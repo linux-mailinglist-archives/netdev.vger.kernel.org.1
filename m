@@ -1,236 +1,95 @@
-Return-Path: <netdev+bounces-205662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D1BDAFF8AA
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 07:55:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F36D5AFF939
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 08:10:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA3887B32B9
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 05:54:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99649565222
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 06:09:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51511286D53;
-	Thu, 10 Jul 2025 05:55:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93AA8235079;
+	Thu, 10 Jul 2025 06:04:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="hfrQuwvl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QTNuYHTm"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 420205383;
-	Thu, 10 Jul 2025 05:55:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6519622068D
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 06:04:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752126930; cv=none; b=RAXjFMJx8654T5wXIId4AX2jnj1puFQbkZyBheF1EGryp6rlm/31muQpdtr2nlijsuQaXYP/T8JaHNs7ZgqrPyl1fwEsw1LDwXEOyPjEqD+Z5VkKNe3ZJIjM3vCWmyO7YDozU2w85FYV1aaGKD6UmdGrUt2U5nnHE0HIS99l17c=
+	t=1752127450; cv=none; b=cUmou/U1QPucX+6roGcVXsvCsMt56P+kbPe2YNlxykiRyE8sKQdqLefXmnD9dE7EcX6lONyl9wpfp0wVV27XOj96WFtGEaPTWnQWn1Ln6UvfGtUXR6WUCXwPhjoVDK84+JbEKZKzak80GI/X0PKaGatdrK4jY8bsSnjKu3rzMPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752126930; c=relaxed/simple;
-	bh=GlRTsNWYMTrAcXnXTGWwFfiMFFeCUzzVnFeqbx0HAzs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lLruVrfmdSKcswuL2Dc/p3peSmouf9/JLsdOS2Q6ZkrWb3tcW7w+KnAZs8p7ybNYm0JpRl1BLlOZIvisfVNALgJ4aFHdAXFpPG5soq1YUdNLYIad2mcZHukIayCB0zR+anrPYhE3y4fkTlZ2hqQaA0dfUDv3zApk/oG6U/nMGyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=hfrQuwvl; arc=none smtp.client-ip=220.197.31.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Ok
-	Omog+xA6ZskFrf7mJLxT2vs7YHH1y9jNOPVQ1DbRU=; b=hfrQuwvlfSGZevpZBB
-	M2b5RmvtGGFuO64H2DqqDVLLUBe4XlCOZgtADHgyYvQctTxuSMIAgALe2gogRy65
-	hxvwpOVDDxLTgZziu789UyTFNTG20xfRBGv7dBE2NuXwpFafhKe2BVlYFMrKZNVb
-	yRVRyckjLVamBdkIIHDmVBUzk=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-2 (Coremail) with SMTP id _____wCnddKLVW9o_xi_Dw--.25287S2;
-	Thu, 10 Jul 2025 13:54:21 +0800 (CST)
-From: Feng Yang <yangfeng59949@163.com>
-To: martin.lau@linux.dev,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	mattbobrowski@google.com,
-	rostedt@goodmis.org,
-	mhiramat@kernel.org,
-	olsajiri@gmail.com
-Cc: bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v2 bpf-next] bpf: Clean up individual BTF_ID code
-Date: Thu, 10 Jul 2025 13:54:19 +0800
-Message-Id: <20250710055419.70544-1-yangfeng59949@163.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1752127450; c=relaxed/simple;
+	bh=B+sJSqD8NmZGbYk1pEEsdF8fEb/eO8C56DGLEoxouDg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iUDej72d7S1VmbDCXZgfNRQ5xVljog3jGl8RsU91e3CfPFd7QZ+ZruUXuaVUUBYy0s1MaJxCIOpr0ukByCMSPPldFkP0MzStLoIRiUEvI5LTpLmWpJvQAx+e5XvqTeEcRjwtG8MpGalfBwPIWFiHdyA9MgAulIOwFFuMdqqfPrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QTNuYHTm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2A24C4CEE3;
+	Thu, 10 Jul 2025 06:04:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752127449;
+	bh=B+sJSqD8NmZGbYk1pEEsdF8fEb/eO8C56DGLEoxouDg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QTNuYHTmPUJJJCAT338pfpgXIUa1sBZGchxxgk3+JKVicggAa57NsABTr/Q09In+t
+	 C3oNq9jKkJaVSyXqiiYrP/aZgOR+9H4dCu+BxWBaaQHRmcG+NcsKF0eNZHXdFNcrbV
+	 vFDg3y7iS2YpSdc/ReiyRWlSUfplnLK5yyGC1RXaVInGmc1fP7tT0+9mjcONH2U7F+
+	 T5orlE5AkGBgKu5JxPdpNJcKFx9Dra8zKZ8kYuo9isAlZ3ouSVkivfj+tefMl0E1UQ
+	 0j4Ir6NN6HFt6LYoopSZk8ywbU00JpiYqHjQ+jeauJrzE3EzOVxXNzekogVv4o0iMI
+	 dec53cfRFAgFA==
+Date: Wed, 9 Jul 2025 23:04:07 -0700
+From: Saeed Mahameed <saeed@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next V6 09/13] devlink: Add 'keep_link_up' generic
+ devlink device param
+Message-ID: <aG9X13Hrg1_1eBQq@x130>
+References: <20250709030456.1290841-1-saeed@kernel.org>
+ <20250709030456.1290841-10-saeed@kernel.org>
+ <20250709195801.60b3f4f2@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wCnddKLVW9o_xi_Dw--.25287S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW3Ww15KFy5AF4UKw15ZrWDJwb_yoW7tr1fpF
-	W8Z3srCr48tw4YgF1DJF4Uuryag3Z5W3y7Cr4DC3ySkF1DXryDWF1jgw13ZF1a9ryqgr9a
-	qr109F1avw1fuFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jnYFAUUUUU=
-X-CM-SenderInfo: p1dqww5hqjkmqzuzqiywtou0bp/1tbipRWGeGhvJOiDmgABsd
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250709195801.60b3f4f2@kernel.org>
 
-From: Feng Yang <yangfeng@kylinos.cn>
+On 09 Jul 19:58, Jakub Kicinski wrote:
+>On Tue,  8 Jul 2025 20:04:51 -0700 Saeed Mahameed wrote:
+>> Devices that support this in permanent mode will be requested to keep the
+>> port link up even when driver is not loaded, netdev carrier state won't
+>> affect the physical port link state.
+>>
+>> This is useful for when the link is needed to access onboard management
+>> such as BMC, even if the host driver isn't loaded.
+>
+>Dunno. This deserves a fuller API, and it's squarely and netdev thing.
+>Let's not add it to devlink.
 
-Use BTF_ID_LIST_SINGLE(a, b, c) instead of
-BTF_ID_LIST(a)
-BTF_ID(b, c)
+I don't see anything missing in the definition of this parameter
+'keep_link_up' it is pretty much self-explanatory, for legacy reasons the
+netdev controls the underlying physical link state. But this is not
+true anymore for complex setups (multi-host, DPU, etc..).
+This is not different as BMC is sort of multi-host, and physical link
+control here is delegated to the firmware.
 
-Signed-off-by: Feng Yang <yangfeng@kylinos.cn>
----
-Changes in v2:
-- Add the missing ones, thanks: jirka.
-- Link to v1: https://lore.kernel.org/all/20250709082038.103249-1-yangfeng59949@163.com/
----
- kernel/bpf/btf.c         | 3 +--
- kernel/bpf/link_iter.c   | 3 +--
- kernel/bpf/prog_iter.c   | 3 +--
- kernel/kallsyms.c        | 3 +--
- kernel/trace/bpf_trace.c | 3 +--
- net/ipv6/route.c         | 3 +--
- net/netlink/af_netlink.c | 3 +--
- net/sched/bpf_qdisc.c    | 9 +++------
- 8 files changed, 10 insertions(+), 20 deletions(-)
+Also do we really want netdev to expose API for permanent nic tunables ?
+I thought this is why we invented devlink to offload raw NIC underlying
+tunables.
 
-diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
-index 2dd13eea7b0e..0aff814cb53a 100644
---- a/kernel/bpf/btf.c
-+++ b/kernel/bpf/btf.c
-@@ -6200,8 +6200,7 @@ int get_kern_ctx_btf_id(struct bpf_verifier_log *log, enum bpf_prog_type prog_ty
- 	return kctx_type_id;
- }
- 
--BTF_ID_LIST(bpf_ctx_convert_btf_id)
--BTF_ID(struct, bpf_ctx_convert)
-+BTF_ID_LIST_SINGLE(bpf_ctx_convert_btf_id, struct, bpf_ctx_convert)
- 
- static struct btf *btf_parse_base(struct btf_verifier_env *env, const char *name,
- 				  void *data, unsigned int data_size)
-diff --git a/kernel/bpf/link_iter.c b/kernel/bpf/link_iter.c
-index fec8005a121c..8158e9c1af7b 100644
---- a/kernel/bpf/link_iter.c
-+++ b/kernel/bpf/link_iter.c
-@@ -78,8 +78,7 @@ static const struct seq_operations bpf_link_seq_ops = {
- 	.show	= bpf_link_seq_show,
- };
- 
--BTF_ID_LIST(btf_bpf_link_id)
--BTF_ID(struct, bpf_link)
-+BTF_ID_LIST_SINGLE(btf_bpf_link_id, struct, bpf_link)
- 
- static const struct bpf_iter_seq_info bpf_link_seq_info = {
- 	.seq_ops		= &bpf_link_seq_ops,
-diff --git a/kernel/bpf/prog_iter.c b/kernel/bpf/prog_iter.c
-index 53a73c841c13..85d8fcb56fb7 100644
---- a/kernel/bpf/prog_iter.c
-+++ b/kernel/bpf/prog_iter.c
-@@ -78,8 +78,7 @@ static const struct seq_operations bpf_prog_seq_ops = {
- 	.show	= bpf_prog_seq_show,
- };
- 
--BTF_ID_LIST(btf_bpf_prog_id)
--BTF_ID(struct, bpf_prog)
-+BTF_ID_LIST_SINGLE(btf_bpf_prog_id, struct, bpf_prog)
- 
- static const struct bpf_iter_seq_info bpf_prog_seq_info = {
- 	.seq_ops		= &bpf_prog_seq_ops,
-diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
-index 4198f30aac3c..1e7635864124 100644
---- a/kernel/kallsyms.c
-+++ b/kernel/kallsyms.c
-@@ -829,8 +829,7 @@ static struct bpf_iter_reg ksym_iter_reg_info = {
- 	.seq_info		= &ksym_iter_seq_info,
- };
- 
--BTF_ID_LIST(btf_ksym_iter_id)
--BTF_ID(struct, kallsym_iter)
-+BTF_ID_LIST_SINGLE(btf_ksym_iter_id, struct, kallsym_iter)
- 
- static int __init bpf_ksym_iter_register(void)
- {
-diff --git a/kernel/trace/bpf_trace.c b/kernel/trace/bpf_trace.c
-index e7f97a9a8bbd..c8162dc89dc3 100644
---- a/kernel/trace/bpf_trace.c
-+++ b/kernel/trace/bpf_trace.c
-@@ -781,8 +781,7 @@ BPF_CALL_1(bpf_task_pt_regs, struct task_struct *, task)
- 	return (unsigned long) task_pt_regs(task);
- }
- 
--BTF_ID_LIST(bpf_task_pt_regs_ids)
--BTF_ID(struct, pt_regs)
-+BTF_ID_LIST_SINGLE(bpf_task_pt_regs_ids, struct, pt_regs)
- 
- const struct bpf_func_proto bpf_task_pt_regs_proto = {
- 	.func		= bpf_task_pt_regs,
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 79c8f1acf8a3..0d5464c64965 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -6805,8 +6805,7 @@ void __init ip6_route_init_special_entries(void)
- #if defined(CONFIG_BPF_SYSCALL) && defined(CONFIG_PROC_FS)
- DEFINE_BPF_ITER_FUNC(ipv6_route, struct bpf_iter_meta *meta, struct fib6_info *rt)
- 
--BTF_ID_LIST(btf_fib6_info_id)
--BTF_ID(struct, fib6_info)
-+BTF_ID_LIST_SINGLE(btf_fib6_info_id, struct, fib6_info)
- 
- static const struct bpf_iter_seq_info ipv6_route_seq_info = {
- 	.seq_ops		= &ipv6_route_seq_ops,
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index e8972a857e51..bea064febf80 100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -2869,8 +2869,7 @@ static const struct rhashtable_params netlink_rhashtable_params = {
- };
- 
- #if defined(CONFIG_BPF_SYSCALL) && defined(CONFIG_PROC_FS)
--BTF_ID_LIST(btf_netlink_sock_id)
--BTF_ID(struct, netlink_sock)
-+BTF_ID_LIST_SINGLE(btf_netlink_sock_id, struct, netlink_sock)
- 
- static const struct bpf_iter_seq_info netlink_seq_info = {
- 	.seq_ops		= &netlink_seq_ops,
-diff --git a/net/sched/bpf_qdisc.c b/net/sched/bpf_qdisc.c
-index 7ea8b54b2ab1..adcb618a2bfc 100644
---- a/net/sched/bpf_qdisc.c
-+++ b/net/sched/bpf_qdisc.c
-@@ -130,8 +130,7 @@ static int bpf_qdisc_btf_struct_access(struct bpf_verifier_log *log,
- 	return 0;
- }
- 
--BTF_ID_LIST(bpf_qdisc_init_prologue_ids)
--BTF_ID(func, bpf_qdisc_init_prologue)
-+BTF_ID_LIST_SINGLE(bpf_qdisc_init_prologue_ids, func, bpf_qdisc_init_prologue)
- 
- static int bpf_qdisc_gen_prologue(struct bpf_insn *insn_buf, bool direct_write,
- 				  const struct bpf_prog *prog)
-@@ -161,8 +160,7 @@ static int bpf_qdisc_gen_prologue(struct bpf_insn *insn_buf, bool direct_write,
- 	return insn - insn_buf;
- }
- 
--BTF_ID_LIST(bpf_qdisc_reset_destroy_epilogue_ids)
--BTF_ID(func, bpf_qdisc_reset_destroy_epilogue)
-+BTF_ID_LIST_SINGLE(bpf_qdisc_reset_destroy_epilogue_ids, func, bpf_qdisc_reset_destroy_epilogue)
- 
- static int bpf_qdisc_gen_epilogue(struct bpf_insn *insn_buf, const struct bpf_prog *prog,
- 				  s16 ctx_stack_off)
-@@ -451,8 +449,7 @@ static struct bpf_struct_ops bpf_Qdisc_ops = {
- 	.owner = THIS_MODULE,
- };
- 
--BTF_ID_LIST(bpf_sk_buff_dtor_ids)
--BTF_ID(func, bpf_kfree_skb)
-+BTF_ID_LIST_SINGLE(bpf_sk_buff_dtor_ids, func, bpf_kfree_skb)
- 
- static int __init bpf_qdisc_kfunc_init(void)
- {
--- 
-2.43.0
+Thanks,
+Saeed.
 
 
