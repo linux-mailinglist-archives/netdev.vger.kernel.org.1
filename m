@@ -1,96 +1,174 @@
-Return-Path: <netdev+bounces-205592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D729AFF617
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 02:44:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 853B9AFF61B
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 02:45:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5CC5171073
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 00:44:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D540F5A508D
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 00:45:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17A7B433A5;
-	Thu, 10 Jul 2025 00:44:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D33EA2260C;
+	Thu, 10 Jul 2025 00:45:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HC/mqOg5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D3E78F54
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 00:44:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A97254685;
+	Thu, 10 Jul 2025 00:45:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752108246; cv=none; b=Cq9hTdQU3nkx+eRD865EGXRAZ5/lFxp00USGwOt4KgooNTmrDSWT0J26e2ym1p23fdTXZsRMtuzBIE9NZcNnZt560vsZn81uz7Misz+wpZkB+4/XnZCjnEP7kw12wqaBIy9eV3DrY4oznwwPkmoV+2PabAi0atgAYRDqgZl6KsU=
+	t=1752108349; cv=none; b=hgx20JlxsZGw4FjmB3S8xewkToL/x3X5lEBdvlqPGLK6LhjT5GKSDnnIvVZ/QptRIAQmVNJZUKN+ii0DAbBdqKTpvUyCCwrmpJOF3OXlhWjFVX1cw47IvhLyyYYfuW4JvsSoPFxqyucL3BvnhP/zR3P5VxlsVJN1eeTG47GLy0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752108246; c=relaxed/simple;
-	bh=GtFfO5UBSQpd6M3n0qyyFSGpUGz7IH8edCIj/6qkjNI=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=FoB41JAEnkhhs+CcUqQwm/Tt7trmCl7n62miLij7WHaSLywjxiNNKEgn6GOwiRBbhIEkZ0b5SADCIa1QnmD/PMx5UDBcDoUcYVenZIHDrLkAwNl93MUJ6zpMpKENgPu+x88Y+nxVwVizjzu3T8uSSfPxFMO4ZZZaEdkeG554t7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-87313ccba79so89808439f.2
-        for <netdev@vger.kernel.org>; Wed, 09 Jul 2025 17:44:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752108243; x=1752713043;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P6ubFXBJaVX9NJ5Nijg0B0BPCDcgJxeSI1/VddLlHAM=;
-        b=EfGta/yzd9y5LB2zyLLhkhGDwg0RUBBvg7Z2oeaUDxz8/AnjVQM43AlvQG6F5WumH2
-         YgxSiXuDmdi0w7N93FGa7/P1KMOwyNPv860cJRyMFVnBS+IBWclBTQcTk9IwTe+d2gym
-         pcamb1Qk6rIxwWFbvGb6BePLHM655aZaO3NdLPuVgtUZq6z5z6ihi4SbKny8Ld2KuRDc
-         wDq/DVv3z9QTACO1L7F3Wma+Ico8o80+WnlowaBjv+NYJs3xx0I+3Nh8tL7MrDBTfgsI
-         HqN68qXh3MY4Pp9y2DBuADqforB6VS2JHDuHeTWhZ35uCu8Ufvch6nL1OJK2TiNXfVqW
-         YmxA==
-X-Forwarded-Encrypted: i=1; AJvYcCV5o2rw5XL/74JM+Zb7HDRZkbxhfue7HQCVBkpdNsF0whoZFeQNzkmfro8GzoujLhlKcWIMOpw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwX44yFtcwJFHa0fTMP7FfV8JCs4PxWciO5B9z8FVemsgCS4MTa
-	FGcc367Z4PReh5pqB3/MFdRWYHbJB8QRjH6sWrFulrHJ6msakuDMcpBG6x2vDFyZi0z1MjDHwFd
-	IYbbhCBS1rdIeWrN12jq0d+j4ROjk7rzqdlf9/CYkEswgMjxR10oseOZPu3M=
-X-Google-Smtp-Source: AGHT+IEEZTrsGg61LrPeklxaxuumgz77c9VLsfiGovZIPBLMORTLfebejWKSzMwqiccyUFrmz9OwM5HLJ3KvEiSnw5pXU5bjBcFZ
+	s=arc-20240116; t=1752108349; c=relaxed/simple;
+	bh=I8FcxIOIccOF8O3uD9BAyqflfYcKOaUA+uygcdy4BKs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lWJay1btcqAY74k6XM5LCsEeLyV28p9f8pfZop6rFPqiiGVd4ctq5n0EB/RcxKeKz/eKrqo3PACicyRglYTGWpzrllNhj7Q1CdsOlGaPoakp8CHOz71Zeoc5YsGz5OJleELMK+HcCLYpGt+ZQyGfs4ejuzdsEx2pwrN/FxLQBYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HC/mqOg5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99BC0C4CEEF;
+	Thu, 10 Jul 2025 00:45:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752108349;
+	bh=I8FcxIOIccOF8O3uD9BAyqflfYcKOaUA+uygcdy4BKs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HC/mqOg5BA8Epnm1y8zqbbSKk19YFNBhzplqqtChWA+juYcbly5iZSoUPxeOYG2LR
+	 AOGz512aCf5E/ai4n817/p+MKIFRWBPmbKh+FWb1I+zjEFosesRSejyWcqcowi1n9y
+	 XZdgM+TBsUDO9p+gC/RugZ7viLF9inOz9L1b6a3mzUvWz22mvFePXBQew/sVOcjgJP
+	 g/VFoFEIkJdLDmQOTWgI0Ljip/yIF5CIoXk74zhaRXqg3Y06pBU/XOD4e32Ig2WNTb
+	 jHc/tkIfT052ix2dM2jxsaUWIRfD63Ye7+7/5/kaH89ghXIbkf9wTiqlaD3BKgfpU2
+	 jDKThEP7PcN5Q==
+Date: Wed, 9 Jul 2025 17:45:47 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Arnd Bergmann <arnd@kernel.org>, Carolina Jubran <cjubran@nvidia.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Mark
+ Bloch <mbloch@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Arnd Bergmann
+ <arnd@arndb.de>, Simon Horman <horms@kernel.org>, Cosmin Ratiu
+ <cratiu@nvidia.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] [v2] devlink: move DEVLINK_ATTR_MAX-sized array off
+ stack
+Message-ID: <20250709174547.3604c42b@kernel.org>
+In-Reply-To: <20250709145908.259213-1-arnd@kernel.org>
+References: <20250709145908.259213-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:408e:b0:864:4aa2:d796 with SMTP id
- ca18e2360f4ac-87968fe0bedmr74344039f.8.1752108243595; Wed, 09 Jul 2025
- 17:44:03 -0700 (PDT)
-Date: Wed, 09 Jul 2025 17:44:03 -0700
-In-Reply-To: <686ea951.050a0220.385921.0015.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <686f0cd3.050a0220.385921.0023.GAE@google.com>
-Subject: Re: [syzbot] [xfs?] INFO: task hung in xfs_file_fsync
-From: syzbot <syzbot+9bc8c0586b39708784d9@syzkaller.appspotmail.com>
-To: anna.luese@v-bien.de, cem@kernel.org, davem@davemloft.net, 
-	edumazet@google.com, horms@kernel.org, jhs@mojatatu.com, jiri@resnulli.us, 
-	john.ogness@linutronix.de, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-xfs@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	pmladek@suse.com, rostedt@goodmis.org, senozhatsky@chromium.org, 
-	syzkaller-bugs@googlegroups.com, xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-syzbot has bisected this issue to:
+On Wed,  9 Jul 2025 16:59:00 +0200 Arnd Bergmann wrote:
+> -	struct nlattr *tb[DEVLINK_ATTR_MAX + 1];
+> +	struct nlattr **tb __free(kfree) = NULL;
 
-commit 0161e2d6950fe66cf6ac1c10d945bae971f33667
-Author: John Ogness <john.ogness@linutronix.de>
-Date:   Mon Dec 9 11:17:46 2024 +0000
+Ugh, now you triggered me.
 
-    printk: Defer legacy printing when holding printk_cpu_sync
+>  	u8 tc_index;
+>  	int err;
+>  
+> +	tb = kcalloc(DEVLINK_ATTR_MAX + 1, sizeof(struct nlattr *), GFP_KERNEL);
+> +	if (!tb)
+> +		return -ENOMEM;
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14b19a8c580000
-start commit:   d006330be3f7 Merge tag 'sound-6.16-rc6' of git://git.kerne..
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=16b19a8c580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=12b19a8c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b309c907eaab29da
-dashboard link: https://syzkaller.appspot.com/bug?extid=9bc8c0586b39708784d9
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15e24a8c580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10ed3582580000
+Cramming all the attributes in a single space is silly, it's better for
+devlink to grow up :/ Carolina could you test this?
 
-Reported-by: syzbot+9bc8c0586b39708784d9@syzkaller.appspotmail.com
-Fixes: 0161e2d6950f ("printk: Defer legacy printing when holding printk_cpu_sync")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
+index 1c4bb0cbe5f0..3d75bc530b30 100644
+--- a/Documentation/netlink/specs/devlink.yaml
++++ b/Documentation/netlink/specs/devlink.yaml
+@@ -853,18 +853,6 @@ doc: Partial family for Devlink.
+         type: nest
+         multi-attr: true
+         nested-attributes: dl-rate-tc-bws
+-      -
+-        name: rate-tc-index
+-        type: u8
+-        checks:
+-          max: rate-tc-index-max
+-      -
+-        name: rate-tc-bw
+-        type: u32
+-        doc: |
+-             Specifies the bandwidth share assigned to the Traffic Class.
+-             The bandwidth for the traffic class is determined
+-             in proportion to the sum of the shares of all configured classes.
+   -
+     name: dl-dev-stats
+     subset-of: devlink
+@@ -1271,12 +1259,20 @@ doc: Partial family for Devlink.
+         type: flag
+   -
+     name: dl-rate-tc-bws
+-    subset-of: devlink
++    name-prefix: devlink-attr-
+     attributes:
+       -
+         name: rate-tc-index
++        type: u8
++        checks:
++          max: rate-tc-index-max
+       -
+         name: rate-tc-bw
++        type: u32
++        doc: |
++             Specifies the bandwidth share assigned to the Traffic Class.
++             The bandwidth for the traffic class is determined
++             in proportion to the sum of the shares of all configured classes.
+ 
+ operations:
+   enum-model: directional
+diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
+index e72bcc239afd..169a07499556 100644
+--- a/include/uapi/linux/devlink.h
++++ b/include/uapi/linux/devlink.h
+@@ -635,8 +635,6 @@ enum devlink_attr {
+ 	DEVLINK_ATTR_REGION_DIRECT,		/* flag */
+ 
+ 	DEVLINK_ATTR_RATE_TC_BWS,		/* nested */
+-	DEVLINK_ATTR_RATE_TC_INDEX,		/* u8 */
+-	DEVLINK_ATTR_RATE_TC_BW,		/* u32 */
+ 
+ 	/* Add new attributes above here, update the spec in
+ 	 * Documentation/netlink/specs/devlink.yaml and re-generate
+@@ -647,6 +645,14 @@ enum devlink_attr {
+ 	DEVLINK_ATTR_MAX = __DEVLINK_ATTR_MAX - 1
+ };
+ 
++enum {
++	DEVLINK_ATTR_RATE_TC_INDEX = 1,		/* u8 */
++	DEVLINK_ATTR_RATE_TC_BW,		/* u32 */
++
++	__DEVLINK_ATTR_RATE_TC_MAX,
++	DEVLINK_ATTR_RATE_TC_MAX = __DEVLINK_ATTR_RATE_TC_MAX - 1
++};
++
+ /* Mapping between internal resource described by the field and system
+  * structure
+  */
+diff --git a/net/devlink/rate.c b/net/devlink/rate.c
+index d39300a9b3d4..83ca62ce6c63 100644
+--- a/net/devlink/rate.c
++++ b/net/devlink/rate.c
+@@ -346,11 +346,11 @@ static int devlink_nl_rate_tc_bw_parse(struct nlattr *parent_nest, u32 *tc_bw,
+ 				       unsigned long *bitmap,
+ 				       struct netlink_ext_ack *extack)
+ {
+-	struct nlattr *tb[DEVLINK_ATTR_MAX + 1];
++	struct nlattr *tb[DEVLINK_ATTR_RATE_TC_MAX + 1];
+ 	u8 tc_index;
+ 	int err;
+ 
+-	err = nla_parse_nested(tb, DEVLINK_ATTR_MAX, parent_nest,
++	err = nla_parse_nested(tb, DEVLINK_ATTR_RATE_TC_MAX, parent_nest,
+ 			       devlink_dl_rate_tc_bws_nl_policy, extack);
+ 	if (err)
+ 		return err;
 
