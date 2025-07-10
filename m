@@ -1,196 +1,196 @@
-Return-Path: <netdev+bounces-205930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C09EBB00D57
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 22:42:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CCECB00D5C
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 22:45:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 735757A3C99
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 20:40:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 047661C876FD
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 20:45:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E00632FF46D;
-	Thu, 10 Jul 2025 20:40:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D1B28B50A;
+	Thu, 10 Jul 2025 20:45:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IkgTu2O2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S1HEh9G4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548DF2FEE32
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 20:40:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3419E2FC017
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 20:45:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752180044; cv=none; b=fWWqJkJcK5ZBjiJdoI1uK+mlERr18SLg+vEnKC/J0NfB7KSwkpS9DBAnOYqZ+LYpT8EGNtN6fyLEb0ItdhIP8bFB9AHrTlPlj3eR7RpqX/COWKvbFGvESwgEk9gRJAQ0MrZqgGgtGFKZlWDKzIlZ25RF3bgK5C4QLKiWEAK4TlY=
+	t=1752180306; cv=none; b=c/w5bxcMdm885I0SgM1uIxK9tLcAOLIbbL5DM3Q1PuMjK0CBrnDe+iL/Nq/NwvbGY55zJPK/Qi4WgadjjhQdPF3tRNf9AXIa47EuhUy0jAbA7b9kcoUtiHS3J1y2v29ilm1GCexCcTc5SZWy+SHCxrFfvbVnydzjJJe2lbrKsI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752180044; c=relaxed/simple;
-	bh=QiQcjwnugEr4scAsaddEGg9VWx9+kWaUrS7Rv6RmOH0=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jXvXuJYFvOkG5jT5mMFuCqBVFlvoTsWzhoNomr+50y+gHfqLy4fiyhlhpLxMgdP3WRYKJyBBJ8dto9c4XXJvHO/aeNm0/TGmnMDnQ8VjUN3pHejeUCfFZ0L6LYF6zUcGKZK4awXaWbGJmyuDGbG2LK/8vhmLmGzp8FlJhlueK5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IkgTu2O2; arc=none smtp.client-ip=209.85.215.178
+	s=arc-20240116; t=1752180306; c=relaxed/simple;
+	bh=fnr2wLEsKBunAwVM2CQHVqnum+xCNPlFlC7W2Ut76jQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dUgX7Xxbf4X1kvFaO0G7ZFYd7iBtoi8JaC9/JJTMq6oHReVbZiS34TwTAaislUuCaG3aa3KbPNoktF2+0q+4yvxilBfdWVK81eEDjtACVlHZ0KzDn6vWE5MtUT1abadWHXrPn6QJz5d1CN4WtS1YFvNfmmYie31Mx+ZKiS0Pkz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S1HEh9G4; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-b0b2d0b2843so1228543a12.2
-        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 13:40:43 -0700 (PDT)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-454cc6e987dso5903435e9.0
+        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 13:45:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752180042; x=1752784842; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/swJcXFTLHY6CJOlRMl4sc3jwx3DFJUcDEDPPCXhstc=;
-        b=IkgTu2O2AW8UJ8ceOqmRnOIScNnDr40p6w3a29uwIYomWhcP7Ud98e+rykx24aZkGB
-         LV1baNarmGUcyoGsU0/5ZYMWfDG5hmxTdurAZtGegz+9EoTeLSvSnqMf2Vp+C5KUDtIO
-         JwDfu+V1K9x2lDnuKQLSpJYmZg44jgTwYkFd+fzEOCKJ/CDYwBzDucVWbhn2sDEjkHcd
-         ocnL9KC9nM095crzTM5rNc7FK3vtZwzFqqpO6you4DVIo7Zzc/l/dGMC7jxXDr1iEkOz
-         kO1//fOoNva8QuYoEidsefs/4Qt5P29tuJ39ESv1EvXobW6ZxDktiFLiZFni+mN/JRmc
-         z0Mg==
+        d=gmail.com; s=20230601; t=1752180302; x=1752785102; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yJr8CSxlO6A2X31kSNvGQDubBn2GH5aSWJS4QhQSy7I=;
+        b=S1HEh9G4dTq5lY7c89uvelqg0nxlb8skBXa6wXrByH8gDCj33jMu+xzyqh1Dw5IhzS
+         uFv4rs2If3n9TDUfDf/fyHKm0PvySlbLaskJ8B0hsDMFOsFJn8edztE3bpWJspeZP8Ly
+         M8GG+kfqusFXG9YZW4XKVCC/LmoNzDrAsuhGtVp7raho7LP86alqAupaNeaISSvJzyDw
+         LhFpXnryYnwTCRrIRi6r912Vcy1pxIdIBOnCMcVeMF2PuOFiKEkMcD8oiJ14jHBsT0wj
+         ocNslto9H/KjIfBLhQ4FA9fuvrrYedmNADgMtr8e6+XY0Zyvx/nwT4DrytiZe+tLE3G0
+         mzcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752180042; x=1752784842;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1752180302; x=1752785102;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/swJcXFTLHY6CJOlRMl4sc3jwx3DFJUcDEDPPCXhstc=;
-        b=qFuoLH7HaxGao+NWK+7HBz5W0WmQUY+DmD87d8VxsLwWnm7NAVbZ354JZ8v5ky3GX4
-         AsqtZBiHrTesuYJ6cCU10xkkzmnV89sqI/kvAtqoM3u4fduouscYZ8XLbtAolpLAC8Qp
-         E7UicJRe1ECsIds3H+IGCHax3Be8wRhG8YBX7s6hzVJebQEx+BLswtlYqK+yWG/QjS0/
-         UfDLEhmgcVRC3Qes7tg+X6uBK3f+E421OfwjPwg3ntFzLvyc8sDUHmueJ0RWl5HBBPB/
-         sOyXkom1bAwrGqe4YrbR7FVyBlJMb/k0bEZwnBfVIEfj4iKQdmSwTGERn1gPJiy7CFh5
-         nyxg==
-X-Gm-Message-State: AOJu0YwgXph/M7OSb6q77CWBH0s1iK6SYRjRoZHmLJPZvRROKDrmqsYp
-	55zM5TW0biTkgjfil3WAGjp2c7kzfUUiuSaRCdiGUisziaJVzan3D7kMHLU1Yhh6
-X-Gm-Gg: ASbGncs2xNqFzeZdcMqKir+EqbtrbQPwk+VXVMoltuHzPAxzojPiaP2JDiL0FDwkJz0
-	WSr+jP64sTZgNqahEqzc5w+lfeNu8FTb38ohiEDtyDauo/M5NJRwuYppAIwUu9PhorH/62DgDJJ
-	USYY4Ik9/iEgkJOTkmUDWmr8grcVsAs6oeK1LVxFIZnxVMgjlOC5zE+nPBJn1ov1zOqT/iU/YRt
-	zvjMkaCui4JefcfqIJ4QY+UtMIKrE59Ck22gGiEuJAJ5rGCl8+4YUl96Gmh17XtAVJjwE/irYt7
-	Vrp8nYzlaXHAmwIddmA7FyW+nPEQ0vXPi7jr8u54DLw=
-X-Google-Smtp-Source: AGHT+IFFyih9eu5JnZ8rSQxVu+1wb0KHiBoxnf9H2MijGkZSGq2/mlDfU0F/w6GhGgqG7J0QfUJ9lA==
-X-Received: by 2002:a17:90a:3945:b0:315:af43:12ee with SMTP id 98e67ed59e1d1-31c4cce5478mr929721a91.16.1752180042392;
-        Thu, 10 Jul 2025 13:40:42 -0700 (PDT)
-Received: from archlinux.lan ([2601:644:8200:dab8::1f6])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31c3eb7f4d7sm3547861a91.46.2025.07.10.13.40.41
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Jul 2025 13:40:42 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Subject: [PATCH net-next 11/11] net: gianfar: iomap with devm
-Date: Thu, 10 Jul 2025 13:40:32 -0700
-Message-ID: <20250710204032.650152-12-rosenp@gmail.com>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250710204032.650152-1-rosenp@gmail.com>
-References: <20250710204032.650152-1-rosenp@gmail.com>
+        bh=yJr8CSxlO6A2X31kSNvGQDubBn2GH5aSWJS4QhQSy7I=;
+        b=lcbhKcX0f7DOP5VGicL0mWAFky6KaZZScktW1x62SR2aYyYNBf3Phs9hScTuDIWjrL
+         BxyNXZApgQiMsr7Rt+fhwibDar6+iSo6+3gXYvlxbBjqM+KsmVHV0b3l4UNFOK9B2iU+
+         cKchyfuB6bxfouGLn904rkTxTUR1bSzTgbam2nSkCZfkGYaWq+luurrrRfUtraOdB8X/
+         P7nyUm3qNqLyoRQWll7AFJm3acDVK+x4eLWAn+0xWFacOY70iuqArfCX/TkkLC99veuq
+         3Kn0BxQK+F9EWuJGAJoZAHHQjTSK9W9Lopi2kryCprSVrEWWP9tVBWuZNbEA2nGfkSWZ
+         8XoA==
+X-Forwarded-Encrypted: i=1; AJvYcCWZfQrrkOR2JXOQTA+9tehckDLZZjb6k0VGrzRjg5zEedMJXmevhZvvO3FlNob64f6A/ed3kgU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqjSgCoQIis7Mlq+yvNZmEO1aQAY5/AfF6rvzwvJw9i1pWPMM4
+	rkWlrOUcVRqTZdZXc2h6E+JLjAPbdUCxNEuBfpo116JlAAhdiDR/PMIwB8AVrt0GTnPyLgabq7y
+	5H9DxgQjIGJZqBj70KnvpKUXMrGCpAl4=
+X-Gm-Gg: ASbGnctXzXGWqKYLY27oACUR/6TPrRstbTZpcgdan1lq1EAmr11huXYohrr6ooiUmYS
+	jU/GvyfovXTrWvUAAGbHdTdxJl5DjUDGME2bVPGGNeM8w3QJTByTUKklj2aFPTMx6aYteQEuo7R
+	ke2D/mdKZxmshx6CyZhmMmAIlfVdpbloEA4dnKb6BDCTV9BNilZ3eMfC8if19LEaqMIJ5fjVlks
+	QX2cspg0KezsAoKXrQdKk5pSsu27VDqGqSo0oIw
+X-Google-Smtp-Source: AGHT+IGs1zj2X+mnw9SOem9pECR/UXkEPJfGQgUQipC9CSfofddfA28Tw9fVX3adpWKZSDMzQMZc91S+PTCuUmmLuCA=
+X-Received: by 2002:a05:600c:5014:b0:43c:f3e1:a729 with SMTP id
+ 5b1f17b1804b1-454db8bf2demr46078345e9.12.1752180302220; Thu, 10 Jul 2025
+ 13:45:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <aGT_hoBELDysGbrp@shell.armlinux.org.uk> <E1uWu14-005KXo-IO@rmk-PC.armlinux.org.uk>
+ <20250702151426.0d25a4ac@fedora.home> <aGU2C3ipj8UmKHq_@shell.armlinux.org.uk>
+ <CAKgT0UcWGH14B0zZnpHeJKw+5VU96LHFR1vR4CXVjqM10iBJSg@mail.gmail.com>
+ <aGWF5Wee3vfoFtMj@shell.armlinux.org.uk> <CAKgT0UdVW6_hewR7zNzMd_h7b_Lm_SHdt72yVhc7cLHcfFxuYQ@mail.gmail.com>
+ <14b442ad-c0ab-4276-8491-c692f0b7c5c9@lunn.ch> <CAKgT0UfXRsVEgvJScapiXNWyqB8Yd07t5dgrKX82MRup78tXrw@mail.gmail.com>
+ <aHAH53ZEE3snK4IE@shell.armlinux.org.uk>
+In-Reply-To: <aHAH53ZEE3snK4IE@shell.armlinux.org.uk>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Thu, 10 Jul 2025 13:44:25 -0700
+X-Gm-Features: Ac12FXw2UXJK4W3aU_xWFKpOY1Hz6ggOH1WxeNvVjZOOfu1IoqHa0p8IgrJE-1E
+Message-ID: <CAKgT0UfB-CKBsAPHRA3TMuiAdiAbBEVTHcEUgmCHL-q0zJMRJA@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/3] net: phylink: add phylink_sfp_select_interface_speed()
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Remove unmap_group_regs as it no longer served a purpose. devm can
-handle this automatically.
+On Thu, Jul 10, 2025 at 11:35=E2=80=AFAM Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> On Thu, Jul 10, 2025 at 10:22:44AM -0700, Alexander Duyck wrote:
+> > On Thu, Jul 10, 2025 at 9:11=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wr=
+ote:
+> > > What is wrong, that it is reporting LP information, or that it is
+> > > reporting it does not support autoneg when in fact it is actually
+> > > doing autoneg?
+> >
+> > I have some debug code on here that is reporting the FW config as the
+> > "LP Advertised". I had borrowed that approach from the phylink
+> > fixedlink config as I thought it was a good way for me to know what
+> > the FW was requesting without having to report it out to a log file.
+>
+> There are a few points to be made here.
+>
+> 1. Fixed link configuration is not the same as !autoneg setting with
+>    the presence of a PHY. !autoneg with a PHY present means that the
+>    PHY has been instructed not to perform autonegotiation, but to set
+>    the specified parameters for the link and only allow the link to
+>    operate at the specified speed/duplex. There are exceptions - as
+>    users expect 1G to work with "autoneg" disabled, and 1G requires
+>    AN in order to bring the link up. Some PHYs support disabling the
+>    autoneg function at 1G speed by internally ignoring the request
+>    to disable autoneg, and instead only advertising to the link
+>    partner that 1G at the specified duplex is supported. We took
+>    that and turned it into a software thing for all PHYs as some
+>    PHYs decided to go a different route - basically not supporting
+>    the AN enable bit being turned off at 1G speeds.
+>
+> 2. Fixed link configuration is a software concept where there is no
+>    accessible PHY present. Phylink rejects fixed link configuration
+>    with a PHY. There is no support to configure a PHY into fixed
+>    speed/duplex if present, and has never been supported prior to
+>    phylink.
+>
+> 3. The history. Prior to phylink (and it remains in some cases today),
+>    fixed link configuration was created by providing a software
+>    emulated PHY to phylib for the MAC driver to use, thus avoiding
+>    MAC drivers having to add explicit code for fixed links. They
+>    looked just like a normal PHY, but was limited to no faster than
+>    1G speeds as the software emulation is a Clause 22 PHY.
+>
+>    This software emulated PHY replaces the presence of a physical
+>    PHY (there is none) and the PHY it emulates looks like a PHY that
+>    supports AN, has AN enabled, but only supports a single speed
+>    and duplex, only advertises a single baseT(x) speed and duplex,
+>    and the link partner agrees on the speed and duplex. This "fools
+>    phylib into resolving the speed and duplex as per the fixed link
+>    configuration.
+>
+>    However, in reality, there is no AN.
+>
+>    This has become part of the user API, because the MII registers of
+>    the fixed link PHY were exported to userspace, and of course through
+>    ethtool.
+>
+>    There has never been a MII API for reading the fixed link parameters
+>    for speeds > 1G, so while phylink enables fixed link configuration
+>    for those speeds, there is no MII register support for this for
+>    userspace.
 
-Remove gotos as they are no longer needed.
+So the issue is in our setup we have a SerDes PHY so it isn't a real
+MII based PHY and it is being managed by the firmware so we don't have
+direct access.
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
- drivers/net/ethernet/freescale/gianfar.c | 26 +++++-------------------
- 1 file changed, 5 insertions(+), 21 deletions(-)
+One thought I was playing around with was emulating a 25/50/100G PMA
+and AN in software and exposing that as the interface to the FW to
+play the role of the PHY. The FW is playing the role of a device tree
+configuration in that the EEPROM is pre-programmed with the expected
+speed/lane/FEC configuration and the FW is reading that to determine
+what the link configuration should be as we cannot use autoneg as the
+switch port on the other side doesn't support it. For our production
+use case we will always be using that speed, but for testing we will
+need to support the ability to set manual speeds.
 
-diff --git a/drivers/net/ethernet/freescale/gianfar.c b/drivers/net/ethernet/freescale/gianfar.c
-index bc1d7c4bd1a7..1932c6d8bc66 100644
---- a/drivers/net/ethernet/freescale/gianfar.c
-+++ b/drivers/net/ethernet/freescale/gianfar.c
-@@ -442,15 +442,6 @@ static int gfar_alloc_rx_queues(struct gfar_private *priv)
- 	return 0;
- }
- 
--static void unmap_group_regs(struct gfar_private *priv)
--{
--	int i;
--
--	for (i = 0; i < MAXGROUPS; i++)
--		if (priv->gfargrp[i].regs)
--			iounmap(priv->gfargrp[i].regs);
--}
--
- static void disable_napi(struct gfar_private *priv)
- {
- 	int i;
-@@ -484,7 +475,7 @@ static int gfar_parse_group(struct device_node *np,
- 			return -ENOMEM;
- 	}
- 
--	grp->regs = of_iomap(np, 0);
-+	grp->regs = devm_of_iomap(priv->dev, np, 0, NULL);
- 	if (!grp->regs)
- 		return -ENOMEM;
- 
-@@ -691,13 +682,13 @@ static int gfar_of_init(struct platform_device *ofdev, struct net_device **pdev)
- 			err = gfar_parse_group(child, priv, model);
- 			if (err) {
- 				of_node_put(child);
--				goto err_grp_init;
-+				return err;
- 			}
- 		}
- 	} else { /* SQ_SG_MODE */
- 		err = gfar_parse_group(np, priv, model);
- 		if (err)
--			goto err_grp_init;
-+			return err;
- 	}
- 
- 	if (of_property_read_bool(np, "bd-stash")) {
-@@ -720,7 +711,7 @@ static int gfar_of_init(struct platform_device *ofdev, struct net_device **pdev)
- 
- 	err = of_get_ethdev_address(np, dev);
- 	if (err == -EPROBE_DEFER)
--		goto err_grp_init;
-+		return err;
- 	if (err) {
- 		eth_hw_addr_random(dev);
- 		dev_info(&ofdev->dev, "Using random MAC address: %pM\n", dev->dev_addr);
-@@ -768,7 +759,7 @@ static int gfar_of_init(struct platform_device *ofdev, struct net_device **pdev)
- 	if (!priv->phy_node && of_phy_is_fixed_link(np)) {
- 		err = of_phy_register_fixed_link(np);
- 		if (err)
--			goto err_grp_init;
-+			return err;
- 
- 		priv->phy_node = of_node_get(np);
- 	}
-@@ -777,10 +768,6 @@ static int gfar_of_init(struct platform_device *ofdev, struct net_device **pdev)
- 	priv->tbi_node = of_parse_phandle(np, "tbi-handle", 0);
- 
- 	return 0;
--
--err_grp_init:
--	unmap_group_regs(priv);
--	return err;
- }
- 
- static u32 cluster_entry_per_class(struct gfar_private *priv, u32 rqfar,
-@@ -3287,7 +3274,6 @@ static int gfar_probe(struct platform_device *ofdev)
- register_fail:
- 	if (of_phy_is_fixed_link(np))
- 		of_phy_deregister_fixed_link(np);
--	unmap_group_regs(priv);
- 	of_node_put(priv->phy_node);
- 	of_node_put(priv->tbi_node);
- 	return err;
-@@ -3303,8 +3289,6 @@ static void gfar_remove(struct platform_device *ofdev)
- 
- 	if (of_phy_is_fixed_link(np))
- 		of_phy_deregister_fixed_link(np);
--
--	unmap_group_regs(priv);
- }
- 
- #ifdef CONFIG_PM
--- 
-2.50.0
+> (As an aside)
+> Someone earlier today sent a reminder about a bug I'd introduced for
+> 10GBASE-R, 5GBASE-R and another interface (I don't recall right now)
+> and I proposed a patch that only cleared the Autoneg bit in the
+> adertising mask. Having been reminded about it, and had Andrew's
+> input on this thread, I'm wondering whether config.advertising
+> should be entirely cleared as in !autoneg mode, the advertising mask
+> makes no sense.
+>
+> However, I'm supposed to be on my vacation, so I'm not going to start
+> testing anything... this email as a bonus that would've otherwise have
+> been delayed by about two weeks... but the way things are going (family
+> issues) it could turn out to be a lot longer as I may have to become a
+> full time carer. So much for an opportunity to have an opportunity to
+> relax, which I desperately need.
 
+Enjoy your vacation. It will probably take me a while to try to work
+out an acceptable solution for how to deal with the buried/hidden PHY
+behind the firmware anyway. For now this thread has become more about
+fbnic anyway then your original patch since we have more-or-less
+verified it works as expected.
 
