@@ -1,122 +1,163 @@
-Return-Path: <netdev+bounces-205966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C99BB00F34
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 01:03:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF7E8B00F38
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 01:05:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4D2C5C4023
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 23:03:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34A1B5C48E3
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 23:05:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84F872980A6;
-	Thu, 10 Jul 2025 23:03:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30C52291C11;
+	Thu, 10 Jul 2025 23:05:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HVYfHP58"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="frrIqENr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B3E0235BE2;
-	Thu, 10 Jul 2025 23:03:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89CA82459E1;
+	Thu, 10 Jul 2025 23:05:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752188626; cv=none; b=CmcsbN/mI1ErbY8zIRlvSoxpdAgCY//VqblfGiFliP1gpPsD5ctB+BPe6GB/URTQiRrre/efQr1dUsw50U6rDfgDOKgQYGLZsa24Er09EcDmc5XTY0yWCUE80S7zclo6b4+btxKQHsmx4A0bYJvHgsUEFFv8guLzvtZlWXJWu9I=
+	t=1752188711; cv=none; b=dsAtRkY2UzWp6h6ibHTHwHfFeQHjkd1Ti93U3oo2ruLpSdtSA0jY0mJbhrWXLRab1OiFJyhvW4+br1NoRa3hfpVAmqVAel4wcIulZ8gFsJIVhAVmCMaV67P99qr22Sh/wtQPJew8girIJN1AHfiD4SJUYaLivduQPn7145ihoF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752188626; c=relaxed/simple;
-	bh=a9enHCjaCkHMvTXJ1wWxdEuVCCVpWZ3hrmLMofq177g=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=eP62VhHkj1YUbyF9pQwMn//YMGq5KaOSBj1MuiFZFYXWMXisaMzf2ZFrbyNz+KEqf8ZQiFxf1uSzucM0tFYAmHfc8Qw4b1HeI7mUjEzHzcRpF/Kkij0B6nhZGc8TV2tsbbu3mZw0W14VMqk/DcX6wi3dDz23Rax5UP4l/iH+qBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HVYfHP58; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-234c5b57557so16256335ad.3;
-        Thu, 10 Jul 2025 16:03:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752188624; x=1752793424; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IWfnonDyLQW4nF8T6gu1K43HYSw1uIJUKk+sbJA25mo=;
-        b=HVYfHP58JZVsvVyfijzJ2DBZhlXN3Ou9qrnsLUS/aGKlZXSsrd9G5hCg78uEm5ULZM
-         OL4d81wS5+7aWDHnSqm7ucxTn8Yj+tpuHtHXyGiGztJ1i5n0Jrrkx0ZFVQnAk9yPNdTI
-         s1iUhNhEayLtmbyJjBUfgnAIDKEVSWLBGgnASBdNQSvR8aFPVg+bWF449KoqQNTRv5b/
-         azjL8+9KSEma44/Dq2t4jGuYFJ2wJsa1rJ26KpsUyqoEMsHy58roOlBSMWaHZ5ygBoE7
-         wNMFY0V5Gk4WmQSE3dnFCAT5b/3BwNVl1zUN4FBoZjJfqalyBhaJ8a8mRaRJGF/X4hsT
-         gvUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752188624; x=1752793424;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=IWfnonDyLQW4nF8T6gu1K43HYSw1uIJUKk+sbJA25mo=;
-        b=oeFgnh0+0B/0gEcugyw4crg4o7XU1CUFLmm0n9e2h2a5q8iUhKYGuh4ZDDhUzRw75T
-         IOHk+4qc0MIefSeU0bB6A1hLv+qYhLFVSsy1hAfHfS8X4Zan5BIwf1J+8iPZyKvvqBoF
-         ofn8cc532TVKn3E4k7l34szVnzJz1gCfRyCrLiG7ENhuTcdM+dPwEFxpJ8tHTaLoEIK7
-         8RYFMljmAYciwS35xeqwxFO7S//fAoH3JznJ9ncm7gs6x8zk1GTeppTK/UiO9h9nqJeN
-         M2gY9qILj7PCKi67pPXFCRbiIidfnYu+LxmVrY6rkcw+a2tkhPJ+Wg3keDG/wNZhMmH5
-         knuw==
-X-Forwarded-Encrypted: i=1; AJvYcCUQFDCChw6Rr2doWWtUaWg5z/Tq6ITBDXKee0Y/IydguwXiW2FDUPhK+T8uBiCsOeWUKl3F3zijQxcHhFMR@vger.kernel.org, AJvYcCVVNJ5tkk24deXWzqDi+Hyh0zTmPGJowvTqjtQGyYMjPufKxNZzcdJHKgT8/vzfY4WpX5GmsEIiYWdq@vger.kernel.org, AJvYcCVr3VNt+dFeAuiVFtO1e4seyO755O8GVIFPp9TVRXGF0/B2H+iCnXCMDH5pk9Y/3nJD4Yyioiz0pZSQLR7D1Bs=@vger.kernel.org, AJvYcCXDpU0XMLOY2zW2smxU3xUO64DLzSE3RZwt773NOk9zr6/Gd8wwuzyHyZ8VMdj/aXSQnwzVRdAGIGOH@vger.kernel.org, AJvYcCXcbXqRrB2F0R+4GkFOUkeOvWor7gOSqooiE+Fz8OhsZEUi6F2iv1/ziem0gnnuyXQbWNZtRzo0@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4UJ1UTSDE4zi0+kf2DG0NeFkBrvIKneIDqQulrhhXJVLdi29p
-	qwY0dbXWtZ33vJvlKv2ME2T4B+vMR10kZZNjGOheC7SPaCxpjusGxy/GZ1l2WN7L
-X-Gm-Gg: ASbGnctlkagiUXPNtbon0kEUxtBCCuUyS59b7Q0umWBhR7teorGdymT8uQQAKPl3zDb
-	iBpa3iVFpaVlaSWMS9uR5pLergopr8C4gW7dmVV3aJAPZn0dV0Ti5suXr71BPKus7zX0BTKNyHg
-	2H/UUubMQs3jcP4cDL064Fy4DyN6MqLBYvRiuLk6pAJt8CzHjZ3GrfgFHn6YKLfG5bmmF9rKFEm
-	Lw+uj9iMIryr7l98qgNE1IHxYffKqYgtwbtCyB8LJ/i0cIiF4MeydZ9lFhM2Cy2p7Cg2ZegBbN0
-	ET+FxiSC/wppEatYDof2JHI/QLzic3/sF3+qRDeogYqa6pazBbZwocPCky3IMHs7c50g9dFTc8L
-	1Ya4ZrzHyMIo953+WyTh9Cqw/u3OllV5246Ma69RT2FmVh93iGCWFNkjVYyNF+JhyInvxYVZW2c
-	DM
-X-Google-Smtp-Source: AGHT+IEp6V8DzKUuaw7dIuw9i6/aRzFnGpSetRLQWo+gM4+bD2+wZcV715hpfDegv6ZhtdX0w3OqVA==
-X-Received: by 2002:a17:903:4b0d:b0:234:8f5d:e3a4 with SMTP id d9443c01a7336-23dede2f256mr13672265ad.2.1752188624200;
-        Thu, 10 Jul 2025 16:03:44 -0700 (PDT)
-Received: from localhost (p5332007-ipxg23901hodogaya.kanagawa.ocn.ne.jp. [180.34.120.7])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de42ad3absm34659995ad.83.2025.07.10.16.03.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Jul 2025 16:03:43 -0700 (PDT)
-Date: Fri, 11 Jul 2025 08:03:37 +0900 (JST)
-Message-Id: <20250711.080337.1396232450801945990.fujita.tomonori@gmail.com>
-To: dakr@kernel.org
-Cc: fujita.tomonori@gmail.com, miguel.ojeda.sandonis@gmail.com,
- kuba@kernel.org, gregkh@linuxfoundation.org, robh@kernel.org,
- saravanak@google.com, alex.gaynor@gmail.com, ojeda@kernel.org,
- rafael@kernel.org, a.hindborg@kernel.org, aliceryhl@google.com,
- bhelgaas@google.com, bjorn3_gh@protonmail.com, boqun.feng@gmail.com,
- david.m.ertman@intel.com, devicetree@vger.kernel.org, gary@garyguo.net,
- ira.weiny@intel.com, kwilczynski@kernel.org, leon@kernel.org,
- linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
- lossin@kernel.org, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
- tmgross@umich.edu
-Subject: Re: [PATCH v3 0/3] rust: Build PHY device tables by using
- module_device_table macro
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <bbd52251-a2ac-4d9a-9b3d-62f968c646bd@kernel.org>
-References: <aG2g7HgDdvmFJpMz@pollux>
-	<20250709.110837.298179611860747415.fujita.tomonori@gmail.com>
-	<bbd52251-a2ac-4d9a-9b3d-62f968c646bd@kernel.org>
+	s=arc-20240116; t=1752188711; c=relaxed/simple;
+	bh=AsL5B47N7rn88G9CKRVlNdr9ATBJ4SMCr2hWerJhB6I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NktW0LJVBX+dJ5X7kPZNxEFpfoWfMBQwclIsJF+EuCJi69RDsa5TRREcfku1q/iZjel8RDLGH2tQF52I9ZaZfsnzVOD/jnrYSteV9hEGHTa173CpWCcW9KcReJ0YozCRGyrvAuymwk+d6ObUBgDo1j0hhQhHMKSZv1cmBzhkjSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=frrIqENr; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=iTgnOZFNlsykscfQThRLMC9ap/4lnKTed6F778FE57I=; b=frrIqENrDbVafPwpEWHU2znUT7
+	jVmHOPMF57EI5O7ED3T9SMq7HXOhRDR2CyG8GhgwCqtcJlmNKhOqtW40gBWC781FmmYaIAz7dd+EZ
+	0qytB2rQtfx0Dt+GYzDiCwGSzQfDAE78i7+VvdhiwBJRwaJbKs9oYM4NZetH2KNcgNHhxQfuTdfic
+	TGsoUlTlCBiRacj7NcVt63I8+vjNk6FN7V3E/jPqoLnlh9ewusNPMUwkkU7W6tePjCKR9hXmJYXIh
+	+JhLa8pf6Wx/M3on23T1DP4ZS+5UzhL/d26kPMkfalMBlhx0vWAjiQAYLmavLQu5Jwbb4tD4X+bC6
+	6762wEug==;
+Received: from [50.53.25.54] (helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1ua0KA-0000000DEBV-3yjZ;
+	Thu, 10 Jul 2025 23:05:07 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: linux-kernel@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>,
+	netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next] net: wangxun: fix VF drivers Kconfig dependencies and help text
+Date: Thu, 10 Jul 2025 16:05:06 -0700
+Message-ID: <20250710230506.3292079-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Thu, 10 Jul 2025 22:01:56 +0200
-Danilo Krummrich <dakr@kernel.org> wrote:
+On x86_64, when CONFIG_PTP_1588_CLOCK_OPTIONAL=m,
+CONFIG_LIBWX can be set to 'y' by either of TXGBEVF=y or NGBEVF=y,
+causing kconfig unmet direct dependencies warning messages:
 
-> On 7/9/25 4:08 AM, FUJITA Tomonori wrote:
->> On Wed, 9 Jul 2025 00:51:24 +0200
->> Danilo Krummrich <dakr@kernel.org> wrote:
->>> Here's the diff to fix up both, I already fixed it up on my end -- no
->>> need to
->>> send a new version.
->> Thanks a lot!
-> 
-> Given the comments from Trevor, do you want me to wait for a respin,
-> consider
-> the few nits when applying, or apply as is?
+WARNING: unmet direct dependencies detected for LIBWX
+  Depends on [m]: NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_WANGXUN [=y] && PTP_1588_CLOCK_OPTIONAL [=m]
+  Selected by [y]:
+  - TXGBEVF [=y] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_WANGXUN [=y] && PCI [=y] && PCI_MSI [=y]
+  - NGBEVF [=y] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_WANGXUN [=y] && PCI_MSI [=y]
 
-Thanks, I'll send v4 shortly.
+and subsequent build errors:
+
+ld: vmlinux.o: in function `wx_clean_tx_irq':
+drivers/net/ethernet/wangxun/libwx/wx_lib.c:757:(.text+0xa48f18): undefined reference to `ptp_schedule_worker'
+ld: vmlinux.o: in function `wx_get_ts_info':
+drivers/net/ethernet/wangxun/libwx/wx_ethtool.c:509:(.text+0xa4a58c): undefined reference to `ptp_clock_index'
+ld: vmlinux.o: in function `wx_ptp_stop':
+drivers/net/ethernet/wangxun/libwx/wx_ptp.c:838:(.text+0xa4b3dc): undefined reference to `ptp_clock_unregister'
+ld: vmlinux.o: in function `wx_ptp_reset':
+drivers/net/ethernet/wangxun/libwx/wx_ptp.c:769:(.text+0xa4b80c): undefined reference to `ptp_schedule_worker'
+ld: vmlinux.o: in function `wx_ptp_create_clock':
+drivers/net/ethernet/wangxun/libwx/wx_ptp.c:532:(.text+0xa4b9d1): undefined reference to `ptp_clock_register'
+
+Add dependency to PTP_1588_CLOCK_OPTIONAL for both txgbevf and ngbevf.
+This is needed since both of them select LIBWX and it depends on
+PTP_1588_CLOCK_OPTIONAL.
+
+Drop "depends on PCI" for TXGBEVF since PCI_MSI implies that.
+
+Move the driver name help text to the module name help text for
+both drivers.
+
+Fixes: 377d180bd71c ("net: wangxun: add txgbevf build")
+Fixes: a0008a3658a3 ("net: wangxun: add ngbevf build")
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>
+Cc: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+---
+ drivers/net/ethernet/wangxun/Kconfig |   17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
+
+--- linux-next-20250710.orig/drivers/net/ethernet/wangxun/Kconfig
++++ linux-next-20250710/drivers/net/ethernet/wangxun/Kconfig
+@@ -66,35 +66,34 @@ config TXGBE
+ 
+ config TXGBEVF
+ 	tristate "Wangxun(R) 10/25/40G Virtual Function Ethernet support"
+-	depends on PCI
+ 	depends on PCI_MSI
++	depends on PTP_1588_CLOCK_OPTIONAL
+ 	select LIBWX
+ 	select PHYLINK
+ 	help
+ 	  This driver supports virtual functions for SP1000A, WX1820AL,
+ 	  WX5XXX, WX5XXXAL.
+ 
+-	  This driver was formerly named txgbevf.
+-
+ 	  More specific information on configuring the driver is in
+ 	  <file:Documentation/networking/device_drivers/ethernet/wangxun/txgbevf.rst>.
+ 
+-	  To compile this driver as a module, choose M here. MSI-X interrupt
+-	  support is required for this driver to work correctly.
++	  To compile this driver as a module, choose M here. The module
++	  will be called txgbevf. MSI-X interrupt support is required
++	  for this driver to work correctly.
+ 
+ config NGBEVF
+ 	tristate "Wangxun(R) GbE Virtual Function Ethernet support"
+ 	depends on PCI_MSI
++	depends on PTP_1588_CLOCK_OPTIONAL
+ 	select LIBWX
+ 	help
+ 	  This driver supports virtual functions for WX1860, WX1860AL.
+ 
+-	  This driver was formerly named ngbevf.
+-
+ 	  More specific information on configuring the driver is in
+ 	  <file:Documentation/networking/device_drivers/ethernet/wangxun/ngbevf.rst>.
+ 
+-	  To compile this driver as a module, choose M here. MSI-X interrupt
+-	  support is required for this driver to work correctly.
++	  To compile this driver as a module, choose M here. The module
++	  will be called ngbefv. MSI-X interrupt support is required for
++	  this driver to work correctly.
+ 
+ endif # NET_VENDOR_WANGXUN
 
