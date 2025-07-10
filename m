@@ -1,125 +1,222 @@
-Return-Path: <netdev+bounces-205887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6B28B00AFD
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 20:07:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B4AAB00B2C
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 20:12:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C9DF17D536
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 18:07:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F17CE3BCCE6
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 18:11:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5782FC3B2;
-	Thu, 10 Jul 2025 18:07:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 884322FCE18;
+	Thu, 10 Jul 2025 18:12:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Cnjvnysb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4TOwDzQO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30D7B12B71
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 18:07:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C844927F198
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 18:12:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752170828; cv=none; b=WXhxAlZu5gdGLnc3HKX/FtVg62uQvCtCCHg702qFJjgjDnkoIEX6rZNIvWLaZRY1No7ZXmK+R1yOfAvkM5E07988Li8HQgc6sJH6pyufyhdK0J3BgKbEVE50Fv5NTiSylwW1NYDzxpnlU9OrTzANjQbVglPaIVUd71NVIaMREqs=
+	t=1752171127; cv=none; b=oSGNorxXx457AS7Y/wUMwDfaJ+Ncs2UhzFG+5axgO4B8Uxww8dKbWzDSzzLWV0pRiNglx8XrtqTTumSJj/+8x4mYOAFe0odC/UUhsIeku8z/4npRETtH61dH2QICBwNyoVqH2qlngCB4sLXpo6M2b1jWq9zv65ktgUPy4HmrhKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752170828; c=relaxed/simple;
-	bh=x+ZF//+d2KLA0HgVudjhpEcPepg8tsPtSahbthlfAFk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZAurC6wAdXWAJqqpbx5+Mm/c25TVU+X5P8rLndv1/c1NmnfsuHWZo9H6oTGPKDqg3ebt6T/7xCZwSAc7B4XVtILim6FNRLhRgCDnKXcK9ixYLpWPvqp5o4RG1ZdWinNTIDF6ZlFmxhZ8eGkmWTSbQ7nSA5qX4bwgA0LUf5SmYck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Cnjvnysb; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56AHYvg1013180;
-	Thu, 10 Jul 2025 18:06:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=UMZnw2mPFViSIIspfxL8aFoXe70mX
-	uEmmobwjjLLiVc=; b=CnjvnysbkUc+cWIdVUATlsAkhG58KZn20agtBHhcWrzey
-	EDUl1MMxp3Uw5vAJR3Jj/SosAQu+4VOalBXbg4WXC3+C/OVbUoNuBxqbXv4GTEdM
-	Wt8VGkagSl/qTm9+PmOZltJo0r3CFbXfx7hP1NNq977pyth7u0Px4SSTT7Ljiwor
-	H2UzWqOtQ/aNxosbR+eKla6XbPIEPES1cEbwLnrEsiHKI3GEYNWUybD4K4e/MoIn
-	wH1qhRSMaD8mQIrOVC1uEMNdpd0tbRmbVXIz/va8LX3BqiVk1IMqK4egDpaIV9QF
-	Sozmgs6vZgAWsl4KTLJ6ljJ3/gmIU7JoNOnltl9Lw==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 47thwxr2w7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 10 Jul 2025 18:06:53 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 56AGa42E027491;
-	Thu, 10 Jul 2025 18:06:53 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 47ptgcky4w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 10 Jul 2025 18:06:53 +0000
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 56AI6qmD015798;
-	Thu, 10 Jul 2025 18:06:52 GMT
-Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 47ptgcky3t-1;
-	Thu, 10 Jul 2025 18:06:52 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: abin.joseph@amd.com, radhey.shyam.pandey@amd.com, michal.simek@amd.com,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-        netdev@vger.kernel.org
-Cc: alok.a.tiwari@oracle.com, darren.kenny@oracle.com
-Subject: [PATCH net] net: ll_temac: Fix missing tx_pending check in ethtools_set_ringparam()
-Date: Thu, 10 Jul 2025 11:06:17 -0700
-Message-ID: <20250710180621.2383000-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1752171127; c=relaxed/simple;
+	bh=NsIibMpgdUN/yNMbmmDbm0dvimOJR7mqvk074U7Gs8g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Agx97JV+HCY+lNUVoT3/FQE82zcOFsxE/CFjF8V/UAbStCjLN/8xxWCM+RUjEqXmkrSa4iHVrrWGqKUj4zdB9GLu9gZtVQRO8EorR8eaBUcH3YD8QQPIeHPxgfL7WYwzbktpmsOt8vd8JmB4lWFSftPfKAUeEyfTxjgdPXmyIuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4TOwDzQO; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-235e389599fso27795ad.0
+        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 11:12:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752171124; x=1752775924; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V19aqiboGpdwFSVORlEjus6nArpZ/d5eCyXiiM9x078=;
+        b=4TOwDzQOq1VFdnRRMcAzz6wv6QmBIJ69gWAcJoEJXPx94BIcF5gLWHNAbxkxVhg6MI
+         4PDL/6srqbJJGP5zxVAsKiCzHbhtPmTrkECmVpcm6gddpQ2/6SKivbIAamiS9Gn3UYQG
+         j949T5OmuYoAD4ut4lkw8BgTWfTJHefaimbn3sE1QXDhULsGGCzVpgHAAc5HheIS/tYh
+         oRi4mqFnRycbx8/jzaOhX1N0M9OcSFDsexJB4eQAW9ZrCDLTD4sraEiZ+Yv3dYEuNXL0
+         IkPnbCh7fMyS2ZcNCUZ8th4x/lAuHJui0dGdikPaBKw0Rw7DI9tihBEM60UUGyJRPiAA
+         1TwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752171124; x=1752775924;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=V19aqiboGpdwFSVORlEjus6nArpZ/d5eCyXiiM9x078=;
+        b=s3N1X4QEhgILSklLyH1V84q3Sw9caGYdPIgKSpL2BfJGUbcyI57eAnPZrITxZxL6T6
+         mVVZUj04mex0ceTmCEv+eRpCuxkoP7ngsNuItfNS37i4n3fm12xl3zQS8oQDoekiloc/
+         fwEWZoMjdcpyWEI92KlycECEsHymJoqgI5qIX0LpCJsHydQGdWKKdQu3SN2xxllIWIYO
+         52Fi0TsggDDk+ZmMPwWRy5NwypTfDd16PkNfUVzhcARu7vgtsc10h1wKJqXjJK7t2eN9
+         eplgWId7XVRe6sjnsdpsr6dguoe2IQglcClwmr7BO6MtMSKfCNDSJOe7Voylk5p7ugPH
+         HLCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXgcUeu2L9XeFBzlGpC3VF5ymxwAy3kDUtHq3/uNjpgxU2C0ROanR43i6JfRgibwU9pRDnMnhk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVQN249Yucw3ELnwj3bqehF12/FjnnRHV/liaSE3BaXWp9M3dP
+	wCKvoNUANQkc3tiK2GZn5Yh8SKajRhdKwBr9cELL0y3ue9TJ3QvEQjmmSd4rGZwce26j5Wv808u
+	VRX/GA/gcFav2A1mLvIpwbXIM6GjJ9lcJwuy4GlRt
+X-Gm-Gg: ASbGncvlFWvyhpi+uEo8OUKzL5RlIEYze5pGokHya9DAgqYRpNBrwgU+vEXqcx75Qbf
+	cQ3nAsxm4T7ZnpP+/fDfukrxpKSxS8JswkWK4PgmYREdAhLTrQ4Rwd7R0eTsRFVIcF/+H/Vq+PN
+	h9OwdugEAZwqoW37b0wCqMhNhmLc8Wgh3LXimtuirKyJkiq56KtFZ8glaygMeNQqpo4ZWt2qI=
+X-Google-Smtp-Source: AGHT+IG5ZbAwY31DrTqPKHnuAy3Jprfz+D7kIoMw6GvkmY8szHlEwG6tCQR4HIE6AdRqx8Df7hZn3pf+KBbD+xSG9cQ=
+X-Received: by 2002:a17:902:ce84:b0:234:a469:62ef with SMTP id
+ d9443c01a7336-23dee4c2b01mr119975ad.3.1752171123623; Thu, 10 Jul 2025
+ 11:12:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-10_04,2025-07-09_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 adultscore=0
- suspectscore=0 phishscore=0 mlxlogscore=999 bulkscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
- definitions=main-2507100154
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzEwMDE1NCBTYWx0ZWRfXwAsR9ARAoqsG iWg0shZN2MME47jHYgvYYmu0/ikceRzJJ9xv9SteiItOMkmuyegChGZl3OA3hTJkXu11/XsiLE2 ucuvvT4nuknI9xQmUNAfem3/FPurZAICpLXYUqFwiUJD55YSvC/UKUmEq8v6PN25L5VUrldh3Mz
- vrCpEldRsnA9yTOPEXEeXWpd8ONQZKmpdq2vlwySTlCCq1VSI5F/BN4Gz8zuIBufmyIYuS7qi23 17knY0avU6PWGfgELLHZ8FzHvOQLThdeh/LECWWowhRnDnIIAw8HUAxoXg//DRsFwQYz2QYZVPd Oz8R/B9nb/TBAEo1fEusOn/plYlxBFxZX+VPy7MDH6ecZOcMiL2a2xFmaxD7mvHNU2BMa1w1ZkX
- CQ6vLRSviMHI93ZNE3FGJjHm0kZapmPGJp5FeLSE5mt7eLHAmh8lJSEFU1x33b7G+K/1n2rp
-X-Proofpoint-GUID: 2Daqc6PyyofPC_ptVATUMQsXM72wlPoU
-X-Authority-Analysis: v=2.4 cv=JeO8rVKV c=1 sm=1 tr=0 ts=6870013e b=1 cx=c_pps a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17 a=Wb1JkmetP80A:10 a=yPCof4ZbAAAA:8 a=8r0NROPdEQMzgN-JFG4A:9 cc=ntf awl=host:12061
-X-Proofpoint-ORIG-GUID: 2Daqc6PyyofPC_ptVATUMQsXM72wlPoU
+References: <20250710082807.27402-1-byungchul@sk.com> <20250710082807.27402-3-byungchul@sk.com>
+In-Reply-To: <20250710082807.27402-3-byungchul@sk.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 10 Jul 2025 11:11:51 -0700
+X-Gm-Features: Ac12FXwouZPPpjT9QSjhfrgvcsGvhkuRBlZmuIVXl9fEL0h9kvK2OFLOD8o7JwM
+Message-ID: <CAHS8izO0mgDBde57fxuN3ko38906F_C=pxxrSEnFA=_9ECO8oQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v9 2/8] netmem: introduce utility APIs to use
+ struct netmem_desc
+To: Byungchul Park <byungchul@sk.com>
+Cc: willy@infradead.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, kernel_team@skhynix.com, kuba@kernel.org, 
+	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org, 
+	akpm@linux-foundation.org, davem@davemloft.net, john.fastabend@gmail.com, 
+	andrew+netdev@lunn.ch, asml.silence@gmail.com, toke@redhat.com, 
+	tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com, 
+	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net, david@redhat.com, 
+	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz, 
+	rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org, 
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com, 
+	hannes@cmpxchg.org, ziy@nvidia.com, jackmanb@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The function ll_temac_ethtools_set_ringparam() incorrectly checked
-rx_pending twice, once correctly for RX and once mistakenly in place
-of tx_pending. This caused tx_pending to be left unchecked against
-TX_BD_NUM_MAX.
-As a result, invalid TX ring sizes may have been accepted or valid
-ones wrongly rejected based on the RX limit, leading to potential
-misconfiguration or unexpected results.
+On Thu, Jul 10, 2025 at 1:28=E2=80=AFAM Byungchul Park <byungchul@sk.com> w=
+rote:
+>
+> To eliminate the use of the page pool fields in struct page, the page
+> pool code should use netmem descriptor and APIs instead.
+>
+> However, some code e.g. __netmem_to_page() is still used to access the
+> page pool fields e.g. ->pp via struct page, which should be changed so
+> as to access them via netmem descriptor, struct netmem_desc instead,
+> since the fields no longer will be available in struct page.
+>
+> Introduce utility APIs to make them easy to use struct netmem_desc as
+> descriptor.  The APIs are:
+>
+>    1. __netmem_to_nmdesc(), to convert netmem_ref to struct netmem_desc,
+>       but unsafely without checking if it's net_iov or system memory.
+>
+>    2. netmem_to_nmdesc(), to convert netmem_ref to struct netmem_desc,
+>       safely with checking if it's net_iov or system memory.
+>
+>    3. nmdesc_to_page(), to convert struct netmem_desc to struct page,
+>       assuming struct netmem_desc overlays on struct page.
+>
+>    4. page_to_nmdesc(), to convert struct page to struct netmem_desc,
+>       assuming struct netmem_desc overlays on struct page, allowing only
+>       head page to be converted.
+>
+>    5. nmdesc_adress(), to get its virtual address corresponding to the
+>       struct netmem_desc.
+>
+> Signed-off-by: Byungchul Park <byungchul@sk.com>
+> ---
+>  include/net/netmem.h | 41 +++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 41 insertions(+)
+>
+> diff --git a/include/net/netmem.h b/include/net/netmem.h
+> index 535cf17b9134..ad9444be229a 100644
+> --- a/include/net/netmem.h
+> +++ b/include/net/netmem.h
+> @@ -198,6 +198,32 @@ static inline struct page *netmem_to_page(netmem_ref=
+ netmem)
+>         return __netmem_to_page(netmem);
+>  }
+>
+> +/**
+> + * __netmem_to_nmdesc - unsafely get pointer to the &netmem_desc backing
+> + * @netmem
+> + * @netmem: netmem reference to convert
+> + *
+> + * Unsafe version of netmem_to_nmdesc(). When @netmem is always backed
+> + * by system memory, performs faster and generates smaller object code
+> + * (no check for the LSB, no WARN). When @netmem points to IOV, provokes
+> + * undefined behaviour.
+> + *
+> + * Return: pointer to the &netmem_desc (garbage if @netmem is not backed
+> + * by system memory).
+> + */
+> +static inline struct netmem_desc *__netmem_to_nmdesc(netmem_ref netmem)
+> +{
+> +       return (__force struct netmem_desc *)netmem;
+> +}
+> +
 
-This patch corrects the condition to properly validate tx_pending.
+Does a netmem_desc represent the pp fields shared between struct page
+and struct net_iov, or does netmem_desc represent paged kernel memory?
+If the former, I don't think we need a safe and unsafe version of this
+helper, since netmem_ref always has netmem_desc fields underneath. If
+the latter, then this helper should not exist at all. We should not
+allow casting netmem_ref to a netmem_desc without first checking if
+it's a net_iov.
 
-Fixes: f7b261bfc35e ("net: ll_temac: Make RX/TX ring sizes configurable")
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
----
- drivers/net/ethernet/xilinx/ll_temac_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+To be honest the cover letter should come up with a detailed
+explanation of (a) what are the current types (b) what are the new
+types (c) what are the relationships between the types, so these
+questions stop coming up.
 
-diff --git a/drivers/net/ethernet/xilinx/ll_temac_main.c b/drivers/net/ethernet/xilinx/ll_temac_main.c
-index edb36ff07a0c6..6f82203a414cd 100644
---- a/drivers/net/ethernet/xilinx/ll_temac_main.c
-+++ b/drivers/net/ethernet/xilinx/ll_temac_main.c
-@@ -1309,7 +1309,7 @@ ll_temac_ethtools_set_ringparam(struct net_device *ndev,
- 	if (ering->rx_pending > RX_BD_NUM_MAX ||
- 	    ering->rx_mini_pending ||
- 	    ering->rx_jumbo_pending ||
--	    ering->rx_pending > TX_BD_NUM_MAX)
-+	    ering->tx_pending > TX_BD_NUM_MAX)
- 		return -EINVAL;
- 
- 	if (netif_running(ndev))
--- 
-2.46.0
+> +static inline struct netmem_desc *netmem_to_nmdesc(netmem_ref netmem)
+> +{
+> +       if (WARN_ON_ONCE(netmem_is_net_iov(netmem)))
+> +               return NULL;
+> +
+> +       return __netmem_to_nmdesc(netmem);
+> +}
+> +
+>  static inline struct net_iov *netmem_to_net_iov(netmem_ref netmem)
+>  {
+>         if (netmem_is_net_iov(netmem))
+> @@ -314,6 +340,21 @@ static inline netmem_ref netmem_compound_head(netmem=
+_ref netmem)
+>         return page_to_netmem(compound_head(netmem_to_page(netmem)));
+>  }
+>
+> +#define nmdesc_to_page(nmdesc)         (_Generic((nmdesc),             \
+> +       const struct netmem_desc * :    (const struct page *)(nmdesc),  \
+> +       struct netmem_desc * :          (struct page *)(nmdesc)))
+> +
+> +static inline struct netmem_desc *page_to_nmdesc(struct page *page)
+> +{
+> +       VM_BUG_ON_PAGE(PageTail(page), page);
+> +       return (struct netmem_desc *)page;
+> +}
+> +
 
+It's not safe to cast a page to netmem_desc, without first checking if
+it's a pp page or not, otherwise you may be casting random non-pp
+pages to netmem_desc...
+
+> +static inline void *nmdesc_address(struct netmem_desc *nmdesc)
+> +{
+> +       return page_address(nmdesc_to_page(nmdesc));
+> +}
+> +
+>  /**
+
+Introduce helpers in the same patch that uses them please. Having to
+cross reference your series to see if there are any callers to this
+(and the callers are correct) is an unnecessary burden to the
+reviewers.
+
+--=20
+Thanks,
+Mina
 
