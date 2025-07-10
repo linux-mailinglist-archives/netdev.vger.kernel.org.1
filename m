@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-205643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 201C2AFF75D
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 05:19:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA104AFF75E
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 05:19:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E0BA4A78D2
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 03:19:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B20AF3BB43A
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 03:19:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B4CC280037;
-	Thu, 10 Jul 2025 03:19:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE323281368;
+	Thu, 10 Jul 2025 03:19:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OslSLc+W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RmMRlX75"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 654F62AD0F
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 03:19:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8324B28134C;
+	Thu, 10 Jul 2025 03:19:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752117588; cv=none; b=sqn049Az51KdTV//RKeAGW3lBk8HBsbAky3cuTC34wElj1lhlwqwEQT9hq1HcI0H6GwwCgvvVxGc2SX+MPLtt8TgeZdFdm7pakPv/jLtGZxVPdgPYDLhW4w07MB7OatnmicRLuA0amMIg8YRlRNC5Bk1WMng7NPqVllGJ0XHldE=
+	t=1752117589; cv=none; b=l+Qr62SDMy7ItxCakwlzeAw9A5z+/iLUpnmOF1t/wpyUtLl63CjQXlzA9FotaU/6n0yR/5qQyD+hMxEp466lPhb2Gml5Q2lXZpqFeSSLhhlKdfOay9622OvbzZrLZWDP3LQnbSGkGi74hrTdRFagV8VlZtLFJro3vPGkZzl0d7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752117588; c=relaxed/simple;
-	bh=7l7QuvV5xdBQYnc/kAJi1S1wWCC3UpOcinS0YwXa7ds=;
+	s=arc-20240116; t=1752117589; c=relaxed/simple;
+	bh=y5UuWEGLf+ly566xqWaqO5gL56qvLAjYHdgMwg7SsQc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=OMWg0aZ5LqxP2W/k5lub6FQncRg6IEmR9dQEodp8GdHtUmBLKaC4ceNKY1vdAj6ZaqB2BTg5Gk2G6Zt8S0oPLR93yEjoZDRr+T6+URI/lpts9ActQ7BWuzGN+2aqTbRLGn1hUKQe82Ja5nYCzTBIx2B18/yX8RY2S/rCO82P86U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OslSLc+W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D02E2C4CEEF;
-	Thu, 10 Jul 2025 03:19:47 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=DquY7u75zg610xXWBj4lGsDxpULJlQ7Ko8Wt1P371/YZSQoKnP9AJhIJXZ16Jt/XfyfNyGhYxtg874wISBSIv5iCq0DcMAvaWHc83Ujfs8vCU4rxCPQtECAknD32KgftmpkX0OJmUTHI8VXJIsgLm7z20mMFnxzihcrYDk3Iksg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RmMRlX75; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53D65C4CEF6;
+	Thu, 10 Jul 2025 03:19:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752117587;
-	bh=7l7QuvV5xdBQYnc/kAJi1S1wWCC3UpOcinS0YwXa7ds=;
+	s=k20201202; t=1752117589;
+	bh=y5UuWEGLf+ly566xqWaqO5gL56qvLAjYHdgMwg7SsQc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=OslSLc+WKbYO1+lA/N+KqYTk9O7d15u51CVgVK1FRChRVaytM6FTg92mpSdIyApRn
-	 oOuF9Fh8CBfL+tzOF3GkNLIbhrW6y9LLbEEFBU9FzuWIhuo2nlTiTRXJh3UOaNm1Fq
-	 nmJsL5EefL+9PvriMOIvwpyBGmkGCQHgjdQe+MFqb5C5GBrVFg3qcFdpa2wXnM+Jtw
-	 ff1Gey9FT0VCH5J6EZo9e5+lgnLaZaSHsS8cu62HtX8CNQdWHIcVLJpGsLDCjVBHBS
-	 /L+8Q5swLywcyaUKWwN17Y9whGKd5DpEjU3Lf+tttKoHEFbP8/zHLiOTb6RRG81YQQ
-	 POok5UpZSbr5Q==
+	b=RmMRlX758+QpPaFnCOJ6fr5AtADwz4I0G1mnursHRkVsvF3yqpP9XGD7A2TXloIq4
+	 InSkbB18r3pvmOJS5oL036KHJnuuJTzjY5z2BtpUqSJ5Dt8XLv0z7Brfqnp5njIewP
+	 ME6qV3YsD7YpqlmHttb+rYmrq57GbY/5XULAZc3zjCdod0Ju1p+rBanFZImUqgIfpR
+	 F/n5K6q8YSiAOCYRd9bQVwNOWhf1C9QUnsSr0+LHYIBch7z2rCUwcVvuPCWoAEmv35
+	 7CO4i9g7k+hIcsomSU1az3HKvTXPPvOTxAsE2ZLKvurtTyLe2PEondca84tSeqiSid
+	 ACUBG4W4Q7Agw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C6B383B261;
-	Thu, 10 Jul 2025 03:20:11 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE56383B261;
+	Thu, 10 Jul 2025 03:20:12 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next v2] MAINTAINERS: remove myself as netronome maintainer
+Subject: Re: [PATCH net v2 0/2] rxrpc: Miscellaneous fixes
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175211761029.973534.12736882115115374721.git-patchwork-notify@kernel.org>
-Date: Thu, 10 Jul 2025 03:20:10 +0000
-References: <20250708082051.40535-1-louis.peens@corigine.com>
-In-Reply-To: <20250708082051.40535-1-louis.peens@corigine.com>
-To: Louis Peens <louis.peens@corigine.com>
-Cc: davem@davemloft.net, kuba@kernel.org, horms@kernel.org,
- netdev@vger.kernel.org, oss-drivers@corigine.com
+ <175211761149.973534.17143599338508690586.git-patchwork-notify@kernel.org>
+Date: Thu, 10 Jul 2025 03:20:11 +0000
+References: <20250708211506.2699012-1-dhowells@redhat.com>
+In-Reply-To: <20250708211506.2699012-1-dhowells@redhat.com>
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, marc.dionne@auristor.com, kuba@kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  8 Jul 2025 10:20:51 +0200 you wrote:
-> I am moving on from Corigine to different things, for the moment
-> slightly removed from kernel development. Right now there is nobody I
-> can in good conscience recommend to take over the maintainer role, but
-> there are still people available for review, so put the driver state to
-> 'Odd Fixes'.
+On Tue,  8 Jul 2025 22:15:02 +0100 you wrote:
+> Here are some miscellaneous fixes for rxrpc:
 > 
-> Additionally add Simon Horman as reviewer - thanks Simon.
+>  (1) Fix assertion failure due to preallocation collision.
+> 
+>  (2) Fix oops due to prealloc backlog struct not yet having been allocated
+>      if no service calls have yet been preallocated.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2] MAINTAINERS: remove myself as netronome maintainer
-    https://git.kernel.org/netdev/net/c/ee48b0abeca9
+  - [net,v2,1/2] rxrpc: Fix bug due to prealloc collision
+    https://git.kernel.org/netdev/net/c/69e4186773c6
+  - [net,v2,2/2] rxrpc: Fix oops due to non-existence of prealloc backlog struct
+    https://git.kernel.org/netdev/net/c/880a88f318cf
 
 You are awesome, thank you!
 -- 
