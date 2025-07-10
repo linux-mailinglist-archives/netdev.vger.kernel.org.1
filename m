@@ -1,81 +1,96 @@
-Return-Path: <netdev+bounces-205632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3484AFF6FC
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 04:47:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A5CAAFF714
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 04:50:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD19B1C419AA
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 02:47:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 765C71887DCD
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 02:50:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BC0B27F198;
-	Thu, 10 Jul 2025 02:47:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FEA541AAC;
+	Thu, 10 Jul 2025 02:49:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iCBs6n2A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JyGsGyb2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E7483208;
-	Thu, 10 Jul 2025 02:47:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B1013208
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 02:49:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752115639; cv=none; b=B8zg/3eNN5cik9sEJB+ZJrZD3Ojda1gQR+XWj2/87at7vgFksjG6rBx2lB/CiwkZM6BzfJLcBGVCcWPcaN0dId4Fkv5CSD73EjzBs0FhNOpZVj8M5xzcEy9oXl7oNHs68DEoG34Dyexiae2OwdtY6Xqc8/xBtxz1X8RX6mFLGLQ=
+	t=1752115788; cv=none; b=OvmIzclLhMAThd/ulwqfirWyuGNcrKQ6Cu94J+xdpmGvjtT5MwEfWI91RB4cRWHhkZaiB5KryCK/1mBYiTdOeQuAH3mIkBn+VD7IL1MHXJCWeqHETKvneMJk2qBllwC5oEglBxxK7aP8axAlxHb1+nrZ+tuSxzFlnz+KUZkEjkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752115639; c=relaxed/simple;
-	bh=VeAI1FxBggyE+WQ47Zj1b5JN7ybUqwe9OVmx2IgcUNo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ae9MIkxSIClbKkBvq3Frkny2dAGOpuK1L2bYASLjyaXZ8LvxeX53cZyf5OFlFJB7smBmnpjJqIJP7AwRTQva8kplHNMYX0YQMCPGei8ys+qXOslY4rUcijo6sGdLYp6h0D8AmMM6BxBs9wmgesHb2G+UvuKY2upDbIxc/BpbTpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iCBs6n2A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 556E5C4CEEF;
-	Thu, 10 Jul 2025 02:47:18 +0000 (UTC)
+	s=arc-20240116; t=1752115788; c=relaxed/simple;
+	bh=zqwdFVyklO7A+Y/CxRG9iDj71a/B0BIIXZdgMbxZUIQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=JOyWKmPnzx22n4cwSEuAA3qcSdiK4cLNIk5vkqHfaae9dxtbvZIWJHB3nthNL64ROgqLiRhHOUBmNV6mlpvy3t4L50ZN1DkejeOgXl82vpc2wDdVrb+IUcGYWX9OMcT6mL0Avbm/7ifp6u7I9TtEN5f0oGhBdUsRiK76HwG2D44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JyGsGyb2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D6C6C4CEEF;
+	Thu, 10 Jul 2025 02:49:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752115638;
-	bh=VeAI1FxBggyE+WQ47Zj1b5JN7ybUqwe9OVmx2IgcUNo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iCBs6n2Ay8o9kCaNx3pYsCaE0M80uKiSq72L69HaliTN8c5m2xXgPjF8WjOeQz5rh
-	 /t/rcGkg3ZsExNRcFi7lrtNXAAIxz9BJACMzgiUp9vZaVgbr3n6ICeYykmPnWKclMV
-	 EZ6p1hjH3BqjGslygJYT+cUvdu9CnVILBcfhtpTFKUIDfnayFlB2+kPnZ2JUsDXXRa
-	 PWQUHkH/Pt86XUf6TqMBZv/IZl1hrtvZ+g91Zwaf8HH3Zm2G1c+3yXqNIFqyNTKS2T
-	 ttblpCbqZPPJiLg3otPJElck9JLiSm3WNKZooBcrNTpxj3CNex9Thd5WlGiTV8NxE+
-	 WilRlekjUJZ0A==
-Date: Wed, 9 Jul 2025 19:47:17 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Saeed Mahameed <saeed@kernel.org>, Gal Pressman
- <gal@nvidia.com>, "Leon Romanovsky" <leon@kernel.org>, Saeed Mahameed
- <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
- <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 3/5] net/mlx5e: Replace recursive VLAN push
- handling with an iterative loop
-Message-ID: <20250709194717.101a7a22@kernel.org>
-In-Reply-To: <1752009387-13300-4-git-send-email-tariqt@nvidia.com>
-References: <1752009387-13300-1-git-send-email-tariqt@nvidia.com>
-	<1752009387-13300-4-git-send-email-tariqt@nvidia.com>
+	s=k20201202; t=1752115787;
+	bh=zqwdFVyklO7A+Y/CxRG9iDj71a/B0BIIXZdgMbxZUIQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=JyGsGyb29GiEIMB3C/S4UDl2/h3bbSTX7F/nu+cq3NJt8P/ZIKyATSLqO7ZReAtxb
+	 2WbpCH+DlFhmM7c2weOUXZ29k0KUOnvvyatUbwITIFXJZhhMXIDAxGX5eD1PVu3LQt
+	 gQfZzGnF7mr+ZxgdctFZv6tSUB8aqh3X0jXYeLTk/s3m6AJO4RCTF0kY1AnPHU6Y70
+	 S9wXj0VH+2vFt4IOwVfufckFtF/2IelNEY8Ywhqi5A3meoAfuZGeHJBl9KZpjl8pil
+	 xw+KPipYuRvyoXrLt1lZfgONl2Ml/xxEGhivjIoISk0LVJ3USAb3hDTrHd6tH5LMf+
+	 RnZ1O0r8MSjpA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34097383B261;
+	Thu, 10 Jul 2025 02:50:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/2] tcp: better memory control for not-yet-accepted
+ sockets
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175211580989.967127.6755941966699309987.git-patchwork-notify@kernel.org>
+Date: Thu, 10 Jul 2025 02:50:09 +0000
+References: <20250707213900.1543248-1-edumazet@google.com>
+In-Reply-To: <20250707213900.1543248-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ ncardwell@google.com, horms@kernel.org, kuniyu@google.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
 
-On Wed, 9 Jul 2025 00:16:25 +0300 Tariq Toukan wrote:
-> +		rcu_read_lock();
-> +		*out_dev = dev_get_by_index_rcu(dev_net(vlan_dev),
-> +						dev_get_iflink(vlan_dev));
-> +		rcu_read_unlock();
-> +		if (!*out_dev)
-> +			return -ENODEV;
-> +	} while (is_vlan_dev(*out_dev));
+Hello:
 
-Would be good adding a comment here to explain why this odd rcu lock
-/ lookup / rcu unlock / keep using the return value outside of rcu
-protection - code flow is correct :S
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon,  7 Jul 2025 21:38:58 +0000 you wrote:
+> Address a possible OOM condition caused by a recent change.
+> 
+> Add a new packetdrill test checking the expected behavior.
+> 
+> Eric Dumazet (2):
+>   tcp: refine sk_rcvbuf increase for ooo packets
+>   selftests/net: packetdrill: add tcp_ooo-before-and-after-accept.pkt
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/2] tcp: refine sk_rcvbuf increase for ooo packets
+    https://git.kernel.org/netdev/net/c/1a03edeb84e6
+  - [net,2/2] selftests/net: packetdrill: add tcp_ooo-before-and-after-accept.pkt
+    https://git.kernel.org/netdev/net/c/b939c074efc1
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
