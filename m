@@ -1,184 +1,128 @@
-Return-Path: <netdev+bounces-205702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F11CBAFFCAE
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 10:45:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DC0EAFFCB7
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 10:46:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD0A21C236EE
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 08:45:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00CE43A565D
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 08:45:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF0AA28BA86;
-	Thu, 10 Jul 2025 08:44:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B3B28BA86;
+	Thu, 10 Jul 2025 08:46:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="VHbJ5ziv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SlSAr/pu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3574B6FC3;
-	Thu, 10 Jul 2025 08:44:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDB9C221FC0
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 08:46:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752137099; cv=none; b=a4URdBCqSdF3TM9mlMXmPhagnJc06IjJ0mIlgHHv9tHwmbCq8PgszBzl4N44hKh/G1nz4Ks11cCXKddPXzKZ7FoE4GxawU2Rs36NeJDEGuG9xaYYW9PhLb6wr8Ma0xKqhfetyWquAyxHWmeTFJCurdK1uNULgrYLEozu4fN8AQI=
+	t=1752137179; cv=none; b=Pquy8TaIx2qtiJJm2cLu93PzlSaMGZsRMF3SHlGdGzq5vnWZJNfks9kGWt+AugxL7JDyzjujq8Q7C6k1SWE7de4Epi7dSzbkcdCpZAKRD+aN7OQPLtBzEoDx5qz2OgRMvCUm4R4HRgDtHcsIBXAcz63l8Ewln0/Ac8LRthzQ7ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752137099; c=relaxed/simple;
-	bh=0DeIS/eUKc5l8nyQlnzRZZMUEK1nHPCumjn758um+H0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KCAg6AqjlSAseaBWP0KQDEqpBMgqnsArg8w/1JdfHE8XAEmTyrRm4oOnp8UlPj9IqNRSIVobRbHMVGM8L2jJASSWctwxOjCtvBK5/j18uBnABRar5IGJeRGnaLihYr9k+//Nixxtz6dA0543xpOIVFaD62p/X1Mb8yKVgJSAmlg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=VHbJ5ziv; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 569NcE4G028281;
-	Thu, 10 Jul 2025 01:44:50 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=f4wV+OEdxP/NnVe0R8EZ110HL
-	V6sAhW7nZL2hCAMY3Q=; b=VHbJ5zivrULuzEm+CLFbhliBE3NMiupuWIjVkyABY
-	+ODugE8E2qJjb3iARs21exacDcn2vBHFp1XCP51F06sxuOid4pDMbmdPYmtlb3BL
-	OOdSvngV5uRsxx8XAD+renNTZaJ5AOYrAcCOBIg7FE0rx1dPXBd0qvGRqVMmT8J5
-	twMQXtezbALdDUVqAn5A3yOWUZHJiCaR7ZHGDN+81e4a+L88d5qPqtOMQPh6mZey
-	u5t6+lDfI594HXWZpmBmMQCZOaElXbKjbGhvR0aWIUFYW7fJORBR6ztGTp1qFAgK
-	WOvs4ZU4MBlP8Xpc7yJYv970tuKRcZ+Eirz4IgLbDud0w==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 47t26d97q3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Jul 2025 01:44:50 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Thu, 10 Jul 2025 01:44:49 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Thu, 10 Jul 2025 01:44:49 -0700
-Received: from optiplex (unknown [10.28.34.253])
-	by maili.marvell.com (Postfix) with SMTP id 69EFF3F7041;
-	Thu, 10 Jul 2025 01:44:46 -0700 (PDT)
-Date: Thu, 10 Jul 2025 14:14:45 +0530
-From: Tanmay Jagdale <tanmay@marvell.com>
-To: Simon Horman <horms@kernel.org>
-CC: <davem@davemloft.net>, <leon@kernel.org>, <sgoutham@marvell.com>,
-        <bbhushan2@marvell.com>, <herbert@gondor.apana.org.au>,
-        <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 12/14] octeontx2-pf: ipsec: Process CPT
- metapackets
-Message-ID: <aG99fdMVhJUNhxtZ@optiplex>
-References: <20250618113020.130888-1-tanmay@marvell.com>
- <20250618113020.130888-13-tanmay@marvell.com>
- <20250620110657.GK194429@horms.kernel.org>
+	s=arc-20240116; t=1752137179; c=relaxed/simple;
+	bh=EztoCdmnN/TXMn+viX2gSXCCexeXv26zbr8Y3UvqK/E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lWXQV7MxhMCCuCqdZwwVllspQ7F3S96LhvODcbXopdTgwjmMc3J4rYPAHISnNYJT6uFlT0sekJlp3NqUciPc6XuOCg2YRmJZFPd4ov75Lo+jIkGONpRsyHZ1kvppFFkgfJSxye6dupC0EpegJVIs+aZbpG2nPghPNYkIsI46B64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SlSAr/pu; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752137176;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PcvUi1eWySw/QvrSjzTNvr0wq6k0z0sn5FSsYfU//w0=;
+	b=SlSAr/puvm0/C5TDXfXF/wpVMnEmVI4h9SYNSD1kBwmQiqcWCQlYOk1Q/9CH+jj117LuSP
+	Jgqx2lncfc6cv9k2RgrgJyUw6GjCnfU45xLaFZhHAZ5kebxV2BVXZxpTOxc4vQyaiNuahO
+	/p+QoFd3NvbZ+6AJRmQZ3ePc7c2YLrM=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-78-Wj10dByEP_yO3GAogzCq6Q-1; Thu, 10 Jul 2025 04:46:15 -0400
+X-MC-Unique: Wj10dByEP_yO3GAogzCq6Q-1
+X-Mimecast-MFC-AGG-ID: Wj10dByEP_yO3GAogzCq6Q_1752137175
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4539b44e7b1so3717705e9.1
+        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 01:46:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752137174; x=1752741974;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PcvUi1eWySw/QvrSjzTNvr0wq6k0z0sn5FSsYfU//w0=;
+        b=X81pG4oorrF4lCO1ULtlHiO2hC1kol+gYVKNA60BDDARf1eaVU/qHYiVssUcyJgETe
+         4i1ZSmH7YdhVwy3SC7P5gwMGg7Qw7ybG+RmKfAhwE3aF9s0LIsGVFLnMvZY8G5iUwnFK
+         hEi2B6XV6Vui1WIkS9Uk8kXnQ5F/Y+0TppTsM/0ixD0fSOgTSpjRrw7XfaYMWryBV/oq
+         QxEEpyi6baoYgZWPJK8+8S/D5BfyouLg4kVJaZKnT50sKhjESE7sH95zCswy281gBvic
+         1J65jXdbAY98J14czyZB3uaelWkHE4/meqYsAFii1qvMLvqdCJzN8rhD7WMFIifxreuw
+         tdAA==
+X-Gm-Message-State: AOJu0Yze3GJ88Z0ydq26e0e1zPqqbAp5eGkI14CLXBoAW0yMShTisEDS
+	PSUY+bVa882yHz9Y3vOgsI142yOJ27GGMu48L2UuekWAiqjvOPTdZmLaL9Z/W64qlE/UX+kmrEP
+	C9TY0kmk0qLzcp1kz7k8tizayHGhIRMb055dpRqRHwx3JUgvOskZt4m7yQ/Nh4arocA==
+X-Gm-Gg: ASbGncsYmPmRxpBPb6agpyLAEKWM+qJwm5V8WE/BrXWAy6slnzoSPBWFLxg6xh6GTGh
+	D8G5KT/i4YK/RAAKzXLgnCOxt3/CLqbnbV6GET9TSPQ9CIW17+hnjSxm1AMQPlKCAZAqPcVuh1g
+	5Sx7MoYLhzoN9wQ/Ln3xWUUH1O79yB/VdWe65jdeT4p7i5SixjHwXgZOdlPXxJQtHYlvwvdiJwT
+	vXn1anxNf6Wvzz5+nhHmRt0Mcx3FYY7LKiIuhdYg6aSW5xTBTQf0KgYdR2NOCP8roPfURmlS5AZ
+	f9Al7DdzzMpBgHDwL9Eb2xKYHsh5w84BcBoESsWqAiqP9zNClDYlY9i6YDbHZSCDXouh/A==
+X-Received: by 2002:a05:600c:3484:b0:453:b1c:442a with SMTP id 5b1f17b1804b1-454dd2da8e3mr16078175e9.27.1752137174105;
+        Thu, 10 Jul 2025 01:46:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFH9XyxMXdYoZpn8IIlQVwQGwj+KmG1H3Io1MO0RxQQcPIweg50djQVKai1ZJSnE6gFubwUIA==
+X-Received: by 2002:a05:600c:3484:b0:453:b1c:442a with SMTP id 5b1f17b1804b1-454dd2da8e3mr16077765e9.27.1752137173686;
+        Thu, 10 Jul 2025 01:46:13 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:271f:bc10:144e:d87a:be22:d005? ([2a0d:3344:271f:bc10:144e:d87a:be22:d005])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454d50def1fsm50985345e9.21.2025.07.10.01.46.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Jul 2025 01:46:13 -0700 (PDT)
+Message-ID: <a965baaa-c4e9-4d99-9143-466b11bc19f8@redhat.com>
+Date: Thu, 10 Jul 2025 10:46:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250620110657.GK194429@horms.kernel.org>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzEwMDA3NCBTYWx0ZWRfX1JOxMuumyVo3 ZazVfy6JmgnC3QcbC2kx4EEkBGJ8pI7ZtQkCT9R+Unih6KP/YC/VdVbEyl9OGjjk7NrDAOI6ZJA pfDt7WMzC+niz404yBSN/sfEuLxV/gvv3xC67YqvqQBYaA+1Z6hWSuBG++H832BLfVRdZEPad1C
- kK4WS3dMWuJxDKvpbPoaxSSCHyMi9dOZOl3436P2RHu0Qe/ArBX133wjWU4iDWxChWRAfbjQogV Irhxfu7AKVc+LSVM1qkT2EZKg09KwoFqwen/2WEX+JizMQuLF5dHuCO4ZDfjTIpuSO17kne1ciP mym95dJ5JOFGA5ztrryhhdmewdWeP2yF5PaYiropo1KpInpUT16ijrZvvmt8k8Xb25OIv3ZMaQl
- 0QmyZ3JsWaUJ5auFqz0nR7r4bAqQVXjTKhVzgVmNd174VsqMT8vKnInkSy8Bd/1KvBsaqBM0
-X-Proofpoint-GUID: KEqZ1-LRdpnbRpSQs1QwHKIvGJzVjeIV
-X-Proofpoint-ORIG-GUID: KEqZ1-LRdpnbRpSQs1QwHKIvGJzVjeIV
-X-Authority-Analysis: v=2.4 cv=O8A5vA9W c=1 sm=1 tr=0 ts=686f7d82 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=kj9zAlcOel0A:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=BK0mZRYZI33l8Kwai9EA:9 a=CjuIK1q_8ugA:10
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-10_01,2025-07-09_01,2025-03-28_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] dt-bindings: net: Convert Marvell Armada NETA and BM to
+ DT schema
+To: "Rob Herring (Arm)" <robh@kernel.org>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Marcin Wojtas <marcin.s.wojtas@gmail.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250702222626.2761199-1-robh@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250702222626.2761199-1-robh@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 2025-06-20 at 16:36:57, Simon Horman (horms@kernel.org) wrote:
-> On Wed, Jun 18, 2025 at 05:00:06PM +0530, Tanmay Jagdale wrote:
-> > CPT hardware forwards decrypted IPsec packets to NIX via the X2P bus
-> > as metapackets which are of 256 bytes in length. Each metapacket
-> > contains CPT_PARSE_HDR_S and initial bytes of the decrypted packet
-> > that helps NIX RX in classifying and submitting to CPU. Additionally,
-> > CPT also sets BIT(11) of the channel number to indicate that it's a
-> > 2nd pass packet from CPT.
-> > 
-> > Since the metapackets are not complete packets, they don't have to go
-> > through L3/L4 layer length and checksum verification so these are
-> > disabled via the NIX_LF_INLINE_RQ_CFG mailbox during IPsec initialization.
-> > 
-> > The CPT_PARSE_HDR_S contains a WQE pointer to the complete decrypted
-> > packet. Add code in the rx NAPI handler to parse the header and extract
-> > WQE pointer. Later, use this WQE pointer to construct the skb, set the
-> > XFRM packet mode flags to indicate successful decryption before submitting
-> > it to the network stack.
-> > 
-> > Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
-> > ---
-> > Changes in V2:
-> > - Removed unnecessary casts
-> > - Don't convert complete cpt_parse_hdr from BE to LE and just
-> >   convert required fields
-> > - Fixed logic to avoid repeated calculation for start and end in sg
-> > 
-> > V1 Link: https://lore.kernel.org/netdev/20250502132005.611698-15-tanmay@marvell.com/
-> > 
-> >  .../marvell/octeontx2/nic/cn10k_ipsec.c       | 52 +++++++++++++++++++
-> >  .../marvell/octeontx2/nic/cn10k_ipsec.h       | 48 +++++++++++++++++
-> >  .../marvell/octeontx2/nic/otx2_common.h       |  2 +
-> >  .../marvell/octeontx2/nic/otx2_struct.h       | 16 ++++++
-> >  .../marvell/octeontx2/nic/otx2_txrx.c         | 29 +++++++++--
-> >  5 files changed, 144 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-> > index 5cb6bc835e56..a95878378334 100644
-> > --- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-> > +++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-> > @@ -346,6 +346,58 @@ static int cn10k_outb_cpt_init(struct net_device *netdev)
-> >  	return ret;
-> >  }
-> >  
-> > +struct nix_wqe_rx_s *cn10k_ipsec_process_cpt_metapkt(struct otx2_nic *pfvf,
-> > +						     struct nix_cqe_rx_s *cqe,
-> > +						     struct sk_buff *skb,
-> > +						     int qidx)
-> > +{
-> > +	struct nix_rx_sg_s *sg = &cqe->sg;
-> > +	struct nix_wqe_rx_s *wqe = NULL;
-> > +	u64 *seg_addr = &sg->seg_addr;
-> > +	struct cpt_parse_hdr_s *cptp;
-> > +	struct xfrm_offload *xo;
-> > +	struct xfrm_state *xs;
-> > +	struct sec_path *sp;
-> > +	void *va;
-> > +
-> > +	/* CPT_PARSE_HDR_S is present in the beginning of the buffer */
-> > +	va = phys_to_virt(otx2_iova_to_phys(pfvf->iommu_domain, *seg_addr));
-> > +
-> > +	cptp = (struct cpt_parse_hdr_s *)va;
-> > +
-> > +	/* Convert the wqe_ptr from CPT_PARSE_HDR_S to a CPU usable pointer */
-> > +	wqe = phys_to_virt(otx2_iova_to_phys(pfvf->iommu_domain,
-> > +					     be64_to_cpu(cptp->wqe_ptr)));
-> 
-> Hi Tanmay,
-Hi Simon,
+On 7/3/25 12:26 AM, Rob Herring (Arm) wrote:
+> diff --git a/Documentation/devicetree/bindings/vendor-prefixes.yaml b/Documentation/devicetree/bindings/vendor-prefixes.yaml
+> index 5d2a7a8d3ac6..741b545e3ab0 100644
+> --- a/Documentation/devicetree/bindings/vendor-prefixes.yaml
+> +++ b/Documentation/devicetree/bindings/vendor-prefixes.yaml
+> @@ -21,6 +21,7 @@ patternProperties:
+>    "^(pciclass|pinctrl-single|#pinctrl-single|PowerPC),.*": true
+>    "^(pl022|pxa-mmc|rcar_sound|rotary-encoder|s5m8767|sdhci),.*": true
+>    "^(simple-audio-card|st-plgpio|st-spics|ts),.*": true
+> +  "^pool[0-3],.*": true
 
-> 
-> be64_to_cpu expects a __be64 argument, but the type of cptp->wqe_ptr is u64.
-> Or, IOW, be64_to_cpu expects to be based a big endian value but
-> the type of it's argument is host byte order.
-Okay. I will fix the structure definition to use __be types.
+The 'DO NOT ADD NEW PROPERTIES TO THIS LIST' comment just above this
+block is a bit scaring, even if the list has been indeed updated a few
+times. @Rob: can you please confirm this chunk is intended?
 
-> 
-> > +
-> > +	/* Get the XFRM state pointer stored in SA context */
-> > +	xs = pfvf->ipsec.inb_sa->base +
-> > +	     (be32_to_cpu(cptp->cookie) * pfvf->ipsec.sa_tbl_entry_sz) + 1024;
-> 
-> Likewise with cookie here.
-ACK.
+Also I understand you want this patch to go through the net-next tree,
+could you please confirm?
 
-> 
-> :Flagged by Sparse.
-> 
-> ...
-> 
-With Regards,
-Tanmay
+Thanks,
+
+/P
+
 
