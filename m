@@ -1,119 +1,135 @@
-Return-Path: <netdev+bounces-205827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A0DCB004EB
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 16:17:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 307CDB004FE
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 16:21:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC7A93AA917
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 14:16:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0233E165662
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 14:20:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58CE127147D;
-	Thu, 10 Jul 2025 14:17:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 805622727F1;
+	Thu, 10 Jul 2025 14:20:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j7mz2C55"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sj+3OTJ2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACBAA18E750;
-	Thu, 10 Jul 2025 14:17:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D021E24677A
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 14:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752157026; cv=none; b=cSk3sFfBtkcItkDSYIsvTbESBu2Qk5kdnmv3PUXHRT4f+VSviczKNAu7X61Vq4/D3Zm+DwNNJETmMgR6EtxvGhW87ebtxYj8+x78vwT9Pgv3VjRd40PljXzKtm10t6wKweuG7y2bLj0VYhv3iwO397EnahXKLbvj1+oz1JMfq3Q=
+	t=1752157239; cv=none; b=lvJPh0L1MyKadkkNSsp8cRjtAU6lJiI1BKEtNeufquEOdKjbE+oK+oWRnP8yJmAjmKOl6vjhJjHvRJ0yEo1QcdvTGvjhSnpj7SosqSC/nkKVs74ocFvildGjCQBwE7gwdrWYTX6nLI8ohghSGLLmW64OQYuIFBVy2p9QhQm03/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752157026; c=relaxed/simple;
-	bh=cH0XWF4BIOD4tAIb15pLfn9fM2ClrDO4rTeFXsuzzK0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QYECfUJxeIPinLIm6YPnr4i8fff44JsITmYpMPWtr9BPZ51EhQfILmAl7cN7xm9WLINUqY97NRjghE9iQYNq06Xg0lIGk9seEKLrOTwtFiad+0UEnng+jQPS4GfeLB+XONIdG1ZMuylfOUFkPBbYc+n9jj37yaSFFj5vr2xsVis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j7mz2C55; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-450cfb79177so5679755e9.0;
-        Thu, 10 Jul 2025 07:17:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752157023; x=1752761823; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=X6NQWnLkUsU4IbrEIKvkyte6IAfv41gNTZEjbgwjMjg=;
-        b=j7mz2C55Yn0wCCTYLGknSaS51U/3FNC4K0K7ue6l6PpocT1CI+nkL6obIm+xOevnkM
-         l63VqbvCdOEBOOtoIrcZqCW6t9+ye0AX37i/1IHfavcAy4NJc9NIt1KsmtmtXDD1xwNF
-         6W81yNG+wqo/dUd6YhjDLxIjAdJb/gq6GoKMSvJH4qMyIpNzmUdl9kWqn4vUNchS+Gwu
-         g19122BJuRnksMCQkQ5R2b3k/FFcr44GH5qaoySKqVqUTZVZYInf3Cral3wUZSwr8zfP
-         CE553P6nYAOp2pKOA3MKfRC+SNmzwCpSz6GwokoRJbbgEha9QqUTcRJ9zf6jXnYznxP/
-         tHcQ==
+	s=arc-20240116; t=1752157239; c=relaxed/simple;
+	bh=H+W6MZTGTC8b6KoFGEsXhh33XmcZnNEGn+9/3uzcB7I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TQZg5UtpQ3NBJi25U44YlGGTPbr4AhfBtnhKF6wV14gJP2ceP8mYCDnA5kanHEqedOe8iBvMUaUguBYNsQlZvkcQLCnno0Sc4DoygDmoRO6nY+X/RaywkD/tp/pFHvwwV+89AsnX/v+4nIvOkT8PsLfYWStAI7IUdXjkEc0FEgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sj+3OTJ2; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752157234;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dg07EnLkF7vG0n2UhzEV54yOcgWLfRsNgXzhWHq/zf0=;
+	b=Sj+3OTJ2sEQrTJq99Ca/qZZHT7nrRi3dXqx6YDAsN2zoSUVunhBmebYG8y8Ez56bWm9Hho
+	S8rgEkMquVnGH8JAxoHm6bUXZJNAfc6NvqwZ2N1JNFok7TJ0/BrdWs/sXBqyl7HbJOxFjl
+	DiVs6/6izq6EW0aktcHifYSKtPZCIHQ=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-421-EcbbM2qLOVGAOYYfoleNOg-1; Thu, 10 Jul 2025 10:20:31 -0400
+X-MC-Unique: EcbbM2qLOVGAOYYfoleNOg-1
+X-Mimecast-MFC-AGG-ID: EcbbM2qLOVGAOYYfoleNOg_1752157231
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3a58939191eso579360f8f.0
+        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 07:20:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752157023; x=1752761823;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X6NQWnLkUsU4IbrEIKvkyte6IAfv41gNTZEjbgwjMjg=;
-        b=SkYo3h7Qqv3sood39hZ1BhV2DRknw1iLcu5odVc2IvnCK7py2a1YCtGXxVkkpKlhnd
-         Oxq4lTQ8cLDGXIFXK2h6zPC92aBm7QGvP2K0wgh4E/OtkOHcSVhrXMqNhEJtQWP9epEX
-         PLWq5t3UFAWUWHMNF5tPnGyLfYEdR7NcwYQEh2Ep3wzajdqa4zuV3KmXhmP/7A6l9G88
-         HU3svz0wCUFEcHXWRf1ihSW975RSVbpvrnRgtFI7fXamDVrok6zzQxLkeif9dvh9jubs
-         k9dwfs8KqQyQMw++131KJqvXlr2WUl7ntmTChsi69rhybf9bZ6JAyBcymAYg5TzO39Zx
-         KNeg==
-X-Forwarded-Encrypted: i=1; AJvYcCUrQhh4ayMyaKyEzeBHyu01FWVpytPaAXzCjjl+p+KdW+IbGnrhfAsjkzTz7JukRQMtPP8TtqVJ@vger.kernel.org, AJvYcCVV4VeXAbbnYmFzmCjsufxk3J6nn86BCz+hMy7Q1NZCXTZG6qbFj2sWc+yhEFrdncRFAboJiGkoYyXIJjs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWBicky05QZHGczIisqJ0QzHR/QeXvmf552HTzINSopv2M+Zf4
-	OrJpaFqKptfm93fFirym4ql6FJbWy653ud9YB4+nSLuQKC6CGxoVEAyj
-X-Gm-Gg: ASbGnct+Ue8aJ9RzKr2EFqnSey8ZRA14TpnvJhjL7mg1nFqtS4EKsJOXL7BKKB3DFUT
-	4LR4woJTW0lgPzGl4jKtDIwXIqjwxDpskd/bA267KWqVjk6jFAppO8iIX7I7DyStwCUPM8igOyw
-	mHeup90PczfBZ/u+6j+AmOOlDivzVLbSGzL8bmu8FXhSqDPxH7LBfTyzqGMTqXj6nXCroohHWr/
-	YW7dPgjmr6FsjvMrdviaWV5SqQodM1v5yG/CnUBFgj5lwfjtRcOla2ZgI+fdfdYF5A8EFOJvWl6
-	Ygycnx9I0D3Qr9kytsXCEnoYOB7yZWF8mIA1GeOqwsGiSdrgazyJXW9FEgxrVlBtdPW2n9pfPoU
-	=
-X-Google-Smtp-Source: AGHT+IGlGSMIN0Z2uimGznfKX4FTEu7U4tYvxhLK7Fd9GfFLljkOaCUfaX3W2X7dXjvzvPzvhqq93g==
-X-Received: by 2002:a05:600c:8b63:b0:43c:fffc:7886 with SMTP id 5b1f17b1804b1-454dd404f37mr28160105e9.8.1752157021984;
-        Thu, 10 Jul 2025 07:17:01 -0700 (PDT)
-Received: from localhost.localdomain ([45.128.133.228])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454d5133183sm60150125e9.40.2025.07.10.07.16.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Jul 2025 07:17:01 -0700 (PDT)
-Date: Thu, 10 Jul 2025 16:16:48 +0200
-From: Oscar Maes <oscmaes92@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
-	edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
-	stable@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2 1/2] net: ipv4: fix incorrect MTU in broadcast
- routes
-Message-ID: <20250710141648-oscmaes92@gmail.com>
-References: <20250703152838.2993-1-oscmaes92@gmail.com>
- <20250708185430.68f143a2@kernel.org>
+        d=1e100.net; s=20230601; t=1752157230; x=1752762030;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dg07EnLkF7vG0n2UhzEV54yOcgWLfRsNgXzhWHq/zf0=;
+        b=gn9d3P6e1pVrzxQc7ur9XKU2el+i2Om3FPQk3JC1a8AMQwKNwjRXLGjakb+G5jZbfc
+         Oz+mNI1QJdCzq01ppozjv9gpE4zCysjhoR7WKSy0q7SByIx1TP5FnkXvc9DwXNZYc3+k
+         tr9zmGmyj+WL2xi1vO5BTwVxLo1EuPywrEsrIBwZWdtoApOY5AgIrYwG+khTA1rHmmoi
+         OwJ9iOi6LGcRuEGLe/sHE66a8uiZ+nnJ+IVH8Onx5EdGYI232r+vYtwys3cocRV5cgr9
+         Dd+u5D1XEdc8pFm/0o8NdWpGJW7w9+P8Sk/ak1wFCJsHWz9+BjPA2vWoTRO7/3tate3N
+         o4+A==
+X-Gm-Message-State: AOJu0YztjBLwAeufVbAwHJTjGeZUdcyqJIgPOsO35rZ/RPc42XFtktMU
+	cHPd4F5lroB1F9/oTM9AWGYZ3R4PJsajkY6u+yb09EpNoVdk/iX1temhfnCtEsDWX6Qce8xDuhW
+	sIUXxulpKMJXnEWa3nUnSM+xZQ4ckZjO2NuZn0UXQfDV60sIjFjSBhfNqgw==
+X-Gm-Gg: ASbGncuyEQigQwTRQ9osF49tRpf38wMspcgWz6N/pO3DAvbGFfxtyksDYvapEyWfiZL
+	Sd9aGFJn0mar81UR6uf7dQ9rWXumdDJ4/EGSXyay3wq4Oj2/mSaEVn45mHLR8scVO4kIGU1nS4j
+	UPOp6oW7aYnZPoSNYOVBA9xQNaLEBpMsyeKrK7tb2Ap6OZt1WCYSxM7WVMEVmPfxjxIARNzjxjb
+	okLhM/rFMWmffd+fj8txE9vHrMH/oCmA8sQrDmIJAn3flwm9G1KjblkfgGzSCneB+Bzx5bbhRwi
+	4+jLc2SqFzKQq2dbs6rUiKdOHLwqsudbGz7gmXmvUYjQB7zIXEnGNSLfixSStoLZRSaoVQ==
+X-Received: by 2002:a05:6000:2b02:b0:3a8:6262:e78 with SMTP id ffacd0b85a97d-3b5e86aef04mr1845872f8f.37.1752157230442;
+        Thu, 10 Jul 2025 07:20:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH5MHh2lSwM1tMKcl0R4d8xjkyF+DWuQplkQGUz9oznluhkOT987/Wba+ND/eSCOxhnDHbefw==
+X-Received: by 2002:a05:6000:2b02:b0:3a8:6262:e78 with SMTP id ffacd0b85a97d-3b5e86aef04mr1845849f8f.37.1752157229948;
+        Thu, 10 Jul 2025 07:20:29 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:271f:bc10:144e:d87a:be22:d005? ([2a0d:3344:271f:bc10:144e:d87a:be22:d005])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8e1f4edsm1969234f8f.83.2025.07.10.07.20.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Jul 2025 07:20:29 -0700 (PDT)
+Message-ID: <0455186e-290f-41b5-b2b3-78d5bfa2b74b@redhat.com>
+Date: Thu, 10 Jul 2025 16:20:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250708185430.68f143a2@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [TEST] net/udpgro.sh is flaky on debug
+To: Jakub Kicinski <kuba@kernel.org>, Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org
+References: <20250710070907.33d11177@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250710070907.33d11177@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 08, 2025 at 06:54:30PM -0700, Jakub Kicinski wrote:
-> On Thu,  3 Jul 2025 17:28:37 +0200 Oscar Maes wrote:
-> >  	if (type == RTN_BROADCAST) {
-> >  		flags |= RTCF_BROADCAST | RTCF_LOCAL;
-> > -		fi = NULL;
-> >  	} else if (type == RTN_MULTICAST) {
-> >  		flags |= RTCF_MULTICAST | RTCF_LOCAL;
-> >  		if (!ip_check_mc_rcu(in_dev, fl4->daddr, fl4->saddr,
+On 7/10/25 4:09 PM, Jakub Kicinski wrote:
+> net/udpgro.sh has around 6% false positive rate on the debug kernels :(
 > 
-> Not super familiar with this code, but do we not need to set 
-> do_cache = false; ? I'm guessing cache interactions may have
-> been the reason fib_info was originally cleared, not sure if
-> that's still relevant..
+> Please see:
+> https://netdev.bots.linux.dev/contest.html?executor=vmksft-net-dbg&test=udpgro-sh&ld_cnt=200&pass=0
+> for recent failures.
 > 
-> I'd also target this at net-next, unless you can pinpoint
-> some kernel version where MTU on bcast routes worked..
-> -- 
-> pw-bot: cr
+> Is there anything we can do to make it more resilient ?
 
-The caching mechanism was introduced after this line, back when nhc was embedded in fib_info.
-(see https://lore.kernel.org/netdev/20120720.142612.691540831359186107.davem@davemloft.net/)
+As most failures happen while waiting for the 'following' packets in non
+GRO scenarios, a trivial attempt could increasing the inter-packet
+timeout (currently 10ms).
 
-I'll resend to net-next.
+Something alike the following. I can send a formal patch, and we can let
+it stage in PW for a bit to observe if it actually helps.
+
+/P
+---
+diff --git a/tools/testing/selftests/net/udpgro.sh
+b/tools/testing/selftests/net/udpgro.sh
+index 1dc337c709f8..43fcd4b0f6a2 100755
+--- a/tools/testing/selftests/net/udpgro.sh
++++ b/tools/testing/selftests/net/udpgro.sh
+@@ -48,7 +48,7 @@ run_one() {
+
+        cfg_veth
+
+-       ip netns exec "${PEER_NS}" ./udpgso_bench_rx -C 1000 -R 10
+${rx_args} &
++       ip netns exec "${PEER_NS}" ./udpgso_bench_rx -C 1000 -R 100
+${rx_args} &
+        local PID1=$!
+
+        wait_local_port_listen ${PEER_NS} 8000 udp
+
 
