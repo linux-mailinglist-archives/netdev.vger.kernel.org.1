@@ -1,193 +1,264 @@
-Return-Path: <netdev+bounces-205970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA847B00FC8
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 01:37:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFBBCB00FD6
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 01:44:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFE1717029C
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 23:37:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97C75760A52
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 23:44:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81EA222D4DD;
-	Thu, 10 Jul 2025 23:37:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AF28286416;
+	Thu, 10 Jul 2025 23:44:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oCeT6JmA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jwJrxykV"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1450418CC13
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 23:37:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D42D156C6A;
+	Thu, 10 Jul 2025 23:44:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752190672; cv=none; b=Q67/uyw2lgXbPsNXb0U+1Jq5dUz7KxT36r8iIFNDH7hqo/AZ+IilF8ExUozUIFDV/So2ShhIW44thCJQ5pPXX5DDFHtOMcju+9AeUX13ifaJ8LEsKtoNGv2kXXt9+9DNQtnFfgK3nC0rBv3mc38+p8bJzdF9m5FCHVqwKJa4qvI=
+	t=1752191085; cv=none; b=ZXmKGujnEGK+X3f6G5bH2dsvVVcL69hh26SMf03D6gGBtbmfYaME9DGcB8YPsWuY5V4LH504OhJIAiszCdnyFWjxUwQSlcGqCs1n1CblvEq7n+nacp8tgSgWWEP44KEmOqlRs56BiTVL/qjnRNBf5HvuWoz+0U4pKuW04NfNY1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752190672; c=relaxed/simple;
-	bh=BOcEwciZG3UPwczqc6Kffau7PK4yhnLOxhmVELp8uO4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=hV1x3PZCqUDXtwjNtlnMEfo7RPF59p6OyXS9sCC0ldC70zV6zDsBJuM3OZu2XBmsKmXxVORZuon9CGclWLtKcxXiOH17+MRLOT+0FN0THPgYLsqYF2DZfSYaSQvth4GnMo+uGFMmKf93Gyh132/kxaQaCpx4LY3OKmpXI/otl6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oCeT6JmA; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <a80e55af-14a2-41d8-afcc-7dbf267e85ef@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1752190657;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RNqapVscHGzGt/oRXqDPP8IZMAkPeXOSaImaeu0zjIk=;
-	b=oCeT6JmAYdHCBQ23iBszQP13Vxu1XWtzMxx3lim7ILp4a4qM/+agQQHNG0zQsgM14dUDIV
-	h0IWjOLnf4GMEsPBluiBclPCzFsPFsFEWZsGAMxz5VYBbdnix9lQl18FtpfHI87qNCSWOW
-	jYw/sB0IpXV6aAe22E8MwX9ggSJVOTA=
-Date: Thu, 10 Jul 2025 19:37:28 -0400
+	s=arc-20240116; t=1752191085; c=relaxed/simple;
+	bh=z259Q4Tp0gYxqEYztifZv2fErAWVdioCuOGrk7OoTbA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HNgOsHRXX7xjBPym64UrVhCW6RUqL5h7e7jxdV/Yhf1hVL/Uiju+UAotvmv0DhU5N5S3exmS9xAO013mZRO+xGqgtX/XKvSQFYWaPHw19Yqb/4ztAiAhkFDerGFVpaKsQ6nGa0KYpw+BzfItM2xO6lc/H9j3jZrPk7yVwXHScJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jwJrxykV; arc=none smtp.client-ip=209.85.219.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6fad4a1dc33so14512466d6.1;
+        Thu, 10 Jul 2025 16:44:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752191082; x=1752795882; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=bvHb1sTKcUnKWQiFLR2r0sXY29OXUGa2fygx6L+kD/Y=;
+        b=jwJrxykVKGHlVkNAPv5/HyyZWpdyIDgtiSzhPaWmJJt4VPEY/IgFb58fs2HCshTTSh
+         0KDLVQ5yC+BLQQjlUJHnoH0zfsUR04IA0YwUUTsa25bP0bmP/SLhVNJitBlUPjf24Mk3
+         kY2ya12YJKhpaRXV+zJEsMw5wxY0IZ38EuLHeUsVrPorTXnKwfgvhGYrdqHDd40U/+4s
+         Is59MeP8JnJMK82nw7/OuPp75hVAphMm0SqkEcdw5zLGtZk8DUfRialvHn8pqDDaeqVa
+         T4HIHgdJm9sFYfG0WPOqdYwvjeN3mnXAvNEfwp9/Ykuw4l7MehMBwZTZejzMASQYU3Qv
+         DuXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752191082; x=1752795882;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bvHb1sTKcUnKWQiFLR2r0sXY29OXUGa2fygx6L+kD/Y=;
+        b=pnrrnEPoU+xAIp3Elm7XoYOWYCtA1+gL9tPomUIPvt30ZdOuBKZ97y3r70EFukcrSl
+         Z4pL+vxIMIN8eYDZR7glcVlMEGf4Vdu15g1cHezxIceOxPFQSZjQrO4qDBAwJDdv+MXi
+         kUPs5fVRAb/LOq5C1ZgH4TI9r2+lthoCNXq8c8l9eqhdBSScLSlkid/F/SQ4MeSROawy
+         qb6AApzx47E4h/MoAwicuO4LrzoDSpv1z7o2H0ElnQnwbOTcxSH+SgcHJPA99brDiQ84
+         cksOKYhYJbBrdn8QVt/TnXnjewiB2w9DbkDZxEIs51qhw8XMu7UBIuJx9/gdmIgQ9XeF
+         u+/w==
+X-Forwarded-Encrypted: i=1; AJvYcCU8BIsXEcApVOuP6aXfKXcOk7Lss/dgLjrPNiGfmijTlWlszC5Jaov8J8Pv5lefRzb08mKCOYGH@vger.kernel.org, AJvYcCVbbs1udmZOeEMywoFXRLJ3690BXJnSIb0l/Voa8+IAwHu9++W5PKYPwtjlKpIsgUZaYsloa6veXKuBjKQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0JK5Z2Q6RkdlEaC8VUYE6oT5kKepLW8JvCFmKH8ymuSm1jpxe
+	IZRkXCfa9ZBZeTvyoy/x3cmEzctvg3cGddwpWRfV2EJfmjiHFiJOBXkV4DsDLMGvH8FP1mVKahs
+	KXb4z5WI1ttqlqwDxElbQjSGqcMIY6pM=
+X-Gm-Gg: ASbGncu0hABU8X8D+o67XUgiR9eXqYN7/Ui5hU5PUILeYHj2J8vbeK9oPEN9LlpjS3n
+	vY4zhC+ySd81PXaC6/dDCnJK08kJcLQCWPEB5zgFyBGCuhCN9UIJY8s2UCqeIL8euCyPg1KPKeZ
+	QrsCiyUerRNXX0IEpJ5GN+Y1Z7awcHACtiBG3RvU7yfMb+sxA5Ev2Ie1tb1joRGQqGYdM6++AGy
+	R9cQn8jlkTpAiUwUQ==
+X-Google-Smtp-Source: AGHT+IECn/n0UQxfjfmrc0JZ37l9MntH3ViegnY1pzNYqOmMOwyY2zJneRJkjnV11tv8X7MfRtah4FaMa5qXVb02Wa4=
+X-Received: by 2002:a05:6214:258f:b0:6fa:fddf:734b with SMTP id
+ 6a1803df08f44-704a38aca5cmr19606046d6.24.1752191082171; Thu, 10 Jul 2025
+ 16:44:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net 4/4] net: axienet: Split into MAC and MDIO drivers
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Michal Simek <michal.simek@amd.com>, Saravana Kannan <saravanak@google.com>,
- Leon Romanovsky <leon@kernel.org>, Dave Ertman <david.m.ertman@intel.com>,
- linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>,
- linux-arm-kernel@lists.infradead.org
-References: <20250619200537.260017-1-sean.anderson@linux.dev>
- <20250619200537.260017-5-sean.anderson@linux.dev>
- <16ebbe27-8256-4bbf-ad0a-96d25a3110b2@lunn.ch>
- <0854ddee-1b53-472c-a4fe-0a345f65da65@linux.dev>
- <c543674a-305e-4691-b600-03ede59488ef@lunn.ch>
- <a8a3e849-bef9-4320-8b32-71d79afbab87@linux.dev>
- <3e2acebe-a9db-494b-bca8-2e1bbc3c1eaf@lunn.ch>
- <d87ab382-cc6c-46df-bd7e-1200154dd84f@linux.dev>
-Content-Language: en-US
-In-Reply-To: <d87ab382-cc6c-46df-bd7e-1200154dd84f@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <aEwfME3dYisQtdCj@pidgin.makrotopia.org> <24c4dfe9-ae3a-4126-b4ec-baac7754a669@linux.dev>
+ <20250709135216.GA721198@horms.kernel.org>
+In-Reply-To: <20250709135216.GA721198@horms.kernel.org>
+From: "Christian Marangi (Ansuel)" <ansuelsmth@gmail.com>
+Date: Fri, 11 Jul 2025 01:44:30 +0200
+X-Gm-Features: Ac12FXzK9auwvTPHIQwIDGSyod4bJnXDWkv_0u6wuaDfHP8r6J2VKj0fDuUQv6c
+Message-ID: <CA+_ehUyDOE-4_FD42BHKXjyT2kWxxWtpy_+HU2bwZXu9TRE7eg@mail.gmail.com>
+Subject: Re: [RFC] comparing the propesed implementation for standalone PCS drivers
+To: Simon Horman <horms@kernel.org>
+Cc: Sean Anderson <sean.anderson@linux.dev>, Daniel Golle <daniel@makrotopia.org>, 
+	netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, Russell King <linux@armlinux.org.uk>, 
+	Vineeth Karumanchi <vineeth.karumanchi@amd.com>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	linux-kernel@vger.kernel.org, Kory Maincent <kory.maincent@bootlin.com>, 
+	Lei Wei <quic_leiwei@quicinc.com>, Michal Simek <michal.simek@amd.com>, 
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>, Robert Hancock <robert.hancock@calian.com>, 
+	John Crispin <john@phrozen.org>, Felix Fietkau <nbd@nbd.name>, Robert Marko <robimarko@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Andrew,
+Il giorno mer 9 lug 2025 alle ore 15:52 Simon Horman
+<horms@kernel.org> ha scritto:
+>
+> On Fri, Jun 13, 2025 at 12:06:23PM -0400, Sean Anderson wrote:
+> > On 6/13/25 08:55, Daniel Golle wrote:
+> > > Hi netdev folks,
+> > >
+> > > there are currently 2 competing implementations for the groundworks to
+> > > support standalone PCS drivers.
+> > >
+> > > https://patchwork.kernel.org/project/netdevbpf/list/?series=970582&state=%2A&archive=both
+> > >
+> > > https://patchwork.kernel.org/project/netdevbpf/list/?series=961784&state=%2A&archive=both
+> > >
+> > > They both kinda stalled due to a lack of feedback in the past 2 months
+> > > since they have been published.
+> > >
+> > > Merging the 2 implementation is not a viable option due to rather large
+> > > architecture differences:
+> > >
+> > >                             | Sean                  | Ansuel
+> > > --------------------------------+-----------------------+-----------------------
+> > > Architecture                        | Standalone subsystem  | Built into phylink
+> > > Need OPs wrapped            | Yes                   | No
+> > > resource lifecycle          | New subsystem         | phylink
+> > > Supports hot remove         | Yes                   | Yes
+> > > Supports hot add            | Yes (*)               | Yes
+> > > provides generic select_pcs | No                    | Yes
+> > > support for #pcs-cell-cells | No                    | Yes
+> > > allows migrating legacy drivers     | Yes                   | Yes
+> > > comes with tested migrations        | Yes                   | No
+> > >
+> > > (*) requires MAC driver to also unload and subsequent re-probe for link
+> > > to work again
+> > >
+> > > Obviously both architectures have pros and cons, here an incomplete and
+> > > certainly biased list (please help completing it and discussing all
+> > > details):
+> > >
+> > > Standalone Subsystem (Sean)
+> > >
+> > > pros
+> > > ====
+> > >  * phylink code (mostly) untouched
+> > >  * doesn't burden systems which don't use dedicated PCS drivers
+> > >  * series provides tested migrations for all Ethernet drivers currently
+> > >    using dedicated PCS drivers
+> > >
+> > > cons
+> > > ====
+> > >  * needs wrapper for each PCS OP
+> > >  * more complex resource management (malloc/free)
+> > >  * hot add and PCS showing up late (eg. due to deferred probe) are
+> > >    problematic
+> > >  * phylink is anyway the only user of that new subsystem
+> >
+> > I mean, if you want I can move the whole thing to live in phylink.c, but
+> > that just enlarges the kernel if PCSs are not being used. The reverse
+> > criticism can be made for Ansuel's series: most phylink users do not
+> > have "dynamic" PCSs but the code is imtimately integrated with phylink
+> > anyway.
+>
+> At the risk of stating the obvious it seems to me that a key decision
+> that needs to be made is weather a new subsystem is the correct direction.
+>
 
-On 6/23/25 19:16, Sean Anderson wrote:
-> On 6/23/25 18:45, Andrew Lunn wrote:
->> On Mon, Jun 23, 2025 at 02:48:53PM -0400, Sean Anderson wrote:
->>> On 6/23/25 14:27, Andrew Lunn wrote:
->>> > On Mon, Jun 23, 2025 at 11:16:08AM -0400, Sean Anderson wrote:
->>> >> On 6/21/25 03:33, Andrew Lunn wrote:
->>> >> > On Thu, Jun 19, 2025 at 04:05:37PM -0400, Sean Anderson wrote:
->>> >> >> Returning EPROBE_DEFER after probing a bus may result in an infinite
->>> >> >> probe loop if the EPROBE_DEFER error is never resolved.
->>> >> > 
->>> >> > That sounds like a core problem. I also thought there was a time
->>> >> > limit, how long the system will repeat probes for drivers which defer.
->>> >> > 
->>> >> > This seems like the wrong fix to me.
->>> >> 
->>> >> I agree. My first attempt to fix this did so by ignoring deferred probes
->>> >> from child devices, which would prevent "recursive" loops like this one
->>> >> [1]. But I was informed that failing with EPROBE_DEFER after creating a
->>> >> bus was not allowed at all, hence this patch.
->>> > 
->>> > O.K. So why not change the order so that you know you have all the
->>> > needed dependencies before registering the MDIO bus?
->>> > 
->>> > Quoting your previous email:
->>> > 
->>> >> Returning EPROBE_DEFER after probing a bus may result in an infinite
->>> >> probe loop if the EPROBE_DEFER error is never resolved. For example,
->>> >> if the PCS is located on another MDIO bus and that MDIO bus is
->>> >> missing its driver then we will always return EPROBE_DEFER.
->>> > 
->>> > Why not get a reference on the PCS device before registering the MDIO
->>> > bus?
->>> 
->>> Because the PCS may be on the MDIO bus. This is probably the most-common
->>> case.
->> 
->> So you are saying the PCS is physically there, but the driver is
->> missing because of configuration errors? Then it sounds like a kconfig
->> issue?
->> 
->> Or are you saying the driver has been built but then removed from
->> /lib/modules/
-> 
-> The latter. Or maybe someone just forgot to install it (or include it
-> with their initramfs). Or maybe there was some error with the MDIO bus.
-> 
-> There are two mutually-exclusive scenarios (that can both occur in the
-> same system). First, the PCS can be attached to our own MDIO bus:
-> 
-> MAC
->  |
->  +->MDIO
->      |
->      +->PCS
->      +->PHY (etc)
-> 
-> In this scenario, we have to probe the MDIO bus before we can look up
-> the PCS, since otherwise the PCS will always be missing when we look for
-> it. But if we do things in the right order then we can't get
-> EPROBE_DEFER, and so there's no risk of a probe loop.
-> 
-> Second, the PCS can be attached to some other MDIO bus:
-> 
-> MAC              MDIO
->  |                 |
->  +->MDIO           +->PCS
->       |
->       +->PHY (etc)
-> 
-> In this scenario, the MDIO bus might not be present for whatever reason
-> and we have the possibility of an EPROBE_DEFER error. If that happens,
-> we will end up in a probe loop because the PHY on the MDIO bus
-> incremented deferred_trigger_count when it probed successfully:
-> 
-> deferred_probe_work_func()
->   driver_probe_device(MAC)
->     axienet_probe(MAC)
->       mdiobus_register(MDIO)
->         device_add(PHY)
->           (probe successful)
->           driver_bound(PHY)
->             driver_deferred_probe_trigger()
->       return -EPROBE_DEFER
->     driver_deferred_probe_add(MAC)
->     // deferred_trigger_count changed, so...
->     driver_deferred_probe_trigger()
+If you want to expand it a bit it's about new subsystem + making things
+more deterministic.
 
-Does the above scenario make sense? As I see it, the only approaches are
+> If I understand things correctly it seems that not creating a new subsystem
+> is likely to lead to a simpler implementation, at least in the near term.
+> While doing so lends itself towards greater flexibility in terms of users,
+> I'd suggest a cleaner abstraction layer, and possibly a smaller footprint
+> (I assume space consumed by unused code) for cases where PCS is not used.
+>
 
-- Modify the driver core to detect and mitigate this sort of scenario
-  (NACKed by Greg).
-- Split the driver into MAC and MDIO parts (this patch).
-- Modify phylink to allow connecting a PCS after phylink_create but
-  before phylink_start. This is tricky because the PCS can affect the
-  supported phy interfaces, and phy interfaces are validated in
-  phylink_create.
-- Defer phylink_create to ndo_open. This means that all the
-  netdev/ethtool ops that use phylink now need to check ip the netdev is
-  open and fall back to some other implementation. I don't think we can
-  just return -EINVAL or whatever because using ethtool on a down device
-  has historically worked. I am wary of breaking userspace because some
-  tool assumes it can get_ksettings while the netdev is down.
+Funnily enough almost all implementation have an attached PCS either
+if it's something very basic or it's something more advanced (normally
+this is 100% of the case when 10g is supported)
 
-Do you see any other options? IMO, aside from the first option, the
-second one has the best UX. With the latter two, you could have a netdev
-that never comes up and the user may not have very good insight as to
-why. E.g. it may not be obvious that the user should try to bring the
-netdev up again after the PCS is probed. By waiting to create the netdev
-until after we successfully probe the PCS we show up in
-devices_deferred and the netdev can be brought up as usual.
+Soo case where PCS is not used are very little and in the case where
+it's not used it's just an empty pointer and some bitmask for PHY
+interface.
 
---Sean
+> On the last point, I do wonder if there are other approaches to managing
+> the footprint. And if so, that may tip the balance towards a new subsystem.
+>
+>
+> Another way of framing this is: Say, hypothetically, Sean was to move his
+> implementation into phylink.c. Then we might be able to have a clearer
+> discussion of the merits of each implementation. Possibly driving towards
+> common ground. But it seems hard to do so if we're unsure if there should
+> be a new subsystem or not.
+>
+
+Honestly speaking this case is very similar to some situation where Russell
+had to intervene as the implementation reached criticality (a recent example is
+EEE where the only solution was to provide to phylink more info so correct
+decision could be made preventing MAC driver doing strange broken stuff)
+
+I'm still with the idea that PCS handling in phylink should be improved.
+For example there is a big problem where phylink doesn't exactly know
+what interface are supported from PCS or MAC with the MAC driver
+implement the common pattern of ORing the interface supported by MAC
+and by the different PCS.
+
+I feel that even if the wrapper solution gets accepted, phylink requires a
+big overhaul for PCS handling. (And Russell more or less already started
+it with filling some condition when the select_pcs fails when the interface
+change)
+
+Things are getting complex enough that in some scenarios the PCS
+might fail calibration or might """explode"""" after a while and phylink
+is currently not designed for that.
+
+And also worth considering that for 1gigabit connection it's possible
+that something will fallback from usxgmii to sgmii in this extreme case
+and I feel phylink should be able to handle that smoothly.
+
+This is really just to give some context hoping it gets some traction
+on why we really need to start fixing the problem and putting effort
+on it. (my opinion is that it will only get worse, I'm scared to see
+the complexity of things when 10g+ stuff will reach consumer or
+prosumer market)
+
+> > > phylink-managed standalone PCS drivers (Ansuel)
+> > >
+> > > pros
+> > > ====
+> > >  * trivial resource management
+> >
+> > Actually, I would say the resource management is much more complex and
+> > difficult to follow due to being spread out over many different
+> > functions.
+> >
+> > >  * no wrappers needed
+> > >  * full support for hot-add and deferred probe
+> > >  * avoids code duplication by providing generic select_pcs
+> > >    implementation
+> > >  * supports devices which provide more than one PCS port per device
+> > >    ('#pcs-cell-cells')
+> > >
+> > > cons
+> > > ====
+> > >  * inclusion in phylink means more (dead) code on platforms not using
+> > >    dedicated PCS
+> > >  * series does not provide migrations for existing drivers
+> > >    (but that can be done after)
+> > >  * probably a bit harder to review as one needs to know phylink very well
+> > >
+> > >
+> > > It would be great if more people can take a look and help deciding the
+> > > general direction to go.
+> >
+> > I also encourage netdev maintainers to have a look; Russell does not
+> > seem to have the time to review either system.
+> >
+> > > There are many drivers awaiting merge which require such
+> > > infrastructure (most are fine with either of the two), some for more
+> > > than a year by now.
+> >
+> > This is the major thing. PCS drivers should have been supported from the
+> > start of phylink, and the longer there is no solution the more legacy
+> > code there is to migrate.
+>
+> This seems to be something we can all agree on :)
 
