@@ -1,97 +1,136 @@
-Return-Path: <netdev+bounces-205826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4947B004EF
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 16:18:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69864B004BF
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 16:10:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88D0F4A21EB
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 14:16:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54A7E48664F
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 14:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D5C02727E9;
-	Thu, 10 Jul 2025 14:16:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="f0TLvDl8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 793D9270EB2;
+	Thu, 10 Jul 2025 14:06:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CA8B271456;
-	Thu, 10 Jul 2025 14:16:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF6FD27056D;
+	Thu, 10 Jul 2025 14:06:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752157006; cv=none; b=nG+ujswrIOwGhuBxMypasVs0m1pXqmQNYUpWdaff0jPlOo/w10wvyijgoc1kTZ0mLMIkcRXk6Pu2d8lPseI6UeT9FocL6buao5pJFoxLS9FLnT7eXV2v7+XktbFvyLgmCaW1aiECaT/IpxY1lAhMKoh0Tfv59NcLrf19H5yYicY=
+	t=1752156377; cv=none; b=LYUM5M6JpxxRA0tNRx9OFdeXcEldiGClT2qyky916FScc5oipH6xfImvpDKocJVJHt1Tw0XuN/QC3t9vDvnAXiwv1Aygbu+xc2MPWxfgrm950LS4l/1QZMvbATp5VpB7axvflRgDqmExqN8j6e0Y6lx6MKeu+V/I4zAGH4jlZVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752157006; c=relaxed/simple;
-	bh=mPp5H/pNukYa5NUBq0aQh0anhclyiXfY7vE1nPk0VTc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=irF5By5wlHwwy3WBnvuATZTwnldNgvcEW9wV4Bqj1cmyr33UEfsdX0eVLnC8aAOsm+GQnoG3v7bnsnEJ5awZ2vIIRDYywpg5h4aJlrfNRPobwY/bi7Hk2TJ75IzU/V2GIbdADhkMzubQhqJzIa8k2GS/AeX5SYmRhKfGdZ4Xwf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=f0TLvDl8; arc=none smtp.client-ip=217.70.178.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::229])
-	by mslow3.mail.gandi.net (Postfix) with ESMTP id B08B9583FAC;
-	Thu, 10 Jul 2025 13:53:37 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 52526442CD;
-	Thu, 10 Jul 2025 13:53:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1752155610;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q6oPPvEhp8Ik88bxmQPhOVUx66A2onWuiWPh0/keNbk=;
-	b=f0TLvDl8TkFp5jnGtNAUkwSy9+3bIfhFHYDZbLYKP1NfCaEZkNFScTJTgycSw/TwQpVGAu
-	mH98japgMA+4ClBT4sJqAHIMozhaI6Pf3cR8A8IIH/1RnQ3DqrvU5xudSGv6btyCfxhwbT
-	o49jZKx86u+dB5f7PSHzhCFTJVuIM++gpA8ULCZs6jfxTaWaa7i3CpBTGAjRkB5MLjlxXH
-	wvxSb4DipFL2b91Eov/r4dwM0mf7CBcxomhF7Pzzj5Rgo8hcqpTZAu9p4+qNmLDt4/tpQ8
-	8u3dwtK4M57NeMUI3IBH2pGWiuJYfWhcR1m39kuXsh4QY8G9yZ7ve/uWBXqZzQ==
-Date: Thu, 10 Jul 2025 15:53:28 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: shenwei.wang@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev
-Subject: Re: [PATCH net-next 2/3] net: fec: add more macros for bits of
- FEC_ECR
-Message-ID: <20250710155328.5d5b54b4@fedora>
-In-Reply-To: <20250710090902.1171180-3-wei.fang@nxp.com>
-References: <20250710090902.1171180-1-wei.fang@nxp.com>
-	<20250710090902.1171180-3-wei.fang@nxp.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1752156377; c=relaxed/simple;
+	bh=yA/I0gJM/OKVOhc8b6C9blaRbMv2JfyPFC62inigLKo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LDwrLKHHMH6IsmQmCckgNjgkywuVjlhiJlDQ+y88stPsYs/29sH1vUrgheL/zdXttr3weI/1U5a9ZL5QjvUDcSAMkE4xJKSYXMyjoUvbVBSFPr4sfOP4916CqF5QAQfOmrpKqzh+Qd0nmWdxSE7PfbUuBi/nsKHMqm0UM6hkOk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-607cc1a2bd8so1611487a12.2;
+        Thu, 10 Jul 2025 07:06:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752156374; x=1752761174;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6racAcJNW4RKgIaC4lIcLewARYRmDGKH6RcAriCOozU=;
+        b=lI5H0z10XAJ/q7X0MsktC3rlqEgbOc5zjkafj7tKtCg7byC9BUefysO4Y3Q+5LD1EZ
+         O5VUWJoZO+cpUgYaasMfzpKlpwicNhihES9nT6d3uAAA/cWasgmrjevPXP4mIpdowRnH
+         YDGzNanA6AxF4mg5HTN6dHdazGofhqM92gj9yUUFeD9uMYlsu2ra6rhQ/tHP76JKNahT
+         k8GTLklqur4M8pmYa9YcL+U0xakqrtC0cQ5cdK32eNgXSXH6IROBT97+4eRBqPwUM92j
+         E2V9DXfVL034NoFNRvZsFkoEbL+7904DqgqobwuAhS7KFZ779wARXak8tNfVsyrKcVCZ
+         goeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUvdf0Fw6Ytv3wk1jvBB2XVqHPQ9I/VKg8fT285tZQGikrfYLh6L/C1HyIMfOGDvwIidDSX@vger.kernel.org, AJvYcCW4qGq/vJH2T/UH5Y8JwbfdhTTTpIZlx0ddXnzQgQ8n4vTPMYKWNhXRWfpa9H5gK6nV0OaD2/U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw86B3UtI2tWRqAf/PQt8TisP6opqAjfMz8rcr6h51sRb0cWu3o
+	9K9Cb/29rqRGcI85xJGlTy4uEHEpw24zJTO9pMgfjokvpYFjZ+Kch9qC
+X-Gm-Gg: ASbGncv64aTezFhSrTGgAooBMKYkPnYlDtyzNeHQM0RaSvwnC5Y2Pp9ETPDYITC3jH4
+	U8+Bp+796LU+AoBEWQus5mdVSBdbG8QmAEnRYlpOf03WNM62tt429QqPgSU59hAFCjkS2Q53xun
+	v5A/B2vOdQehFny6VjRJHAWVqDE1nwS+JcG6VAA6GfzNMgyJYSlKINGrqur4VRQHNgOgIwKGIf0
+	lKshlx8vFWk7v42EgiRaclKIqYzY9KqVWjvmO9jud/hgSiSAhCAItVIeCPceIqou3+rLSJDsiZJ
+	rv5GzPWhXcZdptaLib3KtEIyHxficZYZh6z0wj9sBQEaSS4eTHT8
+X-Google-Smtp-Source: AGHT+IFmVAxl1c+wDjcDDTe+BiajHbN+l+Z6s7GZDC3h8YpwVObUutZTnP3nnWaOqw2omJw6WNqiMQ==
+X-Received: by 2002:a05:6402:1f46:b0:602:36ce:d0e7 with SMTP id 4fb4d7f45d1cf-611c84d65d3mr2307951a12.14.1752156373710;
+        Thu, 10 Jul 2025 07:06:13 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:6::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-611c9524072sm927420a12.20.2025.07.10.07.06.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Jul 2025 07:06:13 -0700 (PDT)
+Date: Thu, 10 Jul 2025 07:06:09 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Boqun Feng <boqun.feng@gmail.com>
+Cc: linux-kernel@vger.kernel.org, rcu@vger.kernel.org, 
+	lkmm@lists.linux.dev, Peter Zijlstra <peterz@infradead.org>, 
+	Ingo Molnar <mingo@kernel.org>, Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
+	Davidlohr Bueso <dave@stgolabs.net>, "Paul E. McKenney" <paulmck@kernel.org>, 
+	Josh Triplett <josh@joshtriplett.org>, Frederic Weisbecker <frederic@kernel.org>, 
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, Joel Fernandes <joelagnelf@nvidia.com>, 
+	Uladzislau Rezki <urezki@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Lai Jiangshan <jiangshanlai@gmail.com>, 
+	Zqiang <qiang.zhang@linux.dev>, aeh@meta.com, netdev@vger.kernel.org, edumazet@google.com, 
+	jhs@mojatatu.com, kernel-team@meta.com, Erik Lundgren <elundgren@meta.com>
+Subject: Re: [PATCH 8/8] locking/lockdep: Use shazptr to protect the key
+ hashlist
+Message-ID: <i3mukc6vgwrp3cy5eis2inyms7f5b4a6pel4cvvdx6jlxrij2g@wgrnkstlifv3>
+References: <20250625031101.12555-1-boqun.feng@gmail.com>
+ <20250625031101.12555-9-boqun.feng@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdegtdeiudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejpdhhvghlohepfhgvughorhgrpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepuddupdhrtghpthhtohepfigvihdrfhgrnhhgsehngihprdgtohhmpdhrtghpthhtohepshhhvghnfigvihdrfigrnhhgsehngihprdgtohhmpdhrtghpthhtohepgihirghonhhinhhgrdifrghnghesnhigphdrtghomhdprhgtphhtthhop
- egrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250625031101.12555-9-boqun.feng@gmail.com>
 
-On Thu, 10 Jul 2025 17:09:01 +0800
-Wei Fang <wei.fang@nxp.com> wrote:
+Hello Boqun,
 
-> There are also some RCR bits that are not defined but are used by the
-> driver, so add macro definitions for these bits to improve readability
-> and maintainability.
+On Tue, Jun 24, 2025 at 08:11:01PM -0700, Boqun Feng wrote:
+> Erik Lundgren and Breno Leitao reported [1] a case where
+> lockdep_unregister_key() can be called from time critical code pathes
+> where rntl_lock() may be held. And the synchronize_rcu() in it can slow
+> down operations such as using tc to replace a qdisc in a network device.
 > 
-> In addition, although FEC_RCR_HALFDPX has been defined, it is not used
-> in the driver. According to the description of FEC_RCR[1] in RM, it is
-> used to disable receive on transmit. Therefore, it is more appropriate
-> to redefine FEC_RCR[1] as FEC_RCR_DRT.
+> In fact the synchronize_rcu() in lockdep_unregister_key() is to wait for
+> all is_dynamic_key() callers to finish so that removing a key from the
+> key hashlist, and we can use shazptr to protect the hashlist as well.
 > 
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> Compared to the proposed solution which replaces synchronize_rcu() with
+> synchronize_rcu_expedited(), using shazptr here can achieve the
+> same/better synchronization time without the need to send IPI. Hence use
+> shazptr here.
+> 
+> Reported-by: Erik Lundgren <elundgren@meta.com>
+> Reported-by: Breno Leitao <leitao@debian.org>
+> Link: https://lore.kernel.org/all/20250321-lockdep-v1-1-78b732d195fb@debian.org/ [1]
+> Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+First of all, thanks for working to fix the origianl issue. I've been
+able to test this in my host, and the gain is impressive.
 
-Maxime
+Before:
+
+         # time /usr/sbin/tc qdisc replace dev eth0 root handle 0x1234: mq
+         real    0m13.195s
+         user    0m0.001s
+         sys     0m2.746s
+	
+With your patch:
+
+	#  time /usr/sbin/tc qdisc replace dev eth0 root handle 0x1234: mq
+	real	0m0.135s
+	user	0m0.002s
+	sys	0m0.116s
+
+	#  time /usr/sbin/tc qdisc replace dev eth0 root handle 0x1: mq
+	real	0m0.127s
+	user	0m0.001s
+	sys	0m0.112s
+
+Please add the following to the series:
+
+Tested-by: Breno Leitao <leitao@debian.org>
 
