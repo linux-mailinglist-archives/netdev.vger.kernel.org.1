@@ -1,221 +1,270 @@
-Return-Path: <netdev+bounces-205934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 629C1B00D77
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 23:04:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DC47B00D7D
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 23:08:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 397C61C48671
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 21:04:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B666C58759E
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 21:08:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0BCC2FD594;
-	Thu, 10 Jul 2025 21:04:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AF502FD864;
+	Thu, 10 Jul 2025 21:08:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="NKoAhR2n"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LQIuVnOE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.denx.de (mx.denx.de [89.58.32.78])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE63271474;
-	Thu, 10 Jul 2025 21:04:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3FB82FCE09
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 21:07:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752181472; cv=none; b=EV6uFQ98JQ3oLyotAN4+GO5clqaZhTBjYFD9yx71Tw0l3wmC/nFMF4y/EXpJkN9rbrLyU6J4nYt7hlzk6rGmvufiyofi09umeBPuq5jnn9AFkAJdlPYCTHQUxU3P1T82Hu8huzE4mZpjolfyrINrBmnOnV5cC3FL3AUYVWV0cfA=
+	t=1752181680; cv=none; b=rbd5suIQR2HLcVjQFYDEaOb8p9ZLWHuZ4NXKBoKvnSygw2fVvUGEhOaYgbTWwj72ddhniKkXZclD8OqaeT1ScSdludp8x8cRxLFwV7FSTRpkfskmvudDHV9ek2XjyxN54M5S7vLwRsDgCjHpaOsW6OvqA/xF6irTJ6F2YW7X5jk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752181472; c=relaxed/simple;
-	bh=X3w/Lmb4tCjm3BYfefbohBWkasM97PEphdqhUzf90po=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OJupyKXY5oIhPD3Ke9buEixHJByI/EQeIWIeccmHZmfI4RztKXqx4zC3P5JXdVwgzQ/P5Ip9LuPjHHjXcD76Ku2t5cofqWzNegPoRZ07YwIF5TjJEg6XBy9AI7oDUHdiBR8xVtZlVhfYrXqOezI3s2s5VF9rcj4LWCrNuWwrVao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=NKoAhR2n; arc=none smtp.client-ip=89.58.32.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9D96210380104;
-	Thu, 10 Jul 2025 23:04:15 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1752181460; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=hEznsWOa6dCQ6qINcx3pqCiUfEhxMJkXZwCwsLHg0BI=;
-	b=NKoAhR2nPBFfkuYKVaXMV1hlVbbaBvMMsxgB4L8meNIyaawoWY+qb/m/YnbvrBbzZt/5qh
-	91ANS8GhzV4ryPkjFmdSUoLDd10tWu/XC1iVwBzeR+IotLoRDcKBMRQ7NtgJFCEsEs9zhr
-	rLmMFB08IS99ST23K3z4MmigurNJEcztPB6G1qGHRyCqzOT9zbE0RNTHMJyM7vB1LNgOPU
-	vZcOCZeJjMS7dGKtkETAJjL2gY0PmEOkTRblnC0N8UOm6CIXkNX4QyjRUbQS9cQqRw+iO8
-	EbuvR2DBv739MI8UDnsCOnlxMPfxSBIQ5gV9mVjVigKWICFeC8Mywd5TohJbKQ==
-Date: Thu, 10 Jul 2025 23:04:13 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
- <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, Richard Cochran
- <richardcochran@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
- <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>, Andrew Lunn
- <andrew@lunn.ch>
-Subject: Re: [net-next v14 04/12] net: mtip: The L2 switch driver for imx287
-Message-ID: <20250710230413.3b6798f7@wsk>
-In-Reply-To: <20250709131651.391e11c5@wsk>
-References: <20250701114957.2492486-1-lukma@denx.de>
-	<20250701114957.2492486-5-lukma@denx.de>
-	<617d064e-99e4-491c-8fe7-d74d8174d9fb@redhat.com>
-	<20250709131651.391e11c5@wsk>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1752181680; c=relaxed/simple;
+	bh=H1IPeIccAnwjfs0WpZeHufMS44gCESa5qppZzC3iFek=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=olLqGZH4OscOH47Cq8LIyAlquF7mweosjae97rHdGKLaFVzAwLx6Si/3BvMlqqF7Le24iXJtpX/JgyIqvdxsqF87jHVInlnj8AwLaLOaNB+uQo8JQAsAT6hjeTJUrLkWKuib7M/pgbLKIQ/ZHa32KhMU/o8fl0zSvMMqB6rX1jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LQIuVnOE; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752181676;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9yGXmz048mjHAM/oCbqLFH8FBN50Fh1/awgsA+FR9KU=;
+	b=LQIuVnOE9Tu/cfdxcYLzkF9UohfmFLdhcHdW2AjgDepOns2pv1GE/EMr4CrR0NFLKKY6Gm
+	qECDM0U+NILVFP0P8ICVfIqfoHRJKFFvnjZvNMZeaLmpo25mSWjxOK4YqKJi93wbaagmaj
+	e9Yl/GEHaMG9e70Uovr0bHijP5Q/N7w=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-126-leZR9H6VP7Wh_FDAX61j0A-1; Thu,
+ 10 Jul 2025 17:07:53 -0400
+X-MC-Unique: leZR9H6VP7Wh_FDAX61j0A-1
+X-Mimecast-MFC-AGG-ID: leZR9H6VP7Wh_FDAX61j0A_1752181670
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8851A195609E;
+	Thu, 10 Jul 2025 21:07:50 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.88.100])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E607730001A1;
+	Thu, 10 Jul 2025 21:07:46 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: =?utf-8?Q?Adri=C3=A1n?= Moreno <amorenoz@redhat.com>
+Cc: dev@openvswitch.org,  netdev@vger.kernel.org,  Andrew Lunn
+ <andrew+netdev@lunn.ch>,  "David S. Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
+ Abeni <pabeni@redhat.com>,  Eelco Chaudron <echaudro@redhat.com>,  Ilya
+ Maximets <i.maximets@ovn.org>,  Mike Pattrick <mpattric@redhat.com>,
+  Florian Westphal <fw@strlen.de>,  John Fastabend
+ <john.fastabend@gmail.com>,  Jakub Sitnicki <jakub@cloudflare.com>,  Joe
+ Stringer <joe@ovn.org>
+Subject: Re: [RFC] net: openvswitch: Inroduce a light-weight socket map
+ concept.
+In-Reply-To: <CAG=2xmOXG_5da9+yX0z8hruTqgQxaHzRLVVHZU9M9cmZ475Qqw@mail.gmail.com>
+	(=?utf-8?Q?=22Adri=C3=A1n?= Moreno"'s message of "Thu, 10 Jul 2025 02:35:26
+ -0700")
+References: <20250627210054.114417-1-aconole@redhat.com>
+	<CAG=2xmOXG_5da9+yX0z8hruTqgQxaHzRLVVHZU9M9cmZ475Qqw@mail.gmail.com>
+Date: Thu, 10 Jul 2025 17:07:45 -0400
+Message-ID: <f7ttt3jpxem.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/bvMryEMKXN67+shfLzzO8Cd";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Last-TLS-Session-Version: TLSv1.3
-
---Sig_/bvMryEMKXN67+shfLzzO8Cd
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Hi Paolo,
+Adri=C3=A1n Moreno <amorenoz@redhat.com> writes:
 
-> Hi Paolo,
->=20
-> > On 7/1/25 1:49 PM, Lukasz Majewski wrote: =20
-> > > Changes for v14:
-> > > - Increase the maximal received frame size to 1536 (for VLAN)
-> > > - Use spin_{un}lock_irq{save|restore} when altering dynamic table
-> > > of the switch and mtip_adjust_link() as both cannot be done when
-> > > switch IRQ is potentially enabled   =20
-> >=20
-> > Why?
-> >=20
-> >  (the previous one alters entries in switching table =20
-> > >   the latter one may reset the whole IP block)   =20
-> >=20
-> > What really matters is the scope (process/atomic, bh, hardirq) of
-> > the relevant callers (the functions that do acquire the given
-> > locks).=20
->=20
-> Maybe I will explain the problem here case (function) by case:
-> - mtip_adjust_link()
->   This function is called when link change is detected (speed, duplex,
->   up/down link).
->=20
->   The problem here is that:
-> 	1. It is called for both MTIP ports (as both are managed by
-> 	this driver)
->=20
-> 	2. NXP's "legacy" driver advises reset of the whole IP block
-> 	when such change is detected.=20
->=20
-> 	Considering the above - interrupts shall be disabled as we may
-> 	end up in undefined state of the IP block - especially that
-> 	re-configuration of switch requires interrupts initialization.
->=20
->=20
-> - mtip_atable_dynamicms_learn_migration() - update of the switching
->   table
->=20
-> 	Can be called from:
-> 	1. function triggered when timer fires (once per 100ms)
->=20
-> 	2. mtip_switch_rx() which is called from mtip_rx_napi()
-> callback (which is protected by net core).
->=20
-> 	It looks like the _irqsave/_irqrestore is an overkill here.
-> 	Both above contexts seems to not require IRQs disabled. I can
-> 	confirm that use of plain spin_{un}lock() functions works.
->=20
-> >  =20
-> > > +/* dynamicms MAC address table learn and migration */
-> > > +static void
-> > > +mtip_atable_dynamicms_learn_migration(struct switch_enet_private
-> > > *fep,
-> > > +				      int curr_time, unsigned
-> > > char *mac,
-> > > +				      u8 *rx_port)
-> > > +{
-> > > +	u8 port =3D MTIP_PORT_FORWARDING_INIT;
-> > > +	struct mtip_port_info *port_info;
-> > > +	u32 rx_mac_lo =3D 0, rx_mac_hi =3D 0;
-> > > +	unsigned long flags;
-> > > +	int index;
-> > > +
-> > > +	spin_lock_irqsave(&fep->learn_lock, flags);   =20
-> >=20
-> > If the _irqsave() part is needed (and I don't see why??!) than all
-> > the other `learn_lock` users should also use such variant, unless
-> > already in hardirq scope.
-> >=20
-> > [...] =20
-> > > +static void mtip_adjust_link(struct net_device *dev)
-> > > +{
-> > > +	struct mtip_ndev_priv *priv =3D netdev_priv(dev);
-> > > +	struct switch_enet_private *fep =3D priv->fep;
-> > > +	struct phy_device *phy_dev;
-> > > +	int status_change =3D 0, idx;
-> > > +	unsigned long flags;
-> > > +
-> > > +	spin_lock_irqsave(&fep->hw_lock, flags);   =20
-> >=20
-> > Same here. =20
->=20
-> Please see the explanation above.
->=20
+> On Fri, Jun 27, 2025 at 05:00:54PM -0400, Aaron Conole wrote:
+>> The Open vSwitch module allows a user to implemnt a flow-based
+>> layer 2 virtual switch.  This is quite useful to model packet
+>> movement analagous to programmable physical layer 2 switches.
+>> But the openvswitch module doesn't always strictly operate at
+>> layer 2, since it implements higher layer concerns, like
+>> fragmentation reassembly, connection tracking, TTL
+>> manipulations, etc.  Rightly so, it isn't *strictly* a layer
+>> 2 virtual forwarding function.
+>>
+>> Other virtual forwarding technologies allow for additional
+>> concepts that 'break' this strict layer separation beyond
+>> what the openvswitch module provides.  The most handy one for
+>> openvswitch to start looking at is the concept of the socket
+>> map, from eBPF.  This is very useful for TCP connections,
+>> since in many cases we will do container<->container
+>> communication (although this can be generalized for the
+>> phy->container case).
+>>
+>> This patch provides two different implementations of actions
+>> that can be used to construct the same kind of socket map
+>> capability within the openvswitch module.  There are additional
+>> ways of supporting this concept that I've discussed offline,
+>> but want to bring it all up for discussion on the mailing list.
+>> This way, "spirited debate" can occur before I spend too much
+>> time implementing specific userspace support for an approach
+>> that may not be acceptable.  I did 'port' these from
+>> implementations that I had done some preliminary testing with
+>> but no guarantees that what is included actually works well.
+>>
+>> For all of these, they are implemented using raw access to
+>> the tcp socket.  This isn't ideal, and a proper
+>> implementation would reuse the psock infrastructure - but
+>> I wanted to get something that we can all at least poke (fun)
+>> at rather than just being purely theoretical.  Some of the
+>> validation that we may need (for example re-writing the
+>> packet's headers) have been omitted to hopefully make the
+>> implementations a bit easier to parse.  The idea would be
+>> to validate these in the validate_and_copy routines.
+>>
+>> The first option that I'll present is the suite of management
+>> actions presented as:
+>>   * sock(commit)
+>>   * sock(try)
+>>   * sock(tuple)
+>>
+>> These options would take a 5-tuple stamp of the IP packet
+>> coming in, and preserve it as it traverses any packet
+>> modifications, recirculations, etc.  The idea of how it would
+>> look in the datapath might be something like:
+>>
+>>    + recirc_id(0),eth(src=3DXXXX,dst=3DYYYY),eth_type(0x800), \
+>>    | ip(src=3Da.b.c.d,dst=3De.f.g.h,proto=3D6),tcp(sport=3DAA,dport=3DBB=
+) \
+>>    | actions:sock(tuple),sock(try,recirc(1))
+>>    \
+>>     + recirc_id(1),{match-action-pairs}
+>>     ...
+>>     + final-action: sock(commit, 2),output(2)
+>>
+>> When a packet enters ovs processing, it would have a tuple
+>> saved, and then forwarded on to another recirc id (or any
+>> other actions that might be desired).  For the first
+>> packe, the sock(try,..) action will result in the
+>> alternativet action list path being taken.  As the packet
+>> is 'moving' through the flow table in the kernel, the
+>> original tuple details for the socket map would not be
+>> modified even if the flow key is updated and the physical
+>> packet changed.  Finally, the sock(commit,2) will add
+>> to the internal table that the stamped tuple should be
+>> forwarded to the particular output port.
+>>
+>> The advantage to this suite of primitives is that the
+>> userspace implementation may be a bit simpler.  Since
+>> the table entries and management is done internally
+>> by these actions, userspace is free to blanket adjust
+>> all of the flows that are tcp destined for a specific
+>> output port by inserting this special tuple/try set
+>> without much additional logic for tracking
+>> connections.  Another advantage is that the userspace
+>> doesn't need to peer into a specific netns and pull
+>> socket details to find matching tuples.
+>
+> What if there is no match on tcp headers at all? Would userspace also
+> add these actions?
 
-Is the explanation enough (and from other e-mails), so I can proceed
-with next version of this patch set?
+Well, for now we discard the kernel provided flow key, but that does
+have the parsed details and we can use that.
 
-> >=20
-> > /P
-> >  =20
->=20
->=20
->=20
->=20
-> Best regards,
->=20
-> Lukasz Majewski
->=20
-> --
->=20
-> DENX Software Engineering GmbH, Managing Director: Johanna Denk,
-> Tabea Lutz HRB 165235 Munich, Office: Kirchenstr.5, D-82194
-> Groebenzell, Germany
-> Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email:
-> lukma@denx.de
+> I guess you could argue that, if OVS is not being asked to do L4, this
+> feature would not apply, but what if it's just the first flow that
+> doesn't have an L4 match? How would userspace now how to add the action?
 
+You can see my answer to Eelco, maybe it helps - but the idea is to work
+by hooking the xlate layer's output.  There could be some kind of
+additional work we need to do when the rules are more complex, as you
+note (for instance looking in the xlate cache), but we should be able to
+do this.
 
+>>
+>> However, it means we need to keep a separate mapping
+>> table in the kernel, and that includes all the
+>> tradeoffs of managing that table (not added in the
+>> patch because it got too clunky are the workqueues
+>> that would check the table to basically stop counters
+>> based on the tcp state so the flow could get expired).
+>>
+>> The userspace work gets simpler, but the work being
+>> done by the kernel space is much more difficult.
+>>
+>> Next is the simpler 'socket(net,ino)' action.  The
+>> flows for this may look something a bit more like:
+>>
+>>    + recirc_id(0),eth(src=3DXXXX,dst=3DYYYY),eth_type(0x800), \
+>>    | ip(src=3Da.b.c.d,dst=3De.f.g.h,proto=3D6),tcp(sport=3DAA,dport=3DBB=
+) \
+>>    | actions:socket(NS,INO,recirc(0x1))
+>>
+>> This is much more compact, but that hides what is
+>> really needed to make this work.  Using the single
+>> primitive would require that during upcall processing
+>> the userspace is aware of the netns for the particular
+>> packet.  When it is generating the flows, it can add
+>> a socket call at the earliest flow possible when it
+>> sees a socket that would be associated with the flow.
+>>
+>> The kernel then only needs to validate at the flow
+>> installation time that the socket is valid.  However,
+>> the userspace must do much more work.  It will need
+>> to go back through the flows it generated and modify
+>> them (or insert new flows) to take this path.  It
+>> will have to peer into each netns and find the
+>> corresponding socket inode, and program those.  If
+>> it cannot find those details when the socket is
+>> first added, it will probably not be able to add
+>> these later (that's an implementation detail, but
+>> at least it will lead to a slow ramp up).
+>>
+>> From a kernel perspective it is much easier.  We
+>> keep a ref to the socket while the action is in
+>> place, but that's all we need.  The
+>> infrastructure needed is mostly all there, and
+>> there aren't many new things we need to change
+>> to make it work.
+>>
+>> So, it's much more work on the userspace side,
+>> but much less 'intrusive' for the kernel.
+>
+> I'm quite intrigued by what would userspace have to do in this case.
+> IIUC, it would have to:
+> 1) Track all sockets created in all affected namespaces
+> 2) Associate a socket with an upcalled packet
+> 3) Carry this information throughout recirculations until an output
+> action is detected and the destination socket found.
 
+That's a way to do it, but it requires OVS to have a separate process
+running to track the sockets as well.  I'd rather just get it at the
+point we know we will output and then lookup the socket details and work
+backwards.  That also means we don't need to preserve information across
+controller callouts from the userspace side.
 
-Best regards,
+> 4) Traverse the recirculation chain backwards to find the first flow
+> (recirc_id(0)) and modify it to add the socket action.
 
-Lukasz Majewski
+Yes, this recirc lookup needs to be thought out because we will
+potentially need to get to the beginning of the chain - picking that is
+important.  We could default to just using recirc_id(0) and then
+doing a flow_mod on the start of the chain to have the right jump point.
+Picking the start of chain is difficult - but I figured that just
+choosing recirc_id(0) would be okay.
 
---
+> Is that what you had in mind or am I completely off-track?
 
-DENX Software Engineering GmbH, Managing Director: Johanna Denk,
-Tabea Lutz HRB 165235 Munich, Office: Kirchenstr.5, D-82194
-Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+Sortof - hopefully I explained it a bit better.
 
---Sig_/bvMryEMKXN67+shfLzzO8Cd
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+> Thanks.
+> Adri=C3=A1n
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmhwKs0ACgkQAR8vZIA0
-zr2/Vgf8CAqpAWYmJVhTy2njCpyqUymWCFVNmNXK6Gllt/Zw6SkfkIq7Mi1felFl
-EJkW8NkrKNvDxmLEuj95mjwk8ICa449UxTacaOTIGSx7cf2NaHuHZ/C3uaPE7qXO
-JRczFT5e/V94lznm06bF+Msp5anCRiP51OB8T3CT5jPuA3lBe3rv9Kib9QmqF/9y
-8scAsy79+4aVtbsGcsghx7sxi/en9c2j2XkrJstKEJhpbYlRq3m/lUlKYzVLdkfq
-YynjGqmcQJMdO4uyORkyyk0D9IqRrVhLKvrWjs7FzcBA+yjjz9XL1GjznewUqfM4
-9GPDqpw9n7gaQxIB+WQj1EhhaJorrA==
-=okWF
------END PGP SIGNATURE-----
-
---Sig_/bvMryEMKXN67+shfLzzO8Cd--
 
