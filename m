@@ -1,390 +1,126 @@
-Return-Path: <netdev+bounces-205764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02B93B000DD
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 13:56:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A799FB000FF
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 13:59:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0D4F1C8133B
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 11:57:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 860CD3BBE9B
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 11:58:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDD0924C068;
-	Thu, 10 Jul 2025 11:56:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD8A224A061;
+	Thu, 10 Jul 2025 11:58:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BijUSe0Z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hv+J8cWA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB4092222AB
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 11:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34BE92222AB
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 11:58:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752148603; cv=none; b=fogZcS1719mXk54b39bh96vL+ctadE6Bub7CjcAAaWqcEZIb5jtzPPt3AXb/CT91H6ukdbVD+PFAtCmKBDXj/hzLQA3NasojqtO7G8ov0GF9ePmSY/Fb/WXQTUpsUE8J3TPbcU3GLLOqZupsidLtuw2OzyY26ydrrVNEUvI9cu0=
+	t=1752148701; cv=none; b=DdMqxXm6kl/mdFBk+aTFvbuuXkUhUdONOzNJjBWZgENaocB3qNYO+N2jOVnh5nLEbHJXvcAjhDJllyjumvxllzQBZpNcM3gZmb8Wxfge3EWtfMEWj0F2izfj7xP1EtlVi7WUvcjjrHYnEgJvSTrPGEeD/T26wnXBEhyFZ9zIHCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752148603; c=relaxed/simple;
-	bh=rb5G70qXFnSXAk+IatFCs9R5tWR/o9T1v9n/4Spo0WM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HtmtB19Rf3E/ttV7u7GgYiS87lvf6StY9dxXz8+ipEAuNQwwEYDYPdQPKTwtR/3qY6BuXtb5vTF4UwgUFfjz6WcdhBPXD/SyBjZ/2AsndmT9sKMAbD/zLRaBhd1ZDNaWXaxDZq+rTCoIL8JRymGSHhQlX+FALQvZXddgrXIi5GU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BijUSe0Z; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752148600;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kkyFAMEt5Iz+PWCaYqtt6MOGf4QHLSC9s47AzIFA+5A=;
-	b=BijUSe0ZrIKPi0EXc9z5K3/As9SZMvcP+PCTV6PosyegAi6d/m81STtNv6AaCwKlvLI6Gq
-	taWMrOLELWrKwl/0RD/1dmm0u4EBfqx4sTxLLlOUMFcCy6jF+MTvGoDcR2mh1hw6kIK5AN
-	idXdO2iJE4WGx//uNs1f2TGwu+ywDHk=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-91-UBfEy3WjN9KUigkWLT-Rig-1; Thu, 10 Jul 2025 07:56:39 -0400
-X-MC-Unique: UBfEy3WjN9KUigkWLT-Rig-1
-X-Mimecast-MFC-AGG-ID: UBfEy3WjN9KUigkWLT-Rig_1752148599
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-315af0857f2so1116280a91.0
-        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 04:56:39 -0700 (PDT)
+	s=arc-20240116; t=1752148701; c=relaxed/simple;
+	bh=37GTRVhuocmfkPKaUGcofliLx6mUVvlkTf3yOPxVGro=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nm4B42jBk/+CLbMurRuDIfXdJFX+Wb+v1epCFQja+mNbPvLDbJajkprBbgdrBoY4oCInive/Aki4lLjKdbHZpvDLMNBMgIdoofsclOQcxgUSGkMNy7Igv+iSf/7IJKdkq6YJk2AX/5yLtezMMwJAHsy7HVjAACW7AgkP2QmMCfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hv+J8cWA; arc=none smtp.client-ip=209.85.219.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6fad3400ea3so8883146d6.0
+        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 04:58:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752148699; x=1752753499; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QvnZaGQ2I3aEx1WPBW9AA4zwM5tnxtodAflKv8pT2ko=;
+        b=hv+J8cWAV0zQEDMFwAbHxunS2BMLIBISXdsCIDvVbnfK92H1nrUEXItrcUZJ5Q+c5L
+         mofR9MPKyCazgWYJE0Y+SRKMjq/rGpYLXVT8jXFg7+Y/DYBhWlcDpqxUzF/uCdRhFcPL
+         VBgkoDaKtIAXTi+txMLGaz/NoP302At46/e/9/7bD80cbt4w0q50EZGcqplwIZViOntO
+         qejhp68G2MgrV8qvBnHSr+UBa9kaRytQM+FgAuXICMGcoTht6UH3ozDNIOzk04w4gfFn
+         mMUNpxtGT1nmUtRDNlgVg+TuAjNkv39+K1wBIjUJWt//4atO4egUgkYs/3n6vQ0qboBY
+         IIzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752148598; x=1752753398;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kkyFAMEt5Iz+PWCaYqtt6MOGf4QHLSC9s47AzIFA+5A=;
-        b=mAlUrVH9fFW9yys7nzchpK5t8kEawPEuyO3oZsAleLHcDTyxSy3FM89jQ3zKqSkvcU
-         CZ5fktIpW34UrWos9vaI1qs234Ttk/hQsrHTjAHbEcqQ5HRO3TLHTXw9DtHrYVIgomvj
-         di1+gjNiUOHuGluh+wYUF+L5Wrzpqub0sWFMI+4YB2UEixUCeYqkS8ck5J0lrySLDCPe
-         aKqn1xmSqVUxL344IEp+24+di6U9z9spcMklSf6GJ8CvNUY3y2CKW3R5xAyZt+1kRWFO
-         zJQ0jrYq2iah89VT33AP9TDpkGl5qkaP2ONvMXURHnF+aG05IKpeDynZe91uKelLinK3
-         frWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWZGw6mRTfQb+ROR86+6y0oyrVHLV9WQchW3IKHVBISPzEHW0BjXp8Ajq1MHlfwuaCzfksXayI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywlq9jEbj+n32TGpHQS/PvU6auijfEECMYkYbfXsApMezISKRam
-	Awd9cHtI/5dVMh0ChQxybJ9oWQWhLYHBiC7aBtPOPraNebqBCLv7S6FcsWbXTaQ9GlCpu0O0GUb
-	RBZRcyqnY3ZN/yg4cZ6W8PMwMymKoVAeKD8PGxxqGciRh2czLN+PL8nF6oOoW6UIQehXMG3UVrP
-	iN0WawRCicsvYWjI7sYvIBGsctaxXGKRYhPUfygHFVUY8=
-X-Gm-Gg: ASbGncth0H/Q7hPhvijt4NTB4RWoOjYzosvC834b8r+Xa8kMAUKKpbOtgxMvVo6iWwI
-	K8ya9yKvbdax9G0oB8TqQQP0s0sMgv3zQ1LOIuvAw4lTz+ptu0VpaATTjYcjHLeFlUMpqCq3B6V
-	0SAQ==
-X-Received: by 2002:a17:90b:3b49:b0:311:e358:c4af with SMTP id 98e67ed59e1d1-31c3f009e6fmr4393640a91.16.1752148598089;
-        Thu, 10 Jul 2025 04:56:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEGzXDXIYrI4f+jLyxhULQ9DqyW5G8ylmygYQYyAzXd4OJkMIkYk3DytFSfacD1R0OWVPHmUj+PcCPRkbGbaLU=
-X-Received: by 2002:a17:90b:3b49:b0:311:e358:c4af with SMTP id
- 98e67ed59e1d1-31c3f009e6fmr4393594a91.16.1752148597517; Thu, 10 Jul 2025
- 04:56:37 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752148699; x=1752753499;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QvnZaGQ2I3aEx1WPBW9AA4zwM5tnxtodAflKv8pT2ko=;
+        b=izqJ+3rXlsqkrlJ54Lrx6o+Lsmukw0ouKKDpt0NVtHxQDPFLOHpgHlrB/Xsz+fHn99
+         qVvdT6cyHJHTWFMyOnpuV4nMMDDf4iuXba5DU8P2lwTwFOBk1psoKFi9Yt6U0FbA6wfh
+         D+vvU3s5cWK7S3cxIL4uf7kFtlK6stvjCEeLFnT1yD8Gjs7H7TDRyMZoXsuyJvD9TRnL
+         agh01S3L1EKufzMLdxPAQpgJQ15uPtT40TSaxkDJ9ygWdo/arPOucZb/zq/UUENDuV9R
+         LxmZz5JmsZGt7wEdNsPqOwDX2Vzi149S+zBq6u4y3LuEFHFfmRNRujz89K0gwDcNjE6v
+         b8lQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVSZZk5Dy0tc36JslVOIz3KhH186OJvjFBth1TmLCd2/k51105NLxmlyUs05joUmzoPxS5T9CU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwIZ0tH9qyhvRNvSyUEJb5bHk+6p20LspNm/21qZNWIgq3XLd+
+	kPa16v6QJx3MYkr1JOWd3J29Banb8Z2qdk3PiJu11XIQ3WFb0gwJUiRV
+X-Gm-Gg: ASbGncu4XaIY1Gqmyj+2Gika5kGh3wgQ4XzAN7BAuVwuJGjcrIXvyUbiDaoobkQm8dP
+	+tluHUcj/NkQXahdxA4R0U8SuxWJOum/JZ+oXCXiH8T21wJpgPvhL2a83qabmkA+sbudIUCffDp
+	GX1xr4r1VzxI05W8kjPaI0ukIYvVcsmspwIIfjZ+CwDvqCUnNHI38T4tssq/8gCJdzfRwTD+lBj
+	JySv9Z0lrC2+207BGCXPxYsFcneJCvDO2XvCYvr6hbxVvcmFRgZznDukR5paJGC4h8EqMIsvM2Y
+	ocOGvKe0S90tH05ZzEBX/L8Z77xPxI36YAiJfnM16J3lNpNslvYpYJMBZA0J0YTp3FPHAY7eO/H
+	Ftvms5Ddo2n6GJHEf6P79XorqcTOu4J9QmxmJSIob
+X-Google-Smtp-Source: AGHT+IHZ2ozF3o+NtlqfmTNQ+zeKqz80ZHwzg+jfefMLkuq+0v1MQTSk+VL6Fq91K4OLyEFYXY4UhA==
+X-Received: by 2002:a05:6214:4a07:b0:704:807f:da4e with SMTP id 6a1803df08f44-7048b8304e8mr90037106d6.11.1752148698777;
+        Thu, 10 Jul 2025 04:58:18 -0700 (PDT)
+Received: from ?IPV6:2600:4040:95d2:7b00:8471:c736:47af:a8b7? ([2600:4040:95d2:7b00:8471:c736:47af:a8b7])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-704979e459csm7709626d6.49.2025.07.10.04.58.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Jul 2025 04:58:18 -0700 (PDT)
+Message-ID: <582cde2d-bdcd-4866-ab78-2a8e8590e8eb@gmail.com>
+Date: Thu, 10 Jul 2025 07:58:17 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250708064819.35282-1-jasowang@redhat.com> <20250708064819.35282-3-jasowang@redhat.com>
-In-Reply-To: <20250708064819.35282-3-jasowang@redhat.com>
-From: Eugenio Perez Martin <eperezma@redhat.com>
-Date: Thu, 10 Jul 2025 13:56:01 +0200
-X-Gm-Features: Ac12FXxqyil8MqjxEy578TLpzJROnoKM1BcKhfmfNf8EzAA5LKZlAqaOzlkMxyw
-Message-ID: <CAJaqyWcSakXs2GC5QkRtT7BjOK3Mzb-RxS198N+ePqKG9h_BhA@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/2] vhost_net: basic in_order support
-To: Jason Wang <jasowang@redhat.com>
-Cc: mst@redhat.com, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, jonah.palmer@oracle.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 04/19] tcp: add datapath logic for PSP with inline key
+ exchange
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Boris Pismenny <borisp@nvidia.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
+ <willemb@google.com>, David Ahern <dsahern@kernel.org>,
+ Neal Cardwell <ncardwell@google.com>, Patrisious Haddad
+ <phaddad@nvidia.com>, Raed Salem <raeds@nvidia.com>,
+ Jianbo Liu <jianbol@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>,
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+ Stanislav Fomichev <sdf@fomichev.me>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org
+References: <20250702171326.3265825-1-daniel.zahka@gmail.com>
+ <20250702171326.3265825-5-daniel.zahka@gmail.com>
+ <686aa16a9e5a7_3ad0f329432@willemb.c.googlers.com.notmuch>
+Content-Language: en-US
+From: Daniel Zahka <daniel.zahka@gmail.com>
+In-Reply-To: <686aa16a9e5a7_3ad0f329432@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 8, 2025 at 8:48=E2=80=AFAM Jason Wang <jasowang@redhat.com> wro=
-te:
->
-> This patch introduces basic in-order support for vhost-net. By
-> recording the number of batched buffers in an array when calling
-> `vhost_add_used_and_signal_n()`, we can reduce the number of userspace
-> accesses. Note that the vhost-net batching logic is kept as we still
-> count the number of buffers there.
->
-> Testing Results:
->
-> With testpmd:
->
-> - TX: txonly mode + vhost_net with XDP_DROP on TAP shows a 17.5%
->   improvement, from 4.75 Mpps to 5.35 Mpps.
-> - RX: No obvious improvements were observed.
->
-> With virtio-ring in-order experimental code in the guest:
->
-> - TX: pktgen in the guest + XDP_DROP on  TAP shows a 19% improvement,
->   from 5.2 Mpps to 6.2 Mpps.
-> - RX: pktgen on TAP with vhost_net + XDP_DROP in the guest achieves a
->   6.1% improvement, from 3.47 Mpps to 3.61 Mpps.
->
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
 
-Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
 
-Thanks!
+On 7/6/25 12:16 PM, Willem de Bruijn wrote:
+>> @@ -689,6 +690,7 @@ void tcp_skb_entail(struct sock *sk, struct sk_buff *skb)
+>>   	tcb->seq     = tcb->end_seq = tp->write_seq;
+>>   	tcb->tcp_flags = TCPHDR_ACK;
+>>   	__skb_header_release(skb);
+>> +	psp_enqueue_set_decrypted(sk, skb);
+> If touching the tcp hot path, maybe a static branch.
 
-> ---
->  drivers/vhost/net.c | 86 ++++++++++++++++++++++++++++++++-------------
->  1 file changed, 61 insertions(+), 25 deletions(-)
->
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index 4f9c67f17b49..8ac994b3228a 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -74,7 +74,8 @@ enum {
->                          (1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
->                          (1ULL << VIRTIO_NET_F_MRG_RXBUF) |
->                          (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
-> -                        (1ULL << VIRTIO_F_RING_RESET)
-> +                        (1ULL << VIRTIO_F_RING_RESET) |
-> +                        (1ULL << VIRTIO_F_IN_ORDER)
->  };
->
->  enum {
-> @@ -450,7 +451,8 @@ static int vhost_net_enable_vq(struct vhost_net *n,
->         return vhost_poll_start(poll, sock->file);
->  }
->
-> -static void vhost_net_signal_used(struct vhost_net_virtqueue *nvq)
-> +static void vhost_net_signal_used(struct vhost_net_virtqueue *nvq,
-> +                                 unsigned int count)
->  {
->         struct vhost_virtqueue *vq =3D &nvq->vq;
->         struct vhost_dev *dev =3D vq->dev;
-> @@ -458,8 +460,8 @@ static void vhost_net_signal_used(struct vhost_net_vi=
-rtqueue *nvq)
->         if (!nvq->done_idx)
->                 return;
->
-> -       vhost_add_used_and_signal_n(dev, vq, vq->heads, NULL,
-> -                                   nvq->done_idx);
-> +       vhost_add_used_and_signal_n(dev, vq, vq->heads,
-> +                                   vq->nheads, count);
->         nvq->done_idx =3D 0;
->  }
->
-> @@ -468,6 +470,8 @@ static void vhost_tx_batch(struct vhost_net *net,
->                            struct socket *sock,
->                            struct msghdr *msghdr)
->  {
-> +       struct vhost_virtqueue *vq =3D &nvq->vq;
-> +       bool in_order =3D vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
->         struct tun_msg_ctl ctl =3D {
->                 .type =3D TUN_MSG_PTR,
->                 .num =3D nvq->batched_xdp,
-> @@ -475,6 +479,11 @@ static void vhost_tx_batch(struct vhost_net *net,
->         };
->         int i, err;
->
-> +       if (in_order) {
-> +               vq->heads[0].len =3D 0;
-> +               vq->nheads[0] =3D nvq->done_idx;
-> +       }
-> +
->         if (nvq->batched_xdp =3D=3D 0)
->                 goto signal_used;
->
-> @@ -496,7 +505,7 @@ static void vhost_tx_batch(struct vhost_net *net,
->         }
->
->  signal_used:
-> -       vhost_net_signal_used(nvq);
-> +       vhost_net_signal_used(nvq, in_order ? 1 : nvq->done_idx);
->         nvq->batched_xdp =3D 0;
->  }
->
-> @@ -758,6 +767,7 @@ static void handle_tx_copy(struct vhost_net *net, str=
-uct socket *sock)
->         int sent_pkts =3D 0;
->         bool sock_can_batch =3D (sock->sk->sk_sndbuf =3D=3D INT_MAX);
->         bool busyloop_intr;
-> +       bool in_order =3D vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
->
->         do {
->                 busyloop_intr =3D false;
-> @@ -794,11 +804,13 @@ static void handle_tx_copy(struct vhost_net *net, s=
-truct socket *sock)
->                                 break;
->                         }
->
-> -                       /* We can't build XDP buff, go for single
-> -                        * packet path but let's flush batched
-> -                        * packets.
-> -                        */
-> -                       vhost_tx_batch(net, nvq, sock, &msg);
-> +                       if (nvq->batched_xdp) {
-> +                               /* We can't build XDP buff, go for single
-> +                                * packet path but let's flush batched
-> +                                * packets.
-> +                                */
-> +                               vhost_tx_batch(net, nvq, sock, &msg);
-> +                       }
->                         msg.msg_control =3D NULL;
->                 } else {
->                         if (tx_can_batch(vq, total_len))
-> @@ -819,8 +831,12 @@ static void handle_tx_copy(struct vhost_net *net, st=
-ruct socket *sock)
->                         pr_debug("Truncated TX packet: len %d !=3D %zd\n"=
-,
->                                  err, len);
->  done:
-> -               vq->heads[nvq->done_idx].id =3D cpu_to_vhost32(vq, head);
-> -               vq->heads[nvq->done_idx].len =3D 0;
-> +               if (in_order) {
-> +                       vq->heads[0].id =3D cpu_to_vhost32(vq, head);
-> +               } else {
-> +                       vq->heads[nvq->done_idx].id =3D cpu_to_vhost32(vq=
-, head);
-> +                       vq->heads[nvq->done_idx].len =3D 0;
-> +               }
->                 ++nvq->done_idx;
->         } while (likely(!vhost_exceeds_weight(vq, ++sent_pkts, total_len)=
-));
->
-> @@ -999,7 +1015,7 @@ static int peek_head_len(struct vhost_net_virtqueue =
-*rvq, struct sock *sk)
->  }
->
->  static int vhost_net_rx_peek_head_len(struct vhost_net *net, struct sock=
- *sk,
-> -                                     bool *busyloop_intr)
-> +                                     bool *busyloop_intr, unsigned int c=
-ount)
->  {
->         struct vhost_net_virtqueue *rnvq =3D &net->vqs[VHOST_NET_VQ_RX];
->         struct vhost_net_virtqueue *tnvq =3D &net->vqs[VHOST_NET_VQ_TX];
-> @@ -1009,7 +1025,7 @@ static int vhost_net_rx_peek_head_len(struct vhost_=
-net *net, struct sock *sk,
->
->         if (!len && rvq->busyloop_timeout) {
->                 /* Flush batched heads first */
-> -               vhost_net_signal_used(rnvq);
-> +               vhost_net_signal_used(rnvq, count);
->                 /* Both tx vq and rx socket were polled here */
->                 vhost_net_busy_poll(net, rvq, tvq, busyloop_intr, true);
->
-> @@ -1021,7 +1037,7 @@ static int vhost_net_rx_peek_head_len(struct vhost_=
-net *net, struct sock *sk,
->
->  /* This is a multi-buffer version of vhost_get_desc, that works if
->   *     vq has read descriptors only.
-> - * @vq         - the relevant virtqueue
-> + * @nvq                - the relevant vhost_net virtqueue
->   * @datalen    - data length we'll be reading
->   * @iovcount   - returned count of io vectors we fill
->   * @log                - vhost log
-> @@ -1029,14 +1045,17 @@ static int vhost_net_rx_peek_head_len(struct vhos=
-t_net *net, struct sock *sk,
->   * @quota       - headcount quota, 1 for big buffer
->   *     returns number of buffer heads allocated, negative on error
->   */
-> -static int get_rx_bufs(struct vhost_virtqueue *vq,
-> +static int get_rx_bufs(struct vhost_net_virtqueue *nvq,
->                        struct vring_used_elem *heads,
-> +                      u16 *nheads,
->                        int datalen,
->                        unsigned *iovcount,
->                        struct vhost_log *log,
->                        unsigned *log_num,
->                        unsigned int quota)
->  {
-> +       struct vhost_virtqueue *vq =3D &nvq->vq;
-> +       bool in_order =3D vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
->         unsigned int out, in;
->         int seg =3D 0;
->         int headcount =3D 0;
-> @@ -1073,14 +1092,16 @@ static int get_rx_bufs(struct vhost_virtqueue *vq=
-,
->                         nlogs +=3D *log_num;
->                         log +=3D *log_num;
->                 }
-> -               heads[headcount].id =3D cpu_to_vhost32(vq, d);
->                 len =3D iov_length(vq->iov + seg, in);
-> -               heads[headcount].len =3D cpu_to_vhost32(vq, len);
-> -               datalen -=3D len;
-> +               if (!in_order) {
-> +                       heads[headcount].id =3D cpu_to_vhost32(vq, d);
-> +                       heads[headcount].len =3D cpu_to_vhost32(vq, len);
-> +               }
->                 ++headcount;
-> +               datalen -=3D len;
->                 seg +=3D in;
->         }
-> -       heads[headcount - 1].len =3D cpu_to_vhost32(vq, len + datalen);
-> +
->         *iovcount =3D seg;
->         if (unlikely(log))
->                 *log_num =3D nlogs;
-> @@ -1090,6 +1111,15 @@ static int get_rx_bufs(struct vhost_virtqueue *vq,
->                 r =3D UIO_MAXIOV + 1;
->                 goto err;
->         }
-> +
-> +       if (!in_order)
-> +               heads[headcount - 1].len =3D cpu_to_vhost32(vq, len + dat=
-alen);
-> +       else {
-> +               heads[0].len =3D cpu_to_vhost32(vq, len + datalen);
-> +               heads[0].id =3D cpu_to_vhost32(vq, d);
-> +               nheads[0] =3D headcount;
-> +       }
-> +
->         return headcount;
->  err:
->         vhost_discard_vq_desc(vq, headcount);
-> @@ -1102,6 +1132,8 @@ static void handle_rx(struct vhost_net *net)
->  {
->         struct vhost_net_virtqueue *nvq =3D &net->vqs[VHOST_NET_VQ_RX];
->         struct vhost_virtqueue *vq =3D &nvq->vq;
-> +       bool in_order =3D vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
-> +       unsigned int count =3D 0;
->         unsigned in, log;
->         struct vhost_log *vq_log;
->         struct msghdr msg =3D {
-> @@ -1149,12 +1181,13 @@ static void handle_rx(struct vhost_net *net)
->
->         do {
->                 sock_len =3D vhost_net_rx_peek_head_len(net, sock->sk,
-> -                                                     &busyloop_intr);
-> +                                                     &busyloop_intr, cou=
-nt);
->                 if (!sock_len)
->                         break;
->                 sock_len +=3D sock_hlen;
->                 vhost_len =3D sock_len + vhost_hlen;
-> -               headcount =3D get_rx_bufs(vq, vq->heads + nvq->done_idx,
-> +               headcount =3D get_rx_bufs(nvq, vq->heads + count,
-> +                                       vq->nheads + count,
->                                         vhost_len, &in, vq_log, &log,
->                                         likely(mergeable) ? UIO_MAXIOV : =
-1);
->                 /* On error, stop handling until the next kick. */
-> @@ -1230,8 +1263,11 @@ static void handle_rx(struct vhost_net *net)
->                         goto out;
->                 }
->                 nvq->done_idx +=3D headcount;
-> -               if (nvq->done_idx > VHOST_NET_BATCH)
-> -                       vhost_net_signal_used(nvq);
-> +               count +=3D in_order ? 1 : headcount;
-> +               if (nvq->done_idx > VHOST_NET_BATCH) {
-> +                       vhost_net_signal_used(nvq, count);
-> +                       count =3D 0;
-> +               }
->                 if (unlikely(vq_log))
->                         vhost_log_write(vq, vq_log, log, vhost_len,
->                                         vq->iov, in);
-> @@ -1243,7 +1279,7 @@ static void handle_rx(struct vhost_net *net)
->         else if (!sock_len)
->                 vhost_net_enable_vq(net, vq);
->  out:
-> -       vhost_net_signal_used(nvq);
-> +       vhost_net_signal_used(nvq, count);
->         mutex_unlock(&vq->mutex);
->  }
->
-> --
-> 2.31.1
->
-
+Ack. Do you imagine we would key the branch on pas creation or on psd 
+creation? Our preference would be to defer the change to its own series 
+if the code is acceptable as is.
 
