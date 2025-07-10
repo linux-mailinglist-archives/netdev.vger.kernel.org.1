@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-205634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12436AFF715
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 04:50:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5426AFF716
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 04:50:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00CAA560FF4
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 02:49:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77E1E7ADB02
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 02:48:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FF8F28000B;
-	Thu, 10 Jul 2025 02:49:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7235C280303;
+	Thu, 10 Jul 2025 02:49:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jntNMcb2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m3hM1Ftc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AD8027FD6B
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 02:49:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B98A27FD4A;
+	Thu, 10 Jul 2025 02:49:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752115789; cv=none; b=u765nEP0PoltnnYgNk8j4RwuyhXvR3p4I/XESu3+6drIwSf7rI7HKpxhN41215InhLy8snaS7n/Ud5VzuCp9yuDik7Nilcuey5G2nn6xPl1vkxJAsX3MBpCya932wAiigJMr9AOe09ZPtIgz3mM/jSbYhbhYWWdbNyYBQpfvAP8=
+	t=1752115799; cv=none; b=WHQIoOgzrVRar1VlVzHQtk9d6lVHvm9KoRcf2IdepV8wmElIb99A/28fYMJGKSCBN/LX/E+RCiCdb47TG4B3wqTSwoSQbuobRaeV0+t+UyNbX8EoHPsttoTbBfskyGbC+jlBTfJ4B6PerXpqrH4WGzh2aYtJIT0hJcDU1rY4qDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752115789; c=relaxed/simple;
-	bh=hh3MFw3UI/nbdOMYCh5dSmBs4J0ZRNZHcIb9qjP9nwU=;
+	s=arc-20240116; t=1752115799; c=relaxed/simple;
+	bh=BBG6fmEuZKVJVXAjZ82nwUl8JpitbtZRkzy8Jlxku3U=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kCYGPGtTv8VxyyeojlW1BQHDgGpfc1796v5EZj4jvLQmxRrzHDpiiTRO+AxTlPdpdVYBqbomFvZhUXcxzYU+SpsJaseuFV5HPRpDDecKBforzgCpXaqCtYDeYURue7B2g0ODurxhXOIBWcUWd9OA9KCoTX6dAE3sbS1/DyyJ98E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jntNMcb2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1339BC4CEEF;
-	Thu, 10 Jul 2025 02:49:49 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=sk0NhC3jr9t4Eg5KxQMn3bDaibUupYpQ7qQfd+oCMrDqz13RJ+aECpMIaaBZtYalrm+2AdX68rorKNHQHmo85sSruW7IL9iKXSK288WSWjClbJTIP+FrfPIDHGtzbsI1eR5qYaSMlwwFsmmB5kwVsVSJC03sqmwLihGRJpdNtVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m3hM1Ftc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 144D4C4CEEF;
+	Thu, 10 Jul 2025 02:49:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752115789;
-	bh=hh3MFw3UI/nbdOMYCh5dSmBs4J0ZRNZHcIb9qjP9nwU=;
+	s=k20201202; t=1752115799;
+	bh=BBG6fmEuZKVJVXAjZ82nwUl8JpitbtZRkzy8Jlxku3U=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jntNMcb2+SrlU/LK9a8wpc+JkzTzN/vGfqRrKK7XznguZJoWH1WB47ZersNyt8vZ+
-	 zpRlh4vovpl1OUC6BAeOQtmzXs17OdPhRYQtuPkCOL5RD2MEtNRaZG5wMRK7jVlMYU
-	 RlsRhdzO+AbyJ+HQ9x0vQ9foLPJgwxQJWzBWTfwewl3Wo5wfjyf3OUbmIrJwIHOhoF
-	 ICuPV8Ma4yvhYpZ6xVc5UTfSRDKrnjhs3kl2lwTaXMXqYUBsyz00k4cqdbeUMWyhh1
-	 7Yx7Br9Nw2M8NxMjipP8pXcRiFQx3xuwyzKWS/Yl4ejGWjDfuF9gaszo6EJvoXwZCS
-	 gAGytyzyG0vQg==
+	b=m3hM1FtcJRdIntqvf5/gO0vmDcvttiggTqgcaxAWRNt6MiqTO/SdC74zVEvGoditx
+	 9nr5Yl+Ym0tFcPqIGzAQkycecduW83b5pUoL2LJODpRFgE89UAu9NobM1zy22rTB/V
+	 7u6oXtx0gyc4yrcPzANyNhwEUlqrJcmCisDapClo6L35j1flSlyv3JNbSSLCfUDpto
+	 fo8FqI18wPBllGqpJ3YxtUy0fu7FBSMyEDFkowx5zd5irdV/oJNgOzqNNv8ZbDGgMZ
+	 q5CSv6IQcEIOeTpQurdXcw1p9puRV6CCdAJrwN8Rf9VScy9zCeV5qNUmNwenIGQeMj
+	 lSHWgN+ovJMZQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF06383B261;
-	Thu, 10 Jul 2025 02:50:12 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD7F383B261;
+	Thu, 10 Jul 2025 02:50:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net/sched: Abort __tc_modify_qdisc if parent class
- does not exist
+Subject: Re: [PATCH net-next v6 0/4] vsock: Introduce SIOCINQ ioctl support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175211581125.967127.9029455164848283277.git-patchwork-notify@kernel.org>
-Date: Thu, 10 Jul 2025 02:50:11 +0000
-References: <20250707210801.372995-1-victor@mojatatu.com>
-In-Reply-To: <20250707210801.372995-1-victor@mojatatu.com>
-To: Victor Nogueira <victor@mojatatu.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, netdev@vger.kernel.org, pctammela@mojatatu.com,
- syzbot+d8b58d7b0ad89a678a16@syzkaller.appspotmail.com,
- syzbot+5eccb463fa89309d8bdc@syzkaller.appspotmail.com,
- syzbot+1261670bbdefc5485a06@syzkaller.appspotmail.com,
- syzbot+4dadc5aecf80324d5a51@syzkaller.appspotmail.com,
- syzbot+15b96fc3aac35468fe77@syzkaller.appspotmail.com
+ <175211582149.967127.15893085355857485590.git-patchwork-notify@kernel.org>
+Date: Thu, 10 Jul 2025 02:50:21 +0000
+References: <20250708-siocinq-v6-0-3775f9a9e359@antgroup.com>
+In-Reply-To: <20250708-siocinq-v6-0-3775f9a9e359@antgroup.com>
+To: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, sgarzare@redhat.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, niuxuewei97@gmail.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  7 Jul 2025 18:08:01 -0300 you wrote:
-> Lion's patch [1] revealed an ancient bug in the qdisc API.
-> Whenever a user creates/modifies a qdisc specifying as a parent another
-> qdisc, the qdisc API will, during grafting, detect that the user is
-> not trying to attach to a class and reject. However grafting is
-> performed after qdisc_create (and thus the qdiscs' init callback) is
-> executed. In qdiscs that eventually call qdisc_tree_reduce_backlog
-> during init or change (such as fq, hhf, choke, etc), an issue
-> arises. For example, executing the following commands:
+On Tue, 08 Jul 2025 14:36:10 +0800 you wrote:
+> Introduce SIOCINQ ioctl support for vsock, indicating the length of unread
+> bytes.
+> 
+> Similar with SIOCOUTQ ioctl, the information is transport-dependent.
+> 
+> The first patch adds SIOCINQ ioctl support in AF_VSOCK.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] net/sched: Abort __tc_modify_qdisc if parent class does not exist
-    https://git.kernel.org/netdev/net/c/ffdde7bf5a43
+  - [net-next,v6,1/4] hv_sock: Return the readable bytes in hvs_stream_has_data()
+    https://git.kernel.org/netdev/net-next/c/f0c5827d07cb
+  - [net-next,v6,2/4] vsock: Add support for SIOCINQ ioctl
+    https://git.kernel.org/netdev/net-next/c/f7c722659275
+  - [net-next,v6,3/4] test/vsock: Add retry mechanism to ioctl wrapper
+    https://git.kernel.org/netdev/net-next/c/53548d6bffac
+  - [net-next,v6,4/4] test/vsock: Add ioctl SIOCINQ tests
+    https://git.kernel.org/netdev/net-next/c/613165683d34
 
 You are awesome, thank you!
 -- 
