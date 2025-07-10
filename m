@@ -1,74 +1,102 @@
-Return-Path: <netdev+bounces-205898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5796B00B85
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 20:38:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 47B35B00B92
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 20:45:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA05B48731A
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 18:37:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C2D83B62AF
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 18:44:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78E4F2FCE11;
-	Thu, 10 Jul 2025 18:38:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5CBA2FCFCD;
+	Thu, 10 Jul 2025 18:45:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="OZoBjmni"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OS+1iK8N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E437C27466C
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 18:38:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F0F72FCE13;
+	Thu, 10 Jul 2025 18:45:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752172701; cv=none; b=fphbuRxV8ToJO64ue99P7IdgsDv25ZSiZN68BbmpvzzP6DNpChwDSTicvIjeFzKjKVpFFd0/EUKtsm49ai+EcFJPxXfpgsxpiVefQ6zflIllyS4xkYaL9lCAsG/J+Gyq7nbzFmYGH2B9NjnrYcshGeGZRxlkm/sh0iNhO23ZlgQ=
+	t=1752173111; cv=none; b=B3wCmhS+NDNXH4dv33WYde9pyi8ON/fgtzW4v04kczjsc4U5hP31+4jtyZwULMz1DMBov2wEfj2eAa/c9fHjp7GWxy08iJI5xh27d4s6kY+Nv06OwpmLjngyDH+ECiyo+uouqT1eUzNRDFP9/wcB/x31ZJzSxG/fl8kARmk1zkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752172701; c=relaxed/simple;
-	bh=gNuRjSvtv+S06Kl+Z7YVyXAIfykFhDAEGNxCYXmGV+E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XULpvyzk33/sAaJaSyQrowUkwG/YprBhtF1YfS0igyMGeM52zhXBDadEmVdih9Q8EvDu1PJSh4ihKNhVaPmTSs18xPE/2wAjy+2YPJ4mrIPpxqbsG5fubHEh7rBkZX7WuXbXExdCSkbgUPWCfbPzAlQCYETnuJ5sooPFjkgpyas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=OZoBjmni; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56AHYvKt013163;
-	Thu, 10 Jul 2025 18:38:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=Hii5oHNBbhd/DGcPkYXER2yINTnlL
-	Ye0wc2T1VFJ/RI=; b=OZoBjmniWpcbERNu0pYYA6Mg81vv7N0pG0HwTTwtMNvpe
-	eqeGRkgD2M6bRNWE2p9WXOqFY21Igw52m/N9mWEypcHpy7NN6UmgETZ4tjc7AGXA
-	TU4zDPJJfQ2cDnBsB32yHlNf/8QahytPkrONA9ZBEmRYQ54qwB3dL9iLdwBEecCw
-	IgTlj9VB1n8kxw2SIdekBkWQ3IAFOLMkiDN6pGxX+iFbcakSwyCRudFUXnav4YyX
-	qVQQOW7/SbX9dL1VQVZTEVGda9ZxGfATSV6rbRDtO5BaQfd6qRgULjQOrxhu5rqc
-	9F3om6ASnvdOT4GrNxH3Dmds98NMT1dU8Y4F2tyUg==
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 47thwxr53d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 10 Jul 2025 18:38:08 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 56AHKqbi024387;
-	Thu, 10 Jul 2025 18:38:08 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 47ptgcw1h1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 10 Jul 2025 18:38:07 +0000
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 56AIc7AT011475;
-	Thu, 10 Jul 2025 18:38:07 GMT
-Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 47ptgcw1g1-1;
-	Thu, 10 Jul 2025 18:38:07 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: abin.joseph@amd.com, radhey.shyam.pandey@amd.com, michal.simek@amd.com,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-        netdev@vger.kernel.org
-Cc: alok.a.tiwari@oracle.com, darren.kenny@oracle.com
-Subject: [PATCH net-next] net: ll_temac: Fix incorrect PHY node reference in debug message
-Date: Thu, 10 Jul 2025 11:37:34 -0700
-Message-ID: <20250710183737.2385156-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1752173111; c=relaxed/simple;
+	bh=FjuyeMKtCIS0jd6XrsqzjUVLDsLRgSk/4GQsuk9iPHE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ay2Ji8GEIeCaZFFqQzeJviDFXfN1hYE2QNN8+UtoCeS2EqPMrIuwIe6yG4lFtRNKOoOBipb2CN9vBho1X2Nx+Mgt+LQU73XhrZt68Ywz1QNVPXVkh3QVZV/0+P8uBn8uAQ2cGcoSsLqCLhplyLI+7tBjxx9ogDsuGmJlp1taE0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OS+1iK8N; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3a6e8b1fa37so1186132f8f.2;
+        Thu, 10 Jul 2025 11:45:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752173108; x=1752777908; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+tmXGTqg6eeBpnnZy9odoGENAwHa6i1JIVa+JuaL8yY=;
+        b=OS+1iK8Nxwfy6Qwzf4qNCLF7YkrSrZAY7pVBemo67MXhLyxN8lEXkeSuKI1IuV5i0G
+         NTqs4Ak7FHg6ZX7kMTpyhLnqNvkrFViDD1ooexFvSGCmvqCEr4X/7rTX/f0m5klu8AX0
+         RGcinFc6k2GQ5ZtAKBHsJEs4CcjJ3ml+l8/YDb90n45Av1zKuBjitzVbHZIsBKSIj9dR
+         LY5nQr7fdrH5OH8Vzhv/174LYuBZM+GveOeOQ/K5DLS/Zrx+OoeyuLTWFh8KtLHrBqWw
+         5JPn9YmS8XbVRqXa8zc+oGxvHhLuN2ylNuml3PXHICqVPfzuUCpjAgSYalGV14tn2jE9
+         6FIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752173108; x=1752777908;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+tmXGTqg6eeBpnnZy9odoGENAwHa6i1JIVa+JuaL8yY=;
+        b=jsGunJjh6jVCFHg3k2SMrcGqSch+o1FnjlehVQHOZ/EcISmoi0MOtX8OkF8oEESrcB
+         nNRdEcaMDTfWGRDC0KHI+l2PxCLEAiiuNNK0CZLIF11Ki8i/pzyUDFA81l9HbhvYB385
+         dk5t+oP7by1Vx8q6Hy40KqzOhvxsh3UYCSZQf8mxwD3MV+uZgg2cmc7D4SA3FiDn4V1V
+         eiegRYlYRp2zqlGpzEGN92o2vmdvBwRUpkbVGbDSbCBtXj+Xw4Iyp+QFn8C3i9tNa3Xi
+         eYOwWai3uuTR0IbFvAb5OcTfTF7ppeVnIwYJ51NNxKNdll2hZ7598b85auvpWMFWaexq
+         K9CA==
+X-Forwarded-Encrypted: i=1; AJvYcCU5V3NcF7eqvgiF0wVXtvPjefVrLDrZyXqQ4BCtB/E4AJtYL9A/5PpBIqfIwGBugReCITE=@vger.kernel.org, AJvYcCWHdmaH18Q94OerLgS2GF0PAFdjTAimqPFW4LzBj9jkqIAzmK1lAUGv0u9nPChOEsIyQ4xtfWoKhvv8/8C/a6N6@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTPhqHpGvMBUH0eq8Q6A3x44pJ0vSam67+6MwuT2nxVcFpmea5
+	jo3L3Rup7i+IE5TlXLmlweYa12LzdbgXDkBoFpFDbyqAiQdkGrkQC0/KUHLHSY9l
+X-Gm-Gg: ASbGncvqtvd3e4cBUXNlpya/wJqvaTxSiUsRgbHp5sE3SKRuMj57kcSgDWtoCUyEOaZ
+	qDZ6xBG/AEPZbx7BufY8HzE0xvcDpYUPxGFqCOiuU9AcKcTdGLn+svEY1MQUtqloQNDIIKCZvMe
+	phee184hMSJeEFvuWkrDePv1Q3ctAOg/uf4HZJgNWPywg6ZNCRER+cAz/CwIsuyJCOrPB7CHWRH
+	77M/qjUtpetfGEqsQKx50S5gz1ki/Bi7KWH9TfDr3bgg+xY+Q7MtesHh4b0IaW1XfN/BtSXJj0K
+	+J7NkXk65RDYItaQoLsmtp7LroYx46hQBXzlkmxKTcP84dNSwhPkb8RsmhPM
+X-Google-Smtp-Source: AGHT+IFOVLXj9+/yGcFNrr1hM2oagcUsAWzlWAvHp3xxFZifqOwLcAH41XMAbdYu7JzvHp+OFoC+Ig==
+X-Received: by 2002:a05:6000:2c04:b0:3b5:e6bf:8379 with SMTP id ffacd0b85a97d-3b5f18d987cmr639004f8f.28.1752173107911;
+        Thu, 10 Jul 2025 11:45:07 -0700 (PDT)
+Received: from localhost ([2a03:2880:31ff:4e::])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8e26c97sm2559318f8f.90.2025.07.10.11.45.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Jul 2025 11:45:07 -0700 (PDT)
+From: Mohsin Bashir <mohsin.bashr@gmail.com>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	horms@kernel.org,
+	cratiu@nvidia.com,
+	noren@nvidia.com,
+	cjubran@nvidia.com,
+	mbloch@nvidia.com,
+	mohsin.bashr@gmail.com,
+	jdamato@fastly.com,
+	gal@nvidia.com,
+	sdf@fomichev.me,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next V2 0/5] selftests: drv-net: Test XDP native support
+Date: Thu, 10 Jul 2025 11:43:46 -0700
+Message-ID: <20250710184351.63797-1-mohsin.bashr@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,44 +104,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-10_04,2025-07-09_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 phishscore=0 bulkscore=0
- malwarescore=0 mlxscore=0 mlxlogscore=999 adultscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
- definitions=main-2507100158
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzEwMDE1OCBTYWx0ZWRfX/8thKAWyp/UE Rk1aMQZYkKgv7tcmOR48wYyVu65C6TLGX9jgMf6DInBk7i+qstVxG9mkNqBb7de8gfeKka48a8r lVGdF2+efBIQXhcrtoP8ZVL063qos6ZGYO+s3gUxBuzvr4CA3lfTKqG59si+LrLulmFsdAitm+F
- TwxO3CGEsxoXnnxsxwfZYALvv75GsexndyL/X8SVHlUQC7VJraSB3WvkiA6SBPCRducDtHONW4+ v9JWHlRojaiXPmdd0zL/IG2zxUlkHcnz46nUCnMwNNM9VN0nLbnLjb691CqnbsUS1skNpDTDB0/ Gg624duDoxHfr7MaJERX3dn0tZcRf06VOIFnGg72YFvIyAtYkrxRB0YyViDeVdiaOVbN9zHTZx5
- 6vdUYqETHnng0mzDuLEx7moZ4hn1Rj6PNhrHsOQ+n3lLp5So8QASucqSJyKTIG+bIE7Fl3Zn
-X-Proofpoint-GUID: mYAz9UZf535vcUQIDOddxYyDYPGK0iny
-X-Authority-Analysis: v=2.4 cv=JeO8rVKV c=1 sm=1 tr=0 ts=68700891 b=1 cx=c_pps a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17 a=Wb1JkmetP80A:10 a=yPCof4ZbAAAA:8 a=w5Q3M98bzMszbH52DAMA:9
-X-Proofpoint-ORIG-GUID: mYAz9UZf535vcUQIDOddxYyDYPGK0iny
 
-In temac_probe(), the debug message intended to print the resolved
-PHY node was mistakenly using the controller node temac_np
-instead of the actual PHY node lp->phy_node. This patch corrects
-the log to reference the correct device tree node.
+This patch series add tests to validate XDP native support for PASS,
+DROP, ABORT, and TX actions, as well as headroom and tailroom adjustment.
+For adjustment tests, validate support for both the extension and
+shrinking cases across various packet sizes and offset values.
 
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+The pass criteria for head/tail adjustment tests require that at-least
+one adjustment value works for at-least one packet size. This ensure
+that the variability in maximum supported head/tail adjustment offset
+across different drivers is being incorporated.
+
+The results reported in this series are based on fbnic. However, the
+series is tested against multiple other drivers including netdevism.
+
+Note: The XDP support for fbnic will be added later.
 ---
- drivers/net/ethernet/xilinx/ll_temac_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Change-log:
+V2:
+  - Remove unused and libxdp-devel headers
+  - Fix reverse xmas tree in xdp_native.bpf.c
+  - Reorder headers in xdp_native.bpf.c
+V1: https://lore.kernel.org/netdev/20250709173707.3177206-1-mohsin.bashr@gmail.com
 
-diff --git a/drivers/net/ethernet/xilinx/ll_temac_main.c b/drivers/net/ethernet/xilinx/ll_temac_main.c
-index 6f82203a414cd..711ed9c2631b0 100644
---- a/drivers/net/ethernet/xilinx/ll_temac_main.c
-+++ b/drivers/net/ethernet/xilinx/ll_temac_main.c
-@@ -1595,7 +1595,7 @@ static int temac_probe(struct platform_device *pdev)
- 	if (temac_np) {
- 		lp->phy_node = of_parse_phandle(temac_np, "phy-handle", 0);
- 		if (lp->phy_node)
--			dev_dbg(lp->dev, "using PHY node %pOF\n", temac_np);
-+			dev_dbg(lp->dev, "using PHY node %pOF\n", lp->phy_node);
- 	} else if (pdata) {
- 		snprintf(lp->phy_name, sizeof(lp->phy_name),
- 			 PHY_ID_FMT, lp->mii_bus->id, pdata->phy_addr);
+Mohsin Bashir (5):
+  selftests: drv-net: Add bpftool util
+  selftests: drv-net: Test XDP_PASS/DROP support
+  selftests: drv-net: Test XDP_TX support
+  selftests: drv-net: Test tail-adjustment support
+  selftests: drv-net: Test head-adjustment support
+
+ tools/testing/selftests/drivers/net/Makefile  |   1 +
+ .../selftests/drivers/net/lib/py/__init__.py  |   2 +-
+ tools/testing/selftests/drivers/net/xdp.py    | 663 ++++++++++++++++++
+ tools/testing/selftests/net/lib/py/utils.py   |   4 +
+ .../selftests/net/lib/xdp_native.bpf.c        | 524 ++++++++++++++
+ 5 files changed, 1193 insertions(+), 1 deletion(-)
+ create mode 100755 tools/testing/selftests/drivers/net/xdp.py
+ create mode 100644 tools/testing/selftests/net/lib/xdp_native.bpf.c
+
 -- 
-2.46.0
+2.47.1
 
 
