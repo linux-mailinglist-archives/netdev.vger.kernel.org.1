@@ -1,329 +1,295 @@
-Return-Path: <netdev+bounces-205681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAC77AFFADC
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 09:28:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3351AAFFB7A
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 09:58:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A953A64213E
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 07:28:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 119764859DB
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 07:58:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93146288C8D;
-	Thu, 10 Jul 2025 07:28:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EEB628B4E2;
+	Thu, 10 Jul 2025 07:58:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e1fIFzEa"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="UnQJkDTu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2068.outbound.protection.outlook.com [40.107.102.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA88C2882B4;
-	Thu, 10 Jul 2025 07:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752132515; cv=none; b=C68iA16//NElLPPGBWPPxwtWHa69cYLmhsHW2NNVGR3/juMNHHiOaVYdZJtYeWyvh/Wr5BF0Z8sj5AKuxD7QNRj13ShJj7dsotWh0f2mEPzXoJ+lxMn8f4eSBpsPmtVE1DE51B+8Io5SXKolWPZXO8L+D8/ZFoxwCOwZO/xbp4U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752132515; c=relaxed/simple;
-	bh=q8aajeMJr0YFcHtfckwDFxnJGjYHirD2U5daz/hfiyw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZTKRghdElSMq6VqoTYYUhqK0rWwgwZMTNTqS+WOrKBUmN6Y82CSZGwlKhwIoD1SVCrTv/DxJU47ztTeemTBbYRZ5u/2SrpBMSpeMdNyBrIIH3PZdvQNL6Mcgun6h9V9hORxuIX0sF/aUWX+0/wsk7pNPzcC3UEc86xg+KyoF9Yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e1fIFzEa; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752132514; x=1783668514;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=q8aajeMJr0YFcHtfckwDFxnJGjYHirD2U5daz/hfiyw=;
-  b=e1fIFzEagPwKaSBa5yDs5L7R7JI7yIXyWYWikwfaKIcuS327mnWHNodT
-   FdPuZ8MjXJp4+q/tBSnoacvdiI8d4QfsYSnIHmWVlgFdX6dX++S2z90lA
-   pMsmacedLDlyIyL8rcXaRKNc42/yPrIxbZe0v0KOVdksLw7L+Mn5WmLoI
-   /lNb7pzzYUznAfEDfVgXQ+IXfRadO8xDdwedW7kPxfcBleJHc5wbvuZ1Z
-   d1LGHDhoAgsbMHGEaBfuXD93eIfedSAdfkzyc7poTqiyucAxmyBz8J+Pm
-   UrTtlk+F+9mms377UXHHvyjQWn9uWdVVkSq2HbWqcjfhLUhwGN7BnYi6X
-   A==;
-X-CSE-ConnectionGUID: I+cDDrd9TxSPGWQ4xVPaOA==
-X-CSE-MsgGUID: wcLRnfeaSiy0hbqNyTUr3g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11489"; a="54531569"
-X-IronPort-AV: E=Sophos;i="6.16,300,1744095600"; 
-   d="scan'208";a="54531569"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2025 00:28:33 -0700
-X-CSE-ConnectionGUID: vr85dqWcS/S3xtlKLeUf7g==
-X-CSE-MsgGUID: wCqDWvxSSMuPwoC2T8lxIQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,300,1744095600"; 
-   d="scan'208";a="186970578"
-Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
-  by fmviesa001.fm.intel.com with ESMTP; 10 Jul 2025 00:28:30 -0700
-Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uZlhk-0004gJ-1w;
-	Thu, 10 Jul 2025 07:28:28 +0000
-Date: Thu, 10 Jul 2025 15:27:52 +0800
-From: kernel test robot <lkp@intel.com>
-To: Yun Lu <luyun_611@163.com>, willemdebruijn.kernel@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] af_packet: fix soft lockup issue caused by
- tpacket_snd()
-Message-ID: <202507101547.Li8m6iCU-lkp@intel.com>
-References: <20250709095653.62469-3-luyun_611@163.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 820FF17BA5;
+	Thu, 10 Jul 2025 07:58:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.68
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752134311; cv=fail; b=gREgUSlrTzX+lD/kYUA4UBAK8Vh7EvYvIh6sm4KGc46/mrG/0W16ZA2D2/2Kv3cANDUUFZo0GWlq+WXeMXGO3uL4cXNRaUAImmbYlONoi1Yxt5funDieiNilPdaFkpy4sTW3uv6fnchBPtD5aiMYyaY6XoCGHYFMrWpcTUE5yHo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752134311; c=relaxed/simple;
+	bh=c+cYZLcAP38y+TkhQwH9gW4ctWyBgM1E0viIKhSm0sk=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Fcp8qC4jVMv8HV1oJplFPtG6mrMzVpISu7+aXU+dWqFP4y/REPka0C+tRDuvJTyH71SFIYaQU4No2V14fW13k//4SUL6fsKPylhAfFknEgCPgraw9mS9LgSMireyQ4yodUM2mXjX1YflPRFbcyHHafdAMd1PSVZrgOtox70E6Vs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=UnQJkDTu; arc=fail smtp.client-ip=40.107.102.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=w5xwTxtx3vrJBnMhSsg8XW5u57xQOQbCYsy/C7v1LfeUI3Rssb1O6NHasZpRX5Mtsci46AUCDRlWaE4HV/4o6ZrTbp8NqqpSYO2TvBgwOJWDr+Er/AIQI/ShOXtYvDfI40lAJ5bJRZ0Ujggw4dIaq2acg++pNsbWTcy/2owjFOYeWo8mHUr+9HicRVv/PiJ+NGsPlcElf12WMMGvtLlz1B9ClQe0P6l8x1J8GzidovBHKfIfVXdAJCWyME4i3/n7rSjZo+6nVqum7IPDPULdNGYEmm7G6tT9vYjBGpcvvF/P67QkQnogc+bYHtUlobLE8KaM1YaGlx6ePhTU2/ICDg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TeAdhwihKv19jZNTrcMrXfuPaFiykHoM2rqO6W80O5Y=;
+ b=PsbYNxpLZJldI+/1+jXA+Ygi23d52vP3fG4dRH8Ts4VXE4LiWrMG3FXHsg6Pwk8PJu317FlZ/iWSE+DJ+IQ+ZowvZV+VIxfrha565fo//cE6YN9U4YMewBXocZAIAgIbZeUew6r994OrIBUjWwcUNYUb066rqX3vEIfZmqClN+8zYjvupH6FvlzSc3RIcFvf7A+2kQNV3V0g5fFxt5lsGWOL32Fw05TRAqeZhFSIWfYrnYONIkUCq0JRBHb0ZLZGbASnwJk2X5ClOO/G1aNDNQ1UdFWx/+Jgwmy7oPYTZun4hnIkMCRgIT58m8OMFqVLr3zCeetxbzIS/WfRtDKxpg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TeAdhwihKv19jZNTrcMrXfuPaFiykHoM2rqO6W80O5Y=;
+ b=UnQJkDTu9yMMKdQYWcEELDPDL21s3t+Usub8QIcHi54dK4cSMYg/7r0dTZLvWSytIIN6CL+KL98SGiOXBYjMj28JKiKbp3YlBAkIN+k5JGNyfpbI5ccFlQf1SkHSD+sZUjxjcXe6lG8dXa/DmBRHVLi4aqXqVeJmHs3Zxuk2dsJX3gBPUwu3KnV1OpulhxXaliFIBmjtIoHE2kNl4sfYEVobbum8b/y+kEMGr1jvj85D9eJgVW51MEyyXtReYCjEK7xK3gfsmB2MifbC1znmZCJO7a2fmATMXHutFMyJfSosvoDxsjNR3RaDqv7tX+/46ljxjqWu14RrccjL5vRrOQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MW4PR12MB7141.namprd12.prod.outlook.com (2603:10b6:303:213::20)
+ by MW6PR12MB8661.namprd12.prod.outlook.com (2603:10b6:303:23f::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.28; Thu, 10 Jul
+ 2025 07:58:26 +0000
+Received: from MW4PR12MB7141.namprd12.prod.outlook.com
+ ([fe80::932c:7607:9eaa:b1f2]) by MW4PR12MB7141.namprd12.prod.outlook.com
+ ([fe80::932c:7607:9eaa:b1f2%5]) with mapi id 15.20.8901.028; Thu, 10 Jul 2025
+ 07:58:25 +0000
+Message-ID: <40196680-c34f-4b41-a6cb-36e3a6089634@nvidia.com>
+Date: Thu, 10 Jul 2025 10:58:17 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] [v2] devlink: move DEVLINK_ATTR_MAX-sized array off stack
+To: Jakub Kicinski <kuba@kernel.org>, Arnd Bergmann <arnd@kernel.org>
+Cc: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Mark Bloch <mbloch@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Arnd Bergmann <arnd@arndb.de>, Simon Horman <horms@kernel.org>,
+ Cosmin Ratiu <cratiu@nvidia.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250709145908.259213-1-arnd@kernel.org>
+ <20250709174547.3604c42b@kernel.org>
+Content-Language: en-US
+From: Carolina Jubran <cjubran@nvidia.com>
+In-Reply-To: <20250709174547.3604c42b@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: TL2P290CA0012.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:2::16) To MW4PR12MB7141.namprd12.prod.outlook.com
+ (2603:10b6:303:213::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250709095653.62469-3-luyun_611@163.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR12MB7141:EE_|MW6PR12MB8661:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0d9124d8-9fb0-4336-d738-08ddbf878c78
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?a3BmcXE2VUdRdGRwcGl0S1pzUDR5N1k0VlZrblg0ZExZdnZjUUZ6aTZIU2pj?=
+ =?utf-8?B?M01qeGhHS0x1Y2wyU2tCTjhuYXpnKzU0Y3JEQ3drRWlQWk1xNkd6d0VrT3Ir?=
+ =?utf-8?B?bVJDazhjdVBsNHJzU2pTaStRMk9LV1dxRnZvRVBuOSt4ZHBFRHROcmlhOURI?=
+ =?utf-8?B?MkFldWlIajAyb3BsaTFoVkRoaTdMSDB1bmt4eWpIV2dWQkNkUnA2Mm16Wlgr?=
+ =?utf-8?B?anBtUmJkOGFsK3R6dGxLVC9uQ1I5eHJMUXlVTW9xdTlXSHVUY3FjRlNidk9n?=
+ =?utf-8?B?WmZYUXJkM2d4dTJWL1VrMXEybE44TkVRRDh5dm1FKzdwVkorK3FzcjkvRml1?=
+ =?utf-8?B?dVBReTJsQ0ZaQWV2dmZlNGRCL2NzNDV2Q2REK1BWNEt5eUh6K2l5a3d0M1J1?=
+ =?utf-8?B?dFdVR3VyNW1kS1pSZURpK1RqU2d0VCtRZkU0OEtUWXBhNTJjWjBRUmpMWHgz?=
+ =?utf-8?B?OEo0VWhkRVcvQU9xNTM4ZWh1cksweThVTHhGZDVSWmNWUGY1czE1aVlzL3FY?=
+ =?utf-8?B?akpEN2t0MGltOGV4b0ZTMUNrR2UrMWF2NzJYOGFoUE50RE9sV1BhL1U0M2V0?=
+ =?utf-8?B?ZnJvLyt4UkFGbTJPTlp2L01MTmZicWFJTGNLVWV3S21sajFqbzVQYUNyV1V6?=
+ =?utf-8?B?dnE5cW4wZ2t1ekZMNURlRVdJSEFBeXVIWTJpT1Z4Tk96VFR0UnI4eEQ0U3ht?=
+ =?utf-8?B?SG4vWGY2eHBRM3Z5aDZxL3JCRVFtWW9TRENNMkp6T3VDQlBNRG5LaFNCd2Iv?=
+ =?utf-8?B?UTY0MTBkOHZJWTFOR29YZ1ZjaHp5SDNkVVdOYVM5R3dQdmdJMHc5Y1FpVVlt?=
+ =?utf-8?B?Q0MrdXFBNkdNMkFOT2lsT1Nsbkx5d1R6ZXBrVGpJSUw3QVdnNGZiM3hHV2cx?=
+ =?utf-8?B?NDJXZWZVVHhRYTRRU0dLOTZleWNKc095cFdPRkdYWlhVaTlWK21FSjhKNlpj?=
+ =?utf-8?B?b05kNVNPdG4wNVF4RE4rR3FUSC9uYytIMnJrZ3Z5S1daSkplOE1vaHV1Rzhl?=
+ =?utf-8?B?dmpSbWtDdWYydGp1UUF4cHFOT25YS2tMVGlGZDhyYXdpLzVCa09nMzZtS2pQ?=
+ =?utf-8?B?ak1kbTRYdkdtNHF2b2lHaUVNc1k4aVJVT3BQKzNZKyt5dTdQdUp5dlhxZ3ht?=
+ =?utf-8?B?UTE0eXpaYVh6aTZQMTRQejY4dGpGVVhQSS9UcitnbjE1c3M1bGRPdTQrUXpn?=
+ =?utf-8?B?YzlLSUZMaEZlckJ6Sm5LSVJhNlYrNkYwUzZhWWFFMEpxOGpnRnZUc0M5b01D?=
+ =?utf-8?B?SHRtSWE4NmxuWG9lZlR3bXduK0xsVXF6Mk0yUzcrbEp6MmpLVTBZT2xacEQ4?=
+ =?utf-8?B?Q0lNUFdNaXUvNkRMSFlEZzBwTnpHSUlVL2I3ZlB2WWpISTN2RnhiZm5ZbXFz?=
+ =?utf-8?B?VVh1bFY3Y2U4dEJYVk5wR3pHbm9Wa2dTZytTU25pYS9SeDVvMVh6THlnNGdj?=
+ =?utf-8?B?cGxRSlFJdisvN21JWWlQNStIMVNHaS80elJVdkR0OEZpdTBaR0RheXI2aXJI?=
+ =?utf-8?B?ZDBRdG5tSzdvUjVJOXBhaERXY3BJYTRScm9kUmM3by9SOUk1eGNhMkVCS3d4?=
+ =?utf-8?B?M1p0Z201Y0d5RElQYUlMYWgzYkplRm1hQktGR0R1UnlyN2FJU1Y1aGdJcFNz?=
+ =?utf-8?B?dUwvenp2bjFQR2QxVWJubjl4bkM0QS9mOU9oUUlrWko2WlZMK29JbE15NDI5?=
+ =?utf-8?B?YnF4eDhWWUFMTFNZcTUzcmVPUG9USURUMHpnQk0zU1I4Skc2cVhtL2pIeGkr?=
+ =?utf-8?B?Ylo3Mk56SzVPRE1aU3ByMHpaK29JSEpCbUxoRGU0RlJnNG5OV2dmbG5wYmw2?=
+ =?utf-8?B?YWJzaGVRWkxXSWZGZlNGNGJxanpTUnpLckpmVU43YTRZRGozZE5hWEt4dHQz?=
+ =?utf-8?B?Nnh2amtEUkFuOUZjeVNrNHRiVE9xS0s5aEE1RnBwMGNnbnlTZVowZjVhOTRM?=
+ =?utf-8?Q?yeGrYUrhraM=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR12MB7141.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?REZ4R1ZnS2NwSENWL1R1ZFo1OHhRLzFsTEw1Ni9qNTJoVWg2TERrUTRoOHg2?=
+ =?utf-8?B?WEp0WU9LL2MzZnVOUWtGWjZLVm5jbndMUGQ4UFhvZ0NGdGFEeFp4M0RJbEk0?=
+ =?utf-8?B?dHlNU2lBU1hHT3QydC84aTk1TGV1Y0NwOThnU2srbGlCQ3pPZmZBd1pmSGcr?=
+ =?utf-8?B?UEhWcnJtVmZuei94UmJ2STNHRVRrN1FlU0orVW1RWVZjMEdsS2R4U1RSRVBh?=
+ =?utf-8?B?bm9uU0lMZHU3T3IwRTYyOFNQOXpDMEVPVk93dUtqWGZOQmJRQ0E0aXM4L3Ft?=
+ =?utf-8?B?QXRBNm1RVjhxUnNlSlFOQm9pcVY5RWdTQkw1RTJwZW00VzlOc3R6Y0J0S05F?=
+ =?utf-8?B?SW1lZjBqSS9YNHZ3VGpMc0VrTm1UVFoyVzJJODBoNVQ4UDE4Y0VPTUNTMTJt?=
+ =?utf-8?B?NnJoNk9EQlUzblVGdndZODRRUDJFcUM3TFpnRXJNVVZCMUxHZ2FWMUlyT3Q3?=
+ =?utf-8?B?ZzhXSVJ4YzJsMkxsKzZEZUNSYWhVNnZBOE9KRXB4WHhuV3c4eVpOcjNaSzA4?=
+ =?utf-8?B?dG9tQUgvN1A3K3M4NG1PVE03WGQ4ZHZnaVo5bmUzQWFuSU5iTUZqcWJRY0sz?=
+ =?utf-8?B?UXBVeHdHSHBDbURQODM0WmR3bGtpR2ZaN21UcWFwU1JiVFNOL3lId0dtdFEw?=
+ =?utf-8?B?cXk4ZGN0Ti9IQUM1US9ZTHRTOEgwcXJ0RUg4NmIya09vZzd1WThuN201QW92?=
+ =?utf-8?B?RU1iVCtDZEh0QnpWN3JqSWF5Z3QyQUFKTTNMS2hkZFA1OHZjQW9HRTdNZmlC?=
+ =?utf-8?B?TkZONHlMeFVhbWZsd2dFMnZsR284dGlXMTc2YUVURVJvb0ZEcmtWSmJ0WWdS?=
+ =?utf-8?B?akxiVVZ4MVB1MDNuSENZRis1VThReEFTWERRQUEzODliOHFUa05CaFVyMEVL?=
+ =?utf-8?B?WmZzWXkvVnZFK2ZkVDVYK3hXZHREU21EbzRmL1RrempRTVFjWVlWc2RQd215?=
+ =?utf-8?B?RDI5N2tvRGlkdWZmREx2a0o1clc4cXVlQW9OSWRBV3pMVGYzbDl2bGVFRFZ6?=
+ =?utf-8?B?M0JIRWFBbmgyREU4TURxSDFaOFBtM2VrQjY2NEd1UTRvYmdqRHU1MFEvVlRD?=
+ =?utf-8?B?aHdWWUNrT2lodzhoc2ZwUVRjeE56N2ZORnk4TE4vU0Q5SDkxbWQ5QmU0b1pv?=
+ =?utf-8?B?WlRlNmhBMHVQaWZZWmRXQ0w0ZmRJMXhWTFN0OWk3YW9FcEM0ZEZqTnVJaTVJ?=
+ =?utf-8?B?SkNpVWJmcGdURXpqL3V5SHFVV0tGWGJTNzMxNTJobWpXOWpTWXNvV0Q1bXNk?=
+ =?utf-8?B?T2VYNUVzeHdYNXVLdkpTOEZmREtnOS9FOElZREQ5cis2VE1URUV1VURFMWl5?=
+ =?utf-8?B?MjJveS8zOXVGT1hKRzdyVUt0a3NxWUZXVEpINUNKbk9Pa05VRkordUlmclpz?=
+ =?utf-8?B?N1N3bGtab0F2NDNkbnl5R1BEUmlSK3dGSlpxSUFlRFpTaUw4Sjd3MU12OG5z?=
+ =?utf-8?B?YUpUd3AvcDhTUlFpTjVEelZlYy9UOHVQVm5FN0RENnRqeWV4RVJwTXhFc2ps?=
+ =?utf-8?B?aU54b0w1VnFvam1OVDhrZWZlR013eFBlamhsdnZ2QlBEVEx4ei80MnRwOEJx?=
+ =?utf-8?B?VHg0NjF2WnhrY2pHMElHdXQ5VFY2Zm1IVFd3MTJOZUxtV0hudStqZE9pNW0y?=
+ =?utf-8?B?aTJFMjZ2aml0Nm1Ld3Y2Y3NDOENBUVVNNG1naGtzbllTMi9PRFYxbVRNNFJv?=
+ =?utf-8?B?OHh1S0cwUCtHOTdxSjloQmN2S21YeGMwZk42ZkZjRVhoT3d1cDRtcXl0YXpN?=
+ =?utf-8?B?YTZlenE2OHJMRk4zc08veGRHOXZ6N2tCUEtQeXV3WjI0Z1pDZXpDSm9YcW8r?=
+ =?utf-8?B?VHVDWnVIVzNGUXNhQ0hRQWdWUGlzWjlqZ3hqYUFXc1FhMVNUWTQ5Q2R6bVJz?=
+ =?utf-8?B?TThQdngvSTlvTkRDaWVVbmF4TDJNVFZKbXl2Z1ovcGVBaXh2Q1hMN0RRSndv?=
+ =?utf-8?B?a25NbWNyU1ZIb3V1RUc1Unp1SCsvQnFxS08rdktBdnN6dTVBSXNVVU5INmJK?=
+ =?utf-8?B?U2o5MXFnaWw0VHdrem55bkFDKzhpOFFQUytuK0tnYlpKd3QyZ2QwMktScGJl?=
+ =?utf-8?B?TTg3VW5rZXZwa01iRjViTE92QTJVZktES09SWlRpNEdPSUR0WmZyZ3l5eEE5?=
+ =?utf-8?Q?LW3scKLGnl5Cm8OYGaT55aJ/S?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0d9124d8-9fb0-4336-d738-08ddbf878c78
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR12MB7141.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2025 07:58:25.8520
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YcBPwfGwJEJtYXy3EN4ZCleviIP+iFvWa8Z0sxGiOgGMMYUfe/DuB74TqyP3TWt9bWE6yo/xMaLnWbDoTEH6iw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8661
 
-Hi Yun,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on net-next/main]
-[also build test ERROR on net/main linus/master v6.16-rc5 next-20250709]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Yun-Lu/af_packet-fix-the-SO_SNDTIMEO-constraint-not-effective-on-tpacked_snd/20250709-175915
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250709095653.62469-3-luyun_611%40163.com
-patch subject: [PATCH v3 2/2] af_packet: fix soft lockup issue caused by tpacket_snd()
-config: i386-buildonly-randconfig-001-20250710 (https://download.01.org/0day-ci/archive/20250710/202507101547.Li8m6iCU-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250710/202507101547.Li8m6iCU-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507101547.Li8m6iCU-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   net/packet/af_packet.c: In function 'tpacket_snd':
->> net/packet/af_packet.c:2956:37: error: expected ';' before 'err'
-    2956 |         } while (likely(ph != NULL))
-         |                                     ^
-         |                                     ;
-    2957 | 
-    2958 |         err = len_sum;
-         |         ~~~                          
 
 
-vim +2956 net/packet/af_packet.c
+On 10/07/2025 3:45, Jakub Kicinski wrote:
+> On Wed,  9 Jul 2025 16:59:00 +0200 Arnd Bergmann wrote:
+>> -	struct nlattr *tb[DEVLINK_ATTR_MAX + 1];
+>> +	struct nlattr **tb __free(kfree) = NULL;
+> 
+> Ugh, now you triggered me.
+> 
+>>   	u8 tc_index;
+>>   	int err;
+>>   
+>> +	tb = kcalloc(DEVLINK_ATTR_MAX + 1, sizeof(struct nlattr *), GFP_KERNEL);
+>> +	if (!tb)
+>> +		return -ENOMEM;
+> 
+> Cramming all the attributes in a single space is silly, it's better for
+> devlink to grow up :/ Carolina could you test this?
+> 
 
-  2769	
-  2770	static int tpacket_snd(struct packet_sock *po, struct msghdr *msg)
-  2771	{
-  2772		struct sk_buff *skb = NULL;
-  2773		struct net_device *dev;
-  2774		struct virtio_net_hdr *vnet_hdr = NULL;
-  2775		struct sockcm_cookie sockc;
-  2776		__be16 proto;
-  2777		int err, reserve = 0;
-  2778		void *ph;
-  2779		DECLARE_SOCKADDR(struct sockaddr_ll *, saddr, msg->msg_name);
-  2780		bool need_wait = !(msg->msg_flags & MSG_DONTWAIT);
-  2781		int vnet_hdr_sz = READ_ONCE(po->vnet_hdr_sz);
-  2782		unsigned char *addr = NULL;
-  2783		int tp_len, size_max;
-  2784		void *data;
-  2785		int len_sum = 0;
-  2786		int status = TP_STATUS_AVAILABLE;
-  2787		int hlen, tlen, copylen = 0;
-  2788		long timeo;
-  2789	
-  2790		mutex_lock(&po->pg_vec_lock);
-  2791	
-  2792		/* packet_sendmsg() check on tx_ring.pg_vec was lockless,
-  2793		 * we need to confirm it under protection of pg_vec_lock.
-  2794		 */
-  2795		if (unlikely(!po->tx_ring.pg_vec)) {
-  2796			err = -EBUSY;
-  2797			goto out;
-  2798		}
-  2799		if (likely(saddr == NULL)) {
-  2800			dev	= packet_cached_dev_get(po);
-  2801			proto	= READ_ONCE(po->num);
-  2802		} else {
-  2803			err = -EINVAL;
-  2804			if (msg->msg_namelen < sizeof(struct sockaddr_ll))
-  2805				goto out;
-  2806			if (msg->msg_namelen < (saddr->sll_halen
-  2807						+ offsetof(struct sockaddr_ll,
-  2808							sll_addr)))
-  2809				goto out;
-  2810			proto	= saddr->sll_protocol;
-  2811			dev = dev_get_by_index(sock_net(&po->sk), saddr->sll_ifindex);
-  2812			if (po->sk.sk_socket->type == SOCK_DGRAM) {
-  2813				if (dev && msg->msg_namelen < dev->addr_len +
-  2814					   offsetof(struct sockaddr_ll, sll_addr))
-  2815					goto out_put;
-  2816				addr = saddr->sll_addr;
-  2817			}
-  2818		}
-  2819	
-  2820		err = -ENXIO;
-  2821		if (unlikely(dev == NULL))
-  2822			goto out;
-  2823		err = -ENETDOWN;
-  2824		if (unlikely(!(dev->flags & IFF_UP)))
-  2825			goto out_put;
-  2826	
-  2827		sockcm_init(&sockc, &po->sk);
-  2828		if (msg->msg_controllen) {
-  2829			err = sock_cmsg_send(&po->sk, msg, &sockc);
-  2830			if (unlikely(err))
-  2831				goto out_put;
-  2832		}
-  2833	
-  2834		if (po->sk.sk_socket->type == SOCK_RAW)
-  2835			reserve = dev->hard_header_len;
-  2836		size_max = po->tx_ring.frame_size
-  2837			- (po->tp_hdrlen - sizeof(struct sockaddr_ll));
-  2838	
-  2839		if ((size_max > dev->mtu + reserve + VLAN_HLEN) && !vnet_hdr_sz)
-  2840			size_max = dev->mtu + reserve + VLAN_HLEN;
-  2841	
-  2842		timeo = sock_sndtimeo(&po->sk, msg->msg_flags & MSG_DONTWAIT);
-  2843		reinit_completion(&po->skb_completion);
-  2844	
-  2845		do {
-  2846			ph = packet_current_frame(po, &po->tx_ring,
-  2847						  TP_STATUS_SEND_REQUEST);
-  2848			if (unlikely(ph == NULL)) {
-  2849				/* Note: packet_read_pending() might be slow if we
-  2850				 * have to call it as it's per_cpu variable, but in
-  2851				 * fast-path we don't have to call it, only when ph
-  2852				 * is NULL, we need to check pending_refcnt.
-  2853				 */
-  2854				if (need_wait && packet_read_pending(&po->tx_ring)) {
-  2855					timeo = wait_for_completion_interruptible_timeout(&po->skb_completion, timeo);
-  2856					if (timeo <= 0) {
-  2857						err = !timeo ? -ETIMEDOUT : -ERESTARTSYS;
-  2858						goto out_put;
-  2859					} else {
-  2860						/* Just reuse ph to continue for the next iteration, and
-  2861						 * ph will be reassigned at the start of the next iteration.
-  2862						 */
-  2863						ph = (void *)1;
-  2864					}
-  2865				}
-  2866				/* check for additional frames */
-  2867				continue;
-  2868			}
-  2869	
-  2870			skb = NULL;
-  2871			tp_len = tpacket_parse_header(po, ph, size_max, &data);
-  2872			if (tp_len < 0)
-  2873				goto tpacket_error;
-  2874	
-  2875			status = TP_STATUS_SEND_REQUEST;
-  2876			hlen = LL_RESERVED_SPACE(dev);
-  2877			tlen = dev->needed_tailroom;
-  2878			if (vnet_hdr_sz) {
-  2879				vnet_hdr = data;
-  2880				data += vnet_hdr_sz;
-  2881				tp_len -= vnet_hdr_sz;
-  2882				if (tp_len < 0 ||
-  2883				    __packet_snd_vnet_parse(vnet_hdr, tp_len)) {
-  2884					tp_len = -EINVAL;
-  2885					goto tpacket_error;
-  2886				}
-  2887				copylen = __virtio16_to_cpu(vio_le(),
-  2888							    vnet_hdr->hdr_len);
-  2889			}
-  2890			copylen = max_t(int, copylen, dev->hard_header_len);
-  2891			skb = sock_alloc_send_skb(&po->sk,
-  2892					hlen + tlen + sizeof(struct sockaddr_ll) +
-  2893					(copylen - dev->hard_header_len),
-  2894					!need_wait, &err);
-  2895	
-  2896			if (unlikely(skb == NULL)) {
-  2897				/* we assume the socket was initially writeable ... */
-  2898				if (likely(len_sum > 0))
-  2899					err = len_sum;
-  2900				goto out_status;
-  2901			}
-  2902			tp_len = tpacket_fill_skb(po, skb, ph, dev, data, tp_len, proto,
-  2903						  addr, hlen, copylen, &sockc);
-  2904			if (likely(tp_len >= 0) &&
-  2905			    tp_len > dev->mtu + reserve &&
-  2906			    !vnet_hdr_sz &&
-  2907			    !packet_extra_vlan_len_allowed(dev, skb))
-  2908				tp_len = -EMSGSIZE;
-  2909	
-  2910			if (unlikely(tp_len < 0)) {
-  2911	tpacket_error:
-  2912				if (packet_sock_flag(po, PACKET_SOCK_TP_LOSS)) {
-  2913					__packet_set_status(po, ph,
-  2914							TP_STATUS_AVAILABLE);
-  2915					packet_increment_head(&po->tx_ring);
-  2916					kfree_skb(skb);
-  2917					continue;
-  2918				} else {
-  2919					status = TP_STATUS_WRONG_FORMAT;
-  2920					err = tp_len;
-  2921					goto out_status;
-  2922				}
-  2923			}
-  2924	
-  2925			if (vnet_hdr_sz) {
-  2926				if (virtio_net_hdr_to_skb(skb, vnet_hdr, vio_le())) {
-  2927					tp_len = -EINVAL;
-  2928					goto tpacket_error;
-  2929				}
-  2930				virtio_net_hdr_set_proto(skb, vnet_hdr);
-  2931			}
-  2932	
-  2933			skb->destructor = tpacket_destruct_skb;
-  2934			__packet_set_status(po, ph, TP_STATUS_SENDING);
-  2935			packet_inc_pending(&po->tx_ring);
-  2936	
-  2937			status = TP_STATUS_SEND_REQUEST;
-  2938			err = packet_xmit(po, skb);
-  2939			if (unlikely(err != 0)) {
-  2940				if (err > 0)
-  2941					err = net_xmit_errno(err);
-  2942				if (err && __packet_get_status(po, ph) ==
-  2943					   TP_STATUS_AVAILABLE) {
-  2944					/* skb was destructed already */
-  2945					skb = NULL;
-  2946					goto out_status;
-  2947				}
-  2948				/*
-  2949				 * skb was dropped but not destructed yet;
-  2950				 * let's treat it like congestion or err < 0
-  2951				 */
-  2952				err = 0;
-  2953			}
-  2954			packet_increment_head(&po->tx_ring);
-  2955			len_sum += tp_len;
-> 2956		} while (likely(ph != NULL))
-  2957	
-  2958		err = len_sum;
-  2959		goto out_put;
-  2960	
-  2961	out_status:
-  2962		__packet_set_status(po, ph, status);
-  2963		kfree_skb(skb);
-  2964	out_put:
-  2965		dev_put(dev);
-  2966	out:
-  2967		mutex_unlock(&po->pg_vec_lock);
-  2968		return err;
-  2969	}
-  2970	
+Sure, testing it. Will update.
+Thanks!
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
+> index 1c4bb0cbe5f0..3d75bc530b30 100644
+> --- a/Documentation/netlink/specs/devlink.yaml
+> +++ b/Documentation/netlink/specs/devlink.yaml
+> @@ -853,18 +853,6 @@ doc: Partial family for Devlink.
+>           type: nest
+>           multi-attr: true
+>           nested-attributes: dl-rate-tc-bws
+> -      -
+> -        name: rate-tc-index
+> -        type: u8
+> -        checks:
+> -          max: rate-tc-index-max
+> -      -
+> -        name: rate-tc-bw
+> -        type: u32
+> -        doc: |
+> -             Specifies the bandwidth share assigned to the Traffic Class.
+> -             The bandwidth for the traffic class is determined
+> -             in proportion to the sum of the shares of all configured classes.
+>     -
+>       name: dl-dev-stats
+>       subset-of: devlink
+> @@ -1271,12 +1259,20 @@ doc: Partial family for Devlink.
+>           type: flag
+>     -
+>       name: dl-rate-tc-bws
+> -    subset-of: devlink
+> +    name-prefix: devlink-attr-
+>       attributes:
+>         -
+>           name: rate-tc-index
+> +        type: u8
+> +        checks:
+> +          max: rate-tc-index-max
+>         -
+>           name: rate-tc-bw
+> +        type: u32
+> +        doc: |
+> +             Specifies the bandwidth share assigned to the Traffic Class.
+> +             The bandwidth for the traffic class is determined
+> +             in proportion to the sum of the shares of all configured classes.
+>   
+>   operations:
+>     enum-model: directional
+> diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
+> index e72bcc239afd..169a07499556 100644
+> --- a/include/uapi/linux/devlink.h
+> +++ b/include/uapi/linux/devlink.h
+> @@ -635,8 +635,6 @@ enum devlink_attr {
+>   	DEVLINK_ATTR_REGION_DIRECT,		/* flag */
+>   
+>   	DEVLINK_ATTR_RATE_TC_BWS,		/* nested */
+> -	DEVLINK_ATTR_RATE_TC_INDEX,		/* u8 */
+> -	DEVLINK_ATTR_RATE_TC_BW,		/* u32 */
+>   
+>   	/* Add new attributes above here, update the spec in
+>   	 * Documentation/netlink/specs/devlink.yaml and re-generate
+> @@ -647,6 +645,14 @@ enum devlink_attr {
+>   	DEVLINK_ATTR_MAX = __DEVLINK_ATTR_MAX - 1
+>   };
+>   
+> +enum {
+> +	DEVLINK_ATTR_RATE_TC_INDEX = 1,		/* u8 */
+> +	DEVLINK_ATTR_RATE_TC_BW,		/* u32 */
+> +
+> +	__DEVLINK_ATTR_RATE_TC_MAX,
+> +	DEVLINK_ATTR_RATE_TC_MAX = __DEVLINK_ATTR_RATE_TC_MAX - 1
+> +};
+> +
+>   /* Mapping between internal resource described by the field and system
+>    * structure
+>    */
+> diff --git a/net/devlink/rate.c b/net/devlink/rate.c
+> index d39300a9b3d4..83ca62ce6c63 100644
+> --- a/net/devlink/rate.c
+> +++ b/net/devlink/rate.c
+> @@ -346,11 +346,11 @@ static int devlink_nl_rate_tc_bw_parse(struct nlattr *parent_nest, u32 *tc_bw,
+>   				       unsigned long *bitmap,
+>   				       struct netlink_ext_ack *extack)
+>   {
+> -	struct nlattr *tb[DEVLINK_ATTR_MAX + 1];
+> +	struct nlattr *tb[DEVLINK_ATTR_RATE_TC_MAX + 1];
+>   	u8 tc_index;
+>   	int err;
+>   
+> -	err = nla_parse_nested(tb, DEVLINK_ATTR_MAX, parent_nest,
+> +	err = nla_parse_nested(tb, DEVLINK_ATTR_RATE_TC_MAX, parent_nest,
+>   			       devlink_dl_rate_tc_bws_nl_policy, extack);
+>   	if (err)
+>   		return err;
+
 
