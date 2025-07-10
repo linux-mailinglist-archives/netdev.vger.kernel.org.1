@@ -1,90 +1,78 @@
-Return-Path: <netdev+bounces-205942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83CB6B00DFA
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 23:40:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6790FB00E08
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 23:45:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6F29587007
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 21:40:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51C311C42BD3
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 21:45:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83F3A290092;
-	Thu, 10 Jul 2025 21:40:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6759612CDA5;
+	Thu, 10 Jul 2025 21:45:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Re7EmrHZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hSXLoRJU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E88D28F95F
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 21:40:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 879674A0C
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 21:45:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752183620; cv=none; b=jS8W82v8CAQrGB8P1PVHJVAV5S71GkaQksPfmONdwsMd8lVjg0aNP89qO23o9ldKZkyVTGOm3maE4XNEZ6hWistXnQC4PSSwJbr7ag2dooWHIZwNixthWqDjIdk66EVaqlGUWsiLf2flhpKwTnjjpE2Xl0ftl+PKy4+6GwsSQAQ=
+	t=1752183927; cv=none; b=owibaZxFJH9IAvUxPjoGVXrkFG1sZRA6UiIeuWMsgTYeA8KnwJQXl8Y7fBZLhzwEtfOcDVkqUZZ05Pos6nhjQD+YnCLABNNeIlcHlcEgZ5WDvaY68MyuNAWCaCk2fWINrkitebcwwzi8CBAKD1aiyPoKD8kEdU9XLh/5vM/ZFI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752183620; c=relaxed/simple;
-	bh=wxAYHaGP0GYdIinjqN1JLMIvuwj3+4Ip8OakFVdWBUI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jDiCrgCYYNZgqPh/NxLusPlAfJKWdkt5mBMcZNgi+v6lwyn68neQ6gbZuOMQd1NpYLGoK3nknptcukajxRH7Wwn/J96dcOZysVuOBHvyhkM99pgiJ2vJKH5ek/M0Eq/2qL0yJ8nOhpHFnEQgaNlrmCBxZbO7gER8yoWG5INsSyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Re7EmrHZ; arc=none smtp.client-ip=209.85.215.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-879d2e419b9so1183338a12.2
-        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 14:40:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1752183618; x=1752788418; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lVGYqkoPvCfnH8pqsSFcE91f8N++sa66Dv3ITu0FMmI=;
-        b=Re7EmrHZrK+fvke0wicyP55/RcXP8qZuuJC5jZFIYG+6z7w0cYe6qqOAdasA8vGLxJ
-         lfD/NzwoMOW9PxIiDJDbXJLuCIa93SSsJtAYv1CebB3s4mRw/AYOPoLBUhLw7ZIjYk2Y
-         wxgpPx1F8RIanFGFsJ+9Kkh86v5JohpKulhfE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752183618; x=1752788418;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lVGYqkoPvCfnH8pqsSFcE91f8N++sa66Dv3ITu0FMmI=;
-        b=q9DNb1+am9HnC40gUxDHdgvC2TFtDCuzC1ncuRUhpVz/IO2kfpg9eyDOLW82KvrEY3
-         bZrTxhzrkFFnVr1SVd9yjq4B7YJSqwVNBh+nDAjUqvTE0/gOQPqJusLQehpwsIAlKUu5
-         45ZAw9mJ+Q+2bCzU7MAkGOob636rsCSXR2IE9aSHtKV7srPnA5zisdlZn2l0zWt/E+rL
-         DLuV5z2QiAruzgzGctS3XRmRfcACT5FHJl6KOABc7gdXkpYm/OGPb3KGNlloGkNXpmh9
-         84oG9GiKizTkNdrfRwCdEaiGajWbkYd3GTq2Ryvtk7A8/7zBeMvc3Tt4/pAOF12gwxBA
-         QNcA==
-X-Gm-Message-State: AOJu0YzSnBZd4zzvBpQTTcJ5gufYjCSsmJYe6dRIHFHSjuomV234zorj
-	TVBd9brbYyAO41uqDCsLIYMx4Fm7s6qMyAsFKsvu96CpGHrrK91Woi1P9PQHCm/AdQ==
-X-Gm-Gg: ASbGnctEn76dkk35y+v6nUzyjb3M5idvAiFFd/25+Vz+ECocA8pJBrit9Di6pNySWVf
-	wBH95QHqe/3Or9oBGX32TJ2HXdvzI2rkg1iWWF0MkTvHMerwtfj2ili21sRJQrTFCyXfi0eV7qs
-	P1cWwMf0FD/KfAo3PZJqA+1dY99HV54grQ8RtKd3+u187mIN3Wwjb6Hierwcxm/lbpE9m+mY5gp
-	jiCKAQFdzWpIqOISlJr6PUE0hvbWiscZwFQigbTm6g+L6Ik6z6jFZg3EzIJPvMtrskaH8njQzMd
-	htC//lrQv/RsQyAk8M+d9Yp/OLc0yv0uf86IlFKjOySCqHKfi0aX61LVpw3gysFe5rWnC27eI/d
-	k5sOAmo4CU2PkwMSdVLmLm13PMHT9+EWowgoovg==
-X-Google-Smtp-Source: AGHT+IG//cJPB6JVF0tlqmDaGPFm1shltPqPBvPF2MsWFrMiLJpNSNXPJyEt4N4p/5rT80OhudmrpA==
-X-Received: by 2002:a17:90b:4cc5:b0:312:39c1:c9cf with SMTP id 98e67ed59e1d1-31c4cca45a1mr1312656a91.7.1752183618133;
-        Thu, 10 Jul 2025 14:40:18 -0700 (PDT)
-Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31c3e9581d8sm3358208a91.6.2025.07.10.14.40.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Jul 2025 14:40:17 -0700 (PDT)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
+	s=arc-20240116; t=1752183927; c=relaxed/simple;
+	bh=iq04ZNNJcvAQvik1Ca5cj+ornOMueb6IOPlwrWoxtRU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OrEJn1E+bvGfVsvxbfqKYjM1APHAAUBcJ6PVa7BXj75c2pLqf2LBzlmzv/2OFSoufqESRbO67wAtq276/j7dD4t+hMD+7upaEHM7Wz3xOLikYXXWpcj1jom0FiNrY5+UkmKpu0CKNfwYf0llwbEqfCvvGkn+B28dIwnBGjsRk/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hSXLoRJU; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752183926; x=1783719926;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=iq04ZNNJcvAQvik1Ca5cj+ornOMueb6IOPlwrWoxtRU=;
+  b=hSXLoRJUF1hOtkyvPMTErGe1o0Y48alfBy+6e140Mjz4BzHJHvGNSLuP
+   BqdhyumYGLqcFz73rLriUDsmijpbAr1vd4MSsBKXtwg9Ayp3CK2LlMg1Y
+   jY/7RKkmGqwZx3jK03VEatI/I71yf5qemd2OknL5SalL9t6ZnLd3RZtH8
+   qdXG+WCVcBUwgQ1slus3qj1Gvfrmr9p2so0F5lhjLrudhIArXeArnM9YN
+   a0GtnTempd23bR1sIbeSU6Xw5rMJDlse6wIj5QH3wi+fGjZIvMBbHvEvu
+   ALZrOIiSMFPF6XSAcZMk359MdPRL1D1uNYJiBTKZC3er19u8xsa7kasao
+   g==;
+X-CSE-ConnectionGUID: HGSFBL00T8erGR2ZouPXmQ==
+X-CSE-MsgGUID: GuJugpwSRS+gShXP4nYjtg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11490"; a="54192340"
+X-IronPort-AV: E=Sophos;i="6.16,301,1744095600"; 
+   d="scan'208";a="54192340"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2025 14:45:25 -0700
+X-CSE-ConnectionGUID: z6WROwxXTPS9BF24MRIUpA==
+X-CSE-MsgGUID: wdk2JgPsT+26j20waqyNDA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,301,1744095600"; 
+   d="scan'208";a="161764925"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa004.fm.intel.com with ESMTP; 10 Jul 2025 14:45:24 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
+	edumazet@google.com,
 	andrew+netdev@lunn.ch,
-	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com,
-	Somnath Kotur <somnath.kotur@broadcom.com>
-Subject: [PATCH net 3/3] bnxt_en: Set DMA unmap len correctly for XDP_REDIRECT
-Date: Thu, 10 Jul 2025 14:39:38 -0700
-Message-ID: <20250710213938.1959625-4-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250710213938.1959625-1-michael.chan@broadcom.com>
-References: <20250710213938.1959625-1-michael.chan@broadcom.com>
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	jacob.e.keller@intel.com,
+	madhu.chittim@intel.com,
+	yahui.cao@intel.com,
+	przemyslaw.kitszel@intel.com
+Subject: [PATCH net-next 0/8][pull request] ice: cleanups and preparation for live migration
+Date: Thu, 10 Jul 2025 14:45:09 -0700
+Message-ID: <20250710214518.1824208-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,66 +81,77 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Somnath Kotur <somnath.kotur@broadcom.com>
+Jake Keller says:
 
-When transmitting an XDP_REDIRECT packet, call dma_unmap_len_set()
-with the proper length instead of 0.  This bug triggers this warning
-on a system with IOMMU enabled:
+Various cleanups and preparation to the ice driver code for supporting
+SR-IOV live migration.
 
-WARNING: CPU: 36 PID: 0 at drivers/iommu/dma-iommu.c:842 __iommu_dma_unmap+0x159/0x170
-RIP: 0010:__iommu_dma_unmap+0x159/0x170
-Code: a8 00 00 00 00 48 c7 45 b0 00 00 00 00 48 c7 45 c8 00 00 00 00 48 c7 45 a0 ff ff ff ff 4c 89 45
-b8 4c 89 45 c0 e9 77 ff ff ff <0f> 0b e9 60 ff ff ff e8 8b bf 6a 00 66 66 2e 0f 1f 84 00 00 00 00
-RSP: 0018:ff22d31181150c88 EFLAGS: 00010206
-RAX: 0000000000002000 RBX: 00000000e13a0000 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: ff22d31181150cf0 R08: ff22d31181150ca8 R09: 0000000000000000
-R10: 0000000000000000 R11: ff22d311d36c9d80 R12: 0000000000001000
-R13: ff13544d10645010 R14: ff22d31181150c90 R15: ff13544d0b2bac00
-FS: 0000000000000000(0000) GS:ff13550908a00000(0000) knlGS:0000000000000000
-CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00005be909dacff8 CR3: 0008000173408003 CR4: 0000000000f71ef0
-PKRU: 55555554
-Call Trace:
-<IRQ>
-? show_regs+0x6d/0x80
-? __warn+0x89/0x160
-? __iommu_dma_unmap+0x159/0x170
-? report_bug+0x17e/0x1b0
-? handle_bug+0x46/0x90
-? exc_invalid_op+0x18/0x80
-? asm_exc_invalid_op+0x1b/0x20
-? __iommu_dma_unmap+0x159/0x170
-? __iommu_dma_unmap+0xb3/0x170
-iommu_dma_unmap_page+0x4f/0x100
-dma_unmap_page_attrs+0x52/0x220
-? srso_alias_return_thunk+0x5/0xfbef5
-? xdp_return_frame+0x2e/0xd0
-bnxt_tx_int_xdp+0xdf/0x440 [bnxt_en]
-__bnxt_poll_work_done+0x81/0x1e0 [bnxt_en]
-bnxt_poll+0xd3/0x1e0 [bnxt_en]
+The logic for unpacking Rx queue context data is added. This is the inverse
+of the existing packing logic. Thanks to <linux/packing.h> this is trivial
+to add.
 
-Fixes: f18c2b77b2e4 ("bnxt_en: optimized XDP_REDIRECT support")
-Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+Code to enable both reading and writing the Tx queue context for a queue
+over a shared hardware register interface is added. Thanks to ice_adapter,
+this is locked across all PFs that need to use it, preventing concurrency
+issues with multiple PFs.
+
+The RSS hash configuration requested by a VF is cached within the VF
+structure. This will be used to track and restore the same configuration
+during migration load.
+
+ice_sriov_set_msix_vec_count() is updated to use pci_iov_vf_id() instead of
+open-coding a worse equivalent, and checks to avoid rebuilding MSI-X if the
+current request is for the existing amount of vectors.
+
+A new ice_get_vf_by_dev() helper function is added to simplify accessing a
+VF from its PCI device structure. This will be used more heavily within the
+live migration code itself.
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This is the first eight patches of my full series to support live
+migration. The full series (based on net-next) is available at [1] for
+early preview if you want to see the changes in context.
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-index 4a6d8cb9f970..09e7e8efa6fa 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-@@ -115,7 +115,7 @@ static void __bnxt_xmit_xdp_redirect(struct bnxt *bp,
- 	tx_buf->action = XDP_REDIRECT;
- 	tx_buf->xdpf = xdpf;
- 	dma_unmap_addr_set(tx_buf, mapping, mapping);
--	dma_unmap_len_set(tx_buf, len, 0);
-+	dma_unmap_len_set(tx_buf, len, len);
- }
- 
- void bnxt_tx_int_xdp(struct bnxt *bp, struct bnxt_napi *bnapi, int budget)
+Some of these changes are not "used" until the live migration patches
+themselves. However, I felt they were sufficiently large and review-able on
+their own. Additionally, if I keep them included within the live migration
+series it is 15 patches which is at the limit of acceptable size for
+netdev. I'd prefer to merge these cleanups first in order to reduce the
+burden of review for the whole feature.
+
+Link: [1] https://github.com/jacob-keller/linux/tree/e810-live-migration/jk-migration-tlv
+
+The following are changes since commit e090f978054e1cfcd970234589168fcbcba33976:
+  Merge branch 'net-dsa-rzn1_a5psw-add-compile_test'
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 100GbE
+
+Jacob Keller (8):
+  ice: add support for reading and unpacking Rx queue context
+  ice: add functions to get and set Tx queue context
+  ice: save RSS hash configuration for migration
+  ice: move ice_vsi_update_l2tsel to ice_lib.c
+  ice: expose VF functions used by live migration
+  ice: use pci_iov_vf_id() to get VF ID
+  ice: avoid rebuilding if MSI-X vector count is unchanged
+  ice: introduce ice_get_vf_by_dev() wrapper
+
+ drivers/net/ethernet/intel/ice/ice_adapter.c  |   1 +
+ drivers/net/ethernet/intel/ice/ice_adapter.h  |   5 +-
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  14 +-
+ drivers/net/ethernet/intel/ice/ice_common.c   | 233 +++++++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_common.h   |   6 +
+ .../net/ethernet/intel/ice/ice_hw_autogen.h   |  12 +
+ drivers/net/ethernet/intel/ice/ice_lib.c      |  35 +++
+ drivers/net/ethernet/intel/ice/ice_lib.h      |   8 +
+ drivers/net/ethernet/intel/ice/ice_sriov.c    |  19 +-
+ drivers/net/ethernet/intel/ice/ice_sriov.h    |   7 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c   |   3 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h   |  26 +-
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c |  59 +----
+ drivers/net/ethernet/intel/ice/ice_virtchnl.h |  19 ++
+ 14 files changed, 378 insertions(+), 69 deletions(-)
+
 -- 
-2.30.1
+2.47.1
 
 
