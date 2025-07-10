@@ -1,300 +1,187 @@
-Return-Path: <netdev+bounces-205699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A08FCAFFC76
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 10:35:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80378AFFC8B
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 10:40:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8EBEA7B9EFB
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 08:32:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9E2C17DD8D
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 08:40:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0CD7233735;
-	Thu, 10 Jul 2025 08:34:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2973D28D82F;
+	Thu, 10 Jul 2025 08:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="dgoarWhn"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="gesfyd+F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40A8F224B14
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 08:34:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5069D28C2B7;
+	Thu, 10 Jul 2025 08:40:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752136446; cv=none; b=qEBeIw3pU800sAC3d4cyQfqvY2+M/3N8r3UwkUxw2UdGx9q3JfFkx+Es9LZG/Zdf62N4oul0CYUlBIPJ2qvtKSuCo4KFDLFRFNPJ9KRcVsb8+D8/Vr7bLcNI++KM3IPIOyn6lA43unBnt94kyBqzgbnqx33nE7jZmKnWXYxOqPY=
+	t=1752136827; cv=none; b=bT3cDNK+P+PBpcqkXh+T+2w6wUoi+qCFG3eryeDJV1G5eoW0dF7CoAAPZyO/MOZ9KTywz4r+G+zQqqP3qWYwnDCXeJNwd62zOpzr5AVuDX3SRrCCMgCZ4DnOmoKfXONH0771wP7ZYDHe7iyHVcrb24e5hED9SceRBGVP24tR0kI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752136446; c=relaxed/simple;
-	bh=1KyDj7OnnwxRI12gEGtA45U0zFy4CYHRnr2u90ziAkw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=ipCwCNPHq0Ee4Rv9i8pSFdpHFUQjCO+eTQz8X9TPFU5e7wgYg3UfROFDoJH50L2lOj2ei7aMCGzxwoljJ8O/LJXDc1Phm6eI4HoDTCtTQEDhobkPinaj3vBcvq9klNJivWJlpAt40vfPQq0AcJEdTGHdxY5XPVEacpxp+arIboA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=dgoarWhn; arc=none smtp.client-ip=210.118.77.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20250710083402euoutp02797de10e69e040b4bc176b1e55cea960~Q1s_UEART0706007060euoutp02y
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 08:34:02 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20250710083402euoutp02797de10e69e040b4bc176b1e55cea960~Q1s_UEART0706007060euoutp02y
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1752136442;
-	bh=vb/sMqUdA6t7ushCPzPW3a6tANqJT3z1wjc44pU7J6Q=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=dgoarWhnDUTIYa4pxC4typ6d/9phKrusza4wUd3IEf/Hw8kO3ZmY0vgzzH7jstipd
-	 W8db/vzElKaUE48paV4gGno23+PtnFc4RwskiZbisGw/oLi7tpud4MsZZKe6mbsBo5
-	 kQ4OfeJwYzYxteZWLLvW/kKQdFYTbhlE9vy3hsVA=
-Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20250710083401eucas1p1d18e23791e1f22c0c0aaf823a35526a2~Q1s96z-on2284322843eucas1p1D;
-	Thu, 10 Jul 2025 08:34:01 +0000 (GMT)
-Received: from [106.210.134.192] (unknown [106.210.134.192]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20250710083400eusmtip220e40928c3c1b68f954ef9e23db72b76~Q1s9PryWJ1803318033eusmtip2d;
-	Thu, 10 Jul 2025 08:34:00 +0000 (GMT)
-Message-ID: <9794af18-4905-46c6-b12c-365ea2f05858@samsung.com>
-Date: Thu, 10 Jul 2025 10:34:00 +0200
+	s=arc-20240116; t=1752136827; c=relaxed/simple;
+	bh=k8QYU1NiNaTnKoiWQNFMKCjrByVIcOn1yXxiqWINZrc=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iKqc+0L5P5mwdiEJVS2Kpr0a0WIMAFQNGqV/YzZfhXsgFZKiGCa2Kowu+KZ9wAbj5chSqdKhhuV2QaQZBQAUGMi4+wueyjcd9L2ILtIeTantfIy+F6d7gVW3FheK/YUUWV9sdj4PUp5p+gQbVCS8zuG1gJsyEoLBJx99aqvyDI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=gesfyd+F; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56A62JoD005273;
+	Thu, 10 Jul 2025 01:40:14 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=xaeNAsq8SKhg81D5XrW0Cp4l0
+	a+Gg3NDnHtyBEMoAGg=; b=gesfyd+FM1rCey7NtAYA+TGghHIIDsygfRGtg3yAG
+	LlSiU8MTYvn56sl7aFeKSzqPmq9kiPRYPoOiPIoklT7c6IJJTI7Haprbv+egW5MZ
+	g6ujz7x+6pHn2KUguIRHQ8aX2xnsr+hS8ayGuvJllYrkuVPl58LAJo6bMTxnsB6O
+	nqBzFWH64qaDMW3Ee21OiACrx9r1hXsiWmyaP9EUIhKdN7/krr18vp7N6iFgEJxk
+	Vd3C16ZA/OB+weITy4sTi9emTDSLvPSNYvzL0gPntjuNR3gaTsD4a93kp4JpWDEl
+	yXU0kgUq/UXTche81sgZL8y+CgSJTHV7W1vb6jDO+Ux1g==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 47t7w3gfjw-4
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 10 Jul 2025 01:40:14 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 10 Jul 2025 01:40:07 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 10 Jul 2025 01:40:07 -0700
+Received: from optiplex (unknown [10.28.34.253])
+	by maili.marvell.com (Postfix) with SMTP id D9C395B6940;
+	Thu, 10 Jul 2025 01:40:03 -0700 (PDT)
+Date: Thu, 10 Jul 2025 14:10:03 +0530
+From: Tanmay Jagdale <tanmay@marvell.com>
+To: Simon Horman <horms@kernel.org>
+CC: <davem@davemloft.net>, <leon@kernel.org>, <sgoutham@marvell.com>,
+        <bbhushan2@marvell.com>, <herbert@gondor.apana.org.au>,
+        <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 14/14] octeontx2-pf: ipsec: Add XFRM state
+ and policy hooks for inbound flows
+Message-ID: <aG98Y985la89vYR7@optiplex>
+References: <20250618113020.130888-1-tanmay@marvell.com>
+ <20250618113020.130888-15-tanmay@marvell.com>
+ <20250620112249.GL194429@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 net] netlink: Fix wraparounds of sk->sk_rmem_alloc.
-To: Kuniyuki Iwashima <kuniyu@google.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
-	netdev@vger.kernel.org, Jason Baron <jbaron@akamai.com>
-Content-Language: en-US
-From: Marek Szyprowski <m.szyprowski@samsung.com>
-In-Reply-To: <20250704054824.1580222-1-kuniyu@google.com>
-Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20250710083401eucas1p1d18e23791e1f22c0c0aaf823a35526a2
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20250710083401eucas1p1d18e23791e1f22c0c0aaf823a35526a2
-X-EPHeader: CA
-X-CMS-RootMailID: 20250710083401eucas1p1d18e23791e1f22c0c0aaf823a35526a2
-References: <20250704054824.1580222-1-kuniyu@google.com>
-	<CGME20250710083401eucas1p1d18e23791e1f22c0c0aaf823a35526a2@eucas1p1.samsung.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250620112249.GL194429@horms.kernel.org>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzEwMDA3NCBTYWx0ZWRfX2qprP3RMsJTL o0xmT2WaV7J8gHOv5HblrtPZlfQR7SbTuGhUjDjzASN3o/AWcBWuGPosZ+hcGqwus859XNAUHux iqYY57OG6TwlCDXgx26w2GtOYBlzGFSzA4iVCURXSEkAc9Pgv9SuYqqmqhQIteYMV8CxSbfdlJQ
+ D5DSFSyq04FykYktpVOkNisYYch/BCP7RHxOG0KXPXvXwPjFfqcBCzIMbEjaYs9B4Dye9IaIcw7 qOOdCjRSXg13VHODn8c3AiNJIlaHuAbP6vx/J1zhujRmMCS1SrknFQAi9hTKuUyupDlsu+t6QZA 6V8+Llem07Q2BFzUHOeCuxvCTrt9+oDaH+qXEgjp8kkWaOM9odPzaGCrK1RDgqvnk+I8B7lvifD
+ 6gc8LTBrHP6NeqEgTJGU4h4SDQ4gL8MsPo9kpFWjqhfjVOpmc0TSqLmVhMGgHwMcOt/kTCZg
+X-Proofpoint-GUID: Ce3dUlXNwKf48bYRfIh2pf8BUspLlIJv
+X-Proofpoint-ORIG-GUID: Ce3dUlXNwKf48bYRfIh2pf8BUspLlIJv
+X-Authority-Analysis: v=2.4 cv=dY+A3WXe c=1 sm=1 tr=0 ts=686f7c6e cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=kj9zAlcOel0A:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=xWn14IjVmXkPw4t3ZSQA:9 a=CjuIK1q_8ugA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-07-10_01,2025-07-09_01,2025-03-28_01
 
-On 04.07.2025 07:48, Kuniyuki Iwashima wrote:
-> Netlink has this pattern in some places
->
->    if (atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf)
->    	atomic_add(skb->truesize, &sk->sk_rmem_alloc);
->
-> , which has the same problem fixed by commit 5a465a0da13e ("udp:
-> Fix multiple wraparounds of sk->sk_rmem_alloc.").
->
-> For example, if we set INT_MAX to SO_RCVBUFFORCE, the condition
-> is always false as the two operands are of int.
->
-> Then, a single socket can eat as many skb as possible until OOM
-> happens, and we can see multiple wraparounds of sk->sk_rmem_alloc.
->
-> Let's fix it by using atomic_add_return() and comparing the two
-> variables as unsigned int.
->
-> Before:
->    [root@fedora ~]# ss -f netlink
->    Recv-Q      Send-Q Local Address:Port                Peer Address:Port
->    -1668710080 0               rtnl:nl_wraparound/293               *
->
-> After:
->    [root@fedora ~]# ss -f netlink
->    Recv-Q     Send-Q Local Address:Port                Peer Address:Port
->    2147483072 0               rtnl:nl_wraparound/290               *
->    ^
->    `--- INT_MAX - 576
->
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Reported-by: Jason Baron <jbaron@akamai.com>
-> Closes: https://lore.kernel.org/netdev/cover.1750285100.git.jbaron@akamai.com/
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+Hi Simon,
 
-This patch landed recently in linux-next as commit ae8f160e7eb2 
-("netlink: Fix wraparounds of sk->sk_rmem_alloc."). In my tests I found 
-that it breaks wifi drivers operation on my tests boards (various ARM 
-32bit and 64bit ones). Reverting it on top of next-20250709 fixes this 
-issue. Here is the log from the failure observed on the Samsung 
-Peach-Pit Chromebook:
+On 2025-06-20 at 16:52:49, Simon Horman (horms@kernel.org) wrote:
+> On Wed, Jun 18, 2025 at 05:00:08PM +0530, Tanmay Jagdale wrote:
+> > Add XFRM state hook for inbound flows and configure the following:
+> >   - Install an NPC rule to classify the 1st pass IPsec packets and
+> >     direct them to the dedicated RQ
+> >   - Allocate a free entry from the SA table and populate it with the
+> >     SA context details based on xfrm state data.
+> >   - Create a mapping of the SPI value to the SA table index. This is
+> >     used by NIXRX to calculate the exact SA context  pointer address
+> >     based on the SPI in the packet.
+> >   - Prepare the CPT SA context to decrypt buffer in place and the
+> >     write it the CPT hardware via LMT operation.
+> >   - When the XFRM state is deleted, clear this SA in CPT hardware.
+> > 
+> > Also add XFRM Policy hooks to allow successful offload of inbound
+> > PACKET_MODE.
+> > 
+> > Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
+> 
+> ...
+> 
+> > @@ -1141,6 +1154,137 @@ static int cn10k_outb_write_sa(struct otx2_nic *pf, struct qmem *sa_info)
+> >  	return ret;
+> >  }
+> >  
+> > +static int cn10k_inb_write_sa(struct otx2_nic *pf,
+> > +			      struct xfrm_state *x,
+> > +			      struct cn10k_inb_sw_ctx_info *inb_ctx_info)
+> > +{
+> > +	dma_addr_t res_iova, dptr_iova, sa_iova;
+> > +	struct cn10k_rx_sa_s *sa_dptr, *sa_cptr;
+> > +	struct cpt_inst_s inst;
+> > +	u32 sa_size, off;
+> > +	struct cpt_res_s *res;
+> > +	u64 reg_val;
+> > +	int ret;
+> > +
+> > +	res = dma_alloc_coherent(pf->dev, sizeof(struct cpt_res_s),
+> > +				 &res_iova, GFP_ATOMIC);
+> > +	if (!res)
+> > +		return -ENOMEM;
+> > +
+> > +	sa_cptr = inb_ctx_info->sa_entry;
+> > +	sa_iova = inb_ctx_info->sa_iova;
+> > +	sa_size = sizeof(struct cn10k_rx_sa_s);
+> > +
+> > +	sa_dptr = dma_alloc_coherent(pf->dev, sa_size, &dptr_iova, GFP_ATOMIC);
+> > +	if (!sa_dptr) {
+> > +		dma_free_coherent(pf->dev, sizeof(struct cpt_res_s), res,
+> > +				  res_iova);
+> > +		return -ENOMEM;
+> > +	}
+> > +
+> > +	for (off = 0; off < (sa_size / 8); off++)
+> > +		*((u64 *)sa_dptr + off) = cpu_to_be64(*((u64 *)sa_cptr + off));
+> > +
+> > +	memset(&inst, 0, sizeof(struct cpt_inst_s));
+> > +
+> > +	res->compcode = 0;
+> > +	inst.res_addr = res_iova;
+> > +	inst.dptr = (u64)dptr_iova;
+> > +	inst.param2 = sa_size >> 3;
+> > +	inst.dlen = sa_size;
+> > +	inst.opcode_major = CN10K_IPSEC_MAJOR_OP_WRITE_SA;
+> > +	inst.opcode_minor = CN10K_IPSEC_MINOR_OP_WRITE_SA;
+> > +	inst.cptr = sa_iova;
+> > +	inst.ctx_val = 1;
+> > +	inst.egrp = CN10K_DEF_CPT_IPSEC_EGRP;
+> > +
+> > +	/* Re-use Outbound CPT LF to install Ingress SAs as well because
+> > +	 * the driver does not own the ingress CPT LF.
+> > +	 */
+> > +	pf->ipsec.io_addr = (__force u64)otx2_get_regaddr(pf, CN10K_CPT_LF_NQX(0));
+> > +	cn10k_cpt_inst_flush(pf, &inst, sizeof(struct cpt_inst_s));
+> > +	dmb(sy);
+> 
+> Hi Tanmay,
+> 
+> As I understand things the above effectively means that this
+> driver will only compile for ARM64.
+> 
+> I do understand that the driver is only intended to be used on ARM64.
+> But it is nice to get compile coverage on other 64bit systems,
+> in particular x86_64.
+> 
+> And moreover, I think the guiding principle should be for drivers
+> to be as independent of the host system as possible.
+> 
+> Can we look into handling this a different way?
+ACK, I will use dma_wmb() here so that it is generic.
 
-# dmesg | grep wifi
-[   16.174311] mwifiex_sdio mmc2:0001:1: WLAN is not the winner! Skip FW 
-dnld
-[   16.503969] mwifiex_sdio mmc2:0001:1: WLAN FW is active
-[   16.574635] mwifiex_sdio mmc2:0001:1: host_mlme: disable, key_api: 2
-[   16.586152] mwifiex_sdio mmc2:0001:1: CMD_RESP: cmd 0x242 error, 
-result=0x2
-[   16.641184] mwifiex_sdio mmc2:0001:1: info: MWIFIEX VERSION: mwifiex 
-1.0 (15.68.7.p87)
-[   16.649474] mwifiex_sdio mmc2:0001:1: driver_version = mwifiex 1.0 
-(15.68.7.p87)
-[   25.953285] mwifiex_sdio mmc2:0001:1 wlan0: renamed from mlan0
-# ifconfig wlan0 up
-# iw wlan0 scan
-command failed: No buffer space available (-105)
-#
-
-Let me know if You need more information to debug this issue.
-
-> ---
->   net/netlink/af_netlink.c | 81 ++++++++++++++++++++++++----------------
->   1 file changed, 49 insertions(+), 32 deletions(-)
->
-> diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-> index e8972a857e51..79fbaf7333ce 100644
-> --- a/net/netlink/af_netlink.c
-> +++ b/net/netlink/af_netlink.c
-> @@ -387,7 +387,6 @@ static void netlink_skb_set_owner_r(struct sk_buff *skb, struct sock *sk)
->   	WARN_ON(skb->sk != NULL);
->   	skb->sk = sk;
->   	skb->destructor = netlink_skb_destructor;
-> -	atomic_add(skb->truesize, &sk->sk_rmem_alloc);
->   	sk_mem_charge(sk, skb->truesize);
->   }
->   
-> @@ -1212,41 +1211,48 @@ struct sk_buff *netlink_alloc_large_skb(unsigned int size, int broadcast)
->   int netlink_attachskb(struct sock *sk, struct sk_buff *skb,
->   		      long *timeo, struct sock *ssk)
->   {
-> +	DECLARE_WAITQUEUE(wait, current);
->   	struct netlink_sock *nlk;
-> +	unsigned int rmem;
->   
->   	nlk = nlk_sk(sk);
-> +	rmem = atomic_add_return(skb->truesize, &sk->sk_rmem_alloc);
->   
-> -	if ((atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf ||
-> -	     test_bit(NETLINK_S_CONGESTED, &nlk->state))) {
-> -		DECLARE_WAITQUEUE(wait, current);
-> -		if (!*timeo) {
-> -			if (!ssk || netlink_is_kernel(ssk))
-> -				netlink_overrun(sk);
-> -			sock_put(sk);
-> -			kfree_skb(skb);
-> -			return -EAGAIN;
-> -		}
-> -
-> -		__set_current_state(TASK_INTERRUPTIBLE);
-> -		add_wait_queue(&nlk->wait, &wait);
-> +	if ((rmem == skb->truesize || rmem < READ_ONCE(sk->sk_rcvbuf)) &&
-> +	    !test_bit(NETLINK_S_CONGESTED, &nlk->state)) {
-> +		netlink_skb_set_owner_r(skb, sk);
-> +		return 0;
-> +	}
->   
-> -		if ((atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf ||
-> -		     test_bit(NETLINK_S_CONGESTED, &nlk->state)) &&
-> -		    !sock_flag(sk, SOCK_DEAD))
-> -			*timeo = schedule_timeout(*timeo);
-> +	atomic_sub(skb->truesize, &sk->sk_rmem_alloc);
->   
-> -		__set_current_state(TASK_RUNNING);
-> -		remove_wait_queue(&nlk->wait, &wait);
-> +	if (!*timeo) {
-> +		if (!ssk || netlink_is_kernel(ssk))
-> +			netlink_overrun(sk);
->   		sock_put(sk);
-> +		kfree_skb(skb);
-> +		return -EAGAIN;
-> +	}
->   
-> -		if (signal_pending(current)) {
-> -			kfree_skb(skb);
-> -			return sock_intr_errno(*timeo);
-> -		}
-> -		return 1;
-> +	__set_current_state(TASK_INTERRUPTIBLE);
-> +	add_wait_queue(&nlk->wait, &wait);
-> +	rmem = atomic_read(&sk->sk_rmem_alloc);
-> +
-> +	if (((rmem && rmem + skb->truesize > READ_ONCE(sk->sk_rcvbuf)) ||
-> +	     test_bit(NETLINK_S_CONGESTED, &nlk->state)) &&
-> +	    !sock_flag(sk, SOCK_DEAD))
-> +		*timeo = schedule_timeout(*timeo);
-> +
-> +	__set_current_state(TASK_RUNNING);
-> +	remove_wait_queue(&nlk->wait, &wait);
-> +	sock_put(sk);
-> +
-> +	if (signal_pending(current)) {
-> +		kfree_skb(skb);
-> +		return sock_intr_errno(*timeo);
->   	}
-> -	netlink_skb_set_owner_r(skb, sk);
-> -	return 0;
-> +
-> +	return 1;
->   }
->   
->   static int __netlink_sendskb(struct sock *sk, struct sk_buff *skb)
-> @@ -1307,6 +1313,7 @@ static int netlink_unicast_kernel(struct sock *sk, struct sk_buff *skb,
->   	ret = -ECONNREFUSED;
->   	if (nlk->netlink_rcv != NULL) {
->   		ret = skb->len;
-> +		atomic_add(skb->truesize, &sk->sk_rmem_alloc);
->   		netlink_skb_set_owner_r(skb, sk);
->   		NETLINK_CB(skb).sk = ssk;
->   		netlink_deliver_tap_kernel(sk, ssk, skb);
-> @@ -1383,13 +1390,19 @@ EXPORT_SYMBOL_GPL(netlink_strict_get_check);
->   static int netlink_broadcast_deliver(struct sock *sk, struct sk_buff *skb)
->   {
->   	struct netlink_sock *nlk = nlk_sk(sk);
-> +	unsigned int rmem, rcvbuf;
->   
-> -	if (atomic_read(&sk->sk_rmem_alloc) <= sk->sk_rcvbuf &&
-> +	rmem = atomic_add_return(skb->truesize, &sk->sk_rmem_alloc);
-> +	rcvbuf = READ_ONCE(sk->sk_rcvbuf);
-> +
-> +	if ((rmem != skb->truesize || rmem <= rcvbuf) &&
->   	    !test_bit(NETLINK_S_CONGESTED, &nlk->state)) {
->   		netlink_skb_set_owner_r(skb, sk);
->   		__netlink_sendskb(sk, skb);
-> -		return atomic_read(&sk->sk_rmem_alloc) > (sk->sk_rcvbuf >> 1);
-> +		return rmem > (rcvbuf >> 1);
->   	}
-> +
-> +	atomic_sub(skb->truesize, &sk->sk_rmem_alloc);
->   	return -1;
->   }
->   
-> @@ -2249,6 +2262,7 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
->   	struct module *module;
->   	int err = -ENOBUFS;
->   	int alloc_min_size;
-> +	unsigned int rmem;
->   	int alloc_size;
->   
->   	if (!lock_taken)
-> @@ -2258,9 +2272,6 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
->   		goto errout_skb;
->   	}
->   
-> -	if (atomic_read(&sk->sk_rmem_alloc) >= sk->sk_rcvbuf)
-> -		goto errout_skb;
-> -
->   	/* NLMSG_GOODSIZE is small to avoid high order allocations being
->   	 * required, but it makes sense to _attempt_ a 32KiB allocation
->   	 * to reduce number of system calls on dump operations, if user
-> @@ -2283,6 +2294,12 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
->   	if (!skb)
->   		goto errout_skb;
->   
-> +	rmem = atomic_add_return(skb->truesize, &sk->sk_rmem_alloc);
-> +	if (rmem >= READ_ONCE(sk->sk_rcvbuf)) {
-> +		atomic_sub(skb->truesize, &sk->sk_rmem_alloc);
-> +		goto errout_skb;
-> +	}
-> +
->   	/* Trim skb to allocated size. User is expected to provide buffer as
->   	 * large as max(min_dump_alloc, 32KiB (max_recvmsg_len capped at
->   	 * netlink_recvmsg())). dump will pack as many smaller messages as
-
-Best regards
--- 
-Marek Szyprowski, PhD
-Samsung R&D Institute Poland
-
+With Regards,
+Tanmay
 
