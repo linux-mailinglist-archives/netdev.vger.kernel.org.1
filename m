@@ -1,434 +1,329 @@
-Return-Path: <netdev+bounces-205680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56AEFAFFA32
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 08:53:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAC77AFFADC
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 09:28:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C5CF544DF6
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 06:53:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A953A64213E
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 07:28:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0710D28982D;
-	Thu, 10 Jul 2025 06:52:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93146288C8D;
+	Thu, 10 Jul 2025 07:28:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="hAGSFxLg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e1fIFzEa"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2058.outbound.protection.outlook.com [40.107.94.58])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B82B288C18;
-	Thu, 10 Jul 2025 06:52:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.58
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752130361; cv=fail; b=keKnnZpuYr2zwVTENc3prQlkbpWpz8C5g1PX9rJQ6cJxsBmYE+gfs1OPaU000aUStDAr99o7xvkfc2yOtZ2sYmF6FqX+ty9YSb01pH1caf3z+szhmhB1VciA4J1NsmyTR91tef7UfUworqG80K4wYKrOaCLQqN8AYdymxDmny88=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752130361; c=relaxed/simple;
-	bh=CH2gBlPqxE04QkIWbtGgHzhhNXQD5QacitJEHnTrcc0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M4x73rtGMGu3yFJVvaId/QqNzDb4x3P2SLM+3tTytplo/Bj6ZXDLEVA8ap7u606zra0EXTd/B1BKZj4jH9DD0SRJcdF0B7eD6BMJBXT+0HlTrof+Jhbzp3oENkJJyDXENrfRIL5qmS45VLDvv/qTprAkvVbUSwMuiZuwBfrJCbs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=hAGSFxLg; arc=fail smtp.client-ip=40.107.94.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=PXaYAeFyxapG03nzjab9EhRIv9e508A3kQ4jm/UhR2Z0LZKk8BRcSEs6K4jQTEGlJv7ovPUfeLfCmA7E8JVoy+jkrsMDC9QPBC1bNNQj9McppoepdDtqokuqoMd8I/+uF8rNhsi1SYYsAs9SfOpYx15MT8zuWzfr2rz0PFx37KtMCgFYDjHNGAqyIWEBVK3jyRRUrtgAi+cp8Hq/CCaVW/m/smvcImHMIb4znGik8JQS/jO8YN6VSJjQtqVO70K7zJFqwoVBu9bgVRUOGkIR5xlB1aTwdLxbTOpSr1lKLG4qbgQmfrq6lhjJHqsn+R4Y89E84d8fg+K/jQVJKBYW9w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZsqjDe8E5qc7syhD27uZQvs7T/gaINEWypmm/iczSSw=;
- b=bJedqgRqvo4QSwoI43EY1hS9pDCSJrFM8KnfKVUcu22KT+cFTWZDK9smWmkmlG5wuKQ5+jQGaq/T2q+U5+YMkCpZX7hSr7gva+239ZiHVSO1hREGJoI/j87AW6Qw4WVfR0pdNvwqLEpZgGDM4TigpaDcSUbdIlMjnsBAY1UYIKv/+vAXXG4uSf8ihr1NcRXk6q/YH+KWY9KrNSgVfuTHQWxlBGSUCPKpjab2iccfuVjvgaTYdF2prj2oRU5bfM1yQ9oGie/T97lBih0HytNMo8QJXuUfM33oXVaLoJIXybcynPquo53UiUDnE7mbyCMNnw+RdyxAC7L4n6CJfU12Wg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZsqjDe8E5qc7syhD27uZQvs7T/gaINEWypmm/iczSSw=;
- b=hAGSFxLgot1oG6q4Lcg4URUT3DROjZbfht1ITrlHPYeX1e9jDHcg57LQor14T57wPa0Qapav8IXOpeSwwp578ABHOrlZwUhPHpoKRNUgaU79NYQ5WTMjkyaGWK6aabyU+qtXTSXrckubyv5AibRKDYH75z316NCuDTjiljFczZgmZj3z5OBRnpbDYSZWum5Ap9RqRcFDi51AcvlOsi7dC/EDg7Wl2uA/3CCXi2T9IAOFtrChxJ2jaQ6C/fRdOX2Z2Hzy2nNrOMbBPk661l1MaMBTxDWWOLSk6eRlS31lM5Rg7D1WugtQO0QOA1E2Uwce88NXXzPgx4psArKMwYPCYQ==
-Received: from CH0PR03CA0449.namprd03.prod.outlook.com (2603:10b6:610:10e::25)
- by DS0PR12MB8525.namprd12.prod.outlook.com (2603:10b6:8:159::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.21; Thu, 10 Jul
- 2025 06:52:34 +0000
-Received: from CH2PEPF0000009C.namprd02.prod.outlook.com
- (2603:10b6:610:10e:cafe::ac) by CH0PR03CA0449.outlook.office365.com
- (2603:10b6:610:10e::25) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8922.22 via Frontend Transport; Thu,
- 10 Jul 2025 06:52:34 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CH2PEPF0000009C.mail.protection.outlook.com (10.167.244.24) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8922.22 via Frontend Transport; Thu, 10 Jul 2025 06:52:33 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 9 Jul 2025
- 23:52:20 -0700
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail205.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 9 Jul
- 2025 23:52:20 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.6)
- with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Wed, 9 Jul
- 2025 23:52:16 -0700
-From: Tariq Toukan <tariqt@nvidia.com>
-To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>
-CC: Saeed Mahameed <saeed@kernel.org>, Gal Pressman <gal@nvidia.com>, "Leon
- Romanovsky" <leon@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, "Tariq
- Toukan" <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Jonathan Corbet
-	<corbet@lwn.net>, <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Dragos Tatulea
-	<dtatulea@nvidia.com>
-Subject: [PATCH net-next V2 3/3] net/mlx5e: Make PCIe congestion event thresholds configurable
-Date: Thu, 10 Jul 2025 09:51:32 +0300
-Message-ID: <1752130292-22249-4-git-send-email-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.8.0
-In-Reply-To: <1752130292-22249-1-git-send-email-tariqt@nvidia.com>
-References: <1752130292-22249-1-git-send-email-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA88C2882B4;
+	Thu, 10 Jul 2025 07:28:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752132515; cv=none; b=C68iA16//NElLPPGBWPPxwtWHa69cYLmhsHW2NNVGR3/juMNHHiOaVYdZJtYeWyvh/Wr5BF0Z8sj5AKuxD7QNRj13ShJj7dsotWh0f2mEPzXoJ+lxMn8f4eSBpsPmtVE1DE51B+8Io5SXKolWPZXO8L+D8/ZFoxwCOwZO/xbp4U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752132515; c=relaxed/simple;
+	bh=q8aajeMJr0YFcHtfckwDFxnJGjYHirD2U5daz/hfiyw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZTKRghdElSMq6VqoTYYUhqK0rWwgwZMTNTqS+WOrKBUmN6Y82CSZGwlKhwIoD1SVCrTv/DxJU47ztTeemTBbYRZ5u/2SrpBMSpeMdNyBrIIH3PZdvQNL6Mcgun6h9V9hORxuIX0sF/aUWX+0/wsk7pNPzcC3UEc86xg+KyoF9Yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e1fIFzEa; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752132514; x=1783668514;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=q8aajeMJr0YFcHtfckwDFxnJGjYHirD2U5daz/hfiyw=;
+  b=e1fIFzEagPwKaSBa5yDs5L7R7JI7yIXyWYWikwfaKIcuS327mnWHNodT
+   FdPuZ8MjXJp4+q/tBSnoacvdiI8d4QfsYSnIHmWVlgFdX6dX++S2z90lA
+   pMsmacedLDlyIyL8rcXaRKNc42/yPrIxbZe0v0KOVdksLw7L+Mn5WmLoI
+   /lNb7pzzYUznAfEDfVgXQ+IXfRadO8xDdwedW7kPxfcBleJHc5wbvuZ1Z
+   d1LGHDhoAgsbMHGEaBfuXD93eIfedSAdfkzyc7poTqiyucAxmyBz8J+Pm
+   UrTtlk+F+9mms377UXHHvyjQWn9uWdVVkSq2HbWqcjfhLUhwGN7BnYi6X
+   A==;
+X-CSE-ConnectionGUID: I+cDDrd9TxSPGWQ4xVPaOA==
+X-CSE-MsgGUID: wcLRnfeaSiy0hbqNyTUr3g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11489"; a="54531569"
+X-IronPort-AV: E=Sophos;i="6.16,300,1744095600"; 
+   d="scan'208";a="54531569"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2025 00:28:33 -0700
+X-CSE-ConnectionGUID: vr85dqWcS/S3xtlKLeUf7g==
+X-CSE-MsgGUID: wCqDWvxSSMuPwoC2T8lxIQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,300,1744095600"; 
+   d="scan'208";a="186970578"
+Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
+  by fmviesa001.fm.intel.com with ESMTP; 10 Jul 2025 00:28:30 -0700
+Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uZlhk-0004gJ-1w;
+	Thu, 10 Jul 2025 07:28:28 +0000
+Date: Thu, 10 Jul 2025 15:27:52 +0800
+From: kernel test robot <lkp@intel.com>
+To: Yun Lu <luyun_611@163.com>, willemdebruijn.kernel@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 2/2] af_packet: fix soft lockup issue caused by
+ tpacket_snd()
+Message-ID: <202507101547.Li8m6iCU-lkp@intel.com>
+References: <20250709095653.62469-3-luyun_611@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-NV-OnPremToCloud: AnonymousSubmission
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF0000009C:EE_|DS0PR12MB8525:EE_
-X-MS-Office365-Filtering-Correlation-Id: b37f2184-99ca-4a8f-f690-08ddbf7e5944
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|7416014|1800799024|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?mYBRqVCpC7D/XYdHvEAx6MBBzr/sDbPeqp1E2EHZpdJR5r1/RbY8cBgpdyrD?=
- =?us-ascii?Q?8ESqxJOdGsJDq/NJnq5LvT+xjwdK3m11jUM4OXIvyJiMy1FtbwDmTxDig6J7?=
- =?us-ascii?Q?UivYCsmQ1U04iOOa+XSetJV54k/h/p/7/LHsYPPpcgyzpavtek1cMTi8XLUd?=
- =?us-ascii?Q?dTOb9m+9/v4ACOXmM5z1XdSowntS6v1tI+9lP4hRREHQwJ6Ewr6s/yCcD6Mf?=
- =?us-ascii?Q?L1JJzKTrAHNXspvEVGTvzjFgRMQNVg6/3mHBNAB3VlegGGlxm3Q2S/03Yj8e?=
- =?us-ascii?Q?CRDpass408eVpR3OhelSp0mxNt6mCfA/sWJGt+khZQMiks0Yu0yIDhj57SX6?=
- =?us-ascii?Q?OgMIGZBL3URLWrTilmY5t9QelznWwtIuhKbea9ET16/RTXDPKoMcPo6AcTTk?=
- =?us-ascii?Q?4fdLNJYHxrJMaOoHn48QiDiXC4K7kBa7wnY739ITogch0S9X9XvYLpdxiJ13?=
- =?us-ascii?Q?JFFy1Hs9FeODAd0msuCnkTMxLWC05z5BccgZnhMuWcFU4G/f0iKQqnT2b/Pm?=
- =?us-ascii?Q?m+ha/1s3tpj+Czw3QGFDQQl4BnwISrEA9N6UcG6+fi4e6KSCifvp7+aCCZT5?=
- =?us-ascii?Q?+ZVZetO4E2fGtHR1ymAr82HTobbnwNp4x+aS79r90TT3fE8jyylPfWBd0DCi?=
- =?us-ascii?Q?HegkQnyDtvWCVm/gqief+37Ea8d+3CAvzaJACJlnECJ8zdRBBsLH8FZJ1znY?=
- =?us-ascii?Q?ptiByQYghnCnqg+rrBbfKsFhN/UQs+3G7Br4RWMxxnWUd77EfpaV2vTip6fq?=
- =?us-ascii?Q?UZ6QkvhqTsc9OZKx2VUgLKmzz7NaXqVhmgWQSEAbdcWutwXOSqkegX6NbXRV?=
- =?us-ascii?Q?duUlvNgTx7zVN9DAZqz2IMVl2OstP0D4frVXQPOOuIwH5MYKlQ7QGFZT9laf?=
- =?us-ascii?Q?4ekmWxLXArNrigQEdzgMAicz8GpnhhsiHOB7nBPpw3H/B5BF7zRKKQHDIByS?=
- =?us-ascii?Q?NJ4eYjyBmpj17DGcw1+BRhN0rR9i1x+ijuvrfjLwDDyzeGEm2HaE0XTDxJaC?=
- =?us-ascii?Q?juG1FJanryAr4T6P8GHzBM4RAZgeZxRNWrsKkm0UapOF2UkUClhbKNin8o4o?=
- =?us-ascii?Q?PpBvPu04QI6W0YY5d73aSNpudvRwMiChkSLeulKTiDS/czUh4eOgtq2waviw?=
- =?us-ascii?Q?akmQ0Y8Cd8AjaCV/vc/aTQ6yMYv5R0pgT+kbx9UGmKCWVEX1BkKN6Wa9hVrE?=
- =?us-ascii?Q?8aafDFqfe+EGWJG+QRPFV0vqASQ7FJFIolpArCOzx7bL1/Wyrau3qx+IXmqq?=
- =?us-ascii?Q?7d1DLsO0QITyojN3jMx9sG9tHs/Quh/z6hp2/aXU36gnLCsSQpjuW1EDUJKK?=
- =?us-ascii?Q?IkmHuMCED9gaNH2rM3Tss+Vss+cSNiblkagAK+7oonrfuCFincYf1TThiem2?=
- =?us-ascii?Q?NG6ElXkCmdxefYSVIB6tPlP8N/Wpr1Wc+FanTa0pqwpRRMYqYOw1om0tINp1?=
- =?us-ascii?Q?j0M8QbsJ6GEZaLLJBF1G48heNfkhIMj45yj5jaCPYUj7FsmA4BIrjzc+HZkC?=
- =?us-ascii?Q?qU4ibKvYRfV1J50O5GGx20/a3bVfXCnFytgz?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(7416014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2025 06:52:33.9330
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b37f2184-99ca-4a8f-f690-08ddbf7e5944
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF0000009C.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8525
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250709095653.62469-3-luyun_611@163.com>
 
-From: Dragos Tatulea <dtatulea@nvidia.com>
+Hi Yun,
 
-Add a new sysfs entry for reading and configuring the PCIe congestion
-event thresholds. The format is the following:
-<inbound_low> <inbound_high> <outbound_low> <outbound_high>
+kernel test robot noticed the following build errors:
 
-Units are 0.01 %. Accepted values are in range (0, 10000].
+[auto build test ERROR on net-next/main]
+[also build test ERROR on net/main linus/master v6.16-rc5 next-20250709]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-When new thresholds are configured, a object modify operation will
-happen. The set function is updated accordingly to act as a modify
-as well.
+url:    https://github.com/intel-lab-lkp/linux/commits/Yun-Lu/af_packet-fix-the-SO_SNDTIMEO-constraint-not-effective-on-tpacked_snd/20250709-175915
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250709095653.62469-3-luyun_611%40163.com
+patch subject: [PATCH v3 2/2] af_packet: fix soft lockup issue caused by tpacket_snd()
+config: i386-buildonly-randconfig-001-20250710 (https://download.01.org/0day-ci/archive/20250710/202507101547.Li8m6iCU-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250710/202507101547.Li8m6iCU-lkp@intel.com/reproduce)
 
-The threshold configuration is stored and queried directly
-in the firmware.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202507101547.Li8m6iCU-lkp@intel.com/
 
-To prevent fat fingering the numbers, read them initially as u64.
+All errors (new ones prefixed by >>):
 
-Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
----
- .../mellanox/mlx5/core/en/pcie_cong_event.c   | 152 +++++++++++++++++-
- 1 file changed, 144 insertions(+), 8 deletions(-)
+   net/packet/af_packet.c: In function 'tpacket_snd':
+>> net/packet/af_packet.c:2956:37: error: expected ';' before 'err'
+    2956 |         } while (likely(ph != NULL))
+         |                                     ^
+         |                                     ;
+    2957 | 
+    2958 |         err = len_sum;
+         |         ~~~                          
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/pcie_cong_event.c b/drivers/net/ethernet/mellanox/mlx5/core/en/pcie_cong_event.c
-index a24e5465ceeb..a74d1e15c92e 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/pcie_cong_event.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/pcie_cong_event.c
-@@ -39,9 +39,13 @@ struct mlx5e_pcie_cong_event {
- 
- 	/* For ethtool stats group. */
- 	struct mlx5e_pcie_cong_stats stats;
-+
-+	struct device_attribute attr;
- };
- 
- /* In units of 0.01 % */
-+#define MLX5E_PCIE_CONG_THRESH_MAX 10000
-+
- static const struct mlx5e_pcie_cong_thresh default_thresh_config = {
- 	.inbound_high = 9000,
- 	.inbound_low = 7500,
-@@ -97,6 +101,7 @@ MLX5E_DEFINE_STATS_GRP(pcie_cong, 0);
- static int
- mlx5_cmd_pcie_cong_event_set(struct mlx5_core_dev *dev,
- 			     const struct mlx5e_pcie_cong_thresh *config,
-+			     bool modify,
- 			     u64 *obj_id)
- {
- 	u32 in[MLX5_ST_SZ_DW(pcie_cong_event_cmd_in)] = {};
-@@ -108,8 +113,16 @@ mlx5_cmd_pcie_cong_event_set(struct mlx5_core_dev *dev,
- 	hdr = MLX5_ADDR_OF(pcie_cong_event_cmd_in, in, hdr);
- 	cong_obj = MLX5_ADDR_OF(pcie_cong_event_cmd_in, in, cong_obj);
- 
--	MLX5_SET(general_obj_in_cmd_hdr, hdr, opcode,
--		 MLX5_CMD_OP_CREATE_GENERAL_OBJECT);
-+	if (!modify) {
-+		MLX5_SET(general_obj_in_cmd_hdr, hdr, opcode,
-+			 MLX5_CMD_OP_CREATE_GENERAL_OBJECT);
-+	} else {
-+		MLX5_SET(general_obj_in_cmd_hdr, hdr, opcode,
-+			 MLX5_CMD_OP_MODIFY_GENERAL_OBJECT);
-+		MLX5_SET(general_obj_in_cmd_hdr, in, obj_id, *obj_id);
-+		MLX5_SET64(pcie_cong_event_obj, cong_obj, modify_select_field,
-+			   MLX5_PCIE_CONG_EVENT_MOD_THRESH);
-+	}
- 
- 	MLX5_SET(general_obj_in_cmd_hdr, hdr, obj_type,
- 		 MLX5_GENERAL_OBJECT_TYPES_PCIE_CONG_EVENT);
-@@ -131,10 +144,12 @@ mlx5_cmd_pcie_cong_event_set(struct mlx5_core_dev *dev,
- 	if (err)
- 		return err;
- 
--	*obj_id = MLX5_GET(general_obj_out_cmd_hdr, out, obj_id);
-+	if (!modify)
-+		*obj_id = MLX5_GET(general_obj_out_cmd_hdr, out, obj_id);
- 
--	mlx5_core_dbg(dev, "PCIe congestion event (obj_id=%llu) created. Config: in: [%u, %u], out: [%u, %u]\n",
-+	mlx5_core_dbg(dev, "PCIe congestion event (obj_id=%llu) %s. Config: in: [%u, %u], out: [%u, %u]\n",
- 		      *obj_id,
-+		      modify ? "modified" : "created",
- 		      config->inbound_high, config->inbound_low,
- 		      config->outbound_high, config->outbound_low);
- 
-@@ -160,13 +175,13 @@ static int mlx5_cmd_pcie_cong_event_destroy(struct mlx5_core_dev *dev,
- 
- static int mlx5_cmd_pcie_cong_event_query(struct mlx5_core_dev *dev,
- 					  u64 obj_id,
--					  u32 *state)
-+					  u32 *state,
-+					  struct mlx5e_pcie_cong_thresh *config)
- {
- 	u32 in[MLX5_ST_SZ_DW(pcie_cong_event_cmd_in)] = {};
- 	u32 out[MLX5_ST_SZ_DW(pcie_cong_event_cmd_out)];
- 	void *obj;
- 	void *hdr;
--	u8 cong;
- 	int err;
- 
- 	hdr = MLX5_ADDR_OF(pcie_cong_event_cmd_in, in, hdr);
-@@ -184,6 +199,8 @@ static int mlx5_cmd_pcie_cong_event_query(struct mlx5_core_dev *dev,
- 	obj = MLX5_ADDR_OF(pcie_cong_event_cmd_out, out, cong_obj);
- 
- 	if (state) {
-+		u8 cong;
-+
- 		cong = MLX5_GET(pcie_cong_event_obj, obj, inbound_cong_state);
- 		if (cong == MLX5E_CONG_HIGH_STATE)
- 			*state |= MLX5E_INBOUND_CONG;
-@@ -193,6 +210,19 @@ static int mlx5_cmd_pcie_cong_event_query(struct mlx5_core_dev *dev,
- 			*state |= MLX5E_OUTBOUND_CONG;
- 	}
- 
-+	if (config) {
-+		*config = (struct mlx5e_pcie_cong_thresh) {
-+			.inbound_low = MLX5_GET(pcie_cong_event_obj, obj,
-+						inbound_cong_low_threshold),
-+			.inbound_high = MLX5_GET(pcie_cong_event_obj, obj,
-+						inbound_cong_high_threshold),
-+			.outbound_low = MLX5_GET(pcie_cong_event_obj, obj,
-+						 outbound_cong_low_threshold),
-+			.outbound_high = MLX5_GET(pcie_cong_event_obj, obj,
-+						  outbound_cong_high_threshold),
-+		};
-+	}
-+
- 	return 0;
- }
- 
-@@ -210,7 +240,7 @@ static void mlx5e_pcie_cong_event_work(struct work_struct *work)
- 	dev = priv->mdev;
- 
- 	err = mlx5_cmd_pcie_cong_event_query(dev, cong_event->obj_id,
--					     &new_cong_state);
-+					     &new_cong_state, NULL);
- 	if (err) {
- 		mlx5_core_warn(dev, "Error %d when querying PCIe cong event object (obj_id=%llu).\n",
- 			       err, cong_event->obj_id);
-@@ -249,6 +279,101 @@ static int mlx5e_pcie_cong_event_handler(struct notifier_block *nb,
- 	return NOTIFY_OK;
- }
- 
-+static bool mlx5e_thresh_check_val(u64 val)
-+{
-+	return val > 0 && val <= MLX5E_PCIE_CONG_THRESH_MAX;
-+}
-+
-+static bool
-+mlx5e_thresh_config_check_order(const struct mlx5e_pcie_cong_thresh *config)
-+{
-+	if (config->inbound_high <= config->inbound_low)
-+		return false;
-+
-+	if (config->outbound_high <= config->outbound_low)
-+		return false;
-+
-+	return true;
-+}
-+
-+#define MLX5E_PCIE_CONG_THRESH_SYSFS_VALUES 4
-+
-+static ssize_t thresh_config_store(struct device *dev,
-+				   struct device_attribute *attr,
-+				   const char *buf,
-+				   size_t count)
-+{
-+	struct mlx5e_pcie_cong_thresh config = {};
-+	struct mlx5e_pcie_cong_event *cong_event;
-+	u64 outbound_high, outbound_low;
-+	u64 inbound_high, inbound_low;
-+	struct mlx5e_priv *priv;
-+	int ret;
-+	int err;
-+
-+	cong_event = container_of(attr, struct mlx5e_pcie_cong_event, attr);
-+	priv = cong_event->priv;
-+
-+	ret = sscanf(buf, "%llu %llu %llu %llu",
-+		     &inbound_low, &inbound_high,
-+		     &outbound_low, &outbound_high);
-+	if (ret != MLX5E_PCIE_CONG_THRESH_SYSFS_VALUES) {
-+		mlx5_core_err(priv->mdev, "Invalid format for PCIe congestion threshold configuration. Expected %d, got %d.\n",
-+			      MLX5E_PCIE_CONG_THRESH_SYSFS_VALUES, ret);
-+		return -EINVAL;
-+	}
-+
-+	if (!mlx5e_thresh_check_val(inbound_high) ||
-+	    !mlx5e_thresh_check_val(inbound_low) ||
-+	    !mlx5e_thresh_check_val(outbound_high) ||
-+	    !mlx5e_thresh_check_val(outbound_low)) {
-+		mlx5_core_err(priv->mdev, "Invalid values for PCIe congestion threshold configuration. Valid range [1, %d]\n",
-+			      MLX5E_PCIE_CONG_THRESH_MAX);
-+		return -EINVAL;
-+	}
-+
-+	config = (struct mlx5e_pcie_cong_thresh) {
-+		.inbound_low = inbound_low,
-+		.inbound_high = inbound_high,
-+		.outbound_low = outbound_low,
-+		.outbound_high = outbound_high,
-+
-+	};
-+
-+	if (!mlx5e_thresh_config_check_order(&config)) {
-+		mlx5_core_err(priv->mdev, "Invalid order of values for PCIe congestion threshold configuration.\n");
-+		return -EINVAL;
-+	}
-+
-+	err = mlx5_cmd_pcie_cong_event_set(priv->mdev, &config,
-+					   true, &cong_event->obj_id);
-+
-+	return err ? err : count;
-+}
-+
-+static ssize_t thresh_config_show(struct device *dev,
-+				  struct device_attribute *attr,
-+				  char *buf)
-+{
-+	struct mlx5e_pcie_cong_event *cong_event;
-+	struct mlx5e_pcie_cong_thresh config;
-+	struct mlx5e_priv *priv;
-+	int err;
-+
-+	cong_event = container_of(attr, struct mlx5e_pcie_cong_event, attr);
-+	priv = cong_event->priv;
-+
-+	err = mlx5_cmd_pcie_cong_event_query(priv->mdev, cong_event->obj_id,
-+					     NULL, &config);
-+
-+	if (err)
-+		return err;
-+
-+	return sysfs_emit(buf, "%u %u %u %u\n",
-+			  config.inbound_low, config.inbound_high,
-+			  config.outbound_low, config.outbound_high);
-+}
-+
- bool mlx5e_pcie_cong_event_supported(struct mlx5_core_dev *dev)
- {
- 	u64 features = MLX5_CAP_GEN_2_64(dev, general_obj_types_127_64);
-@@ -283,7 +408,7 @@ int mlx5e_pcie_cong_event_init(struct mlx5e_priv *priv)
- 	cong_event->priv = priv;
- 
- 	err = mlx5_cmd_pcie_cong_event_set(mdev, &default_thresh_config,
--					   &cong_event->obj_id);
-+					   false, &cong_event->obj_id);
- 	if (err) {
- 		mlx5_core_warn(mdev, "Error creating a PCIe congestion event object\n");
- 		goto err_free;
-@@ -295,10 +420,20 @@ int mlx5e_pcie_cong_event_init(struct mlx5e_priv *priv)
- 		goto err_obj_destroy;
- 	}
- 
-+	cong_event->attr = (struct device_attribute)__ATTR_RW(thresh_config);
-+	err = sysfs_create_file(&mdev->device->kobj,
-+				&cong_event->attr.attr);
-+	if (err) {
-+		mlx5_core_warn(mdev, "Error creating a sysfs entry for pcie_cong limits.\n");
-+		goto err_unregister_nb;
-+	}
-+
- 	priv->cong_event = cong_event;
- 
- 	return 0;
- 
-+err_unregister_nb:
-+	mlx5_eq_notifier_unregister(mdev, &cong_event->nb);
- err_obj_destroy:
- 	mlx5_cmd_pcie_cong_event_destroy(mdev, cong_event->obj_id);
- err_free:
-@@ -316,6 +451,7 @@ void mlx5e_pcie_cong_event_cleanup(struct mlx5e_priv *priv)
- 		return;
- 
- 	priv->cong_event = NULL;
-+	sysfs_remove_file(&mdev->device->kobj, &cong_event->attr.attr);
- 
- 	mlx5_eq_notifier_unregister(mdev, &cong_event->nb);
- 	cancel_work_sync(&cong_event->work);
+
+vim +2956 net/packet/af_packet.c
+
+  2769	
+  2770	static int tpacket_snd(struct packet_sock *po, struct msghdr *msg)
+  2771	{
+  2772		struct sk_buff *skb = NULL;
+  2773		struct net_device *dev;
+  2774		struct virtio_net_hdr *vnet_hdr = NULL;
+  2775		struct sockcm_cookie sockc;
+  2776		__be16 proto;
+  2777		int err, reserve = 0;
+  2778		void *ph;
+  2779		DECLARE_SOCKADDR(struct sockaddr_ll *, saddr, msg->msg_name);
+  2780		bool need_wait = !(msg->msg_flags & MSG_DONTWAIT);
+  2781		int vnet_hdr_sz = READ_ONCE(po->vnet_hdr_sz);
+  2782		unsigned char *addr = NULL;
+  2783		int tp_len, size_max;
+  2784		void *data;
+  2785		int len_sum = 0;
+  2786		int status = TP_STATUS_AVAILABLE;
+  2787		int hlen, tlen, copylen = 0;
+  2788		long timeo;
+  2789	
+  2790		mutex_lock(&po->pg_vec_lock);
+  2791	
+  2792		/* packet_sendmsg() check on tx_ring.pg_vec was lockless,
+  2793		 * we need to confirm it under protection of pg_vec_lock.
+  2794		 */
+  2795		if (unlikely(!po->tx_ring.pg_vec)) {
+  2796			err = -EBUSY;
+  2797			goto out;
+  2798		}
+  2799		if (likely(saddr == NULL)) {
+  2800			dev	= packet_cached_dev_get(po);
+  2801			proto	= READ_ONCE(po->num);
+  2802		} else {
+  2803			err = -EINVAL;
+  2804			if (msg->msg_namelen < sizeof(struct sockaddr_ll))
+  2805				goto out;
+  2806			if (msg->msg_namelen < (saddr->sll_halen
+  2807						+ offsetof(struct sockaddr_ll,
+  2808							sll_addr)))
+  2809				goto out;
+  2810			proto	= saddr->sll_protocol;
+  2811			dev = dev_get_by_index(sock_net(&po->sk), saddr->sll_ifindex);
+  2812			if (po->sk.sk_socket->type == SOCK_DGRAM) {
+  2813				if (dev && msg->msg_namelen < dev->addr_len +
+  2814					   offsetof(struct sockaddr_ll, sll_addr))
+  2815					goto out_put;
+  2816				addr = saddr->sll_addr;
+  2817			}
+  2818		}
+  2819	
+  2820		err = -ENXIO;
+  2821		if (unlikely(dev == NULL))
+  2822			goto out;
+  2823		err = -ENETDOWN;
+  2824		if (unlikely(!(dev->flags & IFF_UP)))
+  2825			goto out_put;
+  2826	
+  2827		sockcm_init(&sockc, &po->sk);
+  2828		if (msg->msg_controllen) {
+  2829			err = sock_cmsg_send(&po->sk, msg, &sockc);
+  2830			if (unlikely(err))
+  2831				goto out_put;
+  2832		}
+  2833	
+  2834		if (po->sk.sk_socket->type == SOCK_RAW)
+  2835			reserve = dev->hard_header_len;
+  2836		size_max = po->tx_ring.frame_size
+  2837			- (po->tp_hdrlen - sizeof(struct sockaddr_ll));
+  2838	
+  2839		if ((size_max > dev->mtu + reserve + VLAN_HLEN) && !vnet_hdr_sz)
+  2840			size_max = dev->mtu + reserve + VLAN_HLEN;
+  2841	
+  2842		timeo = sock_sndtimeo(&po->sk, msg->msg_flags & MSG_DONTWAIT);
+  2843		reinit_completion(&po->skb_completion);
+  2844	
+  2845		do {
+  2846			ph = packet_current_frame(po, &po->tx_ring,
+  2847						  TP_STATUS_SEND_REQUEST);
+  2848			if (unlikely(ph == NULL)) {
+  2849				/* Note: packet_read_pending() might be slow if we
+  2850				 * have to call it as it's per_cpu variable, but in
+  2851				 * fast-path we don't have to call it, only when ph
+  2852				 * is NULL, we need to check pending_refcnt.
+  2853				 */
+  2854				if (need_wait && packet_read_pending(&po->tx_ring)) {
+  2855					timeo = wait_for_completion_interruptible_timeout(&po->skb_completion, timeo);
+  2856					if (timeo <= 0) {
+  2857						err = !timeo ? -ETIMEDOUT : -ERESTARTSYS;
+  2858						goto out_put;
+  2859					} else {
+  2860						/* Just reuse ph to continue for the next iteration, and
+  2861						 * ph will be reassigned at the start of the next iteration.
+  2862						 */
+  2863						ph = (void *)1;
+  2864					}
+  2865				}
+  2866				/* check for additional frames */
+  2867				continue;
+  2868			}
+  2869	
+  2870			skb = NULL;
+  2871			tp_len = tpacket_parse_header(po, ph, size_max, &data);
+  2872			if (tp_len < 0)
+  2873				goto tpacket_error;
+  2874	
+  2875			status = TP_STATUS_SEND_REQUEST;
+  2876			hlen = LL_RESERVED_SPACE(dev);
+  2877			tlen = dev->needed_tailroom;
+  2878			if (vnet_hdr_sz) {
+  2879				vnet_hdr = data;
+  2880				data += vnet_hdr_sz;
+  2881				tp_len -= vnet_hdr_sz;
+  2882				if (tp_len < 0 ||
+  2883				    __packet_snd_vnet_parse(vnet_hdr, tp_len)) {
+  2884					tp_len = -EINVAL;
+  2885					goto tpacket_error;
+  2886				}
+  2887				copylen = __virtio16_to_cpu(vio_le(),
+  2888							    vnet_hdr->hdr_len);
+  2889			}
+  2890			copylen = max_t(int, copylen, dev->hard_header_len);
+  2891			skb = sock_alloc_send_skb(&po->sk,
+  2892					hlen + tlen + sizeof(struct sockaddr_ll) +
+  2893					(copylen - dev->hard_header_len),
+  2894					!need_wait, &err);
+  2895	
+  2896			if (unlikely(skb == NULL)) {
+  2897				/* we assume the socket was initially writeable ... */
+  2898				if (likely(len_sum > 0))
+  2899					err = len_sum;
+  2900				goto out_status;
+  2901			}
+  2902			tp_len = tpacket_fill_skb(po, skb, ph, dev, data, tp_len, proto,
+  2903						  addr, hlen, copylen, &sockc);
+  2904			if (likely(tp_len >= 0) &&
+  2905			    tp_len > dev->mtu + reserve &&
+  2906			    !vnet_hdr_sz &&
+  2907			    !packet_extra_vlan_len_allowed(dev, skb))
+  2908				tp_len = -EMSGSIZE;
+  2909	
+  2910			if (unlikely(tp_len < 0)) {
+  2911	tpacket_error:
+  2912				if (packet_sock_flag(po, PACKET_SOCK_TP_LOSS)) {
+  2913					__packet_set_status(po, ph,
+  2914							TP_STATUS_AVAILABLE);
+  2915					packet_increment_head(&po->tx_ring);
+  2916					kfree_skb(skb);
+  2917					continue;
+  2918				} else {
+  2919					status = TP_STATUS_WRONG_FORMAT;
+  2920					err = tp_len;
+  2921					goto out_status;
+  2922				}
+  2923			}
+  2924	
+  2925			if (vnet_hdr_sz) {
+  2926				if (virtio_net_hdr_to_skb(skb, vnet_hdr, vio_le())) {
+  2927					tp_len = -EINVAL;
+  2928					goto tpacket_error;
+  2929				}
+  2930				virtio_net_hdr_set_proto(skb, vnet_hdr);
+  2931			}
+  2932	
+  2933			skb->destructor = tpacket_destruct_skb;
+  2934			__packet_set_status(po, ph, TP_STATUS_SENDING);
+  2935			packet_inc_pending(&po->tx_ring);
+  2936	
+  2937			status = TP_STATUS_SEND_REQUEST;
+  2938			err = packet_xmit(po, skb);
+  2939			if (unlikely(err != 0)) {
+  2940				if (err > 0)
+  2941					err = net_xmit_errno(err);
+  2942				if (err && __packet_get_status(po, ph) ==
+  2943					   TP_STATUS_AVAILABLE) {
+  2944					/* skb was destructed already */
+  2945					skb = NULL;
+  2946					goto out_status;
+  2947				}
+  2948				/*
+  2949				 * skb was dropped but not destructed yet;
+  2950				 * let's treat it like congestion or err < 0
+  2951				 */
+  2952				err = 0;
+  2953			}
+  2954			packet_increment_head(&po->tx_ring);
+  2955			len_sum += tp_len;
+> 2956		} while (likely(ph != NULL))
+  2957	
+  2958		err = len_sum;
+  2959		goto out_put;
+  2960	
+  2961	out_status:
+  2962		__packet_set_status(po, ph, status);
+  2963		kfree_skb(skb);
+  2964	out_put:
+  2965		dev_put(dev);
+  2966	out:
+  2967		mutex_unlock(&po->pg_vec_lock);
+  2968		return err;
+  2969	}
+  2970	
+
 -- 
-2.31.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
