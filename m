@@ -1,121 +1,97 @@
-Return-Path: <netdev+bounces-205609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59218AFF683
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 03:55:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F2DF9AFF694
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 03:59:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D3EE483E67
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 01:55:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3B783B326B
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 01:59:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80CE927E7D2;
-	Thu, 10 Jul 2025 01:55:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9C6927E7FD;
+	Thu, 10 Jul 2025 01:59:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nr0CpFpE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A789846C;
-	Thu, 10 Jul 2025 01:55:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA80542AB4;
+	Thu, 10 Jul 2025 01:59:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752112547; cv=none; b=rhStFfcRUspOaaRoQgtF76OHvAcevEtnx4HApbeWA2GDb8qpbHRCwai0CoYwvz0oIrQltI+uOW1XXSFM0usTVPoOqDfvH0Vwyuxohi/xGJ8Awgr4CA1Jhao43Rid3aiY5WaNvmyU4UDK2nHZPMJ+tIUxQqpeJtewomh1Akk9Zq8=
+	t=1752112784; cv=none; b=GtBI5cmcxZkK6+rVFGHIuVln5zQibIysRLKXfhAzS+h6Dq0M+2nf3MB12sxpkoUiEZ5ayqhMOyu9RbKpq/H6C8E/13trPiFLSYxjSYx9JJfBkoba+NSI/mOHZRwdnxfCXShH0wQtlmBXioOIJzuJPpbldwgPnvXyl44tLDEiwkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752112547; c=relaxed/simple;
-	bh=+L/rwZ6HABHIMhGOP2zkn36SLvTa9s3kx/uJ/DlIHRI=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=EJmbMdTiff/g3FUt1gPpCTnvE++p0uTGCov3nt3mtpW1Ta+HCXcpUpEPNk2UEi2JgIw1OF1MbaInPzcZ+qdH0XjCn5L3HHYCOLP62GAeMc3IFMymuFgXrx5JX8tGrjj2gBh8G04ConAb8KQOnqGQlXyCMmAYJTC0omw2zeorN2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.204.34.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas1t1752112454t545t20380
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [36.20.45.108])
-X-QQ-SSF:0000000000000000000000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 2056198709268237627
-To: "'Simon Horman'" <horms@kernel.org>
-Cc: <netdev@vger.kernel.org>,
-	<andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>,
-	<edumazet@google.com>,
-	<kuba@kernel.org>,
-	<pabeni@redhat.com>,
-	<mengyuanlou@net-swift.com>,
-	<stable@vger.kernel.org>
-References: <FD180EC06F384721+20250709063512.3343-1-jiawenwu@trustnetic.com> <20250709112937.GU452973@horms.kernel.org>
-In-Reply-To: <20250709112937.GU452973@horms.kernel.org>
-Subject: RE: [PATCH net] net: libwx: fix multicast packets received count
-Date: Thu, 10 Jul 2025 09:54:05 +0800
-Message-ID: <086c01dbf13d$84ab4ec0$8e01ec40$@trustnetic.com>
+	s=arc-20240116; t=1752112784; c=relaxed/simple;
+	bh=O1GCpSX4Cy7TfdvPuHa0WAkHsRBKX3c4B8Ue3NoFr0A=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=RvlFoLq9iID4GSyayxUG+eBhaRIVLabiFWZrId46pEbbCN3E0scvEl9cyWC383ngMKrBoSOb/sDRAt/l04TdjqJ4CiygIiHZlVweJlHR6/itnfXW8DLqOAfM1u30S73ELXOkNdL/+82yn62QR8RCXsdCXyyb174/S1Q+Y4lbqeo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nr0CpFpE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 487C2C4CEEF;
+	Thu, 10 Jul 2025 01:59:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752112784;
+	bh=O1GCpSX4Cy7TfdvPuHa0WAkHsRBKX3c4B8Ue3NoFr0A=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Nr0CpFpE8GCvAnhxFtSjNe3bTavh40kVkR48wpHR/4H5OtN2opcLyzC8VnqlZ1jpo
+	 Gz55DJyDS6oESF7vZiO2UIE7ytMKPNw5k5lf/oeqRqTChHaE2zYmj3vEhcMh3jpczV
+	 swNwK9KRgG8Dc/wska3rxMlwJIXbWQb9qXHi8bKT7816PvMNHNPm/hTSxZco1kDaxw
+	 PrK5/dfqkxiwGImCNPs8BKNNu7U25eISF7awQg7ckKOYpkrVeWScHD5IOtmiVSek3S
+	 uRo6PsBAYa6nSdlALWKd0HATCyID2ECs3LUafwt0OPKFvu1OBHB+kUgHgo8VayAAfM
+	 50X5TU1zQat8Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id DEC94383B261;
+	Thu, 10 Jul 2025 02:00:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQFEaMASMAu75b72C5g8YPIt++TR2gHIKvCMtUtmlvA=
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: Nw9C1WBu09hPPyKucH/9W1kgI0owSi5xAGWjqu/a70S4ZshD0WHJAaHg
-	gG76x8QU2Wo7Mfu4QK4ISWu45mz+tbSHPeuHJVUk4y3h50JuyRZ1xcGSbJqMz7LK7uKf3dt
-	gEc2vist1fdQfvrTR8Psnev8KOjo//q1cHiOnhzmj5+Cq952dwcyVgcutinYJaKWZrAxeGq
-	QP1T02KfMCkuNQiuba2AS4sc/1WUdrczRABcgV9cPS77ZDO2ZlRhrYYUG1jL3renr2ffN0R
-	xekf1/xPInW2LkwKPKcc6qWquUOe0q0MDlKrtt6sfhpEveInfQ8EcdoCN7+z8qdDHNp7mgV
-	IB3RWYAliaZP1TYF4Id6H+FjtVyu9/RfwuShlcdGQSwrymMldU/DDT4LPMkK209RN/4zbWR
-	UdHC/n5Uquun9XHFaRRiNFHxLpKq8GrwdXhd61cOE+i0O1x2eFqyF4hC8IIWLYMwFZUNaHa
-	q4ogRHvSD9dJai4m1EHgZzDTZnbFlpNYFcuqmOn8BLnMJ+G63ZOvrEVALULq/1/4qt3N8ex
-	FkudbcfNFONH/seqn5Cwudw37+Nte6r3MlZTPXBrtETJ8mGmMKj0FGWflDVGxt11ICeticW
-	qP5oKlZ4DWnGpCcRHsTr6u28Su8g3Lfba5zlF8Rq4cQWQ+eCCk3dfaOHhyEL4m/ht82rI7u
-	AZ25Js8SCYfZ59/AO+REOu+U+MVBGe2Loy77fWvKfg3QEgA7cSAEI5KfLJvDcimwrf5erGX
-	lTjoV0OvRfkCnpL/FX5m2bIF0zbE/AT9zNl7fFQvV4Wc2Kyalz1eV1KfnSN6fPteD00BbTv
-	OPF+2z7aVVfCTOAPZjFUyLHsLO/fo2gXJStPVfjc5qCFRkZ37+QWN6JDfgs0ZBW9I97qcdU
-	gvppRUptexo/eVdmkrn0rcR9Q4V9LRoRib6nQ1I1u2iUYQeU3eBlZhbrR8pJhNqUjoEP3sh
-	uBwd75Hhz8FlOCcDzspzFMku9N6PxTDKT8goSMgKGHWbijiur9Z/dIcqOM2q4d/WQvdj9yY
-	QxdP2rdw==
-X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
-X-QQ-RECHKSPAM: 0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] virtio-net: xsk: rx: move the xdp->data
+ adjustment
+ to buf_to_xdp()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175211280676.957497.383613725548170335.git-patchwork-notify@kernel.org>
+Date: Thu, 10 Jul 2025 02:00:06 +0000
+References: <20250705075515.34260-1-minhquangbui99@gmail.com>
+In-Reply-To: <20250705075515.34260-1-minhquangbui99@gmail.com>
+To: Bui Quang Minh <minhquangbui99@gmail.com>
+Cc: netdev@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
+ xuanzhuo@linux.alibaba.com, eperezma@redhat.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, sdf@fomichev.me, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
 
-On Wed, Jul 9, 2025 7:30 PM, Simon Horman wrote:
-> On Wed, Jul 09, 2025 at 02:35:12PM +0800, Jiawen Wu wrote:
-> > Multicast good packets received by PF rings that pass ethternet MAC
-> > address filtering are counted for rtnl_link_stats64.multicast. The
-> > counter is not cleared on read. Fix the duplicate counting on updating
-> > statistics.
-> >
-> > Fixes: 46b92e10d631 ("net: libwx: support hardware statistics")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-> > ---
-> >  drivers/net/ethernet/wangxun/libwx/wx_hw.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-> > index 0f4be72116b8..a9519997286b 100644
-> > --- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-> > +++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-> > @@ -2778,6 +2778,7 @@ void wx_update_stats(struct wx *wx)
-> >  		hwstats->fdirmiss += rd32(wx, WX_RDB_FDIR_MISS);
-> >  	}
-> >
-> > +	hwstats->qmprc = 0;
-> >  	for (i = wx->num_vfs * wx->num_rx_queues_per_pool;
-> >  	     i < wx->mac.max_rx_queues; i++)
-> >  		hwstats->qmprc += rd32(wx, WX_PX_MPRC(i));
-> 
-> Sorry if I am being dense, but I have a question:
-> 
-> The treatment of qmprc prior to this patch seems consistent
-> with other members of hwstats. What makes qmprc special?
+Hello:
 
-The other members are read from CAB registers, and they are cleaned
-on read. 'qmprc' is read from BAR register, it is designed not to be
-cleared on read.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sat,  5 Jul 2025 14:55:14 +0700 you wrote:
+> This commit does not do any functional changes. It moves xdp->data
+> adjustment for buffer other than first buffer to buf_to_xdp() helper so
+> that the xdp_buff adjustment does not scatter over different functions.
+> 
+> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+> ---
+>  drivers/net/virtio_net.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+
+Here is the summary with links:
+  - [net-next] virtio-net: xsk: rx: move the xdp->data adjustment to buf_to_xdp()
+    https://git.kernel.org/netdev/net-next/c/f47e8f618c7d
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
