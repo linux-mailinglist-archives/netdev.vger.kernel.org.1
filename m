@@ -1,162 +1,489 @@
-Return-Path: <netdev+bounces-205749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72120AFFF85
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 12:44:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66C39AFFFC0
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 12:53:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49E981BC4562
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 10:44:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06FBD585F0A
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 10:52:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B395D2DAFCF;
-	Thu, 10 Jul 2025 10:44:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF1C72E041E;
+	Thu, 10 Jul 2025 10:52:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FXg5ACC6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TLl8XuZO"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EA422D9782
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 10:44:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C348A2D8768;
+	Thu, 10 Jul 2025 10:52:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752144260; cv=none; b=sdgtnTnym9fh9K0Zbn7h59zboB39asifjZ2uEOdWvxB1qRfbb//otlz+JrBmiEA2mZfWkmnewEJppusIvj6T+GwtL0eTP2MxO+HP4YdwR/Ks8JWc74MU97PrBVsjZeLR2nWDNz5hfT0UOoDTVEHsPAsI8wUqlWIrtgit7XyRcjQ=
+	t=1752144772; cv=none; b=GQ9U/Q3eOfvpjA2yatdIwx/nRUCg3EDn3uAuQUF2f7acrbODQ9FdCjJoqqF5aTt6KWBGPaTh7ifpv+wNtPd6H8EJUTApH+MmqB+DoKuGNojNQTIUi3DaWhvlWokBbLWM5FliarT/CRsCtfPObTW5FnQKHgWvSr9Zo7AcpwPsmec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752144260; c=relaxed/simple;
-	bh=eT95pxhU8RtV8vghCj7CgQHgVurXwFlZ6cSoxK076RE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VQgY5x9xj5SvfFDZyqyHXx25hjfacXb8WxL1rwT0cw3L/amvaKoqsrQu0FvoTQVvf1aPV1r16l0UasCjVu9/f7T5jSuocJsFKgx+oTxunVFb0Gl7ybv14eSeo2TbthlpqUiRoHcTl50EyQzZa/cA8kN+EFXIHQTDcGHOa+MiAPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FXg5ACC6; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752144258;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8CuYLuo/2Mbdt10kaLMIma7+VZaAp4h5ieIlEmZoMkg=;
-	b=FXg5ACC6KFnisUVxF+TieF9ggpXHQRUg6650nHbPAazr7DwtxcRlZ+D6fjEJQuMAhPVqGY
-	+1iGA/9vVEMA2R/CUVm1V58qbhcXpsbCBSC6X4IajEoNEesTAg0fDqxtvdRuxqsjxRUJCe
-	xW3RfZSoSRhR7nkR3xfAQI5E04dAnxU=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-537-3RcFFqltOeC5MyxDTMJN6g-1; Thu, 10 Jul 2025 06:44:17 -0400
-X-MC-Unique: 3RcFFqltOeC5MyxDTMJN6g-1
-X-Mimecast-MFC-AGG-ID: 3RcFFqltOeC5MyxDTMJN6g_1752144256
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-3132e7266d3so1002948a91.2
-        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 03:44:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752144255; x=1752749055;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8CuYLuo/2Mbdt10kaLMIma7+VZaAp4h5ieIlEmZoMkg=;
-        b=Ed1RlCanRtPchCo2NwqBD9bA/MHwkePE9otv3SSHiQu4ZnTeQGlT6twAhjKxrcefyL
-         2D1TXvaHyt44k5INN9Dk3+SYaUyZC1fLDqg5MerM8AEBeLlepjZJL5SV2kcMi2BWBxNY
-         Ngv4sZMS6Jna7KzWMP2+VEa6hHniZIcNsG8JzOjmbCUMQ1oFSY/qBnttgee1Jw398zoc
-         UtKH59sLYdU6HmtT8SWNc1v2+ONTfNli58Vulo5G2pVmU5vIry0QMcxCJEcX4ueYlJ+3
-         83sC7/lzm6TNZHZWzxr/xgLQkj5tmRB0PL2FLNUy5UUgoirTqgP0vh3Yd5iaPwxbrwK1
-         oRTw==
-X-Forwarded-Encrypted: i=1; AJvYcCVtIjXesHWdXxU2o3r60i53pFHjTDa5ZkOVZdDNwypGZEoQQ9jQ2VDMp47ujwpEgcassoap42o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyK/zlg6pMyTq5u95YjNnuB0TVWfiXylHdAeKXxiqwSVrXJdqIu
-	CcSZqF++LMCcYVtbbRuT271rZWgLrWuEwqGkEtZf+toRG2TBkSe8w2PjqA88rtMOnjF1zsxEa3y
-	MZAuyZJOjxKOGGxtwvCZ+uhc3Cg6lRjharewjJPZWfUsTAfv5d7on/W5CDeRo1J2RQkdBuzY13w
-	3r2ql06GB7RJrM6UyuPsERNyZPPV5VBP9yEQkcixlQ
-X-Gm-Gg: ASbGncv67bXPXyiG9sEf+fanqz3doNKxlz4u7FQ8ahwQ8cayYQPISpM+s6RIm30TKv6
-	ujjPRpQA9LVM9RcizpwKgIPs1xsaeSCqlJ2xhuQ1bBVqvJb0ZQSlxDlNF9tY4tcnIW0F7G6NLhp
-	OZqkBy
-X-Received: by 2002:a17:90b:2d8d:b0:314:2bae:97d7 with SMTP id 98e67ed59e1d1-31c3ef8f4d2mr3609359a91.15.1752144255285;
-        Thu, 10 Jul 2025 03:44:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFFwezNPSDR0OY8bEu9AM3jw2WPYc03gF+OPZi3VVVXopaM3IyuhrTf09fnMSDK2SfqLHqjjnRxLMCIC+bfanw=
-X-Received: by 2002:a17:90b:2d8d:b0:314:2bae:97d7 with SMTP id
- 98e67ed59e1d1-31c3ef8f4d2mr3609334a91.15.1752144254874; Thu, 10 Jul 2025
- 03:44:14 -0700 (PDT)
+	s=arc-20240116; t=1752144772; c=relaxed/simple;
+	bh=F7hIGbtDHeMaDypFULSvcexG7xYZnxxC1omI758japg=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=hhAtUTCkxPMMMN1Kzk6Q8wyTtjtnYVUI4H+WlY7bzO1BQYOZuK5YZrHWwDL5WvdF9g9u5qOz48LW4R9pE6/pijcoOzjrwIXnwy58dVePUxdfd/+6RvQtTjXBCGbpQDdAnyU6jfl9SVUfId7ZVAOX531vVpufUnGmZxPPvn6bEAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TLl8XuZO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4241BC4CEE3;
+	Thu, 10 Jul 2025 10:52:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752144772;
+	bh=F7hIGbtDHeMaDypFULSvcexG7xYZnxxC1omI758japg=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=TLl8XuZOYt58n6IPg9KcRCOXbd8fIODajFJrcQ0fwtpCa19SLoszx+o6veyF0+7TF
+	 llAuVqSkiMJCwiIrR+UR0ULgSSviaLboEdstgQUyUW3f+E3LySS73m7I+BpQwQDORs
+	 9Fhn7ae+8Rbw2od2R/ad2xqBAB26igrJ9dWTQR59SYP3aHc5uQYr6v1DBFWX7fmW6S
+	 7S7I0x2Jjy/hEhtk9ZU0M312p7le/1DY7kencmLj4tljX83ToOIBGP8r8uulysljnR
+	 ktFo3IhaQ8x4GQRH3mGsLUY/Qk73TaIhoOFFMvSuQ4BJrLC4oWN1t0fWtD7a3jge6E
+	 I0qK/KMNH3kXQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F580C83F1D;
+	Thu, 10 Jul 2025 10:52:51 +0000 (UTC)
+From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
+Date: Thu, 10 Jul 2025 18:52:47 +0800
+Subject: [PATCH] Bluetooth: Add PA_LINK to distinguish BIG sync and PA sync
+ connections
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250708144206.95091-1-minhquangbui99@gmail.com> <d808395d-2aad-47a3-a43a-cf2138d1d2b1@redhat.com>
-In-Reply-To: <d808395d-2aad-47a3-a43a-cf2138d1d2b1@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 10 Jul 2025 18:44:03 +0800
-X-Gm-Features: Ac12FXxPNEYS_Ei4p2IcT1GM3jGceeSfmUh4auJlrYXPw23N2AtGMVltUTswdZo
-Message-ID: <CACGkMEs01gmjEa+WyWZ+MspuRBjGcj8N+4ZQs5XCp+rYqZqB6Q@mail.gmail.com>
-Subject: Re: [PATCH net v2] virtio-net: fix received length check in big packets
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Bui Quang Minh <minhquangbui99@gmail.com>, netdev@vger.kernel.org, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Gavin Li <gavinl@nvidia.com>, 
-	Gavi Teitz <gavi@nvidia.com>, Parav Pandit <parav@nvidia.com>, virtualization@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250710-pa_link-v1-1-88cac0c0b776@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIAH6bb2gC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1MDc0MD3YLE+JzMvGxdS5NUI0ujVCNzM4tUJaDqgqLUtMwKsEnRsbW1AAZ
+ IvH1ZAAAA
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Johan Hedberg <johan.hedberg@gmail.com>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Yang Li <yang.li@amlogic.com>
+X-Mailer: b4 0.13-dev-f0463
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1752144769; l=14122;
+ i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
+ bh=kQ4GbUtOkJ7tUT4OgPVDiJ1mrZufI2zvpG1vvRJz7ic=;
+ b=KCiOiyexTPM61jBMhbDFbGMvzir6VcYizQgJ/TesjgqnKnTVPnX+gk1rqzAFzq5Xux8Tc7r12
+ R3+6KIeZXmrCb+5ZG/p0DdFwRQweaDbOQjWrIioyPypEglrf/nxHgzt
+X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
+ pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
+X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
+ auth_id=180
+X-Original-From: Yang Li <yang.li@amlogic.com>
+Reply-To: yang.li@amlogic.com
 
-On Thu, Jul 10, 2025 at 5:57=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 7/8/25 4:42 PM, Bui Quang Minh wrote:
-> > Since commit 4959aebba8c0 ("virtio-net: use mtu size as buffer length
-> > for big packets"), the allocated size for big packets is not
-> > MAX_SKB_FRAGS * PAGE_SIZE anymore but depends on negotiated MTU. The
-> > number of allocated frags for big packets is stored in
-> > vi->big_packets_num_skbfrags. This commit fixes the received length
-> > check corresponding to that change. The current incorrect check can lea=
-d
-> > to NULL page pointer dereference in the below while loop when erroneous
-> > length is received.
-> >
-> > Fixes: 4959aebba8c0 ("virtio-net: use mtu size as buffer length for big=
- packets")
-> > Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
-> > ---
-> > Changes in v2:
-> > - Remove incorrect give_pages call
-> > ---
-> >  drivers/net/virtio_net.c | 9 ++++++---
-> >  1 file changed, 6 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index 5d674eb9a0f2..3a7f435c95ae 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -823,7 +823,7 @@ static struct sk_buff *page_to_skb(struct virtnet_i=
-nfo *vi,
-> >  {
-> >       struct sk_buff *skb;
-> >       struct virtio_net_common_hdr *hdr;
-> > -     unsigned int copy, hdr_len, hdr_padded_len;
-> > +     unsigned int copy, hdr_len, hdr_padded_len, max_remaining_len;
-> >       struct page *page_to_free =3D NULL;
-> >       int tailroom, shinfo_size;
-> >       char *p, *hdr_p, *buf;
-> > @@ -887,12 +887,15 @@ static struct sk_buff *page_to_skb(struct virtnet=
-_info *vi,
-> >        * tries to receive more than is possible. This is usually
-> >        * the case of a broken device.
-> >        */
-> > -     if (unlikely(len > MAX_SKB_FRAGS * PAGE_SIZE)) {
-> > +     BUG_ON(offset >=3D PAGE_SIZE);
->
-> Minor nit (not intended to block this patch): since you are touching
-> this, you could consider replacing the BUG_ON() with a:
->
->  if (WARN_ON_ONCE()) <goto error path>.
+From: Yang Li <yang.li@amlogic.com>
 
-I'm not sure I get this, but using BUG_ON() can help to prevent bugs
-from being explored.
+Currently, BIS_LINK is used for both BIG sync and PA sync connections,
+which makes it impossible to distinguish them when searching for a PA
+sync connection.
 
-Thanks
+Adding PA_LINK will make the distinction clearer and simplify future
+extensions for PA-related features.
 
->
-> /P
->
+Signed-off-by: Yang Li <yang.li@amlogic.com>
+---
+ include/net/bluetooth/hci.h      |  1 +
+ include/net/bluetooth/hci_core.h | 10 +++++++---
+ net/bluetooth/hci_conn.c         | 14 +++++++++-----
+ net/bluetooth/hci_core.c         | 27 +++++++++++++++------------
+ net/bluetooth/hci_event.c        |  7 ++++---
+ net/bluetooth/hci_sync.c         | 10 +++++-----
+ net/bluetooth/iso.c              |  6 ++++--
+ net/bluetooth/mgmt.c             |  1 +
+ 8 files changed, 46 insertions(+), 30 deletions(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 19248d326cb2..50134b48b828 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -560,6 +560,7 @@ enum {
+ #define LE_LINK		0x80
+ #define CIS_LINK	0x82
+ #define BIS_LINK	0x83
++#define PA_LINK		0x84
+ #define INVALID_LINK	0xff
+ 
+ /* LMP features */
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 3ce1fb6f5822..2ebadd45fabb 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1005,6 +1005,7 @@ static inline void hci_conn_hash_add(struct hci_dev *hdev, struct hci_conn *c)
+ 		break;
+ 	case CIS_LINK:
+ 	case BIS_LINK:
++	case PA_LINK:
+ 		h->iso_num++;
+ 		break;
+ 	}
+@@ -1032,6 +1033,7 @@ static inline void hci_conn_hash_del(struct hci_dev *hdev, struct hci_conn *c)
+ 		break;
+ 	case CIS_LINK:
+ 	case BIS_LINK:
++	case PA_LINK:
+ 		h->iso_num--;
+ 		break;
+ 	}
+@@ -1050,6 +1052,7 @@ static inline unsigned int hci_conn_num(struct hci_dev *hdev, __u8 type)
+ 		return h->sco_num;
+ 	case CIS_LINK:
+ 	case BIS_LINK:
++	case PA_LINK:
+ 		return h->iso_num;
+ 	default:
+ 		return 0;
+@@ -1132,7 +1135,7 @@ hci_conn_hash_lookup_create_pa_sync(struct hci_dev *hdev)
+ 	rcu_read_lock();
+ 
+ 	list_for_each_entry_rcu(c, &h->list, list) {
+-		if (c->type != BIS_LINK)
++		if (c->type != PA_LINK)
+ 			continue;
+ 
+ 		if (!test_bit(HCI_CONN_CREATE_PA_SYNC, &c->flags))
+@@ -1327,7 +1330,7 @@ hci_conn_hash_lookup_big_sync_pend(struct hci_dev *hdev,
+ 	rcu_read_lock();
+ 
+ 	list_for_each_entry_rcu(c, &h->list, list) {
+-		if (c->type != BIS_LINK)
++		if (c->type != PA_LINK)
+ 			continue;
+ 
+ 		if (handle == c->iso_qos.bcast.big && num_bis == c->num_bis) {
+@@ -1397,7 +1400,7 @@ hci_conn_hash_lookup_pa_sync_handle(struct hci_dev *hdev, __u16 sync_handle)
+ 	rcu_read_lock();
+ 
+ 	list_for_each_entry_rcu(c, &h->list, list) {
+-		if (c->type != BIS_LINK)
++		if (c->type != PA_LINK)
+ 			continue;
+ 
+ 		/* Ignore the listen hcon, we are looking
+@@ -1996,6 +1999,7 @@ static inline int hci_proto_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 
+ 	case CIS_LINK:
+ 	case BIS_LINK:
++	case PA_LINK:
+ 		return iso_connect_ind(hdev, bdaddr, flags);
+ 
+ 	default:
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index f5cd935490ad..4042e75c33a6 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -785,7 +785,7 @@ static int hci_le_big_terminate(struct hci_dev *hdev, u8 big, struct hci_conn *c
+ 	d->sync_handle = conn->sync_handle;
+ 
+ 	if (test_and_clear_bit(HCI_CONN_PA_SYNC, &conn->flags)) {
+-		hci_conn_hash_list_flag(hdev, find_bis, BIS_LINK,
++		hci_conn_hash_list_flag(hdev, find_bis, PA_LINK,
+ 					HCI_CONN_PA_SYNC, d);
+ 
+ 		if (!d->count)
+@@ -914,6 +914,7 @@ static struct hci_conn *__hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t
+ 		break;
+ 	case CIS_LINK:
+ 	case BIS_LINK:
++	case PA_LINK:
+ 		if (hdev->iso_mtu)
+ 			/* Dedicated ISO Buffer exists */
+ 			break;
+@@ -979,6 +980,7 @@ static struct hci_conn *__hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t
+ 		break;
+ 	case CIS_LINK:
+ 	case BIS_LINK:
++	case PA_LINK:
+ 		/* conn->src should reflect the local identity address */
+ 		hci_copy_identity_address(hdev, &conn->src, &conn->src_type);
+ 
+@@ -1033,7 +1035,6 @@ static struct hci_conn *__hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t
+ 	}
+ 
+ 	hci_conn_init_sysfs(conn);
+-
+ 	return conn;
+ }
+ 
+@@ -1077,6 +1078,7 @@ static void hci_conn_cleanup_child(struct hci_conn *conn, u8 reason)
+ 		break;
+ 	case CIS_LINK:
+ 	case BIS_LINK:
++	case PA_LINK:
+ 		if ((conn->state != BT_CONNECTED &&
+ 		    !test_bit(HCI_CONN_CREATE_CIS, &conn->flags)) ||
+ 		    test_bit(HCI_CONN_BIG_CREATED, &conn->flags))
+@@ -1152,7 +1154,8 @@ void hci_conn_del(struct hci_conn *conn)
+ 	} else {
+ 		/* Unacked ISO frames */
+ 		if (conn->type == CIS_LINK ||
+-		    conn->type == BIS_LINK) {
++		    conn->type == BIS_LINK ||
++		    conn->type == PA_LINK) {
+ 			if (hdev->iso_pkts)
+ 				hdev->iso_cnt += conn->sent;
+ 			else if (hdev->le_pkts)
+@@ -2081,7 +2084,7 @@ struct hci_conn *hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst,
+ 
+ 	bt_dev_dbg(hdev, "dst %pMR type %d sid %d", dst, dst_type, sid);
+ 
+-	conn = hci_conn_add_unset(hdev, BIS_LINK, dst, HCI_ROLE_SLAVE);
++	conn = hci_conn_add_unset(hdev, PA_LINK, dst, HCI_ROLE_SLAVE);
+ 	if (IS_ERR(conn))
+ 		return conn;
+ 
+@@ -2246,7 +2249,7 @@ struct hci_conn *hci_connect_bis(struct hci_dev *hdev, bdaddr_t *dst,
+ 	 * the start periodic advertising and create BIG commands have
+ 	 * been queued
+ 	 */
+-	hci_conn_hash_list_state(hdev, bis_mark_per_adv, BIS_LINK,
++	hci_conn_hash_list_state(hdev, bis_mark_per_adv, PA_LINK,
+ 				 BT_BOUND, &data);
+ 
+ 	/* Queue start periodic advertising and create BIG */
+@@ -2980,6 +2983,7 @@ void hci_conn_tx_queue(struct hci_conn *conn, struct sk_buff *skb)
+ 	switch (conn->type) {
+ 	case CIS_LINK:
+ 	case BIS_LINK:
++	case PA_LINK:
+ 	case ACL_LINK:
+ 	case LE_LINK:
+ 		break;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 42f597cb0941..d1c7becb0953 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2936,12 +2936,14 @@ int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 	case HCI_ACLDATA_PKT:
+ 		/* Detect if ISO packet has been sent as ACL */
+ 		if (hci_conn_num(hdev, CIS_LINK) ||
+-		    hci_conn_num(hdev, BIS_LINK)) {
++		    hci_conn_num(hdev, BIS_LINK) ||
++			hci_conn_num(hdev, PA_LINK)) {
+ 			__u16 handle = __le16_to_cpu(hci_acl_hdr(skb)->handle);
+ 			__u8 type;
+ 
+ 			type = hci_conn_lookup_type(hdev, hci_handle(handle));
+-			if (type == CIS_LINK || type == BIS_LINK)
++			if (type == CIS_LINK || type == BIS_LINK ||
++			    type == PA_LINK)
+ 				hci_skb_pkt_type(skb) = HCI_ISODATA_PKT;
+ 		}
+ 		break;
+@@ -3396,6 +3398,7 @@ static inline void hci_quote_sent(struct hci_conn *conn, int num, int *quote)
+ 		break;
+ 	case CIS_LINK:
+ 	case BIS_LINK:
++	case PA_LINK:
+ 		cnt = hdev->iso_mtu ? hdev->iso_cnt :
+ 			hdev->le_mtu ? hdev->le_cnt : hdev->acl_cnt;
+ 		break;
+@@ -3409,7 +3412,7 @@ static inline void hci_quote_sent(struct hci_conn *conn, int num, int *quote)
+ }
+ 
+ static struct hci_conn *hci_low_sent(struct hci_dev *hdev, __u8 type,
+-				     __u8 type2, int *quote)
++				     int *quote)
+ {
+ 	struct hci_conn_hash *h = &hdev->conn_hash;
+ 	struct hci_conn *conn = NULL, *c;
+@@ -3421,7 +3424,7 @@ static struct hci_conn *hci_low_sent(struct hci_dev *hdev, __u8 type,
+ 	rcu_read_lock();
+ 
+ 	list_for_each_entry_rcu(c, &h->list, list) {
+-		if ((c->type != type && c->type != type2) ||
++		if (c->type != type ||
+ 		    skb_queue_empty(&c->data_q))
+ 			continue;
+ 
+@@ -3625,7 +3628,7 @@ static void hci_sched_sco(struct hci_dev *hdev, __u8 type)
+ 	else
+ 		cnt = &hdev->sco_cnt;
+ 
+-	while (*cnt && (conn = hci_low_sent(hdev, type, type, &quote))) {
++	while (*cnt && (conn = hci_low_sent(hdev, type, &quote))) {
+ 		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
+ 			BT_DBG("skb %p len %d", skb, skb->len);
+ 			hci_send_conn_frame(hdev, conn, skb);
+@@ -3744,8 +3747,8 @@ static void hci_sched_le(struct hci_dev *hdev)
+ 		hci_prio_recalculate(hdev, LE_LINK);
+ }
+ 
+-/* Schedule CIS */
+-static void hci_sched_iso(struct hci_dev *hdev)
++/* Schedule iso */
++static void hci_sched_iso(struct hci_dev *hdev, __u8 type)
+ {
+ 	struct hci_conn *conn;
+ 	struct sk_buff *skb;
+@@ -3753,14 +3756,12 @@ static void hci_sched_iso(struct hci_dev *hdev)
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
+-	if (!hci_conn_num(hdev, CIS_LINK) &&
+-	    !hci_conn_num(hdev, BIS_LINK))
++	if (!hci_conn_num(hdev, type))
+ 		return;
+ 
+ 	cnt = hdev->iso_pkts ? &hdev->iso_cnt :
+ 		hdev->le_pkts ? &hdev->le_cnt : &hdev->acl_cnt;
+-	while (*cnt && (conn = hci_low_sent(hdev, CIS_LINK, BIS_LINK,
+-					    &quote))) {
++	while (*cnt && (conn = hci_low_sent(hdev, type, &quote))) {
+ 		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
+ 			BT_DBG("skb %p len %d", skb, skb->len);
+ 			hci_send_conn_frame(hdev, conn, skb);
+@@ -3785,7 +3786,9 @@ static void hci_tx_work(struct work_struct *work)
+ 		/* Schedule queues and send stuff to HCI driver */
+ 		hci_sched_sco(hdev, SCO_LINK);
+ 		hci_sched_sco(hdev, ESCO_LINK);
+-		hci_sched_iso(hdev);
++		hci_sched_iso(hdev, CIS_LINK);
++		hci_sched_iso(hdev, BIS_LINK);
++		hci_sched_iso(hdev, PA_LINK);
+ 		hci_sched_acl(hdev);
+ 		hci_sched_le(hdev);
+ 	}
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 2c14e9daa199..d1e77dfe9edf 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4433,6 +4433,7 @@ static void hci_num_comp_pkts_evt(struct hci_dev *hdev, void *data,
+ 
+ 		case CIS_LINK:
+ 		case BIS_LINK:
++		case PA_LINK:
+ 			if (hdev->iso_pkts) {
+ 				hdev->iso_cnt += count;
+ 				if (hdev->iso_cnt > hdev->iso_pkts)
+@@ -6378,7 +6379,7 @@ static void hci_le_pa_sync_established_evt(struct hci_dev *hdev, void *data,
+ 	conn->sync_handle = le16_to_cpu(ev->handle);
+ 	conn->sid = HCI_SID_INVALID;
+ 
+-	mask |= hci_proto_connect_ind(hdev, &ev->bdaddr, BIS_LINK,
++	mask |= hci_proto_connect_ind(hdev, &ev->bdaddr, PA_LINK,
+ 				      &flags);
+ 	if (!(mask & HCI_LM_ACCEPT)) {
+ 		hci_le_pa_term_sync(hdev, ev->handle);
+@@ -6389,7 +6390,7 @@ static void hci_le_pa_sync_established_evt(struct hci_dev *hdev, void *data,
+ 		goto unlock;
+ 
+ 	/* Add connection to indicate PA sync event */
+-	pa_sync = hci_conn_add_unset(hdev, BIS_LINK, BDADDR_ANY,
++	pa_sync = hci_conn_add_unset(hdev, PA_LINK, BDADDR_ANY,
+ 				     HCI_ROLE_SLAVE);
+ 
+ 	if (IS_ERR(pa_sync))
+@@ -6420,7 +6421,7 @@ static void hci_le_per_adv_report_evt(struct hci_dev *hdev, void *data,
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	mask |= hci_proto_connect_ind(hdev, BDADDR_ANY, BIS_LINK, &flags);
++	mask |= hci_proto_connect_ind(hdev, BDADDR_ANY, PA_LINK, &flags);
+ 	if (!(mask & HCI_LM_ACCEPT))
+ 		goto unlock;
+ 
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 4ea172a26ccc..d9bb543063fa 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -2929,7 +2929,7 @@ static int hci_le_set_ext_scan_param_sync(struct hci_dev *hdev, u8 type,
+ 		if (sent) {
+ 			struct hci_conn *conn;
+ 
+-			conn = hci_conn_hash_lookup_ba(hdev, BIS_LINK,
++			conn = hci_conn_hash_lookup_ba(hdev, PA_LINK,
+ 						       &sent->bdaddr);
+ 			if (conn) {
+ 				struct bt_iso_qos *qos = &conn->iso_qos;
+@@ -5493,7 +5493,7 @@ static int hci_disconnect_sync(struct hci_dev *hdev, struct hci_conn *conn,
+ {
+ 	struct hci_cp_disconnect cp;
+ 
+-	if (conn->type == BIS_LINK) {
++	if (conn->type == BIS_LINK || conn->type == PA_LINK) {
+ 		/* This is a BIS connection, hci_conn_del will
+ 		 * do the necessary cleanup.
+ 		 */
+@@ -5562,7 +5562,7 @@ static int hci_connect_cancel_sync(struct hci_dev *hdev, struct hci_conn *conn,
+ 		return HCI_ERROR_LOCAL_HOST_TERM;
+ 	}
+ 
+-	if (conn->type == BIS_LINK) {
++	if (conn->type == BIS_LINK || conn->type == PA_LINK) {
+ 		/* There is no way to cancel a BIS without terminating the BIG
+ 		 * which is done later on connection cleanup.
+ 		 */
+@@ -5627,7 +5627,7 @@ static int hci_reject_conn_sync(struct hci_dev *hdev, struct hci_conn *conn,
+ 	if (conn->type == CIS_LINK)
+ 		return hci_le_reject_cis_sync(hdev, conn, reason);
+ 
+-	if (conn->type == BIS_LINK)
++	if (conn->type == BIS_LINK || conn->type == PA_LINK)
+ 		return -EINVAL;
+ 
+ 	if (conn->type == SCO_LINK || conn->type == ESCO_LINK)
+@@ -6995,7 +6995,7 @@ static void create_pa_complete(struct hci_dev *hdev, void *data, int err)
+ 		goto unlock;
+ 
+ 	/* Add connection to indicate PA sync error */
+-	pa_sync = hci_conn_add_unset(hdev, BIS_LINK, BDADDR_ANY,
++	pa_sync = hci_conn_add_unset(hdev, PA_LINK, BDADDR_ANY,
+ 				     HCI_ROLE_SLAVE);
+ 
+ 	if (IS_ERR(pa_sync))
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index fc22782cbeeb..dff99de98042 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -2226,7 +2226,8 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 
+ static void iso_connect_cfm(struct hci_conn *hcon, __u8 status)
+ {
+-	if (hcon->type != CIS_LINK && hcon->type != BIS_LINK) {
++	if (hcon->type != CIS_LINK && hcon->type != BIS_LINK &&
++	    hcon->type != PA_LINK) {
+ 		if (hcon->type != LE_LINK)
+ 			return;
+ 
+@@ -2267,7 +2268,8 @@ static void iso_connect_cfm(struct hci_conn *hcon, __u8 status)
+ 
+ static void iso_disconn_cfm(struct hci_conn *hcon, __u8 reason)
+ {
+-	if (hcon->type != CIS_LINK && hcon->type != BIS_LINK)
++	if (hcon->type != CIS_LINK && hcon->type !=  BIS_LINK &&
++	    hcon->type != PA_LINK)
+ 		return;
+ 
+ 	BT_DBG("hcon %p reason %d", hcon, reason);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 1485b455ade4..f90c53f7885b 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3239,6 +3239,7 @@ static u8 link_to_bdaddr(u8 link_type, u8 addr_type)
+ 	switch (link_type) {
+ 	case CIS_LINK:
+ 	case BIS_LINK:
++	case PA_LINK:
+ 	case LE_LINK:
+ 		switch (addr_type) {
+ 		case ADDR_LE_DEV_PUBLIC:
+
+---
+base-commit: 98b3f8ecdd57baff41dceccf4cba5edff3b9c010
+change-id: 20250710-pa_link-94e292e2768e
+
+Best regards,
+-- 
+Yang Li <yang.li@amlogic.com>
+
 
 
