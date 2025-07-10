@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-205660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FAF4AFF891
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 07:44:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87CFFAFF8A2
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 07:52:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2C68562DBE
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 05:44:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E658189ADD7
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 05:52:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E72028540F;
-	Thu, 10 Jul 2025 05:44:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8427B2868BF;
+	Thu, 10 Jul 2025 05:52:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="db3VTi44"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M5A3eT7N"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 283F9284B2E
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 05:44:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FF982868A2
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 05:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752126290; cv=none; b=Jc5+2KISetZJbRbSZfeKrFq8neko9AW5wl1omM/3kbReIURhRuzxooSFH43SKv1SFBNzlcH5a/U/LeXY3AXR4BuAHlQe7x7Z0SACFyDnD9nyColDQv29aP+i953nzr9p8U6zD9KKjGZfrZRvHYDzzKvqrbaA/zyBH8oy5AKR0B4=
+	t=1752126721; cv=none; b=auERVkWsjFLjRIZ55PybRXT/+6/jXacakGwi8fzM1ozr9KBlSyEWbnVPUc8J5IAmjAe5Ufpep0zPa3pD6+xup7hQ0pn2VyeNqdDqgf0jGEeDdIBH3kIoWiWjLi63iZVUCh/zLXQlmERuVYorQ3Xdr90sQdw1LA4VBgDxqSGTE4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752126290; c=relaxed/simple;
-	bh=Z5Wx4lIjk++hUL947Li6KQCLDmY/rZH7tZACSF8THIk=;
+	s=arc-20240116; t=1752126721; c=relaxed/simple;
+	bh=Sj2VWp0ut4nSgS5crDzVoycJh46XVVESyxcDcqEhlJw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tlCfVvYtq4Ssz7+WqMKufwy1u7SZrTBLXYt17T89lNMMd4F4MHjzK+IfwqWGjwU70B7VY+HveSV/7ko9ZTTsh/Q3EYrAt3TAFlcS3s5zfXJuO8Uc275gxPLhI6FTUcHPAIAbiJ1Mq9lyOIQqVKQNJ34ew2BU0SilRfkmvNXPILw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=db3VTi44; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F9AFC4CEF4;
-	Thu, 10 Jul 2025 05:44:49 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=elGCd/2ykKIpF8G7BS8YsfmaP+VTteCJ0ZIm2lAq/uWXbT795Emckc3AUq0QmFL4ciawtHbXPa2/V1pM7AD2oHsSHHf5M7DM81AdhzbNMpH7FcXcGUxVQT/tB8rlpTZj73/eE5cEEW4aqwe0V/cQWSk+NLvf9IYQXWsWHHHdEsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M5A3eT7N; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80BAFC4CEE3;
+	Thu, 10 Jul 2025 05:52:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752126289;
-	bh=Z5Wx4lIjk++hUL947Li6KQCLDmY/rZH7tZACSF8THIk=;
+	s=k20201202; t=1752126720;
+	bh=Sj2VWp0ut4nSgS5crDzVoycJh46XVVESyxcDcqEhlJw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=db3VTi442a7VOkQef0dzJil54jlGvPGXNb764OCz1mVAtKCH8fOF2HWP6uwSdpUqI
-	 +sWXcZ+sQ4w36hLonvZ40l9UfKGB+vP3M6A/3900AiTC7XImECoyl79MzHln17Y9tD
-	 Z0XE1MF4e2rEgs+j0Ehc4Pc/sp6l3dc+OSd7f+r4g1ysu5RLKISVFxyzHs9i17uwTe
-	 e6nmaNQx98yJq1GX3/ha5ApPQSLwsX32TQBwjjeFIcArf1ofOvpJqnSh4RU91kQRrD
-	 Tu61/cQvtKU3TE2YS6YLbtVuhdCWzu7PLdqdMbSWIVpb6I0vSN/DhaGWuX6nvj0FaV
-	 jfglbi+gb09Lw==
-Date: Wed, 9 Jul 2025 22:44:48 -0700
+	b=M5A3eT7NYh1cIZmXuOlJRBH6/ItTxEAeLyRQFTpMXjuqPgl+WNLqGLYj/lwNeTugk
+	 V/BFHqh7lBm7lC86x+lcdKUBkQcbNr9QKm88biaRQGy7kQWZ7J3qFy7oM0cpUSIIC8
+	 /Q75EgGVbDdgdCNhLT1Wac/VnXDP7VQWDH0Vkh1/uT1pG5McN/P6B8f1UzHDOKb1Ew
+	 sa5x4ebqaBk0wqw1HhVfphG9GftbxASkDkTUbax1g/71YolIDrpUWPksW+KLMWUhRB
+	 tumVbRF2Rr7WOIs5DOucZ9sSpE33D95CHpMbNUwekm9TK0HNO6MIgBJfnR0wooVSpd
+	 CcTi14+BiCQFA==
+Date: Wed, 9 Jul 2025 22:51:58 -0700
 From: Saeed Mahameed <saeed@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
+To: Subbaraya Sundeep <sbhatta@marvell.com>
 Cc: "David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
 	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
 	Simon Horman <horms@kernel.org>
 Subject: Re: [PATCH net-next V6 02/13] net/mlx5: Implement cqe_compress_type
  via devlink params
-Message-ID: <aG9TUPziunm1tRgR@x130>
+Message-ID: <aG9U_jh6GOIxtfG2@x130>
 References: <20250709030456.1290841-1-saeed@kernel.org>
  <20250709030456.1290841-3-saeed@kernel.org>
- <20250709195300.6d393e90@kernel.org>
+ <aG4xBBL_pDavpV9R@28e4571372ae>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,10 +65,14 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20250709195300.6d393e90@kernel.org>
+In-Reply-To: <aG4xBBL_pDavpV9R@28e4571372ae>
 
-On 09 Jul 19:53, Jakub Kicinski wrote:
->On Tue,  8 Jul 2025 20:04:44 -0700 Saeed Mahameed wrote:
+On 09 Jul 09:06, Subbaraya Sundeep wrote:
+>Hi Saeed,
+>
+>On 2025-07-09 at 03:04:44, Saeed Mahameed (saeed@kernel.org) wrote:
+>> From: Saeed Mahameed <saeedm@nvidia.com>
+>>
 >> Selects which algorithm should be used by the NIC in order to decide rate of
 >> CQE compression dependeng on PCIe bus conditions.
 >>
@@ -78,14 +83,21 @@ On 09 Jul 19:53, Jakub Kicinski wrote:
 >> 2) aggressive, merges more CQEs into a single entry, achieving a higher
 >>    compression rate and maximizing performance, particularly under high
 >>    traffic loads.
->
->This description sounds like 'aggressive' always  wins. Higher
->compression rate and higher performance. You gotta describe the trade
->offs for the knobs.
-
-Right I will add few words on latency costs.
-
->
+>>
+>> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+>> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+>> ---
+>>  Documentation/networking/devlink/mlx5.rst     |   9 +
+>>  .../net/ethernet/mellanox/mlx5/core/Makefile  |   2 +-
+>>  .../net/ethernet/mellanox/mlx5/core/devlink.c |   8 +
+>>  .../net/ethernet/mellanox/mlx5/core/devlink.h |   1 +
+>>  .../mellanox/mlx5/core/lib/nv_param.c         | 245 ++++++++++++++++++
+>>  .../mellanox/mlx5/core/lib/nv_param.h         |  14 +
+>>  include/linux/mlx5/driver.h                   |   1 +
+>>  7 files changed, 279 insertions(+), 1 deletion(-)
+>>  create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
+>>  create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.h
+>>
 >> diff --git a/Documentation/networking/devlink/mlx5.rst b/Documentation/networking/devlink/mlx5.rst
 >> index 7febe0aecd53..417e5cdcd35d 100644
 >> --- a/Documentation/networking/devlink/mlx5.rst
@@ -102,23 +114,372 @@ Right I will add few words on latency costs.
 >> +
 >> +       * ``balanced`` : Merges fewer CQEs, resulting in a moderate compression ratio but maintaining a balance between bandwidth savings and performance
 >> +       * ``aggressive`` : Merges more CQEs into a single entry, achieving a higher compression rate and maximizing performance, particularly under high traffic loads
+>> +
+>I think it is better to have this cqe param from ethtool.
+>I remember Jakub suggested to implement cqe-size in ethtool when I
+>submitted with devlink initially. Do you think this HW feature may become
+>common for other NICs too in future?
 >
->Line wrap please.
 
-ack.
+I don't think we should be using ehttool to set permanent NV global HCA
+configs :/, as the series suggests, these are permanent device parameters
+that are preserved on power cycles, hence "permanent devlink param".
 
+"balanced and aggressive" currently the two different ASIC implementation
+for cqe compression in ConnectX chips to accommodate different kinds of
+servers/topologies and PCI connections. I don't see how this could be
+common for other vendors and if others would agree on the same naming.. 
+
+>Thanks,
+>Sundeep
 >
->You already have a rx_cqe_compress ethtool priv flag.
->Why is this needed and how it differs.
->Is it just the default value for the ethtool setting?
-
-cqe compression can be enabled or disabled per queue,
-the priv flag is to enable/disable it on the netdev queues.
-
-This permanent devlink parameter selects the internal ASIC
-mechanism/algorithm for compression which is global for
-all the queues that enable compression.
-
->-- 
->pw-bot: cr
+>>  The ``mlx5`` driver supports reloading via ``DEVLINK_CMD_RELOAD``
+>>
+>>  Info versions
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Makefile b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
+>> index d292e6a9e22c..26c824e13c45 100644
+>> --- a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
+>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
+>> @@ -17,7 +17,7 @@ mlx5_core-y :=	main.o cmd.o debugfs.o fw.o eq.o uar.o pagealloc.o \
+>>  		fs_counters.o fs_ft_pool.o rl.o lag/debugfs.o lag/lag.o dev.o events.o wq.o lib/gid.o \
+>>  		lib/devcom.o lib/pci_vsc.o lib/dm.o lib/fs_ttc.o diag/fs_tracepoint.o \
+>>  		diag/fw_tracer.o diag/crdump.o devlink.o diag/rsc_dump.o diag/reporter_vnic.o \
+>> -		fw_reset.o qos.o lib/tout.o lib/aso.o wc.o fs_pool.o
+>> +		fw_reset.o qos.o lib/tout.o lib/aso.o wc.o fs_pool.o lib/nv_param.o
+>>
+>>  #
+>>  # Netdev basic
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/devlink.c b/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
+>> index 3ffa3fbacd16..18347b44d611 100644
+>> --- a/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
+>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
+>> @@ -10,6 +10,7 @@
+>>  #include "esw/qos.h"
+>>  #include "sf/dev/dev.h"
+>>  #include "sf/sf.h"
+>> +#include "lib/nv_param.h"
+>>
+>>  static int mlx5_devlink_flash_update(struct devlink *devlink,
+>>  				     struct devlink_flash_update_params *params,
+>> @@ -895,8 +896,14 @@ int mlx5_devlink_params_register(struct devlink *devlink)
+>>  	if (err)
+>>  		goto max_uc_list_err;
+>>
+>> +	err = mlx5_nv_param_register_dl_params(devlink);
+>> +	if (err)
+>> +		goto nv_param_err;
+>> +
+>>  	return 0;
+>>
+>> +nv_param_err:
+>> +	mlx5_devlink_max_uc_list_params_unregister(devlink);
+>>  max_uc_list_err:
+>>  	mlx5_devlink_auxdev_params_unregister(devlink);
+>>  auxdev_reg_err:
+>> @@ -907,6 +914,7 @@ int mlx5_devlink_params_register(struct devlink *devlink)
+>>
+>>  void mlx5_devlink_params_unregister(struct devlink *devlink)
+>>  {
+>> +	mlx5_nv_param_unregister_dl_params(devlink);
+>>  	mlx5_devlink_max_uc_list_params_unregister(devlink);
+>>  	mlx5_devlink_auxdev_params_unregister(devlink);
+>>  	devl_params_unregister(devlink, mlx5_devlink_params,
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/devlink.h b/drivers/net/ethernet/mellanox/mlx5/core/devlink.h
+>> index 961f75da6227..74bcdfa70361 100644
+>> --- a/drivers/net/ethernet/mellanox/mlx5/core/devlink.h
+>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/devlink.h
+>> @@ -22,6 +22,7 @@ enum mlx5_devlink_param_id {
+>>  	MLX5_DEVLINK_PARAM_ID_ESW_MULTIPORT,
+>>  	MLX5_DEVLINK_PARAM_ID_HAIRPIN_NUM_QUEUES,
+>>  	MLX5_DEVLINK_PARAM_ID_HAIRPIN_QUEUE_SIZE,
+>> +	MLX5_DEVLINK_PARAM_ID_CQE_COMPRESSION_TYPE
+>>  };
+>>
+>>  struct mlx5_trap_ctx {
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
+>> new file mode 100644
+>> index 000000000000..20a39483be04
+>> --- /dev/null
+>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
+>> @@ -0,0 +1,245 @@
+>> +// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
+>> +/* Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
+>> +
+>> +#include "nv_param.h"
+>> +#include "mlx5_core.h"
+>> +
+>> +enum {
+>> +	MLX5_CLASS_0_CTRL_ID_NV_SW_OFFLOAD_CONFIG             = 0x10a,
+>> +};
+>> +
+>> +struct mlx5_ifc_configuration_item_type_class_global_bits {
+>> +	u8         type_class[0x8];
+>> +	u8         parameter_index[0x18];
+>> +};
+>> +
+>> +union mlx5_ifc_config_item_type_auto_bits {
+>> +	struct mlx5_ifc_configuration_item_type_class_global_bits
+>> +				configuration_item_type_class_global;
+>> +	u8 reserved_at_0[0x20];
+>> +};
+>> +
+>> +struct mlx5_ifc_config_item_bits {
+>> +	u8         valid[0x2];
+>> +	u8         priority[0x2];
+>> +	u8         header_type[0x2];
+>> +	u8         ovr_en[0x1];
+>> +	u8         rd_en[0x1];
+>> +	u8         access_mode[0x2];
+>> +	u8         reserved_at_a[0x1];
+>> +	u8         writer_id[0x5];
+>> +	u8         version[0x4];
+>> +	u8         reserved_at_14[0x2];
+>> +	u8         host_id_valid[0x1];
+>> +	u8         length[0x9];
+>> +
+>> +	union mlx5_ifc_config_item_type_auto_bits type;
+>> +
+>> +	u8         reserved_at_40[0x10];
+>> +	u8         crc16[0x10];
+>> +};
+>> +
+>> +struct mlx5_ifc_mnvda_reg_bits {
+>> +	struct mlx5_ifc_config_item_bits configuration_item_header;
+>> +
+>> +	u8         configuration_item_data[64][0x20];
+>> +};
+>> +
+>> +struct mlx5_ifc_nv_sw_offload_conf_bits {
+>> +	u8         ip_over_vxlan_port[0x10];
+>> +	u8         tunnel_ecn_copy_offload_disable[0x1];
+>> +	u8         pci_atomic_mode[0x3];
+>> +	u8         sr_enable[0x1];
+>> +	u8         ptp_cyc2realtime[0x1];
+>> +	u8         vector_calc_disable[0x1];
+>> +	u8         uctx_en[0x1];
+>> +	u8         prio_tag_required_en[0x1];
+>> +	u8         esw_fdb_ipv4_ttl_modify_enable[0x1];
+>> +	u8         mkey_by_name[0x1];
+>> +	u8         ip_over_vxlan_en[0x1];
+>> +	u8         one_qp_per_recovery[0x1];
+>> +	u8         cqe_compression[0x3];
+>> +	u8         tunnel_udp_entropy_proto_disable[0x1];
+>> +	u8         reserved_at_21[0x1];
+>> +	u8         ar_enable[0x1];
+>> +	u8         log_max_outstanding_wqe[0x5];
+>> +	u8         vf_migration[0x2];
+>> +	u8         log_tx_psn_win[0x6];
+>> +	u8         lro_log_timeout3[0x4];
+>> +	u8         lro_log_timeout2[0x4];
+>> +	u8         lro_log_timeout1[0x4];
+>> +	u8         lro_log_timeout0[0x4];
+>> +};
+>> +
+>> +#define MNVDA_HDR_SZ \
+>> +	(MLX5_ST_SZ_BYTES(mnvda_reg) - \
+>> +	 MLX5_BYTE_OFF(mnvda_reg, configuration_item_data))
+>> +
+>> +#define MLX5_SET_CFG_ITEM_TYPE(_cls_name, _mnvda_ptr, _field, _val) \
+>> +	MLX5_SET(mnvda_reg, _mnvda_ptr, \
+>> +		 configuration_item_header.type.configuration_item_type_class_##_cls_name._field, \
+>> +		 _val)
+>> +
+>> +#define MLX5_SET_CFG_HDR_LEN(_mnvda_ptr, _cls_name) \
+>> +	MLX5_SET(mnvda_reg, _mnvda_ptr, configuration_item_header.length, \
+>> +		 MLX5_ST_SZ_BYTES(_cls_name))
+>> +
+>> +#define MLX5_GET_CFG_HDR_LEN(_mnvda_ptr) \
+>> +	MLX5_GET(mnvda_reg, _mnvda_ptr, configuration_item_header.length)
+>> +
+>> +static int mlx5_nv_param_read(struct mlx5_core_dev *dev, void *mnvda,
+>> +			      size_t len)
+>> +{
+>> +	u32 param_idx, type_class;
+>> +	u32 header_len;
+>> +	void *cls_ptr;
+>> +	int err;
+>> +
+>> +	if (WARN_ON(len > MLX5_ST_SZ_BYTES(mnvda_reg)) || len < MNVDA_HDR_SZ)
+>> +		return -EINVAL; /* A caller bug */
+>> +
+>> +	err = mlx5_core_access_reg(dev, mnvda, len, mnvda, len, MLX5_REG_MNVDA,
+>> +				   0, 0);
+>> +	if (!err)
+>> +		return 0;
+>> +
+>> +	cls_ptr = MLX5_ADDR_OF(mnvda_reg, mnvda,
+>> +			       configuration_item_header.type.configuration_item_type_class_global);
+>> +
+>> +	type_class = MLX5_GET(configuration_item_type_class_global, cls_ptr,
+>> +			      type_class);
+>> +	param_idx = MLX5_GET(configuration_item_type_class_global, cls_ptr,
+>> +			     parameter_index);
+>> +	header_len = MLX5_GET_CFG_HDR_LEN(mnvda);
+>> +
+>> +	mlx5_core_warn(dev, "Failed to read mnvda reg: type_class 0x%x, param_idx 0x%x, header_len %u, err %d\n",
+>> +		       type_class, param_idx, header_len, err);
+>> +
+>> +	return -EOPNOTSUPP;
+>> +}
+>> +
+>> +static int mlx5_nv_param_write(struct mlx5_core_dev *dev, void *mnvda,
+>> +			       size_t len)
+>> +{
+>> +	if (WARN_ON(len > MLX5_ST_SZ_BYTES(mnvda_reg)) || len < MNVDA_HDR_SZ)
+>> +		return -EINVAL;
+>> +
+>> +	if (WARN_ON(MLX5_GET_CFG_HDR_LEN(mnvda) == 0))
+>> +		return -EINVAL;
+>> +
+>> +	return mlx5_core_access_reg(dev, mnvda, len, mnvda, len, MLX5_REG_MNVDA,
+>> +				    0, 1);
+>> +}
+>> +
+>> +static int
+>> +mlx5_nv_param_read_sw_offload_conf(struct mlx5_core_dev *dev, void *mnvda,
+>> +				   size_t len)
+>> +{
+>> +	MLX5_SET_CFG_ITEM_TYPE(global, mnvda, type_class, 0);
+>> +	MLX5_SET_CFG_ITEM_TYPE(global, mnvda, parameter_index,
+>> +			       MLX5_CLASS_0_CTRL_ID_NV_SW_OFFLOAD_CONFIG);
+>> +	MLX5_SET_CFG_HDR_LEN(mnvda, nv_sw_offload_conf);
+>> +
+>> +	return mlx5_nv_param_read(dev, mnvda, len);
+>> +}
+>> +
+>> +static const char *const
+>> +	cqe_compress_str[] = { "balanced", "aggressive" };
+>> +
+>> +static int
+>> +mlx5_nv_param_devlink_cqe_compress_get(struct devlink *devlink, u32 id,
+>> +				       struct devlink_param_gset_ctx *ctx)
+>> +{
+>> +	struct mlx5_core_dev *dev = devlink_priv(devlink);
+>> +	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
+>> +	u8 value = U8_MAX;
+>> +	void *data;
+>> +	int err;
+>> +
+>> +	err = mlx5_nv_param_read_sw_offload_conf(dev, mnvda, sizeof(mnvda));
+>> +	if (err)
+>> +		return err;
+>> +
+>> +	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
+>> +	value = MLX5_GET(nv_sw_offload_conf, data, cqe_compression);
+>> +
+>> +	if (value >= ARRAY_SIZE(cqe_compress_str))
+>> +		return -EOPNOTSUPP;
+>> +
+>> +	strscpy(ctx->val.vstr, cqe_compress_str[value], sizeof(ctx->val.vstr));
+>> +	return 0;
+>> +}
+>> +
+>> +static int
+>> +mlx5_nv_param_devlink_cqe_compress_validate(struct devlink *devlink, u32 id,
+>> +					    union devlink_param_value val,
+>> +					    struct netlink_ext_ack *extack)
+>> +{
+>> +	int i;
+>> +
+>> +	for (i = 0; i < ARRAY_SIZE(cqe_compress_str); i++) {
+>> +		if (!strcmp(val.vstr, cqe_compress_str[i]))
+>> +			return 0;
+>> +	}
+>> +
+>> +	NL_SET_ERR_MSG_MOD(extack,
+>> +			   "Invalid value, supported values are balanced/aggressive");
+>> +	return -EOPNOTSUPP;
+>> +}
+>> +
+>> +static int
+>> +mlx5_nv_param_devlink_cqe_compress_set(struct devlink *devlink, u32 id,
+>> +				       struct devlink_param_gset_ctx *ctx,
+>> +				       struct netlink_ext_ack *extack)
+>> +{
+>> +	struct mlx5_core_dev *dev = devlink_priv(devlink);
+>> +	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
+>> +	int err = 0;
+>> +	void *data;
+>> +	u8 value;
+>> +
+>> +	if (!strcmp(ctx->val.vstr, "aggressive"))
+>> +		value = 1;
+>> +	else /* balanced: can't be anything else already validated above */
+>> +		value = 0;
+>> +
+>> +	err = mlx5_nv_param_read_sw_offload_conf(dev, mnvda, sizeof(mnvda));
+>> +	if (err) {
+>> +		NL_SET_ERR_MSG_MOD(extack,
+>> +				   "Failed to read sw_offload_conf mnvda reg");
+>> +		return err;
+>> +	}
+>> +
+>> +	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
+>> +	MLX5_SET(nv_sw_offload_conf, data, cqe_compression, value);
+>> +
+>> +	return mlx5_nv_param_write(dev, mnvda, sizeof(mnvda));
+>> +}
+>> +
+>> +static const struct devlink_param mlx5_nv_param_devlink_params[] = {
+>> +	DEVLINK_PARAM_DRIVER(MLX5_DEVLINK_PARAM_ID_CQE_COMPRESSION_TYPE,
+>> +			     "cqe_compress_type", DEVLINK_PARAM_TYPE_STRING,
+>> +			     BIT(DEVLINK_PARAM_CMODE_PERMANENT),
+>> +			     mlx5_nv_param_devlink_cqe_compress_get,
+>> +			     mlx5_nv_param_devlink_cqe_compress_set,
+>> +			     mlx5_nv_param_devlink_cqe_compress_validate),
+>> +};
+>> +
+>> +int mlx5_nv_param_register_dl_params(struct devlink *devlink)
+>> +{
+>> +	if (!mlx5_core_is_pf(devlink_priv(devlink)))
+>> +		return 0;
+>> +
+>> +	return devl_params_register(devlink, mlx5_nv_param_devlink_params,
+>> +				    ARRAY_SIZE(mlx5_nv_param_devlink_params));
+>> +}
+>> +
+>> +void mlx5_nv_param_unregister_dl_params(struct devlink *devlink)
+>> +{
+>> +	if (!mlx5_core_is_pf(devlink_priv(devlink)))
+>> +		return;
+>> +
+>> +	devl_params_unregister(devlink, mlx5_nv_param_devlink_params,
+>> +			       ARRAY_SIZE(mlx5_nv_param_devlink_params));
+>> +}
+>> +
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.h b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.h
+>> new file mode 100644
+>> index 000000000000..9f4922ff7745
+>> --- /dev/null
+>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.h
+>> @@ -0,0 +1,14 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
+>> +/* Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
+>> +
+>> +#ifndef __MLX5_NV_PARAM_H
+>> +#define __MLX5_NV_PARAM_H
+>> +
+>> +#include <linux/mlx5/driver.h>
+>> +#include "devlink.h"
+>> +
+>> +int mlx5_nv_param_register_dl_params(struct devlink *devlink);
+>> +void mlx5_nv_param_unregister_dl_params(struct devlink *devlink);
+>> +
+>> +#endif
+>> +
+>> diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
+>> index e6ba8f4f4bd1..96ce152e739f 100644
+>> --- a/include/linux/mlx5/driver.h
+>> +++ b/include/linux/mlx5/driver.h
+>> @@ -135,6 +135,7 @@ enum {
+>>  	MLX5_REG_MTCAP		 = 0x9009,
+>>  	MLX5_REG_MTMP		 = 0x900A,
+>>  	MLX5_REG_MCIA		 = 0x9014,
+>> +	MLX5_REG_MNVDA		 = 0x9024,
+>>  	MLX5_REG_MFRL		 = 0x9028,
+>>  	MLX5_REG_MLCR		 = 0x902b,
+>>  	MLX5_REG_MRTC		 = 0x902d,
+>> --
+>> 2.50.0
+>>
 
