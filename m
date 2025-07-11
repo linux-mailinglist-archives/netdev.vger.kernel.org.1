@@ -1,147 +1,83 @@
-Return-Path: <netdev+bounces-206162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9189B01C6D
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 14:55:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 128E1B01C70
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 14:57:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 456F35A6AAC
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 12:55:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69F3B5A6A70
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 12:57:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD9B2D0C6B;
-	Fri, 11 Jul 2025 12:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1F422D0C83;
+	Fri, 11 Jul 2025 12:56:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tl2GWJnr"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="amGhU/J3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B60753209;
-	Fri, 11 Jul 2025 12:55:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B7D28BAB9;
+	Fri, 11 Jul 2025 12:56:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752238525; cv=none; b=Ffcn6XZfGLvhmqG0DLskh2M45oFw2kP4+OgzL2bbVaJ62H28XyFsrK6NX5PSJ/dBCpl90u2ByV76sq4k6vkYxNdG4/OVa1EqTG9g906gcXcRBNc4OLA3xHypwWmVivpYCYyHQCCjEH6hdPk9A/lU6I3WeLWI8MB5EfUihVYUOiU=
+	t=1752238613; cv=none; b=chjbp4UVB49j48n0lbTGr0vQaBAp03ddIdeagrSYIUenLwCMA2Rk7jIX1mNBQeSsHMDHdN46K6FMfAvqr/7l5sEuvKOefrkjzLuJBEPHfFFQhcAzeLS1sWSSWMnOE3eJZE04XFx+ivdhKiWdZF7LBwfbHIQj6hcpqhnp9Fu54qk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752238525; c=relaxed/simple;
-	bh=AWYHOjXUBWsoijdTe5XjvSVN3q2c0/IUFuIvj0336tQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Tz5pa1hTH9l1+NGJfPdBYRx64aKim0i0jz/vSzwNVZnO6stNdOVpwgsLwrbnhkt+ZC/4PZpuXX2NKcRrUdeFXcr89jCyekx/CYK2iD4qAoE9F/qr6sQTf74kCRAAw93Bwkcv9MkQEvIOrXJNb/8jeF30sQgLCY8EuX56ijxyv8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tl2GWJnr; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ae360b6249fso349455866b.1;
-        Fri, 11 Jul 2025 05:55:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752238522; x=1752843322; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=s1kNo4Un3jL4ulQLE5GVMXMgYj71cxIyyrEQPeH9RHM=;
-        b=Tl2GWJnrNv8xWtgf+hJ4hNFqW9Xl5cgDdvMyRZSy1aNeVAThi+Saw05EtV3jrHLbWR
-         vOu2vlhA2ZFuq+qLvu2dVWXeOEdUhsJa+4sGvW/d3uUvua2UwNl5bCgyi8X5wBOrJd98
-         n/KoYFZ1Trhmg+cMAaWjTfseV0ejphhF9Bk0LfLkfhLCRbhEjsDZy4LfFaOgQNJQVDQ6
-         dS1FnO8h8H/52QyCW2/9JxNLWWgScueEg6CpMyHpfsftbf24/L1soucP32urZXv8WpBN
-         5WNMuPmAJenm1gqVd/hvAIx8zKntLn08uNou7qjA+mV/faFGDkwSnx5I+Vboub9e0eA/
-         iksQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752238522; x=1752843322;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s1kNo4Un3jL4ulQLE5GVMXMgYj71cxIyyrEQPeH9RHM=;
-        b=eh2PUZrJKq2sqjXMsQtnJrcN8IXePKxdle5dyVQitgwjoaEH8Kp3GaMZeOR6LVre9t
-         H7n2ueUyqqVN9B29Omzi3lwt33zbDly+ZGRFvYs+2ldnFUtEdmpHBFm2irOg+KA1ic9D
-         +q79UNOV2nl3aQVlvy6OWnmJOTs+lALhD8keyLiGYK+Ma492Z3UvZ2fk7vvzLogxOKiv
-         YeAi50SNKlc3SF18Dh9a3aFFgiwyXYRV0bXQ52yi4gPbrs0ob9VsPT95MzQJc+MqTj9t
-         pdeVIij5XXg3NOUaxoPq2/Vji9KN/saJ0vESRY56eSZAQRinuZZaUXAaLps2dmhzHL2r
-         D7Vw==
-X-Forwarded-Encrypted: i=1; AJvYcCXZCBKefiKuDiUyEKHBPMDGnzoq1487BECUoyAKUr2dnzCruHLZMIW0ZN0X47J8gK7ixI9a3jOao3TgeuNpl2UJ@vger.kernel.org, AJvYcCXzOgH9Mn7sXtsX5g0sFAc9g4xexkoX9I3po44b6CUvwUqdSX8Z8w99iVwQxYWx3oYGd0Gnnco=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyH2O+HNOfNoLZkdswqmMESx+oe+harf71PCiFHfpTR+qE18Quw
-	LaCKcy6/xfBgG0+qTit2KmM2pot4ki82fXNhQL5nwE/FNL0OUg893B+7
-X-Gm-Gg: ASbGncuibkCbBBKrzUFldgaW2P7pKxJQwNGPsY9qdMrWj71GFuDlk+ZNrZbBrWXNIcl
-	8C5lVSBuMjq8EkcqGN9Hp/MU8vw+q9s4s9IiLNygSZY3cv+qFR7j2MRM+gNolDUNIk2NbWJy7KK
-	lSmLycbkpEgwvWOmFRHJMLATg9OyJXS8L71UqKb3k0LSeVU4pjp7n4ILNkJLjzXBsEuyX0GeDaQ
-	z9UBSqzbPCCf5qoK04n/92O79aqyvShseiXpmBGf0L3M8LH7DdHUZ/boQnv3SK5ktmLS4G1oyi1
-	o2eRTkdqY315OwDm1nvHhkNMHVoAczhDg4NeKCKFN+4X0rNly99O6rdTxRlZeDuK6bE3b4mJYo2
-	DuLUd9W9S/QTJ6UcypVVUyDrYmwVw529Du47QWN6L/061IBB/vjV29PK+XkKZT//NIHWjs7tFYj
-	SGqoBlndedzHr5dUoJ8ZpaeR/s1JEuQsFw1DheFW3FTOK/Ff2hyUBd5iiF72WUwgGavPc50+jdk
-	RO7Mf+Va7w=
-X-Google-Smtp-Source: AGHT+IGFQaxrT7dzjizCciqU78HSGz6eRug0Ek+s0ytFx7ZsmssnCbtFFJ5dIA8PAbzHsdYn9MXgMw==
-X-Received: by 2002:a17:907:3cc6:b0:ae3:a812:a780 with SMTP id a640c23a62f3a-ae6fc1c07a3mr310674266b.61.1752238521536;
-        Fri, 11 Jul 2025 05:55:21 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae6e82962acsm292076666b.139.2025.07.11.05.55.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Jul 2025 05:55:20 -0700 (PDT)
-Message-ID: <6e12178f-e5f8-4202-948b-bdc421d5a361@gmail.com>
-Date: Fri, 11 Jul 2025 14:55:19 +0200
+	s=arc-20240116; t=1752238613; c=relaxed/simple;
+	bh=0p4MaFOIg3N6VS7YUc4ac6zt6bIBYOGJ5EDw95bFQmM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MLkiq1Pdbkk4JuAPJSkJIaa52W2TMP//+y+XEnFrXEj5cjRMYXg6kO7fUtYnoYTu3uZNbUETLPZJftyD/lzJUeR0/nH+Py2K6ipM6+l5ieqOWX9WnXzqlxGQL5IsMgCS3N8gSMqu8NKkh9L6tm5atcou7nyTBJrFOxnhhpDlf8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=amGhU/J3; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=kdIY1TkUi1gK/N72Dx4YnsJolkvTvX4JwJQ3jELfTio=; b=amGhU/J3DDKxiY3+OjEcrjaoOF
+	UTz4CqrkAe7+JmiFUwtpt/TkldYrLWrcw8o3f2oqJ4PUjvIh32UHMGzIme8RX0Q+NWNvV1mYb4dX7
+	jRbgh3aFDBZRGNaRyTM5KpWfERPexbZMRLmljnTjBk6ejd4JjLKLAVTF/HmTKZzueArA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uaDIp-001ETL-Fl; Fri, 11 Jul 2025 14:56:35 +0200
+Date: Fri, 11 Jul 2025 14:56:35 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Biju Das <biju.das.jz@bp.renesas.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Biju Das <biju.das.au@gmail.com>, linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: phy: micrel: Add ksz9131_resume()
+Message-ID: <64dc1932-9bc9-4ec0-930b-c329e92f2f09@lunn.ch>
+References: <20250711054029.48536-1-biju.das.jz@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 nf-next 3/3] netfilter: nft_chain_filter: Add bridge
- double vlan and pppoe
-To: Florian Westphal <fw@strlen.de>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>,
- Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
- bridge@lists.linux.dev, netdev@vger.kernel.org
-References: <20250708151209.2006140-1-ericwouds@gmail.com>
- <20250708151209.2006140-4-ericwouds@gmail.com> <aG2Vfqd779sIK1eL@strlen.de>
-Content-Language: en-US
-From: Eric Woudstra <ericwouds@gmail.com>
-In-Reply-To: <aG2Vfqd779sIK1eL@strlen.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250711054029.48536-1-biju.das.jz@bp.renesas.com>
 
-
-On 7/9/25 12:02 AM, Florian Westphal wrote:
-> Eric Woudstra <ericwouds@gmail.com> wrote:
->> +		if (!pskb_may_pull(skb, VLAN_HLEN))
->> +			break;
->> +		vhdr = (struct vlan_hdr *)(skb->data);
->> +		offset = VLAN_HLEN;
->> +		outer_proto = skb->protocol;
->> +		proto = vhdr->h_vlan_encapsulated_proto;
->> +		skb_set_network_header(skb, offset);
->> +		skb->protocol = proto;
+On Fri, Jul 11, 2025 at 06:40:21AM +0100, Biju Das wrote:
+> The Renesas RZ/G3E SMARC EVK uses KSZ9131RNXC phy. On deep power state,
+> PHY loses the power and on wakeup the rgmii delays are not reconfigured
+> causing it to fail.
 > 
-> Why is skb->protocol munged?  Also applies to the previous patch,
-> I forgot to ask.
+> Replace the callback kszphy_resume()->ksz9131_resume() for reconfiguring
+> the rgmii_delay when it exits from PM suspend state.
+> 
+> Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
 
-In the previous patch in nf_ct_bridge_pre(), indeed, no need to munge
-skb->protocol. So I'll change that.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-But in nft_do_chain_bridge() it is needed in the case of matching 'ip
-saddr', 'ip daddr', 'ip6 saddr' or 'ip6 daddr'. I suspect all ip/ip6
-matches are suffering.
-
-So still matching is something like:
-
-tcp dport 8080 counter name "check"
-
-But no match when:
-
-ip saddr 192.168.1.1 tcp dport 8080 counter name "check"
-
-After munging skb->protocol, I do get the match.
-
-I haven't found where yet, but It seems nft is checking skb->protocol,
-before it tries to match the ip(6) saddr/daddr.
-
-
-And to answer a question in the other patch: this issue is found by
-using my script bridge_fastpath.sh. It first checks the connection,
-conntrack and nft-chain are functional in all testcases. So, it tests
-the functionality of the patches in this patch-set. I want to improve
-the script on a few more issues and then send a non-rfc.
-
+    Andrew
 
