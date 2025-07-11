@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-205997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CFB5B0108B
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 03:03:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C33B3B0108E
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 03:04:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24E611CA0EE1
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 01:03:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B9805C1936
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 01:04:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 689A62E40B;
-	Fri, 11 Jul 2025 01:03:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D3A46447;
+	Fri, 11 Jul 2025 01:04:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UffrceSQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WGUNVeLM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C452745E;
-	Fri, 11 Jul 2025 01:03:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38B373A1B6;
+	Fri, 11 Jul 2025 01:04:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752195799; cv=none; b=hunsHC7bX9WvTmRjBxD/4/2zsaxFnDmwEf4rlpsjmfXRDh8mkXQJSs/1Oc4UMpmM9qCyT/kP4BwNwRHuWptVac+njlev1j6Gi79v0eadPrx0Tg+G1zJthmHXnoM3boeXDVfErvE78Uqce6BWTzIWlvIRdqJbyMDFdVEFRnqK2Xg=
+	t=1752195842; cv=none; b=PVHcN7AHgwz7h3mCE77x6SgHATC4v0/0Sf7mUGKcXYZOzAhNxxy3KkutgR9JsnRyQY28ZazwmncUJpRvVJ7bg0tg6BSE2UAlWgBHz5m5J0+2oherDza2lzMWA1oUGicPuUDusDdjyInaVsDzWWEvKeC2yIu3T54eiYN8xr4zw/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752195799; c=relaxed/simple;
-	bh=rRGd51Wi/wDKoo3MftlDcLUEgCw/Zs3CnYkieFYpZ7k=;
+	s=arc-20240116; t=1752195842; c=relaxed/simple;
+	bh=iMAAkWvqir9PO2U6AoWLhY3TnktwSdRhH6L3AJVP0Og=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ow2QlMGCIdjw3xTHZv6Sw78Lz/TVryQgtLueXb2EWp9gnhW6sftbpzqeXDxj1BfHeqInp/aO3OoYS+fw22vWdDIyxU2oW8XhMVgKcn4bFh0/DhqtpxUPqF/HQeGlMlFVfFQikQlimuzCkxQKHY+065Vrhhjkxssr2VO7EhGS58k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UffrceSQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2BA5C4CEE3;
-	Fri, 11 Jul 2025 01:03:16 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=If+vIJKkot/bMl+GzXXLhiIL+eyBG9V1r5HZVPZbQDKUvVo+/4ftIfHVF8w/tvnv2CBwOpQtdVtiMGPPUK/VPHxwwHfPv2VT27PWAPLj7KYl0KSQFoSD7HLGeuB8QKsD1BuFgS64vH2MK+yAj1hDguon5UnFHi5g7GoJYGAkY6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WGUNVeLM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1C07C4CEE3;
+	Fri, 11 Jul 2025 01:04:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752195796;
-	bh=rRGd51Wi/wDKoo3MftlDcLUEgCw/Zs3CnYkieFYpZ7k=;
+	s=k20201202; t=1752195841;
+	bh=iMAAkWvqir9PO2U6AoWLhY3TnktwSdRhH6L3AJVP0Og=;
 	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=UffrceSQYPPgWZpb06pFbf0N/mcN1A6WqEWN287pO53iZearX/WQRQ1GbCUMe2AhL
-	 9qUIiD5WFn3rf87n6kOMosYJEtfUmbYtI2Xmls8eMC4Ujhsk1auXEp/r1YcFU4ngQ3
-	 0AZpWWb598N9cXvj2Is9Qwk+dOIfiCE5Q6xptpoBv9ELyE38Ual/nVlonbiGuiOHW0
-	 CuUg4yjgYuUG/ErYTdn8STXX6IvFUABXhDHqe+0fQLTSMsCJjyqak65FCw/X1+IpeZ
-	 v3Jo81NR4kPnVEDKHE8bKrEAKlo0ey492+pu7n4m7GWZC3HyLQ2VvQwxOXPr9tldT+
-	 qSnAlqCKW2XXQ==
+	b=WGUNVeLMo2V/NqP+Lh0RR/Fey+SSipVV0LvRRN7nAyZVNoQem+VTJU0THlgbPBcny
+	 6h/74641rTHYdTejMap2giXNRC6ep2eb0UqicxH/BKJf7OzqF3rw9L3dxkPB3OOax1
+	 buVMq5zGdUX7B3d6cmuuUE2zsabj+PWQg7ddzZdeCJ0cC8zyIKfp9IdrFjeeA6IEeM
+	 lzdY4GpV4y3WlxHOUvdHUTzQrFBS8Vs+dN9GznwHA1s6Ad+OIOSFU3k0WMAaWnGvDx
+	 glBnShXIH/3T0+X0+MwZJDF1Kn9dkCWmcnHP8d2Y10ILrNU2bjBSL3BfbNsBa4qVdg
+	 OLcKtUgEcCz7g==
 Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 43CFDCE0A44; Thu, 10 Jul 2025 18:03:16 -0700 (PDT)
-Date: Thu, 10 Jul 2025 18:03:16 -0700
+	id 6309ACE0A44; Thu, 10 Jul 2025 18:04:01 -0700 (PDT)
+Date: Thu, 10 Jul 2025 18:04:01 -0700
 From: "Paul E. McKenney" <paulmck@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>
 Cc: Breno Leitao <leitao@debian.org>, Peter Zijlstra <peterz@infradead.org>,
@@ -56,11 +56,12 @@ Cc: Breno Leitao <leitao@debian.org>, Peter Zijlstra <peterz@infradead.org>,
 	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
 	Joel Fernandes <joel@joelfernandes.org>,
 	Uladzislau Rezki <urezki@gmail.com>, rcu@vger.kernel.org
-Subject: Re: [RFC PATCH 7/8] rcuscale: Add tests for simple hazard pointers
-Message-ID: <dd9b0591-aea2-4a50-bf4e-276224f15f68@paulmck-laptop>
+Subject: Re: [RFC PATCH 8/8] locking/lockdep: Use shazptr to protect the key
+ hashlist
+Message-ID: <06bf79cc-bd0d-487c-bcde-44464d17225d@paulmck-laptop>
 Reply-To: paulmck@kernel.org
 References: <20250414060055.341516-1-boqun.feng@gmail.com>
- <20250414060055.341516-8-boqun.feng@gmail.com>
+ <20250414060055.341516-9-boqun.feng@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,101 +70,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250414060055.341516-8-boqun.feng@gmail.com>
+In-Reply-To: <20250414060055.341516-9-boqun.feng@gmail.com>
 
-On Sun, Apr 13, 2025 at 11:00:54PM -0700, Boqun Feng wrote:
-> Add two rcu_scale_ops to include tests from simple hazard pointers
-> (shazptr). One is with evenly distributed readers, and the other is with
-> all WILDCARD readers. This could show the best and worst case scenarios
-> for the synchronization time of simple hazard pointers.
+On Sun, Apr 13, 2025 at 11:00:55PM -0700, Boqun Feng wrote:
+> Erik Lundgren and Breno Leitao reported [1] a case where
+> lockdep_unregister_key() can be called from time critical code pathes
+> where rntl_lock() may be held. And the synchronize_rcu() in it can slow
+> down operations such as using tc to replace a qdisc in a network device.
 > 
+> In fact the synchronize_rcu() in lockdep_unregister_key() is to wait for
+> all is_dynamic_key() callers to finish so that removing a key from the
+> key hashlist, and we can use shazptr to protect the hashlist as well.
+> 
+> Compared to the proposed solution which replaces synchronize_rcu() with
+> synchronize_rcu_expedited(), using shazptr here can achieve the
+> same/better synchronization time without the need to send IPI. Hence use
+> shazptr here.
+> 
+> Reported-by: Erik Lundgren <elundgren@meta.com>
+> Reported-by: Breno Leitao <leitao@debian.org>
+> Link: https://lore.kernel.org/lkml/20250321-lockdep-v1-1-78b732d195fb@debian.org/
 > Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
 
-Cute trick using the CPU number plus one as a stand-in for a pointer.  ;-)
+From an RCU and shazptr viewpoint:
 
 Reviewed-by: Paul E. McKenney <paulmck@kernel.org>
 
 > ---
->  kernel/rcu/rcuscale.c | 52 ++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 51 insertions(+), 1 deletion(-)
+>  kernel/locking/lockdep.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
 > 
-> diff --git a/kernel/rcu/rcuscale.c b/kernel/rcu/rcuscale.c
-> index d9bff4b1928b..cab42bcc1d26 100644
-> --- a/kernel/rcu/rcuscale.c
-> +++ b/kernel/rcu/rcuscale.c
-> @@ -32,6 +32,7 @@
->  #include <linux/freezer.h>
->  #include <linux/cpu.h>
->  #include <linux/delay.h>
+> diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
+> index 58d78a33ac65..c5781d2dc8c6 100644
+> --- a/kernel/locking/lockdep.c
+> +++ b/kernel/locking/lockdep.c
+> @@ -58,6 +58,7 @@
+>  #include <linux/context_tracking.h>
+>  #include <linux/console.h>
+>  #include <linux/kasan.h>
 > +#include <linux/shazptr.h>
->  #include <linux/stat.h>
->  #include <linux/srcu.h>
->  #include <linux/slab.h>
-> @@ -429,6 +430,54 @@ static struct rcu_scale_ops tasks_tracing_ops = {
 >  
->  #endif // #else // #ifdef CONFIG_TASKS_TRACE_RCU
+>  #include <asm/sections.h>
 >  
-> +static int shazptr_scale_read_lock(void)
-> +{
-> +	long cpu = raw_smp_processor_id();
-> +
-> +	/* Use cpu + 1 as the key */
-> +	guard(shazptr)((void *)(cpu + 1));
-> +
-> +	return 0;
-> +}
-> +
-> +static int shazptr_scale_wc_read_lock(void)
-> +{
-> +	guard(shazptr)(SHAZPTR_WILDCARD);
-> +
-> +	return 0;
-> +}
-> +
-> +
-> +static void shazptr_scale_read_unlock(int idx)
-> +{
-> +	/* Do nothing, it's OK since readers are doing back-to-back lock+unlock*/
-> +}
-> +
-> +static void shazptr_scale_sync(void)
-> +{
-> +	long cpu = raw_smp_processor_id();
-> +
-> +	synchronize_shazptr((void *)(cpu + 1));
-> +}
-> +
-> +static struct rcu_scale_ops shazptr_ops = {
-> +	.ptype		= RCU_FLAVOR,
-> +	.readlock	= shazptr_scale_read_lock,
-> +	.readunlock	= shazptr_scale_read_unlock,
-> +	.sync		= shazptr_scale_sync,
-> +	.exp_sync	= shazptr_scale_sync,
-> +	.name		= "shazptr"
-> +};
-> +
-> +static struct rcu_scale_ops shazptr_wc_ops = {
-> +	.ptype		= RCU_FLAVOR,
-> +	.readlock	= shazptr_scale_wc_read_lock,
-> +	.readunlock	= shazptr_scale_read_unlock,
-> +	.sync		= shazptr_scale_sync,
-> +	.exp_sync	= shazptr_scale_sync,
-> +	.name		= "shazptr_wildcard"
-> +};
-> +
->  static unsigned long rcuscale_seq_diff(unsigned long new, unsigned long old)
->  {
->  	if (!cur_ops->gp_diff)
-> @@ -1090,7 +1139,8 @@ rcu_scale_init(void)
->  	long i;
->  	long j;
->  	static struct rcu_scale_ops *scale_ops[] = {
-> -		&rcu_ops, &srcu_ops, &srcud_ops, TASKS_OPS TASKS_RUDE_OPS TASKS_TRACING_OPS
-> +		&rcu_ops, &srcu_ops, &srcud_ops, &shazptr_ops, &shazptr_wc_ops,
-> +		TASKS_OPS TASKS_RUDE_OPS TASKS_TRACING_OPS
->  	};
+> @@ -1265,14 +1266,18 @@ static bool is_dynamic_key(const struct lock_class_key *key)
 >  
->  	if (!torture_init_begin(scale_type, verbose))
+>  	hash_head = keyhashentry(key);
+>  
+> -	rcu_read_lock();
+> +	/* Need preemption disable for using shazptr. */
+> +	guard(preempt)();
+> +
+> +	/* Protect the list search with shazptr. */
+> +	guard(shazptr)(hash_head);
+> +
+>  	hlist_for_each_entry_rcu(k, hash_head, hash_entry) {
+>  		if (k == key) {
+>  			found = true;
+>  			break;
+>  		}
+>  	}
+> -	rcu_read_unlock();
+>  
+>  	return found;
+>  }
+> @@ -6614,7 +6619,7 @@ void lockdep_unregister_key(struct lock_class_key *key)
+>  		call_rcu(&delayed_free.rcu_head, free_zapped_rcu);
+>  
+>  	/* Wait until is_dynamic_key() has finished accessing k->hash_entry. */
+> -	synchronize_rcu();
+> +	synchronize_shazptr(keyhashentry(key));
+>  }
+>  EXPORT_SYMBOL_GPL(lockdep_unregister_key);
+>  
 > -- 
 > 2.47.1
 > 
