@@ -1,88 +1,94 @@
-Return-Path: <netdev+bounces-206171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62C20B01DAA
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 15:35:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00508B01DF9
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 15:41:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D4494A3CEF
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 13:35:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4B83A4079F
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 13:40:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 330122D6636;
-	Fri, 11 Jul 2025 13:33:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37AEC2D3EFD;
+	Fri, 11 Jul 2025 13:39:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rtsdmY+a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dFqogJIN"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 704D92D46A0;
-	Fri, 11 Jul 2025 13:33:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D1AC3A1CD;
+	Fri, 11 Jul 2025 13:39:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752240811; cv=none; b=i4whucAy9ja8vrQK6h5cFCwvkwK8IcM3fFkWjlIIB3acuDo9M9rJLfx6MloguD9ONhUFs6gqt+dKoHPTlP+lC/sq0O0TmQbN7W/t848U1F1tJ21INyWmJe5ochiC6iQgCGzSdMbmoHsmI371+GzzjLldktESkebBYprJRnYHuig=
+	t=1752241160; cv=none; b=XXwbXDtfV4ZUQuYKz87ToMQEHn/j2qPf32HSF92GHGSk+VxSmc1sxyTbO0PfNkYaHFUe/IkrRmBM8+UWNg6wC4EZEmYFyWlFEnYgyN/KonB4AxfRcu8LSH17M+fFABzLkFjbGHbRW4NqoroAk5G7Gw/ftDjbCdZAI6B40sf2wEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752240811; c=relaxed/simple;
-	bh=w0wqKuxizQBUMM8sSroCRkS63IOuK/FYdyK/viERKu8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DunEvsqeiUOfGC3GpsepVy41IWYvIqMdRUsXDDXjqRoBo9ffn2Pq4u+xsUxOzI1Zzj1WUBq+HBfp7FiErj66fNMYuG5pC/pH0ciyN9EUjaxFNnD/GDcMj1MVQHi6PGjX+iZDHZVqAlSvErXj0588U+rHtq6BK0DyO12V0y7YsKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rtsdmY+a; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=80n7pdzd6xQBl2rE+0CERdPnyQEG94FW6DEO244G9/k=; b=rtsdmY+aAoN5/rSuHvgkte3iv/
-	Vv1SKyK05jH/B5Cz50mQfCX0JUyqcF73G3h47f2SEgQDY1rqEcAobWrTzV8QZjQURv2Fc0Dg7NEWT
-	Y1mTAu5zEljUWaYBtrtTz9eGZ5RAbIsTwYbUymojnZ3Z9qw+jaADBTGk6/BpqJiLeI5s=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uaDsP-001EhK-QA; Fri, 11 Jul 2025 15:33:21 +0200
-Date: Fri, 11 Jul 2025 15:33:21 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	richardcochran@gmail.com, claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, fushi.peng@nxp.com,
-	devicetree@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, imx@lists.linux.dev
-Subject: Re: [PATCH net-next 06/12] ptp: netc: add debugfs support to loop
- back pulse signal
-Message-ID: <083ef067-b628-4dc9-a3e5-ccbb37de3976@lunn.ch>
-References: <20250711065748.250159-1-wei.fang@nxp.com>
- <20250711065748.250159-7-wei.fang@nxp.com>
+	s=arc-20240116; t=1752241160; c=relaxed/simple;
+	bh=eFgED19dQRcbU4DIqiWV1GygAUnicd546BK4INZAAss=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Q0pcEQDrnH8uF69nrSK635L3jPZA6wjUX6vz5TSnMSB+KF2pyIZLnniLNEXAjZ6q1N+cAfKDfCaecZy2gS3bMA8fEuaNQ3KyCJcdkyXTLnU4M1pMOC2RdXexH5Wo83DBbB++cKr0DyAZfJ2RVYemmca/HHNqjVmddPsjqv8ItgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dFqogJIN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECC08C4CEED;
+	Fri, 11 Jul 2025 13:39:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752241159;
+	bh=eFgED19dQRcbU4DIqiWV1GygAUnicd546BK4INZAAss=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dFqogJINkHleezubFaTYRjl9rOp7Qu3v6UH1d2kfuLU5Att7mBp+vYht8FbPQ2OLj
+	 7MhhtQkPYEZxklTihibLlMUGol5w/Xp99J4gsFDg9gRDfNTXKNmFb1CkawU+l0Ew/5
+	 /A1yj3bLqkYUEgvw8IbL7LwWDPQqLaTU3V1+bbqaB/c56AEgU4h6Yd1hVgeGC2DGWC
+	 SPKFNohRdYyeFos9QOEHPd6O7Q+9RRSBSlNmkJBKYRE7vKv/KR85ywFxMI7st/L3MR
+	 ODx7cS5YtdOXPKjxmvkCcF6W4TkJnDTWGLDm5UfRwhddzARKVf4GjgS/B+uUmDVc+4
+	 Zkfu7ZLi/2d7w==
+Date: Fri, 11 Jul 2025 06:39:17 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, shuah@kernel.org, horms@kernel.org,
+ cratiu@nvidia.com, noren@nvidia.com, cjubran@nvidia.com, mbloch@nvidia.com,
+ jdamato@fastly.com, gal@nvidia.com, sdf@fomichev.me, ast@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next V2 0/5] selftests: drv-net: Test XDP native
+ support
+Message-ID: <20250711063917.7aad27f7@kernel.org>
+In-Reply-To: <20250710184351.63797-1-mohsin.bashr@gmail.com>
+References: <20250710184351.63797-1-mohsin.bashr@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250711065748.250159-7-wei.fang@nxp.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> +static void netc_timer_create_debugfs(struct netc_timer *priv)
-> +{
-> +	char debugfs_name[24];
-> +	struct dentry *root;
-> +
-> +	snprintf(debugfs_name, sizeof(debugfs_name), "netc_timer%d",
-> +		 priv->phc_index);
-> +	root = debugfs_create_dir(debugfs_name, NULL);
-> +	if (IS_ERR(root))
-> +		return;
+On Thu, 10 Jul 2025 11:43:46 -0700 Mohsin Bashir wrote:
+> This patch series add tests to validate XDP native support for PASS,
+> DROP, ABORT, and TX actions, as well as headroom and tailroom adjustment.
+> For adjustment tests, validate support for both the extension and
+> shrinking cases across various packet sizes and offset values.
 
-You should never check the return values from a debugfs_
-calls. debugfs is full optional, and the driver should work without
-it. debugfs will also happily accept a NULL or error code as a
-parameter. So even if debugfs_create_dir() fails, keep going,
-debugfs_create_file() won't explode.
+The program does not load in the CI :(
 
-	Andrew
+509: (15) if r1 == 0x0 goto pc+142    ; frame1: R1=scalar(smin=umin=umin32=1,smax=umax=0xffffffff,var_off=(0x0; 0xffffffff))
+510: (25) if r1 > 0x100 goto pc+141   ; frame1: R1=scalar(smin=umin=smin32=umin32=1,smax=umax=smax32=umax32=256,var_off=(0x0; 0x1ff))
+511: (bf) r3 = r10                    ; frame1: R3_w=fp0 R10=fp0\n; if (bpf_xdp_load_bytes(ctx, 0, tmp_buff, hdr_len) < 0) @ xdp_native.bpf.c:377
+512: (07) r3 += -256                  ; frame1: R3_w=fp-256
+513: (bf) r1 = r7                     ; frame1: R1_w=ctx() R7=ctx()
+514: (b7) r2 = 0                      ; frame1: R2_w=0
+515: (bf) r4 = r8                     ; frame1: R4_w=scalar(id=3) R8=scalar(id=3)
+516: (7b) *(u64 *)(r10 -280) = r5     ; frame1: R5=32 R10=fp0 fp-280_w=32
+517: (85) call bpf_xdp_load_bytes#189
+R4 min value is negative, either use unsigned or 'var &= const'
+processed 262 insns (limit 1000000) max_states_per_insn 1 total_states 26 peak_states 26 mark_read 7
+-- END PROG LOAD LOG
+
+I suppose it may be due to compiler version:
+$ clang --version
+clang version 15.0.7 (AWS 15.0.7-3.amzn2023.0.4)
+
+LMK if you need more info / can't repro, but I think the suggestion
+makes sense?
 
