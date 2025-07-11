@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-205982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D89A1B01037
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 02:30:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0229DB01039
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 02:31:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CEE6A1C80D64
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 00:31:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8BF63AE02D
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 00:30:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99D63179A7;
-	Fri, 11 Jul 2025 00:30:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4056912B73;
+	Fri, 11 Jul 2025 00:30:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cH+ENxcG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lsj1gscz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73DA2134CF;
-	Fri, 11 Jul 2025 00:30:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11CB739ACC;
+	Fri, 11 Jul 2025 00:30:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752193843; cv=none; b=IrME7LdeUmpEiG0kXDgPZqgKuuaFwnRZ8IRuUIK3ksvxVeuuU210GvPrpEJbwTIrc8mhPtlBbs66LoTKiRruoRfx9S6yqf4y7L8F0Cc1qI/LRqJwcRLiijH94+Y5QNLRdOsPwH8Q404wqPUNWggsgaFp5FlVuVPdAN7f1ti9jyI=
+	t=1752193845; cv=none; b=sKG2A7nqw/9ytkTM4T2MtxINCs0MQZp2lHk+dOVOsaxDTQ+eipW8cHrzOHHrZh7LrxldTMYzDyhXy3JCrqrDcyRInwX/5Fr21Wj5hVfriaMgWXcvUSmBgEvUu09oWROpuVwD6rFCG+fw6LzDQyabb995+Z40tG7q+KcO8icjp/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752193843; c=relaxed/simple;
-	bh=IbAW8Ngs1E9Vy+31aHo7Xar7SazfvYjXRBU6WqoJB/U=;
+	s=arc-20240116; t=1752193845; c=relaxed/simple;
+	bh=4TcUQRKoGXD7lDinYTHq6z5jiftadbgG7wdz5mhdvsQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=F0Kz+XtzB4SqGaSk/T+qIoJRaAOiZqi7aSOlCFt7FAROzXoi4EWqge/l6wqarGtE1KbKHaQ8NH4g6FZpiKxCb1LZ7ViH8ruGfcV0m/v0gy6odrmz+6HYuNG1n3XXFXLbXOYd8Y0mNagnOtidJs1CUdCY57htTIIc6RzFBSKRxbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cH+ENxcG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 135E4C4CEF5;
-	Fri, 11 Jul 2025 00:30:43 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=llzLjpAjeihNIWDkZXVdr/tA0EC5QHikASzTFXeVnb//3YxXjho5HNwQU1TNZCt+xMkMtLzHfrBju0yrW0kG28HLSZcb6PAz5JWMpuq/uqpkqGwU7PB78xFxtUY4Z1a6MgdqLo+CpXfBnzBloEWw5tdCeixiISpjpHdmzcfXG7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lsj1gscz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C1D8C4CEE3;
+	Fri, 11 Jul 2025 00:30:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752193843;
-	bh=IbAW8Ngs1E9Vy+31aHo7Xar7SazfvYjXRBU6WqoJB/U=;
+	s=k20201202; t=1752193844;
+	bh=4TcUQRKoGXD7lDinYTHq6z5jiftadbgG7wdz5mhdvsQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cH+ENxcGDRe7wXfwfrF+6kl2oJDv5StAoZMFGxXTgbyIoQY60Y2JbcC/MIBtfjV4D
-	 Z8SuzbODNhyOtmnVVBSQrnZ3yZ61R8CCq8Xfjx7fEjB63bJ9J0+tIKm0KerbAHtDw8
-	 Vgc+eCMV7TYRkk9rHvADWs/DfwvdgTbu8JHEBejfFnOZKMrgKslXXT2vkmHOHYWkHp
-	 46Mr7ixlCYd4yJDUV+zSQAmJJ9nwu00spqZ+M12KwRictWaQfpzfkkNpfBkRPlJMi0
-	 BI6DaHCDZhbxHB3rsse7WPC1DKLQOpTdZXqjCEJsA1ILdR6jLoCWwpMAbAmbKsDs5w
-	 k7F7ThiaNyUKg==
+	b=Lsj1gsczFIMUMLfnOrCeoOjNxR0+SFVyGpnX2etxaDdyJNppZIcdb5jz0JKcXJMzC
+	 Gp9swqJ2Ajsd7A6ZhaN2KRNcNsvABZCsUo8BfdJrj22sXG0rs5PRZ2BH4fQ9a/bCzh
+	 lrsrJutyU+uEXczsFdblK41OLhK6ax+bcdowAvtTRETlMw6IAt7ebhLjqhJJdQF6dD
+	 o0ZxrNAW31UROQe23Hg5BW35iC7Eg4xzlJ5GwZlSbpK2qAPotN9PMZKrNh/jPY4ZJJ
+	 4NokIKWxHSQ/o5Cf0u9mLONB4ixEHqVO1OaMF/NqdEiqnPa0wHuoDy3duCZT6ps2W6
+	 ku8DoxZZxfh6w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CBB383B266;
-	Fri, 11 Jul 2025 00:31:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EACFE383B266;
+	Fri, 11 Jul 2025 00:31:07 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,34 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] wireless-next-2025-07-10
+Subject: Re: [PATCH net-next v3] net: replace ND_PRINTK with dynamic debug
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175219386526.1715084.2808725188836361745.git-patchwork-notify@kernel.org>
-Date: Fri, 11 Jul 2025 00:31:05 +0000
-References: <20250710123113.24878-3-johannes@sipsolutions.net>
-In-Reply-To: <20250710123113.24878-3-johannes@sipsolutions.net>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+ <175219386649.1715084.6809706721646089401.git-patchwork-notify@kernel.org>
+Date: Fri, 11 Jul 2025 00:31:06 +0000
+References: <20250708033342.1627636-1-wangliang74@huawei.com>
+In-Reply-To: <20250708033342.1627636-1-wangliang74@huawei.com>
+To: Wang Liang <wangliang74@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, alex.aring@gmail.com,
+ dsahern@kernel.org, yuehaibing@huawei.com, zhangchangzhong@huawei.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
 
 Hello:
 
-This pull request was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 10 Jul 2025 14:30:48 +0200 you wrote:
-> Hi,
+On Tue, 8 Jul 2025 11:33:42 +0800 you wrote:
+> ND_PRINTK with val > 1 only works when the ND_DEBUG was set in compilation
+> phase. Replace it with dynamic debug. Convert ND_PRINTK with val <= 1 to
+> net_{err,warn}_ratelimited, and convert the rest to net_dbg_ratelimited.
 > 
-> And for -next, some work. There's more pending, but for
-> now this is what I have today.
-> 
-> Please pull and let us know if there's any problem.
+> Suggested-by: Ido Schimmel <idosch@idosch.org>
+> Signed-off-by: Wang Liang <wangliang74@huawei.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [GIT,PULL] wireless-next-2025-07-10
-    https://git.kernel.org/netdev/net-next/c/809f683324df
+  - [net-next,v3] net: replace ND_PRINTK with dynamic debug
+    https://git.kernel.org/netdev/net-next/c/96698d1898bc
 
 You are awesome, thank you!
 -- 
