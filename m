@@ -1,139 +1,140 @@
-Return-Path: <netdev+bounces-206132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EF8AB01AE0
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 13:44:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8DB0B01B27
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 13:51:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A0971CC0754
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 11:43:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A85913A6B54
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 11:50:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E9902DE6F0;
-	Fri, 11 Jul 2025 11:40:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99A7F28A41E;
+	Fri, 11 Jul 2025 11:45:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w0GZ4iV/"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XjMvsd5p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D757B2DECBA
-	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 11:40:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175BE230BE1
+	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 11:45:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752234024; cv=none; b=q+tl3GTTVVenntGeFBFdk/jo+KUBDp/LPLo/YFTmutxJjmZiLHFzstpIu/GadEs63Z3IKsixHyZ8SHp6H7u2xlB3sCmfufy1dj1DleMGUQzj/tScN4r4vhpSNnSC5rO1WLOGzhWmjjGk94UY+XCD5IAAJ+1ZM4c6d//r6Rk/vKI=
+	t=1752234354; cv=none; b=YfJ2EbUgwJVFzS2/xTUaCF8qaaY6RKcJGPQBvgOfkoz4d2dDqD7gOF0j/gn3HI7/aK174MkOnEJOE8ECEowLYc1fAb45NHvsHcHVl/UItYQqU2XmTBbz+KFN+hKEN0+Q5j9Ipa6xMm8f7SeKF1ExgqqSDnlcs31MR0x3y3BrccY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752234024; c=relaxed/simple;
-	bh=hcPUQA2gIjox/hV4Xw4sVDp/RdRoHWbC7gUCLo97hsY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Dmusy1LFVAEQWhMS43C440QxGdgac9YklsdENeJfG2cxmaA9Qy0VuMa+5OIEnb1rw2bbHBctvBlgDs9YKKbBIyh/tAGMlBotwecorMrEk6eO5PLVK4YlBbb9pG2dxrHAO+INM/vVzMlutQHkyiuysKOHuBCmwvU3F+9NkVifML8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w0GZ4iV/; arc=none smtp.client-ip=209.85.160.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4a442d07c5fso36709351cf.3
-        for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 04:40:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752234022; x=1752838822; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/BoQKBiVr3qfdiIVr4vktlJH39LphAXbdQKmkO4D0fo=;
-        b=w0GZ4iV/fqbl5HyKHadceNxJkovMLDO1AHadk78bZYpVvQS4kZOkJRxVKu5QR8ijp7
-         /VNgycDWDRUoSNlc4yCN78y813TnJX+GseHMj38Xi7MjulOMqi1N7MhpsUD1O/0rm3cO
-         usdb3e/Ufz6v4MYbfy9+hou/+F5ar52+Wrr+2VzSnzVx/UIrJ/Vvi/eyKrQIsSswjLb1
-         Ym+EHNdbeD6zExLqpSugge5ieqaFuXXlwx1mNN2mwkLOVzrUQ+GayLHPLhgBAVCAX8+H
-         vFxG2f6reanze3rg+MQbKDiLO3iZ7vwJChvi6PySRQfZcpN9qlc9Xj0wqSOlr2MD+j6h
-         +sxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752234022; x=1752838822;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/BoQKBiVr3qfdiIVr4vktlJH39LphAXbdQKmkO4D0fo=;
-        b=g9lVR+h3DdzHfN21PaiJOcAnqS2b5zA1BV/qbURU4RVjV7je27UVNDuAIoJ3EWE8Sc
-         ybd73NUI5W9MmF69uEcUW9Va0JRNwhoem7cwfiLyg21nldCyBSfMAf66TCrfbyL30J09
-         vO7hvxBS8J1pu+AkYnjig9P8gu0CCEcowL4KSofiXJe/GpOUne3cIKBSaIUQ6ilxWjxV
-         Cf2YUhyjBzfCxvhSYREN/2G/eTxZHvkzfyINbE/4zIAB9ciyYCDSMh/K7nYPU7B+kjxq
-         e9yw8184bMK++D23Fv9bKh4z9y5h22EKqQ/mX/kSA9eXTvN09jykNj0gixyWBCVIfIiR
-         PCyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXqkd0c2drEelRUIWcVBZtXWTPvgtb6C6tc16uoSAapG9av0Vy3yh4ZWiVc814LCHX1WRORPfk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRxQLtPcCOTFIKgJH2/hxKONWdKYBN8MRr4CEdN1gW67nSgGis
-	Po+O25qp2KTACo4V41oLamUUD8aU7g0Z/P1tN0N74a0DE2BNurfp+dlhmXWJ7Y7/f5t2HclPpP4
-	kfjcjPg3hFtuQkA==
-X-Google-Smtp-Source: AGHT+IEiZSJcTJIinqqfiL1OD+D1dtRoQufHfoURXOBfZQ0KAj0rDxIkdorvO0kZQcoBN47B+YKhH25SbPw9HA==
-X-Received: from qtbew6.prod.google.com ([2002:a05:622a:5146:b0:494:57b3:465])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:790f:b0:4a6:cee6:9743 with SMTP id d75a77b69052e-4a9fbfca78dmr28047711cf.5.1752234021746;
- Fri, 11 Jul 2025 04:40:21 -0700 (PDT)
-Date: Fri, 11 Jul 2025 11:40:06 +0000
-In-Reply-To: <20250711114006.480026-1-edumazet@google.com>
+	s=arc-20240116; t=1752234354; c=relaxed/simple;
+	bh=XHheDxPdzE/NJEGsbPcyVNbfVHS4B1K+I4eGE6HOa+E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GVjEKIc9S1b83/WNMIE+T1q8H55qxBkrpYtOtKJyjGl4N+sn1MMrjMCAx0Eg3SkPob5OV9SqrGKEaLSpfjl47xadQD2nvopYTFfJAoKzhCkrZANrOK3VXlQDCZ3B9wasaNmiCtS+pQC7U3a/ZjyOzVDL44OnFND2T6DbwSa1T0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XjMvsd5p; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <dc023486-5491-4795-8b07-4808e44c8ebb@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752234349;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3dP9rqKLiGiZntdJQkX4TyBuHFuSn+tzdIeB2/uFcYE=;
+	b=XjMvsd5puLKsCpHgClimdEfBr5zl4lr+RgFVzCxLgugef7Lg/ncvUeg24Q8N9VMD9brri/
+	JC+QoglBJqKw/iejOr9mUYKvpADyEaQmqDmzZqKdi3YQx9aJfqda/3uRarYhnff5wEWzzd
+	HTacpR45P6Pw4anRTZEUJ+AbWzh77aU=
+Date: Fri, 11 Jul 2025 12:45:41 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250711114006.480026-1-edumazet@google.com>
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250711114006.480026-9-edumazet@google.com>
-Subject: [PATCH net-next 8/8] selftests/net: packetdrill: add tcp_rcv_toobig.pkt
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Subject: Re: [PATCH net-next] eea: Add basic driver framework for Alibaba
+ Elastic Ethernet Adaptor
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Wen Gu <guwen@linux.alibaba.com>, Philo Lu <lulie@linux.alibaba.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ Lukas Bulwahn <lukas.bulwahn@redhat.com>,
+ Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Alexander Duyck <alexanderduyck@fb.com>, Dust Li <dust.li@linux.alibaba.com>
+References: <20250710112817.85741-1-xuanzhuo@linux.alibaba.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250710112817.85741-1-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Check that TCP receiver behavior after "tcp: stronger sk_rcvbuf checks"
+On 10/07/2025 12:28, Xuan Zhuo wrote:
+> +/* notify */
+> +bool ering_kick(struct ering *ering)
+> +{
+> +	union {
+> +		u64 data;
+> +		struct db db;
+> +	} val;
+> +
+> +	val.db.kick_flags = EEA_IDX_PRESENT;
+> +	val.db.idx = cpu_to_le16(ering->sq.hw_idx);
+> +
+> +	writeq(val.data, (void __iomem *)ering->db);
+> +
+> +	return true;
+> +}
+> +
 
-Too fat packet is dropped unless receive queue is empty.
+[...]
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- .../net/packetdrill/tcp_rcv_toobig.pkt        | 33 +++++++++++++++++++
- 1 file changed, 33 insertions(+)
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_rcv_toobig.pkt
+> +static inline bool ering_irq_unactive(struct ering *ering)
+> +{
+> +	union {
+> +		u64 data;
+> +		struct db db;
+> +	} val;
+> +
+> +	if (ering->mask == EEA_IRQ_MASK)
+> +		return true;
+> +
+> +	ering->mask = EEA_IRQ_MASK;
+> +
+> +	val.db.kick_flags = EEA_IRQ_MASK;
+> +
+> +	writeq(val.data, (void __iomem *)ering->db);
+> +
+> +	return true;
+> +}
+> +
+> +static inline bool ering_irq_active(struct ering *ering, struct ering *tx_ering)
+> +{
+> +	union {
+> +		u64 data;
+> +		struct db db;
+> +	} val;
+> +
+> +	if (ering->mask == EEA_IRQ_UNMASK)
+> +		return true;
+> +
+> +	ering->mask = EEA_IRQ_UNMASK;
+> +
+> +	val.db.kick_flags = EEA_IRQ_UNMASK;
+> +
+> +	val.db.tx_cq_head = cpu_to_le16(tx_ering->cq.hw_idx);
+> +	val.db.rx_cq_head = cpu_to_le16(ering->cq.hw_idx);
+> +
+> +	writeq(val.data, (void __iomem *)ering->db);
+> +
+> +	return true;
+> +}
 
-diff --git a/tools/testing/selftests/net/packetdrill/tcp_rcv_toobig.pkt b/tools/testing/selftests/net/packetdrill/tcp_rcv_toobig.pkt
-new file mode 100644
-index 0000000000000000000000000000000000000000..f575c0ff89da3c856208b315358c1c4a4c331d12
---- /dev/null
-+++ b/tools/testing/selftests/net/packetdrill/tcp_rcv_toobig.pkt
-@@ -0,0 +1,33 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+--mss=1000
-+
-+`./defaults.sh`
-+
-+    0 `nstat -n`
-+
-+// Establish a connection.
-+   +0 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
-+   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
-+   +0 setsockopt(3, SOL_SOCKET, SO_RCVBUF, [20000], 4) = 0
-+   +0 bind(3, ..., ...) = 0
-+   +0 listen(3, 1) = 0
-+
-+   +0 < S 0:0(0) win 32792 <mss 1000,nop,wscale 7>
-+   +0 > S. 0:0(0) ack 1 win 18980 <mss 1460,nop,wscale 0>
-+  +.1 < . 1:1(0) ack 1 win 257
-+
-+   +0 accept(3, ..., ...) = 4
-+
-+   +0 < P. 1:20001(20000) ack 1 win 257
-+ +.04 > .  1:1(0) ack 20001 win 18000
-+
-+   +0 setsockopt(4, SOL_SOCKET, SO_RCVBUF, [12000], 4) = 0
-+   +0 < P. 20001:80001(60000) ack 1 win 257
-+   +0 > .  1:1(0) ack 20001 win 18000
-+
-+   +0 read(4, ..., 20000) = 20000
-+// A too big packet is accepted if the receive queue is empty
-+   +0 < P. 20001:80001(60000) ack 1 win 257
-+   +0 > .  1:1(0) ack 80001 win 0
-+
--- 
-2.50.0.727.gbf7dc18ff4-goog
+in addition to Andrew's comments, these union { ... } val will have
+partial garbage values, which will later be directly sent to FW. I
+believe it may cause some troubles and it's better to initialize val
+before actually use it.
+
 
 
