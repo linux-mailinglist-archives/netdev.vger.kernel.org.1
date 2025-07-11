@@ -1,105 +1,122 @@
-Return-Path: <netdev+bounces-205976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0935B01004
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 02:01:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63CCFB01014
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 02:11:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34A1D5C2025
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 00:01:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2D565C3A42
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 00:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A3363093BE;
-	Thu, 10 Jul 2025 23:59:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CF24382;
+	Fri, 11 Jul 2025 00:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AjiF6Bp9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QtseUfnd"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827052F3C3C
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 23:59:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38215376
+	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 00:11:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752191951; cv=none; b=lUEGyc52CLJNBafdFMne9vjp3DLFVe/FdDgWN1eIo5M2STSpOGyNiuxuEpRi4CZqd0PKWwMvCgko/zqDeLq0jeBHuQCMC7u65iqm3QWyAxH3k+ew7WjNp4nZm0V4tCm1wf5/bOckzzaljCdgtW2XKcKKqRJYjDsmlTAW4ZsDR6k=
+	t=1752192690; cv=none; b=Ued5qWhQFlK7HOk3CCeBXudgLm/gMzVzA8N2/3ZJDufJkf019wUgHT8d2YePjRL6LfwH0JOYBzEdgb3SA3FIIaMxJjNCOWieQ1G9ny+TfuCdItIfDYWklXC8OZKoL25Ew44x/opIsVGJWWIi3KuiBgxfuFBhI8NiZlOg8i7DRnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752191951; c=relaxed/simple;
-	bh=NzBvjzZSlnSlEwD5PPYSMqLvkxiVg7UhqXlmM5Ui+i0=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=cMWO5uIza5YCpsmy97p+BEgIDyq+9WrvfifFvXwqlT1KLayXeZNybKR0lGdJ0KS6ibFA6V9ZyCM8Oey8q07asFtKT7y6c6edkFXQ3mqBms1z2j/AGC5XD5T+toRnIECvFgsXH1EcQ4iXxucmwuWShHyKyWVzXWwFJJTniZXydbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AjiF6Bp9; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <2ce3b809-28c4-487a-85d2-c62bce7260b0@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1752191937;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5iXgdYm+l921dPhsin9euYhz1uRo0hm5DDdzuaPKGqE=;
-	b=AjiF6Bp9mwnViaXvmTFOYjWNgIxn2AVg35FSMpIdAFk6rkBv+dapf1s0mPZmEk5RqaXNsK
-	y8co69kxpKHE163QzjWR9WPW5vJTZyGEQzx1cSHv4Q4IZZKqaSHyGlIYDQAI2i5Dh6a8xO
-	W4OfIEfixTaZ4iPsAuUxNYIE++LVwcI=
-Date: Thu, 10 Jul 2025 19:58:52 -0400
+	s=arc-20240116; t=1752192690; c=relaxed/simple;
+	bh=ryjwrgI3uHa0nczx1fxEUIPbLXts+xCcD5FjplanMfw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KD83+RnXmJp13oDdNpbeLl8vjr5zbAYKODlARvC7rhYLNa7b3P2eRnNAO/FCNT+ftAy7oGnY49+OKM8Wr4Al93l6J+ZEuZS5zHFeofZPVwdpF4QwMfFyUbGJGbYaSRMAv+V+XdQyVWhPj8pDjEKoDEhWlePbjUaKqT8cHwITMJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QtseUfnd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49069C4CEE3;
+	Fri, 11 Jul 2025 00:11:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752192689;
+	bh=ryjwrgI3uHa0nczx1fxEUIPbLXts+xCcD5FjplanMfw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=QtseUfnd6pu+EGbRBx5Il7M4g93zIYHEQ5yY0WRMNTUGITEAjG/E3AluKZyDrbPZu
+	 YcmLzfyFYGfGifJwMpxLr4fxVkhPiYc5ugsBf3JW4bz1p1nugq/cfZcD++10GyCE8t
+	 u/8syqb6vKv1VX1HHeMFgPKUF2gVjcV7JjohsuUpsJ+VbdK+0c0veWNBkZitvkCWWt
+	 il1DRGwwO2mp+ukjZFRhLJMsu8QUI3B+FpC+yj50qidewx2DzjzUt9JWu/NjXbJ9Kv
+	 mkT2YoPOBcle+nt2MleT7GNDsURwxpj0oO5FMZjgLxdtAu99y1A1HG/3KmXolOJQpK
+	 f4TkinJqcY/Sg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	kuniyu@google.com
+Subject: [PATCH net] netlink: make sure we allow at least one dump skb
+Date: Thu, 10 Jul 2025 17:11:21 -0700
+Message-ID: <20250711001121.3649033-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC] comparing the propesed implementation for standalone PCS
- drivers
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-To: Simon Horman <horms@kernel.org>
-Cc: Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Russell King <linux@armlinux.org.uk>,
- Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, linux-kernel@vger.kernel.org,
- Kory Maincent <kory.maincent@bootlin.com>,
- Christian Marangi <ansuelsmth@gmail.com>, Lei Wei <quic_leiwei@quicinc.com>,
- Michal Simek <michal.simek@amd.com>,
- Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
- Robert Hancock <robert.hancock@calian.com>, John Crispin <john@phrozen.org>,
- Felix Fietkau <nbd@nbd.name>, Robert Marko <robimarko@gmail.com>
-References: <aEwfME3dYisQtdCj@pidgin.makrotopia.org>
- <24c4dfe9-ae3a-4126-b4ec-baac7754a669@linux.dev>
- <20250709135216.GA721198@horms.kernel.org>
- <c84518eb-15da-4356-ac6a-b2fcb807d92f@linux.dev>
-Content-Language: en-US
-In-Reply-To: <c84518eb-15da-4356-ac6a-b2fcb807d92f@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 7/10/25 18:50, Sean Anderson wrote:
-> /* In mac_probe() or whatever */
-> scoped_guard(mutex)(&pcs_remove_lock) {
-> 	/* Just imagine some terrible contortions for compatibility here */
-> 	struct phylink_pcs *pcs = pcs_get(dev, "my_pcs");
-> 	if (IS_ERR(pcs))
-> 		return PTR_ERR(pcs);
-> 
-> 	list_add(pcs->list, &config.pcs_list);
+Commit under Fixes tightened up the memory accounting for Netlink
+sockets. Looks like the accounting is too strict for some existing
+use cases, Marek reported issues with nl80211 / WiFi iw CLI.
 
-One thing we could do would be to add a mac_priv field to the PCS that the
-MAC could stick some kind of identifier in. I could live with that.
+To reduce number of iterations Netlink dumps try to allocate
+messages based on the size of the buffer passed to previous
+recvmsg() calls. If user space uses a larger buffer in recvmsg()
+than sk_rcvbuf we will allocate an skb we won't be able to queue.
 
-But I still don't like how you'd need to hold a lock across pcs_get/
-phylink_create. It feels like an unwieldy API.
+Make sure we always allow at least one skb to be queued.
+Same workaround is already present in netlink_attachskb().
+Alternative would be to cap the allocation size to
+  rcvbuf - rmem_alloc
+but as I said, the workaround is already present in other places.
 
-> 	ret = phylink_create(config, dev->fwnode, interface,
-> 			     &mac_phylink_ops);
-> 	if (ret)
-> 		return ret;
-> }
-> /* At this point the PCS could have already been removed */
+Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
+Link: https://lore.kernel.org/9794af18-4905-46c6-b12c-365ea2f05858@samsung.com
+Fixes: ae8f160e7eb2 ("netlink: Fix wraparounds of sk->sk_rmem_alloc.")
+Tested-by: Marek Szyprowski <m.szyprowski@samsung.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: kuniyu@google.com
+---
+ net/netlink/af_netlink.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
---Sean
+diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
+index 79fbaf7333ce..aeb05d99e016 100644
+--- a/net/netlink/af_netlink.c
++++ b/net/netlink/af_netlink.c
+@@ -2258,11 +2258,11 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
+ 	struct netlink_ext_ack extack = {};
+ 	struct netlink_callback *cb;
+ 	struct sk_buff *skb = NULL;
++	unsigned int rmem, rcvbuf;
+ 	size_t max_recvmsg_len;
+ 	struct module *module;
+ 	int err = -ENOBUFS;
+ 	int alloc_min_size;
+-	unsigned int rmem;
+ 	int alloc_size;
+ 
+ 	if (!lock_taken)
+@@ -2294,8 +2294,9 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
+ 	if (!skb)
+ 		goto errout_skb;
+ 
++	rcvbuf = READ_ONCE(sk->sk_rcvbuf);
+ 	rmem = atomic_add_return(skb->truesize, &sk->sk_rmem_alloc);
+-	if (rmem >= READ_ONCE(sk->sk_rcvbuf)) {
++	if (rmem != skb->truesize && rmem >= rcvbuf) {
+ 		atomic_sub(skb->truesize, &sk->sk_rmem_alloc);
+ 		goto errout_skb;
+ 	}
+-- 
+2.50.0
+
 
