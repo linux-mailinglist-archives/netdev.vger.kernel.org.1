@@ -1,189 +1,148 @@
-Return-Path: <netdev+bounces-206117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5492B01A33
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 12:57:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C92AB01A43
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 13:04:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D365D7B0FA1
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 10:56:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 480687B816D
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 11:03:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C322288528;
-	Fri, 11 Jul 2025 10:57:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22C612882B6;
+	Fri, 11 Jul 2025 11:04:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FTyk2R/A"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C91tenZg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F53B146585;
-	Fri, 11 Jul 2025 10:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832F92836B5;
+	Fri, 11 Jul 2025 11:04:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752231447; cv=none; b=qAo/9QxnCYKRFE8Gh621/uDNSgBNxVu/Nv6cmDu8JCiqc9oNI+QvHRLwPkGEKPhrOJJkGOzvSfYYDlxrR+aosBZjAyMHVPLgm3a/7NmVDOvz7YlhQc/jqCOVw9TQSQB8h2eAcp+BGwTCLQb+WtV+mrcR5JSZwga6e722ruu2MRk=
+	t=1752231873; cv=none; b=YGk/RsGaUtNSYLxhVfNvtVjHYnYOYH1zIMDsDH9PLV+/MGgP3FwGxR8yNOyBWbq0oWAucdSBAU4BGOsYkMzvUd+gzpPR2sgD0vyDMb/605QClMIGube1VbcCxldHXQ61A2Cplkkyg4PDfM642KQSl01/eaV2NHi2kk0FJ4U4guY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752231447; c=relaxed/simple;
-	bh=uEGvEdHU3YHVHFAHSUyXTMKFtV+GvYcrRc5BebHP2fc=;
+	s=arc-20240116; t=1752231873; c=relaxed/simple;
+	bh=nFLgi7//BECQmXxDWxXRsQ3oWB5Qx+laxM0VeYpYygc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uzh/oKajtC9J446APN8NxhaONgLI9Cr+AwoRsVPrXLVXDQxM9xiQM33j9fYGE6tSfEqwU6zA2/BWLSoOaI1lWWbQSSulnQXFm8SFYvCz1XL5UpxoPZ7Vebg5vnAwDVYz1KvDNGbpQlBUohiHhfNR6zqA/FANDZddS/OCVZQNVA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FTyk2R/A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFD2DC4CEED;
-	Fri, 11 Jul 2025 10:57:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752231446;
-	bh=uEGvEdHU3YHVHFAHSUyXTMKFtV+GvYcrRc5BebHP2fc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FTyk2R/AQog2P5s+uEnb9q6grec2CCJKy49vYyy9MpvovJBKtNA0W3dTEUcPpA3mk
-	 ar9ehVfPGaGOQCx/OZk/2OQrUXs2xOoJXqYHINWQdcflxKTUD/6grZvF6tHHGn5QgX
-	 l40aQdHsZMU0mlUDvL9h7hhe6tq376YCKM9A0Unja9zX7VVmGYTQSo8jZIwravnaW8
-	 TBcDt1kPQNl5oltze0ideyVw6Ix22gUIFo83xcz4+GaTa6BsU7X1DvQKAQcDtV1dlc
-	 Wv6yDRQVN4vW1t3AHOJ/IwpXG4ppxliBdq2LGbJ7tyudcp8v2kOuIcGWQjkiwL3k5I
-	 jtd41XPFVv5Tw==
-Date: Fri, 11 Jul 2025 11:57:21 +0100
-From: Simon Horman <horms@kernel.org>
-To: Michael Dege <michael.dege@renesas.com>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
-	Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=M1hRm3bIuhOsCOolrp1/+QicSJqzlv/az9SIhkCB5vvw5zUa8bT3Rh322a02v9Kbn9e+ws9LVsRjRcdY3hrCSIkqJnyHZ3+GJ3/1veDXqYa9lFaprhkNr+uXQJK7a7HSKqXR2si0cKXkeK1YFsfD/SpqHGTajpiaW9SCbStNbnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C91tenZg; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752231872; x=1783767872;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=nFLgi7//BECQmXxDWxXRsQ3oWB5Qx+laxM0VeYpYygc=;
+  b=C91tenZgC6MpStFkIdbr9DFp5o7iu9gVCRl1XaEejv+jHwvHDpmh2A/t
+   7iILBiW537X9MsYavYjVlCRYK41O0Rz4fdibQuJRGRlYLPFeGxKYt5DJd
+   aZrRZoqCjS8WKL4iwp/bTFE/xFyC94dUkhSS/N1y3OvIL6iFFK6LUYWAl
+   kSyiNlRZ62OC12JvqdG2L7YjJyp4P262HuzCm+hsb5HPeJHFMg+YaPNcb
+   iFVHjCdh1uDbihsq0ZmswzKQB7J11wYBKauWKmHuZLo5SYE5LABH08/I9
+   8In8PNFyoxCmXyE4PxjztG1mFne1sMNEgqAu02IX4s2xTsjMYDYC1pEgQ
+   A==;
+X-CSE-ConnectionGUID: TKurDnhsShCsoUpUY+lNvA==
+X-CSE-MsgGUID: Qw7531H0RRy7u4v53Es6NA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11490"; a="58291536"
+X-IronPort-AV: E=Sophos;i="6.16,303,1744095600"; 
+   d="scan'208";a="58291536"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2025 04:03:23 -0700
+X-CSE-ConnectionGUID: k8Eh6q1JQ1KZfBO6cJAURA==
+X-CSE-MsgGUID: xfwK3S46RCGxcTshm6tHJg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,303,1744095600"; 
+   d="scan'208";a="156837141"
+Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
+  by orviesa008.jf.intel.com with ESMTP; 11 Jul 2025 04:03:20 -0700
+Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uaBXB-0006Hf-1v;
+	Fri, 11 Jul 2025 11:03:17 +0000
+Date: Fri, 11 Jul 2025 19:02:47 +0800
+From: kernel test robot <lkp@intel.com>
+To: admiyo@os.amperecomputing.com, Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-Subject: Re: [PATCH v2 3/4] net: renesas: rswitch: add offloading for L2
- switching
-Message-ID: <20250711105721.GU721198@horms.kernel.org>
-References: <20250708-add_l2_switching-v2-0-f91f5556617a@renesas.com>
- <20250708-add_l2_switching-v2-3-f91f5556617a@renesas.com>
- <20250708104740.GF452973@horms.kernel.org>
- <TY4PR01MB142826BE20FB23122B72A96348248A@TY4PR01MB14282.jpnprd01.prod.outlook.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Sudeep Holla <sudeep.holla@arm.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Huisong Li <lihuisong@huawei.com>
+Subject: Re: [PATCH net-next v22 2/2] mctp pcc: Implement MCTP over PCC
+ Transport
+Message-ID: <202507111843.OV6uA3Jr-lkp@intel.com>
+References: <20250710191209.737167-3-admiyo@os.amperecomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <TY4PR01MB142826BE20FB23122B72A96348248A@TY4PR01MB14282.jpnprd01.prod.outlook.com>
+In-Reply-To: <20250710191209.737167-3-admiyo@os.amperecomputing.com>
 
-On Thu, Jul 10, 2025 at 12:36:10PM +0000, Michael Dege wrote:
-> Hello Simon,
-> 
-> > -----Original Message-----
-> > From: Simon Horman <horms@kernel.org>
-> > Sent: Tuesday, July 8, 2025 12:48 PM
-> > To: Michael Dege <michael.dege@renesas.com>
-> > Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>; Niklas Söderlund
-> > <niklas.soderlund@ragnatech.se>; Paul Barker <paul@pbarker.dev>; Andrew Lunn <andrew+netdev@lunn.ch>;
-> > David S. Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub Kicinski
-> > <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; netdev@vger.kernel.org; linux-renesas-
-> > soc@vger.kernel.org; linux-kernel@vger.kernel.org; Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-> > Subject: Re: [PATCH v2 3/4] net: renesas: rswitch: add offloading for L2 switching
-> >
-> > On Tue, Jul 08, 2025 at 11:27:39AM +0200, Michael Dege wrote:
-> > > This commit adds hardware offloading for L2 switching on R-Car S4.
-> > >
-> > > On S4 brdev is limited to one per-device (not per port). Reasoning is
-> > > that hw L2 forwarding support lacks any sort of source port based
-> > > filtering, which makes it unusable to offload more than one bridge
-> > > device. Either you allow hardware to forward destination MAC to a
-> > > port, or you have to send it to CPU. You can't make it forward only if
-> > > src and dst ports are in the same brdev.
-> > >
-> > > Signed-off-by: Michael Dege <michael.dege@renesas.com>
-> > > Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-> >
-> > ...
-> >
-> > > diff --git a/drivers/net/ethernet/renesas/rswitch_l2.c
-> > > b/drivers/net/ethernet/renesas/rswitch_l2.c
-> >
-> > ...
-> >
-> > > +static void rswitch_update_offload_brdev(struct rswitch_private *priv,
-> > > +                                    bool force_update_l2_offload)
-> > > +{
-> > > +   struct net_device *offload_brdev = NULL;
-> > > +   struct rswitch_device *rdev, *rdev2;
-> > > +
-> > > +   rswitch_for_all_ports(priv, rdev) {
-> > > +           if (!rdev->brdev)
-> > > +                   continue;
-> > > +           rswitch_for_all_ports(priv, rdev2) {
-> > > +                   if (rdev2 == rdev)
-> > > +                           break;
-> > > +                   if (rdev2->brdev == rdev->brdev) {
-> > > +                           offload_brdev = rdev->brdev;
-> > > +                           break;
-> > > +                   }
-> > > +           }
-> > > +           if (offload_brdev)
-> > > +                   break;
-> > > +   }
-> > > +
-> > > +   if (offload_brdev == priv->offload_brdev) {
-> > > +           if (offload_brdev && force_update_l2_offload)
-> > > +                   rswitch_update_l2_offload(priv);
-> > > +           return;
-> > > +   }
-> > > +
-> > > +   if (offload_brdev && !priv->offload_brdev)
-> > > +           dev_dbg(&priv->pdev->dev, "starting l2 offload for %s\n",
-> > > +                   netdev_name(offload_brdev));
-> > > +   else if (!offload_brdev && priv->offload_brdev)
-> > > +           dev_dbg(&priv->pdev->dev, "stopping l2 offload for %s\n",
-> > > +                   netdev_name(priv->offload_brdev));
-> > > +   else
-> > > +           dev_dbg(&priv->pdev->dev,
-> > > +                   "changing l2 offload from %s to %s\n",
-> > > +                   netdev_name(priv->offload_brdev),
-> > > +                   netdev_name(offload_brdev));
-> >
-> > Smatch flags a false-positive about possible NULL references by the
-> > netdev_name() calls on the line above.
-> >
-> > Due to the previous if statement it seems to me that cannot occur.
-> > But it did take me a few moments to convince myself of that.
-> >
-> > So while I don't think we should write our code to static analysis tooling.
-> > I did play around a bit to see if I could come up with something that is both easier on the eyes and
-> > keeps Smatch happy.
-> >
-> > Perhaps it isn't easier on the eyes, but rather I'm just more familiar with the code now. But in any
-> > case, I'm sharing what I came up with in case it is useful. (Compile tested only!).
-> >
-> >
-> >         if (!offload_brdev && !priv->offload_brdev)
-> >                 return;
-> >
-> >         if (!priv->offload_brdev)
-> >                 dev_dbg(&priv->pdev->dev, "starting l2 offload for %s\n",
-> >                         netdev_name(offload_brdev));
-> >         else if (!offload_brdev)
-> >                 dev_dbg(&priv->pdev->dev, "stopping l2 offload for %s\n",
-> >                         netdev_name(priv->offload_brdev));
-> >         else if (offload_brdev != priv->offload_brdev)
-> >                 dev_dbg(&priv->pdev->dev,
-> >                         "changing l2 offload from %s to %s\n",
-> >                         netdev_name(priv->offload_brdev),
-> >                         netdev_name(offload_brdev));
-> >         else if (!force_update_l2_offload)
-> >                 return;
-> >
-> 
-> I updated the code, I hope it is OK, because I had to do it differently from your suggestion, because
-> not all cases worked as expected.
-> 
-> The reworked code is tested.
+Hi,
 
-Thanks. FWIIW, Smatch still complains.
+kernel test robot noticed the following build warnings:
 
-But if your code is correct and tested, then I think we should not
-update it a 2nd time to make the tooling happy.
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/admiyo-os-amperecomputing-com/mailbox-pcc-support-mailbox-management-of-the-shared-buffer/20250711-031525
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250710191209.737167-3-admiyo%40os.amperecomputing.com
+patch subject: [PATCH net-next v22 2/2] mctp pcc: Implement MCTP over PCC Transport
+config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20250711/202507111843.OV6uA3Jr-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250711/202507111843.OV6uA3Jr-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202507111843.OV6uA3Jr-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/mctp/mctp-pcc.c:71:8: warning: variable 'skb_buf' set but not used [-Wunused-but-set-variable]
+      71 |         void *skb_buf;
+         |               ^
+   1 warning generated.
+
+
+vim +/skb_buf +71 drivers/net/mctp/mctp-pcc.c
+
+    65	
+    66	static void *mctp_pcc_rx_alloc(struct mbox_client *c, int size)
+    67	{
+    68		struct mctp_pcc_mailbox *box;
+    69		struct mctp_pcc_ndev *mctp_pcc_ndev;
+    70		struct sk_buff *skb;
+  > 71		void *skb_buf;
+    72	
+    73		box = container_of(c, struct mctp_pcc_mailbox, client);
+    74		mctp_pcc_ndev = container_of(c, struct mctp_pcc_ndev, inbox.client);
+    75		if (size > mctp_pcc_ndev->mdev.dev->mtu)
+    76			return NULL;
+    77		mctp_pcc_ndev = container_of(c, struct mctp_pcc_ndev, inbox.client);
+    78		skb = netdev_alloc_skb(mctp_pcc_ndev->mdev.dev, size);
+    79		if (!skb)
+    80			return NULL;
+    81		skb_buf = skb_put(skb, size);
+    82		skb->protocol = htons(ETH_P_MCTP);
+    83	
+    84		skb_queue_head(&box->packets, skb);
+    85	
+    86		return skb->data;
+    87	}
+    88	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
