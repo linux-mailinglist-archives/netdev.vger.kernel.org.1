@@ -1,200 +1,513 @@
-Return-Path: <netdev+bounces-206011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16759B010D9
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 03:33:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B4C8B010E2
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 03:44:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4B5D4851B1
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 01:32:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 532D4764751
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 01:44:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FCB035973;
-	Fri, 11 Jul 2025 01:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D279141987;
+	Fri, 11 Jul 2025 01:44:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HWQdNZfB"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B37EA1442F4;
-	Fri, 11 Jul 2025 01:33:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C47182899
+	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 01:44:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752197590; cv=none; b=I4JQz1ybXungPbAfYMZLqBdSRuOjMUT9c2s3NDSQzTc1cz4WdwBTze1LrKrO9mbU8vkm5Hl5zQsGtRYip+/cGHZa8iYagu7IPwG+Ddc1524CkKXoJvfEjJMHhiWKKU3z+SGHRS6UCBFIqEg5EztyWHckW3V1XUR3bAtaJ1ATvX0=
+	t=1752198269; cv=none; b=M9oyrtSPdfJ2FbAn6uQi/5TxhVtajKBnaEeX8Xn+CdNmxTF1mrDsF/ZlIwFOmVz3/jT0lukugAH1Q3rq+i5z/afOoo7glMHxndBuK8J8ctR3A3IZ88ODN9oZ22AmoE8ueEhNN2g7QUj7Ipc8wFgYknp2Os/gFUEoJYlu0EXUxZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752197590; c=relaxed/simple;
-	bh=NScB+8edl/OfbllKDX5iUijzY0vdcggfvUYRRo63cuE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k/dGj0/i4x/NXeHYzIksfdv76e1cAC7tXormmsGM7JP5UyoeVSKrh1OUzDX0RTBuhZfe9WonMZOHPvZ3AAQeliSsYQmoJRLIiQ5gQIPJyCy2DQi91qvF1tWnea5DjZmWvL80tnOxXPjXqF/qpkRLQW5/RZ5VnepHhkOL1KcIK5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-681ff7000002311f-68-687069ce6d1f
-Date: Fri, 11 Jul 2025 10:32:57 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: willy@infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	kernel_team@skhynix.com, kuba@kernel.org,
-	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
-	akpm@linux-foundation.org, davem@davemloft.net,
-	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
-	asml.silence@gmail.com, toke@redhat.com, tariqt@nvidia.com,
-	edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
-	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	david@redhat.com, lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
-	surenb@google.com, mhocko@suse.com, horms@kernel.org,
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
-	vishal.moola@gmail.com, hannes@cmpxchg.org, ziy@nvidia.com,
-	jackmanb@google.com
-Subject: Re: [PATCH net-next v9 6/8] mlx4: use netmem descriptor and APIs for
- page pool
-Message-ID: <20250711013257.GE40145@system.software.com>
-References: <20250710082807.27402-1-byungchul@sk.com>
- <20250710082807.27402-7-byungchul@sk.com>
- <CAHS8izM9FO01kTxFhM8VUOqDFdtA80BbY=5xpKDM=S9fMcd3YA@mail.gmail.com>
+	s=arc-20240116; t=1752198269; c=relaxed/simple;
+	bh=wjSWkTPeBXW2tx1Qqi01hbov7H8psV4kqgnpKsfLW5k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mL57rTQ23u3Pn+CfcYLDtY3/YlxETX7a4N3wB/vWQOrwILmsqePf7kRX6QQTtCq37xtEZdNHx2l+MHkUXrpStbGMByDrHh+9Jevs2FRNIrTe/i3CNW6LYji3HagPvOEkpZ6AZuBydP4j3/nor3ruWHuu7fdkGz4gEl6q2p1X9/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HWQdNZfB; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752198265;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Zt3KlbbLlIb9ntQo8ZxiuXNPWEVPbSNN/c/T7N+f2kQ=;
+	b=HWQdNZfBkxcWqoDAtxO9LtnSgmWtPLrRl2wQ8eJHvGG4yedcDhr3SYNzWRxG1gxFrcGIPw
+	GLLcM1Mh972OSxiAKyG2hFaAc38fA8WPe2hMJAw++QIpd6pT4Bh4hsJgFT2UP32oAwz+xl
+	ZhYZSqIl6IUFR5zumdYdcibR5BGTP0c=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-551-ciQjZhaeOwyGT82-E3eryA-1; Thu, 10 Jul 2025 21:44:23 -0400
+X-MC-Unique: ciQjZhaeOwyGT82-E3eryA-1
+X-Mimecast-MFC-AGG-ID: ciQjZhaeOwyGT82-E3eryA_1752198263
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-3138e671316so1441714a91.0
+        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 18:44:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752198263; x=1752803063;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Zt3KlbbLlIb9ntQo8ZxiuXNPWEVPbSNN/c/T7N+f2kQ=;
+        b=V7mAAHdcyxnYFTwkaKggoNqxmMPZaCzSdyqbF2qmhraM9H4RM0eB3FCT9BrSQjuVkY
+         W0VDxZHD9R1nNrXlPsDGLhfHd6LQILQlwejDNBrrdVbwYYXyeJykB7heBlFQQG4lJ3a+
+         6iC9Imokueu5hHSZ0V0GmuLpnCSFuZIwQb+6//U1UMYiAR12HylQg2fsJmWTLoZk8Qal
+         O8P8+9X3s5xQdXyQCJmmtsmoZ4wU5D/o0mG+/kxFOjFtv4S5RQeHzopXIqMLynsWHenG
+         eYswAazE/EkgTI/xnp8S9cd6VZgLYcBu5Qgs5K2ilWamiiX0Jp8cG+8ZFon0tJkUxsxd
+         ZknA==
+X-Forwarded-Encrypted: i=1; AJvYcCXHo0Xg9UG+tfx1uJy+4UTtA1s3raUgkg/NVX/qo1ThwqFJxb43bl1RTGPcOMgGcq89ePaRpOk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwAIhbEwNfzoCCplr2fx306eQUj4TGnpB6Ej5S7IXtYg5w/wCQ
+	BdsM5+rWav7XQhxKYG7l6hD6Jdv26IqmwUO7Vu+eTqWd5sQ/QmemPB8bo/LR3HDf0fAsRIS03ub
+	8PEgF6UINfkk388SyU4aVTjI7TQORurTmS0qs1n7SE8LxC22JJbM0hAtTvBpcA6EineYehcCa4S
+	hSPxB8hrYTY7PzVm//HYGR/tVvCNPrOE6Q
+X-Gm-Gg: ASbGncvQ1usj9SI0FIKClX/Zy7ASAp1UWb0oCPAbWdZuRfKEU9xyKAvUHDAI3cGeYUD
+	i01bgUdWMoOqjMYyZNs70Fnci9MQym0DcxtO9/fDjkagerrU20/yvc/V0vtYBgOhvFb2m2igAQX
+	BVunMb5+Q/7tuB2AeMhMouEQ==
+X-Received: by 2002:a17:90b:2b50:b0:30e:6a9d:d78b with SMTP id 98e67ed59e1d1-31c4d4d0740mr1758428a91.12.1752198262162;
+        Thu, 10 Jul 2025 18:44:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHL234yEKg6y0H6Ijdjo4ts3kRRF1EGyNEU+iyI8kqrhvv7V667xAFdlSjti5l3dkuKayZfNJBLadnJF0UJNi0=
+X-Received: by 2002:a17:90b:2b50:b0:30e:6a9d:d78b with SMTP id
+ 98e67ed59e1d1-31c4d4d0740mr1758370a91.12.1752198261372; Thu, 10 Jul 2025
+ 18:44:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHS8izM9FO01kTxFhM8VUOqDFdtA80BbY=5xpKDM=S9fMcd3YA@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SSUxTURSGc/tGKjWPinKFhUkFDERxiCEnapSdd2PU4EaJQ5WnrTI0LSCg
-	JiDEoQoOmIilkIcDVCA2VqFIlGipCI6IwRSVQRAhWkVEGgGntoTI7sv5z/2/s7g8pbzJhPLa
-	lDRRn6JOUrFyWv4lsHzJc61Os8z5KQbM1hoWqn9mQmVvPQPmqjoEP8bfcjDqfMTClXIPBeYX
-	+TSMWScoGGju46DatgF6Kj7ScPe4nYK+My0sFORPUnBv/CsHR+stMmirK2TgwsQ1Cuw5vRy8
-	ajCz0F3zl4GPjgIaWk3XaegpjINmaR54nrgROK12GXhOl7JQ1C6x0J/fg6C9qY+GktxCBNZG
-	FwOTP70dJQ+7ubhw0uQepsjt650ycsfUxRHJlk5uWaKJ0dVOEVvVSZbYvp/nyLvXd1nSUjxJ
-	kzv1ozJSkPeVJSMDb2gy3NjBEuvtDpo8lZzcpqBt8jWJYpI2Q9QvXbtLrpGM83VvwzPfj+Ac
-	9DvEiAJ4LKzEJ9wXZNPc+WOQ8jEtROCGU3bkY1ZYhF2ucf88WIjCVxvPMUYk5ynBxOKOhj7a
-	F8wRtuKi3MeMjxUC4Aa7S+ZbUgoWhI3SkGwqCMKtlz74H1De1l9l7d5W3sthuPIPPzVegPNq
-	S/yyAGEzHu8p8q/PFRbi+3WP/J1YaOGx1VLBTV09Hz+wuOizKMg0Q2GaoTD9V5hmKCREVyGl
-	NiUjWa1NWhmjyUrRZsbsSU22Ie9HqjjyK6EefW+LdyCBR6pARVx1qkbJqDMMWckOhHlKFay4
-	sUGnUSoS1VnZoj51pz49STQ4UBhPq0IUKzwHE5XCPnWaeEAUdaJ+OpXxAaE56ERpBJ/wrbV/
-	7LhdMxEcGttWu2SdZNquGGrpdBtq/xQRZ3FTyaFZf7X7+aGRW2WnAjcpB3PXOrp0e92Xox9G
-	fv4kvjj8IIFabx4dO7ZqdVNb2MXhWYt3rD4vryk+Hcw3bslb846L9Vif7S6LlJrf2DZGRmkG
-	nVGzX3oSmMzs+MHtKtqgUS+PpvQG9T+HrZnjRAMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0iTYRTHed7bXkeTt2X1pkS0ssjSLhScMkryQw+VkVBGEuSoNzdyc2wq
-	GiSmC2mpZXaxabKozKk0WOqW5hK1iwVdVtZMc2rZjVDLZV6zTYn89uP8/+d3vhyWlBbQgaxS
-	nSRo1fIEGSOmxLvDs0KfKTWKNQ2eICi2VDJQMZwKt7rsNBSX1yDwjLSLYLD5EQPXrw2RUPxc
-	T8EvyygJvQ97RFBhjQJ36ScK7mXbSOg5+5iBXP0YCfUjfSLItJcR0HS1hYYXNXk0XBi9SYIt
-	o0sEr2qLGeisnKThU2MuBS1GMwXuvAh4aJoHQ0+/I2i22AgYyrnKQIHTxMAHvRuBs6mHgqKT
-	eQgsDhcNY8NeR9GDTlFEMG763k/iKnMbge8a34uwyZqM75SFYIPLSWJr+WkGW3+eF+GON/cY
-	/LhwjMJ37YMEzs3qY/CP3ncU7ne0Mvj6lwECW6paqT3SWPHmI0KCMkXQrt4SJ1aYDAs07UtT
-	u3/wGWhivgH5sTy3nm/zfCZ9THHBfO0ZG/Ixwy3nXa6RqXkAt4K/4cinDUjMkpyR4Vtreyhf
-	MIc7wBecfEL7WMIBX2tzEb6SlCtDvMH0hZgOZvMtVz5OLZBe63iJ02tlvRzE3/rDTo8X8VnV
-	RVPH/LhofsRdMFWfyy3hG2oeEeeQv3GGyTjDZPxvMs4wmRBVjgKU6hSVXJmwIUx3TJGmVqaG
-	HU5UWZH3VUpPjOfbkefV9kbEsUg2SxJRkaiQ0vIUXZqqEfEsKQuQ3I7SKKSSI/K044I28ZA2
-	OUHQNaIglpLNl+zYL8RJuXh5knBMEDSC9l9KsH6BGWjft6iG7vpdq/wnyCquu26ysP1D08Lk
-	3pc3nnVyMZsuf83v37Dy4ERp/dv4cO7tmtLshbH4dUlmx+vurR8jf1eZnaub24qctptmWUm8
-	I6lfH7JY4386OjrmvlkVGla3czI/xL888tSlnL3agXXL0ivUn+0Xt82r1jt729OlR6NKNlpk
-	lE4hXxtCanXyv0FOTGwmAwAA
-X-CFilter-Loop: Reflected
+References: <20250708064819.35282-1-jasowang@redhat.com> <20250708064819.35282-2-jasowang@redhat.com>
+ <CAJaqyWd4K7tHHg+GCCN9+q3HdhkRdQ0R4iW+RXTP_6=xrP53VA@mail.gmail.com>
+In-Reply-To: <CAJaqyWd4K7tHHg+GCCN9+q3HdhkRdQ0R4iW+RXTP_6=xrP53VA@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Fri, 11 Jul 2025 09:44:10 +0800
+X-Gm-Features: Ac12FXzCFXEOlFdgCE9DKyHNbB7BgzuEFmQmUph58wsDb-dgqx-v3RY_-YznhXs
+Message-ID: <CACGkMEuL4YGa+d7yjopv1nchwdqU4BCP9_-8Ur1L4CKU+8R5Wg@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] vhost: basic in order support
+To: Eugenio Perez Martin <eperezma@redhat.com>
+Cc: mst@redhat.com, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, jonah.palmer@oracle.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 10, 2025 at 11:29:35AM -0700, Mina Almasry wrote:
-> On Thu, Jul 10, 2025 at 1:28 AM Byungchul Park <byungchul@sk.com> wrote:
+On Thu, Jul 10, 2025 at 5:05=E2=80=AFPM Eugenio Perez Martin
+<eperezma@redhat.com> wrote:
+>
+> On Tue, Jul 8, 2025 at 8:48=E2=80=AFAM Jason Wang <jasowang@redhat.com> w=
+rote:
 > >
-> > To simplify struct page, the effort to separate its own descriptor from
-> > struct page is required and the work for page pool is on going.
+> > This patch adds basic in order support for vhost. Two optimizations
+> > are implemented in this patch:
 > >
-> > Use netmem descriptor and APIs for page pool in mlx4 code.
+> > 1) Since driver uses descriptor in order, vhost can deduce the next
+> >    avail ring head by counting the number of descriptors that has been
+> >    used in next_avail_head. This eliminate the need to access the
+> >    available ring in vhost.
 > >
-> > Signed-off-by: Byungchul Park <byungchul@sk.com>
+> > 2) vhost_add_used_and_singal_n() is extended to accept the number of
+> >    batched buffers per used elem. While this increases the times of
+> >    usersapce memory access but it helps to reduce the chance of
+>
+> s/usersapce/userspace/
+>
+> >    used ring access of both the driver and vhost.
+> >
+> > Vhost-net will be the first user for this.
+> >
+> > Signed-off-by: Jason Wang <jasowang@redhat.com>
 > > ---
-> >  drivers/net/ethernet/mellanox/mlx4/en_rx.c   | 48 +++++++++++---------
-> >  drivers/net/ethernet/mellanox/mlx4/en_tx.c   |  8 ++--
-> >  drivers/net/ethernet/mellanox/mlx4/mlx4_en.h |  4 +-
-> >  3 files changed, 32 insertions(+), 28 deletions(-)
+> >  drivers/vhost/net.c   |   6 ++-
+> >  drivers/vhost/vhost.c | 121 +++++++++++++++++++++++++++++++++++-------
+> >  drivers/vhost/vhost.h |   8 ++-
+> >  3 files changed, 111 insertions(+), 24 deletions(-)
 > >
-> > diff --git a/drivers/net/ethernet/mellanox/mlx4/en_rx.c b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
-> > index b33285d755b9..7cf0d2dc5011 100644
-> > --- a/drivers/net/ethernet/mellanox/mlx4/en_rx.c
-> > +++ b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
-> > @@ -62,18 +62,18 @@ static int mlx4_en_alloc_frags(struct mlx4_en_priv *priv,
-> >         int i;
+> > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> > index 7cbfc7d718b3..4f9c67f17b49 100644
+> > --- a/drivers/vhost/net.c
+> > +++ b/drivers/vhost/net.c
+> > @@ -374,7 +374,8 @@ static void vhost_zerocopy_signal_used(struct vhost=
+_net *net,
+> >         while (j) {
+> >                 add =3D min(UIO_MAXIOV - nvq->done_idx, j);
+> >                 vhost_add_used_and_signal_n(vq->dev, vq,
+> > -                                           &vq->heads[nvq->done_idx], =
+add);
+> > +                                           &vq->heads[nvq->done_idx],
+> > +                                           NULL, add);
+> >                 nvq->done_idx =3D (nvq->done_idx + add) % UIO_MAXIOV;
+> >                 j -=3D add;
+> >         }
+> > @@ -457,7 +458,8 @@ static void vhost_net_signal_used(struct vhost_net_=
+virtqueue *nvq)
+> >         if (!nvq->done_idx)
+> >                 return;
 > >
-> >         for (i = 0; i < priv->num_frags; i++, frags++) {
-> > -               if (!frags->page) {
-> > -                       frags->page = page_pool_alloc_pages(ring->pp, gfp);
-> > -                       if (!frags->page) {
-> > +               if (!frags->netmem) {
-> > +                       frags->netmem = page_pool_alloc_netmems(ring->pp, gfp);
-> > +                       if (!frags->netmem) {
-> >                                 ring->alloc_fail++;
-> >                                 return -ENOMEM;
-> >                         }
-> > -                       page_pool_fragment_page(frags->page, 1);
-> > +                       page_pool_fragment_netmem(frags->netmem, 1);
-> >                         frags->page_offset = priv->rx_headroom;
+> > -       vhost_add_used_and_signal_n(dev, vq, vq->heads, nvq->done_idx);
+> > +       vhost_add_used_and_signal_n(dev, vq, vq->heads, NULL,
+> > +                                   nvq->done_idx);
+> >         nvq->done_idx =3D 0;
+> >  }
 > >
-> >                         ring->rx_alloc_pages++;
-> >                 }
-> > -               dma = page_pool_get_dma_addr(frags->page);
-> > +               dma = page_pool_get_dma_addr_netmem(frags->netmem);
-> >                 rx_desc->data[i].addr = cpu_to_be64(dma + frags->page_offset);
+> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> > index 3a5ebb973dba..c7ed069fc49e 100644
+> > --- a/drivers/vhost/vhost.c
+> > +++ b/drivers/vhost/vhost.c
+> > @@ -364,6 +364,7 @@ static void vhost_vq_reset(struct vhost_dev *dev,
+> >         vq->avail =3D NULL;
+> >         vq->used =3D NULL;
+> >         vq->last_avail_idx =3D 0;
+> > +       vq->next_avail_head =3D 0;
+> >         vq->avail_idx =3D 0;
+> >         vq->last_used_idx =3D 0;
+> >         vq->signalled_used =3D 0;
+> > @@ -455,6 +456,8 @@ static void vhost_vq_free_iovecs(struct vhost_virtq=
+ueue *vq)
+> >         vq->log =3D NULL;
+> >         kfree(vq->heads);
+> >         vq->heads =3D NULL;
+> > +       kfree(vq->nheads);
+> > +       vq->nheads =3D NULL;
+> >  }
+> >
+> >  /* Helper to allocate iovec buffers for all vqs. */
+> > @@ -472,7 +475,9 @@ static long vhost_dev_alloc_iovecs(struct vhost_dev=
+ *dev)
+> >                                         GFP_KERNEL);
+> >                 vq->heads =3D kmalloc_array(dev->iov_limit, sizeof(*vq-=
+>heads),
+> >                                           GFP_KERNEL);
+> > -               if (!vq->indirect || !vq->log || !vq->heads)
+> > +               vq->nheads =3D kmalloc_array(dev->iov_limit, sizeof(*vq=
+->nheads),
+> > +                                          GFP_KERNEL);
+> > +               if (!vq->indirect || !vq->log || !vq->heads || !vq->nhe=
+ads)
+> >                         goto err_nomem;
 > >         }
 > >         return 0;
-> > @@ -83,10 +83,10 @@ static void mlx4_en_free_frag(const struct mlx4_en_priv *priv,
-> >                               struct mlx4_en_rx_ring *ring,
-> >                               struct mlx4_en_rx_alloc *frag)
+> > @@ -1990,14 +1995,15 @@ long vhost_vring_ioctl(struct vhost_dev *d, uns=
+igned int ioctl, void __user *arg
+> >                         break;
+> >                 }
+> >                 if (vhost_has_feature(vq, VIRTIO_F_RING_PACKED)) {
+> > -                       vq->last_avail_idx =3D s.num & 0xffff;
+> > +                       vq->next_avail_head =3D vq->last_avail_idx =3D
+> > +                                             s.num & 0xffff;
+> >                         vq->last_used_idx =3D (s.num >> 16) & 0xffff;
+> >                 } else {
+> >                         if (s.num > 0xffff) {
+> >                                 r =3D -EINVAL;
+> >                                 break;
+> >                         }
+> > -                       vq->last_avail_idx =3D s.num;
+> > +                       vq->next_avail_head =3D vq->last_avail_idx =3D =
+s.num;
+>
+> Why not just reuse last_avail_idx instead of creating next_avail_head?
+>
+> At first glance it seemed to me that it was done this way to support
+> rewinding, but in_order path will happily reuse next_avail_head
+> without checking for last_avail_idx except for checking if the ring is
+> empty. Am I missing something?
+
+Because the driver can submit a batch of available buffers so
+last_avail_idx is not necessarily equal to next_avail_head.
+
+>
+> >                 }
+> >                 /* Forget the cached index value. */
+> >                 vq->avail_idx =3D vq->last_avail_idx;
+> > @@ -2590,11 +2596,12 @@ int vhost_get_vq_desc(struct vhost_virtqueue *v=
+q,
+> >                       unsigned int *out_num, unsigned int *in_num,
+> >                       struct vhost_log *log, unsigned int *log_num)
 > >  {
-> > -       if (frag->page)
-> > -               page_pool_put_full_page(ring->pp, frag->page, false);
-> > +       if (frag->netmem)
-> > +               page_pool_put_full_netmem(ring->pp, frag->netmem, false);
-> >         /* We need to clear all fields, otherwise a change of priv->log_rx_info
-> > -        * could lead to see garbage later in frag->page.
-> > +        * could lead to see garbage later in frag->netmem.
-> >          */
-> >         memset(frag, 0, sizeof(*frag));
+> > +       bool in_order =3D vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
+> >         struct vring_desc desc;
+> >         unsigned int i, head, found =3D 0;
+> >         u16 last_avail_idx =3D vq->last_avail_idx;
+> >         __virtio16 ring_head;
+> > -       int ret, access;
+> > +       int ret, access, c =3D 0;
+> >
+> >         if (vq->avail_idx =3D=3D vq->last_avail_idx) {
+> >                 ret =3D vhost_get_avail_idx(vq);
+> > @@ -2605,17 +2612,21 @@ int vhost_get_vq_desc(struct vhost_virtqueue *v=
+q,
+> >                         return vq->num;
+> >         }
+> >
+> > -       /* Grab the next descriptor number they're advertising, and inc=
+rement
+> > -        * the index we've seen. */
+> > -       if (unlikely(vhost_get_avail_head(vq, &ring_head, last_avail_id=
+x))) {
+> > -               vq_err(vq, "Failed to read head: idx %d address %p\n",
+> > -                      last_avail_idx,
+> > -                      &vq->avail->ring[last_avail_idx % vq->num]);
+> > -               return -EFAULT;
+> > +       if (in_order)
+> > +               head =3D vq->next_avail_head & (vq->num - 1);
+> > +       else {
+> > +               /* Grab the next descriptor number they're
+> > +                * advertising, and increment the index we've seen. */
+> > +               if (unlikely(vhost_get_avail_head(vq, &ring_head,
+> > +                                                 last_avail_idx))) {
+> > +                       vq_err(vq, "Failed to read head: idx %d address=
+ %p\n",
+> > +                               last_avail_idx,
+> > +                               &vq->avail->ring[last_avail_idx % vq->n=
+um]);
+> > +                       return -EFAULT;
+> > +               }
+> > +               head =3D vhost16_to_cpu(vq, ring_head);
+> >         }
+> >
+> > -       head =3D vhost16_to_cpu(vq, ring_head);
+> > -
+> >         /* If their number is silly, that's an error. */
+> >         if (unlikely(head >=3D vq->num)) {
+> >                 vq_err(vq, "Guest says index %u > %u is available",
+> > @@ -2658,6 +2669,7 @@ int vhost_get_vq_desc(struct vhost_virtqueue *vq,
+> >                                                 "in indirect descriptor=
+ at idx %d\n", i);
+> >                                 return ret;
+> >                         }
+> > +                       ++c;
+> >                         continue;
+> >                 }
+> >
+> > @@ -2693,10 +2705,12 @@ int vhost_get_vq_desc(struct vhost_virtqueue *v=
+q,
+> >                         }
+> >                         *out_num +=3D ret;
+> >                 }
+> > +               ++c;
+> >         } while ((i =3D next_desc(vq, &desc)) !=3D -1);
+> >
+> >         /* On success, increment avail index. */
+> >         vq->last_avail_idx++;
+> > +       vq->next_avail_head +=3D c;
+> >
+> >         /* Assume notifications from guest are disabled at this point,
+> >          * if they aren't we would need to update avail_event index. */
+> > @@ -2720,8 +2734,9 @@ int vhost_add_used(struct vhost_virtqueue *vq, un=
+signed int head, int len)
+> >                 cpu_to_vhost32(vq, head),
+> >                 cpu_to_vhost32(vq, len)
+> >         };
+> > +       u16 nheads =3D 1;
+> >
+> > -       return vhost_add_used_n(vq, &heads, 1);
+> > +       return vhost_add_used_n(vq, &heads, &nheads, 1);
 > >  }
-> > @@ -440,29 +440,33 @@ static int mlx4_en_complete_rx_desc(struct mlx4_en_priv *priv,
-> >         unsigned int truesize = 0;
-> >         bool release = true;
-> >         int nr, frag_size;
-> > -       struct page *page;
-> > +       netmem_ref netmem;
-> >         dma_addr_t dma;
+> >  EXPORT_SYMBOL_GPL(vhost_add_used);
 > >
-> >         /* Collect used fragments while replacing them in the HW descriptors */
-> >         for (nr = 0;; frags++) {
-> >                 frag_size = min_t(int, length, frag_info->frag_size);
+> > @@ -2757,10 +2772,10 @@ static int __vhost_add_used_n(struct vhost_virt=
+queue *vq,
+> >         return 0;
+> >  }
 > >
-> > -               page = frags->page;
-> > -               if (unlikely(!page))
-> > +               netmem = frags->netmem;
-> > +               if (unlikely(!netmem))
-> >                         goto fail;
-> >
-> > -               dma = page_pool_get_dma_addr(page);
-> > +               dma = page_pool_get_dma_addr_netmem(netmem);
-> >                 dma_sync_single_range_for_cpu(priv->ddev, dma, frags->page_offset,
-> >                                               frag_size, priv->dma_dir);
-> >
-> > -               __skb_fill_page_desc(skb, nr, page, frags->page_offset,
-> > -                                    frag_size);
-> > +               __skb_fill_netmem_desc(skb, nr, netmem, frags->page_offset,
-> > +                                      frag_size);
-> >
-> >                 truesize += frag_info->frag_stride;
-> >                 if (frag_info->frag_stride == PAGE_SIZE / 2) {
-> > +                       struct page *page = netmem_to_page(netmem);
-> 
-> This cast is not safe, try to use the netmem type directly.
+> > -/* After we've used one of their buffers, we tell them about it.  We'l=
+l then
+> > - * want to notify the guest, using eventfd. */
+> > -int vhost_add_used_n(struct vhost_virtqueue *vq, struct vring_used_ele=
+m *heads,
+> > -                    unsigned count)
+> > +static int vhost_add_used_n_ooo(struct vhost_virtqueue *vq,
+> > +                               struct vring_used_elem *heads,
+> > +                               u16 *nheads,
+> > +                               unsigned count)
+>
+> nheads is not used in this function and it is checked to be NULL in
+> the caller, should we remove it from the parameter list?
 
-Can it be net_iov?  It already ensures it's a page-backed netmem.  Why
-is that unsafe?
+Exactly.
 
-With netmem, page_count() and page_to_nid() cannot be used, but needed.
-Or checking 'page == NULL' after the casting works for you?
+>
+> >  {
+> >         int start, n, r;
+> >
+> > @@ -2775,6 +2790,70 @@ int vhost_add_used_n(struct vhost_virtqueue *vq,=
+ struct vring_used_elem *heads,
+> >         }
+> >         r =3D __vhost_add_used_n(vq, heads, count);
+> >
+> > +       return r;
+>
+> Nit: We can merge with the previous statement and do "return
+> __vhost_add_used_n(vq, heads, count);"
 
-	Byungchul
+Right.
 
-> --
-> Thanks,
-> Mina
+>
+> > +}
+> > +
+> > +static int vhost_add_used_n_in_order(struct vhost_virtqueue *vq,
+> > +                                    struct vring_used_elem *heads,
+> > +                                    u16 *nheads,
+>
+> Nit: we can const-ify nheads, and do the same for _in_order variant
+> and vhost_add_used_n. Actually we can do it with heads too but it
+> requires more changes to existing code. I think it would be nice to
+> constify *nheads if you need to respin.
+
+Let me do that.
+
+>
+> > +                                    unsigned count)
+> > +{
+> > +       vring_used_elem_t __user *used;
+> > +       u16 old, new =3D vq->last_used_idx;
+> > +       int start, i;
+> > +
+> > +       if (!nheads)
+> > +               return -EINVAL;
+> > +
+> > +       start =3D vq->last_used_idx & (vq->num - 1);
+> > +       used =3D vq->used->ring + start;
+> > +
+> > +       for (i =3D 0; i < count; i++) {
+> > +               if (vhost_put_used(vq, &heads[i], start, 1)) {
+> > +                       vq_err(vq, "Failed to write used");
+> > +                       return -EFAULT;
+> > +               }
+> > +               start +=3D nheads[i];
+> > +               new +=3D nheads[i];
+> > +               if (start >=3D vq->num)
+> > +                       start -=3D vq->num;
+> > +       }
+> > +
+> > +       if (unlikely(vq->log_used)) {
+> > +               /* Make sure data is seen before log. */
+> > +               smp_wmb();
+> > +               /* Log used ring entry write. */
+> > +               log_used(vq, ((void __user *)used - (void __user *)vq->=
+used),
+> > +                        (vq->num - start) * sizeof *used);
+> > +               if (start + count > vq->num)
+> > +                       log_used(vq, 0,
+> > +                                (start + count - vq->num) * sizeof *us=
+ed);
+> > +       }
+> > +
+> > +       old =3D vq->last_used_idx;
+> > +       vq->last_used_idx =3D new;
+> > +       /* If the driver never bothers to signal in a very long while,
+> > +        * used index might wrap around. If that happens, invalidate
+> > +        * signalled_used index we stored. TODO: make sure driver
+> > +        * signals at least once in 2^16 and remove this. */
+> > +       if (unlikely((u16)(new - vq->signalled_used) < (u16)(new - old)=
+))
+> > +               vq->signalled_used_valid =3D false;
+> > +       return 0;
+> > +}
+> > +
+> > +/* After we've used one of their buffers, we tell them about it.  We'l=
+l then
+> > + * want to notify the guest, using eventfd. */
+> > +int vhost_add_used_n(struct vhost_virtqueue *vq, struct vring_used_ele=
+m *heads,
+> > +                    u16 *nheads, unsigned count)
+> > +{
+> > +       bool in_order =3D vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
+> > +       int r;
+> > +
+> > +       if (!in_order || !nheads)
+> > +               r =3D vhost_add_used_n_ooo(vq, heads, nheads, count);
+> > +       else
+> > +               r =3D vhost_add_used_n_in_order(vq, heads, nheads, coun=
+t);
+> > +
+>
+> I just realized the original code didn't do it either, but we should
+> return if r < 0 here. Otherwise, used->ring[] has a random value and
+> used->idx is incremented covering these values. This should be
+> triggable in a guest that set used->idx valid but used->ring[]
+> invalid, for example.
+
+This looks like a bug, I will send an independent fix.
+
+>
+> >         /* Make sure buffer is written before we update index. */
+> >         smp_wmb();
+> >         if (vhost_put_used_idx(vq)) {
+> > @@ -2853,9 +2932,11 @@ EXPORT_SYMBOL_GPL(vhost_add_used_and_signal);
+> >  /* multi-buffer version of vhost_add_used_and_signal */
+> >  void vhost_add_used_and_signal_n(struct vhost_dev *dev,
+> >                                  struct vhost_virtqueue *vq,
+> > -                                struct vring_used_elem *heads, unsigne=
+d count)
+> > +                                struct vring_used_elem *heads,
+> > +                                u16 *nheads,
+> > +                                unsigned count)
+> >  {
+> > -       vhost_add_used_n(vq, heads, count);
+> > +       vhost_add_used_n(vq, heads, nheads, count);
+> >         vhost_signal(dev, vq);
+> >  }
+> >  EXPORT_SYMBOL_GPL(vhost_add_used_and_signal_n);
+> > diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+> > index bb75a292d50c..dca9f309d396 100644
+> > --- a/drivers/vhost/vhost.h
+> > +++ b/drivers/vhost/vhost.h
+> > @@ -103,6 +103,8 @@ struct vhost_virtqueue {
+> >          * Values are limited to 0x7fff, and the high bit is used as
+> >          * a wrap counter when using VIRTIO_F_RING_PACKED. */
+> >         u16 last_avail_idx;
+> > +       /* Next avail ring head when VIRTIO_F_IN_ORDER is neogitated */
+>
+> s/neogitated/negotiated/
+
+Will fix it.
+
+>
+> > +       u16 next_avail_head;
+> >
+> >         /* Caches available index value from user. */
+> >         u16 avail_idx;
+> > @@ -129,6 +131,7 @@ struct vhost_virtqueue {
+> >         struct iovec iotlb_iov[64];
+> >         struct iovec *indirect;
+> >         struct vring_used_elem *heads;
+> > +       u16 *nheads;
+> >         /* Protected by virtqueue mutex. */
+> >         struct vhost_iotlb *umem;
+> >         struct vhost_iotlb *iotlb;
+> > @@ -213,11 +216,12 @@ bool vhost_vq_is_setup(struct vhost_virtqueue *vq=
+);
+> >  int vhost_vq_init_access(struct vhost_virtqueue *);
+> >  int vhost_add_used(struct vhost_virtqueue *, unsigned int head, int le=
+n);
+> >  int vhost_add_used_n(struct vhost_virtqueue *, struct vring_used_elem =
+*heads,
+> > -                    unsigned count);
+> > +                    u16 *nheads, unsigned count);
+> >  void vhost_add_used_and_signal(struct vhost_dev *, struct vhost_virtqu=
+eue *,
+> >                                unsigned int id, int len);
+> >  void vhost_add_used_and_signal_n(struct vhost_dev *, struct vhost_virt=
+queue *,
+> > -                              struct vring_used_elem *heads, unsigned =
+count);
+> > +                                struct vring_used_elem *heads, u16 *nh=
+eads,
+> > +                                unsigned count);
+> >  void vhost_signal(struct vhost_dev *, struct vhost_virtqueue *);
+> >  void vhost_disable_notify(struct vhost_dev *, struct vhost_virtqueue *=
+);
+> >  bool vhost_vq_avail_empty(struct vhost_dev *, struct vhost_virtqueue *=
+);
+> > --
+> > 2.31.1
+> >
+>
+
+Thanks
+
 
