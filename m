@@ -1,94 +1,173 @@
-Return-Path: <netdev+bounces-206289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E335B027DE
-	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 01:50:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B419B02810
+	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 02:00:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41C8E1C87D9E
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 23:50:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D71B5166805
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 23:59:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46433225768;
-	Fri, 11 Jul 2025 23:49:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BDA0225A31;
+	Fri, 11 Jul 2025 23:55:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r7sRJCyp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V+jMazXu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22851225403
-	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 23:49:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1ABC224AFC;
+	Fri, 11 Jul 2025 23:55:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752277788; cv=none; b=p2tO5Gnpna+K1pZJugoMDxKsk0aGRI5+a50CnSKbzdF61bgw3aJvnnLCEzXHv/tYToHmy7o3xMzW42inGkQpgmeFWYQ+kn7UFfC2m8kZhC+oCDGcMU85PLbEdjC9R2NFM0BEcO+EwoMH8Ggaee6z2Dp9dP2IyA4aGHuhCTbC9w8=
+	t=1752278143; cv=none; b=Z4wTIt5Fqvdzqt4mq27vCrzAoV9veX83EOIhRHsSiyCqJCZk87eAmh+hxJGCQ8hPbcxf5Gn1EDi2xrXVlOIhTWArpvyYlycSl3nqRSlkYmWtKqe6DyVcvn8Iccagxcr/RnT+0rmxHay+PQnZvH844Tv6tYYMW/WQq5E75+h42gk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752277788; c=relaxed/simple;
-	bh=Cs2QHtZX7pbuJibPYV577reP7/7tl8nKCStc7ZgmTQo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fOm6czIhCG2KlWnq7AfGPyNzuvmPCvlZQEjCJ0b3zD1w25Y5EapAXioj9KW+/Wggxuo+Sk39vh8QszwtMfIV3ZVVPdQMbLEyNCfZ9OagzZfzCUGCca1ZYiv6kC9GK9WhSLj9uc55GETBtEcNQU1wK45jus0PoB7fAUYTEpnZ/0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r7sRJCyp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99C63C4CEED;
-	Fri, 11 Jul 2025 23:49:47 +0000 (UTC)
+	s=arc-20240116; t=1752278143; c=relaxed/simple;
+	bh=agC97SuzfuoGpmFEeAGfsfWb9Zbkh2hZUVa2ZICQfgk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FpfdgKPpC8CIWEWVA3TvNnkbEs3Kd246AelpOFCfv37W/cDJGTIXnhZXpBr3aHYdseRSx2HTH5XSLKXFvO+a+7cKnpBQF9WAEACuOGdLBzW4QIQCCR/0GzbRBghY83bmnhx7zcG3vB2MzmI5Hgpj/HDQpcud28MYqHdLdrpoNl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V+jMazXu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6682C4CEED;
+	Fri, 11 Jul 2025 23:55:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752277787;
-	bh=Cs2QHtZX7pbuJibPYV577reP7/7tl8nKCStc7ZgmTQo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=r7sRJCypzIJdOc/A3nArjLDOtIzV6dHNsLaIy1uYmFj3HZgvBbBrCV4RLghgpUYoX
-	 sEEdmnHjna6Yp/lxph2fmPhT8FKrYKrgjV0tVCAzIlUs6ysUSTdt8i1D9BBM3wG1dZ
-	 1Oty7MurjBzPfDPzrDqCp5MEMYWBJrSWt4waSUWiSIzdX52Q2U2VRHla1YFRUNXiem
-	 aOdTTLuETxgO9OkAfVGXnHECUdDTTWpVeNnlHCzGxmOvkeEiJ9azmj0t+hslUpU3kl
-	 E6vNt+cbdmDEFmdkQ+JI2V6pdGeJtIc2WxbCtp5K3jhpksxmeGOn5P2sEZTGo6SRBj
-	 5nLEF2TJzTEWQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC7A383B275;
-	Fri, 11 Jul 2025 23:50:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1752278142;
+	bh=agC97SuzfuoGpmFEeAGfsfWb9Zbkh2hZUVa2ZICQfgk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=V+jMazXuc42rPHB+RgmnSUt3K5cOgrTcf43wY3sNYkb1s5uEPc+2N+kGBERVFHSuB
+	 XNfrebw1pzmX8ip5wm/BDOONVb9VadiSWGj4KXc4EQfN4BUm08ee95IX+CLAyWCB43
+	 MMCFf6Tfru8hFdc7ydemHHLrGguJ9SeIM5upbiksCHwLj6V9USlT29ObzrE2/3XrNF
+	 2B28AucdTY7gbWKwOWL8Z90jZPKuyjT/Qe46w930TTyRpGohxbdCMSX5U0f1FJr0Yh
+	 vdnpGYkSzBNxJXVyfv63oLoQfE9shUxd3vaXeN4LUHNv3a6ilfMTd413U5P7RmnAHS
+	 bO3T0IT76DHMQ==
+Date: Fri, 11 Jul 2025 16:55:41 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
+ <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, Florian Fainelli
+ <f.fainelli@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
+ <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/3] net: netdevsim: Add PHY support in
+ netdevsim
+Message-ID: <20250711165541.586f51e8@kernel.org>
+In-Reply-To: <20250710062248.378459-2-maxime.chevallier@bootlin.com>
+References: <20250710062248.378459-1-maxime.chevallier@bootlin.com>
+	<20250710062248.378459-2-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] selftests: flip local/remote endpoints in
- iou-zcrx.py
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175227780944.2437895.17726322216596872901.git-patchwork-notify@kernel.org>
-Date: Fri, 11 Jul 2025 23:50:09 +0000
-References: <20250710165337.614159-1-vishs@meta.com>
-In-Reply-To: <20250710165337.614159-1-vishs@meta.com>
-To: Vishwanath Seshagiri <vishs@meta.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, dw@davidwei.uk, jdamato@fastly.com,
- horms@kernel.org, netdev@vger.kernel.org, vishs@fb.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 10 Jul 2025 08:22:45 +0200 Maxime Chevallier wrote:
+> @@ -1098,6 +1101,10 @@ static int __init nsim_module_init(void)
+>  {
+>  	int err;
+>  
+> +	err = nsim_phy_drv_register();
+> +	if (err)
+> +		return err;
+> +
+>  	err = nsim_dev_init();
+>  	if (err)
+>  		return err;
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+I think you're missing error handling in this function if something
+after drv_register fails.
 
-On Thu, 10 Jul 2025 09:53:37 -0700 you wrote:
-> From: Vishwanath Seshagiri <vishs@fb.com>
-> 
-> The iou-zcrx selftest currently runs the server on the remote host
-> and the client on the local host. This commit flips the endpoints
-> such that server runs on localhost and client on remote.
-> This change brings the iou-zcrx selftest in convention with other
-> selftests.
-> 
-> [...]
+> @@ -1124,6 +1131,7 @@ static void __exit nsim_module_exit(void)
+>  	rtnl_link_unregister(&nsim_link_ops);
+>  	nsim_bus_exit();
+>  	nsim_dev_exit();
+> +	nsim_phy_drv_unregister();
+>  }
 
-Here is the summary with links:
-  - [net-next,v2] selftests: flip local/remote endpoints in iou-zcrx.py
-    https://git.kernel.org/netdev/net-next/c/650fe2a9dd29
+> +free_mdiobus:
+> +	atomic_dec(&bus_num);
+> +	mdiobus_free(mb->mii);
+> +free_pdev:
+> +	platform_device_unregister(mb->pdev);
+> +free_mb:
 
-You are awesome, thank you!
+Others have added netdevsim code so the entire code base doesn't follow
+what I'm about to say, but if you dont mind indulging my personal coding
+style - error handling labels on a path disjoint from the success path
+should be prefixed with err_$first-undo-action. If the error handling
+shares the path with success the label prefix should be exit_$..
+You can look at drivers/net/netdevsim/bpf.c for examples
+
+> +	kfree(mb);
+> +
+> +	return NULL;
+> +}
+> +
+> +static ssize_t
+> +nsim_phy_add_write(struct file *file, const char __user *data,
+> +		   size_t count, loff_t *ppos)
+> +{
+> +	struct net_device *dev = file->private_data;
+> +	struct netdevsim *ns = netdev_priv(dev);
+> +	struct nsim_phy_device *ns_phy;
+> +	struct phy_device *pphy;
+> +	u32 parent_id;
+> +	char buf[10];
+> +	ssize_t ret;
+> +	int err;
+> +
+> +	if (*ppos != 0)
+> +		return 0;
+> +
+> +	if (count >= sizeof(buf))
+> +		return -ENOSPC;
+> +
+> +	ret = copy_from_user(buf, data, count);
+> +	if (ret)
+> +		return -EFAULT;
+> +	buf[count] = '\0';
+> +
+> +	ret = kstrtouint(buf, 10, &parent_id);
+> +	if (ret)
+> +		return -EINVAL;
+> +
+> +	ns_phy = nsim_phy_register();
+> +	if (IS_ERR(ns_phy))
+> +		return PTR_ERR(ns_phy);
+> +
+> +	if (!parent_id) {
+> +		if (!dev->phydev) {
+> +			err = phy_connect_direct(dev, ns_phy->phy, nsim_adjust_link,
+> +						 PHY_INTERFACE_MODE_NA);
+> +			if (err)
+> +				return err;
+> +
+> +			phy_attached_info(ns_phy->phy);
+> +
+> +			phy_start(ns_phy->phy);
+> +		} else {
+> +			phy_link_topo_add_phy(dev, ns_phy->phy, PHY_UPSTREAM_MAC, dev);
+> +		}
+> +	} else {
+> +		pphy = phy_link_topo_get_phy(dev, parent_id);
+> +		if (!pphy)
+> +			return -EINVAL;
+> +
+> +		phy_link_topo_add_phy(dev, ns_phy->phy, PHY_UPSTREAM_PHY, pphy);
+> +	}
+> +
+> +	nsim_phy_debugfs_create(ns->nsim_dev_port, ns_phy);
+> +
+> +	list_add(&ns_phy->node, &ns->nsim_dev->phy_list);
+
+No locks needed.. for any of this.. ?
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
