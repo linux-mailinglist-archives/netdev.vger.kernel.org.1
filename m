@@ -1,156 +1,450 @@
-Return-Path: <netdev+bounces-206196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FD69B0206B
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 17:29:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E579B0207E
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 17:34:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F06EB5478B9
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 15:28:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A66007B6CEA
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 15:32:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56EC82EAB91;
-	Fri, 11 Jul 2025 15:28:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DD292ED165;
+	Fri, 11 Jul 2025 15:34:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nVzhfgOG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 982042EAB75
-	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 15:28:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752247717; cv=none; b=tTCcWAX7sWNpzm/0rNZ0zW1NNNYMwwif4kwrIhHi0jDO8eRF69LMtped1Y0wGechKDLwpUqoUPyoTlI701wFg6Jcjrb5ZB+1KVur1pKh5qoyUkX8hGu7u637zNgcKtTbit3KN/eMSKgno3dlJQO3prksSxWNV6HcwfDDMMx/9Zg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752247717; c=relaxed/simple;
-	bh=R8bzj8BnA7xeu1Ejvt/BsrBAhec9/uuK7hWClDnpXTk=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=fHhUfCYuV4Dgswrwu/a0GOiMTrLs20nGoyZAXh3XzCOhtDVAxPlT4lE4ZrOkt0EZMTyMzrz/2LTgULAkZDcUaPDi8JBkRO3+X6MiASEDuqoabUSTsUGN0cVw4OsxKWRFmfXyZlA6SaL7EYflHZOMINu+HvXsXLbxdmbfJA9SqBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-86d07ccc9ecso170433839f.0
-        for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 08:28:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752247715; x=1752852515;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qUNjYbfnIGUDJ+fH4l34rKGE25OHoqzo1g6K2n9c1ag=;
-        b=GaKz8Bqe0QFObwc0f/Yvv8aQjhw/qb6MFx/EJIteoi3PIPR4f99ovjlkOJ1iv/+xp9
-         pi2QWSuHEGSJKmh74QrtvtFmxmvkyuhbD+rFNMK4BWnsH0uWIqa/ARuJ0TxiPzurp2em
-         a2sBdm7LtBZjHuMUhNkzVXorJ/TO+z/JUz1kSwrUw3VGoUeG1Yxge4HCff5fmcaznH7L
-         Vd4Ti9jmcADGiUC0gDizztJ5SF+6JU8CW7QzNRBAzen+GFvgjZbLx1SXDk5MIW5PoWgy
-         jA9gUwkF/qRks4rq1paX9JIFoLyUNdOgBQhBuH7nsEpoyNImrXpPrCuW0XEN7SC/0bj3
-         ktvg==
-X-Forwarded-Encrypted: i=1; AJvYcCWRk62vXX0njMDlC2P01ve+3Aohpu8VDQE3+kDPpkLr2rHokfPHGZQT10cXqkadNvfsTCnLafU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy3sMKEDamfq7LV83dhRUOaryUDiMMDxXI7i447WJ74QGBONMCG
-	D5WsnT5cM2y7MtJ4KX8OcgKChkAzl5JUtPsfdAgtxt8SO/3xH6PaJKusjaxbW+4DNt69CKXATdC
-	6XBR3DlLW/v66HV53DPT47agNqUQzlo34BhqzbOdxJNlx0cIi9kN2h3ywctE=
-X-Google-Smtp-Source: AGHT+IGYZn4X48OCo8kCHHADiKQ5Dln3PDwFXiplHCO//8GCHwE1OHJRDwnBPZ6U8h8w0sqyFj7hWoJrDVyjppe8t0yks4IxL3sv
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5B52EA482
+	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 15:34:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752248051; cv=fail; b=JTVVpOhMJpF9xqsoNliBu+OwfQLfouYFTs2XZabmfWAqfSwiqgDHik/ugoqJlbMpv4rVh3IFP9OtcOJLNPyR5E4c5nlU8ZSBf08xif3yeso2ViVa12uaQS5HdL85TW+LqsHJ4IzgLsf3gBRSyKfLlbCJJ5e41EnUuf2FD/EIbYk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752248051; c=relaxed/simple;
+	bh=5P3t3kaNg6DgNLSowQMX7aGfHXwKtb+x/3QRqRWiq/s=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=CjKvR7Br+INPTnQbXXADRk24MU21x54HuTuXhAEtTShlB3CKLnXo8spsNpzT0J9b3SuFQUxUpxXrNFdHfpRnRwoqdlodx5cTWp4DPiOXi1VvAJpqymy5WAGIQPXLekPiJm9MW9AJsrRsngOUHkifjAXIeF+zRaF0Phm6HUZ4xn8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nVzhfgOG; arc=fail smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752248050; x=1783784050;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=5P3t3kaNg6DgNLSowQMX7aGfHXwKtb+x/3QRqRWiq/s=;
+  b=nVzhfgOGpYPetOUMtioZSablVrtl2ZhU2kGICRW8AsTBnnbUZEm4JStD
+   0umJZ+2GRXIr6Gx1N8dKXlldFieSnMydHjHEJCzfMzBRlz8rgacjG6L0P
+   ZGG923QIALXG0fLwB7eF/rz8oTEd5n/FBEDwDI7OVbXPWZ+BziUt5ro8Y
+   E99RuRtVoCMWQeq6fYyQwCKKq2MmF1BLlC8t9TuVKFC3ykVPk/dAbBXIt
+   gjv5G7fcBT6hlo5EASStSM//pHVlMz5yfz0lzV8MYTbTqnUrzgZzx5ZL8
+   TOGnhimMsvx8HDM6o9Y0iRj+2QSd+5Cly9vUIBSLl4bxX8ulces5gcttj
+   A==;
+X-CSE-ConnectionGUID: SXeztcKzTzuXBrf/rlIOqw==
+X-CSE-MsgGUID: 0i81uzLhR022lOZT/jpXJg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="54679588"
+X-IronPort-AV: E=Sophos;i="6.16,304,1744095600"; 
+   d="scan'208";a="54679588"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2025 08:34:09 -0700
+X-CSE-ConnectionGUID: Yko3q0R5R0q6ZhKYgeeVQQ==
+X-CSE-MsgGUID: s9Ejs0NIQS6D2JjKUe6U/w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,304,1744095600"; 
+   d="scan'208";a="162078748"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2025 08:34:08 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Fri, 11 Jul 2025 08:34:07 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Fri, 11 Jul 2025 08:34:07 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (40.107.220.65)
+ by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Fri, 11 Jul 2025 08:34:06 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=asJp5/zc/NcVE/O2WzO4/KQ/URpLF2CXRYZiJDOMyAohWT14Qn85N5l9HLtOyWIIbW3OXdR7PRRiKSm0Pzt61WWftZyqD9IFW/x276Jigjg9RuON4QpkJtoWTw862rNsANUB3UL3A78jnPSbDVnAViUp8liy/BixJ4hx0jlHQxTZ93DdpVhybodYUO1BguRdUIvuSpsu6+8n0HUrLbfzIjk2aOvRtupXLqY0HK4misU6zBjbmMHoM3Lis7MbxRuRlj1yO7h5UEfAuyHfW7eFDOz58+o3kn8Il8HReelDQurdpoeFAf7DmH/OlaDwqgCHG1aH/ZKMwe0siaMC8gPZXw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0xINCJ5soLZiAJooFK5Ci89z3wrIyXS/3XAMBl8veKk=;
+ b=DM6RiRjVd7LOsyXbnTOqLxCuisI5o7GChzrFVbTybLADtYvjXtZ8yy0nK1cllZWUl3WPzpPSuAO2RkaC2XBRa6fvhFTXLBWB/SXkVW7ix3SxFKMw/v0v0hablEYwpD8s55FN9koxIlJfuho6GnUtamFxi6f9UBnfZbJY2VP318YgL0CEkSifxjxXUfv41DXfTZ0SlYLSHGjj2iMCI7TktFchU9Xtm06wO2V8nrkb7F4b42Cz9mNRLiHDMwCvh8hSsMwtA9/jcvpVH1v6n2PXos/jL9O7bM/dne/nkXWX5cTUlIlDcZf9eBxKkenEERdFGcnc+WMzMhfWqxKRe3gxvQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ CH3PR11MB7390.namprd11.prod.outlook.com (2603:10b6:610:14e::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.26; Fri, 11 Jul
+ 2025 15:33:24 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca%7]) with mapi id 15.20.8901.024; Fri, 11 Jul 2025
+ 15:33:24 +0000
+Date: Fri, 11 Jul 2025 17:33:12 +0200
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+CC: Intel Wired LAN <intel-wired-lan@lists.osuosl.org>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, Alexander Lobakin
+	<aleksander.lobakin@intel.com>, Joe Damato <jdamato@fastly.com>, "Anthony
+ Nguyen" <anthony.l.nguyen@intel.com>, <netdev@vger.kernel.org>, "Christoph
+ Petrausch" <christoph.petrausch@deepl.com>, Jaroslav Pulchart
+	<jaroslav.pulchart@gooddata.com>
+Subject: Re: [PATCH iwl-net] ice: fix Rx page leak on multi-buffer frames
+Message-ID: <aHEuuFK+XktcEPzc@boxer>
+References: <20250709-jk-ice-fix-rx-mem-leak-v1-1-cfdd7eeea905@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250709-jk-ice-fix-rx-mem-leak-v1-1-cfdd7eeea905@intel.com>
+X-ClientProxiedBy: DUZPR01CA0172.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:4b3::29) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:1589:b0:86d:60:702f with SMTP id
- ca18e2360f4ac-87977e8b783mr477224139f.0.1752247714648; Fri, 11 Jul 2025
- 08:28:34 -0700 (PDT)
-Date: Fri, 11 Jul 2025 08:28:34 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68712da2.a00a0220.26a83e.0052.GAE@google.com>
-Subject: [syzbot] [hams?] WARNING: refcount bug in ax25_setsockopt
-From: syzbot <syzbot+0ee4da32f91ae2a3f015@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	jreuter@yaina.de, kuba@kernel.org, linux-hams@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|CH3PR11MB7390:EE_
+X-MS-Office365-Filtering-Correlation-Id: 49c9b1c7-1b00-4d8d-1f0f-08ddc0904600
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?Kuef2JdNyE1KCevXuYvxO28wdE5itPlp1F52NfKzhbYAfaO7wewkV3y4NFkI?=
+ =?us-ascii?Q?N0k4whmQss8gJipqF15DtUxn8zcHJOS7Hq3r8/sBD5yflP7xiotBbn/UJhSG?=
+ =?us-ascii?Q?MfLxpMVBt8df10uauzFBocHlWFo615gtFc5WeWrgzEw+jJdZu3GQqU0XdaQe?=
+ =?us-ascii?Q?rqUr2QyJD4omK4bybc6Dwp6NqLiJHFIATzy+JHWn86kk49LOHr3HhuCBIzK1?=
+ =?us-ascii?Q?XGfwLrJnnmXCrX803sT0N7A48zQpwrvfY7j9EhiFpXH+BOmUeuQVn+/GHh+Q?=
+ =?us-ascii?Q?5bbU0mkk9v+UESsxp5T0tyamZW2JkyUFPjF6L/qxvpMcXVcMt/nijSsxmSK2?=
+ =?us-ascii?Q?n9yiBPIK8h/SE6yzSOdys0hog8MotYdI7fCCMSX8/jagsACKyRE9X2WYvvZh?=
+ =?us-ascii?Q?GmIBD44FGlqvYZByLXSWEuN+NyVHi4l8qxAH9t6M3EmMMtK3N0cWCjAfo6UU?=
+ =?us-ascii?Q?FGlJTTDCqTMWF1G5f/s451dn4QWXHFh/NKFE5AoygJC4VB/u34Hka9aBjo+T?=
+ =?us-ascii?Q?DM+JXM6WascEiunyAHNONjQ6+3d4bL8IOdTbC/NKnYFgU2NxOm8Ldjj3DRWy?=
+ =?us-ascii?Q?hEeytFPbpaTs8lzRUIivnPcPoNuA+phn2cDRmxdqWD8a/C1sFn2ggDug1Uqx?=
+ =?us-ascii?Q?iosbLG/cdYiTXS6UXjqf7IV6bheckwqxg199rVsRqpF8sUzatuV7lHGOTW1A?=
+ =?us-ascii?Q?xsJMrlc71Xd+9QXBSRSKHslngVq17FC7ziEyfW8s04ZV7UGEedf5AH5L/QO4?=
+ =?us-ascii?Q?T+x+h4emJ028QMD0bYNVstsUt0reK4lD+Mv4XsqZiBhOII+WJE2nUNN7GA+T?=
+ =?us-ascii?Q?svg641N8P1kgsWKC7CNuYnzXC4a00pFHtQsavGA+te1NZsL4bgdtt1RGQNt/?=
+ =?us-ascii?Q?mkXWPJc17NDGootdTgy9gKwTmKU9AuObJcI4hS+2cVGNeySCg3O9SFkBOwoz?=
+ =?us-ascii?Q?FObNErlzLS3nIduujrn0+SZkvm9vSDzB1BPynwhI7dCt53Nc8mQTt76GNLWo?=
+ =?us-ascii?Q?NN4EzPCuQ+QILDEDOn0pj30NPxBzcbJ8oBDMN2KN7ssrpDYnecCrJoaxZL6b?=
+ =?us-ascii?Q?zz5Riv9Zo+b1r4tXkHQStMGHvgy2BB9zVmyNRtO9QWaQbQkEZKmTyieoXm+K?=
+ =?us-ascii?Q?6rw61exVDDwtg+GzkUJOJz+9WNGiovNKYariqXyKc0l7fWuToarTb48Fo1eV?=
+ =?us-ascii?Q?+JWZ9UQKbGpa7sWKaIFTe9o1lu2vM1d9RaO89ZV4B0B5NcQuZLU9Mpd4BW5v?=
+ =?us-ascii?Q?nQLCKnFaobvis8p53UasRdmdvMc8QPb39iG6bPCOMo2j21tThWXBaSbUeppR?=
+ =?us-ascii?Q?6Qib5xewz/z81b675L+pYKivtqzHtqc1W0iEntykeg7Qgl9upbfV5Uw4HFxY?=
+ =?us-ascii?Q?P45UGUk8OMu/mBc47VWyn3TCwUIbGX+kQPanQ3fGrHmMoQ0VsKPcYi0nWB/n?=
+ =?us-ascii?Q?7ruC6zigCMI=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?gLR9CCuhPrVpgWd/li6/f7JCIvXDYHYPhZYH0tCfLiVF/u6g8TVLJFdY+lc8?=
+ =?us-ascii?Q?SLmABSnc03ESsezgMWhbhbG3lVBghbr/PdlpWvaFfwQ7wHF6MJj3oJnqrc86?=
+ =?us-ascii?Q?uWNitYbjtvAiwS+/aLazPLKemozJWk9njL9Tb8WzftGLeVYWpS5EuNe2ksqC?=
+ =?us-ascii?Q?TZuIt7bHedT5/8ryQvZISB4AhouSczzc4MFtk4+PNQBx/rujEH5CzPcKiZB5?=
+ =?us-ascii?Q?y5jrq9foCnO9PxNcFDvprlr2UJirHhVxwhnJyk9yWJRtgVlMaKhyHzrI7uxh?=
+ =?us-ascii?Q?VjnihsBYPvcqept42dYUSUvjWNUg7UM2x6HuW8VMkd4POCyDy42/CMzz0fxZ?=
+ =?us-ascii?Q?l59TYmkWGOT3i8c/HhBGnOat14J18qbJwmY7v1n1F/R4fxy0hlwq3C0KQgii?=
+ =?us-ascii?Q?sldoQ2+z1Jtkjt8UjDGF2Gns3ggrkTjYp/ijVFK3TiXk6KZE9urUSG37quFQ?=
+ =?us-ascii?Q?4C+bI/DIwsvlKFrWoWzCAEu+1QXJV0QHhFmNnpjTVDE9iKW0n31TdtOm2J6V?=
+ =?us-ascii?Q?4XUbXzLygI5VCwyKASrlZmzK8NhLlv2/rBe7xvRKt+GcOK5oWx18ztjyraYI?=
+ =?us-ascii?Q?643oSQPydJ5uGyb7kEHuAdaRlhZZgDNDHDl7DOL8aQg5UhNzSwgVR3pGWU3g?=
+ =?us-ascii?Q?Nz9Qic59RVhH2msM+wzuXqDF2UXxJFDvlZd7LOICf9Yr/OhCiYgsGukWBRW4?=
+ =?us-ascii?Q?+LhqjKqQGfzD+a8tfqNL6lVX6Z612kOGqxJCzj/Umh41Nr+Be5byaw2BxC++?=
+ =?us-ascii?Q?o2cq3lMSI6j9N6H08uv9Vxta1OGUq9A69mIj78gxJRBsDr7Syp6fad3AMdX+?=
+ =?us-ascii?Q?3iITT83p7xxryvs1gLooyYn1PquZgGEOWG0OEFBPppxts3It/bLgRhh4vpWK?=
+ =?us-ascii?Q?W0BZEEzgd2qT0DjOn8DFLd9F9DFYHh1UuHS1alvdyGoo6aEKCO7R5T52+Mb4?=
+ =?us-ascii?Q?+gVdbxw7YYBOZXOixQF1bgXACO1diHLfA259KzRPTug5Mf0w1flIH2eYH8hJ?=
+ =?us-ascii?Q?3nKUTMbx5MkP6yDn/uCJxL5J6PeWF88yd2ZkhqXRSqaEc98LPMnfdNd9AsFK?=
+ =?us-ascii?Q?9SkQUpGXhiDh8k1bHYl7K2U5uHnZnd+Dvff5dJNyIBxTy6EgzhAHa6UFyxbY?=
+ =?us-ascii?Q?/7W9v8yIo5P8GNKd5DVNTyp8Ghzh8t0GokKiV8/nSzlumXjpmI7yOhsGYFLD?=
+ =?us-ascii?Q?IQSVvdCMkdateprsNvGv57OCHq8d40txcdoIPF92OC53CzeeKp8Gn4j+viGc?=
+ =?us-ascii?Q?fIqw6Hl2rX33lQ9nblHcYHALyIWarA/ndTrhrq++9B7WoL93/ahO9+3Ydro+?=
+ =?us-ascii?Q?UgbllZ3XTzZCfHxHI7uWMa6PIo71TmZS0Ad+rJH+9DG7mvCyZQixIpG69Dhy?=
+ =?us-ascii?Q?WdAxVBsy5zI0/B83eSlguNLGeKkDXO4HRAGbJ9RttCr26n7/RkozKLJEpJ/n?=
+ =?us-ascii?Q?N9bbwPR0YqMp2QzbudeWmE6x/CkYLCQtJ4sGpShKiz9fOcvUC1k6yphIBPpx?=
+ =?us-ascii?Q?IXR3W6FnlOSWKP7Iwi5D/LBC7ZrOQNFjHzsgoZAUKrhgMXBZ5pFRclr6ZA2J?=
+ =?us-ascii?Q?erjfPuKBHYFGw3D091e340VnawAnxbt3gwtfGFcrDRwiUS3ZPjnrCsGlg+0P?=
+ =?us-ascii?Q?Vg=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 49c9b1c7-1b00-4d8d-1f0f-08ddc0904600
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2025 15:33:24.1837
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: RlFJq09vEf07omCTXgiFEcxY76YlZB+YmRCYCxsVH0116PSzzR/B20BNNyKNs3bi2a406UH1O1a7oizg/dssv2rXjS9fpxE89xOC9seIcz0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7390
+X-OriginatorOrg: intel.com
 
-Hello,
+On Wed, Jul 09, 2025 at 12:07:30PM -0700, Jacob Keller wrote:
+> The ice_put_rx_mbuf() function handles calling ice_put_rx_buf() for each
+> buffer in the current frame. This function was introduced as part of
+> handling multi-buffer XDP support in the ice driver.
+> 
+> It works by iterating over the buffers from first_desc up to 1 plus the
+> total number of fragments in the frame, cached from before the XDP program
+> was executed.
+> 
+> If the hardware posts a descriptor with a size of 0, the logic used in
+> ice_put_rx_mbuf() breaks. Such descriptors get skipped and don't get added
+> as fragments in ice_add_xdp_frag. Since the buffer isn't counted as a
+> fragment, we do not iterate over it in ice_put_rx_mbuf(), and thus we don't
+> call ice_put_rx_buf().
+> 
+> Because we don't call ice_put_rx_buf(), we don't attempt to re-use the
+> page or free it. This leaves a stale page in the ring, as we don't
+> increment next_to_alloc.
+> 
+> The ice_reuse_rx_page() assumes that the next_to_alloc has been incremented
+> properly, and that it always points to a buffer with a NULL page. Since
+> this function doesn't check, it will happily recycle a page over the top
+> of the next_to_alloc buffer, losing track of the old page.
+> 
+> Note that this leak only occurs for multi-buffer frames. The
+> ice_put_rx_mbuf() function always handles at least one buffer, so a
+> single-buffer frame will always get handled correctly. It is not clear
+> precisely why the hardware hands us descriptors with a size of 0 sometimes,
+> but it happens somewhat regularly with "jumbo frames" used by 9K MTU.
+> 
+> To fix ice_put_rx_mbuf(), we need to make sure to call ice_put_rx_buf() on
+> all buffers between first_desc and next_to_clean. Borrow the logic of a
+> similar function in i40e used for this same purpose. Use the same logic
+> also in ice_get_pgcnts().
+> 
+> Instead of iterating over just the number of fragments, use a loop which
+> iterates until the current index reaches to the next_to_clean element just
+> past the current frame. Check the current number of fragments (post XDP
+> program). For all buffers up 1 more than the number of fragments, we'll
+> update the pagecnt_bias. For any buffers past this, pagecnt_bias is left
+> as-is. This ensures that fragments released by the XDP program, as well as
+> any buffers with zero-size won't have their pagecnt_bias updated
+> incorrectly. Unlike i40e, the ice_put_rx_mbuf() function does call
+> ice_put_rx_buf() on the last buffer of the frame indicating end of packet.
+> 
+> Move the increment of the ntc local variable to ensure its updated *before*
+> all calls to ice_get_pgcnts() or ice_put_rx_mbuf(), as the loop logic
+> requires the index of the element just after the current frame.
+> 
+> This has the advantage that we also no longer need to track or cache the
+> number of fragments in the rx_ring, which saves a few bytes in the ring.
+> 
+> Cc: Christoph Petrausch <christoph.petrausch@deepl.com>
+> Reported-by: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+> Closes: https://lore.kernel.org/netdev/CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com/
+> Fixes: 743bbd93cf29 ("ice: put Rx buffers after being done with current frame")
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> ---
+> I've tested this in a setup with MTU 9000, using a combination of iperf3
+> and wrk generated traffic.
+> 
+> I tested this in a couple of ways. First, I check memory allocations using
+> /proc/allocinfo:
+> 
+>   awk '/ice_alloc_mapped_page/ { printf("%s %s\n", $1, $2) }' /proc/allocinfo | numfmt --to=iec
+> 
+> Second, I ported some stats from i40e written by Joe Damato to track the
+> page allocation and busy counts. I consistently saw that the allocate stat
+> increased without the busy or waive stats increasing. I also added a stat
+> to track directly when we overwrote a page pointer that was non-NULL in
+> ice_reuse_rx_page(), and saw it increment consistently.
+> 
+> With this fix, all of these indicators are fixed. I've tested both 1500
+> byte and 9000 byte MTU and no longer see the leak. With the counters I was
+> able to immediately see a leak within a few minutes of iperf3, so I am
+> confident that I've resolved the leak with this fix.
+> ---
+>  drivers/net/ethernet/intel/ice/ice_txrx.h |  1 -
+>  drivers/net/ethernet/intel/ice/ice_txrx.c | 71 ++++++++++++-------------------
+>  2 files changed, 28 insertions(+), 44 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
+> index a4b1e9514632..07155e615f75 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_txrx.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
+> @@ -358,7 +358,6 @@ struct ice_rx_ring {
+>  	struct ice_tx_ring *xdp_ring;
+>  	struct ice_rx_ring *next;	/* pointer to next ring in q_vector */
+>  	struct xsk_buff_pool *xsk_pool;
+> -	u32 nr_frags;
+>  	u16 max_frame;
+>  	u16 rx_buf_len;
+>  	dma_addr_t dma;			/* physical address of ring */
+> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+> index 0e5107fe62ad..b139066b6f0d 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_txrx.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+> @@ -865,10 +865,6 @@ ice_add_xdp_frag(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
+>  	__skb_fill_page_desc_noacc(sinfo, sinfo->nr_frags++, rx_buf->page,
+>  				   rx_buf->page_offset, size);
+>  	sinfo->xdp_frags_size += size;
+> -	/* remember frag count before XDP prog execution; bpf_xdp_adjust_tail()
+> -	 * can pop off frags but driver has to handle it on its own
+> -	 */
+> -	rx_ring->nr_frags = sinfo->nr_frags;
+>  
+>  	if (page_is_pfmemalloc(rx_buf->page))
+>  		xdp_buff_set_frag_pfmemalloc(xdp);
+> @@ -939,20 +935,20 @@ ice_get_rx_buf(struct ice_rx_ring *rx_ring, const unsigned int size,
+>  /**
+>   * ice_get_pgcnts - grab page_count() for gathered fragments
+>   * @rx_ring: Rx descriptor ring to store the page counts on
+> + * @ntc: the next to clean element (not included in this frame!)
+>   *
+>   * This function is intended to be called right before running XDP
+>   * program so that the page recycling mechanism will be able to take
+>   * a correct decision regarding underlying pages; this is done in such
+>   * way as XDP program can change the refcount of page
+>   */
+> -static void ice_get_pgcnts(struct ice_rx_ring *rx_ring)
+> +static void ice_get_pgcnts(struct ice_rx_ring *rx_ring, unsigned int ntc)
+>  {
+> -	u32 nr_frags = rx_ring->nr_frags + 1;
+>  	u32 idx = rx_ring->first_desc;
+>  	struct ice_rx_buf *rx_buf;
+>  	u32 cnt = rx_ring->count;
+>  
+> -	for (int i = 0; i < nr_frags; i++) {
+> +	while (idx != ntc) {
+>  		rx_buf = &rx_ring->rx_buf[idx];
+>  		rx_buf->pgcnt = page_count(rx_buf->page);
+>  
+> @@ -1125,62 +1121,49 @@ ice_put_rx_buf(struct ice_rx_ring *rx_ring, struct ice_rx_buf *rx_buf)
+>  }
+>  
+>  /**
+> - * ice_put_rx_mbuf - ice_put_rx_buf() caller, for all frame frags
+> + * ice_put_rx_mbuf - ice_put_rx_buf() caller, for all buffers in frame
+>   * @rx_ring: Rx ring with all the auxiliary data
+>   * @xdp: XDP buffer carrying linear + frags part
+>   * @xdp_xmit: XDP_TX/XDP_REDIRECT verdict storage
+> - * @ntc: a current next_to_clean value to be stored at rx_ring
+> + * @ntc: the next to clean element (not included in this frame!)
+>   * @verdict: return code from XDP program execution
+>   *
+> - * Walk through gathered fragments and satisfy internal page
+> - * recycle mechanism; we take here an action related to verdict
+> - * returned by XDP program;
+> + * Called after XDP program is completed, or on error with verdict set to
+> + * ICE_XDP_CONSUMED.
+> + *
+> + * Walk through buffers from first_desc to the end of the frame, releasing
+> + * buffers and satisfying internal page recycle mechanism. The action depends
+> + * on verdict from XDP program.
+>   */
+>  static void ice_put_rx_mbuf(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
+>  			    u32 *xdp_xmit, u32 ntc, u32 verdict)
+>  {
+> -	u32 nr_frags = rx_ring->nr_frags + 1;
+> +	u32 nr_frags = xdp_get_shared_info_from_buff(xdp)->nr_frags;
+>  	u32 idx = rx_ring->first_desc;
+>  	u32 cnt = rx_ring->count;
+> -	u32 post_xdp_frags = 1;
+>  	struct ice_rx_buf *buf;
+> -	int i;
+> +	int i = 0;
+>  
+> -	if (unlikely(xdp_buff_has_frags(xdp)))
+> -		post_xdp_frags += xdp_get_shared_info_from_buff(xdp)->nr_frags;
+> -
+> -	for (i = 0; i < post_xdp_frags; i++) {
+> +	while (idx != ntc) {
+>  		buf = &rx_ring->rx_buf[idx];
+> +		if (++idx == cnt)
+> +			idx = 0;
+>  
+> -		if (verdict & (ICE_XDP_TX | ICE_XDP_REDIR)) {
+> +		/* An XDP program could release fragments from the end of the
+> +		 * buffer. For these, we need to keep the pagecnt_bias as-is.
+> +		 * To do this, only adjust pagecnt_bias for fragments up to
+> +		 * the total remaining after the XDP program has run.
+> +		 */
+> +		if (verdict != ICE_XDP_CONSUMED)
+>  			ice_rx_buf_adjust_pg_offset(buf, xdp->frame_sz);
+> -			*xdp_xmit |= verdict;
 
-syzbot found the following issue on:
+Hi Jake,
 
-HEAD commit:    faeefc173be4 sock: Correct error checking condition for (a..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=157b9c04580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=eecd7902e39d7933
-dashboard link: https://syzkaller.appspot.com/bug?extid=0ee4da32f91ae2a3f015
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15875398580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=137b9c04580000
+you're likely breaking XDP_REDIRECT/XDP_TX workloads. I believe you need
+to give this patch a spin against xdp-bench and test all actions...
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/25a813551e04/disk-faeefc17.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/06484bfac01b/vmlinux-faeefc17.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/df48cbb45ee8/bzImage-faeefc17.xz
+anyways thanks for great analysis and bugfix!
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+0ee4da32f91ae2a3f015@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-refcount_t: addition on 0; use-after-free.
-WARNING: CPU: 1 PID: 6151 at lib/refcount.c:25 refcount_warn_saturate+0x13a/0x1d0 lib/refcount.c:25
-Modules linked in:
-CPU: 1 UID: 0 PID: 6151 Comm: syz-executor223 Not tainted 6.15.0-rc1-syzkaller-00209-gfaeefc173be4 #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-RIP: 0010:refcount_warn_saturate+0x13a/0x1d0 lib/refcount.c:25
-Code: 00 6b a1 8c e8 17 87 7d fc 90 0f 0b 90 90 eb b9 e8 0b 65 be fc c6 05 94 dc 44 0b 01 90 48 c7 c7 60 6b a1 8c e8 f7 86 7d fc 90 <0f> 0b 90 90 eb 99 e8 eb 64 be fc c6 05 75 dc 44 0b 01 90 48 c7 c7
-RSP: 0018:ffffc900046afc68 EFLAGS: 00010246
-RAX: 975256fdc5619000 RBX: ffff888034835ac8 RCX: ffff888078041e00
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: 0000000000000002 R08: ffffffff81828a12 R09: fffffbfff1d7a978
-R10: dffffc0000000000 R11: fffffbfff1d7a978 R12: 1ffff110069bac05
-R13: ffff888034835a00 R14: ffff888013018000 R15: ffff888034dd6028
-FS:  000055556b9c9380(0000) GS:ffff888125093000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffdd88feca8 CR3: 0000000029122000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ax25_setsockopt+0xbb7/0xf00 net/ax25/af_ax25.c:705
- do_sock_setsockopt+0x3b1/0x710 net/socket.c:2296
- __sys_setsockopt net/socket.c:2321 [inline]
- __do_sys_setsockopt net/socket.c:2327 [inline]
- __se_sys_setsockopt net/socket.c:2324 [inline]
- __x64_sys_setsockopt+0x1ee/0x280 net/socket.c:2324
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f59be6f7969
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 31 1a 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffdd88feda8 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
-RAX: ffffffffffffffda RBX: 0000200000000000 RCX: 00007f59be6f7969
-RDX: 0000000000000019 RSI: 0000000000000101 RDI: 0000000000000004
-RBP: 0000000000000000 R08: 0000000000000010 R09: 00007f59be745214
-R10: 0000200000000000 R11: 0000000000000246 R12: 00007ffdd88fedcc
-R13: 00007ffdd88fee00 R14: 00007ffdd88fede0 R15: 0000000000000036
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> -		} else if (verdict & ICE_XDP_CONSUMED) {
+> +		else if (i++ <= nr_frags)
+>  			buf->pagecnt_bias++;
+> -		} else if (verdict == ICE_XDP_PASS) {
+> -			ice_rx_buf_adjust_pg_offset(buf, xdp->frame_sz);
+> -		}
+>  
+>  		ice_put_rx_buf(rx_ring, buf);
+> -
+> -		if (++idx == cnt)
+> -			idx = 0;
+> -	}
+> -	/* handle buffers that represented frags released by XDP prog;
+> -	 * for these we keep pagecnt_bias as-is; refcount from struct page
+> -	 * has been decremented within XDP prog and we do not have to increase
+> -	 * the biased refcnt
+> -	 */
+> -	for (; i < nr_frags; i++) {
+> -		buf = &rx_ring->rx_buf[idx];
+> -		ice_put_rx_buf(rx_ring, buf);
+> -		if (++idx == cnt)
+> -			idx = 0;
+>  	}
+>  
+>  	xdp->data = NULL;
+>  	rx_ring->first_desc = ntc;
+> -	rx_ring->nr_frags = 0;
+>  }
+>  
+>  /**
+> @@ -1260,6 +1243,10 @@ int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
+>  		/* retrieve a buffer from the ring */
+>  		rx_buf = ice_get_rx_buf(rx_ring, size, ntc);
+>  
+> +		/* Increment ntc before calls to ice_put_rx_mbuf() */
+> +		if (++ntc == cnt)
+> +			ntc = 0;
+> +
+>  		if (!xdp->data) {
+>  			void *hard_start;
+>  
+> @@ -1271,14 +1258,12 @@ int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
+>  			ice_put_rx_mbuf(rx_ring, xdp, NULL, ntc, ICE_XDP_CONSUMED);
+>  			break;
+>  		}
+> -		if (++ntc == cnt)
+> -			ntc = 0;
+>  
+>  		/* skip if it is NOP desc */
+>  		if (ice_is_non_eop(rx_ring, rx_desc))
+>  			continue;
+>  
+> -		ice_get_pgcnts(rx_ring);
+> +		ice_get_pgcnts(rx_ring, ntc);
+>  		xdp_verdict = ice_run_xdp(rx_ring, xdp, xdp_prog, xdp_ring, rx_desc);
+>  		if (xdp_verdict == ICE_XDP_PASS)
+>  			goto construct_skb;
+> 
+> ---
+> base-commit: 31ec70afaaad11fb08970bd1b0dc9ebae3501e16
+> change-id: 20250708-jk-ice-fix-rx-mem-leak-3a328edc4797
+> 
+> Best regards,
+> --  
+> Jacob Keller <jacob.e.keller@intel.com>
+> 
 
