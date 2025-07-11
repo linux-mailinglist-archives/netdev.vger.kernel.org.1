@@ -1,201 +1,160 @@
-Return-Path: <netdev+bounces-206031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4416EB01139
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 04:31:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C233B0114F
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 04:39:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8055958459C
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 02:31:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51DE31C24C6F
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 02:39:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5530318A6B0;
-	Fri, 11 Jul 2025 02:31:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F7E18A93C;
+	Fri, 11 Jul 2025 02:39:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m+FwiDHL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jVEyvQwC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A943D157E6B;
-	Fri, 11 Jul 2025 02:31:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91F6A185955
+	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 02:39:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752201115; cv=none; b=PWTVU4sxvljjBlTghrVnY887z8V9P2S/2prHM8GfbJUbM56+y60Z6hNTaW63Dul7SPCaOqIj37ULwI8RC8+FuFdOcZwokIST9g7otu5kOQr05Wpewql1ZN6ds3ioRR26X1RP6cNRhnxnCaaZbGJ4XhKn+W10Shkat5XFE5uijOw=
+	t=1752201571; cv=none; b=n+psw6zZ9H2OTfi3QJo53FwFvWYVIb+00USzgfxubaN/+EsRIBc7irJoi9GHx4kHR9MfIvWGJIcZCcPZR284OG0zlaNzz6hxQQ7VtsENoLZDWsnph8kWpGSmR+qR0GubnpMiPLQ7zRLM4ML64jfKMZJKqn/kzpQ0sMJjZ3YKplg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752201115; c=relaxed/simple;
-	bh=qoMv3I/wvYY0fBc/km+29iL2QTJH+hPrK/s0FOHTlyY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P7kpSAjf9xartRi/f3Wa6Q7vFdzEYeUGgkceC9Ba478z54Axx7BU4N765snRYetYWKTAPmbwA16jzixd2dECKMCSIUjGynFC9697N8nd5seQYv0Mp5te2swJ/BfUyClHWm2t5hxRkZURS4hay/q2yG06CB/gntb046fuCp2EY3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m+FwiDHL; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6ecf99dd567so21694676d6.0;
-        Thu, 10 Jul 2025 19:31:53 -0700 (PDT)
+	s=arc-20240116; t=1752201571; c=relaxed/simple;
+	bh=KgGRC5RoNcM0kSr7oGDRJgAEFtUY3NCUMt+gWjWaNFY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=faOXnIJ7EtM1V3QGajbE6SxQgFabwxXPKwCREzIZUOwMxAE1ZjyBI9uyzJv9reMrFrmefqjXcy929eqSKsdMDL2FiZCCz1wGR30kgvlQFWiC+dCOSnBKYDAmFE8WXTjZnfKzwILiRLw8Y5jT+vu47ZUZQSj8DqoZGcQ4htWdguw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jVEyvQwC; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-b31c978688dso1037095a12.1
+        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 19:39:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752201112; x=1752805912; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1752201569; x=1752806369; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/hpxRkNYRuqENsjSxqDYk0zNqW0LZ1+U3jypHB6kGXw=;
-        b=m+FwiDHLtz1qpiz5cc0RCZn7ycKTgaN43ZeUm8f83i1tAaBCiXxu3NtoIkEa3SqQ30
-         goYyjqYjBAJXLiDsw1lKwv9LBvdHN65v9NmNwe6zsHtYAh6kFod+7rxcwYnljXXlZEn4
-         AGLIRbEHItvZj326l+XQN8Ids8RjpyuL+4r0jNeqsgeGx9wgj9c1SFpcDRlohbf8SzdH
-         Els+Kh/JoxOeMgch/nJngGVKFXcyQXWJOqMmgFX9oDjyIs6oREwEt2O8ZKIG+YtMWAN+
-         /dvrD4KRIZ394mPmcrWUp2XdDLbPDaXYFnLQ/hoYH+VuYRr4AlLRP9b+HkTBt1ykUYeK
-         LJyg==
+        bh=CZL5PFrII+eMnthqSWAjFrcUUl74o/UEzDavdEnu3s8=;
+        b=jVEyvQwC+l9VifjEU+ie7ZD9nehjh3C0OLG1LRp70okJls+khCBuokxmnPVJZAVSTP
+         ftMlYd8Kr6Bm0N6axH217PehsCnFAnGwdCY0RweM3tp9gAEfpN50XHkxlq5cdb2/oFmr
+         /5Z+0yBs2XZyLpm/OGu8FBhlQkJnmLzUsxznRSzWVY0VxF93Tl9NUsfJd8no3Z7yaWlS
+         KartHZ0mxdESI/GomAkA+eES+SVA9duaXdLxM5hfIUASdJr8i5KEbjz1UTbCYmaYGYDl
+         yhhAJJf/d0IK4l/HLswrGUZ1lyWSyn5pi44QO2JbyTNKTFK9uOYaUZPtM7qnTSf6+Mk8
+         yM6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752201112; x=1752805912;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1752201569; x=1752806369;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/hpxRkNYRuqENsjSxqDYk0zNqW0LZ1+U3jypHB6kGXw=;
-        b=vl68OylrkPLS2DIZyJ3aYj7BZCj+RDyqDrJsxykzXCyO1VtMKO4jglxfDt6L8eBQdM
-         3vrirbOUBJIO2mKq7DfHqT51RI2/be4zYWTEKTtJW6Mx367rfG7jpBZas1ST5DSWFn9h
-         NHMXF7SBDk1vvd3do80xs+UCmU+YDRlYnYZyHWhD4mRy381g0iqpMZ37fWsyH3ivHDo8
-         6veDUK0CvVasT6Tn3kPfbw0ksHiAY5YxLWCdegoacubyXsZ8L3Eu17TiVxs8t7/CsLTC
-         1TXIKbnjs9cdGH2cqDyLHDALgUzsRxK0trpKHJBzLCni0PMfpYKpTMextYrMaPkJVjH9
-         oRew==
-X-Forwarded-Encrypted: i=1; AJvYcCX0jnVE6b/9Fw+iKCjPSAbadqJUvrY4/unWs1hwpPy47xZfSoUya/o3ncPwRUcwMY738Mj9@vger.kernel.org, AJvYcCX8+DFCvWnR31r5q4xFUt9oI02Vum3avb1yuQhkfvS7Q52DTlMd42UwpRgnWGlkuMNeVycma4s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjOEJVCwKK78zoiM+5tAw5XHktnnKYjQaON7jTrWA7Fcrmyr5A
-	2xJz8fQ3pMW5ZBA87SC1ksePYXGa3ZWZZRySkk2xqdif+J1a+BeP6Drh
-X-Gm-Gg: ASbGncuUxmSHFzX5k1stuC3ypTBJCFrjNSAX9aKD9yYlHGI3zI+1d0nKIbCL4vPDtnP
-	3579dw6K7EILv1v/xBI90YdAJ3Ig20Xt0fU9/PnhD6r+byZZRQmg9AFtgwmn3qhCwEc/tDX1ky+
-	eyH4hCyN21/HQiZX91Y+LDX3/AoByjN/euw3gEFnGYJsBRawYLD2Q/5WeOK012vm7+++z29BWJ7
-	EX3OuZhmWYqoxeVOsioAabEmEvGjr6g9nUEhOjJnyd9i/sL+lZkTIZNDrO/XBOtQua942Y6Ckq3
-	v7d5f0hwkjVZn4eiK3LJpayKrqv/EsOt7INYr8gyBkOH+x33J2KDI8ElmocHTMpeJcIEgCLIds6
-	eSgkxFV6hBCDafhqZWlbWK8IZcgVZf1F7KhjYmq09PNVPbhqu9ROYYlX0I3jSeMpXA3YCaZohki
-	CvHcHD1c3aVeCj
-X-Google-Smtp-Source: AGHT+IE4R+kXFovwAQJmZ+v8jqidWY5K2h3e6hQAjYhhgIxztQTNavaWz/IaBUBUvPNaZ4bACtvsYA==
-X-Received: by 2002:a05:6214:da9:b0:6ff:1665:44ef with SMTP id 6a1803df08f44-704a4216423mr26754716d6.22.1752201112490;
-        Thu, 10 Jul 2025 19:31:52 -0700 (PDT)
-Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-704979e40b6sm15319656d6.46.2025.07.10.19.31.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Jul 2025 19:31:52 -0700 (PDT)
-Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 82CAAF40068;
-	Thu, 10 Jul 2025 22:31:51 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Thu, 10 Jul 2025 22:31:51 -0400
-X-ME-Sender: <xms:l3dwaDjCBzuIOtKkXwkkM9WAlS73Aq5nkFvKXN93XoYOd_TT0zh62g>
-    <xme:l3dwaLgIRA1-AMiQ0EzhaINKPj0JsaLuaCEgUuRY_GfugsSsDP579a3VQ4LZCRAaQ
-    y99gtIJlKhWZUNTWw>
-X-ME-Received: <xmr:l3dwaJG9HUf_YlBzMNT7McDBjDlJXoRHWb5JSBXPMHkttbPdWfzwumJTJg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdegvdduvdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpeeuohhquhhnucfh
-    vghnghcuoegsohhquhhnrdhfvghnghesghhmrghilhdrtghomheqnecuggftrfgrthhtvg
-    hrnhephfetvdfgtdeukedvkeeiteeiteejieehvdetheduudejvdektdekfeegvddvhedt
-    necuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtne
-    curfgrrhgrmhepmhgrihhlfhhrohhmpegsohhquhhnodhmvghsmhhtphgruhhthhhpvghr
-    shhonhgrlhhithihqdeiledvgeehtdeigedqudejjeekheehhedvqdgsohhquhhnrdhfvg
-    hngheppehgmhgrihhlrdgtohhmsehfihigmhgvrdhnrghmvgdpnhgspghrtghpthhtohep
-    vdeipdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehlvghithgrohesuggvsghirg
-    hnrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhn
-    vghlrdhorhhgpdhrtghpthhtoheprhgtuhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprh
-    gtphhtthhopehlkhhmmheslhhishhtshdrlhhinhhugidruggvvhdprhgtphhtthhopehp
-    vghtvghriiesihhnfhhrrgguvggrugdrohhrghdprhgtphhtthhopehmihhnghhosehkvg
-    hrnhgvlhdrohhrghdprhgtphhtthhopeifihhllheskhgvrhhnvghlrdhorhhgpdhrtghp
-    thhtoheplhhonhhgmhgrnhesrhgvughhrghtrdgtohhmpdhrtghpthhtohepuggrvhgvse
-    hsthhgohhlrggsshdrnhgvth
-X-ME-Proxy: <xmx:l3dwaODRLba5tSugkVy_SP5N2J9lXjZmT8GsRr6JY6JsnQms934OMw>
-    <xmx:l3dwaF_ia8kPFVbnpkmLR4iT8OTaym4i5NUU--E2eeO-jcBew5COPg>
-    <xmx:l3dwaBh4NeApwlomub9O-GiDghFI1ejzHhFcw_iXo7b9xP8SvotDxA>
-    <xmx:l3dwaOZKDnHFn1g8IKD4re89LI2ZFnt6ibBZvi-GRMte1sPEOTWeWA>
-    <xmx:l3dwaDTgLKUwWlkHjAJaVOemsmbbyA_i2h9K6eiqi-pfk682wMDdl4KD>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 10 Jul 2025 22:31:50 -0400 (EDT)
-Date: Thu, 10 Jul 2025 19:31:50 -0700
-From: Boqun Feng <boqun.feng@gmail.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: linux-kernel@vger.kernel.org, rcu@vger.kernel.org, lkmm@lists.linux.dev,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@kernel.org>, Will Deacon <will@kernel.org>,
-	Waiman Long <longman@redhat.com>,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
-	Joel Fernandes <joelagnelf@nvidia.com>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Zqiang <qiang.zhang@linux.dev>, aeh@meta.com,
-	netdev@vger.kernel.org, edumazet@google.com, jhs@mojatatu.com,
-	kernel-team@meta.com, Erik Lundgren <elundgren@meta.com>
-Subject: Re: [PATCH 8/8] locking/lockdep: Use shazptr to protect the key
- hashlist
-Message-ID: <aHB3lh4zkh8g5H1T@Mac.home>
-References: <20250625031101.12555-1-boqun.feng@gmail.com>
- <20250625031101.12555-9-boqun.feng@gmail.com>
- <i3mukc6vgwrp3cy5eis2inyms7f5b4a6pel4cvvdx6jlxrij2g@wgrnkstlifv3>
+        bh=CZL5PFrII+eMnthqSWAjFrcUUl74o/UEzDavdEnu3s8=;
+        b=TLx54u+DKGYdLQlGkVQjxKybZskNgtRHisI1z+dU1p/J1sfMoGKk8mJ0GXbAvWpUMG
+         8Tq6ro6pf6M3qkUU/ArzZBmeDtaHUDvybLIaVY0l6H5mQpjBgl2f0/lJyZrT0U28NiDg
+         OAhj/nTqBTS5Bjy+r6BdJ35TPSsz0oBdye+1bSuy5Y0xrrjmYTcCMUTEdsbnUO5ikcq7
+         ATApaabhFzTJoIAo803yKIiPepBdvbo3XJhOOAEf+0aCScve3ndGIgff39cm2+ShmD9h
+         jqwcDcudvOC55VhIYiCzkgvuDwzBeYJGMSyVCgUUC9usTHZHQFlXiNB4DfAdKuGNHP6Z
+         dzLg==
+X-Forwarded-Encrypted: i=1; AJvYcCVNMdzshIQ/pKoGJ/7fJrED3SoK2WeM6/NmoUAJLatpFJNTC/3X/pWed9eCWBjEHdEKmo/AKn8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjzRDRl9NgKKV62FSZzjh1IbHuV7WHL92AY+n+CAnYwEhRAk1+
+	ffByhnwszei40n84uMXCiugpVzQHiKPOCPYrPBVwXsXoir04acm8vKLqoOtuXEM8LQsIaJan7lg
+	Rv/8vFVD8qVm5EoQIO0w5vvz+7sT488wnpQmvByLN
+X-Gm-Gg: ASbGncvfzemFip8e+7O7W7Di5Muz9L4wx4Fu9Ndv/gkNB2fQGF6DTvhMUwg0x2oTzSG
+	P7/QGatPmU9ErfMj/kKU7c0zHXOwXvGeee84oNA50wMsMTWhsCMqWoL7p0wx8+mLDurJYHPAPMD
+	j/rYcgqK1cF9CCSkHMAa0qnIlTraFF9O4xr7QWg94Kg4V9ADjkA+TKCdB9C7KwPO2fEgm4IJqOl
+	HaDkJetuIt/v0w5cRXkRWFJ0/d68SfCsPYLkIrDCSt2W6IPUps=
+X-Google-Smtp-Source: AGHT+IEjAbHUx9oL5gKdiuOHQyBImqx/LHOoACB8q/e9Hx17czomqGQuOtyvho534tz+IEFlaq+AL00qAyHn52j688Y=
+X-Received: by 2002:a17:90a:d88f:b0:2fe:e9c6:689e with SMTP id
+ 98e67ed59e1d1-31c50d7b0e2mr835773a91.8.1752201568569; Thu, 10 Jul 2025
+ 19:39:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <i3mukc6vgwrp3cy5eis2inyms7f5b4a6pel4cvvdx6jlxrij2g@wgrnkstlifv3>
+References: <20250711001121.3649033-1-kuba@kernel.org>
+In-Reply-To: <20250711001121.3649033-1-kuba@kernel.org>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Thu, 10 Jul 2025 19:39:16 -0700
+X-Gm-Features: Ac12FXxiXJQ9-97tcaym3-Pb9NEG02NWjGIJXctEgilcbMyHy4GR3IUU-uki80Q
+Message-ID: <CAAVpQUBAC754ht-EJJpcBBf3HB3h_W500KFeUgtUPpm2AmmDkw@mail.gmail.com>
+Subject: Re: [PATCH net] netlink: make sure we allow at least one dump skb
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
+	Marek Szyprowski <m.szyprowski@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 10, 2025 at 07:06:09AM -0700, Breno Leitao wrote:
-> Hello Boqun,
-> 
-> On Tue, Jun 24, 2025 at 08:11:01PM -0700, Boqun Feng wrote:
-> > Erik Lundgren and Breno Leitao reported [1] a case where
-> > lockdep_unregister_key() can be called from time critical code pathes
-> > where rntl_lock() may be held. And the synchronize_rcu() in it can slow
-> > down operations such as using tc to replace a qdisc in a network device.
-> > 
-> > In fact the synchronize_rcu() in lockdep_unregister_key() is to wait for
-> > all is_dynamic_key() callers to finish so that removing a key from the
-> > key hashlist, and we can use shazptr to protect the hashlist as well.
-> > 
-> > Compared to the proposed solution which replaces synchronize_rcu() with
-> > synchronize_rcu_expedited(), using shazptr here can achieve the
-> > same/better synchronization time without the need to send IPI. Hence use
-> > shazptr here.
-> > 
-> > Reported-by: Erik Lundgren <elundgren@meta.com>
-> > Reported-by: Breno Leitao <leitao@debian.org>
-> > Link: https://lore.kernel.org/all/20250321-lockdep-v1-1-78b732d195fb@debian.org/ [1]
-> > Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
-> 
-> First of all, thanks for working to fix the origianl issue. I've been
-> able to test this in my host, and the gain is impressive.
-> 
-> Before:
-> 
->          # time /usr/sbin/tc qdisc replace dev eth0 root handle 0x1234: mq
->          real    0m13.195s
->          user    0m0.001s
->          sys     0m2.746s
-> 	
-> With your patch:
-> 
-> 	#  time /usr/sbin/tc qdisc replace dev eth0 root handle 0x1234: mq
-> 	real	0m0.135s
-> 	user	0m0.002s
-> 	sys	0m0.116s
-> 
-> 	#  time /usr/sbin/tc qdisc replace dev eth0 root handle 0x1: mq
-> 	real	0m0.127s
-> 	user	0m0.001s
-> 	sys	0m0.112s
-> 
-> Please add the following to the series:
-> 
-> Tested-by: Breno Leitao <leitao@debian.org>
+On Thu, Jul 10, 2025 at 5:11=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> Commit under Fixes tightened up the memory accounting for Netlink
+> sockets. Looks like the accounting is too strict for some existing
+> use cases, Marek reported issues with nl80211 / WiFi iw CLI.
+>
+> To reduce number of iterations Netlink dumps try to allocate
+> messages based on the size of the buffer passed to previous
+> recvmsg() calls. If user space uses a larger buffer in recvmsg()
+> than sk_rcvbuf we will allocate an skb we won't be able to queue.
+>
+> Make sure we always allow at least one skb to be queued.
+> Same workaround is already present in netlink_attachskb().
+> Alternative would be to cap the allocation size to
+>   rcvbuf - rmem_alloc
+> but as I said, the workaround is already present in other places.
+>
+> Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
+> Link: https://lore.kernel.org/9794af18-4905-46c6-b12c-365ea2f05858@samsun=
+g.com
+> Fixes: ae8f160e7eb2 ("netlink: Fix wraparounds of sk->sk_rmem_alloc.")
+> Tested-by: Marek Szyprowski <m.szyprowski@samsung.com>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Thanks! Will apply ;-)
+Thanks for the quick fix!
 
-Regards,
-Boqun
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+
+> ---
+> CC: kuniyu@google.com
+> ---
+>  net/netlink/af_netlink.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
+> index 79fbaf7333ce..aeb05d99e016 100644
+> --- a/net/netlink/af_netlink.c
+> +++ b/net/netlink/af_netlink.c
+> @@ -2258,11 +2258,11 @@ static int netlink_dump(struct sock *sk, bool loc=
+k_taken)
+>         struct netlink_ext_ack extack =3D {};
+>         struct netlink_callback *cb;
+>         struct sk_buff *skb =3D NULL;
+> +       unsigned int rmem, rcvbuf;
+>         size_t max_recvmsg_len;
+>         struct module *module;
+>         int err =3D -ENOBUFS;
+>         int alloc_min_size;
+> -       unsigned int rmem;
+>         int alloc_size;
+>
+>         if (!lock_taken)
+> @@ -2294,8 +2294,9 @@ static int netlink_dump(struct sock *sk, bool lock_=
+taken)
+>         if (!skb)
+>                 goto errout_skb;
+>
+> +       rcvbuf =3D READ_ONCE(sk->sk_rcvbuf);
+>         rmem =3D atomic_add_return(skb->truesize, &sk->sk_rmem_alloc);
+> -       if (rmem >=3D READ_ONCE(sk->sk_rcvbuf)) {
+> +       if (rmem !=3D skb->truesize && rmem >=3D rcvbuf) {
+>                 atomic_sub(skb->truesize, &sk->sk_rmem_alloc);
+>                 goto errout_skb;
+>         }
+> --
+> 2.50.0
+>
 
