@@ -1,105 +1,179 @@
-Return-Path: <netdev+bounces-206069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F02A3B013D5
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 08:41:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3979FB013E3
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 08:49:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40D64B423F5
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 06:40:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C12C65A49D4
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 06:49:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DAF21DF990;
-	Fri, 11 Jul 2025 06:41:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D71D1DF990;
+	Fri, 11 Jul 2025 06:49:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="Od/xmrYd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CiwOj5mx"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DF651DF270;
-	Fri, 11 Jul 2025 06:41:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 860991DED57
+	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 06:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752216101; cv=none; b=Bal1LrWTOrX0wdbRptGaB/1R/eCBzaCpIBALGYZKt5qHJN1B3jJ/BUu11or8AaAoMNe/xwj79bQBICO1aXGsw3hXVCetPxI8Szl+KjOmJhwSvGj63FtrIAaDERHvTfu7QMiKq0Guf4LGOW3svvlwpjQvBrsfmBVyaFvs8ZiJWeE=
+	t=1752216572; cv=none; b=htv+Q+O0A201OJIMhOOKVe3YJbm6j4aP1MjoYbmo9+w1WmMPhDfC9bnpwbcCJG0vm74mXUAVjp0yayn/hvA3BQKesdAIQAUfS4AqkkrdNdeTdqO+a1EpoVIbN93A4DpKKecMW8i5oHtCY5RTcmzL87APc5vUxOvszfWfzsDblVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752216101; c=relaxed/simple;
-	bh=MuoVHYxiP3CguwhcMuD93jn4Hic03nlYbsEZIRVuPlM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=aEve9uNNcP3/N7pffIkN8WP0Yb5so9Gmb8FkApIN/3D/O3PoHy+JrYZCxJExS5M+lREkqbbcgDbMytU1r3KHNVsRdYPrTQboTZ5rzdnOwGi0OKSWqWUqeJPQTgSAgqe5AzVfn9+OrjeEaLS0hApLOIdJ4msutHzoTOpRAxpSbnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=Od/xmrYd; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=MuoVHYxiP3CguwhcMuD93jn4Hic03nlYbsEZIRVuPlM=;
-	t=1752216099; x=1753425699; b=Od/xmrYdCJeWKW4TGBjrOVk2ytC+LZDxF6lcqxijIatr3nQ
-	AVWRLQXLL5+20H/ILB27lXRQK/8JlvzSklXs0UHPLVNLEUlbygx4EGmEUBYybxbxYhgBBDMqPO8Et
-	5F7W4ADxVlE46sUzOqB9fdvJ7IDgdwU2ZBBh470PIlODDHf8m/1bIQcI/DbO/Ipr/hFuvklfIUT54
-	qWAktE9/rrjFNg7MQ5oLJn/oyn3LZUJ759Ym7Ndl2lDlT5T5nhNdDyIH+e/ndrIMgttU5QL5y8yk7
-	3/lB8DqBxlwnCx/9UHX7MFOSZsQg1EAHLQOZXk5b+KI8ElNKtYWspJHv5K89u/Og==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1ua7Rt-0000000Fw63-0CV4;
-	Fri, 11 Jul 2025 08:41:34 +0200
-Message-ID: <934e5e1e253ee3025f617cc38ce6fc15e0619d6c.camel@sipsolutions.net>
-Subject: Re: [GIT PULL] wireless-2025-07-10
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
-Date: Fri, 11 Jul 2025 08:41:28 +0200
-In-Reply-To: <20250710172352.3ccd34ec@kernel.org>
-References: <20250710122212.24272-3-johannes@sipsolutions.net>
-	 <20250710172352.3ccd34ec@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
+	s=arc-20240116; t=1752216572; c=relaxed/simple;
+	bh=8WjKZo/Tzc+89ScV1HU0cXSdTevhkck7mFPn4y7/ZAA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GLAyWgcZkGDay0I/MlR7/xCh2tGw5NSzt1yK+KD6/Mm61Zyw+JFFQmUEUw4pEMEUD6J1bIMaSiNYN4afWDjvgykgaMQHEYT2ZHuXB28F6ZG2nhCiVyXYKy4aY9OiwRMMElDSn1Y3aH3acBcefiyvuk3vKin2VHST8mZaUOGsdvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CiwOj5mx; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752216569;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BxbG4JFSAtZVQEjQXI+wWXnxQA/cXn+OA4Z+OMpKyu4=;
+	b=CiwOj5mxnoK/1S9tjeDCBOKbOulBzeC1rHovr+dsPTvtKK3e0up9Fzf7od7mwYuWurkF60
+	hmnnX4Oua8xAQbZvdD4LZSiAFlA3CvTzmelzdriYqLNb9a8qMPSJlQg4L7fjmSye7kXGWc
+	blaQDYyaVxb7Dxkx0qYw4wvzjJuvkl0=
+Received: from mail-vk1-f198.google.com (mail-vk1-f198.google.com
+ [209.85.221.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-206-U1cNHl09PbOikbREUQmATA-1; Fri, 11 Jul 2025 02:49:27 -0400
+X-MC-Unique: U1cNHl09PbOikbREUQmATA-1
+X-Mimecast-MFC-AGG-ID: U1cNHl09PbOikbREUQmATA_1752216566
+Received: by mail-vk1-f198.google.com with SMTP id 71dfb90a1353d-532d32147ffso607106e0c.0
+        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 23:49:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752216566; x=1752821366;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BxbG4JFSAtZVQEjQXI+wWXnxQA/cXn+OA4Z+OMpKyu4=;
+        b=ssa+HsuMGNIOmF/4Y88RsdCeSuHC46P6xi0KtNnz7iEqhJl7err74gokKg+khENjkS
+         2VZH1oHSzucwENtC5rN26s+sH/ihVXdIPGfiH+uQZuNR9gaygXlreZEE0dKQXtwntu3a
+         KmOpNxtA3U1H5mnhRb4m3rPHTmXjUfARA3FeP1yO77dfMI3hWr/HQNWkldt+n6JwQtnV
+         GFU2WJ66CbP99DiV8D5WyPYADhhG46eLMqRghZ0c1/67xSmpjMtw3GnExLP99shtbvG8
+         kTnYqVxo/n6ISLkweWFEEhfTgx+4e7yqmxpwoHlfgwuWsuZL+eLch0eXNI74+q569daA
+         tZ2w==
+X-Forwarded-Encrypted: i=1; AJvYcCWjwAebbkPZxSMfptDLhUDEcUNBFrnUNrO6CurqkigLhH5pVvjjiPvIudQBmrVoah/GWGZA4/I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2tn3utPJmp+AoFJ1H4H0V0u4PCT7llxil+ZalPDE/L9TneMSn
+	0faAiPCm05RnmhS+LdyBXDJZdwZ1S96YRCYUv03ZCaMR7xjo0lUukzXGII2P35K8vS0GP7hJmuf
+	tWW9ljkqKlA9s9jBtPqUmHBMLH/bHk31GHWYVNSUpyjCUC9/OMkTHXvZoxkSfBH6ARTltXK441Y
+	xNU7ZztJJoMgWsdyDvfr4ax2Sw8K30aAPIkPiAEDqN
+X-Gm-Gg: ASbGncs+i9XTsFQ1JPQponYGhAZ7gBEIJXwON8zYXFRo/e2rY/frjC5HSgR4Wwp+jhq
+	OEEgAof2vXuFRKY1oll6zQwB5ufuivo+ra7FZ2JTagfTEbuVHrNSDuzTrsnwTd1cZh+0LCjNheU
+	OmzUY15sJ78XWr3U6yFQYh8g==
+X-Received: by 2002:a05:6102:dca:b0:4e9:c773:dca1 with SMTP id ada2fe7eead31-4f6411e36c2mr1621593137.11.1752216566340;
+        Thu, 10 Jul 2025 23:49:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH8pdr64dQhCGFiGndp3QqJ4OXoQVOVXjcmO3HV7h3AAPJDmNsRuoLhWIcxZByOZsvaufxvkGWZod21F8kL+T8=
+X-Received: by 2002:a05:6102:dca:b0:4e9:c773:dca1 with SMTP id
+ ada2fe7eead31-4f6411e36c2mr1621586137.11.1752216565960; Thu, 10 Jul 2025
+ 23:49:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+References: <20250616062922.682558-1-lulu@redhat.com> <20250616062922.682558-2-lulu@redhat.com>
+ <6107dcb2-51a3-42f8-b856-f443c0e2a60d@6wind.com> <CACGkMEsJdfeNuHdKu0OH=sT4RYhN3d_VOnDcu4_-FquRXo24Xw@mail.gmail.com>
+In-Reply-To: <CACGkMEsJdfeNuHdKu0OH=sT4RYhN3d_VOnDcu4_-FquRXo24Xw@mail.gmail.com>
+From: Cindy Lu <lulu@redhat.com>
+Date: Fri, 11 Jul 2025 14:48:12 +0800
+X-Gm-Features: Ac12FXxIsX9kCA8tu7rmOHAy5cYEuocqulMU9XdacIEoFSZMPVCORVJXY4Z54Eo
+Message-ID: <CACLfguWqF62MMY3Y45GCRnh=5J75q6ebAqhFgOmhsAAsoyYXew@mail.gmail.com>
+Subject: Re: [PATCH v12 1/1] vhost: Reintroduces support of kthread API and
+ adds mode selection
+To: Jason Wang <jasowang@redhat.com>
+Cc: nicolas.dichtel@6wind.com, mst@redhat.com, michael.christie@oracle.com, 
+	sgarzare@redhat.com, linux-kernel@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2025-07-10 at 17:23 -0700, Jakub Kicinski wrote:
-> On Thu, 10 Jul 2025 14:21:06 +0200 Johannes Berg wrote:
-> > So I have more fixes than I'd like at this point, but a few
-> > were under discussion for a while, mt76 fixes were just not
-> > forthcoming until now, and all of them really don't seem
-> > wrong to put into the tree at this point...
-> >=20
-> > Please pull and let us know if there's any problem.
->=20
-> Some good news and some bad news. Bad news is that this missed today's
-> PR. Good news is that we shipped a bug to Linus which is likely to
-> break nl80211 users:
-> https://lore.kernel.org/all/20250711001121.3649033-1-kuba@kernel.org/
-> so I'm gonna send a second PR tomorrow, with the netlink fix and I'll
-> include your fixes in it. I suppose you may want to wait with the fast
-> forward until then.=20
-> Now that I typed this I guess it may be two pieces of bad news..
+On Thu, Jun 19, 2025 at 9:02=E2=80=AFAM Jason Wang <jasowang@redhat.com> wr=
+ote:
+>
+> On Wed, Jun 18, 2025 at 8:06=E2=80=AFPM Nicolas Dichtel
+> <nicolas.dichtel@6wind.com> wrote:
+> >
+> > Le 16/06/2025 =C3=A0 08:28, Cindy Lu a =C3=A9crit :
+> > > This patch reintroduces kthread mode for vhost workers and provides
+> > > configuration to select between kthread and task worker.
+> > >
+> > > - Add 'fork_owner' parameter to vhost_dev to let users select kthread
+> > >   or task mode. Default mode is task mode(VHOST_FORK_OWNER_TASK).
+> > >
+> > > - Reintroduce kthread mode support:
+> > >   * Bring back the original vhost_worker() implementation,
+> > >     and renamed to vhost_run_work_kthread_list().
+> > >   * Add cgroup support for the kthread
+> > >   * Introduce struct vhost_worker_ops:
+> > >     - Encapsulates create / stop / wake=E2=80=91up callbacks.
+> > >     - vhost_worker_create() selects the proper ops according to
+> > >       inherit_owner.
+> > >
+> > > - Userspace configuration interface:
+> > >   * New IOCTLs:
+> > >       - VHOST_SET_FORK_FROM_OWNER lets userspace select task mode
+> > >         (VHOST_FORK_OWNER_TASK) or kthread mode (VHOST_FORK_OWNER_KTH=
+READ)
+> > >       - VHOST_GET_FORK_FROM_OWNER reads the current worker mode
+> > >   * Expose module parameter 'fork_from_owner_default' to allow system
+> > >     administrators to configure the default mode for vhost workers
+> > >   * Kconfig option CONFIG_VHOST_ENABLE_FORK_OWNER_CONTROL controls wh=
+ether
+> > >     these IOCTLs and the parameter are available (for distros that ma=
+y
+> > >     want to disable them)
+> > >
+> > > - The VHOST_NEW_WORKER functionality requires fork_owner to be set
+> > >   to true, with validation added to ensure proper configuration
+> > >
+> > > This partially reverts or improves upon:
+> > >   commit 6e890c5d5021 ("vhost: use vhost_tasks for worker threads")
+> > >   commit 1cdaafa1b8b4 ("vhost: replace single worker pointer with xar=
+ray")
+> > >
+> > > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > > ---
+> > >  drivers/vhost/Kconfig      |  17 +++
+> > >  drivers/vhost/vhost.c      | 244 ++++++++++++++++++++++++++++++++++-=
+--
+> > >  drivers/vhost/vhost.h      |  22 ++++
+> > >  include/uapi/linux/vhost.h |  29 +++++
+> > >  4 files changed, 294 insertions(+), 18 deletions(-)
+> > >
+> > > diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+> > > index 020d4fbb947c..1b3602b1f8e2 100644
+> > > --- a/drivers/vhost/Kconfig
+> > > +++ b/drivers/vhost/Kconfig
+> > > @@ -95,4 +95,21 @@ config VHOST_CROSS_ENDIAN_LEGACY
+> > >
+> > >         If unsure, say "N".
+> > >
+> > > +config VHOST_ENABLE_FORK_OWNER_CONTROL
+> > > +     bool "Enable VHOST_ENABLE_FORK_OWNER_CONTROL"
+> > > +     default n
+> > Why disabling this option by default?
+>
+> I think we should enable this by default.
+>
+> Thanks
+>
+Thanks jason,  I will send  a new version
+Thanks
+cindy
+> >
+> > Regards,
+> > Nicolas
+> >
+>
 
-No worries, and thanks for the heads-up, I can wait. I actually really
-hope this was the last pull request for the current -rc cycle anyway,
-but of course now that I said it someone's going to come out of the
-woodwork with a fix ;)
-
-Re the size problem, nl80211 can indeed create and fill really big SKBs
-if userspace gives a big buffer, which it often does. Looking at it now,
-I'm not sure why we set the rcvbuf to 8KiB in iw? That seems ... odd. It
-looks like I originally did that to _increase_ it, but that seems
-completely off, and my first fix didn't even do anything. Then we fixed
-the call but ...
-
-Looks like the problem is entirely self-made there, but I guess we still
-have to live with stupid userspace, sorry about that. I can take a
-closer look at it all and try to fix things there, if you think it's
-worth it?
-
-johannes
 
