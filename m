@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-206058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 367CAB01377
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 08:25:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3705DB01378
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 08:25:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A0921C24144
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 06:25:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B51C16C508
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 06:25:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 244371D8E07;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78C0C1DD543;
 	Fri, 11 Jul 2025 06:25:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C4F41A08A3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1745B1AA7BF;
 	Fri, 11 Jul 2025 06:25:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752215110; cv=none; b=nBDgtrK4jzbkVMj94YAz8Ae4SytIMnUgRg/PRifpJDWkssAlTJOTQcYAe6MixdZYeWwfZYk1yQ3bGWIu5RSTVzV5SkIC5/Tl6A/ZAm1a4JniO/sEJ0GugHRD4b/A4PMR0ilTUmmGgcO1k46n4JUHYkPPEiGu283tW71+aAlvUS8=
+	t=1752215110; cv=none; b=cj63PGDb8a75KLDCRSKG50+XFEVaFSq42xf6nNzsL85Gk9ZpQjvhpucVT3F1Lu54p0RRGVz7/djPW7xe8QAQp296ByQCAMqwR9rj2B1briJT7tZy57gteNB4+OYjIhW0bUUfNNCQLLU+SHLvMuyfBsmtfoSOQR/Dx6aGL7XT3jA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1752215110; c=relaxed/simple;
-	bh=hERdZR+kkHYGhOhKQMKBJVnuPqUcLCNOZQAXw5r5yHo=;
+	bh=A+uTG2IylH0egwSFG0meytDPc02VJnBvLXBwDHcrmz4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UwSaZNJi1S8VbYMdqRHqD+e69FgX+FP6zhrSbj2/D+xhWgshfTwq3NqSlxXRt6u6qxS0axu9/FQsIz+ZkM3KJWn6atOd5NHdeb98WYXqugYjkALQd/fgbR1I4yhlJE5J22YQSrW1oVT6V6IVn0p7KDGbym0j8rURVVDgd4w3mQA=
+	 MIME-Version:Content-Type; b=dpXEvrBYCuqscESYfiYLTsOCFvAZOEqD5UH2HPQrb8FZDee/OborZVxiefzKWqBTpuMugXY5Ew3ZnssrMA9WQf1fAdaZA7zrCHFnTfGiMtWqu5ezsA8wdW9o04NqLs/wifGusAr8Iy4PZjclRI9YrYcNhgZaH4N0UQKnwgmIFy4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4bdhW24WL0ztSXW;
-	Fri, 11 Jul 2025 14:23:58 +0800 (CST)
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4bdhRB5svQzXf90;
+	Fri, 11 Jul 2025 14:20:38 +0800 (CST)
 Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id CA6EE140146;
-	Fri, 11 Jul 2025 14:25:04 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 6CB42140146;
+	Fri, 11 Jul 2025 14:25:05 +0800 (CST)
 Received: from localhost.localdomain (10.90.31.46) by
  kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -47,9 +47,9 @@ CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
 	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
 	<arnd@kernel.org>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<shaojijie@huawei.com>
-Subject: [PATCH V2 net-next 02/11] net: hns3: clean up the build warning in debugfs by use seq file
-Date: Fri, 11 Jul 2025 14:17:16 +0800
-Message-ID: <20250711061725.225585-3-shaojijie@huawei.com>
+Subject: [PATCH V2 net-next 03/11] net: hns3: use seq_file for files in queue/ in debugfs
+Date: Fri, 11 Jul 2025 14:17:17 +0800
+Message-ID: <20250711061725.225585-4-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20250711061725.225585-1-shaojijie@huawei.com>
 References: <20250711061725.225585-1-shaojijie@huawei.com>
@@ -66,102 +66,57 @@ X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
 
 From: Jian Shen <shenjian15@huawei.com>
 
-Arnd reported that there are two build warning for on-stasck
-buffer oversize. As Arnd's suggestion, using seq file way
-to avoid the stack buffer or kmalloc buffer allocating.
+This patch use seq_file for the following nodes:
+rx_queue_info/queue_map
 
-Reported-by: Arnd Bergmann <arnd@kernel.org>
-Closes: https://lore.kernel.org/all/20250610092113.2639248-1-arnd@kernel.org/
 Signed-off-by: Jian Shen <shenjian15@huawei.com>
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Acked-by: Arnd Bergmann <arnd@arndb.de>
 ---
-ChangeLog:
-v1 -> v2:
-  - Remove unnecessary cast, suggested by Andrew Lunn
-  v1: https://lore.kernel.org/all/20250708130029.1310872-1-shaojijie@huawei.com/
----
- drivers/net/ethernet/hisilicon/hns3/hnae3.h   |   7 +
- .../ethernet/hisilicon/hns3/hns3_debugfs.c    | 128 ++++++++----------
- .../net/ethernet/hisilicon/hns3/hns3_enet.c   |   2 +
- 3 files changed, 62 insertions(+), 75 deletions(-)
+ .../ethernet/hisilicon/hns3/hns3_debugfs.c    | 149 ++++++------------
+ 1 file changed, 44 insertions(+), 105 deletions(-)
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-index 8dc7d6fae224..db9639c3c402 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-@@ -339,6 +339,10 @@ enum hnae3_dbg_cmd {
- 	HNAE3_DBG_CMD_UNKNOWN,
- };
- 
-+#define hnae3_seq_file_to_ae_dev(s)	(dev_get_drvdata((s)->private))
-+#define hnae3_seq_file_to_handle(s)	\
-+		(((struct hnae3_ae_dev *)hnae3_seq_file_to_ae_dev(s))->handle)
-+
- enum hnae3_tc_map_mode {
- 	HNAE3_TC_MAP_MODE_PRIO,
- 	HNAE3_TC_MAP_MODE_DSCP,
-@@ -434,8 +438,11 @@ struct hnae3_ae_dev {
- 	u32 dev_version;
- 	DECLARE_BITMAP(caps, HNAE3_DEV_CAPS_MAX_NUM);
- 	void *priv;
-+	struct hnae3_handle *handle;
- };
- 
-+typedef int (*read_func)(struct seq_file *s, void *data);
-+
- /* This struct defines the operation on the handle.
-  *
-  * init_ae_dev(): (mandatory)
 diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
-index aec719ce3ccd..52877ffec928 100644
+index 52877ffec928..bb1adf9daec7 100644
 --- a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
 +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
-@@ -3,6 +3,7 @@
- 
- #include <linux/debugfs.h>
- #include <linux/device.h>
-+#include <linux/seq_file.h>
- #include <linux/string_choices.h>
- 
- #include "hnae3.h"
-@@ -41,6 +42,7 @@ static struct hns3_dbg_dentry_info hns3_dbg_dentry[] = {
- 
- static int hns3_dbg_bd_file_init(struct hnae3_handle *handle, u32 cmd);
- static int hns3_dbg_common_file_init(struct hnae3_handle *handle, u32 cmd);
-+static int hns3_dbg_common_init_t1(struct hnae3_handle *handle, u32 cmd);
- 
- static struct hns3_dbg_cmd_info hns3_dbg_cmd[] = {
+@@ -288,14 +288,14 @@ static struct hns3_dbg_cmd_info hns3_dbg_cmd[] = {
+ 		.cmd = HNAE3_DBG_CMD_QUEUE_MAP,
+ 		.dentry = HNS3_DBG_DENTRY_QUEUE,
+ 		.buf_len = HNS3_DBG_READ_LEN,
+-		.init = hns3_dbg_common_file_init,
++		.init = hns3_dbg_common_init_t1,
+ 	},
  	{
-@@ -300,7 +302,7 @@ static struct hns3_dbg_cmd_info hns3_dbg_cmd[] = {
- 		.cmd = HNAE3_DBG_CMD_TX_QUEUE_INFO,
+ 		.name = "rx_queue_info",
+ 		.cmd = HNAE3_DBG_CMD_RX_QUEUE_INFO,
  		.dentry = HNS3_DBG_DENTRY_QUEUE,
  		.buf_len = HNS3_DBG_READ_LEN_1MB,
 -		.init = hns3_dbg_common_file_init,
 +		.init = hns3_dbg_common_init_t1,
  	},
  	{
- 		.name = "fd_tcam",
-@@ -674,77 +676,45 @@ static int hns3_dbg_rx_queue_info(struct hnae3_handle *h,
+ 		.name = "tx_queue_info",
+@@ -572,76 +572,46 @@ static int hns3_dbg_coal_info(struct hnae3_handle *h, char *buf, int len)
  	return 0;
  }
  
--static const struct hns3_dbg_item tx_queue_info_items[] = {
+-static const struct hns3_dbg_item rx_queue_info_items[] = {
 -	{ "QUEUE_ID", 2 },
 -	{ "BD_NUM", 2 },
--	{ "TC", 2 },
+-	{ "BD_LEN", 2 },
 -	{ "TAIL", 2 },
 -	{ "HEAD", 2 },
 -	{ "FBDNUM", 2 },
--	{ "OFFSET", 2 },
 -	{ "PKTNUM", 5 },
+-	{ "COPYBREAK", 2 },
 -	{ "RING_EN", 2 },
--	{ "TX_RING_EN", 2 },
+-	{ "RX_RING_EN", 2 },
 -	{ "BASE_ADDR", 10 },
 -};
 -
- static void hns3_dump_tx_queue_info(struct hns3_enet_ring *ring,
+ static void hns3_dump_rx_queue_info(struct hns3_enet_ring *ring,
 -				    struct hnae3_ae_dev *ae_dev, char **result,
 -				    u32 index)
 +				    struct seq_file *s, u32 index)
@@ -170,75 +125,75 @@ index aec719ce3ccd..52877ffec928 100644
 +	void __iomem *base = ring->tqp->io_base;
  	u32 base_add_l, base_add_h;
 -	u32 j = 0;
- 
+-
 -	sprintf(result[j++], "%u", index);
--	sprintf(result[j++], "%u", readl_relaxed(ring->tqp->io_base +
--		HNS3_RING_TX_RING_BD_NUM_REG));
 -
 -	sprintf(result[j++], "%u", readl_relaxed(ring->tqp->io_base +
--		HNS3_RING_TX_RING_TC_REG));
+-		HNS3_RING_RX_RING_BD_NUM_REG));
+ 
+-	sprintf(result[j++], "%u", readl_relaxed(ring->tqp->io_base +
+-		HNS3_RING_RX_RING_BD_LEN_REG));
 -
 -	sprintf(result[j++], "%u", readl_relaxed(ring->tqp->io_base +
--		HNS3_RING_TX_RING_TAIL_REG));
+-		HNS3_RING_RX_RING_TAIL_REG));
 -
 -	sprintf(result[j++], "%u", readl_relaxed(ring->tqp->io_base +
--		HNS3_RING_TX_RING_HEAD_REG));
+-		HNS3_RING_RX_RING_HEAD_REG));
 -
 -	sprintf(result[j++], "%u", readl_relaxed(ring->tqp->io_base +
--		HNS3_RING_TX_RING_FBDNUM_REG));
+-		HNS3_RING_RX_RING_FBDNUM_REG));
 -
 -	sprintf(result[j++], "%u", readl_relaxed(ring->tqp->io_base +
--		HNS3_RING_TX_RING_OFFSET_REG));
--
--	sprintf(result[j++], "%u", readl_relaxed(ring->tqp->io_base +
--		HNS3_RING_TX_RING_PKTNUM_RECORD_REG));
+-		HNS3_RING_RX_RING_PKTNUM_RECORD_REG));
+-	sprintf(result[j++], "%u", ring->rx_copybreak);
 -
 -	sprintf(result[j++], "%s",
 -		str_on_off(readl_relaxed(ring->tqp->io_base +
 -					 HNS3_RING_EN_REG)));
 +	seq_printf(s, "%-10u", index);
 +	seq_printf(s, "%-8u",
-+		   readl_relaxed(base + HNS3_RING_TX_RING_BD_NUM_REG));
-+	seq_printf(s, "%-4u", readl_relaxed(base + HNS3_RING_TX_RING_TC_REG));
-+	seq_printf(s, "%-6u", readl_relaxed(base + HNS3_RING_TX_RING_TAIL_REG));
-+	seq_printf(s, "%-6u", readl_relaxed(base + HNS3_RING_TX_RING_HEAD_REG));
++		   readl_relaxed(base + HNS3_RING_RX_RING_BD_NUM_REG));
 +	seq_printf(s, "%-8u",
-+		   readl_relaxed(base + HNS3_RING_TX_RING_FBDNUM_REG));
++		   readl_relaxed(base + HNS3_RING_RX_RING_BD_LEN_REG));
++	seq_printf(s, "%-6u",
++		   readl_relaxed(base + HNS3_RING_RX_RING_TAIL_REG));
++	seq_printf(s, "%-6u",
++		   readl_relaxed(base + HNS3_RING_RX_RING_HEAD_REG));
 +	seq_printf(s, "%-8u",
-+		   readl_relaxed(base + HNS3_RING_TX_RING_OFFSET_REG));
-+	seq_printf(s, "%-11u",
-+		   readl_relaxed(base + HNS3_RING_TX_RING_PKTNUM_RECORD_REG));
++		   readl_relaxed(base + HNS3_RING_RX_RING_FBDNUM_REG));
++	seq_printf(s, "%-11u", readl_relaxed(base +
++		   HNS3_RING_RX_RING_PKTNUM_RECORD_REG));
++	seq_printf(s, "%-11u", ring->rx_copybreak);
 +	seq_printf(s, "%-9s",
 +		   str_on_off(readl_relaxed(base + HNS3_RING_EN_REG)));
  
  	if (hnae3_ae_dev_tqp_txrx_indep_supported(ae_dev))
 -		sprintf(result[j++], "%s",
 -			str_on_off(readl_relaxed(ring->tqp->io_base +
--						 HNS3_RING_TX_EN_REG)));
-+		seq_printf(s, "%-12s",
-+			   str_on_off(readl_relaxed(base +
-+						    HNS3_RING_TX_EN_REG)));
+-						 HNS3_RING_RX_EN_REG)));
++		seq_printf(s, "%-12s", str_on_off(readl_relaxed(base +
++						  HNS3_RING_RX_EN_REG)));
  	else
 -		sprintf(result[j++], "%s", "NA");
 +		seq_printf(s, "%-12s", "NA");
  
 -	base_add_h = readl_relaxed(ring->tqp->io_base +
--					HNS3_RING_TX_RING_BASEADDR_H_REG);
+-					HNS3_RING_RX_RING_BASEADDR_H_REG);
 -	base_add_l = readl_relaxed(ring->tqp->io_base +
--					HNS3_RING_TX_RING_BASEADDR_L_REG);
+-					HNS3_RING_RX_RING_BASEADDR_L_REG);
 -	sprintf(result[j++], "0x%08x%08x", base_add_h, base_add_l);
-+	base_add_h = readl_relaxed(base + HNS3_RING_TX_RING_BASEADDR_H_REG);
-+	base_add_l = readl_relaxed(base + HNS3_RING_TX_RING_BASEADDR_L_REG);
++	base_add_h = readl_relaxed(base + HNS3_RING_RX_RING_BASEADDR_H_REG);
++	base_add_l = readl_relaxed(base + HNS3_RING_RX_RING_BASEADDR_L_REG);
 +	seq_printf(s, "0x%08x%08x\n", base_add_h, base_add_l);
  }
  
--static int hns3_dbg_tx_queue_info(struct hnae3_handle *h,
+-static int hns3_dbg_rx_queue_info(struct hnae3_handle *h,
 -				  char *buf, int len)
-+static int hns3_dbg_tx_queue_info(struct seq_file *s, void *data)
++static int hns3_dbg_rx_queue_info(struct seq_file *s, void *data)
  {
--	char data_str[ARRAY_SIZE(tx_queue_info_items)][HNS3_DBG_DATA_STR_LEN];
+-	char data_str[ARRAY_SIZE(rx_queue_info_items)][HNS3_DBG_DATA_STR_LEN];
 -	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(h);
--	char *result[ARRAY_SIZE(tx_queue_info_items)];
+-	char *result[ARRAY_SIZE(rx_queue_info_items)];
 +	struct hnae3_handle *h = hnae3_seq_file_to_handle(s);
  	struct hns3_nic_priv *priv = h->priv;
 -	char content[HNS3_DBG_INFO_LEN];
@@ -247,87 +202,121 @@ index aec719ce3ccd..52877ffec928 100644
  	u32 i;
  
  	if (!priv->ring) {
-@@ -752,12 +722,8 @@ static int hns3_dbg_tx_queue_info(struct hnae3_handle *h,
+@@ -649,12 +619,9 @@ static int hns3_dbg_rx_queue_info(struct hnae3_handle *h,
  		return -EFAULT;
  	}
  
--	for (i = 0; i < ARRAY_SIZE(tx_queue_info_items); i++)
+-	for (i = 0; i < ARRAY_SIZE(rx_queue_info_items); i++)
 -		result[i] = &data_str[i][0];
--
--	hns3_dbg_fill_content(content, sizeof(content), tx_queue_info_items,
--			      NULL, ARRAY_SIZE(tx_queue_info_items));
--	pos += scnprintf(buf + pos, len - pos, "%s", content);
-+	seq_puts(s, "QUEUE_ID  BD_NUM  TC  TAIL  HEAD  FBDNUM  OFFSET  ");
-+	seq_puts(s, "PKTNUM     RING_EN  TX_RING_EN  BASE_ADDR\n");
++	seq_puts(s, "QUEUE_ID  BD_NUM  BD_LEN  TAIL  HEAD  FBDNUM  ");
++	seq_puts(s, "PKTNUM     COPYBREAK  RING_EN  RX_RING_EN  BASE_ADDR\n");
  
+-	hns3_dbg_fill_content(content, sizeof(content), rx_queue_info_items,
+-			      NULL, ARRAY_SIZE(rx_queue_info_items));
+-	pos += scnprintf(buf + pos, len - pos, "%s", content);
  	for (i = 0; i < h->kinfo.num_tqps; i++) {
  		/* Each cycle needs to determine whether the instance is reset,
-@@ -769,12 +735,7 @@ static int hns3_dbg_tx_queue_info(struct hnae3_handle *h,
+ 		 * to prevent reference to invalid memory. And need to ensure
+@@ -665,12 +632,7 @@ static int hns3_dbg_rx_queue_info(struct hnae3_handle *h,
  			return -EPERM;
  
- 		ring = &priv->ring[i];
--		hns3_dump_tx_queue_info(ring, ae_dev, result, i);
+ 		ring = &priv->ring[(u32)(i + h->kinfo.num_tqps)];
+-		hns3_dump_rx_queue_info(ring, ae_dev, result, i);
 -		hns3_dbg_fill_content(content, sizeof(content),
--				      tx_queue_info_items,
+-				      rx_queue_info_items,
 -				      (const char **)result,
--				      ARRAY_SIZE(tx_queue_info_items));
+-				      ARRAY_SIZE(rx_queue_info_items));
 -		pos += scnprintf(buf + pos, len - pos, "%s", content);
-+		hns3_dump_tx_queue_info(ring, s, i);
++		hns3_dump_rx_queue_info(ring, s, i);
  	}
  
  	return 0;
-@@ -1170,10 +1131,6 @@ static const struct hns3_dbg_func hns3_dbg_cmd_func[] = {
- 		.cmd = HNAE3_DBG_CMD_RX_QUEUE_INFO,
- 		.dbg_dump = hns3_dbg_rx_queue_info,
+@@ -741,44 +703,23 @@ static int hns3_dbg_tx_queue_info(struct seq_file *s, void *data)
+ 	return 0;
+ }
+ 
+-static const struct hns3_dbg_item queue_map_items[] = {
+-	{ "local_queue_id", 2 },
+-	{ "global_queue_id", 2 },
+-	{ "vector_id", 2 },
+-};
+-
+-static int hns3_dbg_queue_map(struct hnae3_handle *h, char *buf, int len)
++static int hns3_dbg_queue_map(struct seq_file *s, void *data)
+ {
+-	char data_str[ARRAY_SIZE(queue_map_items)][HNS3_DBG_DATA_STR_LEN];
+-	char *result[ARRAY_SIZE(queue_map_items)];
++	struct hnae3_handle *h = hnae3_seq_file_to_handle(s);
+ 	struct hns3_nic_priv *priv = h->priv;
+-	char content[HNS3_DBG_INFO_LEN];
+-	int pos = 0;
+-	int j;
+ 	u32 i;
+ 
+ 	if (!h->ae_algo->ops->get_global_queue_id)
+ 		return -EOPNOTSUPP;
+ 
+-	for (i = 0; i < ARRAY_SIZE(queue_map_items); i++)
+-		result[i] = &data_str[i][0];
++	seq_puts(s, "local_queue_id  global_queue_id  vector_id\n");
+ 
+-	hns3_dbg_fill_content(content, sizeof(content), queue_map_items,
+-			      NULL, ARRAY_SIZE(queue_map_items));
+-	pos += scnprintf(buf + pos, len - pos, "%s", content);
+ 	for (i = 0; i < h->kinfo.num_tqps; i++) {
+ 		if (!priv->ring || !priv->ring[i].tqp_vector)
+ 			continue;
+-		j = 0;
+-		sprintf(result[j++], "%u", i);
+-		sprintf(result[j++], "%u",
+-			h->ae_algo->ops->get_global_queue_id(h, i));
+-		sprintf(result[j++], "%d",
+-			priv->ring[i].tqp_vector->vector_irq);
+-		hns3_dbg_fill_content(content, sizeof(content), queue_map_items,
+-				      (const char **)result,
+-				      ARRAY_SIZE(queue_map_items));
+-		pos += scnprintf(buf + pos, len - pos, "%s", content);
++		seq_printf(s, "%-16u%-17u%d\n", i,
++			   h->ae_algo->ops->get_global_queue_id(h, i),
++			   priv->ring[i].tqp_vector->vector_irq);
+ 	}
+ 
+ 	return 0;
+@@ -1111,10 +1052,6 @@ static int hns3_dbg_get_cmd_index(struct hns3_dbg_data *dbg_data, u32 *index)
+ }
+ 
+ static const struct hns3_dbg_func hns3_dbg_cmd_func[] = {
+-	{
+-		.cmd = HNAE3_DBG_CMD_QUEUE_MAP,
+-		.dbg_dump = hns3_dbg_queue_map,
+-	},
+ 	{
+ 		.cmd = HNAE3_DBG_CMD_DEV_INFO,
+ 		.dbg_dump = hns3_dbg_dev_info,
+@@ -1127,10 +1064,6 @@ static const struct hns3_dbg_func hns3_dbg_cmd_func[] = {
+ 		.cmd = HNAE3_DBG_CMD_RX_BD,
+ 		.dbg_dump_bd = hns3_dbg_rx_bd_info,
  	},
 -	{
--		.cmd = HNAE3_DBG_CMD_TX_QUEUE_INFO,
--		.dbg_dump = hns3_dbg_tx_queue_info,
+-		.cmd = HNAE3_DBG_CMD_RX_QUEUE_INFO,
+-		.dbg_dump = hns3_dbg_rx_queue_info,
 -	},
  	{
  		.cmd = HNAE3_DBG_CMD_PAGE_POOL_INFO,
  		.dbg_dump = hns3_dbg_page_pool_info,
-@@ -1310,6 +1267,27 @@ hns3_dbg_common_file_init(struct hnae3_handle *handle, u32 cmd)
- 	return 0;
- }
- 
-+static int hns3_dbg_common_init_t1(struct hnae3_handle *handle, u32 cmd)
-+{
-+	struct device *dev = &handle->pdev->dev;
-+	struct dentry *entry_dir;
-+	read_func func = NULL;
-+
-+	switch (hns3_dbg_cmd[cmd].cmd) {
-+	case HNAE3_DBG_CMD_TX_QUEUE_INFO:
-+		func = hns3_dbg_tx_queue_info;
+@@ -1277,6 +1210,12 @@ static int hns3_dbg_common_init_t1(struct hnae3_handle *handle, u32 cmd)
+ 	case HNAE3_DBG_CMD_TX_QUEUE_INFO:
+ 		func = hns3_dbg_tx_queue_info;
+ 		break;
++	case HNAE3_DBG_CMD_RX_QUEUE_INFO:
++		func = hns3_dbg_rx_queue_info;
 +		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	entry_dir = hns3_dbg_dentry[hns3_dbg_cmd[cmd].dentry].dentry;
-+	debugfs_create_devm_seqfile(dev, hns3_dbg_cmd[cmd].name, entry_dir,
-+				    func);
-+
-+	return 0;
-+}
-+
- int hns3_dbg_init(struct hnae3_handle *handle)
- {
- 	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(handle);
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-index 49fcee7a6d0f..52f42fe1d56f 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-@@ -5299,6 +5299,8 @@ static int hns3_client_init(struct hnae3_handle *handle)
- 	struct net_device *netdev;
- 	int ret;
- 
-+	ae_dev->handle = handle;
-+
- 	handle->ae_algo->ops->get_tqps_and_rss_info(handle, &alloc_tqps,
- 						    &max_rss_size);
- 	netdev = alloc_etherdev_mq(sizeof(struct hns3_nic_priv), alloc_tqps);
++	case HNAE3_DBG_CMD_QUEUE_MAP:
++		func = hns3_dbg_queue_map;
++		break;
+ 	default:
+ 		return -EINVAL;
+ 	}
 -- 
 2.33.0
 
