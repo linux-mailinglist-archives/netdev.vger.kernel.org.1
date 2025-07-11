@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-206018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF794B010F5
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 03:53:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4ED9B010F6
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 03:53:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED1DE1C82313
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 01:54:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8B961C825FF
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 01:54:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2E6714B96E;
-	Fri, 11 Jul 2025 01:53:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DA301537DA;
+	Fri, 11 Jul 2025 01:53:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gu76alne"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kH8bjJ1t"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FACF149DFF
-	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 01:53:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AC4A1531C1
+	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 01:53:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752198818; cv=none; b=sJdNP2oCjTogAbL9/gCW2fHYp0uHlz3pwZ11M7j/2DMZhxEdm4WYPh8UlG5XXHshQQxy+QFVXuafXxuNU+mh1a1LzXigiTLtrdusbpF4NppguufwlkmQSNdv3/p0HpWhsyQbEq84TMcbml9ylGfUIrm1Dv9jy5n4Lvfq/y4yV6M=
+	t=1752198819; cv=none; b=E4b0E3e9xble09xFuNvdM/WLMUK7Ub6zEFY28iv0lTc9Oa6o+3S1NUqklYf2gMr3aq7FmSD4Nywqxe8u7cHDACZn0GS8eiwXxPzIRr8RvXDlWuoh+s47wDS4Z5j7ak0RxHwE3AQqrjrc2qrpdwz8WWZg6aMmOAM3UgLZq5A4vA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752198818; c=relaxed/simple;
-	bh=KHPt8s4bKECNUQfB/9WjvpVUlEINokQhHtfz11aTCsY=;
+	s=arc-20240116; t=1752198819; c=relaxed/simple;
+	bh=qq/z+2pkhsDn44xzhvdK6rtv2K/GvGpdX6hXp17NKyQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=U3AsbZEdZQkBywi9Aeidx9BE6cvdPI5hQ96WCVh51TDPIqjbTUGKIlJpS0iiRujNqHjLWeTzep9Ni203adoY0tuuSZDWXkuYn65bu6p381dQ4R3RweocG8ponEf9/OpABSR1cQZRI7tBlsXnegVRGtqblsmiSjf+TufF4H/eXzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gu76alne; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6BB4C4CEF7;
-	Fri, 11 Jul 2025 01:53:37 +0000 (UTC)
+	 MIME-Version; b=XsJg3QwuNtaO+FHqwGR6Py0wESyTmwyC4Yn3DocXun37MgdAhSS9nN5BKSHKP+NJ0rAJWJLmhZbo5YeXsHjAmSkluGzoBO/poJWkrt2UNlcHZ1sMgnDoQIaSHK3WeyxhKaekEEfBUS9d3kzqPKVRbJQAvHOLOQMxEppYEqdgjYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kH8bjJ1t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E648C4CEF8;
+	Fri, 11 Jul 2025 01:53:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752198818;
-	bh=KHPt8s4bKECNUQfB/9WjvpVUlEINokQhHtfz11aTCsY=;
+	s=k20201202; t=1752198819;
+	bh=qq/z+2pkhsDn44xzhvdK6rtv2K/GvGpdX6hXp17NKyQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Gu76alneLbClV79fTmGb1RtDhFrjH/sPLWMqovVvHWgN4j4DiOyCFItRfKVqpeCtx
-	 xxCffPITIL9DPA/O3FcJPZpzB3grF7cXnksy+6JdTmYsFUWzGocqgxKph4Jk0ZB6sA
-	 5maWnpf7DO2H9Rea5hz0vV2qvpTsgu2gpv+9xll6jM34met0lNN3RDtXNwRmRLw2F3
-	 unYy9FcaCT98s6ADM4fTC7Qy9cp6Ppf+zxmG7ns9urpuq5DVySmxqVALQONTHj5mNW
-	 2MM8vmXJfB5FSdfLli/aX0RcHmbL2Ej8gGoqfaQ6+Z9gTK4BAUc1bmbmLT6IvAg0i+
-	 LbJwVcItNUs+w==
+	b=kH8bjJ1tuVST9BjOUYxvkoV41BmB5+lSi5Bkn+VheZWXUM4Mz8Qdj39xfApU3Te+z
+	 TwuFm/h441hzyx+CJ9NwD5gAdzKvOKhphliwhe0AjhyuLPJ2LLAcXixfstbhhdkxVX
+	 Y2GZ0MzVts5y/aXk0HrQYmBCFfQKk0uAvldPSFrDgJCkuPDDZ2PAG8TYchRcXwLxal
+	 7fJwKGESrM1gfTYxzL/3kjo5bLtY9ToS+Ns2wJDKgIax1QsuaoeezeyZJhLV6+S4rj
+	 RGczK3GBbReZiW6/i74ear984KXwjPouBsnr3X3+GGjmwbTYHVA6I1AdhWnN74UGHR
+	 w1gEOmwq1kh3g==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -56,9 +56,9 @@ Cc: netdev@vger.kernel.org,
 	ecree.xilinx@gmail.com,
 	gal@nvidia.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 02/11] selftests: drv-net: rss_api: factor out checking min queue count
-Date: Thu, 10 Jul 2025 18:52:54 -0700
-Message-ID: <20250711015303.3688717-3-kuba@kernel.org>
+Subject: [PATCH net-next 03/11] tools: ynl: support packing binary arrays of scalars
+Date: Thu, 10 Jul 2025 18:52:55 -0700
+Message-ID: <20250711015303.3688717-4-kuba@kernel.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250711015303.3688717-1-kuba@kernel.org>
 References: <20250711015303.3688717-1-kuba@kernel.org>
@@ -70,55 +70,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Multiple tests check min queue count, create a helper.
+We support decoding a binary type with a scalar subtype already,
+add support for sending such arrays to the kernel. While at it
+also support using "None" to indicate that the binary attribute
+should be empty. I couldn't decide whether empty binary should
+be [] or None, but there should be no harm in supporting both.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- .../testing/selftests/drivers/net/hw/rss_api.py | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+CC: donald.hunter@gmail.com
+---
+ tools/net/ynl/pyynl/lib/ynl.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/drivers/net/hw/rss_api.py b/tools/testing/selftests/drivers/net/hw/rss_api.py
-index 6ae908bed1a4..2c76fbdb2617 100755
---- a/tools/testing/selftests/drivers/net/hw/rss_api.py
-+++ b/tools/testing/selftests/drivers/net/hw/rss_api.py
-@@ -13,6 +13,13 @@ from lib.py import EthtoolFamily
- from lib.py import NetDrvEnv
- 
- 
-+def _require_2qs(cfg):
-+    qcnt = len(glob.glob(f"/sys/class/net/{cfg.ifname}/queues/rx-*"))
-+    if qcnt < 2:
-+        raise KsftSkipEx(f"Local has only {qcnt} queues")
-+    return qcnt
-+
-+
- def _ethtool_create(cfg, act, opts):
-     output = ethtool(f"{act} {cfg.ifname} {opts}").stdout
-     # Output will be something like: "New RSS context is 1" or
-@@ -57,10 +64,7 @@ from lib.py import NetDrvEnv
-     Check that Netlink notifications are generated when RSS indirection
-     table was modified.
-     """
--
--    qcnt = len(glob.glob(f"/sys/class/net/{cfg.ifname}/queues/rx-*"))
--    if qcnt < 2:
--        raise KsftSkipEx(f"Local has only {qcnt} queues")
-+    _require_2qs(cfg)
- 
-     ethnl = EthtoolFamily()
-     ethnl.ntf_subscribe("monitor")
-@@ -88,10 +92,7 @@ from lib.py import NetDrvEnv
-     Check that Netlink notifications are generated when RSS indirection
-     table was modified on an additional RSS context.
-     """
--
--    qcnt = len(glob.glob(f"/sys/class/net/{cfg.ifname}/queues/rx-*"))
--    if qcnt < 2:
--        raise KsftSkipEx(f"Local has only {qcnt} queues")
-+    _require_2qs(cfg)
- 
-     ctx_id = _ethtool_create(cfg, "-X", "context new")
-     defer(ethtool, f"-X {cfg.ifname} context {ctx_id} delete")
+diff --git a/tools/net/ynl/pyynl/lib/ynl.py b/tools/net/ynl/pyynl/lib/ynl.py
+index 7529bce174ff..13f1210d0010 100644
+--- a/tools/net/ynl/pyynl/lib/ynl.py
++++ b/tools/net/ynl/pyynl/lib/ynl.py
+@@ -575,7 +575,9 @@ genl_family_name_to_id = None
+         elif attr["type"] == 'string':
+             attr_payload = str(value).encode('ascii') + b'\x00'
+         elif attr["type"] == 'binary':
+-            if isinstance(value, bytes):
++            if value is None:
++                attr_payload = b''
++            elif isinstance(value, bytes):
+                 attr_payload = value
+             elif isinstance(value, str):
+                 if attr.display_hint:
+@@ -584,6 +586,9 @@ genl_family_name_to_id = None
+                     attr_payload = bytes.fromhex(value)
+             elif isinstance(value, dict) and attr.struct_name:
+                 attr_payload = self._encode_struct(attr.struct_name, value)
++            elif isinstance(value, list) and attr.sub_type in NlAttr.type_formats:
++                format = NlAttr.get_format(attr.sub_type)
++                attr_payload = b''.join([format.pack(x) for x in value])
+             else:
+                 raise Exception(f'Unknown type for binary attribute, value: {value}')
+         elif attr['type'] in NlAttr.type_formats or attr.is_auto_scalar:
 -- 
 2.50.1
 
