@@ -1,176 +1,119 @@
-Return-Path: <netdev+bounces-206206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C2D1B021AF
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 18:26:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2200BB021C5
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 18:29:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D2F49B443CD
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 16:25:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49F577AEAB9
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 16:28:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 157C12EF653;
-	Fri, 11 Jul 2025 16:26:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="JZUhVmV/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A80A92EF667;
+	Fri, 11 Jul 2025 16:29:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425CA2EF677;
-	Fri, 11 Jul 2025 16:26:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D22282ED161;
+	Fri, 11 Jul 2025 16:29:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752251190; cv=none; b=kFLfy2MmsbCHBATUNL0DPpuot9sc1uRkUfr/oRGaRejcvAbAXpEvHoTs7ip1xMWljn8591uEwMIuvYBNNt1RRY9y9JSvSe1jZ/WNZC5TOwCyMD8O7CyCZ36y4KPGS8kKeM5/zKAtgnoredUJdmhBm3xfNybcFF/s6k0sV+KaFj8=
+	t=1752251384; cv=none; b=p7NtWvKrMm1Tl0PTIkDFLj5ci2dOZOy4AW252jpG6dm29aRHIEMutRfUL8lqsQ/GHupMMcoNi4eBqn+OAZylafJIL3UggJGfphaYanxV8pnARzIbUtfxCusNoRkSQNKSaqNkRCsbSYOdhLLFcY3ZGKOXoqeDyvrBCLiE5wI5nOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752251190; c=relaxed/simple;
-	bh=w9jyJVsLSf6vMw60FONLCt5T/c3YCrZaITMbtU2RnNo=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dX7VHbHcsKfda6RBRxhGohIqoRKWLJ+yjHtTxzKgylbu2aWaMbVHQGgpOLMInxKI1YIOLhZ1QXPWnHUqkaFQZQoPqmLUoZ8mPeGgGoCawB3IInveeSQpJ7Dvh/Aya3dQeD5csRWuYLd2s5n89oE0dOVxvFf0o1P1xZgb9+ZxjMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=JZUhVmV/; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56BDKZdn015681;
-	Fri, 11 Jul 2025 09:26:15 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=Fd/EMmvBgaYToBsHafzJw2Zvn
-	AqIig4ogpEOlH1qL1E=; b=JZUhVmV/7o1mDLab+UP7TZ9GjLbeB78vKQ5CYSZm/
-	dvQ3AoJLOww5kVIA+IRzWh+CmA+D74rEPPeu1uG1nOqswL4E9lJLT9fuh7W+EtCZ
-	mLZZNbhnzB4RPIXmto1C8paj1bTT2OuWa7tD0dqLLlvIhI6L3xkTuFjUtcw0J4r7
-	YGB2La3/vCDN0IkmwQjb44P5oJo89UZoTu07vnye3YqbUjIPTCbignCkdK3x2JUf
-	fquNrvFjcdCir6hCPg3gH6j3yX4xgkQUWVlMLsIxzxqSdwVSzU58RSw/mC6/cKNG
-	3t/5XORrGkAfGaaR1Kd/PcVddSzREpMSMP/9Cru1bAIsQ==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 47u3d2rccp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 11 Jul 2025 09:26:14 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Fri, 11 Jul 2025 09:26:12 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Fri, 11 Jul 2025 09:26:12 -0700
-Received: from ff87d1e86a04 (unknown [10.193.79.61])
-	by maili.marvell.com (Postfix) with SMTP id F257F3F7043;
-	Fri, 11 Jul 2025 09:26:09 -0700 (PDT)
-Date: Fri, 11 Jul 2025 16:26:08 +0000
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: Suraj Gupta <suraj.gupta2@amd.com>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <michal.simek@amd.com>, <vkoul@kernel.org>,
-        <radhey.shyam.pandey@amd.com>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <dmaengine@vger.kernel.org>, <harini.katakam@amd.com>
-Subject: Re: [PATCH V2 2/4] dmaengine: xilinx_dma: Fix irq handler and start
- transfer path for AXI DMA
-Message-ID: <aHE7II-tL6zAzNYB@ff87d1e86a04>
-References: <20250710101229.804183-1-suraj.gupta2@amd.com>
- <20250710101229.804183-3-suraj.gupta2@amd.com>
+	s=arc-20240116; t=1752251384; c=relaxed/simple;
+	bh=Ultbj5aAvjf2i2FBVeLspqO/Pt6abvUu+kiGcpxdHEk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AvFhPqpjvxX3ZQ3LhfmpKyftjEHkpwIgXjgcPnt1zdqN1OfFk7P8BpV25CNnK0NyfLAUpQcD0OnctlezkGcBm5tEjsfahC+LmX8xhREphVxmjLwXy48ghd3Nh16FnnLOsKnNMqarZj6iBOfRRGJH/8urxh8792DMnsGNHuE/Pcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-604bff84741so4367326a12.2;
+        Fri, 11 Jul 2025 09:29:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752251381; x=1752856181;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WOf42JVX0DNZGJ6nN0ZcSyKq/2lB3CkluzXYH2APlPs=;
+        b=E7jO8B8ZO1c61GhamkuWq5YomhlSJm7q/u9avKmY+fN4i+aBaM3mBZrGdHZm3djzIg
+         pHSDW+LZNRiVTlo42tZ7Gbyt7ubgJ/b4p6K5HHuxT4dfPX5dDJzS24eNhWDYFkGm89I0
+         ceI7BXI8EPgp0Csd4TQXsegIUCo6Q90oIJnWJ4acwhpQi5XSfKhN2E2w4DZCsXBejGxO
+         bz/1294ko17dNBFgKYLY5/5ZUqLo/8RFe/d2Ewrj22WVkLZfalmihuQwBb0jq4r5uKPE
+         WsBG4zox7iqUGCYj3sb+BBBDg36ysdaXXQ08SXLntluEaQ7tUkWsguqkSpszZ+EnAifT
+         VuAg==
+X-Forwarded-Encrypted: i=1; AJvYcCUxP0qx11FwrQQyN9gVqZhUO/ynOvt3GFzn5SeADAobJ+IXb8xApedk8BGttlHZzLrdT7Pb2GVcBs4qRqQ=@vger.kernel.org, AJvYcCVTUfy1wv9YMDgEN9zAlBsa+uvx+HEOxbl5IJeQlsmjy0uM2SDjBthKQDH7SVstgd42N9VGYYzv@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxfo/ncAF5vD1aGY1Jz1C+vkYgJJoZsj4ChVVX1CtrzFNXDusN+
+	7l2s50aVaGbcc9hgsB2FRM/fFAqGcNGl8kRmuGdBnXKaQ9UFE5G48aAn
+X-Gm-Gg: ASbGncuodAWEitcBUB9m64LlODyg3jJdU4iH7yI0UUXoWa6U7kHLKIBc9+1civAVYuR
+	2d2GXG3piQlgf7XFsKt3C0BNdZFJriHxay9+Ky7XFFUp2r8scF4QoDQ5bqPq8Eu6OF0Klgpzq7F
+	bIWVvrJ7RQuK/FrEbnHyIf4rVKXXVnGCZbG8eKUclJL3gB4Ehi3D+Mu+GTd1EuIdfaFSWQGNWQR
+	fJCkjyD5olLRYb0fafEt+YcwYYGqKGekZVOSkKR5u8oiUwxgHW0UK71AIi4V17KiAH5/eNCJV8Y
+	/cfapc4WcPm9Pc9gMZEgr06Ke2BOVzbsf2LUGEWt/FFQtVUCauUHw0IBE9qxTe5Vjhzbbk5tTVT
+	nDG6BRiX5Z41Pf2jgSW8J3tA=
+X-Google-Smtp-Source: AGHT+IFTR/x2rOzjfShJFDjaTJRRDT/KRfp5F8jOeyMsaXdaQpXQ6Zfy72nSIupUE0YuKFTtsUwA+w==
+X-Received: by 2002:a17:906:730b:b0:ad5:4a43:5ae8 with SMTP id a640c23a62f3a-ae6fbc63f70mr440148166b.12.1752251380802;
+        Fri, 11 Jul 2025 09:29:40 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:2::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae6e7e91c81sm323374166b.37.2025.07.11.09.29.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Jul 2025 09:29:40 -0700 (PDT)
+Date: Fri, 11 Jul 2025 09:29:38 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kernel-team@meta.com, dw@davidwei.uk
+Subject: Re: [PATCH net-next v2] netdevsim: implement peer queue flow control
+Message-ID: <p22efbdqaaypgp7wu4csohhtzowpgrzrtelev7waumidabryty@lq4txzalfbfl>
+References: <20250703-netdev_flow_control-v2-1-ab00341c9cc1@debian.org>
+ <20250708182718.29c4ae45@kernel.org>
+ <aG5FrObkP+S8cRZh@gmail.com>
+ <20250709143627.5ddbf456@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250710101229.804183-3-suraj.gupta2@amd.com>
-X-Authority-Analysis: v=2.4 cv=IOsCChvG c=1 sm=1 tr=0 ts=68713b27 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=kj9zAlcOel0A:10 a=Wb1JkmetP80A:10 a=zd2uoN0lAAAA:8 a=GxtMjvDmutgGo7HIGz4A:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-GUID: M1ENkY8N2dSvyOTTYEHgkbY9i52JgnTS
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzExMDExOSBTYWx0ZWRfX1LfXBd1YRCa+ rq8f2i8PJ1cgCUvQzEhF4zRq2xgIb5NRAE9E9EBQUKbTp0+Xgwj2HrHfPR5g1p6hahyv8l3ahU7 xAhvyMLbJt1voK6YV1fq36LBhxjNJ1UpPRXGZj4blkO+ItC5JmuIG0SXpUxWxp9d8hp2TyobsjN
- eiBO3eAOV/cR+1wmLa2MVZLiurRcCCKI6m/pfCy/g8ds6GI2WtrDF8ZTBAlCKLWSEpmp9gCkl81 VGcWGK6nIfYZsiHCqfxFl2U5lpp9W+1zaA5O7O8pZ1PCMC3Lad/+8WFYtQA6raDU1jRgSCk8IBL dXSUIfWwO0e72yc0Kg0wcqSz/K9n/Dq9ORgc2NSJv30G/gpoxksMgtX7WZAlW7qw9VcrPVqPpDE
- T/3qGg6797Nkmy5NaSFH4gR5cEqQ2FqgSDlOEgtUpOZW4vDlTJBbJ7DgPeQI0ZevC5Viu3cb
-X-Proofpoint-ORIG-GUID: M1ENkY8N2dSvyOTTYEHgkbY9i52JgnTS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-11_04,2025-07-09_01,2025-03-28_01
+In-Reply-To: <20250709143627.5ddbf456@kernel.org>
 
-On 2025-07-10 at 10:12:27, Suraj Gupta (suraj.gupta2@amd.com) wrote:
-> AXI DMA driver incorrectly assumes complete transfer completion upon
-> IRQ reception, particularly problematic when IRQ coalescing is active.
-> Updating the tail pointer dynamically fixes it.
-> Remove existing idle state validation in the beginning of
-> xilinx_dma_start_transfer() as it blocks valid transfer initiation on
-> busy channels with queued descriptors.
-> Additionally, refactor xilinx_dma_start_transfer() to consolidate coalesce
-> and delay configurations while conditionally starting channels
-> only when idle.
+On Wed, Jul 09, 2025 at 02:36:27PM -0700, Jakub Kicinski wrote:
+> On Wed, 9 Jul 2025 03:34:20 -0700 Breno Leitao wrote:
+> > 	+
+> > 	+	synchronize_net();
+> > 	+       netif_tx_wake_all_queues(dev);
+> > 	+       rcu_read_lock();
+> > 	+       peer = rcu_dereference(ns->peer);
+> > 	+       if (peer)
+> > 	+               netif_tx_wake_all_queues(peer->netdev);
+> > 	+       rcu_read_unlock();
 > 
-> Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
-> Fixes: Fixes: c0bba3a99f07 ("dmaengine: vdma: Add Support for Xilinx AXI Direct Memory Access Engine")
+> That's sufficiently orthogonal to warrant a dedicated function / helper.
+> 
+> In terms of code I think we can skip the whole dance if peer is NULL?
 
-You series looks like net-next material and this one is fixing some
-existing bug. Send this one patch seperately to net.
-Also include net or net-next in subject.
+Sure. We can use rcu_access_pointer() to check if the value is set, and
+then get into the slow path.
 
-Thanks,
-Sundeep
-> ---
->  drivers/dma/xilinx/xilinx_dma.c | 20 ++++++++++----------
->  1 file changed, 10 insertions(+), 10 deletions(-)
+       if (rcu_access_pointer(ns->peer))
+               nsim_wake_queues(dev);
+
+> > Also, with this patch, we will eventually get the following critical
+> > message:
+> > 
+> > 	net_crit_ratelimited("Virtual device %s asks to queue packet!\n", dev->name);
+> > 
+> > I am wondering if that alert is not valid anymore, and I can simply
+> > remove it.
 > 
-> diff --git a/drivers/dma/xilinx/xilinx_dma.c b/drivers/dma/xilinx/xilinx_dma.c
-> index a34d8f0ceed8..187749b7b8a6 100644
-> --- a/drivers/dma/xilinx/xilinx_dma.c
-> +++ b/drivers/dma/xilinx/xilinx_dma.c
-> @@ -1548,9 +1548,6 @@ static void xilinx_dma_start_transfer(struct xilinx_dma_chan *chan)
->  	if (list_empty(&chan->pending_list))
->  		return;
->  
-> -	if (!chan->idle)
-> -		return;
-> -
->  	head_desc = list_first_entry(&chan->pending_list,
->  				     struct xilinx_dma_tx_descriptor, node);
->  	tail_desc = list_last_entry(&chan->pending_list,
-> @@ -1558,23 +1555,24 @@ static void xilinx_dma_start_transfer(struct xilinx_dma_chan *chan)
->  	tail_segment = list_last_entry(&tail_desc->segments,
->  				       struct xilinx_axidma_tx_segment, node);
->  
-> +	if (chan->has_sg && list_empty(&chan->active_list))
-> +		xilinx_write(chan, XILINX_DMA_REG_CURDESC,
-> +			     head_desc->async_tx.phys);
-> +
->  	reg = dma_ctrl_read(chan, XILINX_DMA_REG_DMACR);
->  
->  	if (chan->desc_pendingcount <= XILINX_DMA_COALESCE_MAX) {
->  		reg &= ~XILINX_DMA_CR_COALESCE_MAX;
->  		reg |= chan->desc_pendingcount <<
->  				  XILINX_DMA_CR_COALESCE_SHIFT;
-> -		dma_ctrl_write(chan, XILINX_DMA_REG_DMACR, reg);
->  	}
->  
-> -	if (chan->has_sg)
-> -		xilinx_write(chan, XILINX_DMA_REG_CURDESC,
-> -			     head_desc->async_tx.phys);
->  	reg  &= ~XILINX_DMA_CR_DELAY_MAX;
->  	reg  |= chan->irq_delay << XILINX_DMA_CR_DELAY_SHIFT;
->  	dma_ctrl_write(chan, XILINX_DMA_REG_DMACR, reg);
->  
-> -	xilinx_dma_start(chan);
-> +	if (chan->idle)
-> +		xilinx_dma_start(chan);
->  
->  	if (chan->err)
->  		return;
-> @@ -1914,8 +1912,10 @@ static irqreturn_t xilinx_dma_irq_handler(int irq, void *data)
->  		      XILINX_DMA_DMASR_DLY_CNT_IRQ)) {
->  		spin_lock(&chan->lock);
->  		xilinx_dma_complete_descriptor(chan);
-> -		chan->idle = true;
-> -		chan->start_transfer(chan);
-> +		if (list_empty(&chan->active_list)) {
-> +			chan->idle = true;
-> +			chan->start_transfer(chan);
-> +		}
->  		spin_unlock(&chan->lock);
->  	}
->  
-> -- 
-> 2.25.1
-> 
+> Ah. In nsim_setup() we should remove IFF_NO_QUEUE and stop setting
+> tx_queue_len to 0
+
+That makes sense, thanks!
+--breno
 
