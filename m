@@ -1,125 +1,171 @@
-Return-Path: <netdev+bounces-206135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ADAFB01B7B
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 14:07:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ED8AB01B9E
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 14:14:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5EC15A4696
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 12:07:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B6717A237D
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 12:12:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80AFC28BAB9;
-	Fri, 11 Jul 2025 12:07:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99950290092;
+	Fri, 11 Jul 2025 12:14:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="QDF36VfX"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="PHhpq+JQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from nbd.name (nbd.name [46.4.11.11])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C930E1F4C8C;
-	Fri, 11 Jul 2025 12:07:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE40528C2D2;
+	Fri, 11 Jul 2025 12:14:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752235639; cv=none; b=cVpuZXq1qLI+iv4o9rQw+oEqsmTOMivQJUaEL8vi3I2I0xqPZj/Qhs3Z2VZv8yrNKqfSBcKlZtmlq4dmiZRIaHBlRXCxNHMVwP/CYTGtBLh4zLT5HxvMjP/Uh68OC7kBUlCgJHpYtfvuYHnLIqhBD3GcDxuoEFHiuyWJ2wfPpKE=
+	t=1752236042; cv=none; b=Fr3QEANUn7HnPc+0T/52RXnsdwIk7sekhywZRBo3tuGdcFcuw43qKXORjwsYIfY01KhMwsiqwwpccVrAp5ivDnJPYCQwIDMnHykBgtDuFQdmd8zNg1tdZZ9gt+jLV74B7+EV0FNq2SPkdIdeTpRBGxoqLdFc3y7jNsZnGCRQl6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752235639; c=relaxed/simple;
-	bh=AerIy58F2mKyZGTVixF+HdoXIruvmQT/irkGVWnAmBQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pMMbhB9ibE5CrPKTqYp9fbDzfyhiXrYF/dny/lsPERe1oA+9iQtHaATug0cNZumZ4dxt8jVCPpCfOZrOYAmvze3TXqJLct5qAOxsROYpRDUgVLcw7mzxZAdu0vh0dPK2wMQHiTb798zXO1kMuvTR5VPpXoO6l9ki1pXHN/tvaCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=QDF36VfX; arc=none smtp.client-ip=46.4.11.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
-	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=JAPLs4JTtm6yZPE6BGHezf271ecxd012iwqsakCpiu0=; b=QDF36VfXLn68siDmzoKGYjRbwC
-	aprINtr/fDqge/PGDeR+Tbq1cZytAN5BC9slNXBAU2a0VzVf8+oWHmhiOJcyWHsoNhJcJ5nFQEMcp
-	YMpZkjqAl7QcU5QGOPXTFD2/2w+nFMZxTI7TbQoiDa5h5Ekh6YbrCWYKCJJOe6taUHd8=;
-Received: from p5b2062ed.dip0.t-ipconnect.de ([91.32.98.237] helo=nf.local)
-	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <nbd@nbd.name>)
-	id 1uaCWo-00A2pQ-0W;
-	Fri, 11 Jul 2025 14:06:58 +0200
-Message-ID: <2c84bde8-5d5a-467f-a7ac-791207e7903a@nbd.name>
-Date: Fri, 11 Jul 2025 14:06:57 +0200
+	s=arc-20240116; t=1752236042; c=relaxed/simple;
+	bh=od06OYyJQNBIaoMMEWnmyZCZFNCqB4uJCnhW4mgRLNg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ldm/fD7FLqqzPumIWepmF4lWGEGv+mV9k7m/B7sxJ6XEuduzo4476SKY1QA7AYA3yvTWjFA39HQO9JX45sdEDtZVvgbAxK0t6hhDOqW3AWfIwNqCxn48tgiHfM8G6RLVnDRvDbEOQf5xgKMQTiPdSb8nRWqD5gRBMNb5cw94M/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=PHhpq+JQ; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56BBSfGL024054;
+	Fri, 11 Jul 2025 05:13:41 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=VHbYwcxmV/ccLUWFZRZKrRh
+	/eZa9nENxL6IzsNfpziw=; b=PHhpq+JQG7OmPIZcJ/XSeYUjOREGj0CKyFTMyCb
+	EhtPYT7rfksKjJ410uj+Kut9NeA3tlAz8lAuHcXAwq7My+aBhKPVYwmlNMr9pZe7
+	WNRcXfvQGKUTctaAgIRI7JhUE3h/ZlhikvnYh/X2wCR1ScZ1CMU58dnnegMjkKMg
+	6jm6WdmroOsnVU5y+sq9BR6zxaY20IA6dOqFPAqFpgdxemQalYLs2r59Dh8kb7P+
+	ECvqS3naUvP7Bfn4jOWX4+1oF3YLV/2Xl3Hn48xbundmoE68gOIcqm0Jrw3Tdh3p
+	d5TIXD5ap8gz06bdvBQ4jOFi/0Yq4sbuzLzJ5oRipQuWaIQ==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 47u1s501xp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 11 Jul 2025 05:13:40 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Fri, 11 Jul 2025 05:13:38 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Fri, 11 Jul 2025 05:13:38 -0700
+Received: from optiplex.marvell.com (unknown [10.28.34.253])
+	by maili.marvell.com (Postfix) with ESMTP id B66FD3F7058;
+	Fri, 11 Jul 2025 05:13:35 -0700 (PDT)
+From: Tanmay Jagdale <tanmay@marvell.com>
+To: <davem@davemloft.net>, <leon@kernel.org>, <horms@kernel.org>,
+        <herbert@gondor.apana.org.au>, <sgoutham@marvell.com>,
+        <bbhushan2@marvell.com>
+CC: <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>,
+        Tanmay Jagdale
+	<tanmay@marvell.com>
+Subject: [PATCH net-next v3 00/14] Enable Inbound IPsec offload on Marvell CN10K SoC
+Date: Fri, 11 Jul 2025 17:42:53 +0530
+Message-ID: <20250711121317.340326-1-tanmay@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: fix segmentation after TCP/UDP fraglist GRO
-Content-Language: en-US
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>,
- Richard Gobert <richardbgobert@gmail.com>
-Cc: linux-kernel@vger.kernel.org
-References: <20250705150622.10699-1-nbd@nbd.name>
- <686a7e07728fc_3aa654294f9@willemb.c.googlers.com.notmuch>
-From: Felix Fietkau <nbd@nbd.name>
-Autocrypt: addr=nbd@nbd.name; keydata=
- xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
- ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
- Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
- AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
- vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
- wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
- TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
- l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
- dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
- HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
- VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
- CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
- VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
- Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
- DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
- wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
- f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
- aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
- FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
- TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
- GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
- cL98efvrjdstUfTCP2pfetyN
-In-Reply-To: <686a7e07728fc_3aa654294f9@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzExMDA4NiBTYWx0ZWRfX2eL/zLQ2YfXZ 4ibQcliANTY9Ti7/sJboetU2ZjnJPXdY2jtWKx1bjX4xXljRU0n0aSjMsfvJvQJ1GJU43BT0IYq Gf/9+/HM+OuwzRJNY/CgOv/rrUlCiskM2EZxAkzaEBvfwG2Wx836xEBnNrz8B8DlsX6fHm0tW8r
+ hG9R3D5OiLMTB06Rol3+GBJzW85QCx60anDBdiM52CYP0fjpkyeZJDxPyb6vSBDmMpeqYjCPOMO S2CEv/S99L3AGWLBsuthDGRqji821wHBTCamCtGstPsnV+77gW/asMIXZqGCnhBa216lS3Mtxu3 hLFILXlgVIRwdHIUd6CHu770B0FoFqXwOEgWCoKt9w3YNlnopOppN1apOTsHNr8TCSdOlCVnvrG
+ 1G5E3QwvEFeDj9P9tauOhk3xm5EMCmYN9Lyu5IdXW+qh5QE2RsQU+kG3gi2gTv/1uMImGHW+
+X-Authority-Analysis: v=2.4 cv=DO+P4zNb c=1 sm=1 tr=0 ts=6870fff4 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=Wb1JkmetP80A:10 a=OTBs_5SviU20kZL2kjsA:9
+X-Proofpoint-GUID: V8INzZprujE8PDQrkAXJCfSP78ovgYUJ
+X-Proofpoint-ORIG-GUID: V8INzZprujE8PDQrkAXJCfSP78ovgYUJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-07-11_03,2025-07-09_01,2025-03-28_01
 
-On 06.07.25 15:45, Willem de Bruijn wrote:
-> Felix Fietkau wrote:
->> Since "net: gro: use cb instead of skb->network_header", the skb network
->> header is no longer set in the GRO path.
->> This breaks fraglist segmentation, which relies on ip_hdr()/tcp_hdr()
-> 
-> Only ip_hdr is in scope.
-> 
-> Reviewing TCP and UDP GSO, tcp_hdr/transport header is used also
-> outside segment list. Non segment list GSO also uses ip_hdr in case
-> pseudo checksum needs to be set.
-Will change that in v2, thanks.
-> The GSO code is called with skb->data at the relevant header, so L4
-> helpers are not strictly needed. The main issue is that data will be
-> at the L4 header, and some GSO code also needs to see the IP header
-> (e.g., for aforementioned pseudo checksum calculation).
-> 
->> to check for address/port changes.
-> 
-> If in GSO, then the headers are probably more correctly set at the end
-> of GRO, in gro_complete.
+This patch series adds support for IPsec packet offload for the
+Marvell CN10K SoC.
 
-Just to clarify, in inet/ipv6_gro_complete you want me to iterate over 
-all fragment skbs, calculate the header offset based on the first skb, 
-and set it?
+The packet flow
+---------------
+An encrypted IPSec packet goes through two passes in the RVU hardware
+before reaching the CPU.
+First Pass:
+  The first pass involves identifying the packet as IPSec, assigning an RQ,
+  allocating a buffer from the Aura pool and then send it to CPT for decryption.
 
-- Felix
+Second Pass:
+  After CPT decrypts the packet, it sends a metapacket to NIXRX via the X2P
+  bus. The metapacket contains CPT_PARSE_HDR_S structure and some initial
+  bytes of the decrypted packet which would help NIXRX in classification.
+  CPT also sets BIT(11) of channel number to further help in identifcation.
+  NIXRX allocates a new buffer for this packet and submits it to the CPU.
+
+Once the decrypted metapacket packet is delivered to the CPU, get the WQE
+pointer from CPT_PARSE_HDR_S in the packet buffer. This WQE points to the
+complete decrypted packet. We create an skb using this, set the relevant
+XFRM packet mode flags to indicate successful decryption, and submit it
+to the network stack.
+
+Bharat Bhushan (4):
+  crypto: octeontx2: Share engine group info with AF driver
+  octeontx2-af: Configure crypto hardware for inline ipsec
+  octeontx2-af: Setup Large Memory Transaction for crypto
+  octeontx2-af: Handle inbound inline ipsec config in AF
+
+Geetha sowjanya (1):
+  octeontx2-af: Add mbox to alloc/free BPIDs
+
+Kiran Kumar K (1):
+  octeontx2-af: Add support for SPI to SA index translation
+
+Rakesh Kudurumalla (1):
+  octeontx2-af: Add support for CPT second pass
+
+Tanmay Jagdale (7):
+  octeontx2-pf: ipsec: Allocate Ingress SA table
+  octeontx2-pf: ipsec: Setup NIX HW resources for inbound flows
+  octeontx2-pf: ipsec: Handle NPA threshold interrupt
+  octeontx2-pf: ipsec: Initialize ingress IPsec
+  octeontx2-pf: ipsec: Process CPT metapackets
+  octeontx2-pf: ipsec: Manage NPC rules and SPI-to-SA table entries
+  octeontx2-pf: ipsec: Add XFRM state and policy hooks for inbound flows
+
+ .../marvell/octeontx2/otx2_cpt_common.h       |    8 -
+ drivers/crypto/marvell/octeontx2/otx2_cptpf.h |   10 -
+ .../marvell/octeontx2/otx2_cptpf_main.c       |   50 +-
+ .../marvell/octeontx2/otx2_cptpf_mbox.c       |  282 +---
+ .../marvell/octeontx2/otx2_cptpf_ucode.c      |  116 +-
+ .../marvell/octeontx2/otx2_cptpf_ucode.h      |    3 +-
+ .../ethernet/marvell/octeontx2/af/Makefile    |    2 +-
+ .../ethernet/marvell/octeontx2/af/common.h    |    1 +
+ .../net/ethernet/marvell/octeontx2/af/mbox.c  |    3 -
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |  119 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu.c   |    8 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |   71 +
+ .../ethernet/marvell/octeontx2/af/rvu_cn10k.c |   11 +
+ .../ethernet/marvell/octeontx2/af/rvu_cpt.c   |  707 +++++++++-
+ .../ethernet/marvell/octeontx2/af/rvu_cpt.h   |   71 +
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  235 +++-
+ .../marvell/octeontx2/af/rvu_nix_spi.c        |  211 +++
+ .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   40 +
+ .../marvell/octeontx2/af/rvu_struct.h         |    4 +-
+ .../marvell/octeontx2/nic/cn10k_ipsec.c       | 1204 ++++++++++++++++-
+ .../marvell/octeontx2/nic/cn10k_ipsec.h       |  159 +++
+ .../marvell/octeontx2/nic/otx2_common.c       |   23 +-
+ .../marvell/octeontx2/nic/otx2_common.h       |   16 +
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   17 +
+ .../ethernet/marvell/octeontx2/nic/otx2_reg.h |    5 +
+ .../marvell/octeontx2/nic/otx2_struct.h       |   16 +
+ .../marvell/octeontx2/nic/otx2_txrx.c         |   27 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |    4 +
+ 28 files changed, 2959 insertions(+), 464 deletions(-)
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_nix_spi.c
+
+-- 
+2.43.0
+
 
