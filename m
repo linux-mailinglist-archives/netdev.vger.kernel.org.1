@@ -1,241 +1,272 @@
-Return-Path: <netdev+bounces-206101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C970EB01762
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 11:15:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B021EB017A9
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 11:28:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A6AB3A7BF4
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 09:14:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4844416B5A3
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 09:28:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A83A264FA0;
-	Fri, 11 Jul 2025 09:14:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1E2F279DC3;
+	Fri, 11 Jul 2025 09:28:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="FNUD6XqR"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="pGfk/dKy"
 X-Original-To: netdev@vger.kernel.org
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010018.outbound.protection.outlook.com [52.101.84.18])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2087.outbound.protection.outlook.com [40.107.92.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10974264625;
-	Fri, 11 Jul 2025 09:14:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D2226D4F1;
+	Fri, 11 Jul 2025 09:28:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.87
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752225255; cv=fail; b=H76C1S0VD+gE6ls2/fwyZjDNaE+8zcMZIYV6jU98QYv/4EFRz/iXYEzmWbW4Ri321pEkCFYxUJjekG0vIJC1C6MME5ZdHjitJwrSAslYyOSTNOjNQ9h5ij18WJGIzjLP+Hm/NCMY5xglUCh6dT2A5y5h0jr1g43QzjE6nKlZ8DQ=
+	t=1752226088; cv=fail; b=mJWvXb5G66ymOy0x9XCZc6NwZeaKR/VyWtBTH9yjjHKXbrHvcfZPvVDOa2L4IyMaBGX+R0KjPOHt3jXiamrCGTkR3cHCe4yo6tlClfi48s4VTVHKNZpqL7J5jdPwkGbDlyye1XEzEI2+bOrecJoUg4NaMoeXYLM4efqEeKN6WRw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752225255; c=relaxed/simple;
-	bh=cYl9VcVvX5r7j5bO4u78gf35JQO1Tf8GCz1w+9rXZI0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=QtTOq2+LfBqCYilFsZ90Mr7Obadd6dpdmfEnLp3jcSEEerKXE/Nx9W5BXjaEl6pFY2+0vaZPfgJ7LVnDwStsJ54T2UTgxLJV/XZgKL2Dexd35nYzaX5lSnidPiII1f6Z3eyaGjnf6n9/FEfszdmLiWqvXPSNKfHkJ4Na0OAUflU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=FNUD6XqR; arc=fail smtp.client-ip=52.101.84.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	s=arc-20240116; t=1752226088; c=relaxed/simple;
+	bh=ENzdGdh+hdgRfESHVabyyoybodtXs7CcJMqesE/8Kyo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tllQ0CyWo7RBE1AAbTrGulB4ykrfmUkvG6WyF6e2mwjRDsnG1lYrnzM08UXG8eWQpBJzMxrJK77V+YFUeCp6dy7YjMBgptxWB4hd07sXdnb5oQcmltBFATfRyIkWTxlJCbGGaBr54VGOy4ObXOhNKXs5DgWTNDBa66UzPFtMupc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=pGfk/dKy; arc=fail smtp.client-ip=40.107.92.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=aUk+QU1bNlj7uP9FyQNJGQQHmUCSNuy+ok4p2PqY4rldKmzMxhV1szbTVmcNSP0ZugQvRaj5fLZIVOlIrTrPyCqLjm8ejApO0pW3N25NyiKJPRyhR7cjP/TNfWZ7e5ag2JSEYTj5j7yDAjEsn9PVy28SfFEm61E+cDfo4k8WwsXdSkKmSe39M60y8y4+vhnIDvxbh+PvsIzEjdkAqjT5+Oljl7uxknQIaGsi/IU6lZcRMGCYxvOSYiNWj1npxRkuXAy8zTfDpabhYmBNENfWCPgP7udG2LXxkg4SOfQuMAKou7wPIMRPILTavboM8jdVTJHzUJ5V9/Ea7GVRt7QCsw==
+ b=MTGhQ6FND88UWNZ6+UnmH4/mJZvoPVynHvWEGFvSrbjzRugmPU9B0hh6ode2Y6HibH3YV5Qn1FbNBHLtt+xeaPlrmliHQ3KiTGhjQmvDFYvu7imtb6Pq6uY8+69ln/p/R/vUpdksVboBQ6xINp+miciJngFBdLuVuZXfgXuXoYy4YutXLKN2yBdwmxF0WGfo7d8uTSoQ/VxihQn5qY0ZXcWDc1UZnQw7uvlIPc9HnjWhKWyA+5VkZNe5BM8NN/Nx9EAGBFZY3BSYyoJ6vdsfZCOzuR1uJlPQdwNroGEVCwDn2QkL7bbQhxwLT7jzstm9mBJ0Xw8f4mgUCTiPYb/Kkw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IV5lRFNXPY8NQ1H4hLuSSYSimNbymxKyw5ggZbc+/M0=;
- b=cdMaitEho8g7NSTS6yYLv/KvWHa2eBJyobb35HixbhiL04o9Bgw23Rqdjf+twEKHK0aqzPhSj0lAVIDizrcbhhKIN6wVXUkaBVg/I7XkZu3Q1X/hyqLWDk8ugVtnKfVLuCZleF3Nr93H2qLuVyKzSx4T51pkujuwHbbb91Hmz//PLGoBH6gGXNGfkUo1Cn3cY8PBAKCIOujRvy1UPIriLwQby6uaJRkvtsjQH6ojOVO4l20KUbs7pKPhvpbFZfPv2JICP6h3rwZKp8kSm6r+acGqDi99YK9YwZA1fngbIrdzWOoY1aM2wl0D22UIFNBJayGCVpvsFDhjgWDI0BQBSg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ bh=BnNUUO7ZOjyiOxEqrt3lOyMf/QW5pZzdyNFioe2DbD4=;
+ b=gkYktbR8L5CryZIT+QAT0nJpm9/zJPX3Cer/akiEvIgm8lhsOtw8NGn+cUcI9YYcbQOKR/s8faGBkvKqGeJg5lPpt7Ye6ILexoxXnt9z9wRRjyVM68F7yyYSCew6SEiFTj9UTgksjIRrv8G+flPZLX7bta1p1ezeKb0soc1oXcG8GBd8ivVpJg8aXWmKVmGfIVYPiADrFFiK3r+l+O74a2wcOc/KNmeb65DcnLGj4gkFXFY+9H/hCFDQ/onErLH48dnb4Su6ltBPOIzIHXI7VNq+xgpYMVIfuPyaozsNsfbtumRPU9Hlvz74tbSM58JIN1DjMTNgaN7+kM/LyYFDDg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IV5lRFNXPY8NQ1H4hLuSSYSimNbymxKyw5ggZbc+/M0=;
- b=FNUD6XqR0wNGVDUR/vmulMP07wqArBZpkMGICXMJwiVLXKEdZ5Ei0UErRLgBzlXs+L9zAGr5te3VQ4IXbo7rZE+TaRG49PT7U26lv8B2fNNQcYTFGFm9zcH01wOoMh4RXfzfHd8SAp/VZUKnze+Mw05f7va/Do1sNXiuE3E0gzkyNjC/imwIBB/RVYx55OII/ZKM+Yl/5QyNTqCUJ7mQApCwoUjhAZtglMJrokpTqUjzudB6wy0QbtVIc6lQgcns2++qUMPIDjw36lVr3oxzRwSIXvPDaIiRVlQgPxsE2GPBLITibS5mPt52yBjMWxP+cDh0dJosh09nORbQ0y7/8g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by DBBPR04MB7708.eurprd04.prod.outlook.com (2603:10a6:10:20d::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.29; Fri, 11 Jul
- 2025 09:14:13 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%5]) with mapi id 15.20.8901.024; Fri, 11 Jul 2025
- 09:14:12 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: shenwei.wang@nxp.com,
-	xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	maxime.chevallier@bootlin.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev
-Subject: [PATCH v2 net-next 3/3] net: fec: add fec_set_hw_mac_addr() helper function
-Date: Fri, 11 Jul 2025 17:16:39 +0800
-Message-Id: <20250711091639.1374411-4-wei.fang@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250711091639.1374411-1-wei.fang@nxp.com>
-References: <20250711091639.1374411-1-wei.fang@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: MA0P287CA0005.INDP287.PROD.OUTLOOK.COM
- (2603:1096:a01:d9::17) To PAXPR04MB8510.eurprd04.prod.outlook.com
- (2603:10a6:102:211::7)
+ bh=BnNUUO7ZOjyiOxEqrt3lOyMf/QW5pZzdyNFioe2DbD4=;
+ b=pGfk/dKyi051OX2h7q6coGEawQNgAP8Fc10EZqj10yccIV+WEjJXldVsoGQyVuIdTm8aI4hxIEYNO+SgCaKU75HPj1HplW1mCtzAje754Ahfa2zU4QYiMuLseafSI1PC8x8RZycCKUqO4sS4UyNgGDgMJH6UDIXrZQl4lS7sywBEvofMifd4fXECdE1yG+RHbi2/KylqoumN/pPCnKCUsied7Ow4pX0/+vqlhQws2EZ808ooED1oGHpAfgcF1DauIpswHCCQ8WJAytWTKOnK2PNWaUHj15/WEo3AI+coYTlYE0c4eubNIoGsiGdTH/BzUDa+Ub2aLSISvZUp5O8jMA==
+Received: from DS7PR05CA0002.namprd05.prod.outlook.com (2603:10b6:5:3b9::7) by
+ CY8PR12MB7146.namprd12.prod.outlook.com (2603:10b6:930:5e::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8835.19; Fri, 11 Jul 2025 09:28:02 +0000
+Received: from CY4PEPF0000EE34.namprd05.prod.outlook.com
+ (2603:10b6:5:3b9:cafe::27) by DS7PR05CA0002.outlook.office365.com
+ (2603:10b6:5:3b9::7) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8943.7 via Frontend Transport; Fri,
+ 11 Jul 2025 09:28:02 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ CY4PEPF0000EE34.mail.protection.outlook.com (10.167.242.40) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8922.22 via Frontend Transport; Fri, 11 Jul 2025 09:28:01 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 11 Jul
+ 2025 02:27:49 -0700
+Received: from drhqmail201.nvidia.com (10.126.190.180) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Fri, 11 Jul 2025 02:27:48 -0700
+Received: from dtatulea-c3.nvidia.com (10.127.8.13) by mail.nvidia.com
+ (10.126.190.180) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
+ Transport; Fri, 11 Jul 2025 02:27:45 -0700
+From: Dragos Tatulea <dtatulea@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, Jens Axboe <axboe@kernel.dk>
+CC: <parav@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, Cosmin Ratio
+	<cratiu@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Pavel Begunkov
+	<asml.silence@gmail.com>, Mina Almasry <almasrymina@google.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<io-uring@vger.kernel.org>
+Subject: [PATCH v2 net-next] net: Allow SF devices to be used for ZC DMA
+Date: Fri, 11 Jul 2025 09:26:34 +0000
+Message-ID: <20250711092634.2733340-2-dtatulea@nvidia.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|DBBPR04MB7708:EE_
-X-MS-Office365-Filtering-Correlation-Id: f74694cd-63e2-467d-b691-08ddc05b4d36
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE34:EE_|CY8PR12MB7146:EE_
+X-MS-Office365-Filtering-Correlation-Id: 307290d3-911c-4efd-5f6e-08ddc05d3b4d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|376014|19092799006|52116014|38350700014;
+	BCL:0;ARA:13230040|376014|7416014|1800799024|36860700013|82310400026|13003099007;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ht7vlMq+/XbwZkxfdWwPx01mKRq6RFKNG+aUNhRfmewC1FAN4mjr8k0XysXR?=
- =?us-ascii?Q?6Dp5eclAD8Ges1hgnaMgMughxYFu5jg8Jvfu7G4YGnWNDGcd/khk+DcOt4/m?=
- =?us-ascii?Q?0zcggxhhh6rXhHYFQFGJpONsdpSD/y9LqGSGT/JgP0rUGcjZSN5ojPCMgEPo?=
- =?us-ascii?Q?lLEbm3qf/Jw8ywUrRe4JKz0J/r/ti9Wgl7AyHGm5EDeLpJRX6z6MH2o8oGN5?=
- =?us-ascii?Q?PvEjeYtBiofXl11G1uXQ2yyruPWvzzTQJE5+gLtUNtNpfCrUAbqCDznxXIFB?=
- =?us-ascii?Q?s80+N2Ol+fWcDwc5yruQIlGL1z5SinC8L1Vpo+8XRGPWksMXEiv0q3VLO2JP?=
- =?us-ascii?Q?IIkveBvQvwqcd2n1wDn6CsfZqwtECnXqPnr7TsAnbpzMsJJf1Bd84DEZ6ARS?=
- =?us-ascii?Q?ZZVNlfFbqYigUltAhFj208vg1XXK7fq9KlfOZS/RKk7V/LoZCfLI/dFEj+dJ?=
- =?us-ascii?Q?RD6wTjfSMaUvj0S7+SLRLqOEkoX+uadzErhxH92plWYVlBZyITMqDi/1W0dk?=
- =?us-ascii?Q?zLbCEAQT3GTFoeBNQjfol5c15x/kRJyuEKJikosa7HxQrFP6TIGKhiGNY5sS?=
- =?us-ascii?Q?gjDba99uwRCQxc/jiLphDsZktiestxG6G72Eh8kdGZNp8o3iIKyJnCPgT2s4?=
- =?us-ascii?Q?4RcnbPo54ZWshQNoGExxKI0NkJqQRrwFBAPgqNODl5dnX8DVbMjFfICLJrnw?=
- =?us-ascii?Q?BIvuDAokiY/ErRyVD4sGB8OUDDk2ifxNyDX5N0p4TaY7tI5/bHxAgipqDBk9?=
- =?us-ascii?Q?fuLh2VFjQ3X8oPxEJwN2UnL8wag1ndMPcWlH3Gpc/zyzTFYrEk8yhDephbjd?=
- =?us-ascii?Q?++GmW/+r7kHh35dtZdghFS8BWlq8eSFjTShm81EWfscXufRcFiHUIUCqpkDW?=
- =?us-ascii?Q?20kQOd3017M1Pv/ShaW4TvZO/jEbTPrN4mWrOOjsDF4aJQvuY827SzHR7noB?=
- =?us-ascii?Q?Z0fKoCI3hIaxzu4pgfeE6EWJPCZAMZLZYPmZy/d9r2SnZ+WeK/rhOfXwWEtL?=
- =?us-ascii?Q?M0LM0Ec0CheNOkjtNKq9bRNU0LYChsls5ne0d8AWVHGoDw7fk0o0lTks10NW?=
- =?us-ascii?Q?VsE11gxYMMIsWWWvoPcweDZwXTSlfSCJH7jVJndsslFiKvKBRTF4HwEjIxsE?=
- =?us-ascii?Q?8hzqwjzvlPB0ZYGyEz3H5uADYlTStmJIG6b2XUPqdlBCTKlMyXhl6SQxLQMD?=
- =?us-ascii?Q?FI5NuYMcSpBLC6TKsyQLxisVzpvPifdNVQHKsJabY6tcCnz8pjZqyhCzLexA?=
- =?us-ascii?Q?88rrt6n3hIQu+6oo5M+3HbI1uEu7iWFWIctTHqLR2ISBNBOItMoHQ/u9py+I?=
- =?us-ascii?Q?fHdzkVUvme5USUJku5yIJVUFqJ9a7kWFzW3ZCL75gkhLcyNEbJYyaPIOS/r4?=
- =?us-ascii?Q?r2fP4OFYwWJrDHreMCQyHECz8CpQS2OwUgo1BKpVkdEFCvWjhwq5vyOXM7V2?=
- =?us-ascii?Q?Xx7wmbc3D1iUnoiOuz/Wr29vrqPMoAobH9XhCLxAgl6yF0HFyfmfAA=3D=3D?=
+	=?us-ascii?Q?7HGFA3q33AIAdkstuuqd5TYY8c4oF+4vH0dL9j7gsPh4qHCfJn6JKohdyr0n?=
+ =?us-ascii?Q?3kZpyEDM3ty3xm0zi07u8jHj6j7RbNc/WBYsCZvGw1rREM/kEyXWiPKzA7Jr?=
+ =?us-ascii?Q?kGSliaol+V/E5QO2VdXvYZbe8p7INaml1Z+MJSGhryT87ywgIqfqj7Mh9vi1?=
+ =?us-ascii?Q?Zi+ApHFB7HymFDg5SGAWRoAbE2zO0kXPWKKMrMfXdmnslidrD8r0Y6X6JpLm?=
+ =?us-ascii?Q?H4uD/pgweylbySmUPA118XMJoAqfxN1hNJZr4uxYH4U6+3etkfQ562u6MUIE?=
+ =?us-ascii?Q?TDBX3Ln7x/rcJEwm2Lcdgqen0Ru/+X9VDI6105q8g4cEY2jZ18pOSvY6kdDt?=
+ =?us-ascii?Q?8gA8gGUtUlfhfuA34IVqhnr38I9VK2vKgngdvjOuBMQxEArtSuRdtMNUK1hO?=
+ =?us-ascii?Q?kqggV6HW6QUBswPLmYhkonCTTULelQIPnexYdWvSsUECGH5Il4IrvWqvzx7J?=
+ =?us-ascii?Q?qHMe34VKCHXoDPsT5VtfVbrq1+/NcWid9IuyUpakeuM9dD2IZWQFCuyAkC5I?=
+ =?us-ascii?Q?qYxhlj7bQpSaD0fKOr6cgoIhXD5URa/EmD8NTm00jdleEfWnCneuUpX1pCk/?=
+ =?us-ascii?Q?GYqNiiW84P+IaApz1LE2ns3vcr7sNWZVUreuKWIVBIE72dMWWw6KLGlXX44m?=
+ =?us-ascii?Q?Ug7GCiIuBiffHz9VN5sDW6E+KU9s2lUnNkYnH5bYK6vqccIGJHl3h6nHrS5O?=
+ =?us-ascii?Q?RHDNjfq7Svu9W2VPTvJ5+o5IV5FjN+0g/0TpWtORRZKCBUh/yh7mTFDye47e?=
+ =?us-ascii?Q?qqChqnJXor0YZ11IHGR9zvAGVRsPb8uWLz4goYNEb2s43M+axYhtQ780xFvU?=
+ =?us-ascii?Q?o5YsQ0EM+XCXlO5JbCWIs7HfsadeRWbOf5bS0pPZr5cJ14woR7ibd1lc1Tch?=
+ =?us-ascii?Q?PeTQl/52c8DSk+BKSI5l29ubNPKbOMpuXR561gZYKeiGAutk14zElOPy9gI1?=
+ =?us-ascii?Q?5baM0/+mdlqTzg0Yw9/KF+6Il4iWHte9rJfJvgK22w9l36gHh3HgDnCUa6+S?=
+ =?us-ascii?Q?RQAWF9XaVx6VHx7sQj1m3SmeNM91zNsFBB9f/c3zhMxdy+6HlKxjlxZ4SFHp?=
+ =?us-ascii?Q?kkKVhkH3mWzlypd8F62LC1MsYhnf0PryF297bhNR/eQOhahj6vadM9m0Z2oD?=
+ =?us-ascii?Q?3YgL5MlMCcxhkdOpCFfBmv2e6qM4zfUBCbD7Lc6nnRjwUeL2+t3Grj8aiegi?=
+ =?us-ascii?Q?nLD8fJwQhWJEqaQminmFA0plcwGc85rB8e6fPrrjQUgfCjTlOmB2zztDVzxF?=
+ =?us-ascii?Q?42Uz4gl78fWzohtHeexrawvXbH+4kZZQpzWRbbRbdN2d+Znn55IXBqe6RBmO?=
+ =?us-ascii?Q?V37WM89tPTXWBArOy7qEmRbfzW045klLtKxxeqOPPJq/HJNPiWDINDp42oU3?=
+ =?us-ascii?Q?8iVmQ3jYEh4DcL5dcc7bGer69bc9H67RLdn19MSBElCA/DOjPD5B/wcnPyz/?=
+ =?us-ascii?Q?jhZed4LSHvmA+fbujL8hUem1l44EKtixEGM7t7s/Wcwf+iGy8xO3iWP5IWQg?=
+ =?us-ascii?Q?x+cx5ssyJdMXP+EX9w5Ko3pt5k7pc/K/8BXoeNSChdXtqLTH43J0t53DWQ?=
+ =?us-ascii?Q?=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(19092799006)(52116014)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?zNK87WiqXTi1YXUcNw6aaVztJXOg0uTT2R841Y9kYFBbKS1Ml8FHDFXD7uiE?=
- =?us-ascii?Q?7L18PAZd78BFG6zoRJn5IAiy/7R/Vbjep9Z2xLrY4YHq6sZcUf48qodIfKlI?=
- =?us-ascii?Q?owkChvXhMABEYEhUT1H6mi8bbLs9/JI8YzFVKsY4hiniJ5rYxFDR6Z4tcwvw?=
- =?us-ascii?Q?AvkRh3w2r1GWr0U1ss7NzgBQ4I2c6EVI40KMXUx7qyTIKREmb59gslVbj4ar?=
- =?us-ascii?Q?38i/3A301Ff3m2BjLpNXoiX4hQ9IO4i8Zv8Zx8t/L96864X4wIiy6yTh4tS0?=
- =?us-ascii?Q?3j+dmRVR9tz6HCgXYDFR/VTBmavl6hZ45O7DoNWCjNIHNNh4zUr6rIfyFsUz?=
- =?us-ascii?Q?1FoEA7iHzvSrKd2xG5+8xNQYMe31MDJyFBR9mOU37S6U69hf/RIaod+EGlp8?=
- =?us-ascii?Q?xsfuNFr81HjuX07JaJFz+zr/yQdxm/K4mxpt7FH+IQvZxrPXg291FG9O/D+p?=
- =?us-ascii?Q?8gDuE00OSMdyIkFZval7jmV33wIk/9AQBfrIpFhA7aeJ0/pc+MQLnmCQb5qZ?=
- =?us-ascii?Q?73pu1Y9rpCKjw7bBTy71jZmBlI/0l4tt54xbjExxQ9TGpGGe5R82QjS4HFBc?=
- =?us-ascii?Q?7lY7pvdVyIcBplAAP3uXdkROjo0gSJxfRklKL8x9BvYICJflb5lUTaQyxUod?=
- =?us-ascii?Q?Q+GRhzoNvhFCvmvinxp86E1G0qqTrdFJkg/Yu6S3QsUW64/PvYTCxyPXC1v0?=
- =?us-ascii?Q?nR2osHsM39oJwCobKR2kKl5XJ9Ofer2Dn/xz9gPLoo6oFd675GBUYtJ6EPds?=
- =?us-ascii?Q?MFzjCMa5+qcOpqk5iSWJ8BVb9AH1fwO10Mu6IAeMQemT///mCq7BnX+bEcaE?=
- =?us-ascii?Q?se3Bq0JgucZOp5M4+cooL3/QXXnxM0hyb8LPwWm0Gh4SdLHfs1VLkMqcdMFS?=
- =?us-ascii?Q?cIGa2a+JIV6DEJz4W6khwvf06jyacJZB+zg60Sz0bp50xAdX08JLdeSlY9nb?=
- =?us-ascii?Q?D4H66A+bKfZYoXCiTH9+G8qznp0fI5KmyOez30j/kL7ehQuoPaouJBiQNDJW?=
- =?us-ascii?Q?d2IET4K4GIpTpGrXoMpSx5wt8NP94sZ7d027eWagHw7OZ8XpCDwGAgmYtiVg?=
- =?us-ascii?Q?oPThilOnprRwzCnMN158JmRIol20hroavGNGEmE2752FV7T3JS4uxgO12dvH?=
- =?us-ascii?Q?WLD6+79VviXpwWdb+AxnBOktgqWcBBBUAIeQo+CZ/hjk+gdgs7qX3zTUtEis?=
- =?us-ascii?Q?AxwO+usRTVlYzmv7ilVbwcN/LaVMO3jceymgOX4F9BR289Onnixlj6jUlIhF?=
- =?us-ascii?Q?+jDotAUxl54jiBAGxiZeZuuGhdMwhs1nqwwbAfr57axwjA+ns1FTwKg93c7D?=
- =?us-ascii?Q?d5febqt18m1ddkcDy4K/TXf0a5QEtNtqhgz+Ro9Bz1NIpDm4J0LbWrpzqvis?=
- =?us-ascii?Q?Sg5XTBLjqCgVhztJfz/BUsswIWkn+PiZi9xyrgNlF2DdBMtFOzmyEOmx7NUi?=
- =?us-ascii?Q?01TSYeMEX5yXAeJ4EC0xrXRiImksRvQNVOe5yp8SWvQxI7R6Eb1gQIW1Mu99?=
- =?us-ascii?Q?zcGrGZH4Dx6d+hY5qWH9WGBJQrhAW5HTVo7RTBGLXmx1uSe6I+iz3Zbp7UIH?=
- =?us-ascii?Q?3nyYOKPUCJnyjCS/zZU0ANWR9kMKbryqiQuO2gfA?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f74694cd-63e2-467d-b691-08ddc05b4d36
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2025 09:14:12.8942
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(36860700013)(82310400026)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2025 09:28:01.4219
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6ermt19dcWUmvQKEQ4OezxhajeHJgY4GfoxZTg4VkMVKcnE417GYBtVieLPiaY00BM28p2uYlQFDKSbfefKdXg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB7708
+X-MS-Exchange-CrossTenant-Network-Message-Id: 307290d3-911c-4efd-5f6e-08ddc05d3b4d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE34.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7146
 
-In the current driver, the MAC address is set in both fec_restart() and
-fec_set_mac_address(), so a generic helper function fec_set_hw_mac_addr()
-is added to set the hardware MAC address to make the code more compact.
+For zerocopy (io_uring, devmem), there is an assumption that the
+parent device can do DMA. However that is not always the case:
+scalable function netdevs [1] have the DMA device in the grandparent.
 
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
+This patch adds a helper for getting the DMA device for a netdev from
+its parent or grandparent if necessary. The NULL case is handled in the
+callers.
+
+devmem and io_uring are updated accordingly to use this helper instead
+of directly using the parent.
+
+[1] Documentation/networking/device_drivers/ethernet/mellanox/mlx5/switchdev.rst
+
+Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+Reviewed-by: Cosmin Ratio <cratiu@nvidia.com>
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+----
+Changes in v2 [2]:
+- Dropped the Fixes tag.
+- Added more documentation as requeseted.
+- Renamed the patch title to better reflect its purpose.
+
+Changes in v1 [1]:
+- Upgraded from RFC status.
+- Dropped driver specific bits for generic solution.
+- Implemented single patch as a fix as requested in RFC.
+- Handling of multi-PF netdevs will be handled in a subsequent patch
+  series.
+
+[1] RFC: https://lore.kernel.org/all/20250702172433.1738947-2-dtatulea@nvidia.com/
+[2] v2: https://lore.kernel.org/all/20250709124059.516095-2-dtatulea@nvidia.com/
 ---
- drivers/net/ethernet/freescale/fec_main.c | 26 ++++++++++++-----------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+ include/linux/netdevice.h | 21 +++++++++++++++++++++
+ io_uring/zcrx.c           |  2 +-
+ net/core/devmem.c         | 10 +++++++++-
+ 3 files changed, 31 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-index 00f8be4119ed..b481ee8ee478 100644
---- a/drivers/net/ethernet/freescale/fec_main.c
-+++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -1123,6 +1123,17 @@ static void fec_ctrl_reset(struct fec_enet_private *fep, bool allow_wol)
- 	}
- }
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 5847c20994d3..53aa63d6e5a3 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -5560,4 +5560,25 @@ extern struct net_device *blackhole_netdev;
+ 		atomic_long_add((VAL), &(DEV)->stats.__##FIELD)
+ #define DEV_STATS_READ(DEV, FIELD) atomic_long_read(&(DEV)->stats.__##FIELD)
  
-+static void fec_set_hw_mac_addr(struct net_device *ndev)
++static inline struct device *netdev_get_dma_dev(const struct net_device *dev)
 +{
-+	struct fec_enet_private *fep = netdev_priv(ndev);
++	struct device *dma_dev = dev->dev.parent;
 +
-+	writel(ndev->dev_addr[3] | (ndev->dev_addr[2] << 8) |
-+	       (ndev->dev_addr[1] << 16) | (ndev->dev_addr[0] << 24),
-+	       fep->hwp + FEC_ADDR_LOW);
-+	writel((ndev->dev_addr[5] << 16) | (ndev->dev_addr[4] << 24),
-+	       fep->hwp + FEC_ADDR_HIGH);
++	if (!dma_dev)
++		return NULL;
++
++	/* Common case: dma device is parent device of netdev. */
++	if (dma_dev->dma_mask)
++		return dma_dev;
++
++	/* SF netdevs have an auxdev device as parent, the dma device being the
++	 * grandparent.
++	 */
++	dma_dev = dma_dev->parent;
++	if (dma_dev && dma_dev->dma_mask)
++		return dma_dev;
++
++	return NULL;
 +}
 +
- /*
-  * This function is called to start or restart the FEC during a link
-  * change, transmit timeout, or to reconfigure the FEC.  The network
-@@ -1132,7 +1143,6 @@ static void
- fec_restart(struct net_device *ndev)
+ #endif	/* _LINUX_NETDEVICE_H */
+diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+index 797247a34cb7..93462e5b2207 100644
+--- a/io_uring/zcrx.c
++++ b/io_uring/zcrx.c
+@@ -584,7 +584,7 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
+ 		goto err;
+ 	}
+ 
+-	ifq->dev = ifq->netdev->dev.parent;
++	ifq->dev = netdev_get_dma_dev(ifq->netdev);
+ 	if (!ifq->dev) {
+ 		ret = -EOPNOTSUPP;
+ 		goto err;
+diff --git a/net/core/devmem.c b/net/core/devmem.c
+index b3a62ca0df65..881044e0ae0e 100644
+--- a/net/core/devmem.c
++++ b/net/core/devmem.c
+@@ -183,6 +183,7 @@ net_devmem_bind_dmabuf(struct net_device *dev,
  {
- 	struct fec_enet_private *fep = netdev_priv(ndev);
--	u32 temp_mac[2];
- 	u32 rcntl = OPT_FRAME_SIZE | FEC_RCR_MII;
- 	u32 ecntl = FEC_ECR_ETHEREN;
+ 	struct net_devmem_dmabuf_binding *binding;
+ 	static u32 id_alloc_next;
++	struct device *dma_dev;
+ 	struct scatterlist *sg;
+ 	struct dma_buf *dmabuf;
+ 	unsigned int sg_idx, i;
+@@ -193,6 +194,13 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+ 	if (IS_ERR(dmabuf))
+ 		return ERR_CAST(dmabuf);
  
-@@ -1145,11 +1155,7 @@ fec_restart(struct net_device *ndev)
- 	 * enet-mac reset will reset mac address registers too,
- 	 * so need to reconfigure it.
- 	 */
--	memcpy(&temp_mac, ndev->dev_addr, ETH_ALEN);
--	writel((__force u32)cpu_to_be32(temp_mac[0]),
--	       fep->hwp + FEC_ADDR_LOW);
--	writel((__force u32)cpu_to_be32(temp_mac[1]),
--	       fep->hwp + FEC_ADDR_HIGH);
-+	fec_set_hw_mac_addr(ndev);
- 
- 	/* Clear any outstanding interrupt, except MDIO. */
- 	writel((0xffffffff & ~FEC_ENET_MII), fep->hwp + FEC_IEVENT);
-@@ -3693,7 +3699,6 @@ static void set_multicast_list(struct net_device *ndev)
- static int
- fec_set_mac_address(struct net_device *ndev, void *p)
- {
--	struct fec_enet_private *fep = netdev_priv(ndev);
- 	struct sockaddr *addr = p;
- 
- 	if (addr) {
-@@ -3710,11 +3715,8 @@ fec_set_mac_address(struct net_device *ndev, void *p)
- 	if (!netif_running(ndev))
- 		return 0;
- 
--	writel(ndev->dev_addr[3] | (ndev->dev_addr[2] << 8) |
--		(ndev->dev_addr[1] << 16) | (ndev->dev_addr[0] << 24),
--		fep->hwp + FEC_ADDR_LOW);
--	writel((ndev->dev_addr[5] << 16) | (ndev->dev_addr[4] << 24),
--		fep->hwp + FEC_ADDR_HIGH);
-+	fec_set_hw_mac_addr(ndev);
++	dma_dev = netdev_get_dma_dev(dev);
++	if (!dma_dev) {
++		err = -EOPNOTSUPP;
++		NL_SET_ERR_MSG(extack, "Device doesn't support dma");
++		goto err_put_dmabuf;
++	}
 +
- 	return 0;
- }
+ 	binding = kzalloc_node(sizeof(*binding), GFP_KERNEL,
+ 			       dev_to_node(&dev->dev));
+ 	if (!binding) {
+@@ -209,7 +217,7 @@ net_devmem_bind_dmabuf(struct net_device *dev,
  
+ 	binding->dmabuf = dmabuf;
+ 
+-	binding->attachment = dma_buf_attach(binding->dmabuf, dev->dev.parent);
++	binding->attachment = dma_buf_attach(binding->dmabuf, dma_dev);
+ 	if (IS_ERR(binding->attachment)) {
+ 		err = PTR_ERR(binding->attachment);
+ 		NL_SET_ERR_MSG(extack, "Failed to bind dmabuf to device");
 -- 
-2.34.1
+2.43.0
 
 
