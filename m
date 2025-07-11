@@ -1,112 +1,122 @@
-Return-Path: <netdev+bounces-206227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2DD4B0233B
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 19:59:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4651B02365
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 20:13:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5788A3B0BA3
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 17:59:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C74651C2218D
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 18:13:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34A4A2F1FF1;
-	Fri, 11 Jul 2025 17:59:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B76DF2F2348;
+	Fri, 11 Jul 2025 18:13:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LGCXV47h"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YC28NgXK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F27702F19B1;
-	Fri, 11 Jul 2025 17:59:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62CB2F1FDA
+	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 18:13:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752256794; cv=none; b=nXM55IugeienCJRtyK98pkrTzF+Ymf+RunQXdkAu0aTYRx2I4pLYJYnDB8ulug54ChwUsVg+oeZ37t4wOIUtAY9ekUHDWpk5XuGJwMc4X0mZEc4GBhOVoaVuic7Jou/h/2j2FuCWMjCXLiYi46zrQ85Nci/3pg3hDavsnoTj7RM=
+	t=1752257614; cv=none; b=C9IcIyQGhrmVLCNdvwKGc049FYK05q2JQ0Ei3a9hokH8GpxhxhLt24DoQmKeHDKwi7luJjZym192KYzcyKyQ470xgyxvUcxp2n9AE6oTpZl9a1kDiXrExM8PNSb1sJks3QuF+RkFQdpND4hAEMUM2xKLFJdHI4hvtDQZJU3yAZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752256794; c=relaxed/simple;
-	bh=AKpW72VC+1HOMYg6B0t+mzIDn2Tzs/VVIAhuZ2bpIQU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CipqR4of7+YQzayz8X0UXbQau+ln1aERtmdOl4PS5LIyhdFdPEbYzXK8Fq8CvNLYg92gXB7ukEKjJ/XXf8THET0NwNAhFHQt/l2SfqhPalLh72FkhRVcnorg7W9SqwS73cWCfxNfACyTogkkJkxtcCUK5v4WivO1/LNhgGzG7rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LGCXV47h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95FBBC4CEED;
-	Fri, 11 Jul 2025 17:59:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752256793;
-	bh=AKpW72VC+1HOMYg6B0t+mzIDn2Tzs/VVIAhuZ2bpIQU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LGCXV47hplNjKNNtfxkpYShpJrK1VY2QNanrzvUJ5enWnyEGrJATEcjXlLcyCkM0j
-	 MaF8K9RNAZYeIm63IIpfCtGy8U0+OIad6u5fGRPPJ+VFP09z78l/MlHzQZH6th5K8R
-	 AMJT2nRDxRXm3VbGymENADxOGF0teuWuNgsmFfzzs2VWs/OAIboGLX3Tls3bDC8NGf
-	 JQEEdYLBetuvGmKNkAcVX9CGloop9MMSg6pkYMj+hHPWjOileui90osc/acQkBh6Dj
-	 uLExsKfgwdeoDWnHappV7uhpPHt7SK8Jeg/KOR3CmAHh8Ildeda8m+dgmpkOPSOFvW
-	 +bWvA9o+5IuXg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF4B383B275;
-	Fri, 11 Jul 2025 18:00:16 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1752257614; c=relaxed/simple;
+	bh=z0FAINHMrT/mXWSwLLS5ITQiWYyUydXHEsbDIHwLkNQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=svFcpDhflPYYIJhSkLKDolcrY+x1PwMWMy33inrlWYI3L+JaWA0j6gOwoobSNL3RgTQaDknhufELgCV1uaPD0SWMgkOC43iK2TY5mJY/63s4eUiZ/tCwoKGG8rjCWegEACkAPAFLGYGIBpj87v8bTKjR1W8eOT3f7ARkuyp25vk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=YC28NgXK; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-32f1aaf0d60so21418021fa.1
+        for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 11:13:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1752257611; x=1752862411; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z0FAINHMrT/mXWSwLLS5ITQiWYyUydXHEsbDIHwLkNQ=;
+        b=YC28NgXKQU4MfHLvCSx4TbwDnLLJcR2LnuM3/xqBffmNhSypes9jr+FEFrhYacYNnX
+         ONMLcxbGH6zFMbUXq5QnB8IzjRG6EGPCvemyD3rpJEReBZLFTdGypsmMAWPICJEfk/qq
+         Tw5jL3dwkKQ0rAl6FZ1h8APqPT1q8vo+gz1GeVz2kOoeV/6P2dty3DkAoygFIwtA6vi1
+         O0GgWTRJyjl+ymyFczLMvrnh0BlKEjceif6EpqjTbYNUAkrSfo5mMx0hTlQ3EZxNcu7w
+         lZT9j2DqOaoD3RI37EwH8OpmI1NvrSZMckDm0TyOmHiTKNu0tdaFpD3Rv+lwqULW6X9B
+         MUfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752257611; x=1752862411;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=z0FAINHMrT/mXWSwLLS5ITQiWYyUydXHEsbDIHwLkNQ=;
+        b=J2bQqwDpFoMMYztq6V4urYfneO2hGCYrHb5E10sGyivNPGUe8z9AH736ypFeYE0dQf
+         xsGw1mHJUFFN0Ry4MMWM5eMq54MsU+c7BOdX9D72C9PLET5pFQF9dROI5Htos+RXa330
+         rKO6OzFSEUUGRwhajFWn45FikZJSHnPIvJvGqJaSnlpMeLiCkfINS0/aKqyjk/x9N+R0
+         H356fp0KyHpEp9Q3EdVWR57IwRjbBizX9dSxjInoHrNCfU4da+7+rq1Lr6B9HstOd6bA
+         U8tw+d67vdfmqfor67dIcZTy0ZlN3lvTzlIQvr7+GeMTnA8h5qRHYhydcJeF7g+ZNTpP
+         Bjow==
+X-Forwarded-Encrypted: i=1; AJvYcCXdds4R17bkLvAgSPAc9itBpjUnavWsiVFUdWkQfSKuCCHqRB3FhERmii5Z82TclfnTarziLE0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2DZTTtz7/EOhN0EvYCRdrk4WBU/sTD8KFskELrWfpi+0JRsm1
+	hwoBXyQL+vHmkrD/8tCGHmw94h1PEA9U6mzVGyE6DUgbjws65jVoI8ISLJ+XfunYnc3ceobsxO5
+	B1GevqGtInCLHhZub1J4t3rzfaKr031CFFx6q9JAlZA==
+X-Gm-Gg: ASbGncsJ74IEggfVjCBkWD+kcBt/KLz+zK7wKuQ3Wv6qTMGyJb7UGk9aSBVMXaRfIZc
+	aPzBfhVaVpz+8zTKjRICCqznadvnBRSrW1h8DXZhJWzBljpHA/iutbIVuOm8VajwRed+ybBUbck
+	ZQ1RY+GeZTl3cGgupAwOloRpHOlQ9fZqoVl/QoxNYVF5X0A52HT/eOLMxZLrWqgTJo5zfs4rCsM
+	PK3RpxGkowMikFRAg==
+X-Google-Smtp-Source: AGHT+IFMuBYHoAN7PSAu45/CxJxrRKT9IAF0+U0X5QcMw4v0k+dSQgdIENHIG/kIkaAP4cg8rAILHrMXlK3Z+M3lDSE=
+X-Received: by 2002:a2e:be83:0:b0:32a:85ad:2162 with SMTP id
+ 38308e7fff4ca-330532d0602mr13483321fa.7.1752257611064; Fri, 11 Jul 2025
+ 11:13:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v4 0/7] Move attach_type into bpf_link
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175225681552.2356840.5924088851532659615.git-patchwork-notify@kernel.org>
-Date: Fri, 11 Jul 2025 18:00:15 +0000
-References: <20250710032038.888700-1-chen.dylane@linux.dev>
-In-Reply-To: <20250710032038.888700-1-chen.dylane@linux.dev>
-To: Tao Chen <chen.dylane@linux.dev>
-Cc: daniel@iogearbox.net, razor@blackwall.org, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com,
- song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
- kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
- mattbobrowski@google.com, rostedt@goodmis.org, mhiramat@kernel.org,
- mathieu.desnoyers@efficios.com, horms@kernel.org, willemb@google.com,
- jakub@cloudflare.com, pablo@netfilter.org, kadlec@netfilter.org,
- hawk@kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+References: <20250626080923.632789-1-paulk@sys-base.io> <20250626080923.632789-2-paulk@sys-base.io>
+ <20250704233535.4b026641@minigeek.lan> <20250705153825.2be2b333@minigeek.lan>
+ <aGm8n_wJPiGk85E4@collins> <CAGb2v66s-nWA2dFRpgX6DbDET3dWOm1jPKWm1k9SmGSqhTWoWA@mail.gmail.com>
+In-Reply-To: <CAGb2v66s-nWA2dFRpgX6DbDET3dWOm1jPKWm1k9SmGSqhTWoWA@mail.gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Fri, 11 Jul 2025 20:13:19 +0200
+X-Gm-Features: Ac12FXygNb9Ktxv1UdTrJbOKhH4l5d3j_PT8j5_pIzh_inLuA-iMK4HxDAsC-Wg
+Message-ID: <CACRpkdZSXRxhNORJv5TTaf=B5dpUgXfL-PBW1qH7uKC24o=Heg@mail.gmail.com>
+Subject: Re: [PATCH 1/5] pinctrl: sunxi: Fix a100 emac pin function name
+To: wens@csie.org
+Cc: Paul Kocialkowski <paulk@sys-base.io>, Andre Przywara <andre.przywara@arm.com>, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Sun, Jul 6, 2025 at 5:04=E2=80=AFPM Chen-Yu Tsai <wens@csie.org> wrote:
+> On Sun, Jul 6, 2025 at 8:00=E2=80=AFAM Paul Kocialkowski <paulk@sys-base.=
+io> wrote:
 
-This series was applied to bpf/bpf-next.git (master)
-by Andrii Nakryiko <andrii@kernel.org>:
+> > > So I would very much like to see this patch moved out. Is it just in
+> > > LinusW's tree so far? I don't see it in -next yet.
+> >
+> > I don't think the patches were accepted for over a week so we can proba=
+bly
+> > still act. I will send reverts, unless maintainers want to manually rem=
+ove
+> > these commits?
+>
+> I can drop the dts patches from the sunxi tree. Linus might be able to
+> drop the pinctrl patch.
+>
+> You definitely need to send a revert for the DT binding patch that is
+> already in net-next.
 
-On Thu, 10 Jul 2025 11:20:31 +0800 you wrote:
-> Andrii suggested moving the attach_type into bpf_link, the previous discussion
-> is as follows:
-> https://lore.kernel.org/bpf/CAEf4BzY7TZRjxpCJM-+LYgEqe23YFj5Uv3isb7gat2-HU4OSng@mail.gmail.com
-> 
-> patch1 add attach_type in bpf_link, and pass it to bpf_link_init, which
-> will init the attach_type field.
-> 
-> [...]
+I dropped the patch from the pinctrl tree, no problem.
 
-Here is the summary with links:
-  - [bpf-next,v4,1/7] bpf: Add attach_type in bpf_link
-    (no matching commit)
-  - [bpf-next,v4,2/7] bpf: Remove attach_type in bpf_cgroup_link
-    https://git.kernel.org/bpf/bpf-next/c/9b8d543dc2bb
-  - [bpf-next,v4,3/7] bpf: Remove attach_type in sockmap_link
-    https://git.kernel.org/bpf/bpf-next/c/33f69f736570
-  - [bpf-next,v4,4/7] bpf: Remove location field in tcx_link
-    https://git.kernel.org/bpf/bpf-next/c/5d93e091911c
-  - [bpf-next,v4,5/7] bpf: Remove attach_type in bpf_netns_link
-    https://git.kernel.org/bpf/bpf-next/c/146ecb1e5cf7
-  - [bpf-next,v4,6/7] bpf: Remove attach_type in bpf_tracing_link
-    https://git.kernel.org/bpf/bpf-next/c/6b3c64b371da
-  - [bpf-next,v4,7/7] netkit: Remove location field in netkit_link
-    https://git.kernel.org/bpf/bpf-next/c/4254873c58bf
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Yours,
+Linus Walleij
 
