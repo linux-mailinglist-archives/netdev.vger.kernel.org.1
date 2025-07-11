@@ -1,100 +1,121 @@
-Return-Path: <netdev+bounces-205994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47467B01082
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 02:59:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C239B01085
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 03:00:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65589189D320
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 00:59:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84118563677
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 01:00:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 739052AE66;
-	Fri, 11 Jul 2025 00:59:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41F562770B;
+	Fri, 11 Jul 2025 01:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FU/vnpdK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YycH4XLx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E0E7111BF;
-	Fri, 11 Jul 2025 00:59:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 151FADDBC;
+	Fri, 11 Jul 2025 01:00:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752195565; cv=none; b=Xy6Aur91oocNIcnRSq6xAB5W3xPRIbRbxzGw9ETuDOqSN5PmcGoxwzWXY/Q0J9lEQq+NLUE4iDMvh+XxxoX9gvXsfFa27nGMBd36lHW7SHlbq0S+0IA8savAGi39qTpCZnSy9NG8v/qeuhEQk/0qBZAy9lLLxPCBDIRe5bJGGDs=
+	t=1752195622; cv=none; b=ON1IihgWAR/R5gbv1JOB+bss7N32dLUDxIcUjEnTn9gYlT55PbrablQ+EKszk5jDeuvAe7Ud7i19f5hXY2FO9He5kn/H11umEOdyDuZGPFN8dpDpSnh1znnsQ2FfQbefGWLHfc+XYsCX6lxjwYFY0VSeckxaE72WouLpFR+sf+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752195565; c=relaxed/simple;
-	bh=6kbqF4KKi/QRVp8bBz3dPkp4zvRQekHMP/AMbhz2TdY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MwGf4incipByLvmgQR5iW9oub3Y9gii5s4mvDtcwnEW1DTRZUWhZhwBZuyHFc508NN0k6B9KbGDoPr9RwYKvp20qFGG7oXhf2/zUGpkCaiuMouXHdzsgQA0DztH9DpUIc8P8N6A33SRRRCKQEry1ginD/KIZYAFQdYemC3HeZ1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FU/vnpdK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EF62C4CEE3;
-	Fri, 11 Jul 2025 00:59:22 +0000 (UTC)
+	s=arc-20240116; t=1752195622; c=relaxed/simple;
+	bh=MJuGJlagsCsxyWHy4O2CpzzmsL/8SnYaAOmQQNeXOkM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WRPnM6A92Zryai3ijFnJF7eEp3EJT0gOYM9TtBrqbt/paQpG5mAtzMJ806QC1k6hMmH0+2ZdDYKE6lYNlciWH2DLvFvJq9RmL5+Myf7FNbs+b1OsY2I1C6/CBTITeqea4Tnw/RNP7mG8/CZE6hcNtuTyLwFwTbbHjxRi0xxConQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YycH4XLx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7FCDC4CEE3;
+	Fri, 11 Jul 2025 01:00:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752195564;
-	bh=6kbqF4KKi/QRVp8bBz3dPkp4zvRQekHMP/AMbhz2TdY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FU/vnpdKKG+wfwPSK/pWWOc856lEG5byID/Rp/rjLj+iTzjeO6JmK+emujGYts7dc
-	 vtBX6OhAqS/oZj9zgI3dkDQlf6upgRoZkbLLD+qfXuYycOxmLijDcvLi81k0ZLC24M
-	 qx2xCxxUozPG1Om0pYTRdG62JFcOADlX/HnKHewpUNNLjy9uemVXSgci+2N1FthHhe
-	 fAspijyuf4YHYsaiqkNWxsj7rto8tNNbM7INcq+oRfRfAMxYxFdyru9Ymek67laAW8
-	 TRW7GJ1NORp8CvoGkabhqUYWTHYEIgBnsD3CAC96RiLH6AV7FGMAGzKfXuo0NALqj8
-	 HFVQBCVcOvMaQ==
-Date: Thu, 10 Jul 2025 17:59:21 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Qianfeng Rong <rongqianfeng@vivo.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Potnuri Bharat Teja <bharat@chelsio.com>,
- Veerasenareddy Burru <vburru@marvell.com>, Sathesh Edara
- <sedara@marvell.com>, Louis Peens <louis.peens@corigine.com>, Shahed Shaikh
- <shshaikh@marvell.com>, Manish Chopra <manishc@marvell.com>,
- GR-Linux-NIC-Dev@marvell.com (maintainer:QLOGIC QLCNIC (1/10)Gb ETHERNET
- DRIVER), Jiri Slaby <jirislaby@kernel.org>, Nick Kossifidis
- <mickflemm@gmail.com>, Luis Chamberlain <mcgrof@kernel.org>, Toke
- =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@toke.dk>, Arend van Spriel
- <arend.vanspriel@broadcom.com>, Brian Norris <briannorris@chromium.org>,
- Francesco Dolcini <francesco@dolcini.it>, Ajay Singh
- <ajay.kathat@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Ping-Ke Shih <pkshih@realtek.com>, Kees Cook <kees@kernel.org>, "Gustavo A.
- R. Silva" <gustavoars@kernel.org>, Kory Maincent
- <kory.maincent@bootlin.com>, Aleksander Jan Bajkowski <olek2@wp.pl>, Lucas
- Sanchez Sagrado <lucsansag@gmail.com>, Philipp Hahn <phahn-oss@avm.de>,
- Eric Biggers <ebiggers@google.com>, Hayes Wang <hayeswang@realtek.com>,
- Wentao Liang <vulab@iscas.ac.cn>, Johannes Berg <johannes.berg@intel.com>,
- Sai Krishna <saikrishnag@marvell.com>, Jacobe Zang
- <jacobe.zang@wesion.com>, Dmitry Antipov <dmantipov@yandex.ru>, Kalle Valo
- <kvalo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, David Lin
- <yu-hao.lin@nxp.com>, Aditya Kumar Singh <quic_adisi@quicinc.com>, Roopni
- Devanathan <quic_rdevanat@quicinc.com>, Dan Carpenter
- <dan.carpenter@linaro.org>, Marek Vasut <marex@denx.de>, Alexis
- =?UTF-8?B?TG90aG9yw6k=?= <alexis.lothore@bootlin.com>, Arnd Bergmann
- <arnd@arndb.de>, netdev@vger.kernel.org (open list:CAVIUM LIQUIDIO NETWORK
- DRIVER), linux-kernel@vger.kernel.org (open list), oss-drivers@corigine.com
- (open list:NETRONOME ETHERNET DRIVERS), linux-usb@vger.kernel.org (open
- list:USB NETWORKING DRIVERS), linux-wireless@vger.kernel.org (open
- list:ATHEROS ATH5K WIRELESS DRIVER), brcm80211@lists.linux.dev (open
- list:BROADCOM BRCM80211 IEEE802.11 WIRELESS DRIVERS),
- brcm80211-dev-list.pdl@broadcom.com (open list:BROADCOM BRCM80211
- IEEE802.11 WIRELESS DRIVERS)
-Subject: Re: [PATCH 00/12] net: Use min()/max() to improve code
-Message-ID: <20250710175921.09212fab@kernel.org>
-In-Reply-To: <20250709022210.304030-1-rongqianfeng@vivo.com>
-References: <20250709022210.304030-1-rongqianfeng@vivo.com>
+	s=k20201202; t=1752195621;
+	bh=MJuGJlagsCsxyWHy4O2CpzzmsL/8SnYaAOmQQNeXOkM=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=YycH4XLxGkztwoGXGaVe6/Y008hg/nhlIqaXMaoISYbg7cxGfORcAY+bRX0/Zzcql
+	 aO1ri6Ntyp+a1fVNbmIp0jRQkVOJUSmLMYxbIdpIFyI54ALlGKzzk/n8CtdqLa/nbj
+	 Jh0z9zdBino527mrqdE6EHHoBQwD+Wz3/ot6nBC3owtoSWcu5MHIeKnSG9ChQjAvcM
+	 onYwkS4B6tkl+lTlfi6GrPM3oVKhryBThnJ+jGAbDn6WH2nwhi29dXG3QGUGueBCAp
+	 a+7p3gsBkYGcbSXEX+pIIFh6pC1gkPrudaayEW9kWQaGgK+NsRqQfYy0/0ZBJxVzMo
+	 VYuP88JDquQaw==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id 53464CE0A44; Thu, 10 Jul 2025 18:00:21 -0700 (PDT)
+Date: Thu, 10 Jul 2025 18:00:21 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Boqun Feng <boqun.feng@gmail.com>
+Cc: Breno Leitao <leitao@debian.org>, Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+	Waiman Long <longman@redhat.com>, aeh@meta.com,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	edumazet@google.com, jhs@mojatatu.com, kernel-team@meta.com,
+	Erik Lundgren <elundgren@meta.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Uladzislau Rezki <urezki@gmail.com>, rcu@vger.kernel.org
+Subject: Re: [RFC PATCH 6/8] rcuscale: Allow rcu_scale_ops::get_gp_seq to be
+ NULL
+Message-ID: <6dbbdfa0-ca6b-425a-85a0-7c80041573fb@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <20250414060055.341516-1-boqun.feng@gmail.com>
+ <20250414060055.341516-7-boqun.feng@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250414060055.341516-7-boqun.feng@gmail.com>
 
-On Wed,  9 Jul 2025 10:21:28 +0800 Qianfeng Rong wrote:
-> Use min() to reduce the code and improve its readability.
+On Sun, Apr 13, 2025 at 11:00:53PM -0700, Boqun Feng wrote:
+> For synchronization mechanisms similar to RCU, there could be no "grace
+> period" concept (e.g. hazard pointers), therefore allow
+> rcu_scale_ops::get_gp_seq to be a NULL pointer for these cases, and
+> simply treat started and finished grace period as 0.
 > 
-> No functional changes.
+> Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
 
-For net/ethernet/ this is not worth the churn, sorry.
+Reviewed-by: Paul E. McKenney <paulmck@kernel.org>
+
+> ---
+>  kernel/rcu/rcuscale.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/kernel/rcu/rcuscale.c b/kernel/rcu/rcuscale.c
+> index 0f3059b1b80d..d9bff4b1928b 100644
+> --- a/kernel/rcu/rcuscale.c
+> +++ b/kernel/rcu/rcuscale.c
+> @@ -568,8 +568,10 @@ rcu_scale_writer(void *arg)
+>  		if (gp_exp) {
+>  			b_rcu_gp_test_started =
+>  				cur_ops->exp_completed() / 2;
+> -		} else {
+> +		} else if (cur_ops->get_gp_seq) {
+>  			b_rcu_gp_test_started = cur_ops->get_gp_seq();
+> +		} else {
+> +			b_rcu_gp_test_started = 0;
+>  		}
+>  	}
+>  
+> @@ -625,9 +627,11 @@ rcu_scale_writer(void *arg)
+>  				if (gp_exp) {
+>  					b_rcu_gp_test_finished =
+>  						cur_ops->exp_completed() / 2;
+> -				} else {
+> +				} else if (cur_ops->get_gp_seq) {
+>  					b_rcu_gp_test_finished =
+>  						cur_ops->get_gp_seq();
+> +				} else {
+> +					b_rcu_gp_test_finished = 0;
+>  				}
+>  				if (shutdown) {
+>  					smp_mb(); /* Assign before wake. */
+> -- 
+> 2.47.1
+> 
 
