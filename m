@@ -1,113 +1,169 @@
-Return-Path: <netdev+bounces-206051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEF7EB012B8
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 07:32:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 705F1B01344
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 08:00:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2362A5A6294
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 05:32:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAB3E587634
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 06:00:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4460D8F54;
-	Fri, 11 Jul 2025 05:32:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 080411CEAA3;
+	Fri, 11 Jul 2025 06:00:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oBK0LgU/"
+	dkim=pass (2048-bit key) header.d=folker-schwesinger.de header.i=@folker-schwesinger.de header.b="VSHEWIr/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www522.your-server.de (www522.your-server.de [195.201.215.122])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE353625
-	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 05:32:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AF691C862B;
+	Fri, 11 Jul 2025 06:00:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.201.215.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752211933; cv=none; b=uf0kvValnoihuOIj/lgzL8uF+LNGBwKWopjhrfOcnZRILep8ol5zaawW1tG6q+pDNv08Fw/+BBknSStP59273aAOb5O0mkdeI5rYOqvKK6MEw8yPdG8uUDfm9pjCYuM0JSRU7UDHfyW48iRwIqnDpXJQ0LoQ04rjI2PxgOWNzHI=
+	t=1752213643; cv=none; b=WUrRZHoc6hbS7kvljDMtFoepuQKl697603yNoXSGk/+Vg4YTwBTsDk0QBLbEH9RvQyFoYKtdC39zdKzCv05ZJOk7BE7ReKB+ovPswl6IATfwglVqgfeYGDwle6VujTOWsGnGoyYGtt978YLBe0yhI7ZcW9Pj4QEHThWkkGIW5BA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752211933; c=relaxed/simple;
-	bh=YvGgwL+U6Lw9F2MqRICbQeZggtn9fyJsXdAv22NAYpg=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZSakGSTLnJFC/ASUvwpDNGTpQxxq7HLq+aI2dED05YALb75n/Tfc7819oSz7K0EjG8p8amt2iLTJ2okgnFHtSuuFhUURUsFvgCQU8Gn0zIKzqgbG6pTZP49BO3mObC8/hmGODTWBirr0DRJPV9s4Fh0F6q7hvTBdtqzWG9mmsRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oBK0LgU/; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-313f702d37fso1859178a91.3
-        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 22:32:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752211931; x=1752816731; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=to8LUEEWePW5vOL9+mdZts8hAQhgCYx2zuIVL7aP9E8=;
-        b=oBK0LgU//Q5u4MMrZmr+LAlb42HYFOMqD/wWz/aubWbVelgisybr7Reb2XiH7Jow8x
-         e8xgH+27AhQeAdCO/td9tyAcb5HZpVEa5qm6m4AxLWxlvjUR0wvP/6bKY5ZjpgOLWnB3
-         D4X0cxGkzYGpFoYH2ifNjtBBaN3tC2eOIju0BeDypFe1T2WCtKA9VReoSyhjlKHoRTl9
-         eBf5N0uYr4yXOxmKJKOKdlD7x1oHvYYFzKceOsTfDrFFJTMhsGud4WtCErn9otiKkD9H
-         fXPpqLCc6gZTNULqd6oewJ/6X9hYdSFSCPH2pjDwkfquCdvRnwczsT52JZtfzvlcgseD
-         12VQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752211931; x=1752816731;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=to8LUEEWePW5vOL9+mdZts8hAQhgCYx2zuIVL7aP9E8=;
-        b=Ix/35dICh8L+IFpS82JRKVgASZSrDDW+9vQrGE62mc7xobLTXtsMk1a7jTHH70R0mL
-         DqfVveFMrQctTr02SYTMx4SdzFhAGGtkUd6mW83r/NoKKefJhjhkeMt3oDDqy5Uzox6O
-         owFkeO0V9vlN+PKzjLEvIR3ANaoYJKDrhoxAa0oq40k1seYNDfa0jRaRzU/JzYlhljUw
-         m4VB3IHB7yYOEAuYOPRAVVqO7ppHQ/V2zvsLDOEmgXMTrdfmSkejyqb3g/Ja3wZd3BdB
-         X+FeIY4tWbtCvS+MSn1m++isSZpEobT2fhfsk1nb3wKm6VXhFjIyhQNJ1LFV+ui6p2yU
-         MLnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXP9+bbV43LCvNEiL5zjXB7eNvidgZWdFnxekrKy4qHBueE/TayvDhz+p6r/+d3yIHpONRxjDU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/ggBJcXzkkUR+7opSoDNad6uwA8RmiDyAKYhpxQYyE1FkCu8N
-	faBkv1ya0DPTO5DML9vxt0LL+qdRev680VMjXxlZW1PyIT3EvyaTYZXsaTTfksWnZN2Ar1gBZwL
-	jVm3Ruw==
-X-Google-Smtp-Source: AGHT+IHCKx9hCFV6evQH0LTGzIfcK9waQIJWfhNGr3rtH0NqYo/z3TDmPQBAhzWOvN+HguUl/mALkD5RDiw=
-X-Received: from pjv16.prod.google.com ([2002:a17:90b:5650:b0:31c:32f8:3f88])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:180e:b0:311:9c1f:8524
- with SMTP id 98e67ed59e1d1-31c4f4bf9d7mr2129604a91.15.1752211931063; Thu, 10
- Jul 2025 22:32:11 -0700 (PDT)
-Date: Fri, 11 Jul 2025 05:32:07 +0000
+	s=arc-20240116; t=1752213643; c=relaxed/simple;
+	bh=Bw1sIeEGablurmUSbPeajAnlMFLhIHn8GN+2l1df7aU=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Subject:Cc:
+	 References:In-Reply-To; b=G8Lm5d8z4hDyLYzx8TuBLWYqcYWLot7XqMGd0Sj4uKtdxeCekoggGmr3L7kek3bWz5dKsJaThYsSBO5POPSXK4YnNKvDn0SLtTSzM/H1i07QxS3F2ZaZ8mW2XApW7cJuJdS9ysJVtJyD/U4J1sywhyRXvEo2/NgG7wpscJz3jQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=folker-schwesinger.de; spf=pass smtp.mailfrom=folker-schwesinger.de; dkim=pass (2048-bit key) header.d=folker-schwesinger.de header.i=@folker-schwesinger.de header.b=VSHEWIr/; arc=none smtp.client-ip=195.201.215.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=folker-schwesinger.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=folker-schwesinger.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=folker-schwesinger.de; s=default2212; h=In-Reply-To:References:Cc:Subject:
+	To:From:Message-Id:Date:Content-Type:Content-Transfer-Encoding:Mime-Version:
+	Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=CJlNBkuWVdutfVbuSjBJz+KoaFUSj5G+qp8tZ+jXmq0=; b=VSHEWIr/Q4cpHcFIHJHdzn+y98
+	pjzy2Y48KJiQp5RUcaSueaoIMtfYKfd5LohJGE5MllPzmdinbR3rEetsobSI4jNcu0jolOHr7cJtI
+	yuU5Dwp3ClaeCMdYczFDhcoOQ363R4K82HswyGr/z0qrPX4LynzVX+TMyjJnW/8sFTwzmnNT7+Oaa
+	En92c7kj2yaRxsqDSQMpWUMyhCmyOkxp/oU81Y8yt63RFB7aq09BUzNyf7aS2mt4MsIN0ihhIMUD8
+	yfHYvnl/vLfUgaFJXrgBJMTARK7bq8AUZJyxQ52DmFTnMrRpqYTX1HAKOAiPaVJjL99o4fkc7PWDF
+	EYUEWJCA==;
+Received: from sslproxy06.your-server.de ([78.46.172.3])
+	by www522.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <dev@folker-schwesinger.de>)
+	id 1ua6My-00006M-1w;
+	Fri, 11 Jul 2025 07:32:24 +0200
+Received: from localhost ([127.0.0.1])
+	by sslproxy06.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <dev@folker-schwesinger.de>)
+	id 1ua6My-0002Gq-07;
+	Fri, 11 Jul 2025 07:32:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250711053208.2965945-1-kuniyu@google.com>
-Subject: [PATCH v1 net] netlink: Fix rmem check in netlink_broadcast_deliver().
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 11 Jul 2025 05:32:23 +0000
+Message-Id: <DB8ZAMDZH15T.2BGP4DG9MBAGU@folker-schwesinger.de>
+From: "Folker Schwesinger" <dev@folker-schwesinger.de>
+To: "Suraj Gupta" <suraj.gupta2@amd.com>, <andrew+netdev@lunn.ch>,
+ <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+ <michal.simek@amd.com>, <vkoul@kernel.org>, <radhey.shyam.pandey@amd.com>
+Subject: Re: [PATCH V2 2/4] dmaengine: xilinx_dma: Fix irq handler and start
+ transfer path for AXI DMA
+Cc: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <linux-kernel@vger.kernel.org>, <dmaengine@vger.kernel.org>,
+ <harini.katakam@amd.com>
+X-Mailer: aerc 0.20.1-112-gd31995f1e20b
+References: <20250710101229.804183-1-suraj.gupta2@amd.com>
+ <20250710101229.804183-3-suraj.gupta2@amd.com>
+In-Reply-To: <20250710101229.804183-3-suraj.gupta2@amd.com>
+X-Virus-Scanned: Clear (ClamAV 1.0.7/27695/Thu Jul 10 11:08:41 2025)
 
-We need to allow queuing at least one skb even when skb is
-larger than sk->sk_rcvbuf.
+On Thu Jul 10, 2025 at 12:12 PM CEST, Suraj Gupta wrote:
+> AXI DMA driver incorrectly assumes complete transfer completion upon
+> IRQ reception, particularly problematic when IRQ coalescing is active.
+> Updating the tail pointer dynamically fixes it.
+> Remove existing idle state validation in the beginning of
+> xilinx_dma_start_transfer() as it blocks valid transfer initiation on
+> busy channels with queued descriptors.
+> Additionally, refactor xilinx_dma_start_transfer() to consolidate coalesc=
+e
+> and delay configurations while conditionally starting channels
+> only when idle.
+>
+> Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
+> Fixes: Fixes: c0bba3a99f07 ("dmaengine: vdma: Add Support for Xilinx AXI =
+Direct Memory Access Engine")
 
-The cited commit made a mistake while converting a condition
-in netlink_broadcast_deliver().
+This fixes an issue I recently ran into which prevented starting
+consecutive transfers. Thanks and:
 
-Let's correct the rmem check for the allow-one-skb rule.
+Tested-by: Folker Schwesinger <dev@folker-schwesinger.de>
 
-Fixes: ae8f160e7eb24 ("netlink: Fix wraparounds of sk->sk_rmem_alloc.")
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- net/netlink/af_netlink.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index 79fbaf7333ce2..2d107a8a75d99 100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -1395,7 +1395,7 @@ static int netlink_broadcast_deliver(struct sock *sk, struct sk_buff *skb)
- 	rmem = atomic_add_return(skb->truesize, &sk->sk_rmem_alloc);
- 	rcvbuf = READ_ONCE(sk->sk_rcvbuf);
- 
--	if ((rmem != skb->truesize || rmem <= rcvbuf) &&
-+	if ((rmem == skb->truesize || rmem <= rcvbuf) &&
- 	    !test_bit(NETLINK_S_CONGESTED, &nlk->state)) {
- 		netlink_skb_set_owner_r(skb, sk);
- 		__netlink_sendskb(sk, skb);
--- 
-2.50.0.727.gbf7dc18ff4-goog
+> ---
+>  drivers/dma/xilinx/xilinx_dma.c | 20 ++++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
+>
+> diff --git a/drivers/dma/xilinx/xilinx_dma.c b/drivers/dma/xilinx/xilinx_=
+dma.c
+> index a34d8f0ceed8..187749b7b8a6 100644
+> --- a/drivers/dma/xilinx/xilinx_dma.c
+> +++ b/drivers/dma/xilinx/xilinx_dma.c
+> @@ -1548,9 +1548,6 @@ static void xilinx_dma_start_transfer(struct xilinx=
+_dma_chan *chan)
+>  	if (list_empty(&chan->pending_list))
+>  		return;
+> =20
+> -	if (!chan->idle)
+> -		return;
+> -
+>  	head_desc =3D list_first_entry(&chan->pending_list,
+>  				     struct xilinx_dma_tx_descriptor, node);
+>  	tail_desc =3D list_last_entry(&chan->pending_list,
+> @@ -1558,23 +1555,24 @@ static void xilinx_dma_start_transfer(struct xili=
+nx_dma_chan *chan)
+>  	tail_segment =3D list_last_entry(&tail_desc->segments,
+>  				       struct xilinx_axidma_tx_segment, node);
+> =20
+> +	if (chan->has_sg && list_empty(&chan->active_list))
+> +		xilinx_write(chan, XILINX_DMA_REG_CURDESC,
+> +			     head_desc->async_tx.phys);
+> +
+>  	reg =3D dma_ctrl_read(chan, XILINX_DMA_REG_DMACR);
+> =20
+>  	if (chan->desc_pendingcount <=3D XILINX_DMA_COALESCE_MAX) {
+>  		reg &=3D ~XILINX_DMA_CR_COALESCE_MAX;
+>  		reg |=3D chan->desc_pendingcount <<
+>  				  XILINX_DMA_CR_COALESCE_SHIFT;
+> -		dma_ctrl_write(chan, XILINX_DMA_REG_DMACR, reg);
+>  	}
+> =20
+> -	if (chan->has_sg)
+> -		xilinx_write(chan, XILINX_DMA_REG_CURDESC,
+> -			     head_desc->async_tx.phys);
+>  	reg  &=3D ~XILINX_DMA_CR_DELAY_MAX;
+>  	reg  |=3D chan->irq_delay << XILINX_DMA_CR_DELAY_SHIFT;
+>  	dma_ctrl_write(chan, XILINX_DMA_REG_DMACR, reg);
+> =20
+> -	xilinx_dma_start(chan);
+> +	if (chan->idle)
+> +		xilinx_dma_start(chan);
+> =20
+>  	if (chan->err)
+>  		return;
+> @@ -1914,8 +1912,10 @@ static irqreturn_t xilinx_dma_irq_handler(int irq,=
+ void *data)
+>  		      XILINX_DMA_DMASR_DLY_CNT_IRQ)) {
+>  		spin_lock(&chan->lock);
+>  		xilinx_dma_complete_descriptor(chan);
+> -		chan->idle =3D true;
+> -		chan->start_transfer(chan);
+> +		if (list_empty(&chan->active_list)) {
+> +			chan->idle =3D true;
+> +			chan->start_transfer(chan);
+> +		}
+>  		spin_unlock(&chan->lock);
+>  	}
+> =20
 
 
