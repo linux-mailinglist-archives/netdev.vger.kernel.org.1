@@ -1,95 +1,146 @@
-Return-Path: <netdev+bounces-206191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BB75B01F57
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 16:40:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B09B8B01F5D
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 16:43:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0DDB586F36
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 14:40:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF23C1CC029C
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 14:43:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D38BE2E9745;
-	Fri, 11 Jul 2025 14:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53BBD287265;
+	Fri, 11 Jul 2025 14:43:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="to75VlRm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sz8Vykjg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF7A3167DB7
-	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 14:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270196ADD;
+	Fri, 11 Jul 2025 14:43:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752244802; cv=none; b=Polg/F6Nnm2bTi5SRCTfwWvm1n+GycovAP6P4ZjMxLMS5rltmIaxV++KTf98UrQWGfDDtpxtpGAGYtjACJrIg/BLYKd8yFQtfuO/jOihzKulfypaklzVC3m9zWBaTRMu8w4LA/1EOs4ODTZ7YoXKcKNAtTI7PbmjGmYu0Z6BmNQ=
+	t=1752245010; cv=none; b=NG7vuYGYyDRxmgQNYL6rfv6+9TGlTfaxwhHM7URtvcGL+ZNztrAiATquNl+TBdOxqclcjCrgznXsdn9NjW4Stg2oJsmw7RG9fgZ1t2Wxo7c8Gn0kwntWXCzpTUypi6nDCMZ88tDV7jzctleKB8haFX/oxf6Eq3IisMOs7NFlhGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752244802; c=relaxed/simple;
-	bh=qRHl8irHj26oyGnU9XAYWwu6is3rgjLKi/Djf+zD9OA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=IUt1cExSS34BPBJKY0t99pLbMp8skwav4DlqyQ0Qf1HnJbvwPfo+La+PHOyszy6Vas2FDhHCOLtGdWo5KZgu+rEvIDg6ONrd12e6PBTzTjqmOAgO9AyneMm0A8dQVy/jKQj8OcV5zv+ZxHpMgVmLpBiyjLpfmBzicG9iCTqKGiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=to75VlRm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E6DAC4CEF5;
-	Fri, 11 Jul 2025 14:40:02 +0000 (UTC)
+	s=arc-20240116; t=1752245010; c=relaxed/simple;
+	bh=UEqcf9BWe9KSrJPz14kGQMwOPOmc8OadmITUFSWpuEg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pYlZYy6kvun/kb3ol/RHwtemwdizOWCrhnrgHMFRN6bQz8gPbIWqRdWr1OyqDHGYVI83DOlhcULwXGi//7XWZQNdv9SPQ0eoMr+D+ILnIqI9MAigTgBOn+dcskhend46wLbZhx8XOeF5MHJZBXGOh0bDLxHX8Jc/+bBJKmLCIIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sz8Vykjg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B982C4CEF0;
+	Fri, 11 Jul 2025 14:43:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752244802;
-	bh=qRHl8irHj26oyGnU9XAYWwu6is3rgjLKi/Djf+zD9OA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=to75VlRmN4vMc4MalTBN9axTQHg3eGSoL4PCGiyQqXN7bo8aU8XGEuTLoMa+K/6dk
-	 GBmrlCnEbJ6KRvreH+QJppC8WBjpEP9xp0Z3ZdXY5TgCqsfZaRS4YWluf6kV0X3Daf
-	 CdopZRFysd7T3o67VB4VuiTzxWiBztefyaIVF2J6fLKsn2w28v7SfoPTeWJzCJsLzd
-	 4ycCn3/8AagR38Tvdh2jTVGe00IO3L6Gx4Ju8LCgavErGD36yPvwE8SVEygPwQHgY9
-	 LwqRH3LCnFHXOpSj7RgHkpn+5C1idv6RCTapGQ1AuBQcita2azKtgD1YMV+kqFYYEk
-	 1OfbbqTf79kTw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CC9383B275;
-	Fri, 11 Jul 2025 14:40:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1752245009;
+	bh=UEqcf9BWe9KSrJPz14kGQMwOPOmc8OadmITUFSWpuEg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Sz8VykjguiAuVoV0hyJ3PDMgg7yAmfztLYWKJncQAujXcfRYc+kNt3brvzbT9mrQr
+	 AoTZ61ZcWxsrcWUchqUjn1BbWSSCdumE55cPlAKNS+v6Tv2xkexyoowYoafUKd3DzI
+	 U1F+2HQ0Bm2e2HBXXSQo811niX5aGl72URCbAQ/YeQ0Tf9oKI+auExS2hxYU65V/dZ
+	 bI4XZPP2obDEOwXc9NE+EssbLNyejXj0hMmoLwL/JhJzrURHLD85K0KQjInQw0w3hS
+	 viMtmI6ksFRptGf0lg7tnPBCNcN7wfkS+qDlnapO3FZlVmUFZ4DwQvG/PwzBY4HwfJ
+	 5CdWWhQa0J0/g==
+Date: Fri, 11 Jul 2025 15:43:23 +0100
+From: Simon Horman <horms@kernel.org>
+To: Himanshu Mittal <h-mittal1@ti.com>
+Cc: pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+	davem@davemloft.net, andrew+netdev@lunn.ch,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, srk@ti.com,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com,
+	m-malladi@ti.com, pratheesh@ti.com, prajith@ti.com
+Subject: Re: [PATCH net v2] net: ti: icssg-prueth: Fix buffer allocation for
+ ICSSG
+Message-ID: <20250711144323.GV721198@horms.kernel.org>
+References: <20250710131250.1294278-1-h-mittal1@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: ll_temac: Fix missing tx_pending check in
- ethtools_set_ringparam()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175224482399.2294782.1924457326744652237.git-patchwork-notify@kernel.org>
-Date: Fri, 11 Jul 2025 14:40:23 +0000
-References: <20250710180621.2383000-1-alok.a.tiwari@oracle.com>
-In-Reply-To: <20250710180621.2383000-1-alok.a.tiwari@oracle.com>
-To: Alok Tiwari <alok.a.tiwari@oracle.com>
-Cc: abin.joseph@amd.com, radhey.shyam.pandey@amd.com, michal.simek@amd.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- darren.kenny@oracle.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250710131250.1294278-1-h-mittal1@ti.com>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 10 Jul 2025 11:06:17 -0700 you wrote:
-> The function ll_temac_ethtools_set_ringparam() incorrectly checked
-> rx_pending twice, once correctly for RX and once mistakenly in place
-> of tx_pending. This caused tx_pending to be left unchecked against
-> TX_BD_NUM_MAX.
-> As a result, invalid TX ring sizes may have been accepted or valid
-> ones wrongly rejected based on the RX limit, leading to potential
-> misconfiguration or unexpected results.
+On Thu, Jul 10, 2025 at 06:42:50PM +0530, Himanshu Mittal wrote:
+> Fixes overlapping buffer allocation for ICSSG peripheral
+> used for storing packets to be received/transmitted.
+> There are 3 buffers:
+> 1. Buffer for Locally Injected Packets
+> 2. Buffer for Forwarding Packets
+> 3. Buffer for Host Egress Packets
 > 
-> [...]
+> In existing allocation buffers for 2. and 3. are overlapping causing packet
+> corruption.
+> 
+> Packet corruption observations:
+> During tcp iperf testing, due to overlapping buffers the received ack
+> packet overwrites the packet to be transmitted. So, we see packets on wire
+> with the ack packet content inside the content of next TCP packet from
+> sender device.
+> 
+> Details for AM64x switch mode:
+> -> Allocation by existing driver:
+> +---------+-------------------------------------------------------------+
+> |         |          SLICE 0             |          SLICE 1             |
+> |         +------+--------------+--------+------+--------------+--------+
+> |         | Slot | Base Address | Size   | Slot | Base Address | Size   |
+> |---------+------+--------------+--------+------+--------------+--------+
+> |         | 0    | 70000000     | 0x2000 | 0    | 70010000     | 0x2000 |
+> |         | 1    | 70002000     | 0x2000 | 1    | 70012000     | 0x2000 |
+> |         | 2    | 70004000     | 0x2000 | 2    | 70014000     | 0x2000 |
+> | FWD     | 3    | 70006000     | 0x2000 | 3    | 70016000     | 0x2000 |
+> | Buffers | 4    | 70008000     | 0x2000 | 4    | 70018000     | 0x2000 |
+> |         | 5    | 7000A000     | 0x2000 | 5    | 7001A000     | 0x2000 |
+> |         | 6    | 7000C000     | 0x2000 | 6    | 7001C000     | 0x2000 |
+> |         | 7    | 7000E000     | 0x2000 | 7    | 7001E000     | 0x2000 |
+> +---------+------+--------------+--------+------+--------------+--------+
+> |         | 8    | 70020000     | 0x1000 | 8    | 70028000     | 0x1000 |
+> |         | 9    | 70021000     | 0x1000 | 9    | 70029000     | 0x1000 |
+> |         | 10   | 70022000     | 0x1000 | 10   | 7002A000     | 0x1000 |
+> | Our     | 11   | 70023000     | 0x1000 | 11   | 7002B000     | 0x1000 |
+> | LI      | 12   | 00000000     | 0x0    | 12   | 00000000     | 0x0    |
+> | Buffers | 13   | 00000000     | 0x0    | 13   | 00000000     | 0x0    |
+> |         | 14   | 00000000     | 0x0    | 14   | 00000000     | 0x0    |
+> |         | 15   | 00000000     | 0x0    | 15   | 00000000     | 0x0    |
+> +---------+------+--------------+--------+------+--------------+--------+
+> |         | 16   | 70024000     | 0x1000 | 16   | 7002C000     | 0x1000 |
+> |         | 17   | 70025000     | 0x1000 | 17   | 7002D000     | 0x1000 |
+> |         | 18   | 70026000     | 0x1000 | 18   | 7002E000     | 0x1000 |
+> | Their   | 19   | 70027000     | 0x1000 | 19   | 7002F000     | 0x1000 |
+> | LI      | 20   | 00000000     | 0x0    | 20   | 00000000     | 0x0    |
+> | Buffers | 21   | 00000000     | 0x0    | 21   | 00000000     | 0x0    |
+> |         | 22   | 00000000     | 0x0    | 22   | 00000000     | 0x0    |
+> |         | 23   | 00000000     | 0x0    | 23   | 00000000     | 0x0    |
+> +---------+------+--------------+--------+------+--------------+--------+
+> --> here 16, 17, 18, 19 overlapping with below express buffer
+> 
+> +-----+-----------------------------------------------+
+> |     |       SLICE 0       |        SLICE 1          |
+> |     +------------+----------+------------+----------+
+> |     | Start addr | End addr | Start addr | End addr |
+> +-----+------------+----------+------------+----------+
+> | EXP | 70024000   | 70028000 | 7002C000   | 70030000 | <-- Overlapping
 
-Here is the summary with links:
-  - [net] net: ll_temac: Fix missing tx_pending check in ethtools_set_ringparam()
-    https://git.kernel.org/netdev/net/c/e81750b4e382
+Thanks for the detailed explanation with these tables.
+It is very helpful. I follow both the existing and new mappings
+with their help. Except for one thing.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+It's not clear how EXP was set to the values on the line above.
+Probably I'm missing something very obvious.
+Could you help me out here?
 
+> | PRE | 70030000   | 70033800 | 70034000   | 70037800 |
+> +-----+------------+----------+------------+----------+
+> 
+> +---------------------+----------+----------+
+> |                     | SLICE 0  |  SLICE 1 |
+> +---------------------+----------+----------+
+> | Default Drop Offset | 00000000 | 00000000 |     <-- Field not configured
+> +---------------------+----------+----------+
 
+...
 
