@@ -1,225 +1,156 @@
-Return-Path: <netdev+bounces-206087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A46D4B01481
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 09:25:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6D87B01563
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 10:05:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E79591717F2
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 07:25:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4963F7B3536
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 08:03:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CE7C1F0985;
-	Fri, 11 Jul 2025 07:25:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEB19202C43;
+	Fri, 11 Jul 2025 08:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MTM1bxph"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E2461E5B6D
-	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 07:25:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A881F875A
+	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 08:04:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752218708; cv=none; b=pKj1tTl9LFdr3Rn+ds5cui5OfWgl6jVc7PmtEEAq3eLyivOCyitw3xdU3VN5yyqSNTAQAKct0b/6SM0urfTJpn3eEjYE1NGPqLZ/IYoo0g4MvMo19QBi9KrGldzGu87YEfIeVLIfWjjgP5vYVW4APxNx/NpjYB0Ihnu7XuI0Y34=
+	t=1752221087; cv=none; b=sj3D79Rej6pQSwOzasO+tsIJa5O+Iwz60sndUuBMU+Jgj7aFssr1O2gyu12Jzy9JtQhbkuSGB2LveUlkPo/pmAl/axbXxnMGfk4CepD601O34JeUXr2L70fMf4/7xCDyfRLX5CeE9SDEh1FBj4ZjIxv6PdCDGdB9Kip/yrHA6AQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752218708; c=relaxed/simple;
-	bh=icHxeGLHJ+2GLRLVIeoFlPlPPZQSo9aSWmNufjIdbgs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Lz5meP+EAZbE5/L3UhP52tmHW1qSOY2aTXtSDYO/1wTnonsXXwGl3vpEgyOGono/rtn34QCo79Dni6YlbQbx31w1jbZDg+8/DLkePptrDXpC2JHWrXMWCnGckgE9rfgt+Nf+kXOvQWWLCnT7VFv6FbkoP90Mn1u61p6Sc+hIql0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ua87n-0001bS-PA; Fri, 11 Jul 2025 09:24:51 +0200
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ua87m-007sjf-1G;
-	Fri, 11 Jul 2025 09:24:50 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ua87m-003Mpa-11;
-	Fri, 11 Jul 2025 09:24:50 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: [PATCH net-next v2 1/1] net: selftests: add PHY-loopback test for bad TCP checksums
-Date: Fri, 11 Jul 2025 09:24:49 +0200
-Message-Id: <20250711072449.802677-1-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1752221087; c=relaxed/simple;
+	bh=pkRDOWebUNM4JiyGTyFlT0hsoPMAV1wZl01/hxrceCs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=gL3B3njblQd3LLJJElMmKKGC3IheFBHPgTZ4R436lqTpTyK6zly3XUSzuBHisYqgjfubEhF5iCNZEbeTQkgCWxtxNalyWHUByg04n+h9ebzOGAXfh4V5Bbux44wD61qLQtFcEQUfUJZrBP3ncPfuKHRDpLHCFEw/yLDr6yLPXdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MTM1bxph; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-451d30992bcso13795375e9.2
+        for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 01:04:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752221083; x=1752825883; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3M2iap2RfddA/05gTNnW43uL4IxbrFPZmKO6UgPVVnU=;
+        b=MTM1bxphIVLOhWSm+M1FfqfVIZVuprb0T5RImwHnk6zsTl1xJz1DNIlLBl9z2bV5r5
+         z3Ujiji8EfM6VkI/kyEy1BwtjIRGFANs/7oa0D6PhY+6DT9lqoXvTdKRV2cfgXMRrE9F
+         7PBSdBklrQTN6G+Hiz90qhN2ay0rLqj2qlxmyuseDPlv1qdztYkPibyzYtvpFwVXBKS7
+         bZ3Yd1lQTKvJpmWqrlJK86KExVvyKeIcLIE9n7tmdDga2VZ1/XUlwwRbCHAO7pA4Um1h
+         tkTfGCpwV6CD7naGRPRNUQizDHOW7b6tzBZcb03M/4pV9NAB3PVx8Y68xUW/E3c7If0w
+         Qmdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752221083; x=1752825883;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3M2iap2RfddA/05gTNnW43uL4IxbrFPZmKO6UgPVVnU=;
+        b=ta3S308sq6IAYtroDLNL+EQco/3Ue2chpvpfYxaPKhmy+LI8obYjYgTAKGyjqUSU0e
+         P2uIeBFA4P5gn8/gMTs5cZmsoDt/9szwLSnQ39tGp4RnsgypM4OQEmXdKOTYpEUhkJax
+         rukL8ixgmjq8YjvGxdFrFLckFtsm4aYHvHbH4G6D1mMq2cDMgk4rhx0uzcCUG9vHepGa
+         LrBQE5DBI3dBlSIvJ4+whwFMG3TOri6gh9xk9SggBVgZ9WJ8giTVF/v8xugnIuS2iut3
+         4mmfBVdAICk062BH+5VWyc/uITngg+G9Ppw/P4j5sG+pkw141SY/UeW7ZsJzpV2Dw5E/
+         Yidw==
+X-Forwarded-Encrypted: i=1; AJvYcCWBgXirNH/KmDns9+sfWFUVvl5DQPlcolwIaFVm9GkELwlH5/Xhhrb7JZpS61CGv42C4DQJRsk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxl9VFxNf5ivP/RWkOFbgIkHQiKwbGXTmGOcpX7BTePcQwLK0hl
+	We8DjswTl0lwL/VNTXCTtGqXLqs0SYldTDK51BQnnLaaraUCs3C1F58sW+ximfKJ62DW7vD1UmU
+	nMzT1iSt+xeW9moBrcQ==
+X-Google-Smtp-Source: AGHT+IFlSXEzAMov8oFdISNNULpSYKLnI6k/Wg/M0Dmh3F1GHL/zhYS6s31XC9cw+cBAGqFATVlq5a1YqgWWoCQ=
+X-Received: from wmbel6.prod.google.com ([2002:a05:600c:3e06:b0:451:edc8:7816])
+ (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:1547:b0:453:5c30:a1d0 with SMTP id 5b1f17b1804b1-454f4257f2fmr14179655e9.21.1752221083194;
+ Fri, 11 Jul 2025 01:04:43 -0700 (PDT)
+Date: Fri, 11 Jul 2025 08:04:36 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAJTFcGgC/3WMQQ7CIBBFr9LM2jFAQ0hdeQ/TBYWBkmgxYIim4
+ e6O3bt8L/+/HSqVRBUuww6FWqopbwzqNIBb7RYJk2cGJZQWRkzoeeQIbcVCAUct/KJHabyXwJ8 ny/Q+ereZeU31lcvnyDf5s/9KTaJEWoIRegrBTu4ac453Orv8gLn3/gXhNWXJqwAAAA==
+X-Change-Id: 20250709-device-as-ref-350db5317dd1
+X-Developer-Key: i=aliceryhl@google.com; a=openpgp; fpr=49F6C1FAA74960F43A5B86A1EE7A392FDE96209F
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1570; i=aliceryhl@google.com;
+ h=from:subject:message-id; bh=pkRDOWebUNM4JiyGTyFlT0hsoPMAV1wZl01/hxrceCs=;
+ b=owEBbQKS/ZANAwAKAQRYvu5YxjlGAcsmYgBocMWZf5DwFAkNMr1bNJ+/LMsbDNp8asHUALJEC
+ 96m97gaYBuJAjMEAAEKAB0WIQSDkqKUTWQHCvFIvbIEWL7uWMY5RgUCaHDFmQAKCRAEWL7uWMY5
+ Rg1iEACj7tHOtxXbhYlloF3PdDFqYVx0uxVObHLIawoVwlm0qOu7jgYFt5twhGd67vpOLuPR1Nv
+ d90grP/NrXGdRDadA1J56Y8XLaX13MqGkcQGrZAUN0VCuMCLx/qEjccQ5B8JSD+lOwVV26gsFub
+ C5prv8LaELZ422a8iXkKb+VTpTtUa4arPcbmFsa5bvvPzOqGwYwLI8KDVlZU0NW8bczQz2JXPx3
+ OUNMqZ3HjTWxll55DZBdWG5cHliBdZG0J+Ox4P6m509s/46m/M37U1O0SpJlI/PEaJoLlPH9e4B
+ wuaqGfR5uEgwf5o1oPXvVU0gILQpodJfnxg9XJtTEaT/cOlbeEbhyU+kiuMcankJfb9ACf/s+vC
+ R2iRQM6iyzTMO4rGmYY+IUZ2sR7Ob7vUfO9laUr8QgAZBCCwhll6IOk0bWyyQHLGjIcUu/Wqk/T
+ lF35wHgXYJ+VrlUQryynKkAfTdgejexjBADJ0KoL+cjOr5vCLpHValhlXEr6XX5pCnFABK/WJ8C
+ YLDzqGUbUtF75+hrJbOKDPsvpc4FSRyISEC1JgwYOoxi76WNJSaTa0Ks/n+xVaptZZ0xlFQMSxR
+ YUQ2jeFDP2hMS+S4YpDhCmRrNP3t9w/6gd4ELfkIIbaEL+JD1o9vOCNbdWxB+NznrCp+CMIuGts W7AxjNqzkAB+zmg==
+X-Mailer: b4 0.14.2
+Message-ID: <20250711-device-as-ref-v2-0-1b16ab6402d7@google.com>
+Subject: [PATCH v2 0/2] Rename Device::as_ref() to from_raw()
+From: Alice Ryhl <aliceryhl@google.com>
+To: Danilo Krummrich <dakr@kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dave Ertman <david.m.ertman@intel.com>, 
+	Ira Weiny <ira.weiny@intel.com>, Leon Romanovsky <leon@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, 
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	"=?utf-8?q?Bj=C3=B6rn_Roy_Baron?=" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
+	Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+	Bjorn Helgaas <bhelgaas@google.com>, 
+	"=?utf-8?q?Krzysztof_Wilczy=C5=84ski?=" <kwilczynski@kernel.org>, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org, 
+	Alice Ryhl <aliceryhl@google.com>
+Content-Type: text/plain; charset="utf-8"
 
-Detect NICs and drivers that either drop frames with a corrupted TCP
-checksum or, worse, pass them up as valid.  The test flips one bit in
-the checksum, transmits the packet in internal loopback, and fails when
-the driver reports CHECKSUM_UNNECESSARY.
+The prefix as_* should not be used for a constructor. Constructors
+usually use the prefix from_* instead.
 
-Discussed at:
-https://lore.kernel.org/all/20250625132117.1b3264e8@kernel.org/
+Some prior art in the stdlib: Box::from_raw, CString::from_raw,
+Rc::from_raw, Arc::from_raw, Waker::from_raw, File::from_raw_fd.
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+There is also prior art in the kernel crate: cpufreq::Policy::from_raw,
+fs::File::from_raw_file, Kuid::from_raw, ARef::from_raw,
+SeqFile::from_raw, VmaNew::from_raw, Io::from_raw.
+
+For more, see: https://lore.kernel.org/r/aCd8D5IA0RXZvtcv@pollux
+
+Signed-off-by: Alice Ryhl <aliceryhl@google.com>
 ---
-changes v2:
-- Replaced manual calculation of TCP checksum with standard kernel helper
-  skb_checksum_help().
-- add test documentation
----
- net/core/selftests.c | 84 ++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 82 insertions(+), 2 deletions(-)
+Changes in v2:
+- Split into two patches.
+- Use a different lore link.
+- Link to v1: https://lore.kernel.org/r/20250709-device-as-ref-v1-1-ebf7059ffa9c@google.com
 
-diff --git a/net/core/selftests.c b/net/core/selftests.c
-index 406faf8e5f3f..513c8b5f7c46 100644
---- a/net/core/selftests.c
-+++ b/net/core/selftests.c
-@@ -27,6 +27,7 @@ struct net_packet_attrs {
- 	int max_size;
- 	u8 id;
- 	u16 queue_mapping;
-+	bool bad_csum;
- };
- 
- struct net_test_priv {
-@@ -165,6 +166,37 @@ static struct sk_buff *net_test_get_skb(struct net_device *ndev,
- 		thdr->check = ~tcp_v4_check(l4len, ihdr->saddr, ihdr->daddr, 0);
- 		skb->csum_start = skb_transport_header(skb) - skb->head;
- 		skb->csum_offset = offsetof(struct tcphdr, check);
-+
-+		if (attr->bad_csum) {
-+			u16 csum;
-+
-+			/* Force mangled checksum */
-+			if (skb_checksum_help(skb)) {
-+				kfree_skb(skb);
-+				return NULL;
-+			}
-+
-+			/* To avoid sparse warnings about operating on
-+			 * restricted __sum16/__be16 types, explicitly cast the
-+			 * checksum to a plain u16, perform the manipulation,
-+			 * and then cast the result back.
-+			 */
-+			csum = (__force u16)thdr->check;
-+
-+			/* Mangle the checksum by flipping the LSB. */
-+			csum ^= 1;
-+			/* If mangling resulted in 0, use the raw value for a
-+			 * mangled-zero checksum. We use the literal 0xffff
-+			 * because CSUM_MANGLED_0 has a restricted type.
-+			 */
-+			if (!csum)
-+				csum = 0xffff;
-+
-+			/* Cast the final integer value back to the restricted
-+			 * type
-+			 */
-+			thdr->check = (__force __sum16)csum;
-+		}
- 	} else {
- 		udp4_hwcsum(skb, ihdr->saddr, ihdr->daddr);
- 	}
-@@ -239,7 +271,11 @@ static int net_test_loopback_validate(struct sk_buff *skb,
- 	if (tpriv->packet->id != shdr->id)
- 		goto out;
- 
--	tpriv->ok = true;
-+	if (tpriv->packet->bad_csum && skb->ip_summed == CHECKSUM_UNNECESSARY)
-+		tpriv->ok = -EIO;
-+	else
-+		tpriv->ok = true;
-+
- 	complete(&tpriv->comp);
- out:
- 	kfree_skb(skb);
-@@ -285,7 +321,12 @@ static int __net_test_loopback(struct net_device *ndev,
- 		attr->timeout = NET_LB_TIMEOUT;
- 
- 	wait_for_completion_timeout(&tpriv->comp, attr->timeout);
--	ret = tpriv->ok ? 0 : -ETIMEDOUT;
-+	if (tpriv->ok < 0)
-+		ret = tpriv->ok;
-+	else if (!tpriv->ok)
-+		ret = -ETIMEDOUT;
-+	else
-+		ret = 0;
- 
- cleanup:
- 	dev_remove_pack(&tpriv->pt);
-@@ -345,6 +386,42 @@ static int net_test_phy_loopback_tcp(struct net_device *ndev)
- 	return __net_test_loopback(ndev, &attr);
- }
- 
-+/**
-+ * net_test_phy_loopback_tcp_bad_csum - PHY loopback test with a deliberately
-+ *					corrupted TCP checksum
-+ * @ndev: the network device to test
-+ *
-+ * Builds the same minimal Ethernet/IPv4/TCP frame as
-+ * net_test_phy_loopback_tcp(), then flips the least-significant bit of the TCP
-+ * checksum so the resulting value is provably invalid (neither 0 nor 0xFFFF).
-+ * The frame is transmitted through the device’s internal PHY loopback path:
-+ *
-+ *   test code -> MAC driver -> MAC HW -> xMII -> PHY ->
-+ *   internal PHY loopback -> xMII -> MAC HW -> MAC driver -> test code
-+ *
-+ * Result interpretation
-+ * ---------------------
-+ *  0            The frame is delivered to the stack and the driver reports
-+ *               ip_summed as CHECKSUM_NONE or CHECKSUM_COMPLETE - both are
-+ *               valid ways to indicate “bad checksum, let the stack verify.”
-+ *  -ETIMEDOUT   The MAC/PHY silently dropped the frame; hardware checksum
-+ *               verification filtered it out before the driver saw it.
-+ *  -EIO         The driver returned the frame with ip_summed ==
-+ *               CHECKSUM_UNNECESSARY, falsely claiming a valid checksum and
-+ *               indicating a serious RX-path defect.
-+ *
-+ * Return: 0 on success or a negative error code on failure.
-+ */
-+static int net_test_phy_loopback_tcp_bad_csum(struct net_device *ndev)
-+{
-+	struct net_packet_attrs attr = { };
-+
-+	attr.dst = ndev->dev_addr;
-+	attr.tcp = true;
-+	attr.bad_csum = true;
-+	return __net_test_loopback(ndev, &attr);
-+}
-+
- static const struct net_test {
- 	char name[ETH_GSTRING_LEN];
- 	int (*fn)(struct net_device *ndev);
-@@ -368,6 +445,9 @@ static const struct net_test {
- 	}, {
- 		.name = "PHY internal loopback, TCP    ",
- 		.fn = net_test_phy_loopback_tcp,
-+	}, {
-+		.name = "PHY loopback, bad TCP csum    ",
-+		.fn = net_test_phy_loopback_tcp_bad_csum,
- 	}, {
- 		/* This test should be done after all PHY loopback test */
- 		.name = "PHY internal loopback, disable",
+---
+Alice Ryhl (2):
+      device: rust: rename Device::as_ref() to Device::from_raw()
+      drm: rust: rename as_ref() to from_raw() for drm constructors
+
+ rust/kernel/auxiliary.rs   |  2 +-
+ rust/kernel/cpu.rs         |  2 +-
+ rust/kernel/device.rs      |  6 +++---
+ rust/kernel/drm/device.rs  |  4 ++--
+ rust/kernel/drm/file.rs    |  8 ++++----
+ rust/kernel/drm/gem/mod.rs | 16 ++++++++--------
+ rust/kernel/drm/ioctl.rs   |  4 ++--
+ rust/kernel/faux.rs        |  2 +-
+ rust/kernel/miscdevice.rs  |  2 +-
+ rust/kernel/net/phy.rs     |  2 +-
+ rust/kernel/pci.rs         |  2 +-
+ rust/kernel/platform.rs    |  2 +-
+ 12 files changed, 26 insertions(+), 26 deletions(-)
+---
+base-commit: 86731a2a651e58953fc949573895f2fa6d456841
+change-id: 20250709-device-as-ref-350db5317dd1
+
+Best regards,
 -- 
-2.39.5
+Alice Ryhl <aliceryhl@google.com>
 
 
