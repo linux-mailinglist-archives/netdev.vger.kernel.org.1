@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-206023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66C34B010FB
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 03:54:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60246B010FA
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 03:54:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 113505A8476
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 01:54:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D91517AE5D5
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 01:52:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C80917A31E;
-	Fri, 11 Jul 2025 01:53:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FEBE188907;
+	Fri, 11 Jul 2025 01:53:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tooErw38"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dLFt61md"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38F5317A316
-	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 01:53:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFFC31684AC
+	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 01:53:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752198822; cv=none; b=bFVSXS7FpZOizpiDO8zjzBHBPKG35k11PWWaJSl/NxluITx4w1e6dK4CYjMs/72xsTNIcnmg9oLx8R5FhZl4jRJUNEorhHC2DOPhwkI4DYFRZqgGDJFxK6LfhVLNqlUwNha6auqLUs7GRl62Z8SINdBiAjgJNOZXp4qlnEgKmas=
+	t=1752198823; cv=none; b=IlQVqQJChlrjEI1HHlfuQIMJSvHRJ0qXwxfbzzgd0Kg61eDDEzGEvtx9C2KbHL+2Ac11mXrNu9gt+WZJjDUY0VgR0ftOLviw5atgpkdxRKe12UiUnNsv+mRFyh/eABiuE9fEhb4zP/h7gc7Vqmz2dm+2SVrLyahjMd1Mdl8X9VA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752198822; c=relaxed/simple;
-	bh=WiaUBask73cFQwjSAKniPdMcJAwcU8HPnP7soXMMAOs=;
+	s=arc-20240116; t=1752198823; c=relaxed/simple;
+	bh=VX+YA+NIyzzBWGSTpbZ/i2lQMh6BfiFanH7ukGlxUJk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ap6qNCplxQr6h41fTM/6MeN9g24gZbYbwApr/21Y6BSuz4reivcXvS2vs85tHTGJBpudWbrZBM0vAoz6yqRdQm3d37ArszJbDUj0XGpejBty/gNaT4CumtRfJhzeQ4rd3mfIVzIjysxpLx85M3zNqf/joE8gWO2F6zavgLFAbIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tooErw38; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48F70C4CEFD;
+	 MIME-Version; b=PERAsLrBoaKMIXydi2jj8PHoHf2Wo7yVBnnxOsnSzaLCVh1waekkoVaL378asr8+NTEJDfKl6pE9eCLuCqR48RbpUQ1DE9bkEYORC9OT6oBFmwyZMZQwsb2kRA2kQHU4bw90LWDeLCmpmbYm+J7cegh4biHJxJRZAhtjIWyMueA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dLFt61md; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03D9DC4CEF6;
 	Fri, 11 Jul 2025 01:53:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752198821;
-	bh=WiaUBask73cFQwjSAKniPdMcJAwcU8HPnP7soXMMAOs=;
+	s=k20201202; t=1752198822;
+	bh=VX+YA+NIyzzBWGSTpbZ/i2lQMh6BfiFanH7ukGlxUJk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tooErw387yydt8pgzh52XEzQ0C6adfmaCr2Llp5IkRA9nLOiT4VHMY9Q/xwZCrt5O
-	 PHGvllHxEpCFYFO63psG2oSiWXlr0z1n+ggn0gDpZaZ/4/Sc5yuOcg8PF/gi/7XjYW
-	 m+fTV0gqbWN5I4oUUqKpJtDr9Kn38Vgbm9E4V6ZXvs7Z2yTjHKzvukpMpiCjIvnBxo
-	 4/3M97g9GQ+HBWjOaTBp3LlvFT10hN1mIfOSMM6YIRxn6z336JCHPrZveNwOa9F1C6
-	 ssC5MpqCaRuAmTNTbtR9nM7jsqgvO14JQZ4PnnN58qN8BgdLd5gd8c5PVctDy3ny54
-	 catzrR90y7QAg==
+	b=dLFt61mdS4qtRwvyyWoWCWadLYgXmT1UUJLgwa3mFZG757/awSX/nFUElsswZgtqM
+	 eHOFu9AjttVDwgfUq67tbPL5MjVgxqHsDNbOLnFLmk3CpFTcrLiQLur7iO0/4ZK3hz
+	 ewJrZkl62exvNOSpqnOM9jt7z2JzQFTt7G57CsrvbvdNjOZuL7QvC6Htp3OP0sRMTT
+	 UajQlR3dYFbPFFXQ6wK7GPVb7Ic17EUDd3uR6n+qH0jtIl3gMcD9Ss7QD0gdOSHOyL
+	 Ay61J8Bi+USUH0l3CArkwGgJDl72HpG3v0YOXTvdnQaqZCUw6wAyJUtH+XMpW477TW
+	 qEjvqZyhl6XrQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -56,9 +56,9 @@ Cc: netdev@vger.kernel.org,
 	ecree.xilinx@gmail.com,
 	gal@nvidia.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 07/11] selftests: drv-net: rss_api: test setting hashing key via Netlink
-Date: Thu, 10 Jul 2025 18:52:59 -0700
-Message-ID: <20250711015303.3688717-8-kuba@kernel.org>
+Subject: [PATCH net-next 08/11] netlink: specs: define input-xfrm enum in the spec
+Date: Thu, 10 Jul 2025 18:53:00 -0700
+Message-ID: <20250711015303.3688717-9-kuba@kernel.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250711015303.3688717-1-kuba@kernel.org>
 References: <20250711015303.3688717-1-kuba@kernel.org>
@@ -70,76 +70,76 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Test setting hashing key via Netlink.
+Help YNL decode the values for input-xfrm by defining
+the possible values in the spec. Don't define "no change"
+as it's an IOCTL artifact with no use in Netlink.
 
-  # ./tools/testing/selftests/drivers/net/hw/rss_api.py
-  TAP version 13
-  1..7
-  ok 1 rss_api.test_rxfh_nl_set_fail
-  ok 2 rss_api.test_rxfh_nl_set_indir
-  ok 3 rss_api.test_rxfh_nl_set_indir_ctx
-  ok 4 rss_api.test_rxfh_indir_ntf
-  ok 5 rss_api.test_rxfh_indir_ctx_ntf
-  ok 6 rss_api.test_rxfh_nl_set_key
-  ok 7 rss_api.test_rxfh_fields
-  # Totals: pass:7 fail:0 xfail:0 xpass:0 skip:0 error:0
+With this change on mlx5 input-xfrm gets decoded:
+
+ # ynl --family ethtool --dump rss-get
+ [{'header': {'dev-index': 2, 'dev-name': 'eth0'},
+   'hfunc': 1,
+   'hkey': b'V\xa8\xf9\x9 ...',
+   'indir': [0, 1, ... ],
+   'input-xfrm': 'sym-or-xor',                         <<<
+   'flow-hash': {'ah4': {'ip-dst', 'ip-src'},
+                 'ah6': {'ip-dst', 'ip-src'},
+                 'esp4': {'ip-dst', 'ip-src'},
+                 'esp6': {'ip-dst', 'ip-src'},
+                 'ip4': {'ip-dst', 'ip-src'},
+                 'ip6': {'ip-dst', 'ip-src'},
+                 'tcp4': {'l4-b-0-1', 'ip-dst', 'l4-b-2-3', 'ip-src'},
+                 'tcp6': {'l4-b-0-1', 'ip-dst', 'l4-b-2-3', 'ip-src'},
+                 'udp4': {'l4-b-0-1', 'ip-dst', 'l4-b-2-3', 'ip-src'},
+                 'udp6': {'l4-b-0-1', 'ip-dst', 'l4-b-2-3', 'ip-src'}}
+ }]
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- .../selftests/drivers/net/hw/rss_api.py       | 33 +++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ Documentation/netlink/specs/ethtool.yaml | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-diff --git a/tools/testing/selftests/drivers/net/hw/rss_api.py b/tools/testing/selftests/drivers/net/hw/rss_api.py
-index e40a1b6730bb..a0f3f9937de8 100755
---- a/tools/testing/selftests/drivers/net/hw/rss_api.py
-+++ b/tools/testing/selftests/drivers/net/hw/rss_api.py
-@@ -6,6 +6,7 @@ API level tests for RSS (mostly Netlink vs IOCTL).
- """
- 
- import glob
-+import random
- from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_is, ksft_ne, ksft_raises
- from lib.py import KsftSkipEx, KsftFailEx
- from lib.py import defer, ethtool, CmdExitFailure
-@@ -195,6 +196,38 @@ from lib.py import NetDrvEnv
-     ksft_eq(set(ntf["msg"]["indir"]), {1})
- 
- 
-+def test_rxfh_nl_set_key(cfg):
-+    """
-+    Test setting hashing key via Netlink.
-+    """
-+
-+    dflt = cfg.ethnl.rss_get({"header": {"dev-index": cfg.ifindex}})
-+    defer(cfg.ethnl.rss_set,
-+          {"header": {"dev-index": cfg.ifindex},
-+           "hkey": dflt["hkey"], "indir": None})
-+
-+    # Empty key should error out
-+    with ksft_raises(NlError) as cm:
-+        cfg.ethnl.rss_set({"header": {"dev-index": cfg.ifindex},
-+                           "hkey": None})
-+    ksft_eq(cm.exception.nl_msg.extack['bad-attr'], '.hkey')
-+
-+    # Set key to random
-+    mod = random.randbytes(len(dflt["hkey"]))
-+    cfg.ethnl.rss_set({"header": {"dev-index": cfg.ifindex},
-+                       "hkey": mod})
-+    rss = cfg.ethnl.rss_get({"header": {"dev-index": cfg.ifindex}})
-+    ksft_eq(rss.get("hkey", [-1]), mod)
-+
-+    # Set key to random and indir tbl to something at once
-+    mod = random.randbytes(len(dflt["hkey"]))
-+    cfg.ethnl.rss_set({"header": {"dev-index": cfg.ifindex},
-+                       "indir": [0, 1], "hkey": mod})
-+    rss = cfg.ethnl.rss_get({"header": {"dev-index": cfg.ifindex}})
-+    ksft_eq(rss.get("hkey", [-1]), mod)
-+    ksft_eq(set(rss.get("indir", [-1])), {0, 1})
-+
-+
- def test_rxfh_fields(cfg):
-     """
-     Test reading Rx Flow Hash over Netlink.
+diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+index aa55fc9068e1..3a0453a92300 100644
+--- a/Documentation/netlink/specs/ethtool.yaml
++++ b/Documentation/netlink/specs/ethtool.yaml
+@@ -158,6 +158,28 @@ c-version-name: ethtool-genl-version
+       -
+         name: pse-event-sw-pw-control-error
+         doc: PSE faced an error managing the power control from software
++  -
++    name: input-xfrm
++    doc: RSS hash function transformations.
++    type: enum
++    enum-name:
++    name-prefix: rxh-xfrm-
++    header: linux/ethtool.h
++    entries:
++      -
++        name: sym-xor
++        value: 1
++        doc: >-
++          XOR the corresponding source and destination fields of each specified
++          protocol. Both copies of the XOR'ed fields are fed into the RSS and
++          RXHASH calculation. Note that this XORing reduces the input set
++          entropy and could be exploited to reduce the RSS queue spread.
++      -
++        name: sym-or-xor
++        value: 2
++        doc: >-
++          Similar to SYM_XOR, except that one copy of the XOR'ed fields is
++          replaced by an OR of the same fields.
+   -
+     name: rxfh-fields
+     name-prefix: rxh-
+@@ -1621,6 +1643,7 @@ c-version-name: ethtool-genl-version
+       -
+         name: input-xfrm
+         type: u32
++        enum: input-xfrm
+       -
+         name: start-context
+         type: u32
 -- 
 2.50.1
 
