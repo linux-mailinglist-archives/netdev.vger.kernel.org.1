@@ -1,262 +1,179 @@
-Return-Path: <netdev+bounces-206222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23B9FB022CA
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 19:41:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72164B022D6
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 19:41:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0F40A46DA5
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 17:40:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 686B61C27DBC
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 17:42:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 900272EF670;
-	Fri, 11 Jul 2025 17:40:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D54F02F2363;
+	Fri, 11 Jul 2025 17:41:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UEvXuqzN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DJqYaoBb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B8B4219A91;
-	Fri, 11 Jul 2025 17:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE8F2F2342
+	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 17:41:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752255655; cv=none; b=MPCN7zQS8zZWn0OET7pAyUeaEw1Zr8spx8IhZ9wBRBxvHRZ46bDkykM8fOuJQXdxSmnzar8koogCRmFgUDGEH9AA4S5foswBXc84AhX1yx3av8djthHpxcImRuLD5WDIvt3m1HeazpxN9KyZwv960sVsfBrcukYoEC8w+D3OYSc=
+	t=1752255688; cv=none; b=DeQ+eTnksU/8kMliL24GVlMNw8MrwjDxMlkSsTnfCp80seoUAkR23hG00LHc5bvXs4o7dODxxr2PU9CNa0oKb6SdslSK6Mvv9FsB3/cRlfdohvuzyoHA7FbRa6BOy467triQ1zsncxNN7GNTICJ6zDQ0uWoqlSIvz8tZ7oqgo7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752255655; c=relaxed/simple;
-	bh=Z5h8RYJc6k17AEf7UTbWHnSOM2I8FCkIKpXNIERJo78=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XR1LaYu3pLN0X+0iupIRFSRtBRvdGSZlWNWQ8UZ0wSCgCQeiYpTCAcS3Yxohi03Lus9F9PWx3Qi3FB8a1rHdIjhfBOET6VwjMyEI+5Vf+3h5o1XPWe/4k/8wZkQo2k4oOty6piEaegxLVAL6FWCwvHv4EB0gj4HAv4ZdFdnIih0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UEvXuqzN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37011C4CEED;
-	Fri, 11 Jul 2025 17:40:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752255654;
-	bh=Z5h8RYJc6k17AEf7UTbWHnSOM2I8FCkIKpXNIERJo78=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UEvXuqzNsjkR9n9ms5hU7W4gRqcQOTFDIMNJfU/Mk4UVCDaKfkzCI893GKZx9DIAo
-	 qdt4OvG0eBTuEjiINckV9baYfNAgqRE2a2pqn1yoDRHy7nD7eO/7I80Q1LJ2jtSIsI
-	 vlkx7iHkzfOc1q3umC23An6lHW2kRxmnAIiz9KUTCy4wi2XifdjsQg9y49fgyfSZ6y
-	 TvvEOCYZgZit6f/jFA2PwTV5h0be8ZewiOWw31vMyYRc+mTz5joOrbbucZgBNBjuc3
-	 zxLgsNCW9R3CltpYWl0vtEQlvShg/v01SXWTlv8AFFrL6BQpzssSO7M3qmRJioVfps
-	 mP3tvhoeldj0g==
-Date: Fri, 11 Jul 2025 19:40:47 +0200
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, "Akira Yokosawa" <akiyks@gmail.com>, "Breno Leitao"
- <leitao@debian.org>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Ignacio Encinas Rubio"
- <ignacio@iencinas.com>, "Jan Stancek" <jstancek@redhat.com>, "Marco Elver"
- <elver@google.com>, "Paolo Abeni" <pabeni@redhat.com>, "Randy Dunlap"
- <rdunlap@infradead.org>, "Ruben Wauters" <rubenru09@aol.com>, "Shuah Khan"
- <skhan@linuxfoundation.org>, Jakub Kicinski <kuba@kernel.org>, Simon Horman
- <horms@kernel.org>, joel@joelfernandes.org,
- linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org,
- lkmm@lists.linux.dev, netdev@vger.kernel.org, peterz@infradead.org,
- stern@rowland.harvard.edu
-Subject: Re: [PATCH v9 12/13] docs: parser_yaml.py: add support for line
- numbers from the parser
-Message-ID: <20250711194047.4be0df4c@foz.lan>
-In-Reply-To: <m2ecun5a3a.fsf@gmail.com>
-References: <cover.1752076293.git.mchehab+huawei@kernel.org>
-	<3b18b30b1b50b01a014fd4b5a38423e529cde2fb.1752076293.git.mchehab+huawei@kernel.org>
-	<m2zfdc5ltn.fsf@gmail.com>
-	<m2ms9c5din.fsf@gmail.com>
-	<20250710195757.02e8844a@sal.lan>
-	<m2ecun5a3a.fsf@gmail.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1752255688; c=relaxed/simple;
+	bh=6VyrdOhz3OpJpcaWmKE9X2nQHoJVwliO7EyG8elUc4s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Lxhpw8PXGlqsMsqzVcUtPbClFiZEoOKmDN6j3m7ZPF8jeNbFAQ3BK70PoChycql4PYQxOAnJlJRJVMh5H8aotJiMJd/Ehy8VnGM18jJgfdioehhAikVEkO0lAXyurUd1e7d+tHW6J3FGSLtxZdLBZXG7TTMT7yPYNptAIlUjZwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DJqYaoBb; arc=none smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7d5e18860aeso137999885a.0
+        for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 10:41:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752255686; x=1752860486; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Nin+9OknE6cMvI3bP7mEA9naVL+nmwYUXCjyoIRSmn8=;
+        b=DJqYaoBbvV/5E/gSc+dINfLibUhzB5mCj41HDiL4eWx160/BfyQ+wNnSsiw3SQ5a3Z
+         j7LvdMCd15ICwaxQQ/mClTvJN/qesme0W5CQj99sABX7pGdG8qB/XjpRkxyDS6MAFU70
+         WJqff87lGR/hKnn7vEdpkv7ROiB+toFSQtYJWfoNP3ktlJJWZqlHKGCoYYqSieItrMTG
+         xxA4bbjR49ihP1CkubvqYi2f3T4qPiLswrPfVlAwb9ogImg/u0nC7bwea/VqCr65gh3f
+         T6DUSZRnEP3XZzqBd6a3wbZTj41IHkftMQylPDHmjKBAAz5EXI8aAbg+a/pdXlh7jK8E
+         ISjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752255686; x=1752860486;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Nin+9OknE6cMvI3bP7mEA9naVL+nmwYUXCjyoIRSmn8=;
+        b=occWRHx3T7e2URn4sINFKTqO/lFRhoC7Y/TdzHOSjAb4RW0NIbs0E8ZPiLSwD7AegI
+         vNxHqf/6JQn7KMEQFfMfC6dqtBZ39Cxevon/wAhZF+2QT0cPE0d2S8N7cgk7Pwo+8+d1
+         FM0th+ZnTTb3sY7R46T2TxL95efGBKZxIkbdYc6tng7nQvAMBZ+OHmfiV2gVlkfI0aCD
+         6/gs4xn+tjsnu8ZVeaGOVrRoheDLhddwFyVgRS7luFoq0SdOCiPrEGbog3vau0+ZQyVH
+         hCXikXaksXTteFaCI+Sc2YJkXZvKC7OMqBlUOTROpPSKUR8DMdwSIYLQhsWL2UJBHXJF
+         xIHg==
+X-Forwarded-Encrypted: i=1; AJvYcCUjHAt50AInQfmYIVnmNN4hZc9M2gwZEuynk6KviwGJGlUktgKPA8nk85YZLQQm2QQ1YyIYx5M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBzT+PBsURJgguDgoAbgVHUwf+ugup8O2KBZOrxVfwdIy36RZ6
+	72+9XitN3nquj2cronXZDhrf+rFK1I2rR8OVHeyPY+cQLnlR1QLLdw7/
+X-Gm-Gg: ASbGncvSlUZiXDLfjXl3XSBCyQPOW9QUHsf6ftoRK60ZBv2y1vQcu63WQIpd03pHm1P
+	XllFCOhej/w5ktgRr0+wl7+mXmoOY478pn92s7laJkWPWwcRhYWgMKYkBnjtrH1a3AM5fBRrW3z
+	mKlLTcqYC0j8efZjMinB097piWbPCwsOzALy/zzELQ04nlxk8TMhqrNHnbT5wKwbryNbizBRVSG
+	tc77kuqeF13Ao4bxULM8P+TzbcE67RSQwGp4KB4Qj4ZJeybjDzoMyTl6jTQm0KjNDYF1IfJs97O
+	vELWdrCQUd0IyEa33S2ZXciVo0wEXt4964tv3jW6ElJq/Yq4QV7+M/MdR0A/yEwPLOTQ7A3S1h5
+	+dntqKgIfOQiYQA4VfS3yruNfB20GiY786yvCOkuTqO6IOUzgbRcVEaYB6jHWwcC5haVU/1tEFb
+	rN
+X-Google-Smtp-Source: AGHT+IEBw2nvt/3MNR+BpQCtwmfrhfWrsE6qLvo2OFQZ93WCGpg0ykkC9UZTcYNwVOHb4lXgR/gxfw==
+X-Received: by 2002:a05:620a:1915:b0:7d4:49d4:b908 with SMTP id af79cd13be357-7de049d815fmr537307985a.3.1752255685643;
+        Fri, 11 Jul 2025 10:41:25 -0700 (PDT)
+Received: from ?IPV6:2600:4040:95d2:7b00:8471:c736:47af:a8b7? ([2600:4040:95d2:7b00:8471:c736:47af:a8b7])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7dcde80637esm241892685a.85.2025.07.11.10.41.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Jul 2025 10:41:24 -0700 (PDT)
+Message-ID: <061ab5b3-55e2-47bc-8515-3f6b8b4ecbf2@gmail.com>
+Date: Fri, 11 Jul 2025 13:41:23 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 11/19] net/mlx5e: Support PSP offload functionality
+To: Cosmin Ratiu <cratiu@nvidia.com>, "corbet@lwn.net" <corbet@lwn.net>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "kuba@kernel.org" <kuba@kernel.org>, "horms@kernel.org" <horms@kernel.org>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "donald.hunter@gmail.com" <donald.hunter@gmail.com>,
+ "pabeni@redhat.com" <pabeni@redhat.com>
+Cc: Boris Pismenny <borisp@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
+ "aleksander.lobakin@intel.com" <aleksander.lobakin@intel.com>,
+ "kuniyu@google.com" <kuniyu@google.com>, "leon@kernel.org"
+ <leon@kernel.org>, "toke@redhat.com" <toke@redhat.com>,
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+ "willemb@google.com" <willemb@google.com>, Raed Salem <raeds@nvidia.com>,
+ Dragos Tatulea <dtatulea@nvidia.com>,
+ "ncardwell@google.com" <ncardwell@google.com>,
+ "dsahern@kernel.org" <dsahern@kernel.org>, "sdf@fomichev.me"
+ <sdf@fomichev.me>, Saeed Mahameed <saeedm@nvidia.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Patrisious Haddad <phaddad@nvidia.com>,
+ "jacob.e.keller@intel.com" <jacob.e.keller@intel.com>
+References: <20250702171326.3265825-1-daniel.zahka@gmail.com>
+ <20250702171326.3265825-12-daniel.zahka@gmail.com>
+ <0e7d382ad191c19aed123ff0c2bdda7bbeb5268f.camel@nvidia.com>
+Content-Language: en-US
+From: Daniel Zahka <daniel.zahka@gmail.com>
+In-Reply-To: <0e7d382ad191c19aed123ff0c2bdda7bbeb5268f.camel@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Em Fri, 11 Jul 2025 10:51:37 +0100
-Donald Hunter <donald.hunter@gmail.com> escreveu:
 
-> Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
-> 
-> > Em Thu, 10 Jul 2025 15:25:20 +0100
-> > Donald Hunter <donald.hunter@gmail.com> escreveu:
-> >  
-> >> Donald Hunter <donald.hunter@gmail.com> writes:
-> >>   
-> >> >>              # Parse message with RSTParser
-> >> >> -            for i, line in enumerate(msg.split('\n')):
-> >> >> -                result.append(line, document.current_source, i)
-> >> >> +            lineoffset = 0;
-> >> >> +            for line in msg.split('\n'):
-> >> >> +                match = self.re_lineno.match(line)
-> >> >> +                if match:
-> >> >> +                    lineoffset = int(match.group(1))
-> >> >> +                    continue
-> >> >> +
-> >> >> +                result.append(line, document.current_source, lineoffset)    
-> >> >
-> >> > I expect this would need to be source=document.current_source, offset=lineoffset    
-> >> 
-> >> Ignore that. I see it's not kwargs. It's just the issue below.
-> >>   
-> >> >>              rst_parser = RSTParser()
-> >> >>              rst_parser.parse('\n'.join(result), document)    
-> >> >
-> >> > But anyway this discards any line information by just concatenating the
-> >> > lines together again.    
-> >> 
-> >> Looks to me like there's no Parser() API that works with ViewList() so
-> >> it would be necessary to directly use the docutils RSTStateMachine() for
-> >> this approach to work.  
-> >
-> > It sounds so.
-> >
-> > The enclosed patch seems to address it:
-> >
-> > 	$ make cleandocs; make SPHINXDIRS="netlink/specs" htmldocs
-> > 	...
-> > 	Using alabaster theme
-> > 	source directory: netlink/specs
-> > 	Using Python kernel-doc
-> > 	/new_devel/v4l/docs/Documentation/netlink/specs/rt-neigh.yaml:13: ERROR: Unknown directive type "bogus".
-> >
-> > 	.. bogus:: [docutils]
-> >
-> > Please notice that I added a hunk there to generate the error, just
-> > to make easier to test - I'll drop it at the final version, and add
-> > the proper reported-by/closes/... tags once you test it.
-> >
-> > Regards,
-> > Mauro  
-> 
-> Awesome!
-> 
-> Tested-by: Donald Hunter <donald.hunter@gmail.com>
-> 
-> Patch comments below.
-> 
-> > [PATCH RFC] sphinx: parser_yaml.py: preserve line numbers
-> >
-> > Instead of converting viewlist to text, use it directly, if
-> > docutils supports it.
-> >
-> > Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-> >
-> > diff --git a/Documentation/netlink/specs/rt-neigh.yaml b/Documentation/netlink/specs/rt-neigh.yaml
-> > index e9cba164e3d1..937d2563f151 100644
-> > --- a/Documentation/netlink/specs/rt-neigh.yaml
-> > +++ b/Documentation/netlink/specs/rt-neigh.yaml
-> > @@ -11,6 +11,7 @@ doc:
-> >  definitions:
-> >    -
-> >      name: ndmsg
-> > +    doc: ".. bogus::"
-> >      type: struct
-> >      members:
-> >        -
-> > diff --git a/Documentation/sphinx/parser_yaml.py b/Documentation/sphinx/parser_yaml.py
-> > index 1602b31f448e..2a2faaf759ef 100755
-> > --- a/Documentation/sphinx/parser_yaml.py
-> > +++ b/Documentation/sphinx/parser_yaml.py
-> > @@ -11,7 +11,9 @@ import sys
-> >  
-> >  from pprint import pformat
-> >  
-> > +from docutils import nodes, statemachine  
-> 
-> nodes is not used
 
-I dropped it on patch 14/13.
+On 7/11/25 8:54 AM, Cosmin Ratiu wrote:
+>   int mlx5e_psp_generate_key_spi(struct mlx5_core_dev *mdev,
+>   			       enum mlx5_psp_gen_spi_in_key_size
+> keysz,
+>   			       unsigned int keysz_bytes,
+> - struct psp_key_spi *keys)
+> + struct psp_key_parsed *key)
+>   {
+> + u32 out[MLX5_ST_SZ_DW(psp_gen_spi_out) +
+> MLX5_ST_SZ_DW(key_spi)] = {};
+>   	u32 in[MLX5_ST_SZ_DW(psp_gen_spi_in)] = {};
+> - int err, outlen, i;
+> - void *out, *outkey;
+> + void *outkey;
+> + int err;
+>   
+>   	WARN_ON_ONCE(keysz_bytes > PSP_MAX_KEY);
+>   
+> - outlen = MLX5_ST_SZ_BYTES(psp_gen_spi_out) +
+> MLX5_ST_SZ_BYTES(key_spi);
+> - out = kzalloc(outlen, GFP_KERNEL);
+> - if (!out)
+> - return -ENOMEM;
+> -
+>   	MLX5_SET(psp_gen_spi_in, in, opcode, MLX5_CMD_OP_PSP_GEN_SPI);
+>   	MLX5_SET(psp_gen_spi_in, in, key_size, keysz);
+>   	MLX5_SET(psp_gen_spi_in, in, num_of_spi, 1);
+> - err = mlx5_cmd_exec(mdev, in, sizeof(in), out, outlen);
+> + err = mlx5_cmd_exec(mdev, in, sizeof(in), out, sizeof(out));
+>   	if (err)
+> - goto out;
+> + return err;
+>   
+>   	outkey = MLX5_ADDR_OF(psp_gen_spi_out, out, key_spi);
+> - keys->keysz = keysz_bytes * BITS_PER_BYTE;
+> - keys->spi = MLX5_GET(key_spi, outkey, spi);
+> - for (i = 0; i < keysz_bytes / sizeof(*keys->key); ++i)
+> - keys->key[i] = cpu_to_be32(MLX5_GET(key_spi,
+> - outkey + (32 -
+> keysz_bytes), key[i]));
+> -
+> -out:
+> - kfree(out);
+> - return err;
+> + key->spi = cpu_to_be32(MLX5_GET(key_spi, outkey, spi));
+> + memcpy(key->key, MLX5_ADDR_OF(key_spi, outkey, key),
+> keysz_bytes);
+> +
+>
 
-> 
-> >  from docutils.parsers.rst import Parser as RSTParser  
-> 
-> This import is no longer needed
+Thanks for the updates, Cosmin. I did notice a small problem after 
+applying these, where v1 keys were ok, but not v0. This seems to fix it 
+for me, but it was a bit of a guess. Let me know what the proper 
+adjustment is:
 
-I'll drop on a next spin.
-> 
-> > +from docutils.parsers.rst import states
-> >  from docutils.statemachine import ViewList
-> >  
-> >  from sphinx.util import logging
-> > @@ -66,10 +68,24 @@ class YamlParser(Parser):  
-> 
-> I'm wondering if it makes much sense for this to inherit from Parser any
-> more?
+         outkey = MLX5_ADDR_OF(psp_gen_spi_out, out, key_spi);
+         key->spi = cpu_to_be32(MLX5_GET(key_spi, outkey, spi));
+-       memcpy(key->key, MLX5_ADDR_OF(key_spi, outkey, key), keysz_bytes);
++       memcpy(key->key, MLX5_ADDR_OF(key_spi, outkey, key) + (32 - 
+keysz_bytes), keysz_bytes);
 
-Yes. It still needs other things from the Parser class.
-
-> >          result = ViewList()
-> >  
-> > +        tab_width = 8
-> > +
-> > +        self.state_classes = states.state_classes
-> > +        self.initial_state = 'Body'
-> > +
-> > +        self.statemachine = states.RSTStateMachine(
-> > +              state_classes=self.state_classes,
-> > +              initial_state=self.initial_state,
-> > +              debug=document.reporter.debug_flag)  
-> 
-> I don't think 'self.' is needed for any of these. They can be local to
-> the method. You could just inline states.state_classes and 'Body' into
-> the parameter list.
-
-I dropped from most stuff, but self.statemachine is still needed.
-
-I suspect that because of some other stuff inside the Parser class.
-
-> 
-> > +
-> >          try:
-> >              # Parse message with RSTParser  
-> 
-> Comment is out of date.
-> 
-> >              lineoffset = 0;  
-> 
-> Rogue semicolon
-
-I dropped at patch 14/13.
-
-> 
-> > -            for line in msg.split('\n'):
-> > +
-> > +            lines = statemachine.string2lines(msg, tab_width,
-> > +                                            convert_whitespace=True)
-> > +
-> > +            for line in lines:
-> >                  match = self.re_lineno.match(line)
-> >                  if match:
-> >                      lineoffset = int(match.group(1))
-> > @@ -77,12 +93,7 @@ class YamlParser(Parser):
-> >  
-> >                  result.append(line, document.current_source, lineoffset)
-> >  
-> > -            # Fix backward compatibility with docutils < 0.17.1
-> > -            if "tab_width" not in vars(document.settings):
-> > -                document.settings.tab_width = 8
-> > -
-> > -            rst_parser = RSTParser()
-> > -            rst_parser.parse('\n'.join(result), document)
-> > +            self.statemachine.run(result, document, inliner=None)
-> >  
-> >          except Exception as e:  
-> 
-> I think you could catch StateMachineError here.
-
-Good point. will try that.
-
-> >              document.reporter.error("YAML parsing error: %s" % pformat(e))  
-> 
-> Can you change this to an f"" string.
-
-I prefer f-strings as well, but usually logger classes are recommended
-to use the old way. I guess this came from a previous check with pylint.
-
-Thanks,
-Mauro
 
