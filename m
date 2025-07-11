@@ -1,88 +1,133 @@
-Return-Path: <netdev+bounces-206275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48991B02721
-	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 00:41:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 482F8B02735
+	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 00:53:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 983C0568760
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 22:41:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AAE69B41B6C
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 22:52:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57370221F20;
-	Fri, 11 Jul 2025 22:41:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8279215179;
+	Fri, 11 Jul 2025 22:53:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s45j/NP/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cVE9Djw3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 236E221B9F0;
-	Fri, 11 Jul 2025 22:41:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 501E66BFCE;
+	Fri, 11 Jul 2025 22:53:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752273704; cv=none; b=W+6qI6SHpUAvXFjoB1iXP/nANeYXx5pnlo1CgdIo417cUPyyzIIleHEmtajRzVSuEX+mmD4i8PNaSN6FQGJdlOLkUYG6iYEgBmHsrGgCl5a9CzR+0uo6SLjbYwA4OIkLWB4TbUj811JU7RR3Ucvvwl17itlsBqX0LTfs+1/KgqU=
+	t=1752274404; cv=none; b=CmfdaqhM6qtdzx42GauizLnKFXjOEGXcNepO4xXaPkbMGtkFELsSqsQAjH+1468qbEolnIGjToqm6juKyepAwCELBmUYbflCT0YKW3SCUNfesHy3c3fiuscXrwDJA8JKYFkvRmfMQc6p3Tu6FPHju3ZlNK7PCX63/fllDiRNsBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752273704; c=relaxed/simple;
-	bh=Ry9YoQUwtvmVPYEVrTNJ4go4dFDZm/1iipmepvGODnI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lmijjk6tLFUQGOl3G2X0MycQxlKoI6CVghYevO9yUQmahhJK80RWny77/LpIMMdYhfikF5RCz6ehuAQRspxuBwTFbHDIp4UHNPwxaM7Q5O/O/L8Tbhv4Vy8Etgj24owrr3eT8ylilpZwwjHLmgzV5UiJGMa7xuHfmTRJPR3MDoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s45j/NP/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DA77C4CEED;
-	Fri, 11 Jul 2025 22:41:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752273703;
-	bh=Ry9YoQUwtvmVPYEVrTNJ4go4dFDZm/1iipmepvGODnI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=s45j/NP/GP1dVQx6pd8KivqCSt8sUBVZkt97NM8h51AXzvv2SoT/KL3leO39HHKdC
-	 SgaUV+m8Yu+BcOehO8fDmUqzdEisu3vscF88nhw1Lf0gUoy8d/jfvB1x8ApbpF0sbM
-	 Yx3BXb9Q2aBord9Ffb5qpjcXquL3FrPIqt+2KJXJ11+CbgqpCGK0N27bXSytDyODaa
-	 Jj/idbOlymdVHwOQpdEXzi307oozaS18pV51uFxR0/h87Xee3xkRKKe2Kzkwv0L7DU
-	 IEr66ABuix3cntDF3xR2B0ainjr2yMVab9npohhOXekP5rZ+4R27SH7vJN7RzD/9tL
-	 efwWk6qiauf+A==
-Date: Fri, 11 Jul 2025 15:41:42 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman
- <horms@kernel.org>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, bpf@vger.kernel.org,
- kernel-team@meta.com, Willem de Bruijn <willemb@google.com>
-Subject: Re: [PATCH net-next v5 3/3] selftests: net: add netpoll basic
- functionality test
-Message-ID: <20250711154142.369aaae1@kernel.org>
-In-Reply-To: <k45gwtae6yx3cjy5kprctlnw4wox5fnfd5yjlczgpyu2cw5bsj@dol2der4ykat>
-References: <20250709-netpoll_test-v5-0-b3737895affe@debian.org>
-	<20250709-netpoll_test-v5-3-b3737895affe@debian.org>
-	<20250710184535.374a0643@kernel.org>
-	<k45gwtae6yx3cjy5kprctlnw4wox5fnfd5yjlczgpyu2cw5bsj@dol2der4ykat>
+	s=arc-20240116; t=1752274404; c=relaxed/simple;
+	bh=Dce+jjWbrq9nliEsy0qLQENP2zNYFENdhnn90MXxnSE=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=ptMuoinCzO/E8u04EhC9SOWVFbGK4BxnbCRAnpUR/QtWUcRgGUXLzZhrG7wYcc5+T/iBRn7G2z3kX1Nu5+ld7MMoPQnUEgEGsOKPxy/WV/ooTUIH+7lFHb+Z7tALgLUqOXmqxR5bTkFaVoiURK+dj4Ey3d803crAavc4F0qq0lE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cVE9Djw3; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-748d982e97cso2373568b3a.1;
+        Fri, 11 Jul 2025 15:53:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752274402; x=1752879202; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YtNC6XkkO/jON8C2oec+eMDF/ZX7E6/nGcX0kOFU6yY=;
+        b=cVE9Djw3WR7zlZT90CgB3aLnJ+DedYQte4bs9MEn1FVM9ileI1qFggTzAYzr7Ytkga
+         Ppr29CBjm7ZSwtMYyl+BmwPRcQtvmCYC/O4pIAyNsnpw+NAOg+vpeNF9GeUD0Hpia/T4
+         cFJGEq91fzHPI0KLJYCWncNqqGCefv68KUihZgfi2q0CwBNIEw6ATR82sspUh2Xhh/bk
+         a01n1DgLQJV3ycci8exmaoiGsgJ3eSJC9+PhdONv8F+35A/s1cRAG/9MbMfyW0Q5Y/Z8
+         0MQ2qx6ffM/nGP/HSEZ1baEBAi+QDg3AJnC9mFvJny/JS8ihphoi7pX22g/hwYfpPYPE
+         S2ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752274402; x=1752879202;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YtNC6XkkO/jON8C2oec+eMDF/ZX7E6/nGcX0kOFU6yY=;
+        b=bk9+xsHDc+roqIoXmqfbsUa4YPtt5znUx7tAA/w1oM40+2CqLm3tthvbciEx28J6+8
+         Hz95gNBdKSEVC2cLTOqlyZJadxNHyhJFj6hed9UR2DB7BkHZCX8iFLPVpAtEycGtYGLs
+         dXYGfbEeX7EXRzNKEr2lm0kbUbtreJ3hXchHNQQJUS634qoA3PQXaRQze14636B53VWL
+         GXaXtrsHwAjK1mWpfBZKLZ8O2J1lbv5kEIBwIm0eS7tBdp1EHjng5iKGCpdsVLhDEIod
+         sAURNhM1xqPHKyIG+B7jhEkpP2CQTdzEtE76padIFcioPwxban+lM+4k0Ew68ieaBPie
+         2QAg==
+X-Forwarded-Encrypted: i=1; AJvYcCW8hsO+vhN2Xf4qs13eGJcRlt4ZEB4zIpWBIa/g6y0IYN18ons3+r6z+Bl3GYfsoljeC3aER6QSGGeNt0Pg@vger.kernel.org, AJvYcCX2veo+IUw98j8jRFQd9JXUV+DX0kDRCGmKhr051Dn0Eet7UIuiVsKJvsrlEfXx9Opy+N5DrbU5@vger.kernel.org, AJvYcCX9YcQZsqgbh+tftUY6ZGEMDaEjfzufj2A5I+v7DJesx/rpV9yKW7hnPIi3TZXqTujHNl9Mou73WuWq@vger.kernel.org, AJvYcCXYgcIwrFpHYvDF4Cb+k1o+4dbHL1M6V1Y4+yuW5Imc6ReDc/Xk09jz7Vdnbn+AFpcmX5fifpzBhGkj@vger.kernel.org, AJvYcCXtPBzd/ISa5YBoZOn9ICILPbsiSo73M7ODIJ7fnABssvkFnB9TCofMhS+oDrBtQnldXwOwSW/Ml8e/bA==@vger.kernel.org, AJvYcCXys2xQQCCVXgeEXqRfcpTF+aal14Fbpnc41lZELyPVPBMg2Bu/W4LlqMKckiuJpWNuSqeEWAVO++MOb2d4+tc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZhIUOEgOUrxzqLKiUXuCAgW7VsebBQYNQJqTLLzjDcWtme4n0
+	WLaIFs3JRDt3p7fBiNBk4yvPBGjNbWgfxmVHtMJyXYBEwZHytPkbOpP2
+X-Gm-Gg: ASbGncsTwYr1vbGqxpt5IXYrCbNcj/r0PEVOVfsUl2yams9aZcAHPr4jtbjLNdkaH36
+	gjyLIFFCdxey+tmxQxJAL7lx6wvsZqShcYC5+t3zNSfT/zIxJnq+Pxknj07sd98x/N9fhXog+lE
+	NrObAZJp5MGJX9nd/vLvZ380CmuIv78a36IasxQUGeAxSb4MUe2ceIug6ViUSA5CYTRYbFacFjr
+	OfxES3IgPuEMXwfotuBQufK5TJWk9qR7mE1OxCYq47SbeAdUOSTTarIaHh1JwNObOV487spk/2P
+	yCE+SWOenPT7nrR8ftSig6EXtoFmzV+D2fE2yFQxdtfiR0NEsXZtKna0jZWp6ae5XyqNzoXSsQO
+	okG/QDK/LZZoxwQgkWs7G6PZLC5TdAXtuiiSKoQUsZc0J6PRc2MKbiQuUS+BEdx9VNPiSyHk34F
+	+v
+X-Google-Smtp-Source: AGHT+IFZEQKk5zMLg8zX6aCQinn3vPgxwhVf4C1XvTSJbDH1J4csn2qqped+eTtejLbHorSkHbd8lQ==
+X-Received: by 2002:a05:6a20:6f03:b0:21c:fbf0:21bb with SMTP id adf61e73a8af0-2311ee4b155mr8323398637.24.1752274402391;
+        Fri, 11 Jul 2025 15:53:22 -0700 (PDT)
+Received: from localhost (p5332007-ipxg23901hodogaya.kanagawa.ocn.ne.jp. [180.34.120.7])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b3bbe6f56a9sm5620815a12.59.2025.07.11.15.53.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Jul 2025 15:53:21 -0700 (PDT)
+Date: Sat, 12 Jul 2025 07:53:05 +0900 (JST)
+Message-Id: <20250712.075305.1992034457870738678.fujita.tomonori@gmail.com>
+To: dakr@kernel.org
+Cc: fujita.tomonori@gmail.com, alex.gaynor@gmail.com,
+ gregkh@linuxfoundation.org, ojeda@kernel.org, rafael@kernel.org,
+ robh@kernel.org, saravanak@google.com, tmgross@umich.edu,
+ a.hindborg@kernel.org, aliceryhl@google.com, bhelgaas@google.com,
+ bjorn3_gh@protonmail.com, boqun.feng@gmail.com, david.m.ertman@intel.com,
+ devicetree@vger.kernel.org, gary@garyguo.net, ira.weiny@intel.com,
+ kwilczynski@kernel.org, lenb@kernel.org, leon@kernel.org,
+ linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-pci@vger.kernel.org, lossin@kernel.org, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org
+Subject: Re: [PATCH v4 0/3] rust: Build PHY device tables by using
+ module_device_table macro
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <83b1b2f4-f87c-4b3f-ab4d-84ec429abd79@kernel.org>
+References: <20250711040947.1252162-1-fujita.tomonori@gmail.com>
+	<83b1b2f4-f87c-4b3f-ab4d-84ec429abd79@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 
-On Fri, 11 Jul 2025 08:51:19 -0700 Breno Leitao wrote:
-> > json=True please and you'll get a dict, on CLI you can try:
-> > 
-> > ethtool --json -g eth0  
-> 
-> Sure. I was parsing manually because some options do not have --json
-> format. 
-> 
-> 	ethtool --json -l eth0
-> 	ethtool: bad command line argument(s)
-> 
-> I haven't checked upstream, but, if this feature is upstream, is it worth
-> implementing it?
+On Sat, 12 Jul 2025 00:19:54 +0200
+Danilo Krummrich <dakr@kernel.org> wrote:
 
-I added it relatively recently. Looks like it's already here 
-on my Fedora laptop, but not in the CI system! Let me update
-it there, and you can assume --json -l to work in the test..
+> On 7/11/25 6:09 AM, FUJITA Tomonori wrote:
+>> Build PHY device tables by using module_device_table macro.
+>> The PHY abstractions have been generating their own device tables
+>> manually instead of using the module_device_table macro provided by
+>> the device_id crate. However, the format of device tables occasionally
+>> changes [1] [2], requiring updates to both the device_id crate and the
+>> custom
+>> format used by the PHY abstractions, which is cumbersome to maintain.
+>> [1]:
+>> https://lore.kernel.org/lkml/20241119235705.1576946-14-masahiroy@kernel.org/
+>> [2]:
+>> https://lore.kernel.org/lkml/6e2f70b07a710e761eb68d089d96cee7b27bb2d5.1750511018.git.legion@kernel.org/
+>> Danilo, I incorporated your fixes into the first patch and mentioned
+>> them in the commit message. Let me know if you'd rather take a
+>> different approach.
+> 
+> Thanks FUJITA -- no need to mention it though. :)
+> 
+> Did you forget to pick up Jakub's ACK or was this intentional?
+
+Oops, please add his ACK when applying.
+
+
+Thanks,
+
 
