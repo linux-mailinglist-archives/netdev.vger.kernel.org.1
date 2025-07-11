@@ -1,140 +1,97 @@
-Return-Path: <netdev+bounces-206133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8DB0B01B27
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 13:51:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B4DFB01B51
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 13:59:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A85913A6B54
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 11:50:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6BC61B42621
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 11:58:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99A7F28A41E;
-	Fri, 11 Jul 2025 11:45:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3AD628DF27;
+	Fri, 11 Jul 2025 11:59:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XjMvsd5p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dmtgz5KJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175BE230BE1
-	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 11:45:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C5DE27A44C;
+	Fri, 11 Jul 2025 11:59:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752234354; cv=none; b=YfJ2EbUgwJVFzS2/xTUaCF8qaaY6RKcJGPQBvgOfkoz4d2dDqD7gOF0j/gn3HI7/aK174MkOnEJOE8ECEowLYc1fAb45NHvsHcHVl/UItYQqU2XmTBbz+KFN+hKEN0+Q5j9Ipa6xMm8f7SeKF1ExgqqSDnlcs31MR0x3y3BrccY=
+	t=1752235187; cv=none; b=bu7EmkUyzCsQezsH6CF+wjU6PfrhqGyIy8EMCUfILuOxP+8Rat6RrXplXC8vetZQeA2BW/pELkeuDmVXd2Fd94vEZnXbGTuvV34yKitTyj3eBNhbdkQMKG/pgV4IbIxwR2JbuxPsfp8vZwQtiOkMQUWCdlcxkt8sXDcfRh93/Xs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752234354; c=relaxed/simple;
-	bh=XHheDxPdzE/NJEGsbPcyVNbfVHS4B1K+I4eGE6HOa+E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GVjEKIc9S1b83/WNMIE+T1q8H55qxBkrpYtOtKJyjGl4N+sn1MMrjMCAx0Eg3SkPob5OV9SqrGKEaLSpfjl47xadQD2nvopYTFfJAoKzhCkrZANrOK3VXlQDCZ3B9wasaNmiCtS+pQC7U3a/ZjyOzVDL44OnFND2T6DbwSa1T0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XjMvsd5p; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <dc023486-5491-4795-8b07-4808e44c8ebb@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1752234349;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3dP9rqKLiGiZntdJQkX4TyBuHFuSn+tzdIeB2/uFcYE=;
-	b=XjMvsd5puLKsCpHgClimdEfBr5zl4lr+RgFVzCxLgugef7Lg/ncvUeg24Q8N9VMD9brri/
-	JC+QoglBJqKw/iejOr9mUYKvpADyEaQmqDmzZqKdi3YQx9aJfqda/3uRarYhnff5wEWzzd
-	HTacpR45P6Pw4anRTZEUJ+AbWzh77aU=
-Date: Fri, 11 Jul 2025 12:45:41 +0100
+	s=arc-20240116; t=1752235187; c=relaxed/simple;
+	bh=p2ATkh83EA+QGpVpMDHbD3OAgOYQ3HkCHxVe9BUcXnc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=YhGyjFEgAQvfIIBtwMYk75C2munIPfzkKECndtpgWKsWY821lgqiI6eMd2xwFtfjCGXyDaN4Yk6MJXKfPvxFYAHQHZm2uE0K3jmT3F8r2buZAQr0+QU8vpv1gQdpcSg1BVd+gug3NzXaNJ+lm4dY+Kbq+vUDOY+/eThxY8ffFog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dmtgz5KJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED9D1C4CEED;
+	Fri, 11 Jul 2025 11:59:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752235187;
+	bh=p2ATkh83EA+QGpVpMDHbD3OAgOYQ3HkCHxVe9BUcXnc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=dmtgz5KJ4VIifN8Va6QXtrmJm/PRwnBAATg9N0LE8xMTI9/ZFolPGG3ZNeIRPeWMA
+	 PHLkF8mPbqoXn1N6KphZkR3e0M/csedgLwe8dyCIkbpOjAuI/BFV8OCPySC7BzNbAV
+	 qQIMM8l/nVyOMefCmU/QPatTUZVGEhPI0Pu7v8XUSNvOiKaFJaARs5r2FOS6APBYdX
+	 GFV/2Feo3TrJLC1PdMuZGkHNAd1IKb2mzeEPpK04x1Paf9Xo3xQpj2Cybp06Mew0id
+	 u3kJLVBvtxBu7UGYPVwOJyWdMYSocbU2OWcVYDkVcIYWFwor4ynPFuYi4YqnVjeYN7
+	 RTEl3rXZ6mtSA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DC0383B275;
+	Fri, 11 Jul 2025 12:00:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next] eea: Add basic driver framework for Alibaba
- Elastic Ethernet Adaptor
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Wen Gu <guwen@linux.alibaba.com>, Philo Lu <lulie@linux.alibaba.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Lukas Bulwahn <lukas.bulwahn@redhat.com>,
- Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Alexander Duyck <alexanderduyck@fb.com>, Dust Li <dust.li@linux.alibaba.com>
-References: <20250710112817.85741-1-xuanzhuo@linux.alibaba.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250710112817.85741-1-xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH for-netdev v2 0/2] PCI: hv: MSI parent domain conversion
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175223520902.2242194.14448724855581573230.git-patchwork-notify@kernel.org>
+Date: Fri, 11 Jul 2025 12:00:09 +0000
+References: <cover.1751875853.git.namcao@linutronix.de>
+In-Reply-To: <cover.1751875853.git.namcao@linutronix.de>
+To: Nam Cao <namcao@linutronix.de>
+Cc: maz@kernel.org, tglx@linutronix.de, mhklinux@outlook.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ mani@kernel.org
 
-On 10/07/2025 12:28, Xuan Zhuo wrote:
-> +/* notify */
-> +bool ering_kick(struct ering *ering)
-> +{
-> +	union {
-> +		u64 data;
-> +		struct db db;
-> +	} val;
-> +
-> +	val.db.kick_flags = EEA_IDX_PRESENT;
-> +	val.db.idx = cpu_to_le16(ering->sq.hw_idx);
-> +
-> +	writeq(val.data, (void __iomem *)ering->db);
-> +
-> +	return true;
-> +}
-> +
+Hello:
 
-[...]
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-> +static inline bool ering_irq_unactive(struct ering *ering)
-> +{
-> +	union {
-> +		u64 data;
-> +		struct db db;
-> +	} val;
-> +
-> +	if (ering->mask == EEA_IRQ_MASK)
-> +		return true;
-> +
-> +	ering->mask = EEA_IRQ_MASK;
-> +
-> +	val.db.kick_flags = EEA_IRQ_MASK;
-> +
-> +	writeq(val.data, (void __iomem *)ering->db);
-> +
-> +	return true;
-> +}
-> +
-> +static inline bool ering_irq_active(struct ering *ering, struct ering *tx_ering)
-> +{
-> +	union {
-> +		u64 data;
-> +		struct db db;
-> +	} val;
-> +
-> +	if (ering->mask == EEA_IRQ_UNMASK)
-> +		return true;
-> +
-> +	ering->mask = EEA_IRQ_UNMASK;
-> +
-> +	val.db.kick_flags = EEA_IRQ_UNMASK;
-> +
-> +	val.db.tx_cq_head = cpu_to_le16(tx_ering->cq.hw_idx);
-> +	val.db.rx_cq_head = cpu_to_le16(ering->cq.hw_idx);
-> +
-> +	writeq(val.data, (void __iomem *)ering->db);
-> +
-> +	return true;
-> +}
+On Mon,  7 Jul 2025 10:20:14 +0200 you wrote:
+> Hi,
+> 
+> This series originally belongs to a bigger series sent to PCI tree:
+> https://lore.kernel.org/linux-pci/024f0122314198fe0a42fef01af53e8953a687ec.1750858083.git.namcao@linutronix.de/
+> 
+> However, during review, we noticed that the patch conflicts with another
+> patch in netdev tree:
+> https://lore.kernel.org/netdev/1749651015-9668-1-git-send-email-shradhagupta@linux.microsoft.com/
+> 
+> [...]
 
-in addition to Andrew's comments, these union { ... } val will have
-partial garbage values, which will later be directly sent to FW. I
-believe it may cause some troubles and it's better to initialize val
-before actually use it.
+Here is the summary with links:
+  - [for-netdev,v2,1/2] irqdomain: Export irq_domain_free_irqs_top()
+    https://git.kernel.org/netdev/net-next/c/a6b0465bd283
+  - [for-netdev,v2,2/2] PCI: hv: Switch to msi_create_parent_irq_domain()
+    https://git.kernel.org/netdev/net-next/c/5f83d6337c9c
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
