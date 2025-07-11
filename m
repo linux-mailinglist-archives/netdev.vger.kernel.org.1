@@ -1,144 +1,77 @@
-Return-Path: <netdev+bounces-206231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2483BB023BB
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 20:34:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D79CB02410
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 20:47:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61A27A62D6A
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 18:33:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FBEE1CC571D
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 18:48:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B11A2F430C;
-	Fri, 11 Jul 2025 18:33:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F3C62F3C0F;
+	Fri, 11 Jul 2025 18:46:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="Unc4eNq/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CLtVZ9Ra"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8D702F3C22
-	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 18:33:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 228D62F3C03;
+	Fri, 11 Jul 2025 18:46:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752258813; cv=none; b=e7LBX5Ly2qr6qyAt3tMVmIFCWV6lgf1vS32gmJ1ohRFsz/DybqLPwglO+cbGptTU1rYJmUB31lJBbURtYy3DlXYmgxrPGvYfuGbAjinbh+X4DUs4m+DH6n6zcBlWP81CCYb/5fzVrY3IEeUPjYK2W6NGH2YMNv2TaqrfPmsCzio=
+	t=1752259604; cv=none; b=N63nusfvEy0w6RdA776jjkaQQOPZPparvetUyx53JJoZtso80HY3WeKjyaGIN7O/2x1zuzxaaC0WlsVA9+2r8vHBmMW1lFyissyVJzVpX4Px1h0BxDsaojyaWeg4jfYQiKE94PeEqkFxZJxqJ7kluNGk8mKO1tXggPovHCF0kWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752258813; c=relaxed/simple;
-	bh=bWCC4ZoPLffqwFBCGshYKFXjSxX0H1BlPT8PIH3CjDI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GygF2wpto+CbQqy6NcXBzhlgrDKggdz/yBHkr46mNbP0sxX/36SXyR3eaGb83DMXHveSmnkJ+UmWRFfJIcxgK/ExlYiY/QxfoLq7JCKYaBhWyE9Tqh7YDPb6Fq4b4H8u0z3zX6eAjDf893gbUUagLNOrP99Zjfkiu6YK4aowOGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=Unc4eNq/; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ae0dffaa8b2so471420166b.0
-        for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 11:33:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1752258809; x=1752863609; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=fkiMZ2J4WWxAe30Yz9eXRKes27bISK6iOQFaa/jG/i8=;
-        b=Unc4eNq/ltpEup6WB13kLDMZh+EEbnYwSNKiPtqjd4cAi/lKD59yzh+eCMBbTW4A0D
-         hn0RBaiBadQ9bVyq/fvK8rAYhSEw+bZlhFC9aV+ZD1pgv1teJeElN8isRdLAWauXkoxm
-         YFOISZynAlU1mLzXycae6AY4Ci+rN0qFcMxtk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752258809; x=1752863609;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fkiMZ2J4WWxAe30Yz9eXRKes27bISK6iOQFaa/jG/i8=;
-        b=Ihce4+zOLfDds262w3v0YyzwhPwjChZSv/AhOitte8FpMVII0DWqbtn7/H1DmwQrpF
-         5KStRYXYCabq60rIesLkTLPwRiNNqjQ5+umaQp5OUV0SWo/8fXny1vSc9LYYBNqDId6z
-         SVLWsuPfNebZ/oR5keepu28jB4A5jVbEjaoeZNg5+HRJa1e89lNoBd25iEm5zIBcLJDF
-         xkBmJVUzxIw/9kFa2OukvZrgHYkPoEvxTFE8eHRzGdEXugle8O0W1z9bYBQ9Q9HXGzoL
-         MIrYeo/NYRaJzQ1d3BbVG5QyaaFsOcVWsHYrs0x+xopyx5GwjYlIMYF4e4r5m5kzKHXl
-         rHXA==
-X-Forwarded-Encrypted: i=1; AJvYcCXzUyqvVwNw/Jshi2xnazU6lfIafD1ocVifzpjBxir2AagMduNREAkKN2sSHMAzeM/0zbMu1FA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YynnmhZ0R5SJoCu1N6JVIDS3h1YQ6PJVqKpRkNh5Y02UlYXlCXT
-	EYbhTLTrcfV4hQGn3ZCtSgPpH5DVD+OLcg7FCkeF/KUJ/BFJ+pa3/jgExVIljtrSR6f9EY27TRu
-	LpVvNO2++sg==
-X-Gm-Gg: ASbGncsqG3Pg8mPYRMrZzkqTOYOtHQAGKSrZx68yMEdImIth3wykci1iBCHiGCGuv9v
-	GQ3zeUjjOamfh+SPBAgfRWnOiNfB1TS2LhBrTCK0pAkJKBawYjVs85CUlj74IVTU8hjYrudD0P1
-	Stnohv07ZFeT57sl8w0VEPJcw4hrQmGKWDfcOO+WwPZL4q8rd/NEoS0JlaA8wH8X4YK3FxC8/bV
-	BhUZcawErnuqrkwFEWLI0W/yAsY56K+cjATwE1avAMbOjUohN310eagyD2XJF1D1YrOUl5nOHf5
-	cGsZt9XpP1Fmme1sQDPaMdCFFvtc9qfkaODxkezTklxOr5LuzodKa5Yl7p+UjM8DSRzY8q5EkjT
-	cWyugqO3ep1NwAPqqY2LvQNYz6aB13S4dY2RG36YNLz3sg1Jkp3UduB5jb6RHOluejxuOxYqMBl
-	Nud/IJyPo=
-X-Google-Smtp-Source: AGHT+IHcmp2G4WYXss2fUMFT1lrCHmCgHsK6TC/3mTkYHYNvyqauwLW3yELI4eUiTY6dJQiUb1NRGA==
-X-Received: by 2002:a17:906:f599:b0:ae1:c79f:2b2e with SMTP id a640c23a62f3a-ae6fbf968ccmr498006066b.40.1752258808940;
-        Fri, 11 Jul 2025 11:33:28 -0700 (PDT)
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com. [209.85.218.47])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae6e82df54csm329901566b.155.2025.07.11.11.33.27
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Jul 2025 11:33:28 -0700 (PDT)
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-ae0dffaa8b2so471414266b.0
-        for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 11:33:27 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUklN1Qn6uwIVTolS2dLXH9Tf//6PRzE0pVMurOSSBl7x8VXyvlp9PEwKMcLr1AHmccX5a1JEo=@vger.kernel.org
-X-Received: by 2002:a17:907:3e95:b0:ae0:c6fa:ef45 with SMTP id
- a640c23a62f3a-ae6fbf96592mr483791366b.41.1752258807150; Fri, 11 Jul 2025
- 11:33:27 -0700 (PDT)
+	s=arc-20240116; t=1752259604; c=relaxed/simple;
+	bh=0TkEIXf++g99C3zeGWDyX2nQea6CDn0SC/EAE+N4esw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BAnWsyIdojvl6WL7SaXZD7OMo+oRFziTKtov0h5Ywt619M1zqbStRBRZm9rUsJqmHA9qcyoAOW5pzjGeyhZnYKv0VSqxjDLPIDsgVrzhKVxBfu/6OiuvIdBD0QJ63gRfyaMLKYaWq3QyJXuS9MTTKo92nrRb/iql/fXuSN0C7SI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CLtVZ9Ra; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51366C4CEED;
+	Fri, 11 Jul 2025 18:46:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752259603;
+	bh=0TkEIXf++g99C3zeGWDyX2nQea6CDn0SC/EAE+N4esw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CLtVZ9RaATumi99vK1TwLAUyC3evJEVu45rsgw26SqLhupzDXjPoGnokgCZVVT3t7
+	 t0fX+pPPgIVAz5F+VPJnwppL4u+Cmex1b1ldxbioJmvbZZBybMceAu4JxAWLB32tTl
+	 8/lqHQnmVoaBmRwxO0vAynKg9BMaVpUJS6aSYNjpQtFxv5qAxQ8Vl/WefYKVpQNQPY
+	 TGUfOlB+VVURQgWl0niDDnzEQnhmI94dkD4qhtC8z3n1G6JR+2cZ5VkrNIYX/BSqzs
+	 OJP4X7Q44YMTMTHCOEaZVlkKzCwX/4nfptVFGtOEbIx4DpmdSU1MZERnD8TudaSRsT
+	 yRwuM4cBTyC7Q==
+Date: Fri, 11 Jul 2025 11:46:42 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Thomas Zimmermann <tzimmermann@suse.de>, Simona Vetter
+ <simona@ffwll.ch>, Dave Airlie <airlied@gmail.com>, davem@davemloft.net,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com,
+ dri-devel <dri-devel@lists.freedesktop.org>
+Subject: Re: [GIT PULL] Networking for v6.16-rc6 (follow up)
+Message-ID: <20250711114642.2664f28a@kernel.org>
+In-Reply-To: <CAHk-=wj1Y3LfREoHvT4baucVJ5jvy0cMydcPVQNXhprdhuE2AA@mail.gmail.com>
+References: <20250711151002.3228710-1-kuba@kernel.org>
+	<CAHk-=wj1Y3LfREoHvT4baucVJ5jvy0cMydcPVQNXhprdhuE2AA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250711151002.3228710-1-kuba@kernel.org>
-In-Reply-To: <20250711151002.3228710-1-kuba@kernel.org>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 11 Jul 2025 11:33:10 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wj1Y3LfREoHvT4baucVJ5jvy0cMydcPVQNXhprdhuE2AA@mail.gmail.com>
-X-Gm-Features: Ac12FXykIL-Mz_Bqw9_dzJEakCBd9Y2pyk80DOugpUKw15R_JJAEpkwfYZHB3M4
-Message-ID: <CAHk-=wj1Y3LfREoHvT4baucVJ5jvy0cMydcPVQNXhprdhuE2AA@mail.gmail.com>
-Subject: Re: [GIT PULL] Networking for v6.16-rc6 (follow up)
-To: Jakub Kicinski <kuba@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	Simona Vetter <simona@ffwll.ch>, Dave Airlie <airlied@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	pabeni@redhat.com, dri-devel <dri-devel@lists.freedesktop.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-[ Added in some drm people too, just to give a heads-up that it isn't
-all their fault ]
+On Fri, 11 Jul 2025 11:33:10 -0700 Linus Torvalds wrote:
+> Because this "emergency PR" does seem to have turned my "annoying
+> problem with timeouts at initial login" into "now it doesn't boot at
+> all".
 
-On Fri, 11 Jul 2025 at 08:10, Jakub Kicinski <kuba@kernel.org> wrote:
->
->  The Netlink fixes (on top of the tree) restore
-> operation of iw (WiFi CLI) which uses sillily small recv buffer,
-> and is the reason for this "emergency PR".
+Hm. I'm definitely okay with reverting. So if you revert these three:
 
-So this was "useful" in the sense that it seems to have taken my
-"random long delays at initial graphical login" and made them
-"reliable hangs at early boot time" instead.
+a3c4a125ec72 ("netlink: Fix rmem check in netlink_broadcast_deliver().")
+a3c4a125ec72 ("netlink: Fix rmem check in netlink_broadcast_deliver().")
+ae8f160e7eb2 ("netlink: Fix wraparounds of sk->sk_rmem_alloc.")
 
-I originally blamed the drm tree, because there were some other issues
-in there with reference counting - and because the hang happened at
-that "start graphical environment", but now it really looks like two
-independent issues, where the netlink issues cause the delay, and the
-drm object refcounting issues were entirely separate and coincidental.
-
-I suspect that there is bootup code that needs more than that "just
-one skb", and that all the recent issues with netlink sk_rmem_alloc
-are broken and need reverting.
-
-Because this "emergency PR" does seem to have turned my "annoying
-problem with timeouts at initial login" into "now it doesn't boot at
-all".
-
-Which is good in that the random timeouts and delays were looking like
-a nightmare to bisect, and now it looks like at least the cause of
-them is more clear.
-
-But it's certainly not good in the sense of "we're at almost rc6, we
-shouldn't be having these kinds of issues".
-
-The machine I see this on doesn't actually use WiFi at all, but there
-*is* a WiFi chip in it, I just turn off that interface in favor of the
-wired ports.
-
-But obviously there might also be various other netlink users that are
-unhappy with the accounting changes, so the WiFi angle may be a red
-herring.
-
-            Linus
+everything is just fine?
 
