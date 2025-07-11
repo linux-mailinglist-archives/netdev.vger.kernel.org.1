@@ -1,184 +1,98 @@
-Return-Path: <netdev+bounces-206266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 397F9B02607
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 22:57:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FC25B02614
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 23:03:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 860DE564EDE
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 20:57:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 930111CA8391
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 21:03:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDBAB221F29;
-	Fri, 11 Jul 2025 20:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70EF61C3C11;
+	Fri, 11 Jul 2025 21:03:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="H8FGOcZT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XXbgJLWk"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42B3019995E;
-	Fri, 11 Jul 2025 20:57:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490251B414E;
+	Fri, 11 Jul 2025 21:03:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752267456; cv=none; b=tP/JKzD3h9zuyrx1tZbSsREko86fsCUcyeUpyy2aq7pzvennLoYp67AmWL71nhD+2N94hZiyJjjVf0E0s5cFB9euwa6WeBTQAARf/2qsSrNFcUzWazonw8Z7nuXOZZJDhXZ41IeM9BIyIloVf+D4/8EIkWmxrBO6K6Wrcnec5jE=
+	t=1752267805; cv=none; b=hWquk1jZ3TkmlxIszg/PGfV/kY7kRm9m5h5Zvg2X2RY2L7Z2I1WoAEUZhRyEf2jaTsSukmOy/b42KWEHXXC00fbd5TSqkKcviq0+5Q6v0lGhQj3gvX0nZHIXmaV4Fy2Sn1PvSWiZWVeROo8YcUqy17eijTmAEIdG/oUFEHuMBwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752267456; c=relaxed/simple;
-	bh=7oeksbsqlBDbsMLdrS0Ae+ePAmrEawcDiCXcwACxhMo=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=ruFAvmE7mYETo8cM01pq3Xj8c+1GPQyIFb30I/VgVhcG0NicLWJBiaxRFzFKYU1MXJZhVVvwS2JuOpDiuMviRippt1tm68xQ0/M/eH1gLKTQ++KUQr1kGvxqD9XpyIr86f+wVY1J84qogZ8uJ7P4WsMdVNpIUlt7926FWJkmlyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=H8FGOcZT; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1006)
-	id B09CB2054690; Fri, 11 Jul 2025 13:57:34 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B09CB2054690
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1752267454;
-	bh=YK2hlHCdDL9aIF8iZPjno6SLfHSItOAg/HMmpGq7cI4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=H8FGOcZTmEHW9KxdvYWdoPW3ZPC7yk2wPyvCcf2NB9TifwHY4URnXuZnoNHrR4cUY
-	 Stt2BkIIRrnJUWkJE+kgpk904FGKUGGKhE8I4MTWVUg40p94Wu+YxtihQAxw0ydc6b
-	 8b8ChiKH9SiMJhrhlwxC/q2Wo3F4PjQDN/chCkL0=
-From: Haiyang Zhang <haiyangz@linux.microsoft.com>
-To: linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: haiyangz@microsoft.com,
-	kys@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	stephen@networkplumber.org,
-	davem@davemloft.net,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net] hv_netvsc: Switch VF namespace in netvsc_open instead
-Date: Fri, 11 Jul 2025 13:57:10 -0700
-Message-Id: <1752267430-28487-1-git-send-email-haiyangz@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
+	s=arc-20240116; t=1752267805; c=relaxed/simple;
+	bh=hss40vdmqE4mYcg0sdwPVEcVkg0ntAjmK+txmQ0qyI8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=a55GWpH7WxvfJeJpMLz4aanX8vC6tnmFjk7/nLmy310OTjQb9zGkEqB6ke5PRrRvbDrs7u9PV4dhjkzfxtiQ7T1KfxhCMOoAg7IMrEzOsr7wLSjh2GAH8F8grcdGlvUHywdcPzi7OfM7O3vu7Ys7VHJoUglSGSB/aTehEf4E4JM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XXbgJLWk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B64E1C4CEF0;
+	Fri, 11 Jul 2025 21:03:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752267804;
+	bh=hss40vdmqE4mYcg0sdwPVEcVkg0ntAjmK+txmQ0qyI8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XXbgJLWkdV6MK/tNldMrpBMWn6RFakORTVvdWIkCuVO8IJTD7wOefIEuESd/xJvBa
+	 KCt007VQYJH2atlFmxJWvUBa9dZ+PkhueHJHCcqg/LcR+wWdDRKkZk4R9jBh6W2iYs
+	 CPRqQCKxR2hNsCCOvmly/HeZci66cFuETAisQm5Fqqte3SjTItxWiWTdexvbRU7HAd
+	 gX61qZ8cXoYP5OamMBFv0le0oUcySO6AtUrJFMOCaf+uKkQ7VAjStm1qgLT1wdiDFb
+	 Krd1afoxuI8qG8VUzt+7n0OINNLTk0onC6kt8vKl1p/V7FBw7qX/SSk14+WKvy/dP1
+	 nwZYXCB8cbY4w==
+Date: Fri, 11 Jul 2025 14:03:24 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: Re: [GIT PULL] wireless-2025-07-10
+Message-ID: <20250711140324.65386022@kernel.org>
+In-Reply-To: <934e5e1e253ee3025f617cc38ce6fc15e0619d6c.camel@sipsolutions.net>
+References: <20250710122212.24272-3-johannes@sipsolutions.net>
+	<20250710172352.3ccd34ec@kernel.org>
+	<934e5e1e253ee3025f617cc38ce6fc15e0619d6c.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Haiyang Zhang <haiyangz@microsoft.com>
+On Fri, 11 Jul 2025 08:41:28 +0200 Johannes Berg wrote:
+> > Some good news and some bad news. Bad news is that this missed today's
+> > PR. Good news is that we shipped a bug to Linus which is likely to
+> > break nl80211 users:
+> > https://lore.kernel.org/all/20250711001121.3649033-1-kuba@kernel.org/
+> > so I'm gonna send a second PR tomorrow, with the netlink fix and I'll
+> > include your fixes in it. I suppose you may want to wait with the fast
+> > forward until then. 
+> > Now that I typed this I guess it may be two pieces of bad news..  
+> 
+> No worries, and thanks for the heads-up, I can wait. I actually really
+> hope this was the last pull request for the current -rc cycle anyway,
+> but of course now that I said it someone's going to come out of the
+> woodwork with a fix ;)
+> 
+> Re the size problem, nl80211 can indeed create and fill really big SKBs
+> if userspace gives a big buffer, which it often does. Looking at it now,
+> I'm not sure why we set the rcvbuf to 8KiB in iw? That seems ... odd. It
+> looks like I originally did that to _increase_ it, but that seems
+> completely off, and my first fix didn't even do anything. Then we fixed
+> the call but ...
+> 
+> Looks like the problem is entirely self-made there, but I guess we still
+> have to live with stupid userspace, sorry about that. I can take a
+> closer look at it all and try to fix things there, if you think it's
+> worth it?
 
-The existing code move the VF NIC to new namespace when NETDEV_REGISTER is
-received on netvsc NIC. During deletion of the namespace,
-default_device_exit_batch() >> default_device_exit_net() is called. When
-netvsc NIC is moved back and registered to the default namespace, it
-automatically brings VF NIC back to the default namespace. This will cause
-the default_device_exit_net() >> for_each_netdev_safe loop unable to detect
-the list end, and hit NULL ptr:
+Probably not, unless it's hurting in another way. The well maintained
+userspace is usually not what we have to worry about the most with
+netlink.
 
-[  231.449420] mana 7870:00:00.0 enP30832s1: Moved VF to namespace with: eth0
-[  231.449656] BUG: kernel NULL pointer dereference, address: 0000000000000010
-[  231.450246] #PF: supervisor read access in kernel mode
-[  231.450579] #PF: error_code(0x0000) - not-present page
-[  231.450916] PGD 17b8a8067 P4D 0 
-[  231.451163] Oops: Oops: 0000 [#1] SMP NOPTI
-[  231.451450] CPU: 82 UID: 0 PID: 1394 Comm: kworker/u768:1 Not tainted 6.16.0-rc4+ #3 VOLUNTARY 
-[  231.452042] Hardware name: Microsoft Corporation Virtual Machine/Virtual Machine, BIOS Hyper-V UEFI Release v4.1 11/21/2024
-[  231.452692] Workqueue: netns cleanup_net
-[  231.452947] RIP: 0010:default_device_exit_batch+0x16c/0x3f0
-[  231.453326] Code: c0 0c f5 b3 e8 d5 db fe ff 48 85 c0 74 15 48 c7 c2 f8 fd ca b2 be 10 00 00 00 48 8d 7d c0 e8 7b 77 25 00 49 8b 86 28 01 00 00 <48> 8b 50 10 4c 8b 2a 4c 8d 62 f0 49 83 ed 10 4c 39 e0 0f 84 d6 00
-[  231.454294] RSP: 0018:ff75fc7c9bf9fd00 EFLAGS: 00010246
-[  231.454610] RAX: 0000000000000000 RBX: 0000000000000002 RCX: 61c8864680b583eb
-[  231.455094] RDX: ff1fa9f71462d800 RSI: ff75fc7c9bf9fd38 RDI: 0000000030766564
-[  231.455686] RBP: ff75fc7c9bf9fd78 R08: 0000000000000000 R09: 0000000000000000
-[  231.456126] R10: 0000000000000001 R11: 0000000000000004 R12: ff1fa9f70088e340
-[  231.456621] R13: ff1fa9f70088e340 R14: ffffffffb3f50c20 R15: ff1fa9f7103e6340
-[  231.457161] FS:  0000000000000000(0000) GS:ff1faa6783a08000(0000) knlGS:0000000000000000
-[  231.457707] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  231.458031] CR2: 0000000000000010 CR3: 0000000179ab2006 CR4: 0000000000b73ef0
-[  231.458434] Call Trace:
-[  231.458600]  <TASK>
-[  231.458777]  ops_undo_list+0x100/0x220
-[  231.459015]  cleanup_net+0x1b8/0x300
-[  231.459285]  process_one_work+0x184/0x340
-
-To fix it, move the VF namespace switching code from the NETDEV_REGISTER
-event handler to netvsc_open().
-
-
-Cc: stable@vger.kernel.org
-Fixes: 4c262801ea60 ("hv_netvsc: Fix VF namespace also in synthetic NIC NETDEV_REGISTER event")
-Reported-by: Cathy Avery <cavery@redhat.com>
-Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
----
- drivers/net/hyperv/netvsc_drv.c | 43 ++++++++++-----------------------
- 1 file changed, 13 insertions(+), 30 deletions(-)
-
-diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
-index 42d98e99566e..074ecc346108 100644
---- a/drivers/net/hyperv/netvsc_drv.c
-+++ b/drivers/net/hyperv/netvsc_drv.c
-@@ -135,6 +135,19 @@ static int netvsc_open(struct net_device *net)
- 	}
- 
- 	if (vf_netdev) {
-+		if (!net_eq(dev_net(net), dev_net(vf_netdev))) {
-+			ret = dev_change_net_namespace(vf_netdev, dev_net(net),
-+						       "eth%d");
-+			if (ret)
-+				netdev_err(vf_netdev,
-+					   "Cannot move to same ns as %s: %d\n",
-+					   net->name, ret);
-+			else
-+				netdev_info(vf_netdev,
-+					    "Moved VF to namespace with: %s\n",
-+					    net->name);
-+		}
-+
- 		/* Setting synthetic device up transparently sets
- 		 * slave as up. If open fails, then slave will be
- 		 * still be offline (and not used).
-@@ -2772,31 +2785,6 @@ static struct  hv_driver netvsc_drv = {
- 	},
- };
- 
--/* Set VF's namespace same as the synthetic NIC */
--static void netvsc_event_set_vf_ns(struct net_device *ndev)
--{
--	struct net_device_context *ndev_ctx = netdev_priv(ndev);
--	struct net_device *vf_netdev;
--	int ret;
--
--	vf_netdev = rtnl_dereference(ndev_ctx->vf_netdev);
--	if (!vf_netdev)
--		return;
--
--	if (!net_eq(dev_net(ndev), dev_net(vf_netdev))) {
--		ret = dev_change_net_namespace(vf_netdev, dev_net(ndev),
--					       "eth%d");
--		if (ret)
--			netdev_err(vf_netdev,
--				   "Cannot move to same namespace as %s: %d\n",
--				   ndev->name, ret);
--		else
--			netdev_info(vf_netdev,
--				    "Moved VF to namespace with: %s\n",
--				    ndev->name);
--	}
--}
--
- /*
-  * On Hyper-V, every VF interface is matched with a corresponding
-  * synthetic interface. The synthetic interface is presented first
-@@ -2809,11 +2797,6 @@ static int netvsc_netdev_event(struct notifier_block *this,
- 	struct net_device *event_dev = netdev_notifier_info_to_dev(ptr);
- 	int ret = 0;
- 
--	if (event_dev->netdev_ops == &device_ops && event == NETDEV_REGISTER) {
--		netvsc_event_set_vf_ns(event_dev);
--		return NOTIFY_DONE;
--	}
--
- 	ret = check_dev_is_matching_vf(event_dev);
- 	if (ret != 0)
- 		return NOTIFY_DONE;
--- 
-2.34.1
-
+I was holding off replying until the dust has fully settled but it
+sounds like Linus is still hitting some hard to pin down regression. 
+I don't _think_ it's us any more, so I reckon you're safe to fast
+forward.
 
