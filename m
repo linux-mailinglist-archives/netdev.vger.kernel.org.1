@@ -1,617 +1,163 @@
-Return-Path: <netdev+bounces-206150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC88FB01BC1
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 14:16:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6FCDB01BC9
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 14:16:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5358E8E05FB
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 12:15:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89C6F1CA60F2
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 12:16:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59CC229CB45;
-	Fri, 11 Jul 2025 12:14:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46D5A295DB5;
+	Fri, 11 Jul 2025 12:15:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="d618S8p8"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="g6k/UOfc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6733129B8EA;
-	Fri, 11 Jul 2025 12:14:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91B1295519
+	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 12:15:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752236078; cv=none; b=oAjdQm57DK7WB8Hu9Xfh0ZIb8Gi8GGduTnnuamzRYh7m1TxROTrTs+mUMaIRuNXPj3S1A+NiAg0sagS3+FKY+gkEw3IFAhrVLsIcqvYPH9jnGruBU91DqTTdbq/+4n3iGppb7zFidVWg0rFYi7FofjmH2kjYu6dbAHbNeC+lOCU=
+	t=1752236134; cv=none; b=d+73R+Fak44IwehUgkzHZuNGkyVyYZvQplyrZLFql1UakEfFTgQ1iSqhvBThjASZPZamxogfVHzSi2CmUqORMbHLsdS0o51juUc4FKQCmSsCPvop0O39o4ebZCL94AZW1OT0guekANSsPBU3rtLr+tdT4MJbq47AB0xKiEI2k+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752236078; c=relaxed/simple;
-	bh=41YD1l0PQST3PBvItvY1U7UW9LjtilVluYSu/GClR2c=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ml6TcQQWc52GlGEfFq2l2FbBiqN9gaMnMlHqZU+MRKsgsTkohiHLRWPPrz8KKtdY6zZjnLbMBO4BeKDozBOnwoagI/H7xwu2c+eUqCZxk0qlK2i9c9huahpGlunuxIhhU+iwn7QbtbUVB3Gy1TlMsoaVprW9yGlsPe+2uPOHmxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=d618S8p8; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56B7pgeo013979;
-	Fri, 11 Jul 2025 05:14:28 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	s=arc-20240116; t=1752236134; c=relaxed/simple;
+	bh=Xjn5ySGEMA9LsrxbMTZ6SdqT5i31QukUV4A0p1xnku8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mr7KATpkN7RJlsKEpBacqeKiRxDt1p++WdCNGNeSLhOwc7iTEzwQ/nZO3dBAsCi3Wvs+djBsmg3nNgPHcq+5F65VCGyHUE6c5MEL6VWnWvzAhlDRuHVAGQSyE2D1OTw5NUqFxkhIxlhLW06PLf1eLM5eYoJo3wRH3bvK+cy2kzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=g6k/UOfc; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56BAgYiQ018332
+	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 12:15:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=h
-	t9OgKxMfkSfysJylj6I61s/5kMHA/Cjv+o7eBKrwcM=; b=d618S8p8p8KIkTRDV
-	yNKQ02MmSD6myiNsNlQmKo+CQ6P6//n+E4faiTLyN2k7gXrp5nvsw3QZTsFEha63
-	oyyur3waRn9ywq6Cr5xKzxoNPnzQSmF6/Un8XWq1/GXyg614W3pD4wMaDz+cXtdb
-	lNXo3vk6EFL6o6saIhqMANZkuveNr5BIufx1xoUHFORTQGx/mmaiE3uWFsAin20+
-	OhpSVAt8DpUCPzhfwMVk3mxCU/5i1sMtSCbcL138BniqayARwgXfys6kzox6S7iv
-	mdrHpmK493SxVEXXXkMx5VJdpnWgRJ752Rv8YCD7W577+JwaIkhYM0sE0O3wRctt
-	8FGoQ==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 47txkg8dd8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 11 Jul 2025 05:14:28 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Fri, 11 Jul 2025 05:14:27 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Fri, 11 Jul 2025 05:14:27 -0700
-Received: from optiplex.marvell.com (unknown [10.28.34.253])
-	by maili.marvell.com (Postfix) with ESMTP id CD61C3F7058;
-	Fri, 11 Jul 2025 05:14:23 -0700 (PDT)
-From: Tanmay Jagdale <tanmay@marvell.com>
-To: <davem@davemloft.net>, <leon@kernel.org>, <horms@kernel.org>,
-        <herbert@gondor.apana.org.au>, <sgoutham@marvell.com>,
-        <bbhushan2@marvell.com>
-CC: <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>,
-        Tanmay Jagdale
-	<tanmay@marvell.com>
-Subject: [PATCH net-next v3 14/14] octeontx2-pf: ipsec: Add XFRM state and policy hooks for inbound flows
-Date: Fri, 11 Jul 2025 17:43:07 +0530
-Message-ID: <20250711121317.340326-15-tanmay@marvell.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250711121317.340326-1-tanmay@marvell.com>
-References: <20250711121317.340326-1-tanmay@marvell.com>
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	5WmSJVa8+LyzMZ7AuALMmZArLhe9+Oxn8lyjPgHFxns=; b=g6k/UOfch29P5CwI
+	pqtIbwhQNYh5wJ/FG+d5qTLMv3uOF9J4rZS8PlXlw4ARvQYZ96QHgm3DQFKi2uAz
+	v8rd+pwUwbnPMKXl/IyIel8uZh8YOw2CcTn9SZQMGQyQleDmkft5vZE2lYuss0/N
+	0HZWFHax5VC52ZJguWDzh5L/tBw9jOjjEMpR5Lieo0mOqKVvvdSTNqTuckwroswg
+	MvPwRtZeg1AAEOXG92f9aU+B5xtiRvfVbzo2fVY5JIr+qidvo+E3IboRLrDrEVtX
+	3H8NO0Ot3lxVFcNUvMbC+TThfLfawJliw6yrbBHTNGmVZCRiUyfBfZX1oqLCpCda
+	FmRWPw==
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47tkf32dmy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 12:15:31 +0000 (GMT)
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7deca3ef277so20310785a.1
+        for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 05:15:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752236109; x=1752840909;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5WmSJVa8+LyzMZ7AuALMmZArLhe9+Oxn8lyjPgHFxns=;
+        b=Fj66IErX5FJNEGYh+jBrBiSJonN3ryFR50xUrtM1Ck/Wob3yLaN3Npq7r0Z3VE/gh5
+         psopnxh2+3dgrTd2crUCr60ObYixo7c8qXd9suHOebqEl4QCDPXG8V4dgPQVrrucbYNv
+         3pYy08AIQ+ssZNCf1rLKLPDHI3M5ZhjNnUWpMwA1LC9ISj53PPOx03cBaHrEmyMIgnbw
+         UNCWV3KZWL9SBGuO/vLTvp9V+u3GO9ZlDebpdPs0/3PPV9EtSAM7c2x3ziD6LZKOGfsm
+         e/9MppbbTYuztyib/EtNWMBuf7Cu89FSx1kFCO5hzNDjDR8yfLEoUMzI8IsuXeI9cYLG
+         jilg==
+X-Forwarded-Encrypted: i=1; AJvYcCX8uTzr/UZIBrOP/hUEFy/Oq1myisO/kThHSVj59Rp+1KyPcmmEfW8hx9wTA6H/8hLPlzaWkco=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyd/aYOZP6fBLF3Jp2BcF3FH47F3G+HHlUWP7hOc+F6PLKGrjVT
+	rdRWF9/meT6/vDlgrCUCx+u/sfhyK3iDCjLkl0cPOwnV0N42rRpaSQlp88WK6eks4jAJ86nfWsU
+	9yizwvoSUaO3JaLC7vh12BCNXVq2xA/6f/Fjk5/slgkiR0cbY/1B7ug1vAAE=
+X-Gm-Gg: ASbGncsWF4weQO0Ia0D0XxNdYkpIGyxFWB5FxuvySDCR1g2MINppFuF6FvOBGje7upf
+	oDfNOIiUUOWrHp0RejijLH9Rf0bmaibY3boQ3/xZJGxqoEsl0/DxEWRhFuGlk8Zwc3SUyOuhjyE
+	L5f8coa9wbCnmBoiwVx4/UWor4dLjUKOPnAYtl/0XB0pK18hICogEuwTdPMn7h5fxVt1B096lpn
+	PL3TbKFJe5VaQAKG3tM9RUQ/Wd5p59PcDJFUqYFX08myiyTYo7HiOmEoYTjjcXs8ZpRHv0Lufyk
+	utuipWkr+xwFmuZtdoIGFUS3bqT25ahEGwFSL3H5fZFxNOY1qJFAjias5msnVOMH+9uQYvaE/H8
+	E3+C8cERIU/088+2cc8oA
+X-Received: by 2002:a05:620a:438c:b0:7c5:8ece:8b56 with SMTP id af79cd13be357-7de989b3079mr130008285a.4.1752236109097;
+        Fri, 11 Jul 2025 05:15:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE9IlpHxAb7R4TrzGfVeGwtAC/FU5V/+FMIw/QGwRVWYeM3sTSRsEHYiAI4QhJLyZVlXQj3Zg==
+X-Received: by 2002:a05:620a:438c:b0:7c5:8ece:8b56 with SMTP id af79cd13be357-7de989b3079mr130003685a.4.1752236108508;
+        Fri, 11 Jul 2025 05:15:08 -0700 (PDT)
+Received: from [192.168.143.225] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae6e82964f5sm293248466b.143.2025.07.11.05.15.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Jul 2025 05:15:07 -0700 (PDT)
+Message-ID: <93082ccd-40d2-4a6b-a526-c118c1730a45@oss.qualcomm.com>
+Date: Fri, 11 Jul 2025 14:15:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: 6_CAo-tCEdeeMTGHMBdWUxIN1XJlLTdn
-X-Proofpoint-ORIG-GUID: 6_CAo-tCEdeeMTGHMBdWUxIN1XJlLTdn
-X-Authority-Analysis: v=2.4 cv=OP0n3TaB c=1 sm=1 tr=0 ts=68710024 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=_aetzDJvF-EFRKYuIGoA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzExMDA4NiBTYWx0ZWRfX8Pm0DCMrgu3I /WOSYYUn0ZTpPinfSWc3VAx2mrlEfD+PBkXx7HpzrMMtN3aJfRNxWA5bcM0ITT98X5+6fZzK/U4 A7wDoCVE5xKvF89+5nbGAUkb2GJU9/r/j4MdJQAvsYtJa1tUZaSv2ByzptMxrWrNBs/K8ucXS0q
- 5PFcMOsdKINZVpzPec52HNkIzNGxMCHuY70a+sX/m4JKZ0O5yMPn6tOZM5e2n8I3JPhOmmcBszN h/Mku8DRiOMKIv1WKOQtL91CbFbEb1mRAUGRSvdsaPu/cVcI9gvmVjbi6iKKK32aOI0kJwUlBUQ GattB/frLaFwlS7TyS+HHRTXBURBzLJ/Hva1fPgUSL7VIB91QnUnMDJXMNBEUZ5kacIsq+JiMMF
- 8qCOyd/yeas7SjI8KUFgy2JYKEcU/XW8Cv/Q0GhXa9YZw7AFicCK1cXevO4L0EWT24Q4R/nZ
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 05/10] dt-bindings: clock: ipq9574: Rename NSS CC
+ source clocks to drop rate
+To: Rob Herring <robh@kernel.org>, Luo Jie <quic_luoj@quicinc.com>
+Cc: Georgi Djakov <djakov@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd
+ <sboyd@kernel.org>, Anusha Rao <quic_anusha@quicinc.com>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, linux-arm-msm@vger.kernel.org,
+        linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
+        netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        quic_kkumarcs@quicinc.com, quic_linchen@quicinc.com,
+        quic_leiwei@quicinc.com, quic_pavir@quicinc.com,
+        quic_suruchia@quicinc.com
+References: <20250710-qcom_ipq5424_nsscc-v3-0-f149dc461212@quicinc.com>
+ <20250710-qcom_ipq5424_nsscc-v3-5-f149dc461212@quicinc.com>
+ <20250710225412.GA25762-robh@kernel.org>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <20250710225412.GA25762-robh@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzExMDA4NyBTYWx0ZWRfX8Do6epAh4AqH
+ d6uZ8EVvQg4KrsfhKKhcNnitzabDxkam5SRsmiFltjTDtuGzRJ+VUc3d8xDOACgQek9LnLhZxpO
+ pqfX/9WoXnCS5YNZ3fVHLzF/g/drERfe2xpBNKqCmbjsz3xlG4xfhez83vx3mxL+BVNbVOHRNqp
+ D9TKY3k97wZIpUUAfQp8KSC3+7aoI56Y1Su5TQoPNZNCjn3Mvd1Z5AhO/fM/ERfpd1G1AyHmspv
+ NnXGXxuQlrle2f1r9tLVk5miptz3RQdMkeug6Vfsz3BrD+V3CSLTaanwT0FppFsT+DHCPbWH4gY
+ XpgGTKV635bX2ZH58UFoEvXI2YIFOX5s6fAgqIJidCoEL5Yls+pymCKicutzOBeZlx45erp6r45
+ 26XsvN96go9uqM0gSUfeo3PCKJlKKM74UtfKJrcbGbRbTM6q1BzOFD98yRUo55BTeloSsEzE
+X-Proofpoint-GUID: 6mNXC5wp3v1pzljh1culuHSY1FE66eEU
+X-Authority-Analysis: v=2.4 cv=Xuf6OUF9 c=1 sm=1 tr=0 ts=68710064 cx=c_pps
+ a=qKBjSQ1v91RyAK45QCPf5w==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=icw32r7lKnDoEl_Wh00A:9
+ a=QEXdDO2ut3YA:10 a=NFOGd7dJGGMPyQGDc5-O:22
+X-Proofpoint-ORIG-GUID: 6mNXC5wp3v1pzljh1culuHSY1FE66eEU
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
  definitions=2025-07-11_03,2025-07-09_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 bulkscore=0 spamscore=0 lowpriorityscore=0 impostorscore=0
+ clxscore=1015 priorityscore=1501 malwarescore=0 adultscore=0 mlxscore=0
+ phishscore=0 mlxlogscore=999 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507110087
 
-Add XFRM state hook for inbound flows and configure the following:
-  - Install an NPC rule to classify the 1st pass IPsec packets and
-    direct them to the dedicated RQ
-  - Allocate a free entry from the SA table and populate it with the
-    SA context details based on xfrm state data.
-  - Create a mapping of the SPI value to the SA table index. This is
-    used by NIXRX to calculate the exact SA context  pointer address
-    based on the SPI in the packet.
-  - Prepare the CPT SA context to decrypt buffer in place and the
-    write it the CPT hardware via LMT operation.
-  - When the XFRM state is deleted, clear this SA in CPT hardware.
+On 7/11/25 12:54 AM, Rob Herring wrote:
+> On Thu, Jul 10, 2025 at 08:28:13PM +0800, Luo Jie wrote:
+>> Drop the clock rate suffix from the NSS Clock Controller clock names for
+>> PPE and NSS clocks. A generic name allows for easier extension of support
+>> to additional SoCs that utilize same hardware design.
+> 
+> This is an ABI change. You must state that here and provide a reason the 
+> change is okay (assuming it is). Otherwise, you are stuck with the name 
+> even if not optimal.
 
-Also add XFRM Policy hooks to allow successful offload of inbound
-PACKET_MODE.
+The reason here seems to be simplifying the YAML.. which is not a good
+reason really..
 
-Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
----
-Changes in V3:
-- Use dma_wmb() instead of arm64 specific dmb(sy)
+I would instead suggest keeping the clocks list as-is for ipq9574 (this
+existing case), whereas improving it for any new additions
 
-Changes in V2
-- Used reqid to track NPC rule between XFRM state and policy hooks
-
-V1 Link: https://lore.kernel.org/netdev/20250502132005.611698-16-tanmay@marvell.com/
-V2 Link: https://lore.kernel.org/netdev/20250618113020.130888-15-tanmay@marvell.com/
-
- .../marvell/octeontx2/nic/cn10k_ipsec.c       | 401 +++++++++++++++++-
- .../marvell/octeontx2/nic/cn10k_ipsec.h       |   1 +
- 2 files changed, 379 insertions(+), 23 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-index de73a45ee2c2..d364fc3b51b9 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-@@ -1020,6 +1020,19 @@ static int cn10k_outb_cpt_clean(struct otx2_nic *pf)
- 	return ret;
- }
- 
-+static u32 cn10k_inb_alloc_sa(struct otx2_nic *pf, struct xfrm_state *x)
-+{
-+	u32 sa_index = 0;
-+
-+	sa_index = find_first_zero_bit(pf->ipsec.inb_sa_table, CN10K_IPSEC_INB_MAX_SA);
-+	if (sa_index >= CN10K_IPSEC_INB_MAX_SA)
-+		return sa_index;
-+
-+	set_bit(sa_index, pf->ipsec.inb_sa_table);
-+
-+	return sa_index;
-+}
-+
- static void cn10k_cpt_inst_flush(struct otx2_nic *pf, struct cpt_inst_s *inst,
- 				 u64 size)
- {
-@@ -1134,6 +1147,137 @@ static int cn10k_outb_write_sa(struct otx2_nic *pf, struct qmem *sa_info)
- 	return ret;
- }
- 
-+static int cn10k_inb_write_sa(struct otx2_nic *pf,
-+			      struct xfrm_state *x,
-+			      struct cn10k_inb_sw_ctx_info *inb_ctx_info)
-+{
-+	dma_addr_t res_iova, dptr_iova, sa_iova;
-+	struct cn10k_rx_sa_s *sa_dptr, *sa_cptr;
-+	struct cpt_inst_s inst;
-+	u32 sa_size, off;
-+	struct cpt_res_s *res;
-+	u64 reg_val;
-+	int ret;
-+
-+	res = dma_alloc_coherent(pf->dev, sizeof(struct cpt_res_s),
-+				 &res_iova, GFP_ATOMIC);
-+	if (!res)
-+		return -ENOMEM;
-+
-+	sa_cptr = inb_ctx_info->sa_entry;
-+	sa_iova = inb_ctx_info->sa_iova;
-+	sa_size = sizeof(struct cn10k_rx_sa_s);
-+
-+	sa_dptr = dma_alloc_coherent(pf->dev, sa_size, &dptr_iova, GFP_ATOMIC);
-+	if (!sa_dptr) {
-+		dma_free_coherent(pf->dev, sizeof(struct cpt_res_s), res,
-+				  res_iova);
-+		return -ENOMEM;
-+	}
-+
-+	for (off = 0; off < (sa_size / 8); off++)
-+		*((u64 *)sa_dptr + off) = cpu_to_be64(*((u64 *)sa_cptr + off));
-+
-+	memset(&inst, 0, sizeof(struct cpt_inst_s));
-+
-+	res->compcode = 0;
-+	inst.res_addr = res_iova;
-+	inst.dptr = (u64)dptr_iova;
-+	inst.param2 = sa_size >> 3;
-+	inst.dlen = sa_size;
-+	inst.opcode_major = CN10K_IPSEC_MAJOR_OP_WRITE_SA;
-+	inst.opcode_minor = CN10K_IPSEC_MINOR_OP_WRITE_SA;
-+	inst.cptr = sa_iova;
-+	inst.ctx_val = 1;
-+	inst.egrp = CN10K_DEF_CPT_IPSEC_EGRP;
-+
-+	/* Re-use Outbound CPT LF to install Ingress SAs as well because
-+	 * the driver does not own the ingress CPT LF.
-+	 */
-+	pf->ipsec.io_addr = (__force u64)otx2_get_regaddr(pf, CN10K_CPT_LF_NQX(0));
-+	cn10k_cpt_inst_flush(pf, &inst, sizeof(struct cpt_inst_s));
-+	dma_wmb();
-+
-+	ret = cn10k_wait_for_cpt_respose(pf, res);
-+	if (ret)
-+		goto out;
-+
-+	/* Trigger CTX flush to write dirty data back to DRAM */
-+	reg_val = FIELD_PREP(GENMASK_ULL(45, 0), sa_iova >> 7);
-+	otx2_write64(pf, CN10K_CPT_LF_CTX_FLUSH, reg_val);
-+
-+out:
-+	dma_free_coherent(pf->dev, sa_size, sa_dptr, dptr_iova);
-+	dma_free_coherent(pf->dev, sizeof(struct cpt_res_s), res, res_iova);
-+	return ret;
-+}
-+
-+static void cn10k_xfrm_inb_prepare_sa(struct otx2_nic *pf, struct xfrm_state *x,
-+				      struct cn10k_inb_sw_ctx_info *inb_ctx_info)
-+{
-+	struct cn10k_rx_sa_s *sa_entry = inb_ctx_info->sa_entry;
-+	int key_len = (x->aead->alg_key_len + 7) / 8;
-+	u8 *key = x->aead->alg_key;
-+	u32 sa_size = sizeof(struct cn10k_rx_sa_s);
-+	u64 *tmp_key;
-+	u32 *tmp_salt;
-+	int idx;
-+
-+	memset(sa_entry, 0, sizeof(struct cn10k_rx_sa_s));
-+
-+	/* Disable ESN for now */
-+	sa_entry->esn_en = 0;
-+
-+	/* HW context offset is word-31 */
-+	sa_entry->hw_ctx_off = 31;
-+	sa_entry->pkind = NPC_RX_CPT_HDR_PKIND;
-+	sa_entry->eth_ovrwr = 1;
-+	sa_entry->pkt_output = 1;
-+	sa_entry->pkt_format = 1;
-+	sa_entry->orig_pkt_free = 0;
-+	/* context push size is up to word 31 */
-+	sa_entry->ctx_push_size = 31 + 1;
-+	/* context size, 128 Byte aligned up */
-+	sa_entry->ctx_size = (sa_size / OTX2_ALIGN)  & 0xF;
-+
-+	sa_entry->cookie = inb_ctx_info->sa_index;
-+
-+	/* 1 word (??) prepanded to context header size */
-+	sa_entry->ctx_hdr_size = 1;
-+	/* Mark SA entry valid */
-+	sa_entry->aop_valid = 1;
-+
-+	sa_entry->sa_dir = 0;			/* Inbound */
-+	sa_entry->ipsec_protocol = 1;		/* ESP */
-+	/* Default to Transport Mode */
-+	if (x->props.mode == XFRM_MODE_TUNNEL)
-+		sa_entry->ipsec_mode = 1;	/* Tunnel Mode */
-+
-+	sa_entry->et_ovrwr_ddr_en = 1;
-+	sa_entry->enc_type = 5;			/* AES-GCM only */
-+	sa_entry->aes_key_len = 1;		/* AES key length 128 */
-+	sa_entry->l2_l3_hdr_on_error = 1;
-+	sa_entry->spi = cpu_to_be32(x->id.spi);
-+
-+	/* Last 4 bytes are salt */
-+	key_len -= 4;
-+	memcpy(sa_entry->cipher_key, key, key_len);
-+	tmp_key = (u64 *)sa_entry->cipher_key;
-+
-+	for (idx = 0; idx < key_len / 8; idx++)
-+		tmp_key[idx] = be64_to_cpu(tmp_key[idx]);
-+
-+	memcpy(&sa_entry->iv_gcm_salt, key + key_len, 4);
-+	tmp_salt = (u32 *)&sa_entry->iv_gcm_salt;
-+	*tmp_salt = be32_to_cpu(*tmp_salt);
-+
-+	/* Write SA context data to memory before enabling */
-+	wmb();
-+
-+	/* Enable SA */
-+	sa_entry->sa_valid = 1;
-+}
-+
- static int cn10k_ipsec_get_hw_ctx_offset(void)
- {
- 	/* Offset on Hardware-context offset in word */
-@@ -1241,11 +1385,6 @@ static int cn10k_ipsec_validate_state(struct xfrm_state *x,
- 				   "Only IPv4/v6 xfrm states may be offloaded");
- 		return -EINVAL;
- 	}
--	if (x->xso.type != XFRM_DEV_OFFLOAD_CRYPTO) {
--		NL_SET_ERR_MSG_MOD(extack,
--				   "Cannot offload other than crypto-mode");
--		return -EINVAL;
--	}
- 	if (x->props.mode != XFRM_MODE_TRANSPORT &&
- 	    x->props.mode != XFRM_MODE_TUNNEL) {
- 		NL_SET_ERR_MSG_MOD(extack,
-@@ -1257,11 +1396,6 @@ static int cn10k_ipsec_validate_state(struct xfrm_state *x,
- 				   "Only ESP xfrm state may be offloaded");
- 		return -EINVAL;
- 	}
--	if (x->encap) {
--		NL_SET_ERR_MSG_MOD(extack,
--				   "Encapsulated xfrm state may not be offloaded");
--		return -EINVAL;
--	}
- 	if (!x->aead) {
- 		NL_SET_ERR_MSG_MOD(extack,
- 				   "Cannot offload xfrm states without aead");
-@@ -1298,11 +1432,95 @@ static int cn10k_ipsec_validate_state(struct xfrm_state *x,
- 	return 0;
- }
- 
--static int cn10k_ipsec_inb_add_state(struct xfrm_state *x,
-+static int cn10k_ipsec_inb_add_state(struct net_device *dev,
-+				     struct xfrm_state *x,
- 				     struct netlink_ext_ack *extack)
- {
--	NL_SET_ERR_MSG_MOD(extack, "xfrm inbound offload not supported");
--	return -EOPNOTSUPP;
-+	struct cn10k_inb_sw_ctx_info *inb_ctx_info = NULL, *inb_ctx;
-+	bool enable_rule = false;
-+	struct otx2_nic *pf;
-+	u64 *sa_offset_ptr;
-+	u32 sa_index = 0;
-+	int err = 0;
-+
-+	pf = netdev_priv(dev);
-+
-+	/* If XFRM policy was added before state, then the inb_ctx_info instance
-+	 * would be allocated there.
-+	 */
-+	list_for_each_entry(inb_ctx, &pf->ipsec.inb_sw_ctx_list, list) {
-+		if (inb_ctx->reqid == x->props.reqid) {
-+			inb_ctx_info = inb_ctx;
-+			enable_rule = true;
-+			break;
-+		}
-+	}
-+
-+	if (!inb_ctx_info) {
-+		/* Allocate a structure to track SA related info in driver */
-+		inb_ctx_info = devm_kzalloc(pf->dev, sizeof(*inb_ctx_info), GFP_KERNEL);
-+		if (!inb_ctx_info)
-+			return -ENOMEM;
-+
-+		/* Stash pointer in the xfrm offload handle */
-+		x->xso.offload_handle = (unsigned long)inb_ctx_info;
-+	}
-+
-+	sa_index = cn10k_inb_alloc_sa(pf, x);
-+	if (sa_index >= CN10K_IPSEC_INB_MAX_SA) {
-+		netdev_err(dev, "Failed to find free entry in SA Table\n");
-+		err = -ENOMEM;
-+		goto err_out;
-+	}
-+
-+	/* Fill in information for bookkeeping */
-+	inb_ctx_info->sa_index = sa_index;
-+	inb_ctx_info->spi = x->id.spi;
-+	inb_ctx_info->reqid = x->props.reqid;
-+	inb_ctx_info->sa_entry = pf->ipsec.inb_sa->base +
-+				 (sa_index * pf->ipsec.sa_tbl_entry_sz);
-+	inb_ctx_info->sa_iova = pf->ipsec.inb_sa->iova +
-+				(sa_index * pf->ipsec.sa_tbl_entry_sz);
-+	inb_ctx_info->x_state = x;
-+
-+	/* Store XFRM state pointer in SA context at an offset of 1KB.
-+	 * It will be later used in the rcv_pkt_handler to associate
-+	 * an skb with XFRM state.
-+	 */
-+	sa_offset_ptr = pf->ipsec.inb_sa->base +
-+		 (sa_index * pf->ipsec.sa_tbl_entry_sz) + 1024;
-+	*sa_offset_ptr = (u64)x;
-+
-+	err = cn10k_inb_install_spi_to_sa_match_entry(pf, x, inb_ctx_info);
-+	if (err) {
-+		netdev_err(dev, "Failed to install Inbound IPSec exact match entry\n");
-+		goto err_out;
-+	}
-+
-+	/* Fill the Inbound SA context structure */
-+	cn10k_xfrm_inb_prepare_sa(pf, x, inb_ctx_info);
-+
-+	err = cn10k_inb_write_sa(pf, x, inb_ctx_info);
-+	if (err)
-+		netdev_err(dev, "Error writing inbound SA\n");
-+
-+	/* Enable NPC rule if policy was already installed */
-+	if (enable_rule) {
-+		err = cn10k_inb_ena_dis_flow(pf, inb_ctx_info, false);
-+		if (err)
-+			netdev_err(dev, "Failed to enable rule\n");
-+	} else {
-+		/* All set, add ctx_info to the list */
-+		list_add_tail(&inb_ctx_info->list, &pf->ipsec.inb_sw_ctx_list);
-+	}
-+
-+	cn10k_cpt_device_set_available(pf);
-+	return err;
-+
-+err_out:
-+	x->xso.offload_handle = 0;
-+	devm_kfree(pf->dev, inb_ctx_info);
-+	return err;
- }
- 
- static int cn10k_ipsec_outb_add_state(struct net_device *dev,
-@@ -1314,10 +1532,6 @@ static int cn10k_ipsec_outb_add_state(struct net_device *dev,
- 	struct otx2_nic *pf;
- 	int err;
- 
--	err = cn10k_ipsec_validate_state(x, extack);
--	if (err)
--		return err;
--
- 	pf = netdev_priv(dev);
- 
- 	err = qmem_alloc(pf->dev, &sa_info, pf->ipsec.sa_size, OTX2_ALIGN);
-@@ -1346,10 +1560,52 @@ static int cn10k_ipsec_add_state(struct net_device *dev,
- 				 struct xfrm_state *x,
- 				 struct netlink_ext_ack *extack)
- {
-+	int err;
-+
-+	err = cn10k_ipsec_validate_state(x, extack);
-+	if (err)
-+		return err;
-+
- 	if (x->xso.dir == XFRM_DEV_OFFLOAD_IN)
--		return cn10k_ipsec_inb_add_state(x, extack);
-+		return cn10k_ipsec_inb_add_state(dev, x, extack);
- 	else
- 		return cn10k_ipsec_outb_add_state(dev, x, extack);
-+
-+	return err;
-+}
-+
-+static void cn10k_ipsec_inb_del_state(struct net_device *dev,
-+				      struct otx2_nic *pf, struct xfrm_state *x)
-+{
-+	struct cn10k_inb_sw_ctx_info *inb_ctx_info;
-+	struct cn10k_rx_sa_s *sa_entry;
-+	int err = 0;
-+
-+	/* 1. Find SPI to SA entry */
-+	inb_ctx_info = (struct cn10k_inb_sw_ctx_info *)x->xso.offload_handle;
-+
-+	if (inb_ctx_info->spi != x->id.spi) {
-+		netdev_err(dev, "SPI Mismatch (ctx) 0x%x != 0x%x (xfrm)\n",
-+			   inb_ctx_info->spi, be32_to_cpu(x->id.spi));
-+		return;
-+	}
-+
-+	/* 2. Delete SA in CPT HW */
-+	sa_entry = inb_ctx_info->sa_entry;
-+	memset(sa_entry, 0, sizeof(struct cn10k_rx_sa_s));
-+
-+	sa_entry->ctx_push_size = 31 + 1;
-+	sa_entry->ctx_size = (sizeof(struct cn10k_rx_sa_s) / OTX2_ALIGN) & 0xF;
-+	sa_entry->aop_valid = 1;
-+
-+	if (cn10k_cpt_device_set_inuse(pf)) {
-+		err = cn10k_inb_write_sa(pf, x, inb_ctx_info);
-+		if (err)
-+			netdev_err(dev, "Error (%d) deleting INB SA\n", err);
-+		cn10k_cpt_device_set_available(pf);
-+	}
-+
-+	x->xso.offload_handle = 0;
- }
- 
- static void cn10k_ipsec_del_state(struct net_device *dev, struct xfrm_state *x)
-@@ -1359,11 +1615,11 @@ static void cn10k_ipsec_del_state(struct net_device *dev, struct xfrm_state *x)
- 	struct otx2_nic *pf;
- 	int err;
- 
--	if (x->xso.dir == XFRM_DEV_OFFLOAD_IN)
--		return;
--
- 	pf = netdev_priv(dev);
- 
-+	if (x->xso.dir == XFRM_DEV_OFFLOAD_IN)
-+		return cn10k_ipsec_inb_del_state(dev, pf, x);
-+
- 	sa_info = (struct qmem *)x->xso.offload_handle;
- 	sa_entry = (struct cn10k_tx_sa_s *)sa_info->base;
- 	memset(sa_entry, 0, sizeof(struct cn10k_tx_sa_s));
-@@ -1382,13 +1638,112 @@ static void cn10k_ipsec_del_state(struct net_device *dev, struct xfrm_state *x)
- 	/* If no more SA's then update netdev feature for potential change
- 	 * in NETIF_F_HW_ESP.
- 	 */
--	if (!--pf->ipsec.outb_sa_count)
--		queue_work(pf->ipsec.sa_workq, &pf->ipsec.sa_work);
-+	pf->ipsec.outb_sa_count--;
-+	queue_work(pf->ipsec.sa_workq, &pf->ipsec.sa_work);
-+}
-+
-+static int cn10k_ipsec_policy_add(struct xfrm_policy *x,
-+				  struct netlink_ext_ack *extack)
-+{
-+	struct cn10k_inb_sw_ctx_info *inb_ctx_info = NULL, *inb_ctx;
-+	struct net_device *netdev = x->xdo.dev;
-+	struct otx2_nic *pf;
-+	int ret = 0;
-+	bool disable_rule = true;
-+
-+	if (x->xdo.dir != XFRM_DEV_OFFLOAD_IN) {
-+		netdev_err(netdev, "ERR: Can only offload Inbound policies\n");
-+		ret = -EINVAL;
-+	}
-+
-+	if (x->xdo.type != XFRM_DEV_OFFLOAD_PACKET) {
-+		netdev_err(netdev, "ERR: Only Packet mode supported\n");
-+		ret = -EINVAL;
-+	}
-+
-+	pf = netdev_priv(netdev);
-+
-+	/* If XFRM state was added before policy, then the inb_ctx_info instance
-+	 * would be allocated there.
-+	 */
-+	list_for_each_entry(inb_ctx, &pf->ipsec.inb_sw_ctx_list, list) {
-+		if (inb_ctx->reqid == x->xfrm_vec[0].reqid) {
-+			inb_ctx_info = inb_ctx;
-+			disable_rule = false;
-+			break;
-+		}
-+	}
-+
-+	if (!inb_ctx_info) {
-+		/* Allocate a structure to track SA related info in driver */
-+		inb_ctx_info = devm_kzalloc(pf->dev, sizeof(*inb_ctx_info), GFP_KERNEL);
-+		if (!inb_ctx_info)
-+			return -ENOMEM;
-+
-+		inb_ctx_info->reqid = x->xfrm_vec[0].reqid;
-+	}
-+
-+	ret = cn10k_inb_alloc_mcam_entry(pf, inb_ctx_info);
-+	if (ret) {
-+		netdev_err(netdev, "Failed to allocate MCAM entry for Inbound IPSec flow\n");
-+		goto err_out;
-+	}
-+
-+	ret = cn10k_inb_install_flow(pf, inb_ctx_info);
-+	if (ret) {
-+		netdev_err(netdev, "Failed to install Inbound IPSec flow\n");
-+		goto err_out;
-+	}
-+
-+	/* Leave rule in a disabled state until xfrm_state add is completed */
-+	if (disable_rule) {
-+		ret = cn10k_inb_ena_dis_flow(pf, inb_ctx_info, true);
-+		if (ret)
-+			netdev_err(netdev, "Failed to disable rule\n");
-+
-+		/* All set, add ctx_info to the list */
-+		list_add_tail(&inb_ctx_info->list, &pf->ipsec.inb_sw_ctx_list);
-+	}
-+
-+	/* Stash pointer in the xfrm offload handle */
-+	x->xdo.offload_handle = (unsigned long)inb_ctx_info;
-+
-+err_out:
-+	return ret;
-+}
-+
-+static void cn10k_ipsec_policy_delete(struct xfrm_policy *x)
-+{
-+	struct cn10k_inb_sw_ctx_info *inb_ctx_info;
-+	struct net_device *netdev = x->xdo.dev;
-+	struct otx2_nic *pf;
-+
-+	if (!x->xdo.offload_handle)
-+		return;
-+
-+	pf = netdev_priv(netdev);
-+	inb_ctx_info = (struct cn10k_inb_sw_ctx_info *)x->xdo.offload_handle;
-+
-+	/* Schedule a workqueue to free NPC rule and SPI-to-SA match table
-+	 * entry because they are freed via a mailbox call which can sleep
-+	 * and the delete policy routine from XFRM stack is called in an
-+	 * atomic context.
-+	 */
-+	inb_ctx_info->delete_npc_and_match_entry = true;
-+	queue_work(pf->ipsec.sa_workq, &pf->ipsec.sa_work);
-+}
-+
-+static void cn10k_ipsec_policy_free(struct xfrm_policy *x)
-+{
-+	return;
- }
- 
- static const struct xfrmdev_ops cn10k_ipsec_xfrmdev_ops = {
- 	.xdo_dev_state_add	= cn10k_ipsec_add_state,
- 	.xdo_dev_state_delete	= cn10k_ipsec_del_state,
-+	.xdo_dev_policy_add	= cn10k_ipsec_policy_add,
-+	.xdo_dev_policy_delete	= cn10k_ipsec_policy_delete,
-+	.xdo_dev_policy_free	= cn10k_ipsec_policy_free,
- };
- 
- static void cn10k_ipsec_sa_wq_handler(struct work_struct *work)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
-index 470bf0a48bc9..3d63586a95b6 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
-@@ -94,6 +94,7 @@ struct cn10k_inb_sw_ctx_info {
- 	u32 npc_mcam_entry;
- 	u32 sa_index;
- 	__be32 spi;
-+	u32 reqid;
- 	u16 hash_index;	/* Hash index from SPI_TO_SA match */
- 	u8 way;		/* SPI_TO_SA match table way index */
- 	bool delete_npc_and_match_entry;
--- 
-2.43.0
-
+Konrad
 
