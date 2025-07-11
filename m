@@ -1,304 +1,107 @@
-Return-Path: <netdev+bounces-206056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05306B0134D
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 08:08:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 28D99B0137E
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 08:26:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 508EC171DCA
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 06:08:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80FDF17CDAA
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 06:26:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72B881D516A;
-	Fri, 11 Jul 2025 06:08:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wzGbmC+J"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E7421E491B;
+	Fri, 11 Jul 2025 06:25:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2D6C17A300
-	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 06:08:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD421DFDAB;
+	Fri, 11 Jul 2025 06:25:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752214093; cv=none; b=cWGCXv4bjSdaIYsvh9q7am0dYnv4E5fmJRu6Sl+TQFp9Qmb4teiJzob4vrWOC/jtk0/GZwKNy/JmNCPcy04VVb8xAxLK9IH9XZide6B/n9vAoq0SHW2uk2WuM905CYp5EaVH8nSo7Wz411x7o2F+cC/rlZQp6kqtEptzo7GwiVc=
+	t=1752215113; cv=none; b=qj5495qQJSkg5pT+7wNixQIHDkDNKh6tsa39N2KL2qN5uOX6/BE+3G1pWVap5K+pxtYfOV9bro2WWYzlFw9fe65ofhZuCwbd2n8zZiwg/ArHx7+g9KmIPNE5vfPd/WifLxSb9kXRDUnhf5xgF4jpJrstKfH5Ww1cMwVKwU15Gvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752214093; c=relaxed/simple;
-	bh=gNpih8xnCGQu+jdA+AvUDEylqB16lTu84yaWKyKEg74=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Qd6QThSYvjCLX8aVh2MropRk4Q/6nwhMgiiiWDbo4hYKZMBRMUhtIsBw2lkCALBk7c2vQxkQdGafE25l8Y9ldAtCNMDdI8oWFyIZ2QLNWT2xeCJmafMxg6d7X6+n56v5/6ep0x/Y3dzt0Bj/OOfz0Qa5hGn+ChQ6VBrPbxqUuUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wzGbmC+J; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3122368d82bso2730105a91.0
-        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 23:08:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752214091; x=1752818891; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=HOCCIU1Dxti53uyBexUi4fVJk3Iwlf50sIMO8h+C3FI=;
-        b=wzGbmC+J6pvPg1nwdNCJjWuSttPnvhobFboU+BXaau6jFmINsY039v29fAYcuwXTKD
-         LYK59S6Tsgh2JLCOpIS4xTcd0XluyeMm/erKtj+Q2+8yf5BVa5AZfqI1fdUWkxNwtghR
-         /XQmdoCbaynenFbv93BUFqoFQC6N9X0I/6qdxUZlWw5z/YhIG+ypydYmsKofRuNYhMJV
-         dYbwS5m6OVoozlBVJ482d/UX4Dvk6Mz3HtMpcfSLEridYdjGIiYqTQld9ftiI5MIUi2q
-         WfkV5KgOqCSEE9P204x1E2eCPSDGKdYBFARbehndSFhkiy4EfECRjgoetrjvoIZ0EBc2
-         CutA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752214091; x=1752818891;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HOCCIU1Dxti53uyBexUi4fVJk3Iwlf50sIMO8h+C3FI=;
-        b=jL1i/CJ0WPVM4Oh13LfDoMr9kWkeLvwvoBgObUHeTjBgKAl4y3u36DEpFOH2aZffFH
-         bk/prAGMICe7agvt3RcBN3hWuCBDteN5tuaob4WdVcQRDTYXyDx1tsGbsuiQNi2yUDvp
-         pK4QWN5cPzLu+e8QWXAP2OVmkk4wSpB+3HZnf38pjVLvPKZJrk/4ldZ9JIbYB1ntBv9M
-         WuntI65vjNIt5Joi3m2wBy/c5VJZKKlusH1XuZ2LYwN8RwD0khNuIPgmc6t6z+emT/Cd
-         MlNIPBjBN4CsswGy/ARhOVYJnwTbNt3KCLTKHrP/PiAuCro0U8cD1rsxNYQVxL68XCnJ
-         Svrg==
-X-Forwarded-Encrypted: i=1; AJvYcCUmtBgkMxch+quD5xBxCeoGReXp1zhD1FhiYdqbMPUN7/J06oxlfNq3vpm4hDIndGRaP1MTtg0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGOSUMZgTX9+WLuKQN7RrVVRzb5eDvjt4omFedAXTerYNaQgfH
-	rzsewarRtwPj8ClL1k06WvpcxoQHOL+F0sz0kcTLVyGShPWe67pLUaGqkZtemGeo8/8wgc0MuIA
-	lTO706g==
-X-Google-Smtp-Source: AGHT+IHBnhk857mznsVRtZ1LhvG8NmTW9v1reo6FosSdstl+x90K1TdQYfY6yvbBDBcLJ8YfIbf5Eax50aQ=
-X-Received: from pjf12.prod.google.com ([2002:a17:90b:3f0c:b0:312:3b05:5f44])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1c07:b0:311:9e59:7aba
- with SMTP id 98e67ed59e1d1-31c4ca64db7mr3337736a91.2.1752214090989; Thu, 10
- Jul 2025 23:08:10 -0700 (PDT)
-Date: Fri, 11 Jul 2025 06:07:52 +0000
+	s=arc-20240116; t=1752215113; c=relaxed/simple;
+	bh=zEZp+qXyCUazuCiC+Y/Nu2wudY2k42M4YzEkSX0fYrU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PU9Sxxa1H8nQ695tqZbn9QGtrKbbouIDgt2F2/zor7IUJPuIkWYAYmGClLiXAg/ObPhPUMzg1DleHW6WD33h7Gsfxh9BkYDGeza/SU3Pa1uM8PWghhTehtgtqOmKsVOYcYsBYv9tEJDEcCRuAs5+YREolCG0OLUK8KOqph2wQRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bdhV22tcZz2FbPZ;
+	Fri, 11 Jul 2025 14:23:06 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9EC95140278;
+	Fri, 11 Jul 2025 14:25:03 +0800 (CST)
+Received: from localhost.localdomain (10.90.31.46) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 11 Jul 2025 14:25:02 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
+CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
+	<chenhao418@huawei.com>, <jonathan.cameron@huawei.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
+	<arnd@kernel.org>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<shaojijie@huawei.com>
+Subject: [PATCH V2 net-next 00/11] net: hns3: use seq_file for debugfs
+Date: Fri, 11 Jul 2025 14:17:14 +0800
+Message-ID: <20250711061725.225585-1-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250711060808.2977529-1-kuniyu@google.com>
-Subject: [PATCH v1 net] smc: Fix various oops due to inet_sock type confusion.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: "D. Wythe" <alibuda@linux.alibaba.com>, Dust Li <dust.li@linux.alibaba.com>, 
-	Sidraya Jayagond <sidraya@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Mahanta Jambigi <mjambigi@linux.ibm.com>, Tony Lu <tonylu@linux.alibaba.com>, 
-	Wen Gu <guwen@linux.alibaba.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, 
-	syzbot+40bf00346c3fe40f90f2@syzkaller.appspotmail.com, 
-	syzbot+f22031fad6cbe52c70e7@syzkaller.appspotmail.com, 
-	syzbot+271fed3ed6f24600c364@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-syzbot reported weird splats [0][1] in cipso_v4_sock_setattr() while
-freeing inet_sk(sk)->inet_opt.
+Arnd reported that there are two build warning for on-stasck
+buffer oversize. As Arnd's suggestion, using seq file way
+to avoid the stack buffer or kmalloc buffer allocating.
 
-The address was freed multiple times even though it was read-only memory.
-
-cipso_v4_sock_setattr() did nothing wrong, and the root cause was type
-confusion.
-
-The cited commit made it possible to create smc_sock as an INET socket.
-
-The issue is that struct smc_sock does not have struct inet_sock as the
-first member but hijacks AF_INET and AF_INET6 sk_family, which confuses
-various places.
-
-In this case, inet_sock.inet_opt was actually smc_sock.clcsk_data_ready(),
-which is an address of a function in the text segment.
-
-  $ pahole -C inet_sock vmlinux
-  struct inet_sock {
-  ...
-          struct ip_options_rcu *    inet_opt;             /*   784     8 */
-
-  $ pahole -C smc_sock vmlinux
-  struct smc_sock {
-  ...
-          void                       (*clcsk_data_ready)(struct sock *); /*   784     8 */
-
-The same issue for another field was reported before. [2][3]
-
-At that time, an ugly hack was suggested [4], but it makes both INET
-and SMC code error-prone and hard to change.
-
-Also, yet another variant was fixed by a hacky commit 98d4435efcbf3
-("net/smc: prevent NULL pointer dereference in txopt_get").
-
-Instead of papering over the root cause by such hacks, we should not
-allow non-INET socket to reuse the INET infra.
-
-Let's add inet_sock as the first member of smc_sock.
-
-[0]:
-kvfree_call_rcu(): Double-freed call. rcu_head 000000006921da73
-WARNING: CPU: 0 PID: 6718 at mm/slab_common.c:1956 kvfree_call_rcu+0x94/0x3f0 mm/slab_common.c:1955
-Modules linked in:
-CPU: 0 UID: 0 PID: 6718 Comm: syz.0.17 Tainted: G        W           6.16.0-rc4-syzkaller-g7482bb149b9f #0 PREEMPT
-Tainted: [W]=WARN
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : kvfree_call_rcu+0x94/0x3f0 mm/slab_common.c:1955
-lr : kvfree_call_rcu+0x94/0x3f0 mm/slab_common.c:1955
-sp : ffff8000a03a7730
-x29: ffff8000a03a7730 x28: 00000000fffffff5 x27: 1fffe000184823d3
-x26: dfff800000000000 x25: ffff0000c2411e9e x24: ffff0000dd88da00
-x23: ffff8000891ac9a0 x22: 00000000ffffffea x21: ffff8000891ac9a0
-x20: ffff8000891ac9a0 x19: ffff80008afc2480 x18: 00000000ffffffff
-x17: 0000000000000000 x16: ffff80008ae642c8 x15: ffff700011ede14c
-x14: 1ffff00011ede14c x13: 0000000000000004 x12: ffffffffffffffff
-x11: ffff700011ede14c x10: 0000000000ff0100 x9 : 5fa3c1ffaf0ff000
-x8 : 5fa3c1ffaf0ff000 x7 : 0000000000000001 x6 : 0000000000000001
-x5 : ffff8000a03a7078 x4 : ffff80008f766c20 x3 : ffff80008054d360
-x2 : 0000000000000000 x1 : 0000000000000201 x0 : 0000000000000000
-Call trace:
- kvfree_call_rcu+0x94/0x3f0 mm/slab_common.c:1955 (P)
- cipso_v4_sock_setattr+0x2f0/0x3f4 net/ipv4/cipso_ipv4.c:1914
- netlbl_sock_setattr+0x240/0x334 net/netlabel/netlabel_kapi.c:1000
- smack_netlbl_add+0xa8/0x158 security/smack/smack_lsm.c:2581
- smack_inode_setsecurity+0x378/0x430 security/smack/smack_lsm.c:2912
- security_inode_setsecurity+0x118/0x3c0 security/security.c:2706
- __vfs_setxattr_noperm+0x174/0x5c4 fs/xattr.c:251
- __vfs_setxattr_locked+0x1ec/0x218 fs/xattr.c:295
- vfs_setxattr+0x158/0x2ac fs/xattr.c:321
- do_setxattr fs/xattr.c:636 [inline]
- file_setxattr+0x1b8/0x294 fs/xattr.c:646
- path_setxattrat+0x2ac/0x320 fs/xattr.c:711
- __do_sys_fsetxattr fs/xattr.c:761 [inline]
- __se_sys_fsetxattr fs/xattr.c:758 [inline]
- __arm64_sys_fsetxattr+0xc0/0xdc fs/xattr.c:758
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
- do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
- el0_svc+0x58/0x180 arch/arm64/kernel/entry-common.c:879
- el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:898
- el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:600
-
-[1]:
-Unable to handle kernel write to read-only memory at virtual address ffff8000891ac9a8
-KASAN: probably user-memory-access in range [0x0000000448d64d40-0x0000000448d64d47]
-Mem abort info:
-  ESR = 0x000000009600004e
-  EC = 0x25: DABT (current EL), IL = 32 bits
-  SET = 0, FnV = 0
-  EA = 0, S1PTW = 0
-  FSC = 0x0e: level 2 permission fault
-Data abort info:
-  ISV = 0, ISS = 0x0000004e, ISS2 = 0x00000000
-  CM = 0, WnR = 1, TnD = 0, TagAccess = 0
-  GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-swapper pgtable: 4k pages, 48-bit VAs, pgdp=0000000207144000
-[ffff8000891ac9a8] pgd=0000000000000000, p4d=100000020f950003, pud=100000020f951003, pmd=0040000201000781
-Internal error: Oops: 000000009600004e [#1]  SMP
-Modules linked in:
-CPU: 0 UID: 0 PID: 6946 Comm: syz.0.69 Not tainted 6.16.0-rc4-syzkaller-g7482bb149b9f #0 PREEMPT
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-pstate: 604000c5 (nZCv daIF +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : kvfree_call_rcu+0x31c/0x3f0 mm/slab_common.c:1971
-lr : add_ptr_to_bulk_krc_lock mm/slab_common.c:1838 [inline]
-lr : kvfree_call_rcu+0xfc/0x3f0 mm/slab_common.c:1963
-sp : ffff8000a28a7730
-x29: ffff8000a28a7730 x28: 00000000fffffff5 x27: 1fffe00018b09bb3
-x26: 0000000000000001 x25: ffff80008f66e000 x24: ffff00019beaf498
-x23: ffff00019beaf4c0 x22: 0000000000000000 x21: ffff8000891ac9a0
-x20: ffff8000891ac9a0 x19: 0000000000000000 x18: 00000000ffffffff
-x17: ffff800093363000 x16: ffff80008052c6e4 x15: ffff700014514ecc
-x14: 1ffff00014514ecc x13: 0000000000000004 x12: ffffffffffffffff
-x11: ffff700014514ecc x10: 0000000000000001 x9 : 0000000000000001
-x8 : ffff00019beaf7b4 x7 : ffff800080a94154 x6 : 0000000000000000
-x5 : ffff8000935efa60 x4 : 0000000000000008 x3 : ffff80008052c7fc
-x2 : 0000000000000001 x1 : ffff8000891ac9a0 x0 : 0000000000000001
-Call trace:
- kvfree_call_rcu+0x31c/0x3f0 mm/slab_common.c:1967 (P)
- cipso_v4_sock_setattr+0x2f0/0x3f4 net/ipv4/cipso_ipv4.c:1914
- netlbl_sock_setattr+0x240/0x334 net/netlabel/netlabel_kapi.c:1000
- smack_netlbl_add+0xa8/0x158 security/smack/smack_lsm.c:2581
- smack_inode_setsecurity+0x378/0x430 security/smack/smack_lsm.c:2912
- security_inode_setsecurity+0x118/0x3c0 security/security.c:2706
- __vfs_setxattr_noperm+0x174/0x5c4 fs/xattr.c:251
- __vfs_setxattr_locked+0x1ec/0x218 fs/xattr.c:295
- vfs_setxattr+0x158/0x2ac fs/xattr.c:321
- do_setxattr fs/xattr.c:636 [inline]
- file_setxattr+0x1b8/0x294 fs/xattr.c:646
- path_setxattrat+0x2ac/0x320 fs/xattr.c:711
- __do_sys_fsetxattr fs/xattr.c:761 [inline]
- __se_sys_fsetxattr fs/xattr.c:758 [inline]
- __arm64_sys_fsetxattr+0xc0/0xdc fs/xattr.c:758
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
- do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
- el0_svc+0x58/0x180 arch/arm64/kernel/entry-common.c:879
- el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:898
- el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:600
-Code: aa1f03e2 52800023 97ee1e8d b4000195 (f90006b4)
-
-Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
-Reported-by: syzbot+40bf00346c3fe40f90f2@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/686d9b50.050a0220.1ffab7.0020.GAE@google.com/
-Tested-by: syzbot+40bf00346c3fe40f90f2@syzkaller.appspotmail.com
-Reported-by: syzbot+f22031fad6cbe52c70e7@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/686da0f3.050a0220.1ffab7.0022.GAE@google.com/
-Reported-by: syzbot+271fed3ed6f24600c364@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=271fed3ed6f24600c364 # [2]
-Link: https://lore.kernel.org/netdev/99f284be-bf1d-4bc4-a629-77b268522fff@huawei.com/ # [3]
-Link: https://lore.kernel.org/netdev/20250331081003.1503211-1-wangliang74@huawei.com/ # [4]
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- net/smc/af_smc.c | 14 ++++++++++++++
- net/smc/smc.h    |  8 ++++----
- 2 files changed, 18 insertions(+), 4 deletions(-)
+ChangeLog:
+v1 -> v2:
+  - Remove unused functions in advance to eliminate compilation warnings, suggested by Jakub Kicinski
+  - Remove unnecessary cast, suggested by Andrew Lunn
+  v1: https://lore.kernel.org/all/20250708130029.1310872-1-shaojijie@huawei.com/
+---
 
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index 3760131f14845..1882bab8e00e7 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -30,6 +30,10 @@
- #include <linux/splice.h>
- 
- #include <net/sock.h>
-+#include <net/inet_common.h>
-+#if IS_ENABLED(CONFIG_IPV6)
-+#include <net/ipv6.h>
-+#endif
- #include <net/tcp.h>
- #include <net/smc.h>
- #include <asm/ioctls.h>
-@@ -360,6 +364,16 @@ static void smc_destruct(struct sock *sk)
- 		return;
- 	if (!sock_flag(sk, SOCK_DEAD))
- 		return;
-+	switch (sk->sk_family) {
-+	case AF_INET:
-+		inet_sock_destruct(sk);
-+		break;
-+#if IS_ENABLED(CONFIG_IPV6)
-+	case AF_INET6:
-+		inet6_sock_destruct(sk);
-+		break;
-+#endif
-+	}
- }
- 
- static struct lock_class_key smc_key;
-diff --git a/net/smc/smc.h b/net/smc/smc.h
-index 78ae10d06ed2e..2c90849637398 100644
---- a/net/smc/smc.h
-+++ b/net/smc/smc.h
-@@ -283,10 +283,10 @@ struct smc_connection {
- };
- 
- struct smc_sock {				/* smc sock container */
--	struct sock		sk;
--#if IS_ENABLED(CONFIG_IPV6)
--	struct ipv6_pinfo	*pinet6;
--#endif
-+	union {
-+		struct sock		sk;
-+		struct inet_sock	icsk_inet;
-+	};
- 	struct socket		*clcsock;	/* internal tcp socket */
- 	void			(*clcsk_state_change)(struct sock *sk);
- 						/* original stat_change fct. */
+Jian Shen (5):
+  net: hns3: clean up the build warning in debugfs by use seq file
+  net: hns3: use seq_file for files in queue/ in debugfs
+  net: hns3: use seq_file for files in tm/ in debugfs
+  net: hns3: use seq_file for files in tx_bd_info/ and rx_bd_info/ in
+    debugfs
+  net: hns3: remove the unused code after using seq_file
+
+Jijie Shao (4):
+  net: hns3: remove tx spare info from debugfs.
+  net: hns3: use seq_file for files in common/ of hns3 layer
+  net: hns3: use seq_file for files in reg/ in debugfs
+  net: hns3: use seq_file for files in fd/ in debugfs
+
+Yonglong Liu (2):
+  net: hns3: use seq_file for files in mac_list/ in debugfs
+  net: hns3: use seq_file for files in common/ of hclge layer
+
+ drivers/net/ethernet/hisilicon/hns3/hnae3.h   |   16 +-
+ .../ethernet/hisilicon/hns3/hns3_debugfs.c    | 1044 ++++---------
+ .../ethernet/hisilicon/hns3/hns3_debugfs.h    |   16 -
+ .../net/ethernet/hisilicon/hns3/hns3_enet.c   |    2 +
+ .../hisilicon/hns3/hns3pf/hclge_debugfs.c     | 1356 +++++++----------
+ .../hisilicon/hns3/hns3pf/hclge_debugfs.h     |    1 +
+ .../hisilicon/hns3/hns3pf/hclge_main.c        |    2 +-
+ .../hisilicon/hns3/hns3pf/hclge_main.h        |    4 +-
+ 8 files changed, 859 insertions(+), 1582 deletions(-)
+
 -- 
-2.50.0.727.gbf7dc18ff4-goog
+2.33.0
 
 
