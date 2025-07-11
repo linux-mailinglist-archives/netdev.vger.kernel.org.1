@@ -1,146 +1,109 @@
-Return-Path: <netdev+bounces-206192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B09B8B01F5D
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 16:43:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7520FB02000
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 17:01:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF23C1CC029C
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 14:43:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E67A54A0842
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 14:59:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53BBD287265;
-	Fri, 11 Jul 2025 14:43:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EC412EACFB;
+	Fri, 11 Jul 2025 14:58:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sz8Vykjg"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="IId9Hb+A"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270196ADD;
-	Fri, 11 Jul 2025 14:43:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A07402EAB9E
+	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 14:58:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752245010; cv=none; b=NG7vuYGYyDRxmgQNYL6rfv6+9TGlTfaxwhHM7URtvcGL+ZNztrAiATquNl+TBdOxqclcjCrgznXsdn9NjW4Stg2oJsmw7RG9fgZ1t2Wxo7c8Gn0kwntWXCzpTUypi6nDCMZ88tDV7jzctleKB8haFX/oxf6Eq3IisMOs7NFlhGc=
+	t=1752245901; cv=none; b=ehjL2/AmW5NKiRfcUeeTy27PlpINJ6SG58Qb90zU3OIYtILmY4+CCB0ZDKMvmdxAbzzZSgotXlnvSyrMpU0n+Hxsh45cenqO+BD7oC04ByWhoUS7/tU5OvO3fkp1oO4Q3EoM1Do8uZ0jaJIad12ll33r+L6sQeI7h5a+ddmEi8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752245010; c=relaxed/simple;
-	bh=UEqcf9BWe9KSrJPz14kGQMwOPOmc8OadmITUFSWpuEg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pYlZYy6kvun/kb3ol/RHwtemwdizOWCrhnrgHMFRN6bQz8gPbIWqRdWr1OyqDHGYVI83DOlhcULwXGi//7XWZQNdv9SPQ0eoMr+D+ILnIqI9MAigTgBOn+dcskhend46wLbZhx8XOeF5MHJZBXGOh0bDLxHX8Jc/+bBJKmLCIIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sz8Vykjg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B982C4CEF0;
-	Fri, 11 Jul 2025 14:43:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752245009;
-	bh=UEqcf9BWe9KSrJPz14kGQMwOPOmc8OadmITUFSWpuEg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Sz8VykjguiAuVoV0hyJ3PDMgg7yAmfztLYWKJncQAujXcfRYc+kNt3brvzbT9mrQr
-	 AoTZ61ZcWxsrcWUchqUjn1BbWSSCdumE55cPlAKNS+v6Tv2xkexyoowYoafUKd3DzI
-	 U1F+2HQ0Bm2e2HBXXSQo811niX5aGl72URCbAQ/YeQ0Tf9oKI+auExS2hxYU65V/dZ
-	 bI4XZPP2obDEOwXc9NE+EssbLNyejXj0hMmoLwL/JhJzrURHLD85K0KQjInQw0w3hS
-	 viMtmI6ksFRptGf0lg7tnPBCNcN7wfkS+qDlnapO3FZlVmUFZ4DwQvG/PwzBY4HwfJ
-	 5CdWWhQa0J0/g==
-Date: Fri, 11 Jul 2025 15:43:23 +0100
-From: Simon Horman <horms@kernel.org>
-To: Himanshu Mittal <h-mittal1@ti.com>
-Cc: pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
-	davem@davemloft.net, andrew+netdev@lunn.ch,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, srk@ti.com,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com,
-	m-malladi@ti.com, pratheesh@ti.com, prajith@ti.com
-Subject: Re: [PATCH net v2] net: ti: icssg-prueth: Fix buffer allocation for
- ICSSG
-Message-ID: <20250711144323.GV721198@horms.kernel.org>
-References: <20250710131250.1294278-1-h-mittal1@ti.com>
+	s=arc-20240116; t=1752245901; c=relaxed/simple;
+	bh=Sya4IZecYhktVtfCvUqQruAjlPK6WvHM6B90iSMN2dQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kjKj1/HcLERx55EGpj2iLhZX26pEQzvuYSPglcXarxl1MaM2A4FZ+zI0EUb/ZYN377Pq9v0n4j2EZdWlOkupSDYAfXNTYxiBV351/KFwtVJl5kX8/mHbPIbmLcDaNOwv9Bsy2uaWPA3j54qMjQlcjjeGdIJgUxFq1CNU0oWHNKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=IId9Hb+A; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4a5851764e1so42643621cf.2
+        for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 07:58:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1752245898; x=1752850698; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2xpLl3JD2OmKi675SUm1Nkl7pyLdcDBPv23avyh/9xc=;
+        b=IId9Hb+A/p5KLntqBo8PCqBaELxv7TM8Xq5Wpq4NTGR6uTZyDHdUq6jqKU8zq3PlgZ
+         35bWi2+DQHYJlvFghQlFUTxlkg2lyO/rH58DPHm8vQESsFtAJtBJ5t/oIL+2ZuXsuIFs
+         RvBUxRXCRGZKM1M/Lxo+gpXIp+o/7pEUkTqEQ15I4kCF5yw6LPU+M3D+72DCvUc8ynde
+         YYsxh1oYDPvl2CMN7LtpRdb3OW89ymK3nTtbmLNyA/LF5G4tufQYP3fHtq49Xr1v5RD4
+         k5jEJeNREiAV6ZVRi3FUP1zYAVw8SefwV+3XiRh5lIj/u66tWNpMKpPTata1nWjzJQHY
+         xJ+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752245898; x=1752850698;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2xpLl3JD2OmKi675SUm1Nkl7pyLdcDBPv23avyh/9xc=;
+        b=hM/xbWHp4Kx+A/TP+5f5wfnPpp6BPQwoTG9RNZEIMsGWBJSuIuKx/lqUfmU7ZXXVO8
+         IzhG974LIkBCgAXGg0i9miocyhVEUSbhfukHMb/+h3F2V/CN6nb3lKEhV/Xi+j87NTUm
+         1cpZyDDGX+qr/X2ycfrI0L1beI4D1F8ioEYzpBTTagrupdo56y34OC5dL+QyMWqq231H
+         phSs95VI3OwW5YiT0YdtnHdUu5t4ls6EItWrOgGH7/fxVU+mtkg0YEQouPtrl6Z8BAUN
+         eGYQIwrdBMYpbE3DKaPFhncKIxOxylHSQRbCHKOB9C/P0alZw/Yq58lRRp6VcniEmw2V
+         rknQ==
+X-Gm-Message-State: AOJu0Yy+eI0cbmOcMV+M7r3HiYev1OVFRrirDeQ8a4YwHnnnoTZzj5xe
+	VXlIpreMyR/H9mbY1ITKBbVF9lOxfdcEGvlbgnmUjXb/Tjg3LE35h/Lr1Cf/7PwWvUoI844aeZS
+	Arb9dOPA=
+X-Gm-Gg: ASbGncuV51d22IArh7usPOshOlc+iZ46eSXAyiZ1R8CSMLx2+w3sZH9pEOAQTqVy0Mm
+	BJN6oiICOdn7ljW+7LHOZM1pE9w9yuMXdKqJK0VbOhfzkaaAdy3LMR/rFL7bPd/ui7sG7yxtm4f
+	VqOa1EKtt6+SnfG1eLF6s4JC217Y8i6gtRCQuXi8yrB2vGooScIvWmiPeezKqQkmWuSIbu+3u4U
+	0yh38g/BCM3CHU9kZD3OlvRhVWGoVp9UdNy8/B5/2xyI5wZPKPD+GRR4v3HEnHG7XrXkIkjjTs0
+	Nnfl8lhdYL47aIBdm7/w0NDlNG5jpwsjitcjmdlRCfORYvIQ42vV3gniRjiuNdfFXRe+miQbvpr
+	rS7TSad3n0Zkr1wU6PLejHNiQReNQPJazlWCAXrK8h2/IZp1MIIBb77cLmim7Sw4G50iAWzLco2
+	Y=
+X-Google-Smtp-Source: AGHT+IHL89Heh4CdilUF5hG4UKz4fj2b51QwxhHDN537ydTZFAi50FvMeaNyPPTH09uspMZNgw10pA==
+X-Received: by 2002:ac8:5d0c:0:b0:4a6:f6e6:7693 with SMTP id d75a77b69052e-4a9fb861a08mr57831191cf.6.1752245898221;
+        Fri, 11 Jul 2025 07:58:18 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4a9edc1b784sm22118351cf.12.2025.07.11.07.58.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Jul 2025 07:58:18 -0700 (PDT)
+Date: Fri, 11 Jul 2025 07:58:14 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Li Tian <litian@redhat.com>
+Cc: netdev@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Haiyang Zhang <haiyangz@microsoft.com>,
+ Dexuan Cui <decui@microsoft.com>
+Subject: Re: [PATCH v2] hv_netvsc: Set VF priv_flags to IFF_NO_ADDRCONF
+ before open to prevent IPv6 addrconf
+Message-ID: <20250711075814.1f5ae098@hermes.local>
+In-Reply-To: <20250711040623.12605-1-litian@redhat.com>
+References: <20250710024603.10162-1-litian@redhat.com>
+	<20250711040623.12605-1-litian@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250710131250.1294278-1-h-mittal1@ti.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 10, 2025 at 06:42:50PM +0530, Himanshu Mittal wrote:
-> Fixes overlapping buffer allocation for ICSSG peripheral
-> used for storing packets to be received/transmitted.
-> There are 3 buffers:
-> 1. Buffer for Locally Injected Packets
-> 2. Buffer for Forwarding Packets
-> 3. Buffer for Host Egress Packets
-> 
-> In existing allocation buffers for 2. and 3. are overlapping causing packet
-> corruption.
-> 
-> Packet corruption observations:
-> During tcp iperf testing, due to overlapping buffers the received ack
-> packet overwrites the packet to be transmitted. So, we see packets on wire
-> with the ack packet content inside the content of next TCP packet from
-> sender device.
-> 
-> Details for AM64x switch mode:
-> -> Allocation by existing driver:
-> +---------+-------------------------------------------------------------+
-> |         |          SLICE 0             |          SLICE 1             |
-> |         +------+--------------+--------+------+--------------+--------+
-> |         | Slot | Base Address | Size   | Slot | Base Address | Size   |
-> |---------+------+--------------+--------+------+--------------+--------+
-> |         | 0    | 70000000     | 0x2000 | 0    | 70010000     | 0x2000 |
-> |         | 1    | 70002000     | 0x2000 | 1    | 70012000     | 0x2000 |
-> |         | 2    | 70004000     | 0x2000 | 2    | 70014000     | 0x2000 |
-> | FWD     | 3    | 70006000     | 0x2000 | 3    | 70016000     | 0x2000 |
-> | Buffers | 4    | 70008000     | 0x2000 | 4    | 70018000     | 0x2000 |
-> |         | 5    | 7000A000     | 0x2000 | 5    | 7001A000     | 0x2000 |
-> |         | 6    | 7000C000     | 0x2000 | 6    | 7001C000     | 0x2000 |
-> |         | 7    | 7000E000     | 0x2000 | 7    | 7001E000     | 0x2000 |
-> +---------+------+--------------+--------+------+--------------+--------+
-> |         | 8    | 70020000     | 0x1000 | 8    | 70028000     | 0x1000 |
-> |         | 9    | 70021000     | 0x1000 | 9    | 70029000     | 0x1000 |
-> |         | 10   | 70022000     | 0x1000 | 10   | 7002A000     | 0x1000 |
-> | Our     | 11   | 70023000     | 0x1000 | 11   | 7002B000     | 0x1000 |
-> | LI      | 12   | 00000000     | 0x0    | 12   | 00000000     | 0x0    |
-> | Buffers | 13   | 00000000     | 0x0    | 13   | 00000000     | 0x0    |
-> |         | 14   | 00000000     | 0x0    | 14   | 00000000     | 0x0    |
-> |         | 15   | 00000000     | 0x0    | 15   | 00000000     | 0x0    |
-> +---------+------+--------------+--------+------+--------------+--------+
-> |         | 16   | 70024000     | 0x1000 | 16   | 7002C000     | 0x1000 |
-> |         | 17   | 70025000     | 0x1000 | 17   | 7002D000     | 0x1000 |
-> |         | 18   | 70026000     | 0x1000 | 18   | 7002E000     | 0x1000 |
-> | Their   | 19   | 70027000     | 0x1000 | 19   | 7002F000     | 0x1000 |
-> | LI      | 20   | 00000000     | 0x0    | 20   | 00000000     | 0x0    |
-> | Buffers | 21   | 00000000     | 0x0    | 21   | 00000000     | 0x0    |
-> |         | 22   | 00000000     | 0x0    | 22   | 00000000     | 0x0    |
-> |         | 23   | 00000000     | 0x0    | 23   | 00000000     | 0x0    |
-> +---------+------+--------------+--------+------+--------------+--------+
-> --> here 16, 17, 18, 19 overlapping with below express buffer
-> 
-> +-----+-----------------------------------------------+
-> |     |       SLICE 0       |        SLICE 1          |
-> |     +------------+----------+------------+----------+
-> |     | Start addr | End addr | Start addr | End addr |
-> +-----+------------+----------+------------+----------+
-> | EXP | 70024000   | 70028000 | 7002C000   | 70030000 | <-- Overlapping
+On Fri, 11 Jul 2025 12:06:23 +0800
+Li Tian <litian@redhat.com> wrote:
 
-Thanks for the detailed explanation with these tables.
-It is very helpful. I follow both the existing and new mappings
-with their help. Except for one thing.
-
-It's not clear how EXP was set to the values on the line above.
-Probably I'm missing something very obvious.
-Could you help me out here?
-
-> | PRE | 70030000   | 70033800 | 70034000   | 70037800 |
-> +-----+------------+----------+------------+----------+
+> Set an additional flag IFF_NO_ADDRCONF to prevent ipv6 addrconf.
 > 
-> +---------------------+----------+----------+
-> |                     | SLICE 0  |  SLICE 1 |
-> +---------------------+----------+----------+
-> | Default Drop Offset | 00000000 | 00000000 |     <-- Field not configured
-> +---------------------+----------+----------+
+> Commit 8a321cf7becc6c065ae595b837b826a2a81036b9
+> ("net: add IFF_NO_ADDRCONF and use it in bonding to prevent ipv6 addrconf")
 
-...
+
+Should be Fixes: tag since the reference commit caused the regression.
+Yes, it is a way to blame and track.
 
