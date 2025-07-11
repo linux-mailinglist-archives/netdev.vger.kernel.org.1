@@ -1,152 +1,276 @@
-Return-Path: <netdev+bounces-206053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 514F9B012E9
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 07:44:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AF95B01319
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 07:57:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16EA1764CFC
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 05:44:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84A965875FF
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 05:57:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D001C84D7;
-	Fri, 11 Jul 2025 05:44:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ILpI9yD7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F35731CBEAA;
+	Fri, 11 Jul 2025 05:57:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90A66190477;
-	Fri, 11 Jul 2025 05:44:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAD01CDA3F;
+	Fri, 11 Jul 2025 05:57:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752212689; cv=none; b=UpLflk1jlGE14MNiDs6oJXufTneLtN0ncvr4/oC4m7f7wmQx/FlrdDFx0E13qoIOEeJ+kMEs1pvd4JntZrvVVE7OH3M+wfsZBDWBi/HAdOp7u11eUAiWtVJVDkGl4jY2UBiC+Ur1fVoq44CW24FjDnutSDi6Ljt9x0S4EAPw9dI=
+	t=1752213430; cv=none; b=SVkpZsJmnzDqeGuxKgBYVIYYQxicbxOl1NZuhcQi4ZkXpsa1Y6/fKYqVDwevIdXBADPzD5H77EeB4qcykk2b25KzrggML8YRwWUhbfg41Lg0cy17gyXUGP+0agG1J6fxYCE5sFxgM1YD81+QeXAHJUKW+j4B4fjxfq/YgiB1lmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752212689; c=relaxed/simple;
-	bh=wKO0Y5rTrfPWFFv/RKw/Pm2KLgA4a1Ja9utiPd/DSTQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=smIyltLmcg9mg8Uzr9dbTPwajX+ULLg66g7fG7+osrxhMzXwzX7ewSDQUSYYT7lNzI1I1V1CXjePVsGeLhwkDNMIGFrpcvl+970ePZa79xdFQUN/3P6UuJvPj0EpxYeucUKBCeWm79wbsUxrRCGz2jmHZfXHxSScIW5pM4697cA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ILpI9yD7; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-23c8a5053c2so17557235ad.1;
-        Thu, 10 Jul 2025 22:44:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752212687; x=1752817487; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=svIj+HnRJ5qJzeh7W148yKUqf+BTVFsVDEIKrsaU+3k=;
-        b=ILpI9yD7bs//7doOxAWKc32dX4faq6B6V/XRKfYBaVxn7/hKM9K7S2CNKt33MFog1D
-         jelVSbwe6ctJwg8abiReTLZamlcWboHLlPYpsMgoUicJe+BmgdN9244OkpJYuMP87iXg
-         uL0lm7BT6Ul4js0u3TRztC+SQE5o5mz/8NulgpolbRM/0VRnnRcxHi8fflzXMx92FSgv
-         XhNAhWfZ4ysPSv7Q/iO6SSsq4u4qADLtTmWArSV7PYqpd+/DSIeYUGsVpmuNefXlhsrE
-         khKyJEDAx/9An7m8wEvvivytgjpf39ziNPGl+5dWUCPnYJNVhyAKugQEkrv1jVouT8JE
-         Buvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752212687; x=1752817487;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=svIj+HnRJ5qJzeh7W148yKUqf+BTVFsVDEIKrsaU+3k=;
-        b=KLDoxOAVXoksr/+or0H3PpHJWSqpKgvf0Ri6rIOYd/MG7UUIL/i4OQaTcK/pCjvR+F
-         2GJuBteY/+hrXbuX4aO44cfPmax+EOUflrgnVis42UJFT6PgRrGjoVjfXXlYX+MNFBVK
-         lNtmmBs+srobK4SqU00rRLTTWRS8DJrmbhppzdGs2cKMSI9kX1jSG4fhiArZlgWP8r0U
-         wb0nT7vr99QwRZZvU3Iy9fQa2sB20klJyjn9Nnng4PAhzPKBKeuk8dtQs9Ccl21NHzbx
-         ygikVfHjwk0Q/lEXpqpRFT60F4+LEtFmrkL+1nK/PRvuS9EPfxdCJ+aquontVf5BEkXt
-         Ifjg==
-X-Forwarded-Encrypted: i=1; AJvYcCWNv9B6aRMN2AzdRjU2FuswClCDUoIRrNU86t5UBG5ZKR3zCLcBrjIK0TMtPHOehZi2f9oJGr+ojtw72C0=@vger.kernel.org, AJvYcCWfXlC0vdTRD3Nb3MbVHrdbXWjNfzOd4KSc4CNTnQ7U7Do4lWLE2+VD7K/ak0f+b0xeD0n8Ak53@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuJ8CTl6RElbN0mLda2SnGLWjC9iKDZ1fws8mV7Lv0tP24xw6b
-	YeQYqxIzeLpFtLmzN3vktO3O5kXbbOQiLBw9Fia6PFtBAFyNrwLadnDY
-X-Gm-Gg: ASbGnct/8+0/4Q9Vg/8TylFUWjRIcAltVbPeI4acio1QChPkPXjSNo2vq8K9te6jpKo
-	jlibkmWY0qK/yvjR/f08kKo14pTC9s5tAPUQVYL6kVaXr5fXZPFf9M1crdsWaGE5IzUU5Gb2fHe
-	o5O70RyPGuzqDJRzmDWVdaG/g+XUkxznMTuZkT8hjq1E/8gXz14fVktZtdncPP0c4BjATaW4mp2
-	bD4TAuzH/RlGG38OwcU0uoEMXxv8yZv5gqGhC5GnmSRp6VTpVPnjxFeIvSPITZPNUr15kATh4Xs
-	ogTxw4XuWrlr9iKj9P6cj+zkYK138In7fJue9QZK0kOcMU+QM0MjY2FBKY+NXaRhhWz8NV9UuUq
-	febacXz4+jT2+ZVGhvSwZ/dHG6BE=
-X-Google-Smtp-Source: AGHT+IETvQpk29P3RsJyDGf7uVZW9zMEn+QsjSNk7a8KkH3ABLEI4V7c/X+CdOuTQf1b9nHWTfRgow==
-X-Received: by 2002:a17:902:ebc8:b0:235:dd54:bce1 with SMTP id d9443c01a7336-23df08144f3mr16042445ad.15.1752212686848;
-        Thu, 10 Jul 2025 22:44:46 -0700 (PDT)
-Received: from localhost ([2601:647:6881:9060:86b6:8b81:3098:418])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de4346b70sm38845945ad.195.2025.07.10.22.44.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Jul 2025 22:44:46 -0700 (PDT)
-Date: Thu, 10 Jul 2025 22:44:45 -0700
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: William Liu <will@willsroot.io>, netdev@vger.kernel.org,
-	jhs@mojatatu.com, victor@mojatatu.com, pctammela@mojatatu.com,
-	kuba@kernel.org, stephen@networkplumber.org, dcaratti@redhat.com,
-	savy@syst3mfailure.io, jiri@resnulli.us, davem@davemloft.net,
-	edumazet@google.com, horms@kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: This breaks netem use cases
-Message-ID: <aHCkzdhBHB8Noerp@pop-os.localdomain>
-References: <20250708164141.875402-1-will@willsroot.io>
- <aG10rqwjX6elG1Gx@pop-os.localdomain>
- <9ea58b38-921c-45a0-85cc-a586a6857eb1@redhat.com>
+	s=arc-20240116; t=1752213430; c=relaxed/simple;
+	bh=AWZ6MNmUlaSYtXsoe9LCi794qOXhSWu1+S4JWLgdYJ4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=bzbx2lYq4KWyh6dloujsGBG9RxX5kM3s8vXaPc5EV1sXfHTLJ4CBgZ18fKCl7P1QeNfTMvfUW89vTTb6pJavqVlgnkaeyWT7vo/nuxHFuYJE1QAO60jj/KFV0ENbllcb5LPY7A8VVOue7tPqxW3oDVD2Q8tsf7z8V6wJEkrP0Kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4bdgrt2qNnz13Mb0;
+	Fri, 11 Jul 2025 13:54:22 +0800 (CST)
+Received: from kwepemf100018.china.huawei.com (unknown [7.202.181.17])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9633B140144;
+	Fri, 11 Jul 2025 13:57:03 +0800 (CST)
+Received: from [10.67.120.168] (10.67.120.168) by
+ kwepemf100018.china.huawei.com (7.202.181.17) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 11 Jul 2025 13:57:02 +0800
+Message-ID: <b17987c2-ed51-780a-5a06-fdde34ce907b@hisilicon.com>
+Date: Fri, 11 Jul 2025 13:57:02 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9ea58b38-921c-45a0-85cc-a586a6857eb1@redhat.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCHv2 rdma-next 1/1] net/mlx5: Fix build -Wframe-larger-than
+ warnings
+Content-Language: en-US
+To: Zhu Yanjun <yanjun.zhu@linux.dev>, <saeedm@nvidia.com>, <leon@kernel.org>,
+	<tariqt@nvidia.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <netdev@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>
+References: <20250711030359.4419-1-yanjun.zhu@linux.dev>
+From: Junxian Huang <huangjunxian6@hisilicon.com>
+In-Reply-To: <20250711030359.4419-1-yanjun.zhu@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ kwepemf100018.china.huawei.com (7.202.181.17)
 
-On Thu, Jul 10, 2025 at 10:26:46AM +0200, Paolo Abeni wrote:
-> On 7/8/25 9:42 PM, Cong Wang wrote:
-> > (Cc LKML for more audience, since this clearly breaks potentially useful
-> > use cases)
-> > 
-> > On Tue, Jul 08, 2025 at 04:43:26PM +0000, William Liu wrote:
-> >> netem_enqueue's duplication prevention logic breaks when a netem
-> >> resides in a qdisc tree with other netems - this can lead to a
-> >> soft lockup and OOM loop in netem_dequeue, as seen in [1].
-> >> Ensure that a duplicating netem cannot exist in a tree with other
-> >> netems.
-> > 
-> > As I already warned in your previous patchset, this breaks the following
-> > potentially useful use case:
-> > 
-> > sudo tc qdisc add dev eth0 root handle 1: mq
-> > sudo tc qdisc add dev eth0 parent 1:1 handle 10: netem duplicate 100%
-> > sudo tc qdisc add dev eth0 parent 1:2 handle 20: netem duplicate 100%
-> > 
-> > I don't see any logical problem of such use case, therefore we should
-> > consider it as valid, we can't break it.
+
+
+On 2025/7/11 11:03, Zhu Yanjun wrote:
+> When building, the following warnings will appear.
+> "
+> pci_irq.c: In function ‘mlx5_ctrl_irq_request’:
+> pci_irq.c:494:1: warning: the frame size of 1040 bytes is larger than 1024 bytes [-Wframe-larger-than=]
 > 
-> My understanding is that even the solution you proposed breaks a
-> currently accepted configuration:
+> pci_irq.c: In function ‘mlx5_irq_request_vector’:
+> pci_irq.c:561:1: warning: the frame size of 1040 bytes is larger than 1024 bytes [-Wframe-larger-than=]
 > 
-> https://lore.kernel.org/netdev/CAM0EoMmBdZBzfUAms5-0hH5qF5ODvxWfgqrbHaGT6p3-uOD6vg@mail.gmail.com/
-
-Maybe it is not obvious, my patch does not reject users' setup. It
-probably has bugs, I am more than just happy to address any bugs in the
-next iteration (like for any patch), in fact it is my obligation.
-
-My appologize if I misled any of you to believe my patch is bug-free or
-perfect, it is never the case.
-
-For Jamal's patch, it is his intention to break users' setup, and this
-won't change during any iteration.
-
-They are significantly different.
-
+> eq.c: In function ‘comp_irq_request_sf’:
+> eq.c:897:1: warning: the frame size of 1080 bytes is larger than 1024 bytes [-Wframe-larger-than=]
 > 
-> I call them (both the linked one and the inline one) 'configurations'
-> instead of 'use-cases' because I don't see how any of them could have
-> real users, other than: https://xkcd.com/1172/.
+> irq_affinity.c: In function ‘irq_pool_request_irq’:
+> irq_affinity.c:74:1: warning: the frame size of 1048 bytes is larger than 1024 bytes [-Wframe-larger-than=]
+> "
+> 
+> These warnings indicate that the stack frame size exceeds 1024 bytes in
+> these functions.
+> 
+> To resolve this, instead of allocating large memory buffers on the stack,
+> it is better to use kvzalloc to allocate memory dynamically on the heap.
+> This approach reduces stack usage and eliminates these frame size warnings.
+> 
+> Signed-off-by: Zhu Yanjun <yanjun.zhu@linux.dev>
+> ---
+> v1 -> v2: Add kvfree to error handler;
+> 
+> 1. This commit only build tests;
+> 2. All the changes are on configuration path, will not make difference
+> on the performance;
+> 3. This commit is just to fix build warnings, not error or bug fixes. So
+> not Fixes tag.
+> ---
+>  drivers/net/ethernet/mellanox/mlx5/core/eq.c  | 24 +++++++----
+>  .../mellanox/mlx5/core/irq_affinity.c         | 19 +++++++--
+>  .../net/ethernet/mellanox/mlx5/core/pci_irq.c | 40 +++++++++++++------
+>  3 files changed, 60 insertions(+), 23 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+> index dfb079e59d85..4938dd7c3a09 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+> @@ -873,19 +873,29 @@ static int comp_irq_request_sf(struct mlx5_core_dev *dev, u16 vecidx)
+>  {
+>  	struct mlx5_irq_pool *pool = mlx5_irq_table_get_comp_irq_pool(dev);
+>  	struct mlx5_eq_table *table = dev->priv.eq_table;
+> -	struct irq_affinity_desc af_desc = {};
+> +	struct irq_affinity_desc *af_desc;
+>  	struct mlx5_irq *irq;
+>  
+> +	af_desc = kvzalloc(sizeof(*af_desc), GFP_KERNEL);
+> +	if (!af_desc)
+> +		return -ENOMEM;
+> +
+>  	/* In case SF irq pool does not exist, fallback to the PF irqs*/
+> -	if (!mlx5_irq_pool_is_sf_pool(pool))
+> +	if (!mlx5_irq_pool_is_sf_pool(pool)) {
+> +		kvfree(af_desc);
+>  		return comp_irq_request_pci(dev, vecidx);
+> +	}
+>  
+> -	af_desc.is_managed = false;
+> -	cpumask_copy(&af_desc.mask, cpu_online_mask);
+> -	cpumask_andnot(&af_desc.mask, &af_desc.mask, &table->used_cpus);
+> -	irq = mlx5_irq_affinity_request(dev, pool, &af_desc);
+> -	if (IS_ERR(irq))
+> +	af_desc->is_managed = false;
+> +	cpumask_copy(&af_desc->mask, cpu_online_mask);
+> +	cpumask_andnot(&af_desc->mask, &af_desc->mask, &table->used_cpus);
+> +	irq = mlx5_irq_affinity_request(dev, pool, af_desc);
+> +	if (IS_ERR(irq)) {
+> +		kvfree(af_desc);
+>  		return PTR_ERR(irq);
+> +	}
+> +
+> +	kvfree(af_desc);
+>  
+>  	cpumask_or(&table->used_cpus, &table->used_cpus, mlx5_irq_get_affinity_mask(irq));
+>  	mlx5_core_dbg(pool->dev, "IRQ %u mapped to cpu %*pbl, %u EQs on this irq\n",
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
+> index 2691d88cdee1..82d3c2568244 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
+> @@ -47,29 +47,40 @@ static int cpu_get_least_loaded(struct mlx5_irq_pool *pool,
+>  static struct mlx5_irq *
+>  irq_pool_request_irq(struct mlx5_irq_pool *pool, struct irq_affinity_desc *af_desc)
+>  {
+> -	struct irq_affinity_desc auto_desc = {};
+> +	struct irq_affinity_desc *auto_desc;
+>  	struct mlx5_irq *irq;
+>  	u32 irq_index;
+>  	int err;
+>  
+> +	auto_desc = kvzalloc(sizeof(*auto_desc), GFP_KERNEL);
+> +	if (!auto_desc)
+> +		return ERR_PTR(-ENOMEM);
+> +
+>  	err = xa_alloc(&pool->irqs, &irq_index, NULL, pool->xa_num_irqs, GFP_KERNEL);
+> -	if (err)
+> +	if (err) {
+> +		kvfree(auto_desc);
+>  		return ERR_PTR(err);
+> +	}
 
-Please let me know if you have any other way to use netem duplication on
-a multiqueue NIC _directly_ without worrying about the global spinlock.
+Acked-by: Junxian Huang <huangjunxian6@hisilicon.com>
 
-I bet you have none. Either you need to use it indirectly (attaching to
-a non-root) or you have to face the global spinlock (aka without using
-mq).
-
-I am open to your education. :)
-
-Thanks a lot!
+> +
+>  	if (pool->irqs_per_cpu) {
+>  		if (cpumask_weight(&af_desc->mask) > 1)
+>  			/* if req_mask contain more then one CPU, set the least loadad CPU
+>  			 * of req_mask
+>  			 */
+>  			cpumask_set_cpu(cpu_get_least_loaded(pool, &af_desc->mask),
+> -					&auto_desc.mask);
+> +					&auto_desc->mask);
+>  		else
+>  			cpu_get(pool, cpumask_first(&af_desc->mask));
+>  	}
+> +
+>  	irq = mlx5_irq_alloc(pool, irq_index,
+> -			     cpumask_empty(&auto_desc.mask) ? af_desc : &auto_desc,
+> +			     cpumask_empty(&auto_desc->mask) ? af_desc : auto_desc,
+>  			     NULL);
+>  	if (IS_ERR(irq))
+>  		xa_erase(&pool->irqs, irq_index);
+> +
+> +	kvfree(auto_desc);
+> +
+>  	return irq;
+>  }
+>  
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
+> index 40024cfa3099..48aad94b0a5d 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
+> @@ -470,26 +470,32 @@ void mlx5_ctrl_irq_release(struct mlx5_core_dev *dev, struct mlx5_irq *ctrl_irq)
+>  struct mlx5_irq *mlx5_ctrl_irq_request(struct mlx5_core_dev *dev)
+>  {
+>  	struct mlx5_irq_pool *pool = ctrl_irq_pool_get(dev);
+> -	struct irq_affinity_desc af_desc;
+> +	struct irq_affinity_desc *af_desc;
+>  	struct mlx5_irq *irq;
+>  
+> -	cpumask_copy(&af_desc.mask, cpu_online_mask);
+> -	af_desc.is_managed = false;
+> +	af_desc = kvzalloc(sizeof(*af_desc), GFP_KERNEL);
+> +	if (!af_desc)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	cpumask_copy(&af_desc->mask, cpu_online_mask);
+> +	af_desc->is_managed = false;
+>  	if (!mlx5_irq_pool_is_sf_pool(pool)) {
+>  		/* In case we are allocating a control IRQ from a pci device's pool.
+>  		 * This can happen also for a SF if the SFs pool is empty.
+>  		 */
+>  		if (!pool->xa_num_irqs.max) {
+> -			cpumask_clear(&af_desc.mask);
+> +			cpumask_clear(&af_desc->mask);
+>  			/* In case we only have a single IRQ for PF/VF */
+> -			cpumask_set_cpu(cpumask_first(cpu_online_mask), &af_desc.mask);
+> +			cpumask_set_cpu(cpumask_first(cpu_online_mask), &af_desc->mask);
+>  		}
+>  		/* Allocate the IRQ in index 0. The vector was already allocated */
+> -		irq = irq_pool_request_vector(pool, 0, &af_desc, NULL);
+> +		irq = irq_pool_request_vector(pool, 0, af_desc, NULL);
+>  	} else {
+> -		irq = mlx5_irq_affinity_request(dev, pool, &af_desc);
+> +		irq = mlx5_irq_affinity_request(dev, pool, af_desc);
+>  	}
+>  
+> +	kvfree(af_desc);
+> +
+>  	return irq;
+>  }
+>  
+> @@ -548,16 +554,26 @@ struct mlx5_irq *mlx5_irq_request_vector(struct mlx5_core_dev *dev, u16 cpu,
+>  {
+>  	struct mlx5_irq_table *table = mlx5_irq_table_get(dev);
+>  	struct mlx5_irq_pool *pool = table->pcif_pool;
+> -	struct irq_affinity_desc af_desc;
+> +	struct irq_affinity_desc *af_desc;
+>  	int offset = MLX5_IRQ_VEC_COMP_BASE;
+> +	struct mlx5_irq *irq;
+> +
+> +	af_desc = kvzalloc(sizeof(*af_desc), GFP_KERNEL);
+> +	if (!af_desc)
+> +		return ERR_PTR(-ENOMEM);
+>  
+>  	if (!pool->xa_num_irqs.max)
+>  		offset = 0;
+>  
+> -	af_desc.is_managed = false;
+> -	cpumask_clear(&af_desc.mask);
+> -	cpumask_set_cpu(cpu, &af_desc.mask);
+> -	return mlx5_irq_request(dev, vecidx + offset, &af_desc, rmap);
+> +	af_desc->is_managed = false;
+> +	cpumask_clear(&af_desc->mask);
+> +	cpumask_set_cpu(cpu, &af_desc->mask);
+> +
+> +	irq = mlx5_irq_request(dev, vecidx + offset, af_desc, rmap);
+> +
+> +	kvfree(af_desc);
+> +
+> +	return irq;
+>  }
+>  
+>  static struct mlx5_irq_pool *
 
