@@ -1,106 +1,154 @@
-Return-Path: <netdev+bounces-206174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3046FB01E58
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 15:52:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83660B01EAB
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 16:07:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 799D95A5F82
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 13:52:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DBC03B5803
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 14:06:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4835E2DCBF7;
-	Fri, 11 Jul 2025 13:51:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 942F22E040E;
+	Fri, 11 Jul 2025 14:06:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UYERQJLk"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="edh4/NK1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 215F72D97A2;
-	Fri, 11 Jul 2025 13:51:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F26B42DE6E6;
+	Fri, 11 Jul 2025 14:06:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752241918; cv=none; b=cr1Z5jRaKXwJmNo0pGxZ1i+6TH20ukTSxSC+jeEBbrJJp5XU4jUXnR5ZxjpZJxyfPeKtqUlzwSY8vzBr7rWD4YOf/F7b66IsgoO9WdgBQpn4C5zHxcwwA9B5dMqYybaElUUsTfqkugKod/yOlyPXblY5YB0Hot4U82Sp7DxCpU0=
+	t=1752242795; cv=none; b=g80tCrGt4W37Lufaluual2RK/RJ0poeAJwnbxo9Yyn4wCrqGvs64CDVbya1ER7S7ysTIVizIKolKubZZjTzjSRUxaQI/3ajm4T9SkgS1GnZVLvtaxYeIOuCNGdzJT1WebxH1rm6dt3dErMDFQkhH4qY2Hesbzka29w3lfRtWDTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752241918; c=relaxed/simple;
-	bh=gRYeWY8Ue9r1jN9YT5ewnploOKjK9ri5RO9mKqQvmVo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Y02/07Lj4QV7jO33fb/Vq0eU0JwaMvRIg2Til+k7jVdPxc9PJ4L5jIt1klN6hj7Z+bzJOoE5+KZN4oAm7sUEn7w/QBFfC1+ML5veyiRekxI4t3iTmi13jRzqAE49nzngV/0iASUGZlqeHnO4YP1h9BhN+vydWzR/sn+igFmZ+KY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UYERQJLk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1684FC4CEF9;
-	Fri, 11 Jul 2025 13:51:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752241917;
-	bh=gRYeWY8Ue9r1jN9YT5ewnploOKjK9ri5RO9mKqQvmVo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UYERQJLkSJKOTk5V7QJ/3A+QDttYxwbWTbb/D3nGl4j2G2ydS2cqmdvjcE/XOqJk5
-	 TCsCTR7TwYbP06k7ifflZTo0EJWFRRPJOz2x1lD0xunGK/Y3jYO4EOx9YNOHDFiXIT
-	 K750YtN2FULM+apYWbs1duI6j9XlpKJyRv5MCqiFepksD5N7QGu8sUiHm4LniI5Jp9
-	 yapUlRKZtIRQtAE7zd7p3QkHxlB+9o9O72wLv+bVwbmc/5a4OOrRvlLki7E2P15PM3
-	 gLFU7vloO0Ma+2qWXzh0Ly/cf5jEesDHJOieuLGUyGIGRz3rjhyKOkb796T3tG29Lu
-	 JDYPgjHaY1g0Q==
-Date: Fri, 11 Jul 2025 06:51:56 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Parav Pandit <parav@nvidia.com>
-Cc: Dragos Tatulea <dtatulea@nvidia.com>, "almasrymina@google.com"
- <almasrymina@google.com>, "asml.silence@gmail.com"
- <asml.silence@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Saeed Mahameed
- <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Cosmin Ratiu
- <cratiu@nvidia.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next 1/4] net: Allow non parent devices to be used for
- ZC DMA
-Message-ID: <20250711065156.0d51199e@kernel.org>
-In-Reply-To: <CY8PR12MB71956FF1D74C1EAE3401891CDC4BA@CY8PR12MB7195.namprd12.prod.outlook.com>
-References: <20250702172433.1738947-1-dtatulea@nvidia.com>
-	<20250702172433.1738947-2-dtatulea@nvidia.com>
-	<20250702113208.5adafe79@kernel.org>
-	<c5pxc7ppuizhvgasy57llo2domksote5uvo54q65shch3sqmkm@bgcnojnxt4hh>
-	<20250702135329.76dbd878@kernel.org>
-	<CY8PR12MB7195361C14592016B8D2217DDC43A@CY8PR12MB7195.namprd12.prod.outlook.com>
-	<20250710165851.7c86ba84@kernel.org>
-	<CY8PR12MB71956FF1D74C1EAE3401891CDC4BA@CY8PR12MB7195.namprd12.prod.outlook.com>
+	s=arc-20240116; t=1752242795; c=relaxed/simple;
+	bh=+hOpGDR958pfeCJ341dbAXFobwN1RVoXZXOh+QzDIbU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZUMU2F9rqotbSFUvmuvGnonNf/ml7lWYqWUqXbH81JzA48ooge6BRuc0Xd2dkOfCB2f6AEDKHrKcbGZFEXKCkXf+Fb+xsK0RNIWg2cm2Fb+gAnXNWz9rvbRGHG/KtZdV5GOMFvB16tIc/lMsrN/pZYLi9UFYp88xY7hTrTq1qwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=edh4/NK1; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56BDgiiX007804;
+	Fri, 11 Jul 2025 14:06:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=corp-2025-04-25; bh=Nu+HKnOEwgShghEL
+	a7WQcOASZjIV4FEdtBpsIJxTXv8=; b=edh4/NK1FwGDNvN1eSm9yaGdcor5IebR
+	vc+jfiY8HM14gFlYi6vbGMmY+s8GnZgdEF6JY0564CCv7TDa8619Is6zLvsEp6b6
+	ChZR0NGcoIGa1HA3Tb29vxwXR7lpEHgaixHvVS7Q9BHiYQziMoJOFbLDRC+wWLY3
+	y4wmDsOQucCIibIGqquJ/9cuBCrxIYVAaSMKluQfVOtfUaikpaFpcKp3uE5fg/G4
+	q1i07Zpu4aOjOSOVisE0JGxURU1oqOhfWUIdL+wf1gzaeMeGB5SWzd9lBzahl4RA
+	aUiaq5GJdiTaUCJG5qtQ7s6qJ4tkGfhjzvhrM3t9YaFXI9XPr3HQUw==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 47u3qpg1ng-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 11 Jul 2025 14:06:17 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 56BC5aOP027448;
+	Fri, 11 Jul 2025 14:06:16 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 47ptgdkk32-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 11 Jul 2025 14:06:16 +0000
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 56BE6Frj032682;
+	Fri, 11 Jul 2025 14:06:15 GMT
+Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 47ptgdkjxe-1;
+	Fri, 11 Jul 2025 14:06:15 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: sgoutham@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        horms@kernel.org, netdev@vger.kernel.org
+Cc: alok.a.tiwari@oracle.com, linux-arm-kernel@lists.infradead.org,
+        darren.kenny@oracle.com, linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v3] net: thunderx: Fix format-truncation warning in bgx_acpi_match_id()
+Date: Fri, 11 Jul 2025 07:05:30 -0700
+Message-ID: <20250711140532.2463602-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-07-11_03,2025-07-09_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 adultscore=0
+ suspectscore=0 phishscore=0 mlxlogscore=999 bulkscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
+ definitions=main-2507110100
+X-Proofpoint-ORIG-GUID: cFBORv1YaTLN0JjpskotdNEKFt1USsBN
+X-Authority-Analysis: v=2.4 cv=L4AdQ/T8 c=1 sm=1 tr=0 ts=68711a59 b=1 cx=c_pps a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8 a=xO2tqtdlJwZuTTCz-PAA:9 a=3ZKOabzyN94A:10
+ a=QEXdDO2ut3YA:10 cc=ntf awl=host:12061
+X-Proofpoint-GUID: cFBORv1YaTLN0JjpskotdNEKFt1USsBN
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzExMDEwMCBTYWx0ZWRfXwi8UV4ufyjvg 06j0/3Ill/N8+mJTi6eO9wWPNcMdcnyc9vMcKGohdwEAMRdbOipIesE9+qvZq7cZ1PzvjcWIpBp 3jpZEfyRymxz/pb6C2pwY4NngCFZXq6LjwrcNqtCMf9eiQNwfp+Jfc1y7q9J1CrH0tTipzqMfN6
+ DuRkc9RThOeWeLvAEndHWCiPhSK0XqlWNPdb95gddNGdb/921IRkliPEJsJvc/81c99mO3S7eVn S4+zsisofXk+uSeNIRY616JTNzehAd6o7AcEX7C+e9EWiaXP32cAMxHUCAAinxdpXtH4ucW8/zP ETH8h5PKz22Tz08tjPyfyIY7CoUJUaZOTyTuGEcR0Ibz2jSNoZTZM8lxtcx6Aer6j8BL3c737Q4
+ fcUfJdDyIitRzZRkn6sUTYILpF/W0ZKKfl2nBOpV4haJr3gLgL3fiR0QdXl5ZJKnciI0A+DM
 
-On Fri, 11 Jul 2025 02:52:23 +0000 Parav Pandit wrote:
-> > On Thu, 3 Jul 2025 11:58:50 +0000 Parav Pandit wrote:  
-> > > > In my head subfunctions are a way of configuring a PCIe PASID ergo
-> > > > they _only_ make sense in context of DMA.  
-> > > SF DMA is on the parent PCI device.
-> > >
-> > > SIOV_R2 will have its own PCI RID which is ratified or getting ratified.
-> > > When its done, SF (as SIOV_R2 device) instantiation can be extended
-> > > with its own PCI RID. At that point they can be mapped to a VM.  
-> > 
-> > AFAIU every PCIe transaction for a queue with a PASID assigned should have a
-> > PASID prefix. Why is a different RID necessary?
-> > CPUs can't select IOMMU context based on RID+PASID?  
-> It can, however,
-> PASID is meant to be used for process isolation and not expected to
-> be abused for identify the device. Doing so, would also prohibits
-> using PASID inside the VM. It requires another complex vPASID to
-> pPASID translation.
-> 
-> Tagging MSI-X interrupts with PASID is another challenge.
-> For CC defining isolation boundary with RID+PASID was yet another
-> hack.
-> 
-> There were other issues in splitting PASID for device scaling vs
-> process scaling for dual use.
-> 
-> So it was concluded to opt to avoid that abuse and use the standard
-> RID construct for device identification.
+The buffer bgx_sel used in snprintf() was too small to safely hold
+the formatted string "BGX%d" for all valid bgx_id values. This caused
+a -Wformat-truncation warning with `Werror` enabled during build.
 
-I see, that explains it. Thanks Parav!
+Increase the buffer size from 5 to 7 and use `sizeof(bgx_sel)` in
+snprintf() to ensure safety and suppress the warning.
+
+Build warning:
+  CC      drivers/net/ethernet/cavium/thunder/thunder_bgx.o
+  drivers/net/ethernet/cavium/thunder/thunder_bgx.c: In function
+‘bgx_acpi_match_id’:
+  drivers/net/ethernet/cavium/thunder/thunder_bgx.c:1434:27: error: ‘%d’
+directive output may be truncated writing between 1 and 3 bytes into a
+region of size 2 [-Werror=format-truncation=]
+    snprintf(bgx_sel, 5, "BGX%d", bgx->bgx_id);
+                             ^~
+  drivers/net/ethernet/cavium/thunder/thunder_bgx.c:1434:23: note:
+directive argument in the range [0, 255]
+    snprintf(bgx_sel, 5, "BGX%d", bgx->bgx_id);
+                         ^~~~~~~
+  drivers/net/ethernet/cavium/thunder/thunder_bgx.c:1434:2: note:
+‘snprintf’ output between 5 and 7 bytes into a destination of size 5
+    snprintf(bgx_sel, 5, "BGX%d", bgx->bgx_id);
+
+compiler warning due to insufficient snprintf buffer size.
+
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
+v2->v3
+added Reviewed-by: Simon
+used bgx_sel[7] as suggested by Jakub Kicinski
+https://lore.kernel.org/all/20250710153422.6adae255@kernel.org/
+v1->v2
+No changes. Targeting for net-next.
+https://lore.kernel.org/all/20250708160957.GQ452973@horms.kernel.org/
+---
+ drivers/net/ethernet/cavium/thunder/thunder_bgx.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+index 3b7ad744b2dd6..21495b5dce254 100644
+--- a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
++++ b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+@@ -1429,9 +1429,9 @@ static acpi_status bgx_acpi_match_id(acpi_handle handle, u32 lvl,
+ {
+ 	struct acpi_buffer string = { ACPI_ALLOCATE_BUFFER, NULL };
+ 	struct bgx *bgx = context;
+-	char bgx_sel[5];
++	char bgx_sel[7];
+ 
+-	snprintf(bgx_sel, 5, "BGX%d", bgx->bgx_id);
++	snprintf(bgx_sel, sizeof(bgx_sel), "BGX%d", bgx->bgx_id);
+ 	if (ACPI_FAILURE(acpi_get_name(handle, ACPI_SINGLE_NAME, &string))) {
+ 		pr_warn("Invalid link device\n");
+ 		return AE_OK;
+-- 
+2.46.0
+
 
