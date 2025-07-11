@@ -1,84 +1,87 @@
-Return-Path: <netdev+bounces-206028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1488B01117
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 04:07:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FD1FB01120
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 04:14:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0CEF1CA1A64
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 02:07:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34A05648431
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 02:13:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BFC0146A66;
-	Fri, 11 Jul 2025 02:07:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 016CA146A66;
+	Fri, 11 Jul 2025 02:14:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b0o1sq+f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gJGm4sqI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB75347DD;
-	Fri, 11 Jul 2025 02:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DBCEB665;
+	Fri, 11 Jul 2025 02:14:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752199652; cv=none; b=G9RN1TDJkTsBN3N4fbDV0asVYt5URBZL/ivVJvG8ZAaynGV4nMQjsvIJrA8OVRFSF+0rqzwa1rt5NrKF8jvYSbk9glItGO9H7wEntrJuxdxRjmRoJEpPA8nq+d2PHkMRFzHHwXOz+wdYYK3hIhskXuEHlrL7Zmp8x8pnOufkWU4=
+	t=1752200052; cv=none; b=VoLwq5SyBXifbRhZKXDEhaUfNCsb3j7st/KbnrW8hjgmxE2PXAjtRUjxcnB+36p/5yAcMQ4B7o4/xUEkNNQUZIMmPYm/Cd44p/FKmX33bY91x5jWsqQh7eiFv+ZKbDODXEZcVZ53gdpae0DhGYn7+S0AwFipticv51esi4HyCD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752199652; c=relaxed/simple;
-	bh=PvjSKPyD0gXbh2bB6YpiAqsa881j4RTXn+Ts3T8ihPM=;
+	s=arc-20240116; t=1752200052; c=relaxed/simple;
+	bh=LCrOwh5T+ylicI25k9ihSwSw7r5zv4k5mJRrI6eCl8Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xte4W+9m/6bPNl3PQAdmGl1l6KofGvP6aC909kGj2aIkH9Yhq3USBVjufNuZSR3TfQkR5gsyn/Rh93oth9pS1PHGmAPevpFvclCQla/psQNDcGiKDa3Hjd9czMY1ccKGu5eEEQV/nfG3cNkdt42CyRTTupOQjLrIY/mtX8TUDPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b0o1sq+f; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752199649; x=1783735649;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=PvjSKPyD0gXbh2bB6YpiAqsa881j4RTXn+Ts3T8ihPM=;
-  b=b0o1sq+fiQ9oUkAwWKvaPFjoh6Jgx9TcAEHn0kT3jiUI0W4le81yjwCs
-   WBUSZR5VqUVu2a14xyQN/JQbwBRrutUBPGFRzwVoVpi83Dv0pwqWXUhgK
-   wmsjmlR1DLsmxJHqT4QrYfvjM5gmucyQ0LMk/5qilbqmHBMrVNZbtxGvT
-   jTqkFQWnGw97I0kP+szuYdmP7IdPuzD9XcdkJ+M2VSjyyJdvNQ8CnDrr2
-   cJmJ1aoKC9jBaIfqiXnJtoyhdThpsBzfjKHOIamyF8fPKzZJHDDnd5sDb
-   6BZMfAV0u/Cw7pX4Nm5OkwfcuPFLUitxXymm395cFfwA3kH64/RHkp4un
-   g==;
-X-CSE-ConnectionGUID: SxJy35KLRX+crdHurMv2CA==
-X-CSE-MsgGUID: UR7Y/F2TSGG2EcY+mgmv9Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11490"; a="77040273"
-X-IronPort-AV: E=Sophos;i="6.16,302,1744095600"; 
-   d="scan'208";a="77040273"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2025 19:07:29 -0700
-X-CSE-ConnectionGUID: ezwbokgsSPCaJxheSsnC4A==
-X-CSE-MsgGUID: 56D/N/8bSouThmQuhjJlFg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,302,1744095600"; 
-   d="scan'208";a="160583219"
-Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
-  by orviesa003.jf.intel.com with ESMTP; 10 Jul 2025 19:07:24 -0700
-Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1ua3AY-0005jj-1k;
-	Fri, 11 Jul 2025 02:07:22 +0000
-Date: Fri, 11 Jul 2025 10:06:59 +0800
-From: kernel test robot <lkp@intel.com>
-To: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, Saeed Mahameed <saeed@kernel.org>,
-	Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
-	Jonathan Corbet <corbet@lwn.net>, linux-rdma@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Dragos Tatulea <dtatulea@nvidia.com>
-Subject: Re: [PATCH net-next V2 2/3] net/mlx5e: Add device PCIe congestion
- ethtool stats
-Message-ID: <202507110932.iOkSE74e-lkp@intel.com>
-References: <1752130292-22249-3-git-send-email-tariqt@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rWbbM9vZfhJkHuqk533Xyp3B8wn2McZRnH0oaSmUD6P53VxUhnj4UdWGYPBRxQG5K+XdA+RHeuncqoMx8r8/PVfP0ecZIzifyegD2miPL7O50ohXxhe8j+CvyAH9bGlRxZ6RMiPwGvFRBOGvSDxZFwBi3FguPxQe7EP9IlDicRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gJGm4sqI; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-749248d06faso1429790b3a.2;
+        Thu, 10 Jul 2025 19:14:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752200051; x=1752804851; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eDVaSyXHOgKkfMXp9CzyBGiGzi34di4+wXZorD4U00k=;
+        b=gJGm4sqIYm2FHSLmIrJQFmSmK5ncNbcW4yIerAX+EMDe1v2E21iO1mMf9O1ktWiPjr
+         A9eUD3uelLczoYtm3fAxFS5nVfqitkHlF2lFs5I+pfkL9P2IPBDo1WSWk5swXADa95qw
+         J8xi3+f1msn/KMn5cY5v6GHORJQzChH/MBzVjgaECpms2YznFvnoZ8NMKeH0vLC8dS/W
+         3/iebThbR+xsCXL7em6Jg5GDhgMaNW0rrVVVHVY27DdKwar/ZeVImYn4o+RaPyQiM0Pc
+         Q5VWApw8YP7sbYGsirWFVbkMUt4Qsa5rJ635sZ+2MmlWd7ia+FYiKXJ982W8b//fMmIj
+         v+7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752200051; x=1752804851;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eDVaSyXHOgKkfMXp9CzyBGiGzi34di4+wXZorD4U00k=;
+        b=mmlC93DRAjz/Yz6mwj+zJD1YX4V0q5FpXhjfpQkD50YsakeOaasST7+hFcb8AngUMa
+         YETkoGUt46R2Npjid1Ghw1JD8xdBMpjjNlRy3H7z3CHBFSi+7xK6WfZt90Ws0fY4RnlX
+         Tc4/d4iKY+vwv8kCHXdiu1dkphmdl96zaZk8R4oWdJDd5XoGram6NI7wpx+wchcN8noM
+         A9ZCNx+ktml4rIlnAyLwprOcLEuwV4rMtQSNmlFmEV88cS7M4EG5jcLCByd1Hkvz8woJ
+         +B4XUqTj3FGCEy7LaSbrVLydo68cQ2OvNHrCXkja0cyZGo+tILqlQg3uhr/S+j5Xjd1n
+         I+mg==
+X-Forwarded-Encrypted: i=1; AJvYcCUzGz8VQyVksU8W7Ah5dxSJAJvqJ5ycrM3xZt26I2QdAnPz872Szi/s/06cw7MAByft4cFbqC372sDhvZf70o4=@vger.kernel.org, AJvYcCVqkacqVY5CmtfJ8ECpsk1SweEW/ko9FuPaatSyNRx1Q9QDZX+Gl+s+X/LFusqI/fRqEKKU8vF9@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywred9n++FA1NYPpbF3trYNtRkjNRlm45I3QKjxcGeVpiB/7VCI
+	SZ2OT/oelktaKFHwCPwQwQKKFvLdkwNnBBYbConz27DTBqQgEpbyhFQq
+X-Gm-Gg: ASbGncuYCFpzE0s7ageaBGwfE6gCyiopzneTl+2cQSEzVpLeg8ZR9v5rYjDZQ3g/NBM
+	Nm4GM8OAs/pEa8ZyIBrTDR8523u7PEZnptYtGVqiiBK5FHzeWBZ8NKGay3c3CqxQpCVCHAFG/cK
+	WUflETljVjYXkIYiDHm3XWG9t7W+8pHnmGLspq5jtpuYhd22psmD65zC4g10CuZobPy2sJUh41B
+	m8HffJ0w4bBzOSwV82CC05RwqfixKsQuQrvdJ5j536XltHVM1UDioPYjGCnvi4gVgh4s0Q9fNob
+	ODJS3IcGcMD0ddQAWWkLNqUBhMsLIdk6kUSrcxTJPw/oe/Caw1pN4GncQwFrj+keCe1djfwCslp
+	xlWoA8X7u7vXNcFdIumtH+YmhGoA=
+X-Google-Smtp-Source: AGHT+IHFNG+mkaoyTbxab0Dd/8KAN1YsV1lJbxpq7TB3WKjPwYmtrNAjCLeCdS4zcakk+sW0UpC4oA==
+X-Received: by 2002:a05:6a20:549d:b0:1f5:6f95:2544 with SMTP id adf61e73a8af0-231202f284fmr2235036637.33.1752200050765;
+        Thu, 10 Jul 2025 19:14:10 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74eb9dd5e9asm3854821b3a.25.2025.07.10.19.14.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Jul 2025 19:14:10 -0700 (PDT)
+Date: Fri, 11 Jul 2025 02:14:03 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	shuah@kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net] selftests: rtnetlink: try double sleep to give WQ a
+ chance
+Message-ID: <aHBza5P50wcKjG_h@fedora>
+References: <20250710145312.3361964-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,32 +90,64 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1752130292-22249-3-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <20250710145312.3361964-1-kuba@kernel.org>
 
-Hi Tariq,
+On Thu, Jul 10, 2025 at 07:53:12AM -0700, Jakub Kicinski wrote:
+> The rtnetlink test for preferred lifetime of an address is quite flaky.
+> Problems started around the 6.16 merge window in May. The test fails
+> with:
+> 
+>    FAIL: preferred_lft addresses remaining
+> 
+> and unlike most of our flakes this one fails on the "normal" kernel
+> builds, not the builds with kernel/configs/debug.config. I suspect
+> the flakes may be related to power saving, since the expirations
+> run from a "power efficient" workqueue. Adding a short sleep seems
+> to decrease the flakes by 8x but they still happen. With this
+> patch in place we get a flake every couple of weeks, not every
+> couple of days. Better ideas welcome..
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: liuhangbin@gmail.com
+> CC: shuah@kernel.org
+> CC: linux-kselftest@vger.kernel.org
+> ---
+>  tools/testing/selftests/net/rtnetlink.sh | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
+> index 2e8243a65b50..b9e1497ea27a 100755
+> --- a/tools/testing/selftests/net/rtnetlink.sh
+> +++ b/tools/testing/selftests/net/rtnetlink.sh
+> @@ -299,6 +299,11 @@ kci_test_addrlft()
+>  	done
+>  
+>  	sleep 5
+> +	# Schedule out for a bit, address GC runs from the power efficient WQ
+> +	# if the long sleep above has put the whole system into sleep state
+> +	# the WQ may have not had a chance to run.
+> +	sleep 0.1
+> +
 
-kernel test robot noticed the following build errors:
+How about use slowwait to check if the address still exists. e.g.
 
-[auto build test ERROR on c65d34296b2252897e37835d6007bbd01b255742]
+check_addr_not_exist()
+{
+	dev=$1
+	addr=$2
+	if ip addr show dev $dev | grep -q $addr; then
+		return 1
+	else
+		return 0
+}
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Tariq-Toukan/net-mlx5e-Create-destroy-PCIe-Congestion-Event-object/20250710-145940
-base:   c65d34296b2252897e37835d6007bbd01b255742
-patch link:    https://lore.kernel.org/r/1752130292-22249-3-git-send-email-tariqt%40nvidia.com
-patch subject: [PATCH net-next V2 2/3] net/mlx5e: Add device PCIe congestion ethtool stats
-config: powerpc-randconfig-003-20250711 (https://download.01.org/0day-ci/archive/20250711/202507110932.iOkSE74e-lkp@intel.com/config)
-compiler: clang version 21.0.0git (https://github.com/llvm/llvm-project 01c97b4953e87ae455bd4c41e3de3f0f0f29c61c)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250711/202507110932.iOkSE74e-lkp@intel.com/reproduce)
+	slowwait 5 check_addr_not_exist "$devdummy" "10.23.11."
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507110932.iOkSE74e-lkp@intel.com/
-
-All errors (new ones prefixed by >>, old ones prefixed by <<):
-
->> ERROR: modpost: "mlx5e_pcie_cong_event_supported" [drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.ko] undefined!
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>  	run_cmd_grep_fail "10.23.11." ip addr show dev "$devdummy"
+>  	if [ $? -eq 0 ]; then
+>  		check_err 1
+> -- 
+> 2.50.0
+> 
 
