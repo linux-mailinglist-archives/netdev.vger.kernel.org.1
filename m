@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-205979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E052EB01030
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 02:30:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BED00B01031
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 02:30:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7EC51C80992
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 00:30:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C7875A8466
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 00:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82F56179A7;
-	Fri, 11 Jul 2025 00:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 521008F77;
+	Fri, 11 Jul 2025 00:30:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CgJorz3S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="prfmW5Q5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5824D38B;
-	Fri, 11 Jul 2025 00:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29A3D2BAF4;
+	Fri, 11 Jul 2025 00:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752193799; cv=none; b=r9jumlGieSddL8hz2aDfcdGyRHfXXoErDrMcoBn1QoxXxJ3//6wQ49FV9l91gc7DWs0Vhg6cPCQ5jzYyfXzCNJXZWj1cDiQ9QMILEUZZ8FcWilT9BYeIQas8K0K0IlAIPE56Vp6r8MWs+enCVTfLoLHhY/GtQAzL875kdkSqo5U=
+	t=1752193801; cv=none; b=lJ3/EOAENi13Pr5/sExT5oPs4liEvlZXEmPLJh8tHQEeezZzKcIz78CO5vkPcnNOCty+AH3pJ/zPRNlVssxCX+mwa805l27+BSiW6NOqHcLDIorsoMdwK61KQ7d5I7DyHcxkXr75qeyIYypxxGC+ao6uebj6GhPvuoF74y0xKRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752193799; c=relaxed/simple;
-	bh=AlVgBpWJ8JPmmDOEbAT1bu+FMyG/5fyU5Tu5MVASOmQ=;
+	s=arc-20240116; t=1752193801; c=relaxed/simple;
+	bh=Ft+4bogiN8iJK6q1YUSLmeCrSfh3XWwtQJd7zoj84Nk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jjDVNyPs3dQZPQrHBCJg7ZSBxSU2pjEkBs1ePITQl4t4lKeM3tZCKCMbQooZG1rYYSGFJ09LR0ghkqt6AaRy7cPHzzlVUCcJi6ZW2HeQzsnp8Xaw2mxiwKBBdGgZCGFVd3aFmK0U2BkctXoBdJu1vMqfdcbP30lQWyowE6tf6ho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CgJorz3S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDF9BC4CEF4;
-	Fri, 11 Jul 2025 00:29:58 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=DVJTNac3RULctq629P+AnSWVZQkYhoSk3VkF7UojGNnZv6Pt5G0kQYIRCp/31wJOcyESPPNprUmEAY5NtmPp51qvYBaciQgQefGBtQD+REo/D4kAf6MkSQDDKGw13X7ib3BIG5RXV2EU8qwBIXXhP+lK13Ty55DPWTL13mPdcL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=prfmW5Q5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82ED0C4CEF4;
+	Fri, 11 Jul 2025 00:30:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752193798;
-	bh=AlVgBpWJ8JPmmDOEbAT1bu+FMyG/5fyU5Tu5MVASOmQ=;
+	s=k20201202; t=1752193800;
+	bh=Ft+4bogiN8iJK6q1YUSLmeCrSfh3XWwtQJd7zoj84Nk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CgJorz3Sl4d9BleZ+ZHtplR38wxybXxOHMvBs2+bwyeSTTckFlGxhkex7FoDaixWM
-	 1nnNPXPBWvCsurwrjT5qRB8FvTwp0lk8JRjh2L85ScSL+wqC+Q/b1OOX5HY9yKLBoL
-	 pdKU4pHrsvxT0/4zPpPkrGRyZls+MRyO5bZLVHsvP7MLzEi2upMI6XzMAgfc+Qg04K
-	 EvVHJNU1w0VKQxIU1L4UfArcO6kdB0NXYDm2R6dkqYjhsmt58TPaAluLBGtx8IhJEZ
-	 kaAPm+kK1TtljCy4o5/Dfm9j5PeY5LKaPQtjAeVcnSYtRTbi60tKUd93oq+fqbyYHT
-	 +xexLe3zHMwPQ==
+	b=prfmW5Q5Ou7RiZPWoRErKPUffMDIMSHnkq8qwSe9T1a5b4cYo9zSfHsKI5YQSzoLm
+	 wv6eCp0g2bweYoaskvQBUNK6+jXXCbLsUoSe5k0Tm1wLaNk/Yl96yBZk42TQnwUlrS
+	 GLJhDfsMhpat+2//WJsaYj7VzmxxG+Q5YjgaT5M4v+KD9eyczD9x8L+gPP/7KWa9Iw
+	 x143wh8VlBdSTGjpyRfBN+sm3S8Oej3Lt9OmcjpcGgWjSDLh+7JbYEAruulK9GSgxW
+	 LbemVMx+qs02HqVZKBbBcpfX7pU0aJjBiIP2QjGVTV5uHf1ciTbibRX2KcdgFuw5W6
+	 TovQbjuRO5LRw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33A73383B266;
-	Fri, 11 Jul 2025 00:30:22 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C16383B266;
+	Fri, 11 Jul 2025 00:30:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,34 +52,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] wireless-2025-07-10
+Subject: Re: [PATCH net] netfilter: flowtable: account for Ethernet header in
+ nf_flow_pppoe_proto()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175219382101.1715084.11048048789594676187.git-patchwork-notify@kernel.org>
-Date: Fri, 11 Jul 2025 00:30:21 +0000
-References: <20250710122212.24272-3-johannes@sipsolutions.net>
-In-Reply-To: <20250710122212.24272-3-johannes@sipsolutions.net>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+ <175219382224.1715084.10590390381407848678.git-patchwork-notify@kernel.org>
+Date: Fri, 11 Jul 2025 00:30:22 +0000
+References: <20250707124517.614489-1-edumazet@google.com>
+In-Reply-To: <20250707124517.614489-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ pablo@netfilter.org, kadlec@netfilter.org, netdev@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ eric.dumazet@gmail.com, syzbot+bf6ed459397e307c3ad2@syzkaller.appspotmail.com
 
 Hello:
 
-This pull request was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 10 Jul 2025 14:21:06 +0200 you wrote:
-> Hi,
+On Mon,  7 Jul 2025 12:45:17 +0000 you wrote:
+> syzbot found a potential access to uninit-value in nf_flow_pppoe_proto()
 > 
-> So I have more fixes than I'd like at this point, but a few
-> were under discussion for a while, mt76 fixes were just not
-> forthcoming until now, and all of them really don't seem
-> wrong to put into the tree at this point...
+> Blamed commit forgot the Ethernet header.
+> 
+> BUG: KMSAN: uninit-value in nf_flow_offload_inet_hook+0x7e4/0x940 net/netfilter/nf_flow_table_inet.c:27
+>   nf_flow_offload_inet_hook+0x7e4/0x940 net/netfilter/nf_flow_table_inet.c:27
+>   nf_hook_entry_hookfn include/linux/netfilter.h:157 [inline]
+>   nf_hook_slow+0xe1/0x3d0 net/netfilter/core.c:623
+>   nf_hook_ingress include/linux/netfilter_netdev.h:34 [inline]
+>   nf_ingress net/core/dev.c:5742 [inline]
+>   __netif_receive_skb_core+0x4aff/0x70c0 net/core/dev.c:5837
+>   __netif_receive_skb_one_core net/core/dev.c:5975 [inline]
+>   __netif_receive_skb+0xcc/0xac0 net/core/dev.c:6090
+>   netif_receive_skb_internal net/core/dev.c:6176 [inline]
+>   netif_receive_skb+0x57/0x630 net/core/dev.c:6235
+>   tun_rx_batched+0x1df/0x980 drivers/net/tun.c:1485
+>   tun_get_user+0x4ee0/0x6b40 drivers/net/tun.c:1938
+>   tun_chr_write_iter+0x3e9/0x5c0 drivers/net/tun.c:1984
+>   new_sync_write fs/read_write.c:593 [inline]
+>   vfs_write+0xb4b/0x1580 fs/read_write.c:686
+>   ksys_write fs/read_write.c:738 [inline]
+>   __do_sys_write fs/read_write.c:749 [inline]
 > 
 > [...]
 
 Here is the summary with links:
-  - [GIT,PULL] wireless-2025-07-10
-    https://git.kernel.org/netdev/net/c/7ac5cc261625
+  - [net] netfilter: flowtable: account for Ethernet header in nf_flow_pppoe_proto()
+    https://git.kernel.org/netdev/net/c/18cdb3d982da
 
 You are awesome, thank you!
 -- 
