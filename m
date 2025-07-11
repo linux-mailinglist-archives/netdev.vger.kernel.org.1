@@ -1,221 +1,124 @@
-Return-Path: <netdev+bounces-206250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5FA2B02452
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 21:11:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7543B0245C
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 21:13:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74BF8174509
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 19:11:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEAC81C45CB7
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 19:14:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84DFB2F2C69;
-	Fri, 11 Jul 2025 19:10:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A4B92EF9CC;
+	Fri, 11 Jul 2025 19:13:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zA2TBTD9"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="LgV75rzR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 047332F4320
-	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 19:10:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E0F12AEF1
+	for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 19:13:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752261034; cv=none; b=beVgI+r8UrxoQa6wvVF13lDLFY7MQiez9RaA+iw+btDvilbBTESLGHX0vJysWU5mhSSy+ckj/1khFK+ahIaDyHJmdQHxlywaRN1oIYJxCV2Z7SQTJDpCyVK0wXrpFYQMmz00UEZ/jUzzFP155UGyYE8m7745s4qDWl/R3RuPMvE=
+	t=1752261233; cv=none; b=Apmd2d9UqsGTnxGGycmSWeIIz9+Xrs2jKKzUiGvpEBstDK1Vy8RTM2HKej8SCuq64nLjGu19q9rtMNsFaXrznU3QVDNzVxcgP3w1+euS3gERb1OYW14GizxcKrQT+gSK67DeW2/sOAsIYkjpgDD0vXiXbkUfjFOsMLKriIEOKWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752261034; c=relaxed/simple;
-	bh=Sf9yLVNp6tlDd8F4QBnpk9RK36cKGz7nRv0tQTs2ZAg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QLHWOC5/ITNOlBYBXSldaGjdeniAizfAmSxTQ8hSaxWkXH8+dPVOpoDB6ipoZGF4MeWPfehePAv51dY4FS5tapMIcqE8XDhCgvLCbnUKHuVcUeqA94GwxhvNgjMUmnffUusSxZ4p3g8+l/NwH8yyzQPJ4ED2tCDs8mheqbJQSi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zA2TBTD9; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3121cffd7e8so1860715a91.0
-        for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 12:10:32 -0700 (PDT)
+	s=arc-20240116; t=1752261233; c=relaxed/simple;
+	bh=8BcgoOo7d/63OSh4rLBJxxOjFAkETtCGtPh9tO6j+qY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=bBWXeAGZutxZosoxVkc3sBkfDAdy3qRKr9yYa3G1o5SY1d3oWXWZRNtUDy7lMcSYM2uLqY/HKOUPeetMgB6Qezf0ZvtgX0AzSgRDqFOTZ4/SIbDA/kTv5y/B0twINaEHPEUxCLWur9tCTpYxmeW2qbVV7GorgikqdxY6JVzrZVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=LgV75rzR; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-74b56b1d301so1561305b3a.1
+        for <netdev@vger.kernel.org>; Fri, 11 Jul 2025 12:13:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752261032; x=1752865832; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KBKNgBuQwikHf8KFAmQauicf1aw7MHbnLNAMy8PwebA=;
-        b=zA2TBTD9YmIt5I1QLfNMkAO0KrJsy3X6HW9G37vDhB/lMu9Pz83X36yrtC0mb/0KeA
-         +Tvmj+PgsG4s+P/wpSQ8+EmzG2GxPo3jDcaVgtry57qLmIFb/oIUdVorhxb/GegWFG54
-         gzxCUL5R8TvnBnzFT5DM2qRhy0bJl+Qytr/O079hggOYR9KhBNwpeqvirnF7tUxRIJUM
-         6p1tHW1kewfOxi09ODJFwKKf/GfHfhiZhGLzP5QO6ppZliZEc0ktAa3oy4Jwm9A6aseY
-         Y3rSz8y4foO6ZfW5QGhSx7EUfjBbBzhp8dji4GsALRpOWyy1mW2CICOwmMQk7oqQM5EQ
-         rF+w==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1752261231; x=1752866031; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Pw8tMXj6rdfFqpDgsVOf13IKaNoTZhX9xFiQLvS94yg=;
+        b=LgV75rzRHB2Fdyj5hHJ7d9m/lI+WGAhFn02MxEeEdIKicncdN0ARzLJsqZOMNnPi2w
+         sYxPHSQ1MXfX0a7gjNd8AozqriuISyCTgrDxB4/ghRZRN2N8MOD5JVnSBEOlERygKLVm
+         +7gFkDp4D5EK8L08fKTK5CWoQRn73vVgjiqJKQ53Z4ZpmEY3xlA1/23QoAk/O26GcqNB
+         asqDMB9IKQ/KhTLsI5N/PCWFqFlRpYzRqc6821bJiXlcIvbzCG/OLUxDS1XJRdtw6yaf
+         jgA5psXfEw6AEmn4Iww4ynyiIlC3/tVWWbAcO+UwWNikB7UPegYHnmiopGniR8xN23wG
+         SPjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752261032; x=1752865832;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KBKNgBuQwikHf8KFAmQauicf1aw7MHbnLNAMy8PwebA=;
-        b=RmXGMjtb4rStPoLMHVEoz+2RasI5bMunHDzeXPoObp2KASRoRXhcFbsu+fnwnzwG65
-         U4oX7EyQkl+ygf157hKPzyI80Ihy0h1nhLzsWwqhBKvRGLbh51hNW3lvJChY0ORtvZqe
-         IvsP1JeBpl7KzXD5V/d9B8KrNnbzdIDd9swRqXvReZNobXxZhz3O45jGekBN7PnP3UiW
-         +8DDNHhd0rKP/UaqGL3I6ZwjcGRTJWQCgv7mc/dFMux45xbUt/Q3R+S4pXx/j+vEGzzB
-         h6cY3ApNhuGM5BYC4LrW9K3n+Sq7+WZ8lT6VZL4IobQuAlVZfTrqmnzW4RivOuWntZCi
-         UViA==
-X-Forwarded-Encrypted: i=1; AJvYcCUOrdeT3k3qaSG1v0EQINBZOdkU4pfzAU6e+zJtg99CFxyytiQUsli13VK6g+TCYcCMPvEq5LM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+7Tg7Ka1bxRQTLqJxjvDgLx/Zi6UalHDNn02jzHaPyPwQbfGR
-	2crdvXqpAphoV9dkb/n4NTwvpjO6X0jrP9d5TOs5+5HP2upokBqQYu9TTOC0LXk0tF7hCDFYg11
-	BrmgDjA==
-X-Google-Smtp-Source: AGHT+IE41fsXPuU6HLvqTyEdzL2tzEvZcRN2OmkMZi+MHwlQKPmsM50/Z2p6eR5l2YtQTu6Wv7J+/keyieE=
-X-Received: from pjbnd1.prod.google.com ([2002:a17:90b:4cc1:b0:2fb:fa85:1678])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:554f:b0:311:e305:4e97
- with SMTP id 98e67ed59e1d1-31c4f512c31mr5166224a91.19.1752261032232; Fri, 11
- Jul 2025 12:10:32 -0700 (PDT)
-Date: Fri, 11 Jul 2025 19:06:19 +0000
-In-Reply-To: <20250711191007.3591938-1-kuniyu@google.com>
+        d=1e100.net; s=20230601; t=1752261231; x=1752866031;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Pw8tMXj6rdfFqpDgsVOf13IKaNoTZhX9xFiQLvS94yg=;
+        b=NjCHOQe9TTa24VNDlYUTX3a5vrE27YXm+DY+8pA8D0F8TtnaiOMtnS2xDbunCFyydd
+         MUlcHU3cRKm/ZCobdRIK2pS34gP42NVC3sjCE2FS7V5+Xp/C9MJqz7AonDInHxeaf89W
+         mNPNHdKU2n4D3jBTParkgqaj5J3GOcq2nMBwT6dhsSDriKHT/uOG72ktV7VJpzmmnVx3
+         Xzx7qbNSY+BkuQ78b+ePAu6262vmV2rlmfIAuk4K/5EzDhy9S+GZDaxbyn82sMue+cPo
+         CvIsW4434+CqBhY4x7a9aJvHKyGs+JPUxYzHP37VzWK+JKI7Yl2+tLFBRLUABhB65X3w
+         DNDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUwnDpp4Ho/qVSUcw2q07ax/Ow5nuNj9xYdHXq9TVw3Y65FfJraMmaJO4eGytggucFGu+SrgqE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyq5fvmExpW/QNP5bsR9ZrI7ilq1his1gSvgTuSQU4hfoXyX9Eg
+	+fJ+/DNnbz4A8wKZ9JKrv09BazbATZgmCBd/Z2QFzJHOQWaj/p8u/IwwFDx1X1Xxug==
+X-Gm-Gg: ASbGncv5N1PvYxWR98He+k9HJKcNXfT4Tw168IBZLKe6WCZHi0v0yZuV1l8xUjeqsln
+	l26lJ3EhSMEllVAKJllEX42haHiNVyV1crfzZLd28VgcjXqCHUjnIgjUYThVofNQKeNWii0xBC5
+	IjZ3CFjliyRoxglIYf6SWA527oiVcI3RAenA2icvVmSjQRVJ5i/MPjQfgflFLITkU+3tqhsW0jx
+	HaTRjX+/qILQf9wH29bElZEB4Zmi1SxC3YsoDHj/3ZmU2eGsYl8j3BFvZr/vsGoed3vTbXv/3MA
+	408v5CMrGZ43480k5GJWmtgj0B/WYip8bwNAk8/c0eLQKp99zmiaVT6QHkcEOSJz68R9UBmEffG
+	sTbO/gLk8iqvmRubee67gtLP1bmIZiwIRYm23Rm+9GtkRs4I6Yjdym27P3uXl5c0=
+X-Google-Smtp-Source: AGHT+IEzJq7kKuHcKxI7SDNUkv1XPsZWGFsK3Uidxo93DA1wc2S/2yvIBurC0Sbg+3Bd5W2zZyl8hw==
+X-Received: by 2002:aa7:8886:0:b0:73e:23be:11fc with SMTP id d2e1a72fcca58-74ee3237980mr5280760b3a.22.1752261231255;
+        Fri, 11 Jul 2025 12:13:51 -0700 (PDT)
+Received: from ?IPV6:2804:7f1:e2c2:381b:47:222f:5788:dacb? ([2804:7f1:e2c2:381b:47:222f:5788:dacb])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74eb9f9762esm6198861b3a.148.2025.07.11.12.13.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Jul 2025 12:13:50 -0700 (PDT)
+Message-ID: <01a580b4-0c8d-4d22-a3e4-264335d7a947@mojatatu.com>
+Date: Fri, 11 Jul 2025 16:13:42 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250711191007.3591938-1-kuniyu@google.com>
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250711191007.3591938-15-kuniyu@google.com>
-Subject: [PATCH v1 net-next 14/14] neighbour: Update pneigh_entry in pneigh_create().
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v22 net-next 5/6] selftests/tc-testing: Add selftests for
+ qdisc DualPI2
+To: chia-yu.chang@nokia-bell-labs.com, alok.a.tiwari@oracle.com,
+ pctammela@mojatatu.com, horms@kernel.org, donald.hunter@gmail.com,
+ xandfury@gmail.com, netdev@vger.kernel.org, dave.taht@gmail.com,
+ pabeni@redhat.com, jhs@mojatatu.com, kuba@kernel.org,
+ stephen@networkplumber.org, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, andrew+netdev@lunn.ch,
+ ast@fiberby.net, liuhangbin@gmail.com, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org, ij@kernel.org, ncardwell@google.com,
+ koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com,
+ ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
+ cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
+ vidhi_goel@apple.com
+References: <20250711143208.66722-1-chia-yu.chang@nokia-bell-labs.com>
+ <20250711143208.66722-6-chia-yu.chang@nokia-bell-labs.com>
+Content-Language: en-US
+From: Victor Nogueira <victor@mojatatu.com>
+In-Reply-To: <20250711143208.66722-6-chia-yu.chang@nokia-bell-labs.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-neigh_add() updates pneigh_entry() found or created by pneigh_create().
+On 7/11/25 11:32, chia-yu.chang@nokia-bell-labs.com wrote:
+> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> 
+> Update configuration of tc-tests and preload DualPI2 module for self-tests,
+> and add following self-test cases for DualPI2:
+> 
+>    Test a4c7: Create DualPI2 with default setting
 
-This update is serialised by RTNL, but we will remove it.
+This test case is failing now:
 
-Let's move the update part to pneigh_create() and make it return errno
-instead of a pointer of pneigh_entry.
+Test a4c7: Create DualPI2 with default setting
+exit: 2
+exit: 0
+Error: sch_dualpi2: Dualpi2 options are required.
 
-Now, the pneigh code is RTNL free.
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- include/net/neighbour.h |  5 +++--
- net/core/neighbour.c    | 34 ++++++++++++++++------------------
- net/ipv4/arp.c          |  4 +---
- 3 files changed, 20 insertions(+), 23 deletions(-)
-
-diff --git a/include/net/neighbour.h b/include/net/neighbour.h
-index af6fe50703041..a4f72db41ed69 100644
---- a/include/net/neighbour.h
-+++ b/include/net/neighbour.h
-@@ -382,8 +382,9 @@ void pneigh_enqueue(struct neigh_table *tbl, struct neigh_parms *p,
- 		    struct sk_buff *skb);
- struct pneigh_entry *pneigh_lookup(struct neigh_table *tbl, struct net *net,
- 				   const void *key, struct net_device *dev);
--struct pneigh_entry *pneigh_create(struct neigh_table *tbl, struct net *net,
--				   const void *key, struct net_device *dev);
-+int pneigh_create(struct neigh_table *tbl, struct net *net, const void *key,
-+		  struct net_device *dev, u32 flags, u8 protocol,
-+		  bool permanent);
- int pneigh_delete(struct neigh_table *tbl, struct net *net, const void *key,
- 		  struct net_device *dev);
- 
-diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index 78f2457a101c4..636fbdda0cb2e 100644
---- a/net/core/neighbour.c
-+++ b/net/core/neighbour.c
-@@ -747,24 +747,27 @@ struct pneigh_entry *pneigh_lookup(struct neigh_table *tbl,
- }
- EXPORT_IPV6_MOD(pneigh_lookup);
- 
--struct pneigh_entry *pneigh_create(struct neigh_table *tbl,
--				   struct net *net, const void *pkey,
--				   struct net_device *dev)
-+int pneigh_create(struct neigh_table *tbl, struct net *net,
-+		  const void *pkey, struct net_device *dev,
-+		  u32 flags, u8 protocol, bool permanent)
- {
- 	struct pneigh_entry *n;
- 	unsigned int key_len;
- 	u32 hash_val;
-+	int err = 0;
- 
- 	mutex_lock(&tbl->phash_lock);
- 
- 	n = pneigh_lookup(tbl, net, pkey, dev);
- 	if (n)
--		goto out;
-+		goto update;
- 
- 	key_len = tbl->key_len;
- 	n = kzalloc(sizeof(*n) + key_len, GFP_KERNEL);
--	if (!n)
-+	if (!n) {
-+		err = -ENOBUFS;
- 		goto out;
-+	}
- 
- 	write_pnet(&n->net, net);
- 	memcpy(n->key, pkey, key_len);
-@@ -774,16 +777,20 @@ struct pneigh_entry *pneigh_create(struct neigh_table *tbl,
- 	if (tbl->pconstructor && tbl->pconstructor(n)) {
- 		netdev_put(dev, &n->dev_tracker);
- 		kfree(n);
--		n = NULL;
-+		err = -ENOBUFS;
- 		goto out;
- 	}
- 
- 	hash_val = pneigh_hash(pkey, key_len);
- 	n->next = tbl->phash_buckets[hash_val];
- 	rcu_assign_pointer(tbl->phash_buckets[hash_val], n);
-+update:
-+	WRITE_ONCE(n->flags, flags);
-+	n->permanent = permanent;
-+	WRITE_ONCE(n->protocol, protocol);
- out:
- 	mutex_unlock(&tbl->phash_lock);
--	return n;
-+	return err;
- }
- 
- static void pneigh_destroy(struct rcu_head *rcu)
-@@ -2011,22 +2018,13 @@ static int neigh_add(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (tb[NDA_PROTOCOL])
- 		protocol = nla_get_u8(tb[NDA_PROTOCOL]);
- 	if (ndm_flags & NTF_PROXY) {
--		struct pneigh_entry *pn;
--
- 		if (ndm_flags & (NTF_MANAGED | NTF_EXT_VALIDATED)) {
- 			NL_SET_ERR_MSG(extack, "Invalid NTF_* flag combination");
- 			goto out;
- 		}
- 
--		err = -ENOBUFS;
--		pn = pneigh_create(tbl, net, dst, dev);
--		if (pn) {
--			WRITE_ONCE(pn->flags, ndm_flags);
--			pn->permanent = !!(ndm->ndm_state & NUD_PERMANENT);
--			if (protocol)
--				WRITE_ONCE(pn->protocol, protocol);
--			err = 0;
--		}
-+		err = pneigh_create(tbl, net, dst, dev, ndm_flags, protocol,
-+				    !!(ndm->ndm_state & NUD_PERMANENT));
- 		goto out;
- 	}
- 
-diff --git a/net/ipv4/arp.c b/net/ipv4/arp.c
-index d93b5735b0ba4..5cfc1c9396732 100644
---- a/net/ipv4/arp.c
-+++ b/net/ipv4/arp.c
-@@ -1089,9 +1089,7 @@ static int arp_req_set_public(struct net *net, struct arpreq *r,
- 	if (mask) {
- 		__be32 ip = ((struct sockaddr_in *)&r->arp_pa)->sin_addr.s_addr;
- 
--		if (!pneigh_create(&arp_tbl, net, &ip, dev))
--			return -ENOBUFS;
--		return 0;
-+		return pneigh_create(&arp_tbl, net, &ip, dev, 0, 0, false);
- 	}
- 
- 	return arp_req_set_proxy(net, dev, 1);
--- 
-2.50.0.727.gbf7dc18ff4-goog
-
+cheers,
+Victor
 
