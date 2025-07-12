@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-206363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51CF9B02CDD
-	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 22:35:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F313B02CDE
+	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 22:35:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48A151AA569F
-	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 20:35:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B40D64A448B
+	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 20:35:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D52E223336;
-	Sat, 12 Jul 2025 20:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DBB91FE44B;
+	Sat, 12 Jul 2025 20:35:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wqF81GAg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uFQIY3RT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9161FE44B
-	for <netdev@vger.kernel.org>; Sat, 12 Jul 2025 20:35:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 117442206B5
+	for <netdev@vger.kernel.org>; Sat, 12 Jul 2025 20:35:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752352523; cv=none; b=BRugtn+ZSaPOzdkgIIKoEvBtqEx4VaUHoa957tMCGc6SweQjbcSUeZuuBZ6VpRUVoRar7x5B4wvtPeqeYjrc1wzcnjMGY4Y+5uQRSxFHS1CXS3o7pFLIMoPKM8R6GiAV8411DJbxtmhtzU8oj+nILsLQVq1pGnumaQFVsmCGP0U=
+	t=1752352524; cv=none; b=qKhvXGDMzC7AD5bLPQG/CqAWc8P+1wbvnfle3olAm+B6LyRhK4WCIkMgykKwHuInhvJ3k2PKAqG06ufdklcfvUflD1CGmPC3xH8MFeSulYDl/n8RBWVcv9+LB/8JhS1B2NJfWAMly8sk7tN35xJFs8GdgNBNVDW9arFrHwfbV3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752352523; c=relaxed/simple;
-	bh=ghAfaxk/rm2z6aYmN0Uqe0VOXHRzawxWt5mifyumHX4=;
+	s=arc-20240116; t=1752352524; c=relaxed/simple;
+	bh=efEqm6LuvaPz+nlEkruVz/952mjxWhAu4ol4Q1ZTIvw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=cgJ6bxJXcTc10DGUdh6v+AErPtaXcayQ8N+IjMRhE+zC6l/c1C19sALXhUNAInIt/ZPNuRYseIlVZ0HzO8eDqaTtZ6QFyZhQHQYAiof3dv8bH5lVY7WKTzuo03Qv9pDFXCXtDHf1h6073J6AdI6LMpwTcdtc2QALd96Mc+3QQXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wqF81GAg; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=MZUZhcPIujGT27cT7tRLrsmpzaCrRotfSJ8O/jYN25v3LLcarXIkGokRYXbYnv4YLoW7BCNBtBwD/ye+yt13OFancG0e74/ay1IpQ22lYfew3Cv6yVaJC9S/tylj+Hu1VJYnK2PzOCm0nM2lz0UEngD2eppgMKJIF9+8UiySkl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uFQIY3RT; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b3beafa8d60so66868a12.3
-        for <netdev@vger.kernel.org>; Sat, 12 Jul 2025 13:35:21 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b34fa832869so3304374a12.1
+        for <netdev@vger.kernel.org>; Sat, 12 Jul 2025 13:35:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752352521; x=1752957321; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1752352522; x=1752957322; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=k9qm4lDL4MXYf6qhkJb4jl30W1kGNhheapByVfGSVG0=;
-        b=wqF81GAg2N7NYFkdQzaRLQidav2ZTnzcWmgPlaX5TEEwzZ/540lwYA7PIOO+QHduZJ
-         Mr+YyJVsh2tkXdfyir1dQU2J9Xu/iUKb8jDwNRmBRdlgjMlNBTubJdA4ruU5Y2EG8Yfu
-         qux21dz496iLvah3hHqOxXySFlnVHN2moTN653Zr5QRBXuPdu9q+sN67js9rQ5G7YxA0
-         9KTcRYkW+gHkjZ4iy+mUCT3jtzWb+12kyE5ccmdd/KWy0FT6KjUqC0sxOxG2cspaBrQV
-         nUpoMQDXef++0TjOPjBYHtNkhCwsEuUEggF8sLtVtG39xZIqYCCV2N6h5YDngT1SwA4O
-         pwLw==
+        bh=FtOVcgAy6/fBE+D4GvNRvO+lO7uWfIARwsK0pweRohk=;
+        b=uFQIY3RTjY5v4BoqIogrzYNOEZJjoPRUl+Q3GlIhTkue+cIqHmY9NnZLnY53kKyPnV
+         7aWVOWa32mHVWBRgQYdCJrhqrPNyva77MB5tSOYKdvxXJBeBdnXWBVTwIz3SSU57OZzu
+         Ive2v3OlVcwjm1RfEwCJHZ5pgeb1N97niMCFS6sLVKS7nFL25pIc0gszDLelqkjsv6VX
+         ivehGxUg1HejXqYZiEq5iRiUrJKvWQgMnaYtW5/kiL5q46OuYYCCkzJ8ELp/BCHn24w2
+         oVz8MEhKOP90YHGizJscQX+qDvNHaQ4cmyOzsD5ynMGtQwTok4QBJKWedoD6X3matkvt
+         rt7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752352521; x=1752957321;
+        d=1e100.net; s=20230601; t=1752352522; x=1752957322;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=k9qm4lDL4MXYf6qhkJb4jl30W1kGNhheapByVfGSVG0=;
-        b=sfCKF5Rj71e5BWs2HqvKfroGNqTEpOEBMoCUFLFH1Qvi/M1hsl7by/vg+yr3mjk2rJ
-         Mesdi4Zcuy9Vxko9DQjHfaQC45nr4EZGdEyYlpMjslCryFP51LN1O5duK8BJguNY2k1t
-         xQhmPSFKHcrgWCWmnXlkqnBCG/ziHECtvQK5MkAc1Nw/5nSStFzH5WwG2pY/er6iQBla
-         1fJHTpjp1Ld2TSjCTRXmGa/uSDAZP2jT76N5S2XOkQYDS/Vu+g4RjBz5lgpiO2cF7Y0g
-         dPBkRmxf74CC0vU9rCzvnpG/1LdfzQiZmx9WpCuR1pGOc38rDGnGYZy6ttM1rNl2jbsn
-         4dhw==
-X-Forwarded-Encrypted: i=1; AJvYcCXQmtFyWUrbInsrIVCTtVUZRKlNvboZJtFZVYgJSkATPMFa+vYNABUQ/vrVLYFKSXpPYwxw0Hs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNRX1N8S6OHz5Js8b8hPtEzU19kZFPSA7mhCPrGg44HUxg5S8A
-	qm9Poy4+LczOBDH7hAaZXAMeN6Yo46ropy8fNRoStC0BoJ2wGpLy7BzJHAQZ/N7VQHsj7qqK4IX
-	xVPgMsQ==
-X-Google-Smtp-Source: AGHT+IE/XjET5/Iiku2d9zTEOej1g7Tk2RxhG7oTZTWqer6AYJfsM1fx/ZPTsPIVZGcKzz5RMnoGW34HDrQ=
-X-Received: from pfbhs11.prod.google.com ([2002:a05:6a00:690b:b0:746:e33e:7245])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:3291:b0:233:84b4:d0a4
- with SMTP id adf61e73a8af0-23384b4d575mr2849474637.32.1752352520866; Sat, 12
- Jul 2025 13:35:20 -0700 (PDT)
-Date: Sat, 12 Jul 2025 20:34:10 +0000
+        bh=FtOVcgAy6/fBE+D4GvNRvO+lO7uWfIARwsK0pweRohk=;
+        b=Pcusq0IzcxYQecDgfS6jOr/w1WNsFVggKf/kOHCr0nHsG6C3WWOWo26kxy4TktfCjq
+         bX0yoRK8klUQgD/ePeT9qN8BOxoj51S8BYi4aP6toKpK7beJw7yoJbLjYKyDyvNG/5mC
+         RPfi8ay+/74/RE98B+sZn6RLjpQoLqD7eMjzMuFjwXWMaj9KqkfGWNLcw7acCWT8Rsve
+         sWQLMbj9xHzlb0xDd0iX9IXwra32zDG2f3iTBqa61N7hQc94OCnUxgOhglaQS0kN2H2q
+         0ROtLNm7bvd2C1oP8tK1DMbuovvkvtBf/ElV2bkpaDhD+3lmfAZESYEE2LjVNSMZvrqr
+         7FDg==
+X-Forwarded-Encrypted: i=1; AJvYcCXoevFLVVM0dGh+Mj37csWrej51hCtZlTFAFKsT41eSZnup8RQncltLRd/HshN5XkHrne7PsvY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzf14clBZmS2sQdiko9STxdqoWPLG+b9ECEwSixmKHntVExTGRI
+	KA85S4iZV+7WYEXjsGkjEHwZSavxglWAxYFU+lU2vaq2cLqOzELIM4HMp43yrjBNzDRARY+DfMw
+	b2hX2kw==
+X-Google-Smtp-Source: AGHT+IGK/9FDtXBKXKRBKMJm2HE9zXv0oep1PYMjg/LvWpfmiv/qCYpHcA53Zm3BWFXsyLwlY2yWcjx4AH8=
+X-Received: from pjbrr7.prod.google.com ([2002:a17:90b:2b47:b0:311:f309:e314])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3b44:b0:31c:15c8:4c86
+ with SMTP id 98e67ed59e1d1-31c4d4f8898mr11386292a91.14.1752352522314; Sat, 12
+ Jul 2025 13:35:22 -0700 (PDT)
+Date: Sat, 12 Jul 2025 20:34:11 +0000
 In-Reply-To: <20250712203515.4099110-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,9 +74,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250712203515.4099110-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250712203515.4099110-2-kuniyu@google.com>
-Subject: [PATCH v2 net-next 01/15] neighbour: Make neigh_valid_get_req()
- return ndmsg.
+Message-ID: <20250712203515.4099110-3-kuniyu@google.com>
+Subject: [PATCH v2 net-next 02/15] neighbour: Move two validations from
+ neigh_get() to neigh_valid_get_req().
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
@@ -84,135 +84,91 @@ Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-neigh_get() passes 4 local variable pointers to neigh_valid_get_req().
+We will remove RTNL for neigh_get() and run it under RCU instead.
 
-If it returns a pointer of struct ndmsg, we do not need to pass two
-of them.
+neigh_get() returns -EINVAL in the following cases:
+
+  * NDA_DST is not specified
+  * Both ndm->ndm_ifindex and NTF_PROXY are not specified
+
+These validations do not require RCU.
+
+Let's move them to neigh_valid_get_req().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- net/core/neighbour.c | 51 +++++++++++++++++++++++---------------------
- 1 file changed, 27 insertions(+), 24 deletions(-)
+ net/core/neighbour.c | 28 +++++++++++++++-------------
+ 1 file changed, 15 insertions(+), 13 deletions(-)
 
 diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index 43a5dcbb5f9c7..d35399de640d0 100644
+index d35399de640d0..2c3e0f3615e20 100644
 --- a/net/core/neighbour.c
 +++ b/net/core/neighbour.c
-@@ -2910,10 +2910,9 @@ static int neigh_dump_info(struct sk_buff *skb, struct netlink_callback *cb)
- 	return err;
- }
- 
--static int neigh_valid_get_req(const struct nlmsghdr *nlh,
--			       struct neigh_table **tbl,
--			       void **dst, int *dev_idx, u8 *ndm_flags,
--			       struct netlink_ext_ack *extack)
-+static struct ndmsg *neigh_valid_get_req(const struct nlmsghdr *nlh,
-+					 struct neigh_table **tbl, void **dst,
-+					 struct netlink_ext_ack *extack)
- {
- 	struct nlattr *tb[NDA_MAX + 1];
- 	struct ndmsg *ndm;
-@@ -2922,31 +2921,33 @@ static int neigh_valid_get_req(const struct nlmsghdr *nlh,
- 	ndm = nlmsg_payload(nlh, sizeof(*ndm));
- 	if (!ndm) {
- 		NL_SET_ERR_MSG(extack, "Invalid header for neighbor get request");
--		return -EINVAL;
-+		err = -EINVAL;
-+		goto err;
+@@ -2938,6 +2938,12 @@ static struct ndmsg *neigh_valid_get_req(const struct nlmsghdr *nlh,
+ 		goto err;
  	}
  
- 	if (ndm->ndm_pad1  || ndm->ndm_pad2  || ndm->ndm_state ||
- 	    ndm->ndm_type) {
- 		NL_SET_ERR_MSG(extack, "Invalid values in header for neighbor get request");
--		return -EINVAL;
++	if (!(ndm->ndm_flags & NTF_PROXY) && !ndm->ndm_ifindex) {
++		NL_SET_ERR_MSG(extack, "No device specified");
 +		err = -EINVAL;
 +		goto err;
- 	}
- 
- 	if (ndm->ndm_flags & ~NTF_PROXY) {
- 		NL_SET_ERR_MSG(extack, "Invalid flags in header for neighbor get request");
--		return -EINVAL;
-+		err = -EINVAL;
-+		goto err;
- 	}
- 
++	}
++
  	err = nlmsg_parse_deprecated_strict(nlh, sizeof(struct ndmsg), tb,
  					    NDA_MAX, nda_policy, extack);
  	if (err < 0)
--		return err;
-+		goto err;
- 
--	*ndm_flags = ndm->ndm_flags;
--	*dev_idx = ndm->ndm_ifindex;
- 	*tbl = neigh_find_table(ndm->ndm_family);
--	if (*tbl == NULL) {
-+	if (!*tbl) {
- 		NL_SET_ERR_MSG(extack, "Unsupported family in header for neighbor get request");
--		return -EAFNOSUPPORT;
-+		err = -EAFNOSUPPORT;
-+		goto err;
+@@ -2951,11 +2957,14 @@ static struct ndmsg *neigh_valid_get_req(const struct nlmsghdr *nlh,
  	}
  
  	for (i = 0; i <= NDA_MAX; ++i) {
-@@ -2957,17 +2958,21 @@ static int neigh_valid_get_req(const struct nlmsghdr *nlh,
+-		if (!tb[i])
+-			continue;
+-
+ 		switch (i) {
  		case NDA_DST:
- 			if (nla_len(tb[i]) != (int)(*tbl)->key_len) {
- 				NL_SET_ERR_MSG(extack, "Invalid network address in neighbor get request");
--				return -EINVAL;
++			if (!tb[i]) {
++				NL_SET_ERR_MSG(extack, "Network address not specified");
 +				err = -EINVAL;
 +				goto err;
- 			}
++			}
++
+ 			if (nla_len(tb[i]) != (int)(*tbl)->key_len) {
+ 				NL_SET_ERR_MSG(extack, "Invalid network address in neighbor get request");
+ 				err = -EINVAL;
+@@ -2964,6 +2973,9 @@ static struct ndmsg *neigh_valid_get_req(const struct nlmsghdr *nlh,
  			*dst = nla_data(tb[i]);
  			break;
  		default:
++			if (!tb[i])
++				continue;
++
  			NL_SET_ERR_MSG(extack, "Unsupported attribute in neighbor get request");
--			return -EINVAL;
-+			err = -EINVAL;
-+			goto err;
+ 			err = -EINVAL;
+ 			goto err;
+@@ -3059,11 +3071,6 @@ static int neigh_get(struct sk_buff *in_skb, struct nlmsghdr *nlh,
  		}
  	}
  
--	return 0;
-+	return ndm;
-+err:
-+	return ERR_PTR(err);
- }
- 
- static inline size_t neigh_nlmsg_size(void)
-@@ -3038,18 +3043,16 @@ static int neigh_get(struct sk_buff *in_skb, struct nlmsghdr *nlh,
- 	struct net_device *dev = NULL;
- 	struct neigh_table *tbl = NULL;
- 	struct neighbour *neigh;
-+	struct ndmsg *ndm;
- 	void *dst = NULL;
--	u8 ndm_flags = 0;
--	int dev_idx = 0;
- 	int err;
- 
--	err = neigh_valid_get_req(nlh, &tbl, &dst, &dev_idx, &ndm_flags,
--				  extack);
--	if (err < 0)
--		return err;
-+	ndm = neigh_valid_get_req(nlh, &tbl, &dst, extack);
-+	if (IS_ERR(ndm))
-+		return PTR_ERR(ndm);
- 
--	if (dev_idx) {
--		dev = __dev_get_by_index(net, dev_idx);
-+	if (ndm->ndm_ifindex) {
-+		dev = __dev_get_by_index(net, ndm->ndm_ifindex);
- 		if (!dev) {
- 			NL_SET_ERR_MSG(extack, "Unknown device ifindex");
- 			return -ENODEV;
-@@ -3061,7 +3064,7 @@ static int neigh_get(struct sk_buff *in_skb, struct nlmsghdr *nlh,
- 		return -EINVAL;
- 	}
- 
--	if (ndm_flags & NTF_PROXY) {
-+	if (ndm->ndm_flags & NTF_PROXY) {
+-	if (!dst) {
+-		NL_SET_ERR_MSG(extack, "Network address not specified");
+-		return -EINVAL;
+-	}
+-
+ 	if (ndm->ndm_flags & NTF_PROXY) {
  		struct pneigh_entry *pn;
  
- 		pn = pneigh_lookup(tbl, net, dst, dev, 0);
+@@ -3076,11 +3083,6 @@ static int neigh_get(struct sk_buff *in_skb, struct nlmsghdr *nlh,
+ 					nlh->nlmsg_seq, tbl);
+ 	}
+ 
+-	if (!dev) {
+-		NL_SET_ERR_MSG(extack, "No device specified");
+-		return -EINVAL;
+-	}
+-
+ 	neigh = neigh_lookup(tbl, dst, dev);
+ 	if (!neigh) {
+ 		NL_SET_ERR_MSG(extack, "Neighbour entry not found");
 -- 
 2.50.0.727.gbf7dc18ff4-goog
 
