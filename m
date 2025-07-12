@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-206370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B3ECB02CE4
-	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 22:36:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 682C8B02CE5
+	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 22:36:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1194B4E1547
-	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 20:35:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 378934E1C28
+	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 20:35:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 727C922B8CF;
-	Sat, 12 Jul 2025 20:35:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06B82224882;
+	Sat, 12 Jul 2025 20:35:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g4v3cmrW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gBDOxEaj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05AF922A7E8
-	for <netdev@vger.kernel.org>; Sat, 12 Jul 2025 20:35:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89DF022C355
+	for <netdev@vger.kernel.org>; Sat, 12 Jul 2025 20:35:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752352532; cv=none; b=GOWpW2h4vnq35J2sL4zODVZABYmxqaau/qY3so5Zfp1qrd1lmRY5uAxs5jYmHV6JmIWYDmuTFIeprryPmwSFdCUf4vPLlXCOcso/XSqvxcfujZarDzbhnKeHT3cxSz4veq8qkVp7uN0C4XQilfHMMcoaHAvbx5sdncs1jcOQSZo=
+	t=1752352533; cv=none; b=VNYGxZlkvq3if2nSpgeU0AtBtnYdqJQYsNx/nCw1y3r38M+zErTqkkUS/k7u+DT0QqAsEmWbtn+Y6NwkSKaH5cyIMPphZpxA5cJQpwzErSJeF/ZN+tCv5g9SnYwK7F96jC4nZQbSyBal1NFje2foMVGPRd6j7sewvpOEPnhNSdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752352532; c=relaxed/simple;
-	bh=fauz/V1FWW/LUKO5lwiNkB93eYfomnRwQ9wxAQlkNLo=;
+	s=arc-20240116; t=1752352533; c=relaxed/simple;
+	bh=HiOgL44Uh5m1FF3h0XKNYQwKhS8zmVjU/dbAK0jZ0U4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qGwM6NJ35USwenUZFg3I7RTrvLRZL50aZbMSi5CoXlmRnvP84ZfSA1zqYnosi1z0kBkUvqQKAsrGvfOkdAzOx9QQyFsEnZeC4oGPdzKDLRMHi8rWMsV6NtlUMrOLKL3+5ZG74XI2GHxZIQVNCvCr+D9kXrOVQdd4ZK2ojrBOKVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g4v3cmrW; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=bYNw+s0QSlbIAfhYwRLnipQ5B4FkrziQNlxNAQEH3y3tNvoQIcPtT+JR+uybkAnpU+uDSeZbMavFL/qeyFpTywJfe3og+i/xxKfqtHZ0mNBtVHDCC/KCOomaQtnJtiOog8J6QQZnrKAy2LyKesJPFnPRw/pjGzAA/sq02y4KyZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gBDOxEaj; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-313d6d671ffso2858592a91.2
-        for <netdev@vger.kernel.org>; Sat, 12 Jul 2025 13:35:30 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2356ce55d33so47075125ad.0
+        for <netdev@vger.kernel.org>; Sat, 12 Jul 2025 13:35:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752352530; x=1752957330; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1752352532; x=1752957332; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9k2r84CY+fJpMC4JnK8dcnRpi9ycUpEJtGKqYvT4S1Y=;
-        b=g4v3cmrWbiojcjjfwkdYKVNSME2naUIeCCAG+jbCgCaRQrWRpPCiosmHVq47OShRoi
-         E3MdTMdVb8LimxvbnDyK5SN/kHr71CL8lZGx3+UZYiwhVUCwiuwI/MFAalA8KWmgiJ/h
-         JsudPKg52sBjmr6VKNT0dJEI057EKIyvWgUCcRrf3wsxyZEZNO03hakWyEcGlWDNFr2C
-         5dxytLaDPjsIEYwYWf7pDeBT/6ICV6cOpI+90KNViQ3gIt+4vAF+IwSbID/gimg/yhn9
-         Gn2JHHipkT7l96mwKIT0SATyU2k7FcXqJpYWDYSqL/4AIcO+daRJ8p6mXVBv3W+yP+Qq
-         S+gA==
+        bh=2IpGSktAAXtHw5OcAA4Vm/rZMuJO4mZYnClJ1ITqfNA=;
+        b=gBDOxEajddcbw+xNf68ndgQ6MDswAEs2ZCzsuBJOwa8HkZP+/VOENYZS96KrUbLSok
+         9hzXX8h6MAdjEP8yzxLalutK866uRbqAmHV99c2B97VFiKdqwkf39H2PgMvV+dX9vS3F
+         bUDymmK6Y5O3tPQUiaoPEJ7MAdwkfFh6ODbN9tfYuxhrvhXgb6qnNtHzlfPXSg6GlxOc
+         5ivvn23HGqGJmnyCGMP0olngt+LVz3XvO7gLJEkYPmF0xyjeoqu7L4cKbQzttL+cIF/0
+         T52ewWnzFuNu7q2iBbjz495KjWv60bJY9hD40v6YgPZC5NJHQ9JVvG2FCQRG8uggWzCK
+         XlGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752352530; x=1752957330;
+        d=1e100.net; s=20230601; t=1752352532; x=1752957332;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9k2r84CY+fJpMC4JnK8dcnRpi9ycUpEJtGKqYvT4S1Y=;
-        b=EvGAqpkaUK60RI+vd8xkuuaqtYWpTKxqwGl0lTDqEnm8OHKGJkRR/fmWn7u9VvodL4
-         Ea1pkJ5IizfIRhzL5SbhyBVRsw15BbnHYxOrWxzC7zn3UhzVWUjNy7AUNKNZUqYa/YrN
-         n7g20wFjsJMmx4PvdqF17gaSDZCzbdPol2cBzIYR0NKQMgwPiqPuIj6TfmLygViOIXBN
-         g1kLn0IUEQV+4+xZQQFcxzMN2X6+a88kMBgzdcUHE70goPB9dU7p28gAlqhkt1ZGvkaW
-         iotQOd2xZmSGrqUr0UQRR1/GKCGSu+Fgj7xMP0VkpIEJ+ROZRPQbPcJs495ptjj034Za
-         PDOA==
-X-Forwarded-Encrypted: i=1; AJvYcCXBCyB4bvt2tOISCguxYx02i2OMrjmyn7jlWWCiqJdtX5wJ3FaYleUltEF0/q8UraOstb26Dj4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz94ABJavaPEOVMl8GZbsiji9OZmhUsXDR8hXxF8AWfvchc8gf/
-	uQnsCTVLwiTzpCQke5Y4xseCxZ7/t3VbC87TZVtpsfuVH637m4BJVPspqQPlbLnhgs1jE+tp3gU
-	Baulp5w==
-X-Google-Smtp-Source: AGHT+IET8u/LfuS34u+nOtYaWqf3ek7Hi5iX2G0uWPn2m4XP3ApyYTv7NVVUDoi7L6C8H+58m7dMLHqh7pM=
-X-Received: from pjbrr7.prod.google.com ([2002:a17:90b:2b47:b0:311:f309:e314])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2d88:b0:311:b3e7:fb3c
- with SMTP id 98e67ed59e1d1-31c50e4664bmr9156785a91.31.1752352530387; Sat, 12
- Jul 2025 13:35:30 -0700 (PDT)
-Date: Sat, 12 Jul 2025 20:34:17 +0000
+        bh=2IpGSktAAXtHw5OcAA4Vm/rZMuJO4mZYnClJ1ITqfNA=;
+        b=Ns/lAKFJZH0qcMVzt5qcHfPTRKKn3r1p2RTBAnyDiRYI1rExs/NztSo5Lwq4WniR2i
+         p2EpjVg4ToKzzhqLagYWVdWn6+oer/tJQ1Oi8P4j3yNmYjLwd3V/GJsAIjmNVdtbXPtp
+         iQn4bKrnXhuu5v8ax2n/Ut9YVUBciHvzPVSJmw9slJoFllw3DwOoGWIFuI295le/iJte
+         oF26KerhwkEk6F7VY2DyyxuuAiAzeyCqTI7MqauTM9BIt/TtGP7lieuZYUd0/zvYprzM
+         LTXxfTt+oTC/JUItrUxDswdaIss+T8ngpPYdOR/sy6bRiTmpziv0BZMtThyE59HwPoK1
+         0VXw==
+X-Forwarded-Encrypted: i=1; AJvYcCWKoBDYFbngVQy3l34TmaYNe2yUyAod8U/ZbW5w56b2g4tzDE6JcZZV0ttexP1PeSeYh6+IjKo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFD4xQdbe65PastwZEe90UvdJRRDqCHyltqsfbxA2yCB3ZAyWM
+	94GrQcqJ9sxZqipFcYlhtOrCTZJs9TqxrkCuiqwHH7Yw1dk3xqTIlNeY9bUfXcLhOCaRTZ39SLM
+	+pPThKQ==
+X-Google-Smtp-Source: AGHT+IErBSInFmH1l/m6BEm82M9z8nWsey6+pC8EKWGru7TCwyUyaPpr93+wulEQGar2bD8lMXTeCKCfRZw=
+X-Received: from pjbtc4.prod.google.com ([2002:a17:90b:5404:b0:312:1900:72e2])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1b26:b0:234:ba37:87b6
+ with SMTP id d9443c01a7336-23dede3897amr123015045ad.17.1752352531908; Sat, 12
+ Jul 2025 13:35:31 -0700 (PDT)
+Date: Sat, 12 Jul 2025 20:34:18 +0000
 In-Reply-To: <20250712203515.4099110-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250712203515.4099110-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250712203515.4099110-9-kuniyu@google.com>
-Subject: [PATCH v2 net-next 08/15] neighbour: Annotate access to struct pneigh_entry.{flags,protocol}.
+Message-ID: <20250712203515.4099110-10-kuniyu@google.com>
+Subject: [PATCH v2 net-next 09/15] neighbour: Convert RTM_GETNEIGH to RCU.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
@@ -83,58 +83,59 @@ Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-We will convert pneigh readers to RCU, and its flags and protocol
-will be read locklessly.
+Only __dev_get_by_index() is the RTNL dependant in neigh_get().
 
-Let's annotate the access to the two fields.
-
-Note that all access to pn->permanent is under RTNL (neigh_add()
-and pneigh_ifdown_and_unlock()), so WRITE_ONCE() and READ_ONCE()
-are not needed.
+Let's replace it with dev_get_by_index_rcu() and convert RTM_GETNEIGH
+to RCU.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- net/core/neighbour.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ net/core/neighbour.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index 6f688b643c82b..b8562c6c3e8ef 100644
+index b8562c6c3e8ef..38442cffa480b 100644
 --- a/net/core/neighbour.c
 +++ b/net/core/neighbour.c
-@@ -2044,10 +2044,10 @@ static int neigh_add(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		err = -ENOBUFS;
- 		pn = pneigh_create(tbl, net, dst, dev);
- 		if (pn) {
--			pn->flags = ndm_flags;
-+			WRITE_ONCE(pn->flags, ndm_flags);
- 			pn->permanent = !!(ndm->ndm_state & NUD_PERMANENT);
- 			if (protocol)
--				pn->protocol = protocol;
-+				WRITE_ONCE(pn->protocol, protocol);
- 			err = 0;
- 		}
- 		goto out;
-@@ -2683,8 +2683,9 @@ static int pneigh_fill_info(struct sk_buff *skb, struct pneigh_entry *pn,
- 	if (nlh == NULL)
- 		return -EMSGSIZE;
+@@ -3055,6 +3055,8 @@ static int neigh_get(struct sk_buff *in_skb, struct nlmsghdr *nlh,
+ 	if (!skb)
+ 		return -ENOBUFS;
  
--	neigh_flags_ext = pn->flags >> NTF_EXT_SHIFT;
--	neigh_flags     = pn->flags & NTF_OLD_MASK;
-+	neigh_flags = READ_ONCE(pn->flags);
-+	neigh_flags_ext = neigh_flags >> NTF_EXT_SHIFT;
-+	neigh_flags &= NTF_OLD_MASK;
++	rcu_read_lock();
++
+ 	tbl = neigh_find_table(ndm->ndm_family);
+ 	if (!tbl) {
+ 		NL_SET_ERR_MSG(extack, "Unsupported family in header for neighbor get request");
+@@ -3071,7 +3073,7 @@ static int neigh_get(struct sk_buff *in_skb, struct nlmsghdr *nlh,
+ 	dst = nla_data(tb[NDA_DST]);
  
- 	ndm = nlmsg_data(nlh);
- 	ndm->ndm_family	 = tbl->family;
-@@ -2698,7 +2699,7 @@ static int pneigh_fill_info(struct sk_buff *skb, struct pneigh_entry *pn,
- 	if (nla_put(skb, NDA_DST, tbl->key_len, pn->key))
- 		goto nla_put_failure;
+ 	if (ndm->ndm_ifindex) {
+-		dev = __dev_get_by_index(net, ndm->ndm_ifindex);
++		dev = dev_get_by_index_rcu(net, ndm->ndm_ifindex);
+ 		if (!dev) {
+ 			NL_SET_ERR_MSG(extack, "Unknown device ifindex");
+ 			err = -ENODEV;
+@@ -3106,8 +3108,11 @@ static int neigh_get(struct sk_buff *in_skb, struct nlmsghdr *nlh,
+ 			goto err;
+ 	}
  
--	if (pn->protocol && nla_put_u8(skb, NDA_PROTOCOL, pn->protocol))
-+	if (pn->protocol && nla_put_u8(skb, NDA_PROTOCOL, READ_ONCE(pn->protocol)))
- 		goto nla_put_failure;
- 	if (neigh_flags_ext && nla_put_u32(skb, NDA_FLAGS_EXT, neigh_flags_ext))
- 		goto nla_put_failure;
++	rcu_read_unlock();
++
+ 	return rtnl_unicast(skb, net, pid);
+ err:
++	rcu_read_unlock();
+ 	kfree_skb(skb);
+ 	return err;
+ }
+@@ -3910,7 +3915,7 @@ static const struct rtnl_msg_handler neigh_rtnl_msg_handlers[] __initconst = {
+ 	{.msgtype = RTM_NEWNEIGH, .doit = neigh_add},
+ 	{.msgtype = RTM_DELNEIGH, .doit = neigh_delete},
+ 	{.msgtype = RTM_GETNEIGH, .doit = neigh_get, .dumpit = neigh_dump_info,
+-	 .flags = RTNL_FLAG_DUMP_UNLOCKED},
++	 .flags = RTNL_FLAG_DOIT_UNLOCKED | RTNL_FLAG_DUMP_UNLOCKED},
+ 	{.msgtype = RTM_GETNEIGHTBL, .dumpit = neightbl_dump_info},
+ 	{.msgtype = RTM_SETNEIGHTBL, .doit = neightbl_set},
+ };
 -- 
 2.50.0.727.gbf7dc18ff4-goog
 
