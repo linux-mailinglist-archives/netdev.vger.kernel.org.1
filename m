@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-206374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CFE6B02CE9
-	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 22:36:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA55CB02CE8
+	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 22:36:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F39094E1E1A
-	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 20:35:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5B9D1AA5D01
+	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 20:36:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C51122F74B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE03122F772;
 	Sat, 12 Jul 2025 20:35:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lw61pQfP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PdM1K1xw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FF0225771
-	for <netdev@vger.kernel.org>; Sat, 12 Jul 2025 20:35:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 576B6225779
+	for <netdev@vger.kernel.org>; Sat, 12 Jul 2025 20:35:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752352539; cv=none; b=L2jmm7C0DFB1w6Wo+P/0YbAOgMMa/5iAhG/NTDvcuE7vPnkxgBbKjpxpcVPyK9nG0VZ7MFA6ixfq5mP8tZm3lt2KirbndA+RXakp0MhjvlNVibmu73LdMrce+tckOUuCmmD17aPNNx0lh/GxCvjxM+zxEycW2WFYnGMzlKOAFF4=
+	t=1752352539; cv=none; b=aHC9LfW7IUHpSxNUOdRXCu4XOLpbuuGVQbm4ToprRJQIRCZdwn1kleH6xaBV/pU2nPAOpt6tqRan7tPsU1/2HdyG8V8caTpN/u7ELiLZN+X+hbVCiSn9qWUHrbdvf6iXfk53GJUq3oLk66SFnJZ6hC8Xqr5MTbUCDqgjKYpAjew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1752352539; c=relaxed/simple;
-	bh=X2TYTjd2q05K5YizDyn64EBoHSt2ZRssDQO0uMNUQ8E=;
+	bh=SY6L+Uz9vCkiBGbIL2n7GUOiH+qy1vrzk1hHA1RLq1M=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=JDdIBq4UfmDh9LRZ/GCpB3G0SMJN6y1Y8slayK/0V8JCg48C8M1a4AUjkO8M7/9fDjMbw3O4XYpCOqAZltxiF/S+x81hys4kXYqOJcwJK3XYinuFUKnK07WmVomGzNnK783Rd47miglo5p5QJRqvk1x+bzNTICP9DU71oLILbM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lw61pQfP; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=urMDEDn6mtU4k3ibx45pWbvk8pyKYaXzZa+b7Digw2sTrhA0CaJ5loW/NEPetkcGbmlpr6jI62eCKqZqi5+GL38w+ZsB79AenLtJStYK37UpxF9HPJa9UhNnFiIZ9VBTFAW0YNE5kXNxL8CNaZDUKqFBujsX8UdQR41l9TE8dTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PdM1K1xw; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-235dd77d11fso33155665ad.0
-        for <netdev@vger.kernel.org>; Sat, 12 Jul 2025 13:35:36 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3132e7266d3so3411156a91.2
+        for <netdev@vger.kernel.org>; Sat, 12 Jul 2025 13:35:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752352536; x=1752957336; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1752352537; x=1752957337; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=njMXqRVxNKkS1adc/BB5+eF0l1oU8+6Ztsfz3VUc2ac=;
-        b=Lw61pQfPC5JIFL298kZR2XgBj5WbuWDoXmHCYRtg93GouQSLzksQsdJ27uwjbT4EMn
-         ondFnnMyvcFfKAXnOjR2db3mabVESgkn4s5c1m8sJ8Xz8fto80VC7IsRQymxQ8gUaYJp
-         E+kbnBmLjviw2LeiPZhOqxelQ/Usf3v0a4oDv8bJe+KRjkihznKNQU4mxWAcDiGBxc5T
-         zC1Dx7b2xFh2nt27mjQw0APb98fRcP6iPbw1VNToZk3vBciAMtk12o5+5tY+l4In6yPV
-         2lCJ+xzy24+RgpJ3MpxmMzQZc7Al2xng3pfwawcK5AY+7xaK/JyqleRrunJvm97w7+TY
-         LVLQ==
+        bh=UoOymUhI/J1bC/rOP6CmVDqi10UXPFZIkaT3tbk3iZU=;
+        b=PdM1K1xwVs5r6tif4GlQPo80jC+e/mS4+U6VSTBvaMPH1EXKrJBSHe0Y+REmsq9aX3
+         tEZqSq/dp53ceL6t+hHJ3due9tb86FB9rkAT0blo2RzVBIQuIkgWWOZVU7s9knuozAF7
+         h+E1BpkJ8LCr+GZyMFNlGB9AvzYsyPzpAM/TReHlaGUSKoDgeH/95Ww9H0MRguD6bYMX
+         cr6AUlrkWXjvuz3S8rkqYJYM3MAQFsczQ+chvyS2jBpT1RnO9r3zRmxnpK7tQYOuGeJX
+         jfSDy985k8KiZPiKcspvZ7PejnqGrOZ9ijn2KZm2YAOVkMUo/hYutK4zid49tmtDzPOD
+         XGUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752352536; x=1752957336;
+        d=1e100.net; s=20230601; t=1752352537; x=1752957337;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=njMXqRVxNKkS1adc/BB5+eF0l1oU8+6Ztsfz3VUc2ac=;
-        b=XRVK+hctaMuQp7WjYAaFrhmkN4Ono37enLgANHDBqHysrYPIWwb3L7v8M7dkWPJyge
-         LIXaEofP8KOhh1PtYxYuiKITHfSoVh48/iiDSp6dz2H05r0mxC6/WBvavSTwZP9ZkcLJ
-         TLQLIx98Fyh7+NzWtz2F8ED0qt/W2tyjm6ldZ25ONvGNCusiGRBf49kebThZ7u4Fvsy/
-         0Dfw4ARScPBw7NTXnM92PxgFI9HI2P6RpyaTZfmTrUyE27A9wV25sqgmj7WxrSyCxaSc
-         HuWyC40BE9Bwpvc1EBEbabVAadVAjh+TRbNa1ysVxSEPaLQeWtARAhjiH+kGcaTPjico
-         okDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXEiqpNQWmz1XGL5+DtHvIsdD5LFH+W3Mu7LUF1wyxoFLySMyAkYCn4/EnvWFsyqyenZJdEfnk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqKqQF30WwRBOGMS1bvxSNPgHAyZ1rZK7jwghd4YguZXcnZrVc
-	gLoQbKaySJL52KyRxtxV+FwhObL4KHFZIk5XFROPr9phrpvyVYkyv2OL9RmVZy97Hm0R3AiCy7v
-	9QlabVA==
-X-Google-Smtp-Source: AGHT+IEFfHFQTN3YHOm40hI/loNYL2Vs0GPdHTKO9A5kqHbhlKliOqSQ8lbAEDisw/d6hLPdYbhq0ULIPCg=
-X-Received: from plhn16.prod.google.com ([2002:a17:903:1110:b0:223:690d:fd84])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:a86:b0:234:c549:da0e
- with SMTP id d9443c01a7336-23dee0dea68mr126268175ad.47.1752352536404; Sat, 12
- Jul 2025 13:35:36 -0700 (PDT)
-Date: Sat, 12 Jul 2025 20:34:21 +0000
+        bh=UoOymUhI/J1bC/rOP6CmVDqi10UXPFZIkaT3tbk3iZU=;
+        b=SOHa+TTkGGhQSt6VXffkz6AhmpDgqtA+wn8qrvCoh0O+VC1xUCMdaqNx6c2iphFiIb
+         u8/GYGLo0Loyo5SYKTxiutL5rykDqllYFGJXuig1c+6rRa19W08qJopyp63SfP8xCAat
+         EyR/oQLyLKN7nFhrVeiqsc05ro/DB8TdFSbc81CxvJp0ge2wCwct5aMYqFbdvYv0WTXK
+         jtfQRrNWhjTARnsbCI1Y5Y/GH2pxXQzZDC/UTdc/4BtzjlurlFRP2OcGn/2XEHW6tNHJ
+         v0efpwpBOa8Y/TVOxvKe24ewb4KcnHtwVfA6UB2A1o1njQWs2FGrcy0Wf0gcvEeTKaMC
+         k4mg==
+X-Forwarded-Encrypted: i=1; AJvYcCV3GTuzPLGG73/SpAOvdVhZFUXhNprEnQearhxXkTQBclQS7LZK9lUf+x8/kQL2U2M+SovLnZo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlkHxuzolyApJXg7CNnuLTiRM+iEdEPOxfd2ZeB7d8ovQm8Hep
+	3TKZ1QTrjxSaTnqjkPAa7R/n8AbKiblbLVGIAFW2nQbyMsjnj2MWIIpm9JYRZdC9HSm6iYuxJl9
+	kmpxcfg==
+X-Google-Smtp-Source: AGHT+IEzVcTkwB7UZ5ZRfLJqekX6fj685aGymhQvBLhIOE9extleJH8xXPP5QdOcW9FrzsxVSJwF+YsV7DU=
+X-Received: from pjbsx15.prod.google.com ([2002:a17:90b:2ccf:b0:314:3438:8e79])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3503:b0:31c:260e:5603
+ with SMTP id 98e67ed59e1d1-31c4f562f15mr11561968a91.24.1752352537602; Sat, 12
+ Jul 2025 13:35:37 -0700 (PDT)
+Date: Sat, 12 Jul 2025 20:34:22 +0000
 In-Reply-To: <20250712203515.4099110-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250712203515.4099110-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250712203515.4099110-13-kuniyu@google.com>
-Subject: [PATCH v2 net-next 12/15] neighbour: Remove __pneigh_lookup().
+Message-ID: <20250712203515.4099110-14-kuniyu@google.com>
+Subject: [PATCH v2 net-next 13/15] neighbour: Drop read_lock_bh(&tbl->lock) in pneigh_lookup().
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
@@ -83,79 +83,104 @@ Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-__pneigh_lookup() is the lockless version of pneigh_lookup(),
-but its only caller pndisc_is_router() holds the table lock and
-reads pneigh_netry.flags.
+Now, all callers of pneigh_lookup() are under RCU, and the read
+lock there is no longer needed.
 
-This is because accessing pneigh_entry after pneigh_lookup() was
-illegal unless the caller holds RTNL or the table lock.
+Let's drop the lock, inline __pneigh_lookup_1() to pneigh_lookup(),
+and call it from pneigh_create().
 
-Now, pneigh_entry is guaranteed to be alive during the RCU critical
-section.
-
-Let's call pneigh_lookup() and use READ_ONCE() for n->flags in
-pndisc_is_router() and remove __pneigh_lookup().
+The next patch will remove tbl->lock from pneigh_create().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- include/net/neighbour.h |  2 --
- net/core/neighbour.c    | 11 -----------
- net/ipv6/ndisc.c        |  6 ++----
- 3 files changed, 2 insertions(+), 17 deletions(-)
+ net/core/neighbour.c | 43 ++++++++++++++++---------------------------
+ 1 file changed, 16 insertions(+), 27 deletions(-)
 
-diff --git a/include/net/neighbour.h b/include/net/neighbour.h
-index 6d7f9aa53a7a9..f8c7261cd4ebb 100644
---- a/include/net/neighbour.h
-+++ b/include/net/neighbour.h
-@@ -381,8 +381,6 @@ void pneigh_enqueue(struct neigh_table *tbl, struct neigh_parms *p,
- 		    struct sk_buff *skb);
- struct pneigh_entry *pneigh_lookup(struct neigh_table *tbl, struct net *net,
- 				   const void *key, struct net_device *dev);
--struct pneigh_entry *__pneigh_lookup(struct neigh_table *tbl, struct net *net,
--				     const void *key, struct net_device *dev);
- struct pneigh_entry *pneigh_create(struct neigh_table *tbl, struct net *net,
- 				   const void *key, struct net_device *dev);
- int pneigh_delete(struct neigh_table *tbl, struct net *net, const void *key,
 diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index 324d61f86208f..b296353941bbf 100644
+index b296353941bbf..95d18cab6d3da 100644
 --- a/net/core/neighbour.c
 +++ b/net/core/neighbour.c
-@@ -737,17 +737,6 @@ static struct pneigh_entry *__pneigh_lookup_1(struct pneigh_entry *n,
- 	return NULL;
+@@ -720,23 +720,6 @@ static u32 pneigh_hash(const void *pkey, unsigned int key_len)
+ 	return hash_val;
  }
  
--struct pneigh_entry *__pneigh_lookup(struct neigh_table *tbl,
--		struct net *net, const void *pkey, struct net_device *dev)
+-static struct pneigh_entry *__pneigh_lookup_1(struct pneigh_entry *n,
+-					      struct net *net,
+-					      const void *pkey,
+-					      unsigned int key_len,
+-					      struct net_device *dev)
 -{
--	unsigned int key_len = tbl->key_len;
--	u32 hash_val = pneigh_hash(pkey, key_len);
+-	while (n) {
+-		if (!memcmp(n->key, pkey, key_len) &&
+-		    net_eq(pneigh_net(n), net) &&
+-		    (n->dev == dev || !n->dev))
+-			return n;
 -
--	return __pneigh_lookup_1(rcu_dereference_protected(tbl->phash_buckets[hash_val], 1),
--				 net, pkey, key_len, dev);
+-		n = rcu_dereference_protected(n->next, 1);
+-	}
+-	return NULL;
 -}
--EXPORT_SYMBOL_GPL(__pneigh_lookup);
 -
  struct pneigh_entry *pneigh_lookup(struct neigh_table *tbl,
  				   struct net *net, const void *pkey,
  				   struct net_device *dev)
-diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-index a3ac26c1df6d8..7d5abb3158ec9 100644
---- a/net/ipv6/ndisc.c
-+++ b/net/ipv6/ndisc.c
-@@ -768,11 +768,9 @@ static int pndisc_is_router(const void *pkey,
- 	struct pneigh_entry *n;
- 	int ret = -1;
+@@ -747,13 +730,19 @@ struct pneigh_entry *pneigh_lookup(struct neigh_table *tbl,
  
--	read_lock_bh(&nd_tbl.lock);
--	n = __pneigh_lookup(&nd_tbl, dev_net(dev), pkey, dev);
-+	n = pneigh_lookup(&nd_tbl, dev_net(dev), pkey, dev);
- 	if (n)
--		ret = !!(n->flags & NTF_ROUTER);
--	read_unlock_bh(&nd_tbl.lock);
-+		ret = !!(READ_ONCE(n->flags) & NTF_ROUTER);
+ 	key_len = tbl->key_len;
+ 	hash_val = pneigh_hash(pkey, key_len);
++	n = rcu_dereference_check(tbl->phash_buckets[hash_val],
++				  lockdep_is_held(&tbl->lock));
  
- 	return ret;
+-	read_lock_bh(&tbl->lock);
+-	n = __pneigh_lookup_1(rcu_dereference_protected(tbl->phash_buckets[hash_val], 1),
+-			      net, pkey, key_len, dev);
+-	read_unlock_bh(&tbl->lock);
++	while (n) {
++		if (!memcmp(n->key, pkey, key_len) &&
++		    net_eq(pneigh_net(n), net) &&
++		    (n->dev == dev || !n->dev))
++			return n;
+ 
+-	return n;
++		n = rcu_dereference_check(n->next, lockdep_is_held(&tbl->lock));
++	}
++
++	return NULL;
  }
+ EXPORT_IPV6_MOD(pneigh_lookup);
+ 
+@@ -762,19 +751,18 @@ struct pneigh_entry *pneigh_create(struct neigh_table *tbl,
+ 				   struct net_device *dev)
+ {
+ 	struct pneigh_entry *n;
+-	unsigned int key_len = tbl->key_len;
+-	u32 hash_val = pneigh_hash(pkey, key_len);
++	unsigned int key_len;
++	u32 hash_val;
+ 
+ 	ASSERT_RTNL();
+ 
+ 	read_lock_bh(&tbl->lock);
+-	n = __pneigh_lookup_1(rcu_dereference_protected(tbl->phash_buckets[hash_val], 1),
+-			      net, pkey, key_len, dev);
++	n = pneigh_lookup(tbl, net, pkey, dev);
+ 	read_unlock_bh(&tbl->lock);
+-
+ 	if (n)
+ 		goto out;
+ 
++	key_len = tbl->key_len;
+ 	n = kzalloc(sizeof(*n) + key_len, GFP_KERNEL);
+ 	if (!n)
+ 		goto out;
+@@ -791,6 +779,7 @@ struct pneigh_entry *pneigh_create(struct neigh_table *tbl,
+ 		goto out;
+ 	}
+ 
++	hash_val = pneigh_hash(pkey, key_len);
+ 	write_lock_bh(&tbl->lock);
+ 	n->next = tbl->phash_buckets[hash_val];
+ 	rcu_assign_pointer(tbl->phash_buckets[hash_val], n);
 -- 
 2.50.0.727.gbf7dc18ff4-goog
 
