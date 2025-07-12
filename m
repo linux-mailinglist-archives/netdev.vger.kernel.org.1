@@ -1,90 +1,98 @@
-Return-Path: <netdev+bounces-206357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77B88B02BFC
-	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 18:52:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20F23B02C07
+	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 18:54:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08EC7A47CB7
-	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 16:51:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29FA41C419A2
+	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 16:55:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E858E2857F9;
-	Sat, 12 Jul 2025 16:51:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61BC4288C1F;
+	Sat, 12 Jul 2025 16:54:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="ykhIWjMU"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="corG6KK+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-24421.protonmail.ch (mail-24421.protonmail.ch [109.224.244.21])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBA872750FB
-	for <netdev@vger.kernel.org>; Sat, 12 Jul 2025 16:51:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DFE619DF60;
+	Sat, 12 Jul 2025 16:54:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752339116; cv=none; b=Dv1sS4E03IJU+ztk1QovYS1N5/Utu1Ztg77HLcZdxlaJEhN7sg1GsmFt3UN1epVymX0ukXmv7GVM4DCXpjFhaOg/Nr/qb1iLBM5Hb6lRFK4j+nh17NYC5vHfCzij6ex9awnGOx8EaawjyyWuWbPE3ZBfp/XoxojbUVKamhMiJRU=
+	t=1752339293; cv=none; b=ScQj0ummtjCOaY0k2VfFvTWTnaYr8NYbgptdGNV+WxkbcutrvUsWXkQ+O2EL3rIlpcRl5zAGW3R17my934ytHWHmGn2qxXRISkgiQBMidTYaWri+bTRCID22igP/VHbp/u7f6Xm81N1gI8Tf0yKHOdFmXMUcEU+bLW32mLkwtnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752339116; c=relaxed/simple;
-	bh=qza05lza6gb87u4mUP3nQTSQUJjEpdNgU+7wR5EkS30=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=By4kpEnP47w4bFPJQQiNB0sbpwOvzAs5pJh2KvGzu4/8u0TUft3hltZ8EDTuBQPx6vrW700weF5TA+xtmvGBCm5F8NaAdjBhzZLj7sxCbndVlEzxkSBV38fkSJGklksu+HRfF966vu7vwtkz8iY4xqnWTGZq+u9c20XxaPLUDuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=ykhIWjMU; arc=none smtp.client-ip=109.224.244.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
-	s=protonmail; t=1752339105; x=1752598305;
-	bh=qza05lza6gb87u4mUP3nQTSQUJjEpdNgU+7wR5EkS30=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=ykhIWjMU0lDthqtLwm/KQBR5x1kTfRDiLH2VNCoTdDODFsgFf8/8oGII8O2NaD8kO
-	 kddizbC/vTKTvFM9iNaXzrWnjT4DRExm/ayWZi7WRy8euTvzIkn7vCSLpSevH+YpwO
-	 QZryLpKnFYsx5JlfdpPa/GKabCuwGMCgX1sEvhasrgywJNZDoPFaopfujAQwqSnrLu
-	 BgDRHm3lq+++9EquO6IWjvvWfjERvmjBS0dpUxlMVkhLY+IwWoYvX3OTkTCqrMV3dO
-	 eyuu4C65elsU0SfI83nwrghLwgFWqWCzbpyG+rkIQ+W+2P7a8UVegPfqTND4zHs3+X
-	 GXxgJaLquLXDQ==
-Date: Sat, 12 Jul 2025 16:51:39 +0000
-To: Jakub Kicinski <kuba@kernel.org>
-From: William Liu <will@willsroot.io>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com, victor@mojatatu.com, pctammela@mojatatu.com, pabeni@redhat.com, stephen@networkplumber.org, dcaratti@redhat.com, savy@syst3mfailure.io, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, horms@kernel.org
-Subject: Re: [PATCH net v5 1/2] net/sched: Restrict conditions for adding duplicating netems to qdisc tree
-Message-ID: <Xkn0k1T1WExEErBWNX2KpV5LgS9_QyNobWmlUUjcpihDZ5oJrCtZyvuXfiTnrGiOGQnKVQatnw0suv3voQl_6lMrncCe5NdO3NaQliF16mc=@willsroot.io>
-In-Reply-To: <20250711155506.48bbb351@kernel.org>
-References: <20250708164141.875402-1-will@willsroot.io> <20250711155506.48bbb351@kernel.org>
-Feedback-ID: 42723359:user:proton
-X-Pm-Message-ID: 4da2c8d22e3e242b77956bece8db107ec9a8bf53
+	s=arc-20240116; t=1752339293; c=relaxed/simple;
+	bh=7ulItuDfjo0fn2spkVsfqLm+frVP3gh8Mp2EkflyQ+k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wn9X7SorsiYu5EpwvKoNUlG5Egene5Sg1IEPiCe+Q0IptuUkf6NOcac8xGfNQBx2VenMbkc3bLdErMrYcKsmgC+R8sJu5GQKEu/qy+SjJFerlx2qb6VGXH374KR/IeC8ZwDv3YMs0Uec2vXBHn7u5f4Z1Nxl1nc2kMsaM+oyof8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=corG6KK+; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=u7JZxNPnwYbwyAWArXhk9IJzZ+TGZ4/LK+Ux1qSIQMQ=; b=corG6KK+bALYtQfb4jLjqXA+J+
+	/KMHP1asfC5K1q/Rod527h1tEiV1a8m4/MMK2s+S/u/9fbk1Tu+PnV03YhDT/6jMSgmZiUXjlTpKz
+	EuB2b4QfdORml3EeArXyJlUL7PWdrW6LF8BAzu4UGMXFM6loNUW5oRgqYfdRfEOgPww8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uadUk-001JnS-SD; Sat, 12 Jul 2025 18:54:38 +0200
+Date: Sat, 12 Jul 2025 18:54:38 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/3] net: netdevsim: Add PHY support in
+ netdevsim
+Message-ID: <560e7969-b859-45ed-b368-350a62cec678@lunn.ch>
+References: <20250710062248.378459-1-maxime.chevallier@bootlin.com>
+ <20250710062248.378459-2-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250710062248.378459-2-maxime.chevallier@bootlin.com>
 
-On Friday, July 11th, 2025 at 10:55 PM, Jakub Kicinski <kuba@kernel.org> wr=
-ote:
+> +static int nsim_mdio_read(struct mii_bus *bus, int phy_addr, int reg_num)
+> +{
+> +	return 0;
+> +}
+> +
+> +static int nsim_mdio_write(struct mii_bus *bus, int phy_addr, int reg_num,
+> +			   u16 val)
+> +{
+> +	return 0;
+> +}
 
->=20
->=20
-> On Tue, 08 Jul 2025 16:43:26 +0000 William Liu wrote:
->=20
-> > netem_enqueue's duplication prevention logic breaks when a netem
-> > resides in a qdisc tree with other netems - this can lead to a
-> > soft lockup and OOM loop in netem_dequeue, as seen in [1].
-> > Ensure that a duplicating netem cannot exist in a tree with other
-> > netems.
->=20
->=20
-> We already had one regression scare this week, so given that Cong
-> is not relenting I'll do the unusual thing of parking this fix in
-> net-next. It will reach Linus during the merge window, hopefully
-> the <2 week delay is not a big deal given how long we've taken already.
+If i'm reading the code correctly, each PHY has its own MDIO bus? And
+the PHY is always at address 0?
 
-If this is going to net-next, will this still be a candidate for backportin=
-g like other recent net/sched bug-fixes? Or will this only be considered fi=
-xed starting 6.17 onwards?
+Maybe for address != 0, these should return -ENODEV?
 
-Best,
-William
+I'm guessing the PHY core is going to perform reads/writes for things
+like EEE? And if the MAC driver has an IOCTL handler, it could also do
+reads/writes. So something is needed here, but i do wounder if hard
+coded 0 is going to work out O.K? Have you looked at what accesses the
+core actually does?
+
+     Andrew
 
