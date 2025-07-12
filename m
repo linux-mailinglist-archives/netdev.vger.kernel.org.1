@@ -1,106 +1,131 @@
-Return-Path: <netdev+bounces-206379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5694DB02CF9
-	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 22:55:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BB56B02CFD
+	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 22:58:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81CE01AA56C5
-	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 20:55:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 735B5178940
+	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 20:58:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7839A220698;
-	Sat, 12 Jul 2025 20:55:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 085CA226D04;
+	Sat, 12 Jul 2025 20:58:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XykuiLKA"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="rQisFPWB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10EB02AE99
-	for <netdev@vger.kernel.org>; Sat, 12 Jul 2025 20:55:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6F82AE99;
+	Sat, 12 Jul 2025 20:58:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752353716; cv=none; b=Lz65wBNiVeiJgq/RfHTU5X9bKD+aRX15fYkNpUSvavQrU3O7DgYWb2RqX5VfJapKf8/w/Ox08pm1d6KYVqAIN/a07MVR7Vhh0cg1Nna4hwCmjxdNBLgZJgjkaKxhyHiNcFBg0Ah8X1joysScu+YUnAw02+oL/TxupdYRMR9DaQ0=
+	t=1752353896; cv=none; b=KuhqL/c2178h3oPwZIVbstIHipM7FvJ8v4SSUI3n4E0+V/4hLh/kTztS5vTB3l7/CyZJyu5wZKxCinEMVzQcbEzLRf+ADH/Zh6HSHPpTh2PTc23bg154CLHNTrs3R2e5wCYfqXGbELrho0PgKMLz/InMWSAlL49up8jaVJcwY2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752353716; c=relaxed/simple;
-	bh=7X1MN4te04iDp5U8ut2UFRVxRn7UJtMy7oJlUOvzgOY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m7z2n96OxbJkDn+GytzdRhZB322j4bID8VEf5mqrND1qwVS2JhOACKn0+T4I/tx6oQd+2MJUqnS2CNY17LC7xtPkLtPpi7NPY04PMjKqsEAAFkgIF++gRQi84uwG1Lvi013ZDSMmWfEuJLfZu2ilwb0wId9o550OdKsN6QkrzuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XykuiLKA; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-3122368d7cfso2632850a91.1
-        for <netdev@vger.kernel.org>; Sat, 12 Jul 2025 13:55:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752353714; x=1752958514; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7X1MN4te04iDp5U8ut2UFRVxRn7UJtMy7oJlUOvzgOY=;
-        b=XykuiLKAJ36Kssoa5ORbqdWbKx6KjOKLbcNXMh1rLb8AeOflHdXbmwLa/PSRagvIin
-         qoX0XrpMjXFQfgD0GLCe8vMVypB1WOt+hfewTzGbwsum48NcYx+cAkSTH+CBg6kfkr0f
-         fFVFHvtzPC7LW40NGPtaG38MF6UXZE5nLBycO9HaS6OoJXFxhXKea914M0wYzvok1mb9
-         L47sABObpkMS6X2Bn5FzYYwf1JjYPxmaaH76vTfhabHqUTCc006sHqia61l8Pxth+0dA
-         aDZg2W5DQnW7KLLiFV1tHy9qAByRSJ894raJ4QLRjOHeF2T611p8qDf8niJA+lpnc7pe
-         HR8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752353714; x=1752958514;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7X1MN4te04iDp5U8ut2UFRVxRn7UJtMy7oJlUOvzgOY=;
-        b=UpP/uSsGiTOFjmfWVfbjdB0pqlklOi1pw6QckyPFsJMxQz/LP7glDr71YVP2MF5FfC
-         zAZw4i9Rwc7oOiORLcNnsz9QUYNa2kzTVcCji9Q5xv7nDNxTU4Tm5jRN6vwm/xVd0p5V
-         GBdaxE+xUY48OEuBmktKq+bwxgkVGaE5cTgdpfMM+iAnbi76czjmNm26bqPd3DyNZn8/
-         yUGdI2AhcGfvL/ahOj8ryLCzEFdx3ztPmA7AYGcmYi/76j7UopSQXASm7bYYJmBEvPay
-         PGE2U21Scdrnlsqi4oIDJgqBdAkgkKMsf7RjCzlw23SkEt0H4NwTumm6kaiewsUYt4/o
-         5n2w==
-X-Forwarded-Encrypted: i=1; AJvYcCWd8rt0dYIXkMUOAytxkPjdwTrnjVXloIxsT6O7HwWa7EctlODfocEMgpvhD1bt+nakyiA68gA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhZByl9SaGUnyApo/hBf1hA3OP5Ec58l7Z0XMJr/vGTjxQ224X
-	9VT9021QYDrfIS0nE5b6sP7n2yrsJ7qapgnmHq/aIIbwQ32V6hfc3aeq/ZXPJp4aWhhLDHWmzOH
-	S5UxJPUsqbMgOb9eAy/fVx3jzDv7TDUwx9ia7lhIo
-X-Gm-Gg: ASbGncuGzqjy9h1c1S2IdP52+K5h0eWVglk+NP+Lh+Vyq7ufqsAsDxhT6S8K1C3HJmt
-	tc7Xm52AqDnDGLCV70zq9GR8zvwe1i+yPOsTsh6VF2IXdmJ757Jqpec18b0QTZbRjrtdT3lMmOj
-	qWQwAw9YDvp+JwI9nJAv92vj7PqchXGKpSSm9WmPhwCLC0ApA4BYwHJ4aIjEqcyrnYobyKagW+X
-	0Xj0C27UuF0qmdJx9jPy8f2vCWP0fOVUQQUtu9h
-X-Google-Smtp-Source: AGHT+IF+rj/dEJSDhVNV2RUde/zmvs8TqPsmNOZqIj6kRcJHy0FDp0+3/bZeNks2g33kkRhnH3ja3c3MkHt9lUvwlmA=
-X-Received: by 2002:a17:90b:4c4a:b0:311:eb85:96f0 with SMTP id
- 98e67ed59e1d1-31c4cda5bdbmr11565271a91.29.1752353714283; Sat, 12 Jul 2025
- 13:55:14 -0700 (PDT)
+	s=arc-20240116; t=1752353896; c=relaxed/simple;
+	bh=FEMsf/9UUhbO1J42GaCRa+G6cmu7M28PWoVxpXXzl9o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KSOp2gvFMGghj0+Q3cVmv8aVR2PCtKmXUF1i8zwwbyNaXUS1j/x3vOXp7OErYqx847Snxjx5plx41ES18Egqugoy7cN34zSOF8tsYl10rC8gaob1ld+zPvT5aKnLstnZMwUxIWgkil8PS6AoHfWC8I9Tke+Pev9yeIcLIoKxUCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=rQisFPWB; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=PdU3RQRc7EGqYt9TTQYBK9ze3sa2k9tRuF6p73T8Yxk=; b=rQisFPWBdpvBaJfV
+	ogaZCdtLzGt5LrlqfzQUOoj9EsRKXO0FJMHp+iwxvD4rzvo7cg7mkGCLkIV2mfCUz+Xd+uKI2Qr1G
+	ESCUltzt40WdBicQZDjzm81T0GW+1CeA6tnDn7+j2Z3oStrBNOzZrlDciocP5ojkUNS2c696BG2d2
+	M+t5G8OGStFQHMii266OoVAHbeJqyoys1lLLl2KS1H2Y36Ge6Oxryrg46ftHCANpXZftfTd7UOXoR
+	shnuzh9HBoUZICdbniL/Q8XalmMYlOuwGyiS0q3UkSmWZXHtBObhXtywWadfIqMKKch1HDjtOARaY
+	7tsBRvotMkcdyqXgtg==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1uahIG-00Fjnq-20;
+	Sat, 12 Jul 2025 20:58:00 +0000
+From: linux@treblig.org
+To: ms@dev.tdt.de,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: linux-x25@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [PATCH net-next] net/x25: Remove unused x25_terminate_link()
+Date: Sat, 12 Jul 2025 21:57:59 +0100
+Message-ID: <20250712205759.278777-1-linux@treblig.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250711114006.480026-1-edumazet@google.com> <20250711114006.480026-3-edumazet@google.com>
-In-Reply-To: <20250711114006.480026-3-edumazet@google.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Sat, 12 Jul 2025 13:55:02 -0700
-X-Gm-Features: Ac12FXzknsufV0r2U4X2pwzSjXN5lRM6PPydSjoh0GdpWqHUv3yPfqE_FUElmEE
-Message-ID: <CAAVpQUD6vtxOvNS77mKbBWCzqATOa7oLHsG4bWF9huUq+bVh1Q@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/8] tcp: add LINUX_MIB_BEYOND_WINDOW
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
-	Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jul 11, 2025 at 4:40=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> Add a new SNMP MIB : LINUX_MIB_BEYOND_WINDOW
->
-> Incremented when an incoming packet is received beyond the
-> receiver window.
->
-> nstat -az | grep TcpExtBeyondWindow
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+x25_terminate_link() has been unused since the last use was removed
+in 2020 by:
+commit 7eed751b3b2a ("net/x25: handle additional netdev events")
+
+Remove it.
+
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+---
+ include/net/x25.h |  1 -
+ net/x25/x25_dev.c | 22 ----------------------
+ 2 files changed, 23 deletions(-)
+
+diff --git a/include/net/x25.h b/include/net/x25.h
+index 5e833cfc864e..414f3fd99345 100644
+--- a/include/net/x25.h
++++ b/include/net/x25.h
+@@ -203,7 +203,6 @@ void x25_send_frame(struct sk_buff *, struct x25_neigh *);
+ int x25_lapb_receive_frame(struct sk_buff *, struct net_device *,
+ 			   struct packet_type *, struct net_device *);
+ void x25_establish_link(struct x25_neigh *);
+-void x25_terminate_link(struct x25_neigh *);
+ 
+ /* x25_facilities.c */
+ int x25_parse_facilities(struct sk_buff *, struct x25_facilities *,
+diff --git a/net/x25/x25_dev.c b/net/x25/x25_dev.c
+index 748d8630ab58..fb8ac1aa5826 100644
+--- a/net/x25/x25_dev.c
++++ b/net/x25/x25_dev.c
+@@ -170,28 +170,6 @@ void x25_establish_link(struct x25_neigh *nb)
+ 	dev_queue_xmit(skb);
+ }
+ 
+-void x25_terminate_link(struct x25_neigh *nb)
+-{
+-	struct sk_buff *skb;
+-	unsigned char *ptr;
+-
+-	if (nb->dev->type != ARPHRD_X25)
+-		return;
+-
+-	skb = alloc_skb(1, GFP_ATOMIC);
+-	if (!skb) {
+-		pr_err("x25_dev: out of memory\n");
+-		return;
+-	}
+-
+-	ptr  = skb_put(skb, 1);
+-	*ptr = X25_IFACE_DISCONNECT;
+-
+-	skb->protocol = htons(ETH_P_X25);
+-	skb->dev      = nb->dev;
+-	dev_queue_xmit(skb);
+-}
+-
+ void x25_send_frame(struct sk_buff *skb, struct x25_neigh *nb)
+ {
+ 	unsigned char *dptr;
+-- 
+2.50.1
+
 
