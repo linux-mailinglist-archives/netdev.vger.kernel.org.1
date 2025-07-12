@@ -1,156 +1,153 @@
-Return-Path: <netdev+bounces-206350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9822DB02B9A
-	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 17:08:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38AD8B02B9F
+	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 17:12:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 868981C20F83
-	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 15:08:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F81916C4D8
+	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 15:12:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC68228643F;
-	Sat, 12 Jul 2025 15:08:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XpoY7MHs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48198286881;
+	Sat, 12 Jul 2025 15:12:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from maynard.decadent.org.uk (maynard.decadent.org.uk [65.21.191.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0054620A5EB;
-	Sat, 12 Jul 2025 15:07:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D81014286;
+	Sat, 12 Jul 2025 15:12:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.21.191.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752332880; cv=none; b=YWRHv7vSbcQgP2lRDup30h1SbtwZyZFtzQUgFLrAcYzeSCVAkKpvctcJtiDKGnbpTSGaOZ8LdcpE+5Ci82Jp9b0/yRbYrsEaoYhMptSvDyvg2ZYnDQ2D1I8II0x5VF0ZtydG+3I+KuoBJKX0OUE3CkTiv56eKoSjHtjMUsnV3xw=
+	t=1752333170; cv=none; b=U3EUvtR9BmII6G1/o8yB21h88An6bZdDF9dD3GCJpAConU/dSuKZfem4BKilbqOlbK/XeukMLbpx8QUE36lWUKuaHiO8heH0KsqjN6HQZpo3YKeGJ+dIZPq9xLVw10txjsTpelcNpKUU2w1drn5mKqYcVT9t3Jb4KaHC3qc61YA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752332880; c=relaxed/simple;
-	bh=Ml68cAZ0jrmTzQ/+zKW2XkASPBTqrniL7VHVr0ztAks=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F+bH4ueCj3Dld2JnNS/VEfNLk4syjL/h7GtCqLaK2v3Y4kpalA2Fi5F8wT+kxkGndZIfdTdQotlTUHdoKCcv3wsR5Ti5HuffcfNOGuCoGDbVh5FlhjtuXxOa/wRbRMFtoeeusbsnZHTxNnDVD7AsunDsbA6dWi7BchVyOC0A6fM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XpoY7MHs; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-606b58241c9so5030755a12.3;
-        Sat, 12 Jul 2025 08:07:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752332877; x=1752937677; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LjapWLaKwEm+cnxI7mm3uoKAqQEsEg4Xa2RcYI/4Fpw=;
-        b=XpoY7MHstf3afq5QlK2ZMo4P8MGb/WdWhtKT8ZBS4C2rwxMGptHL9E/j/ByKrlQgkR
-         mnmm9ZbTpuE8CSlxj2bWaAy685OXBZp/W3gDXNcwuoJXTX/bePCS11asy+7olp7zSBPU
-         jx+lh3vs5nmTMiu6R6ZBmdPS22Fnr20SgHtlvwLr7xC12qb7CbwAD+ADhyJa7N/cIowV
-         asM7AWXy0n1mfQZbgFeTiR76HK/zeIVRrLPc0GZe+NZI3TlpLtrVov/PdcIoWn7kPQax
-         MREQDSwmHjDsLCgZDpKJ97spoDNPS/mwqNNzP4ZmlY9x7askAiB3n+DX7A3b7y0gPhfe
-         Wn9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752332877; x=1752937677;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LjapWLaKwEm+cnxI7mm3uoKAqQEsEg4Xa2RcYI/4Fpw=;
-        b=eXZIzt+5i2QwEhdjXRFrOtBA1a+8tCUaNvYawkIRoJC6yxNNuXb9FZq+p0YFmAe98D
-         +takAWVjHsmBPDznzEJxH7ZQc2KDmMamA6NeCiWTT2UUIQat5F4v9xenC4/QsYUNyc29
-         WE1ak6UxLnjjPejbVmKVNCtGcFxobkq0GNx68CLB2C/no/WDWAVhSQoO1iyCEVWYWm2v
-         Topk+iRSc8zghH0mHZsQaFYddCXNpxBRelmlm4RB+foop++WXKAE19azF6e0TGF7t0CV
-         Ge3WA/KVXFiXQebDZksl2NEtcpeOQE6cFO6rT2Drmru/93So5MwFplvt9ApjLYc+Z0Xr
-         k8zw==
-X-Forwarded-Encrypted: i=1; AJvYcCWFvQhnOlYAutOzBLI5nrqlXe1AHsFqB6JU9+gAxSdm9pr0o5V+KQga7QHOrfi1iKrTiDA=@vger.kernel.org, AJvYcCWbiBVwJXTTrQae0HjiAJi7+pwE/9E81fTvbySVgXDLHnEodZ9YRPmUHp59chQ8pzOcu3xmb2Y4iubaUw==@vger.kernel.org, AJvYcCXddcMW2xPnnymrgciB8L0+GvdUbGYkdCFltKZUAW/RS0o+SwND7bDYBNH6Y/SGNWFMRjGGCozM99U/+SvU@vger.kernel.org
-X-Gm-Message-State: AOJu0YzdfTf/9h+H1pn2hRVmwPMa3QOgUlyWIR8DH45betSUNQZhbNWe
-	4xPd4dmYlLdeT2VdtEPF0zJNPxOk2flfkXLv4IIP/wq7CjIpPYTS4WfT
-X-Gm-Gg: ASbGnctvvB6S++rKKh5Tl59RRqft3qGRp7FIurQn2zh9vcXFuoImhTaMG5/yX761QbH
-	0JQocWdmJgOY8gMS/7RBh9AfFyaTKdVip3F25SwrK4s3bosCHytVCFfsnVp+XUZ1RP0cCDNPHSo
-	BDhTWA9O5tTPW5Obl6l+eNdVO3hB0Ml56ALZdCw1Eyo4kS1IiYUZG9LLMLBkPod+hORXnmbTShH
-	x+m4UhE9QmW7iI+3mQVNLcKQTM6ERtVeNB1IukSW2QaS3BnCr5R//srgSsgy5HUUSjKaXNUopP9
-	UJWqmdFfqOu1M50Xl1s+8xfX9gekCvTcUOOiMijh1Z4T47gRFG9vyhBdkBB3dmnSXGe3SS18MmQ
-	wv25+gZ1N5xsZzpB+L67uu5LE4Ew9bOEtejQ=
-X-Google-Smtp-Source: AGHT+IH0ccXxEaV+aqcSaAvnAzt/69VcEQFX7DWBxvFbG4EKn7IpAxKQyRxv0Ia+9U1NVY8obQDJ0A==
-X-Received: by 2002:a05:6402:2553:b0:607:f31f:26de with SMTP id 4fb4d7f45d1cf-611e760ac17mr5513207a12.1.1752332876715;
-        Sat, 12 Jul 2025 08:07:56 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325::1ac? ([2620:10d:c092:600::1:3e2a])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-611ee1716fcsm2181067a12.7.2025.07.12.08.07.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 12 Jul 2025 08:07:55 -0700 (PDT)
-Message-ID: <7c8b9d7f-545c-4e37-8d0e-39b1d525a949@gmail.com>
-Date: Sat, 12 Jul 2025 16:09:13 +0100
+	s=arc-20240116; t=1752333170; c=relaxed/simple;
+	bh=ilrqpBJ48BxReMjEg/7sgs7v0a9iPzBDrQJ0GNwV3B0=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=hiPiJpTzzvUOz18GyOKY71NAFuy0I3o//Ajm/WhBbvnljUCG5nLsF31fLtcjzbKkPiFAb6VuCBnAZulCBrEpF28ou8eM7Fny6lZRmIFaosFA+C/fkKZQFR7mrYW0dV9uiYeGDomPRWl+gN/CLYaZQgxfp+BFbY9hou7mBiEa2/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=decadent.org.uk; spf=pass smtp.mailfrom=decadent.org.uk; arc=none smtp.client-ip=65.21.191.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=decadent.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=decadent.org.uk
+Received: from [89.234.162.240] (helo=deadeye)
+	by maynard with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ben@decadent.org.uk>)
+	id 1uabtz-0059j5-2N;
+	Sat, 12 Jul 2025 15:12:35 +0000
+Received: from ben by deadeye with local (Exim 4.98.2)
+	(envelope-from <ben@decadent.org.uk>)
+	id 1uabty-00000002Vec-2keS;
+	Sat, 12 Jul 2025 17:12:34 +0200
+Message-ID: <c40b5e6cb26654f698e51b131956065b952ad222.camel@decadent.org.uk>
+Subject: Re: Bug#1104670: linux-image-6.12.25-amd64: system does not shut
+ down - GHES: Fatal hardware error
+From: Ben Hutchings <ben@decadent.org.uk>
+To: intel-wired-lan@lists.osuosl.org, linux-pci <linux-pci@vger.kernel.org>,
+  Pavan Chebbi <pavan.chebbi@broadcom.com>, Michael Chan <mchan@broadcom.com>
+Cc: Laurent Bonnaud <L.Bonnaud@laposte.net>, 1104670@bugs.debian.org, 
+	netdev@vger.kernel.org
+Date: Sat, 12 Jul 2025 17:12:30 +0200
+In-Reply-To: <8a232a97-5917-41d3-8e88-e68abdc83202@laposte.net>
+References: <89159d74-c343-480f-9509-b6457244d65d@laposte.net>
+	 <8a232a97-5917-41d3-8e88-e68abdc83202@laposte.net>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-EOHNBDwerU4Tq4Na6UmU"
+User-Agent: Evolution 3.56.1-1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 3/8] page_pool: access ->pp_magic through
- struct netmem_desc in page_pool_page_is_pp()
-To: David Hildenbrand <david@redhat.com>, Byungchul Park <byungchul@sk.com>,
- Mina Almasry <almasrymina@google.com>,
- "willy@infradead.org" <willy@infradead.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- kernel_team@skhynix.com, kuba@kernel.org, ilias.apalodimas@linaro.org,
- harry.yoo@oracle.com, hawk@kernel.org, akpm@linux-foundation.org,
- davem@davemloft.net, john.fastabend@gmail.com, andrew+netdev@lunn.ch,
- toke@redhat.com, tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com,
- saeedm@nvidia.com, leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
- lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
- rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org,
- linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com,
- hannes@cmpxchg.org, ziy@nvidia.com, jackmanb@google.com
-References: <20250710082807.27402-1-byungchul@sk.com>
- <20250710082807.27402-4-byungchul@sk.com>
- <CAHS8izMXkyGvYmf1u6r_kMY_QGSOoSCECkF0QJC4pdKx+DOq0A@mail.gmail.com>
- <20250711011435.GC40145@system.software.com>
- <582f41c0-2742-4400-9c81-0d46bf4e8314@gmail.com>
- <3acd967e-30b3-4e76-9e1b-41c1e19d4f31@redhat.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <3acd967e-30b3-4e76-9e1b-41c1e19d4f31@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 89.234.162.240
+X-SA-Exim-Mail-From: ben@decadent.org.uk
+X-SA-Exim-Scanned: No (on maynard); SAEximRunCond expanded to false
 
-On 7/12/25 15:52, David Hildenbrand wrote:
-> On 12.07.25 15:58, Pavel Begunkov wrote:
->> On 7/11/25 02:14, Byungchul Park wrote:
->> ...>>> +#ifdef CONFIG_PAGE_POOL
->>>>> +/* XXX: This would better be moved to mm, once mm gets its way to
->>>>> + * identify the type of page for page pool.
->>>>> + */
->>>>> +static inline bool page_pool_page_is_pp(struct page *page)
->>>>> +{
->>>>> +       struct netmem_desc *desc = page_to_nmdesc(page);
->>>>> +
->>>>> +       return (desc->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
->>>>> +}
->>>>
->>>> pages can be pp pages (where they have pp fields inside of them) or
->>>> non-pp pages (where they don't have pp fields inside them, because
->>>> they were never allocated from the page_pool).
->>>>
->>>> Casting a page to a netmem_desc, and then checking if the page was a
->>>> pp page doesn't makes sense to me on a fundamental level. The
->>>> netmem_desc is only valid if the page was a pp page in the first
->>>> place. Maybe page_to_nmdesc should reject the cast if the page is not
->>>> a pp page or something.
->>>
->>> Right, as you already know, the current mainline code already has the
->>> same problem but we've been using the werid way so far, in other words,
->>> mm code is checking if it's a pp page or not by using ->pp_magic, but
->>> it's ->lur, ->buddy_list, or ->pcp_list if it's not a pp page.
->>>
->>> Both the mainline code and this patch can make sense *only if* it's
->>> actually a pp page.  It's unevitable until mm provides a way to identify
->>> the type of page for page pool.  Thoughts?
->> Question to mm folks, can we add a new PGTY for page pool and use
->> that to filter page pool originated pages? Like in the incomplete
->> and untested diff below?
-> 
-> https://lore.kernel.org/all/77c6a6dd-0e03-4b81-a9c7-eaecaa4ebc0b@redhat.com/
 
-Great, then it'll be the right thing to do here. I somehow missed
-the post, will add your suggested-by.
+--=-EOHNBDwerU4Tq4Na6UmU
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Pavel Begunkov
+Hi all,
 
+On Sun, 2025-05-04 at 13:45 +0200, Laurent Bonnaud wrote:
+[...]
+>   - Previously the kernel would output an error in /var/lib/systemd/pstor=
+e/ but would shutdown anyway.
+>=20
+>   - Now, with kernel 6.1.135-1, the shutdown is blocked as with 6.12.x ke=
+rnels (see below).
+> --
+> Laurent.
+>=20
+> <30>[  961.098671] systemd-shutdown[1]: Rebooting.
+> <6>[  961.098743] kvm: exiting hardware virtualization
+> <6>[  961.361878] megaraid_sas 0000:17:00.0: megasas_disable_intr_fusion =
+is called outbound_intr_mask:0x40000009
+> <6>[  961.414526] ACPI: PM: Preparing to enter system sleep state S5
+> <0>[  963.828210] {1}[Hardware Error]: Hardware error from APEI Generic H=
+ardware Error Source: 5
+> <0>[  963.828213] {1}[Hardware Error]: event severity: fatal
+> <0>[  963.828214] {1}[Hardware Error]:  Error 0, type: fatal
+> <0>[  963.828216] {1}[Hardware Error]:   section_type: PCIe error
+> <0>[  963.828216] {1}[Hardware Error]:   port_type: 0, PCIe end point
+> <0>[  963.828217] {1}[Hardware Error]:   version: 3.0
+> <0>[  963.828218] {1}[Hardware Error]:   command: 0x0002, status: 0x0010
+> <0>[  963.828220] {1}[Hardware Error]:   device_id: 0000:01:00.1
+> <0>[  963.828221] {1}[Hardware Error]:   slot: 6
+> <0>[  963.828222] {1}[Hardware Error]:   secondary_bus: 0x00
+> <0>[  963.828223] {1}[Hardware Error]:   vendor_id: 0x8086, device_id: 0x=
+1563
+> <0>[  963.828224] {1}[Hardware Error]:   class_code: 020000
+> <0>[  963.828225] {1}[Hardware Error]:   aer_uncor_status: 0x00100000, ae=
+r_uncor_mask: 0x00018000
+> <0>[  963.828226] {1}[Hardware Error]:   aer_uncor_severity: 0x000ef010
+> <0>[  963.828227] {1}[Hardware Error]:   TLP Header: 40000001 0000000f 90=
+028090 00000000
+[...]
+
+It seems that this is a known bug in the BIOS of several Dell PowerEdge
+models including (in this case) the R540.
+
+A workaround was added to the tg3 driver
+<https://git.kernel.org/linus/e0efe83ed325277bb70f9435d4d9fc70bebdcca8>
+and a similar change was proposed (but not accepted) in the i40e driver
+<https://lore.kernel.org/all/20241227035459.90602-1-yue.zhao@shopee.com/>.
+On tihis system the erorr log points to a deivce handled by the ixgbe
+driver, and no workaround has been implemented for that.
+
+Since this issue seems to affect multiple different NIC vendors and
+drivers, would it make more sense to implement this workaround as a PCI
+quirk?
+
+Ben.
+
+--=20
+Ben Hutchings
+Experience is directly proportional to the value of equipment destroyed
+                                                    - Carolyn Scheppner
+
+--=-EOHNBDwerU4Tq4Na6UmU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAmhye14ACgkQ57/I7JWG
+EQkCGRAArhhsaQfYReSLaDpResfBQgdhi852snU1Y27XpESTwii1AV8M71XxWPnw
+m4WnPVctGUQg2Qb6nrwGaiJUr7Rj/R+RzkKynuYmVsVthZGTZtyOx525S/HjJVmQ
+IFOdJA0Mw2czAUo6xB4rwBga9Leq5U7y2zkjvVb9qtMs3A7y5FaLYSv8WRArECXx
+HP2BoWtxv3ItxcU9Os4TYwkcVQga9zpKCUxUzrUvLOKOAIneduV3zqUeoy0YD958
+kkpXLN+PuqGzaxFLzr/r63d4wlBY+De2Vtd/yWKzSr+5n5ZeZ/yi6ZDxWjJXe42c
+B4IIIrh/EsZRXL0ThEwo6sjoaBFxCMwSLhdwIsIhTGXl702VXynS+CqRMT9G8x9T
+EUZj5F3PIKYSB5nb+r2t/XEosAL8z2a7bbZWkQUHruUXpycXCdDFa7rLJdqKBva0
+TFYgstWr9V7oHzPsocZfT3k/UbArzGAwuKk0sWXTAobYmN1vun//muNK03xmu5V8
+ib0t2CXjFiQLtoKPtfev2/BC5lYWb9lMUha7cukLZjPTNQr9dINvqKOc0OlcNd0d
+Lefcf8f13nzQDAr8U/kTWWzz0u1+fTR41jwrr+Qz0ohS7/JJis8hpZSW1ji2ImKj
+Q2YDgm36H28uGMpQzll638Q0SR7+A6CkCHeelMpKNmtulS9+z1w=
+=tyMx
+-----END PGP SIGNATURE-----
+
+--=-EOHNBDwerU4Tq4Na6UmU--
 
