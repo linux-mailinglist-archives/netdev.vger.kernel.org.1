@@ -1,124 +1,196 @@
-Return-Path: <netdev+bounces-206342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26F0DB02B76
-	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 16:38:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39436B02B84
+	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 16:50:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2652F7A10D9
-	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 14:37:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C32743AD792
+	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 14:50:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF942853EA;
-	Sat, 12 Jul 2025 14:38:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0D0527EFF7;
+	Sat, 12 Jul 2025 14:50:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GGrn0yab"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="hyDnnrsw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8126218ADE;
-	Sat, 12 Jul 2025 14:38:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A33E1DACA7
+	for <netdev@vger.kernel.org>; Sat, 12 Jul 2025 14:50:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752331126; cv=none; b=WJVcEZJUVdlUxRyIWkeWJhW95dw6qKwY+tdgYaYBeS9e4AT7546AkcXhDYslDTt7TXLLOoKlCEfGoe/dVItCXNMlxEFkuJuln31JtIoQJ4Do+GCy/0J1ak6VZ5eMqq3vkfw0yqmmnD8I0VVvEoAyfNqMQ5ccqGiLzo0R+baGyL4=
+	t=1752331844; cv=none; b=DlUT/q0LBOdMgDYyXUrtwcsZwzyj1+Iz4yA8oSKP5POg/wvVKslGZnQcTPrjG0tCtmGOmf8ZAPs56j3KQ8VUYZkoZ2e+R6vu4PbiOM7GFZZlxqSQEYUYJxSNOd0pBNKCXwD0CT4zQp5wrBvuf5fDIMGkDsjmlaYIK0cf9/WqeSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752331126; c=relaxed/simple;
-	bh=JL0yAS7YGbdfaUG0OW1m/bcaqjrSdvczB5r/M1DxKs8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Gw30tKGefrRN7oI8qslwAoMUDL1HxvY2bqgOU7b8Wsc+pfM6Us96HWiY1az1J0TgZdjMBm2MfhYFBr6SBYGbr0XprbDlSLtcxRUpeXGk3gklyvoU/UqyHfj/DnlWdzCQdSno0JKySG9oxKLea1tQKnK01YOe9emejD1SpIUwUno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GGrn0yab; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-60c01b983b6so5585162a12.0;
-        Sat, 12 Jul 2025 07:38:44 -0700 (PDT)
+	s=arc-20240116; t=1752331844; c=relaxed/simple;
+	bh=zP5NLEmLJCo+ZVIDfc1PnOQtGR6WLZei6ybdIcRPt2A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tI7ZTK4WiHZoe0jFlo6OrbxiRRn3ebeZKd6ckj+ISQGgQCnGnhm5khJIpRT/7VrMSo/482txKSpxpsxin+TySaVm9KZ0O8T6YT6anfDBOB7t+4+KG1MIuSeKz+Uk4EkE9MNtEwrdcXyNjxXn4UtrLXqdVB8BVBJyoZrm10IoEJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=hyDnnrsw; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2350fc2591dso29776715ad.1
+        for <netdev@vger.kernel.org>; Sat, 12 Jul 2025 07:50:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752331123; x=1752935923; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=koT4tW7sPR7eLhyX94iUXRNXGl+r0eUfBJKco6+0BRU=;
-        b=GGrn0yaboY6Yi/ODmn5qaUtnT5tmqTH9lC7gZnSQbe4m2mKISXwbrBbNhJQl1jy/G4
-         NaUaK4dGxTfIFULBNt5HKamY9t6EUGSeSPtorGIM5KzNaS6Hx//5OC6o3SKnL6qQgH6/
-         Vj+npePqPnJUyX7xIBM1zK7KZBB6o6CZVv77fOfOGOtM9zAsODMr680pXb0QcgzKuQad
-         It91lMTAjVoELdMnzcLevsK224Q7QHFc5g4GwbCaZtjakI9KwlwuZeAgRJI55OPFWij3
-         SdwwbkhavVkgs5zgU49LxzfzZwnGcI2dc6sSEqkDN3gJYV6ieRnFiKT2XNM161eJfPtg
-         sMzg==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1752331842; x=1752936642; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=r8ZD2wqQ2MFObmE2ter/MLsk6WNa+XkZK2/I8F8necI=;
+        b=hyDnnrswm1x37jvfH7G7dIAU4T6APrKOyekvC1ejGc1hKNMq/qvSEgqXRLiLTqtppd
+         R+hUBCVvyQo6+bx6DrzpODjNr+egQcIuOOOomk6ph2yBpR8pw/em97pRM+48cUraJJzx
+         lSkk8iPz2s7KOlK0yDjEbLR/tv8SwhT9vAF7VD6gvzcoJnjMMjSgBWWJ2FllR67M6IGW
+         5Kkk6qbqvI9ixUigSWolqn1NtPAthnmvLv48RaBhNb2WoNkpV5SR2x26REEGsfU84jdS
+         J1kBDozujwIWA40or/4YvCYB0aL4S+QhjBT8yrQzIcDYlUJte/jUVC+dcpP3IPJnUyT0
+         GcQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752331123; x=1752935923;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=koT4tW7sPR7eLhyX94iUXRNXGl+r0eUfBJKco6+0BRU=;
-        b=t0eze/7iMgJEPah3JrIPEV70pfR+jp3eW1YghHvA1a2MNi2wHcLjok8IgfJ225hQf1
-         qY0ZKRm5z7AYVFKfAfbXoW1/qxlKGwTPOQx/8PK/jpzUdIc6ixr/gbshsNbfZijjkmJg
-         JWp2qThvE/pXCm88WO70JT8dmldj89eAtgoRtyGBFqil/XdFJUBBFxevX5E1OBcj83nn
-         LjShnmrLu2HpykJb1EC7yyQWvBI2Blw5J/y7U47jiwAvyqx+D3uFDWdH7yMCAjZ1An5E
-         s3/NMciD6ZoCdaiFX+smsJ62i3otK2RflUXs/T1rpGYMpap9FBuc94O6I039LSuJNxjD
-         sr0A==
-X-Forwarded-Encrypted: i=1; AJvYcCXIrx242aJ5VLt9CMgQxi2cnL6VPp1oA2i8DiOcRbSoc0wOdnf3DroyCTANXccuxqXlGUuqpP5Z1SNNHQ==@vger.kernel.org, AJvYcCXWx+StR0SkGvpDBHJDqJfASrd5o8j+4wn8Xovtv3PWgh3oIa/52oAaHPZ4Gtj4ASbKjA+JNDHd@vger.kernel.org, AJvYcCXmifwxQY6+45/EkhIRLEtG7Ot5R0VM7aglD4dN4DiJFNn3qkRMAQ6ffVskn8fRSTOVDTE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwnxVNbhsnX3qz+5brFE2ytU0Ib0eclV5hgJ/qGucHJDrksPi/
-	nCxHXYZcn0GvY7qSTsrhk/4kvPQv0LJ5MyE8gnbMzu9arDnrzppsDhHM
-X-Gm-Gg: ASbGncvqdIUArJPGxSh+kN0j3of4G0L/z7ZNKHTj5fFrxJygFQ4oVd2baoyGBK4fFXz
-	Cciu3MNLAFHNaEuZMcQSKCKXC1leB83Ui7PZoN46yphy77Ki8RWLTX65cbmx2EBlQYxw3LkJAg1
-	MD+XtwtaOKNfXklmnxehxvHlu8jlnhgpEw+84zO5oVmyD56qNFWdsKDCS+9wsWXNYu8qR6XEOrE
-	Dx+ffuTMU7YGFFlmIDCWT1Ajh17DP6q6mgGVnTExR2b2GUAAzAldzME7wtHKECb56CAD00qQq3B
-	Sc+4UdrROSaMInYjEJ51PfqzjB8k6nt7v1/S0NtKasL41fr2CJp6IG7q0HfDUMRM74O/CPzhU/F
-	lCCHiG0kv1SOB94V0K8zA/YZfYQzVrsUS1u8=
-X-Google-Smtp-Source: AGHT+IFpiBx8aoo3FRRG9yCk+2I/NQ1LWZmLvjhcwcllyNUx2P6pWdBml/WUBj6Iu8ouNjwUof8qmQ==
-X-Received: by 2002:a05:6402:1941:b0:60c:5e47:3af5 with SMTP id 4fb4d7f45d1cf-611c1cb7445mr10377973a12.4.1752331122595;
-        Sat, 12 Jul 2025 07:38:42 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325::1ac? ([2620:10d:c092:600::1:b2ad])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-611fa28e1c4sm1806095a12.10.2025.07.12.07.38.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 12 Jul 2025 07:38:41 -0700 (PDT)
-Message-ID: <b1f80514-3bd8-4feb-b227-43163b70d5c4@gmail.com>
-Date: Sat, 12 Jul 2025 15:39:59 +0100
+        d=1e100.net; s=20230601; t=1752331842; x=1752936642;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=r8ZD2wqQ2MFObmE2ter/MLsk6WNa+XkZK2/I8F8necI=;
+        b=BiEspScLbzSv6CHUO2xxr6PUcTshgSBafk2m4whwiajyzeviD93dS/uncM1quQkjny
+         /nvvpuDcjitLVyiVNnCESgLza0zBnfEmYWT2q7heL10LOJ7TF8ezPgIXZVHzeElPurEi
+         u4XAcipT0f5DqChra9x1SS6SKQ8ELU6DJATtvEoWTF2Mlvk3hu/sufgzzlib71+96BxK
+         6YjoSoY5i10VwXL00V61fteGKfDvnBogknxU8MSyaQ6uvLHXhHi6u8mlWZ33TvpWbSWc
+         5ixbumlXv8nUMV65GmHYeDrSFjqHONw2AKVSq6rFrMRGdXewiKSZdWcH28KqIT7XnyFn
+         04vw==
+X-Gm-Message-State: AOJu0YyUyLKxOG9JFevEpUmHZgyET7aw/gPZgDpdrmcy8aH2GEX5q2cK
+	W66ULr6y/15S8FaME8EQjROYa3728D3jWNDjG01WncSTOZpf0CYVmKWURH/AOi5k2g==
+X-Gm-Gg: ASbGncvI9LaWYdqQeqWvd0KHYX2+fqoPj0HWmFgl6sry9jVU7H4G8EX9ABgfpLw/iMZ
+	7OBrJrz3tvidMNfPIcHQuzAssNYvLjaLsifiB3dfqs+49GANH7hGm4SD7g1gcNaePftiPMLyoU1
+	Y//xU0SeiN2MUKYkDfUIFdVqzuwnH9rxkBCNGdBu3cnEph5LIl0Kli5n/MX/oVKKLxe0+vP9XVb
+	hBFyjg36757s1zCUZUVDfRlviTsC3GOPK0+MiYEX2vtnh2wlobDlpxl8jdRkhGnL48HJm7bIrcU
+	XkAsz+sW288J2v8CJos5UDcuVzo34YZOe3x6pLkW5so8kmA36Rm6ZNl4YeJvD2zIf1vsLqVpO02
+	/1no1CFYnwIKQcu29qK350+BxwKr+MMVCqQ24UuRprto=
+X-Google-Smtp-Source: AGHT+IEFk/VaNJq8qgF/dcFDLR8oEl2KIKmlHFNzH3+OWYoQc5jcu9p9tZJ0S5e1TcPQ+Dqh4/rTPQ==
+X-Received: by 2002:a17:903:64d:b0:233:d3e7:6fd6 with SMTP id d9443c01a7336-23de2fe4e88mr127828165ad.19.1752331842281;
+        Sat, 12 Jul 2025 07:50:42 -0700 (PDT)
+Received: from exu-caveira.tail33bf8.ts.net ([2804:7f1:e2c2:381b:47:222f:5788:dacb])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de4335306sm62856595ad.166.2025.07.12.07.50.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 12 Jul 2025 07:50:41 -0700 (PDT)
+From: Victor Nogueira <victor@mojatatu.com>
+To: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	pctammela@mojatatu.com
+Subject: [PATCH net] selftests/tc-testing: Create test cases for adding qdiscs to invalid qdisc parents
+Date: Sat, 12 Jul 2025 11:50:35 -0300
+Message-ID: <20250712145035.705156-1-victor@mojatatu.com>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 1/8] netmem: introduce struct netmem_desc
- mirroring struct page
-To: Byungchul Park <byungchul@sk.com>, willy@infradead.org,
- netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- kernel_team@skhynix.com, kuba@kernel.org, almasrymina@google.com,
- ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
- akpm@linux-foundation.org, davem@davemloft.net, john.fastabend@gmail.com,
- andrew+netdev@lunn.ch, toke@redhat.com, tariqt@nvidia.com,
- edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com, leon@kernel.org,
- ast@kernel.org, daniel@iogearbox.net, david@redhat.com,
- lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
- rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org,
- linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com,
- hannes@cmpxchg.org, ziy@nvidia.com, jackmanb@google.com
-References: <20250710082807.27402-1-byungchul@sk.com>
- <20250710082807.27402-2-byungchul@sk.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20250710082807.27402-2-byungchul@sk.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 7/10/25 09:28, Byungchul Park wrote:
-> To simplify struct page, the page pool members of struct page should be
-> moved to other, allowing these members to be removed from struct page.
-> 
-> Introduce a network memory descriptor to store the members, struct
-> netmem_desc, and make it union'ed with the existing fields in struct
-> net_iov, allowing to organize the fields of struct net_iov.
+As described in a previous commit [1], Lion's patch [2] revealed an ancient
+bug in the qdisc API. Whenever a user tries to add a qdisc to an
+invalid parent (not a class, root, or ingress qdisc), the qdisc API will
+detect this after qdisc_create is called. Some qdiscs (like fq_codel, pie,
+and sfq) call functions (on their init callback) which assume the parent is
+valid, so qdisc_create itself may have caused a NULL pointer dereference in
+such cases.
 
-FWIW, regardless of memdesc business, I think it'd be great to have
-this patch, as it'll help with some of the netmem casting ugliness and
-shed some cycles as well. For example, we have a bunch of
-niov -> netmem -> niov casts in various places.
+This commit creates 3 TDC tests that attempt to add fq_codel, pie and sfq
+qdiscs to invalid parents
 
+- Attempts to add an fq_codel qdisc to an hhf qdisc parent
+- Attempts to add a pie qdisc to a drr qdisc parent
+- Attempts to add an sfq qdisc to an inexistent hfsc classid (which would
+  belong to a valid hfsc qdisc)
+
+[1] https://lore.kernel.org/all/20250707210801.372995-1-victor@mojatatu.com/
+[2] https://lore.kernel.org/netdev/d912cbd7-193b-4269-9857-525bee8bbb6a@gmail.com/
+
+Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+---
+ .../tc-testing/tc-tests/infra/qdiscs.json     | 66 +++++++++++++++++++
+ 1 file changed, 66 insertions(+)
+
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
+index 5c6851e8d311..b344570e7f40 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
+@@ -672,5 +672,71 @@
+         "teardown": [
+             "$TC qdisc del dev $DUMMY root handle 1: drr"
+         ]
++    },
++    {
++        "id": "be28",
++        "name": "Try to add fq_codel qdisc as a child of an hhf qdisc",
++        "category": [
++            "qdisc",
++            "fq_codel",
++            "hhf"
++        ],
++        "plugins": {
++            "requires": "nsPlugin"
++        },
++        "setup": [
++            "$TC qdisc add dev $DUMMY root handle a: hhf"
++        ],
++        "cmdUnderTest": "$TC qdisc add dev $DUMMY parent a: handle b: fq_codel",
++        "expExitCode": "2",
++        "verifyCmd": "$TC -j qdisc ls dev $DUMMY handle b:",
++        "matchJSON": [],
++        "teardown": [
++            "$TC qdisc del dev $DUMMY root"
++        ]
++    },
++    {
++        "id": "fcb5",
++        "name": "Try to add pie qdisc as a child of a drr qdisc",
++        "category": [
++            "qdisc",
++            "pie",
++            "drr"
++        ],
++        "plugins": {
++            "requires": "nsPlugin"
++        },
++        "setup": [
++            "$TC qdisc add dev $DUMMY root handle a: drr"
++        ],
++        "cmdUnderTest": "$TC qdisc add dev $DUMMY parent a: handle b: pie",
++        "expExitCode": "2",
++        "verifyCmd": "$TC -j qdisc ls dev $DUMMY handle b:",
++        "matchJSON": [],
++        "teardown": [
++            "$TC qdisc del dev $DUMMY root"
++        ]
++    },
++    {
++        "id": "7801",
++        "name": "Try to add fq qdisc as a child of an inexistent hfsc class",
++        "category": [
++            "qdisc",
++            "sfq",
++            "hfsc"
++        ],
++        "plugins": {
++            "requires": "nsPlugin"
++        },
++        "setup": [
++            "$TC qdisc add dev $DUMMY root handle a: hfsc"
++        ],
++        "cmdUnderTest": "$TC qdisc add dev $DUMMY parent a:fff2 sfq limit 4",
++        "expExitCode": "2",
++        "verifyCmd": "$TC -j qdisc ls dev $DUMMY handle b:",
++        "matchJSON": [],
++        "teardown": [
++            "$TC qdisc del dev $DUMMY root"
++        ]
+     }
+ ]
 -- 
-Pavel Begunkov
+2.34.1
 
 
