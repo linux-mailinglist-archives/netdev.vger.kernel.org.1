@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-206306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23F6DB028C6
-	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 03:03:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0985B028C7
+	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 03:03:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9626A167F06
-	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 01:03:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D295B1C8250B
+	for <lists+netdev@lfdr.de>; Sat, 12 Jul 2025 01:03:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0C6813B5A9;
-	Sat, 12 Jul 2025 00:59:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07CBE190679;
+	Sat, 12 Jul 2025 01:00:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ATgotfOX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="URMTS3sY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77BEF1E487;
-	Sat, 12 Jul 2025 00:59:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F0F1E487
+	for <netdev@vger.kernel.org>; Sat, 12 Jul 2025 01:00:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752281984; cv=none; b=SCbsyEFo3Kl7qqZvM53kRjyhrWSUdY6oDK1iy1eptrTCevu59gMbgJfuumYVnet/OhuzM4yhVyH707KvOUqHAvG0WnqWUjxe9G96ZEDzqxHeYql4GZUaQfvlHbvV4TFhHS3+FSPxfP7JB6ecQVBKazvlj8i3ZP8HCa9s+x+EEY4=
+	t=1752282001; cv=none; b=naj7w3N/xxqhuc6tZxSdEUAn2AKqCAPiHQ5MBaxZBBrWHsIID2P1x6AAbV+f46lOnh5sw/M/AiSyerYlpMBX49jj5WIWFNN2WM4FuqQA/lQTykxNWS/rHfjIrbxA+o+NIykAUHzQjstiZAMqYKosjXy01ULGSa4fOREdvCUmvM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752281984; c=relaxed/simple;
-	bh=Hye0BFH1APFxLA6XWqKMNPEqihZOu0d3cyOZ0mcmpro=;
+	s=arc-20240116; t=1752282001; c=relaxed/simple;
+	bh=4T7fjmzTyO1c8GQIMbIsxqQD4A/zrKoiseiYePpKnTs=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gEfRhN1RttZbg64NGNWt4jxF33RnpP752jSi7XCZyf9GMVaxwaE1aeRYz6Ybmtk4rpBUWRTPNxbm+tI6Ov1BaSdl0wmMWoF72C9zuGkNwAQ6q3BYZANzmS4motHX7jLPg0kO1b8OpbfeqbFBdL63QH1DC2xl3q9Iw7ussg1Cgh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ATgotfOX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA66CC4CEED;
-	Sat, 12 Jul 2025 00:59:43 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=XKwncjGj0XZaU2VjB5oFyWAjr8/MZBZr5ujutXsi2Pqam6UNtEb8Bba7xgMep911tRgtlI+V2KCSU4IcMAiDWKkBIacnjNvFJ8WIjcpDfox/VJ65XC3PhS7Kicbg9DqpGsLxRJEU5nFwLJqNtQ/3HgvgPIDk8VPLFC191lFBrUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=URMTS3sY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 320BCC4CEED;
+	Sat, 12 Jul 2025 01:00:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752281983;
-	bh=Hye0BFH1APFxLA6XWqKMNPEqihZOu0d3cyOZ0mcmpro=;
+	s=k20201202; t=1752282001;
+	bh=4T7fjmzTyO1c8GQIMbIsxqQD4A/zrKoiseiYePpKnTs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ATgotfOXXMGo+vTbbfjxVvFMfzW1SfJV1C/jLm8GvKrT0LfUeLoRI2nLo/xTVN43V
-	 ZsZVQRyrZu56wLGqXwxY/NcICZiVeKebPrDun2EG2cTX7he8QNgjen3WPRB31DFMTw
-	 XxMw80hW3+Bf38ke6IM+KU4a+vhccBNIAFvqllkcYLM7PRy3auRNFRN4OiQ9TMbNij
-	 pXpMxR0M5a9w+SGanK0yR8zkLrkaPaBuo4BPONAGk7lz2oQCayXVt8Cd4VYjjiO8tQ
-	 1i0TOW5UB7Xk5GGUJ5EC8lir7/IEw6wEwdCDvJJCNQo3d8aQMczW8eabM2EFiFZNDy
-	 gh47vVkK21Hyg==
+	b=URMTS3sYuXIJecPJoKLqpGpd3tjn8/bTWppEDWxl7kVo6J+5n6qCjPPpNO37t/XBJ
+	 aoQOEvRvwYCLRZKJ5NML2T5lJ/lTvrg83EEfugBEh3Kpm5FhFtPOOzQ+qmrKcZavd7
+	 d5CMz09YbAApd6LE+sYeFhPI8PFe6hLQDed97UQXYIr8uV4oKXsHGXX61kpnf8+kri
+	 bzTORsW/nlE4ggZwzOccD69VIu7fcDCyo779sJYWQcdhLmjYppJzeWN4RK/8bUb9b+
+	 6zIIWgConRLXMoi+VrZBpgaNlh0tpEMnlvP8sQfTdlO/PnfoSWY6e9dJtMh6vzHR/g
+	 IEENE2z4Zj2JQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD11383B275;
-	Sat, 12 Jul 2025 01:00:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB313383B275;
+	Sat, 12 Jul 2025 01:00:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: emaclite: Fix missing pointer increment in
- aligned_read()
+Subject: Re: [PATCH net-next 0/8][pull request] ice: cleanups and preparation
+ for
+ live migration
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175228200576.2451869.14862021372428501844.git-patchwork-notify@kernel.org>
-Date: Sat, 12 Jul 2025 01:00:05 +0000
-References: <20250710173849.2381003-1-alok.a.tiwari@oracle.com>
-In-Reply-To: <20250710173849.2381003-1-alok.a.tiwari@oracle.com>
-To: Alok Tiwari <alok.a.tiwari@oracle.com>
-Cc: abin.joseph@amd.com, radhey.shyam.pandey@amd.com, michal.simek@amd.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- darren.kenny@oracle.com, linux-kernel@vger.kernel.org
+ <175228202249.2451869.6977283175523382881.git-patchwork-notify@kernel.org>
+Date: Sat, 12 Jul 2025 01:00:22 +0000
+References: <20250710214518.1824208-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20250710214518.1824208-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
+ jacob.e.keller@intel.com, madhu.chittim@intel.com, yahui.cao@intel.com,
+ przemyslaw.kitszel@intel.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series was applied to netdev/net-next.git (main)
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
 
-On Thu, 10 Jul 2025 10:38:46 -0700 you wrote:
-> Add missing post-increment operators for byte pointers in the
-> loop that copies remaining bytes in xemaclite_aligned_read().
-> Without the increment, the same byte was written repeatedly
-> to the destination.
-> This update aligns with xemaclite_aligned_write()
+On Thu, 10 Jul 2025 14:45:09 -0700 you wrote:
+> Jake Keller says:
 > 
-> Fixes: bb81b2ddfa19 ("net: add Xilinx emac lite device driver")
-> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+> Various cleanups and preparation to the ice driver code for supporting
+> SR-IOV live migration.
+> 
+> The logic for unpacking Rx queue context data is added. This is the inverse
+> of the existing packing logic. Thanks to <linux/packing.h> this is trivial
+> to add.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: emaclite: Fix missing pointer increment in aligned_read()
-    https://git.kernel.org/netdev/net/c/7727ec1523d7
+  - [net-next,1/8] ice: add support for reading and unpacking Rx queue context
+    https://git.kernel.org/netdev/net-next/c/ef41603d09f1
+  - [net-next,2/8] ice: add functions to get and set Tx queue context
+    https://git.kernel.org/netdev/net-next/c/b6f82e9b79b1
+  - [net-next,3/8] ice: save RSS hash configuration for migration
+    https://git.kernel.org/netdev/net-next/c/5ff8d9562357
+  - [net-next,4/8] ice: move ice_vsi_update_l2tsel to ice_lib.c
+    https://git.kernel.org/netdev/net-next/c/4f98ac2d8e53
+  - [net-next,5/8] ice: expose VF functions used by live migration
+    https://git.kernel.org/netdev/net-next/c/066c2715ada8
+  - [net-next,6/8] ice: use pci_iov_vf_id() to get VF ID
+    https://git.kernel.org/netdev/net-next/c/4ef21c83ea4b
+  - [net-next,7/8] ice: avoid rebuilding if MSI-X vector count is unchanged
+    https://git.kernel.org/netdev/net-next/c/922683498e84
+  - [net-next,8/8] ice: introduce ice_get_vf_by_dev() wrapper
+    https://git.kernel.org/netdev/net-next/c/2d925db5b2c6
 
 You are awesome, thank you!
 -- 
