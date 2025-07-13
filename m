@@ -1,75 +1,88 @@
-Return-Path: <netdev+bounces-206429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE8BCB031AC
-	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 17:10:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 34AD5B031B7
+	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 17:23:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB737189DBA1
-	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 15:11:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67742189797E
+	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 15:23:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 895622797A3;
-	Sun, 13 Jul 2025 15:10:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9360B277CA1;
+	Sun, 13 Jul 2025 15:23:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="ROma9nT+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d6ptGzoJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-80.smtpout.orange.fr [80.12.242.80])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6DC0219E8C;
-	Sun, 13 Jul 2025 15:10:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17EBB1E7C23
+	for <netdev@vger.kernel.org>; Sun, 13 Jul 2025 15:23:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752419452; cv=none; b=NOmNhfB8VuIbqYgAuTSZiY06EEmx2zuRuX6v9P0NZVprMmTqxfgaP9CZEQJIK+H2fBozFbUagaCkyT86dbxUsuLIlQu644UVM6Wn21XZlviaHCxNQaEzj0F3EBbgSrQMSEhIgYvwwdlKtBKlJj6w6bUcPmZSdvpKPwF89NN7Xvs=
+	t=1752420188; cv=none; b=M/Cj/9KlJntRO99JzfwByXKh66O7cqtdJIOd3OnSAbsSsXYApCUhNOj/i27ouQ8OID0Jc7AIWyynnH1Xt1Mu9F662G/X7rqRpdsVH8ydN3PmSZAcaCRuzq8gKPskc0O6RFFYQJONSzuXl+9Dvh7RNzZJJAX08Ncm08eT7B3dF3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752419452; c=relaxed/simple;
-	bh=CHo+u63bLinhn22BEK79KEsilSH+G0MXjcy+Fuv/I64=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uOJDQDv9f9ZFwg1iHoYwMnwed9dI1onkYvx+P9j9d46Oar19AYg0XtG2Z+cgHGJOJSYe1G9d1fuQ6ZmeVqKXe5M+tIHFvtXSGXMcS1+ah7SFfEkFe8hqIvJLu37+WDWcAE24FKd5sy08apM9Cfr5ocDo+JO7mIoN/Ad7dxbNR8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=ROma9nT+; arc=none smtp.client-ip=80.12.242.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from fedora.home ([IPv6:2a01:cb10:785:b00:8347:f260:7456:7662])
-	by smtp.orange.fr with ESMTPA
-	id ayKXuhGW5bk8wayKYuwJrD; Sun, 13 Jul 2025 17:09:36 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1752419376;
-	bh=lbrnp32zBlzDoe9yrenmDLqGbdobjnzv1C3nXLatAF0=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=ROma9nT+GTSVOPpxJhSq8uDpwkB+c0AgQ5ppcgoKc4o/MdmPamwRe0tJlAIdQUev1
-	 9gph+AiqU4f+NY6DsiBBv9FtPnZslSiFuGuxqgwz/RyLrj6PylHbElYo/a/99xegbS
-	 BhK/iKlvWR9Ld06wWFcpDS8Son4OS9XtDIYj9gZw8vEaSPw3oA5s/urh8BJdPVN3xE
-	 Y7sOPRiWo347dq52QNyJBPwMgcH6WPktiN+eYtzt0CNN66TDPAg3GLDQDwKidxMWYy
-	 HXt+riBxF8S9VCaKyoUW8q/df9zioI/+z8tYUh890Eo2Ma0mDFzpcDES6hD6i15mNM
-	 RA/9Z58Td/9uQ==
-X-ME-Helo: fedora.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sun, 13 Jul 2025 17:09:36 +0200
-X-ME-IP: 2a01:cb10:785:b00:8347:f260:7456:7662
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: "Chester A. Unal" <chester.a.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH net-next] net: dsa: mt7530: Constify struct regmap_config
-Date: Sun, 13 Jul 2025 17:09:24 +0200
-Message-ID: <1b20b2e717e9ff15aa0d1e73442dde613174cfef.1752419299.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1752420188; c=relaxed/simple;
+	bh=kPd147dWFEskqLI5gmanWp9YVNft3FhAHyr4l/+adcY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FR7fmBsTscMZ9h1MM07bGpMguU6k4AOniR4bjd++G+fIhaRSnbmVTCu1vKx10bjc51XbHclLEv0M6DIuHZRe7vMXKmeVGr8kBFglKoU9mCDy87nPvjMGO9964mMDaRT/2JRtvj5lxyDmjlq0gS+Plub4a3M4XHsgqsEvXIRSIMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d6ptGzoJ; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-313756c602fso657786a91.3
+        for <netdev@vger.kernel.org>; Sun, 13 Jul 2025 08:23:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752420186; x=1753024986; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KTSekuxJLEHAvl7A9v/WKw4cGXLCV6tIJX8Y/BuwJx8=;
+        b=d6ptGzoJLtJ77YwP6I9p1k9uA/BylkSutDplmb0zTqtjsDhJyzxfiSYPp94jHgXCLu
+         v5loFcwDl55j+lVh12o2YquAdrpbnvDq4Lyk+WbtqHs4D0+HIK44oGwdBWyrjATTnixo
+         JXBQbdQqMuVkffcx/l7trJytZmQnLPE43p7zp7QCkiFkMpUvAfsvIu4vS61wFKAu9uZz
+         HvT4603E+OC3q9EpctmH6nvfJsphuhAjBfKTN1Ff6pj8XMyoby2ez9t5f9JCr6hz9kpp
+         JWsBi36E1QoAdqeRWocT0xSNK930iyRhCcOOH3cy1m/+lUHQa5ZokoIi+9v3m5hgU2K7
+         +miQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752420186; x=1753024986;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KTSekuxJLEHAvl7A9v/WKw4cGXLCV6tIJX8Y/BuwJx8=;
+        b=soWDIu4W/kSgENhsYCUshxleBY9fK5q4VKyZCEbz+lPr3Qhqj0l08faIyDAcIB09Md
+         vj72hwpLxX/wNRI6xASqKwKkYpSqFGiWrJpn3WBTw6WyWycNbWpuHHwlVgjqAH+CNx1q
+         tliRMEGEv7yM1jXx19h8MjrsXeVUT3B1ggOdRrriIGc+iySX0OiBtc0d0xXVOsjQJo8b
+         uZDfCxo5/+86nE91YM6VWq2hApjMH6HUfvQwLCTHizty/JAVMKtjTqEe+ta9VG7oLi3v
+         QAU2RLwMJK8hqS5FiyEyaswa+FvliajAHqKmPvE9riwSS+AsmogrZbVmJy6DiDsTUo8b
+         oq3w==
+X-Gm-Message-State: AOJu0YyIhoFYEOtgyLq+p93zRon+AZcl8w8OaMLhJBnhn+UJkAj3EPQo
+	aHk1sI8OY0OSZvoDsboo3XHP5eVwFvPse4IKVH/0qlcyepBKMbgxGik=
+X-Gm-Gg: ASbGncvO/0fFFnkxFgH1pVFwJxhwP76b2o14ywu/5ejxuO/1elhnOc1QzV6qFNG4iTf
+	DKaicHLcxM2V27/c04iuWAbXwf0+7XQGT6ARMngMh8O7sG5msHPyx1oEqx+gVegYH0kesDzNmMj
+	9IdHT1M30gWU0uuTRlkNRdGA+AAQjzJsMPcnTwL08k11yy1DzXF3/Pf0fXil2h7iLwvg1n3yVdD
+	3R9zYmntwEzFr3a2XE6oR7bWVZOcZCoFfLBVQtX3T7staiGlTyVHpPSqbzzywOLhyv4ucJ42y3O
+	YiAzLWIMuy2S89IDPtMxSTwS45Y3C7UfUCXMYifLMN7GmYnkjqSksryy7bHmqbPGNXNjbHT1ACE
+	1TdaqGjWpLODBGYukbKrQSNVbnrHEgf84rmx6cuWNPaw=
+X-Google-Smtp-Source: AGHT+IHWPWfaUrsOjkK5/SWUAAELZU2X6GfsvFZh1f/CuNN2SuGaDk5Pdif9uKl/2zZWjiI7YpjzMA==
+X-Received: by 2002:a17:903:1106:b0:234:cb4a:bc1c with SMTP id d9443c01a7336-23defb22a52mr58322385ad.6.1752420186336;
+        Sun, 13 Jul 2025 08:23:06 -0700 (PDT)
+Received: from jiaoziyan-Precision-5510.. ([46.232.121.213])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31c3eb7f633sm8522423a91.48.2025.07.13.08.23.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 13 Jul 2025 08:23:05 -0700 (PDT)
+From: Xin Guo <guoxin0309@gmail.com>
+To: ncardwell@google.com,
+	edumazet@google.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	Xin Guo <guoxin0309@gmail.com>
+Subject: [PATCH net-next] tcp: correct the  skip logic in tcp_sacktag_skip()
+Date: Sun, 13 Jul 2025 23:22:53 +0800
+Message-ID: <20250713152253.110107-1-guoxin0309@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,107 +91,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-'struct regmap_config' are not modified in these drivers. They be
-statically defined instead of allocated and populated at run-time.
+tcp_sacktag_skip() directly return the input skb only
+if TCP_SKB_CB(skb)->seq>skip_to_seq,
+this is not right, and  the logic should be
+TCP_SKB_CB(skb)->seq>=skip_to_seq, for example
+if start_seq is equal to tcp_highest_sack_seq() ,
+the start_seq is equal to seq of skb which is from
+tcp_highest_sack().
+and on the other side ,when
+tcp_highest_sack_seq() < start_seq in
+tcp_sacktag_write_queue(),
+the skb is from tcp_highest_sack() will be ignored
+in tcp_sacktag_skip(), so clean the logic also.
 
-The main benefits are:
-  - it saves some memory at runtime
-  - the structures can be declared as 'const', which is always better for
-    structures that hold some function pointers
-  - the code is less verbose
-
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Fixes: 75c119afe14f ("tcp: implement rb-tree based retransmit queue")
+Signed-off-by: Xin Guo <guoxin0309@gmail.com>
 ---
- drivers/net/dsa/mt7530-mdio.c | 21 +++++++++------------
- drivers/net/dsa/mt7530-mmio.c | 21 ++++++++++-----------
- 2 files changed, 19 insertions(+), 23 deletions(-)
+ net/ipv4/tcp_input.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/dsa/mt7530-mdio.c b/drivers/net/dsa/mt7530-mdio.c
-index 51df42ccdbe6..0286a6cecb6f 100644
---- a/drivers/net/dsa/mt7530-mdio.c
-+++ b/drivers/net/dsa/mt7530-mdio.c
-@@ -136,10 +136,17 @@ static const struct of_device_id mt7530_of_match[] = {
- };
- MODULE_DEVICE_TABLE(of, mt7530_of_match);
- 
-+static const struct regmap_config regmap_config = {
-+	.reg_bits = 16,
-+	.val_bits = 32,
-+	.reg_stride = 4,
-+	.max_register = MT7530_CREV,
-+	.disable_locking = true,
-+};
-+
- static int
- mt7530_probe(struct mdio_device *mdiodev)
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 79e3bfb0108f..bbefb866c649 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -1809,7 +1809,7 @@ static struct sk_buff *tcp_sacktag_bsearch(struct sock *sk, u32 seq)
+ static struct sk_buff *tcp_sacktag_skip(struct sk_buff *skb, struct sock *sk,
+ 					u32 skip_to_seq)
  {
--	static struct regmap_config *regmap_config;
- 	struct mt7530_priv *priv;
- 	struct device_node *dn;
- 	int ret;
-@@ -193,18 +200,8 @@ mt7530_probe(struct mdio_device *mdiodev)
- 			return PTR_ERR(priv->io_pwr);
- 	}
+-	if (skb && after(TCP_SKB_CB(skb)->seq, skip_to_seq))
++	if (skb && !before(TCP_SKB_CB(skb)->seq, skip_to_seq))
+ 		return skb;
  
--	regmap_config = devm_kzalloc(&mdiodev->dev, sizeof(*regmap_config),
--				     GFP_KERNEL);
--	if (!regmap_config)
--		return -ENOMEM;
--
--	regmap_config->reg_bits = 16;
--	regmap_config->val_bits = 32;
--	regmap_config->reg_stride = 4;
--	regmap_config->max_register = MT7530_CREV;
--	regmap_config->disable_locking = true;
- 	priv->regmap = devm_regmap_init(priv->dev, &mt7530_regmap_bus, priv,
--					regmap_config);
-+					&regmap_config);
- 	if (IS_ERR(priv->regmap))
- 		return PTR_ERR(priv->regmap);
+ 	return tcp_sacktag_bsearch(sk, skip_to_seq);
+@@ -1997,7 +1997,7 @@ tcp_sacktag_write_queue(struct sock *sk, const struct sk_buff *ack_skb,
+ 			continue;
+ 		}
  
-diff --git a/drivers/net/dsa/mt7530-mmio.c b/drivers/net/dsa/mt7530-mmio.c
-index 842d74268e77..1dc8b93fb51a 100644
---- a/drivers/net/dsa/mt7530-mmio.c
-+++ b/drivers/net/dsa/mt7530-mmio.c
-@@ -18,10 +18,17 @@ static const struct of_device_id mt7988_of_match[] = {
- };
- MODULE_DEVICE_TABLE(of, mt7988_of_match);
- 
-+static const struct regmap_config sw_regmap_config = {
-+	.name = "switch",
-+	.reg_bits = 16,
-+	.val_bits = 32,
-+	.reg_stride = 4,
-+	.max_register = MT7530_CREV,
-+};
-+
- static int
- mt7988_probe(struct platform_device *pdev)
- {
--	static struct regmap_config *sw_regmap_config;
- 	struct mt7530_priv *priv;
- 	void __iomem *base_addr;
- 	int ret;
-@@ -49,16 +56,8 @@ mt7988_probe(struct platform_device *pdev)
- 		return -ENXIO;
- 	}
- 
--	sw_regmap_config = devm_kzalloc(&pdev->dev, sizeof(*sw_regmap_config), GFP_KERNEL);
--	if (!sw_regmap_config)
--		return -ENOMEM;
--
--	sw_regmap_config->name = "switch";
--	sw_regmap_config->reg_bits = 16;
--	sw_regmap_config->val_bits = 32;
--	sw_regmap_config->reg_stride = 4;
--	sw_regmap_config->max_register = MT7530_CREV;
--	priv->regmap = devm_regmap_init_mmio(&pdev->dev, base_addr, sw_regmap_config);
-+	priv->regmap = devm_regmap_init_mmio(&pdev->dev, base_addr,
-+					     &sw_regmap_config);
- 	if (IS_ERR(priv->regmap))
- 		return PTR_ERR(priv->regmap);
- 
+-		if (!before(start_seq, tcp_highest_sack_seq(tp))) {
++		if (tcp_highest_sack_seq(tp) == start_seq) {
+ 			skb = tcp_highest_sack(sk);
+ 			if (!skb)
+ 				break;
 -- 
-2.50.1
+2.43.0
 
 
