@@ -1,57 +1,55 @@
-Return-Path: <netdev+bounces-206444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 147E3B0323F
-	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 19:06:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25904B03293
+	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 20:01:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DBECC7AAAAD
-	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 17:04:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BF5E17AAC7
+	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 18:01:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BF0A28000A;
-	Sun, 13 Jul 2025 17:06:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B43661991B6;
+	Sun, 13 Jul 2025 18:01:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xKNGv00C"
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="qiEMY0Vi"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6041237160;
-	Sun, 13 Jul 2025 17:06:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAFF52E370F
+	for <netdev@vger.kernel.org>; Sun, 13 Jul 2025 18:01:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752426375; cv=none; b=GiH0Ce7u3kW+U1ErRG5c84/h3INa8d4r6hB1ZxfBVU4+i9Kcm7iMs8v/LCmvxXnd+KOErXWnty8ugH9FW/bMJ+RiqM24msvyfh9dzxBC9t6d/BIh7tsbgeANdOUBH2S4wcp1DlVn34/CLXKQ/ZRJ9jyCKy/NP9hI/ditsmrjJgY=
+	t=1752429702; cv=none; b=mWAHW1YDuGRikP9xhNKBILKDnD2YwJwgFr+/c7RdnvdBhPnEJbav9/aHuoMt5EAbCDrk67OmwBLd6O1R4V/tJIq1+DI49LiKPDLX2sxiid8XMWiu1ywoVl0OjksOM7HcCfc5ph6JY/3DVKAFxKR+K1SwxlyEwehEBez15XiX9jI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752426375; c=relaxed/simple;
-	bh=8buxFrE/ZovBFdNA8vZzICYoigzm/dgB4JRsAasaV0E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sK8b980CzZltU1BBAppS18cF1cskylLbFly2jTWzitd6+RZTItsdinByjzIJecpIL0MGE2tzxMd/e3DUmtMwwwtxiA027O/J+oeMQk6y5Gu7/oZRUFA7911HenlZJueA93WSerBPKG7A5zPNnzp3tHuFJO41J0lGjLUrPIJeS/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xKNGv00C; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=95RPu8t4CUwWlmCFT2jOjTv3HPdU6j+ByKVs/cDz7fg=; b=xKNGv00CQ/QVag8uKte+lwPUiO
-	e9XP4VmEPKDgvBcF4XHnqg7+XlJkU8wHSAkWPuMpFQ6T2cuJiIzueZrD79iDs+ts6lAUb2J0nKyxj
-	xg9v1cNeOyK1Sa7X0jQBVdZpHubCOXPan8WiDjGW2L2A/RUhBydyHoQsO6qbKttdFF+s=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ub09H-001O0A-G9; Sun, 13 Jul 2025 19:05:59 +0200
-Date: Sun, 13 Jul 2025 19:05:59 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: ChunHao Lin <hau@realtek.com>
-Cc: hkallweit1@gmail.com, nic_swsd@realtek.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] r8169: add quirk for RTL8116af SerDes
-Message-ID: <9291f271-eafe-4f65-aa08-3c6cb4236f64@lunn.ch>
-References: <20250711034412.17937-1-hau@realtek.com>
+	s=arc-20240116; t=1752429702; c=relaxed/simple;
+	bh=p9hwId6PXUzaYbBiEhyhODus2NORbs661RdDVBddeG8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=YgHY5jJR9haiKeBgu++U0w9EcrgqyET202PxSPpXLUqDamtshygM6V5ltRWXT6lZKkrKbC78NGFMERTqZAIB6w5KyldyWxFMp1qF/avw/Ce9MyDMaM3O+YaWwKG/1jNhKD7cAmjH96sY/KXHbTmJqZYBttNqhs7vGFZv08MgLVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=qiEMY0Vi; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=jl72u5vNCVM5mUST/eG0kwtw7loUA0OWBRfKo2uc48U=; b=qiEMY0ViW+bcuf9p25nn/DYyQo
+	RI5fK6vcRCQQMdqurpELHb6JYSo2zqhoeiuMrbZbI7iBiFBnq0YkcFyxaP8dlKrfE7k1TOCKbFeXz
+	YbB/BplJynFnBO/vdeoYIdelJwDNo008qylEg0rK7c+i+ILsGVsGHpo+iSJbWlpEbadKfSOqh62ub
+	VloeUzNpQQA4rp4lE0vTp9iPvoZwSBb2VDcTxBauszGAO19ZuCbPdv8Uum0LCngKnENAlB0f2gMHM
+	wG4Pb8/5LL+nJ9hl/kSwg2705HUZXiQzSMQC4K6Dp7CnmFr8cSzyaQp2JjVsW2k4zl9BT1r5rtQTz
+	4005DJvw==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1ub114-00000000mEy-0WpP;
+	Sun, 13 Jul 2025 18:01:34 +0000
+Date: Sun, 13 Jul 2025 19:01:34 +0100
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Allison Henderson <allison.henderson@oracle.com>
+Cc: netdev@vger.kernel.org
+Subject: [RFC][PATCH] don't open-code kernel_accept() in rds_tcp_accept_one()
+Message-ID: <20250713180134.GC1880847@ZenIV>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,19 +58,59 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250711034412.17937-1-hau@realtek.com>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-On Fri, Jul 11, 2025 at 11:44:12AM +0800, ChunHao Lin wrote:
-> RTL8116af is a variation of RTL8168fp. It uses SerDes instead of PHY.
-> But SerDes status will not reflect to PHY. So it needs quirk to help
-> to reflect SerDes status during PHY read.
+	rds_tcp_accept_one() starts with a pretty much verbatim
+copy of kernel_accept().  Might as well use the real thing...
 
-Can you give us a few more details. What is on the other end of the
-SERDES? An SGMII PHY? An SFP cage? An Ethernet switch chip?
+	That code went into mainline in 2009, kernel_accept()
+had been added in Aug 2006, the copyright on rds/tcp_listen.c
+is "Copyright (c) 2006 Oracle", so it's entirely possible
+that it predates the introduction of kernel_accept().
 
-A quick search suggests it is used with an SFP cage. How is the I2C
-bus connected? What about GPIOs? Does the RTL8116af itself have GPIOs
-and an I2C bus?
-
-	Andrew
+Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+---
+diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
+index d89bd8d0c354..af36f5bf8649 100644
+--- a/net/rds/tcp_listen.c
++++ b/net/rds/tcp_listen.c
+@@ -105,10 +105,6 @@ int rds_tcp_accept_one(struct socket *sock)
+ 	int conn_state;
+ 	struct rds_conn_path *cp;
+ 	struct in6_addr *my_addr, *peer_addr;
+-	struct proto_accept_arg arg = {
+-		.flags = O_NONBLOCK,
+-		.kern = true,
+-	};
+ #if !IS_ENABLED(CONFIG_IPV6)
+ 	struct in6_addr saddr, daddr;
+ #endif
+@@ -117,25 +113,9 @@ int rds_tcp_accept_one(struct socket *sock)
+ 	if (!sock) /* module unload or netns delete in progress */
+ 		return -ENETUNREACH;
+ 
+-	ret = sock_create_lite(sock->sk->sk_family,
+-			       sock->sk->sk_type, sock->sk->sk_protocol,
+-			       &new_sock);
++	ret = kernel_accept(sock, &new_sock, O_NONBLOCK);
+ 	if (ret)
+-		goto out;
+-
+-	ret = sock->ops->accept(sock, new_sock, &arg);
+-	if (ret < 0)
+-		goto out;
+-
+-	/* sock_create_lite() does not get a hold on the owner module so we
+-	 * need to do it here.  Note that sock_release() uses sock->ops to
+-	 * determine if it needs to decrement the reference count.  So set
+-	 * sock->ops after calling accept() in case that fails.  And there's
+-	 * no need to do try_module_get() as the listener should have a hold
+-	 * already.
+-	 */
+-	new_sock->ops = sock->ops;
+-	__module_get(new_sock->ops->owner);
++		return ret;
+ 
+ 	rds_tcp_keepalive(new_sock);
+ 	if (!rds_tcp_tune(new_sock)) {
 
