@@ -1,127 +1,127 @@
-Return-Path: <netdev+bounces-206450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCBD2B032E3
-	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 22:22:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A309B032EE
+	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 22:37:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BD88174FB3
-	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 20:22:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A91D3ACDDA
+	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 20:36:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD38613B7A3;
-	Sun, 13 Jul 2025 20:21:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A734230BE3;
+	Sun, 13 Jul 2025 20:37:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.blochl.de (mail.blochl.de [151.80.40.192])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B854A00;
-	Sun, 13 Jul 2025 20:21:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=151.80.40.192
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D7792E36FA;
+	Sun, 13 Jul 2025 20:37:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752438119; cv=none; b=T3woxUizF93ityFwOn0Horu6L0tUK1oZ4fw9Br0Gghkk0EO/UK3BunixPDXB3KsiOgllWiytE0R8osu481tSEFmfJtfek6W2eXuXf4YGdchpZvK9S/IWVotaHkIk3rGYcLrVSNjVtmPxe54J47QJ/XY5hqsHa78cmVoFWw/iBVA=
+	t=1752439023; cv=none; b=J485edUrTL+VhV2mAHMhLwEn4AGa2sn/NZecb3x0oukSblJ3+WaVqohRUbgd8N+gocx9gI7lNKnqq+VEPSkzR4cEEWMcBtcBrTHRoiBq9vcxNJ1efxmkKq4tABlPaDJ6myuIti2KTzJj5F2nz33DHDd3NWNed0fi55RTXdhm7Xk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752438119; c=relaxed/simple;
-	bh=th18XKX6O+o0xu2681Z5ey8GxGKru0OzWuqimCAWCSM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=jJiIsRlz7MZ5+2G8bfs7jF39rvtekTJKHP4P6Azh9KJ7NEu7M5IeSD2YpXCszv9y7s4b3DEGMX0hmTTZBg3Fi0diEWs/gFJYdPqdpjMIdwXpdVjVUQNiv4wDOUNal0hXYANdoVy0DddPgyPePSMH4LY3H93KQF5oJIKUBG5710E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blochl.de; spf=pass smtp.mailfrom=blochl.de; arc=none smtp.client-ip=151.80.40.192
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blochl.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blochl.de
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.blochl.de B84804466439
-Authentication-Results: mail.blochl.de; dmarc=none (p=none dis=none) header.from=blochl.de
-Authentication-Results: mail.blochl.de; spf=fail smtp.mailfrom=blochl.de
-Received: from workknecht.fritz.box (ppp-93-104-0-143.dynamic.mnet-online.de [93.104.0.143])
-	by smtp.blochl.de (Postfix) with ESMTPSA id B84804466439;
-	Sun, 13 Jul 2025 20:21:45 +0000 (UTC)
-X-Virus-Status: Clean
-X-Virus-Scanned: clamav-milter 1.4.2 at 472b552e6fe8
-From: =?utf-8?q?Markus_Bl=C3=B6chl?= <markus@blochl.de>
-Date: Sun, 13 Jul 2025 22:21:41 +0200
-Subject: [PATCH net] net: stmmac: intel: populate entire
- system_counterval_t in get_time_fn() callback
+	s=arc-20240116; t=1752439023; c=relaxed/simple;
+	bh=sGGiagykudEKZkkGzuuKG3XVSWwTTSUV7fAg084mJmY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S845MX2n+ZY0+iZD+5SOdR7TMannRmmLvAwDJuEkPZPXHWLYHcK7bbHN/ad+hLSdyL1rKvjfpB41gD8tGyWlviuwgepQCCpRljc6oqfUo/q3G/mBwHDmLUVNLqTwtr0wQiuPJ+al2F1lu2ogCX3rRfUfipVMY9dye5RPGwyElbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1ub3R7-000000002gs-20cO;
+	Sun, 13 Jul 2025 20:36:37 +0000
+Date: Sun, 13 Jul 2025 21:36:34 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: "Chester A. Unal" <chester.a.unal@arinc9.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next] net: dsa: mt7530: Constify struct regmap_config
+Message-ID: <aHQY0hVsua5pP0QC@makrotopia.org>
+References: <1b20b2e717e9ff15aa0d1e73442dde613174cfef.1752419299.git.christophe.jaillet@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20250713-stmmac_crossts-v1-1-31bfe051b5cb@blochl.de>
-X-B4-Tracking: v=1; b=H4sIAFQVdGgC/x3MSQqAMAxA0atI1hY6KA5XEZFao2ZhK00RQby7x
- eVb/P8AYyRk6IsHIl7EFHyGKgtwu/UbClqyQUtdy0YZwek4rJtcDMyJhamW1s5t10llIUdnxJX
- ufziAxwTj+37rhsIvZQAAAA==
-X-Change-ID: 20250713-stmmac_crossts-34d8ab89901a
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Thomas Gleixner <tglx@linutronix.de>
-Cc: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- John Stultz <jstultz@google.com>, netdev@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- markus.bloechl@ipetronik.com, 
- =?utf-8?q?Markus_Bl=C3=B6chl?= <markus@blochl.de>
-X-Mailer: b4 0.14.2
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.6.4 (smtp.blochl.de [0.0.0.0]); Sun, 13 Jul 2025 20:21:46 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1b20b2e717e9ff15aa0d1e73442dde613174cfef.1752419299.git.christophe.jaillet@wanadoo.fr>
 
-get_time_fn() callback implementations are expected to fill out the
-entire system_counterval_t struct as it may be initially uninitialized.
+On Sun, Jul 13, 2025 at 05:09:24PM +0200, Christophe JAILLET wrote:
+> 'struct regmap_config' are not modified in these drivers. They be
+> statically defined instead of allocated and populated at run-time.
+> 
+> The main benefits are:
+>   - it saves some memory at runtime
+>   - the structures can be declared as 'const', which is always better for
+>     structures that hold some function pointers
+>   - the code is less verbose
+> 
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> ---
+>  drivers/net/dsa/mt7530-mdio.c | 21 +++++++++------------
+>  drivers/net/dsa/mt7530-mmio.c | 21 ++++++++++-----------
+>  2 files changed, 19 insertions(+), 23 deletions(-)
+> 
+> diff --git a/drivers/net/dsa/mt7530-mdio.c b/drivers/net/dsa/mt7530-mdio.c
+> index 51df42ccdbe6..0286a6cecb6f 100644
+> --- a/drivers/net/dsa/mt7530-mdio.c
+> +++ b/drivers/net/dsa/mt7530-mdio.c
+> @@ -136,10 +136,17 @@ static const struct of_device_id mt7530_of_match[] = {
+>  };
+>  MODULE_DEVICE_TABLE(of, mt7530_of_match);
+>  
+> +static const struct regmap_config regmap_config = {
 
-This broke with the removal of convert_art_to_tsc() helper functions
-which left use_nsecs uninitialized.
+Maybe calling this one 'regmap_config_mdio'...
 
-Initially assign the entire struct with default values.
 
-Fixes: f5e1d0db3f02 ("stmmac: intel: Remove convert_art_to_tsc()")
-Cc: stable@vger.kernel.org
-Signed-off-by: Markus Blöchl <markus@blochl.de>
----
-Notes:
-    Related-To: <https://lore.kernel.org/lkml/txyrr26hxe3xpq3ebqb5ewkgvhvp7xalotaouwludjtjifnah2@7tmgczln4aoo/>
-    Related-To: <https://lore.kernel.org/lkml/20250709-e1000e_crossts-v2-1-2aae94384c59@blochl.de/>
-    Only compile tested
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+> +	.reg_bits = 16,
+> +	.val_bits = 32,
+> +	.reg_stride = 4,
+> +	.max_register = MT7530_CREV,
+> +	.disable_locking = true,
+> +};
+> +
+> ...
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-index 9a47015254bbe60b806b00b80dbd5b1d8f78a7c6..ea33ae39be6bbca5dc32c73e6d02e86a9d8d6e62 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-@@ -433,6 +433,12 @@ static int intel_crosststamp(ktime_t *device,
- 		return -ETIMEDOUT;
- 	}
- 
-+	*system = (struct system_counterval_t) {
-+		.cycles = 0,
-+		.cs_id = CSID_X86_ART,
-+		.use_nsecs = false,
-+	};
-+
- 	num_snapshot = (readl(ioaddr + GMAC_TIMESTAMP_STATUS) &
- 			GMAC_TIMESTAMP_ATSNS_MASK) >>
- 			GMAC_TIMESTAMP_ATSNS_SHIFT;
-@@ -448,7 +454,7 @@ static int intel_crosststamp(ktime_t *device,
- 	}
- 
- 	system->cycles *= intel_priv->crossts_adj;
--	system->cs_id = CSID_X86_ART;
-+
- 	priv->plat->flags &= ~STMMAC_FLAG_INT_SNAPSHOT_EN;
- 
- 	return 0;
+> diff --git a/drivers/net/dsa/mt7530-mmio.c b/drivers/net/dsa/mt7530-mmio.c
+> index 842d74268e77..1dc8b93fb51a 100644
+> --- a/drivers/net/dsa/mt7530-mmio.c
+> +++ b/drivers/net/dsa/mt7530-mmio.c
+> @@ -18,10 +18,17 @@ static const struct of_device_id mt7988_of_match[] = {
+>  };
+>  MODULE_DEVICE_TABLE(of, mt7988_of_match);
+>  
+> +static const struct regmap_config sw_regmap_config = {
 
----
-base-commit: 3cd752194e2ec2573d0e740f4a1edbfcc28257f5
-change-id: 20250713-stmmac_crossts-34d8ab89901a
+... and this one 'regmap_config_mmio' would be a bit nicer.
 
-Best regards,
--- 
-Markus Blöchl <markus@blochl.de>
+> +	.name = "switch",
+> +	.reg_bits = 16,
+> +	.val_bits = 32,
+> +	.reg_stride = 4,
+> +	.max_register = MT7530_CREV,
+> +};
+> +
 
+Other than that:
+
+Reviewed-by: Daniel Golle <daniel@makrotopia.org>
 
