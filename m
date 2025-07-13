@@ -1,80 +1,81 @@
-Return-Path: <netdev+bounces-206414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A14EB030C2
-	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 13:06:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D3F7B030C7
+	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 13:09:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0302F3AB8A6
-	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 11:06:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CEFD07A1D4E
+	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 11:07:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDBE61CCEE0;
-	Sun, 13 Jul 2025 11:06:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 731D8228C9D;
+	Sun, 13 Jul 2025 11:08:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Fjo5F6UG"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="gN5FPa1c"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2077.outbound.protection.outlook.com [40.107.96.77])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2063.outbound.protection.outlook.com [40.107.94.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5BF748D
-	for <netdev@vger.kernel.org>; Sun, 13 Jul 2025 11:06:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC3681A83F9
+	for <netdev@vger.kernel.org>; Sun, 13 Jul 2025 11:08:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.63
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752404801; cv=fail; b=DzOZayNpOESFlsmcNdZBd8CtOeZ+gJIJsj35Fuhcz8XUiXtWbTHyBFbSNH6m3RdlUP/kmVnw9aHs1cxg0P4NHWmqAqFQFffGYBDlscv5Acvrb6nrED42TCTSGtww8ilOnHwoj35F0x2fLMmqEjIVrfUIOQ+oE3l449I4wmdTqW8=
+	t=1752404938; cv=fail; b=u5DugY8RYlBRRrbiG4TqnrQOAeyNBNR2/OJMkVm7i7TfK8kEDMVHt1fBpDik7Y7LEazXLt+744RndeTzaNqB4ieQLR202kKJ+GHp9SBCIE7rFBtE3h8KfvvobVNVtjjwuJCbTdNORFEeoxiNgrcVyBfi57lYSDODYZb0rnPlbso=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752404801; c=relaxed/simple;
-	bh=U8TLwvDe70BPcKPiecLBdg57jD2N/BTeOYf8cmXwVu0=;
+	s=arc-20240116; t=1752404938; c=relaxed/simple;
+	bh=k0SD2etz9khuqwev5RToAadiI1H1ZuJKuKQsgavDzGQ=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ij/U2H6H9qaK4YpN2oFx0j60d/FI1NvkIgepn/oJ4UeNHt16kN5PSlUV0FR6YDZqFCN6KmQgPYg4mNb4Z3yYsNxx6k7Xw7xUw+q67GmwxQybk0/WncH9dKrkBBftft50jN8GyBLFTItX6yAt0P5OaQD0bA1rIex6q9zI+TJEqBQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Fjo5F6UG; arc=fail smtp.client-ip=40.107.96.77
+	 Content-Type:MIME-Version; b=S7qpD5ephDFYt++R6eDYeXxIJGWtSWsvDlkav8vPAgFLyiPweGAG9Vw42OHBjkQ7bRfDjifByPrj/D4cH5lryzmK5LjBObhL3ueIElCuHWVfFq/WyVN6cbNRUg5GmuPQN8chYgrta7SnSPWU1IF+ooV1bPX9OrrjuxjbLlypqJ8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=gN5FPa1c; arc=fail smtp.client-ip=40.107.94.63
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CZtKo8mQclgen59TvH/uCZOuSskhUQVWdi4gCdhGQ3WdqSgqtGBgs4RD2PHpsvjPmc8FUShRsasKO6Bfv94rmxOE3lc4AFh2kLZ54ZJA8d/qtZsiYdVbOUvgDadJ0Wtez9m+Tn322LTm3VyQwcWBeZam6RyJdNXe6dGm5AJBn065QpU3qYTslkeKfd5nFj1iBW39cJLUqeR4jk8fbH8EyMNJ/tNyTJjfukWbFuKCDY0tNZTnj6SfUNvXYdq0gNMv6Q1gqpGeT4RT2MeUXsz/RnN9g+jQRMxYxobqqwbjPB6py4mw+4CRTjla4Ed4NWAwzcovns91ZfiGxrt6Xi7qTA==
+ b=TXlmnanNoA60cJrcoL4IVL69cdBZuzNCN9HZ6aXnGAoh+abfdpKrv83jrhGm1LkqHqnKqWtSDXXCjKNYLVky4NtQLNYbhx99h5TYojHrNU651PKnbbBb6mmVSXsUoJzrNsoUguShf+pT8Oy8Y/ZVGvfuNDClbS3NoT2oNoGtIM5Gc6eqHs/JVLcwOUu7ichoATJHyrpxMu5iMj7bvdNgQY6l5QXBofR4uYCvJClrIAkBUvsmeqVt/ujv5+pwpxWJIX9KRpPa+82vlDgVpMHFYkX1JV/uA5xkZYRrH2GjTaOyLjgGCOri1VrQBDJlpSwuc8bU5JzExCJQnpmvF6Yzfg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=U8TLwvDe70BPcKPiecLBdg57jD2N/BTeOYf8cmXwVu0=;
- b=mlMxKHXkWLGahgBjtvYQsNPQE5wgpGVGnXCCkaxywfymnXEyT6unZg7NGrCSak7HuDAlrNsCEht/xkDpvOtuQ9XhQdwAzdxzlkollH/f7f5xxkmWri11Ih20aftJrjhUKrn71nOdFlCO9in4gofyqlV2b6bnzipd/51hdIYk3EPDMSv3efOoCRGPM2Vup1tHzJZoJF96EW/Wiw1pWPsEkMwP+Ig9YvOtJNbRY4pX1HEuqQkkd4VNo4xbwJInLIsWr5ATQtLhwNksSVdJBb0h202Zl6oR93Py2WaalTvF7aipMEEYi4MLSkrXrC7fZqQPIbgrgJVq8+vIm2WTEUfT2Q==
+ bh=UIt9421D1o79o4a762MBM15pGnIHUkfSmIGL/hFEeUo=;
+ b=XhNAKWL2zddp9aQLFstDLHwBmNoTi5QgJtJcbiwYQ+oJTtToRE35f6/dz0War5KZH95OEoVVnxrxH4eWly+6+3bMotu9V21YZEX35PcnJeO77Avd6XwKys3b6lUPeihxx+gWfTtTaR/6SqdvYwbjdId5dcgrrdUkF3Xm5knN6VxKD4QlGEP8x3oJ2g056Iuug+Gxnif34recdUAG+9vQpuaYGGXkaJA7Tpoens8LparQo4KSqrSm28Jszlw8LmgvCe9f9ovMafyy/MHV/PlP5a4Vgs78RrT3QXSTk2YI23rLUwUgrLHqWq5mLX7HaCOIr/GO9NqxUb4t7eldJ13jgg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=U8TLwvDe70BPcKPiecLBdg57jD2N/BTeOYf8cmXwVu0=;
- b=Fjo5F6UGE0+ZxzC/jajuEPzbZ8rzCOc4TWv7uUNYkWCUXS3H8162si0fjIA/qqs+5WOCywiePjR8NS/62XergMwkOo+CdZv1fXrIi+iJcSAR4XEbUJlrPRj6iZ1p+mSQ08SXhCxLgN1GzGVH6/lXKvDN0hy1Sq/1BWXd94M7zaDq8S0b8Y94Y+5yg4iEPTouODRuVDwzgr6rbWMseBQtk5vtnQqWwWqn6DLFKAHpmiReE6x6ISYceHc9vxUTUhjLF22LzEw/mCZNnmJHu8JY43M/fQ0EhJYEQ5SyqqA+Dtx08eyNTf1+lYyJQbP/AzAbj4Bk9G2en6xTgsAl44ieKw==
+ bh=UIt9421D1o79o4a762MBM15pGnIHUkfSmIGL/hFEeUo=;
+ b=gN5FPa1cTX/ONBbBDZaBRHcDISqrDwaGeWUW/XXfqP45DF3Ujac+uVNCc3Nco1IlM/YByD6z1hAnvnNXB5PcQi68TEKOdGEMzvkZggctRs46/7EFP8aeHa9kS+TZW0Vda5J7gQpacFCMkZFyUDqufKMQpMbuJazUGguUxedA3tNnYx1Lx/KaEbOwktgvmA3fu/53Bb//Yo1nxyvIIbyeRv3AJAIKTT0u5vsLwvKuspcnbCdnMf2CzHHDp9Krt7yrY4eoinmxSfn+kF7nHdC4JEYgWIZmXN1HdDUIc53l8xLyx5nhPgvHxp5ZMlGbhd3J8ziErak4NPBVZZuLipvHxw==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from CH3PR12MB7500.namprd12.prod.outlook.com (2603:10b6:610:148::17)
- by IA0PR12MB7602.namprd12.prod.outlook.com (2603:10b6:208:43a::16) with
+ by CY8PR12MB7513.namprd12.prod.outlook.com (2603:10b6:930:91::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.27; Sun, 13 Jul
- 2025 11:06:37 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.25; Sun, 13 Jul
+ 2025 11:08:54 +0000
 Received: from CH3PR12MB7500.namprd12.prod.outlook.com
  ([fe80::7470:5626:d269:2bf2]) by CH3PR12MB7500.namprd12.prod.outlook.com
  ([fe80::7470:5626:d269:2bf2%4]) with mapi id 15.20.8922.023; Sun, 13 Jul 2025
- 11:06:31 +0000
-Message-ID: <24aa8c69-89bb-440c-8d63-79d630800c88@nvidia.com>
-Date: Sun, 13 Jul 2025 14:06:25 +0300
+ 11:08:54 +0000
+Message-ID: <cd1af256-1447-4b94-8cf5-8e41014f7bad@nvidia.com>
+Date: Sun, 13 Jul 2025 14:08:48 +0300
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 00/11] ethtool: rss: support RSS_SET via Netlink
+Subject: Re: [PATCH net-next 01/11] ethtool: rss: initial RSS_SET (indirection
+ table handling)
 To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
 Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
  andrew+netdev@lunn.ch, horms@kernel.org, donald.hunter@gmail.com,
  shuah@kernel.org, kory.maincent@bootlin.com, maxime.chevallier@bootlin.com,
  sdf@fomichev.me, ecree.xilinx@gmail.com
 References: <20250711015303.3688717-1-kuba@kernel.org>
+ <20250711015303.3688717-2-kuba@kernel.org>
 Content-Language: en-US
 From: Gal Pressman <gal@nvidia.com>
-In-Reply-To: <20250711015303.3688717-1-kuba@kernel.org>
+In-Reply-To: <20250711015303.3688717-2-kuba@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TL2P290CA0019.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:3::14) To CH3PR12MB7500.namprd12.prod.outlook.com
- (2603:10b6:610:148::17)
+X-ClientProxiedBy: TL2P290CA0017.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:3::7)
+ To CH3PR12MB7500.namprd12.prod.outlook.com (2603:10b6:610:148::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,106 +83,308 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB7500:EE_|IA0PR12MB7602:EE_
-X-MS-Office365-Filtering-Correlation-Id: 57eca72f-5eba-43f0-ecbf-08ddc1fd5285
+X-MS-TrafficTypeDiagnostic: CH3PR12MB7500:EE_|CY8PR12MB7513:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7cd43519-9131-4175-f1bc-08ddc1fda770
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?VHU5djFQcGliN21mOG9OVmpieXhCa1AzVDR2VE42RFkrMkxzeHpuSnBUREZj?=
- =?utf-8?B?S3ZpdVJZaEp6UGhIeXRQK01ubllqYkw1akV5WXBEaXZJSkZNaFJaTGRhMXFJ?=
- =?utf-8?B?Mm8rOFlRR09YQkFVd2x1bTYydXpic1p0UHZjNEh4TDN0NklBeXdveXZIdnV5?=
- =?utf-8?B?RHhCcEtDR1JvTzU3akpYdzY0VTlPTGUwRTNnWlVrd0Z2dXdZWkludWo5eGlJ?=
- =?utf-8?B?RDc4NTdyV2tUZm9kYk12L1R6Ry9ES201NHlXK0pmazhkUEhGVlFLQTB0SVp0?=
- =?utf-8?B?bWF1bXVsMGk5TGduNUdmWC80b0FuM1JoQmhBM0c2RVFsenhOUWJ5NTVpWVBX?=
- =?utf-8?B?UWpobkZoTlJVdVhyYlhmOUZIU0wyMXYyU0RoK3ArNGlQU3ZCcTBTcHN2MW0v?=
- =?utf-8?B?akk4NndmL0xIdk1JMXdUcnlDR2FGcS9lbnp5dTBYd1UrNUdmbWJxMkRNWjJI?=
- =?utf-8?B?WUtmeFVoa2h1azVFMmpsZWdjOURkNzJnamN3MXZ1MzJhK0REREhqU055dTAr?=
- =?utf-8?B?cHo0UGxrS1RTc3huRXNRRVRLT2lkTllyYlYzL1psOTdtTzloUlBpRHdvSnRS?=
- =?utf-8?B?MlphVTJkVlNWc3laNVRJOGhvNXdkejZMc2JCT0NaeUFscmw5RFJpTHJPKzhs?=
- =?utf-8?B?eVhENEp6eHArZExDT0RsQ0xsMkJyS3VrVk5vbGExeGxJOUYyd0tvK3RQT0pp?=
- =?utf-8?B?U05yenJSemNoU2ZLTE1kdFc3RVlOekZaSWpJU29pNXBrWjZtQkVUc0d5SXVw?=
- =?utf-8?B?bTlxdTM3dHFZRENUczhoeWdJWkk3cnRHWXF1R2RXY3M0UDczbW1NcUxndFZr?=
- =?utf-8?B?UEUybDM3TFovTjNKY1lDM0R6cVdwU1JvSXFVNkpqQmV5dDVlbVdsVDFKcWhI?=
- =?utf-8?B?ZE9ncks2d1FCS29SRXA3d0lJQ3p5bnEvOXdueFR6MVlJb2E2dHYrZFVGOG4y?=
- =?utf-8?B?cFZXbTI1ODlnV0s3ejlmT3B4eGpDcEgrL0RYanB6cjhCanRIUmRXTy8waDFC?=
- =?utf-8?B?Q2lDQTZYelZrRG51dnRIZkxWT1pWZkZwUDJVOTM2YTFOV2ppZnVUbVptQkF6?=
- =?utf-8?B?dzAxSkVjbzhHT3RDL0RCU1pSU25EQjdQTS9zK1FqRlZHYU5kQkhzL2EzeWZF?=
- =?utf-8?B?emwwcDl0ZXVJS0p0WjcvZG9MbVhzcy9SdFZTV3M2blcxdmFBenBYdVUwRUdk?=
- =?utf-8?B?TjNvRUUvMDhBSHRaUFNad1RpampxTDRZdWpFaXUzaGVSQW4valpDc1h0bTBE?=
- =?utf-8?B?RGVzS1VHMDJWZ3VlWFJ0OUphV1pnY0M5QVZOWnZkRmVFYkdyZ3ljSEVSdm5O?=
- =?utf-8?B?UzUzWW1DMTdsVWxwR0VKTkVRWnZ3NGNIZGppL3p3ekFXeUVPWjN3WERVZklq?=
- =?utf-8?B?SnRPQmE5UzRpbUhITDV4YkdTK2RUT2pwWDR5WFlycThuaGNlSTlmKy9TRkR3?=
- =?utf-8?B?SG55bUFMUjdmSk00VGo0SDcrQnlnYkVmSSs5d2V5UVBhSXJxUkpiOUhRQmlr?=
- =?utf-8?B?S3FJaUUwOG5TL0lvUkJZSjBUTkxuM1hyMFRLSU9YdXo2ZXBDNVdmbm42bjdV?=
- =?utf-8?B?dmJZbzFUWndESnlha2JJRmc0WTJ2a21nNko1Ym9xQkhwWjJCcXE0dEk1cUd4?=
- =?utf-8?B?YVNnZUVncVhWbUExZWhLcldNOUhUMExOZDhTRFhSYW1jejhwTU9VTExGdmxu?=
- =?utf-8?B?RGp0c2hnWHhQdVlrSnNpRkJ2WFpqU28vNVhLaGxnemxGdVFNWUd5bTUrWUs5?=
- =?utf-8?B?L1pFKzU2VUpWbTdzOFZkWk5GUlE0aGZ1K0lnRnVmQS8wQU9mblh3M2lmN3Uy?=
- =?utf-8?B?bm1NRFdCMlBkK2ZrdGZwM0gySEszdzRaYlZEenBiZ2lRdCs5QjBhNzQvNi9n?=
- =?utf-8?B?Znd0a3BkUFlXL3pXeEF0dFB0K25taEMwNXV1ZHJFQlFSSXo0T3pLV0VvYkw3?=
- =?utf-8?Q?43ohO2gxoH8=3D?=
+	=?utf-8?B?ckhNUDJDdW5YUmVOekRKNEx6V1FkdHc5dHdLdGR1UDFBVGo1M0diNzJZeDRH?=
+ =?utf-8?B?RGdTMjY5QWV4WmR0MjFvZmZYc3hLbFV0STJjcXloM1FmTHgydHg1SVJBbnBR?=
+ =?utf-8?B?WEVsNFJUVDNxbXBwZlBqdndBRWxDR3o4b1NYS01VRi83aVFVSWhwVmJqY0ZG?=
+ =?utf-8?B?Tzc0ODZzMVJvdE5HOHZqSEdWbG9kL1BkbDNJL2xsdzg1TEx4R0syOWxaVWZt?=
+ =?utf-8?B?MzFHMzhVSHVrWkFSZnFRemdMdHVETkY5NU00ZFlDUGRKUzQzRXFOS05SWVRz?=
+ =?utf-8?B?YWNDb2M0VWJNQ3pFRlhSQytZZmdKaEhaaTNxSUFFUG1qZ0gwQklWOE0rdzJt?=
+ =?utf-8?B?bXZ5UVhFVWNmM0gxcWs5b213elFpZkZXa1pPMFlsdXZZcVYzTWZnMVdlSGhN?=
+ =?utf-8?B?UXBVaVBuNHNxczl6M2U2eVI2TFNneFFic3djNFJYc21aZWgrcTIxT3kyOEJ3?=
+ =?utf-8?B?WUk3MXhQRm5IL2o1QVc4SXVJN2YvdlNiQzVheXA4TDI5SElQZTlydFR1TUFp?=
+ =?utf-8?B?cnp5Q0lDSHZEbmVXUTAxWjV3RGdqM0JOSmxzRTVGdHlEMFVuMzFzNTZSUVBl?=
+ =?utf-8?B?VGI0SmZ5YklGekJld1N2eDZwV0Z6SEQyOEpEK1dvWWVzOGo5eEtDSDJocG1v?=
+ =?utf-8?B?OXBqblJkZTh0SG9ic3NYTDVPSTV4NHpaSEhGbWVrVWYzOUd5Nk9sMTVEVEtY?=
+ =?utf-8?B?dTRTbUpNU0syYWpQQ3lJdCtLNWF3Q1h3QnRUNTFLcDJzZ0djNVIzYmdTYURN?=
+ =?utf-8?B?ZFJnZ3RmZEI4MitybnFFYmk4ZFk3QklBL3NvMEFpaUI3c1VydWx0Q3pjUUFS?=
+ =?utf-8?B?ZTc0NjU5SnF4eHRFY0FscmNTZVRxQ0ZnaEJSSE9TSXJxUkgveElQcUlqKy9J?=
+ =?utf-8?B?NW5mV1Q1aDFhcVZBc2FuM0lmSCsvbHBocVRTNndlalVzMGtTT0lUUWRlT2l1?=
+ =?utf-8?B?ZmtzOXNiSm10QnpEUWszMEozaU9BaUZIS0VlZW9hYytKSUcxWUdjQWM4cWhX?=
+ =?utf-8?B?WmhGa2NvdFl4aGNoOUtrMXQ2ZHh4VDgyQWMyZ3l1YzRwY2NDVnZLd1BDSE9z?=
+ =?utf-8?B?bzVOZWhINE1nWTRSOThpL3FiUnNhV2FrNnluVVNqV1NJdjZVeFFjRXhudkww?=
+ =?utf-8?B?dmdzellNVXhOc3p5ZUlhVXYxTkNXYzNza0xraEUya2ZqUzA4UlhCTXRYc3NW?=
+ =?utf-8?B?cGdYTmR2V0ducFV4UC9wbmZjSzRkaGFKeGFjL1k2VWJGVVUzWDdYNFFsYnUx?=
+ =?utf-8?B?cTMrWEpqK1dHdmlxNHNrdzZ6MmFYQmhNVTZtUU5pK2FmY3pUcnZZL2tpdEg4?=
+ =?utf-8?B?WTNuSGxMZ1QyNlVvN1QyM2c1VmhBQ3grSlJGYlRMaTlFb1I3ZEVnUit1YUNI?=
+ =?utf-8?B?SndpalB5dmFyWnl5d3RwV1BIMHp6cGNIY0htS3N2WVZ5aUkwOVUxZkNjQUtw?=
+ =?utf-8?B?OGNUQUNWR2NMRWxPR1VsTjM5Y1E5L1g4MnFRNGRycHNTTmFsVnBZb3UrLzFu?=
+ =?utf-8?B?TUNOWTQySG81bnM0d0VQb1dKUDNlb1ZROWpZTDNScDF5WEFoZmJKOXR6djdF?=
+ =?utf-8?B?b2NrUDZPVWVnZDJlNGRXM2xvTlF3b3BKc2QxQmhzVlNKaGhocll1clIxWE1B?=
+ =?utf-8?B?bllEMHNwOVBzNU5Fd2g1M3lVenlnbis0YUNpVVRIMEl6WHY4VU5HcDlheEFM?=
+ =?utf-8?B?T1dKbVlGRHhYU28yeWVqek51ejZNOVJwT0RWYk03MjBqV0RxTGJRMUlROHVs?=
+ =?utf-8?B?TW1hVXNZclhhMWZTM2tQRVpRZzZWdjNKODVwcUZwUVhNZi9GS25seUdBRHYz?=
+ =?utf-8?B?ZFo1NkErdTNDZG9YZXhiRVNDQlNzZU9NUUNFMUpZWUI4Z2FiNDFyR0tLVUxX?=
+ =?utf-8?B?R1V4TUV4UzZMSjVEQ3RFanVvdU0wMHBaNSszeFZqUjhEY0QveFhxS0J3eCtq?=
+ =?utf-8?Q?mXpoUBuB+QM=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7500.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7500.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cXd6OTUvSUFLSTNtTUE0cm1OUUo5R1hQT3htUENyYUVkak5CaDZHUmFCdXUz?=
- =?utf-8?B?cm14Q0tyVjFTcktGVC9uOWZhSndCOG15V2pCNlNyUGNFSE5oaGhMdFA0bHRw?=
- =?utf-8?B?S0dodXVyLzl4aWc2anRVc1FMbERoMHVRdVpBK1hKWEYrRDR6eTZ6dkxlbGtM?=
- =?utf-8?B?aTJnOC9iNXJFeUZVZXZOSEdGdlBzUVd5L3p2WE04eWNITnF0ZStHdlRxRjUr?=
- =?utf-8?B?L2Vhd0pLbjlTeTd0Uk1IUnlUazdxRFhWRDNxU0d5eWlMaGovam5vTkNxanoz?=
- =?utf-8?B?Z0sreTF1ZzM5MTNadm1yR25OYTEwYTFqZTk3QWdndTZIZFVnUTFzVXlRNWZr?=
- =?utf-8?B?Nk51K2xCcW1iYnhIQ0Nmd3B2MjVtNytESlBZd3psWHV0c0xYN2s2dWxvQ05i?=
- =?utf-8?B?NU1qUVpTTzU2YWhkbmJENVZuVUgwOUx2NnJUZVBOOGJIcjNEZ2p1VGRlNnpY?=
- =?utf-8?B?ekRkaVJFekxpd3ltTlBzVnpRUzF3YitaVWJJNjQ5dVFDeTVjWVh2MlVsOE01?=
- =?utf-8?B?d1dlMlFCMXhDcjBBVGpNbzFQNU1UNFkxQkhzanlkS1ZKcGQ3NU1kNThqQjd4?=
- =?utf-8?B?YUVKclJGTEZtWlJMNHlRZXd5bysvOEZqaFFXMFZKUjRUSGhMTmFlNkozL2Zt?=
- =?utf-8?B?bzBvcHJiUGtDQTFmOHlUaitMRlNIb1VrSkxtRE1yWnhrNXFEdnFwWG9LaXJo?=
- =?utf-8?B?MFJwUkJsMm5NK1hwdnFpV3BRMWM0MmdJYXVqanVPZk4rZzJkNnZ4TU5sVGxm?=
- =?utf-8?B?eGFiOGxWNEdHS2hLbkl5Q3MvU3RLQkcvWjBtUHk3TVFTY3Fid25lNW1BWms4?=
- =?utf-8?B?cjZjeTNDTmpURDdVYVNNVDR5NmRsMHhheHlQWmRjTDh4YnJNT1V3Q1Y3bVpU?=
- =?utf-8?B?L0dFZzQzWlUvOVBSZ0RScE1wVzBGdHdra1ZCRnFWRTV1c0FvTHQxODdRSHhw?=
- =?utf-8?B?eWVoZlg3ZEVjVzZ5OXdtUnVtMkFyT3diMDNoMWRwN2puTXlXY056Z3FDZ25L?=
- =?utf-8?B?NFJ5ZnNldE80N0dZR21MVEV2TnZmeE9uVmdORlJOeFJXek1zYlcwS3Irb3JP?=
- =?utf-8?B?VlFrSkRMQ0dSbUxTOXdoT1pmTytDazJSUHVxd1hUaklBeFI5R2ZTdVdUWXJp?=
- =?utf-8?B?bDlrbnBRR3llWjBySEJ0eHNGVGR2MEF1dTVFaXU3RUQxaHM4WDVSN09xdTUr?=
- =?utf-8?B?SFgwSkZxMERoRlkwUlZZS1FEVzgrT0tlcDJaY0J3aWN6T2xUbEhMOHZsQ1FS?=
- =?utf-8?B?Y3pzVWNHbVpNbmx2MlpHc25NczdnUW05Zm16YUs1WktXbXJtbUtjcGhSUkFT?=
- =?utf-8?B?T01QSHNnVDlobFlLVFZEMHhxc2ZiWVZJUlRjZGt4T3JleE5zZHBxU3k3Z0xU?=
- =?utf-8?B?OHBmKzlnZGcwRm5sQnluck1LT3NqREM3MzE3UFlHVVl5dTN3Um1RZkxlYUJZ?=
- =?utf-8?B?RGdvekNRSElsRldVNHJmVlRSKzcxNjNIWUNJa29oRVBmTHQ2M2x0RGlFVVNp?=
- =?utf-8?B?VWFMRUlyTmxtV3Vjd1pRRzVJbFFNcjVkWjZqRngvWUhjTHU5SzNlWUZmUDRE?=
- =?utf-8?B?Qm50VWJydXN1NTd2Y2RGeTVHTFRpdVFBTm03V3JlcGlseEdVU0M1TG13QmtU?=
- =?utf-8?B?d0NtamxEQVZGbysyaFhrUXJRSXZUaS9yK3hoWExSdTRaakRiN3BiTzJWTlFu?=
- =?utf-8?B?SFV0eEx0YXlkQnJLay9ZNTJzRmRCUU9UR0FQM0pGSFVCTXU4RGx2WUhmbWFE?=
- =?utf-8?B?TVU3LzJmQVhlUkU1SVdaT0JuUEg4WVZsaVBncDQvbmdlajBLTHFTeVYrUjhV?=
- =?utf-8?B?YlNBREJicmZKdDJyLzZKRTIwYlhyRTQyZHdRaXFRYVpYOFRCVDZEVE5DMTNR?=
- =?utf-8?B?UWtzdGRNOVlRWUxQbmVmMVYzVzdIR0xrREx3YkkvQzVBeGhZMGtpT3FzVWJ4?=
- =?utf-8?B?ZVZrNW1FNTJDZkZzOFhrWG5CYTdremdyL1VaeWRMWU5MUXo4UGlrb1NiazRY?=
- =?utf-8?B?NjQxYnVES2VsS2cxRkFrdFl4eHU2Y2FydExpUGpLNDdtS1VYM1B3S0V4Vm92?=
- =?utf-8?B?VGYzdXBwcUVjZzJMUm9vdW9VRmJETlhxWnNEVmJDd25rM1V0eHdXZ21pRjh6?=
- =?utf-8?Q?rPjFJdGAHw4+KtSzP1LDFNdCg?=
+	=?utf-8?B?RnRvRmxaRlR3UzUwMzgrVWhwNUd4OGh3aTNmcGZvbmt0Tk1tcGlnd0ZPWEJw?=
+ =?utf-8?B?cC9sNExPMXp2ZFA4WFNsaUQ3OTJBdG1LblZpZWpMamVJVE5aVSt3T3V5Qy9i?=
+ =?utf-8?B?Z1dzK203UnVPbTY5WW5kaW4vUE9NVE1IeTVxYkxYb3o5TXhVdWZXTmtHb2VX?=
+ =?utf-8?B?QXpUM2dVTm83Szk5cnEwRTFvTUowREhicFNkdVo5UmE1T1RaM0kwVWxSUUxR?=
+ =?utf-8?B?RDNoeWszLzI5MzFrV3JKWTJlS0hMaUlYdmkycC9kdU4veHBqSERKb1hMMXMw?=
+ =?utf-8?B?UWNtV1hyN3lSRnlMZDNTNDRneEMvOUYyTm1kZkt1WjRvRk9ndVpCeVc1RERz?=
+ =?utf-8?B?SFBIMThGOWMxSmhMdXd6UUZXVVFyV3JzaDBxRjFJeURCN2VYOHRsMXdWVy9R?=
+ =?utf-8?B?UisxRnovaXR2WnFpaXN2cWtaSmxJTkxOV2NmTVE5WDUzREhBMkR1a1hTRzZk?=
+ =?utf-8?B?VGVHLzdXeEFXdjRQb0RORitEcm53RVV0Tnhqbmg1Vmo2QWhRUTNuYTg4Q1Bn?=
+ =?utf-8?B?cUQ2QlhhdVVJUVVONmVjb3FiMmRqdTViemg4b3dJTStlM0ZSUVFMVmN6YmZ3?=
+ =?utf-8?B?eHZHd0ZrQ2ZEL1htajJsdUJTaGNObkJnZGFCNElvQ09kbGZndm85V2loYkQ4?=
+ =?utf-8?B?K1JGNVQ2LzcwMDBpQ3E3My9VZWFDMmdnV3Nja01DZTRQN2FxZDZjUVlUVUUy?=
+ =?utf-8?B?M3M4T2VvaFRkNHpNMVh0d016WDlRS2lYWjhteXVXN0pLTS9jQlZkU3Budi9a?=
+ =?utf-8?B?QXg0dCt2cEFCeUh1QlJRYzVKd3BzaW9Vd2hRdExRZm8wcHpMd0s2a09EZkRP?=
+ =?utf-8?B?Q1kraFNqcmZtaVRYZEh1RDBoVXNhRXRIWDJGbFRyLy91TE1Kcnp0WGN4SnNa?=
+ =?utf-8?B?elR0eWZ5Z0lqeWZYY3Q1bDNPellXUlVaUDZHVm5Ubmw2dW5kS2c4YXErTFFF?=
+ =?utf-8?B?MzdxRVhESTdRTUhsVnNwa20zZER0ZlRHSWdVTkhYK3o5dHhBR3pIVVl1cWx1?=
+ =?utf-8?B?QlBBV0srZzc4NVR1M2kwUTJpQnc1c2ZyeSsyRms5VDBjNUxSc3l1UUs5SnF0?=
+ =?utf-8?B?VG03OWpneVk5ZEhFTjFYVzNTaVVhcGI1Y09KOGFzS3c1SlBJOTZkdUJZeTd5?=
+ =?utf-8?B?S2FpTlNmQTMrd09HSU9FMEgvbW9PTGNEcDJQMDRtcXBQUXlyT3ZrRXBoS1RY?=
+ =?utf-8?B?bk5XODJRREl6NWdHN3Y4WDJKOEo2VGJIb1hDNDhYdU5YaVhTUndjTHUySFFK?=
+ =?utf-8?B?SDY3bGlPVlJReXF0VDJyclBzR0R6c1VCTUNmdVdQblZ5QTdSanppTWlJYjNS?=
+ =?utf-8?B?LytCcFNxMmtEbmwvblpncWF5V2lqNGdpV3RMb0NLU1pNWHZlWXBBdFZabkQ0?=
+ =?utf-8?B?RWQ0ZFQrWFFKeldDK0taZjVvRkduTWtoaG8zNktaYlphMjFqQ2Z5c2g1c0JI?=
+ =?utf-8?B?YzgwKzJwNzgwQXk3bE1tM2YwNE1nZ2JKVW5vencvejdpUzYzNi9aYzIzaDJ0?=
+ =?utf-8?B?T0RKMnp6a01rV0dYdkVadEhSUGNtVWJrdENRNTZwMjZIeEc2OHZHSVRsYWVh?=
+ =?utf-8?B?cmlDUUtjRWNEK25ITFlPOFh1TEtRaUlDblZoOFppcGdpN3d5b0xiSnkyWXRq?=
+ =?utf-8?B?a0kzSDZvbG02UlN3bFB6U2RTNUhqTTc1SzM2WkpQWGMySnFsdmgzbkxPQWhy?=
+ =?utf-8?B?Tno3a0JJTXBEQU9VVmhidVNrNVhFNTFlSUltdUJGVlF1dWR5b2d1YmtqUDV5?=
+ =?utf-8?B?WHQzQTNpR1FLUm92RW1pYWVNNWRBTWx1YWZHT3oxaHI5VXZlOTluZVJ4UWNn?=
+ =?utf-8?B?MTBqNnhTY2ZROWRqdEZOOVpzTW1NemorQnVtVXFMRTJ1eFNub3dOMzRMU0hL?=
+ =?utf-8?B?YStoN0UrTVQrMk9jTDdyVjVidW1Wb1ZVRU5IVmN0Vko2eW5nbmphVlo0RmFL?=
+ =?utf-8?B?WE9QVGJPVUk4M1hXN0lDQ0UzZ29zMXdmQjVFRHNiS3dvaTIybk1tc1NRK1dI?=
+ =?utf-8?B?M2ZSdDMwMmZQUWVCd0dIczcwd3VvckRPakRKTTNNRFVZR3V5ZEk1UFUxc0Za?=
+ =?utf-8?B?S0dQQ3haR242R29CUmRlSGdrZGZHRkJUcjArbEgxYXNYNGQwM2FHZXVDTFV3?=
+ =?utf-8?Q?rIp9Ah44vJARSw0+Rk8L3Z+eZ?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 57eca72f-5eba-43f0-ecbf-08ddc1fd5285
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7cd43519-9131-4175-f1bc-08ddc1fda770
 X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7500.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2025 11:06:31.5195
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2025 11:08:53.8984
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rcRR1dEsbfgcG0fAEZkYDK9J1wrfXlY4liM71MgkKPC6a1GY6BUx3NpQcvyL6sL/
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7602
+X-MS-Exchange-CrossTenant-UserPrincipalName: 27ZVpE9k0Pf8Lc1F9l10CfUzmWkqOHAhibDCKtWBR6+VDXtUzmxCkGXJdSJXGx3T
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7513
 
 On 11/07/2025 4:52, Jakub Kicinski wrote:
-> Support configuring RSS settings via Netlink.
-> Creating and removing contexts remains for the following series.
+> Add initial support for RSS_SET, for now only operations on
+> the indirection table are supported.
+> 
+> There are two special cases here:
+>  1) resetting the table to defaults;
+>  2) support for tables of different size.
+> 
+> For (1) I use an empty Netlink attribute (array of size 0).
 
-I was also working on this, but admittedly your version looks better.
+Makes sense.
 
-Given the fact that this is not "feature complete" compared to the ioctl
-interface, isn't it considered a degradation from the user's perspective?
+>  static const struct genl_multicast_group ethtool_nl_mcgrps[] = {
+> diff --git a/net/ethtool/rss.c b/net/ethtool/rss.c
+> index 41ab9fc67652..7167fc3c27a0 100644
+> --- a/net/ethtool/rss.c
+> +++ b/net/ethtool/rss.c
+> @@ -218,6 +218,8 @@ rss_prepare(const struct rss_req_info *request, struct net_device *dev,
+>  {
+>  	rss_prepare_flow_hash(request, dev, data, info);
+>  
+> +	if (!dev->ethtool_ops->get_rxfh)
+> +		return 0;
 
-New userspace ethtool will choose the netlink path and some of the
-functionality will be lost. I assume rss_ctx.py fails?
+What is this for?
+
+>  	if (request->rss_context)
+>  		return rss_prepare_ctx(request, dev, data, info);
+>  	return rss_prepare_get(request, dev, data, info);
+> @@ -466,6 +468,192 @@ void ethtool_rss_notify(struct net_device *dev, u32 rss_context)
+>  	ethnl_notify(dev, ETHTOOL_MSG_RSS_NTF, &req_info.base);
+>  }
+>  
+> +static int
+> +ethnl_rss_set_validate(struct ethnl_req_info *req_info, struct genl_info *info)
+> +{
+> +	const struct ethtool_ops *ops = req_info->dev->ethtool_ops;
+> +	struct rss_req_info *request = RSS_REQINFO(req_info);
+> +	struct nlattr **tb = info->attrs;
+> +	struct nlattr *bad_attr = NULL;
+> +
+> +	if (request->rss_context && !ops->create_rxfh_context)
+> +		bad_attr = bad_attr ?: tb[ETHTOOL_A_RSS_CONTEXT];
+
+If we wish to be consistent with the ioctl flow, we should also check
+that "at least one change was requested".
+
+i.e., if (!tb[ETHTOOL_A_RSS_INDIR]) return err?
+
+> +
+> +	if (bad_attr) {
+> +		NL_SET_BAD_ATTR(info->extack, bad_attr);
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	return 1;
+> +}
+> +
+> +static int
+> +rss_set_prep_indir(struct net_device *dev, struct genl_info *info,
+> +		   struct rss_reply_data *data, struct ethtool_rxfh_param *rxfh,
+> +		   bool *reset, bool *mod)
+> +{
+> +	const struct ethtool_ops *ops = dev->ethtool_ops;
+> +	struct netlink_ext_ack *extack = info->extack;
+> +	struct nlattr **tb = info->attrs;
+> +	struct ethtool_rxnfc rx_rings;
+> +	size_t alloc_size;
+> +	u32 user_size;
+> +	int i, err;
+> +
+> +	if (!tb[ETHTOOL_A_RSS_INDIR])
+> +		return 0;
+> +	if (!data->indir_size)
+> +		return -EOPNOTSUPP;
+> +
+> +	rx_rings.cmd = ETHTOOL_GRXRINGS;
+> +	err = ops->get_rxnfc(dev, &rx_rings, NULL);
+> +	if (err)
+> +		return err;
+> +
+> +	if (nla_len(tb[ETHTOOL_A_RSS_INDIR]) % 4) {
+> +		NL_SET_BAD_ATTR(info->extack, tb[ETHTOOL_A_RSS_INDIR]);
+> +		return -EINVAL;
+> +	}
+> +	user_size = nla_len(tb[ETHTOOL_A_RSS_INDIR]) / 4;
+> +	if (!user_size) {
+> +		if (rxfh->rss_context) {
+> +			NL_SET_ERR_MSG_ATTR(extack, tb[ETHTOOL_A_RSS_INDIR],
+> +					    "can't reset table for a context");
+> +			return -EINVAL;
+> +		}
+> +		*reset = true;
+> +	} else if (data->indir_size % user_size) {
+> +		NL_SET_ERR_MSG_ATTR_FMT(extack, tb[ETHTOOL_A_RSS_INDIR],
+> +					"size (%d) mismatch with device indir table (%d)",
+> +					user_size, data->indir_size);
+> +		return -EINVAL;
+> +	}
+> +
+> +	rxfh->indir_size = data->indir_size;
+> +	alloc_size = array_size(data->indir_size, sizeof(rxfh->indir[0]));
+> +	rxfh->indir = kzalloc(alloc_size, GFP_KERNEL);
+> +	if (!rxfh->indir)
+> +		return -ENOMEM;
+> +
+> +	nla_memcpy(rxfh->indir, tb[ETHTOOL_A_RSS_INDIR], alloc_size);
+
+ethnl_update_binary() will take care of the explicit memcmp down the line?
+
+> +	for (i = 0; i < user_size; i++) {
+> +		if (rxfh->indir[i] < rx_rings.data)
+> +			continue;
+> +
+> +		NL_SET_ERR_MSG_ATTR_FMT(extack, tb[ETHTOOL_A_RSS_INDIR],
+> +					"entry %d: queue out of range (%d)",
+> +					i, rxfh->indir[i]);
+> +		err = -EINVAL;
+> +		goto err_free;
+> +	}
+> +
+> +	if (user_size) {
+> +		/* Replicate the user-provided table to fill the device table */
+> +		for (i = user_size; i < data->indir_size; i++)
+> +			rxfh->indir[i] = rxfh->indir[i % user_size];
+> +	} else {
+> +		for (i = 0; i < data->indir_size; i++)
+> +			rxfh->indir[i] =
+> +				ethtool_rxfh_indir_default(i, rx_rings.data);
+
+Unless you wanted the mcmp to also take care of this case?
+
+> +	}
+> +
+> +	*mod |= memcmp(rxfh->indir, data->indir_table, data->indir_size);
+> +
+> +	return 0;
+> +
+> +err_free:
+> +	kfree(rxfh->indir);
+> +	rxfh->indir = NULL;
+> +	return err;
+> +}
+> +
+> +static int
+> +ethnl_rss_set(struct ethnl_req_info *req_info, struct genl_info *info)
+> +{
+> +	struct rss_req_info *request = RSS_REQINFO(req_info);
+> +	bool indir_reset = false, indir_mod = false;
+> +	struct ethtool_rxfh_context *ctx = NULL;
+> +	struct net_device *dev = req_info->dev;
+> +	struct ethtool_rxfh_param rxfh = {};
+> +	struct nlattr **tb = info->attrs;
+> +	struct rss_reply_data data = {};
+> +	const struct ethtool_ops *ops;
+> +	bool mod = false;
+> +	int ret;
+> +
+> +	ops = dev->ethtool_ops;
+> +	data.base.dev = dev;
+> +
+> +	ret = rss_prepare(request, dev, &data, info);
+> +	if (ret)
+> +		return ret;
+> +
+> +	rxfh.rss_context = request->rss_context;
+> +
+> +	ret = rss_set_prep_indir(dev, info, &data, &rxfh,
+> +				 &indir_reset, &indir_mod);
+> +	if (ret)
+> +		goto exit_clean_data;
+> +	mod |= indir_mod;
+> +
+> +	rxfh.hfunc = ETH_RSS_HASH_NO_CHANGE;
+> +	rxfh.input_xfrm = RXH_XFRM_NO_CHANGE;
+> +
+> +	mutex_lock(&dev->ethtool->rss_lock);
+> +	if (request->rss_context) {
+> +		ctx = xa_load(&dev->ethtool->rss_ctx, request->rss_context);
+> +		if (!ctx) {
+> +			ret = -ENOENT;
+> +			goto exit_unlock;
+> +		}
+> +	}
+> +
+> +	if (!mod)
+> +		ret = 0; /* nothing to tell the driver */
+> +	else if (!rxfh.rss_context)
+> +		ret = ops->set_rxfh(dev, &rxfh, info->extack);
+> +	else
+> +		ret = ops->modify_rxfh_context(dev, ctx, &rxfh, info->extack);
+> +	if (ret)
+> +		goto exit_unlock;
+> +
+> +	if (ctx)
+> +		rss_set_ctx_update(ctx, tb, &data, &rxfh);
+> +	else if (indir_reset)
+> +		dev->priv_flags &= ~IFF_RXFH_CONFIGURED;
+> +	else if (indir_mod)
+> +		dev->priv_flags |= IFF_RXFH_CONFIGURED;
+
+One can argue that IFF_RXFH_CONFIGURED should be set even if the
+requested table is equal to the default one.
+
+> +
+> +exit_unlock:
+> +	mutex_unlock(&dev->ethtool->rss_lock);
+> +	kfree(rxfh.indir);
+> +exit_clean_data:
+> +	rss_cleanup_data(&data.base);
+> +
+> +	return ret ?: mod;
+> +}
 
