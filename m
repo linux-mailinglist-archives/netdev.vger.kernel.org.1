@@ -1,96 +1,95 @@
-Return-Path: <netdev+bounces-206396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BDABB02E4A
-	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 02:37:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0387B02E4D
+	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 02:39:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7A2C4A02C6
-	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 00:37:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30FA6482F93
+	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 00:39:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4F41D531;
-	Sun, 13 Jul 2025 00:37:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF24CE573;
+	Sun, 13 Jul 2025 00:39:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="KRwahk7B"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C2Khdi24"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75042B676;
-	Sun, 13 Jul 2025 00:37:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95EAF2594;
+	Sun, 13 Jul 2025 00:39:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752367068; cv=none; b=T8U34rZ2O6mK+2GOzA0FvTy+FZ5+mQaxi5rNhUX9Jhixjd7hAPrpkpB7jYXLtbCTBBEDZs8r5r4z78HRMa1vHP+OgYlR8emyfIqRk9Jmh/t3bCOQwTGfXqjs3zumqdKpwINw2zuXM7n+Q33DrJkUb0SguqUjQx1Tnfi5rp/77tM=
+	t=1752367187; cv=none; b=SFzIZMzuVw2a4cVc+ZjQteLrOP3UZMuEJW27nXblTwWmY4L4PEqS8ucjWZ0exI757ivM2J39Vv075/yq4frQwdJt7JZ02G9BdqEk5DEtHFVRuyJS5kHC8WSSdh9RoWzU4GSr3b9/Qpo/bTe0tLVgxTcBo3ZmGtu2X2FIlk3gBJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752367068; c=relaxed/simple;
-	bh=KeUBDEaJSUrjs1rP5hrxWaj9uAUG9qfRBdtJf+4d55A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GkCemmFemnQNS1DdVGGbQahyU39vEZMYZa+4x0XpzBwW7qHyKoxX8wRLi2pq2vSVd2Xd+WF8cXWdKLJRm1IXGu8La9wq15FDNveQ1aH7wYDHLTN+IogD3HeJy8vHQ8YXXQgCsb+G9L9h787eSUbQ6rNWz2xWCI1tvtU7KZwaPzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=KRwahk7B; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=1Bf+qIMl/aiJs5aksuCTE/QCXcUqHNYmjKTQ2JG+AbI=; b=KRwahk7B8Ba+H5YV
-	QJNXWM/c/30jY5JdLOCL8PbDOi6hvZf851b6x+gaq82xGapuh8Sr5u7pYeVUVs6UxlStYDlyFHEdk
-	nMqFvRo/59O6Qx6shzzxXInMC+fTjYstWvIORi6U02RZ7dZkItrre+RNd6D9OILfgxEV/paGPXsq3
-	U2Y6gCOAfyNMlUUiy6iTlG2WE2VDylMdZCCELeLno5EbAsVAAtLxZzakSjzkGmw+juquxHm3yD+Ix
-	jOXS3qKNYGq4Nhejo/xzL2o0Fgl2l13ZfcJ6SDsqrn/vvTY/YYX9NfCKEbKgbyY7TEf/OT2r6ZITm
-	90CSRUDl9v3uS6RG+A==;
-Received: from dg by mx.treblig.org with local (Exim 4.96)
-	(envelope-from <dg@treblig.org>)
-	id 1uakin-00Fkol-1Z;
-	Sun, 13 Jul 2025 00:37:37 +0000
-Date: Sun, 13 Jul 2025 00:37:37 +0000
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
-To: Trond Myklebust <trondmy@kernel.org>
-Cc: chuck.lever@oracle.com, anna@kernel.org, jlayton@kernel.org,
-	neil@brown.name, okorniev@redhat.com, Dai.Ngo@oracle.com,
-	tom@talpey.com, linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] SUNRPC: Remove unused xdr functions
-Message-ID: <aHL_0dNwz5BKEH_0@gallifrey>
-References: <20250712233006.403226-1-linux@treblig.org>
- <1ae3c2fa194bb7708ad5a98b1fb7156b9efcb8e7.camel@kernel.org>
- <aHL9HY5V95hV_Qau@gallifrey>
- <0211091956f168aa2c26ffa9da83e220b91479b5.camel@kernel.org>
+	s=arc-20240116; t=1752367187; c=relaxed/simple;
+	bh=FUALmYwbC2vHNgtMO6s9lDgqYQVe4hgXJClPdvSjrvc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=utJZ5U89xWfnczoYMAOb3cxwOUh2xvjzNQIWs2YyuAYruahxMqzlEhYMic5RW0PTucTZqtWLG9luhdLOkunYPfdwFfaRPLFmr0PggoMMW3fOpdu83CYle0wuaihxdlC0qHqqZfd/Esp9R4bgynedlGJVRFEPYzkR/UhtmaAJums=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C2Khdi24; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01F47C4CEEF;
+	Sun, 13 Jul 2025 00:39:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752367187;
+	bh=FUALmYwbC2vHNgtMO6s9lDgqYQVe4hgXJClPdvSjrvc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=C2Khdi24Os0JJFhIxR+i+oQpS5E7fkIXxWyJFL7crVJ+buM6xtxDu4zh46gC6uQcw
+	 0CBViw2g2WdKxwii25yHvtq3w7b79FAjbaTiFoveng7TAQtpg46cn2h4wRaHFanSzt
+	 TDKcDbwm7dl4chYexw6lXd9mGZO8OY7xETWL2+b6UOFRrzxqRDr2zNyaY1GCQ48x/f
+	 EXIDV/Tg4VY/vfwJup0l0h5dMsywtBNqNN7i+A9/xLDMxATNzSfBOCzWcpmSl6m06p
+	 f7OS+U888eORkfFzyn0Ixmo8gfjh4BPz4vire4hExvJ3BvrAFpksHs878x35NIPhCZ
+	 RI66CeAzPdx0Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCEB383B276;
+	Sun, 13 Jul 2025 00:40:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <0211091956f168aa2c26ffa9da83e220b91479b5.camel@kernel.org>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.1.0-34-amd64 (x86_64)
-X-Uptime: 00:37:25 up 76 days,  8:50,  1 user,  load average: 0.00, 0.00, 0.00
-User-Agent: Mutt/2.2.12 (2023-09-09)
+Subject: Re: [PATCH v5 0/2] fix two issues and optimize code on tpacket_snd()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175236720841.2674210.17766353481530263722.git-patchwork-notify@kernel.org>
+Date: Sun, 13 Jul 2025 00:40:08 +0000
+References: <20250711093300.9537-1-luyun_611@163.com>
+In-Reply-To: <20250711093300.9537-1-luyun_611@163.com>
+To: Yun Lu <luyun_611@163.com>
+Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-* Trond Myklebust (trondmy@kernel.org) wrote:
-> On Sun, 2025-07-13 at 00:26 +0000, Dr. David Alan Gilbert wrote:
-> > 
-> > Any chance you could also look at this old one:
-> >  
-> > https://nam10.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fall%2F20250218215250.263709-1-linux%40treblig.org%2F&data=05%7C02%7Ctrondmy%40hammerspace.com%7C9bda97d0c5c34041647e08ddc1a3e7c6%7C0d4fed5c3a7046fe9430ece41741f59e%7C0%7C0%7C638879631926208245%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=uQu4kGGvj5UPPwy%2FwdWL7gLQRahh6DucDGunIOwkvg0%3D&reserved=0
+Hello:
+
+This series was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Fri, 11 Jul 2025 17:32:58 +0800 you wrote:
+> From: Yun Lu <luyun@kylinos.cn>
 > 
-> Ack...
+> This series fix two issues and optimize the code on tpacket_snd():
+> 1, fix the SO_SNDTIMEO constraint not effective due to the changes in
+> commit 581073f626e3;
+> 2, fix a soft lockup issue on a specific edge case, and also optimize
+> the loop logic to be clearer and more obvious;
+> 
+> [...]
 
-Thanks!
+Here is the summary with links:
+  - [v5,1/2] af_packet: fix the SO_SNDTIMEO constraint not effective on tpacked_snd()
+    https://git.kernel.org/netdev/net/c/c1ba3c0cbdb5
+  - [v5,2/2] af_packet: fix soft lockup issue caused by tpacket_snd()
+    https://git.kernel.org/netdev/net/c/55f0bfc03705
 
-Dave
-
-> -- 
-> Trond Myklebust
-> Linux NFS client maintainer, Hammerspace
-> trondmy@kernel.org, trond.myklebust@hammerspace.com
+You are awesome, thank you!
 -- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
