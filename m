@@ -1,86 +1,86 @@
-Return-Path: <netdev+bounces-206461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7B20B03323
-	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 23:48:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E853B03325
+	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 23:48:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C8D63A66B6
-	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 21:47:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7E7016F4C0
+	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 21:48:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CE3D1F582C;
-	Sun, 13 Jul 2025 21:48:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 235401E7C38;
+	Sun, 13 Jul 2025 21:48:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VBulYmld"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cIyXvteB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B8811F4615
-	for <netdev@vger.kernel.org>; Sun, 13 Jul 2025 21:48:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948CF7DA6C
+	for <netdev@vger.kernel.org>; Sun, 13 Jul 2025 21:48:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752443290; cv=none; b=gmo/OdpjRr2krG18dKL40T9wh57qRp/dEQKNpwtFzNrM/+o+9w0Q4/mExZm9+11DjkXPNk6f29n44bRr2uQ/3YB+3M0MrncWp6LG1mluDeAXCJpiW+XGe5V476e5eA/y+a7G8jxn7/uIL07fiHWmw933H/yVJmtuCOM21Xk40z0=
+	t=1752443293; cv=none; b=AzYxnz/5T5KB+xeiU+UXmHRNgBjlFcwnafSMcegrjvqkK/fimZ5in12tXrRu23OQiQGwwR43upDIPoT0pa9MyUwp3KCxJCEuj5yGjllYOCT29Rnr+9O52fE+bG84QMsY6gRc/EVz9yl8dvn57BsUvzwtW4yP6JsIfB8hEzaKnBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752443290; c=relaxed/simple;
-	bh=0xF/qoMYScGyzsUrxqXDhqBlTWWhc5uFUH02xwEcbyA=;
+	s=arc-20240116; t=1752443293; c=relaxed/simple;
+	bh=OEBkpM+3ZTLSNYSrQN/uNlvIweIJ1jNUpKIsoe4o5Rc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=aoEXb2z1Ah2CAAOV9XUWEEq8rYNRhYqmsq1mkIw/WyJOR2dW0OZto83/mcRdrguJrdkxoAoHR1iLbc5E3OlphhtAX8J3DFZ2zDupvmzG6sCPWkFOd/nGKi8vGX00ffrEveDxjczliu6+X54p6/B5QpsUNkax59aWQHMS8DteOPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VBulYmld; arc=none smtp.client-ip=209.85.214.182
+	 MIME-Version; b=JQC17zTZg1htsw2DLo7q0C2iAtRZhLG0isj2ROYDxId70vwXfU+6u282LZTvCCNMyofBqNe3Oh288P09p7htw8sZ7+wewLLpxXPi07uh/OATiIAA9rfw/cZumNMNFzXjD8aMXP3tAqx2+PyZnGOtwHT9Cbvkt/b8vJeWfWSNy0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cIyXvteB; arc=none smtp.client-ip=209.85.210.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-23dc5bcf49eso44955065ad.2
-        for <netdev@vger.kernel.org>; Sun, 13 Jul 2025 14:48:08 -0700 (PDT)
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-74b52bf417cso2324151b3a.0
+        for <netdev@vger.kernel.org>; Sun, 13 Jul 2025 14:48:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752443288; x=1753048088; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1752443289; x=1753048089; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dA8rnfeRTQ3UoeWxoB8E6weN1m+0woqy2zqDPqU2zrg=;
-        b=VBulYmld+BTCMPe8ukv2J2NuIJgtX0g8crva93Yrp9ydy+z6/bSRFWWq7PoZkNNsCk
-         nyxVK0YCQQ4cRQXMnym1xi8ojr2P7qNV4EYtsl8OA3o/JhPQgVzSLfrD29Qpz+KKknQ/
-         ZQ1klgjEPP2nUzo9xcMGjVUHJsWMO6e7xK5IAau2Dk+A2g93GzHPaC2r6DIVXP7lBzcm
-         exVGHtIC9HB55jsPvMHhXun+MvHrN2lOrGrKG+1kggPp6jcWX7jx3ThO1pAFrxQZOya2
-         rDSXrteSoNIn5iNws39aWpxWEeon7HpfVpZgXmYHsKREBfs6GNa4YQRxvlZjCTlDXnPJ
-         Nxig==
+        bh=AJGbRnejhIRcsQWbq3T7kI+xG8r532bfdAYXX+F13jk=;
+        b=cIyXvteBEU//Ty+LMsDv+Fkzk/Gb9WveGSpxmp94t+ZYWS5JE83DdAZ4hriFLRXoyx
+         1tAY06cBP08kufxHXkSSxcokEQvVjU5BVucsTM8stXS2CofXx3eQ+QwRUr7H+h5+nRUL
+         clqpMAmMdgEy7HWmOqsx7mPAnjRFZzNldBwjX9dIDdjHcn2FV8myHb8b10F+8O11M7ME
+         g3sa1hekS5Sj8U0PUJEo64sd/U0BDLL1OpJoB0pA2hvnaKGc1YD3vuL1nNozJ3KNCBjk
+         NrH3+WuZ4SqZXI+pwuqf96rY1M+GvIQ3RQRn9cvVXRnpLfjd/bwqJUDJwnxyY9TlOoph
+         JtPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752443288; x=1753048088;
+        d=1e100.net; s=20230601; t=1752443289; x=1753048089;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dA8rnfeRTQ3UoeWxoB8E6weN1m+0woqy2zqDPqU2zrg=;
-        b=SeOkFG5qZ4Z92JRxkoeQJd81L+2AzAGoAA6ZywHz91oVJ1l0qjB7GdkDFQVDydqzKF
-         sCVyj48cihKBFBh42C2UnjIlOwCTdCxkz2bhaA4Rp6E7eeFMbess53I6402Xog9cyiLy
-         aguJOPwqCjAtk88R4wIV3d+e4blvxz7WWUtbdOnBJSTQ88GAZb9s2iZWBKj+MXgbKxnp
-         yvyevtbN2nMesh77qTrPvQomyMe4QjtE7pvD3vWcVghj1TXNKaUgaSIpGsteeffHcD3O
-         Pa4RiyuoW7QH8WIhX49kwfAs7gxS3TFwuMmiktK0KM1Eqk1iTO/rRtRSL/G21NbWxQu0
-         t90A==
-X-Gm-Message-State: AOJu0Yx8upbeQVXohB0rCBQv9Cn0KOxBjSWKu3gw8IGL61bgxOxj5voE
-	CNfCYZ4c98i7+2lLWhO5og7bwx5Uxbci0EJbVP3sAoIY93o4FF+2vHw1yD7+tA==
-X-Gm-Gg: ASbGncvHvtNWUEOSWCr6OZHEfoA3arWia674U5jQraeEzwu+aMIENLEVa/xpr8Yl7fV
-	hFPZP5PyBaBhUyu3q618eXxmMNmhGWUvuiigbAI1MgwARdFj1BIi86c6YxOWIVQKZhJtHP7SUzO
-	egxOtxlkkm+4PJOo5SJOtw1kIfslpruP7lwaph5wRIk4Z3+F6n2h594AwxGgfkbMqerRnq8CTLb
-	azeV1Q23EQTogWQcoxFz+hnVSNeLNcOKfLtqtU9s9+t5BkDBQOHIKTA+bXRTjEz6jT08mgtMhaA
-	QN6nGushpRFL6EgTeh1cA4wKgh9SxWwiyheoM2l9GyFwHG9ezeBVSGaD12u9vOkMV/hYYeERdGj
-	XOgdoIeEWLLz6Zn4AjOYwh3yIUm0=
-X-Google-Smtp-Source: AGHT+IHiTu437k+u48QiDtkDEh6Z6JU6R3IKvUKlepAhydhRqPJ4YxFokYwtewa9fM897NIEK2fZJw==
-X-Received: by 2002:a17:902:e54d:b0:236:748f:541f with SMTP id d9443c01a7336-23dede81a0dmr155913625ad.33.1752443287942;
-        Sun, 13 Jul 2025 14:48:07 -0700 (PDT)
+        bh=AJGbRnejhIRcsQWbq3T7kI+xG8r532bfdAYXX+F13jk=;
+        b=YHIVHm769prrdFwnJJKP01rCTQk8w4v2yc++01mnqMQZm99IAronXD1Tp2r8zf/snb
+         CaaHw0+xBqX1/LJGuLQXyTUKm7VU/D/yY7H6UL2inLBsyoNdqpC2aIMKjK7ZjkK/7/MF
+         hOQ+pQ83mimScxjSWbUFNvXvLUzGhpBezG+eRz8De2wQSTO3FWYXBfFtXBk+XoYTEECw
+         JPsMLXIH3QPm0tMXT/HfqwdY9k7CWkxTHmlpqYwphc7daCdJIfk4dVZ4leblLFOOQMIk
+         SgnDyXkPZkelcLdjySDs62lwMcA9zcEQjGBVKdCsOUtYleQOSE8nwN7NcG27Bt7a7xLD
+         XLCQ==
+X-Gm-Message-State: AOJu0Yzb6A63YFE75vrPDk4QezVBMpxb24w3+OdPmR4lU0krL0uqU6xE
+	ZcNO6V8lPtVCA0VCIAgTijIP6Rz2vVuerOx/NHNDD0j53thJ0jqTiPJLlc48Gg==
+X-Gm-Gg: ASbGncukDDbMfRphVhwTxzK/gO/+rPIEhf97NvbumOY3Tm3RcUG3NgaFwwTStYEd/ev
+	BYcLX9PGsfd7tVxdUDMSAadGZttjxBkn6sXFS9ZxeTgfiboflf4gWX2isandCZf1wopfW0MttJm
+	oCy0136MzE3/Tk41jefBBLhRYPQ0Zlb4odxaDRpPiFNrgiIaghbG3QLFtWk5E6LuQHsudaiNhza
+	Sa0nfvJgrfVYWcTJWlQgN9ba9JkWiaHkyZWDT+wNYvXycgVj4chw/Uc4I9xy3g3PvEPUDuVyCkN
+	S6279WK2/4+7HhiWcXsqih2GnjL3cL8kKQcJ56wauueFQXYqQ14CjVrOkvBzumV6JGeoA+buUKx
+	Iy/7hjg3YJde8rtgtT4HG6sO90xo1/Z9IT9McQQ==
+X-Google-Smtp-Source: AGHT+IE0J6E4/6jsTJaxldK0rkGAoHLTzC76QzuUDTWVPtCf6MFFSVoCeVLNhRf26LIqbytwIulzSQ==
+X-Received: by 2002:a05:6a20:3d21:b0:220:96:11f6 with SMTP id adf61e73a8af0-23121107488mr15902144637.37.1752443289245;
+        Sun, 13 Jul 2025 14:48:09 -0700 (PDT)
 Received: from pop-os.. ([2601:647:6881:9060:b9d2:1ae4:8a66:82b2])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b3bbe6f1fd0sm8628370a12.53.2025.07.13.14.48.06
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b3bbe6f1fd0sm8628370a12.53.2025.07.13.14.48.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Jul 2025 14:48:07 -0700 (PDT)
+        Sun, 13 Jul 2025 14:48:08 -0700 (PDT)
 From: Cong Wang <xiyou.wangcong@gmail.com>
 To: netdev@vger.kernel.org
 Cc: jhs@mojatatu.com,
 	will@willsroot.io,
 	stephen@networkplumber.org,
 	Cong Wang <xiyou.wangcong@gmail.com>
-Subject: [Patch v3 net 2/4] selftests/tc-testing: Add a nested netem duplicate test
-Date: Sun, 13 Jul 2025 14:47:46 -0700
-Message-Id: <20250713214748.1377876-3-xiyou.wangcong@gmail.com>
+Subject: [Patch v3 net 3/4] selftests/tc-testing: Add a test case for piro with netem duplicate
+Date: Sun, 13 Jul 2025 14:47:47 -0700
+Message-Id: <20250713214748.1377876-4-xiyou.wangcong@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250713214748.1377876-1-xiyou.wangcong@gmail.com>
 References: <20250713214748.1377876-1-xiyou.wangcong@gmail.com>
@@ -92,80 +92,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Integrate the reproducer from William into tc-testing and use scapy
-to generate packets for testing:
+Integrate the test case from Jamal into tc-testing:
 
- # ./tdc.py -e 1676
-  -- ns/SubPlugin.__init__
-  -- scapy/SubPlugin.__init__
- Test 1676: NETEM nested duplicate 100%
- [ 1154.071135] v0p0id1676: entered promiscuous mode
- [ 1154.101066] virtio_net virtio0 enp1s0: entered promiscuous mode
- [ 1154.146301] virtio_net virtio0 enp1s0: left promiscuous mode
- .
- Sent 1 packets.
- [ 1154.173695] v0p0id1676: left promiscuous mode
- [ 1154.216159] v0p0id1676: entered promiscuous mode
- .
- Sent 1 packets.
- [ 1154.238398] v0p0id1676: left promiscuous mode
- [ 1154.260909] v0p0id1676: entered promiscuous mode
- .
- Sent 1 packets.
- [ 1154.282708] v0p0id1676: left promiscuous mode
- [ 1154.309399] v0p0id1676: entered promiscuous mode
- .
- Sent 1 packets.
- [ 1154.337949] v0p0id1676: left promiscuous mode
- [ 1154.360924] v0p0id1676: entered promiscuous mode
- .
- Sent 1 packets.
- [ 1154.383522] v0p0id1676: left promiscuous mode
+Test 94a7: Test PRIO with NETEM duplication
 
- All test results:
+All test results:
 
- 1..1
- ok 1 1676 - NETEM nested duplicate 100%
+1..1
+ok 1 94a7 - Test PRIO with NETEM duplication
 
-Reported-by: William Liu <will@willsroot.io>
 Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
 ---
- .../tc-testing/tc-tests/qdiscs/netem.json     | 25 +++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ .../tc-testing/tc-tests/infra/qdiscs.json     | 29 +++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/netem.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/netem.json
-index 3c4444961488..03c4ceb22990 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/netem.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/netem.json
-@@ -336,5 +336,30 @@
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
+index 5c6851e8d311..bfa6de751270 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
+@@ -672,5 +672,34 @@
          "teardown": [
-             "$TC qdisc del dev $DUMMY handle 1: root"
+             "$TC qdisc del dev $DUMMY root handle 1: drr"
          ]
 +    },
 +    {
-+        "id": "1676",
-+        "name": "NETEM nested duplicate 100%",
-+        "category": ["qdisc", "netem"],
-+        "setup": [
-+            "$TC qdisc add dev $DEV1 root handle 1: netem limit 1000 duplicate 100%",
-+            "$TC qdisc add dev $DEV1 parent 1: handle 2: netem limit 1000 duplicate 100%"
-+        ],
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 root"
++        "id": "94a7",
++        "name": "Test PRIO with NETEM duplication",
++        "category": [
++            "qdisc",
++            "prio",
++            "netem"
 +        ],
 +        "plugins": {
-+            "requires": ["nsPlugin", "scapyPlugin"]
++            "requires": [
++                "nsPlugin"
++            ]
 +        },
-+        "scapy": {
-+            "iface": "$DEV0",
-+            "count": 5,
-+            "packet": "Ether()/IP(dst='10.10.10.1', src='10.10.10.10')/TCP(sport=12345, dport=80)"
-+        },
-+        "cmdUnderTest": "$TC -s qdisc show dev $DEV1",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -s qdisc show dev $DEV1",
-+        "matchPattern": "Sent [0-9]+ bytes [0-9]+ pkt",
-+        "matchCount": "2"
++        "setup": [
++            "$IP link set dev $DUMMY up || true",
++            "$IP addr add 10.10.11.10/24 dev $DUMMY || true",
++            "$TC qdisc add dev $DUMMY root handle 1: prio bands 3 priomap 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0",
++            "$TC filter add dev $DUMMY parent 1:0 protocol ip matchall classid 1:1",
++            "$TC qdisc add dev $DUMMY parent 1:1 handle 10: netem limit 4 duplicate 100%"
++        ],
++        "cmdUnderTest": "ping -c1 -W0.01 -I $DUMMY 10.10.11.11",
++        "expExitCode": "1",
++        "verifyCmd": "$TC -s qdisc show dev $DUMMY | grep -A 5 'qdisc netem' | grep -E 'Sent [0-9]+ bytes [0-9]+ pkt'",
++        "matchPattern": "Sent \\d+ bytes (\\d+) pkt",
++        "matchCount": "1",
++        "teardown": [
++            "$TC qdisc del dev $DUMMY root handle 1: prio"
++        ]
      }
  ]
 -- 
