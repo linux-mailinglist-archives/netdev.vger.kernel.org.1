@@ -1,93 +1,99 @@
-Return-Path: <netdev+bounces-206423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59401B030FB
-	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 14:20:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B685B030F9
+	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 14:19:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA9413B4EE7
-	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 12:19:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBFE93B3320
+	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 12:19:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DECC9227581;
-	Sun, 13 Jul 2025 12:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE22A1EFF9B;
+	Sun, 13 Jul 2025 12:19:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f6vyCsOf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 581E7218580
-	for <netdev@vger.kernel.org>; Sun, 13 Jul 2025 12:20:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA75772626
+	for <netdev@vger.kernel.org>; Sun, 13 Jul 2025 12:19:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752409206; cv=none; b=nOrhLGqnBCNHcPAFRUJo6edlOhcYcMvE/gyz2C9uUfYp9z5VOpVdZ8op9wh+8kfAtWjkYfhv0xAwv54BGAo4wy32JGwP1OfTT8x1IXgJ8xU+Y89JD4cuLbmcC3uWLAf2sb48mXn9lM7WcWb+Kcv9U0xmTV2dPA9TjjwoLEE6z2o=
+	t=1752409184; cv=none; b=o2Pni24s4sFXzmIZ6j11ofF1r8oMHvIJshnbII1jKjf/c/1j4GrriySdYlVrLH600eFnpaiYW5A+A7ldaVeJWuBshd6Q1ALK+WDXsCzBqtXMHQf4VGpxiYotouqdSymU5zKMMH0XV9t9ehzqy+inlg7gaEleC9dxBnwnt3Cc7AE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752409206; c=relaxed/simple;
-	bh=4TLGo6GK4QSP+WPahMdSl6hUqJJNrHr+VZrospIkjj0=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=mlMxtqqaQfT++hlZAyNJ31gXlilGRu+6OekgPbxVz+B/xNsro0aQrK1OfE1yE5dn/VtNe2HE/6HKPLsavE0H2xX2vf9/pa6GJiDaFvoKEPyByev4iN+7n2Px0FCAPi9jYCP6utJix9wZCoYxxhZY/WGCdnPFs/f12Ks+6TuoVQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3ddcfea00afso56286675ab.0
-        for <netdev@vger.kernel.org>; Sun, 13 Jul 2025 05:20:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752409204; x=1753014004;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GHfZZYwlltX3cnWzSRwgx2BtUxjdDvi1oy+Wb8i2L5c=;
-        b=puCaCn71Pr9pbuaSrXwFdX6B1yZ1S/JFnlDDeZAMJLQyk9r1TDV0tlgM9wcQzZQ1aO
-         cUup55qjaIspElFhmde5eSeBpeBXhN9ni2CGQzX8gHMcIO+OoER9gwzHosBQJ6WZAlUM
-         d/2/zpWVo4PuuF9azjFhw/cMC26XiZi7mvDMjGfGlGkejobwIcu7lzreEMZj9dKpcwkJ
-         od65/QcJYz4zKLd1fmA/HkzsBR6OR3sxz1R7xNdvBxIOSq5n3x2tRx7TVNK7pkCglPJp
-         g/vKQviGLV44dwgfOve6QLxWk0dIMaDLQaVE0lyiKVP9JLVhorUgTCDHhfZtyKPGsCk6
-         UF5A==
-X-Forwarded-Encrypted: i=1; AJvYcCVqnqNTg8sAiFBa6T3l3jUke8xT1uPS8JI1xOh+8WaU2ngRNbGmbvtc7yf8+DUaLrGMg6jLMNg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yye0MlfN7P1BoRdvlkv5ut3RfzfMJOkcz2V9dItgOGxosMyCC3I
-	PM/Mt+t/r4fJb5DqV7BTjR2al4fG74WQ9QZEb7WX52Pf4bWhNFcmRzWrjzIcX/7H4NPkFU21uxP
-	ux5uBXlfUOl3zrzzLCshXKPIIO4P4wOlDykPlt7cf97UiCLjCHmA5h3yRtAg=
-X-Google-Smtp-Source: AGHT+IF2Exx2IUNfv7fdIrV5sTW8rBytOis0b7TGzJm4zo9XvFCq3New/6Dkvq4Mr7o0fywQcedS34O/GhHp43TJvQ62c0w91YUL
+	s=arc-20240116; t=1752409184; c=relaxed/simple;
+	bh=qEHo4ELBv6MuDc3E6Epnk3Ae+dsw1bcAbTpSXgh30dc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=TID3WUkxC/5t8UNDSNYrfctZqfwoHgTKwMHAk7rsjXkcsy9pOE0HJEGBkLf9XfeT5hDLb+d1QBksazVffy5LcolP5JGWCKrpeOg4PRj2M4M4wm1Ff+wVrB/1L11FiwSSZN3XxeKeM9oZ8VqElB5zx+R1oku4iLB4VdNFDnquZJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f6vyCsOf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29B3AC4CEE3;
+	Sun, 13 Jul 2025 12:19:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752409184;
+	bh=qEHo4ELBv6MuDc3E6Epnk3Ae+dsw1bcAbTpSXgh30dc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=f6vyCsOfwk0KeHHlTxi4wFejhqCyBFvC8j704jzo+EyTW/DRlTZhj5xy8lgqTPzrj
+	 BCdK+vxqalPF6CsDjdB9Ga0KnN5IrNwdFrV+b37awwFNE5pNzfyCaEHnmWSEtG3EXN
+	 vCtmYh3sMKHZoLmUjK/evJwVb1eY0Oto64wE/QxrB2F4KFyn5yoMRtPAXZYX4AxWtJ
+	 MT7Rc4c0TNqHH6ImpVAu+CQz+eNUlPRrTyovtKCJiRhipd/5qtfKCgVa4Z+ouUFCwS
+	 9B0E7vI7zpXccP/iL5CIbf1Wrzozd/9nbDm+DSEnepN5nzviRYX/mZxW3C6424tvjz
+	 3sfSB+vrzMzoA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE1B383B276;
+	Sun, 13 Jul 2025 12:20:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3b85:b0:3df:399d:39c9 with SMTP id
- e9e14a558f8ab-3e2542e803amr113121025ab.2.1752409203286; Sun, 13 Jul 2025
- 05:20:03 -0700 (PDT)
-Date: Sun, 13 Jul 2025 05:20:03 -0700
-In-Reply-To: <6743b30d.050a0220.1cc393.004e.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6873a473.a70a0220.3b380f.0031.GAE@google.com>
-Subject: Re: [syzbot] [block?] possible deadlock in blk_mq_update_nr_hw_queues
-From: syzbot <syzbot+6279b273d888c2017726@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, ming.lei@redhat.com, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v1] tools: ynl: process unknown for enum values
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175240920551.2773717.15673778957888907336.git-patchwork-notify@kernel.org>
+Date: Sun, 13 Jul 2025 12:20:05 +0000
+References: <20250711170456.4336-1-donald.hunter@gmail.com>
+In-Reply-To: <20250711170456.4336-1-donald.hunter@gmail.com>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+ jstancek@redhat.com, arkadiusz.kubalewski@intel.com, sdf@fomichev.me,
+ donald.hunter@redhat.com
 
-syzbot has bisected this issue to:
+Hello:
 
-commit f1be1788a32e8fa63416ad4518bbd1a85a825c9d
-Author: Ming Lei <ming.lei@redhat.com>
-Date:   Fri Oct 25 00:37:20 2024 +0000
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-    block: model freeze & enter queue as lock for supporting lockdep
+On Fri, 11 Jul 2025 18:04:56 +0100 you wrote:
+> Extend the process_unknown handing to enum values and flags.
+> 
+> Tested by removing entries from rt-link.yaml and rt-neigh.yaml:
+> 
+> ./tools/net/ynl/pyynl/cli.py --family rt-link --dump getlink \
+>     --process-unknown --output-json | jq '.[0] | ."ifi-flags"'
+> [
+>   "up",
+>   "Unknown(6)",
+>   "loopback",
+>   "Unknown(16)"
+> ]
+> 
+> [...]
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14ea5d82580000
-start commit:   a52f9f0d77f2 Merge tag 'batadv-next-pullrequest-20250710' ..
-git tree:       net-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=16ea5d82580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=12ea5d82580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f8235fb7e74dd7f6
-dashboard link: https://syzkaller.appspot.com/bug?extid=6279b273d888c2017726
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14321d82580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=179590f0580000
+Here is the summary with links:
+  - [net-next,v1] tools: ynl: process unknown for enum values
+    https://git.kernel.org/netdev/net-next/c/8c2e602225f0
 
-Reported-by: syzbot+6279b273d888c2017726@syzkaller.appspotmail.com
-Fixes: f1be1788a32e ("block: model freeze & enter queue as lock for supporting lockdep")
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
 
