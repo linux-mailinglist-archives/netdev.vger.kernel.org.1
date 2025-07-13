@@ -1,175 +1,156 @@
-Return-Path: <netdev+bounces-206463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E566DB03324
-	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 23:48:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91A73B03340
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 00:01:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE1361897A51
-	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 21:48:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97EC018984EE
+	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 22:02:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C4B41F9406;
-	Sun, 13 Jul 2025 21:48:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F0681A256B;
+	Sun, 13 Jul 2025 22:01:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dFgXGH/1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ngjhAg4J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D111F91F6
-	for <netdev@vger.kernel.org>; Sun, 13 Jul 2025 21:48:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25711531C8
+	for <netdev@vger.kernel.org>; Sun, 13 Jul 2025 22:01:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752443293; cv=none; b=QVdwR/hVQjxBwu+vEFoi+Cm1q6CDnom0FGrlVMwiPaew3DDq1VkL6Z9nOHcAyMqif/dK/ppbX3e4qdH6gEpAy0Pl7GZCaHh211iVULlstt7YK31KPj/gYDEDuXeWbm/+/TC15Qqeldgt43qCFWjekepvA23j1WCIWuorpJShQ3Y=
+	t=1752444104; cv=none; b=CtjrGplegbaec851D3trJRMrM++ewj8pPw9YKNDhb5OY3sR4OFrvnM9wowCD/+eYtNUZEYLlP1zmbnlAX9dwcCvIe2/WLo9eY2PNMCImJLLpZuonNv1Njf6g9cI/ANNCUUNClMTiR8LHpDZ2Frtt2wm4k9T3qPFWHi3F09BwsBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752443293; c=relaxed/simple;
-	bh=Ntmjkos0CIcdvkurcd5vAFcyjG/Fz+9c9mzNhxrKtdA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=p59wXQVzi+dO4/4epgX+MPXlKQHG8Ruyip/c+GLzHwvc2wEnECGDUqsDnaH4HMuA9uQ/4GlO3ppWprFBUV/fesyKlz2CJ7xLoU44vEP9qp36kft5pc3kO6cBrQDK9fYQPpse8Q4rj8Q4TATvrycTft3JUsDzUmChjc/EbMNT+4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dFgXGH/1; arc=none smtp.client-ip=209.85.210.169
+	s=arc-20240116; t=1752444104; c=relaxed/simple;
+	bh=yZvXkx/I7z47vp0Nv0vWrIs/KiyJ32Bq/JRcQCe02sU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qPMSvZ+XQ4cipz05UShHSlBaLhviJpY5fMWq5GHnfidRIGWOJDHzYsYclj8867oVu2L/5BK2o72muQNG0fxb50yPgiWrA3JRGaVtjkcSTenpsLwzNHR0K8G6pqaG3vdZisY4+6g9OpuWRcoiFa1R57vMsse7CIcV1xvbKzrQ1DU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ngjhAg4J; arc=none smtp.client-ip=209.85.210.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7490acf57b9so2561976b3a.2
-        for <netdev@vger.kernel.org>; Sun, 13 Jul 2025 14:48:11 -0700 (PDT)
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-749248d06faso3088037b3a.2
+        for <netdev@vger.kernel.org>; Sun, 13 Jul 2025 15:01:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752443291; x=1753048091; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4cYKKZ5RX64v+jEJMguFWdNuRYEYo2gaYlQ5sQi4ibA=;
-        b=dFgXGH/1XbyZDT3P9f9js500EjEl/5InV8fMNZ7je9Z2PiBNkbeD0fR08h8z8Z2QL4
-         uX479Ru/SUP55jMd4RO772Lh/+PTBrYs2NpkjDqPiJ2JDBbpzbUk+f+tAt/yg2uTpEVj
-         MS13BEZF4Ag8ZLF7qBBJqpTzSVeSJr8r2ldAyOyuFutMGvZ5i7orf8Q5dGlNSmoT9bmc
-         p4jljCPzEPlzCopLNWYMucx4ln5X7H4bgN9opppBcWLRpkwjjlasJJ6vbjm4H3KqU6SA
-         B2718UlZZXxsc/vHPrivNI1iqi0wQIg7QkkRoWwOEI5gkQw8qiwF43uJ2UZ1JepaJt+y
-         7zuw==
+        d=gmail.com; s=20230601; t=1752444102; x=1753048902; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wYOO/ULSytE0a0IhOX6z6bTnRyN0gKDUjj3II4GOsiI=;
+        b=ngjhAg4JIz0nUwrvT4LQiWDqy/317U6jg/dqTfNnXjIRetMG+FHDSDupCCcbF0tpXI
+         l5HYkh56mV0QcsNMNo8M/USvYsjryCXcWx5On5/bpQ1uPqptv+Nd/Lazsk/Q2aZ5N80l
+         sVWLzNNA4bzwiHg9KUNZeilbwZblusJmjK8Rgd1O8KidyMXfcJ9Ohr/lxX40+BoPcr6B
+         pLqhsFELDHJ66FuyxIx5535fXzneQUTJSEq0xNlmWTIZ6xP7T3wRfkAvWssWCWyXT+8b
+         LtppzA+etXjy/GuwNSvBJtcc/L31+3nQcjvrdE+14NbZvQ2GSOt3+KLLffNnLQlLGKyV
+         nCfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752443291; x=1753048091;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4cYKKZ5RX64v+jEJMguFWdNuRYEYo2gaYlQ5sQi4ibA=;
-        b=gZqrMNWIzxWJgceYqTCT9NDJy1Xxq0fsQHY7wpRJHqYncKZVee6L+uek3bapQSztfs
-         n0Cq+pq5mgkSB+qDvkTjaOLkGZKryxNHEZ/QESwBY2Q1/FEKiYlDnckZb/M0Fl1NpLNk
-         gM0MumBRdWaQdrIZBkWzxQV6VDONyRe/yjDsX6OUC2gtyz3/Juq0+ZhBddUpMxE6csRu
-         w6E7L98g+vKJhPyjOJrjuYhi7KdSjRvtde7BACQw5pQo3av/dCNaXe8RZ9JgVacK6P5z
-         aFNb/LSzbyb1N/xxoIlTKFvkXHnUrBS/d5bVMWm11Cf+2hzJLQ0Iqhk0xxvXn2W0VKTG
-         7UOw==
-X-Gm-Message-State: AOJu0Yzxsn/sOiZhNCRpmPdUj3WEZxGmqKqKrJ6KhB8m6hhVG6/PpLCB
-	Ir1w4iXKou8hlDJi+ia93GbPLaMcXM8gXeSwRbLazJ0yBl0PAOD7xs/vTt3sbA==
-X-Gm-Gg: ASbGncvBudJt4Aik3V9mF6Jc0erjRjMxgUC+wFo38MGrqUVi/8cs4RG9JQoZrX074L1
-	0tvrbDnY0Oq2jjmRbVJVMyY1zbP2mfWJbByoiLQk7eHKxa6PdoT5IpE6EqA/ziLySwGexLd+B7b
-	h/8IbKrVpLdlTQKZjy3YjBQLiT/rFlPIjLTcVa4h3nw9nxTqtHqKsCRKmktbIK1RteoSH4IrLfz
-	XoUy03RXcIMOvvasyXe/xlA0yb4EtbWlOsyaTAG5ZeiJ/zRXokxi9R7j9VelxRdIQsrc42ZkdmW
-	Gooht+27QziF1625pEESNBL9aAf90FMVD6MOJBQEx3B5YXC2DUk0Bp18oNfKK4zzgWbkt3ne/Xa
-	PZIMdhhqyEj2zXSURDFtUxDabyc0=
-X-Google-Smtp-Source: AGHT+IHH0Q8oM7AX/ncK4zAbz45QJkGrjwkxE2CtCm5B/yYMjr+fd+mAYk9ns4+e7y2yGDj71yZTyg==
-X-Received: by 2002:a05:6a20:7491:b0:21e:eb3a:dc04 with SMTP id adf61e73a8af0-2311e04b252mr18813302637.3.1752443290726;
-        Sun, 13 Jul 2025 14:48:10 -0700 (PDT)
-Received: from pop-os.. ([2601:647:6881:9060:b9d2:1ae4:8a66:82b2])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b3bbe6f1fd0sm8628370a12.53.2025.07.13.14.48.09
+        d=1e100.net; s=20230601; t=1752444102; x=1753048902;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wYOO/ULSytE0a0IhOX6z6bTnRyN0gKDUjj3II4GOsiI=;
+        b=ZwEZzKLmCYcMgeDBPyYGG1+RRZ16gnfsKwhPTdm7nTyoQSFVCVW0yHCfuy4G6zt+wk
+         XJ90L/79fKQVdzH7uoVs7k1/BExfJmgj5/Dvhk+LtG3bP70pSVizavE/4VJNmFBtbxOl
+         mhuaqjHqIAqObVMqvET/nj8Bz0HHfru0xwjleQ59bLNwg/H1dbirnpc+o71xyim3P8yp
+         cCthYMaj81QKOoAUIsrW0d8XWJmQIEt3VITKJamrCaBx4xo72GEQSuOgtcCbpSUzUuuH
+         /SMQD07kxPJYDMzbDJiLtYtMv7YLcFYf5i1kFBLlf929xbQ6jnQFilOE5bhjNRkuj1CF
+         aVww==
+X-Gm-Message-State: AOJu0YzrjOgso9yYKwadNDbXdoOZdU9zKP4VmM/Pwgw0tU2Mw5b6RvuD
+	xCnq77Jk3klMT8poqYPWHZJN5T6ww6evZ+atiZkjPGSjUDEYdoVFwQXBFEtMdg==
+X-Gm-Gg: ASbGncs39cj/ppydyJZCi8crtTHexwjIDaATNwOeXEHlkkJOv1Qbyl36fKRPoZ9P3fg
+	MDbs5gps9AZzZtuPeavzcJWVK6KBoXnTsq6L5y5Sv3Y5USVMIeKpRPi3lEnKFskFPIkcHeZzmuC
+	3lvv2vwg+mnCZqdmlJ6+wjoDxn0DF4pRmQY4h2NhqsJumTVzcW4Hod4v6/9dvpADNsBbEZ+nW0B
+	A7WhZFjIkP0q8N1J1F/pGDNmGreKRjO5uqgkj6Jjr9rPVZ8EEKhZbkAtn1cZc8MtpbrRPou4l6E
+	nSWGYQsmNv+t6TH9Hal12jF/QSUsyeH+TdNWnSYDSZwhB85+ygyVYRHdDnF8NSYnFdykKQntqAr
+	jL72VOFOq9k1tYdY4BwvPlYdUx0gb
+X-Google-Smtp-Source: AGHT+IGaFSZIx0RJ99WPGpWR8keI+NyDiaPiT87rzO45euyY8dcXTJ+/Lm/YC4iekmFcBgBcESCC9Q==
+X-Received: by 2002:a05:6a00:2e08:b0:748:e772:f952 with SMTP id d2e1a72fcca58-74ee304e78amr11492867b3a.17.1752444101587;
+        Sun, 13 Jul 2025 15:01:41 -0700 (PDT)
+Received: from localhost ([2601:647:6881:9060:b9d2:1ae4:8a66:82b2])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74eb9e06883sm9652884b3a.63.2025.07.13.15.01.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Jul 2025 14:48:09 -0700 (PDT)
+        Sun, 13 Jul 2025 15:01:41 -0700 (PDT)
+Date: Sun, 13 Jul 2025 15:01:40 -0700
 From: Cong Wang <xiyou.wangcong@gmail.com>
 To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	will@willsroot.io,
-	stephen@networkplumber.org,
-	Cong Wang <xiyou.wangcong@gmail.com>
-Subject: [Patch v3 net 4/4] selftests/tc-testing: Add a test case for mq with netem duplicate
-Date: Sun, 13 Jul 2025 14:47:48 -0700
-Message-Id: <20250713214748.1377876-5-xiyou.wangcong@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250713214748.1377876-1-xiyou.wangcong@gmail.com>
+Cc: jhs@mojatatu.com, will@willsroot.io, stephen@networkplumber.org,
+	Savino Dicanosa <savy@syst3mfailure.io>
+Subject: Re: [Patch v3 net 1/4] net_sched: Implement the right netem
+ duplication behavior
+Message-ID: <aHQsxMkvvyvJvHrh@pop-os.localdomain>
 References: <20250713214748.1377876-1-xiyou.wangcong@gmail.com>
+ <20250713214748.1377876-2-xiyou.wangcong@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250713214748.1377876-2-xiyou.wangcong@gmail.com>
 
-This is a very reasonable use case for multiqueue NIC, add it to
-tc-testing to ensure no one should break it.
+On Sun, Jul 13, 2025 at 02:47:45PM -0700, Cong Wang wrote:
+> I tested netem packet duplication in two configurations:
+> 1. Nest netem-to-netem hierarchy using parent/child attachment
+> 2. Single netem using prio qdisc with netem leaf
+> 
 
-Test 94a8: Test MQ with NETEM duplication
-[  753.877611] v0p0id94a8: entered promiscuous mode
-[  753.909783] virtio_net virtio0 enp1s0: entered promiscuous mode
-[  753.936686] virtio_net virtio0 enp1s0: left promiscuous mode
-.
-Sent 1 packets.
-[  753.984974] v0p0id94a8: left promiscuous mode
-[  754.010725] v0p0id94a8: entered promiscuous mode
-.
-Sent 1 packets.
-[  754.030879] v0p0id94a8: left promiscuous mode
-[  754.067966] v0p0id94a8: entered promiscuous mode
-.
-Sent 1 packets.
-[  754.096516] v0p0id94a8: left promiscuous mode
-[  754.129166] v0p0id94a8: entered promiscuous mode
-.
-Sent 1 packets.
-[  754.156371] v0p0id94a8: left promiscuous mode
-[  754.187278] v0p0id94a8: entered promiscuous mode
-.
-Sent 1 packets.
-[  754.212102] v0p0id94a8: left promiscuous mode
+Below is the complete tcpdump output I had for each of the above setup,
+just provide more evidence here since a lot of people don't trust me.
 
-All test results:
+(Don't get me wrong, it is obviously my fault of not being able to gain
+trust).
 
-1..1
-ok 1 94a8 - Test MQ with NETEM duplication
 
-Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
----
- .../tc-testing/tc-tests/infra/qdiscs.json     | 30 +++++++++++++++++++
- 1 file changed, 30 insertions(+)
+[root@localhost ~]# tcpdump -i lo -nn -c 20 icmp
+[  589.079074] lo: entered promiscuous mode
+dropped privs to tcpdump
+tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+listening on lo, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+12:59:23.485638 IP 127.0.0.1 > 127.0.0.1: ICMP echo request, id 5, seq 1, length 64
+12:59:23.485844 IP 127.0.0.1 > 127.0.0.1: ICMP echo request, id 5, seq 1, length 64
+12:59:23.486714 IP 127.0.0.1 > 127.0.0.1: ICMP echo reply, id 5, seq 1, length 64
+12:59:23.486996 IP 127.0.0.1 > 127.0.0.1: ICMP echo reply, id 5, seq 1, length 64
+12:59:23.487867 IP 127.0.0.1 > 127.0.0.1: ICMP echo reply, id 5, seq 1, length 64
+12:59:23.488163 IP 127.0.0.1 > 127.0.0.1: ICMP echo reply, id 5, seq 1, length 64
 
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-index bfa6de751270..8e206260fa79 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-@@ -701,5 +701,35 @@
-         "teardown": [
-             "$TC qdisc del dev $DUMMY root handle 1: prio"
-         ]
-+    },
-+    {
-+        "id": "94a8",
-+        "name": "Test MQ with NETEM duplication",
-+        "category": [
-+            "qdisc",
-+            "mq",
-+            "netem"
-+        ],
-+        "plugins": {
-+            "requires": ["nsPlugin", "scapyPlugin"]
-+        },
-+        "setup": [
-+            "$IP link set dev $DEV1 up",
-+            "$TC qdisc add dev $DEV1 root handle 1: mq",
-+            "$TC qdisc add dev $DEV1 parent 1:1 handle 10: netem duplicate 100%"
-+        ],
-+        "scapy": {
-+            "iface": "$DEV0",
-+            "count": 5,
-+            "packet": "Ether()/IP(dst='10.10.10.1', src='10.10.10.10')/ICMP()"
-+        },
-+        "cmdUnderTest": "$TC -s qdisc show dev $DEV1",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -s qdisc show dev $DEV1 | grep -A 5 'qdisc netem' | grep -E 'Sent [0-9]+ bytes [0-9]+ pkt'",
-+        "matchPattern": "Sent \\d+ bytes (\\d+) pkt",
-+        "matchCount": "1",
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 root handle 1: mq"
-+        ]
-     }
- ]
--- 
-2.34.1
 
+[root@localhost ~]# tcpdump -i lo -nn -c 20 icmp
+[  361.831773] lo: entered promiscuous mode
+dropped privs to tcpdump
+tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+listening on lo, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+12:55:37.074400 IP 127.0.0.1 > 127.0.0.1: ICMP echo request, id 3, seq 1, length 64
+12:55:37.074606 IP 127.0.0.1 > 127.0.0.1: ICMP echo request, id 3, seq 1, length 64
+12:55:37.074806 IP 127.0.0.1 > 127.0.0.1: ICMP echo request, id 3, seq 1, length 64
+12:55:37.075012 IP 127.0.0.1 > 127.0.0.1: ICMP echo request, id 3, seq 1, length 64
+12:55:37.076508 IP 127.0.0.1 > 127.0.0.1: ICMP echo reply, id 3, seq 1, length 64
+12:55:37.076789 IP 127.0.0.1 > 127.0.0.1: ICMP echo reply, id 3, seq 1, length 64
+12:55:37.077069 IP 127.0.0.1 > 127.0.0.1: ICMP echo reply, id 3, seq 1, length 64
+12:55:37.077404 IP 127.0.0.1 > 127.0.0.1: ICMP echo reply, id 3, seq 1, length 64
+12:55:37.078825 IP 127.0.0.1 > 127.0.0.1: ICMP echo reply, id 3, seq 1, length 64
+12:55:37.079109 IP 127.0.0.1 > 127.0.0.1: ICMP echo reply, id 3, seq 1, length 64
+12:55:37.079404 IP 127.0.0.1 > 127.0.0.1: ICMP echo reply, id 3, seq 1, length 64
+12:55:37.079927 IP 127.0.0.1 > 127.0.0.1: ICMP echo reply, id 3, seq 1, length 64
+12:55:37.081125 IP 127.0.0.1 > 127.0.0.1: ICMP echo reply, id 3, seq 1, length 64
+12:55:37.081477 IP 127.0.0.1 > 127.0.0.1: ICMP echo reply, id 3, seq 1, length 64
+12:55:37.081763 IP 127.0.0.1 > 127.0.0.1: ICMP echo reply, id 3, seq 1, length 64
+12:55:37.082044 IP 127.0.0.1 > 127.0.0.1: ICMP echo reply, id 3, seq 1, length 64
+12:55:37.083253 IP 127.0.0.1 > 127.0.0.1: ICMP echo reply, id 3, seq 1, length 64
+12:55:37.083534 IP 127.0.0.1 > 127.0.0.1: ICMP echo reply, id 3, seq 1, length 64
+12:55:37.083816 IP 127.0.0.1 > 127.0.0.1: ICMP echo reply, id 3, seq 1, length 64
+12:55:37.084101 IP 127.0.0.1 > 127.0.0.1: ICMP echo reply, id 3, seq 1, length 64
+20 packets captured
+40 packets received by filter
+
+
+I didn't include them because the patch description is already very
+long. I am happy to add them to the patch description on request.
+
+Please let me know if I miss anything here. I am very very open to
+continue iterating this patch.
+
+Thanks!
 
