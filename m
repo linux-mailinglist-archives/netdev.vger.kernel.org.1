@@ -1,212 +1,148 @@
-Return-Path: <netdev+bounces-206399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFF13B02E80
-	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 04:58:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31BE6B02EE3
+	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 08:28:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4721189CA72
-	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 02:58:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71DF1165F8C
+	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 06:28:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AFE78615A;
-	Sun, 13 Jul 2025 02:58:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 546351A255C;
+	Sun, 13 Jul 2025 06:27:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AFN8kfvR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hMN5H3W5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A9AB6FC3;
-	Sun, 13 Jul 2025 02:58:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20101C13B;
+	Sun, 13 Jul 2025 06:27:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752375487; cv=none; b=aJuRMMP3iKfWXcGvNDE+YAmtDAOfIe/SiY115bxF1WK5K0zqrx+wh+NMGQaIjlGZMB9oEI6ScZbKBzaqm4Pbpxv3tp4CUsSgZxhI0UAknFrmfV7zEud7LM8+L6QkI/SEqr6woid3xkwLmzFr8VRKH1FANLyNECsbYW4tF2i/sFA=
+	t=1752388079; cv=none; b=XnrZF7mA84f1ECr11lqZu79miRB9dGZ9NnB4V/T1gpe/mUw5dRXFwZHygIrRARvw7xZiQdv9O+/QOIw60iGle2V95pxJSQs2Abr/pcQZdq+5Lh5/vkb4XPyPHGElDMnHVUIWkugN6OkZ4DrxIA4hzRSe3DXccp2LeLpt6u4RP/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752375487; c=relaxed/simple;
-	bh=YbiwQ0BPem0uY7/gAcm5tumD2P83B6P8H0dvB7mPfCM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=b1faCbvPFqEL6F0MjOc5vM4EX6oLb1K3XqCazPvHknSekbQY3fjRutaN68OuryIm/+I+IvJWhIXsp9C0EYxpClHCKOuHegHPrVvgCfzrP1lNILEtuGp45sj3GSCNMFi3GJAgwIXj4NYNGrMQ6tsNk31FLwRi2bVUVGhRzjBFWwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AFN8kfvR; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-23c703c471dso36373015ad.0;
-        Sat, 12 Jul 2025 19:58:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752375485; x=1752980285; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+sWVWcGnnf7yCkkObLlXnTN0/9/+b0sxPxFGLz/OpuU=;
-        b=AFN8kfvRDEz08HmFWcn6lJAsma+rIopzvbxzdgrcRjyq5Yd6irlyiNu8r4LQRWSeb4
-         B0WrXNp10H3dLL9QllrewWJpC6zqst1XBec0dnnyKh29YIWL/YuPWtG6X+rWiQvdkqN0
-         tk2b8Lb48VxpDhc3CF1sQNJyWdtB5IlXl82ZGABThPIK2xBWY1M94NFjecbYIhAfjQ4v
-         fs5z7GVfBjPBplhsmv8XHJnnRqIR4w/6QxSkzDJBC+fdTL5Ap8Lo+Z1Y48yI6zXHUHXi
-         hZ2FkpUHCAXZ4uUF9NadB9Q3RN7MIJH00zyPJ5EG4kewDuFzXEKQ+erkFlbqIT9H/KnQ
-         XkwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752375485; x=1752980285;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+sWVWcGnnf7yCkkObLlXnTN0/9/+b0sxPxFGLz/OpuU=;
-        b=M05cwjQ7g1VSI3WQGeEr4SETF9Eb/TqS+LGs8FgRNeGY49LWzi1Gl4nWuli5huDrW2
-         /QG/o827abxRjqL9Ug7HvzfS2tkzDBgSY/kZjUHrhzGjaD8YShvpv3eFgDFBZr0oMxIl
-         0hA4u0Ae4TGyfLJjjgv164E14n1dHbAOJYEx10iWs4bFH9kgh+QNPls2i3eQosM7UmH9
-         d2WZig3HYUdQMaBNtybEvRJ0XiyRAE0gXktwF+FtbJwqHl8bTUWqHRd0XB+eqRQhdg3D
-         n6sKky3R+P0H8/AqnD8ym3RE+Nl11F4S0jNfipy2pdtm3X00KWS2zf/NnvIIWw+O1Qnt
-         VTTg==
-X-Forwarded-Encrypted: i=1; AJvYcCW00kJkUEe3aSA9BcFL4TjyP5QqBwhK3vni1X08XxYOoSLj0V8q4lILfemcuLIsg+8KgOuJsmk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJdTWmJQZAMK5mmUa1QhZdEJpqXt3Ny7hy8TiBWsodah8LItCA
-	pNzaTf+z5w1G2SCdIRObndYvzv/bFy6iWvnmoaz5DM8l7AAZFfEZoqpT
-X-Gm-Gg: ASbGnctZiVi9P7k2wuIrJsC6f8BaZSluVr711btkqdWbLqpHnCfyHm3wixfY+S7T1wx
-	fMSIpGCARbFOc/2lvcdOhjudcfIIkvcLA5IQuXio8DTRfcpQP7Uf6PZXA/uKUVSDPRYAfImg63M
-	MnOO32g7WTD31DbCuyR8z/qFR5vdqJfQM3yrANqQ6kwDlSHfLmC/NUsxwfNfZWAK1gkNOIWdPdu
-	wJ4eVtuEZ8M8ILK9P4uxxPwlIupdch3a/tq0EtZoF+Dq/Pg+Bmsgl4Kxidgt6+UvoXXZQb79HHk
-	TvDmQcvZuwoNxAIAV4ul0B8eiO84wWwNZpQDBB7BX6zexOpNJjs8dzfvyDo6M9BcZpJICCkyXHp
-	sZFliwmgeVZmtZqFfurm8+5i3Xql5NXQ2KCs8RoEm6PZD8tIvYT+JV8P6kA==
-X-Google-Smtp-Source: AGHT+IEir2uT9XbvhExkxVbCAED4bP0XmTvw4u85jcTivEC6TMsuWgCSWlg3zIYGQETaeEoGI0QCSQ==
-X-Received: by 2002:a17:902:ce81:b0:235:f059:17de with SMTP id d9443c01a7336-23de2fc7a8cmr187265335ad.15.1752375484673;
-        Sat, 12 Jul 2025 19:58:04 -0700 (PDT)
-Received: from KERNELXING-MC1.tencent.com ([111.201.26.0])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31c3eb7b652sm8434818a91.43.2025.07.12.19.57.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 12 Jul 2025 19:58:03 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	bjorn@kernel.org,
-	magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com,
-	jonathan.lemon@gmail.com,
-	sdf@fomichev.me,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	joe@dama.to,
-	willemdebruijn.kernel@gmail.com
-Cc: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next] xsk: skip validating skb list in xmit path
-Date: Sun, 13 Jul 2025 10:57:56 +0800
-Message-Id: <20250713025756.24601-1-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
+	s=arc-20240116; t=1752388079; c=relaxed/simple;
+	bh=qF+yqTT0HCWnjzsAyIFmpCxLqFDSF1VJG0Ed4wgYZqQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aa3S/WYwETVzAS8akurmaHFWfftRYItbPSk0Tg1AEFUV3ewgwYhfxIZaF7Nj5xt5WMggFtJAX4YiVfYEXlopjGmMITiCB2HyjVNQqvpK2nxfeo0dvlUGa5SlEn23Cpc+D1BztBLLMeeo0Lr4hPKjVnYqIFAM5/7YbY2mieBkacI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hMN5H3W5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EEBFC4CEE3;
+	Sun, 13 Jul 2025 06:27:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752388078;
+	bh=qF+yqTT0HCWnjzsAyIFmpCxLqFDSF1VJG0Ed4wgYZqQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hMN5H3W5iWCKvfUgKGA2ygFP5hshzZTL6YS+w1uosKChce7z7evpEkCPdo73fIXYd
+	 Rh5XAGNCD/poP+d08lY2zZZEywbNv2pErfxtqsnL0T+ciagerbkMRv0/ajgACfBQnP
+	 sKzJHzQlH2Wu+Cq/Z11SAu3TO7dRT6w/quvZaZswMIRMQPsI29AKZOJLwTMm4QUG9C
+	 qd6e0D6xEFySOLXYKknRgT+WzUykjzmeuX475ig4ofZEUU2we07sC05FAfgjie84Gp
+	 c+g2CGGFNIJ3LgHE/ad+UKCO41rENHdSP1plW1d0YdCL8FnlM7n6YCY6LAPUiw9DrM
+	 B9lDHn94B0n+g==
+Date: Sun, 13 Jul 2025 09:27:53 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Abhijit Gangurde <abhijit.gangurde@amd.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, shannon.nelson@amd.com,
+	brett.creeley@amd.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
+	andrew+netdev@lunn.ch, allen.hubbe@amd.com, nikhil.agarwal@amd.com,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Andrew Boyer <andrew.boyer@amd.com>
+Subject: Re: [PATCH v3 10/14] RDMA/ionic: Register device ops for control path
+Message-ID: <20250713062753.GA5882@unreal>
+References: <20250701103844.GB118736@unreal>
+ <20250702131803.GB904431@ziepe.ca>
+ <20250702180007.GK6278@unreal>
+ <bb0ac425-2f01-b8c7-2fd7-4ecf9e9ef8b1@amd.com>
+ <20250704170807.GO6278@unreal>
+ <15b773a4-424b-4aa9-2aa4-457fbbee8ec7@amd.com>
+ <20250707072137.GU6278@unreal>
+ <1a7190d4-f3ef-744c-4e46-8cb255dee6cf@amd.com>
+ <20250707164609.GA592765@unreal>
+ <76a68f62-1f73-cc81-0f5b-48a6982a54c7@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <76a68f62-1f73-cc81-0f5b-48a6982a54c7@amd.com>
 
-From: Jason Xing <kernelxing@tencent.com>
+On Tue, Jul 08, 2025 at 03:35:52PM +0530, Abhijit Gangurde wrote:
+> 
+> On 7/7/25 22:16, Leon Romanovsky wrote:
+> > On Mon, Jul 07, 2025 at 08:26:20PM +0530, Abhijit Gangurde wrote:
+> > > On 7/7/25 12:51, Leon Romanovsky wrote:
+> > > > On Mon, Jul 07, 2025 at 10:57:13AM +0530, Abhijit Gangurde wrote:
+> > > > > On 7/4/25 22:38, Leon Romanovsky wrote:
+> > > > > > On Thu, Jul 03, 2025 at 12:49:30PM +0530, Abhijit Gangurde wrote:
+> > > > > > > On 7/2/25 23:30, Leon Romanovsky wrote:
+> > > > > > > > On Wed, Jul 02, 2025 at 10:18:03AM -0300, Jason Gunthorpe wrote:
+> > > > > > > > > On Tue, Jul 01, 2025 at 01:38:44PM +0300, Leon Romanovsky wrote:
+> > > > > > > > > > > +static void ionic_flush_qs(struct ionic_ibdev *dev)
+> > > > > > > > > > > +{
+> > > > > > > > > > > +	struct ionic_qp *qp, *qp_tmp;
+> > > > > > > > > > > +	struct ionic_cq *cq, *cq_tmp;
+> > > > > > > > > > > +	LIST_HEAD(flush_list);
+> > > > > > > > > > > +	unsigned long index;
+> > > > > > > > > > > +
+> > > > > > > > > > > +	/* Flush qp send and recv */
+> > > > > > > > > > > +	rcu_read_lock();
+> > > > > > > > > > > +	xa_for_each(&dev->qp_tbl, index, qp) {
+> > > > > > > > > > > +		kref_get(&qp->qp_kref);
+> > > > > > > > > > > +		list_add_tail(&qp->ibkill_flush_ent, &flush_list);
+> > > > > > > > > > > +	}
+> > > > > > > > > > > +	rcu_read_unlock();
+> > > > > > > > > > Same question as for CQ. What does RCU lock protect here?
+> > > > > > > > > It should protect the kref_get against free of qp. The qp memory must
+> > > > > > > > > be RCU freed.
+> > > > > > > > I'm not sure that this was intension here. Let's wait for an answer from the author.
+> > > > > > > As Jason mentioned, It was intended to protect the kref_get against free of
+> > > > > > > cq and qp
+> > > > > > > in the destroy path.
+> > > > > > How is it possible? IB/core is supposed to protect from accessing verbs
+> > > > > > resources post their release/destroy.
+> > > > > > 
+> > > > > > After you answered what RCU is protecting, I don't see why you would
+> > > > > > have custom kref over QP/CQ/e.t.c objects.
+> > > > > > 
+> > > > > > Thanks
+> > > > > The RCU protected kref here is making sure that all the hw events are
+> > > > > processed before destroy callback returns. Similarly, when driver is
+> > > > > going for ib_unregister_device, it is draining the pending WRs and events.
+> > > > I asked why do you have kref in first place? When ib_unregister_device
+> > > > is called all "pending MR" already supposed to be destroyed.
+> > > > 
+> > > > Thansk
+> > > The custom kref on QP/CQ object is holding the completion for the destroy
+> > > callback.
+> > > If any pending async hw events are being processed, destroy would wait on
+> > > this completion
+> > > before it returns.
+> > Please see how other drivers avoid such situation. There is no need in
+> > custom kref.
+> > 
+> > Thanks
+> 
+> As per your suggestion, I looked some of the other RDMA drivers. While many
+> are using locks, that approach would negate the lockless lookup we gain from
+> the xarray.
+> The MANA RDMA driver, for instance, uses a similar refcount and completion
+> mechanism to handle asynchronous events.
 
-For xsk, it's not needed to validate and check the skb in
-validate_xmit_skb_list() in copy mode because xsk_build_skb() doesn't
-and doesn't need to prepare those requisites to validate. Xsk is just
-responsible for delivering raw data from userspace to the driver.
+Let's do what all other drivers do, please. I prefer simplest solution
+and objects that can potentially be around after verbs objects were
+cleaned doesn't sound right.
 
-Skipping numerous checks somehow contributes to the transmission
-especially in the extremely hot path.
+Thanks
 
-Performance-wise, I used './xdpsock -i enp2s0f0np0 -t  -S -s 64' to verify
-the guess and then measured on the machine with ixgbe driver. It stably
-goes up by 5.48%, which can be seen in the shown below:
-Before:
- sock0@enp2s0f0np0:0 txonly xdp-skb
-                   pps            pkts           1.00
-rx                 0              0
-tx                 1,187,410      3,513,536
-After:
- sock0@enp2s0f0np0:0 txonly xdp-skb
-                   pps            pkts           1.00
-rx                 0              0
-tx                 1,252,590      2,459,456
-
-This patch also removes total ~4% consumption which can be observed
-by perf:
-|--2.97%--validate_xmit_skb
-|          |
-|           --1.76%--netif_skb_features
-|                     |
-|                      --0.65%--skb_network_protocol
-|
-|--1.06%--validate_xmit_xfrm
-
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- include/linux/netdevice.h |  4 ++--
- net/core/dev.c            | 10 ++++++----
- net/xdp/xsk.c             |  2 +-
- 3 files changed, 9 insertions(+), 7 deletions(-)
-
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index a80d21a14612..2df44c22406c 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3351,7 +3351,7 @@ u16 dev_pick_tx_zero(struct net_device *dev, struct sk_buff *skb,
- 		     struct net_device *sb_dev);
- 
- int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev);
--int __dev_direct_xmit(struct sk_buff *skb, u16 queue_id);
-+int __dev_direct_xmit(struct sk_buff *skb, u16 queue_id, bool validate);
- 
- static inline int dev_queue_xmit(struct sk_buff *skb)
- {
-@@ -3368,7 +3368,7 @@ static inline int dev_direct_xmit(struct sk_buff *skb, u16 queue_id)
- {
- 	int ret;
- 
--	ret = __dev_direct_xmit(skb, queue_id);
-+	ret = __dev_direct_xmit(skb, queue_id, true);
- 	if (!dev_xmit_complete(ret))
- 		kfree_skb(skb);
- 	return ret;
-diff --git a/net/core/dev.c b/net/core/dev.c
-index e365b099484e..9fa805c26601 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -4741,7 +4741,7 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
- }
- EXPORT_SYMBOL(__dev_queue_xmit);
- 
--int __dev_direct_xmit(struct sk_buff *skb, u16 queue_id)
-+int __dev_direct_xmit(struct sk_buff *skb, u16 queue_id, bool validate)
- {
- 	struct net_device *dev = skb->dev;
- 	struct sk_buff *orig_skb = skb;
-@@ -4753,9 +4753,11 @@ int __dev_direct_xmit(struct sk_buff *skb, u16 queue_id)
- 		     !netif_carrier_ok(dev)))
- 		goto drop;
- 
--	skb = validate_xmit_skb_list(skb, dev, &again);
--	if (skb != orig_skb)
--		goto drop;
-+	if (validate) {
-+		skb = validate_xmit_skb_list(skb, dev, &again);
-+		if (skb != orig_skb)
-+			goto drop;
-+	}
- 
- 	skb_set_queue_mapping(skb, queue_id);
- 	txq = skb_get_tx_queue(dev, skb);
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index 9c3acecc14b1..55278ad0a558 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -834,7 +834,7 @@ static int __xsk_generic_xmit(struct sock *sk)
- 			continue;
- 		}
- 
--		err = __dev_direct_xmit(skb, xs->queue_id);
-+		err = __dev_direct_xmit(skb, xs->queue_id, false);
- 		if  (err == NETDEV_TX_BUSY) {
- 			/* Tell user-space to retry the send */
- 			xskq_cons_cancel_n(xs->tx, xsk_get_num_desc(skb));
--- 
-2.41.3
-
+> 
+> Thanks
+> 
+> 
 
