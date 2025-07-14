@@ -1,140 +1,239 @@
-Return-Path: <netdev+bounces-206668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21650B03FBF
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 15:25:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 01E34B03FC0
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 15:25:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 647CB4A24C5
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 13:24:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0CDCF4A1B42
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 13:24:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B3A2571D4;
-	Mon, 14 Jul 2025 13:22:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9434125745F;
+	Mon, 14 Jul 2025 13:22:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KtzCk5eQ"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="ghmlNNbh"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012037.outbound.protection.outlook.com [52.101.66.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35827254AF5
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 13:22:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752499375; cv=none; b=qZz/yZxIUlm1msNV/Nt6EopY0jfdJWCztF8IVhLSYIC7SSQiAe3llmKPEM6FW1AeZuc0MCUNk5aK9aWH/+3Uk1hNtkvSAIVZ6Qs7onvkwix8aaGpY6JOZuBsqIjYITteoLG58Xv6OOfEopxJHy8GlP3YBePwnZjzJNDm6cYB0pI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752499375; c=relaxed/simple;
-	bh=DSltvb0vEhfUg7AEaM3U6pLDRM1PmY8c4GSdMZ0F3aQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=CE78ISQlNmeUZ5VjJkHbqgeUt/SAWtVhFUQvaQfzULLGa5aIpMfJytQOtbkDdouD1f9HMJdb4SuOZRvSt5dgjs91S5gKlcJwI5eZvbz2fRGWq61C/pd6EPMpDg2I9v9CQ2Cc3Xdk18fmqUwviJQdddru3ZFzpenrmzTjd6ixwYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KtzCk5eQ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752499373;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+74sl1h9XcDCGHLtxtil1RR5aKu+l0UGJeyQC88qo+g=;
-	b=KtzCk5eQDTIEP3LW8VGRh9EL8q0ClmFn3JgDB+sIL5b3VnB92TG/9swsjbe7It4tcrcZGX
-	Za3FwKDrB2IlJJvd0RkOgYz7awZRk7Bhe6wA3vNZvheEfBA7Y+1rvL3ob9RAF03VIsYdKv
-	3Zp8QMtpiaPUmNvz/O0jV9AT202o3qU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-652-qKVoYMnXN56KHRGt-qnefw-1; Mon, 14 Jul 2025 09:22:51 -0400
-X-MC-Unique: qKVoYMnXN56KHRGt-qnefw-1
-X-Mimecast-MFC-AGG-ID: qKVoYMnXN56KHRGt-qnefw_1752499371
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-456013b59c1so12099905e9.3
-        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 06:22:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752499370; x=1753104170;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+74sl1h9XcDCGHLtxtil1RR5aKu+l0UGJeyQC88qo+g=;
-        b=kkKPDNVvfnpJsDJ3xNMWK8KKv4IE+54neSaQ3LSUu0M5RzAzl6BOHzybI5/9Ww6TEY
-         als8ta15optWONkF7+jTeHTjyXtEd+34++/qI/j+zE9SO7feHP/gCqQJGUiLDwvkmvjK
-         IxNOkPiHiDg0lSz5yIfPUVH8M1l/szzHEBpdCw12HPJaujeIdUDyNRzK+Jhk1tYAsfmB
-         xlTP29uJybcFX8MhKdEp83VWjoGvRWIsvxFWNkracErtRqOCkyzJ3fogr/XeZIsV7sb8
-         hK8NDVq5rytNwBvRvE49R8C+GXzyAxUuMZokjGAc16trnbE/4pOpwfeGhaJZt9FY7yYv
-         vdcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXN0RWa8pNk6cx78Lky19YlMNyrIslDekCsEp+ayo8EPYq1OwZU6a0RoLcJG1uYvujeFCZBJSo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywb2BSqy3IGOlDmxdJZGfjF+vBAs7AzxY6/GyD64y+jd0QK5GmT
-	HwKbO/hOjQ6C98np3UmlbL1+EqQVwWo8TxLF7NSA/a/TsQnNDBoQrRw7QL3SyaA9a61F+gNVWyU
-	w7fPPztAAYQlMjfLmFmECM2GohOZ+Nn6HFIBLD245vY/xTwy1YqlL/G9myw==
-X-Gm-Gg: ASbGnctCL+Z6Ayg0jlW9I8576eBu3rIYMx1TQ7cooHciCYV7hMa7lCqwRp9ggcgd+L0
-	bSJ97pLz6n0dCJU7HQRdk5nVZ5l011IdvFyo0BD3UifkO7bf4JIiNxNzYGSD9s7sbc/lskNkNmL
-	NCH5TdjD3M+uXuRUFWvMVHxVbaBt53c7ygZkPKZXrz7825RyT3I87QZVzacJkD3e7juVMZd7Ul5
-	LUsx+kZFnQHkul6HHFp+bv2+Nt0fUp1VxKzYthWBeRaSaYt5I9zitbjG3CTjDZCqw/wvcspEEhr
-	lIumU8bBOQPxtumeHve5hcVRZ4ZI682d3QjHMIm969Y=
-X-Received: by 2002:a05:600c:848c:b0:43c:e70d:44f0 with SMTP id 5b1f17b1804b1-4557f0b52f2mr103651915e9.19.1752499370505;
-        Mon, 14 Jul 2025 06:22:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHNCV4TnpnSpBNGL5u+cKnLCGpcA5mGUjaCcEkgIGAq0CDxzLK13e64IbjzNHnO8ged+huEHA==
-X-Received: by 2002:a05:600c:848c:b0:43c:e70d:44f0 with SMTP id 5b1f17b1804b1-4557f0b52f2mr103651615e9.19.1752499370003;
-        Mon, 14 Jul 2025 06:22:50 -0700 (PDT)
-Received: from [192.168.0.115] ([212.105.155.228])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454d5032fcbsm173656775e9.6.2025.07.14.06.22.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Jul 2025 06:22:49 -0700 (PDT)
-Message-ID: <eaeaf8e5-ac94-4368-b897-538c757f4e34@redhat.com>
-Date: Mon, 14 Jul 2025 15:22:47 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F08824EA90;
+	Mon, 14 Jul 2025 13:22:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752499377; cv=fail; b=gHu4qfmYf+XyihPV/qMBjhEu63KUV50cs+1VIknS34FyRaMRlHGDqYqge7XL9CeNPscorUDadWEx6tzK2BK64yf/sx6PnSeOhNZFvXkFGk8Gyvmf+3FAkpJ+3TQ/tYJNh4XkeejZw3aVAiizA0qNXLeaqRzZmywCzrxvEVFmTrk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752499377; c=relaxed/simple;
+	bh=lGqa6Z2goylAfib7ZnAMeIA7SFpxv/cWms68axMV+OY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=H8OPBqDCTeirmTuJTwxMC5PzgyyFza0Eqxm0qiExjIpGb6OVrM9frF6H6//ZKBwZ3c4CwruaoImq8tqckONZJ1ld3suhnWl3ggkSP1FdmOiVSagJDvResh9Jvie6pJGvhE2u4EsX/awiAT3hdRO5OH2hD16NeqwcZhvG5k/ZxGY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=ghmlNNbh; arc=fail smtp.client-ip=52.101.66.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=gq6VFUIgRqFBbOW9TONMRapLOmA61mgcjc/puAfyplP1Xw96vXXAwi8pdMje62aO7bx9yf1aS/QWgtsgLbNE6H0isq5u0CbUzsHbL2LfGVe2rCRG5Nf8rskFE2PwfOkyBCI0p8KYMpw1RLqJsVsVH0VlMIHIyDKHa60n6mTU9FWC3f4wvh7OBiWBrz0/2In44hunMzyhnbX8201w7p9LI6+luNATudgZ/v/tfPIxQIkojZd6D+dn0ngv7jZ/IlOBPxOOApj6QAQjoFozKYzAaFhSgjW5p8hX4UQ11ZXfoGKb9GCx6o6cNgeI4PNsb4Z/5pN4LsJwqcLlw4kozMMk/g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lGqa6Z2goylAfib7ZnAMeIA7SFpxv/cWms68axMV+OY=;
+ b=wWsmdDgROvn7mCPr3EF43aPLSv5Gwt2aVJ8KAoHxEmydLHXo8CxG97ONuM0FRuwc6RawQLNEn98NCqlDepDgVOuNYeuTCSkYoCT7FGVx09czGpBDNMjjEJZ/+Sk5J2TOLgoWrXxxVb6Y7bHIuafElJTCm9UoOBrCQnGbkWAnD1HHovKeV6Q9lgxGFHgu+szubiJEskfj549tMGxv7wIqmgAhZp+rPsKR4OP9k7O+8pHHCcBCkZQzAALgvDb2Q9WVsaJ2CPbtXYIvqN5eUu22ioxdmbrEhaFyMq9IWUuh8ELJ1uxgFPbVB4oOu+BxXJaQRC0MDhDkj81Flwnt5kkQ9Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lGqa6Z2goylAfib7ZnAMeIA7SFpxv/cWms68axMV+OY=;
+ b=ghmlNNbhHrEXlg4SSAN4UyxqA47n/zxlY0iTWvE9boVKVXKA1IieIfjTz3w/KPrvzk8JaAImDMvnhSg0Nr9iGevMHS+92s8d8d/VuO1SF6hYONdViYNqiLELP2+Bupw2uY2E8XbI3EwjZn6JXOoV58NrZcmx6UsixbbtJLo90+s4D/eKCvYi1mGMcgJ9zoBnB4eAMI77+75MuQuZ9PXUaPOjyg5jia9oaxBcHhak1HEVRXPT2CXyt7Ubz+q20bNRNNMO8TvVFXd8FtHIc8DPXNWrYgn269RTcJ9kqzRuhM05zc+A8bisImn1we9t5V241wUK/GMIpIcdCn9NM86VJg==
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by PAXPR04MB9277.eurprd04.prod.outlook.com (2603:10a6:102:2b9::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.25; Mon, 14 Jul
+ 2025 13:22:52 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%5]) with mapi id 15.20.8922.028; Mon, 14 Jul 2025
+ 13:22:51 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+CC: Krzysztof Kozlowski <krzk@kernel.org>, "F.S. Peng" <fushi.peng@nxp.com>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>, "robh@kernel.org"
+	<robh@kernel.org>, "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>, "richardcochran@gmail.com"
+	<richardcochran@gmail.com>, Claudiu Manoil <claudiu.manoil@nxp.com>, Clark
+ Wang <xiaoning.wang@nxp.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
+Subject: RE: [PATCH net-next 01/12] dt-bindings: ptp: add bindings for NETC
+ Timer
+Thread-Topic: [PATCH net-next 01/12] dt-bindings: ptp: add bindings for NETC
+ Timer
+Thread-Index:
+ AQHb8jPWk5neHXUn3Eeo02nqDOVTYbQxImMAgAATMMCAAAm6gIAAFX1wgAAGKwCAAAFaQIAADfuAgAACM8CAAAPoAIAAAqbQgAAP8QCAABcf0A==
+Date: Mon, 14 Jul 2025 13:22:51 +0000
+Message-ID:
+ <PAXPR04MB851072E7E1C9F7D5E54440EC8854A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <ce7e7889-f76b-461f-8c39-3317bcbdb0b3@kernel.org>
+ <PAXPR04MB8510C8823F5F229BC78EB4B38854A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <61e6c90d-3811-41c2-853d-d93d9db38f21@kernel.org>
+ <PAXPR04MB85109EE6F29A1D80CF3F367A8854A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <169e742f-778e-4d42-b301-c954ecec170a@kernel.org>
+ <PAXPR04MB85107A7E7EB7141BC8F2518A8854A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <836c9f0b-2b73-4b36-8105-db1ae59b799c@kernel.org>
+ <PAXPR04MB8510CCEA719F8A6DADB8566A8854A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <20250714103104.vyrkxke7cmknxvqj@skbuf>
+ <PAXPR04MB85105A933CBD5BE38F08EB018854A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <20250714113736.cegd3jh5tsb5rprf@skbuf>
+In-Reply-To: <20250714113736.cegd3jh5tsb5rprf@skbuf>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|PAXPR04MB9277:EE_
+x-ms-office365-filtering-correlation-id: 7110bb17-e243-4e9d-5a53-08ddc2d9890c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|19092799006|7416014|376014|366016|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?NQOSwWApCr4yXp4K4xqm8MujHJitPAmThEVXOzNb/S6tz9PNc+U19UYtUTna?=
+ =?us-ascii?Q?ggMQZ3YArNzBUkur7U8LABOFrZ3jUzKsVu9jiujj+HbIGaE+dqsk/HwHDj9O?=
+ =?us-ascii?Q?q7lskLBpeANdW5NPsIYZu96L3lCziS7+Aule+rzAvIGjBzf6EPJUY+rVLw6p?=
+ =?us-ascii?Q?otfW/H5bhxo6iKwdgG+W/a/wuPabI4jZdrUAxguXwkedbmm+0bhoCrBsjoG4?=
+ =?us-ascii?Q?ksFd6o1ieE5EoRmQL2EJGFUlIbbE1gJOZfcoCe+djumjyds2BYmUwgUuOWiH?=
+ =?us-ascii?Q?yEbDpkTackoAiRRH6fj9m1hwhbL0yGGkolUP8H5/9zHasTpEdIKuaJdtbuTU?=
+ =?us-ascii?Q?jshugWSutEm8fwb6xyfTjjAinP++VSJSvHObi2HnRgJ3kHIGK1CBJqciu+pn?=
+ =?us-ascii?Q?3EGEfsdXvVxmmSOYWX76AhNxzRuUKPrpD2Vyem3SL1uQEUpiYWukufIbp7KV?=
+ =?us-ascii?Q?v4aCaXX/hPbWrt/xzQKq/ltTjWkfn7IKLOJxMnc5Hw8uKrU9aNTPnGv2rY3j?=
+ =?us-ascii?Q?tGrko1hAtThqLLIDT0Py79ws7LCSYSzFqBGtG09vzR+P5V/V5MoVBzgpSura?=
+ =?us-ascii?Q?JviDJV/QBjgy68l/biMYTYSgzLBjOBK7jXdlOeh+tUgGPxe4nMXoH0H4xY62?=
+ =?us-ascii?Q?2/YmiPgI4m+zMQFViFSpxg0Eu1pE3tF1rIUiz4/DfnprAoZW/skvzpLavJka?=
+ =?us-ascii?Q?y7Wzfu+B2ZarHQ0OM73u3gaTq0CVtQ6/2GSCkSmkovLXFEwqhquCLgTFfhff?=
+ =?us-ascii?Q?eIVhEG4HUeNeeckZOL9ZEnxlXO3J36pMSrv7/EMmTOwqPKOKpUXLMyUKo/1v?=
+ =?us-ascii?Q?G+URW6cVWipgQFEXkpmW0IsI7X60qtMoCRYO/56IkkTpHjb7IrrZnIVelREh?=
+ =?us-ascii?Q?5RYoNuhAOKKRdMY241z9oTbf7COK/JITYHGUikVv4DMyTL40xv3ZCOI/jzcL?=
+ =?us-ascii?Q?LMExS4cI16kjKgBWrQe6rmeJ5+up+PF2JpAm1XjLU+1O2l4B2tk0TrFY7+Wy?=
+ =?us-ascii?Q?w37or0wWtdeNLFi3FStDpYeohygx6PwaYHB1vTJsCtfGdFlzbtcKgC1rOCC0?=
+ =?us-ascii?Q?DoIyULmwIh7a4lQqdtWVIH7QQHVrMR29XkSB81C/IUZejv3Z2HXdTGGSTCt2?=
+ =?us-ascii?Q?huy9V4uO61JncObk2ibPe9NMa8GWbLU0+PoqVqCy9VGZByRfTWa51ENOgLN0?=
+ =?us-ascii?Q?Ett3NZ/CvQx5Sumy1aZfqKxW/edLJ22q/SA2pHc6y/P9HVu0ilM2VmXq0vfc?=
+ =?us-ascii?Q?CppQBJhj5xeZej93qiXfHaNGH9Z7O20TrpBo26LQsUijZoOE8uZ3GK7/qbnJ?=
+ =?us-ascii?Q?ZXdXSQt+zZ/OCD5rgRCMy/Yko8PCj+XCb7pl9AcVQyf395Eg4G57rq3XGucz?=
+ =?us-ascii?Q?85/xCWcXQDxjI5avWHoOg5EOA0UhoLm78oOJew/cf1pRJ40tnuc3Vv55iwy4?=
+ =?us-ascii?Q?JMTIjbk7fQ7ibJ3VWwDn/kpWBIqeZmi19s5z8bCIu2njs7nS7OhH4A=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(19092799006)(7416014)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?JGGXwRxkEYmcfENgrt1A5R8QJLA9aqL2pGD8ctls0bPisdjEUsOja0uQR1BB?=
+ =?us-ascii?Q?DtZMyUf/I3p73IktF0lYaZe6MbsIrhXiWeImGFJgf/rxFZVX2BnOMUeQd0NT?=
+ =?us-ascii?Q?bbs5Jb9w1R3PlbHmSD9UC44WPD+evluJ3rT4wWDBcY7iyBsOJj1RJgefctaa?=
+ =?us-ascii?Q?O1sPjGqdNzC2kGPpJ56mXctYFNXAxh/Sxpyz4rKsza35wHHHqc8pQPagno8B?=
+ =?us-ascii?Q?tMZnMWomNaRxOjNcI7SWO7rTjY+WLbVjnVEzUJkE+NtisrABIBvK6mDoXmtK?=
+ =?us-ascii?Q?tmv+oHiJtMhsTAITOyfkSrphlYc/UmF9FgPcNDCHtL+XRVQWnKDLrSRaDY8O?=
+ =?us-ascii?Q?o3iw/YLQrhpxFFYgxB2LNlEkRToksYQeMvokniRo2wtfaCAGHI6dzKaa2kLQ?=
+ =?us-ascii?Q?8TK0kE+l1Ua0+eNoct9Bt59Sr+AD2I7spyGpr2t5Z9nnXgXECgYGEt76f6tg?=
+ =?us-ascii?Q?Nf0JNyMjSwb8hPePGTplBj3n5qDuAX4cp9qXG9/k7DWoD6otQcFeu8OlSvR8?=
+ =?us-ascii?Q?b/z+KHXiee8R4dD4yPuwmgo+QhwKas3YOFajL8qQR8y6P48h2DsY+6yr/b6s?=
+ =?us-ascii?Q?ZEDoSNxSpkMC9nBt+8R3kJjra/NQZ5iMFqhYh88YHgjT1W2xPVOjWueyc7RR?=
+ =?us-ascii?Q?CjIovfFSDiS9vVPWqND2CF8hjtq3WAcJr71taA8eXTz67JNYA2K71h25nEsH?=
+ =?us-ascii?Q?AYEUz5UQ5wzvruu2XyeVfOQcIHxqMS1QMFdRcdmBtqRcm0S5z8TcjpciAYjD?=
+ =?us-ascii?Q?w2qMZaHkOL8z+aGVFIDwlK10TdXSBddDqnWdk9bbpZOfoo+wdvVHE7j5o9nP?=
+ =?us-ascii?Q?lhYJTZVzUdOCmn2/m/ntaFGY9YasCDbgNLQG93cyDZXjYihR30+Bmz06QJaj?=
+ =?us-ascii?Q?2fJ85OEEw3FGqepTRyyhDuNrvkFUAeIbapLznmrJmZMr/WKNPP+e2tWsWI72?=
+ =?us-ascii?Q?hToidfCuFsG9aY29simL0He5Dv1Wyq+xbjp7uWwgn8p5V0X0YcCARLrSGT4Y?=
+ =?us-ascii?Q?+89RlHxzbB22Nc1Y80k0ZWmftrVNdNlNkVViTOYyJ2/GcqyzHeRgm6gUxGpe?=
+ =?us-ascii?Q?asFhebCd36CW+S3yxp1lAUkoZw3ccU6Ai04aKxtSyTwjG5QqULM1tAGKil8G?=
+ =?us-ascii?Q?eQ4UBPy+w/g8Hp+G1eTkcAWQXIj8XWHjq4naoaX9MDO+4rve7b4ggCgHUa5q?=
+ =?us-ascii?Q?wnP7xxrGDxKUOWLk7vrRzgJrtMfVmZL/cEmNWjSONJOneeWCG8VQPuEaapOD?=
+ =?us-ascii?Q?5DtLyHAXwqHLvMopIubKa0eKsYbboe0QIX2k88AyiDtEQZs85JtqQ5fG6ar1?=
+ =?us-ascii?Q?IBTknm+pBDp3MgmyjY1VU+vNJNfZPdbuTdaBHYfZ7Dtxi8RqWenCrWByH4pm?=
+ =?us-ascii?Q?KlKMOaYfic3MVzb28wD0nWeNtrcWNUBC/3PiEEAE62R2gGkWS9ZT4JCh7S1e?=
+ =?us-ascii?Q?qhisrHgbAQkTYPEwlAiIhWamPbUmYwMp9na5DWYPbdzuhuZgFuEGsQEK9KsS?=
+ =?us-ascii?Q?tGmtbKoI1shv+hVtexxj3PPNkMqV1oYngwXIis13kYTyUbc7ToGbiR+gWjVH?=
+ =?us-ascii?Q?AeQIKMjWyBq+ExN6rrU=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 net-next 07/15] tcp: Add wait_third_ack for ECN
- negotiation in simultaneous connect
-To: chia-yu.chang@nokia-bell-labs.com, edumazet@google.com,
- linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
- dsahern@kernel.org, kuniyu@amazon.com, bpf@vger.kernel.org,
- netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com,
- kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch,
- donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
- shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
- ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
- g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
- mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
- Jason_Livingood@comcast.com, vidhi_goel@apple.com
-References: <20250704085345.46530-1-chia-yu.chang@nokia-bell-labs.com>
- <20250704085345.46530-8-chia-yu.chang@nokia-bell-labs.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250704085345.46530-8-chia-yu.chang@nokia-bell-labs.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7110bb17-e243-4e9d-5a53-08ddc2d9890c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jul 2025 13:22:51.9179
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Ty5ngmoe5CAIu1JT1OdV3qMIHdz11qsWvm06xV9LIBuqqAR0dF9sCVxny7RFxEHArVYXws7J2Qe5zrRYhGvUxg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB9277
 
-On 7/4/25 10:53 AM, chia-yu.chang@nokia-bell-labs.com wrote:
-> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> 
-> In simultaneous connect scenario, the connection will be established
-> when SYN/ACK is received after patch 23e89e8ee7be7. However, the
-> third ACK is still anticipated to complete the negotiation for either
-> RFC3168 ECN and Accurate ECN. In this sense, an additional flag
-> wait_third_ack is introduced to identify that the 3rd ACK is still
-> anticipated to ensure ECN or AccECN negotiation will be done in the
-> ESTABLISHED state.
-> 
-> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> Co-developed-by: Ilpo Järvinen <ij@kernel.org>
-> Signed-off-by: Ilpo Järvinen <ij@kernel.org>
+> On Mon, Jul 14, 2025 at 01:43:49PM +0300, Wei Fang wrote:
+> > > On Mon, Jul 14, 2025 at 01:28:04PM +0300, Wei Fang wrote:
+> > > > I do not understand, the property is to indicate which pin the boar=
+d is
+> > > > used to out PPS signal, as I said earlier, these pins are multiplex=
+ed with
+> > > > other devices, so different board design may use different pins to =
+out
+> > > > this PPS signal.
+> > >
+> > > Did you look at the 'pins' API in ptp, as used by other drivers, to s=
+et
+> > > a function per pin?
+> >
+> > ptp_set_pinfunc()?
+>=20
+> You're in the right area, but ptp_set_pinfunc() is an internal function.
+> I was specifically referring to struct ptp_clock_info :: pin_config, the
+> verify() function, etc.
 
-I saw there are existing pktdrill test for ECN with simultaneous
-connect, but I'm still wondering it there is a real use case behind?
+I don't think these can meet customer's requirement, the PPS pin depends
+on the board design. If I understand correctly, these can only indicate
+whether the specified pin index is in range, or whether the pin is already
+occupied by another PTP function.
 
-AFAICS simult connect can happen only on loopback, and [Acc]ECN on
-loopback looks useless.
+However, these pins are multiplexed with other devices, such as FLEXIO,
+CAN, etc. If the board is designed to assign this pin to other devices, the=
+n
+this pin cannot output the PPS signal. For for this use case, we need to
+specify a PPS pin which can output PPS signal.
 
-I would simply not allow AccECN on simultaneous connect - assuming that
-would basically drop all the code in this patch without no fourther
-modification required.
+>=20
+> > > > The PPS interface (echo x > /sys/class/ptp/ptp0/pps_enable) provide=
+d
+> > > > by the current PTP framework only supports enabling or disabling th=
+e
+> > > > PPS signal. This is obviously limited for PTP devices with multiple
+> channels.
+> > >
+> > > For what we call "PPS" I think you should be looking at the periodic
+> > > output (perout) function. "PPS" is to emit events towards the local
+> > > system.
+> >
+> > The driver supports both PPS and PEROUT.
+>=20
+> Ok, I noticed patch 3 but missed patch 4. Anyway, the role of
+> PTP_CLK_REQ_PPS is to emit events which can be monitored on the
+> /dev/ppsN char device. It shouldn't have anything to do with external
+> pins.
 
-/P
+Is there a doc to stating that PTP_CLK_REQ_PPS is not used for external
+pins? As far as I know, some customers/users use PTP_CLK_REQ_PPS to
+output PPS signal to sync with other timer devices, for example, a similar
+property "fsl,pps-channel" was added to fec.yaml by others before.
+
+
 
 
