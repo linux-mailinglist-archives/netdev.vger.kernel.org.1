@@ -1,277 +1,116 @@
-Return-Path: <netdev+bounces-206872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7020B04A88
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 00:24:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C219BB04A91
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 00:27:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD1707B45FC
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 22:21:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF8183BF5FC
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 22:27:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F352127990A;
-	Mon, 14 Jul 2025 22:22:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CA32238C0C;
+	Mon, 14 Jul 2025 22:27:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b="Y6969227"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rBKoV7Rl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2AE1277035
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 22:22:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28F6619E971
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 22:27:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752531768; cv=none; b=h43fWenwpAj36Dgu2Wc6LlX3MsF6p6mQ1J35zueIrdgqlPZ6CI54QyaNG4fqyh9Rp1zs4k9zxsctqWh7th8YsHxW7aMcYimBCMPpyPCTogwcTAcX/EFSIIRcUVxZX2T/JUdRcG/e+7LKv9WGLsc+3R+7/L7IHCQd3VD8VN1WEO4=
+	t=1752532069; cv=none; b=WUCO648ZIqVTtOff2RWeFCR57fGs21nanA1ZQDsgEUYfzkqXPylAAfMg/yE21vInYUQ8nNM3/ZjGUy8yit9F7L97YORXzx02d6lmwQQ3EaZFulAHzvz9Koc8z453/qqI2an5KpCWiIXf5grLUnSmoAhesdSTOxPhED0SiSHcjLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752531768; c=relaxed/simple;
-	bh=p9XVMQzKlkJR2uziJtB5iiGfN9ykOGLQGNAFglp2q4I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=spvyUzGHpGGr2/vqe9dixT2vjVZNsKeKPCOxnDTjCDtenoQuPZwBLlpNvbLe+SyZTe5f5yGa4SK87E6tbKkoZ8f8yWuI05ANzjPCsYpu2izSHDOfsyEg0FhoIL+f26UFXiZlCU/46xWAnDSMBLS0MCmFsJMT0LNYupGWu/4oHvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com; spf=pass smtp.mailfrom=openai.com; dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b=Y6969227; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openai.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-558fc8f0750so5717767e87.2
-        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 15:22:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openai.com; s=google; t=1752531765; x=1753136565; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sDp4C+T9O5cBpXTpdiAMs9wdKZ8kVj0Lui5L/9Om+x8=;
-        b=Y6969227HACxZs4v8i6Wa5fCQbQ+DRx/Pgd0qAcwbDrZNmeMX/Vx3Mc6He8nudGXZ/
-         o8Uh4NJ51NUYzFyxH9InoiwczX0nz17LKHAXNEYBBUIw2CpedKZstQDXhi9pwToFlr9n
-         E08/YhGWOI44UsIfLxGtdp+svRfZS6aEDiGck=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752531765; x=1753136565;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sDp4C+T9O5cBpXTpdiAMs9wdKZ8kVj0Lui5L/9Om+x8=;
-        b=aTnDsj3bXz4Dc3P7ZCILHNOUpRfbwYePK0T5xgd04PpeNiY5ln41MsgoYhVmaoBOiO
-         StntfF/0MG++rsqJpaynpA1Ub4rE0cN4CBUqoIKJzf9uuEVTa17B4xUBQq2bSYWGlZz8
-         66JYQu4K6dOSgy82/8J03RXqYOc/pzjvGMNdk7Zt+ahAWiLzxy/+cS+vO02p59NqLaue
-         B7f1PQrQ0ybK6e5EDfoOBw0aGQvh96/wZ2SAcnj23+1HqP8oZRAoIFgrdY/3vlvTZ3C9
-         kttnTGVknjZlo3ZQSd/A3xmN5NVbwTtWMI+nqdcrS+AWyqRUqsJhUxHXI1TmVK3IZDgh
-         KFog==
-X-Forwarded-Encrypted: i=1; AJvYcCX+uNhiY/hHVHkcCE6R80sVXwKcKyjaSstuSq9k5AJjYXRbmjhAt9X9DNnQDs8MnIb/hrYrTYs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvIiB//8yFDpevIVmKMDLg2wSgO7F2QJYIf7X4pIwB0Z1w0pxR
-	hw8IqfoYDG6yWhIHzOj1XP7Yu1Ytw0jjYmdwKddIqYT0eL2XCq1VX8KdK4jS06hSCJY3g7jxLz5
-	zC5x8GsFzCyufE8RiyWC7m4LopPUZ1pUvDfjQJ0m/TA==
-X-Gm-Gg: ASbGncsD7oaQlpg7vjPzZAbxDwnTrEf8J1YcDtrSqCTAushwoz0eplM+xKke7HTLuVW
-	z8xXtPWV1Qk6wDwrVzdvEmGFj8QCUQdyXIip6WvmSAXOOtKfEbaqB4juNN2Q22xXRqyOOnDGeId
-	FQ0hfeeiJzpW8B0UO1t1AtZX4NuT/rcrECfOnpBCgdSXbQ++vKvD8hq5vW2pFRvd+Bi+C/azK1c
-	Ej+J+68
-X-Google-Smtp-Source: AGHT+IFbuQa3AtT5odWdip9sWEwhbeWS/Vq//92CV+s3n/EtzhCNy4hij5W4zVocbt+E2/NHsUbEqg4V+PmwDQaXors=
-X-Received: by 2002:a05:6512:401a:b0:553:2633:8a64 with SMTP id
- 2adb3069b0e04-55a044e4afcmr3649180e87.23.1752531764951; Mon, 14 Jul 2025
- 15:22:44 -0700 (PDT)
+	s=arc-20240116; t=1752532069; c=relaxed/simple;
+	bh=irL0qUUUykobdqxgFsXpKimMJJ8WU7eo3EYS+5Lq7/M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LIfRQhZK53XOJCKIa9EW8wNkzVLwBH6Ybsi86scUeEl6DHf+0q/7aGtJ7Hhmwtx/wVna2DD4lRNRk4+Vys6StWtjM0VBzT5QJS9TJQhcUWtqODJ4kJnJlwl9ONIV1B/fD7wnLYGNTewI0Os2+ZyyPnB6ClbtyQwzo/p7f3MZmUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rBKoV7Rl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1963FC4CEF0;
+	Mon, 14 Jul 2025 22:27:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752532068;
+	bh=irL0qUUUykobdqxgFsXpKimMJJ8WU7eo3EYS+5Lq7/M=;
+	h=From:To:Cc:Subject:Date:From;
+	b=rBKoV7RlezKwLgX0CLC1eniNgBVDkQyIloXAIXxBc+LAz/iaANHxwZlAQd+uiwvI5
+	 hJ9b7V9Ml8QcU0tqKOOyFm1g7wwuRqtg7obIrsA11UpPCf+DnQdEezIgnKIUdqcJ4Y
+	 232uO+bA9CF3Nsm5TE3gS7iAdmAPtGEfAiSZtQvv7a2Jqcz8gyk/cPGbXAblBOlWWT
+	 Emx24iVW1gebtMV8aF1eXRZwCW2IxX9PhUxGVtehLd+rNrkaCKYL+/FdfIRaOqpepA
+	 KpfAZpIxd7HsTahrjhq5w3RkOgjyIgieD8QpvECSmI3f4E4/IFUQGoF047NVC7Xi4m
+	 i894iCgHepyFg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	donald.hunter@gmail.com,
+	shuah@kernel.org,
+	kory.maincent@bootlin.com,
+	maxime.chevallier@bootlin.com,
+	sdf@fomichev.me,
+	ecree.xilinx@gmail.com,
+	gal@nvidia.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next v2 00/11] ethtool: rss: support RSS_SET via Netlink
+Date: Mon, 14 Jul 2025 15:27:18 -0700
+Message-ID: <20250714222729.743282-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250713-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v1-0-ecaed8c2844e@openai.com>
- <20250713-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v1-2-ecaed8c2844e@openai.com>
- <98c8c7d7-4b1a-474f-86b6-884d79ea4e41@intel.com>
-In-Reply-To: <98c8c7d7-4b1a-474f-86b6-884d79ea4e41@intel.com>
-From: Christoph Paasch <cpaasch@openai.com>
-Date: Mon, 14 Jul 2025 15:22:34 -0700
-X-Gm-Features: Ac12FXx5dt2zKcEl92_SaduMLpqLmJBaJOa3H-th5Q3eGGfmbFTR5ux_MCkP9Ss
-Message-ID: <CADg4-L-YRbFeDsmeREZKJpe2aZ4g+LXbxNTPe_nCJ=7v3jgTgg@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/2] net/mlx5: Avoid copying payload to the skb's
- linear part
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
-	Mark Bloch <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-rdma@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jul 14, 2025 at 7:23=E2=80=AFAM Alexander Lobakin
-<aleksander.lobakin@intel.com> wrote:
->
-> From: Christoph Paasch Via B4 Relay <devnull+cpaasch.openai.com@kernel.or=
-g>
-> Date: Sun, 13 Jul 2025 16:33:07 -0700
->
-> > From: Christoph Paasch <cpaasch@openai.com>
-> >
-> > mlx5e_skb_from_cqe_mpwrq_nonlinear() copies MLX5E_RX_MAX_HEAD (256)
-> > bytes from the page-pool to the skb's linear part. Those 256 bytes
-> > include part of the payload.
-> >
-> > When attempting to do GRO in skb_gro_receive, if headlen > data_offset
-> > (and skb->head_frag is not set), we end up aggregating packets in the
->
-> How did you end up with ->head_frag not set? IIRC mlx5 uses
-> napi_build_skb(), which explicitly sets ->head_frag to true.
-> It should be false only for kmalloced linear parts.
+Support configuring RSS settings via Netlink.
+Creating and removing contexts remains for the following series.
 
-This particular code-path calls napi_alloc_skb() which ends up calling
-__alloc_skb() and won't set head_frag to 1.
+v2:
+ - commit message changes
+ - make sure driver implements the set_rxfh op
+ - add comment about early return when lacking get
+ - set IFF_RXFH_CONFIGURED even if user sets the table to identical
+   to default
+ - use ethnl_update_binary()
+ - make sure we free indir if key parsing fails
+ - tests: fix existing rxfh_input_xfrm test for string decode
+ - tests: make defer() cleanup more intelligent WRT ordering
+v1: https://lore.kernel.org/20250711015303.3688717-1-kuba@kernel.org
 
-> > frag_list.
-> >
-> > This is of course not good when we are CPU-limited. Also causes a worse
-> > skb->len/truesize ratio,...
-> >
-> > So, let's avoid copying parts of the payload to the linear part. The
-> > goal here is to err on the side of caution and prefer to copy too littl=
-e
-> > instead of copying too much (because once it has been copied over, we
-> > trigger the above described behavior in skb_gro_receive).
-> >
-> > So, we can do a rough estimate of the header-space by looking at
-> > cqe_l3/l4_hdr_type and kind of do a lower-bound estimate. This is now
-> > done in mlx5e_cqe_get_min_hdr_len(). We always assume that TCP timestam=
-ps
-> > are present, as that's the most common use-case.
-> >
-> > That header-len is then used in mlx5e_skb_from_cqe_mpwrq_nonlinear for
-> > the headlen (which defines what is being copied over). We still
-> > allocate MLX5E_RX_MAX_HEAD for the skb so that if the networking stack
-> > needs to call pskb_may_pull() later on, we don't need to reallocate
-> > memory.
-> >
-> > This gives a nice throughput increase (ARM Neoverse-V2 with CX-7 NIC an=
-d
-> > LRO enabled):
-> >
-> > BEFORE:
-> > =3D=3D=3D=3D=3D=3D=3D
-> > (netserver pinned to core receiving interrupts)
-> > $ netperf -H 10.221.81.118 -T 80,9 -P 0 -l 60 -- -m 256K -M 256K
-> >  87380  16384 262144    60.01    32547.82
-> >
-> > (netserver pinned to adjacent core receiving interrupts)
-> > $ netperf -H 10.221.81.118 -T 80,10 -P 0 -l 60 -- -m 256K -M 256K
-> >  87380  16384 262144    60.00    52531.67
-> >
-> > AFTER:
-> > =3D=3D=3D=3D=3D=3D
-> > (netserver pinned to core receiving interrupts)
-> > $ netperf -H 10.221.81.118 -T 80,9 -P 0 -l 60 -- -m 256K -M 256K
-> >  87380  16384 262144    60.00    52896.06
-> >
-> > (netserver pinned to adjacent core receiving interrupts)
-> >  $ netperf -H 10.221.81.118 -T 80,10 -P 0 -l 60 -- -m 256K -M 256K
-> >  87380  16384 262144    60.00    85094.90
-> >
-> > Signed-off-by: Christoph Paasch <cpaasch@openai.com>
-> > ---
-> >  drivers/net/ethernet/mellanox/mlx5/core/en_rx.c | 33 +++++++++++++++++=
-+++++++-
-> >  1 file changed, 32 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/=
-net/ethernet/mellanox/mlx5/core/en_rx.c
-> > index 2bb32082bfccdc85d26987f792eb8c1047e44dd0..2de669707623882058e3e77=
-f82d74893e5d6fefe 100644
-> > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> > @@ -1986,13 +1986,40 @@ mlx5e_shampo_fill_skb_data(struct sk_buff *skb,=
- struct mlx5e_rq *rq,
-> >       } while (data_bcnt);
-> >  }
-> >
-> > +static u16
-> > +mlx5e_cqe_get_min_hdr_len(const struct mlx5_cqe64 *cqe)
-> > +{
-> > +     u16 min_hdr_len =3D sizeof(struct ethhdr);
-> > +     u8 l3_type =3D get_cqe_l3_hdr_type(cqe);
-> > +     u8 l4_type =3D get_cqe_l4_hdr_type(cqe);
-> > +
-> > +     if (cqe_has_vlan(cqe))
-> > +             min_hdr_len +=3D VLAN_HLEN;
->
-> Can't Q-in-Q be here?
+Jakub Kicinski (11):
+  ethtool: rss: initial RSS_SET (indirection table handling)
+  selftests: drv-net: rss_api: factor out checking min queue count
+  tools: ynl: support packing binary arrays of scalars
+  selftests: drv-net: rss_api: test setting indirection table via
+    Netlink
+  ethtool: rss: support setting hfunc via Netlink
+  ethtool: rss: support setting hkey via Netlink
+  selftests: drv-net: rss_api: test setting hashing key via Netlink
+  netlink: specs: define input-xfrm enum in the spec
+  ethtool: rss: support setting input-xfrm via Netlink
+  ethtool: rss: support setting flow hashing fields
+  selftests: drv-net: rss_api: test input-xfrm and hash fields
 
-Yes, see my reply below.
+ Documentation/netlink/specs/ethtool.yaml      |  39 ++
+ Documentation/networking/ethtool-netlink.rst  |  29 +-
+ .../uapi/linux/ethtool_netlink_generated.h    |   1 +
+ net/ethtool/common.h                          |   1 +
+ net/ethtool/netlink.h                         |   1 +
+ net/ethtool/common.c                          |  15 +
+ net/ethtool/ioctl.c                           |   4 +-
+ net/ethtool/netlink.c                         |   8 +
+ net/ethtool/rss.c                             | 389 ++++++++++++++++++
+ tools/net/ynl/pyynl/lib/ynl.py                |   7 +-
+ .../selftests/drivers/net/hw/rss_api.py       | 289 ++++++++++++-
+ .../drivers/net/hw/rss_input_xfrm.py          |   2 +-
+ 12 files changed, 767 insertions(+), 18 deletions(-)
 
->
-> > +
-> > +     if (l3_type =3D=3D CQE_L3_HDR_TYPE_IPV4)
-> > +             min_hdr_len +=3D sizeof(struct iphdr);
-> > +     else if (l3_type =3D=3D CQE_L3_HDR_TYPE_IPV6)
-> > +             min_hdr_len +=3D sizeof(struct ipv6hdr);
->
-> You don't account extensions and stuff here.
+-- 
+2.50.1
 
-Yes - see my reply below.
-
->
-> > +
-> > +     if (l4_type =3D=3D CQE_L4_HDR_TYPE_UDP)
-> > +             min_hdr_len +=3D sizeof(struct udphdr);
-> > +     else if (l4_type & (CQE_L4_HDR_TYPE_TCP_NO_ACK |
-> > +                         CQE_L4_HDR_TYPE_TCP_ACK_NO_DATA |
-> > +                         CQE_L4_HDR_TYPE_TCP_ACK_AND_DATA))
-> > +             /* Previous condition works because we know that
-> > +              * l4_type !=3D 0x2 (CQE_L4_HDR_TYPE_UDP)
-> > +              */
-> > +             min_hdr_len +=3D sizeof(struct tcphdr) + TCPOLEN_TSTAMP_A=
-LIGNED;
-> > +
-> > +     return min_hdr_len;
-> > +}
-> > +
-> >  static struct sk_buff *
-> >  mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_rq *rq, struct mlx5e_m=
-pw_info *wi,
-> >                                  struct mlx5_cqe64 *cqe, u16 cqe_bcnt, =
-u32 head_offset,
-> >                                  u32 page_idx)
-> >  {
-> >       struct mlx5e_frag_page *frag_page =3D &wi->alloc_units.frag_pages=
-[page_idx];
-> > -     u16 headlen =3D min_t(u16, MLX5E_RX_MAX_HEAD, cqe_bcnt);
-> >       struct mlx5e_frag_page *head_page =3D frag_page;
-> >       struct mlx5e_xdp_buff *mxbuf =3D &rq->mxbuf;
-> >       u32 frag_offset    =3D head_offset;
-> > @@ -2004,10 +2031,14 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e=
-_rq *rq, struct mlx5e_mpw_info *w
-> >       u32 linear_frame_sz;
-> >       u16 linear_data_len;
-> >       u16 linear_hr;
-> > +     u16 headlen;
-> >       void *va;
-> >
-> >       prog =3D rcu_dereference(rq->xdp_prog);
-> >
-> > +     headlen =3D min3(mlx5e_cqe_get_min_hdr_len(cqe), cqe_bcnt,
-> > +                    (u16)MLX5E_RX_MAX_HEAD);
->
-> For your usecase, have you tried setting headlen to just ETH_HLEN here?
-> Fast GRO should still work for this case, then VLAN/IP/L4 layers will
-> do a couple memcpy()s to pull their headers, but even on 32-bit MIPS
-> this was faster than let's say eth_get_headlen() (which involves Flow
-> Dissector) or open-coded header length assumptions as above.
->
-> (the above was correct for 2020 when I last time played with router
->  drivers, but I hope nothing's been broken since then)
-
-Yes, as you correctly point out, it is all about avoiding to copy any
-payload to have fast GRO.
-
-I can give it a shot of just copying eth_hlen. And see what perf I
-get. You are probably right that it won't matter much. I just thought
-that as I have the bits in the cqe that give me some hints on what
-headers are present, I can just be slightly more efficient.
-
-Thanks,
-Christoph
-
->
-> > +
-> >       if (prog) {
-> >               /* area for bpf_xdp_[store|load]_bytes */
-> >               net_prefetchw(netmem_address(frag_page->netmem) + frag_of=
-fset);
->
-> Thanks,
-> Olek
 
