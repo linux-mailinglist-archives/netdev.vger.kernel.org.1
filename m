@@ -1,160 +1,212 @@
-Return-Path: <netdev+bounces-206842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64F85B04821
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 21:58:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B093B04826
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 21:58:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9D184A2950
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 19:58:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C1941A65778
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 19:58:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD8E3244694;
-	Mon, 14 Jul 2025 19:57:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA870256C9B;
+	Mon, 14 Jul 2025 19:58:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CFLDJoxF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TvsJ6Q/T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0E4A2367DF;
-	Mon, 14 Jul 2025 19:57:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0272024C060
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 19:58:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752523077; cv=none; b=P8UDVPTUP/CMZAiGdTf8Il5EULFPi+swzAcBq7p7y3ziXVDQs7HMudZpQfTAoZ9dD56qefrHUcQoy8Q7U9Spf3Ueni/mE+wrykLzjQi/JZuF5IY0ywqSCLot+08H3WevPEOKph6SleDp5RoFBnEqVlHeDVZksuqE3YqpLrL4KI0=
+	t=1752523110; cv=none; b=XY4LVRwDuqO/f72+7bAzStJW/liXTno4X4jWdf2zCDWGgj5tk9UWxjuoKj3iTOSlhOf0ZyHEq4BfUkSR6Omlzud1vaVJeUTUNPpmPU/VebnQV03gq6cKPhvEWI1lwi2pRosLM649uOpn4DK0hHGxECksaZOrZ144069GOEivPXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752523077; c=relaxed/simple;
-	bh=Uk5w1V6I4YwPMjZtuY2O0PIn9pPbYViPRep+5RgeIQM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=qKlDPGcYHNSBwhVtCkyj44MsKhJ1x+Jk1h6BzixchADNs4drlP5Rg4+5qDacGk9ECyxrBlbLoi0v/RfQv5dhm9zX2ThvFfsVKl2PZ5PnTqzhpKPhciOEpsIvruerkrgprk79By7UEmg/pKAabGhiKkpcyDysrWFL242SQoY94MM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CFLDJoxF; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-60c51860bf5so7823837a12.1;
-        Mon, 14 Jul 2025 12:57:55 -0700 (PDT)
+	s=arc-20240116; t=1752523110; c=relaxed/simple;
+	bh=+pqyeAoD5157xnmPHhmqS7gq9lKU2DrmIZAQW9Mfn58=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=D9yPcFvXRytXoWCwe30jqazwJrU2FjSObYCaEq+V2BqM8/qFhA7GrzWLL6/3a73o8rVa7Z+wSa+1qeqGTNEe2C0ZUH5cysfi/KSvQMDSxXMJeffkNaMjf0MjLe55Qaw0iUhT+/zdI8Nn7srDWq6O53/naepYEWNpc7QqC72ajj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TvsJ6Q/T; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-23dd9ae5aacso7525ad.1
+        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 12:58:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752523074; x=1753127874; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=00htzvS//PxmAK1/kqageAXUez+cznfXa5IYx31PylU=;
-        b=CFLDJoxFZ1O3yXEkX5LkPmsjGV3hEUaZlWOVKTsc0+63mmWgtLIP9F/gaibuLfAv4X
-         D9Kq0eB2JNtiHtABmyVoA7kJjG1fz2haUMRD1ul5LUXtnNGiOdt0BPnXj6JsQoiIctWA
-         GMopbjW8Mel4acFPRm2lRaDQ+IeOuyceD3bSw5XNHRXzSMMurm9qfIZroMHL9BOVRTC0
-         z+2R2gKnkD1ajsZZEZVS8/HGEGCuw5FvMsCpfcL+blhD+QlN+FiKAXRmpuA5LRJn36N8
-         9MNr5V6zwDcj97yI5C8DYBvPmmWfuqnF1kwdkPDlE1+RQnnOInAieMh05kGYZ6+Ow8/x
-         fKiQ==
+        d=google.com; s=20230601; t=1752523108; x=1753127908; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tDa5D0A4lwaiBKd2JNzdgebIMAD7+wg9x+lwbfz747o=;
+        b=TvsJ6Q/TBr/xSzZ19yFXmoqEptr5c1imFBCqpPwSpUWlqJT6i+aKgrEXw62mYctkUR
+         qrzflpNLMiqQjMEYHHJGRcTuN93QiAQkExL4kVrTrpVQB8gCy8BuFy7qNHPQDkRhBk/c
+         j5e7PVO3d0zyrAouvz/L6ZNspf3+c0412LTkkvIHIBBTJQM3Ow4P3Bq9zxBpmjPNcWAx
+         eRIrK9ADLtPiMGSB3wcGUpUXr8F5Xmr17MnYTkvmGiMNUVvBRfSf33RelrJD1vAMWdtr
+         CqIlTOORaHKrt5c0RwLgkYeQ9rSjqm+lOFusQLH4zoRrcUO8R3SGQuCT6yXNIopoBk2E
+         E81Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752523074; x=1753127874;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :sender:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=00htzvS//PxmAK1/kqageAXUez+cznfXa5IYx31PylU=;
-        b=wYk2yEId7wEkHCSr5dYxNADbjytwbuKD1r85noPcM5az2o3VD3OOPEFnegAB1yKN9h
-         xxp6e4MWDNeP8gnT8yraLeqB85XtEUU1CfAVnr7VvFfMklyztt+THcAgXyThzVAarAee
-         cKcOXVOCHpcEgkUNjK/qmX2Iufow/Xuhz5Xdm1STAy1NQ52U89ew3+WVjeQgZn6/Y76S
-         tqYQ+eahgtKkMhwcrTNyJOrruUv0IakCM0uxFEfUMa5hLrkmYZpRlwu7t/8asPzjTxvq
-         aqU2Ax6d9ier5X67vLJ5lXMnp6MH/nyIz+n4LJOs0NfsP6mOF3ZIhMlXZmzl5e9hMKe1
-         KMPw==
-X-Forwarded-Encrypted: i=1; AJvYcCV3tLdMrivKn3UkLfMcY36VOElu6zNogCrob8AufOq9aZKJBKkI8GEkTL9KBLKQZqRTgB8bnLYC@vger.kernel.org, AJvYcCVivt43YitkZ4EJvSqAipvVMDI/xHw+8EQpirB5To50i+l6aGIpf0TWJvGc/MWgHhvgfabXSJA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7Iprms3zaa4j1C1y3jiCls9BP6CP86veTpnDbtOjCYlByQpLM
-	CKPP+lLJahBvf08d8fAJsOwjK2NbYQlakZ+1hoBqavFqLBCT7KPKYHQn
-X-Gm-Gg: ASbGncvqNfpnSL2LifJJYwkPUQB+AkGSHhATW+nfeuQgD5KoGzoHox3mGMwbv4i84D/
-	64sZGusWThjnCbHOJCN8ayAdio3b+a8pf8afxAUF2jz1QuF4iyVUN19wFck6QOBFDv+PHhcMucf
-	b64jKF+WRwLoUJeTkYQZiImcgDZvJZS7cpLsY8n5WZG+9cYX8KWkKCexSnNv/CEgT4RYa4qKBqi
-	Zh2x4Oxiyud7bE8EWMbogJrhEfMDKfoP7l+9akZVhh9snwyCtj9Ls+5nbGkESB64pn0VzM6d4EG
-	DR74sIAuXvFoXxGkI1gux77uT+GYq6dVIn3ZguMAuGildYMY0Yuv8/mRipHx2HvHpkdaPmh8Q6C
-	Zs2qS69lK3bHzxG68HySJo31PWjecf+i9cFmUasE2IAOmZN/nozL0xoP6+tXkgDlxPh2JBJl4lL
-	iU
-X-Google-Smtp-Source: AGHT+IG8cI1AwM6WE16Z8zxT3NpTjDoZqeS9GrJMxlRZ5DUBoix7AwUjHNbjadZtnPsAHQK/pQUcEg==
-X-Received: by 2002:a17:906:c14b:b0:ae3:7b53:31b9 with SMTP id a640c23a62f3a-ae70125f453mr1245606366b.35.1752523073891;
-        Mon, 14 Jul 2025 12:57:53 -0700 (PDT)
-Received: from eldamar.lan (host-87-16-197-101.retail.telecomitalia.it. [87.16.197.101])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae6e82952d2sm879782966b.140.2025.07.14.12.57.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Jul 2025 12:57:53 -0700 (PDT)
-Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
-Received: by eldamar.lan (Postfix, from userid 1000)
-	id 1052BBE2DE0; Mon, 14 Jul 2025 21:57:52 +0200 (CEST)
-Date: Mon, 14 Jul 2025 21:57:52 +0200
-From: Salvatore Bonaccorso <carnil@debian.org>
-To: Guillaume Nault <gnault@redhat.com>,
-	Stefano Brivio <sbrivio@redhat.com>,
-	Aaron Conole <aconole@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	Charles Bordet <rough.rock3059@datachamp.fr>
-Cc: linux-kernel@vger.kernel.org, regressions@lists.linux.dev,
-	stable@vger.kernel.org, 1108860@bugs.debian.org
-Subject: [regression] Wireguard fragmentation fails with VXLAN since
- 8930424777e4 ("tunnels: Accept PACKET_HOST skb_tunnel_check_pmtu().")
- causing network timeouts
-Message-ID: <aHVhQLPJIhq-SYPM@eldamar.lan>
+        d=1e100.net; s=20230601; t=1752523108; x=1753127908;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tDa5D0A4lwaiBKd2JNzdgebIMAD7+wg9x+lwbfz747o=;
+        b=QOFW+50YBRiX7JvmYxhot5qxNW9ySTeZ9uvvgYlpRct1mTAgaZR7L84cdGzwy1/n45
+         kcMz0J3cxoZRUqxLKEghVSrgrJw0YuuuThAJvHHj5ZxjLifQNXK+QaBcQxjdtxusLKs4
+         hR2Ek30wngzIWLW9YG02Cba/yaAYSsQzZGFP/L77tcdeOxhTpINPUgPMy6L67+U9Kr4o
+         5itMWD1/00X5Ybin/O8bCyKl3Zxci9D3aDBXQIWTTLfoD2t3nrmLL2Ccy1qta3oEGKD5
+         0bdqBEMaYBPgYaJwkLdL0u76pheKd6IOdK27+cM9e/2eLRNFlMIBj6pMgkFkFzZjtATg
+         7xFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWMXJ6HTl0EPy/AfN/fdSFLou0asg/HQpfTHuTDOj2V5lwY2In+Z793W6TmaGP9V5tAH3hG2/g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvBxWZgoqyVHS7DvucvucQzHntCf1oyhgPe+xJGxM+rS6spy5V
+	Ghw9LF8gmaY4yJJG0QqJsRxNyMv0WOurksuu2dBpRqSdELgUm8y0GEd/IN0wZDvUN902mVmxe5T
+	+lzHzdoYgfK5QuSrIc7coVbXZE1UvczlnlanNgQsK
+X-Gm-Gg: ASbGncuOJPsoVpdhfc586rPiYfLtcUduOK/Y3aUa7Lr1VbDIbL1aE+ejlR9g6eTxlnP
+	q9r1xV8giOzWujaSfoDXM7yCSWgzXpGf2z8jbp9vaFxvID7wWKxiSlDLS8dXaLOZbDvpru4jH+L
+	9afEgJqcLpi145Xo/pAXCfYkp/HMvmdIFnzETpAQq50UHmBvh+5Ftk9pZPzjS2IM6fhMhTkUODE
+	7M2WjuBR9ptmUBae/IjlzZ1mtKd//kS1o27DrxyAlF0KX78
+X-Google-Smtp-Source: AGHT+IFWnfMDtJC2CezIF3KnAbgH/pbj3O5jwVGjDMwdXbeGoiYAzNm9r+9HSREvdPvfvdh1fRM05JSSpaSXXTed5k8=
+X-Received: by 2002:a17:902:c40d:b0:235:e1fa:1fbc with SMTP id
+ d9443c01a7336-23e1aa6bd1bmr603895ad.0.1752523107669; Mon, 14 Jul 2025
+ 12:58:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20250714120047.35901-1-byungchul@sk.com> <20250714120047.35901-3-byungchul@sk.com>
+ <CAHS8izO393X_BDJxnX2d-auhTwrUZK5wYdoAh_tJc0GBf0AqcQ@mail.gmail.com>
+In-Reply-To: <CAHS8izO393X_BDJxnX2d-auhTwrUZK5wYdoAh_tJc0GBf0AqcQ@mail.gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 14 Jul 2025 12:58:15 -0700
+X-Gm-Features: Ac12FXz5nYW9H_RK0Nw_oICAspVAx9135uss8L0AQRp8qp4a_9a4RkfhL6o4a4I
+Message-ID: <CAHS8izNh7aCJOb1WKTx7CXNDPv_UBqFyq2XEHHhqHH=5JPmJCQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v10 02/12] netmem: use netmem_desc instead of
+ page to access ->pp in __netmem_get_pp()
+To: Byungchul Park <byungchul@sk.com>
+Cc: willy@infradead.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, kernel_team@skhynix.com, ilias.apalodimas@linaro.org, 
+	harry.yoo@oracle.com, akpm@linux-foundation.org, andrew+netdev@lunn.ch, 
+	asml.silence@gmail.com, toke@redhat.com, david@redhat.com, 
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org, surenb@google.com, 
+	mhocko@suse.com, linux-rdma@vger.kernel.org, bpf@vger.kernel.org, 
+	vishal.moola@gmail.com, hannes@cmpxchg.org, ziy@nvidia.com, 
+	jackmanb@google.com, wei.fang@nxp.com, shenwei.wang@nxp.com, 
+	xiaoning.wang@nxp.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, anthony.l.nguyen@intel.com, 
+	przemyslaw.kitszel@intel.com, sgoutham@marvell.com, gakula@marvell.com, 
+	sbhatta@marvell.com, hkelam@marvell.com, bbhushan2@marvell.com, 
+	tariqt@nvidia.com, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com, leon@kernel.org, 
+	mbloch@nvidia.com, danishanwar@ti.com, rogerq@kernel.org, nbd@nbd.name, 
+	lorenzo@kernel.org, ryder.lee@mediatek.com, shayne.chen@mediatek.com, 
+	sean.wang@mediatek.com, matthias.bgg@gmail.com, 
+	angelogioacchino.delregno@collabora.com, aleksander.lobakin@intel.com, 
+	horms@kernel.org, m-malladi@ti.com, krzysztof.kozlowski@linaro.org, 
+	matthias.schiffer@ew.tq-group.com, robh@kernel.org, imx@lists.linux.dev, 
+	intel-wired-lan@lists.osuosl.org, linux-arm-kernel@lists.infradead.org, 
+	linux-wireless@vger.kernel.org, linux-mediatek@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Mon, Jul 14, 2025 at 12:37=E2=80=AFPM Mina Almasry <almasrymina@google.c=
+om> wrote:
+>
+> On Mon, Jul 14, 2025 at 5:01=E2=80=AFAM Byungchul Park <byungchul@sk.com>=
+ wrote:
+> >
+> > To eliminate the use of the page pool fields in struct page, the page
+> > pool code should use netmem descriptor and APIs instead.
+> >
+> > However, __netmem_get_pp() still accesses ->pp via struct page.  So
+> > change it to use struct netmem_desc instead, since ->pp no longer will
+> > be available in struct page.
+> >
+> > While at it, add a helper, pp_page_to_nmdesc(), that can be used to
+> > extract netmem_desc from page only if it's pp page.  For now that
+> > netmem_desc overlays on page, it can be achieved by just casting.
+> >
+> > Signed-off-by: Byungchul Park <byungchul@sk.com>
+> > ---
+> >  include/net/netmem.h | 13 ++++++++++++-
+> >  1 file changed, 12 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/include/net/netmem.h b/include/net/netmem.h
+> > index 535cf17b9134..2b8a7b51ac99 100644
+> > --- a/include/net/netmem.h
+> > +++ b/include/net/netmem.h
+> > @@ -267,6 +267,17 @@ static inline struct net_iov *__netmem_clear_lsb(n=
+etmem_ref netmem)
+> >         return (struct net_iov *)((__force unsigned long)netmem & ~NET_=
+IOV);
+> >  }
+> >
+> > +static inline struct netmem_desc *pp_page_to_nmdesc(struct page *page)
+> > +{
+> > +       DEBUG_NET_WARN_ON_ONCE(!page_pool_page_is_pp(page));
+> > +
+> > +       /* XXX: How to extract netmem_desc from page must be changed,
+> > +        * once netmem_desc no longer overlays on page and will be
+> > +        * allocated through slab.
+> > +        */
+> > +       return (struct netmem_desc *)page;
+> > +}
+> > +
+>
+> Same thing. Do not create a generic looking pp_page_to_nmdesc helper
+> which does not check that the page is the correct type. The
+> DEBUG_NET... is not good enough.
+>
+> You don't need to add a generic helper here. There is only one call
+> site. Open code this in the callsite. The one callsite is marked as
+> unsafe, only called by code that knows that the netmem is specifically
+> a pp page. Open code this in the unsafe callsite, instead of creating
+> a generic looking unsafe helper and not even documenting it's unsafe.
+>
 
-Charles Bordet reported the following issue (full context in
-https://bugs.debian.org/1108860)
+On second read through the series, I actually now think this is a
+great idea :-) Adding this helper has simplified the series greatly. I
+did not realize you were converting entire drivers to netmem just to
+get rid of page->pp accesses. Adding a pp_page_to_nmdesc helper makes
+the entire series simpler.
 
-> Dear Maintainer,
-> 
-> What led up to the situation?
-> We run a production environment using Debian 12 VMs, with a network
-> topology involving VXLAN tunnels encapsulated inside Wireguard
-> interfaces. This setup has worked reliably for over a year, with MTU set
-> to 1500 on all interfaces except the Wireguard interface (set to 1420).
-> Wireguard kernel fragmentation allowed this configuration to function
-> without issues, even though the effective path MTU is lower than 1500.
-> 
-> What exactly did you do (or not do) that was effective (or ineffective)?
-> We performed a routine system upgrade, updating all packages include the
-> kernel. After the upgrade, we observed severe network issues (timeouts,
-> very slow HTTP/HTTPS, and apt update failures) on all VMs behind the
-> router. SSH and small-packet traffic continued to work.
-> 
-> To diagnose, we:
-> 
-> * Restored a backup (with the previous kernel): the problem disappeared.
-> * Repeated the upgrade, confirming the issue reappeared.
-> * Systematically tested each kernel version from 6.1.124-1 up to
-> 6.1.140-1. The problem first appears with kernel 6.1.135-1; all earlier
-> versions work as expected.
-> * Kernel version from the backports (6.12.32-1) did not resolve the
-> problem.
-> 
-> What was the outcome of this action?
-> 
-> * With kernel 6.1.135-1 or later, network timeouts occur for
-> large-packet protocols (HTTP, apt, etc.), while SSH and small-packet
-> protocols work.
-> * With kernel 6.1.133-1 or earlier, everything works as expected.
-> 
-> What outcome did you expect instead?
-> We expected the network to function as before, with Wireguard handling
-> fragmentation transparently and no application-level timeouts,
-> regardless of the kernel version.
+You're also calling it only from code paths like drivers that already
+assumed that the page is a pp page and did page->pp deference without
+a check, so this should be safe.
 
-While triaging the issue we found that the commit 8930424777e4
-("tunnels: Accept PACKET_HOST in skb_tunnel_check_pmtu()." introduces
-the issue and Charles confirmed that the issue was present as well in
-6.12.35 and 6.15.4 (other version up could potentially still be
-affected, but we wanted to check it is not a 6.1.y specific
-regression).
+Only thing I would change is add a comment explaining that the calling
+code needs to check the page is pp page or know it's a pp page (like a
+driver that supports pp).
 
-Reverthing the commit fixes Charles' issue.
 
-Does that ring a bell?
+> >  /**
+> >   * __netmem_get_pp - unsafely get pointer to the &page_pool backing @n=
+etmem
+> >   * @netmem: netmem reference to get the pointer from
+> > @@ -280,7 +291,7 @@ static inline struct net_iov *__netmem_clear_lsb(ne=
+tmem_ref netmem)
+> >   */
+> >  static inline struct page_pool *__netmem_get_pp(netmem_ref netmem)
+> >  {
+> > -       return __netmem_to_page(netmem)->pp;
+> > +       return pp_page_to_nmdesc(__netmem_to_page(netmem))->pp;
+> >  }
+>
+> This makes me very sad. Casting from netmem -> page -> nmdesc...
+>
+> Instead, we should be able to go from netmem directly to nmdesc. I
+> would suggest rename __netmem_clear_lsb to netmem_to_nmdesc and have
+> it return netmem_desc instead of net_iov. Then use it here.
+>
+> We could have an unsafe version of netmem_to_nmdesc which converts the
+> netmem to netmem_desc without clearing the lsb and mark it unsafe.
+>
 
-Regards,
-Salvatore
+This, I think, we should address to keep some sanity in the code and
+reduce the casts and make it a bit more maintainable.
+
+--=20
+Thanks,
+Mina
 
