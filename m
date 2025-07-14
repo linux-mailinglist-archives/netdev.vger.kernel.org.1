@@ -1,48 +1,82 @@
-Return-Path: <netdev+bounces-206575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B86B0B0382B
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 09:41:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A574B0382F
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 09:42:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F66F17A63D
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 07:41:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3B2917A68F
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 07:42:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FD7F2367AA;
-	Mon, 14 Jul 2025 07:41:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2D82233712;
+	Mon, 14 Jul 2025 07:42:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mU2U9pud"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="B8Ty965x"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F5FA23644D;
-	Mon, 14 Jul 2025 07:41:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7395944F;
+	Mon, 14 Jul 2025 07:42:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752478890; cv=none; b=TbV8+bAt3kXJxkf8UzdjyL7SKJYalbCq9Lg5WR/nXnCwM8YVlVAM+NgotaAslc8HZWyIZzrzbMYphFWYpplJv36VSO9nH+rHFHtVtgJSvtJFRQeKYFlLGNEQWM/vBFVgskFrEvabJg6Z0zcCYXRMURlUKUhAO56JVahQsoz7O/Q=
+	t=1752478962; cv=none; b=lkiN/jOukb8Qm4HBg2Zsj/wd+ErYWvLkAVf7Fdcn0tYItB3CaSPt3/pvbJCgCkZI390mKm1XW4Udf5yfb5jFDuB0b0Y8jdzhzzjacNgxQ/ru0ksz/4G/PSVNrNLj2h9TTaKWBistZ9Fqb9U+hwsXRNSITufJWWPrdE2QNuDklk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752478890; c=relaxed/simple;
-	bh=c5oXUnZQjWluCTOADuJWO/SA6yL+BgCzjJwJnzdWKSs=;
+	s=arc-20240116; t=1752478962; c=relaxed/simple;
+	bh=ZF1jeh3v4Kpuj61NdE9nZko0By4zUsBpKwHOGKM7WmM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lwmU5eRKPy21S2k2wTDY+E+J5qPawuJymbslrShrtZNgnQ+sZQW8PXxGI2TUaH9GVrfrDc9t4+HblrZcnMgtoko3TBXn5rdC4GVhiauivymTdZsZi6z/LMQwLbHNPxgBFOFHORjTnwOuR3d8jI1mlcQ3fTSiZQpm4zvta7WWrlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mU2U9pud; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AA89C4CEED;
-	Mon, 14 Jul 2025 07:41:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752478889;
-	bh=c5oXUnZQjWluCTOADuJWO/SA6yL+BgCzjJwJnzdWKSs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=mU2U9pudA34L6ZiTZwOpRWNtYJ3H1Y338t0tS3T2N+/32adGBbSvved1vdIhlaAm2
-	 hdXHQn2O5WQ7vQonLFtzgq0eC6zO3RkW3X306xPNlRrNzBoJO42EqCzPLIY9K9ziiX
-	 yPp91In6NmyCz7sXvzLyhngebYvySBmBCM6zb9YvxQLMg19lkGHMS2tlBRYJoii+yP
-	 Xslz+zQYBbUqU5WfdaiBxmxQp4A8fCzBQByjxLQorqKTmiKvpCtciwiGb+vC/h5rhb
-	 ltq9zxtpG+etPqq8eckfTsjxSnAEAFCZnBxL1jDlmJIXGfiimOrVMYn79ZjBrFsOpL
-	 3NEGgifh0eXSw==
-Message-ID: <222133f7-9483-4e4b-b3fe-90e2e830fcf6@kernel.org>
-Date: Mon, 14 Jul 2025 09:41:16 +0200
+	 In-Reply-To:Content-Type; b=IhEq1Y31ofDJVEAZw5QUc4MpxonEYLqV6+JkIGHTW1xar+qIJ9mZQIVXulfEC1FLhii2JcwOMzYOJRKs+BALdOecbvudLhJA3kqjk16FX9+V1Nd7gTzgeTaT3AHMXY2BMpYbqOPcI36kL/9JU3zbTDs0VqAHYrMpglsrQgmxJis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=B8Ty965x; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56DNKJLH005187;
+	Mon, 14 Jul 2025 07:42:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=KMpMO3
+	WC3c6dEIr6KZ2/Jk/KIkc8TR3yo2VFXQvvN30=; b=B8Ty965x2dqCUwAYx4EH2g
+	mdz9J2cMCa/Lec+vOLb75kymFGfH0G1u0CYbzjBYU0yAaKPZN2SzYPOLsLM4kpO8
+	Anizyj2FPNgt41z+AAE+ojhOMgS7uNZVm3kal0OI+uOfomPyZD2HSRtSNzYdvWPf
+	WrGQks0RnjrzUu2Rk6npDrs6R0hySR6Cvwo/WSkDMvN4gdIrTSR7Q+js/29nz2X5
+	5/NNCWgaAthN6b2NjREk0OSFd/rEEOvplq/ZJfh+0IEIlchWi7BbPAwG0aanxCPh
+	jrEULettYtmKKS6aJ464M+/d8jJmmu2uJDyCGnf5cWrYxVeguPxUp+VOq28BY70w
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47ufc6r0r6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 14 Jul 2025 07:42:33 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 56E7fgwD022785;
+	Mon, 14 Jul 2025 07:42:33 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47ufc6r0qt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 14 Jul 2025 07:42:32 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56E5La9L008941;
+	Mon, 14 Jul 2025 07:42:31 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 47v3hmctk0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 14 Jul 2025 07:42:31 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56E7gO5R45875546
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 14 Jul 2025 07:42:24 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6B4292004B;
+	Mon, 14 Jul 2025 07:42:24 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6026520040;
+	Mon, 14 Jul 2025 07:42:23 +0000 (GMT)
+Received: from [9.111.31.253] (unknown [9.111.31.253])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 14 Jul 2025 07:42:23 +0000 (GMT)
+Message-ID: <965af724-c3b4-4e47-97d6-8591ca9790db@linux.ibm.com>
+Date: Mon, 14 Jul 2025 09:42:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,117 +84,132 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 02/16] dt-bindings: net: mediatek,net: allow up to 8
- IRQs
-To: frank-w@public-files.de,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Frank Wunderlich <linux@fw-web.de>
-Cc: MyungJoo Ham <myungjoo.ham@samsung.com>,
- Kyungmin Park <kyungmin.park@samsung.com>,
- Chanwoo Choi <cw00.choi@samsung.com>, Georgi Djakov <djakov@kernel.org>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- Johnson Wang <johnson.wang@mediatek.com>, =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?=
- <arinc.unal@arinc9.com>, Landen Chao <Landen.Chao@mediatek.com>,
- DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
- Daniel Golle <daniel@makrotopia.org>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Felix Fietkau <nbd@nbd.name>, linux-pm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20250706132213.20412-1-linux@fw-web.de>
- <20250706132213.20412-3-linux@fw-web.de>
- <20250707-modest-awesome-baboon-aec601@krzk-bin>
- <B875B8FF-FEDB-4BBD-8843-9BA6E4E89A45@fw-web.de>
- <90a3191f-882d-4302-afd5-e73e751b5b95@collabora.com>
- <9696BB13-9D1E-48D3-B323-03AD23110CF5@public-files.de>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH v1 net] smc: Fix various oops due to inet_sock type
+ confusion.
+To: Kuniyuki Iwashima <kuniyu@google.com>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Dust Li <dust.li@linux.alibaba.com>,
+        Sidraya Jayagond <sidraya@linux.ibm.com>,
+        Wenjia Zhang
+ <wenjia@linux.ibm.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>
+Cc: Mahanta Jambigi <mjambigi@linux.ibm.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        Simon Horman <horms@kernel.org>,
+        Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+        syzbot+40bf00346c3fe40f90f2@syzkaller.appspotmail.com,
+        syzbot+f22031fad6cbe52c70e7@syzkaller.appspotmail.com,
+        syzbot+271fed3ed6f24600c364@syzkaller.appspotmail.com
+References: <20250711060808.2977529-1-kuniyu@google.com>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <9696BB13-9D1E-48D3-B323-03AD23110CF5@public-files.de>
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <20250711060808.2977529-1-kuniyu@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=Je68rVKV c=1 sm=1 tr=0 ts=6874b4e9 cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=pGLkceISAAAA:8 a=DmAWCvTl3qigKM0tJr8A:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE0MDA0MiBTYWx0ZWRfX32w6uTdbE3LV sB4ENNS6Wlaqo6gSxjXdGKCjnZr6utTLenLeo4k4IhJKZ0JMI7MrJxbqjq4BQ2g41QJ8SvH9sdI 0OjCZ9bg0PIz+D19+qRU3nt2pz8Fu1T3PzXnE2XpWW+Ana6rDxjjSJkiPiIluEZrs53sbqQ0y0k
+ mszKBlpFUF+TqB/rPN6jx7ZpIplfAVWxsC/LZgHQXhaUU3EtmSw4jvj1zbeUmaEQxY39J1auj2d 8Fktk894iPSzoq4xZsqeGmQOpfAmPDQH/r1dB+pSMAkVf1GdSYjJgH6iRmFii2huxMQYi7pbv1I 8EcTbPdroDinuUsMWG+ALUkUH0TRBMUT7T9hnmU/4ZoBhs44cvkvRrvyW8FWLsefofQtaQ0VucH
+ vq7A9iogOfdkLPILGC/kW6TanKaQXApiLDMkaPCQvlOw6ATn5uJuLKlLdblCp/fUTlBFN0q0
+X-Proofpoint-GUID: DDg8N3W8N5qFlTM-XGlBgLDiYHQXI0iz
+X-Proofpoint-ORIG-GUID: OVuP7ziXTHj6jCOuUkePD3nfC8YpG7T8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-07-14_01,2025-07-09_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ malwarescore=0 lowpriorityscore=0 suspectscore=0 adultscore=0
+ priorityscore=1501 clxscore=1011 bulkscore=0 phishscore=0 spamscore=0
+ mlxlogscore=999 mlxscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507140042
 
-On 07/07/2025 12:43, Frank Wunderlich wrote:
-> Hi Angelo,
+
+
+On 11.07.25 08:07, Kuniyuki Iwashima wrote:
+> syzbot reported weird splats [0][1] in cipso_v4_sock_setattr() while
+> freeing inet_sk(sk)->inet_opt.
 > 
-> Am 7. Juli 2025 12:06:02 MESZ schrieb AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>:
->> Il 07/07/25 09:30, Frank Wunderlich ha scritto:
->>> Am 7. Juli 2025 08:31:11 MESZ schrieb Krzysztof Kozlowski <krzk@kernel.org>:
->>>> On Sun, Jul 06, 2025 at 03:21:57PM +0200, Frank Wunderlich wrote:
->>>>> From: Frank Wunderlich <frank-w@public-files.de>
->>>>>
->>>>> Increase the maximum IRQ count to 8 (4 FE + 4 RSS/LRO).
->>>>
->>>> Because? Hardware was updated? It was missing before?
->>>
->>> There is no RSS support in driver yet,so IRQs were not added to existing DTS yet.
->>>
->>
->> That's the problem. It's the hardware that you should've described, not the driver.
->>
->> In short, you should've allowed the interrupts from the get-go, and you wouldn't
->> be in this situation now :-)
+> The address was freed multiple times even though it was read-only memory.
 > 
-> I have not upstreamed MT7981 or MT7986. I also do not want to say anybody else did this wrong.
-> I'm happy that MT7986 is working in mainline. It was basicly not taken into account that these IRQs may be needed in future.
+> cipso_v4_sock_setattr() did nothing wrong, and the root cause was type
+> confusion.
 > 
-> The technical documents are often not complete and we get some information step-by-step while testing.
-> Or it was not seen when documents are too large :) many reasons why it was "forgotten to add".
-> We use what we get from sdk and docs and try to make it compatible with mainline....no optimal process,but it is like it is.
+> The cited commit made it possible to create smc_sock as an INET socket.
+> 
+> The issue is that struct smc_sock does not have struct inet_sock as the
+> first member but hijacks AF_INET and AF_INET6 sk_family, which confuses
+> various places.
+> 
+> In this case, inet_sock.inet_opt was actually smc_sock.clcsk_data_ready(),
+> which is an address of a function in the text segment.
+> 
+>   $ pahole -C inet_sock vmlinux
+>   struct inet_sock {
+>   ...
+>           struct ip_options_rcu *    inet_opt;             /*   784     8 */
+> 
+>   $ pahole -C smc_sock vmlinux
+>   struct smc_sock {
+>   ...
+>           void                       (*clcsk_data_ready)(struct sock *); /*   784     8 */
+> 
+> The same issue for another field was reported before. [2][3]
+> 
+> At that time, an ugly hack was suggested [4], but it makes both INET
+> and SMC code error-prone and hard to change.
+> 
+> Also, yet another variant was fixed by a hacky commit 98d4435efcbf3
+> ("net/smc: prevent NULL pointer dereference in txopt_get").
+> 
+> Instead of papering over the root cause by such hacks, we should not
+> allow non-INET socket to reuse the INET infra.
+> 
+> Let's add inet_sock as the first member of smc_sock.
+> 
+[...]
+>  
+>  static struct lock_class_key smc_key;
+> diff --git a/net/smc/smc.h b/net/smc/smc.h
+> index 78ae10d06ed2e..2c90849637398 100644
+> --- a/net/smc/smc.h
+> +++ b/net/smc/smc.h
+> @@ -283,10 +283,10 @@ struct smc_connection {
+>  };
+>  
+>  struct smc_sock {				/* smc sock container */
+> -	struct sock		sk;
+> -#if IS_ENABLED(CONFIG_IPV6)
+> -	struct ipv6_pinfo	*pinet6;
+> -#endif
+> +	union {
+> +		struct sock		sk;
+> +		struct inet_sock	icsk_inet;
+> +	};
+>  	struct socket		*clcsock;	/* internal tcp socket */
+>  	void			(*clcsk_state_change)(struct sock *sk);
+>  						/* original stat_change fct. */
+
+I would like to remind us of the discussions August 2024 around a patchset
+called "net/smc: prevent NULL pointer dereference in txopt_get".
+That discussion eventually ended up in the reduced (?)
+commit 98d4435efcbf ("net/smc: prevent NULL pointer dereference in txopt_get")
+without a union.
+
+I still think this union looks dangerous, but don't understand the code well enough to
+propose an alternative.
+
+Maybe incorporate inet_sock in smc_sock? Like Paoplo suggested in
+https://lore.kernel.org/lkml/20240815043714.38772-1-aha310510@gmail.com/T/#maf6ee926f782736cb6accd2ba162dea0a34e02f9
+
+He also asked for at least some explanatory comments in the union. Which would help me as well.
+
+Kind regards
+Alexandra
 
 
-Then explain in the commit msg that hardware description was incomplete
-and was missing this and that.
 
-This is the valid reason for doing the change.
 
-Best regards,
-Krzysztof
 
