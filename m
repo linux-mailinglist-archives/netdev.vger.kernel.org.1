@@ -1,64 +1,57 @@
-Return-Path: <netdev+bounces-206750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11716B04467
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 17:44:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43683B044A2
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 17:49:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E88416318C
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 15:43:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EFD73A8007
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 15:45:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 193F1259CA0;
-	Mon, 14 Jul 2025 15:38:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8693F23D280;
+	Mon, 14 Jul 2025 15:46:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="u2gyHu4Z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Db+7UqAd"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B9A5251791;
-	Mon, 14 Jul 2025 15:38:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B9711DF985;
+	Mon, 14 Jul 2025 15:46:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752507506; cv=none; b=KpemdWJDn67oyBtmaQ+O35Ibj+KAulqBNoDr7D8ddO27A22Q/xyXIK0HB5uZuG18vLJE1zEVyD4ZPkoJLyr2+PQpi4xJm1cPueUUNk4rJNco6qGvh5oRcPEn0EWkU+i54Afu1CPNLfqjihbSCL1ULrN8njzQhCxlh5JH3uTbPpc=
+	t=1752507973; cv=none; b=FafTEpVegq1rczPVT4LnzTF+bniNIc8KDODiu9kY/hlAKNmYR2rqclZNmnr7eMS9ByZH6c7J11iDVqO2SZa7S1m2WK8w6SFw3MWwN4SdMNiaybguIubAr1YZwq3liQHmHrSHWvcs+4f3R5oGljXQMawNdiUucJvO0k4wXfbB33k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752507506; c=relaxed/simple;
-	bh=Jp6a7sFCA8bADzjFKBewsi2dTVeNX6BR5dt8ClsAD8Y=;
+	s=arc-20240116; t=1752507973; c=relaxed/simple;
+	bh=lGlHwINKmDtZDP+RNzG1kSdCoH7nf9v7DpZThUTtKcY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kc9E6MbdxNDk8ffbS/QCqVKbeyX/sSXmhOWjw75Obz5lpdl6EeDT2DY1yfmDp9Ms2VIavVYcgueDsCBsAEIA8QTkLxHejYbm+Ot/wycy0hLfxqGnouZFtsR8OTV5bhkKhm9lm9qdFNXL9QHA4bBS1bbUuqmvAQdaWz9LYa46mdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=u2gyHu4Z; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=7XTQ1m4MzAcEXx/P+ZyDtRSsoZG9qL19KcIoqi9+fQQ=; b=u2gyHu4ZeEXc/81OUAZF1rqzPX
-	YpzM5RlB83XapYCOuco7OleR8J4VT+n+L+O3mQ0yu2ePS/5fbN8n8eNg3zTUJiQeebJTZFWs94O+y
-	vTyhqRYDIK7jMjrxrrgekAhSsI9Q2894OagjovPrHFuOr/5ZIaHU4K/i9p8KVKkcKQJQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ubLFr-001Tl7-3j; Mon, 14 Jul 2025 17:38:11 +0200
-Date: Mon, 14 Jul 2025 17:38:11 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Hau <hau@realtek.com>
-Cc: "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	nic_swsd <nic_swsd@realtek.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] r8169: add quirk for RTL8116af SerDes
-Message-ID: <e571d596-da26-4596-bf90-b858b5a2f5b4@lunn.ch>
-References: <20250711034412.17937-1-hau@realtek.com>
- <9291f271-eafe-4f65-aa08-3c6cb4236f64@lunn.ch>
- <50df9352e81e4688b917072949b2ee4c@realtek.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=X+Jsmi4L/DP6hi23AveEB/hfoRClI3wMfyHsxjpi3Co7HyjcbtkKnxStdnZRvdjnug2XvkEVaFf/37Sx9H9kA1sTDueSigyDeaXS1EKze7SFcjoeAusK1DE46yRGF6fr8UTwB23zyvTWhKmJEwhYGn9kZs/NsKkJ2Ii5KDMDlsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Db+7UqAd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAA17C4CEED;
+	Mon, 14 Jul 2025 15:46:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752507972;
+	bh=lGlHwINKmDtZDP+RNzG1kSdCoH7nf9v7DpZThUTtKcY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Db+7UqAd1KorwPuzo+Nu5KYrt4KyNnRuAlZqv7mmhA/obONsmroNk5f+SQ9RiaiH7
+	 jLtSs/TYS/FZfAwf8TmzE06dpcN73uT0i/tiTskzWdJwexXF7fHgmhDopwxp+u2rCd
+	 jAbBzSMFYKqy/MyN9mB2MkapxxzjHSgvqFVjH3V7Gk8ReiKxNUnhqRwgQv6tdlvzbe
+	 CyRJTv6ymIRDDWFIkcSWZkboEPDGZzYv4zd32eR8rGGZ2E1BuyHVUZWgqbEm+dA/OY
+	 goh4I0+JuoM+A+u3exfqIA1czLoRlzv/IiGNGfeszHBEk3uvo2pID3qd3LKvOoIyY/
+	 /a4izg/4OZn6w==
+Date: Mon, 14 Jul 2025 16:46:08 +0100
+From: Simon Horman <horms@kernel.org>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: ISO: add socket option to report packet
+ seqnum via CMSG
+Message-ID: <20250714154608.GP721198@horms.kernel.org>
+References: <474a5321753aba17ec2819ba59adfd157ecfb343.1752501596.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,36 +60,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <50df9352e81e4688b917072949b2ee4c@realtek.com>
+In-Reply-To: <474a5321753aba17ec2819ba59adfd157ecfb343.1752501596.git.pav@iki.fi>
 
-On Mon, Jul 14, 2025 at 03:28:37PM +0000, Hau wrote:
-> > 
-> > Can you give us a few more details. What is on the other end of the SERDES?
-> > An SGMII PHY? An SFP cage? An Ethernet switch chip?
-> > 
-> > A quick search suggests it is used with an SFP cage. How is the I2C bus
-> > connected? What about GPIOs? Does the RTL8116af itself have GPIOs and an
-> > I2C bus?
-> > 
+On Mon, Jul 14, 2025 at 05:02:57PM +0300, Pauli Virtanen wrote:
+> User applications need a way to track which ISO interval a given SDU
+> belongs to, to properly detect packet loss. All controllers do not set
+> timestamps, and it's not guaranteed user application receives all packet
+> reports (small socket buffer, or controller doesn't send all reports
+> like Intel AX210 is doing).
+> 
+> Add socket option BT_PKT_SEQNUM that enables reporting of received
+> packet ISO sequence number in BT_SCM_PKT_SEQNUM CMSG.
+> 
+> Signed-off-by: Pauli Virtanen <pav@iki.fi>
 
-> RTL8116af 's SERDES will connect to a SFP cage. It has GPIO and a
-> I2C bus. But driver did not use it to access SFP cage.  Driver
-> depends on mac io 0x6c (LinkStatus) to check link status.
+Hi Pauli,
 
-You cannot correctly use an SFP cage without using the I2C bus and the
-GPIOs. e.g. A copper SFP module likely needs SGMII, where as a fibre
-module needs 1000BaseX. You need to reprogram the PCS depending on
-what the SFP EEPROM says.
+Some minor feedback from my side.
 
-The kernel has all the code needed to coordinate this, phylink. All
-you need to do is write a standard Linux I2C bus driver, a standard
-Linux GPIO driver, and turn your PCS into a Linux PCS. You can then
-instantiate an SFP device. The txgbe driver does this, you can
-probably copy the code from there.
+The byte order annotations around the sequence number seem inconsistent.
+And my guess is that __le16 should be consistently used to hold the sequence
+number.
 
-Have you licensed these parts? The txgbe hardware uses synopsys I2C
-and PCS. So all that was needed was a wrapper around the existing
-drivers.
+Sparse says:
 
-	Andrew
+  net/bluetooth/iso.c:2322:28: warning: incorrect type in assignment (different base types)
+  net/bluetooth/iso.c:2322:28:    expected unsigned short [usertype] sn
+  net/bluetooth/iso.c:2322:28:    got restricted __le16 [usertype] sn
+  net/bluetooth/iso.c:2333:28: warning: incorrect type in assignment (different base types)
+  net/bluetooth/iso.c:2333:28:    expected unsigned short [usertype] sn
+  net/bluetooth/iso.c:2333:28:    got restricted __le16 [usertype] sn
 
