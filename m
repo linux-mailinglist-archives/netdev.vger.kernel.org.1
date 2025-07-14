@@ -1,217 +1,258 @@
-Return-Path: <netdev+bounces-206491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D874CB03479
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 04:30:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4C0FB0347C
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 04:30:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E74761897266
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 02:30:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11F243B1DE4
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 02:30:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40B711C683;
-	Mon, 14 Jul 2025 02:30:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 184767262A;
+	Mon, 14 Jul 2025 02:30:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="gZWr4AlR"
+	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="aQjzWHUS"
 X-Original-To: netdev@vger.kernel.org
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011024.outbound.protection.outlook.com [40.107.130.24])
+Received: from mail-4323.protonmail.ch (mail-4323.protonmail.ch [185.70.43.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252C11C1AAA;
-	Mon, 14 Jul 2025 02:30:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.24
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752460206; cv=fail; b=FLy16cYPgqnQNsrnPKsB1EVwEBv8pRym1idBFwaKRxmY/D/p6270cTV5kk9CadMba62psVYNTbBf+NUJvVEa7lE4pbgDwa12FiqzYlFqbWKSqXL17WYhWVlQjAGcmer+jMPdUW2IfMV3Aq6D2I770KYpgCK3rYbKPUmUxhjbFqg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752460206; c=relaxed/simple;
-	bh=vkdVAYIDoN1juhBJzdowszzrfGLrLMNGJiZuO6fR+rs=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=SKbYwUzRAKdI/xirxwDbRX748+WQfZgs6SaSHtjyAeRNLy1hj/jTMk5WI1da7UClfOQPDsXVzmcE89ZUOcY5wbypFt/0L5hJM81RHpYUVHAHbpX5yhf5J8aTqxBWHSHAj4P8YktLn7iR77OtXHLpWMczoqdDmebz093w6CR86Kc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=gZWr4AlR; arc=fail smtp.client-ip=40.107.130.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gGuiXCYz2tY6TL4tVJYSMNT0d+ToTrALk9980CZ3Z6bPnnmwJNvmxQrRRbDNB1p9tFL+7VFPiVYu8vrEHJTSf/OfneGhVY6CZ8Nwm7nIbdef7fhI/PpDj2hcKDJDLZhFVMDrxhVs7XsVXehAvq5Yb8twYgHS5y1FWsMcQemi16mpRgdz8sgDEqhpJ9f1rHIP8pv+aYiPmbsXLcdkdqkpeV0A/c4Y6MaVl7JrFT/9hrBs+tUXBq7kEkOCeoakdlRlMkwzelV1Pfy2lUFSDOkK4lP0GwVZZm8IQEByS89xf3OQlCbkhFuKhvh8fIRksPWQ0XM6dmbgI9qpvKRHLhJR6w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oPxPhlgBkr6/ePJ6zBqVBAKZ0QfjW/b97S2t2c5QD20=;
- b=Mglxc0KnG1mq7Z4gbKlK7xw9GAKjmhVgL08ZdchuVIbmLGDieLAKWyQtA6HPmHRYg1lM+iFbxY60fns6xgICA6bOvXn9+DA0EkKlLXxd703UcKH3XEuD9kL2bUnGNmsXMji12iAf2y89ifyGK+eLNgxwrbhqj1dOvFtoK3L+uPCjmCWV+7fkFN3JB3GiQZpC1QT7sczOso86wUTZRJc+rPSwIqmniuCxqW1x7RYhTGMxcS1j0hb9gHq1KGC954pBNXg3LBxgNS3i5snWifHNNEuT4CxbW75J9b4Fv+0cAr121q+LMapMzkBF19obG14CjW/a2beevsfEvCipDbYK+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oPxPhlgBkr6/ePJ6zBqVBAKZ0QfjW/b97S2t2c5QD20=;
- b=gZWr4AlRT0J9RTTJ9jmbOtiLB6y/hGvqLZzKtZ1jhR9nzOgGx/6D2Rp5+EPEcgZ7kSfELtFcVVOCuMM4YQ0oUrmpl77F3CAyrHC0aiznhHjNk3Q1+ypdN8jdLqiKW9GfoyX57U4Yb7l62uLRWEfnkcyuPHEdR/K5I/nG/9m5glzeLdaf+PophNr1U+lE8QR3BWZlcKU9LmJDA5RWRgssNQyo2UsLtpHd05DluBWx7NHzpwcDsGhpYiMlm7LoTAVFBe7DWOURqAXDxN8ltrXfWB3dyQtb8MyJid99YYg6t55OEACm06TRXl+LGMvEquTzMvVDKunqBIZ6P7ORJR604A==
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by AM9PR04MB7633.eurprd04.prod.outlook.com (2603:10a6:20b:2d9::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.32; Mon, 14 Jul
- 2025 02:29:58 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%5]) with mapi id 15.20.8922.028; Mon, 14 Jul 2025
- 02:29:58 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
-	<krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>, Claudiu Manoil
-	<claudiu.manoil@nxp.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Clark
- Wang <xiaoning.wang@nxp.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "F.S. Peng"
-	<fushi.peng@nxp.com>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "imx@lists.linux.dev" <imx@lists.linux.dev>
-Subject: RE: [PATCH net-next 02/12] ptp: netc: add NETC Timer PTP driver
- support
-Thread-Topic: [PATCH net-next 02/12] ptp: netc: add NETC Timer PTP driver
- support
-Thread-Index: AQHb8jPan87Rdn8VMEKOXtXyIvr3+bQs6gOAgAP3z+A=
-Date: Mon, 14 Jul 2025 02:29:58 +0000
-Message-ID:
- <PAXPR04MB8510CF6159CECAEC10A638848854A@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <20250711065748.250159-1-wei.fang@nxp.com>
- <20250711065748.250159-3-wei.fang@nxp.com>
- <9f65fac0-e706-4a00-bac7-20c3ee727f69@lunn.ch>
-In-Reply-To: <9f65fac0-e706-4a00-bac7-20c3ee727f69@lunn.ch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|AM9PR04MB7633:EE_
-x-ms-office365-filtering-correlation-id: 76909f76-6ba8-464f-3564-08ddc27e53bd
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|376014|1800799024|19092799006|7416014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?y7FRxnABsJyNCrlfPpiO4APqmkjsahpa3UQLKJLBPHh7gn05xzM8WVvhAnUY?=
- =?us-ascii?Q?W1Vm0fgl4t+Oz+9NcB5LGfYDPorp1tfjqPTl77mwydr+iC75J7RjDZHR1j0e?=
- =?us-ascii?Q?ZfCuaWZN4tEYu+pvdqoDiRzhW5AQuh+5VfNAD/1G8uT4MUhBREZtp4i42vVk?=
- =?us-ascii?Q?GtsSpvOyDOYHG/gprB12SypaSImf/XxLjS1Y6T2b1CLXtK0kbPuX54jKPny3?=
- =?us-ascii?Q?EY/IB2jipxTi9MnKm30dITQ2zan2MAemv/0JDMIF2Hy1hTtvH6QUHFPNKIZo?=
- =?us-ascii?Q?kaoYrvqx+SPwOBJS4lQWeSZOKYYCj8bpb1e1Ex4yatpndOri3kZxuUPTB9NB?=
- =?us-ascii?Q?rVVc69+fPY+hYPb1Fxwa3WuG1HcDZAQ4EuW9mnT2rR8kPMH2zvmxuiB4RViC?=
- =?us-ascii?Q?qcIO5PK7ad7rXgs8SPh6bm+RJS+lBmHB3iQbyYmAEclaSs8K+cJEjWsjgD6C?=
- =?us-ascii?Q?FEaBBBNXRAYoMzPipupt2W4m549c7YUZKSEnI/bD5LnQupjXbBrUoiWplLkI?=
- =?us-ascii?Q?0gteojBEH4QOvj51MsLfp8zWH9YMQ+ZPrT5ctnPHRPRla45ApeD+0YzM98ey?=
- =?us-ascii?Q?tsZCzOrELMLHf/bTmnTGmn6sF5owqJH8iRkSLxkXL7rUfxmr2/+kpxuHrBwi?=
- =?us-ascii?Q?wlshNDUIVrtP9aTwHEQV/PmKk8uYn4R8GxPxA4MaDYEEVGO6nk0N7QazTsIB?=
- =?us-ascii?Q?sAeC8/uaXiqKYjEl6dGI2iSa8lvaHdqXVWOoJToG2GlnIUZwEnmH/hIlxhpo?=
- =?us-ascii?Q?YWn8MW2JFn1JDuD6uRc29dN4IN91rqT+4x+4fuBaoQPPoOWyhEQp7Xt271bn?=
- =?us-ascii?Q?KRIlnGmXdy6u77JMIihc7edqI5jG/QLMad5qS/NN94RsFdWijJc2xIGJBLpq?=
- =?us-ascii?Q?AQrVt9AFEgqzksnyL69Sa1h51pJcJfMzUuoK4WYrN6iyGc8WiLTS6/pChAMx?=
- =?us-ascii?Q?FDZ/YPREtkog+qWOgsxfbGPUZ4yIajR2JBAacqoaDYPjF9lN/V+iU0xGNMys?=
- =?us-ascii?Q?H4u0D2Ouc28mhzzUw55Ahe8s14Jk89q2fGwSQuGZeWt/3coDX5muDpR/T0V6?=
- =?us-ascii?Q?UdhEco2451Bg6TN6xo0W3+tnaRT9saTOwGZT0WmXv/zjj5bY07sUzKMkPsO1?=
- =?us-ascii?Q?wldxv8UiU8KQ5YeJA5hBOb8wIkAFA4EgM60FphCofJMu/k37i3Ttpv0bPJSm?=
- =?us-ascii?Q?V4fxmOvcs3S35SuA8pbAgPgNjjXyybCfldZXsHD1flUlNpKZyzCTMN8QKCbD?=
- =?us-ascii?Q?KIXHOsa76UbENQ9sxIIKUjK5rnRTiiH9OfTBkmpn4iuvojcrIrf5TJVEFRgA?=
- =?us-ascii?Q?oZt3lmauZTirJrWKcBEkylAWAWCc6cM63x8/Xe7squSo0k+waY6he/PL4KEq?=
- =?us-ascii?Q?meQe9cMZEXJr+xCYyjjMRZ4PQXnwOEwXzWsipiTMcjHT3qQiaUhJlpA/eeto?=
- =?us-ascii?Q?gMtpUzdItsuAWa8ibGs7rmSna7J1rVPtV+4B1YLeHMaXDKXvBMXYiQ=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(19092799006)(7416014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?P3nEieoFZQo01xjreQQZbW/2mW/7CGXumADTBnTzcawikmDKVHPN2q9mU/hp?=
- =?us-ascii?Q?kMLsgfD4HuISwEfKhbnnzRcx3s1wNvL10Iu4P3e0WP4Gw6VF4/UB90FCJnJH?=
- =?us-ascii?Q?dvJejFp/IKQfmYprofLx4X58N2OiV4pxZBp7PL0BFN5QBMjRYhIUr+Sn+lQJ?=
- =?us-ascii?Q?FujIRqw1kA9Zxa5QXxTubC77vHK0LIhCPbT1HHBngOHbFu4qRBlauMwf0OUi?=
- =?us-ascii?Q?84l56MeMEq4n0w2f/9GwcNvxj9C1ZU/TlG8CnAou8IyWecrKfYuxAlEROfXn?=
- =?us-ascii?Q?N9QhZEJuhjyVTnySdeAMAF1LCgiLah+S2SBbbot71vz1nr9O2kFljdldS/3j?=
- =?us-ascii?Q?WiT/asBH2F+IuCAn6x2GPWlZzH61yeD7u9pS0NJE4A+pcOtNiEN/MqYnT4wA?=
- =?us-ascii?Q?+y+ZJZiP3fBO2AgX/ZjANsX93ni5FulRxtbHa45Pu8wlEAesAsXr8fWjP+El?=
- =?us-ascii?Q?y3lJa8Ti4cpvZipy69NwvVFLA7KV3j+m5/T/sHkOxkjmr1EtEelOYMmaFlVK?=
- =?us-ascii?Q?pI0l7tbW3nLdPk4TJEzGT6idOkL+6+FLPi87KCdApKnktIOgfLTCOTXVvLeL?=
- =?us-ascii?Q?vcZkOrINDPUTjh48HW0DVaTSqpUpgt4lrhd8XihvMmQrOCRl5yEGSQBWZtYm?=
- =?us-ascii?Q?bvmQEGfbXPtMqaDtXoC5WcMwJpNfzzVbhzglvdKHgQa2tBsS0N+E/9t73HuA?=
- =?us-ascii?Q?o3hnLvR3Ef3YLO8FRkuqMWy/2YsVWOyIP1L6ITXp2JsFZx+CEes6G8CnTdc/?=
- =?us-ascii?Q?CO22KtmRR/81GoKzASRNpJQOPrmEQiH88cg0Wpm9OBToWEKMm4r1svdDoz+B?=
- =?us-ascii?Q?kSweAZPiWYGkAEmcaA0DTHLLVHn7p6EsYRKmCArysqgCm6k8DcvxGPAhdAB3?=
- =?us-ascii?Q?NPLNKnwL1eD6Hsd7MxNqelRSQjF+i2rk1ENqS0FUNPYJLDdU6t5vtmMAfM8T?=
- =?us-ascii?Q?xbg4dnIRRH5U3sXDHmVxwZIlEnf+T/DGpOIU9MEJwTQfJKhT4nBTwGS3AL3W?=
- =?us-ascii?Q?1NG5VEdkbR445MrCsMlqd2bijnvl1SiqQdybXl8IJBHx4mHbHxPuQdxtVIYZ?=
- =?us-ascii?Q?Ctdk2xJjJC7tjhp4+dqVYcAA0xg6/x6OnCWaFAKN82vgqbKBQcyHjJ0RcWQO?=
- =?us-ascii?Q?mJvsjN7/r+kv25+C+6LlgMO9/d17H/PZOSbj0M9np4hgoO3hWi1IQHI7CvzN?=
- =?us-ascii?Q?po1nA5jSc6/8WaEl4xy+0xFK7Nxj0DRuVLl15uE6/+GoKp6y+2NoXri0a3Iq?=
- =?us-ascii?Q?DhaTPcowJ3CNBty8Sa5wWa5FDMIvC6hZz0CzOUXJFsmuXrzDPWlszQICento?=
- =?us-ascii?Q?LZIarWqol41UmaYNb9vEBolyHPBskfKqtXME4JlVYZtKBSGFf6rcXxr6KeZX?=
- =?us-ascii?Q?QfBl1OIpsmHtUdffGJ3v5Z+cinbPudBk1sC/QU6a9t3ZSmU7THvse7mYaxrU?=
- =?us-ascii?Q?NGM4a2uP3lFZzFHTQ2gCGrRNvwr+lBk5uQUKEEd6qWU6H/SZDN++iA3q7spD?=
- =?us-ascii?Q?aVkgptcbsfVrkMJQzgvRMXWPA7tYMGH2TF33c7fmYZxJGEux3H5Z+OAWjSyu?=
- =?us-ascii?Q?Bc4w3mfGsQ8RIhToZ4k=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BF4112CDBE
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 02:30:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.23
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752460242; cv=none; b=AMuvCi/HE0HSluXaJO1WDloKg5XSPbsw7P0rOKsCS+/FRglP2SsdpfvJCEFL1jyM9jM7LgczieLBhBBBZFt2pr/b6LSRoH8XtticUGeEGaATmR3qwNC81QxUH5PVHdOAXojJ/Evdg/WRvbNYlxZIrZHQBnLRacs+UNzTVOKBtvU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752460242; c=relaxed/simple;
+	bh=VfjU38eAwTt0XziaMSWSC3QN+c0VIgN3/uBCuntbJyI=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sYFxpk2txD7F2UaMBplVctbgDRQEFBx6o3SqlqmhQ4w91cno4EbQWtMHHXEcp35N6osOwYLy9i+eqieb/pIV4hK7pw3YfUen+eHDbO7ScWDACiuWjStLNG3Vp5rPR5sUDGW6PQuK7G481OS37UTk6cvSBWUuac9KEiMKpwwEWrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=aQjzWHUS; arc=none smtp.client-ip=185.70.43.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
+	s=protonmail; t=1752460230; x=1752719430;
+	bh=VfjU38eAwTt0XziaMSWSC3QN+c0VIgN3/uBCuntbJyI=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=aQjzWHUSeAjmzp9wMqVdfW3bHmZQrNdL9Sruyvh1Ku5uQYaujutIgCnxernuCxzrF
+	 P4H8cCTYpo7Y++Hta379sMgZBApySqEvtCn4iO3Wgqv+je8P48znXOyyqkuQET913I
+	 GDq+te/kzUOc1ocqVRYdIeB2ihLkT9AYZ31paXOrFYHvNV/BtL7bFCEHtI2tbgYKMq
+	 JQNYJFX5iV+4fql7dOUZ7g0jY9a9mCPG6nCjNkjrWxX6gulJipt9jQr1BmDkucFiA4
+	 QHuTl52IY/EnZ5rMNTfQBbWoxvYMct3xBgEq1B0baIZTaa0g1PaAWo+FALT3u8jEeX
+	 NEXPtt9GX0vNg==
+Date: Mon, 14 Jul 2025 02:30:26 +0000
+To: Cong Wang <xiyou.wangcong@gmail.com>
+From: William Liu <will@willsroot.io>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, stephen@networkplumber.org, Savino Dicanosa <savy@syst3mfailure.io>
+Subject: Re: [Patch v3 net 1/4] net_sched: Implement the right netem duplication behavior
+Message-ID: <pGE9OHWRSf4oJwC4gS0oPonBy8_0WsDthxgLzBYGBtMVeT_EDc-HAz8NbhJxcWe0NEUrf_a7Fyq2op5FVFujfc2KyO-I38Yx_HlQhFwB0Cs=@willsroot.io>
+In-Reply-To: <20250713214748.1377876-2-xiyou.wangcong@gmail.com>
+References: <20250713214748.1377876-1-xiyou.wangcong@gmail.com> <20250713214748.1377876-2-xiyou.wangcong@gmail.com>
+Feedback-ID: 42723359:user:proton
+X-Pm-Message-ID: 4179139e1b9b21fb9e105b64c863d5ab7de8b6e0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 76909f76-6ba8-464f-3564-08ddc27e53bd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jul 2025 02:29:58.2484
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: wSqhccFD2/EnmIiXgZ7l/i0VKe4vVLg5t02kHmXK0gP6jSSvAIaTQbfPfQh85ED9SztNxZ3iUekfbyGrN02y3w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB7633
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> > +	of_property_read_string(np, "clock-names", &clk_name);
-> > +	if (clk_name) {
-> > +		priv->src_clk =3D devm_clk_get_optional(dev, clk_name);
-> > +		if (IS_ERR_OR_NULL(priv->src_clk)) {
-> > +			dev_warn(dev, "Failed to get source clock\n");
-> > +			priv->src_clk =3D NULL;
-> > +			goto select_system_clk;
-> > +		}
-> > +
-> > +		priv->clk_freq =3D clk_get_rate(priv->src_clk);
-> > +		if (!strcmp(clk_name, "system")) {
-> > +			/* There is a 1/2 divider */
-> > +			priv->clk_freq /=3D 2;
-> > +			priv->clk_select =3D NETC_TMR_SYSTEM_CLK;
-> > +		} else if (!strcmp(clk_name, "ccm_timer")) {
-> > +			priv->clk_select =3D NETC_TMR_CCM_TIMER1;
-> > +		} else if (!strcmp(clk_name, "ext_1588")) {
-> > +			priv->clk_select =3D NETC_TMR_EXT_OSC;
-> > +		} else {
-> > +			dev_warn(dev, "Unknown clock source\n");
-> > +			priv->src_clk =3D NULL;
-> > +			goto select_system_clk;
-> > +		}
->=20
-> That is pretty unusual. Generally, a clock is a clock, and you only
-> use the name to pick out a specific clock when there are multiple
-> listed.
->=20
-> Please expand the binding documentation to include a description of
-> how the clock name is used here.
->=20
-> I don't generally get involved with clock trees, but i'm wondering if
-> the tree is correctly described. Maybe you need to add a clk-divider.c
-> into the tree to represent the system clock being divided by two?
->=20
+On Sunday, July 13th, 2025 at 9:48 PM, Cong Wang <xiyou.wangcong@gmail.com>=
+ wrote:
 
-Currently, for i.MX platforms, there is a fixed 1/2 divider inside the
-NETCMIX, so the system clock rate is always divided by two. Another
-solution is to add a " fixed-factor-clock" node to the DTS and set the
-"clock-div" to 2. Then this clock is used as the system clock of NETC,
-so that we can remove the 1/2 divider from the driver. This method
-should be more appropriate, after all, future platforms may remove
-the 1/2 divider or replace it with another divider.
+>=20
+>=20
+> In the old behavior, duplicated packets were sent back to the root qdisc,
+> which could create dangerous infinite loops in hierarchical setups -
+> imagine a scenario where each level of a multi-stage netem hierarchy kept
+> feeding duplicates back to the top, potentially causing system instabilit=
+y
+> or resource exhaustion.
+>=20
+> The new behavior elegantly solves this by enqueueing duplicates to the sa=
+me
+> qdisc that created them, ensuring that packet duplication occurs exactly
+> once per netem stage in a controlled, predictable manner. This change
+> enables users to safely construct complex network emulation scenarios usi=
+ng
+> netem hierarchies (like the 4x multiplication demonstrated in testing)
+> without worrying about runaway packet generation, while still preserving
+> the intended duplication effects.
+>=20
+> Users can now confidently chain multiple netem qdiscs together to achieve
+> sophisticated network impairment combinations, knowing that each stage wi=
+ll
+> apply its effects exactly once to the packet flow, making network testing
+> scenarios more reliable and results more deterministic.
+>=20
+> I tested netem packet duplication in two configurations:
+> 1. Nest netem-to-netem hierarchy using parent/child attachment
+> 2. Single netem using prio qdisc with netem leaf
+>=20
+> Setup commands and results:
+>=20
+> Single netem hierarchy (prio + netem):
+> tc qdisc add dev lo root handle 1: prio bands 3 priomap 0 0 0 0 0 0 0 0 0=
+ 0 0 0 0 0 0 0
+> tc filter add dev lo parent 1:0 protocol ip matchall classid 1:1
+> tc qdisc add dev lo parent 1:1 handle 10: netem limit 4 duplicate 100%
+>=20
+> Result: 2x packet multiplication (1=E2=86=922 packets)
+> 2 echo requests + 4 echo replies =3D 6 total packets
+>=20
+> Expected behavior: Only one netem stage exists in this hierarchy, so
+> 1 ping becomes 2 packets (100% duplication). The 2 echo requests generate
+> 2 echo replies, which also get duplicated to 4 replies, yielding the
+> predictable total of 6 packets (2 requests + 4 replies).
+>=20
+> Nest netem hierarchy (netem + netem):
+> tc qdisc add dev lo root handle 1: netem limit 1000 duplicate 100%
+> tc qdisc add dev lo parent 1: handle 2: netem limit 1000 duplicate 100%
+>=20
+> Result: 4x packet multiplication (1=E2=86=922=E2=86=924 packets)
+> 4 echo requests + 16 echo replies =3D 20 total packets
+>=20
+> Expected behavior: Root netem duplicates 1 ping to 2 packets, child netem
+> receives 2 packets and duplicates each to create 4 total packets. Since
+> ping operates bidirectionally, 4 echo requests generate 4 echo replies,
+> which also get duplicated through the same hierarchy (4=E2=86=928=
+=E2=86=9216), resulting
+> in the predictable total of 20 packets (4 requests + 16 replies).
+>=20
+> The new netem duplication behavior does not break the documented
+> semantics of "creates a copy of the packet before queuing." The man page
+> description remains true since duplication occurs before the queuing
+> process, creating both original and duplicate packets that are then
+> enqueued. The documentation does not specify which qdisc should receive
+> the duplicates, only that copying happens before queuing. The implementat=
+ion
+> choice to enqueue duplicates to the same qdisc (rather than root) is an
+> internal detail that maintains the documented behavior while preventing
+> infinite loops in hierarchical configurations.
+>=20
+> Fixes: 0afb51e72855 ("[PKT_SCHED]: netem: reinsert for duplication")
+> Reported-by: William Liu will@willsroot.io
+>=20
+> Reported-by: Savino Dicanosa savy@syst3mfailure.io
+>=20
+> Signed-off-by: Cong Wang xiyou.wangcong@gmail.com
+>=20
+> ---
+> net/sched/sch_netem.c | 26 +++++++++++++++-----------
+> 1 file changed, 15 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
+> index fdd79d3ccd8c..191f64bd68ff 100644
+> --- a/net/sched/sch_netem.c
+> +++ b/net/sched/sch_netem.c
+> @@ -165,6 +165,7 @@ struct netem_sched_data {
+> */
+> struct netem_skb_cb {
+> u64 time_to_send;
+> + u8 duplicate : 1;
+> };
+>=20
+> static inline struct netem_skb_cb *netem_skb_cb(struct sk_buff *skb)
+> @@ -460,8 +461,16 @@ static int netem_enqueue(struct sk_buff *skb, struct=
+ Qdisc *sch,
+> skb->prev =3D NULL;
+>=20
+>=20
+> /* Random duplication */
+> - if (q->duplicate && q->duplicate >=3D get_crandom(&q->dup_cor, &q->prng=
+))
+>=20
+> - ++count;
+> + if (q->duplicate) {
+>=20
+> + bool dup =3D true;
+> +
+> + if (netem_skb_cb(skb)->duplicate) {
+>=20
+> + netem_skb_cb(skb)->duplicate =3D 0;
+>=20
+> + dup =3D false;
+> + }
+> + if (dup && q->duplicate >=3D get_crandom(&q->dup_cor, &q->prng))
+>=20
+> + ++count;
+> + }
+>=20
+> /* Drop packet? */
+> if (loss_event(q)) {
+> @@ -532,17 +541,12 @@ static int netem_enqueue(struct sk_buff *skb, struc=
+t Qdisc sch,
+> }
+>=20
+> /
+> - * If doing duplication then re-insert at top of the
+> - * qdisc tree, since parent queuer expects that only one
+> - * skb will be queued.
+> + * If doing duplication then re-insert at the same qdisc,
+> + * as going back to the root would induce loops.
+> */
+> if (skb2) {
+> - struct Qdisc rootq =3D qdisc_root_bh(sch);
+> - u32 dupsave =3D q->duplicate; / prevent duplicating a dup... */
+>=20
+> -
+> - q->duplicate =3D 0;
+>=20
+> - rootq->enqueue(skb2, rootq, to_free);
+>=20
+> - q->duplicate =3D dupsave;
+>=20
+> + netem_skb_cb(skb2)->duplicate =3D 1;
+>=20
+> + qdisc_enqueue(skb2, sch, to_free);
+> skb2 =3D NULL;
+> }
+>=20
+> --
+> 2.34.1
+
+FWIW, I suggested changing this behavior to not enqueue from the root a whi=
+le ago too on the security mailing list for the HFSC rsc bug (as the re-ent=
+rancy violated assumptions in other qdiscs), but was told some users might =
+be expecting that behavior and we would break their setups.
+
+If we really want to preserve the ability to have multiple duplicating nete=
+ms in a tree, I think Jamal had a good suggestion here to rely on tc_skb_ex=
+t extensions [1].
+
+However, I noted that there are implementation issues that we would have to=
+ deal with. Copying what I said there [2]:
+
+"The tc_skb_ext approach has a problem... the config option that enables it=
+ is NET_TC_SKB_EXT. I assumed this is a generic name for skb extensions in =
+the tc subsystem, but unfortunately this is hardcoded for NET_CLS_ACT recir=
+culation support.
+
+So what this means is we have the following choices:
+1. Make SCH_NETEM depend on NET_CLS_ACT and NET_TC_SKB_EXT
+2. Add "|| IS_ENABLED(CONFIG_SCH_NETEM)" next to "IS_ENABLED(CONFIG_NET_TC_=
+SKB_EXT)"
+3. Separate NET_TC_SKB_EXT and the idea of recirculation support. But I'm n=
+ot sure how people feel about renaming config options. And this would requi=
+re a small change to the Mellanox driver subsystem.
+
+None of these sound too nice to do, and I'm not sure which approach to take=
+. In an ideal world, 3 would be best, but I'm not sure how others would fee=
+l about all that just to account for a netem edge case."
+
+Of course, we can add an extra extension enum for netem but that will just =
+make this even messier imo.
+
+[1] https://lore.kernel.org/netdev/CAM0EoMmBdZBzfUAms5-0hH5qF5ODvxWfgqrbHaG=
+T6p3-uOD6vg@mail.gmail.com/
+[2] https://lore.kernel.org/netdev/lhR3z8brE3wSKO4PDITIAGXGGW8vnrt1zIPo7C10=
+g2rH0zdQ1lA8zFOuUBklLOTAgMcw4Z6N5YnqRXRzWnkHO-unr5g62msCAUHow-NmY7k=3D@will=
+sroot.io/
+
 
 
