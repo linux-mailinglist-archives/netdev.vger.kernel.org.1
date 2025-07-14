@@ -1,232 +1,126 @@
-Return-Path: <netdev+bounces-206869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F0A9B04A7B
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 00:22:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98A49B04A81
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 00:23:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD9551A64012
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 22:22:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C65627B3C3D
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 22:21:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35400289817;
-	Mon, 14 Jul 2025 22:19:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B42E278E75;
+	Mon, 14 Jul 2025 22:19:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m4i27Pt6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9D0288C9C
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 22:19:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8225288C9C
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 22:19:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752531550; cv=none; b=gzoxQjqlwJ8tEu9YfOTtcKPcjoHAnVqGdK79iZlyMYCSNcEyX+EW4wXZTs72GwUe9PqyjqZbh7XgSNS/qs0GWmv3dMo8TA4yuKIv9h8IEksTAa3n+yqSUZY6EI8Z8rxnhsY3srpbjp4HtdU6yKvhwTeqIVBzyaESTgLV466MqIQ=
+	t=1752531566; cv=none; b=ff9c1Pl6NftG+OlK7zYWgEyO+wXhG7kxGx0A4cg1WLqIPJP6ywz0a0bRBBulHyl+RByXlIiZjVmV2lRrYAB7wfoFZ+tUvgfb31mA1QRP+WHisdm9rmLGnPfliMwO4w4SceDO2Jyb0S4s8frZiW2GRbrQTXBbuZh9L4oRR5681/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752531550; c=relaxed/simple;
-	bh=WvLsStrebJnK8Q/MUh6sAHBydM1B/AoYs/mb+Oep6r8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=H7T+A189nmrCecr4OzgZ/ZBr61DVH4nP0uQ1QxyNBGDowEP/KvpzQpgbqLA5Rvd/02dL1GN5YnuJVG623l1wGOWQQmFsK9OdB8SXzvZppjr+zTndxBwvCe2fHwTXbjegaPDEac8xOwS1ZA4PMf6BjAij9PojjGZ+DveDQPkYkb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+	s=arc-20240116; t=1752531566; c=relaxed/simple;
+	bh=0vCmzadEWXoElFAc4Pjn+I40OQmJKNgMtG6iMe6iBtM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=V7rLHvMlDUVKhr0akFeN+yRb/t3qft9TwfS3TWGpjsf7ybff2zj5RYkQ65ySoMVk56lpQbzOC7/63EeYu68o0f8Ve7Os7cmSCc4aRDrYDGNy8jgmAw+97/LTllp3SZWljmCna88PNHuPw9wh6mv77/WeTstHXaLkObywwheEpX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m4i27Pt6; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-749068b9b63so3276661b3a.0
-        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 15:19:08 -0700 (PDT)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-455fddfa2c3so25533985e9.2
+        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 15:19:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752531563; x=1753136363; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Y36p8ETA+RGPd11WkmhV9BnNZVxUJM7V6bzyiXHPjm8=;
+        b=m4i27Pt6BdaL8UB5QZVp5k12eYPg1UHtQJUMvDTzU2i1L8pyuilxX34P+yh1HY2lEY
+         veUyl6WitQHOxfER05B68L7mQVWlL5ADkfZWDpLRr1YkIW8oosvcah10I5QLkp8SrWRP
+         h0e/6GLpgM2A/oW2GUzdoBz4O+Ur0IzYqUHHDvUUZXcblQ7pu3Fyxg3iRL2KBeDl3BzL
+         4sAlvFph4cu8wTjJutW3U7GoRhyY+0k7TBCfOJBCTB9oDdjniGBelQwv2Ar/cTNJjybV
+         xAGMU7QfyobxsnxoYwKqOJ0t6xClJTpW7r0ysUUCWte5s5Wb3WC3ldsv41SHtk7neoW+
+         vD2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752531547; x=1753136347;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=P9M//saJPuE88O9CpOU1r2acc8qBz1YkKh+TqxRJEJ4=;
-        b=tEqt6oZWiaAHHAUgXSAG77etlagrPGOJ31JA/JHros06l/S3SPU9epzIGKuzFFQCN6
-         AtjaurtfzqT2/TIPiSOhwvE4JM4AwbQqY/ZRKignDuCc5/mpK5hT6aKyMOWwbusoP6UD
-         qvhFX9/krBHn3JgreN+ehD0xlDOAPYaZNDSocbsmXlMLEMBAYgiK+5rkUKFtMQs89Mxg
-         48XQtkOeRBS6FVFXutgRXwx/vEfM/mIcHZd9hdr4QUeqvgcTfo/DpHuMHPAzwq46NOj5
-         80UUb+2H2Ob0BdZjCfhjYJmgVIkrXCH9ZLRuxNex1PWJeMEKGU6x+uheCAOg79qbIhfy
-         KejA==
-X-Gm-Message-State: AOJu0YxyolT8TX0Y3/N/74yYEQvsZ/ijww136MsqlClYXsbGeTz65qPf
-	//X2xZi8LPIrHGiBjLJV7usNWY8NcmS/7fBkHCHWeOb5rtTiGLGxtNlsMu11
-X-Gm-Gg: ASbGnctt17bxdBTeFCMESoTOJhpOxVgJSmEgRh7Ki0PZi88nuVMgys3rHzmLYDN/W5l
-	rvvvJQt1O+4m9oGg/9GDm4qsQ6QHZHcoqDnzCbj+t0y7ITOJ5NViI6+rmrz3yt8XISmSGcVGK5b
-	AtGmSuxJNkRTZjfjoChH0hgoMLzO/w7LI98dXb/QEwkWukVq0mYl/CgySz6XyPFd+NCWElQbhke
-	OkzSboBc81klskE35hIZciA4v/9M4FxA5n4pzwlhzqbMpYK/ufIrG/IgN85lP+wZV256C/O7ThM
-	3EYUp6t2jdr/2IVUbEYrJcc3OfEzemsXQLFr5r4GYvxF8qHk8u1gVOgVynG8SJwCGFNJC9HMf1b
-	RohLuVIbe3ljEgYV3+ZW7N4qJF6hKSR5QjRq7QNpM6Z7vc1cgK54WXaKjUao=
-X-Google-Smtp-Source: AGHT+IE+HnVPnAVNwSL60Sg7aSl1BVUsFcpkMU2jC+/shMsN8nNe88YCUjuKPaWVT5c8U93oLcGJ0g==
-X-Received: by 2002:a05:6a20:6a0e:b0:233:b51a:8597 with SMTP id adf61e73a8af0-233b51a8602mr13306534637.35.1752531547586;
-        Mon, 14 Jul 2025 15:19:07 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-b3bbe6c5660sm10674255a12.48.2025.07.14.15.19.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Jul 2025 15:19:07 -0700 (PDT)
-From: Stanislav Fomichev <sdf@fomichev.me>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Subject: [PATCH net-next v4 7/7] net: s/dev_close_many/netif_close_many/
-Date: Mon, 14 Jul 2025 15:18:55 -0700
-Message-ID: <20250714221855.3795752-8-sdf@fomichev.me>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250714221855.3795752-1-sdf@fomichev.me>
-References: <20250714221855.3795752-1-sdf@fomichev.me>
+        d=1e100.net; s=20230601; t=1752531563; x=1753136363;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y36p8ETA+RGPd11WkmhV9BnNZVxUJM7V6bzyiXHPjm8=;
+        b=rnEn0s825B+6SreEfJs/vY9yzNj+ko7/LaoHn7yTSzJ25MXjKAUsLgN0P1zcItazIM
+         I1Zmj99KxelryRZqp8/aa6/mhvlFqlOAiyBkJxY2wvkaP4t9INKEnAopnETYfhvX65NS
+         BYzxaharxkHLymiRSzZ0JXtITragSva6ko3L9lRNtF3Axnq/1Kto1Y/jwD8xVglO1czA
+         pr6XQzWFjbpkIZU84ZlPmFkB4Iz+B2CKRDPLiMF2uyVBnsWhQumtyXSnKM0+qpXZm9d5
+         p5/Z6izVM/IFD8K4bzRMTBpz7MmfHQXd9WYKquidn1WusbFRdw8LvAmcheLbbgVDbYZd
+         BJiQ==
+X-Gm-Message-State: AOJu0Yw5+MtexsGPJD6C8r8x5ltWgkcixRcbLsUzZAn+jMuf2Hng9JIj
+	9DId43uE30/g/4eBm7qf9V63xq6Yhhkd6l8H5IlaqXj2c8iarKDj693a
+X-Gm-Gg: ASbGncs+XQGZaRPeMgO9BW3FUO5tddOBvvQmwnJEcrxAkdOMElhJjkqwQ0/dDVnaJB1
+	yZjK+jPIvvC1OEE2vb900Hic8fSDtJ+K/feA2xd0kUvjxnnvDr8jnId7aD/4zChMgo/e+/paPN6
+	Fjq1difPs3U13ASc0cQqpA/660Fhn8zYG/qmRNNabNBSa2N0sRiDf2exKedN19SarQ8gpiPWx9P
+	XXz3sTLc6kKXXWOVj3TE/Hy98T3QGS1xJJQW+Nyt2/rVBSWjHkXi2DFnYbs+mcQRUICHY2kn21u
+	8oLxSJXsja7WRxT4OknsDSEl70OUdwXl2B3te2ENsHcileRwlBXh9HptYQX4znwByxdzuBIPIwz
+	GJXGGcasn8Mp9brduwvP0sXdjqXEQkZukybxQrsn4zoMJYg/SEzlEfuJDT4ooR26qV/zOetk7hq
+	9kmzef5V7WXg==
+X-Google-Smtp-Source: AGHT+IGnLum7RIDMZmZuwfEEPe1YBE4EuFvZFEAJHXCsTeNceifpETYz0KklFcyLIeqt1hDjJ2pljg==
+X-Received: by 2002:a05:600c:310a:b0:43d:4686:5cfb with SMTP id 5b1f17b1804b1-4562751c28bmr2315635e9.27.1752531562671;
+        Mon, 14 Jul 2025 15:19:22 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8bd1924sm13693368f8f.16.2025.07.14.15.19.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Jul 2025 15:19:22 -0700 (PDT)
+Message-ID: <d0d2439c-3461-4be4-9014-70c93ab9a1d2@gmail.com>
+Date: Mon, 14 Jul 2025 23:19:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 04/11] selftests: drv-net: rss_api: test setting
+ indirection table via Netlink
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, donald.hunter@gmail.com,
+ shuah@kernel.org, kory.maincent@bootlin.com, maxime.chevallier@bootlin.com,
+ sdf@fomichev.me, gal@nvidia.com
+References: <20250711015303.3688717-1-kuba@kernel.org>
+ <20250711015303.3688717-5-kuba@kernel.org>
+Content-Language: en-GB
+From: Edward Cree <ecree.xilinx@gmail.com>
+In-Reply-To: <20250711015303.3688717-5-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Commit cc34acd577f1 ("docs: net: document new locking reality")
-introduced netif_ vs dev_ function semantics: the former expects locked
-netdev, the latter takes care of the locking. We don't strictly
-follow this semantics on either side, but there are more dev_xxx handlers
-now that don't fit. Rename them to netif_xxx where appropriate.
+On 11/07/2025 02:52, Jakub Kicinski wrote:
+> Test setting indirection table via Netlink.
+> 
+>   # ./tools/testing/selftests/drivers/net/hw/rss_api.py
+>   TAP version 13
+>   1..6
+>   ok 1 rss_api.test_rxfh_nl_set_fail
+>   ok 2 rss_api.test_rxfh_nl_set_indir
+>   ok 3 rss_api.test_rxfh_nl_set_indir_ctx
+>   ok 4 rss_api.test_rxfh_indir_ntf
+>   ok 5 rss_api.test_rxfh_indir_ctx_ntf
+>   ok 6 rss_api.test_rxfh_fields
+>   # Totals: pass:6 fail:0 xfail:0 xpass:0 skip:0 error:0
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-netif_close_many is used only by vlan/dsa and one mtk driver, so move it into
-NETDEV_INTERNAL namespace.
+...
 
-Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
----
- drivers/net/ethernet/mediatek/mtk_eth_soc.c |  3 ++-
- include/linux/netdevice.h                   |  2 +-
- net/8021q/vlan.c                            |  3 ++-
- net/core/dev.c                              | 10 +++++-----
- net/dsa/dsa.c                               |  3 ++-
- net/dsa/user.c                              |  2 +-
- 6 files changed, 13 insertions(+), 10 deletions(-)
+> +def test_rxfh_nl_set_indir_ctx(cfg):
+> +    """
+> +    Test setting indirection table via Netlink.
 
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index 11ee7e1829bf..5a5fcde76dc0 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -4967,7 +4967,7 @@ void mtk_eth_set_dma_device(struct mtk_eth *eth, struct device *dma_dev)
- 		list_add_tail(&dev->close_list, &dev_list);
- 	}
- 
--	dev_close_many(&dev_list, false);
-+	netif_close_many(&dev_list, false);
- 
- 	eth->dma_dev = dma_dev;
- 
-@@ -5610,3 +5610,4 @@ module_platform_driver(mtk_driver);
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("John Crispin <blogic@openwrt.org>");
- MODULE_DESCRIPTION("Ethernet driver for MediaTek SoC");
-+MODULE_IMPORT_NS("NETDEV_INTERNAL");
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 295457fbcfd1..e6131c529af4 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3344,7 +3344,7 @@ int netif_open(struct net_device *dev, struct netlink_ext_ack *extack);
- int dev_open(struct net_device *dev, struct netlink_ext_ack *extack);
- void netif_close(struct net_device *dev);
- void dev_close(struct net_device *dev);
--void dev_close_many(struct list_head *head, bool unlink);
-+void netif_close_many(struct list_head *head, bool unlink);
- void netif_disable_lro(struct net_device *dev);
- void dev_disable_lro(struct net_device *dev);
- int dev_loopback_xmit(struct net *net, struct sock *sk, struct sk_buff *newskb);
-diff --git a/net/8021q/vlan.c b/net/8021q/vlan.c
-index df19a9c0c9d9..7b29e0be74bd 100644
---- a/net/8021q/vlan.c
-+++ b/net/8021q/vlan.c
-@@ -446,7 +446,7 @@ static int vlan_device_event(struct notifier_block *unused, unsigned long event,
- 				list_add(&vlandev->close_list, &close_list);
- 		}
- 
--		dev_close_many(&close_list, false);
-+		netif_close_many(&close_list, false);
- 
- 		list_for_each_entry_safe(vlandev, tmp, &close_list, close_list) {
- 			vlan_stacked_transfer_operstate(dev, vlandev,
-@@ -741,3 +741,4 @@ module_exit(vlan_cleanup_module);
- MODULE_DESCRIPTION("802.1Q/802.1ad VLAN Protocol");
- MODULE_LICENSE("GPL");
- MODULE_VERSION(DRV_VERSION);
-+MODULE_IMPORT_NS("NETDEV_INTERNAL");
-diff --git a/net/core/dev.c b/net/core/dev.c
-index dce23b445ad1..26253802f6cd 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -1767,7 +1767,7 @@ static void __dev_close(struct net_device *dev)
- 	list_del(&single);
- }
- 
--void dev_close_many(struct list_head *head, bool unlink)
-+void netif_close_many(struct list_head *head, bool unlink)
- {
- 	struct net_device *dev, *tmp;
- 
-@@ -1785,7 +1785,7 @@ void dev_close_many(struct list_head *head, bool unlink)
- 			list_del_init(&dev->close_list);
- 	}
- }
--EXPORT_SYMBOL(dev_close_many);
-+EXPORT_SYMBOL_NS_GPL(netif_close_many, "NETDEV_INTERNAL");
- 
- void netif_close(struct net_device *dev)
- {
-@@ -1793,7 +1793,7 @@ void netif_close(struct net_device *dev)
- 		LIST_HEAD(single);
- 
- 		list_add(&dev->close_list, &single);
--		dev_close_many(&single, true);
-+		netif_close_many(&single, true);
- 		list_del(&single);
- 	}
- }
-@@ -12070,7 +12070,7 @@ void unregister_netdevice_many_notify(struct list_head *head,
- 			netdev_lock(dev);
- 		}
- 	}
--	dev_close_many(&close_head, true);
-+	netif_close_many(&close_head, true);
- 	/* ... now unlock them and go over the rest. */
- 	list_for_each_entry(dev, head, unreg_list) {
- 		if (netdev_need_ops_lock(dev))
-@@ -12078,7 +12078,7 @@ void unregister_netdevice_many_notify(struct list_head *head,
- 		else
- 			list_add_tail(&dev->close_list, &close_head);
- 	}
--	dev_close_many(&close_head, true);
-+	netif_close_many(&close_head, true);
- 
- 	list_for_each_entry(dev, head, unreg_list) {
- 		/* And unlink it from device chain. */
-diff --git a/net/dsa/dsa.c b/net/dsa/dsa.c
-index 436a7e1b412a..5b01a0e43ebe 100644
---- a/net/dsa/dsa.c
-+++ b/net/dsa/dsa.c
-@@ -1621,7 +1621,7 @@ void dsa_switch_shutdown(struct dsa_switch *ds)
- 	dsa_switch_for_each_cpu_port(dp, ds)
- 		list_add(&dp->conduit->close_list, &close_list);
- 
--	dev_close_many(&close_list, true);
-+	netif_close_many(&close_list, true);
- 
- 	dsa_switch_for_each_user_port(dp, ds) {
- 		conduit = dsa_port_to_conduit(dp);
-@@ -1829,3 +1829,4 @@ MODULE_AUTHOR("Lennert Buytenhek <buytenh@wantstofly.org>");
- MODULE_DESCRIPTION("Driver for Distributed Switch Architecture switch chips");
- MODULE_LICENSE("GPL");
- MODULE_ALIAS("platform:dsa");
-+MODULE_IMPORT_NS("NETDEV_INTERNAL");
-diff --git a/net/dsa/user.c b/net/dsa/user.c
-index e9334520c54a..f59d66f0975d 100644
---- a/net/dsa/user.c
-+++ b/net/dsa/user.c
-@@ -3604,7 +3604,7 @@ static int dsa_user_netdevice_event(struct notifier_block *nb,
- 			list_add(&dp->user->close_list, &close_list);
- 		}
- 
--		dev_close_many(&close_list, true);
-+		netif_close_many(&close_list, true);
- 
- 		return NOTIFY_OK;
- 	}
--- 
-2.50.0
+"... for custom context via Netlink"?
 
+Apart from that LGTM.
+Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
 
