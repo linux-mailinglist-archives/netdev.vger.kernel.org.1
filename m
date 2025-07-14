@@ -1,487 +1,201 @@
-Return-Path: <netdev+bounces-206743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A586B043FC
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 17:33:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4769BB043DE
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 17:30:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 829EA164AB4
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 15:31:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 038C87B8492
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 15:28:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A810B26E17D;
-	Mon, 14 Jul 2025 15:25:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A58226B0B2;
+	Mon, 14 Jul 2025 15:25:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KyCaTSba"
+	dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b="O7VHYjXy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012034.outbound.protection.outlook.com [40.107.200.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6781B26CE26;
-	Mon, 14 Jul 2025 15:25:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752506756; cv=none; b=b5i+yBgpwrG5bHNbeUkT6RoeNH9rAozei9UbMl/sgF/rwag2ZOHjQVDC/cBelLPOq38iM8ilQc9+9gYTRJEcBNFlkDQx0Vj5a3Svz0gow3cVtgo0flZgl2iaWg7xcHXGF9IE7bNK0fz+Rr1CWEF6KH4OqZANCjjS12isvLKTkRc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752506756; c=relaxed/simple;
-	bh=yAgzo0iDKo5qKAsCdozZMYWrSjDHH+AyXPr4T/UOJPU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=EcoxEbWYnfnTqhXF8cuH+LecUeGmHZ1poXqfb6TqMN2xdZ7vCEbI/Ycmb9WcAe0GC2G3VD+hePLhjSnqw740TqmHMLITlXkwBJ+Qvx0cyauSUw3wKqg3qhblLRTqOOoZE9i2k50h3/Mt1oLpN7Mh9UYDJJ6qL2vumT7YLHU1MdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KyCaTSba; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78BE4C4CEED;
-	Mon, 14 Jul 2025 15:25:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752506756;
-	bh=yAgzo0iDKo5qKAsCdozZMYWrSjDHH+AyXPr4T/UOJPU=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=KyCaTSbaEgpnGxbnkPBKgnVooSX3lbBrlHmCp8MiHMIPT8CayXoGQPxw7MTvBzGZP
-	 sPtCBfzbhIwWxtUyErzmLv9OEmkPPE1pzqIzNys3ygS6DPN3LBgPAPV2etrA1Gm3pj
-	 3qBV6lb4Z1JWut36Hmz2oh7qU+X++Uwcab8Iwo4CB2RSXtq8Ht+HkPho/ObUs0R16F
-	 45RT28UXVUqjgo5dzhZLGPtOscRpOC7PRGIie18XWIiT6Oy7aiSZANdoyuFdeLR1Ic
-	 2IsozytO+PvLnNyT0skNe7iDRrZMXol9y7CacaKPcQf7/Gg6bKpozvCSGkPwFqvRvZ
-	 +6OBvVJx41Piw==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Mon, 14 Jul 2025 17:25:20 +0200
-Subject: [PATCH net-next v3 7/7] net: airoha: Add airoha_offload.h header
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9588823A9BB;
+	Mon, 14 Jul 2025 15:25:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.34
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752506749; cv=fail; b=T+xZ1rcuuAhMFSlYJWK7+EcOWIGCehKSPeCXzEsDZXLJ4Hm4jjO91/W+atw2ei1tYzOK3GIfZ3p1lnN6W4IMJdaypD77XzX2NdI8bZBcoBuwiXTU7L3JJQEcLfzzLBD/jPaf9elRf1SJ4CzEju1v5DwQVYdWh5r27XjRq+XRX3M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752506749; c=relaxed/simple;
+	bh=w5ZI7TTU0cORvA1cKiRhqfTUODR/UQ9pZJZQlxWKM0k=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=IxSG/Jn1Dj5VCsVWX0OGmO5K8zfFWTQ9ErQB1hnEQasOF9FyrIHGBHZTva8GmMS88rRTvejDCHk0ZoTDnXoLEWlBHBTM5KNV50XNZlxb4aCJ4fXtgBUYYu8Hrx7ERsEcDORdA3bTf8qUM22eTuN5G+fc2n3gfLX8CumCIWQFkls=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=O7VHYjXy; arc=fail smtp.client-ip=40.107.200.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altera.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=aSZ/mI0168EWPO9g1gW6yWkKoDG6Qem68tOyYvwVj4XQuCMdiFXKqqAvyyGENIqhVjNXdGDHx54jhOKnpV7n/3yXlvYy3ub7pxfqCC4WtZ1yepla3QnBra5ATyTKDmNPwZo0TriqPNPBCQ1HhOOyMDrL67CcAFcv2lTD37xuw3PuviQuRDIYXnXKGRTNH7geOJZIdCYugxD6L3gtQvEr1QkwSb10MBiKjwAyedh5r7pwsNUWTlYEVOpoYAp1R5cpqGjRGCDmOeS9tTqZTqEEz+YXf3aFcYg2+kgK+ieAb5hMMtSsjbAGSrzEOeA1hxv9IAL9vs2FoZeuRP0i3s/fRA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HRgFKGRqWwZwC2MrVf9mTaxaoAmdNpgj+qUcDwYbZgc=;
+ b=yF5yCqsp0xjZBxZcyFBwrE9fxJJrdaij7VWuASdBtjUwkIoXWM/9NleeQW/olkfP3XNoW8vRYu87l2JQ4Hi7Kdvz5OmGXSE0c14hZX+2iLs+myECXyCSibVEJr7df8j2+nHwMGOxQD+lrcQLFrQu1XOgrfOJ3lSbntsY/eDmDl6lvRjn89LNOD8CC6gloAtEWEalIO6+ch5dBjM3fqyAz0pWgR64wYcZm4GJFQW4eDkrEihmkM/0jrPDkdNIGEvQIHrc+/mJPM7lzaXPW3JYjDIJF60/MWEXSd09INFx9ospJB9y1GtBXCG8tWbO7aZqHsgKtWUJd1+80PhbCySExw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
+ dkim=pass header.d=altera.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HRgFKGRqWwZwC2MrVf9mTaxaoAmdNpgj+qUcDwYbZgc=;
+ b=O7VHYjXyEZ0gZnqEKyGb4HW7gZyOWnqucTJ6471ZrBRHR/XSCfVUyjvgTsu1HI3mrxVYccYiyuWXQNN5/fldcCPya75+xD6plVhbUVPDUhW2cXPJ7BOpQ9Gng7A5ckUy5KHNKqlSGK5UG8J1eWmGr2gfFBvMBiAvt/Zj06zCpbA5u8CZA5WuQfbfuaujlPy5tUtx7WH4K5z+9rFgdMUQMTY27NylU6W0Kh5y5G0nuN56ZVfCKkrWYe5PtoliWKUa0GNdJMzSgD3FvYC649yA6VtVYYtjXVtXHDnFCd0GvAkx47YTCDrkVPkMqVlHrWywDY4GNanKOOTFLVpHfWo7qw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=altera.com;
+Received: from BYAPR03MB3461.namprd03.prod.outlook.com (2603:10b6:a02:b4::23)
+ by PH0PR03MB6368.namprd03.prod.outlook.com (2603:10b6:510:aa::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.25; Mon, 14 Jul
+ 2025 15:25:44 +0000
+Received: from BYAPR03MB3461.namprd03.prod.outlook.com
+ ([fe80::706b:dd15:bc81:313c]) by BYAPR03MB3461.namprd03.prod.outlook.com
+ ([fe80::706b:dd15:bc81:313c%6]) with mapi id 15.20.8901.024; Mon, 14 Jul 2025
+ 15:25:44 +0000
+From: Matthew Gerlach <matthew.gerlach@altera.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	dinguyen@kernel.org,
+	maxime.chevallier@bootlin.com,
+	richardcochran@gmail.com,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Matthew Gerlach <matthew.gerlach@altera.com>
+Subject: [PATCH 0/4] arm64: dts: socfpga: enable ethernet support for Agilex5
+Date: Mon, 14 Jul 2025 08:25:24 -0700
+Message-ID: <20250714152528.311398-1-matthew.gerlach@altera.com>
+X-Mailer: git-send-email 2.49.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BYAPR02CA0001.namprd02.prod.outlook.com
+ (2603:10b6:a02:ee::14) To BYAPR03MB3461.namprd03.prod.outlook.com
+ (2603:10b6:a02:b4::23)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250714-airoha-en7581-wlan-offlaod-v3-7-80abf6aae9e4@kernel.org>
-References: <20250714-airoha-en7581-wlan-offlaod-v3-0-80abf6aae9e4@kernel.org>
-In-Reply-To: <20250714-airoha-en7581-wlan-offlaod-v3-0-80abf6aae9e4@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org
-X-Mailer: b4 0.14.2
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR03MB3461:EE_|PH0PR03MB6368:EE_
+X-MS-Office365-Filtering-Correlation-Id: 90a195bf-35d9-4be1-0bc7-08ddc2eab302
+X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|7416014|376014|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Gl6VvWnqZxVLJ0g7E7JjP5Fvt1rs477Koi3jWZ0jZg87EtQIRSGCyD5I9Huz?=
+ =?us-ascii?Q?pwQWwi/s/g/nJEfMNPtDqoQkOtEcks/Du+cHL2ziVSAI6BSn8x3giW4vNQCC?=
+ =?us-ascii?Q?q1BgMr1z79YyyWhwj3tFbQWMPZkivDPI8jb9SxD63qtZvW97fJaI9sQpteuY?=
+ =?us-ascii?Q?L2zbG0cmbHkh+6ifeHx6w4lBFaUa3ZJ1EJPTfRQ6jMZC3Imuh3LG1U/iP0W1?=
+ =?us-ascii?Q?TxV6lqPt9um9she4MZM4xSGV2uLngCAdq9W/nH4BBYbjg2qUMQsHtgqbkznc?=
+ =?us-ascii?Q?sxIrLK314I6QCGYFgzHj3yXzbwf6wPEElpPyXS5h2TEWTAFJvVbMePzO6yvA?=
+ =?us-ascii?Q?y7aQClWT6y8IpToqyHI7LV98CcEEWIYCBwX83WHWiaoiHB1fgqaVDH8lsmf5?=
+ =?us-ascii?Q?VOmedwjSbmQDWBFqXL0Lr2/rSDR+l2tQfJpkgDgVhQCK6Z/u+fQK4Od4qxMK?=
+ =?us-ascii?Q?4Zx2SRqoUfz54LDmIJAO+hbycFLGXJ4enck+FWTEzei+99mvIs+V0X8aNEiI?=
+ =?us-ascii?Q?Yycdylcuif39gcsULwhw/e40ZF6Q1Ksk8aHKtWol3v9fNTk5Ids2NVSKHMF5?=
+ =?us-ascii?Q?mqs5IPR5NmpZ9hnqnOvMeJ+rm/q+EyjeVTwOOPcoXbYXs+mb0OjNdfmjZVEV?=
+ =?us-ascii?Q?vVFILHUlc9xPKBYs8ieeFYYjzkTf3MhF71V0pz4eOQqkcZRrXRszf9rstcHk?=
+ =?us-ascii?Q?LugV8Vun/O27d6bpJa93H+Eyj24WKHFqWlprbCWtljhVFgKJOhZF771VACMo?=
+ =?us-ascii?Q?UFBl9S2iWTjz1x9hzzh+ZdIYofNdLnusaKYdtYEYdtUezCJf+qS2D4xHSzFu?=
+ =?us-ascii?Q?Rji/VkxgsFOpQu3LsnJdrgFqCIW/PYDEedOyGMUKErAjECtVqUYkmY9bMQBz?=
+ =?us-ascii?Q?pjExEnE6wftalqYqwv8xo57Dn+52k+AEImSPZPMouIq+7xRW8zh7bGheD8Zw?=
+ =?us-ascii?Q?TUhyiAgz5JwzgE3VgL/2j9UFNX3AbSm7iZpoWVyrGseCqiyamFBB6Z3nURhj?=
+ =?us-ascii?Q?sA86ZY8Kn0e+uFWBIFnd7ET2njTXq+jKap0O8NCEn2aeMpv4idYnoB0ox2YL?=
+ =?us-ascii?Q?N830Ir+JG9hboz0XYkSRc0GFzQ8GD96KGNOVCbSRFRvKC0cZrt6jsifLYwgi?=
+ =?us-ascii?Q?yTF/F099Il+JJjouA9XUBOtYzYO53s4xxfe9mveM75LlLVFUKkYBdDPrgW9f?=
+ =?us-ascii?Q?MSNnw0aGHjcFfhBthcS9IKXC5Zzn9zdD9T78JFsjePChU3Kl1yUK/x9/V7Qd?=
+ =?us-ascii?Q?fepfXFei33Kf0/fr8dYFpWVDRt9b2bUjkJDsWcT+prFMpydJA/zXtEwnrzUe?=
+ =?us-ascii?Q?Ldq/8jR+ww8mlv57BG6S2WWNbRm+sqeMMEu8Q70cCLX2gTygb/n7k/Iiu+2i?=
+ =?us-ascii?Q?XWdW6OFeFVMj6d77nCj/9UHMInmSafV5flDiXLUUpvulN/lzv+daZ7eQv/I4?=
+ =?us-ascii?Q?RthM5i7l+GHfqUAwex8sBR0IhbMm0+XLMnL7ms56qB4yDmJQuTu7Hw=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR03MB3461.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?cenSZ4nQHFiP2+z+n+6nM6iZeOR4NNTpGpJ+pF7GQ897JHh62/F0h5HypVc2?=
+ =?us-ascii?Q?3h5CmwsdeYcZvIFBT3TcptZrrH8iqIlKu5+UpjCeFCLwuYVPov44HxU5AAdr?=
+ =?us-ascii?Q?CKoSWYS662lTtd72MsuR/fMnWTazC6ATSr+ZB1QBXxhvJzz7DVTmzeUSULo2?=
+ =?us-ascii?Q?i9H16j2c0oxg2+mo5JUJ3hV0q0ADIKge0BAGLMs0GmQBS10FDErTDM15csF9?=
+ =?us-ascii?Q?kuuRlSJpDnbmNSdDxoPwV+q9bur9zqao92TCFZqe62Azi526a5B7urcBCpiH?=
+ =?us-ascii?Q?Mfc+LSTr8ZJeeQcVDTdJZQZo0QIx2oX8nzJVL/Yh7O6Kgl6b/kNRzYKkwYUI?=
+ =?us-ascii?Q?xtSNGNL2i2tekEjwd/07KOEgo5hU5GXS+Kta6asn3sTfihdSyY2T1f0RcbjJ?=
+ =?us-ascii?Q?Rvzz947LOnqTXBYC6wakBkaeer3LSFT1TeU/O6ER7IigHAy6r13QO2bHVzN3?=
+ =?us-ascii?Q?5Wbl7m+X0Lh2+cXJ50QzvF0KDGEt9KqqeiZUn//dpZdCrjGyDO+fb+eGF1pu?=
+ =?us-ascii?Q?B9KHHo46QQjk5Okant8VHpXxpBKrQ68j/R22UNDsFg2DmypFXRQdzEEED6mU?=
+ =?us-ascii?Q?6BKbTHkke+jHwwyuCj3B/A/znJIJSbMRLF/3MIsIzX8XITpiRYwHE/mnH8QA?=
+ =?us-ascii?Q?O3YtqlOtq5yT8FK+BhVYvSzTtpjkFYzbFcNJSuQ7JQdl/+jU+41XNzOYs57y?=
+ =?us-ascii?Q?PLDg/L7yVdXyDkrnwaVIodlQEZlwEqEeLCSLuyozRH+ZOR3Rwo6Tg3jTOK8C?=
+ =?us-ascii?Q?Odr0yd39HXd1xjnPWwMphvJ/IUctYNO3trRCum3aTgCKJwofpayDtZsz25un?=
+ =?us-ascii?Q?1KonybQyXY71j+Y/QlwLF9yxCfK4cJ4IXR6nddTr0fGilkJ83k3hWrjHhFoo?=
+ =?us-ascii?Q?5e5BaXC7BtarPSL7zCAxDGa7swLbJIEJ00q8+n7DfwhHhkfNhUsIiAIlZcy6?=
+ =?us-ascii?Q?7Z5lAKbRDi3LwT/pZ3RDrn3PZnH93Sp9Bmd2IMYG4rYqv+X10dIZTzO6M5UZ?=
+ =?us-ascii?Q?EpGdvwxNIAlhmA7z1l7ZZtycuHBnjLcRZxtCOL18WPq+e9BdDujtrjGj7ZdZ?=
+ =?us-ascii?Q?YCuQm5YGRLMjiLyNOqxpxFteerIvtUoPhacr8QyQHcQ+YkVNDkfcC2/LJqhH?=
+ =?us-ascii?Q?1xDR+NGM0ubrVU3rFj/yOmvtzr9+iEcOVE/z7Fqfy2tpRRfm5H7WXx99cQNT?=
+ =?us-ascii?Q?6YJHDnxGMj0CE5xWE4RPE9HSNwO+DLM+lKKB/tU0ecxcCnuNjnk6wmorSxXs?=
+ =?us-ascii?Q?K9/k10zQlTbdYbak9hlojnSdI6Z+AMpTsqx291DmMj8zVjAdr1DVWNlZiLQN?=
+ =?us-ascii?Q?5nkuC/TzPLGT1B+RydG+iefWtvK4IPpyXVP0JZ7NFbpwPyGl4LDESisfnnHl?=
+ =?us-ascii?Q?UEh/egzsIQiQ4+zh5W/2bNHQExEUqRkAWWh6Z6tthlzSmUXsjjZ1tVaibX1r?=
+ =?us-ascii?Q?/aQYOqzOPzp3dK7vWHVT2rKV4ltongdhtt9CUJ9PBPsWOQTgfWyUvianPwD7?=
+ =?us-ascii?Q?Z4Wr7g+HIrxTr4KFcf1WuOmBqZ1PKQN82F9jSqwsT3LvieRf3uhnWd6MXjdt?=
+ =?us-ascii?Q?ewfqQk4/im2m69EPYypYIF8nbR87SGl3Ia4eavT49q3MkYABrm5jXfycyF7L?=
+ =?us-ascii?Q?GQ=3D=3D?=
+X-OriginatorOrg: altera.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 90a195bf-35d9-4be1-0bc7-08ddc2eab302
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR03MB3461.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2025 15:25:44.3747
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8Z10CWaPhI35+uYaC+/xGA/lbiQDzOL+QN+K4De0S/DHNambGz8pdRZWGhcbt4rc4yYXhIOCHf3o4VHUfOT7sDubPNfZWYu3f6Yb1/YTWVk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR03MB6368
 
-Move NPU definitions to airoha_offload.h in include/linux/soc/airoha/ in
-order to allow the MT76 driver to access the callback definitions.
+This patch set enables ethernet support for the Agilex5 family SOCFPGAs,
+and specifically enables gmac2 on the Agilex5 SOCFPGA Premium Development Kit.
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/airoha/airoha_npu.c  |   2 +-
- drivers/net/ethernet/airoha/airoha_npu.h  | 102 ------------
- drivers/net/ethernet/airoha/airoha_ppe.c  |   2 +-
- include/linux/soc/airoha/airoha_offload.h | 259 ++++++++++++++++++++++++++++++
- 4 files changed, 261 insertions(+), 104 deletions(-)
+Patch 1 defines Agilex5 compatibility string in the device tree bindings.
 
-diff --git a/drivers/net/ethernet/airoha/airoha_npu.c b/drivers/net/ethernet/airoha/airoha_npu.c
-index 90000496b6a234897d4f208ab78d54af14be4aac..00c0144224a7a9e6321e9959c02400e3cb384126 100644
---- a/drivers/net/ethernet/airoha/airoha_npu.c
-+++ b/drivers/net/ethernet/airoha/airoha_npu.c
-@@ -11,9 +11,9 @@
- #include <linux/of_platform.h>
- #include <linux/of_reserved_mem.h>
- #include <linux/regmap.h>
-+#include <linux/soc/airoha/airoha_offload.h>
- 
- #include "airoha_eth.h"
--#include "airoha_npu.h"
- 
- #define NPU_EN7581_FIRMWARE_DATA		"airoha/en7581_npu_data.bin"
- #define NPU_EN7581_FIRMWARE_RV32		"airoha/en7581_npu_rv32.bin"
-diff --git a/drivers/net/ethernet/airoha/airoha_npu.h b/drivers/net/ethernet/airoha/airoha_npu.h
-deleted file mode 100644
-index 981b283806fa8347256f6dce756729daa4736e47..0000000000000000000000000000000000000000
---- a/drivers/net/ethernet/airoha/airoha_npu.h
-+++ /dev/null
-@@ -1,102 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-only */
--/*
-- * Copyright (c) 2025 AIROHA Inc
-- * Author: Lorenzo Bianconi <lorenzo@kernel.org>
-- */
--
--#define NPU_NUM_CORES		8
--#define NPU_NUM_IRQ		6
--
--enum airoha_npu_wlan_set_cmd {
--	WLAN_FUNC_SET_WAIT_PCIE_ADDR,
--	WLAN_FUNC_SET_WAIT_DESC,
--	WLAN_FUNC_SET_WAIT_NPU_INIT_DONE,
--	WLAN_FUNC_SET_WAIT_TRAN_TO_CPU,
--	WLAN_FUNC_SET_WAIT_BA_WIN_SIZE,
--	WLAN_FUNC_SET_WAIT_DRIVER_MODEL,
--	WLAN_FUNC_SET_WAIT_DEL_STA,
--	WLAN_FUNC_SET_WAIT_DRAM_BA_NODE_ADDR,
--	WLAN_FUNC_SET_WAIT_PKT_BUF_ADDR,
--	WLAN_FUNC_SET_WAIT_IS_TEST_NOBA,
--	WLAN_FUNC_SET_WAIT_FLUSHONE_TIMEOUT,
--	WLAN_FUNC_SET_WAIT_FLUSHALL_TIMEOUT,
--	WLAN_FUNC_SET_WAIT_IS_FORCE_TO_CPU,
--	WLAN_FUNC_SET_WAIT_PCIE_STATE,
--	WLAN_FUNC_SET_WAIT_PCIE_PORT_TYPE,
--	WLAN_FUNC_SET_WAIT_ERROR_RETRY_TIMES,
--	WLAN_FUNC_SET_WAIT_BAR_INFO,
--	WLAN_FUNC_SET_WAIT_FAST_FLAG,
--	WLAN_FUNC_SET_WAIT_NPU_BAND0_ONCPU,
--	WLAN_FUNC_SET_WAIT_TX_RING_PCIE_ADDR,
--	WLAN_FUNC_SET_WAIT_TX_DESC_HW_BASE,
--	WLAN_FUNC_SET_WAIT_TX_BUF_SPACE_HW_BASE,
--	WLAN_FUNC_SET_WAIT_RX_RING_FOR_TXDONE_HW_BASE,
--	WLAN_FUNC_SET_WAIT_TX_PKT_BUF_ADDR,
--	WLAN_FUNC_SET_WAIT_INODE_TXRX_REG_ADDR,
--	WLAN_FUNC_SET_WAIT_INODE_DEBUG_FLAG,
--	WLAN_FUNC_SET_WAIT_INODE_HW_CFG_INFO,
--	WLAN_FUNC_SET_WAIT_INODE_STOP_ACTION,
--	WLAN_FUNC_SET_WAIT_INODE_PCIE_SWAP,
--	WLAN_FUNC_SET_WAIT_RATELIMIT_CTRL,
--	WLAN_FUNC_SET_WAIT_HWNAT_INIT,
--	WLAN_FUNC_SET_WAIT_ARHT_CHIP_INFO,
--	WLAN_FUNC_SET_WAIT_TX_BUF_CHECK_ADDR,
--	WLAN_FUNC_SET_WAIT_DEBUG_ARRAY_ADDR,
--};
--
--enum airoha_npu_wlan_get_cmd {
--	WLAN_FUNC_GET_WAIT_NPU_INFO,
--	WLAN_FUNC_GET_WAIT_LAST_RATE,
--	WLAN_FUNC_GET_WAIT_COUNTER,
--	WLAN_FUNC_GET_WAIT_DBG_COUNTER,
--	WLAN_FUNC_GET_WAIT_RXDESC_BASE,
--	WLAN_FUNC_GET_WAIT_WCID_DBG_COUNTER,
--	WLAN_FUNC_GET_WAIT_DMA_ADDR,
--	WLAN_FUNC_GET_WAIT_RING_SIZE,
--	WLAN_FUNC_GET_WAIT_NPU_SUPPORT_MAP,
--	WLAN_FUNC_GET_WAIT_MDC_LOCK_ADDRESS,
--};
--
--struct airoha_npu {
--	struct device *dev;
--	struct regmap *regmap;
--
--	struct airoha_npu_core {
--		struct airoha_npu *npu;
--		/* protect concurrent npu memory accesses */
--		spinlock_t lock;
--		struct work_struct wdt_work;
--	} cores[NPU_NUM_CORES];
--
--	int irqs[NPU_NUM_IRQ];
--
--	struct airoha_foe_stats __iomem *stats;
--
--	struct {
--		int (*ppe_init)(struct airoha_npu *npu);
--		int (*ppe_deinit)(struct airoha_npu *npu);
--		int (*ppe_flush_sram_entries)(struct airoha_npu *npu,
--					      dma_addr_t foe_addr,
--					      int sram_num_entries);
--		int (*ppe_foe_commit_entry)(struct airoha_npu *npu,
--					    dma_addr_t foe_addr,
--					    u32 entry_size, u32 hash,
--					    bool ppe2);
--		int (*wlan_init_reserved_memory)(struct airoha_npu *npu);
--		int (*wlan_send_msg)(struct airoha_npu *npu, int ifindex,
--				     enum airoha_npu_wlan_set_cmd func_id,
--				     u32 data, gfp_t gfp);
--		int (*wlan_get_msg)(struct airoha_npu *npu, int ifindex,
--				    enum airoha_npu_wlan_get_cmd func_id,
--				    u32 *data, gfp_t gfp);
--		u32 (*wlan_get_queue_addr)(struct airoha_npu *npu, int qid,
--					   bool xmit);
--		void (*wlan_set_irq_status)(struct airoha_npu *npu, u32 val);
--		u32 (*wlan_get_irq_status)(struct airoha_npu *npu, int q);
--		void (*wlan_enable_irq)(struct airoha_npu *npu, int q);
--		void (*wlan_disable_irq)(struct airoha_npu *npu, int q);
--	} ops;
--};
--
--struct airoha_npu *airoha_npu_get(struct device *dev, dma_addr_t *stats_addr);
--void airoha_npu_put(struct airoha_npu *npu);
-diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
-index c354d536bc66e97ab853792e4ab4273283d2fb91..5d12bde6b20a89b3037ae4405b383d75307e8239 100644
---- a/drivers/net/ethernet/airoha/airoha_ppe.c
-+++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-@@ -7,10 +7,10 @@
- #include <linux/ip.h>
- #include <linux/ipv6.h>
- #include <linux/rhashtable.h>
-+#include <linux/soc/airoha/airoha_offload.h>
- #include <net/ipv6.h>
- #include <net/pkt_cls.h>
- 
--#include "airoha_npu.h"
- #include "airoha_regs.h"
- #include "airoha_eth.h"
- 
-diff --git a/include/linux/soc/airoha/airoha_offload.h b/include/linux/soc/airoha/airoha_offload.h
-new file mode 100644
-index 0000000000000000000000000000000000000000..299455abc6dad82791eef6d03adff65f08ed8d2f
---- /dev/null
-+++ b/include/linux/soc/airoha/airoha_offload.h
-@@ -0,0 +1,259 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (c) 2025 AIROHA Inc
-+ * Author: Lorenzo Bianconi <lorenzo@kernel.org>
-+ */
-+#ifndef AIROHA_OFFLOAD_H
-+#define AIROHA_OFFLOAD_H
-+
-+#include <linux/spinlock.h>
-+#include <linux/workqueue.h>
-+
-+#define NPU_NUM_CORES		8
-+#define NPU_NUM_IRQ		6
-+#define NPU_RX0_DESC_NUM	512
-+#define NPU_RX1_DESC_NUM	512
-+
-+/* CTRL */
-+#define NPU_RX_DMA_DESC_LAST_MASK	BIT(29)
-+#define NPU_RX_DMA_DESC_LEN_MASK	GENMASK(28, 15)
-+#define NPU_RX_DMA_DESC_CUR_LEN_MASK	GENMASK(14, 1)
-+#define NPU_RX_DMA_DESC_DONE_MASK	BIT(0)
-+/* INFO */
-+#define NPU_RX_DMA_PKT_COUNT_MASK	GENMASK(31, 28)
-+#define NPU_RX_DMA_PKT_ID_MASK		GENMASK(28, 26)
-+#define NPU_RX_DMA_SRC_PORT_MASK	GENMASK(25, 21)
-+#define NPU_RX_DMA_CRSN_MASK		GENMASK(20, 16)
-+#define NPU_RX_DMA_FOE_ID_MASK		GENMASK(15, 0)
-+/* DATA */
-+#define NPU_RX_DMA_SID_MASK		GENMASK(31, 16)
-+#define NPU_RX_DMA_FRAG_TYPE_MASK	GENMASK(15, 14)
-+#define NPU_RX_DMA_PRIORITY_MASK	GENMASK(13, 10)
-+#define NPU_RX_DMA_RADIO_ID_MASK	GENMASK(9, 6)
-+#define NPU_RX_DMA_VAP_ID_MASK		GENMASK(5, 2)
-+#define NPU_RX_DMA_FRAME_TYPE_MASK	GENMASK(1, 0)
-+
-+struct airoha_npu_rx_dma_desc {
-+	u32 ctrl;
-+	u32 info;
-+	u32 data;
-+	u32 addr;
-+	u64 rsv;
-+} __packed;
-+
-+/* CTRL */
-+#define NPU_TX_DMA_DESC_SCHED_MASK	BIT(31)
-+#define NPU_TX_DMA_DESC_LEN_MASK	GENMASK(30, 18)
-+#define NPU_TX_DMA_DESC_VEND_LEN_MASK	GENMASK(17, 1)
-+#define NPU_TX_DMA_DESC_DONE_MASK	BIT(0)
-+
-+#define NPU_TXWI_LEN	192
-+
-+struct airoha_npu_tx_dma_desc {
-+	u32 ctrl;
-+	u32 addr;
-+	u64 rsv;
-+	u8 txwi[NPU_TXWI_LEN];
-+} __packed;
-+
-+enum airoha_npu_wlan_set_cmd {
-+	WLAN_FUNC_SET_WAIT_PCIE_ADDR,
-+	WLAN_FUNC_SET_WAIT_DESC,
-+	WLAN_FUNC_SET_WAIT_NPU_INIT_DONE,
-+	WLAN_FUNC_SET_WAIT_TRAN_TO_CPU,
-+	WLAN_FUNC_SET_WAIT_BA_WIN_SIZE,
-+	WLAN_FUNC_SET_WAIT_DRIVER_MODEL,
-+	WLAN_FUNC_SET_WAIT_DEL_STA,
-+	WLAN_FUNC_SET_WAIT_DRAM_BA_NODE_ADDR,
-+	WLAN_FUNC_SET_WAIT_PKT_BUF_ADDR,
-+	WLAN_FUNC_SET_WAIT_IS_TEST_NOBA,
-+	WLAN_FUNC_SET_WAIT_FLUSHONE_TIMEOUT,
-+	WLAN_FUNC_SET_WAIT_FLUSHALL_TIMEOUT,
-+	WLAN_FUNC_SET_WAIT_IS_FORCE_TO_CPU,
-+	WLAN_FUNC_SET_WAIT_PCIE_STATE,
-+	WLAN_FUNC_SET_WAIT_PCIE_PORT_TYPE,
-+	WLAN_FUNC_SET_WAIT_ERROR_RETRY_TIMES,
-+	WLAN_FUNC_SET_WAIT_BAR_INFO,
-+	WLAN_FUNC_SET_WAIT_FAST_FLAG,
-+	WLAN_FUNC_SET_WAIT_NPU_BAND0_ONCPU,
-+	WLAN_FUNC_SET_WAIT_TX_RING_PCIE_ADDR,
-+	WLAN_FUNC_SET_WAIT_TX_DESC_HW_BASE,
-+	WLAN_FUNC_SET_WAIT_TX_BUF_SPACE_HW_BASE,
-+	WLAN_FUNC_SET_WAIT_RX_RING_FOR_TXDONE_HW_BASE,
-+	WLAN_FUNC_SET_WAIT_TX_PKT_BUF_ADDR,
-+	WLAN_FUNC_SET_WAIT_INODE_TXRX_REG_ADDR,
-+	WLAN_FUNC_SET_WAIT_INODE_DEBUG_FLAG,
-+	WLAN_FUNC_SET_WAIT_INODE_HW_CFG_INFO,
-+	WLAN_FUNC_SET_WAIT_INODE_STOP_ACTION,
-+	WLAN_FUNC_SET_WAIT_INODE_PCIE_SWAP,
-+	WLAN_FUNC_SET_WAIT_RATELIMIT_CTRL,
-+	WLAN_FUNC_SET_WAIT_HWNAT_INIT,
-+	WLAN_FUNC_SET_WAIT_ARHT_CHIP_INFO,
-+	WLAN_FUNC_SET_WAIT_TX_BUF_CHECK_ADDR,
-+	WLAN_FUNC_SET_WAIT_DEBUG_ARRAY_ADDR,
-+};
-+
-+enum airoha_npu_wlan_get_cmd {
-+	WLAN_FUNC_GET_WAIT_NPU_INFO,
-+	WLAN_FUNC_GET_WAIT_LAST_RATE,
-+	WLAN_FUNC_GET_WAIT_COUNTER,
-+	WLAN_FUNC_GET_WAIT_DBG_COUNTER,
-+	WLAN_FUNC_GET_WAIT_RXDESC_BASE,
-+	WLAN_FUNC_GET_WAIT_WCID_DBG_COUNTER,
-+	WLAN_FUNC_GET_WAIT_DMA_ADDR,
-+	WLAN_FUNC_GET_WAIT_RING_SIZE,
-+	WLAN_FUNC_GET_WAIT_NPU_SUPPORT_MAP,
-+	WLAN_FUNC_GET_WAIT_MDC_LOCK_ADDRESS,
-+};
-+
-+struct airoha_npu {
-+#if (IS_BUILTIN(CONFIG_NET_AIROHA_NPU) || IS_MODULE(CONFIG_NET_AIROHA_NPU))
-+	struct device *dev;
-+	struct regmap *regmap;
-+
-+	struct airoha_npu_core {
-+		struct airoha_npu *npu;
-+		/* protect concurrent npu memory accesses */
-+		spinlock_t lock;
-+		struct work_struct wdt_work;
-+	} cores[NPU_NUM_CORES];
-+
-+	int irqs[NPU_NUM_IRQ];
-+
-+	struct airoha_foe_stats __iomem *stats;
-+
-+	struct {
-+		int (*ppe_init)(struct airoha_npu *npu);
-+		int (*ppe_deinit)(struct airoha_npu *npu);
-+		int (*ppe_flush_sram_entries)(struct airoha_npu *npu,
-+					      dma_addr_t foe_addr,
-+					      int sram_num_entries);
-+		int (*ppe_foe_commit_entry)(struct airoha_npu *npu,
-+					    dma_addr_t foe_addr,
-+					    u32 entry_size, u32 hash,
-+					    bool ppe2);
-+		int (*wlan_init_reserved_memory)(struct airoha_npu *npu);
-+		int (*wlan_send_msg)(struct airoha_npu *npu, int ifindex,
-+				     enum airoha_npu_wlan_set_cmd func_id,
-+				     u32 data, gfp_t gfp);
-+		int (*wlan_get_msg)(struct airoha_npu *npu, int ifindex,
-+				    enum airoha_npu_wlan_get_cmd func_id,
-+				    u32 *data, gfp_t gfp);
-+		u32 (*wlan_get_queue_addr)(struct airoha_npu *npu, int qid,
-+					   bool xmit);
-+		void (*wlan_set_irq_status)(struct airoha_npu *npu, u32 val);
-+		u32 (*wlan_get_irq_status)(struct airoha_npu *npu, int q);
-+		void (*wlan_enable_irq)(struct airoha_npu *npu, int q);
-+		void (*wlan_disable_irq)(struct airoha_npu *npu, int q);
-+	} ops;
-+#endif
-+};
-+
-+#if (IS_BUILTIN(CONFIG_NET_AIROHA_NPU) || IS_MODULE(CONFIG_NET_AIROHA_NPU))
-+struct airoha_npu *airoha_npu_get(struct device *dev, dma_addr_t *stats_addr);
-+void airoha_npu_put(struct airoha_npu *npu);
-+
-+static inline int airoha_npu_wlan_init_reserved_memory(struct airoha_npu *npu)
-+{
-+	return npu->ops.wlan_init_reserved_memory(npu);
-+}
-+
-+static inline int airoha_npu_wlan_send_msg(struct airoha_npu *npu,
-+					   int ifindex,
-+					   enum airoha_npu_wlan_set_cmd cmd,
-+					   u32 data, gfp_t gfp)
-+{
-+	return npu->ops.wlan_send_msg(npu, ifindex, cmd, data, gfp);
-+}
-+
-+static inline int airoha_npu_wlan_get_msg(struct airoha_npu *npu, int ifindex,
-+					  enum airoha_npu_wlan_get_cmd cmd,
-+					  u32 *data, gfp_t gfp)
-+{
-+	return npu->ops.wlan_get_msg(npu, ifindex, cmd, data, gfp);
-+}
-+
-+static inline u32 airoha_npu_wlan_get_queue_addr(struct airoha_npu *npu,
-+						 int qid, bool xmit)
-+{
-+	return npu->ops.wlan_get_queue_addr(npu, qid, xmit);
-+}
-+
-+static inline void airoha_npu_wlan_set_irq_status(struct airoha_npu *npu,
-+						  u32 val)
-+{
-+	npu->ops.wlan_set_irq_status(npu, val);
-+}
-+
-+static inline u32 airoha_npu_wlan_get_irq_status(struct airoha_npu *npu, int q)
-+{
-+	return npu->ops.wlan_get_irq_status(npu, q);
-+}
-+
-+static inline void airoha_npu_wlan_enable_irq(struct airoha_npu *npu, int q)
-+{
-+	npu->ops.wlan_enable_irq(npu, q);
-+}
-+
-+static inline void airoha_npu_wlan_disable_irq(struct airoha_npu *npu, int q)
-+{
-+	npu->ops.wlan_disable_irq(npu, q);
-+}
-+#else
-+static inline struct airoha_npu *airoha_npu_get(struct device *dev,
-+						dma_addr_t *foe_stats_addr)
-+{
-+	return NULL;
-+}
-+
-+static inline void airoha_npu_put(struct airoha_npu *npu)
-+{
-+}
-+
-+static inline int airoha_npu_wlan_init_reserved_memory(struct airoha_npu *npu)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static inline int airoha_npu_wlan_send_msg(struct airoha_npu *npu,
-+					   int ifindex,
-+					   enum airoha_npu_wlan_set_cmd cmd,
-+					   u32 data, gfp_t gfp)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static inline int airoha_npu_wlan_get_msg(struct airoha_npu *npu, int ifindex,
-+					  enum airoha_npu_wlan_get_cmd cmd,
-+					  u32 *data, gfp_t gfp)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static inline u32 airoha_npu_wlan_get_queue_addr(struct airoha_npu *npu,
-+						 int qid, bool xmit)
-+{
-+	return 0;
-+}
-+
-+static inline void airoha_npu_wlan_set_irq_status(struct airoha_npu *npu,
-+						  u32 val)
-+{
-+}
-+
-+static inline u32 airoha_npu_wlan_get_irq_status(struct airoha_npu *npu,
-+						 int q)
-+{
-+	return 0;
-+}
-+
-+static inline void airoha_npu_wlan_enable_irq(struct airoha_npu *npu, int q)
-+{
-+}
-+
-+static inline void airoha_npu_wlan_disable_irq(struct airoha_npu *npu, int q)
-+{
-+}
-+#endif
-+
-+#endif /* AIROHA_OFFLOAD_H */
+Patch 2 defines the base gmac nodes it the Agilex5 DTSI.
+
+Patch 3 enables gmac2 on the Agilex5 SOCFPGA Premium Development Kit.
+
+Patch 4 add the new compatibility string to dwmac-socfpga.c.
+
+Matthew Gerlach (2):
+  dt-bindings: net: altr,socfpga-stmmac: Add compatible string for
+    Agilex5
+  arm64: dts: socfpga: agilex5: enable gmac2 on the Agilex5 dev kit
+
+Mun Yew Tham (2):
+  arm64: dts: Agilex5 Add gmac nodes to DTSI for Agilex5
+  net: stmmac: dwmac-socfpga: Add xgmac support for Agilex5
+
+ .../bindings/net/altr,socfpga-stmmac.yaml     |   9 +-
+ .../arm64/boot/dts/intel/socfpga_agilex5.dtsi | 339 ++++++++++++++++++
+ .../boot/dts/intel/socfpga_agilex5_socdk.dts  |  18 +
+ .../ethernet/stmicro/stmmac/dwmac-socfpga.c   |   1 +
+ 4 files changed, 365 insertions(+), 2 deletions(-)
 
 -- 
-2.50.1
+2.49.0
 
 
