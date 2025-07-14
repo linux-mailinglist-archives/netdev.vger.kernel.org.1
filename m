@@ -1,46 +1,82 @@
-Return-Path: <netdev+bounces-206495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF780B03484
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 04:34:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7B7EB0349D
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 04:46:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECE9E188D385
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 02:34:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 107DB3AAA38
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 02:46:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87BD31D5ABA;
-	Mon, 14 Jul 2025 02:34:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E2578F54;
+	Mon, 14 Jul 2025 02:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Pruja2CJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA237E0E8;
-	Mon, 14 Jul 2025 02:34:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D668EDDC5;
+	Mon, 14 Jul 2025 02:46:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752460447; cv=none; b=itVPScMB5gwNsGpmDxZQd3CY0W5Io1ERAqBdKpVUKq/tpbNxYvkX/Yg7d3+5lolD8O/NPz+mJeuVZ69nFl1Y2I6TDvbKp1AfuGjltuOT2ecJBVcoA4TXdZTE5qIzI85zHyFnxuTl6NeDMHlou497Mn2qid93HhFZZQX0cHdqr50=
+	t=1752461213; cv=none; b=dimXMv+TiGGcNfD8oJn1/hg61YecAVcyQikAjCbqy3Kc9Iw6mrl4X4JeI1WKyiucesSJKLCBYCLOX8dIOOL0bMqI9JBSPHOM8bH/7WIrgWO7vg8UVIgkv9PdIFsm5lbPQN6+rJ+/9b0aMVWW+AJFgf9SqMKQ858wP8WpPFJdozI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752460447; c=relaxed/simple;
-	bh=KC6Nm9Dh/gTGaq3+hmh6YiKDaalS+ZCO6zbEbRMlgd4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=I4GZUwP6cVGBow74XNSaxcRkol1ymlCU8/KUiLGKMczCqo6zfpUzVPBZom4MYQfHtxL4S2qU6zc4zHs21F+TGIZNocbfjZAFuEDNYHw/0t02YNU5ZYrb0SJeJveewZ6GthCdjTJrd+lqlNvAsaRGiwVXMmoHdgWxD3slbJdZBgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4bgR9S2cGMz2CfmS;
-	Mon, 14 Jul 2025 10:29:48 +0800 (CST)
-Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
-	by mail.maildlp.com (Postfix) with ESMTPS id 55E6D140113;
-	Mon, 14 Jul 2025 10:33:54 +0800 (CST)
-Received: from [10.174.176.70] (10.174.176.70) by
- dggpemf500016.china.huawei.com (7.185.36.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 14 Jul 2025 10:33:52 +0800
-Message-ID: <830deee4-073c-44bc-8b94-a050792eeda4@huawei.com>
-Date: Mon, 14 Jul 2025 10:33:50 +0800
+	s=arc-20240116; t=1752461213; c=relaxed/simple;
+	bh=6jVlByuyw2bTejNgVlSpF2RAfEYJ8+KaVDGnkIsYty4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Un7+DXf0Rvmg5QCsOBSpLCZLFUuCY4Q4jUaawhNQONE6FiWX5g6Vw6yaK3C05W5DvTFaGbbc+xzHRxShLkpF/QYKijAEryOiZeXAdpEMPPCh+cKaLMdQjM0BJg7f90n/8DxArzfWOLnbzpg97TvYlEd8FL3vM68totNJXkqFDU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Pruja2CJ; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56DNHoVl026978;
+	Mon, 14 Jul 2025 02:46:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=JWfYSI
+	G6I7rVkluKLLqWpmYdSnPexiUt7de1+X95vKU=; b=Pruja2CJxc0MnzqChhVvb/
+	ZuA53oYN8peSUHjiCHeInFHueTQpDbHTSd7OQ3CYjsG8BHes8NMFh4s366qdCszp
+	Nb1CD3FCCKOuOKL1okfjOMFlxFxgq+XXbJjB3WjEbbeZWdIka3bbak7Sb8S4UE3e
+	zAADUvZo3c4Tm+GpsC69QMJs57gFMIDfoEtQTwnwdzBe+5n3hWLF/4MDMhHM63AB
+	LKn5krCLIRNwz1tDHYvz7Q4Q4vM4rQ68xOnEalyOH3cOhxOUV6IkawIP9St61OjK
+	hSx7USa+CGm3PP7boyyt0G3gT6sOkSPs4XIzkx+JLWVvaMk6u2tjbkhIgqJ+hrwQ
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47uf7cq8dv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 14 Jul 2025 02:46:39 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 56E2kcuA015642;
+	Mon, 14 Jul 2025 02:46:38 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47uf7cq8cr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 14 Jul 2025 02:46:38 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56DMcLsE031903;
+	Mon, 14 Jul 2025 02:46:06 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 47v21tv6ms-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 14 Jul 2025 02:46:06 +0000
+Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56E2k5aP12649174
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 14 Jul 2025 02:46:05 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 668A35805B;
+	Mon, 14 Jul 2025 02:46:05 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 48DF758055;
+	Mon, 14 Jul 2025 02:46:00 +0000 (GMT)
+Received: from [9.39.29.80] (unknown [9.39.29.80])
+	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 14 Jul 2025 02:45:59 +0000 (GMT)
+Message-ID: <926d9ce3-04fc-4055-b5e5-fda8772e3da8@linux.ibm.com>
+Date: Mon, 14 Jul 2025 08:15:58 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,189 +84,81 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 net] smc: Fix various oops due to inet_sock type
- confusion.
-To: Kuniyuki Iwashima <kuniyu@google.com>, "D. Wythe"
-	<alibuda@linux.alibaba.com>, Dust Li <dust.li@linux.alibaba.com>, Sidraya
- Jayagond <sidraya@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: Mahanta Jambigi <mjambigi@linux.ibm.com>, Tony Lu
-	<tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>, Simon Horman
-	<horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
-	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-s390@vger.kernel.org>,
-	<syzbot+40bf00346c3fe40f90f2@syzkaller.appspotmail.com>,
-	<syzbot+f22031fad6cbe52c70e7@syzkaller.appspotmail.com>,
-	<syzbot+271fed3ed6f24600c364@syzkaller.appspotmail.com>
-References: <20250711060808.2977529-1-kuniyu@google.com>
-From: Wang Liang <wangliang74@huawei.com>
-In-Reply-To: <20250711060808.2977529-1-kuniyu@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- dggpemf500016.china.huawei.com (7.185.36.197)
+Subject: Re: [PATCH v2 0/3] ioctl numbers list cleanup for
+ papr-physical-attestation.h
+To: Bagas Sanjaya <bagasdotme@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Documentation <linux-doc@vger.kernel.org>,
+        Linux PowerPC <linuxppc-dev@lists.ozlabs.org>,
+        Linux Networking <netdev@vger.kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Haren Myneni <haren@linux.ibm.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Donnellan <ajd@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nathan Lynch <nathanl@linux.ibm.com>
+References: <20250714015711.14525-1-bagasdotme@gmail.com>
+Content-Language: en-US
+From: Madhavan Srinivasan <maddy@linux.ibm.com>
+In-Reply-To: <20250714015711.14525-1-bagasdotme@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: txyLKlAusqD86jgsu6Jhws2pezSwcL-B
+X-Authority-Analysis: v=2.4 cv=LoGSymdc c=1 sm=1 tr=0 ts=68746f8f cx=c_pps a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=pGLkceISAAAA:8 a=VnNF1IyMAAAA:8 a=k9sf4av91IVL3TbTha8A:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: ejVelwgNTWVw-bzXUfSzhnsqVssm4XJi
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE0MDAxNCBTYWx0ZWRfX+49B4kjAte+2 bQC1hgd9dbASOcQGSUWS4i3BCc1CuWkDPqzZLX3g6bkS6joh/jI/tW7kIQpY5FkhHAPSEl5xZdV dolDM6K8gieG3MO7X97M7PFWAybp1Qe1mPpYRUBlW/7ninEmnYYQ8C0fBG9zo8aqmUZJHbXBo6W
+ Ef+2nyugMp0AZ/BfylMX+50UiU+pIHWmNoEX2dzvWNYc5plpiVpQa2HrAvz1sYoK0j14/HHfEey ZiF+Po351nfTNx6KELqBCYCQUNl9AhBkPJUPxUEVpW3EaJuRIAGZC+OhPZ90ZUP7bw9vZLaZm3g 8jen2oe1g/fTktvOqVzN4nOSwMr+2vrRxpQiAnOtDw4Hknk308uMn9x5H3JpMvawNNBTASb5rRW
+ pWQEm1lN7V7CDpFISPrKa1t/uq5KwmI/4AoaCY+qnH5QgJ3lbV2o1EHhPMPc3ObOD6phaHFh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-07-14_01,2025-07-09_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ lowpriorityscore=0 spamscore=0 malwarescore=0 impostorscore=0
+ clxscore=1011 phishscore=0 mlxlogscore=999 priorityscore=1501
+ suspectscore=0 mlxscore=0 adultscore=0 classifier=spam authscore=0
+ authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2505280000 definitions=main-2507140014
 
 
-在 2025/7/11 14:07, Kuniyuki Iwashima 写道:
-> syzbot reported weird splats [0][1] in cipso_v4_sock_setattr() while
-> freeing inet_sk(sk)->inet_opt.
->
-> The address was freed multiple times even though it was read-only memory.
->
-> cipso_v4_sock_setattr() did nothing wrong, and the root cause was type
-> confusion.
->
-> The cited commit made it possible to create smc_sock as an INET socket.
->
-> The issue is that struct smc_sock does not have struct inet_sock as the
-> first member but hijacks AF_INET and AF_INET6 sk_family, which confuses
-> various places.
->
-> In this case, inet_sock.inet_opt was actually smc_sock.clcsk_data_ready(),
-> which is an address of a function in the text segment.
->
->    $ pahole -C inet_sock vmlinux
->    struct inet_sock {
->    ...
->            struct ip_options_rcu *    inet_opt;             /*   784     8 */
->
->    $ pahole -C smc_sock vmlinux
->    struct smc_sock {
->    ...
->            void                       (*clcsk_data_ready)(struct sock *); /*   784     8 */
->
-> The same issue for another field was reported before. [2][3]
->
-> At that time, an ugly hack was suggested [4], but it makes both INET
-> and SMC code error-prone and hard to change.
->
-> Also, yet another variant was fixed by a hacky commit 98d4435efcbf3
-> ("net/smc: prevent NULL pointer dereference in txopt_get").
->
-> Instead of papering over the root cause by such hacks, we should not
-> allow non-INET socket to reuse the INET infra.
->
-> Let's add inet_sock as the first member of smc_sock.
->
-> [0]:
-> kvfree_call_rcu(): Double-freed call. rcu_head 000000006921da73
-> WARNING: CPU: 0 PID: 6718 at mm/slab_common.c:1956 kvfree_call_rcu+0x94/0x3f0 mm/slab_common.c:1955
-> Modules linked in:
-> CPU: 0 UID: 0 PID: 6718 Comm: syz.0.17 Tainted: G        W           6.16.0-rc4-syzkaller-g7482bb149b9f #0 PREEMPT
-> Tainted: [W]=WARN
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-> pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-> pc : kvfree_call_rcu+0x94/0x3f0 mm/slab_common.c:1955
-> lr : kvfree_call_rcu+0x94/0x3f0 mm/slab_common.c:1955
-> sp : ffff8000a03a7730
-> x29: ffff8000a03a7730 x28: 00000000fffffff5 x27: 1fffe000184823d3
-> x26: dfff800000000000 x25: ffff0000c2411e9e x24: ffff0000dd88da00
-> x23: ffff8000891ac9a0 x22: 00000000ffffffea x21: ffff8000891ac9a0
-> x20: ffff8000891ac9a0 x19: ffff80008afc2480 x18: 00000000ffffffff
-> x17: 0000000000000000 x16: ffff80008ae642c8 x15: ffff700011ede14c
-> x14: 1ffff00011ede14c x13: 0000000000000004 x12: ffffffffffffffff
-> x11: ffff700011ede14c x10: 0000000000ff0100 x9 : 5fa3c1ffaf0ff000
-> x8 : 5fa3c1ffaf0ff000 x7 : 0000000000000001 x6 : 0000000000000001
-> x5 : ffff8000a03a7078 x4 : ffff80008f766c20 x3 : ffff80008054d360
-> x2 : 0000000000000000 x1 : 0000000000000201 x0 : 0000000000000000
-> Call trace:
->   kvfree_call_rcu+0x94/0x3f0 mm/slab_common.c:1955 (P)
->   cipso_v4_sock_setattr+0x2f0/0x3f4 net/ipv4/cipso_ipv4.c:1914
->   netlbl_sock_setattr+0x240/0x334 net/netlabel/netlabel_kapi.c:1000
->   smack_netlbl_add+0xa8/0x158 security/smack/smack_lsm.c:2581
->   smack_inode_setsecurity+0x378/0x430 security/smack/smack_lsm.c:2912
->   security_inode_setsecurity+0x118/0x3c0 security/security.c:2706
->   __vfs_setxattr_noperm+0x174/0x5c4 fs/xattr.c:251
->   __vfs_setxattr_locked+0x1ec/0x218 fs/xattr.c:295
->   vfs_setxattr+0x158/0x2ac fs/xattr.c:321
->   do_setxattr fs/xattr.c:636 [inline]
->   file_setxattr+0x1b8/0x294 fs/xattr.c:646
->   path_setxattrat+0x2ac/0x320 fs/xattr.c:711
->   __do_sys_fsetxattr fs/xattr.c:761 [inline]
->   __se_sys_fsetxattr fs/xattr.c:758 [inline]
->   __arm64_sys_fsetxattr+0xc0/0xdc fs/xattr.c:758
->   __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
->   invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:49
->   el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
->   do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
->   el0_svc+0x58/0x180 arch/arm64/kernel/entry-common.c:879
->   el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:898
->   el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:600
->
-> [1]:
-> Unable to handle kernel write to read-only memory at virtual address ffff8000891ac9a8
-> KASAN: probably user-memory-access in range [0x0000000448d64d40-0x0000000448d64d47]
-> Mem abort info:
->    ESR = 0x000000009600004e
->    EC = 0x25: DABT (current EL), IL = 32 bits
->    SET = 0, FnV = 0
->    EA = 0, S1PTW = 0
->    FSC = 0x0e: level 2 permission fault
-> Data abort info:
->    ISV = 0, ISS = 0x0000004e, ISS2 = 0x00000000
->    CM = 0, WnR = 1, TnD = 0, TagAccess = 0
->    GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-> swapper pgtable: 4k pages, 48-bit VAs, pgdp=0000000207144000
-> [ffff8000891ac9a8] pgd=0000000000000000, p4d=100000020f950003, pud=100000020f951003, pmd=0040000201000781
-> Internal error: Oops: 000000009600004e [#1]  SMP
-> Modules linked in:
-> CPU: 0 UID: 0 PID: 6946 Comm: syz.0.69 Not tainted 6.16.0-rc4-syzkaller-g7482bb149b9f #0 PREEMPT
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-> pstate: 604000c5 (nZCv daIF +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-> pc : kvfree_call_rcu+0x31c/0x3f0 mm/slab_common.c:1971
-> lr : add_ptr_to_bulk_krc_lock mm/slab_common.c:1838 [inline]
-> lr : kvfree_call_rcu+0xfc/0x3f0 mm/slab_common.c:1963
-> sp : ffff8000a28a7730
-> x29: ffff8000a28a7730 x28: 00000000fffffff5 x27: 1fffe00018b09bb3
-> x26: 0000000000000001 x25: ffff80008f66e000 x24: ffff00019beaf498
-> x23: ffff00019beaf4c0 x22: 0000000000000000 x21: ffff8000891ac9a0
-> x20: ffff8000891ac9a0 x19: 0000000000000000 x18: 00000000ffffffff
-> x17: ffff800093363000 x16: ffff80008052c6e4 x15: ffff700014514ecc
-> x14: 1ffff00014514ecc x13: 0000000000000004 x12: ffffffffffffffff
-> x11: ffff700014514ecc x10: 0000000000000001 x9 : 0000000000000001
-> x8 : ffff00019beaf7b4 x7 : ffff800080a94154 x6 : 0000000000000000
-> x5 : ffff8000935efa60 x4 : 0000000000000008 x3 : ffff80008052c7fc
-> x2 : 0000000000000001 x1 : ffff8000891ac9a0 x0 : 0000000000000001
-> Call trace:
->   kvfree_call_rcu+0x31c/0x3f0 mm/slab_common.c:1967 (P)
->   cipso_v4_sock_setattr+0x2f0/0x3f4 net/ipv4/cipso_ipv4.c:1914
->   netlbl_sock_setattr+0x240/0x334 net/netlabel/netlabel_kapi.c:1000
->   smack_netlbl_add+0xa8/0x158 security/smack/smack_lsm.c:2581
->   smack_inode_setsecurity+0x378/0x430 security/smack/smack_lsm.c:2912
->   security_inode_setsecurity+0x118/0x3c0 security/security.c:2706
->   __vfs_setxattr_noperm+0x174/0x5c4 fs/xattr.c:251
->   __vfs_setxattr_locked+0x1ec/0x218 fs/xattr.c:295
->   vfs_setxattr+0x158/0x2ac fs/xattr.c:321
->   do_setxattr fs/xattr.c:636 [inline]
->   file_setxattr+0x1b8/0x294 fs/xattr.c:646
->   path_setxattrat+0x2ac/0x320 fs/xattr.c:711
->   __do_sys_fsetxattr fs/xattr.c:761 [inline]
->   __se_sys_fsetxattr fs/xattr.c:758 [inline]
->   __arm64_sys_fsetxattr+0xc0/0xdc fs/xattr.c:758
->   __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
->   invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:49
->   el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
->   do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
->   el0_svc+0x58/0x180 arch/arm64/kernel/entry-common.c:879
->   el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:898
->   el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:600
-> Code: aa1f03e2 52800023 97ee1e8d b4000195 (f90006b4)
->
-> Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
-> Reported-by: syzbot+40bf00346c3fe40f90f2@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/all/686d9b50.050a0220.1ffab7.0020.GAE@google.com/
-> Tested-by: syzbot+40bf00346c3fe40f90f2@syzkaller.appspotmail.com
-> Reported-by: syzbot+f22031fad6cbe52c70e7@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/all/686da0f3.050a0220.1ffab7.0022.GAE@google.com/
-> Reported-by: syzbot+271fed3ed6f24600c364@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=271fed3ed6f24600c364 # [2]
-> Link: https://lore.kernel.org/netdev/99f284be-bf1d-4bc4-a629-77b268522fff@huawei.com/ # [3]
-> Link: https://lore.kernel.org/netdev/20250331081003.1503211-1-wangliang74@huawei.com/ # [4]
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> ---
->   net/smc/af_smc.c | 14 ++++++++++++++
->   net/smc/smc.h    |  8 ++++----
->   2 files changed, 18 insertions(+), 4 deletions(-)
-Reviewed-by: Wang Liang <wangliang74@huawei.com>
+
+On 7/14/25 7:27 AM, Bagas Sanjaya wrote:
+> Hi,
+> 
+> This is the cleanup series following up from 03c9d1a5a30d93 ("Documentation:
+> Fix description format for powerpc RTAS ioctls"). It is based on docs-next
+> tree. The end result should be the same as my previous fixup patch [1].
+> 
+> Enjoy!
+> 
+
+for powerpc changes
+Acked-by: Madhavan Srinivasan <maddy@linux.ibm.com>
+
+
+> Changes since v1 (RESEND) [2]:
+> 
+>   * Add Fixes: and Reviewed-by: trailers (Haren)
+>   * Expand tabs for uapi/misc/amd-apml.h to match other entries
+> 
+> Jon: Would you like to apply this series on docs-next or should powerpc
+> folks handle it?
+> 
+> [1]: https://lore.kernel.org/linuxppc-dev/20250429130524.33587-2-bagasdotme@gmail.com/
+> [2]: https://lore.kernel.org/lkml/20250708004334.15861-1-bagasdotme@gmail.com/
+> 
+> Bagas Sanjaya (3):
+>   Documentation: ioctl-number: Fix linuxppc-dev mailto link
+>   Documentation: ioctl-number: Extend "Include File" column width
+>   Documentation: ioctl-number: Correct full path to
+>     papr-physical-attestation.h
+> 
+>  .../userspace-api/ioctl/ioctl-number.rst      | 516 +++++++++---------
+>  1 file changed, 258 insertions(+), 258 deletions(-)
+> 
+> 
+> base-commit: f55b3ca3cf1d1652c4b3481b671940461331d69f
+
 
