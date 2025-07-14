@@ -1,276 +1,364 @@
-Return-Path: <netdev+bounces-206508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BF57B03534
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 06:36:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D9A4B03568
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 06:58:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADFB11894B0B
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 04:37:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37F1B3B368A
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 04:58:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C07511E501C;
-	Mon, 14 Jul 2025 04:36:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CE4A1F3B8A;
+	Mon, 14 Jul 2025 04:58:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="b2SMA/mW";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="uxZLDyq+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="n1t1m8gP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791D34501A
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 04:36:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752467805; cv=fail; b=qu+pi8a/Y89yNjyZmPfWa/Zi42Mu94PDt7WP3KP2PVGuuEdZJ9ve+h4LuAPmQfCvQ9B1CnN7GWIQwisyn3rawH9lJWX0R6eWIMBFmjcoQohEMbIARzymUaamD80XrGbo2sx+QTwRBXOx1Jn2rTx+CFmvwvausWDomXfF1YlTE2M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752467805; c=relaxed/simple;
-	bh=mttDDeqpogMz77el2pesjiofTjA0dlcrpr1Kf5874+0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ajKp2PhYeRWfCEIvERcNOnybDRW7kEQCcFd3+ltuR+jpHGJMsHNGxslw/F2jxqtnMEMOQnNxOGB4x7CXUd6FZ5PUnFXMM9RaVQwTr7c2yZgtoKt9SOqU8sRl9TrAdVDUdHSZ1IZ/C2jUCXpLVgA9CDCaC+ZYvg3h/HfpbIgomV4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=b2SMA/mW; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=uxZLDyq+; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56DLW6sq007691;
-	Mon, 14 Jul 2025 04:36:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-id:content-transfer-encoding:content-type:date:from
-	:in-reply-to:message-id:mime-version:references:subject:to; s=
-	corp-2025-04-25; bh=mttDDeqpogMz77el2pesjiofTjA0dlcrpr1Kf5874+0=; b=
-	b2SMA/mWz83x5atm1KRqPM86j97leYc4UvcJdZIQXSkegU5UN1bxqAE24MqbHbYd
-	Cw1cqbe3mHfKfAaiONetsLfp9Ho1/NpaBdVyEqjAqQWIgWm/yyKoVMaIL0vhdmAE
-	e5iVrR+lUrY+A+4Ac3k8fqY0g2dlLKKqovDAcKSWEGBDj/hkEp/UnN+yHnyDCMLf
-	m1P8ASVPePpjC7MvNT8ddx17iRpiJzCbW9/1zIf4TgpoEH3fIZJqZUz3PHY4t4vS
-	XPqdt2VBIxW0+XBOTqEaHrh/btJPEgbKgDepr36sLqs7gOeY8tPFWh2NRxOqGTed
-	NxoVSwmSryhFp6GOM24DSA==
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 47uk1aubub-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 14 Jul 2025 04:36:41 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 56E2Wwtk023985;
-	Mon, 14 Jul 2025 04:36:41 GMT
-Received: from sj2pr03cu002.outbound.protection.outlook.com (mail-westusazon11013048.outbound.protection.outlook.com [52.101.44.48])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 47ue583e64-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 14 Jul 2025 04:36:40 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=x9znFxwNzVKoe27I9uYLljdjfZw2yW95Vr8gOYT8kXb/b8CI9C8S6g3AIR+mqWf/n5OkZb0xaub0/l53USulfLFoGNpPh2LwOCVX6j+HpbV9N0Y2EM/t8BwO6mEp9urjznaIR8OkvlFm9MZSjv7auOw/MNiE/a/b7zKAHmTW5n05NXw2fzbs7WfNkmUs+w1RulegYRZQ2LIXUQECOl6YQkAbGgH/xxw4pdzHRO1otFiFr0u9SuR7zXs444ibSWAgNeWcumrLQnt93Nz+Win6GTd0kKkaXRecKvoO4Xk5OlvHqghwQEeC9iXwS18T7ALyChAzrZN4w0jgWjYBeZtnDw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mttDDeqpogMz77el2pesjiofTjA0dlcrpr1Kf5874+0=;
- b=OIbTSvZccrMT68oVjdm9Qb0eGELgAvVCpYRYYNbGDaCP2MCSDps16lcgW8EXahj5SJup5pr0PB+eRTrdmZt7TzUyQkArqziEmNbO9OnfusdHczkiiWN3Twa0xWogm0tbO5yyManQ0NXujTOdNmilCfjPiczHiXN9sdGwbk/a407UA2SU3TuYQ8JW8f3r8iTYpiPyIyxDHXnsXv/g7OP7lzVxvwVsmma4+wKogadaw6QuR0/naQYJVpxoZLONzkn8cYSYYYi64BZ7jnI3DMhGYiUCbrlESZI3RtlLRHMxBwzNWzw/xcRAW0lPfpevFE2NPewsEpwHVNgX6Kj9sPmRnA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mttDDeqpogMz77el2pesjiofTjA0dlcrpr1Kf5874+0=;
- b=uxZLDyq++MWK8MJHrbqR3mnrarjXOcbpSiJfveH8FAiRZDtqGwm1m6vufC4w1p3/tSNKpRvRV9Sx9ywbZst68drHtdPC21Vb0Xd2oxGsV+sDr9lwgcv55xsbQzPXXc4u/0nkVLOTafsLLKvuIZ2a6c5VEwVs/wRY8ExebywHrK0=
-Received: from IA1PR10MB7417.namprd10.prod.outlook.com (2603:10b6:208:448::15)
- by DM3PR10MB7925.namprd10.prod.outlook.com (2603:10b6:0:46::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.29; Mon, 14 Jul
- 2025 04:36:33 +0000
-Received: from IA1PR10MB7417.namprd10.prod.outlook.com
- ([fe80::4970:7ab6:8d74:aaf9]) by IA1PR10MB7417.namprd10.prod.outlook.com
- ([fe80::4970:7ab6:8d74:aaf9%4]) with mapi id 15.20.8901.024; Mon, 14 Jul 2025
- 04:36:33 +0000
-From: Allison Henderson <allison.henderson@oracle.com>
-To: "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [RFC][PATCH] don't open-code kernel_accept() in
- rds_tcp_accept_one()
-Thread-Topic: [RFC][PATCH] don't open-code kernel_accept() in
- rds_tcp_accept_one()
-Thread-Index: AQHb9CA2QLpUxMoCe0CMXsyeXGlURLQxCX2A
-Date: Mon, 14 Jul 2025 04:36:32 +0000
-Message-ID: <2eb0df2c5dd8b16b5103f0e2859690519c4f2dad.camel@oracle.com>
-References: <20250713180134.GC1880847@ZenIV>
-In-Reply-To: <20250713180134.GC1880847@ZenIV>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.52.3-0ubuntu1 
-autocrypt: addr=allison.henderson@oracle.com; prefer-encrypt=mutual;
- keydata=mQGNBGMrSUYBDADDX1fFY5pimVrKxscCUjLNV6CzjMQ/LS7sN2gzkSBgYKblSsCpzcbO/
- qa0m77Dkf7CRSYJcJHm+euPWh7a9M/XLHe8JDksGkfOfvGAc5kkQJP+JHUlblt4hYSnNmiBgBOO3l
- O6vwjWfv99bw8t9BkK1H7WwedHr0zI0B1kFoKZCqZ/xs+ZLPFTss9xSCUGPJ6Io6Yrv1b7xxwZAw0
- bw9AA1JMt6NS2mudWRAE4ycGHEsQ3orKie+CGUWNv5b9cJVYAsuo5rlgoOU1eHYzU+h1k7GsX3Xv8
- HgLNKfDj7FCIwymKeir6vBQ9/Mkm2PNmaLX/JKe5vwqoMRCh+rbbIqAs8QHzQPsuAvBVvVUaUn2XD
- /d42XjNEDRFPCqgVE9VTh2p1Ge9ovQFc/zpytAoif9Y3QGtErhdjzwGhmZqbAXu1EHc9hzrHhUF8D
- I5Y4v3i5pKjV0hvpUe0OzIvHcLzLOROjCHMA89z95q1hcxJ7LnBd8wbhwN39r114P4PQiixAUAEQE
- AAbQwQWxsaXNvbiBIZW5kZXJzb24gPGFsbGlzb24uaGVuZGVyc29uQG9yYWNsZS5jb20+iQHOBBMB
- CgA4AhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEElfnzzkkP0cwschd6yD6kYDBH6bMFAme1o
- KoACgkQyD6kYDBH6bO6PQv/S0JX125/DVO+mI3GXj00Bsbb5XD+tPUwo7qtMfSg5X80mG6GKao9hL
- ZP22dNlYdQJidNRoVew3pYLKLFcsm1qbiLHBbNVSynGaJuLDbC5sqfsGDmSBrLznefRW+XcKfyvCC
- sG2/fomT4Dnc+8n2XkDYN40ptOTy5/HyVHZzC9aocoXKVGegPwhnz70la3oZfzCKR3tY2Pt368xyx
- jbUOCHx41RHNGBKDyqmzcOKKxK2y8S69k1X+Cx/z+647qaTgEZjGCNvVfQj+DpIef/w6x+y3DoACY
- CfI3lEyFKX6yOy/enjqRXnqz7IXXjVJrLlDvIAApEm0yT25dTIjOegvr0H6y3wJqz10jbjmIKkHRX
- oltd2lIXs2VL419qFAgYIItuBFQ3XpKKMvnO45Nbey1zXF8upDw0s9r9rNDykG7Am2LDUi7CQtKeq
- p9Hjoueq8wWOsPDIzZ5LeRanH/UNYEzYt+MilFukg9btNGoxDCo9rwipAHMx6VGgNER6bVDER
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR10MB7417:EE_|DM3PR10MB7925:EE_
-x-ms-office365-filtering-correlation-id: 3b6df3c5-57ce-44d5-f4e8-08ddc29002af
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?N1ZHcHhvRnFFcGREWFRqQXF1ejZMY0c2MjRBR0I1dVQrOWcyRlZ6eTZBTC9U?=
- =?utf-8?B?UE5BRzczMForUzhDaktXZ0xSWjUzWGsyT2xBNURVZkoxbjVkTEIyMVkwTXRs?=
- =?utf-8?B?OWlBZDBGOE40bUgzVDNMd3c2MFpkYVo2cUU1WU94OHBLcEVtT0x2RGxFUC9h?=
- =?utf-8?B?VTI3T3Y2dXdjcmVBMXpuakJJeUhKbTZLU0l1QXFrQTluNStyczdIbHEvbTNV?=
- =?utf-8?B?SGh5ZEJHOXpqN0RSUlpqcGVRbXFOU0ZYTWhNeVdQZU5aNzAyeWFKeERQN25x?=
- =?utf-8?B?WkJ4NlcydW1nNms4MnNudDRvVlZDcThpbnZ5TnU3TDZUbmVLbFE0MGk3amNw?=
- =?utf-8?B?SWVFc2VPYWRibGRYMUhsVjAzQklRLzNnODBvM2lxaTVoQ0dWdmlBMWc5T3Q4?=
- =?utf-8?B?SGlpNGVjYmdwRmRhSXkzMGpZcTI4UE5DUHdMSktxMVdyaCtLd0xhNEpsQTVx?=
- =?utf-8?B?eENYbGg0ZVN1K09pcEZxMXVTK1loVmdYMUVrZGRURVBiWnhBODlKUFlWUVpw?=
- =?utf-8?B?UnZSWVNlNFZYeSttL2ltb2Y4MEZST1RGck1kNndCZ2R1dUNuTjdHNE9PQ2Rn?=
- =?utf-8?B?RE8vTklPVjA4ZUJ3Y2x0eGxGbVlnSnVvVFkwWjY2R1YwTFV0UW9kbnpVaE1J?=
- =?utf-8?B?bFVtZStONUxVZ0FWVmhrRC9hNnF4TEN6SFRFTytNTUM4NUFKK2RUVmFlTUs4?=
- =?utf-8?B?NjJDeFNEc0pSZFozanRwbHNaSUVYQm13eGU1aVpGZEgvckNQc3liUlpzdW1t?=
- =?utf-8?B?QnlwUHM1TUdzWGJiUlFMNjlaNmw5TUU4dGlaUkV4U2luaU05SG1IZXNKNXho?=
- =?utf-8?B?TURlN1BCNmhnbWo3YWhXRThMTk1NN3JHbTdVcUthSFJTc2ZTeFhRZDJqa1E5?=
- =?utf-8?B?RVJ4NGR3WTRVQTBWN21kL0szanZOSjlmWmpBQndBVVdBTlI3dFFZS0x1azhp?=
- =?utf-8?B?MkJ6VWlHbUxLb01MSDFpZHlGbUZjNTdEeEVhRnZjeVp6QWVOTVNYNHZnQ1JC?=
- =?utf-8?B?VUxidjhiUTBBdlZMdXJDeEV2SmtLKzBpM0pwNnUxMGNnYUxzZDdjZGtnZGk3?=
- =?utf-8?B?RzdEdjd1MlFZN2JFbTlOblpmc1pFSHp6cHdVeEFVTm1mU3B1SDRiVSt2SjRP?=
- =?utf-8?B?TGNISVlNQmh1dXlVazc3YmRzMFZJV2NqRGxXRHJWU2prV2hXVjBiMkpMN2pm?=
- =?utf-8?B?eG5ZWitUZitBMzJtRG90SGRhcXpkRFU3ako0QzNoa3I2bzhpWXlHeGR1QW5J?=
- =?utf-8?B?SkFDOU5BUHVyNGgwK3lqcGNhTUJZVE9BZFl0R1BDNVpXL3pZd3Rzd3YzQzl4?=
- =?utf-8?B?Z214dnNtQnlzVDEzVEtBT0VEUkNYNFc1L3czcGRHYXBqYm8yTk9rYmNibnBP?=
- =?utf-8?B?S2hoejI2SnFEMGdFeDF4Sm9kR3JQUnVJQjRaMUJoSHpwVml4Zm1OT1JiVDdj?=
- =?utf-8?B?ZlBlNDRSeXBNYXlsYU9relpxNGpGei8rYUliL1QxckxpQWNmVkFPbmRxMWQy?=
- =?utf-8?B?TlRrd09LOHQ5MHMwd3RhQUIyd0ltVWdkSWpjbi81cDRVK3YyLytsZXVsUWV1?=
- =?utf-8?B?ckZXM2twWWVXMjFKRFp6NmdnY1pUeU1JUmJFUXVYTUxQVFIraDFIN1BROXor?=
- =?utf-8?B?eDZuZHorSDlac21WKzd5NFV5dlQ4Z2s0M2lTQmhab1p1Z0RsUFZCbWxsSG9O?=
- =?utf-8?B?K0xDYnplNU5HNXJhSFhoMHdDV2t2TitMTWo1YTRvRWVpRnhEeFFLSEJrQ3ls?=
- =?utf-8?B?LzRvcWdCbWhwQTBIb1BBL252ZWhiR1FybW11b0o5M1BwQTI0cHBEQ092NGhK?=
- =?utf-8?B?SjlZWldGeVgzZ3BBdms2MWxncVB2YkFsZnZXcHBzTjcvc2FVekxuWW1SbTRs?=
- =?utf-8?B?d3J6RXBvejFSOGVKd1N5a1hDeWIyZTk0SXFkZHNwcWRBN1h2bnJYM2dhc21S?=
- =?utf-8?B?VFJEajQxM2Y4QkZPQVhBbi9FWjdTNEgyZ09DTFRVb2xsTTRnbTdQMlBVUFdr?=
- =?utf-8?B?RW1kWlV4QTNBPT0=?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR10MB7417.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?YmdDZFhyMkRTVmxUcHJCZ2loUFY0Sm90djlVblVXV1RiUExaZmhOakNzb1Q4?=
- =?utf-8?B?Mk9KOEoxMXBvenhpUm1WQ2kxazE5bEJZaTlGeUJlc3VtbkhYQUkwbXYxZDdl?=
- =?utf-8?B?V29jeUNuT1lHSi9sWjcreGdJdUc4RUIyRFNiTlZvRWROSHVGSW5KWU9OMGo5?=
- =?utf-8?B?M2psN2dvM2dKR2FoQjI5RkFuL3F6dStmMFlqUDlPbS9IOG0zL1FwWE9Gck84?=
- =?utf-8?B?dUswSmlRbnJIcU1GRnA0WG5QYW84RERZT05heVMrdWovcHVWTnBudzV1ZlZI?=
- =?utf-8?B?T1A5TG8vOUkwaWx0ZlIrbklPQ1VqaUlsSyt4Z3c3WG5KdE5EeHJZbFlRV0Zp?=
- =?utf-8?B?SHcwc2dXODI1YWkzSkR2YWgrUnpGU0NjUWxjblRKdGh3QXQ2ZGpBNXZYcWdQ?=
- =?utf-8?B?U0M3dUNaUk5iZXNzaTA0MTRnNlA0VThVNkVpM3F1TFRQd0YwTms5bE1RRU5y?=
- =?utf-8?B?dGRaWkxjemFKUk1TcC84L2Rsb0U3OEwrRFMvUWFEWkZGWHJhM2tiYVRtcjZN?=
- =?utf-8?B?UzhEMkZkQkZ0akMzSWorWWZSZFgyRVU4Q3ZWSjluQ0l6RVNpM0NFSmJKdE1Z?=
- =?utf-8?B?R2M3aDNCTzkzNXNHWkJEZjNwRUJKTWN4VVBiQm1jOG1IU0VpMXIyRWUxd09G?=
- =?utf-8?B?WitxNVcwanhnenp4SDhpTTB4RmlZZG1hVFhTbWIrWTVyMmxwM1BmMkJCbjJq?=
- =?utf-8?B?SlV6VzdTb0JCU3JSR2V5aUljc29hYUdvVkl3OVpiVFlwNGVjd3BqWFRnTnlp?=
- =?utf-8?B?YjFYaDZiMTlaRDRqUXBIOXh4VmJlTDZubHFwNngxNFdmN0xFMkFOdnFvVE1s?=
- =?utf-8?B?bHlVWjM2clY3YzQvS05ESW5pV3pDN0ozRUMxMlJETXZhMVFTKy9EL1RQYmlO?=
- =?utf-8?B?ajRpME1wa1g3YWtMbHZHUlJndUJZZ2FPZ1B6YWE4Rm5CeWYySkN3OS9SR2VU?=
- =?utf-8?B?RXVHQWRtL0tWY29kQjVycGF4aGpMekRMQ1B4QlI4bldYdVR5a2RBRVFoQ1VM?=
- =?utf-8?B?YWRaRUttaEl5QXpqVW92NmV6Sm4zelp5d3pvdXBOTm5IQXFGWXpkM09uVnZh?=
- =?utf-8?B?NDJ2eUllRExSR0Y5NysyalJnOVhGY1VpOHNNWWJRUER2elg1Qmh2cklqMFlu?=
- =?utf-8?B?R013ckpkQzFPSmthZi96dXcybEFwNnRCcEwwTDBuZDJtSUNxMm1VSUNPTUFa?=
- =?utf-8?B?bFhpd2ZpbEpsbXdsSlU2cTdKMnNIckR5bmNqckQxajFEeTN2Z1hQY1h5K0RW?=
- =?utf-8?B?NEhlOU13dm9DR05zZDNtd284VkVRYlk1MEY3K205bTVsYVBiM0RTd2xLZFM4?=
- =?utf-8?B?dHpPQW5mL09WMFNOVzRuWXhHZ0ZNbEZsL05yWW1teW1uOTFiZDJOT3VINGpZ?=
- =?utf-8?B?ZmdLVGMzbC9XY0dsZ0pUeHE2SFNueFhhQUh0TGxxVmx6WU1laU5SQWV6cy9Q?=
- =?utf-8?B?U0dqdGxNSE9WR1BPRy9TbUxRMVpBdkVQYy9NWWFhd3d6MDV0RkxTN2E0REZW?=
- =?utf-8?B?dTFXMVBMY0w4bjVxWXN0OFZLNGNxVzladWFkRE16a2RlUng0eVgvaEVXNCtj?=
- =?utf-8?B?WmladERTMDUwRFkxenovakNEYlNiTFVLMUVCNVB2TnQvTkxwYzd3a3B6cnBo?=
- =?utf-8?B?ODNGWlV4RWdwUjVReTh1U0FVZzlzUEZHUFQ5Y0NnUG5zQWxWRHZxdkNJN090?=
- =?utf-8?B?OVBUZmhCQllVWXRrajQ2NFJSakU3QWQ0NnVxc2VwVjZsZFJTOEpNZlQ5LzZY?=
- =?utf-8?B?eTdabE5SY1dPODJoa1NvZjgzaWlPaUxENkFFczN3RDhQZGZJUFlmTTFKQUJr?=
- =?utf-8?B?b0xvMURIcVVrWVpSZm1tb0oyOU5XQW1xZ0RVTWNheHJ3RkVLNThtNHZJRHJV?=
- =?utf-8?B?WFhueWtldmI3R0hoZU1reXoydU1vNFZERWtXSnUvSFUxc0RMZ3Z1YVFKNVVU?=
- =?utf-8?B?VmVPRkdZNmRNRld4eWNHaXMvV25hcFJ6N3IyTXdOTjdTenEyazMwcXFFQk9Y?=
- =?utf-8?B?QWVYTkhHQ1NBemp0eHAxZmx4YUpjVTRFNE53VThkbnhRazBMSDRWWDA4VGk4?=
- =?utf-8?B?Q3RQRVpWdmpNNzljKzdHUEh3L1ZtU0sxdGtRV3puamZpWjVqMlZIc3ZwL3M1?=
- =?utf-8?B?dmlnNDI0OThxdzVSMWptRDhYcHZWZGM0cmhvQ0dUbU1JNmY0VXdMMGNjMGdI?=
- =?utf-8?B?SHc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <12B356F71489FC46BDB2189786D378F8@namprd10.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32BAB16D9BF
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 04:58:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752469125; cv=none; b=r8c6d/HcJ36bLOX68fD66fdw9Yz0uWAvCJB+JHEIwyXMnCn4v7tDUbr9ADX29t/cLYTHOx0cuDzD4nSymvfH8Cy8f+/sHm5CRFXmEyc78m2xPZkB2BPC1C1EMBoEGsM0yJERRIVjct0XBnH+/BKZsspDU5BmR4MyNl+3V4kjbl0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752469125; c=relaxed/simple;
+	bh=ac7g78miFEWilQGFApjszyinraGNJGe45HPcD4NwCy4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bTWFgULQQ4eohPzX3ApSx0iMJl45qw1PN9yBUlQy6A66TE13cexaux8YjGvcc/F0irOFdOBC4zufpUNWM8AF0RFmIk2xV/XNlfvFT5upME99dmZbIlQDfAKwGBGlQe5B9Wf+5XtfbsrRsazcWVXQVhMNGIRY7hEBwlFCegaXNMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=n1t1m8gP; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=F1MQ1MjX8e9oFs7G/VLfdHX9DbCmUvT82kW853RPlGE=; t=1752469123; x=1753333123; 
+	b=n1t1m8gPlJRid5ZCwa+X20hdZm2vSyDTkVfKgbEQ0Uk0aRC10lBVtp9RMz0Xh0Jvl77K/0sWaHg
+	tF1iSD5nXDiN6H8g30zlGd+rn1OvFxErlqT8cpyltibs+SRKgLQHf45mYzJ4mShSvrJ/9mWqacBEY
+	nyK0N3imO+x49jd5exewGUS9hIFe64F15DKDQhewFsx8TqNL0xmHCLA1vlZIBLzJePj9+uF/hKecZ
+	zRr8jQGh5JCc/WxgJ+MYRLvr+QBB+uU0g+ZckmsojuMcorDcjJSjtHO69TSDkjhU8cjk1lGYRd8mT
+	1rULAh1KNtDuOpBQ0Zx81Hajo0oaQistIqPg==;
+Received: from 70-228-78-207.lightspeed.sntcca.sbcglobal.net ([70.228.78.207]:63266 helo=localhost.localdomain)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1ubB3q-00080i-Ag; Sun, 13 Jul 2025 21:45:07 -0700
+From: John Ousterhout <ouster@cs.stanford.edu>
+To: netdev@vger.kernel.org
+Cc: pabeni@redhat.com,
+	edumazet@google.com,
+	horms@kernel.org,
+	kuba@kernel.org,
+	John Ousterhout <ouster@cs.stanford.edu>
+Subject: [PATCH net-next v11 00/15] Begin upstreaming Homa transport protocol
+Date: Sun, 13 Jul 2025 21:44:32 -0700
+Message-ID: <20250714044448.254-1-ouster@cs.stanford.edu>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	NzL90ta6sQhARXERKjvYJB+YrcR/Ir4eDWUIDfI6LdbUDUMYQCEX3g8QPvGakzbDISBElicLIAnXky48j3PMOWTfow6rIUP4Zp/PooMoriQ0zLNv9Jb2v6r4AqztlJb7X70twYbpm/gQwXbxDOBh3zeBheioycg2fLdE7QM7eQv+Z5/wTTC6ypn4Haeq6fMyj9sBpySoeBfbJB2PTMM/OqSz6ty1qX6nAo/414+5QzByTOkYD4XbkdT47cEwxPm2rCG0Bc0owv3zpLwZbEhvcAIKEjV4nHbHxOkVvGSkVQQcYtlbkKVU9JNKfSI5hbNTr9y1cwyiEVUoWOiUdK+cLNPKjhT8Pnaw8cJVCudfO+0LQAmDBg6IHAkcDmoMNRI+nio+RdCdXEawUOs6BUHS+CZ+t5xO262JL0AxWXvTVVUeO1TvyadJHQ/u30UGjTn8rZ5vG+YS5pBKTs2fPdjmLVJHnXWR9QiM/SYDGTt5St1rTWWzTp4WPpvdF9xVvivofIKqwPg405O23HguOmzgX4Wa7mThWljfhtW7xWBAZs9iX4NXYuwk+X9Q9iVeS9mwDqaUPH1kmFUPMQBfHRbFMDMZLhd6cc9HGu/x5P2/6ZA=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR10MB7417.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3b6df3c5-57ce-44d5-f4e8-08ddc29002af
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jul 2025 04:36:33.2394
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: a1Gw9YU82hUvdZgIJKNcMS28UiaXsaDPjjDYRnAjSdsjyN6lBVxjff2+VbnsdIQ52GERUDxUuGj2dtrFw/F9Yy+u28Fxkz5yLxLYpxMVpuE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR10MB7925
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-14_01,2025-07-09_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0 spamscore=0
- mlxlogscore=999 malwarescore=0 mlxscore=0 suspectscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
- definitions=main-2507140024
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE0MDAyNCBTYWx0ZWRfXxC5/QbawOdn0 JKCX9L2t4QgAPES7VXHDYiQ2VrY2j4Ivu+zPJFvBaI9VgSkgzX6NqeeqexYF0y3q+JP0xVYK4p7 5SJH+CFPWVrONy3Qe/SoA+jJBAMXZEe7Xetf5sWCgLeEfQchHzhq7vtOCkYC2qKcpS1YXHKJsCL
- I9Sbz0YMjs9VhDOdW5lSfxeV70PUmhz36XKxZVUZ7RikOci+CIbmmAY/6VrzjuCdej0wYSmxVgd RidIo77NVDOOpyb7JO9qDltb+gxiPo/yzH80NDkfv1awKYR85nVKT/AsXvFMm/BJBAk378pidQw w5wvixm7qWDHK1GBkPbtCjEGh+Iqcdp8sm0pKhQlopm2EuqC21XsY/V/aUaBVR/5c+OgC/IjRxY
- ZJ5dmM66/mfYDE+7stCoe2PnJoRT5GjQvHXP6j5+yGMGQMxwdxH2H1RDbbnFyBQ5/tiPUgw+
-X-Proofpoint-GUID: 3-Qx_C4hPazKADtir2cGKPCBrVoxmL_D
-X-Proofpoint-ORIG-GUID: 3-Qx_C4hPazKADtir2cGKPCBrVoxmL_D
-X-Authority-Analysis: v=2.4 cv=J8mq7BnS c=1 sm=1 tr=0 ts=6874895a b=1 cx=c_pps a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19
- a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=GoEa3M9JfhUA:10 a=drOt6m5kAAAA:8 a=lg7cvda2CWqSLD4-RrwA:9 a=QEXdDO2ut3YA:10 a=RMMjzBEyIzXRtoq5n5K6:22
+Content-Transfer-Encoding: 8bit
+X-Spam-Score: -1.0
+X-Scan-Signature: fdc9bd3576360f200df6c0613be4fe05
 
-T24gU3VuLCAyMDI1LTA3LTEzIGF0IDE5OjAxICswMTAwLCBBbCBWaXJvIHdyb3RlOg0KPiAJcmRz
-X3RjcF9hY2NlcHRfb25lKCkgc3RhcnRzIHdpdGggYSBwcmV0dHkgbXVjaCB2ZXJiYXRpbQ0KPiBj
-b3B5IG9mIGtlcm5lbF9hY2NlcHQoKS4gIE1pZ2h0IGFzIHdlbGwgdXNlIHRoZSByZWFsIHRoaW5n
-Li4uDQo+IA0KPiAJVGhhdCBjb2RlIHdlbnQgaW50byBtYWlubGluZSBpbiAyMDA5LCBrZXJuZWxf
-YWNjZXB0KCkNCj4gaGFkIGJlZW4gYWRkZWQgaW4gQXVnIDIwMDYsIHRoZSBjb3B5cmlnaHQgb24g
-cmRzL3RjcF9saXN0ZW4uYw0KPiBpcyAiQ29weXJpZ2h0IChjKSAyMDA2IE9yYWNsZSIsIHNvIGl0
-J3MgZW50aXJlbHkgcG9zc2libGUNCj4gdGhhdCBpdCBwcmVkYXRlcyB0aGUgaW50cm9kdWN0aW9u
-IG9mIGtlcm5lbF9hY2NlcHQoKS4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEFsIFZpcm8gPHZpcm9A
-emVuaXYubGludXgub3JnLnVrPg0KPiAtLS0NCj4gZGlmZiAtLWdpdCBhL25ldC9yZHMvdGNwX2xp
-c3Rlbi5jIGIvbmV0L3Jkcy90Y3BfbGlzdGVuLmMNCj4gaW5kZXggZDg5YmQ4ZDBjMzU0Li5hZjM2
-ZjViZjg2NDkgMTAwNjQ0DQo+IC0tLSBhL25ldC9yZHMvdGNwX2xpc3Rlbi5jDQo+ICsrKyBiL25l
-dC9yZHMvdGNwX2xpc3Rlbi5jDQo+IEBAIC0xMDUsMTAgKzEwNSw2IEBAIGludCByZHNfdGNwX2Fj
-Y2VwdF9vbmUoc3RydWN0IHNvY2tldCAqc29jaykNCj4gIAlpbnQgY29ubl9zdGF0ZTsNCj4gIAlz
-dHJ1Y3QgcmRzX2Nvbm5fcGF0aCAqY3A7DQo+ICAJc3RydWN0IGluNl9hZGRyICpteV9hZGRyLCAq
-cGVlcl9hZGRyOw0KPiAtCXN0cnVjdCBwcm90b19hY2NlcHRfYXJnIGFyZyA9IHsNCj4gLQkJLmZs
-YWdzID0gT19OT05CTE9DSywNCj4gLQkJLmtlcm4gPSB0cnVlLA0KPiAtCX07DQo+ICAjaWYgIUlT
-X0VOQUJMRUQoQ09ORklHX0lQVjYpDQo+ICAJc3RydWN0IGluNl9hZGRyIHNhZGRyLCBkYWRkcjsN
-Cj4gICNlbmRpZg0KPiBAQCAtMTE3LDI1ICsxMTMsOSBAQCBpbnQgcmRzX3RjcF9hY2NlcHRfb25l
-KHN0cnVjdCBzb2NrZXQgKnNvY2spDQo+ICAJaWYgKCFzb2NrKSAvKiBtb2R1bGUgdW5sb2FkIG9y
-IG5ldG5zIGRlbGV0ZSBpbiBwcm9ncmVzcyAqLw0KPiAgCQlyZXR1cm4gLUVORVRVTlJFQUNIOw0K
-PiAgDQo+IC0JcmV0ID0gc29ja19jcmVhdGVfbGl0ZShzb2NrLT5zay0+c2tfZmFtaWx5LA0KPiAt
-CQkJICAgICAgIHNvY2stPnNrLT5za190eXBlLCBzb2NrLT5zay0+c2tfcHJvdG9jb2wsDQo+IC0J
-CQkgICAgICAgJm5ld19zb2NrKTsNCj4gKwlyZXQgPSBrZXJuZWxfYWNjZXB0KHNvY2ssICZuZXdf
-c29jaywgT19OT05CTE9DSyk7DQo+ICAJaWYgKHJldCkNCj4gLQkJZ290byBvdXQ7DQo+IC0NCj4g
-LQlyZXQgPSBzb2NrLT5vcHMtPmFjY2VwdChzb2NrLCBuZXdfc29jaywgJmFyZyk7DQo+IC0JaWYg
-KHJldCA8IDApDQo+IC0JCWdvdG8gb3V0Ow0KPiAtDQo+IC0JLyogc29ja19jcmVhdGVfbGl0ZSgp
-IGRvZXMgbm90IGdldCBhIGhvbGQgb24gdGhlIG93bmVyIG1vZHVsZSBzbyB3ZQ0KPiAtCSAqIG5l
-ZWQgdG8gZG8gaXQgaGVyZS4gIE5vdGUgdGhhdCBzb2NrX3JlbGVhc2UoKSB1c2VzIHNvY2stPm9w
-cyB0bw0KPiAtCSAqIGRldGVybWluZSBpZiBpdCBuZWVkcyB0byBkZWNyZW1lbnQgdGhlIHJlZmVy
-ZW5jZSBjb3VudC4gIFNvIHNldA0KPiAtCSAqIHNvY2stPm9wcyBhZnRlciBjYWxsaW5nIGFjY2Vw
-dCgpIGluIGNhc2UgdGhhdCBmYWlscy4gIEFuZCB0aGVyZSdzDQo+IC0JICogbm8gbmVlZCB0byBk
-byB0cnlfbW9kdWxlX2dldCgpIGFzIHRoZSBsaXN0ZW5lciBzaG91bGQgaGF2ZSBhIGhvbGQNCj4g
-LQkgKiBhbHJlYWR5Lg0KPiAtCSAqLw0KPiAtCW5ld19zb2NrLT5vcHMgPSBzb2NrLT5vcHM7DQo+
-IC0JX19tb2R1bGVfZ2V0KG5ld19zb2NrLT5vcHMtPm93bmVyKTsNCj4gKwkJcmV0dXJuIHJldDsN
-CkkgdGhpbmsgd2UgbmVlZCB0aGUgImdvdG8gb3V0IiBoZXJlLCBvciB3ZSB3aWxsIG1pc3MgdGhl
-IG11dGV4IHVubG9jay4gIE90aGVyd2lzZSBrZXJuZWxfYWNjZXB0IGxvb2tzIGxpa2UgYSBwcmV0
-dHkNCnN5bm9ueW1vdXMgd3JhcHBlci4NCg0KVGhhbmtzIQ0KQWxsaXNvbg0KDQo+ICANCj4gIAly
-ZHNfdGNwX2tlZXBhbGl2ZShuZXdfc29jayk7DQo+ICAJaWYgKCFyZHNfdGNwX3R1bmUobmV3X3Nv
-Y2spKSB7DQoNCg==
+This patch series begins the process of upstreaming the Homa transport
+protocol. Homa is an alternative to TCP for use in datacenter
+environments. It provides 10-100x reductions in tail latency for short
+messages relative to TCP. Its benefits are greatest for mixed workloads
+containing both short and long messages running under high network loads.
+Homa is not API-compatible with TCP: it is connectionless and message-
+oriented (but still reliable and flow-controlled). Homa's new API not
+only contributes to its performance gains, but it also eliminates the
+massive amount of connection state required by TCP for highly connected
+datacenter workloads (Homa uses ~ 1 socket per application, whereas
+TCP requires a separate socket for each peer).
+
+For more details on Homa, please consult the Homa Wiki:
+https://homa-transport.atlassian.net/wiki/spaces/HOMA/overview
+The Wiki has pointers to two papers on Homa (one of which describes
+this implementation) as well as man pages describing the application
+API and other information.
+
+There is also a GitHub repo for Homa:
+https://github.com/PlatformLab/HomaModule
+The GitHub repo contains a superset of this patch set, including:
+* Additional source code that will eventually be upstreamed
+* Extensive unit tests (which will also be upstreamed eventually)
+* Application-level library functions (which need to go in glibc?)
+* Man pages (which need to be upstreamed as well)
+* Benchmarking and instrumentation code
+
+For this patch series, Homa has been stripped down to the bare minimum
+functionality capable of actually executing remote procedure calls. (about
+8000 lines of source code, compared to 15000 in the complete Homa). The
+remaining code will be upstreamed in smaller batches once this patch
+series has been accepted. Note: the code in this patch series is
+functional but its performance is not very interesting (about the same
+as TCP).
+
+The patch series is arranged to introduce the major functional components
+of Homa. Until the last patch has been applied, the code is inert (it
+will not be compiled).
+
+Note: this implementation of Homa supports both IPv4 and IPv6.
+
+Major changes for v11 (see individual patches for additional details):
+* There were no comments on the v10 patch series, so there are not many
+  changes in this version
+* Rework the mechanism for waking up RPCs that stalled waiting for
+  buffer pool space (the old approach deprioritized waking RPCs, which
+  led to starvation and server overload).
+* Cleanup and simplify use of RPC reference counts. Before, references were
+  only acquired to bridge gaps in lock ownership; this was complicated and
+  error-prone. Now, reference counts are acquired at the "top level" when
+  an RPC is selected for working on. Any function that receives a homa_rpc as
+  argument can assume it is protected with a reference.
+* Clean up sparse annotations (use name of lock variable, not address)
+
+Major changes for v10 (see individual patches for additional details):
+- Refactor resend mechanism: consolidate code for sending RESEND packets
+  in new function homa_request_retrans (simplifies homa_timer.c); a few
+  bug fixes (updating "granted" field in homa_resend_pkt, etc.)
+- Revise sparse annotations to eliminate __context__ definition
+- Use the destroy function from struct proto properly (fixes races in
+  socket cleanup)
+
+Major changes for v9 (see individual patches for additional details):
+- Introduce homa_net objects; there is now a single global struct homa
+  shared by all network namespaces, with one homa_net per network namespace
+  with netns-specific information. Most info, including socket table and
+  peer table, is stored in the struct homa.
+- Introduce homa_clock as an abstraction layer for the fine-grain clock.
+- Implement limits on the number of active homa_peer objects. This includes
+  adding reference counts in homa_peers and adding code to release peers
+  where there are too many.
+- Switch to using rhashtable to store homa_peers; the table is shared
+  across all network namespaces, though individual peers are namespace-
+  specific.
+
+v8 changes:
+- There were no reviews of the v7 patch series, so there are not many changes
+  in this version
+- Pull out pacer code into separate files pacer.h and pacer.c
+- Refactor homa_pool APIs (move allocation/deallocation into homa_pool.c,
+  move locking responsibility out)
+- Fix various problems from sparse, checkpatch, and kernel-doc
+
+v7 changes:
+- Add documentation files reap.txt and sync.txt.
+- Replace __u64 with _u64 (and __s64 with s64) in non-uapi settings.
+- Replace '__aligned(L1_CACHE_BYTES)' with '____cacheline_aligned_in_smp'.
+- Use alloc_percpu_gfp for homa_pool::cores.
+- Extract bool homa_bpage_available from homa_pool_get_pages.
+- Rename homa_rpc_free to homa_rpc_end.
+- Use skb_queue_purge in homa_rpc_reap instead of hand-coding.
+- Clean up RCU usage in several places:
+  - Eliminate unnecessary use of RCU for homa_sock::dead_rpcs.
+  - Eliminate use of RCU for homa::throttled_rpcs (unnecessary, unclear
+    that it would have worked). Added return value from homa_pacer_xmit.
+  - Call rcu_read_lock/unlock in homa_peer_find (just to be safe; probably
+    isn't necessary)
+  - Eliminate extraneous use of RCU in homa_pool_allocate.
+  - Cleaned up RCU usage around homa_sock::active_rpcs.
+  - Change homa_sock_find to take a reference on the returned socket;
+    caller no longer has to worry about RCU issues.
+- Remove "locker" arguments from homa_lock_rpc, homa_lock_sock,
+  homa_rpc_try_lock, and homa_bucket_lock (shouldn't be needed, given
+  CONFIG_PROVE_LOCKING).
+- Use __GFP_ZERO in *alloc calls instead of initializing individual
+  struct fields to zero.
+- Don't use raw_smp_processor_id; use smp_processor_id instead.
+- Remove homa_peertab_get_peers from this patch series (and also fix
+  problems in it related to RCU usage).
+- Add annotation to homa_peertab_gc_dsts requiring write_lock.
+- Remove "lock_slow" functions, which don't add functionality in this patch
+  series.
+- Remove unused fields from homa_peer structs.
+- Reorder fields in homa_rpc_bucket to squeeze out padding.
+- Refactor homa_sock_start_scan etc.
+  - Take a reference on the current socket to keep it from being freed.
+  - No need now for homa_socktab::active_scans or struct homa_socktab_links.
+  - rcu_read_lock/unlock is now entirely in the homa_sock scan methods;
+    no need for callers to worry about this.
+- Add homa_rpc_hold and homa_rpc_put. Replaces several ad-hoc mechanisms,
+  such as RPC_COPYING_FROM_USER and RPC_COPYING_TO_USER, with a single
+  general-purpose mechanism.
+- Use __skb_queue_purge instead of skb_queue_purge (locking isn't needed
+  because Homa has its own locks).
+- Rename UNKNOWN packet type to RPC_UNKNOWN.
+- Add hsk->is_server plus SO_HOMA_SERVER setsockopt: by default, sockets
+  will not accept incoming RPCs unless they have been bound.
+- Refactor waiting mechanism for incoming packets: simplify wait
+  criteria and use standard mechanisms (wait_event_*) for blocking
+  threads. Create homa_interest.c and homa_interest.h.
+* Add memory accounting for outbound messages (e.g. new sysctl value
+  wmem_max); senders now block when memory limit is exceeded.
+* Made Homa a pernet subsystem (a separate Homa transport for each
+  network namespace).
+
+v6 changes:
+- Make hrtimer variable in homa_timer_main static instead of stack-allocated
+  (avoids complaints when in debug mode).
+- Remove unnecessary cast in homa_dst_refresh.
+- Replace erroneous uses of GFP_KERNEL with GFP_ATOMIC.
+- Check for "all ports in use" in homa_sock_init.
+- Refactor API for homa_rpc_reap to incorporate "reap all" feature,
+  eliminate need for callers to specify exact amount of work to do
+  when in "reap a few" mode.
+- Fix bug in homa_rpc_reap (wasn't resetting rx_frees for each iteration
+  of outer loop).
+
+v5 changes:
+- Change type of start in struct homa_rcvbuf_args from void* to __u64;
+  also add more __user annotations.
+- Refactor homa_interest: replace awkward ready_rpc field with two
+  fields: rpc and rpc_ready. Added new functions homa_interest_get_rpc
+  and homa_interest_set_rpc to encapsulate/clarify access to
+  interest->rpc_ready.
+- Eliminate use of LIST_POISON1 etc. in homa_interests (use list_del_init
+  instead of list_del).
+- Remove homa_next_skb function, which is obsolete, unused, and incorrect
+- Eliminate ipv4_to_ipv6 function (use ipv6_addr_set_v4mapped instead)
+- Eliminate is_mapped_ipv4 function (use ipv6_addr_v4mapped instead)
+- Use __u64 instead of uint64_t in homa.h
+- Remove 'extern "C"' from homa.h
+- Various fixes from patchwork checks (checkpatch.pl, etc.)
+- A few improvements to comments
+
+v4 changes:
+- Remove sport argument for homa_find_server_rpc (unneeded). Also
+  remove client_port field from struct homa_ack
+- Refactor ICMP packet handling (v6 was incorrect)
+- Check for socket shutdown in homa_poll
+- Fix potential for memory garbling in homa_symbol_for_type
+- Remove unused ETHERNET_MAX_PAYLOAD declaration
+- Rename classes in homa_wire.h so they all have "homa_" prefixes
+- Various fixes from patchwork checks (checkpatch.pl, etc.)
+- A few improvements to comments
+
+v3 changes:
+- Fix formatting in Kconfig
+- Set ipv6_pinfo_offset in struct proto
+- Check return value of inet6_register_protosw
+- In homa_load cleanup, don't cleanup things that haven't been
+  initialized
+- Add MODULE_ALIAS_NET_PF_PROTO_TYPE to auto-load module
+- Check return value from kzalloc call in homa_sock_init
+- Change SO_HOMA_SET_BUF to SO_HOMA_RCVBUF
+- Change struct homa_set_buf_args to struct homa_rcvbuf_args
+- Implement getsockopt for SO_HOMA_RCVBUF
+- Return ENOPROTOOPT instead of EINVAL where appropriate in
+  setsockopt and getsockopt
+- Fix crash in homa_pool_check_waiting if pool has no region yet
+- Check for NULL msg->msg_name in homa_sendmsg
+- Change addr->in6.sin6_family to addr->sa.sa_family in homa_sendmsg
+  for clarity
+- For some errors in homa_recvmsg, return directly rather than "goto done"
+- Return error from recvmsg if offsets of returned read buffers are bogus
+- Added comments to clarify lock-unlock pairs for RPCs
+- Renamed homa_try_bucket_lock to homa_try_rpc_lock
+- Fix issues found by test robot and checkpatch.pl
+- Ensure first argument to do_div is 64 bits
+- Remove C++ style comments
+- Removed some code that will only be relevant in future patches that
+  fill in missing Homa functionality
+
+v2 changes:
+- Remove sockaddr_in_union declaration from public API in homa.h
+- Remove kernel wrapper functions (homa_send, etc.) from homa.h
+- Fix many sparse warnings (still more work to do here) and other issues
+  uncovered by test robot
+- Fix checkpatch.pl issues
+- Remove residual code related to unit tests
+- Remove references to tt_record from comments
+- Make it safe to delete sockets during homa_socktab scans
+- Use uintptr_t for portability fo 32-bit platforms
+- Use do_div instead of "/" for portability
+- Remove homa->busy_usecs and homa->gro_busy_usecs (not needed in
+  this stripped down version of Homa)
+- Eliminate usage of cpu_khz, use sched_clock instead of get_cycles
+- Add missing checks of kmalloc return values
+- Remove "inline" qualifier from functions in .c files
+- Document that pad fields must be zero
+- Use more precise type "uint32_t" rather than "int"
+- Remove unneeded #include of linux/version.h
+
+John Ousterhout (15):
+  net: homa: define user-visible API for Homa
+  net: homa: create homa_wire.h
+  net: homa: create shared Homa header files
+  net: homa: create homa_pool.h and homa_pool.c
+  net: homa: create homa_peer.h and homa_peer.c
+  net: homa: create homa_sock.h and homa_sock.c
+  net: homa: create homa_interest.h and homa_interest.c
+  net: homa: create homa_pacer.h and homa_pacer.c
+  net: homa: create homa_rpc.h and homa_rpc.c
+  net: homa: create homa_outgoing.c
+  net: homa: create homa_utils.c
+  net: homa: create homa_incoming.c
+  net: homa: create homa_timer.c
+  net: homa: create homa_plumbing.c
+  net: homa: create Makefile and Kconfig
+
+ MAINTAINERS               |    7 +
+ include/uapi/linux/homa.h |  158 ++++++
+ net/Kconfig               |    1 +
+ net/Makefile              |    1 +
+ net/homa/Kconfig          |   21 +
+ net/homa/Makefile         |   16 +
+ net/homa/homa_impl.h      |  674 ++++++++++++++++++++++
+ net/homa/homa_incoming.c  |  861 ++++++++++++++++++++++++++++
+ net/homa/homa_interest.c  |  121 ++++
+ net/homa/homa_interest.h  |   96 ++++
+ net/homa/homa_outgoing.c  |  562 +++++++++++++++++++
+ net/homa/homa_pacer.c     |  308 ++++++++++
+ net/homa/homa_pacer.h     |  184 ++++++
+ net/homa/homa_peer.c      |  595 ++++++++++++++++++++
+ net/homa/homa_peer.h      |  373 +++++++++++++
+ net/homa/homa_plumbing.c  | 1114 +++++++++++++++++++++++++++++++++++++
+ net/homa/homa_pool.c      |  483 ++++++++++++++++
+ net/homa/homa_pool.h      |  136 +++++
+ net/homa/homa_rpc.c       |  638 +++++++++++++++++++++
+ net/homa/homa_rpc.h       |  492 ++++++++++++++++
+ net/homa/homa_sock.c      |  432 ++++++++++++++
+ net/homa/homa_sock.h      |  408 ++++++++++++++
+ net/homa/homa_stub.h      |   91 +++
+ net/homa/homa_timer.c     |  135 +++++
+ net/homa/homa_utils.c     |  122 ++++
+ net/homa/homa_wire.h      |  338 +++++++++++
+ 26 files changed, 8367 insertions(+)
+ create mode 100644 include/uapi/linux/homa.h
+ create mode 100644 net/homa/Kconfig
+ create mode 100644 net/homa/Makefile
+ create mode 100644 net/homa/homa_impl.h
+ create mode 100644 net/homa/homa_incoming.c
+ create mode 100644 net/homa/homa_interest.c
+ create mode 100644 net/homa/homa_interest.h
+ create mode 100644 net/homa/homa_outgoing.c
+ create mode 100644 net/homa/homa_pacer.c
+ create mode 100644 net/homa/homa_pacer.h
+ create mode 100644 net/homa/homa_peer.c
+ create mode 100644 net/homa/homa_peer.h
+ create mode 100644 net/homa/homa_plumbing.c
+ create mode 100644 net/homa/homa_pool.c
+ create mode 100644 net/homa/homa_pool.h
+ create mode 100644 net/homa/homa_rpc.c
+ create mode 100644 net/homa/homa_rpc.h
+ create mode 100644 net/homa/homa_sock.c
+ create mode 100644 net/homa/homa_sock.h
+ create mode 100644 net/homa/homa_stub.h
+ create mode 100644 net/homa/homa_timer.c
+ create mode 100644 net/homa/homa_utils.c
+ create mode 100644 net/homa/homa_wire.h
+
+--
+2.43.0
+
 
