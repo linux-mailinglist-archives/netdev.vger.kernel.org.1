@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-206536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2AEAB03634
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 07:44:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C22E8B03640
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 07:52:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6706F7A4190
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 05:42:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 106BF16D765
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 05:52:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35B1E217F40;
-	Mon, 14 Jul 2025 05:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4943A1FF1BF;
+	Mon, 14 Jul 2025 05:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KHgnYetF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="htsW7Hnd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05BB21771C;
-	Mon, 14 Jul 2025 05:43:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 132CA2E3705;
+	Mon, 14 Jul 2025 05:51:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752471821; cv=none; b=NgDWEG10p+wwk72G75EABrRqUIjaf5gsDxzAA7qi0/4OGkwXuUHSyuLGziCdfI16i5Nh1mUKakHifX+vQb9WK2dUCTSMd5zuqvIJH5brxPpB+XiEsn5HfXDZ30XOE4QeMZw2yIiVtf4b+u/OrZBLFH+QsYXVE37qxwlPbLvw37Q=
+	t=1752472320; cv=none; b=ulHXZXvTPZlwNbD3tm19j/Anl3T4uvynR47t6B/BqRUyNSNQUkjbLR3QygmHLWp27xDtWUKhTGk4R6P1V9huVgWVeB9neEU4puwvINRCXe3p+mkdnWmnwJL72dVUO9S3H6Sv+9qMz6YN74C8KkHBaA8ZHEPsbEbtflBCpGtNG2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752471821; c=relaxed/simple;
-	bh=U5E7eWmeP6xThNywDNdIL2TmVkGtfAWjscCvkQwwMcQ=;
+	s=arc-20240116; t=1752472320; c=relaxed/simple;
+	bh=2LtHspjFSXcBOwKYztoRClrLY8oarllesMWia3wF3Xg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mI+/KvE25vyDrEbYxQ02+T59yvafo/ZCKAOXMJUoR6hBmnF+5CwzmyqqHZrzUeSLWrp+qrMvg+Tke4qI70tEKbCsWdcbouY3NNXFjdGL/aZ4Bbc8K/C/9yZRCkBBAk4ykAUCE3yGihZNKy0/TdyUWkb6evZ5cSGisp4KYwKecxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KHgnYetF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69B79C4CEED;
-	Mon, 14 Jul 2025 05:43:38 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=JjVBfULh5MBWM/rtiZTAMOBvRCoD5sOvEKJ1WrsUrfmEE+959C6PqNsr9pRjIku1rIAgQolYfmSSX//A/60QteRC3cTt/wY1xsqnio4TZVSkaLlT/gtiAbjHSJOekF3yf6potTQ4bPkE58GT3EOqe430nwutQvq1hF+Ynk0+sAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=htsW7Hnd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D75DC4CEED;
+	Mon, 14 Jul 2025 05:51:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752471820;
-	bh=U5E7eWmeP6xThNywDNdIL2TmVkGtfAWjscCvkQwwMcQ=;
+	s=k20201202; t=1752472319;
+	bh=2LtHspjFSXcBOwKYztoRClrLY8oarllesMWia3wF3Xg=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=KHgnYetFdfPs/P/my+4sT+y7PirFrhWpLZV1aMtq1Silr4RvRE4qg/jfA/T77itT9
-	 scCG3nGoY0BhRpOWZSsBHoamZEk5c+jKLDKC2S/S46obHDNlCCkUgbM/EXPwwx4WYV
-	 6f5CViGoMfGIxSBLhU9MYW0GwoHZIKlS3wccdm4JGNzmNH12PTzR8KS3gOqp5d8T4y
-	 lo0eco8ItnbXEbc0VPMOHHFv9dZ2MHiu+ooSMXYy4Fv+uZWns2VjlLnwlj2V/EwAtE
-	 RJvOHb2NiVPGR80zr/8EaDGCnZI1QO9hO9ONk81ADK1BrbJxkicWILu7a5iMwBm9qN
-	 FSdaIFIKMXX9A==
-Message-ID: <afef6851-5e2f-41f4-b8c0-bf9bd77f7eda@kernel.org>
-Date: Mon, 14 Jul 2025 07:43:36 +0200
+	b=htsW7HndlvL4CLP5HDJ+uonTLCseq68TBcVFlLT1wvewM0BfJloFv3U9Vw1mmd2xt
+	 56wU+hxYguk7Vww+5UEDEo7laSzRBuwyDMYWmaxYFdr0yklPhm2M4dvoWRZkON6TDt
+	 XZicCOgYbjk/n0ooZ0ZMuzRc5Cjh9pWcgK74pOFvvxJSpL/rZJcPcGGI9WOrYsPkk9
+	 X1IJQjWOUBSCsV6Dh0NbKLqKXygbgxNUY7GEk094DMyruweWgsaAgINMnhBJcY64Bc
+	 TPrByFpfeThXeGTbM3lC9dS9Jau3L6QrI1A87bFpI7vEfJwA+tkR/x48KU7ecTbH8+
+	 vEIMEiwKFFE5A==
+Message-ID: <ce7e7889-f76b-461f-8c39-3317bcbdb0b3@kernel.org>
+Date: Mon, 14 Jul 2025 07:51:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,17 +50,16 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/1] dt-bindings: net: rfkill-gpio: document
- reset-gpios
-To: Johannes Berg <johannes@sipsolutions.net>,
- Shengyu Qu <wiagn233@outlook.com>, Chukun Pan <amadeus@jmu.edu.cn>,
- Philipp Zabel <p.zabel@pengutronix.de>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Rob Herring <robh@kernel.org>,
- devicetree@vger.kernel.org, netdev@vger.kernel.org
-References: <20240528143009.1033247-1-amadeus@jmu.edu.cn>
- <TY4PR01MB144321BDC50DEF7A2537C24F0984BA@TY4PR01MB14432.jpnprd01.prod.outlook.com>
- <21d8f6388b98ec0fe8662606a3f1c3181466917d.camel@sipsolutions.net>
+Subject: Re: [PATCH net-next 01/12] dt-bindings: ptp: add bindings for NETC
+ Timer
+To: Wei Fang <wei.fang@nxp.com>, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, richardcochran@gmail.com, claudiu.manoil@nxp.com,
+ vladimir.oltean@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: fushi.peng@nxp.com, devicetree@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, imx@lists.linux.dev
+References: <20250711065748.250159-1-wei.fang@nxp.com>
+ <20250711065748.250159-2-wei.fang@nxp.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -106,29 +105,87 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <21d8f6388b98ec0fe8662606a3f1c3181466917d.camel@sipsolutions.net>
+In-Reply-To: <20250711065748.250159-2-wei.fang@nxp.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 11/07/2025 09:14, Johannes Berg wrote:
-> On Fri, 2025-07-11 at 12:37 +0800, Shengyu Qu wrote:
->> Hello,
->>
->> What is blocking this patch to get merged? I'm seeing more 5G modules 
->> need this to work correctly, for example, FM350.
->>
+On 11/07/2025 08:57, Wei Fang wrote:
+> Add device tree binding doc for the PTP clock based on NETC Timer.
+
+
+A nit, subject: drop second/last, redundant "bindings for". The
+"dt-bindings" prefix is already stating that these are bindings.
+See also:
+https://elixir.bootlin.com/linux/v6.7-rc8/source/Documentation/devicetree/bindings/submitting-patches.rst#L18
+
 > 
-> I guess I have no idea, fell through the cracks and so far nobody cared
-> enough?
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> ---
+>  .../devicetree/bindings/ptp/nxp,ptp-netc.yaml | 67 +++++++++++++++++++
+>  1 file changed, 67 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/ptp/nxp,ptp-netc.yaml
 > 
-> DT folks, what tree should this kind of patch go through? I guess I can
-> take it through wireless-next with other rfkill changes? Or should it go
-> through some DT tree?
+> diff --git a/Documentation/devicetree/bindings/ptp/nxp,ptp-netc.yaml b/Documentation/devicetree/bindings/ptp/nxp,ptp-netc.yaml
+> new file mode 100644
+> index 000000000000..b6b2e881a3c0
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/ptp/nxp,ptp-netc.yaml
+> @@ -0,0 +1,67 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/ptp/nxp,ptp-netc.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: NXP NETC Timer PTP clock
 
+What is NETC?
 
-Preferably: net-next, wireless-next.
+> +
+> +description:
+> +  NETC Timer provides current time with nanosecond resolution, precise
+> +  periodic pulse, pulse on timeout (alarm), and time capture on external
+> +  pulse support. And it supports time synchronization as required for
+> +  IEEE 1588 and IEEE 802.1AS-2020.
+> +
+> +maintainers:
+> +  - Wei Fang <wei.fang@nxp.com>
+> +  - Clark Wang <xiaoning.wang@nxp.com>
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - pci1131,ee02
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  clocks:
+> +    maxItems: 1
+> +
+> +  clock-names:
+> +    oneOf:
 
-If you want it via DT, someone needs to explicitly ping Rob on IRC.
+Why oneOf? Drop
+
+> +      - enum:
+> +          - system
+> +          - ccm_timer
+> +          - ext_1588
+
+Why is this flexible?
+
+> +
+> +  nxp,pps-channel:
+> +    $ref: /schemas/types.yaml#/definitions/uint8
+> +    default: 0
+> +    description:
+> +      Specifies to which fixed interval period pulse generator is
+> +      used to generate PPS signal.
+> +    enum: [0, 1, 2]
+
+Cell phandle tells that. Drop property.
+
 
 Best regards,
 Krzysztof
