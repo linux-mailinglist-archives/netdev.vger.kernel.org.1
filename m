@@ -1,60 +1,55 @@
-Return-Path: <netdev+bounces-206628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B56CB03CD1
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 13:04:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B810BB03CD8
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 13:06:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F45E188A472
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 11:04:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FA29167B00
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 11:06:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C8B244668;
-	Mon, 14 Jul 2025 11:04:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19FB5245014;
+	Mon, 14 Jul 2025 11:06:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TwybnVY7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gPQ2QyAU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA1BE1DDC2B;
-	Mon, 14 Jul 2025 11:04:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31181DDC2B;
+	Mon, 14 Jul 2025 11:06:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752491060; cv=none; b=pTh2OVDrWhvvMKH7Ei/v+Gpc++H9m3uwT//vhHQ9gEP/+jHTaGZqmJv5zMKkn6/hbWQpQmVq5Hf1d3a50B8KM7HPP8e3F/80jPHqkAVnGqmxWducUCvlTJdfv5c0123+jJTbQuKW3jSG2HGmdRkecr1xPGnK3GlBQ3x36tKdbJI=
+	t=1752491165; cv=none; b=Uk+8Qd24jWG3p3vUSz/G+XO5mTryV7xAiC0/bx2kfVdC8Ua+NWjvDGCCySA3MFC3YSO99IxitIwyNLZ5i8ZPesryC6VvWuIceRuW1JfRk0/S/IAoAih5yCS0Sx9w4LOkkqqgqxvlqZdxwHZPR72jvGAqqSDg0HNbLK1JWrmQKaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752491060; c=relaxed/simple;
-	bh=q9HpEtIRrkZdELTtCWPL3gkg5Ju4mFgBx8v63a7Nwic=;
+	s=arc-20240116; t=1752491165; c=relaxed/simple;
+	bh=cPgCiLWJbDjvKBCL1h2VP20MYSDoLy/FVbPzrkJT1cY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KGZZpbufC+yXsLxLkxtA08i0/uyH7HEbAS/PcFKi2VbLj2b2q3bkRsTYTpYUU2aZqMbgMmgmHLSKnxkKvzE3Fn/Fm3etRxxUx8e5mAQnHMdy6IEn1Q5v9XVx7xbMrJccQBMg8Ychahq9TPWBOAo0uKBQuDh16R6RrKpIAgpIPxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TwybnVY7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A384BC4CEED;
-	Mon, 14 Jul 2025 11:04:15 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=I9Yy7xvBfjQIA3XLYbRI9S4w3kRFwd3Bcz/KH30b8/f+N+pEYUgGERFZfHwswuUx1sEDPfPY0IYUYdlQJWN/80pwTDWq7ASOQrnj4G99c22aKAE679LSQMbTvKtZif4Q4mBVOV2wBzndbPeCKJ8Xu+8sGKa0g0ScJm4tGmVR7vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gPQ2QyAU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE99CC4CEED;
+	Mon, 14 Jul 2025 11:06:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752491059;
-	bh=q9HpEtIRrkZdELTtCWPL3gkg5Ju4mFgBx8v63a7Nwic=;
+	s=k20201202; t=1752491164;
+	bh=cPgCiLWJbDjvKBCL1h2VP20MYSDoLy/FVbPzrkJT1cY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TwybnVY71wPexuyymf214H8oWLShebFIFCnA495WvSllztFcYYaOPi7yMbthCIMLU
-	 RxiPYIIrLlhmaYVQS2JIQ+ECeXO22MUj55LLIGEQb4C8QfxTE9JnRm8QpfdDGpdPhU
-	 ddeKZdVcOi9zxlT/wNvdJLIQZ285J+lJ1QEWA//Qi2kqQB6sYORQTgP5YJWU5zfvnK
-	 U9eDSYOg5TA9MlpSZz4lStDf47IaO6s0hE0bSHV5jVmZuLaEDtiwWEy6VR3kVhbUGe
-	 E7Etcrc5wnn2kw5nmJVGkVWqdnt+C1Uig8PY2/3zUqkbykAQ9SMjn66f2LmjTR2vvu
-	 i4CAGd4CSH6RA==
-Date: Mon, 14 Jul 2025 12:04:13 +0100
+	b=gPQ2QyAU8v7LxTlyouulXMHR9nqdcTOONxlr7t5eRBiMvcieI+cSp2NO73gMmdZgF
+	 9g+CC3gBXPsUrZjg4R9A9axMuhRyC70Z0Lh8cWiULuqZphxIhX/dRmUEQWOGJVybT8
+	 PCQ/ZRHhsGlInuWcUpSl1xcLfbHnEnsxY3X6Y0RWpqN6j/oO5ycXyvp+9qJDUumIAZ
+	 c/xGOSJneL0RWOT5c1219OwOWowFocB3yBq0+4LNAdlP5Sz5Izd7PLeOAGn7FJi/u0
+	 p4492Hl2qa4SjMq+Son3SseJIdIzNK/12zkU+SEnrB7yEGx7y+dsRVwX13G/wYh9M1
+	 ySL9C4sqK5OOA==
+Date: Mon, 14 Jul 2025 12:06:00 +0100
 From: Simon Horman <horms@kernel.org>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, shenjian15@huawei.com,
-	liuyonglong@huawei.com, chenhao418@huawei.com,
-	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
-	salil.mehta@huawei.com, arnd@kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V2 net-next 00/11] net: hns3: use seq_file for debugfs
-Message-ID: <20250714110413.GJ721198@horms.kernel.org>
-References: <20250711061725.225585-1-shaojijie@huawei.com>
- <20250712121920.GX721198@horms.kernel.org>
- <df1c269a-085a-47cc-83ef-294ea84b98a2@huawei.com>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	mengyuanlou@net-swift.com, stable@vger.kernel.org
+Subject: Re: [PATCH net v2] net: libwx: fix multicast packets received count
+Message-ID: <20250714110600.GK721198@horms.kernel.org>
+References: <DA229A4F58B70E51+20250714015656.91772-1-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,50 +58,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <df1c269a-085a-47cc-83ef-294ea84b98a2@huawei.com>
+In-Reply-To: <DA229A4F58B70E51+20250714015656.91772-1-jiawenwu@trustnetic.com>
 
-On Mon, Jul 14, 2025 at 09:04:56AM +0800, Jijie Shao wrote:
+On Mon, Jul 14, 2025 at 09:56:56AM +0800, Jiawen Wu wrote:
+> Multicast good packets received by PF rings that pass ethternet MAC
+> address filtering are counted for rtnl_link_stats64.multicast. The
+> counter is not cleared on read. Fix the duplicate counting on updating
+> statistics.
 > 
-> on 2025/7/12 20:19, Simon Horman wrote:
-> > On Fri, Jul 11, 2025 at 02:17:14PM +0800, Jijie Shao wrote:
-> > > Arnd reported that there are two build warning for on-stasck
-> > > buffer oversize. As Arnd's suggestion, using seq file way
-> > > to avoid the stack buffer or kmalloc buffer allocating.
-> > > 
-> > > ---
-> > > ChangeLog:
-> > > v1 -> v2:
-> > >    - Remove unused functions in advance to eliminate compilation warnings, suggested by Jakub Kicinski
-> > >    - Remove unnecessary cast, suggested by Andrew Lunn
-> > >    v1: https://lore.kernel.org/all/20250708130029.1310872-1-shaojijie@huawei.com/
-> > > ---
-> > > 
-> > > Jian Shen (5):
-> > >    net: hns3: clean up the build warning in debugfs by use seq file
-> > >    net: hns3: use seq_file for files in queue/ in debugfs
-> > >    net: hns3: use seq_file for files in tm/ in debugfs
-> > >    net: hns3: use seq_file for files in tx_bd_info/ and rx_bd_info/ in
-> > >      debugfs
-> > Thanks for the update, but unfortunately I don't think this is enough.
-> > 
-> > W=1 builds with bouth Clang 20.1.7 and GCC 15.1.0 warn that
-> > hns3_dbg_fops is unused with the patch (10/11) above applied.
-> > 
-> > >    net: hns3: remove the unused code after using seq_file
-> > I suspect this patch (11/11) needs to be squashed into the previous one (10/11).
-> > 
-> > ...
-> 
-> Yes, it looks like so...
-> 
-> However, in this case, the operation of patch10 is not singular.
-> It modified a debugfs file through a patch while also removing unused code frameworks.
-> 
-> In fact, this warning was cleared in patch 11...
-> 
-> ...
-> 
-> I will merge patch 11 into patch 10 in v3.
+> Fixes: 46b92e10d631 ("net: libwx: support hardware statistics")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+> ---
+> v1 -> v2:
+> - add code comment
 
-Thanks, I agree that looks like a good approach.
+Thanks for the update.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
