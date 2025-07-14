@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-206759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEDF9B044F6
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 18:04:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B6E5B044F5
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 18:04:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A61D4A3314
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 16:03:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C48CD1A615CF
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 16:04:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 020DE25C82D;
-	Mon, 14 Jul 2025 16:03:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B56B25DAEA;
+	Mon, 14 Jul 2025 16:03:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="ZtUUFO62"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="YvnViD3Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D618925C80E
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 16:03:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B841025D1FE
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 16:03:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752509014; cv=none; b=ReSyn8t0qlWfbbbDtVwK5rIuKhNSDJ2xCiwMJ8gKMeFvgJ/eCxYyC4/rtF58SdxNX6U+OrFyTS7M5scBWxVw9PiBbs9Hwh2MDuOKgz91PhvOcl+4y4gWzLYcvaim5y5cBA+RYicX4hmZJrAZ/u5Q1A1nKJ4G1r6VZCQ1LcRlIMc=
+	t=1752509020; cv=none; b=VKe12xE/BLsFCqEVw0aF1sPloimmH6l6ZMPG2FUpSnoh4ufPYos0nXYwQEnIXdk3A8hJM/WytmhyC5PAtFcISyM5YS3XQ/xyf1TjKT+Je/v0cPme898weWsHC7XuWVmiBPtgJI6el602PSUDjA9/luhxiJ8tyXxC0bCUWtm2C1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752509014; c=relaxed/simple;
-	bh=nEbP4mec1mAdu4Gy8NwG+hPMImdmUAeXUMPWohYgk7c=;
+	s=arc-20240116; t=1752509020; c=relaxed/simple;
+	bh=5zqeJd32nK3glrjWiVTfaCmp7WZjXavhcHoFO1tokq0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=u386/+QIqqIFFCXbWWhN/1ARFve/7ALnhsIh3Ou1wsueBltcSG1jGLa7TArkOtS8boynGOVd+fadLIDHtRur37ceCRR0YVS2jetekvUvLnNOYrf+PBPUun+NbuMQSuNongirOXDZfm7Bt0yxonTe6en1eh0Bbe0UV5oHv1KpG80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=ZtUUFO62; arc=none smtp.client-ip=209.85.167.43
+	 In-Reply-To:To:Cc; b=Kjw6Q5ghVHH5HRvgCdlhDSKy5J//BN+0ocaPWamgE5lXDl05cl5cZm40MnGK4HRw0z8ELvvlRaIEBRquqI269972xBQpJd/1A4rzQ2FPVv8jB3uga2YXhg0ukAD08va1tFhD6cn+Ni0C2xjOydT0VIlj8wByQaifsJLF4hB5Vrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=YvnViD3Q; arc=none smtp.client-ip=209.85.208.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-558fa0b2cc8so3531647e87.1
-        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 09:03:32 -0700 (PDT)
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-32b8134ef6aso39272021fa.0
+        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 09:03:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1752509010; x=1753113810; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1752509015; x=1753113815; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=md2mA+3JE0mstqxRdufG1uK98/Tpipcuv42D7+vi3Vc=;
-        b=ZtUUFO62ZNOJT9kuz9paGvbHR6hnc2x8rkb0lRL9wdQMpueZOSmPJZVOuPMXBwO+j5
-         kpQWwBJUJ/Shqkb9ntUGZZ40A8X8HHFD0R75A8pCDDb8+GrD2oYad3auLW+rx0oqw3/v
-         cUJjOF9oRe+9dK3lqNaIn+taWLP14HhL3zUbdGQu6VG81cL/y4szqAOEfkRHI/Y0297e
-         xp1NybPTofgbW9Eo4X1NyYiZRwvZlqfhXxRaO9vFdgbzf/Oo/zYyfslh3KSY9IuM006l
-         SC25Yj7sc/dPfwZ8ScLl68rN1W+tJa0os6rHJrr0nD2xF1wk5byNiIA40aUM559mClpt
-         4bew==
+        bh=vfncrDReC1yR6GJRdYyI1LRv1h0F+IgSL1XA3PqtnyA=;
+        b=YvnViD3QikO9CmX9oROFejumTudJ0EEnjezWoPK+c7ry9qy5regHNQG2u3TNVhYcx+
+         OnrEsD8m/arGXmy9qJe6P1z5XY+rOOST9hjeD5fPpd495yRNu6rwkkfvmsDJ0R/mOBsO
+         TqMEBgn1WNspg9akp4v0E44NM9ater1GmqP6puNvlMdbuh95mPZjNRgDClYdp117QUJe
+         +/zqLSSkF1P1eSglq/VEkAIk+oXfAGyctstgQOPqHydfe6Zl7GFPEfGw3090NHl17opr
+         YzSoMLT1bLufTPuu5hb28u3lgc5b4KWwL1psM28Qb4+mzT1v+fpkRhRGNutwQYcKG7lC
+         WPEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752509010; x=1753113810;
+        d=1e100.net; s=20230601; t=1752509015; x=1753113815;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=md2mA+3JE0mstqxRdufG1uK98/Tpipcuv42D7+vi3Vc=;
-        b=vboj4f3mgG4DQwHi3KVuiuk/yvd/tA89/mbc/H8n2o/AOb5uke3HP+KH0hRW+sUBSU
-         4J8c7v3MyTKa9mod3a3eB9zIRaLvmsH8oh3a7sd/ZHqyZ3rItdHq0jGWbqHADTHyNfL3
-         7HT4Msfka5UOcUfnXo25erzTFYvJ9aiUsgX09mYjAi4M6N5nhEVGZ033yVoIg56FkvNh
-         8Q4MEdZ3bwc6Td/tZPUGqgnKgrVW08PyC2kRqZbRXuFsZW35RPj5QOCW8ek/1YKS4qmD
-         KgOnxmvI6ppBAeE9btacbypjva/oNGgG7dKu+/u/8/zHJfe4NqqHCskDId0O1rpN4xy3
-         IP+Q==
-X-Gm-Message-State: AOJu0YwNj74RgMceip8LRklHp3n4UgL0/7lJEYFDIsmgLg7wRPVGmues
-	pTveO20Ks6+Xkzi3ZaLktAhjnZ+/FMUafjl/E2QRirnQCZtI1lokVhxYeR6w3eHtvH6juGkupX1
-	gUTIz
-X-Gm-Gg: ASbGncuiAgQuc/erzNPi+Zkz5dw+70r67SH+jJ+KBku1NOA8oOa3250OOKpi2Q8WQ/8
-	G/bYIFmCbSj92rRPdxXqgdzUNaEZVaSkLrQlxs83Wd06dcHlHDVBgaHA73k3l+SoBLvBE/uOumP
-	BcBIlnXJjTI1KZB64bHXaClinV/4oP7w+ei6YnenCsmrHbz7wJTruTrbGfu1F4dTYhKGgOO58gk
-	Un2qCNJJy/362l434i1uN3sf3vYmErTsfgniNr+yByRalDasefX6cyqHjzRL7xDoXBTtdzDh5Sm
-	C77x0CKmsJ6wBEDSHEaBTdaryfBbs+DntbWZy9sH+KNmp/mfxtAvFjL1zotdPIDfJvQOvFuv3Bv
-	z9zVmDmZSTrkQaMidSyUPzEnETbhx4V+MQ38hz2GLAfwHitm94rlcHESP+Z02RPKp3byh
-X-Google-Smtp-Source: AGHT+IHkuoBhMYha5ajBQvX0WDkXYf2rbXjt2W0KdAXGjw91mEoel48jhQFMayVNf4pMItysSocMxQ==
-X-Received: by 2002:a05:6512:715:b0:558:f952:41eb with SMTP id 2adb3069b0e04-55a045f082dmr3418523e87.26.1752509010279;
-        Mon, 14 Jul 2025 09:03:30 -0700 (PDT)
+        bh=vfncrDReC1yR6GJRdYyI1LRv1h0F+IgSL1XA3PqtnyA=;
+        b=JBvndEoNkMZgkPaNd2IEwKXKqK5PKbgJ4t20iEbpiFUTMxzkRLEHIOXbDv5Zl4GIg/
+         9+7QlOZx0QCbscHOU+Us7v9+eJa1iU1SP0EgyTTrLx6rxyqACqMQyDjzxCxxzja3eRcH
+         EpODg8xUYJvnlKqmFTcMo5JHXXhdP6vgNdUPdD9UPI4+H5U5FeRAAyJ8W6BDikuF+JVC
+         CSsEKLI/McyCNC5InLoRSxzzDWecXSYB2Q8165q3ak2s/BAkAi9mOaVu7nZWtHg8Xt48
+         iw6nzt+Ui6UwMWuIzxE6QB02aIttSzmLXt/XbQyzQ1R9y4BIm15IbBl/9VB75p/pW08U
+         pZDw==
+X-Gm-Message-State: AOJu0Yz4JDI7jgfLg0Ni/b5bN7BomHjigjCib7TOZpd4Qv+A1E2m0Vv4
+	xA3nnF5X4iopvCAYNDR/YUiJ5ym0QktgQriqDkjom9pzAi+hCJS/ITwZr4Mq5MW9gB2yl/0odBk
+	hYIdV
+X-Gm-Gg: ASbGncvGkpVWoSnOcA5BAZHYHFGnkhNA4YEaivmreAM/TMzxQ+6QqaDOzVW7786sMYo
+	Rwdnw07OubWZorSmNjxKz/FkHzurxSluyzGScrHD5PCRfQBvka9oHhragGwoaPlKKE3/W/ozRQT
+	Fy7x9yVnB0NPrqMbnW9LTh2b8cgw9SGZXCFHSrJ/obfwiLp/Yln+xMlmzeFOOxCOBEIVFP8qb1l
+	L8a/SxxHPyi3I+2SrX8mqkKSk4E7nT1qqqqQqxKzfVqG1wLJozErdkUNmWydvruK6YrZEN4t9PC
+	ZEGFdiBjltuJ+lkg9n0Lp9jWTlqb2xNOve9lmoSKydrDllbbgaKBjA82HVD7FpOQxrtm9rRciVE
+	MHN9xd7H6+jafOTs3s7y+/IpBLjU4l2X8GfaaYOSGEVXxYI2QA2ApeR4hFhy1IeNK2dps
+X-Google-Smtp-Source: AGHT+IHy5NfXB037YR3wzpiulItlA5kJfpuAzIlF+CbzPPq5tb4lpH9xmAz2lUnmyXf5+SKvAfE3lw==
+X-Received: by 2002:a05:651c:2205:b0:32c:bc69:e940 with SMTP id 38308e7fff4ca-33053499dfamr50842161fa.29.1752509015061;
+        Mon, 14 Jul 2025 09:03:35 -0700 (PDT)
 Received: from cloudflare.com (79.184.150.73.ipv4.supernova.orange.pl. [79.184.150.73])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-55943b79c46sm1974882e87.229.2025.07.14.09.03.28
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-32fa2913892sm16723971fa.5.2025.07.14.09.03.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Jul 2025 09:03:29 -0700 (PDT)
+        Mon, 14 Jul 2025 09:03:32 -0700 (PDT)
 From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Mon, 14 Jul 2025 18:03:05 +0200
-Subject: [PATCH net-next v3 2/3] tcp: Consider every port when connecting
- with IP_LOCAL_PORT_RANGE
+Date: Mon, 14 Jul 2025 18:03:06 +0200
+Subject: [PATCH net-next v3 3/3] selftests/net: Cover port sharing
+ scenarios with IP_LOCAL_PORT_RANGE
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,256 +85,609 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250714-connect-port-search-harder-v3-2-b1a41f249865@cloudflare.com>
+Message-Id: <20250714-connect-port-search-harder-v3-3-b1a41f249865@cloudflare.com>
 References: <20250714-connect-port-search-harder-v3-0-b1a41f249865@cloudflare.com>
 In-Reply-To: <20250714-connect-port-search-harder-v3-0-b1a41f249865@cloudflare.com>
 To: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
  "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
  Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>
-Cc: netdev@vger.kernel.org, kernel-team@cloudflare.com, 
- Lee Valentine <lvalentine@cloudflare.com>
+Cc: netdev@vger.kernel.org, kernel-team@cloudflare.com
 X-Mailer: b4 0.15-dev-07fe9
 
-Situation
----------
+Expand the ip_local_port_range tests to check that when using
+IP_LOCAL_PORT_RANGE socket option:
 
-We observe the following scenario in production:
+1) We can share the local port as long as there is no IP address conflict
+   with any other socket. Covered by tcp_port_reuse__no_ip_conflict* tests.
 
-                                                  inet_bind_bucket
-                                                state for port 54321
-                                                --------------------
+2) We cannot share the local port with wildcard sockets or when there is a
+   local IP conflict. Covered by tcp_port_reuse__ip_conflict* tests.
 
-                                                (bucket doesn't exist)
+3) We cannot share the local IP and port to connect to different remote IPs
+   if the port bucket is in non-reuseable state, Corner case covered by
+   tcp_port_reuse__ip_port_conflict_with_unique_dst_after_bind test.
 
-// Process A opens a long-lived connection:
-s1 = socket(AF_INET, SOCK_STREAM)
-s1.setsockopt(IP_BIND_ADDRESS_NO_PORT)
-s1.setsockopt(IP_LOCAL_PORT_RANGE, 54000..54500)
-s1.bind(192.0.2.10, 0)
-s1.connect(192.51.100.1, 443)
-                                                tb->reuse = -1
-                                                tb->reuseport = -1
-s1.getsockname() -> 192.0.2.10:54321
-s1.send()
-s1.recv()
-// ... s1 stays open.
-
-// Process B opens a short-lived connection:
-s2 = socket(AF_INET, SOCK_STREAM)
-s2.setsockopt(SO_REUSEADDR)
-s2.bind(192.0.2.20, 0)
-                                                tb->reuse = 0
-                                                tb->reuseport = 0
-s2.connect(192.51.100.2, 53)
-s2.getsockname() -> 192.0.2.20:54321
-s2.send()
-s2.recv()
-s2.close()
-
-                                                // bucket remains in this
-                                                // state even though port
-                                                // was released by s2
-                                                tb->reuse = 0
-                                                tb->reuseport = 0
-
-// Process A attempts to open another connection
-// when there is connection pressure from
-// 192.0.2.30:54000..54500 to 192.51.100.1:443.
-// Assume only port 54321 is still available.
-
-s3 = socket(AF_INET, SOCK_STREAM)
-s3.setsockopt(IP_BIND_ADDRESS_NO_PORT)
-s3.setsockopt(IP_LOCAL_PORT_RANGE, 54000..54500)
-s3.bind(192.0.2.30, 0)
-s3.connect(192.51.100.1, 443) -> EADDRNOTAVAIL (99)
-
-Problem
--------
-
-We end up in a state where Process A can't reuse ephemeral port 54321 for
-as long as there are sockets, like s1, that keep the bind bucket alive. The
-bucket does not return to "reusable" state even when all sockets which
-blocked it from reuse, like s2, are gone.
-
-The ephemeral port becomes available for use again only after all sockets
-bound to it are gone and the bind bucket is destroyed.
-
-Programs which behave like Process B in this scenario - that is, binding to
-an IP address without setting IP_BIND_ADDRESS_NO_PORT - might be considered
-poorly written. However, the reality is that such implementation is not
-actually uncommon. Trying to fix each and every such program is like
-playing whack-a-mole.
-
-For instance, it could be any software using Golang's net.Dialer with
-LocalAddr provided:
-
-        dialer := &net.Dialer{
-                LocalAddr: &net.TCPAddr{IP: srcIP},
-        }
-        conn, err := dialer.Dial("tcp4", dialTarget)
-
-Or even a ubiquitous tool like dig when using a specific local address:
-
-        $ dig -b 127.1.1.1 +tcp +short example.com
-
-Hence, we are proposing a systematic fix in the network stack itself.
-
-Solution
---------
-
-If there is no IP address conflict with any socket bound to a given local
-port, then from the protocol's perspective, the port can be safely shared.
-
-With that in mind, modify the port search during connect(), that is
-__inet_hash_connect, to consider all bind buckets (ports) when looking for
-a local port for egress.
-
-To achieve this, add an extra walk over bhash2 buckets for the port to
-check for IP conflicts. The additional walk is not free, so perform it only
-once per port - during the second phase of conflict checking, when the
-bhash bucket is locked.
-
-We enable this changed behavior only if the IP_LOCAL_PORT_RANGE socket
-option is set. The rationale is that users are likely to care about using
-every possible local port only when they have deliberately constrained the
-ephemeral port range.
-
-Limitations
------------
-
-1) Connected v4 sockets could share the local port with v6
-non-dualstack (V6ONLY) sockets, but that would require traversing
-(struct inet_bind2_bucket *)->owners, which is not RCU safe.
-
-2) Sharing both the local IP and port with other established sockets, when
-the remote address is unique is still not possible, when the bucket is in a
-non-reusable state (tb->{fastreuse,fastreuseport} >= 0) due to a socket
-explicitly bound to that port.
-
-Alternatives
-------------
-
-* Update bind bucket state on port release
-
-A valid solution to the described problem would also be to walk the bind
-bucket owners when releasing the port and recalculate the
-tb->{reuse,reuseport} state.
-
-However, in comparison to the proposed solution, this alone would not allow
-sharing the local port with other sockets bound to non-conflicting IPs for
-as long as they exist.
-
-Another downside is that we'd pay the extra cost on each unbind (more
-frequent) rather than only when connecting with IP_LOCAL_PORT_RANGE
-set (less frequent). Due to that we would also likely need to guard it
-behind a sysctl (see below).
-
-* Run your service in a dedicated netns
-
-This would also solve the problem. While we don't rule out transitioning to
-this setup in the future at a cost of shifting the complexity elsewhere.
-
-Isolating your service in a netns requires assigning it dedicated IPs for
-egress. If the egress IPs must be shared with other processes, as in our
-case, then SNAT and connection tracking on egress are required - adding
-complexity.
-
-* Guard it behind a sysctl setting instead of a socket option
-
-Users are unlikely to encounter this problem unless their workload connects
-from a severely narrowed-down ephemeral port range. Hence, paying the bind
-bucket walk cost for each connect() call doesn't seem sensible. Whereas
-with a socket option, only a limited set of connections incur the
-performance overhead.
-
-Reported-by: Lee Valentine <lvalentine@cloudflare.com>
 Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 ---
- net/ipv4/inet_hashtables.c | 56 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 54 insertions(+), 2 deletions(-)
+ tools/testing/selftests/net/ip_local_port_range.c  | 524 +++++++++++++++++++++
+ tools/testing/selftests/net/ip_local_port_range.sh |  14 +-
+ 2 files changed, 533 insertions(+), 5 deletions(-)
 
-diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index d3ce6d0a514e..9d8a9c7c8274 100644
---- a/net/ipv4/inet_hashtables.c
-+++ b/net/ipv4/inet_hashtables.c
-@@ -1005,6 +1005,52 @@ EXPORT_IPV6_MOD(inet_bhash2_reset_saddr);
- #define INET_TABLE_PERTURB_SIZE (1 << CONFIG_INET_TABLE_PERTURB_ORDER)
- static u32 *table_perturb;
+diff --git a/tools/testing/selftests/net/ip_local_port_range.c b/tools/testing/selftests/net/ip_local_port_range.c
+index 29451d2244b7..d5ff64c14132 100644
+--- a/tools/testing/selftests/net/ip_local_port_range.c
++++ b/tools/testing/selftests/net/ip_local_port_range.c
+@@ -9,6 +9,7 @@
  
-+/* True on source address conflict with another socket. False otherwise. */
-+static inline bool check_bind2_bucket(const struct sock *sk,
-+				      const struct inet_bind2_bucket *tb2)
+ #include <fcntl.h>
+ #include <netinet/ip.h>
++#include <arpa/inet.h>
+ 
+ #include "../kselftest_harness.h"
+ 
+@@ -20,6 +21,15 @@
+ #define IPPROTO_MPTCP 262
+ #endif
+ 
++static const int ONE = 1;
++
++__attribute__((nonnull)) static inline void close_fd(int *fd)
 +{
-+#if IS_ENABLED(CONFIG_IPV6)
-+	if (sk->sk_family == AF_INET6) {
-+		return tb2->addr_type == IPV6_ADDR_ANY ||
-+		       ipv6_addr_equal(&tb2->v6_rcv_saddr,
-+				       &sk->sk_v6_rcv_saddr);
++	close(*fd);
++}
++
++#define __close_fd __attribute__((cleanup(close_fd)))
++
+ static __u32 pack_port_range(__u16 lo, __u16 hi)
+ {
+ 	return (hi << 16) | (lo << 0);
+@@ -116,6 +126,81 @@ static int get_ip_local_port_range(int fd, __u32 *range)
+ 	return 0;
+ }
+ 
++struct sockaddr_inet {
++	union {
++		struct sockaddr_storage ss;
++		struct sockaddr_in6 v6;
++		struct sockaddr_in v4;
++		struct sockaddr sa;
++	};
++	socklen_t len;
++};
++
++static void make_inet_addr(int af, const char *ip, __u16 port,
++			   struct sockaddr_inet *addr)
++{
++	memset(addr, 0, sizeof(*addr));
++
++	switch (af) {
++	case AF_INET:
++		addr->len = sizeof(addr->v4);
++		addr->v4.sin_family = af;
++		addr->v4.sin_port = htons(port);
++		inet_pton(af, ip, &addr->v4.sin_addr);
++		break;
++	case AF_INET6:
++		addr->len = sizeof(addr->v6);
++		addr->v6.sin6_family = af;
++		addr->v6.sin6_port = htons(port);
++		inet_pton(af, ip, &addr->v6.sin6_addr);
++		break;
 +	}
-+
-+	/* Assume there might be a non-V6ONLY wildcard socket,
-+	 * since walking tb2->owners is not RCU safe.
-+	 */
-+	if (tb2->addr_type == IPV6_ADDR_ANY)
-+		return true;
-+
-+	if (tb2->addr_type != IPV6_ADDR_MAPPED)
-+		return false;
-+#endif
-+	return tb2->rcv_saddr == htonl(INADDR_ANY) ||
-+	       tb2->rcv_saddr == sk->sk_rcv_saddr;
 +}
 +
-+static inline bool check_bind_bucket_rcu(const struct sock *sk,
-+					 const struct inet_bind_bucket *tb)
++static bool is_v4mapped(const struct sockaddr_inet *a)
 +{
-+	const struct inet_bind2_bucket *tb2;
-+
-+	hlist_for_each_entry_rcu(tb2, &tb->bhash2, bhash_node)
-+		if (check_bind2_bucket(sk, tb2))
-+			return true;
-+	return false;
++	return (a->sa.sa_family == AF_INET6 &&
++		IN6_IS_ADDR_V4MAPPED(&a->v6.sin6_addr));
 +}
 +
-+static inline bool check_bind_bucket(const struct sock *sk,
-+				     const struct inet_bind_bucket *tb)
++static void v4mapped_to_ipv4(struct sockaddr_inet *a)
 +{
-+	const struct inet_bind2_bucket *tb2;
++	in_port_t port = a->v6.sin6_port;
++	in_addr_t ip4 = *(in_addr_t *)&a->v6.sin6_addr.s6_addr[12];
 +
-+	hlist_for_each_entry(tb2, &tb->bhash2, bhash_node)
-+		if (check_bind2_bucket(sk, tb2))
-+			return true;
-+	return false;
++	memset(a, 0, sizeof(*a));
++	a->len = sizeof(a->v4);
++	a->v4.sin_family = AF_INET;
++	a->v4.sin_port = port;
++	a->v4.sin_addr.s_addr = ip4;
 +}
 +
- int __inet_hash_connect(struct inet_timewait_death_row *death_row,
- 		struct sock *sk, u64 port_offset,
- 		u32 hash_port0,
-@@ -1070,6 +1116,9 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
- 			if (!inet_bind_bucket_match(tb, net, port, l3mdev))
- 				continue;
- 			if (tb->fastreuse >= 0 || tb->fastreuseport >= 0) {
-+				if (unlikely(local_ports &&
-+					     !check_bind_bucket_rcu(sk, tb)))
-+					break;
- 				rcu_read_unlock();
- 				goto next_port;
- 			}
-@@ -1088,9 +1137,12 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
- 		 */
- 		inet_bind_bucket_for_each(tb, &head->chain) {
- 			if (inet_bind_bucket_match(tb, net, port, l3mdev)) {
--				if (tb->fastreuse >= 0 ||
--				    tb->fastreuseport >= 0)
-+				if (tb->fastreuse >= 0 || tb->fastreuseport >= 0) {
-+					if (unlikely(local_ports &&
-+						     !check_bind_bucket(sk, tb)))
-+						goto ok;
- 					goto next_port_unlock;
-+				}
- 				WARN_ON(hlist_empty(&tb->bhash2));
- 				if (!check_established(death_row, sk,
- 						       port, &tw, false,
++static void ipv4_to_v4mapped(struct sockaddr_inet *a)
++{
++	in_port_t port = a->v4.sin_port;
++	in_addr_t ip4 = a->v4.sin_addr.s_addr;
++
++	memset(a, 0, sizeof(*a));
++	a->len = sizeof(a->v6);
++	a->v6.sin6_family = AF_INET6;
++	a->v6.sin6_port = port;
++	a->v6.sin6_addr.s6_addr[10] = 0xff;
++	a->v6.sin6_addr.s6_addr[11] = 0xff;
++	memcpy(&a->v6.sin6_addr.s6_addr[12], &ip4, sizeof(ip4));
++}
++
++static __u16 inet_port(const struct sockaddr_inet *a)
++{
++	switch (a->sa.sa_family) {
++	case AF_INET:
++		return ntohs(a->v4.sin_port);
++	case AF_INET6:
++		return ntohs(a->v6.sin6_port);
++	default:
++		return 0;
++	}
++}
++
+ FIXTURE(ip_local_port_range) {};
+ 
+ FIXTURE_SETUP(ip_local_port_range)
+@@ -460,4 +545,443 @@ TEST_F(ip_local_port_range, get_port_range)
+ 	ASSERT_TRUE(!err) TH_LOG("close failed");
+ }
+ 
++FIXTURE(tcp_port_reuse__no_ip_conflict) {};
++FIXTURE_SETUP(tcp_port_reuse__no_ip_conflict) {}
++FIXTURE_TEARDOWN(tcp_port_reuse__no_ip_conflict) {}
++
++FIXTURE_VARIANT(tcp_port_reuse__no_ip_conflict) {
++	int af_one;
++	const char *ip_one;
++	int af_two;
++	const char *ip_two;
++};
++
++FIXTURE_VARIANT_ADD(tcp_port_reuse__no_ip_conflict, ipv4) {
++	.af_one = AF_INET,
++	.ip_one = "127.0.0.1",
++	.af_two = AF_INET,
++	.ip_two = "127.0.0.2",
++};
++
++FIXTURE_VARIANT_ADD(tcp_port_reuse__no_ip_conflict, ipv6_v4mapped) {
++	.af_one = AF_INET6,
++	.ip_one = "::ffff:127.0.0.1",
++	.af_two = AF_INET,
++	.ip_two = "127.0.0.2",
++};
++
++FIXTURE_VARIANT_ADD(tcp_port_reuse__no_ip_conflict, ipv6) {
++	.af_one = AF_INET6,
++	.ip_one = "2001:db8::1",
++	.af_two = AF_INET6,
++	.ip_two = "2001:db8::2",
++};
++
++/* Check that a connected socket, which is using IP_LOCAL_PORT_RANGE to relax
++ * port search restrictions at connect() time, can share a local port with a
++ * listening socket bound to a different IP.
++ */
++TEST_F(tcp_port_reuse__no_ip_conflict, share_port_with_listening_socket)
++{
++	const typeof(variant) v = variant;
++	struct sockaddr_inet addr;
++	__close_fd int ln = -1;
++	__close_fd int c = -1;
++	__close_fd int p = -1;
++	__u32 range;
++	int r;
++
++	/* Listen on <ip one>:40000 */
++	ln = socket(v->af_one, SOCK_STREAM, 0);
++	ASSERT_GE(ln, 0) TH_LOG("socket");
++
++	r = setsockopt(ln, SOL_SOCKET, SO_REUSEADDR, &ONE, sizeof(ONE));
++	ASSERT_EQ(r, 0) TH_LOG("setsockopt(SO_REUSEADDR)");
++
++	make_inet_addr(v->af_one, v->ip_one, 40000, &addr);
++	r = bind(ln, &addr.sa, addr.len);
++	ASSERT_EQ(r, 0) TH_LOG("bind(<ip_one>:40000)");
++
++	r = listen(ln, 1);
++	ASSERT_EQ(r, 0) TH_LOG("listen");
++
++	/* Connect from <ip two>:40000 to <ip one>:40000 */
++	c = socket(v->af_two, SOCK_STREAM, 0);
++	ASSERT_GE(c, 0) TH_LOG("socket");
++
++	r = setsockopt(c, SOL_IP, IP_BIND_ADDRESS_NO_PORT, &ONE, sizeof(ONE));
++	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IP_BIND_ADDRESS_NO_PORT)");
++
++	range = pack_port_range(40000, 40000);
++	r = setsockopt(c, SOL_IP, IP_LOCAL_PORT_RANGE, &range, sizeof(range));
++	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IP_LOCAL_PORT_RANGE)");
++
++	make_inet_addr(v->af_two, v->ip_two, 0, &addr);
++	r = bind(c, &addr.sa, addr.len);
++	ASSERT_EQ(r, 0) TH_LOG("bind(<ip_two>:0)");
++
++	make_inet_addr(v->af_one, v->ip_one, 40000, &addr);
++	if (is_v4mapped(&addr))
++		v4mapped_to_ipv4(&addr);
++	r = connect(c, &addr.sa, addr.len);
++	EXPECT_EQ(r, 0) TH_LOG("connect(<ip_one>:40000)");
++	EXPECT_EQ(get_sock_port(c), 40000);
++}
++
++/* Check that a connected socket, which is using IP_LOCAL_PORT_RANGE to relax
++ * port search restrictions at connect() time, can share a local port with
++ * another connected socket bound to a different IP without
++ * IP_BIND_ADDRESS_NO_PORT enabled.
++ */
++TEST_F(tcp_port_reuse__no_ip_conflict, share_port_with_connected_socket)
++{
++	const typeof(variant) v = variant;
++	struct sockaddr_inet dst = {};
++	struct sockaddr_inet src = {};
++	__close_fd int ln = -1;
++	__close_fd int c1 = -1;
++	__close_fd int c2 = -1;
++	__u32 range;
++	__u16 port;
++	int r;
++
++	/* Listen on wildcard. Same family as <ip_two>. */
++	ln = socket(v->af_two, SOCK_STREAM, 0);
++	ASSERT_GE(ln, 0) TH_LOG("socket");
++
++	r = setsockopt(ln, SOL_SOCKET, SO_REUSEADDR, &ONE, sizeof(ONE));
++	ASSERT_EQ(r, 0) TH_LOG("setsockopt(SO_REUSEADDR");
++
++	r = listen(ln, 2);
++	ASSERT_EQ(r, 0) TH_LOG("listen");
++
++	dst.len = sizeof(dst.ss);
++	r = getsockname(ln, &dst.sa, &dst.len);
++	ASSERT_EQ(r, 0) TH_LOG("getsockname");
++
++	/* Connect from <ip one> but without IP_BIND_ADDRESS_NO_PORT */
++	c1 = socket(v->af_one, SOCK_STREAM, 0);
++	ASSERT_GE(c1, 0) TH_LOG("socket");
++
++	make_inet_addr(v->af_one, v->ip_one, 0, &src);
++	r = bind(c1, &src.sa, src.len);
++	ASSERT_EQ(r, 0) TH_LOG("bind");
++
++	if (src.sa.sa_family == AF_INET6 && dst.sa.sa_family == AF_INET)
++		ipv4_to_v4mapped(&dst);
++	r = connect(c1, &dst.sa, dst.len);
++	ASSERT_EQ(r, 0) TH_LOG("connect");
++
++	src.len = sizeof(src.ss);
++	r = getsockname(c1, &src.sa, &src.len);
++	ASSERT_EQ(r, 0) TH_LOG("getsockname");
++
++	/* Connect from <ip two>:<c1 port> with IP_BIND_ADDRESS_NO_PORT */
++	c2 = socket(v->af_two, SOCK_STREAM, 0);
++	ASSERT_GE(c2, 0) TH_LOG("socket");
++
++	r = setsockopt(c2, SOL_IP, IP_BIND_ADDRESS_NO_PORT, &ONE, sizeof(ONE));
++	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IP_BIND_ADDRESS_NO_PORT)");
++
++	port = inet_port(&src);
++	range = pack_port_range(port, port);
++	r = setsockopt(c2, SOL_IP, IP_LOCAL_PORT_RANGE, &range, sizeof(range));
++	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IP_LOCAL_PORT_RANGE)");
++
++	make_inet_addr(v->af_two, v->ip_two, 0, &src);
++	r = bind(c2, &src.sa, src.len);
++	ASSERT_EQ(r, 0) TH_LOG("bind");
++
++	if (is_v4mapped(&dst))
++		v4mapped_to_ipv4(&dst);
++	r = connect(c2, &dst.sa, dst.len);
++	EXPECT_EQ(r, 0) TH_LOG("connect");
++	EXPECT_EQ(get_sock_port(c2), port);
++}
++
++/* Check that two sockets can share the local IP and the ephemeral port when the
++ * destination address differs.
++ */
++TEST(tcp_port_reuse__no_ip_conflict_with_unique_dst)
++{
++	struct sockaddr_inet addr;
++	__close_fd int ln = -1;
++	__close_fd int c1 = -1;
++	__close_fd int c2 = -1;
++	__u32 range;
++	int r;
++
++	/* Listen on 0.0.0.0:30000 */
++	ln = socket(AF_INET, SOCK_STREAM, 0);
++	ASSERT_GE(ln, 0) TH_LOG("socket");
++
++	r = setsockopt(ln, SOL_SOCKET, SO_REUSEADDR, &ONE, sizeof(ONE));
++	ASSERT_EQ(r, 0) TH_LOG("setsockopt(SO_REUSEADDR)");
++
++	make_inet_addr(AF_INET, "0.0.0.0", 30000, &addr);
++	r = bind(ln, &addr.sa, addr.len);
++	ASSERT_EQ(r, 0) TH_LOG("bind");
++
++	r = listen(ln, 2);
++	ASSERT_EQ(r, 0) TH_LOG("listen");
++
++	/* Connect from 127.0.0.1:40000 to 127.1.1.1:30000 */
++	c1 = socket(AF_INET, SOCK_STREAM, 0);
++	ASSERT_GE(c1, 0) TH_LOG("socket");
++
++	range = pack_port_range(40000, 40000);
++	r = setsockopt(c1, SOL_IP, IP_LOCAL_PORT_RANGE, &range, sizeof(range));
++	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IP_LOCAL_PORT_RANGE)");
++
++	make_inet_addr(AF_INET, "127.1.1.1", 30000, &addr);
++	r = connect(c1, &addr.sa, addr.len);
++	ASSERT_EQ(r, 0) TH_LOG("connect(127.1.1.1:30000)");
++	ASSERT_EQ(get_sock_port(c1), 40000);
++
++	/* Connect from 127.0.0.1:40000 to 127.2.2.2:30000 */
++	c2 = socket(AF_INET, SOCK_STREAM, 0);
++	ASSERT_GE(c2, 0) TH_LOG("socket");
++
++	range = pack_port_range(40000, 40000);
++	r = setsockopt(c2, SOL_IP, IP_LOCAL_PORT_RANGE, &range, sizeof(range));
++	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IP_LOCAL_PORT_RANGE)");
++
++	make_inet_addr(AF_INET, "127.2.2.2", 30000, &addr);
++	r = connect(c2, &addr.sa, addr.len);
++	EXPECT_EQ(r, 0) TH_LOG("connect(127.1.1.1:30000)");
++	EXPECT_EQ(get_sock_port(c2), 40000);
++}
++
++FIXTURE(tcp_port_reuse__ip_conflict) {};
++FIXTURE_SETUP(tcp_port_reuse__ip_conflict) {}
++FIXTURE_TEARDOWN(tcp_port_reuse__ip_conflict) {}
++
++FIXTURE_VARIANT(tcp_port_reuse__ip_conflict) {
++	int af_one;
++	const char *ip_one;
++	int af_two;
++	const char *ip_two;
++};
++
++FIXTURE_VARIANT_ADD(tcp_port_reuse__ip_conflict, ipv4) {
++	.af_one = AF_INET,
++	.ip_one = "127.0.0.1",
++	.af_two = AF_INET,
++	.ip_two = "127.0.0.1",
++};
++
++FIXTURE_VARIANT_ADD(tcp_port_reuse__ip_conflict, ipv6_v4mapped) {
++	.af_one = AF_INET6,
++	.ip_one = "::ffff:127.0.0.1",
++	.af_two = AF_INET,
++	.ip_two = "127.0.0.1",
++};
++
++FIXTURE_VARIANT_ADD(tcp_port_reuse__ip_conflict, ipv6) {
++	.af_one = AF_INET6,
++	.ip_one = "2001:db8::1",
++	.af_two = AF_INET6,
++	.ip_two = "2001:db8::1",
++};
++
++FIXTURE_VARIANT_ADD(tcp_port_reuse__ip_conflict, ipv4_wildcard) {
++	.af_one = AF_INET,
++	.ip_one = "0.0.0.0",
++	.af_two = AF_INET,
++	.ip_two = "127.0.0.1",
++};
++
++FIXTURE_VARIANT_ADD(tcp_port_reuse__ip_conflict, ipv6_v4mapped_wildcard) {
++	.af_one = AF_INET6,
++	.ip_one = "::ffff:0.0.0.0",
++	.af_two = AF_INET,
++	.ip_two = "127.0.0.1",
++};
++
++FIXTURE_VARIANT_ADD(tcp_port_reuse__ip_conflict, ipv6_wildcard) {
++	.af_one = AF_INET6,
++	.ip_one = "::",
++	.af_two = AF_INET6,
++	.ip_two = "2001:db8::1",
++};
++
++FIXTURE_VARIANT_ADD(tcp_port_reuse__ip_conflict, dualstack_wildcard) {
++	.af_one = AF_INET6,
++	.ip_one = "::",
++	.af_two = AF_INET6,
++	.ip_two = "127.0.0.1",
++};
++
++/* Check that a socket, which using IP_LOCAL_PORT_RANGE to relax local port
++ * search restrictions at connect() time, can't share a local port with a
++ * listening socket when there is IP address conflict.
++ */
++TEST_F(tcp_port_reuse__ip_conflict, cannot_share_port)
++{
++	const typeof(variant) v = variant;
++	struct sockaddr_inet dst, src;
++	__close_fd int ln = -1;
++	__close_fd int c = -1;
++	__u32 range;
++	int r;
++
++	/* Listen on <ip_one>:40000 */
++	ln = socket(v->af_one, SOCK_STREAM, 0);
++	ASSERT_GE(ln, 0) TH_LOG("socket");
++
++	r = setsockopt(ln, SOL_SOCKET, SO_REUSEADDR, &ONE, sizeof(ONE));
++	ASSERT_EQ(r, 0) TH_LOG("setsockopt(SO_REUSEADDR)");
++
++	make_inet_addr(v->af_one, v->ip_one, 40000, &dst);
++	r = bind(ln, &dst.sa, dst.len);
++	ASSERT_EQ(r, 0) TH_LOG("bind(<ip_one>:40000)");
++
++	r = listen(ln, 1);
++	ASSERT_EQ(r, 0) TH_LOG("listen");
++
++	/* Attempt to connect from <ip two>:40000 */
++	c = socket(v->af_two, SOCK_STREAM, 0);
++	ASSERT_GE(c, 0) TH_LOG("socket");
++
++	r = setsockopt(c, SOL_IP, IP_BIND_ADDRESS_NO_PORT, &ONE, sizeof(ONE));
++	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IP_BIND_ADDRESS_NO_PORT)");
++
++	range = pack_port_range(40000, 40000);
++	r = setsockopt(c, SOL_IP, IP_LOCAL_PORT_RANGE, &range, sizeof(range));
++	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IP_LOCAL_PORT_RANGE)");
++
++	make_inet_addr(v->af_two, v->ip_two, 0, &src);
++	r = bind(c, &src.sa, src.len);
++	ASSERT_EQ(r, 0) TH_LOG("bind(<ip_two>:40000)");
++
++	if (is_v4mapped(&dst))
++		v4mapped_to_ipv4(&dst);
++	r = connect(c, &dst.sa, dst.len);
++	EXPECT_EQ(r, -1) TH_LOG("connect(*:40000)");
++	EXPECT_EQ(errno, EADDRNOTAVAIL);
++}
++
++/* Demonstrate a limitation - a local port cannot be shared by IPv4 sockets with
++ * an IPv6 wildcard socket which is v6-only (i.e., not dualstack).
++ */
++TEST(tcp_port_reuse__ip_conflict_wildcard_v6only)
++{
++	struct sockaddr_inet addr;
++	__close_fd int ln4 = -1;
++	__close_fd int ln6 = -1;
++	__close_fd int c = -1;
++	__u32 range;
++	int r;
++
++	/* Listen on [::]:40000 (v6only) */
++	ln6 = socket(AF_INET6, SOCK_STREAM, 0);
++	ASSERT_GE(ln6, 0) TH_LOG("socket");
++
++	r = setsockopt(ln6, SOL_SOCKET, SO_REUSEADDR, &ONE, sizeof(ONE));
++	ASSERT_EQ(r, 0) TH_LOG("setsockopt(SO_REUSEADDR)");
++
++	r = setsockopt(ln6, IPPROTO_IPV6, IPV6_V6ONLY, &ONE, sizeof(ONE));
++	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IPV6_V6ONLY)");
++
++	make_inet_addr(AF_INET6, "::", 40000, &addr);
++	r = bind(ln6, &addr.sa, addr.len);
++	ASSERT_EQ(r, 0) TH_LOG("bind([::]:40000)");
++
++	r = listen(ln6, 1);
++	ASSERT_EQ(r, 0) TH_LOG("listen");
++
++	/* Listen on 127.0.0.1:30000 */
++	ln4 = socket(AF_INET, SOCK_STREAM, 0);
++	ASSERT_GE(ln4, 0) TH_LOG("socket");
++
++	r = setsockopt(ln4, SOL_SOCKET, SO_REUSEADDR, &ONE, sizeof(ONE));
++	ASSERT_EQ(r, 0) TH_LOG("setsockopt(SO_REUSEADDR)");
++
++	make_inet_addr(AF_INET, "127.0.0.1", 30000, &addr);
++	r = bind(ln4, &addr.sa, addr.len);
++	ASSERT_EQ(r, 0) TH_LOG("bind(127.0.0.1:30000)");
++
++	r = listen(ln4, 1);
++	ASSERT_EQ(r, 0) TH_LOG("listen");
++
++	/* Connect from 127.0.0.1:40000 to 127.0.0.1:30000*/
++	c = socket(AF_INET, SOCK_STREAM, 0);
++	ASSERT_GE(c, 0) TH_LOG("socket");
++
++	range = pack_port_range(40000, 40000);
++	r = setsockopt(c, SOL_IP, IP_LOCAL_PORT_RANGE, &range, sizeof(range));
++	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IP_LOCAL_PORT_RANGE)");
++
++	r = connect(c, &addr.sa, addr.len);
++	EXPECT_EQ(r, -1) TH_LOG("connect(127.0.0.1:30000)");
++	EXPECT_EQ(errno, EADDRNOTAVAIL);
++}
++
++/* Demonstrate a limitation - a local IP and port can't be shared any more, even
++ * when the remote address is unique, after explicitly binding to that port.
++ */
++TEST(tcp_port_reuse__ip_port_conflict_with_unique_dst_after_bind)
++{
++	struct sockaddr_inet addr;
++	__close_fd int ln = -1;
++	__close_fd int c1 = -1;
++	__close_fd int c2 = -1;
++	__u32 range;
++	int s, r;
++
++	/* Listen on 0.0.0.0:30000 */
++	ln = socket(AF_INET, SOCK_STREAM, 0);
++	ASSERT_GE(ln, 0) TH_LOG("socket");
++
++	r = setsockopt(ln, SOL_SOCKET, SO_REUSEADDR, &ONE, sizeof(ONE));
++	ASSERT_EQ(r, 0) TH_LOG("setsockopt(SO_REUSEADDR)");
++
++	make_inet_addr(AF_INET, "0.0.0.0", 30000, &addr);
++	r = bind(ln, &addr.sa, addr.len);
++	ASSERT_EQ(r, 0) TH_LOG("bind(0.0.0.0:30000)");
++
++	r = listen(ln, 2);
++	ASSERT_EQ(r, 0) TH_LOG("listen");
++
++	/* Connect from 127.0.0.1:40000 to 127.1.1.1:30000 */
++	c1 = socket(AF_INET, SOCK_STREAM, 0);
++	ASSERT_GE(c1, 0) TH_LOG("socket");
++
++	range = pack_port_range(40000, 40000);
++	r = setsockopt(c1, SOL_IP, IP_LOCAL_PORT_RANGE, &range, sizeof(range));
++	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IP_LOCAL_PORT_RANGE)");
++
++	make_inet_addr(AF_INET, "127.1.1.1", 30000, &addr);
++	r = connect(c1, &addr.sa, addr.len);
++	ASSERT_EQ(r, 0) TH_LOG("connect(127.1.1.1:30000)");
++	ASSERT_EQ(get_sock_port(c1), 40000);
++
++	/* Block the port. Bind to 127.9.9.9:40000 and unbind immediately */
++	s = socket(AF_INET, SOCK_STREAM, 0);
++	ASSERT_GE(s, 0) TH_LOG("socket");
++
++	r = setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &ONE, sizeof(ONE));
++	ASSERT_EQ(r, 0) TH_LOG("setsockopt(SO_REUSEADDR)");
++
++	make_inet_addr(AF_INET, "127.9.9.9", 40000, &addr);
++	r = bind(s, &addr.sa, addr.len);
++	ASSERT_EQ(r, 0) TH_LOG("bind(127.9.9.9:40000)");
++
++	r = close(s);
++	ASSERT_EQ(r, 0) TH_LOG("close");
++
++	/* Connect from 127.0.0.1:40000 to 127.2.2.2:30000 */
++	c2 = socket(AF_INET, SOCK_STREAM, 0);
++	ASSERT_GE(c2, 0) TH_LOG("socket");
++
++	range = pack_port_range(40000, 40000);
++	r = setsockopt(c2, SOL_IP, IP_LOCAL_PORT_RANGE, &range, sizeof(range));
++	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IP_LOCAL_PORT_RANGE)");
++
++	make_inet_addr(AF_INET, "127.2.2.2", 30000, &addr);
++	r = connect(c2, &addr.sa, addr.len);
++	EXPECT_EQ(r, -1) TH_LOG("connect(127.1.1.1:30000)");
++	EXPECT_EQ(errno, EADDRNOTAVAIL);
++}
++
+ TEST_HARNESS_MAIN
+diff --git a/tools/testing/selftests/net/ip_local_port_range.sh b/tools/testing/selftests/net/ip_local_port_range.sh
+index 4ff746db1256..3fc151545b2d 100755
+--- a/tools/testing/selftests/net/ip_local_port_range.sh
++++ b/tools/testing/selftests/net/ip_local_port_range.sh
+@@ -1,7 +1,11 @@
+-#!/bin/sh
++#!/bin/bash
+ # SPDX-License-Identifier: GPL-2.0
+ 
+-./in_netns.sh \
+-  sh -c 'sysctl -q -w net.mptcp.enabled=1 && \
+-         sysctl -q -w net.ipv4.ip_local_port_range="40000 49999" && \
+-         ./ip_local_port_range'
++./in_netns.sh sh <(cat <<-EOF
++        sysctl -q -w net.mptcp.enabled=1
++        sysctl -q -w net.ipv4.ip_local_port_range="40000 49999"
++        ip -6 addr add dev lo 2001:db8::1/32 nodad
++        ip -6 addr add dev lo 2001:db8::2/32 nodad
++        exec ./ip_local_port_range
++EOF
++)
 
 -- 
 2.43.0
