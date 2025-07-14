@@ -1,410 +1,159 @@
-Return-Path: <netdev+bounces-206766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BA39B04507
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 18:06:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A7CEB04525
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 18:13:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EF0F4A00EF
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 16:05:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56EA84A06C0
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 16:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBA6A25DB1C;
-	Mon, 14 Jul 2025 16:05:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2682C25EFB6;
+	Mon, 14 Jul 2025 16:10:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wA6tmhsX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BKoox0cX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE0725DAFF
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 16:05:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ED5E25DB0B
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 16:10:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752509117; cv=none; b=eyjdyvwEDdWmKgr1QDrEsyfBE8ttCv/cEEeOlimE/4HVe9k7aaRi8ZW8gKw/BbTRJ7HvVE6PWzcviHDQRvDDMg5me3yAPERQe1xEjUe+xS/wgoWChB5DfMQ2ww/3j/bpDvaXctjDrtq2hRZ3uH0MpUQRIxUE9t814vfn6g1MBNg=
+	t=1752509458; cv=none; b=tUas50b2QL3SPP3QT/GR3I6EAdUmKESvXr6Czf+wAWJA6ZOs/UnZFmdxrCNasmQEPQVeXt58wF5bIB2x/vFfV72+n6w/YkpWRC/05IR4TeFhIXGaIOJRzJvCoFnxvN7qr2oJjMrsQl+khRzbUzWUPDovv/ZmQe9fWCoWnjnBe9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752509117; c=relaxed/simple;
-	bh=xNSEpNPh57JKSH/VEZdMFsV6mAzBiOk8QuQCburcvzE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Pt/ttnLbNc3SJ9PhGFiKH9ph9NASEu+eridcCD2KDFOOl231NjtQ92boYH1DmvYfzaV8gkK/BbT+EsjRWTwk1cXEIGdccjMMFyeMQ3AV8YyqLxNFqeRe3QQKyr1hs4XzKNKFjyvm1TtJFf3uz8Q9ANSKf+qnAaH1ZzMtGGE3tTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jeroendb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wA6tmhsX; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jeroendb.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b2c37558eccso3998670a12.1
-        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 09:05:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752509115; x=1753113915; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HmqtE1n6qYM7o20IeQfw03Q0kcLrhjY5U6X+n8Fe9mk=;
-        b=wA6tmhsXhSYPBUpCspRiZdZL8luSZ/6iCqJX0OEWVncBWO+/0j8YMK9jzwTFginubo
-         id9uWJbXDi2FqJwqFRPyalv892FiMpoZH1KCzGxgP9755TpIwEnfrA+R0D1MS2lMtLfb
-         /nJToccDx08svAJSAe4EYolj3dPOOkGLDe/lC3sNKr/wy9yJKkDd584Tr0FoCgE22SlP
-         fWRQ90g4KtgRG1thm5h9CyVn8OKAjQlpZOkIiYTTJ4X/cgdn+cPF11aKlhjWwscIGb3d
-         zJ9J8uM1ljI2FvkeM8TPekTU8cZJzQ/fFDNKox0gQFLGRyRmSFav4Y1yzr0q9qlq97Ku
-         GocA==
+	s=arc-20240116; t=1752509458; c=relaxed/simple;
+	bh=TXBhF2hsvFF6n7aCSxrTP5ln0Far7SI/YRoW6S4tmUk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P2IrSBNJqaBB5A5Jc7azYLifviQjxSlYisohVq9742GptgjlybuLLaCFMP9aazC6nprFK8OCUyxT8rfYmkvI+fzHY0bHR9gWN+KhsB9Nyxb5ZBn7jUD0Omp3njoqcHDp3Adic3+mFYR1IE4BqO2HSlf22QjqZJhD1JP5b2L8y/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BKoox0cX; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752509455;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hJded38NkCminVRmf+Vkk9veSOaA59XspWkWKEaxDxE=;
+	b=BKoox0cXnA4zT6zAgBsdaAyPkmDrDmoM+bE0jT81BHvhneMnKPhv5ZqpAoIRqKPCbGmjus
+	fK9564sCmaP60B9yQkp+fLZ4+fM6qNWNfyN+p4hJIBDrGdlRGq4hYIiAYBv/00Iie67MsB
+	5OV559h8lmkoo59UtNsaLAzNi9VpWtQ=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-284-5Z9iEOFfMXWSyR9_nV2YpQ-1; Mon, 14 Jul 2025 12:10:54 -0400
+X-MC-Unique: 5Z9iEOFfMXWSyR9_nV2YpQ-1
+X-Mimecast-MFC-AGG-ID: 5Z9iEOFfMXWSyR9_nV2YpQ_1752509452
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-451d2037f1eso29294265e9.0
+        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 09:10:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752509115; x=1753113915;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HmqtE1n6qYM7o20IeQfw03Q0kcLrhjY5U6X+n8Fe9mk=;
-        b=hN3sQ/MqXMTS2MR0vAjHQKAGAfdj1R9GcMLdU9n8Tghk+W8feUUqFiUXJs06YF7isK
-         8i0QfBxE+F2O11fpY/DHiKHRca8nCwFgCamTt5OQFhabdHil1g7x9M/1jQrx3OiLuo8w
-         z58lFt6drBOKixkyPbToDx3IW2KAPztztX06BVOmWfoMILPuNXSGHiXA7234NJygrRU1
-         BL6VDl2FRnRCogjXdvv6/TMbQtWL8uZWqLznOQgD+2wVNk8e7PeSQfqsXVo1cQ7BuKD+
-         yUKJ1AikQKq6bzINb810CJsQ2OAT5hgVRm6j2InSaU3Ykod8cmQVJwYUOzrhCBCHyT8e
-         ECBg==
-X-Gm-Message-State: AOJu0YzpRvqlo/FMiajgaekZT6lSAXfBELM6CqqgvkXfEd1fzuTzJN/X
-	fa5jlM4MpKlzJHeIxTMfpWkMrG1Hy2ig6O9kmrwbh5ViQkX6aV1dyNdkSXQDSCKvhVEakwrHDaW
-	pgvIUaGl/UE2p9imSW85Rizi5AMrG8YZdeggYCrp5vrKlNcBWMILfd8mNCSXjlG4MuEMgDd5vIf
-	dNkwJr0Jk1zazh43Ma6ThpH8yNgd+vqGUJLKT4HAtZqfr/Xfo=
-X-Google-Smtp-Source: AGHT+IHpJH6EWIz9PkCQgzCUyNiww3P5Tm1E4RUPt7w91JEyHVD4s6Pdho3jKPsVQT3sO1HX5m+hAXlepJkCRw==
-X-Received: from pfbcw23.prod.google.com ([2002:a05:6a00:4517:b0:748:f030:4e6a])
- (user=jeroendb job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a20:2d23:b0:21f:50d9:dde with SMTP id adf61e73a8af0-2311dc63416mr19676386637.5.1752509115037;
- Mon, 14 Jul 2025 09:05:15 -0700 (PDT)
-Date: Mon, 14 Jul 2025 09:04:51 -0700
-In-Reply-To: <20250714160451.124671-1-jeroendb@google.com>
+        d=1e100.net; s=20230601; t=1752509452; x=1753114252;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hJded38NkCminVRmf+Vkk9veSOaA59XspWkWKEaxDxE=;
+        b=glyAcTRKWXTjHqDdFhOZdUM85PX2T/IFHEHqcZzcxiIJiwqslhIjUk74my1qMZft9x
+         uBNEgJqTY9zY389mbDSN0ME3HE8I6s4nUGz4ixu1UvONc1pwFq9QRK2gWYTCZq5h6b4n
+         sghRjj+xCDhDwme3Xvwoc7QhkBEuXDmbSqimu8YNsN+/5k7hRSe5x18zTaWfhzwhpNzL
+         HOpcdLo+T92fbt5xgnX7CH5CECuTfQI0Kr/Vl/qUU49+vIpJ5cUmX99FTlVql+W1VLnW
+         S8U+LCb0YeSqvjNxkvdmsQYFM/i1WQXgr8zoe6KuGTdOoJNP5T9g6eD2SAsDaMkOSXxH
+         o9yQ==
+X-Gm-Message-State: AOJu0YykPslg3Ys1DqiKskx2dAaEMhCmKzWWpcK+LlnNW+5wqZ8MdEj/
+	Ywo+NZBtOYhVwdpgKS9dnSunL6SRIyhK/ai87Q3uEqi/vo04DRogxeJPgULqj/jCunkqK6hcvRF
+	u8tglapQJdlBXX96kd2Hx3EwG5YHnwW9j17a9gRxJ3wOnZQwbbbeTKUaZZw==
+X-Gm-Gg: ASbGncvr8eFhsMvE1X1Tn+6Wp7D9XzdXH6Sb9eEoKrQVjXhMbrO8FDYBbp9bRIILPty
+	Cw8e+m5XcZGSkxs5E33cb/yFlMr9GjUMT07c0v7RF5vQsd8FQ6X8Z+viffrVSRM5I5USdVpLXLE
+	KgIog2VqWurllH8EnZT/38bRisKvAAVCH4JZdJ6xw0uiFBhWIg9C7/T+MMzNX4ujtAZBQLwcV0t
+	CO4E46JQFoP4v+Ot2KlSO/K0+bet9aiiCC7qfrN5fuHgLl+s0l8kLOT9bj/wispz70LW0gNRVuV
+	QnWq5B2K39Gc1KBJeiM3EsXmmes=
+X-Received: by 2002:a05:600c:1e04:b0:456:c48:491f with SMTP id 5b1f17b1804b1-4560c484fbbmr93343605e9.10.1752509451781;
+        Mon, 14 Jul 2025 09:10:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGu0KDsL3bCGkwFYj1hHtAGF4TYYoQuLK07nUMMS0J4mW+mZWbbAYRS4px+NSDCrvU4TmUMTA==
+X-Received: by 2002:a05:600c:1e04:b0:456:c48:491f with SMTP id 5b1f17b1804b1-4560c484fbbmr93343185e9.10.1752509451327;
+        Mon, 14 Jul 2025 09:10:51 -0700 (PDT)
+Received: from debian ([2001:4649:f075:0:a45e:6b9:73fc:f9aa])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45623f4f838sm5268045e9.1.2025.07.14.09.10.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Jul 2025 09:10:50 -0700 (PDT)
+Date: Mon, 14 Jul 2025 18:10:47 +0200
+From: Guillaume Nault <gnault@redhat.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: netdev@vger.kernel.org, linux-rt-devel@lists.linux.dev,
+	linux-ppp@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Clark Williams <clrkwllms@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH net-next v2 1/1] ppp: Replace per-CPU recursion counter
+ with lock-owner field
+Message-ID: <aHUsB04j+uFrUkpd@debian>
+References: <20250710162403.402739-1-bigeasy@linutronix.de>
+ <20250710162403.402739-2-bigeasy@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250714160451.124671-1-jeroendb@google.com>
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250714160451.124671-6-jeroendb@google.com>
-Subject: [PATCH net-next 5/5] gve: implement DQO RX datapath and control path
- for AF_XDP zero-copy
-From: Jeroen de Borst <jeroendb@google.com>
-To: netdev@vger.kernel.org
-Cc: hramamurthy@google.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, willemb@google.com, pabeni@redhat.com, 
-	Joshua Washington <joshwash@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
-	Jeroen de Borst <jeroendb@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250710162403.402739-2-bigeasy@linutronix.de>
 
-From: Joshua Washington <joshwash@google.com>
+On Thu, Jul 10, 2025 at 06:24:03PM +0200, Sebastian Andrzej Siewior wrote:
+> The per-CPU variable ppp::xmit_recursion is protecting against recursion
+> due to wrong configuration of the ppp channels. The per-CPU variable
 
-Add the RX datapath for AF_XDP zero-copy for DQ RDA. The RX path is
-quite similar to that of the normal XDP case. Parallel methods are
-introduced to properly handle XSKs instead of normal driver buffers.
+I'd rather say that it's the ppp unit that is badly configured: it's
+the ppp unit that can creates the loop (as it creates a networking
+interface).
 
-To properly support posting from XSKs, queues are destroyed and
-recreated, as the driver was initially making use of page pool buffers
-instead of the XSK pool memory.
+> relies on disabled BH for its locking. Without per-CPU locking in
+> local_bh_disable() on PREEMPT_RT this data structure requires explicit
+> locking.
+> 
+> The ppp::xmit_recursion is used as a per-CPU boolean. The counter is
+> checked early in the send routing and the transmit path is only entered
+> if the counter is zero. Then the counter is incremented to avoid
+> recursion. It used to detect recursion on channel::downl and
+> ppp::wlock.
+> 
+> Create a struct ppp_xmit_recursion and move the counter into it.
+> Add local_lock_t to the struct and use local_lock_nested_bh() for
+> locking. Due to possible nesting, the lock cannot be acquired
+> unconditionally but it requires an owner field to identify recursion
+> before attempting to acquire the lock.
+> 
+> The counter is incremented and checked only after the lock is acquired.
+> Since it functions as a boolean rather than a count, and its role is now
+> superseded by the owner field, it can be safely removed.
+> 
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> ---
+>  drivers/net/ppp/ppp_generic.c | 38 ++++++++++++++++++++++++++---------
+>  1 file changed, 29 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
+> index def84e87e05b2..0edc916e0a411 100644
+> --- a/drivers/net/ppp/ppp_generic.c
+> +++ b/drivers/net/ppp/ppp_generic.c
+> @@ -119,6 +119,11 @@ struct ppp_link_stats {
+>  	u64 tx_bytes;
+>  };
+>  
+> +struct ppp_xmit_recursion {
+> +	struct task_struct *owner;
+> +	local_lock_t bh_lock;
+> +};
+> +
 
-Expose support for AF_XDP zero-copy, as the TX and RX datapaths both
-exist.
+This hunk conflicts with latest changes in net-next.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Signed-off-by: Praveen Kaligineedi <pkaligineedi@google.com>
-Signed-off-by: Joshua Washington <joshwash@google.com>
-Signed-off-by: Jeroen de Borst <jeroendb@google.com>
----
- drivers/net/ethernet/google/gve/gve.h         |  3 +
- .../ethernet/google/gve/gve_buffer_mgmt_dqo.c | 24 ++++-
- drivers/net/ethernet/google/gve/gve_main.c    | 42 +++++++--
- drivers/net/ethernet/google/gve/gve_rx_dqo.c  | 94 ++++++++++++++++++-
- 4 files changed, 149 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
-index ff7dc06e7fa4..bceaf9b05cb4 100644
---- a/drivers/net/ethernet/google/gve/gve.h
-+++ b/drivers/net/ethernet/google/gve/gve.h
-@@ -190,6 +190,9 @@ struct gve_rx_buf_state_dqo {
- 	/* The page posted to HW. */
- 	struct gve_rx_slot_page_info page_info;
- 
-+	/* XSK buffer */
-+	struct xdp_buff *xsk_buff;
-+
- 	/* The DMA address corresponding to `page_info`. */
- 	dma_addr_t addr;
- 
-diff --git a/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c b/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c
-index 6c3c459a1b5e..8f5021e59e0a 100644
---- a/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c
-+++ b/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c
-@@ -4,6 +4,7 @@
-  * Copyright (C) 2015-2024 Google, Inc.
-  */
- 
-+#include <net/xdp_sock_drv.h>
- #include "gve.h"
- #include "gve_utils.h"
- 
-@@ -29,6 +30,10 @@ struct gve_rx_buf_state_dqo *gve_alloc_buf_state(struct gve_rx_ring *rx)
- 	/* Point buf_state to itself to mark it as allocated */
- 	buf_state->next = buffer_id;
- 
-+	/* Clear the buffer pointers */
-+	buf_state->page_info.page = NULL;
-+	buf_state->xsk_buff = NULL;
-+
- 	return buf_state;
- }
- 
-@@ -286,7 +291,24 @@ int gve_alloc_buffer(struct gve_rx_ring *rx, struct gve_rx_desc_dqo *desc)
- {
- 	struct gve_rx_buf_state_dqo *buf_state;
- 
--	if (rx->dqo.page_pool) {
-+	if (rx->xsk_pool) {
-+		buf_state = gve_alloc_buf_state(rx);
-+		if (unlikely(!buf_state))
-+			return -ENOMEM;
-+
-+		buf_state->xsk_buff = xsk_buff_alloc(rx->xsk_pool);
-+		if (unlikely(!buf_state->xsk_buff)) {
-+			xsk_set_rx_need_wakeup(rx->xsk_pool);
-+			gve_free_buf_state(rx, buf_state);
-+			return -ENOMEM;
-+		}
-+		/* Allocated xsk buffer. Clear wakeup in case it was set. */
-+		xsk_clear_rx_need_wakeup(rx->xsk_pool);
-+		desc->buf_id = cpu_to_le16(buf_state - rx->dqo.buf_states);
-+		desc->buf_addr =
-+			cpu_to_le64(xsk_buff_xdp_get_dma(buf_state->xsk_buff));
-+		return 0;
-+	} else if (rx->dqo.page_pool) {
- 		buf_state = gve_alloc_buf_state(rx);
- 		if (WARN_ON_ONCE(!buf_state))
- 			return -ENOMEM;
-diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index b1aba3242435..9e96d1d111b1 100644
---- a/drivers/net/ethernet/google/gve/gve_main.c
-+++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -1612,13 +1612,24 @@ static int gve_xsk_pool_enable(struct net_device *dev,
- 		return 0;
- 
- 	err = gve_reg_xsk_pool(priv, dev, pool, qid);
--	if (err) {
--		clear_bit(qid, priv->xsk_pools);
--		xsk_pool_dma_unmap(pool,
--				   DMA_ATTR_SKIP_CPU_SYNC |
--				   DMA_ATTR_WEAK_ORDERING);
-+	if (err)
-+		goto err_xsk_pool_dma_mapped;
-+
-+	/* Stop and start RDA queues to repost buffers. */
-+	if (!gve_is_qpl(priv)) {
-+		err = gve_configure_rings_xdp(priv, priv->rx_cfg.num_queues);
-+		if (err)
-+			goto err_xsk_pool_registered;
- 	}
-+	return 0;
- 
-+err_xsk_pool_registered:
-+	gve_unreg_xsk_pool(priv, qid);
-+err_xsk_pool_dma_mapped:
-+	clear_bit(qid, priv->xsk_pools);
-+	xsk_pool_dma_unmap(pool,
-+			   DMA_ATTR_SKIP_CPU_SYNC |
-+			   DMA_ATTR_WEAK_ORDERING);
- 	return err;
- }
- 
-@@ -1630,6 +1641,7 @@ static int gve_xsk_pool_disable(struct net_device *dev,
- 	struct napi_struct *napi_tx;
- 	struct xsk_buff_pool *pool;
- 	int tx_qid;
-+	int err;
- 
- 	if (qid >= priv->rx_cfg.num_queues)
- 		return -EINVAL;
-@@ -1645,6 +1657,13 @@ static int gve_xsk_pool_disable(struct net_device *dev,
- 	if (!netif_running(dev) || !priv->tx_cfg.num_xdp_queues)
- 		return 0;
- 
-+	/* Stop and start RDA queues to repost buffers. */
-+	if (!gve_is_qpl(priv) && priv->xdp_prog) {
-+		err = gve_configure_rings_xdp(priv, priv->rx_cfg.num_queues);
-+		if (err)
-+			return err;
-+	}
-+
- 	napi_rx = &priv->ntfy_blocks[priv->rx[qid].ntfy_id].napi;
- 	napi_disable(napi_rx); /* make sure current rx poll is done */
- 
-@@ -1656,12 +1675,14 @@ static int gve_xsk_pool_disable(struct net_device *dev,
- 	smp_mb(); /* Make sure it is visible to the workers on datapath */
- 
- 	napi_enable(napi_rx);
--	if (gve_rx_work_pending(&priv->rx[qid]))
--		napi_schedule(napi_rx);
--
- 	napi_enable(napi_tx);
--	if (gve_tx_clean_pending(priv, &priv->tx[tx_qid]))
--		napi_schedule(napi_tx);
-+	if (gve_is_gqi(priv)) {
-+		if (gve_rx_work_pending(&priv->rx[qid]))
-+			napi_schedule(napi_rx);
-+
-+		if (gve_tx_clean_pending(priv, &priv->tx[tx_qid]))
-+			napi_schedule(napi_tx);
-+	}
- 
- 	return 0;
- }
-@@ -2288,6 +2309,7 @@ static void gve_set_netdev_xdp_features(struct gve_priv *priv)
- 	} else if (priv->queue_format == GVE_DQO_RDA_FORMAT) {
- 		xdp_features = NETDEV_XDP_ACT_BASIC;
- 		xdp_features |= NETDEV_XDP_ACT_REDIRECT;
-+		xdp_features |= NETDEV_XDP_ACT_XSK_ZEROCOPY;
- 	} else {
- 		xdp_features = 0;
- 	}
-diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
-index afaa822b1227..7380c2b7a2d8 100644
---- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
-+++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
-@@ -16,6 +16,7 @@
- #include <net/ip6_checksum.h>
- #include <net/ipv6.h>
- #include <net/tcp.h>
-+#include <net/xdp_sock_drv.h>
- 
- static void gve_rx_free_hdr_bufs(struct gve_priv *priv, struct gve_rx_ring *rx)
- {
-@@ -149,6 +150,10 @@ void gve_rx_free_ring_dqo(struct gve_priv *priv, struct gve_rx_ring *rx,
- 			gve_free_to_page_pool(rx, bs, false);
- 		else
- 			gve_free_qpl_page_dqo(bs);
-+		if (gve_buf_state_is_allocated(rx, bs) && bs->xsk_buff) {
-+			xsk_buff_free(bs->xsk_buff);
-+			bs->xsk_buff = NULL;
-+		}
- 	}
- 
- 	if (rx->dqo.qpl) {
-@@ -580,8 +585,11 @@ static int gve_xdp_tx_dqo(struct gve_priv *priv, struct gve_rx_ring *rx,
- 	int err;
- 
- 	xdpf = xdp_convert_buff_to_frame(xdp);
--	if (unlikely(!xdpf))
-+	if (unlikely(!xdpf)) {
-+		if (rx->xsk_pool)
-+			xsk_buff_free(xdp);
- 		return -ENOSPC;
-+	}
- 
- 	tx_qid = gve_xdp_tx_queue_id(priv, rx->q_num);
- 	tx = &priv->tx[tx_qid];
-@@ -592,6 +600,41 @@ static int gve_xdp_tx_dqo(struct gve_priv *priv, struct gve_rx_ring *rx,
- 	return err;
- }
- 
-+static void gve_xsk_done_dqo(struct gve_priv *priv, struct gve_rx_ring *rx,
-+			     struct xdp_buff *xdp, struct bpf_prog *xprog,
-+			     int xdp_act)
-+{
-+	switch (xdp_act) {
-+	case XDP_ABORTED:
-+	case XDP_DROP:
-+	default:
-+		xsk_buff_free(xdp);
-+		break;
-+	case XDP_TX:
-+		if (unlikely(gve_xdp_tx_dqo(priv, rx, xdp)))
-+			goto err;
-+		break;
-+	case XDP_REDIRECT:
-+		if (unlikely(xdp_do_redirect(priv->dev, xdp, xprog)))
-+			goto err;
-+		break;
-+	}
-+
-+	u64_stats_update_begin(&rx->statss);
-+	if ((u32)xdp_act < GVE_XDP_ACTIONS)
-+		rx->xdp_actions[xdp_act]++;
-+	u64_stats_update_end(&rx->statss);
-+	return;
-+
-+err:
-+	u64_stats_update_begin(&rx->statss);
-+	if (xdp_act == XDP_TX)
-+		rx->xdp_tx_errors++;
-+	if (xdp_act == XDP_REDIRECT)
-+		rx->xdp_redirect_errors++;
-+	u64_stats_update_end(&rx->statss);
-+}
-+
- static void gve_xdp_done_dqo(struct gve_priv *priv, struct gve_rx_ring *rx,
- 			     struct xdp_buff *xdp, struct bpf_prog *xprog,
- 			     int xdp_act,
-@@ -633,6 +676,48 @@ static void gve_xdp_done_dqo(struct gve_priv *priv, struct gve_rx_ring *rx,
- 	return;
- }
- 
-+static int gve_rx_xsk_dqo(struct napi_struct *napi, struct gve_rx_ring *rx,
-+			  struct gve_rx_buf_state_dqo *buf_state, int buf_len,
-+			  struct bpf_prog *xprog)
-+{
-+	struct xdp_buff *xdp = buf_state->xsk_buff;
-+	struct gve_priv *priv = rx->gve;
-+	int xdp_act;
-+
-+	xdp->data_end = xdp->data + buf_len;
-+	xsk_buff_dma_sync_for_cpu(xdp);
-+
-+	if (xprog) {
-+		xdp_act = bpf_prog_run_xdp(xprog, xdp);
-+		buf_len = xdp->data_end - xdp->data;
-+		if (xdp_act != XDP_PASS) {
-+			gve_xsk_done_dqo(priv, rx, xdp, xprog, xdp_act);
-+			gve_free_buf_state(rx, buf_state);
-+			return 0;
-+		}
-+	}
-+
-+	/* Copy the data to skb */
-+	rx->ctx.skb_head = gve_rx_copy_data(priv->dev, napi,
-+					    xdp->data, buf_len);
-+	if (unlikely(!rx->ctx.skb_head)) {
-+		xsk_buff_free(xdp);
-+		gve_free_buf_state(rx, buf_state);
-+		return -ENOMEM;
-+	}
-+	rx->ctx.skb_tail = rx->ctx.skb_head;
-+
-+	/* Free XSK buffer and Buffer state */
-+	xsk_buff_free(xdp);
-+	gve_free_buf_state(rx, buf_state);
-+
-+	/* Update Stats */
-+	u64_stats_update_begin(&rx->statss);
-+	rx->xdp_actions[XDP_PASS]++;
-+	u64_stats_update_end(&rx->statss);
-+	return 0;
-+}
-+
- /* Returns 0 if descriptor is completed successfully.
-  * Returns -EINVAL if descriptor is invalid.
-  * Returns -ENOMEM if data cannot be copied to skb.
-@@ -671,7 +756,11 @@ static int gve_rx_dqo(struct napi_struct *napi, struct gve_rx_ring *rx,
- 	buf_len = compl_desc->packet_len;
- 	hdr_len = compl_desc->header_len;
- 
--	/* Page might have not been used for a while and was likely last written
-+	xprog = READ_ONCE(priv->xdp_prog);
-+	if (buf_state->xsk_buff)
-+		return gve_rx_xsk_dqo(napi, rx, buf_state, buf_len, xprog);
-+
-+	/* Page might have not been used for awhile and was likely last written
- 	 * by a different thread.
- 	 */
- 	if (rx->dqo.page_pool) {
-@@ -721,7 +810,6 @@ static int gve_rx_dqo(struct napi_struct *napi, struct gve_rx_ring *rx,
- 		return 0;
- 	}
- 
--	xprog = READ_ONCE(priv->xdp_prog);
- 	if (xprog) {
- 		struct xdp_buff xdp;
- 		void *old_data;
--- 
-2.50.0.727.gbf7dc18ff4-goog
+Apart from the two minor comments above, the patch looks good to me.
+Thanks!
 
 
