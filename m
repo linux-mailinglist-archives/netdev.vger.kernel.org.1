@@ -1,215 +1,267 @@
-Return-Path: <netdev+bounces-206474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A44FB03387
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 01:50:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B04FB0338D
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 02:04:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A23B11893A9B
-	for <lists+netdev@lfdr.de>; Sun, 13 Jul 2025 23:51:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27D10174E8F
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 00:04:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AADF41FAC34;
-	Sun, 13 Jul 2025 23:50:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97AF4184;
+	Mon, 14 Jul 2025 00:04:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b="mD83lXmK"
+	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="lCGhPuyo"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2126.outbound.protection.outlook.com [40.107.220.126])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6CE719D8AC;
-	Sun, 13 Jul 2025 23:50:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.126
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752450651; cv=fail; b=JBFtJ4iogaMBKfrds01gExbEDYR/CnjFbipb3IhVZ1apm+B7WJcXhOPH3FBgvlkmBdHMxEw303JaU1B2k6WuDKdvPeFRl5AqejYmrNbAmGqLwarRqRoN02csDgkHyoj/cRFNi5mG+HcE8kecZ5ZrYc1jvyeFdKs919M5qZyNvoI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752450651; c=relaxed/simple;
-	bh=8bVOEC0R8nxRrWIIay7ATSVV6fQDUozaAqRnFct9AiI=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=UbxYhN+VsJPQADOE+JdsZBYj/t3oSvTqLs/p73pBZmFloOCige8bx8jV3h3eQToDzLyVlZKDowtU4TwAEjRWYHECxuNQ0KUTGpG5N7+ed+3CGJ6rjzhwmVNu0kI24ikWCljCz68cVNB9//oHqAfXkDSj9Em1ycKE7bt+rxujqoM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=fail (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b=mD83lXmK reason="key not found in DNS"; arc=fail smtp.client-ip=40.107.220.126
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UUUer34D4cprr4HVOGzkmykwXgTMTYRN+sRehyFq4y42jedDwnJvHVnUivPWaqsqsOEoJUDMB9EZ0XqPcxTWQeDQocnX1l6nBFGcg4D0hLWyaAqy8p7KR/gjbGzUgZPvBC+TtodIHwKnVfAgOCbvP/gCeCOwBVCFuLTlC7dpVSqkFVWhrg6LFjsSw1nFx5k+I07BdDqj5gCWQiDhdnXAf9GS7N2EGxsfoZtIJr1I/VhNZ9DOZHe5xUpkIFEABoRm/mwFdlSLfSoPVIP9yWNzpI/PmJlmT5/Zt7LhDH/ET0hhIwh4bugnlsObh8TCrWiwEQlOKNH1zE+KbfvfS6GeGg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nbnbIjZi+hQBL80A9ApAyG2K4Fc4phheLcZtAg+tVJ8=;
- b=mAX76Hi9IEjB/SOmBX3O106syqJsxEEd+ff4GzughWJ+hpF8KVHYE5gB6+HUhupsQUt0CMXpjcrnzyLlJmryCsLllhdyr4veUmCVB7MJOg9ijeacB1c1tt7SVEDlt5XD+b20WtVePHhUkzGGAsTatCtFBqOMQPaSPI1l4VgP7IV4leGfzmi8XPgRnC2p90/yfe+ZPSI3bEEUQGMZsezDX6FfO4NByi9+CZmDrnEJaBHgaZiMXmU3BShhuaYrDPEN2KY9HABXeX1uGFdEG4I6QEN2o4WX0OTE8S0r3LNu+W0aX5xSC+DQNWHh0/g6M2yAa+croMB5higR7MdyDm9odA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=amperemail.onmicrosoft.com; dkim=pass
- header.d=amperemail.onmicrosoft.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B01242E36E7
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 00:04:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752451469; cv=none; b=qXKxiMJcER86hlWfbLqyAJbLWNvpDVReAJ4f5XB8lRFLFoQeiVkZ+mIODF72FFBuUX1ArdSz8t2TzDmDnXvuUysV8Ax+TjLkE8OJB5Awj8oOZ7p2xdtOsH/SlKZK2yxp8J0PgEEVMHGuur28i57dHEy3VY7oo1iWkPLnDWsAZ/4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752451469; c=relaxed/simple;
+	bh=FSwMxlbo/QGpTFuOPjphnVAsursGgYapqYaDrKTezPE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tmeSc3IeYxULQBgvgD6ucT+0DWNljIk95QY4lbnMlLf2+JGwbJNoaceg3Is1FZn3vDStu/kTfOouqoTg77mpIHulpKDD91S/biPHxe9r+YXq0VfQ2465QBkZCppQq6yBOmxF+D0kTlS1nZeLiVIL2SuTz8HP5Y2LW/DnMYCTUMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=lCGhPuyo; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-313cde344d4so3919278a91.0
+        for <netdev@vger.kernel.org>; Sun, 13 Jul 2025 17:04:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amperemail.onmicrosoft.com; s=selector1-amperemail-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nbnbIjZi+hQBL80A9ApAyG2K4Fc4phheLcZtAg+tVJ8=;
- b=mD83lXmKomNfohAHlrxRMn5M7o85vwE0fk52lroxe2uC6Bzu9m1+s9tl3X+TQL5mLxG4HteCsPuhXhy68zwkZnyx6nrpuDJJ+sjy339/sHzOBS87zJhHxfa2tTONmGS/QbefTbZfD8X0TZ5aTIqbcUOkYBdg1pqAYXFQT0h1/Nw=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amperemail.onmicrosoft.com;
-Received: from BN3PR01MB9212.prod.exchangelabs.com (2603:10b6:408:2cb::8) by
- BN0PR01MB7165.prod.exchangelabs.com (2603:10b6:408:154::13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8922.32; Sun, 13 Jul 2025 23:50:46 +0000
-Received: from BN3PR01MB9212.prod.exchangelabs.com
- ([fe80::3513:ad6e:208c:5dbd]) by BN3PR01MB9212.prod.exchangelabs.com
- ([fe80::3513:ad6e:208c:5dbd%4]) with mapi id 15.20.8922.028; Sun, 13 Jul 2025
- 23:50:45 +0000
-Message-ID: <0fe71acb-b8b5-4d30-93b4-21aedf2152c8@amperemail.onmicrosoft.com>
-Date: Sun, 13 Jul 2025 19:50:43 -0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v20 1/1] mctp pcc: Implement MCTP over PCC
- Transport
-To: "lihuisong (C)" <lihuisong@huawei.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Sudeep Holla <sudeep.holla@arm.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- admiyo@os.amperecomputing.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>,
- Jeremy Kerr <jk@codeconstruct.com.au>, Eric Dumazet <edumazet@google.com>,
- Matt Johnston <matt@codeconstruct.com.au>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>
-References: <20250423220142.635223-1-admiyo@os.amperecomputing.com>
- <20250423220142.635223-2-admiyo@os.amperecomputing.com>
- <497a60df-c97e-48b7-bf0f-decbee6ed732@huawei.com>
- <a9f67a55-3471-46b3-bd02-757b0796658a@amperemail.onmicrosoft.com>
- <807e5ea9-ed04-4203-b4a6-bf90952e7934@huawei.com>
- <9e3e0739-b859-4a62-954e-2b13f7d5dd85@amperemail.onmicrosoft.com>
- <c2034f07-5422-4ab1-952e-f7d74d0675a7@huawei.com>
-Content-Language: en-US
-From: Adam Young <admiyo@amperemail.onmicrosoft.com>
-In-Reply-To: <c2034f07-5422-4ab1-952e-f7d74d0675a7@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MN2PR16CA0016.namprd16.prod.outlook.com
- (2603:10b6:208:134::29) To BN3PR01MB9212.prod.exchangelabs.com
- (2603:10b6:408:2cb::8)
+        d=asu.edu; s=google; t=1752451467; x=1753056267; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=zSSDOQqFXpLzQoxgAyul5cFWj8aPdAcD36HygUzikz4=;
+        b=lCGhPuyoymft1OsHB+bya3jcMb+qsJa3SVKbrFHrHTgb+V2glnfsOWH4IcBpD/hB0J
+         gqyqBi2uLqwlQ3BK1J56eX74HL7BD6KBtOM3O+9tV37TjzMYYMbsv0WliPyx5cjlbS35
+         7crUCy2FOm9P2tINLJSMgWe5IyqfjWWq7xnvbeN1GaBgltjrjx7blw50GhKQXWN5LiGD
+         CqGixIbeQsX6OJzzRhn6/tkuao4iOdu/WFhmFN2YVwnD4bntNUtdJ3/ooK18WC4lfjuE
+         yPADGPtUsEkeeR9m6hS2lVqMtp3P52oseeO5JallHzLvTHH14qlWLLxQA11IzqmYOgTj
+         KiCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752451467; x=1753056267;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zSSDOQqFXpLzQoxgAyul5cFWj8aPdAcD36HygUzikz4=;
+        b=RLzSe/9iPmTREvArm1OjNJU5mcQbg6+yZjLBsaU36wE4KyD+JxkTu0bKK8IukNZYiZ
+         kWMoT/zX0EHnb3sjwGUGigJyUM6khRJgPVjVRi+CPyiFy6e6JZ7RJ6hBAnicGXjk8szy
+         i2sQGvl5nKNt1oDZ5l7MnOTHd9Xdkt7L39CBqwMXWWv1ZTVU3SJDn316iYGCNCmUvLpC
+         kg1ZB0FBi/TeIwwynhO0K/XRNC7ZmKHvYfZTKcBeDxibQc/lcUx4RkA9CiFL2E/C+N21
+         op2gDAkBX5pzT5UrZyQEbG9Cy3ALbUT0XSuKmHgwLqkBAQ2MHDTj3vD5pdOSMLGA5H+X
+         6Zdw==
+X-Gm-Message-State: AOJu0YzhMgqqu1PrskFoqDmFMDChVlc+QS5I45+/C5Mv2R7NNzirAkJ5
+	rLGqMtfiRenGUprcStZUtVsPhgx1266gczKV0MzhM4CRguidXUxGBiHfVi493pCp8g==
+X-Gm-Gg: ASbGnctQYSfw/nJBWA9FUaLubez4PTkvO2ZtRFrUZKfpLlaOoErlFWT348EJ9oUzfKZ
+	fJzVLTlizk3GUS30nxrOWFWI/YJ4N2WZN7fSPfRQfExdnI6zCGySjHxVavpNXeBn3CYUYKvyjgT
+	T6l/fmLXJ+vsg+8ZOuRL8jzgwbBOgF7JrEF/i9l+ih5cUAUdy4qi76HfB/iKCImAgsGCptYZvPt
+	Qogk4JTylT+sru0XvRZi5tvV2EN0322+7E739nqGaVxAtuD4csmn01HVfS3843vwbr8O3qAxkue
+	INxfvKTZ/f2U67Iu75f4th0zkDFvW6pESZ/CVutNjSdIF5zKnTc7sMvjhezJwwRxFwiPZ4+uUIn
+	E0Npn7OSM+PBWCo3SDHS48OxnHf8V6Lcj
+X-Google-Smtp-Source: AGHT+IHr+FStFFcgRvUqUcq9XqAFtK/fspDbcRzMs+kXI+FK7/6MoNFhX7ZvB9tjOrtUwLH7iXa/CQ==
+X-Received: by 2002:a17:90b:52cd:b0:313:62ee:45a with SMTP id 98e67ed59e1d1-31c4f4cc411mr14460537a91.13.1752451466807;
+        Sun, 13 Jul 2025 17:04:26 -0700 (PDT)
+Received: from xps (209-147-138-224.nat.asu.edu. [209.147.138.224])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de4350bb0sm88539515ad.205.2025.07.13.17.04.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 13 Jul 2025 17:04:26 -0700 (PDT)
+Date: Sun, 13 Jul 2025 17:04:24 -0700
+From: Xiang Mei <xmei5@asu.edu>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: netdev@vger.kernel.org, gregkh@linuxfoundation.org, jhs@mojatatu.com,
+	jiri@resnulli.us, security@kernel.org
+Subject: Re: [PATCH v3] net/sched: sch_qfq: Fix race condition on
+ qfq_aggregate
+Message-ID: <aHRJiGLQkLKfaEc8@xps>
+References: <20250710100942.1274194-1-xmei5@asu.edu>
+ <aHAwoPHQQJvxSiNB@pop-os.localdomain>
+ <aHBA6kAmizjIL1B5@xps>
+ <aHQltvH5c6+z7DpF@pop-os.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN3PR01MB9212:EE_|BN0PR01MB7165:EE_
-X-MS-Office365-Filtering-Correlation-Id: 47198643-efd5-4b72-15e3-08ddc26815da
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|10070799003|376014|7416014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?NkFxd1U3RVBEZ2hsN3k4Sm5HK0lFckFmQjlWR2VkeFliTktFQ2VnRm1xeVBR?=
- =?utf-8?B?RHZWeEVabU1tNzNRRmhobWdrYlU5TW5PQ3ZmUG5HUTNMeTdKNUJ4M3JyKzhV?=
- =?utf-8?B?em1BMzhOb2tqT1pNdkw5WXJVQXhkT3J1Ty9zdG9wQ3JndG03UUltbDF1OWdV?=
- =?utf-8?B?MTNFaXV6OHEzeWlhNmlOZkFOTFErTlFES2ZqdFRoRDZuZnh5eUZkVlVjM0Zk?=
- =?utf-8?B?S1FzcUFJdEFDdlJlUkpiT2lIWkVnUElaTjBOWUw4bGc0ejE3dGVjM0JxQ1hv?=
- =?utf-8?B?WDZ6U1Q2MnhWbjBQV1RWQS9xRmxjbjdLMmxDWGd2a0k3SXBydmNZcG5md1Vr?=
- =?utf-8?B?eHZMSlJxOGx4OXJVaWJyQW5KOU9iK1FuNzRXUEJaY1VyWWZZdEF0TThCN1hz?=
- =?utf-8?B?WUE1bkhTM2Rta1F1elZveDl6M3YzRGRKV1hYMzVrMGltaWRFaWVVdFJzT2Zk?=
- =?utf-8?B?MkRmNVFQVlRLS1dza0VpaFRPN2pRSlRpMlhaT0t2cURaZUhZYjMwR3I5ckE5?=
- =?utf-8?B?ekV4SERrWk5oSk4wYzVXbWtrOENmNXgvSkhVbi9NYVJGS2dOcGJqZytZSzEz?=
- =?utf-8?B?ZUEvYnFHdWF1cWpCRUlxOExoR3pNSGVHVzhSTUFIcTYyTkZJYlUvOFdvaFlm?=
- =?utf-8?B?U0E5RUtQTnBhZFdkOU1uY3NVWHlJMllLRWNUajViYjRkNllENVQ5cVdCVDdU?=
- =?utf-8?B?OXU4SU5MczJ1RDg3OHZxeU82dkhJc1p6M1FvcDdZaDFsU0cwZzQ0TVEvZ1Zr?=
- =?utf-8?B?UFlZeDVBeEE0WWkvcm42VFJ0eG14bXprZjYwM2l2RDg1SEc1OGpZQ25vVFJT?=
- =?utf-8?B?RTJuWFBjTlpnZE92SVA4aHV2UTh2UzVJdERaZW1lUXIzWlZMSUJLTi9KTTJH?=
- =?utf-8?B?M1liaHNEQWwrc0tlWjJiZjlEVW1xY3g4K1ZtaHEwQW5LUnFEZnFsdDgrM1Q0?=
- =?utf-8?B?cE92dm9PVmN2T0tIY2dHMkRiYVBER0VKeWlaWldFazlYbEpRRndPSTJjdUN0?=
- =?utf-8?B?cDk3dUNNZitBeVI5dFNOVU84TlUzM3hRZk9mbTJobVNpS2o0bnBFeU1tSFE0?=
- =?utf-8?B?ZW9YWmdnT0tQRVFyUHFYczJLUXA3Y0o1Ly9wR0RjRVd1b0VxRE11KzV5NGNX?=
- =?utf-8?B?cmliaDlEYXkxMGI0bUFhR2cvV1FwMjUzYldsUWtKMDZ0K1FmWFBVMVJrSzhT?=
- =?utf-8?B?MTlxdkc4RnV5aEgzNkFaNGk0Z2sxQXdxK0xHbEVpRmdHaENvbWl4QjBaYjFp?=
- =?utf-8?B?UFgvcTk5bjYrSFpaUFRHVXhJNnBSMGVMSE5yanU3Z2F5ZGYvZnNaaE40Wk9u?=
- =?utf-8?B?N2lNTUhmRStjaFg4bWt5cUZvL1AvMHZaVW9SY2dGbjRBa296R21wRWtxMTJ1?=
- =?utf-8?B?V3lrTTBlOVdkRXdHSGMyZ0p3b2hGRm8rRUtpcXVFOUEyL0UxUU5pTnJkUjV1?=
- =?utf-8?B?MWlFbnJFZEdRa2tBbWtiUmc5TlVRZFI3Vnd1YjV0MGcyc3V2dEtKZ3dYMng0?=
- =?utf-8?B?WWNCbnlsaFZZMTZibU9kUzFKT2VmMERDVWg2TXJiN0FRZ2ZHNUc4THVBQWJL?=
- =?utf-8?B?MitWdW1IYVhFTjhrU25MWHpuWnFCdHJ3OVRBYXNZRjdnSDdoNnliRmhSeDc4?=
- =?utf-8?B?VitBRkJtY0t2eGllUkFncVFBUG5QdElJK3p5WmorU29peCtZLzFMcEFra1Fz?=
- =?utf-8?B?RlJwc290cVN3cm1pcEl1YUhNa0NxQmNKc0RraDBNR0gzZEUwaXVpaCtSa25K?=
- =?utf-8?B?bC9qTnZrK25IV1pTVkxaM05zUzF6U05tMXN0c09Gb0toTVdtVHN3b3J5aWVO?=
- =?utf-8?B?Vkc2UFN4SmFHUlZROEhTMnpGZWVtTEY4ZjZqRzRNaTh5ZDFaTEN1VEJTV3hS?=
- =?utf-8?B?Q1JqNHlNSTBRNXF5UTJnVGc3TWw1bUN4aEFJS0pzVmFpcU9Ta2tXaFc0cTZt?=
- =?utf-8?Q?T+QYTrtLnAo=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN3PR01MB9212.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZVFDRVdhUmVjeW9OaDY1NGdqU0tpVVVEdkxHYkh2dEg1VzVWbWdnQ2RoYmtV?=
- =?utf-8?B?elB6NjVJZ2lDWVlsUGJFcllqWEVCOXJpalU4cjRncFZJd3FkdWVmVjFLK3dF?=
- =?utf-8?B?OXg5OUF4MmhZOUtRRFRWSTVSLy9mUU9LZWV1WC81TEFjVDJtazZOdE5jWTZ5?=
- =?utf-8?B?dTlEaUpScVpoay9lcmxPUjlJTVdxTVBvdlZja2tiUDYrbDJVZmthOFdxOHpX?=
- =?utf-8?B?S1FIaVZEL3IvenA5ajh1SEEwcW1zdlRCRWYybTUwVEZRVlIzVDE0M3BlcDls?=
- =?utf-8?B?SnREcmtYZG8yM0pMcHIrWGJuWmhiVjA0N2t3VUppM3hTMS9sejAvODh1NnNN?=
- =?utf-8?B?YXgvLzBiZ2orOUQrQ2QxR00wRWlZOEVnaXVqTy9MWmd1U0FVRm1veXNxZXcw?=
- =?utf-8?B?UUcwcFpXZzFuN2lWS3pSTWxLRG00VkU0MzMzTVJLS3hnVXFwR2dVaEtreFlo?=
- =?utf-8?B?QkRhYmVicktvSUd4ZmlPVWRsUGFTOGFnSlRtanM4MjdPVnY4eW04ZlJrbmd1?=
- =?utf-8?B?K2pnckt3NSt2bnVKS0ZZVFJLWEJac25iUldYOHBvS1N6S2lCZndVQlp6WUxX?=
- =?utf-8?B?WmhNN1NmRG14czRvSXI1N3hmSWJPbjB0L3ZSa3FVbk01OG9pV1pCTUNqS3Mv?=
- =?utf-8?B?SWlPSzFsTmpwTmRQVXpVZnA1QS9OcmdMSkV4K2E3Sis1NHNxeUlPYktGeitm?=
- =?utf-8?B?bHhNK2tPVlRnd3EwMExjRmdxWDBVOGhoWExQVllJYXg1RE15VGZZUVBJNDMv?=
- =?utf-8?B?YWtFekhBVU9TNlpJeFIxMTRkQUJINTl4S2xob0FjaEhFSGY2ekpKK0c3V2hJ?=
- =?utf-8?B?RjdIcWFJK0JERnlvRS91WDhzcU1DbExjL04xc2VKaVB0VEpzVVhLZGpTOVI4?=
- =?utf-8?B?aU13VVVIZGVhaThGWFRMVGsyaThSYlJtNGZWQ2Nxa2s4NFpMdExHbkpkWkhm?=
- =?utf-8?B?Tll4dzZoVUlUMkNWSmZGME5ldWFSRDNMbkJDYS9IQmx3Wlc5L1VEYklkcm9T?=
- =?utf-8?B?VlRONlc0TDBhVzdRaWozeGF5SWxTcGdNR0hHN2ZCWTJtc0RqQlhCSVVjenBJ?=
- =?utf-8?B?dnpydm8rM2IyU0RBN1JlYUQzU2hua1I4ZDhZUlUwUGcrOHd0RHFwbkpRdWs1?=
- =?utf-8?B?WlBob09tREdMNGtBWjRUV3REd0tnbWtzdEFQMkpaSGUwYk9yUENiMkNiZHcy?=
- =?utf-8?B?eHNkVTkwWEJaZUdEKyt6Q2p2ak1zV3M2N2grRHF3Q0ZvTHdBZTI4eVJPM3lP?=
- =?utf-8?B?WHFNYWNSd3JlMEVJT2R0NnZiQVFUa1VGQlVDdHFmVVF0MDFMVWx5WGM5TjRQ?=
- =?utf-8?B?b1FvNzBTSFR2c3N5Q2EyZGpkRHpXVkNvSithVXhhQXcrVzMxWkZlS1Roa2h4?=
- =?utf-8?B?VzJ6M2FQSTNhRzdDZDBXSnF1bjZ4WWQ3QjI2TkVQUXhsQnVjQzZoWUlkcGk1?=
- =?utf-8?B?d240UkRHcUtDZ0NvM0k2MGdLWWdqMWRkeVd5R3F2a0lrVkpXbXpYWUJteEtD?=
- =?utf-8?B?Z01lWTE3bldTcnphM2FPN1hOa3Bac3ovTC9BSkx1Zzg3aWh6STZEeGdWVHU2?=
- =?utf-8?B?OVlyZWdDczhzL1QwSmZNa3VuUVIva2lrckM1Z3lvbmRyZWtuWXIxQ2hOOEMy?=
- =?utf-8?B?Nmd5VnliT0hrMlNrZFB1bWhneHR5enBVQllUV0FCT05DYldsbGlTZXZ2cmxU?=
- =?utf-8?B?Y0FRekxBUURNa2M4NVpEb3BBVGtPLzFObm4vZTJwK2s3RUo5ajcvVFFGQ1RQ?=
- =?utf-8?B?eFVKQWdBWHpxNWZCMVpZYUp6Q3NvdUh0SFo4Tk5YbEUrRzVIbFROQkhXTWJ3?=
- =?utf-8?B?NFZvWGpQeSt6WXF1MlZ1WFBJVjRCUE5ocXhWVngwOUNDQUlxLzVKaDdQUkxv?=
- =?utf-8?B?OVk5bzc2cEJ5WS83citZT2UzTnlwTDVZdk5rUE0vbWJOeWo2L0VqRHBzNno2?=
- =?utf-8?B?Z0pjMXJvY0FJZXhldEU3bEx4ZmtrV0NCNnYxbWtBV0tubmxjbUZ1S1Rhakla?=
- =?utf-8?B?RUdYdDRuL1A4eE5iZjNMcGtxcUR4Rm9DU25jRjRzQlFKNVQ0M0ZlQUZkWGV3?=
- =?utf-8?B?OWFwRjcrQ21EbEJUa3pVZUJ5V3Zvams5Tit1dW9UbHpRWXJSMnBkVjNFTHNa?=
- =?utf-8?B?Z2NURmc0a1J0YSswMHhudVE2aDRQSDBPOWZ1aXRYRTRMUzhEemwwQXkrV3JT?=
- =?utf-8?B?aXNCaWhORW9lcXlZOFE5Wk1SQkVtRGdkUDJaZ2xOUmdYL0FKRnE4TGEzK255?=
- =?utf-8?Q?khuJTUva/NpR38cKmCb5TS9p3t4dW5UlAwnlGjOl5A=3D?=
-X-OriginatorOrg: amperemail.onmicrosoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 47198643-efd5-4b72-15e3-08ddc26815da
-X-MS-Exchange-CrossTenant-AuthSource: BN3PR01MB9212.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2025 23:50:45.7329
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5IlsyWp61uzz4GP3kDk/7QLaFizXGC4a+207ukTwEpD9A0yesQrwdOsUtQo4tK9YBSZ4oLPyt0eleQI0HsFCpf1jVgTIXAlUpB425uRP20uk9ysBViqGO8t5AFNwXUyi
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR01MB7165
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aHQltvH5c6+z7DpF@pop-os.localdomain>
+
+On Sun, Jul 13, 2025 at 02:31:34PM -0700, Cong Wang wrote:
+> Hi Xiang,
+> 
+> It looks like your patch caused the following NULL-ptr-deref. I
+> triggered it when running command `./tdc.py -f tc-tests/infra/qdiscs.json`
+> 
+> Could you take a look? I don't have much time now, since I am still
+> finalizing my netem duplicate patches.
+> 
+> Thanks!
+Hi Cong,
+
+I failed to reproduce the attached crash.
+
+Please let me know if I made any mistake while testing:
+1) Apply the patch to an lts version ( I used 6.6.97)
+2) Enable the KASAN/qfq related configs and compile the kernel
+2) `python ./tdc.py -f ./qdiscs.json` to test but I deleted some tests on
+the qdisc I didn't compile.
 
 
-On 6/3/25 08:03, lihuisong (C) wrote:
->>
->> Once the memcpy_toio completes, the driver will not look at the 
->> packet again.Â  if the Kernel did change it at this point, it would 
->> not affect the flow.Â  The send of the packet is checked vi rc 
->> returned from send_data, and it tags the packet as dropped. Is this 
->> not sufficient?
->>
-> Yes, it is not enough.
-> Once send_data() return success, platform can receive an interruptï¼Œbut 
-> the processing of the platform has not ended.
-> This processing includes handling data and then triggering an 
-> interrupt to notify OS. 
+Can you help me with the following three questions?
+1) Can we consistently trigger the vulnerability? 
+2) What's the instruction that "qfq_dequeue+0x1e4" points to?
+3) Is my patch the only applied patch on sch_qfq.c for the crashed kernel?
 
+Thanks,
+Xiang
 
-This comment caused me to rethink how I was using the PCC mailbox API.Â  
-I realized that it was not actually enforcing the PCC protocol, which 
-you identified.Â  It lead me to rewrite a postion of the PCC Mailbox API, 
-and that is in my next patch series.Â  I would appreciate it if you would 
-take a look. I think it addresses this concern, but it might not be 
-completely transparent to a reviewer.Â Â  I would greatly appreciate if 
-you were to look at it and confirm it fixes the issue, or, if I have 
-missed something, let me know what you see.
-
+Here is my test result for your ref:
+---
+(scapyenv) root@pwn:~# python ./tdc.py -f ./qdiscs.json        
+ -- ns/SubPlugin.__init__
+ -- scapy/SubPlugin.__init__
+Test ca5e: Check class delete notification for ffff:
+Test e4b7: Check class delete notification for root ffff:
+Test 33a9: Check ingress is not searchable on backlog update
+Test a4b9: Test class qlen notification
+Test a4bb: Test FQ_CODEL with HTB parent - force packet drop with empty queue
+Test a4be: Test FQ_CODEL with QFQ parent - force packet drop with empty queue
+Test a4bf: Test FQ_CODEL with HFSC parent - force packet drop with empty queue
+Test a4c0: Test FQ_CODEL with DRR parent - force packet drop with empty queue
+Test a4c3: Test HFSC with netem/blackhole - queue emptying during peek operation
+Test 90ec: Test DRR's enqueue reentrant behaviour with netem
+Test 5e6d: Test QFQ's enqueue reentrant behaviour with netem
+Test bf1d: Test HFSC's enqueue reentrant behaviour with netem
+Test 7c3b: Test nested DRR's enqueue reentrant behaviour with netem
+Test 62c4: Test HTB with FQ_CODEL - basic functionality
+.
+Sent 1 packets.
+.
+Sent 1 packets.
+.
+Sent 1 packets.
+.
+Sent 1 packets.
+.
+Sent 1 packets.
+Test 831d: Test HFSC qlen accounting with DRR/NETEM/BLACKHOLE chain
+...
+> 
+> ------------------------------------>
+> 
+> Test 5e6d: Test QFQ's enqueue reentrant behaviour with netem
+> [ 1066.410119] ==================================================================
+> [ 1066.411114] BUG: KASAN: null-ptr-deref in qfq_dequeue+0x1e4/0x5a1
+> [ 1066.412305] Read of size 8 at addr 0000000000000048 by task ping/945
+> [ 1066.413136]
+> [ 1066.413426] CPU: 0 UID: 0 PID: 945 Comm: ping Tainted: G        W           6.16.0-rc5+ #542 PREEMPT(voluntary)
+> [ 1066.413459] Tainted: [W]=WARN
+> [ 1066.413468] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
+> [ 1066.413476] Call Trace:
+> [ 1066.413499]  <TASK>
+> [ 1066.413502]  dump_stack_lvl+0x65/0x90
+> [ 1066.413502]  kasan_report+0x85/0xab
+> [ 1066.413502]  ? qfq_dequeue+0x1e4/0x5a1
+> [ 1066.413502]  qfq_dequeue+0x1e4/0x5a1
+> [ 1066.413502]  ? __pfx_qfq_dequeue+0x10/0x10
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? lock_acquired+0xde/0x10b
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? sch_direct_xmit+0x1a7/0x390
+> [ 1066.413502]  ? __pfx_sch_direct_xmit+0x10/0x10
+> [ 1066.413502]  dequeue_skb+0x411/0x7a8
+> [ 1066.413502]  __qdisc_run+0x94/0x193
+> [ 1066.413502]  ? __pfx___qdisc_run+0x10/0x10
+> [ 1066.413502]  ? find_held_lock+0x2b/0x71
+> [ 1066.413502]  ? __dev_xmit_skb+0x27c/0x45e
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? rcu_is_watching+0x1c/0x3c
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? dev_qdisc_enqueue+0x117/0x14c
+> [ 1066.413502]  __dev_xmit_skb+0x3b9/0x45e
+> [ 1066.413502]  ? __pfx___dev_xmit_skb+0x10/0x10
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? __pfx_rcu_read_lock_bh_held+0x10/0x10
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  __dev_queue_xmit+0xa14/0xbe2
+> [ 1066.413502]  ? look_up_lock_class+0xb0/0x10d
+> [ 1066.413502]  ? __pfx___dev_queue_xmit+0x10/0x10
+> [ 1066.413502]  ? validate_chain+0x4b/0x261
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? __lock_acquire+0x71d/0x7b1
+> [ 1066.413502]  ? neigh_resolve_output+0x13b/0x1d7
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? lock_acquire.part.0+0xb0/0x1c6
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? find_held_lock+0x2b/0x71
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? local_clock_noinstr+0x32/0x9c
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? mark_lock+0x6d/0x14d
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? __asan_memcpy+0x38/0x59
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? eth_header+0x92/0xd1
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? neigh_resolve_output+0x188/0x1d7
+> [ 1066.413502]  ip_finish_output2+0x58b/0x5c3
+> [ 1066.413502]  ip_send_skb+0x25/0x5f
+> [ 1066.413502]  raw_sendmsg+0x9dc/0xb60
+> [ 1066.413502]  ? __pfx_raw_sendmsg+0x10/0x10
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? stack_trace_save+0x8b/0xbb
+> [ 1066.413502]  ? kasan_save_stack+0x1c/0x38
+> [ 1066.413502]  ? kasan_record_aux_stack+0x87/0x91
+> [ 1066.413502]  ? __might_fault+0x72/0xbe
+> [ 1066.413502]  ? __ww_mutex_die.part.0+0xe/0x88
+> [ 1066.413502]  ? __might_fault+0x72/0xbe
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? find_held_lock+0x2b/0x71
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? local_clock_noinstr+0x32/0x9c
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? __lock_release.isra.0+0xdb/0x197
+> [ 1066.413502]  ? __might_fault+0x72/0xbe
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? inet_send_prepare+0x18/0x5d
+> [ 1066.413502]  sock_sendmsg_nosec+0x82/0xe2
+> [ 1066.413502]  __sys_sendto+0x175/0x1cc
+> [ 1066.413502]  ? __pfx___sys_sendto+0x10/0x10
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? __might_fault+0x72/0xbe
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? local_clock_noinstr+0x32/0x9c
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? __lock_release.isra.0+0xdb/0x197
+> [ 1066.413502]  ? __might_fault+0x72/0xbe
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? lock_release+0xde/0x10b
+> [ 1066.413502]  ? srso_return_thunk+0x5/0x5f
+> [ 1066.413502]  ? __do_sys_gettimeofday+0xb3/0x112
+> [ 1066.413502]  __x64_sys_sendto+0x76/0x86
+> [ 1066.413502]  do_syscall_64+0x94/0x209
+> [ 1066.413502]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> [ 1066.413502] RIP: 0033:0x7fb9f917ce27
+> [ 1066.413502] Code: c7 c0 ff ff ff ff eb be 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 80 3d 45 85 0c 00 00 41 89 ca 74 10 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 69 c3 55 48 89 e5 53 48 83 ec 38 44 89 4d d0
+> [ 1066.413502] RSP: 002b:00007ffeb9932798 EFLAGS: 00000202 ORIG_RAX: 000000000000002c
+> [ 1066.413502] RAX: ffffffffffffffda RBX: 000056476e3550a0 RCX: 00007fb9f917ce27
+> [ 1066.413502] RDX: 0000000000000040 RSI: 000056476ea11320 RDI: 0000000000000003
+> [ 1066.413502] RBP: 00007ffeb99327e0 R08: 000056476e357320 R09: 0000000000000010
+> [ 1066.413502] R10: 0000000000000000 R11: 0000000000000202 R12: 000056476ea11320
+> [ 1066.413502] R13: 0000000000000040 R14: 00007ffeb9933e98 R15: 00007ffeb9933e98
+> [ 1066.413502]  </TASK>
+> [ 1066.413502] ==================================================================
+> 
 
