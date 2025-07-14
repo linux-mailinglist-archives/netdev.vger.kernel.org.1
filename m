@@ -1,192 +1,236 @@
-Return-Path: <netdev+bounces-206494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07C22B03480
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 04:33:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF780B03484
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 04:34:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E44718990F8
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 02:33:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECE9E188D385
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 02:34:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D4D71D54EE;
-	Mon, 14 Jul 2025 02:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="n3y+48IE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87BD31D5ABA;
+	Mon, 14 Jul 2025 02:34:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010002.outbound.protection.outlook.com [52.101.69.2])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FAB213B7AE;
-	Mon, 14 Jul 2025 02:33:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.2
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752460406; cv=fail; b=NPwO6PyMemA31RHAaXBbruQZxZIkxYpkmlKW91Z8M4d50VKhvVlrrMEhG+XBNGPvrBpNFp0zDL8Xhzmxa7yGpwZWVFw3RR1WwVTUfUKeWM37Lqn1RZiqGYMc+vE7Fa+sIoPbRpB2pnxlBzzJYk9a/VnCtUbQCcu1DVV1vncB7JM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752460406; c=relaxed/simple;
-	bh=HwyYGLGKMSRTvfwlH9NR95z0IRG8imweL6YFRtWLZ4E=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=lWTCcx6ukBccCB55xIfuwRUAMgIr9/Zl5uw7DMqcnPyL17uNiJhKPcacUMHyF3JjbrIPrTG1fSvUU3h8+YWfLrYnZjE8l+nZjy38Dlp+uamuw3AV0Sqo+5fr+qzMFtS/wBl4vFF6dO0j4C6paXVfKAWMJs3nbihlRH9770qjNu0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=n3y+48IE; arc=fail smtp.client-ip=52.101.69.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FRGXCN9FHb8UBHKHvUnEWXpkEgiqv0AuVVG7PmxTqqhPney56nqEHin202u/yZpr+9eaU5bf+I16QAs8HEtwpwoEFyGeyZXQFLwVACEXuonfLsvnmBfjBWcid1EHt1SYgDjIX2vwJ8f/KlSg7wcLadwxd3NFpRwj/sXXa7z72OF8Ydn6PcLJKtjI3Tkf7j0C/57tzX8hHE5+20y27UmtUJAp8ohp1T3quaiX0ZiiaeBRXPiJkXWUSYbw2XAFKAKx1nkLd8yUBxu66eEGWOaRCqrAuHpXJh2BxTx0xV42nIO+YeAsA0rpPEg8CU3uWDrPlnUbqrF56/D9Yt4AfOT47A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bcKtFR0VlOWbPYVAmVEbWAAelEq2fXn3b1k7kf9Pc8Q=;
- b=xFnXMYPCpEaz88gl0khkR75WR6sX7jGbZVU01xPDYijCHUbBb44q6IRjdfYQX+qwhOyd6h6lIC7U1VzTjs5g1XFOxJN1V621wpzHs0glEan57AT0Fv7CjytXfR4t53HraxgUQykNUM/TxyAw2M3EJdarB9pdmU+Iqtkw+pU4Z71VqS9N51dlpxpZyU45hHMMP5FLv9WSfPq0qnkHNFFm5exflBOhgLiq/NO2UBMmdARhFFpkDqIwfWfJG+JwfKUvZ4aQxr0Bp20nKm7QRmqRx8gTGiA7GkhzrHIriz15HfjFE9k2fs1T3ad9CPqQC31jm3HU/SsH88PXS9InP+3K+w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bcKtFR0VlOWbPYVAmVEbWAAelEq2fXn3b1k7kf9Pc8Q=;
- b=n3y+48IEra8bzMzRSd8KqXTodYm8x0iGlNWM+BhncTdj44+krj/h31Y1ySWYETBUfV0cfTktDObynpx2wBcbf+rHWG8YrwrAkU65wGyfQdTL/sfJniO9KF+hLc/oaYz3t6EfpTZv8H/UwQ8VZgMeE68Ms337GP32EtNoyGm6ukvEuabYm5x/pnfNJHn/HrlC7L+XoGhbdNfR+o15mumq03vD2W+7GUFLvcGg5k7MrrMCzX5dwBrkXFhXw/qJenNNn6dEEwDucpPq5poKlliXZFZIdWnjtHHXSaY/QGHEvg7X8n9erzHvedSZ0qfkp1MPXw634zfCTR34U/DVfBkLGg==
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by AM9PR04MB7633.eurprd04.prod.outlook.com (2603:10a6:20b:2d9::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.32; Mon, 14 Jul
- 2025 02:33:22 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%5]) with mapi id 15.20.8922.028; Mon, 14 Jul 2025
- 02:33:21 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
-	<krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>, Claudiu Manoil
-	<claudiu.manoil@nxp.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Clark
- Wang <xiaoning.wang@nxp.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "F.S. Peng"
-	<fushi.peng@nxp.com>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "imx@lists.linux.dev" <imx@lists.linux.dev>
-Subject: RE: [PATCH net-next 06/12] ptp: netc: add debugfs support to loop
- back pulse signal
-Thread-Topic: [PATCH net-next 06/12] ptp: netc: add debugfs support to loop
- back pulse signal
-Thread-Index: AQHb8jPmgdLLfL1nT0akuzvUbcxyr7Qs7FSAgAP+eYA=
-Date: Mon, 14 Jul 2025 02:33:21 +0000
-Message-ID:
- <PAXPR04MB8510CEA485EAE319AD743C728854A@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <20250711065748.250159-1-wei.fang@nxp.com>
- <20250711065748.250159-7-wei.fang@nxp.com>
- <083ef067-b628-4dc9-a3e5-ccbb37de3976@lunn.ch>
-In-Reply-To: <083ef067-b628-4dc9-a3e5-ccbb37de3976@lunn.ch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|AM9PR04MB7633:EE_
-x-ms-office365-filtering-correlation-id: 230b770e-34ba-4fb3-d6d3-08ddc27ecd16
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|376014|1800799024|19092799006|7416014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?COgOtRQBa8+vI3fVh0rhzs9Kt9PFd3/7fb2vc7sYfNCTr71BnB1HaI95Ljs/?=
- =?us-ascii?Q?+6k5En/TTQulq3QK9MZeFEf1LD4WUK5JwAqoYkycngoC4VVMbsj5aXxQkgKi?=
- =?us-ascii?Q?untL6v88UhBAs2Qk+IjHeLU9R7Pl2C95TTdF//lws0zWRZkufLmqaVw59bov?=
- =?us-ascii?Q?8NEJrCt9SQeIypLa94QIPVrvbw/esgHK5oUj6Lfc4h8qQy/G9WIVzsIKZV2l?=
- =?us-ascii?Q?TWk3CAsNSthaysuqaDIGVH62coZN/1kp8bO6HHR4PF3cpes68MdXjrBTEFFT?=
- =?us-ascii?Q?0BjE1jMpxeuWNUx9G1EU0jvfgry88nYPzWEOU+nmQ2bh9RyeeJ8s6+GpK2e7?=
- =?us-ascii?Q?6C/g+of2GpeYjcuNV8DNznb+VYLk3HAbF4Mw1iL7/7s9HN5yCz2wUlqlVTb7?=
- =?us-ascii?Q?zdA7XkLP53UVy0T64SniJWkFCSFXJ/gRfQpxQR/YgKEffTx4erM2XqjBVJfn?=
- =?us-ascii?Q?qGVVPQTWr++tHdh7LMgI4PNMHO6s45TaezKQ8kbdtikjB+XiYrpD4jl/WcKf?=
- =?us-ascii?Q?QQWZOlLVZKIVjygWN6yc/P82Eh2yb1Cp1tlZX0xplkgmQzQ5IxCB2JWf9InF?=
- =?us-ascii?Q?NYlV3oT+qLNToTT9i2k9WHtB+XSVM+gu7UyeaJaY1qQBauTQOvY93px7Idhk?=
- =?us-ascii?Q?0RjhMrUClKfz/b/VcrhUJYS0/luzSTbI0p13BrZeVCII/kE2Zeah+zij4UTC?=
- =?us-ascii?Q?f4gz5eYCJsR9j5FRA8VAyFgDyywnAI8kv2yhnc7lpuNa7EvwXBCnWx7hvgXJ?=
- =?us-ascii?Q?Sp+X08qlj0L6tABONT+VT2PPJ+H9lM8tWLWHvCUxTB5hJdsxUvN79st1Rm79?=
- =?us-ascii?Q?a6wzesKc4YFChepaPYRqB1rsJZ+Eh3hXoH91Y25fVlXBrQh9BMTsJR42zNGf?=
- =?us-ascii?Q?bMRBWKjHRvGe7OyyoNtbOnvejbtP9YbZ1L9rFsHbmzrRoiiNlUDN5xCAcLWR?=
- =?us-ascii?Q?1FY2U9iGvG0tmfr0YyrJJ2GxqEFmtwFZKBFwuUbissQux7hQg2o67qN266T0?=
- =?us-ascii?Q?ol2XNaquKYI3Bx1EezDeAaeknWoPYu98efU3SLR89QmHNZzY95JbvvDYfBHZ?=
- =?us-ascii?Q?qm2085NbWwbST1OCgxDpTcgMrxUGK/aQjwKg54a96vHe66P6vC3NIFjx/wPa?=
- =?us-ascii?Q?U+KEFJbCYhVPL4o9bzygK85vK/UylIKNro3Mdb6qL/M5uaQNlPBvaMEAPWo/?=
- =?us-ascii?Q?KjHr4QF7hkvmpmM7UB/RyPAjM74gkr76I0IV5/5u5to4bDFP0CsYQy5gD9ck?=
- =?us-ascii?Q?gdw7C5LE3+CRCWrgakQBVIl6FDwoTuPGHv6CEAy68gdVprIC6ac26X4uH3NI?=
- =?us-ascii?Q?v3O15yI8/kz2M7ClUWzebbo7MZFfiroFR+1x/+7pL71LLw418OWSfpPDw9Iv?=
- =?us-ascii?Q?Rq78tzTShrIj7SJe0uZ+MXG7ORZu81A4olLIZp7hFVSyZdtdhd872sfmcQ4T?=
- =?us-ascii?Q?2lKkzIBBC1oJ4TGNfGzjA0irDv0+R63GTN3BuiFTltMQhJNDMDNyZA=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(19092799006)(7416014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?ppueyYc79N1Ne9UoXDBuCIw1hTQRMpVFNt5QOXafvCeBemQdv3QHrEj9TskD?=
- =?us-ascii?Q?4CKpIHKW12Oekhs1HZOXG6iBWN2vzPIgy7ZZmRAHqXOZKxlya/eaVa5K/u7p?=
- =?us-ascii?Q?nTTIm9gXp4AZTidXE/mfyH1A3yG/sbAfK7PEAPa+fl4gaLYNMSzOUIr/E47n?=
- =?us-ascii?Q?ckpknxYWFKn5iR3PO0WKbX7KKJT6UAJlLsM9tAHg6bTHpr5OYqdsmN3vQLlt?=
- =?us-ascii?Q?5himeRCUsXnLiZxbFZlMKpYqcqCReMoiCG5eMTodtwYCZL8RhfrBTAOSOIdV?=
- =?us-ascii?Q?Z0MG9BlaF16qzQ2DS3FCa2Faq/POo4wBBxuO3UrAP254POoZbh1UgL0YYcl+?=
- =?us-ascii?Q?KMNWh645YMsbL91iJ0h5woebbyNAqX3I2rlk/Pts9p8VDEzAIVMNuJkh1G1D?=
- =?us-ascii?Q?OThphTUX93iBTEYNDnZ3/31vfn44Pi+88y4x3Wr+cPBiqyDLl/ssP867NJLi?=
- =?us-ascii?Q?AccKW1mBaevqH4bsHNkE0HAm6PQHW6M90vzP6Gx2L1D4jqaeUW1zrHOEtDfD?=
- =?us-ascii?Q?nyIy7UPLhaCahOFkrvwfieSx8B8qVvRFXVazO+3Uue65+ljHrJU8Jcv5D+VI?=
- =?us-ascii?Q?AkxVRHYtCAC8SNdrqY9RxPr2vAy4pxQTwpaFNF7QN09cYLgt1yCqJbIz2hSG?=
- =?us-ascii?Q?3AvD6+LkBRpKRrX5Qte9B0qi9RU7FuxZF9o+A7hpcMj9W/7yXVbuCMkaOB5s?=
- =?us-ascii?Q?HvyOStdBasHH6n2WUD4I0k7NcSxZubyMfjoeBqt14t/6KNJH4zqcyve9XUbk?=
- =?us-ascii?Q?QM7KSoNIIMmvsPmwoeLx4Xduh83NJ4gPJ4k0jJo+sqvi0TNvUNITPfE0KVwR?=
- =?us-ascii?Q?CnFRRpfaZ+Tkvrs4CA5shByemkF6kvBzoVrVPEJY6rgi77sLGdtdJj+ez1eU?=
- =?us-ascii?Q?HswE3j2VCH9rvSgY5I0GaqTZaFH47Ip+78qoHRrkROVdywX7kyl5Vo3X1jvi?=
- =?us-ascii?Q?xlZ7cgqSEUUaXWptEN/90nqkPc/nYNzzo6GW3GRbWM1tHBjKEwGSEQVRQLds?=
- =?us-ascii?Q?OT2Vc4ialExo0GIN30VnNb7fdXk1etk4nKcxWg6/+942qYng5pFAboEeKha2?=
- =?us-ascii?Q?TKPMX2eRGXYkEJ62zETdoe+uD4o00JCY8vQBszLZZjRjXlW/npKivmdFwkGx?=
- =?us-ascii?Q?TtyQg4Z2euDCsYYK1dw+15MVGa0who7Cx11zrp35g/OTZ2QhouQPgbdUWuWY?=
- =?us-ascii?Q?3yvTSm13ZNfrWVX0uCX9ppJd8NkDaACI+qVyX1ZJ4Mexfiw05aAM7DEvL/3g?=
- =?us-ascii?Q?8l+r+EsC2qSwsujF9pt6a1qIovWNIF5W+7M2I+38L3ijF4CDUoOVnFbHlCQ/?=
- =?us-ascii?Q?sjkzxGGFsbJLFEvk1oZ9LoSoYYPynun1QXfMUHzAQVJNB6CGmJxz0kOtNBPw?=
- =?us-ascii?Q?QECDAc4S4s3JNOFwMiWTNeJJUljX64hFCn76Nsc5mu7LcHvU/epaEvLGv7F7?=
- =?us-ascii?Q?9KSlzyPsxkGSzavse67/VqI4xUQVUZ5WQAEwOi2KZS6dvqJkUeGkwzdsRB1k?=
- =?us-ascii?Q?ynWipn8L0Oe3+b0P2mqET6+CqWimt8ayN1Hqev/nFRPU9g6U3FVITyfSF7fk?=
- =?us-ascii?Q?luR/OmZ8VsTQLzOjJ14=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA237E0E8;
+	Mon, 14 Jul 2025 02:34:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752460447; cv=none; b=itVPScMB5gwNsGpmDxZQd3CY0W5Io1ERAqBdKpVUKq/tpbNxYvkX/Yg7d3+5lolD8O/NPz+mJeuVZ69nFl1Y2I6TDvbKp1AfuGjltuOT2ecJBVcoA4TXdZTE5qIzI85zHyFnxuTl6NeDMHlou497Mn2qid93HhFZZQX0cHdqr50=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752460447; c=relaxed/simple;
+	bh=KC6Nm9Dh/gTGaq3+hmh6YiKDaalS+ZCO6zbEbRMlgd4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=I4GZUwP6cVGBow74XNSaxcRkol1ymlCU8/KUiLGKMczCqo6zfpUzVPBZom4MYQfHtxL4S2qU6zc4zHs21F+TGIZNocbfjZAFuEDNYHw/0t02YNU5ZYrb0SJeJveewZ6GthCdjTJrd+lqlNvAsaRGiwVXMmoHdgWxD3slbJdZBgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4bgR9S2cGMz2CfmS;
+	Mon, 14 Jul 2025 10:29:48 +0800 (CST)
+Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
+	by mail.maildlp.com (Postfix) with ESMTPS id 55E6D140113;
+	Mon, 14 Jul 2025 10:33:54 +0800 (CST)
+Received: from [10.174.176.70] (10.174.176.70) by
+ dggpemf500016.china.huawei.com (7.185.36.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 14 Jul 2025 10:33:52 +0800
+Message-ID: <830deee4-073c-44bc-8b94-a050792eeda4@huawei.com>
+Date: Mon, 14 Jul 2025 10:33:50 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 230b770e-34ba-4fb3-d6d3-08ddc27ecd16
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jul 2025 02:33:21.8778
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zZDjUeMhHsB8Dtmtg5InsrBr4c2HpDSnxdjBfFWrEPhlZmkDLG8NNC+ZwV8QgmjToM2Sci+xqCt0Q4aemU+UPg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB7633
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 net] smc: Fix various oops due to inet_sock type
+ confusion.
+To: Kuniyuki Iwashima <kuniyu@google.com>, "D. Wythe"
+	<alibuda@linux.alibaba.com>, Dust Li <dust.li@linux.alibaba.com>, Sidraya
+ Jayagond <sidraya@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: Mahanta Jambigi <mjambigi@linux.ibm.com>, Tony Lu
+	<tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>, Simon Horman
+	<horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-s390@vger.kernel.org>,
+	<syzbot+40bf00346c3fe40f90f2@syzkaller.appspotmail.com>,
+	<syzbot+f22031fad6cbe52c70e7@syzkaller.appspotmail.com>,
+	<syzbot+271fed3ed6f24600c364@syzkaller.appspotmail.com>
+References: <20250711060808.2977529-1-kuniyu@google.com>
+From: Wang Liang <wangliang74@huawei.com>
+In-Reply-To: <20250711060808.2977529-1-kuniyu@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ dggpemf500016.china.huawei.com (7.185.36.197)
 
-> > +static void netc_timer_create_debugfs(struct netc_timer *priv)
-> > +{
-> > +	char debugfs_name[24];
-> > +	struct dentry *root;
-> > +
-> > +	snprintf(debugfs_name, sizeof(debugfs_name), "netc_timer%d",
-> > +		 priv->phc_index);
-> > +	root =3D debugfs_create_dir(debugfs_name, NULL);
-> > +	if (IS_ERR(root))
-> > +		return;
->=20
-> You should never check the return values from a debugfs_
-> calls. debugfs is full optional, and the driver should work without
-> it. debugfs will also happily accept a NULL or error code as a
-> parameter. So even if debugfs_create_dir() fails, keep going,
-> debugfs_create_file() won't explode.
->=20
-You are right, I will remove the check, thanks
 
+在 2025/7/11 14:07, Kuniyuki Iwashima 写道:
+> syzbot reported weird splats [0][1] in cipso_v4_sock_setattr() while
+> freeing inet_sk(sk)->inet_opt.
+>
+> The address was freed multiple times even though it was read-only memory.
+>
+> cipso_v4_sock_setattr() did nothing wrong, and the root cause was type
+> confusion.
+>
+> The cited commit made it possible to create smc_sock as an INET socket.
+>
+> The issue is that struct smc_sock does not have struct inet_sock as the
+> first member but hijacks AF_INET and AF_INET6 sk_family, which confuses
+> various places.
+>
+> In this case, inet_sock.inet_opt was actually smc_sock.clcsk_data_ready(),
+> which is an address of a function in the text segment.
+>
+>    $ pahole -C inet_sock vmlinux
+>    struct inet_sock {
+>    ...
+>            struct ip_options_rcu *    inet_opt;             /*   784     8 */
+>
+>    $ pahole -C smc_sock vmlinux
+>    struct smc_sock {
+>    ...
+>            void                       (*clcsk_data_ready)(struct sock *); /*   784     8 */
+>
+> The same issue for another field was reported before. [2][3]
+>
+> At that time, an ugly hack was suggested [4], but it makes both INET
+> and SMC code error-prone and hard to change.
+>
+> Also, yet another variant was fixed by a hacky commit 98d4435efcbf3
+> ("net/smc: prevent NULL pointer dereference in txopt_get").
+>
+> Instead of papering over the root cause by such hacks, we should not
+> allow non-INET socket to reuse the INET infra.
+>
+> Let's add inet_sock as the first member of smc_sock.
+>
+> [0]:
+> kvfree_call_rcu(): Double-freed call. rcu_head 000000006921da73
+> WARNING: CPU: 0 PID: 6718 at mm/slab_common.c:1956 kvfree_call_rcu+0x94/0x3f0 mm/slab_common.c:1955
+> Modules linked in:
+> CPU: 0 UID: 0 PID: 6718 Comm: syz.0.17 Tainted: G        W           6.16.0-rc4-syzkaller-g7482bb149b9f #0 PREEMPT
+> Tainted: [W]=WARN
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+> pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> pc : kvfree_call_rcu+0x94/0x3f0 mm/slab_common.c:1955
+> lr : kvfree_call_rcu+0x94/0x3f0 mm/slab_common.c:1955
+> sp : ffff8000a03a7730
+> x29: ffff8000a03a7730 x28: 00000000fffffff5 x27: 1fffe000184823d3
+> x26: dfff800000000000 x25: ffff0000c2411e9e x24: ffff0000dd88da00
+> x23: ffff8000891ac9a0 x22: 00000000ffffffea x21: ffff8000891ac9a0
+> x20: ffff8000891ac9a0 x19: ffff80008afc2480 x18: 00000000ffffffff
+> x17: 0000000000000000 x16: ffff80008ae642c8 x15: ffff700011ede14c
+> x14: 1ffff00011ede14c x13: 0000000000000004 x12: ffffffffffffffff
+> x11: ffff700011ede14c x10: 0000000000ff0100 x9 : 5fa3c1ffaf0ff000
+> x8 : 5fa3c1ffaf0ff000 x7 : 0000000000000001 x6 : 0000000000000001
+> x5 : ffff8000a03a7078 x4 : ffff80008f766c20 x3 : ffff80008054d360
+> x2 : 0000000000000000 x1 : 0000000000000201 x0 : 0000000000000000
+> Call trace:
+>   kvfree_call_rcu+0x94/0x3f0 mm/slab_common.c:1955 (P)
+>   cipso_v4_sock_setattr+0x2f0/0x3f4 net/ipv4/cipso_ipv4.c:1914
+>   netlbl_sock_setattr+0x240/0x334 net/netlabel/netlabel_kapi.c:1000
+>   smack_netlbl_add+0xa8/0x158 security/smack/smack_lsm.c:2581
+>   smack_inode_setsecurity+0x378/0x430 security/smack/smack_lsm.c:2912
+>   security_inode_setsecurity+0x118/0x3c0 security/security.c:2706
+>   __vfs_setxattr_noperm+0x174/0x5c4 fs/xattr.c:251
+>   __vfs_setxattr_locked+0x1ec/0x218 fs/xattr.c:295
+>   vfs_setxattr+0x158/0x2ac fs/xattr.c:321
+>   do_setxattr fs/xattr.c:636 [inline]
+>   file_setxattr+0x1b8/0x294 fs/xattr.c:646
+>   path_setxattrat+0x2ac/0x320 fs/xattr.c:711
+>   __do_sys_fsetxattr fs/xattr.c:761 [inline]
+>   __se_sys_fsetxattr fs/xattr.c:758 [inline]
+>   __arm64_sys_fsetxattr+0xc0/0xdc fs/xattr.c:758
+>   __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+>   invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:49
+>   el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
+>   do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
+>   el0_svc+0x58/0x180 arch/arm64/kernel/entry-common.c:879
+>   el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:898
+>   el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:600
+>
+> [1]:
+> Unable to handle kernel write to read-only memory at virtual address ffff8000891ac9a8
+> KASAN: probably user-memory-access in range [0x0000000448d64d40-0x0000000448d64d47]
+> Mem abort info:
+>    ESR = 0x000000009600004e
+>    EC = 0x25: DABT (current EL), IL = 32 bits
+>    SET = 0, FnV = 0
+>    EA = 0, S1PTW = 0
+>    FSC = 0x0e: level 2 permission fault
+> Data abort info:
+>    ISV = 0, ISS = 0x0000004e, ISS2 = 0x00000000
+>    CM = 0, WnR = 1, TnD = 0, TagAccess = 0
+>    GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+> swapper pgtable: 4k pages, 48-bit VAs, pgdp=0000000207144000
+> [ffff8000891ac9a8] pgd=0000000000000000, p4d=100000020f950003, pud=100000020f951003, pmd=0040000201000781
+> Internal error: Oops: 000000009600004e [#1]  SMP
+> Modules linked in:
+> CPU: 0 UID: 0 PID: 6946 Comm: syz.0.69 Not tainted 6.16.0-rc4-syzkaller-g7482bb149b9f #0 PREEMPT
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+> pstate: 604000c5 (nZCv daIF +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> pc : kvfree_call_rcu+0x31c/0x3f0 mm/slab_common.c:1971
+> lr : add_ptr_to_bulk_krc_lock mm/slab_common.c:1838 [inline]
+> lr : kvfree_call_rcu+0xfc/0x3f0 mm/slab_common.c:1963
+> sp : ffff8000a28a7730
+> x29: ffff8000a28a7730 x28: 00000000fffffff5 x27: 1fffe00018b09bb3
+> x26: 0000000000000001 x25: ffff80008f66e000 x24: ffff00019beaf498
+> x23: ffff00019beaf4c0 x22: 0000000000000000 x21: ffff8000891ac9a0
+> x20: ffff8000891ac9a0 x19: 0000000000000000 x18: 00000000ffffffff
+> x17: ffff800093363000 x16: ffff80008052c6e4 x15: ffff700014514ecc
+> x14: 1ffff00014514ecc x13: 0000000000000004 x12: ffffffffffffffff
+> x11: ffff700014514ecc x10: 0000000000000001 x9 : 0000000000000001
+> x8 : ffff00019beaf7b4 x7 : ffff800080a94154 x6 : 0000000000000000
+> x5 : ffff8000935efa60 x4 : 0000000000000008 x3 : ffff80008052c7fc
+> x2 : 0000000000000001 x1 : ffff8000891ac9a0 x0 : 0000000000000001
+> Call trace:
+>   kvfree_call_rcu+0x31c/0x3f0 mm/slab_common.c:1967 (P)
+>   cipso_v4_sock_setattr+0x2f0/0x3f4 net/ipv4/cipso_ipv4.c:1914
+>   netlbl_sock_setattr+0x240/0x334 net/netlabel/netlabel_kapi.c:1000
+>   smack_netlbl_add+0xa8/0x158 security/smack/smack_lsm.c:2581
+>   smack_inode_setsecurity+0x378/0x430 security/smack/smack_lsm.c:2912
+>   security_inode_setsecurity+0x118/0x3c0 security/security.c:2706
+>   __vfs_setxattr_noperm+0x174/0x5c4 fs/xattr.c:251
+>   __vfs_setxattr_locked+0x1ec/0x218 fs/xattr.c:295
+>   vfs_setxattr+0x158/0x2ac fs/xattr.c:321
+>   do_setxattr fs/xattr.c:636 [inline]
+>   file_setxattr+0x1b8/0x294 fs/xattr.c:646
+>   path_setxattrat+0x2ac/0x320 fs/xattr.c:711
+>   __do_sys_fsetxattr fs/xattr.c:761 [inline]
+>   __se_sys_fsetxattr fs/xattr.c:758 [inline]
+>   __arm64_sys_fsetxattr+0xc0/0xdc fs/xattr.c:758
+>   __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+>   invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:49
+>   el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
+>   do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
+>   el0_svc+0x58/0x180 arch/arm64/kernel/entry-common.c:879
+>   el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:898
+>   el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:600
+> Code: aa1f03e2 52800023 97ee1e8d b4000195 (f90006b4)
+>
+> Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
+> Reported-by: syzbot+40bf00346c3fe40f90f2@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/all/686d9b50.050a0220.1ffab7.0020.GAE@google.com/
+> Tested-by: syzbot+40bf00346c3fe40f90f2@syzkaller.appspotmail.com
+> Reported-by: syzbot+f22031fad6cbe52c70e7@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/all/686da0f3.050a0220.1ffab7.0022.GAE@google.com/
+> Reported-by: syzbot+271fed3ed6f24600c364@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=271fed3ed6f24600c364 # [2]
+> Link: https://lore.kernel.org/netdev/99f284be-bf1d-4bc4-a629-77b268522fff@huawei.com/ # [3]
+> Link: https://lore.kernel.org/netdev/20250331081003.1503211-1-wangliang74@huawei.com/ # [4]
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> ---
+>   net/smc/af_smc.c | 14 ++++++++++++++
+>   net/smc/smc.h    |  8 ++++----
+>   2 files changed, 18 insertions(+), 4 deletions(-)
+Reviewed-by: Wang Liang <wangliang74@huawei.com>
 
