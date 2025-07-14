@@ -1,96 +1,81 @@
-Return-Path: <netdev+bounces-206632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC652B03CFD
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 13:12:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFF3DB03CF7
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 13:11:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DB6A3A5299
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 11:11:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DDF41894665
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 11:12:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179A8246769;
-	Mon, 14 Jul 2025 11:11:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D29EB23A9BB;
+	Mon, 14 Jul 2025 11:11:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gCUgbVuw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dDwzhYxp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D214D1FECB4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E67A920;
 	Mon, 14 Jul 2025 11:11:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752491515; cv=none; b=OYu0CdqMNQaEW+/wStdkQK+e7Qi0fyzBp1RzblUVjzkfSBmtft5bsTxcyEkIV2T357aeecSZY+nk5eZkZl0xpN5VbMR1epgm7z4yA8y0qP/i+ohxVO1F18hpvtUJM2mbsmf89sUkJVoVA8N7z/eHLmb+CGj2epRFkVk0OETkwFM=
+	t=1752491514; cv=none; b=GeCvTLFy/GEkd6VV6Rv2QZBtZ4gECORQLpRUYzhF6z/dlNUlAEKbLE4dS7EtvN2MYVhwDz54L6W+RSQRopBzTUaIMhRVMcYxElv+WEP36v7xkLUI9Xm3b/HchriGSsIXqoF2PtpVjkcpOxC2wXWhQBYv+F/YKe7P8FourL2qGVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752491515; c=relaxed/simple;
-	bh=LrX0RGuZdher2wedibFNe23KtTBoU4hFNhSrfZry7Z4=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=LIrPrbMMzSlfGR6gaeB3y1iVO/nPLNVZ3RZno5ORnpl30Q3loLpkh7S1ydXzO0xM1vcMZS4M6O+sGUa/gd8/A35hBZWm7Nngixtf/wF+V/J+Ap2u6z90UNMKBslQOsWDdZbz/wR2k6FNvn2I3OrdiBCu4Dm8ZfRxYZGOynQqe3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gCUgbVuw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96EF4C4CEED;
-	Mon, 14 Jul 2025 11:11:47 +0000 (UTC)
+	s=arc-20240116; t=1752491514; c=relaxed/simple;
+	bh=K7ai1RNZpl+ipvteH723QkLX51VaUzlzH4tIcQZg+7Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cOo/6dQWPXS1fVT0/sjL4fDThu+BZxKYWeWWIuMKt+SpiF0QSq+0MsuWzgWFykeaEZbN4vRjw+dVLpLTkKG+QFM/1q1teUxCjy9CvE+ZMfcQjzmXL5TPU8BXNsKu0nCyZ0udTrlcpI6mfxhKjU6miCBGNnXPaZpKoPygS+FXOJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dDwzhYxp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A78DC4CEF4;
+	Mon, 14 Jul 2025 11:11:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1752491514;
-	bh=LrX0RGuZdher2wedibFNe23KtTBoU4hFNhSrfZry7Z4=;
-	h=Date:Subject:Cc:To:From:References:In-Reply-To:From;
-	b=gCUgbVuwCBrCSO4Mvgufqg+JpYNjqKPjojpWwPo1arW27+Jg9nGXgu6P+7VTj9QPI
-	 6bnAZTw/FrAzII7XqkEOFdZ50MvW2xtqcE03w2JNnNqQ9qAgCKJTwAbU3/T8I+02oY
-	 7dFhsh4iDA3DUvFzimMeKU73jHfcPheoWlGZ7+w+0OdXvXEAjJdOOUEtGp1wxiPQuz
-	 O4Mdi3PSbaM+Q1bhNRkHWrG3NYSzmW2b6M8M52ZYCCJ1oUfjj87HnhG4OQC85jRFXw
-	 v0fMh/csvBThGIlzhxj8krg0NCShqECGro1wDLJvgmR9cOGXKDTgJ2eyz2rTCTkBZy
-	 NsrDVuXgyCawA==
+	bh=K7ai1RNZpl+ipvteH723QkLX51VaUzlzH4tIcQZg+7Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dDwzhYxpCNVBKfTTA6euZTTWsJL7eq3EgcVJGsWxXn3LDG39dm7V8Hg7kf9sjhKvV
+	 3XxtTNBUU3Qy/gl5YidNDT7osUtQb0w6tpvJcQSTPxNZoH1xLHNShHlnZtRN9sRunm
+	 rmPxqsZ3RFOcTNarqb0J5cSqxkXuVIH9OXnxdjAg89UqS32BUwcU7z0OrNTXWmdHpE
+	 q0iA+u/HR24cPjnbrKExlykW8wQFQh+CeEsvDCum9Z0REV+jjb5ArB9KSW0x56hn9F
+	 Nn4hi+mbJcqSh33c3lXCuNcbdd1CGNX4ci9sOyRv0ufnzbqiuRnxrpsM4mTkF0FJ3N
+	 lwFV9CUHCrwxg==
+Date: Mon, 14 Jul 2025 12:11:50 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	michal.kubiak@intel.com, mengyuanlou@net-swift.com,
+	duanqiangwen@net-swift.com, stable@vger.kernel.org
+Subject: Re: [PATCH net v2 1/3] net: libwx: remove duplicate
+ page_pool_put_full_page()
+Message-ID: <20250714111150.GL721198@horms.kernel.org>
+References: <20250714024755.17512-1-jiawenwu@trustnetic.com>
+ <20250714024755.17512-2-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 14 Jul 2025 13:11:45 +0200
-Message-Id: <DBBQE3GJ0CHT.5PEF7RLS6C33@kernel.org>
-Subject: Re: [PATCH 01/10] gpu: nova-core: use `core::ffi::CStr` method
- names
-Cc: "Maarten Lankhorst" <maarten.lankhorst@linux.intel.com>, "Maxime Ripard"
- <mripard@kernel.org>, "Thomas Zimmermann" <tzimmermann@suse.de>, "David
- Airlie" <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>, "Miguel
- Ojeda" <ojeda@kernel.org>, "Alex Gaynor" <alex.gaynor@gmail.com>, "Boqun
- Feng" <boqun.feng@gmail.com>, "Gary Guo" <gary@garyguo.net>,
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
- <lossin@kernel.org>, "Andreas Hindborg" <a.hindborg@kernel.org>, "Alice
- Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>, "Greg
- Kroah-Hartman" <gregkh@linuxfoundation.org>, "Dave Ertman"
- <david.m.ertman@intel.com>, "Ira Weiny" <ira.weiny@intel.com>, "Leon
- Romanovsky" <leon@kernel.org>, "Breno Leitao" <leitao@debian.org>, "Rafael
- J. Wysocki" <rafael@kernel.org>, "Viresh Kumar" <viresh.kumar@linaro.org>,
- "Luis Chamberlain" <mcgrof@kernel.org>, "Russ Weight"
- <russ.weight@linux.dev>, "Brendan Higgins" <brendan.higgins@linux.dev>,
- "David Gow" <davidgow@google.com>, "Rae Moar" <rmoar@google.com>, "FUJITA
- Tomonori" <fujita.tomonori@gmail.com>, "Rob Herring" <robh@kernel.org>,
- "Saravana Kannan" <saravanak@google.com>,
- <dri-devel@lists.freedesktop.org>, <linux-kernel@vger.kernel.org>,
- <rust-for-linux@vger.kernel.org>, <linux-pm@vger.kernel.org>,
- <linux-kselftest@vger.kernel.org>, <kunit-dev@googlegroups.com>,
- <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>
-To: "Tamir Duberstein" <tamird@gmail.com>
-From: "Danilo Krummrich" <dakr@kernel.org>
-References: <20250709-core-cstr-fanout-1-v1-0-fd793b3e58a2@gmail.com>
- <20250709-core-cstr-fanout-1-v1-1-fd793b3e58a2@gmail.com>
-In-Reply-To: <20250709-core-cstr-fanout-1-v1-1-fd793b3e58a2@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250714024755.17512-2-jiawenwu@trustnetic.com>
 
-On Wed Jul 9, 2025 at 9:58 PM CEST, Tamir Duberstein wrote:
-> Prepare for `core::ffi::CStr` taking the place of `kernel::str::CStr` by
-> avoid methods that only exist on the latter.
->
-> Link: https://github.com/Rust-for-Linux/linux/issues/1075
-> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
-> ---
->  drivers/gpu/drm/drm_panic_qr.rs | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Mon, Jul 14, 2025 at 10:47:53AM +0800, Jiawen Wu wrote:
+> page_pool_put_full_page() should only be invoked when freeing Rx buffers
+> or building a skb if the size is too short. At other times, the pages
+> need to be reused. So remove the redundant page put. In the original
+> code, double free pages cause kernel panic:
 
-This doesn't look like nova-core. :)
+...
+
+> Fixes: 3c47e8ae113a ("net: libwx: Support to receive packets in NAPI")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+
+Thanks for the update.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
