@@ -1,49 +1,48 @@
-Return-Path: <netdev+bounces-206673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFC8AB04038
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 15:39:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9509B0404E
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 15:41:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEE7718841C3
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 13:35:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5DF116B5B7
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 13:40:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E23421F3FC6;
-	Mon, 14 Jul 2025 13:35:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3EE724BBE4;
+	Mon, 14 Jul 2025 13:40:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qPYqJaoS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O9OMVAFa"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 511BE2F22;
-	Mon, 14 Jul 2025 13:34:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC3FE248F60;
+	Mon, 14 Jul 2025 13:40:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752500100; cv=none; b=k0ClVnX5bI62Mkc1XEc7Jjaqbs/k/mbDUKxJ5mTnBtp8ujpweCTXzfKNmBJLxumwvhPgS8ulyFEO3OZsT3zWJF5wavF8yyT0153SA1rZpJfSnax8NBpXscYp5UMSBtSqCjNDFut3qXGysNf+uhZR+iaYAMOZaA6FFD/PGAMWYI8=
+	t=1752500417; cv=none; b=BU/elULybZho26T/CpYZzWke6zcfqbUrqYpkU3m+zWyaFDIDr9grWr+lQDhq/uqZYYGr9L5hhTv/tcKkGOdysJoujeLbK/TyMNesZ6tPUEnCSuzsgaVg2VHms2UuACdROzthZxjOCT3q7JTuloRrxlB/ae58zEiCfg0SrK49KRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752500100; c=relaxed/simple;
-	bh=CEkKa/aikU/CDzdfcPAjOT99jNpHypxstJjnFfoQF3M=;
+	s=arc-20240116; t=1752500417; c=relaxed/simple;
+	bh=ZbTnyFu2wdFpma2HJU3wztP0Nr+eewvviXPIjhzHS7U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m5VF5/nClZzIYxlJba8mqM+mGtULo4d9jEqZ8IsOB47QZWqc6EK1g1gy4DAc4KfZ8PiQrRSJXW91a8QPZBmK5JZIdRKEgpt6HaiBI2tyfAouFNSqy7I3q04Bzvtihi4cqUTfAIxw2pmhaHxPrO1s/icfBKMMuF9c82QFHvoL7kA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qPYqJaoS; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=rkKA5JFXkaqeIgKnZeTRvq/H+eMfFQ7tSAFHadzv+i4=; b=qPYqJaoStTW6WZY8E3xsfppAcV
-	GciwfhUoAIxtaUx5hRVyOQZL595Nutl12IeZGQ+2QwMLot/GFSllOAsMkFzzwfSJiTKTwqNREFIWM
-	u1tdKdG9gNKJ9cvGzr99Z+DlXIe3rzBruOF4Hcro7UHi3k4oDscE48rIsYpUmNuaWcqU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ubJKR-001SkI-Ao; Mon, 14 Jul 2025 15:34:47 +0200
-Date: Mon, 14 Jul 2025 15:34:47 +0200
-From: Andrew Lunn <andrew@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=aDTEaIbxYtM6fC3PZaP8pcRKPSEmGcpBp3apdv5zV6pls4xSwOBYaR6DsG8Iv0gMNCZClUUoMFTjguVOPvegPcO66VKrDxYBhDJblcHPqLKGJZtyTfAmrpeTOf5SGK4COSmsXsfa5S4NncSAn1tyq5Y0mYgV8s5W32rLKXcveJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O9OMVAFa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC30CC4CEED;
+	Mon, 14 Jul 2025 13:40:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752500417;
+	bh=ZbTnyFu2wdFpma2HJU3wztP0Nr+eewvviXPIjhzHS7U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=O9OMVAFaYpKkEUo00VozeeMaavQOzwZLjAlgLt8ICUjTf1vDJGPmPiVM3dxUiQT8W
+	 4VRwcoLQPJ6JrniWAoHeMOl0Y7I99B7kBMzoowssvE7vvbJD99wGH+WqyeduyxvpiE
+	 LFyTzOvhFSUSJalcrHQy3+4qT/AwKsvDWEJMVZJ9ttMUJkd+Zn1hL7vUYIym4+A5lG
+	 Nbg4PYgM5l/qXtq27N0m06xeSHOQnvTqco088zagti/MB+TNyP4Zi51PU8IHExyzn7
+	 /cSLgh9xO92hCf5ggN+Sa9BM4yu/tdDtKQgIgmfTrwZUDTk//QGnPMaS3QdxcHdY74
+	 WwgdJjslLUiQg==
+Date: Mon, 14 Jul 2025 14:40:12 +0100
+From: Simon Horman <horms@kernel.org>
 To: rohan.g.thomas@altera.com
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -56,11 +55,11 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	Matthew Gerlach <matthew.gerlach@altera.com>
-Subject: Re: [PATCH net-next 1/3] net: stmmac: xgmac: Disable RX FIFO
- Overflow interrupts
-Message-ID: <bef4d761-8909-4f90-8822-8c344291cb93@lunn.ch>
+Subject: Re: [PATCH net-next 3/3] net: stmmac: Set CIC bit only for TX queues
+ with COE
+Message-ID: <20250714134012.GN721198@horms.kernel.org>
 References: <20250714-xgmac-minor-fixes-v1-0-c34092a88a72@altera.com>
- <20250714-xgmac-minor-fixes-v1-1-c34092a88a72@altera.com>
+ <20250714-xgmac-minor-fixes-v1-3-c34092a88a72@altera.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,56 +68,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250714-xgmac-minor-fixes-v1-1-c34092a88a72@altera.com>
+In-Reply-To: <20250714-xgmac-minor-fixes-v1-3-c34092a88a72@altera.com>
 
-On Mon, Jul 14, 2025 at 03:59:17PM +0800, Rohan G Thomas via B4 Relay wrote:
+On Mon, Jul 14, 2025 at 03:59:19PM +0800, Rohan G Thomas via B4 Relay wrote:
 > From: Rohan G Thomas <rohan.g.thomas@altera.com>
 > 
-> Enabling RX FIFO Overflow interrupts is counterproductive
-> and causes an interrupt storm when RX FIFO overflows.
-> Disabling this interrupt has no side effect and eliminates
-> interrupt storms when the RX FIFO overflows.
-> 
-> Commit 8a7cb245cf28 ("net: stmmac: Do not enable RX FIFO
-> overflow interrupts") disables RX FIFO overflow interrupts
-> for DWMAC4 IP and removes the corresponding handling of
-> this interrupt. This patch is doing the same thing for
-> XGMAC IP.
+> Currently, in the AF_XDP transmit paths, the CIC bit of
+> TX Desc3 is set for all packets. Setting this bit for
+> packets transmitting through queues that don't support
+> checksum offloading causes the TX DMA to get stuck after
+> transmitting some packets. This patch ensures the CIC bit
+> of TX Desc3 is set only if the TX queue supports checksum
+> offloading.
 > 
 > Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
 > Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
 
-Please take a read of:
+Hi Rohan,
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+I notice that stmmac_xmit() handles a few other cases where
+checksum offload should not be requested via stmmac_prepare_tx_desc:
 
-This appears to be a fixed, so the Subject: line should indicate this.
-Please also include a Fixes: tag, and Cc: stable.
+        csum_insertion = (skb->ip_summed == CHECKSUM_PARTIAL);
+        /* DWMAC IPs can be synthesized to support tx coe only for a few tx
+         * queues. In that case, checksum offloading for those queues that don't
+         * support tx coe needs to fallback to software checksum calculation.
+         *
+         * Packets that won't trigger the COE e.g. most DSA-tagged packets will
+         * also have to be checksummed in software.
+         */
+        if (csum_insertion &&
+            (priv->plat->tx_queues_cfg[queue].coe_unsupported ||
+             !stmmac_has_ip_ethertype(skb))) {
+                if (unlikely(skb_checksum_help(skb)))
+                        goto dma_map_err;
+                csum_insertion = !csum_insertion;
+        }
 
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c | 4 ----
->  1 file changed, 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> index 5dcc95bc0ad28b756accf9670c5fa00aa94fcfe3..7201a38842651a865493fce0cefe757d6ae9bafa 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> @@ -203,10 +203,6 @@ static void dwxgmac2_dma_rx_mode(struct stmmac_priv *priv, void __iomem *ioaddr,
->  	}
->  
->  	writel(value, ioaddr + XGMAC_MTL_RXQ_OPMODE(channel));
-> -
-> -	/* Enable MTL RX overflow */
-> -	value = readl(ioaddr + XGMAC_MTL_QINTEN(channel));
-> -	writel(value | XGMAC_RXOIE, ioaddr + XGMAC_MTL_QINTEN(channel));
+Do we need to care about them in stmmac_xdp_xmit_zc()
+and stmmac_xdp_xmit_xdpf() too?
 
-What is the reset default? Would it make sense to explicitly disable
-it, rather than never enable it? What does 8a7cb245cf28 do?
-
-    Andrew
-
----
-pw-bot: cr
-
-
+...
 
