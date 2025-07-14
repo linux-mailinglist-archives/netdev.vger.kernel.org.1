@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-206906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C16EEB04BDD
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 01:12:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8136B04C07
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 01:14:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 681723A80DB
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 23:11:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A6AAF7A2920
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 23:11:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EA322980CD;
-	Mon, 14 Jul 2025 23:07:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D20229B777;
+	Mon, 14 Jul 2025 23:08:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n7l/XiYL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ihSSFAlj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6FDB290BA5;
-	Mon, 14 Jul 2025 23:07:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0141729B22D;
+	Mon, 14 Jul 2025 23:08:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752534470; cv=none; b=mAaVv8eUW20aYdYuDjoMQg4JWCOqHjb6U8R92i8kpnIAabbQDSQTCk4GQNlHa1f5G2xCuy7dtVsDfFQ6repPBCN5QvXpbw5W8gwivaS5sGQ/WZU4SfvK51sSYQUKwFWuBs7Hs9bZxqjYjzBc8xY4HVOPz0vJf7a4MmuMLywZeaE=
+	t=1752534487; cv=none; b=gMEpk6Kav5CPdO98OamEN0wcb7okY/UQJ0TygyG401CfJpzPMbZTmWeXJU7Gyqa/4HAIr3yg2Pl+dGa+2nUJ0qHpgfmnes8c8RjEAX5B8+aIkMKHjzpqwwkk+LHkxqz4NANZjR7WVXcem49gpeG21GuhbTOo/J+2teNfSWT470s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752534470; c=relaxed/simple;
-	bh=uGyRRMRnX6W2HSzpn2bV1k1KFiIJ0Fo4LhUkRbfoTlo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pYeZZ8r3ymc7Acqe8dNfSkddtzKKpYfTOu46fz3TbThRVnyTsym2nyAA4EEJNH+PegDj9kgJjt8ItA3IDqmDG5fyjFs5p7pmv/STyR+jKYFxpPdpHNcvta2XO7l/+ZTJhEdEG6kiF1ykR5Z1//cmz+etC8qzePQHzu5GWY9zp7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n7l/XiYL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BD3BC4CEED;
-	Mon, 14 Jul 2025 23:07:48 +0000 (UTC)
+	s=arc-20240116; t=1752534487; c=relaxed/simple;
+	bh=foMkf2XIjoogWmo+u4BTZs2WW7/+ehhzLl6WBJ733Ts=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PvzhOCucB9Mzr3lNfs5eMP18LJPtzKaVH5Abfx30qt3R8tqUHIm6P9swxvBIRCQ1VWI83HyAWa7pUFuehbu3k2DIRB/2fuB+7w1iR1x6YEjgWoa36Bsl5/g+iY3RIZj7ppFmhKYQbVbhOdH+BpIVVPOGaKY5JFFOwImCh40faqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ihSSFAlj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DA75C4CEED;
+	Mon, 14 Jul 2025 23:08:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752534469;
-	bh=uGyRRMRnX6W2HSzpn2bV1k1KFiIJ0Fo4LhUkRbfoTlo=;
+	s=k20201202; t=1752534486;
+	bh=foMkf2XIjoogWmo+u4BTZs2WW7/+ehhzLl6WBJ733Ts=;
 	h=From:To:Cc:Subject:Date:From;
-	b=n7l/XiYLNOs06RvuioVk13mT5Uuu/6QSBL1JtNo8IKwEtZ3Cl9kBpjTg23zDw6Ki/
-	 +jdC97WLdcjZ6t3sXqudyGr+HO0bYRCCzlvpbjjbSerW1aTt3BuUsu8IybyhLnJsrd
-	 pXtv8qAFNkCox/lMUQ704ZNSZIWDg8C/WC3AtskAm2eNJBoOzAw0JFyPr1IiariTQ9
-	 rpcx6OFUjoyN5DBKNLC0iTCNYgge7T48WauqPsMcsYqyFJjhXzFIU5h+l+n5MhBfHg
-	 TwtGwd5E7uV7l1Z2YsWeYRON7qgTZy+jPaHt6ZgDFzeR6VWBoFpR1YYyssM114p3RR
-	 e6VZ3nSVssJmQ==
+	b=ihSSFAlj/C9sL+7AZgQasSoC8SVxC/ZPsaHKdI2MFAVjN9l8HaB1tNy2/G7av82Qb
+	 yRvo72IC2W2GMX2IY8IXsLvwcux41yVhNSxHe3gw50DsiuALKEc0fAm8lOvxk2B9ec
+	 OjdpHO3DEMzS5W8PjcWqMZIOqwG/zMyksimLYkhhtdnDhxybhLagxhnghAdm4Zotvt
+	 vQg2Ph4/Y25g5JQj0tNplKsbHFyj2dtEtURWpiPZxkHMxrKmX4G27c3+SApgXcbSSr
+	 MqwEk4lZhRDxR79aTne6cr7uhCj+reCxwIRyb6UVQ05lVv04BKDbGGjLlxaU4UVrp/
+	 sXubjJ+5q6E4w==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -53,9 +53,9 @@ Cc: Xiang Mei <xmei5@asu.edu>,
 	edumazet@google.com,
 	kuba@kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 1/6] net/sched: sch_qfq: Fix null-deref in agg_dequeue
-Date: Mon, 14 Jul 2025 19:07:38 -0400
-Message-Id: <20250714230744.3710270-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 1/4] net/sched: sch_qfq: Fix null-deref in agg_dequeue
+Date: Mon, 14 Jul 2025 19:07:55 -0400
+Message-Id: <20250714230759.3710404-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -65,7 +65,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.98
+X-stable-base: Linux 6.1.145
 Content-Transfer-Encoding: 8bit
 
 From: Xiang Mei <xmei5@asu.edu>
@@ -174,10 +174,10 @@ well.
  4 files changed, 25 insertions(+), 28 deletions(-)
 
 diff --git a/include/net/pkt_sched.h b/include/net/pkt_sched.h
-index 15960564e0c36..4d72d24b1f33e 100644
+index f99a513b40a92..76f9fb651faff 100644
 --- a/include/net/pkt_sched.h
 +++ b/include/net/pkt_sched.h
-@@ -112,7 +112,6 @@ struct qdisc_rate_table *qdisc_get_rtab(struct tc_ratespec *r,
+@@ -113,7 +113,6 @@ struct qdisc_rate_table *qdisc_get_rtab(struct tc_ratespec *r,
  					struct netlink_ext_ack *extack);
  void qdisc_put_rtab(struct qdisc_rate_table *tab);
  void qdisc_put_stab(struct qdisc_size_table *tab);
@@ -185,7 +185,7 @@ index 15960564e0c36..4d72d24b1f33e 100644
  bool sch_direct_xmit(struct sk_buff *skb, struct Qdisc *q,
  		     struct net_device *dev, struct netdev_queue *txq,
  		     spinlock_t *root_lock, bool validate);
-@@ -306,4 +305,28 @@ static inline bool tc_qdisc_stats_dump(struct Qdisc *sch,
+@@ -247,4 +246,28 @@ static inline bool tc_qdisc_stats_dump(struct Qdisc *sch,
  	return true;
  }
  
@@ -215,10 +215,10 @@ index 15960564e0c36..4d72d24b1f33e 100644
 +
  #endif
 diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-index 282423106f15d..ae63b3199b1d1 100644
+index 7c5df62421bbd..6a2d258b01daa 100644
 --- a/net/sched/sch_api.c
 +++ b/net/sched/sch_api.c
-@@ -594,16 +594,6 @@ void __qdisc_calculate_pkt_len(struct sk_buff *skb,
+@@ -593,16 +593,6 @@ void __qdisc_calculate_pkt_len(struct sk_buff *skb,
  	qdisc_skb_cb(skb)->pkt_len = pkt_len;
  }
  
@@ -236,10 +236,10 @@ index 282423106f15d..ae63b3199b1d1 100644
  {
  	struct qdisc_watchdog *wd = container_of(timer, struct qdisc_watchdog,
 diff --git a/net/sched/sch_hfsc.c b/net/sched/sch_hfsc.c
-index afcb83d469ff6..751b1e2c35b3f 100644
+index 61b91de8065f0..302413e0aceff 100644
 --- a/net/sched/sch_hfsc.c
 +++ b/net/sched/sch_hfsc.c
-@@ -835,22 +835,6 @@ update_vf(struct hfsc_class *cl, unsigned int len, u64 cur_time)
+@@ -836,22 +836,6 @@ update_vf(struct hfsc_class *cl, unsigned int len, u64 cur_time)
  	}
  }
  
@@ -263,10 +263,10 @@ index afcb83d469ff6..751b1e2c35b3f 100644
  hfsc_adjust_levels(struct hfsc_class *cl)
  {
 diff --git a/net/sched/sch_qfq.c b/net/sched/sch_qfq.c
-index 5e557b960bde3..e0cefa21ce21c 100644
+index 6462468bf77c7..cde6c7026ab1d 100644
 --- a/net/sched/sch_qfq.c
 +++ b/net/sched/sch_qfq.c
-@@ -992,7 +992,7 @@ static struct sk_buff *agg_dequeue(struct qfq_aggregate *agg,
+@@ -991,7 +991,7 @@ static struct sk_buff *agg_dequeue(struct qfq_aggregate *agg,
  
  	if (cl->qdisc->q.qlen == 0) /* no more packets, remove from list */
  		list_del_init(&cl->alist);
