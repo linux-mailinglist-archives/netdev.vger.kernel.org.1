@@ -1,94 +1,103 @@
-Return-Path: <netdev+bounces-206665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52F13B03FB6
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 15:24:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7E72B03FB4
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 15:24:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9EE01624C7
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 13:23:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC7A07A1BCE
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 13:22:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 225ED253920;
-	Mon, 14 Jul 2025 13:21:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26E9D253950;
+	Mon, 14 Jul 2025 13:21:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eB6jqWJr"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="R3g71tAU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDE0A24C07F;
-	Mon, 14 Jul 2025 13:21:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB17D253F12
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 13:21:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752499266; cv=none; b=npv0rKSGO6aHGim4yNrXAwZcNfTTY7BYaht5iX45VHga9LXTxEBU2dh6kNPJgdg05DMj1uGNGUqaO5/isQ4zk87oiICf1tUUMjyyfzfC4XsWGJ/WFqef6LbiWsCc2JKzg6kkHbztLvhQ75mQIBfER1D4k7aYYv2DtQ5/ASVSLWM=
+	t=1752499282; cv=none; b=VchR1iziBKjYcRXjti2DzAb3C93PbQJREsXUqdMk6M+aSo+MR2Ypnr+6aMZVFVekr/XrFCM5e7peUTlWNiNQ/V66Lx1PL02AgVENVCg0NgCtn7rjrBBW9+KimwPN9EmJAep9DdPGH+yESyCPAHCj9Ua1xPbCc7V2+KjT0AOURWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752499266; c=relaxed/simple;
-	bh=e7cqCMIVwiyT8RzReLiQL/MIid2RLe+DaHtAHYAcb2o=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=sDPC8IM+o3k/RQv0bG1OCJ6oHO/VFaWXwz+2jisg5l0SKKk5oJumEHFKD2BwhqyXrj4Kvlb9E4t2/WsFbjX79bOkgsXTEfJaseTOESF++Id8rRWiD0/A23VH8c/SU/2f6HwDIWcszVFo364l4QTyeZ2452a8ud/l4QaI/9y8bGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eB6jqWJr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AA92C4CEED;
-	Mon, 14 Jul 2025 13:20:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752499265;
-	bh=e7cqCMIVwiyT8RzReLiQL/MIid2RLe+DaHtAHYAcb2o=;
-	h=Date:Subject:Cc:To:From:References:In-Reply-To:From;
-	b=eB6jqWJr8t2Q9Jb220i5BDpkArwX6oTF2Mk56a9D7QpZVUDiPi/UM4Lu8aIUqqtqI
-	 ggfF7nseoLaP9ckNVAc0hCBcynBG5ryhu1l21ilE6a7Ij7dzlctm6ByzKDPfnBQz+9
-	 2IUtQdmkgmP6eVQOb4HsxssFA4V9Vj8LtLBVLHsP9HXZxd0vE1l3yWS4NmSjo0yLkd
-	 1+B7piqJKFBSvAWvFkITGF3vwGhF9jUkepPaKWpuc4+jgxG8LOJXsRm+S3QIIj7p+k
-	 IHvfxcZAeNyo/avWCHy9d6PwUan3wcy9ckGo4eKXVe+6x66jT86R1XIm4+xLbnzE9k
-	 V4ra4+sOp1b2Q==
+	s=arc-20240116; t=1752499282; c=relaxed/simple;
+	bh=8V46B+h7Aq9vDHuLfNmbsEXoaZceorKSPR3tAJDh6es=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gBDc21aYBmBeeJnosa6buxEFTnkiF+r2cM3deGhj3fwUejFZpoynHocJK3gdu/fE6eQSmAuF3tDhUUoJDCtZR1jjyQ7FLI+9REtc8erJDy0FHvyPcAV9bnrrK2RiYh0peax0ctYJ0mwe7vS/ghF+7Hk9DMQKDD0WjZamN4qXADs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=R3g71tAU; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=0miYtI8adthQbJSjL+I5LKEdnoo7DUpP4EAp/foVdpU=; b=R3g71tAUdbs8gGHhissyKuNgCN
+	+vq112vzxYRZFfGg8W923WBD+0D6+00Sd8GNr1VfbkTcJXMIGV48sU3wZjWE/wloUdcQZx1dL7NxM
+	nXRw2I+ep8UT1c3XgiesOVXWL/T26muVGa+j48G1QzSzK+/wG1uxIBEl97kwdFq7Zh1g=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ubJ7N-001SdM-RL; Mon, 14 Jul 2025 15:21:17 +0200
+Date: Mon, 14 Jul 2025 15:21:17 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Naveen Mamindlapalli <naveen130617.lkml@gmail.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>
+Subject: Re: Clarification: ethtool -S stats persistence across ifconfig
+ down/up
+Message-ID: <f84921a4-ccec-4418-9811-959989dcef2c@lunn.ch>
+References: <CABJS2x60cwpoDXTex0M+CyOepWbdvX8-RcwFmBu-vxvNywW0tw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 14 Jul 2025 15:20:58 +0200
-Message-Id: <DBBT50VYG8EJ.1Y54CR9X8SQ80@kernel.org>
-Subject: Re: [PATCH v2 1/2] device: rust: rename Device::as_ref() to
- Device::from_raw()
-Cc: "Alice Ryhl" <aliceryhl@google.com>, "Greg Kroah-Hartman"
- <gregkh@linuxfoundation.org>, "Dave Ertman" <david.m.ertman@intel.com>,
- "Ira Weiny" <ira.weiny@intel.com>, "Leon Romanovsky" <leon@kernel.org>,
- "Miguel Ojeda" <ojeda@kernel.org>, "Boqun Feng" <boqun.feng@gmail.com>,
- "Gary Guo" <gary@garyguo.net>, =?utf-8?q?Bj=C3=B6rn_Roy_Baron?=
- <bjorn3_gh@protonmail.com>, "Benno Lossin" <lossin@kernel.org>, "Andreas
- Hindborg" <a.hindborg@kernel.org>, "Trevor Gross" <tmgross@umich.edu>,
- "Rafael J. Wysocki" <rafael@kernel.org>, "David Airlie"
- <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>, "Maarten Lankhorst"
- <maarten.lankhorst@linux.intel.com>, "Maxime Ripard" <mripard@kernel.org>,
- "Thomas Zimmermann" <tzimmermann@suse.de>, "Bjorn Helgaas"
- <bhelgaas@google.com>, =?utf-8?q?Krzysztof_Wilczy=C5=84ski?=
- <kwilczynski@kernel.org>, <rust-for-linux@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
- <netdev@vger.kernel.org>, <linux-pci@vger.kernel.org>
-To: "Thomas Gleixner" <tglx@linutronix.de>, "Peter Zijlstra"
- <peterz@infradead.org>, "FUJITA Tomonori" <fujita.tomonori@gmail.com>
-From: "Danilo Krummrich" <dakr@kernel.org>
-References: <20250711-device-as-ref-v2-0-1b16ab6402d7@google.com>
- <20250711-device-as-ref-v2-1-1b16ab6402d7@google.com>
-In-Reply-To: <20250711-device-as-ref-v2-1-1b16ab6402d7@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABJS2x60cwpoDXTex0M+CyOepWbdvX8-RcwFmBu-vxvNywW0tw@mail.gmail.com>
 
-On Fri Jul 11, 2025 at 10:04 AM CEST, Alice Ryhl wrote:
-> The prefix as_* should not be used for a constructor. Constructors
-> usually use the prefix from_* instead.
->
-> Some prior art in the stdlib: Box::from_raw, CString::from_raw,
-> Rc::from_raw, Arc::from_raw, Waker::from_raw, File::from_raw_fd.
->
-> There is also prior art in the kernel crate: cpufreq::Policy::from_raw,
-> fs::File::from_raw_file, Kuid::from_raw, ARef::from_raw,
-> SeqFile::from_raw, VmaNew::from_raw, Io::from_raw.
->
-> Link: https://lore.kernel.org/r/aCd8D5IA0RXZvtcv@pollux
-> Signed-off-by: Alice Ryhl <aliceryhl@google.com>
+On Mon, Jul 14, 2025 at 12:46:15PM +0530, Naveen Mamindlapalli wrote:
+> Hi All,
+> 
+> I am trying to better understand the expected behavior of Netdev
+> statistics reported via `ethtool -S`.
+> 
+> Specifically, I would like to clarify:
+> Are drivers expected to retain `ethtool -S` statistics across
+> interface down/up cycles (i.e., ifconfig ethX down followed by
+> ifconfig ethX up)?
+> 
+> >From my reading of the kernel documentation:
+> - The file Documentation/networking/statistics.rst states that
+> standard netdev statistics (such as those shown via ip -s link) are
+> expected to persist across interface resets.
+> - However, Documentation/networking/ethtool-netlink.rst (as of Linux
+> v6.15) does not mention any such requirement for `ethtool -S`
+> statistics.
+> 
+> So my understanding is that `ethtool -S` statistics may reset across
+> down/up, depending on how the hardware and driver implement the stats.
 
-FUJITA, Thomas, Peter: Unless there are any concerns, I'll pick this one up
-soon.
+I'm not sure it is written down anywhere, but the general expectation
+is that they survive a down/up.
+
+Statistic counters going backwards is not so easy to deal with. These
+statistics can be exported to third party systems, e.g. via an SNMP
+agent. So it is better they only go backwards when they wrap around.
+
+Having said that, this topic is not closely looked at when reviewing
+drivers, so i expect there are a number of drivers which do reset to
+zero on close/open.
+
+Feel free to submit a patch extending the documentation, but please
+make it clear that the reality is, some drivers will reset to zero,
+even if the intended behaviour is they don't.
+
+	Andrew
 
