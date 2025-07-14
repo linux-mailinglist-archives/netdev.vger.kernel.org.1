@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-206698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35C71B041ED
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 16:38:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FD69B041EE
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 16:38:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55A734A7C8F
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 14:37:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB17E1A648A8
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 14:38:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9174A25CC42;
-	Mon, 14 Jul 2025 14:37:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67E9625B1F4;
+	Mon, 14 Jul 2025 14:37:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b="C42GjA+i"
+	dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b="PYFU7lx8"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-internal.sh.cz (mail-internal.sh.cz [95.168.196.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8184225A33E
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 14:37:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5648E25A65A
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 14:37:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.168.196.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752503840; cv=none; b=LfZgrTg/NcJWdmUNohnWTzu7NsVOShQYGl/nneKSjokw9CKA0F+Az6Es5Z3U0F7NAWc5GLQeUaIbFEQWt2E6qb1Cj6MSeY88h9gSEjkhukJUZrFPnw7kVbJAx9K4nJ7kYQE/A2nZVFg/yehA/fnnGVCQr3gGzaSEIjrf/sB1QMw=
+	t=1752503845; cv=none; b=bhIOquDy2d9cRAlnoo6k3UNx6KPmlYMxUkXnzNX7KGwRVcgRwniZfTWYbCXRLTEaiCz1w32qLbpZpKAOlc9LXFs8cEwmsou+T9cO3rF3ZNGZ4k/JiLOefe/2X1Vw1c8zNrLTjo8Sh08M12GnvugBlh+ZKZAdlsyxt+n8nlamZTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752503840; c=relaxed/simple;
-	bh=L9QpB46xtyXVpGJFE7iN6uUpkn5Xl3Lz/FMsqBU4XPY=;
+	s=arc-20240116; t=1752503845; c=relaxed/simple;
+	bh=4OXFyfWeor5kuQw3lnpwP7NJJ4DK9wVmfOf8j9iAyMI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JkWhPvlTIirldaK3lkBHpuAJ4GhVVGSK4xS177zGZScEXM+/wgUcouGjJR0kW9g72lPzfzI0oa8XyRVfi6WxdlwUt43XY5Bg56X2E4/TedITNnsmtzq7PvRmyIl14BcA/W5G1jJ276VWng/sDnNMHlPjMyyh0KYwnhxbr0mdP5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com; spf=pass smtp.mailfrom=cdn77.com; dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b=C42GjA+i; arc=none smtp.client-ip=95.168.196.40
+	 MIME-Version; b=u+db8TAecJIFJDkfaQ0+QLviswIGvg5wWBsftVt5q01BdwFAFmFti699cu9eQHnSORDUXOCGfyzU/Y/CgZIhs41NrQlk+VfrlJpFbe2W4dq8qQhMqVwA9hCvPxYsLojdMd2hWFxBl/vBMoRUCRM5BKqxdjuFe9pY/GPH7W9zPdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com; spf=pass smtp.mailfrom=cdn77.com; dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b=PYFU7lx8; arc=none smtp.client-ip=95.168.196.40
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cdn77.com
-DKIM-Signature: a=rsa-sha256; t=1752503828; x=1753108628; s=dkim2019; d=cdn77.com; c=relaxed/relaxed; v=1; bh=nmfvFOIF+WoxFHwhudl/2NOecTFCtVuNHCzK+miq5GM=; h=From:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Transfer-Encoding:In-Reply-To:References;
-   b=C42GjA+i7kkUPdiKTJ2ajROZlAWw4YnTDKYi9n3ZHy2P2EHv232vWrJRhXhcRg2zu9y9jE3gAghTFd9x5Gk+mxQk3qgIArpmODIKJb/3p4jEtIMRnfU4Xivruug1hmeusrWBLrQaRIjpocNG1txZJSytk55tJS32dy+CtLz1FeM=
+DKIM-Signature: a=rsa-sha256; t=1752503828; x=1753108628; s=dkim2019; d=cdn77.com; c=relaxed/relaxed; v=1; bh=1qjKv3KcKXjGF3KGNsJynah+pMd4mE4RxUeeJAFVOQ0=; h=From:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Transfer-Encoding:In-Reply-To:References;
+   b=PYFU7lx8EBTxvh7EtdYATgXtN4/OMZp60c2K9aNLzDX1AnCol6GgPFm9e7y/5ziy7waxDhWG03pQwDqNvUjGc66BHsF1gbsiwjUB3GTOxnxarQYr8VC9zdumU6OKPnEicAlahMgNSSuF4uV454O903N5HuNnuTwPN9wnntbrkYc=
 Received: from osgiliath.superhosting.cz ([95.168.203.222])
-        by mail.sh.cz (14.1.0 build 16 ) with ASMTP (SSL) id 202507141637071511;
+        by mail.sh.cz (14.1.0 build 16 ) with ASMTP (SSL) id 202507141637071517;
         Mon, 14 Jul 2025 16:37:07 +0200
 From: Daniel Sedlak <daniel.sedlak@cdn77.com>
 To: "David S. Miller" <davem@davemloft.net>,
@@ -51,11 +51,11 @@ To: "David S. Miller" <davem@davemloft.net>,
 	Yosry Ahmed <yosry.ahmed@linux.dev>,
 	linux-mm@kvack.org,
 	netdev@vger.kernel.org
-Cc: Daniel Sedlak <daniel.sedlak@cdn77.com>,
-	Matyas Hurtik <matyas.hurtik@cdn77.com>
-Subject: [PATCH v2 net-next 1/2] tcp: account for memory pressure signaled by cgroup
-Date: Mon, 14 Jul 2025 16:36:12 +0200
-Message-ID: <20250714143613.42184-2-daniel.sedlak@cdn77.com>
+Cc: Matyas Hurtik <matyas.hurtik@cdn77.com>,
+	Daniel Sedlak <danie.sedlak@cdn77.com>
+Subject: [PATCH v2 net-next 2/2] mm/vmpressure: add tracepoint for socket pressure detection
+Date: Mon, 14 Jul 2025 16:36:13 +0200
+Message-ID: <20250714143613.42184-3-daniel.sedlak@cdn77.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250714143613.42184-1-daniel.sedlak@cdn77.com>
 References: <20250714143613.42184-1-daniel.sedlak@cdn77.com>
@@ -66,113 +66,84 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CTCH: RefID="str=0001.0A006396.68751625.000E,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0"; Spam="Unknown"; VOD="Unknown"
+X-CTCH: RefID="str=0001.0A006396.68751625.001A,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0"; Spam="Unknown"; VOD="Unknown"
 
-This patch is a result of our long-standing debug sessions, where it all
-started as "networking is slow", and TCP network throughput suddenly
-dropped from tens of Gbps to few Mbps, and we could not see anything in
-the kernel log or netstat counters.
+From: Matyas Hurtik <matyas.hurtik@cdn77.com>
 
-Currently, we have two memory pressure counters for TCP sockets [1],
-which we manipulate only when the memory pressure is signalled through
-the proto struct [2]. However, the memory pressure can also be signaled
-through the cgroup memory subsystem, which we do not reflect in the
-netstat counters. In the end, when the cgroup memory subsystem signals
-that it is under pressure, we silently reduce the advertised TCP window
-with tcp_adjust_rcv_ssthresh() to 4*advmss, which causes a significant
-throughput reduction.
+When the vmpressure function marks all sockets within a particular
+cgroup as under pressure, it can silently reduce network throughput
+significantly. This socket pressure is not currently signaled in any way
+to the users, and it is difficult to detect which cgroup is under socket
+pressure.
 
-So this patch adds a new counter to account for memory pressure
-signaled by the memory cgroup, so it is much easier to spot.
+This patch adds a new tracepoint that is called when a cgroup is under
+socket pressure.
 
-Link: https://elixir.bootlin.com/linux/v6.15.4/source/include/uapi/linux/snmp.h#L231-L232 [1]
-Link: https://elixir.bootlin.com/linux/v6.15.4/source/include/net/sock.h#L1300-L1301 [2]
-Co-developed-by: Matyas Hurtik <matyas.hurtik@cdn77.com>
 Signed-off-by: Matyas Hurtik <matyas.hurtik@cdn77.com>
-Signed-off-by: Daniel Sedlak <daniel.sedlak@cdn77.com>
+Co-developed-by: Daniel Sedlak <danie.sedlak@cdn77.com>
+Signed-off-by: Daniel Sedlak <danie.sedlak@cdn77.com>
 ---
- Documentation/networking/net_cachelines/snmp.rst |  1 +
- include/net/tcp.h                                | 14 ++++++++------
- include/uapi/linux/snmp.h                        |  1 +
- net/ipv4/proc.c                                  |  1 +
- 4 files changed, 11 insertions(+), 6 deletions(-)
+ include/trace/events/memcg.h | 25 +++++++++++++++++++++++++
+ mm/vmpressure.c              |  3 +++
+ 2 files changed, 28 insertions(+)
 
-diff --git a/Documentation/networking/net_cachelines/snmp.rst b/Documentation/networking/net_cachelines/snmp.rst
-index bd44b3eebbef..ed17ff84e39c 100644
---- a/Documentation/networking/net_cachelines/snmp.rst
-+++ b/Documentation/networking/net_cachelines/snmp.rst
-@@ -76,6 +76,7 @@ unsigned_long  LINUX_MIB_TCPABORTONLINGER
- unsigned_long  LINUX_MIB_TCPABORTFAILED
- unsigned_long  LINUX_MIB_TCPMEMORYPRESSURES
- unsigned_long  LINUX_MIB_TCPMEMORYPRESSURESCHRONO
-+unsigned_long  LINUX_MIB_TCPCGROUPSOCKETPRESSURE
- unsigned_long  LINUX_MIB_TCPSACKDISCARD
- unsigned_long  LINUX_MIB_TCPDSACKIGNOREDOLD
- unsigned_long  LINUX_MIB_TCPDSACKIGNOREDNOUNDO
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 761c4a0ad386..aae3efe24282 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -267,6 +267,11 @@ extern long sysctl_tcp_mem[3];
- #define TCP_RACK_STATIC_REO_WND  0x2 /* Use static RACK reo wnd */
- #define TCP_RACK_NO_DUPTHRESH    0x4 /* Do not use DUPACK threshold in RACK */
+diff --git a/include/trace/events/memcg.h b/include/trace/events/memcg.h
+index dfe2f51019b4..19a51db73913 100644
+--- a/include/trace/events/memcg.h
++++ b/include/trace/events/memcg.h
+@@ -100,6 +100,31 @@ TRACE_EVENT(memcg_flush_stats,
+ 		__entry->force, __entry->needs_flush)
+ );
  
-+#define TCP_INC_STATS(net, field)	SNMP_INC_STATS((net)->mib.tcp_statistics, field)
-+#define __TCP_INC_STATS(net, field)	__SNMP_INC_STATS((net)->mib.tcp_statistics, field)
-+#define TCP_DEC_STATS(net, field)	SNMP_DEC_STATS((net)->mib.tcp_statistics, field)
-+#define TCP_ADD_STATS(net, field, val)	SNMP_ADD_STATS((net)->mib.tcp_statistics, field, val)
++TRACE_EVENT(memcg_socket_under_pressure,
 +
- extern atomic_long_t tcp_memory_allocated;
- DECLARE_PER_CPU(int, tcp_memory_per_cpu_fw_alloc);
++	TP_PROTO(const struct mem_cgroup *memcg, unsigned long scanned,
++		unsigned long reclaimed),
++
++	TP_ARGS(memcg, scanned, reclaimed),
++
++	TP_STRUCT__entry(
++		__field(u64, id)
++		__field(unsigned long, scanned)
++		__field(unsigned long, reclaimed)
++	),
++
++	TP_fast_assign(
++		__entry->id = cgroup_id(memcg->css.cgroup);
++		__entry->scanned = scanned;
++		__entry->reclaimed = reclaimed;
++	),
++
++	TP_printk("memcg_id=%llu scanned=%lu reclaimed=%lu",
++		__entry->id,
++		__entry->scanned,
++		__entry->reclaimed)
++);
++
+ #endif /* _TRACE_MEMCG_H */
  
-@@ -277,8 +282,10 @@ extern unsigned long tcp_memory_pressure;
- static inline bool tcp_under_memory_pressure(const struct sock *sk)
- {
- 	if (mem_cgroup_sockets_enabled && sk->sk_memcg &&
--	    mem_cgroup_under_socket_pressure(sk->sk_memcg))
-+	    mem_cgroup_under_socket_pressure(sk->sk_memcg)) {
-+		TCP_INC_STATS(sock_net(sk), LINUX_MIB_TCPCGROUPSOCKETPRESSURE);
- 		return true;
-+	}
+ /* This part must be outside protection */
+diff --git a/mm/vmpressure.c b/mm/vmpressure.c
+index bd5183dfd879..aa9583066731 100644
+--- a/mm/vmpressure.c
++++ b/mm/vmpressure.c
+@@ -21,6 +21,8 @@
+ #include <linux/printk.h>
+ #include <linux/vmpressure.h>
  
- 	return READ_ONCE(tcp_memory_pressure);
++#include <trace/events/memcg.h>
++
+ /*
+  * The window size (vmpressure_win) is the number of scanned pages before
+  * we try to analyze scanned/reclaimed ratio. So the window is used as a
+@@ -317,6 +319,7 @@ void vmpressure(gfp_t gfp, struct mem_cgroup *memcg, bool tree,
+ 			 * pressure events can occur.
+ 			 */
+ 			WRITE_ONCE(memcg->socket_pressure, jiffies + HZ);
++			trace_memcg_socket_under_pressure(memcg, scanned, reclaimed);
+ 		}
+ 	}
  }
-@@ -316,11 +323,6 @@ bool tcp_check_oom(const struct sock *sk, int shift);
- 
- extern struct proto tcp_prot;
- 
--#define TCP_INC_STATS(net, field)	SNMP_INC_STATS((net)->mib.tcp_statistics, field)
--#define __TCP_INC_STATS(net, field)	__SNMP_INC_STATS((net)->mib.tcp_statistics, field)
--#define TCP_DEC_STATS(net, field)	SNMP_DEC_STATS((net)->mib.tcp_statistics, field)
--#define TCP_ADD_STATS(net, field, val)	SNMP_ADD_STATS((net)->mib.tcp_statistics, field, val)
--
- void tcp_tsq_work_init(void);
- 
- int tcp_v4_err(struct sk_buff *skb, u32);
-diff --git a/include/uapi/linux/snmp.h b/include/uapi/linux/snmp.h
-index 1d234d7e1892..9e8d1a5e56a9 100644
---- a/include/uapi/linux/snmp.h
-+++ b/include/uapi/linux/snmp.h
-@@ -231,6 +231,7 @@ enum
- 	LINUX_MIB_TCPABORTFAILED,		/* TCPAbortFailed */
- 	LINUX_MIB_TCPMEMORYPRESSURES,		/* TCPMemoryPressures */
- 	LINUX_MIB_TCPMEMORYPRESSURESCHRONO,	/* TCPMemoryPressuresChrono */
-+	LINUX_MIB_TCPCGROUPSOCKETPRESSURE,      /* TCPCgroupSocketPressure */
- 	LINUX_MIB_TCPSACKDISCARD,		/* TCPSACKDiscard */
- 	LINUX_MIB_TCPDSACKIGNOREDOLD,		/* TCPSACKIgnoredOld */
- 	LINUX_MIB_TCPDSACKIGNOREDNOUNDO,	/* TCPSACKIgnoredNoUndo */
-diff --git a/net/ipv4/proc.c b/net/ipv4/proc.c
-index ea2f01584379..0bcec9a51fb0 100644
---- a/net/ipv4/proc.c
-+++ b/net/ipv4/proc.c
-@@ -235,6 +235,7 @@ static const struct snmp_mib snmp4_net_list[] = {
- 	SNMP_MIB_ITEM("TCPAbortFailed", LINUX_MIB_TCPABORTFAILED),
- 	SNMP_MIB_ITEM("TCPMemoryPressures", LINUX_MIB_TCPMEMORYPRESSURES),
- 	SNMP_MIB_ITEM("TCPMemoryPressuresChrono", LINUX_MIB_TCPMEMORYPRESSURESCHRONO),
-+	SNMP_MIB_ITEM("TCPCgroupSocketPressure", LINUX_MIB_TCPCGROUPSOCKETPRESSURE),
- 	SNMP_MIB_ITEM("TCPSACKDiscard", LINUX_MIB_TCPSACKDISCARD),
- 	SNMP_MIB_ITEM("TCPDSACKIgnoredOld", LINUX_MIB_TCPDSACKIGNOREDOLD),
- 	SNMP_MIB_ITEM("TCPDSACKIgnoredNoUndo", LINUX_MIB_TCPDSACKIGNOREDNOUNDO),
 -- 
 2.39.5
 
