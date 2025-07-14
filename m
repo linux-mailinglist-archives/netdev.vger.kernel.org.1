@@ -1,48 +1,63 @@
-Return-Path: <netdev+bounces-206596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA3D6B03A94
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 11:14:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B30AB03AA9
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 11:21:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6A2E3AC50D
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 09:14:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA6C216592D
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 09:21:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B30A23C4FF;
-	Mon, 14 Jul 2025 09:14:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5825240604;
+	Mon, 14 Jul 2025 09:20:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P3YGNx0b"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="jRJpb3zk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEFDD233D8E;
-	Mon, 14 Jul 2025 09:14:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9A9D20966B;
+	Mon, 14 Jul 2025 09:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752484468; cv=none; b=VuxrF1LYmPBgP9O4eDt9MwDOOLfpWB0VfF1NEb4BWn9q4KVzHd1HGope1oURRIixdnJbxBo57wv5sSttBgzDDnBktVQi8CIXSa/JnJQPpdZp4RNp1TMBMNRsv6Q7NUxcIYLsLbPJwaGaYPJQEu994i1LBJA7bvO/FMyPPll6Css=
+	t=1752484856; cv=none; b=VBMMUyRoEqF0xqaAfHGCbjHocqK582+osUxpzTFrVqkc0GWrohOzMV6HWq1JYWdyK0Y1VfulqIOHun0yTZE58h+Z1rn1dLyHs1ow+n+wtWzqk/nKTfV/vj6hN2qPmkSQGR+YXkzYaugq2b7DDLgcsFx/GKHQRYua5qP0QZySqLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752484468; c=relaxed/simple;
-	bh=rR2asAjUmIht+hQ2CnpxlQ91dM4Dz9yFrrfz3ReVTEg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NxVdcBJBfJ6tASIxrPwlGMNiGj9RpQ90zSspYx/tKRJSzCuc2SWMFslqdc9Yd2XinZq4FISBmvYa+mImiSkA5XFY4GGEAs/C3ue9IWBsd1cEkBs0XF2pLPTxtYSAb9dbIR8QQ2EjEtJGJhC3se1FtQZlvf+1zFXvyCVcGyd5/Ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P3YGNx0b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98690C4CEED;
-	Mon, 14 Jul 2025 09:14:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752484467;
-	bh=rR2asAjUmIht+hQ2CnpxlQ91dM4Dz9yFrrfz3ReVTEg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=P3YGNx0bWiGiMdAyep/5Y5cjG8h+W1nfcMznEfjcFoSJr9w9Sin7SeAcAAx2TdIrl
-	 mMTiGAHwrVH5VACUijFnGbymfHYXhp7GBZ7EaLD2jj9CyhSu/NAaGg3Djlig+8y3/u
-	 /tLJesDUjE8q1aMJLvjEmMVMJdDrLSBfjeSdC7NidxhqOR/tQJ9Xitw8cY5I8JU599
-	 JJXMq68Rkmg81Mm00ccx/K6H8oHgxTEqZ35jO0dTgKZ7vKyr/ZmRmg4gFVUUVGG5BT
-	 8BCFgawuscyNxEnj2WdQhc6C3h5+dzrmV8VRk8TN/aNtXbjw9V/nlGDH1igW2cj7pI
-	 +5pWlBkvDbTSw==
-Message-ID: <169e742f-778e-4d42-b301-c954ecec170a@kernel.org>
-Date: Mon, 14 Jul 2025 11:14:20 +0200
+	s=arc-20240116; t=1752484856; c=relaxed/simple;
+	bh=nsJCzN1RuvWH0xipKFOTbj1OfP0Tz1nFWOA2QY/vEq4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Jk4LWla5/71LNzFmMmTaCEcSbmt1vbc8wxT9Q3vXTlnRsyMTqy0jl5CJNrwKBFk5hRD/I96cFAMSyrMBWKFYEm4ZC4VOrJDYRyT2mJDfGN0DP/ecsGevD1TnlJhMMiHZ/QX1sNKXi1efHwbvuIQcJT6Cuog2g7uzbKpgtv02/98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=jRJpb3zk; arc=none smtp.client-ip=198.47.19.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllvem-sh03.itg.ti.com ([10.64.41.86])
+	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTP id 56E9KCVD2579656;
+	Mon, 14 Jul 2025 04:20:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1752484812;
+	bh=VpRIsrh/SskIsYvaFioLSeLx3UZ4lfhfIHEZTyHFdm4=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=jRJpb3zkCM2TPcl/pnOSPoKvoGNKE2RRL8R3vySw8ty8MIGmfwjLeyF/u2TXmutp1
+	 3kg/8FTnKIMknYEV9gFX7feo6LK+SBynXsCac5zuUWnOD1argqveNGhHjY4N5Ds1IG
+	 V6LF4DGptIMEQl/nT4H3TZDsByJhpPtZ57s301+M=
+Received: from DLEE108.ent.ti.com (dlee108.ent.ti.com [157.170.170.38])
+	by fllvem-sh03.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 56E9KCRv3165019
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
+	Mon, 14 Jul 2025 04:20:12 -0500
+Received: from DLEE109.ent.ti.com (157.170.170.41) by DLEE108.ent.ti.com
+ (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Mon, 14
+ Jul 2025 04:20:11 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE109.ent.ti.com
+ (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
+ Frontend Transport; Mon, 14 Jul 2025 04:20:11 -0500
+Received: from [172.24.26.195] (lt9560gk3.dhcp.ti.com [172.24.26.195])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 56E9K55c269797;
+	Mon, 14 Jul 2025 04:20:06 -0500
+Message-ID: <268f6849-efc6-4663-af20-f6726bd4b78d@ti.com>
+Date: Mon, 14 Jul 2025 14:50:05 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,116 +65,108 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 01/12] dt-bindings: ptp: add bindings for NETC
- Timer
-To: Wei Fang <wei.fang@nxp.com>
-Cc: "F.S. Peng" <fushi.peng@nxp.com>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "imx@lists.linux.dev" <imx@lists.linux.dev>,
- "robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
- <krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>,
- "richardcochran@gmail.com" <richardcochran@gmail.com>,
- Claudiu Manoil <claudiu.manoil@nxp.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, Clark Wang
- <xiaoning.wang@nxp.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
-References: <20250711065748.250159-1-wei.fang@nxp.com>
- <20250711065748.250159-2-wei.fang@nxp.com>
- <ce7e7889-f76b-461f-8c39-3317bcbdb0b3@kernel.org>
- <PAXPR04MB8510C8823F5F229BC78EB4B38854A@PAXPR04MB8510.eurprd04.prod.outlook.com>
- <61e6c90d-3811-41c2-853d-d93d9db38f21@kernel.org>
- <PAXPR04MB85109EE6F29A1D80CF3F367A8854A@PAXPR04MB8510.eurprd04.prod.outlook.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH RFC net-next 0/5] net: ethernet: ti: am65-cpsw: add AF_XDP
+ zero copy support
+To: Roger Quadros <rogerq@kernel.org>,
+        Siddharth Vadapalli
+	<s-vadapalli@ti.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov
+	<ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard
+ Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Sumit
+ Semwal <sumit.semwal@linaro.org>,
+        =?UTF-8?Q?Christian_K=C3=B6nig?=
+	<christian.koenig@amd.com>
+CC: <srk@ti.com>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <bpf@vger.kernel.org>, <linux-media@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <linaro-mm-sig@lists.linaro.org>
+References: <20250520-am65-cpsw-xdp-zc-v1-0-45558024f566@kernel.org>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <PAXPR04MB85109EE6F29A1D80CF3F367A8854A@PAXPR04MB8510.eurprd04.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
+From: "Malladi, Meghana" <m-malladi@ti.com>
+In-Reply-To: <20250520-am65-cpsw-xdp-zc-v1-0-45558024f566@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On 14/07/2025 11:11, Wei Fang wrote:
->>>>> +  nxp,pps-channel:
->>>>> +    $ref: /schemas/types.yaml#/definitions/uint8
->>>>> +    default: 0
->>>>> +    description:
->>>>> +      Specifies to which fixed interval period pulse generator is
->>>>> +      used to generate PPS signal.
->>>>> +    enum: [0, 1, 2]
->>>>
->>>> Cell phandle tells that. Drop property.
->>>
->>> Sorry, I do not understand what you mean, could you explain it in more
->>> detail?
->>
->> Use phandle cells for that - look at other PTP bindings.
+Hi Roger,
+
+On 5/20/2025 3:53 PM, Roger Quadros wrote:
+> This series adds AF_XDP zero coppy support to am65-cpsw driver.
 > 
-> Sorry, I did not find a reference in other PTP bindings. If I understand
-> correctly, you mean I should add a specific cells property to this doc
-> as follows, correct?
+> Tests were performed on AM62x-sk with xdpsock application [1].
 > 
-> "#nxp,pps-channel-cells":
->     description: |
->       Specifies to which fixed interval period pulse generator is
->       used to generate PPS signal.
->     $ref: /schemas/types.yaml#/definitions/uint32
->     const: 1
+> A clear improvement is seen in 64 byte packets on Transmit (txonly)
+> and receive (rxdrop).
+> 1500 byte test seems to be limited by line rate (1G link) so no
+> improvement seen there in packet rate. A test on higher speed link
+> (or PHY-less setup) might be worthwile.
 > 
+> There is some issue during l2fwd with 64 byte packets and benchmark
+> results show 0. I'm still investigating this issue.
+> 
+> AF_XDP performance using 64 byte packets in Kpps.
+> Benchmark:	XDP-SKB		XDP-Native	XDP-Native(ZeroCopy)
+> rxdrop		317		504		824
+> txonly		400		405		757
+> l2fwd 		207		264		0
+> 
+> AF_XDP performance using 1500 byte packets in Kpps.
+> Benchmark:	XDP-SKB		XDP-Native	XDP-Native(ZeroCopy)
+> rxdrop		82		82		82
+> txonly		82		82		82
+> l2fwd 		82		82		82
+> 
+> [1]: https://github.com/xdp-project/bpf-examples/tree/master/AF_XDP-example
+> 
+> To:
+> 
+> Signed-off-by: Roger Quadros <rogerq@kernel.org>
 
+This series crashes Linux on am64xx-hsevm, when I tried nfs boot using 
+AM65-CPSW-NUSS driver:
+logs: 
+https://gist.github.com/MeghanaMalladiTI/d655a1c8ca88113ee7f5f57d6ab0ec4c
 
-No. Is this a timestamper device? You really did not find a TXT document
-describing this, in the same directory? Well, maybe it is not a
-timestamper device, how do I know, your description should be clear here.
+Seems like you have reverted the fix for the same bug which was reported 
+by Siddharth and fixed by Julien: 
+https://lore.kernel.org/all/7f7fb71a-6d15-46f1-b63c-b569a2e230b7@baylibre.com/
 
-How does the other consumer - ethernet - reference this one here? Paste
-complete DTS of this and users, otherwise it is just ping-pong
-discussion where you put just a little effort to bounce back my question.
+reverted lines:
+		if (!common->ports[port].ndev)
+		/* FIXME should we BUG here? */
+			continue;
 
+Can you please take a look at it.
 
-Best regards,
-Krzysztof
+> ---
+> Roger Quadros (5):
+>        net: ethernet: ti: am65-cpsw: fix BPF Program change on multi-port CPSW
+>        net: ethernet: ti: am65-cpsw: add XSK pool helpers
+>        net: ethernet: ti: am65-cpsw: Add AF_XDP zero copy for RX
+>        net: ethernet: ti: am65-cpsw: Add AF_XDP zero copy for TX
+>        net: ethernet: ti: am65-cpsw: enable zero copy in XDP features
+> 
+>   drivers/net/ethernet/ti/Makefile         |   2 +-
+>   drivers/net/ethernet/ti/am65-cpsw-nuss.c | 526 +++++++++++++++++++++++++++----
+>   drivers/net/ethernet/ti/am65-cpsw-nuss.h |  37 ++-
+>   drivers/net/ethernet/ti/am65-cpsw-xdp.c  | 155 +++++++++
+>   4 files changed, 656 insertions(+), 64 deletions(-)
+> ---
+> base-commit: 9f607dc39b6658ba8ea647bd99725e68c66071b7
+> change-id: 20250225-am65-cpsw-xdp-zc-2af9e4be1356
+> 
+> Best regards,
+
+-- 
+Thanks,
+Meghana Malladi
+
 
