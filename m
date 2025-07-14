@@ -1,238 +1,444 @@
-Return-Path: <netdev+bounces-206795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38975B04601
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 18:59:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58BD8B0460B
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 19:02:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 778211675FC
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 16:59:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A3621A615D2
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 17:02:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2CB025DCE0;
-	Mon, 14 Jul 2025 16:59:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72E3A7262D;
+	Mon, 14 Jul 2025 17:02:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UOKjv9S8"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Z1MOXxGo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF9429408;
-	Mon, 14 Jul 2025 16:59:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752512389; cv=fail; b=mkShhTHd03XeQLVHF87DCUhNMkMVVGCU+18iqFOf7rSmBAw59Z+Qd4vAJtDeziWR4qL5YTdQ/bnUX8YQqIodkGP1x5XnyqtK3CDZLYG0giM7BJRLG44yZaOJuIFzZ5B8e+IMLzfolSvAHIvSUH82rJxQk5kQDB+mnhji0j4bp3s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752512389; c=relaxed/simple;
-	bh=hAmVHhBiI4UXfjunBaqjC6HSy/QAOkT1eODO6MzZMa0=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=USFUfQ10uvrPyssexa10ECgIaURsqgfAGEpISNDJJDLCvy63A1qF9m/OcEbsojuS706ludI0bYU3xLw2MOI0Sb+ILu857EmklLLwEq94YqhM1VTSyjHSmK3NccUoRPp7Py0gmJ9UtDbSRbyw1vcwhETba1C3VA2IeLQTLW0Pcj0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UOKjv9S8; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752512388; x=1784048388;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=hAmVHhBiI4UXfjunBaqjC6HSy/QAOkT1eODO6MzZMa0=;
-  b=UOKjv9S8BQKo5CCaHPbb8SflShOAACDUS+av45vJLsKd6yqXCE7DmIQB
-   aZnBXDZFicAOegC2trp5Ybi1NnueJF53K3nXIzQppPuSHUQB4mlQJZLdl
-   ZV93rIxWq0+QP+35HEH4gQSUu8vd1/ftjeJ3pZBCuX1ZcH0MbFMfKCGYh
-   ppsIdwcinKqvHoIIaHJxuuyxBr+vwaCKP1fxyoUA4nh6uZ0NWMCaaQsyJ
-   KO8yz411vGOHqbMVpAKw67Kq0r1Rw1K+X4npEzrUglLEpmTVjjjt8ZWgW
-   gxyqA+dj1IgVnPWuwCvx9cTxKHUrxJ1gGShr4rlHtQKzutYL+xSE+S++8
-   A==;
-X-CSE-ConnectionGUID: dv39YXrgTM24ss7qlLso8w==
-X-CSE-MsgGUID: kbu/zNjSTwy+GIUpDVswPA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="66160521"
-X-IronPort-AV: E=Sophos;i="6.16,311,1744095600"; 
-   d="scan'208";a="66160521"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2025 09:59:48 -0700
-X-CSE-ConnectionGUID: 69SuiLrhTTuULuzi2r4jlw==
-X-CSE-MsgGUID: Z3t6kRNTRLmFu2dLQt/u3A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,311,1744095600"; 
-   d="scan'208";a="187972212"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2025 09:59:43 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 14 Jul 2025 09:59:40 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Mon, 14 Jul 2025 09:59:40 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (40.107.243.66)
- by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 14 Jul 2025 09:59:39 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=iCRbbttWZ3rifSaB9jXhmjcjvwHwVlMMcLuIWEtVmhP3y3+AUe6m2vpIiIMjT7uQ9+2Dqi/vYwwLlm9bBlu0/+MA4cdFq18jDwlHC4lCW2gDeyL/vx+LUh4lXgAG/A04hJPIs6WceatGwtHrxhFKviDx0lcRKKNjhjpELK9x679i2NqprKbvvTwVYAKEHbErpZDztVf7fit+tYJVzgW0mW/g8/n86lFcPHANpT1bQNdI7gFZWlTTT1MbnhLEbjRj6ZnCcIRb9IAlNMLbuffvZyzTAPtpBiuZzvJkzSbkk9QogWyK7ZyLrJ0MjJS8KyxbH5mIE9m5yxgiUEZRBD/Pvw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4YdKIOCxXJh8gCUAEFnLr40/AXvYhO6BeAfcHi9n52Y=;
- b=zC/Yitk9FwuScbkivZGQ7EkJqSYGcBbsuWL3nd3ucxNlBo6BpHP3T2nE6JOsFc8n9meBNds4kzyh9diZWz47Bmvc4SjytibslJNlUhI4SmlZ4l7574d86qKYckTGvfgKdeLELRbCZEIkwUQxq4dGPv/BJqxKatdVf+DQK49AfVHmPs0WEnu+7AMGfERIXb0kyK1IL3v5A6zqk217nyEC/1sJC5BZfozQbckew4Jn92ut5631ODHiL7X3HOQA4T3P2TxaVub0OWtAli4B9p8/H5jIMXhaLeUVaPYABmjREVyDSWecf1ffc1uHpNVtVCP3rXRwkUQp0a8wx3vGJrPB0A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS4PPF814058951.namprd11.prod.outlook.com
- (2603:10b6:f:fc02::36) by DM6PR11MB4644.namprd11.prod.outlook.com
- (2603:10b6:5:28f::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.33; Mon, 14 Jul
- 2025 16:59:37 +0000
-Received: from DS4PPF814058951.namprd11.prod.outlook.com
- ([fe80::a82d:bc86:12ef:3983]) by DS4PPF814058951.namprd11.prod.outlook.com
- ([fe80::a82d:bc86:12ef:3983%7]) with mapi id 15.20.8857.026; Mon, 14 Jul 2025
- 16:59:37 +0000
-Message-ID: <b50bf0ca-abad-454d-8e47-e60312609383@intel.com>
-Date: Mon, 14 Jul 2025 19:59:31 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next] igc: demote register and ring
- dumps to debug
-To: Rui Salvaterra <rsalvaterra@gmail.com>, <anthony.l.nguyen@intel.com>,
-	<przemyslaw.kitszel@intel.com>
-CC: <edumazet@google.com>, <kuba@kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20250707092531.365663-1-rsalvaterra@gmail.com>
-Content-Language: en-US
-From: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
-In-Reply-To: <20250707092531.365663-1-rsalvaterra@gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TLZP290CA0005.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:9::12) To DS4PPF814058951.namprd11.prod.outlook.com
- (2603:10b6:f:fc02::36)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7546E18E3F
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 17:02:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752512532; cv=none; b=I2L9j6053GJj1g5/Dhle8Aho9q0rG3b6/HI2QYaf47aIJnf3lJx43kBPek/3D9BGJ/SgfpvcpRtxs+em66KosNQpDGtX9eqKe55mI4hQyfyY69ybLJG4uCkmx2UrcZBpmIr/LGt/RR6rzYDzlH2fSF9jRnbl+xzQawsD+hkNAZk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752512532; c=relaxed/simple;
+	bh=1auG+TU5cboTfyGVYoIeAniVR+gXLouO0rmStfR+ing=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IeR4cIWtsIsR4CMsLI1xpVemXFt2jkNjZbqNPDM4EMbHwXJ5+zAcoyvt5yHHi5hdsJr96Gmx3JYmFMtoA9yMKv1XpUmVRvi/XauEOiFYI9tAc4V3eOazKwzZ9yJYJ9eY6h2pG4K08jgPNbV85XaXuo9WzR+4MlR1hIuHrm61ypI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Z1MOXxGo; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-236192f8770so30660115ad.0
+        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 10:02:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1752512529; x=1753117329; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Oj/aqV2+o0f8WVyXHFTHhoUS1neovB0UuTBp4DTae2k=;
+        b=Z1MOXxGopuHWQUsXTsUdeWf58qazSpr1HAl7jBsR3E760bxAOJ1gbmcOMmgKCTMQNz
+         jJgiLOybDe9ijBWnAM+8MZyQyz4lhnha/bfx1/0Xos7+fYAX4h4SmocbSFNQci30rlx9
+         k7BwP29qjMdP6shQbYqrt2SkYKB4/4cIX+pe8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752512529; x=1753117329;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Oj/aqV2+o0f8WVyXHFTHhoUS1neovB0UuTBp4DTae2k=;
+        b=IbEGhEnbwVUtbbElsFSEQBabK+v5WbMPGyC2oU5SIf0/OONdemAurBo4o0mWGDVG0b
+         QGPfllB596Rnof/lmu2oTl/tHp//AtIB0CqyPMzXtoRU0Qjj9s6ytQBqyRQ82iaO8ekW
+         RWBgHgGipRDClf7FiQlfkWykm8HNT4Z+wIYiuKUg8lQ0q4ENBIH1nhwq8TUOQhPX1Cd2
+         qdCyCGlc50uXLNIYMt7uhYBDFSAQydrZ84fPgOYUYpfU8gh7amhqmlqx3h5ehmATPAPs
+         NOmZSvyLLxxFW/VHYl/KCZZiVGV0dUYLR5FMrYNGIbpJQLgGcUn5KxmxPqYd8GmLxbjC
+         V9pw==
+X-Gm-Message-State: AOJu0YwyCWHhLKUio14UJXSPewC5i/E6CVIV+x091jiOgDcZSTVaxW7v
+	pfUb3Zs0LfWPqQhs6q80kavCxrrqgaBSOf9A93E9yqEMlfr/2QkzZbxm2XjINX/hLo5tCZ2DB/V
+	yBS93/Xt1vMq2H9nLAZePhA70fkgKYbTeTy0cYFHSPf7iVUr7dn8gvDa13MdCPOigQtgTMgsTv5
+	KxHEkJC9UT3kjKOkZkrVKh4vN7L78seq0jJHbPOLmwSW/KXapNvpobkw==
+X-Gm-Gg: ASbGnctKsZY2htydXujI5ZWm5yiQUKk3OYcNIbb4433lXuhvyXy4nv6WCjWZzzy6uvk
+	QyjPDSaCXaDf04Nw78DYPoTp/7WMAAGPxW8wbeD6UoNu+g/YVz4juy07KL6jgkaXykwO5ruTSx6
+	NFHsi29+PfU1UpPOnzW0aXkOP23aVaSN9n5yErZV6dBEm7pCN+1sov3b7lhmswE+ThFvjMYEpw+
+	zCbyrU33isO17Lf9QDsQs0JuBDyrwmSeLVbX7vZPyCqH1iTr109BNKCsxseK1ghcQs8OSrytJm6
+	NacymS+b6WOeqxqjXDYFfn5z1BKeEmXeerld8lUcqLmwjFAa/nfAH1063OctJfUj93E09QDl16P
+	xOJ+laCegoN2GsO5IE63kGfEb5aPT17Rq2n7K1w+NWVgQxj5Lbv/IK/E57T5ADHMoUk1ByrrMg6
+	h6AQ==
+X-Google-Smtp-Source: AGHT+IGYJtG3QTX9oZnfJEMsiOgiU16uxsyIkFypNGM1WTFRgWlN1cxSXZ7qGW+c8TVjOIGB6PvCBQ==
+X-Received: by 2002:a17:903:124f:b0:233:fd7b:5e0d with SMTP id d9443c01a7336-23e1a42f6f0mr5283455ad.5.1752512528807;
+        Mon, 14 Jul 2025 10:02:08 -0700 (PDT)
+Received: from JRM7P7Q02P.dhcp.broadcom.net ([192.19.144.250])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de4323cd5sm95376135ad.126.2025.07.14.10.02.07
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 14 Jul 2025 10:02:08 -0700 (PDT)
+From: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+X-Google-Original-From: Andy Gospodarek <gospo@broadcom.com>
+To: netdev@vger.kernel.org
+Cc: vikas.gupta@broadcom.com,
+	Andy Gospodarek <gospo@broadcom.com>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>
+Subject: [PATCH net-next] bnxt: move bnxt_hsi.h to include/linux/bnxt/hsi.h
+Date: Mon, 14 Jul 2025 13:02:02 -0400
+Message-Id: <20250714170202.39688-1-gospo@broadcom.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS4PPF814058951:EE_|DM6PR11MB4644:EE_
-X-MS-Office365-Filtering-Correlation-Id: be4bbddb-09f6-4670-1181-08ddc2f7d0b5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?VDJSNSt2S0N5NEk3VS9jU2FlYzVLZUtBN2FEVDlWZy9UZ0gzbDVVcVZsQ3A4?=
- =?utf-8?B?cFkvQlUvM2k2RlVtbmZNd0lESVpUNTlkV2tNckd4K2pQZHBBem42eHV4Mlhx?=
- =?utf-8?B?ckQ2cnRHa2RBYThZUUYwK3JiNHJ4S0tQL3dySitDb0UxUTVlR1YrdXdBcXN1?=
- =?utf-8?B?YUMyWEtUMHdlV0dIcGtFclVLRWpEb3Z6S3h0c1orY2FBMWkvb0RBRW9BWExZ?=
- =?utf-8?B?cEJOVFQycE9hQXdmNDA4N1VFQ05pZXdZU0k5N1hucXE3NTBYUnVmUi9yVk1L?=
- =?utf-8?B?V0ZuM1p6cmRIb0t5c0lKWVY4U0dyUG5IdHcvS2tXZUx1a0MwSW1CdWtpbHpz?=
- =?utf-8?B?SnNmQVg1WUFKTmN4RW04K2xlZkYxYW1mTXNyekJQWnN6RjJFYWZpajl2ZHR4?=
- =?utf-8?B?c0ladEg5cWpwQzlmOEdXQ0d6Rml1aUp6eHJqS25qVUwwckpFc2U4K2k0WnQ5?=
- =?utf-8?B?eEhBUjdzTkUwUEFrM0NMUVpObldHY1dGNlVyVGNMWUdHZUJFV1Z5UGVpWFBY?=
- =?utf-8?B?MVhvNkNGM2hYV1lFbUliMGdQdzBkME1laTA4OU05VmhoZFprazd2b2Z4UXpr?=
- =?utf-8?B?KzZTdU5wcGMxY1NZdDlYUGtvY3RqeFpwSkhlZWFIMnlJOFpoRTJ5aCtXY0kz?=
- =?utf-8?B?MGRrZ0xnbWhJS2FqRnFBeXR2N3dvdElZWWRtOU5sajB5U2VONFk0c24wZlpD?=
- =?utf-8?B?UnI0blIxSmlqNmIySDZCUktPVmg0c1kweVB5b1NEZlVHNHkycUlXV3JSU3dD?=
- =?utf-8?B?Zll2UmwzZU1kMVZjd1ByUVpMQk9HcGZ4THJZMkNxYnlocjFwa25vTCt0cjVm?=
- =?utf-8?B?M1NNMG5MOGcrWHpJYVFLTFBFNkhaMEdEVUxaZU5TK3hvekJpZ09zYTVTVThE?=
- =?utf-8?B?Zk1TajNLQ0R5ZHVwRWhDWFpSNW45ck5lR2xGRmpqQW5iUUlFMlAwQUI4WnI4?=
- =?utf-8?B?aWRVcFJsRXhXQVpvcmZKOGp4VTYwMUhrb2RoZ2t5NDdVL0VQblgwTzBZbXE0?=
- =?utf-8?B?MG9YZ0xpU0VxWkdCaERoZlF4TUtmdzdXaGpKZ2lscUhyVGFHaXZtL0xsb212?=
- =?utf-8?B?RFFYdktUcksxaVNFeVE1VnRuV2hVVm9Cci9hL3lKRkRXViszN0taRnVjaDBz?=
- =?utf-8?B?czdvYzRYTmhJS04yUXZ3anNpMzFzbklMQXNnQTVrci9LNzBxa2pKaGRXdGJs?=
- =?utf-8?B?VklwK2ozTFdnbjJYS21VZE91V1FiRVpYZzBvcGsveTJxZzJlNHFIWWlDUlVL?=
- =?utf-8?B?SXBlemhpMjI1YkNTSitrbGNZU2UwdHRkSGN2YnhVZXRJUHlMRHpGdXBxYjky?=
- =?utf-8?B?OUljVVZRS2hTcm0wSEIrUkF1NUwrYzBWMTBHWWlrYWphVko4b3lncFdUOHVM?=
- =?utf-8?B?VlFWaUhOVjExMkZqd3JFRXlzYzljdkQ0NEoyN1BmZmhNWDJIRUVJWWczTy80?=
- =?utf-8?B?OXh6V29Wa3pSRWdQekEwZUNTOVZuRER5czZWWU5SY2kzSys5Y0RxMzNWTHVC?=
- =?utf-8?B?WXBUZ1U3dWtRQ1VmRTVMMmtZNUZadFp6ZTVrNlVuL3h1WStlQnRmQ2hCRE9N?=
- =?utf-8?B?Rm00MFYvaVhablN5OUtxWmNSZHNQRkZZSzFPUlY2VzErU3BRU0FSVFBsc2x6?=
- =?utf-8?B?OWlyZUl5OEhDNkZ4a0ErT0NyTCtrRG04Zmx0YUVMZTNIVnQzZ05NMWVBb1FE?=
- =?utf-8?B?RnM5VXgvRkVhMjV2TVpXMDJQTDFhRDZ3U3JHNlk2aGxuVzl4Mm5wR3lVUkFj?=
- =?utf-8?B?d3ZrQ2xNbVpYKzZlcnpVSGhUa3FHMEoyZXJreGtBbEJUQnorZWU3dTh2Ykg4?=
- =?utf-8?B?K09EZGxwNExaTDJQV3VSSS9aK1JTanNVdjVENHpGM2lLbGl3bHlVQkdxQS9Z?=
- =?utf-8?B?bSt2ejMrVG14NEdzTFBXTVo0MHJIaFZlRzhSZXF2TnFNRjNVTEJkVnNhN0lu?=
- =?utf-8?Q?fMv49kp2aWU=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS4PPF814058951.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TThKYXhkbHlKL3IrM3BmZkxWNVV4bjdFU2lKNTZPTHR0NURtVStRNUZqODQz?=
- =?utf-8?B?dUZEazBYUnI4bVcxbkxxTDBTQWE0bStQcTcwOTNNcEVMZTRIcU93WjRKRExu?=
- =?utf-8?B?ZGFnNytxVUVSZUx1em1qZ1pYMHJKTURRK0Qvb0NOUlljekRTOE1aTVB0Uitn?=
- =?utf-8?B?dVhLNHlwQThOM2ViQm5zZERkcmN6YW5MQWVjTE85Y2tTc2VpMmdaN0NkQndT?=
- =?utf-8?B?dC9MVGVrWGVhKzFrUXhoRFBaMU5wM3ptZ2RqcnZQMCtYTE9TL1NzQzQxU0tO?=
- =?utf-8?B?cDJHM3o4VjZrWVJmZ00yVjY4dS9GdXNIakg5Slc3R1NnZityZllVT1J0M0w1?=
- =?utf-8?B?SmlUZ004eDhpamRSaHA4dzBMQmROa0dXbDVBT3B3SU1mN0hJRURrZWdmWkdl?=
- =?utf-8?B?V0crT01qTm04TWQ0MDc0Z2o0eSs1alBpUDVtZFhsRjlLc1o4a0ZTSkhZazI3?=
- =?utf-8?B?a0c1aDZ0V0xySjNmZzJaTUJpbUJGM29iSDUvQkhEaUIzMW1MVmVhcnEwUDJ5?=
- =?utf-8?B?Zkw2bFdDMjVYVEtrTGtWendZT0V0NVRUTk1vNlQ4MkRIYnVLK0J6cVJMeno4?=
- =?utf-8?B?aVdUanBmU0pEQ054VzZyeDd4ZVZuZ2g0M1FsQk9wOXErODdEMnpHcy8zTHlv?=
- =?utf-8?B?TUdNdkN3dzNKN2NzOGNJMTRJUEMrTDc2ZGpsT1F4MzNTTzRKNHhYcnkvb0Zt?=
- =?utf-8?B?RUdvUjhsUVZ3cjBBL251ZWxUaEVtZ2dkenZRemdLcThWbWdicjVwNnRrMnIz?=
- =?utf-8?B?RXhOQ0RxN1BiZXFLeklUOEZsR2NIWndvaVU0ZHhJbi9NbU4zRy81cWh4YjNT?=
- =?utf-8?B?b2N3MENmY1dkSmx3TGE3Y1I5U0VFckhnWlVVa2xxazNodXUwUUJXZGN0c2I5?=
- =?utf-8?B?NFpWNDd2R3d2WEd3TERUVy8yMmVRanAxaGtmSjVFZGtqK2F4TGFsOGxkTk1W?=
- =?utf-8?B?aWZJeHMvMjdFaUQvZ2VBQXFUNm1jeUEybUx2eit2VnRDTExHb2JDV1NWNDJQ?=
- =?utf-8?B?bFgzUzRiblBnN1h5K3B6Nll0OFVUelZoMkpjZU5SZHR5RkZXb3JPamRPMzFD?=
- =?utf-8?B?TkRKblJxRGNrUG1nOVZDVVhnZFdWMUpUMUREd3RGcTA2UCtCM2ZOc21IWGxE?=
- =?utf-8?B?Yk9kK2tGWmF1bVRjSHVXb2I0QW9mZEcwdS9lMXE4WU96N25sODRSeVZVOVZO?=
- =?utf-8?B?eHJQRVRjeGN0WXozazE1TkZNYjJrZlpCL05ZNG4vV2FEdWxOYTBwa1VmdnY3?=
- =?utf-8?B?VEVTWEJhTk5BVWcyUzhpQnErSzVpMHdaRVYrTHgwU2R5OUlXdHF0VDVjbzd2?=
- =?utf-8?B?MGpna1pickFBZ3VYYlZJeWJHZ3NiS3p4L2dZSEozcERTT01XWUdhMzdBWTV5?=
- =?utf-8?B?bldVNlRwaTRSYUZ4dmtlV2VvdGlpeitPTmN6clJJalV4Vnl1ckRLRExwR2c0?=
- =?utf-8?B?b0FOdGYrNVd1cVkyeVV2T1dZcXBGN3hmbGY5Z1JCejVOSEV2TG5KbGNCM2N3?=
- =?utf-8?B?NzFrVDdaMzd5Q0JoRDJSeWtiY25Hc3FLbXREWFVybU9MSnV1MkxLelYycERn?=
- =?utf-8?B?dmZZcDMxYk1QTEtpRUdaNnVVMVNHcGJoSFV6SFpzSlZBbXpSRmI4MnZxVkgx?=
- =?utf-8?B?THRQdFdVYWFnRENHNmw1dnNkUjlFcUNmdmQ5S3BiVXVxUm90UHo4YU9MSWdV?=
- =?utf-8?B?RElrd24wS2NPOHQ5MFFpMk9BR3ptcXhIdlJRRW1CT2VOSVUyV0Jxd1BORjFi?=
- =?utf-8?B?SmhBK28rSmxRMHpSSHhncmoydmRXcHRDZ2VlNE5idUNPTlRSWjZnU0V3UUZF?=
- =?utf-8?B?R0VlTWhXMWd2R1FuSFA3a0swUzk3SmdaNmptemRpeGpoZmFTVGgyOWI5TVIz?=
- =?utf-8?B?ajMyM3hFUE05MVNaSXBhVTVWTVM2NGZiWlZtYjZ6dWlJTE5QRWRNZE5SL0lu?=
- =?utf-8?B?QklmTlNEdm9ILzFMdWxpNlpPc2JIWFFCbHRlMW9IUkJYWnkzL2ZEcG96clow?=
- =?utf-8?B?UU5scDJzVkN4aWlxVzdtT09WWC9HR01rcXJLbExiV0VCNkRGVk1CcmhtTFNT?=
- =?utf-8?B?TUxQRTRwNDg4NGJuTnI0ZnJJT3huckZRM3A1SlVvME9yeTlEUk9qR0NWSXkz?=
- =?utf-8?Q?iiFBmyzfBhGqDSo+OC6xsfU3W?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: be4bbddb-09f6-4670-1181-08ddc2f7d0b5
-X-MS-Exchange-CrossTenant-AuthSource: DS4PPF814058951.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2025 16:59:37.2549
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Cdm7D9Emh4yE/tUUM1bRQJzfdadJyPqe2Gvn9VCYagNSb2Q+fuzFfkleVWu6fkIrEWFTsp+B5zw8GTQnQQW47/AMGePyOoPbqmziVFABuFM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4644
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
+This moves bnxt_hsi.h contents to a common location so it can be
+properly referenced by bnxt_en, bnxt_re, and bnge.
 
+Signed-off-by: Andy Gospodarek <gospo@broadcom.com>
+Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+---
+ drivers/infiniband/hw/bnxt_re/roce_hsi.h                      | 4 ++--
+ drivers/net/ethernet/broadcom/bnge/bnge.h                     | 2 +-
+ drivers/net/ethernet/broadcom/bnge/bnge_hwrm.h                | 2 +-
+ drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c            | 2 +-
+ drivers/net/ethernet/broadcom/bnge/bnge_netdev.h              | 2 +-
+ drivers/net/ethernet/broadcom/bnge/bnge_rmem.c                | 2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c                     | 2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c            | 2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c                 | 2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_debugfs.c             | 2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_debugfs.h             | 2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c             | 2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_dim.c                 | 2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c             | 2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c               | 2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.c                | 2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.h                | 2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c                 | 2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c               | 2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c                  | 2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c                 | 2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_vfr.c                 | 2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c                 | 2 +-
+ .../broadcom/bnxt/bnxt_hsi.h => include/linux/bnxt/hsi.h      | 0
+ 24 files changed, 24 insertions(+), 24 deletions(-)
+ rename drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h => include/linux/bnxt/hsi.h (100%)
 
-On 7/7/2025 12:17 PM, Rui Salvaterra wrote:
-> This is debug information, upon which the user is not expected to act. Output as
-> such. This avoids polluting the dmesg with full register dumps at every link
-> down.
-> 
-> Signed-off-by: Rui Salvaterra <rsalvaterra@gmail.com>
-> ---
-> 
-> This file hasn't been touched in over four years, it's probably from a time when
-> the driver was under heavy development (started in 2018). Nevertheless, the
-> status quo is positively annoying. :)
-> 
+diff --git a/drivers/infiniband/hw/bnxt_re/roce_hsi.h b/drivers/infiniband/hw/bnxt_re/roce_hsi.h
+index 7eceb3e9f4ce..024845f945ff 100644
+--- a/drivers/infiniband/hw/bnxt_re/roce_hsi.h
++++ b/drivers/infiniband/hw/bnxt_re/roce_hsi.h
+@@ -39,8 +39,8 @@
+ #ifndef __BNXT_RE_HSI_H__
+ #define __BNXT_RE_HSI_H__
+ 
+-/* include bnxt_hsi.h from bnxt_en driver */
+-#include "bnxt_hsi.h"
++/* include linux/bnxt/hsi.h */
++#include <linux/bnxt/hsi.h>
+ 
+ /* tx_doorbell (size:32b/4B) */
+ struct tx_doorbell {
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge.h b/drivers/net/ethernet/broadcom/bnge/bnge.h
+index a1795302c15a..6fb3683b6b04 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge.h
++++ b/drivers/net/ethernet/broadcom/bnge/bnge.h
+@@ -8,7 +8,7 @@
+ #define DRV_SUMMARY	"Broadcom 800G Ethernet Linux Driver"
+ 
+ #include <linux/etherdevice.h>
+-#include "../bnxt/bnxt_hsi.h"
++#include <linux/bnxt/hsi.h>
+ #include "bnge_rmem.h"
+ #include "bnge_resc.h"
+ 
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm.h b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm.h
+index 012aa4fa5aa9..83794a12cc81 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm.h
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm.h
+@@ -4,7 +4,7 @@
+ #ifndef _BNGE_HWRM_H_
+ #define _BNGE_HWRM_H_
+ 
+-#include "../bnxt/bnxt_hsi.h"
++#include <linux/bnxt/hsi.h>
+ 
+ enum bnge_hwrm_ctx_flags {
+ 	BNGE_HWRM_INTERNAL_CTX_OWNED	= BIT(0),
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
+index 19091318cfdd..5c178fade065 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
+@@ -5,9 +5,9 @@
+ #include <linux/kernel.h>
+ #include <linux/mm.h>
+ #include <linux/pci.h>
++#include <linux/bnxt/hsi.h>
+ 
+ #include "bnge.h"
+-#include "../bnxt/bnxt_hsi.h"
+ #include "bnge_hwrm.h"
+ #include "bnge_hwrm_lib.h"
+ #include "bnge_rmem.h"
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
+index 96b77e44b552..a650d71a58db 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
+@@ -4,7 +4,7 @@
+ #ifndef _BNGE_NETDEV_H_
+ #define _BNGE_NETDEV_H_
+ 
+-#include "../bnxt/bnxt_hsi.h"
++#include <linux/bnxt/hsi.h>
+ 
+ struct tx_bd {
+ 	__le32 tx_bd_len_flags_type;
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_rmem.c b/drivers/net/ethernet/broadcom/bnge/bnge_rmem.c
+index 0e935cc46da6..52ada65943a0 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_rmem.c
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_rmem.c
+@@ -9,9 +9,9 @@
+ #include <linux/dma-mapping.h>
+ #include <linux/vmalloc.h>
+ #include <linux/crash_dump.h>
++#include <linux/bnxt/hsi.h>
+ 
+ #include "bnge.h"
+-#include "../bnxt/bnxt_hsi.h"
+ #include "bnge_hwrm_lib.h"
+ #include "bnge_rmem.h"
+ 
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 6bbe875132b0..de8080df69a8 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -58,8 +58,8 @@
+ #include <net/netdev_queues.h>
+ #include <net/netdev_rx_queue.h>
+ #include <linux/pci-tph.h>
++#include <linux/bnxt/hsi.h>
+ 
+-#include "bnxt_hsi.h"
+ #include "bnxt.h"
+ #include "bnxt_hwrm.h"
+ #include "bnxt_ulp.h"
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
+index 67e70d3d0980..18d6c94d5cb8 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
+@@ -10,7 +10,7 @@
+ #include <linux/types.h>
+ #include <linux/errno.h>
+ #include <linux/pci.h>
+-#include "bnxt_hsi.h"
++#include <linux/bnxt/hsi.h>
+ #include "bnxt.h"
+ #include "bnxt_hwrm.h"
+ #include "bnxt_coredump.h"
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
+index 71e14be2507e..a00b67334f9b 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
+@@ -16,7 +16,7 @@
+ #include <linux/pci.h>
+ #include <linux/etherdevice.h>
+ #include <rdma/ib_verbs.h>
+-#include "bnxt_hsi.h"
++#include <linux/bnxt/hsi.h>
+ #include "bnxt.h"
+ #include "bnxt_hwrm.h"
+ #include "bnxt_dcb.h"
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_debugfs.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_debugfs.c
+index 127b7015f676..3324afbb3bec 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_debugfs.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_debugfs.c
+@@ -10,7 +10,7 @@
+ #include <linux/debugfs.h>
+ #include <linux/module.h>
+ #include <linux/pci.h>
+-#include "bnxt_hsi.h"
++#include <linux/bnxt/hsi.h>
+ #include <linux/dim.h>
+ #include "bnxt.h"
+ #include "bnxt_debugfs.h"
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_debugfs.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_debugfs.h
+index d0bb4887acd0..a0a8d687dd99 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_debugfs.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_debugfs.h
+@@ -7,7 +7,7 @@
+  * the Free Software Foundation.
+  */
+ 
+-#include "bnxt_hsi.h"
++#include <linux/bnxt/hsi.h>
+ #include "bnxt.h"
+ 
+ #ifdef CONFIG_DEBUG_FS
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
+index 777880594a04..4c4581b0342e 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
+@@ -12,7 +12,7 @@
+ #include <linux/vmalloc.h>
+ #include <net/devlink.h>
+ #include <net/netdev_lock.h>
+-#include "bnxt_hsi.h"
++#include <linux/bnxt/hsi.h>
+ #include "bnxt.h"
+ #include "bnxt_hwrm.h"
+ #include "bnxt_vfr.h"
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_dim.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_dim.c
+index 6f6576dc417a..53a3bcb0efe0 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_dim.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_dim.c
+@@ -8,7 +8,7 @@
+  */
+ 
+ #include <linux/dim.h>
+-#include "bnxt_hsi.h"
++#include <linux/bnxt/hsi.h>
+ #include "bnxt.h"
+ 
+ void bnxt_dim_work(struct work_struct *work)
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+index 4c10373abffd..1b37612b1c01 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+@@ -26,7 +26,7 @@
+ #include <linux/timecounter.h>
+ #include <net/netdev_queues.h>
+ #include <net/netlink.h>
+-#include "bnxt_hsi.h"
++#include <linux/bnxt/hsi.h>
+ #include "bnxt.h"
+ #include "bnxt_hwrm.h"
+ #include "bnxt_ulp.h"
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c
+index 669d24ba0e87..de3427c6c6aa 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c
+@@ -12,8 +12,8 @@
+ #include <linux/hwmon.h>
+ #include <linux/hwmon-sysfs.h>
+ #include <linux/pci.h>
++#include <linux/bnxt/hsi.h>
+ 
+-#include "bnxt_hsi.h"
+ #include "bnxt.h"
+ #include "bnxt_hwrm.h"
+ #include "bnxt_hwmon.h"
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.c
+index d2fd2d04ed47..5ce190f50120 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.c
+@@ -20,8 +20,8 @@
+ #include <linux/netdevice.h>
+ #include <linux/pci.h>
+ #include <linux/skbuff.h>
++#include <linux/bnxt/hsi.h>
+ 
+-#include "bnxt_hsi.h"
+ #include "bnxt.h"
+ #include "bnxt_hwrm.h"
+ 
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.h
+index fb5f5b063c3d..791b3a0cdb83 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.h
+@@ -10,7 +10,7 @@
+ #ifndef BNXT_HWRM_H
+ #define BNXT_HWRM_H
+ 
+-#include "bnxt_hsi.h"
++#include <linux/bnxt/hsi.h>
+ 
+ enum bnxt_hwrm_ctx_flags {
+ 	/* Update the HWRM_API_FLAGS right below for any new non-internal bit added here */
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+index 0669d43472f5..471b1393ce6c 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+@@ -15,7 +15,7 @@
+ #include <linux/timekeeping.h>
+ #include <linux/ptp_classify.h>
+ #include <linux/clocksource.h>
+-#include "bnxt_hsi.h"
++#include <linux/bnxt/hsi.h>
+ #include "bnxt.h"
+ #include "bnxt_hwrm.h"
+ #include "bnxt_ptp.h"
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
+index bc0d80356568..ec14b51ba38e 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
+@@ -16,7 +16,7 @@
+ #include <linux/interrupt.h>
+ #include <linux/etherdevice.h>
+ #include <net/dcbnl.h>
+-#include "bnxt_hsi.h"
++#include <linux/bnxt/hsi.h>
+ #include "bnxt.h"
+ #include "bnxt_hwrm.h"
+ #include "bnxt_ulp.h"
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c
+index 0599d3016224..d72fd248f3aa 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c
+@@ -19,8 +19,8 @@
+ #include <net/tc_act/tc_pedit.h>
+ #include <net/tc_act/tc_tunnel_key.h>
+ #include <net/vxlan.h>
++#include <linux/bnxt/hsi.h>
+ 
+-#include "bnxt_hsi.h"
+ #include "bnxt.h"
+ #include "bnxt_hwrm.h"
+ #include "bnxt_sriov.h"
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
+index 2450a369b792..61cf201bb0dc 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
+@@ -21,8 +21,8 @@
+ #include <linux/bitmap.h>
+ #include <linux/auxiliary_bus.h>
+ #include <net/netdev_lock.h>
++#include <linux/bnxt/hsi.h>
+ 
+-#include "bnxt_hsi.h"
+ #include "bnxt.h"
+ #include "bnxt_hwrm.h"
+ #include "bnxt_ulp.h"
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_vfr.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_vfr.c
+index 619f0844e778..bd116fd578d8 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_vfr.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_vfr.c
+@@ -12,8 +12,8 @@
+ #include <linux/rtnetlink.h>
+ #include <linux/jhash.h>
+ #include <net/pkt_cls.h>
++#include <linux/bnxt/hsi.h>
+ 
+-#include "bnxt_hsi.h"
+ #include "bnxt.h"
+ #include "bnxt_hwrm.h"
+ #include "bnxt_vfr.h"
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+index 09e7e8efa6fa..58d579dca3f1 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+@@ -17,7 +17,7 @@
+ #include <linux/filter.h>
+ #include <net/netdev_lock.h>
+ #include <net/page_pool/helpers.h>
+-#include "bnxt_hsi.h"
++#include <linux/bnxt/hsi.h>
+ #include "bnxt.h"
+ #include "bnxt_xdp.h"
+ 
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h b/include/linux/bnxt/hsi.h
+similarity index 100%
+rename from drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h
+rename to include/linux/bnxt/hsi.h
+-- 
+2.31.1
 
-Hi Rui,
-
-Thanks for this patch.
-
-However, I don't completely agree with you.
-I think that the main idea here was to have enough data to pass for the 
-developers in a case where any issue happens without enabling debug 
-mode. Especially, for those issues that reproduce rarely.
-
-I compared this function to the corresponding functions in ixgbe and igb 
-and I see that they are implemented similarly.
-
-Therefore, in my opinion, I think that it is better to leave the prints 
-as they are. Or at least, to push similar changes to the other drivers 
-as well.
 
