@@ -1,138 +1,115 @@
-Return-Path: <netdev+bounces-206584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31B8CB03897
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 10:01:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E68E6B03958
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 10:23:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9353717ACF0
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 08:01:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5502E17CCBC
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 08:22:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49C26233712;
-	Mon, 14 Jul 2025 08:00:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9C2723ABB7;
+	Mon, 14 Jul 2025 08:22:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="afSN2k+r"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D0991E5018;
-	Mon, 14 Jul 2025 08:00:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD528238C24;
+	Mon, 14 Jul 2025 08:22:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752480046; cv=none; b=STNlCWIFnxTRcU3VoAIxCJDNDal/tGF6fJiP0lN/mg1JlsbjnmQqt7Ib65c4RoGbmSY5ONZMw5M+S1ERpr3wm5C5JcRjgDCv8vDXOzF2lC09g3aQo12AqAELUDtjdoN2gpvf3BjyePcs6Yr8pYPetmwYWCiT7j9UWgJJLyIfteE=
+	t=1752481323; cv=none; b=m3EG0UtZdMNlqYA3w5dEA2Vo9Tt15qtIebKjD0KyBMD0lEDGvNY4NwsVEu0Ec5K3NhwA/OzrpWxghsEdQEh4yEcJJ0DjBP2Ddvhec5KVNjRc3soi94FMeaM9qtrpOWAglfV8pQM/Gk6DC5FqP0r4cTnR9RN8st35/C+fP0d2K9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752480046; c=relaxed/simple;
-	bh=ovdHmcxQBDLvdoPNAvCtEcdM4Jq392cLtSD1+SWOnXI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lA7MvyqQO7hyhjPrmjSXdnMsIKksJMghNsZXJWYh2B1wErpas3Eh1y0semYU2X7LywIyr/cU39rhr0O0DXsrVQGXwakonVvDwoFfO26WMgOHrJadNCSjYMXuHL/ctVNFGJWX1qvQ1sVaP1vzpZ/eTtWSqpPYjHsUWQHPXmYcgLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4bgZXL6xm8z2YPsC;
-	Mon, 14 Jul 2025 16:01:38 +0800 (CST)
-Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5D7071A016C;
-	Mon, 14 Jul 2025 16:00:40 +0800 (CST)
-Received: from huawei.com (10.175.124.27) by dggpemf500002.china.huawei.com
- (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 14 Jul
- 2025 16:00:39 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<yuehaibing@huawei.com>, <kuniyu@google.com>, <Markus.Elfring@web.de>
-Subject: [PATCH v2 net-next] ipv6: mcast: Avoid a duplicate pointer check in mld_del_delrec()
-Date: Mon, 14 Jul 2025 16:19:49 +0800
-Message-ID: <20250714081949.3109947-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1752481323; c=relaxed/simple;
+	bh=bkejVvLDnniEBE/OfO+mGbvZJ0Ofy31YLZpWO7e3vLk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=PBH5STwJ2nDMdaEQVCKMJM40w+hA+H1etIm0U917fvBrcvTg5+3zmFgN77gLe7TwxFekct3rjGXZt2I8MzUkX9m+zEJ9f9l5ojffKwCBBfsBtGQEF8m4zLNMW00rj6ADg8dzuR2yAQmR7AkFdHX0iPgpg/w8nIMhM1KxgZYGGcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=afSN2k+r; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1752481312;
+	bh=bkejVvLDnniEBE/OfO+mGbvZJ0Ofy31YLZpWO7e3vLk=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=afSN2k+rBvt490RaS2wJwSoIJEbD/JYvJeaMezWIkqVWXQQGZI7a0ijHj/I0u9TgI
+	 TdBSJHkKk9PxaaVxtCpzEpSR+kmXP1UeKfgvNnZPKE5Cj3CJ21mGxBzgOm9/WVd/D4
+	 831kG0qmnXglemGPXsI0Wq8Qyo/KpOrbLmwyck423bgQ0vM1lFuLGESeSqausdq2HF
+	 0pVX9Nxz3YEb2exPMd9u3nKPVtgixm9qrGl3TnavQSqXAKfSqkYG9tumTNjLBc3a0B
+	 /MNjKsfzIB0A4efA08AaOxElcn4ezbkgcVZcsyMvJvqQ7Rbdit+xubx+Z2I+EKcDag
+	 EIQNvHN27Mvhw==
+Received: from [192.168.72.164] (210-10-213-150.per.static-ipl.aapt.com.au [210.10.213.150])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 265DC6B4BE;
+	Mon, 14 Jul 2025 16:21:51 +0800 (AWST)
+Message-ID: <883a07de53bf3c84ce255456891133da9443d2b1.camel@codeconstruct.com.au>
+Subject: Re: [PATCH net-next v22 2/2] mctp pcc: Implement MCTP over PCC
+ Transport
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: Adam Young <admiyo@amperemail.onmicrosoft.com>, 
+ admiyo@os.amperecomputing.com, Matt Johnston <matt@codeconstruct.com.au>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Sudeep Holla
+	 <sudeep.holla@arm.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
+	Huisong Li <lihuisong@huawei.com>
+Date: Mon, 14 Jul 2025 16:21:50 +0800
+In-Reply-To: <30bcce6d-9a50-4fb8-ab7c-8ae36eb99d74@amperemail.onmicrosoft.com>
+References: <20250710191209.737167-1-admiyo@os.amperecomputing.com>
+	 <20250710191209.737167-3-admiyo@os.amperecomputing.com>
+	 <e64da89fdd2c72afaa62f02449db9b144e02b743.camel@codeconstruct.com.au>
+	 <30bcce6d-9a50-4fb8-ab7c-8ae36eb99d74@amperemail.onmicrosoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- dggpemf500002.china.huawei.com (7.185.36.57)
 
-Avoid duplicate non-null pointer check for pmc in mld_del_delrec().
-No functional changes.
+Hi Adam,
+> If the sk_buff allocation fails, the logic falls back to the old code,=
+=20
+> which passes on a null buffer. There is logic there with notifying the=
+=20
+> sender that I don't want to skip or modify.
 
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
----
-v2: early return if (!pcm) true as Kuniyuki Iwashima suggested, also revise title
----
- net/ipv6/mcast.c | 52 +++++++++++++++++++++++-------------------------
- 1 file changed, 25 insertions(+), 27 deletions(-)
+OK, so this will happen if we didn't allocate a buffer in the first
+place - we'd still get a completion occurring. Let me know if my
+understanding is incorrect.
+>=20
 
-diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
-index 6c875721d423..6d737815d0ab 100644
---- a/net/ipv6/mcast.c
-+++ b/net/ipv6/mcast.c
-@@ -789,34 +789,32 @@ static void mld_del_delrec(struct inet6_dev *idev, struct ifmcaddr6 *im)
- 			break;
- 		pmc_prev = pmc;
- 	}
--	if (pmc) {
--		if (pmc_prev)
--			rcu_assign_pointer(pmc_prev->next, pmc->next);
--		else
--			rcu_assign_pointer(idev->mc_tomb, pmc->next);
--	}
--
--	if (pmc) {
--		im->idev = pmc->idev;
--		if (im->mca_sfmode == MCAST_INCLUDE) {
--			tomb = rcu_replace_pointer(im->mca_tomb,
--						   mc_dereference(pmc->mca_tomb, pmc->idev),
--						   lockdep_is_held(&im->idev->mc_lock));
--			rcu_assign_pointer(pmc->mca_tomb, tomb);
--
--			sources = rcu_replace_pointer(im->mca_sources,
--						      mc_dereference(pmc->mca_sources, pmc->idev),
--						      lockdep_is_held(&im->idev->mc_lock));
--			rcu_assign_pointer(pmc->mca_sources, sources);
--			for_each_psf_mclock(im, psf)
--				psf->sf_crcount = idev->mc_qrv;
--		} else {
--			im->mca_crcount = idev->mc_qrv;
--		}
--		in6_dev_put(pmc->idev);
--		ip6_mc_clear_src(pmc);
--		kfree_rcu(pmc, rcu);
-+	if (!pmc)
-+		return;
-+	if (pmc_prev)
-+		rcu_assign_pointer(pmc_prev->next, pmc->next);
-+	else
-+		rcu_assign_pointer(idev->mc_tomb, pmc->next);
-+
-+	im->idev = pmc->idev;
-+	if (im->mca_sfmode == MCAST_INCLUDE) {
-+		tomb = rcu_replace_pointer(im->mca_tomb,
-+					   mc_dereference(pmc->mca_tomb, pmc->idev),
-+					   lockdep_is_held(&im->idev->mc_lock));
-+		rcu_assign_pointer(pmc->mca_tomb, tomb);
-+
-+		sources = rcu_replace_pointer(im->mca_sources,
-+					      mc_dereference(pmc->mca_sources, pmc->idev),
-+					      lockdep_is_held(&im->idev->mc_lock));
-+		rcu_assign_pointer(pmc->mca_sources, sources);
-+		for_each_psf_mclock(im, psf)
-+			psf->sf_crcount = idev->mc_qrv;
-+	} else {
-+		im->mca_crcount = idev->mc_qrv;
- 	}
-+	in6_dev_put(pmc->idev);
-+	ip6_mc_clear_src(pmc);
-+	kfree_rcu(pmc, rcu);
- }
- 
- static void mld_clear_delrec(struct inet6_dev *idev)
--- 
-2.34.1
+> > I think the issue is that the mbox API is using the void * buffer
+> > as both the data to transfer, and the callback context, so we can't
+> > stash useful context across the completion?
+>=20
+> Correct, the SK_buff is a structure=C2=A0 that points to a buffer, and
+> what gets to the send_data function is the buffer itself. That buffer
+> has no pointer back to the sk_buff.
 
+OK, that's a bit unfortunate. Might be good to see if you can add a
+context pointer to the mailbox request, in which you could stuff the
+skb pointer. USB does this for the transfer completions: there are
+members on the transfer (the struct urb) for both a context and buffer
+pointer.
+
+Of course, that is more a mailbox API change, so you may want to
+consider that as a separate thing later.
+
+> The NETDEV_TX_BUSY is correct, as it means resend the packet, and we=20
+> don't have any reference to it.
+
+OK, you may want to have the tx queue stopped at that point then, if
+you have some facility to re-start it when the mailbox ring buffer has
+space.
+
+Cheers,
+
+
+Jeremy
 
