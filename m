@@ -1,112 +1,154 @@
-Return-Path: <netdev+bounces-206573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9691B0381D
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 09:37:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20130B03827
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 09:39:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE8E018987DA
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 07:38:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 943E97A1C73
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 07:38:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E22982356BA;
-	Mon, 14 Jul 2025 07:37:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BAA623504D;
+	Mon, 14 Jul 2025 07:39:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="YJjIaf8e"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AOD/KYob"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zeus03.de (zeus03.de [194.117.254.33])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7816233D9E
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 07:37:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22EDA1E9B1A;
+	Mon, 14 Jul 2025 07:39:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752478657; cv=none; b=IdSHnpWPVFe/KPM9l02I533Nm9zyK4mbUrMW3LF5eQUWnNZU2vLa6VhjlOM6eKFfMWRHvIZk64wkmceN2PjgaaBDSVdv5ZQ1Ni/dzqCeOMyrmzzibEu4TgVGGCkbmr8OCewV+fkB0bdRmbYLXs5HIAC0YOQrtwEZSIJ/Br5sizA=
+	t=1752478771; cv=none; b=A4GWaFjhe6IEjcNiU8JQv/IvAdGVlPUjx4HFq+hOSQEUPwM1gujj9v8feDWguz7/AUWMPEamA0QRjRTCp1imsBcu+S2RaSVi7EP1cEJ2WD2OkaVIXLVFxPVIZ0iInBpyiBpUPVifqJQJYBe5UUtVsnatbcOETb0fCwyA1uwKWIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752478657; c=relaxed/simple;
-	bh=3hFbJlqW8cbG988BMDFJ2adocaVdbFf7Ph5WXToeAAM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RxNpf4DsxSNSm8NvsyFVjoaDwz3PCqVaMfFsedamyJpBeFMa61WsIUPlIIwneUi07/m73x2rxRoK/5KVQmosY0Y9pT1YtOJrB8tLzP8J8fqzr4i0jQDosRQOffxiarbPYu1APHm3f2vdOt8F+rRyWKtyQhOvlYBKrV5VHF54fsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=YJjIaf8e; arc=none smtp.client-ip=194.117.254.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	sang-engineering.com; h=date:from:to:cc:subject:message-id
-	:references:mime-version:content-type:in-reply-to; s=k1; bh=yy7j
-	unz34iyIyATJXxlEYv9buWS6GzjYVGKjzQjYSQE=; b=YJjIaf8e77CJ+2z2Qguy
-	gZk2oafCVm5xJ7jgQvBWaCA5lVI1fyQat4Me+xivfgdsxA6BoPf4zCInQrECvwDt
-	4nWcpOC6qxOdhkmnreERxxQI2LjTnmA6kXzNUaAuP7eSWdXpYq7cdI7fCVBItzcs
-	U7j/K7xb1eFbBWVG9c5FVCh3pgJm6X1PLL6WzPAWY6k8R4z73kxHUu4pFaAFEh06
-	aDmRdAi0bMAFOxjFAmaXFm7U3AC0oA5l+2OCh+BipEtcgzo3u5IEQcauGHWKiBqE
-	L/o/JbiVFP7FpNvJ9+TYbEab2STkae15wl844IWxjCIvcZlRTuHAXIymxClVaNtY
-	SQ==
-Received: (qmail 2369254 invoked from network); 14 Jul 2025 09:37:33 +0200
-Received: by mail.zeus03.de with UTF8SMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 14 Jul 2025 09:37:33 +0200
-X-UD-Smtp-Session: l3s3148p1@WW6Tu945AuIgAwDPXxNjAMIr4MhSGEU6
-Date: Mon, 14 Jul 2025 09:37:32 +0200
-From: Wolfram Sang <wsa+renesas@sang-engineering.com>
-To: a0282524688@gmail.com
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org,
-	brgl@bgdev.pl, andi.shyti@kernel.org, mkl@pengutronix.de,
-	mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net,
-	jdelvare@suse.com, alexandre.belloni@bootlin.com,
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
-	linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org,
-	linux-usb@vger.kernel.org
-Subject: Re: [PATCH v13 3/7] i2c: Add Nuvoton NCT6694 I2C support
-Message-ID: <aHSzvBYwYUpQTAQr@shikoro>
-References: <20250627102730.71222-1-a0282524688@gmail.com>
- <20250627102730.71222-4-a0282524688@gmail.com>
+	s=arc-20240116; t=1752478771; c=relaxed/simple;
+	bh=isH+LNOSuSMjjTwgNJb2F7KxIlurX0tYxz+h39DW+Pc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LEKWQuGcW25fzC9UyWEmC5TJcaWgAxiieOmNn7QdGt6lQ3VHq8lB6bdoNjE3La05IUb3IX8nuNLl+3KRYMh78dqK7XiGxcCxX3arWSbzK0ns46HPhS88mBN/MsqCM84hp8oVmeuj5Y4hWcvsyrGzg9VSwxe6G+LcnmvpLNqkufg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AOD/KYob; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44792C4CEED;
+	Mon, 14 Jul 2025 07:39:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752478770;
+	bh=isH+LNOSuSMjjTwgNJb2F7KxIlurX0tYxz+h39DW+Pc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=AOD/KYobuLtBzyTbgiLp2pSrxVLtnp6Hhh49MCaM6g4HZNQpxAwHJJSvcdca3M8AM
+	 wyrlyS2GtsoYLpjaQTq27xjyrs/Fs2hH/GFIDdHFu4k4QYbnxGUxlofgPu16Ijlvle
+	 240zI9WDPWsPokYVvJ7try3I/M0yGgAqX0WJ3jjmyF5GxBeXrCeqfnumtiRFp9oKcT
+	 zGKFFJI4makuzZoLOBWuODbyFzGSerXiT9lox9wgLA/9oEERYx24rRUxLh+DCBXCIJ
+	 Mdc3y6VktUZKbE9Bn7OPaqXv285Yl7ryOXRmsU7Uu0OQWU9ZE1fRFElySSVdL2jQ/R
+	 ogqeu3NDl2wZQ==
+Message-ID: <623a647b-806a-4324-9c59-fcad3127f906@kernel.org>
+Date: Mon, 14 Jul 2025 09:39:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="LKuB8htEp3EqNPw/"
-Content-Disposition: inline
-In-Reply-To: <20250627102730.71222-4-a0282524688@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 2/7] net: airoha: npu: Add NPU wlan memory
+ initialization commands
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, Simon Horman <horms@kernel.org>,
+ Felix Fietkau <nbd@nbd.name>
+References: <20250705-airoha-en7581-wlan-offlaod-v2-0-3cf32785e381@kernel.org>
+ <20250705-airoha-en7581-wlan-offlaod-v2-2-3cf32785e381@kernel.org>
+ <20250707-agile-aardwolf-of-politeness-29fead@krzk-bin>
+ <aGt2L1e3xbWVoqOO@lore-desk>
+ <679e6fd2-967f-4057-9ccd-92a37ecc4819@kernel.org>
+ <aGvmoJ83EtYOIa0K@lore-desk>
+ <904d1165-185e-43ac-9b52-a2f17f774e80@kernel.org>
+ <aGzJ1vFufzBts_yG@lore-desk>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <aGzJ1vFufzBts_yG@lore-desk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+On 08/07/2025 09:33, Lorenzo Bianconi wrote:
+> 
+>>
+>>> posted net-next patches as preliminary ones for MT76 changes).
+>>> Moreover, this is the same approach we used when we added WED support to
+>>> mtk_eth_soc driver and the related MT76 support.
+>>> However, I am fine to post the MT76 changes as RFC and just refer to it in
+>>> this series cover-letter. Agree? 
+>>>
+>>>>
+>>>> So far I see ABI break, but without user cannot judge. And that's the
+>>>> hard reason this cannot be accepted.
+>>>
+>>> if you mean the dts changes, I will fix them in v3.
+>>>
+>> No, I mean driver.
+> 
+> Sorry, can you please explain what is the ABI break in the driver codebase?
+> airoha_npu_wlan_init_memory() is executed by MT76 driver and not during NPU
+> probe phase.
+> 
+
+Read the first problem I pointed out - no user. Your new ABI returns
+error and you changed binding in incompatible way.
+
+Binding change is ABI break and its impact is impossible to judge due to
+missing code. I am speaking about this since beginning, but if you keep
+insisting that the driver does not matter then this is a NAK because you
+change ABI in the binding.
 
 
---LKuB8htEp3EqNPw/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-
-> +		if (msg_temp->len > 64)
-> +			return -EPROTO;
-
-Please populate and use 'struct i2c_adapter_quirks' so the I2C core can
-handle the checks for you. At least max_read_len and max_write_len. But
-please also do check the other flags. Usually, USB adapters have way
-more limitations than the buffer size.
-
-
---LKuB8htEp3EqNPw/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmh0s7gACgkQFA3kzBSg
-KbYL/Q//cSewXdBWuo/manXc2oHKH9hQ3DDPQc3spFbfrEbppJuDbMFBquG+aGME
-2VZlV1UjVY4osYpqOY1KkMxysZHuhUcXlHio7eGrq2ROwiwIZc6paaekwv/X83Jz
-cu43ELVOaN+qBFJHqSFFJwD78scsApEXVr2UlMQkVsxfmG+tf7J2RgiP5CNkzZc5
-dp9K8l1qyrpZckzRrWizXlC6R5AatyeJTpJOVCqjYdxXNVH+/wYoBZqm7NF/5WdY
-4LEnr65WhOdcopUiZy89/njHRHtnrcmkddEaiPUiLiDhbPVVC+nU0OtenC41uTx6
-LTLz/pNLHtXFBQOo3Cs/YkVR+dLAbywSeTlgLhaY6/WW17Hkr61m3c3dukh84+Av
-3SIuC/d33D3rVtP5wdEQvGbeJXuAvdVOxsVdiWj8a8TU8+hXQU+v3B2+wRSkFKxS
-JLj8oAcQd2yXcq8FWxmHzQmuVxRyXXTgemm7/WCpoMVVZKWWtaqkb2znCWvJdIaG
-Yi/5EHXgYDjDEwd/ToxFK6vd6sDiPB7jEmFkIOhYADJw4Jak+m4tniHQe2A0zMDE
-zqN9Iw+qhBecQ0GTjDQ/x9l/AwtZlIy+IkfGYlmpw8qcqnoUPGjzri7OXw6DZjra
-QSx2vgqOWESv1vv39NqtIXv2BawdPjuAGqIb0gV4MCacNQTSpK0=
-=vtvN
------END PGP SIGNATURE-----
-
---LKuB8htEp3EqNPw/--
+Best regards,
+Krzysztof
 
