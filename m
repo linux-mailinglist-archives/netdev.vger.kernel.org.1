@@ -1,120 +1,129 @@
-Return-Path: <netdev+bounces-206721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB08AB04390
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 17:23:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 954FDB043A2
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 17:24:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89F691893706
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 15:20:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8880816257D
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 15:22:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F57726059F;
-	Mon, 14 Jul 2025 15:18:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B91AA260565;
+	Mon, 14 Jul 2025 15:21:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f4aCNCmZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EZzpjDQy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 844D92571DD;
-	Mon, 14 Jul 2025 15:18:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CCB51E1DF0;
+	Mon, 14 Jul 2025 15:21:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752506298; cv=none; b=Jg3Ak7J0RpaP7/TQ8uo/kSO+TpAiN2IArYYvQFuefU64tQc92qO+obE6o4C5ndsivqXdtrQyPvMcurpiAS8ss0DZ8pzOkmbmewWn9zalEQkR+xprjqdtPXGxYQvH2sPZm/ZrX8u9JBkLV9+9yA4+Z1uuyeUtf4opeSZcAGohBp4=
+	t=1752506472; cv=none; b=cGe/j/0JNQbU1JWgc4O2fv/hLIAQsqFi3gnBhgl83VeJOhTNXyoijyQzWjw8y0uTVo9UZgAA4eTWpY6ycdeRx+C0nSl6rR80p7GF+xUImtTVBjh+8nO+eKCOgPXVZfIDW0ItLw6qAfAVAkvD19D8ojMpI8erCPWlQUGLkY9LRjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752506298; c=relaxed/simple;
-	bh=H2Vfa1hTNVLtaQ3ZfRlV+2JX86DONilPDV8aWr5D5/E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M4AhlEbVarVpe4ql0xU8nxcS4Es/WGiLgqy8/5bojD4xQRi8r5iF6ah9hOuzEPK//QcpG6mb2N0Z6MCRHb+0kpUSQVUSW6SvPeFP+UaGfxT2EX61ypKwgHQcT8M5QGm+f6WdXliBnwCxt3mnq/HCEwERdChSuA8TS8R6d85xyCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f4aCNCmZ; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-3138e64fc73so1164607a91.2;
-        Mon, 14 Jul 2025 08:18:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752506297; x=1753111097; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H2Vfa1hTNVLtaQ3ZfRlV+2JX86DONilPDV8aWr5D5/E=;
-        b=f4aCNCmZ1Aj0r3Y+WD0umwp2tFFDkErl/1ZAj0oEkH0KtM3BfnPvoMYSIqkIvi3o4B
-         YP4ZKV3yhgzv6tX+Y4bi3UwPKOwDCNUwKE6JCWTagnl1yUPKrbYLQ1n+6993aWfaa8pA
-         G0EEZ4a/wUzobX9E6L1VMMjprfUhn2pSzmqIKyjR6V9SJ0Wfjs4L8iOlRtSilNdXO5rq
-         5/okjGefXTQYSKdddgemyOn3TAo2cQgvZo8foc/hVB/9touB7t15NXNCjywv8NsrEl5b
-         r7H61FLqS4vRaeuPga4W3B+73MspGALC9qbWmkRnzMQTgb/8Irb8R/aJad/emnM4xNB7
-         VWXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752506297; x=1753111097;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=H2Vfa1hTNVLtaQ3ZfRlV+2JX86DONilPDV8aWr5D5/E=;
-        b=vfYo6kttb+RC4cJ5CNvz9m9EORkYifO51G8WHwLQtwy7342Sq/Q5NnT4qRy4OROKGd
-         z9J4omjQrgLD2eh/YMDmsZIYPMOeLjaOfOodz1gyEqEXgeeMCPG88B3HP8cddB4VaD6q
-         8FtP3PMmK8xSK6SY/kT8bWNlz/13xtAuXX/f8x4bE/p+AXqVJ4rqBIEm6RTbZJMIT2Ag
-         a+BaoawLdaTQQFmvKh0W8nJTRGynLCYheV0FO9gjfMcaOtplaZJP0/TGILwVl02eFSxN
-         YCaqSg32nE0cAb6t3CIRxc3J0d+V74d7zVdNJoTGLHB9TvwM7NT/M6Ncj2TNnqf8b3Gw
-         WzCA==
-X-Forwarded-Encrypted: i=1; AJvYcCUGGGAqpocemJ3S3L17372Pua6AGf/nEJamokubpptJy9O51cNHNcCpP5GySADV81CcD526jo3BiY4NaPnsBmKz@vger.kernel.org, AJvYcCULz24z4pWU4sdsFUC60n4/j8zvbyACgmsKQm6i3W6ByUjcGE7ly6OY/F9POMLMoSyncIZzjldV2H5rY2bn@vger.kernel.org, AJvYcCVMJfMp7kERUTRt3AZxUZQJqRK1x1hOUICGJx5bEN75GdktyoQurtcWb2FNx9pUb+A/JUdCF1Op9ujmW8yXXuo=@vger.kernel.org, AJvYcCXsBJ4i+rg/42BXKyy60IfyI0wQJ2j4Uzj+DVvnd+mUSz4qyMrUVXsX0XGXWRoRMMdO9B1g0xdERq4Q@vger.kernel.org, AJvYcCXvMQov6Nzat1SW5zQsPM0N1dS25Iv84LDOlnfp3W71Q3o4SlARNLD9WMeR0ZKh8HMs4AuMTG+OMbM=@vger.kernel.org, AJvYcCXw1DpBVbTLqQN6t5XpeDvltxHmguQPyodOIvMKYi55+A/yn+uLctZrM6kB5Hnkam8VOXpozaYQ@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfTiglU9oFQoTaYXaZt20lefc/Phi/HynvXd4jtXrtjFfNW0It
-	/7AfFduUwB1bgxN/7MH9TWC2eDdRhrONZPL+KSBX3jc3ik+xLK+DdQ1I1926LYCt1z+fT9qthq5
-	cifdGMn9Xl478mLZuvoEy+pf4Eqbq7ks=
-X-Gm-Gg: ASbGncs89UTvOvFt8Js00O4xOcxUSgBf/6/U7ysMRP/s6JKL2TA/wKSBGlnGokr50JV
-	h3CrukIosWiP2uKktLxp9wmPir1CY7GaymajyI1SkZVFmFAi8LbTuPHgMqdzH1NGA/ibQcQYvH1
-	IVxi5yu9L5XBQFvfEP/NiWk8HAGgn4NxlQOoq53kuSEAEsvFHmmE5JjAu4U4I5dMjTKcG+TGr52
-	P1Icyf+dliyW49+cUA=
-X-Google-Smtp-Source: AGHT+IEAaevWA3THWIOPb1Ft9IVMbazdTZ0Roc9iuvAoj1b5HTax5adhB7GCfo0cZ1I1i+dSyxYRJQcg/1n6uYcNd6A=
-X-Received: by 2002:a17:90b:558f:b0:313:f9fc:7214 with SMTP id
- 98e67ed59e1d1-31c4ca77626mr8723572a91.1.1752506296678; Mon, 14 Jul 2025
- 08:18:16 -0700 (PDT)
+	s=arc-20240116; t=1752506472; c=relaxed/simple;
+	bh=EXw+4q6ryjNblxNUNSKpxNGIL/z6m/pmY7l+XtJzUoQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=o84Hu9h4wRC0sEc94QkAZeuZTyqJEYVgnQK6Ud9NFmkV4IEDDuInfW5T53z7FKtrZHJJDcjoVotFq75dHTWV8K6wnWW8QmZKWUd2174ODi1h3ftNy+PhjRh57II0H9pfimDS/ImItPrYLS4qNQpjbp06U5UA0CveLVcQHpqnIy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EZzpjDQy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB7C2C4CEED;
+	Mon, 14 Jul 2025 15:21:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752506472;
+	bh=EXw+4q6ryjNblxNUNSKpxNGIL/z6m/pmY7l+XtJzUoQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=EZzpjDQyqbiy4i0c5Y4vl+xULGF9BFsypL/omCv+FDXSmzC3ZIOk4/Skqj9rNLd/4
+	 h52eQj2ckCuSIt1/TSNUZcynZIPeD4W7eF+1N4hoBSKTaRxheG28Z0RkZMruxLuc9Y
+	 jRwB2xeS7Np9o5XmNN6KSf1t6LAhcdArPX6XRHsQkblxrWKidWuiF5rF5fu8hi0TVu
+	 oh3lpyGNSC6rhF0RlHNKKc/ZwChB1uV7275mXUHwnvzUoBKvxtPgTvPzHkj7wDx21K
+	 FO3c+dNIr7/r9iLVRPgk0qlVpT6xRng9BlOZkFcj+MfPL6nzVIri3qTu9R3u2ehnyg
+	 f59s+herVBlfg==
+From: Will Deacon <will@kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: Will Deacon <will@kernel.org>,
+	Keir Fraser <keirf@google.com>,
+	Steven Moreland <smoreland@google.com>,
+	Frederick Mayle <fmayle@google.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	netdev@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: [PATCH v3 0/9] vsock/virtio: SKB allocation improvements
+Date: Mon, 14 Jul 2025 16:20:54 +0100
+Message-Id: <20250714152103.6949-1-will@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250709-core-cstr-fanout-1-v1-0-fd793b3e58a2@gmail.com>
- <20250709-core-cstr-fanout-1-v1-1-fd793b3e58a2@gmail.com> <DBBQE3GJ0CHT.5PEF7RLS6C33@kernel.org>
- <CAJ-ks9=ZHtzeyyFSZaVuA1t-3C8-hc40n6r8qFWxn628qT-OeA@mail.gmail.com>
-In-Reply-To: <CAJ-ks9=ZHtzeyyFSZaVuA1t-3C8-hc40n6r8qFWxn628qT-OeA@mail.gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 14 Jul 2025 17:18:04 +0200
-X-Gm-Features: Ac12FXzX4FOFR5k7wOozEqN2_nmttthJfs0me70_TpwVT6YUdkB9gcZMGomkNT4
-Message-ID: <CANiq72kyQQMutGDkHH=McRQens+V+wkHLpiSfivmnAwwgXE62w@mail.gmail.com>
-Subject: Re: [PATCH 01/10] gpu: nova-core: use `core::ffi::CStr` method names
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: Danilo Krummrich <dakr@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dave Ertman <david.m.ertman@intel.com>, 
-	Ira Weiny <ira.weiny@intel.com>, Leon Romanovsky <leon@kernel.org>, Breno Leitao <leitao@debian.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
-	Rae Moar <rmoar@google.com>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
-	Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, dri-devel@lists.freedesktop.org, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-pm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kunit-dev@googlegroups.com, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, Javier Martinez Canillas <javierm@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jul 14, 2025 at 2:35=E2=80=AFPM Tamir Duberstein <tamird@gmail.com>=
- wrote:
->
-> How should I respin this one? the subject should be drm/panic, I think.
+Hi folks,
 
-I would mimic what the previous commits did, i.e. drm/panic indeed.
+Here is version three of the patches I previously posted here:
 
-(If I happen to pick it up before a resend, I could fix it on my side)
+  v1: https://lore.kernel.org/r/20250625131543.5155-1-will@kernel.org
+  v2: https://lore.kernel.org/r/20250701164507.14883-1-will@kernel.org
+
+Changes since v2 include:
+
+  * Pass payload length as a parameter to virtio_vsock_skb_put()
+
+  * Reinstate VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE based on a 4KiB total
+    allocation size
+
+  * Split movement of bounds check into a separate patch
+
+Thanks again to Stefano for all the review feedback so far.
 
 Cheers,
-Miguel
+
+Will
+
+Cc: Keir Fraser <keirf@google.com>
+Cc: Steven Moreland <smoreland@google.com>
+Cc: Frederick Mayle <fmayle@google.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: "Eugenio Pérez" <eperezma@redhat.com>
+Cc: linux-kernel@vger.kernel.org 
+Cc: netdev@vger.kernel.org 
+Cc: virtualization@lists.linux.dev
+
+--->8
+
+Will Deacon (9):
+  vhost/vsock: Avoid allocating arbitrarily-sized SKBs
+  vsock/virtio: Validate length in packet header before skb_put()
+  vsock/virtio: Move length check to callers of
+    virtio_vsock_skb_rx_put()
+  vsock/virtio: Resize receive buffers so that each SKB fits in a 4K
+    page
+  vsock/virtio: Rename virtio_vsock_alloc_skb()
+  vsock/virtio: Move SKB allocation lower-bound check to callers
+  vhost/vsock: Allocate nonlinear SKBs for handling large receive
+    buffers
+  vsock/virtio: Rename virtio_vsock_skb_rx_put()
+  vsock/virtio: Allocate nonlinear SKBs for handling large transmit
+    buffers
+
+ drivers/vhost/vsock.c                   | 15 ++++----
+ include/linux/virtio_vsock.h            | 46 +++++++++++++++++++------
+ net/vmw_vsock/virtio_transport.c        | 20 ++++++++---
+ net/vmw_vsock/virtio_transport_common.c |  3 +-
+ 4 files changed, 60 insertions(+), 24 deletions(-)
+
+-- 
+2.50.0.727.gbf7dc18ff4-goog
+
 
