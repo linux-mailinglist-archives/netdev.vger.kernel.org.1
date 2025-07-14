@@ -1,196 +1,85 @@
-Return-Path: <netdev+bounces-206772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3CE7B04568
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 18:27:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 134D3B04570
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 18:28:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA0EF3A4C96
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 16:23:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09CC71893EE6
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 16:28:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA79025F790;
-	Mon, 14 Jul 2025 16:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D9F25F997;
+	Mon, 14 Jul 2025 16:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tElVESDD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XCSR/GoL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 290711DE3C8
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 16:23:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE971F4CB3
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 16:28:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752510234; cv=none; b=Lp8pLeXOuCY0gt7exlyRZyx7IGahMK+NsBc5GAabkwRjcd8SPSzK7HjMgYHOr/1TbK8q9b57WzKaEkjT/qHc/N7cr8KVuZj3xv5eBfMZBS1tvkXUN3MvnCXiNtYdtVU1v/GnDOzvVMe1eY2QDAiGtI4BPsl5XFuhhVrA4mQPyzM=
+	t=1752510481; cv=none; b=D/ZlcCJCaW4dilIbRL3h8h/zI5KXwgK7BY7NHwEcdmMbvm4fmPfH9iy8PGzLt+8qB9wRGxigBSgredzPb8PBHsflTytIEOJ7AqP6P5ZbomOnu9Rk0mE34cUiQDhWd0I20c6o833TnU0VQaatjkE7/ZTPMVIf1s4NPqkm+nYxZ20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752510234; c=relaxed/simple;
-	bh=99KgSQThYEi+muPi3NbKqxLa98OPPNRwJiXJuLspEuM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iMw6++vwujTm+g871wspm0Hm3wI/w+5U/9khfbq4MLcLVd4U9jYlX03BZntSunK5hMJMUssF0G7rrFmWqVp3S0Z0MbJ3N2xKL2b7u9779iy8t3I547XeVbCruocKRLTj7CB9v1wNPoRwuI3S4SPn8R6fvQhbohUM0MOoUglvWvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tElVESDD; arc=none smtp.client-ip=209.85.215.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b3be5c0eb99so1292181a12.1
-        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 09:23:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752510232; x=1753115032; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CtFi1sRNGmlQS4pE8nXz6NVOa+/bYBo/j5rKrMyjft4=;
-        b=tElVESDDQHOPd0f2S/KiirbHEMtBfXbvf1IgLZm71PWQufELd1S1Sfng+tKLzUdjEj
-         Amwata7FWJCPVOQvPz+4Umyr04M8rDonX0xB3Elpppx3K/zjkGBXasfbEkVfJ7DvE+4G
-         dviJhSuQLCwaCngSJfnHAT6Zy0VpOlHLp7jprqUQEuL/1sjH56NejSeZmDLyJ4m0fFRc
-         numvvvu6ZQXVPsuR9EmvSOMvlN5wDUsHphxss2R7uV+iUtrl63t8WpTilioYU/WXwccJ
-         CzXusCrQ8yoB/KVTfPsEBZZ7sVUV9Q2PG3on7doybjEIRcpwQtLABNaM9xsWk68tvIXl
-         YiSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752510232; x=1753115032;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CtFi1sRNGmlQS4pE8nXz6NVOa+/bYBo/j5rKrMyjft4=;
-        b=DPiOYcmsshvxlKoA1kisfH+ofMLeYxT3ZWfqWMro4vPAylh/RPg/VwU4xSVVgHiMyj
-         tEQ3BG0eW49DEC3zznYlNHd+riHQFzaIorF48EUi8h+0k2nXVMwN6rJU79CwX76EuiX6
-         pwFPJgFkCi+qZhZuRAFCkRp5ztF2va+y6PuXP9nvTbFDZOJbisvLg8fSimSP0g6Z3BVY
-         284p7nEP52GZM6LfHw1egK+eZ31P27fxYk3hbsGKv2OntdfAun9enW3D89s0K8YusPTe
-         r5/wXu5Q2Cikz8xciWlHSc6vNk/OjS+Kg95Ed7iHnhmv8Qpvq5xBvKvAs6QBJSibnIov
-         p1uQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWOUjiBnzSuSrlHXJRBH7F1zo249KUP4xgQ9AZv/gqI869Ymz8NtrML5nl3oRQvjZNXK1hxCBE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyOSHoRZB5rbIUmnDTVytBlswgV5vgDt4CtqUNpfmM3u9lI9AD
-	XEYhsRm7He9T2otJldgTRUGyjCd2jDX2E57xt8jCzkzjRlq0yogBaoYXn91FiwmXV0y9UHPDYln
-	gtkC1gi4L/W212mKZCh6s1DJSBIWSNOkMLXz600BM
-X-Gm-Gg: ASbGncsGcv+Y7KqjloqreRM5JfmdvPa97zJ6u23zcisUTgn5l4bgtOkhZz7Y5KQTxS2
-	+mdmgajdSnaLXoEpUMq7uKpC0I3vJmL+iyPmanjljfs1N7eEohWIyreVTxtLKvac8foILQ/2YSh
-	kZa7EMF6vNv+tNFugbI2zav3WyUqJ/opPFO5DBWQrKNlqMvNChKA7tt7k0Dfn8aQIWnQv1yQy8A
-	VT4jelY1NJZww1LsnQqzhuKmxmc4AneImBmag==
-X-Google-Smtp-Source: AGHT+IHqlWFWWNDjDX/Iogv1k6KaZniLPyiFXJh0sCPuaZ5V2ewUcGPV2Q8bNACpYvEK0fixjvOVjjDDM2nZ2gYCvLg=
-X-Received: by 2002:a17:90b:2e4f:b0:313:271a:af56 with SMTP id
- 98e67ed59e1d1-31c4cdad83emr20081422a91.30.1752510232008; Mon, 14 Jul 2025
- 09:23:52 -0700 (PDT)
+	s=arc-20240116; t=1752510481; c=relaxed/simple;
+	bh=Ir5O8j9mlh8qeFowTl4mNXBntZdrl4d1XMrBXY3cnNc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Rdpovj1vdQqqn2XJhTgKG2Un22nsK8eUzn8d2YdMAaeY2QIIdtyANII/P2zUIQaC0X/NWEco+HUM7M0T0yCrNvW0SIEK/GIgbfeVoLT3KlNOdW2za2Sdf+Jcw6/ze+yJxMB+ArogX+3XUIiLVaKAVLwmC7ixCnSWsAfs1y5P02s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XCSR/GoL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 814CCC4CEED;
+	Mon, 14 Jul 2025 16:28:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752510481;
+	bh=Ir5O8j9mlh8qeFowTl4mNXBntZdrl4d1XMrBXY3cnNc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XCSR/GoLW5m+9zcU/mwUEok3+CY/mvFSol2EFnUajuO3MY92aZDYzbqfgNln4h5kH
+	 W+Jixmib+gCUxnlYYUQFHFxBM0ycoyrfsBDTttur5c/oVHMB9X7BEPozsnEgDFPZHa
+	 J01ORHJ1HCNH+YYEH2dSr+vNnyI1gWvseNTShm3yWKiVk9kcCl+lo9GVhsEM5SmzAN
+	 tDoJQvVhQ6Jyay2CqDJ8VViPoBsu8CceAYpnAgjn487bW4yVZapOafc9bEA/Jmo6k/
+	 HEz3BjREWsNFxsS58ZB4G8e2M0YRFUffSKw128+2XpiUTgVPmBRmpQrrnBnjdIwnkF
+	 LiQkUMG9hY0EA==
+Date: Mon, 14 Jul 2025 09:27:59 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Gal Pressman <gal@nvidia.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ donald.hunter@gmail.com, shuah@kernel.org, kory.maincent@bootlin.com,
+ maxime.chevallier@bootlin.com, sdf@fomichev.me, ecree.xilinx@gmail.com
+Subject: Re: [PATCH net-next 09/11] ethtool: rss: support setting input-xfrm
+ via Netlink
+Message-ID: <20250714092759.3f8c77de@kernel.org>
+In-Reply-To: <f894a965-3fb3-4068-9d1e-95ff62705544@nvidia.com>
+References: <20250711015303.3688717-1-kuba@kernel.org>
+	<20250711015303.3688717-10-kuba@kernel.org>
+	<f894a965-3fb3-4068-9d1e-95ff62705544@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250711060808.2977529-1-kuniyu@google.com> <965af724-c3b4-4e47-97d6-8591ca9790db@linux.ibm.com>
-In-Reply-To: <965af724-c3b4-4e47-97d6-8591ca9790db@linux.ibm.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 14 Jul 2025 09:23:40 -0700
-X-Gm-Features: Ac12FXzhMnuOr2Yor8xWWkSSz6suRHysgvVNWOynlvLw1cpJlOlTesXvNOUzeSE
-Message-ID: <CAAVpQUAQVVwPo5fi6rCcJQhH=jqQnkNaAMrBSJju85taEiTdkQ@mail.gmail.com>
-Subject: Re: [PATCH v1 net] smc: Fix various oops due to inet_sock type confusion.
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>, Dust Li <dust.li@linux.alibaba.com>, 
-	Sidraya Jayagond <sidraya@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Mahanta Jambigi <mjambigi@linux.ibm.com>, Tony Lu <tonylu@linux.alibaba.com>, 
-	Wen Gu <guwen@linux.alibaba.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-s390@vger.kernel.org, 
-	syzbot+40bf00346c3fe40f90f2@syzkaller.appspotmail.com, 
-	syzbot+f22031fad6cbe52c70e7@syzkaller.appspotmail.com, 
-	syzbot+271fed3ed6f24600c364@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 14, 2025 at 12:42=E2=80=AFAM Alexandra Winter <wintera@linux.ib=
-m.com> wrote:
-> On 11.07.25 08:07, Kuniyuki Iwashima wrote:
-> > syzbot reported weird splats [0][1] in cipso_v4_sock_setattr() while
-> > freeing inet_sk(sk)->inet_opt.
-> >
-> > The address was freed multiple times even though it was read-only memor=
-y.
-> >
-> > cipso_v4_sock_setattr() did nothing wrong, and the root cause was type
-> > confusion.
-> >
-> > The cited commit made it possible to create smc_sock as an INET socket.
-> >
-> > The issue is that struct smc_sock does not have struct inet_sock as the
-> > first member but hijacks AF_INET and AF_INET6 sk_family, which confuses
-> > various places.
-> >
-> > In this case, inet_sock.inet_opt was actually smc_sock.clcsk_data_ready=
-(),
-> > which is an address of a function in the text segment.
-> >
-> >   $ pahole -C inet_sock vmlinux
-> >   struct inet_sock {
-> >   ...
-> >           struct ip_options_rcu *    inet_opt;             /*   784    =
- 8 */
-> >
-> >   $ pahole -C smc_sock vmlinux
-> >   struct smc_sock {
-> >   ...
-> >           void                       (*clcsk_data_ready)(struct sock *)=
-; /*   784     8 */
-> >
-> > The same issue for another field was reported before. [2][3]
-> >
-> > At that time, an ugly hack was suggested [4], but it makes both INET
-> > and SMC code error-prone and hard to change.
-> >
-> > Also, yet another variant was fixed by a hacky commit 98d4435efcbf3
-> > ("net/smc: prevent NULL pointer dereference in txopt_get").
-> >
-> > Instead of papering over the root cause by such hacks, we should not
-> > allow non-INET socket to reuse the INET infra.
-> >
-> > Let's add inet_sock as the first member of smc_sock.
-> >
-> [...]
-> >
-> >  static struct lock_class_key smc_key;
-> > diff --git a/net/smc/smc.h b/net/smc/smc.h
-> > index 78ae10d06ed2e..2c90849637398 100644
-> > --- a/net/smc/smc.h
-> > +++ b/net/smc/smc.h
-> > @@ -283,10 +283,10 @@ struct smc_connection {
-> >  };
-> >
-> >  struct smc_sock {                            /* smc sock container */
-> > -     struct sock             sk;
-> > -#if IS_ENABLED(CONFIG_IPV6)
-> > -     struct ipv6_pinfo       *pinet6;
-> > -#endif
-> > +     union {
-> > +             struct sock             sk;
-> > +             struct inet_sock        icsk_inet;
-> > +     };
-> >       struct socket           *clcsock;       /* internal tcp socket */
-> >       void                    (*clcsk_state_change)(struct sock *sk);
-> >                                               /* original stat_change f=
-ct. */
->
-> I would like to remind us of the discussions August 2024 around a patchse=
-t
-> called "net/smc: prevent NULL pointer dereference in txopt_get".
-> That discussion eventually ended up in the reduced (?)
-> commit 98d4435efcbf ("net/smc: prevent NULL pointer dereference in txopt_=
-get")
-> without a union.
->
-> I still think this union looks dangerous, but don't understand the code w=
-ell enough to
-> propose an alternative.
->
-> Maybe incorporate inet_sock in smc_sock? Like Paoplo suggested in
-> https://lore.kernel.org/lkml/20240815043714.38772-1-aha310510@gmail.com/T=
-/#maf6ee926f782736cb6accd2ba162dea0a34e02f9
->
-> He also asked for at least some explanatory comments in the union. Which =
-would help me as well.
+On Sun, 13 Jul 2025 14:11:34 +0300 Gal Pressman wrote:
+> > +	/* xfrm_input is NO_CHANGE AKA 0xff if per-context not supported */  
+> 
+> Can you please explain this comment? Shouldn't we fail in this case?
+> Nit: xfrm_input -> input_xfrm.
+> 
+> > +	if (!request->rss_context || ops->rxfh_per_ctx_key)
+> > +		xfrm_sym = !!rxfh.input_xfrm;
 
-I agree with Paolo that smc_sock should "eventually" have only
-inet_sock as the first member, but I think this should/can be done
-in net-next as follow-up.
+xfrm_sym is supposed to indicate whether input_xfrm is set to symmetric.
+Normally !!input_xfrm will tell us, but if we're dealing with a request
+for an RSS context and driver doesn't support per ctx key input_xfrm
+will be 0xff so we'd false positive xfrm_sym and most likely fail the
+SET request if the field config is not symmeric. I'll rewrite this.
 
-The thread above shows such code churn was distracting enough
-and the improper fix was introduced.
+BTW I have a check at netdev reg time to make sure all drivers which
+support xfrm_sym and contexts also support per-context xfrm_sym, but 
+it will conflict with your fix so I didn't include it, yet.
 
