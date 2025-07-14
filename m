@@ -1,136 +1,235 @@
-Return-Path: <netdev+bounces-206805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02585B04714
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 20:04:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3499BB04725
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 20:09:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C2E07A11CB
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 18:02:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 297951A6118C
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 18:09:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8812126B0A7;
-	Mon, 14 Jul 2025 18:03:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D49026C3B8;
+	Mon, 14 Jul 2025 18:09:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z9F92bNP"
+	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="NU0ssmkK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D177E26A1C7
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 18:03:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65F5126C396
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 18:09:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752516239; cv=none; b=uTl7K5jXtG9YoVQAH8cTvGrFSH04IP5Xq35KUvx5VMecn+XPsTUpKY4h+fjZ5hToO5j0w9yoT8UhGuy4CkZLTfwHsRi1nA3+sI3fVJP7s3rfi5d+u9tfAqJDPiTh8JTT2+lsH2ELNWymQcipem+/5POICV60Y2hJtwK16GCfvk0=
+	t=1752516571; cv=none; b=kYYnezbNoB4aj/4+FjNvtZbW+OdSUnciJ18VTuISCZbV9JLdapFrE+NaSzGDaEhz11VLzw6XhuguLu/b1F7egBjuSeoQfIUSrjYMw0rY3GzkYBN8Mo3sIuolBtqRF7PeDMLLJUVRikSbrrD/6j4dUTI6ioXVXsf2LRbb63B8e9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752516239; c=relaxed/simple;
-	bh=xKnjXWOY2IrRzosXfQB3Bpso/mm2u4JxGSYgZGdZjIQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Kwuf6cQ2Ab5fq16ndyW2cjRhjodhmfB1CtJAjXZzIG2lxBjMxK1jRJGsQK4ifeW/n1Idxwno+cdojUUAoAItTzHm6jB/G2ItNcRyH+S3NWFxCwrqFngYwi5nRiw2M/6j9JrY7vFUAe/JuC+3NiWKER2J6fXWVNV0EXNblRYUr/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Z9F92bNP; arc=none smtp.client-ip=209.85.160.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-2ebb468cbb4so4077289fac.2
-        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 11:03:56 -0700 (PDT)
+	s=arc-20240116; t=1752516571; c=relaxed/simple;
+	bh=bxxFogUP1oFJd3d2e7LXv1WV66TV2hKEyk3AFHWrq/0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J4Br66gwtgpV5NPBmojdDJUMf9UeqXfBsrMUbfzYkVG70qNzETkZuqHNc5yFnHBCVv5ZyFPtpYO+n4yCRurHe1Bdy0Zag+K63m60Z1hrzv/OP0yq3fkCOM9CTinDcuOBWnXV7RTkw5nX5nWdhFs4opqkLUBUS5/tBCz4tcoYwmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=NU0ssmkK; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-234eaea2e4eso5746465ad.0
+        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 11:09:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1752516236; x=1753121036; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kUc//PEDPwGX6GKHFUnDylrVbmV9/GKD9WpLyzBk2E0=;
-        b=Z9F92bNPvUvzoOh9o+Tc/v+cCBf2+qu2MWe2G+RnjWD3C5x+s5lLbCFMjjA6bZZHKa
-         W84FRIVVuaQVJ2pqMnhdhw0dQ3pF4LOsc3XrVXolQ6aJ34SCadHwhMOMfQOJAULm48QY
-         OUHlIO8OIR6r5SZqjPuKKb2awKYWSxP9R4yVFTA59l7TkKPMj0wCHwV7sgywmQT9hgpk
-         ldT9xZUimI5KStO+hW3gwxTtS7p7ud+7upXQkYXbhVwVYA2zQ+YA8BBLAcBV5QdIjhHv
-         5FpaNP+G7k6nzJWFPnAKSC1L1uSWICCdR6vRbM98oluqvyDIvrmxKU+aNO1LnzLMerx4
-         DtGg==
+        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1752516567; x=1753121367; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UCIeepe8RfVctcxWkoxn2Xqz4Sfp2ySYQyPBvgJjOjs=;
+        b=NU0ssmkKYBbFwRT/7kFXozy/eZUK9eUpLOkxPIpUpu/7JM905uhLuDL0SlR8L+ZJcd
+         lHOnAK6UG45gYFGJgdeQr8aoIyQDZ8+44wv6W9Slr9Fq/SzdKfkn1lczZ9cLv8DpIbyK
+         IlMMPC5iyDSuTD5v9ORR3P6lmq4C5JxP9Ny8Lrnvw6eUC0qJpccsaO2v7S/yvjvNIh3P
+         Hvee9UR6RbqFKBN3+kd3Nxnbd7/rah3Zr0Y3Rnaybfzlke4nDuqjOI18/IJOyNpIv9rG
+         VWl3FsxyhBGT5z0XnFspLpeXhFK0YO7OodxMJrY3SXgrQm864Ko5Wgmn/KsLz4a58G5g
+         I01A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752516236; x=1753121036;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kUc//PEDPwGX6GKHFUnDylrVbmV9/GKD9WpLyzBk2E0=;
-        b=jdsQx3eF70S5yXr9Ww2p0G+z2PdmvnIFryp6aRkHH3XXG4dQU/RKVCi/Sx7kkwyU8h
-         aGVWnUAiQK+dGJIgeWdjXWey9+HImzr/N1HMfKGEunFig6o7R81FvoyMnoRGGPgQKEwf
-         Uobf4upWtxTdjbQKD7lHE3kiBw8cxwWr6W//Jg2XzRw2CWfCZCjD/hhcXd5CuC74uHNt
-         r6Y8i60oRvsDiE8eTSkPkhQ9jQeN+fYBtT0mvm9x5/gvpa4XWXDEE9A0VF5ea6MQY14d
-         qnRSmIREjQCCauao3E+ktpnTQYLd8WPgXX1C3S2T54dt31eSohyC1irP5EzrbLFKpTA0
-         LTUw==
-X-Forwarded-Encrypted: i=1; AJvYcCVFVM6Q3nMv+U9NaOTGhkcGtpAclRNY29nLgAtQp19HElf4Loc8EMPk7V1wncnaTz2Eto5Ocuw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyaK+inZahEHqt5GpIP+6ws/fq9wGh4qR6PNLb7Y6Kiy11tosgh
-	95nAOzmBDooYUeMgtCDEVPThsh565cr/meaAqO1FcaQjkmc5x7ZjE8Bs8kmH2skaMUQ=
-X-Gm-Gg: ASbGncuHhxqDAHKfVEOdsMOIomF2QoSBdWpEJhU2c6lwwvjcKahNKfKChdLWP6RksJO
-	kib3A+yjhxcencQRHEcGLLf/VaRBv/JWbAZFGE7J9ZciJ8X6AoMuf2WETGSSw2sC/O5lcSJ2gUI
-	h05+8wxTMgganpfPsW2rzsCZH13UhvVprhzwQiPiZNmB1ED0fwJjOECm2wzS6tL+ABDA9drAVYf
-	oRuKGScdCJ+ypU74WnQQy7GmQBPWCPGL4fbNJxNwbA0mzXWQdsE1vobycdEK0m9zEPpD8ORQD34
-	T9jSvDvykEVUDXVD2lEjWN8tTncaZeA8wMiUcSfv0dU+p18FGt7PvuPBmdwzlOQdQOnKQJ20/Sh
-	yh2tyC4oMdKs/ya1fCJB1b3EyvSYj8g==
-X-Google-Smtp-Source: AGHT+IHTpGx6mV7WMwP1pIKs1b9CdmfJ9vEn7hc8jx+5sU/Mj67Y+rDomjPaMvowTYcY4XUtpdxDwA==
-X-Received: by 2002:a05:687c:2001:20b0:2ff:8822:2912 with SMTP id 586e51a60fabf-2ff88223f6cmr1071480fac.5.1752516235811;
-        Mon, 14 Jul 2025 11:03:55 -0700 (PDT)
-Received: from localhost ([2603:8080:b800:f700:6bb2:d90f:e5da:befc])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2ff8dea112bsm84240fac.43.2025.07.14.11.03.55
+        d=1e100.net; s=20230601; t=1752516567; x=1753121367;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UCIeepe8RfVctcxWkoxn2Xqz4Sfp2ySYQyPBvgJjOjs=;
+        b=J6RV4b+y3xcq5GfB/h0U/a1Ovf5t6qDDS9D5L8eS9Rs1iwS3H0m/UG30ncHHYpapEM
+         zl0gqoAPnxSyv+Y5DJs08xqZAs0oqLP+J2VpHXxw30/9oL+Zlu/f6RaDEPwpwVxIZ0cX
+         ENXiJG2FYocgSp77vLVyMLji+KD5bMIJzckqb8pZx3j3DiFfl4DuwfssYygzu4KMFH8E
+         37DpWmN/t9RH4cEAZEeLDaNwhTtSM3rAIv/r94XjjFHo2JcZacPTysPwn4Q/A5mdtjSa
+         nlQCm+6dhfatawvVR3CxTkw8zmRWjidiXzfzSNqytoIT9syNccubmq20UXe76s9wOl6T
+         45Iw==
+X-Gm-Message-State: AOJu0Yx0Kar1Mg6LrrCY7yfsf47kTaPJkMTlTIorQi3p8Iufyi1eQsXq
+	CM5KBpdyIdxaYW7J2zPeU0ggmjZ0IjeGQmLz8FfK19QypCjOIwSepH+8piL49jL3B8B077SZjzO
+	e4e91
+X-Gm-Gg: ASbGncvKxMGUx5IiP6VS1kfDScfW1r90NlWJx/IS0S78qW7yAJCA2WiNNafQZ44xeXO
+	eWGhAnAWjALI6UStpbZ4FZusR+eUaHNMeau6vzdgr/RbtGOnOAQMT6JlrbcjPU3H5GXrVtrRw7F
+	6vXbtt1TO0LPmdABI8YtGRVMRSe/QBhzru9/IvTnSau+ehvR2MHSnzTiTX2ZF2v2Qc/6MUeXprX
+	aMXR49otkW4h/EWc449PmLwdltrtwqEw/mjWVfHPffqxnUBR9zZhktHrVYU3H4DwcQz4okiWc+1
+	0F6qOCqvLr93xfGRKv6VIGiAV3yDKc9/ppWEFMbJ8BOk2lIE3hEBA6Vj7672BCpWPqvD4KV79CW
+	K5Tk0EEH9cg==
+X-Google-Smtp-Source: AGHT+IFzfrE5MqiPgJJWw1On6i9rxwd3VZ8RAZkUcfW6mxZA8sYTKwvf5KmfJzvI9R/s/mBJUFtFww==
+X-Received: by 2002:a17:902:c40a:b0:23c:8f17:5e2f with SMTP id d9443c01a7336-23dede497e0mr85368255ad.4.1752516567327;
+        Mon, 14 Jul 2025 11:09:27 -0700 (PDT)
+Received: from t14.. ([2a00:79e1:abc:133:84d3:3b84:b221:e691])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de42aeadcsm98126405ad.78.2025.07.14.11.09.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Jul 2025 11:03:55 -0700 (PDT)
-Date: Mon, 14 Jul 2025 21:03:53 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Ingo Molnar <mingo@kernel.org>,
-	Kohei Enju <enjuk@amazon.com>, Thomas Gleixner <tglx@linutronix.de>,
-	linux-hams@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net/rose: Remove unnecessary if check in
- rose_dev_first()
-Message-ID: <96fbe379-cf8e-44e9-aeaf-a8beee2eda9c@suswa.mountain>
-References: <20250704083309.321186-3-thorsten.blum@linux.dev>
+        Mon, 14 Jul 2025 11:09:27 -0700 (PDT)
+From: Jordan Rife <jordan@jrife.io>
+To: netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: Jordan Rife <jordan@jrife.io>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+	Stanislav Fomichev <stfomichev@gmail.com>
+Subject: [PATCH v6 bpf-next 00/12] bpf: tcp: Exactly-once socket iteration
+Date: Mon, 14 Jul 2025 11:09:04 -0700
+Message-ID: <20250714180919.127192-1-jordan@jrife.io>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250704083309.321186-3-thorsten.blum@linux.dev>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jul 04, 2025 at 10:33:08AM +0200, Thorsten Blum wrote:
-> dev_hold() already checks if its argument is NULL.
-> 
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-> ---
->  net/rose/rose_route.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/net/rose/rose_route.c b/net/rose/rose_route.c
-> index b72bf8a08d48..35e21a2bec9c 100644
-> --- a/net/rose/rose_route.c
-> +++ b/net/rose/rose_route.c
-> @@ -608,8 +608,7 @@ struct net_device *rose_dev_first(void)
->  			if (first == NULL || strncmp(dev->name, first->name, 3) < 0)
->  				first = dev;
->  	}
-> -	if (first)
-> -		dev_hold(first);
-> +	dev_hold(first);
+TCP socket iterators use iter->offset to track progress through a
+bucket, which is a measure of the number of matching sockets from the
+current bucket that have been seen or processed by the iterator. On
+subsequent iterations, if the current bucket has unprocessed items, we
+skip at least iter->offset matching items in the bucket before adding
+any remaining items to the next batch. However, iter->offset isn't
+always an accurate measure of "things already seen" when the underlying
+bucket changes between reads, which can lead to repeated or skipped
+sockets. Instead, this series remembers the cookies of the sockets we
+haven't seen yet in the current bucket and resumes from the first cookie
+in that list that we can find on the next iteration.
 
-I'm not a fan of these sorts of "remove the NULL check" patches in
-general.  Sure it removes a line of code, but does it really improve
-readability?  I feel like someone reading this code might think a NULL
-check was required.
+This is a continuation of the work started in [1]. This series largely
+replicates the patterns applied to UDP socket iterators, applying them
+instead to TCP socket iterators.
 
-I guess there is also an argument that this is a tiny speedup.  That
-could be a valid argument especially if we had benchmarking data to back
-it up.
+CHANGES
+=======
+v5 -> v6:
+* In patch ten ("selftests/bpf: Create established sockets in socket
+  iterator tests"), use poll() to choose a socket that has a connection
+  ready to be accept()ed. Before, connect_to_server would set the
+  O_NONBLOCK flag on all listening sockets so that accept_from_one could
+  loop through them all and find the one that connect_to_addr_str
+  connected to. However, this is subtly buggy and could potentially lead
+  to test flakes, since the 3 way handshake isn't necessarily done when
+  connect returns, so it's possible none of the accept() calls succeed.
+  Use poll() instead to guarantee that the socket we accept() from is
+  ready and eliminate the need for the O_NONBLOCK flag (Martin).
 
-Of course, if you're planning to take over this code and be the
-maintainer of it, then you get to do whatever you feel is best.  So if
-this change were part of a larger change where you were taking over then
-that's fine.
+v4 -> v5:
+* Move WARN_ON_ONCE before the `done` label in patch two ("bpf: tcp:
+  Make sure iter->batch always contains a full bucket snapshot"")
+  (Martin).
+* Remove unnecessary kfunc declaration in patch eleven ("selftests/bpf:
+  Create iter_tcp_destroy test program") (Martin).
+* Make sure to close the socket fd at the end of `destroy` in patch
+  twelve ("selftests/bpf: Add tests for bucket resume logic in
+  established sockets") (Martin).
 
-regards,
-dan carpenter
+v3 -> v4:
+* Drop braces around sk_nulls_for_each_from in patch five ("bpf: tcp:
+  Avoid socket skips and repeats during iteration") (Stanislav).
+* Add a break after the TCP_SEQ_STATE_ESTABLISHED case in patch five
+  (Stanislav).
+* Add an `if (sock_type == SOCK_STREAM)` check before assigning
+  TCP_LISTEN to skel->rodata->ss in patch eight ("selftests/bpf: Allow
+  for iteration over multiple states") to more clearly express the
+  intent that the option is only consumed for SOCK_STREAM tests
+  (Stanislav).
+* Move the `i = 0` assignment into the for loop in patch ten
+  ("selftests/bpf: Create established sockets in socket iterator
+  tests") (Stanislav).
+
+v2 -> v3:
+* Unroll the loop inside bpf_iter_tcp_batch to make the logic easier to
+  follow in patch two ("bpf: tcp: Make sure iter->batch always contains
+  a full bucket snapshot"). This gets rid of the `resizes` variable from
+  v2 and eliminates the extra conditional that checks how many batch
+  resize attempts have occurred so far (Stanislav).
+    Note: This changes the behavior slightly. Before, in the case that
+    the second call to tcp_seek_last_pos (and later bpf_iter_tcp_resume)
+    advances to a new bucket, which may happen if the current bucket is
+    emptied after releasing its lock, the `resizes` "budget" would be
+    reset, the net effect being that we would try a batch resize with
+    GFP_USER at most once per bucket. Now, we try to resize the batch
+    with GFP_USER at most once per call, so it makes it slightly more
+    likely that we hit the GFP_NOWAIT scenario. However, this edge case
+    should be rare in practice anyway, and the new behavior is more or
+    less consistent with the original retry logic, so avoid the loop and
+    prefer code clarity.
+* Move the call to bpf_iter_tcp_put_batch out of
+  bpf_iter_tcp_realloc_batch and call it directly before invoking
+  bpf_iter_tcp_realloc_batch with GFP_USER inside bpf_iter_tcp_batch.
+  /Don't/ call it before invoking bpf_iter_tcp_realloc_batch the second
+  time while we hold the lock with GFP_NOWAIT. This avoids a conditional
+  inside bpf_iter_tcp_realloc_batch from v2 that only calls
+  bpf_iter_tcp_put_batch if flags != GFP_NOWAIT and is a bit more
+  explicit (Stanislav).
+* Adjust patch five ("bpf: tcp: Avoid socket skips and repeats during
+  iteration") to fit with the new logic in patch two.
+
+v1 -> v2:
+* In patch five ("bpf: tcp: Avoid socket skips and repeats during
+  iteration"), remove unnecessary bucket bounds checks in
+  bpf_iter_tcp_resume. In either case, if st->bucket is outside the
+  current table's range then bpf_iter_tcp_resume_* calls *_get_first
+  which immediately returns NULL anyway and the logic will fall through.
+  (Martin)
+* Add a check at the top of bpf_iter_tcp_resume_listening and
+  bpf_iter_tcp_resume_established to see if we're done with the current
+  bucket and advance it immediately instead of wasting time finding the
+  first matching socket in that bucket with
+  (listening|established)_get_first. In v1, we originally discussed
+  adding logic to advance the bucket in bpf_iter_tcp_seq_next and
+  bpf_iter_tcp_seq_stop, but after trying this the logic seemed harder
+  to track. Overall, keeping everything inside bpf_iter_tcp_resume_*
+  seemed a bit clearer. (Martin)
+* Instead of using a timeout in the last patch ("selftests/bpf: Add
+  tests for bucket resume logic in established sockets") to wait for
+  sockets to leave the ehash table after calling close(), use
+  bpf_sock_destroy to deterministically destroy and remove them. This
+  introduces one more patch ("selftests/bpf: Create iter_tcp_destroy
+  test program") to create the iterator program that destroys a selected
+  socket. Drive this through a destroy() function in the last patch
+  which, just like close(), accepts a socket file descriptor. (Martin)
+* Introduce one more patch ("selftests/bpf: Allow for iteration over
+  multiple states") to fix a latent bug in iter_tcp_soreuse where the
+  sk->sk_state != TCP_LISTEN check was ignored. Add the "ss" variable to
+  allow test code to configure which socket states to allow.
+
+[1]: https://lore.kernel.org/bpf/20250502161528.264630-1-jordan@jrife.io/
+
+Jordan Rife (12):
+  bpf: tcp: Make mem flags configurable through
+    bpf_iter_tcp_realloc_batch
+  bpf: tcp: Make sure iter->batch always contains a full bucket snapshot
+  bpf: tcp: Get rid of st_bucket_done
+  bpf: tcp: Use bpf_tcp_iter_batch_item for bpf_tcp_iter_state batch
+    items
+  bpf: tcp: Avoid socket skips and repeats during iteration
+  selftests/bpf: Add tests for bucket resume logic in listening sockets
+  selftests/bpf: Allow for iteration over multiple ports
+  selftests/bpf: Allow for iteration over multiple states
+  selftests/bpf: Make ehash buckets configurable in socket iterator
+    tests
+  selftests/bpf: Create established sockets in socket iterator tests
+  selftests/bpf: Create iter_tcp_destroy test program
+  selftests/bpf: Add tests for bucket resume logic in established
+    sockets
+
+ net/ipv4/tcp_ipv4.c                           | 269 +++++++---
+ .../bpf/prog_tests/sock_iter_batch.c          | 461 +++++++++++++++++-
+ .../selftests/bpf/progs/sock_iter_batch.c     |  36 +-
+ 3 files changed, 682 insertions(+), 84 deletions(-)
+
+-- 
+2.43.0
 
 
