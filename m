@@ -1,125 +1,100 @@
-Return-Path: <netdev+bounces-206635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3662FB03D2E
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 13:20:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AA0CB03D36
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 13:20:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77D4E174638
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 11:20:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3FA61747B3
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 11:20:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47075244696;
-	Mon, 14 Jul 2025 11:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17EB1246797;
+	Mon, 14 Jul 2025 11:20:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TCo43i71"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T1sKVGCQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6046519AD48
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 11:20:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C751917C77;
+	Mon, 14 Jul 2025 11:20:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752492017; cv=none; b=IpLgApNzjMP2xFMOD5uM3/ivEEoOUktGbgp2h2ymbMbC8YTdF8rei+iTHoHOLceyO1Y9hWwHryzdQuZxXPOw/PNSF/5KYut3Dh3Lr6N6lxNOJ3uT2qpo5M6IXjcVGVTMe8BhzAabf58/lAQIhlGO8R2Vsds52ao7+M1ValSiJgo=
+	t=1752492027; cv=none; b=HNSr3IlE4WzFW0QuNWA5wNo3otfAMXyBfMWcLVHRVDEB4rm3IZFszS4KQjtJ8v3hpz0wNPEM5WG/xSTsFuj0YWAwnbfXvgAfDFmF2pxOfzVL8+Mgn877cgne2mtSXrqQIMcChoX8zrfllWLm6zGAJ2igSLCyEYb4IVr58MDF0D8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752492017; c=relaxed/simple;
-	bh=U+ABV2Z/K8FhS1tVsDtWSNLoxl2AP1Zy78uF8iTobqs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=h5e0EGXwMfjwUT53yKbM2EIz2NnlNyO7jKwftEIjzQiSq8esDmGR/g5mfmfePQW0La/iIySGnLXxzPs/R5FBbeSDl+QU6K6telUwvUTyosEhD36qqZGqppJ02c12ZYwKKQp0QielPf1vXtitG0+3bRDV/a9Z/00GYxW6sJ6t+iY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TCo43i71; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752492013;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1Y2GjFqzQOcWBUPguZ9USD97IUATEowPrFd5x574Jlc=;
-	b=TCo43i71mxbIFTPT/vwzSGnUEtXb3Hjb3IMFYn40LP3/UAwGr6K87DzTxp0oOAmFl9kFk1
-	NlwV8UxpB5h5APA2ZXySSL3XxSEfiF4IoWX1qbRRA84gXQDCY5A8KeQ+rTy6U4ejmhwrho
-	le56Hs2AM2PXctT+f8WTI+lT0ZV3AJI=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-631-C7NToHHNOAqiJr38uynuMQ-1; Mon, 14 Jul 2025 07:20:12 -0400
-X-MC-Unique: C7NToHHNOAqiJr38uynuMQ-1
-X-Mimecast-MFC-AGG-ID: C7NToHHNOAqiJr38uynuMQ_1752492011
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3a5780e8137so2792427f8f.1
-        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 04:20:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752492011; x=1753096811;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Y2GjFqzQOcWBUPguZ9USD97IUATEowPrFd5x574Jlc=;
-        b=C0DQcJjcn4sT3B6KIBgwRVTvZq/743wdC8irtdmxWanHubpOAdL3Vcsbjc7CxlmSPm
-         qrrQH9KurlA+kYYS7fxYcbbUrSdWIPFZLcaVOEr8vHripcOQ9PhqUYx2N7eR9qe+uVHW
-         i/wSQSrBCNNTAahWCjAQIzRxbiB/6xStqBuKQR3H+4zk8LWytHhL0L0Ghxnv6k2TaQdg
-         wLRQ3vEUyfj5DnS/Iv7x6A1eaHt8FnBtCefmQH/6uoN9VvNJi4gZSqoAfFbxDaGEtH/x
-         IM8klMG4xbnoqsXrXy5M6xB7MWjXu53KKutzt1uu4ky5mRDVbrJ0jEgcDvZXVBrlJI9e
-         z2tQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUUide6qB6nAEOSQfy3OhgWM+PbXYTzTiFhJieIAy70c2jidFvZeZusEE1fVn2RvhP1ADbkkdo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywh+L5PDubtKq66aEcVgxC/qy2z6Z0LEcWS8pH1GZDSAZQHOguS
-	+LtQRFYrMnEss3JKAvQyT+IwUValvrbDyi1+/fMc4iDYjdXlJP2QYJg+B+03nSwayFzJ9n9aOlb
-	Q4rMzwhRKyxKkEm6G8FgObqGk3Cq82ndG2+mFGSczxKmVSe839PJ3PV3h0A==
-X-Gm-Gg: ASbGncuL3eeSQtcQS2FgYuDvPG2tCWWviL9XGrg31FjxWGn9b79YOJ/s9RGtC7q2mN5
-	YO/q7XQpF40AcwU2Ddq8tbY2fRdsqmEfnmcwYINu0CD0D545aTPqQPcCfpMF0zKwnDYfyUR1yoL
-	QiCoVsnC0R3Rg6pOeFMNiGM8U3/tY+MmYIimzwYGwURmlIoILp0hbgSSE+Sb6TcHjUGcbVB+lx7
-	6b7gNhAx70Ot2pMAm/A55xUJoZKeHzMdym23488A4pxMTZKkBn+hht8ORxBKisREkRX9OrP5mk3
-	6dGJ8cP3MmMhp5JaSs0zeNVHkmNZE7efEebfNs624GQ=
-X-Received: by 2002:a05:6000:240e:b0:3a3:70ab:b274 with SMTP id ffacd0b85a97d-3b5e7f13a0amr13230082f8f.12.1752492010670;
-        Mon, 14 Jul 2025 04:20:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFY5XrOya3yhJllGztjovrFQKpCxb10L3EkWzmPKdKNg7g1cHqucJ9l4yQULMvIkstPwMqvTQ==
-X-Received: by 2002:a05:6000:240e:b0:3a3:70ab:b274 with SMTP id ffacd0b85a97d-3b5e7f13a0amr13230053f8f.12.1752492010098;
-        Mon, 14 Jul 2025 04:20:10 -0700 (PDT)
-Received: from [192.168.0.115] ([212.105.155.228])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8dc201asm11984844f8f.22.2025.07.14.04.20.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Jul 2025 04:20:09 -0700 (PDT)
-Message-ID: <b8f0ae48-b059-4137-9b74-f69c122f98f9@redhat.com>
-Date: Mon, 14 Jul 2025 13:20:06 +0200
+	s=arc-20240116; t=1752492027; c=relaxed/simple;
+	bh=yyO1ARgaD0chxUdPV6nq/lVx78EqnrQvO7cKx+N0Xcc=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:To:From:Subject:
+	 References:In-Reply-To; b=RWBdJ3c0apcy/pDOaM4TLE+2AwOZyZcOs5XRbAt8d8PzoQy1OZENvOnXg6XWLrlCVFRbgbC03pTs9E2XYoZr8yN1LSmtgv5LOTjitVo9SCxnVX272xFICzBos8iou1EG0QmWeb8Az97JXTVBKp56Kl377nnS5N46bOh0hi8uNfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T1sKVGCQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F374C4CEF7;
+	Mon, 14 Jul 2025 11:20:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752492026;
+	bh=yyO1ARgaD0chxUdPV6nq/lVx78EqnrQvO7cKx+N0Xcc=;
+	h=Date:Cc:To:From:Subject:References:In-Reply-To:From;
+	b=T1sKVGCQiQdvyl/cIrNjaFkfKdIghzZjDABgUQVkPoZcEydnAmLGISsDlkF2nzUe0
+	 FnfuetExCJGdIdp3EpKqzxsGcY2zumfZ2wk57u8+1F/va1VYZAvTuldCeeRkxL4PH6
+	 ZTgQ8IzqNfHDLE/8p0Ilbp8QJWdrQ7OtdNeQC8sHgkxBlGYGYYGEiDqRVyIKBRiDFK
+	 7r1kchDXiXNFLIRBm7ZOZvlk4hx6ko6J0Xv4pBheLJQQ0kpyrV2aMO879FM4SNZfjs
+	 Qen023IiMr+Rpai/MMpXQeFmy8dQnnVBckFzyKZ7vk2+tauOCAapDlMiNEWZRKkiPU
+	 W7z9Dhgu5R0YA==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 net-next 04/15] tcp: ecn functions in separated
- include file
-To: chia-yu.chang@nokia-bell-labs.com, edumazet@google.com,
- linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
- dsahern@kernel.org, kuniyu@amazon.com, bpf@vger.kernel.org,
- netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com,
- kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch,
- donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
- shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
- ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
- g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
- mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
- Jason_Livingood@comcast.com, vidhi_goel@apple.com
-References: <20250704085345.46530-1-chia-yu.chang@nokia-bell-labs.com>
- <20250704085345.46530-5-chia-yu.chang@nokia-bell-labs.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250704085345.46530-5-chia-yu.chang@nokia-bell-labs.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Date: Mon, 14 Jul 2025 13:20:14 +0200
+Message-Id: <DBBQKL12V4V0.W2CW7276D7WE@kernel.org>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>, "Viresh Kumar"
+ <viresh.kumar@linaro.org>, "Miguel Ojeda" <ojeda@kernel.org>, "Alex Gaynor"
+ <alex.gaynor@gmail.com>, "Boqun Feng" <boqun.feng@gmail.com>, "Gary Guo"
+ <gary@garyguo.net>, =?utf-8?q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, "Benno Lossin" <lossin@kernel.org>, "Andreas
+ Hindborg" <a.hindborg@kernel.org>, "Alice Ryhl" <aliceryhl@google.com>,
+ "Trevor Gross" <tmgross@umich.edu>, "Maarten Lankhorst"
+ <maarten.lankhorst@linux.intel.com>, "Maxime Ripard" <mripard@kernel.org>,
+ "Thomas Zimmermann" <tzimmermann@suse.de>, "David Airlie"
+ <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>, "FUJITA Tomonori"
+ <fujita.tomonori@gmail.com>, "Andrew Lunn" <andrew@lunn.ch>, "Heiner
+ Kallweit" <hkallweit1@gmail.com>, "Russell King" <linux@armlinux.org.uk>,
+ "David S. Miller" <davem@davemloft.net>, "Eric Dumazet"
+ <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni"
+ <pabeni@redhat.com>, "Michael Turquette" <mturquette@baylibre.com>,
+ "Stephen Boyd" <sboyd@kernel.org>, "Breno Leitao" <leitao@debian.org>,
+ "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>, "Luis Chamberlain"
+ <mcgrof@kernel.org>, "Russ Weight" <russ.weight@linux.dev>, "Dave Ertman"
+ <david.m.ertman@intel.com>, "Ira Weiny" <ira.weiny@intel.com>, "Leon
+ Romanovsky" <leon@kernel.org>, "Bjorn Helgaas" <bhelgaas@google.com>,
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, "Arnd
+ Bergmann" <arnd@arndb.de>, "Brendan Higgins" <brendan.higgins@linux.dev>,
+ "David Gow" <davidgow@google.com>, "Rae Moar" <rmoar@google.com>, "Jens
+ Axboe" <axboe@kernel.dk>, <linux-pm@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <rust-for-linux@vger.kernel.org>,
+ <nouveau@lists.freedesktop.org>, <dri-devel@lists.freedesktop.org>,
+ <netdev@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+ <linux-pci@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+ <kunit-dev@googlegroups.com>, <linux-block@vger.kernel.org>
+To: "Tamir Duberstein" <tamird@gmail.com>
+From: "Danilo Krummrich" <dakr@kernel.org>
+Subject: Re: [PATCH 00/17] rust: replace `kernel::c_str!` with C-Strings
+References: <20250710-core-cstr-cstrings-v1-0-027420ea799e@gmail.com>
+In-Reply-To: <20250710-core-cstr-cstrings-v1-0-027420ea799e@gmail.com>
 
-On 7/4/25 10:53 AM, chia-yu.chang@nokia-bell-labs.com wrote:
-> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> 
-> The following patches will modify ECN helpers and add AccECN herlpers,
-> and this patch moves the existing ones into a separated include file.
-> 
-> No functional changes.
-> 
-> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+On Thu Jul 10, 2025 at 5:31 PM CEST, Tamir Duberstein wrote:
+> This series depends on step 3[0] which depends on steps 2a[1] and 2b[2]
+> which both depend on step 1[3].
 
-Acked-by: Paolo Abeni <pabeni@redhat.com>
+For nova-core, auxiliary, device, firmware, PCI and platform,
 
+	Acked-by: Danilo Krummrich <dakr@kernel.org>
+
+(Note that there is quite some new stuff queued up in various trees that wi=
+ll
+need those changes as well.)
 
