@@ -1,111 +1,138 @@
-Return-Path: <netdev+bounces-206718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF981B042A6
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 17:08:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2F47B0431A
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 17:14:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D275B16AEA8
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 15:06:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FA883A37CF
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 15:12:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF0A9259C80;
-	Mon, 14 Jul 2025 15:06:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 946A825BF13;
+	Mon, 14 Jul 2025 15:10:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="asnmaG/H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="laKAG7sw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B82A42E630;
-	Mon, 14 Jul 2025 15:06:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0989925A2C0
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 15:10:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752505592; cv=none; b=otUY4cm5CHcfz5dq39ZldrYWOsy8K0Kcq0dhMMxmkTk8PzYCvq3fYcvkRMnuZ5H01wpQ880OFUNHeQgmO3JO4XSPEfeNSvAB3h3SQXP6IqrIiJFkzNTyp56Puu4I74DyHOTS1XmmXTugZuPyQM1iH+cM9Z1sN7L2FxeSACGHZJ8=
+	t=1752505857; cv=none; b=Eja1VFkf7ZuJ6dZaKSCip2QThbZZG6DDfZ98X9r69ofXT2OD6lCw7Nd73Ev9SPvJVo9kLFRVboY/ig+v/kTGvl8V7kvpvWuf/RPXDeMU0ZylFxPrfOpK+ADFjjKIDTXthsHC5tjqiHw1zgl1jDopKLC0zhUlo/7QDxXtXnq/I6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752505592; c=relaxed/simple;
-	bh=rZEwBG5xcYTfwrowVFDeZfsNzGHUEzr6KDrtWIj8qU4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aLvgCKAZ0ofE5L2LdPtk9lG+VtOG6jecxt7WD6p6ln5UXQ1NZ9XeLSO0t0U4oFmdCSzuwsz66t94yx9gzGyy42STwIS3zwt8ili49LXkGry2e/cuSkDl/uawmLPZFuSzHJvsauLW286qrRZqIRLu/b54cFmXhSl6P5c8kyUmGi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=asnmaG/H; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A92E4C4CEED;
-	Mon, 14 Jul 2025 15:06:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752505592;
-	bh=rZEwBG5xcYTfwrowVFDeZfsNzGHUEzr6KDrtWIj8qU4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=asnmaG/H6O1mKZurcswdFwsaHP/ZtxcpcKa1S/7hM4yz/H9VAF9G3XKmFUk5ExXXB
-	 sB3nClYrxCawRcgzLPj+0UdHKzXXZnMULYu/24R14s52W4ApkV++qeZY374VzYAkA9
-	 BlIFlWrn9ol+kogWbB2F3lWmJ+uRuF1fiLSfwgj/Gq13LtNvqnpBAumFfJnhFCntWR
-	 T675lR9RoQxUuyq/rZlxUwl6JFCA0dNxL4WSXOMypmL2rvXowGJC25uBtlaz0F29Cq
-	 7jnQZjBpgL1ohHEALsUymmQfK0mablSFKM/0eLLV1ozBk0RiJXFPiNIrF6pTeUa9AW
-	 oyfBXFs+ISAQg==
-Date: Mon, 14 Jul 2025 08:06:29 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Malladi, Meghana" <m-malladi@ti.com>
-Cc: Roger Quadros <rogerq@kernel.org>, Siddharth Vadapalli
- <s-vadapalli@ti.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Sumit Semwal
- <sumit.semwal@linaro.org>, Christian =?UTF-8?B?S8O2bmln?=
- <christian.koenig@amd.com>, <srk@ti.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>,
- <linux-media@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
- <linaro-mm-sig@lists.linaro.org>
-Subject: Re: [PATCH RFC net-next 0/5] net: ethernet: ti: am65-cpsw: add
- AF_XDP zero copy support
-Message-ID: <20250714080629.29aa7a2d@kernel.org>
-In-Reply-To: <268f6849-efc6-4663-af20-f6726bd4b78d@ti.com>
-References: <20250520-am65-cpsw-xdp-zc-v1-0-45558024f566@kernel.org>
-	<268f6849-efc6-4663-af20-f6726bd4b78d@ti.com>
+	s=arc-20240116; t=1752505857; c=relaxed/simple;
+	bh=snV1h/fsrCacfsgF5T0Qgop134NGknVucVw8EfRNh94=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p09lX6AlVA1XkeGrTF3mK/VOMjXxLrLqHPRuUkG4VEPgFi6+Zf1JD2xPoqwenxXHjdWfvPZ/hDP2flRuh68XMoOl+Hp/OuXVqy5eQYRNenf8WNcl30S6Igr8fDYI2Hc9TKdAB2zSichkiVu2mQbZcrnbzvmmzOUItN05G1amYxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=laKAG7sw; arc=none smtp.client-ip=209.85.219.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6facc3b9559so58568526d6.0
+        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 08:10:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752505855; x=1753110655; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Fv9SFZzpMCzAW/BPsWGqCjkOKDdV2QO0uyk4yHaHxpE=;
+        b=laKAG7swuGC5pD6t8RgREMq5QgyKfZsi/L+dow+pCxN2VpdpNoeAkf4Hf/a4pqFpIc
+         ViD0yYG9gI3d1fqu7NrSI9CHQWLlV+i7XGt2yin4wKmRGFs0PQdajfWQm85QQ48N7eLi
+         uHlRewCzJTv6/yNpo9pDpkBCkgNmK505bqwVQCAsm0wq2dB3XNnyYlg6l1sClup1E2cR
+         sLOn8iqZeg7Yvj/qFDT1BnYEJz0wlD6Yus0jmiI1jxmTIbMm7kXOnUuuFLp79Cnd1cst
+         myErBrQg0HNakRCIjCfyqTZwDDdTZBOcjohWKz6Fbw6XX2wQ38R6fUMm77kJtZj7FIDO
+         7cXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752505855; x=1753110655;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fv9SFZzpMCzAW/BPsWGqCjkOKDdV2QO0uyk4yHaHxpE=;
+        b=HlMEbG25ksLCMRVvnhgfCRc25rKdlKI2lmOCy1X1F66NMmboHiM6XZlee5d3Y44Yjg
+         vBBAHu3o+Pd4tu+0KEjGnDdZNcRADSsKoP2aq2Bk4dHYkfBMy91Sjn+sxcBykByMGTyO
+         hnxZJ8gLnJ+xz3QQPm3JT8Dp4tW7p5nnLhoTWbkI7m2m+5oLIfdF6qcDcqHnf3q8NszJ
+         GyUuIgwNf1OalgYN41gxapyX5RuRa1eJr7Ne96MBDsvWNzjKQzxatk6J3IHFRdOeH8LR
+         1CoGHVkRHlC4GnlsQ/YaI/q1PU5iXLYM8YhTQ6F9b4BIQtoJGNAQdb16CA4ZyP7lAbym
+         ggaw==
+X-Forwarded-Encrypted: i=1; AJvYcCXGjwCYFJKQmFSA1T9l7GBuilqEijWLoYDCOxpD/Qt+7jvYEo8JAcSytg6NExREYj6urp8v8h8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx16tfdVprkHtA/7Cn6/QsS2xjPp1MvEVJSguUv7X6xkPcT7era
+	3Qq+AIvSVmFHTapMkVtuCmNDE0YSN8D0kZKBA3Fp1mXwSLWok6Riq2p5
+X-Gm-Gg: ASbGncs4bVMaX4UM0VBK+B3xLQPq3lzAroKyB0y6wn9dPj1KV/Ta1cW0v0iKAaV9UYD
+	ttJAf+F9QSsAQvGgzexXVuJYtITaJA64tneTEOBrFEAen52Z1yUFmKi6hyml9uvtfCfmMamcRnZ
+	9utI/M4u3xMiCSiMK65Tyz2/oo8yawaDnhhRWoyXLRMT+XAZSCMsf+Rep8roOH+J6Agw6rrVvjz
+	G02WjGHOD1gijI3hWs8gMrGnbY/K4WLki16FG6aSkFZUf00jxZrDiAUICCqZ4eiaxj/gZSVN/6R
+	DfreTS1UriDVU/uiq4cwkJ1k6Pw6uO4EHzFwlyYZrolmWSARZ4ZFuH9aa8/lk3RwtsyKv/CQyqk
+	7mtCot58S+yhrB9W8sBZPeGVK8g5JRzMB1Mz9VrtHTjTSFL0q1A+8F55y4IN6mgn3L3h6gFpwCm
+	iy
+X-Google-Smtp-Source: AGHT+IEWvLNDZv2gQ4nTyTXSwwgFgCpJcIsRZFHQPUVv6xkzmCGHBgn6gHmZu1/8GeBLaHMxUs558w==
+X-Received: by 2002:a05:6214:3292:b0:702:be81:c3de with SMTP id 6a1803df08f44-704a39518aemr192285396d6.30.1752505854933;
+        Mon, 14 Jul 2025 08:10:54 -0700 (PDT)
+Received: from ?IPV6:2600:4040:95d2:7b00:8471:c736:47af:a8b7? ([2600:4040:95d2:7b00:8471:c736:47af:a8b7])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70497d75351sm47983886d6.95.2025.07.14.08.10.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Jul 2025 08:10:54 -0700 (PDT)
+Message-ID: <47f5b04b-fe78-4e61-8bdd-a50348ea14dd@gmail.com>
+Date: Mon, 14 Jul 2025 11:10:52 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 08/19] net: psp: add socket security association code
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Boris Pismenny <borisp@nvidia.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
+ <willemb@google.com>, David Ahern <dsahern@kernel.org>,
+ Neal Cardwell <ncardwell@google.com>, Patrisious Haddad
+ <phaddad@nvidia.com>, Raed Salem <raeds@nvidia.com>,
+ Jianbo Liu <jianbol@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>,
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+ Stanislav Fomichev <sdf@fomichev.me>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org
+References: <20250702171326.3265825-1-daniel.zahka@gmail.com>
+ <20250702171326.3265825-9-daniel.zahka@gmail.com>
+ <686aa894a8b6e_3ad0f32946d@willemb.c.googlers.com.notmuch>
+Content-Language: en-US
+From: Daniel Zahka <daniel.zahka@gmail.com>
+In-Reply-To: <686aa894a8b6e_3ad0f32946d@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Mon, 14 Jul 2025 14:50:05 +0530 Malladi, Meghana wrote:
-> > AF_XDP performance using 64 byte packets in Kpps.
-> > Benchmark:	XDP-SKB		XDP-Native	XDP-Native(ZeroCopy)
-> > rxdrop		317		504		824
-> > txonly		400		405		757
-> > l2fwd 		207		264		0
-> > 
-> > AF_XDP performance using 1500 byte packets in Kpps.
-> > Benchmark:	XDP-SKB		XDP-Native	XDP-Native(ZeroCopy)
-> > rxdrop		82		82		82
-> > txonly		82		82		82
-> > l2fwd 		82		82		82
-> > 
-> > [1]: https://github.com/xdp-project/bpf-examples/tree/master/AF_XDP-example
-> > 
-> > To:
-> > 
-> > Signed-off-by: Roger Quadros <rogerq@kernel.org>  
-> 
-> This series crashes Linux on am64xx-hsevm, when I tried nfs boot using 
-> AM65-CPSW-NUSS driver:
-> logs: 
-> https://gist.github.com/MeghanaMalladiTI/d655a1c8ca88113ee7f5f57d6ab0ec4c
-> 
-> Seems like you have reverted the fix for the same bug which was reported 
-> by Siddharth and fixed by Julien: 
-> https://lore.kernel.org/all/7f7fb71a-6d15-46f1-b63c-b569a2e230b7@baylibre.com/
-> 
-> reverted lines:
-> 		if (!common->ports[port].ndev)
-> 		/* FIXME should we BUG here? */
-> 			continue;
-> 
-> Can you please take a look at it.
 
-Just to be clear -- you're reporting this problem to Roger so that its
-fixed before the series is reposted? I don't see this in the tree, I
-wanted to make sure it's not something I need to track as a regression.
+
+On 7/6/25 12:47 PM, Willem de Bruijn wrote:
+>> +    -
+>> +      name: rx-assoc
+>> +      doc: Allocate a new Rx key + SPI pair, associate it with a socket.
+>> +      attribute-set: assoc
+>> +      do:
+>> +        request:
+>> +          attributes:
+>> +            - dev-id
+>> +            - version
+>> +            - sock-fd
+>> +        reply:
+>> +          attributes:
+>> +            - dev-id
+>> +            - version
+> Why return the same values as passed in the request?
+
+version provides no information to the caller here because it is echoed 
+back from the request. I will eliminate it in the next version. dev-id 
+is optional in the request and looked up based on sk_dst_get() if not 
+provided, so it does provide information to the caller. This socket to 
+device mapping will probably be needed to respond to key rotation 
+notifications, so I think keeping it around makes sense.
 
