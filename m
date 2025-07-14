@@ -1,43 +1,86 @@
-Return-Path: <netdev+bounces-206708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82C4EB04259
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 16:59:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 162E4B04272
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 17:02:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2659918890BB
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 14:59:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C2F1188B088
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 15:02:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 760E3258CF2;
-	Mon, 14 Jul 2025 14:59:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 483FB25B695;
+	Mon, 14 Jul 2025 15:00:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cHlm/59X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49EBB259C9F;
-	Mon, 14 Jul 2025 14:59:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FA8025A2B2
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 15:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752505165; cv=none; b=j8UJyLBAt8pvSZdaXV5BWSZ8GuC7V/ninnTD9vpSYf2N6/s783hBW9l46IF2hQ/L//aRBDGfLt+yHm3jzmag1drMfcLzhP+QIfMC7ttZSoHJg6hIh8DAsgEjsnODTW/CwSFITyScX+12Xi+AFetUlP9iIMJS+FUHyEw3cYXjbi0=
+	t=1752505237; cv=none; b=iZwixSGmJyYouoBvIgA+krMa3jGo9xZlOsqZswVasa4g0oNQyNP8jA5p59cq6DcPdXzrKtIITl8DIEUhU4F0vw/aoNpfAfw+H//RzA1rFYgrR0OIz9JIaIuwg4BBlCUPs7UjhzTgmJx7/I5iqa+tNT1HkrmBpH2U93f7nnEzeYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752505165; c=relaxed/simple;
-	bh=LoJlg3EAlbipWWqeMfoaXHl8EBht7nYYHONIWaDbPlg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fHKtXImslIIn6yTRB/b3oUkiAeYcsQq9wFGpaKnl8Eg5z0hyMmoIQJOXgTf/qfNsuQiXF3V0jKb1p8YPAmgNt84xcB33ipdnHRtcCvYbVJlIMgu8SCI6u+JbrEyd9wwVIwBHdByeG+2oUa2MGJHTlkUUnX77TQb5QIH3G0bY3fE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id C11E161E64847;
-	Mon, 14 Jul 2025 16:58:58 +0200 (CEST)
-Message-ID: <21eded54-3460-4000-baba-815522012e02@molgen.mpg.de>
-Date: Mon, 14 Jul 2025 16:58:58 +0200
+	s=arc-20240116; t=1752505237; c=relaxed/simple;
+	bh=IHKSZdBg3WcFhFDOVCLrgHqXdaBXMkfRz+CGmXp1u3w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=VT9utcRnPWkJVyhdwrBrQEzg5Weu0hgHIquHi/QGiPFs13SmMdVRJ2JN21eIu5/m+tT0y0bNHkTu9wXFSjnwDlerUo5/gv2sYYQx2NZzwtaaH/+Bxi4j+CpjJTvccqWRRof50KzP0Kr6pgPvVeBWfVAUMyIgA1RpQ4yDvMfFG+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cHlm/59X; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752505234;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aFwyX6lIQ0fjoLyREcaVc/pevM031iihhbAQ/uu7vB8=;
+	b=cHlm/59XL6xIPLOGB9cvD+Ggupaog3r1L3iWBVLpiLXsOy4fl5VARqwHbd23tUOAs1qJeo
+	8CLDht86gwKF/bQDCs8diJbsL9YbqhKVrDkWzKUL/KGxXZUFDh9gdFHiAcbYDdyE1VNPHW
+	PvAapgmlfLLsG7uC9b52QioxhKUTyXM=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-499-YVEg5eUuPseeHe2isjPP7Q-1; Mon, 14 Jul 2025 11:00:30 -0400
+X-MC-Unique: YVEg5eUuPseeHe2isjPP7Q-1
+X-Mimecast-MFC-AGG-ID: YVEg5eUuPseeHe2isjPP7Q_1752505229
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-455f79a2a16so22082065e9.2
+        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 08:00:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752505229; x=1753110029;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aFwyX6lIQ0fjoLyREcaVc/pevM031iihhbAQ/uu7vB8=;
+        b=wDsOcPzpIYccfYvVIKdsemQHIEd6mta3imWwya0c8dz6OQIVNjtaFwct1aXIPkPf60
+         ss9Rr0RywGP1uzRTfRZDmLnGM4zGyIZp+waeWeehjiELuk5kL+leMIVQj5TK/BYWUAxm
+         /JbiuJXUNcJ7YtjFtF9knRxDpXI/2JsGohZS/Qx/fZ0ssfaK6xzvDTpX+2PQapt91gKy
+         vTONk+taIkaRgYsrHjOtqgwVfQSvR/+QdoumWIckNK2mdkeeZq+F8Q2XJsptdCLCeBf4
+         oRyMHVt32iQr256TfoMHoLv+aOQJd8L7shuCb2FiDJMyFdAeZH00zNWUz7VdRT0Zl8eX
+         vfmg==
+X-Forwarded-Encrypted: i=1; AJvYcCXu7Kq7bDIF/BCaZMiXeiJVvqUCZajfYF7wnfYOsM8L4pjARhKnv9cF1aebb+pP4y9m9fzpdJc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqCgt9mno+cyznVk7+CKLA25kNBMtXclTqTK9DV9vo3IAjcKBC
+	NQ6ELF4lpf7s0lKTo7cIyYMxVks7LysfJETHN9EsX39jLxszUCvAo9VTFZ9kcdG16iwEKa8pl2X
+	lkggEz4D7+MFNUbgRX+vuxiuGY3V1QNXh9ZpPd0fv7EJfAQikxOi6PksMYg==
+X-Gm-Gg: ASbGncudYeGJIxtmGQ4B5VbMH9xlawUec6KJ6btmVdjvMh05Zz6NCiwYDsebbw2FUNq
+	JI+dZ1E36R4ZJ8jRDlKV/JdlhLSQMf1qAlBCPs1x7JFmBV9qC3Y9SatxvlWbsd3P93iPoemXfTB
+	Pd4j4mNVDqjTYgkCURwAMjNsu2V4izVbKQcyiB9Ig5Ls7dgN1kAcUmH3BcQ0Qkq2f6IGNAkCGUf
+	idmKM5DhG9WUbq0v4ewmNKuZWw2AuFAft4knaRnemQrNExGVzeD917kFrzsif6tJ2ct9mzLOBDl
+	8UT9dLAkI8dHI5wu61xeK+kcpmcWiEfII7aNm4/loJo=
+X-Received: by 2002:a05:600c:37cf:b0:456:fd4:5322 with SMTP id 5b1f17b1804b1-4560fd45573mr66168795e9.11.1752505229187;
+        Mon, 14 Jul 2025 08:00:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF/DiiAZoBKMtGEbuxHY6nd18x8tIp6jAQkUUQbuvelaXC253z18SXm8PELPhx5Rs/OhWM7Ng==
+X-Received: by 2002:a05:600c:37cf:b0:456:fd4:5322 with SMTP id 5b1f17b1804b1-4560fd45573mr66168005e9.11.1752505228616;
+        Mon, 14 Jul 2025 08:00:28 -0700 (PDT)
+Received: from [192.168.0.115] ([212.105.155.228])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4560ddf5e0esm69819555e9.18.2025.07.14.08.00.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Jul 2025 08:00:28 -0700 (PDT)
+Message-ID: <0e71834c-881e-4a13-a2c0-3443e2ab7605@redhat.com>
+Date: Mon, 14 Jul 2025 17:00:25 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -45,249 +88,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: ISO: add socket option to report packet seqnum
- via CMSG
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
- johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <474a5321753aba17ec2819ba59adfd157ecfb343.1752501596.git.pav@iki.fi>
- <bbdbe42b-614c-4f66-8712-f0ab8d54b490@molgen.mpg.de>
- <e647579c99fcbfeb0c89f041ea5ea61e608be099.camel@iki.fi>
+Subject: Re: [PATCH v12 net-next 13/15] tcp: accecn: AccECN option failure
+ handling
+To: chia-yu.chang@nokia-bell-labs.com, edumazet@google.com,
+ linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
+ dsahern@kernel.org, kuniyu@amazon.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com,
+ kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch,
+ donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
+ ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
+ g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
+ mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
+ Jason_Livingood@comcast.com, vidhi_goel@apple.com
+References: <20250704085345.46530-1-chia-yu.chang@nokia-bell-labs.com>
+ <20250704085345.46530-14-chia-yu.chang@nokia-bell-labs.com>
 Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <e647579c99fcbfeb0c89f041ea5ea61e608be099.camel@iki.fi>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250704085345.46530-14-chia-yu.chang@nokia-bell-labs.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Dear Pauli,
+On 7/4/25 10:53 AM, chia-yu.chang@nokia-bell-labs.com wrote:
+> @@ -443,9 +456,34 @@ static inline void tcp_accecn_set_ace(struct tcp_sock *tp, struct sk_buff *skb,
+>  	}
+>  }
+>  
+> +static inline u8 tcp_accecn_option_init(const struct sk_buff *skb,
+> +					u8 opt_offset)
+> +{
+> +	u8 *ptr = skb_transport_header(skb) + opt_offset;
+> +	unsigned int optlen = ptr[1] - 2;
+> +
+> +	WARN_ON_ONCE(ptr[0] != TCPOPT_ACCECN0 && ptr[0] != TCPOPT_ACCECN1);
 
+You should probably error out from this function when WARN_ON_ONCE() is
+true. I've no idea about the possibly meaningful error value to be returned.
 
-Thank you for your prompt reply.
+/P
 
-
-Am 14.07.25 um 16:53 schrieb Pauli Virtanen:
-
-> ma, 2025-07-14 kello 16:15 +0200, Paul Menzel kirjoitti:
-
->> Am 14.07.25 um 16:02 schrieb Pauli Virtanen:
->>> User applications need a way to track which ISO interval a given SDU
->>> belongs to, to properly detect packet loss. All controllers do not set
->>> timestamps, and it's not guaranteed user application receives all packet
->>> reports (small socket buffer, or controller doesn't send all reports
->>> like Intel AX210 is doing).
->>>
->>> Add socket option BT_PKT_SEQNUM that enables reporting of received
->>> packet ISO sequence number in BT_SCM_PKT_SEQNUM CMSG.
->>
->> Are there user applications already supporting this, so it can be tested?
-> 
-> I sent the associated tests to linux-bluetooth list
-> 
-> https://lore.kernel.org/linux-bluetooth/c9a75585e3640d8a1efca0bf96158eec1ca25fdc.1752501450.git.pav@iki.fi/
-
-Awesome. Can this be referenced in the commit message?
-
->>> Signed-off-by: Pauli Virtanen <pav@iki.fi>
->>> ---
->>>
->>> Notes:
->>>       Intel AX210 is not sending all reports:
->>>       
->>>       $ btmon -r dump.btsnoop -I -C90|grep -A1 'ISO Data RX: Handle 2304'
->>>       ...
->>>       > ISO Data RX: Handle 2304 flags 0x02 dlen 64                      #1713 [hci0] 22.567744
->>>               dd 01 3c 00 6d 08 e9 14 1e 3b 85 7b 35 c2 25 0b  ..<.m....;.{5.%.
->>>       --
->>>       > ISO Data RX: Handle 2304 flags 0x02 dlen 64                      #1718 [hci0] 22.573745
->>>               de 01 3c 00 41 65 22 4f 99 9b 0b b6 ff cb 06 00  ..<.Ae"O........
->>>       --
->>>       > ISO Data RX: Handle 2304 flags 0x02 dlen 64                      #1727 [hci0] 22.587933
->>>               e0 01 3c 00 8b 6e 33 44 65 51 ee d7 e0 ee 49 d8  ..<..n3DeQ....I.
->>>       --
->>>       > ISO Data RX: Handle 2304 flags 0x02 dlen 64                      #1732 [hci0] 22.596742
->>>               e1 01 3c 00 a7 48 54 a7 c1 9f dc 37 66 fe 04 ab  ..<..HT....7f...
->>>       ...
->>>       
->>>       Here, report for packet with sequence number 0x01df is missing.
->>
->> Sorry, but where are the sequence number in the trace?
-> 
-> It's the first two bytes, see Core specification Vol 4E Sec 5.4.5 "HCI
-> ISO Data packets".
-
-Now I see it. Thank you!
-
->>>       
->>>       This may be spec violation by the controller, see Core v6.1 pp. 3702
->>>       
->>>           All SDUs shall be sent to the upper layer including the indication
->>>           of validity of data. A report shall be sent to the upper layer if
->>>           the SDU is completely missing.
->>>       
->>>       Regardless, it will be easier for user applications to see the HW
->>>       sequence numbers directly, so they don't have to count packets and it's
->>>       in any case more reliable if packets get dropped due to socket buffer
->>>       size.
->>
->> I wouldn’t mind to have the note in the commit message.
-> 
-> I'm not sure it's a spec violation --- the text in the specification is
-> not fully clear what "All SDUs" means in the context here --- so I
-> don't really want to say so in the commit message.
-> 
-> The limited socket buffer and that AX210 drops some reports is mentioned
-> in the commit message.
-
-True.
-
->>>    include/net/bluetooth/bluetooth.h |  9 ++++++++-
->>>    net/bluetooth/af_bluetooth.c      |  7 +++++++
->>>    net/bluetooth/iso.c               | 21 ++++++++++++++++++---
->>>    3 files changed, 33 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
->>> index 114299bd8b98..0e31779a3341 100644
->>> --- a/include/net/bluetooth/bluetooth.h
->>> +++ b/include/net/bluetooth/bluetooth.h
->>> @@ -244,6 +244,10 @@ struct bt_codecs {
->>>    
->>>    #define BT_ISO_BASE		20
->>>    
->>> +#define BT_PKT_SEQNUM		21
->>> +
->>> +#define BT_SCM_PKT_SEQNUM	0x05
->>> +
->>>    __printf(1, 2)
->>>    void bt_info(const char *fmt, ...);
->>>    __printf(1, 2)
->>> @@ -391,7 +395,8 @@ struct bt_sock {
->>>    enum {
->>>    	BT_SK_DEFER_SETUP,
->>>    	BT_SK_SUSPEND,
->>> -	BT_SK_PKT_STATUS
->>> +	BT_SK_PKT_STATUS,
->>> +	BT_SK_PKT_SEQNUM,
->>>    };
->>>    
->>>    struct bt_sock_list {
->>> @@ -475,6 +480,7 @@ struct bt_skb_cb {
->>>    	u8 pkt_type;
->>>    	u8 force_active;
->>>    	u16 expect;
->>> +	u16 pkt_seqnum;
->>
->> Excuse my ignorance, just want to make sure, the type is big enough.
-> 
-> The hardware sequence number is also 16 bits.
-
-Understood.
-
->>>    	u8 incoming:1;
->>>    	u8 pkt_status:2;
->>>    	union {
->>> @@ -488,6 +494,7 @@ struct bt_skb_cb {
->>>    
->>>    #define hci_skb_pkt_type(skb) bt_cb((skb))->pkt_type
->>>    #define hci_skb_pkt_status(skb) bt_cb((skb))->pkt_status
->>> +#define hci_skb_pkt_seqnum(skb) bt_cb((skb))->pkt_seqnum
->>>    #define hci_skb_expect(skb) bt_cb((skb))->expect
->>>    #define hci_skb_opcode(skb) bt_cb((skb))->hci.opcode
->>>    #define hci_skb_event(skb) bt_cb((skb))->hci.req_event
->>> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
->>> index 6ad2f72f53f4..44b7acb20a67 100644
->>> --- a/net/bluetooth/af_bluetooth.c
->>> +++ b/net/bluetooth/af_bluetooth.c
->>> @@ -364,6 +364,13 @@ int bt_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->>>    			put_cmsg(msg, SOL_BLUETOOTH, BT_SCM_PKT_STATUS,
->>>    				 sizeof(pkt_status), &pkt_status);
->>>    		}
->>> +
->>> +		if (test_bit(BT_SK_PKT_SEQNUM, &bt_sk(sk)->flags)) {
->>> +			u16 pkt_seqnum = hci_skb_pkt_seqnum(skb);
->>> +
->>> +			put_cmsg(msg, SOL_BLUETOOTH, BT_SCM_PKT_SEQNUM,
->>> +				 sizeof(pkt_seqnum), &pkt_seqnum);
->>> +		}
->>>    	}
->>>    
->>>    	skb_free_datagram(sk, skb);
->>> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
->>> index fc22782cbeeb..469450bb6b6c 100644
->>> --- a/net/bluetooth/iso.c
->>> +++ b/net/bluetooth/iso.c
->>> @@ -1687,6 +1687,17 @@ static int iso_sock_setsockopt(struct socket *sock, int level, int optname,
->>>    			clear_bit(BT_SK_PKT_STATUS, &bt_sk(sk)->flags);
->>>    		break;
->>>    
->>> +	case BT_PKT_SEQNUM:
->>> +		err = copy_safe_from_sockptr(&opt, sizeof(opt), optval, optlen);
->>> +		if (err)
->>> +			break;
->>> +
->>> +		if (opt)
->>> +			set_bit(BT_SK_PKT_SEQNUM, &bt_sk(sk)->flags);
->>> +		else
->>> +			clear_bit(BT_SK_PKT_SEQNUM, &bt_sk(sk)->flags);
->>> +		break;
->>> +
->>>    	case BT_ISO_QOS:
->>>    		if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND &&
->>>    		    sk->sk_state != BT_CONNECT2 &&
->>> @@ -2278,7 +2289,7 @@ static void iso_disconn_cfm(struct hci_conn *hcon, __u8 reason)
->>>    void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
->>>    {
->>>    	struct iso_conn *conn = hcon->iso_data;
->>> -	__u16 pb, ts, len;
->>> +	__u16 pb, ts, len, sn;
->>
->> Use `seqnum` for consistency with the parts above.
->>
->>>    
->>>    	if (!conn)
->>>    		goto drop;
->>> @@ -2308,6 +2319,7 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
->>>    				goto drop;
->>>    			}
->>>    
->>> +			sn = hdr->sn;
->>>    			len = __le16_to_cpu(hdr->slen);
->>>    		} else {
->>>    			struct hci_iso_data_hdr *hdr;
->>> @@ -2318,18 +2330,20 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
->>>    				goto drop;
->>>    			}
->>>    
->>> +			sn = hdr->sn;
->>>    			len = __le16_to_cpu(hdr->slen);
->>>    		}
->>>    
->>>    		flags  = hci_iso_data_flags(len);
->>>    		len    = hci_iso_data_len(len);
->>>    
->>> -		BT_DBG("Start: total len %d, frag len %d flags 0x%4.4x", len,
->>> -		       skb->len, flags);
->>> +		BT_DBG("Start: total len %d, frag len %d flags 0x%4.4x sn %d",
->>> +		       len, skb->len, flags, sn);
->>>    
->>>    		if (len == skb->len) {
->>>    			/* Complete frame received */
->>>    			hci_skb_pkt_status(skb) = flags & 0x03;
->>> +			hci_skb_pkt_seqnum(skb) = sn;
->>>    			iso_recv_frame(conn, skb);
->>>    			return;
->>>    		}
->>> @@ -2352,6 +2366,7 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
->>>    			goto drop;
->>>    
->>>    		hci_skb_pkt_status(conn->rx_skb) = flags & 0x03;
->>> +		hci_skb_pkt_seqnum(conn->rx_skb) = sn;
->>>    		skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
->>>    					  skb->len);
->>>    		conn->rx_len = len - skb->len;
-
-Kind regards,
-
-Paul
 
