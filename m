@@ -1,120 +1,102 @@
-Return-Path: <netdev+bounces-206790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC29BB045B5
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 18:43:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E1EDB045B7
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 18:43:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E311C7B05E5
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 16:41:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03C317B07A8
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 16:42:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB5E5266591;
-	Mon, 14 Jul 2025 16:42:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EB752620D5;
+	Mon, 14 Jul 2025 16:42:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pWe8IheH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RqnAw7ON"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D5A9266571;
-	Mon, 14 Jul 2025 16:42:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEF95260588
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 16:42:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752511328; cv=none; b=gaZnl1aHKzXWQTtK0CKEgBLM5NF3RMFxW+RdUd/hPEJ0x6/KA5qC+uqAbzyF2K0e57725sCQGn+lysANZeBR84LMl47pKXIXCwOVf9LEi+Otu33DCVH5CIkPC/H25IbNmw1Pz1FEKs8C9yG9DpvHYU10H8lCdohp0iB0TpHGROg=
+	t=1752511345; cv=none; b=gQN3YR4vm3YU5xvzA12hhJ4xiKrXiFliSWBUNGsFJzinb9j0LH1Pi3vXxqsWc5ybOF2yjK84mNMI9cbNq6aSdHz5hIW2i/96dXx39CIzchV0OXkRzgmAm4fRGfI0PIvnkE933CSoJHm3/oZKCNJwb+73t0zMOyRKaEUIUUttCvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752511328; c=relaxed/simple;
-	bh=1N7+GeRvg3UlhrQNvi0MzXHzXlGklkvNQD2n2ZPlph0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Ik0bUBHDNR4KJR4vVLYmL7wNO71K2czqRjbqhHCQ0D7WG0aaro/w8YToQQzCl7wMWXLuXL7R9+Bo8dlz7ZkMGppVN6Hs8Ej+fNKwGvEKxXZufxb4DjlGC8ErGJqZBZoHWNge4BTas4/5bbgf28QHNY5LGjZGfBmEeEJnAFXHuIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pWe8IheH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21763C4CEED;
-	Mon, 14 Jul 2025 16:42:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752511328;
-	bh=1N7+GeRvg3UlhrQNvi0MzXHzXlGklkvNQD2n2ZPlph0=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=pWe8IheHYI0DOKkc6IvgLlhe0xFiK3bUyYa+43WIUQ89a/NR0SQkrtc3VOjv6IWAD
-	 ibCIUX30Odfewdkm9HJJiXll0L+DqSFmyvFGt03L0qa1HOZVxoMy2keQD7BS0NNUeO
-	 6uqo5bXsoW9pmt91VhogxjiCfbmfxmiOTFzPLLDLCvAqFM6Zm5jOYpGM60yEeT8eM/
-	 fqoUcZb+zvShhRMO6clllWcD3/ycL1+1LQkendAecvDj1CAV9kbe1LqoTsfH9lSP+d
-	 HobSkNHGjYtiRUPC8bDptauPUCm2tG+RwIj87azWMn/GopRA2wZ4FwzzEdN3jZ9QH2
-	 XQrHcTQfEj4MA==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Mon, 14 Jul 2025 18:41:46 +0200
-Subject: [PATCH net 3/3] mptcp: reset fallback status gracefully at
- disconnect() time
+	s=arc-20240116; t=1752511345; c=relaxed/simple;
+	bh=CBiOWgTbH6mBxN5Ueovjxh8H9DeHQsuCNdyto7bQGqs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ge81kIIq+IsfkuGrLMrX/BalwYu1gfKAoSJoNISJPaFftvMIo2lAvWGPKvs43qPh0fm9U6TpKWX4PUdNI7HYKA7L8V+fErPKtX87Ok2UNc7bPSoBx2DSMjv2MoU+2uyLTp9hAykS7pmbDTFC4YTylK3hzseEJHoDLL9RyssPMRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RqnAw7ON; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-b26f5f47ba1so3596600a12.1
+        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 09:42:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752511343; x=1753116143; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CBiOWgTbH6mBxN5Ueovjxh8H9DeHQsuCNdyto7bQGqs=;
+        b=RqnAw7ON8BvQm9W4FOcyb2dvCXYsYTpGkdtsE9tcr+95kQtefvTCjuw7Z43mfmZDtU
+         2xK98hj1Xtby1Y8FkR/8mPse/D5JTzYKxBb+/rA+ZPB1HAs4rJdyU30LrM3QwAM4oqWV
+         x5GjLG2ZaiGk4eTiDpA6PbbOSfsdnN+RXgWD7jRiGATC5OjvOa/mYp9CPItQskh278cz
+         OmVgaAuWEEHfcJ26Oun0fsZoSCUCE8YEnj6foj8E+U9VMaqZgAvu7B4p3C0Vv3D+WAZK
+         QsK7USkPzba1cXzqB/yKzhOJrab6hSJzevpCOQmWGCwOgQmrwku8PBChH6rdTbXCAh+i
+         vC9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752511343; x=1753116143;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CBiOWgTbH6mBxN5Ueovjxh8H9DeHQsuCNdyto7bQGqs=;
+        b=Ya0BW0YdRaGWdZZo/GCEtSTo6cTvc5uS/zwa1UcSo6ZuFjhCL0G7zX9izdTmLmliDc
+         1L/Y/oGwOrMcvPdiRS4aqt8FiSQB/3mYGmJKR5tIg7rv1HoW9O0gR5Z+KDmQ/twoEQ1i
+         Zm8/aLX/6XMzFcJ7Oyt3eVZAj4iZRinxtqJbRGQHfrtcXVimxycSAL8vCay9uwqJEjVz
+         l+JjswvqfT6P6kr5gevzKFtx8t+KjsCn2N2g7JZkW/blcV/1iLADOFQBsszdodMH0OpJ
+         aggBi6m/VYSAS4kCNR6Oac0mq3RQHHqlXrFfha34GwjD9f4qFxL32CuCsnE+WHgYtoP/
+         PaNA==
+X-Forwarded-Encrypted: i=1; AJvYcCWcBXH82zW3lf3y656rnTQvwsmFVY6h1x0fDOrPpeF7kzbPxrO0Tu3ZXp89rEawjMy2cC228b8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHIuMEAc8jeK2su2B9KPlIk1wrRLkcsKwBIAr8E4BkE5GcNanZ
+	1Gc+R4niSPtfAt/A1O2szje1TU1ljdOhN5OLPF7+WgL3ddb3xkLlqoka4yBoJovNPXVbNx7JU3B
+	4pL5o4HuOUPPysexiSY33f/tTThHHfB8gXHCtZBNQ
+X-Gm-Gg: ASbGncs62ZOwIu9nRi2p8cINx8nVi/G09UfFLh4lW/EedVCQ2mk5DcVxWgx6LvzTmdi
+	xjHzElAK4oCsC4jVpgot9NMiIiy2VRytQjOIIB/YshP830fPcvsduPAUnYAKKwsyqkewhb/VltJ
+	364Xg487z8ObE7ORAVx7TVNcvJu+YX8biBleMBPXr0jXmwNdss4PqfOoKwPQWT4nYSKb5qqxOmt
+	DbHq+rRShe4VRb3CkqLN60rzsuxP85BxyR1iA==
+X-Google-Smtp-Source: AGHT+IHetMliiiiDydhmaCxsBQrgccYD+etGrXdLocRuZAremfRO01jz/DZULhdQUdpZs9OByqjF6ydOGiy58cu/VYs=
+X-Received: by 2002:a17:90b:3b90:b0:311:b0ec:1360 with SMTP id
+ 98e67ed59e1d1-31c4ccf4bc1mr19820630a91.29.1752511342873; Mon, 14 Jul 2025
+ 09:42:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250714-net-mptcp-fallback-races-v1-3-391aff963322@kernel.org>
-References: <20250714-net-mptcp-fallback-races-v1-0-391aff963322@kernel.org>
-In-Reply-To: <20250714-net-mptcp-fallback-races-v1-0-391aff963322@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, stable@vger.kernel.org
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1498; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=gfDHvhkpq8awEepc0HtZrNS8nkt/GbmvMC5YwhaAY2I=;
- b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDJKjUNNt1vzCmyOOG/gm3qv/POWFp+o3uyDydIKLRxC7
- TZlk1w6SlkYxLgYZMUUWaTbIvNnPq/iLfHys4CZw8oEMoSBi1MAJjJ1L8P/RNtv0/58nJMsWvSO
- S8noSHyQ4gy1ilLdiJVfXV8fbrbkYGTYL1rs1a3lVaGnV6kpfcU+xsalbflMS0/HnJlapuF9tTw A
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+References: <20250714081949.3109947-1-yuehaibing@huawei.com>
+In-Reply-To: <20250714081949.3109947-1-yuehaibing@huawei.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Mon, 14 Jul 2025 09:42:11 -0700
+X-Gm-Features: Ac12FXy6QarP7_7bnDBMPeBZuzZfs7pD0MO4S9tO1DtMXZCd9Z_2kaicajsPMoc
+Message-ID: <CAAVpQUAPbj6=HoGtpJhO4SEnzBXis38DWpFOtz55iHpuYV4Tgw@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next] ipv6: mcast: Avoid a duplicate pointer check
+ in mld_del_delrec()
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Markus.Elfring@web.de
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Paolo Abeni <pabeni@redhat.com>
+On Mon, Jul 14, 2025 at 1:00=E2=80=AFAM Yue Haibing <yuehaibing@huawei.com>=
+ wrote:
+>
+> Avoid duplicate non-null pointer check for pmc in mld_del_delrec().
+> No functional changes.
+>
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 
-mptcp_disconnect() clears the fallback bit unconditionally, without
-touching the associated flags.
-
-The bit clear is safe, as no fallback operation can race with that --
-all subflow are already in TCP_CLOSE status thanks to the previous
-FASTCLOSE -- but we need to consistently reset all the fallback related
-status.
-
-Also acquire the relevant lock, to avoid fouling static analyzers.
-
-Fixes: b29fcfb54cd7 ("mptcp: full disconnect implementation")
-Cc: stable@vger.kernel.org
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- net/mptcp/protocol.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index bf92cee9b5cee39e2b0831b6f7e06ce013fb6913..6a817a13b1549c3397e8fa2e315448ce2770e195 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -3142,7 +3142,16 @@ static int mptcp_disconnect(struct sock *sk, int flags)
- 	 * subflow
- 	 */
- 	mptcp_destroy_common(msk, MPTCP_CF_FASTCLOSE);
-+
-+	/* The first subflow is already in TCP_CLOSE status, the following
-+	 * can't overlap with a fallback anymore
-+	 */
-+	spin_lock_bh(&msk->fallback_lock);
-+	msk->allow_subflows = true;
-+	msk->allow_infinite_fallback = true;
- 	WRITE_ONCE(msk->flags, 0);
-+	spin_unlock_bh(&msk->fallback_lock);
-+
- 	msk->cb_flags = 0;
- 	msk->recovery = false;
- 	WRITE_ONCE(msk->can_ack, false);
-
--- 
-2.48.1
-
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
