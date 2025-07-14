@@ -1,238 +1,406 @@
-Return-Path: <netdev+bounces-206567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05D0EB037FB
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 09:29:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73199B03804
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 09:32:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F9ED17A641
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 07:29:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87D3D189CDFE
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 07:32:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4044D23506E;
-	Mon, 14 Jul 2025 07:29:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iBf3X3er"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6934A2356B9;
+	Mon, 14 Jul 2025 07:32:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mxct.zte.com.cn (mxct.zte.com.cn [183.62.165.209])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 593553D76;
-	Mon, 14 Jul 2025 07:29:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1D1C1E9B29;
+	Mon, 14 Jul 2025 07:32:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=183.62.165.209
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752478172; cv=none; b=ES//Gd6nQB0CPKFvEhV5tgKyOz/6/aqhsBBSoR+LIuT2l/sH8WJY4fY/oPuFqBLbDN54Kqp10IGJq8MuXPTvki/58sumq2jEtQNs3znUROz80McR95kXBDOkS+xIRt7zbtIuSUJB8T6/vV0VtESVha/35AY6ekdoc55+MbOPdCE=
+	t=1752478333; cv=none; b=Ufd1olN97K1TsNLGPASVcyPWl19JgjzRWyLbU9KEcUfcKwE6NX20Q7tPPCte0QwzRcYryC/TFjfFs3JZA1dVRi2GruMCPIHSbJtS92a/tEjeB9aOU8c3tkxcm77I9eWLMOr1AS8y0WrxE58JwbkhTO6DK5Er7mcAvSZGdK914A0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752478172; c=relaxed/simple;
-	bh=1lsnNAkONw9TDWPkYEtvFbvEU3cLpjPmSE98N3h/Big=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c7XABpo16yqnXP7n5CmmtzHYpcGeW2gHUOiL2jpT24mUnbHf1EXZrOZsTJsgfz5gFXJbQnmX+ig1uJNrpR49F3SWOF/aIXhB/CzDhuCWNd9Yx/ABbFAzUcdagM+dw+h2O0Ab5vrUFy2/QcwCRYI2x4gfJI9JDObN8argz1MMpi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iBf3X3er; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3a6d1369d4eso2251017f8f.2;
-        Mon, 14 Jul 2025 00:29:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752478169; x=1753082969; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zL1BWSoBAWuDQ4I14p3y5SceqlmmQ/H5Rm2Krj1fU+Q=;
-        b=iBf3X3erb1vpoDKf8sezcg7ZXHy4gsEZiEc3vdaSRxdgnyXSZCzO63BS1e+JjRcB8v
-         K3woWz+RHw2kU4+/986CYGv/C45euVYfpIqwMD2To2ZcER8n4w7kFajwQKS0PNlyFsNn
-         dQKX0eysMLnqPKe5kHBkPMWXhoc3ZrOVlwBL0I0chWQyaPWmCPNhTxCD5DGXlh+DEo01
-         eC7Gwpc16PDSXIp/1mub/YGpGPPWZJedG/epD178K9IW+aNn1nBt0JYpQtyLMtUA8deA
-         IwX8ZNLa8mKzHmNmnpI1pUS0TTKTh1DpWwJIklbXG6/9uIHOrEVG1NtcVJ/E9TZouOpu
-         2b6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752478169; x=1753082969;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zL1BWSoBAWuDQ4I14p3y5SceqlmmQ/H5Rm2Krj1fU+Q=;
-        b=HoUhEERfc6jCgxr6mSuEiKH9Ro/Rzo9yzLmAihhptBQ4rt60zKsLZX2OBrUSFWfpaO
-         nRAT+M26HSIpj4ViY8RB4lvYpnJtgjX8ciStNzftfSQl5uJx9GNgO5VScYfnOyZqpAh0
-         6Ow3JRRdmSmu7YThqkBsi/L9WDFcEYbxbBXkCBfgWeOZxT4LnAdyCjrvRsFZZeOFgxmi
-         UkGM37vtyRD8DBm7zDJrKuq8xI8CRbYc3N/lIeGuugCjHJe8WMZ31WUEdmX7NqhBKzdq
-         4jKz52sNH9cyYvPoHsYgyU0h3xurswiPDgla6M8zkq2/MOhlwafJhbCDZpTREPD46LM4
-         T4Vw==
-X-Forwarded-Encrypted: i=1; AJvYcCU9QWDf5oCKrZ/9xWcKjm6hilebnCtoB0CgqF9xrDX2frmuu9YQk3xoIAQWiLMsqT93/HCvcIM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZbLEA/2yaPezEGDv43NE6EKInhY7NJTZOOBR4LmLp3cTrIczZ
-	7fKiSUSDHyVqTUfjRwTKYjUxFEfDnmoZsNy+a/Mpvt+Y6VObEiHWrtnC
-X-Gm-Gg: ASbGncu5gwdO/wJOs8vz4voPnOGsWoOIY9huoTMdthDU5B9ROQNg6+RreGPbbfrENwM
-	bEwtuhAAKNxWYDvjida6XdypNNOgT4fCEJaArIA3nudgcYGnwquN9jrY1lOyBlCBhzk8r3ne7+N
-	Ujm3s31REANE21IHGnSqs31RbMd3ArNF0NQP/TL98LEnSP/k9JDuvS0cB7cHA2XCqhO4mHBkgJu
-	JRFn7113cF/7T0c89Q/oLfI7bYGYH7vyx87TisiOWk68CXmStTC7dsEQAVin0kfe1oKb8EGiYuW
-	bC5iQ+AibVp83Xktp43T6Dmqa8zHMGDtmFW7JIxY82TMzI8zCV6DylGx5u8kJfJPjEdz//mhLpF
-	3zRQPIoA4jT3QPSnPIyFuVQpFBkZvy/+WA+e1QJYt/LHXZA==
-X-Google-Smtp-Source: AGHT+IFpopB3hK0mGRj+xeB9+XqD5GeatO2oBohUHU5VVD4wIJ5AcS6VGCNxs3/ZNpmKcFX0opNIGg==
-X-Received: by 2002:a05:6000:18ab:b0:3b5:dd38:3523 with SMTP id ffacd0b85a97d-3b5f351dd71mr7168623f8f.8.1752478168215;
-        Mon, 14 Jul 2025 00:29:28 -0700 (PDT)
-Received: from [10.80.19.106] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4560105be56sm58807215e9.0.2025.07.14.00.29.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Jul 2025 00:29:27 -0700 (PDT)
-Message-ID: <befdca60-f9e5-486d-8df4-eafe4f338d79@gmail.com>
-Date: Mon, 14 Jul 2025 10:29:13 +0300
+	s=arc-20240116; t=1752478333; c=relaxed/simple;
+	bh=iPmlH9IS+Cm4g5BFjXOHe2StK5wu94hpmwV62BAx9/c=;
+	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=KT3YoUIguehPK852zkBNiE+A0vD+ydJv0ibeOBPTsh0rEZdiBzKUZvcS9L7s6ru3S1Q9nfYRs4REcdPQ7t1Y2gHAYwo9Nwv+6w0vEuHlL859BRj0fqPQpWaDbhNNEpVO7nkwDuiJJ508eduyfVy/2au3Du5jZc1b9u/MmaZsDxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=183.62.165.209
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mxct.zte.com.cn (FangMail) with ESMTPS id 4bgYt46yDSz4xVcs;
+	Mon, 14 Jul 2025 15:31:56 +0800 (CST)
+Received: from xaxapp05.zte.com.cn ([10.99.98.109])
+	by mse-fl2.zte.com.cn with SMTP id 56E7Vm3Z002820;
+	Mon, 14 Jul 2025 15:31:48 +0800 (+08)
+	(envelope-from fan.yu9@zte.com.cn)
+Received: from mapi (xaxapp05[null])
+	by mapi (Zmail) with MAPI id mid32;
+	Mon, 14 Jul 2025 15:31:50 +0800 (CST)
+Date: Mon, 14 Jul 2025 15:31:50 +0800 (CST)
+X-Zmail-TransId: 2afc6874b266ffffffff8ce-17bff
+X-Mailer: Zmail v1.0
+Message-ID: <202507141531506787l5w2IA8v8T_DcZ960ijO@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net/mlx5: Avoid copying payload to the skb's
- linear part
-To: cpaasch@openai.com, Saeed Mahameed <saeedm@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
- Mark Bloch <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-rdma@vger.kernel.org, netdev@vger.kernel.org
-References: <20250713-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v1-0-ecaed8c2844e@openai.com>
- <20250713-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v1-2-ecaed8c2844e@openai.com>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20250713-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v1-2-ecaed8c2844e@openai.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+From: <fan.yu9@zte.com.cn>
+To: <kuba@kernel.org>, <edumazet@google.com>, <kuniyu@amazon.com>,
+        <ncardwell@google.com>, <davem@davemloft.net>, <dsahern@kernel.org>
+Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-trace-kernel@vger.kernel.org>, <yang.yang29@zte.com.cn>,
+        <xu.xin16@zte.com.cn>, <tu.qiang35@zte.com.cn>,
+        <jiang.kun2@zte.com.cn>, <qiu.yutan@zte.com.cn>,
+        <wang.yaxin@zte.com.cn>, <he.peilin@zte.com.cn>
+Subject: =?UTF-8?B?W1BBVENIIFJFU0VORCBuZXQtbmV4dCB2NF0gdGNwOiBleHRlbmQgdGNwX3JldHJhbnNtaXRfc2tiIHRyYWNlcG9pbnQgd2l0aCBmYWlsdXJlIHJlYXNvbnM=?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl2.zte.com.cn 56E7Vm3Z002820
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 6874B26C.000/4bgYt46yDSz4xVcs
 
+From: Fan Yu <fan.yu9@zte.com.cn>
 
+Background
+==========
+When TCP retransmits a packet due to missing ACKs, the
+retransmission may fail for various reasons (e.g., packets
+stuck in driver queues, sequence errors, or routing issues).
 
-On 14/07/2025 2:33, Christoph Paasch via B4 Relay wrote:
-> From: Christoph Paasch <cpaasch@openai.com>
-> 
-> mlx5e_skb_from_cqe_mpwrq_nonlinear() copies MLX5E_RX_MAX_HEAD (256)
-> bytes from the page-pool to the skb's linear part. Those 256 bytes
-> include part of the payload.
-> 
-> When attempting to do GRO in skb_gro_receive, if headlen > data_offset
-> (and skb->head_frag is not set), we end up aggregating packets in the
-> frag_list.
-> 
-> This is of course not good when we are CPU-limited. Also causes a worse
-> skb->len/truesize ratio,...
-> 
-> So, let's avoid copying parts of the payload to the linear part. The
-> goal here is to err on the side of caution and prefer to copy too little
-> instead of copying too much (because once it has been copied over, we
-> trigger the above described behavior in skb_gro_receive).
-> 
-> So, we can do a rough estimate of the header-space by looking at
-> cqe_l3/l4_hdr_type and kind of do a lower-bound estimate. This is now
-> done in mlx5e_cqe_get_min_hdr_len(). We always assume that TCP timestamps
-> are present, as that's the most common use-case.
-> 
-> That header-len is then used in mlx5e_skb_from_cqe_mpwrq_nonlinear for
-> the headlen (which defines what is being copied over). We still
-> allocate MLX5E_RX_MAX_HEAD for the skb so that if the networking stack
-> needs to call pskb_may_pull() later on, we don't need to reallocate
-> memory.
-> 
-> This gives a nice throughput increase (ARM Neoverse-V2 with CX-7 NIC and
-> LRO enabled):
-> 
-> BEFORE:
-> =======
-> (netserver pinned to core receiving interrupts)
-> $ netperf -H 10.221.81.118 -T 80,9 -P 0 -l 60 -- -m 256K -M 256K
->   87380  16384 262144    60.01    32547.82
-> 
-> (netserver pinned to adjacent core receiving interrupts)
-> $ netperf -H 10.221.81.118 -T 80,10 -P 0 -l 60 -- -m 256K -M 256K
->   87380  16384 262144    60.00    52531.67
-> 
-> AFTER:
-> ======
-> (netserver pinned to core receiving interrupts)
-> $ netperf -H 10.221.81.118 -T 80,9 -P 0 -l 60 -- -m 256K -M 256K
->   87380  16384 262144    60.00    52896.06
-> 
-> (netserver pinned to adjacent core receiving interrupts)
->   $ netperf -H 10.221.81.118 -T 80,10 -P 0 -l 60 -- -m 256K -M 256K
->   87380  16384 262144    60.00    85094.90
-> 
+The original tcp_retransmit_skb tracepoint:
+&apos;commit e086101b150a ("tcp: add a tracepoint for tcp retransmission")&apos;
+lacks visibility into these failure causes, making production
+diagnostics difficult.
 
-Nice improvement.
+Solution
+========
+Adds a "result" field to the tcp_retransmit_skb tracepoint,
+enumerating with explicit failure cases:
+TCP_RETRANS_ERR_DEFAULT (retransmit terminate unexpectedly)
+TCP_RETRANS_IN_HOST_QUEUE (packet still queued in driver)
+TCP_RETRANS_END_SEQ_ERROR (invalid end sequence)
+TCP_RETRANS_NOMEM (retransmit no memory)
+TCP_RETRANS_ROUTE_FAIL (routing failure)
+TCP_RETRANS_RCV_ZERO_WINDOW (closed receiver window)
 
-Did you test impact on other archs?
+Functionality
+=============
+Enables users to know why some tcp retransmission failed and filter
+retransmission failures by reason.
 
-Did you test impact on non-LRO flows?
-Specifically:
-a. Large MTU, tcp stream.
-b. Large MTU, small UDP packets.
+Compatibility description
+=========================
+This patch extends the tcp_retransmit_skb tracepoint
+by adding a new "result" field at the end of its
+existing structure (within TP_STRUCT__entry). The
+compatibility implications are detailed as follows:
 
+1) Structural compatibility for legacy user-space tools
 
-> Signed-off-by: Christoph Paasch <cpaasch@openai.com>
-> ---
->   drivers/net/ethernet/mellanox/mlx5/core/en_rx.c | 33 ++++++++++++++++++++++++-
->   1 file changed, 32 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> index 2bb32082bfccdc85d26987f792eb8c1047e44dd0..2de669707623882058e3e77f82d74893e5d6fefe 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> @@ -1986,13 +1986,40 @@ mlx5e_shampo_fill_skb_data(struct sk_buff *skb, struct mlx5e_rq *rq,
->   	} while (data_bcnt);
->   }
->   
-> +static u16
-> +mlx5e_cqe_get_min_hdr_len(const struct mlx5_cqe64 *cqe)
-> +{
-> +	u16 min_hdr_len = sizeof(struct ethhdr);
-> +	u8 l3_type = get_cqe_l3_hdr_type(cqe);
-> +	u8 l4_type = get_cqe_l4_hdr_type(cqe);
-> +
-> +	if (cqe_has_vlan(cqe))
-> +		min_hdr_len += VLAN_HLEN;
-> +
-> +	if (l3_type == CQE_L3_HDR_TYPE_IPV4)
-> +		min_hdr_len += sizeof(struct iphdr);
-> +	else if (l3_type == CQE_L3_HDR_TYPE_IPV6)
-> +		min_hdr_len += sizeof(struct ipv6hdr);
-> +
-> +	if (l4_type == CQE_L4_HDR_TYPE_UDP)
-> +		min_hdr_len += sizeof(struct udphdr);
-> +	else if (l4_type & (CQE_L4_HDR_TYPE_TCP_NO_ACK |
-> +			    CQE_L4_HDR_TYPE_TCP_ACK_NO_DATA |
-> +			    CQE_L4_HDR_TYPE_TCP_ACK_AND_DATA))
-> +		/* Previous condition works because we know that
-> +		 * l4_type != 0x2 (CQE_L4_HDR_TYPE_UDP)
-> +		 */
-> +		min_hdr_len += sizeof(struct tcphdr) + TCPOLEN_TSTAMP_ALIGNED;
-> +
-> +	return min_hdr_len;
-> +}
-> +
->   static struct sk_buff *
->   mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_rq *rq, struct mlx5e_mpw_info *wi,
->   				   struct mlx5_cqe64 *cqe, u16 cqe_bcnt, u32 head_offset,
->   				   u32 page_idx)
+Legacy tools/BPF programs accessing existing fields
+(by offset or name) can still work without modification
+or recompilation.The new field is appended to the end,
+preserving original memory layout.
 
-BTW, this function handles IPoIB as well, not only Eth.
+2) Note: semantic changes
 
->   {
->   	struct mlx5e_frag_page *frag_page = &wi->alloc_units.frag_pages[page_idx];
-> -	u16 headlen = min_t(u16, MLX5E_RX_MAX_HEAD, cqe_bcnt);
->   	struct mlx5e_frag_page *head_page = frag_page;
->   	struct mlx5e_xdp_buff *mxbuf = &rq->mxbuf;
->   	u32 frag_offset    = head_offset;
-> @@ -2004,10 +2031,14 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_rq *rq, struct mlx5e_mpw_info *w
->   	u32 linear_frame_sz;
->   	u16 linear_data_len;
->   	u16 linear_hr;
-> +	u16 headlen;
->   	void *va;
->   
->   	prog = rcu_dereference(rq->xdp_prog);
->   
-> +	headlen = min3(mlx5e_cqe_get_min_hdr_len(cqe), cqe_bcnt,
-> +		       (u16)MLX5E_RX_MAX_HEAD);
-> +
->   	if (prog) {
->   		/* area for bpf_xdp_[store|load]_bytes */
->   		net_prefetchw(netmem_address(frag_page->netmem) + frag_offset);
-> 
+The original tracepoint primarily only focused on
+successfully retransmitted packets. With this patch,
+the tracepoint now covers all packets that trigger
+retransmission attempts, including those that may
+terminate early due to specific reasons. For accurate
+statistics, users should filter using "result" to
+distinguish outcomes.
 
+Before patched:
+# cat /sys/kernel/debug/tracing/events/tcp/tcp_retransmit_skb/format
+field:const void * skbaddr; offset:8; size:8; signed:0;
+field:const void * skaddr; offset:16; size:8; signed:0;
+field:int state; offset:24; size:4; signed:1;
+field:__u16 sport; offset:28; size:2; signed:0;
+field:__u16 dport; offset:30; size:2; signed:0;
+field:__u16 family; offset:32; size:2; signed:0;
+field:__u8 saddr[4]; offset:34; size:4; signed:0;
+field:__u8 daddr[4]; offset:38; size:4; signed:0;
+field:__u8 saddr_v6[16]; offset:42; size:16; signed:0;
+field:__u8 daddr_v6[16]; offset:58; size:16; signed:0;
+print fmt: "skbaddr=%p skaddr=%p family=%s sport=%hu dport=%hu saddr=%pI4 daddr=%pI4 saddrv6=%pI6c daddrv6=%pI6c state=%s"
+
+After patched:
+# cat /sys/kernel/debug/tracing/events/tcp/tcp_retransmit_skb/format
+field:unsigned short common_type; offset:0; size:2; signed:0;
+field:unsigned char common_flags; offset:2; size:1; signed:0;
+field:unsigned char common_preempt_count; offset:3; size:1; signed:0;
+field:int common_pid; offset:4; size:4; signed:1;
+
+field:const void * skbaddr; offset:8; size:8; signed:0;
+field:const void * skaddr; offset:16; size:8; signed:0;
+field:int state; offset:24; size:4; signed:1;
+field:__u16 sport; offset:28; size:2; signed:0;
+field:__u16 dport; offset:30; size:2; signed:0;
+field:__u16 family; offset:32; size:2; signed:0;
+field:__u8 saddr[4]; offset:34; size:4; signed:0;
+field:__u8 daddr[4]; offset:38; size:4; signed:0;
+field:__u8 saddr_v6[16]; offset:42; size:16; signed:0;
+field:__u8 daddr_v6[16]; offset:58; size:16; signed:0;
+field:enum tcp_retransmit_result result; offset:76; size:4; signed:0;
+
+print fmt: "skbaddr=%p skaddr=%p family=%s sport=%hu dport=%hu saddr=%pI4 daddr=%pI4 saddrv6=%pI6c daddrv6=%pI6c state=%s result=%s"
+
+Change Log
+=========
+v3->v4:
+Some fixes according to
+https://lore.kernel.org/all/CANn89i+JGSt=_CtWfhDXypWW-34a6SoP3RAzWQ9B9VL4+PHjDw@mail.gmail.com/
+1. Consolidate ENOMEMs into a unified TCP_RETRANS_NOMEM
+
+v2->v3:
+Some fixes according to
+https://lore.kernel.org/all/CANn89iJvyYjiweCESQL8E-Si7M=gosYvh1BAVWwAWycXW8GSdg@mail.gmail.com/
+1. Rename "quit_reason" to "result". Also, keep "key=val" format concise(no space in vals)
+
+v1->v2:
+Some fixes according to
+https://lore.kernel.org/all/CANn89iK-6kT-ZUpNRMjPY9_TkQj-dLuKrDQtvO1140q4EUsjFg@mail.gmail.com/
+1.Rename TCP_RETRANS_QUIT_UNDEFINED to TCP_RETRANS_ERR_DEFAULT.
+2.Added detailed compatibility consequences section.
+
+Co-developed-by: xu xin <xu.xin16@zte.com.cn>
+Signed-off-by: xu xin <xu.xin16@zte.com.cn>
+Signed-off-by: Fan Yu <fan.yu9@zte.com.cn>
+---
+include/linux/tcp.h        | 10 ++++++++
+include/trace/events/tcp.h | 51 ++++++++++++++++++++++++-------------
+net/ipv4/tcp_output.c      | 52 ++++++++++++++++++++++++++++----------
+3 files changed, 81 insertions(+), 32 deletions(-)
+
+diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+index 29f59d50dc73..b34479f5cb56 100644
+--- a/include/linux/tcp.h
++++ b/include/linux/tcp.h
+@@ -530,6 +530,16 @@ enum tsq_flags {
+ 	TCPF_ACK_DEFERRED		= BIT(TCP_ACK_DEFERRED),
+};
+
++enum tcp_retransmit_result {
++	TCP_RETRANS_ERR_DEFAULT,
++	TCP_RETRANS_SUCCESS,
++	TCP_RETRANS_IN_HOST_QUEUE,
++	TCP_RETRANS_END_SEQ_ERROR,
++	TCP_RETRANS_NOMEM,
++	TCP_RETRANS_ROUTE_FAIL,
++	TCP_RETRANS_RCV_ZERO_WINDOW,
++};
++
+#define tcp_sk(ptr) container_of_const(ptr, struct tcp_sock, inet_conn.icsk_inet.sk)
+
+/* Variant of tcp_sk() upgrading a const sock to a read/write tcp socket.
+diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
+index 54e60c6009e3..6b736fa01d94 100644
+--- a/include/trace/events/tcp.h
++++ b/include/trace/events/tcp.h
+@@ -13,17 +13,35 @@
+#include <linux/sock_diag.h>
+#include <net/rstreason.h>
+
+-/*
+- * tcp event with arguments sk and skb
+- *
+- * Note: this class requires a valid sk pointer; while skb pointer could
+- *       be NULL.
+- */
+-DECLARE_EVENT_CLASS(tcp_event_sk_skb,
++#define TCP_RETRANSMIT_RESULT		\
++		ENUM(TCP_RETRANS_ERR_DEFAULT,		"retrans_err_default")	\
++		ENUM(TCP_RETRANS_SUCCESS,		"retrans_succ")		\
++		ENUM(TCP_RETRANS_IN_HOST_QUEUE,		"packet_in_driver")	\
++		ENUM(TCP_RETRANS_END_SEQ_ERROR,		"end_seq_error")	\
++		ENUM(TCP_RETRANS_NOMEM,			"retrans_nomem")	\
++		ENUM(TCP_RETRANS_ROUTE_FAIL,		"route_fail")		\
++		ENUMe(TCP_RETRANS_RCV_ZERO_WINDOW,	"rcv_zero_window")	\
++
++/* Redefine for export. */
++#undef ENUM
++#undef ENUMe
++#define ENUM(a, b)	TRACE_DEFINE_ENUM(a);
++#define ENUMe(a, b)	TRACE_DEFINE_ENUM(a);
++
++TCP_RETRANSMIT_RESULT
++
++/* Redefine for symbolic printing. */
++#undef ENUM
++#undef ENUMe
++#define ENUM(a, b)	{ a, b },
++#define ENUMe(a, b)	{ a, b }
++
++TRACE_EVENT(tcp_retransmit_skb,
+
+-	TP_PROTO(const struct sock *sk, const struct sk_buff *skb),
++	TP_PROTO(const struct sock *sk, const struct sk_buff *skb,
++		enum tcp_retransmit_result result),
+
+-	TP_ARGS(sk, skb),
++	TP_ARGS(sk, skb, result),
+
+ 	TP_STRUCT__entry(
+ 		__field(const void *, skbaddr)
+@@ -36,6 +54,7 @@ DECLARE_EVENT_CLASS(tcp_event_sk_skb,
+ 		__array(__u8, daddr, 4)
+ 		__array(__u8, saddr_v6, 16)
+ 		__array(__u8, daddr_v6, 16)
++		__field(enum tcp_retransmit_result, result)
+ 	),
+
+ 	TP_fast_assign(
+@@ -58,21 +77,17 @@ DECLARE_EVENT_CLASS(tcp_event_sk_skb,
+
+ 		TP_STORE_ADDRS(__entry, inet->inet_saddr, inet->inet_daddr,
+ 			sk->sk_v6_rcv_saddr, sk->sk_v6_daddr);
++
++		__entry->result = result;
+ 	),
+
+-	TP_printk("skbaddr=%p skaddr=%p family=%s sport=%hu dport=%hu saddr=%pI4 daddr=%pI4 saddrv6=%pI6c daddrv6=%pI6c state=%s",
++	TP_printk("skbaddr=%p skaddr=%p family=%s sport=%hu dport=%hu saddr=%pI4 daddr=%pI4 saddrv6=%pI6c daddrv6=%pI6c state=%s result=%s",
+ 		__entry->skbaddr, __entry->skaddr,
+ 		show_family_name(__entry->family),
+ 		__entry->sport, __entry->dport, __entry->saddr, __entry->daddr,
+ 		__entry->saddr_v6, __entry->daddr_v6,
+-		  show_tcp_state_name(__entry->state))
+-);
+-
+-DEFINE_EVENT(tcp_event_sk_skb, tcp_retransmit_skb,
+-
+-	TP_PROTO(const struct sock *sk, const struct sk_buff *skb),
+-
+-	TP_ARGS(sk, skb)
++		  show_tcp_state_name(__entry->state),
++		  __print_symbolic(__entry->result, TCP_RETRANSMIT_RESULT))
+);
+
+#undef FN
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index 3ac8d2d17e1f..8f7bc33f30be 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -3326,6 +3326,7 @@ static void tcp_retrans_try_collapse(struct sock *sk, struct sk_buff *to,
+*/
+int __tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
+{
++	enum tcp_retransmit_result result = TCP_RETRANS_ERR_DEFAULT;
+ 	struct inet_connection_sock *icsk = inet_csk(sk);
+ 	struct tcp_sock *tp = tcp_sk(sk);
+ 	unsigned int cur_mss;
+@@ -3336,8 +3337,11 @@ int __tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
+ 	if (icsk->icsk_mtup.probe_size)
+ 		icsk->icsk_mtup.probe_size = 0;
+
+-	if (skb_still_in_host_queue(sk, skb))
+-		return -EBUSY;
++	if (skb_still_in_host_queue(sk, skb)) {
++		result = TCP_RETRANS_IN_HOST_QUEUE;
++		err = -EBUSY;
++		goto out;
++	}
+
+start:
+ 	if (before(TCP_SKB_CB(skb)->seq, tp->snd_una)) {
+@@ -3348,14 +3352,22 @@ int __tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
+ 		}
+ 		if (unlikely(before(TCP_SKB_CB(skb)->end_seq, tp->snd_una))) {
+ 			WARN_ON_ONCE(1);
+-			return -EINVAL;
++			result = TCP_RETRANS_END_SEQ_ERROR;
++			err = -EINVAL;
++			goto out;
++		}
++		if (tcp_trim_head(sk, skb, tp->snd_una - TCP_SKB_CB(skb)->seq)) {
++			result = TCP_RETRANS_NOMEM;
++			err = -ENOMEM;
++			goto out;
+ 		}
+-		if (tcp_trim_head(sk, skb, tp->snd_una - TCP_SKB_CB(skb)->seq))
+-			return -ENOMEM;
+ 	}
+
+-	if (inet_csk(sk)->icsk_af_ops->rebuild_header(sk))
+-		return -EHOSTUNREACH; /* Routing failure or similar. */
++	if (inet_csk(sk)->icsk_af_ops->rebuild_header(sk)) {
++		result = TCP_RETRANS_ROUTE_FAIL;
++		err = -EHOSTUNREACH; /* Routing failure or similar. */
++		goto out;
++	}
+
+ 	cur_mss = tcp_current_mss(sk);
+ 	avail_wnd = tcp_wnd_end(tp) - TCP_SKB_CB(skb)->seq;
+@@ -3366,8 +3378,11 @@ int __tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
+ 	* our retransmit of one segment serves as a zero window probe.
+ 	*/
+ 	if (avail_wnd <= 0) {
+-		if (TCP_SKB_CB(skb)->seq != tp->snd_una)
+-			return -EAGAIN;
++		if (TCP_SKB_CB(skb)->seq != tp->snd_una) {
++			result = TCP_RETRANS_RCV_ZERO_WINDOW;
++			err = -EAGAIN;
++			goto out;
++		}
+ 		avail_wnd = cur_mss;
+ 	}
+
+@@ -3379,11 +3394,17 @@ int __tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
+ 	}
+ 	if (skb->len > len) {
+ 		if (tcp_fragment(sk, TCP_FRAG_IN_RTX_QUEUE, skb, len,
+-				 cur_mss, GFP_ATOMIC))
+-			return -ENOMEM; /* We&apos;ll try again later. */
++				 cur_mss, GFP_ATOMIC)) {
++			result = TCP_RETRANS_NOMEM;
++			err = -ENOMEM;  /* We&apos;ll try again later. */
++			goto out;
++		}
+ 	} else {
+-		if (skb_unclone_keeptruesize(skb, GFP_ATOMIC))
+-			return -ENOMEM;
++		if (skb_unclone_keeptruesize(skb, GFP_ATOMIC)) {
++			result = TCP_RETRANS_NOMEM;
++			err = -ENOMEM;
++			goto out;
++		}
+
+ 		diff = tcp_skb_pcount(skb);
+ 		tcp_set_skb_tso_segs(skb, cur_mss);
+@@ -3421,6 +3442,7 @@ int __tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
+ 				nskb->dev = NULL;
+ 				err = tcp_transmit_skb(sk, nskb, 0, GFP_ATOMIC);
+ 			} else {
++				result = TCP_RETRANS_NOMEM;
+ 				err = -ENOBUFS;
+ 			}
+ 		} tcp_skb_tsorted_restore(skb);
+@@ -3438,7 +3460,7 @@ int __tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
+ 				TCP_SKB_CB(skb)->seq, segs, err);
+
+ 	if (likely(!err)) {
+-		trace_tcp_retransmit_skb(sk, skb);
++		result = TCP_RETRANS_SUCCESS;
+ 	} else if (err != -EBUSY) {
+ 		NET_ADD_STATS(sock_net(sk), LINUX_MIB_TCPRETRANSFAIL, segs);
+ 	}
+@@ -3448,6 +3470,8 @@ int __tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
+ 	*/
+ 	TCP_SKB_CB(skb)->sacked |= TCPCB_EVER_RETRANS;
+
++out:
++	trace_tcp_retransmit_skb(sk, skb, result);
+ 	return err;
+}
+
+--
+2.25.1
 
