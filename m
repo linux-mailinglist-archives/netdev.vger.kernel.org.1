@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-206868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C59FB04A7A
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 00:22:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F0A9B04A7B
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 00:22:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABFBA1A6422D
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 22:22:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD9551A64012
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 22:22:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C96D289375;
-	Mon, 14 Jul 2025 22:19:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35400289817;
+	Mon, 14 Jul 2025 22:19:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF43289343
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 22:19:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9D0288C9C
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 22:19:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752531549; cv=none; b=nWm4l8UG7ZIMbfjo1u9fHYwGm+0yUUWz8fliXHvE3W/xmkQn1avJH1EdzndLp5asGdA4IyyKtSMgq/mAC4Yz7oDDtL/Pl5HNbprKvnhqbquovoFXYcvLgW+HrN1RLeK1wDTJ8lCaiJwrxMbY8nebNqATSSNK4L5iuzXdOZlbnLo=
+	t=1752531550; cv=none; b=gzoxQjqlwJ8tEu9YfOTtcKPcjoHAnVqGdK79iZlyMYCSNcEyX+EW4wXZTs72GwUe9PqyjqZbh7XgSNS/qs0GWmv3dMo8TA4yuKIv9h8IEksTAa3n+yqSUZY6EI8Z8rxnhsY3srpbjp4HtdU6yKvhwTeqIVBzyaESTgLV466MqIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752531549; c=relaxed/simple;
-	bh=sOjyMpOEYUALdickfW71Bcgc7I0nasJZzx5+xqDDPWY=;
+	s=arc-20240116; t=1752531550; c=relaxed/simple;
+	bh=WvLsStrebJnK8Q/MUh6sAHBydM1B/AoYs/mb+Oep6r8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=baYH6s8h7cC2x2JLOBx3b/tWTgIeNmipYyFcFh9oyYC2OKIZGdY9o36ZeNFkkS0G2iworUb9iXECeiaWS+zHzUl8wZ+Nd0k3unz17+Xm8og8Xy8i+PVV1+iJqElCK35Xg+hTOdU5lfWXRaJ7hiiiI9qKe4G7vjBb6xUXwaUfRO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.170
+	 MIME-Version; b=H7T+A189nmrCecr4OzgZ/ZBr61DVH4nP0uQ1QxyNBGDowEP/KvpzQpgbqLA5Rvd/02dL1GN5YnuJVG623l1wGOWQQmFsK9OdB8SXzvZppjr+zTndxBwvCe2fHwTXbjegaPDEac8xOwS1ZA4PMf6BjAij9PojjGZ+DveDQPkYkb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-749248d06faso4025364b3a.2
-        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 15:19:07 -0700 (PDT)
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-749068b9b63so3276661b3a.0
+        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 15:19:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752531546; x=1753136346;
+        d=1e100.net; s=20230601; t=1752531547; x=1753136347;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5rhA+lDZESl5M93I2PKWinDEI37PdDGcvw/NHQDjiy8=;
-        b=hoiR5sV9lSmHYeWpNdCyjGoaJTkncHjvSU/kaP2V2kxcLg/wHRP9HLeruLLMfQbSXz
-         A9h9oIxKX6dJIdyJKBcnVgbL4jnd+TsWrX3OwGEqZSgKmwsYyOMdq2PP00Fe81JpPjHd
-         FiL4fU5+X7zNBfE44y67FaFaXQvbczba/iK/wHW64qD/dTcWaIFNFgByOEGdkbmc7E1E
-         U4dKGDK+sYZ+PbkkAsNPDdqxMWhysCxyX3VOBAJzkQxsqlvJy6hR325XwZhW66+b4fp3
-         OnlYWXD+1qTHdvglRf3ez+9OmBRMeJ0ep2y4Naq6YiNpvv6yIKioOLOcRmpim0bFDI5T
-         LL6w==
-X-Gm-Message-State: AOJu0YzYXiJIUGnQGfpgWmBp2RmbW6PqCRd1hjcYIfj1ceBkSrNvwaVJ
-	TqDYnFdtae4YOso1yLkfG6NP+nuFHGybxZQno6vU7/PnzHpV1XlwXalTqPrn
-X-Gm-Gg: ASbGncs3PnSd48wWY/4sWPcicW/G1CQ7yap7dwRewHHDLOVP2qWuBLWMPVJtqOr1kNq
-	aRNmbU/XNrscZipVEYZ5PGxTlZNh9sv0h+bhV/nJvBhLP8R2SWaczV/VpwM8I0mPoNIV57tzzHZ
-	KszbcyDNdpjgDfqVo9muz3OduqmyBL5SjBrETIUEhoSEUT00t+HwhAVYVjfQw1BIMonqC+8wjvj
-	NMXBc880D7+FCpu/KUKV4YXNOzewpq18wEC2cZOJxyKH9A76X54BzBM94sJkqUh0XfHfkm2Quux
-	gWQk10d+9toRNTIj9Rre5E68WofZPkWAmLSPTI+Mle61wTohxa2iZtOyTDFT+bKdj7PuZ7OB8Of
-	RggS6VAEJej2U9txx/bSU0ICRXHgbbaRh7fB5ZNBdLyj0igNauGZQew/0nqo=
-X-Google-Smtp-Source: AGHT+IFuAZb/k8fZh0u54aQcAYl33O75Yfn79WrxQeoUpZ20zLPTRoL4pNFHxLgfqnWdedxUhNIHDA==
-X-Received: by 2002:a05:6a20:2586:b0:234:7ad1:8d64 with SMTP id adf61e73a8af0-2347ad190bdmr9270191637.39.1752531546151;
-        Mon, 14 Jul 2025 15:19:06 -0700 (PDT)
+        bh=P9M//saJPuE88O9CpOU1r2acc8qBz1YkKh+TqxRJEJ4=;
+        b=tEqt6oZWiaAHHAUgXSAG77etlagrPGOJ31JA/JHros06l/S3SPU9epzIGKuzFFQCN6
+         AtjaurtfzqT2/TIPiSOhwvE4JM4AwbQqY/ZRKignDuCc5/mpK5hT6aKyMOWwbusoP6UD
+         qvhFX9/krBHn3JgreN+ehD0xlDOAPYaZNDSocbsmXlMLEMBAYgiK+5rkUKFtMQs89Mxg
+         48XQtkOeRBS6FVFXutgRXwx/vEfM/mIcHZd9hdr4QUeqvgcTfo/DpHuMHPAzwq46NOj5
+         80UUb+2H2Ob0BdZjCfhjYJmgVIkrXCH9ZLRuxNex1PWJeMEKGU6x+uheCAOg79qbIhfy
+         KejA==
+X-Gm-Message-State: AOJu0YxyolT8TX0Y3/N/74yYEQvsZ/ijww136MsqlClYXsbGeTz65qPf
+	//X2xZi8LPIrHGiBjLJV7usNWY8NcmS/7fBkHCHWeOb5rtTiGLGxtNlsMu11
+X-Gm-Gg: ASbGnctt17bxdBTeFCMESoTOJhpOxVgJSmEgRh7Ki0PZi88nuVMgys3rHzmLYDN/W5l
+	rvvvJQt1O+4m9oGg/9GDm4qsQ6QHZHcoqDnzCbj+t0y7ITOJ5NViI6+rmrz3yt8XISmSGcVGK5b
+	AtGmSuxJNkRTZjfjoChH0hgoMLzO/w7LI98dXb/QEwkWukVq0mYl/CgySz6XyPFd+NCWElQbhke
+	OkzSboBc81klskE35hIZciA4v/9M4FxA5n4pzwlhzqbMpYK/ufIrG/IgN85lP+wZV256C/O7ThM
+	3EYUp6t2jdr/2IVUbEYrJcc3OfEzemsXQLFr5r4GYvxF8qHk8u1gVOgVynG8SJwCGFNJC9HMf1b
+	RohLuVIbe3ljEgYV3+ZW7N4qJF6hKSR5QjRq7QNpM6Z7vc1cgK54WXaKjUao=
+X-Google-Smtp-Source: AGHT+IE+HnVPnAVNwSL60Sg7aSl1BVUsFcpkMU2jC+/shMsN8nNe88YCUjuKPaWVT5c8U93oLcGJ0g==
+X-Received: by 2002:a05:6a20:6a0e:b0:233:b51a:8597 with SMTP id adf61e73a8af0-233b51a8602mr13306534637.35.1752531547586;
+        Mon, 14 Jul 2025 15:19:07 -0700 (PDT)
 Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-74eb9e063besm11030737b3a.45.2025.07.14.15.19.05
+        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-b3bbe6c5660sm10674255a12.48.2025.07.14.15.19.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Jul 2025 15:19:05 -0700 (PDT)
+        Mon, 14 Jul 2025 15:19:07 -0700 (PDT)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com
-Subject: [PATCH net-next v4 6/7] net: s/dev_set_threaded/netif_set_threaded/
-Date: Mon, 14 Jul 2025 15:18:54 -0700
-Message-ID: <20250714221855.3795752-7-sdf@fomichev.me>
+Subject: [PATCH net-next v4 7/7] net: s/dev_close_many/netif_close_many/
+Date: Mon, 14 Jul 2025 15:18:55 -0700
+Message-ID: <20250714221855.3795752-8-sdf@fomichev.me>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <20250714221855.3795752-1-sdf@fomichev.me>
 References: <20250714221855.3795752-1-sdf@fomichev.me>
@@ -84,176 +84,148 @@ netdev, the latter takes care of the locking. We don't strictly
 follow this semantics on either side, but there are more dev_xxx handlers
 now that don't fit. Rename them to netif_xxx where appropriate.
 
-Note that one dev_set_threaded call still remains in mt76 for debugfs file.
+netif_close_many is used only by vlan/dsa and one mtk driver, so move it into
+NETDEV_INTERNAL namespace.
 
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- .../networking/net_cachelines/net_device.rst         |  2 +-
- drivers/net/ethernet/atheros/atl1c/atl1c_main.c      |  2 +-
- drivers/net/ethernet/mellanox/mlxsw/pci.c            |  2 +-
- drivers/net/ethernet/renesas/ravb_main.c             |  2 +-
- drivers/net/wireguard/device.c                       |  2 +-
- drivers/net/wireless/ath/ath10k/snoc.c               |  2 +-
- include/linux/netdevice.h                            |  1 +
- net/core/dev.c                                       |  6 +++---
- net/core/dev_api.c                                   | 12 ++++++++++++
- net/core/net-sysfs.c                                 |  2 +-
- 10 files changed, 23 insertions(+), 10 deletions(-)
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c |  3 ++-
+ include/linux/netdevice.h                   |  2 +-
+ net/8021q/vlan.c                            |  3 ++-
+ net/core/dev.c                              | 10 +++++-----
+ net/dsa/dsa.c                               |  3 ++-
+ net/dsa/user.c                              |  2 +-
+ 6 files changed, 13 insertions(+), 10 deletions(-)
 
-diff --git a/Documentation/networking/net_cachelines/net_device.rst b/Documentation/networking/net_cachelines/net_device.rst
-index c69cc89c958e..2d3dc4692d20 100644
---- a/Documentation/networking/net_cachelines/net_device.rst
-+++ b/Documentation/networking/net_cachelines/net_device.rst
-@@ -165,7 +165,7 @@ struct sfp_bus*                     sfp_bus
- struct lock_class_key*              qdisc_tx_busylock
- bool                                proto_down
- unsigned:1                          wol_enabled
--unsigned:1                          threaded                                                            napi_poll(napi_enable,dev_set_threaded)
-+unsigned:1                          threaded                                                            napi_poll(napi_enable,netif_set_threaded)
- unsigned_long:1                     see_all_hwtstamp_requests
- unsigned_long:1                     change_proto_down
- unsigned_long:1                     netns_immutable
-diff --git a/drivers/net/ethernet/atheros/atl1c/atl1c_main.c b/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
-index ef1a51347351..3a9ad4a9c1cb 100644
---- a/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
-+++ b/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
-@@ -2688,7 +2688,7 @@ static int atl1c_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	adapter->mii.mdio_write = atl1c_mdio_write;
- 	adapter->mii.phy_id_mask = 0x1f;
- 	adapter->mii.reg_num_mask = MDIO_CTRL_REG_MASK;
--	dev_set_threaded(netdev, true);
-+	netif_set_threaded(netdev, true);
- 	for (i = 0; i < adapter->rx_queue_count; ++i)
- 		netif_napi_add(netdev, &adapter->rrd_ring[i].napi,
- 			       atl1c_clean_rx);
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/pci.c b/drivers/net/ethernet/mellanox/mlxsw/pci.c
-index 058dcabfaa2e..a2e97b712a3d 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/pci.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/pci.c
-@@ -156,7 +156,7 @@ static int mlxsw_pci_napi_devs_init(struct mlxsw_pci *mlxsw_pci)
- 	}
- 	strscpy(mlxsw_pci->napi_dev_rx->name, "mlxsw_rx",
- 		sizeof(mlxsw_pci->napi_dev_rx->name));
--	dev_set_threaded(mlxsw_pci->napi_dev_rx, true);
-+	netif_set_threaded(mlxsw_pci->napi_dev_rx, true);
- 
- 	return 0;
- 
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index c9f4976a3527..4e79bf88688a 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -3075,7 +3075,7 @@ static int ravb_probe(struct platform_device *pdev)
- 	if (info->coalesce_irqs) {
- 		netdev_sw_irq_coalesce_default_on(ndev);
- 		if (num_present_cpus() == 1)
--			dev_set_threaded(ndev, true);
-+			netif_set_threaded(ndev, true);
+diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+index 11ee7e1829bf..5a5fcde76dc0 100644
+--- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
++++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+@@ -4967,7 +4967,7 @@ void mtk_eth_set_dma_device(struct mtk_eth *eth, struct device *dma_dev)
+ 		list_add_tail(&dev->close_list, &dev_list);
  	}
  
- 	/* Network device register */
-diff --git a/drivers/net/wireguard/device.c b/drivers/net/wireguard/device.c
-index 4a529f1f9bea..5afec5a865f4 100644
---- a/drivers/net/wireguard/device.c
-+++ b/drivers/net/wireguard/device.c
-@@ -366,7 +366,7 @@ static int wg_newlink(struct net_device *dev,
- 	if (ret < 0)
- 		goto err_free_handshake_queue;
+-	dev_close_many(&dev_list, false);
++	netif_close_many(&dev_list, false);
  
--	dev_set_threaded(dev, true);
-+	netif_set_threaded(dev, true);
- 	ret = register_netdevice(dev);
- 	if (ret < 0)
- 		goto err_uninit_ratelimiter;
-diff --git a/drivers/net/wireless/ath/ath10k/snoc.c b/drivers/net/wireless/ath/ath10k/snoc.c
-index d51f2e5a79a4..0ee68d3dad12 100644
---- a/drivers/net/wireless/ath/ath10k/snoc.c
-+++ b/drivers/net/wireless/ath/ath10k/snoc.c
-@@ -936,7 +936,7 @@ static int ath10k_snoc_hif_start(struct ath10k *ar)
+ 	eth->dma_dev = dma_dev;
  
- 	bitmap_clear(ar_snoc->pending_ce_irqs, 0, CE_COUNT_MAX);
- 
--	dev_set_threaded(ar->napi_dev, true);
-+	netif_set_threaded(ar->napi_dev, true);
- 	ath10k_core_napi_enable(ar);
- 	/* IRQs are left enabled when we restart due to a firmware crash */
- 	if (!test_bit(ATH10K_SNOC_FLAG_RECOVERY, &ar_snoc->flags))
+@@ -5610,3 +5610,4 @@ module_platform_driver(mtk_driver);
+ MODULE_LICENSE("GPL");
+ MODULE_AUTHOR("John Crispin <blogic@openwrt.org>");
+ MODULE_DESCRIPTION("Ethernet driver for MediaTek SoC");
++MODULE_IMPORT_NS("NETDEV_INTERNAL");
 diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index d11804be460c..295457fbcfd1 100644
+index 295457fbcfd1..e6131c529af4 100644
 --- a/include/linux/netdevice.h
 +++ b/include/linux/netdevice.h
-@@ -588,6 +588,7 @@ static inline bool napi_complete(struct napi_struct *n)
- 	return napi_complete_done(n, 0);
- }
+@@ -3344,7 +3344,7 @@ int netif_open(struct net_device *dev, struct netlink_ext_ack *extack);
+ int dev_open(struct net_device *dev, struct netlink_ext_ack *extack);
+ void netif_close(struct net_device *dev);
+ void dev_close(struct net_device *dev);
+-void dev_close_many(struct list_head *head, bool unlink);
++void netif_close_many(struct list_head *head, bool unlink);
+ void netif_disable_lro(struct net_device *dev);
+ void dev_disable_lro(struct net_device *dev);
+ int dev_loopback_xmit(struct net *net, struct sock *sk, struct sk_buff *newskb);
+diff --git a/net/8021q/vlan.c b/net/8021q/vlan.c
+index df19a9c0c9d9..7b29e0be74bd 100644
+--- a/net/8021q/vlan.c
++++ b/net/8021q/vlan.c
+@@ -446,7 +446,7 @@ static int vlan_device_event(struct notifier_block *unused, unsigned long event,
+ 				list_add(&vlandev->close_list, &close_list);
+ 		}
  
-+int netif_set_threaded(struct net_device *dev, bool threaded);
- int dev_set_threaded(struct net_device *dev, bool threaded);
+-		dev_close_many(&close_list, false);
++		netif_close_many(&close_list, false);
  
- void napi_disable(struct napi_struct *n);
+ 		list_for_each_entry_safe(vlandev, tmp, &close_list, close_list) {
+ 			vlan_stacked_transfer_operstate(dev, vlandev,
+@@ -741,3 +741,4 @@ module_exit(vlan_cleanup_module);
+ MODULE_DESCRIPTION("802.1Q/802.1ad VLAN Protocol");
+ MODULE_LICENSE("GPL");
+ MODULE_VERSION(DRV_VERSION);
++MODULE_IMPORT_NS("NETDEV_INTERNAL");
 diff --git a/net/core/dev.c b/net/core/dev.c
-index 2d3d9166e7af..dce23b445ad1 100644
+index dce23b445ad1..26253802f6cd 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -4797,7 +4797,7 @@ static inline void ____napi_schedule(struct softnet_data *sd,
- 
- 	if (test_bit(NAPI_STATE_THREADED, &napi->state)) {
- 		/* Paired with smp_mb__before_atomic() in
--		 * napi_enable()/dev_set_threaded().
-+		 * napi_enable()/netif_set_threaded().
- 		 * Use READ_ONCE() to guarantee a complete
- 		 * read on napi->thread. Only call
- 		 * wake_up_process() when it's not NULL.
-@@ -6960,7 +6960,7 @@ static void napi_stop_kthread(struct napi_struct *napi)
- 	napi->thread = NULL;
+@@ -1767,7 +1767,7 @@ static void __dev_close(struct net_device *dev)
+ 	list_del(&single);
  }
  
--int dev_set_threaded(struct net_device *dev, bool threaded)
-+int netif_set_threaded(struct net_device *dev, bool threaded)
+-void dev_close_many(struct list_head *head, bool unlink)
++void netif_close_many(struct list_head *head, bool unlink)
  {
- 	struct napi_struct *napi;
- 	int err = 0;
-@@ -7004,7 +7004,7 @@ int dev_set_threaded(struct net_device *dev, bool threaded)
+ 	struct net_device *dev, *tmp;
  
- 	return err;
+@@ -1785,7 +1785,7 @@ void dev_close_many(struct list_head *head, bool unlink)
+ 			list_del_init(&dev->close_list);
+ 	}
  }
--EXPORT_SYMBOL(dev_set_threaded);
-+EXPORT_SYMBOL(netif_set_threaded);
+-EXPORT_SYMBOL(dev_close_many);
++EXPORT_SYMBOL_NS_GPL(netif_close_many, "NETDEV_INTERNAL");
  
- /**
-  * netif_queue_set_napi - Associate queue with the napi
-diff --git a/net/core/dev_api.c b/net/core/dev_api.c
-index 1bf0153195f2..dd7f57013ce5 100644
---- a/net/core/dev_api.c
-+++ b/net/core/dev_api.c
-@@ -367,3 +367,15 @@ void netdev_state_change(struct net_device *dev)
- 	netdev_unlock_ops(dev);
+ void netif_close(struct net_device *dev)
+ {
+@@ -1793,7 +1793,7 @@ void netif_close(struct net_device *dev)
+ 		LIST_HEAD(single);
+ 
+ 		list_add(&dev->close_list, &single);
+-		dev_close_many(&single, true);
++		netif_close_many(&single, true);
+ 		list_del(&single);
+ 	}
  }
- EXPORT_SYMBOL(netdev_state_change);
-+
-+int dev_set_threaded(struct net_device *dev, bool threaded)
-+{
-+	int ret;
-+
-+	netdev_lock(dev);
-+	ret = netif_set_threaded(dev, threaded);
-+	netdev_unlock(dev);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL(dev_set_threaded);
-diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index e41ad1890e49..c28cd6665444 100644
---- a/net/core/net-sysfs.c
-+++ b/net/core/net-sysfs.c
-@@ -757,7 +757,7 @@ static int modify_napi_threaded(struct net_device *dev, unsigned long val)
- 	if (val != 0 && val != 1)
- 		return -EOPNOTSUPP;
+@@ -12070,7 +12070,7 @@ void unregister_netdevice_many_notify(struct list_head *head,
+ 			netdev_lock(dev);
+ 		}
+ 	}
+-	dev_close_many(&close_head, true);
++	netif_close_many(&close_head, true);
+ 	/* ... now unlock them and go over the rest. */
+ 	list_for_each_entry(dev, head, unreg_list) {
+ 		if (netdev_need_ops_lock(dev))
+@@ -12078,7 +12078,7 @@ void unregister_netdevice_many_notify(struct list_head *head,
+ 		else
+ 			list_add_tail(&dev->close_list, &close_head);
+ 	}
+-	dev_close_many(&close_head, true);
++	netif_close_many(&close_head, true);
  
--	ret = dev_set_threaded(dev, val);
-+	ret = netif_set_threaded(dev, val);
+ 	list_for_each_entry(dev, head, unreg_list) {
+ 		/* And unlink it from device chain. */
+diff --git a/net/dsa/dsa.c b/net/dsa/dsa.c
+index 436a7e1b412a..5b01a0e43ebe 100644
+--- a/net/dsa/dsa.c
++++ b/net/dsa/dsa.c
+@@ -1621,7 +1621,7 @@ void dsa_switch_shutdown(struct dsa_switch *ds)
+ 	dsa_switch_for_each_cpu_port(dp, ds)
+ 		list_add(&dp->conduit->close_list, &close_list);
  
- 	return ret;
- }
+-	dev_close_many(&close_list, true);
++	netif_close_many(&close_list, true);
+ 
+ 	dsa_switch_for_each_user_port(dp, ds) {
+ 		conduit = dsa_port_to_conduit(dp);
+@@ -1829,3 +1829,4 @@ MODULE_AUTHOR("Lennert Buytenhek <buytenh@wantstofly.org>");
+ MODULE_DESCRIPTION("Driver for Distributed Switch Architecture switch chips");
+ MODULE_LICENSE("GPL");
+ MODULE_ALIAS("platform:dsa");
++MODULE_IMPORT_NS("NETDEV_INTERNAL");
+diff --git a/net/dsa/user.c b/net/dsa/user.c
+index e9334520c54a..f59d66f0975d 100644
+--- a/net/dsa/user.c
++++ b/net/dsa/user.c
+@@ -3604,7 +3604,7 @@ static int dsa_user_netdevice_event(struct notifier_block *nb,
+ 			list_add(&dp->user->close_list, &close_list);
+ 		}
+ 
+-		dev_close_many(&close_list, true);
++		netif_close_many(&close_list, true);
+ 
+ 		return NOTIFY_OK;
+ 	}
 -- 
 2.50.0
 
