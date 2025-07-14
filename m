@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-206574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20130B03827
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 09:39:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B86B0B0382B
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 09:41:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 943E97A1C73
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 07:38:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F66F17A63D
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 07:41:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BAA623504D;
-	Mon, 14 Jul 2025 07:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FD7F2367AA;
+	Mon, 14 Jul 2025 07:41:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AOD/KYob"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mU2U9pud"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22EDA1E9B1A;
-	Mon, 14 Jul 2025 07:39:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F5FA23644D;
+	Mon, 14 Jul 2025 07:41:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752478771; cv=none; b=A4GWaFjhe6IEjcNiU8JQv/IvAdGVlPUjx4HFq+hOSQEUPwM1gujj9v8feDWguz7/AUWMPEamA0QRjRTCp1imsBcu+S2RaSVi7EP1cEJ2WD2OkaVIXLVFxPVIZ0iInBpyiBpUPVifqJQJYBe5UUtVsnatbcOETb0fCwyA1uwKWIA=
+	t=1752478890; cv=none; b=TbV8+bAt3kXJxkf8UzdjyL7SKJYalbCq9Lg5WR/nXnCwM8YVlVAM+NgotaAslc8HZWyIZzrzbMYphFWYpplJv36VSO9nH+rHFHtVtgJSvtJFRQeKYFlLGNEQWM/vBFVgskFrEvabJg6Z0zcCYXRMURlUKUhAO56JVahQsoz7O/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752478771; c=relaxed/simple;
-	bh=isH+LNOSuSMjjTwgNJb2F7KxIlurX0tYxz+h39DW+Pc=;
+	s=arc-20240116; t=1752478890; c=relaxed/simple;
+	bh=c5oXUnZQjWluCTOADuJWO/SA6yL+BgCzjJwJnzdWKSs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LEKWQuGcW25fzC9UyWEmC5TJcaWgAxiieOmNn7QdGt6lQ3VHq8lB6bdoNjE3La05IUb3IX8nuNLl+3KRYMh78dqK7XiGxcCxX3arWSbzK0ns46HPhS88mBN/MsqCM84hp8oVmeuj5Y4hWcvsyrGzg9VSwxe6G+LcnmvpLNqkufg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AOD/KYob; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44792C4CEED;
-	Mon, 14 Jul 2025 07:39:26 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=lwmU5eRKPy21S2k2wTDY+E+J5qPawuJymbslrShrtZNgnQ+sZQW8PXxGI2TUaH9GVrfrDc9t4+HblrZcnMgtoko3TBXn5rdC4GVhiauivymTdZsZi6z/LMQwLbHNPxgBFOFHORjTnwOuR3d8jI1mlcQ3fTSiZQpm4zvta7WWrlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mU2U9pud; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AA89C4CEED;
+	Mon, 14 Jul 2025 07:41:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752478770;
-	bh=isH+LNOSuSMjjTwgNJb2F7KxIlurX0tYxz+h39DW+Pc=;
+	s=k20201202; t=1752478889;
+	bh=c5oXUnZQjWluCTOADuJWO/SA6yL+BgCzjJwJnzdWKSs=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=AOD/KYobuLtBzyTbgiLp2pSrxVLtnp6Hhh49MCaM6g4HZNQpxAwHJJSvcdca3M8AM
-	 wyrlyS2GtsoYLpjaQTq27xjyrs/Fs2hH/GFIDdHFu4k4QYbnxGUxlofgPu16Ijlvle
-	 240zI9WDPWsPokYVvJ7try3I/M0yGgAqX0WJ3jjmyF5GxBeXrCeqfnumtiRFp9oKcT
-	 zGKFFJI4makuzZoLOBWuODbyFzGSerXiT9lox9wgLA/9oEERYx24rRUxLh+DCBXCIJ
-	 Mdc3y6VktUZKbE9Bn7OPaqXv285Yl7ryOXRmsU7Uu0OQWU9ZE1fRFElySSVdL2jQ/R
-	 ogqeu3NDl2wZQ==
-Message-ID: <623a647b-806a-4324-9c59-fcad3127f906@kernel.org>
-Date: Mon, 14 Jul 2025 09:39:24 +0200
+	b=mU2U9pudA34L6ZiTZwOpRWNtYJ3H1Y338t0tS3T2N+/32adGBbSvved1vdIhlaAm2
+	 hdXHQn2O5WQ7vQonLFtzgq0eC6zO3RkW3X306xPNlRrNzBoJO42EqCzPLIY9K9ziiX
+	 yPp91In6NmyCz7sXvzLyhngebYvySBmBCM6zb9YvxQLMg19lkGHMS2tlBRYJoii+yP
+	 Xslz+zQYBbUqU5WfdaiBxmxQp4A8fCzBQByjxLQorqKTmiKvpCtciwiGb+vC/h5rhb
+	 ltq9zxtpG+etPqq8eckfTsjxSnAEAFCZnBxL1jDlmJIXGfiimOrVMYn79ZjBrFsOpL
+	 3NEGgifh0eXSw==
+Message-ID: <222133f7-9483-4e4b-b3fe-90e2e830fcf6@kernel.org>
+Date: Mon, 14 Jul 2025 09:41:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,25 +50,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 2/7] net: airoha: npu: Add NPU wlan memory
- initialization commands
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+Subject: Re: [PATCH v8 02/16] dt-bindings: net: mediatek,net: allow up to 8
+ IRQs
+To: frank-w@public-files.de,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Frank Wunderlich <linux@fw-web.de>
+Cc: MyungJoo Ham <myungjoo.ham@samsung.com>,
+ Kyungmin Park <kyungmin.park@samsung.com>,
+ Chanwoo Choi <cw00.choi@samsung.com>, Georgi Djakov <djakov@kernel.org>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, Simon Horman <horms@kernel.org>,
- Felix Fietkau <nbd@nbd.name>
-References: <20250705-airoha-en7581-wlan-offlaod-v2-0-3cf32785e381@kernel.org>
- <20250705-airoha-en7581-wlan-offlaod-v2-2-3cf32785e381@kernel.org>
- <20250707-agile-aardwolf-of-politeness-29fead@krzk-bin>
- <aGt2L1e3xbWVoqOO@lore-desk>
- <679e6fd2-967f-4057-9ccd-92a37ecc4819@kernel.org>
- <aGvmoJ83EtYOIa0K@lore-desk>
- <904d1165-185e-43ac-9b52-a2f17f774e80@kernel.org>
- <aGzJ1vFufzBts_yG@lore-desk>
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ Johnson Wang <johnson.wang@mediatek.com>, =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?=
+ <arinc.unal@arinc9.com>, Landen Chao <Landen.Chao@mediatek.com>,
+ DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
+ Daniel Golle <daniel@makrotopia.org>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Felix Fietkau <nbd@nbd.name>, linux-pm@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20250706132213.20412-1-linux@fw-web.de>
+ <20250706132213.20412-3-linux@fw-web.de>
+ <20250707-modest-awesome-baboon-aec601@krzk-bin>
+ <B875B8FF-FEDB-4BBD-8843-9BA6E4E89A45@fw-web.de>
+ <90a3191f-882d-4302-afd5-e73e751b5b95@collabora.com>
+ <9696BB13-9D1E-48D3-B323-03AD23110CF5@public-files.de>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -114,40 +123,43 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <aGzJ1vFufzBts_yG@lore-desk>
+In-Reply-To: <9696BB13-9D1E-48D3-B323-03AD23110CF5@public-files.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 08/07/2025 09:33, Lorenzo Bianconi wrote:
+On 07/07/2025 12:43, Frank Wunderlich wrote:
+> Hi Angelo,
 > 
->>
->>> posted net-next patches as preliminary ones for MT76 changes).
->>> Moreover, this is the same approach we used when we added WED support to
->>> mtk_eth_soc driver and the related MT76 support.
->>> However, I am fine to post the MT76 changes as RFC and just refer to it in
->>> this series cover-letter. Agree? 
->>>
+> Am 7. Juli 2025 12:06:02 MESZ schrieb AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>:
+>> Il 07/07/25 09:30, Frank Wunderlich ha scritto:
+>>> Am 7. Juli 2025 08:31:11 MESZ schrieb Krzysztof Kozlowski <krzk@kernel.org>:
+>>>> On Sun, Jul 06, 2025 at 03:21:57PM +0200, Frank Wunderlich wrote:
+>>>>> From: Frank Wunderlich <frank-w@public-files.de>
+>>>>>
+>>>>> Increase the maximum IRQ count to 8 (4 FE + 4 RSS/LRO).
 >>>>
->>>> So far I see ABI break, but without user cannot judge. And that's the
->>>> hard reason this cannot be accepted.
+>>>> Because? Hardware was updated? It was missing before?
 >>>
->>> if you mean the dts changes, I will fix them in v3.
+>>> There is no RSS support in driver yet,so IRQs were not added to existing DTS yet.
 >>>
->> No, I mean driver.
+>>
+>> That's the problem. It's the hardware that you should've described, not the driver.
+>>
+>> In short, you should've allowed the interrupts from the get-go, and you wouldn't
+>> be in this situation now :-)
 > 
-> Sorry, can you please explain what is the ABI break in the driver codebase?
-> airoha_npu_wlan_init_memory() is executed by MT76 driver and not during NPU
-> probe phase.
+> I have not upstreamed MT7981 or MT7986. I also do not want to say anybody else did this wrong.
+> I'm happy that MT7986 is working in mainline. It was basicly not taken into account that these IRQs may be needed in future.
 > 
+> The technical documents are often not complete and we get some information step-by-step while testing.
+> Or it was not seen when documents are too large :) many reasons why it was "forgotten to add".
+> We use what we get from sdk and docs and try to make it compatible with mainline....no optimal process,but it is like it is.
 
-Read the first problem I pointed out - no user. Your new ABI returns
-error and you changed binding in incompatible way.
 
-Binding change is ABI break and its impact is impossible to judge due to
-missing code. I am speaking about this since beginning, but if you keep
-insisting that the driver does not matter then this is a NAK because you
-change ABI in the binding.
+Then explain in the commit msg that hardware description was incomplete
+and was missing this and that.
 
+This is the valid reason for doing the change.
 
 Best regards,
 Krzysztof
