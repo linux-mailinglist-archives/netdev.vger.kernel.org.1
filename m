@@ -1,213 +1,158 @@
-Return-Path: <netdev+bounces-206849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F0D0B048EE
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 23:02:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F056B04902
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 23:04:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 888C44A1873
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 21:02:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C9754A26F3
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 21:03:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E0C2239573;
-	Mon, 14 Jul 2025 21:02:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5860723AB90;
+	Mon, 14 Jul 2025 21:04:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NCNb9MQ/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F3623817F
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 21:02:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9839815C158;
+	Mon, 14 Jul 2025 21:04:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752526955; cv=none; b=RBz1RUgD2+ejR7ZfHp98t6hf6PxDqK24k/SvG1yZEstfrBhNT1/GRArrOk2PD8q/CFyMmdtq7k48eBybzJfe/crDOnQS0wFwKayioQ7lPt/cHt5kp1QbSUWpwwznkpypvp4x6zFR2jK+DdNQoNFQvEC/qLRa03l/BgbaiFaQl0M=
+	t=1752527057; cv=none; b=bEkEnY7/AeAVgJ1f4fQwLqB3jFObCiTO/2rasDTORtSp3pOQWPATDeQQYir3REaykhQ9/DwelLAP+PcaY7Fu4UIORBYwmbN8m2sFK28OmtcRQGe75xs6JqWoTuAE6LPcVSHQTxQ2lj054cvJQBWOyyJ2dEPFZow+6aXvTEEjgGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752526955; c=relaxed/simple;
-	bh=xH3QLy9ZM+VnbqR3ZsfNogbkwjOy1dIvl2E4ICHDUwY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=cEgQJeY1LIX1jwIjgwvRzSNy5FE2Y1vvRfSLZ2nU09RJZd0w3NXpE9kWC4tzefS/dMZ+2td+IWbv9/H+ahZ8Kpg2AhGKBQXn0x9/cH7B64oJRXfqC9JRG4osK7fBNrBWBnIsx/3DsaAQWZB0582A1hlZdgyeeMmJ0623CuLfH2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-87313ccba79so937775039f.2
-        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 14:02:33 -0700 (PDT)
+	s=arc-20240116; t=1752527057; c=relaxed/simple;
+	bh=XWC0zxNYZfIjRWOG7IoJiPS5eyTrWieCg+q04+Ow2d0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EMs0DA49FLo8ityGySoEnbmr9RCe5xdqJouMIrBmpVJwg7O5pI3rRFDilEMjLKA/Ucvu5XnMdXy1IexNFlN46VgBTUcoqMZU5tYGL/YosIPi/JTGg4RmQZhQFcPorVp0m9D+Gq7ruwLh+NqglFOBlHaJnUpUCnsAi8RCbJC1t38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NCNb9MQ/; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-451d41e1ad1so33447735e9.1;
+        Mon, 14 Jul 2025 14:04:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752527052; x=1753131852; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=mouR0tzYVYgaU9BwCE8alLNv2Rg+cKwIajr55xzq3Io=;
+        b=NCNb9MQ/QzEiPl+AjCNda7ZSJDFm5STuDzcV4G3z+LE6z52/58mquzKJm3qoPCClsy
+         YVXXMwTZ/N0y9LbLIvvqx6WUG8ldgnLydZBQA1n95HJqVkMF1SDNFbI8WMllcwiCNT90
+         lpe7ixfqmPiGtv9NILtIb6biZ2N3cj8uBFgllxTkpHMJq36VQjW6ECscG3yoApqfRVzZ
+         QWzoN2RJ+T+Tu6JYewKSIdg+lVM3xGPwyFyu3rsIoSFeEL8Uh+3+7ECZhsU6MEgzBQx6
+         Ql6D0CJQRqKX/9xBUgcBegxF/oCgN4QMQPnAxlX+H5azv1ywM7EdhEJgA60vXNKBE6AO
+         XkBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752526953; x=1753131753;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=C2Q1NLh7gUoTVClx27jDS/g66nSd1V24PSANTOejsys=;
-        b=OAlw4b/ROsOixB2i+BfxaCeI9Nyr0UJv+t8iYmgqa8sH9ETP17U45PK4ihHqr2R1kt
-         ykN4BWa8tWoea39msjq40pVsjhxGgQmS+ddzNVZoTTePalZdzhcZFTSO3fRcTW36eAva
-         BUL6gFK6hKL22I1FGa3qeawAi3Cncpd0C+DFAYx9H48dvIFu4g11jW0yXhmhAUH1ea0g
-         WJqcBECMtPAo8J4QjPMj20sZUhgEvnCvN5S0Ap5w38T6beYX+nUK0MrrvpZfGHp6IuBX
-         Bzl4IiHzhu98fPtjkZfQEPFGMaiIFwdQ2Ud+mR5P+lzWX7LW5wegRjSRKMCMNvi1IE+Y
-         zuaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUARr1H+zK7Xd6By6WuE4rJl+OcFN7qnuIC8rpwUDktS+/7n2txu0S7eXPMRB8lDEGKnHos9GM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSmxfbE2/LQPWP9FkgLH55DAIIWePiIcHBSNVNXGQfvibvRzK+
-	qI1X+4II4Ykdfx7AFO+GwZbuZC5p2/RD+vYjJFBcbEsIn50TtBBiGgn3OGesP5iREaHkIthisJ7
-	VZ074sICldt963CBvDyA75r9g2EJea52ZjVW09dZySXbfZ5i7olRbwe9CeHo=
-X-Google-Smtp-Source: AGHT+IH8lFGhU84Vmgqxm566NwZTQrh3zGXp2GScmXDpOp9azBaSRZ+zVJ3KiQ1WYhskdPAtHVvLeToalmaGLoapz1rMj4jaMNII
+        d=1e100.net; s=20230601; t=1752527052; x=1753131852;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mouR0tzYVYgaU9BwCE8alLNv2Rg+cKwIajr55xzq3Io=;
+        b=Jw4Jcsl4oFJp1SqvIWzOR9Dwy/NXvjdtgnygOVhYDkoM4iPeuJ1MuS/jN0Etc4c67Y
+         mjvf62K5tnRtqo9lQDCfm7z52wG+MCdvpRzWvInaqEVaWjuLEjaBRuAd76TTYe4I/vg3
+         wKFnCis8rgBab0NbKc3xHbAwLrHtcyb+tjZJKHvE0Mlk1neGkssClKhO+shthtDKHaKc
+         rlArdYdKqQtbp+58Do2gmsMrlgZyh5DyqHaYUzNjBhVzX0iSOJC0aYsfILC4XklKa7Tu
+         j3NPYuLdxOTXBoPvt/dJEQn73XwyVW7SB14P7uNleagPpBNEid9yXcbIxctLCncZcyF5
+         elGA==
+X-Forwarded-Encrypted: i=1; AJvYcCVV230zqE6CeR4lRbPhVAJClfMyyxqBub4ompt508UvmKJjZ/MMOqgsg/PKbWRdjP+Ho47rOXsnNc89nOcjSWyd@vger.kernel.org, AJvYcCW9DB0xwrTYiv+nm+Kf5HvRBOuPV5swvuSA1DF51lOFo9nwG6Wq0EnJPXZy5r/+NMV4xOE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9r2hEAKOJz/vSbgNk+oEB0WKo+yj1/Ob8qSY4g1/irnS910Bg
+	eJz8Tv1TqDpEKk11KPwCmZ8WuvvdVFZsTqQ1Ret5QLAzR9Pw8T0mnVa725J0c6GL
+X-Gm-Gg: ASbGnctpOwcQ99xJ3HgP5OZV96Ek4C5N7KjWbZfcM5zDWqzaM7ZDsSd9UJcUzCWB7BR
+	RM826EoRZseorr86Ql6TFbzLaDzgrCCd4ufFLDAHiFwQlPPRjujecpOhJU9vT9XVJutZux4r+SE
+	XrtnSzUM47kta5kxqRII6VFwY5Ml+FzYCIWT1OQy9PynC0wDRfJM79eQL3UFUOhg/ncxWgv4WFE
+	fSfiy9UEeS4zmKJxY1rcUG5wOkOlcEbJIoTpaIkBV31ocYxu9HJ4jPlm5ramnyxzji2t7KX9V9H
+	mZGmKdeAtKigWmEH1w1wMkdvV/vIPJ0rUsKPo7I10jashNl0steb58gXoKOmiqWvVtLdnqveSbi
+	Q8+HNY2YCBJCTTC5fvpY=
+X-Google-Smtp-Source: AGHT+IH6zXTxX+LNCWcxRTcfW/J/nHlhc1PThiqfATIeWBU6atdA9tOZZyTYRLPbCj8P4NRFR2HI9w==
+X-Received: by 2002:a05:600c:8505:b0:442:e0f9:394d with SMTP id 5b1f17b1804b1-45565edc90dmr113035265e9.24.1752527052297;
+        Mon, 14 Jul 2025 14:04:12 -0700 (PDT)
+Received: from localhost ([2a03:2880:31ff:8::])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4561b176f87sm40748325e9.35.2025.07.14.14.04.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Jul 2025 14:04:11 -0700 (PDT)
+From: Mohsin Bashir <mohsin.bashr@gmail.com>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	horms@kernel.org,
+	cratiu@nvidia.com,
+	noren@nvidia.com,
+	cjubran@nvidia.com,
+	mbloch@nvidia.com,
+	mohsin.bashr@gmail.com,
+	jdamato@fastly.com,
+	gal@nvidia.com,
+	sdf@fomichev.me,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	nathan@kernel.org,
+	nick.desaulniers+lkml@gmail.com,
+	morbo@google.com,
+	justinstitt@google.com,
+	bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next V4 0/5] selftests: drv-net: Test XDP native support
+Date: Mon, 14 Jul 2025 14:03:47 -0700
+Message-ID: <20250714210352.1115230-1-mohsin.bashr@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:60ca:b0:86c:ef0b:3a52 with SMTP id
- ca18e2360f4ac-8797883ec84mr1643507939f.11.1752526952671; Mon, 14 Jul 2025
- 14:02:32 -0700 (PDT)
-Date: Mon, 14 Jul 2025 14:02:32 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68757068.a70a0220.18f9d4.000a.GAE@google.com>
-Subject: [syzbot] [wireless?] INFO: task hung in el1_interrupt
-From: syzbot <syzbot+6d053681b57b25d51ba9@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+This patch series add tests to validate XDP native support for PASS,
+DROP, ABORT, and TX actions, as well as headroom and tailroom adjustment.
+For adjustment tests, validate support for both the extension and
+shrinking cases across various packet sizes and offset values.
 
-syzbot found the following issue on:
+The pass criteria for head/tail adjustment tests require that at-least
+one adjustment value works for at-least one packet size. This ensure
+that the variability in maximum supported head/tail adjustment offset
+across different drivers is being incorporated.
 
-HEAD commit:    ec4801305969 Merge branches 'for-next/core' and 'for-next/..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=157c3a8c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9e99b6fcd403d050
-dashboard link: https://syzkaller.appspot.com/bug?extid=6d053681b57b25d51ba9
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-userspace arch: arm64
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=141c0d82580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=137c3a8c580000
+The results reported in this series are based on fbnic. However, the
+series is tested against multiple other drivers including netdevism.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/64d8dc107d9d/disk-ec480130.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/31280b2dee28/vmlinux-ec480130.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/b3f9fb3d09f8/Image-ec480130.gz.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6d053681b57b25d51ba9@syzkaller.appspotmail.com
-
-INFO: task kworker/u8:7:279 blocked for more than 143 seconds.
-      Not tainted 6.16.0-rc5-syzkaller-gec4801305969 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/u8:7    state:D stack:0     pid:279   tgid:279   ppid:2      task_flags:0x4208060 flags:0x00000010
-Workqueue: events_power_efficient crda_timeout_work
-Call trace:
- __switch_to+0x414/0x834 arch/arm64/kernel/process.c:742 (T)
- context_switch kernel/sched/core.c:5401 [inline]
- __schedule+0x1414/0x2a28 kernel/sched/core.c:6790
- preempt_schedule_irq+0x80/0x188 kernel/sched/core.c:7113
- arm64_preempt_schedule_irq+0x44/0x58 arch/arm64/kernel/entry-common.c:305
- el1_interrupt+0x3c/0x
- __el1_irq arch/arm64/kernel/entry-common.c:656 [inline]
- el1_interrupt+0x3c/0x54 arch/arm64/kernel/entry-common.c:668
- el1h_64_irq_handler+0x18/0x24 arch/arm64/kernel/entry-common.c:673
- el1h_64_irq+0x6c/0x70 arch/arm64/kernel/entry.S:592
- __daif_local_irq_restore arch/arm64/include/asm/irqflags.h:175 [inline] (P)
- arch_local_irq_restore arch/arm64/include/asm/irqflags.h:195 [inline] (P)
- put_cpu_partial+0x154/0x1c0 mm/slub.c:3258 (P)
- __slab_free+0x1b0/0x280 mm/slub.c:4513
- do_slab_free mm/slub.c:4595 [inline]
- ___cache_free+0x150/0x170 mm/slub.c:4701
- qlink_free+0x48/0x94 mm/kasan/quarantine.c:163
- qlist_free_all+0x44/0xb8 mm/kasan/quarantine.c:179
- kasan_quarantine_reduce+0x118/0x124 mm/kasan/quarantine.c:286
- __kasan_slab_alloc+0x2c/0x88 mm/kasan/common.c:329
- kasan_slab_alloc include/linux/kasan.h:250 [inline]
- slab_post_alloc_hook mm/slub.c:4148 [inline]
- slab_alloc_node mm/slub.c:4197 [inline]
- __kmalloc_cache_noprof+0x238/0x3fc mm/slub.c:4354
- kmalloc_noprof include/linux/slab.h:905 [inline]
- kzalloc_noprof include/linux/slab.h:1039 [inline]
- regulatory_hint_core net/wireless/reg.c:3246 [inline]
- restore_regulatory_settings+0x1664/0x2504 net/wireless/reg.c:3578
- crda_timeout_work+0x38/0x68 net/wireless/reg.c:543
- process_one_work+0x7e8/0x155c kernel/workqueue.c:3238
- process_scheduled_works kernel/workqueue.c:3321 [inline]
- worker_thread+0x958/0xed8 kernel/workqueue.c:3402
- kthread+0x5fc/0x75c kernel/kthread.c:464
- ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:843
-
-Showing all locks held in the system:
-3 locks held by kworker/u8:0/12:
- #0: ffff0000d11ae948 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_one_work+0x63c/0x155c kernel/workqueue.c:3212
- #1: ffff800097a87bc0 ((work_completion)(&(&ifa->dad_work)->work)){+.+.}-{0:0}, at: process_one_work+0x6d4/0x155c kernel/workqueue.c:3212
- #2: ffff8000928b6568 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x20/0x2c net/core/rtnetlink.c:80
-2 locks held by kworker/1:0/24:
-1 lock held by khungtaskd/32:
- #0: ffff80008f8599c0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire+0x4/0x48 include/linux/rcupdate.h:330
-3 locks held by kworker/u8:2/41:
- #0: ffff0000c0031948 ((wq_completion)events_power_efficient){+.+.}-{0:0}, at: process_one_work+0x63c/0x155c kernel/workqueue.c:3212
- #1: ffff8000990e7bc0 ((reg_check_chans).work){+.+.}-{0:0}, at: process_one_work+0x6d4/0x155c kernel/workqueue.c:3212
- #2: ffff8000928b6568 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x20/0x2c net/core/rtnetlink.c:80
-3 locks held by kworker/u8:3/42:
-5 locks held by pr/ttyAMA0/43:
-2 locks held by kworker/u8:6/217:
-4 locks held by kworker/u8:7/279:
-3 locks held by kworker/u8:8/318:
-2 locks held by kworker/1:2/1821:
-3 locks held by kworker/u8:10/2084:
-3 locks held by kworker/u8:11/2164:
-4 locks held by kworker/0:2/2316:
-1 lock held by klogd/6132:
-4 locks held by udevd/6143:
-3 locks held by dhcpcd/6198:
-2 locks held by getty/6295:
- #0: ffff0000d25040a0 (&tty->ldisc_sem){++++}-{0:0}, at: ldsem_down_read+0x3c/0x4c drivers/tty/tty_ldsem.c:340
- #1: ffff80009ba2e2f0 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x34c/0xfa4 drivers/tty/n_tty.c:2222
-2 locks held by kworker/1:3/6637:
-3 locks held by kworker/0:3/6642:
- #0: ffff0000c0028d48 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work+0x63c/0x155c kernel/workqueue.c:3212
- #1: ffff80009ff67bc0 (deferred_process_work){+.+.}-{0:0}, at: process_one_work+0x6d4/0x155c kernel/workqueue.c:3212
- #2: ffff8000928b6568 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x20/0x2c net/core/rtnetlink.c:80
-1 lock held by syz-executor/6650:
- #0: ffff8000928b6568 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x20/0x2c net/core/rtnetlink.c:80
-3 locks held by syz-executor/6651:
- #0: ffff80009291bdb0 (cb_lock){++++}-{4:4}, at: genl_rcv+0x28/0x50 net/netlink/genetlink.c:1218
- #1: ffff80009291bbc8 (genl_mutex){+.+.}-{4:4}, at: genl_lock net/netlink/genetlink.c:35 [inline]
- #1: ffff80009291bbc8 (genl_mutex){+.+.}-{4:4}, at: genl_op_lock net/netlink/genetlink.c:60 [inline]
- #1: ffff80009291bbc8 (genl_mutex){+.+.}-{4:4}, at: genl_rcv_msg+0xf4/0x624 net/netlink/genetlink.c:1209
- #2: ffff8000928b6568 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x20/0x2c net/core/rtnetlink.c:80
-2 locks held by syz-executor/6657:
- #0: ffff80009291bdb0 (cb_lock){++++}-{4:4}, at: genl_rcv+0x28/0x50 net/netlink/genetlink.c:1218
- #1: ffff8000928b6568 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x20/0x2c net/core/rtnetlink.c:80
-1 lock held by syz-executor/6658:
- #0: ffff8000928b6568 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x20/0x2c net/core/rtnetlink.c:80
-3 locks held by kworker/u8:12/6822:
-3 locks held by kworker/u8:13/6823:
-2 locks held by kworker/1:5/6824:
-3 locks held by kworker/u8:16/6827:
-2 locks held by kworker/u8:17/6828:
-3 locks held by syz-executor/6829:
-2 locks held by udevd/6832:
-
-=============================================
-
-
-
+Note: The XDP support for fbnic will be added later.
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Change-log:
+V4:
+  - Support XDP handling for netdevsim
+  - Fix pylint warning with P4
+  - Update commit message for P2,P3 to show pass/fail summary
+V3: https://lore.kernel.org/netdev/20250712002648.2385849-1-mohsin.bashr@gmail.com
+V2: https://lore.kernel.org/netdev/20250710184351.63797-1-mohsin.bashr@gmail.com
+V1: https://lore.kernel.org/netdev/20250709173707.3177206-1-mohsin.bashr@gmail.com
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Jakub Kicinski (1):
+  net: netdevsim: hook in XDP handling
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Mohsin Bashir (4):
+  selftests: drv-net: Test XDP_PASS/DROP support
+  selftests: drv-net: Test XDP_TX support
+  selftests: drv-net: Test tail-adjustment support
+  selftests: drv-net: Test head-adjustment support
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+ drivers/net/netdevsim/netdev.c                |  19 +-
+ tools/testing/selftests/drivers/net/Makefile  |   1 +
+ tools/testing/selftests/drivers/net/xdp.py    | 656 ++++++++++++++++++
+ .../selftests/net/lib/xdp_native.bpf.c        | 538 ++++++++++++++
+ 4 files changed, 1213 insertions(+), 1 deletion(-)
+ create mode 100755 tools/testing/selftests/drivers/net/xdp.py
+ create mode 100644 tools/testing/selftests/net/lib/xdp_native.bpf.c
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+-- 
+2.47.1
 
-If you want to undo deduplication, reply with:
-#syz undup
 
