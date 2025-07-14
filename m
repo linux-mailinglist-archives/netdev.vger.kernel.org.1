@@ -1,195 +1,136 @@
-Return-Path: <netdev+bounces-206804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EB86B04710
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 20:03:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 02585B04714
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 20:04:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C02127A49F9
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 18:01:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C2E07A11CB
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 18:02:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0174B26A1AE;
-	Mon, 14 Jul 2025 18:03:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8812126B0A7;
+	Mon, 14 Jul 2025 18:03:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OLIjyCy3"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z9F92bNP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1D325A645
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 18:03:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D177E26A1C7
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 18:03:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752516181; cv=none; b=maUoUEknUBpq7kRg1sD/dYYL15WZcheiVI6klSyR8AL5sOZ8bdKcJm7czuXbuFVbRflPwLmLiJS2OeykmRITqzHUk/f5WmAW/+xp9l+4RQyEpziYZoQOhOIIdCLyVdWkZMDDRUxlmB0xshf7timIPHmrwStrVOSDMuJ410n0//0=
+	t=1752516239; cv=none; b=uTl7K5jXtG9YoVQAH8cTvGrFSH04IP5Xq35KUvx5VMecn+XPsTUpKY4h+fjZ5hToO5j0w9yoT8UhGuy4CkZLTfwHsRi1nA3+sI3fVJP7s3rfi5d+u9tfAqJDPiTh8JTT2+lsH2ELNWymQcipem+/5POICV60Y2hJtwK16GCfvk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752516181; c=relaxed/simple;
-	bh=bD7rg46lG+a95esZQz8sRVTb5zo8aMwzO2OCspQPot8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lS03naSdUxKX2EbvgZ74KsciOBI+Hp5s7xqNSmElJpNOp0ilStQqiTTv3AW7qBc5JOKG4zhUw2LrqVwEitlTj6OBDmSahcqr7zRh2BqDVQufR1QSYj/OOsgIXTqlDqufZR3XFgbAbFCpgHanAd5EyNqzYJ93Q+bc02k/qUTrLPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OLIjyCy3; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-23dc5bcf49eso56254535ad.2
-        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 11:03:00 -0700 (PDT)
+	s=arc-20240116; t=1752516239; c=relaxed/simple;
+	bh=xKnjXWOY2IrRzosXfQB3Bpso/mm2u4JxGSYgZGdZjIQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kwuf6cQ2Ab5fq16ndyW2cjRhjodhmfB1CtJAjXZzIG2lxBjMxK1jRJGsQK4ifeW/n1Idxwno+cdojUUAoAItTzHm6jB/G2ItNcRyH+S3NWFxCwrqFngYwi5nRiw2M/6j9JrY7vFUAe/JuC+3NiWKER2J6fXWVNV0EXNblRYUr/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Z9F92bNP; arc=none smtp.client-ip=209.85.160.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-2ebb468cbb4so4077289fac.2
+        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 11:03:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752516180; x=1753120980; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O6E+Nzc/K3p/4FxVNjQXCo2R2Lfp11YKUIbLXFvX0bo=;
-        b=OLIjyCy3nbT9beUQVnr4z2ksa7e6i7qomyNxNOlNX7SoA/NuPFxOhs8O8IqIHz0Y5J
-         OcBP/LUwJXJ/7v6OAkoo7bCU3VqRH6Wd3ke2inTARgHgcF5cisntakNPgpWftSFGLL8X
-         gf58Kr3Lk25EFqf1Eo0c9X8t7Rf55hFQzXD4o8DHw5EqbvovrQVZ9yRV7JVZGI7BV8X+
-         RLSFu6CVSpJUz+xFayFqP+EhQ5gq0x4OCYeoP9RyurHQZ5QcCCON0a0OtnjroHM5tfdr
-         mA2/4CUPjoK98+rSNy8KZMtYa/oKuDyuDlLAoAG9DDZq14JxQuF/d8uEHOf6HsQC6Vy4
-         PkBw==
+        d=linaro.org; s=google; t=1752516236; x=1753121036; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kUc//PEDPwGX6GKHFUnDylrVbmV9/GKD9WpLyzBk2E0=;
+        b=Z9F92bNPvUvzoOh9o+Tc/v+cCBf2+qu2MWe2G+RnjWD3C5x+s5lLbCFMjjA6bZZHKa
+         W84FRIVVuaQVJ2pqMnhdhw0dQ3pF4LOsc3XrVXolQ6aJ34SCadHwhMOMfQOJAULm48QY
+         OUHlIO8OIR6r5SZqjPuKKb2awKYWSxP9R4yVFTA59l7TkKPMj0wCHwV7sgywmQT9hgpk
+         ldT9xZUimI5KStO+hW3gwxTtS7p7ud+7upXQkYXbhVwVYA2zQ+YA8BBLAcBV5QdIjhHv
+         5FpaNP+G7k6nzJWFPnAKSC1L1uSWICCdR6vRbM98oluqvyDIvrmxKU+aNO1LnzLMerx4
+         DtGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752516180; x=1753120980;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=O6E+Nzc/K3p/4FxVNjQXCo2R2Lfp11YKUIbLXFvX0bo=;
-        b=ZSlS1LpgrT6185PwjLiGpI89SSvb3VEFISxQBdEJYvmY8qNQazzkes0/1JVCYOpinW
-         mUlLDVv2sUhR3djmml/7dbCKQ2+C4S6OUj8shmMsCENokeTb9Tg7PCZUkDseF357LYYj
-         QUY3VmOYkxquSiBtAbUxiyo2Up9K0csgmsoORArnQiPWvdyqArftSvUXAHY9SQ2OXEi3
-         Cwy0IFPcyPttNGrVnxgh8veVeHV44dW4YmbHfpjyfGd8ll8tZmHLRD3FVAPDOrdQEcbK
-         aG8bEw6jKQgB5dOi+phyS/HXbxCPSbOnP/ID61YHhMvmMMKyoEhTX1ZGq8MEg94gQdQZ
-         kldw==
-X-Forwarded-Encrypted: i=1; AJvYcCV6YO2URmezWhOvM/LNHNTViuOexauSWA/vJDa+FKxEVVu7EZjTDU76Y5SPC1d2yqo4nhvmAUA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHnp0Wq/hDqFGQcogSA/YObBOZVVkBx+cxVidVebRmsYaZXtWT
-	KwxokF8rzzGI0lOnAtC+0mlp0sFM1QT1J3G6hmFgaQYgPu7O1DeAOi7+/yinahPWRNcfDrLNKqp
-	vVRw/hhyCk8hz9XDnWQueI943OF4F81hMP2dgLXMG
-X-Gm-Gg: ASbGncuVjTaW2erSS3LiTkiBnC0eletjmn1haiFrFkC8IU21ogZLqrsAwI+RKoWhssS
-	EjVV31g9gMMm+u6t3bKu2145KMo9OCSvSCS2Rod2o3EX7aHjVEV50aL9thWuzOJs0EOu4OAPXv8
-	lGc47PXVzgkOMDucRM3W1wJxJlUicQdgeaf0C+8rYLSqQOCppcrK8MaKyplpU0hLuZIEox2F8TW
-	zjxW3e0JAqd74skb3Ydfe4uUNZtir+DNKIXTJ09zEic1gOY
-X-Google-Smtp-Source: AGHT+IG7PqofdZIi6yyWYFtnJ1dgVAahvuF6PnKF2gEfcQ1LCBFisX0Vuf5x7Rorv4erCoSRhDGF4a/Rpp1v19w9Q10=
-X-Received: by 2002:a17:903:2b0b:b0:23c:863d:2989 with SMTP id
- d9443c01a7336-23dede2cc82mr209125765ad.3.1752516179303; Mon, 14 Jul 2025
- 11:02:59 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752516236; x=1753121036;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kUc//PEDPwGX6GKHFUnDylrVbmV9/GKD9WpLyzBk2E0=;
+        b=jdsQx3eF70S5yXr9Ww2p0G+z2PdmvnIFryp6aRkHH3XXG4dQU/RKVCi/Sx7kkwyU8h
+         aGVWnUAiQK+dGJIgeWdjXWey9+HImzr/N1HMfKGEunFig6o7R81FvoyMnoRGGPgQKEwf
+         Uobf4upWtxTdjbQKD7lHE3kiBw8cxwWr6W//Jg2XzRw2CWfCZCjD/hhcXd5CuC74uHNt
+         r6Y8i60oRvsDiE8eTSkPkhQ9jQeN+fYBtT0mvm9x5/gvpa4XWXDEE9A0VF5ea6MQY14d
+         qnRSmIREjQCCauao3E+ktpnTQYLd8WPgXX1C3S2T54dt31eSohyC1irP5EzrbLFKpTA0
+         LTUw==
+X-Forwarded-Encrypted: i=1; AJvYcCVFVM6Q3nMv+U9NaOTGhkcGtpAclRNY29nLgAtQp19HElf4Loc8EMPk7V1wncnaTz2Eto5Ocuw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyaK+inZahEHqt5GpIP+6ws/fq9wGh4qR6PNLb7Y6Kiy11tosgh
+	95nAOzmBDooYUeMgtCDEVPThsh565cr/meaAqO1FcaQjkmc5x7ZjE8Bs8kmH2skaMUQ=
+X-Gm-Gg: ASbGncuHhxqDAHKfVEOdsMOIomF2QoSBdWpEJhU2c6lwwvjcKahNKfKChdLWP6RksJO
+	kib3A+yjhxcencQRHEcGLLf/VaRBv/JWbAZFGE7J9ZciJ8X6AoMuf2WETGSSw2sC/O5lcSJ2gUI
+	h05+8wxTMgganpfPsW2rzsCZH13UhvVprhzwQiPiZNmB1ED0fwJjOECm2wzS6tL+ABDA9drAVYf
+	oRuKGScdCJ+ypU74WnQQy7GmQBPWCPGL4fbNJxNwbA0mzXWQdsE1vobycdEK0m9zEPpD8ORQD34
+	T9jSvDvykEVUDXVD2lEjWN8tTncaZeA8wMiUcSfv0dU+p18FGt7PvuPBmdwzlOQdQOnKQJ20/Sh
+	yh2tyC4oMdKs/ya1fCJB1b3EyvSYj8g==
+X-Google-Smtp-Source: AGHT+IHTpGx6mV7WMwP1pIKs1b9CdmfJ9vEn7hc8jx+5sU/Mj67Y+rDomjPaMvowTYcY4XUtpdxDwA==
+X-Received: by 2002:a05:687c:2001:20b0:2ff:8822:2912 with SMTP id 586e51a60fabf-2ff88223f6cmr1071480fac.5.1752516235811;
+        Mon, 14 Jul 2025 11:03:55 -0700 (PDT)
+Received: from localhost ([2603:8080:b800:f700:6bb2:d90f:e5da:befc])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2ff8dea112bsm84240fac.43.2025.07.14.11.03.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Jul 2025 11:03:55 -0700 (PDT)
+Date: Mon, 14 Jul 2025 21:03:53 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Ingo Molnar <mingo@kernel.org>,
+	Kohei Enju <enjuk@amazon.com>, Thomas Gleixner <tglx@linutronix.de>,
+	linux-hams@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net/rose: Remove unnecessary if check in
+ rose_dev_first()
+Message-ID: <96fbe379-cf8e-44e9-aeaf-a8beee2eda9c@suswa.mountain>
+References: <20250704083309.321186-3-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250714143613.42184-1-daniel.sedlak@cdn77.com> <20250714143613.42184-3-daniel.sedlak@cdn77.com>
-In-Reply-To: <20250714143613.42184-3-daniel.sedlak@cdn77.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 14 Jul 2025 11:02:48 -0700
-X-Gm-Features: Ac12FXz9MdgoMJI07wN-4_mDJf6QjZu83kf2eiskVdklZE-t6ycrn9vI5oAn9u4
-Message-ID: <CAAVpQUAsZsEKQ65Kuh7wmcf6Yqq8m4im7dYFvVd1RL4QHxMN8g@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 2/2] mm/vmpressure: add tracepoint for socket
- pressure detection
-To: Daniel Sedlak <daniel.sedlak@cdn77.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Neal Cardwell <ncardwell@google.com>, David Ahern <dsahern@kernel.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org, netdev@vger.kernel.org, 
-	Matyas Hurtik <matyas.hurtik@cdn77.com>, Daniel Sedlak <danie.sedlak@cdn77.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250704083309.321186-3-thorsten.blum@linux.dev>
 
-On Mon, Jul 14, 2025 at 7:37=E2=80=AFAM Daniel Sedlak <daniel.sedlak@cdn77.=
-com> wrote:
->
-> From: Matyas Hurtik <matyas.hurtik@cdn77.com>
->
-> When the vmpressure function marks all sockets within a particular
-> cgroup as under pressure, it can silently reduce network throughput
-> significantly. This socket pressure is not currently signaled in any way
-> to the users, and it is difficult to detect which cgroup is under socket
-> pressure.
->
-> This patch adds a new tracepoint that is called when a cgroup is under
-> socket pressure.
->
-> Signed-off-by: Matyas Hurtik <matyas.hurtik@cdn77.com>
-> Co-developed-by: Daniel Sedlak <danie.sedlak@cdn77.com>
-> Signed-off-by: Daniel Sedlak <danie.sedlak@cdn77.com>
+On Fri, Jul 04, 2025 at 10:33:08AM +0200, Thorsten Blum wrote:
+> dev_hold() already checks if its argument is NULL.
+> 
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 > ---
->  include/trace/events/memcg.h | 25 +++++++++++++++++++++++++
->  mm/vmpressure.c              |  3 +++
->  2 files changed, 28 insertions(+)
->
-> diff --git a/include/trace/events/memcg.h b/include/trace/events/memcg.h
-> index dfe2f51019b4..19a51db73913 100644
-> --- a/include/trace/events/memcg.h
-> +++ b/include/trace/events/memcg.h
-> @@ -100,6 +100,31 @@ TRACE_EVENT(memcg_flush_stats,
->                 __entry->force, __entry->needs_flush)
->  );
->
-> +TRACE_EVENT(memcg_socket_under_pressure,
-> +
-> +       TP_PROTO(const struct mem_cgroup *memcg, unsigned long scanned,
-> +               unsigned long reclaimed),
-> +
-> +       TP_ARGS(memcg, scanned, reclaimed),
-> +
-> +       TP_STRUCT__entry(
-> +               __field(u64, id)
-> +               __field(unsigned long, scanned)
-> +               __field(unsigned long, reclaimed)
-> +       ),
-> +
-> +       TP_fast_assign(
-> +               __entry->id =3D cgroup_id(memcg->css.cgroup);
-> +               __entry->scanned =3D scanned;
-> +               __entry->reclaimed =3D reclaimed;
-> +       ),
-> +
-> +       TP_printk("memcg_id=3D%llu scanned=3D%lu reclaimed=3D%lu",
-> +               __entry->id,
+>  net/rose/rose_route.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/net/rose/rose_route.c b/net/rose/rose_route.c
+> index b72bf8a08d48..35e21a2bec9c 100644
+> --- a/net/rose/rose_route.c
+> +++ b/net/rose/rose_route.c
+> @@ -608,8 +608,7 @@ struct net_device *rose_dev_first(void)
+>  			if (first == NULL || strncmp(dev->name, first->name, 3) < 0)
+>  				first = dev;
+>  	}
+> -	if (first)
+> -		dev_hold(first);
+> +	dev_hold(first);
 
-Maybe a noob question: How can we translate the memcg ID
-to the /sys/fs/cgroup/... path ?
+I'm not a fan of these sorts of "remove the NULL check" patches in
+general.  Sure it removes a line of code, but does it really improve
+readability?  I feel like someone reading this code might think a NULL
+check was required.
 
-It would be nice to place this patch first and the description of
-patch 2 has how to use the new stat with this tracepoint.
+I guess there is also an argument that this is a tiny speedup.  That
+could be a valid argument especially if we had benchmarking data to back
+it up.
 
+Of course, if you're planning to take over this code and be the
+maintainer of it, then you get to do whatever you feel is best.  So if
+this change were part of a larger change where you were taking over then
+that's fine.
 
-> +               __entry->scanned,
-> +               __entry->reclaimed)
-> +);
-> +
->  #endif /* _TRACE_MEMCG_H */
->
->  /* This part must be outside protection */
-> diff --git a/mm/vmpressure.c b/mm/vmpressure.c
-> index bd5183dfd879..aa9583066731 100644
-> --- a/mm/vmpressure.c
-> +++ b/mm/vmpressure.c
-> @@ -21,6 +21,8 @@
->  #include <linux/printk.h>
->  #include <linux/vmpressure.h>
->
-> +#include <trace/events/memcg.h>
-> +
->  /*
->   * The window size (vmpressure_win) is the number of scanned pages befor=
-e
->   * we try to analyze scanned/reclaimed ratio. So the window is used as a
-> @@ -317,6 +319,7 @@ void vmpressure(gfp_t gfp, struct mem_cgroup *memcg, =
-bool tree,
->                          * pressure events can occur.
->                          */
->                         WRITE_ONCE(memcg->socket_pressure, jiffies + HZ);
-> +                       trace_memcg_socket_under_pressure(memcg, scanned,=
- reclaimed);
+regards,
+dan carpenter
 
-This is triggered only when we enter the memory pressure state
-and not when we leave the state, right ?  Is it possible to issue
-such an event ?
-
-
->                 }
->         }
->  }
-> --
-> 2.39.5
->
 
