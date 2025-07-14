@@ -1,86 +1,86 @@
-Return-Path: <netdev+bounces-206671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF787B04015
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 15:35:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8AACB0402D
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 15:38:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C6AB1A6478A
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 13:31:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEB38175A60
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 13:34:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B79324EA85;
-	Mon, 14 Jul 2025 13:30:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE8142522BE;
+	Mon, 14 Jul 2025 13:34:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HxvTKTdI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GpzctJLL"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD2E188CC9
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 13:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50540251791
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 13:34:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752499834; cv=none; b=OFbXSzc7uX7nF7j0spQG1GGxzYz4MNdJmet/r3roTyq89cmY3MzogYh0tdRNcMSdVMnENWmDT1UazoWq4LEsAOBH1Wo9Ih5YdoFlId+tGAp5yEnwrAGZ4sVm4A716nXlAXRJF+7fyaLVIHztN0Jp64DP3JQ43uvty121qv7NlvE=
+	t=1752500042; cv=none; b=MRyNO6dbnSZfV4ozvR6NJvK0mjbUKEGMBWtcCMQynWllZhV56sGqFwFQdT9gJOGuTQMWC6PirGGIRchshM+gq1ynHrSBstd8DE1H94/UyraF7mLsmc/lfuc3Aovb7N4CKL43r+8TyTk/3AY//AtflkefmBpEHwTmCMAD/ALXzMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752499834; c=relaxed/simple;
-	bh=jE2PjP+eUyYjMNAeVnNr5q6iOIuN3tAeEx+RGEXiP+M=;
+	s=arc-20240116; t=1752500042; c=relaxed/simple;
+	bh=dknSdYPDMo76cFz0sXYbOIhIT5DVtRwgwQqMWZ1ploE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=tW5Oy+oG/oAA7jQTCkPJL/C4FGIgeGDPRfWPgsQGTDl8DQidhaQERmMbneQ4Y5JhTHoxJEeIhSLs1ea8aEsWgbKQbWQ2tTNLh6ea7FtquPSyROKo83LozXY39hB2B5NBEVtHEM+s6WkJQzBaNWldDlYY16yIby9BBImPFnS0Ios=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HxvTKTdI; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=WcwNmP8o3oN4HlsQcF+2x1XVYrngP0HhnEJdM1Lz4dQDXLEfOsMrrWq6rFyLqsW3ca48Ll2ZQPKEiKQGJxp7lhr7Hup6a5LLX78bwc+pNp9JCxIrtZ4l/AXnvXI2tOI43LlW1hyprT/NGHJMjIFZ1CmflUbvE+KQhBGl7WqN1GE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GpzctJLL; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752499831;
+	s=mimecast20190719; t=1752500040;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+zrHqcWkaADA2V8M40rY+/BG8BMVb7igefIEkGbRiek=;
-	b=HxvTKTdI1itRGZQJ2uwjeuXXe7W60mB52wyg37fJQtO2zwHB3meczxI0U0cL7qCxH8nekB
-	j8KlMq/zSVJLB/5OKiNmLitDfHBwJ+dC0s7N9etWzfPhO+UpIVRr634qSupvZ71yXugewc
-	06TeSay7s/ZhnJiiZ3r13Sy8TeH2UoI=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Ib61hPCB4AUA3/+sodbduYae96rRA8xkreivfOor25Y=;
+	b=GpzctJLL7UYjrjouZ4PlUM97VKFQY/VF4SQ9d8rp6RJ5aO3VTmdpXcLJDPkedCK4iGCqG7
+	0YXYST4etSTYjmrWJBohncxeHetXqiFwMozJ1jlJ80Bq8D6tqWpV0l1lQRBkp6p3TEm4eI
+	jga3JLDxVBa+zT5+UAxIKkNpH4k7jvg=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-637-PlJ257k6OF2UytsUTJ5dew-1; Mon, 14 Jul 2025 09:30:30 -0400
-X-MC-Unique: PlJ257k6OF2UytsUTJ5dew-1
-X-Mimecast-MFC-AGG-ID: PlJ257k6OF2UytsUTJ5dew_1752499826
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3af3c860ed7so1911808f8f.1
-        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 06:30:27 -0700 (PDT)
+ us-mta-680-3za8PlOJM9KYxjJorqBlWw-1; Mon, 14 Jul 2025 09:33:53 -0400
+X-MC-Unique: 3za8PlOJM9KYxjJorqBlWw-1
+X-Mimecast-MFC-AGG-ID: 3za8PlOJM9KYxjJorqBlWw_1752500033
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3a4eee2398bso2125415f8f.1
+        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 06:33:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752499826; x=1753104626;
+        d=1e100.net; s=20230601; t=1752500033; x=1753104833;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+zrHqcWkaADA2V8M40rY+/BG8BMVb7igefIEkGbRiek=;
-        b=U88wo7F+zA5IUEz9vCm3OcASxFGz36rjU8zK5U3rcVZYDrMP7Gjdvcff6c5m7/hCin
-         S274cdrWHrxhAlU7Thy4ZT09vZZHOiXdu1IKbo4kkk617lXuiAcN9a34gi6XkkOMs9o4
-         6MriuYooQ4tQeqSjzNhtMxpP4nhT8qiT4Zi1AmHEOlBzX23S5amcUnOPG5UzKmQkalcK
-         pd0ihgi8afnV5gBxoUMFvmh/xOj1T4acTWaZBJBdqKPvm6l85+xrFGQ72lte1zdYHnTv
-         Q0NNdti/VxVvMGs2udLrwJB/UD0gXiqw7g/y7rfPKWdZmd1G9ebHjdakE0TSt2tYGUnc
-         4v+g==
-X-Forwarded-Encrypted: i=1; AJvYcCXv2TXAbZ+EQ5oeo7G6c4IGehNIYd40q77dZgSQKSqq82hkUGUUaZ9ByxFk3N5mZTIspTSis5g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyJ2/5zQKyeE28XYt8j+v+hPYOelXQcf+ykAw+REOPsFTsC2IK
-	tGKAIxSYDxyoWV7dtj/9MS2Vsr9xDqlTkUOW5vFHwlIBsUBt3IC4jw1gczjUSzuLDPxeWH88Kyx
-	FrTt1HoikEoD3UzLAP+eyDsAkpqyO0Fh+bkghHJjhXT4JoGINwcGCjEqQzQ==
-X-Gm-Gg: ASbGnct9RYNn+2VhAIyJcY0Hk8Z0iHBLHSaM9Yq8tUYPo3ARc8pX4QWHdc+gVxez/Be
-	Nnq1A8fs9+S1Fla6L1tifSEsCYiALZEh3loqP5MRLLdq28CTIO0uUG5oEZMMK0JWBC9JakoAN03
-	nOU2Qrf39U3rxDVJ9ZxmuHwI+TWcBvI9cLW5oEnlkQNmXD32a3dJI6FvX5Ji9sxv+W/ku/+a2VZ
-	cTGlwYQTbKz3ovMMD5pAsppkUfbk+AsoyuR8UtXYy7krgmZMshVKchGwFKLv+Uug0k5hLIRwpDJ
-	iTYnkO7/et4G4ZCQuCNTkU08xxGVE4Tikf+zJFLbjN8=
-X-Received: by 2002:a05:6000:1a86:b0:3a4:eda1:6c39 with SMTP id ffacd0b85a97d-3b5f2dc216dmr9064710f8f.13.1752499826076;
-        Mon, 14 Jul 2025 06:30:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHFaTEcDjTABy5Z9QcNaN67akhbYxVRmsOC1nK6NjQhL0rqHS1s4JU+e5aThLy1SFXDe8sLSA==
-X-Received: by 2002:a05:6000:1a86:b0:3a4:eda1:6c39 with SMTP id ffacd0b85a97d-3b5f2dc216dmr9064691f8f.13.1752499825633;
-        Mon, 14 Jul 2025 06:30:25 -0700 (PDT)
+        bh=Ib61hPCB4AUA3/+sodbduYae96rRA8xkreivfOor25Y=;
+        b=kPiWgbLMlFy2jdC7TSaCBgNM3wZw+qUP2D7iJyIZ36NTlwj2sfoBZW614XwURSjxfF
+         CA93vxC2emqrVhFIo1nV5cq+7higbDBIdno15jI0SkxRwngeAdYT+TBmOwxtVnHjcOnQ
+         k7dnHEJjY+evXFHuc9VoBYwQhAU3/oq88Pu3up64zJqxOwaXqgHnCWriLx+JvXuYp6xB
+         TKdc/eLyQZpTSE2jVI//TrAzgLSF/8xofc0rPJlGGMI1A3wKMIB5UYqk6SaBCbqJloz/
+         SAyR00ia3DJqcRFNCjJYwfYnLkok3zN0x+Ej6PL2I6EgKbNmBCmevzPaDKWW4eoH//Et
+         4YfA==
+X-Forwarded-Encrypted: i=1; AJvYcCU63LCFX/kjXqHzNKcJTWu/ZAAJ1fekxyBCmHXA2XKZmbM4roQ7icgKXLAP2VTcBDCtK4a2LKo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDD5w5nDE8H4nqJZOtS1sg7uxIJPZekjWKbFF/0zZZG6mDnUzP
+	y4gQoJwOwRo57plY1Heqx1K38/lgpdsGHDHmZAv76UFGmfd0QGVGLe6mQXfS4EXu2rHMUfMFGep
+	b1ZKNwp+Fa5DYTUvrultH7eqACNmq3E5/K88uKM5Vmn5lvSBKHKmKoX68RA==
+X-Gm-Gg: ASbGncu6NxqSLeDVwWfjl74Igju+q2XmxcJUycSfUqn39YhuaZOVt2e7Efq2XwtS9cP
+	/lp8WVMA86dbzFoPGA2kLJyrdchBKA/29uG5+pF61nR9EcIn80GcHpI+1DeeQQrIc2vKICtsjlA
+	S1ojM9jCKUPhCz+aDXQl2bec5zpKr6/Tybd6YHPKXt7hPm2RXP4HI2Uv67m5A40l9SuA8cCB0Vl
+	Gf71KfKn6FAQYmayLesOhqPRDJ8vQNZrJXDL9CAPQ3SM4sQptUiZeq9G2p7SfFjFSP3tDU+b5C2
+	OGc+I3SBJrdRIGyJcClEC4FudeEbemeWo66widcTVfw=
+X-Received: by 2002:adf:e194:0:b0:3a4:e393:11e2 with SMTP id ffacd0b85a97d-3b5f35795c3mr9445133f8f.34.1752500032642;
+        Mon, 14 Jul 2025 06:33:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEcwfUCJlkG4jBfS0/HPnRj2f8oJvU/65bj2WaKyheEy4Aut2WkWbMl50W+qZ6Yk9d4ozuegA==
+X-Received: by 2002:adf:e194:0:b0:3a4:e393:11e2 with SMTP id ffacd0b85a97d-3b5f35795c3mr9445096f8f.34.1752500032183;
+        Mon, 14 Jul 2025 06:33:52 -0700 (PDT)
 Received: from [192.168.0.115] ([212.105.155.228])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4560ddf5e0esm67383545e9.18.2025.07.14.06.30.23
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8e26f22sm12633688f8f.94.2025.07.14.06.33.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Jul 2025 06:30:25 -0700 (PDT)
-Message-ID: <dcf822ea-9dd1-47f5-8b2f-9c98013b1499@redhat.com>
-Date: Mon, 14 Jul 2025 15:30:22 +0200
+        Mon, 14 Jul 2025 06:33:51 -0700 (PDT)
+Message-ID: <226c49dc-ee9c-4edb-9428-2b8b37f542fe@redhat.com>
+Date: Mon, 14 Jul 2025 15:33:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,8 +88,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 net-next 08/15] tcp: accecn: add AccECN rx byte
- counters
+Subject: Re: [PATCH v12 net-next 09/15] tcp: accecn: AccECN needs to know
+ delivered bytes
 To: chia-yu.chang@nokia-bell-labs.com, edumazet@google.com,
  linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
  dsahern@kernel.org, kuniyu@amazon.com, bpf@vger.kernel.org,
@@ -103,33 +103,29 @@ To: chia-yu.chang@nokia-bell-labs.com, edumazet@google.com,
  mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
  Jason_Livingood@comcast.com, vidhi_goel@apple.com
 References: <20250704085345.46530-1-chia-yu.chang@nokia-bell-labs.com>
- <20250704085345.46530-9-chia-yu.chang@nokia-bell-labs.com>
+ <20250704085345.46530-10-chia-yu.chang@nokia-bell-labs.com>
 Content-Language: en-US
 From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250704085345.46530-9-chia-yu.chang@nokia-bell-labs.com>
+In-Reply-To: <20250704085345.46530-10-chia-yu.chang@nokia-bell-labs.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-n 7/4/25 10:53 AM, chia-yu.chang@nokia-bell-labs.com wrote:
-> diff --git a/include/net/tcp.h b/include/net/tcp.h
-> index 61b103633da4..0d8e1a676dad 100644
-> --- a/include/net/tcp.h
-> +++ b/include/net/tcp.h
-> @@ -971,6 +971,9 @@ static inline u32 tcp_rsk_tsval(const struct tcp_request_sock *treq)
->   * See draft-ietf-tcpm-accurate-ecn for the latest values.
->   */
->  #define TCP_ACCECN_CEP_INIT_OFFSET 5
-> +#define TCP_ACCECN_E1B_INIT_OFFSET 1
-> +#define TCP_ACCECN_E0B_INIT_OFFSET 1
-> +#define TCP_ACCECN_CEB_INIT_OFFSET 0
+On 7/4/25 10:53 AM, chia-yu.chang@nokia-bell-labs.com wrote:
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index eea790295e54..f7d7649612a2 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -1050,6 +1050,7 @@ struct tcp_sacktag_state {
+>  	u64	last_sackt;
+>  	u32	reord;
+>  	u32	sack_delivered;
+> +	u32	delivered_bytes;
 
-It looks like the definitions above are not used in this patch. I
-suggest moving the definition in 'tcp: accecn: AccECN option'
+Explicitly mentioning in the commit message that the above fills a 4
+bytes hole could be helpful for reviewers.
 
-Otherwise the code LGTM, but I still have some doubts WRT the
-significant increase of the hotpath data.
+Otherwise LGTM,
 
-/P
-
+Acked-by: Paolo Abeni <pabeni@redhat.com>
 
 
