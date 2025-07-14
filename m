@@ -1,261 +1,188 @@
-Return-Path: <netdev+bounces-206785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8DA7B045A5
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 18:41:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7981B045A8
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 18:41:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 080FB16A081
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 16:41:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 343683A246C
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 16:41:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA9BA25BF1E;
-	Mon, 14 Jul 2025 16:41:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 021AB26158C;
+	Mon, 14 Jul 2025 16:41:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="OcnvVX2T"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="L6iTTA5J"
 X-Original-To: netdev@vger.kernel.org
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE57F1F4CB3;
-	Mon, 14 Jul 2025 16:41:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752511271; cv=pass; b=JwJ0zSRrQKeEcDp/P1kHxrD3TEOgSZQoTVSM0hmemC92PAzCzZ3geYqNjmsyrzTLaPg9Bu8fw0GJPZGi5Y3xlWHPJt7qVaqyhahuZ7T0YurNBrBrlYZAKfuCtwZ3iLY/bq8BIcxxPFUcMHuCRUd2ZzMmFQNFo0fuZ4IHTtsAyEw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752511271; c=relaxed/simple;
-	bh=hv6IWH3cq1kbC4Yk/9rrFWekSNr8ifAYeq4KH8pi9TQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iKVpiNHP/D8IAg90+YqWAJYyB9gaJn7Qirsmd2EfYOsR3le1I0tc6+hFVBa7/HiW2C5kT4r3c0oWVdXw8HiDvSIIV/VA9ApdiVAFUdNc2f7olLqe6A5rB9Lw8PSPAWanJEHEvNSXCbRDoCAUomDNDd8AWXP2fJRrFsmxbc+Xjcg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=OcnvVX2T; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
-Received: from monolith.lan (unknown [193.138.7.198])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bgp3c1FVWz49Psn;
-	Mon, 14 Jul 2025 19:40:59 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1752511262;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=vn9aL+KxI0Zs9wTT5HhYOvvfjbX8cff8m4lR7olPBKY=;
-	b=OcnvVX2TQrA/X55uuQlmS3ktKHlFSHnbyGhP3e6A41Sx7f0KsQh3zmgbCUJCv0RE+zOQT/
-	9+zREOvcgpvpuOpds8nb4mpHT4w8ju6oBFPZxBs4D1uyjNePy6Bw4K9F8tXvR9N9CSqABf
-	rwqDrZxcsBbvB30daABVcpkhxzfbFWv4Xej90Bk4aiuGRrcl7zYzoyftrLtO6YVheYYql/
-	r+E8TsUjyrmmsizNY/jmjgDqqyD/n6gWnpWvskxY/6aB3AhXSYr39A9PuLiHVoJS+Bx0Yc
-	yMdNRaoRtTeqczVBmEwVd7QSDyeN+Rg9oBUr+sRoZ5aiM5uHfh+Lrr622KkmeQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1752511262;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=vn9aL+KxI0Zs9wTT5HhYOvvfjbX8cff8m4lR7olPBKY=;
-	b=St4f1TpvOUPimyJ+NL8VplVR1+CzaiuUf5PN1AoXMJqaEPfAr2jWEPCziQfrezgkqTDaNB
-	BkA/TNTYSDu2cfGNZ1VyP0SlyPBh+ABbgBSUbbO+SnCOoZmgGjFNMGLXuWf/61RaVB93Yk
-	jQmb5LlTdcKNI/Lq1qPNPVqn+r1ec9GuP2ObMxOAeKOEN6jWkUSeZNUm97HCkYF1QRhBZW
-	lTUi6Xz67hgooW/ov8KvkgcLRtDAr16SVPsQxLnKQyyX9DdfqriDUAUrNQ418kbXk8u/wM
-	WgjXFh/4nA7Bor30+xf+h7ysW7QVLO8qVCiR2hG8CDDP2lYqe11HJFCfd42IZg==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1752511262; a=rsa-sha256;
-	cv=none;
-	b=SAGOHVsZ2XNS+kadX287OeZz1/+v54JeoApx77S8SzE/2zrMg6bSxLhAcj9egU8wa/zSzS
-	+up/MFddA6C9ln2M4qXSYhnZ79dZiBm7zvvxUeYnTG5e04VTJCHS3NgqZjLgpmVQQit9W1
-	vtbpMh87aaoXJGfBqyS8q9n0SPYRKB/ticXnG98jjnAkhCGa7eKT5Fr8ASuAGwvR/T/31j
-	d+nyhDbPqZguWtYAEaFSQI6HjTc96by0N7f5OkivsC3VBa/vDU9AaL0EAw9KAWaDcePozR
-	FU6+h4/ISKj4N+d0qZkQMJxL7RTxYwLVuD6NhtC72CfKRAVQkFNUIbKvCVywEw==
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>,
-	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com,
-	davem@davemloft.net,
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AEA025F97F;
+	Mon, 14 Jul 2025 16:41:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752511310; cv=none; b=YDc3EhVn67lvYUCrmC+TrLoN/HQ87+Q/Jy0JefROQNNOaDBxHrmBBOIvb+mtIZaYyyIORjQMMdi5O81LfLcSzzyfUk1caKnw23Hw84P+rMRddVBim4VltNrUTPyT1AYfAaNvvVDJkxZr/c1bL1xarRIJnFmQlKjjfP9ZA/yJudM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752511310; c=relaxed/simple;
+	bh=LHGxNKkPFo/k6boxFl7Q/3wRfLXRmp0votNJ5kvkbBo=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=N9HL2gTGK+vrcmptuu7i6l+cBaWTTTe8gyaoP6pM5YQ8dzU6ujUxKzY3qHbh9nUPCPv2IuN8y/qjdkwXGOATBrrWukXVsg5tVUoV455IV0kEGg2FTloNuhiM9CC4LYErwLDClGsHlIQlP5JcLBgO7D9I61JmSaiodMMHuCNCDIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=L6iTTA5J; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1006)
+	id E9B75211CE1A; Mon, 14 Jul 2025 09:41:48 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E9B75211CE1A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1752511308;
+	bh=9QMFgykrjbbChs7NfmUYFWDLoGQ54scZpKmu2YN1Lfc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=L6iTTA5Jbf04Sku70ZErFpMBMRww6mhw9GT3gAxesPCCOvk0EfTzHDRAnz7JBP+Ea
+	 TKnNd3cZ1/79MTufulnV7MiLdxMqPOCEq3ZQEk+2c+quGHI1hnJUPHKFdoGvwJYcEi
+	 +pTK3YVfmiPhB7Hn28znwDSfE7E+F6dkEhPYrizM=
+From: Haiyang Zhang <haiyangz@linux.microsoft.com>
+To: linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: haiyangz@microsoft.com,
+	kys@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	andrew+netdev@lunn.ch,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: ISO: add socket option to report packet seqnum via CMSG
-Date: Mon, 14 Jul 2025 19:40:37 +0300
-Message-ID: <712e0e6752a8619bdde98d55af0a9e672aa290c2.1752511130.git.pav@iki.fi>
-X-Mailer: git-send-email 2.50.1
+	davem@davemloft.net,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	cavery@redhat.com
+Subject: [PATCH net,v2] hv_netvsc: Switch VF namespace in netvsc_open instead
+Date: Mon, 14 Jul 2025 09:41:37 -0700
+Message-Id: <1752511297-8817-1-git-send-email-haiyangz@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-User applications need a way to track which ISO interval a given SDU
-belongs to, to properly detect packet loss. All controllers do not set
-timestamps, and it's not guaranteed user application receives all packet
-reports (small socket buffer, or controller doesn't send all reports
-like Intel AX210 is doing).
+From: Haiyang Zhang <haiyangz@microsoft.com>
 
-Add socket option BT_PKT_SEQNUM that enables reporting of received
-packet ISO sequence number in BT_SCM_PKT_SEQNUM CMSG.
+The existing code move the VF NIC to new namespace when NETDEV_REGISTER is
+received on netvsc NIC. During deletion of the namespace,
+default_device_exit_batch() >> default_device_exit_net() is called. When
+netvsc NIC is moved back and registered to the default namespace, it
+automatically brings VF NIC back to the default namespace. This will cause
+the default_device_exit_net() >> for_each_netdev_safe loop unable to detect
+the list end, and hit NULL ptr:
 
-Use BT_PKT_SEQNUM == 22 for the socket option, as 21 was used earlier
-for a removed experimental feature that never got into mainline.
+[  231.449420] mana 7870:00:00.0 enP30832s1: Moved VF to namespace with: eth0
+[  231.449656] BUG: kernel NULL pointer dereference, address: 0000000000000010
+[  231.450246] #PF: supervisor read access in kernel mode
+[  231.450579] #PF: error_code(0x0000) - not-present page
+[  231.450916] PGD 17b8a8067 P4D 0 
+[  231.451163] Oops: Oops: 0000 [#1] SMP NOPTI
+[  231.451450] CPU: 82 UID: 0 PID: 1394 Comm: kworker/u768:1 Not tainted 6.16.0-rc4+ #3 VOLUNTARY 
+[  231.452042] Hardware name: Microsoft Corporation Virtual Machine/Virtual Machine, BIOS Hyper-V UEFI Release v4.1 11/21/2024
+[  231.452692] Workqueue: netns cleanup_net
+[  231.452947] RIP: 0010:default_device_exit_batch+0x16c/0x3f0
+[  231.453326] Code: c0 0c f5 b3 e8 d5 db fe ff 48 85 c0 74 15 48 c7 c2 f8 fd ca b2 be 10 00 00 00 48 8d 7d c0 e8 7b 77 25 00 49 8b 86 28 01 00 00 <48> 8b 50 10 4c 8b 2a 4c 8d 62 f0 49 83 ed 10 4c 39 e0 0f 84 d6 00
+[  231.454294] RSP: 0018:ff75fc7c9bf9fd00 EFLAGS: 00010246
+[  231.454610] RAX: 0000000000000000 RBX: 0000000000000002 RCX: 61c8864680b583eb
+[  231.455094] RDX: ff1fa9f71462d800 RSI: ff75fc7c9bf9fd38 RDI: 0000000030766564
+[  231.455686] RBP: ff75fc7c9bf9fd78 R08: 0000000000000000 R09: 0000000000000000
+[  231.456126] R10: 0000000000000001 R11: 0000000000000004 R12: ff1fa9f70088e340
+[  231.456621] R13: ff1fa9f70088e340 R14: ffffffffb3f50c20 R15: ff1fa9f7103e6340
+[  231.457161] FS:  0000000000000000(0000) GS:ff1faa6783a08000(0000) knlGS:0000000000000000
+[  231.457707] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  231.458031] CR2: 0000000000000010 CR3: 0000000179ab2006 CR4: 0000000000b73ef0
+[  231.458434] Call Trace:
+[  231.458600]  <TASK>
+[  231.458777]  ops_undo_list+0x100/0x220
+[  231.459015]  cleanup_net+0x1b8/0x300
+[  231.459285]  process_one_work+0x184/0x340
 
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
+To fix it, move the VF namespace switching code from the NETDEV_REGISTER
+event handler to netvsc_open().
+
+Cc: stable@vger.kernel.org
+Cc: cavery@redhat.com
+Fixes: 4c262801ea60 ("hv_netvsc: Fix VF namespace also in synthetic NIC NETDEV_REGISTER event")
+Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
 ---
+v2: verified it's applicable to net, fixed cc list.
 
-Notes:
-    v2:
-    - fix missing __le16_to_cpu for hdr->sn
-    - change BT_PKT_SEQNUM value to 22, to avoid clashing with removed
-      experimental feature (only in bluetooth-next, it was never merged in
-      mainline)
-    - still call seqnum "sn", as the name is used in "hdr->sn"
-    
-    Tests: https://lore.kernel.org/linux-bluetooth/c9a75585e3640d8a1efca0bf96158eec1ca25fdc.1752501450.git.pav@iki.fi/
+---
+ drivers/net/hyperv/netvsc_drv.c | 43 ++++++++++-----------------------
+ 1 file changed, 13 insertions(+), 30 deletions(-)
 
- include/net/bluetooth/bluetooth.h | 11 ++++++++++-
- net/bluetooth/af_bluetooth.c      |  7 +++++++
- net/bluetooth/iso.c               | 21 ++++++++++++++++++---
- 3 files changed, 35 insertions(+), 4 deletions(-)
-
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 114299bd8b98..ada5b56a4413 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -244,6 +244,12 @@ struct bt_codecs {
- 
- #define BT_ISO_BASE		20
- 
-+/* Socket option value 21 reserved */
-+
-+#define BT_PKT_SEQNUM		22
-+
-+#define BT_SCM_PKT_SEQNUM	0x05
-+
- __printf(1, 2)
- void bt_info(const char *fmt, ...);
- __printf(1, 2)
-@@ -391,7 +397,8 @@ struct bt_sock {
- enum {
- 	BT_SK_DEFER_SETUP,
- 	BT_SK_SUSPEND,
--	BT_SK_PKT_STATUS
-+	BT_SK_PKT_STATUS,
-+	BT_SK_PKT_SEQNUM,
- };
- 
- struct bt_sock_list {
-@@ -475,6 +482,7 @@ struct bt_skb_cb {
- 	u8 pkt_type;
- 	u8 force_active;
- 	u16 expect;
-+	u16 pkt_seqnum;
- 	u8 incoming:1;
- 	u8 pkt_status:2;
- 	union {
-@@ -488,6 +496,7 @@ struct bt_skb_cb {
- 
- #define hci_skb_pkt_type(skb) bt_cb((skb))->pkt_type
- #define hci_skb_pkt_status(skb) bt_cb((skb))->pkt_status
-+#define hci_skb_pkt_seqnum(skb) bt_cb((skb))->pkt_seqnum
- #define hci_skb_expect(skb) bt_cb((skb))->expect
- #define hci_skb_opcode(skb) bt_cb((skb))->hci.opcode
- #define hci_skb_event(skb) bt_cb((skb))->hci.req_event
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 6ad2f72f53f4..44b7acb20a67 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -364,6 +364,13 @@ int bt_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
- 			put_cmsg(msg, SOL_BLUETOOTH, BT_SCM_PKT_STATUS,
- 				 sizeof(pkt_status), &pkt_status);
- 		}
-+
-+		if (test_bit(BT_SK_PKT_SEQNUM, &bt_sk(sk)->flags)) {
-+			u16 pkt_seqnum = hci_skb_pkt_seqnum(skb);
-+
-+			put_cmsg(msg, SOL_BLUETOOTH, BT_SCM_PKT_SEQNUM,
-+				 sizeof(pkt_seqnum), &pkt_seqnum);
-+		}
+diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
+index 42d98e99566e..074ecc346108 100644
+--- a/drivers/net/hyperv/netvsc_drv.c
++++ b/drivers/net/hyperv/netvsc_drv.c
+@@ -135,6 +135,19 @@ static int netvsc_open(struct net_device *net)
  	}
  
- 	skb_free_datagram(sk, skb);
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index fc22782cbeeb..d402a22c8f91 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -1687,6 +1687,17 @@ static int iso_sock_setsockopt(struct socket *sock, int level, int optname,
- 			clear_bit(BT_SK_PKT_STATUS, &bt_sk(sk)->flags);
- 		break;
- 
-+	case BT_PKT_SEQNUM:
-+		err = copy_safe_from_sockptr(&opt, sizeof(opt), optval, optlen);
-+		if (err)
-+			break;
+ 	if (vf_netdev) {
++		if (!net_eq(dev_net(net), dev_net(vf_netdev))) {
++			ret = dev_change_net_namespace(vf_netdev, dev_net(net),
++						       "eth%d");
++			if (ret)
++				netdev_err(vf_netdev,
++					   "Cannot move to same ns as %s: %d\n",
++					   net->name, ret);
++			else
++				netdev_info(vf_netdev,
++					    "Moved VF to namespace with: %s\n",
++					    net->name);
++		}
 +
-+		if (opt)
-+			set_bit(BT_SK_PKT_SEQNUM, &bt_sk(sk)->flags);
-+		else
-+			clear_bit(BT_SK_PKT_SEQNUM, &bt_sk(sk)->flags);
-+		break;
-+
- 	case BT_ISO_QOS:
- 		if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND &&
- 		    sk->sk_state != BT_CONNECT2 &&
-@@ -2278,7 +2289,7 @@ static void iso_disconn_cfm(struct hci_conn *hcon, __u8 reason)
- void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- {
- 	struct iso_conn *conn = hcon->iso_data;
--	__u16 pb, ts, len;
-+	__u16 pb, ts, len, sn;
+ 		/* Setting synthetic device up transparently sets
+ 		 * slave as up. If open fails, then slave will be
+ 		 * still be offline (and not used).
+@@ -2772,31 +2785,6 @@ static struct  hv_driver netvsc_drv = {
+ 	},
+ };
  
- 	if (!conn)
- 		goto drop;
-@@ -2308,6 +2319,7 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 				goto drop;
- 			}
+-/* Set VF's namespace same as the synthetic NIC */
+-static void netvsc_event_set_vf_ns(struct net_device *ndev)
+-{
+-	struct net_device_context *ndev_ctx = netdev_priv(ndev);
+-	struct net_device *vf_netdev;
+-	int ret;
+-
+-	vf_netdev = rtnl_dereference(ndev_ctx->vf_netdev);
+-	if (!vf_netdev)
+-		return;
+-
+-	if (!net_eq(dev_net(ndev), dev_net(vf_netdev))) {
+-		ret = dev_change_net_namespace(vf_netdev, dev_net(ndev),
+-					       "eth%d");
+-		if (ret)
+-			netdev_err(vf_netdev,
+-				   "Cannot move to same namespace as %s: %d\n",
+-				   ndev->name, ret);
+-		else
+-			netdev_info(vf_netdev,
+-				    "Moved VF to namespace with: %s\n",
+-				    ndev->name);
+-	}
+-}
+-
+ /*
+  * On Hyper-V, every VF interface is matched with a corresponding
+  * synthetic interface. The synthetic interface is presented first
+@@ -2809,11 +2797,6 @@ static int netvsc_netdev_event(struct notifier_block *this,
+ 	struct net_device *event_dev = netdev_notifier_info_to_dev(ptr);
+ 	int ret = 0;
  
-+			sn = __le16_to_cpu(hdr->sn);
- 			len = __le16_to_cpu(hdr->slen);
- 		} else {
- 			struct hci_iso_data_hdr *hdr;
-@@ -2318,18 +2330,20 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 				goto drop;
- 			}
- 
-+			sn = __le16_to_cpu(hdr->sn);
- 			len = __le16_to_cpu(hdr->slen);
- 		}
- 
- 		flags  = hci_iso_data_flags(len);
- 		len    = hci_iso_data_len(len);
- 
--		BT_DBG("Start: total len %d, frag len %d flags 0x%4.4x", len,
--		       skb->len, flags);
-+		BT_DBG("Start: total len %d, frag len %d flags 0x%4.4x sn %d",
-+		       len, skb->len, flags, sn);
- 
- 		if (len == skb->len) {
- 			/* Complete frame received */
- 			hci_skb_pkt_status(skb) = flags & 0x03;
-+			hci_skb_pkt_seqnum(skb) = sn;
- 			iso_recv_frame(conn, skb);
- 			return;
- 		}
-@@ -2352,6 +2366,7 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 			goto drop;
- 
- 		hci_skb_pkt_status(conn->rx_skb) = flags & 0x03;
-+		hci_skb_pkt_seqnum(conn->rx_skb) = sn;
- 		skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
- 					  skb->len);
- 		conn->rx_len = len - skb->len;
+-	if (event_dev->netdev_ops == &device_ops && event == NETDEV_REGISTER) {
+-		netvsc_event_set_vf_ns(event_dev);
+-		return NOTIFY_DONE;
+-	}
+-
+ 	ret = check_dev_is_matching_vf(event_dev);
+ 	if (ret != 0)
+ 		return NOTIFY_DONE;
 -- 
-2.50.1
+2.34.1
 
 
