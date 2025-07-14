@@ -1,96 +1,86 @@
-Return-Path: <netdev+bounces-206670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED159B03FD8
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 15:28:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF787B04015
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 15:35:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 103EC4A6495
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 13:24:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C6AB1A6478A
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 13:31:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EE5324DD0A;
-	Mon, 14 Jul 2025 13:24:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B79324EA85;
+	Mon, 14 Jul 2025 13:30:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="AWpvA5Mn";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="MORvkYEK";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="AWpvA5Mn";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="MORvkYEK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HxvTKTdI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D49A246767
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 13:24:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD2E188CC9
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 13:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752499447; cv=none; b=LBjotD37Xw6LejB2/abD7xuhmqKG9d3Yk59CL+EBPRyhZ/JUHJcPu1ikpI3w1+lztgBYz9ZH0Vw/j1ogImce1+QZNbI9ibK2J0ZawqAxIz5wcR0nRF/aMLVlwLmsdtHc7rl44mJ5EeWliP5FO339QgzaZj2Ft8rVpb+K1p1da8E=
+	t=1752499834; cv=none; b=OFbXSzc7uX7nF7j0spQG1GGxzYz4MNdJmet/r3roTyq89cmY3MzogYh0tdRNcMSdVMnENWmDT1UazoWq4LEsAOBH1Wo9Ih5YdoFlId+tGAp5yEnwrAGZ4sVm4A716nXlAXRJF+7fyaLVIHztN0Jp64DP3JQ43uvty121qv7NlvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752499447; c=relaxed/simple;
-	bh=iUFYrjPTWaorjo8hMNDtqJKBDwwwnfzk4l5oqmb0t8E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r7YVd0xaZD0Fgk65pIx25TPDUqjhChUDEkIg3TMzjiS1k9F9Otn/RBve+OkztBmnCxRmxzh0zi0ywcWgC6+H8xFfKjumvf0+Ym7A+0/xUmKPgoqrgbJXSmPt1jYUiybHaveORbIi35gznE5Wt1Myz1XASILaUZ+spWxefrLCY7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=AWpvA5Mn; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=MORvkYEK; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=AWpvA5Mn; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=MORvkYEK; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 6CEB51F387;
-	Mon, 14 Jul 2025 13:24:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1752499443; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	s=arc-20240116; t=1752499834; c=relaxed/simple;
+	bh=jE2PjP+eUyYjMNAeVnNr5q6iOIuN3tAeEx+RGEXiP+M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=tW5Oy+oG/oAA7jQTCkPJL/C4FGIgeGDPRfWPgsQGTDl8DQidhaQERmMbneQ4Y5JhTHoxJEeIhSLs1ea8aEsWgbKQbWQ2tTNLh6ea7FtquPSyROKo83LozXY39hB2B5NBEVtHEM+s6WkJQzBaNWldDlYY16yIby9BBImPFnS0Ios=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HxvTKTdI; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752499831;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=tKznGN/QHd573gll6YXfcW05c/8J5n9Vq6ijHudJWMI=;
-	b=AWpvA5MnJzaZ9xL1d1wNIVk8DSXFqmfyNWrntuHiRs5SmKxbxDAGyl8YDixporR06ItzOi
-	JqFs+214inopKojRublon68rK4ibwBnoeiCUPTZfUSUX2tG5ORIe9lWNDlroo2CtA4CeHE
-	xNHGjyY+01wPfubV09jQazHiUM793HE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1752499443;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=tKznGN/QHd573gll6YXfcW05c/8J5n9Vq6ijHudJWMI=;
-	b=MORvkYEKhrO5sQZFpofVuk7aeGpJk5GVvpgzIII2yylgtLgr9OQ28bPUFEWAzgG1Nh5znX
-	M7m7v5CwQ1Kv0UDA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=AWpvA5Mn;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=MORvkYEK
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1752499443; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=tKznGN/QHd573gll6YXfcW05c/8J5n9Vq6ijHudJWMI=;
-	b=AWpvA5MnJzaZ9xL1d1wNIVk8DSXFqmfyNWrntuHiRs5SmKxbxDAGyl8YDixporR06ItzOi
-	JqFs+214inopKojRublon68rK4ibwBnoeiCUPTZfUSUX2tG5ORIe9lWNDlroo2CtA4CeHE
-	xNHGjyY+01wPfubV09jQazHiUM793HE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1752499443;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=tKznGN/QHd573gll6YXfcW05c/8J5n9Vq6ijHudJWMI=;
-	b=MORvkYEKhrO5sQZFpofVuk7aeGpJk5GVvpgzIII2yylgtLgr9OQ28bPUFEWAzgG1Nh5znX
-	M7m7v5CwQ1Kv0UDA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2C0D8138A1;
-	Mon, 14 Jul 2025 13:24:03 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id qk5dCvMEdWixDQAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Mon, 14 Jul 2025 13:24:03 +0000
-Message-ID: <92073822-ab60-40ca-9ff5-a41119c0ad3d@suse.cz>
-Date: Mon, 14 Jul 2025 15:24:02 +0200
+	 in-reply-to:in-reply-to:references:references;
+	bh=+zrHqcWkaADA2V8M40rY+/BG8BMVb7igefIEkGbRiek=;
+	b=HxvTKTdI1itRGZQJ2uwjeuXXe7W60mB52wyg37fJQtO2zwHB3meczxI0U0cL7qCxH8nekB
+	j8KlMq/zSVJLB/5OKiNmLitDfHBwJ+dC0s7N9etWzfPhO+UpIVRr634qSupvZ71yXugewc
+	06TeSay7s/ZhnJiiZ3r13Sy8TeH2UoI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-637-PlJ257k6OF2UytsUTJ5dew-1; Mon, 14 Jul 2025 09:30:30 -0400
+X-MC-Unique: PlJ257k6OF2UytsUTJ5dew-1
+X-Mimecast-MFC-AGG-ID: PlJ257k6OF2UytsUTJ5dew_1752499826
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3af3c860ed7so1911808f8f.1
+        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 06:30:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752499826; x=1753104626;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+zrHqcWkaADA2V8M40rY+/BG8BMVb7igefIEkGbRiek=;
+        b=U88wo7F+zA5IUEz9vCm3OcASxFGz36rjU8zK5U3rcVZYDrMP7Gjdvcff6c5m7/hCin
+         S274cdrWHrxhAlU7Thy4ZT09vZZHOiXdu1IKbo4kkk617lXuiAcN9a34gi6XkkOMs9o4
+         6MriuYooQ4tQeqSjzNhtMxpP4nhT8qiT4Zi1AmHEOlBzX23S5amcUnOPG5UzKmQkalcK
+         pd0ihgi8afnV5gBxoUMFvmh/xOj1T4acTWaZBJBdqKPvm6l85+xrFGQ72lte1zdYHnTv
+         Q0NNdti/VxVvMGs2udLrwJB/UD0gXiqw7g/y7rfPKWdZmd1G9ebHjdakE0TSt2tYGUnc
+         4v+g==
+X-Forwarded-Encrypted: i=1; AJvYcCXv2TXAbZ+EQ5oeo7G6c4IGehNIYd40q77dZgSQKSqq82hkUGUUaZ9ByxFk3N5mZTIspTSis5g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyJ2/5zQKyeE28XYt8j+v+hPYOelXQcf+ykAw+REOPsFTsC2IK
+	tGKAIxSYDxyoWV7dtj/9MS2Vsr9xDqlTkUOW5vFHwlIBsUBt3IC4jw1gczjUSzuLDPxeWH88Kyx
+	FrTt1HoikEoD3UzLAP+eyDsAkpqyO0Fh+bkghHJjhXT4JoGINwcGCjEqQzQ==
+X-Gm-Gg: ASbGnct9RYNn+2VhAIyJcY0Hk8Z0iHBLHSaM9Yq8tUYPo3ARc8pX4QWHdc+gVxez/Be
+	Nnq1A8fs9+S1Fla6L1tifSEsCYiALZEh3loqP5MRLLdq28CTIO0uUG5oEZMMK0JWBC9JakoAN03
+	nOU2Qrf39U3rxDVJ9ZxmuHwI+TWcBvI9cLW5oEnlkQNmXD32a3dJI6FvX5Ji9sxv+W/ku/+a2VZ
+	cTGlwYQTbKz3ovMMD5pAsppkUfbk+AsoyuR8UtXYy7krgmZMshVKchGwFKLv+Uug0k5hLIRwpDJ
+	iTYnkO7/et4G4ZCQuCNTkU08xxGVE4Tikf+zJFLbjN8=
+X-Received: by 2002:a05:6000:1a86:b0:3a4:eda1:6c39 with SMTP id ffacd0b85a97d-3b5f2dc216dmr9064710f8f.13.1752499826076;
+        Mon, 14 Jul 2025 06:30:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHFaTEcDjTABy5Z9QcNaN67akhbYxVRmsOC1nK6NjQhL0rqHS1s4JU+e5aThLy1SFXDe8sLSA==
+X-Received: by 2002:a05:6000:1a86:b0:3a4:eda1:6c39 with SMTP id ffacd0b85a97d-3b5f2dc216dmr9064691f8f.13.1752499825633;
+        Mon, 14 Jul 2025 06:30:25 -0700 (PDT)
+Received: from [192.168.0.115] ([212.105.155.228])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4560ddf5e0esm67383545e9.18.2025.07.14.06.30.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Jul 2025 06:30:25 -0700 (PDT)
+Message-ID: <dcf822ea-9dd1-47f5-8b2f-9c98013b1499@redhat.com>
+Date: Mon, 14 Jul 2025 15:30:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,123 +88,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 1/7] netmem: introduce struct netmem_desc
- mirroring struct page
+Subject: Re: [PATCH v12 net-next 08/15] tcp: accecn: add AccECN rx byte
+ counters
+To: chia-yu.chang@nokia-bell-labs.com, edumazet@google.com,
+ linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
+ dsahern@kernel.org, kuniyu@amazon.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com,
+ kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch,
+ donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
+ ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
+ g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
+ mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
+ Jason_Livingood@comcast.com, vidhi_goel@apple.com
+References: <20250704085345.46530-1-chia-yu.chang@nokia-bell-labs.com>
+ <20250704085345.46530-9-chia-yu.chang@nokia-bell-labs.com>
 Content-Language: en-US
-To: Harry Yoo <harry.yoo@oracle.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: Byungchul Park <byungchul@sk.com>, willy@infradead.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- kernel_team@skhynix.com, almasrymina@google.com,
- ilias.apalodimas@linaro.org, hawk@kernel.org, akpm@linux-foundation.org,
- davem@davemloft.net, john.fastabend@gmail.com, andrew+netdev@lunn.ch,
- asml.silence@gmail.com, toke@redhat.com, tariqt@nvidia.com,
- edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com, leon@kernel.org,
- ast@kernel.org, daniel@iogearbox.net, david@redhat.com,
- lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, rppt@kernel.org,
- surenb@google.com, mhocko@suse.com, horms@kernel.org,
- linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com,
- hannes@cmpxchg.org, ziy@nvidia.com, jackmanb@google.com
-References: <20250625043350.7939-1-byungchul@sk.com>
- <20250625043350.7939-2-byungchul@sk.com> <20250626174904.4a6125c9@kernel.org>
- <20250627035405.GA4276@system.software.com>
- <20250627173730.15b25a8c@kernel.org> <aGHNmKRng9H6kTqz@hyeyoo>
- <20250701164508.0738f00f@kernel.org> <aHTQrso2Klvcwasf@hyeyoo>
-From: Vlastimil Babka <vbabka@suse.cz>
-Autocrypt: addr=vbabka@suse.cz; keydata=
- xsFNBFZdmxYBEADsw/SiUSjB0dM+vSh95UkgcHjzEVBlby/Fg+g42O7LAEkCYXi/vvq31JTB
- KxRWDHX0R2tgpFDXHnzZcQywawu8eSq0LxzxFNYMvtB7sV1pxYwej2qx9B75qW2plBs+7+YB
- 87tMFA+u+L4Z5xAzIimfLD5EKC56kJ1CsXlM8S/LHcmdD9Ctkn3trYDNnat0eoAcfPIP2OZ+
- 9oe9IF/R28zmh0ifLXyJQQz5ofdj4bPf8ecEW0rhcqHfTD8k4yK0xxt3xW+6Exqp9n9bydiy
- tcSAw/TahjW6yrA+6JhSBv1v2tIm+itQc073zjSX8OFL51qQVzRFr7H2UQG33lw2QrvHRXqD
- Ot7ViKam7v0Ho9wEWiQOOZlHItOOXFphWb2yq3nzrKe45oWoSgkxKb97MVsQ+q2SYjJRBBH4
- 8qKhphADYxkIP6yut/eaj9ImvRUZZRi0DTc8xfnvHGTjKbJzC2xpFcY0DQbZzuwsIZ8OPJCc
- LM4S7mT25NE5kUTG/TKQCk922vRdGVMoLA7dIQrgXnRXtyT61sg8PG4wcfOnuWf8577aXP1x
- 6mzw3/jh3F+oSBHb/GcLC7mvWreJifUL2gEdssGfXhGWBo6zLS3qhgtwjay0Jl+kza1lo+Cv
- BB2T79D4WGdDuVa4eOrQ02TxqGN7G0Biz5ZLRSFzQSQwLn8fbwARAQABzSBWbGFzdGltaWwg
- QmFia2EgPHZiYWJrYUBzdXNlLmN6PsLBlAQTAQoAPgIbAwULCQgHAwUVCgkICwUWAgMBAAIe
- AQIXgBYhBKlA1DSZLC6OmRA9UCJPp+fMgqZkBQJnyBr8BQka0IFQAAoJECJPp+fMgqZkqmMQ
- AIbGN95ptUMUvo6aAdhxaOCHXp1DfIBuIOK/zpx8ylY4pOwu3GRe4dQ8u4XS9gaZ96Gj4bC+
- jwWcSmn+TjtKW3rH1dRKopvC07tSJIGGVyw7ieV/5cbFffA8NL0ILowzVg8w1ipnz1VTkWDr
- 2zcfslxJsJ6vhXw5/npcY0ldeC1E8f6UUoa4eyoskd70vO0wOAoGd02ZkJoox3F5ODM0kjHu
- Y97VLOa3GG66lh+ZEelVZEujHfKceCw9G3PMvEzyLFbXvSOigZQMdKzQ8D/OChwqig8wFBmV
- QCPS4yDdmZP3oeDHRjJ9jvMUKoYODiNKsl2F+xXwyRM2qoKRqFlhCn4usVd1+wmv9iLV8nPs
- 2Db1ZIa49fJet3Sk3PN4bV1rAPuWvtbuTBN39Q/6MgkLTYHb84HyFKw14Rqe5YorrBLbF3rl
- M51Dpf6Egu1yTJDHCTEwePWug4XI11FT8lK0LNnHNpbhTCYRjX73iWOnFraJNcURld1jL1nV
- r/LRD+/e2gNtSTPK0Qkon6HcOBZnxRoqtazTU6YQRmGlT0v+rukj/cn5sToYibWLn+RoV1CE
- Qj6tApOiHBkpEsCzHGu+iDQ1WT0Idtdynst738f/uCeCMkdRu4WMZjteQaqvARFwCy3P/jpK
- uvzMtves5HvZw33ZwOtMCgbpce00DaET4y/UzsBNBFsZNTUBCACfQfpSsWJZyi+SHoRdVyX5
- J6rI7okc4+b571a7RXD5UhS9dlVRVVAtrU9ANSLqPTQKGVxHrqD39XSw8hxK61pw8p90pg4G
- /N3iuWEvyt+t0SxDDkClnGsDyRhlUyEWYFEoBrrCizbmahOUwqkJbNMfzj5Y7n7OIJOxNRkB
- IBOjPdF26dMP69BwePQao1M8Acrrex9sAHYjQGyVmReRjVEtv9iG4DoTsnIR3amKVk6si4Ea
- X/mrapJqSCcBUVYUFH8M7bsm4CSxier5ofy8jTEa/CfvkqpKThTMCQPNZKY7hke5qEq1CBk2
- wxhX48ZrJEFf1v3NuV3OimgsF2odzieNABEBAAHCwXwEGAEKACYCGwwWIQSpQNQ0mSwujpkQ
- PVAiT6fnzIKmZAUCZ8gcVAUJFhTonwAKCRAiT6fnzIKmZLY8D/9uo3Ut9yi2YCuASWxr7QQZ
- lJCViArjymbxYB5NdOeC50/0gnhK4pgdHlE2MdwF6o34x7TPFGpjNFvycZqccSQPJ/gibwNA
- zx3q9vJT4Vw+YbiyS53iSBLXMweeVV1Jd9IjAoL+EqB0cbxoFXvnjkvP1foiiF5r73jCd4PR
- rD+GoX5BZ7AZmFYmuJYBm28STM2NA6LhT0X+2su16f/HtummENKcMwom0hNu3MBNPUOrujtW
- khQrWcJNAAsy4yMoJ2Lw51T/5X5Hc7jQ9da9fyqu+phqlVtn70qpPvgWy4HRhr25fCAEXZDp
- xG4RNmTm+pqorHOqhBkI7wA7P/nyPo7ZEc3L+ZkQ37u0nlOyrjbNUniPGxPxv1imVq8IyycG
- AN5FaFxtiELK22gvudghLJaDiRBhn8/AhXc642/Z/yIpizE2xG4KU4AXzb6C+o7LX/WmmsWP
- Ly6jamSg6tvrdo4/e87lUedEqCtrp2o1xpn5zongf6cQkaLZKQcBQnPmgHO5OG8+50u88D9I
- rywqgzTUhHFKKF6/9L/lYtrNcHU8Z6Y4Ju/MLUiNYkmtrGIMnkjKCiRqlRrZE/v5YFHbayRD
- dJKXobXTtCBYpLJM4ZYRpGZXne/FAtWNe4KbNJJqxMvrTOrnIatPj8NhBVI0RSJRsbilh6TE
- m6M14QORSWTLRg==
-In-Reply-To: <aHTQrso2Klvcwasf@hyeyoo>
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250704085345.46530-9-chia-yu.chang@nokia-bell-labs.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: 6CEB51F387
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_TWELVE(0.00)[37];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RCVD_TLS_ALL(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[sk.com,infradead.org,vger.kernel.org,kvack.org,skhynix.com,google.com,linaro.org,kernel.org,linux-foundation.org,davemloft.net,gmail.com,lunn.ch,redhat.com,nvidia.com,iogearbox.net,oracle.com,suse.com,cmpxchg.org];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	R_RATELIMIT(0.00)[to_ip_from(RLduzbn1medsdpg3i8igc4rk67)];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.cz:dkim,suse.cz:mid]
-X-Spam-Score: -3.01
 
-On 7/14/25 11:42, Harry Yoo wrote:
-> On Tue, Jul 01, 2025 at 04:45:08PM -0700, Jakub Kicinski wrote:
->> Thanks a lot, this clarifies things for me.
-> 
-> You're welcome :)
-> 
->> Unfortunately, I still think that it's hard to judge patches 1 and 7 
->> in context limited to this series, so let's proceed to reposting just
->> the "middle 5" patches.
-> 
-> Could you please share your thoughts on why it's hard to judge them and
-> what's missing from the series, such as in the comments, changelog, or
-> the cover letter?
+n 7/4/25 10:53 AM, chia-yu.chang@nokia-bell-labs.com wrote:
+> diff --git a/include/net/tcp.h b/include/net/tcp.h
+> index 61b103633da4..0d8e1a676dad 100644
+> --- a/include/net/tcp.h
+> +++ b/include/net/tcp.h
+> @@ -971,6 +971,9 @@ static inline u32 tcp_rsk_tsval(const struct tcp_request_sock *treq)
+>   * See draft-ietf-tcpm-accurate-ecn for the latest values.
+>   */
+>  #define TCP_ACCECN_CEP_INIT_OFFSET 5
+> +#define TCP_ACCECN_E1B_INIT_OFFSET 1
+> +#define TCP_ACCECN_E0B_INIT_OFFSET 1
+> +#define TCP_ACCECN_CEB_INIT_OFFSET 0
 
-I think we moved on in the discussion since then? "middle 5" patches are now
-merged, and 1+7 was, along with more patches (that make the context less
-limited hopefully), posted as v9/v10 now?
+It looks like the definitions above are not used in this patch. I
+suggest moving the definition in 'tcp: accecn: AccECN option'
+
+Otherwise the code LGTM, but I still have some doubts WRT the
+significant increase of the hotpath data.
+
+/P
 
 
 
