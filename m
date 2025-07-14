@@ -1,473 +1,185 @@
-Return-Path: <netdev+bounces-206528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3619CB035E4
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 07:36:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B0FDB0360B
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 07:40:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEE923B73AF
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 05:35:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 995BD161084
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 05:40:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B92820B7EC;
-	Mon, 14 Jul 2025 05:35:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0CDF1FECDD;
+	Mon, 14 Jul 2025 05:40:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kt9YUZVd"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="TN82vm4D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2089.outbound.protection.outlook.com [40.107.243.89])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63B8C20A5D6
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 05:35:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752471355; cv=none; b=oJLCxRXsalOgOChnoSz3+7mDtRNkzN40Y/RY7BfsD2pEDJpcJ+GSajv+0wkjcSGYnYsaF5PYHqEV5dQhiCl9Qk6b6gWkK8p/t+3nWED/QZNkudkMaF6K78zt+DxAlWmcv1jHQ5p0+fDUZmtlEGViXoSg1m9KzC2wa13Hm0KQaMw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752471355; c=relaxed/simple;
-	bh=86oeJRTi4U6HDmJSSY/Edxey8jimTHSr583uznkN8OY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FALojY3zOnLeVDik3XiBgaCWF4Tno62Y8OeY5jVTx3/m8ZAfDyhhGyvNAwqtqhoQ9Dm0CrzDQ/CoTgWlxW+2BXpstwphed8K1yql80/9IItA94VJGGBQSx5sSXD6ebLM9aLus+hYLoCSrws9WVj/ig7lKw5zbruykav3ZVKgSVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kt9YUZVd; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-73c17c770a7so4753166b3a.2
-        for <netdev@vger.kernel.org>; Sun, 13 Jul 2025 22:35:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752471352; x=1753076152; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/L7P3oE1hGMJob/q7nnm2/8i/ZXnhCgY+G2gViu30n8=;
-        b=Kt9YUZVdq28JADCLvebWGmCtaUMW5PjpA4TaTs1IqAkuSEcaBvVuKrgYOr8rfAM+oP
-         N9eWPpu3c4ZPQaJ5Ri8ApOZWSi1d1sUrlKv+uTIbbrrlGmFkIsujbi2NMqM8qFH0jIGp
-         LVI9z2lF9uDtB0F/qesIJA40od2jpjMIgdonJrfgIkoAyFU2VvIliyhWaS8BtlfK+/f2
-         5mVoD25uB905zdNiTql8UpYK0PTVHRkNubW/z+2g3yETU38Hf0EB3UuwxO9xU4jceKb/
-         035d+0muEJ/rODgUBtRV9Ha1ijdSJ28Du+FomFi2UTsw7Vsvx9UruUgqXRPQPRYHYk18
-         Qkcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752471352; x=1753076152;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/L7P3oE1hGMJob/q7nnm2/8i/ZXnhCgY+G2gViu30n8=;
-        b=iU8XtIR9KPTF2CLumXEXUZheGKrRx3xe74SAIi487U55XfiFtdsC7LRJlDMTSN61Iy
-         sMs+3+qIW/365mnXo9857mvcl75m2HCWHMKuk7I0iQwB5wgasMPicajoCzgjI7Ugjzlf
-         UpiE9XwsoWLTExj286lE3kESV9kZg3Mk7Pq5+OdDuVP0LdY1BvpikV0hbO6lmBIe8H5m
-         /wlBhweIKecrRgS4LVK38BZE81eXR5oTKeMqv42625NrGyDYi4eEjWCf7q1SSR1PkCJv
-         gRTyPhiyBxCEplQ5DejzBuYIL2bY4cUiPmDLNaMKzTuM/7lR7XIfwlt+O976eJdxW3D7
-         lLFw==
-X-Gm-Message-State: AOJu0YwCZFl8Pf9a9ycrwzO+oWCn9L9tyZjH8lMnk4OoZA/9jPeOxD37
-	lFjj9JUXoRiaHRVEF2IgKSTqODDpK0pOUDB4AqJ5roMKWpdM43v1fH2X
-X-Gm-Gg: ASbGncsSnGyZisnBNKTn9z28FLqk/K6kmT+7a/fDZdEiS4MsoqZhmjDqRAfNLyNinMA
-	LdUq7E6eYefBVtR9zj4yyymBwsPvoPTFvES4GXRc4mOh29HhIisNsj3n4ba5BjNrBMxmioH/cTf
-	rAtU9AINQvSXBccitGw/ymAgzqtB09zhwQmPxaatvOdL+VvGWJNz/Uww389ErzqcrpKlTwIxzjw
-	cF/MhjQV8fz3fnF63SvMx+DF2GP3vdMqRykC0iuDMsHxAHDykehzHpzwSJ9m4Ri0pwhdWHz80xR
-	nqDn1yOjnrQPVkb40H5TuvbkxmRVUKzVlLE3cikyo6z1DwLRo2wTM4OEWw6zbw6Fq+cixvquzD8
-	hZLAC24aGRfhUgYNlGBHPJF/MLRPe434fj6gWEe7xmL1hZcpNkbyfR/sMcE7nqg==
-X-Google-Smtp-Source: AGHT+IGYbAKtgDLV5NK0ycsP7CBdgSQY5Ow6NeAjujS3go2updOBJ+OdCtl0cFGcZJwkgawkH+4GqQ==
-X-Received: by 2002:a05:6a00:a1f:b0:736:a8db:93b4 with SMTP id d2e1a72fcca58-74ee04a9b48mr14846762b3a.2.1752471352312;
-        Sun, 13 Jul 2025 22:35:52 -0700 (PDT)
-Received: from hcdev-d520mt2.. (60-250-196-139.hinet-ip.hinet.net. [60.250.196.139])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74eb9e14e9bsm9313078b3a.49.2025.07.13.22.35.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Jul 2025 22:35:51 -0700 (PDT)
-From: Marvin Lin <milkfafa@gmail.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com
-Cc: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	openbmc@lists.ozlabs.org,
-	KWLIU@nuvoton.com,
-	tmaimon77@gmail.com,
-	kflin@nuvoton.com,
-	Marvin Lin <milkfafa@gmail.com>
-Subject: [PATCH] net: stmmac: Add NCSI support
-Date: Mon, 14 Jul 2025 13:35:27 +0800
-Message-Id: <20250714053527.767380-1-milkfafa@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66A1A1E9906;
+	Mon, 14 Jul 2025 05:40:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.89
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752471655; cv=fail; b=EtUbpZAx/UBfRfxQt1OWSkN4ysH+bjVhxYdAQCeEbqScdDp75ebZsWkasHxZoc96RTiOVWoySNNgRySPAWcJPHL9ubhsZSpoOgwUsVbgfaz64v5dVZPTE1NhZyBdKZz6v8fDfLkrdhgvlt+xhBHcJWwHPOBGcI/2P1DTfOK2S+s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752471655; c=relaxed/simple;
+	bh=Ncv0T9y1aXLf/MscKUZ4koAeSJv9uhu0WZCbqgOHl00=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JzpJvzxxlghj26/5eaT2t5T3vDMdYRWwHrVBPkdB5OHRfpjClUP/ljSoX6f4SfF8xFIieSjE2FeU8x8HA1ttuii8EEwHNlX5s+hA8e5LQCP2WjtJYW2YDD5eDGKozLuGnKeRZVZdBP1wuFWXe+uiitoRNru5gAOl8CBn9nTFAi4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=TN82vm4D; arc=fail smtp.client-ip=40.107.243.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=h7MRKiV3kXZ12N1AQScwGIxIro0W6aXRcJgLoqbi+mNPkDr2mq5NGOklYCwVyszDcNm2OP7ifOGgkTLn2yv21AE9Tw/kT6HmViQRVU7NMue6bPKvOJ55BBTDKPxHMJfMyu2OmtqCCzr6qAyG2X7VjCt9dBph0GrVzPuZO6OrFWKWcPXB5PvvUas56kSEOWFLN1fnOzV9qBBrGdRP46LFIolRoekRNU3Fq0N7w+ytNwmKbZ3M1lAUJteP9v14FwSvvjJf0xgspVJRlM7zwyclV9DBvzgvcYzyL99TZi1ORKVQZbFO0oV4nipvDqfHRCGSWgjhc4appruD4WsskyhKfQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PKpUeH6u760FZOwDML2WxgUGF8LJIt0dYxt01yjFnk4=;
+ b=pdz8gCdiUCmen73eTLtvUIRPJDh/za93YIF64w9Mc2jO2AZrwLMpWcEBsrOod5iv2L9Lz9NG2EGhnBrbLVAwmK3sW0ISzOHn+f56IlWL3wzRGO37FH3oldc+C2w4fwZf4PfWfyvX1aFZx34sCT79+sNbqGM/pbyEuSd69TNY0AfQcLvMtkg3hB5HP9JG3/9pq3thd95Ck0AavolHVP6oeefH1oUV1JktK3JgrdnutQUX12x1XyCK6WPw9mm0uwHWB4eNcLZe1YjovtJUkTVLih1fMIq24KEgt9JVwTLC2U2Eyu+orEY4jILe1KVRG1dPzbqnv8zPcMVw8aHqr0pAJw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PKpUeH6u760FZOwDML2WxgUGF8LJIt0dYxt01yjFnk4=;
+ b=TN82vm4DtLqk7XFsFXDjU6ja0inbt1IzzwAOjAt/5uGuUV/9JbBhWMWML13KwzBJ5SY2aNy1EyKaT0U6B+dNWNjFsgCf9iWIUh29vlZhEwP9C1KqUjRzrmY4APtDqkPOvMqeMDSM597Bh0poxmKAz3EiYJd1uIz6GmiGXlgrBPeuYbFmLPkMzpNwtPadeUws2bb+lht3nvDWTobmULkjTyqHLpMeQuekcENkfh6zWBOfiw6d1/OYdaUQUIJghdAWC1fpKY7jRabQZ1WlRHlgwAWFmgurX5LhWFpwk+R6mS/dGdnrDV4KoZ+tAaRGW6yke+PsO9RUDKGSEHu9XUgLGw==
+Received: from CH2PR03CA0011.namprd03.prod.outlook.com (2603:10b6:610:59::21)
+ by PH7PR12MB7113.namprd12.prod.outlook.com (2603:10b6:510:1ec::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.29; Mon, 14 Jul
+ 2025 05:40:50 +0000
+Received: from CH1PEPF0000AD7A.namprd04.prod.outlook.com
+ (2603:10b6:610:59:cafe::3b) by CH2PR03CA0011.outlook.office365.com
+ (2603:10b6:610:59::21) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8922.30 via Frontend Transport; Mon,
+ 14 Jul 2025 05:40:49 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ CH1PEPF0000AD7A.mail.protection.outlook.com (10.167.244.59) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8922.22 via Frontend Transport; Mon, 14 Jul 2025 05:40:49 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 13 Jul
+ 2025 22:40:36 -0700
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Sun, 13 Jul 2025 22:40:35 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
+ Transport; Sun, 13 Jul 2025 22:40:32 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>
+CC: Saeed Mahameed <saeed@kernel.org>, Gal Pressman <gal@nvidia.com>, "Leon
+ Romanovsky" <leon@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, "Tariq
+ Toukan" <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next 0/6] net/mlx5: misc changes 2025-07-14
+Date: Mon, 14 Jul 2025 08:39:39 +0300
+Message-ID: <1752471585-18053-1-git-send-email-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.8.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD7A:EE_|PH7PR12MB7113:EE_
+X-MS-Office365-Filtering-Correlation-Id: 19abb78f-e64b-4792-72ee-08ddc298fd78
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|82310400026|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?+X5pHtWjljtag48IVFIZSvXr+kA0LZumwutWxUNrJpycSspPY3D9ffW8jcir?=
+ =?us-ascii?Q?vLnRIWCTyHi4TclKKineXfoyyhnHnejdpnZLoAfe+EExnFIUM9HSJVbv0cOJ?=
+ =?us-ascii?Q?9GSbeiW5HPKmVjw+u+kDnw0OADUBzRQuC04xOzkc+kggfVC85sn5S5YoqJpW?=
+ =?us-ascii?Q?qFZIukdJN89mxR4cLByj2FfjXYh4WLTBIWK9DXvcmRTb68itXjIg1hJFbWnl?=
+ =?us-ascii?Q?pBTF2M/auAFD+v4bZyAja3mSRDnPAJZnaW7VNS/LkkLe+PPMwDP231o82mm6?=
+ =?us-ascii?Q?HA0VGO7qVrmLIgM2OT7BjbBZvWkajT0ocq5WMuJxwLM1D9rMG8y0BhsMbvOR?=
+ =?us-ascii?Q?txnefeUtXERUgtpUCESw/EDATMXXcbxupH8mym1Zr3ZpDtg6cPyQym7VO3kT?=
+ =?us-ascii?Q?O/3uHOGK7tHH8oC9d2jgumLseU7QwKmYu6uRsI0UXDLQkjTU7JeeiB/fjA8j?=
+ =?us-ascii?Q?y52sYjpRQdQyMLSfZCR38oZqXE7TW6IUJ/Zy/2J3Vz8IYXVGWNYThHtMhyfi?=
+ =?us-ascii?Q?g4Jg4yO6O2TSUR+c+90pP6vfaJLRAAtHXWcPuJWA0hNSJ4vU1rJXwpDV5l9q?=
+ =?us-ascii?Q?OdHnaO5iapV4RVp3ENXJ3jrqZgGBe3JS+4nC+49IuOxZJRk6NI7B05WaNSB2?=
+ =?us-ascii?Q?r2AvdGtEj+ROInZdhjm6HMJe2kJ4wjapMJfJ37yl8UR5wZiEhsdtRVS+B41a?=
+ =?us-ascii?Q?yWLWNAL4JyfIrzf4ciSM+rBNMw69rxxkCgEO2Loua36iaCJ5Afx8UdTmmKD6?=
+ =?us-ascii?Q?zE6ClEUmlw1+cSSkQFyhJnscwZViZcOi0NRfF4XAxSxSA6nqw+RN0Kgrrvh8?=
+ =?us-ascii?Q?2wYOs5nlX2q1s8VT9+z71keh8SrhytDpMXEHHQfoxhbY+v85vjaRxDThO05k?=
+ =?us-ascii?Q?xSLh4FilPojzBQGw7SL46nwzOAOZgJfr69+fK9fov0A2LpOJCgsBLY9Eme56?=
+ =?us-ascii?Q?qoS0b72y/rH7o+mK1sBfn0vRRy7/W36FJDH8MQv4apXGkmhZB9Ixj/Bpg+Zt?=
+ =?us-ascii?Q?68rh9SEbG8PvG+EJlgHMtEVf5c3ryZjDpBYG/6zYhgdjNW7Ow526WiYspQ2l?=
+ =?us-ascii?Q?alpo6wiGwEMVUypMIQ19nNDcxAnlGRqlz56A8iEZn951+zE5eWo7/Cw5qpRL?=
+ =?us-ascii?Q?jmoSG/lJLzKD/0jtlYjVL2B6Vy90XY3i4aBTukHo0JxmtDzFz2Q+X7n+dcHo?=
+ =?us-ascii?Q?3J2yIlYiVK3gCuemkmz8zOcsOqPeM9fz3piBzgOj8buK4T2Wsbfu4KcwWWK7?=
+ =?us-ascii?Q?RWo4hfDKFkcWV2spGVX78K9Sx+lWijXKk5k/nUkZRl4viGjLFw3eDZ+QFqKG?=
+ =?us-ascii?Q?CncyNDUXFCqoA641LYx6Ccsabcc+FajypNk/XSvw2GlzLiacIrOvdWc4oqx9?=
+ =?us-ascii?Q?TZsHswBAHg/CrZHw8fFcUCp9ICOqHcMJIUi7KMrSUPLCIY9FpkJB00QCSbre?=
+ =?us-ascii?Q?qJ6WiZ0mx3fVC+st06cxAicpVyKms0St64nEqsZe79jn7ebxcIz1QmXO13B9?=
+ =?us-ascii?Q?lpHR7MehFuf/PD6+DEPkiFe0gOwfIrSNbRsc?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2025 05:40:49.8776
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 19abb78f-e64b-4792-72ee-08ddc298fd78
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH1PEPF0000AD7A.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7113
 
-The NCSI is defined as the interface between BMC and Network
-Controller on Host side. The interface is responsible for providing
-external network connectivity for BMC.
+Hi,
 
-This patch adds support for NCSI that registers and starts NCSI
-device, it also skips PHY-related operations if use-ncsi property is
-defined in the DTS.
+This series contains misc enhancements to the mlx5 driver.
 
-Signed-off-by: Marvin Lin <milkfafa@gmail.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac.h  |   2 +
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 166 +++++++++++++-----
- .../ethernet/stmicro/stmmac/stmmac_platform.c |  27 ++-
- include/linux/stmmac.h                        |   1 +
- 4 files changed, 142 insertions(+), 54 deletions(-)
+Regards,
+Tariq
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-index cda09cf5dcca..9dc386e0bc6b 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-@@ -365,6 +365,8 @@ struct stmmac_priv {
- 	/* XDP BPF Program */
- 	unsigned long *af_xdp_zc_qps;
- 	struct bpf_prog *xdp_prog;
-+
-+	struct ncsi_dev *ncsidev;
- };
- 
- enum stmmac_state {
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index b948df1bff9a..dfe3e588ffb2 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -51,6 +51,7 @@
- #include "dwmac1000.h"
- #include "dwxgmac2.h"
- #include "hwif.h"
-+#include <net/ncsi.h>
- 
- /* As long as the interface is active, we keep the timestamping counter enabled
-  * with fine resolution and binary rollover. This avoid non-monotonic behavior
-@@ -3131,10 +3132,12 @@ static int stmmac_init_dma_engine(struct stmmac_priv *priv)
- 	if (priv->extend_desc && (priv->mode == STMMAC_RING_MODE))
- 		priv->plat->dma_cfg->atds = 1;
- 
--	ret = stmmac_reset(priv, priv->ioaddr);
--	if (ret) {
--		netdev_err(priv->dev, "Failed to reset the dma\n");
--		return ret;
-+	if (!priv->plat->use_ncsi) {
-+		ret = stmmac_reset(priv, priv->ioaddr);
-+		if (ret) {
-+			netdev_err(priv->dev, "Failed to reset the dma\n");
-+			return ret;
-+		}
- 	}
- 
- 	/* DMA Configuration */
-@@ -3643,6 +3646,14 @@ static void stmmac_hw_teardown(struct net_device *dev)
- 	clk_disable_unprepare(priv->plat->clk_ptp_ref);
- }
- 
-+static void stmmac_ncsi_handler(struct ncsi_dev *nd)
-+{
-+	if (unlikely(nd->state != ncsi_dev_state_functional))
-+		return;
-+
-+	netdev_info(nd->dev, "NCSI interface %s\n", nd->link_up ? "up" : "down");
-+}
-+
- static void stmmac_free_irq(struct net_device *dev,
- 			    enum request_irq_err irq_err, int irq_idx)
- {
-@@ -4046,14 +4057,16 @@ static int __stmmac_open(struct net_device *dev,
- 	if (ret < 0)
- 		return ret;
- 
--	if ((!priv->hw->xpcs ||
--	     xpcs_get_an_mode(priv->hw->xpcs, mode) != DW_AN_C73)) {
--		ret = stmmac_init_phy(dev);
--		if (ret) {
--			netdev_err(priv->dev,
--				   "%s: Cannot attach to PHY (error: %d)\n",
--				   __func__, ret);
--			goto init_phy_error;
-+	if (!priv->plat->use_ncsi) {
-+		if ((!priv->hw->xpcs ||
-+		     xpcs_get_an_mode(priv->hw->xpcs, mode) != DW_AN_C73)) {
-+			ret = stmmac_init_phy(dev);
-+			if (ret) {
-+				netdev_err(priv->dev,
-+					   "%s: Cannot attach to PHY (error: %d)\n",
-+					   __func__, ret);
-+				goto init_phy_error;
-+			}
- 		}
- 	}
- 
-@@ -4082,9 +4095,23 @@ static int __stmmac_open(struct net_device *dev,
- 
- 	stmmac_init_coalesce(priv);
- 
--	phylink_start(priv->phylink);
--	/* We may have called phylink_speed_down before */
--	phylink_speed_up(priv->phylink);
-+	if (priv->plat->use_ncsi) {
-+		u32 ctrl;
-+
-+		stmmac_mac_flow_ctrl(priv, DUPLEX_FULL, FLOW_AUTO);
-+		ctrl = readl(priv->ioaddr + MAC_CTRL_REG);
-+		ctrl &= ~priv->hw->link.speed_mask;
-+		ctrl |= priv->hw->link.speed100;
-+		ctrl |= priv->hw->link.duplex;
-+		writel(ctrl, priv->ioaddr + MAC_CTRL_REG);
-+
-+		/* If using NC-SI subsystem, set our carrier on and start the stack */
-+		netif_carrier_on(dev);
-+	} else {
-+		phylink_start(priv->phylink);
-+		/* We may have called phylink_speed_down before */
-+		phylink_speed_up(priv->phylink);
-+	}
- 
- 	ret = stmmac_request_irq(dev);
- 	if (ret)
-@@ -4094,17 +4121,29 @@ static int __stmmac_open(struct net_device *dev,
- 	netif_tx_start_all_queues(priv->dev);
- 	stmmac_enable_all_dma_irq(priv);
- 
--	return 0;
-+	/* Start the NCSI device */
-+	if (priv->plat->use_ncsi) {
-+		ret = ncsi_start_dev(priv->ncsidev);
-+		if (ret) {
-+			netdev_err(priv->dev, "ERROR: start the ncsi device(%d)\n", ret);
-+			goto ncsi_error;
-+		}
-+	}
- 
-+	return 0;
-+ncsi_error:
-+	stmmac_disable_all_queues(priv);
- irq_error:
--	phylink_stop(priv->phylink);
-+	if (!priv->plat->use_ncsi)
-+		phylink_stop(priv->phylink);
- 
- 	for (chan = 0; chan < priv->plat->tx_queues_to_use; chan++)
- 		hrtimer_cancel(&priv->dma_conf.tx_queue[chan].txtimer);
- 
- 	stmmac_hw_teardown(dev);
- init_error:
--	phylink_disconnect_phy(priv->phylink);
-+	if (!priv->plat->use_ncsi)
-+		phylink_disconnect_phy(priv->phylink);
- init_phy_error:
- 	pm_runtime_put(priv->device);
- 	return ret;
-@@ -4139,11 +4178,15 @@ static int stmmac_release(struct net_device *dev)
- 	struct stmmac_priv *priv = netdev_priv(dev);
- 	u32 chan;
- 
--	if (device_may_wakeup(priv->device))
--		phylink_speed_down(priv->phylink, false);
--	/* Stop and disconnect the PHY */
--	phylink_stop(priv->phylink);
--	phylink_disconnect_phy(priv->phylink);
-+	if (priv->plat->use_ncsi) {
-+		ncsi_stop_dev(priv->ncsidev);
-+	} else {
-+		if (device_may_wakeup(priv->device))
-+			phylink_speed_down(priv->phylink, false);
-+		/* Stop and disconnect the PHY */
-+		phylink_stop(priv->phylink);
-+		phylink_disconnect_phy(priv->phylink);
-+	}
- 
- 	stmmac_disable_all_queues(priv);
- 
-@@ -6230,7 +6273,8 @@ static int stmmac_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
- 	case SIOCGMIIPHY:
- 	case SIOCGMIIREG:
- 	case SIOCSMIIREG:
--		ret = phylink_mii_ioctl(priv->phylink, rq, cmd);
-+		if (!priv->plat->use_ncsi)
-+			ret = phylink_mii_ioctl(priv->phylink, rq, cmd);
- 		break;
- 	default:
- 		break;
-@@ -6691,6 +6735,9 @@ static int stmmac_vlan_rx_add_vid(struct net_device *ndev, __be16 proto, u16 vid
- 	bool is_double = false;
- 	int ret;
- 
-+	if (priv->plat->use_ncsi)
-+		return ncsi_vlan_rx_add_vid(ndev, proto, vid);
-+
- 	ret = pm_runtime_resume_and_get(priv->device);
- 	if (ret < 0)
- 		return ret;
-@@ -6725,6 +6772,9 @@ static int stmmac_vlan_rx_kill_vid(struct net_device *ndev, __be16 proto, u16 vi
- 	bool is_double = false;
- 	int ret;
- 
-+	if (priv->plat->use_ncsi)
-+		return ncsi_vlan_rx_kill_vid(ndev, proto, vid);
-+
- 	ret = pm_runtime_resume_and_get(priv->device);
- 	if (ret < 0)
- 		return ret;
-@@ -7504,7 +7554,9 @@ int stmmac_dvr_probe(struct device *device,
- 	if (!priv->xstats.pcpu_stats)
- 		return -ENOMEM;
- 
--	stmmac_set_ethtool_ops(ndev);
-+	if (!plat_dat->use_ncsi)
-+		stmmac_set_ethtool_ops(ndev);
-+
- 	priv->pause_time = pause;
- 	priv->plat = plat_dat;
- 	priv->ioaddr = res->addr;
-@@ -7619,6 +7671,9 @@ int stmmac_dvr_probe(struct device *device,
- 	 * host DMA width for allocation and the device DMA width for
- 	 * register handling.
- 	 */
-+	if (priv->plat->use_ncsi)
-+		ndev->hw_features |= NETIF_F_HW_VLAN_CTAG_FILTER;
-+
- 	if (priv->plat->host_dma_width)
- 		priv->dma_cap.host_dma_width = priv->plat->host_dma_width;
- 	else
-@@ -7728,22 +7783,35 @@ int stmmac_dvr_probe(struct device *device,
- 	if (!pm_runtime_enabled(device))
- 		pm_runtime_enable(device);
- 
--	ret = stmmac_mdio_register(ndev);
--	if (ret < 0) {
--		dev_err_probe(priv->device, ret,
--			      "MDIO bus (id: %d) registration failed\n",
--			      priv->plat->bus_id);
--		goto error_mdio_register;
--	}
-+	if (!priv->plat->use_ncsi) {
-+		ret = stmmac_mdio_register(ndev);
-+		if (ret < 0) {
-+			dev_err_probe(priv->device, ret,
-+				      "MDIO bus (id: %d) registration failed\n",
-+				      priv->plat->bus_id);
-+			goto error_mdio_register;
-+		}
- 
--	ret = stmmac_pcs_setup(ndev);
--	if (ret)
--		goto error_pcs_setup;
-+		ret = stmmac_pcs_setup(ndev);
-+		if (ret)
-+			goto error_pcs_setup;
- 
--	ret = stmmac_phy_setup(priv);
--	if (ret) {
--		netdev_err(ndev, "failed to setup phy (%d)\n", ret);
--		goto error_phy_setup;
-+		ret = stmmac_phy_setup(priv);
-+		if (ret) {
-+			netdev_err(ndev, "failed to setup phy (%d)\n", ret);
-+			goto error_phy_setup;
-+		}
-+	} else {
-+		if (!IS_ENABLED(CONFIG_NET_NCSI)) {
-+			netdev_err(priv->dev, "CONFIG_NET_NCSI not enabled\n");
-+			goto error_phy_setup;
-+		}
-+		dev_info(priv->device, "register NCSI dev\n");
-+		priv->ncsidev = ncsi_register_dev(priv->dev, stmmac_ncsi_handler);
-+		if (!priv->ncsidev)
-+			goto error_phy_setup;
-+
-+		dev_info(priv->device, "Using NCSI interface\n");
- 	}
- 
- 	ret = register_netdev(ndev);
-@@ -7768,9 +7836,11 @@ int stmmac_dvr_probe(struct device *device,
- 	return ret;
- 
- error_netdev_register:
--	phylink_destroy(priv->phylink);
-+	if (!priv->plat->use_ncsi)
-+		phylink_destroy(priv->phylink);
- error_phy_setup:
--	stmmac_pcs_clean(ndev);
-+	if (!priv->plat->use_ncsi)
-+		stmmac_pcs_clean(ndev);
- error_pcs_setup:
- 	stmmac_mdio_unregister(ndev);
- error_mdio_register:
-@@ -7868,13 +7938,15 @@ int stmmac_suspend(struct device *dev)
- 
- 	mutex_unlock(&priv->lock);
- 
--	rtnl_lock();
--	if (device_may_wakeup(priv->device) && !priv->plat->pmt)
--		phylink_speed_down(priv->phylink, false);
-+	if (!priv->plat->use_ncsi) {
-+		rtnl_lock();
-+		if (device_may_wakeup(priv->device) && !priv->plat->pmt)
-+			phylink_speed_down(priv->phylink, false);
- 
--	phylink_suspend(priv->phylink,
--			device_may_wakeup(priv->device) && priv->plat->pmt);
--	rtnl_unlock();
-+		phylink_suspend(priv->phylink,
-+				device_may_wakeup(priv->device) && priv->plat->pmt);
-+		rtnl_unlock();
-+	}
- 
- 	if (stmmac_fpe_supported(priv))
- 		ethtool_mmsv_stop(&priv->fpe_cfg.mmsv);
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index b80c1efdb323..de500e59461f 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -447,17 +447,30 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
- 		eth_zero_addr(mac);
- 	}
- 
--	phy_mode = device_get_phy_mode(&pdev->dev);
--	if (phy_mode < 0)
--		return ERR_PTR(phy_mode);
-+	if (of_get_property(pdev->dev.of_node, "use-ncsi", NULL)) {
-+		plat->use_ncsi = true;
-+		plat->has_xgmac = 0;
-+		plat->has_gmac4 = 0;
-+		plat->has_gmac = 0;
-+	} else {
-+		plat->use_ncsi = false;
-+	}
- 
--	plat->phy_interface = phy_mode;
-+	if (!plat->use_ncsi) {
-+		phy_mode = device_get_phy_mode(&pdev->dev);
-+		if (phy_mode < 0)
-+			return ERR_PTR(phy_mode);
-+
-+		plat->phy_interface = phy_mode;
-+	}
- 	rc = stmmac_of_get_mac_mode(np);
- 	plat->mac_interface = rc < 0 ? plat->phy_interface : rc;
- 
--	/* Some wrapper drivers still rely on phy_node. Let's save it while
--	 * they are not converted to phylink. */
--	plat->phy_node = of_parse_phandle(np, "phy-handle", 0);
-+	if (!plat->use_ncsi) {
-+		/* Some wrapper drivers still rely on phy_node. Let's save it while
-+		 * they are not converted to phylink. */
-+		plat->phy_node = of_parse_phandle(np, "phy-handle", 0);
-+	}
- 
- 	/* PHYLINK automatically parses the phy-handle property */
- 	plat->port_node = of_fwnode_handle(np);
-diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-index 26ddf95d23f9..668768043f7e 100644
---- a/include/linux/stmmac.h
-+++ b/include/linux/stmmac.h
-@@ -288,5 +288,6 @@ struct plat_stmmacenet_data {
- 	int msi_tx_base_vec;
- 	const struct dwmac4_addrs *dwmac4_addrs;
- 	unsigned int flags;
-+	int use_ncsi;
- };
- #endif
+
+Lama Kayal (4):
+  net/mlx5: HWS, Enable IPSec hardware offload in legacy mode
+  net/mlx5e: SHAMPO, Cleanup reservation size formula
+  net/mlx5e: SHAMPO, Remove mlx5e_shampo_get_log_hd_entry_size()
+  net/mlx5e: Remove duplicate mkey from SHAMPO header
+
+Leon Romanovsky (1):
+  net/mlx5e: Properly access RCU protected qdisc_sleeping variable
+
+Moshe Shemesh (1):
+  net/mlx5e: fix kdoc warning on eswitch.h
+
+ drivers/net/ethernet/mellanox/mlx5/core/en.h  | 10 ++---
+ .../ethernet/mellanox/mlx5/core/en/params.c   | 43 ++++++-------------
+ .../ethernet/mellanox/mlx5/core/en/params.h   |  6 ---
+ .../net/ethernet/mellanox/mlx5/core/en/qos.c  |  2 +-
+ .../mlx5/core/en_accel/ipsec_offload.c        |  3 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c | 27 ++++++++----
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  2 +-
+ .../net/ethernet/mellanox/mlx5/core/eswitch.h |  2 +-
+ 8 files changed, 41 insertions(+), 54 deletions(-)
+
+
+base-commit: a52f9f0d77f20efc285908a28b5697603b6597c7
 -- 
-2.34.1
+2.40.1
 
 
