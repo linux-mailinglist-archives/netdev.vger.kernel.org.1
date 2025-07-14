@@ -1,356 +1,339 @@
-Return-Path: <netdev+bounces-206695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A8DCB0417F
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 16:25:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58F5BB0417B
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 16:24:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C261178C16
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 14:25:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A692C7ADFFA
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 14:22:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC1762571B3;
-	Mon, 14 Jul 2025 14:23:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CFE52594AA;
+	Mon, 14 Jul 2025 14:21:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VmhsyiVg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mm9TZXlf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC01B248195;
-	Mon, 14 Jul 2025 14:23:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752503008; cv=fail; b=oeBDiHvm/WZczrnmc9McFifvTPrmNdL30U+xwebbGp3PePlixEhm/mDQbEZwPTjEfPmm/ihckFIgy0yy9P3+QKCJBBt3QDQU7iYIN0j8rMpv0Pt5Mk/BLj1Lgt0rpkDCqC79BsCZXAs4polaaM7MkF6vpmXz+urBA/ifZxzbFro=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752503008; c=relaxed/simple;
-	bh=5BdM9vAs3ZjSLzFLIJ9k3TukaOA4HfO81Gdffy91AjM=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=OL3q6GG0Xo7AfU9FMtW5Arv/vDXHWc7cHUXg8pFZw+evPSXijsx96dQOkD68rY/fL7JNrvEuqvBZjeDEcOd9cOSwlPshtVr633lhjhnn9cQNbakjDDN4iRKmFaxliepmgXWjdcz7BkY55h4IsyNfJYPTE8EJtuGPlynnxIHUxI8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VmhsyiVg; arc=fail smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752503007; x=1784039007;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=5BdM9vAs3ZjSLzFLIJ9k3TukaOA4HfO81Gdffy91AjM=;
-  b=VmhsyiVgl6My9gaIr0qe5JtjUwYCUUdQTA1PkE2ynvwhHE5sruN13USs
-   gYtVbBw460aJweyJsaaECMs5Fu/F8XuelheS1NtdiGNr7a69xM6AuCyJh
-   1qkn1CDKtA1D3An8zk7oZ8R3pceKbsrBoKwQYFTFBpjXIjcwtltDp8SlT
-   5jMz0rjSy6MHQPI3EyR8JJTz9PDwKhERmegEJ4QwfrbtekSapuD50IFsc
-   6yOKddCwC46fxgh1qrX99zmaylzyCgjfLizP/Vs6yVuK3VZMvCWsp2JgX
-   prbV6B9YN0a2JP/BZCj0EJL75J5SpwBxpef5UvbNTJtSwMZtnJlvJjEaQ
-   g==;
-X-CSE-ConnectionGUID: 0IMR3FOyRHCw2ALmhStHCw==
-X-CSE-MsgGUID: 5Mrj4SZtRkGZLwUfq6/wOQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="66057048"
-X-IronPort-AV: E=Sophos;i="6.16,311,1744095600"; 
-   d="scan'208";a="66057048"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2025 07:23:25 -0700
-X-CSE-ConnectionGUID: m9S8gMCWRkidB5PTpxzo8A==
-X-CSE-MsgGUID: RrnbobX7TVyuhtUnB7Ffqw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,311,1744095600"; 
-   d="scan'208";a="161248050"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2025 07:23:24 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 14 Jul 2025 07:23:22 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Mon, 14 Jul 2025 07:23:22 -0700
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (40.107.95.72) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 14 Jul 2025 07:23:18 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Qlc1gU2s/f0scQqW7nmpBAuUd1CET5Sjt5CjR4yHMireB4REiVDPoj6ahauV1EppT17Y7MWd/5YGgZWKBf0zVfDsvqSdcboQxlZGU6tdbepCeV6aInjeFldINabNLxPmjojun8YODDA65j8+CceS141N8RK420ko/snzC7l2+H4kdR1GREP6OzMyAYGpzM2QR5zYv6dXvC2qQRX4wZsNqfYCL3/thd5JGAidDQrLT89RVaThp3LRUVpDN76m3cLVrtIF87C/ue3mJommrZXa9da4/vnbkZz3yMnO/agXmpKM3XuULNDMw0qw3C1eVLEdFbVa3xfStlbZVv9YZNAAzg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=j0sSMOCbRW2K4SEcNgB4KC1kq3VPGHFdJlXm432ACjU=;
- b=L8TvEGfA5ljdNRPR9rwL0J+rwzXupQj4KOKNHPCbbbsTO3sRZz/eZTufFtPGHf+9kgaHguQqCpBFz061oUenmciIHb8XvdopWAPBm+BH3xIxj/dEz30Tnv5RBopZAMW2kx4Osyl9lDQHiBFXbg5CgfFQ7cQtLYfyp6r/Mr32S/Tfi3DrxDYXaPcPCr+ylkqHvQ5jFHMEq7SNSVQScEUc2xWXQWQjk3puxCACMlk4QOAIlsrQ5GRdXcLY0WMjtJdwc2IWUOJEtEVOZCeTApg5+Ib5Hn1Ma8dcTIiEjI1IwAPxkYhrqU6oB1ng/D++gHkrUjEg/25zH2xMyQKUJtolEg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by IA1PR11MB7200.namprd11.prod.outlook.com (2603:10b6:208:42f::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.29; Mon, 14 Jul
- 2025 14:22:35 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808%3]) with mapi id 15.20.8922.028; Mon, 14 Jul 2025
- 14:22:35 +0000
-Message-ID: <98c8c7d7-4b1a-474f-86b6-884d79ea4e41@intel.com>
-Date: Mon, 14 Jul 2025 16:20:14 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net/mlx5: Avoid copying payload to the skb's
- linear part
-To: <cpaasch@openai.com>
-CC: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>
-References: <20250713-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v1-0-ecaed8c2844e@openai.com>
- <20250713-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v1-2-ecaed8c2844e@openai.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <20250713-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v1-2-ecaed8c2844e@openai.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DUZPR01CA0089.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:46a::12) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20E87254848;
+	Mon, 14 Jul 2025 14:21:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752502875; cv=none; b=ZAUhqeeWd5+VYtjSa0mgVDs09VDpCnJNHzXJxfg90v5NARFbOM9JWiulVi+Zew1hKJaMGTKJf5DsXxmHdIANTnMuHxXhCa91FELGkteug+d5pX3W/9oYeU6fwCp64KhsEgx/vY3leboWGlLdLy0pRwcjGOHKUR/srACaM5PWVUE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752502875; c=relaxed/simple;
+	bh=S5zzvy8qBN4oLuPgCKkXFZd4YsWaT+CALAOShFjWnx4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=REnsRjOBEXWQAlkiNxrSz0BCj3sLms+FPpO6G/ZBqAKxYGPCy45UDuOKztmH2HUlN7jH85oQDr9Etr7j1MHTo2JNwym638Y8NgRcmKuTQD+bGZFvvi2207Jp0P2Z5dI7bC/vkRY9XbBkAk1A4a6CIbO3LQJXAY0x5iZYpmbK90s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mm9TZXlf; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-32f1763673cso53647261fa.3;
+        Mon, 14 Jul 2025 07:21:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752502871; x=1753107671; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tr9tLd8PzVeEnhN2KZdTshX06WyiXWHv7nHjm3Vcz+0=;
+        b=Mm9TZXlfMrmfuXFN7oVKuucdKaMK7ZzzPvZ+JugIF2wc/2T6M1UulikagdZ/0RcirN
+         ePYeG2WY84Ip4uJrnDQ71235bpejwEOK9z3z7Lcyde/kOMP9/clgJpqunIOXDq0Warzt
+         nvwBSjK3PEiflVzWQWdqXPahRGYyuLbdkchy3tJCKq+kAOQhoOSwiPhxnzsgbwDtF3F1
+         ERwQc0Ayu6Sce2sNsgIiW3Laac1nCByDe+VfmnrIBKSsU6fyKZ6uXDEZrMMUJjM7PqXY
+         kvme8pfRe0gw+rjDZWo7Uqj6Ogd+7WrTlSDKjh2NFtmifU3Q4o3kknVn1L0N+8Mru6TY
+         ukJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752502871; x=1753107671;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tr9tLd8PzVeEnhN2KZdTshX06WyiXWHv7nHjm3Vcz+0=;
+        b=n+v9G86OdqENyT5dtzBICHiagjcOFkF6mS6FmQiFsNMeG/E9+/7uStH6/e1Vd6KEYW
+         5WN0DN0jE1T2ahDR7VBMJHnk4PoqU8H1dqc256Fy/NQabSOCDQG65G4d6HA7Lp0EDy8I
+         bT5d5FKyaE1dlsQuDw61RGSGDNBvqkbfAU717L3Js6Tpt/hLZiKiqwp6y+PJqmT3JtBl
+         5ZmW91/gQH0GK1CHI8UNUuGdtTHNz3Fg5I5IGy+AXemqyoAeVSNOEfqrAorvU7AS08V+
+         XdsXSAhWvyGE+J1+05ElMWlDuogF19gftWu01jtQWGP3HSPqQYUwU3qUgj8p3Lxg9vf1
+         KBUA==
+X-Forwarded-Encrypted: i=1; AJvYcCVG3C6CRbmuQyIic+oUc3/s8f2M4TZZCTnB+40GAS5y2A5RuJfZw5yU9jyU3mO08NmucfxnFcVie2Rhd1Cb@vger.kernel.org, AJvYcCVjzPNZI0UuKsSShZWsGDTveJkxjiGthnW7Xh/61m8ZsVdeLsB+ZFAe6MsbA1yODS+lxgKmsnGINYk4E51Vvsg=@vger.kernel.org, AJvYcCXSmCdMr+kWlJpmEj3VxXCWTmodcA1HAZjooSC8m66406bsZiw+Sj2sede+eGJeHisv+IDsGOka@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyLPj+kjVah3aNbixJ1QWh9x7rkO9hGm95f6ZUElecLzCZob3F
+	FFeOhgtyzrIpUNl4r2mhWveMasPkgGjmbQ4BIny8ycoetOpDT5qpXjj25yryITv5R/h8kjp1N3f
+	79jwtACtvmDjkIjkaYYBEEYJysapTM2s=
+X-Gm-Gg: ASbGncvKPhRVCS7p1M11SmFOjkSMJLDYcprl1LciA5Sfi7tRNNyKAj9raLBd5MKFR53
+	UEtMH6ZuWVCSH9aCVETbACXG6r32XHXxLQVxBXQ2WDSUlmaPkdaJR/kTcRrl+8Tfzr4DhuHcZTU
+	Rd7wDrExX3wGys6N2Y66aEtxMspB9CaPyYdENLGOLOcHxomXoekmPFccJhTPd3ePm3rDdTYdY2D
+	2NpAVivNmZC4vXB
+X-Google-Smtp-Source: AGHT+IFv25s94eTshSlQ99k1GFSIdZpkudSJYBxlEVRj+v7lYPuzRldQqXMLGqzCb6/NnsB0mYCmDTzM9pi6MTXLDcs=
+X-Received: by 2002:a2e:be11:0:b0:30b:d17b:26aa with SMTP id
+ 38308e7fff4ca-33053298910mr37764911fa.2.1752502870805; Mon, 14 Jul 2025
+ 07:21:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|IA1PR11MB7200:EE_
-X-MS-Office365-Filtering-Correlation-Id: aa1777db-ea0d-4fd4-67b9-08ddc2e1e107
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?akpBSDB2Qkd3eTRITzBJTzU2OVZvTklaRTZYTHNleGducVZUUWtJVm51Y0NW?=
- =?utf-8?B?eGU0a1ZrM05nbGNWSFc0ZHhmQThaeWxsejVaUU5Tc1RWZEE5bmp6T1FESW5m?=
- =?utf-8?B?UHhTeFZxZ1k3QXBIcFhHZktaU3g0RUorRGhqY1pXSjJyT052dmpWMDlmempj?=
- =?utf-8?B?bWhqVFg3bWV5U29EbS8rUGVjOWpONWZ0UEl1OTNaZE10VHZwcGtidkY1TUhq?=
- =?utf-8?B?MVpTWGRmbzYzN0VKR3l4S2x5VlZ6NTNTU1lDZ2FwU1RxY1BLekVEU1AvQ2Nw?=
- =?utf-8?B?dTZUbVI5YTRMTy85U1JPd2M1aW1oRnJFTDRrZDNQQUd2d25ZVytvc1BpRTRM?=
- =?utf-8?B?U0pGOHpyOFlISkFFa0g3YUZjcEcxUzNLVXh4aFo3Zk9yK2d0RzNYTmdlZkZy?=
- =?utf-8?B?VXZadjYvdk9UQWpySkROZzlsWUdqVVRZOUxpRTQvRFlheDlaRHdvdndOQ1VI?=
- =?utf-8?B?bm1VUXBBa1VQTGszc01Cd1Rsa2lxaGliQlR0VDE3SDdzQmh3dnhrdndXUmYw?=
- =?utf-8?B?YXIrSVBrM1VqSHJNSXRwNUlYaWt4YWx3TlBEaDNQckhWMENrdlpCTEw0YjRl?=
- =?utf-8?B?OTBWQ3hOKzNabFJKWDFvZmpYa1A3Y2V0VVIrWDhHaW8zdU1JV08xT2tmSkto?=
- =?utf-8?B?Ny96d05FNzI1MDZYMXlEVFJUT2l3Zlc5UDIzdHlib0VmMXEvYXFvaW9xaCtC?=
- =?utf-8?B?ZVFZRjRyajhldGVESG9LdnFnRTc2M3U0S3pzM2pUWC93bDlzZnZRU3FaanRS?=
- =?utf-8?B?SDN5WEl5ZEorZ0ZwV24xMVpFS1JKdG1Pc014dTc5MjBCZTdHM05mNkpCVHNW?=
- =?utf-8?B?d3poaEZMS1d1ZjB0T0d1eTBBeGZXenhMN0pTbWxhNWw0UHE4S3BpWmJma2ZI?=
- =?utf-8?B?amJzbk9EdlJzZGtGZWc4ZnB6MGNPS24rR1BLWFREalVBcDVPQUtzalFSdDI5?=
- =?utf-8?B?VTVlc0w1Z3BaN2Jya1VRL2pHYjhXTm0xd0toZUpRcW9WYkNxMlFhbzZubTNS?=
- =?utf-8?B?T3FsUHV3YS9jZ2IyM2MrYnhDZ0M2WGdFTlo3SzhSWFhqNFhmYUJRUnU4cElz?=
- =?utf-8?B?WDk2MHBJZ2lzc3B5UjZkUWd5bjVFVEdtZURYSEFqSVA1YjVHMk1SaHdzQ3Rt?=
- =?utf-8?B?bDFrVTBGSnl0OHhiaTZ5L1duRkhWOGNkcjI3THNMRmZpb2IrN1I5eGQ0VTE4?=
- =?utf-8?B?MnRITS9HOUR3VlRDK0FJRWZ5eDJPeUovK2t6eG1hYzhMaWRJNUtmQ3lDQWtM?=
- =?utf-8?B?Tzh2NXlaT0tDL1BocGYyNnVoK1FyOEp3TmZOOGtmN1phYkNRa3I0aXRod3Z0?=
- =?utf-8?B?UVduM2tkU3lZbEVkZnR0b3lpdXNUSHBzam1JbXQyVkZkb2ZpUW5OUVVES09u?=
- =?utf-8?B?UVZSZldqYlFXd1dCcEgrUk5RRnRjODFTNWRjdGlGV1doSHE2TExvRVpyV21P?=
- =?utf-8?B?MnNpcWVSQzFKeEFRL3NGN3F5emJMMWpsQ0pQM1JtaXoxMFk0QWF4M0hvYnBq?=
- =?utf-8?B?UE16UVZ3WTI0REJ5R2xySzhMeVg5U29DN1A2dXhBajduNVE3clpWcjhZUGw4?=
- =?utf-8?B?MFJPRmRVa0VtaHVZWmM5dE5ydWFreXNBQjB5bmR3WVhwTWxVMk4zc2d5RThH?=
- =?utf-8?B?Q3VCcnVNcXAzdkVwc1FsSEhqS1E4R05uN09nSGFhcXhjcU55Y0lPSldIM1g3?=
- =?utf-8?B?RXJ3Rk1rQlVSQ2pKbkU5TkI0RE8wTGEyTlVVQVpBczFQakhFWUxNWWluRkJz?=
- =?utf-8?B?OVh5Z0pJWWxkVkliV0tXVjJBWStIU2xJdkIzbnZyanREQ242UHBkQ2lpNUpN?=
- =?utf-8?B?VVFVSXk4bWJmQm55aWo1bWhzWHNjemN2WkRkZ05hd0drWWxTOThqVmRWZkt1?=
- =?utf-8?B?QXh2UzRiSlF6ZnZ4UWxYRm5WbGFYWkcvUUxJeHVYY3JxVDRTa0NVUXZRNUVy?=
- =?utf-8?Q?ClhIdaAZP4I=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?L1Y3TFpzUE9oSUVpVWdIYUFqY3lONkxUWFZzOVFJSEpFcDhlcHdySFg1V3Yw?=
- =?utf-8?B?YnBOaWMyaGRPRHVLbHphWDVsbDh6VDJvSDhpemlGRi81ZDNCdFBYUTNmYU5y?=
- =?utf-8?B?c0VCZzAwZlVmdmpuUjlPeFo5ZURNTHRsVXR3Q3lTUW5Sc3NGMDBSdHVmaGM0?=
- =?utf-8?B?eSsyTjFGUWVJa083QkJxaG5xQmdVbzZVc0o0UEs4bXFqblJjYWhtSHdKT29M?=
- =?utf-8?B?OXltdklaNHpzVk9TTXhiQk1KVTU4eVZVeDdZVnY2SXZ0NGNqRVJGaExXVW9k?=
- =?utf-8?B?YW1za2E4SVI0dnBCenRsUkhrb2ErbjRWaWNrdjRyb3ZHVVhSRjNsN0ZzNkFG?=
- =?utf-8?B?c29yUjVvc25zT1R5dFh6U0FuUTE0eVFnMks2eWVGREQwSlV6bVJTL1FWTFAy?=
- =?utf-8?B?Rk9NcnBYNUZNZ3VpeG9FQ0dpb0NjNGJBSnZTMHc1UlFFQTFBVGJ6c0dxNWt4?=
- =?utf-8?B?d0lvZFVxVWVRMjgyenFYSWdXdzVyYVFVTTZBbEhrT1kxZGcwWHdZVFdZU1JC?=
- =?utf-8?B?NTJaenZSZW5XVGJMdWNldFRNSm9xbDhaeWswZS96MTZMR0ticmp1WnB0RDI3?=
- =?utf-8?B?dkFIRHdjS1VBRkh1MHdmWFl6TkRPMlZsdkE4ck1rTXFyMTRJMTdqK2ZYSDQ4?=
- =?utf-8?B?UjZucUZPQ09lNWFDa1U5UnBwOGQ0MUxXUFFLeVM5S21heVVvbmNIUVY2Y2hL?=
- =?utf-8?B?enNpOEtZSnZveWlVSmZ4QXZlNGxNY2hoMS9QTkU4cXZlYVlDUzlyc25naElL?=
- =?utf-8?B?NHkxRVdSOGNVWjBEajNxbUNCUDM3N2daWE5hY3VvYlM2anZRdlJOb2dPaVQ0?=
- =?utf-8?B?UlVDSnRrblQ3cTZrSnhWbm5mS0xJNm5yMWtPdllkVVNLMG5wUzZSamFVV1N6?=
- =?utf-8?B?Z2N3L3NzY2d6OWxET2FpY2YzRUQ5RUhxZ1A2UUJqQ1FhN1EzdkVLdUNBclpu?=
- =?utf-8?B?WlgwM3AyempJd1k1UlU4RUNpdW1BUXpkd1RpV2VMVUNsTWlxNi96RWoxMjBs?=
- =?utf-8?B?cklrN3Y0Sll6cWNTUVZ3NUJscnNabXZSbEhsWTJ3dzJWUW5kSVVzOVpYTWpX?=
- =?utf-8?B?MUl2WVphbTJaYm1LcHZra2d4bzlWRWlYUWlHK0ZXSGp2ekU0VVZiQnM4TVZY?=
- =?utf-8?B?cnF4RHV2TlBsaThYc1QvczFVQWw1bUZqVzBtWDAwM2tRdEE3R3ViUW9WVk5B?=
- =?utf-8?B?bDA2Zkg5cDBtdlJ3MWNBOWJnSlBrUUgySFNwZWlwSVFzcTNiM0F1K1I3WkZj?=
- =?utf-8?B?YkVSLzhtR3Uvb2t2eGVlVnNyUTM1M1MxL3MvMGVwaWdqSUF6cnhobUMrK0tX?=
- =?utf-8?B?UzRXV2I2RjU4VkQ1aGF0VDNCT2hZenFnUjcwbERqZmE5YmsxS2twTk01alcr?=
- =?utf-8?B?RkRacVR0a0wxNjhReUdXQ1poWkdUaHpoQUEzY1pLZ0N4SktRMmZXd2RNT3hY?=
- =?utf-8?B?UUdrbW9mZTRIbnNGakl2UTdWZy8vUFZ1UHdpWmNneDhBMDBBYk4yWmxLT0Qz?=
- =?utf-8?B?dXpha0lpZjJUcExDMzNiZmlZeVhkVCtWMncrOUYzYXhvekQzY3BVVTZhbWVs?=
- =?utf-8?B?NlkzUFEzU2s3YzhmN3BXQ0RJMWF6cDdJeUpGd2hTT3pyWDBvcVUrcSt0eUV4?=
- =?utf-8?B?c0U5TFl6U2pTcVdzdWVENHNhQ0ppdnVKTW4zQXJpQWpSSXc0MjNsM0ZmMVVu?=
- =?utf-8?B?SFlhd3g4SmFJNlphK3E5TFcrSHplWEpKYmhCOGtjYlZNUy94d29tTGdlWkZ2?=
- =?utf-8?B?UjVZK1d6SVljRVpveW9NU2NPRWJzbzAxSzZJWTJUZXNoNTFWVVEveUsrL0JP?=
- =?utf-8?B?R0ZxazJtK0oxc3lXT0dueHI5UEQ2b1lXU2tZV08vTXBQbnNZdythZXdRaENY?=
- =?utf-8?B?cDg2U2doSktYd3FoNWo0dm1jR1NRWWxHY043bDhubkE2dkNaRDNXVUlUWm1D?=
- =?utf-8?B?Wm9hU3hCcGhuVjN1NWRKL2Y3TVlhelg4b1ZUWHNxeC9FYXovSWIvbVR3cU0x?=
- =?utf-8?B?cTZYOUd3R29xMGxabnlUOXJ2MGlURzdLUUtRTzlkbXBnUFVjMFhFMUI2bEMx?=
- =?utf-8?B?RlNnMytRSGhXZEZGTnliaTZFQnZVMzZrSEtXcWcyUXprT0Nid1pBOENBOTlH?=
- =?utf-8?B?YzZxdHFyRlphd0JuVnFFTHhkRDltSm5Wa2lmSkV6bVFHM0NxWXFBRVhQMVVC?=
- =?utf-8?B?MFE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: aa1777db-ea0d-4fd4-67b9-08ddc2e1e107
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2025 14:22:35.7709
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: y+xPVrXzKhlXkrTAV+jn54PFEey7TlvfaIm7xku8RCIhMmUtVH/sFcd4NtAMmceSDVoWvfx0BXkHI3U255ln8ObSjgngzzdQYX2AP7jpE8Y=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7200
-X-OriginatorOrg: intel.com
+References: <474a5321753aba17ec2819ba59adfd157ecfb343.1752501596.git.pav@iki.fi>
+ <bbdbe42b-614c-4f66-8712-f0ab8d54b490@molgen.mpg.de>
+In-Reply-To: <bbdbe42b-614c-4f66-8712-f0ab8d54b490@molgen.mpg.de>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 14 Jul 2025 10:20:58 -0400
+X-Gm-Features: Ac12FXzdCcOWcVCDmHTQLk2byvGNCXMRrDfigJYmUdSRGVRnx5_2pIJH8NiXFFQ
+Message-ID: <CABBYNZL1O0On5xz6_sa0L+GsAWuPNNDk2oLhRUw-THJ9kF1ZTg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: ISO: add socket option to report packet seqnum
+ via CMSG
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: Pauli Virtanen <pav@iki.fi>, linux-bluetooth@vger.kernel.org, marcel@holtmann.org, 
+	johan.hedberg@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Christoph Paasch Via B4 Relay <devnull+cpaasch.openai.com@kernel.org>
-Date: Sun, 13 Jul 2025 16:33:07 -0700
+Hi Paul,
 
-> From: Christoph Paasch <cpaasch@openai.com>
-> 
-> mlx5e_skb_from_cqe_mpwrq_nonlinear() copies MLX5E_RX_MAX_HEAD (256)
-> bytes from the page-pool to the skb's linear part. Those 256 bytes
-> include part of the payload.
-> 
-> When attempting to do GRO in skb_gro_receive, if headlen > data_offset
-> (and skb->head_frag is not set), we end up aggregating packets in the
+On Mon, Jul 14, 2025 at 10:15=E2=80=AFAM Paul Menzel <pmenzel@molgen.mpg.de=
+> wrote:
+>
+> Dear Pauli,
+>
+>
+> Thank you for your patch.
+>
+>
+> Am 14.07.25 um 16:02 schrieb Pauli Virtanen:
+> > User applications need a way to track which ISO interval a given SDU
+> > belongs to, to properly detect packet loss. All controllers do not set
+> > timestamps, and it's not guaranteed user application receives all packe=
+t
+> > reports (small socket buffer, or controller doesn't send all reports
+> > like Intel AX210 is doing).
+> >
+> > Add socket option BT_PKT_SEQNUM that enables reporting of received
+> > packet ISO sequence number in BT_SCM_PKT_SEQNUM CMSG.
+>
+> Are there user applications already supporting this, so it can be tested?
+>
+> > Signed-off-by: Pauli Virtanen <pav@iki.fi>
+> > ---
+> >
+> > Notes:
+> >      Intel AX210 is not sending all reports:
+> >
+> >      $ btmon -r dump.btsnoop -I -C90|grep -A1 'ISO Data RX: Handle 2304=
+'
+> >      ...
+> >      > ISO Data RX: Handle 2304 flags 0x02 dlen 64                     =
+ #1713 [hci0] 22.567744
+> >              dd 01 3c 00 6d 08 e9 14 1e 3b 85 7b 35 c2 25 0b  ..<.m....=
+;.{5.%.
+> >      --
+> >      > ISO Data RX: Handle 2304 flags 0x02 dlen 64                     =
+ #1718 [hci0] 22.573745
+> >              de 01 3c 00 41 65 22 4f 99 9b 0b b6 ff cb 06 00  ..<.Ae"O.=
+.......
+> >      --
+> >      > ISO Data RX: Handle 2304 flags 0x02 dlen 64                     =
+ #1727 [hci0] 22.587933
+> >              e0 01 3c 00 8b 6e 33 44 65 51 ee d7 e0 ee 49 d8  ..<..n3De=
+Q....I.
+> >      --
+> >      > ISO Data RX: Handle 2304 flags 0x02 dlen 64                     =
+ #1732 [hci0] 22.596742
+> >              e1 01 3c 00 a7 48 54 a7 c1 9f dc 37 66 fe 04 ab  ..<..HT..=
+..7f...
+> >      ...
+> >
+> >      Here, report for packet with sequence number 0x01df is missing.
+>
+> Sorry, but where are the sequence number in the trace?
 
-How did you end up with ->head_frag not set? IIRC mlx5 uses
-napi_build_skb(), which explicitly sets ->head_frag to true.
-It should be false only for kmalloced linear parts.
+Looks like btmon don't actually print it, though that probably is
+something we want to add along with handling of timestamp if that is
+used.
 
-> frag_list.
-> 
-> This is of course not good when we are CPU-limited. Also causes a worse
-> skb->len/truesize ratio,...
-> 
-> So, let's avoid copying parts of the payload to the linear part. The
-> goal here is to err on the side of caution and prefer to copy too little
-> instead of copying too much (because once it has been copied over, we
-> trigger the above described behavior in skb_gro_receive).
-> 
-> So, we can do a rough estimate of the header-space by looking at
-> cqe_l3/l4_hdr_type and kind of do a lower-bound estimate. This is now
-> done in mlx5e_cqe_get_min_hdr_len(). We always assume that TCP timestamps
-> are present, as that's the most common use-case.
-> 
-> That header-len is then used in mlx5e_skb_from_cqe_mpwrq_nonlinear for
-> the headlen (which defines what is being copied over). We still
-> allocate MLX5E_RX_MAX_HEAD for the skb so that if the networking stack
-> needs to call pskb_may_pull() later on, we don't need to reallocate
-> memory.
-> 
-> This gives a nice throughput increase (ARM Neoverse-V2 with CX-7 NIC and
-> LRO enabled):
-> 
-> BEFORE:
-> =======
-> (netserver pinned to core receiving interrupts)
-> $ netperf -H 10.221.81.118 -T 80,9 -P 0 -l 60 -- -m 256K -M 256K
->  87380  16384 262144    60.01    32547.82
-> 
-> (netserver pinned to adjacent core receiving interrupts)
-> $ netperf -H 10.221.81.118 -T 80,10 -P 0 -l 60 -- -m 256K -M 256K
->  87380  16384 262144    60.00    52531.67
-> 
-> AFTER:
-> ======
-> (netserver pinned to core receiving interrupts)
-> $ netperf -H 10.221.81.118 -T 80,9 -P 0 -l 60 -- -m 256K -M 256K
->  87380  16384 262144    60.00    52896.06
-> 
-> (netserver pinned to adjacent core receiving interrupts)
->  $ netperf -H 10.221.81.118 -T 80,10 -P 0 -l 60 -- -m 256K -M 256K
->  87380  16384 262144    60.00    85094.90
-> 
-> Signed-off-by: Christoph Paasch <cpaasch@openai.com>
-> ---
->  drivers/net/ethernet/mellanox/mlx5/core/en_rx.c | 33 ++++++++++++++++++++++++-
->  1 file changed, 32 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> index 2bb32082bfccdc85d26987f792eb8c1047e44dd0..2de669707623882058e3e77f82d74893e5d6fefe 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> @@ -1986,13 +1986,40 @@ mlx5e_shampo_fill_skb_data(struct sk_buff *skb, struct mlx5e_rq *rq,
->  	} while (data_bcnt);
->  }
->  
-> +static u16
-> +mlx5e_cqe_get_min_hdr_len(const struct mlx5_cqe64 *cqe)
-> +{
-> +	u16 min_hdr_len = sizeof(struct ethhdr);
-> +	u8 l3_type = get_cqe_l3_hdr_type(cqe);
-> +	u8 l4_type = get_cqe_l4_hdr_type(cqe);
-> +
-> +	if (cqe_has_vlan(cqe))
-> +		min_hdr_len += VLAN_HLEN;
+> >
+> >      This may be spec violation by the controller, see Core v6.1 pp. 37=
+02
+> >
+> >          All SDUs shall be sent to the upper layer including the indica=
+tion
+> >          of validity of data. A report shall be sent to the upper layer=
+ if
+> >          the SDU is completely missing.
+> >
+> >      Regardless, it will be easier for user applications to see the HW
+> >      sequence numbers directly, so they don't have to count packets and=
+ it's
+> >      in any case more reliable if packets get dropped due to socket buf=
+fer
+> >      size.
+>
+> I wouldn=E2=80=99t mind to have the note in the commit message.
+>
+> >   include/net/bluetooth/bluetooth.h |  9 ++++++++-
+> >   net/bluetooth/af_bluetooth.c      |  7 +++++++
+> >   net/bluetooth/iso.c               | 21 ++++++++++++++++++---
+> >   3 files changed, 33 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/=
+bluetooth.h
+> > index 114299bd8b98..0e31779a3341 100644
+> > --- a/include/net/bluetooth/bluetooth.h
+> > +++ b/include/net/bluetooth/bluetooth.h
+> > @@ -244,6 +244,10 @@ struct bt_codecs {
+> >
+> >   #define BT_ISO_BASE         20
+> >
+> > +#define BT_PKT_SEQNUM                21
+> > +
+> > +#define BT_SCM_PKT_SEQNUM    0x05
+> > +
+> >   __printf(1, 2)
+> >   void bt_info(const char *fmt, ...);
+> >   __printf(1, 2)
+> > @@ -391,7 +395,8 @@ struct bt_sock {
+> >   enum {
+> >       BT_SK_DEFER_SETUP,
+> >       BT_SK_SUSPEND,
+> > -     BT_SK_PKT_STATUS
+> > +     BT_SK_PKT_STATUS,
+> > +     BT_SK_PKT_SEQNUM,
+> >   };
+> >
+> >   struct bt_sock_list {
+> > @@ -475,6 +480,7 @@ struct bt_skb_cb {
+> >       u8 pkt_type;
+> >       u8 force_active;
+> >       u16 expect;
+> > +     u16 pkt_seqnum;
+>
+> Excuse my ignorance, just want to make sure, the type is big enough.
+>
+> >       u8 incoming:1;
+> >       u8 pkt_status:2;
+> >       union {
+> > @@ -488,6 +494,7 @@ struct bt_skb_cb {
+> >
+> >   #define hci_skb_pkt_type(skb) bt_cb((skb))->pkt_type
+> >   #define hci_skb_pkt_status(skb) bt_cb((skb))->pkt_status
+> > +#define hci_skb_pkt_seqnum(skb) bt_cb((skb))->pkt_seqnum
+> >   #define hci_skb_expect(skb) bt_cb((skb))->expect
+> >   #define hci_skb_opcode(skb) bt_cb((skb))->hci.opcode
+> >   #define hci_skb_event(skb) bt_cb((skb))->hci.req_event
+> > diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.=
+c
+> > index 6ad2f72f53f4..44b7acb20a67 100644
+> > --- a/net/bluetooth/af_bluetooth.c
+> > +++ b/net/bluetooth/af_bluetooth.c
+> > @@ -364,6 +364,13 @@ int bt_sock_recvmsg(struct socket *sock, struct ms=
+ghdr *msg, size_t len,
+> >                       put_cmsg(msg, SOL_BLUETOOTH, BT_SCM_PKT_STATUS,
+> >                                sizeof(pkt_status), &pkt_status);
+> >               }
+> > +
+> > +             if (test_bit(BT_SK_PKT_SEQNUM, &bt_sk(sk)->flags)) {
+> > +                     u16 pkt_seqnum =3D hci_skb_pkt_seqnum(skb);
+> > +
+> > +                     put_cmsg(msg, SOL_BLUETOOTH, BT_SCM_PKT_SEQNUM,
+> > +                              sizeof(pkt_seqnum), &pkt_seqnum);
+> > +             }
+> >       }
+> >
+> >       skb_free_datagram(sk, skb);
+> > diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+> > index fc22782cbeeb..469450bb6b6c 100644
+> > --- a/net/bluetooth/iso.c
+> > +++ b/net/bluetooth/iso.c
+> > @@ -1687,6 +1687,17 @@ static int iso_sock_setsockopt(struct socket *so=
+ck, int level, int optname,
+> >                       clear_bit(BT_SK_PKT_STATUS, &bt_sk(sk)->flags);
+> >               break;
+> >
+> > +     case BT_PKT_SEQNUM:
+> > +             err =3D copy_safe_from_sockptr(&opt, sizeof(opt), optval,=
+ optlen);
+> > +             if (err)
+> > +                     break;
+> > +
+> > +             if (opt)
+> > +                     set_bit(BT_SK_PKT_SEQNUM, &bt_sk(sk)->flags);
+> > +             else
+> > +                     clear_bit(BT_SK_PKT_SEQNUM, &bt_sk(sk)->flags);
+> > +             break;
+> > +
+> >       case BT_ISO_QOS:
+> >               if (sk->sk_state !=3D BT_OPEN && sk->sk_state !=3D BT_BOU=
+ND &&
+> >                   sk->sk_state !=3D BT_CONNECT2 &&
+> > @@ -2278,7 +2289,7 @@ static void iso_disconn_cfm(struct hci_conn *hcon=
+, __u8 reason)
+> >   void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+> >   {
+> >       struct iso_conn *conn =3D hcon->iso_data;
+> > -     __u16 pb, ts, len;
+> > +     __u16 pb, ts, len, sn;
+>
+> Use `seqnum` for consistency with the parts above.
+>
+> >
+> >       if (!conn)
+> >               goto drop;
+> > @@ -2308,6 +2319,7 @@ void iso_recv(struct hci_conn *hcon, struct sk_bu=
+ff *skb, u16 flags)
+> >                               goto drop;
+> >                       }
+> >
+> > +                     sn =3D hdr->sn;
+> >                       len =3D __le16_to_cpu(hdr->slen);
+> >               } else {
+> >                       struct hci_iso_data_hdr *hdr;
+> > @@ -2318,18 +2330,20 @@ void iso_recv(struct hci_conn *hcon, struct sk_=
+buff *skb, u16 flags)
+> >                               goto drop;
+> >                       }
+> >
+> > +                     sn =3D hdr->sn;
+> >                       len =3D __le16_to_cpu(hdr->slen);
+> >               }
+> >
+> >               flags  =3D hci_iso_data_flags(len);
+> >               len    =3D hci_iso_data_len(len);
+> >
+> > -             BT_DBG("Start: total len %d, frag len %d flags 0x%4.4x", =
+len,
+> > -                    skb->len, flags);
+> > +             BT_DBG("Start: total len %d, frag len %d flags 0x%4.4x sn=
+ %d",
+> > +                    len, skb->len, flags, sn);
+> >
+> >               if (len =3D=3D skb->len) {
+> >                       /* Complete frame received */
+> >                       hci_skb_pkt_status(skb) =3D flags & 0x03;
+> > +                     hci_skb_pkt_seqnum(skb) =3D sn;
+> >                       iso_recv_frame(conn, skb);
+> >                       return;
+> >               }
+> > @@ -2352,6 +2366,7 @@ void iso_recv(struct hci_conn *hcon, struct sk_bu=
+ff *skb, u16 flags)
+> >                       goto drop;
+> >
+> >               hci_skb_pkt_status(conn->rx_skb) =3D flags & 0x03;
+> > +             hci_skb_pkt_seqnum(conn->rx_skb) =3D sn;
+> >               skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb-=
+>len),
+> >                                         skb->len);
+> >               conn->rx_len =3D len - skb->len;
+>
+>
+> Kind regards,
+>
+> Paul
 
-Can't Q-in-Q be here?
 
-> +
-> +	if (l3_type == CQE_L3_HDR_TYPE_IPV4)
-> +		min_hdr_len += sizeof(struct iphdr);
-> +	else if (l3_type == CQE_L3_HDR_TYPE_IPV6)
-> +		min_hdr_len += sizeof(struct ipv6hdr);
 
-You don't account extensions and stuff here.
-
-> +
-> +	if (l4_type == CQE_L4_HDR_TYPE_UDP)
-> +		min_hdr_len += sizeof(struct udphdr);
-> +	else if (l4_type & (CQE_L4_HDR_TYPE_TCP_NO_ACK |
-> +			    CQE_L4_HDR_TYPE_TCP_ACK_NO_DATA |
-> +			    CQE_L4_HDR_TYPE_TCP_ACK_AND_DATA))
-> +		/* Previous condition works because we know that
-> +		 * l4_type != 0x2 (CQE_L4_HDR_TYPE_UDP)
-> +		 */
-> +		min_hdr_len += sizeof(struct tcphdr) + TCPOLEN_TSTAMP_ALIGNED;
-> +
-> +	return min_hdr_len;
-> +}
-> +
->  static struct sk_buff *
->  mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_rq *rq, struct mlx5e_mpw_info *wi,
->  				   struct mlx5_cqe64 *cqe, u16 cqe_bcnt, u32 head_offset,
->  				   u32 page_idx)
->  {
->  	struct mlx5e_frag_page *frag_page = &wi->alloc_units.frag_pages[page_idx];
-> -	u16 headlen = min_t(u16, MLX5E_RX_MAX_HEAD, cqe_bcnt);
->  	struct mlx5e_frag_page *head_page = frag_page;
->  	struct mlx5e_xdp_buff *mxbuf = &rq->mxbuf;
->  	u32 frag_offset    = head_offset;
-> @@ -2004,10 +2031,14 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_rq *rq, struct mlx5e_mpw_info *w
->  	u32 linear_frame_sz;
->  	u16 linear_data_len;
->  	u16 linear_hr;
-> +	u16 headlen;
->  	void *va;
->  
->  	prog = rcu_dereference(rq->xdp_prog);
->  
-> +	headlen = min3(mlx5e_cqe_get_min_hdr_len(cqe), cqe_bcnt,
-> +		       (u16)MLX5E_RX_MAX_HEAD);
-
-For your usecase, have you tried setting headlen to just ETH_HLEN here?
-Fast GRO should still work for this case, then VLAN/IP/L4 layers will
-do a couple memcpy()s to pull their headers, but even on 32-bit MIPS
-this was faster than let's say eth_get_headlen() (which involves Flow
-Dissector) or open-coded header length assumptions as above.
-
-(the above was correct for 2020 when I last time played with router
- drivers, but I hope nothing's been broken since then)
-
-> +
->  	if (prog) {
->  		/* area for bpf_xdp_[store|load]_bytes */
->  		net_prefetchw(netmem_address(frag_page->netmem) + frag_offset);
-
-Thanks,
-Olek
+--=20
+Luiz Augusto von Dentz
 
