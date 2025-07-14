@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-206779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD5E3B04592
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 18:37:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BDA5B04593
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 18:37:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30B554A0E6E
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 16:37:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D91201A62D3B
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 16:37:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C871263C8A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 888C6263F47;
 	Mon, 14 Jul 2025 16:37:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="M0dD65X5"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="aphfYyu7"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99D725BF1E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E914626158B;
 	Mon, 14 Jul 2025 16:37:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752511033; cv=none; b=fc5qqAzFyL74/HO5+m49QQ3mom1PO5QMZ4DbXf6sySyIzeYSG3eTocsEjQCQ+BLxCKH0m0aMk0DlhCI8hOGSDb9K6xKVebR3Xr+ui6F26HqT6aegt7MSMLZBBWUP/NQla4nFgM8pakNp9IN5xIGfTYT866nu4uoYs/1xKpeXjpE=
+	t=1752511033; cv=none; b=u496EN99ApeDC21anV1gxPA5LdnB5U5sRK/JqCYGuc/ZSYO3qa59RDPDb4oJ+K+vJpBr3n4ka+rSipkN1l91wHamYY6SPz2KSISZjY2fLpzJ7OCN25kMMXcbDJJjqdhfuKF8U3BXSo8hlluzuoQcaA51Dvol/eO59oPjVS15ol4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1752511033; c=relaxed/simple;
-	bh=tTBbCPNjh3kndWKdQLLOC9WO7P6uncnMXrl9fKN6diI=;
+	bh=yReikR58Lp8W/7OGiLE+dcPuXMVnnclT1LFvehcRPsU=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bc7hscSrcNOECZPzNDzaFB92PTHDDS7fc6R7/ADNs3ywBhecHYPRK47twg8oAccK4IrNtWlfrlUXVWZFzUMcZRFiFWRdPVMtrME/XBNr1oi3CqgK0EGc8DcdS2UXatnKenhCbWSkTZk4etAL+IfB/L446GCDT4M2UgYs8dNGlV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=M0dD65X5; arc=none smtp.client-ip=68.232.154.123
+	 MIME-Version:Content-Type; b=R0+OnpzVKPG7agB0Mrlonq9IGfvGgDB7OJpJY2eKOW5eO67EYzYW5jm5CSyg4GUAoMkATLpKUOs62rK3x7jcCsNzf704mn+x1dFXtV/gs/2s/9RPT/Z5lhP/0hjKuOgFPFKOBs8JbnEp06WWmJn6JnvfquILHL/xZBrZa2jU/NE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=aphfYyu7; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1752511031; x=1784047031;
+  t=1752511032; x=1784047032;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=tTBbCPNjh3kndWKdQLLOC9WO7P6uncnMXrl9fKN6diI=;
-  b=M0dD65X53D7YKq5Z5hKnxOaSv0TwsmDAsoNQGOJBMSaxmYuP2O3HOVUW
-   wGguN8SR0/oxcU49PddK2bsAbThHFlFRvqUCTtkOjrZKy1ygRAgtEuI0r
-   XyXtQ8u1EXyp+TGtE616ZznSeZVscsOjvz7zVaVeAGWysKq6Dns+OR/CB
-   olKD6KZ596ubltWrh1hHnpLVQNYagF7OfWqhA4RB+okD0uQkFvXOamNy4
-   f/7MBaki6CJJsfP0whFcZbq5sqiCHB2oKgRJXapWOrr1R5rvrCmOx4GDz
-   JvGxwIThFjU5ge8g9oMDlyjCsv84PZuMPsAaAww/aNULGFzeXoMWw1/LR
-   A==;
+  bh=yReikR58Lp8W/7OGiLE+dcPuXMVnnclT1LFvehcRPsU=;
+  b=aphfYyu7jfULjTqdixkuYII8sUZCPT6PTMbEsBRan4MCeqW7+V2Loe3H
+   6+sSkvAN3CzX1PJf5g0U9QjEAbhGuPkLpVds0OAE9SxpZSLzVli7/9MRc
+   FikCOe+PNAditOvS4eM9FU9+CipCIuVSx6eBo8h2yiLearPk2nciyIYKA
+   QzC8CQbsZWdQ1G0i62amPOUvtxN6QY9ojYQ3lM8QpEvMoI8hz8y7pOfHw
+   1ZIRW/K055Y9MFkKPsV/bUNSeO+AYs8otjm5RX5ZRICXnklZOVUWl1+2U
+   VeHnZ+Gssc4ijID0eniWQIaSkCPJ3+brlWz8GdF73Zo1hsLJI+mHuViVt
+   w==;
 X-CSE-ConnectionGUID: hBq1ljEWSkqL674rDMJkcA==
-X-CSE-MsgGUID: ImMng/ZlRaCQ7+lJv5BLcQ==
+X-CSE-MsgGUID: iEPb35OVRjOOUiIF1VgRIw==
 X-IronPort-AV: E=Sophos;i="6.16,311,1744095600"; 
-   d="scan'208";a="211399321"
+   d="scan'208";a="211399323"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Jul 2025 09:37:09 -0700
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Jul 2025 09:37:10 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
  chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
@@ -65,11 +65,10 @@ To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
 	<alexandre.belloni@bootlin.com>, <claudiu.beznea@tuxon.dev>
 CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>, "Ryan
- Wanner" <Ryan.Wanner@microchip.com>, Conor Dooley
-	<conor.dooley@microchip.com>
-Subject: [PATCH v2 1/5] dt-bindings: net: cdns,macb: Add external REFCLK property
-Date: Mon, 14 Jul 2025 09:36:59 -0700
-Message-ID: <d558467c4d5b27fb3135ffdead800b14cd9c6c0a.1752510727.git.Ryan.Wanner@microchip.com>
+ Wanner" <Ryan.Wanner@microchip.com>
+Subject: [PATCH v2 2/5] net: cadence: macb: Expose REFCLK as a device tree property
+Date: Mon, 14 Jul 2025 09:37:00 -0700
+Message-ID: <7f9b65896d6b7b48275bc527b72a16347f8ce10a.1752510727.git.Ryan.Wanner@microchip.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1752510727.git.Ryan.Wanner@microchip.com>
 References: <cover.1752510727.git.Ryan.Wanner@microchip.com>
@@ -84,35 +83,46 @@ Content-Type: text/plain
 
 From: Ryan Wanner <Ryan.Wanner@microchip.com>
 
-REFCLK can be provided by an external source so this should be exposed
-by a DT property. The REFCLK is used for RMII and in some SoCs that use
-this driver the RGMII 125MHz clk can also be provided by an external
-source.
+The RMII and RGMII can both support internal or external provided
+REFCLKs 50MHz and 125MHz respectively. Since this is dependent on
+the board that the SoC is on this needs to be set via the device tree.
+
+This property flag is checked in the MACB DT node so the REFCLK cap is
+configured the correct way for the RMII or RGMII is configured on the
+board.
 
 Signed-off-by: Ryan Wanner <Ryan.Wanner@microchip.com>
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
 ---
- Documentation/devicetree/bindings/net/cdns,macb.yaml | 7 +++++++
+ drivers/net/ethernet/cadence/macb_main.c | 7 +++++++
  1 file changed, 7 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/cdns,macb.yaml b/Documentation/devicetree/bindings/net/cdns,macb.yaml
-index 8d69846b2e09..e69f60c37793 100644
---- a/Documentation/devicetree/bindings/net/cdns,macb.yaml
-+++ b/Documentation/devicetree/bindings/net/cdns,macb.yaml
-@@ -114,6 +114,13 @@ properties:
-   power-domains:
-     maxItems: 1
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index d1f1ae5ea161..9ebe1062b359 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -4109,8 +4109,12 @@ static const struct net_device_ops macb_netdev_ops = {
+ static void macb_configure_caps(struct macb *bp,
+ 				const struct macb_config *dt_conf)
+ {
++	struct device_node *np = bp->pdev->dev.of_node;
++	bool refclk_ext;
+ 	u32 dcfg;
  
-+  cdns,refclk-ext:
-+    type: boolean
-+    description:
-+      This selects if the REFCLK for RMII is provided by an external source.
-+      For RGMII mode this selects if the 125MHz REF clock is provided by an external
-+      source.
++	refclk_ext = of_property_read_bool(np, "cdns,refclk-ext");
 +
-   cdns,rx-watermark:
-     $ref: /schemas/types.yaml#/definitions/uint32
-     description:
+ 	if (dt_conf)
+ 		bp->caps = dt_conf->caps;
+ 
+@@ -4141,6 +4145,9 @@ static void macb_configure_caps(struct macb *bp,
+ 		}
+ 	}
+ 
++	if (refclk_ext)
++		bp->caps |= MACB_CAPS_USRIO_HAS_CLKEN;
++
+ 	dev_dbg(&bp->pdev->dev, "Cadence caps 0x%08x\n", bp->caps);
+ }
+ 
 -- 
 2.43.0
 
