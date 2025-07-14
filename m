@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-206902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15E42B04BA1
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 01:09:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 587C2B04BBC
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 01:11:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C04C63A981A
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 23:09:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B3FE1AA1EBB
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 23:11:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B041F27F16C;
-	Mon, 14 Jul 2025 23:06:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15901290BB4;
+	Mon, 14 Jul 2025 23:07:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Aczq7j9P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yr3QkWkC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837791A5BB1;
-	Mon, 14 Jul 2025 23:06:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBFBA27A444;
+	Mon, 14 Jul 2025 23:07:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752534384; cv=none; b=RQMNO/i2lcIi1Y5NXgBd2Xq+inFqhhTXFAZGCiyNuPq9W33lBVgja4dM1J9WZsGOY5uXIZMVQp26x7ABthVherhys9hzkxGY6rfnARoi6OLQBoVQj8xn0heA3cTowvbB+phMfEngNu2fEH9r/sBG9C8/pPEJTC1m4AmqVTlpTxQ=
+	t=1752534443; cv=none; b=fqiZIhSdVUbr40Bs9yhUdfwGcJuYoqi5u5b6U16GszErX6xGLiO3Wac9q2ncbL8Q84XMNnyY8mHIUBmjPuEsytO2kyzCspNkRvFP8+mm4XjKJs+qOMk+msLfqvtJa5wqTTN8zqE6bO7vVktIK38u6SUpcD2CnHZRAouPK8kGx2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752534384; c=relaxed/simple;
-	bh=Z1+JIOw21utdO9Avsc3kNZqpkB8AdozXAqShFjNMqRE=;
+	s=arc-20240116; t=1752534443; c=relaxed/simple;
+	bh=hsFS1F2DNe4e5GEf8JnX5lUC+2YRjDfH3CvTbXpOY7g=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=iCDZKDghTQwOrwv28C408qtA5CXpvUR8JGPbuoLOXimZ3+ZsI0k0nJxgbzRvXkrL8MeM+SyOONfLgopZcJVH35lM71adBRDQmaK19IoIAKKkR4RtWyq5rEXp9N6ddZpG/b4kLAKQO2pq8E+lxsJR31rJbU8Cyw9RhA2fV463X1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Aczq7j9P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2BB5C4CEF0;
-	Mon, 14 Jul 2025 23:06:22 +0000 (UTC)
+	 MIME-Version; b=uYX2mfSAtay1GWQHk+j53dLZ1T6T66eeOm2G8Rg9KYz5IX0EDjDVlln87/cRoOn2mfWVrQoCzA0ymGrp8atCenpgJepssq2iyvkKuvaDMEB5CzoF0p547/+a+A93xt+0stR0JalBtzvcFUoPdRY4+cScnC7nGkU0pE4ruHUWKMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yr3QkWkC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 273D0C4CEED;
+	Mon, 14 Jul 2025 23:07:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752534384;
-	bh=Z1+JIOw21utdO9Avsc3kNZqpkB8AdozXAqShFjNMqRE=;
+	s=k20201202; t=1752534442;
+	bh=hsFS1F2DNe4e5GEf8JnX5lUC+2YRjDfH3CvTbXpOY7g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Aczq7j9PvgaCyedhmr8S6NR3UwAE2XX2tbTCcp3Rh+q3p2jNAIqWvtiSQhYBNdptP
-	 bRmb5usrPmJLtG2gBwA3U1w9FqISoNCC7Nxv7h6CpbtcoYxl2JMFwb8omLZ9d8011k
-	 Cc+1a1dNp9FRHFXQT7n8NT3+kmRc3zvdX0Y2mJz4eQsHeIY0I1AJu99pHznej+lMxZ
-	 b+b8Ut9lO7dqfeb+7958YfZKoB5FTmmZw7ucSn7Hr6G9GAVT79g7UXAr4eUrzpILGW
-	 E4bNtmj/w8HOKbu3416y+hZn+CrGTGQrSs3/ePQPlUGsrwqUj1MFEB7qF9GCGyljRJ
-	 DrHfaBAJaMF9w==
+	b=Yr3QkWkCp4ezFB2Wf30eNo53Sz5bfn8/thuTPJZBY1JPk00cpOUGrYqlgotPCzwCU
+	 ZiHSwfZj63b6QsossP0hH8tYH5TZwGTpIBIZGZFqXkM6GG1p2dLPiGt8by5Q7x8IwH
+	 7+kpHohxqxbTglqp348kuDwRLTrRU4lIzuPM8SOf0si+YjCl11rW2Q6zBhdT6bi8h6
+	 +QYFjT1SxBjlNEYAMe8WiZ1Xcgv+0PQmhLwNY6JIJkiud788fKrDQLyOmoIZJpDNMu
+	 +u6+cqoQRVApaI3E3LlZXue+keHb85QLU0bkWhTExt1a6Lr8IWeDn5oFssePDlAqOn
+	 0CD0LkCy2yHsw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -54,12 +54,12 @@ Cc: Xiang Mei <xmei5@asu.edu>,
 	edumazet@google.com,
 	kuba@kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.15 02/15] net/sched: sch_qfq: Fix null-deref in agg_dequeue
-Date: Mon, 14 Jul 2025 19:06:03 -0400
-Message-Id: <20250714230616.3709521-2-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 02/12] net/sched: sch_qfq: Fix null-deref in agg_dequeue
+Date: Mon, 14 Jul 2025 19:07:05 -0400
+Message-Id: <20250714230715.3710039-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250714230616.3709521-1-sashal@kernel.org>
-References: <20250714230616.3709521-1-sashal@kernel.org>
+In-Reply-To: <20250714230715.3710039-1-sashal@kernel.org>
+References: <20250714230715.3710039-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,7 +68,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.15.6
+X-stable-base: Linux 6.12.38
 Content-Transfer-Encoding: 8bit
 
 From: Xiang Mei <xmei5@asu.edu>
@@ -218,10 +218,10 @@ index d7b7b6cd4aa10..8a75c73fc5558 100644
 +
  #endif
 diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-index d58921ffcf35e..d5913dbcf9df1 100644
+index 26378eac1bd08..f716133f1987b 100644
 --- a/net/sched/sch_api.c
 +++ b/net/sched/sch_api.c
-@@ -595,16 +595,6 @@ void __qdisc_calculate_pkt_len(struct sk_buff *skb,
+@@ -594,16 +594,6 @@ void __qdisc_calculate_pkt_len(struct sk_buff *skb,
  	qdisc_skb_cb(skb)->pkt_len = pkt_len;
  }
  
@@ -266,10 +266,10 @@ index 5a7745170e84b..d8fd35da32a7c 100644
  hfsc_adjust_levels(struct hfsc_class *cl)
  {
 diff --git a/net/sched/sch_qfq.c b/net/sched/sch_qfq.c
-index bf1282cb22eba..bcce366088716 100644
+index aa4fbd2fae29e..73335025a4599 100644
 --- a/net/sched/sch_qfq.c
 +++ b/net/sched/sch_qfq.c
-@@ -989,7 +989,7 @@ static struct sk_buff *agg_dequeue(struct qfq_aggregate *agg,
+@@ -992,7 +992,7 @@ static struct sk_buff *agg_dequeue(struct qfq_aggregate *agg,
  
  	if (cl->qdisc->q.qlen == 0) /* no more packets, remove from list */
  		list_del_init(&cl->alist);
