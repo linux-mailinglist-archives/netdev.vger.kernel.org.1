@@ -1,104 +1,175 @@
-Return-Path: <netdev+bounces-206560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C51EAB03785
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 09:06:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69714B037A5
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 09:13:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F1C818979D7
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 07:06:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A837C16B138
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 07:13:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9FC222DA1F;
-	Mon, 14 Jul 2025 07:05:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4963822FAFD;
+	Mon, 14 Jul 2025 07:13:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="htbpSLaV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PNMbBLV4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94DB222D7B5
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 07:05:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7894D1CAA7B
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 07:13:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752476759; cv=none; b=iyPXfjVT8R7PNis7tjvf56+ODX2o1k0OoyXLjAqzcW13GoWwe0eZKQPOKVfzeTMfoc/+0tdmRpb+ZAazAiZ9c+1pt8dMjBto8Tk+z8C2DvPOpu0xEyGwP4/s4gMB9KO4HAZ06jX83r/E0DBcH1is5o0PichFcyLA6PxfckKNjZk=
+	t=1752477229; cv=none; b=RtxBHdu0MKG+55qHDOeixzPyVs1lpTcvXDws3Yn6Q8IuhGB5DNXwlazjSKbt1SFkM/dWZGpFESuAO2BgTIQWy2NePnCLXwEKvLhahKsLMyy6SuZ7Ypv3u8K+N+Tf0E/CsA3+f1wE6k33vcN2sfmmaKsVpH6/VjzZKZqH5xZTdNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752476759; c=relaxed/simple;
-	bh=noh0Oc/jqAkwUGriJP9VJIA4fArqX4OcB3jSBAqv4lo=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ymc+OTQkZ3M9kLDlOzPQea0/KDzxUoaZZadrC+zAAa9fBJJ6bklTiFD6UP/WNdhqUQ0X4nYuvrc/V7XarW7IrtRdy4NwSuYwzgkWKek/dXg8h0VG2qiXdIX+l9QM+RlXLsfHjW69Tf94C62q6OqRVHYpaOBEp1qVI81X5Xtskos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=htbpSLaV; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 7715E207B0;
-	Mon, 14 Jul 2025 09:05:55 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 29cJbJtZvNpR; Mon, 14 Jul 2025 09:05:54 +0200 (CEST)
-Received: from EXCH-02.secunet.de (unknown [10.32.0.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	s=arc-20240116; t=1752477229; c=relaxed/simple;
+	bh=YOtU6TIjf7Gil2q/VUkmDd0rXOtqnwYAk0X6u5BgunI=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OBoP7SoUGD2pMgU3+AqLHIaFQBmRDH9sai50OETtXCsfz+IOw3p13Ojl4yqOqlD4GuzvoTDIwMYpny4oQ07u27WwyACFY6K1637X4/VVO2A4zz/rwi4nzf4gkniTZbSQ+Om+2tL2MwwGGCtVstlC/VAgWJxoeTTD/zEVyNBVqF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PNMbBLV4; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752477226;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Pnu5TDThDFnIUlSczVqFdKvx391LQqv8l2bFaqO43+8=;
+	b=PNMbBLV4TyV6Zj7W2EdXjWgQJvsZ2eV1gv/yL/xRvdZsFYdRpoiTQQq8O5YsNXRZ9mj943
+	+cfoSMf/FaHw8890O/KW+YDS7DmDKh/QrT6TwRUfzoo1U8x2UYU6y87OgUHI+6n4txCsyH
+	l/GXK0qEFq7+Qr2WaJYd3v8LcELroAU=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-684-RhNUQeLeNASIxM-bcKZm8Q-1; Mon,
+ 14 Jul 2025 03:13:43 -0400
+X-MC-Unique: RhNUQeLeNASIxM-bcKZm8Q-1
+X-Mimecast-MFC-AGG-ID: RhNUQeLeNASIxM-bcKZm8Q_1752477222
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id A7BB6207AC;
-	Mon, 14 Jul 2025 09:05:54 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com A7BB6207AC
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1752476754;
-	bh=noh0Oc/jqAkwUGriJP9VJIA4fArqX4OcB3jSBAqv4lo=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=htbpSLaVqa+e8GqEYZg9vamYPXtXkbuEbDx8HFmx+cOnEUpPsWTLwiXUTYdNymEVH
-	 q/FEqB6emLYtokSgxdNSfVcIRQ2TbbwmxnfglCG7ZLc8FeArMaI3qLrLjfA4qI00Bc
-	 HC7mDK/Pbzh5cLTiUsdZXDc4QY11UKW3Gq92BnPMs05nbytf5vW+7N1rbV7/InD3yx
-	 SS2QO3B8UrfWKXjO3bWyBgf2zSgYkMJFjrNTADt9TJSCDG1tzOyMuYlDGjtMUC0bvV
-	 lFVN7rXOdusuSMF5EXbvpchVzxMSJ62xwDeFrFWoytBSSn+sPGdaQal2eRQ6CMKLtd
-	 9wBQHaroJDf/A==
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by EXCH-02.secunet.de
- (10.32.0.172) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.10; Mon, 14 Jul
- 2025 09:05:54 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 14 Jul
- 2025 09:05:54 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 686593184234; Mon, 14 Jul 2025 09:05:53 +0200 (CEST)
-Date: Mon, 14 Jul 2025 09:05:53 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Aakash Kumar Shankarappa <saakashkumar@marvell.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "horms@kernel.org"
-	<horms@kernel.org>, Abed Mohammad Kamaluddin <akamaluddin@marvell.com>,
-	"antony@phenome.org" <antony@phenome.org>
-Subject: Re: [EXTERNAL] Re: [PATCH] xfrm: Duplicate SPI Handling
-Message-ID: <aHSsUbP3JtdJtPfa@gauss3.secunet.de>
-References: <20250630123856.1750366-1-saakashkumar@marvell.com>
- <aGeDsU-DjJG7Saj7@gauss3.secunet.de>
- <BL1PPF236BDCF3E6140C103E6AA14EE5FF0DA49A@BL1PPF236BDCF3E.namprd18.prod.outlook.com>
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D66AF18002EC;
+	Mon, 14 Jul 2025 07:13:41 +0000 (UTC)
+Received: from server.redhat.com (unknown [10.72.112.34])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 644B4180045B;
+	Mon, 14 Jul 2025 07:13:37 +0000 (UTC)
+From: Cindy Lu <lulu@redhat.com>
+To: lulu@redhat.com,
+	jasowang@redhat.com,
+	mst@redhat.com,
+	michael.christie@oracle.com,
+	sgarzare@redhat.com,
+	nicolas.dichtel@6wind.com,
+	linux-kernel@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v13 0/1]vhost: Add support of kthread API
+Date: Mon, 14 Jul 2025 15:12:31 +0800
+Message-ID: <20250714071333.59794-1-lulu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <BL1PPF236BDCF3E6140C103E6AA14EE5FF0DA49A@BL1PPF236BDCF3E.namprd18.prod.outlook.com>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Wed, Jul 09, 2025 at 10:20:42AM +0000, Aakash Kumar Shankarappa wrote:
-> Hi Steffen,
-> Thanks for applying the patch .
-> Just to understand the flow better – will this go via your ipsec<https://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec.git> tree for the next merge window or be queued for -net for stable ?
+In commit 6e890c5d5021 ("vhost: use vhost_tasks for worker threads"),   
+the vhost now uses vhost_task and operates as a child of the   
+owner thread. This aligns with containerization principles.   
+However, this change has caused confusion for some legacy   
+userspace applications. Therefore, we are reintroducing   
+support for the kthread API. 
 
-This was applied to the ipsec-next tree, it goes to
-mainline during the next merge window. It will not
-be backported to stable.
+In this series, a new UAPI is implemented to allow   
+userspace applications to configure their thread mode.
+
+Changelog v2:
+ 1. Change the module_param's name to enforce_inherit_owner, and the default value is true.
+ 2. Change the UAPI's name to VHOST_SET_INHERIT_FROM_OWNER.
+
+Changelog v3:
+ 1. Change the module_param's name to inherit_owner_default, and the default value is true.
+ 2. Add a structure for task function; the worker will select a different mode based on the value inherit_owner.
+ 3. device will have their own inherit_owner in struct vhost_dev
+ 4. Address other comments
+
+Changelog v4:
+ 1. remove the module_param, only keep the UAPI
+ 2. remove the structure for task function; change to use the function pointer in vhost_worker
+ 3. fix the issue in vhost_worker_create and vhost_dev_ioctl
+ 4. Address other comments
+
+Changelog v5:
+ 1. Change wakeup and stop function pointers in struct vhost_worker to void.
+ 2. merging patches 4, 5, 6 in a single patch
+ 3. Fix spelling issues and address other comments.
+
+Changelog v6:
+ 1. move the check of VHOST_NEW_WORKER from vhost_scsi to vhost
+ 2. Change the ioctl name VHOST_SET_INHERIT_FROM_OWNER to VHOST_FORK_FROM_OWNER
+ 3. reuse the function __vhost_worker_flush
+ 4. use a ops sturct to support worker relates function
+ 5. reset the value of inherit_owner in vhost_dev_reset_owner.
+ 
+Changelog v7: 
+ 1. add a KConfig knob to disable legacy app support
+ 2. Split the changes into two patches to separately introduce the ops and add kthread support.
+ 3. Utilized INX_MAX to avoid modifications in __vhost_worker_flush
+ 4. Rebased on the latest kernel
+ 5. Address other comments
+ 
+Changelog v8: 
+ 1. Rebased on the latest kernel
+ 2. Address some other comments 
+ 
+Changelog v9:
+ 1. Rebased on the latest kernel. 
+ 2. Squashed patches 6‑7. 
+ 3. Squashed patches 2‑4. 
+ 4. Minor fixes in commit log
+ 
+ 
+Changelog v10:
+ 1.Add support for the module_param.
+ 2.Squash patches 3 and 4.
+ 3.Make minor fixes in the commit log.
+ 4.Fix the mismatched tabs in Kconfig.
+ 5.Rebase on the latest kernel.
+
+Changelog v11:
+ 1.make the module_param under Kconfig
+ 2.Make minor fixes in the commit log.
+ 3.change the name inherit_owner to fork_owner
+ 4.add NEW ioctl VHOST_GET_FORK_FROM_OWNER
+ 5.Rebase on the latest kernel
+
+Changelog v12:
+1.Squash all patches to 1.
+2.Add define for task mode and kthread mode
+3.Address some other comments
+4.Rebase on the latest kernel
+
+Changelog v13:
+ 1.enable the kconfig by default
+ 2.Rebase on the latest kernel
+      
+Tested with QEMU with kthread mode/task mode/kthread+task mode
+
+Cindy Lu (1):
+  vhost: Reintroduces support of kthread API and adds mode selection
+
+ drivers/vhost/Kconfig      |  18 +++
+ drivers/vhost/vhost.c      | 244 ++++++++++++++++++++++++++++++++++---
+ drivers/vhost/vhost.h      |  22 ++++
+ include/uapi/linux/vhost.h |  29 +++++
+ 4 files changed, 295 insertions(+), 18 deletions(-)
+
+-- 
+2.45.0
 
 
