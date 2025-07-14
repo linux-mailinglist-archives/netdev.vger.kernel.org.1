@@ -1,162 +1,197 @@
-Return-Path: <netdev+bounces-206489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A11E3B03472
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 04:24:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73868B03477
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 04:28:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF8F31747B2
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 02:24:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EAFC3B9F97
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 02:27:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F062217333F;
-	Mon, 14 Jul 2025 02:24:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3F4F1D9A70;
+	Mon, 14 Jul 2025 02:28:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=maxlinear.com header.i=@maxlinear.com header.b="NjXY3ljS"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Wz6YCxqk"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2076.outbound.protection.outlook.com [40.107.93.76])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A0FE1F94A
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 02:23:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.76
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752459841; cv=fail; b=byKNxIlgaTt1kX7N52W22TyX+SGZn/rwQFoL82ikWcqMd4PyFZDYAXypq3YhsOHhZiI/6vh/EkRFWHGSprllJ0ZqZiVNG4XFhqc0/0YYJp8xbNUrnCkCIhzD45vsH4NVqsiksDf8M6YD21UTS9/D5iCVgSndyqaf/f53qlSRy/o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752459841; c=relaxed/simple;
-	bh=NjY219tDSyoi2Xh5V9PQvURvsUhnPMC4luIv9YeXcYc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bOBhT/MmK1pcn+74Y2bBKYVvQGWz1NPirCUM+4rRmY1oPSTFkgQX63URnaN1UmUtT98lkS6F5OgoR+h4VanpEr/m+2PrZyiygACzOgVJjQ+6WYlGNn9X+NTNheBRAi+VV5PbCEfL7HZJmhetZ07da8k+Ub3zUOmTfOxNW5I5KlQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=maxlinear.com; spf=pass smtp.mailfrom=maxlinear.com; dkim=pass (2048-bit key) header.d=maxlinear.com header.i=@maxlinear.com header.b=NjXY3ljS; arc=fail smtp.client-ip=40.107.93.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=maxlinear.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=maxlinear.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LB81aRXaw/eAlucsrydkqueUGBFauHg6G6/XiYA+VFzIsdxaGs0oXHHLYQr/r+UnAolxDZEIZGl/zOsaSuRxZLSEAeOXtW/NXc+DLo9HZvJbU60K4LaHo/tqLLKFuilr/Gfh6WCZJr/nT2EJLGNrgBaIpwC0NeiAK6/b0651K85JRaQrVX1I9LZrM4l3vqRXdWawjJh+w0X9vgDneVglqnxGmIuYhVDflhemLATM0EnKD3cgvcKA68rhT4TJpw8HCZ/mujGE3ZPdWkIP28wyC1kRqK9M8BchrcSUKAZ0A4EumXveZQ2D33BHmHWiN0F3Wq/p5tC6gywBEVmzdMMe5Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WT8yrxri4810f7GEuWrpb5sj1LK+2zcnQTq544qn2W4=;
- b=FjdrynT9W+jXBPBbX4DA50NOHM4kTndh2os/y53QqQ3rMwdPjR3LcxH4GPIPWBG0bWNIwHCTwKxmOUPxi4F3PGgnp3+WSRRyrX1pa9UAvTwDvGtqZIu/FquQ4GQAWjvk5eXHww57jqmxLyeNK0yd/rQARqmmJ9YIq3NDm8oWYrRrxA5uL+ycoN7rqs9HSWAAPkMlrbcSTq2He6WDx/HQW/WEP3te98XUMNPQHLHwAD3TZ7SrihZGBBx0mD0UtNFt9D6Qm5xLO6qVzUCu3OkGAjkA2dM8+T1MiGcWC+HebozZYgxZSxJAzknrq+niDAxbPDJqLzWOR0hQW5+3f6+EEA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 174.47.1.83) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=maxlinear.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none
- header.from=maxlinear.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=maxlinear.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WT8yrxri4810f7GEuWrpb5sj1LK+2zcnQTq544qn2W4=;
- b=NjXY3ljS6qEdvzmAhEO7fAM7+PiODB9JY0R/pTNzt3blWGAtuWcJOFmWNPu35WLtspsLTm/ik5s5YnqkjeK4ZdfY3TIqvMyz+L3nKsGFDje7+zf6/lmXPm6ZYkHL1zc6u+ot+1ubRJlNJ7MnngajBgA6Ieas5uc+vnTNvVHqTuFJjQckdHeERE3XBo+drmeHEwG+IgjxTJGL8qWf6HgqPwCArOVH8n19Mb3tP0vLnaoJfDz40B61IbbDP8FqQRGWTgf4r8KZo1hVtBEHPKrzwaZ45DI+LCX6RgMajnYVk0zLeocHGA30FdYOQT/9KoWD60JKsSiPeaAd9pzMFHWM2g==
-Received: from BN9PR03CA0046.namprd03.prod.outlook.com (2603:10b6:408:fb::21)
- by BLAPR19MB4481.namprd19.prod.outlook.com (2603:10b6:208:292::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.25; Mon, 14 Jul
- 2025 02:23:55 +0000
-Received: from BN1PEPF0000468A.namprd05.prod.outlook.com
- (2603:10b6:408:fb:cafe::80) by BN9PR03CA0046.outlook.office365.com
- (2603:10b6:408:fb::21) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8922.28 via Frontend Transport; Mon,
- 14 Jul 2025 02:23:55 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 174.47.1.83)
- smtp.mailfrom=maxlinear.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=maxlinear.com;
-Received-SPF: Pass (protection.outlook.com: domain of maxlinear.com designates
- 174.47.1.83 as permitted sender) receiver=protection.outlook.com;
- client-ip=174.47.1.83; helo=usmxlcas.maxlinear.com; pr=C
-Received: from usmxlcas.maxlinear.com (174.47.1.83) by
- BN1PEPF0000468A.mail.protection.outlook.com (10.167.243.135) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.8922.22 via Frontend Transport; Mon, 14 Jul 2025 02:23:54 +0000
-Received: from sgb016.sgsw.maxlinear.com (10.23.238.16) by mail.maxlinear.com
- (10.23.38.120) with Microsoft SMTP Server id 15.1.2507.39; Sun, 13 Jul 2025
- 19:23:52 -0700
-From: Jack Ping CHNG <jchng@maxlinear.com>
-To: <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <fancer.lancer@gmail.com>, <yzhu@maxlinear.com>,
-	<sureshnagaraj@maxlinear.com>, Jack Ping CHNG <jchng@maxlinear.com>
-Subject: [PATCH] net: pcs: xpcs: Use devm_clk_get_optional
-Date: Mon, 14 Jul 2025 10:23:48 +0800
-Message-ID: <20250714022348.2147396-1-jchng@maxlinear.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08DDF1D5146
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 02:28:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752460091; cv=none; b=epsZt3fekn5bH1NHbPl+VHR0R4OopqZI3nQPbt28hyo/fTCxQzuco+rsWOmrrtEikPOFNUANyT3BzYYLo1n+6xw/KMXeTMB2qrqeg5c++de41u20j1YMCnfaUJthW7PzASVtTSrrgFaFZ0NNJgxr1CwZHa8fF5YvVFD9qIs2nlM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752460091; c=relaxed/simple;
+	bh=3nJgZl9vP4SdfX+E5yML/xW+OYiWq6C5glcWeET+8VE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KKJINivDLnp7nEBP/j3k6PunibennbAMzYPwu4IODaoDTazHQ6VZmF8c12LkYRtce4mXz1++INjMExmtJKFaxSyM0Fhppu8JqvPmiln+67PSpgUW7KjZpXZKCgnk+T2qrePHKYSxZ9oBK+zA1OvyCvSTnpFkjh46hl/6YiXHOpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Wz6YCxqk; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56DNNxFM030447
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 02:28:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	F8OpwaFzraWMloUlXGdAgiuapqHg/Vvr2jLfpvwdlYE=; b=Wz6YCxqkz1Ookwwo
+	mwfv8M+KivyoXwwzHCHRR4PEuzJM4R/fuR1WjLum6Q7rwbARYOUeUHzA0x1wXleU
+	JNESETe6FMEKAR3SoaAkf2lqHQ1FNQCUihgy2BaZ+zIsg1SoAnVqdcicUzbOZxiS
+	zkCa5FP0Lrgz47fDh8KtRMuiu9AOHX1Go8/8QblPasIMYtcJob88q8z2sxlXyIyj
+	BjTMhCaW+sD5E94aLdjRFdhuYh4Z+Gij4OLulq+Km+L/R8uy6PoDHdFBkRnAkBfQ
+	DuwwyVrUxLriYtggCs1m1uk/lIru/aV26n0nIDIrSo+4M1SZiMTNF6smTYZ0q4G3
+	QzjWNA==
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com [209.85.215.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47ufu82wrd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 02:28:08 +0000 (GMT)
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-b115fb801bcso4209174a12.3
+        for <netdev@vger.kernel.org>; Sun, 13 Jul 2025 19:28:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752460087; x=1753064887;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=F8OpwaFzraWMloUlXGdAgiuapqHg/Vvr2jLfpvwdlYE=;
+        b=trt73I+t2IEApnFftmVjb/tqDEqbFI8nOAby76L2so7Wgir1DRBfRMwaazyx6nq2Lz
+         AcSX/ILSGg0CLqdAG9tg2e/JvfwMbzysUx97PVuSVBaLzCUXnnpHwhWZkTUCzuMeqonF
+         FUtOEVovTR8znx7DFJELxyA4J3HTEJEW2ocZCflBueeS8F+q4EU2t/4tkayyo15MRbNi
+         HstAbOrgma9UwgLkSZnsFATrkMxUHObyNjBZ0w/XtsQsuPPlSWk0XqZZ9/PkmwPew8Jw
+         pQKTla8TsskX/+y4wAYUfv/g+1Kk8r8j9qfFshayGf9oiMLV9fXOVdoX1F8vcSG2fgbW
+         Kvzg==
+X-Gm-Message-State: AOJu0YyA0EpDtlXrFdYtQZRqyHC9I1vDxqUp2ueB1tC+9y9eI5J3P+cs
+	8LkuZC7Q0k98rGwrmoq/4cJfmM6TuZtBLzoypeBFvm9htHLcYQCTCtnBGjhgu3FwviXdQGvmfd8
+	ZrpYtbemvmCVdBKjamBO+mzR9bR3I/pNZceBphVojHXgBPRCAGT1aDfsfJIs=
+X-Gm-Gg: ASbGncuKCA2Z646Dh+SpqTmR365E97K/+0Vka8u7Mk13c9vfkCcrYulS7xQXq4SAa7u
+	mwK8FkIKZJPiOwwlEtlO3jVMPb81AH9dWAp7JjeP4sEuAvwhuK1uYabWazImLgWXtWfw7CCe0Wf
+	E9SNXLrwXwxb0ckStadW4QBJcI7eXSlXjJeMyL77rCWyuin+WeBAar6d1a4YUisOvxOq5q/cBjX
+	UP+mZXhi+Fr1XSlKGatbNAjkOsS9Ov1mKScUwFsFTVEAwr48Gx7t+OeCRvquu4b2x9pq5IqtLNV
+	ER/pH8v3tdVI9eBB/IuQO+kw7T/JPNxsppARqj88ptLuZu05UQHDU5HLsJKsSMiK/LnHMaj1iJE
+	jT7ervjE8Pce4KaKOetqPrK8274mc
+X-Received: by 2002:a05:6a20:7491:b0:21f:7430:148a with SMTP id adf61e73a8af0-231201fa1f9mr17819859637.28.1752460087273;
+        Sun, 13 Jul 2025 19:28:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IERlTzQAbGBtic0xw9HUW209GmM3H8UeFAoNwCUVrD0zAm95+xPpoXxs/SybzhJTxECUBR7vQ==
+X-Received: by 2002:a05:6a20:7491:b0:21f:7430:148a with SMTP id adf61e73a8af0-231201fa1f9mr17819826637.28.1752460086833;
+        Sun, 13 Jul 2025 19:28:06 -0700 (PDT)
+Received: from [10.133.33.227] (tpe-colo-wan-fw-bordernet.qualcomm.com. [103.229.16.4])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74eb9dd598csm10053918b3a.17.2025.07.13.19.28.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 13 Jul 2025 19:28:06 -0700 (PDT)
+Message-ID: <465b60e7-fe68-407c-add4-856178f4cb7c@oss.qualcomm.com>
+Date: Mon, 14 Jul 2025 10:28:00 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 0/4] Enable ethernet on qcs615
+To: Yijie Yang <quic_yijiyang@quicinc.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org
+References: <20250121-dts_qcs615-v3-0-fa4496950d8a@quicinc.com>
+Content-Language: en-US
+From: Yijie Yang <yijie.yang@oss.qualcomm.com>
+In-Reply-To: <20250121-dts_qcs615-v3-0-fa4496950d8a@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF0000468A:EE_|BLAPR19MB4481:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4b7d42f8-d8cf-42d8-20a0-08ddc27d7b43
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?mlPW1nRjawWZ87LfV5fzj96LPaxZqA04dgNHhrMJXHNuvCxCrHjlkS85/jWA?=
- =?us-ascii?Q?g0F1vhrNeWBEJ5K8Tb3fKSOsctipr83lpxJYkGXBK8mgT+ZSPOINCy6dR61H?=
- =?us-ascii?Q?aGEH7GfM7utVZ3hPXIsCSudXLSTpGpj7suWHWZk4Zuc/gJ2PAfRNdRrD+ihr?=
- =?us-ascii?Q?dLKC9P324/F/6Xd/xYZzVoP5N/ENfzcEWSrOiw+Ej5Yy6q9qY6aOeeDhgpez?=
- =?us-ascii?Q?OUpRvDBS1GISMd/Yn+bDDRGCROb1Mp2p8dhl6cyfLqm3WPS95Th6gGqkMHKy?=
- =?us-ascii?Q?8DWJb9TF2skr1aSRorBjLpJYSd0ywgK6L47TbzHfw5BBHLINww3v3ICtcUY3?=
- =?us-ascii?Q?gxhBXhDX6HGDDLutZjcQtG3M8wYmZNJwMlPGNa+lqElbdJnK3vfgW9Oji1ch?=
- =?us-ascii?Q?d7X73xc72EGJzlWW3QF8NmxKpyLzq2ZO4Pv+2dKwjVNXhfp1tzr9U+6D7/te?=
- =?us-ascii?Q?DGe30SdYeBY/1t2GwWar5gd14T95WZn1KLxKiB+D9RevrcBTGnXlrTmXj++F?=
- =?us-ascii?Q?rjlKBD/c6YmOPdwrkoM/nlwaSINeutVd4QJLdK8lEy89il6ecbL3kZjuMsEe?=
- =?us-ascii?Q?UJ8ZwJIvUQSt6IihgO3z7me2isTgEDwPfDRBnxutLfj/ryq1kQZ17d54ohla?=
- =?us-ascii?Q?8ioFsZkBZWfTiDwodQFL+vxHg7EONkQwi1U6P8zjCmrqVnUz9qHQKCRphhx9?=
- =?us-ascii?Q?qHTRYPXrLL0smhuNKkH0A2VWH839ThIed/wYgSsmpnPSEVfjrDCP2np+Lzpc?=
- =?us-ascii?Q?tDR2RS/1frhjYsR0kBVb5MDLFGSemp+Nj7EpulCQ253c0t2Y7/mKXJC5MsDt?=
- =?us-ascii?Q?4FgCm5xo+1CAM8NIfRvKThaIkvDf/0wR7ius781r4i+48p6dI8KZpx3hrpmq?=
- =?us-ascii?Q?sC+RAxAkBKO8BTr1aOwTtj5vvIPOCaTjVzE3qpVjzwLx5R548DcnJ79unGsG?=
- =?us-ascii?Q?AsSjet7ZSqmy2vHIF9XLinVWwplb6E3+t1nNTqiJ++w+Gqhd5oMsxH2w+ge0?=
- =?us-ascii?Q?Tdm6AHAIzy1HIJIWYY9st5s25JtiC6aLwGW767XMMSe64BJcIbgFSearE2Sq?=
- =?us-ascii?Q?Vr20aL/JsN97+6Pt0EKe48m5eg4Grt/ma6EAjZ5MsQ6yR5UvKkYx9v3RFPQv?=
- =?us-ascii?Q?GLMQO3ogvwozJdIvXPiZa+DhN+qUut82t2u+w6gXF2d8wyOkLGxZi2S+6C4t?=
- =?us-ascii?Q?WbUnZwts/wfjEJ/kwOr3zVzvgQnLL/Yb7XubQyrjACKG1/8sPfa1m7GzTjvX?=
- =?us-ascii?Q?k+ljpH5KJaTsuEO3RAjMnipu7/SITO/J4DKRmeyyIVj5MseFaSPrjXk0QBat?=
- =?us-ascii?Q?Xb4TXSWDaBPMYSBFrZbV1foYbtB7ZUsME3hck9fqFfPqVE8rU7GzA5Dp3irW?=
- =?us-ascii?Q?/IaV6w4P5jK9AKZejbAOshEf70/Pedb7k1jCukppmY9hSU0kDUx8JitLHg4u?=
- =?us-ascii?Q?G0g1QQqP2JLStD3OHDUKIjW/2ge4bCm3+MY/jP7omIvrRJBoAwRUeTKlgT18?=
- =?us-ascii?Q?J0jCSGYwLa2g/OADu4iCj5zUEM8+irJGZ0E/?=
-X-Forefront-Antispam-Report:
-	CIP:174.47.1.83;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:usmxlcas.maxlinear.com;PTR:174-47-1-83.static.ctl.one;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: maxlinear.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2025 02:23:54.9769
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4b7d42f8-d8cf-42d8-20a0-08ddc27d7b43
-X-MS-Exchange-CrossTenant-Id: dac28005-13e0-41b8-8280-7663835f2b1d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=dac28005-13e0-41b8-8280-7663835f2b1d;Ip=[174.47.1.83];Helo=[usmxlcas.maxlinear.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF0000468A.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BLAPR19MB4481
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE0MDAxMSBTYWx0ZWRfX74N9EOvD5JPY
+ 4qZ6d5aHmOudlhKEZK62aLcYgnqAtbXhppSgbsYbHBAixprHT43sHekkw97Y1VMN+kUjLGYDHoJ
+ OSBkchtzBZ7GbWCjjrZp4dXFIxQoCDgYuC/8abERzD8+WginPo0hmipcxeFLvU8Y55IJqnm/Iwv
+ 4o2S9VRs+t+R2AuhcE4m8lnYAO4EvSG7jXyBfLavbdqlQebvg3fzKSKpz0wrf18yWx73EQfsgfn
+ Vo5F9Vf1hrUmmNkpudoluFpbuVxdpzKUekVvFcOBR9ah++a5LHs/O08f3rXI132cV8mRfwFQdA5
+ 8+0QxgQ7L072c+21ZZ9zFOGrC8P26P8k43zsdQm31jFMz/L3GQn7gQ+ebCCaWUEi0wz4wqczutf
+ vmOMkvyOEGisr6Smph/4GWXrxwSW5HuUK/A0DJUOKvPACi5D85KiOlCxQe+BwDZLRhhRQAHM
+X-Proofpoint-ORIG-GUID: doZdrRNuASN9abSQvZUDddA_skOvALIR
+X-Proofpoint-GUID: doZdrRNuASN9abSQvZUDddA_skOvALIR
+X-Authority-Analysis: v=2.4 cv=f59IBPyM c=1 sm=1 tr=0 ts=68746b38 cx=c_pps
+ a=Oh5Dbbf/trHjhBongsHeRQ==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8
+ a=mTSKI_wBhsZyk7PTtHgA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=_Vgx9l1VpLgwpw_dHYaR:22 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-07-14_01,2025-07-09_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1011 lowpriorityscore=0 malwarescore=0 spamscore=0 mlxscore=0
+ bulkscore=0 suspectscore=0 impostorscore=0 adultscore=0 priorityscore=1501
+ mlxlogscore=999 phishscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507140011
 
-Synopsys DesignWare XPCS CSR clock is optional,
-so it is better to use devm_clk_get_optional
-instead of devm_clk_get.
 
-Signed-off-by: Jack Ping CHNG <jchng@maxlinear.com>
----
- drivers/net/pcs/pcs-xpcs-plat.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/pcs/pcs-xpcs-plat.c b/drivers/net/pcs/pcs-xpcs-plat.c
-index 629315f1e57c..137d91038fb4 100644
---- a/drivers/net/pcs/pcs-xpcs-plat.c
-+++ b/drivers/net/pcs/pcs-xpcs-plat.c
-@@ -280,7 +280,7 @@ static int xpcs_plat_init_clk(struct dw_xpcs_plat *pxpcs)
- 	struct device *dev = &pxpcs->pdev->dev;
- 	int ret;
- 
--	pxpcs->cclk = devm_clk_get(dev, "csr");
-+	pxpcs->cclk = devm_clk_get_optional(dev, "csr");
- 	if (IS_ERR(pxpcs->cclk))
- 		return dev_err_probe(dev, PTR_ERR(pxpcs->cclk),
- 				     "Failed to get CSR clock\n");
+On 2025-01-21 15:54, Yijie Yang wrote:
+> Correct the definition and usage of phy-mode in both the DT binding and
+> driver code.
+> Add dts nodes and EMAC driver data to enable ethernet interface on
+> qcs615-ride platform.
+> The EMAC version currently in use on this platform is the same as that in
+> qcs404. The EPHY model is Micrel KSZ9031.
+> 
+> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
+> ---
+> Changes in v3:
+> - Correct the definition of 'rgmii' in ethernet-controller.yaml.
+> - Remove the redundant max-speed limit in the dts file.
+> - Update the definition of 'rgmii' to prevent any further misunderstandings.
+> - Update the phy-mode in the dts file from rgmii to rgmii-id.
+> - Mask the PHY mode passed to the driver to allow the MAC to add the delay.
+> - Update the low power mode exit interrupt from 662 to 661.
+> - Update the compatible string to fallback to qcs404 since they share the same hardware.
+> - Update base commit to next-20250120.
+> - Link to v2: https://lore.kernel.org/r/20241118-dts_qcs615-v2-0-e62b924a3cbd@quicinc.com
+> 
+> ---
+> Yijie Yang (4):
+>        dt-bindings: net: ethernet-controller: Correct the definition of phy-mode
+>        net: stmmac: dwmac-qcom-ethqos: Mask PHY mode if configured with rgmii-id
+>        arm64: dts: qcom: qcs615: add ethernet node
+>        arm64: dts: qcom: qcs615-ride: Enable ethernet node
+> 
+>   .../bindings/net/ethernet-controller.yaml          |   2 +-
+>   arch/arm64/boot/dts/qcom/qcs615-ride.dts           | 104 +++++++++++++++++++++
+>   arch/arm64/boot/dts/qcom/qcs615.dtsi               |  34 +++++++
+>   .../ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    |  18 +++-
+>   4 files changed, 152 insertions(+), 6 deletions(-)
+> ---
+> base-commit: 9424d9acada6461344c71ac02f2f3fbcdd775498
+> change-id: 20241224-dts_qcs615-9612efea02cb
+> prerequisite-message-id: <20250120-schema_qcs615-v4-1-d9d122f89e64@quicinc.com>
+> prerequisite-patch-id: b97f36116c87036abe66e061db82588eb1bbaa9a
+> 
+> Best regards,
+
+
+Since my last submission, I’ve been working on an updated version of the 
+patch that incorporates the feedback received and improves the overall 
+implementation. I plan to submit the revised version shortly.
+
+Please let me know if there are any additional concerns or changes in 
+direction I should be aware of. I’d really appreciate any guidance to 
+ensure the patch aligns well with the current goals of the subsystem.
+
+
 -- 
-2.43.0
+Best Regards,
+Yijie
 
 
