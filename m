@@ -1,184 +1,177 @@
-Return-Path: <netdev+bounces-206615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B934AB03B97
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 12:06:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B92DCB03B9F
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 12:09:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCB5A16DD96
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 10:06:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E640B3BA2B8
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 10:08:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ED5224291A;
-	Mon, 14 Jul 2025 10:06:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AA91242928;
+	Mon, 14 Jul 2025 10:09:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sDuOLcQL"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2DA780B;
-	Mon, 14 Jul 2025 10:05:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2919B218AA0;
+	Mon, 14 Jul 2025 10:09:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752487565; cv=none; b=P1g7xtNFh8vlqu8sfxBzpcb3oesqbGZM7KVYVSSRKRPK9JPEmFnFYU1KEVUmwCFZuyZQA7khWIaWCMVeUVveUdOrkxBaejy4++dFqclIMm+/1opYWd3UVdTwXbjA+Mn690xNXwQ7R0uTw1OwuKI09DgDwjSiykd0CKN7UW/11jE=
+	t=1752487761; cv=none; b=C2/HTx+DBP7dstrOxyTrLSsLMIlLSBfyA1FhjrZ6bcc4duDrsWOtgU1b3cMpt0/JgKN91ByComJunDXMw4IC+D6rPEn9KWiZBt6WpdiwyBrLoPvEmxAA2WWBDwuwJnUE74l0EWdoVW1PFRWrHsuooLyIeudpBQaE9ITlcWc8rXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752487565; c=relaxed/simple;
-	bh=wW+uBxRxSh7drtS3oHUktaTkC7UxagpwSUmVuFGOxTA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YZ1PgIX+ovqhx2uOhzJI9lMfAMe1D8BF+F6hlKzqqaT1zlI/+MY6S8sS3mBOKmRAmoe6o1b0QVZXKI9Z2J6hd42cBeUmsG24SPM5epNCIwlcYTaatmmRez3wB3b5Mxhj965gC02pG2WCXOSkClNrSCJ/qqZRqXSw/6sG182XHzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-669ff7000002311f-07-6874d685ba14
-Date: Mon, 14 Jul 2025 19:05:51 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: willy@infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	kernel_team@skhynix.com, kuba@kernel.org, almasrymina@google.com,
-	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
-	akpm@linux-foundation.org, davem@davemloft.net,
-	john.fastabend@gmail.com, andrew+netdev@lunn.ch, toke@redhat.com,
-	tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com,
-	saeedm@nvidia.com, leon@kernel.org, ast@kernel.org,
-	daniel@iogearbox.net, david@redhat.com, lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
-	surenb@google.com, mhocko@suse.com, horms@kernel.org,
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
-	vishal.moola@gmail.com, hannes@cmpxchg.org, ziy@nvidia.com,
-	jackmanb@google.com
-Subject: Re: [PATCH net-next v9 2/8] netmem: introduce utility APIs to use
- struct netmem_desc
-Message-ID: <20250714100551.GA44803@system.software.com>
-References: <20250710082807.27402-1-byungchul@sk.com>
- <20250710082807.27402-3-byungchul@sk.com>
- <4a8b0a45-b829-462c-a655-af0bda10a246@gmail.com>
- <20250713230752.GA7758@system.software.com>
- <5ee839d6-2734-41c5-b34c-8d686c910bc8@gmail.com>
+	s=arc-20240116; t=1752487761; c=relaxed/simple;
+	bh=LgBpN4ddFnQRjIEEAiu4b2l+jmE+KpxUfD5LylOozdk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WuWZaFevrSxUjr2t82HXT8n83TVnyI6kVr+YAMwtR7NMThyWvlOXaNPwyzS5ez1SaBtXUBAMDAaaAgQD49dKmhNmzVcdMU4MZZWP2O+5vj/WFW7KBoadglIJf/GP68ToQKdF2QErK5m4/72uV6ZCwRZwKd+BI85qK30CIwNT7DQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sDuOLcQL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95E5CC4CEED;
+	Mon, 14 Jul 2025 10:09:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752487759;
+	bh=LgBpN4ddFnQRjIEEAiu4b2l+jmE+KpxUfD5LylOozdk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=sDuOLcQL0lHDsljvCpPbvRJN8HyKeEfnasiRHFu9StatpquuZRiARP5x/cI9avOUK
+	 Eb+crUHtbavB0w6YxZ5JnqYNQNSRiQLhOJIEUdVCt5o7kblP9C2BA3NdsEOuaONTRx
+	 4nsacwevEhcZ0XGpqW3rzRW/nDPO6VhWk4JYB79wlcKnhm8oXvF/RDtD+5q1YFlhA4
+	 JEzsTTPMRKdQPtvbwYtcpLkoSEy2GP4MIgWYmS8Jb/cum+MjjwfZxUTU9SRcrQjow2
+	 WW8VE/wxEW8Zc0/1oepjjdBJzhf3hn77dM8kBZ/OhiT0OoaUpCVypQBdc5tBQ5hNf2
+	 yYNttJnB66xZQ==
+Message-ID: <836c9f0b-2b73-4b36-8105-db1ae59b799c@kernel.org>
+Date: Mon, 14 Jul 2025 12:09:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5ee839d6-2734-41c5-b34c-8d686c910bc8@gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRjHeXfOzjkOF8d5e0soWImkZBZWD1ER1YcD0QWCKPtgo53caF7Y
-	1FykaFmZqWWL0mWxLpo6cbLETV1mc06li2Zo66ZmallmpaWZpTlF6tuP5/88P/4fHoaQ6IWL
-	GGVMPK+OkamklIgUffa8seJUZ7wirGXEGwpMZRQYfybBnR6rEApKqxB8n3hFw6ijiYJbN8YI
-	KGhNJ+GH6RcB/c5eGozmHdBdNECC7YyFgN7zzRRkp08ScG9imIYT1mIBtFXlCOHSr0ICLKk9
-	NDyrKaCgq2xaCAP2bBJa9CUkdOdsBqfBD8YeDiFwmCwCGMu6RoGu3UDBu/RuBO0NvSRcTctB
-	YKpzCWHy54zjamMXvXkZ1zD0heAqS14IuGr9G5ozmBO4u8XBXKarneDMpWcpzjxykeZed9oo
-	rjlvkuSqraMCLvvkMMV9639Jcl/qOijOVNlBco8MDnq3V4Rog5xXKRN59cpNB0WK5vcWMq5i
-	SVKLy0KlonH/TOTBYDYcm5xO4Txfv185yyQbiAfbvpFuptgg7HJNEG72YUPwp+d2OhOJGILN
-	o3D52yLKHXizkfjrlSqBm8UsYON3C+lekrA/EHbUfyDmAi/ckt83ayXYYOyaGpw5YGY4AN+Z
-	YtxjD3Yj7rtcMVvCl12K66uaBHPlbAzOGtLO8UL8oNhFXkCs/j+r/j+r/p/VgIhSJFHGJEbL
-	lKrwUIU2RpkUeig22oxmPqYo+fcBKxpp22NHLIOknmJXpUYhEcoSNdpoO8IMIfURf3yjVkjE
-	cpn2GK+OjVQnqHiNHQUwpNRfvHrsqFzCRsni+SM8H8er51MB47EoFRkzAmsLi1M22GrKI54W
-	PUHVgzudOr/9awwhy3XbkroOx29v3OLndV4+bsnND5IfG96ybt/jgHUZ28LO/VkzXq+Li2ww
-	eS4OSovKXVvf2Zd4pqe5r6w2q+n285SwBcb12qzpPx3SC62OQl9/61bbh9MhN/fW5iZvykg9
-	Xv7KtlinCt4lJTUK2apgQq2R/QX/hLe1LQMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRjHec95d85xNDouy5Mm0UICoysJD90Q/NAxukGJGJQtPbjltU3H
-	DALTQTTT7repZYjzSltrbVpqsnmZ+GGlVDMzzSytRK28ZlmbEfXtx/N/fn+eDw9DSn/iIEaZ
-	miGoUuXJMkqMxfu25a7TvchQbHSWbYUiUw0F1TNaKO+vFUFRlQ3BxGwPDd+a2ygovTtFQpFb
-	h2HS9J2E960DNFRb9kKf8QOG+rN2EgYuuCjI182R0DA7SkNObQUBzuJ2ETy1FYjg6vcyEuzZ
-	/TR0PSqi4E3NLxF8cORjaDdUYugriIDWkmUw1TGCoNlkJ2DqfDEFVzpLKHin60PQ6RzAUHim
-	AIGp0SOCuRlvR2HLGzoilHeOjJG8tbKb4OsMvTRfYsnkH1SE8XpPJ8lbqs5RvOXrZZp//aKe
-	4l035zBfV/uN4PNzRyn+y/tXmB9rfE7xpcPjBG+yPscHpIfF2xOEZKVGUG3YeUyscA3Zcbp5
-	pbbdY6ey0XSgHvkxHLuFu/3EKvIxZkO5j0+/YB9T7BrO45klfRzAruU+v3TQeiRmSPYmxd17
-	a6R8wRI2jhu/YSN8LGGBq56wY9+SlJ1EXHPTMPkn8Ofabw0utJJsGOeZ/+gVGC8Hc+XzjG/s
-	x+7gBq+bF45Yyq7mmmxtxEUkMfxnG/6zDf/sEkRWoQBlqiZFrkwOX69OUmSlKrXr49NSLMj7
-	FMbTPy7VoomuXQ7EMki2SOKxqhVSkVyjzkpxII4hZQGST70qhVSSIM86JajS4lSZyYLagYIZ
-	LAuU7I4RjknZRHmGkCQI6YLqb0owfkHZqDB2vmNsxLnfnR3fUxU1P5wXVRodEynfE8ekh0R3
-	Pcxzhxeu7banxAbc6cZtM+acIyfuO1cuqfO/MGrsn+w2y6bii4c01x6s2KzXtDSsWt71zP14
-	/OtQjv6Whq4/OJ04sLi/yf/t8UhXToL25KHxEO3R4mizsDoE9BEtzY9j0s7IsFoh3xRGqtTy
-	36w7ufIQAwAA
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 01/12] dt-bindings: ptp: add bindings for NETC
+ Timer
+To: Wei Fang <wei.fang@nxp.com>
+Cc: "F.S. Peng" <fushi.peng@nxp.com>,
+ "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "imx@lists.linux.dev" <imx@lists.linux.dev>,
+ "robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
+ <krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>,
+ "richardcochran@gmail.com" <richardcochran@gmail.com>,
+ Claudiu Manoil <claudiu.manoil@nxp.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Clark Wang
+ <xiaoning.wang@nxp.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
+References: <20250711065748.250159-1-wei.fang@nxp.com>
+ <20250711065748.250159-2-wei.fang@nxp.com>
+ <ce7e7889-f76b-461f-8c39-3317bcbdb0b3@kernel.org>
+ <PAXPR04MB8510C8823F5F229BC78EB4B38854A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <61e6c90d-3811-41c2-853d-d93d9db38f21@kernel.org>
+ <PAXPR04MB85109EE6F29A1D80CF3F367A8854A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <169e742f-778e-4d42-b301-c954ecec170a@kernel.org>
+ <PAXPR04MB85107A7E7EB7141BC8F2518A8854A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <PAXPR04MB85107A7E7EB7141BC8F2518A8854A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 14, 2025 at 10:43:35AM +0100, Pavel Begunkov wrote:
-> On 7/14/25 00:07, Byungchul Park wrote:
-> > On Sat, Jul 12, 2025 at 12:59:34PM +0100, Pavel Begunkov wrote:
-> > > On 7/10/25 09:28, Byungchul Park wrote:
-> > > ...> +
-> > > >    static inline struct net_iov *netmem_to_net_iov(netmem_ref netmem)
-> > > >    {
-> > > >        if (netmem_is_net_iov(netmem))
-> > > > @@ -314,6 +340,21 @@ static inline netmem_ref netmem_compound_head(netmem_ref netmem)
-> > > >        return page_to_netmem(compound_head(netmem_to_page(netmem)));
-> > > >    }
-> > > > 
-> > > > +#define nmdesc_to_page(nmdesc)               (_Generic((nmdesc),             \
-> > > > +     const struct netmem_desc * :    (const struct page *)(nmdesc),  \
-> > > > +     struct netmem_desc * :          (struct page *)(nmdesc)))
-> > > 
-> > > Considering that nmdesc is going to be separated from pages and
-> > > accessed through indirection, and back reference to the page is
-> > > not needed (at least for net/), this helper shouldn't even exist.
-> > > And in fact, you don't really use it ...
-> > > > +static inline struct netmem_desc *page_to_nmdesc(struct page *page)
-> > > > +{
-> > > > +     VM_BUG_ON_PAGE(PageTail(page), page);
-> > > > +     return (struct netmem_desc *)page;
-> > > > +}
-> > > > +
-> > > > +static inline void *nmdesc_address(struct netmem_desc *nmdesc)
-> > > > +{
-> > > > +     return page_address(nmdesc_to_page(nmdesc));
-> > > > +}
-> > > 
-> > > ... That's the only caller, and nmdesc_address() is not used, so
-> > > just nuke both of them. This helper doesn't even make sense.
-> > > 
-> > > Please avoid introducing functions that you don't use as a general
-> > > rule.
-> > 
-> > I'm sorry about making you confused.  I should've included another patch
-> > using the helper like the following.
+On 14/07/2025 11:56, Wei Fang wrote:
 > 
-> Ah, I see. And still, it's not a great function. There should be
-> no way to extract a page or a page address from a nmdesc.
+>>
+>> How does the other consumer - ethernet - reference this one here? Paste
+>> complete DTS of this and users, otherwise it is just ping-pong
+>> discussion where you put just a little effort to bounce back my question.
 > 
-> For the diff below it's same as with the mt76 patch, it's allocating
-> a page, expects it to be a page, using it as a page, but for no reason
-> keeps it wrapped into netmem. It only adds confusion and overhead.
-> A rule of thumb would be only converting to netmem if the new code
-> would be able to work with a netmem-wrapped net_iovs.
+> Below is the DTS node of enetc (ethernet device) and timer node.
+> 
+> enetc_port0: ethernet@0,0 {
+> 	compatible = "pci1131,e101";
+> 	reg = <0x000000 0 0 0 0>;
+> 	pinctrl-names = "default";
+> 	pinctrl-0 = <&pinctrl_enetc0>;
+> 	phy-handle = <&ethphy0>;
+> 	phy-mode = "rgmii-id";
+> 	status = "okay";
 
-Thanks.  I'm now working on this job, avoiding your concern.
+How do you use netc_timer in such case?
 
-By the way, am I supposed to wait for you to complete the work about
-extracting type from page e.g. page pool (or bump) type?
+> };
+> 
+> netc_timer: ethernet@18,0 {
+> 	compatible = "pci1131,ee02";
+> 	reg = <0x00c000 0 0 0 0>;
+> 	clocks = <&netc_system333m>;
+> 	clock-names = "system";
+> };
+> 
+> Currently, the enetc driver uses the PCIe device number and function number
+> of the Timer to obtain the Timer device, so there is no related binding in DTS.
 
-	Byungchul
+So you just tightly coupled these devices. Looks poor design for me, but
+your choice. Anyway, then use that channel as information to pass the
+pin/timer/channel number. You do not get a new property for that.
 
-> > diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> > index cef9dfb877e8..adccc7c8e68f 100644
-> > --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> > +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> > @@ -3266,7 +3266,7 @@ static u32 idpf_rx_hsplit_wa(const struct libeth_fqe *hdr,
-> >                            struct libeth_fqe *buf, u32 data_len)
-> >   {
-> >       u32 copy = data_len <= L1_CACHE_BYTES ? data_len : ETH_HLEN;
-> > -     struct page *hdr_page, *buf_page;
-> > +     struct netmem_desc *hdr_nmdesc, *buf_nmdesc;
-> >       const void *src;
-> >       void *dst;
-> > 
-> > @@ -3274,10 +3274,10 @@ static u32 idpf_rx_hsplit_wa(const struct libeth_fqe *hdr,
-> >           !libeth_rx_sync_for_cpu(buf, copy))
-> >               return 0;
-> > 
-> > -     hdr_page = __netmem_to_page(hdr->netmem);
-> > -     buf_page = __netmem_to_page(buf->netmem);
-> > -     dst = page_address(hdr_page) + hdr->offset + hdr_page->pp->p.offset;
-> > -     src = page_address(buf_page) + buf->offset + buf_page->pp->p.offset;
-> > +     hdr_nmdesc = __netmem_to_nmdesc(hdr->netmem);
-> > +     buf_nmdesc = __netmem_to_nmdesc(buf->netmem);
-> > +     dst = nmdesc_address(hdr_nmdesc) + hdr->offset + hdr_nmdesc->pp->p.offset;
-> > +     src = nmdesc_address(buf_nmdesc) + buf->offset + buf_nmdesc->pp->p.offset;
-> > 
-> >       memcpy(dst, src, LARGEST_ALIGN(copy));
-> >       buf->offset += copy;
-> --
-> Pavel Begunkov
+> In the future, we plan to add phandle to the enetc document to bind enetc
+> and Timer, because there will be multiple Timer instances on subsequent
+> platforms.
+
+Bindings must be complete, not "in the future" but now. Start sending
+complete work, so we won't have to guess it.
+
+> 
+> But what I want to say is that "nxp,pps-channel" is used to specify which
+
+There is no user in your DTS of nxp,pps-channel.
+
+Best regards,
+Krzysztof
 
