@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-206478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29516B03418
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 03:06:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7D47B0342B
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 03:32:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7AED11894C6C
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 01:06:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA8C51897B48
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 01:32:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2D5C15B971;
-	Mon, 14 Jul 2025 01:06:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00150156C40;
+	Mon, 14 Jul 2025 01:32:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF0971FC3;
-	Mon, 14 Jul 2025 01:05:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AD1A2114;
+	Mon, 14 Jul 2025 01:32:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752455162; cv=none; b=uNvs2W8RWXQUSZd2ieAsGmp0v04mBvNaGb4sKsPKC90AHdg2s9l5La17VxKsCj4IHULVoUdJoeBDN8oFQvwV1+QxfSjVde7bUuNYoHZdQegw3292h6YMSr0F2vEGKKjbWELniyKQjzg57nOUtDr530XoJY2RtVcKsbvL+zOsb8g=
+	t=1752456752; cv=none; b=hyRBQfVMLNp6ggn7yRaL97MKl9lAoAHec/+ICPiFWAXO2MB1QZnf7690C0AY/dthltDuWNzcRY+QEPgR+ILl9ETqrKSs5wM7sm/TxU6p9Hoy35PgX96I+85rwanFsw7alFDA5S+8G82hwCPOFzcS0mJO1UblhaZadUj8tbVjzNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752455162; c=relaxed/simple;
-	bh=bJRJQ30ihyl+2uSUUGcMy1ghyKNWXsYlVJ4mGZwrp8k=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=MuspcsX0Pqz4Cr9t/mFKgwgPPn1kLIEPkOKzES3V2rpR0YazF6bClh1dXzSGKyT5jcS0BGlB3kJDD7XPoDiIxNQaGZrcPN/GJdS9gLtRUXtyv8eVZiX4PjIuBsbqhDJsE6imQYUeaf9DvngP7yFHtZUW8yWbYXCfKfVqADZY2ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+	s=arc-20240116; t=1752456752; c=relaxed/simple;
+	bh=J87hDMifmjUwUTFd7ku73pfQf31y4ATa5tbb4Vx1I2M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=lUe9aWlbixX+R+5+Rv8XTEfrAFyyK7/5NQlp24NTRt2mFcusuHKeBE9z9uajI926eQG3GLS0m4tjdHTefR3ZaJw6n++lH5787Ug8pJUuJp7PlwUhUMvYYW3/b2LEVYZddv8XDZjabP2m/1g7sQtyHC7PaaSi6TQrhASWs+xkmrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bgPFF44xCz2FbNt;
-	Mon, 14 Jul 2025 09:02:57 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5CDA7140277;
-	Mon, 14 Jul 2025 09:04:58 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4bgPp74SkYzXf9P;
+	Mon, 14 Jul 2025 09:27:59 +0800 (CST)
+Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
+	by mail.maildlp.com (Postfix) with ESMTPS id 81BAB1401F2;
+	Mon, 14 Jul 2025 09:32:27 +0800 (CST)
+Received: from [10.174.179.113] (10.174.179.113) by
+ dggpemf500002.china.huawei.com (7.185.36.57) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 14 Jul 2025 09:04:57 +0800
-Message-ID: <df1c269a-085a-47cc-83ef-294ea84b98a2@huawei.com>
-Date: Mon, 14 Jul 2025 09:04:56 +0800
+ 15.2.1544.11; Mon, 14 Jul 2025 09:32:26 +0800
+Message-ID: <5e714038-3460-42b9-b003-616a394ee2b3@huawei.com>
+Date: Mon, 14 Jul 2025 09:32:25 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,73 +48,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-	<shenjian15@huawei.com>, <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
-	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<salil.mehta@huawei.com>, <arnd@kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V2 net-next 00/11] net: hns3: use seq_file for debugfs
-To: Simon Horman <horms@kernel.org>
-References: <20250711061725.225585-1-shaojijie@huawei.com>
- <20250712121920.GX721198@horms.kernel.org>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20250712121920.GX721198@horms.kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Subject: Re: [PATCH net-next] ipv6: mcast: Remove unnecessary null check in
+ mld_del_delrec()
+To: Kuniyuki Iwashima <kuniyu@google.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20250712092811.2992283-1-yuehaibing@huawei.com>
+ <CAAVpQUC-mV=SuNNhKbpy_1Mbh_sOs856+oNqDVJ4KcLjhDh2kw@mail.gmail.com>
+Content-Language: en-US
+From: Yue Haibing <yuehaibing@huawei.com>
+In-Reply-To: <CAAVpQUC-mV=SuNNhKbpy_1Mbh_sOs856+oNqDVJ4KcLjhDh2kw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ dggpemf500002.china.huawei.com (7.185.36.57)
 
-
-on 2025/7/12 20:19, Simon Horman wrote:
-> On Fri, Jul 11, 2025 at 02:17:14PM +0800, Jijie Shao wrote:
->> Arnd reported that there are two build warning for on-stasck
->> buffer oversize. As Arnd's suggestion, using seq file way
->> to avoid the stack buffer or kmalloc buffer allocating.
+On 2025/7/13 6:12, Kuniyuki Iwashima wrote:
+> On Sat, Jul 12, 2025 at 2:06 AM Yue Haibing <yuehaibing@huawei.com> wrote:
 >>
->> ---
->> ChangeLog:
->> v1 -> v2:
->>    - Remove unused functions in advance to eliminate compilation warnings, suggested by Jakub Kicinski
->>    - Remove unnecessary cast, suggested by Andrew Lunn
->>    v1: https://lore.kernel.org/all/20250708130029.1310872-1-shaojijie@huawei.com/
->> ---
+>> These is no need to check null for pmc twice.
 >>
->> Jian Shen (5):
->>    net: hns3: clean up the build warning in debugfs by use seq file
->>    net: hns3: use seq_file for files in queue/ in debugfs
->>    net: hns3: use seq_file for files in tm/ in debugfs
->>    net: hns3: use seq_file for files in tx_bd_info/ and rx_bd_info/ in
->>      debugfs
-> Thanks for the update, but unfortunately I don't think this is enough.
->
-> W=1 builds with bouth Clang 20.1.7 and GCC 15.1.0 warn that
-> hns3_dbg_fops is unused with the patch (10/11) above applied.
->
->>    net: hns3: remove the unused code after using seq_file
-> I suspect this patch (11/11) needs to be squashed into the previous one (10/11).
->
-> ...
+>> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+>> ---
+>>  net/ipv6/mcast.c | 2 --
+>>  1 file changed, 2 deletions(-)
+>>
+>> diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
+>> index 6c875721d423..f3dae72aa9d3 100644
+>> --- a/net/ipv6/mcast.c
+>> +++ b/net/ipv6/mcast.c
+>> @@ -794,9 +794,7 @@ static void mld_del_delrec(struct inet6_dev *idev, struct ifmcaddr6 *im)
+> 
+> Rather early return after the first loop if (!pmc) and
+> remove 1 nest level below.
 
-Yes, it looks like so...
-
-However, in this case, the operation of patch10 is not singular.
-It modified a debugfs file through a patch while also removing unused code frameworks.
-
-In fact, this warning was cleared in patch 11...
-
-...
-
-I will merge patch 11 into patch 10 in v3.
-
-Thanks,
-Jijie Shao
-
-
-
-
-
-
-
-
+Thanks, will do in v2.
+> 
+> 
+>>                         rcu_assign_pointer(pmc_prev->next, pmc->next);
+>>                 else
+>>                         rcu_assign_pointer(idev->mc_tomb, pmc->next);
+>> -       }
+>>
+>> -       if (pmc) {
+>>                 im->idev = pmc->idev;
+>>                 if (im->mca_sfmode == MCAST_INCLUDE) {
+>>                         tomb = rcu_replace_pointer(im->mca_tomb,
+>> --
+>> 2.34.1
+>>
+> 
 
