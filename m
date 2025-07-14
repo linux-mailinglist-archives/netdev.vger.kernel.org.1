@@ -1,166 +1,147 @@
-Return-Path: <netdev+bounces-206657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 963B4B03E85
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 14:21:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FB65B03EB0
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 14:28:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE36F189C055
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 12:21:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9F104A0ADA
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 12:28:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EEDC225771;
-	Mon, 14 Jul 2025 12:21:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D056A2472B4;
+	Mon, 14 Jul 2025 12:28:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B1ovxHET"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lOMiTO0B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54F5921B91F
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 12:21:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D5C23C4E1;
+	Mon, 14 Jul 2025 12:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752495689; cv=none; b=TyEhJc7txj9Ka1vAXvF5wWp2y0P17AUqyhjCHQhn2Rombi3zkiPLrIo53gr1E+uWnjKZTqu3299zD9luvEFKd8kqdcMYCTnSq+0KxjMVr87rEURKV7et4LGwLYszK/UHexz7ybohNPjHux2yPh6N2gQ6MjBonhFgnPFX3ho3ock=
+	t=1752496133; cv=none; b=NlRe+adHU0bU/kqq0lpl6FTWZdx526IDyEyznFmSwyiHCF5bRdObSVArUvgApBKibZlIUu/iO7rXn9pQsVWJpA0v8F2PdwNVf0kurQrNBDqjHcylnYa2svlCCqs7gZIM7Qzg/1aEe7wQXKVNmaEM1Tl5o4kiacgzU+Eq5I3g6NU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752495689; c=relaxed/simple;
-	bh=8mXUg96EvsUZr1iMagJfnqsF+/XijVdhvxERcN70AIE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=btswD2AEZUSs+Ii629I9MS7IMmqTNRiljDyQgHDVvMuSbFrkF+7qwNhE14FE+EUwum+Bh9KwTyFLXxnBKx5RyHItLGXcIkfJ5gffb0t/w27Iz9ONBjbduiAziBgydDl/cuWlFm2qOX3tfu/edPlpb0cyHE8F0v1FDCxhiHQXfFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B1ovxHET; arc=none smtp.client-ip=209.85.221.49
+	s=arc-20240116; t=1752496133; c=relaxed/simple;
+	bh=VhjsyGfVk/NYPkxf3dUl3ag4ZXP4DikybPpZX89jZFE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tgKKWwFtRFaPSJAQJEjiYvk5pY/ucMBV+0mutzY3TtoRHY53vuHCv7kW7sLL89Zp5sE/VI+6pY/tuH8XhhLdef3QurPZcMa036UWy4DYXLXTUX0Bq288s2NaEYkyTrJY7wxoN77NU/mZ5y8wiq44nzuua383HktasmXkqAQTN4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lOMiTO0B; arc=none smtp.client-ip=209.85.208.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3a4e742dc97so3113513f8f.0
-        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 05:21:26 -0700 (PDT)
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-32cd0dfbdb8so34196881fa.0;
+        Mon, 14 Jul 2025 05:28:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752495685; x=1753100485; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1752496130; x=1753100930; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PUhNkhnJM9LJg+lJ4kHUKdCxmecqnhP8vLoEyt2XIgA=;
-        b=B1ovxHET4cDmEV6kU7YdYxKVedEg3snNl9IeNW9CKdD0wcLonf+MlyHsY2+Ri48/JB
-         h6gbn6ceYmsadh3hOlX9iso31DEwjKqUbKGiluGZEBB7FKoJloM/KF7oYbYnqlqTaEuM
-         iSy+xZRDEdaEHDdKEWJxP8Dsn45lByuvKQGbB9SxhbXOUBPkrRUy2nMMvalqG1kovHzc
-         QyS48OsYEWvoHSKAkDDvXBO7ndjy2BCHwVTCMmEVRwsGQPhxn/kzgEl+PgoUzcxNkQ4V
-         h+ihpKHvAQqy4qh/KPLAu9L/AMrwYlJURwuPnpM+ltv8iSs19qrRx0afG+1cOXNBU7Ny
-         uI0w==
+        bh=SbUxRDt1V115BL2AgQxJUishMrxXTwdY/Gt4NlJymo0=;
+        b=lOMiTO0B2YTNiSCrl+ZvRtoZ98lAhynFz1dmUxHF79iSRytHCZL+crfJl/ZYoubxfl
+         z9NG2U8v9EjaTemKOx0nGA/XZdmeagJmGKjEydKdPl5isnmWASZJ34+JB1oIsWMYXqPo
+         KLYHDj0EbqhWFdILgZMcirT3hhL8NOTWdwN2f+5xweI9Xjqhf8fMS7zJOMvxGXBs/9iB
+         kvxaQ7iy7Mgn68KoMx12V86Yo6J3Po2iOuUnsVcLkTnN6ieL4dnxw3MGJEr4EVSZ7B6V
+         /uJ/KIThHJ9qVHzYLfNcUZDiJnOq+Yf2vwDMTDkVogtaAnsHpOqHzxtYg7XGGu0gmJAc
+         oA1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752495685; x=1753100485;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1752496130; x=1753100930;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=PUhNkhnJM9LJg+lJ4kHUKdCxmecqnhP8vLoEyt2XIgA=;
-        b=SpYMMdB8q6nCfzh7H8Mv1x72nevHQJdBamTxTYuGcha1UDUDBwQHNESZ8B6/n+MxrI
-         FVzwCqMmSmtTW9gjV9B7m+V0k+hhyi/cAEupiXVyTo5OcYfS/h/9RR4S9nzsLoFBLpB4
-         soMnz9z5zVaXGk9IfJGQUrybsmx5aqm85zDRWy2Q7tr3Lh+9G+2bmH8zCB6OWyypVGY1
-         YGKvhfKbXeCIriXnbSce24a6YZdu/FjfF3uolbjBIPsFINWd9IjjGVVhU/3ps1NqrtLV
-         ycj03ooE/axs1ha5Cw/pKDFW+27EV1ujUDUFBz/+zlUu6UhDqCAyLDVXJUDOwUKlFuli
-         wb3g==
-X-Forwarded-Encrypted: i=1; AJvYcCWeLVNzR4D8lJKlrmXKjHHmXohjm+/py37e++WN+9xBptOEWqm+HmSoEi9xtuKl0nSgEGFCAII=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBJsgs678YQzNf1BuUJ4QuOrYIbG5OKy+9Go90laISMo1aPlZj
-	FN3cDu3021kxsTsJ6URktvy3WW2VKTPBXhZwq3uQCM6c4l0qK/VUF4PNi1EO6A==
-X-Gm-Gg: ASbGnctwSXe6rcEZC6vb5xwJXTsWiyLTiobhTxUO72Pqb/JpPO3YuOoM5BEu/9tuBiT
-	SiqJ/mCzhkEGMy0x2gJ0ANwItDN3YN6TV4ySQtCv8ig0RygpgLug2Q2aax5UOTFSMaclk8amQtO
-	VjcRrNzwxGPtWk9hvHOT4/j32Roywc3NJnynvZyy7zGHTUMmR5vhNYCIac7aOjCHousZd2ZjxO/
-	nuoRZiNDMHw09ucqHepM1PcmBF15BHZtVk0KOnou4ecDZqfGKWI7g3/iZGkTE1YVOrDwmqP/X4k
-	Qbx5jxlKFfix0Yrbral2Rr00DNZHEceMeYyuUC0qMjTMIfwfGJAHMUAzM+smfdqkxEKCzpbqbw7
-	fnscf4W/U4cHpK+CtNIHkz7ao0ID9hsiNoz2maDH5J7tOk26bXK75xvdYFPeq
-X-Google-Smtp-Source: AGHT+IFPob/ovid7y6X6Qrgj4BNMpAVrprUu4PpYPUCrQ6SCsUTGZL+60GqaHj6ms6E+U4jzYhkbhQ==
-X-Received: by 2002:a05:6000:1acf:b0:3a5:1388:9a55 with SMTP id ffacd0b85a97d-3b5e7f0a33emr13049731f8f.5.1752495685046;
-        Mon, 14 Jul 2025 05:21:25 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8bd1997sm12502206f8f.10.2025.07.14.05.21.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Jul 2025 05:21:24 -0700 (PDT)
-Date: Mon, 14 Jul 2025 13:21:14 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Jacek Kowalski <jacek@jacekk.info>
-Cc: Simon Horman <horms@kernel.org>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Subject: Re: [PATCH iwl-next v2 1/5] e1000: drop unnecessary constant casts
- to u16
-Message-ID: <20250714132114.70feff08@pumpkin>
-In-Reply-To: <522a1e9d-0453-447b-b541-86b76fa245bd@jacekk.info>
-References: <b4ee0893-6e57-471d-90f4-fe2a7c0a2ada@jacekk.info>
-	<e199da76-00d0-43d3-8f61-f433bc0352ad@jacekk.info>
-	<20250708190635.GW452973@horms.kernel.org>
-	<522a1e9d-0453-447b-b541-86b76fa245bd@jacekk.info>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        bh=SbUxRDt1V115BL2AgQxJUishMrxXTwdY/Gt4NlJymo0=;
+        b=RU+IE5tWIWzaz8RAXxLYlhEZVkzFynVSCe/Ay08/S6LD2IRuxm1WhMkfN8QTi8wjqM
+         t6qZ5ce6wS1ohLe2645SPQ0qwv6sagu9bok9f4UKBbi4XWCpxv2yK/kh31k96G05xdqr
+         llchz9sa/9dvwqKyifJyuUcn72GvH6aw0zB9Yky0ZoRXrog39VBK3uLkHPvQ32CtcBB4
+         8ilXF9KzER6c9tCZDMd6jtB1nteLmU5Vpf2kgTCk/8NR21AbyQ5DCVQQgTp2Ikh9U66u
+         grqAJlKfzc4qccvaOpigMYzDw3IgQj3lF2MmOfeQmHUtoaTKqDrL2iuDsGQ+XCNDr6ju
+         plrg==
+X-Forwarded-Encrypted: i=1; AJvYcCUYdt9Z0redpu3PgAlxy3YM9zjWVbG/oFXMmSSWYSCbpqaIbnT6eVy8gnmlfgeGPGYQTQYRu0+U6euvKOjU@vger.kernel.org, AJvYcCW6ks7v2fNsNs6yBAtlCTJ+SpP1jhc7A7NtQMB3uPo2KC+2yBqd6QQyjS7EfXIoIIw7itV2eLFM5hQXUYT7b0A=@vger.kernel.org, AJvYcCWj3eNRE6w4HNQQYTIrYS9WS/76foJTtmbskLw832SpneCKGgCctOr1EDQVboLfLy708RN7RTtyDACA@vger.kernel.org, AJvYcCXHGm+Hs7wcSZKG1KiShqWFZUbYB7nBRWrDYSwjvTu0eOHZQcEZ5gZCWNa6ZRiGRQp0jxuP7o49FyinAE691Pa3@vger.kernel.org, AJvYcCXMi/2YI4HO8d84iMtrln4ETDc8Oh0d/oyYU4oezrXRtCj7GSM6Wlg/S8neeplI0KGJTUfwh6tf@vger.kernel.org, AJvYcCXuA5rnfUtruG3RHZWAuHRpE+RFqjj4aa6ZvAu73WH4tHLuvwmMSPiGAEOVDWXPtFRaI959hUtjyLE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRm8oXPWILPjaV9akEciCXyBtcq2VHdvF2bPcbyNX9dweB8MlQ
+	crBqEgnhAk/lICQhE7GLyOpxnk+lMGDcJlQNxgr4tEGpxm0S6916uisfXpiQzBaOokRgbivD5HH
+	BuZoAF+aYWm3s+0bx20ve6lFNv5NL/nE=
+X-Gm-Gg: ASbGncsH8CJC47vwTo/RcthQZcwakpV3sn5eTFwFeu0AnITy/qkJhOSd0E0I+HqZwMb
+	q260G5JyW8C1mpZkR6oLU0C8lANHw2P942KkAXcX5RNPetzpLV/dTolFuJHKXslU/jcPV+XTXb5
+	3xt+r056+BlXmIrJdzCM55xXSJYiv1L59WzOroT/NcR7kNEh+pgmy1NpGIyUJABC3MvVnwAEJTF
+	3sRPlFf0Xlpu9Iyl275IU5i6padEU8gGRa4B+vlsz27Vo+z3pC+
+X-Google-Smtp-Source: AGHT+IHrSBkjEoqU/I5DY/nGtzSq30SG70sPRuWAgDJvgCsJU9oDbgAOubBSXw4/LD+Vz0YhYyXX8s9x0cDKBQKVndA=
+X-Received: by 2002:a2e:b5da:0:b0:32b:7111:95a7 with SMTP id
+ 38308e7fff4ca-330535da03dmr27580171fa.41.1752496129946; Mon, 14 Jul 2025
+ 05:28:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250709-core-cstr-fanout-1-v1-0-fd793b3e58a2@gmail.com>
+ <20250709-core-cstr-fanout-1-v1-5-fd793b3e58a2@gmail.com> <DBBQCHNN1N7F.3O470V9YDXE70@kernel.org>
+In-Reply-To: <DBBQCHNN1N7F.3O470V9YDXE70@kernel.org>
+From: Tamir Duberstein <tamird@gmail.com>
+Date: Mon, 14 Jul 2025 08:28:13 -0400
+X-Gm-Features: Ac12FXxlpQphBeoscQniP1NYfXjAeRGBqEAxGkTlGCPTLLtOzVyVDIQfLGYMkU0
+Message-ID: <CAJ-ks9k2jyVpc6g9bGK4fUHbqUBUnH-aHawi5YKvhtpAEcqr2A@mail.gmail.com>
+Subject: Re: [PATCH 05/10] rust: drm: use `core::ffi::CStr` method names
+To: Danilo Krummrich <dakr@kernel.org>
+Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dave Ertman <david.m.ertman@intel.com>, 
+	Ira Weiny <ira.weiny@intel.com>, Leon Romanovsky <leon@kernel.org>, Breno Leitao <leitao@debian.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
+	Rae Moar <rmoar@google.com>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+	Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, dri-devel@lists.freedesktop.org, 
+	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-pm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	kunit-dev@googlegroups.com, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 8 Jul 2025 21:40:12 +0200
-Jacek Kowalski <jacek@jacekk.info> wrote:
-
-> >> -		if ((old_vid != (u16)E1000_MNG_VLAN_NONE) &&
-> >> +		if ((old_vid != E1000_MNG_VLAN_NONE) &&  
+On Mon, Jul 14, 2025 at 7:09=E2=80=AFAM Danilo Krummrich <dakr@kernel.org> =
+wrote:
+>
+> On Wed Jul 9, 2025 at 9:58 PM CEST, Tamir Duberstein wrote:
+> > Prepare for `core::ffi::CStr` taking the place of `kernel::str::CStr` b=
+y
+> > avoid methods that only exist on the latter.
 > >
-> > Ditto.
+> > Link: https://github.com/Rust-for-Linux/linux/issues/1075
+> > Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+> > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+> > ---
+> >  rust/kernel/drm/device.rs | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
 > >
-> > But more importantly, both Clang 20.1.7 W=1 builds (or at any rate,
-> > builds with -Wtautological-constant-out-of-range-compare), and Smatch
-> > complain that the comparison above is now always true because
-> > E1000_MNG_VLAN_NONE is -1, while old_vid is unsigned.
+> > diff --git a/rust/kernel/drm/device.rs b/rust/kernel/drm/device.rs
+> > index b7ee3c464a12..998b942b6dd8 100644
+> > --- a/rust/kernel/drm/device.rs
+> > +++ b/rust/kernel/drm/device.rs
+> > @@ -83,8 +83,8 @@ impl<T: drm::Driver> Device<T> {
+> >          major: T::INFO.major,
+> >          minor: T::INFO.minor,
+> >          patchlevel: T::INFO.patchlevel,
+> > -        name: T::INFO.name.as_char_ptr().cast_mut(),
+> > -        desc: T::INFO.desc.as_char_ptr().cast_mut(),
+> > +        name: crate::str::as_char_ptr_in_const_context(T::INFO.name).c=
+ast_mut(),
+> > +        desc: crate::str::as_char_ptr_in_const_context(T::INFO.desc).c=
+ast_mut(),
+>
+> Maybe looks slightly cleaner to import this function, not a blocker thoug=
+h.
 
-I'm guessing 'old_vid' is actually u16 (or the compiler knows the
-value came from a u16).
+I don't feel strongly. I think I chose not to import it because of the
+potential for conflicts.
 
-In either case the compiler can 'know' that the condition is always
-true - but a 'u16 old_vid' is promoted to 'signed int' prior to
-the compare with -1, whereas if a 'u32 old_vid' is known to contain
-a 16bit value it is the -1 that is converted to ~0u.
-
-> 
-> You are right - I have missed that E1000_MNG_VLAN_NONE is negative.
-> Therefore (u16)E1000_MNG_VLAN_NONE has a side effect of causing a 
-> wraparound.
-> 
-> It's even more interesting that (inadvertently) I have not made a 
-> similar change in e1000e:
-> 
-> ./drivers/net/ethernet/intel/e1000e/netdev.c:
-> if (adapter->mng_vlan_id != (u16)E1000_MNG_VLAN_NONE) {
-> 
-> 
-> > Perhaps E1000_MNG_VLAN_NONE should be updated to be UINT16_MAX?  
-> 
-> There's no UINT16_MAX in kernel as far as I know. I'd rather leave it as 
-> it was or, if you insist on further refactoring, use either one of:
-> 
-> #define E1000_MNG_VLAN_NONE (u16)(~((u16) 0))
-> mimick ACPI: #define ACPI_UINT16_MAX                 (u16)(~((u16) 0))
-> 
-> #define E1000_MNG_VLAN_NONE ((u16)-1)
-> move the cast into the constant
-> 
-> #define E1000_MNG_VLAN_NONE 0xFFFF
-> use ready-made value
-
-Possibly better is 0xFFFFu.
-Then 'u16 old_val' is first promoted to 'signed int' and then implicitly
-cast to 'unsigned int' prior to the comparison.
-
-Remember C does all maths as [un]signed int (except for types bigger than int).
-Local variables, function parameters and function results should really
-be [un]signed int provided the domain of value doesn't exceed that of int.
-Otherwise the compile is forced to generate explicit instructions to mask
-the result of arithmetic operations to the smaller type.
-
-	David 
-
-> 
-> (parentheses left only due to the constant being "(-1)" and not "-1").
-> 
-
+See also https://github.com/rust-lang/rfcs/pull/3490 which would
+obviate the need for this method.
 
