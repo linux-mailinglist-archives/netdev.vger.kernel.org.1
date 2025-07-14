@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-206830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B750B04773
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 20:39:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 963D6B0478C
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 20:52:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FCF94A6019
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 18:38:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8AC94E101D
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 18:52:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 076A024C060;
-	Mon, 14 Jul 2025 18:39:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22581277807;
+	Mon, 14 Jul 2025 18:52:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="6ZlDIXZh"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hrFQBCcJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252E826FD8E
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 18:39:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8926327703A;
+	Mon, 14 Jul 2025 18:52:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752518361; cv=none; b=TI+Ie1UK+uf2v8PLpHBAMSzE/3qJc+wziuAiqBPfquawnXIN8Wu9NeImT4b8BC+4se/0WrXXXWb4U9mssB33pUfOxgXZX4d4qxXc11oU6TJXu4jkPiLDbwbZMOkEGv5W+wxHvfqrsrT8eE4t0Qf+7q+Ru0Fr0f6uf2LE+4jUZdg=
+	t=1752519151; cv=none; b=o01zQiSgmMnexD+vU5aHeohsHdywTMFNYQAlLMBy3M6EpTOdE9R/xTHIqF6xfs+5+zdeN9p4K6jNXLbb/RmQk7g1nJ1zIcVhCYC/B4cUIPgFfAFCFaKIlkKMPgwT/oNkyA4A8D2/hs2A/LP9jfER9Y/thy3KtxA8RMt3Bd7uUmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752518361; c=relaxed/simple;
-	bh=SubsgNZCCaeG9QVxEyW6Hg20M0b1soMMkVGUNSuhzww=;
+	s=arc-20240116; t=1752519151; c=relaxed/simple;
+	bh=lijElj7CzTGD5PyNhNfpkNy08rng4q72faSFa1O+88I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hLWXnGKBLuZbHKVfU7wR0TOcG/ocsp+m9Zcvs+LKJIPT0ZNU2f0c3At2YPIEuKCA/NxHTMCw+8RT1iYKSt74AkzutGr323yScQM4rJXaNQxFXBSSKjLP5tDuFUSvvXVDJLmvgNjfmgoocAbCKp1vVGePKzOWwB/N4waNSp60D1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=6ZlDIXZh; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=BQpwNpiXZjVfkt5ngGQubFbSprKcXFVrzHDZJQ/CnQlYPHXOa5Vy2sLyOodTH18McUH/pDWahsi3wEeXsZLD5nYD8b2RoF5yuQHEKHv59VrhiLVoWqv31FH3/jmlAWoasLsXKPolh9q4wi0MWySgvk7JuooQ2Szmizm3q5zDUnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hrFQBCcJ; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,24 +36,30 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=VHshUn4Jqsjc36RFvXDqeUrN9tkhjfQpm1zjkj8ZSrk=; b=6ZlDIXZhD2UmKvILONrgZEctz+
-	3bPo9jpQ/hYy+lc/C4aatJppzjAhFZcUq+LZWigfTFhanQxkWf5olK8WVbw40Wl7arvTAaGGwnT+8
-	h7Bb3FxhKW7JAl9//aZyzOqAeK3I/qPIXk2c9w825LWBsQKlBsA5rvFPduqVHRM5S00I=;
+	bh=4mcaPOCXuzcuqrql8CPC5ZiVQE91mo1ELmABGML81qY=; b=hrFQBCcJKrv941KwidwkQk5On0
+	sxEaQxGet6J1wRs/YJC9eALAMFdzcFjE6rM3vHOOOq3smX+wk7XtWc3iet3vCh/bbMQeF6sumdaa9
+	VYBJ3aDVS9J7gemohTr+FBreGj6t76boDpUEJrzYRJQau85/5pr1nPUqFB+Tumsb8JRQ=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1ubO4u-001Uus-IQ; Mon, 14 Jul 2025 20:39:04 +0200
-Date: Mon, 14 Jul 2025 20:39:04 +0200
+	id 1ubOHh-001V2I-Uc; Mon, 14 Jul 2025 20:52:17 +0200
+Date: Mon, 14 Jul 2025 20:52:17 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Alok Tiwari <alok.a.tiwari@oracle.com>
-Cc: sayantan.nandy@airoha.com, lorenzo@kernel.org, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net] net: airoha: fix potential use-after-free in
- airoha_npu_get()
-Message-ID: <555d7fb6-091e-4c10-bfea-85898e644481@lunn.ch>
-References: <20250714175720.3394568-1-alok.a.tiwari@oracle.com>
+To: Matthew Gerlach <matthew.gerlach@altera.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com, dinguyen@kernel.org,
+	maxime.chevallier@bootlin.com, richardcochran@gmail.com,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/4] arm64: dts: socfpga: agilex5: enable gmac2 on the
+ Agilex5 dev kit
+Message-ID: <86e1e04a-3242-482c-adb0-dde7375561c1@lunn.ch>
+References: <20250714152528.311398-1-matthew.gerlach@altera.com>
+ <20250714152528.311398-4-matthew.gerlach@altera.com>
+ <de1e4302-0262-4bcc-b324-49bfc2f5fd11@lunn.ch>
+ <256054d7-351a-4b1c-8e1a-48628ace091d@altera.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,41 +68,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250714175720.3394568-1-alok.a.tiwari@oracle.com>
+In-Reply-To: <256054d7-351a-4b1c-8e1a-48628ace091d@altera.com>
 
-On Mon, Jul 14, 2025 at 10:57:17AM -0700, Alok Tiwari wrote:
-> np->name was being used after calling of_node_put(np), which
-> releases the node and can lead to a use-after-free bug.
-> Store the name in a local variable before releasing the
-> node to avoid potential issues.
+On Mon, Jul 14, 2025 at 11:09:33AM -0700, Matthew Gerlach wrote:
+> 
+> 
+> On 7/14/25 10:25 AM, Andrew Lunn wrote:
+> > > +&gmac2 {
+> > > +	status = "okay";
+> > > +	phy-mode = "rgmii";	/* Delays implemented by the IO ring of the Agilex5 SOCFPGA. */
+> > 
+> > Please could you explain in more details what this means.
+> > 
+> > The normal meaning for 'rgmii' is that the PCB implements the delay. I
+> > just want to fully understand what this IO ring is, and if it is part
+> > of the PCB.
+> 
+> The IO ring is the logic in the Agilex5 that controls the pins on the chip.
+> It is this logic that sits between the MAC IP in the Agilex5 and the pins
+> connected to the PCB that is inserting the necessary delays. Technically the
+> PCB is not implementing the delays, but the "wires" between the MAC and the
+> external pins of the Agilex5 are implementing the delay. It seems to me that
+> "rgmii" is a more accurate description of the hardware than "rgmii-id" in
+> this case.
 
-The description does not match the patch. You are not storing the
-name, you are storing a pointer to the name.
+Is this delay hard coded, physically impossible to be disabled? A
+syntheses option? Can it be changed at run time? Is the IO ring under
+the control of a pinctrl driver? Can i use the standard 'skew-delay'
+DT property to control this delay?
 
-> diff --git a/drivers/net/ethernet/airoha/airoha_npu.c b/drivers/net/ethernet/airoha/airoha_npu.c
-> index 0e5b8c21b9aa8..30cd617232244 100644
-> --- a/drivers/net/ethernet/airoha/airoha_npu.c
-> +++ b/drivers/net/ethernet/airoha/airoha_npu.c
-> @@ -400,11 +400,12 @@ struct airoha_npu *airoha_npu_get(struct device *dev, dma_addr_t *stats_addr)
->  	if (!np)
->  		return ERR_PTR(-ENODEV);
->  
-> +	const char *np_name = np->name;
->  	pdev = of_find_device_by_node(np);
->  	of_node_put(np);
->  
->  	if (!pdev) {
-> -		dev_err(dev, "cannot find device node %s\n", np->name);
-> +		dev_err(dev, "cannot find device node %s\n", np_name);
+For silicon, if the delay cannot be removed, we have MAC drivers masks
+the phy-mode to indicate it has implemented the delay. The MAC driver
+should also return -EINVAL for any other RGMII mode than rgmii-id,
+because that is the only RGMII mode which is possible.
 
-What you don't describe in the commit message is why the pointer to
-the name is valid. After the of_node_put(), the node could be freed,
-and i would assume if the node has gone, the name has gone as well.
+Since this is an FPGA, it is a bit more complex, so i want to fully
+understand what is going on, what the different options are.
 
-I think a better fix for this is to move the of_node_put(np) to later.
-
-    Andrew
-
----
-pw-bot: cr
+	Andrew
 
