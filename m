@@ -1,353 +1,429 @@
-Return-Path: <netdev+bounces-206592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB550B039D7
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 10:49:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55D4CB039E2
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 10:51:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DD9D3BC105
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 08:48:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CAF01883205
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 08:52:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB754242905;
-	Mon, 14 Jul 2025 08:48:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7691226863;
+	Mon, 14 Jul 2025 08:51:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KmA0TrCU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YHIhWMZp"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E296B23C51D
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 08:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E485918D;
+	Mon, 14 Jul 2025 08:51:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752482906; cv=none; b=Q+wsu8dkLhMHeQod/ZY5jOgnXCQSkLVOvsW0aaGiwSSj0MDxfz7n5N4cdjBoYq1gzNLCppGfBsrlqkNGVNEbsR+tLuvBSK68Tg638QtR6anXBRyth+mhkYHXGImj1OHShzVvMbVNW+R0zn3SMBoE+OozxWrz0U1rVIoOIsIkEFU=
+	t=1752483109; cv=none; b=GnKgIk+rTsDl2tjQELCZVS+W8QTl7ARfoNaAABumO/iEI3I55CReIVyjlB401jW+TZNu+q1Qlipp7Md/DYl1Lb/33GDzLe3ulMD/JasE4XNPEcPzZXV+PwSXQG0tS4gnARPTElhgd4XVX0NGsBhQig/hUXFlL3uiD8CmLWXJXAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752482906; c=relaxed/simple;
-	bh=67OXwfrIjNdZfuovonlhsGQCwnlOvoNn6n6bYZ8AC4A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qH1CwfV0I2cwlcdUb0AlSkw8Fu1vAjvQW+smQovY/z8HcIrUHRI4e95eNsl3HEnayRhtPrhUe2sYeZTpAbxdXZhzTFUjV4E5bveLdcbF668TLR4xUIB5APmdi40iARGTL3R2ZpU763eGcowFqVl+EsilN2R/WneI3hk4bMH6FAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KmA0TrCU; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752482904;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HTm6k0I1DKufpkfUAdchZL6z/jAmnCf3r4PKHD7MB2g=;
-	b=KmA0TrCUccsumta3GLPKO5xfUkWA3iSfKCwbhrQHLcqF0drbSETp4jDdQYrToY09xBTlcB
-	zce9zu5IZ4vhQEmoj4tF118yf5V3ZgjO85qsQZVZvhpvn9xjoKH8VG86B36zv3T7af113q
-	1SRcQQ9bskvGQMqiLk1WH4MJCXqFg64=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-76-nmwWT3LmP0qq-ezyp_2aeg-1; Mon,
- 14 Jul 2025 04:48:20 -0400
-X-MC-Unique: nmwWT3LmP0qq-ezyp_2aeg-1
-X-Mimecast-MFC-AGG-ID: nmwWT3LmP0qq-ezyp_2aeg_1752482899
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 86341180120F;
-	Mon, 14 Jul 2025 08:48:19 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.72.112.55])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B01C81803AF2;
-	Mon, 14 Jul 2025 08:48:15 +0000 (UTC)
-From: Jason Wang <jasowang@redhat.com>
-To: mst@redhat.com,
-	jasowang@redhat.com,
-	eperezma@redhat.com
-Cc: kvm@vger.kernel.org,
-	virtualization@lists.linux.dev,
+	s=arc-20240116; t=1752483109; c=relaxed/simple;
+	bh=0bq0K8OfL6M4aPku/VfCBSkagDTz0F+sbz+md0m69d8=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=QvVHOfDoz0ivGVW10ZBJRJb/IfAfndBPrv3r57Zk1dbyo8g/4WgCXYx0nR3F0Uqb8mmvyAIMmYlApt04kbokmDwlHXye+p6nR1MV7mKKZqf8Ro87tEJlZosITaqkf9wtGdFrTNf+rwUXBlIh04vUOKL4NDeYZ2cyG5GbV+vw84o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YHIhWMZp; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-74b54cead6cso2686542b3a.1;
+        Mon, 14 Jul 2025 01:51:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752483107; x=1753087907; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vjcaN3TK1/ipyAXF0Ozg91NsiOrwTAt3igwqT0Oz2yU=;
+        b=YHIhWMZp/DHs8nNagj9U4jBf9KZL2HWgA2cs+gW1keNjzRiZbDRVI3nQf6CA9076ST
+         H7Vc8sAwVm+zExI4Exhb4rcM2AKbE1GhbsPPGWWKvdHhpLi7VnjrYhfptq6oIDp6mI/i
+         IaENOaLpWe+LMJkre3CA/3rehU2EuX70QvVsx/BjXPZKww0DZnKJS1ymzL/5yW+XUpB7
+         npOCrH6xaBotFerSDzPQTeJCGenHAlcjaaroAOiqJ/qfl0OyuKUo8ZLXP01n0rjn2jWD
+         q/IAE7rqv4ecYzFpl8UfX2FSWnLMnFlIgBG8GOIpEspF18dmDD6HzrT+8/W1AC6HTg0d
+         gRTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752483107; x=1753087907;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vjcaN3TK1/ipyAXF0Ozg91NsiOrwTAt3igwqT0Oz2yU=;
+        b=a1f7X+NXoyAOjzHFAztl7xb56gGF2AIeWO2x9t970p6K8vdIQx3QY4Qt/d0+bqnGRV
+         GQzTSvesIOf8mGNFLG9QTz4m+yMAEA0ce+XxfkPXtmb9o/SikFHXCMEABrpsAb02T6W/
+         Zpdc5ImUGWyeqB/32oiYl3rKo6PX7F543uLwi1EFjw44/9SNMf7J94nJ+9c8phEEPL81
+         3Kccj2npqzfeiXhtTa6WWbiUQOg1tIdBiQHtyAtnyAHQD04KR/hqiFup1vyxvyXYOd5k
+         IXwnHOSOKupp/MZQ+076anlPoKrpoH3n4Hx49+QAzVG8j49hDzoQA/1wucW1mqZEkvBr
+         uSTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUJtkz4nMNXDgmq6kH82YgJqoiEFZCwTK/1obepcB8TtTDsLpWYGri+ge4L6UPEH1caKY0TcyzUx61ydB8=@vger.kernel.org, AJvYcCUTUPUGWORSFqQx+fHhzoiofG2NTwoGhoVuiwxyuBZeteD0znUj15M6e1gKGZslr9Sn6P3TUQlj@vger.kernel.org, AJvYcCVzF9+obct164S1zwN0wFK0gIXzagOUjYT6C/+LOp7j6PfAjLUzAnUcmLB9w2L8S5/CitKY7NBsc93L@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFTQ6c8vu/L3xwlKQ+WoPr9iByzNbbkgjhLz3cNc8OPhZAN6iH
+	QRD9ouuR4tm40Su3MIZjIsYM3J54sDox1D1IAbx92ynyaQlsG/s1Ntk0
+X-Gm-Gg: ASbGncvhF9nq0sTQMADIRrDstfRjRty0y8L9A+wQp3m4bIThHad1g9y7z+mwwQSk+/U
+	FdUAjwnuOgBvWB49t9HhfNBvp/FKg6sVVAqmOE1I91T8DpxKFO+SigZ4l4fX5pUVh8uMZiuf+5s
+	dFDPXeE4cUvQsbFhqhMQonZki2sQMntwRsJmcEwB4+en90cliujqHLUaz9DoFfh1V7DKaDsiWpV
+	DaoCK8zEd1dm6qxL4RdzKqmWtfldBkVEmSc/pQj389orKzYbE+fFvzPzmrAatwedYxrpzX50e0B
+	86gsOFkFTPpvTwDjY4ltOG2pzLb9Rjfe7WtH8hGYebCyfZlhz0wl6VYEgA0mmvjnO2jbbADjyDX
+	fS2aIAlCiXTIaTZMx
+X-Google-Smtp-Source: AGHT+IGko9sPPq3tXLjmbCsU5NO6smqzZADUbzSqc4BdMPjej/nHJb87Y3cnK2TKEX4mxx3ILkMxPQ==
+X-Received: by 2002:a05:6a21:398f:b0:21c:f778:6736 with SMTP id adf61e73a8af0-2312030f117mr21623496637.27.1752483107014;
+        Mon, 14 Jul 2025 01:51:47 -0700 (PDT)
+Received: from gmail.com ([116.237.168.226])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b3bbe6c5660sm9571052a12.48.2025.07.14.01.51.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Jul 2025 01:51:43 -0700 (PDT)
+From: Qingfang Deng <dqfext@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-ppp@vger.kernel.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	jonah.palmer@oracle.com
-Subject: [PATCH net-next V2 3/3] vhost_net: basic in_order support
-Date: Mon, 14 Jul 2025 16:47:55 +0800
-Message-ID: <20250714084755.11921-4-jasowang@redhat.com>
-In-Reply-To: <20250714084755.11921-1-jasowang@redhat.com>
-References: <20250714084755.11921-1-jasowang@redhat.com>
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH net-next] ppp: remove rwlock usage
+Date: Mon, 14 Jul 2025 16:51:38 +0800
+Message-ID: <20250714085139.2220182-1-dqfext@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-This patch introduces basic in-order support for vhost-net. By
-recording the number of batched buffers in an array when calling
-`vhost_add_used_and_signal_n()`, we can reduce the number of userspace
-accesses. Note that the vhost-net batching logic is kept as we still
-count the number of buffers there.
+In struct channel, the upl lock is implemented using rwlock_t,
+protecting access to pch->ppp and pch->bridge.
 
-Testing Results:
+As previously discussed on the list, using rwlock in the network fast
+path is not recommended.
+This patch replaces the rwlock with a spinlock for writers, and uses RCU
+for readers.
 
-With testpmd:
+- pch->ppp and pch->bridge are now declared as __rcu pointers.
+- Readers use rcu_dereference_bh() under rcu_read_lock_bh().
+- Writers use spin_lock_bh() to update, followed by synchronize_rcu()
+  where required.
 
-- TX: txonly mode + vhost_net with XDP_DROP on TAP shows a 17.5%
-  improvement, from 4.75 Mpps to 5.35 Mpps.
-- RX: No obvious improvements were observed.
-
-With virtio-ring in-order experimental code in the guest:
-
-- TX: pktgen in the guest + XDP_DROP on TAP shows a 19% improvement,
-  from 5.2 Mpps to 6.2 Mpps.
-- RX: pktgen on TAP with vhost_net + XDP_DROP in the guest achieves a
-  6.1% improvement, from 3.47 Mpps to 3.61 Mpps.
-
-Acked-by: Jonah Palmer <jonah.palmer@oracle.com>
-Acked-by: Eugenio Pérez <eperezma@redhat.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
+Signed-off-by: Qingfang Deng <dqfext@gmail.com>
 ---
- drivers/vhost/net.c | 86 ++++++++++++++++++++++++++++++++-------------
- 1 file changed, 61 insertions(+), 25 deletions(-)
+ drivers/net/ppp/ppp_generic.c | 121 ++++++++++++++++++----------------
+ 1 file changed, 65 insertions(+), 56 deletions(-)
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 2199ba3b191e..b44778d1e580 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -74,7 +74,8 @@ enum {
- 			 (1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
- 			 (1ULL << VIRTIO_NET_F_MRG_RXBUF) |
- 			 (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
--			 (1ULL << VIRTIO_F_RING_RESET)
-+			 (1ULL << VIRTIO_F_RING_RESET) |
-+			 (1ULL << VIRTIO_F_IN_ORDER)
- };
+diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
+index 4cf9d1822a83..bfa60a03ee4a 100644
+--- a/drivers/net/ppp/ppp_generic.c
++++ b/drivers/net/ppp/ppp_generic.c
+@@ -173,11 +173,11 @@ struct channel {
+ 	struct ppp_channel *chan;	/* public channel data structure */
+ 	struct rw_semaphore chan_sem;	/* protects `chan' during chan ioctl */
+ 	spinlock_t	downl;		/* protects `chan', file.xq dequeue */
+-	struct ppp	*ppp;		/* ppp unit we're connected to */
++	struct ppp __rcu *ppp;		/* ppp unit we're connected to */
+ 	struct net	*chan_net;	/* the net channel belongs to */
+ 	netns_tracker	ns_tracker;
+ 	struct list_head clist;		/* link in list of channels per unit */
+-	rwlock_t	upl;		/* protects `ppp' and 'bridge' */
++	spinlock_t	upl;		/* protects `ppp' and 'bridge' */
+ 	struct channel __rcu *bridge;	/* "bridged" ppp channel */
+ #ifdef CONFIG_PPP_MULTILINK
+ 	u8		avail;		/* flag used in multilink stuff */
+@@ -639,34 +639,34 @@ static struct bpf_prog *compat_ppp_get_filter(struct sock_fprog32 __user *p)
+  */
+ static int ppp_bridge_channels(struct channel *pch, struct channel *pchb)
+ {
+-	write_lock_bh(&pch->upl);
+-	if (pch->ppp ||
++	spin_lock_bh(&pch->upl);
++	if (rcu_dereference_protected(pch->ppp, lockdep_is_held(&pch->upl)) ||
+ 	    rcu_dereference_protected(pch->bridge, lockdep_is_held(&pch->upl))) {
+-		write_unlock_bh(&pch->upl);
++		spin_unlock_bh(&pch->upl);
+ 		return -EALREADY;
+ 	}
+ 	refcount_inc(&pchb->file.refcnt);
+ 	rcu_assign_pointer(pch->bridge, pchb);
+-	write_unlock_bh(&pch->upl);
++	spin_unlock_bh(&pch->upl);
  
- enum {
-@@ -450,7 +451,8 @@ static int vhost_net_enable_vq(struct vhost_net *n,
- 	return vhost_poll_start(poll, sock->file);
+-	write_lock_bh(&pchb->upl);
+-	if (pchb->ppp ||
++	spin_lock_bh(&pchb->upl);
++	if (rcu_dereference_protected(pchb->ppp, lockdep_is_held(&pch->upl)) ||
+ 	    rcu_dereference_protected(pchb->bridge, lockdep_is_held(&pchb->upl))) {
+-		write_unlock_bh(&pchb->upl);
++		spin_unlock_bh(&pchb->upl);
+ 		goto err_unset;
+ 	}
+ 	refcount_inc(&pch->file.refcnt);
+ 	rcu_assign_pointer(pchb->bridge, pch);
+-	write_unlock_bh(&pchb->upl);
++	spin_unlock_bh(&pchb->upl);
+ 
+ 	return 0;
+ 
+ err_unset:
+-	write_lock_bh(&pch->upl);
++	spin_lock_bh(&pch->upl);
+ 	/* Re-read pch->bridge with upl held in case it was modified concurrently */
+ 	pchb = rcu_dereference_protected(pch->bridge, lockdep_is_held(&pch->upl));
+ 	RCU_INIT_POINTER(pch->bridge, NULL);
+-	write_unlock_bh(&pch->upl);
++	spin_unlock_bh(&pch->upl);
+ 	synchronize_rcu();
+ 
+ 	if (pchb)
+@@ -680,25 +680,25 @@ static int ppp_unbridge_channels(struct channel *pch)
+ {
+ 	struct channel *pchb, *pchbb;
+ 
+-	write_lock_bh(&pch->upl);
++	spin_lock_bh(&pch->upl);
+ 	pchb = rcu_dereference_protected(pch->bridge, lockdep_is_held(&pch->upl));
+ 	if (!pchb) {
+-		write_unlock_bh(&pch->upl);
++		spin_unlock_bh(&pch->upl);
+ 		return -EINVAL;
+ 	}
+ 	RCU_INIT_POINTER(pch->bridge, NULL);
+-	write_unlock_bh(&pch->upl);
++	spin_unlock_bh(&pch->upl);
+ 
+ 	/* Only modify pchb if phcb->bridge points back to pch.
+ 	 * If not, it implies that there has been a race unbridging (and possibly
+ 	 * even rebridging) pchb.  We should leave pchb alone to avoid either a
+ 	 * refcount underflow, or breaking another established bridge instance.
+ 	 */
+-	write_lock_bh(&pchb->upl);
++	spin_lock_bh(&pchb->upl);
+ 	pchbb = rcu_dereference_protected(pchb->bridge, lockdep_is_held(&pchb->upl));
+ 	if (pchbb == pch)
+ 		RCU_INIT_POINTER(pchb->bridge, NULL);
+-	write_unlock_bh(&pchb->upl);
++	spin_unlock_bh(&pchb->upl);
+ 
+ 	synchronize_rcu();
+ 
+@@ -2139,10 +2139,9 @@ static int ppp_mp_explode(struct ppp *ppp, struct sk_buff *skb)
+ #endif /* CONFIG_PPP_MULTILINK */
+ 
+ /* Try to send data out on a channel */
+-static void __ppp_channel_push(struct channel *pch)
++static void __ppp_channel_push(struct channel *pch, struct ppp *ppp)
+ {
+ 	struct sk_buff *skb;
+-	struct ppp *ppp;
+ 
+ 	spin_lock(&pch->downl);
+ 	if (pch->chan) {
+@@ -2161,7 +2160,6 @@ static void __ppp_channel_push(struct channel *pch)
+ 	spin_unlock(&pch->downl);
+ 	/* see if there is anything from the attached unit to be sent */
+ 	if (skb_queue_empty(&pch->file.xq)) {
+-		ppp = pch->ppp;
+ 		if (ppp)
+ 			__ppp_xmit_process(ppp, NULL);
+ 	}
+@@ -2169,15 +2167,18 @@ static void __ppp_channel_push(struct channel *pch)
+ 
+ static void ppp_channel_push(struct channel *pch)
+ {
+-	read_lock_bh(&pch->upl);
+-	if (pch->ppp) {
+-		(*this_cpu_ptr(pch->ppp->xmit_recursion))++;
+-		__ppp_channel_push(pch);
+-		(*this_cpu_ptr(pch->ppp->xmit_recursion))--;
++	struct ppp *ppp;
++
++	rcu_read_lock_bh();
++	ppp = rcu_dereference_bh(pch->ppp);
++	if (ppp) {
++		(*this_cpu_ptr(ppp->xmit_recursion))++;
++		__ppp_channel_push(pch, ppp);
++		(*this_cpu_ptr(ppp->xmit_recursion))--;
+ 	} else {
+-		__ppp_channel_push(pch);
++		__ppp_channel_push(pch, NULL);
+ 	}
+-	read_unlock_bh(&pch->upl);
++	rcu_read_unlock_bh();
  }
  
--static void vhost_net_signal_used(struct vhost_net_virtqueue *nvq)
-+static void vhost_net_signal_used(struct vhost_net_virtqueue *nvq,
-+				  unsigned int count)
+ /*
+@@ -2279,6 +2280,7 @@ void
+ ppp_input(struct ppp_channel *chan, struct sk_buff *skb)
  {
- 	struct vhost_virtqueue *vq = &nvq->vq;
- 	struct vhost_dev *dev = vq->dev;
-@@ -458,8 +460,8 @@ static void vhost_net_signal_used(struct vhost_net_virtqueue *nvq)
- 	if (!nvq->done_idx)
+ 	struct channel *pch = chan->ppp;
++	struct ppp *ppp;
+ 	int proto;
+ 
+ 	if (!pch) {
+@@ -2290,18 +2292,19 @@ ppp_input(struct ppp_channel *chan, struct sk_buff *skb)
+ 	if (ppp_channel_bridge_input(pch, skb))
  		return;
  
--	vhost_add_used_and_signal_n(dev, vq, vq->heads, NULL,
--				    nvq->done_idx);
-+	vhost_add_used_and_signal_n(dev, vq, vq->heads,
-+				    vq->nheads, count);
- 	nvq->done_idx = 0;
- }
- 
-@@ -468,6 +470,8 @@ static void vhost_tx_batch(struct vhost_net *net,
- 			   struct socket *sock,
- 			   struct msghdr *msghdr)
- {
-+	struct vhost_virtqueue *vq = &nvq->vq;
-+	bool in_order = vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
- 	struct tun_msg_ctl ctl = {
- 		.type = TUN_MSG_PTR,
- 		.num = nvq->batched_xdp,
-@@ -475,6 +479,11 @@ static void vhost_tx_batch(struct vhost_net *net,
- 	};
- 	int i, err;
- 
-+	if (in_order) {
-+		vq->heads[0].len = 0;
-+		vq->nheads[0] = nvq->done_idx;
-+	}
-+
- 	if (nvq->batched_xdp == 0)
- 		goto signal_used;
- 
-@@ -496,7 +505,7 @@ static void vhost_tx_batch(struct vhost_net *net,
+-	read_lock_bh(&pch->upl);
++	rcu_read_lock_bh();
++	ppp = rcu_dereference_bh(pch->ppp);
+ 	if (!ppp_decompress_proto(skb)) {
+ 		kfree_skb(skb);
+-		if (pch->ppp) {
+-			++pch->ppp->dev->stats.rx_length_errors;
+-			ppp_receive_error(pch->ppp);
++		if (ppp) {
++			++ppp->dev->stats.rx_length_errors;
++			ppp_receive_error(ppp);
+ 		}
+ 		goto done;
  	}
  
- signal_used:
--	vhost_net_signal_used(nvq);
-+	vhost_net_signal_used(nvq, in_order ? 1 : nvq->done_idx);
- 	nvq->batched_xdp = 0;
- }
+ 	proto = PPP_PROTO(skb);
+-	if (!pch->ppp || proto >= 0xc000 || proto == PPP_CCPFRAG) {
++	if (!ppp || proto >= 0xc000 || proto == PPP_CCPFRAG) {
+ 		/* put it on the channel queue */
+ 		skb_queue_tail(&pch->file.rq, skb);
+ 		/* drop old frames if queue too long */
+@@ -2310,11 +2313,11 @@ ppp_input(struct ppp_channel *chan, struct sk_buff *skb)
+ 			kfree_skb(skb);
+ 		wake_up_interruptible(&pch->file.rwait);
+ 	} else {
+-		ppp_do_recv(pch->ppp, skb, pch);
++		ppp_do_recv(ppp, skb, pch);
+ 	}
  
-@@ -750,6 +759,7 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
- 	int sent_pkts = 0;
- 	bool sock_can_batch = (sock->sk->sk_sndbuf == INT_MAX);
- 	bool busyloop_intr;
-+	bool in_order = vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
- 
- 	do {
- 		busyloop_intr = false;
-@@ -786,11 +796,13 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
- 				break;
- 			}
- 
--			/* We can't build XDP buff, go for single
--			 * packet path but let's flush batched
--			 * packets.
--			 */
--			vhost_tx_batch(net, nvq, sock, &msg);
-+			if (nvq->batched_xdp) {
-+				/* We can't build XDP buff, go for single
-+				 * packet path but let's flush batched
-+				 * packets.
-+				 */
-+				vhost_tx_batch(net, nvq, sock, &msg);
-+			}
- 			msg.msg_control = NULL;
- 		} else {
- 			if (tx_can_batch(vq, total_len))
-@@ -811,8 +823,12 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
- 			pr_debug("Truncated TX packet: len %d != %zd\n",
- 				 err, len);
  done:
--		vq->heads[nvq->done_idx].id = cpu_to_vhost32(vq, head);
--		vq->heads[nvq->done_idx].len = 0;
-+		if (in_order) {
-+			vq->heads[0].id = cpu_to_vhost32(vq, head);
-+		} else {
-+			vq->heads[nvq->done_idx].id = cpu_to_vhost32(vq, head);
-+			vq->heads[nvq->done_idx].len = 0;
-+		}
- 		++nvq->done_idx;
- 	} while (likely(!vhost_exceeds_weight(vq, ++sent_pkts, total_len)));
- 
-@@ -991,7 +1007,7 @@ static int peek_head_len(struct vhost_net_virtqueue *rvq, struct sock *sk)
+-	read_unlock_bh(&pch->upl);
++	rcu_read_unlock_bh();
  }
  
- static int vhost_net_rx_peek_head_len(struct vhost_net *net, struct sock *sk,
--				      bool *busyloop_intr)
-+				      bool *busyloop_intr, unsigned int count)
+ /* Put a 0-length skb in the receive queue as an error indication */
+@@ -2323,20 +2326,22 @@ ppp_input_error(struct ppp_channel *chan, int code)
  {
- 	struct vhost_net_virtqueue *rnvq = &net->vqs[VHOST_NET_VQ_RX];
- 	struct vhost_net_virtqueue *tnvq = &net->vqs[VHOST_NET_VQ_TX];
-@@ -1001,7 +1017,7 @@ static int vhost_net_rx_peek_head_len(struct vhost_net *net, struct sock *sk,
+ 	struct channel *pch = chan->ppp;
+ 	struct sk_buff *skb;
++	struct ppp *ppp;
  
- 	if (!len && rvq->busyloop_timeout) {
- 		/* Flush batched heads first */
--		vhost_net_signal_used(rnvq);
-+		vhost_net_signal_used(rnvq, count);
- 		/* Both tx vq and rx socket were polled here */
- 		vhost_net_busy_poll(net, rvq, tvq, busyloop_intr, true);
+ 	if (!pch)
+ 		return;
  
-@@ -1013,7 +1029,7 @@ static int vhost_net_rx_peek_head_len(struct vhost_net *net, struct sock *sk,
- 
- /* This is a multi-buffer version of vhost_get_desc, that works if
-  *	vq has read descriptors only.
-- * @vq		- the relevant virtqueue
-+ * @nvq		- the relevant vhost_net virtqueue
-  * @datalen	- data length we'll be reading
-  * @iovcount	- returned count of io vectors we fill
-  * @log		- vhost log
-@@ -1021,14 +1037,17 @@ static int vhost_net_rx_peek_head_len(struct vhost_net *net, struct sock *sk,
-  * @quota       - headcount quota, 1 for big buffer
-  *	returns number of buffer heads allocated, negative on error
-  */
--static int get_rx_bufs(struct vhost_virtqueue *vq,
-+static int get_rx_bufs(struct vhost_net_virtqueue *nvq,
- 		       struct vring_used_elem *heads,
-+		       u16 *nheads,
- 		       int datalen,
- 		       unsigned *iovcount,
- 		       struct vhost_log *log,
- 		       unsigned *log_num,
- 		       unsigned int quota)
- {
-+	struct vhost_virtqueue *vq = &nvq->vq;
-+	bool in_order = vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
- 	unsigned int out, in;
- 	int seg = 0;
- 	int headcount = 0;
-@@ -1065,14 +1084,16 @@ static int get_rx_bufs(struct vhost_virtqueue *vq,
- 			nlogs += *log_num;
- 			log += *log_num;
+-	read_lock_bh(&pch->upl);
+-	if (pch->ppp) {
++	rcu_read_lock_bh();
++	ppp = rcu_dereference_bh(pch->ppp);
++	if (ppp) {
+ 		skb = alloc_skb(0, GFP_ATOMIC);
+ 		if (skb) {
+ 			skb->len = 0;		/* probably unnecessary */
+ 			skb->cb[0] = code;
+-			ppp_do_recv(pch->ppp, skb, pch);
++			ppp_do_recv(ppp, skb, pch);
  		}
--		heads[headcount].id = cpu_to_vhost32(vq, d);
- 		len = iov_length(vq->iov + seg, in);
--		heads[headcount].len = cpu_to_vhost32(vq, len);
--		datalen -= len;
-+		if (!in_order) {
-+			heads[headcount].id = cpu_to_vhost32(vq, d);
-+			heads[headcount].len = cpu_to_vhost32(vq, len);
-+		}
- 		++headcount;
-+		datalen -= len;
- 		seg += in;
  	}
--	heads[headcount - 1].len = cpu_to_vhost32(vq, len + datalen);
-+
- 	*iovcount = seg;
- 	if (unlikely(log))
- 		*log_num = nlogs;
-@@ -1082,6 +1103,15 @@ static int get_rx_bufs(struct vhost_virtqueue *vq,
- 		r = UIO_MAXIOV + 1;
- 		goto err;
- 	}
-+
-+	if (!in_order)
-+		heads[headcount - 1].len = cpu_to_vhost32(vq, len + datalen);
-+	else {
-+		heads[0].len = cpu_to_vhost32(vq, len + datalen);
-+		heads[0].id = cpu_to_vhost32(vq, d);
-+		nheads[0] = headcount;
-+	}
-+
- 	return headcount;
- err:
- 	vhost_discard_vq_desc(vq, headcount);
-@@ -1094,6 +1124,8 @@ static void handle_rx(struct vhost_net *net)
- {
- 	struct vhost_net_virtqueue *nvq = &net->vqs[VHOST_NET_VQ_RX];
- 	struct vhost_virtqueue *vq = &nvq->vq;
-+	bool in_order = vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
-+	unsigned int count = 0;
- 	unsigned in, log;
- 	struct vhost_log *vq_log;
- 	struct msghdr msg = {
-@@ -1141,12 +1173,13 @@ static void handle_rx(struct vhost_net *net)
- 
- 	do {
- 		sock_len = vhost_net_rx_peek_head_len(net, sock->sk,
--						      &busyloop_intr);
-+						      &busyloop_intr, count);
- 		if (!sock_len)
- 			break;
- 		sock_len += sock_hlen;
- 		vhost_len = sock_len + vhost_hlen;
--		headcount = get_rx_bufs(vq, vq->heads + nvq->done_idx,
-+		headcount = get_rx_bufs(nvq, vq->heads + count,
-+					vq->nheads + count,
- 					vhost_len, &in, vq_log, &log,
- 					likely(mergeable) ? UIO_MAXIOV : 1);
- 		/* On error, stop handling until the next kick. */
-@@ -1222,8 +1255,11 @@ static void handle_rx(struct vhost_net *net)
- 			goto out;
- 		}
- 		nvq->done_idx += headcount;
--		if (nvq->done_idx > VHOST_NET_BATCH)
--			vhost_net_signal_used(nvq);
-+		count += in_order ? 1 : headcount;
-+		if (nvq->done_idx > VHOST_NET_BATCH) {
-+			vhost_net_signal_used(nvq, count);
-+			count = 0;
-+		}
- 		if (unlikely(vq_log))
- 			vhost_log_write(vq, vq_log, log, vhost_len,
- 					vq->iov, in);
-@@ -1235,7 +1271,7 @@ static void handle_rx(struct vhost_net *net)
- 	else if (!sock_len)
- 		vhost_net_enable_vq(net, vq);
- out:
--	vhost_net_signal_used(nvq);
-+	vhost_net_signal_used(nvq, count);
- 	mutex_unlock(&vq->mutex);
+-	read_unlock_bh(&pch->upl);
++	rcu_read_unlock_bh();
  }
  
+ /*
+@@ -2884,7 +2889,6 @@ int ppp_register_net_channel(struct net *net, struct ppp_channel *chan)
+ 
+ 	pn = ppp_pernet(net);
+ 
+-	pch->ppp = NULL;
+ 	pch->chan = chan;
+ 	pch->chan_net = get_net_track(net, &pch->ns_tracker, GFP_KERNEL);
+ 	chan->ppp = pch;
+@@ -2895,7 +2899,7 @@ int ppp_register_net_channel(struct net *net, struct ppp_channel *chan)
+ #endif /* CONFIG_PPP_MULTILINK */
+ 	init_rwsem(&pch->chan_sem);
+ 	spin_lock_init(&pch->downl);
+-	rwlock_init(&pch->upl);
++	spin_lock_init(&pch->upl);
+ 
+ 	spin_lock_bh(&pn->all_channels_lock);
+ 	pch->file.index = ++pn->last_channel_index;
+@@ -2924,13 +2928,15 @@ int ppp_channel_index(struct ppp_channel *chan)
+ int ppp_unit_number(struct ppp_channel *chan)
+ {
+ 	struct channel *pch = chan->ppp;
++	struct ppp *ppp;
+ 	int unit = -1;
+ 
+ 	if (pch) {
+-		read_lock_bh(&pch->upl);
+-		if (pch->ppp)
+-			unit = pch->ppp->file.index;
+-		read_unlock_bh(&pch->upl);
++		rcu_read_lock_bh();
++		ppp = rcu_dereference_bh(pch->ppp);
++		if (ppp)
++			unit = ppp->file.index;
++		rcu_read_unlock_bh();
+ 	}
+ 	return unit;
+ }
+@@ -2942,12 +2948,14 @@ char *ppp_dev_name(struct ppp_channel *chan)
+ {
+ 	struct channel *pch = chan->ppp;
+ 	char *name = NULL;
++	struct ppp *ppp;
+ 
+ 	if (pch) {
+-		read_lock_bh(&pch->upl);
+-		if (pch->ppp && pch->ppp->dev)
+-			name = pch->ppp->dev->name;
+-		read_unlock_bh(&pch->upl);
++		rcu_read_lock_bh();
++		ppp = rcu_dereference_bh(pch->ppp);
++		if (ppp && ppp->dev)
++			name = ppp->dev->name;
++		rcu_read_unlock_bh();
+ 	}
+ 	return name;
+ }
+@@ -3470,9 +3478,9 @@ ppp_connect_channel(struct channel *pch, int unit)
+ 	ppp = ppp_find_unit(pn, unit);
+ 	if (!ppp)
+ 		goto out;
+-	write_lock_bh(&pch->upl);
++	spin_lock_bh(&pch->upl);
+ 	ret = -EINVAL;
+-	if (pch->ppp ||
++	if (rcu_dereference_protected(pch->ppp, lockdep_is_held(&pch->upl)) ||
+ 	    rcu_dereference_protected(pch->bridge, lockdep_is_held(&pch->upl)))
+ 		goto outl;
+ 
+@@ -3497,13 +3505,13 @@ ppp_connect_channel(struct channel *pch, int unit)
+ 		ppp->dev->hard_header_len = hdrlen;
+ 	list_add_tail(&pch->clist, &ppp->channels);
+ 	++ppp->n_channels;
+-	pch->ppp = ppp;
++	rcu_assign_pointer(pch->ppp, ppp);
+ 	refcount_inc(&ppp->file.refcnt);
+ 	ppp_unlock(ppp);
+ 	ret = 0;
+ 
+  outl:
+-	write_unlock_bh(&pch->upl);
++	spin_unlock_bh(&pch->upl);
+  out:
+ 	mutex_unlock(&pn->all_ppp_mutex);
+ 	return ret;
+@@ -3518,10 +3526,11 @@ ppp_disconnect_channel(struct channel *pch)
+ 	struct ppp *ppp;
+ 	int err = -EINVAL;
+ 
+-	write_lock_bh(&pch->upl);
+-	ppp = pch->ppp;
+-	pch->ppp = NULL;
+-	write_unlock_bh(&pch->upl);
++	spin_lock_bh(&pch->upl);
++	ppp = rcu_replace_pointer(pch->ppp, NULL, lockdep_is_held(&pch->upl));
++	spin_unlock_bh(&pch->upl);
++	synchronize_rcu();
++
+ 	if (ppp) {
+ 		/* remove it from the ppp unit's list */
+ 		ppp_lock(ppp);
 -- 
-2.39.5
+2.43.0
 
 
