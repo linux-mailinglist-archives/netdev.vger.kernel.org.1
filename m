@@ -1,224 +1,192 @@
-Return-Path: <netdev+bounces-206487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62467B0345B
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 04:08:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E61D2B0345F
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 04:13:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA9513B9667
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 02:08:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E72A21899764
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 02:14:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B014A1C2DB2;
-	Mon, 14 Jul 2025 02:08:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="DkSkfVGa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BACF1C6FE9;
+	Mon, 14 Jul 2025 02:13:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from OS8PR02CU002.outbound.protection.outlook.com (mail-japanwestazon11012024.outbound.protection.outlook.com [40.107.75.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1F5C17B50A;
-	Mon, 14 Jul 2025 02:08:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.75.24
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752458923; cv=fail; b=KJu6wndyWSOhArvcppiafdeicCTSTwPDHfkvEaWhfE8Fj3bewLlRn5pWMIVqeBZNn/O5BiKrBAkhtDsIfk7djaiSKXg3c7BrkIQi7mEn3JvNY5j+3p2TxmdqfhhIg0NvQToymVQBbOdEADW3J3e7ZhowgJBMlelZmhQT/qMI6V4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752458923; c=relaxed/simple;
-	bh=DMKF/V5kkSQc8lvchbA9ardd2pFqUKSZoceoziESo7Y=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=f20qi3mDZXn4WKycFvPWvUMb2rvOrkHNHGoAzvjewkuGXUBJUhHPHj+GEFOVnrWEzHM1/6352Sq2KOsHxnA+UBPwnm3/1TKCh+GwFmhJVjARrWM2BpW+gtN6E577E6prFdQ1Pdx1sxkMglyZcgeLR++MVZ619l11agIBVtt1fAU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=DkSkfVGa; arc=fail smtp.client-ip=40.107.75.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LorPiXsv16DftY3Xh2yOgwhkw1ZPaHEPKMjGEv3P+cSuHrze98P+8mZHupbGaXfsjn+QwXqaEoVNEV1HBghmw9rrcIScPy/d7pOfBD8eAqHXslUMr0Lm6y6hIqVH6OrmzEsfGIwt5MsM09a/kw208KZEf+9Ly0VoX/qm7+XsplHo0pUI0q9BkU0f+hXoFMRlM8bRPMVr17W35pV8KnhIlD6KNIwbZR2cJhrlRm4gAEXsFou8ru9NoWwYHpTUbDHxEThOQ3aJMbmXWjJWBmyoEygWM9SfPmXgXzuEBjF5Txad5BDwtRqiJ06QOIiUTw9A+4Qog+s8hcU92/RFo6feOQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=p4bLiKCllBmBb3HM9Aa4NuuVZQmRRrSWo9BCiELIJPU=;
- b=NtBK6z395Bnbac8ut17K5NsaFhw+gF35NQF/m2BCJq/lIn4Q7ay6gi4Gq8pEgo4TEgnhQ0UgREwo6SheE9G2Cjv3lmhi702mt+GeidyCn3RbMnucXmpaIkagdsjO6fTI2mixFrrk8yOlSzNcxpcat751SqZLsfEa6WbnqJVFEyeqoDWRJnOJ6fvrg+ChMpSm9ARa/YrziPjLpWFCMfnlCU12PhS6ci0LtJSWH7pwmmz4rSIDxBX4VZbbnRi2QpZieLuY+J62JwZ/+YFj1Cg4VcK3phQvJnZDJ7IbkvJnAwJ+4S7eUo0vht/IgsMsbAcihKdSX82Jc2NbR3gpmMtEPw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=p4bLiKCllBmBb3HM9Aa4NuuVZQmRRrSWo9BCiELIJPU=;
- b=DkSkfVGaKKqNZ+yPerYXhry/YIApf5pITMHmH10PXe9XhityEUsu2mwjtjGYnZ1k/YsivXMgJAVgn7LC013s9HD7zGY99WJRPHttwJgVTksIL/t4zjWgq1HJQ0xu7PWQWLkdtl+lZFSYVfxsVHsF8C0pZJnK/mp2EFlBbuMLCNgL1prTj+VmeApunG0hB7arEXQfYvvP+kqRJL6Lo5HPU4j/eR01uP+puKB6j9s+d7fy6a2taMQeZB1SLAW/tCwD4vyKqqBIMCWjtWfzSo0YT5FQOCKuNmd1teFLEcyf4tZMgej1XXHr2Os2EnrQ4XGdPRrsORn4u85YK3CN5tdsWA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from SI2PR06MB5140.apcprd06.prod.outlook.com (2603:1096:4:1af::9) by
- PS1PPF80815FF87.apcprd06.prod.outlook.com (2603:1096:308::259) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8901.35; Mon, 14 Jul 2025 02:08:38 +0000
-Received: from SI2PR06MB5140.apcprd06.prod.outlook.com
- ([fe80::468a:88be:bec:666]) by SI2PR06MB5140.apcprd06.prod.outlook.com
- ([fe80::468a:88be:bec:666%4]) with mapi id 15.20.8880.024; Mon, 14 Jul 2025
- 02:08:38 +0000
-Message-ID: <d4652bc5-766b-436e-b207-49cf9838bf95@vivo.com>
-Date: Mon, 14 Jul 2025 10:08:24 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/12] net: Use min()/max() to improve code
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Potnuri Bharat Teja <bharat@chelsio.com>,
- Veerasenareddy Burru <vburru@marvell.com>, Sathesh Edara
- <sedara@marvell.com>, Louis Peens <louis.peens@corigine.com>,
- Shahed Shaikh <shshaikh@marvell.com>, Manish Chopra <manishc@marvell.com>,
- "maintainer:QLOGIC QLCNIC (1/10)Gb ETHERNET DRIVER"
- <GR-Linux-NIC-Dev@marvell.com>, Jiri Slaby <jirislaby@kernel.org>,
- Nick Kossifidis <mickflemm@gmail.com>, Luis Chamberlain <mcgrof@kernel.org>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
- Arend van Spriel <arend.vanspriel@broadcom.com>,
- Brian Norris <briannorris@chromium.org>,
- Francesco Dolcini <francesco@dolcini.it>,
- Ajay Singh <ajay.kathat@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, Ping-Ke Shih
- <pkshih@realtek.com>, Kees Cook <kees@kernel.org>,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- Kory Maincent <kory.maincent@bootlin.com>,
- Aleksander Jan Bajkowski <olek2@wp.pl>,
- Lucas Sanchez Sagrado <lucsansag@gmail.com>, Philipp Hahn
- <phahn-oss@avm.de>, Eric Biggers <ebiggers@google.com>,
- Hayes Wang <hayeswang@realtek.com>, Wentao Liang <vulab@iscas.ac.cn>,
- Johannes Berg <johannes.berg@intel.com>,
- Sai Krishna <saikrishnag@marvell.com>, Jacobe Zang <jacobe.zang@wesion.com>,
- Dmitry Antipov <dmantipov@yandex.ru>, Kalle Valo <kvalo@kernel.org>,
- Sascha Hauer <s.hauer@pengutronix.de>, David Lin <yu-hao.lin@nxp.com>,
- Aditya Kumar Singh <quic_adisi@quicinc.com>,
- Roopni Devanathan <quic_rdevanat@quicinc.com>,
- Dan Carpenter <dan.carpenter@linaro.org>, Marek Vasut <marex@denx.de>,
- =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
- Arnd Bergmann <arnd@arndb.de>,
- "open list:CAVIUM LIQUIDIO NETWORK DRIVER" <netdev@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>,
- "open list:NETRONOME ETHERNET DRIVERS" <oss-drivers@corigine.com>,
- "open list:USB NETWORKING DRIVERS" <linux-usb@vger.kernel.org>,
- "open list:ATHEROS ATH5K WIRELESS DRIVER" <linux-wireless@vger.kernel.org>,
- "open list:BROADCOM BRCM80211 IEEE802.11 WIRELESS DRIVERS"
- <brcm80211@lists.linux.dev>,
- "open list:BROADCOM BRCM80211 IEEE802.11 WIRELESS DRIVERS"
- <brcm80211-dev-list.pdl@broadcom.com>
-References: <20250709022210.304030-1-rongqianfeng@vivo.com>
- <20250710175921.09212fab@kernel.org>
-From: Qianfeng Rong <rongqianfeng@vivo.com>
-In-Reply-To: <20250710175921.09212fab@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: TYAPR01CA0059.jpnprd01.prod.outlook.com
- (2603:1096:404:2b::23) To SI2PR06MB5140.apcprd06.prod.outlook.com
- (2603:1096:4:1af::9)
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C82A10A1E;
+	Mon, 14 Jul 2025 02:13:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752459225; cv=none; b=aFvy9LvndyaKihHoZqwl7I3FTSHlw1TeiHTRZgl67ZE+DvRuoGYEfK1DTAdYPKjEHqXMSZ5P+0hLeBfckdtWXAfpUoDrqsZ5a06vGUUKcCARj7zuvUgLV3/jTOKqPFavFVH9tdXldt/V1ehKMCwQXte3C6gZNPTnkgAPdSdulDk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752459225; c=relaxed/simple;
+	bh=sdjr8AbPHXdRJMjgbFlVdtF0CEhEbkJzwj0cN1MLk6U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UNsCYVTZ8+nUlEeAs6TQ96WHzbnOkTNJ9PSWfPWaZ/VaZ+oA1X7Fby75BfMYsfCltH03HBaitLg9gnAQRhU0nz63YO7ux0fFYjk707PsjeRZZ/gCkxlV0Pd9YHhIh//QL9BPntl+4/w9mUuAtMuo09P1W/ProoMoDCCxfgYkqWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-669ff7000002311f-8e-687467cf8f8f
+Date: Mon, 14 Jul 2025 11:13:30 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: willy@infradead.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	kernel_team@skhynix.com, kuba@kernel.org, almasrymina@google.com,
+	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
+	akpm@linux-foundation.org, davem@davemloft.net,
+	john.fastabend@gmail.com, andrew+netdev@lunn.ch, toke@redhat.com,
+	tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com,
+	saeedm@nvidia.com, leon@kernel.org, ast@kernel.org,
+	daniel@iogearbox.net, david@redhat.com, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+	surenb@google.com, mhocko@suse.com, horms@kernel.org,
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+	vishal.moola@gmail.com, hannes@cmpxchg.org, ziy@nvidia.com,
+	jackmanb@google.com
+Subject: Re: [PATCH net-next v9 8/8] mt76: use netmem descriptor and APIs for
+ page pool
+Message-ID: <20250714021330.GA9457@system.software.com>
+References: <20250710082807.27402-1-byungchul@sk.com>
+ <20250710082807.27402-9-byungchul@sk.com>
+ <a21b340d-6d0f-4d39-906e-e983564605ed@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SI2PR06MB5140:EE_|PS1PPF80815FF87:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3a51257c-ce0a-48e6-2e80-08ddc27b588f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?MWxXK1B4VGowUzRPekZBZk1GaVorNUZHM2xHSEc3ZjF1eVNlRmZkSGpiNEY5?=
- =?utf-8?B?VEJCQjNKNzRsWDlYSml1ZjFWYkFhT0pjK0dKM3pvMTBCR20xcjRQWTR5a3h3?=
- =?utf-8?B?ZG1YUVBkNVNMSmZmRUFoSDVNQkdpNm9BeSttYlhwL28zQmhVcXRsZjhqZXBH?=
- =?utf-8?B?eGVBNUp3eGYzOGRpUUw2ME52Sm1KWUIzUTR6YmdOKzgvd3hTNkxyRkJrK2hk?=
- =?utf-8?B?SGhhRVVOK0tab2hPd2pYNmhPa001Wm5XM0xLOGJPZkpFY0hQMi9URlJLYVNa?=
- =?utf-8?B?L1lOT1FESjRucXFzckJ2MzVacW9Hd3dRaGF0N3IwWDBGdC9LRDg4SzZNUWpI?=
- =?utf-8?B?Y2tzd0c3NW5IZzlWa09TdjdyZXRWSE83b3dMaUxqVlBoMlBsZ3NRZEd5aDda?=
- =?utf-8?B?d1RsNUxnMlhibWp2amNOWFBKNmU0SUEyNk5XdXE3NGs1aldiaktDYWxNSHlH?=
- =?utf-8?B?U0ZvWE00ODVabGlXYmV4Rlo1VTMwaTZUZm9wcW8xR0lZQzBzb0VJVVp4Ukor?=
- =?utf-8?B?a3d6SmlhZHNwd2IyVi9ac29ZNXhOMjlsOVhoeGtnSnZOdWVRNFBabUVLaERp?=
- =?utf-8?B?UlUrelFDampnZG1rQlR4aUI2WWxFcm5kT3Zlc3d3NjZkajN4TlgrbFZPNFlN?=
- =?utf-8?B?dlVsZG5HTWRXeTBFOUFiZUUzODZId2tIU2ZOMGcvVjJwL0R0WHQ1VlpUeGRi?=
- =?utf-8?B?bFMzVElLUHZjRVlHblVHb0ZCZVczRU9kcUVkVHJGcDE2N0l0Yk9Oc2lhUmtr?=
- =?utf-8?B?WVhYUzhLcGxrNkpTcE1VMEFyQ1kzclcyczJUNHB2dWV6WkhodjVuc0VQWXFW?=
- =?utf-8?B?b3NRTXpYM2pKWlFiMndRdUh3TVBjaW5xTURzMXJVR2tZTjVsRy9QTGR4MEl6?=
- =?utf-8?B?cEtzcmlZSlNlTkFyMDBTS2dYaUZxcVNEQUE3TVhXb21DOWtNcjFVbUJYdWxD?=
- =?utf-8?B?N0FqNzZ4U1ZiN1VHM1lGWUwzZTdvcHBBZ2FXaTRFMTA4aWtxYmNJZjBBZnFL?=
- =?utf-8?B?bDd2YjVjTXVrKzVKbGloL0d3ZWIyWVMyV1FCUEl2N2RUdWh5TkpjdjVGcHFB?=
- =?utf-8?B?WEloYjBGWEpmZXpMSHJweTdXRWJoeU5IM2VtODhodWVrTCthK0wvQWE5VTkv?=
- =?utf-8?B?QzNoUkJlaXBCRXdjdGRGejRTTkFQdVVyWFMvQWZNZ29QZ2JyUFZON2VENDZa?=
- =?utf-8?B?TXJXU0o1TDNBR0lKVkh1MVVrbzlkbnlKVTBEK2pKQ3RHTDcyWFdpNnVUOFB4?=
- =?utf-8?B?djk4enI5WE9nM0QzdmIvZEh2dVBXb3FMb1VUbURTMHhQVDZqcjhQbmM5cWFG?=
- =?utf-8?B?bEw4UzhFZFE1OHVBaGR5eGhoTktFRVYzejd6SGs3RzU3UW1zMFdlYitxdktG?=
- =?utf-8?B?bHBGMjFleWR4dEp6VS93bUhpSURRUGs2dW5qeG9ENHd2M0hwT0F2ZG5rZkp6?=
- =?utf-8?B?Y1pSalAxQmV5bXBuNmRtWlREQXRUR0R3M0FFUHJxdXJnSmJGcXlyTWJsNGhX?=
- =?utf-8?B?d2N1QjJwR2V5MHFDeWYzNE9yK0szWmVaeGtqVnE4WGpsUGt1bUtwczhCQ2RE?=
- =?utf-8?B?TGNEMmZsakJEemM3ODVUU2prSGRKQzlseEVqaTZMTkFTcmFaekFaMlVTbjJ6?=
- =?utf-8?B?TGNFcENLSWNBak11bm9aTSsrR1dWdkZFVDRhU1lyWWNhSS9FaStpdG8xSmZI?=
- =?utf-8?B?cTlVM2ZJTjlFNGtreStyTkMzRkVScmJ6R3FZeVdDV0lpczA5dGNWeWlOVlBa?=
- =?utf-8?B?OFVpTTBwRW11VGpEMEdxY1p3a25IY2JnRVk4THZuL1g0dmlZeGVVbHQvNXZC?=
- =?utf-8?B?UHJ0amxpeXBaNjZlS0sxMEFveUdEN0hCdnpjOXZRWTRlTlNGc0FJT0dmQ1RK?=
- =?utf-8?B?TmZrQUp6NlZ3ZGtGWXB1MWJycWhGaUhHaGNicittZ0kwRm1NdmM1TStDd1B4?=
- =?utf-8?Q?c7ylH0duMrI=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SI2PR06MB5140.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?UDQwTXh2dHNqZnc2MjJiWTlMNFNJUU52TjdsOHQxeFJxYTBOOVBESGFVWjBH?=
- =?utf-8?B?M2Nwa0RRYTZ2M09LOUZLVWhid3g2b3RwZjl0N2poM2pyZUxkNGVabTVJa0Zr?=
- =?utf-8?B?SG9YU3ZmMWFsSmpqeEt3SXNGZERKQUhrVlNzOW10RUZ6cXpibzVySEhHV2Q2?=
- =?utf-8?B?WGdlajlWSWNlQ1VwNHIxam15MmxJZjNtM1B3aWpiR2NWaythZFdJWC9lMU8v?=
- =?utf-8?B?cHRNZ2NaSE1UWlpQZXVQN1h5M2JWdnZLTFdRMXpkWTJIcXdGb1N1TXRnc3Fh?=
- =?utf-8?B?ekxYSm84cktFaUNrRldoQzAxenFhdndyK2swZUl4RG91a2pUUWtGV3J0V2VG?=
- =?utf-8?B?OUF5Q1d3bmpCRzJ1bE8zUHYxci9pVG5TcDA1UDdrS3ZGRFJQZGhqTHg3ZkpR?=
- =?utf-8?B?Unc0ZURFcitwbFJXdVd1YTczTXJpY0kxbzh3dUNRN3VEMXhHTy9McWlpbEFE?=
- =?utf-8?B?WDRUdURoOGY5RmJKd0czOXdpMUdycFh0SWZvcnZvTmczditleFJoc1lvclZy?=
- =?utf-8?B?Zkl6ZSsyQWVkcTNpemRvOTRIb3FLSllHaG9ZQlJGMTZ0OGwyZGxucmxJSkFU?=
- =?utf-8?B?NzdMenF6bzlNTlYvYjZQbUhsVElSVE5zeWNEbEdhekFhZkdLZ3lsNmk4emZX?=
- =?utf-8?B?RVNCYjNvVzRtTzhYWDIxOTVwQ2xqakFmNklFbUgySUN5dEFIZG1seXBlaFZr?=
- =?utf-8?B?ZWp0UWpWNE9QKzhkYytIQ0dlNVMzdTRDR2NlVVlvUzVsVWlSa0xPb210dTlx?=
- =?utf-8?B?VTR6QnBkanBWbU1DdmpuSzZnVjBGSWlVaEdveFhzZVRmbDdjVUM1TFFyYmJV?=
- =?utf-8?B?MTFhUE1Cc0o3ZGdQWHNSSXA2WUNSL0Npc20xQTdnL3hmaXNuOUhSaVM4a0d6?=
- =?utf-8?B?MTVLSzB0L0pEeGpnN2dGV3lDWDArNGZyNVg1R3lPSThITVZCMGFDYjB3Qmhi?=
- =?utf-8?B?SXlZSjdQVGtObTRvdHVEYVY0clhEMFZLcGxOWXhPRlE1OXB5VWhyNTEvNmN2?=
- =?utf-8?B?aGNsbDBQTW91SHkxaWF2UCtNa1gzOXRGaFdDT2lTY2tGbGhqbnZ4Q3V0Mm0x?=
- =?utf-8?B?ZWxEZXNMTHFwb0p6a0dPL2xKN0NMeUJkcC8wK0JuY1c3eVg2WUdtaEFCelZk?=
- =?utf-8?B?VGRuaEdPTVBrcENnVkt1MmtNSDNNUFNINDhUUzlhTWwzaUFYdUxxTnV2SUpj?=
- =?utf-8?B?c0plU0taRlpQMkt2NWF5eEQzMEs1UFZoQ3hhOUc1THFXREhPZ1ZGSGlKb0o3?=
- =?utf-8?B?MHZNVGsxWmdTaUJGNm4rbDR1UWkwMGxzQlRvb2JaT2xESndXOEdwRVVJU1or?=
- =?utf-8?B?Nk5xK3pxY3FwRmx1bmR5MUR4dkJQZmp3SEkwUmVFL1JCcUpuUjVkaGhSYjgv?=
- =?utf-8?B?c0liODYrQWYvaU02Sm5semd0VWVyeFF3RENuL1NOaGo2Sjd0MGxJRkVIUnF4?=
- =?utf-8?B?VzZJcittRWF1VlRNNktqc2RGRjRSdWx0dWpza0laWnBYUGo2NWJ6akZrcEZ4?=
- =?utf-8?B?UUlqMDIvK0l1ckw0Vi9neGZkL3k1YzY2TTF3aFVrMGFOWURwWm9CTndIdU5p?=
- =?utf-8?B?a2xzMU82VmJaMC9HUzQxdlhXRSt3cTl4WmE1b0dtKytpL29RM0RLWXFlNktE?=
- =?utf-8?B?TFZtWkQybGVRMkt2QXZERHdzVFEwVUxOL2ZlS2M4LzhYcDdWYXJTbjV3N1dS?=
- =?utf-8?B?LzJlMVAram93K0wrRGcvOWhsbkY0Tmd0NlkzRXF1VTdQOFB1OVBFZnl4dFBa?=
- =?utf-8?B?L3hvVGd4NFB2MXdVQ29icDBLU0NuR0h4djA1MEQxNlg3K2ZvbXdRQVczNVJB?=
- =?utf-8?B?ZFVGWlJsZ05zWklqdktpZG11cGQ5NUZBaGRlS2JLajdDNFFWb2c3Yko1S1BN?=
- =?utf-8?B?UVNUSmNWK0NsUzZpei93QXl0Z0tuRmFrWUQ0NHBGZXZjblI3UUNQL0N6b2x3?=
- =?utf-8?B?UDRHZjZWejNwM2x6amRyWk5tWU5HUkhPTEc2dDhkNWRMcUpLVmlITlZsOS9C?=
- =?utf-8?B?VGo0ZXlwM3lZZDVuZm03cGZmbUNKc2M5a1M0dEZwcURuRzB5b2czaFNlTm9C?=
- =?utf-8?B?d2d4Qmc4bzk4UFNIcVh5MEoyRlJOdHQ1NWFpeW5NSTQxVnRvdm04UzBtTnVw?=
- =?utf-8?Q?7exFwiiWYEYaE7iNrR9L3LTea?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3a51257c-ce0a-48e6-2e80-08ddc27b588f
-X-MS-Exchange-CrossTenant-AuthSource: SI2PR06MB5140.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2025 02:08:38.2992
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LnqCgY2TUe6u/AOG/bQmKf8U4B+EDVgPFUCyEbvXwTmVPv7JI7mKE3ONNZH5kgTdyZz8L+mT6qCbWJTnGcBp3w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PS1PPF80815FF87
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a21b340d-6d0f-4d39-906e-e983564605ed@gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa1BMYRjHvXvOnnPa7DhW6lXGZUlk5NaMJyOTD40XY5jhi3xgR4fdaVvN
+	bvdxWWpEo5j4UFvYRJctlpXaQqMVyrWJtKHbpiQpiqabS1tj+Pab5/9/fvN8eDhKliH25FSa
+	SEGrUajljISWfJl6eVntgUjlimvNCLLMRQwUDsVCXqtVDFmmEgTfh9+xMFD1mIGc7EEKsl4m
+	0vDDPEJBxyMHC4WWrdCS20nD3aRSChxnqhlISRyl4N5wLwvHrfkiqC1JFcP5kasUlOpbWXhV
+	nsVAc9FvMXTaUmioMRTQ0JIaBI+M7jD4tAdBlblUBIOnLzBwrs7IQHtiC4K6Bw4aMo+lIjBX
+	2MUwOjTuyHzYzAYtJA96+ihSXNAoImWGJpYYLVHkVr4vSbbXUcRiOsUQS38aS96/ucuQ6vRR
+	mpRZB0QkJaGXId863tKkr6KeIebiepo8M1ax26eHSNaFCmpVtKBdvn6vRHn8eSUT8XpubKK+
+	HelRqXsycuEw749fJ1xh//Kd6qEJpnlvbNR3TzDD+2C7fZhyshu/FH9usI3PJRzFpzP4elsu
+	k4w4bga/Czc92+/sSPk1uLq+Czk7Mv48wslWBz0ZTMc1GR8mmOJ9sf3XJ5Fzl+K9cN4vzoku
+	fCC2OQKdjZn8Any/5LHIqcG8lcNPLt6kJ++chSvz7fRZxBv+sxr+sxr+WY2IMiGZShMdrlCp
+	/f2UcRpVrN++g+EWNP4wuYfHdltRf+0OG+I5JJ8qtRfrlDKxIloXF25DmKPkbtLuJq1SJg1V
+	xMUL2oN7tFFqQWdDXhwt95CuGowJlfEHFJFCmCBECNq/qYhz8dQj9wbr2HOfkCXBdbcbHbM3
+	p30ME7d1viyessLk1S8+dETnikxkzibDtFu+OVsW/5y3PcKYVNOnTlkfYN7qPSO4vi/9JKmM
+	vDhwLa/CpXdvT9eT95qjlwIWsdskMcFp5bSxfG1mwfwNjV9X+2ekvrihYb8pZVUbPczxwonA
+	bHZnlOuonNYpFSt9Ka1O8QeU2HghLAMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTcRjG+Z9zds7ZanBaZqc7rUSytIKiF8owBP1TGSFFVB9y1NENdYtN
+	TYVg1UKStJuBTa0ToalJs2U6y6TmbXbB8pLL1NVMyRSnZeYtyxVR3348z/N7P70sqZiiFrMa
+	bYKg16rilLSMku3ZeiawKSZBveGLJwhyLSU03BlPhtvvbRLILS5HMDrxjoGvtQ003Lo5RkJu
+	k4mCb5ZJEnrr3QzcsUaAq6CPgqq0ChLcFxw0ZJimSHg8McTAaVshATV5jRJ4VZ4pgazJfBIq
+	jO8ZaHmYS0N3yU8J9NkzKGg0F1HgygyBetEXxp4PIqi1VBAwdj6PhivNIg09JheC5ho3BTmn
+	MhFYqp0SmBqfvZFT182E+OGaQQ+Jy4reErjS3MVg0ZqI7xcG4HRnM4mtxedobP1ymcGdb6po
+	7MieonCl7SuBM84M0Xikt4PCnuo2Gt/6NExgS1kbtVdxSLbtmBCnSRL067dHydSnXz6lj7eu
+	SDYZe5ARVfimIynLc5v4R45xxssU58eLxs+/meb8eadzgvSyD7eWH2i3z+YyluSyaf7uhwI6
+	HbHsfO4g3/Ui2ruRc1t4R9sn5N0ouCzEp9vc1J9iHt947eNvJrkA3jnTT3hdklvC355hvSjl
+	gnm7O9i7WMCt4p+UNxAXkdz8n2z+Tzb/k0VEFiMfjTYpXqWJ2xxkiFWnaDXJQUd18VY0+xIF
+	J6cv2dBoS7gdcSxSzpU7ywxqhUSVZEiJtyOeJZU+8s9derVCfkyVkirodUf0iXGCwY6WsJRy
+	oXznASFKwcWoEoRYQTgu6P+2BCtdbESpTQP+fpuWtkg7RmJcujqZ1hgcOiw6voeF+ZRFPDsc
+	aFGueX31xrpCfmhXRmt+5PfUHQ9gOn5/Wni/Z/lKyyJqjuIbUSLFoyJ3NjqzvlSn3R3aV+ks
+	Ku1K9IS2nvC006Yw3+sTy87u8zA6deePe6Wr5w1FsmLiTGT4E9E17a+kDGrVxgBSb1D9Amgj
+	fDUOAwAA
+X-CFilter-Loop: Reflected
 
+On Sat, Jul 12, 2025 at 03:22:17PM +0100, Pavel Begunkov wrote:
+> On 7/10/25 09:28, Byungchul Park wrote:
+> > To simplify struct page, the effort to separate its own descriptor from
+> > struct page is required and the work for page pool is on going.
+> > 
+> > Use netmem descriptor and APIs for page pool in mt76 code.
+> > 
+> > Signed-off-by: Byungchul Park <byungchul@sk.com>
+> > Reviewed-by: Mina Almasry <almasrymina@google.com>
+> > ---
+> ...>   static inline void mt76_set_tx_blocked(struct mt76_dev *dev, bool blocked)
+> > diff --git a/drivers/net/wireless/mediatek/mt76/sdio_txrx.c b/drivers/net/wireless/mediatek/mt76/sdio_txrx.c
+> > index 0a927a7313a6..b1d89b6f663d 100644
+> > --- a/drivers/net/wireless/mediatek/mt76/sdio_txrx.c
+> > +++ b/drivers/net/wireless/mediatek/mt76/sdio_txrx.c
+> > @@ -68,14 +68,14 @@ mt76s_build_rx_skb(void *data, int data_len, int buf_len)
+> > 
+> >       skb_put_data(skb, data, len);
+> >       if (data_len > len) {
+> > -             struct page *page;
+> > +             netmem_ref netmem;
+> > 
+> >               data += len;
+> > -             page = virt_to_head_page(data);
+> > -             skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags,
+> > -                             page, data - page_address(page),
+> > -                             data_len - len, buf_len);
+> > -             get_page(page);
+> > +             netmem = virt_to_head_netmem(data);
+> > +             skb_add_rx_frag_netmem(skb, skb_shinfo(skb)->nr_frags,
+> > +                                    netmem, data - netmem_address(netmem),
+> > +                                    data_len - len, buf_len);
+> > +             get_netmem(netmem);
+> >       }
+> > 
+> >       return skb;
+> > @@ -88,7 +88,7 @@ mt76s_rx_run_queue(struct mt76_dev *dev, enum mt76_rxq_id qid,
+> >       struct mt76_queue *q = &dev->q_rx[qid];
+> >       struct mt76_sdio *sdio = &dev->sdio;
+> >       int len = 0, err, i;
+> > -     struct page *page;
+> > +     netmem_ref netmem;
+> >       u8 *buf, *end;
+> > 
+> >       for (i = 0; i < intr->rx.num[qid]; i++)
+> > @@ -100,11 +100,11 @@ mt76s_rx_run_queue(struct mt76_dev *dev, enum mt76_rxq_id qid,
+> >       if (len > sdio->func->cur_blksize)
+> >               len = roundup(len, sdio->func->cur_blksize);
+> > 
+> > -     page = __dev_alloc_pages(GFP_KERNEL, get_order(len));
+> > -     if (!page)
+> > +     netmem = page_to_netmem(__dev_alloc_pages(GFP_KERNEL, get_order(len)));
+> > +     if (!netmem)
+> >               return -ENOMEM;
+> > 
+> > -     buf = page_address(page);
+> > +     buf = netmem_address(netmem);
+> 
+> We shouldn't just blindly convert everything to netmem just for the purpose
+> of creating a type casting hell. It's allocating a page, and continues to
+> use it as a page, e.g. netmem_address() will fail otherwise. So just leave
+> it to be a page, and convert it to netmem and the very last moment when
+> the api expects a netmem. There are likely many chunks like that.
 
-在 2025/7/11 8:59, Jakub Kicinski 写道:
-> On Wed,  9 Jul 2025 10:21:28 +0800 Qianfeng Rong wrote:
->> Use min() to reduce the code and improve its readability.
->>
->> No functional changes.
-> For net/ethernet/ this is not worth the churn, sorry.
+Thanks for the feedback.
 
-Never mind, thanks for your reply.
+Unon reconsideration, focusing on the conversion between page and
+netmem_desc, plus small modification on user side code e.i. driver are
+sufficient to achieve my objectives.  I won't change a lot on user side
+code like this from the next spin.
 
-Best regards,
-Qianfeng
+	Byungchul
 
+> > 
+> >       sdio_claim_host(sdio->func);
+> >       err = sdio_readsb(sdio->func, buf, MCR_WRDR(qid), len);
+> > @@ -112,7 +112,7 @@ mt76s_rx_run_queue(struct mt76_dev *dev, enum mt76_rxq_id qid,
+> > 
+> >       if (err < 0) {
+> >               dev_err(dev->dev, "sdio read data failed:%d\n", err);
+> > -             put_page(page);
+> > +             put_netmem(netmem);
+> >               return err;
+> >       }
+> > 
+> > @@ -140,7 +140,7 @@ mt76s_rx_run_queue(struct mt76_dev *dev, enum mt76_rxq_id qid,
+> >               }
+> >               buf += round_up(len + 4, 4);
+> >       }
+> > -     put_page(page);
+> > +     put_netmem(netmem);
+> > 
+> >       spin_lock_bh(&q->lock);
+> >       q->head = (q->head + i) % q->ndesc;
+> --
+> Pavel Begunkov
 
