@@ -1,164 +1,110 @@
-Return-Path: <netdev+bounces-206496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7B7EB0349D
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 04:46:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 923BAB034A3
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 04:49:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 107DB3AAA38
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 02:46:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69F1A1898ED3
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 02:50:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E2578F54;
-	Mon, 14 Jul 2025 02:46:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Pruja2CJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8121978F54;
+	Mon, 14 Jul 2025 02:49:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D668EDDC5;
-	Mon, 14 Jul 2025 02:46:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A21D1448E3
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 02:49:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752461213; cv=none; b=dimXMv+TiGGcNfD8oJn1/hg61YecAVcyQikAjCbqy3Kc9Iw6mrl4X4JeI1WKyiucesSJKLCBYCLOX8dIOOL0bMqI9JBSPHOM8bH/7WIrgWO7vg8UVIgkv9PdIFsm5lbPQN6+rJ+/9b0aMVWW+AJFgf9SqMKQ858wP8WpPFJdozI=
+	t=1752461383; cv=none; b=GXPlDDNx+2WGgx7vFLSfkzUKO6mEPifOUG+tUKEXef/zxL6le557NAzN+n2b8idIUFPQytIVhdUXmO6/FA5eMfJBB3wQhXeeZj7hdiukNai3jZ4q6iZ2A7SBDFbyDzIYmQas74Hoh6+eRQqFQOIHGqTUwErDh07U9G9HrBw4lPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752461213; c=relaxed/simple;
-	bh=6jVlByuyw2bTejNgVlSpF2RAfEYJ8+KaVDGnkIsYty4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Un7+DXf0Rvmg5QCsOBSpLCZLFUuCY4Q4jUaawhNQONE6FiWX5g6Vw6yaK3C05W5DvTFaGbbc+xzHRxShLkpF/QYKijAEryOiZeXAdpEMPPCh+cKaLMdQjM0BJg7f90n/8DxArzfWOLnbzpg97TvYlEd8FL3vM68totNJXkqFDU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Pruja2CJ; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56DNHoVl026978;
-	Mon, 14 Jul 2025 02:46:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=JWfYSI
-	G6I7rVkluKLLqWpmYdSnPexiUt7de1+X95vKU=; b=Pruja2CJxc0MnzqChhVvb/
-	ZuA53oYN8peSUHjiCHeInFHueTQpDbHTSd7OQ3CYjsG8BHes8NMFh4s366qdCszp
-	Nb1CD3FCCKOuOKL1okfjOMFlxFxgq+XXbJjB3WjEbbeZWdIka3bbak7Sb8S4UE3e
-	zAADUvZo3c4Tm+GpsC69QMJs57gFMIDfoEtQTwnwdzBe+5n3hWLF/4MDMhHM63AB
-	LKn5krCLIRNwz1tDHYvz7Q4Q4vM4rQ68xOnEalyOH3cOhxOUV6IkawIP9St61OjK
-	hSx7USa+CGm3PP7boyyt0G3gT6sOkSPs4XIzkx+JLWVvaMk6u2tjbkhIgqJ+hrwQ
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47uf7cq8dv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 14 Jul 2025 02:46:39 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 56E2kcuA015642;
-	Mon, 14 Jul 2025 02:46:38 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47uf7cq8cr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 14 Jul 2025 02:46:38 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56DMcLsE031903;
-	Mon, 14 Jul 2025 02:46:06 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 47v21tv6ms-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 14 Jul 2025 02:46:06 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56E2k5aP12649174
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 14 Jul 2025 02:46:05 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 668A35805B;
-	Mon, 14 Jul 2025 02:46:05 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 48DF758055;
-	Mon, 14 Jul 2025 02:46:00 +0000 (GMT)
-Received: from [9.39.29.80] (unknown [9.39.29.80])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 14 Jul 2025 02:45:59 +0000 (GMT)
-Message-ID: <926d9ce3-04fc-4055-b5e5-fda8772e3da8@linux.ibm.com>
-Date: Mon, 14 Jul 2025 08:15:58 +0530
+	s=arc-20240116; t=1752461383; c=relaxed/simple;
+	bh=Wm803i2f63O+l4rwwTM+bCWk+h3wMSdAfjMloCkfoLA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VFpb3+5pTjogpfJ/5lFGNXnCNI7X0+lOvi864EYxKE5wN9RGHq1lf1taF1vXHawcQoTufMbuMFqlrnuUFe5WIQHrb8/Fnxm1uQivYJaGbfBdchZ5ykrbLcOfS6eSAWwuyKRkQ5NTx3pQn2t8+dxEEecmdVLgVyOWouBi3sLPFB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.169.211.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: esmtpgz11t1752461292ta9229bb1
+X-QQ-Originating-IP: 2GnXr+EB/qDKQuS5X9XpYJiSAFHQ92HxF8sEZDuh4XI=
+Received: from lap-jiawenwu.trustnetic.com ( [125.118.253.137])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 14 Jul 2025 10:48:09 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 14934807709353301416
+EX-QQ-RecipientCnt: 11
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: netdev@vger.kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	michal.kubiak@intel.com
+Cc: mengyuanlou@net-swift.com,
+	duanqiangwen@net-swift.com,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net v2 0/3] Fix Rx fatal errors
+Date: Mon, 14 Jul 2025 10:47:52 +0800
+Message-Id: <20250714024755.17512-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/3] ioctl numbers list cleanup for
- papr-physical-attestation.h
-To: Bagas Sanjaya <bagasdotme@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Documentation <linux-doc@vger.kernel.org>,
-        Linux PowerPC <linuxppc-dev@lists.ozlabs.org>,
-        Linux Networking <netdev@vger.kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Haren Myneni <haren@linux.ibm.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Donnellan <ajd@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nathan Lynch <nathanl@linux.ibm.com>
-References: <20250714015711.14525-1-bagasdotme@gmail.com>
-Content-Language: en-US
-From: Madhavan Srinivasan <maddy@linux.ibm.com>
-In-Reply-To: <20250714015711.14525-1-bagasdotme@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: txyLKlAusqD86jgsu6Jhws2pezSwcL-B
-X-Authority-Analysis: v=2.4 cv=LoGSymdc c=1 sm=1 tr=0 ts=68746f8f cx=c_pps a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=pGLkceISAAAA:8 a=VnNF1IyMAAAA:8 a=k9sf4av91IVL3TbTha8A:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: ejVelwgNTWVw-bzXUfSzhnsqVssm4XJi
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE0MDAxNCBTYWx0ZWRfX+49B4kjAte+2 bQC1hgd9dbASOcQGSUWS4i3BCc1CuWkDPqzZLX3g6bkS6joh/jI/tW7kIQpY5FkhHAPSEl5xZdV dolDM6K8gieG3MO7X97M7PFWAybp1Qe1mPpYRUBlW/7ninEmnYYQ8C0fBG9zo8aqmUZJHbXBo6W
- Ef+2nyugMp0AZ/BfylMX+50UiU+pIHWmNoEX2dzvWNYc5plpiVpQa2HrAvz1sYoK0j14/HHfEey ZiF+Po351nfTNx6KELqBCYCQUNl9AhBkPJUPxUEVpW3EaJuRIAGZC+OhPZ90ZUP7bw9vZLaZm3g 8jen2oe1g/fTktvOqVzN4nOSwMr+2vrRxpQiAnOtDw4Hknk308uMn9x5H3JpMvawNNBTASb5rRW
- pWQEm1lN7V7CDpFISPrKa1t/uq5KwmI/4AoaCY+qnH5QgJ3lbV2o1EHhPMPc3ObOD6phaHFh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-14_01,2025-07-09_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- lowpriorityscore=0 spamscore=0 malwarescore=0 impostorscore=0
- clxscore=1011 phishscore=0 mlxlogscore=999 priorityscore=1501
- suspectscore=0 mlxscore=0 adultscore=0 classifier=spam authscore=0
- authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505280000 definitions=main-2507140014
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: OPyRvWmxDTDeI1qX3TgwVNWqfC+lHV/1zqGGksazTiA9IxwBk0MYKO7c
+	4a6lQlOldTe6dO76YqRkfEWu+ERTHPlh/tfDkEG9vcUGxPkhMCmbyisLWC1fbFcD6Y1fUVe
+	YJXxYf8rEOUgxVRMpZCmp7tQHp/JYGLFtyKgkJnFY9cda1l12I4m+oem7DWX2kCjSW7l06V
+	nzUAUYnVbvAH6P4QpZb2JQAsMVXeE9YYaJS0J8pmAfVgCCKVnkAqNalrxtx5gc7XzZ/vBoV
+	5vlo8/ssvBdhrK0GDuooFzKHRvYu79hoqobE9TtgF7/GaeQKBJ50Y0ewEbBToJQxKoMVbVo
+	wvlWiJsqJCPDffKl/+AcJFDuHBAskki5rAir5RwRMOLDhI6gKKLlwVRzfqWJxnWH+gBKQiC
+	PpI2QNgvCajZ/aDcm+zUze/w7sZVqf7mpxlOOtQRHTl4qA8O43an8iJQT5hM4xPmWFvT/Gf
+	zA6rs2rlekxN1UlTgmmpqnSBYeYBTVhh/1yD3cA/bQqT7FhxCXitahdmmyla94NjKCVLoXO
+	uZLUVofnrTEirEDDkx/Nd3zkohApLmo0SUuq1V0RlwV3FV1qmzEGwmGg31h527v6lrUG68b
+	NaE2gf90D20gjhJbc32mqS5Yi5byOqSGCQEHQTAj9dhUs/C1QsvLO6k48/bsPh2ryJkK8qo
+	hAYuqjJEdvvOGeDXWa8RjEox7vWy6j5+lfJ9sk8zW0Ag4Jsmjm4YXy7xbCNUPLLTVfon4CN
+	xLpxmr8l8UD1oizLnzi2ZPbZS46LqN/qOemgfs6EjgMcwoEvQw6eou/ib0OxFW6JcymtbZQ
+	0QUh85M9t0n8MiTONS6HFueqBQLizgejGuo4qHwGtZu4+y8/W6gMQtsCJ4ZMSYKRmT0gbWi
+	4cz9DDGdtl+ZpEVRB3ALqQlkaZGuZfUA66MOgzNXhPh4IksKIYJd8CRM5L7507+1M5CtCc6
+	bvw+e9UAfbOtyf09tNMC8ubZerzX1bH5Gm60YEHh7IQWeK7HWsomNvwqODZ2Ktmj13IB/2G
+	OrzniXqiQ9+BbgzS1hH3njxLD15dadgypRnvSaKCvHvAjEeHuN81k608jmqRA3RlL1YEYzv
+	JVwKUmJmO32PqWoY/P9qFZ2CjNtEyqGUzm0FrSkHgfuN2kJ100Ww7U=
+X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+X-QQ-RECHKSPAM: 0
 
+There are some fatal errors on the Rx NAPI path, which can cause the
+kernel to crash. Fix known issues and potential risks.
 
+The part of the patches has been mentioned before[1].
 
-On 7/14/25 7:27 AM, Bagas Sanjaya wrote:
-> Hi,
-> 
-> This is the cleanup series following up from 03c9d1a5a30d93 ("Documentation:
-> Fix description format for powerpc RTAS ioctls"). It is based on docs-next
-> tree. The end result should be the same as my previous fixup patch [1].
-> 
-> Enjoy!
-> 
+[1]: https://lore.kernel.org/all/C8A23A11DB646E60+20250630094102.22265-1-jiawenwu@trustnetic.com/
 
-for powerpc changes
-Acked-by: Madhavan Srinivasan <maddy@linux.ibm.com>
+Change logs in v2:
+- link to v1: https://lore.kernel.org/all/20250709064025.19436-1-jiawenwu@trustnetic.com/
+- remove the unused member in WX_CB
+- correct the spelling mistake
 
+Jiawen Wu (3):
+  net: libwx: remove duplicate page_pool_put_full_page()
+  net: libwx: fix the using of Rx buffer DMA
+  net: libwx: properly reset Rx ring descriptor
 
-> Changes since v1 (RESEND) [2]:
-> 
->   * Add Fixes: and Reviewed-by: trailers (Haren)
->   * Expand tabs for uapi/misc/amd-apml.h to match other entries
-> 
-> Jon: Would you like to apply this series on docs-next or should powerpc
-> folks handle it?
-> 
-> [1]: https://lore.kernel.org/linuxppc-dev/20250429130524.33587-2-bagasdotme@gmail.com/
-> [2]: https://lore.kernel.org/lkml/20250708004334.15861-1-bagasdotme@gmail.com/
-> 
-> Bagas Sanjaya (3):
->   Documentation: ioctl-number: Fix linuxppc-dev mailto link
->   Documentation: ioctl-number: Extend "Include File" column width
->   Documentation: ioctl-number: Correct full path to
->     papr-physical-attestation.h
-> 
->  .../userspace-api/ioctl/ioctl-number.rst      | 516 +++++++++---------
->  1 file changed, 258 insertions(+), 258 deletions(-)
-> 
-> 
-> base-commit: f55b3ca3cf1d1652c4b3481b671940461331d69f
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c   |  7 +++----
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c  | 20 +++++++-------------
+ drivers/net/ethernet/wangxun/libwx/wx_type.h |  2 --
+ 3 files changed, 10 insertions(+), 19 deletions(-)
+
+-- 
+2.48.1
 
 
