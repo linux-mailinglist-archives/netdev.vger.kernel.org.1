@@ -1,159 +1,129 @@
-Return-Path: <netdev+bounces-206767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A7CEB04525
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 18:13:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB13FB0451D
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 18:11:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56EA84A06C0
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 16:10:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3ADB7172FA4
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 16:11:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2682C25EFB6;
-	Mon, 14 Jul 2025 16:10:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7C7425F7BF;
+	Mon, 14 Jul 2025 16:11:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BKoox0cX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H9y+30kg"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ED5E25DB0B
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 16:10:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 256F925E816
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 16:11:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752509458; cv=none; b=tUas50b2QL3SPP3QT/GR3I6EAdUmKESvXr6Czf+wAWJA6ZOs/UnZFmdxrCNasmQEPQVeXt58wF5bIB2x/vFfV72+n6w/YkpWRC/05IR4TeFhIXGaIOJRzJvCoFnxvN7qr2oJjMrsQl+khRzbUzWUPDovv/ZmQe9fWCoWnjnBe9A=
+	t=1752509483; cv=none; b=sRJSgUws5zv935UW1YNsk9spnzhidmm9PCyncJ4bTM5KQrtuVDOEgcmLSGAnWvCWL6l42C4fD8SyIE1tsgDAMamyIVPWT+HD1Avc76GDvZyZ61zFWuvdl705xn6kQQlIn2KTBhZKnt0y0mcL1/FZejDGP2HjmFLmz8N4VAzucTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752509458; c=relaxed/simple;
-	bh=TXBhF2hsvFF6n7aCSxrTP5ln0Far7SI/YRoW6S4tmUk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P2IrSBNJqaBB5A5Jc7azYLifviQjxSlYisohVq9742GptgjlybuLLaCFMP9aazC6nprFK8OCUyxT8rfYmkvI+fzHY0bHR9gWN+KhsB9Nyxb5ZBn7jUD0Omp3njoqcHDp3Adic3+mFYR1IE4BqO2HSlf22QjqZJhD1JP5b2L8y/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BKoox0cX; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752509455;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hJded38NkCminVRmf+Vkk9veSOaA59XspWkWKEaxDxE=;
-	b=BKoox0cXnA4zT6zAgBsdaAyPkmDrDmoM+bE0jT81BHvhneMnKPhv5ZqpAoIRqKPCbGmjus
-	fK9564sCmaP60B9yQkp+fLZ4+fM6qNWNfyN+p4hJIBDrGdlRGq4hYIiAYBv/00Iie67MsB
-	5OV559h8lmkoo59UtNsaLAzNi9VpWtQ=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-284-5Z9iEOFfMXWSyR9_nV2YpQ-1; Mon, 14 Jul 2025 12:10:54 -0400
-X-MC-Unique: 5Z9iEOFfMXWSyR9_nV2YpQ-1
-X-Mimecast-MFC-AGG-ID: 5Z9iEOFfMXWSyR9_nV2YpQ_1752509452
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-451d2037f1eso29294265e9.0
-        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 09:10:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752509452; x=1753114252;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1752509483; c=relaxed/simple;
+	bh=vQjKQqQj7/0FRocDtrqvFlkmdQNJcoyjkB7/v8vcPLU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OaHw7ltk8mpzTL0hkCjo+OtnkYjBD09TA4TqtuD3GbvAjWCKmMDynwW4PNd2GFwQHqu/2ocB/CfDOjQof70fzstQUDbarp5+Y0T8LdJ4l33r1n28vbntmtNRtW3stFKOMlVKDc5V1KR52KJ3axw0K8VmwOMuTsYGjcrOa5MBRRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H9y+30kg; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-311da0bef4aso4395912a91.3
+        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 09:11:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752509481; x=1753114281; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hJded38NkCminVRmf+Vkk9veSOaA59XspWkWKEaxDxE=;
-        b=glyAcTRKWXTjHqDdFhOZdUM85PX2T/IFHEHqcZzcxiIJiwqslhIjUk74my1qMZft9x
-         uBNEgJqTY9zY389mbDSN0ME3HE8I6s4nUGz4ixu1UvONc1pwFq9QRK2gWYTCZq5h6b4n
-         sghRjj+xCDhDwme3Xvwoc7QhkBEuXDmbSqimu8YNsN+/5k7hRSe5x18zTaWfhzwhpNzL
-         HOpcdLo+T92fbt5xgnX7CH5CECuTfQI0Kr/Vl/qUU49+vIpJ5cUmX99FTlVql+W1VLnW
-         S8U+LCb0YeSqvjNxkvdmsQYFM/i1WQXgr8zoe6KuGTdOoJNP5T9g6eD2SAsDaMkOSXxH
-         o9yQ==
-X-Gm-Message-State: AOJu0YykPslg3Ys1DqiKskx2dAaEMhCmKzWWpcK+LlnNW+5wqZ8MdEj/
-	Ywo+NZBtOYhVwdpgKS9dnSunL6SRIyhK/ai87Q3uEqi/vo04DRogxeJPgULqj/jCunkqK6hcvRF
-	u8tglapQJdlBXX96kd2Hx3EwG5YHnwW9j17a9gRxJ3wOnZQwbbbeTKUaZZw==
-X-Gm-Gg: ASbGncvr8eFhsMvE1X1Tn+6Wp7D9XzdXH6Sb9eEoKrQVjXhMbrO8FDYBbp9bRIILPty
-	Cw8e+m5XcZGSkxs5E33cb/yFlMr9GjUMT07c0v7RF5vQsd8FQ6X8Z+viffrVSRM5I5USdVpLXLE
-	KgIog2VqWurllH8EnZT/38bRisKvAAVCH4JZdJ6xw0uiFBhWIg9C7/T+MMzNX4ujtAZBQLwcV0t
-	CO4E46JQFoP4v+Ot2KlSO/K0+bet9aiiCC7qfrN5fuHgLl+s0l8kLOT9bj/wispz70LW0gNRVuV
-	QnWq5B2K39Gc1KBJeiM3EsXmmes=
-X-Received: by 2002:a05:600c:1e04:b0:456:c48:491f with SMTP id 5b1f17b1804b1-4560c484fbbmr93343605e9.10.1752509451781;
-        Mon, 14 Jul 2025 09:10:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGu0KDsL3bCGkwFYj1hHtAGF4TYYoQuLK07nUMMS0J4mW+mZWbbAYRS4px+NSDCrvU4TmUMTA==
-X-Received: by 2002:a05:600c:1e04:b0:456:c48:491f with SMTP id 5b1f17b1804b1-4560c484fbbmr93343185e9.10.1752509451327;
-        Mon, 14 Jul 2025 09:10:51 -0700 (PDT)
-Received: from debian ([2001:4649:f075:0:a45e:6b9:73fc:f9aa])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45623f4f838sm5268045e9.1.2025.07.14.09.10.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Jul 2025 09:10:50 -0700 (PDT)
-Date: Mon, 14 Jul 2025 18:10:47 +0200
-From: Guillaume Nault <gnault@redhat.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, linux-rt-devel@lists.linux.dev,
-	linux-ppp@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH net-next v2 1/1] ppp: Replace per-CPU recursion counter
- with lock-owner field
-Message-ID: <aHUsB04j+uFrUkpd@debian>
-References: <20250710162403.402739-1-bigeasy@linutronix.de>
- <20250710162403.402739-2-bigeasy@linutronix.de>
+        bh=0TfSgDJeBP98iuDTDSKxBCCJTmDXTCi+E40UIkPN7us=;
+        b=H9y+30kgZeQQxUjH6/JpblUyTnASYxvo8k91S12fRRhhx6qEDaE5kHbEH5LDjWc4E5
+         SVKZDW8nhQDc7buUcZ3Xf1Sc0GQ2HNSXWKdbSixyw/AXYnoIYtHsBCeoU7TD+5n/YKUy
+         7feN19M2KYTBNn2rqD74f1wDNZgd4wtWn5g0psc0snCrUnf0DyxGQznq7Fgp/w2fgvem
+         AEZNAtQTIKxp7s6/fdlhLlWhHVc2AWxs5hcC1OpCg2Zonru6Mb2tJldLOA7iCvcX8np+
+         oV6Zkoq8W/JESfGyKcIzAvZ/YqAM8t2S1YbUhdxDB4UHHjrpsNyhaP5z8Vg1Ii9n6v7X
+         rROA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752509481; x=1753114281;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0TfSgDJeBP98iuDTDSKxBCCJTmDXTCi+E40UIkPN7us=;
+        b=GngqJFbGixDqvSof1P4QdPfWNMkIoXKGwYCql7AXfWVqt1gzQSgIL8CPmK9vads3nq
+         gMk4X5iVJO2bDXcGfnPd0HwJCnUBdL24PW+aurB4OrHxmkzJOJRdvodOpmvxv0QX7GnF
+         M41a7qaqWjkja9gr6F0BRgZuWYNk3WqzmZ5mwmoO63ubQCkfHBeYE6xlw8prkuEco0OJ
+         z6H7S3ZydxDil4TB8YLIqz+iy6xLDsZCfiEto2x9nFImEgYBf71Jh3Ok4qSrIbbZ9d/k
+         2H0A/ZI5jeag2tlSar2Rvg55BvnpDwkfNER1CNjsoxWBy3/UWprbdc9aVo/YSL4ttTHJ
+         pJEw==
+X-Forwarded-Encrypted: i=1; AJvYcCXr2xB26YRzgaOrsrHXMyMJDrX1bRpZ5Yh+ertKOz3MtNWK/9t4Kr9vtpSA/x3JIP9Pib70tyE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3qNix+fp62DilBMW4smP+vZv2aI/TLTZasvDlQ8wujnnAHfD4
+	a9iOXP1ZobH+8RvVaGtYBuKj6WAF+z6vX7UO8i9xQDVaPlNDuS936M8upWlUBslZLSUTeZmWbpJ
+	QHyL+fUkSv1EhUyQwnYzypWSdMUk2rQHAPxuYYtyS
+X-Gm-Gg: ASbGncvQW0Uvy34PQebu7YBRdA/XRFnv0RMNiXF/meJ31fObZR1M8cnCk2PPpHKg7Um
+	TkLdIbAcyNzThiBJOHW309sgcO8JsIWBMoHYs8bvAuZ1ZOlktZmzg126I4MnCtBP3227mJIj+XL
+	/r6TZbhXWuncjdfXykcaWhpPNe1K8f8zvPU6oHSSLz+lTd//53/h/iaAOL3/hw9o+COFnpfISEw
+	aux9gwiKbBRmugxmRwArVcMcbyNZ1TQZKLN0Q==
+X-Google-Smtp-Source: AGHT+IGi1lKzp97hb5nVKjsLp2Yc4PioYfFvtz13TEi2ODa2cHytGcZk5J9zzTFWV8PfG2ePjvzUGLBXY7BkNPMEZRY=
+X-Received: by 2002:a17:90b:1d89:b0:31a:b92c:d679 with SMTP id
+ 98e67ed59e1d1-31c4f5e3054mr18709800a91.35.1752509481220; Mon, 14 Jul 2025
+ 09:11:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250710162403.402739-2-bigeasy@linutronix.de>
+References: <20250712054157.GZ1880847@ZenIV> <20250712063901.3761823-1-kuniyu@google.com>
+ <20250714-digital-tollwut-82312f134986@brauner> <20250714150412.GF1880847@ZenIV>
+In-Reply-To: <20250714150412.GF1880847@ZenIV>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Mon, 14 Jul 2025 09:11:09 -0700
+X-Gm-Features: Ac12FXxwA2_HHK63FHlPcihHW7Wr9zzuGKYWHs16ti9q29J1bNFJMl70wG0K_mo
+Message-ID: <CAAVpQUBK5029mFoajUOYoL3aNTfJg0fqR7FSHViLvt-Ob4u0VA@mail.gmail.com>
+Subject: Re: [PATCH][RFC] don't bother with path_get()/path_put() in unix_open_file()
+To: Al Viro <viro@zeniv.linux.org.uk>
+Cc: Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 10, 2025 at 06:24:03PM +0200, Sebastian Andrzej Siewior wrote:
-> The per-CPU variable ppp::xmit_recursion is protecting against recursion
-> due to wrong configuration of the ppp channels. The per-CPU variable
+On Mon, Jul 14, 2025 at 8:04=E2=80=AFAM Al Viro <viro@zeniv.linux.org.uk> w=
+rote:
+>
+> On Mon, Jul 14, 2025 at 10:24:11AM +0200, Christian Brauner wrote:
+> > On Sat, Jul 12, 2025 at 06:38:33AM +0000, Kuniyuki Iwashima wrote:
+> > > From: Al Viro <viro@zeniv.linux.org.uk>
+> > > Date: Sat, 12 Jul 2025 06:41:57 +0100
+> > > > Once unix_sock ->path is set, we are guaranteed that its ->path wil=
+l remain
+> > > > unchanged (and pinned) until the socket is closed.  OTOH, dentry_op=
+en()
+> > > > does not modify the path passed to it.
+> > > >
+> > > > IOW, there's no need to copy unix_sk(sk)->path in unix_open_file() =
+- we
+> > > > can just pass it to dentry_open() and be done with that.
+> > > >
+> > > > Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+> > >
+> > > Sounds good.  I confirmed vfs_open() copies the passed const path ptr=
+.
+> > >
+> > > Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+> >
+> > I can just throw that into the SCM_PIDFD branch?
+>
+> Fine by me; the thing is, I don't have anything else in the area at the m=
+oment
+> (and won't until -rc1 - CLASS(get_unused_fd) series will stray there, but
+> it's not settled enough yet, so it's definitely the next cycle fodder).
+>
+> So if you (or netdev folks) already have anything going on in the af_unix=
+.c,
+> I've no problem with that thing going there.
 
-I'd rather say that it's the ppp unit that is badly configured: it's
-the ppp unit that can creates the loop (as it creates a networking
-interface).
-
-> relies on disabled BH for its locking. Without per-CPU locking in
-> local_bh_disable() on PREEMPT_RT this data structure requires explicit
-> locking.
-> 
-> The ppp::xmit_recursion is used as a per-CPU boolean. The counter is
-> checked early in the send routing and the transmit path is only entered
-> if the counter is zero. Then the counter is incremented to avoid
-> recursion. It used to detect recursion on channel::downl and
-> ppp::wlock.
-> 
-> Create a struct ppp_xmit_recursion and move the counter into it.
-> Add local_lock_t to the struct and use local_lock_nested_bh() for
-> locking. Due to possible nesting, the lock cannot be acquired
-> unconditionally but it requires an owner field to identify recursion
-> before attempting to acquire the lock.
-> 
-> The counter is incremented and checked only after the lock is acquired.
-> Since it functions as a boolean rather than a count, and its role is now
-> superseded by the owner field, it can be safely removed.
-> 
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> ---
->  drivers/net/ppp/ppp_generic.c | 38 ++++++++++++++++++++++++++---------
->  1 file changed, 29 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
-> index def84e87e05b2..0edc916e0a411 100644
-> --- a/drivers/net/ppp/ppp_generic.c
-> +++ b/drivers/net/ppp/ppp_generic.c
-> @@ -119,6 +119,11 @@ struct ppp_link_stats {
->  	u64 tx_bytes;
->  };
->  
-> +struct ppp_xmit_recursion {
-> +	struct task_struct *owner;
-> +	local_lock_t bh_lock;
-> +};
-> +
-
-This hunk conflicts with latest changes in net-next.
-
-Apart from the two minor comments above, the patch looks good to me.
-Thanks!
-
+AFAIK, there's no conflicting changes around unix_open_file() in
+net-next, and this is more of vfs stuff, so whichever is fine to me.
 
