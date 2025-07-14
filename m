@@ -1,79 +1,82 @@
-Return-Path: <netdev+bounces-206505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 720DCB034F0
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 05:22:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29C68B03518
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 06:05:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 273EE7A06F2
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 03:20:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 830CF3B8953
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 04:05:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6578C1C84AB;
-	Mon, 14 Jul 2025 03:22:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3SkKoNGv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 049291DE8BF;
+	Mon, 14 Jul 2025 04:05:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4998BE4A
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 03:22:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57CD14A11;
+	Mon, 14 Jul 2025 04:05:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752463333; cv=none; b=Qqw3EloUMF1B5F8BTSonbh3wY5dRuXQ5t9Rz0umQgNkFQGCL19CO0mDFFtwsTA/OcKEVP0DRFpzqfDtKjeevr9XbaxaZ2JJ9JBntbBUzCtBKEZmVXAF4nFBSabOzmbTWSbdM/QlYZGPfaA07ZpG82d80UMtGjnVHtnC0bNcHUsM=
+	t=1752465935; cv=none; b=NToD5/6/jNFWnKbl9S67383Z16Uja3XU4RcIKQabPZyz+Gn1tI+hX78rYlSv62OOSo/Q6BXmFbgfc6Iix9BbhOfv2PjO/jmhQyiRbJhSnnXA3doV7ATKytS3UdxdEbooCpEW3/bIbP8zZQUkULIDhgyk0zjq3iTGek0AFpGXtmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752463333; c=relaxed/simple;
-	bh=UhOhYhF5kRDq3pnWChDtdqvQetRsWYULJEJv+nANSdk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d8n7EMfvCWwwL1LaOeL0UDeCnFFHAJMIO6wL+/4nXOUw/k1IYVgeinwvo5jy8yTMUQyDwKseYrxZx1DmNQM+AK94cdFgl+oOk5T48degW7y0kc+H3cYdIhHlLa8m8S2LrMOc5w5t6/ogDrPgM7ALg+3yBL/SvxM6XYp9W7mEf84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3SkKoNGv; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=mSlL9yoU7UARseb6ywTRXG/K2VRKY5hFBpTl2TTot0w=; b=3SkKoNGvtw2W322bFAY9nd2opG
-	F/L5Xw42vJjgLKJPwoWzlZtmZhoM34VASm9hDimjo3YgLdi9zuuZ/KYqnoP6TyRrtYEqDH/UGd7CU
-	57A73k9Z4eYISe2lszynZVFUNt7tiocJxneZyzhBKN1eCVXb0D2SYAVsSjy7chb86P64=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ub9lX-001Pa8-Dm; Mon, 14 Jul 2025 05:22:07 +0200
-Date: Mon, 14 Jul 2025 05:22:07 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jack Ping CHNG <jchng@maxlinear.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, fancer.lancer@gmail.com,
-	yzhu@maxlinear.com, sureshnagaraj@maxlinear.com
-Subject: Re: [PATCH] net: pcs: xpcs: Use devm_clk_get_optional
-Message-ID: <a9072d67-d48d-4c43-aa9f-2957c53b3772@lunn.ch>
-References: <20250714022348.2147396-1-jchng@maxlinear.com>
+	s=arc-20240116; t=1752465935; c=relaxed/simple;
+	bh=BIOBOMEyZSMRK3yVZTk6UPPB0pcOqwWhOV8QxF5CxF8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=C3/FX63M7R1/Uu3DhrMLvSkUtoeMUi0KclgBOJ1fML9LoFuBjPiFHf+IYSzCec2Sv5oPK3qiMVFvxq4k5wMO9lCOdOCDd2itaokpIItLmJ1jbjsxh5CTeiFCKcQ+mDke45bJpEfRqk7mm7y9iyTY1mcMoi0Q/FmsavEZbSJSEQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jmu.edu.cn; spf=pass smtp.mailfrom=jmu.edu.cn; arc=none smtp.client-ip=45.254.49.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jmu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jmu.edu.cn
+Received: from localhost.localdomain (unknown [119.122.214.181])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 1be077f35;
+	Mon, 14 Jul 2025 12:00:13 +0800 (GMT+08:00)
+From: Chukun Pan <amadeus@jmu.edu.cn>
+To: wiagn233@outlook.com
+Cc: amadeus@jmu.edu.cn,
+	conor+dt@kernel.org,
+	devicetree@vger.kernel.org,
+	johannes@sipsolutions.net,
+	netdev@vger.kernel.org,
+	p.zabel@pengutronix.de
+Subject: Re: [PATCH v2 1/1] dt-bindings: net: rfkill-gpio: document reset-gpios
+Date: Mon, 14 Jul 2025 12:00:04 +0800
+Message-Id: <20250714040004.481274-1-amadeus@jmu.edu.cn>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <TY4PR01MB144321BDC50DEF7A2537C24F0984BA@TY4PR01MB14432.jpnprd01.prod.outlook.com>
+References: <TY4PR01MB144321BDC50DEF7A2537C24F0984BA@TY4PR01MB14432.jpnprd01.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250714022348.2147396-1-jchng@maxlinear.com>
+Content-Transfer-Encoding: 8bit
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlCGUhKVkMeTE4fSExNGUJNH1YeHw5VEwETFhoSFy
+	QUDg9ZV1kYEgtZQVlKSkJVSklJVUlKT1VKQ0pZV1kWGg8SFR0UWUFZT0tIVUpLSU9PT0tVSktLVU
+	tZBg++
+X-HM-Tid: 0a980717215e03a2kunm472be37a742ad0
+X-HM-MType: 10
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6Pkk6Azo4TzE4DRE5FyoaHToy
+	Mz9PFA9VSlVKTE5JT01OTUpPTk5PVTMWGhIXVRoWGh8eDgg7ERYOVR4fDlUYFUVZV1kSC1lBWUpK
+	QlVKSUlVSUpPVUpDSllXWQgBWUFKS09DNwY+
 
-On Mon, Jul 14, 2025 at 10:23:48AM +0800, Jack Ping CHNG wrote:
-> Synopsys DesignWare XPCS CSR clock is optional,
-> so it is better to use devm_clk_get_optional
-> instead of devm_clk_get.
-> 
-> Signed-off-by: Jack Ping CHNG <jchng@maxlinear.com>
+Hi Shengyu,
 
-Please read:
+> What is blocking this patch to get merged? I'm seeing more 5G modules
+> need this to work correctly, for example, FM350.
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+I don't know either. I sent this patch again this year, [1]
+but no one responded.
 
-You need to indicate what tree the patch is for in the Subject: line.
+[1] https://lore.kernel.org/all/20250208102009.514525-2-amadeus@jmu.edu.cn/
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Thanks,
+Chukun
 
-    Andrew
+--
+2.25.1
+
 
