@@ -1,78 +1,124 @@
-Return-Path: <netdev+bounces-206885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10827B04AA1
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 00:29:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75A08B04AA5
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 00:29:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C9B54A3480
-	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 22:28:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 914C97A2051
+	for <lists+netdev@lfdr.de>; Mon, 14 Jul 2025 22:27:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0E7427933E;
-	Mon, 14 Jul 2025 22:28:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CD452749C2;
+	Mon, 14 Jul 2025 22:29:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HX84jHkz"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ffCpTw+i"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF07278E7C
-	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 22:28:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15C572627FC
+	for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 22:29:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752532112; cv=none; b=DAZFLRLfq17P8PlhWN1SYkF3P0cU74FbIMyNw9U+51Gty2Lgepv0q90VhqsNAvWDiMttGZ+68nIHCYF+XVftIFrF3CseDbq+zy2mulMS2/xc5CSZW5bqS2t63A+Rdf7zJL57fD6n+yY7eaOf8NULIfanfb1PxsQNB+dxw4cQsXs=
+	t=1752532160; cv=none; b=ieN8naWvvgvXgUg2uZzAHsxRvRRIJzMYDDUZVO0Sis9CpDCFOpPdcgM2c/W6C6SEiL+kfrvhum7T7AtOUVorNowovKyo1Zje81tc5ePaXTrrCZZea9K192xfmNcljsM7zpLYsSgFKNgHI4hvXMU0w7k7OwMfg5dN03kOOZWCEiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752532112; c=relaxed/simple;
-	bh=hLie23F/e+ruCQvbaIR1ODG+2t72nvoLeJzAlfDHiA0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uPpRshY79fzixiq/2doh71Yuj7XFKNNTA8NwraWxQFHDfr3vO5vcNn4fa/ePevnA8HTIcj3xplZaJw2qlhOf7kmCCR7ivLWygSQ6v3LlpTJFp+3SbQi95uIiFNNlrVNFvWjthdgG6u5PP8Ge9JVKemFyAnvm6LxGFHTc/S00c0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HX84jHkz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F64DC4CEED;
-	Mon, 14 Jul 2025 22:28:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752532112;
-	bh=hLie23F/e+ruCQvbaIR1ODG+2t72nvoLeJzAlfDHiA0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HX84jHkzPP1JYygc2S7hJ2vz/rALFIdZy6qV9wkOPVxEk7OShngrGoGyigFAyKp7i
-	 M2I+w/qwelzGL0rjc1jILpXCaX89KG5YrOHUtX527A8zuGzIEZMK1hcr+NA9lwCL4E
-	 wMFz4ty98gpDaE+Ysby/Vkm7jdse2XGVdAdlnaESJ0a1zLbqLZGOKui6MnjiKAsELy
-	 Blm8reaSiBf+vyPz1SpE+QKbXgCQwSTq54cLzerzn3mjO7ncsncguCaCiNsuF8BsCc
-	 Ao9Yrynv5KfTcENchzx4Q4JLQdpPl1QbJUrMOfqYppUhaVy9fi1IC26Q8fs3CLDPtz
-	 e1Cq+EhnGcDaw==
-Date: Mon, 14 Jul 2025 15:28:31 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Edward Cree <ecree.xilinx@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- donald.hunter@gmail.com, shuah@kernel.org, kory.maincent@bootlin.com,
- maxime.chevallier@bootlin.com, sdf@fomichev.me, gal@nvidia.com
-Subject: Re: [PATCH net-next 04/11] selftests: drv-net: rss_api: test
- setting indirection table via Netlink
-Message-ID: <20250714152831.4c8745de@kernel.org>
-In-Reply-To: <d0d2439c-3461-4be4-9014-70c93ab9a1d2@gmail.com>
-References: <20250711015303.3688717-1-kuba@kernel.org>
-	<20250711015303.3688717-5-kuba@kernel.org>
-	<d0d2439c-3461-4be4-9014-70c93ab9a1d2@gmail.com>
+	s=arc-20240116; t=1752532160; c=relaxed/simple;
+	bh=pJnm9Oj99nS8XPVmx+Sv6KI3a8fGfJkUedosPujfQ/g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KqiwyNJfcciEAF7M11Phq5/mrptZzspIFnZlbbHumhSoBSw0gEwngLxRJitba04afQWHZhZRtKaXQ7kpbrIuLa9qNqeyW6JktregF4uBe9DA40gJl8Cy0fyHDRBUvmhoyp3dtujIvnxov/QPs+IGV76n9Dfr8l/WDbTuhhKuc6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ffCpTw+i; arc=none smtp.client-ip=91.218.175.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <d109f0de-c857-46f6-9560-a7bd93b59bef@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752532155;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=b0LwTTo9xIG1xQG6uvghVnGDmMDc4C6/jvkxhw5/uY0=;
+	b=ffCpTw+ialmLq8C2vkn6EWsLUKW/RqvNggj3D6DXHng+/3Mcrf3N9S/wGJBpJlHlpJ948g
+	bWF+uJIVAZaH1Sf8gEdbiOWd0uJQR9Tz7O4Ufa9PG8daB57/ZwIGn/ClKpj6u8YW4roc5M
+	Jx70NECbzv5qh58cNHW+SfjUKKTo5b0=
+Date: Mon, 14 Jul 2025 15:29:08 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH v6 bpf-next 10/12] selftests/bpf: Create established
+ sockets in socket iterator tests
+To: Jordan Rife <jordan@jrife.io>
+Cc: Daniel Borkmann <daniel@iogearbox.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>,
+ Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+ Stanislav Fomichev <stfomichev@gmail.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <20250714180919.127192-1-jordan@jrife.io>
+ <20250714180919.127192-11-jordan@jrife.io>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20250714180919.127192-11-jordan@jrife.io>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 14 Jul 2025 23:19:21 +0100 Edward Cree wrote:
-> > +def test_rxfh_nl_set_indir_ctx(cfg):
-> > +    """
-> > +    Test setting indirection table via Netlink.  
-> 
-> "... for custom context via Netlink"?
-> 
-> Apart from that LGTM.
-> Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
+On 7/14/25 11:09 AM, Jordan Rife wrote:
+> +static int *connect_to_server(int family, int sock_type, const char *addr,
+> +			      __u16 port, int nr_connects, int *server_fds,
+> +			      int server_fds_len)
+> +{
+> +	struct pollfd *server_poll_fds = NULL;
+> +	struct network_helper_opts opts = {
 
-Oops, just posted v2..
+A nit. I removed "opts" and just passed NULL to connect_to_addr_str.
+
+I also carried Stan's ack from v4. Applied. Thanks.
+
+> +		.timeout_ms = 0,
+> +	};
+> +	int *established_socks = NULL;
+> +	int i;
+> +
+> +	server_poll_fds = calloc(server_fds_len, sizeof(*server_poll_fds));
+> +	if (!ASSERT_OK_PTR(server_poll_fds, "server_poll_fds"))
+> +		return NULL;
+> +
+> +	for (i = 0; i < server_fds_len; i++) {
+> +		server_poll_fds[i].fd = server_fds[i];
+> +		server_poll_fds[i].events = POLLIN;
+> +	}
+> +
+> +	i = 0;
+> +
+> +	established_socks = malloc(sizeof(*established_socks) * nr_connects*2);
+> +	if (!ASSERT_OK_PTR(established_socks, "established_socks"))
+> +		goto error;
+> +
+> +	while (nr_connects--) {
+> +		established_socks[i] = connect_to_addr_str(family, sock_type,
+> +							   addr, port, &opts);
+> +		if (!ASSERT_OK_FD(established_socks[i], "connect_to_addr_str"))
+> +			goto error;
+> +		i++;
+> +		established_socks[i] = accept_from_one(server_poll_fds,
+> +						       server_fds_len);
+> +		if (!ASSERT_OK_FD(established_socks[i], "accept_from_one"))
+> +			goto error;
+> +		i++;
+> +	}
+> +
+> +	free(server_poll_fds);
+> +	return established_socks;
+> +error:
+> +	free_fds(established_socks, i);
+> +	free(server_poll_fds);
+> +	return NULL;
+> +}
+
 
