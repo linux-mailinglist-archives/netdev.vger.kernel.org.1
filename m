@@ -1,129 +1,131 @@
-Return-Path: <netdev+bounces-207287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6450B069AE
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 01:01:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BC2AB069C1
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 01:12:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C786580029
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 23:01:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44D6B4E5ECA
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 23:12:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCDAF2D5424;
-	Tue, 15 Jul 2025 23:01:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FB712D29C2;
+	Tue, 15 Jul 2025 23:12:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Aq0P36/V"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G4KlHejU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C8862D541B
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 23:01:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BCA24A3C;
+	Tue, 15 Jul 2025 23:12:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752620494; cv=none; b=aPGL2l4VooNVGYeMP5rkVRDxuhLSnSTQrHxduUXxyToWb0XekNkglZSIbvHM8kSCVYlu3WJ3EKqe5sUn0uLaiWeCRd4tJWkb/va0uJMjTqTFp561CuLAn+tpc/If0GFhZLX+4zQRH+IL/w5nUfXFIz6wRL9Xq6kU64ZIBkZDcTc=
+	t=1752621173; cv=none; b=SEhLtiEshyi1IuSwwv+Ejh1IyhYWKPkAQ/f9aYp9Pc3kBupqF0YcYO4pBrjUivS3idvSw5JUbD8FJ/rNULNl9LI9K/h1CV5xPrM426GmOQEF5LGFtLvGZVKJEzwo738j/S3LNBZ1mw5x7OozCCFV8oa6rOWTWJvMkqzGJN+TArc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752620494; c=relaxed/simple;
-	bh=C0yIBGjgQuUwh2cILUg4KfKwRH5Zo3VTXMZAiLB5IzM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Y37FgSlzqjkBUYLyc+Bq9oHdl7taZ9jG0AZ1khBEZQMydroaJ/kAaJmcTEH0s0pBswqGFHNWh86nByl9eocs3UiHoDiWBXaATYwdX6g0dRPsxTw9/bc5VrxX7wT/rFTqnM/An/YDymL0TaOH7pcD3D1WsK2p1LHtHlikxRcjB3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Aq0P36/V; arc=none smtp.client-ip=209.85.210.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-73e58d50fe2so785407a34.1
-        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 16:01:32 -0700 (PDT)
+	s=arc-20240116; t=1752621173; c=relaxed/simple;
+	bh=cnSaEW1G2x+Vi12ZOlKThqIkkcwIaeVH5M8TjdoEHkY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jl0CUM6bTC6zZUcSyiuFWr5zncqHXjqMBatYMxX5jOSdy1rpIP/BDAufGa+B5h8JX5v7NKst5pd6M8vDXeJdCI1MsKc8kCt35h6V7rgvonmMJQ+cf/Ow/MktMnJ+Q4607GGJ5RCkx+JGdZ71YtlC28EzZNmOiLNOBFghWoIGXlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G4KlHejU; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-23c8a505177so56048375ad.2;
+        Tue, 15 Jul 2025 16:12:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1752620492; x=1753225292; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=B4SWITf8rdF2+7Tku3l2OCdj3WOMyrXJ2wvElW7xvwI=;
-        b=Aq0P36/Vw14ZTOSZP7VIoVXi0jFTCXxSroHDH9b1wV7v8QYZs64zqWi1W1JNVwADNZ
-         tzJKbkbCaG2wczXIw7esS3v9YoRn1c+XrXrH578lawGjfqxViYMUlqv8aTuVmctyw0pN
-         3hbX7LBqwQ2sXTiX3HiqKDQjOZIOS5I1q5+EgdKDizdV0HnM6Te5jiiw0ouhUAXT16bM
-         uJT0EUXj8I9LkO+6k6KTxe/2eo3WHRSloo37tZ7qUyVwzUmmPDR/ekiERhxn8nUF46BA
-         ix5d3m0XAx8s7bqczDZ/0AlMX9oe4NZxfO4ph1bRKC8GkeDPG6M1hXLP1ECisprPC/hP
-         xR4A==
+        d=gmail.com; s=20230601; t=1752621171; x=1753225971; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hAPRSx32Yoh23SFp75OsDGsW9gXJ3MOIHEnOw0OZgZI=;
+        b=G4KlHejUFZL4smMIC2i6wHh4dbmZRpIxq42rpDCPR9LDEcj35/3WuIUToPW/V1wJy4
+         VSDa235vdqmjdT6ELQByih/3yB0BQUQ1Ez3OqYytaTxbxcL4nEjgnE1U7U/+QRALm49i
+         keAW/KQezbpq5Cp4n9hsOdjwXgdzS38iUNZLN2y+/S42NIECqPZAGTqI6UGFiobaKOEQ
+         XaTdhwkaji6UBd5I2ZCpbd+XIjyOK137+iVlnqNfX6bQls5XQqWIC29bW8xP31PYlF5Z
+         NPcojUXc3UlAB2qz9NmGQfl4pfisjoCM+cDBLCKDUcvpEwfkIa2MP3AWd2u3o/2Zhx4j
+         +PTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752620492; x=1753225292;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B4SWITf8rdF2+7Tku3l2OCdj3WOMyrXJ2wvElW7xvwI=;
-        b=G8KoMVXgPVAGeLtmX1VykofDTH7ULFwJ16WkzxqJ3/vNsOIfwIi/NyuQMNRWUfpcrE
-         /Fo9kGAkvTgEoISpPqSzlGERrm8rFdKF459j1M6q9JHaRk4/K8duCWKmr8TxEJ3x80zK
-         qV8FuurOwAmdx2zSQ5A3K0lhtfew5eRIuPbYdeNYrDkbHOxbV26rv1KYF31fjvdaUl+o
-         oP6HJa2Ty7i7avixBjRkcVeaWWCeaFk9097ehK2grteIHfGghC4xuvB/XlIbYeICvYEu
-         08VdRTsAnPCMhuuXNggT6Pv9T9+zQ5qEVXe/FJdQl/7WPz/g9zX9qpo+SgOLFQQjrQR1
-         ODRw==
-X-Forwarded-Encrypted: i=1; AJvYcCWS7BhzWaWTXwsQpVWSv0n7Z9VQ9RiOXLrwnEi6z95S1x6RolYZ0qVL3qMnIh997/TA/ECl8Nw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx54kVeJFbUYlK7yVS6aJoXXogS0rnIdsZI6qxW6qlx0vJ026AL
-	RwIztL0R/+wcDIVEIitpCAyNG9lYlFpX3KfuNAdbY7ojR52wsFgtBUiPtFQPRT2zBmPrpoHJu5L
-	uqj00
-X-Gm-Gg: ASbGncs0j49jDpZzwhaMKwe1x8PYIrI3EVtFqbgDkh4sDoQppxRym22DSWJ+f4bgsQy
-	OnF8bOEbEgpMhasvdbqs4hFLZYxVF5TEeElqhPqk8qIlqXIDKhGwjkLvG+q6UpPpLli27btsxEW
-	ZsLxjsGiL/3BQL+6esxzumT4x0lqHE1CP5JGyLAZR3fxdrjN8GeWg3TwUOKdwZgHF8lwBLLDa9G
-	mjstreESqmibPNLMJ/qq5Mv0S4m9vTtQsjUjBTf0KF8OzZi8hmoUAIbONGeFz7cIGW2d5Y1y5k4
-	ESfegzIqp7nukctFIqKeoFZq+KkA5YR8jGOVkgzAOwvk5fk2fq9oMaZIa9KY2f/P2Q9yfL9j4VJ
-	TkjHFQPpjirCnLcozQCYOFhU0PfD3mUUF+PPQ1pc=
-X-Google-Smtp-Source: AGHT+IE8Nfeo8scY90CqHg5efo6nAkc64loFfqqe2YK8azM++ugsfehXsqpsTS6+ghhEcDe7uWrOaQ==
-X-Received: by 2002:a05:6808:3c49:b0:401:e721:8b48 with SMTP id 5614622812f47-41d031f1f01mr437628b6e.8.1752620492132;
-        Tue, 15 Jul 2025 16:01:32 -0700 (PDT)
-Received: from localhost ([2603:8080:b800:f700:9b4e:9dd8:875d:d59])
-        by smtp.gmail.com with UTF8SMTPSA id 5614622812f47-41c267defd7sm558510b6e.11.2025.07.15.16.01.31
+        d=1e100.net; s=20230601; t=1752621171; x=1753225971;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hAPRSx32Yoh23SFp75OsDGsW9gXJ3MOIHEnOw0OZgZI=;
+        b=HOdLfUBGnmksB22/ii5R9/Y0ZBfDaizVqux5aSXhOy6t9QKwwPVgO124kd68iSX7GH
+         Jw7JC2D5pnoIcVLMRO6W1HkaDk9tHTEfHEILZQgSlpdf8bbU4UkzsQW3/GLlkM+1roiv
+         NOJDj+Q5cwYhRTzZO6ksCrX86Z6DSErhglCO9jXkltNiUwax42N0a5mw394L8eu38Hx3
+         Cdvv/EtWZ+eLqmsg3nEGgjYJalwfl6JRHRDWavMd1CbJu5wgyCcrNQaulm2chYIVE4gZ
+         1rZ+owfSQRP17TS3GsPtCh/mTouIpiLr7hQdX5Du9ysu7A748atnGZoG7I48GwA5GCyE
+         fuvA==
+X-Forwarded-Encrypted: i=1; AJvYcCUPeOoj4/uTOvO/lZTzT5jUbX0v0LmSEMm4gaCpRy362IQo2929QqkuvGRTrfCcguvBczRnB6+V@vger.kernel.org, AJvYcCX7SG55GKPHvU0ya6RqEAYpnN9WbGUrlXVnEdK8HAvWd6poBhL0AdzV0n+PslRXyiGoszpa6Yg9XPnaIbT3CA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzotWltq6VneCjWWar0dnoA/m1kYtlNU3PJpTFi8qFgsrI2afgQ
+	likA3zmGK5u4MdpbrKI5/44o1Ot3851wldimGsbTl4M4wLGf8tJDgo1F
+X-Gm-Gg: ASbGncvpOKCZEqaKNmm8QVlGykZGcptWWjiqU2Kggo9HgUegkUCVueug0ihHapy5Yre
+	cSCU/8FumqrsjLRXiBzE8WCPpa2FM8/atNfknLfyWug2nCBG0tcI+un5nGHAtoWoeLuNi91ZHVj
+	3o3JpM/qLNyToevauW1ku+r+weRIiGMlFXdFHokQ4icRbrZM2xoNMySG3IM9sGRXCeFY6UKKimO
+	lEOwmlLNQsQZ0DhvGHKfXXmTW8BDao3kThO4WhdnhxFw1gl17de1Zq7Tqn2G8hz86gvUwYhJVYH
+	LoyGLnYKnTjdyHR6qrZ8D2wMwN9WQYlbfs0zz/FotoB1wTE2MY7kveJ/jtye/rvcreZxkHRsnrT
+	+5TSdv8J87A+jPu6NocjJhzs4
+X-Google-Smtp-Source: AGHT+IGshsBE0EpvzBXYF91wyMej1W2e+64pc4pC0n1OrITGe6q1Y4ZuOz24myUDG1ahFwsL3M85jQ==
+X-Received: by 2002:a17:903:198c:b0:235:e1d6:4e45 with SMTP id d9443c01a7336-23e24f44b0amr9612455ad.25.1752621170746;
+        Tue, 15 Jul 2025 16:12:50 -0700 (PDT)
+Received: from p920.. ([2001:569:799a:1600:5324:4bfb:25b5:ccf1])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de42847casm119769045ad.14.2025.07.15.16.12.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Jul 2025 16:01:31 -0700 (PDT)
-Date: Tue, 15 Jul 2025 18:01:30 -0500
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Carolina Jubran <cjubran@nvidia.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Cosmin Ratiu <cratiu@nvidia.com>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: [PATCH net-next] net/mlx5: Fix an IS_ERR() vs NULL bug in
- esw_qos_move_node()
-Message-ID: <0ce4ec2a-2b5d-4652-9638-e715a99902a7@sabinyo.mountain>
+        Tue, 15 Jul 2025 16:12:50 -0700 (PDT)
+From: Moon Hee Lee <moonhee.lee.ca@gmail.com>
+To: johannes@sipsolutions.net
+Cc: linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	linux-kernel-mentees@lists.linux.dev,
+	netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	syzbot+f73f203f8c9b19037380@syzkaller.appspotmail.com,
+	skhan@linuxfoundation.org,
+	david.hunter.linux@gmail.com,
+	Moon Hee Lee <moonhee.lee.ca@gmail.com>
+Subject: [PATCH wireless-next] wifi: mac80211: reject TDLS operations when station is not associated
+Date: Tue, 15 Jul 2025 16:09:05 -0700
+Message-ID: <20250715230904.661092-2-moonhee.lee.ca@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+Content-Transfer-Encoding: 8bit
 
-The __esw_qos_alloc_node() function returns NULL on error.  It doesn't
-return error pointers.  Update the error checking to match.
+syzbot triggered a WARN in ieee80211_tdls_oper() by sending
+NL80211_TDLS_ENABLE_LINK immediately after NL80211_CMD_CONNECT,
+before association completed and without prior TDLS setup.
 
-Fixes: 96619c485fa6 ("net/mlx5: Add support for setting tc-bw on nodes")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+This left internal state like sdata->u.mgd.tdls_peer uninitialized,
+leading to a WARN_ON() in code paths that assumed it was valid.
+
+Reject the operation early if not in station mode or not associated.
+
+Reported-by: syzbot+f73f203f8c9b19037380@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=f73f203f8c9b19037380
+Fixes: 81dd2b882241 ("mac80211: move TDLS data to mgd private part")
+Tested-by: syzbot+f73f203f8c9b19037380@syzkaller.appspotmail.com
+Signed-off-by: Moon Hee Lee <moonhee.lee.ca@gmail.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ net/mac80211/tdls.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
-index e1cef8dd3b4d..91d863c8c152 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
-@@ -1405,9 +1405,10 @@ esw_qos_move_node(struct mlx5_esw_sched_node *curr_node)
+diff --git a/net/mac80211/tdls.c b/net/mac80211/tdls.c
+index 94714f8ffd22..ba5fbacbeeda 100644
+--- a/net/mac80211/tdls.c
++++ b/net/mac80211/tdls.c
+@@ -1422,7 +1422,7 @@ int ieee80211_tdls_oper(struct wiphy *wiphy, struct net_device *dev,
+ 	if (!(wiphy->flags & WIPHY_FLAG_SUPPORTS_TDLS))
+ 		return -EOPNOTSUPP;
  
- 	new_node = __esw_qos_alloc_node(curr_node->esw, curr_node->ix,
- 					curr_node->type, NULL);
--	if (!IS_ERR(new_node))
--		esw_qos_nodes_set_parent(&curr_node->children, new_node);
-+	if (!new_node)
-+		return ERR_PTR(-ENOMEM);
+-	if (sdata->vif.type != NL80211_IFTYPE_STATION)
++	if (sdata->vif.type != NL80211_IFTYPE_STATION || !sdata->vif.cfg.assoc)
+ 		return -EINVAL;
  
-+	esw_qos_nodes_set_parent(&curr_node->children, new_node);
- 	return new_node;
- }
- 
+ 	switch (oper) {
 -- 
-2.47.2
+2.43.0
 
 
