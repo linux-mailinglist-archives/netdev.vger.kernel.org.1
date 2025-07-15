@@ -1,125 +1,127 @@
-Return-Path: <netdev+bounces-206954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D02BB04DAC
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 04:08:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C9A1B04DB7
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 04:12:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DA4A17E1A2
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 02:08:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 839B34A4341
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 02:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21CB92C326A;
-	Tue, 15 Jul 2025 02:08:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 712BA2C326F;
+	Tue, 15 Jul 2025 02:12:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qj2KM3qW"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF242BAF7;
-	Tue, 15 Jul 2025 02:08:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEBDA2C031E;
+	Tue, 15 Jul 2025 02:12:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752545315; cv=none; b=bdveytxT5SJ+AXDM811KMvO+3Tax/PCUvWzXrg4yqSnuLXgwq8lCEhrZL3zd9BLaW98ky6ev7/c6SuGHT/W9y7QagrEN7ek+UHzEJBYV0FWlv85zKuX88+1O2pvr4judyvBDlrWlSMPm/1fzSUOTh/uPmmTKWXqz3aVVfZK009o=
+	t=1752545546; cv=none; b=pZSzS0uAtAvibLbefpvALXetxXfKTqpzTVBhAm/ogaBZ7ay50igWyCWUMxYYXjOhirqvXkPXxMvRg+LNujYfmy0z74X24Joxmx/Z2go3iviBR0Bigd7hwC1jL3Uq2X+QjBKRRoW2cP27WzLa4jsK+pmIgQWNosz4iGJSGHKvj0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752545315; c=relaxed/simple;
-	bh=jCmfu4Cq1HT1kT/tSt3zFQGeQNBzBfyC9ZCmWTbXlVg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WRKI19gFaYHMcYQ38WuYxrCPPCmoYK4qyt+Z9GbIovQySWdL1FYDY4j0uiufHkj3smXScwewYsLueOp7BUIdPAuirxjrnVs4AZwvKhfQnurP9+9xAn5vDMA8WYmSSaUACdxRcRTJ45+HTrE/h7ThfIU5L4BRmPKiuJEXE3rhu+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-669ff7000002311f-49-6875b8184208
-Date: Tue, 15 Jul 2025 11:08:19 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Harry Yoo <harry.yoo@oracle.com>, Vlastimil Babka <vbabka@suse.cz>,
-	willy@infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	kernel_team@skhynix.com, almasrymina@google.com,
-	ilias.apalodimas@linaro.org, hawk@kernel.org,
-	akpm@linux-foundation.org, davem@davemloft.net,
-	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
-	asml.silence@gmail.com, toke@redhat.com, tariqt@nvidia.com,
-	edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
-	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	david@redhat.com, lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com, rppt@kernel.org, surenb@google.com,
-	mhocko@suse.com, horms@kernel.org, linux-rdma@vger.kernel.org,
-	bpf@vger.kernel.org, vishal.moola@gmail.com, hannes@cmpxchg.org,
-	ziy@nvidia.com, jackmanb@google.com
-Subject: Re: [PATCH net-next v7 1/7] netmem: introduce struct netmem_desc
- mirroring struct page
-Message-ID: <20250715020819.GA80407@system.software.com>
-References: <20250625043350.7939-2-byungchul@sk.com>
- <20250626174904.4a6125c9@kernel.org>
- <20250627035405.GA4276@system.software.com>
- <20250627173730.15b25a8c@kernel.org>
- <aGHNmKRng9H6kTqz@hyeyoo>
- <20250701164508.0738f00f@kernel.org>
- <aHTQrso2Klvcwasf@hyeyoo>
- <92073822-ab60-40ca-9ff5-a41119c0ad3d@suse.cz>
- <aHUMwHft71cB8PFY@hyeyoo>
- <20250714184743.4acd7ead@kernel.org>
+	s=arc-20240116; t=1752545546; c=relaxed/simple;
+	bh=OL8eh+ET7ODxT9eqmQeIc1DaHSMO83XtpakOahXi1HI=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=YUcqouvKLpWxbaitDOl3uVkGCgjrCUXSKqVxCUSHrWZoeEmhNTxJszuI/Giawm3nPwZh/9C9sASybsBhCSXYkSAkhCHAH7petsFvrMSV2/gjmqO8kL9sjqBmt3k4j/ClHep34ZA23MB1W4h5lmKD8VFpSoBSQCYx/P6gWV8vYrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qj2KM3qW; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-70e77831d68so49483907b3.2;
+        Mon, 14 Jul 2025 19:12:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752545544; x=1753150344; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=P/kiJ0AGrl246k+hU6tFxQRZl1/F2KkE4EwQPyUtMzE=;
+        b=Qj2KM3qWj2A0U38RoMxsNatdKf3Ng09JND+snq19qy1MWGKoChQInuM3Efj8PnhzoU
+         x3Lk6/Q/WMVGMHiN2ImrtnNq+l3gL9XsZODSpg3PrkaKbca+Y6hn0UIio5d1Pplc7Xy3
+         50tCp2mSiaTXvL8yRrR8bCEQlbrW8qK2wkhoGoOIB5of4NjSG15nxl0yxg/YPTTMlWkC
+         w1eTa85JK6Tu4GIBy+wfTilrxMzdO1/2B4+oBziIUVn8MvRpZta64EMp4bJQcDtK+jFb
+         dGwMA4WAmdPwZP+wRY++6Xd1mD9tfzZtjxPn4UxUaG/29LSxlX6fYuZz51RKcSAoZ6E8
+         5ndg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752545544; x=1753150344;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=P/kiJ0AGrl246k+hU6tFxQRZl1/F2KkE4EwQPyUtMzE=;
+        b=heJQ9KFXpJvTcHvKpp/Nt/hAOY6j15XlUiEhR2Vv9JV9iLhqY27Q+Zlq1MV/9qn+LH
+         Envfv9WSpen7tBMX/OEnat7uRxDFubTcecnaAQXSo7/04Ou7taOwpK5O7dk0+8KkouRg
+         fYeTj3PEjFO/7IfY8Qac/nNw9jChvJCNS8e4Q8MHyhcuWSOJyRrG94SBpDDEFPal2x2t
+         24yyglKR+jrYTpK5Bjzf6nsAWyCrhvRDggfkKweOdgNn4p8OD7qvzbU6cdJjsCXAdpL6
+         OS50GeU/3LT98wT7YW/SIuMlm6PgjJuAHBbvExXen2aTU+iOt8MPMySZqumvWlWMUJ0b
+         2UZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVGnBG43aB9P9eIu1Qyebe+B2lUyNKa71iBxhU5xbY+oIvSOM1ZgNiemhGo8WzOv40CgoFG6sN0Xc61V41wGyg=@vger.kernel.org, AJvYcCWjSZa1T/fQfjHPr5VUk3ZEr3v7Px87B0a17qyWI8EQ9HPQdz/iN4IJf+jbf6Wb1wyFz84ylfsWp85bfow=@vger.kernel.org, AJvYcCXvhrAs51mA4ekXE5NjQA6r6uuVl/IL5NEGRPLxmpQDIyVIWW4iLvBI0YUvdf2V3brxU/GXQXdW@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJkKk6t3D8N4GYs9iA84nFfI0bS0YB0qI8Jxt5go4phScbPvvO
+	9jUuSMFAwSdtKxqJTKpMxRflvmYDxIypNB5fojyr1kjJaaLH9Yvn9dzwKdgR1Dhnf8RSz+VO0Qy
+	SNlPh8R9SycqRFztZaT5CuPnbF3bOUPI=
+X-Gm-Gg: ASbGncud4rZs7Y0/a+xzU5AU2mWmyCgsWcWwC5b7/NKl5Dw9Gpay7iRk5GT88bzWDBQ
+	w/FG2+66+Bivqw1KK6pN+fT06uDSiN/hfbtTe3/OrFlGT7pQWWdd+kbSvJTS+7XsV2eAsJfGZZ/
+	qYyM5hu1ihXC07vbYy9Utl5uhZIbWgsmwFTg8p80gdr3Zjf1Wx7tZLBV7HmHBTL2pSjZi/yiYjN
+	q4SHcwUCyp/7TIeimrdJXPqq+oPVCCpPP4a/LTY
+X-Google-Smtp-Source: AGHT+IEtVr+JsxC2gJh379iPBuOZoVuruZ3Umbs9N3Juzg1W5BMxEFQML9bdmwsk2kq+ovB/XipjouSJmFQN3pe3GuQ=
+X-Received: by 2002:a05:690c:f14:b0:717:c40f:be9c with SMTP id
+ 00721157ae682-717d5bc0652mr226143477b3.9.1752545543522; Mon, 14 Jul 2025
+ 19:12:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250714184743.4acd7ead@kernel.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRjHeXfOzjlbjo7L6m0GwVIK7aJh9ARRfjA4oYISRFmyRju00byw
-	uaVB4NQKJS2yi86Fs/DSMkbL5gq12pbZjUSpVlkrb3S31GxmWU6L/Pbj//yfH8+HhyGklUIZ
-	o8nM4XWZSq2cEpPiTyE1K2UugzpmwrkCLPZGCi4GcqH+tUsIFpsTwej4CxpGvHcoOF8zRoDl
-	UREJ3+w/CBho76XhoiMZ/HWDJLQcaSag91gHBaVFEwS0jn+mocDVIIBOZ5kQTv6oJaA5/zUN
-	3dctFLxq/C2EQXcpCXfNF0jwl8VDu3UBjN3/iMBrbxbA2NGzFJR3WSnoK/Ij6PL0klBlKkNg
-	b/MJYSIw5ai6/YqOj+A8H4cIrunCMwF3zfyS5qwOA3elIYor8XURnMNWTHGO4RM01/OkheI6
-	KiZI7pprRMCVFn6muK8Dz0luqO0xxdmbHpPcA6uXTglNE29Q8VqNkdet3rhbrB5olWXfonP7
-	3pjIfJRPlSARg9k47P1uI//xt+aW6ZxkI7H/11NBkCl2Gfb5xokgh7ERuOhK5XSfYG9QOHA6
-	LcjzWCVu6R2d7ktYwAV+HypBYkbKFhJ44OoHemYQiu9W9v9djsK+yXdTC8wUh+P6SSYYi9hY
-	bPfUTlfms0vxTecdQdCD2UsMPuevoGcOXYRvNfjI44g1z9KaZ2nN/7VWRNiQVJNpzFBqtHGr
-	1HmZmtxVe7IyHGjqYeoO/tzpQsOdW92IZZA8RALvc9RSodKoz8twI8wQ8jDJ+5c6tVSiUuYd
-	4HVZCp1By+vdKJwh5Qsla8b2q6TsXmUOv4/ns3ndv6mAEcnyUc62/v3tKiZQfqYybL2xp7o/
-	vRMtPl290HS8LzR9dcYW12BBbRg/h48xJMkSv6Qwc3lR9VuLQJbapyhf5+pmo+/t3bG2Z3lX
-	UsWphF2exMuO6lrmsOJ6ZLJJ7ztEPiRuv4lWLDeWEQnDouiOw5s2fl+zpDgSGVK3P9zMymQ9
-	CjmpVytjowidXvkHKz1dRSwDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRjHec95d87ZaHJaVi+uTyu7CFlR0QNdlIQ6REVEFFmkhzy14bVN
-	RSVpXiAStSuRa8a6eoXVvE1Rq2mmhGSWtm6bLmdXtNTEWxdnRX378f//f8+nh6NVkziA08Ul
-	Svo4MUbDKLBi5/qs5cSepF3Ze3IpmK3lDJSNpUBRj10G5tJqBCPjr1gYbn7IwPWrozSYH2dj
-	+GadoMHb4mGhzLYD3Lf6MdSfrKHBc7qVgbzsSRoaxgdYyLQXU9BU2CaDjup8GVyYuElDjbGH
-	had1ZgZc5T9l0O/Iw9BmKsHgzg+FFss8GH30GUGztYaC0dxCBs53Whh4m+1G0NnkwXA5Ix+B
-	tdEpg8mx6RuXH7jY0ECh6fMgLVSWvKCEWtMbVrDYkoSK4iAhx9lJC7bSU4xgGzrHCq+76xmh
-	9dIkFmrtw5SQlzXACF+9L7Ew2NjFCNfff6EEa2UX3qUKV2yIkmJ0yZJ+xaZIhdbbEJBwn015
-	25uBjcjI5CA5R/g15FtN/QxjPpC4vz+nfMzwS4jTOU772J9fRLIrCrCPaf4uQ8Yuhvt4Di+S
-	es/IzF7JA8l0O1EOUnAqPosm3qpP7O9iNmkr6PsjBxHnjw/TAjfNalL0g/PFcn4VsTbdnJnM
-	5ReSe9UPqTNIafrPNv1nm/7ZFkSXIn9dXHKsqItZG2yI1qbG6VKCD8fH2tD0S9xKnzprRyNP
-	tzoQzyHNLCV8TNSqZGKyITXWgQhHa/yVH9/otSpllJiaJunjI/RJMZLBgdQc1sxXbtsnRar4
-	o2KiFC1JCZL+b0tx8gAjOhZSbY7AXE/K9tw0bnH7nt6wDfJL6avz916lHR7K9bKgaP/tZys6
-	1O/GNgbLmSfqsICWLQMdVXXX/DYv2uhKTntSXnnB3hbvV0kniEcOLdg9wbuMC8jBiTvr5k9l
-	tSv3DrErzSf6wov8y5bZLOndN8ynjh9rP1By+ob6Ch71aw7RYINWXBVE6w3iL74R2YYOAwAA
-X-CFilter-Loop: Reflected
+From: Moon Hee Lee <moonhee.lee.ca@gmail.com>
+Date: Mon, 14 Jul 2025 19:12:12 -0700
+X-Gm-Features: Ac12FXwsgRjDPpzTojqRaKExjmsAG5iXutBqOoKqYivzz9QyVrL7TRtbrLx7q1o
+Message-ID: <CAF3JpA4QvNvdx-tq-5ogMmmaOuZuYq8Q=JZjQj0egWGE-=Nogg@mail.gmail.com>
+Subject: [syzbot] [wireless?] WARNING in ieee80211_tdls_oper
+To: syzbot+f73f203f8c9b19037380@syzkaller.appspotmail.com
+Cc: Johannes Berg <johannes@sipsolutions.net>, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: multipart/mixed; boundary="00000000000093565a0639ee4e4b"
 
-On Mon, Jul 14, 2025 at 06:47:43PM -0700, Jakub Kicinski wrote:
-> 
-> On Mon, 14 Jul 2025 22:58:31 +0900 Harry Yoo wrote:
-> > > > Could you please share your thoughts on why it's hard to judge them and
-> > > > what's missing from the series, such as in the comments, changelog, or
-> > > > the cover letter?
-> 
-> My main concern (as shared on earlier revisions) is the type hierarchy
-> exposed to the drivers. Converting things back and forth or blindly
-> downcasting to netmem and upcasting back to the CPU-readable type is
-> no good.
+--00000000000093565a0639ee4e4b
+Content-Type: text/plain; charset="UTF-8"
 
-I understand your concern.  I removed a lot of converting things but
-left essencial things, that is inevitable to remove accessing the pp
-fields through struct page.  Is it still not okay with v10 [1]?
+#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git
+main
 
-There are some points under disscussion with Mina but I'm curious about
-how you think about the direction changed.
+--00000000000093565a0639ee4e4b
+Content-Type: text/x-patch; charset="UTF-8"; 
+	name="0001-mac80211-reject-TDLS-operations-when-station-is-not-.patch"
+Content-Disposition: attachment; 
+	filename="0001-mac80211-reject-TDLS-operations-when-station-is-not-.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_md3w7m310>
+X-Attachment-Id: f_md3w7m310
 
-[1] https://lore.kernel.org/all/20250714120047.35901-1-byungchul@sk.com/
-
-	Byungchul
+RnJvbSA2MGJjZWY2YzY3ZWRmNjZmZjk2MzY3ZTAzYWFhNzA0MjI1ODVlYTRhIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBNb29uIEhlZSBMZWUgPG1vb25oZWUubGVlLmNhQGdtYWlsLmNv
+bT4KRGF0ZTogTW9uLCAxNCBKdWwgMjAyNSAxOTowMjoxMCAtMDcwMApTdWJqZWN0OiBbUEFUQ0hd
+IG1hYzgwMjExOiByZWplY3QgVERMUyBvcGVyYXRpb25zIHdoZW4gc3RhdGlvbiBpcyBub3QKIGFz
+c29jaWF0ZWQKTUlNRS1WZXJzaW9uOiAxLjAKQ29udGVudC1UeXBlOiB0ZXh0L3BsYWluOyBjaGFy
+c2V0PVVURi04CkNvbnRlbnQtVHJhbnNmZXItRW5jb2Rpbmc6IDhiaXQKClRETFMgY2FuIGJlIGVz
+dGFibGlzaGVkIG9ubHkgYWZ0ZXIgdGhlIFNUQSBpcyBjb25uZWN0ZWQgdG8gYW4gQVAuCklmIHVz
+ZXJzcGFjZSAob3IgZnV6emVycykgaXNzdWVzIE5MODAyMTFfVERMU18qIGNvbW1hbmRzIGJlZm9y
+ZQphc3NvY2lhdGlvbiBpcyBjb21wbGV0ZSwgaW50ZXJuYWwgc3RhdGUgc3VjaCBhcyBzZGF0YS0+
+dS5tZ2QudGRsc19wZWVyCnJlbWFpbnMgdW5pbml0aWFsaXNlZCBhbmQgaWVlZTgwMjExX3RkbHNf
+b3BlcigpIHJhaXNlcyBXQVJOX09OKCkuCgpBZGQgYW4g4oCcYXNzb2NpYXRlZOKAnSBjaGVjayBp
+biBpZWVlODAyMTFfdGRsc19vcGVyKCkgc28gdGhlIGZ1bmN0aW9uCnJldHVybnMgLUVJTlZBTCB3
+aGVuZXZlciB0aGUgaW50ZXJmYWNlIGlzIG5vdCBib3RoIGluIHN0YXRpb24gbW9kZQphbmQgYWxy
+ZWFkeSBhc3NvY2lhdGVkLgoKU2lnbmVkLW9mZi1ieTogTW9vbiBIZWUgTGVlIDxtb29uaGVlLmxl
+ZS5jYUBnbWFpbC5jb20+Ci0tLQogbmV0L21hYzgwMjExL3RkbHMuYyB8IDIgKy0KIDEgZmlsZSBj
+aGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigtKQoKZGlmZiAtLWdpdCBhL25ldC9t
+YWM4MDIxMS90ZGxzLmMgYi9uZXQvbWFjODAyMTEvdGRscy5jCmluZGV4IDk0NzE0ZjhmZmQyMi4u
+YmE1ZmJhY2JlZWRhIDEwMDY0NAotLS0gYS9uZXQvbWFjODAyMTEvdGRscy5jCisrKyBiL25ldC9t
+YWM4MDIxMS90ZGxzLmMKQEAgLTE0MjIsNyArMTQyMiw3IEBAIGludCBpZWVlODAyMTFfdGRsc19v
+cGVyKHN0cnVjdCB3aXBoeSAqd2lwaHksIHN0cnVjdCBuZXRfZGV2aWNlICpkZXYsCiAJaWYgKCEo
+d2lwaHktPmZsYWdzICYgV0lQSFlfRkxBR19TVVBQT1JUU19URExTKSkKIAkJcmV0dXJuIC1FT1BO
+T1RTVVBQOwogCi0JaWYgKHNkYXRhLT52aWYudHlwZSAhPSBOTDgwMjExX0lGVFlQRV9TVEFUSU9O
+KQorCWlmIChzZGF0YS0+dmlmLnR5cGUgIT0gTkw4MDIxMV9JRlRZUEVfU1RBVElPTiB8fCAhc2Rh
+dGEtPnZpZi5jZmcuYXNzb2MpCiAJCXJldHVybiAtRUlOVkFMOwogCiAJc3dpdGNoIChvcGVyKSB7
+Ci0tIAoyLjQzLjAKCg==
+--00000000000093565a0639ee4e4b--
 
