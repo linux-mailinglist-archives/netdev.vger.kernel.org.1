@@ -1,133 +1,98 @@
-Return-Path: <netdev+bounces-207296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70042B069F1
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 01:40:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A0AEB069EF
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 01:39:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9075D3A7703
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 23:39:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C8664A392A
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 23:39:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B2CF2D77FC;
-	Tue, 15 Jul 2025 23:39:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 661612D4B62;
+	Tue, 15 Jul 2025 23:39:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nLikDS4d"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EotaRwYU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14CEC2C08AB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D47F2D3A93;
 	Tue, 15 Jul 2025 23:39:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752622787; cv=none; b=kHkmUyNwya69G36pmD3pUTUIXI+Zh42RwBOTwm0pYZA94M9MrWmANggjK+p+ZsH4l23aSRaLh8wKCKjT88imLMUniBAp746Jlj7bgeutjFWhs9O7a6Q3TVZ6vn7CjYbfRzks6jvwqxT0lQCNiB0z56J5icSM3SNpBjVMPPSeLEs=
+	t=1752622786; cv=none; b=CltHJUCHaTCibwlDe/muOTWn9uJ4i8+el1AWWtPv2wqhiHQzLN7J+q1q3rFCCjinY7aEPNAq5FftZfRPe99sKb3kLF3DzZvnVo4lABkanTv4w5hkwr3awIShSUo1cKqApNIavvVSOLHsZ9DvsCcdR2oINmRp3+Ms+0phDsPn93Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752622787; c=relaxed/simple;
-	bh=/NMAMgGHYTD9vYTSprLzcvM83YjeYox24zUTm5stx4M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OnTh3gE5ZAD+Mghau3rayU8ozxHBDjCBJdGqE9+2v1lHoQmDvQnUeQX3p80l1leB7EvTXvp33zRwXGeBNyc1KKRoE1D6B/+PwbIWME92pl1B6twlxGzc2Z3loBqShdqzo1z824BuexEtiG52v+wmfw2CVe8ijI+q3AKBs4LMzvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nLikDS4d; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-879399faac9so459716039f.3;
-        Tue, 15 Jul 2025 16:39:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752622785; x=1753227585; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/NMAMgGHYTD9vYTSprLzcvM83YjeYox24zUTm5stx4M=;
-        b=nLikDS4dQnmJ77ecjBdMUF1BSmI5nyTxyVNizaU6gH51C16gX4vtjz4QNDa8STjkjV
-         YjwHiRH9mOOMm+T/viOpNx5mQqyokGywZkvmCkLxctMsRDZWzuJYNLMSOb8WKbzSkqxQ
-         lhpZMTVRyjl+8shw0P+MSv/gahetMJKtMJzBdN/Uear5KwfBXCSzCFzddXbAhW3hXoEO
-         9iN6OOuTWEFVjNw9lPdzU2eaTkL6jp5fOqfQD8NI1AH6FMXHnWSTtsdvRjQQL+QjQGIu
-         9C7QjLd35hLKRb92SPHEL/UuKdCZLHXS4zY69t+VMfVnFIC4uUAi9c1nl+NB3OaMWuwB
-         Daww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752622785; x=1753227585;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/NMAMgGHYTD9vYTSprLzcvM83YjeYox24zUTm5stx4M=;
-        b=GThWIK0ZqR/54vkpEoI5jk9B0Nw/YWVTaN41d94CSa8MriGbBmqT4IUJYKWg+4Vabb
-         WqFDc92Wd/SRHjoGrn7ICMr0XtRixMNu2Baz77nxpSuuE8VZDgiwH+aFdnW8J3tDyrhr
-         igRP+Rkm22qsgsgYH5b7173h296HTaN/J7tFHe+q9EuI1ImI5CWqWVCiM6Bvdi7HgNvD
-         ueTylc0/XEhD/f11yU/rlTHF28lRnqDYSyLyM8cSx7fowjjRblYM5kUEKtgBIpGKtRUT
-         ChPiPy9r3A9CXPVXQuycGIthpVdRLmDBA7tk84eelk0DsOdUaKS34uWqFOKKKZPFIqJA
-         oCkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWZeNYWsqwzfLA3gazpGu2FAhtDEA1rSt2oTQ/6bd7rWpcCN18Xx2DBzCddrcoAa5B9RXoWerpm@vger.kernel.org, AJvYcCXeUllA9OLnTEMkZpqZNQyykv3lTb7Ssz8fzM0y1jJ4nMMwkiUdfcGfF0J8SfNnI3LZwy8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDZs1+w9AQ+Zyx3TVFByvH9hhWZ0VQ+is8NgQ2WzIEDO5mAYz5
-	Qw1VgsK0/ELTaJ3rOykvDVCo8PC+N1YSxGoXDj21r2V0QSeyvxdDpTlLE9D5bAscRdpCZ5wp5yw
-	m4qYOgJt+bjpssF1drD0RFoflv18M5zg=
-X-Gm-Gg: ASbGncuFCFaSYMeJG3TtCKpEm60R1pY/lwTW9PeNAIkYZmfB/AmltrC61ZvqnJrdWOK
-	sznqeZ102tuwA40LzAbVLg62HEVw4CFjU+QnAdPM1Nml/8BgSN3UZyPHba09VtYHsrrTXhfzcVb
-	IBmUSPsM5O8dUaap+TThqeEywc3PUPkApSkYwPS2NtLCF8SsPpOiDw7g12Lo83vLQSoqLyI8fLC
-	VJMLg==
-X-Google-Smtp-Source: AGHT+IF1AGPGLx+chLnXPzSUIbo1llisHxGaUomK0TaJpx2Peo++4xVrX9r1sdpHVqem/gKN7QhN2iTgLZPlqjjmDW4=
-X-Received: by 2002:a05:6602:154d:b0:879:572e:238c with SMTP id
- ca18e2360f4ac-879c091cc40mr161860839f.9.1752622784998; Tue, 15 Jul 2025
- 16:39:44 -0700 (PDT)
+	s=arc-20240116; t=1752622786; c=relaxed/simple;
+	bh=q3QIBc/TsdXBWirwIMIHxwp+8kRlnWdwqh1CRlQ82NU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=L3mRDxtTriBXW85Drtl7HYO00hH9NN9OII18wVRJ7TQ6hZyDLaAOxEVVXvds8/2sDd7q45R6eY9IPugTn7trSvNUeW1fI4CyLXTR85slXPoOswVyzjYJt72x41m2mCozU4RGZsbPD5FyP79hy+xdgP5u8GOE/Ttf0qyNjhdUDQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EotaRwYU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9497C4CEE3;
+	Tue, 15 Jul 2025 23:39:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752622785;
+	bh=q3QIBc/TsdXBWirwIMIHxwp+8kRlnWdwqh1CRlQ82NU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=EotaRwYUI7AAtHpn69V6T63FUu/TQgcsEuWQOrGJo5F/IWGf/z8IHUenYw8Wive+q
+	 SW+2AYdXXZnmnd1P07d86pJso5KevSYAytDeXBV8yKUD8jzz8mYgCQGDyf91U4sHFq
+	 P6IMnFoISHnRqz3EQjKoshItmjaTR2ckZ6hVNdApnhi06fRk7/SC1Ug8Fzsqatr2IY
+	 Dx9rJYvDkp/2iyFt4NSFObtVDPvbC0Wy40Fs2/gScMSVKTw2qrM83nX406DfumOpWO
+	 fDyy21UbuPE1UQBOdAlXT8ewL0TuaC6fcxGrIBpcfh3CdnUH2vzUnPkpaADF5HJmS1
+	 w9ZyS9PBNsmhg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7167E383BA30;
+	Tue, 15 Jul 2025 23:40:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250713025756.24601-1-kerneljasonxing@gmail.com>
- <aHUqR5_NoU8BYbz5@mini-arch> <CAL+tcoCiL0jjUO8RPiWX-+9VtjQm50ZeM5MQXn3Q6m+yNYryzQ@mail.gmail.com>
- <20250715161911.32272364@kernel.org>
-In-Reply-To: <20250715161911.32272364@kernel.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 16 Jul 2025 07:39:08 +0800
-X-Gm-Features: Ac12FXxB5gBAZoZ7le3QojwPXtKckJgE1Ad6qaVWew8gFow9WbpZrKl1KtyVeAk
-Message-ID: <CAL+tcoAn8ADUGARSzZB=5dGoa+Kh7HnNBLxyqTa3W6tOhUK-sg@mail.gmail.com>
-Subject: Re: [PATCH net-next] xsk: skip validating skb list in xmit path
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Stanislav Fomichev <stfomichev@gmail.com>, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, joe@dama.to, willemdebruijn.kernel@gmail.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: stmmac: intel: populate entire
+ system_counterval_t in get_time_fn() callback
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175262280626.617203.5242260114409933910.git-patchwork-notify@kernel.org>
+Date: Tue, 15 Jul 2025 23:40:06 +0000
+References: <20250713-stmmac_crossts-v1-1-31bfe051b5cb@blochl.de>
+In-Reply-To: <20250713-stmmac_crossts-v1-1-31bfe051b5cb@blochl.de>
+To: =?utf-8?b?TWFya3VzIEJsw7ZjaGwgPG1hcmt1c0BibG9jaGwuZGU+?=@codeaurora.org
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+ alexandre.torgue@foss.st.com, tglx@linutronix.de,
+ lakshmi.sowjanya.d@intel.com, richardcochran@gmail.com, jstultz@google.com,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ markus.bloechl@ipetronik.com
 
-On Wed, Jul 16, 2025 at 7:19=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 15 Jul 2025 07:53:19 +0800 Jason Xing wrote:
-> > > Although, again, if you care about performance, why not use zerocopy
-> > > mode?
-> >
-> > I attached the performance impact because I'm working on the different
-> > modes in xsk to see how it really behaves. You can take it as a kind
-> > of investigation :)
->
-> How does the copy mode compare to a normal packet socket?
+Hello:
 
-We combine a TCP user-space stack that is not mature obviously with
-this copy mode af_xdp in the virtual machine, seeing that in some
-cases:
-1) in the real workload the cpu% could be minimized a lot (almost
-50%), which is one of factors we care about most of the time.
-2) the throughput does not always outperform TCP in the kernel. So
-far, only in request & response cases, we're able to see xsk ramp up
-the transmission.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-I'm focusing on the physical machine scenario in the meantime.
-Everything went not well admittedly.
+On Sun, 13 Jul 2025 22:21:41 +0200 you wrote:
+> get_time_fn() callback implementations are expected to fill out the
+> entire system_counterval_t struct as it may be initially uninitialized.
+> 
+> This broke with the removal of convert_art_to_tsc() helper functions
+> which left use_nsecs uninitialized.
+> 
+> Initially assign the entire struct with default values.
+> 
+> [...]
 
-As I said, I'm still trying to find/test every possible feature in
-xsk, hoping to find a final solution to deploy.
+Here is the summary with links:
+  - [net] net: stmmac: intel: populate entire system_counterval_t in get_time_fn() callback
+    https://git.kernel.org/netdev/net/c/e6176ab107ec
 
-I'm also thinking if it's possible to 1) remove the sendto syscall
-that is used to drive/notify the xsk, 2) prepare enough skbs
-beforehand instead of allocating one and then freeing it over and over
-again. Well, these so-called ideas are just out of thin air :p
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Thanks,
-Jason
+
 
