@@ -1,92 +1,168 @@
-Return-Path: <netdev+bounces-206950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0474EB04D87
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 03:38:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83967B04D88
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 03:46:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8842F7B0026
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 01:36:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EA0C1A619B3
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 01:46:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E73E0288C15;
-	Tue, 15 Jul 2025 01:38:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBD0F2BF3E2;
+	Tue, 15 Jul 2025 01:45:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mrUBhGQr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VaYijqUi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B501A5B8C
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 01:38:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 848052BEC42;
+	Tue, 15 Jul 2025 01:45:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752543490; cv=none; b=fDVf/2MqMOBwynFhifRTLHWD4yjbxZsPEemD+C/IJvJsr8ykN+YxTqx/nst8E/eXLO36BiomvBS2MVkqeZEwx536OYe3y370Fkca75h3YkpFw47jLgYuPF9bgGOk7vFLWjwJve4h3BS4t4QSGBUvrIVAf4gPtfb7wvuPyIYTW9A=
+	t=1752543958; cv=none; b=Ug2nkGCpwio0z+snvO6DiPHtB16kkfSO065iy9zUGScL7s6XYHPo0lyvIipI87eLitsot4CyuiOxlWGOFpOHNSooNahUM0tNCx+s+AZIPnQsqQfQe6J/MdxViuKg9bVIG/wVwV2Xd4ulwpag5Wp8yVnR6i2ty6sz/oWQF9/9U7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752543490; c=relaxed/simple;
-	bh=cNCNmllpS8iWCQasfVOHi8kmn6fKsyd2/XJHLexMlJE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qDtjI7KDnD3S54naseu83R0+olhqNFTqBzIXdYpNX/vfkNbVxzjY6Jd764f/y8qTRUCvz9PSjX21Q9rhCC+wQfWaoCI0pw1XNR3wvtLgoew2J9ZPvBVZ69qgSfWBxIUS+FYePqXbZ0EqcEzOhkd/BaJ5vjA6Kjk5Wbc4uZynPiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mrUBhGQr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 042BCC4CEED;
-	Tue, 15 Jul 2025 01:38:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752543490;
-	bh=cNCNmllpS8iWCQasfVOHi8kmn6fKsyd2/XJHLexMlJE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mrUBhGQrCGeU1PlCUHqPFewMY24KjrS//fwrBFKGOSFD4vQgPIcL24NxHUFN2PaZB
-	 yzlICJwTfGe6uA3p2IhFNPAh9a+IGZ8RKRQW0Re8SaSoOYKBqsCmTyRN35CVlwJ9Kw
-	 Lfae8Jp8t+wboKDrKrgo+bkxz8CsV/EDTtsxXB87rWLFH/VRkHegnY6fRyGhRhZTL+
-	 CRnvX2PJwO87USsomaoy1PNkjp9FAYQmAkWHS+yYQL0L3jomf8NnDk8LuQ0NBGXRbw
-	 kt/5vs11W4mpKxUwNXJz9tEVB4d2ifBNXnWK6tW8jj5+F7QpQX+qTiYSOXklyVwxCj
-	 6GGgTK8qSSFYw==
-Date: Mon, 14 Jul 2025 18:38:09 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, Simon Horman
- <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
- <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next 1/8] tcp: do not accept packets beyond window
-Message-ID: <20250714183809.02ed2853@kernel.org>
-In-Reply-To: <20250711114006.480026-2-edumazet@google.com>
-References: <20250711114006.480026-1-edumazet@google.com>
-	<20250711114006.480026-2-edumazet@google.com>
+	s=arc-20240116; t=1752543958; c=relaxed/simple;
+	bh=/swcXr2ss79nJxFip+SNNqYNuVuEmY4AkU1neU+GXDQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a/cHBex2ImmzWcbIaXzm6H4UpvJOLJIvgLGTvqTTnJkM1b0M7vhJWFwUH0Obx3uGAxkLF98rLiGuKvhZy7WsBVIZmO3rMyo2OuptSvZIBo6R/4KpxGTwJnmthEMAd6LPOXE/ZGZtz2lv5kkMA4jNuoroyOnxEOzwCt8lwgJUcIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VaYijqUi; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752543956; x=1784079956;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/swcXr2ss79nJxFip+SNNqYNuVuEmY4AkU1neU+GXDQ=;
+  b=VaYijqUi0xfEBYEfYfCe0jZMGPeCNnnSUAdY3gFX7lRTGO/QWmV4/5V9
+   EgwYbwoF9o0cVORYDFFc6oSkpfN2j1PWnZqe6HOlQRkhvLyMF40xEjz+r
+   CzES+N+eVCAzDuELcrvigNym6v5yRydGoPWdUOjaPRwdjQm19U55Kp87o
+   kjKzqH8da61s0LlR/1raEhvOPjkyJh9+RgS+OX31kNC+mxcEiyol1yk3t
+   NeTOK6mC1l8KKK4q51vX2A2GCJwVv45iJOCf7c3CszJPj5PMSRBgshcN0
+   0jUJeSeL99AgyzhGVMuiste+SyZjUZ6O+XTXGiaF6TCbB+0aYGyv0IBB9
+   A==;
+X-CSE-ConnectionGUID: DB6WahnkRSCAxxlDMBSjwg==
+X-CSE-MsgGUID: 9ObbP/PBTLGIt6HxOGZaWw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="57360546"
+X-IronPort-AV: E=Sophos;i="6.16,312,1744095600"; 
+   d="scan'208";a="57360546"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2025 18:45:55 -0700
+X-CSE-ConnectionGUID: yu+/zp4GTtKNOp/AuwsKwA==
+X-CSE-MsgGUID: J3Rvn9+kRXemF9VDSSLEcg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,312,1744095600"; 
+   d="scan'208";a="162633732"
+Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
+  by fmviesa004.fm.intel.com with ESMTP; 14 Jul 2025 18:45:48 -0700
+Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1ubUjr-0009Wt-01;
+	Tue, 15 Jul 2025 01:45:47 +0000
+Date: Tue, 15 Jul 2025 09:45:38 +0800
+From: kernel test robot <lkp@intel.com>
+To: Byungchul Park <byungchul@sk.com>, willy@infradead.org,
+	netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	kernel_team@skhynix.com, almasrymina@google.com,
+	ilias.apalodimas@linaro.org, harry.yoo@oracle.com,
+	akpm@linux-foundation.org, andrew+netdev@lunn.ch,
+	asml.silence@gmail.com, toke@redhat.com, david@redhat.com,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+	surenb@google.com, mhocko@suse.com, linux-rdma@vger.kernel.org,
+	bpf@vger.kernel.org, vishal.moola@gmail.com, hannes@cmpxchg.org,
+	ziy@nvidia.com, jackmanb@google.com, wei.fang@nxp.com,
+	shenwei.wang@nxp.com, xiaoning.wang@nxp.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org
+Subject: Re: [PATCH net-next v10 12/12] libeth: xdp: access ->pp through
+ netmem_desc instead of page
+Message-ID: <202507150904.kGZOOZns-lkp@intel.com>
+References: <20250714120047.35901-13-byungchul@sk.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250714120047.35901-13-byungchul@sk.com>
 
-On Fri, 11 Jul 2025 11:39:59 +0000 Eric Dumazet wrote:
-> -	/** @SKB_DROP_REASON_TCP_INVALID_SEQUENCE: Not acceptable SEQ field */
-> +	/** @SKB_DROP_REASON_TCP_INVALID_SEQUENCE: Not acceptable SEQ field.
-> +	 */
->  	SKB_DROP_REASON_TCP_INVALID_SEQUENCE,
-> +	/** @SKB_DROP_REASON_TCP_INVALID_END_SEQUENCE: Not acceptable END_SEQ field.
-> +	 */
-> +	SKB_DROP_REASON_TCP_INVALID_END_SEQUENCE,
+Hi Byungchul,
 
-FWIW this is not valid kdoc. We can either do:
+kernel test robot noticed the following build errors:
 
-	/** @WORDS: bla bla bla */
+[auto build test ERROR on c65d34296b2252897e37835d6007bbd01b255742]
 
-or
+url:    https://github.com/intel-lab-lkp/linux/commits/Byungchul-Park/netmem-introduce-struct-netmem_desc-mirroring-struct-page/20250714-200214
+base:   c65d34296b2252897e37835d6007bbd01b255742
+patch link:    https://lore.kernel.org/r/20250714120047.35901-13-byungchul%40sk.com
+patch subject: [PATCH net-next v10 12/12] libeth: xdp: access ->pp through netmem_desc instead of page
+config: x86_64-rhel-9.4-rust (https://download.01.org/0day-ci/archive/20250715/202507150904.kGZOOZns-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+rustc: rustc 1.88.0 (6b00bc388 2025-06-23)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250715/202507150904.kGZOOZns-lkp@intel.com/reproduce)
 
-	/**
-	 * @WORDS: bla bla bla
-	 */
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202507150904.kGZOOZns-lkp@intel.com/
 
-but "networking inspired style":
+All errors (new ones prefixed by >>):
 
-	/** @WORDS: bla bla bla
-	 */
+   In file included from drivers/net/ethernet/intel/libeth/tx.c:6:
+>> include/net/libeth/xdp.h:1295:23: error: passing 'const struct page *' to parameter of type 'struct page *' discards qualifiers [-Werror,-Wincompatible-pointer-types-discards-qualifiers]
+    1295 |                          pp_page_to_nmdesc(page)->pp->p.offset, len, true);
+         |                                            ^~~~
+   include/net/netmem.h:270:66: note: passing argument to parameter 'page' here
+     270 | static inline struct netmem_desc *pp_page_to_nmdesc(struct page *page)
+         |                                                                  ^
+   1 error generated.
 
-is not allowed.
 
-Ima fix for you when applying.
+vim +1295 include/net/libeth/xdp.h
+
+  1263	
+  1264	bool libeth_xdp_buff_add_frag(struct libeth_xdp_buff *xdp,
+  1265				      const struct libeth_fqe *fqe,
+  1266				      u32 len);
+  1267	
+  1268	/**
+  1269	 * libeth_xdp_prepare_buff - fill &libeth_xdp_buff with head FQE data
+  1270	 * @xdp: XDP buffer to attach the head to
+  1271	 * @fqe: FQE containing the head buffer
+  1272	 * @len: buffer len passed from HW
+  1273	 *
+  1274	 * Internal, use libeth_xdp_process_buff() instead. Initializes XDP buffer
+  1275	 * head with the Rx buffer data: data pointer, length, headroom, and
+  1276	 * truesize/tailroom. Zeroes the flags.
+  1277	 * Uses faster single u64 write instead of per-field access.
+  1278	 */
+  1279	static inline void libeth_xdp_prepare_buff(struct libeth_xdp_buff *xdp,
+  1280						   const struct libeth_fqe *fqe,
+  1281						   u32 len)
+  1282	{
+  1283		const struct page *page = __netmem_to_page(fqe->netmem);
+  1284	
+  1285	#ifdef __LIBETH_WORD_ACCESS
+  1286		static_assert(offsetofend(typeof(xdp->base), flags) -
+  1287			      offsetof(typeof(xdp->base), frame_sz) ==
+  1288			      sizeof(u64));
+  1289	
+  1290		*(u64 *)&xdp->base.frame_sz = fqe->truesize;
+  1291	#else
+  1292		xdp_init_buff(&xdp->base, fqe->truesize, xdp->base.rxq);
+  1293	#endif
+  1294		xdp_prepare_buff(&xdp->base, page_address(page) + fqe->offset,
+> 1295				 pp_page_to_nmdesc(page)->pp->p.offset, len, true);
+  1296	}
+  1297	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
