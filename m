@@ -1,112 +1,107 @@
-Return-Path: <netdev+bounces-207009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 865B8B0531F
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 09:28:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82DCBB05324
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 09:29:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA0003A3F59
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 07:28:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 808B37B6C47
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 07:25:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D15927280A;
-	Tue, 15 Jul 2025 07:24:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E0912701CE;
+	Tue, 15 Jul 2025 07:22:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="bb9CUVZn"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="xV4ayyVH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D91A26F471;
-	Tue, 15 Jul 2025 07:24:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7EF417C77;
+	Tue, 15 Jul 2025 07:22:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752564249; cv=none; b=uMMxOZuatNSVMkpqvZTwmFWeWl5nOIXDcr4lfdUyiQ28I+2ZDbE+Fr3ymU9zHbVi+Sxg2L3/UAmEMu1B1C2Rq7M9DgHgFkOAB2pq+nRcHN3j5hRW197I96rECJptmRTlt1/1pqzTjwaIWG5FQN4m01uah2k6xVYsy1MZwBqTmtk=
+	t=1752564128; cv=none; b=PAVborFcxROuQwkYOfS1cWzJRH7RIsynaNIm79hTQiK6ZIXnzOnwrkRE1pNtkqFxaCZredu+r0ZrqM4SsoM2foOPPhpezSfEmvwvcreWngNigXyTpfWX8n6yFLNnhktQx61duZ3olDcVLHHrltzD99MVK5yl8LlOgdhSfF7qnKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752564249; c=relaxed/simple;
-	bh=BXTbNsqHYtb78aC3SqWfGneQbTCjnctCyxMCBJ09N7k=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=rGPFnF2ESgIiR1mslHUN+mq1AU1v/wWEoO1nMKMsf75kGAA/SXgfH8MMYQyd1pCmH6fyFIFNKLeqAeEElyussrhcUmn+1+YUH3dgZ5IUfa3XJd4WW4UOcETWVuHzNJi8I+D3ezWI0E9shokqDPr1iWCeucLWAyAfsdTsdA7evsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=bb9CUVZn; arc=none smtp.client-ip=54.206.34.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1752564099;
-	bh=6ljyNSsJ9lRiZijcfuWG6pzCp0qBpPAPmbp2XKWMBlU=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject;
-	b=bb9CUVZn86ENM63zABfZN3lTUs8nLzthyk69brgQUipicO1k0HKkgQqDx22yeETtB
-	 SfCvIv8iPfXQnuBIIaKimfqUKt2pwCW41eccBJRVYZTi1yCl2FjWk2GH+uUvY60f77
-	 1Y8E+gzigLeamygcbYJuQhGBFO0epkFMHkhnLiQ0=
-X-QQ-mid: zesmtpip4t1752564070t2d6fe610
-X-QQ-Originating-IP: 02fN+bCDAMO8qWCbbIp+weQD8yas8dWFM1orO/k1MLY=
-Received: from [IPV6:2408:8670:2e0:408::113:10 ( [localhost])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 15 Jul 2025 15:21:06 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 7763901825682944429
-EX-QQ-RecipientCnt: 11
-Message-ID: <B4FF81C421E3D77D+65165cda-6331-4a05-b7b5-b7173cfdbd55@uniontech.com>
-Date: Tue, 15 Jul 2025 15:21:05 +0800
+	s=arc-20240116; t=1752564128; c=relaxed/simple;
+	bh=Rhik2SI+sxdIEG5rfGbMFjsf4x5xltoyJp8F3xN1GvI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ejiuz8NUtXdV/i2Arl4Ez7gW7Amh1x0cGJG4DyMOjLYv3yo8OkIAPohbO2UJgA/ZR4T3tYG/0FWefzPGpGQzQ3iLH/Hx6ZFLQKQuBWEYjExoeW3E/Y/s+UsTi7HA7G+kLo23j/trKcTiy5AFagyWTp7P6R+LDlMkptgBxHL24ek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=xV4ayyVH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BF12C4CEE3;
+	Tue, 15 Jul 2025 07:22:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1752564127;
+	bh=Rhik2SI+sxdIEG5rfGbMFjsf4x5xltoyJp8F3xN1GvI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=xV4ayyVHzmMklnAQs9ZPV19B42Zsk2m7JMrMJ9Ou80gk+ulgxsyLIhmhnUsk5ITkT
+	 BIOD164QstgeLz9+xuFFZ01NuqUGgIn+VixhoplzD96lw9IWhOcL5obCmwa6Ivp5vT
+	 /UdnZj44/JtIwtk6Q92BDyrCHIsNzPlEBMflYjVA=
+Date: Tue, 15 Jul 2025 09:22:03 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: WangYuli <wangyuli@uniontech.com>
+Cc: seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, dave@stgolabs.net,
+	jonathan.cameron@huawei.com, dave.jiang@intel.com,
+	alison.schofield@intel.com, vishal.l.verma@intel.com,
+	ira.weiny@intel.com, dan.j.williams@intel.com,
+	lucas.demarchi@intel.com, thomas.hellstrom@linux.intel.com,
+	rodrigo.vivi@intel.com, airlied@gmail.com, simona@ffwll.ch,
+	marcin.s.wojtas@gmail.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, arend.vanspriel@broadcom.com,
+	ilpo.jarvinen@linux.intel.com, andriy.shevchenko@linux.intel.com,
+	jirislaby@kernel.org, jgross@suse.com, sstabellini@kernel.org,
+	oleksandr_tyshchenko@epam.com, akpm@linux-foundation.org,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	ming.li@zohomail.com, linux-cxl@vger.kernel.org,
+	intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+	netdev@vger.kernel.org, kvalo@kernel.org, johannes.berg@intel.com,
+	quic_ramess@quicinc.com, ragazenta@gmail.com,
+	jeff.johnson@oss.qualcomm.com, mingo@kernel.org, j@jannau.net,
+	linux@treblig.org, linux-wireless@vger.kernel.org,
+	brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
+	linux-serial@vger.kernel.org, xen-devel@lists.xenproject.org,
+	shenlichuan@vivo.com, yujiaoliang@vivo.com, colin.i.king@gmail.com,
+	cvam0000@gmail.com, zhanjun@uniontech.com, niecheng1@uniontech.com,
+	guanwentao@uniontech.com
+Subject: Re: [PATCH] treewide: Fix typo "notifer"
+Message-ID: <2025071545-endnote-imprison-2b98@gregkh>
+References: <B3C019B63C93846F+20250715071245.398846-1-wangyuli@uniontech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: kuniyu@amazon.com
-Cc: davem@davemloft.net, dsahern@kernel.org, duanmuquan@baidu.com,
- edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, jiazhenyuan@uniontech.com,
- goutongchen@uniontech.com
-Reply-To: 20230619175824.50385-1-kuniyu@amazon.com
-From: Gou Hao <gouhao@uniontech.com>
-Subject: Re: [PATCH v2] tcp: fix connection reset due to tw hashdance race.
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz7a-0
-X-QQ-XMAILINFO: NTHY/YkN8c+xGEVxJtBoRp+Rh2MzaENRXsVS4OUIl4yIJAA0PwjIPztf
-	kcEyXcoJWYEXP19kMe4BeM7M4MOCOklYysHqIzaEb6gZ0aPPu5WCsMmb/uhhUjk+v67KcmL
-	ilbYttFo/o3RimbcaSPSLGayDU+fu+qEb0rP9n9Z4y7+jQU3qe22JvdrohgIE8tgr57EVUg
-	ahkO2XyMcAFFOAXXo0zZwgbFTtDnCpHOK6uGiG2DNwvbhAaLEPMcut7H/c0A+lhCCxD9xX9
-	PJF4Rgg33W02ABCKyXj9s0tHvD5qmSqRqCd1j3XAh26sitVHTBYLkNHqDp68p7KnOQXKbOX
-	wgfoIAgmWDtBk4EH5gVr3hCY/X0dKngQrjpbLU0QUGDjcc+JUHI7WxUQ0HhqiS/DKt3u8xh
-	wKWxG4VWII3M4vt8xxD4CCuucQPb/eoItaZdrD5ctlZdZKg6JioqpRcLf3IHzSRvi/DzeK5
-	mvmZuqKZUZesr5WkvpWxFK/URcw2GXbpvF+NoNVzCm9oucTtbjlz4v8khjbKxiCW78Rb54N
-	uk9j50v/09O5oY8ZLy1n8JPv6jxu/WNcIoiBD9YcGZdwDMEecI4idqBxwDFFuV2dYAguzO4
-	ZLFFniKAsnST1d1ckJycfhNXJu/1KcYgFSV6FBeB2Vw35P+t929kky8aIbHcKo/yPWjPATk
-	tftQz/9TYYyIfXH4JHEs77R+T28dwqorGx/1ktUrP/JdrxV7kF5QX7TQduWXlyxiBWztjD4
-	4AJTyswcjp2sEemKd30s+fJOqVC7F+IFR7QoHnhboOuWT2DDh2yzRuCUujFqIfu016fo+s+
-	a+f20OZ/COY7g0XYdiCw6RVeLMDZfRobjsXOVPCKf3ERWxWEQodR0AKpeFcsZyujdAQnwI9
-	s00clh3o2UiA26pRbobKR6gVgSyQqE+LAbkv9pMjQfsmxFzTUrTUbKzFCIutQfwEEQ0dHS1
-	/34A9iy3Eud6asg8Zp1S/MA6ju4MR6ZvFNoyxeoeWSSnvVftRzlVrDNEq
-X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <B3C019B63C93846F+20250715071245.398846-1-wangyuli@uniontech.com>
 
-Could you please tell me how this issue was ultimately resolved? I don't 
-see any related patches in mainline.
+On Tue, Jul 15, 2025 at 03:12:45PM +0800, WangYuli wrote:
+> There are some spelling mistakes of 'notifer' in comments which
+> should be 'notifier'.
+> 
+> Fix them and add it to scripts/spelling.txt.
+> 
+> Signed-off-by: WangYuli <wangyuli@uniontech.com>
+> ---
+>  arch/x86/kvm/i8254.c                                        | 4 ++--
+>  drivers/cxl/core/mce.h                                      | 2 +-
+>  drivers/gpu/drm/xe/xe_vm_types.h                            | 2 +-
+>  drivers/net/ethernet/marvell/mvneta.c                       | 2 +-
+>  drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.c | 2 +-
+>  drivers/tty/serial/8250/8250_dw.c                           | 2 +-
+>  include/xen/xenbus.h                                        | 2 +-
+>  scripts/spelling.txt                                        | 1 +
+>  8 files changed, 9 insertions(+), 8 deletions(-)
 
-We encountered the same situation in our actual business: due to lookup 
-failure, the client received RST packets.
-
-As follows:
-
-    CPU 0                                       CPU 1
-    -----                                             -----
-tcp_v4_rcv()                      syn_recv_sock()
-                                             inet_ehash_insert()
-                                             -> 
-sk_nulls_del_node_init_rcu(osk)
-__inet_lookup_established()
-                                             -> 
-__sk_nulls_add_node_rcu(sk, list)
-
-
---
+Please break this up into one-patch-per-subsystem, like is required for
+things like this.
 
 thanks,
 
-Gou Hao
+greg k-h
 
