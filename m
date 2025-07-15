@@ -1,154 +1,171 @@
-Return-Path: <netdev+bounces-207240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26E8AB06555
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 19:44:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B04FFB06558
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 19:47:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA64C16F7F7
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 17:44:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCA533B5089
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 17:46:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A7BB286413;
-	Tue, 15 Jul 2025 17:43:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E3722857D8;
+	Tue, 15 Jul 2025 17:47:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cJ/tFzTR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="INNqxjBo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F365328507B;
-	Tue, 15 Jul 2025 17:43:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D46782853EA
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 17:47:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752601429; cv=none; b=PX+zKvscgzip+zWpHJhjh0UlAMMC/czbxkc0K3lrmlQoSjpwCUCkHNO94GHDcZgkyEBTr9MR37oYYebBY2w5S6N6ujiB3cgwNb3atx5ARD3+BmQj/NpczcNMVFVy6SnrH3fvLZsUUmi2ManeLwR5qQllcH9Tl0xoDFLwThFA8dQ=
+	t=1752601628; cv=none; b=YfOpaIcbG1wkMeJuN2oleVirZQxI1DmhBOpjeZVdo9r/TFZQqKrJZckYyceJ+u7X0ThwsJrNl6NsCItJQmByCzuhtkz1EjN4yoszudpP5pPk+Q07Ui+sjvytUiptCuDhgb1Hclk4J1wrAlj92KwIcFGTp2xKnoEpz77988xXyN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752601429; c=relaxed/simple;
-	bh=54VsIhKZIv/mNC4NrTI9DMJ7xO/jEt3cjbBcWJjARgg=;
+	s=arc-20240116; t=1752601628; c=relaxed/simple;
+	bh=SnLp5g3Y32T7s024ewMrU5KwBsImwIVTSS6wMI7KFus=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=boDqHqZsC8uwcLuUviwiLBae8dng3kcS19ZOAfcy+BR6Ey6cCtvXOo5nfByJdWnbdWJ2kgbyXVxr2HTS/uQROijQDAZoc92yLS/P7y1cmDD42Lj0xlgxwCe+853Z11lgQmZHk4FexQEf2wUhsbMqnAEmhWDCnjFyQ9ynP3qp0RQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cJ/tFzTR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99843C4CEE3;
-	Tue, 15 Jul 2025 17:43:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752601428;
-	bh=54VsIhKZIv/mNC4NrTI9DMJ7xO/jEt3cjbBcWJjARgg=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=cJ/tFzTRQvVmZe4bXDNiYPtuqt/7L/tJESoX0k/L6gt+FYeldUsQj+/4OgvhhudJ2
-	 a3Gz8r8S//vHl2Rawg9VD8KL8fop2h6lLT4IkLRJaTWynA3bf14gmE46MSUNREkv/Z
-	 kySwX/bMmaD2nntB3vVVp7T7NXIFxYzX8QDI7+UkV3zHSCMx4vsffdRWwhH10dwQkQ
-	 RC2u5GYUUG593bC6qBFvUpVlKnjLoxKVDZkjau1bWsDeFDybD96JFHHFCD/G9MJibh
-	 HxSkK7BltDpfwwtZOmXvhpxm/Ay6oywwTMZw+61Pe3Yxr4rV9y+kQlMcwr2JYiD32R
-	 XOPAPeaXMLe3w==
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-608acb0a27fso8037863a12.0;
-        Tue, 15 Jul 2025 10:43:48 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWFJ2aBN+IdXQfaoM9Rr1F6xJuqlgIN83XVrX0Ch2o5JD2YBb5YoAGJ5jPbsiNdm9/N9TkxyB3TubkOCgTu@vger.kernel.org, AJvYcCWWx8zKCA5zRhzsMAO+fKU9uIj9zbWSumGXgbn102GrINWvgfVTJP13vN9jW+M1Q5g565tao0ed@vger.kernel.org, AJvYcCXb3SJPEn56JzJUJgEcHDyXfmKzaE8n13/7ehaFOWXAgP69YS4UZhPJpUFmO5OLkLF2K7M7hoVFVpTf@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4wfaXT7lT6agYaZESqNkDGgZ2RW5lZgM9jBSMK/Wmaum8I2dH
-	8uNMqJhysgLPLvOQC+mkoRBROBe4fWWJtiDHjSPGE1F57DAPkVPmE6cC/5Fn5CLBsVHJJBheRfL
-	NRidCMmQ654vxITMSjvgXHrN8XFs0zA==
-X-Google-Smtp-Source: AGHT+IFSfJ329hc32n6pv+14gS0mt5gTgoFqsqGbemfhsisnZDnXEaldUJ2gRxLUkvPg+1tT8vixRzdxTK8k0xV9biU=
-X-Received: by 2002:a17:906:730f:b0:ad8:9466:3348 with SMTP id
- a640c23a62f3a-ae9c9b0ce31mr42139766b.36.1752601427144; Tue, 15 Jul 2025
- 10:43:47 -0700 (PDT)
+	 To:Cc:Content-Type; b=UP4rqSMT8LBcHljNzRjNaV/ETgHUb0RyCOo5gISGruvAx01ZELA4CG88tTsonBNQlYtaMJ572Rf/prMUnZVJliO/I2pJw4XTuWOwwwC17jPdsD75QxqmcT3Mwf8na8Z/2rZopj6FTotekUljPeEQZ/aIJLJ6YN1WqPRFSAgfSQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=INNqxjBo; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-313a188174fso114208a91.1
+        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 10:47:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752601625; x=1753206425; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xtI5TVfeROksiTJdvjBPcnmRsk5SRUfXtKYI8vkVdQA=;
+        b=INNqxjBoehDshkh8tBIM/8m8k7FOAGn+VAU6q8f6+2nBCunFqpoQR6ws0pk0blWMJQ
+         Y4+TX2n9c1L2V6qphxSD/l75yqSStjS90lmNUnwevJ+qV8h3u1PLz4rWBQMyJLkHL5Xa
+         b7QovEkK8H9Clemt1/1iwteFlR3C5PEVXwoROei0D7Fh1MswetoJdzrt+V2pa4vutB5c
+         ZZIIqFGArtyQl83+0Ir3JmUfCeR8chZEe7DXibJ2qBtXrZ2vnexqBIeyqu+Nbcvq67B0
+         WsRf+NsnmF8tL9SP5+b5Y5SfltY1I654v+XCknKKCeitlIxcoFzWh2Xw193n0beR1EYO
+         qT4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752601625; x=1753206425;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xtI5TVfeROksiTJdvjBPcnmRsk5SRUfXtKYI8vkVdQA=;
+        b=Z8vFRggi4jSTq838dK4lZZQObXDc5WhX86P12B5Lyp8qFYGjMPd5DnsPrC3z4K3r7Q
+         DtApZZo+wCOTCP1kfaL1pGTzd9byCT1Sqo/CwtTjCP7/xyEQnqqayzLpRHsP0UvFYZj0
+         aWX0M+LfqDxqX6+xa2senblBKrRNCKqZVK4qNXCmZu7vEX3nHybMZBKW69nRk3nA4h8/
+         cHfKN+/1NA3ffx0n6MDJMDAvvNT1vtqxr33uI7RMA1oH0eXLaREJmcukGceIH8CvZ/3M
+         E9wq/8YT2YiRd8arMCv8h3Dm9RnlA67mtk159I1IAcNl+hMzwPi3JklhaGYs6roice2N
+         N2sA==
+X-Forwarded-Encrypted: i=1; AJvYcCXhuH5D59i5TKsf66EQsvSn+8YuFUyKm6yLIugNmvmvLUDE5QYR2e5tm4DTFjDY1GlzV7aoMkk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwySQVXc2yVv8ZiAs1QLcehp1JWG6x4Jzaaq99zy7zcq7fNu+I5
+	h7wPV6MAB+nViN/cAX51ryHqxOlEW5PM0+TLRhlfWYTIg//IRnVVQiSXsXBQxKTXFV8UtVT8JZ9
+	G0yjXOPXmSSi7j4fmiZgUFkRG1jGYUNbVf63VjtFi
+X-Gm-Gg: ASbGncurImaihDMRm7G+JIYlBuieNaqUnXH/7pY9zvWym8E0w35HZc2As/zX7QhbrCO
+	tAl5Y8IPqlN/9IIX97CQapQJZ0ddxcc9tQ23s+o9fKesM3sGl1+Htrg0k+ZtPA/ZeE4zf5awKeu
+	G7j68OUiV83mAxq0TDsrHWfhpBSiUmPodou6qUQhXntRQLhTqaPlNxzQhocMFgbSmy07AdCsgBB
+	MOIkFwoXOegHqyvSkpyyRQf/UvK9VL1FeZyLg==
+X-Google-Smtp-Source: AGHT+IHfCsKu3lQSrTdI7OheuW7x5UPYOpr8U883CkFaQ3jyr7bhPNopPsIhMxRmBOJHKWhV7kmqmZMyKliyM7hEO/U=
+X-Received: by 2002:a17:90b:4c8c:b0:2fa:42f3:e3e4 with SMTP id
+ 98e67ed59e1d1-31c8f7a0009mr5495202a91.3.1752601624826; Tue, 15 Jul 2025
+ 10:47:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250703021600.125550-1-inochiama@gmail.com> <20250703021600.125550-3-inochiama@gmail.com>
-In-Reply-To: <20250703021600.125550-3-inochiama@gmail.com>
-From: Rob Herring <robh@kernel.org>
-Date: Tue, 15 Jul 2025 12:43:35 -0500
-X-Gmail-Original-Message-ID: <CAL_JsqLKLKHj+vQJmZnaXRj3TmqR3ELjpBc27HRbTOOP9FD0hg@mail.gmail.com>
-X-Gm-Features: Ac12FXz_neDQRbYET5mV11I82g2lSNlhGKsWNEzC8k-2DtgP7jZ-KwLmxIiQkME
-Message-ID: <CAL_JsqLKLKHj+vQJmZnaXRj3TmqR3ELjpBc27HRbTOOP9FD0hg@mail.gmail.com>
-Subject: Re: [PATCH 2/3] riscv: dts: sophgo: Add mdio multiplexer device for cv18xx
-To: Inochi Amaoto <inochiama@gmail.com>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, 
-	Chen Wang <unicorn_wang@outlook.com>, Richard Cochran <richardcochran@gmail.com>, 
-	Alexander Sverdlin <alexander.sverdlin@gmail.com>, Yixun Lan <dlan@gentoo.org>, 
-	Ze Huang <huangze@whut.edu.cn>, Thomas Bonnefille <thomas.bonnefille@bootlin.com>, 
-	devicetree@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	sophgo@lists.linux.dev, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	Longbin Li <looong.bin@gmail.com>
+References: <20250714143613.42184-1-daniel.sedlak@cdn77.com>
+ <20250714143613.42184-3-daniel.sedlak@cdn77.com> <CAAVpQUAsZsEKQ65Kuh7wmcf6Yqq8m4im7dYFvVd1RL4QHxMN8g@mail.gmail.com>
+ <8a7cea99-0ab5-4dba-bc89-62d4819531eb@cdn77.com> <CAAVpQUDj23KHKpMFA4J7gV=H_BnvG4z0aVxf6-B04KsYtBL=1w@mail.gmail.com>
+In-Reply-To: <CAAVpQUDj23KHKpMFA4J7gV=H_BnvG4z0aVxf6-B04KsYtBL=1w@mail.gmail.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Tue, 15 Jul 2025 10:46:53 -0700
+X-Gm-Features: Ac12FXwB4PCIKnOdMppbdcFbf-MhYkOWAqn6Sbv43aI2tWEjulnADX2xLPhXtBU
+Message-ID: <CAAVpQUD=diV7aWqJqyQjL7MOZuC5xQ0AwJssPJ6vu4nYZPer+g@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 2/2] mm/vmpressure: add tracepoint for socket
+ pressure detection
+To: Daniel Sedlak <daniel.sedlak@cdn77.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Neal Cardwell <ncardwell@google.com>, David Ahern <dsahern@kernel.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org, netdev@vger.kernel.org, 
+	Matyas Hurtik <matyas.hurtik@cdn77.com>, Daniel Sedlak <danie.sedlak@cdn77.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 2, 2025 at 9:16=E2=80=AFPM Inochi Amaoto <inochiama@gmail.com> =
-wrote:
+On Tue, Jul 15, 2025 at 10:17=E2=80=AFAM Kuniyuki Iwashima <kuniyu@google.c=
+om> wrote:
 >
-> Add DT device node of mdio multiplexer device for cv18xx SoC.
-
-This adds a dtbs_check warning:
-
-mdio@3009800 (mdio-mux-mmioreg): mdio@80:reg:0:0: 128 is greater than
-the maximum of 31
-
+> On Tue, Jul 15, 2025 at 12:01=E2=80=AFAM Daniel Sedlak <daniel.sedlak@cdn=
+77.com> wrote:
+> >
+> > Hi Kuniyuki,
+> >
+> > On 7/14/25 8:02 PM, Kuniyuki Iwashima wrote:
+> > >> +TRACE_EVENT(memcg_socket_under_pressure,
+> > >> +
+> > >> +       TP_PROTO(const struct mem_cgroup *memcg, unsigned long scann=
+ed,
+> > >> +               unsigned long reclaimed),
+> > >> +
+> > >> +       TP_ARGS(memcg, scanned, reclaimed),
+> > >> +
+> > >> +       TP_STRUCT__entry(
+> > >> +               __field(u64, id)
+> > >> +               __field(unsigned long, scanned)
+> > >> +               __field(unsigned long, reclaimed)
+> > >> +       ),
+> > >> +
+> > >> +       TP_fast_assign(
+> > >> +               __entry->id =3D cgroup_id(memcg->css.cgroup);
+> > >> +               __entry->scanned =3D scanned;
+> > >> +               __entry->reclaimed =3D reclaimed;
+> > >> +       ),
+> > >> +
+> > >> +       TP_printk("memcg_id=3D%llu scanned=3D%lu reclaimed=3D%lu",
+> > >> +               __entry->id,
+> > >
+> > > Maybe a noob question: How can we translate the memcg ID
+> > > to the /sys/fs/cgroup/... path ?
+> >
+> > IMO this should be really named `cgroup_id` instead of `memcg_id`, but
+> > we kept the latter to keep consistency with the rest of the file.
+> >
+> > To find cgroup path you can use:
+> > - find /sys/fs/cgroup/ -inum `memcg_id`, and it will print "path" to th=
+e
+> > affected cgroup.
+> > - or you can use bpftrace tracepoint hooks and there is a helper
+> > function [1].
 >
-> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
-> ---
->  arch/riscv/boot/dts/sophgo/cv180x.dtsi | 29 ++++++++++++++++++++++++++
->  1 file changed, 29 insertions(+)
+> Thanks, this is good to know and worth in the commit message.
 >
-> diff --git a/arch/riscv/boot/dts/sophgo/cv180x.dtsi b/arch/riscv/boot/dts=
-/sophgo/cv180x.dtsi
-> index 7eecc67f896e..3a82cc40ea1a 100644
-> --- a/arch/riscv/boot/dts/sophgo/cv180x.dtsi
-> +++ b/arch/riscv/boot/dts/sophgo/cv180x.dtsi
-> @@ -31,6 +31,33 @@ rst: reset-controller@3003000 {
->                         #reset-cells =3D <1>;
->                 };
+> >
+> > Or we can put the cgroup_path to the tracepoint instead of that ID, but
+> > I feel it can be too much overhead, the paths can be pretty long.
 >
-> +               mdio: mdio@3009800 {
+> Agree, the ID is good enough given we can find the cgroup by oneliner.
+>
+> >
+> > Link: https://bpftrace.org/docs/latest#functions-cgroup_path [1]
+> > > It would be nice to place this patch first and the description of
+> > > patch 2 has how to use the new stat with this tracepoint.
+> >
+> > Sure, can do that. However, I am unsure how a good idea is to
+> > cross-reference commits, since each may go through a different tree
+> > because each commit is for a different subsystem. They would have to go
+> > through one tree, right?
+>
+> Right.
 
-The nodename is wrong here because this is not an MDIO bus. It is a
-mux. So "mdio-mux@..." for the node name.
+Sorry, I meant to say the two patches don't need to go along to a
+single tree and you can post them separately as each change is
+independent.
 
-> +                       compatible =3D "mdio-mux-mmioreg", "mdio-mux";
-> +                       reg =3D <0x3009800 0x4>;
-> +                       #address-cells =3D <1>;
-> +                       #size-cells =3D <0>;
-> +                       mdio-parent-bus =3D <&gmac0_mdio>;
-> +                       mux-mask =3D <0x80>;
-> +                       status =3D "disabled";
-> +
-> +                       internal_mdio: mdio@0 {
-> +                               #address-cells =3D <1>;
-> +                               #size-cells =3D <0>;
-> +                               reg =3D <0>;
-> +
-> +                               internal_ephy: phy@0 {
-> +                                       compatible =3D "ethernet-phy-ieee=
-802.3-c22";
-> +                                       reg =3D <1>;
-> +                               };
-> +                       };
-> +
-> +                       external_mdio: mdio@80 {
-> +                               #address-cells =3D <1>;
-> +                               #size-cells =3D <0>;
-> +                               reg =3D <0x80>;
-> +                       };
-> +               };
-> +
->                 gpio0: gpio@3020000 {
->                         compatible =3D "snps,dw-apb-gpio";
->                         reg =3D <0x3020000 0x1000>;
-> @@ -196,6 +223,8 @@ gmac0: ethernet@4070000 {
->                         clock-names =3D "stmmaceth", "ptp_ref";
->                         interrupts =3D <SOC_PERIPHERAL_IRQ(15) IRQ_TYPE_L=
-EVEL_HIGH>;
->                         interrupt-names =3D "macirq";
-> +                       phy-handle =3D <&internal_ephy>;
-> +                       phy-mode =3D "internal";
->                         resets =3D <&rst RST_ETH0>;
->                         reset-names =3D "stmmaceth";
->                         rx-fifo-depth =3D <8192>;
-> --
-> 2.50.0
->
+> Probably you can just assume both patches will be merged
+> and post the tracepoint patch to mm ML first and then add its
+> lore.kernel.org link and howto in the stat patch and post it to netdev ML=
+.
 
