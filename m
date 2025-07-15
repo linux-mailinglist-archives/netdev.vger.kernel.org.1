@@ -1,99 +1,85 @@
-Return-Path: <netdev+bounces-207258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F17BB06770
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 22:04:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D870B0679F
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 22:16:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AA45502D77
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 20:03:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6896188A8CF
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 20:17:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68398272E7B;
-	Tue, 15 Jul 2025 20:03:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E72E41EFF9B;
+	Tue, 15 Jul 2025 20:16:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="pLbFDViD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i6TplRCc"
 X-Original-To: netdev@vger.kernel.org
-Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B45CA2749EC;
-	Tue, 15 Jul 2025 20:03:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2511EEE0;
+	Tue, 15 Jul 2025 20:16:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752609819; cv=none; b=HrmS2ar4KVaxj5/w/JBqwDdagRkm5om7B+kX4R7vP7Oska8ByT17L7DVTX1ZCka2KAiTj/Mgy6WpZcRuMMeEaqnfyzYBfcwWPBQktAAwwDVvLGIjPpdCQ3K5FjUqsd/TLYlRkM/Elv3ldWfzDuZhxteqppiRHZuSeMKguxUjvaM=
+	t=1752610604; cv=none; b=ie5ySVZ/JCPxYZdug5LaasGZgy+hLAiyRpomPK9WIZwKoDVMqQIUpOlRu9JoejRHQdUppyjoO7eXAVe8rS1fFI2zv63rI1C2tkf9bo2kk5naEI4p1DF2GMiTjzZOIZRxlmBlwLpGAqqWQj5LPCIeWhGTs7/mq56dXt3khi2JDAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752609819; c=relaxed/simple;
-	bh=hWcwwSCIE1juPICXC7jR+4JoO+FPPx/JLkJnjiyX7Iw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=mx7VDMgYbVp9AD7MRq1bV9GgcUH38248tz3RAbe0A8mi6uX6O1PQLCy6H5KAU0qXAxPqKlA+WiOz3q+41cPd0QexDsIUa0rEGNmBe98xVxZ6sabUPO0WCxllzw6Fj05n++DMlBP13eoUP1tSHCf8bC0TlFnA9hQgbxYVEPCKpjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=pLbFDViD; arc=none smtp.client-ip=45.79.88.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 9F8524040B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-	t=1752609816; bh=5kPEQacK23+5d9HZEBwKwlf08U1WgpD16N1/izqmHtU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=pLbFDViDIrgJL8ZQateU2gyMeDQgIUGqckKBl894fT8zEhfferjsoQNUJfu/F2kmi
-	 bHgqmunluMg8/CrAP+1xeAzeyBkwb9k/D8gjRgUcLUtOue7x0CQjovVXSpittsvf8z
-	 QHuolRJl87REBezg0rRnN0jj+EqXpjmuFqUtc9a8Js+uKkCDBjoD5CsAi7GwFpawto
-	 N97D86OaxcchGHK0hiv4wr35SrKHUfZUNx1UUfyju4YWpNfSs3xE8Z4miAkT0VNoil
-	 DaHSRLO19jjiyqSuJMJn7MDoLLiQh2Yx9AB8i0FtGQmhUrD1RtCeNjc96fpMMNIzN4
-	 7g8TuYdwWsqRg==
-Received: from localhost (unknown [IPv6:2601:280:4600:2da9::1fe])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by ms.lwn.net (Postfix) with ESMTPSA id 9F8524040B;
-	Tue, 15 Jul 2025 20:03:36 +0000 (UTC)
-From: Jonathan Corbet <corbet@lwn.net>
-To: Bagas Sanjaya <bagasdotme@gmail.com>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Documentation
- <linux-doc@vger.kernel.org>, Linux PowerPC
- <linuxppc-dev@lists.ozlabs.org>, Linux Networking <netdev@vger.kernel.org>
-Cc: Richard Cochran <richardcochran@gmail.com>, Haren Myneni
- <haren@linux.ibm.com>, Bagas Sanjaya <bagasdotme@gmail.com>, Madhavan
- Srinivasan <maddy@linux.ibm.com>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Andrew Donnellan <ajd@linux.ibm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nathan Lynch
- <nathanl@linux.ibm.com>
-Subject: Re: [PATCH v2 0/3] ioctl numbers list cleanup for
- papr-physical-attestation.h
-In-Reply-To: <20250714015711.14525-1-bagasdotme@gmail.com>
-References: <20250714015711.14525-1-bagasdotme@gmail.com>
-Date: Tue, 15 Jul 2025 14:03:35 -0600
-Message-ID: <878qkpfch4.fsf@trenco.lwn.net>
+	s=arc-20240116; t=1752610604; c=relaxed/simple;
+	bh=sJ/g+WH+oOo18gZ32qIGOTp7+DqXt/8ANhMamSl+Th0=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=K07jBElLb7fbfr6TdXh0MPbh7Q7QLG2CVSFrMTngu+pn2E7yeHNY3RJz6cLNm3iRCzZNsVnbi5FiGPxD5dKhiT4yUg6S4FguXntOxiKExLqlLhjfPSicHNLQhYpD1DT9ji2+cPsslX4WeVd96RJCpYxdzIWXd3DvRDxaC2vAxBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i6TplRCc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64470C4CEE3;
+	Tue, 15 Jul 2025 20:16:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752610602;
+	bh=sJ/g+WH+oOo18gZ32qIGOTp7+DqXt/8ANhMamSl+Th0=;
+	h=Date:From:To:Cc:Subject:From;
+	b=i6TplRCckdtx7+U7OXpU24bzZ+zNt0yQx/dSuHo7SKSP7ETgH9g42mvC4cpXGiOWN
+	 bKLT7ScvWzStfzfPhCtB/Bj/4Ld/3E/rEILtL9C4Y+yuN59ayQQJODu3glIpMk3h9t
+	 SDb322BxGu3uTFR0RicZWfbvs8znJUzNVdcKAUTkefEh702yY1npnIiPbbW7BZDIZb
+	 YZ4BOs0FM3prZHVS2syFfzgseoYUPPki73W+G8ANgi9T1Tx+xd9ut6UNC24q2PwOMt
+	 z5PGnOC8e53vzc5u/l6p/S/EbTSNZ++/8+NGpxZKDv4aTzec9mM8z7SbDK/lnTOPRi
+	 2CnJExDVNcolw==
+Date: Tue, 15 Jul 2025 13:16:37 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Remi Denis-Courmont <courmisch@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, llvm@lists.linux.dev
+Subject: -Wuninitialized-const-pointer in net/phonet/pep.c
+Message-ID: <20250715201637.GA2104822@ax162>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Bagas Sanjaya <bagasdotme@gmail.com> writes:
+Hi all,
 
-> Hi,
->
-> This is the cleanup series following up from 03c9d1a5a30d93 ("Documentation:
-> Fix description format for powerpc RTAS ioctls"). It is based on docs-next
-> tree. The end result should be the same as my previous fixup patch [1].
->
-> Enjoy!
->
-> Changes since v1 (RESEND) [2]:
->
->   * Add Fixes: and Reviewed-by: trailers (Haren)
->   * Expand tabs for uapi/misc/amd-apml.h to match other entries
->
-> Jon: Would you like to apply this series on docs-next or should powerpc
-> folks handle it?
+A new warning in clang [1] points out that dst is not initialized when
+passed to pep_find_pipe() in pep_sock_accept():
 
-I've applied it.  I took out the vast pile of Fixes tags, though; I
-don't think all that was justified for these tweaks.
+  net/phonet/pep.c:829:37: error: variable 'dst' is uninitialized when passed as a const pointer argument here [-Werror,-Wuninitialized-const-pointer]
+    829 |         newsk = pep_find_pipe(&pn->hlist, &dst, pipe_handle);
+        |                                            ^~~
 
-Thanks,
+It looks like this was introduced by commit f7ae8d59f661 ("Phonet:
+allocate sock from accept syscall rather than soft IRQ") if I understand
+correctly. Prior to that change, both calls to pep_find_pipe() were in
+the same function with pn_skb_get_dst_sockaddr(skb, &dst) before them,
+so dst would always be initialized. Should pn_skb_get_dst_sockaddr() be
+called before pep_find_pipe() in pep_sock_accept() as well or is there
+some other fix for this? I am not familiar with this code, hence the
+inquiry.
 
-jon
+[1]: https://github.com/llvm/llvm-project/commit/00dacf8c22f065cb52efb14cd091d441f19b319e
+
+Cheers,
+Nathan
 
