@@ -1,206 +1,127 @@
-Return-Path: <netdev+bounces-207267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDEA3B06813
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 22:51:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1A39B06828
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 22:55:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E31A64E7744
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 20:50:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51B5856460E
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 20:55:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 246F22C08BF;
-	Tue, 15 Jul 2025 20:49:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m4XVR0dN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C51B285CAF;
+	Tue, 15 Jul 2025 20:55:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A0A2BEC53;
-	Tue, 15 Jul 2025 20:49:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 920241F0E24
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 20:55:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752612564; cv=none; b=n+/8OQz9jh76k1Wm3snKlJCP6INJIPapRMQEfakMDvPIvLUOmTyBUhz32wTSByLMQmw/EydR0QqhJENht4fFr9UPolN4rRvXyFpuZAfkZCD3448Ctsc3WixUmi0lsmj/0MuI0QuY+aoT1HZV2U/wQ3XZpIVCsW6MmflcM0hbpTg=
+	t=1752612934; cv=none; b=HzftGkvzSVHfwd852wezSMuQqvpuktw/dw9wpThQJ3l3900oxY0t17bK5kgVrnzleafBCjb2hDIe4R+WJkNCtHjXkW7BIAFNNniPWl4/yfhXF4E+y8inG7KnYPoeWnDl2mMebUxaaF+9Di2A73s09xXwmkNFQHqk5JljXp3XUxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752612564; c=relaxed/simple;
-	bh=2k6oOaOIoLK+z7m39WCUT29OW2ydOaBVNPxwBT9CTCM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YyFLewWsTQOuKpTf9GTRPNYFMQshC8nG0lOINX6gFmXWbJw2BLA7aKik3lWUyqX/1meBr9Xn1elUJ3hsiPSRXNDkbXg0xIxZkdLQyshz4E6wubtQIVU82kXRMqZLiU/MRu2cE3a22nLzZOGaK3Uf+YYaN0M38Bd7MSrcIjpBsVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m4XVR0dN; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b3bad2f99f5so241975a12.1;
-        Tue, 15 Jul 2025 13:49:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752612561; x=1753217361; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=14hLQTWKqKRy13dDlgIc/p+KnWY5Barjhpd+yfegt8s=;
-        b=m4XVR0dNidKmyJdlrMLF+6/0HyLycB3nMobz26Qz0VDVx16k4D3BREHwTOehh/czLn
-         Xd5CmjkQJJRdHlpHBKf109MUputoFR41xpzDfG/bfi6v4+sJ6xGSTD2iLcejqKpS5IHP
-         syKLnv3msFg0Jqt/ZXOwk9RzfUO7GgIJ3wta/RG0rSJIJTAOAVPyGny1UIHkK1WL4TXs
-         u0Z69zR2oy7IY2Z8m7WPZukEiRu7BybXtNEaAGPWEj4osiUy6d8npoTbCIfnSBWX+1p8
-         4wzeYPQM+IUr75zyz4ED1gv48RYSFUgq+Y5/uOuI4dhX6zZxVxLMbS2oj0wOorNVrFOr
-         2Xig==
+	s=arc-20240116; t=1752612934; c=relaxed/simple;
+	bh=9CNoR++wDZH7NsfjU8OM+KHOVHW57lf73ByuG1G6U60=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=SNIoKnqG2Vu97DsSDlN27I4W5spF8L2ftWiitM6F2XKtiXzUyTuR7oCZrIyy/6Oxil100rRvlgSs4U4AyU36VYTnL3AXdFuEdfoWGGaBdeZdKyurBQ0xVi91bg6frmu8jxUir7P4oNCl8poPECNsSx1O2sJz5vhzBDKYD2y+Pp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-869e9667f58so1322434939f.3
+        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 13:55:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752612561; x=1753217361;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=14hLQTWKqKRy13dDlgIc/p+KnWY5Barjhpd+yfegt8s=;
-        b=PxwHvviWOzOo+RKSHJvJyaVEB+jcUGzZXqiBCIN44K/+lf6vmUkg/3U+W5/LVe8uzk
-         ZtdIrOVMFChqugx5E2oxBPblDgIkGNbWXENfNo1TAVxwYxqSa1YaIRFiqH40XEUJB+Wh
-         nuIg6vhpd3SmCfE+k78fAUKajyp+MMyuelD2nruIs+qEYd/kRwDuHc+TMPWnSyPKkkQD
-         sXnTWZct9wFEjaOSc/F3mr7dCnTK2+MmbEBXLNtoZVreDFssQI9B+nBR/EzYUux1Lqin
-         ab/4G19k14spEHeYJPs7i6toIjS9r/oWYY9rQOAXmn6Ctz5YW2GAK6tAWvlLY0/oSE9I
-         fo6g==
-X-Forwarded-Encrypted: i=1; AJvYcCUUgnSI2Rv9ZPFjj9E7KDhrRPPSBfm4GfO2F7nX3Fh+F7++DFyPN96erepsuRV2O8UjQXA=@vger.kernel.org, AJvYcCUXXAPhDPw7bq6FyOyPv7qmydjNZ/v28H3MOD3AROcj515TMgxtwf8BDfrmNOZG/7SCJ0U0O1DbTXIcoL4K@vger.kernel.org, AJvYcCWEw0WxpTbmh6zSezv8K5OlrrJcw2CV9kY22XbBZRUpFdBDDqpAod171s7iKEKiOnzjAiww8OcjMYkf@vger.kernel.org, AJvYcCWu62wM3wgJjoR9DY1gbzTu0U3K16yYH665C69CLqbbs9MSa7IPYCnRwS3uGNcWq0EVvAGJFas3@vger.kernel.org
-X-Gm-Message-State: AOJu0Yww07A+CqRYOKLXiz0w/n4PCYFwkEBEdnwQ9pwRIBK5LsQpYmSg
-	cMcSp896w9V9p4qtGRKpu6szL4l+J7jXAOFff53lVTCfj6Vw6GbvpEM=
-X-Gm-Gg: ASbGnctBykNkR3cL1VMWRsp+e6Ih+bjaH3o0FdFIrAVs5dWQhaNC2Zc+7KSpAyM4nUz
-	ke4mOjWtZXaRUK4OaBZ6zSQCkf6+gqQWF/IzUKK+7ZlTjw4XRnp/YeShZWcCUvMOEnFU1LHq4I0
-	A5ee++M8vWlnSVHYjgTH+lzEx1N4K1ds5xXB48TennUAcrrbaNLlBRaksR3w2Ujvbx+CYonYN8V
-	CKHnGbk24s5cNCi7JOHGDbApXr0Iqyne9nL0Gj5Yj0scRMKqrM9cDrU7ppO6cdzasqLc37ocqmc
-	iw8Gc/3lXI799OcH8CJ7W3oh4DSkcRP7fmS+ABTXQiIStn32hicB/lDMCtN33jm8wjYBR++jVE1
-	Mt9KaQn75LVQnRb/deHwaV7S2QshKg4HxgEufyfu6YwRY7vzxqe8YD8QnBKeSPCRb7/L3Cg==
-X-Google-Smtp-Source: AGHT+IHUnvTzwE3v7P+iYmq/aAJvJN5snakMmspvRxaiVwSsTvMAUABpmAowrZMJ4AO5lfSSL0O9lA==
-X-Received: by 2002:a17:90b:3f8f:b0:315:f6d6:d29c with SMTP id 98e67ed59e1d1-31c8fbc1b65mr7446154a91.15.1752612560340;
-        Tue, 15 Jul 2025 13:49:20 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-31c9f1fb8dbsm38527a91.22.2025.07.15.13.49.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Jul 2025 13:49:19 -0700 (PDT)
-Date: Tue, 15 Jul 2025 13:49:19 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Song Yoong Siang <yoong.siang.song@intel.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH bpf-next,v4 1/1] doc: clarify XDP Rx metadata handling
- and driver requirements
-Message-ID: <aHa-zwLmFSLDKeBA@mini-arch>
-References: <20250715071502.3503440-1-yoong.siang.song@intel.com>
+        d=1e100.net; s=20230601; t=1752612931; x=1753217731;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5vHveuGolym5EQhvmtNqG6g0knqcjvQnZGLJgsJjMjQ=;
+        b=wPKStOT2wBdaphoF3nGsdh6aYek8O+HaFTIyFQ7ZdF54WStij3KK4N0PRVeKqHAFzl
+         90NnxisW+rjLJo9Ft7H4BRKtqlUJ6Ie/AKKz98sMFLRfoSzIvtKdFS4AjLPA7CB8Nc8s
+         ChVTA9VGuUvjAYvoaR2+q3UgZYux3l5JnRKE+bmee2EHuxPc/MdZp7CsH30jWJ9UOZtD
+         Tg+yekbVD1kkEpPp+WwybuifdCvE3F8M8w21AZHjNSk4jupSpsyjBZMFHA6FeewWm33r
+         agSRSUTMYWhpaMgvvk2F5Uzgibzi313Qi+kVH2FJyVcM+rXMPWNsRqOdN15YLdFAfY7s
+         vV8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWZJN0HlzAAIFh9cWsHx0ggef6Qifvgj38Nvj+lbSbPrlrY0Y6Kw0r9syQ/sDneDfKULkBRks4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQ1D6csEAhd/EOUun/jevu9JciTAB5VQyGdL2yHqMBjdmtTRqD
+	KKSqHrXB8veseErTIXzgmw6mD8UMZz9Xlsn5E3lVVkiro3OxlHAPC0NTa5z0h5u/pP2N/gTo59g
+	hr2TTY9SyBNL2ZXyuRxnra8BpZUhY5utzaJMAFWim8j9ucuXat8VIQR7C6KY=
+X-Google-Smtp-Source: AGHT+IH41fXInBQhUVFmEC3BYpBSmFe7XYx0t5+7O+tY1xbSuO+MoSFA7uJ2u4Qx5gs1goSDakuSQ0X0NWold4XDloeyf2ZNnLbF
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250715071502.3503440-1-yoong.siang.song@intel.com>
+X-Received: by 2002:a05:6602:3f0b:b0:85b:3c49:8811 with SMTP id
+ ca18e2360f4ac-879c0842721mr125977339f.4.1752612930955; Tue, 15 Jul 2025
+ 13:55:30 -0700 (PDT)
+Date: Tue, 15 Jul 2025 13:55:30 -0700
+In-Reply-To: <676d25b2.050a0220.2f3838.0464.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6876c042.a00a0220.3af5df.0009.GAE@google.com>
+Subject: Re: [syzbot] [net?] INFO: task hung in inet_rtm_newaddr
+From: syzbot <syzbot+adeb8550754921fece20@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	horms@kernel.org, jhs@mojatatu.com, jiri@resnulli.us, kadlec@netfilter.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
+	syzkaller-bugs@googlegroups.com, vinicius.gomes@intel.com, 
+	xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 07/15, Song Yoong Siang wrote:
-> Improves the documentation for XDP Rx metadata handling, especially for
-> AF_XDP use cases. It clarifies that drivers must remove any device-reserved
-> metadata from the data_meta area before passing the frame to the XDP
-> program.
-> 
-> Besides, expand the explanation of how userspace and BPF programs should
-> coordinate the use of METADATA_SIZE, and adds a detailed diagram to
-> illustrate pointer adjustments and metadata layout.
-> 
-> Additional, describe the requirements and constraints enforced by
-> bpf_xdp_adjust_meta().
-> 
-> Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
-> ---
-> 
-> V4:
->   - update the documentation to indicate that drivers are expected to copy
->     any device-reserved metadata from the metadata area (Jakub)
->   - remove selftest tool changes.
-> 
-> V3: https://lore.kernel.org/netdev/20250702165757.3278625-1-yoong.siang.song@intel.com/
->   - update doc and commit msg accordingly.
-> 
-> V2: https://lore.kernel.org/netdev/20250702030349.3275368-1-yoong.siang.song@intel.com/
->   - unconditionally do bpf_xdp_adjust_meta with -XDP_METADATA_SIZE (Stanislav)
-> 
-> V1: https://lore.kernel.org/netdev/20250701042940.3272325-1-yoong.siang.song@intel.com/
-> ---
->  Documentation/networking/xdp-rx-metadata.rst | 47 ++++++++++++++------
->  1 file changed, 34 insertions(+), 13 deletions(-)
-> 
-> diff --git a/Documentation/networking/xdp-rx-metadata.rst b/Documentation/networking/xdp-rx-metadata.rst
-> index a6e0ece18be5..2e067eb6c5d6 100644
-> --- a/Documentation/networking/xdp-rx-metadata.rst
-> +++ b/Documentation/networking/xdp-rx-metadata.rst
-> @@ -49,7 +49,10 @@ as follows::
->               |                 |
->     xdp_buff->data_meta   xdp_buff->data
->  
-> -An XDP program can store individual metadata items into this ``data_meta``
-> +Certain devices may utilize the ``data_meta`` area for specific purposes.
-> +Drivers for these devices must move any hardware-related metadata out from the
-> +``data_meta`` area before presenting the frame to the XDP program. This ensures
-> +that the XDP program can store individual metadata items into this ``data_meta``
->  area in whichever format it chooses. Later consumers of the metadata
->  will have to agree on the format by some out of band contract (like for
->  the AF_XDP use case, see below).
-> @@ -63,18 +66,36 @@ the final consumer. Thus the BPF program manually allocates a fixed number of
->  bytes out of metadata via ``bpf_xdp_adjust_meta`` and calls a subset
->  of kfuncs to populate it. The userspace ``XSK`` consumer computes
->  ``xsk_umem__get_data() - METADATA_SIZE`` to locate that metadata.
-> -Note, ``xsk_umem__get_data`` is defined in ``libxdp`` and
-> -``METADATA_SIZE`` is an application-specific constant (``AF_XDP`` receive
-> -descriptor does _not_ explicitly carry the size of the metadata).
-> -
-> -Here is the ``AF_XDP`` consumer layout (note missing ``data_meta`` pointer)::
-> -
-> -  +----------+-----------------+------+
-> -  | headroom | custom metadata | data |
-> -  +----------+-----------------+------+
-> -                               ^
-> -                               |
-> -                        rx_desc->address
-> +Note, ``xsk_umem__get_data`` is defined in ``libxdp`` and ``METADATA_SIZE`` is
-> +an application-specific constant. Since the ``AF_XDP`` receive descriptor does
-> +_not_ explicitly carry the size of the metadata, it is the responsibility of the
-> +driver to copy any device-reserved metadata out from the metadata area and
-> +ensure that ``xdp_buff->data_meta`` is set equal to ``xdp_buff->data`` before a
-> +BPF program is executed. This is necessary so that, after the BPF program
-> +adjusts the metadata area, the consumer can reliably retrieve the metadata
-> +address using ``METADATA_SIZE`` offset.
-> +
-> +The following diagram shows how custom metadata is positioned relative to the
-> +packet data and how pointers are adjusted for metadata access (note the absence
-> +of the ``data_meta`` pointer in ``xdp_desc``)::
-> +
-> +              |<-- bpf_xdp_adjust_meta(xdp_buff, -METADATA_SIZE) --|
-> +  new xdp_buff->data_meta                              old xdp_buff->data_meta
-> +              |                                                    |
-> +              |                                            xdp_buff->data
-> +              |                                                    |
-> +   +----------+----------------------------------------------------+------+
-> +   | headroom |                  custom metadata                   | data |
-> +   +----------+----------------------------------------------------+------+
-> +              |                                                    |
-> +              |                                            xdp_desc->addr
-> +              |<------ xsk_umem__get_data() - METADATA_SIZE -------|
-> +
-> +``bpf_xdp_adjust_meta`` ensures that ``METADATA_SIZE`` is aligned to 4 bytes,
-> +does not exceed 252 bytes, and leaves sufficient space for building the
-> +xdp_frame. If these conditions are not met, it returns a negative error. In this
-> +case, the BPF program should not proceed to populate data into the ``data_meta``
-> +area.
->  
->  XDP_PASS
->  ========
+syzbot has found a reproducer for the following issue on:
 
-Can we move these details into a new section? Call it 'Driver implementation'
-or something similar and explain all the above. Because the original
-purpose of the doc was to explain the API to the user applications.
-Since we are hiding these details from the users, explaining them
-separately seems more clear.
+HEAD commit:    0be23810e32e Add linux-next specific files for 20250714
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=17c3e98c580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=adc3ea2bfe31343b
+dashboard link: https://syzkaller.appspot.com/bug?extid=adeb8550754921fece20
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16d1098c580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=116b08f0580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/13b5be5048fe/disk-0be23810.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/3d2b3b2ceddf/vmlinux-0be23810.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c7e5fbf3efa6/bzImage-0be23810.xz
+
+The issue was bisected to:
+
+commit 5a781ccbd19e4664babcbe4b4ead7aa2b9283d22
+Author: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Date:   Sat Sep 29 00:59:43 2018 +0000
+
+    tc: Add support for configuring the taprio scheduler
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10de9adf980000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=12de9adf980000
+console output: https://syzkaller.appspot.com/x/log.txt?x=14de9adf980000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+adeb8550754921fece20@syzkaller.appspotmail.com
+Fixes: 5a781ccbd19e ("tc: Add support for configuring the taprio scheduler")
+
+INFO: task syz-executor:6015 blocked for more than 143 seconds.
+      Not tainted 6.16.0-rc6-next-20250714-syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor    state:D stack:26920 pid:6015  tgid:6015  ppid:1      task_flags:0x400140 flags:0x00004006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5314 [inline]
+ __schedule+0x16f5/0x4d00 kernel/sched/core.c:6697
+ __schedule_loop kernel/sched/core.c:6775 [inline]
+ schedule+0x165/0x360 kernel/sched/core.c:6790
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6847
+ __mutex_lock_common kernel/locking/mutex.c:679 [inline]
+ __mutex_lock+0x724/0xe80 kernel/locking/mutex.c:747
+ rtnl_net_lock include/linux/rtnetlink.h:130 [inline]
+ inet_rtm_newaddr+0x3b0/0x18b0 net/ipv4/devinet.c:979
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
