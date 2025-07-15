@@ -1,139 +1,107 @@
-Return-Path: <netdev+bounces-207056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 706DAB05790
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 12:15:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 28808B057A4
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 12:20:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE884561C91
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 10:15:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FB19168DA5
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 10:19:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C39702D5C8E;
-	Tue, 15 Jul 2025 10:15:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EB842D6402;
+	Tue, 15 Jul 2025 10:19:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FztlJ1OF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eNlPbPE/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 864CF19DF6A;
-	Tue, 15 Jul 2025 10:15:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39589275873
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 10:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752574535; cv=none; b=kiAYg2MpLvE7LBUaY04B8p+rYWTMjfBuAmwgqpvRQTm9pE2nSsJEu9rXEChHz1Dq39QDdX1knnLokWcdD9qBFBID5fQDVaLl3nDmxI/DLssa8rQaLUUb1Hq5Pq6h0oJikGbmYLNVAim/VyWLVzpKO6HPKyGFH5qSGGKiYgQTmxk=
+	t=1752574795; cv=none; b=bGhllLtqGFgdVtQhRjBEHWV7wpzmO7RKZrRPeg5lpC7oTjwxJhgTU8KR150koOFE5I4rfy37uhJUoq89K6+CKZLrN8YRJEWzawIaDNTngjjOE0HvMKThc05Ian56zHjzj58U2asMDkN1VaWTAiErdEPlKxrkYNDIvHs+rbeivMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752574535; c=relaxed/simple;
-	bh=IBYVlI+orIMPRgYFaIqphL4RshTJzkbjmDni9IWE3vI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i9wBC96AnWHFHeISRa0spUnaZedyx4fzGTPcG8R9koKsnPWxcs4jmOoXIDp+8uqEez8kHJdlBA7J3aYLwx+xZUMd6+qMUMobOfkj1uro9Kpmh4KpExEtQywP7lzxKFOUqUskx7eOfvUKOsYFl/YGzMvbkxsbmWnJhVhJ4HA/dkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FztlJ1OF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1BDCC4CEE3;
-	Tue, 15 Jul 2025 10:15:28 +0000 (UTC)
+	s=arc-20240116; t=1752574795; c=relaxed/simple;
+	bh=BNKxjY/W7+prDJejNl+rrxKqZXwSei0aj4Vkuz4lVsA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=oBM4++t9JAOh86E7vzVh4LMMcPZwGMa5qW6j5sBgTi4n4mLkv+/1p+5wfoF+EBGy8ibz0KVQdQgqV35dySG4nRCn6IZxvtOb035XKl/0Qt8YM2B+GvVqO7oA9y9glfDd3kUnqByP+m906zAFWETuu6ebrX6LMvIq7kcVFQbaVoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eNlPbPE/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C453AC4CEF1;
+	Tue, 15 Jul 2025 10:19:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752574535;
-	bh=IBYVlI+orIMPRgYFaIqphL4RshTJzkbjmDni9IWE3vI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FztlJ1OFq4eDjn612gnPl+YVBf7o63I7kavAKkN6NFFz2JarOIQLE/JFJXeCg6HIL
-	 z4ZOGtGZqr2hPQKCDh6IFKndGWXk3RHqqyPPB3czhiyvHdDfjkLQATIl9Lfl8M5gID
-	 0HJtGGxF+rGCtt710YXgmyHq4m4s6ORR7QRXexgQRC8ZUNIjSNQXBlfwaF88VnHy5Q
-	 DAeqFE4EsBQdtOCEvZ/PIaHSEYH78SR85B5+0dobS6Zx5s4O7OpqEuvklCOv/kkzQZ
-	 i3ZfJH1M7EPMLX9i6abuLL0sl0GpzfeP8svATD4gLx1MMmUlMd7S/CH7JSvW9yWmk3
-	 gd5aHtoOobY1A==
-Date: Tue, 15 Jul 2025 11:15:25 +0100
-From: Will Deacon <will@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-	llvm@lists.linux.dev, Ingo Molnar <mingo@redhat.com>,
-	Bill Wendling <morbo@google.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Leon Romanovsky <leonro@mellanox.com>, linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Mark Rutland <mark.rutland@arm.com>,
-	Michael Guralnik <michaelgur@mellanox.com>, patches@lists.linux.dev,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Jijie Shao <shaojijie@huawei.com>
-Subject: Re: [PATCH v3 6/6] IB/mlx5: Use __iowrite64_copy() for write
- combining stores
-Message-ID: <aHYqPRqgcl5DQOpq@willie-the-truck>
-References: <0-v3-1893cd8b9369+1925-mlx5_arm_wc_jgg@nvidia.com>
- <6-v3-1893cd8b9369+1925-mlx5_arm_wc_jgg@nvidia.com>
- <20250714215504.GA2083014@nvidia.com>
+	s=k20201202; t=1752574794;
+	bh=BNKxjY/W7+prDJejNl+rrxKqZXwSei0aj4Vkuz4lVsA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=eNlPbPE/30tp0HMf5oT3DhoOlLPxXPsH+FGI38E1ln9h+pdpWo1l/kxC7EZXKRIHP
+	 QWjBGM2IrSRgaU2WqJZ8cF1XRXO+lxl5/nfDmmbzPl8Jg4MYSuYLeNvEcMQ7nkc1wT
+	 +DKFk1UCjvQxRj3oVhEuDKCvGTT2xMDU6B2SQh7ktZiGq4Nf+RNEWjQe1qJxxIAre4
+	 O2Ez35ZRQ8aiGV2a3aprszbapU2exPGTWAH6MVf667voyWtXXhdJgYKE8Ib+6bf53D
+	 +FRQR5pwLPmVJwVqJBPrsZHQNuG7EG5vO+QU21F7tcIbC1FvR6eeL0Xla5a3/l9zIf
+	 wlQQQIEbHujKA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE0E383BA08;
+	Tue, 15 Jul 2025 10:20:16 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250714215504.GA2083014@nvidia.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v4 0/8] net: mctp: Improved bind handling
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175257481551.2793.9987057213083962280.git-patchwork-notify@kernel.org>
+Date: Tue, 15 Jul 2025 10:20:15 +0000
+References: <20250710-mctp-bind-v4-0-8ec2f6460c56@codeconstruct.com.au>
+In-Reply-To: <20250710-mctp-bind-v4-0-8ec2f6460c56@codeconstruct.com.au>
+To: Matt Johnston <matt@codeconstruct.com.au>
+Cc: jk@codeconstruct.com.au, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org
 
-On Mon, Jul 14, 2025 at 06:55:04PM -0300, Jason Gunthorpe wrote:
-> On Thu, Apr 11, 2024 at 01:46:19PM -0300, Jason Gunthorpe wrote:
-> > mlx5 has a built in self-test at driver startup to evaluate if the
-> > platform supports write combining to generate a 64 byte PCIe TLP or
-> > not. This has proven necessary because a lot of common scenarios end up
-> > with broken write combining (especially inside virtual machines) and there
-> > is other way to learn this information.
-> > 
-> > This self test has been consistently failing on new ARM64 CPU
-> > designs (specifically with NVIDIA Grace's implementation of Neoverse
-> > V2). The C loop around writeq() generates some pretty terrible ARM64
-> > assembly, but historically this has worked on a lot of existing ARM64 CPUs
-> > till now.
-> > 
-> > We see it succeed about 1 time in 10,000 on the worst effected
-> > systems. The CPU architects speculate that the load instructions
-> > interspersed with the stores makes the WC buffers statistically flush too
-> > often and thus the generation of large TLPs becomes infrequent. This makes
-> > the boot up test unreliable in that it indicates no write-combining,
-> > however userspace would be fine since it uses a ST4 instruction.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Thu, 10 Jul 2025 16:55:53 +0800 you wrote:
+> This series improves a couple of aspects of MCTP bind() handling.
 > 
-> After a year of testing this in real systems it turns out that still
-> some systems are not good enough with the unrolled 8 byte store loop.
-> In my view the CPUs are quite bad here and this WC performance
-> optimization is not working very well.
+> MCTP wasn't checking whether the same MCTP type was bound by multiple
+> sockets. That would result in messages being received by an arbitrary
+> socket, which isn't useful behaviour. Instead it makes more sense to
+> have the duplicate binds fail, the same as other network protocols.
+> An exception is made for more-specific binds to particular MCTP
+> addresses.
 > 
-> There are only two more options to work around this issue, use the
-> unrolled 16 byte STP or the single Neon instruction 64 byte store.
-> 
-> Since STP was rejected alread we've only tested the Neon version. It
-> does make a huge improvement, but it still somehow fails to combine
-> rarely sometimes. The CPU is really bad at this :(
+> [...]
 
-I think the thread was from last year so I've forgotten most of the
-details, but wasn't STP rejected because it wasn't virtualisable? In
-which case, doesn't NEON suffer from exactly the same (or possibly
-worse) problem?
+Here is the summary with links:
+  - [net-next,v4,1/8] net: mctp: mctp_test_route_extaddr_input cleanup
+    https://git.kernel.org/netdev/net-next/c/3558ab79a2f2
+  - [net-next,v4,2/8] net: mctp: Prevent duplicate binds
+    https://git.kernel.org/netdev/net-next/c/3954502377ec
+  - [net-next,v4,3/8] net: mctp: Treat MCTP_NET_ANY specially in bind()
+    https://git.kernel.org/netdev/net-next/c/5000268c2982
+  - [net-next,v4,4/8] net: mctp: Add test for conflicting bind()s
+    https://git.kernel.org/netdev/net-next/c/4ec4b7fc04a7
+  - [net-next,v4,5/8] net: mctp: Use hashtable for binds
+    https://git.kernel.org/netdev/net-next/c/1aeed732f4f8
+  - [net-next,v4,6/8] net: mctp: Allow limiting binds to a peer address
+    https://git.kernel.org/netdev/net-next/c/3549eb08e550
+  - [net-next,v4,7/8] net: mctp: Test conflicts of connect() with bind()
+    https://git.kernel.org/netdev/net-next/c/b7e28129b667
+  - [net-next,v4,8/8] net: mctp: Add bind lookup test
+    https://git.kernel.org/netdev/net-next/c/e6d8e7dbc5a3
 
-Also, have you managed to investigate why the CPU tends not to get this
-right? Do we e.g. end up taking interrupts/exceptions while the self
-test is running or something like that?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Sorry for the wall of questions!
 
-Will
 
