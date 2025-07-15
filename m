@@ -1,92 +1,79 @@
-Return-Path: <netdev+bounces-207299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98C0CB069F8
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 01:40:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FAC0B06A04
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 01:45:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC29B4A4800
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 23:40:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CADDE7A888C
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 23:44:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E27062DE71B;
-	Tue, 15 Jul 2025 23:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74D512C3258;
+	Tue, 15 Jul 2025 23:45:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X0o15vR6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c7NPD4nK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBCF42DE6F4
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 23:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B8591F30CC;
+	Tue, 15 Jul 2025 23:45:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752622795; cv=none; b=qvzx+txwNmWC/Tg09uBV6JFr0+/Oh5QenCIHrGaEfFOzUQf5X5Z00PTbkfwdwP0c440LzA7dvxCDuEoXLx/41LsVRoP6EBNRg684bDvGYdV/kRBsjImrTTBG1xgAcDQYviPfUevDvE9irHXK9sby7j7cLGKmAjtLiLTlahfsnTQ=
+	t=1752623134; cv=none; b=Eqka7HZGtb00KP0UAvWlp2s406SYStiMh9J4PDYJOveyRFoP+hqTwzNz6C1iZaFDfJR0AcXwPOm+MtfJIrmiKXbjd5/oFBNR7JbTBgmEKeCo1My4eOyGelt391CZ74SdQZUetkaoN1etqOjbkcpzjZvpJAzLZxh6JZ+1sligGgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752622795; c=relaxed/simple;
-	bh=IpUExIM3JmT4jqALGw9LNJZiUYu7F4+Fb/qbx8FNLhY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RStfehcWg8L4VnfeIRNQHjoHM1AfyAmEKhajuGjtncpDIy9KxxfDJOYzjgAX8iVM+Oo2GSP08NPlppRWKnwPVYcz0M35V76EusURMtFdXPgf7sxabwwoH33HvWgubFfseksKfbR8mr4hA9XrR3AU444aN77CDbI1V60e1zVExOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X0o15vR6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E02FC4CEE3;
-	Tue, 15 Jul 2025 23:39:55 +0000 (UTC)
+	s=arc-20240116; t=1752623134; c=relaxed/simple;
+	bh=vHOQ2jry88zOnVVJZnM/DJXyiUBLY5+Ih9GHdsfOQOY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SFLZZTfSEhkezHuobYbApOemm/VEuV0MUE6hkRJCxIQPyYHg4+VHtrsbACHwK1iZR8ljxR3hrbrBsnOb8e3QZ2Wguxq4O2JAaI85hFZOpPqzI4dnhFivmVQ+8Fpzy3jZjLtxYUJUsOjocqYwIZlwZxBxmAQjL1qBXwJTzfN6Mmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c7NPD4nK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B645DC4CEE3;
+	Tue, 15 Jul 2025 23:45:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752622795;
-	bh=IpUExIM3JmT4jqALGw9LNJZiUYu7F4+Fb/qbx8FNLhY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=X0o15vR64zbj6nT8pOJrYKzHbzzsP+cvi0cOiGlH6Lv5rKIIydZGD7I4HJx8weDO/
-	 5yPFuhZeLqmozcJykUuS0cXAArjCh9GkC08E1lgmhsezJQ/KmHw8nMPk8/ZmnbYqQV
-	 1b+lQxqPl5GgZQ/hUwWYzXdSUq5+LvnNZKRs9ISVvhj8tpgMdwnDbyMn9gNqOINpPo
-	 UpD8yrIMoxM7vx3ie66r2mMKDCjE2BAP4TK9mGkAUle5TB39S0pIABUaVrIlkMM0rU
-	 XRY7xcm6lpU/X7qxrn30zEcI2U0sP+VAqOHeVTMpjRsNNNrM50dj+L2pemSLVRsK80
-	 zfRiaghIY/JPw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAECF383BA30;
-	Tue, 15 Jul 2025 23:40:16 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1752623134;
+	bh=vHOQ2jry88zOnVVJZnM/DJXyiUBLY5+Ih9GHdsfOQOY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=c7NPD4nKlLEDBsXMithXGlQx9kj7Z/cYKhSmIaGI0FKGN6KrFmF+H0pPetrTQa41k
+	 ApmO+1Vl7UwZbOMBEGwMUSfUkOvqe3BWcisA9WsSiJtglWiRmcZdxUXVAWOdj4NTTI
+	 BWCEo/B8nHEBpBx+7LO1KZAqn5yH39pGYSS6Nl1SwGCqIBmdDL0DX/dKsqdv+W5/VD
+	 uDkNsDXsClxJCAtmvUvjmC1u2Co/jIoo0SS8w0ODOaTib6Lia52Q31fg/dCLneBMc6
+	 QJJ+spsETQLfqwoT3feOiXBDsle8X2Ab5002xIjr7rmLwsJ/TZ0dS7d0vUmdzWvhhu
+	 BlE66QF75VVeA==
+Date: Tue, 15 Jul 2025 16:45:32 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Felix Fietkau <nbd@nbd.name>
+Cc: netdev@vger.kernel.org, Michal Ostrowski <mostrows@earthlink.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: pppoe: implement GRO support
+Message-ID: <20250715164532.28305dc3@kernel.org>
+In-Reply-To: <20250715104425.8688-1-nbd@nbd.name>
+References: <20250715104425.8688-1-nbd@nbd.name>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [RFC][PATCH] don't open-code kernel_accept() in
- rds_tcp_accept_one()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175262281550.617203.2479152268039457766.git-patchwork-notify@kernel.org>
-Date: Tue, 15 Jul 2025 23:40:15 +0000
-References: <20250713180134.GC1880847@ZenIV>
-In-Reply-To: <20250713180134.GC1880847@ZenIV>
-To: Al Viro <viro@ZenIV.linux.org.uk>
-Cc: allison.henderson@oracle.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sun, 13 Jul 2025 19:01:34 +0100 you wrote:
-> rds_tcp_accept_one() starts with a pretty much verbatim
-> copy of kernel_accept().  Might as well use the real thing...
+On Tue, 15 Jul 2025 12:44:24 +0200 Felix Fietkau wrote:
+> Only handles packets where the pppoe header length field matches the exact
+> packet length. Significantly improves rx throughput.
 > 
-> 	That code went into mainline in 2009, kernel_accept()
-> had been added in Aug 2006, the copyright on rds/tcp_listen.c
-> is "Copyright (c) 2006 Oracle", so it's entirely possible
-> that it predates the introduction of kernel_accept().
-> 
-> [...]
+> When running NAT traffic through a MediaTek MT7621 devices from a host
+> behind PPPoE to a host directly connected via ethernet, the TCP throughput
+> that the device is able to handle improves from ~130 Mbit/s to ~630 Mbit/s,
+> using fraglist GRO.
 
-Here is the summary with links:
-  - [RFC] don't open-code kernel_accept() in rds_tcp_accept_one()
-    https://git.kernel.org/netdev/net-next/c/5cc7fce3493c
+Doesn't build:
 
-You are awesome, thank you!
+ERROR: modpost: "inet_gro_receive" [drivers/net/ppp/pppoe.ko] undefined!
+ERROR: modpost: "inet_gro_complete" [drivers/net/ppp/pppoe.ko] undefined!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
