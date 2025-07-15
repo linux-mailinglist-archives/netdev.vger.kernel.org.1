@@ -1,138 +1,124 @@
-Return-Path: <netdev+bounces-206973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A95F6B04F20
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 05:34:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07845B04F8C
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 05:54:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFC1F16B0D3
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 03:34:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49F5F188E3F8
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 03:54:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC8482D0C75;
-	Tue, 15 Jul 2025 03:34:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDE222D12E4;
+	Tue, 15 Jul 2025 03:54:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gtQOE/I0"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37BD425B2E3;
-	Tue, 15 Jul 2025 03:34:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96BC61B4F1F;
+	Tue, 15 Jul 2025 03:54:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752550475; cv=none; b=XsCbozQrzK9woSVHwp/PsLGw8yxxi6PpDRqiaOCfklk8K0xbhzy2S43Wgp0LMzvN01wlR9rbfCfqPUvUNmbQCsyWsa+x4wcmzlBcpnEc+TH+Yv1lrWYGn4wcsPRPIdXCBLcK7V8DUkBvxtXX5AKRyF4SUOoWr7EGuoU8qCkQMSw=
+	t=1752551661; cv=none; b=XN0hw7bVWo7A0Sfq1aEIn4Zhq9Gdnl6HmoOcXyT9pF0yuUN0OBQmWFdnDL9l+TSANPAsECIbq0W8FtWb9AiXhS8Qhb05lWX56x1qrhc1Z3T0qJygLYPBhocwAGL63/cgM7pxnbIWWcDfCzLt2gAZmxRHbHAMO/t3Ea2Q4ALsdnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752550475; c=relaxed/simple;
-	bh=iGIynGgZcN+Tky8z+74hs/M6AuLP5AAfdj32j/amb0Q=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AJvdAYfd1PUhWzYA9BRtYk/zt9mhO9W0Qlc8Y3VnHYRA35I7KZZRHyDJKpOczPx+A54Vnyma71k0erVFA7XfnNKIkX6GRTI5NzpWtmMSjK3DukSrnhQJMIiObjsIjQCy08R7BA2MqOm+lsJ2pZvtoFUlgQ3KxliHuJ7AwzBjt/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bh4WJ74gLz2FbPL;
-	Tue, 15 Jul 2025 11:32:28 +0800 (CST)
-Received: from kwepemo200008.china.huawei.com (unknown [7.202.195.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 34F83140156;
-	Tue, 15 Jul 2025 11:34:31 +0800 (CST)
-Received: from huawei.com (10.67.175.28) by kwepemo200008.china.huawei.com
- (7.202.195.61) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 15 Jul
- 2025 11:34:30 +0800
-From: Xinyu Zheng <zhengxinyu6@huawei.com>
-To: <mst@redhat.com>, <jasowang@redhat.com>, <pbonzini@redhat.com>,
-	<stefanha@redhat.com>, <virtualization@lists.linux-foundation.org>,
-	<kvm@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <gregkh@linuxfoundation.org>,
-	<stable@vger.kernel.org>
-CC: <zhengxinyu6@huawei.com>
-Subject: [PATCH v6.1] vhost-scsi: protect vq->log_used with vq->mutex
-Date: Tue, 15 Jul 2025 03:22:55 +0000
-Message-ID: <20250715032255.1624137-1-zhengxinyu6@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1752551661; c=relaxed/simple;
+	bh=R2NhqYJcsbfnwkDNnCnNVLiCMS9BTr1YY+cvgm42Mvc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UK8N2AIwl681yqDBEdlKcwhb1zjo1ub+VRweo2tRFcRw05oQNoDcUnuYSxzcl/lLJef2C6svslTw8ziUh7UlyDomtlW02GYJzWnYZtYgfJ3fW1nQSuXRwq56hvcnZHhX1NpzrR8tJQ0Q1Kjd8ExMbl2uHZV6PWD4N68Rchla+f4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gtQOE/I0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECE79C4CEE3;
+	Tue, 15 Jul 2025 03:54:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752551660;
+	bh=R2NhqYJcsbfnwkDNnCnNVLiCMS9BTr1YY+cvgm42Mvc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gtQOE/I0sXT8utigzhHgXqTEOL3H7XlIUhkOTwDww2ZoRXAn0dS1ueUXDmLz3NYq1
+	 ek37yiFG8NEZIi5+/29nMezHyKEYJZxwMxM/LBI4YtasXZFEwbLTRvpprg7rl7Nf5Z
+	 xjop+gXI5FuaG/5xo2ZNtafgYDtOPHXDQeJhFHjhBNCCctj0t+JAHUBzdQtPIzjoHf
+	 HGlU3w4UjPuCuezFH6hNHZf+TUINu/z1Docgsumb8XejYJepCi8+SG5kLw/w53OsXT
+	 405VnH2SQOc6CdPbn9bU2l5v+d4JgVAs4uFaSDm5ps2JS4MeFzFm8zx3QgrwIJ/UqF
+	 BSJ+OaMQW6HxA==
+Date: Mon, 14 Jul 2025 22:54:19 -0500
+From: Rob Herring <robh@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/7] dt-bindings: net: airoha: npu: Add
+ memory regions used for wlan offload
+Message-ID: <20250715035419.GA11704-robh@kernel.org>
+References: <20250714-airoha-en7581-wlan-offlaod-v3-0-80abf6aae9e4@kernel.org>
+ <20250714-airoha-en7581-wlan-offlaod-v3-1-80abf6aae9e4@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemo200008.china.huawei.com (7.202.195.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250714-airoha-en7581-wlan-offlaod-v3-1-80abf6aae9e4@kernel.org>
 
-From: Dongli Zhang <dongli.zhang@oracle.com>
+On Mon, Jul 14, 2025 at 05:25:14PM +0200, Lorenzo Bianconi wrote:
+> Document memory regions used by Airoha EN7581 NPU for wlan traffic
+> offloading.
+> 
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+>  .../devicetree/bindings/net/airoha,en7581-npu.yaml    | 19 +++++++++++++++----
+>  1 file changed, 15 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml b/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml
+> index 76dd97c3fb4004674dc30a54c039c1cc19afedb3..f99d60f75bb03931a1c4f35066c72c709e337fd2 100644
+> --- a/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml
+> +++ b/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml
+> @@ -41,9 +41,18 @@ properties:
+>        - description: wlan irq line5
+>  
+>    memory-region:
+> -    maxItems: 1
+> -    description:
+> -      Memory used to store NPU firmware binary.
+> +    items:
+> +      - description: NPU firmware binary region
+> +      - description: NPU wlan offload RX buffers region
+> +      - description: NPU wlan offload TX buffers region
+> +      - description: NPU wlan offload TX packet identifiers region
 
-[ Upstream commit f591cf9fce724e5075cc67488c43c6e39e8cbe27 ]
+1 entry was valid before, but not anymore? If so, justify it in the 
+commit message.
 
-The vhost-scsi completion path may access vq->log_base when vq->log_used is
-already set to false.
-
-    vhost-thread                       QEMU-thread
-
-vhost_scsi_complete_cmd_work()
--> vhost_add_used()
-   -> vhost_add_used_n()
-      if (unlikely(vq->log_used))
-                                      QEMU disables vq->log_used
-                                      via VHOST_SET_VRING_ADDR.
-                                      mutex_lock(&vq->mutex);
-                                      vq->log_used = false now!
-                                      mutex_unlock(&vq->mutex);
-
-				      QEMU gfree(vq->log_base)
-        log_used()
-        -> log_write(vq->log_base)
-
-Assuming the VMM is QEMU. The vq->log_base is from QEMU userpace and can be
-reclaimed via gfree(). As a result, this causes invalid memory writes to
-QEMU userspace.
-
-The control queue path has the same issue.
-
-Cc: stable@vger.kernel.org#6.1.x
-Cc: gregkh@linuxfoundation.org
-Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
-Reviewed-by: Mike Christie <michael.christie@oracle.com>
-Message-Id: <20250403063028.16045-2-dongli.zhang@oracle.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-[ Conflicts in drivers/vhost/scsi.c
-  bacause vhost_scsi_complete_cmd_work() has been refactored. ]
-Signed-off-by: Xinyu Zheng <zhengxinyu6@huawei.com>
----
- drivers/vhost/scsi.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
-index 3077cb9d58d6..87f2f56fd20a 100644
---- a/drivers/vhost/scsi.c
-+++ b/drivers/vhost/scsi.c
-@@ -568,8 +568,10 @@ static void vhost_scsi_complete_cmd_work(struct vhost_work *work)
- 		ret = copy_to_iter(&v_rsp, sizeof(v_rsp), &iov_iter);
- 		if (likely(ret == sizeof(v_rsp))) {
- 			struct vhost_scsi_virtqueue *q;
--			vhost_add_used(cmd->tvc_vq, cmd->tvc_vq_desc, 0);
- 			q = container_of(cmd->tvc_vq, struct vhost_scsi_virtqueue, vq);
-+			mutex_lock(&q->vq.mutex);
-+			vhost_add_used(cmd->tvc_vq, cmd->tvc_vq_desc, 0);
-+			mutex_unlock(&q->vq.mutex);
- 			vq = q - vs->vqs;
- 			__set_bit(vq, vs->compl_bitmap);
- 		} else
-@@ -1173,8 +1175,11 @@ static void vhost_scsi_tmf_resp_work(struct vhost_work *work)
- 	else
- 		resp_code = VIRTIO_SCSI_S_FUNCTION_REJECTED;
- 
-+	mutex_lock(&tmf->svq->vq.mutex);
- 	vhost_scsi_send_tmf_resp(tmf->vhost, &tmf->svq->vq, tmf->in_iovs,
- 				 tmf->vq_desc, &tmf->resp_iov, resp_code);
-+	mutex_unlock(&tmf->svq->vq.mutex);
-+
- 	vhost_scsi_release_tmf_res(tmf);
- }
- 
--- 
-2.34.1
-
+> +
+> +  memory-region-names:
+> +    items:
+> +      - const: firmware
+> +      - const: pkt
+> +      - const: tx-pkt
+> +      - const: tx-bufid
+>  
+>  required:
+>    - compatible
+> @@ -79,6 +88,8 @@ examples:
+>                       <GIC_SPI 121 IRQ_TYPE_LEVEL_HIGH>,
+>                       <GIC_SPI 122 IRQ_TYPE_LEVEL_HIGH>,
+>                       <GIC_SPI 123 IRQ_TYPE_LEVEL_HIGH>;
+> -        memory-region = <&npu_binary>;
+> +        memory-region = <&npu_firmware>, <&npu_pkt>, <&npu_txpkt>,
+> +                        <&npu_txbufid>;
+> +        memory-region-names = "firmware", "pkt", "tx-pkt", "tx-bufid";
+>        };
+>      };
+> 
+> -- 
+> 2.50.1
+> 
 
