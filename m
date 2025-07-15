@@ -1,131 +1,108 @@
-Return-Path: <netdev+bounces-206989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5C21B0512C
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 07:45:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48D68B05137
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 07:49:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC1A64A3360
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 05:45:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 982354A6555
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 05:49:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F98C265CBD;
-	Tue, 15 Jul 2025 05:45:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2ADB263F3C;
+	Tue, 15 Jul 2025 05:49:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MCRjH2iv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KKWLQJOG"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay15.mail.gandi.net (relay15.mail.gandi.net [217.70.178.235])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACAB24501A;
-	Tue, 15 Jul 2025 05:45:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6232C12DDA1
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 05:49:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752558311; cv=none; b=fSC989F5uEy97qO0GiIOL8/YsGgD4MuQBzT8Nkn7q1MX9r+kRYnzy180spxSyicqpjMM/htQ2cpXG36F/e79+FGtPq7aB45Kdanq34DhpCGDj823uYgtjFziboHJBNeg/SAGPdfermnVCRQM3Q8CWWhAZfHzT2xHNA5GEy1k4aw=
+	t=1752558554; cv=none; b=IQJ4YEvzWuiHqgRQbx4i+ZWOxC2igvCMNnGDh/PZmpHnniTzVkmvY0lwXokbBbp66n/FIFLYEcR65/kxcRCB8Xs2Bos59zxwP3OlBJariCpNt4KqkJZCUzaYXcRUxDeSLClu8ze3UO+PiLGilnB1v9ZEyYKSUpWh93oD7MevdJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752558311; c=relaxed/simple;
-	bh=9szHCQY3rT3vmVl4mX4u+FByo6rzsAxsYHWiIKk0Skk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OVO+ek+DUVJrVaz1hlBfyuVCisBpKO44qUeBthL8leiQLN6xj0/b3o2+gcD3lnuT6szlagJYG1pSU0t07tgNCRCDj9AkjAvFpympd6PlwGa0Ys4SEXCpPG/ebE8ZIqZRbSPQa7QM9b5xKELsbLacvb/ix6Ck+ApcoQ15ymYS4TA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MCRjH2iv; arc=none smtp.client-ip=217.70.178.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 88AAE44299;
-	Tue, 15 Jul 2025 05:45:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1752558306;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KpcAUAryQqnJpja2poJMF9++SUKZn3dkdBj4SYa8tRM=;
-	b=MCRjH2ivv0evxbjVj/+m51rex4KMtrT7XYvW/sTdd6168sQmcGjfYi0RoFf52+veELkNVV
-	/UQTHeuiO4dhUHrVkoCwQwZl2/cqkfDlXmi1OtR/X9TqD+ohChxcO10Bg7mcReku1RIBbW
-	JjwrpqsDkVXaEfwxXlUnW9qzGnRZylbw5cpyWn/0gzwETyWtUXPA6KMuNUW/jdX7Rjte3k
-	3lRQcW+JxIaO9y9T0UcOJCSbR2plWksGY90yvaACfnHq/5+soMbbL5d4KrJIE21pJBrY5v
-	M+IQc226fi+/CaJrkjhYzJspvBR7Kg/a9Zah8TZB4CGyd0f6LE38A1NiMitE+w==
-Date: Tue, 15 Jul 2025 07:45:03 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
- <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, Florian Fainelli
- <f.fainelli@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>, Vladimir
- Oltean <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
- <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v3 3/3] selftests: ethtool: Introduce ethernet
- PHY selftests on netdevsim
-Message-ID: <20250715074503.7b5505ce@fedora.home>
-In-Reply-To: <20250711165813.02e3cd80@kernel.org>
-References: <20250710062248.378459-1-maxime.chevallier@bootlin.com>
-	<20250710062248.378459-4-maxime.chevallier@bootlin.com>
-	<20250711165813.02e3cd80@kernel.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1752558554; c=relaxed/simple;
+	bh=kFBYaHi99g+zJqrDSAM4z24Bb53x4OJTfWRHfSVAYqk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=r2Bnw7Zb32LFXpO61bs6SxHPKVfjAYQI/Y/zQ41zhkmgFDdDYOH2EQ7jxvIMM5SEAFEwuvGhA4iHcC2sIvfOUek8zO95xNddsMgxfMZdQL/XhzHFs8guQ5Zkwkx8m+zqOvDXT8Kepfv7YsUecGmB7Kg/v8WBFaRo2hsV8pNbw08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KKWLQJOG; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-23c8a5053c2so49192335ad.1
+        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 22:49:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752558552; x=1753163352; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kFBYaHi99g+zJqrDSAM4z24Bb53x4OJTfWRHfSVAYqk=;
+        b=KKWLQJOGmSLjtT6M7N+YlsngrHL34OopUrpWR7m49b6uZyMYLto2Al5nnvakfGT7Dl
+         pJ+hjWwscKoBlsptTgYLiyOoItdDn+MGdwmb/A2RX9+DLqrx7UHyXRabbcnEdY2ykKsB
+         ax1O0/0N1a1Wz+ju5jHJ5/Mv6ASyzfGMUAcOAfHAfvml9O1XYoNPtfdU0zijJ6Dep26W
+         HBb8KcOgtsxwdy5bC7DTV/wPmPAwK3q2gO2pGyrqxPg72Lm5OjCudqP1AJ5J/Sw9u9yt
+         WNEUKjee97LlxwLp3jHDs9jZE7Oj/RYc25z1W2+5RLSBpxIaaW1ZlTY9BWbMl46jIYwg
+         Z7Sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752558552; x=1753163352;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kFBYaHi99g+zJqrDSAM4z24Bb53x4OJTfWRHfSVAYqk=;
+        b=iRpfb9Tv4EwsXOOXfe7d26mQfyBpys/3ww5HToO5/X3DbBy7I4a4qqJ14It0nt/k8r
+         YAuGCMdVEOx+oMdX4/shn7x+SQfHk+D7BWfZSheEEkcY5r/vsYAPuX8H6AuKxX2UoYWJ
+         e+TpEpUe07Yx1tE9j6rKAuMxEVEot1mV+ER+s/Dri05hO1slG+svs/KuhYaLPM14CAN2
+         eqWixgHeZNGv9bxmUlaOvYK/sUTs87m1ZOjTycxw57BWF56uDz+kTi8FZAZMjTxoKZTr
+         QkpSR1gk/aVH2+u+L52iOf4DSmpeYc/wEur4EgPYxPbsq4Ms79e7KymqwKYMGJ9MaWUN
+         KtnQ==
+X-Gm-Message-State: AOJu0Yw/DSEhchtCxVnhsXEjHa4t3rPJ70bZKSLw3DsERxQF3QALCvfN
+	CSCZwiC3mPQSMxy9u/1E/xH5McNxX4RWTEx0MSg6LnHRzD8TyumpSiLEdqg5weUhrlOwS/JAtDQ
+	9XlNm/T1rPL0wIeDnTjXzFUQW3iB7foR7IO9Q
+X-Gm-Gg: ASbGncudoznthffpHtCk8KxQzrMVxLtGG5Ev6RxGiLbJF10Nhr47c3maRT2VoI0rau0
+	4YuAtr633FCSo2rsxHwxWb+dLp94YOvCVN0hqANqAtbWasFQWctHpl6cvP3285eNLZb7rVSwVYu
+	DC1qwSkv/2gpaxcJp4a2awEOMH97F3IGCG6SKpBA5JRY+gVhKkXOI+DyuoKI545CXyqGzfpsoZU
+	3I9l1m6
+X-Google-Smtp-Source: AGHT+IE00O9FqGGIu6PazW7EAC8qPfOWWwWnPJhYl9t5dEnEIs9jwyWTpbI+j0yTbAFYN4OUEu1lH5F2cpH97xvdb0M=
+X-Received: by 2002:a17:902:cf0d:b0:22e:72fe:5f9c with SMTP id
+ d9443c01a7336-23df0943513mr195288025ad.42.1752558552536; Mon, 14 Jul 2025
+ 22:49:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdehgedtvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedujedprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtp
- hhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
+References: <20250708081516.53048-1-krikku@gmail.com> <38cb3493-1b13-4b8a-b84c-81a6845d876f@redhat.com>
+ <CACLgkEah6FthfCg0CX3GrJxE2Tpuqiwdfw7gHvyQKECfOYKE3g@mail.gmail.com>
+In-Reply-To: <CACLgkEah6FthfCg0CX3GrJxE2Tpuqiwdfw7gHvyQKECfOYKE3g@mail.gmail.com>
+From: Krishna Kumar <krikku@gmail.com>
+Date: Tue, 15 Jul 2025 11:18:35 +0530
+X-Gm-Features: Ac12FXyySNecCxXP4IeZQPPzweH3vU1Fb0qOtHqBUFGojN_XV4TW7J9sjnaLjAw
+Message-ID: <CACLgkEYao_RjVEVgcEqwZPBmmFC+5Y=Lu7VE4Wv=WhDGEhbftQ@mail.gmail.com>
+Subject: Re: [PATCH] net: Fix RPS table slot collision overwriting flow
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	tom@herbertland.com, bhutchings@solarflare.com, kuba@kernel.org, 
+	horms@kernel.org, sdf@fomichev.me, kuniyu@google.com, ahmed.zaki@intel.com, 
+	aleksander.lobakin@intel.com, atenart@kernel.org, jdamato@fastly.com, 
+	krishna.ku@flipkart.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Jakub,
+On Sun, Jul 13, 2025 at 5:14=E2=80=AFPM Krishna Kumar <krikku@gmail.com> wr=
+ote:
 
-On Fri, 11 Jul 2025 16:58:13 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
+> Thanks for your review comments. I felt the patch was preventing an
+> unintended behavior (repeated reprogramming, early flow expiration)
+> that disrupts aRFS functionality, and is more appropriate for the 'net'
+> tree? If that is not the case, I will test and recreate against net-next.
 
-> On Thu, 10 Jul 2025 08:22:47 +0200 Maxime Chevallier wrote:
-> > +set -o pipefail
-> > +
-> > +# Check simple PHY addition and listing
-> > +
-> > +# Parent == 0 means that the PHY's parent is the netdev
-> > +PHY_DFS=$(make_phydev_on_netdev "$NSIM_ID" 0)
-> > +
-> > +# First PHY gets index 1
-> > +index=$(ethtool --show-phys "$NSIM_NETDEV" | grep "PHY index" | cut -d ' ' -f 3)
-> > +check $? "$index" "1"
-> > +
-> > +# Insert a second PHY, same parent. It gets index 2.
-> > +PHY2_DFS=$(make_phydev_on_netdev "$NSIM_ID" 0)
-> > +
-> > +# Create another netdev
-> > +NSIM_ID2=$((RANDOM % 1024))
-> > +NSIM_NETDEV_2=$(make_netdev_from_id "$NSIM_ID2")
-> > +
-> > +PHY3_DFS=$(make_phydev_on_netdev "$NSIM_ID2" 0);
-> > +
-> > +# Check unfiltered PHY Dump
-> > +n_phy=$(ethtool --show-phys '*' | grep -c "PHY index")
-> > +check $? "$n_phy" "3"
-> > +
-> > +# Check filtered Dump
-> > +n_phy=$(ethtool --show-phys "$NSIM_NETDEV" | grep -c "PHY index")
-> > +check $? "$n_phy" "2"  
-> 
-> Not a very strong preference, but I wonder if we should wire up the
-> paths to the Python lib for drivers/net/netdevsim and switch to Python?
-> It does the setup and cleanup and it gives us direct YNL access.
-> More convenient for testing new stuff than jugging ethtool builds..
-> But I guess you could argue that testing the CLI is good in itself.
-
-That's totally OK for me, looking at selftests/drivers/net/netdevsim/
-it was unclear to me what was the proper way forward.
-
-My python skills are not the best, I'm basically writing C using python
-syntax, but I can certainly give that a shot.
+Grok suggests these are to be considered enhancement patches and not
+bug fixes - same as what was suggested by Paolo. I am closing this and
+resending as two separate patches against net-next.
 
 Thanks,
-
-Maxime
+- Krishna
 
