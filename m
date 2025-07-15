@@ -1,157 +1,175 @@
-Return-Path: <netdev+bounces-207042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59DCDB0570D
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 11:50:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E778B05730
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 11:54:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AEBFC1898365
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 09:50:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B40091C22DA5
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 09:54:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 638942D5C6B;
-	Tue, 15 Jul 2025 09:50:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A26B72D8DC2;
+	Tue, 15 Jul 2025 09:53:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RYdxeWU8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iJls0LXr"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C1E238C1B
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 09:50:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A552D8DA7
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 09:53:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752573018; cv=none; b=ZqZ5EGFcIMX6ZqQAcAud9ffCZrc+MLwzMTkXPNHbgo2hZzsDYKLdzA6iHSA9GG7wVW9QFFO0cPKPBignXfvagqOffC+axCmXFg8trxiZWDIhnoGRXTbXZIOoIKzQYvKhxnGgUEnR5twY7oRyD/jOr8ocXtDlvavTzjY1Lhr895c=
+	t=1752573214; cv=none; b=NNTNB3rw8hrx30GSWWIsj3KbEWeKjoV1M1mpXE+uGK2YCRP5+rxPaNDLO3DU51pBukB5Hntp3m1vhrnKb4/mWrWiKgLESFdEFe5mbiL0kbqy1nEReMXACbGbOVLRKOdooXg4WKSvVLjG2XkETvBCjN3TqOCiSeEOMVCG0FquacI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752573018; c=relaxed/simple;
-	bh=Ki0SgJl307cBiI+Sug5JFb+Pdax20SoV1tLcDKXVkeQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P99TrLJGe4QX2pyOhufC7Kwb4tygofLXK/BXLtC+mSp964mKRggvtMcpcygQOuEOaSM0rbKm7ZH/4Kh8YUxylniy0Dt2EC+IvmTEd1XJpCvxUFFLKsqxs16MupsDcv6B/GRd9nfCO4sU3e3f256JbChdlQC9E/KWaIylgjMK2UU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RYdxeWU8; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1752573214; c=relaxed/simple;
+	bh=6tGyBJtvc2RtGieTCJUc7+YbV5rIOi+F+HZmZMgrilY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CaE1P53kracbLvoetuUNytz3sX1o+VSJSjV6O9hR16Gl70kO/wTOenTExTNfgPwEM8vjirDWcdFvui6yAukGFxDVwzDfaln1+vG3hYBww2slZiG7YAnE0nVRWsn1Rll+wQbpD+eZSypLYJxFvfu0R4k81hpPKtweGbyrefMuJO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iJls0LXr; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752573015;
+	s=mimecast20190719; t=1752573210;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=iQEjAlaLqgiRX099uVhM3nPBv3g2I22KqeqxbeRqaJI=;
-	b=RYdxeWU8+3oqnA+N0lHHjM+bCtw0xcflPhJ3d1+0jjzavOR+WOErJiwKfvNi+WukDlaPZ9
-	Qrh2gWEmo7n7JSKVwbmo+4smSBQ2xo2UOds5jr8MLW63c51+I0BGThJr+tpb3fYLq7Jdur
-	csGI0kTCskPEk8S+jG6a1P2jlCbPG7c=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=4iPXF4gYG8U7aUqDfy3cGUXBvmWO/3o2DGgrJboTKas=;
+	b=iJls0LXrwrwB+H0aB+Czi2O2qtBD8uZ2t0X5vXG8Xjv4+JGwZZEoMPB8SOJBXPKDTMOgiM
+	U1BG6zLr0Y6n2Dws/aIGdTbqOfJoaDpzhokGxSVbRYD8q947nIaLL6+N98EnQUdIBCzRFu
+	FoA8PQ6KsJN5xCkgZWmSa3ww2WSEgaw=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-688-Ppo_D_rUNaKFwofYBopmUw-1; Tue, 15 Jul 2025 05:50:13 -0400
-X-MC-Unique: Ppo_D_rUNaKFwofYBopmUw-1
-X-Mimecast-MFC-AGG-ID: Ppo_D_rUNaKFwofYBopmUw_1752573013
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-45624f0be48so4923935e9.3
-        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 02:50:13 -0700 (PDT)
+ us-mta-610-B0MqUUveMw6W9rIadhd8Mg-1; Tue, 15 Jul 2025 05:53:27 -0400
+X-MC-Unique: B0MqUUveMw6W9rIadhd8Mg-1
+X-Mimecast-MFC-AGG-ID: B0MqUUveMw6W9rIadhd8Mg_1752573207
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-704d5ca41f2so25435176d6.2
+        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 02:53:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752573012; x=1753177812;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iQEjAlaLqgiRX099uVhM3nPBv3g2I22KqeqxbeRqaJI=;
-        b=rLywSbHb1idKkOHT5D1j6dYl48P4/0gm92zreof4p7ZVx1zjzRp7CtQDA3+CW1/Hsd
-         qcB3u60zqYO4uk1MOuTKwTZ0s6wt40MsR4ZUwQMjyreYgtjInyXg5CxV6LSCULviZW0E
-         lS7ovqO0lOtvnkJCzGPZM/Dyn+MZcCswcISoz03mP+qpqsvzxSum85SKRFIJPpF66O4t
-         p9vXOggfT3JmsN24VGZ8Bc7BF04ivhJiECFQ86tvKwo6GLyf0ZLPDM9ThgsQyRfSHfQG
-         9iUHUIYB+uHe1Wf/z0BmuudAcH7hSDEmz6OoU104h3TtFZogu0dk+uEUGdtvixDhNqob
-         aXpQ==
-X-Gm-Message-State: AOJu0YzKWsWDcTNdEVNtdF333MyOs7XMvGn0snD7SejklO5fdL6kd6eg
-	f2hx6esvzJ7CBLl9r66qiTTI5HOArG2M99KQ6+ytLIj3hKilbD0o4HQlF8R6ctHmKaltEBilZSN
-	qzODRumV+B8zTDW/SxHhLE7oYSML1UXvcyRT75K7wvkAIJ2CVlnJuue1SsQ==
-X-Gm-Gg: ASbGncse98JfdpD8SEor8mLGtv0X8rqiHyq4sIHleEBwxE+qNHlJmX7HULsiv1fodLL
-	giegOR7yn1x94mCkxb1qssBehhjtHNwPuQW3gWmq2pFT+xsPR5fhY3sf+d4sIbKKKCUBfpWhlCo
-	RS+t3VE+r0NZ5TipSDXO2nqDbzH90iWWcZ+sswyOSyiRmLe9HwbxL9d+kYBDVvO2MC8gDNoI4oK
-	mcKE/HBf89zn72eBTjH6ROLOuPubVmFEavNQPSlso242Pj2EzH+DWE1ESf3WZyvCMP3wkXfOc0w
-	m+sWX0BxyvRm8cACcAPOkQ2bBKtXfjBON0IHm6PJ3abZmgKK8lH6GlHRHtNoBDksmkZPg3YfgVY
-	twt+3938yOYA=
-X-Received: by 2002:a05:600c:8505:b0:453:1058:f8c1 with SMTP id 5b1f17b1804b1-4555f895526mr150680125e9.3.1752573012539;
-        Tue, 15 Jul 2025 02:50:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE9E+SICra0WsD4nKZHDqyXOhwE+ihUk3ntWqvTNfrBMrLXWeidWJig86sG8z6W3uhU/mZe/w==
-X-Received: by 2002:a05:600c:8505:b0:453:1058:f8c1 with SMTP id 5b1f17b1804b1-4555f895526mr150679795e9.3.1752573012118;
-        Tue, 15 Jul 2025 02:50:12 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4561b176f87sm54947305e9.35.2025.07.15.02.50.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Jul 2025 02:50:11 -0700 (PDT)
-Message-ID: <dc01a67a-9946-456b-bfe8-fb20df0dc464@redhat.com>
-Date: Tue, 15 Jul 2025 11:50:10 +0200
+        d=1e100.net; s=20230601; t=1752573207; x=1753178007;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4iPXF4gYG8U7aUqDfy3cGUXBvmWO/3o2DGgrJboTKas=;
+        b=bC9xQFS52TNY8Gwy9v6A/hF8TL7PZV//3WBQQfFeBX/7Op6Nz4u1jZcjEHm20pYVVc
+         w/vaEtJWrpX5Ot7ToELvewM7ybss7ZIpC39Io1Ka5f1xa1+6YTRv3mfads56ZbV0bjt3
+         6AEzUPfz/6I2EzJ1g8aZFVBwHUnY+spHFk/ZUpg0e7g2CMLZfEfRbKJVjmXJ1X0OYkVA
+         r7Za3rLh7CjH+667QCd71p3Dpsi/uCDnpid8OaWL2HUFft69Auuo0BGIqZaQRjCto5mD
+         MOUMc63PmYlyHyYpe7DdF1HMuQUEq7E94hRHIPQHiA7cZ2+frDZrCv+CmefjmnjpyM3V
+         UcYA==
+X-Forwarded-Encrypted: i=1; AJvYcCULjz3weNCeRLPfA4JMyOtyhd4GhtobQNudbFaiTrArK3Z2Leob4ymoQX2/bg2kAsTnABUeFK8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyV2fY3fEnUD2VGhJarhTf/d0f1eGSQkfL4pTGVP1Ya9+WYeG1E
+	RVn6JT8tYhpYp+H4E3bZkCakDWwhty4NhKJdTr6ccUyJSzh2cX/wXJ4FZkc5f11ySm0lsxKINlU
+	safX8txn5oaBDPLP+vrFi/deDGHj3ddnXn/vSS+GDXO2yONGexvGxxAAGnw==
+X-Gm-Gg: ASbGnctmeYtl235MNjalgoTQgDL2c7E5CQcTS1RHFaCi8PaE/Sm66nO1J/5aAm/5tEN
+	hxoBr+T6u/gk2OPtM6HRpbs6vOD+ZABDeHmPdxsf2SsdusTGIp+kNT8yNn43rU3E1iBGlWdlAoE
+	o5N9wZ8liFHNeIzsRemGEfwy4h8i25cYFPDacYlPftB/2lNLNpDbITH70FP2NS7difxOnij0C/T
+	kgdUsyZTttyzKGjxYewGvr6zjDqWEMN8q18ly29OZzKd4ou8LtyFr16mwK/L1WdT0H+9GsO+Ke/
+	wyZ4ntA2NJZ9S8oM+PB9angfMbxYtBoe9TMNQWrEeA==
+X-Received: by 2002:a05:6214:5c49:b0:6fa:c31a:af20 with SMTP id 6a1803df08f44-704a353d443mr226990116d6.5.1752573207206;
+        Tue, 15 Jul 2025 02:53:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHWPMdVgtbcgI78Os5fvtMkQsvRVpbE9a1O27Hj85Ywr6W1l9K18b6noTWD3ov2A5GOpnHzCA==
+X-Received: by 2002:a05:6214:5c49:b0:6fa:c31a:af20 with SMTP id 6a1803df08f44-704a353d443mr226989786d6.5.1752573206613;
+        Tue, 15 Jul 2025 02:53:26 -0700 (PDT)
+Received: from sgarzare-redhat ([5.179.142.44])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-704aa850c20sm40166476d6.70.2025.07.15.02.53.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Jul 2025 02:53:26 -0700 (PDT)
+Date: Tue, 15 Jul 2025 11:53:17 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Will Deacon <will@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Keir Fraser <keirf@google.com>, 
+	Steven Moreland <smoreland@google.com>, Frederick Mayle <fmayle@google.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	netdev@vger.kernel.org, virtualization@lists.linux.dev, stable@vger.kernel.org
+Subject: Re: [PATCH v3 2/9] vsock/virtio: Validate length in packet header
+ before skb_put()
+Message-ID: <47gzwbsawomsgitmxcyd333k27qlwoail2k7ivwtqczbxuapyf@2gdxmlwlfsk4>
+References: <20250714152103.6949-1-will@kernel.org>
+ <20250714152103.6949-3-will@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 2/8] net: mctp: Prevent duplicate binds
-To: Matt Johnston <matt@codeconstruct.com.au>,
- Jeremy Kerr <jk@codeconstruct.com.au>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org
-References: <20250710-mctp-bind-v4-0-8ec2f6460c56@codeconstruct.com.au>
- <20250710-mctp-bind-v4-2-8ec2f6460c56@codeconstruct.com.au>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250710-mctp-bind-v4-2-8ec2f6460c56@codeconstruct.com.au>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250714152103.6949-3-will@kernel.org>
 
-On 7/10/25 10:55 AM, Matt Johnston wrote:
-> @@ -611,15 +610,36 @@ static void mctp_sk_close(struct sock *sk, long timeout)
->  static int mctp_sk_hash(struct sock *sk)
->  {
->  	struct net *net = sock_net(sk);
-> +	struct sock *existing;
-> +	struct mctp_sock *msk;
-> +	int rc;
-> +
-> +	msk = container_of(sk, struct mctp_sock, sk);
->  
->  	/* Bind lookup runs under RCU, remain live during that. */
->  	sock_set_flag(sk, SOCK_RCU_FREE);
->  
->  	mutex_lock(&net->mctp.bind_lock);
-> -	sk_add_node_rcu(sk, &net->mctp.binds);
-> -	mutex_unlock(&net->mctp.bind_lock);
->  
-> -	return 0;
-> +	/* Prevent duplicate binds. */
-> +	sk_for_each(existing, &net->mctp.binds) {
-> +		struct mctp_sock *mex =
-> +			container_of(existing, struct mctp_sock, sk);
-> +
-> +		if (mex->bind_type == msk->bind_type &&
-> +		    mex->bind_addr == msk->bind_addr &&
-> +		    mex->bind_net == msk->bind_net) {
-> +			rc = -EADDRINUSE;
-> +			goto out;
-> +		}
+On Mon, Jul 14, 2025 at 04:20:56PM +0100, Will Deacon wrote:
+>When receiving a vsock packet in the guest, only the virtqueue buffer
+>size is validated prior to virtio_vsock_skb_rx_put(). Unfortunately,
+>virtio_vsock_skb_rx_put() uses the length from the packet header as the
+>length argument to skb_put(), potentially resulting in SKB overflow if
+>the host has gone wonky.
+>
+>Validate the length as advertised by the packet header before calling
+>virtio_vsock_skb_rx_put().
+>
+>Cc: <stable@vger.kernel.org>
+>Fixes: 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")
+>Signed-off-by: Will Deacon <will@kernel.org>
+>---
+> net/vmw_vsock/virtio_transport.c | 12 ++++++++++--
+> 1 file changed, 10 insertions(+), 2 deletions(-)
+>
+>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>index f0e48e6911fc..bd2c6aaa1a93 100644
+>--- a/net/vmw_vsock/virtio_transport.c
+>+++ b/net/vmw_vsock/virtio_transport.c
+>@@ -624,8 +624,9 @@ static void virtio_transport_rx_work(struct work_struct *work)
+> 	do {
+> 		virtqueue_disable_cb(vq);
+> 		for (;;) {
+>+			unsigned int len, payload_len;
+>+			struct virtio_vsock_hdr *hdr;
+> 			struct sk_buff *skb;
+>-			unsigned int len;
+>
+> 			if (!virtio_transport_more_replies(vsock)) {
+> 				/* Stop rx until the device processes already
+>@@ -642,12 +643,19 @@ static void virtio_transport_rx_work(struct work_struct *work)
+> 			vsock->rx_buf_nr--;
+>
+> 			/* Drop short/long packets */
+>-			if (unlikely(len < sizeof(struct virtio_vsock_hdr) ||
+>+			if (unlikely(len < sizeof(*hdr) ||
 
-It looks like the list size is bounded only implicitly by ulimit -n.
-Fuzzers or bad setup could hung the kernel with extreme long list traversal.
+pre-existing: in some part we use sizeof(*hdr) in other 
+VIRTIO_VSOCK_SKB_HEADROOM, I think we should try to uniform that, but of 
+course not for this series!
 
-Not blocking this patch, but I suggest to either use an hash/tree to
-store the binding, or check for "rescheduling needed" in the loop.
+> 				     len > virtio_vsock_skb_len(skb))) {
+> 				kfree_skb(skb);
+> 				continue;
+> 			}
+>
+>+			hdr = virtio_vsock_hdr(skb);
+>+			payload_len = le32_to_cpu(hdr->len);
+>+			if (payload_len > len - sizeof(*hdr)) {
 
-/P
+Since this is an hot path, should we use `unlikely`, like in the 
+previous check, to instruct the branch predictor?
 
-> +	}
-> +
-> +	sk_add_node_rcu(sk, &net->mctp.binds);
-> +	rc = 0;
-> +
-> +out:
-> +	mutex_unlock(&net->mctp.bind_lock);
-> +	return rc;
->  }
->  
->  static void mctp_sk_unhash(struct sock *sk)
-> 
+The rest LGTM!
+
+Thanks,
+Stefano
+
+>+				kfree_skb(skb);
+>+				continue;
+>+			}
+>+
+> 			virtio_vsock_skb_rx_put(skb);
+> 			virtio_transport_deliver_tap_pkt(skb);
+> 			virtio_transport_recv_pkt(&virtio_transport, skb);
+>-- 
+>2.50.0.727.gbf7dc18ff4-goog
+>
 
 
