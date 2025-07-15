@@ -1,87 +1,93 @@
-Return-Path: <netdev+bounces-207243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 189D4B06584
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 20:03:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34A04B065CE
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 20:13:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C96E7B2444
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 18:02:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B5861AA80F2
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 18:13:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D80632980A3;
-	Tue, 15 Jul 2025 18:03:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C973C29A9EE;
+	Tue, 15 Jul 2025 18:13:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lreBpZYc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k9JI1j1Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EC752874F7
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 18:03:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5335529A9E4
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 18:13:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752602614; cv=none; b=b2MS/hYQZTZXg1reItzfDpy7EUjJ7Hg1uTnMzZ1SIVEqI6xCAwDV+BHo4iVuSv1nfBMdonXUW5sgRKaJdkGMn3OlUz3vEqQHXYg1XQ05G7tdEGzvPv6Tw9ohoTJDka1OKsoGlrNUrDKjcqR/kYMc4jNn53YZwhtuCxQzyGrY9/U=
+	t=1752603207; cv=none; b=UhrU9B16diMca+qvq9fd4n/XSESIh9p1tW4qbvQcKdXqPjazphUPsfavARKIqlXKD6YO+i0qb5ZQBFOcZPXmIR5GeR8tKLMLtvCkcKPZjZiBibVacjbL/ATJQYf4HzcwjJqs7K8jpXHrFAZargRHZsBtX1R7IlM/xWeLPdSBmPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752602614; c=relaxed/simple;
-	bh=grONTDHMtYhzrNOx63wyb/Qi6y245xbHXde1u/zJfUE=;
+	s=arc-20240116; t=1752603207; c=relaxed/simple;
+	bh=p707MAcw9CgGwDsWDEOMwpTLYV3uZn9gyOXcVIXgbrQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BrizhNQSHD9VSLMSxs1uifM0DIDd6JBow1yoCUgGEdAUF/Y/fK1zDM2jvRrdiNKXNQf9ENB5yzdz5nNS2vika7Mr0gQ/bnUIkvagx3FjNuV9ttBcwDHdW8AqRRXHy6JFEaCANYnMMej7cc6JeR/Y6LDg9I+u0unWvHlO8zInY/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lreBpZYc; arc=none smtp.client-ip=209.85.210.171
+	 Content-Type:Content-Disposition:In-Reply-To; b=WElq9lXOE6xSW+5GFQSHg5XW/lWvM29y5b9Bg6UxNUbtpbVpnM7XwpcYDpxYR1Vp9KVhUHfyOb3hcrtg5O1TrUbDTfCm6r6uAVg4wHfnreVp8flHfbWhM+T+vOD5UtotKNJPPYGfm/42WT5RhkVo8QsJIfbMuDC7A2htx//LilU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k9JI1j1Y; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-73972a54919so5258290b3a.3
-        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 11:03:33 -0700 (PDT)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2349f096605so73730445ad.3
+        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 11:13:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752602612; x=1753207412; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1752603205; x=1753208005; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yD1bNOH0Nq7pNRYMUT7CnE5h/Y2yIsNQdwwE2zDFn1I=;
-        b=lreBpZYcKOhb9VeNKES2lShAZtKLSEL/P1fNCjy1hwvWnaoNf/Dk17DsEHsrqKzhvI
-         pMvGkpUOkxg8e2ezdVAW9+e/Bz2dJOI8XkrkRAqQX4DBY6JDoOHmlexiuzg5VWzgAYHF
-         uyWbd0mQumQ1bwXk8iqfmU/qg5B3MCMCSOIUu4FUPvhRvn0NTfD0XzFgPGbHwhFpFQoI
-         hz6ZXGonnbGzyZiotd543XybR56tFspmnYd7QHXdMEefHqTCDlGh3SqxVtBBSj8qYiSD
-         WF8E0uK4El/8+SOGm5TgUhYxG7tpQI1eXmHiLv4pmrukNzZG4x+2Sn22o3J78X/B73gm
-         CGpw==
+        bh=sWRPlWJsAVTpNbbUc7TiQbNI9HLk92v+Jn2hG7aZ0JY=;
+        b=k9JI1j1YxNLSkdQ4ISkeE3/thdmSiWWysYglvLmO7/X5Se+oMIAVdwPFDIxDqHTF1K
+         O47YPjyKTFXd3WqFaO8bdOGodfOo2vNdXqIsY54TyklM0v0WrtUe5dGCJucoNkm/ghLo
+         RuUaSxWl06t6akELr3l1SzY1PtFZcH4YzNLW+x5RBK8wrOBfaFBDG42IArv8hBDytIgF
+         IKxFw1jK7r7dsHY9neHA3vc4N6PcLRW7VNJOzmNJmEsCnPq1+hu4EPAnmfG1EyxVSCI2
+         tea2Ycuc3DATO77HeLQPEPF57pOzuHQWahfb0z+ua9yfD/iV4EnwGXDhhO5Q9znHsM3R
+         ASEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752602612; x=1753207412;
+        d=1e100.net; s=20230601; t=1752603205; x=1753208005;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yD1bNOH0Nq7pNRYMUT7CnE5h/Y2yIsNQdwwE2zDFn1I=;
-        b=kx6FjwPolLDQsjonlaZ1o5ByH85ocaaLl25ly6HieDE8Nnu/yRKJWMcwQg2oQf/4Ym
-         9j7T0AtSgjwixvhttaPDACH0LGTwJRLJWRUH/VL0LcDtCRrlo0QrmOY43dJRavPo4/o7
-         SlKOs1vRYx3Fe2+fLRfhXJeC7Fnx03nCtkKfm334FbN+fAsbkpuJppQBkBdbv1MvtZGz
-         nmaSeeG4xvLHHJKyQY0QgaHB5vpkQN2Jiz2VG4ZzFU5k94VzzDNHS8Ae0YwYqxVHyvPy
-         5ef6up/We3CEUQE7oBM6RuvD6p8g2SoaJhIHPGSKTs3/v3BnkL2ppF9bIV8CY+d/sWOw
-         Oe0g==
-X-Gm-Message-State: AOJu0YzV2TH4ywcapSEUflA0maB3rXsonxa+DOcZl849QVKNdvzFYrPd
-	jo4E7TzMOY3lTLga3Nqa5T+2jW9GnNyFTEyu1MqjkpMOCEz5PxUYC8di
-X-Gm-Gg: ASbGncuGHbEG7BEOjxmFET9DS/Ipft54VqmkyKJpHVXEtwiTJoe4mEZVEqf0P9sGUvP
-	e0pcYRFgUg6KlaCatP85d4oNKjVaa4wpR43sL4D8/0Oy/NOhlyT6u2fVFwqVQFtuL4NXX0HVr1O
-	VrqkJXq7Ia7F9ufQjENRJlHFfjLxMAv+JXgQl/9vl5LZC9I0C/JtPBncE2ekcUnlJfj7NrGB3KJ
-	SR4/eZBVt0eoHSiXBnr6DB3Yd+J9oC2LN8boUEbAr5oLpzzKMoSwU1CCiXAIZ4ji12rtwrGdze6
-	LCywGVNztVxaTYvUdEJ8c9dLeE2YZevehLqyhnl2o6erGeYyXD3nedSvbb+RRq4ItIqT2wnHZjY
-	7+l5RojpMIiaV1NtCNKyvGZpwlA==
-X-Google-Smtp-Source: AGHT+IFwlYG2w+pCEclYzgDxXO52cU2EnojbuRv3/4lCn3QCKw9kClBr+Cz/bsyNdwPw7vRfO4gwpw==
-X-Received: by 2002:a17:902:f682:b0:234:8eeb:d834 with SMTP id d9443c01a7336-23dee1e8154mr288516025ad.16.1752602612286;
-        Tue, 15 Jul 2025 11:03:32 -0700 (PDT)
+        bh=sWRPlWJsAVTpNbbUc7TiQbNI9HLk92v+Jn2hG7aZ0JY=;
+        b=FmOAUoOyjE3zo0XZP6FKlA6reU8Vu68gRRcDAG3S+r/NCKwBC9Y9jw3IrMEh1Jxkbg
+         8eNBB7Wmp0fY/5M+WGWq853YkAeDGffyYrwhUtDKYUluXUBofnqsHzw8kyvJmw+7oxfQ
+         ybeUeD7LinhAQJnf/znYq5sTjMUTWxyJB/fTxp3EZLQJT2oPScjFl3/L23SwGyyg+Sgg
+         15cy0Hn/pcOGHsre7hTqq3XDZ31kHFZ0er7SkyowNBUgnOHT53wh+eI/BJcdfSle1Kin
+         +Q4lbXYwtsprSV2EEifa7gFLN5aSRzoKiQTltl1At356KH78OuQMoa46R/hUHSedog9p
+         aQFw==
+X-Forwarded-Encrypted: i=1; AJvYcCWy7wwG8Jqh6JQFS2r5Qk88fyjW7ZRFVTbC0Htmb/Zbq6JXyc/rQBVFDWcySteYbKkmVOSq7JU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXJwHgnEH0KzVyDk+rhzxBIRNhuBM+wCDelqL328ijotzJL8jN
+	Mhb3SXI6QsiIsyh2T94P48mUqti8mBgvd5cKOYo+H31NigT9mBUkhuBS
+X-Gm-Gg: ASbGnctjYaxYTQhR1rFwVlJZ4wAeP3O7XfOB69qJDWzWge4Wxl70jQ0g9EeH/RkVU+J
+	eTCb7/ZFG5CXycXbr9KPne1LNhpPmtv7V7YyxrfYM0c8kdWxaw1OSdrqxLPhZVW7Tem8wHBWZKO
+	c+Sl9ra8qizX/S26+CjKbBz70dpWjTc4vmjhHqTjAD/y0eL5lV/6ba508BSAaSMToc5LYDO6ATd
+	L9lj6AnL8Lc/GKKQRvgBLxND6ejvZnIKgcIEzQ8VFyChZ9qb790lpMswAiN21tC/3OTEUxf9GJi
+	dg3SmRV4Cu3hwatULXxde89qouE6l7ogLGqAAOXjFPFnfhnqsjLBwazCLYNwKgAxdDYX4Z1otdj
+	efi1WnJFq+WX+BoNqUrGAVOAHUl567M4tAbDN
+X-Google-Smtp-Source: AGHT+IEpOTExL5O+lo9Qr6i5nSApAIo+HRXbipgqZzDnzBFExVLgT2I9OxXWr4jyFgJ6ig29xrJYvw==
+X-Received: by 2002:a17:903:234e:b0:235:129a:175f with SMTP id d9443c01a7336-23dee23805dmr267845675ad.34.1752603205316;
+        Tue, 15 Jul 2025 11:13:25 -0700 (PDT)
 Received: from localhost ([129.210.115.104])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de428b8a0sm115643985ad.8.2025.07.15.11.03.31
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de42ab6efsm117405805ad.53.2025.07.15.11.13.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Jul 2025 11:03:31 -0700 (PDT)
-Date: Tue, 15 Jul 2025 11:03:30 -0700
+        Tue, 15 Jul 2025 11:13:24 -0700 (PDT)
+Date: Tue, 15 Jul 2025 11:13:23 -0700
 From: Cong Wang <xiyou.wangcong@gmail.com>
-To: William Liu <will@willsroot.io>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, stephen@networkplumber.org,
-	Savino Dicanosa <savy@syst3mfailure.io>
-Subject: Re: [Patch v3 net 1/4] net_sched: Implement the right netem
- duplication behavior
-Message-ID: <aHaX8n8o/fLBi57L@pop-os.localdomain>
-References: <20250713214748.1377876-1-xiyou.wangcong@gmail.com>
- <20250713214748.1377876-2-xiyou.wangcong@gmail.com>
- <pGE9OHWRSf4oJwC4gS0oPonBy8_0WsDthxgLzBYGBtMVeT_EDc-HAz8NbhJxcWe0NEUrf_a7Fyq2op5FVFujfc2KyO-I38Yx_HlQhFwB0Cs=@willsroot.io>
+To: Xiang Mei <xmei5@asu.edu>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	gregkh@linuxfoundation.org, jhs@mojatatu.com, jiri@resnulli.us,
+	security@kernel.org
+Subject: Re: [PATCH v3] net/sched: sch_qfq: Fix race condition on
+ qfq_aggregate
+Message-ID: <aHaaQ1aSVt6vSQlT@pop-os.localdomain>
+References: <20250710100942.1274194-1-xmei5@asu.edu>
+ <aHAwoPHQQJvxSiNB@pop-os.localdomain>
+ <aHBA6kAmizjIL1B5@xps>
+ <aHQltvH5c6+z7DpF@pop-os.localdomain>
+ <aHRJiGLQkLKfaEc8@xps>
+ <20250714153223.5137cafe@kernel.org>
+ <aHWcRp7mB-AXcFKd@xps>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,46 +96,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <pGE9OHWRSf4oJwC4gS0oPonBy8_0WsDthxgLzBYGBtMVeT_EDc-HAz8NbhJxcWe0NEUrf_a7Fyq2op5FVFujfc2KyO-I38Yx_HlQhFwB0Cs=@willsroot.io>
+In-Reply-To: <aHWcRp7mB-AXcFKd@xps>
 
-On Mon, Jul 14, 2025 at 02:30:26AM +0000, William Liu wrote:
-> FWIW, I suggested changing this behavior to not enqueue from the root a while ago too on the security mailing list for the HFSC rsc bug (as the re-entrancy violated assumptions in other qdiscs), but was told some users might be expecting that behavior and we would break their setups.
-
-Thanks for your valuable input.
-
-Instead of arguing on what users expect, I think it is fair to use the
-man page as our argreement with user. Please let me know if you have
-more reasonable argreement or more reasonable use case for us to justify
-updates to the man page.
-
-I have an open mind.
-
+On Mon, Jul 14, 2025 at 05:09:42PM -0700, Xiang Mei wrote:
 > 
-> If we really want to preserve the ability to have multiple duplicating netems in a tree, I think Jamal had a good suggestion here to rely on tc_skb_ext extensions [1].
-
-Do you mind to be more specific here? I don't think I am following you
-on why tc_skb_ext is better here.
-
-The reason why I changed back to netem_skb_cb is exactly because of the
-enqueue beahvior change, which now only allows the skb to be queued to
-the same qdisc.
-
-If you have a specific reasonable use case you suspect my patch might
-break, please share it with me. It would help me to understand you
-better and more importantly to test this patch more comprehensively,
-I'd love to add as many selftests as I can.
-
+> Here is more information no how I tested:
 > 
-> However, I noted that there are implementation issues that we would have to deal with. Copying what I said there [2]:
+> 1) I ran `python3 ./tdc.py -f ./tc-tests/infra/qdiscs.json -e 5e6d` 100
+> times
+> 2) The KASAN is enabled, and my patch is on it
+> 3) All 100 results show `ok 1 5e6d - Test QFQ's enqueue reentrant behaviour
+> with netem` without any crashing in dmesg
 > 
-> "The tc_skb_ext approach has a problem... the config option that enables it is NET_TC_SKB_EXT. I assumed this is a generic name for skb extensions in the tc subsystem, but unfortunately this is hardcoded for NET_CLS_ACT recirculation support.
+> I may need more information to trace this crash.
 
-IMHO, Kconfig is not a problem here, we just need to deal with the
-necessary dependency if we really need to use it.
+Now I figured out why... It is all because of I used a wrong vmlinux to
+test this. Although I switched to vanilla -net branch, I forgot to
+rebuild the vmlinux which was still the one with my netem patches. And I
+just saw "netem duplicate 100%" in test case 5e6d, now it explains
+everything.
 
-Like I said above, I don't see the problem of using netem_skb_cb after
-enqueuing to the same qdisc, this is the only reason why I don't see the
-need to changing it to either tc_skb_cb or skb_ext.
+Appologize for my stupid mistake here. I think it is clearly caused by
+my netem duplication patch (although the fix is not necessarily there).
 
-Thanks for your review!
+I will take care of this in my netem patchset.
+
+Sorry for the noise.
 
