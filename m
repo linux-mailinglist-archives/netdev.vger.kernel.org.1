@@ -1,113 +1,95 @@
-Return-Path: <netdev+bounces-207108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3F05B05CB2
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 15:35:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7193BB05CDB
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 15:37:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAB991C25056
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:33:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 415A916898E
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:36:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10F712EA494;
-	Tue, 15 Jul 2025 13:28:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 200AC2EBB8E;
+	Tue, 15 Jul 2025 13:29:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D22UEriV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PFo353tJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1AB52E7F1D
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 13:28:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2A32E7F3C;
+	Tue, 15 Jul 2025 13:29:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752586111; cv=none; b=fDgUdbUXiZObIt75QccsPN/mwgxvfNBkdWKdgE/VpCys2mRAbwtCVCFkUC9sR/X3vCZ+TFLhaxEeNGhuZqEYRMJgu3VNlWZTrgkX3MIHuEJ2yseiEhrQ+KrEhaDON9On0PN71jlNXf4feVuCjiiU0Yojbl5EP/VFeNYmRWILoy0=
+	t=1752586186; cv=none; b=AC7XZtBShQAkvlSWD9zsZ9xmaD1vMFLlkkXcd/zl6WirouNadi9F7riKZa64ER8trx0uHtqHMNglJUveyUatr86GO7G6aVm2ERsRPoW282iXHL3aSBq/pN+2rDM5diMZGv3lILRJvNLPGwzLXojaF7gsiz+HtFMcfs7s7A+dJjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752586111; c=relaxed/simple;
-	bh=EWGkR6Lx9mbVlTQNbryZBJap6TMRNyDG+0JgC1ARmbs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k2tPx7Pdm/X4Qyx2uLjuIbhOUXzoXT9VNWKP93gOPM+rPT/7KJm33JiYB58fhWA7jEUHs/BHWKV6noUwHMd3/aM07heSy6OFlXR2CI0TQOgkWtzfJs1yceaY6/0HbJgkqbZP2gcLEvsSxtmkwTFQ/Z/TbcHSpGlpULPrDBmyyr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D22UEriV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37BD7C4CEF1;
-	Tue, 15 Jul 2025 13:28:30 +0000 (UTC)
+	s=arc-20240116; t=1752586186; c=relaxed/simple;
+	bh=zGU0LcwmTAnL029F6vzgvGMlUoaM+RD55WK6CDtweko=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=I68JR2CcifUr5h6WrY9FvWOSnFAp4SLRTCWKlZhaU+zS19J0ijhU0HB19fmDB1kpYSGesi4956XhwFGrEh26z8QL5cPN9KQ3DQLiiQfnsn8qYr1j0KhlNBv4aiXfpnBr51wHb/u60UnwJs/NUJ2WGKeDZT7Eek6PUxZJL/PIvhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PFo353tJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC753C4CEE3;
+	Tue, 15 Jul 2025 13:29:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752586110;
-	bh=EWGkR6Lx9mbVlTQNbryZBJap6TMRNyDG+0JgC1ARmbs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=D22UEriVwlhdsgHzHLaRZbaw7xqODAzzW6ovxbSt9CdB0cvFpp1k81POCMcQzGEvZ
-	 WvaoGyizH0qzkSnUkvRI5pXm6Xso19PWiwFvuJUvUxmtPJQ6PuAz1xXKyfL3VYdAAP
-	 2lSimXVc988j/pi2EvIjnLmLrxWVj0vQzaJaTdVNyOQnuiAlRjYdDWnwutjUWzHeqR
-	 KO47ieD9OzxdkqEuqTnKzRu3DARvhxI4cwQKljTMIdMep0lCT4H1Y/cNyPLShoQP/n
-	 GTHz7NuJ91pv3XRDJQ8ScrN1+LM6cyf8FJtp6VYzexuh4MEkXbxdlyb4axNH+BIKyI
-	 n/zWg3qiqrUiQ==
-Date: Tue, 15 Jul 2025 06:28:29 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
-Cc: Matthieu Baerts <matttbe@kernel.org>, Eric Dumazet
- <edumazet@google.com>, Simon Horman <horms@kernel.org>, Kuniyuki Iwashima
- <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>,
- netdev@vger.kernel.org, eric.dumazet@gmail.com, "David S . Miller"
- <davem@davemloft.net>
-Subject: Re: [PATCH net-next 0/8] tcp: receiver changes
-Message-ID: <20250715062829.0408857d@kernel.org>
-In-Reply-To: <6a599379-1eb5-41c2-84fc-eb6fde36d3ba@redhat.com>
-References: <20250711114006.480026-1-edumazet@google.com>
-	<a7a89aa2-7354-42c7-8219-99a3cafd3b33@redhat.com>
-	<d0fea525-5488-48b7-9f88-f6892b5954bf@kernel.org>
-	<6a599379-1eb5-41c2-84fc-eb6fde36d3ba@redhat.com>
+	s=k20201202; t=1752586185;
+	bh=zGU0LcwmTAnL029F6vzgvGMlUoaM+RD55WK6CDtweko=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=PFo353tJ/UldlBJuOwuH/i5Nx3LbtpCHVfJk9ehteoQ/KohwjYZP8MraL03yTghmm
+	 LRv7eKXC8eAhi8Xmn1ttJkJxll+JhFJ37LfMFdahbwcsbCQSpABTSnQuUb8wKgf6ES
+	 1oV/hnQX7cVcrm1sMBhRRHfv8NgJPknWomhSsXi520RqZE1w+pBjpGyWNr1OuEYo/p
+	 n5yg+QNksi/xfXNDwUgVs2lgF4J/ec/eIr7K3Is8sulD4lKB4Wgbe5bTBngU08MPyy
+	 tM/cXv96vKc1va9BgaViWdl8cgFAZG1BudwRzLtua/DfXyc8fxJmWTZTB7aJ4c0x7v
+	 yaPUeDHBV8EkA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD1A383BA03;
+	Tue, 15 Jul 2025 13:30:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] selftests: net: increase inter-packet timeout in
+ udpgro.sh
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175258620651.421913.3791564351416618105.git-patchwork-notify@kernel.org>
+Date: Tue, 15 Jul 2025 13:30:06 +0000
+References: 
+ <b0370c06ddb3235debf642c17de0284b2cd3c652.1752163107.git.pabeni@redhat.com>
+In-Reply-To: 
+ <b0370c06ddb3235debf642c17de0284b2cd3c652.1752163107.git.pabeni@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, horms@kernel.org, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org
 
-On Tue, 15 Jul 2025 12:14:34 +0200 Paolo Abeni wrote:
-> > Eventually, because the failure is due to a poll timed out, and other
-> > unrelated tests have failed at that time too, could it be due to
-> > overloaded test machines? =20
->=20
-> Not for a 60s timeout, I guess :-P
+Hello:
 
-I think the timeout may be packetdrill-version related.
-I tried with the Fedora packetdrill and the test times out.
-With packetdrill built from source on my laptop I get:
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-# (null):17: error handling packet: timing error: expected outbound packet =
-at 0.074144 sec but happened at -1752585909.757339 sec; tolerance 0.004000 =
-sec
-# script packet:  0.074144 S. 0:0(0) ack 1 <mss 1460,nop,wscale 0>
-# actual packet: -1752585909.757339 S.0 0:0(0) ack 1 <mss 1460,nop,wscale 0>
+On Thu, 10 Jul 2025 18:04:50 +0200 you wrote:
+> The mentioned test is not very stable when running on top of
+> debug kernel build. Increase the inter-packet timeout to allow
+> more slack in such environments.
+> 
+> Fixes: 3327a9c46352 ("selftests: add functionals test for UDP GRO")
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> 
+> [...]
 
-:o
+Here is the summary with links:
+  - [net] selftests: net: increase inter-packet timeout in udpgro.sh
+    https://git.kernel.org/netdev/net/c/0e9418961f89
 
-But the CI just gets the failure Paolo quoted.
-
-I'm leaning towards Eric using a different packetdrill, and/or this
-being packetdrill / compiler related. On Fedora I'm hitting this build
-failure which may explain why the distro hasn't updated recently:
-
-cc -g -Wall -Werror   -c -o code.o code.c
-In file included from code.h:29,
-                 from code.c:26:
-types.h:64:12: error: two or more data types in declaration specifiers
-   64 | typedef u8 bool;
-      |            ^~~~
-types.h:64:1: error: useless type name in empty declaration [-Werror]
-   64 | typedef u8 bool;
-      | ^~~~~~~
-types.h:66:9: error: cannot use keyword =E2=80=98false=E2=80=99 as enumerat=
-ion constant
-   66 |         false =3D 0,
-      |         ^~~~~
-types.h:66:9: note: =E2=80=98false=E2=80=99 is a keyword with =E2=80=98-std=
-=3Dc23=E2=80=99 onwards
-cc1: all warnings being treated as errors
-make: *** [<builtin>: code.o] Error 1
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Neal?
 
