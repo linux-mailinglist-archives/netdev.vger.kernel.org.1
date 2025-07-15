@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-207141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BFB9B05EB1
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 15:56:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28622B05F34
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 16:02:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 613F87A02EA
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:54:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F127500082
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:56:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ABD62EF9A1;
-	Tue, 15 Jul 2025 13:46:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01AE82E3386;
+	Tue, 15 Jul 2025 13:46:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="dt/d39U/"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="A3sIOoxq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
+Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD042E3B14
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 13:46:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 448D52EBBBC
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 13:46:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752587196; cv=none; b=SJL5BIL96yB8+o4L5jzptsztjDm/U0T87wRDjqwDFRxZ8W/YSq7lzb1HPw1dvSZwhDe8Rt2VlfYX4AlAG3T2/FMxVVCiNopACrYW++UkqwD9myBz6A7zTSxwxhOdLxfjAGjwObQ2T5op7mh6DTcJs4Anb7OZMZRcUf4lyXMxB18=
+	t=1752587199; cv=none; b=loQCCOfhg21xg5iveLKtAsJqXA0E19sMg8MqqQMMVh0SvWN9uhHQTBJbwdY3ox5jJC7Mxl1kERp5pi911eGARGHabupJH8lyms5qCB4zbboc55158jHJk/XSMu7Ter2KM+b7LHtLYUD3Zcckt4DkIL4QPU12FLi8q1nbroMhfI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752587196; c=relaxed/simple;
-	bh=PESbSQ2riBmWnB3ifW6iRWmYUAMSpluf1ck6gekndAw=;
+	s=arc-20240116; t=1752587199; c=relaxed/simple;
+	bh=HjU6PxyUlCUhs2dvYf0iMA7Zry8aPzm7Aen+lVRuL90=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rlpGs8TE8ob7Hgzs60PrAmYyIXSM9JOTLP44L5SmrP7Vld5MQTYxld4QfhUeWzIX5ls+wWLUwLL1Xcv+c7i4h1r7CWudwkRwq+MxXv8OfjB6eaHi2q+G6eCQ5eIfoZJem/5vNH1juPg0x9L5e1NRhHqMVWdhF6/x1kG6nUUHOag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=dt/d39U/; arc=none smtp.client-ip=54.207.22.56
+	 MIME-Version; b=O/mNgPSOnJNJTK7skYWaZQk78djWSDNmuRWOFsXksJpwVkoFrBvSuZLWEVvNjOu3Ez8+0L6m4sG+NkQThMFk/XgM1TaDv79+sR4t1k/o/TFgnAr3QlykwZ3XXygx39Vg1F+YyrMGgEcKfgXEvTrjHKm464Lrq7jR2Tz8NgK7+v8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=A3sIOoxq; arc=none smtp.client-ip=54.206.34.216
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1752587127;
-	bh=DQOAtGRHzOhokt1byV1hDfgfMVfreeOvNYgUQQUEI+w=;
+	s=onoh2408; t=1752587136;
+	bh=ltFUUSzAPz2OoVfH54nkwDpFnO/axW/szGNu9HIiAOI=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=dt/d39U/JvCGRYvJywjrnl6l+GFiWSoghBEC8LTHxqR9Qje6oIFcAkRizOqLdSzXs
-	 GMHBh5+6oynlPBWuLPdwN8DzoqGlX+xfe8PDbLUefu65zP9IgoIjFczk1dMH/QJHiX
-	 Fa3X5qoKmbn21HWedq5TPEsnWWmhrHTAmkKDcYFU=
-X-QQ-mid: zesmtpip2t1752587114t4242d337
-X-QQ-Originating-IP: bUZPMnhKZ8NU12puD/0nV8FvyCDfWloR8Qvt76r6nV8=
+	b=A3sIOoxq8qCcErnRKrwZqcxB61P7coOwgAn1V8WUJ2licka7PBrzVtxm3qXhQQV67
+	 64yVTQn0oswUZT2lAhCRrAX6i5gHwHWc6YcD/GgbpV1dZ4BKVSHdRV1sdFspGjW4x4
+	 1lBR9E07CbFunXqywDuJ/d9i6iE/7DtltT3Va5xY=
+X-QQ-mid: zesmtpip2t1752587121taaa03ec6
+X-QQ-Originating-IP: IIvVAyKvuXb4Hz7pVF2rGJuCkoWUtC78LZlVFBjDx2g=
 Received: from avenger-e500 ( [localhost])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 15 Jul 2025 21:45:09 +0800 (CST)
+	id ; Tue, 15 Jul 2025 21:45:17 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 17289734867236313614
+X-BIZMAIL-ID: 8982638937609059235
 EX-QQ-RecipientCnt: 63
 From: WangYuli <wangyuli@uniontech.com>
 To: wangyuli@uniontech.com
@@ -111,9 +111,9 @@ Cc: airlied@gmail.com,
 	xen-devel@lists.xenproject.org,
 	yujiaoliang@vivo.com,
 	zhanjun@uniontech.com
-Subject: [PATCH v2 6/8] serial: 8250_dw: Fix typo "notifer"
-Date: Tue, 15 Jul 2025 21:44:05 +0800
-Message-ID: <2BF1749F02ADE664+20250715134407.540483-6-wangyuli@uniontech.com>
+Subject: [PATCH v2 7/8] xen/xenbus: Fix typo "notifer"
+Date: Tue, 15 Jul 2025 21:44:06 +0800
+Message-ID: <906F22CD3C183048+20250715134407.540483-7-wangyuli@uniontech.com>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
 References: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
@@ -126,23 +126,23 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: NsGGqG9YEWxp8csmZI23l1Ki+X9sxynR3N7bfFfThHvM/DTHwBdgfgTd
-	t9npfMSJTVokze+9VPL9BDT7t6/xBcEeRUlrgni5YDBqPk75Z6CWBj13SjUdH8OZ+VVas0D
-	HTy1VDFuNs1oJkprzrk3ry/rUbTamDrsylnPGeWRdBXHOyrH1HIpqarR2MIBI1E68A7zVqs
-	FTMBw6yFqUnmHozmm6ursuDeI4c0qwIWRSEb2aWoKasa792ua4XJ/hfvz4VZkmBAi305XwT
-	S2PYetZgVHtlMI5VCr9KzaLNyg8lVOL4JgXyiDOcBlz5MlvXgy5EdE+2EdtWcOxvSel4MNt
-	mVCeoKQvpHDJ0s3ecoZE24k1nJE01JgXmt4CJq1F+PLf7dDjI8/DfB7G/25fvlIF5hn65Ow
-	TUsnTtnOGyMaT1IeXGfq6scg+FVnzzZ8rP2KLwgbf0eEcIZlb5JUpwULiH1GpYSOxeQIuKd
-	kZfV1jBK8rAJgkvhKkM9wy3x4ZgjeZ7wpLiFEWFkSET7Myh7tDzNG9Tq8nuXlUOZKrkEljX
-	LeefhYNjqd/u3KqFqlJz8tUzLv1cLO4NooHiXD/nf0UI9akEOugKN1ywZhAAoJduGE5IUKW
-	sNYT2iczKTMGywUn5v6keKrJYEQn8fD81XnJNcpeqAssrv9j8Lr2X/MTRORRGs/bxVZ7Vca
-	Ht3AHvnh9nmjnmoUO4d8gr4bVHther9LdgrVfcIrHQDUTehNRAA7hk07uekcxc366LDLxDW
-	G0GTVg5SgSOkvKEoAhD3ojVRftPxXjQTvnxA6HfTtNkxgpoM5eCst0DOtXmRa3jlJulyv2C
-	+Z8+9+rVl3KrFdNX/jRjxlToEIaWrc9hgCzLz5bxHnAJpjJKgOsYZZVN76dmJD9gsnVPH3s
-	tnbVd4NlGDubdRCJZ1uBUKr2Ib8UcpRYRTZBg7Wp51Hwa6rbLR2DagO3z9OeZLN0HOipvNZ
-	QYQ7tshrHViQdLNzeCcigj/RgsSZQ8CYOs4emLzvN9h1u0vwMYYSg2/kwIVXZ38l3Q0U7wZ
-	DMx/bmxrupGZwhUngXkojShgfhi302Hg2lPSvPvinMicsi2NWXlf539KfSDm78kZswfz2dQ
-	lbN3/v1j/lCIgp1GkrxYcA=
+X-QQ-XMAILINFO: M0vH/xy+mm2+jN6c4WGTdeZjsrpi+JQtsnTDdG1x9FGOZX7SZgo+cUCm
+	t37lSOf7yQFsVMLdFDCRezb/LROAB3NDOjPsKxjdjQFLSEsyxxUl9+qQ+J+Gk4+nEP1TrkU
+	JisWnONIPowGJmVptxWoWvzDbwPpJqdf86IWmncHlW7jPeRKxIU14VXaHKrK6yuHMP8eMgJ
+	z8p99qqK7XgXmTXvWiM96ZDey2wqJ+ItEvYo/N0qdMSRtM+n3M07gDpgkmCh/CaEkr7g0mT
+	YqOJQK5nWZV4+hyHKtW6IK3+kw8URz8J7Q67Gu/xpTeJoFMcSO21oSXlzVC56JNQnQbDYeW
+	PVHerz1Nt7FhoWdf3kWqPqmG9qjrxdLNW5A0g8BzjURO4d0SjL1IUSukzWrBb/UpuMC4xbt
+	8ixIne0xM+vspzfOL7eS7Kmb88tk06oCrB/r7TBAmh38DqXZeLJU74mqhQM1I/l3xAg/Npe
+	L8HcGBcJYZ8/0kieXpuCiH5xI5QJNbYayvydeSr3tP0uFShIPs/w2jyJHdCgN+hhbWkIjYs
+	7SArdoFyAQjVFwBTc2FwaKt/btnNUSmK3LC+QHtvGArHXLcfKs2PaRXfHjWUS6MirFTyzkR
+	LLRBX4SbBO1L9LLTzln4N0/qdsQhRWEQJgZscdE6O1f9Nm78vEk5gXPT5Bp6UFqK2NwFV9b
+	Al5LhzvGxk5t9r5ewi9AHzA2pI4SDLHBWecWHdIVk+ok91+lQVKEpAGFv66dIuqC7vJx6JI
+	hnpiMr0vLMQKiWqTV2iVy0vOY8ElIHjWP7xmGEK+25qU2LiQxehwC6bi3YKYilD60bLDR5+
+	U9IQCaprga6pMI7ZEeO/1wnRLyQVvhRvvg/SikPFmxJ/oiPx1i0ps21NwhKl2bdVvECNhmm
+	mHsIRe5PAe6I3oxnYTR/Nc3BqY1lQ2I/+4jiRvYvTpT4h3XV8uIBUm2IXfha1hOyr06vW5N
+	oyFrdoF5yjIhR4+F7RDVWoY8Ra+IAZBXPxeFl3nKssNKJBU1tC5Ds9MFj7jyb3GRGjthaEd
+	NO/F8tDNjIs046zc/55pYvh9Jor79cNBHwXd9Cu1dgd1G5jyGTk8zm+yZGHkq53T7yZAWTN
+	oDNMOTChdZMAJMRJ955OHii6HYZ22iHSkv1eH8/gOYi+ndhGzVl54A=
 X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
 X-QQ-RECHKSPAM: 0
 
@@ -152,22 +152,22 @@ should be 'notifier'.
 Link: https://lore.kernel.org/all/B3C019B63C93846F+20250715071245.398846-1-wangyuli@uniontech.com/
 Signed-off-by: WangYuli <wangyuli@uniontech.com>
 ---
- drivers/tty/serial/8250/8250_dw.c | 2 +-
+ include/xen/xenbus.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/tty/serial/8250/8250_dw.c b/drivers/tty/serial/8250/8250_dw.c
-index 1902f29444a1..6d9af6417620 100644
---- a/drivers/tty/serial/8250/8250_dw.c
-+++ b/drivers/tty/serial/8250/8250_dw.c
-@@ -392,7 +392,7 @@ static void dw8250_set_termios(struct uart_port *p, struct ktermios *termios,
- 	rate = clk_round_rate(d->clk, newrate);
- 	if (rate > 0) {
- 		/*
--		 * Note that any clock-notifer worker will block in
-+		 * Note that any clock-notifier worker will block in
- 		 * serial8250_update_uartclk() until we are done.
- 		 */
- 		ret = clk_set_rate(d->clk, newrate);
+diff --git a/include/xen/xenbus.h b/include/xen/xenbus.h
+index 3f90bdd387b6..00b84f2e402b 100644
+--- a/include/xen/xenbus.h
++++ b/include/xen/xenbus.h
+@@ -180,7 +180,7 @@ int xenbus_printf(struct xenbus_transaction t,
+  * sprintf-style type string, and pointer. Returns 0 or errno.*/
+ int xenbus_gather(struct xenbus_transaction t, const char *dir, ...);
+ 
+-/* notifer routines for when the xenstore comes up */
++/* notifier routines for when the xenstore comes up */
+ extern int xenstored_ready;
+ int register_xenstore_notifier(struct notifier_block *nb);
+ void unregister_xenstore_notifier(struct notifier_block *nb);
 -- 
 2.50.0
 
