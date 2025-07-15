@@ -1,224 +1,207 @@
-Return-Path: <netdev+bounces-207202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98D9DB06372
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 17:50:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB761B0637D
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 17:53:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA3ED4E55C6
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 15:49:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6375B7B48D6
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 15:51:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F14E5247DF9;
-	Tue, 15 Jul 2025 15:49:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE49A24A078;
+	Tue, 15 Jul 2025 15:52:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="e0tO8rWq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MLQl/tvM"
 X-Original-To: netdev@vger.kernel.org
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11023111.outbound.protection.outlook.com [40.93.201.111])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D428020E710;
-	Tue, 15 Jul 2025 15:49:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.111
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752594598; cv=fail; b=ZU7REgF+E6fLGCATPbFqfldt4pJrYQPWrFCRV6ugix+pa6qheYwhyDeALOq7h6295iVv0IKRq283aZn5qjC86wbwpMhfBEMKL7MKSSlnU2RhGlOMQlGxPDaBDSyH1OnwRFrYuczH+RRv3w2psFN5IUt/kEBBBQT4mvzt/MrZtW4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752594598; c=relaxed/simple;
-	bh=8/vXEyweDMyiuDF9TKDveqPtQ6QqOY4YcSy7GKZFGX4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=IagIInvSbvz7TzwDKYxUZFVmiYLQgJl3XIMEFWPfOmBhjfh7TjvD9kKdudT2ilXT4gQF6EHm5f7eyewL3dxj8y24W9M5f+QOLM7ZQGpW+cEgGLJIgLJ2zZPLxGrlEHsYSfbarq/9FXic8HPvRfObshrXrvVGdtPpj7bR8VofoZE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=e0tO8rWq; arc=fail smtp.client-ip=40.93.201.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=VJ+hJv/nMmvFS2zNegfDVk9eTvCTJHmqITtbpJ+26bSJ0XwEYSwZB78hqDUn0+EVrsuya7blgSyBmAJcDBdBcwiXTUK7R/XO048IUIlm5BBqUw7gFFyPLAJkTujI8SwxMwCMYsagvmp/3WcF7AXSGOEC9Fw/EylQUmDD/U84bwCQr9R9P+RXn3kMQpk7+MwfvyDRWBioeXDEjSA82K21e/OpFuGusWZDSBD9SECpGDp6qjQ33lR9XQVaokOdZfAnulQxnvwGKyAVabi+VyCuB1n5eS2F6AwgXGPN5DnSyCVGKvbhOQxqJRrNCQOjCTaykgRwYzoNxHICM23qjSPHuQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8/vXEyweDMyiuDF9TKDveqPtQ6QqOY4YcSy7GKZFGX4=;
- b=IqdFk6BVODX60KAX5yv7W9/4Z/eyd10nxgSHe4ZHqIJJLbaMPnn5D+ESUAppdU+Jn/IceHJlHj0Eavl1IC6LoMEPBNxfW8IQ4FVRQMtVMnnueE+lv9c1AvdWHVqvwGbStjnJ3aG0+/sMiY6JkagZrUcr+AP1spbhHcZIDp6TwA9KxdFF4IVbzAgCiz7lY0Wrp8pApJ+GtarQbBPw6YLo0EJQSBrXZkkLxSyzj+03dOio1B4st6HCJa6UbTxA8Gxw7Lj+YvUwdF8v0c7ZrfjbJWjnX1FWfF5B2vTz2AVTPP3sLrg7Ieb+ODv6L19RAOUBmVpxC99hsvo+acdyP9/jww==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8/vXEyweDMyiuDF9TKDveqPtQ6QqOY4YcSy7GKZFGX4=;
- b=e0tO8rWq3Z/l2qAdb88e0gEODW5Tofn2myCxWXDjI+Np04dFTd5kqabH4KYvchhPXef8oVwoLgwsaswSgjHYHA+d5lAy46vgr8PkWKavvYPhGhU3akcf4YvjXuclH6HWgm17TctG0TqBT/6XN7xstRuLUUNM5yCwxoeiUw28oUU=
-Received: from SN6PR2101MB0943.namprd21.prod.outlook.com (2603:10b6:805:f::12)
- by SA0PR21MB3037.namprd21.prod.outlook.com (2603:10b6:806:153::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.11; Tue, 15 Jul
- 2025 15:49:52 +0000
-Received: from SN6PR2101MB0943.namprd21.prod.outlook.com
- ([fe80::c112:335:8240:6ecf]) by SN6PR2101MB0943.namprd21.prod.outlook.com
- ([fe80::c112:335:8240:6ecf%5]) with mapi id 15.20.8964.004; Tue, 15 Jul 2025
- 15:49:52 +0000
-From: Haiyang Zhang <haiyangz@microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>, Haiyang Zhang
-	<haiyangz@linux.microsoft.com>
-CC: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, KY Srinivasan
-	<kys@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui
-	<decui@microsoft.com>, "edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "stephen@networkplumber.org"
-	<stephen@networkplumber.org>, "davem@davemloft.net" <davem@davemloft.net>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: RE: [EXTERNAL] Re: [PATCH net] hv_netvsc: Switch VF namespace in
- netvsc_open instead
-Thread-Topic: [EXTERNAL] Re: [PATCH net] hv_netvsc: Switch VF namespace in
- netvsc_open instead
-Thread-Index: AQHb8qZwEo+zpg1Bpky71Oo7+qJ8VrQyanIAgADsrsA=
-Date: Tue, 15 Jul 2025 15:49:52 +0000
-Message-ID:
- <SN6PR2101MB0943E6D0DB9E9D7906FDD54DCA57A@SN6PR2101MB0943.namprd21.prod.outlook.com>
-References: <1752267430-28487-1-git-send-email-haiyangz@linux.microsoft.com>
- <20250714182914.27c94a91@kernel.org>
-In-Reply-To: <20250714182914.27c94a91@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=999cd5fd-7af6-48ac-9949-a551fcbcbfd4;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-07-15T15:36:20Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
- 3, 0, 1;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN6PR2101MB0943:EE_|SA0PR21MB3037:EE_
-x-ms-office365-filtering-correlation-id: 34ce18d2-b1b2-4ea5-4fd8-08ddc3b73cc5
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|7416014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?YGaz01IaJx8nir9Dpky/K5RtE+qQKQE92JfiE9nz+RmrCUbbAV8Cs2QhJzgb?=
- =?us-ascii?Q?ZJa75iU+a2CYOej25n9gPfTFTNRp1/M0qFmpHLQYg0x1WfVDavKT4jGYSqxD?=
- =?us-ascii?Q?ZxxlgL7Zcn0keJqTE5CUkMBEYuP0V2yFiXP9VGuZtNyDRhqXoFfEkJdlRX4/?=
- =?us-ascii?Q?38KmGtzzpPFsfEaCtQnvCOuNm8rChN+PeZhP7A3TYRef2wlI5BaRK0gzYAy1?=
- =?us-ascii?Q?APDR9L1u9i3omBtkC4rW5VM25wm7PF4iV4jY9O6y2BRd/v7uwuB03bqFtTU1?=
- =?us-ascii?Q?WHZ35qv5SsImdRLviE0HD2ZJL0NGYmVM/YyY4stvoF/7vShZkjK4lJFBh4MY?=
- =?us-ascii?Q?tX1C+0l2I/Ybas25amMvEAA9Cih9sPZFox0XezcPCN0Hr6aau9zjlKKuYXSL?=
- =?us-ascii?Q?2Qy8ahw5n6iGJ79WP6cgyx5m0KP+/q1r0YspbNrAndL8ywWYT3Me8AEvWgVb?=
- =?us-ascii?Q?362Z11X+mWNBEBlKrPUJYr8weNw782FXP3HgvdM7g0HDedQLJxNXbla+Axk+?=
- =?us-ascii?Q?jwUVg1aqXKTgD1SS8d9CAzaaamC0mMrrzgfoVVpYTAPAbCa5XWWt2Z3YKbJf?=
- =?us-ascii?Q?RtJS6dq5LE5hU3Dnvl1nJsrdH9gNrNOOSCB3whWmhXqYhd1NxXGZSWwgb1sv?=
- =?us-ascii?Q?J1l0eNwWZfVxl4TMxaBIPlat1y2Ww14l6+2wxQsZuxYsXIEd1k9Rqi4GNyRQ?=
- =?us-ascii?Q?BA5NZX37CQ44mfijqvAlpK/ndOUQtmiqzBl1xG4HgUjUCfzQ1FXpLM9Dsh33?=
- =?us-ascii?Q?VyEzBA/7Tz22IiGqHBpyb6NsTOZgxHoT9Tb+KdirubpZuYM8Z1oiEjGLuQF4?=
- =?us-ascii?Q?2ZGkN/PIzQaf4fymsLP4gvxLXhbYyo3CuXQKyqc8ogFr+OkJrpCCP2TgI3Ko?=
- =?us-ascii?Q?+f775fRHaZ2VnGuT+Rx5Qtl1gW9BpRmJ5MOyqFqEA7jcqiAXcHgQ5nlspExW?=
- =?us-ascii?Q?YuD7Q+tHrxkVm82yP9T9E129OdNDjOtBLNwSFsJiRDT0Z9MKnvFpoqyYHw6M?=
- =?us-ascii?Q?KblpYkbIT5rwZf88MohYWbxtmr/AWDDe8mlToZRbPU48Ebm8yHMQ3GRQ3D3n?=
- =?us-ascii?Q?Yak8Xhz2ii+IpebOOGUl+pSh2tKbHBrGOzmCN/bDwTzx8K2VkjmAxXaVTH8H?=
- =?us-ascii?Q?dtpHQJLGC54Hd6MxkqFfjZesrrWRdwdn2RkQvUnOTmtQ7rSEeQnt5kvg1bHu?=
- =?us-ascii?Q?SrnCOkleEEJEM/KTwt0SRr6Yw4jfhlY0tx4G0Weqy1H7isiZX1+NzCNKLZCR?=
- =?us-ascii?Q?W4V0IlDwWwINaPurqfsbc+D77+q8SkJ9HXojaQUbZwyBezVcm2Hw1YVJjhFV?=
- =?us-ascii?Q?Rl4pH4mDeMgZLddLssa3nHlXVme6U8ooO5XuZOD4a8qVHmZzPypto22jrOda?=
- =?us-ascii?Q?XOrqYJPFWKxe3ufHeL+4pja7NhTjMnEA49iUSqklwsA9xKcJfvuxsIpO9tkI?=
- =?us-ascii?Q?k8qpbv92ulVylMa0lTyvYlEbNiSx9AxSvZ/v8qJRXpBhMY4TE4EpGg=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR2101MB0943.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?U/66ybjZjwZOywXahYmEHtRCaf0bm9YBV2tQ78BaGAvH3j3dP4KIBBExG8Wa?=
- =?us-ascii?Q?wAxfD0gGb+RS2SbhmwGh++NhutdQ76KlUQ8TvEL1Uo0RS1GSw2ZsxSlnuMlu?=
- =?us-ascii?Q?cSJhKsWR/XxXWE4eaMCS44vaX/NSj3mexpROur0mCWdcrJZVxA6fIWRFIQT3?=
- =?us-ascii?Q?ixQzB+4JgbzOogROtbjWf3CW8u/P6IxuSS6CuMTfMTAyYVlJvfntz62nWbQ1?=
- =?us-ascii?Q?S/FMElbi7H5tZBA1CD3YyT+wIQzLGnoTZWqhAhkDWkQw6xyVxBLUnnl2BoC4?=
- =?us-ascii?Q?Rbou6IZ5pHpywkPovrO/zWSxP/jCNiQi550t/BzUl1LS3yPh5zLjg+WsHb1m?=
- =?us-ascii?Q?HlGGNlzYNmO2jg9/+wyjMvHOwi8KLmuruJLwELvQvHI1RnuN9X1MdCFPvHp2?=
- =?us-ascii?Q?cQDl6tO+2phsnXPC6z0tay9pCG4lADjrHuDQgKh3ODOW4x69g1BmxcwJPfRT?=
- =?us-ascii?Q?jf8IUpMNNctSpdKBRpJJGAzONxHZZ/GrtcgFihugOdyP7ypaBMkjkvdLdmy9?=
- =?us-ascii?Q?PGv09uPamBLMllX3aV6F0LPSFgBNRnzvY2T3GeGIyVgFQqFhYTH/VW9mkH9i?=
- =?us-ascii?Q?0ZTTgJkVKxElxGknM0T/NflTx4nFvRQmygAQ1GHxt/ChQRQggds7Q6SUbK9D?=
- =?us-ascii?Q?0KG1RlfDciQgetyLc3GwYr0xCGq/98dhxFsPjL3zNbvr/tHO3krPovo5djgM?=
- =?us-ascii?Q?RNiKaLvzdi24JW8BCiFtVqC7H427iqEJxardvdMLUbIZSnL83LuImsmIXlnQ?=
- =?us-ascii?Q?huYg6dcljIuesjCxn/RdBvyxfOId2oPUnaR2Fjhd1ifAK6nQtrzfRa9UR+Y6?=
- =?us-ascii?Q?uwndkHBypLAWLR5PP7zcJBxxqjQdAggH4bwDCVij9U24OukDoz5lz3PXyWEE?=
- =?us-ascii?Q?NZRjJI2NI+i4PcTDZenjlHpUOR5CG/8cDSIHHUWIuKYToLeRHoTvkFdueK/s?=
- =?us-ascii?Q?+M5jjjQzgQsqMRbe92+cSjUYtUabuIoOaol6/yswBrR3XVbnJR/+PNApdval?=
- =?us-ascii?Q?Shh1j/3e8hwBa2fISo/Eb6fMBFIWXa4auYKlXn3fprBbFUXbyfrIEnEx1s06?=
- =?us-ascii?Q?DC+TFR/6NL05H9XAhPcRgje+b61dvanokWjFz4fcMT1kCTyOD4r/9VVwIsrq?=
- =?us-ascii?Q?K8kQtGFLI7WtsjEhW9n08rSNsGsQrBZHdn+TiSRV86sqEbgPkl1tQckx/ZiI?=
- =?us-ascii?Q?FJFK784SEMPz2xh7o/Bsxze+L0aSJ661usS6ghSUbGUF/THsr+n5TAfzHkd5?=
- =?us-ascii?Q?QV/RotP4WmqrX2gZW6ZN8/eFHAKyECumWhJNgtU5vodzAFv/PPaPQmc+J6Tm?=
- =?us-ascii?Q?lYfuLbR77p8woS5C5kdLSsFRtshOunMHoYNH3xxKaKDUQcynDfgmjQLnabA2?=
- =?us-ascii?Q?djoJIQVRSzzKIMn8A6/8qY9YbgjXYnSaRt5UML2fHoHZs3/GJf/J/nky6GGI?=
- =?us-ascii?Q?yqTDzTl5NIBYAB8kcrt/c52lg2GJ6t8urMWPo3hF/UVdJSbI0MEzCx08f+vG?=
- =?us-ascii?Q?lVUN60QKJ33sjAoFcREiwHuTvil5qoG1ak3Yzxa3+6QLMhDOxm1nJ70Qm+v3?=
- =?us-ascii?Q?wHrl2LaChSb+8FZ7ci0T6RRHtxSatli02Rc+5oK/?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006A9231845
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 15:52:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752594777; cv=none; b=rWCtGTFPEwrBs8ZfZhdXG3Bd88W/XIt5DwEhsp8yr65DKqe3AJlspecXRxv1T7km6OY90u6tatLBDtwYxw+vZlS4wWlp82/MGbdVKOdYXz+M03xGF3I7BDwpl4rw3Euem30SrHE5dArtsJ8AZIbm1dgPVZPTI+xv35EpLnqYHzQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752594777; c=relaxed/simple;
+	bh=uDfrJF/drcy35q3gMp74bx+UGibPNfQDLes/+Jl9AVM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FodFYVGDus41PPxG7UV42UJNejTDxKtiYA4BqJBt3JT9FfAye+EDLv2PIuyrg44xHndgVYJpvay/auCk6UIuAb09X3YLawJSuy3AJsrz3TYRxMO/ChdqyXjwo/f7A1Zg5ypMPnPD4pwaGMrGwMzfQqXxC7L/BSm3oVGJnl/065Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MLQl/tvM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752594774;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wGVgaXIwZocM9TTdAix5oncCbiNFuNiHnVvJ4UMFQXE=;
+	b=MLQl/tvMlxZWfL6Z6F1MsFxOyX3n40nZf3w7F7faPfSgHEJe0Y0Ay/zT/I2Kz14boV050h
+	oM9/C29AzxNuODAuhN7ncwK5AoAsw4JfycWzRbFViHgihoaURkqf0Lr8VALw/nbcF58CG0
+	2Itk5x8pTz1NE/buO3SNsKqFn1r5wNM=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-375-hrJTRUKJPg2q_GijFFpx8Q-1; Tue, 15 Jul 2025 11:52:52 -0400
+X-MC-Unique: hrJTRUKJPg2q_GijFFpx8Q-1
+X-Mimecast-MFC-AGG-ID: hrJTRUKJPg2q_GijFFpx8Q_1752594771
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-ae6d660903aso519090866b.2
+        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 08:52:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752594771; x=1753199571;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wGVgaXIwZocM9TTdAix5oncCbiNFuNiHnVvJ4UMFQXE=;
+        b=tiDZnK/Yaxn79i66ej3mziyHbE90MlqZzUcpaqeB/QBwbyNTX+EkEcW1ufLsDX1l1b
+         m/aIyaMNabGHbEqPmbgjy5NpWmIukav35zw/yGEh0uXUhM4oVLP6nyvH+fqId2utngZB
+         YBR+iQrOBiRhGjcJ+GunyTQshY/fb7tkyMPrnbr4ao7R4xrptxGVbXs7+igD5gch4pVP
+         hRFI7xYnHrtSICFt0dORQ7kFJWd6IJr7U7rDQYKYnvKB9wuK3lRva3KrzclGTcWolW43
+         nQOAbvvbScsya2rBl80wg1UUYBe79qHhRPl+Kef/zBxNN8dOCZrX9fGUIjNSNOTaL8qG
+         CLpw==
+X-Forwarded-Encrypted: i=1; AJvYcCWclJAgTFAxEQpFw/D29ezKliF1pEHFikecRzW7tyq0BprkPwNwOyLjrJMRu6xMdV8UufVsyvk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQco9NWSUO+RradJW9rgB9at7GJjgkr0rRQ+6sCFxBDfk3rFk4
+	E2LLPPKthuq5XDpu15W56HFs5/mUJOYUGqzw+/on/q1GFCLrEZjoRQvRXBQXggzDw0yi30iQEZ5
+	fmKwCV0ljzxn3XLsN9PIZbPat5sUaUn7mhTHaYBsHYzQTb3He3Kj/ji6Tc3H62LTIOcB6GBmiBK
+	JUiE9ooxFpZJ3X8H2MYQb56g09otqqA0U1
+X-Gm-Gg: ASbGnctmcSuLWPmXOlnPNKFmHxa6Nj6n4XwnELNV7M40OTZh7pO8OKUwkNSP+aQmDkz
+	rT6/ErpfbGlB/IEiSi3QENfLd9t0jsL6eVpRVPlknNoxHYaVwqcwp/vyoJVFYD1+myD7nrqgXVx
+	J5Z4H8+lO/VfvcPnHvk3OmGg==
+X-Received: by 2002:a17:906:c115:b0:ad5:2e5b:d16b with SMTP id a640c23a62f3a-ae6fbe3d07emr2002471166b.27.1752594771133;
+        Tue, 15 Jul 2025 08:52:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGUS6HiH3OZ7t7wywPZ+i8XtYq8L6TxhaGYbPlDaYTLcxgd1/uZaFKuIjLPtsvr7tm1eM8MCwXkgLfvRdsAGGY=
+X-Received: by 2002:a17:906:c115:b0:ad5:2e5b:d16b with SMTP id
+ a640c23a62f3a-ae6fbe3d07emr2002466666b.27.1752594770666; Tue, 15 Jul 2025
+ 08:52:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR2101MB0943.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 34ce18d2-b1b2-4ea5-4fd8-08ddc3b73cc5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jul 2025 15:49:52.2203
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: kXPpS/66Rj/i1xsP/zIGR93JoCQTstAEsBk2+BGnN1WEfpGa0J7HaJuMqkEDjRxXNgdEJ2BAkrEiX64Lvjsn2g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR21MB3037
+References: <20250714071333.59794-1-lulu@redhat.com>
+In-Reply-To: <20250714071333.59794-1-lulu@redhat.com>
+From: Lei Yang <leiyang@redhat.com>
+Date: Tue, 15 Jul 2025 23:52:12 +0800
+X-Gm-Features: Ac12FXwfXi0jx38BKdlRwU2IFKU-jNFpCJwwxM4OKirTaJ-ZKXvGTV-e0aBSlEs
+Message-ID: <CAPpAL=w8GQypO4gFv6vgO0YDNPLLQ-4JuEKyp9oHP8WiATWOmQ@mail.gmail.com>
+Subject: Re: [PATCH v13 0/1]vhost: Add support of kthread API
+To: Cindy Lu <lulu@redhat.com>
+Cc: jasowang@redhat.com, mst@redhat.com, michael.christie@oracle.com, 
+	sgarzare@redhat.com, nicolas.dichtel@6wind.com, linux-kernel@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Tested this patch with virtio-net regression tests, everything works fine.
 
+Tested-by: Lei Yang <leiyang@redhat.com>
 
-> -----Original Message-----
-> From: Jakub Kicinski <kuba@kernel.org>
-> Sent: Monday, July 14, 2025 9:29 PM
-> To: Haiyang Zhang <haiyangz@linux.microsoft.com>
-> Cc: linux-hyperv@vger.kernel.org; netdev@vger.kernel.org; Haiyang Zhang
-> <haiyangz@microsoft.com>; KY Srinivasan <kys@microsoft.com>;
-> wei.liu@kernel.org; Dexuan Cui <decui@microsoft.com>; edumazet@google.com=
-;
-> pabeni@redhat.com; stephen@networkplumber.org; davem@davemloft.net; linux=
--
-> kernel@vger.kernel.org; stable@vger.kernel.org
-> Subject: [EXTERNAL] Re: [PATCH net] hv_netvsc: Switch VF namespace in
-> netvsc_open instead
->=20
-> On Fri, 11 Jul 2025 13:57:10 -0700 Haiyang Zhang wrote:
-> > The existing code move the VF NIC to new namespace when NETDEV_REGISTER
-> is
-> > received on netvsc NIC. During deletion of the namespace,
-> > default_device_exit_batch() >> default_device_exit_net() is called. Whe=
-n
-> > netvsc NIC is moved back and registered to the default namespace, it
-> > automatically brings VF NIC back to the default namespace. This will
-> cause
-> > the default_device_exit_net() >> for_each_netdev_safe loop unable to
-> detect
-> > the list end, and hit NULL ptr:
->=20
-> Are you saying that when netns is dismantled both devices are listed
-> for moving back to default, but the netvsc_event_set_vf_ns() logic
-> tries to undo the move / move the VF before the netns dismantle loop
-> got to it?
-
-netvsc_event_set_vf_ns() moves the VF to default ns before the netns=20
-dismantle loop got to it, and causes the Null prt error.
-
-> This needs a better fix, moving on open is way too hacky.
-> Perhaps we should start with reverting 4c262801ea60 and then trying
-> to implement it in a more robust way?
-
-This patch reverts the 4c262801ea60, and moves the logic to netvsc_open().
-
-I was thinking some other ways too... But seems I couldn't find a way
-to know it's in the for_each_netdev_safe loop, and to skip moving the=20
-VF in netvsc_event_set_vf_ns() this case.
-
-Thanks,
-- Haiyang
-
+On Mon, Jul 14, 2025 at 3:13=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
+>
+> In commit 6e890c5d5021 ("vhost: use vhost_tasks for worker threads"),
+> the vhost now uses vhost_task and operates as a child of the
+> owner thread. This aligns with containerization principles.
+> However, this change has caused confusion for some legacy
+> userspace applications. Therefore, we are reintroducing
+> support for the kthread API.
+>
+> In this series, a new UAPI is implemented to allow
+> userspace applications to configure their thread mode.
+>
+> Changelog v2:
+>  1. Change the module_param's name to enforce_inherit_owner, and the defa=
+ult value is true.
+>  2. Change the UAPI's name to VHOST_SET_INHERIT_FROM_OWNER.
+>
+> Changelog v3:
+>  1. Change the module_param's name to inherit_owner_default, and the defa=
+ult value is true.
+>  2. Add a structure for task function; the worker will select a different=
+ mode based on the value inherit_owner.
+>  3. device will have their own inherit_owner in struct vhost_dev
+>  4. Address other comments
+>
+> Changelog v4:
+>  1. remove the module_param, only keep the UAPI
+>  2. remove the structure for task function; change to use the function po=
+inter in vhost_worker
+>  3. fix the issue in vhost_worker_create and vhost_dev_ioctl
+>  4. Address other comments
+>
+> Changelog v5:
+>  1. Change wakeup and stop function pointers in struct vhost_worker to vo=
+id.
+>  2. merging patches 4, 5, 6 in a single patch
+>  3. Fix spelling issues and address other comments.
+>
+> Changelog v6:
+>  1. move the check of VHOST_NEW_WORKER from vhost_scsi to vhost
+>  2. Change the ioctl name VHOST_SET_INHERIT_FROM_OWNER to VHOST_FORK_FROM=
+_OWNER
+>  3. reuse the function __vhost_worker_flush
+>  4. use a ops sturct to support worker relates function
+>  5. reset the value of inherit_owner in vhost_dev_reset_owner.
+>
+> Changelog v7:
+>  1. add a KConfig knob to disable legacy app support
+>  2. Split the changes into two patches to separately introduce the ops an=
+d add kthread support.
+>  3. Utilized INX_MAX to avoid modifications in __vhost_worker_flush
+>  4. Rebased on the latest kernel
+>  5. Address other comments
+>
+> Changelog v8:
+>  1. Rebased on the latest kernel
+>  2. Address some other comments
+>
+> Changelog v9:
+>  1. Rebased on the latest kernel.
+>  2. Squashed patches 6=E2=80=917.
+>  3. Squashed patches 2=E2=80=914.
+>  4. Minor fixes in commit log
+>
+>
+> Changelog v10:
+>  1.Add support for the module_param.
+>  2.Squash patches 3 and 4.
+>  3.Make minor fixes in the commit log.
+>  4.Fix the mismatched tabs in Kconfig.
+>  5.Rebase on the latest kernel.
+>
+> Changelog v11:
+>  1.make the module_param under Kconfig
+>  2.Make minor fixes in the commit log.
+>  3.change the name inherit_owner to fork_owner
+>  4.add NEW ioctl VHOST_GET_FORK_FROM_OWNER
+>  5.Rebase on the latest kernel
+>
+> Changelog v12:
+> 1.Squash all patches to 1.
+> 2.Add define for task mode and kthread mode
+> 3.Address some other comments
+> 4.Rebase on the latest kernel
+>
+> Changelog v13:
+>  1.enable the kconfig by default
+>  2.Rebase on the latest kernel
+>
+> Tested with QEMU with kthread mode/task mode/kthread+task mode
+>
+> Cindy Lu (1):
+>   vhost: Reintroduces support of kthread API and adds mode selection
+>
+>  drivers/vhost/Kconfig      |  18 +++
+>  drivers/vhost/vhost.c      | 244 ++++++++++++++++++++++++++++++++++---
+>  drivers/vhost/vhost.h      |  22 ++++
+>  include/uapi/linux/vhost.h |  29 +++++
+>  4 files changed, 295 insertions(+), 18 deletions(-)
+>
+> --
+> 2.45.0
+>
+>
 
 
