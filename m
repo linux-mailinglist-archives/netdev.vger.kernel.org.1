@@ -1,298 +1,142 @@
-Return-Path: <netdev+bounces-207053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63776B05773
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 12:06:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DA98B05788
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 12:10:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 837693A8BFC
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 10:05:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70D6356049B
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 10:10:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D7D9231A30;
-	Tue, 15 Jul 2025 10:06:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ow/mOCu+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8AE62D29BF;
+	Tue, 15 Jul 2025 10:10:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC82BA42
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 10:05:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.75.44.102])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56F03275842;
+	Tue, 15 Jul 2025 10:10:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.75.44.102
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752573960; cv=none; b=ir4Omesjh+9HRvuSF4jwGdLPIo70v4GyC5lyJ7XNw+7qEkJAADOa8wNjRVVFYh3nSnS3vRVTrQIEMvVMNupSQFdpIdJFLgAZJxW7ygIZN3Pi+8d2P5T0DnLqHp3U4a7uCpzr7A08GWl/sYQtyL9EmwnLrsarTVTMdamYFJi/EXU=
+	t=1752574210; cv=none; b=f5hDlEW+sCi0tH0d/Fbiu+Ddb+nhP5yoFE0PgFHPEA8UjaMLHdK/+g1rJkWdmZvmPFR1Gwpj4qn458J1pJtSSEA9vmUqTgrFv1xd/eXfu6NA+UkPIQNtFDFkkwrHYLlxTMsEch4UGFQ4AXYffGjCA+5jC1DCKZViLfEtZW7q4Uk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752573960; c=relaxed/simple;
-	bh=BKM3c2HN52dkYzElpIbNy+rlv/PBta3lyZTzXdkClcw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y+5D3xpp2TtwF/l7QgXiViW1XkD5ZiWSu9nzWXYueY5492+5k+VHb6wOj3c4FwuseSiYBrl+TidtgoR9ElFHacF5iu4lM3ZV2g4DNZAGFwEuo5JfdMOq7VbxGa1uQivBcXIbZu25PhqTMEOohAuUFi6iTxy+sggoQJdjDyiKHTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ow/mOCu+; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752573957;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RNEezTBowS9yRXOKkgc/JNGKfKHDVruijS88iSDpTcc=;
-	b=Ow/mOCu+JKBwiboQSIbmvKYiWevHFkTsS7+9SXejJo+ekx8H1tLi/WqMM77ymBAy5mDFHi
-	XIyW3YxUYkjnFKXq7c4o7IqjudRBQxos48csEGsAtBZbOGHjH6p7JvG/m0ul9mS8qopJxn
-	xHLAatnj8qBHsBmnYeBhtfOKRnx7AMI=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-591-W-f_4nBGMhyqmr4TLVYpig-1; Tue, 15 Jul 2025 06:05:56 -0400
-X-MC-Unique: W-f_4nBGMhyqmr4TLVYpig-1
-X-Mimecast-MFC-AGG-ID: W-f_4nBGMhyqmr4TLVYpig_1752573955
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-451d2037f1eso33900445e9.0
-        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 03:05:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752573955; x=1753178755;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RNEezTBowS9yRXOKkgc/JNGKfKHDVruijS88iSDpTcc=;
-        b=H22u2hMQIs/9X4gXrp1p5WsVmYKXUy9cggVHNaCAH4duSImcyY/sYr7lXOa45ZkyT5
-         RjhfOOwzOYptNsP+cxU3hW0ERxss0FAzqEUHAeZMRpvBKFm5Zn63a1FLid3ZBilXz7xt
-         fcCIP0imUoiCYIzVlW0rFZ1NBDUpONKdLxwUtPLfhFnRWx8zqRcoTcVrPBprMNVeZqOt
-         OS4+25hUoTOjVw/InFOWaqRF4kVlpmcMrvOhm39ZfAQ6YV+LBN2sHOt+H0p+2SH14xhG
-         4J/YaLhHamiIVenfwLV+Je21GBCC/FaDLRmVSCMghMiuZgVfCk9ysKt4w9KT+2InPM+8
-         5nvg==
-X-Gm-Message-State: AOJu0YxF0v/GYeQsGwpNMXSFKc/xb1gqMWi+LNaXZoUJE3HDzMlyteaD
-	y9duhU7AKLc3r67t0+boJPmJG48VHjFrLsMsXce7BZsi+T6Ry9SjtG9MMfIM8GD0Ru3c83kGudr
-	dXgRynlT7JR99dv386LSUS1HcJ/vsX5fllnvOvrMCULfvgWdrZT1KC9EJeg==
-X-Gm-Gg: ASbGncviuWlbOeFmdCK59twCwW2PPEN/9O7C0diUP5P5CKmTptIc9UyNk3CgvvRtzq/
-	K+Nfr/Y5RhaowrMN3LFuI+xNLHJmI38YJtwpqRgyLKOoU/Q6nVNkK0JrBwHbuOjweB89D3O7d9l
-	ophEf8INYiMHhqVSjrbt2BX8JVA03X4yFYBWjDg1ze5VkUsaQQz4iTES4z5jaV6prlogXxql4xS
-	VyHCTPO8vTm8t15HWBTNTDOOmBoZ2K+R21rZhWoCS5O4e6A3hop9nNEGH6JvsWS3Ava+DeNp7pl
-	l2r5Thr4XyLHguib44Xd23cxGbV09c/7NsUyKoEtjPC4sH8vSmIgXJANgKqZDx4fGSGUiAgz2ar
-	+x4gjTWAXK6w=
-X-Received: by 2002:a05:600c:1c14:b0:456:28f4:a576 with SMTP id 5b1f17b1804b1-45628f4a959mr12009635e9.27.1752573955107;
-        Tue, 15 Jul 2025 03:05:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEmyuB/ZfovPAaLTvxhqsmz3BK7RhvZRbgnWKTdPcf/VszsyoEiXJ5k/f5bxr/8KH4UZ9S7JA==
-X-Received: by 2002:a05:600c:1c14:b0:456:28f4:a576 with SMTP id 5b1f17b1804b1-45628f4a959mr12009295e9.27.1752573954617;
-        Tue, 15 Jul 2025 03:05:54 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454d5037fa0sm195814555e9.7.2025.07.15.03.05.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Jul 2025 03:05:54 -0700 (PDT)
-Message-ID: <151b85fe-72a2-4eb4-9aef-4e3b13b1c8ff@redhat.com>
-Date: Tue, 15 Jul 2025 12:05:52 +0200
+	s=arc-20240116; t=1752574210; c=relaxed/simple;
+	bh=bun7DXgfrzihoQdy+CxHxRyUuSdCirsltCFXqR+nYyI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=GyRQXzSOvN5XaISS6Skvn2ZmU0CG86bS3ydsSm495y+BZuXhcM+Y1WoyM6YzF5lZkJGVEmLoKYjTz6yQApstsz5GfbYoc02ZfZh4g1PeM3npqaP7fBesyo9gQXuP5sgHfW68qHEh83uUxMFsuUldPWEEZuV4TlFvPgFEK/h2d5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=13.75.44.102
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
+Received: from lizhi2$eswincomputing.com ( [10.11.96.26] ) by
+ ajax-webmail-app1 (Coremail) ; Tue, 15 Jul 2025 18:09:35 +0800 (GMT+08:00)
+Date: Tue, 15 Jul 2025 18:09:35 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: =?UTF-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>
+To: "Krzysztof Kozlowski" <krzk@kernel.org>
+Cc: weishangjuan@eswincomputing.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk,
+	yong.liang.choong@linux.intel.com, vladimir.oltean@nxp.com,
+	jszhang@kernel.org, jan.petrous@oss.nxp.com,
+	prabhakar.mahadev-lad.rj@bp.renesas.com, inochiama@gmail.com,
+	boon.khai.ng@altera.com, dfustini@tenstorrent.com, 0x1207@gmail.com,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, ningyu@eswincomputing.com,
+	linmin@eswincomputing.com, pinkesh.vaghela@einfochips.com
+Subject: Re: Re: [PATCH v3 2/2] ethernet: eswin: Add eic7700 ethernet driver
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2024.2-cmXT6 build
+ 20241203(6b039d88) Copyright (c) 2002-2025 www.mailtech.cn
+ mispb-72143050-eaf5-4703-89e0-86624513b4ce-eswincomputing.com
+In-Reply-To: <1b975a3e-ae1c-4354-90db-1f8d7ff567d3@kernel.org>
+References: <20250528041455.878-1-weishangjuan@eswincomputing.com>
+ <20250528041634.912-1-weishangjuan@eswincomputing.com>
+ <1b975a3e-ae1c-4354-90db-1f8d7ff567d3@kernel.org>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 5/8] net: mctp: Use hashtable for binds
-To: Matt Johnston <matt@codeconstruct.com.au>,
- Jeremy Kerr <jk@codeconstruct.com.au>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org
-References: <20250710-mctp-bind-v4-0-8ec2f6460c56@codeconstruct.com.au>
- <20250710-mctp-bind-v4-5-8ec2f6460c56@codeconstruct.com.au>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250710-mctp-bind-v4-5-8ec2f6460c56@codeconstruct.com.au>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Message-ID: <2e8343eb.34d0.1980d8fa817.Coremail.lizhi2@eswincomputing.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:TAJkCgA3WxHfKHZon0WwAA--.12412W
+X-CM-SenderInfo: xol2xx2s6h245lqf0zpsxwx03jof0z/1tbiAQEEDGh1MO8oigAAso
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
 
-On 7/10/25 10:55 AM, Matt Johnston wrote:
-> Ensure that a specific EID (remote or local) bind will match in
-> preference to a MCTP_ADDR_ANY bind.
-> 
-> This adds infrastructure for binding a socket to receive messages from a
-> specific remote peer address, a future commit will expose an API for
-> this.
-> 
-> Signed-off-by: Matt Johnston <matt@codeconstruct.com.au>
-> 
-> ---
-> v2:
-> - Use DECLARE_HASHTABLE
-> - Fix long lines
-> ---
->  include/net/netns/mctp.h | 20 +++++++++---
->  net/mctp/af_mctp.c       | 11 ++++---
->  net/mctp/route.c         | 81 ++++++++++++++++++++++++++++++++++++++----------
->  3 files changed, 87 insertions(+), 25 deletions(-)
-> 
-> diff --git a/include/net/netns/mctp.h b/include/net/netns/mctp.h
-> index 1db8f9aaddb4b96f4803df9f30a762f5f88d7f7f..89555f90b97b297e50a571b26c5232b824909da7 100644
-> --- a/include/net/netns/mctp.h
-> +++ b/include/net/netns/mctp.h
-> @@ -6,19 +6,25 @@
->  #ifndef __NETNS_MCTP_H__
->  #define __NETNS_MCTP_H__
->  
-> +#include <linux/hash.h>
-> +#include <linux/hashtable.h>
->  #include <linux/mutex.h>
->  #include <linux/types.h>
->  
-> +#define MCTP_BINDS_BITS 7
-> +
->  struct netns_mctp {
->  	/* Only updated under RTNL, entries freed via RCU */
->  	struct list_head routes;
->  
-> -	/* Bound sockets: list of sockets bound by type.
-> -	 * This list is updated from non-atomic contexts (under bind_lock),
-> -	 * and read (under rcu) in packet rx
-> +	/* Bound sockets: hash table of sockets, keyed by
-> +	 * (type, src_eid, dest_eid).
-> +	 * Specific src_eid/dest_eid entries also have an entry for
-> +	 * MCTP_ADDR_ANY. This list is updated from non-atomic contexts
-> +	 * (under bind_lock), and read (under rcu) in packet rx.
->  	 */
->  	struct mutex bind_lock;
-> -	struct hlist_head binds;
-> +	DECLARE_HASHTABLE(binds, MCTP_BINDS_BITS);
-
-Note that I comment on patch 2/8 before actually looking at this patch.
-
-As a possible follow-up I suggest a dynamically allocating the hash
-table at first bind time.
-
->  
->  	/* tag allocations. This list is read and updated from atomic contexts,
->  	 * but elements are free()ed after a RCU grace-period
-> @@ -34,4 +40,10 @@ struct netns_mctp {
->  	struct list_head neighbours;
->  };
->  
-> +static inline u32 mctp_bind_hash(u8 type, u8 local_addr, u8 peer_addr)
-> +{
-> +	return hash_32(type | (u32)local_addr << 8 | (u32)peer_addr << 16,
-> +		       MCTP_BINDS_BITS);
-> +}
-> +
->  #endif /* __NETNS_MCTP_H__ */
-> diff --git a/net/mctp/af_mctp.c b/net/mctp/af_mctp.c
-> index 20edaf840a607700c04b740708763fbd02a2df47..16341de5cf2893bbc04a8c05a038c30be6570296 100644
-> --- a/net/mctp/af_mctp.c
-> +++ b/net/mctp/af_mctp.c
-> @@ -626,17 +626,17 @@ static int mctp_sk_hash(struct sock *sk)
->  	struct net *net = sock_net(sk);
->  	struct sock *existing;
->  	struct mctp_sock *msk;
-> +	u32 hash;
->  	int rc;
->  
->  	msk = container_of(sk, struct mctp_sock, sk);
->  
-> -	/* Bind lookup runs under RCU, remain live during that. */
-> -	sock_set_flag(sk, SOCK_RCU_FREE);
-> +	hash = mctp_bind_hash(msk->bind_type, msk->bind_addr, MCTP_ADDR_ANY);
->  
->  	mutex_lock(&net->mctp.bind_lock);
->  
->  	/* Prevent duplicate binds. */
-> -	sk_for_each(existing, &net->mctp.binds) {
-> +	sk_for_each(existing, &net->mctp.binds[hash]) {
->  		struct mctp_sock *mex =
->  			container_of(existing, struct mctp_sock, sk);
->  
-> @@ -648,7 +648,10 @@ static int mctp_sk_hash(struct sock *sk)
->  		}
->  	}
->  
-> -	sk_add_node_rcu(sk, &net->mctp.binds);
-> +	/* Bind lookup runs under RCU, remain live during that. */
-> +	sock_set_flag(sk, SOCK_RCU_FREE);
-> +
-> +	sk_add_node_rcu(sk, &net->mctp.binds[hash]);
->  	rc = 0;
->  
->  out:
-> diff --git a/net/mctp/route.c b/net/mctp/route.c
-> index a20d6b11d4186b55cab9d76e367169ea712553c7..69cfb0e6c545c2b44e5defdfac4e602c4f0265b1 100644
-> --- a/net/mctp/route.c
-> +++ b/net/mctp/route.c
-> @@ -40,14 +40,45 @@ static int mctp_dst_discard(struct mctp_dst *dst, struct sk_buff *skb)
->  	return 0;
->  }
->  
-> -static struct mctp_sock *mctp_lookup_bind(struct net *net, struct sk_buff *skb)
-> +static struct mctp_sock *mctp_lookup_bind_details(struct net *net,
-> +						  struct sk_buff *skb,
-> +						  u8 type, u8 dest,
-> +						  u8 src, bool allow_net_any)
->  {
->  	struct mctp_skb_cb *cb = mctp_cb(skb);
-> -	struct mctp_hdr *mh;
->  	struct sock *sk;
-> -	u8 type;
-> +	u8 hash;
->  
-> -	WARN_ON(!rcu_read_lock_held());
-> +	WARN_ON_ONCE(!rcu_read_lock_held());
-> +
-> +	hash = mctp_bind_hash(type, dest, src);
-> +
-> +	sk_for_each_rcu(sk, &net->mctp.binds[hash]) {
-> +		struct mctp_sock *msk = container_of(sk, struct mctp_sock, sk);
-> +
-> +		if (!allow_net_any && msk->bind_net == MCTP_NET_ANY)
-> +			continue;
-> +
-> +		if (msk->bind_net != MCTP_NET_ANY && msk->bind_net != cb->net)
-> +			continue;
-> +
-> +		if (msk->bind_type != type)
-> +			continue;
-> +
-> +		if (!mctp_address_matches(msk->bind_addr, dest))
-> +			continue;
-> +
-> +		return msk;
-> +	}
-> +
-> +	return NULL;
-> +}
-> +
-> +static struct mctp_sock *mctp_lookup_bind(struct net *net, struct sk_buff *skb)
-> +{
-> +	struct mctp_sock *msk;
-> +	struct mctp_hdr *mh;
-> +	u8 type;
->  
->  	/* TODO: look up in skb->cb? */
->  	mh = mctp_hdr(skb);
-> @@ -57,20 +88,36 @@ static struct mctp_sock *mctp_lookup_bind(struct net *net, struct sk_buff *skb)
->  
->  	type = (*(u8 *)skb->data) & 0x7f;
->  
-> -	sk_for_each_rcu(sk, &net->mctp.binds) {
-> -		struct mctp_sock *msk = container_of(sk, struct mctp_sock, sk);
-> -
-> -		if (msk->bind_net != MCTP_NET_ANY && msk->bind_net != cb->net)
-> -			continue;
-> -
-> -		if (msk->bind_type != type)
-> -			continue;
-> -
-> -		if (!mctp_address_matches(msk->bind_addr, mh->dest))
-> -			continue;
-> +	/* Look for binds in order of widening scope. A given destination or
-> +	 * source address also implies matching on a particular network.
-> +	 *
-> +	 * - Matching destination and source
-> +	 * - Matching destination
-> +	 * - Matching source
-> +	 * - Matching network, any address
-> +	 * - Any network or address
-> +	 */
-
-Note for a possible follow-up: a more idiomatic approach uses a
-compute_score() function that respect the above priority and require a
-single hash traversal, see, i.e. net/ipv4/udp.c
-
-/P
-
+RGVhcsKgS3J6eXN6dG9mIEtvemxvd3NraSwKClRoYW5rIHlvdSBmb3IgeW91ciBwcm9mZXNzaW9u
+YWwgYW5kIHZhbHVhYmxlIHN1Z2dlc3Rpb25zLgpPdXIgcXVlc3Rpb24gaXMgZW1iZWRkZWQgYmVs
+b3cgeW91ciBjb21tZW50LgoKQmVzdCByZWdhcmRzLAoKCkxpIFpoaQpFc3dpbiBDb21wdXRpbmcK
+Cj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MyAyLzJdIGV0aGVybmV0OiBlc3dpbjogQWRkIGVpYzc3
+MDAgZXRoZXJuZXQgZHJpdmVyCj4gRGF0ZTogVGh1LCAzIEp1bCAyMDI1IDExOjUzOjMzICswMjAw
+CVt0aHJlYWQgb3ZlcnZpZXddCj4gTWVzc2FnZS1JRDogPGYwOTZhZmExLTI2MGUtNGY4Yy04NTk1
+LTNiNDE0MjViMjk2NEBrZXJuZWwub3JnPiAocmF3KQo+IEluLVJlcGx5LVRvOiA8MjAyNTA3MDMw
+OTIwMTUuMTIwMC0xLXdlaXNoYW5nanVhbkBlc3dpbmNvbXB1dGluZy5jb20+Cj4gT24gMDMvMDcv
+MjAyNSAxMToyMCwgd2Vpc2hhbmdqdWFuQGVzd2luY29tcHV0aW5nLmNvbSB3cm90ZToKPiA+ICsJ
+cmV0ID0gb2ZfcHJvcGVydHlfcmVhZF91MzJfaW5kZXgocGRldi0+ZGV2Lm9mX25vZGUsICJlc3dp
+bixzeXNjcmdfY3NyIiwgMSwKPiA+ICsJCQkJCSAmaHNwX2FjbGtfY3RybF9vZmZzZXQpOwo+ID4g
+KwlpZiAocmV0KQo+ID4gKwkJcmV0dXJuIGRldl9lcnJfcHJvYmUoJnBkZXYtPmRldiwgcmV0LCAi
+Y2FuJ3QgZ2V0IGhzcF9hY2xrX2N0cmxfb2Zmc2V0XG4iKTsKPiA+ICsKPiA+ICsJcmVnbWFwX3Jl
+YWQoZHdjX3ByaXYtPmNyZ19yZWdtYXAsIGhzcF9hY2xrX2N0cmxfb2Zmc2V0LCAmaHNwX2FjbGtf
+Y3RybF9yZWdzZXQpOwo+ID4gKwloc3BfYWNsa19jdHJsX3JlZ3NldCB8PSAoRUlDNzcwMF9IU1Bf
+QUNMS19DTEtFTiB8IEVJQzc3MDBfSFNQX0FDTEtfRElWU09SKTsKPiA+ICsJcmVnbWFwX3dyaXRl
+KGR3Y19wcml2LT5jcmdfcmVnbWFwLCBoc3BfYWNsa19jdHJsX29mZnNldCwgaHNwX2FjbGtfY3Ry
+bF9yZWdzZXQpOwo+ID4gKwo+ID4gPiArCXJldCA9IG9mX3Byb3BlcnR5X3JlYWRfdTMyX2luZGV4
+KHBkZXYtPmRldi5vZl9ub2RlLCAiZXN3aW4sc3lzY3JnX2NzciIsIDIsCj4gPiArCQkJCQkgJmhz
+cF9jZmdfY3RybF9vZmZzZXQpOwo+ID4gKwlpZiAocmV0KQo+ID4gKwkJcmV0dXJuIGRldl9lcnJf
+cHJvYmUoJnBkZXYtPmRldiwgcmV0LCAiY2FuJ3QgZ2V0IGhzcF9jZmdfY3RybF9vZmZzZXRcbiIp
+Owo+ID4gKwo+ID4gKwlyZWdtYXBfd3JpdGUoZHdjX3ByaXYtPmNyZ19yZWdtYXAsIGhzcF9jZmdf
+Y3RybF9vZmZzZXQsIEVJQzc3MDBfSFNQX0NGR19DVFJMX1JFR1NFVCk7Cj4gPiArCj4gPiArCWR3
+Y19wcml2LT5oc3BfcmVnbWFwID0gc3lzY29uX3JlZ21hcF9sb29rdXBfYnlfcGhhbmRsZShwZGV2
+LT5kZXYub2Zfbm9kZSwKPiA+ICsJCQkJCQkJICAgICAgICJlc3dpbixoc3Bfc3BfY3NyIik7Cj4g
+Cj4gVGhlcmUgaXMgbm8gc3VjaCBwcm9wZXJ0eS4gSSBhbHJlYWR5IHNhaWQgYXQgdjIgeW91IGNh
+bm5vdCBoYXZlCj4gdW5kb2N1bWVudGVkIEFCSS4KPiAKClRoZSBwcm9wZXJ0aWVzIGluIHRoZSBZ
+QU1MIGZpbGUgdXNlIGRhc2hlcywgd2hpbGUgdGhlIGRyaXZlciB1c2VzIHVuZGVyc2NvcmVzLCBy
+ZXN1bHRpbmcgaW4gYW4gaW5jb25zaXN0ZW5jeS4gVGhpcyB3aWxsIGJlIGNvcnJlY3RlZCBpbiB0
+aGUgbmV4dCBwYXRjaC4gSXMgdGhpcyBjb3JyZWN0PwoKPiA+ICsJaWYgKElTX0VSUihkd2NfcHJp
+di0+aHNwX3JlZ21hcCkpCj4gPiArCQlyZXR1cm4gZGV2X2Vycl9wcm9iZSgmcGRldi0+ZGV2LCBQ
+VFJfRVJSKGR3Y19wcml2LT5oc3BfcmVnbWFwKSwKPiA+ICsJCQkJIkZhaWxlZCB0byBnZXQgaHNw
+X3NwX2NzciByZWdtYXBcbiIpOwo+ID4gKwo+ID4gKwlyZXQgPSBvZl9wcm9wZXJ0eV9yZWFkX3Uz
+Ml9pbmRleChwZGV2LT5kZXYub2Zfbm9kZSwgImVzd2luLGhzcF9zcF9jc3IiLCAyLAo+IAo+IE5B
+Swo+IAo+ID4gKwkJCQkJICZldGhfcGh5X2N0cmxfb2Zmc2V0KTsKPiA+ICsJaWYgKHJldCkKPiA+
+ICsJCXJldHVybiBkZXZfZXJyX3Byb2JlKCZwZGV2LT5kZXYsIHJldCwgImNhbid0IGdldCBldGhf
+cGh5X2N0cmxfb2Zmc2V0XG4iKTsKPiA+ICsKPiA+ICsJcmVnbWFwX3JlYWQoZHdjX3ByaXYtPmhz
+cF9yZWdtYXAsIGV0aF9waHlfY3RybF9vZmZzZXQsICZldGhfcGh5X2N0cmxfcmVnc2V0KTsKPiA+
+ICsJZXRoX3BoeV9jdHJsX3JlZ3NldCB8PSAoRUlDNzcwMF9FVEhfVFhfQ0xLX1NFTCB8IEVJQzc3
+MDBfRVRIX1BIWV9JTlRGX1NFTEkpOwo+ID4gKwlyZWdtYXBfd3JpdGUoZHdjX3ByaXYtPmhzcF9y
+ZWdtYXAsIGV0aF9waHlfY3RybF9vZmZzZXQsIGV0aF9waHlfY3RybF9yZWdzZXQpOwo+ID4gKwo+
+ID4gKwlyZXQgPSBvZl9wcm9wZXJ0eV9yZWFkX3UzMl9pbmRleChwZGV2LT5kZXYub2Zfbm9kZSwg
+ImVzd2luLGhzcF9zcF9jc3IiLCAzLAo+ID4gKwkJCQkJICZldGhfYXhpX2xwX2N0cmxfb2Zmc2V0
+KTsKPiA+ICsJaWYgKHJldCkKPiA+ICsJCXJldHVybiBkZXZfZXJyX3Byb2JlKCZwZGV2LT5kZXYs
+IHJldCwgImNhbid0IGdldCBldGhfYXhpX2xwX2N0cmxfb2Zmc2V0XG4iKTsKPiA+ICsKPiA+ICsJ
+cmVnbWFwX3dyaXRlKGR3Y19wcml2LT5oc3BfcmVnbWFwLCBldGhfYXhpX2xwX2N0cmxfb2Zmc2V0
+LCBFSUM3NzAwX0VUSF9DU1lTUkVRX1ZBTCk7Cj4gPiArCj4gPiArCXBsYXRfZGF0LT5jbGtfdHhf
+aSA9IGRldm1fY2xrX2dldF9lbmFibGVkKCZwZGV2LT5kZXYsICJ0eCIpOwo+ID4gKwlpZiAoSVNf
+RVJSKHBsYXRfZGF0LT5jbGtfdHhfaSkpCj4gPiArCQlyZXR1cm4gZGV2X2Vycl9wcm9iZSgmcGRl
+di0+ZGV2LCBQVFJfRVJSKHBsYXRfZGF0LT5jbGtfdHhfaSksCj4gPiArCQkJCSJlcnJvciBnZXR0
+aW5nIHR4IGNsb2NrXG4iKTsKPiA+ICsKPiA+ICsJcGxhdF9kYXQtPmZpeF9tYWNfc3BlZWQgPSBl
+aWM3NzAwX3Fvc19maXhfc3BlZWQ7Cj4gPiArCXBsYXRfZGF0LT5zZXRfY2xrX3R4X3JhdGUgPSBz
+dG1tYWNfc2V0X2Nsa190eF9yYXRlOwo+ID4gKwlwbGF0X2RhdC0+YnNwX3ByaXYgPSBkd2NfcHJp
+djsKPiA+ICsKPiA+ICsJcmV0ID0gc3RtbWFjX2R2cl9wcm9iZSgmcGRldi0+ZGV2LCBwbGF0X2Rh
+dCwgJnN0bW1hY19yZXMpOwo+ID4gKwlpZiAocmV0KQo+ID4gKwkJcmV0dXJuIGRldl9lcnJfcHJv
+YmUoJnBkZXYtPmRldiwgcmV0LCAiRmFpbGVkIHRvIGRyaXZlciBwcm9iZVxuIik7Cj4gPiArCj4g
+PiArCXJldHVybiByZXQ7Cj4gPiArfQo+ID4gKwo+ID4gK3N0YXRpYyBjb25zdCBzdHJ1Y3Qgb2Zf
+ZGV2aWNlX2lkIGVpYzc3MDBfZHdtYWNfbWF0Y2hbXSA9IHsKPiA+ICsJeyAuY29tcGF0aWJsZSA9
+ICJlc3dpbixlaWM3NzAwLXFvcy1ldGgiIH0sCj4gPiArCXsgfQo+ID4gK307Cj4gPiArTU9EVUxF
+X0RFVklDRV9UQUJMRShvZiwgZWljNzcwMF9kd21hY19tYXRjaCk7Cj4gPiArCj4gPiArc3RhdGlj
+IHN0cnVjdCBwbGF0Zm9ybV9kcml2ZXIgZWljNzcwMF9kd21hY19kcml2ZXIgPSB7Cj4gKwkucHJv
+YmUgID0gZWljNzcwMF9kd21hY19wcm9iZSwKPiArCS5yZW1vdmUgPSBzdG1tYWNfcGx0ZnJfcmVt
+b3ZlLAo+ICsJLmRyaXZlciA9IHsKPiArCQkubmFtZSAgICAgICAgICAgPSAiZWljNzcwMC1ldGgt
+ZHdtYWMiLAo+ICsJCS5wbSAgICAgICAgICAgICA9ICZzdG1tYWNfcGx0ZnJfcG1fb3BzLAo+ICsJ
+CS5vZl9tYXRjaF90YWJsZSA9IGVpYzc3MDBfZHdtYWNfbWF0Y2gsCj4gKwl9LAo+ICt9Owo+ICtt
+b2R1bGVfcGxhdGZvcm1fZHJpdmVyKGVpYzc3MDBfZHdtYWNfZHJpdmVyKTsKPiArCj4gK01PRFVM
+RV9BVVRIT1IoIkVzd2luIik7Cj4gCj4gRHJvcCwgdGhhdCdzIG5vdCBhIHBlcnNvbi4KPiAKPiAK
+PiBCZXN0IHJlZ2FyZHMsCj4gS3J6eXN6dG9mCg==
 
