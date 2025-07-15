@@ -1,150 +1,124 @@
-Return-Path: <netdev+bounces-207093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207094-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 692C3B05ABB
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 15:02:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3555FB05AC2
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 15:05:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C105E1AA6246
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:02:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B2463B6332
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:05:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAFF31F0E26;
-	Tue, 15 Jul 2025 13:02:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6304A2E03FF;
+	Tue, 15 Jul 2025 13:05:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sbo9ettj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vG8xap+x"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114182566
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 13:02:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CABF2561AE;
+	Tue, 15 Jul 2025 13:05:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752584551; cv=none; b=RiZDaZyyyS9qUei2F9yIR2msf37HchxQeUGLhyW4rjtysloDlOBUWNxBSOdUymFFWfXzZLSo3khUSTGn5uXPn/eofih6k0aAyjbVK9dwOJtQVjI3RvjlxMVc1/oleWEWLzeFbTlgfJ4/I85M+YS7ObUk1/3Bzqr/5z/+mNhLZSQ=
+	t=1752584753; cv=none; b=WcuTSRb/rbs0Ij3CgFnPPrg9Xy/F1JyeX59BSOzIdGcmT+JP3eCZMp/L7FD+K3bTvzvbKCp+zZgHq8C+vtSdId10S/5TyLiHU9XN6GZXjMHrb3eTetopYPDIWGDoGCLW+Uo9+9ugd1g2v6o9LvGEEFyMJYVbBU08GkNAozip74g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752584551; c=relaxed/simple;
-	bh=6qfx1AFvVvUSMbmXqpWZAUM1XcuqC/9zxs9mjQcS4EU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iHf3iyNRNDHtYgbYh5AFRwtgrowMhv7VBM5YYaEFL4pxNBPj0CYnguRF/7KfbTksu4Bdt3VMyPykUpuAcj3v41mXCr9CdSUAC92DM4ZztDjRUSvKcGyUfd2+iz4fILFTCL7o1YmjhfevaOecsOmsu282ymCeVaKLyfaVWwsTZtM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sbo9ettj; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752584549;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=p7tWYD4tx+fg2lnHVa/1g7HWDf3N37jy+j/78STt+1w=;
-	b=Sbo9ettjMNmNXmQnTZVc/leuYjNxH/rzxUSaThJ4HL8ryvyi4WhH6LGd36PHVNVw4dJvxF
-	kGGPEDWDths/AabGbNjaWhevYorUvF7/2Sk58+vmD9y7I6/+xrkky67QDdjbSCInqxEEoF
-	7ZDpx1AKuKQHbQgN3/zNVW6KCLSVH4o=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-550-xpdEkpdGNAufPTLrAD66Dg-1; Tue, 15 Jul 2025 09:02:27 -0400
-X-MC-Unique: xpdEkpdGNAufPTLrAD66Dg-1
-X-Mimecast-MFC-AGG-ID: xpdEkpdGNAufPTLrAD66Dg_1752584546
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-455ea9cb0beso31867605e9.0
-        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 06:02:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752584546; x=1753189346;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p7tWYD4tx+fg2lnHVa/1g7HWDf3N37jy+j/78STt+1w=;
-        b=tIOQhL7g0kGvFfL9p69FVnQ9dUZ0ZJUAW3H5Ba2jsrRnfxo6ObV183pH+X16kL8D4s
-         DbZbiRR820Xr3c1kyfq3u8xpbMhwu5DgGtEfggUvWBdse4EUSImeJHJvFOxff65CPtw1
-         lP4MMPC0m2C67wRuOgbDhdYLJT0om4hL4wcuqkMVZ7hyZVplBE8AzjTgeIX5WDayjorH
-         Im5pyXftq98lf/Ls1CLNYRNg/Zs8GVXdm4ykZ2aHEXwAScmL2f2qpHcsy19jGxh9cYXc
-         SJTnIAbZYg+EhWohZGglEeBeyJKrA3viYB2bS2ZZi4ZnslZFH/T4Kb/q5H+A1RhHSVq3
-         qxsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVVSwrTaJvbn5o6Y+T4+W4xzAwL4Yrbk+bIM7gOAQPnmgn7BRmcbNdxMuxP26i9q8Ha4YZKoFA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwN/8zclHJq9A0IJm7gt8K8fdHptmxQ2e6VfTRB2gp2v5814n2d
-	GaZqqbxzzI/cfaNJgrs7KZs7SEAbGDHnhGm5FSU88KwIx9Iraq17LfNkd4DBTNwb0cM6/vL+cR/
-	q2Lib9ppu+46TfEcGqZEOl1OwCXbYXqbKfZJTmD2lPk0LByMEsx0REOu/bA==
-X-Gm-Gg: ASbGncvsL2+DnMUKgLJlWypCqocLhrCDXJkymTZurldxvpDWXVLGmRGTA2yUHnji2+k
-	jq70HsXX/z3ZZQtxyKe4EdpZaRZrfBuCnrI/SL784j9uMn8I8vG8Q06t3YryGzVcLFCRUl5cf1h
-	nB39SQlrby8gVhkbPOP/PuoDUvTJzIHLKxrkKdY+/5+4on1a1jMWHfD3fuuGIpAp8Comwqc2IUU
-	u3ch2hUXj5K0ScITEJCJQ6Wi6Lb5w30VBc9n8LvadGI5aaZSHx4FuL1hsT0nxdylVYbrjmiFjBl
-	pOEoRXIbivw0a4GvuRxNrum2tD1i4ofbBaR+vEambGNQPfsH6v2yPmUXQYeyKQwUwH7hE8R+xtq
-	7j8iAF0GYpog=
-X-Received: by 2002:a05:600c:a08:b0:43c:f8fe:dd82 with SMTP id 5b1f17b1804b1-454f4255c7amr153327755e9.18.1752584545995;
-        Tue, 15 Jul 2025 06:02:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFQmEKYWF5RFQOcNA8dAn6VORUEh2xGxKp+QojOuV5+23NJaOdrjj/10cvaoZSjormmd2ur7A==
-X-Received: by 2002:a05:600c:a08:b0:43c:f8fe:dd82 with SMTP id 5b1f17b1804b1-454f4255c7amr153325695e9.18.1752584543813;
-        Tue, 15 Jul 2025 06:02:23 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4562b18f8absm5076125e9.36.2025.07.15.06.02.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Jul 2025 06:02:22 -0700 (PDT)
-Message-ID: <e6801550-fb58-4a94-9405-b14e13c0e936@redhat.com>
-Date: Tue, 15 Jul 2025 15:02:21 +0200
+	s=arc-20240116; t=1752584753; c=relaxed/simple;
+	bh=0uPpU45llipC3TzVqDMQ5evN4sRa1g4MKHiGLtm5jEU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TZLmWZ5IW0YJ7dgbePttZsNzNrLUIQ4RGEEPo6aPvhH8oohQpjFeGrV0yeRvYzsejF6ZuqrKJdWVmnuqe+IcLYZr0Buv9CLuLg0F2iBA1drfGkISa4Ix6htH9soabKm/0AotZiueF6WetImN4zN6H1C/7iVc0bkDKPjOGSCJC7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vG8xap+x; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9F2AC4CEE3;
+	Tue, 15 Jul 2025 13:05:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752584752;
+	bh=0uPpU45llipC3TzVqDMQ5evN4sRa1g4MKHiGLtm5jEU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=vG8xap+xPani99WC7EezMokh7vHK7xaU73nUyI6x6jK3v2jEwl9hx+p0kvDxS6E+T
+	 VRAfURHh72NhMJEHFyQBie+ArNzs6KztNn011inS+zewEb/VCU8mbrogOFRVK9OT1F
+	 3PcWZskbZ9XmD+CP0YpY4rcFSIf8tuu3NUyNkB2vc4xpTPUayXDeniP5qsG3toEpql
+	 APGb/pzZqRMnBC1D/94iC9dFaHNrO93pVYfT3up8JiMiUKgoH59f4wVgETVJaKgxwf
+	 gIhj+5zf8e0VbRSpPm47rjMGQYATWXXwLvTbgiZ+fPGn0o+BW/2OpzybqFtaJ63DjF
+	 QrzFlzRXBsnNg==
+Date: Tue, 15 Jul 2025 14:05:47 +0100
+From: Simon Horman <horms@kernel.org>
+To: Haiyang Zhang <haiyangz@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	haiyangz@microsoft.com, kys@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	cavery@redhat.com
+Subject: Re: [PATCH net,v2] hv_netvsc: Switch VF namespace in netvsc_open
+ instead
+Message-ID: <20250715130547.GV721198@horms.kernel.org>
+References: <1752511297-8817-1-git-send-email-haiyangz@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/5] dpll: zl3073x: Implement phase offset
- monitor feature
-To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
-Cc: Prathosh Satish <Prathosh.Satish@microchip.com>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
- Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>
-References: <20250710153848.928531-1-ivecera@redhat.com>
- <20250710153848.928531-4-ivecera@redhat.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250710153848.928531-4-ivecera@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1752511297-8817-1-git-send-email-haiyangz@linux.microsoft.com>
 
-On 7/10/25 5:38 PM, Ivan Vecera wrote:
-> @@ -536,8 +539,38 @@ zl3073x_dpll_input_pin_phase_offset_get(const struct dpll_pin *dpll_pin,
->  		return 0;
->  	}
->  
-> -	/* Report the latest measured phase offset for the connected ref */
-> -	*phase_offset = pin->phase_offset * DPLL_PHASE_OFFSET_DIVIDER;
-> +	ref_phase = pin->phase_offset;
-> +
-> +	/* The DPLL being locked to a higher freq than the current ref
-> +	 * the phase offset is modded to the period of the signal
-> +	 * the dpll is locked to.
-> +	 */
-> +	if (ZL3073X_DPLL_REF_IS_VALID(conn_ref) && conn_ref != ref) {
-> +		u32 conn_freq, ref_freq;
-> +
-> +		/* Get frequency of connected ref */
-> +		rc = zl3073x_dpll_input_ref_frequency_get(zldpll, conn_ref,
-> +							  &conn_freq);
-> +		if (rc)
-> +			return rc;
-> +
-> +		/* Get frequency of given ref */
-> +		rc = zl3073x_dpll_input_ref_frequency_get(zldpll, ref,
-> +							  &ref_freq);
-> +		if (rc)
-> +			return rc;
-> +
-> +		if (conn_freq > ref_freq) {
-> +			s64 conn_period;
-> +			int div_factor;
-> +
-> +			conn_period = div_s64(PSEC_PER_SEC, conn_freq);
-> +			div_factor = div64_s64(ref_phase, conn_period);
-> +			ref_phase -= conn_period * div_factor;
+On Mon, Jul 14, 2025 at 09:41:37AM -0700, Haiyang Zhang wrote:
+> From: Haiyang Zhang <haiyangz@microsoft.com>
+> 
+> The existing code move the VF NIC to new namespace when NETDEV_REGISTER is
+> received on netvsc NIC. During deletion of the namespace,
+> default_device_exit_batch() >> default_device_exit_net() is called. When
+> netvsc NIC is moved back and registered to the default namespace, it
+> automatically brings VF NIC back to the default namespace. This will cause
+> the default_device_exit_net() >> for_each_netdev_safe loop unable to detect
+> the list end, and hit NULL ptr:
+> 
+> [  231.449420] mana 7870:00:00.0 enP30832s1: Moved VF to namespace with: eth0
+> [  231.449656] BUG: kernel NULL pointer dereference, address: 0000000000000010
+> [  231.450246] #PF: supervisor read access in kernel mode
+> [  231.450579] #PF: error_code(0x0000) - not-present page
+> [  231.450916] PGD 17b8a8067 P4D 0 
+> [  231.451163] Oops: Oops: 0000 [#1] SMP NOPTI
+> [  231.451450] CPU: 82 UID: 0 PID: 1394 Comm: kworker/u768:1 Not tainted 6.16.0-rc4+ #3 VOLUNTARY 
+> [  231.452042] Hardware name: Microsoft Corporation Virtual Machine/Virtual Machine, BIOS Hyper-V UEFI Release v4.1 11/21/2024
+> [  231.452692] Workqueue: netns cleanup_net
+> [  231.452947] RIP: 0010:default_device_exit_batch+0x16c/0x3f0
+> [  231.453326] Code: c0 0c f5 b3 e8 d5 db fe ff 48 85 c0 74 15 48 c7 c2 f8 fd ca b2 be 10 00 00 00 48 8d 7d c0 e8 7b 77 25 00 49 8b 86 28 01 00 00 <48> 8b 50 10 4c 8b 2a 4c 8d 62 f0 49 83 ed 10 4c 39 e0 0f 84 d6 00
+> [  231.454294] RSP: 0018:ff75fc7c9bf9fd00 EFLAGS: 00010246
+> [  231.454610] RAX: 0000000000000000 RBX: 0000000000000002 RCX: 61c8864680b583eb
+> [  231.455094] RDX: ff1fa9f71462d800 RSI: ff75fc7c9bf9fd38 RDI: 0000000030766564
+> [  231.455686] RBP: ff75fc7c9bf9fd78 R08: 0000000000000000 R09: 0000000000000000
+> [  231.456126] R10: 0000000000000001 R11: 0000000000000004 R12: ff1fa9f70088e340
+> [  231.456621] R13: ff1fa9f70088e340 R14: ffffffffb3f50c20 R15: ff1fa9f7103e6340
+> [  231.457161] FS:  0000000000000000(0000) GS:ff1faa6783a08000(0000) knlGS:0000000000000000
+> [  231.457707] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  231.458031] CR2: 0000000000000010 CR3: 0000000179ab2006 CR4: 0000000000b73ef0
+> [  231.458434] Call Trace:
+> [  231.458600]  <TASK>
+> [  231.458777]  ops_undo_list+0x100/0x220
+> [  231.459015]  cleanup_net+0x1b8/0x300
+> [  231.459285]  process_one_work+0x184/0x340
+> 
+> To fix it, move the VF namespace switching code from the NETDEV_REGISTER
+> event handler to netvsc_open().
+> 
+> Cc: stable@vger.kernel.org
+> Cc: cavery@redhat.com
+> Fixes: 4c262801ea60 ("hv_netvsc: Fix VF namespace also in synthetic NIC NETDEV_REGISTER event")
+> Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
 
-It's not obvious to me that the above div64_s64() will yield a 32b value
-for every possible arguments/configuration. Possibly a comment would
-help (or just use s64 for div_factor).
+With this change do we go back to the situation that existed prior
+to the cited patch? Quoting the cited commit:
 
-/P
+    The existing code moves VF to the same namespace as the synthetic NIC
+    during netvsc_register_vf(). But, if the synthetic device is moved to a
+    new namespace after the VF registration, the VF won't be moved together.
 
+Or perhaps not because if synthetic device is moved then, in practice, it
+will subsequently be reopened? (Because it is closed as part of the move
+to a different netns?)
+
+I am unsure.
 
