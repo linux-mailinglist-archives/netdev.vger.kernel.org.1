@@ -1,383 +1,192 @@
-Return-Path: <netdev+bounces-207180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D528B06211
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 16:57:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E846B061ED
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 16:54:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D40CD5A1B2A
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 14:48:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBCCB5044B1
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 14:48:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A4EC233704;
-	Tue, 15 Jul 2025 14:47:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9B441E5710;
+	Tue, 15 Jul 2025 14:48:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eCj6Z+zL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aiqR77ez"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E603239E6E
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 14:47:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ADDB1E834F
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 14:48:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752590833; cv=none; b=fCFHmEbtRvUJlJhW5KvnwJZWd0Hsnrlp37ahLsp5w68o21RBQtIpAppE9js9uYUUuvf4MN37oKsOAKYCgDzn2jYitmPLB8opocdJhlu6iWwN5DO2MyTj9YDwD2L6vaBs6rQzkOW2BkQ/Oc6o2X42Hg0Kje5INePFMSDprUAJ1O8=
+	t=1752590912; cv=none; b=fEIfOqdp65U96UwyCKpTWRvwW8Kla6cwsT3TfiHFBhZAJsQb6aS/gzC+MNtdD251cNf4+WxJqnb55+rPdgbs/WsV3JLgfMfVHQFqHbEw3dZeOoVThmNjzGQWZrG55YSfX4vXCsd9CHAEZIW49efKoqIspgMyPPrg4vCmdRmITag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752590833; c=relaxed/simple;
-	bh=oK1vgMuq6+cnsCndzyQpeCqHlGbgy6yIdAjJf22cPYc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CDGV7ssSngG9sCrk+r9WHt8GNCJaRB7Yh7qt6oF61B9WlvMXui6mrS7eD+PfdEkB2A4W8AKxLyox/knc0JIb5NDLz7XFNkZoEiFoe7Q3sIXXTLKPC+fqSaZjWzpOQuuwf8CuIHQiEY3nOs46AoqO2zUOpPTcvC/uFU1dABM6fOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eCj6Z+zL; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752590830;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fnG9dfVPtS3f3Mp0Snn/l55Roln2PCuXGOhqghCAopc=;
-	b=eCj6Z+zLHhmB2IzUQpgbEggPX42oxg4M5wKjqyUqxXWZ73GWusV0FMCSUi0bDxBNtxABvN
-	u/lOQ1WjlKcEhCKXCHvxehQI7tzdN94ESTOvl11Aafo9zXxgTE7whoupqYyBKCGoHTzeIH
-	nXO4JBCqnt6ZZbPyajTOy5ZtqgfZ1TA=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-211-nCbHWMI7OWyQUgSG8o8YWA-1; Tue,
- 15 Jul 2025 10:47:06 -0400
-X-MC-Unique: nCbHWMI7OWyQUgSG8o8YWA-1
-X-Mimecast-MFC-AGG-ID: nCbHWMI7OWyQUgSG8o8YWA_1752590824
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5D6D91800252;
-	Tue, 15 Jul 2025 14:47:04 +0000 (UTC)
-Received: from p16v.redhat.com (unknown [10.45.225.30])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B674919560AF;
-	Tue, 15 Jul 2025 14:47:00 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Jiri Pirko <jiri@nvidia.com>,
-	Prathosh Satish <prathosh.satish@microchip.com>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Michal Schmidt <mschmidt@redhat.com>,
-	Petr Oros <poros@redhat.com>
-Subject: [PATCH net-next v2 5/5] dpll: zl3073x: Add support to get fractional frequency offset
-Date: Tue, 15 Jul 2025 16:46:33 +0200
-Message-ID: <20250715144633.149156-6-ivecera@redhat.com>
-In-Reply-To: <20250715144633.149156-1-ivecera@redhat.com>
-References: <20250715144633.149156-1-ivecera@redhat.com>
+	s=arc-20240116; t=1752590912; c=relaxed/simple;
+	bh=kjd8J1QyRSMxi2R5UYVWN/B388GsbuobvrFO4L751dM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=atoLcoaUNYB+eC/9467d35jC70yVawNoYDugID1aJFqKTIxrr8D4/x4QMBw3oMsHPlzPbuhbXSV1L9p7Exj7nXnAcd9EgEcdBXn+y5ZZySMwa7ajQyG3Ab0WgMqXEmEJAR78X2fUFR5uvIQdL9h5Kzkc/74HQMstR3WqTd2AswQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aiqR77ez; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-311ef4fb43dso4564623a91.3
+        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 07:48:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752590910; x=1753195710; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5LXCe7vXC3cVdnINUzgQ6yl9HtA003N86C/8zvLxE1U=;
+        b=aiqR77ezIS5wk9xSLONhHgATC8wsoXsBFlTmV/OIysPBK9vkW7ofhJq+7+MkahE942
+         jCaLPgL4KV5Rp7V83HsncFrZ/ZlD7rjX0n1PnlkREUi8Ux4vGiWhAHZQDuEqgKsDMvnW
+         3ySrudt0cckYaOYtTZ+/hltkAUeXWaEsNAUX+XyRj0clTxJjJW3A8aSR2oBlqBFesonf
+         7ImmATm/olIj11tq/69VNCQqj7rA1gPwstE3LsYHPgdpoLOJppjbhrNWkg/eAiBmc4KR
+         IvyXoTp0OG0RvnUOG87TTSTlctdgpbe6zi+kKfYIrNQ/Bd5CqIFZS/9FaVpAlNxA2IMZ
+         EIdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752590910; x=1753195710;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5LXCe7vXC3cVdnINUzgQ6yl9HtA003N86C/8zvLxE1U=;
+        b=w3myanN36NtQpcYLNucMuMzkH6g6pEfut1aelm7JP91JqFVWpeDqzyH/RJzTkb8zBn
+         2ozbP61lEJFzw5csoXfz6F5HHo2DKkTlsxdh/IW7eUrrHIFbb46DzNkjYDnmBIiCuFKI
+         EDfqyFJA74+lr6eKYLs8zY0jPjaxS3az7ORbZiA4xbq7iNO7Sv5NR2tzoG/6qEIN5Hct
+         WtB3NZG77AY1Nzo1j7uWyzpvyRiP8Dvtk5hzbMUcjDsCwQmu2eS/+ZUBgOuMXPscWbXZ
+         hhGfekIfzA+JLwsCPZbcJnFMKep+U8V5iciqbz5LdWrQ+OnIL73wLWbigB79AB4/Gj5N
+         lT0g==
+X-Forwarded-Encrypted: i=1; AJvYcCXsABZipcgLkEV+lQ8fOn3K26GxavleJ56Eapnfcwx4hI0Z21fKV58C/XWGEmjp3d1Y9HDknOc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXYUQqzr2NHzsW/zhKIkhQeHZIFt0GDqhkG8KI3bXrWdmP/Lhn
+	Tp42fAXCoGv0bnm08jSwZb4gwP817hbXJadLp1sYC1XO9OlWW5xpzM4wm1KF+isOICBlEdSjAeC
+	ODpWNAWYA61jXDK4gN6ibw9AH8+uNuePigZoLEBJ2
+X-Gm-Gg: ASbGncuRFrXSQvEFFr2NnGX7XQHZrPyqjnKddQqfM2bym8EcLH/5xqs2JV5Se1q5y/V
+	sUAGI2KTb5IZmXQgknOr2hPEymcJFARcBeqbDar2KtOiSWWf5wHTp9ybimSSgfBBubi2sbW+vBA
+	9ifGcM49TYfZ/d1EcQGiJOg0s4kpO2LWe01MTEUwJvWbuhkLZ6Cb6WhzLKEf/M5zQkJfJGCJ/ii
+	c1LTifqZxaWfI6WsHKRJmhNJBwjsjsMRBE83yKx
+X-Google-Smtp-Source: AGHT+IFDRkChtqk+Qk99sapmg4o/969rKL7xNz4Wu2Y9pXnB1qsuKf4Nxc128zz7KdoGKg8uBmWSMCXnL5A8NmQPBLY=
+X-Received: by 2002:a17:90b:3c0e:b0:312:f0d0:bc4 with SMTP id
+ 98e67ed59e1d1-31c4f48b7a4mr25080785a91.5.1752590910099; Tue, 15 Jul 2025
+ 07:48:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+References: <20250711114006.480026-1-edumazet@google.com> <a7a89aa2-7354-42c7-8219-99a3cafd3b33@redhat.com>
+ <d0fea525-5488-48b7-9f88-f6892b5954bf@kernel.org> <6a599379-1eb5-41c2-84fc-eb6fde36d3ba@redhat.com>
+ <20250715062829.0408857d@kernel.org> <20250715063314.43a993f9@kernel.org>
+In-Reply-To: <20250715063314.43a993f9@kernel.org>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Tue, 15 Jul 2025 07:48:18 -0700
+X-Gm-Features: Ac12FXzb7-nCxc0fVesO3CBBEjuPjyHIwdpGBx78tGP28W3eEECJYo0RpeIs-NY
+Message-ID: <CAAVpQUBt7SWEz0gtZD2NkjRvHj6qmYij=mcW0G3+Qxgg53zv4A@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/8] tcp: receiver changes
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
+	Matthieu Baerts <matttbe@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, "David S . Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Adds support to get fractional frequency offset for input pins. Implement
-the appropriate callback and function that periodicaly performs reference
-frequency measurement and notifies DPLL core about changes.
+On Tue, Jul 15, 2025 at 6:33=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Tue, 15 Jul 2025 06:28:29 -0700 Jakub Kicinski wrote:
+> > # (null):17: error handling packet: timing error: expected outbound pac=
+ket at 0.074144 sec but happened at -1752585909.757339 sec; tolerance 0.004=
+000 sec
+> > # script packet:  0.074144 S. 0:0(0) ack 1 <mss 1460,nop,wscale 0>
+> > # actual packet: -1752585909.757339 S.0 0:0(0) ack 1 <mss 1460,nop,wsca=
+le 0>
+>
+> This is definitely compiler related, I rebuilt with clang and the build
+> error goes away. Now I get a more sane failure:
+>
+> # tcp_rcv_big_endseq.pkt:41: error handling packet: timing error: expecte=
+d outbound packet at 1.230105 sec but happened at 1.190101 sec; tolerance 0=
+.005046 sec
+> # script packet:  1.230105 . 1:1(0) ack 54001 win 0
+> # actual packet:  1.190101 . 1:1(0) ack 54001 win 0
+>
+> $ gcc --version
+> gcc (GCC) 15.1.1 20250521 (Red Hat 15.1.1-2)
+>
+> I don't understand why the ack is supposed to be delayed, should we
+> just do this? (I think Eric is OOO, FWIW)
+>
+> diff --git a/tools/testing/selftests/net/packetdrill/tcp_rcv_big_endseq.p=
+kt b/tools/testing/selftests/net/packetdrill/tcp_rcv_big_endseq.pkt
+> index 7e170b94fd36..3848b419e68c 100644
+> --- a/tools/testing/selftests/net/packetdrill/tcp_rcv_big_endseq.pkt
+> +++ b/tools/testing/selftests/net/packetdrill/tcp_rcv_big_endseq.pkt
+> @@ -38,7 +38,7 @@
+>
+>  // If queue is empty, accept a packet even if its end_seq is above wup +=
+ rcv_wnd
+>    +0 < P. 4001:54001(50000) ack 1 win 257
+> -  +.040 > .  1:1(0) ack 54001 win 0
+> +  +0 > .  1:1(0) ack 54001 win 0
+>
+>  // Check LINUX_MIB_BEYOND_WINDOW has been incremented 3 times.
+>  +0 `nstat | grep TcpExtBeyondWindow | grep -q " 3 "`
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-Tested-by: Prathosh Satish <prathosh.satish@microchip.com>
-Co-developed-by: Prathosh Satish <Prathosh.Satish@microchip.com>
-Signed-off-by: Prathosh Satish <Prathosh.Satish@microchip.com>
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- drivers/dpll/zl3073x/core.c | 67 +++++++++++++++++++++++++++++++++++
- drivers/dpll/zl3073x/core.h | 15 ++++++++
- drivers/dpll/zl3073x/dpll.c | 69 +++++++++++++++++++++++++++++++++++--
- drivers/dpll/zl3073x/regs.h | 19 ++++++++++
- 4 files changed, 168 insertions(+), 2 deletions(-)
+I remember I didn't see this error just after the commit that added the tes=
+t,
+and now I see the failure after commit 1d2fbaad7cd8c ("tcp: stronger
+sk_rcvbuf checks").
 
-diff --git a/drivers/dpll/zl3073x/core.c b/drivers/dpll/zl3073x/core.c
-index eb62a492b1727..7ebcfc5ec1f09 100644
---- a/drivers/dpll/zl3073x/core.c
-+++ b/drivers/dpll/zl3073x/core.c
-@@ -720,6 +720,66 @@ int zl3073x_ref_phase_offsets_update(struct zl3073x_dev *zldev, int channel)
- 				    ZL_REF_PHASE_ERR_READ_RQST_RD);
- }
- 
-+/**
-+ * zl3073x_ref_ffo_update - update reference fractional frequency offsets
-+ * @zldev: pointer to zl3073x_dev structure
-+ *
-+ * The function asks device to update fractional frequency offsets latch
-+ * registers the latest measured values, reads and stores them into
-+ *
-+ * Return: 0 on success, <0 on error
-+ */
-+static int
-+zl3073x_ref_ffo_update(struct zl3073x_dev *zldev)
-+{
-+	int i, rc;
-+
-+	/* Per datasheet we have to wait for 'ref_freq_meas_ctrl' to be zero
-+	 * to ensure that the measured data are coherent.
-+	 */
-+	rc = zl3073x_poll_zero_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL,
-+				  ZL_REF_FREQ_MEAS_CTRL);
-+	if (rc)
-+		return rc;
-+
-+	/* Select all references for measurement */
-+	rc = zl3073x_write_u8(zldev, ZL_REG_REF_FREQ_MEAS_MASK_3_0,
-+			      GENMASK(7, 0)); /* REF0P..REF3N */
-+	if (rc)
-+		return rc;
-+	rc = zl3073x_write_u8(zldev, ZL_REG_REF_FREQ_MEAS_MASK_4,
-+			      GENMASK(1, 0)); /* REF4P..REF4N */
-+	if (rc)
-+		return rc;
-+
-+	/* Request frequency offset measurement */
-+	rc = zl3073x_write_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL,
-+			      ZL_REF_FREQ_MEAS_CTRL_REF_FREQ_OFF);
-+	if (rc)
-+		return rc;
-+
-+	/* Wait for finish */
-+	rc = zl3073x_poll_zero_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL,
-+				  ZL_REF_FREQ_MEAS_CTRL);
-+	if (rc)
-+		return rc;
-+
-+	/* Read DPLL-to-REFx frequency offset measurements */
-+	for (i = 0; i < ZL3073X_NUM_REFS; i++) {
-+		s32 value;
-+
-+		/* Read value stored in units of 2^-32 signed */
-+		rc = zl3073x_read_u32(zldev, ZL_REG_REF_FREQ(i), &value);
-+		if (rc)
-+			return rc;
-+
-+		/* Convert to ppm -> ffo = (10^6 * value) / 2^32 */
-+		zldev->ref[i].ffo = mul_s64_u64_shr(value, 1000000, 32);
-+	}
-+
-+	return 0;
-+}
-+
- static void
- zl3073x_dev_periodic_work(struct kthread_work *work)
- {
-@@ -734,6 +794,13 @@ zl3073x_dev_periodic_work(struct kthread_work *work)
- 		dev_warn(zldev->dev, "Failed to update phase offsets: %pe\n",
- 			 ERR_PTR(rc));
- 
-+	/* Update references' fractional frequency offsets */
-+	rc = zl3073x_ref_ffo_update(zldev);
-+	if (rc)
-+		dev_warn(zldev->dev,
-+			 "Failed to update fractional frequency offsets: %pe\n",
-+			 ERR_PTR(rc));
-+
- 	list_for_each_entry(zldpll, &zldev->dplls, list)
- 		zl3073x_dpll_changes_check(zldpll);
- 
-diff --git a/drivers/dpll/zl3073x/core.h b/drivers/dpll/zl3073x/core.h
-index 1a5edc4975735..71af2c8001109 100644
---- a/drivers/dpll/zl3073x/core.h
-+++ b/drivers/dpll/zl3073x/core.h
-@@ -30,10 +30,12 @@ struct zl3073x_dpll;
-  * struct zl3073x_ref - input reference invariant info
-  * @enabled: input reference is enabled or disabled
-  * @diff: true if input reference is differential
-+ * @ffo: current fractional frequency offset
-  */
- struct zl3073x_ref {
- 	bool	enabled;
- 	bool	diff;
-+	s64	ffo;
- };
- 
- /**
-@@ -170,6 +172,19 @@ zl3073x_output_pin_out_get(u8 id)
- 	return id / 2;
- }
- 
-+/**
-+ * zl3073x_ref_ffo_get - get current fractional frequency offset
-+ * @zldev: pointer to zl3073x device
-+ * @index: input reference index
-+ *
-+ * Return: the latest measured fractional frequency offset
-+ */
-+static inline s64
-+zl3073x_ref_ffo_get(struct zl3073x_dev *zldev, u8 index)
-+{
-+	return zldev->ref[index].ffo;
-+}
-+
- /**
-  * zl3073x_ref_is_diff - check if the given input reference is differential
-  * @zldev: pointer to zl3073x device
-diff --git a/drivers/dpll/zl3073x/dpll.c b/drivers/dpll/zl3073x/dpll.c
-index a63a3434da744..3e42e9e7fd272 100644
---- a/drivers/dpll/zl3073x/dpll.c
-+++ b/drivers/dpll/zl3073x/dpll.c
-@@ -37,6 +37,7 @@
-  * @esync_control: embedded sync is controllable
-  * @pin_state: last saved pin state
-  * @phase_offset: last saved pin phase offset
-+ * @freq_offset: last saved fractional frequency offset
-  */
- struct zl3073x_dpll_pin {
- 	struct list_head	list;
-@@ -50,6 +51,7 @@ struct zl3073x_dpll_pin {
- 	bool			esync_control;
- 	enum dpll_pin_state	pin_state;
- 	s64			phase_offset;
-+	s64			freq_offset;
- };
- 
- /*
-@@ -270,6 +272,18 @@ zl3073x_dpll_input_pin_esync_set(const struct dpll_pin *dpll_pin,
- 			     ZL_REG_REF_MB_MASK, BIT(ref));
- }
- 
-+static int
-+zl3073x_dpll_input_pin_ffo_get(const struct dpll_pin *dpll_pin, void *pin_priv,
-+			       const struct dpll_device *dpll, void *dpll_priv,
-+			       s64 *ffo, struct netlink_ext_ack *extack)
-+{
-+	struct zl3073x_dpll_pin *pin = pin_priv;
-+
-+	*ffo = pin->freq_offset;
-+
-+	return 0;
-+}
-+
- static int
- zl3073x_dpll_input_pin_frequency_get(const struct dpll_pin *dpll_pin,
- 				     void *pin_priv,
-@@ -1595,6 +1609,7 @@ static const struct dpll_pin_ops zl3073x_dpll_input_pin_ops = {
- 	.direction_get = zl3073x_dpll_pin_direction_get,
- 	.esync_get = zl3073x_dpll_input_pin_esync_get,
- 	.esync_set = zl3073x_dpll_input_pin_esync_set,
-+	.ffo_get = zl3073x_dpll_input_pin_ffo_get,
- 	.frequency_get = zl3073x_dpll_input_pin_frequency_get,
- 	.frequency_set = zl3073x_dpll_input_pin_frequency_set,
- 	.phase_offset_get = zl3073x_dpll_input_pin_phase_offset_get,
-@@ -2050,6 +2065,52 @@ zl3073x_dpll_pin_phase_offset_check(struct zl3073x_dpll_pin *pin)
- 	return false;
- }
- 
-+/**
-+ * zl3073x_dpll_pin_ffo_check - check for pin fractional frequency offset change
-+ * @pin: pin to check
-+ *
-+ * Check for the given pin's fractional frequency change.
-+ *
-+ * Return: true on fractional frequency offset change, false otherwise
-+ */
-+static bool
-+zl3073x_dpll_pin_ffo_check(struct zl3073x_dpll_pin *pin)
-+{
-+	struct zl3073x_dpll *zldpll = pin->dpll;
-+	struct zl3073x_dev *zldev = zldpll->dev;
-+	u8 ref, status;
-+	s64 ffo;
-+	int rc;
-+
-+	/* Get reference monitor status */
-+	ref = zl3073x_input_pin_ref_get(pin->id);
-+	rc = zl3073x_read_u8(zldev, ZL_REG_REF_MON_STATUS(ref), &status);
-+	if (rc) {
-+		dev_err(zldev->dev, "Failed to read %s refmon status: %pe\n",
-+			pin->label, ERR_PTR(rc));
-+
-+		return false;
-+	}
-+
-+	/* Do not report ffo changes if the reference monitor report errors */
-+	if (status != ZL_REF_MON_STATUS_OK)
-+		return false;
-+
-+	/* Get the latest measured ref's ffo */
-+	ffo = zl3073x_ref_ffo_get(zldev, ref);
-+
-+	/* Compare with previous value */
-+	if (pin->freq_offset != ffo) {
-+		dev_dbg(zldev->dev, "%s freq offset changed: %lld -> %lld\n",
-+			pin->label, pin->freq_offset, ffo);
-+		pin->freq_offset = ffo;
-+
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
- /**
-  * zl3073x_dpll_changes_check - check for changes and send notifications
-  * @zldpll: pointer to zl3073x_dpll structure
-@@ -2130,11 +2191,15 @@ zl3073x_dpll_changes_check(struct zl3073x_dpll *zldpll)
- 			pin_changed = true;
- 		}
- 
--		/* Check for phase offset change once per second */
--		if (zldpll->check_count % 2 == 0)
-+		/* Check for phase offset and ffo change once per second */
-+		if (zldpll->check_count % 2 == 0) {
- 			if (zl3073x_dpll_pin_phase_offset_check(pin))
- 				pin_changed = true;
- 
-+			if (zl3073x_dpll_pin_ffo_check(pin))
-+				pin_changed = true;
-+		}
-+
- 		if (pin_changed)
- 			dpll_pin_change_ntf(pin->dpll_pin);
- 	}
-diff --git a/drivers/dpll/zl3073x/regs.h b/drivers/dpll/zl3073x/regs.h
-index a382cd4a109f5..614e33128a5c9 100644
---- a/drivers/dpll/zl3073x/regs.h
-+++ b/drivers/dpll/zl3073x/regs.h
-@@ -94,6 +94,9 @@
- #define ZL_DPLL_REFSEL_STATUS_STATE		GENMASK(6, 4)
- #define ZL_DPLL_REFSEL_STATUS_STATE_LOCK	4
- 
-+#define ZL_REG_REF_FREQ(_idx)						\
-+	ZL_REG_IDX(_idx, 2, 0x44, 4, ZL3073X_NUM_REFS, 4)
-+
- /**********************
-  * Register Page 4, Ref
-  **********************/
-@@ -101,6 +104,22 @@
- #define ZL_REG_REF_PHASE_ERR_READ_RQST		ZL_REG(4, 0x0f, 1)
- #define ZL_REF_PHASE_ERR_READ_RQST_RD		BIT(0)
- 
-+#define ZL_REG_REF_FREQ_MEAS_CTRL		ZL_REG(4, 0x1c, 1)
-+#define ZL_REF_FREQ_MEAS_CTRL			GENMASK(1, 0)
-+#define ZL_REF_FREQ_MEAS_CTRL_REF_FREQ		1
-+#define ZL_REF_FREQ_MEAS_CTRL_REF_FREQ_OFF	2
-+#define ZL_REF_FREQ_MEAS_CTRL_DPLL_FREQ_OFF	3
-+
-+#define ZL_REG_REF_FREQ_MEAS_MASK_3_0		ZL_REG(4, 0x1d, 1)
-+#define ZL_REF_FREQ_MEAS_MASK_3_0(_ref)		BIT(_ref)
-+
-+#define ZL_REG_REF_FREQ_MEAS_MASK_4		ZL_REG(4, 0x1e, 1)
-+#define ZL_REF_FREQ_MEAS_MASK_4(_ref)		BIT((_ref) - 8)
-+
-+#define ZL_REG_DPLL_MEAS_REF_FREQ_CTRL		ZL_REG(4, 0x1f, 1)
-+#define ZL_DPLL_MEAS_REF_FREQ_CTRL_EN		BIT(0)
-+#define ZL_DPLL_MEAS_REF_FREQ_CTRL_IDX		GENMASK(6, 4)
-+
- #define ZL_REG_REF_PHASE(_idx)						\
- 	ZL_REG_IDX(_idx, 4, 0x20, 6, ZL3073X_NUM_REFS, 6)
- 
--- 
-2.49.1
+[root@fedora packetdrill]# uname -r
+6.16.0-rc5-01431-g75dff0584cce
+[root@fedora packetdrill]# ./ksft_runner.sh tcp_rcv_big_endseq.pkt
+TAP version 13
+1..2
+ok 1 ipv4
+ok 2 ipv6
+# Totals: pass:2 fail:0 xfail:0 xpass:0 skip:0 error:0
 
+[root@fedora packetdrill]# uname -r
+6.16.0-rc5-01432-g1d2fbaad7cd8
+[root@fedora packetdrill]# ./ksft_runner.sh tcp_rcv_big_endseq.pkt
+TAP version 13
+1..2
+tcp_rcv_big_endseq.pkt:41: error handling packet: timing error:
+expected outbound packet at 1.148682 sec but happened at 1.108681 sec;
+tolerance 0.005005 sec
+script packet:  1.148682 . 1:1(0) ack 54001 win 0
+actual packet:  1.108681 . 1:1(0) ack 54001 win 0
+not ok 1 ipv4
+tcp_rcv_big_endseq.pkt:41: error handling packet: timing error:
+expected outbound packet at 1.146130 sec but happened at 1.106130 sec;
+tolerance 0.005005 sec
+script packet:  1.146130 . 1:1(0) ack 54001 win 0
+actual packet:  1.106130 . 1:1(0) ack 54001 win 0
+not ok 2 ipv6
+# Totals: pass:0 fail:2 xfail:0 xpass:0 skip:0 error:0
+
+
+On 75dff0584cce, the test failed if I removed the delay.
+I haven't checked where it comes from, but probably that's
+why Eric added the delay ?
+
+[root@fedora packetdrill]# ./ksft_runner.sh tcp_rcv_big_endseq.pkt
+TAP version 13
+1..2
+tcp_rcv_big_endseq.pkt:41: error handling packet: timing error:
+expected outbound packet at 1.105941 sec but happened at 1.146774 sec;
+tolerance 0.004000 sec
+script packet:  1.105941 . 1:1(0) ack 54001 win 0
+actual packet:  1.146774 . 1:1(0) ack 54001 win 0
+not ok 1 ipv4
+tcp_rcv_big_endseq.pkt:41: error handling packet: timing error:
+expected outbound packet at 1.106215 sec but happened at 1.146815 sec;
+tolerance 0.004000 sec
+script packet:  1.106215 . 1:1(0) ack 54001 win 0
+actual packet:  1.146815 . 1:1(0) ack 54001 win 0
+
+not ok 2 ipv6
+# Totals: pass:0 fail:2 xfail:0 xpass:0 skip:0 error:0
 
