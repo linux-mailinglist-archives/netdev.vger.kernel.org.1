@@ -1,121 +1,122 @@
-Return-Path: <netdev+bounces-207146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ACF3B05F84
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 16:06:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57EDFB05FCF
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 16:09:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1AC53A64A2
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 14:00:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 554F14A2150
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 14:00:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B66D2E611E;
-	Tue, 15 Jul 2025 13:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gw5yogSB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF34E2EAB61;
+	Tue, 15 Jul 2025 13:50:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6959C2E6106
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 13:50:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 130642E6136;
+	Tue, 15 Jul 2025 13:50:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752587415; cv=none; b=CAIhky3gXeduJpC5QvI5womGWLTJabDGT+Sz6+ruhzI5aZ36RMIg4gOIL09Ba2mDFLDVr3YEq5z/7LfPron0y93jeio+jRuge9r4EawTHfdTkTZOXl0jOhKT/vs8wRwuThV1c/5+X12OccSjYUo8LFLfZWXastMaNhDE27NYK7I=
+	t=1752587422; cv=none; b=nSQeM90gmr8QzB2fDyUsA9rujAhSCM7Zs7TDyXu+fn427s7CBNnpQrZ+Zco/f+HyQuzhoEueH2jaAYqu+p5ZEtOnjiOvkRD5i00vfDSjhd+B9mg73Kvtwm4s4v6nW8zCfPo0PzCqzUdWt3wUCzsE7Rha2EVszw0cLnKnaFWcpE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752587415; c=relaxed/simple;
-	bh=P+Ag3CpHVYqC0PMxRCTmPq9+gOsuc36KZLKWUlmgvPE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H1TfswOigw+LxU0BdAMpcJp+rgTcAus/whBFHGiZVwtkjZiXb0ruRQ6h9+l2Tcmk6ygOyw+x1as/5bJ8pOTzH48VjaGP7LSpqif2pvu/bE6NkczjzDVj/wpI1knNzCSNqgn20DnuRjMIfT74b4JDmr3iLM7QbRF0DnTJAkKxGzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Gw5yogSB; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752587413;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1/5Kal+h1ZC7VqPLjnC3GHu/uLr/x1AdCe10DVQDPRA=;
-	b=Gw5yogSBtoxqax61XevprNRUOUnylUYyFieEFHel3KRE/cbVfVQ15bRGt5ZzV5Mrx9gVGV
-	49YDwscqmtpGfsJ50SW1cBszpjx30KAEiNle4XgAJHMxQIShkZUPjb90CwDuLN7jlCK+1D
-	uQGzCQ9DyLieXBKU7iqLdECM9tQAo/I=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-57-35UKzNeRMqmYrMNeWE8fUw-1; Tue, 15 Jul 2025 09:50:12 -0400
-X-MC-Unique: 35UKzNeRMqmYrMNeWE8fUw-1
-X-Mimecast-MFC-AGG-ID: 35UKzNeRMqmYrMNeWE8fUw_1752587411
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4538f375e86so46485705e9.3
-        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 06:50:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752587411; x=1753192211;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1/5Kal+h1ZC7VqPLjnC3GHu/uLr/x1AdCe10DVQDPRA=;
-        b=VrkLv8W7xoLeknkOMs1k/jRj0pHAy0gZ4WTLlujl5btu+MENjQrVa/JrTA7Nq7sXFf
-         fnK/7HyT+i3Do/76L0Xhq0o3c+hAZU7Q9KOfq0pt/3whve493J8wMDa7BmHyE2D1odea
-         XgcOMxmhDSVVyGEBX0divJFKQNwiCqV7YRe/E9YzpcSmTjvu6qlHuF3Ej6a5XRf98aCi
-         Ki0x+9VEMXhc4bYp7eWlNDUFlGcQT5V/Q9jng3TaPeK+qzzE0YD66MyawtkDR+seW+Y3
-         KWsQOFeoXvfxRvY/BWKT/4Z8t37+GZAz67sq4jAZWOl+pqbTI1F53fxhnpdBoS0Ut8hh
-         S8HA==
-X-Forwarded-Encrypted: i=1; AJvYcCWCiHbhwkcJGU3PcIr/1DfoJdhFQkTCbeCI/6rA3kbRGzCsyEIIfePQEWYRc3lVEugqLFv0JjI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNsd/zPTqlB7q93gvWBHwmTEHNufoHfbp8Sb1wOM3PuhrbH+2y
-	Y3iP00QJjVV1IftBcqXWrQ7W6HzamIwEQ0/JUHRyBqqVfL4A43EGX2i/qLYbHrf+z0sxvwyLgv2
-	JY0PXMJBFEPm1equ/fFNnY/9mHkF/xFA5ik+OA1e3Kqm/LTNBU+DvJHjRZw==
-X-Gm-Gg: ASbGncsaDtvd+Tns6JOFR0gb98KGAxsKsQNTuzUo1ewkNFaBAwVpjNpJrlCZ0Xs38l1
-	BXHND1lhJYxlrVrIf2lNPWgzoE43k17aaLOKCHtUuvMe9mq8mqq1IqbAsXNkA3aynr8znUwAbhQ
-	86asg8uR0LCN3yx4fvROJsYsbQxF38kV4Kyn779M4ttf8CjabreRnGuSZ1sTkuvpbGpvV5PsvAV
-	flHGo72UILmfkKFOqoA06gOt7GpG3AlibeQok3+/1Bsg+X7lUr+K8Kfv9MbC7WBwT/0BfHy5wyy
-	yqBwi/ybnKeyZVivrcwIXehFktkcBct6oWxYIZqaAF8cO5VShnkpDsczCz6fS5uOhALZhkfCrtq
-	ZWhp3k2463K8=
-X-Received: by 2002:a05:600c:4e8f:b0:456:2397:817 with SMTP id 5b1f17b1804b1-456272ed401mr28017355e9.13.1752587410758;
-        Tue, 15 Jul 2025 06:50:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFeYqh+g4OaKXu3+Ri9RxoMt8ajuVKOqr/6JFiWdn+XUDnVSlmGlftemTzOj4dY5B0ex62u9Q==
-X-Received: by 2002:a05:600c:4e8f:b0:456:2397:817 with SMTP id 5b1f17b1804b1-456272ed401mr28016895e9.13.1752587410340;
-        Tue, 15 Jul 2025 06:50:10 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8dc1de0sm15031492f8f.24.2025.07.15.06.50.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Jul 2025 06:50:09 -0700 (PDT)
-Message-ID: <bd47870b-e266-4b1b-a806-b8db1b06e1d4@redhat.com>
-Date: Tue, 15 Jul 2025 15:50:08 +0200
+	s=arc-20240116; t=1752587422; c=relaxed/simple;
+	bh=+0PGXrsSAKe+iUuwlrADb2v3BmRkBV8/GR6xTlwwAMo=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=U/i9oZ8kA3RpLFZSkTm21BRt4negqC3pKfBOvQTOqx9kOzdlDRSUdi6WKUkuyfQm2E2mBtudUcwhUqf0UrlhU+LujNTYqdDs/M1SjfGlF6WWC4BFRCgPqHQIW/hAyaE5LISy/MWwzgAwi8XPzLWD399i59BWUSmxWDVRn+D0qaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bhL874BTNz6L4wL;
+	Tue, 15 Jul 2025 21:46:47 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 7F934140446;
+	Tue, 15 Jul 2025 21:50:17 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 15 Jul
+ 2025 15:50:15 +0200
+Date: Tue, 15 Jul 2025 14:50:14 +0100
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: WangYuli <wangyuli@uniontech.com>
+CC: <airlied@gmail.com>, <akpm@linux-foundation.org>,
+	<alison.schofield@intel.com>, <andrew+netdev@lunn.ch>,
+	<andriy.shevchenko@linux.intel.com>, <arend.vanspriel@broadcom.com>,
+	<bp@alien8.de>, <brcm80211-dev-list.pdl@broadcom.com>,
+	<brcm80211@lists.linux.dev>, <colin.i.king@gmail.com>, <cvam0000@gmail.com>,
+	<dan.j.williams@intel.com>, <dave.hansen@linux.intel.com>,
+	<dave.jiang@intel.com>, <dave@stgolabs.net>, <davem@davemloft.net>,
+	<dri-devel@lists.freedesktop.org>, <edumazet@google.com>,
+	<gregkh@linuxfoundation.org>, <guanwentao@uniontech.com>, <hpa@zytor.com>,
+	<ilpo.jarvinen@linux.intel.com>, <intel-xe@lists.freedesktop.org>,
+	<ira.weiny@intel.com>, <j@jannau.net>, <jeff.johnson@oss.qualcomm.com>,
+	<jgross@suse.com>, <jirislaby@kernel.org>, <johannes.berg@intel.com>,
+	<kuba@kernel.org>, <kvalo@kernel.org>, <kvm@vger.kernel.org>,
+	<linux-cxl@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-serial@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
+	<linux@treblig.org>, <lucas.demarchi@intel.com>, <marcin.s.wojtas@gmail.com>,
+	<ming.li@zohomail.com>, <mingo@kernel.org>, <mingo@redhat.com>,
+	<netdev@vger.kernel.org>, <niecheng1@uniontech.com>,
+	<oleksandr_tyshchenko@epam.com>, <pabeni@redhat.com>, <pbonzini@redhat.com>,
+	<quic_ramess@quicinc.com>, <ragazenta@gmail.com>, <rodrigo.vivi@intel.com>,
+	<seanjc@google.com>, <shenlichuan@vivo.com>, <simona@ffwll.ch>,
+	<sstabellini@kernel.org>, <tglx@linutronix.de>,
+	<thomas.hellstrom@linux.intel.com>, <vishal.l.verma@intel.com>,
+	<x86@kernel.org>, <xen-devel@lists.xenproject.org>, <yujiaoliang@vivo.com>,
+	<zhanjun@uniontech.com>
+Subject: Re: [PATCH v2 8/8] scripts/spelling.txt: Add notifer||notifier to
+ spelling.txt
+Message-ID: <20250715145014.000075ec@huawei.com>
+In-Reply-To: <A205796B545C4241+20250715134407.540483-8-wangyuli@uniontech.com>
+References: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
+	<A205796B545C4241+20250715134407.540483-8-wangyuli@uniontech.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/8] tcp: receiver changes
-To: Jakub Kicinski <kuba@kernel.org>, Neal Cardwell <ncardwell@google.com>
-Cc: Matthieu Baerts <matttbe@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
- Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com, "David S . Miller" <davem@davemloft.net>
-References: <20250711114006.480026-1-edumazet@google.com>
- <a7a89aa2-7354-42c7-8219-99a3cafd3b33@redhat.com>
- <d0fea525-5488-48b7-9f88-f6892b5954bf@kernel.org>
- <6a599379-1eb5-41c2-84fc-eb6fde36d3ba@redhat.com>
- <20250715062829.0408857d@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250715062829.0408857d@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-On 7/15/25 3:28 PM, Jakub Kicinski wrote:
-> On Tue, 15 Jul 2025 12:14:34 +0200 Paolo Abeni wrote:
->>> Eventually, because the failure is due to a poll timed out, and other
->>> unrelated tests have failed at that time too, could it be due to
->>> overloaded test machines?  
->>
->> Not for a 60s timeout, I guess :-P
+On Tue, 15 Jul 2025 21:44:07 +0800
+WangYuli <wangyuli@uniontech.com> wrote:
 
-FTR, the above was referred to the mptcp selftest failure/timeout.
+> This typo was not listed in scripts/spelling.txt, thus it was more
+> difficult to detect. Add it for convenience.
+> 
+> Link: https://lore.kernel.org/all/B3C019B63C93846F+20250715071245.398846-1-wangyuli@uniontech.com/
 
-/P
+Adding a link tag to your own previous patch doesn't seem particularly
+useful as something to end up in the git log (which depending on
+maintainer preference may gain a link tag to this version).
+
+> Signed-off-by: WangYuli <wangyuli@uniontech.com>
+other than that, LGTM
+
+Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+
+> ---
+>  scripts/spelling.txt | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/scripts/spelling.txt b/scripts/spelling.txt
+> index c9a6df5be281..d824c4b17390 100644
+> --- a/scripts/spelling.txt
+> +++ b/scripts/spelling.txt
+> @@ -1099,6 +1099,7 @@ notication||notification
+>  notications||notifications
+>  notifcations||notifications
+>  notifed||notified
+> +notifer||notifier
+>  notity||notify
+>  notfify||notify
+>  nubmer||number
 
 
