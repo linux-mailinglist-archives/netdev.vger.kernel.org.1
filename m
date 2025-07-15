@@ -1,112 +1,83 @@
-Return-Path: <netdev+bounces-207276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90AF0B06852
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 23:06:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 035F0B06881
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 23:24:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE35F567E97
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 21:06:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C9767A4AEE
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 21:22:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C47A2C15AC;
-	Tue, 15 Jul 2025 21:06:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6A6F273802;
+	Tue, 15 Jul 2025 21:24:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LiRHJ9Zh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IjOteLk8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3696B2BEFF2;
-	Tue, 15 Jul 2025 21:06:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2146972634
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 21:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752613576; cv=none; b=bkAEs1+8uUckgPLb5MDh/UDHvawk98sEaFbU4tq01Px0c0I1pwNOCEvq5SnnVteU0oEh/btp6HJZ2yP9K6RJXv+OGrj3zto+Nla4vil/S0bPzQBEkV1PNw1IAgUaXRn301gchAqLQjYKh1EaiRn1rSfKJ2L2tnyWK+fdPzu/RT0=
+	t=1752614658; cv=none; b=W/XArxp1dRKUmsXe5Z/KB4jPrzL4eARBmCQTi8A0O9GToSpx1gV94j8iK3vrxzEqY0h8egu6Sp8xlArygn5bADpra7tN/Y0GvH1kQt/OII+s2SxQgZJovl0+IfxHzO1e86M3lUE78ZTPCL8dyTA+gMW/UCxWjtZW0nkyiWk/KwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752613576; c=relaxed/simple;
-	bh=B0uDFBWhMLiOQt1P0y4cEBhweDPEM6JqqckSMNeXITE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qOuXC8OY1O0CydcuRvsskuOpMrYCb7YXPpjYx5HmEbB2MekG/+H9nwoRR0QgK8DGySxvWRaDQf37HqDXoHuBa31SBS6iu8VyIQ6XgDN2NwP0qxKDwZaXpKv4HbI+jQllfSV1CLJrZJmBG3AbuExaqvk6W5jPHbTmYg2wr/5niH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LiRHJ9Zh; arc=none smtp.client-ip=209.85.128.49
+	s=arc-20240116; t=1752614658; c=relaxed/simple;
+	bh=7D1ahHGaAl/v7MnAd6dMClc0h+Fp8VG1amzlESU5O0g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=arz1GZjzRet9cmxBU4CThGBBELxtNgygMK3nd6JBJL98MBzJX/NYxcWyyFZzKzOxROImvv53c6ZXewXWPlNrIe+awsWTaVJSNuriaJGMCm6H3fDF0e8yTF6X/aG0RCW+Ej9Lkyz8zjVR/ATotZH7eHdbAWBMMBVARBQ6vuoFlmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IjOteLk8; arc=none smtp.client-ip=209.85.167.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-455fdfb5d04so20959785e9.2;
-        Tue, 15 Jul 2025 14:06:13 -0700 (PDT)
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-41b6561d3b7so795912b6e.1
+        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 14:24:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752613572; x=1753218372; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FNTSorGhe9i+sp8Ybr0CDpGpLTbKDEyQzBf6s4Xcw/U=;
-        b=LiRHJ9ZhQy1NptjK2quUsPBRknXF6ctGjDBnuIhKs9ihVo4UK7QYRn4WvWFFqGoPSm
-         AM40rCfUy1rNjLLnJV8oC7YqT3bZ9f6F62Y4iwnekrrTLR3oMlQxQrGF3FIE3+ssutvy
-         yOFazz4+RAxddXmMGqEK82mjUUAp6fDrY+BEqyrky4NnhTx9ST0U9IYIxi/bjdKw+crM
-         uueJyOwkyN0p5rDHwt8KFB9zFLAwFu2E9N8yOO3qwJi/oMqwZO2a+yyUto/fiHvudFF/
-         lfsjPonE+N+f4cacRQMO203Ml/Liyl3G+IzoquBf7Fc7JTiVw1pAjD9dSSWvXDEK6z9b
-         7haQ==
+        d=gmail.com; s=20230601; t=1752614656; x=1753219456; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=y/tQoEIqJKl/dL9+V9+OzIl4u+yt/F14Qbh9khLLPFo=;
+        b=IjOteLk8/qmEiJPouf90dbVj+yio3AngiJ5HF2KfUoQYjNYUjDcLiKLqdxqwF+Sbvo
+         SmV2omvoo4UQ7EcI7CgYQYPcE5zS43Tp0QQt4LqhOisJu8YLUqBk3htjQ3ZrNyuRbOnF
+         cRx6M7tfw5renf78Rmft2NxjbwMA9JMenkR01w7TGXrv1sAEUhFtmDYJFfzqPC5m4cRF
+         jwjZXdS/BkkHTN6w2RBgGfpMZvH5zh/iz/z1QGnrC+1PFXCHycwLAStvZ6WAhVV7o6tO
+         uzJR1KLSyvMiVpMdQiFte+f4mTOxcNVNpiQyQj5Bo6pIu+G6kXFzdCyskVqiwmqipcid
+         Cp2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752613572; x=1753218372;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FNTSorGhe9i+sp8Ybr0CDpGpLTbKDEyQzBf6s4Xcw/U=;
-        b=SvjQdkIE49V+rpHIOoZ5AaJ+4nfr1O47GtBdyARJavsXiMoiKO0JnIoH3Khm3RqRSj
-         dNUAQHqAvC6+ZHuG1oGCsc9QzIZHx/SSNU0Z+yqfCRClcW2vINJKGuYBnwS0ZJUobI7E
-         CBeP/rsWlbhXYTXKEd9G+thhy3emcX/9f7CsBxVq2bbtDHtxoYVqATbwFJ51yhFq3JKs
-         7bHConyq3OCSiTQYr1/9w1/sVyPNX0pN6uSvb+h+KS2QlPSRIDCu+W9VfmiXaDaMylK+
-         ZBtoH+KST6izGQijFHd0nQAYuMWOYrNksHzDHCxuZq4S47qzNxKG46nAmrWjfLUtAwnU
-         dKGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW7gKWVDOVTK6uHvaWTt/t4p/HSeLqmdAiIBTTVSZUIVXsLr8A8ovboN1sTLB0QxbLTbzdKa31L/1GbGe2Yafwg@vger.kernel.org, AJvYcCXwmjzWiZw2y8PBlnKTHstgyS4wShakgEgoHaeiRZaND2Fb7khD/86Gm4E0uDHBd4Bg8mQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPDsqXD3iuPjJhpBm+r2mRK/lS/NCkT5Bax8ZxEWt0YVwVVKsD
-	F45+xJbNbzn74y0FVa4KZqQQz++F1npe+1uVi9iUibFogwVWwnq9UGEXHBexD2Xh
-X-Gm-Gg: ASbGncuuFMNv+pFr/Od35u3ez/3Fc+cXJccoaxH9s3BDK26Zg43nHF25PPS6hzn4oCw
-	BZOEb8uAWgC3ZvCbNf3ahHVciMT4VNs5CamPfxrEklxKjGByJuCYiT2//QignIXBgLGYC9RmIuD
-	yCjaBiTQpifXdjFz7ReUbcBsNUbtNOC6CSLJWo8ohy/FTpW2WnEwvg35/eU5cYWbdw4LVvrQ3Y1
-	UH4+sOXRMofTiVK+IVFV1EBepR9Tt6NIiw8Vu0ytVPZDOdkXJO/fr6omnowBVZ8MWxFMohNEKJm
-	VdtzYuVKl0RT+KSc4hAdHeZ/CjkIm+bFquUQF0peCE0zbpcQEZLw3UmXIfoQsQWBLYcarOsFKs9
-	yHzPnn7H3O2J8EnNgHfSH
-X-Google-Smtp-Source: AGHT+IENKG0UWtpE51WYWxJAYKTSoxDD9/ai4pcRD0fYyFp4WAqVt00bcvLB0au2k2kXM7i92d3V9w==
-X-Received: by 2002:a05:600c:1c10:b0:456:1b6b:daaa with SMTP id 5b1f17b1804b1-4562e041759mr3129435e9.29.1752613571969;
-        Tue, 15 Jul 2025 14:06:11 -0700 (PDT)
-Received: from localhost ([2a03:2880:31ff:40::])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4562e886113sm1051595e9.23.2025.07.15.14.06.11
+        d=1e100.net; s=20230601; t=1752614656; x=1753219456;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=y/tQoEIqJKl/dL9+V9+OzIl4u+yt/F14Qbh9khLLPFo=;
+        b=vTpxJphN3EXDfccJH1gFZ3JebEFWQmgzzCQsPNbVCvhqHQ8lWzgaEfR178ODpMd66W
+         N+lnO5jBhHJfjNETlNKBnIUjbj/7yew24WJ/Ff0uYfH/3iaGRL/g5i/VxmEvfWiqkxGJ
+         Sq3eNhtlZbde2UP7zok0grJ7k49C6waqFHvZ5hNnfTGLvDHw7RprA7CiJu29b/Phhy28
+         Sm359QECOGOuXam1Wz3a1bt/7R35QjJxkw9rCEHsGYcyBEXBgn98Fgoj16tzo5yHIpnV
+         gKGehGofhADx1lPpeR9uLdVrp6I+khaYl0kR1LeMEhX1cbZW5zsL80/pZzSm+IQlRXR5
+         6MrA==
+X-Gm-Message-State: AOJu0YxW7xWkUoaAD7pbgtAs+Bi8O/mQmxpEzpwxggcMiVNejFrzcoBa
+	B9hT9zCKwZpFjXz3ABKDfgn5ebN/CfqD6M9GGRq4UCe+qnEfJWmI8GJloDiyXjuR
+X-Gm-Gg: ASbGncv/tNJj/0ygpR5x04NPuwJe39zXaXvMT/uDMXSFMV/Kp8iGlupHRIMPOWxTvaS
+	hdiSthsdkM4YwaYfmkZcBRd6/aPDKVp/WobbQoi/KBQQCAwmRurqIFnpoqa/peMbz6tWeRroyGT
+	QYc08g1EB7IBivzxUZa1qcsT+y/hgmApMgw5p+mmSH8FY4zgikxdI3GKxx/7eMQfXonLy+U7vmF
+	7r7fDnyZ66vsHyZzuaVW8BBOWfdyauCok0/CkQNBdkXmn3/SMdNDWZwrOUkSjewjHXea90/xguo
+	tjmsQ/2pSkDDb5yKoaaxuHBRZrFkVrhEpUnCLNLd0G5xFPtu+glX0a7uwsGfODgdq+UWRp+7fHn
+	zfCz7PrpsRxb5J0n1oQeOHcM=
+X-Google-Smtp-Source: AGHT+IH7Lud7U1UhJTVoV1HxLqVKLXo1WL9RmVQRqah7djxBe2n/AbbORnqZ7XSgFF7Wwvi0Fj9hGQ==
+X-Received: by 2002:a05:6808:508b:b0:40b:1588:e005 with SMTP id 5614622812f47-41d037e362bmr250172b6e.10.1752614655618;
+        Tue, 15 Jul 2025 14:24:15 -0700 (PDT)
+Received: from localhost ([2a03:2880:11ff:8::])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-4141c1ac4f9sm2331700b6e.37.2025.07.15.14.24.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Jul 2025 14:06:11 -0700 (PDT)
-From: Mohsin Bashir <mohsin.bashr@gmail.com>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	horms@kernel.org,
-	cratiu@nvidia.com,
-	noren@nvidia.com,
-	cjubran@nvidia.com,
-	mbloch@nvidia.com,
-	mohsin.bashr@gmail.com,
-	jdamato@fastly.com,
-	gal@nvidia.com,
-	sdf@fomichev.me,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	nathan@kernel.org,
-	nick.desaulniers+lkml@gmail.com,
-	morbo@google.com,
-	justinstitt@google.com,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: [PATCH net-next V5 5/5] selftests: drv-net: Test head-adjustment support
-Date: Tue, 15 Jul 2025 14:05:53 -0700
-Message-ID: <20250715210553.1568963-6-mohsin.bashr@gmail.com>
+        Tue, 15 Jul 2025 14:24:15 -0700 (PDT)
+From: Tianyi Cui <1997cui@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: Tianyi Cui <1997cui@gmail.com>
+Subject: [PATCH net-next] selftests/drivers/net: Support ipv6 for napi_id test
+Date: Tue, 15 Jul 2025 14:23:05 -0700
+Message-ID: <20250715212349.2308385-1-1997cui@gmail.com>
 X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250715210553.1568963-1-mohsin.bashr@gmail.com>
-References: <20250715210553.1568963-1-mohsin.bashr@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -115,414 +86,117 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add test to validate the headroom adjustment support for both extension
-and the shrinking cases. For the extension part, eat up space from
-the start of payload data whereas, for the shrinking part, populate
-the newly available space with a tag. In the user-space, validate that a
-test string is manipulated accordingly.
+Add support for IPv6 environment for napi_id test.
 
-./drivers/net/xdp.py
-TAP version 13
-1..9
-ok 1 xdp.test_xdp_native_pass_sb
-ok 2 xdp.test_xdp_native_pass_mb
-ok 3 xdp.test_xdp_native_drop_sb
-ok 4 xdp.test_xdp_native_drop_mb
-ok 5 xdp.test_xdp_native_tx_mb
-\# Failed run: pkt_sz 2048, ... offset -256. Reason: Adjustment failed
-ok 6 xdp.test_xdp_native_adjst_tail_grow_data
-ok 7 xdp.test_xdp_native_adjst_tail_shrnk_data
-\# Failed run: pkt_sz 512, ... offset -128. Reason: Adjustment failed
-ok 8 xdp.test_xdp_native_adjst_head_grow_data
-\# Failed run: pkt_sz (2048) > HDS threshold (1536) and offset 64 > 48
-ok 9 xdp.test_xdp_native_adjst_head_shrnk_data
-\# Totals: pass:9 fail:0 xfail:0 xpass:0 skip:0 error:0
+Test Plan:
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
+    ./run_kselftest.sh -t drivers/net:napi_id.py
+    TAP version 13
+    1..1
+    # timeout set to 45
+    # selftests: drivers/net: napi_id.py
+    # TAP version 13
+    # 1..1
+    # ok 1 napi_id.test_napi_id
+    # # Totals: pass:1 fail:0 xfail:0 xpass:0 skip:0 error:0
+    ok 1 selftests: drivers/net: napi_id.py
+
+Signed-off-by: Tianyi Cui <1997cui@gmail.com>
 ---
- tools/testing/selftests/drivers/net/xdp.py    | 147 ++++++++++++++-
- .../selftests/net/lib/xdp_native.bpf.c        | 167 ++++++++++++++++++
- 2 files changed, 313 insertions(+), 1 deletion(-)
+ .../testing/selftests/drivers/net/napi_id.py  |  5 +--
+ .../selftests/drivers/net/napi_id_helper.c    | 35 ++++++++++++++-----
+ 2 files changed, 29 insertions(+), 11 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/xdp.py b/tools/testing/selftests/drivers/net/xdp.py
-index 8d80f6860b8b..89c70daa3e69 100755
---- a/tools/testing/selftests/drivers/net/xdp.py
-+++ b/tools/testing/selftests/drivers/net/xdp.py
-@@ -12,7 +12,7 @@ from dataclasses import dataclass
- from enum import Enum
+diff --git a/tools/testing/selftests/drivers/net/napi_id.py b/tools/testing/selftests/drivers/net/napi_id.py
+index 356bac46ba04..4382a99c3756 100755
+--- a/tools/testing/selftests/drivers/net/napi_id.py
++++ b/tools/testing/selftests/drivers/net/napi_id.py
+@@ -7,10 +7,11 @@ from lib.py import bkg, cmd, rand_port, NetNSEnter
  
- from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_ne, ksft_pr
--from lib.py import KsftFailEx, NetDrvEpEnv
-+from lib.py import KsftFailEx, NetDrvEpEnv, EthtoolFamily, NlError
- from lib.py import bkg, cmd, rand_port
- from lib.py import ip, bpftool, defer
+ def test_napi_id(cfg) -> None:
+     port = rand_port()
+-    listen_cmd = f"{cfg.test_dir}/napi_id_helper {cfg.addr_v['4']} {port}"
++    listen_addr = cfg.addr_v['6'] if cfg.addr_v["6"] else cfg.addr_v["4"]
++    listen_cmd = f"{cfg.test_dir}/napi_id_helper {listen_addr} {port}"
  
-@@ -31,6 +31,7 @@ class XDPAction(Enum):
-     DROP = 1  # Drop the packet
-     TX = 2    # Route the packet to the remote host
-     TAIL_ADJST = 3  # Adjust the tail of the packet
-+    HEAD_ADJST = 4  # Adjust the head of the packet
+     with bkg(listen_cmd, ksft_wait=3) as server:
+-        cmd(f"echo a | socat - TCP:{cfg.addr_v['4']}:{port}", host=cfg.remote, shell=True)
++        cmd(f"echo a | socat - TCP:{cfg.baddr}:{port}", host=cfg.remote, shell=True)
  
+     ksft_eq(0, server.ret)
  
- class XDPStats(Enum):
-@@ -483,6 +484,147 @@ def test_xdp_native_adjst_tail_shrnk_data(cfg):
-     _validate_res(res, offset_lst, pkt_sz_lst)
+diff --git a/tools/testing/selftests/drivers/net/napi_id_helper.c b/tools/testing/selftests/drivers/net/napi_id_helper.c
+index eecd610c2109..7f49ca6c8637 100644
+--- a/tools/testing/selftests/drivers/net/napi_id_helper.c
++++ b/tools/testing/selftests/drivers/net/napi_id_helper.c
+@@ -7,41 +7,58 @@
+ #include <unistd.h>
+ #include <arpa/inet.h>
+ #include <sys/socket.h>
++#include <netdb.h>
  
+ #include "../../net/lib/ksft.h"
  
-+def get_hds_thresh(cfg):
-+    """
-+    Retrieves the header data split (HDS) threshold for a network interface.
-+
-+    Args:
-+        cfg: Configuration object containing network settings.
-+
-+    Returns:
-+        The HDS threshold value. If the threshold is not supported or an error occurs,
-+        a default value of 1500 is returned.
-+    """
-+    netnl = cfg.netnl
-+    hds_thresh = 1500
-+
-+    try:
-+        rings = netnl.rings_get({'header': {'dev-index': cfg.ifindex}})
-+        if 'hds-thresh' not in rings:
-+            ksft_pr(f'hds-thresh not supported. Using default: {hds_thresh}')
-+            return hds_thresh
-+        hds_thresh = rings['hds-thresh']
-+    except NlError as e:
-+        ksft_pr(f"Failed to get rings: {e}. Using default: {hds_thresh}")
-+
-+    return hds_thresh
-+
-+
-+def _test_xdp_native_head_adjst(cfg, prog, pkt_sz_lst, offset_lst):
-+    """
-+    Tests the XDP head adjustment action for a multi-buffer case.
-+
-+    Args:
-+        cfg: Configuration object containing network settings.
-+        netnl: Network namespace or link object (not used in this function).
-+
-+    This function sets up the packet size and offset lists, then performs
-+    the head adjustment test by sending and receiving UDP packets.
-+    """
-+    cfg.require_cmd("socat", remote=True)
-+
-+    prog_info = _load_xdp_prog(cfg, BPFProgInfo(prog, "xdp_native.bpf.o", "xdp.frags", 9000))
-+    port = rand_port()
-+
-+    _set_xdp_map("map_xdp_setup", TestConfig.MODE.value, XDPAction.HEAD_ADJST.value)
-+    _set_xdp_map("map_xdp_setup", TestConfig.PORT.value, port)
-+
-+    hds_thresh = get_hds_thresh(cfg)
-+    for offset in offset_lst:
-+        for pkt_sz in pkt_sz_lst:
-+            # The "head" buffer must contain at least the Ethernet header
-+            # after we eat into it. We send large-enough packets, but if HDS
-+            # is enabled head will only contain headers. Don't try to eat
-+            # more than 28 bytes (UDPv4 + eth hdr left: (14 + 20 + 8) - 14)
-+            l2_cut_off = 28 if cfg.addr_ipver == 4 else 48
-+            if pkt_sz > hds_thresh and offset > l2_cut_off:
-+                ksft_pr(
-+                f"Failed run: pkt_sz ({pkt_sz}) > HDS threshold ({hds_thresh}) and "
-+                f"offset {offset} > {l2_cut_off}"
-+                )
-+                return {"status": "pass"}
-+
-+            test_str = ''.join(random.choice(string.ascii_lowercase) for _ in range(pkt_sz))
-+            tag = format(random.randint(65, 90), '02x')
-+
-+            _set_xdp_map("map_xdp_setup",
-+                     TestConfig.ADJST_OFFSET.value,
-+                     offset)
-+            _set_xdp_map("map_xdp_setup", TestConfig.ADJST_TAG.value, int(tag, 16))
-+            _set_xdp_map("map_xdp_setup", TestConfig.ADJST_OFFSET.value, offset)
-+
-+            recvd_str = _exchg_udp(cfg, port, test_str)
-+
-+            # Check for failures around adjustment and data exchange
-+            failure = _check_for_failures(recvd_str, _get_stats(prog_info['maps']['map_xdp_stats']))
-+            if failure is not None:
-+                return {
-+                    "status": "fail",
-+                    "reason": failure,
-+                    "offset": offset,
-+                    "pkt_sz": pkt_sz
-+                }
-+
-+            # Validate data content based on offset direction
-+            expected_data = None
-+            if offset < 0:
-+                expected_data = chr(int(tag, 16)) * (0 - offset) + test_str
-+            else:
-+                expected_data = test_str[offset:]
-+
-+            if recvd_str != expected_data:
-+                return {
-+                    "status": "fail",
-+                    "reason": "Data mismatch",
-+                    "offset": offset,
-+                    "pkt_sz": pkt_sz
-+                }
-+
-+    return {"status": "pass"}
-+
-+
-+def test_xdp_native_adjst_head_grow_data(cfg):
-+    """
-+    Tests the XDP headroom growth support.
-+
-+    Args:
-+        cfg: Configuration object containing network settings.
-+
-+    This function sets up the packet size and offset lists, then calls the
-+    _test_xdp_native_head_adjst_mb function to perform the actual test. The
-+    test is passed if the headroom is successfully extended for given packet
-+    sizes and offsets.
-+    """
-+    pkt_sz_lst = [512, 1024, 2048]
-+
-+    # Positive value indicates data part is growing by the corresponding value
-+    offset_lst = [-16, -32, -64, -128, -256]
-+    res = _test_xdp_native_head_adjst(cfg, "xdp_prog_frags", pkt_sz_lst, offset_lst)
-+
-+    _validate_res(res, offset_lst, pkt_sz_lst)
-+
-+
-+def test_xdp_native_adjst_head_shrnk_data(cfg):
-+    """
-+    Tests the XDP headroom shrinking support.
-+
-+    Args:
-+        cfg: Configuration object containing network settings.
-+
-+    This function sets up the packet size and offset lists, then calls the
-+    _test_xdp_native_head_adjst_mb function to perform the actual test. The
-+    test is passed if the headroom is successfully shrunk for given packet
-+    sizes and offsets.
-+    """
-+    pkt_sz_lst = [512, 1024, 2048]
-+
-+    # Negative value indicates data part is shrinking by the corresponding value
-+    offset_lst = [16, 32, 64, 128, 256]
-+    res = _test_xdp_native_head_adjst(cfg, "xdp_prog_frags", pkt_sz_lst, offset_lst)
-+
-+    _validate_res(res, offset_lst, pkt_sz_lst)
-+
-+
- def main():
-     """
-     Main function to execute the XDP tests.
-@@ -493,6 +635,7 @@ def main():
-     function to execute the tests.
-     """
-     with NetDrvEpEnv(__file__) as cfg:
-+        cfg.netnl = EthtoolFamily()
-         ksft_run(
-             [
-                 test_xdp_native_pass_sb,
-@@ -502,6 +645,8 @@ def main():
-                 test_xdp_native_tx_mb,
-                 test_xdp_native_adjst_tail_grow_data,
-                 test_xdp_native_adjst_tail_shrnk_data,
-+                test_xdp_native_adjst_head_grow_data,
-+                test_xdp_native_adjst_head_shrnk_data,
-             ],
-             args=(cfg,))
-     ksft_exit()
-diff --git a/tools/testing/selftests/net/lib/xdp_native.bpf.c b/tools/testing/selftests/net/lib/xdp_native.bpf.c
-index 1383d465266c..93c0a74d37ef 100644
---- a/tools/testing/selftests/net/lib/xdp_native.bpf.c
-+++ b/tools/testing/selftests/net/lib/xdp_native.bpf.c
-@@ -25,6 +25,7 @@ enum {
- 	XDP_MODE_DROP = 1,
- 	XDP_MODE_TX = 2,
- 	XDP_MODE_TAIL_ADJST = 3,
-+	XDP_MODE_HEAD_ADJST = 4,
- } xdp_map_modes;
- 
- enum {
-@@ -328,6 +329,170 @@ static int xdp_tail_ext(struct xdp_md *ctx, __u16 port)
- 	return XDP_ABORTED;
- }
- 
-+static int xdp_adjst_head_shrnk_data(struct xdp_md *ctx, __u64 hdr_len,
-+				     const __u32 size)
-+{
-+	char tmp_buff[MAX_ADJST_OFFSET];
-+	void *data, *data_end;
-+	void *offset_ptr;
-+
-+	data = (void *)(long)ctx->data;
-+	data_end = (void *)(long)ctx->data_end;
-+
-+	/* Update the length information in the IP and UDP headers before
-+	 * adjusting the headroom. This simplifies accessing the relevant
-+	 * fields in the IP and UDP headers for fragmented packets. Any
-+	 * failure beyond this point will result in the packet being aborted,
-+	 * so we don't need to worry about incorrect length information for
-+	 * passed packets.
-+	 */
-+	update_pkt(data, data_end, (__s16)(0 - size));
-+
-+	if (bpf_xdp_load_bytes(ctx, 0, tmp_buff, MAX_ADJST_OFFSET) < 0)
-+		return -1;
-+
-+	if (bpf_xdp_adjust_head(ctx, size) < 0)
-+		return -1;
-+
-+	if (size > MAX_ADJST_OFFSET)
-+		return -1;
-+
-+	if (hdr_len > MAX_ADJST_OFFSET || hdr_len == 0)
-+		return -1;
-+
-+	/* Added here to handle clang complain about negative value */
-+	hdr_len = (hdr_len & 0x1ff) >= 256 ? 256 : hdr_len & 0xff;
-+
-+	if (hdr_len == 0)
-+		return -1;
-+
-+	if (bpf_xdp_store_bytes(ctx, 0, tmp_buff, hdr_len) < 0)
-+		return -1;
-+
-+	return 0;
-+}
-+
-+static int xdp_adjst_head_grow_data(struct xdp_md *ctx, __u64 hdr_len,
-+				    const __u32 size)
-+{
-+	char tmp_buff[MAX_ADJST_OFFSET];
-+	void *data, *data_end;
-+	void *offset_ptr;
-+	__s32 *val;
-+	__u32 key;
-+	__u8 tag;
-+
-+	if (hdr_len > MAX_ADJST_OFFSET || hdr_len == 0)
-+		return -1;
-+
-+	/* Added here to handle clang complain about negative value */
-+	hdr_len = (hdr_len & 0x1ff) >= 256 ? 256 : hdr_len & 0xff;
-+
-+	if (hdr_len == 0)
-+		return -1;
-+
-+	if (bpf_xdp_load_bytes(ctx, 0, tmp_buff, hdr_len) < 0)
-+		return -1;
-+
-+	if (size > MAX_ADJST_OFFSET)
-+		return -1;
-+
-+	if (bpf_xdp_adjust_head(ctx, 0 - size) < 0)
-+		return -1;
-+
-+	if (bpf_xdp_store_bytes(ctx, 0, tmp_buff, hdr_len) < 0)
-+		return -1;
-+
-+	data = (void *)(long)ctx->data;
-+	data_end = (void *)(long)ctx->data_end;
-+
-+	offset_ptr = data + hdr_len;
-+	if (offset_ptr > data_end)
-+		return -1;
-+
-+	key = XDP_ADJST_TAG;
-+	val = bpf_map_lookup_elem(&map_xdp_setup, &key);
-+	if (!val)
-+		return -1;
-+
-+	tag = (__u8)(*val);
-+
-+	for (int i = 0; i < min(MAX_ADJST_OFFSET, size); i++) {
-+		if (offset_ptr + 1 > data_end)
-+			return -1;
-+
-+		__builtin_memcpy(offset_ptr, &tag, 1);
-+		offset_ptr++;
-+	}
-+
-+	update_pkt(data, data_end, (__s16)(size));
-+
-+	return 0;
-+}
-+
-+static int xdp_head_adjst(struct xdp_md *ctx, __u16 port)
-+{
-+	void *data_end = (void *)(long)ctx->data_end;
-+	void *data = (void *)(long)ctx->data;
-+	struct udphdr *udph_ptr = NULL;
-+	__u32 key, size, hdr_len;
-+	__s32 *val;
-+	int res;
-+
-+	/* Filter packets based on UDP port */
-+	udph_ptr = filter_udphdr(ctx, port);
-+	if (!udph_ptr)
-+		return XDP_PASS;
-+
-+	hdr_len = (void *)udph_ptr - data + sizeof(struct udphdr);
-+
-+	key = XDP_ADJST_OFFSET;
-+	val = bpf_map_lookup_elem(&map_xdp_setup, &key);
-+	if (!val)
-+		return XDP_PASS;
-+
-+	switch (*val) {
-+	case -16:
-+	case 16:
-+		size = 16;
-+		break;
-+	case -32:
-+	case 32:
-+		size = 32;
-+		break;
-+	case -64:
-+	case 64:
-+		size = 64;
-+		break;
-+	case -128:
-+	case 128:
-+		size = 128;
-+		break;
-+	case -256:
-+	case 256:
-+		size = 256;
-+		break;
-+	default:
-+		bpf_printk("Invalid adjustment offset: %d\n", *val);
-+		goto abort;
-+	}
-+
-+	if (*val < 0)
-+		res = xdp_adjst_head_grow_data(ctx, hdr_len, size);
-+	else
-+		res = xdp_adjst_head_shrnk_data(ctx, hdr_len, size);
-+
-+	if (res)
-+		goto abort;
-+
-+	record_stats(ctx, STATS_PASS);
-+	return XDP_PASS;
-+
-+abort:
-+	record_stats(ctx, STATS_ABORT);
-+	return XDP_ABORTED;
-+}
-+
- static int xdp_prog_common(struct xdp_md *ctx)
+ int main(int argc, char *argv[])
  {
- 	__u32 key, *port;
-@@ -352,6 +517,8 @@ static int xdp_prog_common(struct xdp_md *ctx)
- 		return xdp_mode_tx_handler(ctx, (__u16)(*port));
- 	case XDP_MODE_TAIL_ADJST:
- 		return xdp_tail_ext(ctx, (__u16)(*port));
-+	case XDP_MODE_HEAD_ADJST:
-+		return xdp_head_adjst(ctx, (__u16)(*port));
+-	struct sockaddr_in address;
++	struct sockaddr_storage address;
++	struct addrinfo *result;
++	struct addrinfo hints;
+ 	unsigned int napi_id;
+-	unsigned int port;
++	socklen_t addr_len;
+ 	socklen_t optlen;
+ 	char buf[1024];
+ 	int opt = 1;
++	int family;
+ 	int server;
+ 	int client;
+ 	int ret;
+ 
+-	server = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
++	memset(&hints, 0, sizeof(hints));
++	hints.ai_family = AF_UNSPEC;
++	hints.ai_socktype = SOCK_STREAM;
++	hints.ai_flags = AI_PASSIVE;
++
++	ret = getaddrinfo(argv[1], argv[2], &hints, &result);
++	if (ret != 0) {
++		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(ret));
++		return 1;
++	}
++
++	family = result->ai_family;
++	addr_len = result->ai_addrlen;
++
++	server = socket(family, SOCK_STREAM, IPPROTO_TCP);
+ 	if (server < 0) {
+ 		perror("socket creation failed");
++		freeaddrinfo(result);
+ 		if (errno == EAFNOSUPPORT)
+ 			return -1;
+ 		return 1;
  	}
  
- 	/* Default action is to simple pass */
+-	port = atoi(argv[2]);
+-
+ 	if (setsockopt(server, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
+ 		perror("setsockopt");
++		freeaddrinfo(result);
+ 		return 1;
+ 	}
+ 
+-	address.sin_family = AF_INET;
+-	inet_pton(AF_INET, argv[1], &address.sin_addr);
+-	address.sin_port = htons(port);
++	memcpy(&address, result->ai_addr, result->ai_addrlen);
++	freeaddrinfo(result);
+ 
+-	if (bind(server, (struct sockaddr *)&address, sizeof(address)) < 0) {
++	if (bind(server, (struct sockaddr *)&address, addr_len) < 0) {
+ 		perror("bind failed");
+ 		return 1;
+ 	}
 -- 
 2.47.1
 
