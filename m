@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-206939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C075B04D10
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 02:40:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A58DB04D13
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 02:40:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0C474A1992
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 00:40:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C0F21A655BA
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 00:40:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E421B043C;
-	Tue, 15 Jul 2025 00:39:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E7F21CF5C6;
+	Tue, 15 Jul 2025 00:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kXm5q5qc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mMV8c9W1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFB511A83F8;
-	Tue, 15 Jul 2025 00:39:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8E551C8616;
+	Tue, 15 Jul 2025 00:39:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752539999; cv=none; b=VC66c1Gk0w55N7GuBSH4pQ6KrFELY55ANY+vnDNDmChp6S8PwsfJp+YosHXxx4OpqaLq4bqYouJTa73pCS1kNtTtkJT8dkN4gqCeayYMItz5KqIX76f2tO7l5OogCcafg4UuJDGn1K2mPHmA3QxAFxzoEN+1adA2sSKo3KVa+c4=
+	t=1752540000; cv=none; b=dw67i62hBlTSnjpUID2G87iS1s0ejXq1DHVoY8O2guOi9jdgs5khIlcU385W3DVI5pnvn0o4c7fjSTH46XM0aGe1HVLOzlWGpHpSSWe9lmsIvOivSRh80AqJQ3yjF4PTEFPygp9xCLi+tJtAc0BnHvFyfDiBa2Y0aR4jibeAojc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752539999; c=relaxed/simple;
-	bh=CrHiF8PKaUNTRhE8iGDTKs4Yqu86OLZWnacNnmMUNeE=;
+	s=arc-20240116; t=1752540000; c=relaxed/simple;
+	bh=TmcW3WDYSLfl58t7Xk/YEdWTjU6cisrLSFYaweL9ZZE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NvtRGc8BJg1ugXUGi8T6jSs4IyVaBSkyv4v3xK6MJFVLtyqePY8M5vIcmOQ++yNa+NN54mhTHGbVJg64fglUntRC7aa1eukuC7zJZlvM/RHtuQOJw4viO3YiBdvmapw9J0Dnwqn0+A8Pug6ID8z/44Rg2gvboFwgSJBQfic8yDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kXm5q5qc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64ECEC4CEED;
-	Tue, 15 Jul 2025 00:39:58 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=jD121hTvZw9QFJcJqdhg8IeJ5e9ye8b9onJqpANuu/UCSKyXlG+rqyzEjws8OQHC+zJzRQ9QUyYh8z77FX8YVmF92zT4gZZiStVAAVmsrq4ID40fSzNah61kTQEW3clDW9KW05nYO+HyAvGRIeZnF4emw4dOenKk2WWdmK8RTQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mMV8c9W1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A08DFC4CEF4;
+	Tue, 15 Jul 2025 00:39:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752539998;
-	bh=CrHiF8PKaUNTRhE8iGDTKs4Yqu86OLZWnacNnmMUNeE=;
+	s=k20201202; t=1752539999;
+	bh=TmcW3WDYSLfl58t7Xk/YEdWTjU6cisrLSFYaweL9ZZE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kXm5q5qcipOJ71OlegvwYZqW/X1kAHs/zc0aPlEBuLdWBW+EbWgmeAi1xc+1Fywca
-	 OA7rFLz1sEG9G/G0YftPywBX3G2rF0sSunf6GSlrplgVsXvzaSYm0oqEYz3PnPfraN
-	 spKDKTXHtdXcz1bZLSjkWSOijBurq6Lnx+DbyLU64nJJ6Ps5F282pzCZzcJuBbTL0E
-	 PwhRfonufbSgWSZSIOPENXHwe9Di1/67K/z//A+c03J0/BSYs1YtvzwT0Atu+GiPK/
-	 C7JTYvZ8aTF/MlHAAM/viNyzQdL9kC36i9gyZ0NVQiCEuRJKhvJ0vfySjGmRGxHFha
-	 e9TjkhDwobLYw==
+	b=mMV8c9W1t6a4ClOXNsrkFrNw6IDbiiRto3xkUxBBol/CNufaWvAG2GqQX+xOPP4W/
+	 /7qn7/f3tOg4TqAwYIzLqH5QlefY1gJgFe98fu1DY/466+y+jvF+JJl4CYVw2HBKL2
+	 twVCXyBzwhPf3glOGjIVeMWZHe9GlDmst/67+c81AypfbhNf5b6Mm6OubtnTmyNprx
+	 2rXydQubR/9nwlB5hj3GcmImo4Vfk17XfDC+0t6y1zaDZUkRORZqPmOVKSERUVXhoL
+	 dqkJcbaVkjqiQ6WXvSVBkMlYdBh8KuMaCLgolzWdW4SSKvGZp9VIpZhi8S8zBMPcYS
+	 /jwfvAvaPy+kw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D90383B276;
-	Tue, 15 Jul 2025 00:40:20 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCC9383B276;
+	Tue, 15 Jul 2025 00:40:21 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [pull-request] mlx5-next updates 2025-07-14
+Subject: Re: [PATCH net-next v2 1/2] net: ipv4: fix incorrect MTU in broadcast
+ routes
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175254001900.4040142.4020209946156928576.git-patchwork-notify@kernel.org>
-Date: Tue, 15 Jul 2025 00:40:19 +0000
-References: <1752481357-34780-1-git-send-email-tariqt@nvidia.com>
-In-Reply-To: <1752481357-34780-1-git-send-email-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, leon@kernel.org, jgg@ziepe.ca,
- saeedm@nvidia.com, linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, mbloch@nvidia.com
+ <175254002050.4040142.7007853567795246386.git-patchwork-notify@kernel.org>
+Date: Tue, 15 Jul 2025 00:40:20 +0000
+References: <20250710142714.12986-1-oscmaes92@gmail.com>
+In-Reply-To: <20250710142714.12986-1-oscmaes92@gmail.com>
+To: Oscar Maes <oscmaes92@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ stable@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This pull request was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 14 Jul 2025 11:22:37 +0300 you wrote:
-> Hi,
+On Thu, 10 Jul 2025 16:27:13 +0200 you wrote:
+> Currently, __mkroute_output overrules the MTU value configured for
+> broadcast routes.
 > 
-> The following pull-request contains common mlx5 updates
-> for your *net-next* tree.
-> Please pull and let me know of any problem.
+> This buggy behaviour can be reproduced with:
 > 
-> Regards,
-> Tariq
+> ip link set dev eth1 mtu 9000
+> ip route del broadcast 192.168.0.255 dev eth1 proto kernel scope link src 192.168.0.2
+> ip route add broadcast 192.168.0.255 dev eth1 proto kernel scope link src 192.168.0.2 mtu 1500
 > 
 > [...]
 
 Here is the summary with links:
-  - [pull-request] mlx5-next updates 2025-07-14
-    https://git.kernel.org/netdev/net-next/c/2f4053db0b13
+  - [net-next,v2,1/2] net: ipv4: fix incorrect MTU in broadcast routes
+    https://git.kernel.org/netdev/net-next/c/9e30ecf23b1b
+  - [net-next,v2,2/2] selftests: net: add test for variable PMTU in broadcast routes
+    https://git.kernel.org/netdev/net-next/c/5777d1871bf6
 
 You are awesome, thank you!
 -- 
