@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-207228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2103BB064D7
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 19:04:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C12EDB064D8
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 19:04:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 291A51AA6403
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 17:03:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF4431AA5E3E
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 17:03:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81CC3277C96;
-	Tue, 15 Jul 2025 17:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C509281513;
+	Tue, 15 Jul 2025 17:03:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="iejwvZ39"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="b2QUpikJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F36062417F8
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 17:03:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43C327F16C
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 17:03:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752598998; cv=none; b=by5SZmSYHdOMs4bkE9rANtdfHR4g//LjbLIUMv9TjYjX73Y0lt2xgIBlz1h40zGEZsY8VFEPLEB4BdJDDSvduaN3ru6US2hZinrwDkRYdlpkjljfCRjdNKrpG5Bs86iwF95WEDNZ48972y9RC7M112rhCHMwdG6ehEhCo5/THnQ=
+	t=1752599000; cv=none; b=JFyIjj9d0GoUvHmKCmmkeJzCCmciR9ukl2Snuigjfi4Ab4ReOyS0mPZHUFbj4A2AlT/q0/wOZ3d5qmazpNPBzPRuoFpKanpLEv+Kcp9nurE3BKK0c4Z4Ow5am0Mw2dtJW67s40kiBEPLYubYWX2whdARBujtDCkUzgFIiitj3so=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752598998; c=relaxed/simple;
-	bh=H5/0qhNfRtIQcPtpcRQ5QirUHLaPsai5PTwqOwbiZz8=;
+	s=arc-20240116; t=1752599000; c=relaxed/simple;
+	bh=7iTmpEkIucCSGyvx3qB88gP14e5Ca/SnEczrO/VPcSY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LtaxypBxhGK9mtKh++DWwZmkDCM6i9XDbfzlelRav/kDSZWkGnqe0C0wAl5PN9n26HySCDEziuOE8d4itIjZdEkSBXM8yvyWpnVzN8LEzfWMKtWAzsD8NWdLNXJkXdbFuhdZntgXZFmdJGCr4AxVGV8zDpcMgx8yeYBZjvxYHHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=fail (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=iejwvZ39 reason="signature verification failed"; arc=none smtp.client-ip=67.231.156.173
+	 MIME-Version:Content-Type; b=JxRWJvw50ZldL9H5eygSZ0d01DFVcbIbMKHYv6ZrhVPUZC+D6eGNwoGdrnalJWm9wFKUspKtx6pf5la0oc4e3/2cE0XVhtGRK4oOCudLpGoVartinofBvBYKtbRO0t3HI8bUIXNHzS2QVzP7hNWPiCxk5FA2El3Prd7zKNwangk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=fail (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=b2QUpikJ reason="signature verification failed"; arc=none smtp.client-ip=67.231.156.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56FBng0f032125;
-	Tue, 15 Jul 2025 10:03:07 -0700
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56FEk765000654;
+	Tue, 15 Jul 2025 10:03:12 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=Vh4x0pPGp67ljpFx8eyJ0n6O+
-	Ac9ibnppD7wBlRK8as=; b=iejwvZ39oEs4SkMd7621Dcl+XAACdEF6QP48+Sh9l
-	pQWDtH2zXSf2xq95EebDW+/VWGzD/kkBFc20SVcl5Zjrm8WNWmilBbCLxxpq2gFh
-	tWQJPmfn5XDVbpbTpAmdqOlbLeZ/O2sTY46ok907JOzKENPZqZdh10LAOYK4Bqfi
-	u0KSsJdI2Aj5Jssk9+Km8v7t0azV+0oXHu8rr3qnY/wZfRhy/rsyzPH43u+w6PGR
-	O/HJIJSh6jXU6b0434/MLraspeMFn6ZDYwW/lRH/jcmtNwXxtzOOvOM7I726SVCn
-	DpOh8POj15V/nWynQFL0r1fvj0vaBc/9pqlYczimqwsrQ==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 47wpevgr3t-2
+	:references:subject:to; s=pfpt0220; bh=FJbVGpIOEX5iecJnRPyji5i/i
+	5jqhqNPG2ElIf/+pOI=; b=b2QUpikJcg0QgsqaU+zbvIctSkhOcDc32uRJOlk3d
+	F2RagssYzQzHb6xhZNc2n58J9rvnK0mi7O9J8sYuXcEO0nZKaMx/evDG1b8EUTYU
+	3ZH6J9VlOk6fCMDklxeVqgJWhiJPG9SINiBbiO92VYNo4765l/0FHQnYvHlfD4Oc
+	30p1dCaOmU3ayjpANgBLo99g1HiaJxWrUTz6yMuserJcY6YT+JtIFKDzjHvI/9AQ
+	9OTCX1OruXTHOy4/9XHSRlC1sQNMXhGy3Ms40eFcaqlxZTEreB4CUJTy1WNbjyAh
+	V5a8VuHZ2GZhkIK9F9M8Iw1y2KLT+jzGEaoRPVYQXzoAA==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 47wbm52bdg-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 15 Jul 2025 10:03:07 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+	Tue, 15 Jul 2025 10:03:12 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Tue, 15 Jul 2025 10:03:06 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Tue, 15 Jul 2025 10:03:06 -0700
+ 15.2.1544.4; Tue, 15 Jul 2025 10:03:11 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Tue, 15 Jul 2025 10:03:11 -0700
 Received: from hyd1358.marvell.com (unknown [10.29.37.11])
-	by maili.marvell.com (Postfix) with ESMTP id BC52A5B692E;
-	Tue, 15 Jul 2025 10:03:02 -0700 (PDT)
+	by maili.marvell.com (Postfix) with ESMTP id 786A65B692E;
+	Tue, 15 Jul 2025 10:03:07 -0700 (PDT)
 From: Subbaraya Sundeep <sbhatta@marvell.com>
 To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
         <kuba@kernel.org>, pabeni4redhat.com@mx0b-0016f401.pphosted.com,
@@ -64,9 +64,9 @@ To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
 CC: <gakula@marvell.com>, <hkelam@marvell.com>, <bbhushan2@marvell.com>,
         <jerinj@marvell.com>, <lcherian@marvell.com>, <sgoutham@marvell.com>,
         <netdev@vger.kernel.org>, Subbaraya Sundeep <sbhatta@marvell.com>
-Subject: [net-next PATCH v2 10/11] octeontx2-af: Display new bandwidth profiles too in debugfs
-Date: Tue, 15 Jul 2025 22:32:03 +0530
-Message-ID: <1752598924-32705-11-git-send-email-sbhatta@marvell.com>
+Subject: [net-next PATCH v2 11/11] octeontx2-pf: Use new bandwidth profiles in receive queue
+Date: Tue, 15 Jul 2025 22:32:04 +0530
+Message-ID: <1752598924-32705-12-git-send-email-sbhatta@marvell.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1752598924-32705-1-git-send-email-sbhatta@marvell.com>
 References: <1752598924-32705-1-git-send-email-sbhatta@marvell.com>
@@ -77,51 +77,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Proofpoint-GUID: I8-eJ2jaiOJhhLQf9cvpP7x_W5HXJduQ
-X-Proofpoint-ORIG-GUID: I8-eJ2jaiOJhhLQf9cvpP7x_W5HXJduQ
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE1MDE1NiBTYWx0ZWRfX5PUoJWZO+ncL nVeuBYfdSCPbHxxJSumzQtKghnPMczrxZFPJh+Rm16jc39AWtLK1uwY1DRQne1lDpxijsxXjV5z CQi2i51Lw/U3rauXty4Utz8kySakdaC+oOEvDHBuq+D3f01RC8O/2ggcf+AWF1fJbTL5x8L8+C0
- 5/PfO170nCu8wokAvu0PzAEZx+LWzwOgHwYIv0KU28TggoiHg2skfVaG/hlXrEkga7d9V8B+BOz plieGJztcf6+36IZvup6adyfYUmbqqiYxruHV/j2sQ8oaFtDI//WXbZBu5oMInIEI6XemPF3nRN RShY41Z6LqKhShgoK23Hc/e1PDbJMY4U4ADZz28KYoAnGioq6wSSJt42mFzT7pfXduxajCmYkec
- eWi7583OciOrrgR7dicynfb1DIlfdEBB4HII9ifK9RzEtwMT3zhNEegQxgcOcRn0dz+/X1ss
-X-Authority-Analysis: v=2.4 cv=Pav/hjhd c=1 sm=1 tr=0 ts=687689cb cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=Wb1JkmetP80A:10 a=M5GUcnROAAAA:8 a=RZIP-wGVsQArKk7uDzMA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Authority-Analysis: v=2.4 cv=M7tNKzws c=1 sm=1 tr=0 ts=687689d0 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=Wb1JkmetP80A:10 a=M5GUcnROAAAA:8 a=VbpyGYBai7zdicxOX80A:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-GUID: dGsz0XnQCYgUPgFUZKQ8_ZvNqL3bF8Ro
+X-Proofpoint-ORIG-GUID: dGsz0XnQCYgUPgFUZKQ8_ZvNqL3bF8Ro
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE1MDE1NiBTYWx0ZWRfX5ZEKH0e4bC+l njDRn2gyK1My2jFzi+ENpVG8bZu+cAzisjcd9ITh9lO3T1nlD22Slg/zkiiArOW3KrRiwldgMbj RSorgSVCtnkN2fkvwJRe/jVexjZXeqygZ55kJtQeR4jPA0DHLKdFQJJtbS2hZiOHXY7VjCyL/CR
+ JTbC7hlf5hAN6TBH4MKblo1epf7tprJpbTCdCq/XrjTLyJdVIxj/DaiTfpwCv0//S6K6kWHej3t EF3xzmYKbAX43d7/hYbd2T67vmDG05iZRjZGYykwQ4KyDlCvkTGKg38GtVln72fVrgZaBw7Qk7/ djOKnS2T9KMb6Zwkcu9k851kAZg/ZEMiUvEmiYHnufPz2f+hjT7KPxURvF5XQbaSiAEZw1INHLX
+ e3AK9EuJ0Qe3AzzFQifzydSD9HuDT2qvjqvZkVqD0bRGqDiKpJgNSzizv2ccopptUkMiC/MW
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-07-15_04,2025-07-15_02,2025-03-28_01
 
-Consider the new profiles of cn20k too while displaying
-bandwidth profile contexts in debugfs.
+Receive queue points to a bandwidth profile for rate limiting.
+Since cn20k has additional bandwidth profiles use them
+too while mapping receive queue to bandwidth profile.
 
 Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
 ---
- drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-index 7243592f0e43..ed502ca0c927 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-@@ -2056,7 +2056,9 @@ static void print_nix_cn10k_rq_ctx(struct seq_file *m,
- 	seq_printf(m, "W1: ipsecd_drop_ena \t\t%d\nW1: chi_ena \t\t\t%d\n\n",
- 		   rq_ctx->ipsecd_drop_ena, rq_ctx->chi_ena);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
+index cab157aac251..3e1bf22cba69 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
+@@ -341,6 +341,12 @@ int cn10k_map_unmap_rq_policer(struct otx2_nic *pfvf, int rq_idx,
+ 	aq->rq.band_prof_id = policer;
+ 	aq->rq_mask.band_prof_id = GENMASK(9, 0);
  
--	seq_printf(m, "W2: band_prof_id \t\t%d\n", rq_ctx->band_prof_id);
-+	seq_printf(m, "W2: band_prof_id \t\t%d\n",
-+		   (u16)rq_ctx->band_prof_id_h << 10 | rq_ctx->band_prof_id);
++	/* If policer id is greater than 1023 then it implies hardware supports
++	 * more leaf profiles. In that case use band_prof_id_h for 4 MSBs.
++	 */
++	aq->rq.band_prof_id_h = policer >> 10;
++	aq->rq_mask.band_prof_id_h = GENMASK(3, 0);
 +
- 	seq_printf(m, "W2: policer_ena \t\t%d\n", rq_ctx->policer_ena);
- 	seq_printf(m, "W2: spb_sizem1 \t\t\t%d\n", rq_ctx->spb_sizem1);
- 	seq_printf(m, "W2: wqe_skip \t\t\t%d\nW2: sqb_ena \t\t\t%d\n",
-@@ -2574,7 +2576,10 @@ static void print_band_prof_ctx(struct seq_file *m,
- 		(prof->rc_action == 1) ? "DROP" : "RED";
- 	seq_printf(m, "W1: rc_action\t\t%s\n", str);
- 	seq_printf(m, "W1: meter_algo\t\t%d\n", prof->meter_algo);
--	seq_printf(m, "W1: band_prof_id\t%d\n", prof->band_prof_id);
-+
-+	seq_printf(m, "W1: band_prof_id\t%d\n",
-+		   (u16)prof->band_prof_id_h << 7 | prof->band_prof_id);
-+
- 	seq_printf(m, "W1: hl_en\t\t%d\n", prof->hl_en);
- 
- 	seq_printf(m, "W2: ts\t\t\t%lld\n", (u64)prof->ts);
+ 	/* Fill AQ info */
+ 	aq->qidx = rq_idx;
+ 	aq->ctype = NIX_AQ_CTYPE_RQ;
 -- 
 2.34.1
 
