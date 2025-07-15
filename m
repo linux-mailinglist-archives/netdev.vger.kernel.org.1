@@ -1,98 +1,83 @@
-Return-Path: <netdev+bounces-206947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CC31B04D70
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 03:29:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AA0DB04D75
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 03:32:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E57CA1A67D42
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 01:30:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C80007AA776
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 01:31:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40C2F1C84B8;
-	Tue, 15 Jul 2025 01:29:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF03719EEC2;
+	Tue, 15 Jul 2025 01:32:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F8S3wtSr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P8wURV+y"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 154961A83F8;
-	Tue, 15 Jul 2025 01:29:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3CF086337;
+	Tue, 15 Jul 2025 01:32:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752542988; cv=none; b=CETNJeClhIFf3IGydSScy3EL0UzBi18/3/rdBY3R2/7f3CHmVuOGwwlVJTeNwV+VhQGNxmbuqkxitKxOnFR4DP3+jEPIqNmZnVQ6qAed/Oo6fauaTQ7hSrH8btBdpFchz2gBn2hz0ofDzy2bZRSGRTpJCAMIClY4FfLF8CzcsUQ=
+	t=1752543163; cv=none; b=I/ROo+7bLGBwxAGl4sE1euTjSfpg7xjIgl39o2doAw8uw3y5WaN88nIhke+aKYBpPUtYbEWcrcxkeHJgneM7yxeb7asHATFwXuvzmAjllxaI79lrb4CrRlMKxGt8VB8W3l1QsPi1dRx/GLf1NLR1LlfPAz5OSWmoYpbK45b+zoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752542988; c=relaxed/simple;
-	bh=NFtG1yp4KAvmoF987bsoECw6745I4XetR5kNMHK7MBw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=XcNInscpk7BD/cpNnUm+Y72ZssS+y+Z0dCZTrt+7RCQL2kgGoCSGsbdEXZXbfJhPh4w1/AOhlaoQAe7ELExYuhnIrbbdiPHwo2QQfbXSjwKfvECjH+0kkcK0LiSpYdgO0pPZRmzVkrajjCZbsE+gIQddlYU5edKBuxq6fg84AAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F8S3wtSr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D18AC4CEED;
-	Tue, 15 Jul 2025 01:29:47 +0000 (UTC)
+	s=arc-20240116; t=1752543163; c=relaxed/simple;
+	bh=4X9PMiQSHXCuAFU/Rgaom9rSazS9ZHJ9k7UyTvWMp94=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jp+m78qjPSKKBb6F5aaHGrCE4f+CafZ4bPNYU35Y/+rn74ugOpZhxt1yp+0afxJCwWp1JBsKJ54PoBc6AAESlRGSfGPVJXo6Ux5CXrklZJPbkpSXVT/nKA1fZ8EkMFzePDxiubHje+/InER+RZpNvtX+ceWXUHz6ttYvBs0fAu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P8wURV+y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E47DC4CEED;
+	Tue, 15 Jul 2025 01:32:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752542987;
-	bh=NFtG1yp4KAvmoF987bsoECw6745I4XetR5kNMHK7MBw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=F8S3wtSrDUVFh8tACJDKHNX3kBS2utFTMDpMEXRsDyarsvTkOnWNYWcEMnJ+gVFU0
-	 685A1STZUrtD3a7pyzbID8yCECMyLp3F0pdi2zweX5Y4HgfqQEmoHctoyPKmHv/AXM
-	 1js52Ee2euA/AxguDmGzQChKE9eZWfN4H7cKtj29PmuKR1qqnJqJGEPByuePLV9X1n
-	 gJ5hVSyx3Ss/I4ZSZaOf7cuk+R1bYx11aDVclNycmTv2/WGmCLS5X+IGv14gD7Vrh3
-	 GjMU7a21UGyRBEjCEMAe1nJ6jhtwZjPzRpeGbsFIzfrNb2eCHPg3WYPvEYS8Jc9kOZ
-	 IRfZp1EFcyU3w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 99F94383B276;
-	Tue, 15 Jul 2025 01:30:09 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1752543163;
+	bh=4X9PMiQSHXCuAFU/Rgaom9rSazS9ZHJ9k7UyTvWMp94=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=P8wURV+ywM653PShMtixhFGZMmr7y2kEwCb8uoHCLf11cXNwQYGhXhlP/ewn/Ke4u
+	 ZnU5Uux/88e1QOPjyISQG/bMbdsHkxeFlwM2bbViwxx+aSWM575oFW2TTbh6O2oVTL
+	 IC9nnwafySl0IPAx1yfr87pkWXfzCGjYd9GjM72lJ8eIrLnwyIUikr2WtmuwWTF2VW
+	 VVr/r0PBByd2OBik+6zOeXdpsjZaxCLSW7I8wVAi5BQb1ojwtzy2F7BBUwR8OrxIvP
+	 +KkCS+F/Ey8FA6ECQavARIQpF23OBrLKfCgwU0CA1YZEDtPRWsN5wbrkphdpV3J/4v
+	 FCgU8gZoPpybA==
+Date: Mon, 14 Jul 2025 18:32:42 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Li Tian <litian@redhat.com>
+Cc: netdev@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Haiyang Zhang <haiyangz@microsoft.com>,
+ Dexuan Cui <decui@microsoft.com>, Stephen Hemminger
+ <stephen@networkplumber.org>, Long Li <longli@microsoft.com>
+Subject: Re: [PATCH net v3] hv_netvsc: Set VF priv_flags to IFF_NO_ADDRCONF
+ before open to prevent IPv6 addrconf
+Message-ID: <20250714183242.58bf076f@kernel.org>
+In-Reply-To: <20250712100716.3991-1-litian@redhat.com>
+References: <20250712100716.3991-1-litian@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: wangxun: fix LIBWX dependencies again
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175254300824.4049503.6759866563316837064.git-patchwork-notify@kernel.org>
-Date: Tue, 15 Jul 2025 01:30:08 +0000
-References: <20250711082339.1372821-1-arnd@kernel.org>
-In-Reply-To: <20250711082339.1372821-1-arnd@kernel.org>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: jiawenwu@trustnetic.com, mengyuanlou@net-swift.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- richardcochran@gmail.com, linux@armlinux.org.uk, arnd@arndb.de,
- vadim.fedorenko@linux.dev, heikki.krogerus@linux.intel.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri, 11 Jul 2025 10:23:34 +0200 you wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
+On Sat, 12 Jul 2025 18:07:08 +0800 Li Tian wrote:
+> Set an additional flag IFF_NO_ADDRCONF to prevent ipv6 addrconf.
 > 
-> Two more drivers got added that use LIBWX and cause a build warning
-> 
-> WARNING: unmet direct dependencies detected for LIBWX
->   Depends on [m]: NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_WANGXUN [=y] && PTP_1588_CLOCK_OPTIONAL [=m]
->   Selected by [y]:
->   - NGBEVF [=y] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_WANGXUN [=y] && PCI_MSI [=y]
->   Selected by [m]:
->   - NGBE [=m] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_WANGXUN [=y] && PCI [=y] && PTP_1588_CLOCK_OPTIONAL [=m]
-> 
-> [...]
+> Commit 8a321cf7becc
+> ("net: add IFF_NO_ADDRCONF and use it in bonding to prevent ipv6 addrconf")
 
-Here is the summary with links:
-  - net: wangxun: fix LIBWX dependencies again
-    https://git.kernel.org/netdev/net-next/c/a86eb2a60dcc
+This line looks quite odd, it's in the middle of the commit message but
+it's not a real sentence. If there's a single Fixes tag I usually refer
+to it as "commit under Fixes", e.g. "Commit under Fixes changed XYZ but
+it missed .." Please make this commit message read like a coherent
+explanation rather than set of notes..
 
-You are awesome, thank you!
+> This new flag change was not made to hv_netvsc resulting in the VF being
+> assinged an IPv6.
+> 
+> Fixes: 8a321cf7becc ("net: add IFF_NO_ADDRCONF and use it in bonding to prevent ipv6 addrconf")
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
