@@ -1,175 +1,104 @@
-Return-Path: <netdev+bounces-206942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47279B04D33
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 03:08:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AB48B04D38
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 03:11:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E1AF1A67DFA
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 01:08:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96CD63A7BAF
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 01:11:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D8E819F42D;
-	Tue, 15 Jul 2025 01:08:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24B741A8412;
+	Tue, 15 Jul 2025 01:11:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="HcLN9Hwl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TS+hm9F8"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EEC3B67F;
-	Tue, 15 Jul 2025 01:08:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E96F928F4;
+	Tue, 15 Jul 2025 01:11:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752541702; cv=none; b=GZiSHPqumOfEtWnBhaTm3HCdxQU/JTw6tqoM70RcYEkYus3kM/9eYcJN3yA9dNMy1FIDrpoUfzt0kf0bcPthcII1zxvPhh95vMOnIpV2d8qWpsqxxJgmKhZG4xHYuLSJ4Uk0apIJYY5HrypobvglkF3JxmpkgXZPDzGmphOG79M=
+	t=1752541898; cv=none; b=P+O+E7gRrNZoSevZGg1zrGgnvRu+zzA/j+hZzN9YEPMAw2B2jiYpam0mj1QdN+gFT2qSBKzrwXVBL31g1kYmOblusmuy+1SEvCUZfj1bzMfYM3QoqIcrJOOxatHdG1wykTOA5EHmcaIYWVQFSzZUPMoILH4i59n8WhWTGlADBEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752541702; c=relaxed/simple;
-	bh=ojrv6DJfXjklr/E0fZqpqhsV0atMlJMyXmZtdKiYlPQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=YNMVi/MC4GPzfEbXjEwUhPsn9tQ2UiAlqJYo4DR2/emP0V/BcEQyvzRu3SOszfbN1Zapz/4CfbhWg0NBWfEvwI9uajGrRyMwAySZIPbn9nKT0HxKt/vLIUOvhcmtnwrMLJ/t/Z1k/mMLAOjJ8b25pr9nom2wlR+C1lxusC49AuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=HcLN9Hwl; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1752541697;
-	bh=ojrv6DJfXjklr/E0fZqpqhsV0atMlJMyXmZtdKiYlPQ=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=HcLN9HwlQSJy468mVAXckRgEKJUzHfeAzRiYM5tur9AtCOgBN/Pdcb+3okPGklKYj
-	 t0OYQD5jo0iKWnLuWktQbVDiWiMSLqY3NDsJ9DmV34IEK1B2tG5cegIsnofsmQ2pgb
-	 YpAw3V8BoIzlyES3jb1+QfMKH+XQbnyfVuZd5/nY3y5Y0B+pG/dgkqBXDpYS7IbAiQ
-	 NEYAo9XD8uuN0z8xuiaB4r8t0BMlfEBaqss7WMq09wcR7xiY/IiFq744TfKxAz5zdn
-	 OXBIYebGHkGRDnSBQ/HgLpMOhVbHo1k27Abv5u3irX0e3smRAjPRlqEVPxkawQkNu6
-	 3BOzqhdpka0eg==
-Received: from pecola.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id A1DCF6B68A;
-	Tue, 15 Jul 2025 09:08:16 +0800 (AWST)
-Message-ID: <27c18b26e7de5e184245e610b456a497e717365d.camel@codeconstruct.com.au>
-Subject: Re: [PATCH] net: mctp: Add MCTP PCIe VDM transport driver
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: YH Chung <yh_chung@aspeedtech.com>, "matt@codeconstruct.com.au"
- <matt@codeconstruct.com.au>, "andrew+netdev@lunn.ch"
- <andrew+netdev@lunn.ch>,  "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,  "kuba@kernel.org"
- <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, 
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, BMC-SW
- <BMC-SW@aspeedtech.com>
-Cc: Khang D Nguyen <khangng@amperemail.onmicrosoft.com>
-Date: Tue, 15 Jul 2025 09:08:16 +0800
-In-Reply-To: <SEZPR06MB57635C8B59C4B0C6053BC1C99054A@SEZPR06MB5763.apcprd06.prod.outlook.com>
-References: <20250714062544.2612693-1-yh_chung@aspeedtech.com>
-	 <a01f2ed55c69fc22dac9c8e5c2e84b557346aa4d.camel@codeconstruct.com.au>
-	 <SEZPR06MB57635C8B59C4B0C6053BC1C99054A@SEZPR06MB5763.apcprd06.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1752541898; c=relaxed/simple;
+	bh=tILcL9lOOKgHOdK6m9Dq8RGStCv1M3g+AM12QcV3CQE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=i0nKTnbiep/reFMgbJRRBhwxKQzBm6MpRLttt12aGS3aD9JTG6M0poQDwymb3AK37dtXr+tlY06VPawaj+FBgHOEmP4kvVZLQf5ktXoNnJNtdS2FJdhFpmQbikirVEUoYFcad0AwsgNNpsBHuKT74PLoIRjXVTBpAfCmMh6VhX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TS+hm9F8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BC39C4CEED;
+	Tue, 15 Jul 2025 01:11:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752541897;
+	bh=tILcL9lOOKgHOdK6m9Dq8RGStCv1M3g+AM12QcV3CQE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TS+hm9F8p0PwL4KIr8ShmWzZSW6WZkA+d5Lgjp4xYMy3UCXWuFWBFlbfY0rK0ztUk
+	 XzcuELpJ3Gv2GAag9SnnOp0g0DRTbXsVgz6S6tyOvVQ/aNoQd6RSme+QoAutfQsOOv
+	 y+6rFEkNSv3t5b587rhhuC2VY6smLS3xJeR15KkE9mR1RZVGjFk8UK/pr9bzJzEnW9
+	 Aptv4s2WgdhBNQFKEidsyyFTR3tsHOP4w/nRWws74fvZabDktpmK1RmfAZa57hM6II
+	 uvp3Q5RKZZd4b5dJaCGn6qO3Y5JEELrwaYm9p7J9njWXRPRUsviyMYlkrWdDwbeLPm
+	 s/aC29uuZ0Stg==
+Date: Mon, 14 Jul 2025 18:11:36 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Jens Axboe
+ <axboe@kernel.dk>, <parav@nvidia.com>, Cosmin Ratio <cratiu@nvidia.com>,
+ Tariq Toukan <tariqt@nvidia.com>, Pavel Begunkov <asml.silence@gmail.com>,
+ Mina Almasry <almasrymina@google.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <io-uring@vger.kernel.org>
+Subject: Re: [PATCH v2 net-next] net: Allow SF devices to be used for ZC DMA
+Message-ID: <20250714181136.7fd53312@kernel.org>
+In-Reply-To: <20250711092634.2733340-2-dtatulea@nvidia.com>
+References: <20250711092634.2733340-2-dtatulea@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi YH,
+On Fri, 11 Jul 2025 09:26:34 +0000 Dragos Tatulea wrote:
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 5847c20994d3..53aa63d6e5a3 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -5560,4 +5560,25 @@ extern struct net_device *blackhole_netdev;
+>  		atomic_long_add((VAL), &(DEV)->stats.__##FIELD)
+>  #define DEV_STATS_READ(DEV, FIELD) atomic_long_read(&(DEV)->stats.__##FIELD)
+>  
+> +static inline struct device *netdev_get_dma_dev(const struct net_device *dev)
+> +{
+> +	struct device *dma_dev = dev->dev.parent;
+> +
+> +	if (!dma_dev)
+> +		return NULL;
+> +
+> +	/* Common case: dma device is parent device of netdev. */
+> +	if (dma_dev->dma_mask)
+> +		return dma_dev;
+> +
+> +	/* SF netdevs have an auxdev device as parent, the dma device being the
+> +	 * grandparent.
+> +	 */
+> +	dma_dev = dma_dev->parent;
+> +	if (dma_dev && dma_dev->dma_mask)
+> +		return dma_dev;
+> +
+> +	return NULL;
+> +}
 
-> > Do we really need an abstraction for MCTP VDM drivers? How many are you
-> > expecting? Can you point us to a client of the VDM abstraction?
-> >=20
-> > There is some value in keeping consistency for the MCTP lladdr formats =
-across
-> > PCIe transports, but I'm not convinced we need a whole abstraction laye=
-r for
-> > this.
-> >=20
-> We plan to follow existing upstream MCTP transports=E2=80=94such as I=C2=
-=B2C, I=C2=B3C,
-> and USB=E2=80=94by abstracting the hardware-specific details into a commo=
-n
-> interface and focus on the transport binding protocol in this patch.
-> This driver has been tested by our AST2600 and AST2700 MCTP driver.
-
-Is that one driver (for both 2600 and 2700) or two?
-
-I'm still not convinced you need an abstraction layer specifically for
-VDM transports, especially as you're forcing a specific driver model
-with the deferral of TX to a separate thread.
-
-Even if this abstraction layer is a valid approach, it would not be
-merged until you also have an in-kernel user of it.
-
-> > > TX path uses a dedicated kernel thread and ptr_ring: skbs queued by
-> > > the MCTP stack are enqueued on the ring and processed in-thread conte=
-xt.
-> >=20
-> > Is this somehow more suitable than the existing netdev queues?
-> >=20
-> Our current implementation has two operations that take time: 1)
-> Configure the PCIe VDM routing type as DSP0238 requested if we are
-> sending certain ctrl message command codes like Discovery Notify
-> request or Endpoint Discovery response. 2) Update the BDF/EID routing
-> table.
-
-More on this below, but: you don't need to handle either of those in
-a transport driver.
-
-> > > +struct mctp_pcie_vdm_route_info {
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u8 eid;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u8 dirty;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u16 bdf_addr;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct hlist_node hnode;
-> > > +};
-> >=20
-> > Why are you keeping your own routing table in the transport driver? We =
-already
-> > have the route and neighbour tables in the MCTP core code.
-> >=20
-> > Your assumption that you can intercept MCTP control messages to keep a
-> > separate routing table will not work.
-> >=20
-> We maintain a routing table in the transport driver to record the
-> mapping between BDFs and EIDs, as the BDF is only present in the PCIe
-> VDM header of received Endpoint Discovery Responses. This information
-> is not forwarded to the MCTP core in the MCTP payload. We update the
-> table with this mapping before forwarding the MCTP message to the
-> core.
-
-There is already support for this in the MCTP core - the neighbour table
-maintains mappings between EID and link-layer addresses. In the case of
-a PCIe VDM transport, those link-layer addresses contain the bdf data.
-
-The transport driver only needs to be involved in packet transmit and
-receive. Your bdf data is provided to the driver through the
-header_ops->create() op.
-
-Any management of the neighbour table is performed by userspace, which
-has visibility of the link-layer addresses of incoming skbs - assuming
-your drivers are properly setting the cb->haddr data on receive.
-
-This has already been established through the existing transports that
-consume lladdr data (i2c and i3c). You should not be handling the
-lladdr-to-EID mapping *at all* in the transport driver.
-
-> Additionally, if the MCTP Bus Owner operates in Endpoint (EP) role on
-> the PCIe bus, it cannot obtain the physical addresses of other devices
-> from the PCIe bus.
-
-Sure it can, there are mechanisms for discovery. However, that's
-entirely handled by userspace, which can update the existing neighbour
-table.
-
-> Agreed. In our implement, we always fill in the "Route By ID" type
-> when core asks us to create the header, since we don't know the
-> correct type to fill at that time.=C2=A0 And later we update the Route ty=
-pe
-> based on the ctrl message code when doing TX. I think it would be nice
-> if we can have a uniformed address format to get the actual Route type
-> by passed-in lladdr when creating the header.
-
-OK, so we'd include the routing type in the lladdr data then.
-
-Cheers,
-
-
-Jeremy
+LGTM, but we need a better place for this function. netdevice.h is
+included directly by 1.5k files, and indirectly by probably another 5k.
+It's not a great place to put random helpers with 2 callers. 
+Maybe net/netdev_rx_queue.h and net/core/netdev_rx_queue.c?
+I don't think it needs to be a static inline either.
+-- 
+pw-bot: cr
 
