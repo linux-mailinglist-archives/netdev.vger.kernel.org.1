@@ -1,173 +1,242 @@
-Return-Path: <netdev+bounces-207143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FCD5B05F4B
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 16:04:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 91CFEB05EC6
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 15:56:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BF493B32B7
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:57:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD60450046A
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:50:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 580BC2E49B1;
-	Tue, 15 Jul 2025 13:47:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89D402E7631;
+	Tue, 15 Jul 2025 13:44:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="kjgKyL39"
+	dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b="qihK7e/G"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2052.outbound.protection.outlook.com [40.107.237.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 592E02E4997
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 13:47:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752587245; cv=none; b=jdCla3pdMjpqnh8KRr+7f7WQLHmmeTksXXsOpAx3qQcFnox+nCVcmeZFt1M52745xcsl0uh8EvjB00gncDnhQ6W11uhF5QKDfZtnBkD7gemxT938QpQeB4kFtjfM+5SYMUI+dFx1/tdwgqjqpHZnJjkQ/HRdS2P1kqmYGUW6bGQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752587245; c=relaxed/simple;
-	bh=NHY04lWbnuGt7TUMVXMBAd99xrE3nzf7tN3dhvAdpFk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ACDOzjVccID0tP/vqmKpniTOWNc+vbuAPuLYcALZXAS66GWO4IbvvhA4k+HrjEbyQg2vVBM2zWfCWkhtvalKjKAjJFnWJ+RJcwc4WYsnMMT39rXa5LaIJs9Cb+cR4pMwebh1rpDpLjw06k233pcuR/KVVLPDIpUzmh8icQ7wjNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=kjgKyL39; arc=none smtp.client-ip=18.132.163.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1752587161;
-	bh=NWDrOIeUTkfMgeyG9DirCptVDnqPmotqOLDK+VZpCcc=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=kjgKyL395Bpv+Gv8DO1Yp/nbLJUdG4lX5EExTEGa5HvUgx02Vp1SBT0Gb/y0HJ70C
-	 1+EK2g1XPTpeg5IzW8sW8CkR4SxSM/kfWdPVtirIlmJjKs6ICQM7PC7yVdfUmzyud/
-	 6/TgenGECuUxaVU/HjvcO3soaKw/bg/n+g+rMOa8=
-X-QQ-mid: zesmtpip2t1752587129tb54538eb
-X-QQ-Originating-IP: PsIrTfnu37O5BQpc09CPKOeWtbwmOWY2B4qF0spybKw=
-Received: from avenger-e500 ( [localhost])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 15 Jul 2025 21:45:25 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 9443703254596192763
-EX-QQ-RecipientCnt: 63
-From: WangYuli <wangyuli@uniontech.com>
-To: wangyuli@uniontech.com
-Cc: airlied@gmail.com,
-	akpm@linux-foundation.org,
-	alison.schofield@intel.com,
-	andrew+netdev@lunn.ch,
-	andriy.shevchenko@linux.intel.com,
-	arend.vanspriel@broadcom.com,
-	bp@alien8.de,
-	brcm80211-dev-list.pdl@broadcom.com,
-	brcm80211@lists.linux.dev,
-	colin.i.king@gmail.com,
-	cvam0000@gmail.com,
-	dan.j.williams@intel.com,
-	dave.hansen@linux.intel.com,
-	dave.jiang@intel.com,
-	dave@stgolabs.net,
-	davem@davemloft.net,
-	dri-devel@lists.freedesktop.org,
-	edumazet@google.com,
-	gregkh@linuxfoundation.org,
-	guanwentao@uniontech.com,
-	hpa@zytor.com,
-	ilpo.jarvinen@linux.intel.com,
-	intel-xe@lists.freedesktop.org,
-	ira.weiny@intel.com,
-	j@jannau.net,
-	jeff.johnson@oss.qualcomm.com,
-	jgross@suse.com,
-	jirislaby@kernel.org,
-	johannes.berg@intel.com,
-	jonathan.cameron@huawei.com,
-	kuba@kernel.org,
-	kvalo@kernel.org,
-	kvm@vger.kernel.org,
-	linux-cxl@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	linux@treblig.org,
-	lucas.demarchi@intel.com,
-	marcin.s.wojtas@gmail.com,
-	ming.li@zohomail.com,
-	mingo@kernel.org,
-	mingo@redhat.com,
-	netdev@vger.kernel.org,
-	niecheng1@uniontech.com,
-	oleksandr_tyshchenko@epam.com,
-	pabeni@redhat.com,
-	pbonzini@redhat.com,
-	quic_ramess@quicinc.com,
-	ragazenta@gmail.com,
-	rodrigo.vivi@intel.com,
-	seanjc@google.com,
-	shenlichuan@vivo.com,
-	simona@ffwll.ch,
-	sstabellini@kernel.org,
-	tglx@linutronix.de,
-	thomas.hellstrom@linux.intel.com,
-	vishal.l.verma@intel.com,
-	x86@kernel.org,
-	xen-devel@lists.xenproject.org,
-	yujiaoliang@vivo.com,
-	zhanjun@uniontech.com
-Subject: [PATCH v2 8/8] scripts/spelling.txt: Add notifer||notifier to spelling.txt
-Date: Tue, 15 Jul 2025 21:44:07 +0800
-Message-ID: <A205796B545C4241+20250715134407.540483-8-wangyuli@uniontech.com>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
-References: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C29C42D372D;
+	Tue, 15 Jul 2025 13:44:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752587077; cv=fail; b=Viaunt6FFqUKu1n4tBIL3q/+lFzRFmxY4KeaHcsBEjQ3uIb2+GMytQMXouZxz4CtZHka/bxA2lRex/jwVMC1WedAPLZzSd68pn/wBKHY2e+d5IUu9PGm6/L4qcLTf7/l7fvcbXt0yqE6amg/5KqipQzz0gPwbSxEUmsrFimBhUs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752587077; c=relaxed/simple;
+	bh=O+SOfU63agRhAJIFa3UvKM47KP8kNoA+eYxcH8Q6Psw=;
+	h=Message-ID:Date:From:Subject:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=WxWLwNpvQ/5b7UtxzkLsAKNP2uYwkzbxZvWCzj6iiSjdctW2nYEOL9KuBXy5egVx6H8AglcXO1LS7R1bECscPy7I5IYPqMM4Ka2Ae23atMQniDVC5Ny/jnJUIP5/nhseaUNQPcv2cQZ4ZpbUKPdPP9gfkr1joSsaqo8OWO+K7Fc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=qihK7e/G; arc=fail smtp.client-ip=40.107.237.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altera.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=pWeIfuOXJNaFk2U7hQBKj/96zEml7lXjFbPsgL7g4185c9Pe99XZAb7iQX7LL/3e8gdFWwleLY+8A/dSf1V6qwkRiPgrFtwipVmbjxiiqSY+z+UqraJiK1Se+l51u1fp58RCr2ZflRIYFlSvfWtxP39GCCCrgnXpaS8J2GuiuPUg+42yHz2wfP4Nx5JuxZHQW29oMI2pkybVnArZSWbVP3fTMXvyNiTmbKZlbGMeUTBeGFpdOoEcllRm/iHUDRwHwDFBCycox2S8+SC2xOStlON0zfE+P/+vzp6eWVtn4CwrZoBRA40AxVwSgfw4+Wgtd8W8W0Y5cw2BNX9SGs13Qw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VAUlL8zVqmMXuGZNA/Icc7HbRigfwrN0m1s7+P2JppE=;
+ b=FSPFs+zf/TyeSkzCy19U1k/XqNZ3azkYR5C39Zt/jGiw/0yDbwHVXStzqG/v+Lbf/aplNWqJmH/5QUs8X5K2dA5BCgjvVxdKDiTBVexWpCEg4J6l4UQZb6ySj339JvMu3/K1vrTVh4GMDlBhGOlMAvfkUR1vPWpwcuSFd/LHeJ42aCQTQKeJJ0feJDYw51/xCqVvKaTsHtPvhOs98PVjuDrttkatcMq37vtH4arqNoydeMIAlF7EQ4//YywJBysrujglyHO78228n2NRAudl3dL8a1K/6Jl6H5oPYjcsP64nq/yj1th8XWsf9RP1eFnpMjS/38sJh2wjtJ9NiFDiVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
+ dkim=pass header.d=altera.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VAUlL8zVqmMXuGZNA/Icc7HbRigfwrN0m1s7+P2JppE=;
+ b=qihK7e/GBX5hiGeEJ75sBPi0CS/D4//MW9r1eSxZVge/8RGgnodcOu+tTf9j4V+RPA888/fq/7m2dVa5tmPBbJ3nxPI2LPzFiMxz02LuVV6HN3geWdyn6dF74AFMq8aswD5iTe2/16AeiH35jyDOsMFrzoH6CbHWOzMnsLIumi0+Ve8mvuB2XUWgVLbmaj43/oSSazt1c17h3WL3fhfNGer3fxyZXygSvcEWwKH7mpfvenH/Lujd9cAY8FTBiTcLwUNz/o3JvFc76sT4vuyo6wiNrqWgtAGg5yWGMW+BufvqUGiFzlIaq7zKzBtjAIIRX4bZS2QWcwssxG7D/ipdsQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=altera.com;
+Received: from DM6PR03MB5371.namprd03.prod.outlook.com (2603:10b6:5:24c::21)
+ by BN9PR03MB6090.namprd03.prod.outlook.com (2603:10b6:408:11b::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.32; Tue, 15 Jul
+ 2025 13:44:33 +0000
+Received: from DM6PR03MB5371.namprd03.prod.outlook.com
+ ([fe80::8d3c:c90d:40c:7076]) by DM6PR03MB5371.namprd03.prod.outlook.com
+ ([fe80::8d3c:c90d:40c:7076%3]) with mapi id 15.20.8922.025; Tue, 15 Jul 2025
+ 13:44:33 +0000
+Message-ID: <9f4acd69-12ff-4b2f-bb3a-e8d401b23238@altera.com>
+Date: Tue, 15 Jul 2025 19:14:21 +0530
+User-Agent: Mozilla Thunderbird
+From: "G Thomas, Rohan" <rohan.g.thomas@altera.com>
+Subject: Re: [PATCH net-next 3/3] net: stmmac: Set CIC bit only for TX queues
+ with COE
+To: Simon Horman <horms@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Serge Semin <fancer.lancer@gmail.com>,
+ Romain Gantois <romain.gantois@bootlin.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Matthew Gerlach <matthew.gerlach@altera.com>
+References: <20250714-xgmac-minor-fixes-v1-0-c34092a88a72@altera.com>
+ <20250714-xgmac-minor-fixes-v1-3-c34092a88a72@altera.com>
+ <20250714134012.GN721198@horms.kernel.org>
+Content-Language: en-US
+In-Reply-To: <20250714134012.GN721198@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MA0PR01CA0027.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a01:b8::20) To DM6PR03MB5371.namprd03.prod.outlook.com
+ (2603:10b6:5:24c::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: MycRura4/XvKSghc7/pa9XHASutBsOQuzzHY2t37wkqnL3EQ4b2WP1Gh
-	ElPQzWwQFnREb3nQLWJ3qNzjb3GcBfyJQKPQJ69yoG0q3zHaR7KQSKKXEsSHkMcoRM1k1BY
-	ps22/1Fsn8ySr1dc7bfZolGEZmjkxQssEqY9w2BSkA2XLRnIoeKrS7baLaSRY+pqXVNX9V7
-	5WZifSZZU0GTWkbHj5EVtB8VGov6xpIuEQELM0qeKO7zsDY1lbolGVIThKsrApHifihhx10
-	kGbHlbr/XyYZCPJSL38sDGEvgAvMd4h8mxd0UzTJzqi5eBn9xm/nRX6lh58v9YfhxQygE8n
-	8z+tICs+z+h8xv1w/BwPwtWN//u/2d1LCIv0PSkPjewkoyyF8Xed/LcJ+QeFCHo2dy8QdHb
-	4NljU0ORp/rJkPBOrJXrTOu1w5VHR5GHiAqvAocLjcJ1a6ndacn0gfMu5OeKC2wBOHhUNFR
-	SKHclylNdXcTXdEmOI4lFAQAMMmJdBJ7joZqeQN1YiqsHnY5ZEtudusulG2RyUDWbPxbQ2m
-	1mKDH24orXFn87VH0DKvhK7sCBYTqUqoznSQFgjub/r3vLIQu890ikweU25IXIWi/4spciI
-	h/aOfxddCISl+f3p2pBdd0JQVIkWABbETYXu3QJNFPbaDH0uQrjUAnUxAQ02wdN2WWLRPi3
-	5Vl5jR7tEgE+dy/Zya+9+QwysaAwx+HZlr6A8lX+8wIVHpMhObBlww95PNjNSlW9WTwdylO
-	3tsH49ARtWp1b39aDGNKlMq8iQ9SN3X2Cs5VwkBDqKn+auYNXaqnYLPRxnPjBpJpRrLz6Gi
-	P2lwe3W/OjAb7WxH5OM6r3NDxGjiIKtvDu/Bq4UoXh465lOyZF9eirXc6DMEe8pROGUZGvq
-	/92dzLXsH5aN8F4isgT1Nj8kgj02Rn6wA9jL6fb5111ik2fZXhveOqSU7sykaxtMkkeDKcR
-	EiLjmufldz9fBK7+kb6t522q+4bOCQYh9yPE7yK0XSFr6AnjUiltOZfOC7cTmIG3c2vK9lf
-	EK3CKh0lbnwcaHdpdP7ncsBzcwk+BY090uuUgsyxIvZXVgcJxfKALtGg+fE5BbuMF8rDlu9
-	KArMdL/MEdR
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-X-QQ-RECHKSPAM: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR03MB5371:EE_|BN9PR03MB6090:EE_
+X-MS-Office365-Filtering-Correlation-Id: f9a81e44-bfe6-4375-b556-08ddc3a5baeb
+X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?bm9rcktyV3FHVWZ3eWNPMW5wRk5IQXdWSmVqV21raHlzeFg1Qnl5REliL1Jk?=
+ =?utf-8?B?ZzNLdU50ejYzTHpEVnJGSkovbEIwZGNvMHZlaUJsMkNOdUpLZWo3K2k1MHJ3?=
+ =?utf-8?B?cmpMQ0VQWUxRdlFwRWpDbkY1OTJIZGo0bWRKdWY1K0xuczlwamVvS1RPcmNw?=
+ =?utf-8?B?TDhsNGVid2tuaER6VkpQQkdFK28wSWdSd0VnZ2pxK2VpbHdmczdya3htblY0?=
+ =?utf-8?B?K1VRZjJETXd2cHpISXlwd0hIK0p3Nm1RNW9RblVRQW9sblhWUEFya0JoV3c1?=
+ =?utf-8?B?bG9qeTVaV1AxNXBqa0JSTDVEMFZpcDJxWXRuTytPaUFrNnZFN3hXQ2ZvZEZh?=
+ =?utf-8?B?QXBGa1FUaTRBMjN3NUx0a3BXaTRrRzVrSExkdS92ODRadU9EaEVoV3RDVjNS?=
+ =?utf-8?B?SWt6VEg0U3hEd1kybHlUbEM3NVlEVmZHN044OUh5S0NXMkhObTJzRTBlNGx4?=
+ =?utf-8?B?K1B1S2FNWm94K3ZUQTEyczZIUlBEVkJZbDMyN0dveE1nRFpkV0RlREt6cFJv?=
+ =?utf-8?B?QXpoeTBxWmZrYUx1cStLcEhGOUZNNVB0RERCRGNyVXJuYlFSREF2bWk4RWhB?=
+ =?utf-8?B?U2FSbTBLR1krMFFwWUl6MXRPclMwMGFXbVRTL2NSdjMyUE5WU1h3OFozeE1o?=
+ =?utf-8?B?a1hXTkpsZXlnN3JFVVBsNVI4TGpXRHl2bUNuUVROcXZrem1ZWXJhbFhqZExm?=
+ =?utf-8?B?RjFYanV2WmZrQmpQZUJYUlM4Z0J5NVo4RDU4RGZNUkFYRjdHczJ1OTBLMVkr?=
+ =?utf-8?B?QjcvRSthZ3FpT1o5Ymx2YnlsVEJ3TlNJU01DOHR1c082L2hsR1VPOUtNOENR?=
+ =?utf-8?B?Q3A1NTZHazd5WVhNUXBROTVxK01zd09SbVFvZVk5RkNTZFR4cXFsMjFzbTI2?=
+ =?utf-8?B?clNHV0puVXFzR0t3MDlGSG43VTBxY25pQ2xnRXhPSGxIL3pKc0xhZTJhNksv?=
+ =?utf-8?B?U2QyVTRnTGpUSVY1Sml4U3hJMlUyREJvRSs2SkJxd2Rva2NRL3lKcmZldmxK?=
+ =?utf-8?B?S1U0clQ2VUZpZzdnc29VT3ZkMEVrL1FXb2lRU0hNMHdvdnBzWW1xYVdGcEFp?=
+ =?utf-8?B?ZjVadGhuSFYrNFE4T1pEVktKbUd0NEQ5SEIxSkdValRyZ1k5STEyMWhsUGQz?=
+ =?utf-8?B?NDhGZlE4c3pUTUIvWGUxVXV5cXhGbUdDVEVZdjFqaEFWaWdTZ0ZjM01Yc3Vl?=
+ =?utf-8?B?dCtINVNDRFh4TWt6Z2hCV09wVWFpZ2c0MjhneVV4UTZwZmphV1U5YmhIcW43?=
+ =?utf-8?B?YWZ1Q0ZIR0VCZzRybDFSRXFUb3lQQVkxWlFVZDFwUEdjYWNMRjZjUGI2bVJK?=
+ =?utf-8?B?T3E5OXF5R0lBTFNIUFhMNmpyakFFUyt2NmFQbmhYWmF2SXZWelNYQ1dvYjha?=
+ =?utf-8?B?djhLRkQ1UjBpTDE1STF4cGQwTUFxSS9NalJzZ2VvcUVobWkxVXF2WFRVNnE5?=
+ =?utf-8?B?N1dBUi8zWXFMM2JFVUZjMkZ6V2JVQ2lYS0pXUlp6VUQ0bzRpa2hvTVRrQTJu?=
+ =?utf-8?B?aUVhK08rZFRhdHpUNGpGNHQzVmEvWHlLTDFkZjdEeUs0OFNxV01ta3h4UnFj?=
+ =?utf-8?B?Lys0bHlEWFA4WFpjZlFhWTVHZjloQnhZZ3k4MGFWd3EvVmRNOU5HcWJMYi9P?=
+ =?utf-8?B?Y1lYbHNWd01pY2xpM0lLaEEzSm81eFBoZmNqcnZCNHk2WHRLaHA5NGRlWTk3?=
+ =?utf-8?B?VXU4THBicnVpZDZFVVA5ODUvT0FoSFBhUTVxc1hoVEZHSC9JNkE0OWkxM1gy?=
+ =?utf-8?B?d1YvOVpGZHkvMkp1ZmdHMFo2YnRJbk9IK01XcEJseXFMYWNtTkU1aUEvKzhx?=
+ =?utf-8?B?ODBGYkczRVJUZm85czViaXU2VHlHYmdoSG9iN2FkRU5TWDk4cEY5RmJnT1hn?=
+ =?utf-8?B?bEgvd0xNNEtqZWFoQ2VEZlZENFZBQ1p3MjgvYldwTEoxaHc9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR03MB5371.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?N293ZENnc3lBVFdSOFdpeUhHc1k4cnhaT0FFUTRHcmhvRGdTM3ZWck1EMCtn?=
+ =?utf-8?B?QlkzZm83Njhnbm15QU53ZnpuOU9EZWEwcnR3VGVlaThqMzZvMjV1RTZKVXZn?=
+ =?utf-8?B?TzNzdnFHTWpIbGFzQ2YzMFp6Y2xPMXdvTS9wazJoL1JZRG05L1F2Rm9YdnBK?=
+ =?utf-8?B?c2NBTWJLbEVtNlhKSFl2b3ZJd2Q3c1hNaVk0RTJaTU9aUVdRRGtUbElTbEk2?=
+ =?utf-8?B?TGkzemJMYkFXRmI0MTFqdEE4Si83RWxHc1E2NEJKNi83WWlFdHVWOTlNUDVy?=
+ =?utf-8?B?RzNzbUF0Ym1KWDdwUHBzUEQ0U3NJcCtORnBXZmhnSnMySUZFS1J6T3JNZ0hZ?=
+ =?utf-8?B?Wi9xR2hFaU1qRDdEMWRKSzdQb2Z1SHcyRU9RclRvZm5lempKS29sNDNEOXdD?=
+ =?utf-8?B?aEpwQzkyeEVIM25tVysvUmpJMXo2VW9WN0pEVDVRcDVHdUhNVklmcjVsZjFQ?=
+ =?utf-8?B?QzFzN0piZHJqTHZiUGVoNW5QeXlkVHFoUTRuMTdLZjhIa3pPb1hKdFk1dVh6?=
+ =?utf-8?B?SWhPaVVMdmhLUHBCZzlodjg0UDJvaVI4VSs1aTJDZ0hvSENiY0JHaE85cTRX?=
+ =?utf-8?B?aUt1dFF5UXJCNDQ2ZFJiS1FxYTVOMElvcDI4K1hZUXkzVFBmSnNsTno4amJs?=
+ =?utf-8?B?UnpYQVZ2Mm00ODdsYWFCOHcvVGRRVHlURXNZMkF3UkRPVUZYNUkxdVloWEEv?=
+ =?utf-8?B?T1laWDhhZmJ5bzJ3L2xNaWVUMnAyYUczWmpIb0Jod2RTWDVtYnQ2RTc4Z284?=
+ =?utf-8?B?R0s0S0czRS9NVjRZcmtESHhnZVM1K2tJZ1AxOW5OQUFXd0tTc1ZHcVNqSFZP?=
+ =?utf-8?B?ckVDRHZHNlZhRkFFeGxKNEpkSXc0cHh6KzVvWU5rRnFKMHJaSCtSb0V6Um1Y?=
+ =?utf-8?B?OVZVaHVnYTgybUZrRkxZU3Y0MTJTa0RnRTVuYkRmb3BpNVlyTGFhNEVSTzNJ?=
+ =?utf-8?B?MitkUG84dThvOVM5ZVUyOTBESFF3dkZ4Rlhlek5ya2w5amtZOEZNV3RqZFE0?=
+ =?utf-8?B?dzNHc0xwMW9OdWpJc05ZUERNNFEvbk8zQ3NDWTRzWUthTExmRDM2ekJmZHhn?=
+ =?utf-8?B?cmEwRUwyYnhvYy9EYVEyTkg3NVJ5c0FXL292d2R3S2xmYThjSm1HbU9TSzhn?=
+ =?utf-8?B?QVFhbGJNZk9yYmlhaTNlTFV6LzhtdUVqSkhXVHNmUHRaMWFzT2JPZTBoU3lN?=
+ =?utf-8?B?S0hwTjVCUmNSaWNtWlBMWXhMVDZjY1h1a2E0dkJMR09nNnVhemExc0xvdmNM?=
+ =?utf-8?B?ZzFPOXVUenl5YlZMVDRxUTYvNEpIRTJRdkdjUUI1aFRqZUlnUkViN0lVUXBs?=
+ =?utf-8?B?YkFGL3RYTEZPYmkzalN2bUgra0MrSjdFMWVUWHFTbjA4YmJKZDNmT0pTTFdL?=
+ =?utf-8?B?eU1TQWlaVVdNQ1VBQTJMRGN3UlI0aEhaRnVhQzltTFJWa2ZvSEp0UThNQzNj?=
+ =?utf-8?B?WGhZRFNxby9NM3BXRjUrU0s4enpMRGtiUExqaDVFSTAwREtVQ3lIZ1RVUzRX?=
+ =?utf-8?B?c3c2VE0wczhmWE5UZlk2T1VtUlNCblZQb2tid2FtaFZ6SnlaMXZ2djZtMWJC?=
+ =?utf-8?B?ejFMNFd2dXJ4NE9JUTI0RnMyYVNRTlRWeGs0VTdmSStBMmo2U016TzNaenRm?=
+ =?utf-8?B?bGo4R2tHVXNZeDZLUmRtbldEVi9HWENjNzR1T3R2cUJCajZUL2gvcHdkQnZE?=
+ =?utf-8?B?KzFXNGtLRkZLWDZUdGFwbHlaV2pBVjJoS2Nib2hoVlZWbVJDWlVWTTZvaEhj?=
+ =?utf-8?B?c2hWS1hEcjlUTFEzdjg2endrVzlaRDJXcjgvOGkxR2g3RTBhOEFJZURqUWZY?=
+ =?utf-8?B?Uk13bXBUSGdOanVsbzdENW9iSEZpRzk1TmV4NWZEZi91VVFQamgyL2lRektO?=
+ =?utf-8?B?OXNXcE10YnNUSWhqdmtLNEkzYVN0VG9iV3ZzVHA2YmVmc0RzNWlBWXgvSVlE?=
+ =?utf-8?B?ZnRic3h4d1hUOGFFOTFFeVEvVmxhK2t2RXRySDZKY2cwMURyV1JvZEFscENk?=
+ =?utf-8?B?VlpiL0k0YzZCRGNodzBDem8wTjg5NjE4UGJQa0lrb3lBUi9lSWFrNTR4N3RJ?=
+ =?utf-8?B?WkU4WUd3S2dST2V1Tlp5OXRJVVFrakVXaHpNTWJxN1daTzBJRG1NcjhiVHFO?=
+ =?utf-8?B?UmtlbjhBQlRhVjhsR0lrZUN0QXp1MWQvZ25Yd2pkNk1sV3UxTk00RGRMOUI1?=
+ =?utf-8?B?enc9PQ==?=
+X-OriginatorOrg: altera.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f9a81e44-bfe6-4375-b556-08ddc3a5baeb
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR03MB5371.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2025 13:44:33.3019
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: n5x7zE2FptIHYdtn/BeFNZMwMnb3AagyBtmTvCnlsgNNcNOQNhIh/lx2Q+4r5sPIyiUhGiNaFnFfykcKH635CGB13Mpch7AQaPGhX1JuU1M=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR03MB6090
 
-This typo was not listed in scripts/spelling.txt, thus it was more
-difficult to detect. Add it for convenience.
+Hi Simon,
 
-Link: https://lore.kernel.org/all/B3C019B63C93846F+20250715071245.398846-1-wangyuli@uniontech.com/
-Signed-off-by: WangYuli <wangyuli@uniontech.com>
----
- scripts/spelling.txt | 1 +
- 1 file changed, 1 insertion(+)
+Thanks for reviewing the patch.
 
-diff --git a/scripts/spelling.txt b/scripts/spelling.txt
-index c9a6df5be281..d824c4b17390 100644
---- a/scripts/spelling.txt
-+++ b/scripts/spelling.txt
-@@ -1099,6 +1099,7 @@ notication||notification
- notications||notifications
- notifcations||notifications
- notifed||notified
-+notifer||notifier
- notity||notify
- notfify||notify
- nubmer||number
--- 
-2.50.0
+On 7/14/2025 7:10 PM, Simon Horman wrote:
+> On Mon, Jul 14, 2025 at 03:59:19PM +0800, Rohan G Thomas via B4 Relay wrote:
+>> From: Rohan G Thomas <rohan.g.thomas@altera.com>
+>>
+>> Currently, in the AF_XDP transmit paths, the CIC bit of
+>> TX Desc3 is set for all packets. Setting this bit for
+>> packets transmitting through queues that don't support
+>> checksum offloading causes the TX DMA to get stuck after
+>> transmitting some packets. This patch ensures the CIC bit
+>> of TX Desc3 is set only if the TX queue supports checksum
+>> offloading.
+>>
+>> Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
+>> Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
+> 
+> Hi Rohan,
+> 
+> I notice that stmmac_xmit() handles a few other cases where
+> checksum offload should not be requested via stmmac_prepare_tx_desc:
+> 
+>          csum_insertion = (skb->ip_summed == CHECKSUM_PARTIAL);
+>          /* DWMAC IPs can be synthesized to support tx coe only for a few tx
+>           * queues. In that case, checksum offloading for those queues that don't
+>           * support tx coe needs to fallback to software checksum calculation.
+>           *
+>           * Packets that won't trigger the COE e.g. most DSA-tagged packets will
+>           * also have to be checksummed in software.
+>           */
+>          if (csum_insertion &&
+>              (priv->plat->tx_queues_cfg[queue].coe_unsupported ||
+>               !stmmac_has_ip_ethertype(skb))) {
+>                  if (unlikely(skb_checksum_help(skb)))
+>                          goto dma_map_err;
+>                  csum_insertion = !csum_insertion;
+>          }
+> 
+> Do we need to care about them in stmmac_xdp_xmit_zc()
+> and stmmac_xdp_xmit_xdpf() too?
 
+This patch only addresses avoiding the TX DMA hang by ensuring the CIC
+bit is only set when the queue supports checksum offload. For DSA tagged
+packets checksum offloading is not supported by the DWMAC IPs but no TX
+DMA hang. AFAIK, currently AF_XDP paths don't have equivalent handling
+like skb_checksum_help(), since they operate on xdp buffers. So this
+patch doesn't attempt to implement a sw fallback but just avoids DMA
+stall.
+
+> 
+> ...
+
+Best Regards,
+Rohan
 
