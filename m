@@ -1,145 +1,165 @@
-Return-Path: <netdev+bounces-206991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EA35B05159
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 07:57:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9157DB051D5
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 08:34:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A88181AA3461
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 05:57:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4BFA3AFDDF
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 06:33:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A75B2D3229;
-	Tue, 15 Jul 2025 05:57:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF3A52609FC;
+	Tue, 15 Jul 2025 06:33:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jJ0kddfR"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="VkJuX+M2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0135255F24;
-	Tue, 15 Jul 2025 05:57:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74014B672;
+	Tue, 15 Jul 2025 06:33:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752559032; cv=none; b=H/oRjwtXmXAJvia2cdLs9Ogn9n7mnBOXx/hLTkV5e5KArztjHqE9nqBF40C1pfw9xS6tS7BalVsXh2uWoG9bJCul/VkPC3tWL/dAaExUMSZPe9EfBSAl/0A3JtakHhPndiB+PWiteG9TSGVIvLCKADOin+Gd8jj0ghB6fmRbm0Q=
+	t=1752561238; cv=none; b=R64eqBFUFXtOicstF0q9lZmB36aMNTAUZGXBYe8v+MlydeOLr3q8Jphso521mbi2xLmKLiYXTpJ0dL76LHoYnEQh2KPo4PfcPoVjhxmq0M8RdY5a7YRpu94d2HbPKzVx3m/Dh3bOHK3JOJEiYnoPZqOmSOmdFCdxBetmpegcai0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752559032; c=relaxed/simple;
-	bh=wmvN79kkI2uY89k/rrcdVS6059/8dQL8TezMZWnf+rM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UuwIH4MM45hCUNMHgWeG49I8VJJPNO+tDblhdMsyAS6SLXsvums274nez4bdkmBpRHmgcQVvy+dcvx/U8TpauUDIrGNZH5I666NUa6m4PMYmWs+EuE6gjCwhU9KOTjL1dqgjLfgt2v/lRyFze5eGQvRWAwEOexHm9oLHVTKbEs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jJ0kddfR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8964C4CEE3;
-	Tue, 15 Jul 2025 05:57:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752559031;
-	bh=wmvN79kkI2uY89k/rrcdVS6059/8dQL8TezMZWnf+rM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jJ0kddfRq/wi2cczPvscCBtaQBOvPPubaZPv3FhypEw+5UKK0WhctGzJqakUE47mj
-	 0hgvMUtevpezIfVJrccsqdtSYPd2sjN0nRb9tN0vghFJ+c05Vt5+gWGqNDdNJk7p6H
-	 Sh8oWOAYHvlvgAcM5ZwOV2KbvC/4LCYKyIt/WgUJb5b0ER0EaKLDgyQwMcQxcdZpWG
-	 yRZoRdLWkXFBN0aAu91ZYkfbMxd4cRB9BrlHetz/bw9JgY4rGuKT9x+znMMEXCi7ry
-	 xSs/2RLQ/Ed9IUoMZM+nwW7VQ7Wh00EVvhINdsIUSq31XrazAB7+UGLadWmjzYO5wH
-	 BcbPsbS4HX8Vw==
-Date: Tue, 15 Jul 2025 08:57:07 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, llvm@lists.linux.dev,
-	Ingo Molnar <mingo@redhat.com>, Bill Wendling <morbo@google.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Arnd Bergmann <arnd@arndb.de>, linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Mark Rutland <mark.rutland@arm.com>,
-	Michael Guralnik <michaelgur@mellanox.com>, patches@lists.linux.dev,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Jijie Shao <shaojijie@huawei.com>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v3 6/6] IB/mlx5: Use __iowrite64_copy() for write
- combining stores
-Message-ID: <20250715055707.GC5882@unreal>
-References: <0-v3-1893cd8b9369+1925-mlx5_arm_wc_jgg@nvidia.com>
- <6-v3-1893cd8b9369+1925-mlx5_arm_wc_jgg@nvidia.com>
- <20250714215504.GA2083014@nvidia.com>
+	s=arc-20240116; t=1752561238; c=relaxed/simple;
+	bh=WC45c/DnzmSKE85Z1Qai86T8LgFzFt5mXdfv7rXwSO0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dVOcVpYxzLANZk2/YmVgVR+5mi1e+XHmBPKc4WxQieqpUXA/vXdye58fszg3WhXF52SsMoFHNtm0njD9iev4TKCv367itgrUHCCzzgk/rLQ87zJ4V2O+eM1lH1gbmoAnYosUJgekO2qXxQxoEbuN+yhySycqrUqfekwfg6B+5WY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=VkJuX+M2; arc=none smtp.client-ip=217.70.178.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
+	by mslow3.mail.gandi.net (Postfix) with ESMTP id C11B8587043;
+	Tue, 15 Jul 2025 06:05:42 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 3A02E44354;
+	Tue, 15 Jul 2025 06:05:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1752559535;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9vRRRofKzYTk4D1n78QDRieI6X+rxdAzS6AVWnX1z1A=;
+	b=VkJuX+M2u8O9YDU70VOX5FCojosBhI8llh9v5jiH+jd27KMO5RVflqQX+rDLZmZmOptQIB
+	S04bNJ5t/QKOVxc+qJ6hAoJ09ZMl4nvxEHmQQ7n32u0IoEGKdj1j155KJnHfbVxFUf6vku
+	S6Fadh5pANHce0LFYSpI8KTZ+HWb1agKX8jbACJjR44yrzCcD+t83r9oI8fl7xMFrKSr6V
+	ioZZ0nEpQBR+nwEDnuVEX1KOQD29IBRa4oioNTeniKDxizJffYOJwWaapVJ0I1q/1mWXlF
+	pRpMroalkrMQfOWbBfxaGXZ+WG8w83j1Myw+WAAdqtghs6vVnvhCjhw5JX/B+g==
+Date: Tue, 15 Jul 2025 08:05:32 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, Florian Fainelli
+ <f.fainelli@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
+ <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/3] net: netdevsim: Add PHY support in
+ netdevsim
+Message-ID: <20250715080532.07883d74@fedora.home>
+In-Reply-To: <560e7969-b859-45ed-b368-350a62cec678@lunn.ch>
+References: <20250710062248.378459-1-maxime.chevallier@bootlin.com>
+	<20250710062248.378459-2-maxime.chevallier@bootlin.com>
+	<560e7969-b859-45ed-b368-350a62cec678@lunn.ch>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250714215504.GA2083014@nvidia.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdehgedtjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeevieevgeehgfekgedtledvleeuieelheegiefftdeuhfelvddufeelheegteevgeenucfkphepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedujedprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpt
+ hhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Mon, Jul 14, 2025 at 06:55:04PM -0300, Jason Gunthorpe wrote:
-> On Thu, Apr 11, 2024 at 01:46:19PM -0300, Jason Gunthorpe wrote:
-> > mlx5 has a built in self-test at driver startup to evaluate if the
-> > platform supports write combining to generate a 64 byte PCIe TLP or
-> > not. This has proven necessary because a lot of common scenarios end up
-> > with broken write combining (especially inside virtual machines) and there
-> > is other way to learn this information.
-> > 
-> > This self test has been consistently failing on new ARM64 CPU
-> > designs (specifically with NVIDIA Grace's implementation of Neoverse
-> > V2). The C loop around writeq() generates some pretty terrible ARM64
-> > assembly, but historically this has worked on a lot of existing ARM64 CPUs
-> > till now.
-> > 
-> > We see it succeed about 1 time in 10,000 on the worst effected
-> > systems. The CPU architects speculate that the load instructions
-> > interspersed with the stores makes the WC buffers statistically flush too
-> > often and thus the generation of large TLPs becomes infrequent. This makes
-> > the boot up test unreliable in that it indicates no write-combining,
-> > however userspace would be fine since it uses a ST4 instruction.
-> 
-> Hi Catalin,
-> 
-> After a year of testing this in real systems it turns out that still
-> some systems are not good enough with the unrolled 8 byte store loop.
-> In my view the CPUs are quite bad here and this WC performance
-> optimization is not working very well.
-> 
-> There are only two more options to work around this issue, use the
-> unrolled 16 byte STP or the single Neon instruction 64 byte store.
-> 
-> Since STP was rejected alread we've only tested the Neon version. It
-> does make a huge improvement, but it still somehow fails to combine
-> rarely sometimes. The CPU is really bad at this :(
-> 
-> So we want to make mlx5 use the single 64 byte neon store instruction
-> like userspace has been using for a long time for this testing
-> algorithm.
-> 
-> It is simple enough, but the question has come up where to put the
-> code.  Do you want to somehow see the neon option to be in the
-> arch/arm64 code or should we stick it in the driver under a #ifdef?
-> 
-> The entry/exit from neon is slow enough I don't think any driver doing
-> performance work would want to use neon instead of __iowrite64_copy(),
-> so I do not think it should be hidden inside __iowrite64_copy(). Nor
-> have I thought of a name for an arch generic function..
+On Sat, 12 Jul 2025 18:54:38 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-__iowrite64_slow_copy() ????
+> > +static int nsim_mdio_read(struct mii_bus *bus, int phy_addr, int reg_n=
+um)
+> > +{
+> > +	return 0;
+> > +}
+> > +
+> > +static int nsim_mdio_write(struct mii_bus *bus, int phy_addr, int reg_=
+num,
+> > +			   u16 val)
+> > +{
+> > +	return 0;
+> > +} =20
+>=20
+> If i'm reading the code correctly, each PHY has its own MDIO bus? And
+> the PHY is always at address 0?
 
-> 
-> Thanks,
-> Jason
+Yes indeed.=20
+
+> Maybe for address !=3D 0, these should return -ENODEV?
+
+That could be done yes, but I don't think this will ever happen as this
+is only ever going to be used in netdevsim, which also controls the PHY
+instantiation. I'm OK to add the ENODEV though :)
+
+For the record, the first draft implementation I had locally used a
+single MDIO bus on which we could register up to 32 netdevsim PHYs, but
+that wasn't enough. At some point Jakub pointed me to the case of
+netlink DUMP requests that would be too large to fit in a single
+netlink message (default threshold for that is > 4K messages), so to
+test that with the phy_link_topology stuff, I had to add around 150
+PHYs...
+
+> I'm guessing the PHY core is going to perform reads/writes for things
+> like EEE? And if the MAC driver has an IOCTL handler, it could also do
+> reads/writes. So something is needed here, but i do wounder if hard
+> coded 0 is going to work out O.K? Have you looked at what accesses the
+> core actually does?
+
+I don't see that driver being useful outside of netdevsim, so at
+least we have a good idea of what the MAC driver will do.
+
+There'e no ioctl, but we can be on the safe side and stub it a bit more.
+
+=46rom the tests I've been running, I didn't encounter any side-effect
+but I only tested very simple cases (set link up, run ethtool, etc.)
+
+I've considered re-using swphy for example, and using an emulated MDIO
+bus for netdevsim PHY, but my fear was that this would in the end get
+too complex. Let's say we want to add a new netdevsim debugfs
+file that allows us to control what is the speed reported by the phy,
+if we want to report say 10G speeds, we also need to emulate C45, etc.
+
+I guess at some point, we will run into scenarios where phylib is going
+to call some genphy helpers, it really depends on how deep we want to go
+with this netdevsim PHY driver.
+
+The use-cases that I saw were :
+ - Being able to test the netlink stuff now that we have the ability to
+know which PHY handles which command
+ - In the future, write some tests for the linkmode reporting (that I
+broke once with phy_caps)
+ - When PHY Muxes eventually get there, I'd also like to netdevsim
+that.
+
+However that's just my view of the thing, we could also consider having
+this driver rely purely on MDIO emulation, where the MDIO registers
+would behave exactly as specified in C22/C37/C45, but that's quite more
+complex :)
+
+I'm open for any improvement or ideas on that driver :)
+
+>      Andrew
+
+Thanks for the review,
+
+Maxime
 
