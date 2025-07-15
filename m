@@ -1,119 +1,82 @@
-Return-Path: <netdev+bounces-207005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE199B0529E
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 09:19:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C66E7B05283
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 09:16:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3A594A5BC7
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 07:19:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13DA74A7658
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 07:16:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C894272E58;
-	Tue, 15 Jul 2025 07:16:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D9D27147F;
+	Tue, 15 Jul 2025 07:15:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="fGVxSsnO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l5bWZrNa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFD26271444
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 07:16:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC76626F478;
+	Tue, 15 Jul 2025 07:15:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752563801; cv=none; b=utc3TZumvuWXr7TBZSDRWPs9Nq03HXMKcMQ9FlLAd+sMM79NglRCFquxPs34UhoPnPgT+z31qHWHnXIGawYBORQIM2vxkyU1eW6btaSQUps4IrNGBJXoDBQtVaFoHafDXfNHoZHt2u1KVW62p4I93ppA5E8DLFAZ1/gFBUxk1xE=
+	t=1752563741; cv=none; b=kpXW3UxySfinsoUGjR78q7bulE1f1DZH+t0qB1LeRU8b+uhdf+YrcK32IXhlVCrl9oeCHOd36zWC4iR8py0/1O430oanVknIcsQ0DOqAllKu8j9RLW0andlhy2f7aV6rPXpMNlJwQzAsEzoNCZLZQLS5XjFbOu3K8EhP9W/1T/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752563801; c=relaxed/simple;
-	bh=3tRzF+eAG69iCFJsLHqK7qCIOSv/sCoudEUDZNrr2KA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ikm2VJxaU/CPba5oRhko4qEPEED31MkXtkuZIw6SNKXVxylJOOz/sWt9YBmekgaz29K8xRa1f5Pxdt5++KTpwH18VvFtTCsBuJ3f2Q5Ez1goPEpSpzBrTL3+gbV2P+pR0eP1m2sk4vvgn5ZXQATQCfzGW1cMfiDcXp4ui+xuyZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=fGVxSsnO; arc=none smtp.client-ip=18.169.211.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1752563604;
-	bh=RFKqX/8jGLZ0gCM1lRc1v1zeuP3fiXSjkW615zWkF/8=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=fGVxSsnOyLb+URLacjA1Sd3bbCsbyuEhRq1fqx/9kf9hxKAfgwJglUml0EAcf66lr
-	 qP5bwH2xTPNO89oJgiIGSIe7rO7+BstjN+GEPqloQKhHWEeVxqnQCBXEKNUyVVL6S2
-	 Zn3uC07ASOaEv2fW+Hoe7yFbmdxKoXTBgjiZK0Vc=
-X-QQ-mid: zesmtpip3t1752563587t54e86ea1
-X-QQ-Originating-IP: LAPbbLpI8/WwODO7cz/sB4Ix6FIzw86cgmvoh1lVP0U=
-Received: from avenger-e500 ( [localhost])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 15 Jul 2025 15:13:02 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 14369993403465055196
-EX-QQ-RecipientCnt: 63
-From: WangYuli <wangyuli@uniontech.com>
-To: seanjc@google.com,
-	pbonzini@redhat.com,
-	tglx@linutronix.de,
-	mingo@redhat.com,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	x86@kernel.org,
-	hpa@zytor.com,
-	dave@stgolabs.net,
-	jonathan.cameron@huawei.com,
-	dave.jiang@intel.com,
-	alison.schofield@intel.com,
-	vishal.l.verma@intel.com,
-	ira.weiny@intel.com,
-	dan.j.williams@intel.com,
-	lucas.demarchi@intel.com,
-	thomas.hellstrom@linux.intel.com,
-	rodrigo.vivi@intel.com,
-	airlied@gmail.com,
-	simona@ffwll.ch,
-	marcin.s.wojtas@gmail.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	arend.vanspriel@broadcom.com,
-	ilpo.jarvinen@linux.intel.com,
-	andriy.shevchenko@linux.intel.com,
-	gregkh@linuxfoundation.org,
-	jirislaby@kernel.org,
-	jgross@suse.com,
-	sstabellini@kernel.org,
-	oleksandr_tyshchenko@epam.com,
-	akpm@linux-foundation.org
-Cc: kvm@vger.kernel.org,
+	s=arc-20240116; t=1752563741; c=relaxed/simple;
+	bh=66XFHTlp/vLtCpVft2/nBl04cFbKoI8kcWKDesGdOEQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lTy/ggFCXmbCGXKOZXW3xJeqsOH/RtjEKAhkUxIbtm+PXMYW5/EuLxshyLtsIgli+DiarqMGB0jI8HooRUFtegpAOCtP1k7v76yn2MJlGEcD2+CblgptLdGU8gVGvNwofiIxJ6gqFWhB9+vyV4442vH9vCD1FekNOfvD1MBWwBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l5bWZrNa; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752563740; x=1784099740;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=66XFHTlp/vLtCpVft2/nBl04cFbKoI8kcWKDesGdOEQ=;
+  b=l5bWZrNa0njdriL2m/+9rSIR/4fq6BVyvF293cGYIRATyuj6cypdDcUn
+   Tl2tqV0/hnk7Wyj0oK4J1bWbrrAs+ZY4D/WZ4yQqiCr7aKgnJNqJ8N2qV
+   TQY/bp2dnrkUmfxmWW+mqwuiSHkFdGc0LIGF0laBQ/T0S9WQyyQiev2eG
+   RSA0Y0MpXWq/YEzEGOpjONx+COp6VPiAcj37rBX89uqe7gAK1YvOeuVsJ
+   S4VWpaG5BbcVnN3DERjwLiiXtX8/I/dRmkM/Zdcs8azK8x9rkXMHH4SyN
+   tTUx0vUxzqyovWrN2MbHd71H5N7b4g2w7jV/mf5wdAw7UZnm8q/LEMel7
+   g==;
+X-CSE-ConnectionGUID: dgq2UFbaTx2XxRaw9v5qyg==
+X-CSE-MsgGUID: vrWH766zSq2CD5X/dZz7bA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="58427976"
+X-IronPort-AV: E=Sophos;i="6.16,313,1744095600"; 
+   d="scan'208";a="58427976"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 00:15:36 -0700
+X-CSE-ConnectionGUID: Pv1ZxgCOTJONF08bK+CveQ==
+X-CSE-MsgGUID: j90nGgMtTZuXn4FtKbEdaA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,313,1744095600"; 
+   d="scan'208";a="188155495"
+Received: from p12ill20yoongsia.png.intel.com ([10.88.227.38])
+  by fmviesa001.fm.intel.com with ESMTP; 15 Jul 2025 00:15:32 -0700
+From: Song Yoong Siang <yoong.siang.song@intel.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	wangyuli@uniontech.com,
-	ming.li@zohomail.com,
-	linux-cxl@vger.kernel.org,
-	intel-xe@lists.freedesktop.org,
-	dri-devel@lists.freedesktop.org,
-	netdev@vger.kernel.org,
-	kvalo@kernel.org,
-	johannes.berg@intel.com,
-	quic_ramess@quicinc.com,
-	ragazenta@gmail.com,
-	jeff.johnson@oss.qualcomm.com,
-	mingo@kernel.org,
-	j@jannau.net,
-	linux@treblig.org,
-	linux-wireless@vger.kernel.org,
-	brcm80211@lists.linux.dev,
-	brcm80211-dev-list.pdl@broadcom.com,
-	linux-serial@vger.kernel.org,
-	xen-devel@lists.xenproject.org,
-	shenlichuan@vivo.com,
-	yujiaoliang@vivo.com,
-	colin.i.king@gmail.com,
-	cvam0000@gmail.com,
-	zhanjun@uniontech.com,
-	niecheng1@uniontech.com,
-	guanwentao@uniontech.com
-Subject: [PATCH] treewide: Fix typo "notifer"
-Date: Tue, 15 Jul 2025 15:12:45 +0800
-Message-ID: <B3C019B63C93846F+20250715071245.398846-1-wangyuli@uniontech.com>
-X-Mailer: git-send-email 2.50.0
+	bpf@vger.kernel.org
+Subject: [PATCH bpf-next,v4 1/1] doc: clarify XDP Rx metadata handling and driver requirements
+Date: Tue, 15 Jul 2025 15:15:02 +0800
+Message-Id: <20250715071502.3503440-1-yoong.siang.song@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -121,157 +84,104 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: Nj7jiM2mkr3wuQga4E8Ap70nRURNWdUayhETDW1ovZAv4COlH4JghuhG
-	/pvfuzDSwLXOANE+dnBiwMQsv1i0z9oMYkFfmb6iVDB5Ny49o+KcQTbGDHphoR2EHm2hZRt
-	EtXwn8dBz7hEVzKVqIDmbVSQtvuy47FEDZrE1ObeA5O/5CsCmy4rc+h+lDjOOURGBImub8T
-	CbXVoldTO/tK7t+yoGQ/Z4mia54GsQtuF3xrk+9Lz+DUu2h3g2D+pilTiVYpi0NNEw6KSpm
-	RtCYoSF8AXcLmb6pUoJofHXxaws4vTmJ3cG1YyXebrQyIep78h08HY/J/yeB00Cm8/aVG09
-	EoGb9DpDQw0k2LUB2R07OW3tE+FB0mvcckuhAo1kpV1rxyQPJ3oq211lIjLjJ2WpztR8lCC
-	BrNRSEvogIlmothapVbvRTVlKglfGxDIh+qle8gBV1La2I2glQcBm80O2dN+jqdBYqx4fLq
-	1HNUlZppA+fLOFSBGGXu8usHNaWG0Ad4eVIRuBmr0rO/HCCAMrooGxhAVJSfGQk2nTgamSQ
-	kUvfA3ikDRjzWMYrIuDMynnw8tCqiC2vUa2WCwc22XOZBKa4lmGtTuLeT0GyFhfFvfIE04J
-	KCwxVccvQ9pKLXNPHDLZIeCPgxWnUs3gJGKfD1SyZBJFaegz2Q1gAcu5xlohxgAqZpMnWyz
-	81ozAGfM8eClmUsCKk7OxJeQYircldWyZstyKNcSy05kg3uR+v5qoNuAJI/V8L0piRG7gGP
-	dw92gnOoe99Uqkndl9qV1BgSkUZgxd0QyZ8bAuS1z4lKZkHa/YdwPa4XHfJujHLJWyIScAa
-	gT7Y+gxMGnSgkiqZRDUyC4/qwzO7k/Tjw47RqlchN42vDUUQplVxWuIvKAN9ONw+3forklc
-	XhDGBbsMCYfJyhYMMufpftC4NXu/E4WJmgVPbFCVfVrhAnrITVl4d5dbX5TuFTWnRXkI3+B
-	PUjxDfvaXwoHlGzPgaKqAY4GVqaTYt7tHUiClbX1Q0En42ezA6O4qKEMpPpOtqGl09GBC8G
-	5woDYNMdvK9oXAvx+Ry8rFNG3HtTot3Sq3mYT4jInZCKS+Ojx2
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-X-QQ-RECHKSPAM: 0
 
-There are some spelling mistakes of 'notifer' in comments which
-should be 'notifier'.
+Improves the documentation for XDP Rx metadata handling, especially for
+AF_XDP use cases. It clarifies that drivers must remove any device-reserved
+metadata from the data_meta area before passing the frame to the XDP
+program.
 
-Fix them and add it to scripts/spelling.txt.
+Besides, expand the explanation of how userspace and BPF programs should
+coordinate the use of METADATA_SIZE, and adds a detailed diagram to
+illustrate pointer adjustments and metadata layout.
 
-Signed-off-by: WangYuli <wangyuli@uniontech.com>
+Additional, describe the requirements and constraints enforced by
+bpf_xdp_adjust_meta().
+
+Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
 ---
- arch/x86/kvm/i8254.c                                        | 4 ++--
- drivers/cxl/core/mce.h                                      | 2 +-
- drivers/gpu/drm/xe/xe_vm_types.h                            | 2 +-
- drivers/net/ethernet/marvell/mvneta.c                       | 2 +-
- drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.c | 2 +-
- drivers/tty/serial/8250/8250_dw.c                           | 2 +-
- include/xen/xenbus.h                                        | 2 +-
- scripts/spelling.txt                                        | 1 +
- 8 files changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/kvm/i8254.c b/arch/x86/kvm/i8254.c
-index 739aa6c0d0c3..9ff55112900a 100644
---- a/arch/x86/kvm/i8254.c
-+++ b/arch/x86/kvm/i8254.c
-@@ -641,7 +641,7 @@ static void kvm_pit_reset(struct kvm_pit *pit)
- 	kvm_pit_reset_reinject(pit);
- }
+V4:
+  - update the documentation to indicate that drivers are expected to copy
+    any device-reserved metadata from the metadata area (Jakub)
+  - remove selftest tool changes.
+
+V3: https://lore.kernel.org/netdev/20250702165757.3278625-1-yoong.siang.song@intel.com/
+  - update doc and commit msg accordingly.
+
+V2: https://lore.kernel.org/netdev/20250702030349.3275368-1-yoong.siang.song@intel.com/
+  - unconditionally do bpf_xdp_adjust_meta with -XDP_METADATA_SIZE (Stanislav)
+
+V1: https://lore.kernel.org/netdev/20250701042940.3272325-1-yoong.siang.song@intel.com/
+---
+ Documentation/networking/xdp-rx-metadata.rst | 47 ++++++++++++++------
+ 1 file changed, 34 insertions(+), 13 deletions(-)
+
+diff --git a/Documentation/networking/xdp-rx-metadata.rst b/Documentation/networking/xdp-rx-metadata.rst
+index a6e0ece18be5..2e067eb6c5d6 100644
+--- a/Documentation/networking/xdp-rx-metadata.rst
++++ b/Documentation/networking/xdp-rx-metadata.rst
+@@ -49,7 +49,10 @@ as follows::
+              |                 |
+    xdp_buff->data_meta   xdp_buff->data
  
--static void pit_mask_notifer(struct kvm_irq_mask_notifier *kimn, bool mask)
-+static void pit_mask_notifier(struct kvm_irq_mask_notifier *kimn, bool mask)
- {
- 	struct kvm_pit *pit = container_of(kimn, struct kvm_pit, mask_notifier);
+-An XDP program can store individual metadata items into this ``data_meta``
++Certain devices may utilize the ``data_meta`` area for specific purposes.
++Drivers for these devices must move any hardware-related metadata out from the
++``data_meta`` area before presenting the frame to the XDP program. This ensures
++that the XDP program can store individual metadata items into this ``data_meta``
+ area in whichever format it chooses. Later consumers of the metadata
+ will have to agree on the format by some out of band contract (like for
+ the AF_XDP use case, see below).
+@@ -63,18 +66,36 @@ the final consumer. Thus the BPF program manually allocates a fixed number of
+ bytes out of metadata via ``bpf_xdp_adjust_meta`` and calls a subset
+ of kfuncs to populate it. The userspace ``XSK`` consumer computes
+ ``xsk_umem__get_data() - METADATA_SIZE`` to locate that metadata.
+-Note, ``xsk_umem__get_data`` is defined in ``libxdp`` and
+-``METADATA_SIZE`` is an application-specific constant (``AF_XDP`` receive
+-descriptor does _not_ explicitly carry the size of the metadata).
+-
+-Here is the ``AF_XDP`` consumer layout (note missing ``data_meta`` pointer)::
+-
+-  +----------+-----------------+------+
+-  | headroom | custom metadata | data |
+-  +----------+-----------------+------+
+-                               ^
+-                               |
+-                        rx_desc->address
++Note, ``xsk_umem__get_data`` is defined in ``libxdp`` and ``METADATA_SIZE`` is
++an application-specific constant. Since the ``AF_XDP`` receive descriptor does
++_not_ explicitly carry the size of the metadata, it is the responsibility of the
++driver to copy any device-reserved metadata out from the metadata area and
++ensure that ``xdp_buff->data_meta`` is set equal to ``xdp_buff->data`` before a
++BPF program is executed. This is necessary so that, after the BPF program
++adjusts the metadata area, the consumer can reliably retrieve the metadata
++address using ``METADATA_SIZE`` offset.
++
++The following diagram shows how custom metadata is positioned relative to the
++packet data and how pointers are adjusted for metadata access (note the absence
++of the ``data_meta`` pointer in ``xdp_desc``)::
++
++              |<-- bpf_xdp_adjust_meta(xdp_buff, -METADATA_SIZE) --|
++  new xdp_buff->data_meta                              old xdp_buff->data_meta
++              |                                                    |
++              |                                            xdp_buff->data
++              |                                                    |
++   +----------+----------------------------------------------------+------+
++   | headroom |                  custom metadata                   | data |
++   +----------+----------------------------------------------------+------+
++              |                                                    |
++              |                                            xdp_desc->addr
++              |<------ xsk_umem__get_data() - METADATA_SIZE -------|
++
++``bpf_xdp_adjust_meta`` ensures that ``METADATA_SIZE`` is aligned to 4 bytes,
++does not exceed 252 bytes, and leaves sufficient space for building the
++xdp_frame. If these conditions are not met, it returns a negative error. In this
++case, the BPF program should not proceed to populate data into the ``data_meta``
++area.
  
-@@ -694,7 +694,7 @@ struct kvm_pit *kvm_create_pit(struct kvm *kvm, u32 flags)
- 
- 	pit_state->irq_ack_notifier.gsi = 0;
- 	pit_state->irq_ack_notifier.irq_acked = kvm_pit_ack_irq;
--	pit->mask_notifier.func = pit_mask_notifer;
-+	pit->mask_notifier.func = pit_mask_notifier;
- 
- 	kvm_pit_reset(pit);
- 
-diff --git a/drivers/cxl/core/mce.h b/drivers/cxl/core/mce.h
-index ace73424eeb6..ca272e8db6c7 100644
---- a/drivers/cxl/core/mce.h
-+++ b/drivers/cxl/core/mce.h
-@@ -7,7 +7,7 @@
- 
- #ifdef CONFIG_CXL_MCE
- int devm_cxl_register_mce_notifier(struct device *dev,
--				   struct notifier_block *mce_notifer);
-+				   struct notifier_block *mce_notifier);
- #else
- static inline int
- devm_cxl_register_mce_notifier(struct device *dev,
-diff --git a/drivers/gpu/drm/xe/xe_vm_types.h b/drivers/gpu/drm/xe/xe_vm_types.h
-index 1979e9bdbdf3..0ca27579fd1f 100644
---- a/drivers/gpu/drm/xe/xe_vm_types.h
-+++ b/drivers/gpu/drm/xe/xe_vm_types.h
-@@ -259,7 +259,7 @@ struct xe_vm {
- 		 * up for revalidation. Protected from access with the
- 		 * @invalidated_lock. Removing items from the list
- 		 * additionally requires @lock in write mode, and adding
--		 * items to the list requires either the @userptr.notifer_lock in
-+		 * items to the list requires either the @userptr.notifier_lock in
- 		 * write mode, OR @lock in write mode.
- 		 */
- 		struct list_head invalidated;
-diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet/marvell/mvneta.c
-index 147571fdada3..ee4696600146 100644
---- a/drivers/net/ethernet/marvell/mvneta.c
-+++ b/drivers/net/ethernet/marvell/mvneta.c
-@@ -4610,7 +4610,7 @@ static int mvneta_stop(struct net_device *dev)
- 		/* Inform that we are stopping so we don't want to setup the
- 		 * driver for new CPUs in the notifiers. The code of the
- 		 * notifier for CPU online is protected by the same spinlock,
--		 * so when we get the lock, the notifer work is done.
-+		 * so when we get the lock, the notifier work is done.
- 		 */
- 		spin_lock(&pp->lock);
- 		pp->is_stopped = true;
-diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.c b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.c
-index b94c3619526c..bcd56c7c4e42 100644
---- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.c
-+++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.c
-@@ -8313,7 +8313,7 @@ struct brcmf_cfg80211_info *brcmf_cfg80211_attach(struct brcmf_pub *drvr,
- 	cfg->d11inf.io_type = (u8)io_type;
- 	brcmu_d11_attach(&cfg->d11inf);
- 
--	/* regulatory notifer below needs access to cfg so
-+	/* regulatory notifier below needs access to cfg so
- 	 * assign it now.
- 	 */
- 	drvr->config = cfg;
-diff --git a/drivers/tty/serial/8250/8250_dw.c b/drivers/tty/serial/8250/8250_dw.c
-index 1902f29444a1..6d9af6417620 100644
---- a/drivers/tty/serial/8250/8250_dw.c
-+++ b/drivers/tty/serial/8250/8250_dw.c
-@@ -392,7 +392,7 @@ static void dw8250_set_termios(struct uart_port *p, struct ktermios *termios,
- 	rate = clk_round_rate(d->clk, newrate);
- 	if (rate > 0) {
- 		/*
--		 * Note that any clock-notifer worker will block in
-+		 * Note that any clock-notifier worker will block in
- 		 * serial8250_update_uartclk() until we are done.
- 		 */
- 		ret = clk_set_rate(d->clk, newrate);
-diff --git a/include/xen/xenbus.h b/include/xen/xenbus.h
-index 3f90bdd387b6..00b84f2e402b 100644
---- a/include/xen/xenbus.h
-+++ b/include/xen/xenbus.h
-@@ -180,7 +180,7 @@ int xenbus_printf(struct xenbus_transaction t,
-  * sprintf-style type string, and pointer. Returns 0 or errno.*/
- int xenbus_gather(struct xenbus_transaction t, const char *dir, ...);
- 
--/* notifer routines for when the xenstore comes up */
-+/* notifier routines for when the xenstore comes up */
- extern int xenstored_ready;
- int register_xenstore_notifier(struct notifier_block *nb);
- void unregister_xenstore_notifier(struct notifier_block *nb);
-diff --git a/scripts/spelling.txt b/scripts/spelling.txt
-index c9a6df5be281..d824c4b17390 100644
---- a/scripts/spelling.txt
-+++ b/scripts/spelling.txt
-@@ -1099,6 +1099,7 @@ notication||notification
- notications||notifications
- notifcations||notifications
- notifed||notified
-+notifer||notifier
- notity||notify
- notfify||notify
- nubmer||number
+ XDP_PASS
+ ========
 -- 
-2.50.0
+2.34.1
 
 
