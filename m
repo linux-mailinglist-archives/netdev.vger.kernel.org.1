@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-207264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D190B067BE
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 22:30:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05B97B067BC
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 22:30:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AD4C564EFE
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 20:30:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 136365041A0
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 20:29:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEF252BE7D9;
-	Tue, 15 Jul 2025 20:30:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A2BF29B8E4;
+	Tue, 15 Jul 2025 20:30:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P6nBD4B2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TX+BW4cw"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06FA52BEC5C
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 20:30:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F59228000A
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 20:30:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752611412; cv=none; b=TwdVkkofOFByLt7l57ICtEM6yB5KywzUDXsyBHHItXA44s9t0DWPzrN+pVklFHdfiRZcdNW3+REzCq5FWeLIs9Ty8ZjeFRve7KfQ+6i/FoWOyIYcmViBIIADsa84Wo5Zk1WJ9k0gWmzyf0jLveo+rIL13I1iax79MtfD3uwoHno=
+	t=1752611408; cv=none; b=KKAogIWJkpwlkRZrUmUo5cZFA/pgB10DeaGQ8ZyjxCucK+fTp5yOVaXkVnaFvRlPG2CI24nZYI6c/xuCdlH8MynxK0ONCZ6LbODU/vlad6zeVUzQNte1C0+RZEIS+j6Z9bqiVG4DrU8cW+85HtGUGQvVcNl/WdfkXIzSeDEwu7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752611412; c=relaxed/simple;
-	bh=AJvehBzMxcWZIX071FFmpzVMhkIy2ZgCJihd7ddoSDs=;
+	s=arc-20240116; t=1752611408; c=relaxed/simple;
+	bh=DF51Ija4aTi6aDT+XWtc4DwAwkeHZC1nY5FsBaDZsB4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YNpEMMXPBomXYfoEcJDet1STOi6CvSf/oMc58RmDSmu1iear6Yx74r13VOK598cO/X0nGVbA2vwRWc8RcvrsEm66xSTGO2a4/XA3P/kn1P/OGZrpRjaOa0i6A/2Gh/mJEbinAQSVy9Cu24aOGsg+Pde1yuQkMrAoM/oSSdWOowo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P6nBD4B2; arc=none smtp.client-ip=198.175.65.19
+	 MIME-Version; b=i1plc3VIwb0xlLnSAGwVMMN0a3Jvt/cvejh1p6tFPw3uqhDC4RrGKqNz4OS+fmtQtZLEkldx0dP6DV+ogvrKR1ouQhrZ2Y9K6YD/hAr1SJYvEekLWyx7Vdu5GWUhYl8U6PbxeMUepcYY+npTCgmyk234Ubz0DlZb7XrseD/G7SA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TX+BW4cw; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752611411; x=1784147411;
+  t=1752611407; x=1784147407;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=AJvehBzMxcWZIX071FFmpzVMhkIy2ZgCJihd7ddoSDs=;
-  b=P6nBD4B2AcFxsaR6jXLvUtJCE9rDA+OZNu9Cg5wfW4aczl80cGdJvmrP
-   ezLIa1Bp6yVfIkkKasx9NGAfS8/tJpaysFyhSjKsclGMExdKLKAzmzbz3
-   0cuCixNJ4tuU1anu+M0t5oB1J9r5zBKaK/N0+q1EhorjMQ8X/GAVQjGqv
-   W+rOt1Ygf1myWrAXrZV/3b4GvthUZTCa+Z+KBnepzZm14nkMYTq763Buc
-   XQcTy8DCIWlgZfgVY4EDJgSPwPT+dr4bErZF6MGgtwEfwfgvmgYb+Ha59
-   KLhixzOvZBf7Agx3v1r8O6xboIpQwshjYADaDJB3fzMR/SOawQP3Y4qXn
-   w==;
-X-CSE-ConnectionGUID: HsQ4TRgJSha0iSLoya+Gxw==
-X-CSE-MsgGUID: dVDY2tLxRUm/ml85mW8X6g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11493"; a="54699814"
+  bh=DF51Ija4aTi6aDT+XWtc4DwAwkeHZC1nY5FsBaDZsB4=;
+  b=TX+BW4cwmHRVcSqKyl6TXAFIdYpsa+q7LbFRLz5dycndnu4jWUIqvRYK
+   0plu9Phr2Pv84zjWGtgQNrFrZECRos125iGmoQ5WLTNHQ/lyTBq1ulXlR
+   EDDs0LOjNp5JiUW91NxyXos8tLe2IfG8g2vGyUJfPQJUYQgWn1qROHA3G
+   FhXaaLIG5VqU/YgRRs6FTf2riaesaTRJTbODTscLUc2cCiIhhoTMvLD2r
+   tsq0hyODJLChqrt65W9XbfM7YDkuuKSwLKPAcibdF++Fc+9sjw6AiqqFw
+   wJEE539hVVy1c/rOKgeDY+/S/xou9yMuJxxBkS6bpMVpuc2rIfkwfkSVa
+   Q==;
+X-CSE-ConnectionGUID: g9d4msQqSaif+bGL6Skh8w==
+X-CSE-MsgGUID: 6EZYw65pRiWlouItg8HO5A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11493"; a="54699819"
 X-IronPort-AV: E=Sophos;i="6.16,314,1744095600"; 
-   d="scan'208";a="54699814"
+   d="scan'208";a="54699819"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
   by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 13:29:58 -0700
-X-CSE-ConnectionGUID: FHqBpq6NQ0Ckkm5PieiwkQ==
-X-CSE-MsgGUID: MHS8uEPJSNKX0X64YFTCyw==
+X-CSE-ConnectionGUID: GdePXKMtTQ25WNap89ha7A==
+X-CSE-MsgGUID: r4RctxcjTCutVINMhqyb2Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,314,1744095600"; 
-   d="scan'208";a="194449516"
+   d="scan'208";a="194449521"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa001.jf.intel.com with ESMTP; 15 Jul 2025 13:29:58 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -65,16 +65,14 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Arnd Bergmann <arnd@arndb.de>,
+Cc: Dave Ertman <david.m.ertman@intel.com>,
 	anthony.l.nguyen@intel.com,
 	horms@kernel.org,
-	linux@treblig.org,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Sunitha Mekala <sunithax.d.mekala@intel.com>
-Subject: [PATCH net 1/3] ethernet: intel: fix building with large NR_CPUS
-Date: Tue, 15 Jul 2025 13:29:44 -0700
-Message-ID: <20250715202948.3841437-2-anthony.l.nguyen@intel.com>
+	Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
+Subject: [PATCH net 2/3] ice: add NULL check in eswitch lag check
+Date: Tue, 15 Jul 2025 13:29:45 -0700
+Message-ID: <20250715202948.3841437-3-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250715202948.3841437-1-anthony.l.nguyen@intel.com>
 References: <20250715202948.3841437-1-anthony.l.nguyen@intel.com>
@@ -84,95 +82,38 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Arnd Bergmann <arnd@arndb.de>
+From: Dave Ertman <david.m.ertman@intel.com>
 
-With large values of CONFIG_NR_CPUS, three Intel ethernet drivers fail to
-compile like:
+The function ice_lag_is_switchdev_running() is being called from outside of
+the LAG event handler code.  This results in the lag->upper_netdev being
+NULL sometimes.  To avoid a NULL-pointer dereference, there needs to be a
+check before it is dereferenced.
 
-In function ‘i40e_free_q_vector’,
-    inlined from ‘i40e_vsi_alloc_q_vectors’ at drivers/net/ethernet/intel/i40e/i40e_main.c:12112:3:
-  571 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-include/linux/rcupdate.h:1084:17: note: in expansion of macro ‘BUILD_BUG_ON’
- 1084 |                 BUILD_BUG_ON(offsetof(typeof(*(ptr)), rhf) >= 4096);    \
-drivers/net/ethernet/intel/i40e/i40e_main.c:5113:9: note: in expansion of macro ‘kfree_rcu’
- 5113 |         kfree_rcu(q_vector, rcu);
-      |         ^~~~~~~~~
-
-The problem is that the 'rcu' member in 'q_vector' is too far from the start
-of the structure. Move this member before the CPU mask instead, in all three
-drivers.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Acked-by: David S. Miller <davem@davemloft.net>
+Fixes: 776fe19953b0 ("ice: block default rule setting on LAG interface")
+Signed-off-by: Dave Ertman <david.m.ertman@intel.com>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Tested-by: Sunitha Mekala <sunithax.d.mekala@intel.com> (A Contingent worker at Intel)
+Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/fm10k/fm10k.h | 3 ++-
- drivers/net/ethernet/intel/i40e/i40e.h   | 2 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe.h | 3 ++-
- 3 files changed, 5 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_lag.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/fm10k/fm10k.h b/drivers/net/ethernet/intel/fm10k/fm10k.h
-index 6119a4108838..65a2816142d9 100644
---- a/drivers/net/ethernet/intel/fm10k/fm10k.h
-+++ b/drivers/net/ethernet/intel/fm10k/fm10k.h
-@@ -189,13 +189,14 @@ struct fm10k_q_vector {
- 	struct fm10k_ring_container rx, tx;
+diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c b/drivers/net/ethernet/intel/ice/ice_lag.c
+index 2410aee59fb2..d132eb477551 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lag.c
++++ b/drivers/net/ethernet/intel/ice/ice_lag.c
+@@ -2226,7 +2226,8 @@ bool ice_lag_is_switchdev_running(struct ice_pf *pf)
+ 	struct ice_lag *lag = pf->lag;
+ 	struct net_device *tmp_nd;
  
- 	struct napi_struct napi;
-+	struct rcu_head rcu;	/* to avoid race with update stats on free */
-+
- 	cpumask_t affinity_mask;
- 	char name[IFNAMSIZ + 9];
+-	if (!ice_is_feature_supported(pf, ICE_F_SRIOV_LAG) || !lag)
++	if (!ice_is_feature_supported(pf, ICE_F_SRIOV_LAG) ||
++	    !lag || !lag->upper_netdev)
+ 		return false;
  
- #ifdef CONFIG_DEBUG_FS
- 	struct dentry *dbg_q_vector;
- #endif /* CONFIG_DEBUG_FS */
--	struct rcu_head rcu;	/* to avoid race with update stats on free */
- 
- 	/* for dynamic allocation of rings associated with this q_vector */
- 	struct fm10k_ring ring[] ____cacheline_internodealigned_in_smp;
-diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-index c67963bfe14e..7c600d6e66ba 100644
---- a/drivers/net/ethernet/intel/i40e/i40e.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e.h
-@@ -945,6 +945,7 @@ struct i40e_q_vector {
- 	u16 reg_idx;		/* register index of the interrupt */
- 
- 	struct napi_struct napi;
-+	struct rcu_head rcu;	/* to avoid race with update stats on free */
- 
- 	struct i40e_ring_container rx;
- 	struct i40e_ring_container tx;
-@@ -955,7 +956,6 @@ struct i40e_q_vector {
- 	cpumask_t affinity_mask;
- 	struct irq_affinity_notify affinity_notify;
- 
--	struct rcu_head rcu;	/* to avoid race with update stats on free */
- 	char name[I40E_INT_NAME_STR_LEN];
- 	bool arm_wb_state;
- 	bool in_busy_poll;
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-index 47311b134a7a..e6acd791bf64 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-@@ -507,9 +507,10 @@ struct ixgbe_q_vector {
- 	struct ixgbe_ring_container rx, tx;
- 
- 	struct napi_struct napi;
-+	struct rcu_head rcu;	/* to avoid race with update stats on free */
-+
- 	cpumask_t affinity_mask;
- 	int numa_node;
--	struct rcu_head rcu;	/* to avoid race with update stats on free */
- 	char name[IFNAMSIZ + 9];
- 
- 	/* for dynamic allocation of rings associated with this q_vector */
+ 	rcu_read_lock();
 -- 
 2.47.1
 
