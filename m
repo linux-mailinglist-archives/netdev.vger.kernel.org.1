@@ -1,146 +1,203 @@
-Return-Path: <netdev+bounces-207130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9B04B05D80
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 15:44:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD418B05E29
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 15:50:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBA4A567F85
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:42:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 883801C27F47
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:44:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC06C2ECD10;
-	Tue, 15 Jul 2025 13:35:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36C052E718B;
+	Tue, 15 Jul 2025 13:37:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eg2xqcb4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UMMN9a1x"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252F22E2657
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 13:35:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4273C2D372D;
+	Tue, 15 Jul 2025 13:37:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752586505; cv=none; b=p1Tyn04zhc4F8FW8hbyLuCn4Lw1qLdaLlDFvB3qQgj3QGV31PkDGmnuJZOm+vMsnNlpH62Z/ROsCF+bK+vTzWM5cDd+HKOwfm8wPWEb3UGhHXHUHcwNKG5kPoI1a9K4WqJ3gQb9S/fNBmzRinnsbcZSyaH0iobIRwoUHteWowHQ=
+	t=1752586665; cv=none; b=dIJaN6zBbmoCcVHr615A8hP3xlSGVYaPuaJdZdLruNPRluqJQF3259LaUYKHxiP05RFMMwZx0jrXXrDTHQlgjc+sbNjvRpJS7XjwBhDkKghD2J2z/9ApuBxyNl9CWwxjoaDXhI7mgBarKKlebNwUimHqppThcgCgaHXNT8THzbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752586505; c=relaxed/simple;
-	bh=FNkrpVUP8aBvhfjNdBg9m90d8eea1ssCdQUMoWqFo0g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=maB0dGqKnG1e7GVBlsU38gBnmO2pnVgKHhGutO5AlHAb6MKfp1RIibMrbPSszxH3pQW/f2oWHPUT1jcJsR/Tu8YPm6algZNYd/K3/5ktsLaGF3sA6bfeBwlPbP2YnfsSmDKZd9XMNaQtLAGYmiWSDicd8mpCS2Qsi2cVUVeBsQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Eg2xqcb4; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752586502;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Hna3RjrfnrkuE/vpT4GxFQWfy5w2zHOHWkjX7cFXw9A=;
-	b=Eg2xqcb4oNtXckM5xZlZdI+mEgxwRMtGUSQvQKxuQ0UxdnVADeBkK3m0vM+btNu1z5kyVO
-	e8JkYWIWlSoTrGfoxhkcfp49fzgpfMzPGnsIS0xIZdMOuwguGoDTs+uF8QBk5IL5GOLJO8
-	UNpfSHLpYTgopsPTgu/6q7HrMA/vTzQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-64-ft_PKHCFNCm-CY1huRQ4Zw-1; Tue, 15 Jul 2025 09:35:01 -0400
-X-MC-Unique: ft_PKHCFNCm-CY1huRQ4Zw-1
-X-Mimecast-MFC-AGG-ID: ft_PKHCFNCm-CY1huRQ4Zw_1752586500
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4538f375e86so46289575e9.3
-        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 06:35:00 -0700 (PDT)
+	s=arc-20240116; t=1752586665; c=relaxed/simple;
+	bh=UZOkLJq1yQRo2joDviEQwZX005oLg/tuPJiZ4DBAWek=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oBRIQM3FLquArZUHn4dGd/zYJns4Z0kygailtjsSUcjz2RUFRBNCKjQRAsv8rQBCrPHUpmwnAIP/Ms3v5Yl+keL1oNWuHQqOWBzdIQvrS2IXUZt2uPHntbfOkmYRMyz4/BxV5rJ8e5LLWTF/rO67Nlod1qTkq3cPRnjdac7ZZOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UMMN9a1x; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-32cd499007aso40345951fa.0;
+        Tue, 15 Jul 2025 06:37:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752586661; x=1753191461; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eNrscCBPbLnulVmw8wNgBHHyDnL0sYlWPeSwnjiE1fs=;
+        b=UMMN9a1xAt1xGFg+hIQy3KWiLi1vpWReL1mWlGI3C8sV0sW+fR8fO4eBYAVgr0VqEC
+         nCqGXQWfSiDYWw9R4pdflNc7sqgamIC4+MDJ8KeZcnvAjhEhi90EcBm3jBUvqBn/21pI
+         kXFkfw6rgVLywi69vCC29+rTiWtOjwOMChx8xdBWE0LS3v5TM3B+ULiIhhlX76A8zbJt
+         4J6vo1FzzjwMg8DKU4ehwiiwnmg5yfgbHSyYsADF83/5Fk806ct3Gr54+Njyn1noY/j9
+         yrGvqnMg06oHg2I09oq0VH58A37iHxPZIdq9aRP9L4O0OUj7U8ENpOtLI4fsy5UBEuUf
+         uyDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752586499; x=1753191299;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hna3RjrfnrkuE/vpT4GxFQWfy5w2zHOHWkjX7cFXw9A=;
-        b=dQiiqhOMBDMNlRLPhqT4k6aw/14C/PpegwiNsIxs1C7Irw8jCee08pHjx7xEvYekoN
-         JoVS1hcTrpUheoGpWE9s5c4vD7xbPSfU5jIeIMisQ43Qm0EVmiybgYgM0Ygzlw5hAHX3
-         ajMk4JpcFFgFpbtdURrG/nsWlh9IUqU6PB85C/8G1TOiXv6t9mpVdzbNsKcrZM8YkRzC
-         G/+f8G0K5fimmgty1M3uZ1e5+87k1NxrYM4VVlCOfN5UEs2h9h06ocBaFBhOkwhCVrNZ
-         uEuFsVtSscHhSQrnOz5EyeGRw8RaWPpsqorf9W4gQFHVTdA6xiMH7tFcPY/COVkkGto/
-         DGVw==
-X-Gm-Message-State: AOJu0YwiuUQU2yzwEitcKwOK9l7tSE1OtSkuhKCPa2I5xYGfChprAfl/
-	ZiaXcNdJt5u7FqKVwucXzTs+5bbVxiNysEfQEsX5Kv7BNHiBrYSSWbw6M7l2p0ighu7t0g3+/4u
-	H+RkW7ExK+4TFbgK2dfnV7rXwEu9zgOKQK7c4buwlDB7rfDGmbrNiQrDR6w==
-X-Gm-Gg: ASbGncu1dF2SgAHqgxgMrr6e8oNKAtbJ8QziJ6pyT25CHExl7wDJW21U3LaSOgqyyKX
-	jta1SFuiWWPQujck/XBWBL3jlpndTQnZaEzJCzfu/evD8hv7uZmgi0VzsEqvrv5bz08UEDG9ewD
-	7ntfTTonAyuOF0vAHWBbMJ4rL7T97K6mrJ88ipTdojNPM1MXs//T/jKtRjuLD/Awxb/TCJvnUSV
-	h47bWGCmgEL9FDbAQJh/1zaLkztXGsv6GuX25CKPUFWvKp0AJZbSsokZ4lmWIipR+ot0DpFayPp
-	DAJsxxRi/53zOu+3WxxybqfJiaxRWtYpg4lWPlH80bpnXsddZ1vs/YyUxBvoKv4SJ8jS5hlgr7l
-	WdPpPyWA8sBk=
-X-Received: by 2002:a05:600c:6295:b0:456:58e:318e with SMTP id 5b1f17b1804b1-4562771c329mr32530655e9.30.1752586499380;
-        Tue, 15 Jul 2025 06:34:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFFLt0H3ouwQHrfzti4Gau5tDX0PXneRZR47ct1MkwMEfPNZ/zhgGSAD+eLXD1StfdRkCurLQ==
-X-Received: by 2002:a05:600c:6295:b0:456:58e:318e with SMTP id 5b1f17b1804b1-4562771c329mr32530235e9.30.1752586498941;
-        Tue, 15 Jul 2025 06:34:58 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-456278a4460sm13752225e9.1.2025.07.15.06.34.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Jul 2025 06:34:58 -0700 (PDT)
-Message-ID: <cb12d567-6654-48b0-8443-522aaddcc406@redhat.com>
-Date: Tue, 15 Jul 2025 15:34:56 +0200
+        d=1e100.net; s=20230601; t=1752586661; x=1753191461;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eNrscCBPbLnulVmw8wNgBHHyDnL0sYlWPeSwnjiE1fs=;
+        b=v1WmQZbLzzKEgDtbT72uCU3tCy3B4kofn6tp6YMmNtinxF2P38GDi+xrs8fCxr/W+2
+         M1szqez39Zak407NGiwM1Zswl8iw0NbgUnBBWrManeHIMIWi7qkn6NuJOS8n4tF2FjoH
+         ESCzIY8mkwSy7Z1kjbDXIV2r/j5Tgr7UVMr1D6YXQzeLa/clRBQj22hJFC6FjCJL+tQL
+         smtlAt80stJDzUvWb+o/fg1ybMmXk33l54zW3QfAZQiJIC8n6USKHQFMqhu+hkrJvBmC
+         /jkKaGyL4smvOB7tTDpQDHaYYgITKDmPHziPXq+ZnmcqSpYzQWP3lb2oJgNU08PRwq0p
+         6CGw==
+X-Forwarded-Encrypted: i=1; AJvYcCU+7JnzK5cr7+XYbcgkyTdFcB6Jq84K1mPAE/OqqpoPXpzb27DwuNzv+srl6bdESBkauShQs6y6@vger.kernel.org, AJvYcCVv4XCyW5AKWwNJy0f1pDJ6emmef64ycSPimia1tbTHrBgw3RQIfye/YjkZK3av/Nb0/l3cuu4HK9qwDkzn@vger.kernel.org, AJvYcCXC7uxU9TY707VbJO+Q07ktRBflE9iQ7iXNi6SJjT0YPjGQ/yU9aels0pURGO1mV6a0Xdpul3E4jj7Vem4GxrI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8wdDdHtLRZh3h99mx0EwyeqkRVMZtOj9hnicwrHBd82fwyVlF
+	Euu2QwgShq7ZnC52xBd4jqgNaoygGDA5nb0qjXEc+pAtGMep1KJ8Zg1JURdDcc+yb+sAbDg3b4l
+	kxHENKP6hc+0W6kIV7diFWyeofl631Sw=
+X-Gm-Gg: ASbGncuU6STOmrhifLXneTojC1xBuPuZ5txpz13/cMhzFu772I1hH+zNlGOVI8IKMdW
+	puFyvxyHjv6fdKYJoBep+dxca8JozFml+vP4Gz1LKqrBoFJoQLYqpuTNxh0cOoOdONX1DKa/GiL
+	nHZesxdgUSv0rWINiTn+7htuq322fAW4ioZ+tr4FucsUwo/kcLF5omiFDOxPpTHuDPrI13+5aOy
+	rgyJA==
+X-Google-Smtp-Source: AGHT+IHmsGoXd7Dae9wkOiRS1DoObc9wHLvD4xc7v2A7uvkRowpUm8thuvki77DBD41ammVrV6P0k/llYbUfcilRlSY=
+X-Received: by 2002:a2e:bc18:0:b0:32b:533a:f4d6 with SMTP id
+ 38308e7fff4ca-33084ba8ce4mr8628211fa.34.1752586660925; Tue, 15 Jul 2025
+ 06:37:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6] ipv6: add `force_forwarding` sysctl to enable
- per-interface forwarding
-To: Gabriel Goller <g.goller@proxmox.com>,
- Nicolas Dichtel <nicolas.dichtel@6wind.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, David Ahern <dsahern@kernel.org>,
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20250711124243.526735-1-g.goller@proxmox.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250711124243.526735-1-g.goller@proxmox.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250707-iso_ts-v4-1-0f0bb162a182@amlogic.com> <dc9925eceb0abe78f7bafe2ed183b0f90bdb3ac5.camel@iki.fi>
+In-Reply-To: <dc9925eceb0abe78f7bafe2ed183b0f90bdb3ac5.camel@iki.fi>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 15 Jul 2025 09:37:28 -0400
+X-Gm-Features: Ac12FXwwTGnWfGjAAFG5KTyUcf5d9lL8tUe6GdE0JoCkHFlYfE5ZmLnseeivXfs
+Message-ID: <CABBYNZLFnbfdXjRV0taeTNF5bsey-WFf4TFsf_ox0FNuJbEutw@mail.gmail.com>
+Subject: Re: [PATCH v4] Bluetooth: ISO: Support SCM_TIMESTAMPING for ISO TS
+To: Pauli Virtanen <pav@iki.fi>
+Cc: yang.li@amlogic.com, Marcel Holtmann <marcel@holtmann.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 7/11/25 2:42 PM, Gabriel Goller wrote:
-> It is currently impossible to enable ipv6 forwarding on a per-interface
-> basis like in ipv4. To enable forwarding on an ipv6 interface we need to
-> enable it on all interfaces and disable it on the other interfaces using
-> a netfilter rule. This is especially cumbersome if you have lots of
-> interface and only want to enable forwarding on a few. According to the
-> sysctl docs [0] the `net.ipv6.conf.all.forwarding` enables forwarding
-> for all interfaces, while the interface-specific
-> `net.ipv6.conf.<interface>.forwarding` configures the interface
-> Host/Router configuration.
-> 
-> Introduce a new sysctl flag `force_forwarding`, which can be set on every
-> interface. The ip6_forwarding function will then check if the global
-> forwarding flag OR the force_forwarding flag is active and forward the
-> packet.
-> 
-> To preserver backwards-compatibility reset the flag (on all interfaces)
-> to 0 if the net.ipv6.conf.all.forwarding flag is set to 0.
-> 
-> Add a short selftest that checks if a packet gets forwarded with and
-> without `force_forwarding`.
-> 
-> [0]: https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt
-> 
-> Signed-off-by: Gabriel Goller <g.goller@proxmox.com>
-> Acked-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-> ---
-> v6: 
->     * rebase
->     * remove brackts around single line
->     * add 'nodad' to addresses in selftest to avoid sporadic failures
+Hi Pauli,
 
-I'm sorry, but it still does not apply. Please rebase again and re-submit.
+On Tue, Jul 15, 2025 at 9:30=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> Hi Yang,
+>
+> ma, 2025-07-07 kello 10:38 +0800, Yang Li via B4 Relay kirjoitti:
+> > From: Yang Li <yang.li@amlogic.com>
+> >
+> > User-space applications (e.g. PipeWire) depend on
+> > ISO-formatted timestamps for precise audio sync.
+> >
+> > The ISO ts is based on the controller=E2=80=99s clock domain,
+> > so hardware timestamping (hwtimestamp) must be used.
+> >
+> > Ref: Documentation/networking/timestamping.rst,
+> > section 3.1 Hardware Timestamping.
+> >
+> > Signed-off-by: Yang Li <yang.li@amlogic.com>
+> > ---
+> > Changes in v4:
+> > - Optimizing the code
+> > - Link to v3: https://lore.kernel.org/r/20250704-iso_ts-v3-1-2328bc6029=
+61@amlogic.com
+> >
+> > Changes in v3:
+> > - Change to use hwtimestamp
+> > - Link to v2: https://lore.kernel.org/r/20250702-iso_ts-v2-1-723d199c80=
+68@amlogic.com
+> >
+> > Changes in v2:
+> > - Support SOCK_RCVTSTAMPNS via CMSG for ISO sockets
+> > - Link to v1: https://lore.kernel.org/r/20250429-iso_ts-v1-1-e586f30de6=
+cb@amlogic.com
+> > ---
+> >  net/bluetooth/iso.c | 6 +++++-
+> >  1 file changed, 5 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+> > index fc22782cbeeb..677144bb6b94 100644
+> > --- a/net/bluetooth/iso.c
+> > +++ b/net/bluetooth/iso.c
+> > @@ -2278,6 +2278,7 @@ static void iso_disconn_cfm(struct hci_conn *hcon=
+, __u8 reason)
+> >  void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+> >  {
+> >       struct iso_conn *conn =3D hcon->iso_data;
+> > +     struct skb_shared_hwtstamps *hwts;
+> >       __u16 pb, ts, len;
+> >
+> >       if (!conn)
+> > @@ -2301,13 +2302,16 @@ void iso_recv(struct hci_conn *hcon, struct sk_=
+buff *skb, u16 flags)
+> >               if (ts) {
+> >                       struct hci_iso_ts_data_hdr *hdr;
+> >
+> > -                     /* TODO: add timestamp to the packet? */
+> >                       hdr =3D skb_pull_data(skb, HCI_ISO_TS_DATA_HDR_SI=
+ZE);
+> >                       if (!hdr) {
+> >                               BT_ERR("Frame is too short (len %d)", skb=
+->len);
+> >                               goto drop;
+> >                       }
+> >
+> > +                     /*  Record the timestamp to skb*/
+> > +                     hwts =3D skb_hwtstamps(skb);
+> > +                     hwts->hwtstamp =3D us_to_ktime(le32_to_cpu(hdr->t=
+s));
+>
+> Several lines below there is
+>
+>         conn->rx_skb =3D bt_skb_alloc(len, GFP_KERNEL);
+>         skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb-
+> >len),
+>                                                   skb->len);
+>
+> so timestamp should be copied explicitly also into conn->rx_skb,
+> otherwise it gets lost when you have ACL-fragmented ISO packets.
 
-Thanks,
+Yep, it is not that the code is completely wrong but it is operating
+on the original skb not in the rx_skb as you said, that said is only
+the first fragment that contains the ts header so we only have to do
+it once in case that was not clear.
 
-Paolo
+> It could also be useful to write a simple test case that extracts the
+> timestamp from CMSG, see for example how it was done for BT_PKT_SEQNUM:
+> https://lore.kernel.org/linux-bluetooth/b98b7691e4ba06550bb8f275cad0635bc=
+9e4e8d2.1752511478.git.pav@iki.fi/
+> bthost_send_iso() can take ts=3Dtrue and some timestamp value.
+>
+> > +
+> >                       len =3D __le16_to_cpu(hdr->slen);
+> >               } else {
+> >                       struct hci_iso_data_hdr *hdr;
+> >
+> > ---
+> > base-commit: b8db3a9d4daeb7ff6a56c605ad6eca24e4da78ed
+> > change-id: 20250421-iso_ts-c82a300ae784
+> >
+> > Best regards,
+>
+> --
+> Pauli Virtanen
 
+
+
+--=20
+Luiz Augusto von Dentz
 
