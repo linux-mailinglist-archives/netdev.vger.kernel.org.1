@@ -1,142 +1,233 @@
-Return-Path: <netdev+bounces-207060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43466B057A8
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 12:22:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EF285B057C5
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 12:28:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B7994E278A
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 10:22:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B87034E3581
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 10:27:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 307A62D77F8;
-	Tue, 15 Jul 2025 10:22:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B65132D6402;
+	Tue, 15 Jul 2025 10:28:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I9Ovq6zU"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qai9w8Y7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2081.outbound.protection.outlook.com [40.107.92.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 728972D661D;
-	Tue, 15 Jul 2025 10:22:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752574944; cv=none; b=rmZomX8n2gbOuN8oMnLp63kl7x2l6PFkrxTU+wFGjPNBw9Bnm77sUsjcBYhcgkpVZcWXSglpn8+XVNEro/z9Jh6xRWzWKRRRhfVJnwNtXKw4gzxEuGhuC9p2uSuM+o2/JnveAZQ1NpyRtXYx4HUhOMh92x8ooSB7oF6/lulyo2M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752574944; c=relaxed/simple;
-	bh=yEBbCY9oUZbDlS3ZBBT7sSaX45VBbabpp8PPuahDIIU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ae6/9vhWNpioF8pBVldo3h4oVm+N5fiVqjtuioqBplAATSmHaxUlilCUDsSlTT4H/s9JC1xznpI8pWaRwQbEzSjUcsVewkSLV0jFE6fgdbYiBchI1mvBmxS2EUK4is7KCpyJfJoob/kA8Wm6O+3/xX51LbCVswzqBoaTmB3Rqps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I9Ovq6zU; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-60c6fea6742so10323969a12.1;
-        Tue, 15 Jul 2025 03:22:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752574941; x=1753179741; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2crJGfvy9Jnr87YgMI4zA0rz0NIO2gRU/WUVx+zJOAU=;
-        b=I9Ovq6zU8PyywlNtcZKeu522Iq4CSqvOamQ6l0+9ymjytS01NS3H5ZP7lmOn3AoL8A
-         gFYRyPySLzCDTtaG52g8vKYq0bpIsAHnMYoWQldeEzyZauZ13hLwPrOYWBjO2YuFFcdb
-         PQLnXZ09jvzz15QktraKLiFqJ4xbmbAbnQsKA8oDDDmrCdeU2TplDWjHzuRMED+U8YEp
-         BeHqqR7JXCYAJMiA7fGpHkNFdO5nPeHJgXYguBt5vxLLH1l/hWRHzliQ/iXDRGVtmZUX
-         D4KdLtcss+YDJiD7h42AHo9SQNGactBX+4T8aZAWUERsbDnCRaNcM1iqcK9SZxudfAmx
-         fK+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752574941; x=1753179741;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2crJGfvy9Jnr87YgMI4zA0rz0NIO2gRU/WUVx+zJOAU=;
-        b=D8aPLHaNojJKBjWZo+Tk56CjH5H3gCIfB0tiPzCXWxIIxKoGC70aQHpGuAbLF4Swpz
-         c+pjQzf1WR91EOQBQL7XPFyfKH5itaT1FI5MEwgv1bLHriF72zboEGVOD2TpA5ToDeJ9
-         pqN/fwRFd70lo6M8X7c/0gEHUtAjkg8TV7kWqeierENcHUMSxgUwEflJBKdLfiacCctR
-         YJwo/GZv3/JUeZ8DWYQ8lcvHy/RgLh39XLWvjspJJ2ZJ+N6Ol4QPHtNwm1v9hml2hU+o
-         SH3CbV9cAO72zpwpGcJ7D/zj3MSKyB+47BNHagX2ugHtdplBGAWaNslyiJvAfoFDi2T7
-         4Ang==
-X-Forwarded-Encrypted: i=1; AJvYcCUDWI8toIMszEGriUcVM03KbOtrocl47NVA3la+ybXIPWfVFvHzbXWzV5EAmFWXLEEvz2k=@vger.kernel.org, AJvYcCUaQMO8pWpai8r8clDNoiU8vxvk7utW2WzBV6p7uEaXgrDfFFde9eIG+W0a1PF072RfJkg/KsV4@vger.kernel.org, AJvYcCVKp+DuoxI2YDALvIy8i9GQCtYhZDPIqPtFASbmPxrghebiYOJF6k+OZ4K7kZr3bKXIataQpibtpn+N7ZVU@vger.kernel.org, AJvYcCXrofpzRYgeG8NkQmXqFLf8sI/vLDqdeYUIb+FulTHQloOITypmbhP8kDTAuDsH2noS2NtPuGG52flBMA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXs8CfVM6qduixTYQpJLtCIBeFCXA837cCrcL4n64Ci4HfSpjY
-	fzkgKxNrvJB8y/jrY4jBaWYbEC3xMV3Hh5RzW6scJ9ZFqeecwXx3BWwL
-X-Gm-Gg: ASbGncu/DNidOI1z9OgZm7X7Hs/Uq2cbzEv8aJniynWKmYqfbxZixgeWxvRcgukdypO
-	yvdiTaIAfNKq7XHEI4nmSsiDFeMzPc1wjy992GjPzXweN8SV9Ve6KPzWjO+X+5m8knlL8oSb5b3
-	0ywRBEGh2dIg/GH8M/kxMw9HbmGxS3PdO9YbUq3YMhcKukjmJp9aOpO1AXMLRANSO+TUXLVWUw3
-	ndbNQQazPI0mXWLC0R1fbQ9pflOqEakRuz1BhlN/O3/rZI6Etxi5GvW2OD32TaBMhd9nHzBNnYE
-	U1qxCY1ugni8jCMlzt5kADY/YtblFQdGuLOI262Ms+yTLqvCu0Wby7/Fzvs7+5ruMnZYcjVVvxX
-	AUTR29dBf3h49Nnj/wVMVyXqzrZld0nyqBmw=
-X-Google-Smtp-Source: AGHT+IH2Fp/Hb7ISJckZNbpE6kxbt03ub1njSzKQw/Kjz/TN3XGfF0/RC3z3jw0kIXpvnI8LNZUctg==
-X-Received: by 2002:a05:6402:3485:b0:608:64ff:c9b5 with SMTP id 4fb4d7f45d1cf-611e76580bbmr14606034a12.8.1752574940393;
-        Tue, 15 Jul 2025 03:22:20 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325::1ac? ([2620:10d:c092:600::1:a4c1])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-611d8d54112sm6292085a12.1.2025.07.15.03.22.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Jul 2025 03:22:19 -0700 (PDT)
-Message-ID: <839d5486-a92a-4ae8-a536-b4a0e3d595ea@gmail.com>
-Date: Tue, 15 Jul 2025 11:23:47 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07CE4211489
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 10:28:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752575288; cv=fail; b=WkF1AlpTbyS4KBeqzf3xtGlSItX66crRUrdRDaVqmnNxDIuMZvOfKMmw4OHI4npSdXWrfIa7HWTm3UVj18Py1l0jPM6JWMaJ3E4EiWnnTKuUbQ5ARef+KveFEHK/uHB2DdjwAe2RxBl7kf0JTXtEU5bVLr13+wkwCn37C+8tI5k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752575288; c=relaxed/simple;
+	bh=ezGfxdYOQ/M29QZfCJcvCLQ4UaevUeNtcsBTlxTDxLc=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=I+7dhPPvmaXmoCklC53eeA3gAEIhM2JwLWlbldIr/ZgbiHwvRjtREMwi9iyJu//kC5nVde8tdpAMzcZLa6YIlRPjxOmWX5ApJ/gEylMZGS0EwzZY9lvLK5ciQ7z785DUqhy8plqbcEqSI1u+b0b7cQEQ9hbNnwumNJsRYBFQkxY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qai9w8Y7; arc=fail smtp.client-ip=40.107.92.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jSOR8a16x1euJh/8Iun/pej/YLfN+TErxxLQbg4CCcZ22j3/btG+joKK7Ck1Zepae2l4Y+9OAag4uTI5+JeWZV2dDrkmVN62LA40qd7pXmXt1QOkMqD+Cq8novgJr36lNB4GCjbTDUQk0SkBuYWQr9ypb24GYt9zIJydkhm+TRsDiIkY4iKFId55x3Dn9i+09lHFARqqAmaZ0tHNTJ6tLzhDQyBfSIdxvntNlvpobZbiriJnnR8JeOcgwpBDy34EAgZ9z1Bk4J6tPDSaRE4zessW8/pgBMoB3pswUozBeohroTUYvVkvy/pdXkm90abKkMfFLZKArcEXj/+eDDOR5Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WSTFGAOhncR04Qg4tOA0HQyEzsuCf5uOLPrdoW/f740=;
+ b=pjViUtQOXAnjn684HcoykBnwG0Ad3u2NWHFA/dDekY0dKc4IX7RyLwn7A0yt48ab1y61un+KBwq8aHgCdLgI6pnSJZCJeCp0zzGolnnztlh2ZNz9+siMkfFzX9T635S2YGyoKn8FDPzhsg1LNP3uZDBzWTMRL18FsL5OJl6fDiK9of81YNZMz7P9jQCINR1/OQ73hI4CAR/UTX0AayLymeUPKCL0WPf2YYAbXnAfS2ddRIiZrF5EybegP3gzFoluwn8OTXTt4VOjgn9KwOe86CU2TFAbMwUg6VxQHfZQAzWUF2Gg1J/yW+DmeZ8Ucg2crvGGOlBEdPgcolBtuSO4AQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WSTFGAOhncR04Qg4tOA0HQyEzsuCf5uOLPrdoW/f740=;
+ b=qai9w8Y7dZp1Q0WP31PH9CtJ1/gfnDdp9Ql9QvWjcYwbUQSmeKTjL8Hwak4QduuaJxSAe7Ig0iOavX7o8f29L1OZ/Io0bjiWK8KuZFt0LutLfMuvW6EH/q4+UuTio3U+4Jtzx7l4u9bKFG2tvYQRBrYRxlhJNpZLnbU8R2DvJP7Q3lOZOt4jf+4MCh0hWIJgRYALQPj6DuELodD2KbwTHoGJffqD/p5F1m1ikW8IjKOISN7KEOwKT4NLpHgcc/pqh1xG7s5lqsxZKWe2DqO1HGMXeDH36NFdFhYsWbjrgQYB7YIy3Ay+X8KQPcesnOl+IWV370rD47ETHYxjWh+FpA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB7500.namprd12.prod.outlook.com (2603:10b6:610:148::17)
+ by SN7PR12MB7853.namprd12.prod.outlook.com (2603:10b6:806:348::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.25; Tue, 15 Jul
+ 2025 10:28:03 +0000
+Received: from CH3PR12MB7500.namprd12.prod.outlook.com
+ ([fe80::7470:5626:d269:2bf2]) by CH3PR12MB7500.namprd12.prod.outlook.com
+ ([fe80::7470:5626:d269:2bf2%4]) with mapi id 15.20.8922.023; Tue, 15 Jul 2025
+ 10:27:57 +0000
+Message-ID: <7bfc8766-0f6f-4309-984e-24ef86f5c8e3@nvidia.com>
+Date: Tue, 15 Jul 2025 13:27:51 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 10/11] ethtool: rss: support setting flow hashing
+ fields
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ donald.hunter@gmail.com, shuah@kernel.org, kory.maincent@bootlin.com,
+ maxime.chevallier@bootlin.com, sdf@fomichev.me, ecree.xilinx@gmail.com
+References: <20250711015303.3688717-1-kuba@kernel.org>
+ <20250711015303.3688717-11-kuba@kernel.org>
+ <2a4c0db9-d330-441f-bce1-937401657bfe@nvidia.com>
+ <20250714092933.029a6847@kernel.org>
+Content-Language: en-US
+From: Gal Pressman <gal@nvidia.com>
+In-Reply-To: <20250714092933.029a6847@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: TL2P290CA0012.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:2::16) To CH3PR12MB7500.namprd12.prod.outlook.com
+ (2603:10b6:610:148::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 1/7] netmem: introduce struct netmem_desc
- mirroring struct page
-To: Jakub Kicinski <kuba@kernel.org>, Harry Yoo <harry.yoo@oracle.com>
-Cc: Vlastimil Babka <vbabka@suse.cz>, Byungchul Park <byungchul@sk.com>,
- willy@infradead.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, kernel_team@skhynix.com, almasrymina@google.com,
- ilias.apalodimas@linaro.org, hawk@kernel.org, akpm@linux-foundation.org,
- davem@davemloft.net, john.fastabend@gmail.com, andrew+netdev@lunn.ch,
- toke@redhat.com, tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com,
- saeedm@nvidia.com, leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
- david@redhat.com, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
- rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org,
- linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com,
- hannes@cmpxchg.org, ziy@nvidia.com, jackmanb@google.com
-References: <20250625043350.7939-1-byungchul@sk.com>
- <20250625043350.7939-2-byungchul@sk.com> <20250626174904.4a6125c9@kernel.org>
- <20250627035405.GA4276@system.software.com>
- <20250627173730.15b25a8c@kernel.org> <aGHNmKRng9H6kTqz@hyeyoo>
- <20250701164508.0738f00f@kernel.org> <aHTQrso2Klvcwasf@hyeyoo>
- <92073822-ab60-40ca-9ff5-a41119c0ad3d@suse.cz> <aHUMwHft71cB8PFY@hyeyoo>
- <20250714184743.4acd7ead@kernel.org>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20250714184743.4acd7ead@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB7500:EE_|SN7PR12MB7853:EE_
+X-MS-Office365-Filtering-Correlation-Id: 70d4319f-2d8d-43fa-0753-08ddc38a4433
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?bHdLcGVMeU05QXI5NmFUcmE4c2R1Y3NvREF1V1VjMnRTQi9zaXcrbnBPbmV0?=
+ =?utf-8?B?RWQvTkpmdFNkbG90VnBPZFpiMlRGMWJ2K0EzV1ZROWYxNzRZWVRJeExRUklG?=
+ =?utf-8?B?M3Y4NDV0OTMrK0VIYVJaYXdXdmxpYkpvN3VxYkZUbVpUUTl1SEJJK1c3VnBw?=
+ =?utf-8?B?anZFT0FubGZvQzJwSWdSOXJPdHAzbWZzUXJTSERLTlNON2pWYlluYVpSQ3E1?=
+ =?utf-8?B?WTkyeUVXam5yeXdzak5HZkJJSC92N1Nza0RRZWZhME5FdU1jeVBObjUwTW9H?=
+ =?utf-8?B?eTV1dXlkN3pHZlArWUFqcks5MHFGdXlEVWUzRUt1akk5R2kyY0lVYno4Rys4?=
+ =?utf-8?B?ZTBnUFozbFpZbVRUaU4yOW5zQmRjM2pKSURlTWRrYjdIMTRobVJ3SkRpNFNV?=
+ =?utf-8?B?bFJDT09xbDVNdUdkV1RzL1Vuc0UrRFkyM1hRRDNWM0dXdUsrNitiWUpvQTJl?=
+ =?utf-8?B?anlzV3IzUll0NEcvMkkzTGtNNkN3YXU4RVFPRE5ybnJmcVZmL2JXenozaVhn?=
+ =?utf-8?B?dFhQK2R4T0RId25QZUN0ZlBUdkhVRENkV3NOYlpLR3FiY3NLWXpTTFdzODhh?=
+ =?utf-8?B?TlhlWWFkWk93cENUaWRTeCs0eDQxWFE4bFYzQUF0T1VVWUE2eDE2RGRweGk3?=
+ =?utf-8?B?c0Noa1RRNTM3SU5xU1BjN0JmUElDTjFjc1ZoWDhyRHViRWVML2VkK2xUVmVi?=
+ =?utf-8?B?bXp1NXN2bDV1cnhHWE0yQllJSXk3eldrMmpVZU52bUZTanZpZWNDY1F6L09L?=
+ =?utf-8?B?eDBwazhuQTBKb3FNVXUyMWFxWEFBSi8yck92dCtZTFhyTmFTWWdvSFJYT21I?=
+ =?utf-8?B?ODJ1ME1Lb2xDbHpVcm1sS0RiQ1hkN0E0ZGVVeFA4aGprbTFkNDdJbUJxVTcv?=
+ =?utf-8?B?Z2hFZzZiZlU1WTdoSWVCL1grTWhvWWZKM09OTjliWUIzMEhoSk0wb1BtL3Qr?=
+ =?utf-8?B?UzFsSVdMaWc4UmFXTi9aTHlOQ0dzcTFMTjB2amJRc0JTQ0RrbUNMRk1xdFlx?=
+ =?utf-8?B?OFNQOVBvSjJzcEJEdDFQZDJ0bHpiZXV6cnBlYTBwM3A2UGh3RUVucGEwb204?=
+ =?utf-8?B?c1IyL2V6b2hLL3JYaW1xa05zbC9jdXpKOTYvbDhhbndad0k1azBidVdlUkJo?=
+ =?utf-8?B?a2l6Q1crVEo0RDBza0lVUWNoU3VhZW55SHVoVGpWNE1TK2pRZ3VtcmY4TE5m?=
+ =?utf-8?B?QnJGeVFrMDRoeUM3d0JxZmcrZ3VwRm1mMU4yU1pHTDI0V21aSTh2eCsrS3Zu?=
+ =?utf-8?B?aTNCNk9MbmNPNnBFeDdsUERRaGZFSTFZRWtzS0tDUERJbmZ3Z3lQS1dQVCsr?=
+ =?utf-8?B?VElwOVZwUjBOUVV0UHdPMlU3bGJKMFdVTGEyNTcwZkdIalFJWDJzRWdQU0VD?=
+ =?utf-8?B?UGJYdWRXb1FuZUZKcC9ORkRGb0lBanlUOTd3VjZwN053OW41b0ViOENsRGVT?=
+ =?utf-8?B?MU9wNEl4b2VWbTRsL0dHVWxzU21CVWc0VFpFT080R1ozQktMMDh5M1lzRHJR?=
+ =?utf-8?B?eWs5Z2VqcmhJdUtlRmJNaXcyUHVKNWF2QTJhVTZ0cnAycmxCZll3RE9XVmRs?=
+ =?utf-8?B?dU9FSFBaYXRlZ0JOUE1Bd05VbXl0UWVXeGI2OEU0SGtNRDVYbFV2WUpITDY5?=
+ =?utf-8?B?YlMzbmN1WHdsamRkU1FtRlpWc1FXQm85SkhyRVh6T3hCRldqN2UwTG5iYnFH?=
+ =?utf-8?B?TnVYbHpoaSszNDdMVlNLaUs0YmhpUW9uU0dCem5LVGdHR2J2UWtrN09DYXQr?=
+ =?utf-8?B?aVJMUTBZelMrRlBpYkt5NUdPeUdjRTVXNVF4eEpTQndKbnU4RHlETThndkZh?=
+ =?utf-8?B?ZnRFUGdnV3A2ZDFjK01hb0w3ZGtSV2E3d2V4SkRhR1RVK0oxMzhuRFJvelcz?=
+ =?utf-8?B?R2U2SVhybnNBOTcxL3lpMW9QcjcrWSswekRwQk5acEdrUStUUjBCemdiRGQ0?=
+ =?utf-8?Q?y29PicvQ7W4=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7500.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?SEptdHVnc2hkL2hFUjBkem91RGxveGdrbUQ2Tm9xT1gzTUo3cytEc1paVFVS?=
+ =?utf-8?B?ZzUraDhmREpYcnpjaHBpMURrNlJzQ2I3NmdwQUdQWnhRNkVncjdmMFgxS1NC?=
+ =?utf-8?B?V3l4QXVxTGoveGhpMHhBRTYzcGJEWFZsMFVxNUt3V01acGpZOStJSmtnaW5O?=
+ =?utf-8?B?RFVCaDBvOURCYUc5Yk0yZ1QzNXgvUmRxRTR1ajlYTVU0M2FQc0x1V1RVd0FT?=
+ =?utf-8?B?VnhOV2RUMnBqbVFBa2ZaTjlLczdiaHpPQ1JiSnlMMDc0eUlqRmRpV1h0blhp?=
+ =?utf-8?B?c2pYT0Vaa1E1aUkxN2lNT3pzbFgxU3dPYmt4aUFHNUFOM1hhRVNtL2M5VnFU?=
+ =?utf-8?B?Sk1PODFwcWIzU0Eva0VnV1lrRUNLSi9MYjJlTGxvR0duU3J1eEl1LzZUcFox?=
+ =?utf-8?B?R3R3TFdETFRZM2NVejlzTmRDcFdMTUx0VmlqVDR4QnQwZ1JqYkN1OTZQNHUz?=
+ =?utf-8?B?Q3F4NS9XaGJ2dk5PYUE3NVlQRFl5QU5XQkhoLzcxNmVkTE9iazRTUDg5SGlL?=
+ =?utf-8?B?NHhGczhqU1FGYU5LWVA1YmFuOEZoN0RrbVBHa1ZXditMM1ZJMnFUQ3BpUTZ2?=
+ =?utf-8?B?QjNVNDlaUmtMR2RkZFQrb2U0NzJnamUwb2x1MFRzUHE4OWgyQm02WWlvYkpy?=
+ =?utf-8?B?by94ZmJHbGRWOTY5aElXRzNMQTFodnF4Q3hZN05GT0tnc3ZvSzR0SnVxYlJv?=
+ =?utf-8?B?ei9WQi9Va3BrYW0yeHNldUk5eTdTaDlzbGdBMUt3MmlheWh6NUNuVXNMTUcx?=
+ =?utf-8?B?dk1sNXRMY21CY1NhUk5ES0Y1Z1pnMUovK1Bsa0FIemFadDlnNlJqeE0rYU1W?=
+ =?utf-8?B?dVZlZVZCVUQ1MmxxRnBWM2oyZUhNTHJiaFVRVzhMMW1tc00rcVRCNEliYnM3?=
+ =?utf-8?B?dzY5emY4WTd1dGUzNkpjU2RFL3VaSitKaWlpclA3SmQzayt3MjltcFIvbEJj?=
+ =?utf-8?B?eC9kRDJVVitlWVZvd2EyMUl3UHRZaE0rL3BVemlLbnRIcjhxekZRZFQxTTZx?=
+ =?utf-8?B?UVA3YktSbTdzVjdQUVpiam53eFljck5GVDB3S01vS3VmTytZZGhSZHl3eHY5?=
+ =?utf-8?B?Rjk4NXdpWFFqMkFWT0NieEtZTDRhUktqYmpFWVZ5Y2ZGckZTbFRwWTFxT1hP?=
+ =?utf-8?B?MWtsNG01amRSUlBSN3pxbjBsRW5kKzlMVTA1cUJZZXRYcmFVeG05cXFsVTYx?=
+ =?utf-8?B?Zzc5U1A4WllJZERqV244TXNlanJaOERiWE4yT1JDZjM3c05OZ29kaG1BR1U2?=
+ =?utf-8?B?Sm5nQlppTzFVUWN3aGhHUy80K1h6dVZ4c2E2cWdXeHAxa1RHS3FPMXJYRTds?=
+ =?utf-8?B?dHVwVDV6bGxMM3QzVGNzTE5Eek9HZ1lpSUdQa1ErSlgwSys1SzRVMnZ6TUVx?=
+ =?utf-8?B?SDNmRHJ1U242NmlUNmtBOGxVeDdOSUE2TzVBeEJsQVNCN1ZmOU5tZU93ZUN4?=
+ =?utf-8?B?K0pJSGFCNit5RkFxTXRPM29rZ1lZd3hOZ2tiS3RlV3FBa1ljTktYRUkxK21P?=
+ =?utf-8?B?M0kyQU9SSGoxZUR1VFNqUGVkMERCYWVTS2I0VzJOZ0NWL0RlUVUwQWRTektS?=
+ =?utf-8?B?M1hZbXFpWU5yUC9FVk1hbnRseTNqUUhqSVNaQjUxb1FXc3JVZmNrb2hFYm4x?=
+ =?utf-8?B?SHZPcDE3dUNYNGxiY1Aza1VqdWsxL2Z4c3RmUFMrZElocmNkTFpDUXl4NHIv?=
+ =?utf-8?B?b1lnVXFVRDR5L1ErRkpsL0xpSFBMZHI0TnBValZFVm01RGlPWjhaTGpUMlRZ?=
+ =?utf-8?B?bHhwb0xnbEEzbUR5L011bmVSa0doa0NYMkJwTFZIdERpaWVnZU5BYmRXMlpq?=
+ =?utf-8?B?TURiRW9pbGJaMk1pcVFKZ1NVclFXbnVPWVkySnNMazB5QWEyWmJla2x2RUdY?=
+ =?utf-8?B?OCtRaVhXWElEV3B1ZWNnVWNtMmZqWEZrNFNoakxzZWhtWUZXTlVtWGt6SXhr?=
+ =?utf-8?B?VVJlbFVGR1AySWdiQnIzb3NWTDhZQWJNNkE1RUdveUs5bFJvdlhtbEs5QWlM?=
+ =?utf-8?B?dmpDREx6UnZ5c1djdk5VTWF2c2xZNzlpdzkzR2NuVjY3MHV2cWdCbHJTL29o?=
+ =?utf-8?B?SS9VK2l6Yll0ODdoSXZrdEQwdEdmOEpCYklSNkVjU3FqTlRjeGxDbjc5cSsz?=
+ =?utf-8?Q?LrQ0sLRXbzX9eu4aijkNiXmwI?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 70d4319f-2d8d-43fa-0753-08ddc38a4433
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7500.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2025 10:27:57.6646
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +92FI9BgM8pT38EAk90ZcvxsuDrls5q0Bgv7vu4qUj0V2FowdTeXkDypHiVyAubr
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7853
 
-On 7/15/25 02:47, Jakub Kicinski wrote:
-> On Mon, 14 Jul 2025 22:58:31 +0900 Harry Yoo wrote:
->>>> Could you please share your thoughts on why it's hard to judge them and
->>>> what's missing from the series, such as in the comments, changelog, or
->>>> the cover letter?
+On 14/07/2025 19:29, Jakub Kicinski wrote:
+> On Sun, 13 Jul 2025 14:12:33 +0300 Gal Pressman wrote:
+>> On 11/07/2025 4:53, Jakub Kicinski wrote:
+>>> Add support for ETHTOOL_SRXFH (setting hashing fields) in RSS_SET.
+>>>
+>>> The tricky part is dealing with symmetric hashing, user can change
+>>> the hashing fields and symmetric hash in one request. Since fields
+>>> and hash function config are separate driver callback changes to
+>>> the two are not atomic. Keep things simple and validate the settings
+>>> against both pre- and post- change ones. Meaning that we will reject
+>>> the config request if user tries to correct the flow fields and set
+>>> input_xfrm in one request, or disables input_xfrm and makes flow
+>>> fields non-symmetric.  
+>>
+>> How is it different than what we have in ioctl?
 > 
-> My main concern (as shared on earlier revisions) is the type hierarchy
+> Because:
+> 
+>   user can change the hashing fields and symmetric hash in one request
+> 
+> IOCTL has two separate calls for this so there's no way to even try
+> to change both at once. I'll add "unlike IOCTL which has separate
+> calls" ?
 
-Quick overview. struct netmem_desc is a common denominator b/w pp pages
-and net_iov, and contains fields used by the pp generic path, e.g.
-refcount, dma_addr. Before, pp was using type casting hacks to keep
-code generic with some overhead on bit masking, now it'll be able to
-look up netmem_desc from a netmem and use it directly.
+So it's different because you can use netlink directly to change both,
+but from userspace ethtool perspective there's no difference, right?
+It's still two commands.
 
-That's pretty much what I was suggesting niov / page aliasing to be
-1+ years ago, but unfortunately that didn't happen. It definitely
-removes some type casting hackiness.
+Makes sense, thanks for the explanation.
 
-> exposed to the drivers. 
+> 
+>>> We can adjust it later if there's a real need. Starting simple feels
+>>> right, and potentially partially applying the settings isn't nice,
+>>> either.
+>>>
+>>> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+>>> ---
+>>>  static void
+>>>  rss_set_ctx_update(struct ethtool_rxfh_context *ctx, struct nlattr **tb,
+>>>  		   struct rss_reply_data *data, struct ethtool_rxfh_param *rxfh)
+>>> @@ -673,11 +767,11 @@ ethnl_rss_set(struct ethnl_req_info *req_info, struct genl_info *info)
+>>>  	struct rss_req_info *request = RSS_REQINFO(req_info);
+>>>  	struct ethtool_rxfh_context *ctx = NULL;
+>>>  	struct net_device *dev = req_info->dev;
+>>> +	bool mod = false, fields_mod = false;  
+>>
+>> Why not use mod?
+> 
+> Because it's a difference driver-facing op.
 
-v10 adds a bunch of "pp_page_to_nmdesc(page)->pp" in the drivers,
-Not sure I have a strong opinion, but it can be turned into a helper.
-
-Converting things back and forth or blindly
-> downcasting to netmem and upcasting back to the CPU-readable type is
-> no good.
-
--- 
-Pavel Begunkov
-
+Why do we need to differentiate where the mod originated? We have a
+single return value.
 
