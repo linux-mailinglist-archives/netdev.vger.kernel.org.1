@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-207088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21162B0597C
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 14:01:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F3B0B05915
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:46:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD2923A22F2
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 12:01:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7D674A18D6
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 11:46:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08F472D9EDA;
-	Tue, 15 Jul 2025 12:01:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 105292D9EF1;
+	Tue, 15 Jul 2025 11:45:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECA662DC359;
-	Tue, 15 Jul 2025 12:01:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD3C12749D6;
+	Tue, 15 Jul 2025 11:45:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752580893; cv=none; b=eC2QTcdZ8dNnSZAK6eGRbkkWLZ3Nl3Hrb6SVYy0VYDfDEvWjtg7faa5JZvzTTqav1moxiDsZOrzv1lsyqcR63ed0CdSrACdCsYOfIM1txo8YIxr42/VxKu2aj2upgbw2OhkMeBI/u9ku+n5sDzwUGVz4xK0jwiJcEAU9d/pUbyA=
+	t=1752579957; cv=none; b=C/7ttzy/bM5GFBY3rDHlX0y5XuKbETRUIprBR2ElsqQC8YmCObP+OYdmJJRXaAZGb7NxGaWSGrNiXO2Ythzl+HMrQRWZVFwDnhOybaV9XsJXFZAEfBvxP6RRAxGGAXg6jp+rYOt14HGe6fLR37CQU2sBpMkJdVC0RKfv1xmHY/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752580893; c=relaxed/simple;
-	bh=Uit/bRubTiyDNAb7Oh76MrdVa16vELT94DebeHjoOio=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SaMqqdFJv1BCjX+SaJTBkt1OtVj8zwIQD8hjjNxt53zrNFDMr0Viu1PqCx8S4uWCOterehdo/DICMSD9aJWJ4Q0BctYW5QhHEZnEo4PqYza3r0JpBQ/3b7Cx3zEimPYvNuW3eHiFSt4/456HLddeb2fNvgbtm51B6XCN8LT+5a0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from icess-ProLiant-DL380-Gen10.. (unknown [211.71.28.34])
-	by APP-03 (Coremail) with SMTP id rQCowAC3SHr5QnZoKgtBBA--.14063S2;
-	Tue, 15 Jul 2025 20:01:07 +0800 (CST)
-From: Ma Ke <make24@iscas.ac.cn>
-To: ioana.ciornei@nxp.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	akpm@linux-foundation.org,
-	Ma Ke <make24@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] net: dpaa2: Fix device reference count leak in MAC endpoint handling
-Date: Tue, 15 Jul 2025 20:00:56 +0800
-Message-Id: <20250715120056.3274056-1-make24@iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1752579957; c=relaxed/simple;
+	bh=TJj1GBM3kY96ER4pDl0GjSYNA4pjhWLv2UTd9LIoEPU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BlRl+vY7eV6sZXp+mnb67jpzeXyfmX7CBu+BL2x5sFPqLOpsiexc4kDRyzC1ZqNd5P/UYh7Fn8sdVLiW5nrnlHSCypW6oIBGqehruKcvVm9/a8Z7YJgiyjEpZa/9ozGKry0MegQM84fdD4XUWj+VW0H5b9njD0UmtEI0xWOJYJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4bhHMr1CPDz2CfpH;
+	Tue, 15 Jul 2025 19:41:44 +0800 (CST)
+Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
+	by mail.maildlp.com (Postfix) with ESMTPS id BB1A61A0188;
+	Tue, 15 Jul 2025 19:45:50 +0800 (CST)
+Received: from huawei.com (10.175.124.27) by dggpemf500002.china.huawei.com
+ (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 15 Jul
+ 2025 19:45:49 +0800
+From: Yue Haibing <yuehaibing@huawei.com>
+To: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<yuehaibing@huawei.com>
+Subject: [PATCH v2 net-next] ipv6: mcast: Simplify mld_clear_{report|query}()
+Date: Tue, 15 Jul 2025 20:07:09 +0800
+Message-ID: <20250715120709.3941510-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,136 +54,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowAC3SHr5QnZoKgtBBA--.14063S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxWFW3Gw15XF1rAr4DXr18Zrb_yoWrGr4Dpa
-	yUAas8Xrykta13WFs7ua1kZFy5Ca10ka48WF1xu34fZFs0qw15urWUtFyjyry09FWkAr15
-	Jr4qyanruFyDGa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
-	64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8Jw
-	Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAG
-	YxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxkIecxEwVAFwV
-	W5JwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v2
-	6r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2
-	Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_
-	Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMI
-	IF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUhL0nUUUUU
-	=
-X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ dggpemf500002.china.huawei.com (7.185.36.57)
 
-The fsl_mc_get_endpoint() function uses device_find_child() for
-localization, which implicitly calls get_device() to increment the
-device's reference count before returning the pointer. However, the
-caller dpaa2_switch_port_connect_mac() and dpaa2_eth_connect_mac()
-fails to properly release this reference in multiple scenarios. We
-should call put_device() to decrement reference count properly.
+Use __skb_queue_purge() instead of re-implementing it. Note that it uses
+kfree_skb_reason() instead of kfree_skb() internally, and pass
+SKB_DROP_REASON_QUEUE_PURGE drop reason to the kfree_skb tracepoint.
 
-As comment of device_find_child() says, 'NOTE: you will need to drop
-the reference with put_device() after use'.
-
-Found by code review.
-
-Cc: stable@vger.kernel.org
-Fixes: 719479230893 ("dpaa2-eth: add MAC/PHY support through phylink")
-Fixes: 84cba72956fd ("dpaa2-switch: integrate the MAC endpoint support")
-Signed-off-by: Ma Ke <make24@iscas.ac.cn>
+Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 ---
- drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c | 15 ++++++++++++---
- .../net/ethernet/freescale/dpaa2/dpaa2-switch.c  | 15 ++++++++++++---
- 2 files changed, 25 insertions(+), 6 deletions(-)
+v2: Add drop reason note
+---
+ net/ipv6/mcast.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
-index b82f121cadad..f1543039a5b6 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
-@@ -4666,12 +4666,19 @@ static int dpaa2_eth_connect_mac(struct dpaa2_eth_priv *priv)
- 		return PTR_ERR(dpmac_dev);
- 	}
+diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
+index 8aecdd85a6ae..36ca27496b3c 100644
+--- a/net/ipv6/mcast.c
++++ b/net/ipv6/mcast.c
+@@ -845,21 +845,15 @@ static void mld_clear_delrec(struct inet6_dev *idev)
  
--	if (IS_ERR(dpmac_dev) || dpmac_dev->dev.type != &fsl_mc_bus_dpmac_type)
-+	if (IS_ERR(dpmac_dev))
- 		return 0;
+ static void mld_clear_query(struct inet6_dev *idev)
+ {
+-	struct sk_buff *skb;
+-
+ 	spin_lock_bh(&idev->mc_query_lock);
+-	while ((skb = __skb_dequeue(&idev->mc_query_queue)))
+-		kfree_skb(skb);
++	__skb_queue_purge(&idev->mc_query_queue);
+ 	spin_unlock_bh(&idev->mc_query_lock);
+ }
  
-+	if (dpmac_dev->dev.type != &fsl_mc_bus_dpmac_type) {
-+		put_device(&dpmac_dev->dev);
-+		return 0;
-+	}
-+
- 	mac = kzalloc(sizeof(struct dpaa2_mac), GFP_KERNEL);
--	if (!mac)
-+	if (!mac) {
-+		put_device(&dpmac_dev->dev);
- 		return -ENOMEM;
-+	}
+ static void mld_clear_report(struct inet6_dev *idev)
+ {
+-	struct sk_buff *skb;
+-
+ 	spin_lock_bh(&idev->mc_report_lock);
+-	while ((skb = __skb_dequeue(&idev->mc_report_queue)))
+-		kfree_skb(skb);
++	__skb_queue_purge(&idev->mc_report_queue);
+ 	spin_unlock_bh(&idev->mc_report_lock);
+ }
  
- 	mac->mc_dev = dpmac_dev;
- 	mac->mc_io = priv->mc_io;
-@@ -4679,7 +4686,7 @@ static int dpaa2_eth_connect_mac(struct dpaa2_eth_priv *priv)
- 
- 	err = dpaa2_mac_open(mac);
- 	if (err)
--		goto err_free_mac;
-+		goto err_put_device;
- 
- 	if (dpaa2_mac_is_type_phy(mac)) {
- 		err = dpaa2_mac_connect(mac);
-@@ -4703,6 +4710,8 @@ static int dpaa2_eth_connect_mac(struct dpaa2_eth_priv *priv)
- 
- err_close_mac:
- 	dpaa2_mac_close(mac);
-+err_put_device:
-+	put_device(&dpmac_dev->dev);
- err_free_mac:
- 	kfree(mac);
- 	return err;
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-index 147a93bf9fa9..6bf1c164129a 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-@@ -1448,12 +1448,20 @@ static int dpaa2_switch_port_connect_mac(struct ethsw_port_priv *port_priv)
- 	if (PTR_ERR(dpmac_dev) == -EPROBE_DEFER)
- 		return PTR_ERR(dpmac_dev);
- 
--	if (IS_ERR(dpmac_dev) || dpmac_dev->dev.type != &fsl_mc_bus_dpmac_type)
-+	if (IS_ERR(dpmac_dev))
- 		return 0;
-+
-+	if (dpmac_dev->dev.type != &fsl_mc_bus_dpmac_type) {
-+		put_device(&dpmac_dev->dev);
-+		return 0;
-+	}
- 
- 	mac = kzalloc(sizeof(*mac), GFP_KERNEL);
--	if (!mac)
-+	if (!mac) {
-+		put_device(&dpmac_dev->dev);
- 		return -ENOMEM;
-+	}
- 
- 	mac->mc_dev = dpmac_dev;
- 	mac->mc_io = port_priv->ethsw_data->mc_io;
-@@ -1461,7 +1469,7 @@ static int dpaa2_switch_port_connect_mac(struct ethsw_port_priv *port_priv)
- 
- 	err = dpaa2_mac_open(mac);
- 	if (err)
--		goto err_free_mac;
-+		goto err_put_device;
- 
- 	if (dpaa2_mac_is_type_phy(mac)) {
- 		err = dpaa2_mac_connect(mac);
-@@ -1481,6 +1489,8 @@ static int dpaa2_switch_port_connect_mac(struct ethsw_port_priv *port_priv)
- 
- err_close_mac:
- 	dpaa2_mac_close(mac);
-+err_put_device:
-+	put_device(&dpmac_dev->dev);
- err_free_mac:
- 	kfree(mac);
- 	return err;
 -- 
-2.25.1
+2.34.1
 
 
