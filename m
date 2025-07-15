@@ -1,124 +1,154 @@
-Return-Path: <netdev+bounces-207239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55623B06546
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 19:38:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26E8AB06555
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 19:44:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C693C3BF689
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 17:37:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA64C16F7F7
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 17:44:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3C7A28507B;
-	Tue, 15 Jul 2025 17:37:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A7BB286413;
+	Tue, 15 Jul 2025 17:43:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VgyPUXB4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cJ/tFzTR"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 010311D79BE
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 17:37:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F365328507B;
+	Tue, 15 Jul 2025 17:43:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752601067; cv=none; b=d7ac6F00GfHPObXJjuMq5O7K1sQmjCNUXpDxR/XFVGFvTAPgyJPYXUBXCCyjvj/J8ru00ZWYaberEFdz2B4uDcQvfkYMf03eRKDQ14oosE88sJ1WPZZKI3wuGErrGbTywhMcuCfZN0+eyT1NabPlUSk6fP2jWCll/fKWkXi5p/8=
+	t=1752601429; cv=none; b=PX+zKvscgzip+zWpHJhjh0UlAMMC/czbxkc0K3lrmlQoSjpwCUCkHNO94GHDcZgkyEBTr9MR37oYYebBY2w5S6N6ujiB3cgwNb3atx5ARD3+BmQj/NpczcNMVFVy6SnrH3fvLZsUUmi2ManeLwR5qQllcH9Tl0xoDFLwThFA8dQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752601067; c=relaxed/simple;
-	bh=XfSVpD9Z7XphBM4ixb2rCWDLMorg8f3Q4PGNqpR6KAE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CEgpGxduhskVvtG7rSJBIphdIgfC83Ttv4EBCXVBh/7TLuRNgMheP9etkbf3cjtTvXOPEM3Jvdgba33pPFmyoqmfqs5SJ8R2Iyhx/eigQkEhsUW3Hstgr64nQdAUEi7Z2JIKrJurkoUY9AXF1u3f9mZLK7KYWnq83XVEJiA5lcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VgyPUXB4; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752601063;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Cdcx7QAfZlAuJUAK+fb/wqda3KOPzzyARCBWyre1UeA=;
-	b=VgyPUXB4kBilNEBCjaVRvMPJjFdGrAL4dDjuXwdkSBXI2Z+oj9iRItEDAoCfabeRuWkuke
-	nVfWIZmfNEgE1kJdfAF5H3Z0XAMJ+wfw8RIceJ5R2Wo3KRJX+5DgLI6gYFGoI0idZZoifu
-	du6m8vpx88VxG+9FgFHRxqMeGIW86bQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-662-zPy6GhQ_Oiy_m92EHoQTfQ-1; Tue, 15 Jul 2025 13:37:42 -0400
-X-MC-Unique: zPy6GhQ_Oiy_m92EHoQTfQ-1
-X-Mimecast-MFC-AGG-ID: zPy6GhQ_Oiy_m92EHoQTfQ_1752601061
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45597cc95d5so23049655e9.1
-        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 10:37:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752601061; x=1753205861;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Cdcx7QAfZlAuJUAK+fb/wqda3KOPzzyARCBWyre1UeA=;
-        b=QaUbSP2Zumn+zHUpC1BdX6N5nLHRP7q1vDZWnXlt7Qq0EcLE3BmQkUFb+pK1lRQcUA
-         mLBqFz2CmpAUDVASd6ADkeCXyjAumrPPsWmDorS4L9PuFxtwbIGYVFRJdkTN5j436Hol
-         kqPWlZavWfAQJQESod6yXX+IxfAMU5/A0sJSjxQOtavf1mQdBNbE/L7APOrkHpz/YIRh
-         AUg080Jps+4JUo/rPxlPdp3/S0YxjNqTHMXcTTCmSrL0ASqnAxzSryyqW8En1vThHJbo
-         IUtoOMXaGLJOUIs0FwP3bkz6KS+bb3ZIxCEsws+y+UAWgW7zU56Rsql1ubzDeEVBDJnv
-         1doQ==
-X-Gm-Message-State: AOJu0YwPpjrrFdQoJ+rEHo9fDAIAagZTJvaCLYK6caY/k+ycSW76zN0C
-	ER5vN4XvXvS8kdfN7kH/8WbXmRNSmEyB4wE3GidHWqNVarB6tSTdsx+kPK7ZyHU/S/rYpkHY5tJ
-	Xhua42ZvHjtB/ZHXwdRBt/zRClIHsE1p3CebByE9vnZGv/v7zaxQtAQ+uIg==
-X-Gm-Gg: ASbGncvGCLFi0Bw4Gtn9B13DlKWZMr1jxPCtoQyhOtt8liOzEM1XrQXWClMUz6iYX/U
-	IxSpCQEUY21oic+JFVpyAtF4TC3nxXCrOyO9eOjIWxuwcuL8NhWNWmoEZUbIuSRkclGKwlBPz/l
-	hCBXm/Zp0UvxV7dySj6Kkxfs5IOFIDWzzdLrYmHPTCAumiY4vciW0tfUPy9L9MN0pGDf5wK6Qh9
-	GuRtppVuoAdMNeJeYwU8ZMpHiHzT1rJ8Kv43GnlaSiSuO3RAA3z1qkvX0AlrkpEr0E9dqvi/dsC
-	7YKk/YWblxCVT7sOSJLkVajSGJ8=
-X-Received: by 2002:a05:600c:c11c:b0:453:66f:b96e with SMTP id 5b1f17b1804b1-454ec146a71mr126236645e9.11.1752601061309;
-        Tue, 15 Jul 2025 10:37:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEav7jSZeI2X7Lu4R457llVbI4CiXULRrrPNd8TKiDciKzpga3jeaECrjhf/ot1tIBrxWWMDw==
-X-Received: by 2002:a05:600c:c11c:b0:453:66f:b96e with SMTP id 5b1f17b1804b1-454ec146a71mr126236465e9.11.1752601060964;
-        Tue, 15 Jul 2025 10:37:40 -0700 (PDT)
-Received: from debian ([2001:4649:f075:0:a45e:6b9:73fc:f9aa])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454d5050d34sm209336735e9.9.2025.07.15.10.37.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Jul 2025 10:37:40 -0700 (PDT)
-Date: Tue, 15 Jul 2025 19:37:37 +0200
-From: Guillaume Nault <gnault@redhat.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, linux-rt-devel@lists.linux.dev,
-	linux-ppp@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH net-next v3 0/1] ppp: Replace per-CPU recursion counter
- with lock-owner field
-Message-ID: <aHaR4QzKvCDi/LYx@debian>
-References: <20250715150806.700536-1-bigeasy@linutronix.de>
+	s=arc-20240116; t=1752601429; c=relaxed/simple;
+	bh=54VsIhKZIv/mNC4NrTI9DMJ7xO/jEt3cjbBcWJjARgg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=boDqHqZsC8uwcLuUviwiLBae8dng3kcS19ZOAfcy+BR6Ey6cCtvXOo5nfByJdWnbdWJ2kgbyXVxr2HTS/uQROijQDAZoc92yLS/P7y1cmDD42Lj0xlgxwCe+853Z11lgQmZHk4FexQEf2wUhsbMqnAEmhWDCnjFyQ9ynP3qp0RQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cJ/tFzTR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99843C4CEE3;
+	Tue, 15 Jul 2025 17:43:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752601428;
+	bh=54VsIhKZIv/mNC4NrTI9DMJ7xO/jEt3cjbBcWJjARgg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=cJ/tFzTRQvVmZe4bXDNiYPtuqt/7L/tJESoX0k/L6gt+FYeldUsQj+/4OgvhhudJ2
+	 a3Gz8r8S//vHl2Rawg9VD8KL8fop2h6lLT4IkLRJaTWynA3bf14gmE46MSUNREkv/Z
+	 kySwX/bMmaD2nntB3vVVp7T7NXIFxYzX8QDI7+UkV3zHSCMx4vsffdRWwhH10dwQkQ
+	 RC2u5GYUUG593bC6qBFvUpVlKnjLoxKVDZkjau1bWsDeFDybD96JFHHFCD/G9MJibh
+	 HxSkK7BltDpfwwtZOmXvhpxm/Ay6oywwTMZw+61Pe3Yxr4rV9y+kQlMcwr2JYiD32R
+	 XOPAPeaXMLe3w==
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-608acb0a27fso8037863a12.0;
+        Tue, 15 Jul 2025 10:43:48 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWFJ2aBN+IdXQfaoM9Rr1F6xJuqlgIN83XVrX0Ch2o5JD2YBb5YoAGJ5jPbsiNdm9/N9TkxyB3TubkOCgTu@vger.kernel.org, AJvYcCWWx8zKCA5zRhzsMAO+fKU9uIj9zbWSumGXgbn102GrINWvgfVTJP13vN9jW+M1Q5g565tao0ed@vger.kernel.org, AJvYcCXb3SJPEn56JzJUJgEcHDyXfmKzaE8n13/7ehaFOWXAgP69YS4UZhPJpUFmO5OLkLF2K7M7hoVFVpTf@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4wfaXT7lT6agYaZESqNkDGgZ2RW5lZgM9jBSMK/Wmaum8I2dH
+	8uNMqJhysgLPLvOQC+mkoRBROBe4fWWJtiDHjSPGE1F57DAPkVPmE6cC/5Fn5CLBsVHJJBheRfL
+	NRidCMmQ654vxITMSjvgXHrN8XFs0zA==
+X-Google-Smtp-Source: AGHT+IFSfJ329hc32n6pv+14gS0mt5gTgoFqsqGbemfhsisnZDnXEaldUJ2gRxLUkvPg+1tT8vixRzdxTK8k0xV9biU=
+X-Received: by 2002:a17:906:730f:b0:ad8:9466:3348 with SMTP id
+ a640c23a62f3a-ae9c9b0ce31mr42139766b.36.1752601427144; Tue, 15 Jul 2025
+ 10:43:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250715150806.700536-1-bigeasy@linutronix.de>
+References: <20250703021600.125550-1-inochiama@gmail.com> <20250703021600.125550-3-inochiama@gmail.com>
+In-Reply-To: <20250703021600.125550-3-inochiama@gmail.com>
+From: Rob Herring <robh@kernel.org>
+Date: Tue, 15 Jul 2025 12:43:35 -0500
+X-Gmail-Original-Message-ID: <CAL_JsqLKLKHj+vQJmZnaXRj3TmqR3ELjpBc27HRbTOOP9FD0hg@mail.gmail.com>
+X-Gm-Features: Ac12FXz_neDQRbYET5mV11I82g2lSNlhGKsWNEzC8k-2DtgP7jZ-KwLmxIiQkME
+Message-ID: <CAL_JsqLKLKHj+vQJmZnaXRj3TmqR3ELjpBc27HRbTOOP9FD0hg@mail.gmail.com>
+Subject: Re: [PATCH 2/3] riscv: dts: sophgo: Add mdio multiplexer device for cv18xx
+To: Inochi Amaoto <inochiama@gmail.com>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, 
+	Chen Wang <unicorn_wang@outlook.com>, Richard Cochran <richardcochran@gmail.com>, 
+	Alexander Sverdlin <alexander.sverdlin@gmail.com>, Yixun Lan <dlan@gentoo.org>, 
+	Ze Huang <huangze@whut.edu.cn>, Thomas Bonnefille <thomas.bonnefille@bootlin.com>, 
+	devicetree@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	sophgo@lists.linux.dev, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	Longbin Li <looong.bin@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 15, 2025 at 05:08:05PM +0200, Sebastian Andrzej Siewior wrote:
-> This is another approach to avoid relying on local_bh_disable() for
-> locking of per-CPU in ppp.
-> 
-> I redid it with the per-CPU lock and local_lock_nested_bh() as discussed
-> in v1. The xmit_recursion counter has been removed since it served the
-> same purpose as the owner field. Both were updated and checked.
-> 
-> The xmit_recursion looks like a counter in ppp_channel_push() but at
-> this point, the counter should always be 0 so it always serves as a
-> boolean. Therefore I removed it.
-> 
-> I do admit that this looks easier to review.
+On Wed, Jul 2, 2025 at 9:16=E2=80=AFPM Inochi Amaoto <inochiama@gmail.com> =
+wrote:
+>
+> Add DT device node of mdio multiplexer device for cv18xx SoC.
 
-Thanks!
+This adds a dtbs_check warning:
 
-Reviewed-by: Guillaume Nault <gnault@redhat.com>
+mdio@3009800 (mdio-mux-mmioreg): mdio@80:reg:0:0: 128 is greater than
+the maximum of 31
 
+>
+> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+> ---
+>  arch/riscv/boot/dts/sophgo/cv180x.dtsi | 29 ++++++++++++++++++++++++++
+>  1 file changed, 29 insertions(+)
+>
+> diff --git a/arch/riscv/boot/dts/sophgo/cv180x.dtsi b/arch/riscv/boot/dts=
+/sophgo/cv180x.dtsi
+> index 7eecc67f896e..3a82cc40ea1a 100644
+> --- a/arch/riscv/boot/dts/sophgo/cv180x.dtsi
+> +++ b/arch/riscv/boot/dts/sophgo/cv180x.dtsi
+> @@ -31,6 +31,33 @@ rst: reset-controller@3003000 {
+>                         #reset-cells =3D <1>;
+>                 };
+>
+> +               mdio: mdio@3009800 {
+
+The nodename is wrong here because this is not an MDIO bus. It is a
+mux. So "mdio-mux@..." for the node name.
+
+> +                       compatible =3D "mdio-mux-mmioreg", "mdio-mux";
+> +                       reg =3D <0x3009800 0x4>;
+> +                       #address-cells =3D <1>;
+> +                       #size-cells =3D <0>;
+> +                       mdio-parent-bus =3D <&gmac0_mdio>;
+> +                       mux-mask =3D <0x80>;
+> +                       status =3D "disabled";
+> +
+> +                       internal_mdio: mdio@0 {
+> +                               #address-cells =3D <1>;
+> +                               #size-cells =3D <0>;
+> +                               reg =3D <0>;
+> +
+> +                               internal_ephy: phy@0 {
+> +                                       compatible =3D "ethernet-phy-ieee=
+802.3-c22";
+> +                                       reg =3D <1>;
+> +                               };
+> +                       };
+> +
+> +                       external_mdio: mdio@80 {
+> +                               #address-cells =3D <1>;
+> +                               #size-cells =3D <0>;
+> +                               reg =3D <0x80>;
+> +                       };
+> +               };
+> +
+>                 gpio0: gpio@3020000 {
+>                         compatible =3D "snps,dw-apb-gpio";
+>                         reg =3D <0x3020000 0x1000>;
+> @@ -196,6 +223,8 @@ gmac0: ethernet@4070000 {
+>                         clock-names =3D "stmmaceth", "ptp_ref";
+>                         interrupts =3D <SOC_PERIPHERAL_IRQ(15) IRQ_TYPE_L=
+EVEL_HIGH>;
+>                         interrupt-names =3D "macirq";
+> +                       phy-handle =3D <&internal_ephy>;
+> +                       phy-mode =3D "internal";
+>                         resets =3D <&rst RST_ETH0>;
+>                         reset-names =3D "stmmaceth";
+>                         rx-fifo-depth =3D <8192>;
+> --
+> 2.50.0
+>
 
