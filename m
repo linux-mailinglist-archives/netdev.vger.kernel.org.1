@@ -1,224 +1,315 @@
-Return-Path: <netdev+bounces-207265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23FC5B067CC
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 22:33:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4022CB067E1
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 22:44:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39AE650428E
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 20:33:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 792A71783BA
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 20:44:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 809E4230BE4;
-	Tue, 15 Jul 2025 20:33:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82CC1272E5D;
+	Tue, 15 Jul 2025 20:44:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WLlSwKOg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I/870+Z8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099431EF39E
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 20:33:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752611635; cv=fail; b=qKmOvxoOREJImBIEHSiDtddxgXe0Io3L59GG89Kx8TRafmgeN7Q23/XKgW+I/7kyy/Vkl6bu6OS5eHnu2M45tmHdkueR2Q6piHs0uw1bx4WS8jZfWbMUfM2y9QTK1iTttx39+jAbx8Z4T8FA6IegNqyZcKRum2xxfWoIOAJkYVk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752611635; c=relaxed/simple;
-	bh=N/ff/zXmLAQ5jIbQYp9DRIYgf761wJq8wFITN6DhXiI=;
-	h=Message-ID:Date:From:To:CC:Subject:Content-Type:MIME-Version; b=dgyVAeVlr7ZPKXm2eS9KvJ7uU7ACPgk9izrA5Eaq71+PWvXChnyb+XF373xKeET0JeF1bn+pFJABulFWPgqZxa4R6E79D47k9Lu3Ccqy+P9gqJPVbKZA0pc/JtKLbG9QWeqeD5EkuhtCKlomMxyzLZTtBR7k9uR6fI3ezEzEKOk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WLlSwKOg; arc=fail smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752611634; x=1784147634;
-  h=message-id:date:from:to:cc:subject:
-   content-transfer-encoding:mime-version;
-  bh=N/ff/zXmLAQ5jIbQYp9DRIYgf761wJq8wFITN6DhXiI=;
-  b=WLlSwKOgieN4nADRaSBkxUqygQs71wxBtZTd+SG0OqTBXrRXtedaipOQ
-   rAHNkOo9/nWpnLc+IjzlA/lM4eK2AuhlOxHxwlb6phf+dnDeQaw3Gh9qM
-   Y1be2A0rt72XoBKtrB7nlOM/Xr0nBqgRoVerwbZtFP10jzXlFbidkf5Cj
-   cBoZdG5jShtPyYqCZX9pga0fVntH5Fi+w/bcAsumG2P7jhglblM7HNFB5
-   JRqqD9FLKDPidS7eCdSO8WXscaVWCvqnkCsweho3NXSLsFOay0gxSSQHp
-   kWhcYNgKBEnDPaJQpdijYvTfbVz6OtL7kBw9eTVDQ/OqGqHTe/eMPhncx
-   A==;
-X-CSE-ConnectionGUID: X1Sk2IzQTU27GDLPZS2uIQ==
-X-CSE-MsgGUID: IGD2Ky7QSaiU+Wyw7dmx8Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11493"; a="42475407"
-X-IronPort-AV: E=Sophos;i="6.16,314,1744095600"; 
-   d="scan'208";a="42475407"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 13:33:48 -0700
-X-CSE-ConnectionGUID: lfYBldCqR9GR59CsB5MeyA==
-X-CSE-MsgGUID: RJkHdtyEQQe4aHFGGuAkKA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,314,1744095600"; 
-   d="scan'208";a="188320634"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 13:33:48 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Tue, 15 Jul 2025 13:33:47 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26 via Frontend Transport; Tue, 15 Jul 2025 13:33:47 -0700
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (40.107.100.53)
- by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 15 Jul 2025 13:33:46 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ApQxuMZXAViy/jkE11bXBZET5W0eN6PXGdnv1Ip+HxA67h6lnmDFlG6lTmqcnGcX8RSy9YvG4muIRCbdfuuOQmFPgVso6uM9rJJP2k9rmZXVteZWODGi3OVT+pUsKIJbVpEIaUKnAnQPYqaR4PfxnpKJ/mL42B2z7YCA5Qt09cq2UJBLg8jq9IY/qaBjL8kFK51jFn/u4SPiNFQ5yteEhQap3S/KbvPrTXq3fQHremVJZRIzTgdC3BErBJZ2L16MAmKNQhB2mUI9upJPnoPY5pbAym/wkofks4tckS6Yoob+Os7HRh6AqSwDeIbK9C3RtuIVKl1VFZnVkiaA0ahJcA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=N/ff/zXmLAQ5jIbQYp9DRIYgf761wJq8wFITN6DhXiI=;
- b=LdpHWMML+0MMieHMLAbG01+cCw4jQnSeL/R66cgfoVSJJAGVD5qw0lzBadksWCsep+IcLpix41XcyWVw52iAhc9RTavzmKy38Y1JDmPXzaK6+LBAetEIY0rzm8hvv+VrH24OEXNasv566fH1stOEtl690HBMCwpmMuJdWCVZID0E/EseXLHtteenoniFge9EzlXwN5VqClZrkAh2qNrcvfmhw28HH8maBLe5f0oiTuysZ7N227JRiGP/DXlna4apAr4jZOOHVFe5T0ZZU5UWdpeoH5Su0zuW2Lhh6uxZG5aaOSCP73J8I55KfhCk62hDwpRDDDiM9QL9lHuLdidmkA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by CY8PR11MB6841.namprd11.prod.outlook.com (2603:10b6:930:62::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.25; Tue, 15 Jul
- 2025 20:33:44 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6%4]) with mapi id 15.20.8922.028; Tue, 15 Jul 2025
- 20:33:44 +0000
-Message-ID: <5b94d14e-a0e7-47bd-82fc-c85171cbf26e@intel.com>
-Date: Tue, 15 Jul 2025 22:33:40 +0200
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-Subject: [RFC] Solution how to split a file in a way that git blame looks fine
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DB9PR02CA0005.eurprd02.prod.outlook.com
- (2603:10a6:10:1d9::10) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEDBC1FDA9E;
+	Tue, 15 Jul 2025 20:44:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752612268; cv=none; b=juUJ9XSjNbWcYrzl1pPIMXR3lWeUyl0xJ6WWIGeJd1hV2W2KZ/dw9ebs/1TKuM9yUwhdZNitNXyeew1aXQ6P62JNtLkHqb1KVm43NKzy32ueldQZ6st/gwXABRENmbIFugs9EsuxWmAOy3bFYCsH6Y0PZQA7Sv+XRFeZAK3EmlQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752612268; c=relaxed/simple;
+	bh=+NHg7CpVR6QykgY6wGysAsan+dQhwgyVX7dBSu3u22M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RbzXNXQ6b0Hzx9DlFD9m04dwO5GydQ8Jg4EM+61ut1atCoo6cscVB3bhx9PBM5JYk6EIjj0jKB6T1yCLm7+IWKq1+/5efwZar2O4L9VUftauX0I1VYH/dOhdO6P2K5BN+gJ6d4i5sJnJ0roxNSvNT8FlMI7G2W/T0isY+K4MzUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I/870+Z8; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-237e6963f63so35443355ad.2;
+        Tue, 15 Jul 2025 13:44:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752612266; x=1753217066; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=J40PrKy/s+BZm+RMAnLvAV2lySSbc6BKDGO6tf6c1gw=;
+        b=I/870+Z8bGIaWpHyLJJMvyrT4oQr2fzXTDlcnpec85ltDvU69ARGIWQSibVxq2xtcV
+         HCUR3oGGxCssjEL7ZIkaPxg+1ApPu+BGucjksisTcZPzszJJdUMAwWIf7V3aF8TWX2iZ
+         u5ltofOF6DM+zFzq23u4aW1+DWOWZOr6YedJwXxMZrXZplyKuGxwtzt3N9eouj7zA2ZK
+         OesCkyVpiAhwfE4ZWBl3t08kR4GFXxhLmANUnkl/mreTSsohmnc+a7B6WXqf6b21QPZH
+         7MxWxdp4tktgzucuNXUV/a2H/tuxIpTgmzO44HXcrDa/6fRk+VWHRGUlQr7SqN/7+gvw
+         zg6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752612266; x=1753217066;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=J40PrKy/s+BZm+RMAnLvAV2lySSbc6BKDGO6tf6c1gw=;
+        b=JRF/c+p6kSn5noiASZB1XdzCiSVln58wxuysJ25KL8fFNcoq6JPvj5KETKxX0OLwez
+         aM9oTQMnX3c+ieqH0TxH8MfVVgAfPO2jywaaC9J0dlhyJ+CDPfi+RB+yDhwe8dyXdc5p
+         rsWk5+GpZTBkbkpOE87jks+ar+Hf8B8bo+e88Bu6NxDxNynY6P7kN/qMPxIv768aQSEY
+         apu+w9pTu6YKl+PCk7nHCyY1ZXzxVm7D7dBIP+OthQx2wlxrJtnje3qyO+AEPGqnW/NF
+         H4xE/uBc0pTvmlavC4LYxAGQNFAmm67xEHxgW+WJsozcoykPvzYMSY6kyMsfcXh6k75G
+         Lbdw==
+X-Forwarded-Encrypted: i=1; AJvYcCUOdmoBYpg0jUh7DTqcEofH6h3duV3KlhagLfuqK3IbybSpcKWkR6cNUiNEAy8FkP8uC/7C68mE@vger.kernel.org, AJvYcCWKcpWlW56+dypoNrrJcM/aI0KKl9tf9gww7nwhTkPar201B2IAbA2D0uAOs/j2D6z7CYI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqJZfiC50HVWC8gRqJMRMsN0Toru0tl8FZPe8NS+gXSGAMeZ/q
+	cpwRNUZ9Bt/hXQ3NMtMZXPrWi0yGv3YvChpIBN2OIgDVtd1/a3NEuBw=
+X-Gm-Gg: ASbGncuppEtzcI8FQDfoNHHB+hkoLLthfRegv+0/aO/RipihHi/YnhZT5QrvVA/+4xl
+	x0Uk6tWpHr2w5BP2Tusf3wtSXqOvtlpyn/e7y6M44tb5ULNpGeFoO3FxZBnkoM504zY/Jafd9yn
+	nUXeSgLQkyJyMAzi3bmsWuhyZLEgUflPwdHlaXkKGdvQsNf9Jr9nKQd/z3AtzZWwKFw/kq0wOrZ
+	ewcSrcws1c40U/LktMbUpi2baf2MmPb4B2qSrzEyva5CAR8tLhmFMC/EHMbK+klVZpWMcX+iB/A
+	cxlgEPD5JWMTuKxudIY7cSvRLOZJRXM6mVnJg6NJkgQw3otDf5LOHMPMxocCM2VUQI88swWgU6H
+	Gm+X0UBNG3z52G/A/2QkeD9u1ixq4yHsSuHz3Sctbs2FvUg0F7Tl9y/rEE9k=
+X-Google-Smtp-Source: AGHT+IEw+IuhNNp/R17WWY4jBseF2i+zKm/TbYLLe+93CS8X5A6pd+qUBNVgfPAU7wiKzXr6bvuW8A==
+X-Received: by 2002:a17:903:ace:b0:234:d7b2:2ac4 with SMTP id d9443c01a7336-23e256b5f75mr2579005ad.17.1752612265803;
+        Tue, 15 Jul 2025 13:44:25 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-31c9f1ba67csm41666a91.8.2025.07.15.13.44.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Jul 2025 13:44:25 -0700 (PDT)
+Date: Tue, 15 Jul 2025 13:44:24 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
+	sdf@fomichev.me, ast@kernel.org, daniel@iogearbox.net,
+	hawk@kernel.org, john.fastabend@gmail.com, joe@dama.to,
+	willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next] xsk: skip validating skb list in xmit path
+Message-ID: <aHa9qLUtD3nR3Xl7@mini-arch>
+References: <20250713025756.24601-1-kerneljasonxing@gmail.com>
+ <aHUqR5_NoU8BYbz5@mini-arch>
+ <CAL+tcoCiL0jjUO8RPiWX-+9VtjQm50ZeM5MQXn3Q6m+yNYryzQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|CY8PR11MB6841:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9f2ccea1-685c-4700-6bea-08ddc3dee45e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?UmdhbXhPY1B4VmYzQVN3SXFYMEcxTDduR2lWWUE2TWo1VitZcldtM2JUR0M2?=
- =?utf-8?B?T0NJL1lkY3hoWDZUNlpkMEw4TlZlRUprTVNMN01YREFZV2dhTTRwcTRiMXcx?=
- =?utf-8?B?TnBiZUFTcUxMYjE4a0NZVVNRczlmYTRLaHlKSGkyRDIzTWdpSmtCektXaWp5?=
- =?utf-8?B?ekdlUm9sWlNWVVN6OXk2Z25pbUdVem5ZY09HZ2tGaXU5cFptcDdNWkRwOVhy?=
- =?utf-8?B?ZDlxNGFGeFI3dWRjWGpxOWkzV25tcFQ3ZlkzWmI3MktSR1kxNkI5RUQwWDds?=
- =?utf-8?B?TDZaN2tucGdzd2ZIWDF3MFJIZVVKa0lmRk9WNTJEQUdMWllpd3EwWGlYUEgv?=
- =?utf-8?B?MVhKem9JVUg0ekp3Z01jNFQxczVQTHZ4UUJySEdHaGp0QjM1Ri9FWjlKLzFy?=
- =?utf-8?B?TlVnTmpmWVl0VW1GUlJwTHFDZE9HSjl0SDZSNFg2RVlWeERPNkNabnRzdmd2?=
- =?utf-8?B?Ly9EbUNxYVNFVjkxQzBuUDROcEtEelEzRlp5SnU2U25CRWdKT1BQQmJ6VjBB?=
- =?utf-8?B?cndIWlhzWmlpVVQwc2JRbGhVK0Z4QmtMcm9SVExzbSthd1pjUStOcko3TlBv?=
- =?utf-8?B?dGsyUXpoSHkyTUw3blhycUFWMWdHOTJJNWZkbitJQzFXbGNNcXFTeEQ1Q3JI?=
- =?utf-8?B?VG9BY0RWVjNuYzVONk5FckpIeHpMMU9Zb29nczd2emRZblY3RFRBclROQWxC?=
- =?utf-8?B?ZU0yZmQrbGZ2OG5lWm5TQXNpRDc0aTlRMXNXR2N0aFovc2hzeUpUVUw2RVZJ?=
- =?utf-8?B?V2tZeGFmOFQ5b3RzbG1hUmtjTS9oMjgvaVJzMmN2NFZPdHhlOFRCVEtXZzJI?=
- =?utf-8?B?NDR5UGlhdUhreVdYTm9uQlNlRjBsSHhlTXlqdjd5d2Uwd012UyttS2lpTjlx?=
- =?utf-8?B?cFNvdnEwaE13UmxpZnN2b24vQUxNZy9Sa0V0UlFIWlFiWWdsS1hMakxadUg1?=
- =?utf-8?B?eitnK2p2cEpndFBlRDVTcm83RmNPUU51REZFVFAvSzBOaEU3alEzcHFOaVZl?=
- =?utf-8?B?c2t3K2huazl0Q1dMVlNPS1ErWmlSZ1g0NlpwRlNJMHVwcTdWUWFIQkdVUWtu?=
- =?utf-8?B?bUtGS0VzYnVZYXhoN3VDdm9mNFY5dDlJMlNyVlRiY1J6eDdmYVVhNXhJSUlu?=
- =?utf-8?B?UWZycXhhSmYrOFBCYlQzNHdhQVRZSmlKQUxrT0JwSmhVUHJWTjJaZTlOc2xX?=
- =?utf-8?B?ZzRXN0ppYy9NMVZINm9ZRFk5Vy8wZFJYOExGQThRN2R4T1lFaGkzOFdjNWN2?=
- =?utf-8?B?TWJHVnFyL0lUZ2ZwcFR3c2ZJSFkvOVgrenp4MGRCV1VZNmQvN2RlUmdnSlg1?=
- =?utf-8?B?NTB4Vmo4OXpYNm0xVjZjOXBuN3dHOTdueHpGSlp3bWNscy90VXVyZ3hLYWhX?=
- =?utf-8?B?Y0lYVW13Zkh4eFA2SEtQdGY4VVQ4UDBad0NLcGp2Zzc0RmRpNldySDhobE15?=
- =?utf-8?B?M0sxU2RtOGZXQWFhSjdrVlVLZkx6dWdEbGFLY3dYTWZwK0Nva2owcGFIbXZk?=
- =?utf-8?B?T2FHN283TG1QMHZlRjk1QUtHcHRaWElpdXlLNWE5ZGptZS9aQWs4dmxkZWk0?=
- =?utf-8?B?SUNvNlh0WGdPd1E1a0xuOWVQNTgwcmt3bmRHMHhvQ0hqLzR0VHRkRUxuZExP?=
- =?utf-8?B?Z2tYRTJseDJucGNIUWg3TEVYSlVNMHlLRGs3eDV0M1lnQzQ2QWdxak5pRDlk?=
- =?utf-8?B?NjhDb3hRMUYvTWt4bTU3bndrN0NnajRHVkFaeXRORjdVNVcrZzUrZU81bTRa?=
- =?utf-8?B?ZnpwU05EQzl3WW51VzVMQW0xUGRIMFVkUkN3eStWTDA0dTNoMFZnT3RnWjZa?=
- =?utf-8?B?WTZ5UEhDZVVvN2k4MmU2VGFrd2hPZi9kMnVVRUVFSkxXUEZBekYzN1g3c1oz?=
- =?utf-8?B?RS83RzFZb0sxT1gvQmJRTkVkQ3MxNURPUVVOdzlaY1FuZFZOcGdobG9hV3kv?=
- =?utf-8?Q?2BEtoW9NIjw=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?c2NBYmVvMkNPQmNCL0N3ckZDa3BIMWtNVlZhbW8rNnVCN2k1eVFnYXlTLysr?=
- =?utf-8?B?Z1U1MWJ6Q0lRdkFaVmRWd3cyWWZNMng5OWQ5N2J3ZnVSQ0E0NlJBUERJdDY1?=
- =?utf-8?B?Q205NDlNTjhuSjZSb3BNSlZ1cFJ5YWNJa2xGSFhZSktNUk5OaVBhcm5yNndE?=
- =?utf-8?B?V2JyU09BTzFqanprOEJYODNtR3hrRzNSUVJXVmNCOFA1Ulpmb2oxZXFCZ0NC?=
- =?utf-8?B?NVFySkcxenZDdXI2SkJkU0d2bkFTZGxkS3l3R2tEOW4rU0NpaFozS3d1Z1NB?=
- =?utf-8?B?R0tPRmIvVWV4NWdRWXZ3bEdGQnpTU0JTUDFyWnlpZkVYUlQra3MyRENKa1pt?=
- =?utf-8?B?VEUyeFdqTVZrTUwwSGJJQ0h2SjVXdWlyOCtOZVlUODBXYjN1RVdmMXRMYmFP?=
- =?utf-8?B?MFQvalpNRHdraXQyeFVKdjlQd1gvWEZVU0tuVXNFOFZ0ZnNUdkd2dGxuaGc4?=
- =?utf-8?B?c3YyMHRrbENIaC9CS3Z4eU41Qk5OeW9XS3FRUDRQQ1hFaDU2WldXQVh0VVZp?=
- =?utf-8?B?aTNWcHdadGFHQ0VjcXFWNDhDRFlIV3U0RGlyZ09PSGVnOG9tQzhiNE9HcER3?=
- =?utf-8?B?Y1AxOEcwUjJHWC9CTXhsN1FhYkxRREl0eUlzRWMvV0h6KzVxV2xCUlArQVZo?=
- =?utf-8?B?N1ZiVDRxMDNSYkdPaXdxMWYzaktwNGRGMkhBc1B5UnJ2QzdRbk1ONUZKSzZM?=
- =?utf-8?B?ZjFqSjNDSlpPWS9YTi9nUFFmYVhNZWNJSkRjYXhCTHN2UlRHWEc0RWRCM2x0?=
- =?utf-8?B?VkVZRFJZN3hzZnl5dDRyMXlQblhSTlhzTE01cXRPcUNCai9mUHJpaGJmQ2tl?=
- =?utf-8?B?ZVRVS1NpZlJCcTl6VUJJQm5XamYxZzc5MVVScmJmdWF0eExjMTVhSXR2WUxs?=
- =?utf-8?B?VjA2VnJpeGFjK1dCRytZN1lJU3dQd1BYRHkrWEVvYTR4Y2ErZys2b1p1YkdK?=
- =?utf-8?B?UVhDYUE2QmozY3pBMlE3TzZoc0xkbXZPODRSTHJRNERxKzY1SWNaOFZtOFph?=
- =?utf-8?B?elAybmVRNUxjb3JzSERDNXUyRUFGMVIxUFdJV0FUbFNMQktuelRoMnhHRytt?=
- =?utf-8?B?cUdOY28wVEZwd1pVYldiZWlwc0YyYlozK0l1cjY4VDhaMmRQNVIrd21oaHpS?=
- =?utf-8?B?SDRJdWtvd3VURWNTcWF6NCt6T0YxUjRRNW9YMlVoejdsekU1ZTY0TGhJNlk2?=
- =?utf-8?B?Ni9lN0twWXpGY0c2ekdTZmVGZC9BNVNrRjRHRXVsSHpuRW85UHVFVnoxczZ4?=
- =?utf-8?B?alh1Qk5lUitXSzNiVWR1WHFSTDFrK2wxcWxlazJOd0VDYUlvakJIdEYvUmxS?=
- =?utf-8?B?LzlIVEJOZzdrallFSkE1OEdsSEY3d2VYR2FIdXRrVndKNEN3QnBybXgwNi9T?=
- =?utf-8?B?ZFQ4Q0pGcnlWOE85aDIralZkUEg1RFhycVFpK1BZMWsrRmIxVENwdUZxdDVo?=
- =?utf-8?B?RVdUSjAwZ3V6TEI0OTFPTGZrNVNmZm5ObEdpcmZGdkF1U3ZGQW5LU0ZKZE5X?=
- =?utf-8?B?bU9VSk92eGRGdFMxdzNFWDUyZDRwTFBrRzNSaDVnMExDbC9QMTNPRmpiMDlz?=
- =?utf-8?B?cktnVExFanNxUERKM3pzTUxkQTk4L2gzT3NzNkVyZzBKbTBaZCt4L2tFR0RZ?=
- =?utf-8?B?aEI3QkR2OVZCYTNEaEdMbC9Oc3ZaMFNYdm5RN3d1V0xMeGo4WWo3K3Y0dHh4?=
- =?utf-8?B?TEZVTE5pMzBHbHBXb3M4ZGIrRFlkMjZpb3JOZGs1RzZkYThPSUN6QUlmQTNX?=
- =?utf-8?B?a2g5SVJiODBXM0IxQVcvODVReTI2bExMckVGbk9HV3prMWhkeFptU3U0aTk0?=
- =?utf-8?B?aWg3NzIzTGtEd0pQYkMydXhNc3RkU3liL01wbmw1UGk0Q3pCdWJCZzduRXBj?=
- =?utf-8?B?SnlHVXJPa2tYSlo2SGphcm5JdHFvQVNWM00wVUpNVW5MQTREMHdMUGRKeGsx?=
- =?utf-8?B?eTB4TGRGazZGZDlRWDllNWtHL001WXNIemFjYmVaUWt6NG8rMG14aDlySmtS?=
- =?utf-8?B?ZGtmN09kaUJDNkxFTlMrZVZoNzYxR3ljYzhEenVVUnRIR29DblJVd2REYUtw?=
- =?utf-8?B?TFVZVnVEeTRFZ1gyWFowcW1Nb3dHVXN3TkRuSE9Sem5nVjlNTGlCZ085OUda?=
- =?utf-8?B?bExPRUo0cUFmYXdsMk5xWkxOSDF4ZlYyR0RFYmtZdGFnM0FkV1MvbTQzbGRP?=
- =?utf-8?B?RHc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9f2ccea1-685c-4700-6bea-08ddc3dee45e
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2025 20:33:44.0785
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nG/aWrtxtqsYgdWLtGZKXeJ+hRea/AY37OfDQ7aswjE0IcjtMmk2AzuyH33QMIui4hsUg08krCe3/0lc159XaCTcP9CgCIwsQx6wp2PVQsM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB6841
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAL+tcoCiL0jjUO8RPiWX-+9VtjQm50ZeM5MQXn3Q6m+yNYryzQ@mail.gmail.com>
 
-Hi,
+On 07/15, Jason Xing wrote:
+> On Tue, Jul 15, 2025 at 12:03 AM Stanislav Fomichev
+> <stfomichev@gmail.com> wrote:
+> >
+> > On 07/13, Jason Xing wrote:
+> > > From: Jason Xing <kernelxing@tencent.com>
+> > >
+> > > For xsk, it's not needed to validate and check the skb in
+> > > validate_xmit_skb_list() in copy mode because xsk_build_skb() doesn't
+> > > and doesn't need to prepare those requisites to validate. Xsk is just
+> > > responsible for delivering raw data from userspace to the driver.
+> >
+> > So the __dev_direct_xmit was taken out of af_packet in commit 865b03f21162
+> > ("dev: packet: make packet_direct_xmit a common function"). And a call
+> > to validate_xmit_skb_list was added in 104ba78c9880 ("packet: on direct_xmit,
+> > limit tso and csum to supported devices") to support TSO. Since we don't
+> > support tso/vlan offloads in xsk_build_skb, removing validate_xmit_skb_list
+> > seems fair.
+> 
+> Right, if you don't mind, I think I will copy&paste your words in the
+> next respin.
+> 
+> >
+> > Although, again, if you care about performance, why not use zerocopy
+> > mode?
+> 
+> I attached the performance impact because I'm working on the different
+> modes in xsk to see how it really behaves. You can take it as a kind
+> of investigation :)
+> 
+> I like zc mode, but the fact is that:
+> 1) with ixgbe driver, my machine could totally lose connection as long
+> as the xsk tries to send packets. I'm still debugging it :(
+> 2) some customers using virtio_net don't have a supported host, so
+> copy mode is the only one choice.
+> 
+> >
+> > > Skipping numerous checks somehow contributes to the transmission
+> > > especially in the extremely hot path.
+> > >
+> > > Performance-wise, I used './xdpsock -i enp2s0f0np0 -t  -S -s 64' to verify
+> > > the guess and then measured on the machine with ixgbe driver. It stably
+> > > goes up by 5.48%, which can be seen in the shown below:
+> > > Before:
+> > >  sock0@enp2s0f0np0:0 txonly xdp-skb
+> > >                    pps            pkts           1.00
+> > > rx                 0              0
+> > > tx                 1,187,410      3,513,536
+> > > After:
+> > >  sock0@enp2s0f0np0:0 txonly xdp-skb
+> > >                    pps            pkts           1.00
+> > > rx                 0              0
+> > > tx                 1,252,590      2,459,456
+> > >
+> > > This patch also removes total ~4% consumption which can be observed
+> > > by perf:
+> > > |--2.97%--validate_xmit_skb
+> > > |          |
+> > > |           --1.76%--netif_skb_features
+> > > |                     |
+> > > |                      --0.65%--skb_network_protocol
+> > > |
+> > > |--1.06%--validate_xmit_xfrm
+> >
+> > It is a bit surprising that mostly no-op validate_xmit_skb_list takes
+> > 4% of the cycles. netif_skb_features taking ~2%? Any idea why? Is
+> > it unoptimized kernel? Which driver is it?
+> 
+> No idea on this one, sorry. I tested with different drivers (like
+> i40e) and it turned out to be nearly the same result.
 
-I have developed (or discovered ;)) how to split a file in a way that
-both old and new are nice in terms of git-blame
+I was trying to follow validate_xmit_skb_list, but too many things
+happen in there. Although, without gso/vlan, most of these should
+be no-op. Plus you have xfrm compiled in. So still surprising, let's see
+if other people have any suggestions.
 
-https://github.com/pkitszel/linux/commits/virtchnl-split/
+> One of my machines looks like this:
+> # lspci -vv | grep -i ether
+> 02:00.0 Ethernet controller: Intel Corporation Ethernet Controller
+> 10-Gigabit X540-AT2 (rev 01)
+> 02:00.1 Ethernet controller: Intel Corporation Ethernet Controller
+> 10-Gigabit X540-AT2 (rev 01)
+> # lscpu
+> Architecture:                x86_64
+>   CPU op-mode(s):            32-bit, 64-bit
+>   Address sizes:             46 bits physical, 48 bits virtual
+>   Byte Order:                Little Endian
+> CPU(s):                      48
+>   On-line CPU(s) list:       0-47
+> Vendor ID:                   GenuineIntel
+>   BIOS Vendor ID:            Intel(R) Corporation
+>   Model name:                Intel(R) Xeon(R) CPU E5-2670 v3 @ 2.30GHz
+>     BIOS Model name:         Intel(R) Xeon(R) CPU E5-2670 v3 @ 2.30GHz
+>  CPU @ 2.3GHz
+>     BIOS CPU family:         179
+>     CPU family:              6
+>     Model:                   63
+>     Thread(s) per core:      2
+>     Core(s) per socket:      12
+>     Socket(s):               2
+>     Stepping:                2
+>     CPU(s) scaling MHz:      96%
+>     CPU max MHz:             3100.0000
+>     CPU min MHz:             1200.0000
+>     BogoMIPS:                4589.31
+>     Flags:                   fpu vme de pse tsc msr pae mce cx8 apic
+> sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss
+> ht tm pbe syscall nx pdpe1gb rdtscp lm constant_ts
+>                              c arch_perfmon pebs bts rep_good nopl
+> xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor
+> ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm p
+>                              cid dca sse4_1 sse4_2 x2apic movbe popcnt
+> tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm cpuid_fault
+> epb intel_ppin ssbd ibrs ibpb stibp tpr_shadow fl
+>                              expriority ept vpid ept_ad fsgsbase
+> tsc_adjust bmi1 avx2 smep bmi2 erms invpcid cqm xsaveopt cqm_llc
+> cqm_occup_llc dtherm ida arat pln pts vnmi md_clear flush_l
+>                              1d
+> 
+> >
+> > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > ---
+> > >  include/linux/netdevice.h |  4 ++--
+> > >  net/core/dev.c            | 10 ++++++----
+> > >  net/xdp/xsk.c             |  2 +-
+> > >  3 files changed, 9 insertions(+), 7 deletions(-)
+> > >
+> > > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> > > index a80d21a14612..2df44c22406c 100644
+> > > --- a/include/linux/netdevice.h
+> > > +++ b/include/linux/netdevice.h
+> > > @@ -3351,7 +3351,7 @@ u16 dev_pick_tx_zero(struct net_device *dev, struct sk_buff *skb,
+> > >                    struct net_device *sb_dev);
+> > >
+> > >  int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev);
+> > > -int __dev_direct_xmit(struct sk_buff *skb, u16 queue_id);
+> > > +int __dev_direct_xmit(struct sk_buff *skb, u16 queue_id, bool validate);
+> > >
+> > >  static inline int dev_queue_xmit(struct sk_buff *skb)
+> > >  {
+> > > @@ -3368,7 +3368,7 @@ static inline int dev_direct_xmit(struct sk_buff *skb, u16 queue_id)
+> > >  {
+> > >       int ret;
+> > >
+> > > -     ret = __dev_direct_xmit(skb, queue_id);
+> > > +     ret = __dev_direct_xmit(skb, queue_id, true);
+> > >       if (!dev_xmit_complete(ret))
+> > >               kfree_skb(skb);
+> > >       return ret;
+> >
+> > Implementation wise, will it be better if we move a call to validate_xmit_skb_list
+> > from __dev_direct_xmit to dev_direct_xmit (and a few other callers of
+> > __dev_direct_xmit)? This will avoid the new flag.
+> 
+> __dev_direct_xmit() helper was developed to serve the xsk type a few
+> years ago. For now it has only two callers. If we expect to avoid a
+> new parameter, we will also move the dev check[1] as below to the
+> callers of __dev_direct_xmit(). Then move validate_xmit_skb_list to
+> __dev_direct_xmit(). It's not that concise, I assume? I'm not sure if
+> I miss your point.
+> 
+> [1]
+> if (unlikely(!netif_running(dev) ||  !netif_carrier_ok(dev)))
+>         goto drop;
 
-The purpose of RFC is to ask if anyone is in strong disagreement with me
+We can keep the check in its original place. I don't think the order of
+the checks matters? I was thinking something along these (untested)
+lines. Avoids one conditional in each path (not that it matters)..
 
-There is more commits needed to have it nice, so it forms a git-log vs
-git-blame tradeoff, but (after the brief moment that this is on the top)
-we spend orders of magnitude more time looking at the blame output (and
-commit messages linked from that) - so I find it much better to see
-actual logic changes instead of "move xx to yy" stuff (typical for
-"squashed/single-commit splits").
-
-Cherry-picks/rebases work the same with this method as with simple
-"squashed/single-commit" approach (literally all commits squashed into
-one (to have better git-log, but shitty git-blame output).
-
-Rationale for the split itself is, as usual, "file is big and we want to
-extend it".
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index e6131c529af4..36cdeef6a5e9 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -3367,8 +3367,15 @@ static inline int dev_queue_xmit_accel(struct sk_buff *skb,
+ 
+ static inline int dev_direct_xmit(struct sk_buff *skb, u16 queue_id)
+ {
++	struct sk_buff *orig_skb = skb;
++	bool again = false;
+ 	int ret;
+ 
++	skb = validate_xmit_skb_list(skb, dev, &again);
++	if (skb != orig_skb) {
++		/* dropped_inc and kfree */
++	}
++
+ 	ret = __dev_direct_xmit(skb, queue_id);
+ 	if (!dev_xmit_complete(ret))
+ 		kfree_skb(skb);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 26253802f6cd..d3b9a75852fd 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -4744,19 +4744,13 @@ EXPORT_SYMBOL(__dev_queue_xmit);
+ int __dev_direct_xmit(struct sk_buff *skb, u16 queue_id)
+ {
+ 	struct net_device *dev = skb->dev;
+-	struct sk_buff *orig_skb = skb;
+ 	struct netdev_queue *txq;
+ 	int ret = NETDEV_TX_BUSY;
+-	bool again = false;
+ 
+ 	if (unlikely(!netif_running(dev) ||
+ 		     !netif_carrier_ok(dev)))
+ 		goto drop;
+ 
+-	skb = validate_xmit_skb_list(skb, dev, &again);
+-	if (skb != orig_skb)
+-		goto drop;
+-
+ 	skb_set_queue_mapping(skb, queue_id);
+ 	txq = skb_get_tx_queue(dev, skb);
+ 
 
