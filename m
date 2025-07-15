@@ -1,96 +1,72 @@
-Return-Path: <netdev+bounces-207018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC9CDB0543A
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 10:12:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97925B05446
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 10:14:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 308DE17A106
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 08:12:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE0424E788F
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 08:13:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04AB8274677;
-	Tue, 15 Jul 2025 08:12:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6AE42550CF;
+	Tue, 15 Jul 2025 08:14:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XLGg6JGi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NjjSfm8h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF2126D4E9;
-	Tue, 15 Jul 2025 08:12:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 088782741C6
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 08:14:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752567132; cv=none; b=iUf2a/dtxo0+7ddnxKNm11hEDBJ462EVhevXonk4sLC6c2F2NfNqPyL60F6WJkFjKjyHsoLRwJzYGYvT0MQGeWlY7cfjdrMSMjCvd+PPo4NU2FZ/an7ZV8I2Gxne8bHP/X5K1OL1SVJWm1sqPL+HiVLFo9yM79GWB7QZiiKXEtg=
+	t=1752567258; cv=none; b=SXOGTOZGjXOb6Upv7qvoF5IzmbbhG3h2sFOigib8VNcIay7Q3WS0CClwbrdi2cK2XsOr5rq7iZVWOR9ZqtQgQAp87bMbmYI8tVH3oPKfXhGb1Alq7JBp5Eo7d3gUeKBSQWYkdLTyuHcdQd9+fuL5dxDsorluKg5StoRAmlF/30E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752567132; c=relaxed/simple;
-	bh=A42hZ1CXXzEmtAuN3Oh4U+HhEO00ifH9+iMTus1OfLM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IUxfrtm2TGGH1LovzJ+CrtgoXZMuh75tZa+uH3V5daiLALSha8cWlGzNWQawCZaDgxZ/3BiidVvuZr++DsTcOiPpvYo8KAZbcphARk3drjr8xIdHa1J95GZuPtRm4owz/sgTK8Pg4LtD/ZWCYHkIu4T8YQ0g6V4ceq0E7WveZPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XLGg6JGi; arc=none smtp.client-ip=209.85.216.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-3134c67a173so5363652a91.1;
-        Tue, 15 Jul 2025 01:12:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752567131; x=1753171931; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=J9cZzIxfvxK1Q11zfJm7mjrfAiqzGoJPBeFUMFwlPyY=;
-        b=XLGg6JGi4DKHsaBDMBomYu7kgK8vsYLIPEaOSOuTPEw4qIeQ4/WGHqbfW8hBgw67Ql
-         XmTLvSbUioR6Si/qiGhUrPU5PgL6lnFJ7leYqtgu+wgKL5lK+Nkx/gkWr+CpSMOFNEyt
-         NA/IEipe13IUsUKiVfWrkei/+vE1O2uKZ5RDorbqFX7D4pBnHy3dnQtUZM+2ROXLWiMf
-         sR8XZ4SwG5Yiin51EPIm3gEZFKK659KUrQkPTDEdVTzNY6a3KiA18chp6ax5tRsoa1J2
-         p69LSRtq1RphSXE4qw6GdBdKWNmjdb6uD0Ys7G18k4+dQ2zRMdo8ebpjct0D475y5+ES
-         vUZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752567131; x=1753171931;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=J9cZzIxfvxK1Q11zfJm7mjrfAiqzGoJPBeFUMFwlPyY=;
-        b=fEDnJkBCLEiSxRk7eFFMChoViWqjy9clvqG5czS4+l7o4StqTss4CAe756ixMIPrVd
-         9LIWNIZlbNYEBhC3nqHBtFm0Lz4sG4bhKtaAG77NTOVtZE2Vkt1eVzHpYC5Va8ysuN6R
-         nfXiV/7Whz5zf3kA5Iu0E+DD5lmYrU6/HIK9yMjWRRDhu2Dwhz7649Sc3174Dc9dsQLX
-         geV3fJ/2/kRkDz8qLiBfWjv6qpiQ2UViUmLpn43S+dZABN8r8WPB7IoxlXGiqoZZaU3E
-         GoMBWxAFV7/Ltq2ev9JebD1p5vOiVoCFe/iskomQQy7m6PcyFdIF98XHw7870v3KHhLh
-         1eCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU+ByCqzn2ZawVyw1bQDHSIJu6SJzGdi74cs0Mxg3X69yckGCZyh+fmSrFWeMLe5EUQDME=@vger.kernel.org, AJvYcCWWYbakaQHUAP/8PHmHIeC4wNNp3gFbH4wdvX7tqfq+koroocWJZyX1UTblNWUhKjoXwkwyPm0W@vger.kernel.org, AJvYcCX7xspcH7bEkOF/Oaoo4BYYuOUKVrSvdoOmyhEgnfi+tAql44X9G/P5qo1ouXuXJAK51apeJiCQPXVnoJg/@vger.kernel.org
-X-Gm-Message-State: AOJu0YywIDJVJkq4E+PZHAF/5huIQU1MuQo8C4nLG2ZpG8Ar10ScSHlk
-	emoJpf0UGJnbK6xSPYGgJkggKo5eyp9AL0cK/D0RGYnub87TL/ZlGJ0Q
-X-Gm-Gg: ASbGncs7xuH7ScbpnkthrdqqBExuExlrx/Ep4ORxf4OfV6e/CcWU6VrmoTrhq7Cy24S
-	VOovyOhk35amIoow4EAAT+QWOCS1Pn1YTL4EVXYB+ra0og64j8tFsNm0B9Jd7jgLZ0DIduDjAle
-	71c3SNPurebzdMFesD2pm/2Isz4mwltYBGLIw+P7SrFsnPd26FJTona+mM3e+FA7QnsF2c1bk3/
-	AyYHcWH3vsPcO6S00U6iTs5E3rf6pMiB2wW2hM+fWWO+Onu10NJIQ7L/VGO2X0GALTgGIDvY71l
-	iW35b1sXxklw+aCsim1r2Ei9qz3ZKEET6uKVPnv/c4VJ7k6Pt6UaW7maLb2aXVGwsWeDJcSJEPc
-	RXCGg/a0jK2Ypxea+kQLsar3asn4NFvn+PZSamWEd/BE=
-X-Google-Smtp-Source: AGHT+IFs5trgbTAyKft18DYDReY5ltyl88fzCm7ptR0K9hii4EwznJNonE1VzgHtlmmcLfwXRMVL9g==
-X-Received: by 2002:a17:90b:3b90:b0:312:25dd:1c99 with SMTP id 98e67ed59e1d1-31c4ccd99d8mr25949761a91.19.1752567130634;
-        Tue, 15 Jul 2025 01:12:10 -0700 (PDT)
-Received: from manjaro.domain.name ([2401:4900:1c68:e0ce:6703:6e3f:3a79:d2e6])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31c3017ca4csm14236712a91.31.2025.07.15.01.12.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Jul 2025 01:12:10 -0700 (PDT)
-From: Pranav Tyagi <pranav.tyagi03@gmail.com>
-To: john.fastabend@gmail.com,
-	jakub@cloudflare.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	ast@kernel.org,
-	cong.wang@bytedance.com,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: skhan@linuxfoundation.org,
-	linux-kernel-mentees@lists.linux.dev,
-	Pranav Tyagi <pranav.tyagi03@gmail.com>,
-	syzbot+b18872ea9631b5dcef3b@syzkaller.appspotmail.com
-Subject: [PATCH] net: skmsg: fix NULL pointer dereference in sk_msg_recvmsg()
-Date: Tue, 15 Jul 2025 13:41:58 +0530
-Message-ID: <20250715081158.7651-1-pranav.tyagi03@gmail.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1752567258; c=relaxed/simple;
+	bh=vvEV9AGMWDVula8eIbEWTUIPHY3pwQ1Udwoo3CWwGqU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GOPrZxd+BiDrHaV+AXK9dXhaXX5YFFLvO5yqot0o3KbW1A7U4WQxngQ9zvGw4fGHuwf0WgDABqahdXpgls16BltqBxByyCGcuIZd20AOG6+Ta/6nrSZ7IyMjJMLJBcRPSi5qSX6oZS37m8mPXaGThMlEqcEf2xrgmVKmk0oXxr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NjjSfm8h; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752567256;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=KtmJq5SLHjTBciIhRXS4fbE2xHHV6Dpl7qEaO9Jok7Y=;
+	b=NjjSfm8h5FdUk6fx6j0HcKIveOmkIuu54aUzVqSpagfWD8Mig1I+UHFhAK4lthqsZafEwA
+	+eN+qkOSejTn7VL2EuCSzpc/dACi6A5fiBRYJFLttNToC2TbUjy1eiiyYiHK0ZT2TJ8Ho3
+	03ktWmqbzRH+Z1WjKwxwzKsWkwwRuV0=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-170-VC6-odmvPjeAJldSEb3EFQ-1; Tue,
+ 15 Jul 2025 04:14:10 -0400
+X-MC-Unique: VC6-odmvPjeAJldSEb3EFQ-1
+X-Mimecast-MFC-AGG-ID: VC6-odmvPjeAJldSEb3EFQ_1752567248
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A6AA319560A2;
+	Tue, 15 Jul 2025 08:14:08 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.225.139])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D3BCA1800285;
+	Tue, 15 Jul 2025 08:14:05 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Eric Dumazet <edumazet@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next] tcp: fix UaF in tcp_prune_ofo_queue()
+Date: Tue, 15 Jul 2025 10:13:58 +0200
+Message-ID: <b78d2d9bdccca29021eed9a0e7097dd8dc00f485.1752567053.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,36 +74,136 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-A NULL page from sg_page() in sk_msg_recvmsg() can reach
-__kmap_local_page_prot() and crash the kernel. Add a check for the page
-before calling copy_page_to_iter() and fail early with -EFAULT to
-prevent the crash.
+The CI reported a UaF in tcp_prune_ofo_queue():
 
-Reported-by: syzbot+b18872ea9631b5dcef3b@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=b18872ea9631b5dcef3b
-Fixes: 2bc793e3272a ("skmsg: Extract __tcp_bpf_recvmsg() and tcp_bpf_wait_data()")
-Signed-off-by: Pranav Tyagi <pranav.tyagi03@gmail.com>
+BUG: KASAN: slab-use-after-free in tcp_prune_ofo_queue+0x55d/0x660
+Read of size 4 at addr ffff8880134729d8 by task socat/20348
+
+CPU: 0 UID: 0 PID: 20348 Comm: socat Not tainted 6.16.0-rc5-virtme #1 PREEMPT(full)
+Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x82/0xd0
+ print_address_description.constprop.0+0x2c/0x400
+ print_report+0xb4/0x270
+ kasan_report+0xca/0x100
+ tcp_prune_ofo_queue+0x55d/0x660
+ tcp_try_rmem_schedule+0x855/0x12e0
+ tcp_data_queue+0x4dd/0x2260
+ tcp_rcv_established+0x5e8/0x2370
+ tcp_v4_do_rcv+0x4ba/0x8c0
+ __release_sock+0x27a/0x390
+ release_sock+0x53/0x1d0
+ tcp_sendmsg+0x37/0x50
+ sock_write_iter+0x3c1/0x520
+ vfs_write+0xc09/0x1210
+ ksys_write+0x183/0x1d0
+ do_syscall_64+0xc1/0x380
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fcf73ef2337
+Code: 0f 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
+RSP: 002b:00007ffd4f924708 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fcf73ef2337
+RDX: 0000000000002000 RSI: 0000555f11d1a000 RDI: 0000000000000008
+RBP: 0000555f11d1a000 R08: 0000000000002000 R09: 0000000000000000
+R10: 0000000000000040 R11: 0000000000000246 R12: 0000000000000008
+R13: 0000000000002000 R14: 0000555ee1a44570 R15: 0000000000002000
+ </TASK>
+
+Allocated by task 20348:
+ kasan_save_stack+0x24/0x50
+ kasan_save_track+0x14/0x30
+ __kasan_slab_alloc+0x59/0x70
+ kmem_cache_alloc_node_noprof+0x110/0x340
+ __alloc_skb+0x213/0x2e0
+ tcp_collapse+0x43f/0xff0
+ tcp_try_rmem_schedule+0x6b9/0x12e0
+ tcp_data_queue+0x4dd/0x2260
+ tcp_rcv_established+0x5e8/0x2370
+ tcp_v4_do_rcv+0x4ba/0x8c0
+ __release_sock+0x27a/0x390
+ release_sock+0x53/0x1d0
+ tcp_sendmsg+0x37/0x50
+ sock_write_iter+0x3c1/0x520
+ vfs_write+0xc09/0x1210
+ ksys_write+0x183/0x1d0
+ do_syscall_64+0xc1/0x380
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Freed by task 20348:
+ kasan_save_stack+0x24/0x50
+ kasan_save_track+0x14/0x30
+ kasan_save_free_info+0x3b/0x60
+ __kasan_slab_free+0x38/0x50
+ kmem_cache_free+0x149/0x330
+ tcp_prune_ofo_queue+0x211/0x660
+ tcp_try_rmem_schedule+0x855/0x12e0
+ tcp_data_queue+0x4dd/0x2260
+ tcp_rcv_established+0x5e8/0x2370
+ tcp_v4_do_rcv+0x4ba/0x8c0
+ __release_sock+0x27a/0x390
+ release_sock+0x53/0x1d0
+ tcp_sendmsg+0x37/0x50
+ sock_write_iter+0x3c1/0x520
+ vfs_write+0xc09/0x1210
+ ksys_write+0x183/0x1d0
+ do_syscall_64+0xc1/0x380
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+The buggy address belongs to the object at ffff888013472900
+ which belongs to the cache skbuff_head_cache of size 232
+The buggy address is located 216 bytes inside of
+ freed 232-byte region [ffff888013472900, ffff8880134729e8)
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x13472
+head: order:1 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+flags: 0x80000000000040(head|node=0|zone=1)
+page_type: f5(slab)
+raw: 0080000000000040 ffff88800198fb40 ffffea0000347b10 ffffea00004f5290
+raw: 0000000000000000 0000000000120012 00000000f5000000 0000000000000000
+head: 0080000000000040 ffff88800198fb40 ffffea0000347b10 ffffea00004f5290
+head: 0000000000000000 0000000000120012 00000000f5000000 0000000000000000
+head: 0080000000000001 ffffea00004d1c81 00000000ffffffff 00000000ffffffff
+head: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff888013472880: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff888013472900: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff888013472980: fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc
+                                                    ^
+ ffff888013472a00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff888013472a80: fc fc fc fc fc fc fc fc fa fb fb fb fb fb fb fb
+
+Indeed tcp_prune_ofo_queue() is reusing the skb dropped a few lines
+above. The caller wants to enqueue 'in_skb', lets check space vs the
+latter.
+
+Fixes: 1d2fbaad7cd8 ("tcp: stronger sk_rcvbuf checks")
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
- net/core/skmsg.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Only build tested: I would appreciate an additional pair of eyes...
+---
+ net/ipv4/tcp_input.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-index 4d75ef9d24bf..f5367356a483 100644
---- a/net/core/skmsg.c
-+++ b/net/core/skmsg.c
-@@ -432,6 +432,10 @@ int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
- 			sge = sk_msg_elem(msg_rx, i);
- 			copy = sge->length;
- 			page = sg_page(sge);
-+			if (!page) {
-+				copied = copied ? copied : -EFAULT;
-+				goto out;
-+			}
- 			if (copied + copy > len)
- 				copy = len - copied;
- 			copy = copy_page_to_iter(page, sge->offset, copy, iter);
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 9c5baace4b7b..672cbfbdcec1 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -5517,7 +5517,7 @@ static bool tcp_prune_ofo_queue(struct sock *sk, const struct sk_buff *in_skb)
+ 		tcp_drop_reason(sk, skb, SKB_DROP_REASON_TCP_OFO_QUEUE_PRUNE);
+ 		tp->ooo_last_skb = rb_to_skb(prev);
+ 		if (!prev || goal <= 0) {
+-			if (tcp_can_ingest(sk, skb) &&
++			if (tcp_can_ingest(sk, in_skb) &&
+ 			    !tcp_under_memory_pressure(sk))
+ 				break;
+ 			goal = sk->sk_rcvbuf >> 3;
 -- 
-2.49.0
+2.50.0
 
 
