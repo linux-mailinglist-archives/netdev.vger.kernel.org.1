@@ -1,243 +1,158 @@
-Return-Path: <netdev+bounces-207270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CC38B06833
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 22:59:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AD27B06844
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 23:06:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BDE7D7A344C
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 20:58:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 879CA5670CA
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 21:06:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AA1E2BE645;
-	Tue, 15 Jul 2025 20:59:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB30828689C;
+	Tue, 15 Jul 2025 21:06:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vt-edu.20230601.gappssmtp.com header.i=@vt-edu.20230601.gappssmtp.com header.b="pcSIr9jg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BShpFfa7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF01218858
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 20:59:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17AB62727EC;
+	Tue, 15 Jul 2025 21:06:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752613185; cv=none; b=Qjx/juA9Bn4WieV6anSgNkLMDqKBAykdJh/JGlfzoaeKSnWvPxhzb7bb9x9DHO/91TajfnRlLCOe+MNRg3kh4ImWAtRCGYeMP7RKe083QsLRWOAw7UUhYq6ruc5iSMIxUknQtHyKTM51k7UmS4g94kfUeAwgJzP5ZyFcYFQ2F4M=
+	t=1752613562; cv=none; b=rtCcyjJYnez/FnPS6dWu65OrW1vsL2mox3WUGM7gBoCg/JPiIPclDZQkh28TwbWBE7mtIqxBm4Vl8xg4cjX39o9YJdB4go19170Aj9O+K2uLJxIf8kvfdgDy1XpNl3/Jh5Kb4MZ8T1s+l9bcK3R+AOlvAIJ3KTeewPKTVZp/ImA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752613185; c=relaxed/simple;
-	bh=jK2PJ1pLXHoKPhr1KHcSC8ZcmaKbtsnsQeWzZk5oydU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BPigKBz7O/K+7wMkCkSB9SLy1wLYiy/OSyW8VCmyHsTeFo/0/iBEbhELUbsFdIKh2cyT6wzcyA/qnKQn7X9wbror80teW0Ac8oCMNgjKI2aMlwLzqKrNgnUw1QJH9ZvqO6SlzoHLM5kV6Dul0qNfeZQhp2UBpx4bx7apr7ftd14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vt.edu; spf=pass smtp.mailfrom=vt.edu; dkim=pass (2048-bit key) header.d=vt-edu.20230601.gappssmtp.com header.i=@vt-edu.20230601.gappssmtp.com header.b=pcSIr9jg; arc=none smtp.client-ip=209.85.167.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vt.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vt.edu
-Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-41b8e837427so472777b6e.3
-        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 13:59:42 -0700 (PDT)
+	s=arc-20240116; t=1752613562; c=relaxed/simple;
+	bh=FYGfjfOp0uffIaOqOxp3So3TBknLCN3hEFHcZKI2YSM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JX0l055ltuT1T9VV45LU3U4bzeHxTSB5hJra8Y3XSkYIoBRDFvIvDQJ1o7ATCA/wsickfrrUULZ1x5ByVfPa1oWP5ZJecSMP3zPsGa4QJ2Gd7EeAcsSBkQbrEjnTxh58uPt86xdUAiriH4LLC4TH80x4SL9IjeSzvEtFP8Ea8lQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BShpFfa7; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3a548a73ff2so4632169f8f.0;
+        Tue, 15 Jul 2025 14:06:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vt-edu.20230601.gappssmtp.com; s=20230601; t=1752613182; x=1753217982; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RpLIXS+YHqc5mxGfOSQbNuEZInQXTG4i5qkw5Ltm2ew=;
-        b=pcSIr9jgyi0qz6jMEw3Kj0N+o0JdXAhJvjL9aE8lRhKq3Bi6XwtKLTRt3VC0vPgM/Z
-         Ieg+9+61MFZbn72asU+Ghm0uWcjxHzZl26i/+RcneLG+V9N/BOztS1mV5LhcM3dkWtxt
-         tRKrLq7AVaQg5ROuFXqELVkPPXd2Lcvmab6R/+hGW7oUtWz557LKnI4atsG2W7D09PPX
-         LZY68y9GX9h0gveRoFOTt4JLmL5gfvBhAQdjakG8L15cvMoBtex1IVRL8TRDY2OQMaHm
-         WTYropf59CMzEywtkC9ArhZkB6kHZFSZn4SHxYAJz0UkS/hA9b3YsSnt26gyqKO/+TpD
-         t/PQ==
+        d=gmail.com; s=20230601; t=1752613559; x=1753218359; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xrNWGpEv1BAuId4AbOTg2+zWZrUKdhz6s19aGKtODkM=;
+        b=BShpFfa70DHufToOuPE5dFMRV1FacQ4E0lItlN+FPoptYpsAamHKAttspi8zJUhMli
+         i24+hR8nHg732G3lHOgzG2KoRjXhkJKaaxuk96oaj3f8nUyVdvyyO8TSdMlX4GiR+3aX
+         LGmuurV+Vj9Gp59RA/O4QOXRfzG1J9ngJAZWYbtznn6SKhKWd6F6+OllThokEc6Tadma
+         cGE25hN7Krwrb7LL1C3czARqxKvpkzG3fUM8496YzA3jD8bh3goPIWddVV3Mw6mzcRSw
+         7X3W4jp0irKxNNU/qDOcBsWHi3hUiRplaCqKFwG1yln3lFI1RbjPuTsXDO56MXrkB4Mh
+         abLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752613182; x=1753217982;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RpLIXS+YHqc5mxGfOSQbNuEZInQXTG4i5qkw5Ltm2ew=;
-        b=CLeAOt1OitAIWNyjzDLMXKdi3KVrXkbYQnfyvVrOJrllUXE7iSy+1vDrTeQW30MFuQ
-         VGBfpRIxrBmKFEBG2kwF3SNloFjBv9EmqwnMjXeOkkzdCuN11Dx1ySkQcmvvxWa/2p74
-         Co7VmNQhNdoUfVmau4u1+y2f++vvkM6H/NoIr81qt7rg6k3SGE9MbP51IQvgamG8yicl
-         1uCVJHhrwrAprVcFOlkfEMMpBHWC0QZnqCxCTxxE8ABEieQKpLPs9QD3AEzon4rN1FmE
-         M4Pvgpa7oshjOMnbg1HQwc/zFvLdb5GXi29gPNFCNbT/yVd+CaF3nZIgrotOqvl8Rka8
-         cuDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXBOp1QqHeULkKaBcn44/MaB4tVGLiP2/tddL+qb25iGLe42w9lxvdgaMMTKpaBn06HE6PgX/E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXRLM6S8AVqhD7hKLtOIy1X2KC7vet7jf8YDb7JIhioaGZjpDF
-	JSR/Hmr3loANyx3j4ZAqTC43BC16mMbscaF1ldONz/rp6BTNgdKBtpHL9LNkes8bh00=
-X-Gm-Gg: ASbGnct26QhcC18/XbLUCMEvK9CUSkVQ+Mv2ZNDQd5Jz+pFV5ZAoA11aYJzNSGnPWuE
-	vPAiolNCpm6dM5Tw44O9YiVuq65qrRaDMeIJqGexOXWF83eVAGYSdE3SqZbodD4l/IS4tysAlXv
-	3sRULx1HHb/APXorC2afkOhiQRvFvoRFWh7yAo58VUOrJwmGSiNXXF/qfaqTdJKOxMlG2+aL/lB
-	yWRrNveMLlQOCJYMDJRokAaTZmxG3po8wnt06EdwNGTvNDevzIll5+Y4/+6kf1YYrxX81dRjaCm
-	eWBHDXaDKnZdw+VBOdrW45x0kw1iX4aYnvV1pg0yyfykghc5eo6Of978Nbs8M1dY8kQ+dDymvI1
-	X+yfuj+KhnQzRn6phm09kFh/4262C+eGAap7HtRVJNf/cBFBDGQQVMCXf0eDrwwYF
-X-Google-Smtp-Source: AGHT+IHMuvYgTjdEJouwL9rFNOehORJPx/jwpmcs0VZMmCrB+BtDdM4ygC9BoJ12UmywSThmX7MsOg==
-X-Received: by 2002:a05:6808:1814:b0:408:f80a:bab9 with SMTP id 5614622812f47-41d033f488dmr188402b6e.11.1752613181573;
-        Tue, 15 Jul 2025 13:59:41 -0700 (PDT)
-Received: from ?IPV6:2603:8080:7400:36da:68bc:2e93:4664:2a0f? ([2603:8080:7400:36da:68bc:2e93:4664:2a0f])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-41d05f24034sm42642b6e.33.2025.07.15.13.59.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Jul 2025 13:59:40 -0700 (PDT)
-Message-ID: <c9eac8f6-8e7f-4ed0-b34d-5dc50be8078f@vt.edu>
-Date: Tue, 15 Jul 2025 15:59:39 -0500
+        d=1e100.net; s=20230601; t=1752613559; x=1753218359;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xrNWGpEv1BAuId4AbOTg2+zWZrUKdhz6s19aGKtODkM=;
+        b=lepb8YePKZphpbeQiSGR2YvwfUHT74ru8DqoppVpCsbrxxJ3gdq64xIXvDSePRDRgY
+         qHV+cFDx6hTuLJ66funw553ZUou1fII+UbP0NrALinitSA2bHcFIeyPLc45vnJRwKlZy
+         94KxnZOcHfF4cU7QfFEF45SY2GyXlk6noWhTFYAwvvTfabK0S37p31PUGAXVNn9kWQPz
+         yI5O2lgUDB2pbI65BthVHdePIeW1NGbF2E6ZHN4uGItS/h323f50VKyVWM/tN19FTX9y
+         DDHsA9DD8IR9PcgGnInhPrJO8qN19gVfavtTn7dRhqQPZDjeBS9OtoJgqd/cs4La43zO
+         D/sw==
+X-Forwarded-Encrypted: i=1; AJvYcCUn/2c5dVUI0xtKBgnpZ+LekfGwnKqWb8n0H5boB+fdmRKbXMkj/ohtq/i6h3ivWVkDTss=@vger.kernel.org, AJvYcCWgp1brMjfB975Q/zYM7qigThXzFot2ZzUKOT8vhHHIwVoDe2g86goNf8J8Y+Tce36LSv+CO5MmQq/asqrCunzm@vger.kernel.org
+X-Gm-Message-State: AOJu0YyagKhFVW7qV8C6v/TOz9+GW1l9jPTanviggy3Hf60QLuc3X4Us
+	D1hFfP46UwKxkfES0NVLfwYO3LYAHYwTPP0gPkRqc1IJ40mIfVGmYIZf5CVQxg==
+X-Gm-Gg: ASbGnct1v54RWxt5nCOImXBsdcLcT65WEQF4gz+vr5A5B2xrN5m5MJI9Jjr9GOtrMD2
+	1jcwV4Y2YOilHcXIsfdE8hhPQ82V2iaRfmmJISat+NRqwal164LUZlp/7qf0PuWBXP9ON25Xj8e
+	FmQEcYGqVj+zEirtLAH068jtNMVioI7gHcA5kCru+kP7+DY3iDtuw1xhCW8pp6Nu1gxzr/RZ6MI
+	hILFKJ7TxeCK7aXU+hIPFbKQuYCbTToc2WPasKrvR/ua50tcSB18rPKpzqgeYQj7NC1Ugp6ld0+
+	N7RgtzsbhEtgeJbd387Lq0mJSMhV1Ug1hQnmCE/PO1CK/3TPqzXHghbVI39MhFfTu1VBC25kp4E
+	vk/v0787vS7ti0DdmQkg=
+X-Google-Smtp-Source: AGHT+IGccMr+l6TuXlKeBOZcix9T3KSSEJKc+0G7hoGr2gWaAJ1sQCGF1RAGBN3M/xcDwUCYyKwhrA==
+X-Received: by 2002:adf:b64b:0:b0:3a5:3062:793a with SMTP id ffacd0b85a97d-3b60dd72f31mr406572f8f.33.1752613558746;
+        Tue, 15 Jul 2025 14:05:58 -0700 (PDT)
+Received: from localhost ([2a03:2880:31ff:2::])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8e269a0sm15808133f8f.86.2025.07.15.14.05.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Jul 2025 14:05:58 -0700 (PDT)
+From: Mohsin Bashir <mohsin.bashr@gmail.com>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	horms@kernel.org,
+	cratiu@nvidia.com,
+	noren@nvidia.com,
+	cjubran@nvidia.com,
+	mbloch@nvidia.com,
+	mohsin.bashr@gmail.com,
+	jdamato@fastly.com,
+	gal@nvidia.com,
+	sdf@fomichev.me,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	nathan@kernel.org,
+	nick.desaulniers+lkml@gmail.com,
+	morbo@google.com,
+	justinstitt@google.com,
+	bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: [PATCH net-next V5 0/5] net: netdevsim: hook in XDP handling
+Date: Tue, 15 Jul 2025 14:05:48 -0700
+Message-ID: <20250715210553.1568963-1-mohsin.bashr@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] bonding: Switch periodic LACPDU state machine from
- counter to jiffies
-To: carlos.bilbao@kernel.org, jv@jvosburgh.net, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: sforshee@kernel.org
-References: <20250715205733.50911-1-carlos.bilbao@kernel.org>
-Content-Language: en-US
-From: Carlos Bilbao <bilbao@vt.edu>
-In-Reply-To: <20250715205733.50911-1-carlos.bilbao@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-FYI, I was able to test this locally but couldn’t find any kselftests to
-stress the bonding state machine. If anyone knows of additional ways to
-test it, I’d be happy to run them.
+This patch series add tests to validate XDP native support for PASS,
+DROP, ABORT, and TX actions, as well as headroom and tailroom adjustment.
+For adjustment tests, validate support for both the extension and
+shrinking cases across various packet sizes and offset values.
 
-Thanks!
+The pass criteria for head/tail adjustment tests require that at-least
+one adjustment value works for at-least one packet size. This ensure
+that the variability in maximum supported head/tail adjustment offset
+across different drivers is being incorporated.
 
-Carlos
+The results reported in this series are based on fbnic. However, the
+series is tested against multiple other drivers including netdevism.
 
-On 7/15/25 15:57, carlos.bilbao@kernel.org wrote:
-> From: Carlos Bilbao <carlos.bilbao@kernel.org>
->
-> Replace the bonding periodic state machine for LACPDU transmission of
-> function ad_periodic_machine() with a jiffies-based mechanism, which is
-> more accurate and can help reduce drift under contention.
->
-> Signed-off-by: Carlos Bilbao (DigitalOcean) <carlos.bilbao@kernel.org>
-> ---
->   drivers/net/bonding/bond_3ad.c | 79 +++++++++++++---------------------
->   include/net/bond_3ad.h         |  2 +-
->   2 files changed, 32 insertions(+), 49 deletions(-)
->
-> diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
-> index c6807e473ab7..8654a51266a3 100644
-> --- a/drivers/net/bonding/bond_3ad.c
-> +++ b/drivers/net/bonding/bond_3ad.c
-> @@ -1421,44 +1421,24 @@ static void ad_periodic_machine(struct port *port, struct bond_params *bond_para
->   	    (!(port->actor_oper_port_state & LACP_STATE_LACP_ACTIVITY) && !(port->partner_oper.port_state & LACP_STATE_LACP_ACTIVITY)) ||
->   	    !bond_params->lacp_active) {
->   		port->sm_periodic_state = AD_NO_PERIODIC;
-> -	}
-> -	/* check if state machine should change state */
-> -	else if (port->sm_periodic_timer_counter) {
-> -		/* check if periodic state machine expired */
-> -		if (!(--port->sm_periodic_timer_counter)) {
-> -			/* if expired then do tx */
-> -			port->sm_periodic_state = AD_PERIODIC_TX;
-> -		} else {
-> -			/* If not expired, check if there is some new timeout
-> -			 * parameter from the partner state
-> -			 */
-> -			switch (port->sm_periodic_state) {
-> -			case AD_FAST_PERIODIC:
-> -				if (!(port->partner_oper.port_state
-> -				      & LACP_STATE_LACP_TIMEOUT))
-> -					port->sm_periodic_state = AD_SLOW_PERIODIC;
-> -				break;
-> -			case AD_SLOW_PERIODIC:
-> -				if ((port->partner_oper.port_state & LACP_STATE_LACP_TIMEOUT)) {
-> -					port->sm_periodic_timer_counter = 0;
-> -					port->sm_periodic_state = AD_PERIODIC_TX;
-> -				}
-> -				break;
-> -			default:
-> -				break;
-> -			}
-> -		}
-> +	} else if (port->sm_periodic_state == AD_NO_PERIODIC)
-> +		port->sm_periodic_state = AD_FAST_PERIODIC;
-> +	/* check if periodic state machine expired */
-> +	else if (time_after_eq(jiffies, port->sm_periodic_next_jiffies)) {
-> +		/* if expired then do tx */
-> +		port->sm_periodic_state = AD_PERIODIC_TX;
->   	} else {
-> +		/* If not expired, check if there is some new timeout
-> +		 * parameter from the partner state
-> +		 */
->   		switch (port->sm_periodic_state) {
-> -		case AD_NO_PERIODIC:
-> -			port->sm_periodic_state = AD_FAST_PERIODIC;
-> -			break;
-> -		case AD_PERIODIC_TX:
-> -			if (!(port->partner_oper.port_state &
-> -			    LACP_STATE_LACP_TIMEOUT))
-> +		case AD_FAST_PERIODIC:
-> +			if (!(port->partner_oper.port_state & LACP_STATE_LACP_TIMEOUT))
->   				port->sm_periodic_state = AD_SLOW_PERIODIC;
-> -			else
-> -				port->sm_periodic_state = AD_FAST_PERIODIC;
-> +			break;
-> +		case AD_SLOW_PERIODIC:
-> +			if ((port->partner_oper.port_state & LACP_STATE_LACP_TIMEOUT))
-> +				port->sm_periodic_state = AD_PERIODIC_TX;
->   			break;
->   		default:
->   			break;
-> @@ -1471,21 +1451,24 @@ static void ad_periodic_machine(struct port *port, struct bond_params *bond_para
->   			  "Periodic Machine: Port=%d, Last State=%d, Curr State=%d\n",
->   			  port->actor_port_number, last_state,
->   			  port->sm_periodic_state);
-> +
->   		switch (port->sm_periodic_state) {
-> -		case AD_NO_PERIODIC:
-> -			port->sm_periodic_timer_counter = 0;
-> -			break;
-> -		case AD_FAST_PERIODIC:
-> -			/* decrement 1 tick we lost in the PERIODIC_TX cycle */
-> -			port->sm_periodic_timer_counter = __ad_timer_to_ticks(AD_PERIODIC_TIMER, (u16)(AD_FAST_PERIODIC_TIME))-1;
-> -			break;
-> -		case AD_SLOW_PERIODIC:
-> -			/* decrement 1 tick we lost in the PERIODIC_TX cycle */
-> -			port->sm_periodic_timer_counter = __ad_timer_to_ticks(AD_PERIODIC_TIMER, (u16)(AD_SLOW_PERIODIC_TIME))-1;
-> -			break;
->   		case AD_PERIODIC_TX:
->   			port->ntt = true;
-> -			break;
-> +			if (!(port->partner_oper.port_state &
-> +						LACP_STATE_LACP_TIMEOUT))
-> +				port->sm_periodic_state = AD_SLOW_PERIODIC;
-> +			else
-> +				port->sm_periodic_state = AD_FAST_PERIODIC;
-> +		fallthrough;
-> +		case AD_SLOW_PERIODIC:
-> +		case AD_FAST_PERIODIC:
-> +			if (port->sm_periodic_state == AD_SLOW_PERIODIC)
-> +				port->sm_periodic_next_jiffies = jiffies
-> +					+ HZ * AD_SLOW_PERIODIC_TIME;
-> +			else /* AD_FAST_PERIODIC */
-> +				port->sm_periodic_next_jiffies = jiffies
-> +					+ HZ * AD_FAST_PERIODIC_TIME;
->   		default:
->   			break;
->   		}
-> @@ -1987,7 +1970,7 @@ static void ad_initialize_port(struct port *port, int lacp_fast)
->   		port->sm_rx_state = 0;
->   		port->sm_rx_timer_counter = 0;
->   		port->sm_periodic_state = 0;
-> -		port->sm_periodic_timer_counter = 0;
-> +		port->sm_periodic_next_jiffies = 0;
->   		port->sm_mux_state = 0;
->   		port->sm_mux_timer_counter = 0;
->   		port->sm_tx_state = 0;
-> diff --git a/include/net/bond_3ad.h b/include/net/bond_3ad.h
-> index 2053cd8e788a..aabb8c97caf4 100644
-> --- a/include/net/bond_3ad.h
-> +++ b/include/net/bond_3ad.h
-> @@ -227,7 +227,7 @@ typedef struct port {
->   	rx_states_t sm_rx_state;	/* state machine rx state */
->   	u16 sm_rx_timer_counter;	/* state machine rx timer counter */
->   	periodic_states_t sm_periodic_state;	/* state machine periodic state */
-> -	u16 sm_periodic_timer_counter;	/* state machine periodic timer counter */
-> +	unsigned long sm_periodic_next_jiffies;	/* state machine periodic next expected sent */
->   	mux_states_t sm_mux_state;	/* state machine mux state */
->   	u16 sm_mux_timer_counter;	/* state machine mux timer counter */
->   	tx_states_t sm_tx_state;	/* state machine tx state */
+Note: The XDP support for fbnic will be added later.
+---
+Change-log:
+V5:
+  - Fix warning caused by rcu_dereference() in p1
+  - Fix checkpatch warnings with P3, P4, and P5
+V4: https://lore.kernel.org/netdev/20250714210352.1115230-1-mohsin.bashr@gmail.com
+V3: https://lore.kernel.org/netdev/20250712002648.2385849-1-mohsin.bashr@gmail.com
+V2: https://lore.kernel.org/netdev/20250710184351.63797-1-mohsin.bashr@gmail.com
+V1: https://lore.kernel.org/netdev/20250709173707.3177206-1-mohsin.bashr@gmail.com
+
+Jakub Kicinski (1):
+  net: netdevsim: hook in XDP handling
+
+Mohsin Bashir (4):
+  selftests: drv-net: Test XDP_PASS/DROP support
+  selftests: drv-net: Test XDP_TX support
+  selftests: drv-net: Test tail-adjustment support
+  selftests: drv-net: Test head-adjustment support
+
+ drivers/net/netdevsim/netdev.c                |  19 +-
+ tools/testing/selftests/drivers/net/Makefile  |   1 +
+ tools/testing/selftests/drivers/net/xdp.py    | 656 ++++++++++++++++++
+ .../selftests/net/lib/xdp_native.bpf.c        | 540 ++++++++++++++
+ 4 files changed, 1215 insertions(+), 1 deletion(-)
+ create mode 100755 tools/testing/selftests/drivers/net/xdp.py
+ create mode 100644 tools/testing/selftests/net/lib/xdp_native.bpf.c
+
+-- 
+2.47.1
+
 
