@@ -1,86 +1,80 @@
-Return-Path: <netdev+bounces-207063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77CEEB057E8
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 12:34:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71BD8B057F3
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 12:36:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C154D163DD9
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 10:34:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 956F13BC9DF
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 10:36:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5D0F2D46C9;
-	Tue, 15 Jul 2025 10:34:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C16762D781A;
+	Tue, 15 Jul 2025 10:36:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BYRX7OIz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jLRq7Wkd"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA75F2D0283
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 10:34:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEC8826FA5C;
+	Tue, 15 Jul 2025 10:36:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752575646; cv=none; b=LDetqtd97XLgD+QR4XuFjGWeTfxLqkzASqIBa5OZai4yJD2NTHWlaHMe8QX4hZn5DFu6bdVwpjs/bRKmD+xEgP9u8yXLCoh/0PLHOtlCfK2RAxsrI09VeDZjkNZObp51UAVU9aSOFUFIreudxgkKaKPz+9NFOorhMMdaVi+y8eM=
+	t=1752575782; cv=none; b=mbPM6+EgmJngvIxPjTV3ZzEA9K604hWOuKvQkQLLXS/3OsAOjP3ObqoagA8hg4mjzWP55hgtOypAdSUBiXvdABCT1pmWBoxeWZyqug1vmTUzd97ta44l9uYUnjWVtSNuPCQpyGHxPZ9d2Ficl/Qa616M1Z0xIeMlfIb0c2rF+jI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752575646; c=relaxed/simple;
-	bh=+XosNr1noYyK5bt9K7G69Cb5UP29nUNpnRR95dziKDY=;
+	s=arc-20240116; t=1752575782; c=relaxed/simple;
+	bh=F+tYOXJ8hjiy2s7ICd+QbNKS1sdyZsQBpGzRhNcc6jw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gR7DRVx4ZaWebhYEVwCCM1TVg/fbj7KmojIS5H0NsFSbzIJu89Ao1NwJ6TjFLdicy4ilRd8AWkytqP0wKD3OFar+hMObeOuZx6pIBJbfVquzZFucWHJ4k8byTDc3nxdIqq2en0ibeCKcL+TpxDTcAI3gxMX3hIjOV5B6h3pvBoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BYRX7OIz; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752575643;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PJZroVj36ZRC3vYmznkw5e0xFAh0ohF+p4dqRbNSEEs=;
-	b=BYRX7OIzXJhaXv63hvSe+xNCXi2k91ipaEe4O6hDEnwyPXiAVWYqBE2+SwE2KOOOZ6g+p9
-	IO+CrfqqOUlKklLtUy56rsikgU9nhCVieHJa0ev6JVxa1lmMsx95LhfvaKplasMqa1w6J+
-	gmCW8AFFUDVbg5zqtRKWHoix1jBn5oQ=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-12-IPpDUGeYNzmxuJfk7frDkA-1; Tue, 15 Jul 2025 06:33:57 -0400
-X-MC-Unique: IPpDUGeYNzmxuJfk7frDkA-1
-X-Mimecast-MFC-AGG-ID: IPpDUGeYNzmxuJfk7frDkA_1752575636
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3a4fabcafecso2590749f8f.0
-        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 03:33:57 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=VvS0HmwWN4rpr06EATS+0a/HqWTKmvT4x5yFePkxdrl2HasSO2Z1jdkjF6KfTt2U4dA6KftBGeX3hlIo9UIZ1HXt+Hfa5Kx684lAadfTM8jdr8Il40Q6S4cYVB3j+P/g6uLfm2z1rSF99TxZWoY9m8g+2kGawystLagAClQJuVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jLRq7Wkd; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-606b58241c9so8828084a12.3;
+        Tue, 15 Jul 2025 03:36:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752575779; x=1753180579; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RwJj2XW0Xtg7vWbGRjw0IzVQ1p4FfGBNG+AO9cOWVHY=;
+        b=jLRq7WkdZMcSiLTaLVo7wsMRPJhu8Vi22rCcac22t1+fk9PVHtmbbebj7bFJYtEsj3
+         YXawYvu3CGGetIn/4FPdpUFhTc0HE7aGDO92BvrzCbPM4YQJljtis07+KKJXHM1ipEq1
+         TEKJrMwGfiYZ6zXjdFmK74Uy1O5ajGflD7JLCKbGRnYY1abTUmreKlXHJuwCFycuDmvh
+         jXHpyQd1I/sWmfzpOiMpgFnXf2aGn+TKz7H2Ilrac9oEWnIK2/wENKSSkTYf1W7JkNHC
+         TjDfrYWlw672+tyk0aA5tEOQ7l0n/l0FxN0LSdeEw/DD9h4RW71cWPitgwSxOZkJuL9Y
+         5eaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752575636; x=1753180436;
+        d=1e100.net; s=20230601; t=1752575779; x=1753180579;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PJZroVj36ZRC3vYmznkw5e0xFAh0ohF+p4dqRbNSEEs=;
-        b=SfIYyJTnq/mkSRUSv2dlGcVzbn5zLfVTStcDFlZyHQ8NHGrY1kYHcB+Tnrm04se6W/
-         XHa2Fbp9LqIbQymo5CkUDKJhcmKRxGnZtTDjyhL3sMxiWZkhlbbw1pcJKu1tOoZBqWyy
-         Df+m4aTmMFnscyVtGggEJJzsE5KK+6K5ZRFT7pAqNmkDIqVQ3dO5A9ZotTyPaH8xKwYy
-         jtBvmJlK0n6Zsce5zSoRHX/XxOH/2N85oZC9DvPYpBtzyNYVS5Tzh5TGSSP8oU6bLgHl
-         6hGb5q2hnyafUBeirXZTTQUqpRMksCXM8N8tPX81RoQ20NeBxtqN4hbXBQx7P344m3AU
-         ICPg==
-X-Gm-Message-State: AOJu0YwwADWCTg6RKyk3j82tdsmyW7cpXvaspdsJFljy89FAbzXOaOK4
-	JAIb8YJYUP7h1UXe2Ov/GGnFrAzmjj+t2xyHyc5UhWzrJXwt3G1N3Lot6rn8EEsvG7Yn95tRvL9
-	ljae+0fwKNqkAAjIbrorHX8Ip0FSF3bOK05ANEXLH/WEcp6bWJbNT3uYDFQ==
-X-Gm-Gg: ASbGncvFuczQqjW16oZhpHY+K5J1amjgaEfW8WLWigjK4ZlKPqIv8mCbvw6U+FAUubP
-	ytQq3dRyXd1z1W7g1nGrZR3YFO0lHh2uFwlvnxLktVcxPtDsP6VzWxt5jI9IbMftXf3+Tn3S2li
-	eXzkEFM2AUpLzmqc0LGjBBz5SnKbFwKKJeNEcEvkWKWiNAbPwJTE5torxPn5UrNzWKdo8Pq2dqE
-	UNHJ01TBze/08LrsDtNF/mG5Oj2s2sgc2z4kZ7xduKaVOJFDF+DYYXlnOiAV3Qw70XbXC2TEf8F
-	dc3+Sw4WcGuks2a7SErAYVrxpHiHZK39hmZ+uYvxM7IrquAu3ty7bbBF8Ed+N9MdPJFl4t2gEii
-	UIB8/k8OI2L4=
-X-Received: by 2002:a05:6000:144e:b0:3a4:cbc6:9db0 with SMTP id ffacd0b85a97d-3b5f3593547mr13886747f8f.51.1752575636030;
-        Tue, 15 Jul 2025 03:33:56 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFPG2tIYoFI1tuT6qjgNqxoevPWcjHN6ppGIaEdQxignfEXuFG+6+vW+GCRlJ+0Y/2Vp2b0LA==
-X-Received: by 2002:a05:6000:144e:b0:3a4:cbc6:9db0 with SMTP id ffacd0b85a97d-3b5f3593547mr13886714f8f.51.1752575635585;
-        Tue, 15 Jul 2025 03:33:55 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454d5050d34sm199648385e9.9.2025.07.15.03.33.54
+        bh=RwJj2XW0Xtg7vWbGRjw0IzVQ1p4FfGBNG+AO9cOWVHY=;
+        b=fRX/gvWiP7kNG0x/Tou2BwWsyQGD7FmbeCN3nhjQrmzTsR/tLIiJwDixcYovTFAxqB
+         96aHcgAsLV+SxQvnOR1g4BqwCSzICyBWjkfFBjhhDhlaPa2aAIghIXRdSWyedAXhGUs0
+         nEkxr/JwfbTuKnxGj7iRIfJzf0giePzfE3/in7/hskj7exFTCfaEiL4rWbQq/gtIVIPy
+         Qra4NdMV67KaDuZr8Wi2ayuIgsBXWd9GuVC28lVbinge2GPbXzHlkKW0OwLaVUfXdb8A
+         xBILe0sRpkhzzdY1IsdgVapSOHFoZhVHeCUFo3B8Of2FOv8bpw1gRVI8ngX2REv1rWsP
+         9Kyw==
+X-Forwarded-Encrypted: i=1; AJvYcCU9fiQqqiDjpOj+Kig2Q87XSpJuhWG0qBZIMPLe6U9ET8yH4uw9T+ClUaOznlrYvA2xMIOHKfaOi78ra3G1@vger.kernel.org, AJvYcCVZsnhDbiyE/JgAah3tzPW2f+IQZjpMi4Hhz3et+UtOugLx4t78bDjM5nRJs6bmqx28poY=@vger.kernel.org, AJvYcCWhavnj3O1PTKR8zI9QqXyoHXmtaZWLzPLTEtxtT0Qx5GtxzazpofwNq9Tg/aCB4TAIbGT1Iu0G@vger.kernel.org, AJvYcCXazEYsKl7jAoKhtxP35zuL0x2hOTmN7amcCte9N7aWsiZFmOHYxML6TcOQ/jYowugySxCu/X0dq0V3x7SkAgA=@vger.kernel.org, AJvYcCXpeKODxpGM2n1jjr6eqi6EvZ16iUVKvQUYP4I/hvWoK6YMxaXYwsNN/jwqAOeG4IvJzdqKXRavaoEHHQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyteToK/UTJ/hBhdG31uTCfny/IppUCtdnAPOwA84yr/M+/vQf
+	tp9UIW2JtVkdcF25ESyoSnZeiLbJi+Wyz94Wf3InBToNa1LMmVZzG+Ic
+X-Gm-Gg: ASbGncu2a/IUk7obcDeeAYwrV6+/LBvFNWTUt/AEE5tJpevr7bq39I4osD2lLd0Hq6W
+	Ei7E3Fnojp7r3pQF9PcNFJREBhxTy7XVPJnWfooWshbz2gKSONe6hRyb3poGZYb9d1mUzDCudI0
+	S0LQ7AeuWHESjUAvpJ74DMopQhYY8VOSYZQmnjTALXJftMVdSWQjQ9pP5VS7VvxrgjaDsqeq7Yk
+	+z5O41JWFwkPRRPEqpZxfNwivMNt3lRajAZXbANIg74+cvkVqeQHOv/8hPl8x2mvdWiJ+mlunK2
+	e0kuVsWmkzy+7spl34zvx20PALOMWNEzdz/LKb7s6GUTPVyc6Elg/TZDb9ngp8+5V8qOrPSnfaN
+	R2VjyLk3dFjWdjabm2VZCDQoLbHrFVxJaaB/qEJIjrAmauQ==
+X-Google-Smtp-Source: AGHT+IGaK5G3wNkKd0FQXTFLEb3wcMNGQ8G+9vcipY4gHF5O0bM0XfRnvGt5TQBO6UmtOz1kGEnKVw==
+X-Received: by 2002:a17:907:930c:b0:ae6:a8c1:c633 with SMTP id a640c23a62f3a-ae6fc1fae79mr1633481566b.34.1752575779007;
+        Tue, 15 Jul 2025 03:36:19 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325::1ac? ([2620:10d:c092:600::1:a4c1])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae6e82dedd3sm976790966b.150.2025.07.15.03.36.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Jul 2025 03:33:55 -0700 (PDT)
-Message-ID: <3d2568b9-e275-490d-a412-2fe7a5b096a3@redhat.com>
-Date: Tue, 15 Jul 2025 12:33:53 +0200
+        Tue, 15 Jul 2025 03:36:18 -0700 (PDT)
+Message-ID: <9bed2f6e-6251-4d0c-ad1e-f1b8625a0a10@gmail.com>
+Date: Tue, 15 Jul 2025 11:37:45 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,41 +82,97 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net: bonding: add bond_is_icmpv6_nd() helper
-To: Tonghao Zhang <tonghao@bamaicloud.com>, Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Nikolay Aleksandrov <razor@blackwall.org>,
- Zengbing Tu <tuzengbing@didiglobal.com>
-References: <20250710091636.90641-1-tonghao@bamaicloud.com>
- <aHSt_BX4K4DK5CEz@fedora>
- <125F3BD1-1DC7-42AF-AAB4-167AD665D687@bamaicloud.com>
+Subject: Re: [PATCH net-next v10 02/12] netmem: use netmem_desc instead of
+ page to access ->pp in __netmem_get_pp()
+To: Mina Almasry <almasrymina@google.com>, Byungchul Park <byungchul@sk.com>
+Cc: willy@infradead.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, kernel_team@skhynix.com,
+ ilias.apalodimas@linaro.org, harry.yoo@oracle.com,
+ akpm@linux-foundation.org, andrew+netdev@lunn.ch, toke@redhat.com,
+ david@redhat.com, Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+ surenb@google.com, mhocko@suse.com, linux-rdma@vger.kernel.org,
+ bpf@vger.kernel.org, vishal.moola@gmail.com, hannes@cmpxchg.org,
+ ziy@nvidia.com, jackmanb@google.com, wei.fang@nxp.com, shenwei.wang@nxp.com,
+ xiaoning.wang@nxp.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, anthony.l.nguyen@intel.com,
+ przemyslaw.kitszel@intel.com, sgoutham@marvell.com, gakula@marvell.com,
+ sbhatta@marvell.com, hkelam@marvell.com, bbhushan2@marvell.com,
+ tariqt@nvidia.com, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com,
+ leon@kernel.org, mbloch@nvidia.com, danishanwar@ti.com, rogerq@kernel.org,
+ nbd@nbd.name, lorenzo@kernel.org, ryder.lee@mediatek.com,
+ shayne.chen@mediatek.com, sean.wang@mediatek.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, aleksander.lobakin@intel.com,
+ horms@kernel.org, m-malladi@ti.com, krzysztof.kozlowski@linaro.org,
+ matthias.schiffer@ew.tq-group.com, robh@kernel.org, imx@lists.linux.dev,
+ intel-wired-lan@lists.osuosl.org, linux-arm-kernel@lists.infradead.org,
+ linux-wireless@vger.kernel.org, linux-mediatek@lists.infradead.org
+References: <20250714120047.35901-1-byungchul@sk.com>
+ <20250714120047.35901-3-byungchul@sk.com>
+ <CAHS8izO393X_BDJxnX2d-auhTwrUZK5wYdoAh_tJc0GBf0AqcQ@mail.gmail.com>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <125F3BD1-1DC7-42AF-AAB4-167AD665D687@bamaicloud.com>
-Content-Type: text/plain; charset=UTF-8
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CAHS8izO393X_BDJxnX2d-auhTwrUZK5wYdoAh_tJc0GBf0AqcQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 7/14/25 2:53 PM, Tonghao Zhang wrote:
->> 2025年7月14日 15:13，Hangbin Liu <liuhangbin@gmail.com> 写道：
->> Hmm, I don’t see much improvement with this patch compared to without it.
->> So I don’t think this update is necessary.
+On 7/14/25 20:37, Mina Almasry wrote:
+> On Mon, Jul 14, 2025 at 5:01 AM Byungchul Park <byungchul@sk.com> wrote:
+...>> +static inline struct netmem_desc *pp_page_to_nmdesc(struct page *page)
+>> +{
+>> +       DEBUG_NET_WARN_ON_ONCE(!page_pool_page_is_pp(page));
+>> +
+>> +       /* XXX: How to extract netmem_desc from page must be changed,
+>> +        * once netmem_desc no longer overlays on page and will be
+>> +        * allocated through slab.
+>> +        */
+>> +       return (struct netmem_desc *)page;
+>> +}
+>> +
 > 
-> This patch use the skb_header_pointer instead of pskb_network_may_pull. The skb_header_pointer is more efficient than pskb_network_may_pull.
->  And use the comm helper can consolidate some duplicate code.
+> Same thing. Do not create a generic looking pp_page_to_nmdesc helper
+> which does not check that the page is the correct type. The
+> DEBUG_NET... is not good enough.
+> 
+> You don't need to add a generic helper here. There is only one call
+> site. Open code this in the callsite. The one callsite is marked as
+> unsafe, only called by code that knows that the netmem is specifically
+> a pp page. Open code this in the unsafe callsite, instead of creating
+> a generic looking unsafe helper and not even documenting it's unsafe.
+> 
+>>   /**
+>>    * __netmem_get_pp - unsafely get pointer to the &page_pool backing @netmem
+>>    * @netmem: netmem reference to get the pointer from
+>> @@ -280,7 +291,7 @@ static inline struct net_iov *__netmem_clear_lsb(netmem_ref netmem)
+>>    */
+>>   static inline struct page_pool *__netmem_get_pp(netmem_ref netmem)
+>>   {
+>> -       return __netmem_to_page(netmem)->pp;
+>> +       return pp_page_to_nmdesc(__netmem_to_page(netmem))->pp;
+>>   }
+> 
+> This makes me very sad. Casting from netmem -> page -> nmdesc...
 
-I think the eventual cleanup here is very subjective, especially
-compared to the diffstat. Any eventual performance improvement should be
-supported by some figures, in relevant tests.
+The function is not used, and I don't think the series adds any
+new users? It can be killed then. It's a horrible function anyway,
+would be much better to have a variant taking struct page * if
+necessary.
 
-In this specific case I don't think you will be able to measure any
-relevant gain; pskb_network_may_pull() could be slower than
-skb_header_pointer() only when the headers are not in the liner part,
-and that in turns could happen only if we are already on some kind of
-slow path.
+> Instead, we should be able to go from netmem directly to nmdesc. I
+> would suggest rename __netmem_clear_lsb to netmem_to_nmdesc and have
+> it return netmem_desc instead of net_iov. Then use it here.
 
-/P
+Glad you liked the diff I suggested :) In either case, seems
+like it's not strictly necessary for this iteration as
+__netmem_get_pp() should be killed, and the rest of patches work
+directly with pages.
+
+  
+> We could have an unsafe version of netmem_to_nmdesc which converts the
+> netmem to netmem_desc without clearing the lsb and mark it unsafe.
+> 
+
+-- 
+Pavel Begunkov
 
 
