@@ -1,256 +1,162 @@
-Return-Path: <netdev+bounces-207068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97FC4B05845
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:00:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BFF9B05849
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:03:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A3921A61093
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 11:00:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87EDC1A60FAE
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 11:03:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB5B3226CF1;
-	Tue, 15 Jul 2025 11:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 672A32D8394;
+	Tue, 15 Jul 2025 11:03:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VxhJcCGB"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="acbrdwET"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D5A4241114
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 11:00:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6B022673A9;
+	Tue, 15 Jul 2025 11:03:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752577221; cv=none; b=nCx1tb7MuKrZvg/BI0S4gOHZFNKP3lcJ0Of8nC0tPjJ3lXGQj4KMboY9FBiePROoWqhaS9PuuOBJg7p+BsdXddu7n1jamVaZgk0HMpS33gi2NW0+i2uh63zp7GkilCnKgghuBRlIf7f8uoVyKtk2cy78tNTr2ZKIZ0KTJPPjCls=
+	t=1752577387; cv=none; b=Om+lnMWqteGMEYyC15lt0EpnDdgOcKVW0vgT//piiJOjJIb004yiYjZlPkVu1S7bZjVi02jwDQd9nMSi6JcRp5Q/mIfno9IAmez+qbJHVtwhtdOXNuf9al0I1u7m7HHXFQw6mlU1M7RdfNvm8EtHroXwc4/WdCR3SJKuWptcUPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752577221; c=relaxed/simple;
-	bh=VWAyEjhzHfZnqcZyzvhGGhaLq9uUeL69FOpazGDX8lQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iJfF241ZBnZZEaOrwHfjakFnGCaSKjk2hPBzJeSCoks2AVaXVhXuk6fuwNDd8Pa4Nyqdr6YOQLtPTvajgC3eZxJ+iZYpAP49UJFAL7QoQcs6mC55/fWGzQlnZ9KwD25Bi3r1N9Mikleb9wPhtT2oQGRBdW0OJDpD0UxFjvhOxCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VxhJcCGB; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752577218;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UDYromUN4X7oqrVyCqPutBBMeduCEyx9kb+TcCXFA9w=;
-	b=VxhJcCGBpeYTt0XKP1gNSHODZJW1CNCNLL0zT6qdRtG7iIPy61Q/p71ADNvCgkKWWsO/nk
-	y0iz/0bIOXK4PPmhjRAJdz50BSYy+vgY/WoSUfRm883TlqP6/nmbWgy8Oxo3hoJkxWU+1X
-	sQ8RLWXNwwAwUIE/gOIYBBQj+Xqm6SM=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-199-rSzbYb8rPVKvX53YnXUX6Q-1; Tue, 15 Jul 2025 07:00:16 -0400
-X-MC-Unique: rSzbYb8rPVKvX53YnXUX6Q-1
-X-Mimecast-MFC-AGG-ID: rSzbYb8rPVKvX53YnXUX6Q_1752577216
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-451ac1b43c4so29542795e9.0
-        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 04:00:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752577215; x=1753182015;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UDYromUN4X7oqrVyCqPutBBMeduCEyx9kb+TcCXFA9w=;
-        b=vTUyu7lK6JJ4KUDLoPfMPEQZeQYJL6/+2FCK4LsO0jZ8ok6q91utjxghVZ0eQg9vy2
-         8OWSdvO6LTVXhnPGXnRbx3cFuTe8x01MrUpA2bRt+wy7I1rXsFPSj3ynXCMa2FjGKfOI
-         KUWLYkoRAL0fX+OkI4H10auNtApO3j0jwT7X8htd9vw0byRXZYhklT2c/RYMERUamwr6
-         TehG8USMYSr+08QTZLD4l/hDrHCAqI09CqYsbDxfjeyrmi0rO4EuVX/cgvXyDvq8/K+f
-         2mglmqx/Qo0WABLYhglQqZT4WVpjuQKoCUhuaGPy/agGsmRef0fN6CmQnDAVMuEcNC7/
-         DEsw==
-X-Gm-Message-State: AOJu0YxHJ00XGoF7WgdO7AJIMLeMZaObTcQ7Ph2cJKfvD3pmMZ6hAbht
-	asK78VDAgah9tFY0s5TPZLizb0Zl/06qb2F630QiJfdhMt07oHWdiNZVRoCt3muFFtzhciRLS7f
-	3UU06E11NxiE5ZR4Q9LtzTQeDFAGJUsZ+gQxS796UtjJNF1yjAz/6kq9YFA==
-X-Gm-Gg: ASbGncv60bUyq1C3SIaFizfqInF+SDA5/28CravtTuak8f0JjyIoTXr2RAaOVH0GB0L
-	nYQiryhXgw8jxjVtbehlDLOMZjhda75M4YdCjkcyb3Vn1EP8SfudFVde/L4KnFpf0SwmtpDQJJL
-	Mhb/0qgmEEwuk6xNmFpWpWzU/cITUQKT52Z9dg7m+eYKawdsQLC1NqBc/PxU5niQwfUaB5SHHys
-	zWBHVirZsq3waq/iF07GKgo5xpMh1WQEBDIUVdDZqMNDfQ7AWoWCkHTOed8Px1jHMmuLcRD4b6v
-	u70F6IKmz6MjG1ihkkIHVqEhYUmmD+Z7Y7mjLiblN7/ZJOyrZzI4ZiFMuuXEnrMYYnJay4ML51H
-	7H26VO8APNtU=
-X-Received: by 2002:a05:600c:6085:b0:456:1b8b:b8ab with SMTP id 5b1f17b1804b1-4561b8bbb3bmr77641355e9.30.1752577215397;
-        Tue, 15 Jul 2025 04:00:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFvLBXQE4ArALHQLB4NkFBGD4rJKckvmXpQwHHB8XEVhqM7Eox/KFB5OvuAq4wE1jUZVKgQ0w==
-X-Received: by 2002:a05:600c:6085:b0:456:1b8b:b8ab with SMTP id 5b1f17b1804b1-4561b8bbb3bmr77640895e9.30.1752577214894;
-        Tue, 15 Jul 2025 04:00:14 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-456101b616csm86882545e9.4.2025.07.15.04.00.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Jul 2025 04:00:14 -0700 (PDT)
-Message-ID: <bfa4949f-8b20-4660-a67e-a06a07fe4e3c@redhat.com>
-Date: Tue, 15 Jul 2025 13:00:13 +0200
+	s=arc-20240116; t=1752577387; c=relaxed/simple;
+	bh=6+1tfxhRAKeckRR71WjO7SHqYCGup9Q/qfjkGi5il68=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=NA+QTdfNSmFfAheVm00aw784e1xNhY/uXTE/ijGxd8SB5if1qfxAm37Dv7/9Ua1u1onofU3HwROVbCyl2baXacH3xx7Gz0xVu7KcbW9sF0uq/2SDGR39spTaMGvkpwFj3FgX+q9+D9aievG4cv87WdZmg4RPVEZ0fA1OF2iyG+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=acbrdwET; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56F5c0oM011542;
+	Tue, 15 Jul 2025 11:02:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=NWEBi6E9kskv6BEIyPrdnk
+	sgs6FzVCDGGRu5t+yBxd4=; b=acbrdwETygV/M9A7hyLhbxz+6eKSnwcvCI/IIh
+	mSnE2XAw9B+vh3gSWBwDQJRWJvyNETPSBMMS8fJOpUaoIRPFchezSOHotDfj56ZP
+	rk8l84NydRTEAcqm3IlVgmieaC++0U+xK33V65YU3Z7LExLvJyC0kqds+u7dFLne
+	f+TDtMrgTyhp1OTPi90NyFi7BttKwq1y/WR8NMD2tOgr2SgZ0bRyO4LZB9p8697c
+	HGUByVlw0U+xzVe3uIcwJsn/d3hGEDS3/5ACf2zh24HveiyAfhLRsY2wwn42OK7O
+	2boNNtsd2EgYTK1UqXfhZuU2uVgbPr9HiVf2gucp6trk7AsQ==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47w5dyjqxn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 15 Jul 2025 11:02:40 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 56FB2e5o003607
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 15 Jul 2025 11:02:40 GMT
+Received: from nsssdc-sh01-lnx.ap.qualcomm.com (10.80.80.8) by
+ nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.10; Tue, 15 Jul 2025 04:02:37 -0700
+From: Luo Jie <quic_luoj@quicinc.com>
+Subject: [PATCH net-next v3 0/3] Add shared PHY counter support for QCA807x
+ and QCA808x
+Date: Tue, 15 Jul 2025 19:02:25 +0800
+Message-ID: <20250715-qcom_phy_counter-v3-0-8b0e460a527b@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 3/4] net: renesas: rswitch: add offloading for L2
- switching
-To: Michael Dege <michael.dege@renesas.com>,
- Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
- Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-References: <20250710-add_l2_switching-v3-0-c0a328327b43@renesas.com>
- <20250710-add_l2_switching-v3-3-c0a328327b43@renesas.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250710-add_l2_switching-v3-3-c0a328327b43@renesas.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAEI1dmgC/3XNQQ6DIBAF0KsY1qUBRA1d9R5NYwwMlUVBAYnGe
+ PdSVm3SLn/+/Dc7CuANBHSpduQhmWCczaE+VUiOg30ANipnxAhrSEcEnqV79tO49dItNoLHXGg
+ QNeNUK4XybPKgzVrIG7IQsYU1ontuRhOi81v5lWjp/7OJYoJFPTR8IExI3l7nxUhj5TlfFi6xD
+ 4LyHwR7E1wpEEp0rdDfxHEcLzwt4Q//AAAA
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Luo Jie <quic_luoj@quicinc.com>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1752577357; l=1750;
+ i=quic_luoj@quicinc.com; s=20250209; h=from:subject:message-id;
+ bh=6+1tfxhRAKeckRR71WjO7SHqYCGup9Q/qfjkGi5il68=;
+ b=syaXrqIz6oMh3k9FbyBwaRsO2WRqPxwDS1L5urb563thEUI4iWr4QrZs1HDAKH5kyqNYylGAw
+ KuSx6znkE6zBoYpQPCP/QQrt1IydoVQaWv38vYBqmOiUB00IixhiIuh
+X-Developer-Key: i=quic_luoj@quicinc.com; a=ed25519;
+ pk=pzwy8bU5tJZ5UKGTv28n+QOuktaWuriznGmriA9Qkfc=
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: zEuudNBPeD3f-D-qAvR-qW0ZMo9tTc_P
+X-Authority-Analysis: v=2.4 cv=RtXFLDmK c=1 sm=1 tr=0 ts=68763550 cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8
+ a=COk6AnOGAAAA:8 a=cCCatxcZxqH0WtuQzukA:9 a=QEXdDO2ut3YA:10
+ a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE1MDA5OSBTYWx0ZWRfX9xrvinzkCJMM
+ XIuruZ7PMPLiCdVbGJ+yY3iOO1iyKj31FUQU1/oiNvujXhG4seyQfLDKn/ZMMZQCu6EmTW++s5Y
+ AEa2jidXEbMT7THiWDX/0EFTfqIDICl1HaNAuUPHkiehnDD9RscX8YqezsKAkz6/uN2GJzNVNpY
+ vp8jXIAbA9OgAr3f864gsSU73i/FeGKpiXgKe8osdyLO+KGKrY6t5q8/ZglgzUfb7aDvtKZZ7jy
+ yMbWM2bGdMqpYM8RRUeL5H0Tl4ObkckxrkrfOhwKoRAENkHZctHVV3OJTzJ5DHlSVmfJfkoaPK2
+ yZ2uayOSjkCLXQQCXqQ7QFAHRatnvjPLKCaD1HRlbd5joVXrxf24O+CoWyMjC3w0vkDH0HeBg6B
+ Zax72r7zKaOxyrTnvJYxmfiUSewQK5GmaD03d30/GaPlVe5l4/QYvXMtn6+z0iCzMQTB4LLP
+X-Proofpoint-GUID: zEuudNBPeD3f-D-qAvR-qW0ZMo9tTc_P
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-07-15_01,2025-07-14_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 mlxscore=0 bulkscore=0 suspectscore=0 lowpriorityscore=0
+ impostorscore=0 malwarescore=0 clxscore=1015 mlxlogscore=999
+ priorityscore=1501 phishscore=0 spamscore=0 classifier=spam authscore=0
+ authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2505280000 definitions=main-2507150099
 
-On 7/10/25 2:31 PM, Michael Dege wrote:
-> This commit adds hardware offloading for L2 switching on R-Car S4.
-> 
-> On S4 brdev is limited to one per-device (not per port). Reasoning
-> is that hw L2 forwarding support lacks any sort of source port based
-> filtering, which makes it unusable to offload more than one bridge
-> device. Either you allow hardware to forward destination MAC to a
-> port, or you have to send it to CPU. You can't make it forward only
-> if src and dst ports are in the same brdev.
-> 
-> Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-> Signed-off-by: Michael Dege <michael.dege@renesas.com>
+The implementation of the PHY counter is identical for both QCA808x and
+QCA807x series devices. This includes counters for both good and bad CRC
+frames in the RX and TX directions, which are active when CRC checking
+is enabled.
 
-Minor nit: you should specify the target tree in the subj prefix (in
-this case 'net-next').
+This patch series introduces PHY counter functions into a shared library,
+enabling counter support for the QCA808x and QCA807x families through this
+common infrastructure. Additionally, enable CRC checking and configure
+automatic clearing of counters after reading within config_init() to ensure
+accurate counter recording.
 
-[...]
-> +static void rswitch_update_l2_hw_learning(struct rswitch_private *priv)
-> +{
-> +	bool learning_needed;
-> +	struct rswitch_device *rdev;
-> +
-> +	rswitch_for_all_ports(priv, rdev) {
-> +		if (rdev_for_l2_offload(rdev))
-> +			learning_needed = rdev->learning_requested;
-> +		else
-> +			learning_needed = false;
-> +
-> +		if (!rdev->learning_offloaded && learning_needed) {
-> +			rswitch_modify(priv->addr, FWPC0(rdev->port),
-> +				       0,
-> +				       FWPC0_MACSSA | FWPC0_MACHLA | FWPC0_MACHMA);
-> +
-> +			rdev->learning_offloaded = true;
-> +			netdev_info(rdev->ndev, "starting hw learning\n");
-> +		}
-> +
-> +		if (rdev->learning_offloaded && !learning_needed) {
-> +			rswitch_modify(priv->addr, FWPC0(rdev->port),
-> +				       FWPC0_MACSSA | FWPC0_MACHLA | FWPC0_MACHMA,
-> +				       0);
-> +
-> +			rdev->learning_offloaded = false;
-> +			netdev_info(rdev->ndev, "stopping hw learning\n");
+Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+---
+Changes in v3:
+- Resolved the compilation error on the ARCH_i386 platform as reported by
+  the kernel test robot.
+- Link to v2: https://lore.kernel.org/r/20250714-qcom_phy_counter-v2-0-94dde9d9769f@quicinc.com
 
-You could factor out the above 3 statements is a separare helper
-receving the new 'leraning_offloaded' status and save some code duplication.
+Changes in v2:
+- Update to use the standardized PHY statistics framework.
+- Enabled automatic clearing of counters following each read operation,
+  ensuring support for 64-bit statistics.
+- Link to v1: https://lore.kernel.org/r/20250709-qcom_phy_counter-v1-0-93a54a029c46@quicinc.com
 
-> +		}
-> +	}
-> +}
-> +
-> +static void rswitch_update_l2_hw_forwarding(struct rswitch_private *priv)
-> +{
-> +	struct rswitch_device *rdev;
-> +	unsigned int fwd_mask;
-> +
-> +	/* calculate fwd_mask with zeroes in bits corresponding to ports that
-> +	 * shall participate in hardware forwarding
-> +	 */
-> +	fwd_mask = GENMASK(RSWITCH_NUM_AGENTS - 1, 0);
-> +
-> +	rswitch_for_all_ports(priv, rdev) {
-> +		if (rdev_for_l2_offload(rdev) && rdev->forwarding_requested)
-> +			fwd_mask &= ~BIT(rdev->port);
-> +	}
-> +
-> +	rswitch_for_all_ports(priv, rdev) {
-> +		if (rdev_for_l2_offload(rdev) && rdev->forwarding_requested) {
-> +			/* Update allowed offload destinations even for ports
-> +			 * with L2 offload enabled earlier.
-> +			 *
-> +			 * Do not allow L2 forwarding to self for hw port.
-> +			 */
-> +			iowrite32(FIELD_PREP(FWCP2_LTWFW_MASK, fwd_mask | BIT(rdev->port)),
-> +				  priv->addr + FWPC2(rdev->port));
-> +
-> +			if (!rdev->forwarding_offloaded) {
-> +				rswitch_modify(priv->addr, FWPC0(rdev->port),
-> +					       0,
-> +					       FWPC0_MACDSA);
-> +
-> +				rdev->forwarding_offloaded = true;
-> +				netdev_info(rdev->ndev,
-> +					    "starting hw forwarding\n");
-> +			}
-> +		} else if (rdev->forwarding_offloaded) {
-> +			iowrite32(FIELD_PREP(FWCP2_LTWFW_MASK, fwd_mask | BIT(rdev->port)),
-> +				  priv->addr + FWPC2(rdev->port));
-> +
-> +			rswitch_modify(priv->addr, FWPC0(rdev->port),
-> +				       FWPC0_MACDSA,
-> +				       0);
-> +
-> +			rdev->forwarding_offloaded = false;
-> +			netdev_info(rdev->ndev, "stopping hw forwarding\n");
+---
+Luo Jie (3):
+      net: phy: qcom: Add PHY counter support
+      net: phy: qcom: qca808x: Support PHY counter
+      net: phy: qcom: qca807x: Support PHY counter
 
-Similar thing above.
+ drivers/net/phy/qcom/qca807x.c      | 25 +++++++++++++
+ drivers/net/phy/qcom/qca808x.c      | 23 ++++++++++++
+ drivers/net/phy/qcom/qcom-phy-lib.c | 75 +++++++++++++++++++++++++++++++++++++
+ drivers/net/phy/qcom/qcom.h         | 23 ++++++++++++
+ 4 files changed, 146 insertions(+)
+---
+base-commit: 06baf9bfa6ca8db7d5f32e12e27d1dc1b7cb3a8a
+change-id: 20250709-qcom_phy_counter-49fe93241fdd
 
-> +		}
-> +	}
-> +}
-> +
-> +void rswitch_update_l2_offload(struct rswitch_private *priv)
-> +{
-> +	rswitch_update_l2_hw_learning(priv);
-> +	rswitch_update_l2_hw_forwarding(priv);
-> +}
-> +
-> +static void rswitch_update_offload_brdev(struct rswitch_private *priv,
-> +					 bool force_update_l2_offload)
-
-Apparently always called with force_update_l2_offload == false, if so
-you should drop such argument...
-
-> +{
-> +	struct net_device *offload_brdev = NULL;
-> +	struct rswitch_device *rdev, *rdev2;
-> +
-> +	rswitch_for_all_ports(priv, rdev) {
-> +		if (!rdev->brdev)
-> +			continue;
-> +		rswitch_for_all_ports(priv, rdev2) {
-> +			if (rdev2 == rdev)
-> +				break;
-> +			if (rdev2->brdev == rdev->brdev) {
-> +				offload_brdev = rdev->brdev;
-> +				break;
-> +			}
-> +		}
-> +		if (offload_brdev)
-> +			break;
-> +	}
-> +
-> +	if (offload_brdev == priv->offload_brdev && !force_update_l2_offload)
-> +		return;
-> +
-> +	if (offload_brdev == priv->offload_brdev)
-
-... otherwise (this function can be called with force_update_l2_offload
-==  true) we can reach here with priv->offload_brdev and/or
-offload_brdev == NULL and the following statement will cause a NULL ptr
-dereference.
-
-/P
+Best regards,
+-- 
+Luo Jie <quic_luoj@quicinc.com>
 
 
