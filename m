@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-207297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91C49B069F5
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 01:40:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACCD4B069F6
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 01:40:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FEA81AA1F02
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 23:40:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E03374A310A
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 23:40:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19E0C2D4B62;
-	Tue, 15 Jul 2025 23:39:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 637402DAFB9;
+	Tue, 15 Jul 2025 23:39:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qbUH+syl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z/61GWtx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1DC2571C3
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 23:39:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D0242DAFB0;
+	Tue, 15 Jul 2025 23:39:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752622793; cv=none; b=HhT7c8/UlFtVHxImWV576FGnHWWHA9XmYijZqh04Wrw6QJhMM6bm2rrH0Lv7vPMWQz9CBl58WKWo/r4BIl2b8CjYUBgHWI1EaY6BJeHgbco4P1J0yQ0E63XYf/Ydjr1FEFuSimjsgqEF3jkkl+Wfo3Ua7oLbmNFP8tCi4j+1XnM=
+	t=1752622794; cv=none; b=M4d3MwIIL8VPmJC6B2RRu63IQ/C6D0jjBzswH8/AQ6ujtCtIVWWAdzUxop6oScn87GeE0OCPVyOISHxb/kPSbc0LEOEwAwIUcV9PP+WTpKy941C3VY7BSN6UEYqnPKJ8HoOQ/e3f6v1idX5WhGcZ3Mf4pQXVS3RVbQdAtR9/kZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752622793; c=relaxed/simple;
-	bh=EdUVU71lKqsEiAfN1jNs2cp/gKF9ykokK/ehDureoY8=;
+	s=arc-20240116; t=1752622794; c=relaxed/simple;
+	bh=RKoLZjYjMewwzYDaxldtjmdIVQTQjGHg+KTdm9LFeUE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=q7nayGC1FTfuy9WRcwEyTLhszUCzXapffjpSog7PCHnKnXM8Cq2CLZFkzUq3sl2c+CDWxSeIw1OS4JzXP1KVoZLV33Hl+EozwhikOZB6YKAOcQGLUyZ/xDXEHWn2HjCODIFjxyIx9RdHxWkklROTjmLxXdCvVldbonbtDR9oSxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qbUH+syl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73BAEC4CEE3;
-	Tue, 15 Jul 2025 23:39:52 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=jBs8MTr2nOq4L7aBXBdI1vwCKxvUEy5KzIitCskfVqPZniE/tAzuYc8cS9YrOn9CgcKE5Mmqr3DlEPjqKo8Rua1459ahz8eD2UxbHZAnYYV4LFDYt/ONK++LzzydG7eOf3dizUSEg4iSJtF9s7nrMUZHBAE+1RjJoBlM3ML1jK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z/61GWtx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1584C4CEF6;
+	Tue, 15 Jul 2025 23:39:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752622792;
-	bh=EdUVU71lKqsEiAfN1jNs2cp/gKF9ykokK/ehDureoY8=;
+	s=k20201202; t=1752622793;
+	bh=RKoLZjYjMewwzYDaxldtjmdIVQTQjGHg+KTdm9LFeUE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qbUH+sylJuSfearjErpK7ThfhLPmabJacBoweC4wKMhOfYjDOmNM8S6bs9a6+QED7
-	 bKQ1VHWRuoftdG7E60/jnlbE74e/fLO+uaZgmaqT3eAFeOPo4WcOls828YvJk07MVR
-	 Rhp0QoOuOzxlZGdOORHCpVaCKp/z1hqkANQ9KakeVIWmUfXJlmcBVZ4i4ZLGhEA0aa
-	 MEZPR/3uClyxKkGQfxIAPP5CKV+1CpaJhumJz9/EwOLlDaZpW5mSu5npFsM0PRM51s
-	 WMxpEZ1ofzrGyOtB7JKYUd0nWpz6C0uwi0yyugvEmMXTKGo/nnkEQKzqG38+XS2u0U
-	 8qtAyMus08y+A==
+	b=Z/61GWtxD/bbdTIRxSM6181aRcpKXGNTEC6goSDq17ouabluS1LdfQ61ibiCq0Q9L
+	 75G8T7GJDLZRUVnxViFNP0H/LcVf7z8cesJS9D6wJrdSf1FI/OSNRbPDDrR16dT67V
+	 FWCrciIv6ad84TYMqUr92bSzyrAP7oPBEzrG1A1658/TuUQi15KkPfuF75gPUhhD4a
+	 hNAb3g24MjhLIRDoCE9hRvxbSTSZbsZDPSRN6xu9vq42b4H5HxL1M2MBeOyMWm97Yd
+	 40iqtFkYRUz+SbEtaQAhJg+MgLfk9fj+qOf/mCAs/kpwCaSk1i5+Nqco1r26R2uXsB
+	 tma7TRm+CSb1g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E0C383BA30;
-	Tue, 15 Jul 2025 23:40:14 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D76383BA30;
+	Tue, 15 Jul 2025 23:40:15 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] bnxt: move bnxt_hsi.h to
- include/linux/bnxt/hsi.h
+Subject: Re: [PATCH net-next] ipv6: mcast: Remove unnecessary null check in
+ ip6_mc_find_dev()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175262281274.617203.17200656875788495871.git-patchwork-notify@kernel.org>
-Date: Tue, 15 Jul 2025 23:40:12 +0000
-References: <20250714170202.39688-1-gospo@broadcom.com>
-In-Reply-To: <20250714170202.39688-1-gospo@broadcom.com>
-To: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Cc: netdev@vger.kernel.org, vikas.gupta@broadcom.com, gospo@broadcom.com,
- michael.chan@broadcom.com, pavan.chebbi@broadcom.com
+ <175262281425.617203.12056812500600130761.git-patchwork-notify@kernel.org>
+Date: Tue, 15 Jul 2025 23:40:14 +0000
+References: <20250714081732.3109764-1-yuehaibing@huawei.com>
+In-Reply-To: <20250714081732.3109764-1-yuehaibing@huawei.com>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 14 Jul 2025 13:02:02 -0400 you wrote:
-> This moves bnxt_hsi.h contents to a common location so it can be
-> properly referenced by bnxt_en, bnxt_re, and bnge.
+On Mon, 14 Jul 2025 16:17:32 +0800 you wrote:
+> These is no need to check null for idev before return NULL.
 > 
-> Signed-off-by: Andy Gospodarek <gospo@broadcom.com>
-> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
-> Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-> 
-> [...]
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+> ---
+>  net/ipv6/mcast.c | 3 ---
+>  1 file changed, 3 deletions(-)
 
 Here is the summary with links:
-  - [net-next] bnxt: move bnxt_hsi.h to include/linux/bnxt/hsi.h
-    https://git.kernel.org/netdev/net-next/c/c34632dbb29b
+  - [net-next] ipv6: mcast: Remove unnecessary null check in ip6_mc_find_dev()
+    https://git.kernel.org/netdev/net-next/c/ce6030afe459
 
 You are awesome, thank you!
 -- 
