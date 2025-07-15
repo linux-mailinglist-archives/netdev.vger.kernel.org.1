@@ -1,157 +1,123 @@
-Return-Path: <netdev+bounces-207086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C80B6B05947
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:52:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9915B0597A
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 14:01:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CCF64A5A6D
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 11:52:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AAE367B4C81
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 11:58:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AFA72D9EEA;
-	Tue, 15 Jul 2025 11:52:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABA082DCF57;
+	Tue, 15 Jul 2025 11:59:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="ETzqpQH0"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="VJewBGZ3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2B3618E1F
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 11:52:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48456255F56;
+	Tue, 15 Jul 2025 11:59:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752580349; cv=none; b=q5m+RW66sNqTuPHDDpHbDAWoE/bNaziqaentI/JapQUxX7bmbPiASEg91Ts5RypAtmFFbB50Rw0qbOjmYvZsC3zR5G5TzUv84ZyBjSTE0WGPcB53Zh6Gmy1+j3lW5NIC6tpC9yyBHWnj1vQ2ChsxiNLJ1Sv8GbT88o9MGb925+o=
+	t=1752580747; cv=none; b=Z4Fqfj+/IY70fZe6tUXokZ/oBaYZ8yRena7m7GfxDaBcfQT4QcXCiOLiiaBbu+UNYidesMfAkSSqvDKgShZi2W8YIVHxt7cciFxU8ZFIpe99g7Fz35wqyhWi9IZKk5IL1l08VkSAxmLE48X7MMn5uRqhVAMhvoYWWteMH5s2dDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752580349; c=relaxed/simple;
-	bh=0SGGpE1FSUN860WwuC1EDMtRnqLDzeHsrpZIKGCl/m8=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=nh0/NOpbLwxx+1bL6Nmw6kqGaEblxGas0pRQcPES4yCAwaGqarFU6B8oWp2srSCdO1IrB3DtBkeUB/lYUmC6jynqrIEUheSCmyQKlIogt4ELKClo7+HXSL7i0ZnDAaQKCUeEbrIGl8y8vubETdfadTg+jONa0VBxcrMdBK2t/HI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=ETzqpQH0; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1752580347; x=1784116347;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=0SGGpE1FSUN860WwuC1EDMtRnqLDzeHsrpZIKGCl/m8=;
-  b=ETzqpQH0MZ0O6WPpKGqfF259PJaa8P5FiAnbLArtmeTk3bo2gO1Edt50
-   67wJpe5nmMZKmNij3kU4lgR2PsYceT7uEOoUt8R/HWuhvOvoe354NmYPN
-   0TeN1xmVt1H9Hj+zAKWOaXvpJdyVsWAomFOZpJIBe0c+8NidaLymT+k5S
-   Km4VvprBilQQXITTs7nn4bzg+wLf5GY2MB9q+AC/6tFA5+X6NFoDvBOCP
-   DXdHUY0IpyS2sMTCPbcx6gZ6zNGb6ro8VHEYHi7+N+3/3g6H8uWzPr89P
-   vbKPKfIXPduyUA5eQUjYnCxZJp7SPEUkZ5riMbAi9logQhxrIlYF1LQ5g
-   Q==;
-X-IronPort-AV: E=Sophos;i="6.16,313,1744070400"; 
-   d="scan'208";a="214683291"
-Subject: RE: [PATCH ethtool] netlink: fix missing headers in text output
-Thread-Topic: [PATCH ethtool] netlink: fix missing headers in text output
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 11:52:25 +0000
-Received: from EX19MTAEUC002.ant.amazon.com [10.0.17.79:63135]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.36.43:2525] with esmtp (Farcaster)
- id c1e0bddd-6f36-45e4-9f00-d761ad99d406; Tue, 15 Jul 2025 11:52:24 +0000 (UTC)
-X-Farcaster-Flow-ID: c1e0bddd-6f36-45e4-9f00-d761ad99d406
-Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19MTAEUC002.ant.amazon.com (10.252.51.245) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 15 Jul 2025 11:52:22 +0000
-Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19D005EUA002.ant.amazon.com (10.252.50.11) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 15 Jul 2025 11:52:22 +0000
-Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
- EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
- 15.02.1544.014; Tue, 15 Jul 2025 11:52:22 +0000
-From: "Arinzon, David" <darinzon@amazon.com>
-To: "kuba@kernel.org" <kuba@kernel.org>, "mkubecek@suse.cz" <mkubecek@suse.cz>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"ant.v.moryakov@gmail.com" <ant.v.moryakov@gmail.com>
-Thread-Index: AQHb9X7sn+3G9RoAeU22LmBfVeBqjQ==
-Date: Tue, 15 Jul 2025 11:52:22 +0000
-Message-ID: <3bf85637ed244052a26f03cc42cf8f12@amazon.com>
-References: <0bcad81d1d004c74abfbb73eacbe6ec2@amazon.com>
-In-Reply-To: <0bcad81d1d004c74abfbb73eacbe6ec2@amazon.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1752580747; c=relaxed/simple;
+	bh=YmPNxGKjS1dEpn30AMRe4G0TS7iLo75lESz+IwrMYA4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QsLFkYolU+K4rqqc+PFcAbF9iVgCUKTu+oTK1iRUwkkznhMwYVz8obc48aXIfMJNj58WVm4Wgm5Z/ZF8M8FAMvU39A8LLI2TnqkGBf4e01VOa3pFHD9hTUz8QQl4ft5i8gE60H8EtCODenQOnvoatpBPhyWG/F7DZPaF5mZ4bPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=VJewBGZ3; arc=none smtp.client-ip=115.124.30.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1752580734; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=0o9QFjXw4TW4GuCjZSOcW5pP6pwzDy8uoogLDMEQgFU=;
+	b=VJewBGZ30Kug2CoQAVV5CRwmI6LTl1A7i0oULWFQLqId3pgmJgz8HqYLtveN9+nL8EG0ccP3NxQPWR6w14YPcR4vWKoaS9hGeV0WLc4qOSolsB4x3PhOhhpvbD7HxDW4/NNNmKWIfNvWwRLVLzApDN/kkQZuOkfE5LLROZsA2sM=
+Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0Wj0NmO9_1752580733 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 15 Jul 2025 19:58:53 +0800
+Date: Tue, 15 Jul 2025 19:58:52 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com    >
+To: Alexandra Winter <wintera@linux.ibm.com>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Dust Li <dust.li@linux.alibaba.com>,
+	Sidraya Jayagond <sidraya@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Mahanta Jambigi <mjambigi@linux.ibm.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>, Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+	syzbot+40bf00346c3fe40f90f2@syzkaller.appspotmail.com,
+	syzbot+f22031fad6cbe52c70e7@syzkaller.appspotmail.com,
+	syzbot+271fed3ed6f24600c364@syzkaller.appspotmail.com
+Subject: Re: [PATCH v1 net] smc: Fix various oops due to inet_sock type
+ confusion.
+Message-ID: <20250715115852.GA20773@j66a10360.sqa.eu95>
+References: <20250711060808.2977529-1-kuniyu@google.com>
+ <965af724-c3b4-4e47-97d6-8591ca9790db@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <965af724-c3b4-4e47-97d6-8591ca9790db@linux.ibm.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-> The commit under fixes added a NULL-check which prevents us from
-> printing text headers. Conversions to add JSON support often use:
->=20
->=A0=A0 print_string(PRINT_FP, NULL, "some text:\n", NULL);
->=20
-> to print in plain text mode.
->=20
-> Correct output:
->=20
->=A0=A0 Channel parameters for vpn0:
->=A0=A0 Pre-set maximums:
->=A0=A0 RX:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
->=A0=A0 TX:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
->=A0=A0 Other:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
->=A0=A0 Combined:=A0=A0=A0=A0 1
->=A0=A0 Current hardware settings:
->=A0=A0 RX:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
->=A0=A0 TX:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
->=A0=A0 Other:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
->=A0=A0 Combined:=A0=A0=A0=A0 0
->=20
-> With the buggy patch:
->=20
->=A0=A0 Channel parameters for vpn0:
->=A0=A0 RX:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
->=A0=A0 TX:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
->=A0=A0 Other:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
->=A0=A0 Combined:=A0=A0=A0=A0 1
->=A0=A0 RX:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
->=A0=A0 TX:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
->=A0=A0 Other:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
->=A0=A0 Combined:=A0=A0=A0=A0 0
->=20
-> Fixes: fd328ccb3cc0 ("json_print: add NULL check before jsonw_string_fiel=
-d() in print_string()")
-> Signed-off-by: Jakub Kicinski mailto:kuba@kernel.org
-> ---
->=A0 json_print.c | 3 ++-
->=A0 1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/json_print.c b/json_print.c
-> index 4f61640392cf..e07c651f477b 100644
-> --- a/json_print.c
-> +++ b/json_print.c
-> @@ -143,10 +143,11 @@ void print_string(enum output_type type,
->=A0=A0=A0=A0=A0=A0=A0=A0 } else if (_IS_FP_CONTEXT(type)) {
->=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (value)
->=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 f=
-printf(stdout, fmt, value);
-> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 else
-> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 fprin=
-tf(stdout, fmt);
->=A0=A0=A0=A0=A0=A0=A0=A0 }
->=A0 }
->=20
-> -
->=A0 /*
->=A0=A0 * value's type is bool. When using this function in FP context you =
-can't pass
->=A0=A0 * a value to it, you will need to use "is_json_context()" to have d=
-ifferent
-> --=20
-> 2.50.1
+On Mon, Jul 14, 2025 at 09:42:22AM +0200, Alexandra Winter wrote:
+> 
+> 
+> On 11.07.25 08:07, Kuniyuki Iwashima wrote:
+> > syzbot reported weird splats [0][1] in cipso_v4_sock_setattr() while
+> > freeing inet_sk(sk)->inet_opt.
+> > 
+> > The address was freed multiple times even though it was read-only memory.
+> > 
+> > cipso_v4_sock_setattr() did nothing wrong, and the root cause was type
+> > confusion.
+> > 
+> > The cited commit made it possible to create smc_sock as an INET socket.
+> > 
+> > The issue is that struct smc_sock does not have struct inet_sock as the
+> > first member but hijacks AF_INET and AF_INET6 sk_family, which confuses
+> > various places.
+> > 
+> > In this case, inet_sock.inet_opt was actually smc_sock.clcsk_data_ready(),
+> 
+> I would like to remind us of the discussions August 2024 around a patchset
+> called "net/smc: prevent NULL pointer dereference in txopt_get".
+> That discussion eventually ended up in the reduced (?)
+> commit 98d4435efcbf ("net/smc: prevent NULL pointer dereference in txopt_get")
+> without a union.
+> 
+> I still think this union looks dangerous, but don't understand the code well enough to
+> propose an alternative.
+> 
+> Maybe incorporate inet_sock in smc_sock? Like Paoplo suggested in
+> https://lore.kernel.org/lkml/20240815043714.38772-1-aha310510@gmail.com/T/#maf6ee926f782736cb6accd2ba162dea0a34e02f9
+> 
+> He also asked for at least some explanatory comments in the union. Which would help me as well.
+> 
 
-Thanks for identifying the issue and proposing the fix.
+Just caught this suggestion... The primary risk with using a union is the
+potential for the sk member's offset within the inet_sock structure to
+change in the future, although this is highly improbable. But in any
+case, directly using inet_sock is certainly a safer approach.
 
-Reviewed-by: David Arinzon <mailto:darinzon@amazon.com>
+Uncertain if @Kuniyuki will still get to revise a version, If there's no further
+follow-up, I'll make the changes when I get a change.
+
+Best wishes,
+D. Wythe
+
 
