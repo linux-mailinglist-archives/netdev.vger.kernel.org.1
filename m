@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-207212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CE7BB0641C
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 18:15:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 234CAB06440
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 18:23:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C95815814FB
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 16:15:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B02BC162E4F
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 16:23:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 267D11F3BAB;
-	Tue, 15 Jul 2025 16:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68CDE1E3762;
+	Tue, 15 Jul 2025 16:23:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KYat4eAl"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OXgz+WsU"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605771C4A24
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 16:15:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E05A62A1B2
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 16:23:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752596156; cv=none; b=p64saOBp4VgaLOz2oeXAKUbWaowoQ96yv5usdOSmoKEyHWy5w0CBbEChp0cgx+lp7OqkZMiIJ/MNssBq2HfdWqPLVAAiArejtdvw0fATE0vFbAD7+dbDx277VlkqkaW9J0YJx+lQ9IEjWx+j1yknHxsrHRR3mPTmTpRQH1iRoYA=
+	t=1752596605; cv=none; b=rCTqQ0hrIpqo6xk4CZTjl+KCCfL+FV0wgeff2Rh+lDcOcpKH5w1iKFXGo29pfhiwakCKGIruPdHcXTj0YBWPkzaygaS460GnPK7mPD2sdcm1kvjM2BBSr1t/Qn15EnEilCMjONxNYvE79vwTPcJ7d3R1PEQAjnu6fC/ltepPu8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752596156; c=relaxed/simple;
-	bh=RgwoLqirdlXIhxtQhlBF+mmW/bebs9uw4I1PFybSQnw=;
+	s=arc-20240116; t=1752596605; c=relaxed/simple;
+	bh=m83F+j/Z5W0MxlkC71y0FEgkjM+Lr50R1GiqCXn/Ou0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dnlrd7ZP/BH/dkGjsvN6A2J+SYGwQbOq376urH0EvvvsJ55Xo4s+ZQbrJhQogcai9IfDOQYGPcrdqBkZTL+TLfabf2ryIMhAXlVf3J+aVfcsJ5cIMmp9syGSOWt4Wc3PXpylTlYeUfev9pB98I2pmqYRC/wBkI7GlIM8nLCD5+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KYat4eAl; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=fSioWPJNY2406WluNOniR0zNObPqNJIB9KN0ITgX1Xhz6wYuG90LZjFU0xcApTKtasU0ZHNBAINTOPBSLR+bSBg1lGoEBz7voAmkOTyGOgdDlx1u6JRUaFmMgC3h4l8u71SG6CUS84DoTdgyyVWglicY7QtqXN7P5139uaIuabI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=OXgz+WsU; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,20 +36,24 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=uzwmmuXxMSLYErQxvPhYqNc3mWgX/z4RK8xr9fPwMZ0=; b=KYat4eAlB6bPqLaUENRXQW0GV2
-	bvnxiGf3NecGkkhnqZJHBy5tImpUgckxHLwrAImKZmbs7eLdHpJVozhx7kNU66ySfhYyC5XgAEsgT
-	3TBXXgJrqTs7WZfkHW+oAGKwKFIHwbhRirC37axdedBZKN+kCvsBx61leMlGgNvtIpzk=;
+	bh=6N5ixXzYqAsxEa59PwExtdaf3MvivnU2rrVqhDnhb4w=; b=OXgz+WsUaq4+gRqOqnKuH/Wbz6
+	Bo6LBXtPMDToszQi/KI8NR7ZMQ4OTfo3Vm1SCrfjsWvYq4NBR2VFHyAtTqQh7bPqEROAU078VBAd7
+	fi88CgzqGT4k3QZLNXgDabf6+liSQKfoXytvH8++pUiX8gj+FDaWzsMMcp5yGbap+OEo=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1ubiJr-001bex-Qk; Tue, 15 Jul 2025 18:15:51 +0200
-Date: Tue, 15 Jul 2025 18:15:51 +0200
+	id 1ubiQx-001bi0-BD; Tue, 15 Jul 2025 18:23:11 +0200
+Date: Tue, 15 Jul 2025 18:23:11 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Jack Ping CHNG <jchng@maxlinear.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, fancer.lancer@gmail.com,
-	yzhu@maxlinear.com, sureshnagaraj@maxlinear.com
-Subject: Re: [PATCH net-next v2] net: pcs: xpcs: Use devm_clk_get_optional
-Message-ID: <06ffd971-ce57-4971-be97-2e1c76e791e1@lunn.ch>
-References: <20250715021956.3335631-1-jchng@maxlinear.com>
+To: Alok Tiwari <alok.a.tiwari@oracle.com>
+Cc: sayantan.nandy@airoha.com, lorenzo@kernel.org, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net v2] net: airoha: fix potential use-after-free in
+ airoha_npu_get()
+Message-ID: <230d2600-bd9b-4144-81c5-b79dcbb42b46@lunn.ch>
+References: <20250715143102.3458286-1-alok.a.tiwari@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,14 +62,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250715021956.3335631-1-jchng@maxlinear.com>
+In-Reply-To: <20250715143102.3458286-1-alok.a.tiwari@oracle.com>
 
-On Tue, Jul 15, 2025 at 10:19:56AM +0800, Jack Ping CHNG wrote:
-> Synopsys DesignWare XPCS CSR clock is optional,
-> so it is better to use devm_clk_get_optional
-> instead of devm_clk_get.
+On Tue, Jul 15, 2025 at 07:30:58AM -0700, Alok Tiwari wrote:
+> np->name was being used after calling of_node_put(np), which
+> releases the node and can lead to a use-after-free bug.
+> Previously, of_node_put(np) was called unconditionally after
+> of_find_device_by_node(np), which could result in a use-after-free if
+> pdev is NULL.
 > 
-> Signed-off-by: Jack Ping CHNG <jchng@maxlinear.com>
+> This patch moves of_node_put(np) after the error check to ensure
+> the node is only released after both the error and success cases
+> are handled appropriately, preventing potential resource issues.
+> 
+> Fixes: 23290c7bc190 ("net: airoha: Introduce Airoha NPU support")
+> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
