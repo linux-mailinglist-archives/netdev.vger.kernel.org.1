@@ -1,191 +1,145 @@
-Return-Path: <netdev+bounces-207029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28AC2B055B3
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 11:00:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDCCBB055CC
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 11:05:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B888188D88E
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 09:00:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21FB43A91E9
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 09:04:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81FB6275103;
-	Tue, 15 Jul 2025 09:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 978692D4B5E;
+	Tue, 15 Jul 2025 09:05:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pvFGLVYz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kj0voNdk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5514122B8A1;
-	Tue, 15 Jul 2025 09:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 608E9275B03;
+	Tue, 15 Jul 2025 09:05:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752570029; cv=none; b=H+nujjwkFEiQlqfWi2cRLSJT/XI3QI/++l4TC6FL3oYxFPVm+fPedIdjZjwSD87cE8tJwScUObowIBuGeL5Ud8mG28WSBQFtY20w0Mf4vqM6K5spnHB3u250sNGl07u2fhWHCdXU9M6iwV2z/5jdJg84dppoqWjG5aCHWIJj0zg=
+	t=1752570311; cv=none; b=jp7j6aG9JVVItw4P6C12Lwmukz3yd+CMlX5b2USA1R9sT/rkQmgbVdXIVGwfHh0BvM+o2j25lnHyCpgBkjxGsed5vFY50g9xyjxmm8rZmnaciqlB/C/UQ/hwJv/G3wXfRh0FvzUPJSOC5zU42tsFzpOJ6qJYya48SksmsAcs5Rs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752570029; c=relaxed/simple;
-	bh=/fSaFmzNZewgomFZk/gLqQ6dUoME78cATqFdKv1CmqE=;
+	s=arc-20240116; t=1752570311; c=relaxed/simple;
+	bh=thKBkCXzV9KuJW7F0B1WOX2ZVw+tt/tQ2I7VYlgi6Vg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A0T+QVbXkR8R3lQsv90oWSWQGcmQIaEfKWFbgni/9JzwmlQGq75kuLc0AqmCYIVvq0FfbNEUtM0s9QALJqWicrzHXZr2XniZlwX9flaWCKGMGoWU+dOifOw19y+wivarEes6PVJgYjx1zlh/4C6r5gxdxgWNirE8fuGbzBU2oUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pvFGLVYz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02BADC4CEE3;
-	Tue, 15 Jul 2025 09:00:22 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=czHYi3TmpAq+6c5LBHMyeoGPKU5lOBrK2X2373vO9D8FRqrTYmqUqmdTY1xGqRvmtVxUWRrck++TeqAC/9qk/5arRRDpCr4hVfab/FPaD0u28a/wluPEgsBJrRTVqN2eBxXY/rPtvDUEs6VmeBd8qDUbGfVy9vW6pIWTkfWAVlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kj0voNdk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A8F4C4CEF6;
+	Tue, 15 Jul 2025 09:05:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752570028;
-	bh=/fSaFmzNZewgomFZk/gLqQ6dUoME78cATqFdKv1CmqE=;
+	s=k20201202; t=1752570311;
+	bh=thKBkCXzV9KuJW7F0B1WOX2ZVw+tt/tQ2I7VYlgi6Vg=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=pvFGLVYzhNqOC/kSI/4Xn23X6QKO6JAWGUIK9qSDGVILdYWjEkrt7z0orc36YIju5
-	 R4gegq/7RuLBDpkd9CtMwGtznMIh40kIDUNeHEuRVBx35s9Zn6Iksc8lXgu8vlcjOU
-	 ZffzQOgArxhE48yxQw3JR48c6gjtk+fMa1rMLf/CDyh2xA/OcyqOBnVoXjVmqMYahP
-	 5UOyvYJW4g93R5mbSmSei+e7M6LkdWZ2hiBYWwKulQkMEacrtDLuLkoaqaBaELHciN
-	 AQq4gdE6rJ+Nh+F+rkVkL1WFKoPbICTP02WLkIuL4tSJNzXKE5mvLMyRNpQzZ8Bv0+
-	 Ej/n5x8jATqAA==
-Message-ID: <a1076669-f044-4a84-aa1c-478573bf3c64@kernel.org>
-Date: Tue, 15 Jul 2025 11:00:20 +0200
+	b=Kj0voNdk37BYd/tZUcOhqKAXQC9VqpiDgoEC1z3eJ8cB3kXgoQ3VlO4RUzn8lXQ0U
+	 XRDld5q6OAkXtEBkLiPKfpvvRfSzOHqroAiQbfRXfz98dZb7kJR6sKpJPRS0RZAURX
+	 vbF9bYuUKOxra6MIvNYJjYwC8tKPsILoIUoCXdsdC4ezY9sv/Qamh4GNgQdNJa86vU
+	 1X7KlZCEFLBtbwFq4kZa21tEl/jWM6JOtSEcZTTODFOHNKsEkvCQUuVKmEvmGXAQkt
+	 ISp/fMOf2lP/9nmvy0dig0OjLlAacd/UPu+JsgYGXD6r6s9Lc+DQLwzUYTCiPJP6sx
+	 osVYVckua9UwQ==
+Message-ID: <2903c507-7419-4097-8166-999746319a8e@kernel.org>
+Date: Tue, 15 Jul 2025 11:05:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/2] dt-bindings: ethernet: eswin: Document for EIC7700
- SoC
-To: =?UTF-8?B?6Z+m5bCa5aif?= <weishangjuan@eswincomputing.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, mcoquelin.stm32@gmail.com,
- alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk,
- yong.liang.choong@linux.intel.com, vladimir.oltean@nxp.com,
- jszhang@kernel.org, jan.petrous@oss.nxp.com,
- prabhakar.mahadev-lad.rj@bp.renesas.com, inochiama@gmail.com,
- boon.khai.ng@altera.com, dfustini@tenstorrent.com, 0x1207@gmail.com,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, ningyu@eswincomputing.com,
- linmin@eswincomputing.com, lizhi2@eswincomputing.com,
- pinkesh.vaghela@einfochips.com
-References: <20250703091808.1092-1-weishangjuan@eswincomputing.com>
- <20250703091947.1148-1-weishangjuan@eswincomputing.com>
- <9316adcb-4626-4ff8-a308-725c6ab34eba@kernel.org>
- <724b4f84.323b.1980d4b15c4.Coremail.weishangjuan@eswincomputing.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <724b4f84.323b.1980d4b15c4.Coremail.weishangjuan@eswincomputing.com>
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net 0/2] selftests: mptcp: connect: cover alt modes
+Content-Language: en-GB, fr-BE
+To: netdev@vger.kernel.org
+Cc: Florian Westphal <fw@strlen.de>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, stable@vger.kernel.org,
+ mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, Christoph Paasch <cpaasch@apple.com>,
+ Davide Caratti <dcaratti@redhat.com>
+References: <20250714-net-mptcp-sft-connect-alt-v1-0-bf1c5abbe575@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20250714-net-mptcp-sft-connect-alt-v1-0-bf1c5abbe575@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 15/07/2025 10:54, 韦尚娟 wrote:
->>> +
->>> +allOf:
->>> +  - $ref: snps,dwmac.yaml#
->>> +
->>> +properties:
->>> +  compatible:
->>> +    items:
->>> +      - const: eswin,eic7700-qos-eth
->>> +      - const: snps,dwmac-5.20
->>> +
->>> +  reg:
->>> +    minItems: 1
->>
->> Nope. Changelog does not explain that, it is not correct and no one ever
->> requested something like that. See also writing bindings about constraints.
+Hello,
+
+On 14/07/2025 17:52, Matthieu Baerts (NGI0) wrote:
+> mptcp_connect.sh can be executed manually with "-m <MODE>" and "-C" to
+> make sure everything works as expected when using "mmap" and "sendfile"
+> modes instead of "poll", and with the MPTCP checksum support.
 > 
-> I have reviewed the writing method from other YAML files in the source code, 
-> and they all use “reg: maxItems: 1 ” instead of “reg: minItems: 1”. So we also
-> need to use “reg: maxItems: 1 ” in our YAML file. Is this understanding correct?
-
-Yes, assuming you have here one entry.
-
+> These modes should be validated, but they are not when the selftests are
+> executed via the kselftest helpers. It means that most CIs validating
+> these selftests, like NIPA for the net development trees and LKFT for
+> the stable ones, are not covering these modes.
 > 
->>> +
->>> +  interrupt-names:
->>> +    const: macirq
->>> +
->>> +  interrupts:
->>> +    maxItems: 1
->>> +
->>> +  phy-mode:
->>> +    $ref: /schemas/types.yaml#/definitions/string
->>> +    enum:
->>> +      - rgmii
->>> +      - rgmii-rxid
->>> +      - rgmii-txid
->>> +      - rgmii-id
->>> +
->>> +  phy-handle:
->>> +    $ref: /schemas/types.yaml#/definitions/phandle
->>> +    description: Reference to the PHY device
->>> +
->>> +  clocks:
->>> +    minItems: 2
->>> +    maxItems: 2
->>> +
->>> +  clock-names:
->>> +    minItems: 2
->>> +    maxItems: 2
->>> +    contains:
->>> +      enum:
->>> +        - stmmaceth
->>> +        - tx
->>
->> Not much changed, nothing explained in the changelog in cover letter.
->>
-> 
-> For clocks and clock-names, other YAML files have no minItems
-> and maxItems. Remove minItems and maxItems from
-> clocks and clock-names and as we have fix 2 clocks. Add description in clocks:items. 
-> Ref yaml: sophgo,sg2044-dwmac.yaml, starfive,jh7110-dwmac.yaml
-> 
-> All the changes will be added in cover letter in the next version. Is this understanding correct?
+> To fix that, new test programs have been added, simply calling
+> mptcp_connect.sh with the right parameters.
 
-Yes.
+I just noticed these new tests print nested TAP output containing
+subtest results with the same content as the mptcp_connect.sh test. In
+other words, NIPA or other CIs will think the exact same tests are now
+executed 4 times, e.g.
 
-Best regards,
-Krzysztof
+  # ok 2 - mptcp_connect: ping tests # time=2887ms
+
+I will force new tests' prefixes to have different test names.
+
+pw-bot: cr
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
