@@ -1,173 +1,291 @@
-Return-Path: <netdev+bounces-207198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E07B6B062CD
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 17:24:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7380DB062F4
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 17:30:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A1F016B05B
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 15:22:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 116BE7AAE66
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 15:29:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47BFE235BEE;
-	Tue, 15 Jul 2025 15:22:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A273721858D;
+	Tue, 15 Jul 2025 15:30:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V2GBqhP4"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="NXpZNI/o"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11023075.outbound.protection.outlook.com [40.107.201.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E6E23ABB9
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 15:21:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752592921; cv=none; b=VBg1wxaEGwXa3XVX0XxHsIM/cV2frgyGZ/25nZUZS2QFDShE5LRGI8DiITTNkFnUk6Ngq/6Sd0p424FLCBUneVYtpTAedmN+8/vAGE7wESWoRq5hCFlUgiVuIUFb1e5Hcg/8RFjvMVCIrBXyiP+1FFVGpRsK23tnZiUGsCK7UT8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752592921; c=relaxed/simple;
-	bh=OA8jfvqB94WTqblc7B6TblgCAhJnB1BowDnSQb7RcJI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YoO5VPNzGt03ttCFTOGJZ+1wdjucP+rFNiIHDhog6RFq5gBVJA2E3G0B8w6ptCjVZZ6of6nGgmkw3AcRkee4bVO5DEWzcQ1wVBPuGvtljUEqK7y95fI6fOLvEKeKTYwXf03EkzHDyF7g65c5Gh/nbPXgoqcDL1E70rf8W7BghVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V2GBqhP4; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752592918;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7fI0v1yI+mRa3f2C1cjF3TQ6M2kT1SS2IwxcIibzixE=;
-	b=V2GBqhP4ZXTGis/HRDSF7tgWRnSetfYG/kNwxq7rCMgRi3g86TzgLc0P+RJIrHg/BcZdbc
-	Of0FndCjpkubHIlCkROgtjvybm5juhXojFKTd7ArgX1tVQdo6AJ0RIwIaOVCuDIAsnpsyd
-	Oy4P3/J6hS/cenfT2nVrckgX3T3QPrE=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-654-yxBq-AXtMquDcGFQ9WrWSg-1; Tue, 15 Jul 2025 11:21:57 -0400
-X-MC-Unique: yxBq-AXtMquDcGFQ9WrWSg-1
-X-Mimecast-MFC-AGG-ID: yxBq-AXtMquDcGFQ9WrWSg_1752592916
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-ae6c9aa2c93so491915566b.1
-        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 08:21:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752592916; x=1753197716;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7fI0v1yI+mRa3f2C1cjF3TQ6M2kT1SS2IwxcIibzixE=;
-        b=R3Qg1lfTBTsTPGan/EJ/491RITIZu63C4dPZ+Lumj/H+4f/jc8pcw6lz5hzL6yGaWA
-         UG4P1zXvzls+aoMb5KroqVCbOIfGzeVfSUb9xd1yntYOyA9pup2iZMCBGzBytcYOAXSR
-         WSce6g6mP9k4sv1iYxn17ggQYHm5oqCXCqW7VAjoXX2rHRStJ5qHhjJOQbz8vob0M9mv
-         uKedp8QuRdNRiL1czSCKw5YpAs7pv2kLy8JrcWuQL+D4BKcYexJ+edBl4Id/s8Zq3pFd
-         /43N3NIK1/6eOyLkwwHSkea5gGEY+6uKUir5Mo5y/l9gkTYcusZwCDJsZ+fCXDYoe97G
-         t/Cg==
-X-Forwarded-Encrypted: i=1; AJvYcCU/sIzSrCorf9AClrEW5PmB47WRGbXU2CB/Z2O17U3IrTjLzQO9L75QtPc+JDSxPG8OkseY0EE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyelNd5yo4kmGXQI8B1wPA/GWZfNmGv4aLey6b/DQMwvYWgtEtl
-	vRChvbjmGhEgA63KyKF/jypJD1iTF8lmGgmbwfObVwwzPSkghzVeS2rf8aZ32gNpRRnsdq6f0oW
-	iexYgaV+TjUU81rAm5SLnKq8EIc6kbOAAWpKZVWnJp638aRw8wUGnWsvqvKBAGi2sU03meERAco
-	YYb3qAW32CyvNGtkHwG0Xq9pdk0cppGesD
-X-Gm-Gg: ASbGncsbDPSuY92OnXEJd8P6tt7yGiPXdoA+SybeYkJJaC6JInG6dpEGqBxwu9BdE9V
-	RTpR6+Al/KYAJcbHOL08EIaEJMC0DO7DvkKyUPntG7hNUQT4c0RX0OmwoJpwM3Yes8YNQE3awTy
-	tsvHCs7GqqBKpIX8OqBB3hpA==
-X-Received: by 2002:a17:906:f59f:b0:ae3:5be2:d9e8 with SMTP id a640c23a62f3a-ae6fc6f5e4amr2016854566b.18.1752592915705;
-        Tue, 15 Jul 2025 08:21:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG04Q0/L7+tw1PxjEvUIsfEfnfanZh/MEfguoQzygMTmlyTx8BJASaAiyVGdXWILSHA5dGrH0aEap7oQDpZqQo=
-X-Received: by 2002:a17:906:f59f:b0:ae3:5be2:d9e8 with SMTP id
- a640c23a62f3a-ae6fc6f5e4amr2016851466b.18.1752592915292; Tue, 15 Jul 2025
- 08:21:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E88B685260;
+	Tue, 15 Jul 2025 15:30:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.75
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752593451; cv=fail; b=f6Pjn3JJWPgt5mZAf3w093vMzc0rugkf7pr6UPVLEIaXxw0Wv2N2nA7md7NtkFa+XKlqMOHoWCeN1nGsZnH63JKrPfDkbsn0nt8AlSngPAyjeZZLsFWPq9wFAHpdfMTqz3FPOh72U4D43z2oOFlUOT9raFXPw5WLGqC9Zel0Edc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752593451; c=relaxed/simple;
+	bh=2hLKj5f9rqAVWYAmU42kOXy+bFbFNAJwVO7/5PUyZf0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=VA8ptYLaTgPEMzLB0y/hZqGbrXyfFr93nSkHa+mKee+gZhgnyNR0LgGZaRqq96n1PP3k9boMH2cF+pJihxEklDsPNqfxp5K/hzZuq+fPVZ0rr01ym4WQYFAm0HlHzlwFlji/mstmq4YqAUouxDIvvUXr4PEfpVnwdXdltEd9EZk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=NXpZNI/o; arc=fail smtp.client-ip=40.107.201.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jJFZBU151MsbcY17qZZCQfdwRQ3KTa+koatAyyXuN4l7LW2DJaDBroh3d7Co0U8v7m7xZTukDpl2RNurpDDJYPc2NyziYPiGxyXEZLYE1gNop5LYqAZP3hSb2N9YGwes5hL7xAEIGR76CcSxnsolpounxWFizmjCBPwvTWuPtrnTJ6WA02xcVnxRgJAGM1/1LOjwev/I3lqFMs3dpdRhIblslfX8d8vm3r94t4Wi69h80FV2I3J3R5Qihqk2ZUuy5hRecbfN0tBkMe+fVf6ubvLleYeTiuqfJ/tG71NxLRmR3Mk3/j84P99NfK9m60Rf92fyj7E7c4ZZrTdoPCx7IQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=id+ypH+weyypGaxuH12kiJroedXXNLADsI80nq1+LMg=;
+ b=Cgt9yf8tTS9ugd/glhOc0oRXp8tWeaVcjKjD1t8kK+BaEx+olnKrvA8YS3GkxKjp2FR3QJ4Ux3QhYtsk8fc66glPcUhctFlaSzv6hobkF8XVuvlpVVKV3LZLEoppIylGRSixfniPosfdz2CpUBm7PbdUFD481BRnR0ZcyUIkwto+BMqpn7zVzAoWESF9BCZo6IQAAU9fkZ9xlB1hWU+VFBYk3dcE2R71Gyc0qT0uJhJTV3YtPILPXF1tirErpxmolCVui2Z023OkC1tNVKfLI795+N9Q7JUU3oa9OGpjIsWbeUelJE6iEzjk3xHgCV9NOgL5+DW24GbeId6I48pf7g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=id+ypH+weyypGaxuH12kiJroedXXNLADsI80nq1+LMg=;
+ b=NXpZNI/oaaJae6vT1yxQSVNG9Qg+3C0mXPz//lrhQp/0xgDyO7UFtOZAum/JNO1y7ECRwH8jkAnrBp/ryZ8Bo2DGrTkdl2DHOJX0adfolsR6ipkEbDwLnxjJC0/dyMQiNY85KjqvOEEMlB7HvRPpkrMde06D7NR4fIjnJtE9gtM=
+Received: from SN6PR2101MB0943.namprd21.prod.outlook.com (2603:10b6:805:f::12)
+ by DS4PR21MB4770.namprd21.prod.outlook.com (2603:10b6:8:2a4::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.12; Tue, 15 Jul
+ 2025 15:30:43 +0000
+Received: from SN6PR2101MB0943.namprd21.prod.outlook.com
+ ([fe80::c112:335:8240:6ecf]) by SN6PR2101MB0943.namprd21.prod.outlook.com
+ ([fe80::c112:335:8240:6ecf%5]) with mapi id 15.20.8964.004; Tue, 15 Jul 2025
+ 15:30:42 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: Simon Horman <horms@kernel.org>, Haiyang Zhang
+	<haiyangz@linux.microsoft.com>
+CC: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, KY Srinivasan
+	<kys@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui
+	<decui@microsoft.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"davem@davemloft.net" <davem@davemloft.net>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>, "cavery@redhat.com" <cavery@redhat.com>
+Subject: RE: [EXTERNAL] Re: [PATCH net,v2] hv_netvsc: Switch VF namespace in
+ netvsc_open instead
+Thread-Topic: [EXTERNAL] Re: [PATCH net,v2] hv_netvsc: Switch VF namespace in
+ netvsc_open instead
+Thread-Index: AQHb9N43knD0TGxECUCpKCAyzRddwbQzKJ+AgAAho6A=
+Date: Tue, 15 Jul 2025 15:30:42 +0000
+Message-ID:
+ <SN6PR2101MB0943A212F67D779BA97B7FC4CA57A@SN6PR2101MB0943.namprd21.prod.outlook.com>
+References: <1752511297-8817-1-git-send-email-haiyangz@linux.microsoft.com>
+ <20250715130547.GV721198@horms.kernel.org>
+In-Reply-To: <20250715130547.GV721198@horms.kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=85da4776-cebc-462c-96e1-d6d235ca4478;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-07-15T15:06:10Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
+ 3, 0, 1;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN6PR2101MB0943:EE_|DS4PR21MB4770:EE_
+x-ms-office365-filtering-correlation-id: a6e05867-27ad-423b-ee35-08ddc3b48fa5
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|366016|7416014|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?P8zSCIjDv20KB7p2sqZe+Of8fOgQsJ6Jzjg0SoNccmW0Ec+otMOF9F5iptAR?=
+ =?us-ascii?Q?nl6WgDjYgFJz861ZhBjvPWAnrzjjSqOnYhDrsNIWnr3LA3Dh3H7zIRJFKnWg?=
+ =?us-ascii?Q?rtf5qVZuK8NdgzFqKsqkjytssbN+ngLcZaAgHHweaY87R19lS+HzQNQTdxgK?=
+ =?us-ascii?Q?JYUzsXf8VnAu3zPusgnsPg93P0FBeqfO5UCYYAE7yaxFzDMoyGP+8dwMJ6js?=
+ =?us-ascii?Q?w045CJwBUFt6eHYj+sskGw9iZgdtuKiB6aVC1TxPsYIkA5cIqTL8d3wpOafc?=
+ =?us-ascii?Q?C1//u/YjxrwV0dMj6+rFy/f0HsDIuWLg8y1u0y3u1YVHxgH6xYWEBnWf38oL?=
+ =?us-ascii?Q?bxoobqbbZ73DpI7jdU+DR4iF14lqrnOw7XxEH5M+PF070dq3fWGd6815d/d2?=
+ =?us-ascii?Q?tB6WzsMnMxwPHD0yXzZ2WrPZ04d8z2OOobH+id7IDYtYxkeFYcz7HSIrHjID?=
+ =?us-ascii?Q?mvMEXAfoxhTRX7Mr88Cvoo5m6c4ss4CLauzyYv+DabcbZFIPJZtvy13Ni/6g?=
+ =?us-ascii?Q?XkUNO2xheyZkU0iFPOkSF7vPowGVWM5suFjNEQXfI8f6xwygHY7H/kdZOlUt?=
+ =?us-ascii?Q?7muJX1QOC5j+OSCoBKqJ/to9RL4/tyJOQEA3f4rq/Ywjkk9M25ZdMrrY8CUc?=
+ =?us-ascii?Q?xmvolwWpYdpB9OJo1EEj332F3O+h2R/LQwddhwBv1uZS7xqL9mGklvnTcCaf?=
+ =?us-ascii?Q?0T4ax6ziPgr+iFP0LFgWWlThRWBZR5owt8Cs4P4MuZmb6i/9u2UZ7TSwlVd+?=
+ =?us-ascii?Q?aD+Y0RMfujq/7qd0wLeVwpeTIjEMeAKzL6ax6I7gHjORwJQFQW3aqxoMi94q?=
+ =?us-ascii?Q?bM9hX0BP4UShplXWqOScEtzSVl7+whBHSfcDH78+YAq3ruHfPcN5c9I0eZrD?=
+ =?us-ascii?Q?xyeY6SArpbbOgKQGdx3G8RoBmmTYIIWRStLjNIcG7TQdBEYauSP7Z8aXvt0K?=
+ =?us-ascii?Q?FmKN+d0Z1sBGRZvjsS+LX74oaUE8yBscLR4qLAkjWiavSIKstA+KFyCXDtkg?=
+ =?us-ascii?Q?gCTKDQIiiUT8346HUQxuXRALnt7c5pS/oNMbiYxEtf7+N26CEklZcPyiPU7Z?=
+ =?us-ascii?Q?nkT0mKzEp0nSkrKhOTPENhYnNv6yibUGnQKr56ErFmLVwHFGNNWRl+e95Gg1?=
+ =?us-ascii?Q?UHfEsNAtk0ZmpdZ3pd+Ux14vbs0FG9WQxRo0uNPvjbEdGqlxzpYxbHrHaYWJ?=
+ =?us-ascii?Q?O+seGNuoHSY4dgKqyYnBdCa8ZneLmkTLy+0P703Nr8fLy3itN/f6vMmMNqv7?=
+ =?us-ascii?Q?lfay1gzfWr34Oxr9Wne+uHYVB7H3HWMT9rEX5Jqf/KQbCvMYbo11ySvurgZo?=
+ =?us-ascii?Q?+fQ6kffBs4VmnCUnbK/r6Ypw7erjcmJThGlT+Gvb3NuJ5Mf8qiSlvjRrMkpj?=
+ =?us-ascii?Q?+4s2rqDlqnmg2kQkVR90DWVTSROiMdvSR/m8L9/DWHg25FXq+sjzraibEdVC?=
+ =?us-ascii?Q?MCk32yCqjYgq6tsi7MggFaho72BS6WIeoQQMvDn9qXBCZhcRGiZfJA=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR2101MB0943.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(1800799024)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?lsizj1+Hquphj3l6MRSMg9/AbD6T+lJ4iYPGTCs4xoPWZuFwUNTnaWjkLP49?=
+ =?us-ascii?Q?HfHVQNpIHlwAYkKRNtdCVAmXfNH5N5oy2XQSZyuZhE4EroNAmyttm2wVJoP7?=
+ =?us-ascii?Q?qlhNJG7nuq5J+87O6tPMYt/9VmZIkKAkaLfETL0Xw/77U7K7Cpn48rf4gpqE?=
+ =?us-ascii?Q?4T6PToVI8aAo2ywwTAs7fqT5qOvyHn4BTFyVDstfH9CkNVXlIjR/lmSLfItL?=
+ =?us-ascii?Q?yigFRO9Co3Nk8Dy2O0dSnR98Ud6z0Ar5jl7ng9C6cxS+4wYvhu1or1yQAvhZ?=
+ =?us-ascii?Q?4tyFRTQnuzphHbvPOnHfKdEZUC4yYxBHejQVYW+hNRieCuC3cz2RGyP9kUr/?=
+ =?us-ascii?Q?y5E1u0N/HY2HJTlaLXHBw2NRPWHIhypcGn91hdpbJ6LY1GT0zL+HsajHYAll?=
+ =?us-ascii?Q?clTlkGAn60zmlzT6Z/z2BivifvXGeCZaLfxJzcPKa2Bl+gy1MzLT3kt8ol0I?=
+ =?us-ascii?Q?49xN3BCwVx9fIkDTuuz3nce0xk6rSL2rU4bGkWMmwAoOj8PXo9KUD+3EraXK?=
+ =?us-ascii?Q?Qv5SpCW8sSyHd4xdsJB32nwP8g1Dp/UnVuWBHajr22gbahfVa+OFhKHvVyhV?=
+ =?us-ascii?Q?p393WMDmhdPLeNUPctxyR2BmDhtzctGcN6pCPhjM4kQMroF3Au7oaZvNoWL9?=
+ =?us-ascii?Q?ft3NWWtAaeXWszT7j7ifMJx5fY3cinT4j4mnGXLz7CcIB/66llfI1L+Aqo9G?=
+ =?us-ascii?Q?kbp2N7i9xE0KrghmVo6g5mHMqBqxewcHkfsXtTyCil35KPOLJE15VXHCS9lo?=
+ =?us-ascii?Q?UOt+5doKSoTamYe14bnqO0biW22YrL1ol3PO9Z1O8I0zU+Dv7NItjbpqf1tl?=
+ =?us-ascii?Q?c9EmFu1oyifiGW2gnIh5mfMgoOLZSpbXJ5prP5SCt6XjYoQNZshy3OBH6TjP?=
+ =?us-ascii?Q?aBPWH2ttpx2NhQsur3T+WkQbLqEC/aovsiw0gKrborBOr1vqcxkseJqd72uk?=
+ =?us-ascii?Q?JH4KIsYc5Z1qFS3I5URSyOhAQDru2fz/RaL5Rf2jWJyVZdPvrAdw9DK8dChJ?=
+ =?us-ascii?Q?cnRERkUZdsgkSJlcC5q8p0t99allwbURwwmRkroWNlA78WAsL+860XfmAd1l?=
+ =?us-ascii?Q?xRhJ5KEAB/SsLbW1ghqdoJPjrsd1IwnhwC+nvfK+ffhH4w36KETUTP9I3G1v?=
+ =?us-ascii?Q?UlnB03RM8MAtWRswPe71SjBLInk9GjfWrmCEqnj/hnyQkWYQaQ5rxZOD/ZyA?=
+ =?us-ascii?Q?X8iB9f89brhQzj0HTve3M4MkTKcrsd6zY0n0ZuOe7lSnRDmxnriclhbhir/j?=
+ =?us-ascii?Q?cQQH5FpV/awFZ4xf5tuan9IJDfWjB7xla+yMfmKnDp1yVIAMAiETjnfuG0VU?=
+ =?us-ascii?Q?HL+c0hBLury0rJ5DMU8cZ3/pb1TFJAwQDVQfpuIdL9Kns/RX48UkbKmST4PN?=
+ =?us-ascii?Q?D5oCpPn7/XdR2x3Lja7Zs9ioxZBdlBeuJi/BvbiRdZj8yrhQ43EvDtT1Xb4D?=
+ =?us-ascii?Q?fMaxXQ+4WFIFVV5IkxCgJ/84XFaMHMK8KtX0FSYJtyykp1tDCCGfmWWIIAPe?=
+ =?us-ascii?Q?pB9mpxOReiaqj1ItmYQ77pxi+c+sYseee5z1fMH03Z2wa+sAS0AANNkHTS/e?=
+ =?us-ascii?Q?db7lmQBEBWEj2jgshlGKZK0afYnYN1O87Z0eOrpg?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250708144206.95091-1-minhquangbui99@gmail.com>
- <d808395d-2aad-47a3-a43a-cf2138d1d2b1@redhat.com> <CACGkMEs01gmjEa+WyWZ+MspuRBjGcj8N+4ZQs5XCp+rYqZqB6Q@mail.gmail.com>
-In-Reply-To: <CACGkMEs01gmjEa+WyWZ+MspuRBjGcj8N+4ZQs5XCp+rYqZqB6Q@mail.gmail.com>
-From: Lei Yang <leiyang@redhat.com>
-Date: Tue, 15 Jul 2025 23:21:16 +0800
-X-Gm-Features: Ac12FXz1YLuKyuuRFUqAPOMa3ysRrX3OPGeF3wFUvNM12KNl4C21Kk7IWP1rQN8
-Message-ID: <CAPpAL=wSKdNA_q=zSN4c+7dhj6D7bWxKBNo+9o8ZCvFpYp+5FA@mail.gmail.com>
-Subject: Re: [PATCH net v2] virtio-net: fix received length check in big packets
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Jason Wang <jasowang@redhat.com>, 
-	Gavin Li <gavinl@nvidia.com>, Gavi Teitz <gavi@nvidia.com>, Parav Pandit <parav@nvidia.com>, 
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR2101MB0943.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a6e05867-27ad-423b-ee35-08ddc3b48fa5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jul 2025 15:30:42.7394
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: QZTuroyULLxORE8L0dd/O5OO2wVVmccn+mEcWOUNgfS3fN4Kdsm1pmwA72DtNfNZfrR1KEzRDVBYufnHW4o20A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PR21MB4770
 
-Tested this patch with virtio-net regression tests, everything works fine.
 
-Tested-by: Lei Yang <leiyang@redhat.com>
 
-On Thu, Jul 10, 2025 at 6:44=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
-ote:
->
-> On Thu, Jul 10, 2025 at 5:57=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> w=
-rote:
+> -----Original Message-----
+> From: Simon Horman <horms@kernel.org>
+> Sent: Tuesday, July 15, 2025 9:06 AM
+> To: Haiyang Zhang <haiyangz@linux.microsoft.com>
+> Cc: linux-hyperv@vger.kernel.org; netdev@vger.kernel.org; Haiyang Zhang
+> <haiyangz@microsoft.com>; KY Srinivasan <kys@microsoft.com>;
+> wei.liu@kernel.org; Dexuan Cui <decui@microsoft.com>;
+> andrew+netdev@lunn.ch; edumazet@google.com; kuba@kernel.org;
+> pabeni@redhat.com; davem@davemloft.net; linux-kernel@vger.kernel.org;
+> stable@vger.kernel.org; cavery@redhat.com
+> Subject: [EXTERNAL] Re: [PATCH net,v2] hv_netvsc: Switch VF namespace in
+> netvsc_open instead
+>=20
+> On Mon, Jul 14, 2025 at 09:41:37AM -0700, Haiyang Zhang wrote:
+> > From: Haiyang Zhang <haiyangz@microsoft.com>
 > >
-> > On 7/8/25 4:42 PM, Bui Quang Minh wrote:
-> > > Since commit 4959aebba8c0 ("virtio-net: use mtu size as buffer length
-> > > for big packets"), the allocated size for big packets is not
-> > > MAX_SKB_FRAGS * PAGE_SIZE anymore but depends on negotiated MTU. The
-> > > number of allocated frags for big packets is stored in
-> > > vi->big_packets_num_skbfrags. This commit fixes the received length
-> > > check corresponding to that change. The current incorrect check can l=
-ead
-> > > to NULL page pointer dereference in the below while loop when erroneo=
-us
-> > > length is received.
-> > >
-> > > Fixes: 4959aebba8c0 ("virtio-net: use mtu size as buffer length for b=
-ig packets")
-> > > Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
-> > > ---
-> > > Changes in v2:
-> > > - Remove incorrect give_pages call
-> > > ---
-> > >  drivers/net/virtio_net.c | 9 ++++++---
-> > >  1 file changed, 6 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > index 5d674eb9a0f2..3a7f435c95ae 100644
-> > > --- a/drivers/net/virtio_net.c
-> > > +++ b/drivers/net/virtio_net.c
-> > > @@ -823,7 +823,7 @@ static struct sk_buff *page_to_skb(struct virtnet=
-_info *vi,
-> > >  {
-> > >       struct sk_buff *skb;
-> > >       struct virtio_net_common_hdr *hdr;
-> > > -     unsigned int copy, hdr_len, hdr_padded_len;
-> > > +     unsigned int copy, hdr_len, hdr_padded_len, max_remaining_len;
-> > >       struct page *page_to_free =3D NULL;
-> > >       int tailroom, shinfo_size;
-> > >       char *p, *hdr_p, *buf;
-> > > @@ -887,12 +887,15 @@ static struct sk_buff *page_to_skb(struct virtn=
-et_info *vi,
-> > >        * tries to receive more than is possible. This is usually
-> > >        * the case of a broken device.
-> > >        */
-> > > -     if (unlikely(len > MAX_SKB_FRAGS * PAGE_SIZE)) {
-> > > +     BUG_ON(offset >=3D PAGE_SIZE);
+> > The existing code move the VF NIC to new namespace when NETDEV_REGISTER
+> is
+> > received on netvsc NIC. During deletion of the namespace,
+> > default_device_exit_batch() >> default_device_exit_net() is called. Whe=
+n
+> > netvsc NIC is moved back and registered to the default namespace, it
+> > automatically brings VF NIC back to the default namespace. This will
+> cause
+> > the default_device_exit_net() >> for_each_netdev_safe loop unable to
+> detect
+> > the list end, and hit NULL ptr:
 > >
-> > Minor nit (not intended to block this patch): since you are touching
-> > this, you could consider replacing the BUG_ON() with a:
+> > [  231.449420] mana 7870:00:00.0 enP30832s1: Moved VF to namespace with=
+:
+> eth0
+> > [  231.449656] BUG: kernel NULL pointer dereference, address:
+> 0000000000000010
+> > [  231.450246] #PF: supervisor read access in kernel mode
+> > [  231.450579] #PF: error_code(0x0000) - not-present page
+> > [  231.450916] PGD 17b8a8067 P4D 0
+> > [  231.451163] Oops: Oops: 0000 [#1] SMP NOPTI
+> > [  231.451450] CPU: 82 UID: 0 PID: 1394 Comm: kworker/u768:1 Not tainte=
+d
+> 6.16.0-rc4+ #3 VOLUNTARY
+> > [  231.452042] Hardware name: Microsoft Corporation Virtual
+> Machine/Virtual Machine, BIOS Hyper-V UEFI Release v4.1 11/21/2024
+> > [  231.452692] Workqueue: netns cleanup_net
+> > [  231.452947] RIP: 0010:default_device_exit_batch+0x16c/0x3f0
+> > [  231.453326] Code: c0 0c f5 b3 e8 d5 db fe ff 48 85 c0 74 15 48 c7 c2
+> f8 fd ca b2 be 10 00 00 00 48 8d 7d c0 e8 7b 77 25 00 49 8b 86 28 01 00 0=
+0
+> <48> 8b 50 10 4c 8b 2a 4c 8d 62 f0 49 83 ed 10 4c 39 e0 0f 84 d6 00
+> > [  231.454294] RSP: 0018:ff75fc7c9bf9fd00 EFLAGS: 00010246
+> > [  231.454610] RAX: 0000000000000000 RBX: 0000000000000002 RCX:
+> 61c8864680b583eb
+> > [  231.455094] RDX: ff1fa9f71462d800 RSI: ff75fc7c9bf9fd38 RDI:
+> 0000000030766564
+> > [  231.455686] RBP: ff75fc7c9bf9fd78 R08: 0000000000000000 R09:
+> 0000000000000000
+> > [  231.456126] R10: 0000000000000001 R11: 0000000000000004 R12:
+> ff1fa9f70088e340
+> > [  231.456621] R13: ff1fa9f70088e340 R14: ffffffffb3f50c20 R15:
+> ff1fa9f7103e6340
+> > [  231.457161] FS:  0000000000000000(0000) GS:ff1faa6783a08000(0000)
+> knlGS:0000000000000000
+> > [  231.457707] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > [  231.458031] CR2: 0000000000000010 CR3: 0000000179ab2006 CR4:
+> 0000000000b73ef0
+> > [  231.458434] Call Trace:
+> > [  231.458600]  <TASK>
+> > [  231.458777]  ops_undo_list+0x100/0x220
+> > [  231.459015]  cleanup_net+0x1b8/0x300
+> > [  231.459285]  process_one_work+0x184/0x340
 > >
-> >  if (WARN_ON_ONCE()) <goto error path>.
->
-> I'm not sure I get this, but using BUG_ON() can help to prevent bugs
-> from being explored.
->
-> Thanks
->
+> > To fix it, move the VF namespace switching code from the NETDEV_REGISTE=
+R
+> > event handler to netvsc_open().
 > >
-> > /P
-> >
->
->
+> > Cc: stable@vger.kernel.org
+> > Cc: cavery@redhat.com
+> > Fixes: 4c262801ea60 ("hv_netvsc: Fix VF namespace also in synthetic NIC
+> NETDEV_REGISTER event")
+> > Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
+>=20
+> With this change do we go back to the situation that existed prior
+> to the cited patch? Quoting the cited commit:
+>=20
+>     The existing code moves VF to the same namespace as the synthetic NIC
+>     during netvsc_register_vf(). But, if the synthetic device is moved to
+> a
+>     new namespace after the VF registration, the VF won't be moved
+> together.
+>=20
+> Or perhaps not because if synthetic device is moved then, in practice, it
+> will subsequently be reopened? (Because it is closed as part of the move
+> to a different netns?)
+
+There are two cases:
+1) the synthetic device is moved to a new namespace before the VF device is=
+=20
+offered from PCI:
+During netvsc_register_vf() >> dev_change_net_namespace() will put VF to=20
+the same namespace.
+
+2) the synthetic device is moved to a new namespace after the VF device is=
+=20
+offered from PCI:
+The commit 4c262801ea60 does the move in netvsc_event_set_vf_ns >> dev_chan=
+ge_net_namespace().
+But it will cause Null ptr error during namespace deletion >> default_devic=
+e_exit_net().
+
+This patch keeps the code path (1) unchanged, and fix the code path (2).
+And yes, __dev_change_net_namespace() >> netif_close(dev), so in the new=20
+namespace the NIC always needs to be re-opened before using.
+
+Thanks,
+- Haiyang
 
 
