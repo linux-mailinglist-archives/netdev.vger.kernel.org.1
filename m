@@ -1,108 +1,145 @@
-Return-Path: <netdev+bounces-206990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48D68B05137
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 07:49:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EA35B05159
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 07:57:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 982354A6555
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 05:49:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A88181AA3461
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 05:57:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2ADB263F3C;
-	Tue, 15 Jul 2025 05:49:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A75B2D3229;
+	Tue, 15 Jul 2025 05:57:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KKWLQJOG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jJ0kddfR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6232C12DDA1
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 05:49:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0135255F24;
+	Tue, 15 Jul 2025 05:57:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752558554; cv=none; b=IQJ4YEvzWuiHqgRQbx4i+ZWOxC2igvCMNnGDh/PZmpHnniTzVkmvY0lwXokbBbp66n/FIFLYEcR65/kxcRCB8Xs2Bos59zxwP3OlBJariCpNt4KqkJZCUzaYXcRUxDeSLClu8ze3UO+PiLGilnB1v9ZEyYKSUpWh93oD7MevdJI=
+	t=1752559032; cv=none; b=H/oRjwtXmXAJvia2cdLs9Ogn9n7mnBOXx/hLTkV5e5KArztjHqE9nqBF40C1pfw9xS6tS7BalVsXh2uWoG9bJCul/VkPC3tWL/dAaExUMSZPe9EfBSAl/0A3JtakHhPndiB+PWiteG9TSGVIvLCKADOin+Gd8jj0ghB6fmRbm0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752558554; c=relaxed/simple;
-	bh=kFBYaHi99g+zJqrDSAM4z24Bb53x4OJTfWRHfSVAYqk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r2Bnw7Zb32LFXpO61bs6SxHPKVfjAYQI/Y/zQ41zhkmgFDdDYOH2EQ7jxvIMM5SEAFEwuvGhA4iHcC2sIvfOUek8zO95xNddsMgxfMZdQL/XhzHFs8guQ5Zkwkx8m+zqOvDXT8Kepfv7YsUecGmB7Kg/v8WBFaRo2hsV8pNbw08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KKWLQJOG; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-23c8a5053c2so49192335ad.1
-        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 22:49:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752558552; x=1753163352; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kFBYaHi99g+zJqrDSAM4z24Bb53x4OJTfWRHfSVAYqk=;
-        b=KKWLQJOGmSLjtT6M7N+YlsngrHL34OopUrpWR7m49b6uZyMYLto2Al5nnvakfGT7Dl
-         pJ+hjWwscKoBlsptTgYLiyOoItdDn+MGdwmb/A2RX9+DLqrx7UHyXRabbcnEdY2ykKsB
-         ax1O0/0N1a1Wz+ju5jHJ5/Mv6ASyzfGMUAcOAfHAfvml9O1XYoNPtfdU0zijJ6Dep26W
-         HBb8KcOgtsxwdy5bC7DTV/wPmPAwK3q2gO2pGyrqxPg72Lm5OjCudqP1AJ5J/Sw9u9yt
-         WNEUKjee97LlxwLp3jHDs9jZE7Oj/RYc25z1W2+5RLSBpxIaaW1ZlTY9BWbMl46jIYwg
-         Z7Sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752558552; x=1753163352;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kFBYaHi99g+zJqrDSAM4z24Bb53x4OJTfWRHfSVAYqk=;
-        b=iRpfb9Tv4EwsXOOXfe7d26mQfyBpys/3ww5HToO5/X3DbBy7I4a4qqJ14It0nt/k8r
-         YAuGCMdVEOx+oMdX4/shn7x+SQfHk+D7BWfZSheEEkcY5r/vsYAPuX8H6AuKxX2UoYWJ
-         e+TpEpUe07Yx1tE9j6rKAuMxEVEot1mV+ER+s/Dri05hO1slG+svs/KuhYaLPM14CAN2
-         eqWixgHeZNGv9bxmUlaOvYK/sUTs87m1ZOjTycxw57BWF56uDz+kTi8FZAZMjTxoKZTr
-         QkpSR1gk/aVH2+u+L52iOf4DSmpeYc/wEur4EgPYxPbsq4Ms79e7KymqwKYMGJ9MaWUN
-         KtnQ==
-X-Gm-Message-State: AOJu0Yw/DSEhchtCxVnhsXEjHa4t3rPJ70bZKSLw3DsERxQF3QALCvfN
-	CSCZwiC3mPQSMxy9u/1E/xH5McNxX4RWTEx0MSg6LnHRzD8TyumpSiLEdqg5weUhrlOwS/JAtDQ
-	9XlNm/T1rPL0wIeDnTjXzFUQW3iB7foR7IO9Q
-X-Gm-Gg: ASbGncudoznthffpHtCk8KxQzrMVxLtGG5Ev6RxGiLbJF10Nhr47c3maRT2VoI0rau0
-	4YuAtr633FCSo2rsxHwxWb+dLp94YOvCVN0hqANqAtbWasFQWctHpl6cvP3285eNLZb7rVSwVYu
-	DC1qwSkv/2gpaxcJp4a2awEOMH97F3IGCG6SKpBA5JRY+gVhKkXOI+DyuoKI545CXyqGzfpsoZU
-	3I9l1m6
-X-Google-Smtp-Source: AGHT+IE00O9FqGGIu6PazW7EAC8qPfOWWwWnPJhYl9t5dEnEIs9jwyWTpbI+j0yTbAFYN4OUEu1lH5F2cpH97xvdb0M=
-X-Received: by 2002:a17:902:cf0d:b0:22e:72fe:5f9c with SMTP id
- d9443c01a7336-23df0943513mr195288025ad.42.1752558552536; Mon, 14 Jul 2025
- 22:49:12 -0700 (PDT)
+	s=arc-20240116; t=1752559032; c=relaxed/simple;
+	bh=wmvN79kkI2uY89k/rrcdVS6059/8dQL8TezMZWnf+rM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UuwIH4MM45hCUNMHgWeG49I8VJJPNO+tDblhdMsyAS6SLXsvums274nez4bdkmBpRHmgcQVvy+dcvx/U8TpauUDIrGNZH5I666NUa6m4PMYmWs+EuE6gjCwhU9KOTjL1dqgjLfgt2v/lRyFze5eGQvRWAwEOexHm9oLHVTKbEs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jJ0kddfR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8964C4CEE3;
+	Tue, 15 Jul 2025 05:57:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752559031;
+	bh=wmvN79kkI2uY89k/rrcdVS6059/8dQL8TezMZWnf+rM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jJ0kddfRq/wi2cczPvscCBtaQBOvPPubaZPv3FhypEw+5UKK0WhctGzJqakUE47mj
+	 0hgvMUtevpezIfVJrccsqdtSYPd2sjN0nRb9tN0vghFJ+c05Vt5+gWGqNDdNJk7p6H
+	 Sh8oWOAYHvlvgAcM5ZwOV2KbvC/4LCYKyIt/WgUJb5b0ER0EaKLDgyQwMcQxcdZpWG
+	 yRZoRdLWkXFBN0aAu91ZYkfbMxd4cRB9BrlHetz/bw9JgY4rGuKT9x+znMMEXCi7ry
+	 xSs/2RLQ/Ed9IUoMZM+nwW7VQ7Wh00EVvhINdsIUSq31XrazAB7+UGLadWmjzYO5wH
+	 BcbPsbS4HX8Vw==
+Date: Tue, 15 Jul 2025 08:57:07 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org, llvm@lists.linux.dev,
+	Ingo Molnar <mingo@redhat.com>, Bill Wendling <morbo@google.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Arnd Bergmann <arnd@arndb.de>, linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Mark Rutland <mark.rutland@arm.com>,
+	Michael Guralnik <michaelgur@mellanox.com>, patches@lists.linux.dev,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Jijie Shao <shaojijie@huawei.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v3 6/6] IB/mlx5: Use __iowrite64_copy() for write
+ combining stores
+Message-ID: <20250715055707.GC5882@unreal>
+References: <0-v3-1893cd8b9369+1925-mlx5_arm_wc_jgg@nvidia.com>
+ <6-v3-1893cd8b9369+1925-mlx5_arm_wc_jgg@nvidia.com>
+ <20250714215504.GA2083014@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250708081516.53048-1-krikku@gmail.com> <38cb3493-1b13-4b8a-b84c-81a6845d876f@redhat.com>
- <CACLgkEah6FthfCg0CX3GrJxE2Tpuqiwdfw7gHvyQKECfOYKE3g@mail.gmail.com>
-In-Reply-To: <CACLgkEah6FthfCg0CX3GrJxE2Tpuqiwdfw7gHvyQKECfOYKE3g@mail.gmail.com>
-From: Krishna Kumar <krikku@gmail.com>
-Date: Tue, 15 Jul 2025 11:18:35 +0530
-X-Gm-Features: Ac12FXyySNecCxXP4IeZQPPzweH3vU1Fb0qOtHqBUFGojN_XV4TW7J9sjnaLjAw
-Message-ID: <CACLgkEYao_RjVEVgcEqwZPBmmFC+5Y=Lu7VE4Wv=WhDGEhbftQ@mail.gmail.com>
-Subject: Re: [PATCH] net: Fix RPS table slot collision overwriting flow
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	tom@herbertland.com, bhutchings@solarflare.com, kuba@kernel.org, 
-	horms@kernel.org, sdf@fomichev.me, kuniyu@google.com, ahmed.zaki@intel.com, 
-	aleksander.lobakin@intel.com, atenart@kernel.org, jdamato@fastly.com, 
-	krishna.ku@flipkart.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250714215504.GA2083014@nvidia.com>
 
-On Sun, Jul 13, 2025 at 5:14=E2=80=AFPM Krishna Kumar <krikku@gmail.com> wr=
-ote:
+On Mon, Jul 14, 2025 at 06:55:04PM -0300, Jason Gunthorpe wrote:
+> On Thu, Apr 11, 2024 at 01:46:19PM -0300, Jason Gunthorpe wrote:
+> > mlx5 has a built in self-test at driver startup to evaluate if the
+> > platform supports write combining to generate a 64 byte PCIe TLP or
+> > not. This has proven necessary because a lot of common scenarios end up
+> > with broken write combining (especially inside virtual machines) and there
+> > is other way to learn this information.
+> > 
+> > This self test has been consistently failing on new ARM64 CPU
+> > designs (specifically with NVIDIA Grace's implementation of Neoverse
+> > V2). The C loop around writeq() generates some pretty terrible ARM64
+> > assembly, but historically this has worked on a lot of existing ARM64 CPUs
+> > till now.
+> > 
+> > We see it succeed about 1 time in 10,000 on the worst effected
+> > systems. The CPU architects speculate that the load instructions
+> > interspersed with the stores makes the WC buffers statistically flush too
+> > often and thus the generation of large TLPs becomes infrequent. This makes
+> > the boot up test unreliable in that it indicates no write-combining,
+> > however userspace would be fine since it uses a ST4 instruction.
+> 
+> Hi Catalin,
+> 
+> After a year of testing this in real systems it turns out that still
+> some systems are not good enough with the unrolled 8 byte store loop.
+> In my view the CPUs are quite bad here and this WC performance
+> optimization is not working very well.
+> 
+> There are only two more options to work around this issue, use the
+> unrolled 16 byte STP or the single Neon instruction 64 byte store.
+> 
+> Since STP was rejected alread we've only tested the Neon version. It
+> does make a huge improvement, but it still somehow fails to combine
+> rarely sometimes. The CPU is really bad at this :(
+> 
+> So we want to make mlx5 use the single 64 byte neon store instruction
+> like userspace has been using for a long time for this testing
+> algorithm.
+> 
+> It is simple enough, but the question has come up where to put the
+> code.  Do you want to somehow see the neon option to be in the
+> arch/arm64 code or should we stick it in the driver under a #ifdef?
+> 
+> The entry/exit from neon is slow enough I don't think any driver doing
+> performance work would want to use neon instead of __iowrite64_copy(),
+> so I do not think it should be hidden inside __iowrite64_copy(). Nor
+> have I thought of a name for an arch generic function..
 
-> Thanks for your review comments. I felt the patch was preventing an
-> unintended behavior (repeated reprogramming, early flow expiration)
-> that disrupts aRFS functionality, and is more appropriate for the 'net'
-> tree? If that is not the case, I will test and recreate against net-next.
+__iowrite64_slow_copy() ????
 
-Grok suggests these are to be considered enhancement patches and not
-bug fixes - same as what was suggested by Paolo. I am closing this and
-resending as two separate patches against net-next.
-
-Thanks,
-- Krishna
+> 
+> Thanks,
+> Jason
 
