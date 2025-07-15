@@ -1,131 +1,106 @@
-Return-Path: <netdev+bounces-207149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21DC8B0602A
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 16:13:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66B6AB05F7D
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 16:06:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49BC91C24A56
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 14:04:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AFB9166EC5
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:58:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B83BC2EBDD0;
-	Tue, 15 Jul 2025 13:53:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA6A42E9725;
+	Tue, 15 Jul 2025 13:47:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="o+xt6hlu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tu+DwCab"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A4852EBBA2;
-	Tue, 15 Jul 2025 13:53:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77C532E92CF;
+	Tue, 15 Jul 2025 13:47:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752587607; cv=none; b=WhvSJHCJXfr1NQkHPL6B/RpmdXyuVHZygVo17+nHuhnv7lDR48yjPblOUNnM1e+q+P8Gzs91doGcIf6yIIcY0pNPrhLCgRDo9EG681WZSt+evUuZBu8S5HhmRmWO4UZ5T+e5z9GfcWWONFbm2GiTf7tGmSEflpqTKI54Q78AS3Q=
+	t=1752587267; cv=none; b=Wzuncy0abVSvaznLV/gnNxseduJ5vUFLdndvDjGc1FQtQujSZnlgXhKBPJgZcwsW8PPL4yT8ulE3IEEn4SNIR08RyAI/G2TO+pR3HcWhz6oRUyLMwchDrUZWThEowXuWuVLb/aAekI6KiI9kpcmiGNGFfB+0OLh2tukeQbJFIjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752587607; c=relaxed/simple;
-	bh=2WPMFMyikH/G6/16u51IVbRdVX9Mzx6gAQHNVq6vYjo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=U/CKbQ4xU6q4fcfm9FPxNRn3owQoJpoD0Oj1kYqJLQwatoX0IFWr2cr0Z8BsF88a00CrbDQuqwOr0e4ZTlY4JY8rqYR7WXUT7SukQNvZrka32NCSrIwJ+D4vRyDZrgKkTxgWBD+akXJR32i73OupXlc85fM95QKVljHSwLpfHn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=o+xt6hlu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA20AC4CEE3;
-	Tue, 15 Jul 2025 13:53:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1752587607;
-	bh=2WPMFMyikH/G6/16u51IVbRdVX9Mzx6gAQHNVq6vYjo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=o+xt6hlu2zvPTa/1Izyq1xRBoA6dJZy7gjp381ieNBYWR8qVWU0GKwfqirmiYwNJa
-	 hk/ygK+Eb+/0BtgBhAPRzCBz5CjWuqlFyy+N9ak0zCz19EgLN6dkRU4NWDg8/PD1j+
-	 ugOAw7jlUhpGhFmMROy9eRAmG8W0lovavcF1Fn8Q=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	stable <stable@kernel.org>,
-	HarshaVardhana S A <harshavardhana.sa@broadcom.com>
-Subject: [PATCH 5.10 076/208] vsock/vmci: Clear the vmci transport packet properly when initializing it
-Date: Tue, 15 Jul 2025 15:13:05 +0200
-Message-ID: <20250715130813.988873492@linuxfoundation.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250715130810.830580412@linuxfoundation.org>
-References: <20250715130810.830580412@linuxfoundation.org>
-User-Agent: quilt/0.68
-X-stable: review
-X-Patchwork-Hint: ignore
+	s=arc-20240116; t=1752587267; c=relaxed/simple;
+	bh=XRdi2rYpWozWFUyNpKRyQIlIgW0ex9Y+h8idTQDCjmE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CVdGBDHEr0dcPBUE24Vge3kZ12dKvDlPpBN9toLX6z4VAi8+/Av/yBH+v+7u9vum4lVj+AIvzxL0+kCpo0tVSr0I8D5YGdhANh1NYYqcEeXudGSKFJUrU/MtqPZi43cRvExA0nEru66i2I44+Fktof4GxPxUjZM//yExm9jfaVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tu+DwCab; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AAB9C4CEE3;
+	Tue, 15 Jul 2025 13:47:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752587266;
+	bh=XRdi2rYpWozWFUyNpKRyQIlIgW0ex9Y+h8idTQDCjmE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Tu+DwCab5+deHPy3s6INOdZMdPIW1N9NkH+bYpL0aKue8oLK+DKa+1ktykwln0eQx
+	 jj/348mIAJpMTyLKsVKMLG8Vzu0V+y3nvmni875mlBT3vBBwPdPBazpVw9XcbcG2X8
+	 LwrvghvFMkftpg3fiSn9eu76XGZEhFrZGTASUo24YhRr4PJ2dt9azWWcBln00dfzCx
+	 U9sPbGpKS/lW6Lb488yHauZwTMaPAOIePhS3aGG7dcc0IX1/9FNYUWe8o1AwNJLh5J
+	 4iZemKyZAw7nOTvI7GnbI9veQUsKEoBt8rFjBLSKU17i1EAdik7luBrIFM/ykkpphu
+	 pYTcQQlJuFmbA==
+Date: Tue, 15 Jul 2025 14:47:40 +0100
+From: Simon Horman <horms@kernel.org>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	shuah@kernel.org, cratiu@nvidia.com, noren@nvidia.com,
+	cjubran@nvidia.com, mbloch@nvidia.com, jdamato@fastly.com,
+	gal@nvidia.com, sdf@fomichev.me, ast@kernel.org,
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+	nathan@kernel.org, nick.desaulniers+lkml@gmail.com,
+	morbo@google.com, justinstitt@google.com, bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next V4 1/5] net: netdevsim: hook in XDP handling
+Message-ID: <20250715134740.GA1341824@horms.kernel.org>
+References: <20250714210352.1115230-1-mohsin.bashr@gmail.com>
+ <20250714210352.1115230-2-mohsin.bashr@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250714210352.1115230-2-mohsin.bashr@gmail.com>
 
-5.10-stable review patch.  If anyone has any objections, please let me know.
+On Mon, Jul 14, 2025 at 02:03:48PM -0700, Mohsin Bashir wrote:
+> From: Jakub Kicinski <kuba@kernel.org>
+> 
+> Add basic XDP support by hooking in do_xdp_generic().
+> This should be enough to validate most basic XDP tests.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
+> ---
+>  drivers/net/netdevsim/netdev.c | 19 ++++++++++++++++++-
+>  1 file changed, 18 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+> index f316e44130f7..ab2cdbf968a7 100644
+> --- a/drivers/net/netdevsim/netdev.c
+> +++ b/drivers/net/netdevsim/netdev.c
+> @@ -332,15 +332,32 @@ static int nsim_get_iflink(const struct net_device *dev)
+>  static int nsim_rcv(struct nsim_rq *rq, int budget)
+>  {
+>  	struct net_device *dev = rq->napi.dev;
+> +	struct bpf_prog *xdp_prog;
+> +	struct netdevsim *ns;
+>  	struct sk_buff *skb;
+>  	unsigned int skblen;
+>  	int i, ret;
+>  
+> +	ns = netdev_priv(dev);
+> +	xdp_prog = rcu_dereference(ns->xdp.prog);
 
-------------------
+I'm somewhat confused by this because ns->xdp.prog doesn't appear to be
+protected by RCU.
 
-From: HarshaVardhana S A <harshavardhana.sa@broadcom.com>
+Flagged by Sparse.
 
-commit 223e2288f4b8c262a864e2c03964ffac91744cd5 upstream.
-
-In vmci_transport_packet_init memset the vmci_transport_packet before
-populating the fields to avoid any uninitialised data being left in the
-structure.
-
-Cc: Bryan Tan <bryan-bt.tan@broadcom.com>
-Cc: Vishnu Dasa <vishnu.dasa@broadcom.com>
-Cc: Broadcom internal kernel review list
-Cc: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: virtualization@lists.linux.dev
-Cc: netdev@vger.kernel.org
-Cc: stable <stable@kernel.org>
-Signed-off-by: HarshaVardhana S A <harshavardhana.sa@broadcom.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Fixes: d021c344051a ("VSOCK: Introduce VM Sockets")
-Acked-by: Stefano Garzarella <sgarzare@redhat.com>
-Link: https://patch.msgid.link/20250701122254.2397440-1-gregkh@linuxfoundation.org
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- net/vmw_vsock/vmci_transport.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
---- a/net/vmw_vsock/vmci_transport.c
-+++ b/net/vmw_vsock/vmci_transport.c
-@@ -119,6 +119,8 @@ vmci_transport_packet_init(struct vmci_t
- 			   u16 proto,
- 			   struct vmci_handle handle)
- {
-+	memset(pkt, 0, sizeof(*pkt));
-+
- 	/* We register the stream control handler as an any cid handle so we
- 	 * must always send from a source address of VMADDR_CID_ANY
- 	 */
-@@ -131,8 +133,6 @@ vmci_transport_packet_init(struct vmci_t
- 	pkt->type = type;
- 	pkt->src_port = src->svm_port;
- 	pkt->dst_port = dst->svm_port;
--	memset(&pkt->proto, 0, sizeof(pkt->proto));
--	memset(&pkt->_reserved2, 0, sizeof(pkt->_reserved2));
- 
- 	switch (pkt->type) {
- 	case VMCI_TRANSPORT_PACKET_TYPE_INVALID:
-
-
+-- 
+pw-bot: changes-requested
 
