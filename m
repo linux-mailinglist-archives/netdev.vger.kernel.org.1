@@ -1,96 +1,125 @@
-Return-Path: <netdev+bounces-207289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E74AB069BE
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 01:09:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52DBDB069C7
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 01:15:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D1D07AC011
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 23:08:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A82594A7B45
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 23:15:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0F082D46C7;
-	Tue, 15 Jul 2025 23:09:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B77F22264D5;
+	Tue, 15 Jul 2025 23:15:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GJA48c6A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ggLvj/Zh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA14D2D3A98;
-	Tue, 15 Jul 2025 23:09:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 882641C4A24;
+	Tue, 15 Jul 2025 23:15:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752620988; cv=none; b=KWKVnvhpV/MwGcPd8UoykAivOnrr1iD6RB5k/KMGYVdH2dhue1Wu/s+zp2isvM9rY2XOflMl900jJpp/lubQffMel9wxfr1OYfnSI+pJgXRCBbGnCtS9RGgfYAKCocSr8i2M1oUqvy7gVZvbOy/orsnjTFYFdafixz8BmonEaFg=
+	t=1752621349; cv=none; b=G2747kdCp/zrk2wB1RN2+VTbaMpxVtIqBQA/51GIQfX90Hv58PGWuVj+Wzhfcq2h3kLU5XI3sC64xvaO3HUxZqQ1Gs+xyzBxhvc1ZEhpBwn3Ms8DQmtw0hbFcQ60IeBIseY9GvR0Ws7MBcESVXez0tRSHn6g0Tle2md7hEk1K7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752620988; c=relaxed/simple;
-	bh=YOmnXgvM5vzlC1lpAL+tZsqNx97efp40hWXPIu9CvcU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ruHZvxocOe0PGe3d6L5yqvxLbai1VSLvgn6KOlkvxQRPMWqIlY/r3JSOgGOetqv9V3rkBHC9RlW8YNcwYGbpSf0Xy6Bo1Ww//RGsQPmc50Qw/R4RAFxqrSlRtHONPngKWjRgrHLeQjBk02J71HN6bM+bTZcyXjpULlyGSFM2/po=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GJA48c6A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B0F0C4CEF7;
-	Tue, 15 Jul 2025 23:09:48 +0000 (UTC)
+	s=arc-20240116; t=1752621349; c=relaxed/simple;
+	bh=/dCGa5H4AelaG2ZkyOmjOIG3ouvsTLqq2o32O6e/pE4=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=SNUnrgNgNdjFz93hGKBVTAHgJPZvi028I/hIk8ea2/cfAX07oPCo0pZ63VX2dRwq7bncIXLAwMcqjbm03/yPKtnJYmpYjgWEuK8KWF/Mqrzuql5aJd58NqIhOL6PCRyiFeL4xYl/TrNR1Xc1LGQX2Qr7pgIfdAHhnOeCODkdoVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ggLvj/Zh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEA1FC4CEE3;
+	Tue, 15 Jul 2025 23:15:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752620988;
-	bh=YOmnXgvM5vzlC1lpAL+tZsqNx97efp40hWXPIu9CvcU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GJA48c6A0td2OYMqxzln6V5/ObGmg0pk4PTEMKOcV4vyWHifqpHwk9wCgJv1ayT+k
-	 VKJWtv/h01OgBXr5Th9sGbITc2F1q8OoCCOl+TLSGy1dpxpVQGM8mG5Do0Tqp/8HGy
-	 vG2GsN/CEnWuvP4rxGpuvAMRjqESOAbt136t9Xf7GwGoRDjz2wCbvOKNaN7xCw1AwL
-	 0SLklElIRb2042CB2p3FNVlARkthr1uP0/Mk8UNUtJ2drg7IWfRhKoxA8HIJc1ukzl
-	 INFWwW5ThLq3SXlnakIMMjV8t30dKGYsVX/tBT2TfjL4kYpc0Z4loHXxahJ9zoY82c
-	 AwbHsFVz+v5NA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 1FCC8383BA30;
-	Tue, 15 Jul 2025 23:10:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1752621349;
+	bh=/dCGa5H4AelaG2ZkyOmjOIG3ouvsTLqq2o32O6e/pE4=;
+	h=From:Date:Subject:To:Cc:From;
+	b=ggLvj/ZhFnutu1dLxVmY5OZDKI9B8R17r2osh4kwYQBdvcN/M+KqKuqSaKk87Qizn
+	 gY4M3O4EeUPWfu04dX2uCTYB8Hac3nu54liiFeq02gkTkDx7Pqsag9MG4Ux/13DTvT
+	 fKsgQgVEoEda3AyXkfLaNZzj6Fxc0yOfYfJ3dxQ7ctOYxIcxxWYrgp2DeSOqxpytNT
+	 YiBFDUcoYIV2N7XbmfNygVAmMWSNS/1R55PC9siF7onx3UTXfZyzEkRo6Ztp5MSdQd
+	 SEF/QNcnGm1VvQ4nd0UHhvIoSoNBj205O6mXI2Rjb/fR++qUGocm1k0xGJYvF+3mdM
+	 HCCaVdtwFo+4A==
+From: Nathan Chancellor <nathan@kernel.org>
+Date: Tue, 15 Jul 2025 16:15:40 -0700
+Subject: [PATCH net] phonet/pep: Move call to pn_skb_get_dst_sockaddr()
+ earlier in pep_sock_accept()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] usb: net: sierra: check for no status endpoint
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175262100900.609531.18066112974576940495.git-patchwork-notify@kernel.org>
-Date: Tue, 15 Jul 2025 23:10:09 +0000
-References: <20250714111326.258378-1-oneukum@suse.com>
-In-Reply-To: <20250714111326.258378-1-oneukum@suse.com>
-To: Oliver Neukum <oneukum@suse.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org, syzbot+3f89ec3d1d0842e95d50@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250715-net-phonet-fix-uninit-const-pointer-v1-1-8efd1bd188b3@kernel.org>
+X-B4-Tracking: v=1; b=H4sIABvhdmgC/x2NTQqDMBCFryKzdiATtJZepbhQOzGzmUiSiiDe3
+ WlXj+/xfk4onIULvJoTMu9SJKkBtQ0scdKVUT7G4J3v3UA9KlfcYvpJkAO/KioVl6TF/CRaOeO
+ jC46efiZiAlvaMlv2//IGa8J4XTdLsBqFegAAAA==
+X-Change-ID: 20250715-net-phonet-fix-uninit-const-pointer-64f0182b11e1
+To: Remi Denis-Courmont <courmisch@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+ netdev@vger.kernel.org, llvm@lists.linux.dev, patches@lists.linux.dev, 
+ stable@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>
+X-Mailer: b4 0.15-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1958; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=/dCGa5H4AelaG2ZkyOmjOIG3ouvsTLqq2o32O6e/pE4=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDBllD5VmbO6UYWt6FVlU9/ulb2lZe4azElfB3SOmJa8ML
+ actja3rKGVhEONikBVTZKl+rHrc0HDOWcYbpybBzGFlAhnCwMUpABPp/Mrwv+isZKrqs8gdqmlf
+ VG62Sh9+Lmrf6rlHurqmjKtGkytiP8M/W82Hj79+v/zt8x9fBUvZ9R/X2aXMr+V1bXFvKe8QY5v
+ KBgA=
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-Hello:
+A new warning in clang [1] points out a place in pep_sock_accept() where
+dst is uninitialized then passed as a const pointer to pep_find_pipe():
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+  net/phonet/pep.c:829:37: error: variable 'dst' is uninitialized when passed as a const pointer argument here [-Werror,-Wuninitialized-const-pointer]
+    829 |         newsk = pep_find_pipe(&pn->hlist, &dst, pipe_handle);
+        |                                            ^~~:
 
-On Mon, 14 Jul 2025 13:12:56 +0200 you wrote:
-> The driver checks for having three endpoints and
-> having bulk in and out endpoints, but not that
-> the third endpoint is interrupt input.
-> Rectify the omission.
-> 
-> Reported-by: syzbot+3f89ec3d1d0842e95d50@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/linux-usb/686d5a9f.050a0220.1ffab7.0017.GAE@google.com/
-> Tested-by: syzbot+3f89ec3d1d0842e95d50@syzkaller.appspotmail.com
-> Fixes: eb4fd8cd355c8 ("net/usb: add sierra_net.c driver")
-> Signed-off-by: Oliver Neukum <oneukum@suse.com>
-> 
-> [...]
+Move the call to pn_skb_get_dst_sockaddr(), which initializes dst, to
+before the call to pep_find_pipe(), so that dst is consistently used
+initialized throughout the function.
 
-Here is the summary with links:
-  - [net] usb: net: sierra: check for no status endpoint
-    https://git.kernel.org/netdev/net/c/4c4ca3c46167
+Cc: stable@vger.kernel.org
+Fixes: f7ae8d59f661 ("Phonet: allocate sock from accept syscall rather than soft IRQ")
+Link: https://github.com/llvm/llvm-project/commit/00dacf8c22f065cb52efb14cd091d441f19b319e [1]
+Closes: https://github.com/ClangBuiltLinux/linux/issues/2101
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+---
+ net/phonet/pep.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+diff --git a/net/phonet/pep.c b/net/phonet/pep.c
+index 53a858478e22..62527e1ebb88 100644
+--- a/net/phonet/pep.c
++++ b/net/phonet/pep.c
+@@ -826,6 +826,7 @@ static struct sock *pep_sock_accept(struct sock *sk,
+ 	}
+ 
+ 	/* Check for duplicate pipe handle */
++	pn_skb_get_dst_sockaddr(skb, &dst);
+ 	newsk = pep_find_pipe(&pn->hlist, &dst, pipe_handle);
+ 	if (unlikely(newsk)) {
+ 		__sock_put(newsk);
+@@ -850,7 +851,6 @@ static struct sock *pep_sock_accept(struct sock *sk,
+ 	newsk->sk_destruct = pipe_destruct;
+ 
+ 	newpn = pep_sk(newsk);
+-	pn_skb_get_dst_sockaddr(skb, &dst);
+ 	pn_skb_get_src_sockaddr(skb, &src);
+ 	newpn->pn_sk.sobject = pn_sockaddr_get_object(&dst);
+ 	newpn->pn_sk.dobject = pn_sockaddr_get_object(&src);
 
+---
+base-commit: 0e9418961f897be59b1fab6e31ae1b09a0bae902
+change-id: 20250715-net-phonet-fix-uninit-const-pointer-64f0182b11e1
+
+Best regards,
+--  
+Nathan Chancellor <nathan@kernel.org>
 
 
