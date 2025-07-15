@@ -1,119 +1,165 @@
-Return-Path: <netdev+bounces-207229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C12EDB064D8
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 19:04:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 613DDB064E8
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 19:07:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF4431AA5E3E
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 17:03:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 391E8567527
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 17:07:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C509281513;
-	Tue, 15 Jul 2025 17:03:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE8427F183;
+	Tue, 15 Jul 2025 17:07:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="b2QUpikJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SfRqkZjG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43C327F16C
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 17:03:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBCF423CEF8
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 17:07:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752599000; cv=none; b=JFyIjj9d0GoUvHmKCmmkeJzCCmciR9ukl2Snuigjfi4Ab4ReOyS0mPZHUFbj4A2AlT/q0/wOZ3d5qmazpNPBzPRuoFpKanpLEv+Kcp9nurE3BKK0c4Z4Ow5am0Mw2dtJW67s40kiBEPLYubYWX2whdARBujtDCkUzgFIiitj3so=
+	t=1752599239; cv=none; b=WK5uhAD06iIWrq0ZHOnznkyRBXN6ZC6Hp/28l6Dxomok7oyaF43E8t/so7QqoYfKJ1Q8qUQ/lv8FD3jSHUlqvvE/5QOmZPvbls9s3FoWXQyaGvGkeImb5qA3uBxEy9w6DgSahllL0NGwELhUlX3rd/ySVLjHCgjWS0ZhbSNmzBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752599000; c=relaxed/simple;
-	bh=7iTmpEkIucCSGyvx3qB88gP14e5Ca/SnEczrO/VPcSY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JxRWJvw50ZldL9H5eygSZ0d01DFVcbIbMKHYv6ZrhVPUZC+D6eGNwoGdrnalJWm9wFKUspKtx6pf5la0oc4e3/2cE0XVhtGRK4oOCudLpGoVartinofBvBYKtbRO0t3HI8bUIXNHzS2QVzP7hNWPiCxk5FA2El3Prd7zKNwangk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=fail (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=b2QUpikJ reason="signature verification failed"; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56FEk765000654;
-	Tue, 15 Jul 2025 10:03:12 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=FJbVGpIOEX5iecJnRPyji5i/i
-	5jqhqNPG2ElIf/+pOI=; b=b2QUpikJcg0QgsqaU+zbvIctSkhOcDc32uRJOlk3d
-	F2RagssYzQzHb6xhZNc2n58J9rvnK0mi7O9J8sYuXcEO0nZKaMx/evDG1b8EUTYU
-	3ZH6J9VlOk6fCMDklxeVqgJWhiJPG9SINiBbiO92VYNo4765l/0FHQnYvHlfD4Oc
-	30p1dCaOmU3ayjpANgBLo99g1HiaJxWrUTz6yMuserJcY6YT+JtIFKDzjHvI/9AQ
-	9OTCX1OruXTHOy4/9XHSRlC1sQNMXhGy3Ms40eFcaqlxZTEreB4CUJTy1WNbjyAh
-	V5a8VuHZ2GZhkIK9F9M8Iw1y2KLT+jzGEaoRPVYQXzoAA==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 47wbm52bdg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 15 Jul 2025 10:03:12 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Tue, 15 Jul 2025 10:03:11 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Tue, 15 Jul 2025 10:03:11 -0700
-Received: from hyd1358.marvell.com (unknown [10.29.37.11])
-	by maili.marvell.com (Postfix) with ESMTP id 786A65B692E;
-	Tue, 15 Jul 2025 10:03:07 -0700 (PDT)
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, pabeni4redhat.com@mx0b-0016f401.pphosted.com,
-        <horms@kernel.org>
-CC: <gakula@marvell.com>, <hkelam@marvell.com>, <bbhushan2@marvell.com>,
-        <jerinj@marvell.com>, <lcherian@marvell.com>, <sgoutham@marvell.com>,
-        <netdev@vger.kernel.org>, Subbaraya Sundeep <sbhatta@marvell.com>
-Subject: [net-next PATCH v2 11/11] octeontx2-pf: Use new bandwidth profiles in receive queue
-Date: Tue, 15 Jul 2025 22:32:04 +0530
-Message-ID: <1752598924-32705-12-git-send-email-sbhatta@marvell.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1752598924-32705-1-git-send-email-sbhatta@marvell.com>
-References: <1752598924-32705-1-git-send-email-sbhatta@marvell.com>
+	s=arc-20240116; t=1752599239; c=relaxed/simple;
+	bh=D5iNuzhutabTsgyHNmq5UmAbTLz86s43oSR1uhCMj50=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gzQUb5nw7Jkmyv4ywhELADitdWTwOM3fesevGG9Y5GRUyML9rclL4kzX7RD5zh3o8tqpI3+lb9CoQYftae6PM5mQ9eYPakORIDynHLoi/k93BejESIUQ3aMcTnuUc4tn7aOyCxCnNNpNYftSvG5Sw/hK3VZlc/BW6vQhtb1w60I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SfRqkZjG; arc=none smtp.client-ip=209.85.215.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-b3bad2f99f5so88118a12.1
+        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 10:07:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752599237; x=1753204037; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D5iNuzhutabTsgyHNmq5UmAbTLz86s43oSR1uhCMj50=;
+        b=SfRqkZjGk4xLkiKRPkic45WPKXaunL6NYZ24h/zXDjXDzVm4ku84fp4z7wFl5/gT/o
+         RO6VUrqjGgUqCgv11XHDFwX/RXJi6jdpIzJ/Egn3oy3gd4uWtNb9YDgk2RNu4YiT/s8+
+         ieb5H1s1tn8Q4K4o1pTRHw5hsLHncT4J2Wf0S2hUXP+tDsX7KOzQ7Sfi6xNYHdyFUzwN
+         /+zg0zJDgJsfKcDCSQ6rdvbZdUu1xVWK6NkTIrocbAeqszZCU1iaAGC5vwXdns35Lv+b
+         7RtAceJEbs34p7AF5aUCyvRXEWT/pIQNgCZ0Bz43VMepOiDH5PDya6ERuVPSyRaYaT/v
+         FNOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752599237; x=1753204037;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=D5iNuzhutabTsgyHNmq5UmAbTLz86s43oSR1uhCMj50=;
+        b=SrIZhBv0VaMuZWqvFxwD9oMuWuo9eWGubNtvJPPCr4pw7X82ofA5y7Hnv3eRtU9tzM
+         WMqjIYxALz6qYjpJySRGHD9GbVT6ScXtX2Eft78YzV0UqDeTsXNLPjEe0b6YvIRsbmuJ
+         XJFH15lDQ5gKcWirxlkNf4qH5XgBTAsOAzP9RRuWAgXLaAMg1HjoLJKnkL81GC7mJKYL
+         AetzXnX2gSOuDqXMZ/SsgjrsIYWU/Z5S5F3QNH7Yyw2XuPxi65T+k/vAhxHfDd2e3+Vv
+         4hyMPzfue7bcK1qHDRcEFtk8DrA9+HUXYtkRbDmAWaZjNbBpNQHwnmIFm8C7qPy/mfqZ
+         fenQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWVFhsPXFUvveNUM3j8z7sXD135N+IB/rJA8xsRiIHi7SjyrBIQ9WsJ+jbREK4lsGKh8pcU5KQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0NQ1gL27/T/WxGjBVRiC24olHf0qntNVU8i7IJig2qpYTnW7H
+	O1dIXNRC1aK6AI6IkiKPX1+Oharq7XFIGWNLvvn154/WY1+75yZ2jG4MJ3FfJbCDKPikUs0jP2I
+	Tjv2z54ru+F+ojxBUxoIOzp3TrpW41H1IEXImZa30
+X-Gm-Gg: ASbGnctD+yXCR5h8owpJJHOIltaPkmTdpSQQ3zjSPB+7EP5sQWKJi5esIwDasp4OYNW
+	D+zDLaooU9ipka8kAk7m0BbMp6e+09zs7God8WpJkJk4AOp3FnHIdw0dpC2BFqK0y3xId8GMxN4
+	GCmsrKVt/D7iyQs6pZtLXOkj/2uszq3qcmHu7N7rzoqxXx7MezCXUFT8b3AxL75DsC8nkcU2CKc
+	bcfKCS1WbhYNCM7lyR5YhYFyzAF9K3S6uKsmQ==
+X-Google-Smtp-Source: AGHT+IHLAGTn1Emeu5qzmFf+v0WLOm0wkpMjlKYOjirs6Jes9LhingmeqRFWoO0Ayq2Sf39BciZkEOn0fxvO6vjDMnk=
+X-Received: by 2002:a17:90b:4e83:b0:311:a5ab:3d47 with SMTP id
+ 98e67ed59e1d1-31c8f7dbf49mr7146720a91.1.1752599236745; Tue, 15 Jul 2025
+ 10:07:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=M7tNKzws c=1 sm=1 tr=0 ts=687689d0 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=Wb1JkmetP80A:10 a=M5GUcnROAAAA:8 a=VbpyGYBai7zdicxOX80A:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: dGsz0XnQCYgUPgFUZKQ8_ZvNqL3bF8Ro
-X-Proofpoint-ORIG-GUID: dGsz0XnQCYgUPgFUZKQ8_ZvNqL3bF8Ro
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE1MDE1NiBTYWx0ZWRfX5ZEKH0e4bC+l njDRn2gyK1My2jFzi+ENpVG8bZu+cAzisjcd9ITh9lO3T1nlD22Slg/zkiiArOW3KrRiwldgMbj RSorgSVCtnkN2fkvwJRe/jVexjZXeqygZ55kJtQeR4jPA0DHLKdFQJJtbS2hZiOHXY7VjCyL/CR
- JTbC7hlf5hAN6TBH4MKblo1epf7tprJpbTCdCq/XrjTLyJdVIxj/DaiTfpwCv0//S6K6kWHej3t EF3xzmYKbAX43d7/hYbd2T67vmDG05iZRjZGYykwQ4KyDlCvkTGKg38GtVln72fVrgZaBw7Qk7/ djOKnS2T9KMb6Zwkcu9k851kAZg/ZEMiUvEmiYHnufPz2f+hjT7KPxURvF5XQbaSiAEZw1INHLX
- e3AK9EuJ0Qe3AzzFQifzydSD9HuDT2qvjqvZkVqD0bRGqDiKpJgNSzizv2ccopptUkMiC/MW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-15_04,2025-07-15_02,2025-03-28_01
+References: <20250711060808.2977529-1-kuniyu@google.com> <965af724-c3b4-4e47-97d6-8591ca9790db@linux.ibm.com>
+ <20250715115852.GA20773@j66a10360.sqa.eu95>
+In-Reply-To: <20250715115852.GA20773@j66a10360.sqa.eu95>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Tue, 15 Jul 2025 10:07:05 -0700
+X-Gm-Features: Ac12FXyF2RRGFRlApZSFjNa_0BZUMnhfS-C-PutTrPe_apQKn2nYMlszR-omJEs
+Message-ID: <CAAVpQUDrtvVadYGG1ZfL=usU11jbN-bZ=FQ4n5+1Ammry-w1yQ@mail.gmail.com>
+Subject: Re: [PATCH v1 net] smc: Fix various oops due to inet_sock type confusion.
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: Alexandra Winter <wintera@linux.ibm.com>, Dust Li <dust.li@linux.alibaba.com>, 
+	Sidraya Jayagond <sidraya@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Mahanta Jambigi <mjambigi@linux.ibm.com>, Tony Lu <tonylu@linux.alibaba.com>, 
+	Wen Gu <guwen@linux.alibaba.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-s390@vger.kernel.org, 
+	syzbot+40bf00346c3fe40f90f2@syzkaller.appspotmail.com, 
+	syzbot+f22031fad6cbe52c70e7@syzkaller.appspotmail.com, 
+	syzbot+271fed3ed6f24600c364@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Receive queue points to a bandwidth profile for rate limiting.
-Since cn20k has additional bandwidth profiles use them
-too while mapping receive queue to bandwidth profile.
+On Tue, Jul 15, 2025 at 4:59=E2=80=AFAM D. Wythe <alibuda@linux.alibaba.com=
+> wrote:
+>
+> On Mon, Jul 14, 2025 at 09:42:22AM +0200, Alexandra Winter wrote:
+> >
+> >
+> > On 11.07.25 08:07, Kuniyuki Iwashima wrote:
+> > > syzbot reported weird splats [0][1] in cipso_v4_sock_setattr() while
+> > > freeing inet_sk(sk)->inet_opt.
+> > >
+> > > The address was freed multiple times even though it was read-only mem=
+ory.
+> > >
+> > > cipso_v4_sock_setattr() did nothing wrong, and the root cause was typ=
+e
+> > > confusion.
+> > >
+> > > The cited commit made it possible to create smc_sock as an INET socke=
+t.
+> > >
+> > > The issue is that struct smc_sock does not have struct inet_sock as t=
+he
+> > > first member but hijacks AF_INET and AF_INET6 sk_family, which confus=
+es
+> > > various places.
+> > >
+> > > In this case, inet_sock.inet_opt was actually smc_sock.clcsk_data_rea=
+dy(),
+> >
+> > I would like to remind us of the discussions August 2024 around a patch=
+set
+> > called "net/smc: prevent NULL pointer dereference in txopt_get".
+> > That discussion eventually ended up in the reduced (?)
+> > commit 98d4435efcbf ("net/smc: prevent NULL pointer dereference in txop=
+t_get")
+> > without a union.
+> >
+> > I still think this union looks dangerous, but don't understand the code=
+ well enough to
+> > propose an alternative.
+> >
+> > Maybe incorporate inet_sock in smc_sock? Like Paoplo suggested in
+> > https://lore.kernel.org/lkml/20240815043714.38772-1-aha310510@gmail.com=
+/T/#maf6ee926f782736cb6accd2ba162dea0a34e02f9
+> >
+> > He also asked for at least some explanatory comments in the union. Whic=
+h would help me as well.
+> >
+>
+> Just caught this suggestion... The primary risk with using a union is the
+> potential for the sk member's offset within the inet_sock structure to
+> change in the future, although this is highly improbable.
 
-Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Right, and this only happens when we start using inet_sock in the union.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
-index cab157aac251..3e1bf22cba69 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
-@@ -341,6 +341,12 @@ int cn10k_map_unmap_rq_policer(struct otx2_nic *pfvf, int rq_idx,
- 	aq->rq.band_prof_id = policer;
- 	aq->rq_mask.band_prof_id = GENMASK(9, 0);
- 
-+	/* If policer id is greater than 1023 then it implies hardware supports
-+	 * more leaf profiles. In that case use band_prof_id_h for 4 MSBs.
-+	 */
-+	aq->rq.band_prof_id_h = policer >> 10;
-+	aq->rq_mask.band_prof_id_h = GENMASK(3, 0);
-+
- 	/* Fill AQ info */
- 	aq->qidx = rq_idx;
- 	aq->ctype = NIX_AQ_CTYPE_RQ;
--- 
-2.34.1
 
+> But in any
+> case, directly using inet_sock is certainly a safer approach.
+>
+> Uncertain if @Kuniyuki will still get to revise a version, If there's no =
+further
+> follow-up, I'll make the changes when I get a change.
+
+I'll post a follow-up once net.git is merged to net-next.
 
