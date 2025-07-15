@@ -1,140 +1,119 @@
-Return-Path: <netdev+bounces-207248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA4EAB06623
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 20:41:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C197B0662B
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 20:43:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89FEB504BA4
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 18:40:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A883D17E575
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 18:43:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D0D92BE639;
-	Tue, 15 Jul 2025 18:41:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C82F2BE638;
+	Tue, 15 Jul 2025 18:43:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="j4qA7O1f"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jJbhMDqn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-4317.protonmail.ch (mail-4317.protonmail.ch [185.70.43.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46C4628A402
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 18:41:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16BAE1DE2BF;
+	Tue, 15 Jul 2025 18:43:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752604882; cv=none; b=PE4azpoRGnlqZB9+xzG+WEwfKOrgSNs9qS17mB4/YB5DMgNm9kReiR0k7QViqWc0e7ccUC1ac+c9dJp7nvfAflO0+uttRHQzNTJAAGp3nKdcxoVsrd0XyeJr37rbAFogXIEO7/bt9LlHldFT4ZNP8b2HITo7a4WnuWa9HlrKaEs=
+	t=1752605025; cv=none; b=elq/EdMlCm9bFqA9oOHeRWauwPZ0PL+vC7DL2yPc1N+/HbPAudomxoKh9TxeABe9Z0iA5Z6Y71T22hq8sF8HrOs/xwgzS7DT71umHhgXmr/zwEEW/kYoHrwkgHpsXGw6ZK3SSSd8hoR++Cu9Dgm3K9XpAVSZMDireDYfmzjWCf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752604882; c=relaxed/simple;
-	bh=yQg+k6fb+9ZgqH2UOCOw5ct42D4V3pGJTMg7MmEcKxY=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kO/ggHL4HOjGLOLdBO3AcVa7g9F9UiaUneMv1c+wUHz/Ql6RyyOQci9iYtFws7C4qyYF5qfViSNi3anU9q5ufRukzJmrkLpuEWffDK98QNZziw5/Mjeb4su/PKk+oKKnLcZDGVjsyR+UMYu9y7IlbkR2kR4Z2alOAysj3J3UEHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=j4qA7O1f; arc=none smtp.client-ip=185.70.43.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
-	s=protonmail; t=1752604868; x=1752864068;
-	bh=yQg+k6fb+9ZgqH2UOCOw5ct42D4V3pGJTMg7MmEcKxY=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=j4qA7O1f+puDccgzt+HzvBVRkBXqfFwBpOSzsWgaY3OPsp/lqD/gBxQkC6eJBLNDa
-	 vtB/uElZB+voJzxbZ7KUXH08qDzhzuvBilCecgI2KcTg03O7p3rzFYlG55XwBP11p3
-	 YwEwHIKHFTTmUJt+GeFHq2kga1vH2od5060MvDlqW/62Y7ZyAiXyaelfU3Z0n+tOci
-	 B+/FgrOOuZtjZ+08du8xBBTvno3RIqpybJAbtlCSWQkdtHdfdTDcPeAeGH7viyinZT
-	 6lbjpbttSnQECmu8PzsW3/81ddxVr0MpcgxqyBcsx2oC58bgPWMq3bMVRo3Dy+HVMJ
-	 l2etY7Wf5WccQ==
-Date: Tue, 15 Jul 2025 18:41:05 +0000
-To: Cong Wang <xiyou.wangcong@gmail.com>
-From: William Liu <will@willsroot.io>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, stephen@networkplumber.org, Savino Dicanosa <savy@syst3mfailure.io>
-Subject: Re: [Patch v3 net 1/4] net_sched: Implement the right netem duplication behavior
-Message-ID: <xi0MIYyksyLO_1P2VCdlupWbaZk4XFWqX4yq0L-ZjavT4RyEnl7KzGTnk9aAOWdSFAUIhR8nCN3U5_0kwyG6iDDfdTxWeQsaFIJS_WSOEiw=@willsroot.io>
-In-Reply-To: <aHaX8n8o/fLBi57L@pop-os.localdomain>
-References: <20250713214748.1377876-1-xiyou.wangcong@gmail.com> <20250713214748.1377876-2-xiyou.wangcong@gmail.com> <pGE9OHWRSf4oJwC4gS0oPonBy8_0WsDthxgLzBYGBtMVeT_EDc-HAz8NbhJxcWe0NEUrf_a7Fyq2op5FVFujfc2KyO-I38Yx_HlQhFwB0Cs=@willsroot.io> <aHaX8n8o/fLBi57L@pop-os.localdomain>
-Feedback-ID: 42723359:user:proton
-X-Pm-Message-ID: 5f4d2356bcc0f7e45fc87a28eb7ab3ab78d8bed8
+	s=arc-20240116; t=1752605025; c=relaxed/simple;
+	bh=hnwA/Cl94G/uuXZ1hoCLu04p0joBovLqTgYpqqTRKGQ=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CneSrd/R/md5eDs6S2jopMMzUpRtztk9Gxz0aaeq+UuRmOr3Tkfui7dXgKQYBio7sq31DghoMfL+g/5WO0Gf1btMS94Q1LWPtBPUe74nSmL5RaTsIJsAoytBMZeijVO81w4p7p3/t9U5o7uFj6ijflfyvYxhzBF0rk1EezhSL/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jJbhMDqn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 928DDC4CEE3;
+	Tue, 15 Jul 2025 18:43:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752605024;
+	bh=hnwA/Cl94G/uuXZ1hoCLu04p0joBovLqTgYpqqTRKGQ=;
+	h=From:Subject:Date:To:Cc:From;
+	b=jJbhMDqn4U5Gp9wyAsC8aGRzjq6bXIFKvNCXMrOiVH/YzQJft8dvtlBdsiZCJDVkJ
+	 kMXmO2W0q4IYsPDh8FGHA2T2D6HnoKoqPNwoudFz35UKFFy1W79+rYcqoYGH5zPgsN
+	 MT+eOYLYWtLx9yDjzgI9pJNgJyDrZRA1TSopUXYJ8JICpKslmMTiJRW/s5IoyYVT0G
+	 ro8DJWFEsbhxVIwpAUT02soKuUhXfy2CqMYftgrGAKfMT1rhS6HswURzz35woUXt7m
+	 YPeWzVfPsX51st98KyN0DDOPqYmVtGOCePrzM/5KI5EttGmKWqAe3/XTqArL4BmUST
+	 CpN3W8ZJmmxCA==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net v2 0/2] selftests: mptcp: connect: cover alt modes
+Date: Tue, 15 Jul 2025 20:43:27 +0200
+Message-Id: <20250715-net-mptcp-sft-connect-alt-v2-0-8230ddd82454@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFChdmgC/42NQQrDIBRErxL+ur+ojQS66j1KFsZ+E2mq4SuSE
+ rx7JSfobt4MM3NAIvaU4N4dwFR88jE0UJcO7GLCTOhfjUEJpcUgewyU8bNlu2FyGW0MgWxGszY
+ tjXFiuJHrCVp/Y3J+P7ef0GowNnPxKUf+nn9FntEf00WiwMlJq800kR70400caL1GnmGstf4An
+ AUV3cgAAAA=
+X-Change-ID: 20250714-net-mptcp-sft-connect-alt-c1aaf073ef4e
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>, Christoph Paasch <cpaasch@openai.com>, 
+ Davide Caratti <dcaratti@redhat.com>
+Cc: Florian Westphal <fw@strlen.de>, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, stable@vger.kernel.org
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1651; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=hnwA/Cl94G/uuXZ1hoCLu04p0joBovLqTgYpqqTRKGQ=;
+ b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDLKFkadUrrUPXOiTVhTyaIT+rqyklab7u9xTM9fYuzH8
+ +iclzdHRykLgxgXg6yYIot0W2T+zOdVvCVefhYwc1iZQIYwcHEKwESsTjP8FTu3WUx65cr8fdZS
+ l3sOLJBVvbt6i8BNY7svJ9forj4qeZzhf+5GzncPp/dt+fYj97jml3cKeyZ5Xyifv5xHlUkyubI
+ 3iRcA
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-On Tuesday, July 15th, 2025 at 6:03 PM, Cong Wang <xiyou.wangcong@gmail.com=
-> wrote:
+mptcp_connect.sh can be executed manually with "-m <MODE>" and "-C" to
+make sure everything works as expected when using "mmap" and "sendfile"
+modes instead of "poll", and with the MPTCP checksum support.
 
->=20
->=20
-> On Mon, Jul 14, 2025 at 02:30:26AM +0000, William Liu wrote:
->=20
-> > FWIW, I suggested changing this behavior to not enqueue from the root a=
- while ago too on the security mailing list for the HFSC rsc bug (as the re=
--entrancy violated assumptions in other qdiscs), but was told some users mi=
-ght be expecting that behavior and we would break their setups.
->=20
->=20
-> Thanks for your valuable input.
->=20
-> Instead of arguing on what users expect, I think it is fair to use the
-> man page as our argreement with user. Please let me know if you have
-> more reasonable argreement or more reasonable use case for us to justify
-> updates to the man page.
->=20
-> I have an open mind.
+These modes should be validated, but they are not when the selftests are
+executed via the kselftest helpers. It means that most CIs validating
+these selftests, like NIPA for the net development trees and LKFT for
+the stable ones, are not covering these modes.
 
-I don't really have too strong of an opinion here and personally think it m=
-akes more sense to enqueue from the current qdisc under duplication. Howeve=
-r, if the code has been performing the enqueue at the root from so many yea=
-rs ago..
+To fix that, new test programs have been added, simply calling
+mptcp_connect.sh with the right parameters.
 
-I will defer to what others say on this.
+The first patch can be backported up to v5.6, and the second one up to
+v5.14.
 
-> > If we really want to preserve the ability to have multiple duplicating =
-netems in a tree, I think Jamal had a good suggestion here to rely on tc_sk=
-b_ext extensions [1].
->=20
->=20
-> Do you mind to be more specific here? I don't think I am following you
-> on why tc_skb_ext is better here.
->=20
-> The reason why I changed back to netem_skb_cb is exactly because of the
-> enqueue beahvior change, which now only allows the skb to be queued to
-> the same qdisc.
->=20
-> If you have a specific reasonable use case you suspect my patch might
-> break, please share it with me. It would help me to understand you
-> better and more importantly to test this patch more comprehensively,
-> I'd love to add as many selftests as I can.
->=20
-> > However, I noted that there are implementation issues that we would hav=
-e to deal with. Copying what I said there [2]:
-> >=20
-> > "The tc_skb_ext approach has a problem... the config option that enable=
-s it is NET_TC_SKB_EXT. I assumed this is a generic name for skb extensions=
- in the tc subsystem, but unfortunately this is hardcoded for NET_CLS_ACT r=
-ecirculation support.
->=20
->=20
-> IMHO, Kconfig is not a problem here, we just need to deal with the
-> necessary dependency if we really need to use it.
->=20
-> Like I said above, I don't see the problem of using netem_skb_cb after
-> enqueuing to the same qdisc, this is the only reason why I don't see the
-> need to changing it to either tc_skb_cb or skb_ext.
->=20
-> Thanks for your review!
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Changes in v2:
+- force using a different prefix in the subtests to avoid having the
+  same test names in all mptcp_connect*.sh selftests.
+- Link to v1: https://lore.kernel.org/r/20250714-net-mptcp-sft-connect-alt-v1-0-bf1c5abbe575@kernel.org
 
-If tc_skb_ext is used, then the original behavior of enqueue from root can =
-be preserved and multiple duplicating netems can now exist in the tree in a=
-ny hierarchy. No potential user setups or expectations will be broken.=20
+---
+Matthieu Baerts (NGI0) (2):
+      selftests: mptcp: connect: also cover alt modes
+      selftests: mptcp: connect: also cover checksum
 
-I am not sure how others would feel about propagating this amount of change=
- though just for this one specific use case though (but I am of the opinion=
- that not hardcoding NET_TC_SKB_EXT for one specific use case is a good thi=
-ng regardless).
+ tools/testing/selftests/net/mptcp/Makefile                  | 3 ++-
+ tools/testing/selftests/net/mptcp/mptcp_connect_checksum.sh | 5 +++++
+ tools/testing/selftests/net/mptcp/mptcp_connect_mmap.sh     | 5 +++++
+ tools/testing/selftests/net/mptcp/mptcp_connect_sendfile.sh | 5 +++++
+ 4 files changed, 17 insertions(+), 1 deletion(-)
+---
+base-commit: b640daa2822a39ff76e70200cb2b7b892b896dce
+change-id: 20250714-net-mptcp-sft-connect-alt-c1aaf073ef4e
 
-Best,
-William
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
 
