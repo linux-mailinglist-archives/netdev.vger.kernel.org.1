@@ -1,167 +1,162 @@
-Return-Path: <netdev+bounces-206997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DC81B05222
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 08:47:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45CDFB05256
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 09:01:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63B1E1AA6FDF
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 06:47:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04C023A5FC6
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 07:01:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77ACE25CC7A;
-	Tue, 15 Jul 2025 06:47:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FF9726E6E6;
+	Tue, 15 Jul 2025 07:01:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MzRKpzk+"
+	dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b="be1IOfdj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from mail-internal.sh.cz (mail-internal.sh.cz [95.168.196.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A216623BCF7;
-	Tue, 15 Jul 2025 06:47:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D705E19307F
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 07:01:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.168.196.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752562039; cv=none; b=uID7oms6JiZ6lQ5fq/64q5RReGDA5IEGHBo+RxjLAwfV210spRviMCqIzVgae83aPxim4OnH9Vp87F4D22m9xejlTyMV71Jf5MikssBSoTPrgncYVtLuwCS6nob94q3Y4CwIpmOgmy3dVnfNOBwe5ZzAh1aOySxU98TjsQjy73M=
+	t=1752562884; cv=none; b=puW8oE7l/46JB9cMjGo31ZkDtUVTjAoFKIRgYJUXT1c1jEOElUYxLF4AkF3H7UKqflgY1E4cGsr19SDiXJwEZFrzmB3VeAry5yP86a8lwnyg+htkZ0OtakKH6sOF+QmmNEsZ1sJuk3lrQI3UBEr/wYp8Ws3Jj4RpMTAENxY8CpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752562039; c=relaxed/simple;
-	bh=CcEr+yxzjUP7rrvl1n/6Ya71JSibRPTajrQn80BBuio=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GD36MJkYNhgqn7xXYx29hdlbIQTNVgO6lIpUP/GBIAmaf468Lod2Ig5AvpMHVjRVXZJuE/MiV3Lzkz1Mcaq9eY5vK7jl5xesVaP1KeZK2KKMVBq2WwTD9U7M4qHVzGLGVvES+LeB8ScK8+flbBwMdCQiSDQTjs1MgrCppZI9TLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MzRKpzk+; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752562038; x=1784098038;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=CcEr+yxzjUP7rrvl1n/6Ya71JSibRPTajrQn80BBuio=;
-  b=MzRKpzk+hGjJoMPymBYLKIPkf0NbHI2sKYYRczpFV7N9YEcuvAtZt6vd
-   sFHWbGlFPOoyjSOER7ZYQ+9FXPH2nZMIDk0b8KPIxD4LUr4E0BIwbIb5u
-   GvLHejg2ryWhiguonn4pAR9Xkq7Djyn+lARlDWjgCoLX83BtKtUqjQWjl
-   Tkp5CzcPEWyON9SqFnO3pzjnQBJhoxGFkoZIJD117vx1rsmj3ntbPyxmL
-   FKoAAVTz7yaXH91W7CrO/JNwvUujZKk8vEZURLUBthOSoU873W8eu40F8
-   ud+ruD4wTlkZx1oBbjmQzVvB4p0aWcK9CsmwfEt5p9KuigeTx5lqZyLQP
-   w==;
-X-CSE-ConnectionGUID: cO8vUQQVQ3eTXUfPNISf0A==
-X-CSE-MsgGUID: vtmbnHHCStqXYUT+9xhXsA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="54641610"
-X-IronPort-AV: E=Sophos;i="6.16,313,1744095600"; 
-   d="scan'208";a="54641610"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2025 23:47:15 -0700
-X-CSE-ConnectionGUID: uKHbWTDLR3WAvdXNGLfsPQ==
-X-CSE-MsgGUID: oGB91pAPQhayXPnaXyzTnw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,313,1744095600"; 
-   d="scan'208";a="156551176"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2025 23:47:11 -0700
-Date: Tue, 15 Jul 2025 08:46:06 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Jianbo Liu <jianbol@nvidia.com>
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Saeed Mahameed <saeed@kernel.org>, Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Lama Kayal <lkayal@nvidia.com>
-Subject: Re: [PATCH net-next 1/6] net/mlx5: HWS, Enable IPSec hardware
- offload in legacy mode
-Message-ID: <aHX5Lu6Ef4/gLwDS@mev-dev.igk.intel.com>
-References: <1752471585-18053-1-git-send-email-tariqt@nvidia.com>
- <1752471585-18053-2-git-send-email-tariqt@nvidia.com>
- <aHSm7SHg1xTMNE0F@mev-dev.igk.intel.com>
- <d03d6fd7-b86e-4c1f-92ef-ffc26339bf97@nvidia.com>
+	s=arc-20240116; t=1752562884; c=relaxed/simple;
+	bh=fxfbSVj+fk1Ndeq1ATB3dRz1ZuqIFub5WdK7JEY/dfg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QkEaAkCuETivJDagY2tB3+vwwtwvn6i9ei+QGrtKNbeD5g1g0LIJr7H1I6Vt7fTC/DGaBTH9KkM7BKTeqpjADOC+UuIwkCVbAnoy1I1RZY2OBG0wJt3ai9Q3nR3JYdAeAgFxBZeKMfptIfSgOqOTJ9pr27OOvscx4z19X0JNMc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com; spf=pass smtp.mailfrom=cdn77.com; dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b=be1IOfdj; arc=none smtp.client-ip=95.168.196.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cdn77.com
+DKIM-Signature: a=rsa-sha256; t=1752562879; x=1753167679; s=dkim2019; d=cdn77.com; c=relaxed/relaxed; v=1; bh=jnqC9yKLQ2Y78KFCIs80rSm9Z70HqexDU7UQ8kaOjM8=; h=From:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:In-Reply-To:References;
+   b=be1IOfdjGAzP+kD7y8Cso6J7NJjNDI/jBjkPI8vQRwpBhqEzVt00XZm3Y07RMXngyPfC0B/NTb7qpFfYuOlmgQchrikp/5DYL+qqjaiR9gX8tpfqUVwHn6Ipj4cLUR+4pstFAwBUvPyvesROoOtWIkJUIF3SeYAiEvI4Vsx8O6Q=
+Received: from [10.0.5.28] ([95.168.203.222])
+        by mail.sh.cz (14.1.0 build 16 ) with ASMTP (SSL) id 202507150901160877;
+        Tue, 15 Jul 2025 09:01:16 +0200
+Message-ID: <8a7cea99-0ab5-4dba-bc89-62d4819531eb@cdn77.com>
+Date: Tue, 15 Jul 2025 09:01:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d03d6fd7-b86e-4c1f-92ef-ffc26339bf97@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net-next 2/2] mm/vmpressure: add tracepoint for socket
+ pressure detection
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Neal Cardwell <ncardwell@google.com>,
+ David Ahern <dsahern@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Yosry Ahmed <yosry.ahmed@linux.dev>,
+ linux-mm@kvack.org, netdev@vger.kernel.org,
+ Matyas Hurtik <matyas.hurtik@cdn77.com>,
+ Daniel Sedlak <danie.sedlak@cdn77.com>
+References: <20250714143613.42184-1-daniel.sedlak@cdn77.com>
+ <20250714143613.42184-3-daniel.sedlak@cdn77.com>
+ <CAAVpQUAsZsEKQ65Kuh7wmcf6Yqq8m4im7dYFvVd1RL4QHxMN8g@mail.gmail.com>
+Content-Language: en-US
+From: Daniel Sedlak <daniel.sedlak@cdn77.com>
+In-Reply-To: <CAAVpQUAsZsEKQ65Kuh7wmcf6Yqq8m4im7dYFvVd1RL4QHxMN8g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CTCH: RefID="str=0001.0A006378.6875FCDE.0019,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0"; Spam="Unknown"; VOD="Unknown"
 
-On Mon, Jul 14, 2025 at 11:04:54PM +0800, Jianbo Liu wrote:
-> 
-> 
-> On 7/14/2025 2:43 PM, Michal Swiatkowski wrote:
-> > On Mon, Jul 14, 2025 at 08:39:40AM +0300, Tariq Toukan wrote:
-> > > From: Lama Kayal <lkayal@nvidia.com>
-> > > 
-> > > IPSec hardware offload in legacy mode should not be affected by the
-> > > steering mode, hence it should also work properly with hmfs mode.
-> > 
-> > What about dmfs mode? I am not sure, if you didn't remove it because it
-> > is still needed or just forgot about removing it.
-> > 
-> 
-> It is still needed.
-> We support packet offload for all steering modes in legacy, and only dmfs in
-> switchdev. This is the logic we added before:
-> 
->             dmfs    smfs
-> legacy       Y       Y
-> switchdev    Y       N
-> 
-> Now we support hmfs. It is the same as smfs. So the table becomes:
->             dmfs    smfs   hmfs
-> legacy       Y       Y      Y
-> switchdev    Y       N      N
-> 
-> Instead of adding "mdev->priv.steering->mode ==
-> MLX5_FLOW_STEERING_MODE_HMFS", We removed "mdev->priv.steering->mode ==
-> MLX5_FLOW_STEERING_MODE_SMFS", and the code is simpler and clean.
-> 
+Hi Kuniyuki,
 
-Ok, got it, thanks.
+On 7/14/25 8:02 PM, Kuniyuki Iwashima wrote:
+>> +TRACE_EVENT(memcg_socket_under_pressure,
+>> +
+>> +       TP_PROTO(const struct mem_cgroup *memcg, unsigned long scanned,
+>> +               unsigned long reclaimed),
+>> +
+>> +       TP_ARGS(memcg, scanned, reclaimed),
+>> +
+>> +       TP_STRUCT__entry(
+>> +               __field(u64, id)
+>> +               __field(unsigned long, scanned)
+>> +               __field(unsigned long, reclaimed)
+>> +       ),
+>> +
+>> +       TP_fast_assign(
+>> +               __entry->id = cgroup_id(memcg->css.cgroup);
+>> +               __entry->scanned = scanned;
+>> +               __entry->reclaimed = reclaimed;
+>> +       ),
+>> +
+>> +       TP_printk("memcg_id=%llu scanned=%lu reclaimed=%lu",
+>> +               __entry->id,
+> 
+> Maybe a noob question: How can we translate the memcg ID
+> to the /sys/fs/cgroup/... path ?
 
+IMO this should be really named `cgroup_id` instead of `memcg_id`, but 
+we kept the latter to keep consistency with the rest of the file.
+
+To find cgroup path you can use:
+- find /sys/fs/cgroup/ -inum `memcg_id`, and it will print "path" to the 
+affected cgroup.
+- or you can use bpftrace tracepoint hooks and there is a helper 
+function [1].
+
+Or we can put the cgroup_path to the tracepoint instead of that ID, but 
+I feel it can be too much overhead, the paths can be pretty long.
+
+Link: https://bpftrace.org/docs/latest#functions-cgroup_path [1]
+> It would be nice to place this patch first and the description of
+> patch 2 has how to use the new stat with this tracepoint.
+
+Sure, can do that. However, I am unsure how a good idea is to 
+cross-reference commits, since each may go through a different tree 
+because each commit is for a different subsystem. They would have to go 
+through one tree, right?
+
+
+>> +               __entry->scanned,
+>> +               __entry->reclaimed)
+>> +);
+>> +
+>>   #endif /* _TRACE_MEMCG_H */
+>>
+>>   /* This part must be outside protection */
+>> diff --git a/mm/vmpressure.c b/mm/vmpressure.c
+>> index bd5183dfd879..aa9583066731 100644
+>> --- a/mm/vmpressure.c
+>> +++ b/mm/vmpressure.c
+>> @@ -21,6 +21,8 @@
+>>   #include <linux/printk.h>
+>>   #include <linux/vmpressure.h>
+>>
+>> +#include <trace/events/memcg.h>
+>> +
+>>   /*
+>>    * The window size (vmpressure_win) is the number of scanned pages before
+>>    * we try to analyze scanned/reclaimed ratio. So the window is used as a
+>> @@ -317,6 +319,7 @@ void vmpressure(gfp_t gfp, struct mem_cgroup *memcg, bool tree,
+>>                           * pressure events can occur.
+>>                           */
+>>                          WRITE_ONCE(memcg->socket_pressure, jiffies + HZ);
+>> +                       trace_memcg_socket_under_pressure(memcg, scanned, reclaimed);
 > 
-> > In case it is ok as it is:
-> > Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> > 
-> 
-> Yes, it's ok. Thanks for the review.
-> 
-> Jianbo
-> 
-> > Thanks
-> > 
-> > > 
-> > > Remove steering mode validation when calculating the cap for packet
-> > > offload, this will also enable the missing cap MLX5_IPSEC_CAP_PRIO
-> > > needed for crypto offload.
-> > > 
-> > > Signed-off-by: Lama Kayal <lkayal@nvidia.com>
-> > > Reviewed-by: Jianbo Liu <jianbol@nvidia.com>
-> > > Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> > > ---
-> > >   .../net/ethernet/mellanox/mlx5/core/en_accel/ipsec_offload.c   | 3 +--
-> > >   1 file changed, 1 insertion(+), 2 deletions(-)
-> > > 
-> > > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_offload.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_offload.c
-> > > index 820debf3fbbf..ef7322d381af 100644
-> > > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_offload.c
-> > > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_offload.c
-> > > @@ -42,8 +42,7 @@ u32 mlx5_ipsec_device_caps(struct mlx5_core_dev *mdev)
-> > >   	if (MLX5_CAP_IPSEC(mdev, ipsec_full_offload) &&
-> > >   	    (mdev->priv.steering->mode == MLX5_FLOW_STEERING_MODE_DMFS ||
-> > > -	     (mdev->priv.steering->mode == MLX5_FLOW_STEERING_MODE_SMFS &&
-> > > -	     is_mdev_legacy_mode(mdev)))) {
-> > > +	     is_mdev_legacy_mode(mdev))) {
-> > >   		if (MLX5_CAP_FLOWTABLE_NIC_TX(mdev,
-> > >   					      reformat_add_esp_trasport) &&
-> > >   		    MLX5_CAP_FLOWTABLE_NIC_RX(mdev,
-> > > -- 
-> > > 2.40.1
-> > > 
-> > 
-> 
+> This is triggered only when we enter the memory pressure state
+> and not when we leave the state, right ?  Is it possible to issue
+> such an event ?
+
+AFAIK, the currently used API in the vmpressure function does not have 
+anything like enter or leave the socket memory pressure state. It only 
+periodically re-arms the socket pressure for a specific duration. So the 
+current tracepoint is called when the socket pressure is re-armed.
+
+I am not sure how feasible it is to rewrite it so we have enter and 
+leave logic. I am not that familiar with those code paths.
+
+Thanks!
+Daniel
+
+
 
