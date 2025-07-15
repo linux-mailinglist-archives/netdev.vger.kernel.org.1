@@ -1,91 +1,50 @@
-Return-Path: <netdev+bounces-207290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BC2AB069C1
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 01:12:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BB22B069BC
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 01:09:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44D6B4E5ECA
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 23:12:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BA0E567D14
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 23:09:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FB712D29C2;
-	Tue, 15 Jul 2025 23:12:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E87FC2C17AD;
+	Tue, 15 Jul 2025 23:09:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G4KlHejU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sJW5H80o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BCA24A3C;
-	Tue, 15 Jul 2025 23:12:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEDD82BF3DB;
+	Tue, 15 Jul 2025 23:09:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752621173; cv=none; b=SEhLtiEshyi1IuSwwv+Ejh1IyhYWKPkAQ/f9aYp9Pc3kBupqF0YcYO4pBrjUivS3idvSw5JUbD8FJ/rNULNl9LI9K/h1CV5xPrM426GmOQEF5LGFtLvGZVKJEzwo738j/S3LNBZ1mw5x7OozCCFV8oa6rOWTWJvMkqzGJN+TArc=
+	t=1752620987; cv=none; b=WX8WATmHzQphOTUmCXTaOFU5mwCbEh1e/S71CvsNRkjZAjKJCQp9gxQstki971NdK6J5wOZ15w0n5CuacUwULlz+aDir0GkLAuFZIlTMmylm/H5BLTkivTZnAQ671+okARoRunTJAqfJC3e9vK3TEco8mIqsJCdPcuSfDo2e9JE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752621173; c=relaxed/simple;
-	bh=cnSaEW1G2x+Vi12ZOlKThqIkkcwIaeVH5M8TjdoEHkY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jl0CUM6bTC6zZUcSyiuFWr5zncqHXjqMBatYMxX5jOSdy1rpIP/BDAufGa+B5h8JX5v7NKst5pd6M8vDXeJdCI1MsKc8kCt35h6V7rgvonmMJQ+cf/Ow/MktMnJ+Q4607GGJ5RCkx+JGdZ71YtlC28EzZNmOiLNOBFghWoIGXlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G4KlHejU; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-23c8a505177so56048375ad.2;
-        Tue, 15 Jul 2025 16:12:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752621171; x=1753225971; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hAPRSx32Yoh23SFp75OsDGsW9gXJ3MOIHEnOw0OZgZI=;
-        b=G4KlHejUFZL4smMIC2i6wHh4dbmZRpIxq42rpDCPR9LDEcj35/3WuIUToPW/V1wJy4
-         VSDa235vdqmjdT6ELQByih/3yB0BQUQ1Ez3OqYytaTxbxcL4nEjgnE1U7U/+QRALm49i
-         keAW/KQezbpq5Cp4n9hsOdjwXgdzS38iUNZLN2y+/S42NIECqPZAGTqI6UGFiobaKOEQ
-         XaTdhwkaji6UBd5I2ZCpbd+XIjyOK137+iVlnqNfX6bQls5XQqWIC29bW8xP31PYlF5Z
-         NPcojUXc3UlAB2qz9NmGQfl4pfisjoCM+cDBLCKDUcvpEwfkIa2MP3AWd2u3o/2Zhx4j
-         +PTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752621171; x=1753225971;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hAPRSx32Yoh23SFp75OsDGsW9gXJ3MOIHEnOw0OZgZI=;
-        b=HOdLfUBGnmksB22/ii5R9/Y0ZBfDaizVqux5aSXhOy6t9QKwwPVgO124kd68iSX7GH
-         Jw7JC2D5pnoIcVLMRO6W1HkaDk9tHTEfHEILZQgSlpdf8bbU4UkzsQW3/GLlkM+1roiv
-         NOJDj+Q5cwYhRTzZO6ksCrX86Z6DSErhglCO9jXkltNiUwax42N0a5mw394L8eu38Hx3
-         Cdvv/EtWZ+eLqmsg3nEGgjYJalwfl6JRHRDWavMd1CbJu5wgyCcrNQaulm2chYIVE4gZ
-         1rZ+owfSQRP17TS3GsPtCh/mTouIpiLr7hQdX5Du9ysu7A748atnGZoG7I48GwA5GCyE
-         fuvA==
-X-Forwarded-Encrypted: i=1; AJvYcCUPeOoj4/uTOvO/lZTzT5jUbX0v0LmSEMm4gaCpRy362IQo2929QqkuvGRTrfCcguvBczRnB6+V@vger.kernel.org, AJvYcCX7SG55GKPHvU0ya6RqEAYpnN9WbGUrlXVnEdK8HAvWd6poBhL0AdzV0n+PslRXyiGoszpa6Yg9XPnaIbT3CA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzotWltq6VneCjWWar0dnoA/m1kYtlNU3PJpTFi8qFgsrI2afgQ
-	likA3zmGK5u4MdpbrKI5/44o1Ot3851wldimGsbTl4M4wLGf8tJDgo1F
-X-Gm-Gg: ASbGncvpOKCZEqaKNmm8QVlGykZGcptWWjiqU2Kggo9HgUegkUCVueug0ihHapy5Yre
-	cSCU/8FumqrsjLRXiBzE8WCPpa2FM8/atNfknLfyWug2nCBG0tcI+un5nGHAtoWoeLuNi91ZHVj
-	3o3JpM/qLNyToevauW1ku+r+weRIiGMlFXdFHokQ4icRbrZM2xoNMySG3IM9sGRXCeFY6UKKimO
-	lEOwmlLNQsQZ0DhvGHKfXXmTW8BDao3kThO4WhdnhxFw1gl17de1Zq7Tqn2G8hz86gvUwYhJVYH
-	LoyGLnYKnTjdyHR6qrZ8D2wMwN9WQYlbfs0zz/FotoB1wTE2MY7kveJ/jtye/rvcreZxkHRsnrT
-	+5TSdv8J87A+jPu6NocjJhzs4
-X-Google-Smtp-Source: AGHT+IGshsBE0EpvzBXYF91wyMej1W2e+64pc4pC0n1OrITGe6q1Y4ZuOz24myUDG1ahFwsL3M85jQ==
-X-Received: by 2002:a17:903:198c:b0:235:e1d6:4e45 with SMTP id d9443c01a7336-23e24f44b0amr9612455ad.25.1752621170746;
-        Tue, 15 Jul 2025 16:12:50 -0700 (PDT)
-Received: from p920.. ([2001:569:799a:1600:5324:4bfb:25b5:ccf1])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de42847casm119769045ad.14.2025.07.15.16.12.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Jul 2025 16:12:50 -0700 (PDT)
-From: Moon Hee Lee <moonhee.lee.ca@gmail.com>
-To: johannes@sipsolutions.net
-Cc: linux-kernel@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	linux-kernel-mentees@lists.linux.dev,
-	netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	syzbot+f73f203f8c9b19037380@syzkaller.appspotmail.com,
-	skhan@linuxfoundation.org,
-	david.hunter.linux@gmail.com,
-	Moon Hee Lee <moonhee.lee.ca@gmail.com>
-Subject: [PATCH wireless-next] wifi: mac80211: reject TDLS operations when station is not associated
-Date: Tue, 15 Jul 2025 16:09:05 -0700
-Message-ID: <20250715230904.661092-2-moonhee.lee.ca@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1752620987; c=relaxed/simple;
+	bh=2RFYljIrtzF6EA9y3KeXlKkjmLPiGbpidXPF+wUUDpg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Qmb6l4OrmVJ3q832wVj+OUzzB1EsvmICfARwnnAqxdTVtqfR6oY1lxoALSZRo0mjaXMnVbXOfJnc44XDYOxy2o9ZnZuW/S3f3TR6hM+6c6sTtxJgwKxPXkr4q2RMb9fc1iKGu7nqzEeFi0jdzKXOlisx+mozF0ThgSOc+mzkBOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sJW5H80o; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FA2DC4CEE3;
+	Tue, 15 Jul 2025 23:09:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752620987;
+	bh=2RFYljIrtzF6EA9y3KeXlKkjmLPiGbpidXPF+wUUDpg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=sJW5H80oH7xJFyW4Ir4MByxiIwqMpWTmrgPkeR7pjh3LzNJGWA3SeaG9qGMQMYpyQ
+	 3cUqBGrJupgncZGUSznbujk/rGUX7HBw2KskEZyNkbW+KM5agOmwrGtUP7R4EMq5Fp
+	 dtDZifgV6YM7l1xzkzLCQykQe8QoPCFZjBTXf1iGNsy0hjsYYpZg7fRV7L+ct5cJpF
+	 5MrQcMGAcLT78c87zI+lyjIDb8YpvvbkTcyZrbqz04WzjW/2Z1qwAmZNI4lknT67/v
+	 Ig/vpEhBFW6l0WOq/HY8bOI4g4tm+/GmkSFd9hPr2wQESwIvEJXk6t2dBGdEopSc4c
+	 /S3yQOzcZbDQQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEEB383BA30;
+	Tue, 15 Jul 2025 23:10:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,39 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] can: tcan4x5x: fix reset gpio usage during probe
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175262100776.609531.9996914746793816320.git-patchwork-notify@kernel.org>
+Date: Tue, 15 Jul 2025 23:10:07 +0000
+References: <20250715101625.3202690-2-mkl@pengutronix.de>
+In-Reply-To: <20250715101625.3202690-2-mkl@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ linux-can@vger.kernel.org, kernel@pengutronix.de, brett.werling@garmin.com,
+ msp@baylibre.com
 
-syzbot triggered a WARN in ieee80211_tdls_oper() by sending
-NL80211_TDLS_ENABLE_LINK immediately after NL80211_CMD_CONNECT,
-before association completed and without prior TDLS setup.
+Hello:
 
-This left internal state like sdata->u.mgd.tdls_peer uninitialized,
-leading to a WARN_ON() in code paths that assumed it was valid.
+This patch was applied to netdev/net.git (main)
+by Marc Kleine-Budde <mkl@pengutronix.de>:
 
-Reject the operation early if not in station mode or not associated.
+On Tue, 15 Jul 2025 12:13:39 +0200 you wrote:
+> From: Brett Werling <brett.werling@garmin.com>
+> 
+> Fixes reset GPIO usage during probe by ensuring we retrieve the GPIO and
+> take the device out of reset (if it defaults to being in reset) before
+> we attempt to communicate with the device. This is achieved by moving
+> the call to tcan4x5x_get_gpios() before tcan4x5x_find_version() and
+> avoiding any device communication while getting the GPIOs. Once we
+> determine the version, we can then take the knowledge of which GPIOs we
+> obtained and use it to decide whether we need to disable the wake or
+> state pin functions within the device.
+> 
+> [...]
 
-Reported-by: syzbot+f73f203f8c9b19037380@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=f73f203f8c9b19037380
-Fixes: 81dd2b882241 ("mac80211: move TDLS data to mgd private part")
-Tested-by: syzbot+f73f203f8c9b19037380@syzkaller.appspotmail.com
-Signed-off-by: Moon Hee Lee <moonhee.lee.ca@gmail.com>
----
- net/mac80211/tdls.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Here is the summary with links:
+  - [net] can: tcan4x5x: fix reset gpio usage during probe
+    https://git.kernel.org/netdev/net/c/0f97a7588db7
 
-diff --git a/net/mac80211/tdls.c b/net/mac80211/tdls.c
-index 94714f8ffd22..ba5fbacbeeda 100644
---- a/net/mac80211/tdls.c
-+++ b/net/mac80211/tdls.c
-@@ -1422,7 +1422,7 @@ int ieee80211_tdls_oper(struct wiphy *wiphy, struct net_device *dev,
- 	if (!(wiphy->flags & WIPHY_FLAG_SUPPORTS_TDLS))
- 		return -EOPNOTSUPP;
- 
--	if (sdata->vif.type != NL80211_IFTYPE_STATION)
-+	if (sdata->vif.type != NL80211_IFTYPE_STATION || !sdata->vif.cfg.assoc)
- 		return -EINVAL;
- 
- 	switch (oper) {
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
