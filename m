@@ -1,147 +1,231 @@
-Return-Path: <netdev+bounces-207065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1AADB05800
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 12:40:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A51CB05817
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 12:45:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16FDC164601
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 10:40:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78AF5562E59
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 10:45:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E42872D660E;
-	Tue, 15 Jul 2025 10:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 127302D8DBE;
+	Tue, 15 Jul 2025 10:44:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dqgAlTJc"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="pGcYvD2F"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from nbd.name (nbd.name [46.4.11.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE855230BD2
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 10:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B912D837E;
+	Tue, 15 Jul 2025 10:44:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752576028; cv=none; b=CMdREQ4b3aavABvk5xW+gOMnXqLxLvElYmtkHhjGU8IseeFdaDOhj4VwMfs8KW0rPkv2LTOgxnuFawLsodBrlnu4FJOvr/4e4XOysP7FCrVLcXFzMuFk38/uMKjHcanNS5ngRCS6VueyO2UFjEguEI/qBxYTKGlYm/g4wR0o1lg=
+	t=1752576290; cv=none; b=qfT8Z5tL+M7bUAYN3naMqBj+Pz28am5LL/ei4FoR0EucFkosPb6DX3843PPmomVNcJLlUlDI11vAswx3lNJT9GWYQO03szlQr7fdMGVK7xlFU120nBK0wuN8qpyXzVKByci1EoLwt/OTtDAcvjnS9tMsDryPwXILKgPrE4HrZ/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752576028; c=relaxed/simple;
-	bh=iS4jv1G7943nQm5ZnIVGEyc4UHlIucD64Nz9LCerUWo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Yd1n3CGn7WX7T9hvG61D7orULcCaxviTOIKfjgwJx80bbjancr5OX4nbxbtDDkZhVWdt7Rh1+5scBmOuTwgLWvhV3DTyZ+uKLqMhBzmcgUdGirpb+Syqns3vkJvlviGEtH3VWcOvnGH2EWMGAaTgiwfW/DzeokbSXrnuyNmDs5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dqgAlTJc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72BADC4CEE3;
-	Tue, 15 Jul 2025 10:40:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752576028;
-	bh=iS4jv1G7943nQm5ZnIVGEyc4UHlIucD64Nz9LCerUWo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dqgAlTJc7bQcGW3PsEsXiRlO6f0qvFlCoZ6KvDKw9wnSIGB/GavfUYx2lVw3195A/
-	 ipeQizj8fE+9ObfbQXVS9BAoStQmfFR/mGfiBllZ/COkxn+gIQPXDpSE2LQVH18uAS
-	 gBLlmVEAqIw8eK7/EJPK+KLa6JlSR/AhL0DdbSvmhTAJkqMH+Pk0aiMqGbcCFfeciW
-	 yQbA3XbgGdn9iV1hUdP9N5f+ezbBVJPSjz1W4FS5TLaHAir9tmyvkcobzRAuhGLMa2
-	 3azYj1VT6fmfBAP+VDRpz7wYO7sf05FXRupptKSYLEYmxSdIHhXMIH04d8AoKafsOu
-	 9KKOOchfNdTBQ==
-Message-ID: <be30fd08-0347-4c0c-a31b-bceae00b6a60@kernel.org>
-Date: Tue, 15 Jul 2025 12:40:23 +0200
+	s=arc-20240116; t=1752576290; c=relaxed/simple;
+	bh=tAAyI6btdERrX7kxlEMiQsdnF9Ia2Q+2uiKMlGybJto=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MKbwiFgGm2vj5ude2xMVSVle6LHcxwPfY1LIZnEYJF3YCxVGUfzWhyhzUi7pz/fG0OWk3Q+1w3jGnMBdu/Nc9Ww8uZXww3D9xPjOJywg2vi/uSHwRDKhBcgzSJOe1kKUGIbU6vvm0eJyXXARNR/1BS/iCjpD1E0+cyzoa4+jWPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=pGcYvD2F; arc=none smtp.client-ip=46.4.11.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
+	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=i7fP8BcumApPjNSeUMxVqB2p8QkYDUChQH+pYPCBu/Y=; b=pGcYvD2FVp5ZZCcjNbSDGj0dyn
+	PBc8FaOmgTXGhfEg3yEFABbrdF2zBftBEkIemTa5gymhaOGp9Qez/Q8jowo4ypPFZYIxl911FOCMm
+	8g/grdjGZ/t4lo1Davy0nZagwXff8nRI5gmQuXHaRbTtif1jnbPkwPefie2NLrlhQmiw=;
+Received: from p5b2062ed.dip0.t-ipconnect.de ([91.32.98.237] helo=Maecks.lan)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+	(Exim 4.96)
+	(envelope-from <nbd@nbd.name>)
+	id 1ubd9D-00C9uA-1j;
+	Tue, 15 Jul 2025 12:44:31 +0200
+From: Felix Fietkau <nbd@nbd.name>
+To: netdev@vger.kernel.org,
+	Michal Ostrowski <mostrows@earthlink.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel@vger.kernel.org
+Subject: [PATCH] net: pppoe: implement GRO support
+Date: Tue, 15 Jul 2025 12:44:24 +0200
+Message-ID: <20250715104425.8688-1-nbd@nbd.name>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next 0/8] tcp: receiver changes
-Content-Language: en-GB, fr-BE
-To: Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Neal Cardwell <ncardwell@google.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
- Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com, "David S . Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>
-References: <20250711114006.480026-1-edumazet@google.com>
- <a7a89aa2-7354-42c7-8219-99a3cafd3b33@redhat.com>
- <d0fea525-5488-48b7-9f88-f6892b5954bf@kernel.org>
- <6a599379-1eb5-41c2-84fc-eb6fde36d3ba@redhat.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <6a599379-1eb5-41c2-84fc-eb6fde36d3ba@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Paolo,
+Only handles packets where the pppoe header length field matches the exact
+packet length. Significantly improves rx throughput.
 
-On 15/07/2025 12:14, Paolo Abeni wrote:
-> On 7/15/25 11:21 AM, Matthieu Baerts wrote:
->> On 15/07/2025 10:25, Paolo Abeni wrote:
->>> @Matttbe: can you reproduce the flakes locally? if so, does reverting
->>> that series stop them? (not that I'm planning a revert, just to validate
->>> my guess).
->>
->> I'm trying to reproduce this locally on top of net-next, no luck so far.
->> I will also continue to monitor the MPTCP CI.
->>
->> For the moment, I don't think it might be linked to this series: 
-> 
-> Agreed. I did not notice the pending mptcp patches, which are a more
-> relevant suspect here.
-> 
->> Eventually, because the failure is due to a poll timed out, and other
->> unrelated tests have failed at that time too, could it be due to
->> overloaded test machines?
-> 
-> Not for a 60s timeout, I guess :-P
+When running NAT traffic through a MediaTek MT7621 devices from a host
+behind PPPoE to a host directly connected via ethernet, the TCP throughput
+that the device is able to handle improves from ~130 Mbit/s to ~630 Mbit/s,
+using fraglist GRO.
 
-:)
+Signed-off-by: Felix Fietkau <nbd@nbd.name>
+---
+ drivers/net/ppp/pppoe.c | 107 +++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 106 insertions(+), 1 deletion(-)
 
-The poll timeout is set to 10s I think. But yes, it is still too long to
-be caused by an overloaded test machine I suppose.
-
-Cheers,
-Matt
+diff --git a/drivers/net/ppp/pppoe.c b/drivers/net/ppp/pppoe.c
+index 410effa42ade..3595f2d35de6 100644
+--- a/drivers/net/ppp/pppoe.c
++++ b/drivers/net/ppp/pppoe.c
+@@ -77,6 +77,7 @@
+ #include <net/net_namespace.h>
+ #include <net/netns/generic.h>
+ #include <net/sock.h>
++#include <net/gro.h>
+ 
+ #include <linux/uaccess.h>
+ 
+@@ -435,7 +436,7 @@ static int pppoe_rcv(struct sk_buff *skb, struct net_device *dev,
+ 	if (skb->len < len)
+ 		goto drop;
+ 
+-	if (pskb_trim_rcsum(skb, len))
++	if (!skb_is_gso(skb) && pskb_trim_rcsum(skb, len))
+ 		goto drop;
+ 
+ 	ph = pppoe_hdr(skb);
+@@ -1173,6 +1174,108 @@ static struct pernet_operations pppoe_net_ops = {
+ 	.size = sizeof(struct pppoe_net),
+ };
+ 
++static u16
++compare_pppoe_header(struct pppoe_hdr *phdr, struct pppoe_hdr *phdr2)
++{
++	return (__force __u16)((phdr->sid ^ phdr2->sid) |
++			       (phdr->tag[0].tag_type ^ phdr2->tag[0].tag_type));
++}
++
++static __be16 pppoe_hdr_proto(struct pppoe_hdr *phdr)
++{
++	switch (phdr->tag[0].tag_type) {
++	case cpu_to_be16(PPP_IP):
++		return cpu_to_be16(ETH_P_IP);
++	case cpu_to_be16(PPP_IPV6):
++		return cpu_to_be16(ETH_P_IPV6);
++	default:
++		return 0;
++	}
++
++}
++
++static struct sk_buff *pppoe_gro_receive(struct list_head *head,
++					 struct sk_buff *skb)
++{
++	const struct packet_offload *ptype;
++	unsigned int hlen, off_pppoe;
++	struct sk_buff *pp = NULL;
++	struct pppoe_hdr *phdr;
++	struct sk_buff *p;
++	__be16 type;
++	int flush = 1;
++
++	off_pppoe = skb_gro_offset(skb);
++	hlen = off_pppoe + sizeof(*phdr) + 2;
++	phdr = skb_gro_header(skb, hlen, off_pppoe);
++	if (unlikely(!phdr))
++		goto out;
++
++	/* ignore packets with padding or invalid length */
++	if (skb_gro_len(skb) != be16_to_cpu(phdr->length) + hlen - 2)
++		goto out;
++
++	NAPI_GRO_CB(skb)->network_offsets[NAPI_GRO_CB(skb)->encap_mark] = hlen;
++
++	type = pppoe_hdr_proto(phdr);
++	if (!type)
++		goto out;
++
++	ptype = gro_find_receive_by_type(type);
++	if (!ptype)
++		goto out;
++
++	flush = 0;
++
++	list_for_each_entry(p, head, list) {
++		struct pppoe_hdr *phdr2;
++
++		if (!NAPI_GRO_CB(p)->same_flow)
++			continue;
++
++		phdr2 = (struct pppoe_hdr *)(p->data + off_pppoe);
++		if (compare_pppoe_header(phdr, phdr2))
++			NAPI_GRO_CB(p)->same_flow = 0;
++	}
++
++	skb_gro_pull(skb, sizeof(*phdr) + 2);
++	skb_gro_postpull_rcsum(skb, phdr, sizeof(*phdr) + 2);
++
++	pp = indirect_call_gro_receive_inet(ptype->callbacks.gro_receive,
++					    ipv6_gro_receive, inet_gro_receive,
++					    head, skb);
++
++out:
++	skb_gro_flush_final(skb, pp, flush);
++
++	return pp;
++}
++
++static int pppoe_gro_complete(struct sk_buff *skb, int nhoff)
++{
++	struct pppoe_hdr *phdr = (struct pppoe_hdr *)(skb->data + nhoff);
++	__be16 type = pppoe_hdr_proto(phdr);
++	struct packet_offload *ptype;
++	int err = -ENOENT;
++
++	ptype = gro_find_complete_by_type(type);
++	if (ptype)
++		err = INDIRECT_CALL_INET(ptype->callbacks.gro_complete,
++					 ipv6_gro_complete, inet_gro_complete,
++					 skb, nhoff + sizeof(*phdr) + 2);
++
++	return err;
++}
++
++static struct packet_offload pppoe_packet_offload __read_mostly = {
++	.type = cpu_to_be16(ETH_P_PPP_SES),
++	.priority = 10,
++	.callbacks = {
++		.gro_receive = pppoe_gro_receive,
++		.gro_complete = pppoe_gro_complete,
++	},
++};
++
+ static int __init pppoe_init(void)
+ {
+ 	int err;
+@@ -1189,6 +1292,7 @@ static int __init pppoe_init(void)
+ 	if (err)
+ 		goto out_unregister_pppoe_proto;
+ 
++	dev_add_offload(&pppoe_packet_offload);
+ 	dev_add_pack(&pppoes_ptype);
+ 	dev_add_pack(&pppoed_ptype);
+ 	register_netdevice_notifier(&pppoe_notifier);
+@@ -1208,6 +1312,7 @@ static void __exit pppoe_exit(void)
+ 	unregister_netdevice_notifier(&pppoe_notifier);
+ 	dev_remove_pack(&pppoed_ptype);
+ 	dev_remove_pack(&pppoes_ptype);
++	dev_remove_offload(&pppoe_packet_offload);
+ 	unregister_pppox_proto(PX_PROTO_OE);
+ 	proto_unregister(&pppoe_sk_proto);
+ 	unregister_pernet_device(&pppoe_net_ops);
 -- 
-Sponsored by the NGI0 Core fund.
+2.50.1
 
 
