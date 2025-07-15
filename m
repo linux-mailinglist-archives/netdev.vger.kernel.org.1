@@ -1,243 +1,157 @@
-Return-Path: <netdev+bounces-207085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62418B05948
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:52:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C80B6B05947
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:52:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95E324E500B
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 11:51:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CCF64A5A6D
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 11:52:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE6C1254873;
-	Tue, 15 Jul 2025 11:52:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AFA72D9EEA;
+	Tue, 15 Jul 2025 11:52:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="TGK+bdKH"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="ETzqpQH0"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2087.outbound.protection.outlook.com [40.107.236.87])
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B86125BF0E;
-	Tue, 15 Jul 2025 11:52:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.87
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752580326; cv=fail; b=TfUqXVEVsbLimoD+a9X9Rn1yJsDPFZ5R3T7fBG3amQ8y3Q/sXYg+TnWoXm4uXAt428s2gPDYWtQsRAKJszHWA+bPEBfv13VMvH9/ynaxTpSD+je8G//WTHeKFr5AWYRbNjpxJbXimVRPzwzhZqUaCuz9tDTp0Y5IpMPqniInGfg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752580326; c=relaxed/simple;
-	bh=edgAY/mO+l4emHqHRnAPLCi1doOzV01eF7Gf7Iw981Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=FGjq8b73Jtq0RoYQJRkrWgVeSlRXqU/2IzkmuZv/YPW5liQnlFo4UjwOOfFIUCQLblK1mZB1nYa9S9HLFh5/uQxDfqCzHyfRP8tey2wvyLA9g74O8EkS+56ObtW3SgnpcvNFc/XsqMlCTE/PHqAytYoTm2Qfo9TGnmLVDxY7HUE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=TGK+bdKH; arc=fail smtp.client-ip=40.107.236.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Bf4bfu94ct3+1QItPDnYLAkjDuOlBz8J5xma5sRCGdnnlI6/yGmMlPcvYvLtcm1EFz+sL4Bv2bBG7Jp1coyPXiT34uoVYyEmFwke3Qh9vVusH1KnmykbUSgIQosuuSlZodSBolrGwtSy4PjwRcYd9aSCmSHk5C362o+iIl2u9eHlMydvbMo80G39ddukH/aGez3ZFIcXmmmtuWlQ07n5d/hISoeOyABAK8GVRwR3m74MS+rLdKrz7zuw14JMvZUOpA/quiI67+OUZaAbqCXsixC7MH2giOdExhuj6JdR7fc3GajrMBqndxkLEbJfNSfMxQvuktuVMkaO68bnWdUtJg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bfkUolST63xQOcpWWuBwE9NEWrbBVDZZR6miTU67RDU=;
- b=MYCuCgzbb0MBFIgMINmfVhmkErn/IgQT5ln4hWJJTJo78xLY0HVjGZx19xaO2kxmj5x6G+vltH+9NaqAar03fwsLQEeSCSfvWHhcY8jbob+k1J8jAj7oqSSWrhAxPXwyvJsexQhaavWJAUEhQVCSYlAh6t1oZ7dIYqYQXcpkX/2oe0NPKtLHZtwZFNSNyc2+q6JXPjjuReSHsDNZPo8LTzogySzqCotqaLAnBTTO+pFrAYtCtPsHbZxkfGcR0R2kBD7YKJwzVf5Om3Odw9Gp7omESVTtNYPv3rvNEtd8FwSyR+n/V2RbphEcCm9oeVbl9hJrFFpO88iBWxVQ2Nd/1g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bfkUolST63xQOcpWWuBwE9NEWrbBVDZZR6miTU67RDU=;
- b=TGK+bdKHm+OwNoZgULIKPOOpSwjKwIW98yi+89AOx2l5DT8Gj0wySZHt2u6h0xxL2jwdr8emZ9DG4gUL/yPJxerKlDb7t3f/xOiLd1WlJVO9KAXeGDV0kTN21DvoV/G4uevdZS7vJzGOOoKPpg91WmEQI3b5ESyGNrNg52OngyUrhkecfh6PssySra5/tykjKzthq8OA26Zq+8MXAIL99CuXcJUItWdbcwVfyIb2DjbEJ7Cdbn4RLWrCjPZxAnjGj0BXOFGsG4tVgHQ316DlfnJNVpEo+clgIvSejsKgKmftYubPAm1ua9Ckh+Gp4k3/KF7zVhnCcHpwJspEoIcPhw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by CH1PR12MB9693.namprd12.prod.outlook.com (2603:10b6:610:2b0::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.27; Tue, 15 Jul
- 2025 11:52:02 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%7]) with mapi id 15.20.8901.033; Tue, 15 Jul 2025
- 11:52:02 +0000
-Date: Tue, 15 Jul 2025 08:52:00 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Will Deacon <will@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-	llvm@lists.linux.dev, Ingo Molnar <mingo@redhat.com>,
-	Bill Wendling <morbo@google.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Leon Romanovsky <leonro@mellanox.com>, linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Mark Rutland <mark.rutland@arm.com>,
-	Michael Guralnik <michaelgur@mellanox.com>, patches@lists.linux.dev,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Jijie Shao <shaojijie@huawei.com>
-Subject: Re: [PATCH v3 6/6] IB/mlx5: Use __iowrite64_copy() for write
- combining stores
-Message-ID: <20250715115200.GJ2067380@nvidia.com>
-References: <0-v3-1893cd8b9369+1925-mlx5_arm_wc_jgg@nvidia.com>
- <6-v3-1893cd8b9369+1925-mlx5_arm_wc_jgg@nvidia.com>
- <20250714215504.GA2083014@nvidia.com>
- <aHYqPRqgcl5DQOpq@willie-the-truck>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aHYqPRqgcl5DQOpq@willie-the-truck>
-X-ClientProxiedBy: BLAPR03CA0148.namprd03.prod.outlook.com
- (2603:10b6:208:32e::33) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2B3618E1F
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 11:52:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752580349; cv=none; b=q5m+RW66sNqTuPHDDpHbDAWoE/bNaziqaentI/JapQUxX7bmbPiASEg91Ts5RypAtmFFbB50Rw0qbOjmYvZsC3zR5G5TzUv84ZyBjSTE0WGPcB53Zh6Gmy1+j3lW5NIC6tpC9yyBHWnj1vQ2ChsxiNLJ1Sv8GbT88o9MGb925+o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752580349; c=relaxed/simple;
+	bh=0SGGpE1FSUN860WwuC1EDMtRnqLDzeHsrpZIKGCl/m8=;
+	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=nh0/NOpbLwxx+1bL6Nmw6kqGaEblxGas0pRQcPES4yCAwaGqarFU6B8oWp2srSCdO1IrB3DtBkeUB/lYUmC6jynqrIEUheSCmyQKlIogt4ELKClo7+HXSL7i0ZnDAaQKCUeEbrIGl8y8vubETdfadTg+jONa0VBxcrMdBK2t/HI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=ETzqpQH0; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1752580347; x=1784116347;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version:subject;
+  bh=0SGGpE1FSUN860WwuC1EDMtRnqLDzeHsrpZIKGCl/m8=;
+  b=ETzqpQH0MZ0O6WPpKGqfF259PJaa8P5FiAnbLArtmeTk3bo2gO1Edt50
+   67wJpe5nmMZKmNij3kU4lgR2PsYceT7uEOoUt8R/HWuhvOvoe354NmYPN
+   0TeN1xmVt1H9Hj+zAKWOaXvpJdyVsWAomFOZpJIBe0c+8NidaLymT+k5S
+   Km4VvprBilQQXITTs7nn4bzg+wLf5GY2MB9q+AC/6tFA5+X6NFoDvBOCP
+   DXdHUY0IpyS2sMTCPbcx6gZ6zNGb6ro8VHEYHi7+N+3/3g6H8uWzPr89P
+   vbKPKfIXPduyUA5eQUjYnCxZJp7SPEUkZ5riMbAi9logQhxrIlYF1LQ5g
+   Q==;
+X-IronPort-AV: E=Sophos;i="6.16,313,1744070400"; 
+   d="scan'208";a="214683291"
+Subject: RE: [PATCH ethtool] netlink: fix missing headers in text output
+Thread-Topic: [PATCH ethtool] netlink: fix missing headers in text output
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 11:52:25 +0000
+Received: from EX19MTAEUC002.ant.amazon.com [10.0.17.79:63135]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.36.43:2525] with esmtp (Farcaster)
+ id c1e0bddd-6f36-45e4-9f00-d761ad99d406; Tue, 15 Jul 2025 11:52:24 +0000 (UTC)
+X-Farcaster-Flow-ID: c1e0bddd-6f36-45e4-9f00-d761ad99d406
+Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
+ EX19MTAEUC002.ant.amazon.com (10.252.51.245) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 15 Jul 2025 11:52:22 +0000
+Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
+ EX19D005EUA002.ant.amazon.com (10.252.50.11) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 15 Jul 2025 11:52:22 +0000
+Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
+ EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
+ 15.02.1544.014; Tue, 15 Jul 2025 11:52:22 +0000
+From: "Arinzon, David" <darinzon@amazon.com>
+To: "kuba@kernel.org" <kuba@kernel.org>, "mkubecek@suse.cz" <mkubecek@suse.cz>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"ant.v.moryakov@gmail.com" <ant.v.moryakov@gmail.com>
+Thread-Index: AQHb9X7sn+3G9RoAeU22LmBfVeBqjQ==
+Date: Tue, 15 Jul 2025 11:52:22 +0000
+Message-ID: <3bf85637ed244052a26f03cc42cf8f12@amazon.com>
+References: <0bcad81d1d004c74abfbb73eacbe6ec2@amazon.com>
+In-Reply-To: <0bcad81d1d004c74abfbb73eacbe6ec2@amazon.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|CH1PR12MB9693:EE_
-X-MS-Office365-Filtering-Correlation-Id: e82663d4-339a-418e-3414-08ddc39602fe
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?R6rgt3Nem9c3JrwSbbOTUebS/Y5yyPzNtb/MNzBKPpq7VcyM/euVBk/jmAlz?=
- =?us-ascii?Q?QgLYTVudTmfPYZAV5X9Ro/Xg8dIhrcEZWq98IeN3XOtnhcfOzOJHKQBLvKWA?=
- =?us-ascii?Q?fLZwedloJiTzXjoLYogdKcmKcA+7jWlmpqcrnMnuHVkbcfZDgCW1rgrnZvR+?=
- =?us-ascii?Q?jfkA7GSnMMd1XPFP5dGYoBz4RmJ18kUrB7rxRi2pfnOpxHDnof2gJmLBaF6y?=
- =?us-ascii?Q?3u7S+Y/PqJN92SU4qcel1CWqCHCjsVvqiltkyNhkpz3Xd/UE3oudtcLy/g1w?=
- =?us-ascii?Q?Kh9BhveTsRrG/5W/gagsAGZ8tY2yF3EwyPmXJYPYR9ghG27W0z7CeetVCqf2?=
- =?us-ascii?Q?hgshMoTOnKS4538gqOK7jCJoJmtrgNqVL+sEWPSsnUPhEzP6r/DsF5cA9gJV?=
- =?us-ascii?Q?ZG6Xz06vNbvcVONlofkyQR/as+GDEznY9Sdx0DJ30NMFbgfcUJXGNKkeKBJQ?=
- =?us-ascii?Q?wJHjAIPg21N19/QN6KyC3buxA8p8ElkfU3uPPANZK/QyLIEhZRRt6pYfs6gT?=
- =?us-ascii?Q?wt2h//As4Ra5TSgnAoZmQaAjQl307HrUNyka1uFCiK0kGuEEk5MI5nZPG46m?=
- =?us-ascii?Q?9QBpCeTklZnt5Daeaz3N3c54Dnjh4VlUglHAi2PEsngisj4echtaTOyo9++A?=
- =?us-ascii?Q?FXMZy99rMd8AAwj0QRtS+aizAKpF7AqdBxrMNp97njOYYbHYgFEhvOmbqfn2?=
- =?us-ascii?Q?IpvpqVAUJPjXr8JYI/Nb0bkCa01WPnIZIaZ7gUM2eW+GeC9uAcdeRNAaKZze?=
- =?us-ascii?Q?JhDhgADEgwSNQ7MscsMzJHZYDCBDUwQeLtHxbwiSVZf1tTAbU62RxfmHpioD?=
- =?us-ascii?Q?w3eATam1dHS1Y7/pvYd3koAXysQpk9r1wn+8ilfk/ROVUYlXsKzVxe7cx1mn?=
- =?us-ascii?Q?7XedWS+KOaCp6DnMkW+Isq5Cj+Oxh7U96B/qIx/Et8jIuQr0sqiCHVpKC5o+?=
- =?us-ascii?Q?NnbE9BfYf3tAuFH2rw03PdcXRt0YdDsw5/1Cd/cU6k0Gqo1OokNt010dFrAa?=
- =?us-ascii?Q?jVci+lDdJFbZZuBithWghQxihOHoDRnkt3ztdxMRS5bw2EDnhUT5KQlbuV0s?=
- =?us-ascii?Q?OZkynv1tymb2Z+mknX7L+LzVjhFS4Ms/JRWE1WxRmN4kNbYLYLrHAwuzMYk1?=
- =?us-ascii?Q?+EGOuwpY5GmURS0q/SWi7QhJ7ndVp8/8eqEDJjggwtD5ysgsbU5fROddw86V?=
- =?us-ascii?Q?XB+niM3UGEmrtU9TBbr+q/1GZVzMXskbNUYK1LN8ycwsqBsi/bbGTeB9GtsS?=
- =?us-ascii?Q?iP/tqusH7jve+qI4m8oTeCUS9NLla7WAu1v5y6cVwbyC3iOHivd5g6Q6FtIm?=
- =?us-ascii?Q?ol0c06htni7m+jC4ngG3NszhvfVKLToVQJwuW+70snhsxjWz4UufMPgvsUv3?=
- =?us-ascii?Q?CDYhuLMH2PuqAlEgqPyoGLdFrRL/G+HWWCNQRkz9/PygOOdoUQ1WAgV90Q/b?=
- =?us-ascii?Q?cOQXIUVOdlo=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?J+Vi2p25kpu1TffEcCGLoYK0H/mR5iZ6ZUGyn+s53c0XPK0apFs1CGeGgXHO?=
- =?us-ascii?Q?i7jJec5aeOA7/9IB6mZMe9CywsL5offIYisRJv99GV9EYryRhoTL5sRsnC2O?=
- =?us-ascii?Q?XWocvDYF/q5PDV3334/aiEf+sI0dV0hxpjHvnVemGvewDUYL0H17wprFOWSA?=
- =?us-ascii?Q?13IqX1J/OimepTm5myD+wq4cbxU7s/Zm29b8PqWZNWEPKN4nPzcH/BsZH/5j?=
- =?us-ascii?Q?uehoW/NK6rs/q+yJctWM7NtgpCCEZ8h50anueYf9A5FvSd7MtwDvHoUcvYTM?=
- =?us-ascii?Q?udOrBbxR8lx32C2OvNC9QLh6/bc3e2wZIjU4IlqmPK3fn3g3znm3pAHSfvAX?=
- =?us-ascii?Q?JV6SeLmPv6GIxqAxFA0BCWZoqp1h/9c/szZ5SYqRATSusdMe68ASuo6NV872?=
- =?us-ascii?Q?LvrprfLzhffATzwK3pzn67DfJHZxOO9OEyboXW4uYoYh2hwXJleHNx31OHyn?=
- =?us-ascii?Q?8Z7s6n8Abg4azECNZq3+Cb3vUMGJPn4q9x5ix03oEOivpR/fheZPtHgtJHLH?=
- =?us-ascii?Q?UJmFVG2gvAnKs5bBBoAUOBEWIimvSgpKOe8+R4m2C5NUgwDgYgio6R84zH7w?=
- =?us-ascii?Q?tfBgJKx/An/3Tqg+xYHhNKY90X3FprzNtP3e0VJubXlD0aa+6IULhOmXf56m?=
- =?us-ascii?Q?mIMPZeqgfH/CV/OVT9akgVDbEO1Q6LPzTrkyXEOMIrHTE3Pw46PoWxSzT4Q3?=
- =?us-ascii?Q?odOMaTOeKD4IxHwX50ER+NIQb6v3nWgkazbFlylzRSOmq+zZ6IphIEm4D1kJ?=
- =?us-ascii?Q?mHdPGVPVYAHLBu5XSmnFoTCzRStqq22jqwj0phnr4dSmKrXJo4lm5xCaJd0e?=
- =?us-ascii?Q?YSxmEcbRderthYVux8iI9+kPwaF2cCmUH3pXu4ASdRclw4sqV6PMWK8B7b6C?=
- =?us-ascii?Q?2LM7DT0EuAoP54sc4fJcBr3SsC3SUx6wJEa97cvXTawXCurCAV/QlMLcZzeP?=
- =?us-ascii?Q?5Q8UAawBTbWfc4lk8ffaz+9iza0gyJLd7mAjNm2Pl3cOANbYYhAXlI2NwKGB?=
- =?us-ascii?Q?vvwQyLvgL8RJQYC1p/4ud/XIk1ATFsic8+si+M04hZtBLELMJNZaYU6Mpmp8?=
- =?us-ascii?Q?Rt6/6Fe3N1toYoN+3L5jifZYzSpqiQN1X1mKak8yL1DDVN8jodwbPZjA/Pzh?=
- =?us-ascii?Q?eKoYyCJ/aaNIdxGd6xcSaWVyLeMBIYLyercpa0g1//2IOCqpV7EPAQXVHhrz?=
- =?us-ascii?Q?wz9VFpDWmnaPln9hzaJwLyMKd9OvYmD6tSe5I62sQlFiJ3ZLC26gyWrXfgCY?=
- =?us-ascii?Q?5ZGl2QW7Gs4naBxYhZz3MrG35fl/END2j6si2tMGoFku+/BgIiIGcVvd3wd4?=
- =?us-ascii?Q?YinfrhHsJDp849wmYIXAKgIm3e7r05lox9CeV3usCV3U71pi2nksqNlvm4PU?=
- =?us-ascii?Q?a95iaNYVH/bWVmVwZQhmtvyIsblk2cfqc4ZtDzSlwZu/xOvz70qYcVSC1KOe?=
- =?us-ascii?Q?DMNBwLUfMmavWbWiTJi9nDfWNJwoeWPa4Z1fctgz0dwQ0n9iMLfs/a8V0D1p?=
- =?us-ascii?Q?iogsAmu87E60tE4R+TZJAbVv0P9FenSv4tantzWCevt5EX5mpMRpcOF5enRL?=
- =?us-ascii?Q?JN+GrAFvMRCasUi2YYD7BSrcZ8QqN3tfdW6Bteja?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e82663d4-339a-418e-3414-08ddc39602fe
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2025 11:52:02.1092
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rAGfT/IK6zVTgYYp26C2k98Wf850rdkX3hkh5gku+2ulOb5xQbOkUFkXnFXQlQC7
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH1PR12MB9693
 
-On Tue, Jul 15, 2025 at 11:15:25AM +0100, Will Deacon wrote:
-> > Since STP was rejected alread we've only tested the Neon version. It
-> > does make a huge improvement, but it still somehow fails to combine
-> > rarely sometimes. The CPU is really bad at this :(
-> 
-> I think the thread was from last year so I've forgotten most of the
-> details, but wasn't STP rejected because it wasn't virtualisable? 
+> The commit under fixes added a NULL-check which prevents us from
+> printing text headers. Conversions to add JSON support often use:
+>=20
+>=A0=A0 print_string(PRINT_FP, NULL, "some text:\n", NULL);
+>=20
+> to print in plain text mode.
+>=20
+> Correct output:
+>=20
+>=A0=A0 Channel parameters for vpn0:
+>=A0=A0 Pre-set maximums:
+>=A0=A0 RX:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
+>=A0=A0 TX:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
+>=A0=A0 Other:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
+>=A0=A0 Combined:=A0=A0=A0=A0 1
+>=A0=A0 Current hardware settings:
+>=A0=A0 RX:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
+>=A0=A0 TX:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
+>=A0=A0 Other:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
+>=A0=A0 Combined:=A0=A0=A0=A0 0
+>=20
+> With the buggy patch:
+>=20
+>=A0=A0 Channel parameters for vpn0:
+>=A0=A0 RX:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
+>=A0=A0 TX:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
+>=A0=A0 Other:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
+>=A0=A0 Combined:=A0=A0=A0=A0 1
+>=A0=A0 RX:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
+>=A0=A0 TX:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
+>=A0=A0 Other:=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n/a
+>=A0=A0 Combined:=A0=A0=A0=A0 0
+>=20
+> Fixes: fd328ccb3cc0 ("json_print: add NULL check before jsonw_string_fiel=
+d() in print_string()")
+> Signed-off-by: Jakub Kicinski mailto:kuba@kernel.org
+> ---
+>=A0 json_print.c | 3 ++-
+>=A0 1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/json_print.c b/json_print.c
+> index 4f61640392cf..e07c651f477b 100644
+> --- a/json_print.c
+> +++ b/json_print.c
+> @@ -143,10 +143,11 @@ void print_string(enum output_type type,
+>=A0=A0=A0=A0=A0=A0=A0=A0 } else if (_IS_FP_CONTEXT(type)) {
+>=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (value)
+>=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 f=
+printf(stdout, fmt, value);
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 else
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 fprin=
+tf(stdout, fmt);
+>=A0=A0=A0=A0=A0=A0=A0=A0 }
+>=A0 }
+>=20
+> -
+>=A0 /*
+>=A0=A0 * value's type is bool. When using this function in FP context you =
+can't pass
+>=A0=A0 * a value to it, you will need to use "is_json_context()" to have d=
+ifferent
+> --=20
+> 2.50.1
 
-Yes, that was the claim.
+Thanks for identifying the issue and proposing the fix.
 
-> In which case, doesn't NEON suffer from exactly the same (or possibly
-> worse) problem?
-
-In general yes, in specific no.
-
-mlx5 (and other RDMA devices) have long used Neon for MMIO in
-userspace, so any VMM assigning mlx5 devices simply must make this
-work - it is already not optional. So we know that all VMs out there
-with mlx5 support neon for mlx5, and it is safe for mlx5 to use.
-
-Typically this is trivally done in a VMM by never emulating mlx5's
-MMIO space. If the VMM takes a fault on a MMIO page it fixes the fault
-and restarts the neon instruction.
-
-The generality was the notion that there could be other devices in a
-VM that are fully emulated and using these challenging instructions
-would break the simple emulation. This is why the general purpose
-__iowrite64_copy() didn't use STP.
-
-> Also, have you managed to investigate why the CPU tends not to get this
-> right? 
-
-I have asked but our CPU architects have said it is too complex to
-analyze, but they admit it doesn't work entirely well :(
-
-The belief is some micro-architectural condition is breaking it as we
-see even neon instructions failing during every test.
-
-They say it is fully fixed with ST64B in the future.
-
-> Do we e.g. end up taking interrupts/exceptions while the self
-> test is running or something like that?
-
-I doubt it, the test is running in kernel mode during boot for
-hundreds of iterations. An interrupt on every interation is not
-likely. Any single successful combine is a pass for the test.
-
-Even an interrupt shouldn't disrupt a single instruction Neon store,
-yet we can still mesure a low rate of neon failures.
-
-> Sorry for the wall of questions!
-
-No worries! It's weird and definately complicated.
-
-Jason
+Reviewed-by: David Arinzon <mailto:darinzon@amazon.com>
 
