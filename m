@@ -1,119 +1,149 @@
-Return-Path: <netdev+bounces-207096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47A86B05AE8
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 15:09:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DC2BB05AF2
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 15:12:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 700B53A896E
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:09:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A155217565F
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:12:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAAD32E2F00;
-	Tue, 15 Jul 2025 13:09:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41F1B2E2667;
+	Tue, 15 Jul 2025 13:12:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LxVtsJyk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E9I0/cFG"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 712CF145355;
-	Tue, 15 Jul 2025 13:09:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80FEC2E2EE9
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 13:12:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752584970; cv=none; b=HJ/PMNQvyLJkbxCUdzdjz9skkv6sn708K0q6BB3WCTs3IMfAS9Mpme1bKumQni2hmgdLy4TkvtUDv/Mx74z2iTv7jKEvjAJqruQtthNZ4ZOOuy9dVsPprc101BiH1JtwPfGB6Oymebxig+eEEPvQu8eNC4A5k9ZH6b1LKh/dAjk=
+	t=1752585129; cv=none; b=GuSiue0QRedfL77Fv9Gy7tFkU4xWFJB2AGnGkOn54n+PLjflKB6qvgmFoatDjqtaC3FlPYwjOFG8aD0/X3bld1XS7huWMzky8nlzwugyT+tbFS+jGU5mry03pHkebJ5LhvxXfyNuaY9/yi5Vd+DHSYQDZybpyh5vX/P1R+nJ3PM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752584970; c=relaxed/simple;
-	bh=eoF/UePDKZmut/JhG6GaJN6c2Lua9uujSd7gKNYVqD4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M1d1XCklEFtMyf2O7jJD7286cLMOK8wlCw1l67MW3IypFmtVRiDcKbhV8PujGfhlEef5QwzTAfbq76LZEIjRyrx0WpRtVoATF4XMoPPMYBIqBcEOcqPLysJUkOONT+rlMbNPT8OV9vISEFNt646Wm5+j0ncPQ6TbUluAYp7uWLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LxVtsJyk; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=16c8+dR6HK0YJK9HdtebFuRBOksx/FzCYGCA1VXItEE=; b=LxVtsJyka2iWGcioJGwDwlizsr
-	L4EoRNpGscSylpareAM6ksRdtJVRFOsui0skpA2/emISSuak68BrHCOwSX67AqvNVMsbZRfVt0T1x
-	1GK7n791vGtFiKvcyV7KK6VVRcHhKCBcOhznASGSpV5vB2jBFhfT7ss8ERvpNv/FdH60=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ubfPJ-001a2l-Pl; Tue, 15 Jul 2025 15:09:17 +0200
-Date: Tue, 15 Jul 2025 15:09:17 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: =?utf-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>
-Cc: weishangjuan@eswincomputing.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk,
-	yong.liang.choong@linux.intel.com, vladimir.oltean@nxp.com,
-	jszhang@kernel.org, jan.petrous@oss.nxp.com,
-	prabhakar.mahadev-lad.rj@bp.renesas.com, inochiama@gmail.com,
-	boon.khai.ng@altera.com, dfustini@tenstorrent.com, 0x1207@gmail.com,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, ningyu@eswincomputing.com,
-	linmin@eswincomputing.com, pinkesh.vaghela@einfochips.com
-Subject: Re: Re: [PATCH v3 2/2] ethernet: eswin: Add eic7700 ethernet driver
-Message-ID: <e734f2fd-b96f-4981-9f00-a94f3fd03213@lunn.ch>
-References: <20250703091808.1092-1-weishangjuan@eswincomputing.com>
- <20250703092015.1200-1-weishangjuan@eswincomputing.com>
- <c212c50e-52ae-4330-8e67-792e83ab29e4@lunn.ch>
- <7ccc507d.34b1.1980d6a26c0.Coremail.lizhi2@eswincomputing.com>
+	s=arc-20240116; t=1752585129; c=relaxed/simple;
+	bh=G+ns0uih/2uJnqImmyyh/cjDmesXOrcn+5Yz32pH4mY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PuHsNU+a/IUD9e05FQliYC/d8OgTV9ojAX9JHZ4nyR8WT4JdzITzpdrpTTo9wWKC3ieoT+/JuMhs8pRnxUae9eP6n4YajYdVG7Ht81lcD6maG6P5dD0yTynb8PYIdNpNg2sD2GnLHv4VQvqBC24d0fo+jMbUFWEuwd3vn7WTEEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E9I0/cFG; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752585126;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PZz4VIlihh12lH8XqRKgb8bjytGutX1e1f4gwGdB4vo=;
+	b=E9I0/cFGUut37BXb6A9FINr7DbXcD9xcjuTFfB74M4NgRnLCUYiQYWkQLGx90FJELOjB3b
+	8rJThYonN+t7bMyaDcSQqYUZAY72xl2YopLd/bymO+kUk51x0/4vYokhwilwSar9DmPH9w
+	D4+wljA1OriEBqiSRc1Z06zXOfiZx9g=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-589-D5HwydE_Ppu_WBPgOJU1Ag-1; Tue, 15 Jul 2025 09:12:05 -0400
+X-MC-Unique: D5HwydE_Ppu_WBPgOJU1Ag-1
+X-Mimecast-MFC-AGG-ID: D5HwydE_Ppu_WBPgOJU1Ag_1752585124
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4561611dc2aso19775345e9.0
+        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 06:12:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752585124; x=1753189924;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PZz4VIlihh12lH8XqRKgb8bjytGutX1e1f4gwGdB4vo=;
+        b=v4XxJPIaR0Iet1Ie4guLlyASUMeyKj+S+Rk7AaNxjuTvfkZ/P2ZOkOxA5ooK6m5AV4
+         lkSkAd4Uv8gfRsiDuioOYphlPhqR39e31nZQP5Jt1q1R9iXJhTyDB6Mv8vq+OZ1SboHi
+         XPQKJKNO85EQrNIfErWxETiAG+tB+N7NUMwPxMzFnOJiO6U5U7vUwKeWBKywg2fBlmpj
+         UWKLds6c3Uecsq7BfZbUizVv505ggRSLXUxtkjIOWSCEH8Jx2m2j7cfp72oceIG06huL
+         or5NXNeofp2a7gxLCH99VLvgbLhYzUWE7LyDwaNAxulNQ0i37Pf3CYHGdBYsmNvk6IXA
+         Q4sw==
+X-Forwarded-Encrypted: i=1; AJvYcCUAmBtYAsoBRS+13G2AzGmoN3JSQzbGMUEfgvvqVJpFywleXyZpBgRpk95N9Z4iX8v8PkEePpQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxqppy6ww6p9Aw4wLHJZhyP/e5ji7YwCP7+RiPDhtDtjrwc+Lbb
+	moxqTDri6fkAAx67YkCAGAtpMhjrT6ovFn7Yqmo+G/7/oH6mfQjSuIpMx5LfBiBZR6sw+VM/4Mz
+	tQ3sVgUrVEGkWaKp+g3xFcet2cq3OcCFp9F16KO8Za1ZRYI4l8FvAO+zp1Q==
+X-Gm-Gg: ASbGncs4Y8abAxp0BgTPewrtk5jIZE8tagKq6aVCoSilbRySfdWP/EQQg/JyHP1K9Mq
+	64OwAtyzsAIaT06T/5gOfR73VBrH/xTeLWReh8rF0OuXR66vmUtAxULMaMItr3ZNUFfBT0CabXI
+	j02uMcv3zVMtX25KEBAk1ShncX4Wu+Tnzg1lYA0kp6xICpeX1zAv1ggKTM8ViUDMqF9a4HGGbwE
+	62nhPM4a/nMLIc/JJ3AFFWoUXXoSIUghuMCQj55ulflfcfK8Y5RwIn7OeWg8wK691T/6PruzxZx
+	JghUmyuoNtUoGtZjvFf1bhqKyQ/efxUt7NxRcJKmzNjEzqNG0diDYwzZ9+BkUrYVrEEr/y79jwW
+	rvAPd1UCbnEM=
+X-Received: by 2002:a05:600c:3481:b0:456:1752:2b39 with SMTP id 5b1f17b1804b1-45627727ef0mr23163675e9.33.1752585123981;
+        Tue, 15 Jul 2025 06:12:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEvhstXqxkYiuemf61jyKIee/sWIfmW07HUYzwNSL7GMP+VePr5KTLB5NLMowun8JOgyGr8Vw==
+X-Received: by 2002:a05:600c:3481:b0:456:1752:2b39 with SMTP id 5b1f17b1804b1-45627727ef0mr23163335e9.33.1752585123501;
+        Tue, 15 Jul 2025 06:12:03 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45624651a09sm30800535e9.12.2025.07.15.06.12.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Jul 2025 06:12:03 -0700 (PDT)
+Message-ID: <495a37e7-e31d-4671-a4d9-7e653ad80b60@redhat.com>
+Date: Tue, 15 Jul 2025 15:12:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7ccc507d.34b1.1980d6a26c0.Coremail.lizhi2@eswincomputing.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 4/5] dpll: zl3073x: Add support to adjust phase
+To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
+Cc: Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
+ Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>
+References: <20250710153848.928531-1-ivecera@redhat.com>
+ <20250710153848.928531-5-ivecera@redhat.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250710153848.928531-5-ivecera@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> > > +	dwc_priv->dly_param_1000m[0] = EIC7700_DELAY_VALUE0;
-> > > +	dwc_priv->dly_param_1000m[1] = EIC7700_DELAY_VALUE1;
-> > > +	dwc_priv->dly_param_1000m[2] = EIC7700_DELAY_VALUE0;
-> > > +	dwc_priv->dly_param_100m[0] = EIC7700_DELAY_VALUE0;
-> > > +	dwc_priv->dly_param_100m[1] = EIC7700_DELAY_VALUE1;
-> > > +	dwc_priv->dly_param_100m[2] = EIC7700_DELAY_VALUE0;
-> > > +	dwc_priv->dly_param_10m[0] = 0x0;
-> > > +	dwc_priv->dly_param_10m[1] = 0x0;
-> > > +	dwc_priv->dly_param_10m[2] = 0x0;
-> > 
-> > What are the three different values for?
-> > 
-> 
-> Let me clarify the purpose of the three elements in each dly_param_* array:
->   dly_param_[x][0]: Delay configuration for TXD signals
->   dly_param_[x][1]: Delay configuration for control signals (e.g., TX_EN, RX_DV, RX_CLK)
->   dly_param_[x][2]: Delay configuration for RXD signals
+On 7/10/25 5:38 PM, Ivan Vecera wrote:
+> +static int
+> +zl3073x_dpll_output_pin_phase_adjust_get(const struct dpll_pin *dpll_pin,
+> +					 void *pin_priv,
+> +					 const struct dpll_device *dpll,
+> +					 void *dpll_priv,
+> +					 s32 *phase_adjust,
+> +					 struct netlink_ext_ack *extack)
+> +{
+> +	struct zl3073x_dpll *zldpll = dpll_priv;
+> +	struct zl3073x_dev *zldev = zldpll->dev;
+> +	struct zl3073x_dpll_pin *pin = pin_priv;
+> +	u32 synth_freq;
+> +	s32 phase_comp;
+> +	u8 out, synth;
+> +	int rc;
+> +
+> +	out = zl3073x_output_pin_out_get(pin->id);
+> +	synth = zl3073x_out_synth_get(zldev, out);
+> +	synth_freq = zl3073x_synth_freq_get(zldev, synth);
+> +
+> +	guard(mutex)(&zldev->multiop_lock);
+> +
+> +	/* Read output configuration */
+> +	rc = zl3073x_mb_op(zldev, ZL_REG_OUTPUT_MB_SEM, ZL_OUTPUT_MB_SEM_RD,
+> +			   ZL_REG_OUTPUT_MB_MASK, BIT(out));
+> +	if (rc)
+> +		return rc;
+> +
+> +	/* Read current output phase compensation */
+> +	rc = zl3073x_read_u32(zldev, ZL_REG_OUTPUT_PHASE_COMP, &phase_comp);
+> +	if (rc)
+> +		return rc;
+> +
+> +	/* Value in register is expressed in half synth clock cycles */
+> +	phase_comp *= (int)div_u64(PSEC_PER_SEC, 2 * synth_freq);
 
-Maybe add a #define or an enum for the index.
+Is 'synth_freq' guaranteed to be != 0 even on extreme conditions?
+Possibly a comment or an explicit check could help.
 
-Do these delays represent the RGMII 2ns delay?
+/P
 
-> > {
-> > > +		eic7700_set_delay(dwc_priv->rx_delay_ps, dwc_priv->tx_delay_ps,
-> > > +				  &dwc_priv->dly_param_1000m[1]);
-> > > +		eic7700_set_delay(dwc_priv->rx_delay_ps, dwc_priv->tx_delay_ps,
-> > > +				  &dwc_priv->dly_param_100m[1]);
-> > > +		eic7700_set_delay(dwc_priv->rx_delay_ps, dwc_priv->tx_delay_ps,
-> > > +				  &dwc_priv->dly_param_10m[1]);
-> > > +	} else {
-> > > +		dev_dbg(&pdev->dev, " use default dly\n");
-> > 
-> > What is the default? It should be 0ps. So there is no point printing
-> > this message.
-> > 
-> 
-> The default value is EIC7700_DELAY_VALUE1
-
-But what does EIC7700_DELAY_VALUE1 mean? It should mean 0ps? But i'm
-not sure it does.
-
-	Andrew
 
