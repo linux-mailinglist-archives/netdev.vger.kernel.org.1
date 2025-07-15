@@ -1,203 +1,168 @@
-Return-Path: <netdev+bounces-207131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD418B05E29
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 15:50:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3832B05E46
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 15:52:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 883801C27F47
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:44:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78400501C97
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:46:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36C052E718B;
-	Tue, 15 Jul 2025 13:37:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B3DF2E3B19;
+	Tue, 15 Jul 2025 13:38:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UMMN9a1x"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Soq+l7x0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4273C2D372D;
-	Tue, 15 Jul 2025 13:37:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD2C2ECEA5;
+	Tue, 15 Jul 2025 13:38:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752586665; cv=none; b=dIJaN6zBbmoCcVHr615A8hP3xlSGVYaPuaJdZdLruNPRluqJQF3259LaUYKHxiP05RFMMwZx0jrXXrDTHQlgjc+sbNjvRpJS7XjwBhDkKghD2J2z/9ApuBxyNl9CWwxjoaDXhI7mgBarKKlebNwUimHqppThcgCgaHXNT8THzbM=
+	t=1752586710; cv=none; b=tTNwpNRDGjlS5ADSnu+DSvpkOZL1GjYEzlLpno4DOjhxdsIxJ7M5P5s2SPdEvMXlsv4qD4NJyLBxn0bSVbFe7Z4AuVyaume3Aj+kzPw67rQCX3BqmFSHmRO13CPmyI2Mcz67FEJMSrdGb9qsNpTFJ1yVjAkvuBHH3hPmrSrDenk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752586665; c=relaxed/simple;
-	bh=UZOkLJq1yQRo2joDviEQwZX005oLg/tuPJiZ4DBAWek=;
+	s=arc-20240116; t=1752586710; c=relaxed/simple;
+	bh=DMKIf8aWEIGOaSziFnfi3lGFRGwvJS/wmrcYpsZO8SM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oBRIQM3FLquArZUHn4dGd/zYJns4Z0kygailtjsSUcjz2RUFRBNCKjQRAsv8rQBCrPHUpmwnAIP/Ms3v5Yl+keL1oNWuHQqOWBzdIQvrS2IXUZt2uPHntbfOkmYRMyz4/BxV5rJ8e5LLWTF/rO67Nlod1qTkq3cPRnjdac7ZZOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UMMN9a1x; arc=none smtp.client-ip=209.85.208.172
+	 To:Cc:Content-Type; b=ovlR7b6ID5iJDFK5BBTQ7KgsLhY8Dtq5J7qRGFiVF+D+DClxBf00+niUOlreJA2JzIDzwOVmC2/X1cV8wK+8UXwRoTn6fbL/V4SA4UKMcAsaMX32DTlX6Bn9oPD0RqkfNEmSABnRjBj0O2RkeNWyE1IJacUFKmblUMb54oqbKFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Soq+l7x0; arc=none smtp.client-ip=209.85.222.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-32cd499007aso40345951fa.0;
-        Tue, 15 Jul 2025 06:37:42 -0700 (PDT)
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7e33fa45065so25996885a.1;
+        Tue, 15 Jul 2025 06:38:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752586661; x=1753191461; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1752586708; x=1753191508; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eNrscCBPbLnulVmw8wNgBHHyDnL0sYlWPeSwnjiE1fs=;
-        b=UMMN9a1xAt1xGFg+hIQy3KWiLi1vpWReL1mWlGI3C8sV0sW+fR8fO4eBYAVgr0VqEC
-         nCqGXQWfSiDYWw9R4pdflNc7sqgamIC4+MDJ8KeZcnvAjhEhi90EcBm3jBUvqBn/21pI
-         kXFkfw6rgVLywi69vCC29+rTiWtOjwOMChx8xdBWE0LS3v5TM3B+ULiIhhlX76A8zbJt
-         4J6vo1FzzjwMg8DKU4ehwiiwnmg5yfgbHSyYsADF83/5Fk806ct3Gr54+Njyn1noY/j9
-         yrGvqnMg06oHg2I09oq0VH58A37iHxPZIdq9aRP9L4O0OUj7U8ENpOtLI4fsy5UBEuUf
-         uyDw==
+        bh=GQi1T6NwkTeZfxo29WdZM32LKwWG4+C0TAJA/JztXec=;
+        b=Soq+l7x04dAdwIAB/4VNT4bVrCaq01uMuRuQd3X1yLDtokYe/nuQc/3jVaHKjesl55
+         1jQQNXvlwZw79skeDTtUaJ7GzT1DEYtXgqdO1nd+sU3sdhdbyLzsPBtZp+cKNjgHjh2i
+         kRD82M2api9Xg5t48Zl1FnUj61OZin3NUuQCtnLPcFoELBFpcILonhaEZjD/jrPjILj/
+         KVYhhE7N2M3n/QK4cD3jJudGR49Xxi1s1ZMFEAP4jml1/jvZATDNgPmAcgg3ki+TI8ot
+         9rWd9Tqu40PmpxHxNhdWXiatBxPo1Nys79ncVa6FWYRpDyDd1fjoSpIcSQZBkDCtUQNw
+         gbaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752586661; x=1753191461;
+        d=1e100.net; s=20230601; t=1752586708; x=1753191508;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=eNrscCBPbLnulVmw8wNgBHHyDnL0sYlWPeSwnjiE1fs=;
-        b=v1WmQZbLzzKEgDtbT72uCU3tCy3B4kofn6tp6YMmNtinxF2P38GDi+xrs8fCxr/W+2
-         M1szqez39Zak407NGiwM1Zswl8iw0NbgUnBBWrManeHIMIWi7qkn6NuJOS8n4tF2FjoH
-         ESCzIY8mkwSy7Z1kjbDXIV2r/j5Tgr7UVMr1D6YXQzeLa/clRBQj22hJFC6FjCJL+tQL
-         smtlAt80stJDzUvWb+o/fg1ybMmXk33l54zW3QfAZQiJIC8n6USKHQFMqhu+hkrJvBmC
-         /jkKaGyL4smvOB7tTDpQDHaYYgITKDmPHziPXq+ZnmcqSpYzQWP3lb2oJgNU08PRwq0p
-         6CGw==
-X-Forwarded-Encrypted: i=1; AJvYcCU+7JnzK5cr7+XYbcgkyTdFcB6Jq84K1mPAE/OqqpoPXpzb27DwuNzv+srl6bdESBkauShQs6y6@vger.kernel.org, AJvYcCVv4XCyW5AKWwNJy0f1pDJ6emmef64ycSPimia1tbTHrBgw3RQIfye/YjkZK3av/Nb0/l3cuu4HK9qwDkzn@vger.kernel.org, AJvYcCXC7uxU9TY707VbJO+Q07ktRBflE9iQ7iXNi6SJjT0YPjGQ/yU9aels0pURGO1mV6a0Xdpul3E4jj7Vem4GxrI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8wdDdHtLRZh3h99mx0EwyeqkRVMZtOj9hnicwrHBd82fwyVlF
-	Euu2QwgShq7ZnC52xBd4jqgNaoygGDA5nb0qjXEc+pAtGMep1KJ8Zg1JURdDcc+yb+sAbDg3b4l
-	kxHENKP6hc+0W6kIV7diFWyeofl631Sw=
-X-Gm-Gg: ASbGncuU6STOmrhifLXneTojC1xBuPuZ5txpz13/cMhzFu772I1hH+zNlGOVI8IKMdW
-	puFyvxyHjv6fdKYJoBep+dxca8JozFml+vP4Gz1LKqrBoFJoQLYqpuTNxh0cOoOdONX1DKa/GiL
-	nHZesxdgUSv0rWINiTn+7htuq322fAW4ioZ+tr4FucsUwo/kcLF5omiFDOxPpTHuDPrI13+5aOy
-	rgyJA==
-X-Google-Smtp-Source: AGHT+IHmsGoXd7Dae9wkOiRS1DoObc9wHLvD4xc7v2A7uvkRowpUm8thuvki77DBD41ammVrV6P0k/llYbUfcilRlSY=
-X-Received: by 2002:a2e:bc18:0:b0:32b:533a:f4d6 with SMTP id
- 38308e7fff4ca-33084ba8ce4mr8628211fa.34.1752586660925; Tue, 15 Jul 2025
- 06:37:40 -0700 (PDT)
+        bh=GQi1T6NwkTeZfxo29WdZM32LKwWG4+C0TAJA/JztXec=;
+        b=uKYBBv+FCbSzIDeV/gQCzEgnZeZcIG7AQa+wc1cXndolZztfZF/cDEXJWPFF/9EpNz
+         CpX+Xma0FSPMVaFnCTJIxJyjzMhbldhnFxB2ubBD6P/07N75dgwW8e7i5BT8aqnZ0Hrf
+         0udjzzVMcJlU3pTTe4XA2lNBUb+N/sY3YSXfaR1zGG6J0i9P/MT2eBbVPFn+vM0NJQL2
+         yHJ5lsBlwsidH5sLD9+7wWPZX3RCkQ+wmQO4n+dZ3PH4755YoFcw2MrJbG/8nr+rO4De
+         aXF7rgRRAw401LOsqSjgGfIPYYaehW4p/8+SF9DYnMlWluL9egYnSFuLUqLeal4zi2Pu
+         NxdA==
+X-Forwarded-Encrypted: i=1; AJvYcCUSXQkPQlcKqCvcDrQgtpXEM6q3q2IOcMWBJhHIOOYBj1sVnRQWU5fBjq5Co/d3xCssQocsmS8OVrlquTk=@vger.kernel.org, AJvYcCWBALj1WmFoQQay8mKnGsmzg7lWqzJScMOhzVjEZJMAgHeHbjCX0Isqsb5D6tpoHpBUZg+ViiuB@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2veCIAw0aN+iaAWt/Tiogd0ZjJdLBWNd6mi5BbjuIffZTyLpt
+	dJp5am79/mX446SLbspSgjLdNPH7YpgFLkeTxa4MCaYVk1Wnhn/tyciYgYqgyV/qS/i6VN4NxWr
+	t+I0MmzCZc5sVhfTk9TuMGUdSqkAROj8=
+X-Gm-Gg: ASbGncuepiZ4t4KsrS8yWbOyKQT2LslgHaD+jHDQfnpE9kd3F2abuODyZ7875CwH5uS
+	NRaVMQRfcZoCrDdu0yecsnopOYSgkdrBBu5fUtInuxQFmhJnpq8XJMXpFEID08ptFkWxaBIc2wu
+	u94TwsvHAmX1BV3nvAoXqIWT8Ko68PsCN7IjVC/6qBZ72Yb/GF/QJKcvsKGh0W1pqZCkEe2s4vg
+	pz9pQ==
+X-Google-Smtp-Source: AGHT+IHjynnQLckw4oi7+qn+5RKS+0q+ovWs1yb2i3TtOQjxqFzMNv30VLwUR0Z8x+NFVm75a2J8FWKhUJ3NCqqtKug=
+X-Received: by 2002:ad4:5f0b:0:b0:6fd:609d:e924 with SMTP id
+ 6a1803df08f44-704a7047431mr347735046d6.36.1752586705013; Tue, 15 Jul 2025
+ 06:38:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250707-iso_ts-v4-1-0f0bb162a182@amlogic.com> <dc9925eceb0abe78f7bafe2ed183b0f90bdb3ac5.camel@iki.fi>
-In-Reply-To: <dc9925eceb0abe78f7bafe2ed183b0f90bdb3ac5.camel@iki.fi>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 15 Jul 2025 09:37:28 -0400
-X-Gm-Features: Ac12FXwwTGnWfGjAAFG5KTyUcf5d9lL8tUe6GdE0JoCkHFlYfE5ZmLnseeivXfs
-Message-ID: <CABBYNZLFnbfdXjRV0taeTNF5bsey-WFf4TFsf_ox0FNuJbEutw@mail.gmail.com>
-Subject: Re: [PATCH v4] Bluetooth: ISO: Support SCM_TIMESTAMPING for ISO TS
-To: Pauli Virtanen <pav@iki.fi>
-Cc: yang.li@amlogic.com, Marcel Holtmann <marcel@holtmann.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+References: <CANZ3JQRRiOdtfQJoP9QM=6LS1Jto8PGBGw6y7-TL=BcnzHQn1Q@mail.gmail.com>
+ <20250714181032.GS721198@horms.kernel.org>
+In-Reply-To: <20250714181032.GS721198@horms.kernel.org>
+From: Wang Haoran <haoranwangsec@gmail.com>
+Date: Tue, 15 Jul 2025 21:38:11 +0800
+X-Gm-Features: Ac12FXyAi6q58E5yk-hrfOil0SX6R5fhR2UitDOMIIisELNeKoalCEdt2-Sj3WU
+Message-ID: <CANZ3JQQtC1ytmaqGR3xx6eDVyV-ZJp=hCZDcAJV-ktA2RHvTYA@mail.gmail.com>
+Subject: Re: We found a bug in i40e_debugfs.c for the latest linux
+To: Simon Horman <horms@kernel.org>
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
 	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Pauli,
+Hi Simon,
 
-On Tue, Jul 15, 2025 at 9:30=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
->
-> Hi Yang,
->
-> ma, 2025-07-07 kello 10:38 +0800, Yang Li via B4 Relay kirjoitti:
-> > From: Yang Li <yang.li@amlogic.com>
-> >
-> > User-space applications (e.g. PipeWire) depend on
-> > ISO-formatted timestamps for precise audio sync.
-> >
-> > The ISO ts is based on the controller=E2=80=99s clock domain,
-> > so hardware timestamping (hwtimestamp) must be used.
-> >
-> > Ref: Documentation/networking/timestamping.rst,
-> > section 3.1 Hardware Timestamping.
-> >
-> > Signed-off-by: Yang Li <yang.li@amlogic.com>
-> > ---
-> > Changes in v4:
-> > - Optimizing the code
-> > - Link to v3: https://lore.kernel.org/r/20250704-iso_ts-v3-1-2328bc6029=
-61@amlogic.com
-> >
-> > Changes in v3:
-> > - Change to use hwtimestamp
-> > - Link to v2: https://lore.kernel.org/r/20250702-iso_ts-v2-1-723d199c80=
-68@amlogic.com
-> >
-> > Changes in v2:
-> > - Support SOCK_RCVTSTAMPNS via CMSG for ISO sockets
-> > - Link to v1: https://lore.kernel.org/r/20250429-iso_ts-v1-1-e586f30de6=
-cb@amlogic.com
-> > ---
-> >  net/bluetooth/iso.c | 6 +++++-
-> >  1 file changed, 5 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-> > index fc22782cbeeb..677144bb6b94 100644
-> > --- a/net/bluetooth/iso.c
-> > +++ b/net/bluetooth/iso.c
-> > @@ -2278,6 +2278,7 @@ static void iso_disconn_cfm(struct hci_conn *hcon=
-, __u8 reason)
-> >  void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
-> >  {
-> >       struct iso_conn *conn =3D hcon->iso_data;
-> > +     struct skb_shared_hwtstamps *hwts;
-> >       __u16 pb, ts, len;
-> >
-> >       if (!conn)
-> > @@ -2301,13 +2302,16 @@ void iso_recv(struct hci_conn *hcon, struct sk_=
-buff *skb, u16 flags)
-> >               if (ts) {
-> >                       struct hci_iso_ts_data_hdr *hdr;
-> >
-> > -                     /* TODO: add timestamp to the packet? */
-> >                       hdr =3D skb_pull_data(skb, HCI_ISO_TS_DATA_HDR_SI=
-ZE);
-> >                       if (!hdr) {
-> >                               BT_ERR("Frame is too short (len %d)", skb=
-->len);
-> >                               goto drop;
-> >                       }
-> >
-> > +                     /*  Record the timestamp to skb*/
-> > +                     hwts =3D skb_hwtstamps(skb);
-> > +                     hwts->hwtstamp =3D us_to_ktime(le32_to_cpu(hdr->t=
-s));
->
-> Several lines below there is
->
->         conn->rx_skb =3D bt_skb_alloc(len, GFP_KERNEL);
->         skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb-
-> >len),
->                                                   skb->len);
->
-> so timestamp should be copied explicitly also into conn->rx_skb,
-> otherwise it gets lost when you have ACL-fragmented ISO packets.
+Thanks for the clarification.
 
-Yep, it is not that the code is completely wrong but it is operating
-on the original skb not in the rx_skb as you said, that said is only
-the first fragment that contains the ts header so we only have to do
-it once in case that was not clear.
+We=E2=80=99ve observed that i40e_dbg_command_buf is
+initialized with a fixed size of 256 bytes, but we
+didn=E2=80=99t find any assignment statements updating
+its contents elsewhere in the kernel source code.
 
-> It could also be useful to write a simple test case that extracts the
-> timestamp from CMSG, see for example how it was done for BT_PKT_SEQNUM:
-> https://lore.kernel.org/linux-bluetooth/b98b7691e4ba06550bb8f275cad0635bc=
-9e4e8d2.1752511478.git.pav@iki.fi/
-> bthost_send_iso() can take ts=3Dtrue and some timestamp value.
+We=E2=80=99re unsure whether this buffer could potentially
+be used or modified in other contexts that we
+might have missed.
+
+If the buffer is indeed isolated and only used
+as currently observed, then the current use of
+snprintf() should be safe.
+
+We=E2=80=99d appreciate your confirmation on whether
+this buffer could potentially be used beyond its
+current scope.
+
+Regards,
+Wang Haoran
+
+Simon Horman <horms@kernel.org> =E4=BA=8E2025=E5=B9=B47=E6=9C=8815=E6=97=A5=
+=E5=91=A8=E4=BA=8C 02:10=E5=86=99=E9=81=93=EF=BC=9A
 >
-> > +
-> >                       len =3D __le16_to_cpu(hdr->slen);
-> >               } else {
-> >                       struct hci_iso_data_hdr *hdr;
+> On Thu, Jul 10, 2025 at 10:14:18AM +0800, Wang Haoran wrote:
+> > Hi, my name is Wang Haoran. We found a bug in the
+> > i40e_dbg_command_read function located in
+> > drivers/net/ethernet/intel/i40e/i40e_debugfs.c in the latest Linux
+> > kernel (version 6.15.5).
+> > The buffer "i40e_dbg_command_buf" has a size of 256. When formatted
+> > together with the network device name (name), a newline character, and
+> > a null terminator, the total formatted string length may exceed the
+> > buffer size of 256 bytes.
+> > Since "snprintf" returns the total number of bytes that would have
+> > been written (the length of  "%s: %s\n" ), this value may exceed the
+> > buffer length passed to copy_to_user(), this will ultimatly cause
+> > function "copy_to_user" report a buffer overflow error.
+> > Replacing snprintf with scnprintf ensures the return value never
+> > exceeds the specified buffer size, preventing such issues.
+>
+> Thanks Wang Haoran.
+>
+> I agree that using scnprintf() is a better choice here than snprintf().
+>
+> But it is not clear to me that this is a bug.
+>
+> I see that i40e_dbg_command_buf is initialised to be the
+> empty string. And I don't see it's contents being updated.
+>
+> While ->name should be no longer than IFNAMSIZ - 1 (=3D15) bytes long,
+> excluding the trailing '\0'.
+>
+> If so, the string formatted by the line below should always
+> comfortably fit within buf_size (256 bytes).
+>
 > >
-> > ---
-> > base-commit: b8db3a9d4daeb7ff6a56c605ad6eca24e4da78ed
-> > change-id: 20250421-iso_ts-c82a300ae784
+> > --- i40e_debugfs.c 2025-07-06 17:04:26.000000000 +0800
+> > +++ i40e_debugfs.c 2025-07-09 15:51:47.259130500 +0800
+> > @@ -70,7 +70,7 @@
+> >   return -ENOSPC;
+> >
+> >   main_vsi =3D i40e_pf_get_main_vsi(pf);
+> > - len =3D snprintf(buf, buf_size, "%s: %s\n", main_vsi->netdev->name,
+> > + len =3D scnprintf(buf, buf_size, "%s: %s\n", main_vsi->netdev->name,
+> >         i40e_dbg_command_buf);
+> >
+> >   bytes_not_copied =3D copy_to_user(buffer, buf, len);
 > >
 > > Best regards,
->
-> --
-> Pauli Virtanen
-
-
-
---=20
-Luiz Augusto von Dentz
+> > Wang Haoran
+> >
 
