@@ -1,239 +1,136 @@
-Return-Path: <netdev+bounces-207152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B93F8B06077
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 16:17:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 87A17B06091
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 16:18:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AC3558824B
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 14:10:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45FEF5A01CD
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 14:11:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53A0F2E7BB5;
-	Tue, 15 Jul 2025 13:57:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDA1D2F270F;
+	Tue, 15 Jul 2025 13:58:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cNm3tN16"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W7OLEC4o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C3072E3382;
-	Tue, 15 Jul 2025 13:57:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A88BE2F270B
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 13:58:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752587879; cv=none; b=HCXk/D9N3ggMzooQsUam0q2osElr6H45JYLCmWnDGssgjtpfRbbCwmWBicToZqNz6AA0tK0ozZ8zf+ysNDhxu8byYqmDsv068VJhFsHZYOLup6Gih6Okx2zfGRM6yPIqLy1R/jf+Aufk7iEwKqsP2yqX2l+piC+NCbvVEJFZRU8=
+	t=1752587905; cv=none; b=FmjdLAi3+8hAvH2zQLeKhCaHIJrMIXF3LqiGvlzO4vU6pZbeuwyTLFK/CazHYE48n0NsHyMGuFEUg5/QWZc1qf/qqKmwARSAPeSURE7VxdynhDafv4DksVf7TmhMYyTsMAY6oBcEfFKNrE2MUmkSa8z19ndMxenPEe8XE0ACXYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752587879; c=relaxed/simple;
-	bh=GDhrTQL5TCFnlFDRs1KqKPt46EOEW/acwXmtRFdmZr8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HhvvyzSx0IP68SmOJETNCg6CreaF9wON37bWgSleIzVGlA6U4FADFKNje3asNNa1RMHHCKy65BzV6KkZr4BOcY/Qv25SPSIe/RJQ2R77G1teYn12E54JZeI4RdJBtzS44wKuo0Ij1ncvfQ6bzX7yESjiGqtdw2iU7F2O5omGz2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cNm3tN16; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-32ac42bb4e4so44864591fa.0;
-        Tue, 15 Jul 2025 06:57:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752587875; x=1753192675; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5wd3vZa0hBJt2XEf+/qd/yWCD7aOef+WZtT0Xwlp5EM=;
-        b=cNm3tN16nMzSp2NhYSMdPLp8v8iGOZRc/17OH8M2v3W+lcCAnTK7+hZZ0q5Q8hB44t
-         5EOUbsezzX8Dv++oalbsWLCJg0GInYX746gOL/h3GkYdu+ySu10EjcIohnfdqT/MgznK
-         IOXaNPfCrrdd+hBBmvuCgnpISPUdkAAW+muh0koS55GvdnsXVT+iUpFOdakdIIYl1/kF
-         HhhCEy9/m7UhNU6HtjojoKPpPB8W7tO3amGp1tnI/PpKQBOg3kbILSOI41/G2jhKZJuo
-         t8dM6myUsLiG1Kde/q/+xsMV+ASHnmgFm94qqCzjfprHD4yjpNfQ/VqfzKU/1BThLk2N
-         jzcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752587875; x=1753192675;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5wd3vZa0hBJt2XEf+/qd/yWCD7aOef+WZtT0Xwlp5EM=;
-        b=GfTZhB/3qMtO74fl9hFybXphU9ZVBJJfSVk5V4nb2BEbWEkoxYKiTi0uuBU9UieTXl
-         2JgLGjb3ItB9lH1MzSPvvDJxHQp0iQ6vKU9eHzM8TfWwBNzrTSCZ/D/faNB4lYJ/fIUW
-         BpYXj1YjaKReTGGCEXdBgoUSeva90tn/5KMmOcmUSt9CPMDKqlQmY05uGS0oPW0292xJ
-         BIMDuVbE6brq4l4QR+D32eHQMGugOlYOavZf4mkjzCPKKeGZpqPfuUu7gvEE1XTEoHG9
-         /vlrlGCTr2W81pFtIlTRtrNRYdk7J0UaoBnHP+3LgmKvQo/sbp/dlu9ICWJzFXi997cb
-         Bw9A==
-X-Forwarded-Encrypted: i=1; AJvYcCUlVN6ESVGi/9BDmm0ZmrvDvRIlhOlrZsXi/Be55OXkQu7Bj6+eN2la8bpcCTP8qwFimPkVp/zfCU2hI/dWcqE=@vger.kernel.org, AJvYcCVjX6b+QlcQlnuzLlSHf0eITHCa0RCPXKjxJr3FejMAIM9m2rHT2ppO9BUox9661a87qeZjEyjuEwelYLNy@vger.kernel.org, AJvYcCWEaK7QUwVPS5JS/PptGAv0MSZ9TRjzVx7pvrhkXWUg73hX/qQf6/XdOurtBPdBwd8tZQufjDRu@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywb9uAWVoEzpBy2cYzdWDUgJPhhjMW/iKh/phNgTEh8366b1zoP
-	4hGyR8ez8u4Tl0NTQZj9SL2yQyVacaId8K6Shi3XTflofpoUWMjAqyjqgHmIfpZ+r89X/hGkL++
-	4hoz5yAOCWIZekv3zG3whkt6L4TS+KPs=
-X-Gm-Gg: ASbGncsegktuFC0dvAElbfdsXemc5gEV9yfuo4CLvxaaa23ZfxDtYIyJOUl/I1824aL
-	3H6DG/1VB7vwCuS2G8KW5XpgVDVA2gybvGfsG/aZnFuJ3lvi8lfGLRwvWuDGPnYyRreyoLEOtxc
-	SNzD0qieZMloC0gq5qtn4BnSiC7Lgv+bHKuHETL2b1GJ/EItDyzbThjqoT0BqZjied95760DQkN
-	IoTSoggunL9kY9h
-X-Google-Smtp-Source: AGHT+IHrjPDlAh6yOR8TcwCHBt5GIJ+sm0Qq5QJRdLGApX1o9tf1uALm75s1vPQeoyoX4Xg8Ci6aSnoUpI9O+c49zNM=
-X-Received: by 2002:a2e:a585:0:b0:32a:6a85:f294 with SMTP id
- 38308e7fff4ca-3305346e497mr52038731fa.35.1752587875240; Tue, 15 Jul 2025
- 06:57:55 -0700 (PDT)
+	s=arc-20240116; t=1752587905; c=relaxed/simple;
+	bh=azK0wIRR0+Hp6wdY0YKnR7aVC/wVGif1BMBmHrNOC5A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OIIH4sCJLT9dkf5eBbq6mf+SWyEa6fEfvR+/0DljOpt6acVU3UZkTfRiiTgqUSerCTXBeFmT84p8EmvnyUS/lvQesdahYY7kn+jVvrnu7b0prW1SgcVLCijzJyqUtn50md+TMs7JbTmvJXmFwNtY6gUSQwqLMvY9wxDKiT5jz64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W7OLEC4o; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2EF3C4CEF7;
+	Tue, 15 Jul 2025 13:58:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752587905;
+	bh=azK0wIRR0+Hp6wdY0YKnR7aVC/wVGif1BMBmHrNOC5A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=W7OLEC4obI79gt2SDur9GzEZq2XxCINeqssWqNN31DSUYEWvzi8KjJSs59yUceHrA
+	 xMaZFM5UY6oHq41cgpKX7uf7tR5J3Z2ujAXvGP0IbP6Ya4tJTd+eC+DCEWY7C/hwx8
+	 9UBxq1yATuclIzSAQx0hnNEBz2Yk+5TwFQAxImJgkabfuDYDX8B4bgK9BpHnnCwvn7
+	 n+MQN2CB1nxAtwRJ5x5Fb6cLQS737XrEYhhvDMNj4m7T3r7QLyPMxhbR6AruMLW0hT
+	 jC/SCP5JkGP+yRLjApbtUdHZAJeFV1hXO/5rZdbAgk6jecWo/OarwiBAQjfiVDOG9T
+	 Uorl6PMKYep6Q==
+Date: Tue, 15 Jul 2025 14:58:21 +0100
+From: Simon Horman <horms@kernel.org>
+To: David Wilder <wilder@us.ibm.com>
+Cc: netdev@vger.kernel.org, jv@jvosburgh.net, pradeeps@linux.vnet.ibm.com,
+	pradeep@us.ibm.com, i.maximets@ovn.org, amorenoz@redhat.com,
+	haliu@redhat.com
+Subject: Re: [PATCH net-next v5 6/7] bonding: Update for extended
+ arp_ip_target format.
+Message-ID: <20250715135821.GY721198@horms.kernel.org>
+References: <20250714225533.1490032-1-wilder@us.ibm.com>
+ <20250714225533.1490032-7-wilder@us.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250707-iso_ts-v4-1-0f0bb162a182@amlogic.com>
- <dc9925eceb0abe78f7bafe2ed183b0f90bdb3ac5.camel@iki.fi> <CABBYNZLFnbfdXjRV0taeTNF5bsey-WFf4TFsf_ox0FNuJbEutw@mail.gmail.com>
-In-Reply-To: <CABBYNZLFnbfdXjRV0taeTNF5bsey-WFf4TFsf_ox0FNuJbEutw@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 15 Jul 2025 09:57:42 -0400
-X-Gm-Features: Ac12FXz9AhULqH4a8J-A_3sZmWpMk2U8gWeHUwqOazDuZWQCCySLh9mXg6eAW-Q
-Message-ID: <CABBYNZL1Aicj15eYBgug4_KARK6xcd7eVKnzcE=vUK=mugUM4w@mail.gmail.com>
-Subject: Re: [PATCH v4] Bluetooth: ISO: Support SCM_TIMESTAMPING for ISO TS
-To: Pauli Virtanen <pav@iki.fi>
-Cc: yang.li@amlogic.com, Marcel Holtmann <marcel@holtmann.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250714225533.1490032-7-wilder@us.ibm.com>
 
-Hi,
+On Mon, Jul 14, 2025 at 03:54:51PM -0700, David Wilder wrote:
+> Updated bond_fill_info() to support extended arp_ip_target format.
+> 
+> Forward and backward compatibility between the kernel and iprout2 is
+> preserved.
+> 
+> Signed-off-by: David Wilder <wilder@us.ibm.com>
+> ---
+>  drivers/net/bonding/bond_netlink.c | 28 ++++++++++++++++++++++++++--
+>  include/net/bonding.h              |  1 +
+>  2 files changed, 27 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/bonding/bond_netlink.c b/drivers/net/bonding/bond_netlink.c
+> index 5486ef40907e..6e8aebe5629f 100644
+> --- a/drivers/net/bonding/bond_netlink.c
+> +++ b/drivers/net/bonding/bond_netlink.c
+> @@ -701,8 +701,32 @@ static int bond_fill_info(struct sk_buff *skb,
+>  
+>  	targets_added = 0;
+>  	for (i = 0; i < BOND_MAX_ARP_TARGETS; i++) {
+> -		if (bond->params.arp_targets[i].target_ip) {
+> -			if (nla_put_be32(skb, i, bond->params.arp_targets[i].target_ip))
+> +		struct bond_arp_target *target = &bond->params.arp_targets[i];
+> +		struct Data {
+> +			__u32 addr;
+> +			struct bond_vlan_tag vlans[BOND_MAX_VLAN_TAGS + 1];
+> +		} data;
+> +		int size = 0;
+> +
+> +		if (target->target_ip) {
+> +			data.addr = target->target_ip;
 
-On Tue, Jul 15, 2025 at 9:37=E2=80=AFAM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Pauli,
->
-> On Tue, Jul 15, 2025 at 9:30=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote=
-:
-> >
-> > Hi Yang,
-> >
-> > ma, 2025-07-07 kello 10:38 +0800, Yang Li via B4 Relay kirjoitti:
-> > > From: Yang Li <yang.li@amlogic.com>
-> > >
-> > > User-space applications (e.g. PipeWire) depend on
-> > > ISO-formatted timestamps for precise audio sync.
-> > >
-> > > The ISO ts is based on the controller=E2=80=99s clock domain,
-> > > so hardware timestamping (hwtimestamp) must be used.
-> > >
-> > > Ref: Documentation/networking/timestamping.rst,
-> > > section 3.1 Hardware Timestamping.
-> > >
-> > > Signed-off-by: Yang Li <yang.li@amlogic.com>
-> > > ---
-> > > Changes in v4:
-> > > - Optimizing the code
-> > > - Link to v3: https://lore.kernel.org/r/20250704-iso_ts-v3-1-2328bc60=
-2961@amlogic.com
-> > >
-> > > Changes in v3:
-> > > - Change to use hwtimestamp
-> > > - Link to v2: https://lore.kernel.org/r/20250702-iso_ts-v2-1-723d199c=
-8068@amlogic.com
-> > >
-> > > Changes in v2:
-> > > - Support SOCK_RCVTSTAMPNS via CMSG for ISO sockets
-> > > - Link to v1: https://lore.kernel.org/r/20250429-iso_ts-v1-1-e586f30d=
-e6cb@amlogic.com
-> > > ---
-> > >  net/bluetooth/iso.c | 6 +++++-
-> > >  1 file changed, 5 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-> > > index fc22782cbeeb..677144bb6b94 100644
-> > > --- a/net/bluetooth/iso.c
-> > > +++ b/net/bluetooth/iso.c
-> > > @@ -2278,6 +2278,7 @@ static void iso_disconn_cfm(struct hci_conn *hc=
-on, __u8 reason)
-> > >  void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
-> > >  {
-> > >       struct iso_conn *conn =3D hcon->iso_data;
-> > > +     struct skb_shared_hwtstamps *hwts;
-> > >       __u16 pb, ts, len;
-> > >
-> > >       if (!conn)
-> > > @@ -2301,13 +2302,16 @@ void iso_recv(struct hci_conn *hcon, struct s=
-k_buff *skb, u16 flags)
-> > >               if (ts) {
-> > >                       struct hci_iso_ts_data_hdr *hdr;
-> > >
-> > > -                     /* TODO: add timestamp to the packet? */
-> > >                       hdr =3D skb_pull_data(skb, HCI_ISO_TS_DATA_HDR_=
-SIZE);
-> > >                       if (!hdr) {
-> > >                               BT_ERR("Frame is too short (len %d)", s=
-kb->len);
-> > >                               goto drop;
-> > >                       }
-> > >
-> > > +                     /*  Record the timestamp to skb*/
-> > > +                     hwts =3D skb_hwtstamps(skb);
-> > > +                     hwts->hwtstamp =3D us_to_ktime(le32_to_cpu(hdr-=
->ts));
-> >
-> > Several lines below there is
-> >
-> >         conn->rx_skb =3D bt_skb_alloc(len, GFP_KERNEL);
-> >         skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb-
-> > >len),
-> >                                                   skb->len);
-> >
-> > so timestamp should be copied explicitly also into conn->rx_skb,
-> > otherwise it gets lost when you have ACL-fragmented ISO packets.
->
-> Yep, it is not that the code is completely wrong but it is operating
-> on the original skb not in the rx_skb as you said, that said is only
-> the first fragment that contains the ts header so we only have to do
-> it once in case that was not clear.
+Hi David,
 
-I might just do a fixup myself, something like the following:
+There appears to be an endian mismatch here. Sparse says:
 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 0a951c6514af..f48fb62e640d 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -2374,6 +2374,13 @@ void iso_recv(struct hci_conn *hcon, struct
-sk_buff *skb, u16 flags)
-                skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->l=
-en),
-                                          skb->len);
-                conn->rx_len =3D len - skb->len;
-+
-+               /* Copy timestamp from skb to rx_skb if present */
-+               if (ts) {
-+                       hwts =3D skb_hwtstamps(conn->rx_skb);
-+                       hwts->hwtstamp =3D skb_hwtstamps(skb)->hwtstamp;
-+               }
-+
-                break;
+  .../bond_netlink.c:712:35: warning: incorrect type in assignment (different base types)
+  .../bond_netlink.c:712:35:    expected unsigned int [usertype] addr
+  .../bond_netlink.c:712:35:    got restricted __be32 [usertype] target_ip
 
-        case ISO_CONT:
+> +			size = sizeof(target->target_ip);
+> +		}
 
+It seems that data.addr may be used uninitialised below
+if the if condition above is not met.
 
-> > It could also be useful to write a simple test case that extracts the
-> > timestamp from CMSG, see for example how it was done for BT_PKT_SEQNUM:
-> > https://lore.kernel.org/linux-bluetooth/b98b7691e4ba06550bb8f275cad0635=
-bc9e4e8d2.1752511478.git.pav@iki.fi/
-> > bthost_send_iso() can take ts=3Dtrue and some timestamp value.
-> >
-> > > +
-> > >                       len =3D __le16_to_cpu(hdr->slen);
-> > >               } else {
-> > >                       struct hci_iso_data_hdr *hdr;
-> > >
-> > > ---
-> > > base-commit: b8db3a9d4daeb7ff6a56c605ad6eca24e4da78ed
-> > > change-id: 20250421-iso_ts-c82a300ae784
-> > >
-> > > Best regards,
-> >
-> > --
-> > Pauli Virtanen
->
->
->
-> --
-> Luiz Augusto von Dentz
+Flagged by Smatch.
 
+> +
+> +		for (int level = 0; target->flags & BOND_TARGET_USERTAGS && target->tags; level++) {
+> +			if (level > BOND_MAX_VLAN_TAGS)
+> +				goto nla_put_failure;
+> +
+> +			memcpy(&data.vlans[level], &target->tags[level],
+> +			       sizeof(struct bond_vlan_tag));
+> +			size = size + sizeof(struct bond_vlan_tag);
+> +
+> +			if (target->tags[level].vlan_proto == BOND_VLAN_PROTO_NONE)
+> +				break;
+> +		}
+> +
+> +		if (size) {
+> +			if (nla_put(skb, i, size, &data))
+>  				goto nla_put_failure;
+>  			targets_added = 1;
+>  		}
 
+...
 
---=20
-Luiz Augusto von Dentz
+-- 
+pw-bot: changes-requested
 
