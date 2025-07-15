@@ -1,150 +1,154 @@
-Return-Path: <netdev+bounces-206987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00F2DB050E2
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 07:26:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54C12B05107
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 07:34:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B4A05605C5
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 05:26:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A6E941AA6695
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 05:34:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFB972D374D;
-	Tue, 15 Jul 2025 05:26:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B86B251791;
+	Tue, 15 Jul 2025 05:34:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="UtP3Cg2J"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Doryo96c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2069D35975
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 05:26:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D4BA1DE3C7
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 05:34:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752557204; cv=none; b=GFffc3zOMRWetf4ffJCaYAQKzLCmHUhANlEeQn4ghnYzCLJNM8BeR2QfxJg70MGAPUyV7Qi0o2d4zIvuyGONSRcKosLfAr2AmkBUfQ8Q8JtBe7iaxRk8HNYUHlPAXj0POX45jaHIqCdFqYso+55ufKLOLDqyEGNtc77Bm5MhD2c=
+	t=1752557657; cv=none; b=LuvDkXtLbad6vxhS9BA337RA1XoTaETJwtTHMz/1QqF5rKITnT98/xf4srF2eyBno9eZODyV6gbL+D6fG/IvuhbkK2xSRaSvz1NXy59c8oIJVfIIvjL6eG1oLD9Y6JcIuu7pVBJGgAsoZ2CBdwjECX5jfto8qfQTnYUHYPkL3eI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752557204; c=relaxed/simple;
-	bh=Vok3sAiLujP5+hTf7U9u6KkZUMEHc7gwTOuzgIEBsWQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Jo55et50PXtjhSO31UeNBs+QfwQ6zMhuxsnsKcopHvloyss8So/lwrotK22pgZmfqbr03liMuOTOTUShVjx8a1jqillXYVRjYN9UkfTPb3iHB11RtTSaUkuS3rhLVrp2obs2BpDcVcIrxAxsMsdtOiA4VSt2qgbqnNrpfIuUON8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=UtP3Cg2J; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-555024588a8so4485353e87.0
-        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 22:26:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1752557201; x=1753162001; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EriOcw6Ti5BC4myF5JQ02kFXKB9Pwigas67q+yAyzZY=;
-        b=UtP3Cg2JB1Gh2e3V/wnmeHpFpvPqHf03QPPoGYlyiv4DE3nTeYn9cIdoM+J4oB0vsi
-         PLGdDg7yOAsnFwC6rLkIUTEldxTQyypC94wClnaRR+5ihly/0CW1wU6iWf/OupOtHKRp
-         hBArkONR4cuiWfaXs/peRUT7zJ4sIuutOL3jk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752557201; x=1753162001;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EriOcw6Ti5BC4myF5JQ02kFXKB9Pwigas67q+yAyzZY=;
-        b=muiV9HYWrjNyYO12uMOxnfYCO+9+tsGcHdPZ0Wrd0ydYwDtSM1Pbusy/6kcdDKq9eB
-         d6E+GY/ewk2LvCH8NsAiv1a3fDdGXtpFG0RhPxKvK1mjM/G4UjxBvIcmC+aeMl5Lr7Gb
-         E9K7Ov2W7d1cvmBiIvYujcddk0SyDQWDKJLr/yYz0Ok5hH1SlXDI/gZ2ovrCDNk7D7Ga
-         whrfJv7ZXcE/jt30+iPdszQNbSkMxJudJj4tU5gYUL2wiNrYcomvLv+erdXOxZcRKwen
-         OaUXCzlogm3ksET0ZTCWtRrQIqWMQYtBEZgM6zKeHK8UFdpUPJgwKgCAPs7jk+e0zEXT
-         vfzw==
-X-Forwarded-Encrypted: i=1; AJvYcCVlG+Z7qY9XN3JlTshAgPEznpLIs2sQGMWNhGh0kqYhSimoXru/B/FWlaL/S3AIAu69/iHvdvI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy3/DvBFQBr4j0VhvlAQfcGukDTqiuRVm9spfSLXiv0B2Xh7Bq8
-	GFw2KU74UKVLL7lGxwSM/NEwQJqhFJBJB5TSXoyIYgMFJlXqT1ze8yimR+xaHh9+9aKNeVoHl8P
-	VFF81xg3SX3SnZI9vCFnqZj7M6vR7Ce1UaXnZRfNR
-X-Gm-Gg: ASbGncsCQQ+ZzFJNStbcBLW97K0YEPC/m0hl6aJAiImEtWLJjDGkUJFJ5v3WTrHH+GK
-	KY6PCGxnZz50DxxgCZG26NeGPsqD4i9XVHBtBLsrAoNw60P4x78zPLeTKB7i0pmUrl/YPFm2PYb
-	RctS+gXGbdCdCsG2Ht6RH801W48SkNNoHkiyp47YXMUzGXJiPpfWOvd/wHA/1yhR3e3a+khJVwX
-	h8wp5k9ex6h5786Bdlhy4YwRDv1XC9KbeI=
-X-Google-Smtp-Source: AGHT+IEQf0W1yeQYNRbpUyAxFlgjb3kYw5Q0BNqfDsziWw7aP+1TqaYvLMXYRwQa9tomb76nSKuU56uoGnkXehDyLpc=
-X-Received: by 2002:a05:6512:3b9c:b0:556:341b:fb0a with SMTP id
- 2adb3069b0e04-55a044ca226mr6271614e87.15.1752557201192; Mon, 14 Jul 2025
- 22:26:41 -0700 (PDT)
+	s=arc-20240116; t=1752557657; c=relaxed/simple;
+	bh=aqGFfl1twW0Qc1W6K4xwwVazkug9mWZPNSjbozdTJnk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L1+3wUg/pmqibXLe4p8XJyGHq4REUDx/sw2S27+xQF5WDO+SraN2gkk+3CfXka2geaRvNvcXuJNhmdDGceiJWj8nNMQynpEpUfkiQKWkaruvyXzZE6VSGfjrN0qS9d4O0QvkpmQKECJWrcFOrluYhvNy2nQeIe92Q0ELicrRcn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Doryo96c; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752557656; x=1784093656;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=aqGFfl1twW0Qc1W6K4xwwVazkug9mWZPNSjbozdTJnk=;
+  b=Doryo96cuRzvbKdjhrnw82AS4qPl8BR7SEOTHlycRy25R8b1XtcvKUaf
+   KGTR2QK86yZwqRugp2OCbILwUgURaAsk7aePrLXwMoZf4Yl2it5o+su53
+   ck03qn/HhXXl4qtKi3Tjwyqyu6Xtd+9c3CIy0SiV92gKSBFTF8Ldq8J0o
+   Zlly8K3zmhjJwARyXRBohDV+VxYNncpka6MYcqtiiqrI3OoyT86flt8AI
+   TIHkabx8fkRhs0MIkaKATCvMW1pvQvA7ju6cHUM85Q3wsuv3GC62VqOlf
+   PxaVtNR1xU9YPbb4J3/P91TV/8eJr9xK7nDCDZy4CGzw+KszgyS3B7Ozt
+   A==;
+X-CSE-ConnectionGUID: NgU8AT3sSx+Up8/v2aUYMw==
+X-CSE-MsgGUID: gRdfWkBBTwqss5wga3RNeQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="53985020"
+X-IronPort-AV: E=Sophos;i="6.16,312,1744095600"; 
+   d="scan'208";a="53985020"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2025 22:34:16 -0700
+X-CSE-ConnectionGUID: u5tl5zjHRs2oXNJrKAwVpQ==
+X-CSE-MsgGUID: jLB3xuV4Q/yKpj0Iozv55A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,312,1744095600"; 
+   d="scan'208";a="157483592"
+Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
+  by fmviesa009.fm.intel.com with ESMTP; 14 Jul 2025 22:34:13 -0700
+Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1ubYIt-0009gZ-1L;
+	Tue, 15 Jul 2025 05:34:11 +0000
+Date: Tue, 15 Jul 2025 13:34:00 +0800
+From: kernel test robot <lkp@intel.com>
+To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, pabeni@redhat.com,
+	edumazet@google.com, horms@kernel.org, kuba@kernel.org,
+	John Ousterhout <ouster@cs.stanford.edu>
+Subject: Re: [PATCH net-next v11 15/15] net: homa: create Makefile and Kconfig
+Message-ID: <202507151339.DEc1Vydw-lkp@intel.com>
+References: <20250714044448.254-16-ouster@cs.stanford.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250624143220.244549-1-laura.nao@collabora.com> <20250624143220.244549-13-laura.nao@collabora.com>
-In-Reply-To: <20250624143220.244549-13-laura.nao@collabora.com>
-From: Chen-Yu Tsai <wenst@chromium.org>
-Date: Tue, 15 Jul 2025 13:26:30 +0800
-X-Gm-Features: Ac12FXx0XfJFXA_DIIE4IblGQiwtiWyeXBGiD295gCS64kpCUO8jzl3QeCZ10ZM
-Message-ID: <CAGXv+5EWEsLBS86G828ezpnD3x-MaC3F-AtyGFyzKxPvZ0GcAw@mail.gmail.com>
-Subject: Re: [PATCH v2 12/29] clk: mediatek: Add MT8196 topckgen clock support
-To: Laura Nao <laura.nao@collabora.com>
-Cc: mturquette@baylibre.com, sboyd@kernel.org, robh@kernel.org, 
-	krzk+dt@kernel.org, conor+dt@kernel.org, matthias.bgg@gmail.com, 
-	angelogioacchino.delregno@collabora.com, p.zabel@pengutronix.de, 
-	richardcochran@gmail.com, guangjie.song@mediatek.com, 
-	linux-clk@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
-	kernel@collabora.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250714044448.254-16-ouster@cs.stanford.edu>
 
-Another thing,
+Hi John,
 
-On Tue, Jun 24, 2025 at 10:33=E2=80=AFPM Laura Nao <laura.nao@collabora.com=
-> wrote:
->
-> Add support for the MT8196 topckgen clock controller, which provides
-> muxes and dividers for clock selection in other IP blocks.
->
-> Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collab=
-ora.com>
-> Signed-off-by: Laura Nao <laura.nao@collabora.com>
-> ---
->  drivers/clk/mediatek/Makefile              |    2 +-
->  drivers/clk/mediatek/clk-mt8196-topckgen.c | 1257 ++++++++++++++++++++
->  2 files changed, 1258 insertions(+), 1 deletion(-)
->  create mode 100644 drivers/clk/mediatek/clk-mt8196-topckgen.c
->
-> diff --git a/drivers/clk/mediatek/Makefile b/drivers/clk/mediatek/Makefil=
-e
-> index b1773d2bcb3d..bc0e86e20074 100644
-> --- a/drivers/clk/mediatek/Makefile
-> +++ b/drivers/clk/mediatek/Makefile
-> @@ -160,7 +160,7 @@ obj-$(CONFIG_COMMON_CLK_MT8195_VDOSYS) +=3D clk-mt819=
-5-vdo0.o clk-mt8195-vdo1.o
->  obj-$(CONFIG_COMMON_CLK_MT8195_VENCSYS) +=3D clk-mt8195-venc.o
->  obj-$(CONFIG_COMMON_CLK_MT8195_VPPSYS) +=3D clk-mt8195-vpp0.o clk-mt8195=
--vpp1.o
->  obj-$(CONFIG_COMMON_CLK_MT8195_WPESYS) +=3D clk-mt8195-wpe.o
-> -obj-$(CONFIG_COMMON_CLK_MT8196) +=3D clk-mt8196-apmixedsys.o
-> +obj-$(CONFIG_COMMON_CLK_MT8196) +=3D clk-mt8196-apmixedsys.o clk-mt8196-=
-topckgen.o
->  obj-$(CONFIG_COMMON_CLK_MT8365) +=3D clk-mt8365-apmixedsys.o clk-mt8365.=
-o
->  obj-$(CONFIG_COMMON_CLK_MT8365_APU) +=3D clk-mt8365-apu.o
->  obj-$(CONFIG_COMMON_CLK_MT8365_CAM) +=3D clk-mt8365-cam.o
-> diff --git a/drivers/clk/mediatek/clk-mt8196-topckgen.c b/drivers/clk/med=
-iatek/clk-mt8196-topckgen.c
-> new file mode 100644
-> index 000000000000..fc0c1227dd8d
-> --- /dev/null
-> +++ b/drivers/clk/mediatek/clk-mt8196-topckgen.c
+kernel test robot noticed the following build errors:
 
-[...]
+[auto build test ERROR on net-next/main]
 
-> +       FACTOR(CLK_TOP_APLL1_D4, "apll1_d4", "vlp_apll1", 1, 4),
-> +       FACTOR(CLK_TOP_APLL1_D8, "apll1_d8", "vlp_apll1", 1, 8),
-> +       FACTOR(CLK_TOP_APLL2_D4, "apll2_d4", "vlp_apll2", 1, 4),
-> +       FACTOR(CLK_TOP_APLL2_D8, "apll2_d8", "vlp_apll2", 1, 8),
+url:    https://github.com/intel-lab-lkp/linux/commits/John-Ousterhout/net-homa-define-user-visible-API-for-Homa/20250714-130009
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250714044448.254-16-ouster%40cs.stanford.edu
+patch subject: [PATCH net-next v11 15/15] net: homa: create Makefile and Kconfig
+config: um-allmodconfig (https://download.01.org/0day-ci/archive/20250715/202507151339.DEc1Vydw-lkp@intel.com/config)
+compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250715/202507151339.DEc1Vydw-lkp@intel.com/reproduce)
 
-These aren't used anywhere in this driver, but they are referenced
-directly in the vlpckgen driver. Maybe these should be moved over
-to that driver instead? Otherwise we end up with some weird circular
-link between the two clock controllers which doesn't seem correct
-to me.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202507151339.DEc1Vydw-lkp@intel.com/
 
-[...]
+All errors (new ones prefixed by >>):
+
+   In file included from net/homa/homa_incoming.c:5:
+   In file included from net/homa/homa_impl.h:13:
+   In file included from include/linux/icmp.h:16:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/um/include/asm/hardirq.h:5:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:12:
+   In file included from arch/um/include/asm/io.h:24:
+   include/asm-generic/io.h:1175:55: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+    1175 |         return (port > MMIO_UPPER_LIMIT) ? NULL : PCI_IOBASE + port;
+         |                                                   ~~~~~~~~~~ ^
+   In file included from net/homa/homa_incoming.c:5:
+>> net/homa/homa_impl.h:529:9: error: use of undeclared identifier 'cpu_khz'
+     529 |         return cpu_khz;
+         |                ^
+   net/homa/homa_impl.h:546:13: error: use of undeclared identifier 'cpu_khz'
+     546 |         tmp = ns * cpu_khz;
+         |                    ^
+   net/homa/homa_impl.h:565:16: error: use of undeclared identifier 'cpu_khz'
+     565 |         tmp = usecs * cpu_khz;
+         |                       ^
+   1 warning and 3 errors generated.
+
+
+vim +/cpu_khz +529 net/homa/homa_impl.h
+
+9ce7b7d7321e0e John Ousterhout 2025-07-13  520  
+9ce7b7d7321e0e John Ousterhout 2025-07-13  521  /**
+9ce7b7d7321e0e John Ousterhout 2025-07-13  522   * homa_clock_khz() - Return the frequency of the values returned by
+9ce7b7d7321e0e John Ousterhout 2025-07-13  523   * homa_clock, in units of KHz.
+9ce7b7d7321e0e John Ousterhout 2025-07-13  524   * Return: see above.
+9ce7b7d7321e0e John Ousterhout 2025-07-13  525   */
+9ce7b7d7321e0e John Ousterhout 2025-07-13  526  static inline u64 homa_clock_khz(void)
+9ce7b7d7321e0e John Ousterhout 2025-07-13  527  {
+9ce7b7d7321e0e John Ousterhout 2025-07-13  528  #ifdef CONFIG_X86_TSC
+9ce7b7d7321e0e John Ousterhout 2025-07-13 @529  	return cpu_khz;
+9ce7b7d7321e0e John Ousterhout 2025-07-13  530  #else
+9ce7b7d7321e0e John Ousterhout 2025-07-13  531  	return 1000000;
+9ce7b7d7321e0e John Ousterhout 2025-07-13  532  #endif /* CONFIG_X86_TSC */
+9ce7b7d7321e0e John Ousterhout 2025-07-13  533  }
+9ce7b7d7321e0e John Ousterhout 2025-07-13  534  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
