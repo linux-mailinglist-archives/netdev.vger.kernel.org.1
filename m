@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-207261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05B97B067BC
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 22:30:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A85BB067BB
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 22:30:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 136365041A0
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 20:29:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB456564A62
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 20:30:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A2BF29B8E4;
-	Tue, 15 Jul 2025 20:30:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0311917BA1;
+	Tue, 15 Jul 2025 20:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TX+BW4cw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BGNdkHHW"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F59228000A
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 20:30:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1134F2BE641
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 20:30:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752611408; cv=none; b=KKAogIWJkpwlkRZrUmUo5cZFA/pgB10DeaGQ8ZyjxCucK+fTp5yOVaXkVnaFvRlPG2CI24nZYI6c/xuCdlH8MynxK0ONCZ6LbODU/vlad6zeVUzQNte1C0+RZEIS+j6Z9bqiVG4DrU8cW+85HtGUGQvVcNl/WdfkXIzSeDEwu7w=
+	t=1752611410; cv=none; b=gq1P2vMs0eusX4H18rlin3lmbgaFBpGTQGvH8yfwHqk76OC3rb4cjVXC9hM4gGUuVQMuGFGgi3MTAfiSAc7mO94NqSsnxog+76dAIZbsgHol5p191MIv2YO1pArop3HVgYRy+i5yUgcU3kDsFj66Bpre4J0WZhUzGA40UF771TQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752611408; c=relaxed/simple;
-	bh=DF51Ija4aTi6aDT+XWtc4DwAwkeHZC1nY5FsBaDZsB4=;
+	s=arc-20240116; t=1752611410; c=relaxed/simple;
+	bh=/oUdp1eUjc8e9Lgd7+wGCZ0B94uY7ood0jBLhM2gczY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=i1plc3VIwb0xlLnSAGwVMMN0a3Jvt/cvejh1p6tFPw3uqhDC4RrGKqNz4OS+fmtQtZLEkldx0dP6DV+ogvrKR1ouQhrZ2Y9K6YD/hAr1SJYvEekLWyx7Vdu5GWUhYl8U6PbxeMUepcYY+npTCgmyk234Ubz0DlZb7XrseD/G7SA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TX+BW4cw; arc=none smtp.client-ip=198.175.65.19
+	 MIME-Version; b=hg52gqcPHiy85vm1t46DIcDmEQaQlb/O6stCdzPjAIeXjCyeD/SGrENzJNsa/atChvyKIHArMO1BZ6f3zihyBfW8aHuqiNW427T453BzrURIjW62XznlFDQBLaoM7xC7XoNt4nXTmPzaXz/xkvQXliAz6RE0fO8lHzuTYArxUY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BGNdkHHW; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752611407; x=1784147407;
+  t=1752611409; x=1784147409;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=DF51Ija4aTi6aDT+XWtc4DwAwkeHZC1nY5FsBaDZsB4=;
-  b=TX+BW4cwmHRVcSqKyl6TXAFIdYpsa+q7LbFRLz5dycndnu4jWUIqvRYK
-   0plu9Phr2Pv84zjWGtgQNrFrZECRos125iGmoQ5WLTNHQ/lyTBq1ulXlR
-   EDDs0LOjNp5JiUW91NxyXos8tLe2IfG8g2vGyUJfPQJUYQgWn1qROHA3G
-   FhXaaLIG5VqU/YgRRs6FTf2riaesaTRJTbODTscLUc2cCiIhhoTMvLD2r
-   tsq0hyODJLChqrt65W9XbfM7YDkuuKSwLKPAcibdF++Fc+9sjw6AiqqFw
-   wJEE539hVVy1c/rOKgeDY+/S/xou9yMuJxxBkS6bpMVpuc2rIfkwfkSVa
+  bh=/oUdp1eUjc8e9Lgd7+wGCZ0B94uY7ood0jBLhM2gczY=;
+  b=BGNdkHHWhVhsK8HbYlvdiPce8ZMf/76nycvVo2pTXbM5vaOo6VNVnvzb
+   yPlNm9ds1eLG4VME0vHC4iXXDUHshkZA9QmI9FvDfIaVP4VIoDgkUEuCK
+   XUvax5tdruA0zdtj+8/cvPb1Y6Lmz1q0TLWFj+s7Ha4Bn6kT5Fy2H026+
+   qwOL+pGBOiFT7H67YVEzu0vOr/tqE8NlqQq+QYYG12JLx1GhPDk08HAQz
+   Ns7hL8/q2eiDMSRqbcbbA3f4aa6J/WG4HTmCRAk36B/Cuzbxf4FVBuJca
+   0itzpHmGWC+O3H7EDBIraC7bjcdP3V1ilzlO70NpNxpN1P3k5k46fR7c9
    Q==;
-X-CSE-ConnectionGUID: g9d4msQqSaif+bGL6Skh8w==
-X-CSE-MsgGUID: 6EZYw65pRiWlouItg8HO5A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11493"; a="54699819"
+X-CSE-ConnectionGUID: SyCYL58FR6GSrzeZz3iv+Q==
+X-CSE-MsgGUID: peRx+I3ESka9Juyajliq2A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11493"; a="54699826"
 X-IronPort-AV: E=Sophos;i="6.16,314,1744095600"; 
-   d="scan'208";a="54699819"
+   d="scan'208";a="54699826"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
   by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 13:29:58 -0700
-X-CSE-ConnectionGUID: GdePXKMtTQ25WNap89ha7A==
-X-CSE-MsgGUID: r4RctxcjTCutVINMhqyb2Q==
+X-CSE-ConnectionGUID: XQwbfGLMQP+25/KDxH03Wg==
+X-CSE-MsgGUID: ZnBOBT3rQRy+vYMkIyebow==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,314,1744095600"; 
-   d="scan'208";a="194449521"
+   d="scan'208";a="194449525"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa001.jf.intel.com with ESMTP; 15 Jul 2025 13:29:58 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -65,14 +65,14 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Dave Ertman <david.m.ertman@intel.com>,
+Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
 	anthony.l.nguyen@intel.com,
-	horms@kernel.org,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
-Subject: [PATCH net 2/3] ice: add NULL check in eswitch lag check
-Date: Tue, 15 Jul 2025 13:29:45 -0700
-Message-ID: <20250715202948.3841437-3-anthony.l.nguyen@intel.com>
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
+	Rinitha S <sx.rinitha@intel.com>
+Subject: [PATCH net 3/3] ice: check correct pointer in fwlog debugfs
+Date: Tue, 15 Jul 2025 13:29:46 -0700
+Message-ID: <20250715202948.3841437-4-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250715202948.3841437-1-anthony.l.nguyen@intel.com>
 References: <20250715202948.3841437-1-anthony.l.nguyen@intel.com>
@@ -84,36 +84,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Dave Ertman <david.m.ertman@intel.com>
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-The function ice_lag_is_switchdev_running() is being called from outside of
-the LAG event handler code.  This results in the lag->upper_netdev being
-NULL sometimes.  To avoid a NULL-pointer dereference, there needs to be a
-check before it is dereferenced.
+pf->ice_debugfs_pf_fwlog should be checked for an error here.
 
-Fixes: 776fe19953b0 ("ice: block default rule setting on LAG interface")
-Signed-off-by: Dave Ertman <david.m.ertman@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
+Fixes: 96a9a9341cda ("ice: configure FW logging")
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_lag.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/intel/ice/ice_debugfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c b/drivers/net/ethernet/intel/ice/ice_lag.c
-index 2410aee59fb2..d132eb477551 100644
---- a/drivers/net/ethernet/intel/ice/ice_lag.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lag.c
-@@ -2226,7 +2226,8 @@ bool ice_lag_is_switchdev_running(struct ice_pf *pf)
- 	struct ice_lag *lag = pf->lag;
- 	struct net_device *tmp_nd;
+diff --git a/drivers/net/ethernet/intel/ice/ice_debugfs.c b/drivers/net/ethernet/intel/ice/ice_debugfs.c
+index 9fc0fd95a13d..cb71eca6a85b 100644
+--- a/drivers/net/ethernet/intel/ice/ice_debugfs.c
++++ b/drivers/net/ethernet/intel/ice/ice_debugfs.c
+@@ -606,7 +606,7 @@ void ice_debugfs_fwlog_init(struct ice_pf *pf)
  
--	if (!ice_is_feature_supported(pf, ICE_F_SRIOV_LAG) || !lag)
-+	if (!ice_is_feature_supported(pf, ICE_F_SRIOV_LAG) ||
-+	    !lag || !lag->upper_netdev)
- 		return false;
+ 	pf->ice_debugfs_pf_fwlog = debugfs_create_dir("fwlog",
+ 						      pf->ice_debugfs_pf);
+-	if (IS_ERR(pf->ice_debugfs_pf))
++	if (IS_ERR(pf->ice_debugfs_pf_fwlog))
+ 		goto err_create_module_files;
  
- 	rcu_read_lock();
+ 	fw_modules_dir = debugfs_create_dir("modules",
 -- 
 2.47.1
 
