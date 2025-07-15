@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-207142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28622B05F34
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 16:02:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FCD5B05F4B
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 16:04:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F127500082
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:56:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BF493B32B7
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 13:57:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01AE82E3386;
-	Tue, 15 Jul 2025 13:46:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 580BC2E49B1;
+	Tue, 15 Jul 2025 13:47:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="A3sIOoxq"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="kjgKyL39"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
+Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 448D52EBBBC
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 13:46:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 592E02E4997
+	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 13:47:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752587199; cv=none; b=loQCCOfhg21xg5iveLKtAsJqXA0E19sMg8MqqQMMVh0SvWN9uhHQTBJbwdY3ox5jJC7Mxl1kERp5pi911eGARGHabupJH8lyms5qCB4zbboc55158jHJk/XSMu7Ter2KM+b7LHtLYUD3Zcckt4DkIL4QPU12FLi8q1nbroMhfI4=
+	t=1752587245; cv=none; b=jdCla3pdMjpqnh8KRr+7f7WQLHmmeTksXXsOpAx3qQcFnox+nCVcmeZFt1M52745xcsl0uh8EvjB00gncDnhQ6W11uhF5QKDfZtnBkD7gemxT938QpQeB4kFtjfM+5SYMUI+dFx1/tdwgqjqpHZnJjkQ/HRdS2P1kqmYGUW6bGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752587199; c=relaxed/simple;
-	bh=HjU6PxyUlCUhs2dvYf0iMA7Zry8aPzm7Aen+lVRuL90=;
+	s=arc-20240116; t=1752587245; c=relaxed/simple;
+	bh=NHY04lWbnuGt7TUMVXMBAd99xrE3nzf7tN3dhvAdpFk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=O/mNgPSOnJNJTK7skYWaZQk78djWSDNmuRWOFsXksJpwVkoFrBvSuZLWEVvNjOu3Ez8+0L6m4sG+NkQThMFk/XgM1TaDv79+sR4t1k/o/TFgnAr3QlykwZ3XXygx39Vg1F+YyrMGgEcKfgXEvTrjHKm464Lrq7jR2Tz8NgK7+v8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=A3sIOoxq; arc=none smtp.client-ip=54.206.34.216
+	 MIME-Version; b=ACDOzjVccID0tP/vqmKpniTOWNc+vbuAPuLYcALZXAS66GWO4IbvvhA4k+HrjEbyQg2vVBM2zWfCWkhtvalKjKAjJFnWJ+RJcwc4WYsnMMT39rXa5LaIJs9Cb+cR4pMwebh1rpDpLjw06k233pcuR/KVVLPDIpUzmh8icQ7wjNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=kjgKyL39; arc=none smtp.client-ip=18.132.163.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1752587136;
-	bh=ltFUUSzAPz2OoVfH54nkwDpFnO/axW/szGNu9HIiAOI=;
+	s=onoh2408; t=1752587161;
+	bh=NWDrOIeUTkfMgeyG9DirCptVDnqPmotqOLDK+VZpCcc=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=A3sIOoxq8qCcErnRKrwZqcxB61P7coOwgAn1V8WUJ2licka7PBrzVtxm3qXhQQV67
-	 64yVTQn0oswUZT2lAhCRrAX6i5gHwHWc6YcD/GgbpV1dZ4BKVSHdRV1sdFspGjW4x4
-	 1lBR9E07CbFunXqywDuJ/d9i6iE/7DtltT3Va5xY=
-X-QQ-mid: zesmtpip2t1752587121taaa03ec6
-X-QQ-Originating-IP: IIvVAyKvuXb4Hz7pVF2rGJuCkoWUtC78LZlVFBjDx2g=
+	b=kjgKyL395Bpv+Gv8DO1Yp/nbLJUdG4lX5EExTEGa5HvUgx02Vp1SBT0Gb/y0HJ70C
+	 1+EK2g1XPTpeg5IzW8sW8CkR4SxSM/kfWdPVtirIlmJjKs6ICQM7PC7yVdfUmzyud/
+	 6/TgenGECuUxaVU/HjvcO3soaKw/bg/n+g+rMOa8=
+X-QQ-mid: zesmtpip2t1752587129tb54538eb
+X-QQ-Originating-IP: PsIrTfnu37O5BQpc09CPKOeWtbwmOWY2B4qF0spybKw=
 Received: from avenger-e500 ( [localhost])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 15 Jul 2025 21:45:17 +0800 (CST)
+	id ; Tue, 15 Jul 2025 21:45:25 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 8982638937609059235
+X-BIZMAIL-ID: 9443703254596192763
 EX-QQ-RecipientCnt: 63
 From: WangYuli <wangyuli@uniontech.com>
 To: wangyuli@uniontech.com
@@ -111,9 +111,9 @@ Cc: airlied@gmail.com,
 	xen-devel@lists.xenproject.org,
 	yujiaoliang@vivo.com,
 	zhanjun@uniontech.com
-Subject: [PATCH v2 7/8] xen/xenbus: Fix typo "notifer"
-Date: Tue, 15 Jul 2025 21:44:06 +0800
-Message-ID: <906F22CD3C183048+20250715134407.540483-7-wangyuli@uniontech.com>
+Subject: [PATCH v2 8/8] scripts/spelling.txt: Add notifer||notifier to spelling.txt
+Date: Tue, 15 Jul 2025 21:44:07 +0800
+Message-ID: <A205796B545C4241+20250715134407.540483-8-wangyuli@uniontech.com>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
 References: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
@@ -126,48 +126,47 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: M0vH/xy+mm2+jN6c4WGTdeZjsrpi+JQtsnTDdG1x9FGOZX7SZgo+cUCm
-	t37lSOf7yQFsVMLdFDCRezb/LROAB3NDOjPsKxjdjQFLSEsyxxUl9+qQ+J+Gk4+nEP1TrkU
-	JisWnONIPowGJmVptxWoWvzDbwPpJqdf86IWmncHlW7jPeRKxIU14VXaHKrK6yuHMP8eMgJ
-	z8p99qqK7XgXmTXvWiM96ZDey2wqJ+ItEvYo/N0qdMSRtM+n3M07gDpgkmCh/CaEkr7g0mT
-	YqOJQK5nWZV4+hyHKtW6IK3+kw8URz8J7Q67Gu/xpTeJoFMcSO21oSXlzVC56JNQnQbDYeW
-	PVHerz1Nt7FhoWdf3kWqPqmG9qjrxdLNW5A0g8BzjURO4d0SjL1IUSukzWrBb/UpuMC4xbt
-	8ixIne0xM+vspzfOL7eS7Kmb88tk06oCrB/r7TBAmh38DqXZeLJU74mqhQM1I/l3xAg/Npe
-	L8HcGBcJYZ8/0kieXpuCiH5xI5QJNbYayvydeSr3tP0uFShIPs/w2jyJHdCgN+hhbWkIjYs
-	7SArdoFyAQjVFwBTc2FwaKt/btnNUSmK3LC+QHtvGArHXLcfKs2PaRXfHjWUS6MirFTyzkR
-	LLRBX4SbBO1L9LLTzln4N0/qdsQhRWEQJgZscdE6O1f9Nm78vEk5gXPT5Bp6UFqK2NwFV9b
-	Al5LhzvGxk5t9r5ewi9AHzA2pI4SDLHBWecWHdIVk+ok91+lQVKEpAGFv66dIuqC7vJx6JI
-	hnpiMr0vLMQKiWqTV2iVy0vOY8ElIHjWP7xmGEK+25qU2LiQxehwC6bi3YKYilD60bLDR5+
-	U9IQCaprga6pMI7ZEeO/1wnRLyQVvhRvvg/SikPFmxJ/oiPx1i0ps21NwhKl2bdVvECNhmm
-	mHsIRe5PAe6I3oxnYTR/Nc3BqY1lQ2I/+4jiRvYvTpT4h3XV8uIBUm2IXfha1hOyr06vW5N
-	oyFrdoF5yjIhR4+F7RDVWoY8Ra+IAZBXPxeFl3nKssNKJBU1tC5Ds9MFj7jyb3GRGjthaEd
-	NO/F8tDNjIs046zc/55pYvh9Jor79cNBHwXd9Cu1dgd1G5jyGTk8zm+yZGHkq53T7yZAWTN
-	oDNMOTChdZMAJMRJ955OHii6HYZ22iHSkv1eH8/gOYi+ndhGzVl54A=
-X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
+X-QQ-XMAILINFO: MycRura4/XvKSghc7/pa9XHASutBsOQuzzHY2t37wkqnL3EQ4b2WP1Gh
+	ElPQzWwQFnREb3nQLWJ3qNzjb3GcBfyJQKPQJ69yoG0q3zHaR7KQSKKXEsSHkMcoRM1k1BY
+	ps22/1Fsn8ySr1dc7bfZolGEZmjkxQssEqY9w2BSkA2XLRnIoeKrS7baLaSRY+pqXVNX9V7
+	5WZifSZZU0GTWkbHj5EVtB8VGov6xpIuEQELM0qeKO7zsDY1lbolGVIThKsrApHifihhx10
+	kGbHlbr/XyYZCPJSL38sDGEvgAvMd4h8mxd0UzTJzqi5eBn9xm/nRX6lh58v9YfhxQygE8n
+	8z+tICs+z+h8xv1w/BwPwtWN//u/2d1LCIv0PSkPjewkoyyF8Xed/LcJ+QeFCHo2dy8QdHb
+	4NljU0ORp/rJkPBOrJXrTOu1w5VHR5GHiAqvAocLjcJ1a6ndacn0gfMu5OeKC2wBOHhUNFR
+	SKHclylNdXcTXdEmOI4lFAQAMMmJdBJ7joZqeQN1YiqsHnY5ZEtudusulG2RyUDWbPxbQ2m
+	1mKDH24orXFn87VH0DKvhK7sCBYTqUqoznSQFgjub/r3vLIQu890ikweU25IXIWi/4spciI
+	h/aOfxddCISl+f3p2pBdd0JQVIkWABbETYXu3QJNFPbaDH0uQrjUAnUxAQ02wdN2WWLRPi3
+	5Vl5jR7tEgE+dy/Zya+9+QwysaAwx+HZlr6A8lX+8wIVHpMhObBlww95PNjNSlW9WTwdylO
+	3tsH49ARtWp1b39aDGNKlMq8iQ9SN3X2Cs5VwkBDqKn+auYNXaqnYLPRxnPjBpJpRrLz6Gi
+	P2lwe3W/OjAb7WxH5OM6r3NDxGjiIKtvDu/Bq4UoXh465lOyZF9eirXc6DMEe8pROGUZGvq
+	/92dzLXsH5aN8F4isgT1Nj8kgj02Rn6wA9jL6fb5111ik2fZXhveOqSU7sykaxtMkkeDKcR
+	EiLjmufldz9fBK7+kb6t522q+4bOCQYh9yPE7yK0XSFr6AnjUiltOZfOC7cTmIG3c2vK9lf
+	EK3CKh0lbnwcaHdpdP7ncsBzcwk+BY090uuUgsyxIvZXVgcJxfKALtGg+fE5BbuMF8rDlu9
+	KArMdL/MEdR
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
 X-QQ-RECHKSPAM: 0
 
-There is a spelling mistake of 'notifer' in the comment which
-should be 'notifier'.
+This typo was not listed in scripts/spelling.txt, thus it was more
+difficult to detect. Add it for convenience.
 
 Link: https://lore.kernel.org/all/B3C019B63C93846F+20250715071245.398846-1-wangyuli@uniontech.com/
 Signed-off-by: WangYuli <wangyuli@uniontech.com>
 ---
- include/xen/xenbus.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/spelling.txt | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/xen/xenbus.h b/include/xen/xenbus.h
-index 3f90bdd387b6..00b84f2e402b 100644
---- a/include/xen/xenbus.h
-+++ b/include/xen/xenbus.h
-@@ -180,7 +180,7 @@ int xenbus_printf(struct xenbus_transaction t,
-  * sprintf-style type string, and pointer. Returns 0 or errno.*/
- int xenbus_gather(struct xenbus_transaction t, const char *dir, ...);
- 
--/* notifer routines for when the xenstore comes up */
-+/* notifier routines for when the xenstore comes up */
- extern int xenstored_ready;
- int register_xenstore_notifier(struct notifier_block *nb);
- void unregister_xenstore_notifier(struct notifier_block *nb);
+diff --git a/scripts/spelling.txt b/scripts/spelling.txt
+index c9a6df5be281..d824c4b17390 100644
+--- a/scripts/spelling.txt
++++ b/scripts/spelling.txt
+@@ -1099,6 +1099,7 @@ notication||notification
+ notications||notifications
+ notifcations||notifications
+ notifed||notified
++notifer||notifier
+ notity||notify
+ notfify||notify
+ nubmer||number
 -- 
 2.50.0
 
