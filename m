@@ -1,174 +1,99 @@
-Return-Path: <netdev+bounces-207257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C647B066B0
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 21:17:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F17BB06770
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 22:04:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4F6F565624
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 19:17:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AA45502D77
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 20:03:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 361CA2BF007;
-	Tue, 15 Jul 2025 19:16:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68398272E7B;
+	Tue, 15 Jul 2025 20:03:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="k4G5FLYV"
+	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="pLbFDViD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4005528F948
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 19:16:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B45CA2749EC;
+	Tue, 15 Jul 2025 20:03:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752606995; cv=none; b=P5rQxMASN212tV1pbXkXuau4xdao+O4R4Y40coWEq6/uK3X4MWtN8s4h7gn+Ac1XruD4tN1cLUfaQJ3fj+W2TqTBCGCymFmuASF6VvVtTa317N4+sikbVYLKvI45A4Z18kr3TSSN8qle3korjIPgaL99djkjY59Yv4mf3qsEBHI=
+	t=1752609819; cv=none; b=HrmS2ar4KVaxj5/w/JBqwDdagRkm5om7B+kX4R7vP7Oska8ByT17L7DVTX1ZCka2KAiTj/Mgy6WpZcRuMMeEaqnfyzYBfcwWPBQktAAwwDVvLGIjPpdCQ3K5FjUqsd/TLYlRkM/Elv3ldWfzDuZhxteqppiRHZuSeMKguxUjvaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752606995; c=relaxed/simple;
-	bh=jmEenBBnJcPJ6JLSnRvcrVhxo7jKKE5kjzYF95A58vQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Va1FRySLJCGEet34FBifQNBlF7zewMGPD4PREuTErY3FJF9j+Q5LOW1/Y3CV9mYDbX6x7CboRe/JD3zoITqvTwJxSjTTbvflqC1e8v/V6RPhdf1AmZY3KAOl1g8dCzdXRorzAO6Cdvy1QTw5Ve2m630r8UZOM7EgFQiEMZ0TlZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=k4G5FLYV; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4ab5e2ae630so33588021cf.3
-        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 12:16:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1752606992; x=1753211792; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EyWMZNHH8t0HhJoB77UysafRoavoppKyzNMNzqOvChI=;
-        b=k4G5FLYV7bs+tpC6ndMGLj+mSrqSyctAEH6RaNim3NJmvSrUn1EkTS+66geC66nhEo
-         Qn84B9GfGOEWIxCOZnEi3wOd7lvDia3j5JlI6OWnPP1XN8Ui37F5AvjflaGrBXSRbM2J
-         1pYiUQ7MEceodNTVBmh49Qq5/cOCpj0cwQzA9PIWSrRNzguRvVg4pOlgv2RM30vQWust
-         xbNJnozB6gcZvjcimiGFgDLBc3I4ItzmlIIlxth7TSTr8yg2kczFtH3mxucAUJzEenBr
-         k5Kjw7tlIPUTuolUm+PfsulCMxyeLgquZAQCnPfpgosDncccyVoaNPu++IQTzQtflme0
-         dkCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752606992; x=1753211792;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EyWMZNHH8t0HhJoB77UysafRoavoppKyzNMNzqOvChI=;
-        b=Bb3Lyf8YwbsitNPrGlvrOnf6/tWynsFiKQXq1/XjtlNl0+UhVAzgrMhZxSbrSMN0Ee
-         +MJwySw9OxPQ5wI14z2J2IiLUVp5QQeZynlTbeAA9u9Cf95lnrwG0O1hUuF2Fcfba7NF
-         rgSev/FtPZAbxmAD0WXG7/oVvr2YxUQYVTjrS7CwmZ0QDmT85HmguR5pW1e1Q/WICEaq
-         G3fPnaFOuTrUV0TRgU02oSa2yLOBM/bXPhrCBTkkI0f5GfryZ9Nb4sdOUoAholXGueCS
-         rp09nGTNzBcRXW5oo5tGZidTXMM4q2FQv9sanx0A5HO2uAxoSLJ7G2L9YkxPpVXEST40
-         ntnw==
-X-Forwarded-Encrypted: i=1; AJvYcCU2k6NTU3ldMQwXpxqp5C0BZpRP52fZW5mAAtgpea006ZW3cnb72jkMkrY7FADa0kmFwvA9U8o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4vMADHq5p4XOgP/M9Kc+UMNMv+5SbxVhwe2mgU8hhDiMJQZhh
-	DFcvIvsgoG4v+MbsQZ2zAfpAQmbC4q3HrKxOjzenNPrIEK/3doWwBQXLAbYkGfie7DU=
-X-Gm-Gg: ASbGncve/8SjgwwWu9lDR1QvQuns8yRcbhnOYJvknchTpHq7LOzypgeXsMhSizHjNw7
-	nzBpcamuGibYlOeVfG2fV+vYkhkXpQZDU19Z1GHukSHs6vzUw19dk13AT7ElCkKoYwaTn3rBf26
-	8gj0FTkRLVTUd+mfUAB5ftfLF1/FDqsH+6zb3NR8uam+58BRz5vhRgDFBzQrIyBi534PuaQzS76
-	djiukMwJZIi1jMdn15z5zjDfY5nU2A43S+5w6YDQ7+klwPnvItuTYs5Q53YjagQuPFZ08RupqeM
-	E2hR9G7CKSqHvqk53q3HPx0DZ/zfjduQAC8jANbUEYTY/Ebw0GSk8uWYlOQI4YQSrxrMdGT0+ut
-	LhYuNlDU4S5SNyc+A7pkxoD67vtmzi0m/lNwfnhUw4BO+lgPzThW6jAMRDVbv1N5aGYrvtX1P0Q
-	==
-X-Google-Smtp-Source: AGHT+IFNu6OS2CHvkVX/AFP0Ggu6QTgX/HryXXNt8GtSiABsUgLTgba9EtOOht2y1gHxuQnp05k70A==
-X-Received: by 2002:ac8:5acc:0:b0:4a6:f9b0:2093 with SMTP id d75a77b69052e-4ab90cf6cfamr9216651cf.46.1752606991715;
-        Tue, 15 Jul 2025 12:16:31 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-167-56-70.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.56.70])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4a9edc593edsm64349751cf.21.2025.07.15.12.16.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Jul 2025 12:16:30 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1ubl8f-00000008tB4-2UzY;
-	Tue, 15 Jul 2025 16:16:29 -0300
-Date: Tue, 15 Jul 2025 16:16:29 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Abhijit Gangurde <abhijit.gangurde@amd.com>, shannon.nelson@amd.com,
-	brett.creeley@amd.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
-	andrew+netdev@lunn.ch, allen.hubbe@amd.com, nikhil.agarwal@amd.com,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Andrew Boyer <andrew.boyer@amd.com>
-Subject: Re: [PATCH v3 10/14] RDMA/ionic: Register device ops for control path
-Message-ID: <20250715191629.GA2116306@ziepe.ca>
-References: <20250702131803.GB904431@ziepe.ca>
- <20250702180007.GK6278@unreal>
- <bb0ac425-2f01-b8c7-2fd7-4ecf9e9ef8b1@amd.com>
- <20250704170807.GO6278@unreal>
- <15b773a4-424b-4aa9-2aa4-457fbbee8ec7@amd.com>
- <20250707072137.GU6278@unreal>
- <1a7190d4-f3ef-744c-4e46-8cb255dee6cf@amd.com>
- <20250707164609.GA592765@unreal>
- <76a68f62-1f73-cc81-0f5b-48a6982a54c7@amd.com>
- <20250713062753.GA5882@unreal>
+	s=arc-20240116; t=1752609819; c=relaxed/simple;
+	bh=hWcwwSCIE1juPICXC7jR+4JoO+FPPx/JLkJnjiyX7Iw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=mx7VDMgYbVp9AD7MRq1bV9GgcUH38248tz3RAbe0A8mi6uX6O1PQLCy6H5KAU0qXAxPqKlA+WiOz3q+41cPd0QexDsIUa0rEGNmBe98xVxZ6sabUPO0WCxllzw6Fj05n++DMlBP13eoUP1tSHCf8bC0TlFnA9hQgbxYVEPCKpjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=pLbFDViD; arc=none smtp.client-ip=45.79.88.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 9F8524040B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+	t=1752609816; bh=5kPEQacK23+5d9HZEBwKwlf08U1WgpD16N1/izqmHtU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=pLbFDViDIrgJL8ZQateU2gyMeDQgIUGqckKBl894fT8zEhfferjsoQNUJfu/F2kmi
+	 bHgqmunluMg8/CrAP+1xeAzeyBkwb9k/D8gjRgUcLUtOue7x0CQjovVXSpittsvf8z
+	 QHuolRJl87REBezg0rRnN0jj+EqXpjmuFqUtc9a8Js+uKkCDBjoD5CsAi7GwFpawto
+	 N97D86OaxcchGHK0hiv4wr35SrKHUfZUNx1UUfyju4YWpNfSs3xE8Z4miAkT0VNoil
+	 DaHSRLO19jjiyqSuJMJn7MDoLLiQh2Yx9AB8i0FtGQmhUrD1RtCeNjc96fpMMNIzN4
+	 7g8TuYdwWsqRg==
+Received: from localhost (unknown [IPv6:2601:280:4600:2da9::1fe])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by ms.lwn.net (Postfix) with ESMTPSA id 9F8524040B;
+	Tue, 15 Jul 2025 20:03:36 +0000 (UTC)
+From: Jonathan Corbet <corbet@lwn.net>
+To: Bagas Sanjaya <bagasdotme@gmail.com>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Documentation
+ <linux-doc@vger.kernel.org>, Linux PowerPC
+ <linuxppc-dev@lists.ozlabs.org>, Linux Networking <netdev@vger.kernel.org>
+Cc: Richard Cochran <richardcochran@gmail.com>, Haren Myneni
+ <haren@linux.ibm.com>, Bagas Sanjaya <bagasdotme@gmail.com>, Madhavan
+ Srinivasan <maddy@linux.ibm.com>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Andrew Donnellan <ajd@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nathan Lynch
+ <nathanl@linux.ibm.com>
+Subject: Re: [PATCH v2 0/3] ioctl numbers list cleanup for
+ papr-physical-attestation.h
+In-Reply-To: <20250714015711.14525-1-bagasdotme@gmail.com>
+References: <20250714015711.14525-1-bagasdotme@gmail.com>
+Date: Tue, 15 Jul 2025 14:03:35 -0600
+Message-ID: <878qkpfch4.fsf@trenco.lwn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250713062753.GA5882@unreal>
+Content-Type: text/plain
 
-On Sun, Jul 13, 2025 at 09:27:53AM +0300, Leon Romanovsky wrote:
-> Let's do what all other drivers do, please. I prefer simplest solution
-> and objects that can potentially be around after verbs objects were
-> cleaned doesn't sound right.
+Bagas Sanjaya <bagasdotme@gmail.com> writes:
 
-I think it is OK, at least QP makes sense and matches some other
-drivers.
+> Hi,
+>
+> This is the cleanup series following up from 03c9d1a5a30d93 ("Documentation:
+> Fix description format for powerpc RTAS ioctls"). It is based on docs-next
+> tree. The end result should be the same as my previous fixup patch [1].
+>
+> Enjoy!
+>
+> Changes since v1 (RESEND) [2]:
+>
+>   * Add Fixes: and Reviewed-by: trailers (Haren)
+>   * Expand tabs for uapi/misc/amd-apml.h to match other entries
+>
+> Jon: Would you like to apply this series on docs-next or should powerpc
+> folks handle it?
 
-+static void ionic_qp_event(struct ionic_ibdev *dev, u32 qpid, u8 code)
-+{
-+       struct ib_event ibev;
-+       struct ionic_qp *qp;
-+
-+       rcu_read_lock();
-+       qp = xa_load(&dev->qp_tbl, qpid);
-+       if (qp)
-+               kref_get(&qp->qp_kref);
-+       rcu_read_unlock();
-+
+I've applied it.  I took out the vast pile of Fixes tags, though; I
+don't think all that was justified for these tweaks.
 
-The above is an async event path, and the kref is effectively the open
-coded rwlock pattern we use often.
+Thanks,
 
-The unlock triggers a completion:
-
-+       kref_put(&qp->qp_kref, ionic_qp_complete);
-+static inline void ionic_qp_complete(struct kref *kref)
-+{
-+       struct ionic_qp *qp = container_of(kref, struct ionic_qp, qp_kref);
-+       
-+       complete(&qp->qp_rel_comp);
-+}
-
-Which acts as the unlock. And then qp destruction:
-
-+int ionic_destroy_qp(struct ib_qp *ibqp, struct ib_udata *udata)
-+{
-+       kref_put(&qp->qp_kref, ionic_qp_complete);
-+       wait_for_completion(&qp->qp_rel_comp);
-
-Which is the typical "write" side of the lock.
-
-So this is all normal, the qp doesn't outlive destroy, destroy waits
-for all the async event deliver to complete. It has to, we free the
-underlying memory in the core code.
-
-As long as the other case are like this it is fine
-
-+       xa_erase_irq(&dev->qp_tbl, qp->qpid);
-+       synchronize_rcu();
-
-This should go away though, don't like to see synchronize_rcu(). The
-idea is you kfree the QP with RCU. But the core code doesn't do that..
-
-So in the short term you should take the lock instead of using rcu:
-
-       xa_lock(&dev->qp_tbl);
-       qp = xa_load(&dev->qp_tbl, qpid);
-       if (qp)
-               kref_get(&qp->qp_kref);
-
-Jason
+jon
 
