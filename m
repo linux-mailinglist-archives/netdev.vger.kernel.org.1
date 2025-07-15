@@ -1,232 +1,171 @@
-Return-Path: <netdev+bounces-206919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-206920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21BE8B04CCA
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 02:26:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9059CB04CCD
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 02:28:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B8974A7D2F
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 00:26:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2F9E3AF39E
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 00:28:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABC7D14EC5B;
-	Tue, 15 Jul 2025 00:26:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="G1FHzJlm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A98414EC5B;
+	Tue, 15 Jul 2025 00:28:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B451E13AA2F
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 00:26:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1737A4400;
+	Tue, 15 Jul 2025 00:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752539185; cv=none; b=p0tVA2l8fB2iWbImIE1agK5khxJSmKVnIgeP6Ie799YjibBTxSaUyW6zQKc3WrFcE4wH9PLj6SBJM2Kr8J3ijPIH/nEMLLcy2nSQ+fQv+z65WLx7j/oNgns1wCwsLqcvJ+EN2MKESKR0WtqSMyk18YWiSbIzg738TjY9sOeBa/4=
+	t=1752539335; cv=none; b=JMUzPw3PSgjL96bhXZFh5W5vu+IXjV4W7wWgB1x3cDBH7zFpzbXItqeeumkE7sfFrwjWALjfF9jQsTzLCiH3kqG7FporI65nFu6v4LR3gdVcRBAmH3aFi8QDz3JGkHrqK5jn5UD6ZgIFsiit7VZpsrtZBGQVrq3MfBI08YvaS3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752539185; c=relaxed/simple;
-	bh=LiV8jHKcIjJme1/D5vj/00XvOEmMQMptlJ6ONy5ps8Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AQTChx+U8mjh5rwQo0eOvS0NUTV5R9GfG/WcGIManOe6Qvq6Df+tBYaoGGDxPuLfsALREfK0YPyr6lRP2rxYbPjllGM8LNx6gbCvQed5PS2mzH2hEeXlUHiMqt+bd1Bc3jj7k+muxG6bY+Jrdp096HHb5ps0Zc06nzv9sG1uWSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=G1FHzJlm; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7e278d8345aso158670785a.0
-        for <netdev@vger.kernel.org>; Mon, 14 Jul 2025 17:26:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1752539182; x=1753143982; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3Mlpwfj3URCo7lhI788Fsy/bl58+0MG3EEAGnhLZHaE=;
-        b=G1FHzJlmUFib2oeWagMri3DgmAng4+2A0ymNEFXcjIX3Jo471oWRZ8JKAvUZb8qq4r
-         vL7Lviyu1euxl3a7dr8PGxyK8zvPqyr6yCjmX01pMMRQFExU8d1u465Exde1pUOQXqDx
-         JpNbbNrpbuP1KkMezl373b5labnd0OeIaP2nJontdKbMp6ZQvA9hNzdgCGSqUB8UxeEb
-         g4tPwwLjpPKagdkb7p3kKrmj327+uscM8o2xq1Z8M9a1SJmil2HQ/AIIOycGlZxsS9nh
-         euhcieJuzKBEEe04s7orvxCPfKKl7r3z3x5CF8WKJ8ud39cyipyI5u5olFzdLzHAFesL
-         FeiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752539182; x=1753143982;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3Mlpwfj3URCo7lhI788Fsy/bl58+0MG3EEAGnhLZHaE=;
-        b=kjpBdlC7T+XEjcKHJbZGV52g81or3wv3CKmoALpQSL8g2EuITG/hU9IH8+S+buDVRf
-         fLyvxpiD8A9ipvYhMjE8B2Z/41VFTJdRPUcYfJbQl7niTSNbnMqO/Oejii0hVt7Clp7S
-         s3RSIF4VOQxB6AnJQ6LftzL0v80Y9yRhlZ7mS9FbG5xb9LENbsPlnfhsr43EGeylRcw2
-         7PZmXkJ/wydI0/dxEElkgh58PXRd9u53EaIgt2+WVv0wnmFZEcLfSTWjmYnJTaOAdG2m
-         1bW6mpU5ItaN7JrUsfiLfuYfCcfVQkvQayOv0W4bcdKwJJZ7f1t0VL0SDlaZPulMjg59
-         zUOQ==
-X-Gm-Message-State: AOJu0YwfDpO+xQbLpegiGS+FSBnJO54+F3tlSrvZBhMiuvgNsPdl9dGd
-	DX33+rEtoaHZymi1G9aZ4/I89UzCFiCDxGtjutdR5RUyw3OdlVdka5dLQ8csPmNW024=
-X-Gm-Gg: ASbGncsfAubMGoWWBG6Ar95CxpS8GSGHNttP9TjUUJRp6AkjA+EnkgNSfqJarRM4Wfc
-	tuGL4Z64bJ1wbdoneacL4ZJa4bH7rNmVk8gLYftnLUhMxP0k9xPe7Q/csTaeFbXqe7ReV3vTHn8
-	xYxcJxvQ58tU5L1iK6cC/BPlu72/QN3viJqYhcnfd+7EbFP8Uf6QeUFovkzq2e0/dd+f1UXLjuJ
-	jNyMv3uu2oIORqYKe4sm4/sOT3zG0v4l1nrgJX/7CvjUH30bmdFKhaWfp6xSfBDeiyTu3qbJaQ8
-	K46pColAKDUBnEtuq8atE8AWLL4XzEKo1afe+67OrL+4SiFH/qGqBTbBTlSKpC+3mtksaHWgyt+
-	a7Qdv1y/od1ABUTTh8qJM6iswTPpHRELC4ma4QGJmume2PPU=
-X-Google-Smtp-Source: AGHT+IGq5NuM2gYxO5y5Q/ZrhH0BxEUoJ3LwVIlugtZFybZHtEhx2FKOOI4VDSQ3wT6tdREu1nnDrA==
-X-Received: by 2002:a05:6214:1cc3:b0:702:c15f:3291 with SMTP id 6a1803df08f44-704a38b3207mr273136436d6.22.1752539182318;
-        Mon, 14 Jul 2025 17:26:22 -0700 (PDT)
-Received: from [10.73.214.168] ([208.184.112.130])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70497d5d5absm52458586d6.83.2025.07.14.17.26.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Jul 2025 17:26:21 -0700 (PDT)
-Message-ID: <755110eb-9dea-4df6-b207-21bc06491498@bytedance.com>
-Date: Mon, 14 Jul 2025 17:26:19 -0700
+	s=arc-20240116; t=1752539335; c=relaxed/simple;
+	bh=6Pn+jrVzcTZPHBI5NWZuSnQwGaQzOX1qUC31sBcjPTg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bqL0Aqw5s/8uC7Wqc3sY+INYVDmCz8t1l+zuu20Hw2kmg2zMbPimMchjKLzcUBOPu32XFH58jVajwN5PkLX0GwnIco+q8gi89gXbiPZaQK3gj+FR1ICZ1/o5VjbZWThzLiHkYaqz1EWs23TL2FKAL5tvsLGeJ8OpemN3OV2EGBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4bh0Lf3SMlz2CfdV;
+	Tue, 15 Jul 2025 08:24:42 +0800 (CST)
+Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
+	by mail.maildlp.com (Postfix) with ESMTPS id CE9501A016C;
+	Tue, 15 Jul 2025 08:28:48 +0800 (CST)
+Received: from DESKTOP-F6Q6J7K.china.huawei.com (10.174.175.220) by
+ kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 15 Jul 2025 08:28:47 +0800
+From: Fan Gong <gongfan1@huawei.com>
+To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	<linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Bjorn Helgaas
+	<helgaas@kernel.org>, luosifu <luosifu@huawei.com>, Xin Guo
+	<guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>, Zhou
+ Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
+	<shijing34@huawei.com>, Fu Guiming <fuguiming@h-partners.com>, Meny Yossefi
+	<meny.yossefi@huawei.com>, Gur Stavi <gur.stavi@huawei.com>, Lee Trager
+	<lee@trager.us>, Michael Ellerman <mpe@ellerman.id.au>, Vadim Fedorenko
+	<vadim.fedorenko@linux.dev>, Suman Ghosh <sumang@marvell.com>, Przemek
+ Kitszel <przemyslaw.kitszel@intel.com>, Joe Damato <jdamato@fastly.com>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: [PATCH net-next v09 0/8] net: hinic3: Add a driver for Huawei 3rd gen  NIC - management interfaces
+Date: Tue, 15 Jul 2025 08:28:35 +0800
+Message-ID: <cover.1752489734.git.zhuyikai1@h-partners.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Patch bpf-next v4 4/4] tcp_bpf: improve ingress redirection
- performance with message corking
-To: Jakub Sitnicki <jakub@cloudflare.com>,
- Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, john.fastabend@gmail.com,
- zhoufeng.zf@bytedance.com, Amery Hung <amery.hung@bytedance.com>,
- Cong Wang <cong.wang@bytedance.com>
-References: <20250701011201.235392-1-xiyou.wangcong@gmail.com>
- <20250701011201.235392-5-xiyou.wangcong@gmail.com>
- <87ecuyn5x2.fsf@cloudflare.com>
- <509939c4-2e3e-41a6-888f-cbbf6d4c93cb@bytedance.com>
- <87a55lmrwn.fsf@cloudflare.com> <aGdWhRi/0KLTFL8k@pop-os.localdomain>
- <87cyabhotr.fsf@cloudflare.com>
-Content-Language: en-US
-From: Zijian Zhang <zijianzhang@bytedance.com>
-In-Reply-To: <87cyabhotr.fsf@cloudflare.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemf100013.china.huawei.com (7.202.181.12)
 
-On 7/8/25 1:51 AM, Jakub Sitnicki wrote:
-> On Thu, Jul 03, 2025 at 09:20 PM -07, Cong Wang wrote:
->> On Thu, Jul 03, 2025 at 01:32:08PM +0200, Jakub Sitnicki wrote:
->>> I'm all for reaping the benefits of batching, but I'm not thrilled about
->>> having a backlog worker on the path. The one we have on the sk_skb path
->>> has been a bottleneck:
->>
->> It depends on what you compare with. If you compare it with vanilla
->> TCP_BPF, we did see is 5% latency increase. If you compare it with
->> regular TCP, it is still much better. Our goal is to make Cillium's
->> sockops-enable competitive with regular TCP, hence we compare it with
->> regular TCP.
->>
->> I hope this makes sense to you. Sorry if this was not clear in our cover
->> letter.
-> 
-> Latency-wise I think we should be comparing sk_msg send-to-local against
-> UDS rather than full-stack TCP.
-> 
-> There is quite a bit of guessing on my side as to what you're looking
-> for because the cover letter doesn't say much about the use case.
-> 
+This is the 2/3 patch of the patch-set described below.
 
-Let me add more details to the use cases,
+The patch-set contains driver for Huawei's 3rd generation HiNIC
+Ethernet device that will be available in the future.
 
-Assume user space code uses TCP to connect to a peer which may be
-local or remote. We are trying to use sockmap to transparently
-accelerate the TCP connection where both the sender and the receiver are
-on the same machine. User space code does not need to be modified, local
-connections will be accelerated, remote connections remain the same.
-Because of the transparency here, UDS is not an option here. UDS
-requires user-space code change, and it means users know they are
-talking to local peer.
+This is an SRIOV device, designed for data centers.
+Initially, the driver only supports VFs.
 
-We assume that since we bypass the Linux network stack, better tput,
-latency and cpu usage will be observed. However, it's not ths case, tput
-is worse when the message size is small (<64k).
+Following the discussion over RFC01, the code will be submitted in
+separate smaller patches where until the last patch the driver is
+non-functional. The RFC02 submission contains overall view of the entire
+driver but every patch will be posted as a standalone submission.
 
-It's similar to cilium "sockops-enable" config, which is deprecated
-mostly because of performance. The config uses sockmap to manage the
-TCP connection between pods in the same machine.
+Changes:
 
-https://github.com/cilium/cilium/blob/v1.11.4/bpf/sockops/bpf_sockops.c
+PATCH 02 V01: https://lore.kernel.org/netdev/cover.1749561390.git.root@localhost.localdomain
 
-> For instance, do you control the sender?  Why not do big writes on the
-> sender side if raw throughput is what you care about?
-> 
+PATCH 02 V02: https://lore.kernel.org/netdev/cover.1749718348.git.zhuyikai1@h-partners.com
+* Fix build allmodconfig warning (patchwork)
+* Update cover-letter changes information.
 
-As described above, we assume user space uses TCP, and we cannot change
-the user space code.
+PATCH 02 V03: https://lore.kernel.org/netdev/cover.1750054732.git.zhuyikai1@h-partners.com
+* Use refcount_*() instead of atomic_*() (Jakub Kicinski)
+* Consistency fixes : HIG->HIGH, BAR45->BAR4/5 , etc (ALOK TIWARI)
+* Code format fixes : use \n before return, remove extra spaces (ALOK TIWARI)
+* Remove hinic3_request_irq redundant error print (ALOK TIWARI)
+* Modify hinic3_wq_create error print (ALOK TIWARI)
 
->>> 1) There's no backpressure propagation so you can have a backlog
->>> build-up. One thing to check is what happens if the receiver closes its
->>> window.
->>
->> Right, I am sure there are still a lot of optimizations we can further
->> improve. The only question is how much we need for now. How about
->> optimizing it one step each time? :)
-> 
-> This is introducing a quite a bit complexity from the start. I'd like to
-> least explore if it can be done in a simpler fashion before committing to
-> it.
-> 
-> You point at wake-ups as being the throughput killer. As an alternative,
-> can we wake up the receiver conditionally? That is only if the receiver
-> has made progress since on the queue since the last notification. This
-> could also be a form of wakeup moderation.
-> 
+PATCH 02 V04: https://lore.kernel.org/netdev/cover.1750665915.git.zhuyikai1@h-partners.com
+* Break it up into smaller patches (Jakub Kicinski)
 
-wake-up is indeed one of the throughput killer, and I agree it can be
-mitigated by waking up the receiver conditionally.
+PATCH 02 V05: https://lore.kernel.org/netdev/cover.1750821322.git.zhuyikai1@h-partners.com
+* Fix build clang warning (Jakub Kicinski)
 
-IIRC, sock lock is another __main__ throughput killer,
-In the tcp_bpf_sendmsg, the context of sender process,
-we need to lock_sock(sender) -> release_sock(sender) -> lock_sock(recv)
--> release_sock(recv) -> lock_sock(sender) -> release_sock(sender).
+PATCH 02 V06: https://lore.kernel.org/netdev/cover.1750937080.git.zhuyikai1@h-partners.com
+* Use kmalloc instead of kzalloc for cmd_buf allocation (Vadim Fedorenko)
+* Use usleep_range() for avoid CPU busy waiting (Vadim Fedorenko)
+* Use kcalloc for intr_coalesce initialization (Vadim Fedorenko)
+* Code format fixes: use reverse x-mas tree (Vadim Fedorenko)
+* Simplify hinic3_mbox_pre_init logic (Vadim Fedorenko)
 
-This makes the sender somewhat dependent to the receiver, when the 
-receiver is working, the sender will be blocked.
+PATCH 02 V07: https://lore.kernel.org/netdev/cover.1751597094.git.zhuyikai1@h-partners.com
+* Use threaded IRQ instead of tasklet (Paolo Abeni)
+* Use wmb instead of rmb in cmdq_sync_cmd_handler (Paolo Abeni)
 
-    sender                      receiver
-tcp_bpf_sendmsg
-                            tcp_bpf_recvmsg (working)
-tcp_bpf_sendmsg (blocked)
+PATCH 02 V08: https://lore.kernel.org/netdev/cover.1752126177.git.zhuyikai1@h-partners.com
+* Remove msg_send_lock to avoid a double-locking schema (Vadim Fedorenko)
+* Use send_msg_id when assigning the value to msg_id (Vadim Fedorenko)
+
+PATCH 02 V09:
+* Use iowrite32be & ioread32be instead of writel & readl (Jakub Kicinski)
+* Use queue_work instead of queue_work_on(WORK_CPU_UNBOUND...) (Jakub Kicinski)
+* Modify aeqe & ceqe wmb comment (Jakub Kicinski)
+* Remove synchronize_irq before free_irq (Jakub Kicinski)
+
+Fan Gong (8):
+  hinic3: Async Event Queue interfaces
+  hinic3: Complete Event Queue interfaces
+  hinic3: Command Queue framework
+  hinic3: Command Queue interfaces
+  hinic3: TX & RX Queue coalesce interfaces
+  hinic3: Mailbox framework
+  hinic3: Mailbox management interfaces
+  hinic3: Interrupt request configuration
+
+ drivers/net/ethernet/huawei/hinic3/Makefile   |   4 +-
+ .../net/ethernet/huawei/hinic3/hinic3_cmdq.c  | 914 ++++++++++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_cmdq.h  | 156 +++
+ .../ethernet/huawei/hinic3/hinic3_common.c    |  31 +
+ .../ethernet/huawei/hinic3/hinic3_common.h    |  27 +
+ .../net/ethernet/huawei/hinic3/hinic3_csr.h   |  79 ++
+ .../net/ethernet/huawei/hinic3/hinic3_eqs.c   | 792 +++++++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_eqs.h   | 129 +++
+ .../ethernet/huawei/hinic3/hinic3_hw_cfg.c    |  43 +
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.c   |  31 +
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.h   |  13 +
+ .../ethernet/huawei/hinic3/hinic3_hw_intf.h   |  36 +
+ .../net/ethernet/huawei/hinic3/hinic3_hwif.c  | 149 ++-
+ .../net/ethernet/huawei/hinic3/hinic3_hwif.h  |  16 +
+ .../net/ethernet/huawei/hinic3/hinic3_irq.c   | 136 ++-
+ .../net/ethernet/huawei/hinic3/hinic3_main.c  |  61 +-
+ .../net/ethernet/huawei/hinic3/hinic3_mbox.c  | 838 +++++++++++++++-
+ .../net/ethernet/huawei/hinic3/hinic3_mbox.h  | 125 +++
+ .../ethernet/huawei/hinic3/hinic3_nic_dev.h   |  14 +-
+ .../huawei/hinic3/hinic3_queue_common.h       |   1 +
+ .../net/ethernet/huawei/hinic3/hinic3_wq.c    | 109 +++
+ .../net/ethernet/huawei/hinic3/hinic3_wq.h    |  11 +
+ 22 files changed, 3700 insertions(+), 15 deletions(-)
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_cmdq.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_cmdq.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_csr.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_eqs.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_eqs.h
 
 
-We introduce kworker here mainly to solve the sock lock issue, we want
-to have senders only need to acquire sender sock lock, receivers only
-need to acquire receiver sock lock. Only the kworker, as a middle man,
-needs to have both sender and receiver lock to transfer the data from
-the sender to the receiver. As a result, tcp_bpf_sendmsg and
-tcp_bpf_recvmsg can be independent to each other.
-
-    sender                      receiver
-tcp_bpf_sendmsg
-                            tcp_bpf_recvmsg (working)
-tcp_bpf_sendmsg
-tcp_bpf_sendmsg
-...
-
->>> 2) There's a scheduling latency. That's why the performance of splicing
->>> sockets with sockmap (ingress-to-egress) looks bleak [1].
->>
->> Same for regular TCP, we have to wakeup the receiver/worker. But I may
->> misunderstand this point?
-> 
-> What I meant is that, in the pessimistic case, to deliver a message we
-> now have to go through two wakeups:
-> 
-> sender -wakeup-> kworker -wakeup-> receiver
-> 
->>> So I have to dig deeper...
->>>
->>> Have you considered and/or evaluated any alternative designs? For
->>> instance, what stops us from having an auto-corking / coalescing
->>> strategy on the sender side?
->>
->> Auto corking _may_ be not as easy as TCP, since essentially we have no
->> protocol here, just a pure socket layer.
-> 
-> You're right. We don't have a flush signal for auto-corking on the
-> sender side with sk_msg's.
-> 
-> What about what I mentioned above - can we moderate the wakeups based on
-> receiver making progress? Does that sound feasible to you?
-> 
-> Thanks,
-> -jkbs
+base-commit: 5e95c0a3a55aea490420bd6994805edb050cc86b
+-- 
+2.43.0
 
 
