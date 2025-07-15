@@ -1,127 +1,206 @@
-Return-Path: <netdev+bounces-207268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1A39B06828
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 22:55:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33D75B06830
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 22:57:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51B5856460E
-	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 20:55:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D4A47B7EA9
+	for <lists+netdev@lfdr.de>; Tue, 15 Jul 2025 20:56:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C51B285CAF;
-	Tue, 15 Jul 2025 20:55:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D904E28727E;
+	Tue, 15 Jul 2025 20:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RN+IDxbe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 920241F0E24
-	for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 20:55:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B21641DC9B8;
+	Tue, 15 Jul 2025 20:57:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752612934; cv=none; b=HzftGkvzSVHfwd852wezSMuQqvpuktw/dw9wpThQJ3l3900oxY0t17bK5kgVrnzleafBCjb2hDIe4R+WJkNCtHjXkW7BIAFNNniPWl4/yfhXF4E+y8inG7KnYPoeWnDl2mMebUxaaF+9Di2A73s09xXwmkNFQHqk5JljXp3XUxc=
+	t=1752613060; cv=none; b=uS5ylxxyEesCsjjISY1vNgYkl0zI9dWIF/W+3JoaWs7xVpMpU43Yx/Z/fkC5KpW9Vyz58OJc6o7Kiu7aEGzF5wrwFDw9h/DLtRgO6hRsuAYdQSLhC75pZCuHMzdIucSRKq1mJxBWu253Cvm640Gs0oFt+tqYulwgNLZNHWO8hYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752612934; c=relaxed/simple;
-	bh=9CNoR++wDZH7NsfjU8OM+KHOVHW57lf73ByuG1G6U60=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=SNIoKnqG2Vu97DsSDlN27I4W5spF8L2ftWiitM6F2XKtiXzUyTuR7oCZrIyy/6Oxil100rRvlgSs4U4AyU36VYTnL3AXdFuEdfoWGGaBdeZdKyurBQ0xVi91bg6frmu8jxUir7P4oNCl8poPECNsSx1O2sJz5vhzBDKYD2y+Pp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-869e9667f58so1322434939f.3
-        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 13:55:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752612931; x=1753217731;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5vHveuGolym5EQhvmtNqG6g0knqcjvQnZGLJgsJjMjQ=;
-        b=wPKStOT2wBdaphoF3nGsdh6aYek8O+HaFTIyFQ7ZdF54WStij3KK4N0PRVeKqHAFzl
-         90NnxisW+rjLJo9Ft7H4BRKtqlUJ6Ie/AKKz98sMFLRfoSzIvtKdFS4AjLPA7CB8Nc8s
-         ChVTA9VGuUvjAYvoaR2+q3UgZYux3l5JnRKE+bmee2EHuxPc/MdZp7CsH30jWJ9UOZtD
-         Tg+yekbVD1kkEpPp+WwybuifdCvE3F8M8w21AZHjNSk4jupSpsyjBZMFHA6FeewWm33r
-         agSRSUTMYWhpaMgvvk2F5Uzgibzi313Qi+kVH2FJyVcM+rXMPWNsRqOdN15YLdFAfY7s
-         vV8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWZJN0HlzAAIFh9cWsHx0ggef6Qifvgj38Nvj+lbSbPrlrY0Y6Kw0r9syQ/sDneDfKULkBRks4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQ1D6csEAhd/EOUun/jevu9JciTAB5VQyGdL2yHqMBjdmtTRqD
-	KKSqHrXB8veseErTIXzgmw6mD8UMZz9Xlsn5E3lVVkiro3OxlHAPC0NTa5z0h5u/pP2N/gTo59g
-	hr2TTY9SyBNL2ZXyuRxnra8BpZUhY5utzaJMAFWim8j9ucuXat8VIQR7C6KY=
-X-Google-Smtp-Source: AGHT+IH41fXInBQhUVFmEC3BYpBSmFe7XYx0t5+7O+tY1xbSuO+MoSFA7uJ2u4Qx5gs1goSDakuSQ0X0NWold4XDloeyf2ZNnLbF
+	s=arc-20240116; t=1752613060; c=relaxed/simple;
+	bh=yHLetidUjsZN7RzvYQdZwkWIcftP0/dIz6TpMlYhQK0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Iv2f7RG/MRkoB0+eDr/wlhOc+d0b+FM0Wr/f3TaQVD8vFbc6ytQD+MCGPeid5bDNF+Hok1RfRp6tCFGltCeh13PjuTGZQMZJMvOSPszoq9K6xE/80kWaJ3poXKDtV953t3ltK8elW+62VR+1Hob7uIf7W/8t7IK745+RO7o72Ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RN+IDxbe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C366C4CEE3;
+	Tue, 15 Jul 2025 20:57:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752613059;
+	bh=yHLetidUjsZN7RzvYQdZwkWIcftP0/dIz6TpMlYhQK0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=RN+IDxbe4uibUHwRVILAFrBBk70Qacbt5TQoYSwdTcsWzLnV1ANSKGTNe5/TkJUl2
+	 oU7ruh9CRik02gT3X9ekLiDzYhX2acEMG7yh2mWo7jjP2byELcS/vV6nU09Yp+gMRa
+	 PvzNrHixDDTWRwsWR7o6+cDUgkmPnIE7YrB5UE9hs5FhF3SvW3Jc1wYqk8t/JsI8c2
+	 Oeo3oNU6btqCljYKUJ/8sV8R0SXs5ipOZyOJlHjXYIWd81/nBpTiXZuahW+Hbz5Ekd
+	 /1qrWIDHcM1SBSQRLAlrxF4SRVzdpu/7+QUCUISdf+3f03z56Ts2nNJths2pSwZZpY
+	 mdUym407KwnUg==
+From: carlos.bilbao@kernel.org
+To: jv@jvosburgh.net,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: sforshee@kernel.org,
+	bilbao@vt.edu,
+	Carlos Bilbao <carlos.bilbao@kernel.org>
+Subject: [PATCH] bonding: Switch periodic LACPDU state machine from counter to jiffies
+Date: Tue, 15 Jul 2025 15:57:33 -0500
+Message-ID: <20250715205733.50911-1-carlos.bilbao@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:3f0b:b0:85b:3c49:8811 with SMTP id
- ca18e2360f4ac-879c0842721mr125977339f.4.1752612930955; Tue, 15 Jul 2025
- 13:55:30 -0700 (PDT)
-Date: Tue, 15 Jul 2025 13:55:30 -0700
-In-Reply-To: <676d25b2.050a0220.2f3838.0464.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6876c042.a00a0220.3af5df.0009.GAE@google.com>
-Subject: Re: [syzbot] [net?] INFO: task hung in inet_rtm_newaddr
-From: syzbot <syzbot+adeb8550754921fece20@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, jhs@mojatatu.com, jiri@resnulli.us, kadlec@netfilter.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
-	syzkaller-bugs@googlegroups.com, vinicius.gomes@intel.com, 
-	xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-syzbot has found a reproducer for the following issue on:
+From: Carlos Bilbao <carlos.bilbao@kernel.org>
 
-HEAD commit:    0be23810e32e Add linux-next specific files for 20250714
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=17c3e98c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=adc3ea2bfe31343b
-dashboard link: https://syzkaller.appspot.com/bug?extid=adeb8550754921fece20
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16d1098c580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=116b08f0580000
+Replace the bonding periodic state machine for LACPDU transmission of
+function ad_periodic_machine() with a jiffies-based mechanism, which is
+more accurate and can help reduce drift under contention.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/13b5be5048fe/disk-0be23810.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/3d2b3b2ceddf/vmlinux-0be23810.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/c7e5fbf3efa6/bzImage-0be23810.xz
-
-The issue was bisected to:
-
-commit 5a781ccbd19e4664babcbe4b4ead7aa2b9283d22
-Author: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Date:   Sat Sep 29 00:59:43 2018 +0000
-
-    tc: Add support for configuring the taprio scheduler
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10de9adf980000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=12de9adf980000
-console output: https://syzkaller.appspot.com/x/log.txt?x=14de9adf980000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+adeb8550754921fece20@syzkaller.appspotmail.com
-Fixes: 5a781ccbd19e ("tc: Add support for configuring the taprio scheduler")
-
-INFO: task syz-executor:6015 blocked for more than 143 seconds.
-      Not tainted 6.16.0-rc6-next-20250714-syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor    state:D stack:26920 pid:6015  tgid:6015  ppid:1      task_flags:0x400140 flags:0x00004006
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5314 [inline]
- __schedule+0x16f5/0x4d00 kernel/sched/core.c:6697
- __schedule_loop kernel/sched/core.c:6775 [inline]
- schedule+0x165/0x360 kernel/sched/core.c:6790
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6847
- __mutex_lock_common kernel/locking/mutex.c:679 [inline]
- __mutex_lock+0x724/0xe80 kernel/locking/mutex.c:747
- rtnl_net_lock include/linux/rtnetlink.h:130 [inline]
- inet_rtm_newaddr+0x3b0/0x18b0 net/ipv4/devinet.c:979
-
-
+Signed-off-by: Carlos Bilbao (DigitalOcean) <carlos.bilbao@kernel.org>
 ---
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+ drivers/net/bonding/bond_3ad.c | 79 +++++++++++++---------------------
+ include/net/bond_3ad.h         |  2 +-
+ 2 files changed, 32 insertions(+), 49 deletions(-)
+
+diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
+index c6807e473ab7..8654a51266a3 100644
+--- a/drivers/net/bonding/bond_3ad.c
++++ b/drivers/net/bonding/bond_3ad.c
+@@ -1421,44 +1421,24 @@ static void ad_periodic_machine(struct port *port, struct bond_params *bond_para
+ 	    (!(port->actor_oper_port_state & LACP_STATE_LACP_ACTIVITY) && !(port->partner_oper.port_state & LACP_STATE_LACP_ACTIVITY)) ||
+ 	    !bond_params->lacp_active) {
+ 		port->sm_periodic_state = AD_NO_PERIODIC;
+-	}
+-	/* check if state machine should change state */
+-	else if (port->sm_periodic_timer_counter) {
+-		/* check if periodic state machine expired */
+-		if (!(--port->sm_periodic_timer_counter)) {
+-			/* if expired then do tx */
+-			port->sm_periodic_state = AD_PERIODIC_TX;
+-		} else {
+-			/* If not expired, check if there is some new timeout
+-			 * parameter from the partner state
+-			 */
+-			switch (port->sm_periodic_state) {
+-			case AD_FAST_PERIODIC:
+-				if (!(port->partner_oper.port_state
+-				      & LACP_STATE_LACP_TIMEOUT))
+-					port->sm_periodic_state = AD_SLOW_PERIODIC;
+-				break;
+-			case AD_SLOW_PERIODIC:
+-				if ((port->partner_oper.port_state & LACP_STATE_LACP_TIMEOUT)) {
+-					port->sm_periodic_timer_counter = 0;
+-					port->sm_periodic_state = AD_PERIODIC_TX;
+-				}
+-				break;
+-			default:
+-				break;
+-			}
+-		}
++	} else if (port->sm_periodic_state == AD_NO_PERIODIC)
++		port->sm_periodic_state = AD_FAST_PERIODIC;
++	/* check if periodic state machine expired */
++	else if (time_after_eq(jiffies, port->sm_periodic_next_jiffies)) {
++		/* if expired then do tx */
++		port->sm_periodic_state = AD_PERIODIC_TX;
+ 	} else {
++		/* If not expired, check if there is some new timeout
++		 * parameter from the partner state
++		 */
+ 		switch (port->sm_periodic_state) {
+-		case AD_NO_PERIODIC:
+-			port->sm_periodic_state = AD_FAST_PERIODIC;
+-			break;
+-		case AD_PERIODIC_TX:
+-			if (!(port->partner_oper.port_state &
+-			    LACP_STATE_LACP_TIMEOUT))
++		case AD_FAST_PERIODIC:
++			if (!(port->partner_oper.port_state & LACP_STATE_LACP_TIMEOUT))
+ 				port->sm_periodic_state = AD_SLOW_PERIODIC;
+-			else
+-				port->sm_periodic_state = AD_FAST_PERIODIC;
++			break;
++		case AD_SLOW_PERIODIC:
++			if ((port->partner_oper.port_state & LACP_STATE_LACP_TIMEOUT))
++				port->sm_periodic_state = AD_PERIODIC_TX;
+ 			break;
+ 		default:
+ 			break;
+@@ -1471,21 +1451,24 @@ static void ad_periodic_machine(struct port *port, struct bond_params *bond_para
+ 			  "Periodic Machine: Port=%d, Last State=%d, Curr State=%d\n",
+ 			  port->actor_port_number, last_state,
+ 			  port->sm_periodic_state);
++
+ 		switch (port->sm_periodic_state) {
+-		case AD_NO_PERIODIC:
+-			port->sm_periodic_timer_counter = 0;
+-			break;
+-		case AD_FAST_PERIODIC:
+-			/* decrement 1 tick we lost in the PERIODIC_TX cycle */
+-			port->sm_periodic_timer_counter = __ad_timer_to_ticks(AD_PERIODIC_TIMER, (u16)(AD_FAST_PERIODIC_TIME))-1;
+-			break;
+-		case AD_SLOW_PERIODIC:
+-			/* decrement 1 tick we lost in the PERIODIC_TX cycle */
+-			port->sm_periodic_timer_counter = __ad_timer_to_ticks(AD_PERIODIC_TIMER, (u16)(AD_SLOW_PERIODIC_TIME))-1;
+-			break;
+ 		case AD_PERIODIC_TX:
+ 			port->ntt = true;
+-			break;
++			if (!(port->partner_oper.port_state &
++						LACP_STATE_LACP_TIMEOUT))
++				port->sm_periodic_state = AD_SLOW_PERIODIC;
++			else
++				port->sm_periodic_state = AD_FAST_PERIODIC;
++		fallthrough;
++		case AD_SLOW_PERIODIC:
++		case AD_FAST_PERIODIC:
++			if (port->sm_periodic_state == AD_SLOW_PERIODIC)
++				port->sm_periodic_next_jiffies = jiffies
++					+ HZ * AD_SLOW_PERIODIC_TIME;
++			else /* AD_FAST_PERIODIC */
++				port->sm_periodic_next_jiffies = jiffies
++					+ HZ * AD_FAST_PERIODIC_TIME;
+ 		default:
+ 			break;
+ 		}
+@@ -1987,7 +1970,7 @@ static void ad_initialize_port(struct port *port, int lacp_fast)
+ 		port->sm_rx_state = 0;
+ 		port->sm_rx_timer_counter = 0;
+ 		port->sm_periodic_state = 0;
+-		port->sm_periodic_timer_counter = 0;
++		port->sm_periodic_next_jiffies = 0;
+ 		port->sm_mux_state = 0;
+ 		port->sm_mux_timer_counter = 0;
+ 		port->sm_tx_state = 0;
+diff --git a/include/net/bond_3ad.h b/include/net/bond_3ad.h
+index 2053cd8e788a..aabb8c97caf4 100644
+--- a/include/net/bond_3ad.h
++++ b/include/net/bond_3ad.h
+@@ -227,7 +227,7 @@ typedef struct port {
+ 	rx_states_t sm_rx_state;	/* state machine rx state */
+ 	u16 sm_rx_timer_counter;	/* state machine rx timer counter */
+ 	periodic_states_t sm_periodic_state;	/* state machine periodic state */
+-	u16 sm_periodic_timer_counter;	/* state machine periodic timer counter */
++	unsigned long sm_periodic_next_jiffies;	/* state machine periodic next expected sent */
+ 	mux_states_t sm_mux_state;	/* state machine mux state */
+ 	u16 sm_mux_timer_counter;	/* state machine mux timer counter */
+ 	tx_states_t sm_tx_state;	/* state machine tx state */
+-- 
+2.43.0
+
 
