@@ -1,407 +1,161 @@
-Return-Path: <netdev+bounces-207560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66E70B07CFA
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 20:33:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BB64B07D01
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 20:37:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6417F3B4694
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 18:33:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC8131C2259B
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 18:37:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1579287245;
-	Wed, 16 Jul 2025 18:33:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80ADE283FCF;
+	Wed, 16 Jul 2025 18:37:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qjCKFUg+"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RJyv8W69"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9363242909
-	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 18:33:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 209A37346F
+	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 18:37:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752690825; cv=none; b=puU0gVPBY1Gy8RtgkHZwlhQWiWUp+qqI4uBv1v9LEtQ4Vyy18OTKnSapM4KtyYaAX0BcGd1lX2FzgoGFrlnqTiGrXyGEOjn+NBCOwIS18LFkZ7/QYFVb4vFZzSsUIAQVe1SfJNxGdOZlK3G2698Evi+NTb0QSQeJ2cBbgHOo8Rg=
+	t=1752691056; cv=none; b=FqudOjuPjDl4tumo+MPhm3jG+hSRAbHj0wrFadZzPxml9CeG+g0x1Ecx/TrKuP0bKgUUMirA3TkQwaCMeSRLADhFg5lLstjRnN2R0q/Ix+vEqSkKUsC4DMWzy/hlOafMzgxtgoj5yJfXh8ZI5DdlVv9D5uF2GFRzNxymGkOdDSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752690825; c=relaxed/simple;
-	bh=2PlGqhByxxmNPpy9WqSdbiYQvFGS2+QpVzWrzY9yVGQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O8C7MQcJibcJxKnH875Gr6JnIQpAOhAKYDdpMqk/jdyDragljHgHNcfy88lV7reLPjf19qXBwy5PuFhwqJutImrC1adXvpXAOpbw+CCnPSq+V0rmaTuMp5dqu5mPexsb3h+424P2mCodL7VUeFe8ZTpJ92LkNqIdvDlluL5maTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qjCKFUg+; arc=none smtp.client-ip=209.85.215.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-b3226307787so87412a12.1
-        for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 11:33:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752690823; x=1753295623; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EpbBIE6VZb4neKxYjg4Tskes73yyrFR7E2JPnsAnw/I=;
-        b=qjCKFUg++Pe+gE30OiassXye1/82wR3X0y3gNJycS30k5Sl7ajirHLRRjDmU1lBqbw
-         XBRdx4e9BEzh6HVeXPrxGhN+89JZSMZloEqdAWmb77P6k3J42tbOu6XfkHCXfuX0hpvg
-         h6d8pJ4m7832iLwa+bpGsZRwJgsGEY0TBJQ2ti3BBN0FrwzId0eHlfGrAkbPE6LMq6jk
-         taBKvEz0h2WreOEYXxWsIcFa+1cO8AEqvjPNccGE59b4UkOd8Ac086pVrMpZbBrodBAc
-         zsOFdl6uV/ov+3HSJi57oxHVY6Q96A/V+3CtpRx1W5xZNJB3lzj46C+yzBLuiXZCTZ6h
-         6wHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752690823; x=1753295623;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EpbBIE6VZb4neKxYjg4Tskes73yyrFR7E2JPnsAnw/I=;
-        b=YMi7pBBGjTBqvr0MJIv0ejmrnxjrGYH+AKaJ8Ue2jOHstcpqW/svY9olC7wTc+EuEl
-         ryEMK7zufxPzug2U7XwLLRnYc6myYsP4+34KBDTOh/1Ls/kK/VAfuHdUPzKkmW0T/dvW
-         mGg5Y7LiC4oixT3Ftf8L5yL3GWlmIy4K/IYWOg7GxYJ3scdR/DbYvRpv/3BBEmA2IWqN
-         GoEN9zJHSYWJF5VQF7GnIcO4dp/QAvYsjhA+wrZ1L/e8+0P8X8OLBk8TrC+ep2pUdCr/
-         be49MgKkGPl0Wjic+SExsPVrDBQh8mnEvKw9Hznn62D8Pfnq5uKYjJ873x2HTJSNATAI
-         0mZw==
-X-Forwarded-Encrypted: i=1; AJvYcCWy5/UPfBWf7ZjyEc9/UQPCHGkYIiCbDfjsy99xRWyfiDHhZJtVTsayTR5vTsNs9PRVv/E9AiU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwH9gKsQG454UBK7kU4AQf+gmpIZwnIMKV7tKsYOjKaF/wtwyU+
-	lTgjxQiFfA2EFMJfoMFW0Besukx8qDzjqS7PPaz7HQUMaNl+rmXihTDLfcm98yzzghrYuzcaaHG
-	SKLVQLDix+QeZr3VAnEl/058T8Exu/9VAqSXTDavd
-X-Gm-Gg: ASbGncss8aSteK1xXyeITmgR/V9kz4gGqGgbjmcENxmB7gpc1e3ww9VnTmAe1IY78jN
-	NZlycu5Mh+L4KfhWa/q8BPnZjrr8lpxh1Z8u4QnxCPnZQ4q+biykaPg9w0C33MJmx45yjkiNiA2
-	T66DmGDGPOS+AduKUgqK9qBcf00bFK98l+VHN+6HLRvZG5GxACWdtSDHrYPsmpLPYcQk7j3UO0g
-	Kxa7eVd+vLrNcJd4qD66ZLkzoH3ZiX0hesKBNQFX2UBWdx5
-X-Google-Smtp-Source: AGHT+IFhda0RVK/FgbAFUsObdIzmqEGoa3JbuNgOYmUB3mkLE67GWjOdBeit0I+XoV41s9AepKz862Wnzvy60WFoWXY=
-X-Received: by 2002:a17:90b:224e:b0:311:c1ec:7d0a with SMTP id
- 98e67ed59e1d1-31c9f4cf4bemr4276917a91.25.1752690822850; Wed, 16 Jul 2025
- 11:33:42 -0700 (PDT)
+	s=arc-20240116; t=1752691056; c=relaxed/simple;
+	bh=Zqte3NYXHOks91o8e5stjLsYHVqwx6Ky9vMowuh9tI8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cIyqH4gAr7MjG7Px8XSYoaeCkB51nlw7m6cQXzqqNCwwqYKiGs99IosvDQRwath8lpkJGwp/boZygJO/f1dX57xekVod8BODX7Xa57oU/0HLFxRSyII7Zq8INWaHnLO60B5Roa7qXZZLmDAnvpJPKXzH4XhoQR8TY3PVXhUFNYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RJyv8W69; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 16 Jul 2025 11:37:26 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752691051;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4M+AYbeSm4JPoXFjLgh6i1xWpk+QabtlbWqg0E6/p9c=;
+	b=RJyv8W69eNmx8bxaVekGbkXTNcZ+VrjT/41No1TBYBgUP10iH2KEFOKr+J1rb2PZ1hTBdw
+	+QxVy3Wvblj7bMjVIG8Z2myFWv+KzuJ40MoWZTDN6K1ciRS9GQLcb4Rkg1YDWhP+NqTL/i
+	nH9uFWmBklowYoPtEp4PBDa5QYkbL0o=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Daniel Sedlak <daniel.sedlak@cdn77.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Neal Cardwell <ncardwell@google.com>, 
+	David Ahern <dsahern@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org, netdev@vger.kernel.org, 
+	Matyas Hurtik <matyas.hurtik@cdn77.com>
+Subject: Re: [PATCH v2 net-next 1/2] tcp: account for memory pressure
+ signaled by cgroup
+Message-ID: <ellemab7vyzd2n74tis4uqfpbxu3uepoygqil2im4l446k5bh7@kufhyeelglfr>
+References: <20250714143613.42184-1-daniel.sedlak@cdn77.com>
+ <20250714143613.42184-2-daniel.sedlak@cdn77.com>
+ <vlybtuctmjmsfkh4x455q4iokcme4zbowvolvti2ftmcysechr@ydj4uss6vkm2>
+ <CAAVpQUBNoRgciFXVtqS2rxjCeD44JHOuDNcuN0J__guY33pfjw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250716100006458kPWBPIJB6IdzWuUKlv4tF@zte.com.cn>
-In-Reply-To: <20250716100006458kPWBPIJB6IdzWuUKlv4tF@zte.com.cn>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 16 Jul 2025 11:33:30 -0700
-X-Gm-Features: Ac12FXyOspCHhAx87c88VO1duhZR6TZrGQh2VzNA4krdYiossFF4birkUv2k-pc
-Message-ID: <CAAVpQUCDJOnwRhjcwFke2vTZQ8rymopC3hpyPteLA3cRgXFz9Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v6] tcp: trace retransmit failures in tcp_retransmit_skb
-To: fan.yu9@zte.com.cn
-Cc: kuba@kernel.org, edumazet@google.com, ncardwell@google.com, 
-	davem@davemloft.net, dsahern@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, yang.yang29@zte.com.cn, 
-	xu.xin16@zte.com.cn, tu.qiang35@zte.com.cn, jiang.kun2@zte.com.cn, 
-	qiu.yutan@zte.com.cn, wang.yaxin@zte.com.cn, he.peilin@zte.com.cn
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAAVpQUBNoRgciFXVtqS2rxjCeD44JHOuDNcuN0J__guY33pfjw@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jul 15, 2025 at 7:00=E2=80=AFPM <fan.yu9@zte.com.cn> wrote:
->
-> From: Fan Yu <fan.yu9@zte.com.cn>
->
-> Background
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> When TCP retransmits a packet due to missing ACKs, the
-> retransmission may fail for various reasons (e.g., packets
-> stuck in driver queues, receiver zero windows, or routing issues).
->
-> The original tcp_retransmit_skb tracepoint:
->
-> 'commit e086101b150a ("tcp: add a tracepoint for tcp retransmission")'
->
-> lacks visibility into these failure causes, making production
-> diagnostics difficult.
->
-> Solution
-> =3D=3D=3D=3D=3D=3D=3D=3D
-> Adds the retval("err") to the tcp_retransmit_skb tracepoint.
-> Enables users to know why some tcp retransmission failed and
-> users can filter retransmission failures by retval.
->
-> Compatibility description
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-> This patch extends the tcp_retransmit_skb tracepoint
-> by adding a new "err" field at the end of its
-> existing structure (within TP_STRUCT__entry). The
-> compatibility implications are detailed as follows:
->
-> 1) Structural compatibility for legacy user-space tools
-> Legacy tools/BPF programs accessing existing fields
-> (by offset or name) can still work without modification
-> or recompilation.The new field is appended to the end,
-> preserving original memory layout.
->
-> 2) Note: semantic changes
-> The original tracepoint primarily only focused on
-> successfully retransmitted packets. With this patch,
-> the tracepoint now can figure out packets that may
-> terminate early due to specific reasons. For accurate
-> statistics, users should filter using "err" to
-> distinguish outcomes.
->
-> Before patched:
-> # cat /sys/kernel/debug/tracing/events/tcp/tcp_retransmit_skb/format
-> field:const void * skbaddr; offset:8; size:8; signed:0;
-> field:const void * skaddr; offset:16; size:8; signed:0;
-> field:int state; offset:24; size:4; signed:1;
-> field:__u16 sport; offset:28; size:2; signed:0;
-> field:__u16 dport; offset:30; size:2; signed:0;
-> field:__u16 family; offset:32; size:2; signed:0;
-> field:__u8 saddr[4]; offset:34; size:4; signed:0;
-> field:__u8 daddr[4]; offset:38; size:4; signed:0;
-> field:__u8 saddr_v6[16]; offset:42; size:16; signed:0;
-> field:__u8 daddr_v6[16]; offset:58; size:16; signed:0;
->
-> print fmt: "skbaddr=3D%p skaddr=3D%p family=3D%s sport=3D%hu dport=3D%hu =
-saddr=3D%pI4 daddr=3D%pI4 saddrv6=3D%pI6c daddrv6=3D%pI6c state=3D%s"
->
-> After patched:
-> # cat /sys/kernel/debug/tracing/events/tcp/tcp_retransmit_skb/format
-> field:const void * skbaddr; offset:8; size:8; signed:0;
-> field:const void * skaddr; offset:16; size:8; signed:0;
-> field:int state; offset:24; size:4; signed:1;
-> field:__u16 sport; offset:28; size:2; signed:0;
-> field:__u16 dport; offset:30; size:2; signed:0;
-> field:__u16 family; offset:32; size:2; signed:0;
-> field:__u8 saddr[4]; offset:34; size:4; signed:0;
-> field:__u8 daddr[4]; offset:38; size:4; signed:0;
-> field:__u8 saddr_v6[16]; offset:42; size:16; signed:0;
-> field:__u8 daddr_v6[16]; offset:58; size:16; signed:0;
-> field:int err; offset:76; size:4; signed:1;
->
-> print fmt: "skbaddr=3D%p skaddr=3D%p family=3D%s sport=3D%hu dport=3D%hu =
-saddr=3D%pI4 daddr=3D%pI4 saddrv6=3D%pI6c daddrv6=3D%pI6c state=3D%s err=3D=
-%d"
->
-> Suggested-by: KuniyukiIwashima <kuniyu@google.com>
+On Wed, Jul 16, 2025 at 11:07:44AM -0700, Kuniyuki Iwashima wrote:
+> On Wed, Jul 16, 2025 at 9:50 AM Shakeel Butt <shakeel.butt@linux.dev> wrote:
+> >
+> > On Mon, Jul 14, 2025 at 04:36:12PM +0200, Daniel Sedlak wrote:
+> > > This patch is a result of our long-standing debug sessions, where it all
+> > > started as "networking is slow", and TCP network throughput suddenly
+> > > dropped from tens of Gbps to few Mbps, and we could not see anything in
+> > > the kernel log or netstat counters.
+> > >
+> > > Currently, we have two memory pressure counters for TCP sockets [1],
+> > > which we manipulate only when the memory pressure is signalled through
+> > > the proto struct [2]. However, the memory pressure can also be signaled
+> > > through the cgroup memory subsystem, which we do not reflect in the
+> > > netstat counters. In the end, when the cgroup memory subsystem signals
+> > > that it is under pressure, we silently reduce the advertised TCP window
+> > > with tcp_adjust_rcv_ssthresh() to 4*advmss, which causes a significant
+> > > throughput reduction.
+> > >
+> > > So this patch adds a new counter to account for memory pressure
+> > > signaled by the memory cgroup, so it is much easier to spot.
+> > >
+> > > Link: https://elixir.bootlin.com/linux/v6.15.4/source/include/uapi/linux/snmp.h#L231-L232 [1]
+> > > Link: https://elixir.bootlin.com/linux/v6.15.4/source/include/net/sock.h#L1300-L1301 [2]
+> > > Co-developed-by: Matyas Hurtik <matyas.hurtik@cdn77.com>
+> > > Signed-off-by: Matyas Hurtik <matyas.hurtik@cdn77.com>
+> > > Signed-off-by: Daniel Sedlak <daniel.sedlak@cdn77.com>
+> > > ---
+> > >  Documentation/networking/net_cachelines/snmp.rst |  1 +
+> > >  include/net/tcp.h                                | 14 ++++++++------
+> > >  include/uapi/linux/snmp.h                        |  1 +
+> > >  net/ipv4/proc.c                                  |  1 +
+> > >  4 files changed, 11 insertions(+), 6 deletions(-)
+> > >
+> > > diff --git a/Documentation/networking/net_cachelines/snmp.rst b/Documentation/networking/net_cachelines/snmp.rst
+> > > index bd44b3eebbef..ed17ff84e39c 100644
+> > > --- a/Documentation/networking/net_cachelines/snmp.rst
+> > > +++ b/Documentation/networking/net_cachelines/snmp.rst
+> > > @@ -76,6 +76,7 @@ unsigned_long  LINUX_MIB_TCPABORTONLINGER
+> > >  unsigned_long  LINUX_MIB_TCPABORTFAILED
+> > >  unsigned_long  LINUX_MIB_TCPMEMORYPRESSURES
+> > >  unsigned_long  LINUX_MIB_TCPMEMORYPRESSURESCHRONO
+> > > +unsigned_long  LINUX_MIB_TCPCGROUPSOCKETPRESSURE
+> > >  unsigned_long  LINUX_MIB_TCPSACKDISCARD
+> > >  unsigned_long  LINUX_MIB_TCPDSACKIGNOREDOLD
+> > >  unsigned_long  LINUX_MIB_TCPDSACKIGNOREDNOUNDO
+> > > diff --git a/include/net/tcp.h b/include/net/tcp.h
+> > > index 761c4a0ad386..aae3efe24282 100644
+> > > --- a/include/net/tcp.h
+> > > +++ b/include/net/tcp.h
+> > > @@ -267,6 +267,11 @@ extern long sysctl_tcp_mem[3];
+> > >  #define TCP_RACK_STATIC_REO_WND  0x2 /* Use static RACK reo wnd */
+> > >  #define TCP_RACK_NO_DUPTHRESH    0x4 /* Do not use DUPACK threshold in RACK */
+> > >
+> > > +#define TCP_INC_STATS(net, field)    SNMP_INC_STATS((net)->mib.tcp_statistics, field)
+> > > +#define __TCP_INC_STATS(net, field)  __SNMP_INC_STATS((net)->mib.tcp_statistics, field)
+> > > +#define TCP_DEC_STATS(net, field)    SNMP_DEC_STATS((net)->mib.tcp_statistics, field)
+> > > +#define TCP_ADD_STATS(net, field, val)       SNMP_ADD_STATS((net)->mib.tcp_statistics, field, val)
+> > > +
+> > >  extern atomic_long_t tcp_memory_allocated;
+> > >  DECLARE_PER_CPU(int, tcp_memory_per_cpu_fw_alloc);
+> > >
+> > > @@ -277,8 +282,10 @@ extern unsigned long tcp_memory_pressure;
+> > >  static inline bool tcp_under_memory_pressure(const struct sock *sk)
+> > >  {
+> > >       if (mem_cgroup_sockets_enabled && sk->sk_memcg &&
+> > > -         mem_cgroup_under_socket_pressure(sk->sk_memcg))
+> > > +         mem_cgroup_under_socket_pressure(sk->sk_memcg)) {
+> > > +             TCP_INC_STATS(sock_net(sk), LINUX_MIB_TCPCGROUPSOCKETPRESSURE);
+> > >               return true;
+> >
+> > Incrementing it here will give a very different semantic to this stat
+> > compared to LINUX_MIB_TCPMEMORYPRESSURES. Here the increments mean the
+> > number of times the kernel check if a given socket is under memcg
+> > pressure for a net namespace. Is that what we want?
+> 
+> I'm trying to decouple sk_memcg from the global tcp_memory_allocated
+> as you and Wei planned before, and the two accounting already have the
+> different semantics from day1 and will keep that, so a new stat having a
+> different semantics would be fine.
+> 
+> But I think per-memcg stat like memory.stat.XXX would be a good fit
+> rather than pre-netns because one netns could be shared by multiple
+> cgroups and multiple sockets in the same cgroup could be spread across
+> multiple netns.
 
-I don't deserve this tag.  (Also, a space between first/last name is missin=
-g.)
-
-Suggested-by can be used when the core idea is provided by someone,
-but not when someone just reviews the patch and points out something
-wrong.
-
-But code-wise, the change looks good to me.
-
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
-
-
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Co-developed-by: xu xin <xu.xin16@zte.com.cn>
-> Signed-off-by: xu xin <xu.xin16@zte.com.cn>
-> Signed-off-by: Fan Yu <fan.yu9@zte.com.cn>
-> ---
-> Change Log
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D
-> v5->v6:
-> Some fixes according to
-> https://lore.kernel.org/all/20250715183335.860529-1-kuniyu@google.com/
-> 1. fixed HTML entity conversion in email and adjusted error counting logi=
-c.
->
-> v4->v5:
-> Some fixes according to
-> https://lore.kernel.org/all/20250715072058.12f343bb@kernel.org/
-> 1. Instead of introducing new TCP_RETRANS_* enums, directly
-> passing the retval to the tracepoint.
->
-> v3->v4:
-> Some fixes according to
-> https://lore.kernel.org/all/CANn89i+JGSt=3D_CtWfhDXypWW-34a6SoP3RAzWQ9B9V=
-L4+PHjDw@mail.gmail.com/
-> 1. Consolidate ENOMEMs into a unified TCP_RETRANS_NOMEM.
->
-> v2->v3:
-> Some fixes according to
-> https://lore.kernel.org/all/CANn89iJvyYjiweCESQL8E-Si7M=3DgosYvh1BAVWwAWy=
-cXW8GSdg@mail.gmail.com/
-> 1. Rename "quit_reason" to "result". Also, keep "key=3Dval" format concis=
-e(no space in vals).
->
-> v1->v2:
-> Some fixes according to
-> https://lore.kernel.org/all/CANn89iK-6kT-ZUpNRMjPY9_TkQj-dLuKrDQtvO1140q4=
-EUsjFg@mail.gmail.com/
-> 1.Rename TCP_RETRANS_QUIT_UNDEFINED to TCP_RETRANS_ERR_DEFAULT.
-> 2.Added detailed compatibility consequences section.
->
->  include/trace/events/tcp.h | 27 ++++++++--------------
->  net/ipv4/tcp_output.c      | 46 ++++++++++++++++++++++++--------------
->  2 files changed, 38 insertions(+), 35 deletions(-)
->
-> diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
-> index 54e60c6009e3..9d2c36c6a0ed 100644
-> --- a/include/trace/events/tcp.h
-> +++ b/include/trace/events/tcp.h
-> @@ -13,17 +13,11 @@
->  #include <linux/sock_diag.h>
->  #include <net/rstreason.h>
->
-> -/*
-> - * tcp event with arguments sk and skb
-> - *
-> - * Note: this class requires a valid sk pointer; while skb pointer could
-> - *       be NULL.
-> - */
-> -DECLARE_EVENT_CLASS(tcp_event_sk_skb,
-> +TRACE_EVENT(tcp_retransmit_skb,
->
-> -       TP_PROTO(const struct sock *sk, const struct sk_buff *skb),
-> +       TP_PROTO(const struct sock *sk, const struct sk_buff *skb, int er=
-r),
->
-> -       TP_ARGS(sk, skb),
-> +       TP_ARGS(sk, skb, err),
->
->         TP_STRUCT__entry(
->                 __field(const void *, skbaddr)
-> @@ -36,6 +30,7 @@ DECLARE_EVENT_CLASS(tcp_event_sk_skb,
->                 __array(__u8, daddr, 4)
->                 __array(__u8, saddr_v6, 16)
->                 __array(__u8, daddr_v6, 16)
-> +               __field(int, err)
->         ),
->
->         TP_fast_assign(
-> @@ -58,21 +53,17 @@ DECLARE_EVENT_CLASS(tcp_event_sk_skb,
->
->                 TP_STORE_ADDRS(__entry, inet->inet_saddr, inet->inet_dadd=
-r,
->                               sk->sk_v6_rcv_saddr, sk->sk_v6_daddr);
-> +
-> +               __entry->err =3D err;
->         ),
->
-> -       TP_printk("skbaddr=3D%p skaddr=3D%p family=3D%s sport=3D%hu dport=
-=3D%hu saddr=3D%pI4 daddr=3D%pI4 saddrv6=3D%pI6c daddrv6=3D%pI6c state=3D%s=
-",
-> +       TP_printk("skbaddr=3D%p skaddr=3D%p family=3D%s sport=3D%hu dport=
-=3D%hu saddr=3D%pI4 daddr=3D%pI4 saddrv6=3D%pI6c daddrv6=3D%pI6c state=3D%s=
- err=3D%d",
->                   __entry->skbaddr, __entry->skaddr,
->                   show_family_name(__entry->family),
->                   __entry->sport, __entry->dport, __entry->saddr, __entry=
-->daddr,
->                   __entry->saddr_v6, __entry->daddr_v6,
-> -                 show_tcp_state_name(__entry->state))
-> -);
-> -
-> -DEFINE_EVENT(tcp_event_sk_skb, tcp_retransmit_skb,
-> -
-> -       TP_PROTO(const struct sock *sk, const struct sk_buff *skb),
-> -
-> -       TP_ARGS(sk, skb)
-> +                 show_tcp_state_name(__entry->state),
-> +                 __entry->err)
->  );
->
->  #undef FN
-> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> index b616776e3354..caf11920a878 100644
-> --- a/net/ipv4/tcp_output.c
-> +++ b/net/ipv4/tcp_output.c
-> @@ -3330,8 +3330,10 @@ int __tcp_retransmit_skb(struct sock *sk, struct s=
-k_buff *skb, int segs)
->         if (icsk->icsk_mtup.probe_size)
->                 icsk->icsk_mtup.probe_size =3D 0;
->
-> -       if (skb_still_in_host_queue(sk, skb))
-> -               return -EBUSY;
-> +       if (skb_still_in_host_queue(sk, skb)) {
-> +               err =3D -EBUSY;
-> +               goto out;
-> +       }
->
->  start:
->         if (before(TCP_SKB_CB(skb)->seq, tp->snd_una)) {
-> @@ -3342,14 +3344,19 @@ int __tcp_retransmit_skb(struct sock *sk, struct =
-sk_buff *skb, int segs)
->                 }
->                 if (unlikely(before(TCP_SKB_CB(skb)->end_seq, tp->snd_una=
-))) {
->                         WARN_ON_ONCE(1);
-> -                       return -EINVAL;
-> +                       err =3D -EINVAL;
-> +                       goto out;
-> +               }
-> +               if (tcp_trim_head(sk, skb, tp->snd_una - TCP_SKB_CB(skb)-=
->seq)) {
-> +                       err =3D -ENOMEM;
-> +                       goto out;
->                 }
-> -               if (tcp_trim_head(sk, skb, tp->snd_una - TCP_SKB_CB(skb)-=
->seq))
-> -                       return -ENOMEM;
->         }
->
-> -       if (inet_csk(sk)->icsk_af_ops->rebuild_header(sk))
-> -               return -EHOSTUNREACH; /* Routing failure or similar. */
-> +       if (inet_csk(sk)->icsk_af_ops->rebuild_header(sk)) {
-> +               err =3D -EHOSTUNREACH; /* Routing failure or similar. */
-> +               goto out;
-> +       }
->
->         cur_mss =3D tcp_current_mss(sk);
->         avail_wnd =3D tcp_wnd_end(tp) - TCP_SKB_CB(skb)->seq;
-> @@ -3360,8 +3367,10 @@ int __tcp_retransmit_skb(struct sock *sk, struct s=
-k_buff *skb, int segs)
->          * our retransmit of one segment serves as a zero window probe.
->          */
->         if (avail_wnd <=3D 0) {
-> -               if (TCP_SKB_CB(skb)->seq !=3D tp->snd_una)
-> -                       return -EAGAIN;
-> +               if (TCP_SKB_CB(skb)->seq !=3D tp->snd_una) {
-> +                       err =3D -EAGAIN;
-> +                       goto out;
-> +               }
->                 avail_wnd =3D cur_mss;
->         }
->
-> @@ -3373,11 +3382,15 @@ int __tcp_retransmit_skb(struct sock *sk, struct =
-sk_buff *skb, int segs)
->         }
->         if (skb->len > len) {
->                 if (tcp_fragment(sk, TCP_FRAG_IN_RTX_QUEUE, skb, len,
-> -                                cur_mss, GFP_ATOMIC))
-> -                       return -ENOMEM; /* We'll try again later. */
-> +                                cur_mss, GFP_ATOMIC)) {
-> +                       err =3D -ENOMEM;  /* We'll try again later. */
-> +                       goto out;
-> +               }
->         } else {
-> -               if (skb_unclone_keeptruesize(skb, GFP_ATOMIC))
-> -                       return -ENOMEM;
-> +               if (skb_unclone_keeptruesize(skb, GFP_ATOMIC)) {
-> +                       err =3D -ENOMEM;
-> +                       goto out;
-> +               }
->
->                 diff =3D tcp_skb_pcount(skb);
->                 tcp_set_skb_tso_segs(skb, cur_mss);
-> @@ -3431,17 +3444,16 @@ int __tcp_retransmit_skb(struct sock *sk, struct =
-sk_buff *skb, int segs)
->                 tcp_call_bpf_3arg(sk, BPF_SOCK_OPS_RETRANS_CB,
->                                   TCP_SKB_CB(skb)->seq, segs, err);
->
-> -       if (likely(!err)) {
-> -               trace_tcp_retransmit_skb(sk, skb);
-> -       } else if (err !=3D -EBUSY) {
-> +       if (unlikely(err) && err !=3D -EBUSY)
->                 NET_ADD_STATS(sock_net(sk), LINUX_MIB_TCPRETRANSFAIL, seg=
-s);
-> -       }
->
->         /* To avoid taking spuriously low RTT samples based on a timestam=
-p
->          * for a transmit that never happened, always mark EVER_RETRANS
->          */
->         TCP_SKB_CB(skb)->sacked |=3D TCPCB_EVER_RETRANS;
->
-> +out:
-> +       trace_tcp_retransmit_skb(sk, skb, err);
->         return err;
->  }
->
-> --
-> 2.25.1
+Yeah it makes much more sense to have memcg stat for memcg based socket
+pressure.
 
