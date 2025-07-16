@@ -1,66 +1,60 @@
-Return-Path: <netdev+bounces-207590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09B63B07F6E
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 23:20:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EA8CB07F86
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 23:25:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00B26A474B3
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 21:19:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CFDAA47881
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 21:24:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC0E824293F;
-	Wed, 16 Jul 2025 21:20:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2492228B3EF;
+	Wed, 16 Jul 2025 21:24:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jdwznjsd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VVUcSyiZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3FA42AE8E;
-	Wed, 16 Jul 2025 21:20:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3EEF289E3D;
+	Wed, 16 Jul 2025 21:24:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752700816; cv=none; b=tFPlD9qZmIlXIcQ+D/aaug9NxF34vAj3qtRiyBMXFYGSjxZQB/7Fe+V3UyCKiMcyo9nFq+3uDfDJFtIQpLQ+0CXzz9Ianft+VZ1kGxssVEwbT8mX1h2jKypfa2DX8Zz5FAZHnOFuGdWqsE/1iuIZDTtuho6hqnnBHAyWfx27IfY=
+	t=1752701097; cv=none; b=gOPE3GpFsmy70g329kDIVbe7LGeKhvctfl+iq57IFnRJxXHKA1TpbErHouEi72nQ6cuIHBbMG6Mt0DQf4uqBWZGKWVU91NkSY0LsR0qIp6hUEHDnC+KIad4uEijsiqVKH8HYp0VkwruBbF+CLOg8A19ceS0BpwbSDhrJJwBdpE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752700816; c=relaxed/simple;
-	bh=chUpeeDGgxPJszLbrkeZFF4VVZU5mOnEoefpj04yyA8=;
+	s=arc-20240116; t=1752701097; c=relaxed/simple;
+	bh=2fZ39SZz8mlc4YI/aOzd9OhNDsBlj+8OWbDogwbqpIk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TbS0IUf3IMHYR49B3eUM0Yz/aVpbwB9MJzhsGc7fGsNt+n2ih1dMPE5jtR0PPIbbjR47CJCMxvdEGFSbl1hjYrvIReGO8WXR7pPNn3ScJp2+M95Wdmez5b3eCypvHanxnIADRt3W2GBaIFzNjvPDxotTH3pAsVbHAF5JgCSG9p0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jdwznjsd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF009C4CEE7;
-	Wed, 16 Jul 2025 21:20:15 +0000 (UTC)
+	 MIME-Version:Content-Type; b=arX2DtBkLw5Ch9QqOct5s+iu+/yCGDoW9AOG3bs83uXZWefl+nwFsCTfYzoOVZP4/m3pZkyoZn4w6zVuUZj/nlYApmgzhyItEclPGy4CYCfFy0uf9bE6tQxQfvc1ORr9L7pr9yTl5Sm5d22YCr7vNoo3isarBaS0M9lAiafNl2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VVUcSyiZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37BA7C4CEE7;
+	Wed, 16 Jul 2025 21:24:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752700816;
-	bh=chUpeeDGgxPJszLbrkeZFF4VVZU5mOnEoefpj04yyA8=;
+	s=k20201202; t=1752701096;
+	bh=2fZ39SZz8mlc4YI/aOzd9OhNDsBlj+8OWbDogwbqpIk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Jdwznjsddwkgb5b6DdMLhIir8bvZ6Ff6dR4gWmvrQxcxcpfsdTByPPG7dpc0ZyQGe
-	 WiT/AXPt5CZ3mdy/23hjnOFSHmvfo4Ho/gH2OKSjndrdnRfbaFh1C5iuAFhegtMSPk
-	 3l/+3Rcuok+0ZRdntcM1co+rwYrQAZaUqKvp3nm5JVm5gwWFyjSzoQ95lPBN6EBmTX
-	 u9N8PBoL6RcCepfl+poAxcOwU80Lur7HeEssQFwbnBKDw8kWHU/TBAfiJb2fpRPlRP
-	 CmEft+63S55d36TIzw4ObXPPXIIidcy+U99pRcI93DkotkasEFj2A7uMQwAnFmndjg
-	 cjsehFCN5iIzg==
-Date: Wed, 16 Jul 2025 14:20:15 -0700
+	b=VVUcSyiZBZMMzxDcZUoKJnOmTgZxi0ZkrxIzZ/PJ9dxQx3M9GINC0nw7814qEVnH7
+	 Y84acnd1k8FFsgydsTCFBsapWV/W9vKbUHkFl4joyhOVAvaNaV1BgEmIi7cCEEntst
+	 FuxcNMTsco6sK7XSIJcl2dL8ZGwDWGLzY3vw21hnkSoNun4QrHS6jykJi2qV/EVlcj
+	 ClJMGlD/RxCEm8Xpn4S+14Xn7Gv/rf1ddLTTsxKWvBMj0Wd0URKGJr/rScp6KWf8MH
+	 k9zm2RbBbgzhT2aDRUbW8A2g144UTg4MxmvxN6KmBqWquzPTWyV1OZxLZR4XwcWsv/
+	 CRlUZjkj/UKCw==
+Date: Wed, 16 Jul 2025 14:24:55 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Stanislav Fomichev <stfomichev@gmail.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <borkmann@iogearbox.net>,
- Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, sdf@fomichev.me,
- kernel-team@cloudflare.com, arthur@arthurfabre.com, jakub@cloudflare.com
-Subject: Re: [PATCH bpf-next V2 0/7] xdp: Allow BPF to set RX hints for
- XDP_REDIRECTed packets
-Message-ID: <20250716142015.0b309c71@kernel.org>
-In-Reply-To: <aHeKYZY7l2i1xwel@lore-desk>
-References: <175146824674.1421237.18351246421763677468.stgit@firesoul>
-	<aGVY2MQ18BWOisWa@mini-arch>
-	<b1873a92-747d-4f32-91f8-126779947e42@kernel.org>
-	<aGvcb53APFXR8eJb@mini-arch>
-	<aG427EcHHn9yxaDv@lore-desk>
-	<aHE2F1FJlYc37eIz@mini-arch>
-	<aHeKYZY7l2i1xwel@lore-desk>
+To: Jeongjun Park <aha310510@gmail.com>
+Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, yangbo.lu@nxp.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzbot+7cfb66a237c4a5fb22ad@syzkaller.appspotmail.com
+Subject: Re: [PATCH net] ptp: prevent possible ABBA deadlock in
+ ptp_clock_freerun()
+Message-ID: <20250716142455.17883979@kernel.org>
+In-Reply-To: <CAO9qdTHdZnD5fC-V8E2JqKiM+ijOj15GRZjfwO+aAg_CUhNDnw@mail.gmail.com>
+References: <20250705145031.140571-1-aha310510@gmail.com>
+	<20250707171118.55fc88cc@kernel.org>
+	<CAO9qdTHdZnD5fC-V8E2JqKiM+ijOj15GRZjfwO+aAg_CUhNDnw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,44 +64,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 16 Jul 2025 13:17:53 +0200 Lorenzo Bianconi wrote:
-> > > I can't see what the non-redirected use-case could be. Can you please provide
-> > > more details?
-> > > Moreover, can it be solved without storing the rx_hash (or the other
-> > > hw-metadata) in a non-driver specific format?  
-> > 
-> > Having setters feels more generic than narrowly solving only the redirect,
-> > but I don't have a good use-case in mind.
-> >   
-> > > Storing the hw-metadata in some of hw-specific format in xdp_frame will not
-> > > allow to consume them directly building the skb and we will require to decode
-> > > them again. What is the upside/use-case of this approach? (not considering the
-> > > orthogonality with the get method).  
-> > 
-> > If we add the store kfuncs to regular drivers, the metadata  won't be stored
-> > in the xdp_frame; it will go into the rx descriptors so regular path that
-> > builds skbs will use it.  
+On Wed, 16 Jul 2025 14:12:27 +0900 Jeongjun Park wrote:
+> > Either way - you forgot to CC Vladimir, again.  
 > 
-> IIUC, the described use-case would be to modify the hw metadata via a
-> 'setter' kfunc executed by an eBPF program bounded to the NIC and to store
-> the new metadata in the DMA descriptor in order to be consumed by the driver
-> codebase building the skb, right?
-> If so:
-> - we can get the same result just storing (running a kfunc) the modified hw
->   metadata in the xdp_buff struct using a well-known/generic layout and
->   consume it in the driver codebase (e.g. if the bounded eBPF program
->   returns XDP_PASS) using a generic xdp utility routine. This part is not in
->   the current series.
-> - Using this approach we are still not preserving the hw metadata if we pass
->   the xdp_frame to a remote CPU returning XDP_REDIRCT (we need to add more
->   code)
-> - I am not completely sure if can always modify the DMA descriptor directly
->   since it is DMA mapped.
-> 
-> What do you think?
+> No need to reference Vladimir, as this bug is a structural issue that has
+> been around since the n_vclocks feature was added, as indicated in the
+> Fixes tag.
 
-FWIW I commented on an earlier revision to similar effect as Stanislav.
-To me the main concern is that we're adding another adhoc scheme, and
-are making xdp_frame grow into a para-skb. We added XDP to make raw
-packet access fast, now we're making drivers convert metadata twice :/
+I'm asking you to CC him, so that he can help reviewing your code.
 
