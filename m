@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-207312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12241B06A46
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 02:04:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEBE7B06A47
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 02:04:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56E94563DC1
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 00:04:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A736C7A7645
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 00:03:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E73E433AC;
-	Wed, 16 Jul 2025 00:04:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A5613AA3C;
+	Wed, 16 Jul 2025 00:04:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R6n+Mjbq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rba8RHd1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A69F339A8
-	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 00:04:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE90137C2A
+	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 00:04:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752624257; cv=none; b=qbp2KJcf4Z9S1Yc63F574x/fbEnSZvAQvgoGqpb2qXkyeXvQNdrhT0bKM+vvJ/whbJS5rflu33vi637c2iYkznwO7MRqHMZ1eHUZJBRoYjXvf3MQvtGn5pO47VdDED4A3ksyHVrPsZkxGT6lV+BqPAWpJSWo9n3ASB+CkTVdl44=
+	t=1752624258; cv=none; b=gfK5tP8/xpW16tfGOpYCJnu4PRUBE915BweYHPjcM1KaZ2l8gI9xVXpBCCsqLk1doAc5+P0R5zqwwGaYwddpo0cmmto7BVfwzfh4GlL7fWVvOKqZCEqS0YsI4qQW1JfcdUZer4oVG0S0sObxNG1OczwUBEkLYot56IbLX5VEpRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752624257; c=relaxed/simple;
-	bh=yFsb48K8POIueDxbVCJoK+OgWBzU5wk3QICaCpXND9c=;
+	s=arc-20240116; t=1752624258; c=relaxed/simple;
+	bh=TM+OIpn5qDFKCpJgmAorBNopoJnu97BLBkxEoWn/S04=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SXrkwLYaIwfKorDBhaBOQnKt5mDixr38YPhXGF7pelJqk7aRzx3xQyDYHofkhfgH1jwsXIyeAAFqy8cTHGtq/GkYlDKhgknefepNHFsk7B/26+Y9bwAcR0ZB4gLLZQBQjtQ4IM9ZY1vWcCSq2+XMkHkH0Yq7mXIAAS37Amuy0kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R6n+Mjbq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 763D0C4CEFB;
-	Wed, 16 Jul 2025 00:04:16 +0000 (UTC)
+	 MIME-Version; b=ZbHYAXbpzsxahiiwEqWM6ffUKhdOcvtz59Anzni74+bYXzGq/EtnnlCZU8FTiTMeBEYZJhbaUgBgjO0DKdU3J6mBKXa2Cp1Ohpb97/uTZr4metUNUCDqzUZUgOvkKWKu7AJKr3Q/m0hI+93V80Nvr8T5qDuv6NRvO5Vf3bxEtF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rba8RHd1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42932C4CEF7;
+	Wed, 16 Jul 2025 00:04:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1752624257;
-	bh=yFsb48K8POIueDxbVCJoK+OgWBzU5wk3QICaCpXND9c=;
+	bh=TM+OIpn5qDFKCpJgmAorBNopoJnu97BLBkxEoWn/S04=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=R6n+Mjbq1mKtjVwCYzEolmZW6hFp+QPLtseh3tM5Gf5vUDsWnEnjE6BpiJTGCIW1e
-	 CRrb32h+F3MIf7DHR6HIlS880FlGKiVtZ8xNk1hHSmoKSB8ZmXq5xOUbTAoKQLYDHc
-	 vtNPNcfvZMSAzEf1+lbn4eHObw8WiManoEhAlgPSasbsM4VW8UDQd9u3d0+oP3EaEm
-	 +0yOSoOxZ6YpUTej1TRfIHQmD4aAipyUajWlsRC+NoYzwOl/GO85TRJi9QdCZjTkeq
-	 WID1YyX2zmpvd+odD0zaiIgcJT6U0pjMSI0jxrAxEJtsd/0McvP0FICOCqT/5WHJg0
-	 lTYSIV0B/uFxQ==
+	b=rba8RHd1Ofjj01eioUFScghxLbVXvWgk+T8f/lKN9FB9Y6lNz6NBYEJUeULRHuUux
+	 31XJ6JNzibvPPlRVk2cY1IoXwrHUSlhCO1gcPFRSh1xKr7Z1FA7gQEvcJO5gWptCN5
+	 giBU7/ntcwb3xjUIwdOA9VyVrUev03Ua/eyaiO41S2cS1CVivEs1vM91rgEosTCpUt
+	 OwXsLt2Yrqv+EOlJF6kd0sY6Y7fXsXPccjCIi/rsDFPKcqSJBeYmzjsMlOEFkYc8l6
+	 4oqfFrE+BCT6VZmJKPs3pxXIENIo02qFxposF7+UdsmFrQ+Q7kLuYPv/bN1QJa3Mvl
+	 0fF+Kh0fm0G9w==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -58,9 +58,9 @@ Cc: netdev@vger.kernel.org,
 	jdamato@fastly.com,
 	andrew@lunn.ch,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v3 04/11] selftests: drv-net: rss_api: test setting indirection table via Netlink
-Date: Tue, 15 Jul 2025 17:03:24 -0700
-Message-ID: <20250716000331.1378807-5-kuba@kernel.org>
+Subject: [PATCH net-next v3 05/11] ethtool: rss: support setting hfunc via Netlink
+Date: Tue, 15 Jul 2025 17:03:25 -0700
+Message-ID: <20250716000331.1378807-6-kuba@kernel.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250716000331.1378807-1-kuba@kernel.org>
 References: <20250716000331.1378807-1-kuba@kernel.org>
@@ -72,152 +72,95 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Test setting indirection table via Netlink.
+Support setting RSS hash function / algo via ethtool Netlink.
+Like IOCTL we don't validate that the function is within the
+range known to the kernel. The drivers do a pretty good job
+validating the inputs, and the IDs are technically "dynamically
+queried" rather than part of uAPI.
 
-  # ./tools/testing/selftests/drivers/net/hw/rss_api.py
-  TAP version 13
-  1..6
-  ok 1 rss_api.test_rxfh_nl_set_fail
-  ok 2 rss_api.test_rxfh_nl_set_indir
-  ok 3 rss_api.test_rxfh_nl_set_indir_ctx
-  ok 4 rss_api.test_rxfh_indir_ntf
-  ok 5 rss_api.test_rxfh_indir_ctx_ntf
-  ok 6 rss_api.test_rxfh_fields
-  # Totals: pass:6 fail:0 xfail:0 xpass:0 skip:0 error:0
+Only change should be that in Netlink we don't support user
+explicitly passing ETH_RSS_HASH_NO_CHANGE (0), if no change
+is requested the attribute should be absent.
 
-Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
+The ETH_RSS_HASH_NO_CHANGE is retained in driver-facing
+API for consistency (not that I see a strong reason for it).
+
+Reviewed-by: Gal Pressman <gal@nvidia.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-v3:
- - adjust docstring
-v2:
- - test set on lo which doesn't have any ops (expected to fail)
----
- .../selftests/drivers/net/hw/rss_api.py       | 96 ++++++++++++++++++-
- 1 file changed, 93 insertions(+), 3 deletions(-)
+ Documentation/netlink/specs/ethtool.yaml     |  1 +
+ Documentation/networking/ethtool-netlink.rst |  1 +
+ net/ethtool/rss.c                            | 12 +++++++++++-
+ 3 files changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/drivers/net/hw/rss_api.py b/tools/testing/selftests/drivers/net/hw/rss_api.py
-index 2c76fbdb2617..7353e8f3e1a4 100755
---- a/tools/testing/selftests/drivers/net/hw/rss_api.py
-+++ b/tools/testing/selftests/drivers/net/hw/rss_api.py
-@@ -6,10 +6,10 @@ API level tests for RSS (mostly Netlink vs IOCTL).
- """
+diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+index 1eca88a508a0..0d02d8342e4c 100644
+--- a/Documentation/netlink/specs/ethtool.yaml
++++ b/Documentation/netlink/specs/ethtool.yaml
+@@ -2654,6 +2654,7 @@ c-version-name: ethtool-genl-version
+           attributes:
+             - header
+             - context
++            - hfunc
+             - indir
+     -
+       name: rss-ntf
+diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+index 27db7540e60e..f6e4439caa94 100644
+--- a/Documentation/networking/ethtool-netlink.rst
++++ b/Documentation/networking/ethtool-netlink.rst
+@@ -1999,6 +1999,7 @@ RSS_SET
+ =====================================  ======  ==============================
+   ``ETHTOOL_A_RSS_HEADER``             nested  request header
+   ``ETHTOOL_A_RSS_CONTEXT``            u32     context number
++  ``ETHTOOL_A_RSS_HFUNC``              u32     RSS hash func
+   ``ETHTOOL_A_RSS_INDIR``              binary  Indir table bytes
+ =====================================  ======  ==============================
  
- import glob
--from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_is, ksft_ne
-+from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_is, ksft_ne, ksft_raises
- from lib.py import KsftSkipEx, KsftFailEx
--from lib.py import defer, ethtool
--from lib.py import EthtoolFamily
-+from lib.py import defer, ethtool, CmdExitFailure
-+from lib.py import EthtoolFamily, NlError
- from lib.py import NetDrvEnv
+diff --git a/net/ethtool/rss.c b/net/ethtool/rss.c
+index c8db523671de..bc9025cfcf1c 100644
+--- a/net/ethtool/rss.c
++++ b/net/ethtool/rss.c
+@@ -475,6 +475,7 @@ void ethtool_rss_notify(struct net_device *dev, u32 rss_context)
+ const struct nla_policy ethnl_rss_set_policy[ETHTOOL_A_RSS_START_CONTEXT + 1] = {
+ 	[ETHTOOL_A_RSS_HEADER] = NLA_POLICY_NESTED(ethnl_header_policy),
+ 	[ETHTOOL_A_RSS_CONTEXT] = { .type = NLA_U32, },
++	[ETHTOOL_A_RSS_HFUNC] = NLA_POLICY_MIN(NLA_U32, 1),
+ 	[ETHTOOL_A_RSS_INDIR] = { .type = NLA_BINARY, },
+ };
  
+@@ -489,6 +490,9 @@ ethnl_rss_set_validate(struct ethnl_req_info *req_info, struct genl_info *info)
+ 	if (request->rss_context && !ops->create_rxfh_context)
+ 		bad_attr = bad_attr ?: tb[ETHTOOL_A_RSS_CONTEXT];
  
-@@ -59,6 +59,95 @@ from lib.py import NetDrvEnv
-     return ret
++	if (request->rss_context && !ops->rxfh_per_ctx_key)
++		bad_attr = bad_attr ?: tb[ETHTOOL_A_RSS_HFUNC];
++
+ 	if (bad_attr) {
+ 		NL_SET_BAD_ATTR(info->extack, bad_attr);
+ 		return -EOPNOTSUPP;
+@@ -588,6 +592,8 @@ rss_set_ctx_update(struct ethtool_rxfh_context *ctx, struct nlattr **tb,
+ 			ethtool_rxfh_context_indir(ctx)[i] = rxfh->indir[i];
+ 		ctx->indir_configured = !!nla_len(tb[ETHTOOL_A_RSS_INDIR]);
+ 	}
++	if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE)
++		ctx->hfunc = rxfh->hfunc;
+ }
  
+ static int
+@@ -618,7 +624,11 @@ ethnl_rss_set(struct ethnl_req_info *req_info, struct genl_info *info)
+ 		goto exit_clean_data;
+ 	indir_mod = !!tb[ETHTOOL_A_RSS_INDIR];
  
-+def test_rxfh_nl_set_fail(cfg):
-+    """
-+    Test error path of Netlink SET.
-+    """
-+    _require_2qs(cfg)
+-	rxfh.hfunc = ETH_RSS_HASH_NO_CHANGE;
++	rxfh.hfunc = data.hfunc;
++	ethnl_update_u8(&rxfh.hfunc, tb[ETHTOOL_A_RSS_HFUNC], &mod);
++	if (rxfh.hfunc == data.hfunc)
++		rxfh.hfunc = ETH_RSS_HASH_NO_CHANGE;
 +
-+    ethnl = EthtoolFamily()
-+    ethnl.ntf_subscribe("monitor")
-+
-+    with ksft_raises(NlError):
-+        ethnl.rss_set({"header": {"dev-name": "lo"},
-+                       "indir": None})
-+
-+    with ksft_raises(NlError):
-+        ethnl.rss_set({"header": {"dev-index": cfg.ifindex},
-+                       "indir": [100000]})
-+    ntf = next(ethnl.poll_ntf(duration=0.2), None)
-+    ksft_is(ntf, None)
-+
-+
-+def test_rxfh_nl_set_indir(cfg):
-+    """
-+    Test setting indirection table via Netlink.
-+    """
-+    qcnt = _require_2qs(cfg)
-+
-+    # Test some SETs with a value
-+    reset = defer(cfg.ethnl.rss_set,
-+                  {"header": {"dev-index": cfg.ifindex}, "indir": None})
-+    cfg.ethnl.rss_set({"header": {"dev-index": cfg.ifindex},
-+                       "indir": [1]})
-+    rss = cfg.ethnl.rss_get({"header": {"dev-index": cfg.ifindex}})
-+    ksft_eq(set(rss.get("indir", [-1])), {1})
-+
-+    cfg.ethnl.rss_set({"header": {"dev-index": cfg.ifindex},
-+                       "indir": [0, 1]})
-+    rss = cfg.ethnl.rss_get({"header": {"dev-index": cfg.ifindex}})
-+    ksft_eq(set(rss.get("indir", [-1])), {0, 1})
-+
-+    # Make sure we can't set the queue count below max queue used
-+    with ksft_raises(CmdExitFailure):
-+        ethtool(f"-L {cfg.ifname} combined 0 rx 1")
-+    with ksft_raises(CmdExitFailure):
-+        ethtool(f"-L {cfg.ifname} combined 1 rx 0")
-+
-+    # Test reset back to default
-+    reset.exec()
-+    rss = cfg.ethnl.rss_get({"header": {"dev-index": cfg.ifindex}})
-+    ksft_eq(set(rss.get("indir", [-1])), set(range(qcnt)))
-+
-+
-+def test_rxfh_nl_set_indir_ctx(cfg):
-+    """
-+    Test setting indirection table for a custom context via Netlink.
-+    """
-+    _require_2qs(cfg)
-+
-+    # Get setting for ctx 0, we'll make sure they don't get clobbered
-+    dflt = cfg.ethnl.rss_get({"header": {"dev-index": cfg.ifindex}})
-+
-+    # Create context
-+    ctx_id = _ethtool_create(cfg, "-X", "context new")
-+    defer(ethtool, f"-X {cfg.ifname} context {ctx_id} delete")
-+
-+    cfg.ethnl.rss_set({"header": {"dev-index": cfg.ifindex},
-+                       "context": ctx_id, "indir": [1]})
-+    rss = cfg.ethnl.rss_get({"header": {"dev-index": cfg.ifindex},
-+                             "context": ctx_id})
-+    ksft_eq(set(rss.get("indir", [-1])), {1})
-+
-+    ctx0 = cfg.ethnl.rss_get({"header": {"dev-index": cfg.ifindex}})
-+    ksft_eq(ctx0, dflt)
-+
-+    cfg.ethnl.rss_set({"header": {"dev-index": cfg.ifindex},
-+                       "context": ctx_id, "indir": [0, 1]})
-+    rss = cfg.ethnl.rss_get({"header": {"dev-index": cfg.ifindex},
-+                             "context": ctx_id})
-+    ksft_eq(set(rss.get("indir", [-1])), {0, 1})
-+
-+    ctx0 = cfg.ethnl.rss_get({"header": {"dev-index": cfg.ifindex}})
-+    ksft_eq(ctx0, dflt)
-+
-+    # Make sure we can't set the queue count below max queue used
-+    with ksft_raises(CmdExitFailure):
-+        ethtool(f"-L {cfg.ifname} combined 0 rx 1")
-+    with ksft_raises(CmdExitFailure):
-+        ethtool(f"-L {cfg.ifname} combined 1 rx 0")
-+
-+
- def test_rxfh_indir_ntf(cfg):
-     """
-     Check that Netlink notifications are generated when RSS indirection
-@@ -129,6 +218,7 @@ from lib.py import NetDrvEnv
-     """ Ksft boiler plate main """
+ 	rxfh.input_xfrm = RXH_XFRM_NO_CHANGE;
  
-     with NetDrvEnv(__file__, nsim_test=False) as cfg:
-+        cfg.ethnl = EthtoolFamily()
-         ksft_run(globs=globals(), case_pfx={"test_"}, args=(cfg, ))
-     ksft_exit()
- 
+ 	mutex_lock(&dev->ethtool->rss_lock);
 -- 
 2.50.1
 
