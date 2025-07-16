@@ -1,216 +1,143 @@
-Return-Path: <netdev+bounces-207611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 068E2B0800F
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 23:59:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A0E2B08046
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 00:12:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8F403B556A
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 21:58:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0BBE56646F
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 22:12:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 599642EE261;
-	Wed, 16 Jul 2025 21:59:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66A722EE295;
+	Wed, 16 Jul 2025 22:12:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XAUAZ6/f"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TVPxDp+C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE38D2C3756;
-	Wed, 16 Jul 2025 21:58:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE3DEACE
+	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 22:12:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752703141; cv=none; b=WSCA+N58uY9kKBcuBna4Tj1pzZe2h71Xqkys7Qjevqy4kVPLYt3ydxUeiuJoybbjBx8fhrkg/yiIoGMZZolC6d32+c+cn8Q33QiLE8/bL1yaMIoyIwXh8L/L9IH/tD8olkUpOcKsHcXAgBBU0MIugR2aRpII1GaCrE+ek7VquMk=
+	t=1752703946; cv=none; b=aYxqqn4pLvUhHbwa6WAns7jS304B8xCFPbXpGw22jbOjpufMJjDLpMhTp7aJ+/4zm+ZTLJ/1IdGLKK3GAjo9rivKLj+LWj9GcV4R3EdCXnerFUEqIQFowBBQ6u9pUxVD/HsjGiGAOME1XN37Htq2PCl655L5RzgfFFbD5S3vQO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752703141; c=relaxed/simple;
-	bh=UkBJ9cHYRd6RJlLltFrluzjDP16UJwlZC6ZXRxpXOZc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SWQLfvH/owZewZcWLaiFZtdM7PtkJiYW4kOWOOLPM1wBTJBqBRHeIjO3y649/C7mxzxlEo3HR5Tn5SFnUn4iOn/uFnA3af5q1BqoKkbhn37scc3O3CNWLYJyaTqIDguSEnd923pmxQZKUf8bO/sFntCvxJN2VRI42lsFvM5Iop0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XAUAZ6/f; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3df210930f7so1777365ab.1;
-        Wed, 16 Jul 2025 14:58:57 -0700 (PDT)
+	s=arc-20240116; t=1752703946; c=relaxed/simple;
+	bh=k+Mesw1RnjtaPwmMiUut0dQ9KglVoII7wx/HezRggqo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=WJC8tWEAhAAmopnOqMBdRK4b9r+OreaGiFJ4F3zlc3vDXRpzBl+XREzj389vfJiYtVMLuZv/Ku1+60BVuvCsNwvNAztXpV5vMOQZT+YSn8qC2OiI/uTQ0QsXTOcBMd7y6C95PTS7c2Bi8F5DsBmpjgz2lkh2Gjv3Nq1TEQFpJ7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TVPxDp+C; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b2c00e965d0so184667a12.2
+        for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 15:12:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752703137; x=1753307937; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bRyPRnH4RA0lEl0YXiJRnsaPybpKGPwgWOjr0WxsL+4=;
-        b=XAUAZ6/fblSDGgk4m1yFwyn2zD9aLmUSEUBQKIjpQpIElyJmSCBHs7nmQxKa+MlZMM
-         HSz66lgHh5rCurGJWFjaaCuZ0toYhk0eeaKR9E5rDbYViyJQ5CxHoGHzU5juKsxnQlrv
-         2IaSi5Km/1u2qTFwKn/4gHDOKiPqn7yq62mvqQ7tfWNQ5l6XxxT937cSdUicrrvRHT8A
-         udx49iEgg1klP5O+fHpbziDIAESIopt1p5e4ITZf5rkfXkzYiBEyvVeRhMYnUfLrIw8p
-         0uvPqA/8yuXH3k36uiJ1oCDJIsrmEcq9qWh6+qv74snK2lQzVm2IjtTfn43rB12YKQtz
-         AppA==
+        d=google.com; s=20230601; t=1752703944; x=1753308744; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ACyA4jZEQy+g0hj67FmINgzKcsu3Ytkey1UJGietB3E=;
+        b=TVPxDp+C392DR/ajy6mGBqi/j4OoAe5h28pFpEy+KH07QV+3CSZdPLmDEMQ+5Aau9w
+         cnumBHfCfIEIT3dGWlb/ryuwoDJ0b7FYBULEu8mhy9qofkQdVEDfZLMW68Aj8p904mGf
+         vwPORJkwaXG3UsMX+2jQr+ZkwSwpL2Yyvh91dIOeAwEmy72iS3vjyR562jXwaRLB1KlZ
+         5bKoDP4PXFj5LK+MHjLDM3SEgOxV5Ulq78ydaUW25gB1Sy0Y/GdQv7D9ze9iVUmt/6qP
+         NaSuCwSdNDgWlaRHJ+rlTXASwl1RG1UAdeGN3IzLYDWH1mMDfFmXRp8RBU5Bpm9G7uNx
+         57/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752703137; x=1753307937;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bRyPRnH4RA0lEl0YXiJRnsaPybpKGPwgWOjr0WxsL+4=;
-        b=HslZ+bvNdSzU+IUVa8qBFxCyazM/NZqZV3l1gbR7Tz3OMQcKjkeW7GvkgtHZUkZGMz
-         J/6fgQcoqOlM2fZxCeEVRBiSpPDMYxTGqx739KJhDm4xV2Ou9iOoPN4EBlbzizM9m53m
-         YA68MkcIaBIsLXhK9W6sbQkvApHaZ3eBs2DjWvnofDB0aq0onk4okm2kqCIEBIL5dD2G
-         W1KD5DqSfwL2ssCVN9wQ3ac9A2VOb8MeYrP2Ztw0p3CLSezZAkEsfr1lopz7de39whnd
-         NRgbsqO0KIP2s3X5vNmN95Z38p7UQ3ItTxe8qjmHiXnMGKwVVTdD9BTD+oryG8SlzJQV
-         YRkg==
-X-Forwarded-Encrypted: i=1; AJvYcCUbVWQaqxzrlSb8Ad2Wt8cb6dBwzFfAVbucTmPLKz1HjjCJQmgnWPBQsJf1Z9A3CKK/aIL6BygIdBZP+fk=@vger.kernel.org, AJvYcCX3sgqyAz7yoY6XuqXWgO8xkkuegQ0BLthifGKepxhPow/AH6ZVK6qZJNJGOO5y1TE9qK4O6mob@vger.kernel.org, AJvYcCXSMkNDQbEXDkPoTit6GyFC35oY4n/L0ij7h3xU7hJXLR75WeSPWe4QeGtaJSVlXeyrEQAOmjvPIIx25J8I@vger.kernel.org
-X-Gm-Message-State: AOJu0YztBTdJEaHQxPl/y/vmCIS9N+45050yovZN8Q4oMHEhxjxBZaqE
-	NvtDUmPIn6s6/NFS4VZtwqlkysRJJlrir20V1HRTGwIg0zB5PijSyVXp1PCTIHp2mi7grCeHmob
-	wTRfwf/sBlawISfuVTGFR6cPHQCXbFbDGIJxY
-X-Gm-Gg: ASbGnct7jh0N524gOhXmmMYW5DK0IzqwtVFEJRDA7qQrPlSRkMXjbWb8BLrmYMJLDmK
-	8cAtikEVA++ELk0N7pOYEbWs9FPlZPHRkjWQiPOtmnqbhPfNSMbIOhZhxOkvudK0LRts7K+cD2Y
-	81jUOKUyxzEyrb/BELY2QKrD9CepNE1aicYd6zDDRa1Xb5pXwXT45ZIHPM8lp9foMiwHOav6xWV
-	VikD6iD+YisVVwTvBd29M5DicLKLgkWbmziFzFXyQ==
-X-Google-Smtp-Source: AGHT+IE3a6WhwJDruIuFMeBsTOmTR/N3kTnhGSIPlruRWVnOf+Fd9QQFjbSI3bmdZbPZcMnwYlm9nS7oMyOIHKd4+3o=
-X-Received: by 2002:a92:c649:0:b0:3e1:3491:e873 with SMTP id
- e9e14a558f8ab-3e28ba05923mr13473965ab.10.1752703136658; Wed, 16 Jul 2025
- 14:58:56 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752703944; x=1753308744;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ACyA4jZEQy+g0hj67FmINgzKcsu3Ytkey1UJGietB3E=;
+        b=V2OuJsLZW+kvX3DH8NjqPxaOvX8vym9vV/XFXdKKVdXQN4xq2E8QEY2bgyz3pyCKPL
+         nFqyBNcCEeJ+eh3wBxXfiJUja3vrJ8cZ+yklbG0hpT5kNtlscmpUJ448G3VPeda9gMFu
+         prtM6fSvSKxwbRST4CsU8zaHvHAnd3KsYnWGoBQAupVSsTNm4aQdBLjAJHSqktZyxd2Z
+         a7JoYUoJ6hPDjAzCGn9ma2ZnUCULHhTMppFTBsg7ByJZIFImD9tLsMYA8HeQBL5ttCPM
+         P/soFFLRK8Uhvoclg+/oXn0hu966krnTlPaK8JSQC/Wsinbm11pLQGN9V883/VxyXNPX
+         OquA==
+X-Forwarded-Encrypted: i=1; AJvYcCWBCg2rQ5eCOKEq5wTi/8kgXxb4CrgWzY37GKP0A0FIJqqLK76IJPQpP0take/NmiywMJP1YZg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFlKBpIE2tyiNpXH7ufhuOedSI8hyXjlf7Ma4yXPMhfpySmoYd
+	oOgHQ7HgZTsbqUZ/NrZU6lrWxPH4UC5Ma+MbLxDpNN8eW+yHcgpy0W9KxX/xx/nk7IuGNm57SPT
+	6jhXrww==
+X-Google-Smtp-Source: AGHT+IHuzFFC+YqmDOfppBhKEc+ATiDAs5fAwLDqAqWudrqI8U+P9D0mg223Zs3uu1DiD5NRon95BycvkE4=
+X-Received: from pjq16.prod.google.com ([2002:a17:90b:5610:b0:311:485b:d057])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2ecd:b0:313:20d2:c99b
+ with SMTP id 98e67ed59e1d1-31c9e6f680emr6171381a91.9.1752703944173; Wed, 16
+ Jul 2025 15:12:24 -0700 (PDT)
+Date: Wed, 16 Jul 2025 22:08:05 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250716002607.4927-1-litian@redhat.com> <20250716092927.GO721198@horms.kernel.org>
- <CADvbK_cdOTO_UVg6ovx-Si7-ja=ErYw-MnSnR-CL4HwmtKJ8YQ@mail.gmail.com> <SN6PR2101MB0943EAAB55E0BF97E0841419CA56A@SN6PR2101MB0943.namprd21.prod.outlook.com>
-In-Reply-To: <SN6PR2101MB0943EAAB55E0BF97E0841419CA56A@SN6PR2101MB0943.namprd21.prod.outlook.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Wed, 16 Jul 2025 17:58:45 -0400
-X-Gm-Features: Ac12FXyPbx72VLC09xD0LTQCjT62SZmePXXnJFipm7Xmc3IgwrmJvHi6smqgTY0
-Message-ID: <CADvbK_cgPq8x5OR2RomZqL9+_ce8-e=-EG2pZw6TK4mE1ova3Q@mail.gmail.com>
-Subject: Re: [EXTERNAL] Re: [PATCH v3] hv_netvsc: Set VF priv_flags to
- IFF_NO_ADDRCONF before open to prevent IPv6 addrconf
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: Simon Horman <horms@kernel.org>, Li Tian <litian@redhat.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Stephen Hemminger <stephen@networkplumber.org>, Long Li <longli@microsoft.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
+Message-ID: <20250716221221.442239-1-kuniyu@google.com>
+Subject: [PATCH v3 net-next 00/15] neighbour: Convert RTM_GETNEIGH to RCU and
+ make pneigh RTNL-free.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 16, 2025 at 12:15=E2=80=AFPM Haiyang Zhang <haiyangz@microsoft.=
-com> wrote:
->
->
->
-> > -----Original Message-----
-> > From: Xin Long <lucien.xin@gmail.com>
-> > Sent: Wednesday, July 16, 2025 11:14 AM
-> > To: Simon Horman <horms@kernel.org>
-> > Cc: Li Tian <litian@redhat.com>; netdev@vger.kernel.org; linux-
-> > hyperv@vger.kernel.org; linux-kernel@vger.kernel.org; Haiyang Zhang
-> > <haiyangz@microsoft.com>; Dexuan Cui <decui@microsoft.com>; Stephen
-> > Hemminger <stephen@networkplumber.org>; Long Li <longli@microsoft.com>
-> > Subject: [EXTERNAL] Re: [PATCH v3] hv_netvsc: Set VF priv_flags to
-> > IFF_NO_ADDRCONF before open to prevent IPv6 addrconf
-> >
-> > On Wed, Jul 16, 2025 at 5:29=E2=80=AFAM Simon Horman <horms@kernel.org>=
- wrote:
-> > >
-> > > + Xin Long
-> > >
-> > Thanks for Ccing me.
-> >
-> > > On Wed, Jul 16, 2025 at 08:26:05AM +0800, Li Tian wrote:
-> > > > Set an additional flag IFF_NO_ADDRCONF to prevent ipv6 addrconf.
-> > > >
-> > > > Commit under Fixes added a new flag change that was not made
-> > > > to hv_netvsc resulting in the VF being assinged an IPv6.
-> > > >
-> > > > Fixes: 8a321cf7becc ("net: add IFF_NO_ADDRCONF and use it in bondin=
-g
-> > to prevent ipv6 addrconf")
-> > > > Suggested-by: Cathy Avery <cavery@redhat.com>
-> > > > Signed-off-by: Li Tian <litian@redhat.com>
-> > > > ---
-> > > > v3:
-> > > >   - only fixes commit message.
-> > > > v2:
-> > https://lore.ker/
-> > nel.org%2Fnetdev%2F20250710024603.10162-1-
-> > litian%40redhat.com%2F&data=3D05%7C02%7Chaiyangz%40microsoft.com%7C8048=
-5948c
-> > b344b12f2dd08ddc47b7c6e%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C63=
-888
-> > 2756868249313%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwL=
-jAu
-> > MDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&s=
-dat
-> > a=3D1ljWIFtnhAiGjdIEgNNlQZGK%2F%2FZHdgHVkvyCWY9%2BKxI%3D&reserved=3D0
-> > > >   - instead of replacing flag, add it.
-> > > > v1:
-> > https://lore.ker/
-> > nel.org%2Fnetdev%2F20250710024603.10162-1-
-> > litian%40redhat.com%2F&data=3D05%7C02%7Chaiyangz%40microsoft.com%7C8048=
-5948c
-> > b344b12f2dd08ddc47b7c6e%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C63=
-888
-> > 2756868272381%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwL=
-jAu
-> > MDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&s=
-dat
-> > a=3Do%2B2BM9YEi3O2zcqQu9KfPae6PZerBWO%2FhL5KCIeJ9xI%3D&reserved=3D0
-> > > > ---
-> > > >  drivers/net/hyperv/netvsc_drv.c | 5 ++++-
-> > > >  1 file changed, 4 insertions(+), 1 deletion(-)
-> > >
-> > > Hi Li Tian,
-> > >
-> > > Thanks for addressing earlier feedback.
-> > >
-> > > I don't think you need to repost because of this, but for future
-> > reference:
-> > >
-> > > 1. Because this is a fix for a commit that is present in net
-> > >    it should be targeted at that tree.
-> > >
-> > >    Subject: [PATCH net vX] ...
-> > >
-> > > 2. Please use get_maintainers.pl this.patch to generate the CC list. =
-In
-> > >    this case Xin Long (now CCed) should be included as he is the auth=
-or
-> > of the
-> > >    patch cited in the Fixes tag.
-> > >
-> > >    b4 can help you with this and other aspects of patch management.
-> > >
-> > > >
-> > > > diff --git a/drivers/net/hyperv/netvsc_drv.c
-> > b/drivers/net/hyperv/netvsc_drv.c
-> > > > index c41a025c66f0..8be9bce66a4e 100644
-> > > > --- a/drivers/net/hyperv/netvsc_drv.c
-> > > > +++ b/drivers/net/hyperv/netvsc_drv.c
-> > > > @@ -2317,8 +2317,11 @@ static int netvsc_prepare_bonding(struct
-> > net_device *vf_netdev)
-> > > >       if (!ndev)
-> > > >               return NOTIFY_DONE;
-> > > >
-> > > > -     /* set slave flag before open to prevent IPv6 addrconf */
-> > > > +     /* Set slave flag and no addrconf flag before open
-> > > > +      * to prevent IPv6 addrconf.
-> > > > +      */
-> > > >       vf_netdev->flags |=3D IFF_SLAVE;
-> > > > +     vf_netdev->priv_flags |=3D IFF_NO_ADDRCONF;
-> > If it is only to prevent IPv6 addrconf, I think you can replace IFF_SLA=
-VE
-> > with IFF_NO_ADDRCONF.
-> >
-> > IFF_SLAVE normally comes with IFF_MASTER, like bonding and eql.
-> > I don't see IFF_MASTER used in netvsc_drv.c, so IFF_SLAVE probably
-> > should be dropped, including the one in __netvsc_vf_setup()?
->
-> The IFF_SLAVE is not just for ipv6, the comment should be updated.
-> IFF_SLAVE is also used by udev and our other user mode daemons, so it nee=
-ds
-> to stay.
->
-Got it, then the patch looks good to me.
+This is kind of v3 of the series below [0] but without NEIGHTBL patches.
 
-Reviewed-by: Xin Long <lucien.xin@gmail.com>
+Patch 1 ~ 4 and 9 come from the series to convert RTM_GETNEIGH to RCU.
+
+Other patches clean up pneigh_lookup() and convert the pneigh code to
+RCU + private mutex so that we can easily remove RTNL from RTM_NEWNEIGH
+in the later series.
+
+[0]: https://lore.kernel.org/netdev/20250418012727.57033-1-kuniyu@amazon.com/
+
+
+Changes:
+  v3:
+    * Patch 1:
+      * Return ERR_PTR() direclty instead of goto in neigh_valid_get_req().
+    * Patch 2:
+      * Use NL_SET_ERR_ATTR_MISS() for NDA_DST
+    * Patch 3:
+      * Rename err label to err_free_skb
+    * Patch 8:
+      * Cache pn->protocol in pneigh_fill_info()
+    * Patch 9:
+      * Rename err label to err_unlock
+
+  v2: https://lore.kernel.org/netdev/20250712203515.4099110-1-kuniyu@google.com/
+    * Add patch 6 to silence Sparse __rcu warning
+
+  v1: https://lore.kernel.org/netdev/20250711191007.3591938-1-kuniyu@google.com/
+
+
+Kuniyuki Iwashima (15):
+  neighbour: Make neigh_valid_get_req() return ndmsg.
+  neighbour: Move two validations from neigh_get() to
+    neigh_valid_get_req().
+  neighbour: Allocate skb in neigh_get().
+  neighbour: Move neigh_find_table() to neigh_get().
+  neighbour: Split pneigh_lookup().
+  neighbour: Annotate neigh_table.phash_buckets and pneigh_entry.next
+    with __rcu.
+  neighbour: Free pneigh_entry after RCU grace period.
+  neighbour: Annotate access to struct pneigh_entry.{flags,protocol}.
+  neighbour: Convert RTM_GETNEIGH to RCU.
+  neighbour: Drop read_lock_bh(&tbl->lock) in pneigh_dump_table().
+  neighbour: Use rcu_dereference() in pneigh_get_{first,next}().
+  neighbour: Remove __pneigh_lookup().
+  neighbour: Drop read_lock_bh(&tbl->lock) in pneigh_lookup().
+  neighbour: Protect tbl->phash_buckets[] with a dedicated mutex.
+  neighbour: Update pneigh_entry in pneigh_create().
+
+ include/net/neighbour.h |  17 +-
+ net/core/neighbour.c    | 384 ++++++++++++++++++++--------------------
+ net/ipv4/arp.c          |   6 +-
+ net/ipv6/ip6_output.c   |   2 +-
+ net/ipv6/ndisc.c        |   8 +-
+ 5 files changed, 207 insertions(+), 210 deletions(-)
+
+-- 
+2.50.0.727.gbf7dc18ff4-goog
+
 
