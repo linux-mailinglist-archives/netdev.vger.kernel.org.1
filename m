@@ -1,82 +1,97 @@
-Return-Path: <netdev+bounces-207640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E570B080C9
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 00:59:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A525B080DA
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 01:19:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0AB7F1C264CD
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 22:59:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BB314A8350
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 23:19:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FAC22EF285;
-	Wed, 16 Jul 2025 22:59:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A311129292F;
+	Wed, 16 Jul 2025 23:19:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CqwE2//n"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YOxyIzgg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 288871D555;
-	Wed, 16 Jul 2025 22:59:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D37019DF8D
+	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 23:19:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752706741; cv=none; b=dbANFb8qlWlgmmt0X0zYdEh+UbdKZm9O5dx5CcBlitQDSj4AiJbi01I4J06yBXbPNMLqfss9VN7cxOyOAWDut4XELyE0pYsh52cdZVbxxTCELNB32oQ9o7j+kwl0mKbo87+BFeat6/E8M1yte2Ckf5nDtVs0bV6oxMyZfCkXH1E=
+	t=1752707987; cv=none; b=c1slt49aJ4rvqkdw11jjw/cS7vjU53txKEAMsbqzrdcJ+2WI/1v6XlibCsF+de0OFHKr2Jn53t2LwL9foYtrrkAlCu/Cw4PZTXqgOmbMmY6exzKVDzv12UjH77Il75/dU0jbZXx6jAC0brKHcozwS/+/Qr5SpElwZqDl0BpnrVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752706741; c=relaxed/simple;
-	bh=0dkzby8hdqpTEYrx4v2fUKiDbSXRJB+rFnnph5DXf3g=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:From:Subject:Cc:
-	 References:In-Reply-To; b=t5OgIdCfRjq82VAY7/nuwizbFVZD0Zb2wx8jHui+1LSV1KpOuaUE2qIRxTnZM8r4ECsROL7sv0VVxmmUnZ2vehIlaXVbnR/ixcw+TLzXf+dFmEnqgBf6H+Y575d0XOuHSWJ6LeQLcinQed9guBdIsN4LhLaJmDmRbZQ66rf3i5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CqwE2//n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD12FC4CEE7;
-	Wed, 16 Jul 2025 22:58:55 +0000 (UTC)
+	s=arc-20240116; t=1752707987; c=relaxed/simple;
+	bh=kx+4ZYsQpDAmMk5ChkJlInSDwEN1VVHvPfCH1VnGMsI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=eMxkKp42NZXEXKEr/04xdnGI3fQD7az/B9tur5nYZ6aJiKsk/r/4FYwz8hvuhMryIIcGjT4aMpnlWZL91hGIG4wSG5g+sXoWGvJAj73HYaBYqy1OYCHlVpuC2tf+syxxT3i1NBZyl87wyjVWM+jflw8W1MCrADwlJkb+2wLrLEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YOxyIzgg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 058BDC4CEE7;
+	Wed, 16 Jul 2025 23:19:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752706741;
-	bh=0dkzby8hdqpTEYrx4v2fUKiDbSXRJB+rFnnph5DXf3g=;
-	h=Date:To:From:Subject:Cc:References:In-Reply-To:From;
-	b=CqwE2//naBbFY3iq8URW16L5jkKdga66bMIFfNFJFVFELk9jFQxPzIYH096mnzp1T
-	 bDP6tpnsGjbhmqoo1glEZ4q0De3URCBal6mFYFPJun73I00ur8MFJKUGUDsIq2YDLg
-	 OdKofq7lr/+iStgHZ1YjNqcgp5RFJSpDrx3c/PRNGPmuqOEAzkAFwZuyJ4iGOgfCXV
-	 bLdyRtMkhCf73MrLZttJbYugKxm4cerwA8WM004sJu+BOyeaB55p6/8Wnqs/K1t9GQ
-	 4D53TWom2O0uLGuT4+1JiGDDzWhWNCC4kKh+LwF85bhGhOZs2uPWSW5eLQlS1mqPiq
-	 YVZINSp0ugotQ==
+	s=k20201202; t=1752707986;
+	bh=kx+4ZYsQpDAmMk5ChkJlInSDwEN1VVHvPfCH1VnGMsI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=YOxyIzggkLlEmH823frHhPnCuJX+XHd+xkJmlZN7KVcLFmeMS3qkBcvV8DohuVlNM
+	 KXNbmyivPFWN/axz4zSbwAs86xg37rEWOCBq696h1fBfpPT+BCI+8f6ec7PRfOhVQv
+	 e9jKzQblFVWoiRQF1WHKRaSzNpcZvv6rJNs21NJzk0A1Xk7JGsRBQuv0xaHzsBpc1u
+	 NA95JQ6FmHl73FX7+y/+QrtWQH/U1FUyMgHlBjfJzbp+rrOlXoNbUdOkUSlJYzWrjz
+	 mJtoXjFHwzEVMjfZfpE+oJE2DksOAcHOj2nBqPzZqReWp17bYvy7553HzQiS5arGJi
+	 u24aszmuHZkTg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 710CE383BA38;
+	Wed, 16 Jul 2025 23:20:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 17 Jul 2025 00:58:53 +0200
-Message-Id: <DBDUOLUZTQND.3B3B677YYKFSX@kernel.org>
-To: "FUJITA Tomonori" <fujita.tomonori@gmail.com>
-From: "Danilo Krummrich" <dakr@kernel.org>
-Subject: Re: [PATCH v4 0/3] rust: Build PHY device tables by using
- module_device_table macro
-Cc: <alex.gaynor@gmail.com>, <gregkh@linuxfoundation.org>,
- <ojeda@kernel.org>, <rafael@kernel.org>, <robh@kernel.org>,
- <saravanak@google.com>, <tmgross@umich.edu>, <a.hindborg@kernel.org>,
- <aliceryhl@google.com>, <bhelgaas@google.com>, <bjorn3_gh@protonmail.com>,
- <boqun.feng@gmail.com>, <david.m.ertman@intel.com>,
- <devicetree@vger.kernel.org>, <gary@garyguo.net>, <ira.weiny@intel.com>,
- <kwilczynski@kernel.org>, <lenb@kernel.org>, <leon@kernel.org>,
- <linux-acpi@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <linux-pci@vger.kernel.org>, <lossin@kernel.org>, <netdev@vger.kernel.org>,
- <rust-for-linux@vger.kernel.org>
-References: <20250711040947.1252162-1-fujita.tomonori@gmail.com>
-In-Reply-To: <20250711040947.1252162-1-fujita.tomonori@gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] net: airoha: fix potential use-after-free in
+ airoha_npu_get()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175270800628.1359575.17421649701122534916.git-patchwork-notify@kernel.org>
+Date: Wed, 16 Jul 2025 23:20:06 +0000
+References: <20250715143102.3458286-1-alok.a.tiwari@oracle.com>
+In-Reply-To: <20250715143102.3458286-1-alok.a.tiwari@oracle.com>
+To: ALOK TIWARI <alok.a.tiwari@oracle.com>
+Cc: sayantan.nandy@airoha.com, lorenzo@kernel.org, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, netdev@vger.kernel.org, linux-mediatek@lists.infradead.org,
+ linux-arm-kernel@lists.infradead.org
 
-On Fri Jul 11, 2025 at 6:09 AM CEST, FUJITA Tomonori wrote:
-> Build PHY device tables by using module_device_table macro.
->
-> The PHY abstractions have been generating their own device tables
-> manually instead of using the module_device_table macro provided by
-> the device_id crate. However, the format of device tables occasionally
-> changes [1] [2], requiring updates to both the device_id crate and the cu=
-stom
-> format used by the PHY abstractions, which is cumbersome to maintain.
+Hello:
 
-Applied to driver-core-testing, thanks!
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 15 Jul 2025 07:30:58 -0700 you wrote:
+> np->name was being used after calling of_node_put(np), which
+> releases the node and can lead to a use-after-free bug.
+> Previously, of_node_put(np) was called unconditionally after
+> of_find_device_by_node(np), which could result in a use-after-free if
+> pdev is NULL.
+> 
+> This patch moves of_node_put(np) after the error check to ensure
+> the node is only released after both the error and success cases
+> are handled appropriately, preventing potential resource issues.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2] net: airoha: fix potential use-after-free in airoha_npu_get()
+    https://git.kernel.org/netdev/net/c/3cd582e7d078
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
