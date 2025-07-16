@@ -1,142 +1,139 @@
-Return-Path: <netdev+bounces-207546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F35C4B07B83
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 18:50:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35806B07BBE
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 19:04:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 424EA16F8D5
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 16:50:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3387D3A9D92
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 17:04:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B04C12F5493;
-	Wed, 16 Jul 2025 16:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48CAA2F5475;
+	Wed, 16 Jul 2025 17:04:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Xqr5SlOS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CmqfGpxn"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17D4D283FE0
-	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 16:50:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 830BA186294;
+	Wed, 16 Jul 2025 17:04:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752684606; cv=none; b=SU9qZ/hLe7kyKX9GqE75yZfBA3Zkrgf02jsl750TXwI+YHZ9DDimrSIufbGMH2bqpFq9iSvudy9zOV5YbHLUDjTD+M3oGolW+9uI66Pa2mtUDiYuh5tQNvzXXvRETWNOYQ56bZRaeiPhe41lUGAIkToB1WVemAsiPP9EhbDC7Wo=
+	t=1752685471; cv=none; b=T5ivyT8PWvsqm6KeD7wt8tTuPvY3Ep4op53Zg+54AptFHhURljEjemNth46+GQ5pBWIMgb+Aj5ZlOWlq/PydztXfexl6ISIsUtMIQjg0wwXKhQLIoyKOYmyevPXpDHXuA5FQuLCMrIqfI3aGhgPTmjEtav1MHPU2i6vmpeb8TSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752684606; c=relaxed/simple;
-	bh=P+k06D7qBbCZm8y3X9WpXeA/zja+4RlUeGc0UOrydo4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E0oQ5ccoUBUyHBZ0Fv3T/IOjMl3z62hL7DdF7sadA4r4TsciuKSyzNA388ikCNEYcuXO1K35eNCQ0osxywj4+vdzUSqNQt4I+hoSLgH4z9FUbiBufW+NbVKCGguTuftZcRuUAn+cwmtBlz5erSwtOXuvZ9mALLgJjuLmSySuMSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Xqr5SlOS; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 16 Jul 2025 09:49:49 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1752684599;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eJMpmtlIPf4k+hDO7cbykgh07PoM5NDYPjmc8MkH7/4=;
-	b=Xqr5SlOSNTfFxmkk2StgfhvEBwSew07x8SDxLTfEdxR64duiIBUX0ioQGZCxzF4QLQoE59
-	D42vfchWcmJLG8avGrPG8gDtFkYSPR2iZxgNO8soiJ0FNewbOKNAzx/NgQh2bGCrhWKqgC
-	D5Q9KvyMgt3ghQQFNA4LSRGVa4Aqylw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Daniel Sedlak <daniel.sedlak@cdn77.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, David Ahern <dsahern@kernel.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org, 
-	netdev@vger.kernel.org, Matyas Hurtik <matyas.hurtik@cdn77.com>
-Subject: Re: [PATCH v2 net-next 1/2] tcp: account for memory pressure
- signaled by cgroup
-Message-ID: <vlybtuctmjmsfkh4x455q4iokcme4zbowvolvti2ftmcysechr@ydj4uss6vkm2>
-References: <20250714143613.42184-1-daniel.sedlak@cdn77.com>
- <20250714143613.42184-2-daniel.sedlak@cdn77.com>
+	s=arc-20240116; t=1752685471; c=relaxed/simple;
+	bh=pfDCSCBF20xGHAe1g8MHqdHKoqvKbZb6FrEiuiU5isE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=M7x9glD9ZDLRiq37GovboNRbklMBZH8Mxwu6DqGcGvdzp53PJOpFc34P7Zr4U8b5ji2zIqvWKyMDPMH1uGZpnRZsZi7MZaEixDm/IzBnZTfvOgjplgaaQRUp043JT1WSQJ3fF6zHjdgTOi7L77Yu9zRV7ib6zJDbThhTphpDx4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CmqfGpxn; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-60c51860bf5so64895a12.1;
+        Wed, 16 Jul 2025 10:04:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752685468; x=1753290268; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=q7oYQp9TxI4Fj95McwORlYyfvoBodxMgz2aYymOhtlQ=;
+        b=CmqfGpxnApb0w3PmsNh7Oz2oPNElP6FOg2JHq00liLAFtyyWXfiG34m8kBDLTe9Yj9
+         sKqU4Ac0HVp2e77BKS1qjV3b6YT4urtczCwYBWQK8C+3EXF6cFaNebAxnmg6qTwzYE0h
+         7pJQsihbuN6CCtx8r5STsT9+7FE5e/AxaUt/YibkAMO0BgrS2/TLGGPm9NpVzarKcCBB
+         y8qKm4IDiggbVhky4kBxSNT6eDArjxsebE/0ju7fqWgOCCFQ+vf4wzFQWvEFwThhXhcV
+         yE/K0mj5M0TpwD4ToFamZ1hdxw9NjNAHPwDkUcwP9/9N6c0VCCchfAUNDEl2/L7nev/M
+         kdMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752685468; x=1753290268;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=q7oYQp9TxI4Fj95McwORlYyfvoBodxMgz2aYymOhtlQ=;
+        b=H3he4aWY7ysk+66exsU2nItEyU0uXTtAuR+FYVKE0kPLp7BnfqWH+zLBrb55zd3F2V
+         sTgirKd5OVL9JUxFU68kPwR9GDbL1bu+0NW8o9N+ST1qMSPuA3wXURje1k6aw3TRBxb3
+         57UJFdfxCpWWC6OaqqjyB4KIuuTwRP8AQ5Ky2TsxY7F9nMXdgs3fnC8rKzAPpzXSs3gj
+         tMHaVjffNkTayPua5qLzYvTk1VsFcvsFYSh4pVC3FEd3cOPfYrMuvfp81jlj4Ybrej+d
+         DTm9QIicoRO1kTgrRfFbrfJnX4jR09w/kEJALzclRG4S+9o9dBi6+vDXH5Y0ckhtvuWq
+         fpYg==
+X-Forwarded-Encrypted: i=1; AJvYcCU4QDCf9SapSc5MFuVcUJ1cPcDhicJ37YPLSdrYI6cu4unUMiO+VUcZ4/ODq31CFPmbMR8=@vger.kernel.org, AJvYcCWRPcP/7wYQcVkLWfMGnAiZUNmHdPWn0B1JQofOnI5JRyj5bHNaz4wZVKczEm/yLsB5uaC27Jkl@vger.kernel.org, AJvYcCWkK00Q1iEkZoyUcGYdcfgsukQ4GzILE4VoWUu0PO7lo1MYJfCte5JVaiGnEs1yej/eP3NE8JKSenpNrZd+@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywk6ifeiXeZ4tsOqu4Qh9+2O/zDYfS/4VpxFtjGbxbmFMODU2dI
+	bDdUg6yNlg7a8hzDzYlb3H5cIjNVgJqFHomNx5HEgbE8K/MzhxLv14t54uQ2aEsQUOjIHWjD+hh
+	FEekqNIadu7tS8QPhXByAuoMd+jH3WG/oYzae
+X-Gm-Gg: ASbGncv817ARo7EBC1FUe8P8RereHP14Q2n1uOfJAcz0k2aqpxu3F/fYNGaHSjWe8Zd
+	zHy5K4TSpCF3cukSAfm5J1Mx1K4fhvdK6OtXTSEnQO9k9jg7LMLtcGcyuQfOb+AEwxZ5HmNySQg
+	oEQ7S+T2vgDt51CVIvTRkA+biGY1dZ6qyz3xXwS1QWjm3UwL2U1pHMIneIhVZx77DXvlCfdPVtH
+	L2aFi+b4MK/DnV7QHua5Svo72dV8Wf3atYH
+X-Google-Smtp-Source: AGHT+IFamd7Y4MRHtmq2184BO6w8sFgyxYl7Zh4itA6app2I7UPsgQc9mmLYflqnadMMT9/lraUol3z1FAgnq1p09mo=
+X-Received: by 2002:a05:6000:288f:b0:3a5:1410:71c0 with SMTP id
+ ffacd0b85a97d-3b60dd95b34mr2909840f8f.38.1752684982596; Wed, 16 Jul 2025
+ 09:56:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250714143613.42184-2-daniel.sedlak@cdn77.com>
-X-Migadu-Flow: FLOW_OUT
+References: <20250703121521.1874196-1-dongml2@chinatelecom.cn>
+ <20250703121521.1874196-3-dongml2@chinatelecom.cn> <CAADnVQKP1-gdmq1xkogFeRM6o3j2zf0Q8Atz=aCEkB0PkVx++A@mail.gmail.com>
+ <45f4d349-7b08-45d3-9bec-3ab75217f9b6@linux.dev> <3bccb986-bea1-4df0-a4fe-1e668498d5d5@linux.dev>
+In-Reply-To: <3bccb986-bea1-4df0-a4fe-1e668498d5d5@linux.dev>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 16 Jul 2025 09:56:11 -0700
+X-Gm-Features: Ac12FXzz97G1BInpuw1CatASNIHUf58Eb9JFMy5wt8frDaYX3XmuvRo8Dbo2D70
+Message-ID: <CAADnVQ+Afov4E=9t=3M=zZmO9z4ZqT6imWD5xijDHshTf3J=RA@mail.gmail.com>
+Subject: Inlining migrate_disable/enable. Was: [PATCH bpf-next v2 02/18]
+ x86,bpf: add bpf_global_caller for global trampoline
+To: Menglong Dong <menglong.dong@linux.dev>, Peter Zijlstra <peterz@infradead.org>
+Cc: Menglong Dong <menglong8.dong@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Jiri Olsa <jolsa@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, 
+	LKML <linux-kernel@vger.kernel.org>, Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 14, 2025 at 04:36:12PM +0200, Daniel Sedlak wrote:
-> This patch is a result of our long-standing debug sessions, where it all
-> started as "networking is slow", and TCP network throughput suddenly
-> dropped from tens of Gbps to few Mbps, and we could not see anything in
-> the kernel log or netstat counters.
-> 
-> Currently, we have two memory pressure counters for TCP sockets [1],
-> which we manipulate only when the memory pressure is signalled through
-> the proto struct [2]. However, the memory pressure can also be signaled
-> through the cgroup memory subsystem, which we do not reflect in the
-> netstat counters. In the end, when the cgroup memory subsystem signals
-> that it is under pressure, we silently reduce the advertised TCP window
-> with tcp_adjust_rcv_ssthresh() to 4*advmss, which causes a significant
-> throughput reduction.
-> 
-> So this patch adds a new counter to account for memory pressure
-> signaled by the memory cgroup, so it is much easier to spot.
-> 
-> Link: https://elixir.bootlin.com/linux/v6.15.4/source/include/uapi/linux/snmp.h#L231-L232 [1]
-> Link: https://elixir.bootlin.com/linux/v6.15.4/source/include/net/sock.h#L1300-L1301 [2]
-> Co-developed-by: Matyas Hurtik <matyas.hurtik@cdn77.com>
-> Signed-off-by: Matyas Hurtik <matyas.hurtik@cdn77.com>
-> Signed-off-by: Daniel Sedlak <daniel.sedlak@cdn77.com>
-> ---
->  Documentation/networking/net_cachelines/snmp.rst |  1 +
->  include/net/tcp.h                                | 14 ++++++++------
->  include/uapi/linux/snmp.h                        |  1 +
->  net/ipv4/proc.c                                  |  1 +
->  4 files changed, 11 insertions(+), 6 deletions(-)
-> 
-> diff --git a/Documentation/networking/net_cachelines/snmp.rst b/Documentation/networking/net_cachelines/snmp.rst
-> index bd44b3eebbef..ed17ff84e39c 100644
-> --- a/Documentation/networking/net_cachelines/snmp.rst
-> +++ b/Documentation/networking/net_cachelines/snmp.rst
-> @@ -76,6 +76,7 @@ unsigned_long  LINUX_MIB_TCPABORTONLINGER
->  unsigned_long  LINUX_MIB_TCPABORTFAILED
->  unsigned_long  LINUX_MIB_TCPMEMORYPRESSURES
->  unsigned_long  LINUX_MIB_TCPMEMORYPRESSURESCHRONO
-> +unsigned_long  LINUX_MIB_TCPCGROUPSOCKETPRESSURE
->  unsigned_long  LINUX_MIB_TCPSACKDISCARD
->  unsigned_long  LINUX_MIB_TCPDSACKIGNOREDOLD
->  unsigned_long  LINUX_MIB_TCPDSACKIGNOREDNOUNDO
-> diff --git a/include/net/tcp.h b/include/net/tcp.h
-> index 761c4a0ad386..aae3efe24282 100644
-> --- a/include/net/tcp.h
-> +++ b/include/net/tcp.h
-> @@ -267,6 +267,11 @@ extern long sysctl_tcp_mem[3];
->  #define TCP_RACK_STATIC_REO_WND  0x2 /* Use static RACK reo wnd */
->  #define TCP_RACK_NO_DUPTHRESH    0x4 /* Do not use DUPACK threshold in RACK */
->  
-> +#define TCP_INC_STATS(net, field)	SNMP_INC_STATS((net)->mib.tcp_statistics, field)
-> +#define __TCP_INC_STATS(net, field)	__SNMP_INC_STATS((net)->mib.tcp_statistics, field)
-> +#define TCP_DEC_STATS(net, field)	SNMP_DEC_STATS((net)->mib.tcp_statistics, field)
-> +#define TCP_ADD_STATS(net, field, val)	SNMP_ADD_STATS((net)->mib.tcp_statistics, field, val)
-> +
->  extern atomic_long_t tcp_memory_allocated;
->  DECLARE_PER_CPU(int, tcp_memory_per_cpu_fw_alloc);
->  
-> @@ -277,8 +282,10 @@ extern unsigned long tcp_memory_pressure;
->  static inline bool tcp_under_memory_pressure(const struct sock *sk)
->  {
->  	if (mem_cgroup_sockets_enabled && sk->sk_memcg &&
-> -	    mem_cgroup_under_socket_pressure(sk->sk_memcg))
-> +	    mem_cgroup_under_socket_pressure(sk->sk_memcg)) {
-> +		TCP_INC_STATS(sock_net(sk), LINUX_MIB_TCPCGROUPSOCKETPRESSURE);
->  		return true;
+On Tue, Jul 15, 2025 at 2:31=E2=80=AFAM Menglong Dong <menglong.dong@linux.=
+dev> wrote:
+>
+>  Following are the test results for fentry-multi:
+>    36.36% bpf_prog_2dcccf652aac1793_bench_trigger_fentry_multi [k]
+> bpf_prog_2dcccf652aac1793_bench_trigger_fentry_multi
+>    20.54% [kernel] [k] migrate_enable
+>    19.35% [kernel] [k] bpf_global_caller_5_run
+>    6.52% [kernel] [k] bpf_global_caller_5
+>    3.58% libc.so.6 [.] syscall
+>    2.88% [kernel] [k] entry_SYSCALL_64
+>    1.50% [kernel] [k] memchr_inv
+>    1.39% [kernel] [k] fput
+>    1.04% [kernel] [k] migrate_disable
+>    0.91% [kernel] [k] _copy_to_user
+>
+> And I also did the testing for fentry:
+>    54.63% bpf_prog_2dcccf652aac1793_bench_trigger_fentry [k]
+> bpf_prog_2dcccf652aac1793_bench_trigger_fentry
+>    10.43% [kernel] [k] migrate_enable
+>    10.07% bpf_trampoline_6442517037 [k] bpf_trampoline_6442517037
+>    8.06% [kernel] [k] __bpf_prog_exit_recur
+>    4.11% libc.so.6 [.] syscall
+>    2.15% [kernel] [k] entry_SYSCALL_64
+>    1.48% [kernel] [k] memchr_inv
+>    1.32% [kernel] [k] fput
+>    1.16% [kernel] [k] _copy_to_user
+>    0.73% [kernel] [k] bpf_prog_test_run_raw_tp
 
-Incrementing it here will give a very different semantic to this stat
-compared to LINUX_MIB_TCPMEMORYPRESSURES. Here the increments mean the
-number of times the kernel check if a given socket is under memcg
-pressure for a net namespace. Is that what we want?
+Let's pause fentry-multi stuff and fix this as a higher priority.
+Since migrate_disable/enable is so hot in yours and my tests,
+let's figure out how to inline it.
 
+As far as I can see both functions can be moved to a header file
+including this_rq() macro, but we need to keep
+struct rq private to sched.h. Moving the whole thing is not an option.
+Luckily we only need nr_pinned from there.
+Maybe we can offsetof(struct rq, nr_pinned) in a precompile step
+the way it's done for asm-offsets ?
+And then use that constant to do nr_pinned ++, --.
+__set_cpus_allowed_ptr() is a slow path and can stay .c
+
+Maybe Peter has better ideas ?
 
