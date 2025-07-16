@@ -1,90 +1,221 @@
-Return-Path: <netdev+bounces-207637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84793B080B1
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 00:51:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27EACB080B3
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 00:52:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF4161C2457D
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 22:51:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DF811896DBD
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 22:52:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26EDF2EE96C;
-	Wed, 16 Jul 2025 22:50:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80ADC2EE966;
+	Wed, 16 Jul 2025 22:52:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NsnahU3Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.hostedemail.com (smtprelay0017.hostedemail.com [216.40.44.17])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4316A2B9BA;
-	Wed, 16 Jul 2025 22:50:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5D8194A65;
+	Wed, 16 Jul 2025 22:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752706240; cv=none; b=LPT49b4YobHYQbvripyNIZleuIs6onvdKFazI4inRAed60G0rlmn3h+jv18zOEIcM0/WcxX6A7F35+fZtKGHddtRyng4HPfwqE2NWsRA0LMHsrQz0tCk9EucXhWcb2gxK6jaxSfrKmBKDXWNEzwDgnjHqfLeiIOvqGh9AEdUY7Y=
+	t=1752706336; cv=none; b=Y26dYCcX9PnLpBbTCWIO6uBjN0YHsHP1xZhmx3T/SOlAezR6mcdUaWFVBYhhaqO6fFZ7O/JC2gGpsT1OLe55bUC0Gx6vRa2ucsBm+H6+txZnPiBGhOhT7qJ7TMlk0rXWJ/oXYbT7B4L64+ncfyA6/FZsgFv0ibDs74QUi8Cy77E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752706240; c=relaxed/simple;
-	bh=CWwZR3vXHcSGmk9jbJwrkcTI+WlgvFDrMWEsoEh6CHo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hCpxDv0bHo1FCRL2/yiqI51Y7J0vmo7E7sgacjuLvVgwOLYfRpUVfYdCqdJLq1Z2jrMR2dLwom42fjcN3IxXUa0VmF2TMZhHTamBls+6JZ07/ZZ1/r6wREM79I2EwLBgL9/S/af9jdtBm3G7RQwAZalgBXAtETbRiQb1deFNU9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=goodmis.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
-Received: from omf18.hostedemail.com (a10.router.float.18 [10.200.18.1])
-	by unirelay06.hostedemail.com (Postfix) with ESMTP id 652461101FB;
-	Wed, 16 Jul 2025 22:50:36 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf18.hostedemail.com (Postfix) with ESMTPA id 2635D35;
-	Wed, 16 Jul 2025 22:50:34 +0000 (UTC)
-Date: Wed, 16 Jul 2025 18:50:53 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Menglong Dong
- <menglong.dong@linux.dev>, Menglong Dong <menglong8.dong@gmail.com>, Jiri
- Olsa <jolsa@kernel.org>, bpf <bpf@vger.kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, LKML
- <linux-kernel@vger.kernel.org>, Network Development
- <netdev@vger.kernel.org>, "Jose E. Marchesi" <jemarch@gnu.org>
-Subject: Re: Inlining migrate_disable/enable. Was: [PATCH bpf-next v2 02/18]
- x86,bpf: add bpf_global_caller for global trampoline
-Message-ID: <20250716185053.11026a4f@gandalf.local.home>
-In-Reply-To: <20250716184940.17b6b073@gandalf.local.home>
-References: <20250703121521.1874196-1-dongml2@chinatelecom.cn>
-	<20250703121521.1874196-3-dongml2@chinatelecom.cn>
-	<CAADnVQKP1-gdmq1xkogFeRM6o3j2zf0Q8Atz=aCEkB0PkVx++A@mail.gmail.com>
-	<45f4d349-7b08-45d3-9bec-3ab75217f9b6@linux.dev>
-	<3bccb986-bea1-4df0-a4fe-1e668498d5d5@linux.dev>
-	<CAADnVQ+Afov4E=9t=3M=zZmO9z4ZqT6imWD5xijDHshTf3J=RA@mail.gmail.com>
-	<20250716182414.GI4105545@noisy.programming.kicks-ass.net>
-	<CAADnVQ+5sEDKHdsJY5ZsfGDO_1SEhhQWHrt2SMBG5SYyQ+jt7w@mail.gmail.com>
-	<20250716184940.17b6b073@gandalf.local.home>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1752706336; c=relaxed/simple;
+	bh=2uwhbsvGFETcdpUqnjKaZc/H/gOzRQsVm/jpht4Wzwo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ErrAr2GjEpFntUER0XxMdFh8rKcdDYSxVIyOtDLBFbqoPFimiiNt3vVBCMTqjSS85O/cTcjxE4MXx6q4Gc4oIambL9g9MObhDzpqo60u+fcjqVh1y9eOkeqxU+tNr1Q/Y7T7g7JVH2C7zvcj66gFQfkbY+IrjwPPG1KW0HGaUPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NsnahU3Q; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752706334; x=1784242334;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=2uwhbsvGFETcdpUqnjKaZc/H/gOzRQsVm/jpht4Wzwo=;
+  b=NsnahU3Q1h3sQYdqIdLh9CgGWqkQb90yIBytCMZGLaorlgkQaHgPP3Ey
+   RySn/rACJxZ+BljaeVbx2ZYtY04m1wwxXyrkSTYZNqbnoF0219PNVoDON
+   p47jkpAGOgfHN297PXmU3aTyVCfOeDKRzK8TcBYOqII6bS+ebc/ELs4Tb
+   8dntB1D/rjHVhPPpHsFmzIONUMit1C1i+NOHjXuJNdOlqDX/rO9xjYVxK
+   6Uv+nMEK87aMm7duiw3BLxnYEQFHSIrhfJiduGCWmlIn5xL7hN/w6Yy+L
+   AJ4Den6cNnkRe46GWzfkhXeuIpMZFwkQI7NvFkittVdw/y2ucPLsdARdw
+   A==;
+X-CSE-ConnectionGUID: PtwgkpGsTWCBs50vlwQ+2g==
+X-CSE-MsgGUID: NX51/kQuR4qUAf64PAZf4Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11493"; a="55059203"
+X-IronPort-AV: E=Sophos;i="6.16,316,1744095600"; 
+   d="scan'208";a="55059203"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2025 15:52:13 -0700
+X-CSE-ConnectionGUID: BrbkwENoSH+nREL15mlPbg==
+X-CSE-MsgGUID: S9TmOYLAR0utBq17nPnwqQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,316,1744095600"; 
+   d="scan'208";a="157032345"
+Received: from puneetse-mobl.amr.corp.intel.com (HELO [10.125.111.193]) ([10.125.111.193])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2025 15:52:13 -0700
+Message-ID: <d439e0c2-837f-4d0e-967c-3e41e5788bf8@intel.com>
+Date: Wed, 16 Jul 2025 15:52:11 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v17 10/22] cx/memdev: Indicate probe deferral
+To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
+ netdev@vger.kernel.org, dan.j.williams@intel.com, edward.cree@amd.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
+Cc: Alejandro Lucero <alucerop@amd.com>
+References: <20250624141355.269056-1-alejandro.lucero-palau@amd.com>
+ <20250624141355.269056-11-alejandro.lucero-palau@amd.com>
+Content-Language: en-US
+From: Dave Jiang <dave.jiang@intel.com>
+In-Reply-To: <20250624141355.269056-11-alejandro.lucero-palau@amd.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 2635D35
-X-Stat-Signature: gxxosfe1go81sakf8wk4oyufjwfcqqot
-X-Rspamd-Server: rspamout06
-X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
-X-Session-ID: U2FsdGVkX1/BJkFj3iiMXx1spu5bVz7zXgsz3/uVj+E=
-X-HE-Tag: 1752706234-691707
-X-HE-Meta: U2FsdGVkX199mFPQImK6Q6bFbaNQ6zSd0Vu4iKQAOkfLW8xOMrpzsK+Ge8+vbiy23HjAHtK1Xi+jVu2+z1DVVCD74+l48LoQw8X1ZeAHCMD6XL11fFbVNjjLyUaT1R9ysOiNahEUO8XWTOY4BGDJUP0xLfyZibUi9w4N3bTUzBnrBRixCm+GqwYFobDdnN11XsMVZPB7BvOG8BHtALYkKJ45KshjvzFSSh+npJov1NYxBNrrR95QWg4EptaLGeqTX5H9ZrOjk7A/V7COBA95zN+/9GhzsGmOcnzGI05AeTCubNVO+941ibTx2Yzfl37do3TlJuya1EXiaFSR4+Qi3x2GdLo468dm3dFN7ZrozyU0PAmDxn5pJ72jROHqzp0c
 
-On Wed, 16 Jul 2025 18:49:40 -0400
-Steven Rostedt <rostedt@goodmis.org> wrote:
 
-> GNU Cauldron in Porto, Portugal is having a kernel track (hopefully if it
-> gets accepted). I highly recommend you attending and recommending these
-> features. It's happening two days after Kernel Recipes (I already booked my
-> plane tickets).
+
+On 6/24/25 7:13 AM, alejandro.lucero-palau@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
 > 
+> The first step for a CXL accelerator driver that wants to establish new
+> CXL.mem regions is to register a 'struct cxl_memdev'. That kicks off
+> cxl_mem_probe() to enumerate all 'struct cxl_port' instances in the
+> topology up to the root.
+> 
+> If the port driver has not attached yet the expectation is that the
+> driver waits until that link is established. The common cxl_pci driver
+> has reason to keep the 'struct cxl_memdev' device attached to the bus
+> until the root driver attaches. An accelerator may want to instead defer
+> probing until CXL resources can be acquired.
+> 
+> Use the @endpoint attribute of a 'struct cxl_memdev' to convey when a
+> accelerator driver probing should be deferred vs failed. Provide that
+> indication via a new cxl_acquire_endpoint() API that can retrieve the
+> probe status of the memdev.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
 
-Bah, I forgot you are on the abstract so you already know about this! ;-)
+Just noticed this. The subject needs a fix
 
-[ But I might as well advertise to let other kernel devs know ]
+s/cx/cxl/
 
--- Steve
+DJ
+
+> ---
+>  drivers/cxl/core/memdev.c | 42 +++++++++++++++++++++++++++++++++++++++
+>  drivers/cxl/core/port.c   |  2 +-
+>  drivers/cxl/mem.c         |  7 +++++--
+>  include/cxl/cxl.h         |  2 ++
+>  4 files changed, 50 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
+> index f43d2aa2928e..e2c6b5b532db 100644
+> --- a/drivers/cxl/core/memdev.c
+> +++ b/drivers/cxl/core/memdev.c
+> @@ -1124,6 +1124,48 @@ struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
+>  }
+>  EXPORT_SYMBOL_NS_GPL(devm_cxl_add_memdev, "CXL");
+>  
+> +/*
+> + * Try to get a locked reference on a memdev's CXL port topology
+> + * connection. Be careful to observe when cxl_mem_probe() has deposited
+> + * a probe deferral awaiting the arrival of the CXL root driver.
+> + */
+> +struct cxl_port *cxl_acquire_endpoint(struct cxl_memdev *cxlmd)
+> +{
+> +	struct cxl_port *endpoint;
+> +	int rc = -ENXIO;
+> +
+> +	device_lock(&cxlmd->dev);
+> +
+> +	endpoint = cxlmd->endpoint;
+> +	if (!endpoint)
+> +		goto err;
+> +
+> +	if (IS_ERR(endpoint)) {
+> +		rc = PTR_ERR(endpoint);
+> +		goto err;
+> +	}
+> +
+> +	device_lock(&endpoint->dev);
+> +	if (!endpoint->dev.driver)
+> +		goto err_endpoint;
+> +
+> +	return endpoint;
+> +
+> +err_endpoint:
+> +	device_unlock(&endpoint->dev);
+> +err:
+> +	device_unlock(&cxlmd->dev);
+> +	return ERR_PTR(rc);
+> +}
+> +EXPORT_SYMBOL_NS_GPL(cxl_acquire_endpoint, "CXL");
+> +
+> +void cxl_release_endpoint(struct cxl_memdev *cxlmd, struct cxl_port *endpoint)
+> +{
+> +	device_unlock(&endpoint->dev);
+> +	device_unlock(&cxlmd->dev);
+> +}
+> +EXPORT_SYMBOL_NS_GPL(cxl_release_endpoint, "CXL");
+> +
+>  static void sanitize_teardown_notifier(void *data)
+>  {
+>  	struct cxl_memdev_state *mds = data;
+> diff --git a/drivers/cxl/core/port.c b/drivers/cxl/core/port.c
+> index 9acf8c7afb6b..fa10a1643e4c 100644
+> --- a/drivers/cxl/core/port.c
+> +++ b/drivers/cxl/core/port.c
+> @@ -1563,7 +1563,7 @@ static int add_port_attach_ep(struct cxl_memdev *cxlmd,
+>  		 */
+>  		dev_dbg(&cxlmd->dev, "%s is a root dport\n",
+>  			dev_name(dport_dev));
+> -		return -ENXIO;
+> +		return -EPROBE_DEFER;
+>  	}
+>  
+>  	struct cxl_port *parent_port __free(put_cxl_port) =
+> diff --git a/drivers/cxl/mem.c b/drivers/cxl/mem.c
+> index 7f39790d9d98..cda0b2ff73ce 100644
+> --- a/drivers/cxl/mem.c
+> +++ b/drivers/cxl/mem.c
+> @@ -148,14 +148,17 @@ static int cxl_mem_probe(struct device *dev)
+>  		return rc;
+>  
+>  	rc = devm_cxl_enumerate_ports(cxlmd);
+> -	if (rc)
+> +	if (rc) {
+> +		cxlmd->endpoint = ERR_PTR(rc);
+>  		return rc;
+> +	}
+>  
+>  	struct cxl_port *parent_port __free(put_cxl_port) =
+>  		cxl_mem_find_port(cxlmd, &dport);
+>  	if (!parent_port) {
+>  		dev_err(dev, "CXL port topology not found\n");
+> -		return -ENXIO;
+> +		cxlmd->endpoint = ERR_PTR(-EPROBE_DEFER);
+> +		return -EPROBE_DEFER;
+>  	}
+>  
+>  	if (cxl_pmem_size(cxlds) && IS_ENABLED(CONFIG_CXL_PMEM)) {
+> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
+> index fcdf98231ffb..2928e16a62e2 100644
+> --- a/include/cxl/cxl.h
+> +++ b/include/cxl/cxl.h
+> @@ -234,4 +234,6 @@ int cxl_map_component_regs(const struct cxl_register_map *map,
+>  void cxl_set_capacity(struct cxl_dev_state *cxlds, u64 capacity);
+>  struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
+>  				       struct cxl_dev_state *cxlmds);
+> +struct cxl_port *cxl_acquire_endpoint(struct cxl_memdev *cxlmd);
+> +void cxl_release_endpoint(struct cxl_memdev *cxlmd, struct cxl_port *endpoint);
+>  #endif /* __CXL_CXL_H__ */
+
 
