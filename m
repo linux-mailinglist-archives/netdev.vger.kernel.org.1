@@ -1,230 +1,132 @@
-Return-Path: <netdev+bounces-207403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3DFBB07004
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 10:15:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91590B07053
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 10:22:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC4313B5BDC
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 08:14:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D69EB5828FD
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 08:22:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3554628ECD7;
-	Wed, 16 Jul 2025 08:14:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 469C92E9EC4;
+	Wed, 16 Jul 2025 08:22:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="Wy2dWO9Q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YxNr8dV8"
 X-Original-To: netdev@vger.kernel.org
-Received: from nbd.name (nbd.name [46.4.11.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52F3728E575;
-	Wed, 16 Jul 2025 08:14:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09BCE2EA46E;
+	Wed, 16 Jul 2025 08:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752653699; cv=none; b=ka/jTTrj1UKtUaAgn1FdzyAy1ULL3eKv8rQUzX00fPTvV5YcKYoiRUI9AHG9r35v9jCvsckQmqIti0xv1gQGFLmqn7bg9RnZvdyugthUoKYTHyWolukQQc52y7zCR69WPCTwErMt3z/qVeni/DdUAHhYNor4YTjCXLTHTmHtPmM=
+	t=1752654135; cv=none; b=mHpaB8+fkS4+IHaF3mDIJlpwshx6wJhCd+d0hJkis80sEgYdtqzhfaxzhbBHrr8XOIaG8PjCC6Oc78524+/q1M1F2NBzOGdUVl8EHDTBtTbRu8PoksZqtHk2NuiH3E1eMs6EFjINNUXSIk3H8PYTbGVZ2MMLgEmjqFnT8HGgwoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752653699; c=relaxed/simple;
-	bh=2LCnUyql/OQPcoVL4gnTJkuVMTkAskSzF6kC7RYglks=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oR+X44Zl+B0s6qeS8I/4L7YT/77qkNswCpM8izP5w0JPqLUSX7Lyx3V3PBmgxSPJOwE9EeZWxE9xox29znsLt+zzyV4N4+Rhvtvw4O2x21QVtzs/k8pAiNMVApksOr6u+IomoA2RVL5OK54JQtgBdzyEF8Qw9MZ8zgk1h+zJwQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=Wy2dWO9Q; arc=none smtp.client-ip=46.4.11.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
-	s=20160729; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
-	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=9HV6YslljJs9VslHk9RePk1lTfD81Kde8X8Ykcwrz9c=; b=Wy2dWO9QYmZqgRMZQoYYmI/23s
-	jPV2mQR2cqkOUOQDqqKUHr7vrZzm+gDsXiTce0H14r20pzjEI4aWkYmES8PQF3y1M+jyQMarJyLN5
-	A8+zPrb8+kITwZLedQh1KSX1dtJ3uNs9z47ZXy4ztp/rQ4W9AGsrbXxWbM/BTygo5KpM=;
-Received: from p5b2062ed.dip0.t-ipconnect.de ([91.32.98.237] helo=Maecks.lan)
-	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
-	(Exim 4.96)
-	(envelope-from <nbd@nbd.name>)
-	id 1ubxHq-00CVWY-0S;
-	Wed, 16 Jul 2025 10:14:46 +0200
-From: Felix Fietkau <nbd@nbd.name>
-To: netdev@vger.kernel.org,
-	Michal Ostrowski <mostrows@earthlink.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1752654135; c=relaxed/simple;
+	bh=cnOqqRyy8qapop2aj8Jh9qYqoK7bu5+GswzkuuErweY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rtJBeCm5s5kuJmAOScIoiLc5T9b5GHka/8DkNOf4zur/j/RzxnjnpJEdYHL6gH0o1wFs9Ok3eY7qtFfN51Ntc/ua6NBYDGllDRmorR33zBB1kkXWtFF/iAnXMS8iE4D6NPox0iOmEH8C/cq7Y0SPK3EsJAVKdbGSb0fbdOAAd5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YxNr8dV8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAA6EC4CEF0;
+	Wed, 16 Jul 2025 08:22:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752654134;
+	bh=cnOqqRyy8qapop2aj8Jh9qYqoK7bu5+GswzkuuErweY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YxNr8dV8utIpB32/zJ1R+YimFzAuZwRROQZBqfJHoDS1ouPaDNML/T8mkaNtZMorC
+	 kPTe0Y1t6Iey7AUMZP7C5z0XxnTIjBMTw/w+h+6SFXB0B1AwAfN33HXIgy28zIE6Py
+	 RyPQ33zcZhyWh/Zbgw+mAuB4HhAhx+GgIkjvmpgzyIc9k5uJadbiBJyJ3TPXEiPZ+N
+	 gt+wfW/KeOkvC+pDiV/pYPoCG4OGTZgGyqAmSuTJyH1V1IuwYfH7Up4a+Z11t3vYYC
+	 a6VuvwUWYzY1djopIhfce3XbH4hsyUXakJfB45GOZK8PpEl6aE56MoeJ3BsFJ2cRnI
+	 MNn3jyoDwNqiw==
+Date: Wed, 16 Jul 2025 09:22:09 +0100
+From: Simon Horman <horms@kernel.org>
+To: "G Thomas, Rohan" <rohan.g.thomas@altera.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2] net: pppoe: implement GRO support
-Date: Wed, 16 Jul 2025 10:14:41 +0200
-Message-ID: <20250716081441.93088-1-nbd@nbd.name>
-X-Mailer: git-send-email 2.50.1
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Romain Gantois <romain.gantois@bootlin.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Matthew Gerlach <matthew.gerlach@altera.com>
+Subject: Re: [PATCH net-next 3/3] net: stmmac: Set CIC bit only for TX queues
+ with COE
+Message-ID: <20250716082209.GH721198@horms.kernel.org>
+References: <20250714-xgmac-minor-fixes-v1-0-c34092a88a72@altera.com>
+ <20250714-xgmac-minor-fixes-v1-3-c34092a88a72@altera.com>
+ <20250714134012.GN721198@horms.kernel.org>
+ <9f4acd69-12ff-4b2f-bb3a-e8d401b23238@altera.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9f4acd69-12ff-4b2f-bb3a-e8d401b23238@altera.com>
 
-Only handles packets where the pppoe header length field matches the exact
-packet length. Significantly improves rx throughput.
+On Tue, Jul 15, 2025 at 07:14:21PM +0530, G Thomas, Rohan wrote:
+> Hi Simon,
+> 
+> Thanks for reviewing the patch.
+> 
+> On 7/14/2025 7:10 PM, Simon Horman wrote:
+> > On Mon, Jul 14, 2025 at 03:59:19PM +0800, Rohan G Thomas via B4 Relay wrote:
+> > > From: Rohan G Thomas <rohan.g.thomas@altera.com>
+> > > 
+> > > Currently, in the AF_XDP transmit paths, the CIC bit of
+> > > TX Desc3 is set for all packets. Setting this bit for
+> > > packets transmitting through queues that don't support
+> > > checksum offloading causes the TX DMA to get stuck after
+> > > transmitting some packets. This patch ensures the CIC bit
+> > > of TX Desc3 is set only if the TX queue supports checksum
+> > > offloading.
+> > > 
+> > > Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
+> > > Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
+> > 
+> > Hi Rohan,
+> > 
+> > I notice that stmmac_xmit() handles a few other cases where
+> > checksum offload should not be requested via stmmac_prepare_tx_desc:
+> > 
+> >          csum_insertion = (skb->ip_summed == CHECKSUM_PARTIAL);
+> >          /* DWMAC IPs can be synthesized to support tx coe only for a few tx
+> >           * queues. In that case, checksum offloading for those queues that don't
+> >           * support tx coe needs to fallback to software checksum calculation.
+> >           *
+> >           * Packets that won't trigger the COE e.g. most DSA-tagged packets will
+> >           * also have to be checksummed in software.
+> >           */
+> >          if (csum_insertion &&
+> >              (priv->plat->tx_queues_cfg[queue].coe_unsupported ||
+> >               !stmmac_has_ip_ethertype(skb))) {
+> >                  if (unlikely(skb_checksum_help(skb)))
+> >                          goto dma_map_err;
+> >                  csum_insertion = !csum_insertion;
+> >          }
+> > 
+> > Do we need to care about them in stmmac_xdp_xmit_zc()
+> > and stmmac_xdp_xmit_xdpf() too?
+> 
+> This patch only addresses avoiding the TX DMA hang by ensuring the CIC
+> bit is only set when the queue supports checksum offload. For DSA tagged
+> packets checksum offloading is not supported by the DWMAC IPs but no TX
+> DMA hang. AFAIK, currently AF_XDP paths don't have equivalent handling
+> like skb_checksum_help(), since they operate on xdp buffers. So this
+> patch doesn't attempt to implement a sw fallback but just avoids DMA
+> stall.
 
-When running NAT traffic through a MediaTek MT7621 devices from a host
-behind PPPoE to a host directly connected via ethernet, the TCP throughput
-that the device is able to handle improves from ~130 Mbit/s to ~630 Mbit/s,
-using fraglist GRO.
+Ok, fair enough.
 
-Signed-off-by: Felix Fietkau <nbd@nbd.name>
----
-v2: fix compile error
-
- drivers/net/ppp/pppoe.c | 104 +++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 103 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ppp/pppoe.c b/drivers/net/ppp/pppoe.c
-index 410effa42ade..5d35eafd06df 100644
---- a/drivers/net/ppp/pppoe.c
-+++ b/drivers/net/ppp/pppoe.c
-@@ -77,6 +77,7 @@
- #include <net/net_namespace.h>
- #include <net/netns/generic.h>
- #include <net/sock.h>
-+#include <net/gro.h>
- 
- #include <linux/uaccess.h>
- 
-@@ -435,7 +436,7 @@ static int pppoe_rcv(struct sk_buff *skb, struct net_device *dev,
- 	if (skb->len < len)
- 		goto drop;
- 
--	if (pskb_trim_rcsum(skb, len))
-+	if (!skb_is_gso(skb) && pskb_trim_rcsum(skb, len))
- 		goto drop;
- 
- 	ph = pppoe_hdr(skb);
-@@ -1173,6 +1174,105 @@ static struct pernet_operations pppoe_net_ops = {
- 	.size = sizeof(struct pppoe_net),
- };
- 
-+static u16
-+compare_pppoe_header(struct pppoe_hdr *phdr, struct pppoe_hdr *phdr2)
-+{
-+	return (__force __u16)((phdr->sid ^ phdr2->sid) |
-+			       (phdr->tag[0].tag_type ^ phdr2->tag[0].tag_type));
-+}
-+
-+static __be16 pppoe_hdr_proto(struct pppoe_hdr *phdr)
-+{
-+	switch (phdr->tag[0].tag_type) {
-+	case cpu_to_be16(PPP_IP):
-+		return cpu_to_be16(ETH_P_IP);
-+	case cpu_to_be16(PPP_IPV6):
-+		return cpu_to_be16(ETH_P_IPV6);
-+	default:
-+		return 0;
-+	}
-+
-+}
-+
-+static struct sk_buff *pppoe_gro_receive(struct list_head *head,
-+					 struct sk_buff *skb)
-+{
-+	const struct packet_offload *ptype;
-+	unsigned int hlen, off_pppoe;
-+	struct sk_buff *pp = NULL;
-+	struct pppoe_hdr *phdr;
-+	struct sk_buff *p;
-+	__be16 type;
-+	int flush = 1;
-+
-+	off_pppoe = skb_gro_offset(skb);
-+	hlen = off_pppoe + sizeof(*phdr) + 2;
-+	phdr = skb_gro_header(skb, hlen, off_pppoe);
-+	if (unlikely(!phdr))
-+		goto out;
-+
-+	/* ignore packets with padding or invalid length */
-+	if (skb_gro_len(skb) != be16_to_cpu(phdr->length) + hlen - 2)
-+		goto out;
-+
-+	NAPI_GRO_CB(skb)->network_offsets[NAPI_GRO_CB(skb)->encap_mark] = hlen;
-+
-+	type = pppoe_hdr_proto(phdr);
-+	if (!type)
-+		goto out;
-+
-+	ptype = gro_find_receive_by_type(type);
-+	if (!ptype)
-+		goto out;
-+
-+	flush = 0;
-+
-+	list_for_each_entry(p, head, list) {
-+		struct pppoe_hdr *phdr2;
-+
-+		if (!NAPI_GRO_CB(p)->same_flow)
-+			continue;
-+
-+		phdr2 = (struct pppoe_hdr *)(p->data + off_pppoe);
-+		if (compare_pppoe_header(phdr, phdr2))
-+			NAPI_GRO_CB(p)->same_flow = 0;
-+	}
-+
-+	skb_gro_pull(skb, sizeof(*phdr) + 2);
-+	skb_gro_postpull_rcsum(skb, phdr, sizeof(*phdr) + 2);
-+
-+	pp = ptype->callbacks.gro_receive(head, skb);
-+
-+out:
-+	skb_gro_flush_final(skb, pp, flush);
-+
-+	return pp;
-+}
-+
-+static int pppoe_gro_complete(struct sk_buff *skb, int nhoff)
-+{
-+	struct pppoe_hdr *phdr = (struct pppoe_hdr *)(skb->data + nhoff);
-+	__be16 type = pppoe_hdr_proto(phdr);
-+	struct packet_offload *ptype;
-+	int err = -ENOENT;
-+
-+	ptype = gro_find_complete_by_type(type);
-+	if (ptype)
-+		err = ptype->callbacks.gro_complete(skb, nhoff +
-+						    sizeof(*phdr) + 2);
-+
-+	return err;
-+}
-+
-+static struct packet_offload pppoe_packet_offload __read_mostly = {
-+	.type = cpu_to_be16(ETH_P_PPP_SES),
-+	.priority = 10,
-+	.callbacks = {
-+		.gro_receive = pppoe_gro_receive,
-+		.gro_complete = pppoe_gro_complete,
-+	},
-+};
-+
- static int __init pppoe_init(void)
- {
- 	int err;
-@@ -1189,6 +1289,7 @@ static int __init pppoe_init(void)
- 	if (err)
- 		goto out_unregister_pppoe_proto;
- 
-+	dev_add_offload(&pppoe_packet_offload);
- 	dev_add_pack(&pppoes_ptype);
- 	dev_add_pack(&pppoed_ptype);
- 	register_netdevice_notifier(&pppoe_notifier);
-@@ -1208,6 +1309,7 @@ static void __exit pppoe_exit(void)
- 	unregister_netdevice_notifier(&pppoe_notifier);
- 	dev_remove_pack(&pppoed_ptype);
- 	dev_remove_pack(&pppoes_ptype);
-+	dev_remove_offload(&pppoe_packet_offload);
- 	unregister_pppox_proto(PX_PROTO_OE);
- 	proto_unregister(&pppoe_sk_proto);
- 	unregister_pernet_device(&pppoe_net_ops);
--- 
-2.50.1
-
+As per Andrew's advice elsewhere in this thread.
+This patch also looks like it should be a fix for net,
+and should have a Fixes tag.
 
