@@ -1,112 +1,138 @@
-Return-Path: <netdev+bounces-207482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207483-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A03EB07849
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 16:39:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C20BDB07851
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 16:41:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45EAA7B842D
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 14:37:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E26E4164EAC
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 14:41:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9BC225C810;
-	Wed, 16 Jul 2025 14:38:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC02525C822;
+	Wed, 16 Jul 2025 14:40:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q94mj1Pi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CxnAO2U+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f196.google.com (mail-yb1-f196.google.com [209.85.219.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A634126057A
-	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 14:38:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC85119F40A;
+	Wed, 16 Jul 2025 14:40:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752676733; cv=none; b=JMUU4HXsfxqeIfedr/hoj6bx9j926AGHVSOmCJGz/n5ZL1SaFTr6+JjQh84O9IbWn+U1zgy5gV4vz/MqO2Zv8C20nWo89kJ4VPmwwGse961NddfoiYA/fCH6ekKqaKnR9aNdsoKrMOFpU76CnbvlC4Cd9HiQLKoUdlexraSFy9U=
+	t=1752676859; cv=none; b=MPK2yRTKQ3t1rPj4aMDp78WfbJMWskxF0c/rDhSjWwS9I4fAsO/ojqApuho9kZAn1rYCzd7uWrS9A0MayIYGS9qUE7PD04ysCOhkK16kEQmBO7h2cWabTScx3W+cuhIEX3cpO1jh4RkYDo6EpoCNHbcjfLTW0d6fjo9DSxE5HYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752676733; c=relaxed/simple;
-	bh=IMJWkGnLWAoHHACStORaqYMu+6knT/PMv1odls4h4Dc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tTGR02H1RZ5UhxpxJF4xpqm8ZkOK84zf3oXkRQvaB4ZtDypj1YS7NCxbplIX1Pq7+Qnwok64O8VSnMuqlJh0Q0Bn+PhSmI3C97XfcytX7Kywv8IJHgVB1/mUApfi3+3O9W2gle21a9ovSSpVB/Y33QtynOqEVAo1YQikSgpOp90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q94mj1Pi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1DC2C4CEE7;
-	Wed, 16 Jul 2025 14:38:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752676733;
-	bh=IMJWkGnLWAoHHACStORaqYMu+6knT/PMv1odls4h4Dc=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Q94mj1PiokQuzRCKtKf3tPwdIgdAtyPBoSp0rAZl5ruIlJ9Gd2aRMJqYLwQmLWCDO
-	 UDLf40qEml6isXcGRPDiUxgqNtfbDifw/3wJsgx5jV9yEK6J3Yons0a9KknO4WchoR
-	 tSUuz83e/r7SzjWyvi71PjAqervRicXJ+v9UdIwoxayFeh4xSzKbzDiIF4batHfX9y
-	 uOQ0yx9UhATJoWuTbiOtjMLynh60fVKycuQzMIct1KcQVEIoi9iEpgvY//Kf6oiqLJ
-	 cb4WwGDejOhRkcmAKcsPJPM4PV15SXWLuQmNYYTuuFcq88HsVIMqDoQyikOR8T01ov
-	 vF6lC816nLFHQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	borisp@nvidia.com,
-	john.fastabend@gmail.com
-Subject: [PATCH net] tls: always refresh the queue when reading sock
-Date: Wed, 16 Jul 2025 07:38:50 -0700
-Message-ID: <20250716143850.1520292-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1752676859; c=relaxed/simple;
+	bh=pfwYeQ0lSxFqkmbHNbtiMcwWyHLPm2mIdKPW8D3rFWA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XSSRLPHLdQvqxSWtKh3Xf20CFYKqbdmj6TVhBAZm2Vv3a+SEYrfAp5sVMlrKSfEOWqQ4TlNXWPObFx8Pkk56aSDck2V2YArz7P0Ad87CYi7EujIeqaMDRPikdF1AADFqQLKP2JvvLQqxlemp0z8iwSQ9mb31rsz6a0skWB+BEz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CxnAO2U+; arc=none smtp.client-ip=209.85.219.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f196.google.com with SMTP id 3f1490d57ef6-e8bd171826cso315362276.3;
+        Wed, 16 Jul 2025 07:40:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752676856; x=1753281656; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pfwYeQ0lSxFqkmbHNbtiMcwWyHLPm2mIdKPW8D3rFWA=;
+        b=CxnAO2U+dEL/tkywJlpiZnh46YQfJZFgAQ2VXFpsR/EhweHqf5uSjgJlgpX0hFH5jz
+         cMWZB8iJKS1KrR24wpDjabEFLJIcIwMpJJDPtUkq+zuenicwONYDOFNFqbZsIlFwT/An
+         dzO0V3VzlO6ZSgycTY1+JkIpuZUM1UgtJZdqgL2DDINWcKr4hFdVssLRioxB/jjS2Yos
+         70qqUgKU1b/QPSs2ERdZGiHGG/r9aD1RR7HjFrmAMetU+IXvGx5c71lSfjRb339DG1cV
+         iP1mR7cUH5oEJWt0OkKYqrC9wB7IyzHAzy1mJm8JMkAc0DGzSHUZa1x4eDBaD2uUcby1
+         VW3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752676856; x=1753281656;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pfwYeQ0lSxFqkmbHNbtiMcwWyHLPm2mIdKPW8D3rFWA=;
+        b=gkUExtFWo8OzdS6+grI/8SRU6p2ZyfeXJpv//JTKTdCSlquoYPwc45/epyDx4n0v2r
+         YDoGmbuHiwfszIw6Df1KROyEIO5/RYluW4leNOJI823EzsN25uRXHliFA+1WhlO8ZbX4
+         ISTol/J0Rbr0WR8NniZB5HxYivAITj79ppbkhJpG19NEQZVSbYE1dJwcPokQUtaGv7sQ
+         FgkJajn2yZFDf940xtJvk3SFokiupK8BU46131j4XKfli4hLih9J0xzd7zjrwQCX0tof
+         aO+u2IFAwrsaTAGx8RuDO/OY/UnZpxzAiLX/cqVxnSdB9EUEdIQ1eAKzeoRdJiKrJxc6
+         sWaw==
+X-Forwarded-Encrypted: i=1; AJvYcCU2YUWbOzRt68e4k6cbxN+cYqjbS1Vjx3vspDpnCULkfmkYs419t9GwdaWo5+/lHHI3MEDMNvfsF3iEz+7a@vger.kernel.org, AJvYcCU8aDc4uAsVlX3HEmownYcqJIurqz1g+iFuCrT1Hxj1hN+jPTxiZqu9pifjTJmZ0bxh9s+3YLRx@vger.kernel.org, AJvYcCUR701OLNhTic/i0UVnJx6uKMovU09sWvsw+0B1NVIfCDyPMp8lX7mNua6wR7kVhCvdVXw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYrTlwbCActBEG9qS345Ar2XUtg1ewUNNuqI/uNn5FyD6/N7SS
+	2YRVgpYu7G+6xXBftRCXs4+71csYfUMuL8880bJPv5t3cA6TyH3Zhlfk8Qws7wMOaoXwWwP8DYO
+	6sTYexg/krcLZaC2M2GmjoBo7zg2263W2GpQ7q5pLYA==
+X-Gm-Gg: ASbGncvLivG/ftp0L90vALGXQ+CpGpdRHVRg83USKiDy7pFXMOSMYTjyH4v26KAWHlr
+	llVHlHhP+z0LDa2NidILZ8OAs2Wk3PdesgTtC86VelQlEqyaBK0efVBbd3blmozOpRzTC9UgbhN
+	my0pD0VcG8qmc+O0uBjVhCQqY37vQtiJgyXv0WLxq8wYrbmVDFv2d+nAATC4EqUJSluMpwKXPyL
+	URJG0o=
+X-Google-Smtp-Source: AGHT+IEEsGkjeJRr+4AxB4v8yEdFBdHjv0f7mCtSLB+EbeD9EY0YJN/yeyk9YT3I1MCKXufJeinGe9qxBV4f6r3UUfs=
+X-Received: by 2002:a05:690c:3693:b0:710:f09c:b00f with SMTP id
+ 00721157ae682-7183712dc18mr40453547b3.15.1752676855537; Wed, 16 Jul 2025
+ 07:40:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250703121521.1874196-1-dongml2@chinatelecom.cn>
+ <20250703121521.1874196-3-dongml2@chinatelecom.cn> <CAADnVQKP1-gdmq1xkogFeRM6o3j2zf0Q8Atz=aCEkB0PkVx++A@mail.gmail.com>
+ <45f4d349-7b08-45d3-9bec-3ab75217f9b6@linux.dev> <CAADnVQ+7NhegoZGHkiRyNO8ywks3ssPzQd6ipQzumZsWUHJALg@mail.gmail.com>
+In-Reply-To: <CAADnVQ+7NhegoZGHkiRyNO8ywks3ssPzQd6ipQzumZsWUHJALg@mail.gmail.com>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Wed, 16 Jul 2025 22:40:54 +0800
+X-Gm-Features: Ac12FXwhFnOEikntgmWcObUoZ2zctoMhZNba-RlPeEbc7K2an5Dl4pIZ79cUM88
+Message-ID: <CADxym3bT8P796Qqcd0mtJwR09bgs0Bc45GuPkb39ELLsg1MQ_g@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2 02/18] x86,bpf: add bpf_global_caller for
+ global trampoline
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Menglong Dong <menglong.dong@linux.dev>, Steven Rostedt <rostedt@goodmis.org>, 
+	Jiri Olsa <jolsa@kernel.org>, bpf <bpf@vger.kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	LKML <linux-kernel@vger.kernel.org>, Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-After recent changes in net-next TCP compacts skbs much more
-aggressively. This unearthed a bug in TLS where we may try
-to operate on an old skb when checking if all skbs in the
-queue have matching decrypt state and geometry.
+On Wed, Jul 16, 2025 at 12:35=E2=80=AFAM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
+>
+> On Tue, Jul 15, 2025 at 1:37=E2=80=AFAM Menglong Dong <menglong.dong@linu=
+x.dev> wrote:
+> >
+> >
+> > On 7/15/25 10:25, Alexei Starovoitov wrote:
+[......]
+> >
+> > According to my benchmark, it has ~5% overhead to save/restore
+> > *5* variants when compared with *0* variant. The save/restore of regs
+> > is fast, but it still need 12 insn, which can produce ~6% overhead.
+>
+> I think it's an ok trade off, because with one global trampoline
+> we do not need to call rhashtable lookup before entering bpf prog.
+> bpf prog will do it on demand if/when it needs to access arguments.
+> This will compensate for a bit of lost performance due to extra save/rest=
+ore.
 
-    BUG: KASAN: slab-use-after-free in tls_strp_check_rcv+0x898/0x9a0 [tls]
-    (net/tls/tls_strp.c:436 net/tls/tls_strp.c:530 net/tls/tls_strp.c:544)
-    Read of size 4 at addr ffff888013085750 by task tls/13529
+I just think of another benefit of defining multiple global trampolines
+here, which you may be interested in. In the feature, we can make
+the global trampoline supports functions that have 7+ arguments.
+If we use _one_ global trampoline, it's not possible, as we can't handle
+the arguments in the stack. However, it's possible if we define
+different global trampoline for the functions that have different arguments
+count, and what we need to do in the feature is do some adjustment
+to CALLER_DEFINE().
 
-    CPU: 2 UID: 0 PID: 13529 Comm: tls Not tainted 6.16.0-rc5-virtme
-    Call Trace:
-     kasan_report+0xca/0x100
-     tls_strp_check_rcv+0x898/0x9a0 [tls]
-     tls_rx_rec_wait+0x2c9/0x8d0 [tls]
-     tls_sw_recvmsg+0x40f/0x1aa0 [tls]
-     inet_recvmsg+0x1c3/0x1f0
+Wish you are interested in this idea :)
 
-Always reload the queue, fast path is to have the record in the queue
-when we wake, anyway (IOW the path going down "if !strp->stm.full_len").
+Thanks!
+Menglong Dong
 
-Fixes: 0d87bbd39d7f ("tls: strp: make sure the TCP skbs do not have overlapping data")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: borisp@nvidia.com
-CC: john.fastabend@gmail.com
----
- net/tls/tls_strp.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/net/tls/tls_strp.c b/net/tls/tls_strp.c
-index 65b0da6fdf6a..095cf31bae0b 100644
---- a/net/tls/tls_strp.c
-+++ b/net/tls/tls_strp.c
-@@ -512,9 +512,8 @@ static int tls_strp_read_sock(struct tls_strparser *strp)
- 	if (inq < strp->stm.full_len)
- 		return tls_strp_read_copy(strp, true);
- 
-+	tls_strp_load_anchor_with_queue(strp, inq);
- 	if (!strp->stm.full_len) {
--		tls_strp_load_anchor_with_queue(strp, inq);
--
- 		sz = tls_rx_msg_size(strp, strp->anchor);
- 		if (sz < 0) {
- 			tls_strp_abort_strp(strp, sz);
--- 
-2.50.1
-
+>
+> PS
+> pls don't add your chinatelecom.cn email in cc.
+> gmail just cannot deliver there and it's annoying to keep deleting
+> it manually in every reply.
 
