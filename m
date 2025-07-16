@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-207580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BA62B07F17
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 22:46:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3B81B07F24
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 22:49:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31FF93B06A3
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 20:45:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC3BD7B49CB
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 20:48:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F08B1E3762;
-	Wed, 16 Jul 2025 20:46:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC2EB274FFE;
+	Wed, 16 Jul 2025 20:49:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="CV5LG6JA"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="ij1pFQBV"
 X-Original-To: netdev@vger.kernel.org
-Received: from AS8PR03CU001.outbound.protection.outlook.com (mail-westeuropeazon11012037.outbound.protection.outlook.com [52.101.71.37])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011071.outbound.protection.outlook.com [52.101.70.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA4F1CD2C;
-	Wed, 16 Jul 2025 20:46:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.71.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAAE91E3762;
+	Wed, 16 Jul 2025 20:49:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.71
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752698780; cv=fail; b=a3mxoCX7n2R56K7MDl2sHzrbzIMp7OweQXva68i4S7KMoyTcYiHi5lA1hJM7A6QfIQ3kOrLWGoCM6Fndh0e7J59KhfP+75shNRtfmvTJGyHcAwYL3c3b81g/ex3YxCXzjrVb0DqVcePd5YLiYtJJThg9lfVE2TEpI/29xb36UKg=
+	t=1752698979; cv=fail; b=MzaK8ZRvGRmGO0qmx15DroFc1le7wajFp4kNmR/sYhBZrzle+jQ4BqtsLvn/cPajvcmG2M7z8cw6EhMrD3Y1HGH6+k3AutrlkxlSBInulAZI5JRnozHbHvI5J6CJBjZAxi+nic6TmKY18jQ7au/n1Gkyxctyni4+o9gLtYHCPug=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752698780; c=relaxed/simple;
-	bh=VWJXuCPYZYYgBOB5vlXHO2GlQZRZwgqY2CzWSl2TFvA=;
+	s=arc-20240116; t=1752698979; c=relaxed/simple;
+	bh=CZeoWGcEUm5j52ih3Im8kKjnJr8kLPe/+URPkSsFRiU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=FwwlU49DMlnjGqvx59s4SjoDIXVgDVF9cWEgXh66p9OWl5trfkWiV+Yl/drkOM04CeGUnebmNAg6kfh7sWjh0H0HhZfiZRx5NumGUxpmS3YnZRBtgZSpTIaifq4OLFWpkpvVmPl3iyEO8Zfsk4lI3nkvoNXtX8rHFZXhijyjUg8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=CV5LG6JA; arc=fail smtp.client-ip=52.101.71.37
+	 Content-Disposition:In-Reply-To:MIME-Version; b=HIgLHaGOfLyKSRgpBxS/6tIACZIq2ndb+JSoayggo/5EInw83OuJXflfC0JgjH0/yXJ6nmXxD0raJQ+AbiuAju5hMvoCaLLVdQV8cDi9eq8keLvVQp8LXSengj3bLZI/l2HOsGrM4HlCpNgvAjpvuG147rBb4oAf1RNi4zYxCK8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=ij1pFQBV; arc=fail smtp.client-ip=52.101.70.71
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Lns0w/g/0KUmFbOeIpcetdO3V7CrfraJVILN92LLWtLpDlGd1UTdqr/bympmWd2m5MIXP+ZNkifBQNe+WD0hxXwKUEx0qpwkjD2YS8y0vk3n4bCX+swGyQZUN+n81Vok9Qvv9CTvdO7xfbpxGSiUJR/TfUbhU80XxZ5EITq+addU0kulcfOKu2SWjOPg0Hb5pnbejd8YPuIMS4jdIkXzl5b79DwVnVD6UzzXYwofskpwvmhgFYlxpnplFochVRGlHrRPBvMhpJH7mRL46eP6K5v2rVyRRlKQNm3KGUFcdbSkvyFlwpMtCLN+exe5FkB9uTFbvJIJPY7mA0bGG4P5Pw==
+ b=vjHO/XMDlS1hlzf6RRmXzhXs81SNeOKSxtuGyTehGFpX5yv6eufC93MfLaxRAjghalsAuCcDopnWIzqgQ8wZrARDk1Uk1MS8Pc0lG/oolQWMq4s8mnUWrmXfw0Z2b4uO6xfg5m36QRWlTkw7MAFwbr9TlFUzUT65AYiqVKeBRxhMoFvJmXQHecOZ4QEOT3XTGtXkHiS9brJOhQDTaYH+yra/AAjIy3LOrrcmUiWpIRoggZlIORqz1pXM6JCKlhAY6/1pwen/LMS8UcMQWSJzOw4Z8SaexyQUpSTfA/4iVQ66quJUy8m+9CUmN9R0Vb/Avq06U4I5zs8Nid90nIi0pg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0KZBm3hCTnx2Qqvs8ymoMYdgWGrfzvQjmd4nHp0SC18=;
- b=SOapuC+GnFX5pyQEEDobX6H7Vf+uzE8X/puN95qGWzQLS5dnHEHFZWw94jSe4KPOr0Io/Zzz5smiOCLWlerhO0EQ7cN2b3RwQDzLLg8wIBV1FPLn7lhYJY4cw8xUKHtXaSUZZq9JFxQROwMGIWyPl2lCmw/qsHzSfSmUGVwlAgb7dg7FBBVSbfOpGLqnAdl+aU1mzJlYx7gfgQ59jeFDJHPcFOvcuVyyLlW1yOkCZzyD35Lc2TbNA6qKM74ea392YvR/y3OdUZMVZheHoGrMYBRguP9S15wO5n/md2iiJEXwTnvzxy06gcY5ed72u9Wr3thM9J0lEkNaKJy1y8WTrA==
+ bh=1IjpgfY6O4oc+jDI0CD8b+9mrYJ0JpNaSed0oZ3y69g=;
+ b=IgjwGQ8c5IGD+w9LenbbUQH/5IkrqRr8Opw+xQ4wXrNlO77un3JXbo3pfWRDP1ngtfr++oHsxqrgzS8uxn6cAwREi0Qj45XEPtIELw5kd8dlSE0uV8FgXjqxVRicKW46W9xxAzSAFzM1cmRwqPXSCjkScqQofG4TWD4I6d58k1d3atpTNpyJ/QgtRklrY2cSrj6Qhmrp4Cfq82+XGTxomDrrTqu1ZTYql0k3YPltoRVzjgRgU5opUmuZVTFgT+4DjsRlrULD6qcxK7hXzboYvU0WJ76kgslUlKQdOcwzJB+mZYBxQab2yJMRU+DYBfKcmZjEHLg+g29bj4APhpg7VA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0KZBm3hCTnx2Qqvs8ymoMYdgWGrfzvQjmd4nHp0SC18=;
- b=CV5LG6JA7H998ja80sV+/ZukZvsjRA0l65U0xT+cY1wSnk3kDaAWnIo2gG6LdniPmEaNF+pZ/v93VcdL1xgEWt0Rj4PshqFdoA3pG/AkVqvmyIbSmXL3Bf7TEnzHaZoE/wRArLj/VTs0FvGkcoKhtdme3pPMpiXNNGjJHvDIL3zZR5b5L0XG5FV3EB5EFPV1nviAVnKUBLkk1QcohVquRxdcMQwDlhzYgLBqaUZMqSBesf7Arv0HQToxva7c/ZacxR5hNzGBdr4Y+fcCpWgbkJgbVH0A8s/bLKEP/QuXpVzhcP4hkDtng5z6kDFEVmG5gOIm3xKNU0NtdduicubOlA==
+ bh=1IjpgfY6O4oc+jDI0CD8b+9mrYJ0JpNaSed0oZ3y69g=;
+ b=ij1pFQBVnseVxg4EPOlAtth9Kta6bXLuCqJCKcWfA1T+D/7/d7kDCou/YZSM0vGevS37yZdUkNnxQtnuKh8E9jH0xCQTjGGlMwJ8nMiFk8LqTF1pNA6eEKCUBA6WimOqanLIS3Rds9utwRgV59BAW0AeaRbvjyLRpYhldkdQUVTLw3A1HD7tYk3cAmgRHkjGef2xRPQclx6ciCt1DBH9RdF4DK7AjEmz/AbPHKtOId/TjHRHmPURV8ZVzyKZn2HPnL//QdIZpJ2S1OK96Lm9xqjG98c44m4DSKOg1wVs1241KXgmTmCCmcK4SDcjd3rApxFyScsT0wMHHXj6QSJz5w==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
- by VI2PR04MB10192.eurprd04.prod.outlook.com (2603:10a6:800:229::16) with
+ by PAXPR04MB9677.eurprd04.prod.outlook.com (2603:10a6:102:24f::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.32; Wed, 16 Jul
- 2025 20:46:13 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.36; Wed, 16 Jul
+ 2025 20:49:33 +0000
 Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
  ([fe80::9126:a61e:341d:4b06]) by PAXPR04MB9642.eurprd04.prod.outlook.com
  ([fe80::9126:a61e:341d:4b06%5]) with mapi id 15.20.8922.028; Wed, 16 Jul 2025
- 20:46:13 +0000
-Date: Wed, 16 Jul 2025 16:46:07 -0400
+ 20:49:33 +0000
+Date: Wed, 16 Jul 2025 16:49:27 -0400
 From: Frank Li <Frank.li@nxp.com>
 To: Wei Fang <wei.fang@nxp.com>
 Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
@@ -68,16 +68,16 @@ Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
 	fushi.peng@nxp.com, devicetree@vger.kernel.org,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 	imx@lists.linux.dev, kernel@pengutronix.de
-Subject: Re: [PATCH v2 net-next 09/14] net: enetc: save the parsed
- information of PTP packet to skb->cb
-Message-ID: <aHgPjwiIWfhYnPyC@lizhi-Precision-Tower-5810>
+Subject: Re: [PATCH v2 net-next 10/14] net: enetc: Add
+ enetc_update_ptp_sync_msg() to process PTP sync packet
+Message-ID: <aHgQV8O8FPZO/cdT@lizhi-Precision-Tower-5810>
 References: <20250716073111.367382-1-wei.fang@nxp.com>
- <20250716073111.367382-10-wei.fang@nxp.com>
+ <20250716073111.367382-11-wei.fang@nxp.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250716073111.367382-10-wei.fang@nxp.com>
-X-ClientProxiedBy: AM0PR01CA0106.eurprd01.prod.exchangelabs.com
- (2603:10a6:208:10e::47) To PAXPR04MB9642.eurprd04.prod.outlook.com
+In-Reply-To: <20250716073111.367382-11-wei.fang@nxp.com>
+X-ClientProxiedBy: AM0P190CA0025.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:208:190::35) To PAXPR04MB9642.eurprd04.prod.outlook.com
  (2603:10a6:102:240::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -86,291 +86,274 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|VI2PR04MB10192:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6c23634e-6e94-4800-9a97-08ddc4a9cd70
+X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|PAXPR04MB9677:EE_
+X-MS-Office365-Filtering-Correlation-Id: 425b1601-7a5e-45ab-e0be-08ddc4aa4482
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|7416014|376014|52116014|19092799006|1800799024|38350700014;
+	BCL:0;ARA:13230040|52116014|376014|7416014|1800799024|366016|19092799006|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?uzka39FxRJEzjb8FDHfipFfNQSnvl9xoUUsbeIrRcLEgZllO5QoU3n5B51uG?=
- =?us-ascii?Q?cLMtAkFN+PZ5UmSXPYMww+KJcOhnjfAUBHirTpDDAJlZ+vdcnyyNisusXceP?=
- =?us-ascii?Q?TY6TIAlYd5NXfoHyI8hsV19GGq+wEqF02KGMo1UzhD+abrmOlNoRZA0cq/63?=
- =?us-ascii?Q?Xvw5ifkl15IVFhSFtZkJDNeIe6me+K1Ih1HWTPS1I6E28K7MjvrNW0RgJU3D?=
- =?us-ascii?Q?2OFQDzNMjzcnPMshSWAcofI00Q1t64Z/mRwgsGEZgHwJHe6b3qzxSYtaMQxQ?=
- =?us-ascii?Q?rTqZmso8cZFKSIAebqtRA+9OJRwfV2wZWRX2dTgBnzXNC91QUPGnFCurDwI3?=
- =?us-ascii?Q?Rd0q4PjPKYGcR+UflIrN3xqhzsLEMS2cl0MN5Rqh0jSZMtfnwgch+kAJYyq5?=
- =?us-ascii?Q?KGsfM5jFClPD2t5oFNeJZK+uc4/CizLp1gaxsxw7xQSuKO97VIhKJYEjqqPI?=
- =?us-ascii?Q?77hKJSKOzJXTGm0b3L1YYTGZunrftPHD2whD+51Zo4OFfunETEqfBcAGFVeI?=
- =?us-ascii?Q?txDIMQZeLhQrv3X1GpHlYQSVzjGgecanyb75pqWGAfMRvZENiqeCL/FNa8e2?=
- =?us-ascii?Q?ct8lT6vdxV2q5ffX0yEha+tO11cYoAR650vUbAXOgnRgzTaMNkHpyz8W3K17?=
- =?us-ascii?Q?CKVN6nWJ/20QgOW+HYcFNbagbEY7wLv8r2ykZc/JJbl5+EPr8nmFBwZuO2hy?=
- =?us-ascii?Q?irYzgB9gk24B3MTz+pL7X4aUoQJr3cHNgxJi3Cv1J0CwKnndO6o81keJabDp?=
- =?us-ascii?Q?NKpaEFvyAAK0399UPQxWrKGweqPd9W51BQJK2LYRuFp9sQsHIbiJ/J6Xf3j3?=
- =?us-ascii?Q?LA6r3jyZ4sAKP5HwwaLXHUxAiYccbt61WtW+HE3mcZP8+TVmKgZUnQbsVTW/?=
- =?us-ascii?Q?r1sHtyP3ayFU76xVewJX9KsVA9KjO8WD1IJ+1O/MNLFHg55zTsWYlBW0Gr2M?=
- =?us-ascii?Q?WrBl6Y5SW49NR+/uWMobJa9rCGJRiQA7PoCXDhlEiCZ+F3JT40eXuMLcrrN2?=
- =?us-ascii?Q?S6y5x5z8a032Q20W/B1v1UsoRs/3JMZtIWMNYj4pE0ifr3fyvNFNd8B23n5l?=
- =?us-ascii?Q?J4FyIKoWe4bskgHxFcHKVRy2HLi0S6lfmsuveDUIAx5MFuxMY7mJOF30x3mQ?=
- =?us-ascii?Q?NDgU8poRgni+rXbVtHhuVei3wow5WKSHh5aSDcqSCXR30i4rIr84PUWfpnvs?=
- =?us-ascii?Q?Pvvy4TAhMEAchTocn9iKo2FczJYWhMzXrGP2frCAMvoi4x+nLob4R9leKTv6?=
- =?us-ascii?Q?3Fb7x/Qt5iKyCt1NXnjrH5YunmCB1TGMkhWxPJ+PY6DSgvJsJz+TUkShfHGQ?=
- =?us-ascii?Q?UGZn+JkPOLHSkRkWR5IFAGKzVheVsuBFyJAAZbJGDLWYUOmEa9iRciSf90dR?=
- =?us-ascii?Q?rz+GDYg5Ete08n5+9SiBFfFznAcnMFn4w0v8HyfvoMXdmQYeHaFTntPlV9Mq?=
- =?us-ascii?Q?7IksYZgjygiDqBuMpwBk8CBrtoZEwz+D4T1wcePGPYDHqqRoL14Z1w=3D=3D?=
+	=?us-ascii?Q?7DvHkDGH/p3ZAom6FyCR/Du/Q7lApCyuCJw/mfeWDT8s7T2wVUHTEc5gPTvm?=
+ =?us-ascii?Q?zWnfP/WYE4XPEdFwT2qG0vJJy4NdpqW26Q4It66jomHn8ruJh++AA3qnTWr9?=
+ =?us-ascii?Q?Hn4C62NgQ5AJe7/GwgYVuTC0sVIaxOsSfSKIG/MQFtaOlH/nmMsu6IExACq7?=
+ =?us-ascii?Q?3ttUq1UoVpkM3WftXBTzzr7J7tf7PSkBnMJRVwsaASHt3eAoq64zqxIzXtWn?=
+ =?us-ascii?Q?sqCwmwvdfCyWHyJ65dQviwYuNus2oGOVCg4BbFUwhqq78g3Hy3piIcDZC7bG?=
+ =?us-ascii?Q?QK/AHEP04isrCVXVXAAGOPjNLUes08uJAJpZcsYw7QQ/+rgIvpSpliwvKVPv?=
+ =?us-ascii?Q?YlbKGDIpIRa6ZG8uYXse9KZ6hJfPwypovR5IP0gU0uoLOhQ3axRN9eUlkGBc?=
+ =?us-ascii?Q?GaAzJO3jodFZ5kjsF6Kzu9wdgMAbWQn8uggQ9I6ltrGitTRGmtKHuX0W3knK?=
+ =?us-ascii?Q?5na3Tu7dARksweoioRGq/pT2J+qq/umjKxquI0WW49YU1q7htyakOzGsYMgi?=
+ =?us-ascii?Q?LEZBNCaVF3v/3ZKCjyocqL/9tZVjqI06ASzd1epsyHGB++8/IgVHXSpDuVSo?=
+ =?us-ascii?Q?YWO3Pw+xZQiOHdNZq3qJ7y0yMjxW9q24NZm1GW/+ZI1ZJrLbXD4CM6bOqsIZ?=
+ =?us-ascii?Q?pUsja0vsvS5GzYKezMgRvVduUO4B8U1vTrFnuw4FBVuBr9kxLJdpNDkzaiN1?=
+ =?us-ascii?Q?FWhLxSd/Gww8D/KW/ypoOsH+HoqAUdvdoqycjx2+PpsWrLVIKcUkC3bPBmGY?=
+ =?us-ascii?Q?W+WU+WZyMl0lMRxq/o5Ttilx5B3yaLZbFvq9upnNt6g5SaoSUym/xnGMCAuY?=
+ =?us-ascii?Q?BXJ/qAjEWJ5LqFbHI81MfCrcSDoP06JhYwn7owTnoaZWDCTt7/j+Hls2/z/C?=
+ =?us-ascii?Q?U1YOsSZ0v1yLOXLRRdy8yrRWCgJnbFU9dcVGiUEl22zn/6HtcZrKrLz1Gxg0?=
+ =?us-ascii?Q?68dM4b3DxmrAjY41i2yzOkWu8DCw5+yR+aR6g2w4PVFVXo9D82mR8HiyJvU3?=
+ =?us-ascii?Q?U09JBHK0FW4sE3ECZAHlD55bBdye20XfgOOy9bnNaLSeLvUFZ6Gg2oDcf1yX?=
+ =?us-ascii?Q?VcY7lSrY/e9JKLDO79JW8eDhqckPY2xEIDywIxcqysUpJEY9iieyssM+4RnE?=
+ =?us-ascii?Q?kQv2Dn4aJs7ZlwTCtchKkoBykwIMD4ov2HasJOBsxYZoLgoMuUaHq8QaHKC4?=
+ =?us-ascii?Q?DI5SMsUxtRvmiaU240Zyw3tntWxD7DZDtaPFQa6puheXN4nXhtT7kWSqlYS1?=
+ =?us-ascii?Q?Dsz9ovMXv9J5Rr3HjjJ8UW/YKiKf0U/19z7n7GxodW22nIY1vBleE9OWrdx9?=
+ =?us-ascii?Q?ULDh1N0I1HTI0LAwAyW1kW6Pu6vj+4X9Awx65LZlXWU/xfg/wlsx7KWdU/al?=
+ =?us-ascii?Q?s3s4CYmJvYwF0/fnWTwxZMMYeHOugl3iUNjMtrHXLp5EgnlRnKYrYdIf51tl?=
+ =?us-ascii?Q?xqYCkJ/ny0O6ePRTV0aC5fDGXb46aaL7fMEHrCpf4qpfRSPQjnoaGA=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(52116014)(19092799006)(1800799024)(38350700014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(7416014)(1800799024)(366016)(19092799006)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Nzm6jcGLJxyvwW+cOVPwQzC/5fawx08qk+0h1ge5MJhFIYIfOeovFEFPbXk2?=
- =?us-ascii?Q?Q+8IbSdlxWOxwK+CeLnpNHDvTSqAmwY6M5Al6LrVgPejuVK24Bxc5e8AI4aK?=
- =?us-ascii?Q?WofsEL6U5yhB6zV3/Z9dmtok2C7EPrw9S1UAPtJtfmH6IXgMDu/z+TFIx7Di?=
- =?us-ascii?Q?8gLq6UVE11WL2E9Myd7+vkuO9lKcFS6oCCP15fCLLt4s3CzMj1fhWediCWz6?=
- =?us-ascii?Q?I/gzgs4h1aNfwczXYt2h+LASqEOQIwIUWGfstnzB1BdwPKC6bbfTEftdLGrz?=
- =?us-ascii?Q?I1AJOq3ZrCCPMDBdCZpm3qviYLXvi72P9p4J5vJMddifQpK8aVxQcNS/Fhy3?=
- =?us-ascii?Q?IOvrYx5YD8CMh+9OEgbBh7m00U2/W4sq+FBFnEgrnnGNOZwae44NSUyFx9f3?=
- =?us-ascii?Q?H/soJ8ZynZxVabAw7UKfCaVP84URk3z42yhuBtg5eX+1BL/eipt5a37/KQ6I?=
- =?us-ascii?Q?hYAp8oMo/r3irN4YLGtdFBth00SijGNBbU/WH4l3GTSKNme45GZj1pSVE8ZK?=
- =?us-ascii?Q?HMLIs1SYloHYZIRamNJjGSd5v7y18tgNW+X88DTKhfO6jKiwMFf/22U8DALR?=
- =?us-ascii?Q?Wz/aGXTmMjbyg+PTgHZ4L8Dn04TaMEwqhnfDpDxJvGR2MHORkFqBBvMSHrQt?=
- =?us-ascii?Q?JxR0KwJumcVbJq3nurIPynTOc6gB0VJBbhl6bVxcusGRGx6A5ukmW+GDrmcr?=
- =?us-ascii?Q?bLAUGVM+6jKgsZPfZ3nTlsPMcO1odvmoq5KewYXvXJCV+h7hFRPuKd2t2/To?=
- =?us-ascii?Q?ginEZe1g5HGf4f7iz6n9lxFXxnOoQwxVVEuaCAuJaBBhbYefCjUj3DzlOV71?=
- =?us-ascii?Q?v3Pbq5YtohA7yiHMtjKmzxrtk6/8gIE2kaMVlSZYYbp0L+cjCYASQWERIYb8?=
- =?us-ascii?Q?HSb7i0tbajTHPjIeDMRA2IrDz7EuUteQNcQW0H8BoZgsWABQN2svNr7uEOCo?=
- =?us-ascii?Q?Gd6hGFZ9mkufoIeH74CCFTMUgBjlwzM1P0BT8gwaNwSHmey0cTVdku7Mgx8Z?=
- =?us-ascii?Q?450w68NlDGc43mD0qgf7nwzhDOwwK4gKHNrMAAtrp8hUQHrI7tsAOG89UC12?=
- =?us-ascii?Q?k+sDav9Vx1QRaTBqvMlcS1npouven1quQgAXFC7ET80+KK1yN1cO+e4n/AXs?=
- =?us-ascii?Q?rE5oHbWy7h0VzaVaGP9ghsDh4Qc8nJFFKudSkLVhGM0yUnwxkGiOQGmdVCJ2?=
- =?us-ascii?Q?112BM+0SzvMQaUZUUl22iMrsQ+QWXof0rWhPSKDseuoobGikbOOzey66hWla?=
- =?us-ascii?Q?X8p4l1hVK5+WdAi09KomLONLNuTUJvTWAqOYY8FTF4odgj8vGTMXU2q0T9Dk?=
- =?us-ascii?Q?cTE0lnr+NycQ4BamlZy1ExdHP0YPQOJYTRh67RvETU1nJTVKqnO2CswOY3z+?=
- =?us-ascii?Q?dgp+ZwIgG1itXKOtUamdsHtLlrekjYAsQm03Pzw80jWPT3IjWmUDBoJeOrQH?=
- =?us-ascii?Q?WSqP7sMEvinT9meBw3hZkCRKlwBM0YRrHfey1KSY0pJrfmX3TOQ4mD7gEj4G?=
- =?us-ascii?Q?FGN/ebwGw7zXy8UHr2Fw8lZxCPwQDxG+uo6/ZGs14zhqkvCYVXfgfHzvVwbv?=
- =?us-ascii?Q?czGlEcq1VDxjiPG5N1P2r2nnLhaYmHBYyigCTqQN?=
+	=?us-ascii?Q?Fz7tH6hdLeBdsTR5/pkASH6ZPb1110CKvy2262ncLvj4aJU6ptUWakBLyNK8?=
+ =?us-ascii?Q?Eq2kFsJAhfv8vwfD8DNZMM9nBneM2J50pdl2mz6BzhQyFn7AOQQpb4OUq+vK?=
+ =?us-ascii?Q?b25OYO07ia3uy6SRtXkOwVdf0roaco4vf9fpiY/X+tUUhGE3CzqaH6yUCxkz?=
+ =?us-ascii?Q?INowNcPWbDpmMuSEluFcaHPWErq0Zpc+AkhVxl87rCL/qVx3nt+XDcPVKSdb?=
+ =?us-ascii?Q?kd9N+5fX1xMdyql517C/fuvxy87VM5GGwLxZLw7K0wgZUdrZ5eEBp0VcOr/U?=
+ =?us-ascii?Q?xOc2doMsiNXpLh+V6o1SnoEqgJUiQ3b/OPZXrvmVayWCtOxobYZCuK1RjFW3?=
+ =?us-ascii?Q?Dtba9sYSzZPRvB2vLvv7ZAuJxJexYgwmUzLN1QnHNrGF3UOba61L6GqL8AGf?=
+ =?us-ascii?Q?+iXSLny+pKLayMt1NpvuCi5hV9PC1sYvGR1GFpSpfjXWpM2ANRGYTMWgVsMo?=
+ =?us-ascii?Q?F4Ph0TufMxn+8LmRV84if05WXHJnp9gQfHumMXohDJDusJjBjd3BMtqfa5U0?=
+ =?us-ascii?Q?zyFykZiJZ2dvmClw3oOqVPaA92850UacYWGWfYYJByQhGCcFcWyzykeckxm2?=
+ =?us-ascii?Q?qMzmfIgO4dIPiqxQw8FgDmEMXXaRKqXhJECAvSR/Fa5JsJSSCJkH2+V+cmiH?=
+ =?us-ascii?Q?ovt6mhnPSDnOb4i8qcOdBO2x5qevZQetfyjDaTSSW5nHpd8nxPTKmjSNk4bu?=
+ =?us-ascii?Q?it8ouokeqMNjysMdILnJHKEKD0qfOoytAez4Ft1hsWPttdOtQxKQwr2LOnZE?=
+ =?us-ascii?Q?dyHvbLAzfy9rVipSIKEC7vXNXk6fWo+A8/zhGHPMVQbEUB4o/WRABkmoZ/x9?=
+ =?us-ascii?Q?67+RsXnvxHeoLP4fB61m3tLLc19XgR3k0gK3w1k9qGnOwJCscB0R7ihrFXA2?=
+ =?us-ascii?Q?CJPREHR0hLylLF+5XFYLn2tGmgXr5l2+TDPPO91QFb0FWavWAoyV5YlSY0to?=
+ =?us-ascii?Q?2vzWZ1cPM43jXwwMepLnZO6T1YMCKjZT8lnLXBc3qZYu/lFIzNz8UjfgVM6z?=
+ =?us-ascii?Q?pesg2TXfK9syox93YjseHY0z/JZagmXhfWnDxWr1oDj3HMKcujg1oqwLZtIP?=
+ =?us-ascii?Q?LH8MOw3JNj2KknEUkufxvIztqyL1YoLXZGSD04Esrmgu27aKpY7F/ryk/cAD?=
+ =?us-ascii?Q?u+F6UNBOSF4hoQeDHN1p13LE+viPwyuTtGbsV2J9BGUei9GcfcSja6R02Pw3?=
+ =?us-ascii?Q?rUhd5xkfz1aTs405+dowdTqKLDmEm2XxkQ7yCFLEQHAZ3H+0laNAiaE61aPn?=
+ =?us-ascii?Q?5velkuzT9tJUH5B26wk+udEMArZyXhyV1WBT0h+EE1fHxrJ7pxqg2A0WXh1V?=
+ =?us-ascii?Q?DZ62fyoPX/z9gXx38nVBnNUo0wV65GE/wY8NEW9cmQMGpj6xmlsoqj/H0dyw?=
+ =?us-ascii?Q?br3Nxnl2UKM3+5zMXWtWK0hAXeN3960R3oCyvpz5+e6E6Drg4sEIZVrUxu9i?=
+ =?us-ascii?Q?OnOlYH8gRY4E9aQyQ7RM6+5d1dX9NPH5pLGeyAdATnc4vbWhldrtN8Lwfm4o?=
+ =?us-ascii?Q?bjKT+A8gOxwEGVh0eXBu2sVK5gdYu8mmqCTOQ74x/i+2/lBJ5NZcpptyq+qu?=
+ =?us-ascii?Q?3KngUmH4xafPXk5cNQvydBEp7Yjhs1DJLdEiOUO7?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6c23634e-6e94-4800-9a97-08ddc4a9cd70
+X-MS-Exchange-CrossTenant-Network-Message-Id: 425b1601-7a5e-45ab-e0be-08ddc4aa4482
 X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2025 20:46:13.4913
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2025 20:49:33.1770
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LuLE4Jz+D11rg8DIlVYrkZLGZW7Uv7esif2p6/mU4cV0VSVBk/9LlaIFgojpV3kfRFPFd8f2TEgJ2FvS36At2w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI2PR04MB10192
+X-MS-Exchange-CrossTenant-UserPrincipalName: szKoazbMRQ9HodiLD8LJQF8C4QEMphBOYJwAbkg78YxzdlEGeTRuiY7y4IHpuVP/+CMdY9PinK7maN8zxx1CGw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB9677
 
-On Wed, Jul 16, 2025 at 03:31:06PM +0800, Wei Fang wrote:
-> Currently, the Tx PTP packets are parsed twice in the enetc driver, once
-> in enetc_xmit() and once in enetc_map_tx_buffs(). The latter is duplicate
-> and is unnecessary, since the parsed information can be saved to skb->cb
-> so that enetc_map_tx_buffs() can get the previously parsed data from
-> skb->cb. Therefore, we add struct enetc_skb_cb as the format of the data
-> in the skb->cb buffer to save the parsed information of PTP packet.
+On Wed, Jul 16, 2025 at 03:31:07PM +0800, Wei Fang wrote:
+> Currently, the PTP Sync packets are processed in enetc_map_tx_buffs(),
+> which makes the function too long and not concise enough. Secondly,
+> for the upcoming ENETC v4 one-step support, some appropriate changes
+> are also needed. Therefore, enetc_update_ptp_sync_msg() is extracted
+> from enetc_map_tx_buffs() as a helper function to process the PTP Sync
+> packets.
 
-Add struct enetc_skb_cb as the format of the data in the skb-cb buffer to
-save the parsed information of PTP packet.
 
-Use saved information in enetc_map_tx_buffs() to avoid parse data again.
+net: enetc: Extract enetc_update_ptp_sync_msg() to handle PTP Sync packets
 
->
-> In addition, the variables offset1 and offset2 in enetc_map_tx_buffs()
-> are renamed to corr_off and tstamp_off to make them easier to understand.
+Move PTP Sync packet processing from enetc_map_tx_buffs() to a new helper
+function enetc_update_ptp_sync_msg() to simplify the original function.
 
-Also, rename variables offset1 and offset2 in enetc_map_tx_buffs() to
-corr_off and tstamp_off for better readability.
+Prepare for upcoming ENETC v4 one-step support.
+
+Frank
+
 
 >
 > Signed-off-by: Wei Fang <wei.fang@nxp.com>
->
 > ---
-> v2 changes:
-> 1. Add description of offset1 and offset2 being renamed in the commit
-> message.
-> ---
->  drivers/net/ethernet/freescale/enetc/enetc.c | 65 ++++++++++----------
->  drivers/net/ethernet/freescale/enetc/enetc.h |  9 +++
->  2 files changed, 43 insertions(+), 31 deletions(-)
+>  drivers/net/ethernet/freescale/enetc/enetc.c  | 129 ++++++++++--------
+>  .../net/ethernet/freescale/enetc/enetc_hw.h   |   1 +
+>  2 files changed, 71 insertions(+), 59 deletions(-)
 >
 > diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
-> index e4287725832e..c1373163a096 100644
+> index c1373163a096..ef002ed2fdb9 100644
 > --- a/drivers/net/ethernet/freescale/enetc/enetc.c
 > +++ b/drivers/net/ethernet/freescale/enetc/enetc.c
-> @@ -225,13 +225,12 @@ static int enetc_map_tx_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb)
+> @@ -221,12 +221,79 @@ static void enetc_unwind_tx_frame(struct enetc_bdr *tx_ring, int count, int i)
+>  	}
+>  }
+>
+> +static u32 enetc_update_ptp_sync_msg(struct enetc_ndev_priv *priv,
+> +				     struct sk_buff *skb)
+> +{
+> +	struct enetc_skb_cb *enetc_cb = ENETC_SKB_CB(skb);
+> +	u16 tstamp_off = enetc_cb->origin_tstamp_off;
+> +	u16 corr_off = enetc_cb->correction_off;
+> +	struct enetc_si *si = priv->si;
+> +	struct enetc_hw *hw = &si->hw;
+> +	__be32 new_sec_l, new_nsec;
+> +	__be16 new_sec_h;
+> +	u32 lo, hi, nsec;
+> +	u8 *data;
+> +	u64 sec;
+> +	u32 val;
+> +
+> +	lo = enetc_rd_hot(hw, ENETC_SICTR0);
+> +	hi = enetc_rd_hot(hw, ENETC_SICTR1);
+> +	sec = (u64)hi << 32 | lo;
+> +	nsec = do_div(sec, 1000000000);
+> +
+> +	/* Update originTimestamp field of Sync packet
+> +	 * - 48 bits seconds field
+> +	 * - 32 bits nanseconds field
+> +	 *
+> +	 * In addition, the UDP checksum needs to be updated
+> +	 * by software after updating originTimestamp field,
+> +	 * otherwise the hardware will calculate the wrong
+> +	 * checksum when updating the correction field and
+> +	 * update it to the packet.
+> +	 */
+> +
+> +	data = skb_mac_header(skb);
+> +	new_sec_h = htons((sec >> 32) & 0xffff);
+> +	new_sec_l = htonl(sec & 0xffffffff);
+> +	new_nsec = htonl(nsec);
+> +	if (enetc_cb->udp) {
+> +		struct udphdr *uh = udp_hdr(skb);
+> +		__be32 old_sec_l, old_nsec;
+> +		__be16 old_sec_h;
+> +
+> +		old_sec_h = *(__be16 *)(data + tstamp_off);
+> +		inet_proto_csum_replace2(&uh->check, skb, old_sec_h,
+> +					 new_sec_h, false);
+> +
+> +		old_sec_l = *(__be32 *)(data + tstamp_off + 2);
+> +		inet_proto_csum_replace4(&uh->check, skb, old_sec_l,
+> +					 new_sec_l, false);
+> +
+> +		old_nsec = *(__be32 *)(data + tstamp_off + 6);
+> +		inet_proto_csum_replace4(&uh->check, skb, old_nsec,
+> +					 new_nsec, false);
+> +	}
+> +
+> +	*(__be16 *)(data + tstamp_off) = new_sec_h;
+> +	*(__be32 *)(data + tstamp_off + 2) = new_sec_l;
+> +	*(__be32 *)(data + tstamp_off + 6) = new_nsec;
+> +
+> +	/* Configure single-step register */
+> +	val = ENETC_PM0_SINGLE_STEP_EN;
+> +	val |= ENETC_SET_SINGLE_STEP_OFFSET(corr_off);
+> +	if (enetc_cb->udp)
+> +		val |= ENETC_PM0_SINGLE_STEP_CH;
+> +
+> +	enetc_port_mac_wr(priv->si, ENETC_PM0_SINGLE_STEP, val);
+> +
+> +	return lo & ENETC_TXBD_TSTAMP;
+> +}
+> +
+>  static int enetc_map_tx_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb)
 >  {
 >  	bool do_vlan, do_onestep_tstamp = false, do_twostep_tstamp = false;
 >  	struct enetc_ndev_priv *priv = netdev_priv(tx_ring->ndev);
-> +	struct enetc_skb_cb *enetc_cb = ENETC_SKB_CB(skb);
->  	struct enetc_hw *hw = &priv->si->hw;
+>  	struct enetc_skb_cb *enetc_cb = ENETC_SKB_CB(skb);
+> -	struct enetc_hw *hw = &priv->si->hw;
 >  	struct enetc_tx_swbd *tx_swbd;
 >  	int len = skb_headlen(skb);
 >  	union enetc_tx_bd temp_bd;
-> -	u8 msgtype, twostep, udp;
->  	union enetc_tx_bd *txbd;
-> -	u16 offset1, offset2;
->  	int i, count = 0;
->  	skb_frag_t *frag;
->  	unsigned int f;
-> @@ -280,16 +279,10 @@ static int enetc_map_tx_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb)
->  	count++;
->
->  	do_vlan = skb_vlan_tag_present(skb);
-> -	if (skb->cb[0] & ENETC_F_TX_ONESTEP_SYNC_TSTAMP) {
-> -		if (enetc_ptp_parse(skb, &udp, &msgtype, &twostep, &offset1,
-> -				    &offset2) ||
-> -		    msgtype != PTP_MSGTYPE_SYNC || twostep)
-> -			WARN_ONCE(1, "Bad packet for one-step timestamping\n");
-> -		else
-> -			do_onestep_tstamp = true;
-> -	} else if (skb->cb[0] & ENETC_F_TX_TSTAMP) {
-> +	if (enetc_cb->flag & ENETC_F_TX_ONESTEP_SYNC_TSTAMP)
-> +		do_onestep_tstamp = true;
-> +	else if (enetc_cb->flag & ENETC_F_TX_TSTAMP)
->  		do_twostep_tstamp = true;
-> -	}
->
->  	tx_swbd->do_twostep_tstamp = do_twostep_tstamp;
->  	tx_swbd->qbv_en = !!(priv->active_offloads & ENETC_F_QBV);
-> @@ -333,6 +326,8 @@ static int enetc_map_tx_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb)
+> @@ -326,67 +393,11 @@ static int enetc_map_tx_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb)
 >  		}
 >
 >  		if (do_onestep_tstamp) {
-> +			u16 tstamp_off = enetc_cb->origin_tstamp_off;
-> +			u16 corr_off = enetc_cb->correction_off;
->  			__be32 new_sec_l, new_nsec;
->  			u32 lo, hi, nsec, val;
->  			__be16 new_sec_h;
-> @@ -362,32 +357,32 @@ static int enetc_map_tx_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb)
->  			new_sec_h = htons((sec >> 32) & 0xffff);
->  			new_sec_l = htonl(sec & 0xffffffff);
->  			new_nsec = htonl(nsec);
-> -			if (udp) {
-> +			if (enetc_cb->udp) {
->  				struct udphdr *uh = udp_hdr(skb);
->  				__be32 old_sec_l, old_nsec;
->  				__be16 old_sec_h;
+> -			u16 tstamp_off = enetc_cb->origin_tstamp_off;
+> -			u16 corr_off = enetc_cb->correction_off;
+> -			__be32 new_sec_l, new_nsec;
+> -			u32 lo, hi, nsec, val;
+> -			__be16 new_sec_h;
+> -			u8 *data;
+> -			u64 sec;
+> -
+> -			lo = enetc_rd_hot(hw, ENETC_SICTR0);
+> -			hi = enetc_rd_hot(hw, ENETC_SICTR1);
+> -			sec = (u64)hi << 32 | lo;
+> -			nsec = do_div(sec, 1000000000);
+> +			u32 tstamp = enetc_update_ptp_sync_msg(priv, skb);
 >
-> -				old_sec_h = *(__be16 *)(data + offset2);
-> +				old_sec_h = *(__be16 *)(data + tstamp_off);
->  				inet_proto_csum_replace2(&uh->check, skb, old_sec_h,
->  							 new_sec_h, false);
+>  			/* Configure extension BD */
+> -			temp_bd.ext.tstamp = cpu_to_le32(lo & 0x3fffffff);
+> +			temp_bd.ext.tstamp = cpu_to_le32(tstamp);
+>  			e_flags |= ENETC_TXBD_E_FLAGS_ONE_STEP_PTP;
+> -
+> -			/* Update originTimestamp field of Sync packet
+> -			 * - 48 bits seconds field
+> -			 * - 32 bits nanseconds field
+> -			 *
+> -			 * In addition, the UDP checksum needs to be updated
+> -			 * by software after updating originTimestamp field,
+> -			 * otherwise the hardware will calculate the wrong
+> -			 * checksum when updating the correction field and
+> -			 * update it to the packet.
+> -			 */
+> -			data = skb_mac_header(skb);
+> -			new_sec_h = htons((sec >> 32) & 0xffff);
+> -			new_sec_l = htonl(sec & 0xffffffff);
+> -			new_nsec = htonl(nsec);
+> -			if (enetc_cb->udp) {
+> -				struct udphdr *uh = udp_hdr(skb);
+> -				__be32 old_sec_l, old_nsec;
+> -				__be16 old_sec_h;
+> -
+> -				old_sec_h = *(__be16 *)(data + tstamp_off);
+> -				inet_proto_csum_replace2(&uh->check, skb, old_sec_h,
+> -							 new_sec_h, false);
+> -
+> -				old_sec_l = *(__be32 *)(data + tstamp_off + 2);
+> -				inet_proto_csum_replace4(&uh->check, skb, old_sec_l,
+> -							 new_sec_l, false);
+> -
+> -				old_nsec = *(__be32 *)(data + tstamp_off + 6);
+> -				inet_proto_csum_replace4(&uh->check, skb, old_nsec,
+> -							 new_nsec, false);
+> -			}
+> -
+> -			*(__be16 *)(data + tstamp_off) = new_sec_h;
+> -+			*(__be32 *)(data + tstamp_off + 2) = new_sec_l;
+> -+			*(__be32 *)(data + tstamp_off + 6) = new_nsec;
+> -
+> -			/* Configure single-step register */
+> -			val = ENETC_PM0_SINGLE_STEP_EN;
+> -			val |= ENETC_SET_SINGLE_STEP_OFFSET(corr_off);
+> -			if (enetc_cb->udp)
+> -				val |= ENETC_PM0_SINGLE_STEP_CH;
+> -
+> -			enetc_port_mac_wr(priv->si, ENETC_PM0_SINGLE_STEP,
+> -					  val);
+>  		} else if (do_twostep_tstamp) {
+>  			skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
+>  			e_flags |= ENETC_TXBD_E_FLAGS_TWO_STEP_PTP;
+> diff --git a/drivers/net/ethernet/freescale/enetc/enetc_hw.h b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
+> index 73763e8f4879..377c96325814 100644
+> --- a/drivers/net/ethernet/freescale/enetc/enetc_hw.h
+> +++ b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
+> @@ -614,6 +614,7 @@ enum enetc_txbd_flags {
+>  #define ENETC_TXBD_STATS_WIN	BIT(7)
+>  #define ENETC_TXBD_TXSTART_MASK GENMASK(24, 0)
+>  #define ENETC_TXBD_FLAGS_OFFSET 24
+> +#define ENETC_TXBD_TSTAMP	GENMASK(29, 0)
 >
-> -				old_sec_l = *(__be32 *)(data + offset2 + 2);
-> +				old_sec_l = *(__be32 *)(data + tstamp_off + 2);
->  				inet_proto_csum_replace4(&uh->check, skb, old_sec_l,
->  							 new_sec_l, false);
->
-> -				old_nsec = *(__be32 *)(data + offset2 + 6);
-> +				old_nsec = *(__be32 *)(data + tstamp_off + 6);
->  				inet_proto_csum_replace4(&uh->check, skb, old_nsec,
->  							 new_nsec, false);
->  			}
->
-> -			*(__be16 *)(data + offset2) = new_sec_h;
-> -			*(__be32 *)(data + offset2 + 2) = new_sec_l;
-> -			*(__be32 *)(data + offset2 + 6) = new_nsec;
-> +			*(__be16 *)(data + tstamp_off) = new_sec_h;
-> ++			*(__be32 *)(data + tstamp_off + 2) = new_sec_l;
-> ++			*(__be32 *)(data + tstamp_off + 6) = new_nsec;
-
-strange why there are two ++ here.
-
->
->  			/* Configure single-step register */
->  			val = ENETC_PM0_SINGLE_STEP_EN;
-> -			val |= ENETC_SET_SINGLE_STEP_OFFSET(offset1);
-> -			if (udp)
-> +			val |= ENETC_SET_SINGLE_STEP_OFFSET(corr_off);
-> +			if (enetc_cb->udp)
->  				val |= ENETC_PM0_SINGLE_STEP_CH;
->
->  			enetc_port_mac_wr(priv->si, ENETC_PM0_SINGLE_STEP,
-> @@ -938,12 +933,13 @@ static int enetc_map_tx_tso_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb
->  static netdev_tx_t enetc_start_xmit(struct sk_buff *skb,
->  				    struct net_device *ndev)
+>  static inline __le32 enetc_txbd_set_tx_start(u64 tx_start, u8 flags)
 >  {
-> +	struct enetc_skb_cb *enetc_cb = ENETC_SKB_CB(skb);
->  	struct enetc_ndev_priv *priv = netdev_priv(ndev);
->  	struct enetc_bdr *tx_ring;
->  	int count;
->
->  	/* Queue one-step Sync packet if already locked */
-> -	if (skb->cb[0] & ENETC_F_TX_ONESTEP_SYNC_TSTAMP) {
-> +	if (enetc_cb->flag & ENETC_F_TX_ONESTEP_SYNC_TSTAMP) {
->  		if (test_and_set_bit_lock(ENETC_TX_ONESTEP_TSTAMP_IN_PROGRESS,
->  					  &priv->flags)) {
->  			skb_queue_tail(&priv->tx_skbs, skb);
-> @@ -1005,24 +1001,29 @@ static netdev_tx_t enetc_start_xmit(struct sk_buff *skb,
->
->  netdev_tx_t enetc_xmit(struct sk_buff *skb, struct net_device *ndev)
->  {
-> +	struct enetc_skb_cb *enetc_cb = ENETC_SKB_CB(skb);
->  	struct enetc_ndev_priv *priv = netdev_priv(ndev);
->  	u8 udp, msgtype, twostep;
->  	u16 offset1, offset2;
->
-> -	/* Mark tx timestamp type on skb->cb[0] if requires */
-> +	/* Mark tx timestamp type on enetc_cb->flag if requires */
->  	if ((skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) &&
-> -	    (priv->active_offloads & ENETC_F_TX_TSTAMP_MASK)) {
-> -		skb->cb[0] = priv->active_offloads & ENETC_F_TX_TSTAMP_MASK;
-> -	} else {
-> -		skb->cb[0] = 0;
-> -	}
-> +	    (priv->active_offloads & ENETC_F_TX_TSTAMP_MASK))
-> +		enetc_cb->flag = priv->active_offloads & ENETC_F_TX_TSTAMP_MASK;
-> +	else
-> +		enetc_cb->flag = 0;
->
->  	/* Fall back to two-step timestamp if not one-step Sync packet */
-> -	if (skb->cb[0] & ENETC_F_TX_ONESTEP_SYNC_TSTAMP) {
-> +	if (enetc_cb->flag & ENETC_F_TX_ONESTEP_SYNC_TSTAMP) {
->  		if (enetc_ptp_parse(skb, &udp, &msgtype, &twostep,
->  				    &offset1, &offset2) ||
-> -		    msgtype != PTP_MSGTYPE_SYNC || twostep != 0)
-> -			skb->cb[0] = ENETC_F_TX_TSTAMP;
-> +		    msgtype != PTP_MSGTYPE_SYNC || twostep != 0) {
-> +			enetc_cb->flag = ENETC_F_TX_TSTAMP;
-> +		} else {
-> +			enetc_cb->udp = !!udp;
-> +			enetc_cb->correction_off = offset1;
-> +			enetc_cb->origin_tstamp_off = offset2;
-> +		}
->  	}
->
->  	return enetc_start_xmit(skb, ndev);
-> @@ -1214,7 +1215,9 @@ static bool enetc_clean_tx_ring(struct enetc_bdr *tx_ring, int napi_budget)
->  		if (xdp_frame) {
->  			xdp_return_frame(xdp_frame);
->  		} else if (skb) {
-> -			if (unlikely(skb->cb[0] & ENETC_F_TX_ONESTEP_SYNC_TSTAMP)) {
-> +			struct enetc_skb_cb *enetc_cb = ENETC_SKB_CB(skb);
-> +
-> +			if (unlikely(enetc_cb->flag & ENETC_F_TX_ONESTEP_SYNC_TSTAMP)) {
->  				/* Start work to release lock for next one-step
->  				 * timestamping packet. And send one skb in
->  				 * tx_skbs queue if has.
-> diff --git a/drivers/net/ethernet/freescale/enetc/enetc.h b/drivers/net/ethernet/freescale/enetc/enetc.h
-> index 62e8ee4d2f04..ce3fed95091b 100644
-> --- a/drivers/net/ethernet/freescale/enetc/enetc.h
-> +++ b/drivers/net/ethernet/freescale/enetc/enetc.h
-> @@ -54,6 +54,15 @@ struct enetc_tx_swbd {
->  	u8 qbv_en:1;
->  };
->
-> +struct enetc_skb_cb {
-> +	u8 flag;
-> +	bool udp;
-> +	u16 correction_off;
-> +	u16 origin_tstamp_off;
-> +};
-> +
-> +#define ENETC_SKB_CB(skb) ((struct enetc_skb_cb *)((skb)->cb))
-> +
->  struct enetc_lso_t {
->  	bool	ipv6;
->  	bool	tcp;
 > --
 > 2.34.1
 >
