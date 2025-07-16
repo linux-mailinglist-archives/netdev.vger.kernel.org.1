@@ -1,92 +1,91 @@
-Return-Path: <netdev+bounces-207424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03912B0722E
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 11:50:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D878B07276
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 12:02:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDF443A1C29
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 09:49:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2657D3B3558
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 10:02:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1CE22F199B;
-	Wed, 16 Jul 2025 09:49:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B8A292B5D;
+	Wed, 16 Jul 2025 10:02:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eI5yULec"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FIityDdL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5412BFC9B;
-	Wed, 16 Jul 2025 09:49:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4A6256C6D;
+	Wed, 16 Jul 2025 10:02:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752659397; cv=none; b=EnQA9hQJUPWJ1Q+oUXV275/oXgc+6e9JeLzhx04WyAIJODTUhahhlNHjSs+qViriNtZQUPUsMZeyQGtSoJlTFvahA4DzWmYqpapiE2jQJxNf8RBnWrA++8ijHyUJoDyZQrBQc41YGaQtPFC6WNryC0Zd+xM+oOT0CQALYU+nVfA=
+	t=1752660172; cv=none; b=VUOod25eHy0vAPNQU4q35eb3qaEp6kQS6FGIn9/5Eh4CNX0ScyV4NEL663cAREvcaJhHsNR/vawiCiQkAHKUj9tqmsvN5pmvNUAlG1yteUh3uVj07yjukwVP2qe0w182fTafE7DWn96cK2T/ElwMHXli41sOMaBF57J7dIY82Rk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752659397; c=relaxed/simple;
-	bh=EEdeWg3CLcEY98K4EHAAFMbr4uaieqIt7xKgPk0v/Es=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hwdxAqdwko6mz2J4n1nFBjNJx+yXiqxu9SoLZGOhSzgkPAAqPKHal5BE65iYqJSBBxR0T4zpPG6bGDobAZ1AZ63fQD42Z5grJv4miuA+C2G1rwOLNHMJUfVFbTq6cr76yniFDTyLZrTJYRuLKebwRksY9Mp2WDcCeMP3a9sff90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eI5yULec; arc=none smtp.client-ip=209.85.128.51
+	s=arc-20240116; t=1752660172; c=relaxed/simple;
+	bh=Q6W7KX29Jk928R1qVVNWD5JXLZbZXkTQ9C5nRhOJYqA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cWbQQOkielLjPFr7y1is07ovq8FUJrLnWiFZvT5kXexB8R+y/4VjfMBnIdruQioVPk6isnKRAm4KAU9j70kTmAqExVjvOFq5Sxhaq7juYhG5y/tjfyfvNtbPScgMgWL+434+OscpnxJPTb9JcXU97TQIdNk/FXqhtjotShGwTcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FIityDdL; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4535fc0485dso8576005e9.0;
-        Wed, 16 Jul 2025 02:49:55 -0700 (PDT)
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3a524caf77eso665600f8f.3;
+        Wed, 16 Jul 2025 03:02:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752659394; x=1753264194; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1752660169; x=1753264969; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=IYrQ7+sV7dVTWPVBK1RBCFMdeN88v1wt1t/v9UbOVE8=;
-        b=eI5yULecqdgfxcdVMB1XtIiCnP2zs2ypQ5ACP/q6HNFwkRrXUklZksF20S6ZFN5PCC
-         GKmQcG+Et00nsFyt/OklXMHmgxAnXfI/RS61ZN8CGID67plBI46xl0zFjMjSOVoLiYkQ
-         LD1E7KuBCO4KnyV4vGEHd+f065Xbplq4r0GjPYsevjBKJ3YvYezAo5CPXl/lEtIpQKnO
-         zBCLYFjNEX7nMVrWTvIDfiUPM4g6XMIzdvORsqPWoQlDEkztSb9+gkq8ZEfRT2qs7ogI
-         EL6UYv8WeEwYYEnJjgHEOWe+FsDFsSr1aGHfUZpjrI4GKuTE3CNm92ftIu5m3dDv2Fup
-         ty1A==
+        bh=j8wz/ZahP4wIDUhx29OUaHi7Qy3IKMSy66Iy4Sl+Bos=;
+        b=FIityDdL+61H9jCYQ7ThP70f1E0D3BzCRREMio/Z/FZmqrBBP0YqJ65I+948poN77O
+         MJWYPpss2JWg+E1vywI7Wpj1PoCOXI/hLq/Pbfw572e8TJSu5/8GkOlbusejvQmkL7cO
+         zyCqRID5pt8z9AprDfnnnBEJQhv1NRTkFN5zgmZFOjSw81bsW+JibQLVkzOE9xlRZCQv
+         aQb7ZXIclo7zq7nw+ZNvJLgofy0sid/thoH3ucS9QCCvBHgnVWqari13g84QJMvwnT35
+         wt2skpAY1aF/lVThxssYEgQx13bnP/jR6noBgZ9OuTmLiQ5JfMkQFzQMPH+U+8pGKgJN
+         BQbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752659394; x=1753264194;
+        d=1e100.net; s=20230601; t=1752660169; x=1753264969;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=IYrQ7+sV7dVTWPVBK1RBCFMdeN88v1wt1t/v9UbOVE8=;
-        b=f9eql9fZ1AXWRW5HIpDRgEryYxgNlq3gd7X9MpwNA5zX0e4mh2IbFJ8/6yi7BKcT+p
-         fyo82HJ0282bZ9PFbsZ0LJimrNUd7aOUh0vbcPnkm7pNnjJlOPsDswUgvPCbND4sx0gy
-         K8m8dl2HYlakQ1b61GHFgMo3GRoxSD5gY8eqp047CNriVf93XvOxRL8utfSzgPrlrlUY
-         60EadxpF6PoYMmoYjoEkzD1V+p7NdKznjhi85j/smDGoGmkXD5szJYELJfxFrw4IVJyf
-         SP3EtB62y0UUlDfy1gqintAux/CS+1vQpdKvQ6FbD0xfGISo8mCSCgFvplkj5BiuhiRC
-         Abog==
-X-Forwarded-Encrypted: i=1; AJvYcCUEexf//dk9VWlut/Ooyl8IPe2aBtthdvXHI5T6cixEj5scFQI9fz7DMWGv35i4lvczcQiuQOKj@vger.kernel.org, AJvYcCXRQ9HIUFhbMDHvDtMJ7KZCxUJLbgDzlTWEqOD1eP94vZpvmAR/i0ktvpSViltYMC7aNfgneMIM8CKndM4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyr7a27w4bakA2VIz8Czc13cg4eSEM2mTJVGBb3ZV8gCjAHL65G
-	7s9H/MlRO9YUWm2EQp/ZvLxoB490V/j61R2JbsOjsdSISSK66tD2trkC
-X-Gm-Gg: ASbGncsu+Q5p4Mg+28kLK444xxEaqpM7zLIEQyxEb0/cI0mrM400qrY+tJcgWEJvtZT
-	j0at0PpI5Cqi2qiynCHF7DtxhJ93l2oOk/3z9tpiWGOPoTNFA1aw5ScqVmY2vewo3jVTZg14ble
-	WIy3gQchrbiZvE9rimh115uSoQw7ucfnWxzqnhT2qxRV/DWVma6Gl54RvqVmH+2SoJczbjU/Uoy
-	CF594HoUKXNVcQhdLYsr4b4LTwi+Z6CmW5PfycFkljm9I4b5PDsbAZrO5nSgmejgM2h1Q1hIGuO
-	V7AmX9qFMhQuCFAEOU+mZaLWtNo13M4ypCQEuEeh0rArYUieBjbxWBZAHj1FDiI5445fnp2uIUD
-	i30TD3XN5gC9N2OIvVLQVZZOouvCnwd06YC/jC+KCVDDsHdElJtM=
-X-Google-Smtp-Source: AGHT+IF3heKpRm+ABAaNBtuxBVQgq8WAa+ukmgI7ealy/Apb29VlJ59eiNp/mNklVk0xhpZZa6fecA==
-X-Received: by 2002:a05:6000:2388:b0:3a5:324a:89b5 with SMTP id ffacd0b85a97d-3b60dd68770mr781461f8f.8.1752659394076;
-        Wed, 16 Jul 2025 02:49:54 -0700 (PDT)
+        bh=j8wz/ZahP4wIDUhx29OUaHi7Qy3IKMSy66Iy4Sl+Bos=;
+        b=G848GgfIfmL78wDlFcjkG/+dHKE/V88jLPneOHaqr8NVxXK9diZl2lRvr6mTn5fZKX
+         e0TrAttzMerss1HLpwAYMwz3Mzwg2VFNIVkTecsGDF/kxaUI2zSpyeXji/hfPBOphfef
+         5EYDq39qBW+5332Ev5yccMwL1sPRlDTlFR6VmTOLkn5MrvxQHQqvAPiMaPIsHvW27V/Q
+         KTclNvToW5XOvRcJpC4+lcKQp0ZkvL5cRIG9It8qbTH728eESTitLuUI6TzCXpx6Ooty
+         H02FUH70ZfYk1bGIrd5NyVOVY+mfC8NafDT4ASoeZvADT6LkD85v0PpakS1xWb0RmwIi
+         PlzA==
+X-Forwarded-Encrypted: i=1; AJvYcCWT3Gc59fwHG6jTYRklZAwbnR6MnVLemoP7zsGe+OC8cVOEHHcesdwWOvaLorYsqPsgb7G9cv16tE8VTCw=@vger.kernel.org, AJvYcCWUDpVy2aiZRRnPMwgBcx3hzhX58Kv8c55Ffmttw/DeCD3Xa0qC3sZKEa1WTdQpWVdcYPlx9Hus@vger.kernel.org
+X-Gm-Message-State: AOJu0YzaN4LEObMwNg+BN5VYPk7cN3Q9zagZIm7wh5vAqMd53E6NQ1sL
+	5wFyvYcZG3N/k2HNNaQ5nt1+I8tiE1DQhTYzFiYyJFE/kYiZUCNoXWOL
+X-Gm-Gg: ASbGncuR+Axi/vcw/Tp6HN/68k7NAJ+8+YubkM4E24V7QEZ/hXiZKhSCdtneCfoH7RD
+	BQiNvmI+Kgtt0KlRm+TcPgDplpxZuxt9dL0NdPiJrSGqohVRM9tZu925xGowhOTvrxyEQqEW0og
+	ArVQP7jhabxSLHsq7hc9mnkMMAfsbNv4oWO3I1BG6Ljg8/e8kb4bztpVNrXB7B2Fm/TpCBt5EpV
+	WTkDJi59FzbvtA+aT7if4QwFoCxEXn8e4lf95RKKGDQwEhWlQ1jhsmWb1eDiRXQLMn7Ki7Kgshl
+	sLTxscbnAUFbiJtkSIOlsFxO3q+DlXJv+XuorS9B27NlXR7z8ckas+PuWPo2S/arhXB7OWtYhwT
+	iRDFHxZNCY+y/E8hlLQvvXRmtS0IlzxTQUO4j+9plfiphQznddcU=
+X-Google-Smtp-Source: AGHT+IGRmALVudWUgbbTD+N67O8rohnNgtorDH43lpCcRFVuNAi5vwWQyweV7/kSPGRdbZpl5fWZ+A==
+X-Received: by 2002:adf:b601:0:b0:3a4:eb46:7258 with SMTP id ffacd0b85a97d-3b60dd892c5mr658102f8f.15.1752660168913;
+        Wed, 16 Jul 2025 03:02:48 -0700 (PDT)
 Received: from thomas-precision3591.imag.fr ([2001:660:5301:24:962d:ebf0:4a44:e416])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3b5e8e1f4edsm17150986f8f.83.2025.07.16.02.49.53
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3b5e8bd1776sm17609677f8f.12.2025.07.16.03.02.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Jul 2025 02:49:53 -0700 (PDT)
+        Wed, 16 Jul 2025 03:02:48 -0700 (PDT)
 From: Thomas Fourier <fourier.thomas@gmail.com>
 To: 
 Cc: Thomas Fourier <fourier.thomas@gmail.com>,
-	Mark Einon <mark.einon@gmail.com>,
+	Chris Snook <chris.snook@gmail.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Ingo Molnar <mingo@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] et131x: Add missing check after DMA map
-Date: Wed, 16 Jul 2025 11:47:30 +0200
-Message-ID: <20250716094733.28734-2-fourier.thomas@gmail.com>
+Subject: [PATCH net v2] net: ag71xx: Add missing check after DMA map
+Date: Wed, 16 Jul 2025 11:57:25 +0200
+Message-ID: <20250716095733.37452-3-fourier.thomas@gmail.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -97,94 +96,43 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 The DMA map functions can fail and should be tested for errors.
-If the mapping fails, unmap and return an error.
 
-Fixes: 38df6492eb51 ("et131x: Add PCIe gigabit ethernet driver et131x to drivers/net")
+Fixes: d51b6ce441d3 ("net: ethernet: add ag71xx driver")
 Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
 ---
 v1 -> v2:
-  - Fix subject
-  - Fix double decrement of frag
-  - Make comment more explicit about why there are two loops
+  - do not pass free function to ag71xx_fill_rx_buf()
 
- drivers/net/ethernet/agere/et131x.c | 36 +++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ drivers/net/ethernet/atheros/ag71xx.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/drivers/net/ethernet/agere/et131x.c b/drivers/net/ethernet/agere/et131x.c
-index 678eddb36172..5c8217638dda 100644
---- a/drivers/net/ethernet/agere/et131x.c
-+++ b/drivers/net/ethernet/agere/et131x.c
-@@ -2459,6 +2459,10 @@ static int nic_send_packet(struct et131x_adapter *adapter, struct tcb *tcb)
- 							  skb->data,
- 							  skb_headlen(skb),
- 							  DMA_TO_DEVICE);
-+				if (dma_mapping_error(&adapter->pdev->dev,
-+						      dma_addr))
-+					return -ENOMEM;
-+
- 				desc[frag].addr_lo = lower_32_bits(dma_addr);
- 				desc[frag].addr_hi = upper_32_bits(dma_addr);
- 				frag++;
-@@ -2468,6 +2472,10 @@ static int nic_send_packet(struct et131x_adapter *adapter, struct tcb *tcb)
- 							  skb->data,
- 							  skb_headlen(skb) / 2,
- 							  DMA_TO_DEVICE);
-+				if (dma_mapping_error(&adapter->pdev->dev,
-+						      dma_addr))
-+					return -ENOMEM;
-+
- 				desc[frag].addr_lo = lower_32_bits(dma_addr);
- 				desc[frag].addr_hi = upper_32_bits(dma_addr);
- 				frag++;
-@@ -2478,6 +2486,10 @@ static int nic_send_packet(struct et131x_adapter *adapter, struct tcb *tcb)
- 							  skb_headlen(skb) / 2,
- 							  skb_headlen(skb) / 2,
- 							  DMA_TO_DEVICE);
-+				if (dma_mapping_error(&adapter->pdev->dev,
-+						      dma_addr))
-+					goto unmap_first_out;
-+
- 				desc[frag].addr_lo = lower_32_bits(dma_addr);
- 				desc[frag].addr_hi = upper_32_bits(dma_addr);
- 				frag++;
-@@ -2489,6 +2501,9 @@ static int nic_send_packet(struct et131x_adapter *adapter, struct tcb *tcb)
- 						    0,
- 						    desc[frag].len_vlan,
- 						    DMA_TO_DEVICE);
-+			if (dma_mapping_error(&adapter->pdev->dev, dma_addr))
-+				goto unmap_out;
-+
- 			desc[frag].addr_lo = lower_32_bits(dma_addr);
- 			desc[frag].addr_hi = upper_32_bits(dma_addr);
- 			frag++;
-@@ -2578,6 +2593,27 @@ static int nic_send_packet(struct et131x_adapter *adapter, struct tcb *tcb)
- 		       &adapter->regs->global.watchdog_timer);
- 	}
- 	return 0;
-+
-+unmap_out:
-+	// Unmap the body of the packet with map_page
-+	while (--i) {
-+		frag--;
-+		dma_addr = desc[frag].addr_lo;
-+		dma_addr |= (u64)desc[frag].addr_hi << 32;
-+		dma_unmap_page(&adapter->pdev->dev, dma_addr,
-+			       desc[frag].len_vlan, DMA_TO_DEVICE);
+diff --git a/drivers/net/ethernet/atheros/ag71xx.c b/drivers/net/ethernet/atheros/ag71xx.c
+index d8e6f23e1432..cbc730c7cff2 100644
+--- a/drivers/net/ethernet/atheros/ag71xx.c
++++ b/drivers/net/ethernet/atheros/ag71xx.c
+@@ -1213,6 +1213,11 @@ static bool ag71xx_fill_rx_buf(struct ag71xx *ag, struct ag71xx_buf *buf,
+ 	buf->rx.rx_buf = data;
+ 	buf->rx.dma_addr = dma_map_single(&ag->pdev->dev, data, ag->rx_buf_size,
+ 					  DMA_FROM_DEVICE);
++	if (dma_mapping_error(&ag->pdev->dev, buf->rx.dma_addr)) {
++		skb_free_frag(data);
++		buf->rx.rx_buf = NULL;
++		return false;
 +	}
-+
-+unmap_first_out:
-+	// Unmap the header with map_single
-+	while (frag--) {
-+		dma_addr = desc[frag].addr_lo;
-+		dma_addr |= (u64)desc[frag].addr_hi << 32;
-+		dma_unmap_single(&adapter->pdev->dev, dma_addr,
-+				 desc[frag].len_vlan, DMA_TO_DEVICE);
-+	}
-+
-+	return -ENOMEM;
+ 	desc->data = (u32)buf->rx.dma_addr + offset;
+ 	return true;
  }
+@@ -1511,6 +1516,10 @@ static netdev_tx_t ag71xx_hard_start_xmit(struct sk_buff *skb,
  
- static int send_packet(struct sk_buff *skb, struct et131x_adapter *adapter)
+ 	dma_addr = dma_map_single(&ag->pdev->dev, skb->data, skb->len,
+ 				  DMA_TO_DEVICE);
++	if (dma_mapping_error(&ag->pdev->dev, dma_addr)) {
++		netif_dbg(ag, tx_err, ndev, "DMA mapping error\n");
++		goto err_drop;
++	}
+ 
+ 	i = ring->curr & ring_mask;
+ 	desc = ag71xx_ring_desc(ring, i);
 -- 
 2.43.0
 
