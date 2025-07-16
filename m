@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-207303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B90FB06A37
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 02:01:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6572FB06A39
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 02:02:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A20A31A600D8
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 00:02:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CBB31A60159
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 00:02:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3BC31A23B5;
-	Wed, 16 Jul 2025 00:01:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 794B1EEBB;
+	Wed, 16 Jul 2025 00:01:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="naZ8PxKC"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gzN05hhi"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7997610F1
-	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 00:01:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7462921B9D9
+	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 00:01:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752624097; cv=none; b=WDUDf01WIa2wIAsWeFnl2S5PBWTbmkWT93UP3Img5S7iAVIj0G+BCuGJb62TYFxb2p4gA/q/wzyKCL7kZeQONZyGtRxD56/+6w8yMwBJeprTdX+XjZw223vYX8GZiDQDXL9tHX01X4Ybo14b0T+o/vRggYWpJCuR2Xc4a4woM7I=
+	t=1752624101; cv=none; b=Q1RQlcrJOyJTbgeN96b+CN0Bb5iMpUBfRgw/m9HVgIev8a96xIZh+UeND5yzz206EV6GaxWJIcamvovl8WF8hBo5Jg87vB95N4XdIaQJZ2ESwuBXHpf1TKszxmVT87Z8H6Z88flb255qd42EnEx8C9NvR7ED1/H2xDvnWNtQvBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752624097; c=relaxed/simple;
-	bh=ptCTmsUmw+ZgmwvdsK7zWBp6fQ3EHDqqTzKOdIFWImA=;
+	s=arc-20240116; t=1752624101; c=relaxed/simple;
+	bh=UUxoVzcyD9RgSudkCBZCQ9NsJr4Lz/rWYjdz0jmLqOA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=t1iIowP43RYiFAI5QShh65e7xGitsq/3SwGOEKPX/mkIyuJdnaHsDCKY4lSODAf3dAU+krn20Z46BOqKZHDd++3pQw5H32KTaPpkTDwT5MfRLtTAivJ8pfY3D9XiwEAeakfdokehkpXVU1GY7GzIJwUs2O9lkWToZshpsjgfvQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=naZ8PxKC; arc=none smtp.client-ip=95.215.58.177
+	 MIME-Version; b=XbQIra8/G8/3X/5wSLjOgJzxtfZMXHY4zPdL6u19E98hUkig18au47tNuFa6SE0XyNfUO3aCLL6G6FvtJ7hDYlKvtITAk8VL5zygc5Iixwyst4UohPTy7qo3VKBA5MpiGC1HOk9a8WbAo4ka9qPnIXexiRczF7J85BnD8dcVXc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gzN05hhi; arc=none smtp.client-ip=95.215.58.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1752624093;
+	t=1752624096;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=iRuFXoOx7ugRu+xZOn9KsE5pqVIii62tEGweLLSB5Os=;
-	b=naZ8PxKCh+sRYCLRMgsA1O5bc1h3AEmUMvXomw4BnYQE0xmjLIGBYLSwyRDLZgXMjx0YgP
-	7p7FimTn7tm3+6oqPO8LoXgGIsHl847LvEoUrnIeH8/mbL+mXh8MhS+6XXJCJ/XuTizSIY
-	vZtQMxotcOGussgvOl+f6bSErOdx2xc=
+	bh=ArPO0aSMNQ4VJy5Cn1NLmMTjUMksppDpeUXhdV8G3FI=;
+	b=gzN05hhi+uV+I7xKdtM+ZCjaHJ48IbPgXyyNjBhfgmBmNhSEFSk2dW1KypcZdrEDgJtWId
+	5JMFgcjSVS8P4RdCXntMJnUE2wfTqVJBGfKKFC+3LBUDML4EW4B5yNThEtbUSe0Hmqizau
+	9jKdx7JJHjVu46j9+HcwLFVs2PaxcAk=
 From: Sean Anderson <sean.anderson@linux.dev>
 To: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -59,9 +59,9 @@ Cc: Dave Ertman <david.m.ertman@intel.com>,
 	linux-arm-kernel@lists.infradead.org,
 	Ira Weiny <ira.weiny@intel.com>,
 	Sean Anderson <sean.anderson@linux.dev>
-Subject: [PATCH net v2 1/4] auxiliary: Support hexadecimal ids
-Date: Tue, 15 Jul 2025 20:01:07 -0400
-Message-Id: <20250716000110.2267189-2-sean.anderson@linux.dev>
+Subject: [PATCH net v2 2/4] net: axienet: Fix resource release ordering
+Date: Tue, 15 Jul 2025 20:01:08 -0400
+Message-Id: <20250716000110.2267189-3-sean.anderson@linux.dev>
 In-Reply-To: <20250716000110.2267189-1-sean.anderson@linux.dev>
 References: <20250716000110.2267189-1-sean.anderson@linux.dev>
 Precedence: bulk
@@ -73,75 +73,233 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Support creating auxiliary devices with the id included as part of the
-name. This allows for hexadecimal ids, which may be more appropriate for
-auxiliary devices created as children of memory-mapped devices. If an
-auxiliary device's id is set to AUXILIARY_DEVID_NONE, the name must
-be of the form "name.id".
+Device-managed resources are released after manually-managed resources.
+Therefore, once any manually-managed resource is acquired, all further
+resources must be manually-managed too.
 
-With this patch, dmesg logs from an auxiliary device might look something
-like
+Convert all resources before the MDIO bus is created into device-managed
+resources. In all cases but one there are already devm variants available.
 
-[    4.781268] xilinx_axienet 80200000.ethernet: autodetected 64-bit DMA range
-[   21.889563] xilinx_emac.mac xilinx_emac.mac.80200000 net4: renamed from eth0
-[   32.296965] xilinx_emac.mac xilinx_emac.mac.80200000 net4: PHY [axienet-80200000:05] driver [RTL8211F Gigabit Ethernet] (irq=70)
-[   32.313456] xilinx_emac.mac xilinx_emac.mac.80200000 net4: configuring for inband/sgmii link mode
-[   65.095419] xilinx_emac.mac xilinx_emac.mac.80200000 net4: Link is Up - 1Gbps/Full - flow control rx/tx
-
-this is especially useful when compared to what might happen if there is
-an error before userspace has the chance to assign a name to the netdev:
-
-[    4.947215] xilinx_emac.mac xilinx_emac.mac.1 (unnamed net_device) (uninitialized): incorrect link mode  for in-band status
-
+Fixes: 46aa27df8853 ("net: axienet: Use devm_* calls")
 Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
 ---
 
-Changes in v2:
-- Add example log output to commit message
+(no changes since v1)
 
- drivers/base/auxiliary.c      | 6 +++++-
- include/linux/auxiliary_bus.h | 4 +++-
- 2 files changed, 8 insertions(+), 2 deletions(-)
+ .../net/ethernet/xilinx/xilinx_axienet_main.c | 89 ++++++++-----------
+ 1 file changed, 37 insertions(+), 52 deletions(-)
 
-diff --git a/drivers/base/auxiliary.c b/drivers/base/auxiliary.c
-index dba7c8e13a53..64a0d5e2eb83 100644
---- a/drivers/base/auxiliary.c
-+++ b/drivers/base/auxiliary.c
-@@ -331,7 +331,11 @@ int __auxiliary_device_add(struct auxiliary_device *auxdev, const char *modname)
- 		return -EINVAL;
- 	}
+diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+index 6011d7eae0c7..1f277e5e4a62 100644
+--- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
++++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+@@ -2744,6 +2744,11 @@ static void axienet_dma_err_handler(struct work_struct *work)
+ 	axienet_setoptions(ndev, lp->options);
+ }
  
--	ret = dev_set_name(dev, "%s.%s.%d", modname, auxdev->name, auxdev->id);
-+	if (auxdev->id == AUXILIARY_DEVID_NONE)
-+		ret = dev_set_name(dev, "%s.%s", modname, auxdev->name);
-+	else
-+		ret = dev_set_name(dev, "%s.%s.%d", modname, auxdev->name,
-+				   auxdev->id);
- 	if (ret) {
- 		dev_err(dev, "auxiliary device dev_set_name failed: %d\n", ret);
- 		return ret;
-diff --git a/include/linux/auxiliary_bus.h b/include/linux/auxiliary_bus.h
-index 4086afd0cc6b..76904cf2c3dd 100644
---- a/include/linux/auxiliary_bus.h
-+++ b/include/linux/auxiliary_bus.h
-@@ -51,6 +51,8 @@
-  * unregisters the auxiliary device.
-  */
- 
-+#define AUXILIARY_DEVID_NONE	(-1)
++static void axienet_disable_misc(void *clocks)
++{
++	clk_bulk_disable_unprepare(XAE_NUM_MISC_CLOCKS, clocks);
++}
 +
  /**
-  * struct auxiliary_device - auxiliary device object.
-  * @dev: Device,
-@@ -269,7 +271,7 @@ struct auxiliary_device *__devm_auxiliary_device_create(struct device *dev,
+  * axienet_probe - Axi Ethernet probe function.
+  * @pdev:	Pointer to platform device structure.
+@@ -2767,7 +2772,7 @@ static int axienet_probe(struct platform_device *pdev)
+ 	int addr_width = 32;
+ 	u32 value;
  
- #define devm_auxiliary_device_create(dev, devname, platform_data)     \
- 	__devm_auxiliary_device_create(dev, KBUILD_MODNAME, devname,  \
--				       platform_data, 0)
-+				       platform_data, AUXILIARY_DEVID_NONE)
+-	ndev = alloc_etherdev(sizeof(*lp));
++	ndev = devm_alloc_etherdev(&pdev->dev, sizeof(*lp));
+ 	if (!ndev)
+ 		return -ENOMEM;
  
- /**
-  * module_auxiliary_driver() - Helper macro for registering an auxiliary driver
+@@ -2795,22 +2800,17 @@ static int axienet_probe(struct platform_device *pdev)
+ 	seqcount_mutex_init(&lp->hw_stats_seqcount, &lp->stats_lock);
+ 	INIT_DEFERRABLE_WORK(&lp->stats_work, axienet_refresh_stats);
+ 
+-	lp->axi_clk = devm_clk_get_optional(&pdev->dev, "s_axi_lite_clk");
++	lp->axi_clk = devm_clk_get_optional_enabled(&pdev->dev,
++						    "s_axi_lite_clk");
+ 	if (!lp->axi_clk) {
+ 		/* For backward compatibility, if named AXI clock is not present,
+ 		 * treat the first clock specified as the AXI clock.
+ 		 */
+-		lp->axi_clk = devm_clk_get_optional(&pdev->dev, NULL);
+-	}
+-	if (IS_ERR(lp->axi_clk)) {
+-		ret = PTR_ERR(lp->axi_clk);
+-		goto free_netdev;
+-	}
+-	ret = clk_prepare_enable(lp->axi_clk);
+-	if (ret) {
+-		dev_err(&pdev->dev, "Unable to enable AXI clock: %d\n", ret);
+-		goto free_netdev;
++		lp->axi_clk = devm_clk_get_optional_enabled(&pdev->dev, NULL);
+ 	}
++	if (IS_ERR(lp->axi_clk))
++		return dev_err_probe(&pdev->dev, PTR_ERR(lp->axi_clk),
++				     "could not get AXI clock\n");
+ 
+ 	lp->misc_clks[0].id = "axis_clk";
+ 	lp->misc_clks[1].id = "ref_clk";
+@@ -2818,18 +2818,23 @@ static int axienet_probe(struct platform_device *pdev)
+ 
+ 	ret = devm_clk_bulk_get_optional(&pdev->dev, XAE_NUM_MISC_CLOCKS, lp->misc_clks);
+ 	if (ret)
+-		goto cleanup_clk;
++		return dev_err_probe(&pdev->dev, ret,
++				     "could not get misc. clocks\n");
+ 
+ 	ret = clk_bulk_prepare_enable(XAE_NUM_MISC_CLOCKS, lp->misc_clks);
+ 	if (ret)
+-		goto cleanup_clk;
++		return dev_err_probe(&pdev->dev, ret,
++				     "could not enable misc. clocks\n");
++
++	ret = devm_add_action_or_reset(&pdev->dev, axienet_disable_misc,
++				       lp->misc_clks);
++	if (ret)
++		return ret;
+ 
+ 	/* Map device registers */
+ 	lp->regs = devm_platform_get_and_ioremap_resource(pdev, 0, &ethres);
+-	if (IS_ERR(lp->regs)) {
+-		ret = PTR_ERR(lp->regs);
+-		goto cleanup_clk;
+-	}
++	if (IS_ERR(lp->regs))
++		return PTR_ERR(lp->regs);
+ 	lp->regs_start = ethres->start;
+ 
+ 	/* Setup checksum offload, but default to off if not specified */
+@@ -2898,19 +2903,17 @@ static int axienet_probe(struct platform_device *pdev)
+ 			lp->phy_mode = PHY_INTERFACE_MODE_1000BASEX;
+ 			break;
+ 		default:
+-			ret = -EINVAL;
+-			goto cleanup_clk;
++			return -EINVAL;
+ 		}
+ 	} else {
+ 		ret = of_get_phy_mode(pdev->dev.of_node, &lp->phy_mode);
+ 		if (ret)
+-			goto cleanup_clk;
++			return ret;
+ 	}
+ 	if (lp->switch_x_sgmii && lp->phy_mode != PHY_INTERFACE_MODE_SGMII &&
+ 	    lp->phy_mode != PHY_INTERFACE_MODE_1000BASEX) {
+ 		dev_err(&pdev->dev, "xlnx,switch-x-sgmii only supported with SGMII or 1000BaseX\n");
+-		ret = -EINVAL;
+-		goto cleanup_clk;
++		return -EINVAL;
+ 	}
+ 
+ 	if (!of_property_present(pdev->dev.of_node, "dmas")) {
+@@ -2925,7 +2928,7 @@ static int axienet_probe(struct platform_device *pdev)
+ 				dev_err(&pdev->dev,
+ 					"unable to get DMA resource\n");
+ 				of_node_put(np);
+-				goto cleanup_clk;
++				return ret;
+ 			}
+ 			lp->dma_regs = devm_ioremap_resource(&pdev->dev,
+ 							     &dmares);
+@@ -2942,19 +2945,17 @@ static int axienet_probe(struct platform_device *pdev)
+ 		}
+ 		if (IS_ERR(lp->dma_regs)) {
+ 			dev_err(&pdev->dev, "could not map DMA regs\n");
+-			ret = PTR_ERR(lp->dma_regs);
+-			goto cleanup_clk;
++			return PTR_ERR(lp->dma_regs);
+ 		}
+ 		if (lp->rx_irq <= 0 || lp->tx_irq <= 0) {
+ 			dev_err(&pdev->dev, "could not determine irqs\n");
+-			ret = -ENOMEM;
+-			goto cleanup_clk;
++			return -ENOMEM;
+ 		}
+ 
+ 		/* Reset core now that clocks are enabled, prior to accessing MDIO */
+ 		ret = __axienet_device_reset(lp);
+ 		if (ret)
+-			goto cleanup_clk;
++			return ret;
+ 
+ 		/* Autodetect the need for 64-bit DMA pointers.
+ 		 * When the IP is configured for a bus width bigger than 32 bits,
+@@ -2981,14 +2982,13 @@ static int axienet_probe(struct platform_device *pdev)
+ 		}
+ 		if (!IS_ENABLED(CONFIG_64BIT) && lp->features & XAE_FEATURE_DMA_64BIT) {
+ 			dev_err(&pdev->dev, "64-bit addressable DMA is not compatible with 32-bit architecture\n");
+-			ret = -EINVAL;
+-			goto cleanup_clk;
++			return -EINVAL;
+ 		}
+ 
+ 		ret = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(addr_width));
+ 		if (ret) {
+ 			dev_err(&pdev->dev, "No suitable DMA available\n");
+-			goto cleanup_clk;
++			return ret;
+ 		}
+ 		netif_napi_add(ndev, &lp->napi_rx, axienet_rx_poll);
+ 		netif_napi_add(ndev, &lp->napi_tx, axienet_tx_poll);
+@@ -2998,15 +2998,12 @@ static int axienet_probe(struct platform_device *pdev)
+ 
+ 		lp->eth_irq = platform_get_irq_optional(pdev, 0);
+ 		if (lp->eth_irq < 0 && lp->eth_irq != -ENXIO) {
+-			ret = lp->eth_irq;
+-			goto cleanup_clk;
++			return lp->eth_irq;
+ 		}
+ 		tx_chan = dma_request_chan(lp->dev, "tx_chan0");
+-		if (IS_ERR(tx_chan)) {
+-			ret = PTR_ERR(tx_chan);
+-			dev_err_probe(lp->dev, ret, "No Ethernet DMA (TX) channel found\n");
+-			goto cleanup_clk;
+-		}
++		if (IS_ERR(tx_chan))
++			return dev_err_probe(lp->dev, PTR_ERR(tx_chan),
++					     "No Ethernet DMA (TX) channel found\n");
+ 
+ 		cfg.reset = 1;
+ 		/* As name says VDMA but it has support for DMA channel reset */
+@@ -3014,7 +3011,7 @@ static int axienet_probe(struct platform_device *pdev)
+ 		if (ret < 0) {
+ 			dev_err(&pdev->dev, "Reset channel failed\n");
+ 			dma_release_channel(tx_chan);
+-			goto cleanup_clk;
++			return ret;
+ 		}
+ 
+ 		dma_release_channel(tx_chan);
+@@ -3119,13 +3116,6 @@ static int axienet_probe(struct platform_device *pdev)
+ 		put_device(&lp->pcs_phy->dev);
+ 	if (lp->mii_bus)
+ 		axienet_mdio_teardown(lp);
+-cleanup_clk:
+-	clk_bulk_disable_unprepare(XAE_NUM_MISC_CLOCKS, lp->misc_clks);
+-	clk_disable_unprepare(lp->axi_clk);
+-
+-free_netdev:
+-	free_netdev(ndev);
+-
+ 	return ret;
+ }
+ 
+@@ -3143,11 +3133,6 @@ static void axienet_remove(struct platform_device *pdev)
+ 		put_device(&lp->pcs_phy->dev);
+ 
+ 	axienet_mdio_teardown(lp);
+-
+-	clk_bulk_disable_unprepare(XAE_NUM_MISC_CLOCKS, lp->misc_clks);
+-	clk_disable_unprepare(lp->axi_clk);
+-
+-	free_netdev(ndev);
+ }
+ 
+ static void axienet_shutdown(struct platform_device *pdev)
 -- 
 2.35.1.1320.gc452695387.dirty
 
