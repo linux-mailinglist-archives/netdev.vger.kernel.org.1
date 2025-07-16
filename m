@@ -1,276 +1,170 @@
-Return-Path: <netdev+bounces-207350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C2D0B06BD5
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 04:47:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5933B06BDC
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 05:04:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D0A91AA707B
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 02:48:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E52016D4A5
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 03:04:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8D5F277013;
-	Wed, 16 Jul 2025 02:47:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC24326FA4E;
+	Wed, 16 Jul 2025 03:04:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ruo1JzCF"
+	dkim=pass (2048-bit key) header.d=maxlinear.com header.i=@maxlinear.com header.b="RRlgct5/"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2087.outbound.protection.outlook.com [40.107.223.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 911F81DB356
-	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 02:47:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752634057; cv=none; b=C4Djmzv2hEMwi0WR1MsTBojVMg5TICkxO8ANP1kL32KVlfxwp4UAk3WhwPDZPsd8ZqvoCAvxllWNX+/4kq/J7TY/dXRpan230SXz9Ssi8feB/1lnLgqFPhUT7jatfSThIOOoACJOMBj8rYChusv4tUJTnGYnTrCoLUWpI5gfR8s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752634057; c=relaxed/simple;
-	bh=6tyFQG9ObMR6DQRml1mb/juchm0s9LQKambyFuaWRJY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=C1Hg7syR0xIJHNF+mkQ4jt1Qpzr0wZ1W60OP+YgpFfJSh+gGB2fCzSB2P7AXfGdCvrhmZJ89/fAB8ylZMGtRPokRP4rqc9dFUCIG3KqS1DAlUxiz4b7KdXrqE4fx9z8YM8n/ujQ/t5RBB4FxVUVf9v9OTFh8CsSzWF1OlYgDGHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ruo1JzCF; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752634053;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=s6LOs3KwxAcMoFoSn4gzE7xIJQ2DUSqrbD9QaSjD71I=;
-	b=Ruo1JzCFsYgin/C3Ef7SE1zn4IhsRZDjo5uqdmlYk6+QPjh/gJZn/yVcRKPuXhMboAAHAx
-	55YmHaz+6ROFaEQnKD9chjyeiQ0SBY3+PRu3s6Dr906bdwmBKWOxR1qXGJ/0UDobUKtTdk
-	vWLQrVUtlRF1omLb5tWRjih56/H3+lg=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-171-enNGbKD6OmeZAnUiSNvCyA-1; Tue, 15 Jul 2025 22:47:32 -0400
-X-MC-Unique: enNGbKD6OmeZAnUiSNvCyA-1
-X-Mimecast-MFC-AGG-ID: enNGbKD6OmeZAnUiSNvCyA_1752634051
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-3141f9ce4e2so9986556a91.1
-        for <netdev@vger.kernel.org>; Tue, 15 Jul 2025 19:47:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752634051; x=1753238851;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s6LOs3KwxAcMoFoSn4gzE7xIJQ2DUSqrbD9QaSjD71I=;
-        b=flbw9WMouVEJSyzXFE02Z8eSiIj7xozg7QMe/uLKLHmxRAEzYpIvJ+EPWWTqW5F3X6
-         rqEuHatcJdPEjVsijJiY5LA3VbHUfOolFiDFs/NujOvfJzf3ofeiV9l2Tlxnzhc1sO7A
-         77VeNUXu0ytHO68trz+TLLC+6KFCZXSMsIQaWmlLlQNl7vUIHmvXbvlHlt+5rWNbON4N
-         mmxW05Q6U2NEr09Hol1qvjelMHfiKz3Yoo7piTraHRJqJ1vDkN5D3jdU5y7Gp9h8CRcK
-         aOS/MOHu/CR12mwiypPLEzG1CAqaBHEVa46TZuKVpoHtb2OyRgv6n3+wKK0rV/cH4vR8
-         3XTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWU+OG3edA4qnc4+iz5BFlHCZoUbXHKpOzKuPkYHjYClPAlRinVRNGJcfBcMROYHqp+Dx08niE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLzz7GF0E6nYPKB7xI1SghktLXwnTC6nIxvrvz7yY+OIkgj+qZ
-	/fJtltH4xlW9M+sWLd+jJoJtHAqruqCRUG/IHY1eAiLo6UWDXPXnJIcU19U400gT3LT0WqrqY/c
-	KolbHCa3zpFXqGRmMzNKEd0MUUD8Ed4ZXe260CkQTnvvPMDinUylhdRqsdHZmTulVagqgPsVt56
-	3YxjSZAVsFoxDqCu0kgwjx+P0pmo5YKIN0
-X-Gm-Gg: ASbGncv/IkL4YL9/wChGYZMy9o3vlTkEAlft3wEcz+/61BsNaXzSsObdqwG1v/sTNrU
-	FGcVO77keZHy8FF9kqS5R2WZvWD3qmZdGpadaOZqzUwXkJfDbNbLvQ/pAQUlMY5uWwJqLEzQqgm
-	ExdHBVZV9lotG+D5SPJ+o=
-X-Received: by 2002:a17:90b:55cb:b0:312:959:dc41 with SMTP id 98e67ed59e1d1-31c9f43747emr1236233a91.27.1752634050874;
-        Tue, 15 Jul 2025 19:47:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFSgy3Q6uvDcv+dh57LPDBZNKo40hU3FNxj6pWecHXujau5F/JesmVv4D6IJmpzKmuDlsaWm5Df3O5TB62z2j0=
-X-Received: by 2002:a17:90b:55cb:b0:312:959:dc41 with SMTP id
- 98e67ed59e1d1-31c9f43747emr1236201a91.27.1752634050348; Tue, 15 Jul 2025
- 19:47:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C444F522F
+	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 03:03:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.87
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752635042; cv=fail; b=I3b1ycx5RNqwNPniKhXxm80V2xlP92C74xoCBD6WWNN5ISGGIZLBWMWr7+/FD20x0qf17+ghQls/ie1ve9YmLc5Sh45bOUTg4eLisWqZILmlmnCbrhb5RPSY9x+qbremWR/u9iBTsDPW7N4ReIVZZFJRnH/MCX3ffwatQL3GOkQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752635042; c=relaxed/simple;
+	bh=C7525OWD5Ck5y5yiD23m6QyYdDn/ckamMc1d/R098uo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WMDY7OqTHW1QQVYjYnbfoUTR4HOg61DO4QMcfa0iieLzk0j9ULXgEPaFOYpR+gumstvyQC858wAytsYCik2V6KOHIcCRuJiCv5pADwXEtdWqaD6/vN6QMPOfYxvVoOvCosV1IRfqZtpejfAehK3fVVVEqI1tXL6GSHjpWW7nmU8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=maxlinear.com; spf=pass smtp.mailfrom=maxlinear.com; dkim=pass (2048-bit key) header.d=maxlinear.com header.i=@maxlinear.com header.b=RRlgct5/; arc=fail smtp.client-ip=40.107.223.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=maxlinear.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=maxlinear.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=nSz6IJlznYkvAy6EaF4ZXsMtMQ9+QTTkp+gnrGBBUAhTOvsa5yNHiVrRVAIRLBBHowYLUN9kwggpTUmgPU69J/rHcsN0y1ibBjLvw18WVk7Z+X5PdTBPTT5kb2WMwdZhHAQYtKLbS1omorrMZZLHad+Dr+WJH7p2ntAOlF1vDSvQIe7OXPP8lm1VTPRCL6vFdX5vpZsAoCywsP2s+EqjBsO1Fz2D/BE9uAbSvzO6PpLs4lItBcI9orEuMLFKY2alY4r33yYhpV9OF7I5PhyXTudhECy+oIN8qubK5vCTTQnSgH7XeuKBUbOW9tsHgrjWblNEJTjhETcF20V5LFx38w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=uYbw7PFB1ylwgl6LPz/FoY6JJZ/MNPgI2KhnR0WKAS0=;
+ b=dNL6YNMWNtQyoP7dzDHrNYkwbK4fPDLlq37mez6mAN6gPxQQStSOs/ObB+qGCis30mEdZQ3TRXnHgycxXANpzI7lq9LDdBcFAPAzj/YxSrpgmJhenuEsNtxFF+k6PM1ZFgMryLOe47ZSrc1ZxIYZw8Zfp2eFrKx8royAZ0suZJm4TYfPcHyRfc8hZ26wZnsUpIonvGM68xHJhNBHP8n7iBnxModyUHDcgsu7DLISkyXpUAIQfs24QJyBTI3yJacoJ6kK/GfV1EFirhteaPKqXHh2sM3fDlE58MdOQ70wPBUqlPMaGtNz3905wqh0DCidbdEnZdhRlG584c5WiRMNOQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 174.47.1.83) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=maxlinear.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none
+ header.from=maxlinear.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=maxlinear.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uYbw7PFB1ylwgl6LPz/FoY6JJZ/MNPgI2KhnR0WKAS0=;
+ b=RRlgct5/sapCGpkEBCn9XSalGLh6fZcBZ0ybzljQwSkafE0R7ojfkUGYC8mH7lfgSXZ19x2KeyFPyfJdGgsoLgd4RnitenYt+7GESZqje1HAjT3FC0LOlg0+w7qpMTkJl/bCOsfERVv+XtwloKrIn2omSseYrUoHFIkUVNbJcGIlKeNiSJz7FWgjNq2aBuMYTB+QCFe8A4uNClLKLjwInN79OuwmY5uWNYQPaud61CCLq+rLHBwqjXlajFIyPoW4R2XP80L7hA4VTLGYzgmj8AnPc69ug1YwELwSIq6yYCnKxDG6rDP1D8SkIHbXZyCNHyhTHMvgMQPoQn5KiDdYdg==
+Received: from DS7PR05CA0096.namprd05.prod.outlook.com (2603:10b6:8:56::28) by
+ SJ1PR19MB6380.namprd19.prod.outlook.com (2603:10b6:a03:455::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.28; Wed, 16 Jul
+ 2025 03:03:56 +0000
+Received: from DS2PEPF00003443.namprd04.prod.outlook.com
+ (2603:10b6:8:56:cafe::3b) by DS7PR05CA0096.outlook.office365.com
+ (2603:10b6:8:56::28) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8943.19 via Frontend Transport; Wed,
+ 16 Jul 2025 03:03:55 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 174.47.1.83)
+ smtp.mailfrom=maxlinear.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=maxlinear.com;
+Received-SPF: Pass (protection.outlook.com: domain of maxlinear.com designates
+ 174.47.1.83 as permitted sender) receiver=protection.outlook.com;
+ client-ip=174.47.1.83; helo=usmxlcas.maxlinear.com; pr=C
+Received: from usmxlcas.maxlinear.com (174.47.1.83) by
+ DS2PEPF00003443.mail.protection.outlook.com (10.167.17.70) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.8922.22 via Frontend Transport; Wed, 16 Jul 2025 03:03:55 +0000
+Received: from sgb016.sgsw.maxlinear.com (10.23.238.16) by mail.maxlinear.com
+ (10.23.38.120) with Microsoft SMTP Server id 15.1.2507.39; Tue, 15 Jul 2025
+ 20:03:52 -0700
+From: Jack Ping CHNG <jchng@maxlinear.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <fancer.lancer@gmail.com>, <yzhu@maxlinear.com>,
+	<sureshnagaraj@maxlinear.com>, Jack Ping CHNG <jchng@maxlinear.com>
+Subject: [PATCH net-next] net: pcs: xpcs: mask readl() return value to 16 bits
+Date: Wed, 16 Jul 2025 11:03:49 +0800
+Message-ID: <20250716030349.3796806-1-jchng@maxlinear.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250702103722.576219-1-zuozhijie@bytedance.com>
- <CACGkMEvjXBZ-Q77-8YRyd_EV0t9xMT8R8-FT5TKJBnqAOed=pQ@mail.gmail.com> <d5ad1b10-f485-4939-b9de-918b378362b9@bytedance.com>
-In-Reply-To: <d5ad1b10-f485-4939-b9de-918b378362b9@bytedance.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 16 Jul 2025 10:47:19 +0800
-X-Gm-Features: Ac12FXwY0618meZM7op6lRwCQ2ykvxYxmr5LBy2rowmHFXBgfqqUkpEG1gaprFg
-Message-ID: <CACGkMEvZ5dqjc6+1uwoq98x-78eymGFHXpOJtbViG3U9mOyn8g@mail.gmail.com>
-Subject: Re: Re: [PATCH net v2] virtio-net: fix a rtnl_lock() deadlock during probing
-To: Zigit Zo <zuozhijie@bytedance.com>
-Cc: mst@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS2PEPF00003443:EE_|SJ1PR19MB6380:EE_
+X-MS-Office365-Filtering-Correlation-Id: fd88a858-9a65-454e-94d8-08ddc41566b8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?llxqjEYuZ34GAyvwH3FmAhIWLyueoV19R2DR2J2sj5DuPax2SQthCqmsTkY3?=
+ =?us-ascii?Q?rYZ/AqEridu7H9TVOqH9m5jAQ2ftKbfoqTVDXZNld+22UWcepValkYKN3SFg?=
+ =?us-ascii?Q?0LW2T5m6CJwOcCYFAsA7J/Uf+klPq5xmiyTdns3+FGoklVTwHLU469lWwGxc?=
+ =?us-ascii?Q?FyFTS+j9RwaJjmEEjDlLKhq6wFPqFghGDEd2MTi5nwwaPo1tfnBuNC86XFAL?=
+ =?us-ascii?Q?YvXBU+DnNBL5KwvpDpMbj003IJoT2aEGXzl1eLJXKT/CoAHYIN7x9DbsUItg?=
+ =?us-ascii?Q?+roB09TRkO8IctvkaJDrMLcIl7xCqSwuSpgqwmDBZdDoIkPIg1Omu+9Akywu?=
+ =?us-ascii?Q?qyFJf8rCCI30D+BPDfm0qQt/aBImF/5T7pJFc979V0IffKnAS2HzYbps2lWd?=
+ =?us-ascii?Q?iYkyA0E6Z3eJVAknnbsaSuVf5tZ39dh0TgEtudCzttr5hJC2I9HFTYwdq8rJ?=
+ =?us-ascii?Q?d2bP1H/j7lDQawWZib1/oKtMDRm39hsO0LaJt0AZujiJdkV/693J5S1S3WB8?=
+ =?us-ascii?Q?BZ3reqNDJaYdl+EYbnpTbABrJK8uHPZs+HRMO/I/pHci5ZREjm4K1iBJ65PK?=
+ =?us-ascii?Q?nuqpYR8FSAdKeDvVWLpz6hf2fhHKbdNXpNAPKameoJAkfL3YUfQJ+CyrIvRA?=
+ =?us-ascii?Q?QaJA1XLcYJLlrlzXfyehI2o/zPeuRzDW0TMZuCqI6CHBu2bFl028DF3ar1gP?=
+ =?us-ascii?Q?sopiTa8o24WSzxZqYlFWQQpX1eka3qb+/Inq0GnD3tC1es344VlxH2Vm1trx?=
+ =?us-ascii?Q?9MxG8oR8ZNtHvgTjvLoLuhXfAi2xv863fQoyjBZS9MU4N5GDJebx5lcZ0BgS?=
+ =?us-ascii?Q?jI5fCZxRu5u+eDFqIBYLsXqivWmtj5Lmj4wbHVs3qNwsobn3bGiFHy5dgUP5?=
+ =?us-ascii?Q?zX+1aFLwCRE4VPTxF2awcpsg6xxhtQRD7Hpd1UDK1PgAHDtw8jryHq8jwn8B?=
+ =?us-ascii?Q?bjGb4q3HFNPUd2raRwD01Oa52UThxOOdtvL7C1DAl/1s7mGVOEB6+Uiaw0N7?=
+ =?us-ascii?Q?QUNVMWWpuUgMjoxLC6kEhDJmgz4tXqolF3/+ZniCPrPuWECyAy3t93NMzQMY?=
+ =?us-ascii?Q?u5zf36LRyMEa+GSeU/dpul597UX1rD1LIr9SjfjXTWziCWYGnqYxtrNOBZ2G?=
+ =?us-ascii?Q?DhKdqPVLy2PQDhhe+Gxo7uY7qXmp5pQHuBWjXbYBZjquj3PuB8QbujFXwD/j?=
+ =?us-ascii?Q?5AoBGNlIMEjopWnrgyc5G41t/rmFw57nblazbCsbcKWm3PQDgGe+gVPgHQhB?=
+ =?us-ascii?Q?LJK/WSZYE5vKhvAL8CxER0TNFJ6P3SDGd6vQg3dVl56s7IucBZlZw62nq1OZ?=
+ =?us-ascii?Q?rif8urS+7tcJAfIaBxgFIBFaBEhXTKKGAiQkKgUM8hpGI/NgMWgI4Y1envrh?=
+ =?us-ascii?Q?DDWxTB8IBHZPnvZCNJTZEaFDH/Hxq3KwrgxF9cvYmBHj7Y/eKe2CiY4M99Cx?=
+ =?us-ascii?Q?10qzv4hPtiTI5HelFfxOUoHU6lwlld/hxS5LVckc/WutahJ1zN/rygoACoA/?=
+ =?us-ascii?Q?zCDZOciB1T+agMIvvclC9aZCQ2h+NnvtIJvL?=
+X-Forefront-Antispam-Report:
+	CIP:174.47.1.83;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:usmxlcas.maxlinear.com;PTR:174-47-1-83.static.ctl.one;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: maxlinear.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2025 03:03:55.1946
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: fd88a858-9a65-454e-94d8-08ddc41566b8
+X-MS-Exchange-CrossTenant-Id: dac28005-13e0-41b8-8280-7663835f2b1d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=dac28005-13e0-41b8-8280-7663835f2b1d;Ip=[174.47.1.83];Helo=[usmxlcas.maxlinear.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS2PEPF00003443.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR19MB6380
 
-Hi Zigit:
+readl() returns 32-bit value but Clause 22/45 registers are 16-bit wide.
+Masking with 0xFFFF avoids using garbage upper bits.
 
-On Tue, Jul 15, 2025 at 7:00=E2=80=AFPM Zigit Zo <zuozhijie@bytedance.com> =
-wrote:
->
-> On 7/15/25 5:31 PM, Jason Wang wrote:
-> > On Wed, Jul 2, 2025 at 6:37=E2=80=AFPM Zigit Zo <zuozhijie@bytedance.co=
-m> wrote:
-> >>
-> >> This bug happens if the VMM sends a VIRTIO_NET_S_ANNOUNCE request whil=
-e
-> >> the virtio-net driver is still probing with rtnl_lock() hold, this wil=
-l
-> >> cause a recursive mutex in netdev_notify_peers().
-> >>
-> >> Fix it by temporarily save the announce status while probing, and then=
- in
-> >> virtnet_open(), if it sees a delayed announce work is there, it starts=
- to
-> >> schedule the virtnet_config_changed_work().
-> >>
-> >> Another possible solution is to directly check whether rtnl_is_locked(=
-)
-> >> and call __netdev_notify_peers(), but in that way means we need to rel=
-ies
-> >> on netdev_queue to schedule the arp packets after ndo_open(), which we
-> >> thought is not very intuitive.
-> >>
-> >> We've observed a softlockup with Ubuntu 24.04, and can be reproduced w=
-ith
-> >> QEMU sending the announce_self rapidly while booting.
-> >>
-> >> [  494.167473] INFO: task swapper/0:1 blocked for more than 368 second=
-s.
-> >> [  494.167667]       Not tainted 6.8.0-57-generic #59-Ubuntu
-> >> [  494.167810] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disa=
-bles this message.
-> >> [  494.168015] task:swapper/0       state:D stack:0     pid:1     tgid=
-:1     ppid:0      flags:0x00004000
-> >> [  494.168260] Call Trace:
-> >> [  494.168329]  <TASK>
-> >> [  494.168389]  __schedule+0x27c/0x6b0
-> >> [  494.168495]  schedule+0x33/0x110
-> >> [  494.168585]  schedule_preempt_disabled+0x15/0x30
-> >> [  494.168709]  __mutex_lock.constprop.0+0x42f/0x740
-> >> [  494.168835]  __mutex_lock_slowpath+0x13/0x20
-> >> [  494.168949]  mutex_lock+0x3c/0x50
-> >> [  494.169039]  rtnl_lock+0x15/0x20
-> >> [  494.169128]  netdev_notify_peers+0x12/0x30
-> >> [  494.169240]  virtnet_config_changed_work+0x152/0x1a0
-> >> [  494.169377]  virtnet_probe+0xa48/0xe00
-> >> [  494.169484]  ? vp_get+0x4d/0x100
-> >> [  494.169574]  virtio_dev_probe+0x1e9/0x310
-> >> [  494.169682]  really_probe+0x1c7/0x410
-> >> [  494.169783]  __driver_probe_device+0x8c/0x180
-> >> [  494.169901]  driver_probe_device+0x24/0xd0
-> >> [  494.170011]  __driver_attach+0x10b/0x210
-> >> [  494.170117]  ? __pfx___driver_attach+0x10/0x10
-> >> [  494.170237]  bus_for_each_dev+0x8d/0xf0
-> >> [  494.170341]  driver_attach+0x1e/0x30
-> >> [  494.170440]  bus_add_driver+0x14e/0x290
-> >> [  494.170548]  driver_register+0x5e/0x130
-> >> [  494.170651]  ? __pfx_virtio_net_driver_init+0x10/0x10
-> >> [  494.170788]  register_virtio_driver+0x20/0x40
-> >> [  494.170905]  virtio_net_driver_init+0x97/0xb0
-> >> [  494.171022]  do_one_initcall+0x5e/0x340
-> >> [  494.171128]  do_initcalls+0x107/0x230
-> >> [  494.171228]  ? __pfx_kernel_init+0x10/0x10
-> >> [  494.171340]  kernel_init_freeable+0x134/0x210
-> >> [  494.171462]  kernel_init+0x1b/0x200
-> >> [  494.171560]  ret_from_fork+0x47/0x70
-> >> [  494.171659]  ? __pfx_kernel_init+0x10/0x10
-> >> [  494.171769]  ret_from_fork_asm+0x1b/0x30
-> >> [  494.171875]  </TASK>
-> >>
-> >> Fixes: df28de7b0050 ("virtio-net: synchronize operstate with admin sta=
-te on up/down")
-> >> Signed-off-by: Zigit Zo <zuozhijie@bytedance.com>
-> >> ---
-> >> v1 -> v2:
-> >> - Check vi->status in virtnet_open().
-> >> v1:
-> >> - https://lore.kernel.org/netdev/20250630095109.214013-1-zuozhijie@byt=
-edance.com/
-> >> ---
-> >>  drivers/net/virtio_net.c | 43 ++++++++++++++++++++++++---------------=
--
-> >>  1 file changed, 26 insertions(+), 17 deletions(-)
-> >>
-> >> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> >> index e53ba600605a..859add98909b 100644
-> >> --- a/drivers/net/virtio_net.c
-> >> +++ b/drivers/net/virtio_net.c
-> >> @@ -3151,6 +3151,10 @@ static int virtnet_open(struct net_device *dev)
-> >>         if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_STATUS)) {
-> >>                 if (vi->status & VIRTIO_NET_S_LINK_UP)
-> >>                         netif_carrier_on(vi->dev);
-> >> +               if (vi->status & VIRTIO_NET_S_ANNOUNCE) {
-> >> +                       vi->status &=3D ~VIRTIO_NET_S_ANNOUNCE;
-> >> +                       schedule_work(&vi->config_work);
-> >> +               }
-> >>                 virtio_config_driver_enable(vi->vdev);
-> >
-> > Instead of doing tricks like this.
-> >
-> > I wonder if the fix is as simple as calling
-> > virtio_config_driver_disable() before init_vqs()?
-> >
-> > Thanks
-> >
->
-> That might not work as the device like QEMU will set the VIRTIO_NET_S_ANN=
-OUNCE
-> regardless of most of the driver status, QEMU only checks whether the dri=
-ver has
-> finalized it's features with VIRTIO_NET_F_GUEST_ANNOUNCE & VIRTIO_NET_F_C=
-TRL_VQ.
->
-> We've made a little patch to verify, don't know if it matches your though=
-t, but
-> it does not seem to work :(
->
->     diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->     index e53ba600605a..f309ce3fe243 100644
->     --- a/drivers/net/virtio_net.c
->     +++ b/drivers/net/virtio_net.c
->     @@ -6903,6 +6903,9 @@ static int virtnet_probe(struct virtio_device *=
-vdev)
->                     vi->curr_queue_pairs =3D num_online_cpus();
->             vi->max_queue_pairs =3D max_queue_pairs;
->
->     +       /* Disable config change notification until ndo_open. */
->     +       virtio_config_driver_disable(vi->vdev);
->     +
->             /* Allocate/initialize the rx/tx queues, and invoke find_vqs =
-*/
->             err =3D init_vqs(vi);
->             if (err)
->     @@ -6965,9 +6968,6 @@ static int virtnet_probe(struct virtio_device *=
-vdev)
->                     goto free_failover;
->             }
->
->     -       /* Disable config change notification until ndo_open. */
->     -       virtio_config_driver_disable(vi->vdev);
->     -
->             virtio_device_ready(vdev);
->
->             if (vi->has_rss || vi->has_rss_hash_report) {
->
-> For reproduce details,
->
-> 1. Spawn qemu with monitor, like `-monitor unix:qemu.sock,server`
-> 2. In another window, run `while true; echo "announce_self"; end | socat =
-- unix-connect:qemu.sock > /dev/null`
-> 3. The boot up will get hanged when probing the virtio_net
->
-> The simplest version we've made is to revert the usage of
-> `virtnet_config_changed_work()` back to the `schedule_work()`, but as in =
-v1,
-> we're still trying to understand the impact, making sure that it won't br=
-eak
-> other things.
->
-> Regards,
->
+Signed-off-by: Jack Ping CHNG <jchng@maxlinear.com>
+---
+ drivers/net/pcs/pcs-xpcs-plat.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks for the clarification. Now I see the issue.
-
-It looks like the root cause is to call virtio_config_changed_work()
-directly during probe().
-
-Let's switch to use virtio_config_changed() instead so that we can
-properly check the config_driver_disabled.
-
-Thanks
+diff --git a/drivers/net/pcs/pcs-xpcs-plat.c b/drivers/net/pcs/pcs-xpcs-plat.c
+index 629315f1e57c..9dcaf7a66113 100644
+--- a/drivers/net/pcs/pcs-xpcs-plat.c
++++ b/drivers/net/pcs/pcs-xpcs-plat.c
+@@ -66,7 +66,7 @@ static int xpcs_mmio_read_reg_indirect(struct dw_xpcs_plat *pxpcs,
+ 	switch (pxpcs->reg_width) {
+ 	case 4:
+ 		writel(page, pxpcs->reg_base + (DW_VR_CSR_VIEWPORT << 2));
+-		ret = readl(pxpcs->reg_base + (ofs << 2));
++		ret = readl(pxpcs->reg_base + (ofs << 2)) & 0xffff;
+ 		break;
+ 	default:
+ 		writew(page, pxpcs->reg_base + (DW_VR_CSR_VIEWPORT << 1));
+@@ -124,7 +124,7 @@ static int xpcs_mmio_read_reg_direct(struct dw_xpcs_plat *pxpcs,
+ 
+ 	switch (pxpcs->reg_width) {
+ 	case 4:
+-		ret = readl(pxpcs->reg_base + (csr << 2));
++		ret = readl(pxpcs->reg_base + (csr << 2)) & 0xffff;
+ 		break;
+ 	default:
+ 		ret = readw(pxpcs->reg_base + (csr << 1));
+-- 
+2.43.0
 
 
