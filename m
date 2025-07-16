@@ -1,123 +1,112 @@
-Return-Path: <netdev+bounces-207481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7127B0782D
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 16:32:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A03EB07849
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 16:39:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17FC63A57C8
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 14:31:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45EAA7B842D
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 14:37:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C38F72BF3DB;
-	Wed, 16 Jul 2025 14:30:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9BC225C810;
+	Wed, 16 Jul 2025 14:38:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QGqOXs1u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q94mj1Pi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92155263C9F;
-	Wed, 16 Jul 2025 14:30:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A634126057A
+	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 14:38:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752676250; cv=none; b=T09tE91Sue3efDA+1emlkw24trNOUbxx85KfKf/QbtO/e6K7UBc03Ux8RFNd8cOMxAh/A7O+3Z3ttBCBtqvKtlG1AL8lLxFWA2WAiRQufsAP2DCkAAwjt5O6wGtu5m0Lvw6oSTkVeicaeZ1WR2U4aXa7XQodde8V1mq8Q4Oi3sQ=
+	t=1752676733; cv=none; b=JMUU4HXsfxqeIfedr/hoj6bx9j926AGHVSOmCJGz/n5ZL1SaFTr6+JjQh84O9IbWn+U1zgy5gV4vz/MqO2Zv8C20nWo89kJ4VPmwwGse961NddfoiYA/fCH6ekKqaKnR9aNdsoKrMOFpU76CnbvlC4Cd9HiQLKoUdlexraSFy9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752676250; c=relaxed/simple;
-	bh=+7GaLCQmfxsw2Ze83ywPS5OxpKBvvXdTtasxk+627lU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=E8BOA693WXQ+f4i49kWDtj0sXDH/XVHVGJHer9EuKVnJ7gcqHKvtiIKLz5R4oUN5aqoCbBgbiLLy4Cf+XC+b+af0CQxpGkmKcZWS6N8GZGx/jbBNwe4ABUSEcRqC3EpBPg89GmJzxwK3fIBREXHS2GxEFT+WfmtNoTpflWUfLCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QGqOXs1u; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A9A7C4CEE7;
-	Wed, 16 Jul 2025 14:30:49 +0000 (UTC)
+	s=arc-20240116; t=1752676733; c=relaxed/simple;
+	bh=IMJWkGnLWAoHHACStORaqYMu+6knT/PMv1odls4h4Dc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tTGR02H1RZ5UhxpxJF4xpqm8ZkOK84zf3oXkRQvaB4ZtDypj1YS7NCxbplIX1Pq7+Qnwok64O8VSnMuqlJh0Q0Bn+PhSmI3C97XfcytX7Kywv8IJHgVB1/mUApfi3+3O9W2gle21a9ovSSpVB/Y33QtynOqEVAo1YQikSgpOp90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q94mj1Pi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1DC2C4CEE7;
+	Wed, 16 Jul 2025 14:38:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752676250;
-	bh=+7GaLCQmfxsw2Ze83ywPS5OxpKBvvXdTtasxk+627lU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QGqOXs1u0zySTLcUmFrIDYXDkv2yPNs1SuBpeQt/Re5xhNXypKTWDW7vNlCCbSLpo
-	 xlr9MYwyVcddC6UmAPn4bl+dYJ1QOV1V3MdCDsmEJr6etSlz9Q7DtpeXa7lEpqRbrL
-	 2z/YD75gDjbWNjTXokItmjd9xF7aSrSwig5MG1twuoa+Oh/jNEsleJFMZ43OLeg5zP
-	 cRK5TEVHo6t4uuxxdXnoN0818O4zVPqewc0uv/qDqagsq+lAuZBiux3Zg1i4XYngWj
-	 qnTlHpMwqpVTwQBh7u5pgpPlifRJtRa6fLU+uLLAwXWYTQr8hfbPhfN6dURQfAoL7E
-	 Got7FyN64ebKg==
-Date: Wed, 16 Jul 2025 07:30:48 -0700
+	s=k20201202; t=1752676733;
+	bh=IMJWkGnLWAoHHACStORaqYMu+6knT/PMv1odls4h4Dc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Q94mj1PiokQuzRCKtKf3tPwdIgdAtyPBoSp0rAZl5ruIlJ9Gd2aRMJqYLwQmLWCDO
+	 UDLf40qEml6isXcGRPDiUxgqNtfbDifw/3wJsgx5jV9yEK6J3Yons0a9KknO4WchoR
+	 tSUuz83e/r7SzjWyvi71PjAqervRicXJ+v9UdIwoxayFeh4xSzKbzDiIF4batHfX9y
+	 uOQ0yx9UhATJoWuTbiOtjMLynh60fVKycuQzMIct1KcQVEIoi9iEpgvY//Kf6oiqLJ
+	 cb4WwGDejOhRkcmAKcsPJPM4PV15SXWLuQmNYYTuuFcq88HsVIMqDoQyikOR8T01ov
+	 vF6lC816nLFHQ==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Mohsin Bashir <mohsin.bashr@gmail.com>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, shuah@kernel.org, horms@kernel.org,
- cratiu@nvidia.com, noren@nvidia.com, cjubran@nvidia.com, mbloch@nvidia.com,
- jdamato@fastly.com, gal@nvidia.com, sdf@fomichev.me, ast@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
- nathan@kernel.org, nick.desaulniers+lkml@gmail.com, morbo@google.com,
- justinstitt@google.com, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH net-next V5 0/5] net: netdevsim: hook in XDP handling
-Message-ID: <20250716073048.03e117a1@kernel.org>
-In-Reply-To: <20250715210553.1568963-1-mohsin.bashr@gmail.com>
-References: <20250715210553.1568963-1-mohsin.bashr@gmail.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	borisp@nvidia.com,
+	john.fastabend@gmail.com
+Subject: [PATCH net] tls: always refresh the queue when reading sock
+Date: Wed, 16 Jul 2025 07:38:50 -0700
+Message-ID: <20250716143850.1520292-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Tue, 15 Jul 2025 14:05:48 -0700 Mohsin Bashir wrote:
-> This patch series add tests to validate XDP native support for PASS,
-> DROP, ABORT, and TX actions, as well as headroom and tailroom adjustment.
-> For adjustment tests, validate support for both the extension and
-> shrinking cases across various packet sizes and offset values.
-> 
-> The pass criteria for head/tail adjustment tests require that at-least
-> one adjustment value works for at-least one packet size. This ensure
-> that the variability in maximum supported head/tail adjustment offset
-> across different drivers is being incorporated.
-> 
-> The results reported in this series are based on fbnic. However, the
-> series is tested against multiple other drivers including netdevism.
+After recent changes in net-next TCP compacts skbs much more
+aggressively. This unearthed a bug in TLS where we may try
+to operate on an old skb when checking if all skbs in the
+queue have matching decrypt state and geometry.
 
-Not much luck, on netdevsim with a debug kernel build the test seems to
-time out after 3min 30sec without printing anything.
+    BUG: KASAN: slab-use-after-free in tls_strp_check_rcv+0x898/0x9a0 [tls]
+    (net/tls/tls_strp.c:436 net/tls/tls_strp.c:530 net/tls/tls_strp.c:544)
+    Read of size 4 at addr ffff888013085750 by task tls/13529
 
-A normal VM it doesn't time out but it seems to reliably fail as follows:
+    CPU: 2 UID: 0 PID: 13529 Comm: tls Not tainted 6.16.0-rc5-virtme
+    Call Trace:
+     kasan_report+0xca/0x100
+     tls_strp_check_rcv+0x898/0x9a0 [tls]
+     tls_rx_rec_wait+0x2c9/0x8d0 [tls]
+     tls_sw_recvmsg+0x40f/0x1aa0 [tls]
+     inet_recvmsg+0x1c3/0x1f0
 
-TAP version 13
-1..1
-# timeout set to 180
-# selftests: drivers/net: xdp.py
-# TAP version 13
-# 1..9
-# ok 1 xdp.test_xdp_native_pass_sb
-# ok 2 xdp.test_xdp_native_pass_mb
-# ok 3 xdp.test_xdp_native_drop_sb
-# ok 4 xdp.test_xdp_native_drop_mb
-# ok 5 xdp.test_xdp_native_tx_mb
-# # Exception| Traceback (most recent call last):
-# # Exception|   File "/home/virtme/testing-17/tools/testing/selftests/net/lib/py/ksft.py", line 243, in ksft_run
-# # Exception|     case(*args)
-# # Exception|   File "/home/virtme/testing-17/tools/testing/selftests/drivers/net/./xdp.py", line 466, in test_xdp_native_adjst_tail_grow_data
-# # Exception|     _validate_res(res, offset_lst, pkt_sz_lst)
-# # Exception|   File "/home/virtme/testing-17/tools/testing/selftests/drivers/net/./xdp.py", line 337, in _validate_res
-# # Exception|     raise KsftFailEx(f"{res['reason']}")
-# # Exception| net.lib.py.ksft.KsftFailEx: Adjustment failed
-# not ok 6 xdp.test_xdp_native_adjst_tail_grow_data
-# ok 7 xdp.test_xdp_native_adjst_tail_shrnk_data
-# # Failed run: pkt_sz 512, offset -256. Last successful run: pkt_sz 512, offset -128. Reason: Adjustment failed
-# ok 8 xdp.test_xdp_native_adjst_head_grow_data
-# # Exception| Traceback (most recent call last):
-# # Exception|   File "/home/virtme/testing-17/tools/testing/selftests/net/lib/py/ksft.py", line 243, in ksft_run
-# # Exception|     case(*args)
-# # Exception|   File "/home/virtme/testing-17/tools/testing/selftests/drivers/net/./xdp.py", line 625, in test_xdp_native_adjst_head_shrnk_data
-# # Exception|     _validate_res(res, offset_lst, pkt_sz_lst)
-# # Exception|   File "/home/virtme/testing-17/tools/testing/selftests/drivers/net/./xdp.py", line 337, in _validate_res
-# # Exception|     raise KsftFailEx(f"{res['reason']}")
-# # Exception| net.lib.py.ksft.KsftFailEx: Data exchange failed
-# not ok 9 xdp.test_xdp_native_adjst_head_shrnk_data
-# # Totals: pass:7 fail:2 xfail:0 xpass:0 skip:0 error:0
-not ok 1 selftests: drivers/net: xdp.py # exit=1
+Always reload the queue, fast path is to have the record in the queue
+when we wake, anyway (IOW the path going down "if !strp->stm.full_len").
+
+Fixes: 0d87bbd39d7f ("tls: strp: make sure the TCP skbs do not have overlapping data")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: borisp@nvidia.com
+CC: john.fastabend@gmail.com
+---
+ net/tls/tls_strp.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/net/tls/tls_strp.c b/net/tls/tls_strp.c
+index 65b0da6fdf6a..095cf31bae0b 100644
+--- a/net/tls/tls_strp.c
++++ b/net/tls/tls_strp.c
+@@ -512,9 +512,8 @@ static int tls_strp_read_sock(struct tls_strparser *strp)
+ 	if (inq < strp->stm.full_len)
+ 		return tls_strp_read_copy(strp, true);
+ 
++	tls_strp_load_anchor_with_queue(strp, inq);
+ 	if (!strp->stm.full_len) {
+-		tls_strp_load_anchor_with_queue(strp, inq);
+-
+ 		sz = tls_rx_msg_size(strp, strp->anchor);
+ 		if (sz < 0) {
+ 			tls_strp_abort_strp(strp, sz);
 -- 
-pw-bot: cr
+2.50.1
+
 
