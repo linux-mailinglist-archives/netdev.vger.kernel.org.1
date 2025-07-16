@@ -1,154 +1,159 @@
-Return-Path: <netdev+bounces-207459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F73BB0760D
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 14:46:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44FD0B0763E
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 14:52:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E606B7B6252
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 12:43:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 62B737BC9BF
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 12:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68C1B2F50B7;
-	Wed, 16 Jul 2025 12:45:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE5062F50A2;
+	Wed, 16 Jul 2025 12:52:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VrIYYCnc"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MwbN2H02"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62F526A095
-	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 12:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A88012F3C34
+	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 12:52:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752669908; cv=none; b=LW5E3gvajupDTBM37+Bu4Ef5b8914MHl7G+gqcrOZ1M/RpJt9OlEUDpjulD98livdkdHaWkaNZ4+b+3/6h9GsWn646H8HXw2K6YLDZcWZ/sGZuLNSm/tIknlUTjNeehTETZcMfkxQdEuZhmK/6N7mH/IjwZKng7BzyHqEJZ1DfA=
+	t=1752670327; cv=none; b=RLIERzAQH9LeMyVQZqRc1M3UCTxOHL+KE4NjkAsi06L/7oORQo+TKZs5ZsZi37Gc8wb6WSn0/+h8laFkg5w6xjg12AN6Fgz785bCjYP3ZQl+c7m8j6Ep2eImha/BzHiQlDG8nWl9D2pL3h9Z4mMMQ8rIplnnYhIs1FbzPZ7YGiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752669908; c=relaxed/simple;
-	bh=bpsgmgeDGEc1PhZcHWMBFolFyeCIgQauwicXcX6/NmU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=YzxnCgnjjCgadqd114BTlTASp2/7tOp0QxuGcyW1D6LzwrCdwPxa8AaxeV+6zTNCfG8dF69EKTBzldp2O0TqGpfFC6tPawUYaujEdBvJwr80kvVsTfpaj1bKQfSo8Or8H5YB4MhJm+LAwY5pBa1h+4PdqDSu24P/GDDXyUDe9bU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VrIYYCnc; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752669905;
+	s=arc-20240116; t=1752670327; c=relaxed/simple;
+	bh=BgpwLOuihvCHzD5hv6/Y9aWhLnwAwkI6lX5RYOEdsos=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OJwRh0HI72UGYZA0xg7qd0tCneZF6G0tkCy98dgQ5SZOgqo8MT2OGESNYzKHNrXgDDMVLN4mi9+AfYh3bkgqN9PEgSBmPD2SbadxJ9je7tVLzGSWBUHAM0LIpzNhCJuPlubqfXNGsujgAYaYB/f/r/bSimZO9IMw6wZdRbc0Ccs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MwbN2H02; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752670312;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/6quTScKxILcudF7nQxBzrgXnyLUQnBhym3m6W7b0cU=;
-	b=VrIYYCnckCx4HT0ycOmJA2a+ngXz4NTkzNk5NcJ5YsCB0GPOxRHilIjRGgMTpRDuQQsl0C
-	L6wOnR0qB5lWooHX03F/a3+Zbp0xM8evQD5gTTTrm/pM/vC6TQUhLYeZ1GG0IYurWyn42d
-	zOKtefl7dc/ZHbnmmGCienFT/fYq4i4=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-322-cdU086dvM8ubdr7GK5D3jQ-1; Wed,
- 16 Jul 2025 08:45:03 -0400
-X-MC-Unique: cdU086dvM8ubdr7GK5D3jQ-1
-X-Mimecast-MFC-AGG-ID: cdU086dvM8ubdr7GK5D3jQ_1752669901
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 271821800165;
-	Wed, 16 Jul 2025 12:45:01 +0000 (UTC)
-Received: from RHTRH0061144 (unknown [10.22.65.149])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ADA491801712;
-	Wed, 16 Jul 2025 12:44:57 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Guillaume Nault <gnault@redhat.com>
-Cc: Salvatore Bonaccorso <carnil@debian.org>,  Stefano Brivio
- <sbrivio@redhat.com>,  Jakub Kicinski <kuba@kernel.org>,  "David S.
- Miller" <davem@davemloft.net>,  David Ahern <dsahern@kernel.org>,  Eric
- Dumazet <edumazet@google.com>,  Simon Horman <horms@kernel.org>,
-  netdev@vger.kernel.org,  Paolo Abeni <pabeni@redhat.com>,  Charles Bordet
- <rough.rock3059@datachamp.fr>,  linux-kernel@vger.kernel.org,
-  regressions@lists.linux.dev,  stable@vger.kernel.org,
-  1108860@bugs.debian.org
-Subject: Re: [regression] Wireguard fragmentation fails with VXLAN since
- 8930424777e4 ("tunnels: Accept PACKET_HOST skb_tunnel_check_pmtu().")
- causing network timeouts
-In-Reply-To: <aHYiwvElalXstQVa@debian> (Guillaume Nault's message of "Tue, 15
-	Jul 2025 11:43:30 +0200")
-References: <aHVhQLPJIhq-SYPM@eldamar.lan> <aHYiwvElalXstQVa@debian>
-Date: Wed, 16 Jul 2025 08:44:55 -0400
-Message-ID: <f7tjz485mpk.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	bh=BgpwLOuihvCHzD5hv6/Y9aWhLnwAwkI6lX5RYOEdsos=;
+	b=MwbN2H02kuOq6xWkkFbFgvMPh71sN/iHa3P4q4qOvdn8oX8obtjqKLTxHgmmqoOLPZKGMq
+	JJMzH1GOXVjOU2FVLn6HV0XA+h0B8/HnQq+W9kGUHQpn9K9aFEmSRgw//IMakuAdyiVm2V
+	SOfE+7EWr/B+OmEveeSI71reFSayI2w=
+From: Menglong Dong <menglong.dong@linux.dev>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Menglong Dong <menglong8.dong@gmail.com>, alexei.starovoitov@gmail.com,
+ rostedt@goodmis.org, jolsa@kernel.org, bpf@vger.kernel.org,
+ John Fastabend <john.fastabend@gmail.com>,
+ Martin KaFai Lau <martin.lau@linux.dev>,
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject:
+ Re: [PATCH bpf-next v2 06/18] bpf: tracing: add support to record and check
+ the accessed args
+Date: Wed, 16 Jul 2025 20:50:44 +0800
+Message-ID: <2067709.yKVeVyVuyW@7940hx>
+In-Reply-To:
+ <CAEf4BzYXy7GOnFwPWA+-Vn9oOSJ7m--KMBBsZPw8-tx=0rbAdA@mail.gmail.com>
+References:
+ <20250703121521.1874196-1-dongml2@chinatelecom.cn>
+ <0027bec0-e10f-4c7d-9a56-1c9be7737f6a@linux.dev>
+ <CAEf4BzYXy7GOnFwPWA+-Vn9oOSJ7m--KMBBsZPw8-tx=0rbAdA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: multipart/signed; boundary="nextPart2241665.OBFZWjSADL";
+ micalg="pgp-sha512"; protocol="application/pgp-signature"
+X-Migadu-Flow: FLOW_OUT
 
-Guillaume Nault <gnault@redhat.com> writes:
+--nextPart2241665.OBFZWjSADL
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"; protected-headers="v1"
+From: Menglong Dong <menglong.dong@linux.dev>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Wed, 16 Jul 2025 20:50:44 +0800
+Message-ID: <2067709.yKVeVyVuyW@7940hx>
+MIME-Version: 1.0
 
-> On Mon, Jul 14, 2025 at 09:57:52PM +0200, Salvatore Bonaccorso wrote:
->> Hi,
->> 
->> Charles Bordet reported the following issue (full context in
->> https://bugs.debian.org/1108860)
->> 
->> > Dear Maintainer,
->> > 
->> > What led up to the situation?
->> > We run a production environment using Debian 12 VMs, with a network
->> > topology involving VXLAN tunnels encapsulated inside Wireguard
->> > interfaces. This setup has worked reliably for over a year, with MTU set
->> > to 1500 on all interfaces except the Wireguard interface (set to 1420).
->> > Wireguard kernel fragmentation allowed this configuration to function
->> > without issues, even though the effective path MTU is lower than 1500.
->> > 
->> > What exactly did you do (or not do) that was effective (or ineffective)?
->> > We performed a routine system upgrade, updating all packages include the
->> > kernel. After the upgrade, we observed severe network issues (timeouts,
->> > very slow HTTP/HTTPS, and apt update failures) on all VMs behind the
->> > router. SSH and small-packet traffic continued to work.
->> > 
->> > To diagnose, we:
->> > 
->> > * Restored a backup (with the previous kernel): the problem disappeared.
->> > * Repeated the upgrade, confirming the issue reappeared.
->> > * Systematically tested each kernel version from 6.1.124-1 up to
->> > 6.1.140-1. The problem first appears with kernel 6.1.135-1; all earlier
->> > versions work as expected.
->> > * Kernel version from the backports (6.12.32-1) did not resolve the
->> > problem.
->> > 
->> > What was the outcome of this action?
->> > 
->> > * With kernel 6.1.135-1 or later, network timeouts occur for
->> > large-packet protocols (HTTP, apt, etc.), while SSH and small-packet
->> > protocols work.
->> > * With kernel 6.1.133-1 or earlier, everything works as expected.
->> > 
->> > What outcome did you expect instead?
->> > We expected the network to function as before, with Wireguard handling
->> > fragmentation transparently and no application-level timeouts,
->> > regardless of the kernel version.
->> 
->> While triaging the issue we found that the commit 8930424777e4
->> ("tunnels: Accept PACKET_HOST in skb_tunnel_check_pmtu()." introduces
->> the issue and Charles confirmed that the issue was present as well in
->> 6.12.35 and 6.15.4 (other version up could potentially still be
->> affected, but we wanted to check it is not a 6.1.y specific
->> regression).
->> 
->> Reverthing the commit fixes Charles' issue.
->> 
->> Does that ring a bell?
->
-> It doesn't ring a bell. Do you have more details on the setup that has
-> the problem? Or, ideally, a self-contained reproducer?
+On Wednesday, July 16, 2025 1:11 AM Andrii Nakryiko <andrii.nakryiko@gmail.=
+com> write:
+> On Mon, Jul 14, 2025 at 4:45=E2=80=AFPM Menglong Dong <menglong.dong@linu=
+x.dev> wrote:
+> >
+> >
+> > On 2025/7/15 06:07, Andrii Nakryiko wrote:
+> > > On Thu, Jul 3, 2025 at 5:20=E2=80=AFAM Menglong Dong <menglong8.dong@=
+gmail.com> wrote:
+> > >> In this commit, we add the 'accessed_args' field to struct bpf_prog_=
+aux,
+> > >> which is used to record the accessed index of the function args in
+> > >> btf_ctx_access().
+> > > Do we need to bother giving access to arguments through direct ctx[i]
+> > > access for these multi-fentry/fexit programs? We have
+> > > bpf_get_func_arg_cnt() and bpf_get_func_arg() which can be used to get
+> > > any given argument at runtime.
+> >
+> >
+> > Hi Andrii. This commit is not for that purpose. We remember all the acc=
+essed
+> > args to bpf_prog_aux->accessed_args. And when we attach the tracing-mul=
+ti
+> > prog to the kernel functions, we will check if the accessed arguments a=
+re
+> > consistent between all the target functions.
+> >
+> > The bpf_prog_aux->accessed_args will be used in
+> > https://lore.kernel.org/bpf/20250703121521.1874196-12-dongml2@chinatele=
+com.cn/
+> >
+> > in bpf_tracing_check_multi() to do such checking.
+> >
+> > With such checking, the target functions don't need to have
+> > the same prototype, which makes tracing-multi more flexible.
+>=20
+> Yeah, and my point is why even track this at verifier level. If we
+> don't allow direct ctx[i] access and only access arguments through
+> bpf_get_func_arg(), we can check actual number of arguments at runtime
+> and if program is trying to access something that's not there, we'll
+> just return error code, so user can handle this generically.
+>=20
+> I'm just not sure if there is a need to do anything more than that.
 
-+1 - I tested this patch with an OVS setup using vxlan and geneve
-tunnels.  A reproducer or more details would help.
+This commit is for the ctx[i] direct access, and we can use
+bpf_core_cast() instead, as you said in
+https://lore.kernel.org/bpf/CADxym3Zrqb6MxoV6mg4ioQMCiR+Cden9tmD5YHj8DtRFjn=
+14HA@mail.gmail.com/T/#m7daa262d423c0e8bb1c7033e51099ef06180d2c5
 
->> Regards,
->> Salvatore
->> 
+Which means that we don't need this commit any more.
+
+
+
+--nextPart2241665.OBFZWjSADL
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEEfXselyBLFGBR0Mm8PZ2NQ5E0lkFAmh3oCQACgkQ8PZ2NQ5E
+0llrzgf/bR1rHzhff7j2nQAYFvS3uMbeaEIAL9DciUYGIfc4tPPP1fp3qvz8mE+y
+qUeYUN8fLFbC1r0luHQxtah29hd5viz95ALNA9Ag+68Eei7wXj7wFjludDaueiLN
+ipnQIIDvduK5K+ogqPyWD6cV5Dl2FWeWLBG2F57PIzNBJ2P9fCnpDmd9kM97OvWX
+ZCfnud6yMAJXPTIQTa+TcBCgMj5BgEOEHgpKbagsu9pOmM9hIhHPUa7GyMmx8lLS
+MkoqgEWpKr2Vs/gtafrzHIII0R+KCaT57jYPwcuo5SCLjEQuqf7ez0NxzWI7f9Dx
+yUcxNEyMUHBGT1HDO7q20XQLnA0N8A==
+=Unak
+-----END PGP SIGNATURE-----
+
+--nextPart2241665.OBFZWjSADL--
+
+
 
 
