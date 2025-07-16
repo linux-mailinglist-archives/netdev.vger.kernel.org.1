@@ -1,152 +1,154 @@
-Return-Path: <netdev+bounces-207421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3AB2B07193
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 11:25:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCA25B07199
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 11:26:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 073E850085F
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 09:24:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DA7616D70D
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 09:26:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48DA228B401;
-	Wed, 16 Jul 2025 09:25:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AA6E2F0C78;
+	Wed, 16 Jul 2025 09:26:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ge71JVxy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GV8QBgOV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7126B157493
-	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 09:25:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F8842F0059;
+	Wed, 16 Jul 2025 09:26:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752657919; cv=none; b=mm0sQES2ReHlkc/mTMkZjV6mt6oYu7K0Rt8EXjT7Uu2By2Rm6EtQp9kAaHYgR1OcJ3ABW+9ebOPXlrktZahBN9jFoJSFB5d1DuwmBTe9wJGU4wCaHOn265S2sMkhFbRfH6e94XjzcawyYmER8vBEw9shZg3vhzKGx3JDwqFRdkY=
+	t=1752657989; cv=none; b=qJFg1MGkV3UtkEjffvrhw67dmUvYgZwCSlKr8bJmnECMFhrh6mZsFyTCLt1QMtasl/UWmVbxlXiRHUjPkPOpoeHP5Lm93JdGIAlImRLh5w6cjMDoI1dX8xwwqPcRPxH/7q9RaQKPokJnM7psUzJx0agFTXq/izqJNpC5cksQ2+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752657919; c=relaxed/simple;
-	bh=dkpNnjpYsRhJQBoL5SohE6eDXE1Dfz7eQHIaMTW4SHs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I8y83sG7lAMg6k1Uh2Ig7FIc9N5o9qWOO+jXuoHe0Cw0+XwLQqikch8KdJbT/mr2fIWwPQbkWvncppkjwSDiNWCNsdZ4yzhz2aXZANeHji2g1c0cfIBXFvIbhDOLS0ntrKhRHNvGfYQG0GrDKq+bwX/uDmbbB4PmCgkYLowVQMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ge71JVxy; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752657918; x=1784193918;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=dkpNnjpYsRhJQBoL5SohE6eDXE1Dfz7eQHIaMTW4SHs=;
-  b=Ge71JVxyQ31EcBJn2noyDZ/ngHp0Qz93h4M/d+qIudCY7pt0zgJs5rcx
-   nxdUPQvNSr3N27Yx1qt8+6sfmB6o8MJZrVBXU5t6ln7ZZ87S9IXwD4N0e
-   tg6J1RRBZr2wVj1K7n5DdB4YkHJxqxpTmm/6XuaLAWHIroeSozzXQaed5
-   Hy39iOC/mxVbzg/KzJ7onaQ/AiWMfqat/Gby7d86D8CATHQyiWrXxQohS
-   asf+OS1E2uk0hW3yMlkBv4ZJavtUWkMdSc30dasicpK7MIKu/rNlcletu
-   OasI+KXKIjOPMAbQQGZYNUtL/mbkJSXe8+f/gmnxda6FD19Ey9btNya5i
-   Q==;
-X-CSE-ConnectionGUID: 9PaYg9bJTEe8s8ZpLun1EQ==
-X-CSE-MsgGUID: cacKaEc1QZWCreLkcoT92w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11493"; a="54990013"
-X-IronPort-AV: E=Sophos;i="6.16,315,1744095600"; 
-   d="scan'208";a="54990013"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2025 02:25:17 -0700
-X-CSE-ConnectionGUID: khmRv9vYRvSjNH+DH50fJg==
-X-CSE-MsgGUID: eFyp1+WeR6SXM5VzHx5kNg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,315,1744095600"; 
-   d="scan'208";a="188455816"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2025 02:25:14 -0700
-Date: Wed, 16 Jul 2025 11:24:07 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Subbaraya Sundeep <sbhatta@marvell.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni4redhat.com@mx0a-0016f401.pphosted.com,
-	horms@kernel.org, gakula@marvell.com, hkelam@marvell.com,
-	bbhushan2@marvell.com, jerinj@marvell.com, lcherian@marvell.com,
-	sgoutham@marvell.com, netdev@vger.kernel.org
-Subject: Re: [net-next PATCH v2 01/11] octeontx2-af: Simplify context writing
- and reading to hardware
-Message-ID: <aHdvt63yoJLt/1g9@mev-dev.igk.intel.com>
-References: <1752598924-32705-1-git-send-email-sbhatta@marvell.com>
- <1752598924-32705-2-git-send-email-sbhatta@marvell.com>
+	s=arc-20240116; t=1752657989; c=relaxed/simple;
+	bh=rZFV7iCiwcCgWnCKhjPZ1zpfN5fAxekeaBpaYqRspxc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bqYfwCzA29e73UvntFaP32QPy2L4dzCL6ZkicygAWDBd4Qb3m8QY+te0jfxZK19zaICAGMehoOErVt8z2/r71omSBxEDQaDz29jAq58+TiXOa6BE6Wc4WS0V+jFPs5NiveMthzcXWMoI94cQqx0vLbS0i3iTot7aa6u3K3rUKsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GV8QBgOV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75ECEC4CEF0;
+	Wed, 16 Jul 2025 09:26:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752657988;
+	bh=rZFV7iCiwcCgWnCKhjPZ1zpfN5fAxekeaBpaYqRspxc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=GV8QBgOVbpAs4HDllMV5uCVc8Pw02E4JwJg9Au3KHZbyiDW+E9qegDcLn8mXH6p1s
+	 jV1ElzA9RiOwwq3eoa+id2OmrJLN6+BEKV2CbSPBW1ClcaVWWNyTFfrTRRUW0ikyWc
+	 5NAoJJ089zojD4qGVqsDsUIJbw2SI5ZkNsvzK0W9L47Fz9v5HOLtmTGJu7hgfJ0cJp
+	 w09LGsjhtiT+DG2kdXS8t25D15W4/smfKkrhLT8HxVsIYQZN+d+1o8r3NW6AnbCdFu
+	 EN9SWpOz7qD4cHtwLuZa3c4LUE7koGsd0THT3xzGjcM2+coQyzQM5zEP57HEtpiZ/z
+	 5i3CZnvLd9V2g==
+Message-ID: <d0c8c1ce-5bb2-45f5-9d7f-fac734dcfe31@kernel.org>
+Date: Wed, 16 Jul 2025 11:26:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1752598924-32705-2-git-send-email-sbhatta@marvell.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next V4] net: track pfmemalloc drops via
+ SKB_DROP_REASON_PFMEMALLOC
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+ Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+ kernel-team@cloudflare.com, mfleming@cloudflare.com
+References: <175146472829.1363787.9293177520571232738.stgit@firesoul>
+ <20250707174346.2211c46a@kernel.org>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20250707174346.2211c46a@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 15, 2025 at 10:31:54PM +0530, Subbaraya Sundeep wrote:
-> Simplify NIX context reading and writing by using hardware
-> maximum context size instead of using individual sizes of
-> each context type.
+
+
+On 08/07/2025 02.43, Jakub Kicinski wrote:
+> On Wed, 02 Jul 2025 15:59:19 +0200 Jesper Dangaard Brouer wrote:
+>> Add a new SKB drop reason (SKB_DROP_REASON_PFMEMALLOC) to track packets
+>> dropped due to memory pressure. In production environments, we've observed
+>> memory exhaustion reported by memory layer stack traces, but these drops
+>> were not properly tracked in the SKB drop reason infrastructure.
+>>
+>> While most network code paths now properly report pfmemalloc drops, some
+>> protocol-specific socket implementations still use sk_filter() without
+>> drop reason tracking:
+>> - Bluetooth L2CAP sockets
+>> - CAIF sockets
+>> - IUCV sockets
+>> - Netlink sockets
+>> - SCTP sockets
+>> - Unix domain sockets
 > 
-> Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
-> ---
->  .../ethernet/marvell/octeontx2/af/rvu_nix.c   | 46 ++++++++++---------
->  .../marvell/octeontx2/af/rvu_struct.h         |  7 ++-
->  2 files changed, 30 insertions(+), 23 deletions(-)
+>> @@ -1030,10 +1030,8 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+>>   	}
+>>   
+>>   	if (tfile->socket.sk->sk_filter &&
+>> -	    sk_filter(tfile->socket.sk, skb)) {
+>> -		drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
+>> +	    (sk_filter_reason(tfile->socket.sk, skb, &drop_reason)))
 > 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-> index bdf4d852c15d..48d44911b663 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-> @@ -17,6 +17,8 @@
->  #include "lmac_common.h"
->  #include "rvu_npc_hash.h"
->  
-> +#define NIX_MAX_CTX_SIZE	128
-> +
-
-[...]
-
->  
->  	return 0;
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_struct.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu_struct.h
-> index 0596a3ac4c12..8a66f53a7658 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_struct.h
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_struct.h
-> @@ -370,6 +370,8 @@ struct nix_cq_ctx_s {
->  	u64 qsize		: 4;
->  	u64 cq_err_int		: 8;
->  	u64 cq_err_int_ena	: 8;
-> +	/* Ensure all context sizes are minimum 128 bytes */
-> +	u64 padding[12];
->  };
->  
->  /* CN10K NIX Receive queue context structure */
-> @@ -672,7 +674,8 @@ struct nix_sq_ctx_s {
->  struct nix_rsse_s {
->  	uint32_t rq			: 20;
->  	uint32_t reserved_20_31		: 12;
-> -
-> +	/* Ensure all context sizes are minimum 128 bytes */
-> +	u64 padding[15];
->  };
->  
->  /* NIX receive multicast/mirror entry structure */
-> @@ -684,6 +687,8 @@ struct nix_rx_mce_s {
->  	uint64_t rsvd_31_24 : 8;
->  	uint64_t pf_func    : 16;
->  	uint64_t next       : 16;
-> +	/* Ensure all context sizes are minimum 128 bytes */
-> +	u64 padding[15];
->  };
-
-To be sure that each used structures are correct size you can
-use static assertion, sth like:
-static_assert((NIC_MAX_CTX_SIZE) == sizeof(struct X))
-
-Thanks
-
->  
->  enum nix_band_prof_layers {
-> -- 
-> 2.34.1
+> why the outside brackets?
 > 
+
+Good catch, yes the brackets are unnecessary, will remove in V5.
+
+>> @@ -591,6 +592,10 @@ enum skb_drop_reason {
+>>   	 * non conform CAN-XL frame (or device is unable to receive CAN frames)
+>>   	 */
+>>   	SKB_DROP_REASON_CANXL_RX_INVALID_FRAME,
+>> +	/**
+>> +	 * @SKB_DROP_REASON_PFMEMALLOC: dropped when under memory pressure
+> 
+> I guess kinda, but in practice not very precise?
+> 
+> How about: packet allocated from memory reserve reached a path or
+> socket not eligible for use of memory reserves.
+> 
+
+I like it, this is a good description, thanks! :-)
+
+> I could be misremembering the meaning of "memory reserve" TBH.
+> 
+>> +	 */
+>> +	SKB_DROP_REASON_PFMEMALLOC,
+>>   	/**
+>>   	 * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
+>>   	 * shouldn't be used as a real 'reason' - only for tracing code gen
+> 
+>> -	if (unlikely(sk_add_backlog(sk, skb, limit))) {
+>> +	if (unlikely((err = sk_add_backlog(sk, skb, limit)))) {
+> 
+> I understand the else if () case but here you can simply:
+> 
+> 	err = sk_add_backlog(sk, skb, limit);
+> 	if (unlikely(err))
+
+Agreed, will fix in V5.
+
+> no need to make checkpatch upset.
+> 
+>> @@ -162,7 +163,7 @@ static int rose_state3_machine(struct sock *sk, struct sk_buff *skb, int framety
+>>   		rose_frames_acked(sk, nr);
+>>   		if (ns == rose->vr) {
+>>   			rose_start_idletimer(sk);
+>> -			if (sk_filter_trim_cap(sk, skb, ROSE_MIN_LEN) == 0 &&
+>> +			if (sk_filter_trim_cap(sk, skb, ROSE_MIN_LEN, &dr) == 0 &&
+> 
+> let's switch to negation rather than comparing to 0 while at it?
+> otherwise we run over 80 chars
+> 
+
+Sure I will adjust code.
+
+>>   			    __sock_queue_rcv_skb(sk, skb) == 0) {
+>>   				rose->vr = (rose->vr + 1) % ROSE_MODULUS;
+>>   				queued = 1;
+
+--Jesper
 
