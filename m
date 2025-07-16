@@ -1,94 +1,93 @@
-Return-Path: <netdev+bounces-207456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90B80B07525
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 13:56:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B78FAB07531
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 13:57:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95EFE583D78
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 11:56:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5B451AA47D3
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 11:58:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4F552F50B6;
-	Wed, 16 Jul 2025 11:55:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA7432F4331;
+	Wed, 16 Jul 2025 11:57:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="av3nxYxK"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="C3/OtXtD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3B22F4A1E
-	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 11:55:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81DDF2F3C1A
+	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 11:57:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752666909; cv=none; b=J94i3hky8DJ28pv12p3jgIrALQpxHXUSCZbqjRU2ZjoU/ZjfO5KgxCSVHU+Rj4I+FoBtG36ewlT7vYiVAml81mhsKP2lwnWyq/YVURMLWudOQSEj3RGGzNeVSEe2wwFG5iFgz8/RtmcsJ2ag7hUaKPAtacoJte9T7f5V1VY0YDM=
+	t=1752667051; cv=none; b=oYbWQl3xSKpj3iDvdZhVMbA38+lN8i2dRVxVa5vv1imb5hApLgMt/iVWJwxnsxr+xI/ZMSDiLz0/wLTW/ze4y9Ax42fmyhj5J4QvVWOqohR1fraW3kGrEk+oI/s2awvq7aJ0uKoyM/tsZGSUb8jxZ0HA+P7pAdIQhlcS6cS600I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752666909; c=relaxed/simple;
-	bh=n1CmIW4ydj3nNk9kLxEDrgG5jUViDoe3ELYqlFKv98E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WpTHRGdri79S1Gzs9WAgh4mhdP+MmALS/N67WK2HJJfw8EmhZ5c3fIkUye5t0NKQtYGGcN5fu/ZrCZ6ERIs0S2rzd7jMqDiUCIU3/IZhGkE1enB9f20qs8ggjylEUyOtDxHZP7yYWVe/7rpJWcJ00inm8Wr2Q72X/DZ6H8YKWr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=av3nxYxK; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-60c01f70092so10847970a12.3
-        for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 04:55:06 -0700 (PDT)
+	s=arc-20240116; t=1752667051; c=relaxed/simple;
+	bh=csn7WYtvsUdjHkQMbcST2wsNn0ffcZxw8hDRTLxE6DA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rWcdI2LpjYdzUkB+Rp2e6WxCsKTNV6hhc/PLaVouLPppKb2BqmbnacH5jR8269D9hwtUD5tqUqnsuP3SsCXXY6UPkaEGcbekEaQyakGnG1MmK+61CPdsRSVGaxv3i0xOuG8voTL9Tea721uQtYXtnBrdVEcEpwv9iAiiaeuOR4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=C3/OtXtD; arc=none smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b31c978688dso3375730a12.1
+        for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 04:57:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1752666905; x=1753271705; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hcNeGiKpO8fC3Ox97SV3Ky1dSlGLIE06AiTXTqVjIfs=;
-        b=av3nxYxKxg/hbWdRWFxBB20A9nD1sT2RXds/L6ygLlnQ4XzXn7krffCnJ9e31VFbUq
-         UrPsxGUIDkKWbucaWopEmqwzXZKLZqaLxpEia+bPLyGgIhYtyUZ0dtDzGHbDxnW3Rai6
-         P1PdIlnf3HFeYTEzogctAj2QjcBlszCpF6cIk3s16bH6XS6CQmdwzNHaPR6QHuUJID/w
-         7tSMK/uNInHrs3eGrhC/rLrsWPX4KKxN4w1eS2zi7kyFGtzTYuHxE/F4fSFsONJ/+3wr
-         z+/m+Ba95QUUSeiieyvT1GF20hVgJARC9DgyWm7TthpmK9RRQHkdVFizuETQ8C/PV3zY
-         fZSg==
+        d=bytedance.com; s=google; t=1752667049; x=1753271849; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hLRTtR8co0X61jWgkdjoqtJ4EJUXMSFsfzr4OSlttHI=;
+        b=C3/OtXtDnvVJGuFJf8nY9NDTgU3fmyHQp+gokBMNUcTRQdRuuGvm4xknpHBMjCRjTJ
+         H3aXCUckswLpQ07ocQDPDHnn9F9UrVECNpBVaNzrowEMiX9XUhqSjPKvESvS7L6qWZxg
+         1pS6nlg9gnHJbjrPSa62EUhJu3gA7NsxliNt/kZ6kvfuL5Qt0IMRYsi0RktLnapiySVp
+         brgzkUvLeOLoJafJXJNMb262efzaEGY8Iz2NqLjhqhVNX2aNYhNUvahnPXzs+wXNbsCC
+         OH408Ru/u0RMmJX9mVn26RVGkQsWIBkV/+iX/A5nWbMZJVlDhpKnEVraBdulh5rPr91/
+         NaaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752666905; x=1753271705;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hcNeGiKpO8fC3Ox97SV3Ky1dSlGLIE06AiTXTqVjIfs=;
-        b=aDvM0wt7jYORIVCycqQHyG5x+BpZjQHgyQn1lnWXdzsOIXXUtw8Q6wSVz3SL3VdNwG
-         bQr7p/1QZqMtfSkXGDARb4M02tn+4Ri2dYlAmOtZqXY0wyB6iMeEpR7nWF2bGbCn4wei
-         XoZkI4PPI6ChO7v5Rv3da0RutIyZeISKPVFrTi+65z47rq1jKwvhbA1j0WuZcrCQAbSt
-         RyIBbf6rUNymSHABdUqBzhVYOgCv+Jk6XeVEgtklS2wNgPWn6dVMSsQBDnl51XN7T84W
-         3YX7xazvos0NmDJV/A7lP1TFr5sU3tUJt9Spa/3uJfwt4E1BZKSXRDBWjYFFKUQj19t8
-         pYng==
-X-Gm-Message-State: AOJu0Yxsh2PudY4+fNpdK1umHCUqCmtmjuReuIzcWpl/FO28JJIDcKME
-	dz0dlWA2dPgGwc07I5TFuwasnO/wLE6HkA6BRFZkRNjel8Pl8d/FUZhDr7dtc43+/tDmZoE6PIl
-	wJVuoTK4S4Fi0cu8cRmHokwOelRxLGiBkcF9RcXErLOiBfBHGle1qcx+Bhftl0JE5
-X-Gm-Gg: ASbGnctjlsmE3VPLFqf6PoJ0PUgwRF5H2SjLMKr6MQm9S+W6GxR9nIa2TLvdTO9hOjc
-	eufA8f635K5ImUJ2RDxkVuVVAidLe8WQOPJO2PqNCltwr97cKCGULd2tf6ukbdFELPCulRT9u+w
-	jwaMynScesPh5e9Y6zilSbSJ+3LxTmAra+eLIV3eYMAxidRrEFvHpzcHh9Xj+PjAWdxs7Wxbwmr
-	1SJpl01vwK5TwJd3FNU8imd9WID9ZTYTZiUFciKuy8EnWZ6KIgz6/M1aM+4jS2GcBQ4dYvC95xS
-	aJX6KDYW1QiUg/KYoj3EQY5nchBD7qzatF4/yzglj2XCyZAekbR/zGdKyZcUXn+VcM3j1P8s5is
-	egKNJhZNg1bNeYDnHANMdj6hVg1tW6JVYslg/2PwTaVq7BNqAywvhJWbI
-X-Google-Smtp-Source: AGHT+IEk/eea0bMdXgNsKY9GOkArYnleDhfcduy0qhpwPOHBUU8UK1/ccFo32t6ur4YWhdCfnh6EeA==
-X-Received: by 2002:a17:907:a08a:b0:ade:4121:8d52 with SMTP id a640c23a62f3a-ae9c9997326mr327356466b.16.1752666905103;
-        Wed, 16 Jul 2025 04:55:05 -0700 (PDT)
-Received: from inifinity.homelan.mandelbit.com ([2001:67c:2fbc:1:96ff:526e:2192:5194])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae6e8264636sm1169169666b.86.2025.07.16.04.55.04
+        d=1e100.net; s=20230601; t=1752667049; x=1753271849;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hLRTtR8co0X61jWgkdjoqtJ4EJUXMSFsfzr4OSlttHI=;
+        b=Ot4tilEgmkCrKKTK/dkwsa0WJX21Q8SmxYNieFAW40sVLTOc6WAP9Pi2CMdVh/vRXr
+         6h9Gnq96+H6AW8DZPDa0G5Q+68u+EC1hyFgMwJnDpEf/GQZd4cWSF6elQiBhCWcRxbZa
+         dvgIKlMCG4etsJPvr8Y3756IoB2o5KB7l3Ez+nhAhg4CadouDuwlh3niuPBhO/DmeOv0
+         l+8aP2PiI6pH6mYloLPUdDDa3IHi3UIUMnxfui3bd0Z8eJi4CHk13+jOpWktPOKmvxwM
+         rx3Xg64KcCSWSsWsXSH4h789XbKXEWhNxIvKq0urZrh8HcAvpXLX5gmRdJ+fmH08dxso
+         uPJA==
+X-Forwarded-Encrypted: i=1; AJvYcCX7QAn3QCXFZAV0ESVebam4CkJpvo7Uosvt2NRDqeJtSW3VcyQ5D1ZdSz0Qlhmekrk6TDXhCcc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxaDX/UK6QeRbfdfzmcKj3d2jSJpiREgkcF7BYWR9+KNsr4VW7
+	7792moCnjqfptv6QfZsICn+0wqeXtzu0rbJvumlj+qWQCb7U+oNZAMJBcNkSjI3NWDs=
+X-Gm-Gg: ASbGnctwxLy4mE0Ur23OFtowD4eSM2kR+yNX93RZpMOo0fUsMEQxpJsyeDp1paXATJu
+	5zWygmewW17MXJJUwKs8Yz2jr6cmN7DedPis5EncQiYRWRnDHReoVJ17e4Z3+7OYfPCJbloqk/a
+	BIPUnjq8XZmbxxplWShxMNnlcQ2vYQ7s3DrGzQhNEok2XNu1716O3KyYJoeQ2Jro/OoexxWyEvA
+	HJT0UgLHo89grU0XLRKkIi2osXdmMLh4PT0feRpPwzvK5ix8lOfZbj1e/s+i6fJ8ceIgm6ghw6/
+	d4FzvU/RnY8OzJxRJV1y2JGiaFYKH2/PjunoNRIH4pAUockGAPDTE0zlaqdGgu3KqlsYuNl7upS
+	pqMQ8ee4cttDhaC3c2Bw8oiT3oH2LRg0w
+X-Google-Smtp-Source: AGHT+IEQPkNtoh9bRZW+IJ62bS4hVLKInbUmsPl/kIaslUF8mapeIjngutJf68Y6R1ZJMkkbtdUZ7Q==
+X-Received: by 2002:a17:90b:1c89:b0:313:2768:3f6b with SMTP id 98e67ed59e1d1-31c9e77ce91mr4104373a91.27.1752667048532;
+        Wed, 16 Jul 2025 04:57:28 -0700 (PDT)
+Received: from vexas.. ([203.208.189.9])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31c9f29ddcbsm1292668a91.36.2025.07.16.04.57.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Jul 2025 04:55:04 -0700 (PDT)
-From: Antonio Quartulli <antonio@openvpn.net>
-To: netdev@vger.kernel.org
-Cc: Ralf Lici <ralf@mandelbit.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Gert Doering <gert@greenie.muc.de>,
-	Antonio Quartulli <antonio@openvpn.net>
-Subject: [PATCH net 3/3] ovpn: reset GSO metadata after decapsulation
-Date: Wed, 16 Jul 2025 13:54:43 +0200
-Message-ID: <20250716115443.16763-4-antonio@openvpn.net>
-X-Mailer: git-send-email 2.49.1
-In-Reply-To: <20250716115443.16763-1-antonio@openvpn.net>
-References: <20250716115443.16763-1-antonio@openvpn.net>
+        Wed, 16 Jul 2025 04:57:28 -0700 (PDT)
+From: Zigit Zo <zuozhijie@bytedance.com>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com
+Cc: zuozhijie@bytedance.com,
+	virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	edumazet@google.com
+Subject: [PATCH net v3] virtio-net: fix recursived rtnl_lock() during probe()
+Date: Wed, 16 Jul 2025 19:57:17 +0800
+Message-ID: <20250716115717.1472430-1-zuozhijie@bytedance.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,62 +96,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Ralf Lici <ralf@mandelbit.com>
+The deadlock appears in a stack trace like:
 
-The ovpn_netdev_write() function is responsible for injecting
-decapsulated and decrypted packets back into the local network stack.
+  virtnet_probe()
+    rtnl_lock()
+    virtio_config_changed_work()
+      netdev_notify_peers()
+        rtnl_lock()
 
-Prior to this patch, the skb could retain GSO metadata from the outer,
-encrypted tunnel packet. This original GSO metadata, relevant to the
-sender's transport context, becomes invalid and misleading for the
-tunnel/data path once the inner packet is exposed.
+It happens if the VMM sends a VIRTIO_NET_S_ANNOUNCE request while the
+virtio-net driver is still probing.
 
-Leaving this stale metadata intact causes internal GSO validation checks
-further down the kernel's network stack (validate_xmit_skb()) to fail,
-leading to packet drops. The reasons for these failures vary by
-protocol, for example:
-- for ICMP, no offload handler is registered;
-- for TCP and UDP, the respective offload handlers return errors when
-  comparing skb->len to the outdated skb_shinfo(skb)->gso_size.
+The config_work in probe() will get scheduled until virtnet_open() enables
+the config change notification via virtio_config_driver_enable().
 
-By calling skb_gso_reset(skb) we ensure the inner packet is presented to
-gro_cells_receive() with a clean state, correctly indicating it is an
-individual packet from the perspective of the local stack.
-
-This change eliminates the "Driver has suspect GRO implementation, TCP
-performance may be compromised" warning and improves overall TCP
-performance by allowing GSO/GRO to function as intended on the
-decapsulated traffic.
-
-Fixes: 11851cbd60ea ("ovpn: implement TCP transport")
-Reported-by: Gert Doering <gert@greenie.muc.de>
-Closes: https://github.com/OpenVPN/ovpn-net-next/issues/4
-Tested-by: Gert Doering <gert@greenie.muc.de>
-Signed-off-by: Ralf Lici <ralf@mandelbit.com>
-Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+Fixes: df28de7b0050 ("virtio-net: synchronize operstate with admin state on up/down")
+Signed-off-by: Zigit Zo <zuozhijie@bytedance.com>
 ---
- drivers/net/ovpn/io.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+v3 -> v2:
+* Simplify the changes.
+v1 -> v2:
+* Check vi->status in virtnet_open().
+* https://lore.kernel.org/netdev/20250702103722.576219-1-zuozhijie@bytedance.com/
+v1:
+* https://lore.kernel.org/netdev/20250630095109.214013-1-zuozhijie@bytedance.com/
+---
+ drivers/net/virtio_net.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ovpn/io.c b/drivers/net/ovpn/io.c
-index ebf1e849506b..3e9e7f8444b3 100644
---- a/drivers/net/ovpn/io.c
-+++ b/drivers/net/ovpn/io.c
-@@ -62,6 +62,13 @@ static void ovpn_netdev_write(struct ovpn_peer *peer, struct sk_buff *skb)
- 	unsigned int pkt_len;
- 	int ret;
- 
-+	/*
-+	 * GSO state from the transport layer is not valid for the tunnel/data
-+	 * path. Reset all GSO fields to prevent any further GSO processing
-+	 * from entering an inconsistent state.
-+	 */
-+	skb_gso_reset(skb);
-+
- 	/* we can't guarantee the packet wasn't corrupted before entering the
- 	 * VPN, therefore we give other layers a chance to check that
- 	 */
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 5d674eb9a0f2..82b4a2a2b8c4 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -7059,7 +7059,7 @@ static int virtnet_probe(struct virtio_device *vdev)
+ 	   otherwise get link status from config. */
+ 	netif_carrier_off(dev);
+ 	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_STATUS)) {
+-		virtnet_config_changed_work(&vi->config_work);
++		virtio_config_changed(vi->vdev);
+ 	} else {
+ 		vi->status = VIRTIO_NET_S_LINK_UP;
+ 		virtnet_update_settings(vi);
+
+base-commit: dae7f9cbd1909de2b0bccc30afef95c23f93e477
 -- 
-2.49.1
+2.49.0
 
 
