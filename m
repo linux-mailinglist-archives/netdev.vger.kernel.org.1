@@ -1,77 +1,159 @@
-Return-Path: <netdev+bounces-207342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A267B06B35
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 03:37:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B25DEB06B48
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 03:44:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F21F564766
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 01:37:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8F9D189359C
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 01:44:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7743526560A;
-	Wed, 16 Jul 2025 01:37:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E222676DF;
+	Wed, 16 Jul 2025 01:44:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X2wjWYYo"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="BY4N73qG";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="c+Uedxzu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51D1C264FBB
-	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 01:37:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45E95376F1
+	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 01:44:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752629843; cv=none; b=Ox3gd/lj2jL54EFaTrTB3p2DRRRP8uSJBDpN2ddrcfow14qPWyFwkyqq60wTyPvkMZoGU2GxW22rQ9kUA8/hqtf/k9/WgbwBvcCKGSaS44XVpVF9p5Cq6I1y43p5jFds6ojG7A7v1gW09dyheXF5Oz85SHdPj+0ymdS1+4OsPsM=
+	t=1752630250; cv=none; b=kA4MOg+yL6/8gAv8i4Hh9+PXPJSaph77dX4/SiKidrW250I5HuiMplh25W/ZZmUrQfGyytyiVTuXMW8F3GV6YfU/wUBSwLahwFxms6w/B5KAZY4MXJ3Zml9P1BL9TRA+URdxtKXWXdlfn9sVXc0/xFVH8ugvGWv/9Nu6CC4O8o0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752629843; c=relaxed/simple;
-	bh=wOr6+uXIFBh/+DTMjgFVXtaoZWzUaFr3JJgBKW4ZHRo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dswMX5IxdhtTonwrUS1fqgJpIe08cp9Oe36+6y8Obn14uWlfoPBm3AKc2UykoBIXjmP9tgltOeEtQ7ZSzb/KICvjmhH4iNDtVURCe2FeQkG2wgILWQ+n0eWaNRzm9nrz2OC745rmdeysiOiGvU1qMAA525/zt0BmGR2IdPGqwNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X2wjWYYo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DA52C4CEE3;
-	Wed, 16 Jul 2025 01:37:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752629842;
-	bh=wOr6+uXIFBh/+DTMjgFVXtaoZWzUaFr3JJgBKW4ZHRo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=X2wjWYYoyc0WeI1ebmCUQn3VXewN8aNZznHdQLDHciiCP6Xlc0yTdeNJe5pB7Vv2x
-	 SXiN2qztSrL+ycZrvOAoehjqxPbfuBkKkA7MnUjE4zJ/xVxClnGlnaKL57qLWo/I3s
-	 9tcCaO8kJuVm6fi9ltydGh0Yd6DrlbQxcUIF30RWQ76ng4pb2941LFpxsayp4uY9ev
-	 U6YQxbUrsJ5snjpASesdhT8MJitaf6imB2EBapJlGnva51FdzgEN6yjI7kHPC0LZtu
-	 drS/fIFPo0GVjmFiYEZZQWNvIIJAmRgEoxB2HTF/kz6PiDy1/mja2cQEx1Ztt67ju9
-	 5sTGxWFfMG3+g==
-Date: Tue, 15 Jul 2025 18:37:21 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, David Ahern
- <dsahern@kernel.org>, Simon Horman <horms@kernel.org>, Kuniyuki Iwashima
- <kuni1840@gmail.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 net-next 08/15] neighbour: Annotate access to struct
- pneigh_entry.{flags,protocol}.
-Message-ID: <20250715183721.5e574b33@kernel.org>
-In-Reply-To: <20250712203515.4099110-9-kuniyu@google.com>
-References: <20250712203515.4099110-1-kuniyu@google.com>
-	<20250712203515.4099110-9-kuniyu@google.com>
+	s=arc-20240116; t=1752630250; c=relaxed/simple;
+	bh=lsh0ZP8BFypEnpWnD1v+SD42g+eC8pgzK8dXSRLnQec=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=MRaHaUL47t5YJ6J6AdhSBNBPgKKncQ0mrXz+v4XdRw9dJPDSRhiSvEd6B3bDzr2Tf3epPxlzCjkZNAag9LCXCUfEv6l4R5ic+lWyN9N4pNdZWUBSOdM7GSQrKko98EFH1lT3HaF1bDCG4htyKpkNutWkqlIag078axOQ8Yuy/2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=BY4N73qG; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=c+Uedxzu; arc=none smtp.client-ip=103.168.172.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
+	by mailfout.phl.internal (Postfix) with ESMTP id 3900DEC00DB;
+	Tue, 15 Jul 2025 21:44:06 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-08.internal (MEProxy); Tue, 15 Jul 2025 21:44:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm3;
+	 t=1752630246; x=1752716646; bh=iP3EyNriSPnBrtm15Q16hcuXGYp3sDVI
+	+iVu+X1V7no=; b=BY4N73qG+Kvhg7kp9JhuwbCxGvuaxerIU/Bw87QRci+dg53N
+	84L7W+aeHL5jUj0maMMm9wYhW00GnCtfObb6T4aUIN2k2aVkYJXNgJtbZP6M3q83
+	sVLkoP50E2QigGhOsG695NwffahDcV5fcJQr5p0b3hKKiIgaw6SR5NUpg0F8x6MA
+	xMMqk3cCogAnUJfW7GZdIT7qMKw3H/p9w/VYWbUjh5MAwnkT8GnVvqRr3o7whcA+
+	HpeTP47TqJoTiXiR4ga0EMjIWRk3EOHmyuU5RP9XpO2Hj9dAowdye+pdAUDKReg9
+	U2WB7DsVMbHuPOjq/WojCRMOSFF4q2z7wOu+EA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1752630246; x=
+	1752716646; bh=iP3EyNriSPnBrtm15Q16hcuXGYp3sDVI+iVu+X1V7no=; b=c
+	+UedxzulyU+SgVk/KUm+K55jAPI2TRVqODsa/Dt7gS9cgtNKdRzgs5DOz/5RBW6e
+	D3BqmYsuc5Mv2pJPQ2sxEyIcmINulFEH8Sr7KonDQ6wfoIUB6yu8zMz9nD3RgaNN
+	N7SUY28iuu1c0fCeMkywm7Wt0ZWkdbWFqFXKnZQl1zyHdnHS/imygU5kJng9eCfP
+	EKZ4du7vdVwHLfWA92kBvi+fXwkcwweq+B7FYI2bxAKXlCKwZRcCYYAoaJHLrR+7
+	jrDuZCBWj7Slb70Cusj7+x2+JCjx5TvZcaPX/kFAxrpyLDIhiU0zReDalk0/GAj1
+	EjjXc8boOdzYL9e9AacoQ==
+X-ME-Sender: <xms:5AN3aDyV7GIOVl8O1uG3i57onaCSU5DuTMFtvIQ-Tq_xjZL7uScwng>
+    <xme:5AN3aPqrcBDHsmv2rOZ22M1Hcn9OmHfj-b-0Oc_O_gn5lxhBpFwOh9DiaD7JMRQ0Y
+    31-QduU5DRNjLoPm0w>
+X-ME-Received: <xmr:5AN3aLMSosOn_ad8VMikzG4ItM2gDYg9oJAVcGK1Z-5dAPQsuENMv8UMxpwROJXw8N2jvQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdehieegvdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefhvfevufgjfhfogggtgfffkfesthhqredtredtjeenucfhrhhomheplfgrhicuggho
+    shgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrdhnvghtqeenucggtffrrghtthgvrh
+    hnpeegfefghffghffhjefgveekhfeukeevffethffgtddutdefffeuheelgeelieeuhfen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjvhesjh
+    hvohhssghurhhghhdrnhgvthdpnhgspghrtghpthhtohepuddvpdhmohguvgepshhmthhp
+    ohhuthdprhgtphhtthhopehtohhnghhhrghosegsrghmrghitghlohhuugdrtghomhdprh
+    gtphhtthhopehrrgiiohhrsegslhgrtghkfigrlhhlrdhorhhgpdhrtghpthhtohepuggr
+    vhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehtuhiivghnghgsihhngh
+    esughiughighhlohgsrghlrdgtohhmpdhrtghpthhtoheplhhiuhhhrghnghgsihhnsehg
+    mhgrihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
+    dprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgs
+    rgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslh
+    hunhhnrdgthh
+X-ME-Proxy: <xmx:5AN3aLdeXaYrGEu1_3I37uSt-Vlo_ZuFiCie5Je92A2wYClng74sRQ>
+    <xmx:5AN3aJWPjOaj7m9Zjf0rkOX3k7y7t-VUaXC5pBD5TtGvk-IyHhUOiQ>
+    <xmx:5AN3aEAOzs8qCJgnuBQvfJUXVmiksq_Xb6VF_tJq3YfR0B-nqirKSA>
+    <xmx:5AN3aM4P9JCtwLRwOmEQqFCrXAufwtu1BRMyu7oXNSEiN0ErXcFgbA>
+    <xmx:5gN3aNJEwp0mowhefDmc5k_jJE0r5Z_9J669twEWJYT4-q0_-2sfJeg8>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 15 Jul 2025 21:44:04 -0400 (EDT)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id 38CAB9FC97; Tue, 15 Jul 2025 18:44:03 -0700 (PDT)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id 37A719FC54;
+	Tue, 15 Jul 2025 18:44:03 -0700 (PDT)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Paolo Abeni <pabeni@redhat.com>
+cc: Tonghao Zhang <tonghao@bamaicloud.com>,
+    Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+    Andrew Lunn <andrew+netdev@lunn.ch>,
+    Nikolay Aleksandrov <razor@blackwall.org>,
+    Zengbing Tu <tuzengbing@didiglobal.com>
+Subject: Re: [PATCH net-next v2] net: bonding: add bond_is_icmpv6_nd() helper
+In-reply-to: <3d2568b9-e275-490d-a412-2fe7a5b096a3@redhat.com>
+References: <20250710091636.90641-1-tonghao@bamaicloud.com> <aHSt_BX4K4DK5CEz@fedora> <125F3BD1-1DC7-42AF-AAB4-167AD665D687@bamaicloud.com> <3d2568b9-e275-490d-a412-2fe7a5b096a3@redhat.com>
+Comments: In-reply-to Paolo Abeni <pabeni@redhat.com>
+   message dated "Tue, 15 Jul 2025 12:33:53 +0200."
+X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 15 Jul 2025 18:44:03 -0700
+Message-ID: <758111.1752630243@famine>
 
-On Sat, 12 Jul 2025 20:34:17 +0000 Kuniyuki Iwashima wrote:
-> -	if (pn->protocol && nla_put_u8(skb, NDA_PROTOCOL, pn->protocol))
-> +	if (pn->protocol && nla_put_u8(skb, NDA_PROTOCOL, READ_ONCE(pn->protocol)))
+Paolo Abeni <pabeni@redhat.com> wrote:
 
-I don't have a good sense of what's idiomatic for READ_ONCE() but
-reading the same member twice in one condition, once with READ_ONCE()
-and once without looks a bit funny to me :S
--- 
-no real bugs, but I hope at least one of the nit picks is worth
-addressing ;) so
-pw-bot: cr
+>On 7/14/25 2:53 PM, Tonghao Zhang wrote:
+>>> 2025=E5=B9=B47=E6=9C=8814=E6=97=A5 15:13=EF=BC=8CHangbin Liu <liuhangbi=
+n@gmail.com> =E5=86=99=E9=81=93=EF=BC=9A
+>>> Hmm, I don=E2=80=99t see much improvement with this patch compared to w=
+ithout it.
+>>> So I don=E2=80=99t think this update is necessary.
+>>=20
+>> This patch use the skb_header_pointer instead of pskb_network_may_pull. =
+The skb_header_pointer is more efficient than pskb_network_may_pull.
+>>  And use the comm helper can consolidate some duplicate code.
+>
+>I think the eventual cleanup here is very subjective, especially
+>compared to the diffstat. Any eventual performance improvement should be
+>supported by some figures, in relevant tests.
+>
+>In this specific case I don't think you will be able to measure any
+>relevant gain; pskb_network_may_pull() could be slower than
+>skb_header_pointer() only when the headers are not in the liner part,
+>and that in turns could happen only if we are already on some kind of
+>slow path.
+
+	Does the ICMP6 header of a received packet end up in the linear
+part, or in a frag?  That's what's being inspected by this code, and I
+presumed that the linear area would be just the protocol headers
+although thinking about it now, I suppose ICMPv6 is a protocol, but I
+don't know how often the pull of the ICMPv6 message data would have to
+copy to the linear area.
+
+	-J
+
+---
+	-Jay Vosburgh, jv@jvosburgh.net
+
 
