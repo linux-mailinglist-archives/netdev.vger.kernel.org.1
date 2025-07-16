@@ -1,90 +1,91 @@
-Return-Path: <netdev+bounces-207455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6C48B07528
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 13:56:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90B80B07525
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 13:56:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E391507195
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 11:55:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95EFE583D78
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 11:56:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B0832F50AB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4F552F50B6;
 	Wed, 16 Jul 2025 11:55:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="Y/tBD+QP"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="av3nxYxK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 442B32F433B
-	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 11:55:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3B22F4A1E
+	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 11:55:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752666908; cv=none; b=Hrw3uuR5Xl74zdmI+CntIBbaa2KCyR9DfuT6HKj9LLu78bFaSMnfD58/RMg0OSlnvm4SrYhML8xp5YV517kxYOf/pbvB/YI+8oBEoiq03iIdSr/gj9h/wg6W1IfHzWiqsR40CPGblf9p/oSq5bqrdpcOsQGKK1oMbDmZeuSVanE=
+	t=1752666909; cv=none; b=J94i3hky8DJ28pv12p3jgIrALQpxHXUSCZbqjRU2ZjoU/ZjfO5KgxCSVHU+Rj4I+FoBtG36ewlT7vYiVAml81mhsKP2lwnWyq/YVURMLWudOQSEj3RGGzNeVSEe2wwFG5iFgz8/RtmcsJ2ag7hUaKPAtacoJte9T7f5V1VY0YDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752666908; c=relaxed/simple;
-	bh=4uM8h2zDxTifUVwL4yXA0Y/Xe9t7qQtUmvw4ZrsrXtM=;
+	s=arc-20240116; t=1752666909; c=relaxed/simple;
+	bh=n1CmIW4ydj3nNk9kLxEDrgG5jUViDoe3ELYqlFKv98E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EQWoWAEfCp4didzosT9lfsJRkWrjHr8IfUkoFCpxUndlDrMxVJ6LKBcuZ1HFpZrsfRTgINzyra4nX343AVTUXZiGGbRKj/lVd01gTDaOsBB0q05jqw0dQqGsHS0Ozp6FdWSO+Own1Ao9YY2M8nTtGmwUAm9RBy7tdb+LGrUj/sU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=Y/tBD+QP; arc=none smtp.client-ip=209.85.218.50
+	 MIME-Version; b=WpTHRGdri79S1Gzs9WAgh4mhdP+MmALS/N67WK2HJJfw8EmhZ5c3fIkUye5t0NKQtYGGcN5fu/ZrCZ6ERIs0S2rzd7jMqDiUCIU3/IZhGkE1enB9f20qs8ggjylEUyOtDxHZP7yYWVe/7rpJWcJ00inm8Wr2Q72X/DZ6H8YKWr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=av3nxYxK; arc=none smtp.client-ip=209.85.208.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-ae3703c2a8bso1210094166b.0
-        for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 04:55:05 -0700 (PDT)
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-60c01f70092so10847970a12.3
+        for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 04:55:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1752666904; x=1753271704; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1752666905; x=1753271705; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/rqoVGFO4BuBauPe/9qrFvajGd6GPidXg1smqflXIbQ=;
-        b=Y/tBD+QPkXwwxWNBXGaT4iApApVPiPxbw7MyzkkxkRmOe8csJY33S5zigsNHsy3BoT
-         SH50EtHOp9UFLJuBCNsAjlrT2JELSMyNT3+fH+h98zTgN/P1YGkpZia2fRbQY/mdMQ05
-         2MBa+bGAiBlzThUU4/pbO3fP8Ab7bD1EuQqHFETdTGAG+gTnnfSvS3HdMvsCD3rRn83k
-         hVSuobfhhCpbjoJA4DqQpomgdfuZ3NJENrfxIDlq06JViIcozi4WWbtEKHCVMnQKs7uB
-         ejei/h4+A6IzLN9h/H1GWzPJ3K+3eISvjuw+WF6q2auh/bDURH8Jc4DDs0JK8aQUl4Ii
-         WzuA==
+        bh=hcNeGiKpO8fC3Ox97SV3Ky1dSlGLIE06AiTXTqVjIfs=;
+        b=av3nxYxKxg/hbWdRWFxBB20A9nD1sT2RXds/L6ygLlnQ4XzXn7krffCnJ9e31VFbUq
+         UrPsxGUIDkKWbucaWopEmqwzXZKLZqaLxpEia+bPLyGgIhYtyUZ0dtDzGHbDxnW3Rai6
+         P1PdIlnf3HFeYTEzogctAj2QjcBlszCpF6cIk3s16bH6XS6CQmdwzNHaPR6QHuUJID/w
+         7tSMK/uNInHrs3eGrhC/rLrsWPX4KKxN4w1eS2zi7kyFGtzTYuHxE/F4fSFsONJ/+3wr
+         z+/m+Ba95QUUSeiieyvT1GF20hVgJARC9DgyWm7TthpmK9RRQHkdVFizuETQ8C/PV3zY
+         fZSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752666904; x=1753271704;
+        d=1e100.net; s=20230601; t=1752666905; x=1753271705;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/rqoVGFO4BuBauPe/9qrFvajGd6GPidXg1smqflXIbQ=;
-        b=jPecaB+0COeTJCbbgXah39EfV2ujsTzLOB64SI8Kiw73L26bkziVAzT3B+nSxCXoIt
-         5lVduxvO/o5WAy8G3MxipngNIkjBmBFOi5Wp4rbpiFM8K4kkiFUgsQtCGR6EGNXRTc1E
-         oH/q61qj9D/2+DWkZy2D0F9WTKsxfqoq4uHzsL0xC0Ni43ddJBdSCvYHd0MOHrR//bIO
-         8ZIF8PP8MzL1CD/ABPdGVsZlw61fKUTrPA9chhzHvBt9n+tDIZJN8bOVSjFlLrQXIxbF
-         hWkwPhe5RzXapezJ45xFDNFbGALNpxI1ylJ8VTzrXJgW5AGxjKRvtMMJtujaQDtZUZpQ
-         etWQ==
-X-Gm-Message-State: AOJu0YyNvr0so1yDgrHjUGt1VmnBQ0FQzKmMKfqExVyW1T2DyNEs5Qc/
-	56yAf4CbFJc7/exrlSP6x4JAknu6i3eWxqx2ry/DEGM0a+LQwD/Ux+cEdVCK7tUEihBYt6g+zmP
-	v9yFxA37WiLXNxdAK1AZuzcH4HR4rRudBq/J+pA3YLjO73zMp64uBHDflmqZfaGaK
-X-Gm-Gg: ASbGnct7eOT4naJ3pxACIV2OM4PpjOAF3HRIonRR3P/xtQN7Ebygmz2EAOPy856rpft
-	2ehQLQ8DtiG7gUZ/TQ2khiCU6Kn+nMplzyGM4bIxmCHjEfGW2HMonnwsJ/ASFscJbpbm7eyFhPP
-	5PrxHybwDH1oQK22H90xu71GkZThUkjpb7sYy0pyMX/TpEtnnY939qkoBcndNYjSb7k+9lPM9m6
-	fwgucOGSBOrE2X6tjDf8KHt9kMraQJJ5JHpI+J9kLZoAGtKlyLP9x6mHOUan03mRoFBmt26VfOJ
-	ATXcpklY14yy+T0zFsVpF0lBiSG9e0Mpl42KGw7uvv3YwLza/ORr9FaPe9NYCS5LgqCxDXa4TY8
-	9lQt9epYCrGFDj7wJk/IcnKsGkPOQIRtxCegNX2hdr70pJQ==
-X-Google-Smtp-Source: AGHT+IEFNW5JZ482DTH8mFHC2HnD+XcZpwAkYGZ4dRGj/VLD+ZmycYOHR4VBtr9JHIKw5+V42dImXw==
-X-Received: by 2002:a17:907:7e99:b0:ae3:b2b7:7f2f with SMTP id a640c23a62f3a-ae9c9b3f3c5mr290416266b.40.1752666903971;
-        Wed, 16 Jul 2025 04:55:03 -0700 (PDT)
+        bh=hcNeGiKpO8fC3Ox97SV3Ky1dSlGLIE06AiTXTqVjIfs=;
+        b=aDvM0wt7jYORIVCycqQHyG5x+BpZjQHgyQn1lnWXdzsOIXXUtw8Q6wSVz3SL3VdNwG
+         bQr7p/1QZqMtfSkXGDARb4M02tn+4Ri2dYlAmOtZqXY0wyB6iMeEpR7nWF2bGbCn4wei
+         XoZkI4PPI6ChO7v5Rv3da0RutIyZeISKPVFrTi+65z47rq1jKwvhbA1j0WuZcrCQAbSt
+         RyIBbf6rUNymSHABdUqBzhVYOgCv+Jk6XeVEgtklS2wNgPWn6dVMSsQBDnl51XN7T84W
+         3YX7xazvos0NmDJV/A7lP1TFr5sU3tUJt9Spa/3uJfwt4E1BZKSXRDBWjYFFKUQj19t8
+         pYng==
+X-Gm-Message-State: AOJu0Yxsh2PudY4+fNpdK1umHCUqCmtmjuReuIzcWpl/FO28JJIDcKME
+	dz0dlWA2dPgGwc07I5TFuwasnO/wLE6HkA6BRFZkRNjel8Pl8d/FUZhDr7dtc43+/tDmZoE6PIl
+	wJVuoTK4S4Fi0cu8cRmHokwOelRxLGiBkcF9RcXErLOiBfBHGle1qcx+Bhftl0JE5
+X-Gm-Gg: ASbGnctjlsmE3VPLFqf6PoJ0PUgwRF5H2SjLMKr6MQm9S+W6GxR9nIa2TLvdTO9hOjc
+	eufA8f635K5ImUJ2RDxkVuVVAidLe8WQOPJO2PqNCltwr97cKCGULd2tf6ukbdFELPCulRT9u+w
+	jwaMynScesPh5e9Y6zilSbSJ+3LxTmAra+eLIV3eYMAxidRrEFvHpzcHh9Xj+PjAWdxs7Wxbwmr
+	1SJpl01vwK5TwJd3FNU8imd9WID9ZTYTZiUFciKuy8EnWZ6KIgz6/M1aM+4jS2GcBQ4dYvC95xS
+	aJX6KDYW1QiUg/KYoj3EQY5nchBD7qzatF4/yzglj2XCyZAekbR/zGdKyZcUXn+VcM3j1P8s5is
+	egKNJhZNg1bNeYDnHANMdj6hVg1tW6JVYslg/2PwTaVq7BNqAywvhJWbI
+X-Google-Smtp-Source: AGHT+IEk/eea0bMdXgNsKY9GOkArYnleDhfcduy0qhpwPOHBUU8UK1/ccFo32t6ur4YWhdCfnh6EeA==
+X-Received: by 2002:a17:907:a08a:b0:ade:4121:8d52 with SMTP id a640c23a62f3a-ae9c9997326mr327356466b.16.1752666905103;
+        Wed, 16 Jul 2025 04:55:05 -0700 (PDT)
 Received: from inifinity.homelan.mandelbit.com ([2001:67c:2fbc:1:96ff:526e:2192:5194])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae6e8264636sm1169169666b.86.2025.07.16.04.55.03
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae6e8264636sm1169169666b.86.2025.07.16.04.55.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Jul 2025 04:55:03 -0700 (PDT)
+        Wed, 16 Jul 2025 04:55:04 -0700 (PDT)
 From: Antonio Quartulli <antonio@openvpn.net>
 To: netdev@vger.kernel.org
-Cc: Antonio Quartulli <antonio@openvpn.net>,
+Cc: Ralf Lici <ralf@mandelbit.com>,
 	Sabrina Dubroca <sd@queasysnail.net>,
 	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Ralf Lici <ralf@mandelbit.com>
-Subject: [PATCH net 2/3] ovpn: reject unexpected netlink attributes
-Date: Wed, 16 Jul 2025 13:54:42 +0200
-Message-ID: <20250716115443.16763-3-antonio@openvpn.net>
+	Gert Doering <gert@greenie.muc.de>,
+	Antonio Quartulli <antonio@openvpn.net>
+Subject: [PATCH net 3/3] ovpn: reset GSO metadata after decapsulation
+Date: Wed, 16 Jul 2025 13:54:43 +0200
+Message-ID: <20250716115443.16763-4-antonio@openvpn.net>
 X-Mailer: git-send-email 2.49.1
 In-Reply-To: <20250716115443.16763-1-antonio@openvpn.net>
 References: <20250716115443.16763-1-antonio@openvpn.net>
@@ -96,499 +97,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Netlink ops do not expect all attributes to be always set, however
-this condition is not explicitly coded any where, leading the user
-to believe that all sent attributes are somewhat processed.
+From: Ralf Lici <ralf@mandelbit.com>
 
-Fix this behaviour by introducing explicit checks.
+The ovpn_netdev_write() function is responsible for injecting
+decapsulated and decrypted packets back into the local network stack.
 
-For CMD_OVPN_PEER_GET and CMD_OVPN_KEY_GET directly open-code the
-needed condition in the related ops handlers.
-While for all other ops use attribute subsets in the ovpn.yaml spec file.
+Prior to this patch, the skb could retain GSO metadata from the outer,
+encrypted tunnel packet. This original GSO metadata, relevant to the
+sender's transport context, becomes invalid and misleading for the
+tunnel/data path once the inner packet is exposed.
 
-Fixes: b7a63391aa98 ("ovpn: add basic netlink support")
-Reported-by: Ralf Lici <ralf@mandelbit.com>
-Closes: https://github.com/OpenVPN/ovpn-net-next/issues/19
+Leaving this stale metadata intact causes internal GSO validation checks
+further down the kernel's network stack (validate_xmit_skb()) to fail,
+leading to packet drops. The reasons for these failures vary by
+protocol, for example:
+- for ICMP, no offload handler is registered;
+- for TCP and UDP, the respective offload handlers return errors when
+  comparing skb->len to the outdated skb_shinfo(skb)->gso_size.
+
+By calling skb_gso_reset(skb) we ensure the inner packet is presented to
+gro_cells_receive() with a clean state, correctly indicating it is an
+individual packet from the perspective of the local stack.
+
+This change eliminates the "Driver has suspect GRO implementation, TCP
+performance may be compromised" warning and improves overall TCP
+performance by allowing GSO/GRO to function as intended on the
+decapsulated traffic.
+
+Fixes: 11851cbd60ea ("ovpn: implement TCP transport")
+Reported-by: Gert Doering <gert@greenie.muc.de>
+Closes: https://github.com/OpenVPN/ovpn-net-next/issues/4
+Tested-by: Gert Doering <gert@greenie.muc.de>
+Signed-off-by: Ralf Lici <ralf@mandelbit.com>
 Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
 ---
- Documentation/netlink/specs/ovpn.yaml | 153 +++++++++++++++++++++++++-
- drivers/net/ovpn/netlink-gen.c        |  61 +++++++++-
- drivers/net/ovpn/netlink-gen.h        |   6 +
- drivers/net/ovpn/netlink.c            |  51 +++++++--
- 4 files changed, 251 insertions(+), 20 deletions(-)
+ drivers/net/ovpn/io.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/Documentation/netlink/specs/ovpn.yaml b/Documentation/netlink/specs/ovpn.yaml
-index 096c51f0c69a..ba76426a542d 100644
---- a/Documentation/netlink/specs/ovpn.yaml
-+++ b/Documentation/netlink/specs/ovpn.yaml
-@@ -160,6 +160,66 @@ attribute-sets:
-         name: link-tx-packets
-         type: uint
-         doc: Number of packets transmitted at the transport level
-+  -
-+    name: peer-new-input
-+    subset-of: peer
-+    attributes:
-+      -
-+        name: id
-+      -
-+        name: remote-ipv4
-+      -
-+        name: remote-ipv6
-+      -
-+        name: remote-ipv6-scope-id
-+      -
-+        name: remote-port
-+      -
-+        name: socket
-+      -
-+        name: vpn-ipv4
-+      -
-+        name: vpn-ipv6
-+      -
-+        name: local-ipv4
-+      -
-+        name: local-ipv6
-+      -
-+        name: keepalive-interval
-+      -
-+        name: keepalive-timeout
-+  -
-+    name: peer-set-input
-+    subset-of: peer
-+    attributes:
-+      -
-+        name: id
-+      -
-+        name: remote-ipv4
-+      -
-+        name: remote-ipv6
-+      -
-+        name: remote-ipv6-scope-id
-+      -
-+        name: remote-port
-+      -
-+        name: vpn-ipv4
-+      -
-+        name: vpn-ipv6
-+      -
-+        name: local-ipv4
-+      -
-+        name: local-ipv6
-+      -
-+        name: keepalive-interval
-+      -
-+        name: keepalive-timeout
-+  -
-+    name: peer-del-input
-+    subset-of: peer
-+    attributes:
-+      -
-+        name: id
-   -
-     name: keyconf
-     attributes:
-@@ -216,6 +276,33 @@ attribute-sets:
-           obtain the actual cipher IV
-         checks:
-           exact-len: nonce-tail-size
-+
-+  -
-+    name: keyconf-get
-+    subset-of: keyconf
-+    attributes:
-+      -
-+        name: peer-id
-+      -
-+        name: slot
-+      -
-+        name: key-id
-+      -
-+        name: cipher-alg
-+  -
-+    name: keyconf-swap-input
-+    subset-of: keyconf
-+    attributes:
-+      -
-+        name: peer-id
-+  -
-+    name: keyconf-del-input
-+    subset-of: keyconf
-+    attributes:
-+      -
-+        name: peer-id
-+      -
-+        name: slot
-   -
-     name: ovpn
-     attributes:
-@@ -235,12 +322,66 @@ attribute-sets:
-         type: nest
-         doc: Peer specific cipher configuration
-         nested-attributes: keyconf
-+  -
-+    name: ovpn-peer-new-input
-+    subset-of: ovpn
-+    attributes:
-+      -
-+        name: ifindex
-+      -
-+        name: peer
-+        nested-attributes: peer-new-input
-+  -
-+    name: ovpn-peer-set-input
-+    subset-of: ovpn
-+    attributes:
-+      -
-+        name: ifindex
-+      -
-+        name: peer
-+        nested-attributes: peer-set-input
-+  -
-+    name: ovpn-peer-del-input
-+    subset-of: ovpn
-+    attributes:
-+      -
-+        name: ifindex
-+      -
-+        name: peer
-+        nested-attributes: peer-del-input
-+  -
-+    name: ovpn-keyconf-get
-+    subset-of: ovpn
-+    attributes:
-+      -
-+        name: ifindex
-+      -
-+        name: keyconf
-+        nested-attributes: keyconf-get
-+  -
-+    name: ovpn-keyconf-swap-input
-+    subset-of: ovpn
-+    attributes:
-+      -
-+        name: ifindex
-+      -
-+        name: keyconf
-+        nested-attributes: keyconf-swap-input
-+  -
-+    name: ovpn-keyconf-del-input
-+    subset-of: ovpn
-+    attributes:
-+      -
-+        name: ifindex
-+      -
-+        name: keyconf
-+        nested-attributes: keyconf-del-input
+diff --git a/drivers/net/ovpn/io.c b/drivers/net/ovpn/io.c
+index ebf1e849506b..3e9e7f8444b3 100644
+--- a/drivers/net/ovpn/io.c
++++ b/drivers/net/ovpn/io.c
+@@ -62,6 +62,13 @@ static void ovpn_netdev_write(struct ovpn_peer *peer, struct sk_buff *skb)
+ 	unsigned int pkt_len;
+ 	int ret;
  
- operations:
-   list:
-     -
-       name: peer-new
--      attribute-set: ovpn
-+      attribute-set: ovpn-peer-new-input
-       flags: [ admin-perm ]
-       doc: Add a remote peer
-       do:
-@@ -252,7 +393,7 @@ operations:
-             - peer
-     -
-       name: peer-set
--      attribute-set: ovpn
-+      attribute-set: ovpn-peer-set-input
-       flags: [ admin-perm ]
-       doc: modify a remote peer
-       do:
-@@ -286,7 +427,7 @@ operations:
-             - peer
-     -
-       name: peer-del
--      attribute-set: ovpn
-+      attribute-set: ovpn-peer-del-input
-       flags: [ admin-perm ]
-       doc: Delete existing remote peer
-       do:
-@@ -316,7 +457,7 @@ operations:
-             - keyconf
-     -
-       name: key-get
--      attribute-set: ovpn
-+      attribute-set: ovpn-keyconf-get
-       flags: [ admin-perm ]
-       doc: Retrieve non-sensitive data about peer key and cipher
-       do:
-@@ -331,7 +472,7 @@ operations:
-             - keyconf
-     -
-       name: key-swap
--      attribute-set: ovpn
-+      attribute-set: ovpn-keyconf-swap-input
-       flags: [ admin-perm ]
-       doc: Swap primary and secondary session keys for a specific peer
-       do:
-@@ -350,7 +491,7 @@ operations:
-       mcgrp: peers
-     -
-       name: key-del
--      attribute-set: ovpn
-+      attribute-set: ovpn-keyconf-del-input
-       flags: [ admin-perm ]
-       doc: Delete cipher key for a specific peer
-       do:
-diff --git a/drivers/net/ovpn/netlink-gen.c b/drivers/net/ovpn/netlink-gen.c
-index 58e1a4342378..14298188c5f1 100644
---- a/drivers/net/ovpn/netlink-gen.c
-+++ b/drivers/net/ovpn/netlink-gen.c
-@@ -29,6 +29,22 @@ const struct nla_policy ovpn_keyconf_nl_policy[OVPN_A_KEYCONF_DECRYPT_DIR + 1] =
- 	[OVPN_A_KEYCONF_DECRYPT_DIR] = NLA_POLICY_NESTED(ovpn_keydir_nl_policy),
- };
- 
-+const struct nla_policy ovpn_keyconf_del_input_nl_policy[OVPN_A_KEYCONF_SLOT + 1] = {
-+	[OVPN_A_KEYCONF_PEER_ID] = NLA_POLICY_FULL_RANGE(NLA_U32, &ovpn_a_keyconf_peer_id_range),
-+	[OVPN_A_KEYCONF_SLOT] = NLA_POLICY_MAX(NLA_U32, 1),
-+};
-+
-+const struct nla_policy ovpn_keyconf_get_nl_policy[OVPN_A_KEYCONF_CIPHER_ALG + 1] = {
-+	[OVPN_A_KEYCONF_PEER_ID] = NLA_POLICY_FULL_RANGE(NLA_U32, &ovpn_a_keyconf_peer_id_range),
-+	[OVPN_A_KEYCONF_SLOT] = NLA_POLICY_MAX(NLA_U32, 1),
-+	[OVPN_A_KEYCONF_KEY_ID] = NLA_POLICY_MAX(NLA_U32, 7),
-+	[OVPN_A_KEYCONF_CIPHER_ALG] = NLA_POLICY_MAX(NLA_U32, 2),
-+};
-+
-+const struct nla_policy ovpn_keyconf_swap_input_nl_policy[OVPN_A_KEYCONF_PEER_ID + 1] = {
-+	[OVPN_A_KEYCONF_PEER_ID] = NLA_POLICY_FULL_RANGE(NLA_U32, &ovpn_a_keyconf_peer_id_range),
-+};
-+
- const struct nla_policy ovpn_keydir_nl_policy[OVPN_A_KEYDIR_NONCE_TAIL + 1] = {
- 	[OVPN_A_KEYDIR_CIPHER_KEY] = NLA_POLICY_MAX_LEN(256),
- 	[OVPN_A_KEYDIR_NONCE_TAIL] = NLA_POLICY_EXACT_LEN(OVPN_NONCE_TAIL_SIZE),
-@@ -60,16 +76,49 @@ const struct nla_policy ovpn_peer_nl_policy[OVPN_A_PEER_LINK_TX_PACKETS + 1] = {
- 	[OVPN_A_PEER_LINK_TX_PACKETS] = { .type = NLA_UINT, },
- };
- 
-+const struct nla_policy ovpn_peer_del_input_nl_policy[OVPN_A_PEER_ID + 1] = {
-+	[OVPN_A_PEER_ID] = NLA_POLICY_FULL_RANGE(NLA_U32, &ovpn_a_peer_id_range),
-+};
-+
-+const struct nla_policy ovpn_peer_new_input_nl_policy[OVPN_A_PEER_KEEPALIVE_TIMEOUT + 1] = {
-+	[OVPN_A_PEER_ID] = NLA_POLICY_FULL_RANGE(NLA_U32, &ovpn_a_peer_id_range),
-+	[OVPN_A_PEER_REMOTE_IPV4] = { .type = NLA_BE32, },
-+	[OVPN_A_PEER_REMOTE_IPV6] = NLA_POLICY_EXACT_LEN(16),
-+	[OVPN_A_PEER_REMOTE_IPV6_SCOPE_ID] = { .type = NLA_U32, },
-+	[OVPN_A_PEER_REMOTE_PORT] = NLA_POLICY_MIN(NLA_BE16, 1),
-+	[OVPN_A_PEER_SOCKET] = { .type = NLA_U32, },
-+	[OVPN_A_PEER_VPN_IPV4] = { .type = NLA_BE32, },
-+	[OVPN_A_PEER_VPN_IPV6] = NLA_POLICY_EXACT_LEN(16),
-+	[OVPN_A_PEER_LOCAL_IPV4] = { .type = NLA_BE32, },
-+	[OVPN_A_PEER_LOCAL_IPV6] = NLA_POLICY_EXACT_LEN(16),
-+	[OVPN_A_PEER_KEEPALIVE_INTERVAL] = { .type = NLA_U32, },
-+	[OVPN_A_PEER_KEEPALIVE_TIMEOUT] = { .type = NLA_U32, },
-+};
-+
-+const struct nla_policy ovpn_peer_set_input_nl_policy[OVPN_A_PEER_KEEPALIVE_TIMEOUT + 1] = {
-+	[OVPN_A_PEER_ID] = NLA_POLICY_FULL_RANGE(NLA_U32, &ovpn_a_peer_id_range),
-+	[OVPN_A_PEER_REMOTE_IPV4] = { .type = NLA_BE32, },
-+	[OVPN_A_PEER_REMOTE_IPV6] = NLA_POLICY_EXACT_LEN(16),
-+	[OVPN_A_PEER_REMOTE_IPV6_SCOPE_ID] = { .type = NLA_U32, },
-+	[OVPN_A_PEER_REMOTE_PORT] = NLA_POLICY_MIN(NLA_BE16, 1),
-+	[OVPN_A_PEER_VPN_IPV4] = { .type = NLA_BE32, },
-+	[OVPN_A_PEER_VPN_IPV6] = NLA_POLICY_EXACT_LEN(16),
-+	[OVPN_A_PEER_LOCAL_IPV4] = { .type = NLA_BE32, },
-+	[OVPN_A_PEER_LOCAL_IPV6] = NLA_POLICY_EXACT_LEN(16),
-+	[OVPN_A_PEER_KEEPALIVE_INTERVAL] = { .type = NLA_U32, },
-+	[OVPN_A_PEER_KEEPALIVE_TIMEOUT] = { .type = NLA_U32, },
-+};
-+
- /* OVPN_CMD_PEER_NEW - do */
- static const struct nla_policy ovpn_peer_new_nl_policy[OVPN_A_PEER + 1] = {
- 	[OVPN_A_IFINDEX] = { .type = NLA_U32, },
--	[OVPN_A_PEER] = NLA_POLICY_NESTED(ovpn_peer_nl_policy),
-+	[OVPN_A_PEER] = NLA_POLICY_NESTED(ovpn_peer_new_input_nl_policy),
- };
- 
- /* OVPN_CMD_PEER_SET - do */
- static const struct nla_policy ovpn_peer_set_nl_policy[OVPN_A_PEER + 1] = {
- 	[OVPN_A_IFINDEX] = { .type = NLA_U32, },
--	[OVPN_A_PEER] = NLA_POLICY_NESTED(ovpn_peer_nl_policy),
-+	[OVPN_A_PEER] = NLA_POLICY_NESTED(ovpn_peer_set_input_nl_policy),
- };
- 
- /* OVPN_CMD_PEER_GET - do */
-@@ -86,7 +135,7 @@ static const struct nla_policy ovpn_peer_get_dump_nl_policy[OVPN_A_IFINDEX + 1]
- /* OVPN_CMD_PEER_DEL - do */
- static const struct nla_policy ovpn_peer_del_nl_policy[OVPN_A_PEER + 1] = {
- 	[OVPN_A_IFINDEX] = { .type = NLA_U32, },
--	[OVPN_A_PEER] = NLA_POLICY_NESTED(ovpn_peer_nl_policy),
-+	[OVPN_A_PEER] = NLA_POLICY_NESTED(ovpn_peer_del_input_nl_policy),
- };
- 
- /* OVPN_CMD_KEY_NEW - do */
-@@ -98,19 +147,19 @@ static const struct nla_policy ovpn_key_new_nl_policy[OVPN_A_KEYCONF + 1] = {
- /* OVPN_CMD_KEY_GET - do */
- static const struct nla_policy ovpn_key_get_nl_policy[OVPN_A_KEYCONF + 1] = {
- 	[OVPN_A_IFINDEX] = { .type = NLA_U32, },
--	[OVPN_A_KEYCONF] = NLA_POLICY_NESTED(ovpn_keyconf_nl_policy),
-+	[OVPN_A_KEYCONF] = NLA_POLICY_NESTED(ovpn_keyconf_get_nl_policy),
- };
- 
- /* OVPN_CMD_KEY_SWAP - do */
- static const struct nla_policy ovpn_key_swap_nl_policy[OVPN_A_KEYCONF + 1] = {
- 	[OVPN_A_IFINDEX] = { .type = NLA_U32, },
--	[OVPN_A_KEYCONF] = NLA_POLICY_NESTED(ovpn_keyconf_nl_policy),
-+	[OVPN_A_KEYCONF] = NLA_POLICY_NESTED(ovpn_keyconf_swap_input_nl_policy),
- };
- 
- /* OVPN_CMD_KEY_DEL - do */
- static const struct nla_policy ovpn_key_del_nl_policy[OVPN_A_KEYCONF + 1] = {
- 	[OVPN_A_IFINDEX] = { .type = NLA_U32, },
--	[OVPN_A_KEYCONF] = NLA_POLICY_NESTED(ovpn_keyconf_nl_policy),
-+	[OVPN_A_KEYCONF] = NLA_POLICY_NESTED(ovpn_keyconf_del_input_nl_policy),
- };
- 
- /* Ops table for ovpn */
-diff --git a/drivers/net/ovpn/netlink-gen.h b/drivers/net/ovpn/netlink-gen.h
-index 66a4e4a0a055..220b5b2fdd4f 100644
---- a/drivers/net/ovpn/netlink-gen.h
-+++ b/drivers/net/ovpn/netlink-gen.h
-@@ -13,8 +13,14 @@
- 
- /* Common nested types */
- extern const struct nla_policy ovpn_keyconf_nl_policy[OVPN_A_KEYCONF_DECRYPT_DIR + 1];
-+extern const struct nla_policy ovpn_keyconf_del_input_nl_policy[OVPN_A_KEYCONF_SLOT + 1];
-+extern const struct nla_policy ovpn_keyconf_get_nl_policy[OVPN_A_KEYCONF_CIPHER_ALG + 1];
-+extern const struct nla_policy ovpn_keyconf_swap_input_nl_policy[OVPN_A_KEYCONF_PEER_ID + 1];
- extern const struct nla_policy ovpn_keydir_nl_policy[OVPN_A_KEYDIR_NONCE_TAIL + 1];
- extern const struct nla_policy ovpn_peer_nl_policy[OVPN_A_PEER_LINK_TX_PACKETS + 1];
-+extern const struct nla_policy ovpn_peer_del_input_nl_policy[OVPN_A_PEER_ID + 1];
-+extern const struct nla_policy ovpn_peer_new_input_nl_policy[OVPN_A_PEER_KEEPALIVE_TIMEOUT + 1];
-+extern const struct nla_policy ovpn_peer_set_input_nl_policy[OVPN_A_PEER_KEEPALIVE_TIMEOUT + 1];
- 
- int ovpn_nl_pre_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
- 		     struct genl_info *info);
-diff --git a/drivers/net/ovpn/netlink.c b/drivers/net/ovpn/netlink.c
-index a4ec53def46e..c7f382437630 100644
---- a/drivers/net/ovpn/netlink.c
-+++ b/drivers/net/ovpn/netlink.c
-@@ -352,7 +352,7 @@ int ovpn_nl_peer_new_doit(struct sk_buff *skb, struct genl_info *info)
- 		return -EINVAL;
- 
- 	ret = nla_parse_nested(attrs, OVPN_A_PEER_MAX, info->attrs[OVPN_A_PEER],
--			       ovpn_peer_nl_policy, info->extack);
-+			       ovpn_peer_new_input_nl_policy, info->extack);
- 	if (ret)
- 		return ret;
- 
-@@ -476,7 +476,7 @@ int ovpn_nl_peer_set_doit(struct sk_buff *skb, struct genl_info *info)
- 		return -EINVAL;
- 
- 	ret = nla_parse_nested(attrs, OVPN_A_PEER_MAX, info->attrs[OVPN_A_PEER],
--			       ovpn_peer_nl_policy, info->extack);
-+			       ovpn_peer_set_input_nl_policy, info->extack);
- 	if (ret)
- 		return ret;
- 
-@@ -654,7 +654,7 @@ int ovpn_nl_peer_get_doit(struct sk_buff *skb, struct genl_info *info)
- 	struct ovpn_peer *peer;
- 	struct sk_buff *msg;
- 	u32 peer_id;
--	int ret;
-+	int ret, i;
- 
- 	if (GENL_REQ_ATTR_CHECK(info, OVPN_A_PEER))
- 		return -EINVAL;
-@@ -668,6 +668,23 @@ int ovpn_nl_peer_get_doit(struct sk_buff *skb, struct genl_info *info)
- 			      OVPN_A_PEER_ID))
- 		return -EINVAL;
- 
-+	/* OVPN_CMD_PEER_GET expects only the PEER_ID, therefore
-+	 * ensure that the user hasn't specified any other attribute.
-+	 *
-+	 * Unfortunately this check cannot be performed via netlink
-+	 * spec/policy and must be open-coded.
++	/*
++	 * GSO state from the transport layer is not valid for the tunnel/data
++	 * path. Reset all GSO fields to prevent any further GSO processing
++	 * from entering an inconsistent state.
 +	 */
-+	for (i = 0; i < OVPN_A_PEER_MAX + 1; i++) {
-+		if (i == OVPN_A_PEER_ID)
-+			continue;
++	skb_gso_reset(skb);
 +
-+		if (attrs[i]) {
-+			NL_SET_ERR_MSG_FMT_MOD(info->extack,
-+					       "unexpected attribute %u", i);
-+			return -EINVAL;
-+		}
-+	}
-+
- 	peer_id = nla_get_u32(attrs[OVPN_A_PEER_ID]);
- 	peer = ovpn_peer_get_by_id(ovpn, peer_id);
- 	if (!peer) {
-@@ -768,7 +785,7 @@ int ovpn_nl_peer_del_doit(struct sk_buff *skb, struct genl_info *info)
- 		return -EINVAL;
- 
- 	ret = nla_parse_nested(attrs, OVPN_A_PEER_MAX, info->attrs[OVPN_A_PEER],
--			       ovpn_peer_nl_policy, info->extack);
-+			       ovpn_peer_del_input_nl_policy, info->extack);
- 	if (ret)
- 		return ret;
- 
-@@ -969,14 +986,14 @@ int ovpn_nl_key_get_doit(struct sk_buff *skb, struct genl_info *info)
- 	struct ovpn_peer *peer;
- 	struct sk_buff *msg;
- 	u32 peer_id;
--	int ret;
-+	int ret, i;
- 
- 	if (GENL_REQ_ATTR_CHECK(info, OVPN_A_KEYCONF))
- 		return -EINVAL;
- 
- 	ret = nla_parse_nested(attrs, OVPN_A_KEYCONF_MAX,
- 			       info->attrs[OVPN_A_KEYCONF],
--			       ovpn_keyconf_nl_policy, info->extack);
-+			       ovpn_keyconf_get_nl_policy, info->extack);
- 	if (ret)
- 		return ret;
- 
-@@ -988,6 +1005,24 @@ int ovpn_nl_key_get_doit(struct sk_buff *skb, struct genl_info *info)
- 			      OVPN_A_KEYCONF_SLOT))
- 		return -EINVAL;
- 
-+	/* OVPN_CMD_KEY_GET expects only the PEER_ID and the SLOT, therefore
-+	 * ensure that the user hasn't specified any other attribute.
-+	 *
-+	 * Unfortunately this check cannot be performed via netlink
-+	 * spec/policy and must be open-coded.
-+	 */
-+	for (i = 0; i < OVPN_A_KEYCONF_MAX + 1; i++) {
-+		if (i == OVPN_A_KEYCONF_PEER_ID ||
-+		    i == OVPN_A_KEYCONF_SLOT)
-+			continue;
-+
-+		if (attrs[i]) {
-+			NL_SET_ERR_MSG_FMT_MOD(info->extack,
-+					       "unexpected attribute %u", i);
-+			return -EINVAL;
-+		}
-+	}
-+
- 	peer_id = nla_get_u32(attrs[OVPN_A_KEYCONF_PEER_ID]);
- 	peer = ovpn_peer_get_by_id(ovpn, peer_id);
- 	if (!peer) {
-@@ -1037,7 +1072,7 @@ int ovpn_nl_key_swap_doit(struct sk_buff *skb, struct genl_info *info)
- 
- 	ret = nla_parse_nested(attrs, OVPN_A_KEYCONF_MAX,
- 			       info->attrs[OVPN_A_KEYCONF],
--			       ovpn_keyconf_nl_policy, info->extack);
-+			       ovpn_keyconf_swap_input_nl_policy, info->extack);
- 	if (ret)
- 		return ret;
- 
-@@ -1074,7 +1109,7 @@ int ovpn_nl_key_del_doit(struct sk_buff *skb, struct genl_info *info)
- 
- 	ret = nla_parse_nested(attrs, OVPN_A_KEYCONF_MAX,
- 			       info->attrs[OVPN_A_KEYCONF],
--			       ovpn_keyconf_nl_policy, info->extack);
-+			       ovpn_keyconf_del_input_nl_policy, info->extack);
- 	if (ret)
- 		return ret;
- 
+ 	/* we can't guarantee the packet wasn't corrupted before entering the
+ 	 * VPN, therefore we give other layers a chance to check that
+ 	 */
 -- 
 2.49.1
 
