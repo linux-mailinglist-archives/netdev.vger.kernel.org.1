@@ -1,131 +1,152 @@
-Return-Path: <netdev+bounces-207420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6891B07191
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 11:24:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3AB2B07193
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 11:25:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2617D7B6B67
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 09:22:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 073E850085F
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 09:24:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A3B32F199B;
-	Wed, 16 Jul 2025 09:23:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48DA228B401;
+	Wed, 16 Jul 2025 09:25:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A96Y+yss"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ge71JVxy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA3D22127C;
-	Wed, 16 Jul 2025 09:23:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7126B157493
+	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 09:25:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752657825; cv=none; b=HXJU/oEzu/m49cIqfy+vWZFBNYiB+myUZ8NUCq6v1kluzR35s07RyxR+Odk50Mnl/UpL9jU1RPpE0Olk7jWBFWZCXyeypwGeN5JkixERNNR5t6hy6afHtqSBKY0UpoibqMkJGU5HwHYhQGcvGVOzpFGyKnzeJhzMihYAtKzbxAA=
+	t=1752657919; cv=none; b=mm0sQES2ReHlkc/mTMkZjV6mt6oYu7K0Rt8EXjT7Uu2By2Rm6EtQp9kAaHYgR1OcJ3ABW+9ebOPXlrktZahBN9jFoJSFB5d1DuwmBTe9wJGU4wCaHOn265S2sMkhFbRfH6e94XjzcawyYmER8vBEw9shZg3vhzKGx3JDwqFRdkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752657825; c=relaxed/simple;
-	bh=8bb59Y7qB/JB1/x9ope6S0w9QIQuBIWcCUed5RbRWdI=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=F+AbB0KTxx52ej3W9tQ1DhfkWLUcyWgeqn0T8V3egeWRpUC4cm6xdY/wj3VLtypEkwNJ7LI/49eox7xa0u7b+upjJ8ZfS6QjOb/TrEQGKOhjsVDTogQYZJrHCM4IZkkUaRLCSqyNQp60NMudAdxp/NEVYrAAwInwsaIYOBIC4MQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A96Y+yss; arc=none smtp.client-ip=209.85.222.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-88173565536so670427241.0;
-        Wed, 16 Jul 2025 02:23:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752657823; x=1753262623; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=8bb59Y7qB/JB1/x9ope6S0w9QIQuBIWcCUed5RbRWdI=;
-        b=A96Y+yssh8lylf7PdrmBqHZjYOVs4Dzi4mP2PoULJhHSrR/idSvoWQzUbhfGyHUVyM
-         sclrtRX6vLXO2JkJKXQFrUnFS1pe27l81XdIlJNzw1eqdSPA3kr60HY2fQNqyMLuGLt5
-         t29S1ubBNHdHkxskjnQB+ugq+iaXWADBZA7AZyHrgJSKv6YEFzQeUak8f8T0FFka0RBw
-         +Tq/du7/paCXLSKPOrg2yualGaFPZzkXUFfcj2QNkjsS2sh1p+atL7AY+KeTDi/0WyTT
-         JuEU5pJIlpwFIt8Jo4fo8eHUGXnjLZzMbNxNkZlVZ6gNOcHmDwrhzlvDcGH3EuPeFLZA
-         kmyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752657823; x=1753262623;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8bb59Y7qB/JB1/x9ope6S0w9QIQuBIWcCUed5RbRWdI=;
-        b=vT8kAMRpbFV8ANN/abv6d0MirtwDUzOt3wAVmpK3eSYdADopD42dFrzAXyI1k5OO1O
-         S7af9otiVK86ZmU3oaISwB4807pv27wVqbuvBbTHrCJjq1B039w1zVJosJFnYMxtGn2m
-         NuWQ/7AxIOwEyfW9NNmEUbubB6Zbog7h9VxKZGGKYVqPBV3p/jeVWCyu0d8eY8LJAD14
-         QzrIXeVf1jVyKyTQuLvt7vuIJFztORCmrbyIS/D3rkxfo/9HoEzb0yJggbb8PIa3dtkJ
-         zdhzhKPfJlKScLSw5qPuuRp4ZI/OM0GaAUpAF0NRNcQdMoGksM34p2e5PykgPpz7IgUS
-         qcmA==
-X-Forwarded-Encrypted: i=1; AJvYcCU3D060rOp26/EgkyOateZcRXz2OK6liJm+zo93PvFnNcXUzBa4Ikpxmk7Yy9bOoJY3z+5xb5cI@vger.kernel.org, AJvYcCUbNYjWMIlw7ywSG0p7kpJV5waU13+WcIkPwLJ2mVjpbuP2BuNcJmWyGeIw5o8Suu5KnGc3Vgueeu5vVoU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHmLbyLz87yvlMUwOOtyS7WE6HrG5Yw75avHHXxXGURcDFF3CS
-	upppr8rcQe4NPf0aQ3Nvamn6FubjEvS/+VfrcwPM8xLz5SGDwFUf/4fwWB0DlUeo8efitN0dLO0
-	GU2c9/KagTxVx/ybtpY8cRAUH7EuVR9z3qXExSbyiEA==
-X-Gm-Gg: ASbGncv4+rDtgvmdeojtFWu5CQV/ouzJ/7RIwBUwviqlYbBb3dVEEx61gaW6DN/4HQD
-	yDBXOW5quBVhaSlJqYoj92BMmCGmucfnkEYZAzzhp5Qdg+YJejd3YqSvhNQ+QBkPpbdJEHHElrm
-	ls1CAKOeQeYSS0R8+OeuiapH4jSzu9PH+ayIALurqsJyeKSZZo66dtwiJ9ecFoncxx0f6ZhrLXr
-	hb3w7U=
-X-Google-Smtp-Source: AGHT+IHbhfnfusQK9pbbtL026/fcLsRE78Jlhv++1FuiMatxhLTQJ+73q9kklmr2eP6jxQDehdPv2C7LAS1LRoealqE=
-X-Received: by 2002:a05:6102:3e11:b0:4e7:866c:5cd9 with SMTP id
- ada2fe7eead31-4f890152c29mr1304099137.11.1752657823234; Wed, 16 Jul 2025
- 02:23:43 -0700 (PDT)
+	s=arc-20240116; t=1752657919; c=relaxed/simple;
+	bh=dkpNnjpYsRhJQBoL5SohE6eDXE1Dfz7eQHIaMTW4SHs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I8y83sG7lAMg6k1Uh2Ig7FIc9N5o9qWOO+jXuoHe0Cw0+XwLQqikch8KdJbT/mr2fIWwPQbkWvncppkjwSDiNWCNsdZ4yzhz2aXZANeHji2g1c0cfIBXFvIbhDOLS0ntrKhRHNvGfYQG0GrDKq+bwX/uDmbbB4PmCgkYLowVQMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ge71JVxy; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752657918; x=1784193918;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=dkpNnjpYsRhJQBoL5SohE6eDXE1Dfz7eQHIaMTW4SHs=;
+  b=Ge71JVxyQ31EcBJn2noyDZ/ngHp0Qz93h4M/d+qIudCY7pt0zgJs5rcx
+   nxdUPQvNSr3N27Yx1qt8+6sfmB6o8MJZrVBXU5t6ln7ZZ87S9IXwD4N0e
+   tg6J1RRBZr2wVj1K7n5DdB4YkHJxqxpTmm/6XuaLAWHIroeSozzXQaed5
+   Hy39iOC/mxVbzg/KzJ7onaQ/AiWMfqat/Gby7d86D8CATHQyiWrXxQohS
+   asf+OS1E2uk0hW3yMlkBv4ZJavtUWkMdSc30dasicpK7MIKu/rNlcletu
+   OasI+KXKIjOPMAbQQGZYNUtL/mbkJSXe8+f/gmnxda6FD19Ey9btNya5i
+   Q==;
+X-CSE-ConnectionGUID: 9PaYg9bJTEe8s8ZpLun1EQ==
+X-CSE-MsgGUID: cacKaEc1QZWCreLkcoT92w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11493"; a="54990013"
+X-IronPort-AV: E=Sophos;i="6.16,315,1744095600"; 
+   d="scan'208";a="54990013"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2025 02:25:17 -0700
+X-CSE-ConnectionGUID: khmRv9vYRvSjNH+DH50fJg==
+X-CSE-MsgGUID: eFyp1+WeR6SXM5VzHx5kNg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,315,1744095600"; 
+   d="scan'208";a="188455816"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2025 02:25:14 -0700
+Date: Wed, 16 Jul 2025 11:24:07 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Subbaraya Sundeep <sbhatta@marvell.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni4redhat.com@mx0a-0016f401.pphosted.com,
+	horms@kernel.org, gakula@marvell.com, hkelam@marvell.com,
+	bbhushan2@marvell.com, jerinj@marvell.com, lcherian@marvell.com,
+	sgoutham@marvell.com, netdev@vger.kernel.org
+Subject: Re: [net-next PATCH v2 01/11] octeontx2-af: Simplify context writing
+ and reading to hardware
+Message-ID: <aHdvt63yoJLt/1g9@mev-dev.igk.intel.com>
+References: <1752598924-32705-1-git-send-email-sbhatta@marvell.com>
+ <1752598924-32705-2-git-send-email-sbhatta@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Xianying Wang <wangxianying546@gmail.com>
-Date: Wed, 16 Jul 2025 17:23:29 +0800
-X-Gm-Features: Ac12FXyNFIaCK2pDYZ0jchMpDYF8x-Rd4WuhffoKeJLrRhYKDwWu0ZHWBZNeFqg
-Message-ID: <CAOU40uCe07E+jSONsnFXWfdPHPQjcvEoFX-QdJ2eAw2DqXZ=sg@mail.gmail.com>
-Subject: [BUG] INFO: rcu detected stall in unix_stream_connect
-To: kuniyu@google.com
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1752598924-32705-2-git-send-email-sbhatta@marvell.com>
 
-Hi,
+On Tue, Jul 15, 2025 at 10:31:54PM +0530, Subbaraya Sundeep wrote:
+> Simplify NIX context reading and writing by using hardware
+> maximum context size instead of using individual sizes of
+> each context type.
+> 
+> Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+> ---
+>  .../ethernet/marvell/octeontx2/af/rvu_nix.c   | 46 ++++++++++---------
+>  .../marvell/octeontx2/af/rvu_struct.h         |  7 ++-
+>  2 files changed, 30 insertions(+), 23 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+> index bdf4d852c15d..48d44911b663 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+> @@ -17,6 +17,8 @@
+>  #include "lmac_common.h"
+>  #include "rvu_npc_hash.h"
+>  
+> +#define NIX_MAX_CTX_SIZE	128
+> +
 
-I discovered a kernel panic using the Syzkaller framework, described
-as INFO: rcu detected stall. This issue was reproduced on kernel
-version 6.16.0-rc5.
+[...]
 
-From the dmesg log, RCU detects a stall on CPU 0. The NMI backtrace,
-which shows what the CPU was actually doing, reveals it was stuck in a
-tight loop within the timer interrupt handler. The CPU appears to be
-spinning in functions like lapic_next_deadline
-(arch/x86/kernel/apic/apic.c:429) while processing a timer softirq in
-run_timer_softirq (kernel/time/timer.c:2403).
+>  
+>  	return 0;
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_struct.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu_struct.h
+> index 0596a3ac4c12..8a66f53a7658 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_struct.h
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_struct.h
+> @@ -370,6 +370,8 @@ struct nix_cq_ctx_s {
+>  	u64 qsize		: 4;
+>  	u64 cq_err_int		: 8;
+>  	u64 cq_err_int_ena	: 8;
+> +	/* Ensure all context sizes are minimum 128 bytes */
+> +	u64 padding[12];
+>  };
+>  
+>  /* CN10K NIX Receive queue context structure */
+> @@ -672,7 +674,8 @@ struct nix_sq_ctx_s {
+>  struct nix_rsse_s {
+>  	uint32_t rq			: 20;
+>  	uint32_t reserved_20_31		: 12;
+> -
+> +	/* Ensure all context sizes are minimum 128 bytes */
+> +	u64 padding[15];
+>  };
+>  
+>  /* NIX receive multicast/mirror entry structure */
+> @@ -684,6 +687,8 @@ struct nix_rx_mce_s {
+>  	uint64_t rsvd_31_24 : 8;
+>  	uint64_t pf_func    : 16;
+>  	uint64_t next       : 16;
+> +	/* Ensure all context sizes are minimum 128 bytes */
+> +	u64 padding[15];
+>  };
 
-Meanwhile, the task that was running on CPU 0 before it got stuck in
-the interrupt is blocked in the unix_stream_connect function
-(net/unix/af_unix.c:1683). The syzkaller reproducer appears to create
-a deadlock scenario by having a listening UNIX socket attempt to
-connect to its own endpoint.
+To be sure that each used structures are correct size you can
+use static assertion, sth like:
+static_assert((NIC_MAX_CTX_SIZE) == sizeof(struct X))
 
-I suspect this is a complex race condition or deadlock within the
-kernel's core timer subsystem. The stress and unusual blocking state
-induced by the UNIX socket operations, combined with concurrent POSIX
-timer usage, likely exposes a latent bug in the hrtimer or tick
-management. This causes the CPU to spin with interrupts disabled,
-which in turn triggers the RCU stall.
+Thanks
 
-This can be reproduced on:
-
-HEAD commit:
-
-d7b8f8e20813f0179d8ef519541a3527e7661d3a
-
-report: https://pastebin.com/raw/N3GD5hL7
-
-console output : https://pastebin.com/raw/RCZfTKCb
-
-kernel config : https://pastebin.com/raw/xAVw5DnH
-
-C reproducer :https://pastebin.com/raw/Z1B1ray5
-
-Let me know if you need more details or testing.
-
-Best regards,
-
-Xianying
+>  
+>  enum nix_band_prof_layers {
+> -- 
+> 2.34.1
+> 
 
