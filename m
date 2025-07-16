@@ -1,635 +1,182 @@
-Return-Path: <netdev+bounces-207363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61CBAB06DBC
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 08:13:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D105B06DC9
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 08:21:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11C953A7B77
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 06:12:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B808D7AA8A4
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 06:19:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C940F280328;
-	Wed, 16 Jul 2025 06:13:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 295D2271449;
+	Wed, 16 Jul 2025 06:21:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="mlFc3x+r"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZswQbBqL"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A9802459E5
-	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 06:13:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57B3B1D5CED;
+	Wed, 16 Jul 2025 06:21:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752646391; cv=none; b=PmIEjRm4MSmLc+DGoav155FrbT+1/0J+Mfmf762fv546RU+dSYpEQYiJlZSmmf66bllKH6kw1Lt1zcNxwWc771nrE5megKjn10kzlqzWRGcGTv4Ru6hXQXNSc0ujqxA6zmsLyy0HfQyvjKlOOouhQjwJDtFS7sjFd5DIx58NMbs=
+	t=1752646870; cv=none; b=flaoxyDhbd7v3PKycH8ZAY41RjS2/iwew3SjIhjqsKUMtD40PxcFy8w629qRVDM0DEq+rkmIxQy8Qvj2Eofdqv2JJkxeAvea5tJ52N3eB5dVYEIL5QbZ+XSlqS5gERNqRFndKXXmCwg7158/OhAV09v7DE418N5/HE34GNyY0nA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752646391; c=relaxed/simple;
-	bh=rbWtUj9mFhSEweHjAgRNuP6lkAZXacthVS7S5nWO53M=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=bw2aO3J32Kgs9dLy67mlPIu6J3MqaZuCiK91VaFZibjRCjHgZgg3AEbBc9pNxc1SpRUkPiBTioLdXyVhsYPUauW5J+vbxi6CF7ov8gcbBv8KApryjAda0swJ57Bd8q9Xa6V/2VGdRWhlYbDQetJPntm9ywvsnhm55sxHAJ+1YGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=mlFc3x+r; arc=none smtp.client-ip=115.124.30.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1752646378; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=o2zSwp1I9WMW3AVVFOCLD25xHl5LABxU4RfhOH+rgeQ=;
-	b=mlFc3x+rFFk3QMvmwSI2mvXe7Ki6xPsqhHctjv/F/AErO+XsvdVdEONQafpijRhDJ+K7pcWcCg9B+dw6YjhPSkRd95B7yottZVuhFkGzWUkbw8o/0OXqtbsn7eIFZNU4c2b6tt4kMJa1EnV8jRNf6kzQ05E89GzKeJqEvuv4KuY=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Wj3-eMH_1752646376 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 16 Jul 2025 14:12:57 +0800
-Message-ID: <1752645720.5179944-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next] eea: Add basic driver framework for Alibaba Elastic Ethernet Adaptor
-Date: Wed, 16 Jul 2025 14:02:00 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Wen Gu <guwen@linux.alibaba.com>,
- Philo Lu <lulie@linux.alibaba.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Lukas Bulwahn <lukas.bulwahn@redhat.com>,
- Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Alexander Duyck <alexanderduyck@fb.com>,
- Dust Li <dust.li@linux.alibaba.com>
-References: <20250710112817.85741-1-xuanzhuo@linux.alibaba.com>
- <20250711105546.GT721198@horms.kernel.org>
-In-Reply-To: <20250711105546.GT721198@horms.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1752646870; c=relaxed/simple;
+	bh=ELxF6Rsm67tznC+VYpiWbBK2wQPbxOR1mWi46OfR3xI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I4WVMduyYzd/ghpI0xYhUYMtK2Lko2aGmH62PZGEk7DlnKKWVFCPlTTIAAhrfS62bLs7rc5WvTqP99ouq8tgFC/+g3g0p/8YBFUJHlKN1zdGBmstdfwyfh/ofsNpTUEWhFzDd9vI8Labv63o+ETow1E3/gyDKoX8Dnxp7gUkbIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZswQbBqL; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-455b00283a5so27975095e9.0;
+        Tue, 15 Jul 2025 23:21:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752646866; x=1753251666; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=56uD9SyE0IQHcvuX/OShaw3UWeO3kygh4tIChfdx0hA=;
+        b=ZswQbBqLeKKd0+ut6lLlSL/wW3QIYEabzTMvlYqgoDsQbV/1Kq3wr25vE5pX1tKLwY
+         LhSv3RBXyf8cxxRL45O+scciqXePZAzWS98p+5JMTOUuPLFtwEJIiwPoupJ0REz5K6SR
+         JEJyqzIKZR6qsaK+vEwcOcZPflGRswjWP9hWiPWsV5YEbo2Qvr2qVG4IxBDIO5QVDyZt
+         vWc1zbGMG0c4ePGLbnyCn08H6Nv0yr3jQZh4Y8lsbBnQAUcmFKJlk3dsEPx5HHnqkVjH
+         0Es6beTO+UZogTAQBEnG2KWc4NeTywyzg4AEpcmphVEq96Lp4m1GlB+8VM2dBym3rttY
+         Jmww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752646866; x=1753251666;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=56uD9SyE0IQHcvuX/OShaw3UWeO3kygh4tIChfdx0hA=;
+        b=VIMfoX3VGCBmo7sbnabJG31naoPak3y6FlSxO7fz4LGTHcGhAuMbPXz5d6DvS/lzSq
+         lZPdOy6mmPkntMVj41sW7LzBOHwfByW1G20YM15vlsOj2YLV3za0FVMm3RlVXAPGwdSk
+         z+gDWGYqqotVObIHfabOIejop/fvUcHv6c33TygbB5BxAUGm0RPAVmTZTI6rXfTRuvwu
+         BpR7GW68yHAh5GNfqrbNw4Xyg13cemN7f6J902P1ohYtt1Any08rpVQgZsdJjH0qj8bi
+         qMXc07EgGUdQHedSoQx1mbWC4WDnM02DjSvo7n70a8y4cCiWhwRhMIv5AtlUfLn7N+Yf
+         NhVA==
+X-Forwarded-Encrypted: i=1; AJvYcCUtkWujujZNs8yrA59Pb8ENrT5pqayq3xqwkkPSgE3QoHclFWBYAtyVD7j3PvJCUhL8OK8Gx28gZ/ki@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkQbv+i5GX10yegqSNlUDHUPo3jNFOl6x31ea6XAqqs7OJYPR6
+	S4EgQJZvbCiveAAlRezO9Bvu5Apky8HzPnlBtV9cOJ/1uAHhBSEuhkWQ
+X-Gm-Gg: ASbGncvOv+qBY2i2mhF1r3DWscpgpP4uZw+CPXzBnl/53mn9iWagildTFmQkZZzvqie
+	zSl5sOtC7oce0pzc25v2lFwns/O50ZEKYkpSFFCkpVfOkGclcK+6d8mOskFShJ56cOrUgdneLV/
+	lSvsKpwts11GVfteQ2l3ZyVnqK4qov4lcWQZh7mVLj2ZRhPqvk4NjIpr8u3WCWpTQhyqk+nt9BL
+	hIHGBicwBWbiNPDFjbrKV6d+906aEwW3iSEBEy6NCZ3inBrIsjiBtNHD/N2n/++goPh2ZnrkaXO
+	SvAkwpbFNNb4njtMVO9wmyf7CTbv4nh0hkk1zds3cGCOt9jdX3fet2SNQ9B3s96ZsSfKShzVG5w
+	S4fJm5/Y3Bnh27LFX1FOEwLtnk26qIDRMzMl7mt3SPqf9FA==
+X-Google-Smtp-Source: AGHT+IEsSy/n/FGec1Fc0PuUqm7HoXy3h3RE0tFYu79dHrC8k3M2KnDAF3Ups6FNOKK6/oTuHwyBYA==
+X-Received: by 2002:a05:600c:80c3:b0:456:f85:469b with SMTP id 5b1f17b1804b1-4562ee45c9cmr5599465e9.25.1752646866020;
+        Tue, 15 Jul 2025 23:21:06 -0700 (PDT)
+Received: from [10.80.16.197] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4562e8b0934sm10406885e9.40.2025.07.15.23.21.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Jul 2025 23:21:04 -0700 (PDT)
+Message-ID: <72f6c840-0469-461b-834b-2258a06c9cf3@gmail.com>
+Date: Wed, 16 Jul 2025 09:21:01 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-
-On Fri, 11 Jul 2025 11:55:46 +0100, Simon Horman <horms@kernel.org> wrote:
-> On Thu, Jul 10, 2025 at 07:28:17PM +0800, Xuan Zhuo wrote:
-> > Add a driver framework for EEA that will be available in the future.
-> >
-> > Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >  MAINTAINERS                                   |   8 +
-> >  drivers/net/ethernet/Kconfig                  |   1 +
-> >  drivers/net/ethernet/Makefile                 |   1 +
-> >  drivers/net/ethernet/alibaba/Kconfig          |  29 +
-> >  drivers/net/ethernet/alibaba/Makefile         |   5 +
-> >  drivers/net/ethernet/alibaba/eea/Makefile     |   9 +
-> >  drivers/net/ethernet/alibaba/eea/eea_adminq.c | 464 +++++++++++
-> >  drivers/net/ethernet/alibaba/eea/eea_adminq.h |  70 ++
-> >  drivers/net/ethernet/alibaba/eea/eea_desc.h   | 153 ++++
-> >  .../net/ethernet/alibaba/eea/eea_ethtool.c    | 310 +++++++
-> >  .../net/ethernet/alibaba/eea/eea_ethtool.h    |  50 ++
-> >  drivers/net/ethernet/alibaba/eea/eea_net.c    | 582 +++++++++++++
-> >  drivers/net/ethernet/alibaba/eea/eea_net.h    | 196 +++++
-> >  drivers/net/ethernet/alibaba/eea/eea_pci.c    | 548 +++++++++++++
-> >  drivers/net/ethernet/alibaba/eea/eea_pci.h    |  66 ++
-> >  drivers/net/ethernet/alibaba/eea/eea_ring.c   | 209 +++++
-> >  drivers/net/ethernet/alibaba/eea/eea_ring.h   | 144 ++++
-> >  drivers/net/ethernet/alibaba/eea/eea_rx.c     | 773 ++++++++++++++++++
-> >  drivers/net/ethernet/alibaba/eea/eea_tx.c     | 405 +++++++++
-> >  19 files changed, 4023 insertions(+)
->
-> This is a large patch.
-> And it's difficult to cover 4k lines in a review sitting
-> (having spend some time on this, I am getting hungry for lunch by now :).
->
-> Please consider breaking it up in a sensible way.
-> And if you do so please note that each patch needs to compile (with W=3D1)
-> and so on when applied in order so that bisection is not broken.
-
-Thank you very much for your review and the suggestion. We understand the
-concern, and we're aware that large patches can be challenging to review.
-However, given the nature of this driver and how similar implementations ha=
-ve
-been handled historically, we don't plan to split this patch at this time, =
-as
-doing so wouldn't bring significant benefits in this case.
-
-We've already removed most of the features and kept only the core functiona=
-lity
-=E2=80=94 this is already a minimal implementation.
-
-We've addressed most of the comments and will include the fixes in the next
-version. A few remaining items are still under discussion and listed below =
-for
-reference.
-
-Appreciate your time and effort, and hope you=E2=80=99ve enjoyed your lunch!
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] net/mlx5: Correctly set gso_size when LRO is used
+To: cpaasch@openai.com, Saeed Mahameed <saeedm@nvidia.com>,
+ Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Gal Pressman <gal@nvidia.com>
+Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <20250715-cpaasch-pf-925-investigate-incorrect-gso_size-on-cx-7-nic-v2-1-e06c3475f3ac@openai.com>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20250715-cpaasch-pf-925-investigate-incorrect-gso_size-on-cx-7-nic-v2-1-e06c3475f3ac@openai.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
->
-> >  create mode 100644 drivers/net/ethernet/alibaba/Kconfig
-> >  create mode 100644 drivers/net/ethernet/alibaba/Makefile
-> >  create mode 100644 drivers/net/ethernet/alibaba/eea/Makefile
-> >  create mode 100644 drivers/net/ethernet/alibaba/eea/eea_adminq.c
-> >  create mode 100644 drivers/net/ethernet/alibaba/eea/eea_adminq.h
-> >  create mode 100644 drivers/net/ethernet/alibaba/eea/eea_desc.h
-> >  create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.c
-> >  create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.h
-> >  create mode 100644 drivers/net/ethernet/alibaba/eea/eea_net.c
-> >  create mode 100644 drivers/net/ethernet/alibaba/eea/eea_net.h
-> >  create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.c
-> >  create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.h
-> >  create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.c
-> >  create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.h
-> >  create mode 100644 drivers/net/ethernet/alibaba/eea/eea_rx.c
-> >  create mode 100644 drivers/net/ethernet/alibaba/eea/eea_tx.c
->
-> ...
->
-> > diff --git a/drivers/net/ethernet/alibaba/eea/eea_adminq.c b/drivers/ne=
-t/ethernet/alibaba/eea/eea_adminq.c
->
-> ...
->
-> > +struct eea_aq_create {
-> > +#define EEA_QUEUE_FLAGS_HW_SPLIT_HDR BIT(0)
-> > +#define EEA_QUEUE_FLAGS_SQCQ         BIT(1)
-> > +#define EEA_QUEUE_FLAGS_HWTS         BIT(2)
-> > +	__le32 flags;
-> > +	/* queue index.
-> > +	 * rx: 0 =3D=3D qidx % 2
-> > +	 * tx: 1 =3D=3D qidx % 2
-> > +	 */
-> > +	__le16 qidx;
-> > +	/* the depth of the queue */
-> > +	__le16 depth;
-> > +	/*  0: without SPLIT HDR
-> > +	 *  1: 128B
-> > +	 *  2: 256B
-> > +	 *  3: 512B
-> > +	 */
-> > +	u8 hdr_buf_size;
-> > +	u8 sq_desc_size;
-> > +	u8 cq_desc_size;
-> > +	u8 reserve0;
-> > +	/* The verctor for the irq. rx,tx share the same vector */
->
-> nit: vector
->
->      checkpatch.pl --codespell is your friend
->
-> > +	__le16 msix_vector;
-> > +	__le16 reserve;
-> > +	/* sq ring cfg. */
-> > +	__le32 sq_addr_low;
-> > +	__le32 sq_addr_high;
-> > +	/* cq ring cfg. Just valid when flags include EEA_QUEUE_FLAGS_SQCQ. */
-> > +	__le32 cq_addr_low;
-> > +	__le32 cq_addr_high;
-> > +};
->
-> ...
->
-> > +static int eea_adminq_exec(struct eea_net *enet, u16 cmd,
-> > +			   void *req, u32 req_size, void *res, u32 res_size)
-> > +{
-> > +	dma_addr_t req_addr, res_addr;
-> > +	struct device *dma;
-> > +	int ret;
-> > +
-> > +	dma =3D enet->edev->dma_dev;
-> > +
-> > +	req_addr =3D 0;
-> > +	res_addr =3D 0;
-> > +
-> > +	if (req) {
-> > +		req_addr =3D dma_map_single(dma, req, req_size, DMA_TO_DEVICE);
-> > +		if (unlikely(dma_mapping_error(dma, req_addr)))
-> > +			return -ENOMEM;
-> > +	}
-> > +
-> > +	if (res) {
-> > +		res_addr =3D dma_map_single(dma, res, res_size, DMA_FROM_DEVICE);
-> > +		if (unlikely(dma_mapping_error(dma, res_addr))) {
-> > +			ret =3D -ENOMEM;
-> > +			goto err_map_res;
-> > +		}
-> > +	}
-> > +
-> > +	ret =3D eea_adminq_submit(enet, cmd, req_addr, res_addr, req_size, re=
-s_size);
->
-> Please arrange Networking code so that it is 80 columns wide or less,
-> where that can be done without reducing readability. E.g. don't split
-> strings across multiple lines. Do wrap lines like the one above like this:
->
-> 	ret =3D eea_adminq_submit(enet, cmd, req_addr, res_addr, req_size,
-> 				res_size);
->
-> Note that the start of the non-whitespace portion of the 2nd line
-> is aligned to be exactly inside the opening parentheses of the previous
-> line.
->
-> checkpatch.pl --max-line-length=3D80 is useful here.
 
-We are aware of the current limit of 100 characters, and we have been coding
-according to that guideline. Of course, we try to keep lines within 80
-characters where possible. However, in some cases, we find that using up to=
- 100
-characters improves readability, so 80 is not a strict requirement for us.
+On 15/07/2025 23:20, Christoph Paasch via B4 Relay wrote:
+> From: Christoph Paasch <cpaasch@openai.com>
+> 
+> gso_size is expected by the networking stack to be the size of the
+> payload (thus, not including ethernet/IP/TCP-headers). However, cqe_bcnt
+> is the full sized frame (including the headers). Dividing cqe_bcnt by
+> lro_num_seg will then give incorrect results.
+> 
+> For example, running a bpftrace higher up in the TCP-stack
+> (tcp_event_data_recv), we commonly have gso_size set to 1450 or 1451 even
+> though in reality the payload was only 1448 bytes.
+> 
+> This can have unintended consequences:
+> - In tcp_measure_rcv_mss() len will be for example 1450, but. rcv_mss
+> will be 1448 (because tp->advmss is 1448). Thus, we will always
+> recompute scaling_ratio each time an LRO-packet is received.
+> - In tcp_gro_receive(), it will interfere with the decision whether or
+> not to flush and thus potentially result in less gro'ed packets.
+> 
+> So, we need to discount the protocol headers from cqe_bcnt so we can
+> actually divide the payload by lro_num_seg to get the real gso_size.
+> 
+> v2:
+>   - Use "(unsigned char *)tcp + tcp->doff * 4 - skb->data)" to compute header-len
+>     (Tariq Toukan <tariqt@nvidia.com>)
+>   - Improve commit-message (Gal Pressman <gal@nvidia.com>)
+> 
+> Fixes: e586b3b0baee ("net/mlx5: Ethernet Datapath files")
+> Signed-off-by: Christoph Paasch <cpaasch@openai.com>
+> ---
+>   drivers/net/ethernet/mellanox/mlx5/core/en_rx.c | 12 ++++++++----
+>   1 file changed, 8 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> index 84b1ab8233b8107f0d954ea29c33601b279a2c27..7462514c7f3d1606339ede13a6207c1629ab65a3 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> @@ -1154,8 +1154,9 @@ static void mlx5e_lro_update_tcp_hdr(struct mlx5_cqe64 *cqe, struct tcphdr *tcp)
+>   	}
+>   }
+>   
+> -static void mlx5e_lro_update_hdr(struct sk_buff *skb, struct mlx5_cqe64 *cqe,
+> -				 u32 cqe_bcnt)
+> +static unsigned int mlx5e_lro_update_hdr(struct sk_buff *skb,
+> +					 struct mlx5_cqe64 *cqe,
+> +					 u32 cqe_bcnt)
+>   {
+>   	struct ethhdr	*eth = (struct ethhdr *)(skb->data);
+>   	struct tcphdr	*tcp;
+> @@ -1205,6 +1206,8 @@ static void mlx5e_lro_update_hdr(struct sk_buff *skb, struct mlx5_cqe64 *cqe,
+>   		tcp->check = tcp_v6_check(payload_len, &ipv6->saddr,
+>   					  &ipv6->daddr, check);
+>   	}
+> +
+> +	return (unsigned int)((unsigned char *)tcp + tcp->doff * 4 - skb->data);
+>   }
+>   
+>   static void *mlx5e_shampo_get_packet_hd(struct mlx5e_rq *rq, u16 header_index)
+> @@ -1561,8 +1564,9 @@ static inline void mlx5e_build_rx_skb(struct mlx5_cqe64 *cqe,
+>   		mlx5e_macsec_offload_handle_rx_skb(netdev, skb, cqe);
+>   
+>   	if (lro_num_seg > 1) {
+> -		mlx5e_lro_update_hdr(skb, cqe, cqe_bcnt);
+> -		skb_shinfo(skb)->gso_size = DIV_ROUND_UP(cqe_bcnt, lro_num_seg);
+> +		unsigned int hdrlen = mlx5e_lro_update_hdr(skb, cqe, cqe_bcnt);
+> +
+> +		skb_shinfo(skb)->gso_size = DIV_ROUND_UP(cqe_bcnt - hdrlen, lro_num_seg);
+>   		/* Subtract one since we already counted this as one
+>   		 * "regular" packet in mlx5e_complete_rx_cqe()
+>   		 */
+> 
+> ---
+> base-commit: 0e9418961f897be59b1fab6e31ae1b09a0bae902
+> change-id: 20250714-cpaasch-pf-925-investigate-incorrect-gso_size-on-cx-7-nic-852b450a8dad
+> 
+> Best regards,
 
-Is there a specific rule or convention in the networking area that we should
-follow? Sorry, I have not heard of such a rule before.
-
-Here, we think one line is better.
-
->
-> > +
-> > +	if (res)
-> > +		dma_unmap_single(dma, res_addr, res_size, DMA_FROM_DEVICE);
-> > +
-> > +err_map_res:
-> > +	if (req)
-> > +		dma_unmap_single(dma, req_addr, req_size, DMA_TO_DEVICE);
-> > +
-> > +	return ret;
-> > +}
->
-> ...
->
-> > +struct aq_dev_status *eea_adminq_dev_status(struct eea_net *enet)
-> > +{
-> > +	struct aq_queue_drv_status *drv_status;
-> > +	struct aq_dev_status *dev_status;
-> > +	void *req __free(kfree);
-> > +	int err, i, num, size;
-> > +	struct ering *ering;
-> > +	void *rep;
-> > +
-> > +	num =3D enet->cfg.tx_ring_num * 2 + 1;
-> > +
-> > +	req =3D kcalloc(num, sizeof(struct aq_queue_drv_status), GFP_KERNEL);
-> > +	if (!req)
-> > +		return NULL;
-> > +
-> > +	size =3D struct_size(dev_status, q_status, num);
-> > +
-> > +	rep =3D kmalloc(size, GFP_KERNEL);
-> > +	if (!rep)
-> > +		return NULL;
-> > +
-> > +	drv_status =3D req;
-> > +	for (i =3D 0; i < enet->cfg.rx_ring_num * 2; ++i, ++drv_status) {
-> > +		ering =3D qid_to_ering(enet, i);
-> > +		drv_status->qidx =3D cpu_to_le16(i);
-> > +		drv_status->cq_head =3D cpu_to_le16(ering->cq.head);
-> > +		drv_status->sq_head =3D cpu_to_le16(ering->sq.head);
-> > +	}
-> > +
-> > +	drv_status->qidx =3D cpu_to_le16(i);
-> > +	drv_status->cq_head =3D cpu_to_le16(enet->adminq.ring->cq.head);
-> > +	drv_status->sq_head =3D cpu_to_le16(enet->adminq.ring->sq.head);
-> > +
-> > +	err =3D eea_adminq_exec(enet, EEA_AQ_CMD_DEV_STATUS,
-> > +			      req, num * sizeof(struct aq_queue_drv_status),
-> > +			      rep, size);
-> > +	if (err) {
-> > +		kfree(rep);
-> > +		return NULL;
-> > +	}
-> > +
-> > +	return rep;
-> > +}
->
-> This function mixes manual cleanup of rep and automatic cleanup of req.
-> I think this is not the best approach and I'd suggest using the idiomatic
-> approach of using a goto label ladder to unwind on errors.
->
-> 	req =3D kcalloc(...);
-> 	if (!req)
-> 		return NULL;
->
-> 	...
->
-> 	rep =3D kmalloc(size, GFP_KERNEL);
-> 	if (!rep)
-> 		goto error_free_req;
->
-> 	...
->
-> 	err =3D eea_adminq_exec(...);
-> 	if (err)
-> 		goto error_free_rep;
->
-> 	return rep;
->
-> error_free_rep:
-> 	kfree(rep);
-> error_free_req:
-> 	kfree(req);
->
-> 	return NULL;
->
-> But, if you really want to keep using __free() please do so like this.
-> Because although the code is currently correct. It will break if
-> it is subsequently modified to return for any reason before
-> req is initialised (currently by the return value of kcalloc).
->
->     void *req __free(kfree) =3D NULL;
->
-> The reasoning is that __free() is a bit magic and this could
-> easily be overlooked in future.
-
-
-I see.
-
-
->
-> ...
->
-> > diff --git a/drivers/net/ethernet/alibaba/eea/eea_desc.h b/drivers/net/=
-ethernet/alibaba/eea/eea_desc.h
->
->
-> > new file mode 100644
-> > index 000000000000..a01288a8435e
-> > --- /dev/null
-> > +++ b/drivers/net/ethernet/alibaba/eea/eea_desc.h
-> > @@ -0,0 +1,153 @@
-> > +/* SPDX-License-Identifier: GPL-2.0-or-later */
-> > +/*
-> > + * Driver for Alibaba Elastic Ethernet Adaptor.
-> > + *
-> > + * Copyright (C) 2025 Alibaba Inc.
-> > + */
-> > +
-> > +#ifndef __EEA_DESC_H__
-> > +#define __EEA_DESC_H__
-> > +
-> > +#define EEA_DESC_TS_MASK (BIT(48) - 1)
->
-> I expect GENMASK can be used here.
-> And for similar cases elsewhere in this driver.
->
-> > +#define EEA_DESC_TS(desc) (le64_to_cpu((desc)->ts) & EEA_DESC_TS_MASK)
->
-> ...
->
-> > +struct eea_rx_cdesc {
-> > +#define EEA_DESC_F_DATA_VALID	BIT(6)
-> > +#define EEA_DESC_F_SPLIT_HDR	BIT(5)
-> > +	__le16 flags;
-> > +	__le16 id;
-> > +	__le16 len;
-> > +#define EEA_NET_PT_NONE      0
-> > +#define EEA_NET_PT_IPv4      1
-> > +#define EEA_NET_PT_TCPv4     2
-> > +#define EEA_NET_PT_UDPv4     3
-> > +#define EEA_NET_PT_IPv6      4
-> > +#define EEA_NET_PT_TCPv6     5
-> > +#define EEA_NET_PT_UDPv6     6
-> > +#define EEA_NET_PT_IPv6_EX   7
-> > +#define EEA_NET_PT_TCPv6_EX  8
-> > +#define EEA_NET_PT_UDPv6_EX  9
-> > +	__le16 pkt_type:10,
-> > +	       reserved1:6;
->
-> Sparse complains about the above. And I'm not at all sure that
-> a __le16 bitfield works as intended on a big endian system.
->
-> I would suggest some combination of: FIELD_PREP, FIELD_GET, GENMASK,
-> cpu_to_le16() and le16_to_cpu().
->
-> Also, please do make sure patches don't introduce new Sparse warnings.
-
-I will try.
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 
 Thanks.
-
->
-> > +
-> > +	/* hw timestamp [0:47]: ts */
-> > +	__le64 ts;
-> > +
-> > +	__le32 hash;
-> > +
-> > +	/* 0-9: hdr_len  split header
-> > +	 * 10-15: reserved1
-> > +	 */
-> > +	__le16 len_ex;
-> > +	__le16 reserved2;
-> > +
-> > +	__le32 reserved3;
-> > +	__le32 reserved4;
-> > +};
->
-> ...
->
-> > diff --git a/drivers/net/ethernet/alibaba/eea/eea_ethtool.c b/drivers/n=
-et/ethernet/alibaba/eea/eea_ethtool.c
->
-> ...
->
-> > +static const struct eea_stat_desc eea_rx_stats_desc[] =3D {
-> > +	EEA_RX_STAT(descs),
-> > +	EEA_RX_STAT(packets),
-> > +	EEA_RX_STAT(bytes),
-> > +	EEA_RX_STAT(drops),
-> > +	EEA_RX_STAT(kicks),
-> > +	EEA_RX_STAT(split_hdr_bytes),
-> > +	EEA_RX_STAT(split_hdr_packets),
-> > +};
-> > +
-> > +static const struct eea_stat_desc eea_tx_stats_desc[] =3D {
-> > +	EEA_TX_STAT(descs),
-> > +	EEA_TX_STAT(packets),
-> > +	EEA_TX_STAT(bytes),
-> > +	EEA_TX_STAT(drops),
-> > +	EEA_TX_STAT(kicks),
-> > +	EEA_TX_STAT(timeouts),
-> > +};
-> > +
-> > +#define EEA_TX_STATS_LEN	ARRAY_SIZE(eea_tx_stats_desc)
-> > +#define EEA_RX_STATS_LEN	ARRAY_SIZE(eea_rx_stats_desc)
->
-> Some of the stats above appear to cover stats covered by struct
-> rtnl_link_stats64. And perhaps other standard structures.
-> Please only report standard counters using standard mechanisms.
-> And only use get_ethtool_stats to report non-standard counters.
->
-> Link: https://www.kernel.org/doc/html/v6.16-rc4/networking/statistics.htm=
-l#notes-for-driver-authors
->
-> ...
->
-> > diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.c b/drivers/net/e=
-thernet/alibaba/eea/eea_net.c
->
-> ...
->
-> > +int eea_queues_check_and_reset(struct eea_device *edev)
->
-> The return value of this function is not checked.
-> So probably it can not return a value at all.
-> I.e.
->
-> void eea_queues_check_and_reset(struct eea_device *edev)
->
-> But if the return value is to be checked then I think that either
-> of the following would be best:
-> * returning bool
-> * returning 0 on sucess, and a negative error value (e.e. -ENOMEM)
->
-> Returning -1 in kernel code like this seems odd.
->
-> > +{
-> > +	struct aq_dev_status *dstatus __free(kfree) =3D NULL;
-> > +	struct eea_aq_queue_status *qstatus =3D NULL;
->
-> The initialisation of qstatus here seems unnecessary:
-> It's not accessed before it is initialised to dstatus->q_status below.
->
-> > +	struct eea_aq_queue_status *qs;
-> > +	int num, err, i, need_reset =3D 0;
->
-> Please arrange local variables in Networking code in reverse xmas tree
-> order - longest line to shortest.
->
-> Edward Cree's tool can be of assistance here:
-> https://github.com/ecree-solarflare/xmastree
->
-> > +
-> > +	num =3D edev->enet->cfg.tx_ring_num * 2 + 1;
-> > +
-> > +	rtnl_lock();
-> > +
-> > +	dstatus =3D eea_adminq_dev_status(edev->enet);
-> > +	if (!dstatus) {
-> > +		netdev_warn(edev->enet->netdev, "query queue status failed.\n");
-> > +		rtnl_unlock();
-> > +		return -1;
->
-> I would use a goto here.
->
-> > +	}
-> > +
-> > +	if (le16_to_cpu(dstatus->link_status) =3D=3D EEA_LINK_DOWN_STATUS) {
-> > +		eea_netdev_stop(edev->enet->netdev);
-> > +		edev->enet->link_err =3D EEA_LINK_ERR_LINK_DOWN;
-> > +		netdev_warn(edev->enet->netdev, "device link is down. stop device.\n=
-");
->
-> And here.
->
-> > +		rtnl_unlock();
-> > +		return 0;
-> > +	}
-> > +
-> > +	qstatus =3D dstatus->q_status;
-> > +
-> > +	for (i =3D 0; i < num; ++i) {
-> > +		qs =3D &qstatus[i];
-> > +
-> > +		if (le16_to_cpu(qs->status) =3D=3D EEA_QUEUE_STATUS_NEED_RESET) {
-> > +			netdev_warn(edev->enet->netdev, "queue status: queue %d needs to re=
-set\n",
-> > +				    le16_to_cpu(qs->qidx));
-> > +			++need_reset;
-> > +		}
-> > +	}
-> > +
-> > +	err =3D 0;
-> > +	if (need_reset)
-> > +		err =3D eea_reset_hw_resources(edev->enet, NULL);
-> > +
->
-> The label for the goto would go here.
-> e.g.:
->
-> out_unlock:
->
-> > +	rtnl_unlock();
-> > +	return err;
-> > +}
->
-> ...
->
-> > diff --git a/drivers/net/ethernet/alibaba/eea/eea_pci.c b/drivers/net/e=
-thernet/alibaba/eea/eea_pci.c
->
-> ...
->
-> > +static inline void iowrite64_twopart(u64 val, __le32 __iomem *lo,
-> > +				     __le32 __iomem *hi)
->
-> If lo and hi are adjacent then I wonder if the callers can be reworked to
-> use iowrite64_lo_hi().
->
-> If not, please no inline functions in .c files in Networking code unless
-> there is a demonstrable reason to do so, usually performance. Rather, let
-> the compiler do it's thing and inline code as it sees fit.
->
-> > +{
-> > +	iowrite32((u32)val, lo);
->
-> This cast seems unnecessary.
->
-> > +	iowrite32(val >> 32, hi);
-> > +}
->
-> ...
->
-> > +void __force *eea_pci_db_addr(struct eea_device *edev, u32 off)
->
-> I'm unsure of the meaning of __force in a function signature.
-> Perhaps it can be removed?
->
-> > +{
-> > +	return (void __force *)edev->ep_dev->db_base + off;
-> > +}
->
-> Are you sure it is correct to cast-away the __iomem annotation of db_base?
-> The intention of that annotation is to help ensure that access
-> to iomem is done correctly.
->
-> > diff --git a/drivers/net/ethernet/alibaba/eea/eea_tx.c b/drivers/net/et=
-hernet/alibaba/eea/eea_tx.c
->
-> ...
->
-> > +static void eea_tx_meta_put_and_unmap(struct enet_tx *tx, struct eea_t=
-x_meta *meta)
-> > +{
-> > +	struct eea_tx_meta *head;
-> > +
-> > +	head =3D meta;
-> > +
-> > +	while (true) {
-> > +		dma_unmap_single(tx->dma_dev, meta->dma_addr, meta->dma_len, DMA_TO_=
-DEVICE);
-> > +
-> > +		meta->data =3D NULL;
-> > +
-> > +		if (meta->next) {
-> > +			meta =3D meta->next;
-> > +			continue;
-> > +		}
-> > +
-> > +		break;
-> > +	}
->
-> Perhaps this can be expressed more succinctly as follows.
-> (Completely untested!)
->
-> 	for (; meta->next; meta =3D meta->next) {
-> 		dma_unmap_single(tx->dma_dev, meta->dma_addr, meta->dma_len,
-> 				 DMA_TO_DEVICE);
-> 		meta->data =3D NULL;
-> 	}
->
-> > +
-> > +	meta->next =3D tx->free;
-> > +	tx->free =3D head;
-> > +}
->
-> ...
 
