@@ -1,233 +1,154 @@
-Return-Path: <netdev+bounces-207458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 912D4B0759F
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 14:27:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F73BB0760D
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 14:46:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7E0516A9F9
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 12:27:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E606B7B6252
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 12:43:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7EE22F2C40;
-	Wed, 16 Jul 2025 12:27:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68C1B2F50B7;
+	Wed, 16 Jul 2025 12:45:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GNnc0juZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VrIYYCnc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42DBD20110B;
-	Wed, 16 Jul 2025 12:27:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62F526A095
+	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 12:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752668856; cv=none; b=TLnO+3LrFVqCi4iylJXoHbUch/UCLGNyB4O3Hgo0EAK2+U5X8KLhMbphmB+hX1crwTRy81YAVhtX9IVE9X8QEPaFC/egpIku/18VlDAnVN9vdv4kF/YXRq2z6J8HPVGMjWd1bkm8oHszrBCzvp6I8STP8dQyYf2eTl+m7mwke4k=
+	t=1752669908; cv=none; b=LW5E3gvajupDTBM37+Bu4Ef5b8914MHl7G+gqcrOZ1M/RpJt9OlEUDpjulD98livdkdHaWkaNZ4+b+3/6h9GsWn646H8HXw2K6YLDZcWZ/sGZuLNSm/tIknlUTjNeehTETZcMfkxQdEuZhmK/6N7mH/IjwZKng7BzyHqEJZ1DfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752668856; c=relaxed/simple;
-	bh=xwq/vRLbdM7WL4q5HIsuxXoQO20oEJ8lc3HqoaMuIeM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fhFFJAGS2YNmz4ceTZApkm28sSL+4D7vgzwv4JteFvFTIYq+N5B4INBrfCwOIVHTvSGcAAMPx1mWpJ1J5x7LDuiVSvg40vmux8HrSLEc/8kSIruqshB4nw3uvVxG0BxZ9KrQBqXPbiF2kAaMoltOo0LG68F1BxlDjEfCXPPScOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GNnc0juZ; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-742c7a52e97so5409600b3a.3;
-        Wed, 16 Jul 2025 05:27:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752668854; x=1753273654; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=COHxjyd9TVO00pYSe36h0VbD3h6ewBA8auhnHn9D4Vs=;
-        b=GNnc0juZxgbVRGyKoBRKfZNXEe6HEwkbZ13ayBioTK/lepHBZU5eoe6LLH9DAzTN6d
-         dbWL1fSgXPnI5F8PpEUknKMzXaxSHaB0mPlwKwAmBsuF1uXppciVulYgVnVsOCDeWv3l
-         zMLT7sH5es/csMRDOaQYQdHGImCLGrNYpqyZVe5pJfPVPYuFGMvcyJrmy+G+RD0IMteX
-         TNOQ3rrIx9U12vNUDLFP3jjNzZtO5VmolIIy8amvuTbWsCB3p3DyG6VbAoHKrDJTpkyM
-         SETBDBfe0J4GfNzCcQiIgF4y9Uo69iZds7uVx/bSm2DGoSuYRxA1br4PcbNulbAIhRY0
-         r19w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752668854; x=1753273654;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=COHxjyd9TVO00pYSe36h0VbD3h6ewBA8auhnHn9D4Vs=;
-        b=buiD7w8F12MNhgOTodLbmMvtJ2zrLiO9ZozOv4vO8Jv1F9wi+jCa3d1BzGT3nLiVlR
-         RsEU/Fcv1GqPcUxx3sRrivr6uda5FOplWFTsGBAXc+4c6m0VvQ0KWXHkGrT0dyFDGG5n
-         f/NLzXgpzxZLL1Y2DeClPhl6KoCaaRU/6a58zWgZQs+InQby9aGJkUVdOYcIN11TxdKP
-         1FiyYQ8MwGLuQEvrXS09JqjymcVUAsdY4gLWQpYQ2hqrEXVjvCEpOcUpVtlCNjkrmY8c
-         y0EN56jt9/W/hX4GqDy/Yc8gP39Qd/NgloqNtPv+HycYhwQieR+mtdVZHclRnCv3Tbw0
-         rSfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU9OVIb5c9541N/JbCLdksrE+N9YcV3TH48bDO92rg/8PT14F01eCFoGJITvACaMF70rBBBP0c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGuikNUenaxBGBFeQP5eWKQ8IdZD90/vJP3BGA+UmKtFFgBveT
-	tPyw3sC7CTtKAPbHUH8aXe9c6/1EDWo7JsYHcwi5dtNz1BO+od86jvFJ
-X-Gm-Gg: ASbGncuzngEqmSmYsqnHDschs6cBJSCiAuvbQF+jprx1lUS6pk8Bef/67VQ1dTTnc1O
-	zUCIYFHXwOFTKIraZx6o1lbLIRgvWboD3cGTSRkMAEMVSeW8ZTsX9BUa5oN5XaxXhCyeCVQItro
-	FLjvC5JzTjd89zMbVzxrxlh2O/u4VRd0Xs/a4P0ZGPi0Waj9zmvFhAnaQ8vC0vCIlCWUGgRDmnk
-	JvZD03jn4V7MVCv6VrYLjgak7XLuqYBCUmtL0eaHqYC+spKjs4GW0tVDMmPW3g/mg5lN2Apu37k
-	9aDn15p9z6O8lsYGGNm0gi4BQCXVxmGxv8T2LnQHaIq628EPUDgDdM7/mOBuPCG+NCQvCqX5TzF
-	wHAUXYuAcmmgbdv1TItaYgS6Y9RWJx7EaseaVzzcF+GzMX2DBABaG88T2X4f7pkkQfh7ziA==
-X-Google-Smtp-Source: AGHT+IHyJtLsZB/0aPAdoOaZcA2I1LWb6k5JcJIxHbQDwRstjmQx8MuU8sX1SNxozXJnQaCI2D6eNw==
-X-Received: by 2002:a05:6a00:887:b0:736:50d1:fc84 with SMTP id d2e1a72fcca58-756ea8b5c61mr4275871b3a.21.1752668854345;
-        Wed, 16 Jul 2025 05:27:34 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.24])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74eb9dd5a94sm14164946b3a.21.2025.07.16.05.27.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Jul 2025 05:27:33 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	bjorn@kernel.org,
-	magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com,
-	jonathan.lemon@gmail.com,
-	sdf@fomichev.me,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	joe@dama.to,
-	willemdebruijn.kernel@gmail.com
-Cc: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v2] xsk: skip validating skb list in xmit path
-Date: Wed, 16 Jul 2025 20:27:25 +0800
-Message-Id: <20250716122725.6088-1-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
+	s=arc-20240116; t=1752669908; c=relaxed/simple;
+	bh=bpsgmgeDGEc1PhZcHWMBFolFyeCIgQauwicXcX6/NmU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=YzxnCgnjjCgadqd114BTlTASp2/7tOp0QxuGcyW1D6LzwrCdwPxa8AaxeV+6zTNCfG8dF69EKTBzldp2O0TqGpfFC6tPawUYaujEdBvJwr80kvVsTfpaj1bKQfSo8Or8H5YB4MhJm+LAwY5pBa1h+4PdqDSu24P/GDDXyUDe9bU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VrIYYCnc; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752669905;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/6quTScKxILcudF7nQxBzrgXnyLUQnBhym3m6W7b0cU=;
+	b=VrIYYCnckCx4HT0ycOmJA2a+ngXz4NTkzNk5NcJ5YsCB0GPOxRHilIjRGgMTpRDuQQsl0C
+	L6wOnR0qB5lWooHX03F/a3+Zbp0xM8evQD5gTTTrm/pM/vC6TQUhLYeZ1GG0IYurWyn42d
+	zOKtefl7dc/ZHbnmmGCienFT/fYq4i4=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-322-cdU086dvM8ubdr7GK5D3jQ-1; Wed,
+ 16 Jul 2025 08:45:03 -0400
+X-MC-Unique: cdU086dvM8ubdr7GK5D3jQ-1
+X-Mimecast-MFC-AGG-ID: cdU086dvM8ubdr7GK5D3jQ_1752669901
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 271821800165;
+	Wed, 16 Jul 2025 12:45:01 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.65.149])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ADA491801712;
+	Wed, 16 Jul 2025 12:44:57 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Guillaume Nault <gnault@redhat.com>
+Cc: Salvatore Bonaccorso <carnil@debian.org>,  Stefano Brivio
+ <sbrivio@redhat.com>,  Jakub Kicinski <kuba@kernel.org>,  "David S.
+ Miller" <davem@davemloft.net>,  David Ahern <dsahern@kernel.org>,  Eric
+ Dumazet <edumazet@google.com>,  Simon Horman <horms@kernel.org>,
+  netdev@vger.kernel.org,  Paolo Abeni <pabeni@redhat.com>,  Charles Bordet
+ <rough.rock3059@datachamp.fr>,  linux-kernel@vger.kernel.org,
+  regressions@lists.linux.dev,  stable@vger.kernel.org,
+  1108860@bugs.debian.org
+Subject: Re: [regression] Wireguard fragmentation fails with VXLAN since
+ 8930424777e4 ("tunnels: Accept PACKET_HOST skb_tunnel_check_pmtu().")
+ causing network timeouts
+In-Reply-To: <aHYiwvElalXstQVa@debian> (Guillaume Nault's message of "Tue, 15
+	Jul 2025 11:43:30 +0200")
+References: <aHVhQLPJIhq-SYPM@eldamar.lan> <aHYiwvElalXstQVa@debian>
+Date: Wed, 16 Jul 2025 08:44:55 -0400
+Message-ID: <f7tjz485mpk.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-From: Jason Xing <kernelxing@tencent.com>
+Guillaume Nault <gnault@redhat.com> writes:
 
-This patch only does one thing that removes validate_xmit_skb_list()
-for xsk.
+> On Mon, Jul 14, 2025 at 09:57:52PM +0200, Salvatore Bonaccorso wrote:
+>> Hi,
+>> 
+>> Charles Bordet reported the following issue (full context in
+>> https://bugs.debian.org/1108860)
+>> 
+>> > Dear Maintainer,
+>> > 
+>> > What led up to the situation?
+>> > We run a production environment using Debian 12 VMs, with a network
+>> > topology involving VXLAN tunnels encapsulated inside Wireguard
+>> > interfaces. This setup has worked reliably for over a year, with MTU set
+>> > to 1500 on all interfaces except the Wireguard interface (set to 1420).
+>> > Wireguard kernel fragmentation allowed this configuration to function
+>> > without issues, even though the effective path MTU is lower than 1500.
+>> > 
+>> > What exactly did you do (or not do) that was effective (or ineffective)?
+>> > We performed a routine system upgrade, updating all packages include the
+>> > kernel. After the upgrade, we observed severe network issues (timeouts,
+>> > very slow HTTP/HTTPS, and apt update failures) on all VMs behind the
+>> > router. SSH and small-packet traffic continued to work.
+>> > 
+>> > To diagnose, we:
+>> > 
+>> > * Restored a backup (with the previous kernel): the problem disappeared.
+>> > * Repeated the upgrade, confirming the issue reappeared.
+>> > * Systematically tested each kernel version from 6.1.124-1 up to
+>> > 6.1.140-1. The problem first appears with kernel 6.1.135-1; all earlier
+>> > versions work as expected.
+>> > * Kernel version from the backports (6.12.32-1) did not resolve the
+>> > problem.
+>> > 
+>> > What was the outcome of this action?
+>> > 
+>> > * With kernel 6.1.135-1 or later, network timeouts occur for
+>> > large-packet protocols (HTTP, apt, etc.), while SSH and small-packet
+>> > protocols work.
+>> > * With kernel 6.1.133-1 or earlier, everything works as expected.
+>> > 
+>> > What outcome did you expect instead?
+>> > We expected the network to function as before, with Wireguard handling
+>> > fragmentation transparently and no application-level timeouts,
+>> > regardless of the kernel version.
+>> 
+>> While triaging the issue we found that the commit 8930424777e4
+>> ("tunnels: Accept PACKET_HOST in skb_tunnel_check_pmtu()." introduces
+>> the issue and Charles confirmed that the issue was present as well in
+>> 6.12.35 and 6.15.4 (other version up could potentially still be
+>> affected, but we wanted to check it is not a 6.1.y specific
+>> regression).
+>> 
+>> Reverthing the commit fixes Charles' issue.
+>> 
+>> Does that ring a bell?
+>
+> It doesn't ring a bell. Do you have more details on the setup that has
+> the problem? Or, ideally, a self-contained reproducer?
 
-For xsk, it's not needed to validate and check the skb in
-validate_xmit_skb_list() in copy mode because xsk_build_skb() doesn't
-and doesn't need to prepare those requisites to validate. Xsk is just
-responsible for delivering raw data from userspace to the driver.
++1 - I tested this patch with an OVS setup using vxlan and geneve
+tunnels.  A reproducer or more details would help.
 
-The __dev_direct_xmit was taken out of af_packet in commit 865b03f21162
-("dev: packet: make packet_direct_xmit a common function"). And a call
-to validate_xmit_skb_list was added in commit 104ba78c9880 ("packet: on
-direct_xmit, limit tso and csum to supported devices") to support TSO.
-Since we don't support tso/vlan offloads in xsk_build_skb, we can remove
-validate_xmit_skb_list for xsk. Skipping numerous checks somehow
-contributes to the transmission especially in the extremely hot path.
-
-Performance-wise, I used './xdpsock -i enp2s0f0np0 -t  -S -s 64' to verify
-the guess and then measured on the machine with ixgbe driver. It stably
-goes up by 5.48%, which can be seen in the shown below:
-Before:
- sock0@enp2s0f0np0:0 txonly xdp-skb
-                   pps            pkts           1.00
-rx                 0              0
-tx                 1,187,410      3,513,536
-After:
- sock0@enp2s0f0np0:0 txonly xdp-skb
-                   pps            pkts           1.00
-rx                 0              0
-tx                 1,252,590      2,459,456
-
-This patch also removes total ~4% consumption which can be observed
-by perf:
-|--2.97%--validate_xmit_skb
-|          |
-|           --1.76%--netif_skb_features
-|                     |
-|                      --0.65%--skb_network_protocol
-|
-|--1.06%--validate_xmit_xfrm
-
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
-V2
-Link: https://lore.kernel.org/all/20250713025756.24601-1-kerneljasonxing@gmail.com/
-1. avoid adding a new flag
-2. add more descriptions from Stan
----
- include/linux/netdevice.h | 30 ++++++++++++++++++++----------
- net/core/dev.c            |  6 ------
- 2 files changed, 20 insertions(+), 16 deletions(-)
-
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index a80d21a14612..8e05c99928e1 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3364,16 +3364,6 @@ static inline int dev_queue_xmit_accel(struct sk_buff *skb,
- 	return __dev_queue_xmit(skb, sb_dev);
- }
- 
--static inline int dev_direct_xmit(struct sk_buff *skb, u16 queue_id)
--{
--	int ret;
--
--	ret = __dev_direct_xmit(skb, queue_id);
--	if (!dev_xmit_complete(ret))
--		kfree_skb(skb);
--	return ret;
--}
--
- int register_netdevice(struct net_device *dev);
- void unregister_netdevice_queue(struct net_device *dev, struct list_head *head);
- void unregister_netdevice_many(struct list_head *head);
-@@ -4301,6 +4291,26 @@ static __always_inline int ____dev_forward_skb(struct net_device *dev,
- 	return 0;
- }
- 
-+static inline int dev_direct_xmit(struct sk_buff *skb, u16 queue_id)
-+{
-+	struct net_device *dev = skb->dev;
-+	struct sk_buff *orig_skb = skb;
-+	bool again = false;
-+	int ret;
-+
-+	skb = validate_xmit_skb_list(skb, dev, &again);
-+	if (skb != orig_skb) {
-+		dev_core_stats_tx_dropped_inc(dev);
-+		kfree_skb_list(skb);
-+		return NET_XMIT_DROP;
-+	}
-+
-+	ret = __dev_direct_xmit(skb, queue_id);
-+	if (!dev_xmit_complete(ret))
-+		kfree_skb(skb);
-+	return ret;
-+}
-+
- bool dev_nit_active_rcu(const struct net_device *dev);
- static inline bool dev_nit_active(const struct net_device *dev)
- {
-diff --git a/net/core/dev.c b/net/core/dev.c
-index e365b099484e..793f5d45c6b2 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -4744,19 +4744,13 @@ EXPORT_SYMBOL(__dev_queue_xmit);
- int __dev_direct_xmit(struct sk_buff *skb, u16 queue_id)
- {
- 	struct net_device *dev = skb->dev;
--	struct sk_buff *orig_skb = skb;
- 	struct netdev_queue *txq;
- 	int ret = NETDEV_TX_BUSY;
--	bool again = false;
- 
- 	if (unlikely(!netif_running(dev) ||
- 		     !netif_carrier_ok(dev)))
- 		goto drop;
- 
--	skb = validate_xmit_skb_list(skb, dev, &again);
--	if (skb != orig_skb)
--		goto drop;
--
- 	skb_set_queue_mapping(skb, queue_id);
- 	txq = skb_get_tx_queue(dev, skb);
- 
--- 
-2.41.3
+>> Regards,
+>> Salvatore
+>> 
 
 
