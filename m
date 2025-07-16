@@ -1,95 +1,71 @@
-Return-Path: <netdev+bounces-207614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2647DB0803C
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 00:10:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADB38B0803E
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 00:11:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D205D566294
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 22:10:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 299641C27F50
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 22:11:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E92D82EE603;
-	Wed, 16 Jul 2025 22:09:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B86602EE26C;
+	Wed, 16 Jul 2025 22:11:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LFDjqxXx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KD48eNbH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFAEA2EE5FE;
-	Wed, 16 Jul 2025 22:09:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90EDEEACE;
+	Wed, 16 Jul 2025 22:11:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752703791; cv=none; b=OSNAOIVcIUh1JWEbevMF7bjhYIJggxg2R/xjVpCmBZ9Bz3hPGxW4lDbrz4xDJfJ0m6r7+v9ybhwTBTHPHSIsU8egVN1NmLWNEntTbYBkU85MAAy7wPRjtQg6A9SCYSxfr3VeurqHjw+RF6IMITE1QxtLwCtfTFUEdD1QxCjqFt0=
+	t=1752703876; cv=none; b=Eiaa6jC5vz0/5XnYMAignQdwa2Fmz9fgz29GKPLVv1S5gsroAjFBOyCUQY3wCnz3vXngzsKomxJbdUi2ETttyl7B7oOay4yGDF2kO255f7Mj5icYeqiDj3mJWOqBaelrpfDybduXs2IvsSiWJf2JuyRe+fF/+xxhoB55hI/OmYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752703791; c=relaxed/simple;
-	bh=mNFVHEBnhuird5zyEhCc/wBwLPL9kDMSU2Mpwt4O8zQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Dt/smOCvCD0pqG4N7ew90nuGYpFujG3p5hNm6oxPcttyJTguUf5vAvTSS13JyMx+Z+TAa3g4Z85TvTbpc61WHCQADQIUBcwlgxdM9bMNsbl0L6TLgSWpEezkWHpYb04vUe/nVmJVa6W8oThrSar2COrdvyM73+fkbMLnqS5kqsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LFDjqxXx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39669C4CEE7;
-	Wed, 16 Jul 2025 22:09:51 +0000 (UTC)
+	s=arc-20240116; t=1752703876; c=relaxed/simple;
+	bh=3SDH+1+pSijYEYf7NFSfZ/Q8NeDVbaPqts/KRkGfBXk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=e3pAbuzfPDoKAIQRPCYvupBO5smv9XCXFGylOb1AX7JZqyHiN9gem2EsqzflAtEF0aAUt+AGxecsi6LI6s6SQzBy+R8D/gYMR2JXNJdGV8XHxueQOxCGyrSZzHQoo5pd5ryNKjkfM5OxQFpuYfBbZIIicz/h9y8aKnmokP8+Uog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KD48eNbH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E117BC4CEE7;
+	Wed, 16 Jul 2025 22:11:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752703791;
-	bh=mNFVHEBnhuird5zyEhCc/wBwLPL9kDMSU2Mpwt4O8zQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LFDjqxXxxyL8E6s+/CABfGzDqLNG2T/c14BO45mBISplDEdnSQC3/1vgcOU+SujVb
-	 x8Ftmcp46TAVPwZ+masX9gbi8ommh7fQ6aQhiyUwVIldcFNcq/B7z67Gq4hx+mESBt
-	 yjQcp8pB1GZIgb2DC2GA3ay4vMa30QXiF3Hyb5kdb09mdHkehpN+Q4PDvLf7fKrYwE
-	 RJ80ZrAnghLjxvV4c/Jce/IHuP9Yn3ySzjOD5dfq5xkmFHpeY0NmvPfJ1vhFAKddKk
-	 VY8aHTup+2zkJuCy4a6mB7NU/SSNx7w5uHrBzy6g/9j4l44/BD0gQOm0DlKYZN89Ht
-	 jYUNpmb95yU4g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADEBC383BA38;
-	Wed, 16 Jul 2025 22:10:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1752703876;
+	bh=3SDH+1+pSijYEYf7NFSfZ/Q8NeDVbaPqts/KRkGfBXk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KD48eNbHtItduaOjS4jwO/GrUphFrUvE5D4o6EY/YFmwp4S47g9Vl7RJ0bOUYKcZ+
+	 YnF8inhdu+Mz4A46NY+3Bvmo2Xslc3fw/swcv7HsUQEk0fWbl9555yinbqv9YgGZrb
+	 M3tx9p57V/p8SPfdHxZs1BKzw66yUtx3F8MrljMs7xXrmJSEqUN98S1k4oaNKs9sRb
+	 VQkuGQ7TwD6+fsBCAmglabEgyGsA7qwQa057xagtnqLUOUSgu2z0sV2dwiVJI00h36
+	 oSshTxiVoq0UWzcJ9CEVdsrA59hqZUgiEBfl01CJ8hB1lPdvhIaxgj8lQ5C1IxNM28
+	 1jCBP251uwZjQ==
+Date: Wed, 16 Jul 2025 15:11:15 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Zqiang <qiang.zhang@linux.dev>
+Cc: oneukum@suse.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: usb: Remove duplicate assignments for
+ net->pcpu_stat_type
+Message-ID: <20250716151115.0ef44776@kernel.org>
+In-Reply-To: <20250716001524.168110-2-qiang.zhang@linux.dev>
+References: <20250716001524.168110-1-qiang.zhang@linux.dev>
+	<20250716001524.168110-2-qiang.zhang@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] selftests: rtnetlink: fix addrlft test flakiness on
- power-saving systems
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175270381125.1341865.1254102075141304386.git-patchwork-notify@kernel.org>
-Date: Wed, 16 Jul 2025 22:10:11 +0000
-References: <20250715043459.110523-1-liuhangbin@gmail.com>
-In-Reply-To: <20250715043459.110523-1-liuhangbin@gmail.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
- linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Wed, 16 Jul 2025 08:15:24 +0800 Zqiang wrote:
+> Signed-off-by: Zqiang <qiang.zhang@linux.dev>
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 15 Jul 2025 04:34:59 +0000 you wrote:
-> Jakub reported that the rtnetlink test for the preferred lifetime of an
-> address has become quite flaky. The issue started appearing around the 6.16
-> merge window in May, and the test fails with:
-> 
->     FAIL: preferred_lft addresses remaining
-> 
-> The flakiness might be related to power-saving behavior, as address
-> expiration is handled by a "power-efficient" workqueue.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net] selftests: rtnetlink: fix addrlft test flakiness on power-saving systems
-    https://git.kernel.org/netdev/net-next/c/3047957cc7c1
-
-You are awesome, thank you!
+Your email address seems to suggest the latin spelling of your name
+should be Qiang Zhang. Please use that instead of Zqiang?
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
