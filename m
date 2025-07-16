@@ -1,191 +1,273 @@
-Return-Path: <netdev+bounces-207557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 420B0B07C7D
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 20:08:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C67EB07CA7
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 20:19:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0C2D3B550C
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 18:07:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8EA717A558E
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 18:18:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECC6028D8FE;
-	Wed, 16 Jul 2025 18:07:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D996028DEE0;
+	Wed, 16 Jul 2025 18:19:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MdR61cdu"
+	dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b="iZl1Saq0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from OS0P286CU010.outbound.protection.outlook.com (mail-japanwestazon11011051.outbound.protection.outlook.com [40.107.74.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2852283FCF
-	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 18:07:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752689279; cv=none; b=PWoPwpi0JX3YFzO81sN7YX98v1HtVzI7bvSgASmPem2i1edNCUAOLrkuIkHGrlRpx2eDzZO+IdZsQNLTRFrEES7k0pTNKCPypFjD3TWUN5KtA0gf8PX+fzpsb66eKxYeHH86/GqYSwsVB7JopTUppgRZPIOb/LUIdzTvcXRL3nw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752689279; c=relaxed/simple;
-	bh=r+/J00r88pbp9r2+6CgOPBBi4aOmlFIDaultrznfTe8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q7ZILe2/0/IEFvkKyt1DmSzReL6W8QGc8CJhG1CKHMyecXjPcgQwCBiKjWj9kIcdqVLWOS/BqiR5eWAYye2xa/l0ZLcMt0khMhpTgveKZwy+iGVO+OB1Jts5b6buEsREE/sGbhyWBrLv5r1WCL1C/8Q0jir67uBiNF5ecfa3iKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MdR61cdu; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-235ea292956so1021835ad.1
-        for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 11:07:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752689277; x=1753294077; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HtBqIB8vQTR5u8cmm+T4QFZrBMFS3cf5PT3R4konQOk=;
-        b=MdR61cdupNQ2p6Rgltx+G5PZN1t7sYRPs019RP6ANNqU+4LsAOxOUOcg1ttV55B38o
-         a5UcQmPNo7hHWaRDwpkT+omrd/yXDWvW9253HOvlPqcIOWMwMFe9Z7OZDonBXArrECQr
-         DuWvTxQqm6S7vO7s/NhLiG1rL9qe2jWkO4Oh2nkwxU/zEACzhLjYdLbWw/N5tsNOAesj
-         HUJb/RjF9zGtT5+YcB+FlAJ0xrzoyV+8y50TUf0mI5j6qeCh8iRjBM99p07LKUIfEjuj
-         tMxeUA2CfV4r2cieffBcL5xGT0mm51EmBx9xb+9T23EK71bID2XYPIba2gR2aRHBflYQ
-         6J3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752689277; x=1753294077;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HtBqIB8vQTR5u8cmm+T4QFZrBMFS3cf5PT3R4konQOk=;
-        b=pZ5+GnscFVu4r8pJwc4HXU9PyOwiXU0HdVk5neHjqVrSxwqP4neIj4Wi5QxYrjq25v
-         z+8JwLFQjutRnPVgOHVI3KA9ygYunfM2fiVxDUNQO3VNQS0GFWNxIHkNPsdI8KTf78QG
-         ayaXk0W8V9JMXeYdAOL6TPbBHltIVX8riIn02ra75RouQHPBksaS12SvAmt0CEsyUyX3
-         3UZOHkCh9yn6xgwKM8M58fSFqMmDMsFnurZ/vcsCW9XpESj+Cfh0uvl2+GpqskUCT9kX
-         erdvffDlyXw3f1z6L60sQ39BIvY0VHciCd1GGfJHv3jhVX2qd55/gJiKgkoxin3fFWvT
-         gEzw==
-X-Forwarded-Encrypted: i=1; AJvYcCV79rCstgP1M1lkISfDhLwbn4ZbcfCgtzff7fjoXomYohFKQAoh9Uvxrkg2ugnckVT1tLsKlrA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yym3YQg3SdFt9NfYr+91lI4iZuY6vUxeTYXMDuwtUaPfOQHGFpZ
-	T3yjiKetfXT4Qc40sPzmVt8454FrfKe6LSanj2hnnEKQJjxasWxuePLB0GO3mS2sUqz2vnfPKsj
-	j+rGU4mCxPBjVauWyYAW1DGs9FRLAW9rCUIYDaWV/
-X-Gm-Gg: ASbGncvkG5yhwrlQfUHrMW7hxno5hoPN5Vx3gLC7ookGPvrdiH3nngXfV2xhwI4y+70
-	1+70oDJVK1wvEdqb5GTGDHvS+LRvmu11mjAqBI5z8sSN7KRA1mqOI6nxR/Ifnx/5pHq5VAExjfR
-	8Sku603JkuY67BCIUvFz/SFrrk5KuSUjfvLICQ5tTsx0xP9LCuFAvwPpXPCdF1CLcKX9hWtlIdq
-	noPko348grkbB1dEbuDqrAzldA4fvRhR0qUd2k8gGOvepxj
-X-Google-Smtp-Source: AGHT+IFGQs/MhfAF/+F7gLLhpBzOXJuauznlby7F1yG4NA9+LP2teg9k4yIgRkRG4Jy0JEX6O8hUmbjUe7rQ0t4POyo=
-X-Received: by 2002:a17:902:d490:b0:234:d7b2:2ab9 with SMTP id
- d9443c01a7336-23e256adcc4mr58822625ad.12.1752689276880; Wed, 16 Jul 2025
- 11:07:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B433B35949;
+	Wed, 16 Jul 2025 18:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.74.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752689983; cv=fail; b=cjXDdPQR2gB8VeBbkP2VVj4d1AOp52vawvuNN0fFw4r0Cam/FDlX6GwwIMOCre8zj84Q/MtcQncx9b99uZmTEJxxB3nTYs6fe5MfXgcdXlZJsMGLFptk5EJ1JwYPp8bqRUvfMJEcctnETAUtKxkSo+7dPlTPlCoqXCltq5Zf4gM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752689983; c=relaxed/simple;
+	bh=BBnJKpl82Afa8EpiYEyWoogDds3OnBFZxmZKI4xXBQU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=rKB5rNHtaWf455DSfB5N8/V/6spZAqc1PEotXLYcrU1q3Oso3ed5IwvEBWfBNt3pfs8jvuNBxlQZ6sD22zUqkZuaEXhBcj34Iz8QFA9RyP2zFw0xp2V+joYAgQMvHWWUT8mNH0C7OLKLwgXZQy/PDzelRlO2sRO9/XHlCNaWbB0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b=iZl1Saq0; arc=fail smtp.client-ip=40.107.74.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=UNOcEgVJSMaQu4SrfxxCYyBXmIafDsA/Nr8Ffsc49yWk9fKaMTAsw1AT6FmO4qVjj/OJkQ7JoPvo/OftC9xoVuwK1Np9vVWtsxHtH8W9oJ69pNMKC/u2DOqfl+vjZJwBLQzOtsRJ4zc/KngiAGzgy151brDyoSXIK7N3ZGGeoPYJy6ETR7yq5vD9cbbjacEDXRH3LWS1l2lKBXsep27l/FXeBKMwc9pZ3/P1yPmVe/b9AGuPmehlwITQfyn5tUpLvbyh9jjaxiNWM1m+U4CT+Ge7Y+NN5PpDYwwSd9r5lwak33nPd/4SsWUYmCFyUenHuN7JAILxBgLnG+3MQXMm/g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zyDXjwVUy7sWdd4AnS0BRamaayO6x9EB8a9X8ksaOrI=;
+ b=LyKhV6h69qZr9lwnckHz36bBawjhiVxDPGDuWWZxu8ZJImxT4FAzrllpBvPSIU5mJfVa09re7dETlfzIe6O0Hnwc6yVQcYadeclahJ6VKK2JmnrtXnm66oofELU4KOov+j8s6P8UUv2QpkRmFO2/64nAL8bTzJjNUwFsd0UVFMkYOL1CdRtw/tXxbXlTwURTk1IH5YI7Pw69gZdunnqdcB+zevETFnDX6SgQATheErP2XMHl9Ny86TiMl4GKX/i6+498BTupvcMAFCN70zHcfwmsmxJOR7CT72nh/VY0GmX3XcJPwvG1vOyEKfJ0vRL5o7iB+utGWkgYLiMuky8r/Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=bp.renesas.com; dmarc=pass action=none
+ header.from=bp.renesas.com; dkim=pass header.d=bp.renesas.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bp.renesas.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zyDXjwVUy7sWdd4AnS0BRamaayO6x9EB8a9X8ksaOrI=;
+ b=iZl1Saq0JrcZy5X2WfNORNLQch4kXtALoXRMOu1KOKj6nRSecbO2vShD8pPvdoS9ke5R+gLjxhwdS+Nxbf6046gbjtgaZU/I90o4K4+6qUxkVc4yLb8y8MMCoTJWiYAb2GaTqf3vDIHJv1aMGe6IQoOv2cBNPjGm6ku5pkHi7v0=
+Received: from TY3PR01MB11346.jpnprd01.prod.outlook.com (2603:1096:400:3d0::7)
+ by OS3PR01MB10075.jpnprd01.prod.outlook.com (2603:1096:604:1e5::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.32; Wed, 16 Jul
+ 2025 18:19:35 +0000
+Received: from TY3PR01MB11346.jpnprd01.prod.outlook.com
+ ([fe80::86ef:ca98:234d:60e1]) by TY3PR01MB11346.jpnprd01.prod.outlook.com
+ ([fe80::86ef:ca98:234d:60e1%4]) with mapi id 15.20.8922.028; Wed, 16 Jul 2025
+ 18:19:33 +0000
+From: Biju Das <biju.das.jz@bp.renesas.com>
+To: Biju Das <biju.das.jz@bp.renesas.com>, Prabhakar Mahadev Lad
+	<prabhakar.mahadev-lad.rj@bp.renesas.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre
+ Torgue <alexandre.torgue@foss.st.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
+	"linux-stm32@st-md-mailman.stormreply.com"
+	<linux-stm32@st-md-mailman.stormreply.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Geert Uytterhoeven <geert+renesas@glider.be>,
+	biju.das.au <biju.das.au@gmail.com>
+Subject: RE: [PATCH net-next] net: stmmac: dwmac-renesas-gbeth: Add PM
+ suspend/resume callbacks
+Thread-Topic: [PATCH net-next] net: stmmac: dwmac-renesas-gbeth: Add PM
+ suspend/resume callbacks
+Thread-Index: AQHb7c6+F2cIzXpCE0eHQabSLpoq6LQ1IIJw
+Date: Wed, 16 Jul 2025 18:19:33 +0000
+Message-ID:
+ <TY3PR01MB11346F9BF41DA974F52CD4CB88656A@TY3PR01MB11346.jpnprd01.prod.outlook.com>
+References: <20250705170326.106073-1-biju.das.jz@bp.renesas.com>
+In-Reply-To: <20250705170326.106073-1-biju.das.jz@bp.renesas.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=bp.renesas.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: TY3PR01MB11346:EE_|OS3PR01MB10075:EE_
+x-ms-office365-filtering-correlation-id: c65e6165-e331-406a-57d6-08ddc4955087
+x-ld-processed: 53d82571-da19-47e4-9cb4-625a166a4a2a,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|376014|1800799024|7416014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?QcaZtl0ra5oKd9YdoCpljEQhLHAh3uyILAMIPVvppIoQ8OI5MAEz6S3qjTqw?=
+ =?us-ascii?Q?D2p2gSEeYKDqVXRnxDCOr/mUiND2VbdJslPOsrNiK0YhjH55BsRnaQaSbJbU?=
+ =?us-ascii?Q?m2Tc7rrybEGDT6Q+O0YdAyKW0s01Pw/DZqp/haREVGFHkXEuHB9M6Hq+ZBUC?=
+ =?us-ascii?Q?5Ny+/R4md3+i10PTTtdItt4xy0Jvljoq5bFwViJHJqHelwALA0bvMfKfXXCt?=
+ =?us-ascii?Q?89sTayn9V7TvZyniXmaq/c1bkYQAeY9/nBL0qn9tsByUlF/SX4t+8rC5U4FK?=
+ =?us-ascii?Q?lovlzqNyo01kcuMvDBdK31afbKYbNe9/1ye5jFv7We2YRMGG43mQ+N9jY3Yl?=
+ =?us-ascii?Q?927kxIgJIoBXzFDuSyjqvx5VrRoNs4MaDW0nLBk3ikvKLN95LdH6ysGbjuYN?=
+ =?us-ascii?Q?/S83Ab4h2+h59jQ489fiCqsXonP7gv4vwJP9FFj1tq/ON6Wi4JL3QZPovpvH?=
+ =?us-ascii?Q?KCZHnacrTUeLmXO5r7IcAV6IEXaVz06IYuthaKPANtrz1gVqVTLrzmZbXv22?=
+ =?us-ascii?Q?BNSCwnWX3qevsUx3OhC3SE1HWmKYuMhkelxfFrZ6cd5busD/YoRlmgOOI76G?=
+ =?us-ascii?Q?j3RDUqXF2c2c2fQQBhDeifLIlr517DgkRSZ5QLbELPNP4hRkX5GZgkQzvFRf?=
+ =?us-ascii?Q?DwDPN0x4PhSWmb9G4PcM8wSnVzBnMCI920WZbHffmnSKsuJDr4xX2w5LbMG9?=
+ =?us-ascii?Q?VnfVmDzPmtPDAhbFuNSp09Cq0Qsh40XyJ7Ux9ck1xcnC8RcmW9LhTGlCJFyo?=
+ =?us-ascii?Q?r/g1v6uIiyYFUcGDq5eu3MT/9ztNC9nCK9zkz6rjU3UHxZ7rGQvn4AsjF5Dt?=
+ =?us-ascii?Q?5uV5brKr21KmUYnLtWaffQY6kVjQ5mJRR0pYhoTA24Oqos5fVYYBw7+Ndcxt?=
+ =?us-ascii?Q?8p3s9QwbFlW477nfHVLkYwT5dTOD8VFPuZCxTGe7TGHErxNpi2Qb6RRVWDdG?=
+ =?us-ascii?Q?jGYY6TMHVvfQ1eEgRnglNyVdh9MMNHjYKgyAbv43hJvYJJAPObRj6qya6WXb?=
+ =?us-ascii?Q?YpsurI/hbrQVd+UlP3YOjmet709to4nREaw1jo6YaFg2NGr3vuTveSZAU+X7?=
+ =?us-ascii?Q?zAIz9li7XjwhWG2dNv3uO5fvVIq+8X9XhXis90DPhakZn/BOs76nexd1loEo?=
+ =?us-ascii?Q?JyCN1tA8e/kOt7JB7Ef96AfA1qatfSUqj9TeTdEKnRvaW/si62X9czK8dS1b?=
+ =?us-ascii?Q?4Qt1aRz7f0UVS7GG3IUDooy+wOUxf5nJWG72WNcqPiuiwb1OC01mKlxGba1m?=
+ =?us-ascii?Q?/VKLduqKUXhDpEqxIQtF3GVrefXFiECQB5c/fBK2Awj0Nx9EfvOikE1tczeS?=
+ =?us-ascii?Q?yPsjIzAKLrAJQpkPR59WHnAv+XC2hId4vJP++aqSM/X7IdRaHqr3pwMcSoLc?=
+ =?us-ascii?Q?tzp2m+nJElSvGzILMA1LWEb8gHPhWJKbPjs/tIKKjCEvuk2bW0QtVIPt2C5s?=
+ =?us-ascii?Q?iWnPLBlAoNTEM70klF5WTAUifxA2q75//PHHXy3T9Nzbytws5fDo7A=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY3PR01MB11346.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?bfFnZeJcd3vISO1RhzumAV9MIqw6fGJSt7xL3sM+vi5M40sCQRV961OEMTvZ?=
+ =?us-ascii?Q?7apBOc1ZezPJ3dq2JuXHKrHl9ywVLv4saHfeUJuYQOY9qhgLbiRaIo5ClJ/G?=
+ =?us-ascii?Q?qbiSDUCT1Cgu33RGfeBu3c7+sECeMKnxNocpj3bqVPG2SpppctxwLgXIotZd?=
+ =?us-ascii?Q?7SQioEoZytNYlrNGQztKa4fsUrplCOkh6sRmZEk7ECzXj9vXM1eo+19hOieI?=
+ =?us-ascii?Q?kpkxP73c7zWxH0XYNwAyRbIXy3KzifaINiH+AyW57iAt50NfesDLcmhwqREh?=
+ =?us-ascii?Q?G9+9l2bu8yZU1rx2c1l4cxdRbmKoX14ghuTSXB8X2HBm3Od66NLTb3mENzHG?=
+ =?us-ascii?Q?9HyruVjjps7rD4GL3a8709AomrEldJkR6/7qkXhe8jVsnzk+Flb1dt4afh2L?=
+ =?us-ascii?Q?YB9dUE4jz89IchzYsy+MOoLkr9g0bHCBx7Aeo02Fw3PtsREx1P7eWJFAe+c4?=
+ =?us-ascii?Q?9zn6JGgKZ45QyviJ+X36c9lV8by1rqlzwonMXEs3kMV9zrmFm8zxmy7hEEKC?=
+ =?us-ascii?Q?0XnKgvEwGUegY0Toy0REFJLjmnqX5k30G5Hjj6E7uCNNRTIG5E5iGXtKRLb5?=
+ =?us-ascii?Q?QKyS+aR62InVMr20oZusNM7y9U7eMZA0LDqH2rtGHELAozyRRIS2FxwdgyC1?=
+ =?us-ascii?Q?kVpRi/O07tZ/PCxJvUJwL41SBTpXE0xOwGeZN3HsP4uc3pUif8J2+6g+yUZa?=
+ =?us-ascii?Q?ISG3txWqd01DGxxw+4c1MLDpERRn3trQ8zhhVDUAWAPHEtO+O2fIRfp4FEK1?=
+ =?us-ascii?Q?VyWsaAjD8Y1I2IXTHtHJFfdYtP0Moow5hJORydSE7Dy4KpBY/ElH9Ab+UYj+?=
+ =?us-ascii?Q?QVxDXvI2ehur1682VVA0Om9I288wmTs62QJwC90eO0K6UdErKRjQx91gTrNs?=
+ =?us-ascii?Q?oUrQ35RPulA+HI2rj8KDQsvAM585SyHEiu9Bsfi2QI3OMzoZVdIdWTRUELFB?=
+ =?us-ascii?Q?6BQC9yYmzsg/GvA2/Q/FxwW7alux9pLzW43FGNNqaZ6KQgu4yawzJcZ04P0k?=
+ =?us-ascii?Q?lJ/n5M88R9hzJ2EPBpXso4HBUarvCRrqD76pkMQkjjwwY9BRsbf+nXS/Br9o?=
+ =?us-ascii?Q?KzlVksR8joCnSnDtwxNwvZNYYv+OwS5kn0PpndrgOK4XWUuQeel9WU0TSM1w?=
+ =?us-ascii?Q?PNF80ZWW0bdoUHX6o9c/52ecVLYk8JSQf/pjj1EtzZ5+uWRnpO2RdNKZ2zAY?=
+ =?us-ascii?Q?0GNX1QYJhUBBZX0hyZx/6zLIz3BBK0UCrpDU9U82/r9j3I3FsV/MZkxSXDp9?=
+ =?us-ascii?Q?V9Mewt3+hads3DK5k38Uh+H9Piyh+P6cK3dnz6xndWDxazFdbBybGOTQMcKb?=
+ =?us-ascii?Q?dbX1s1iwiElfLDkp4ee0ifo+yffPVivVYTjKOYrLQ8FbUR+4DF+qaYp2r0DH?=
+ =?us-ascii?Q?7KrQnHrbvN1tCKpmBuCtlBENTgipfPB8gyGk3bzauS80pfJsYuzz1ZqDCUMN?=
+ =?us-ascii?Q?sznobvtR8qAp3gGhSdnVBskK8GNo38VuleLyaDwZ6lMeTqP61VAEHGIU+Ihs?=
+ =?us-ascii?Q?9E7/CmVTmrqFjsFw373NxWbZNl0clBdEVa9btcIU56YwYgRlWPJXYm5kqGTr?=
+ =?us-ascii?Q?H62l6kLx8AbBN1MMmkZp3aUUnFQukdL4zdu6rr93NHs4I7BIsk1PfSNOelG3?=
+ =?us-ascii?Q?7g=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250714143613.42184-1-daniel.sedlak@cdn77.com>
- <20250714143613.42184-2-daniel.sedlak@cdn77.com> <vlybtuctmjmsfkh4x455q4iokcme4zbowvolvti2ftmcysechr@ydj4uss6vkm2>
-In-Reply-To: <vlybtuctmjmsfkh4x455q4iokcme4zbowvolvti2ftmcysechr@ydj4uss6vkm2>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 16 Jul 2025 11:07:44 -0700
-X-Gm-Features: Ac12FXzTb1KzWeKzpPlneXdiabppVB68MvIey5AKLhH3yNR2XP56uLG6-DIvxu4
-Message-ID: <CAAVpQUBNoRgciFXVtqS2rxjCeD44JHOuDNcuN0J__guY33pfjw@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 1/2] tcp: account for memory pressure signaled
- by cgroup
-To: Shakeel Butt <shakeel.butt@linux.dev>
-Cc: Daniel Sedlak <daniel.sedlak@cdn77.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Neal Cardwell <ncardwell@google.com>, 
-	David Ahern <dsahern@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org, netdev@vger.kernel.org, 
-	Matyas Hurtik <matyas.hurtik@cdn77.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: bp.renesas.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: TY3PR01MB11346.jpnprd01.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c65e6165-e331-406a-57d6-08ddc4955087
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jul 2025 18:19:33.6576
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 9rzr93f7NXdZVoyLYaGsgBdU0aYncBazTcdLLyg+Kvdnw00Cs/xmxY3OXNczPkFbeDUI1QhtKZt7e2JSz9QFplRLXHlKoQCAq4QaxxLLht0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: OS3PR01MB10075
 
-On Wed, Jul 16, 2025 at 9:50=E2=80=AFAM Shakeel Butt <shakeel.butt@linux.de=
-v> wrote:
->
-> On Mon, Jul 14, 2025 at 04:36:12PM +0200, Daniel Sedlak wrote:
-> > This patch is a result of our long-standing debug sessions, where it al=
-l
-> > started as "networking is slow", and TCP network throughput suddenly
-> > dropped from tens of Gbps to few Mbps, and we could not see anything in
-> > the kernel log or netstat counters.
-> >
-> > Currently, we have two memory pressure counters for TCP sockets [1],
-> > which we manipulate only when the memory pressure is signalled through
-> > the proto struct [2]. However, the memory pressure can also be signaled
-> > through the cgroup memory subsystem, which we do not reflect in the
-> > netstat counters. In the end, when the cgroup memory subsystem signals
-> > that it is under pressure, we silently reduce the advertised TCP window
-> > with tcp_adjust_rcv_ssthresh() to 4*advmss, which causes a significant
-> > throughput reduction.
-> >
-> > So this patch adds a new counter to account for memory pressure
-> > signaled by the memory cgroup, so it is much easier to spot.
-> >
-> > Link: https://elixir.bootlin.com/linux/v6.15.4/source/include/uapi/linu=
-x/snmp.h#L231-L232 [1]
-> > Link: https://elixir.bootlin.com/linux/v6.15.4/source/include/net/sock.=
-h#L1300-L1301 [2]
-> > Co-developed-by: Matyas Hurtik <matyas.hurtik@cdn77.com>
-> > Signed-off-by: Matyas Hurtik <matyas.hurtik@cdn77.com>
-> > Signed-off-by: Daniel Sedlak <daniel.sedlak@cdn77.com>
-> > ---
-> >  Documentation/networking/net_cachelines/snmp.rst |  1 +
-> >  include/net/tcp.h                                | 14 ++++++++------
-> >  include/uapi/linux/snmp.h                        |  1 +
-> >  net/ipv4/proc.c                                  |  1 +
-> >  4 files changed, 11 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/Documentation/networking/net_cachelines/snmp.rst b/Documen=
-tation/networking/net_cachelines/snmp.rst
-> > index bd44b3eebbef..ed17ff84e39c 100644
-> > --- a/Documentation/networking/net_cachelines/snmp.rst
-> > +++ b/Documentation/networking/net_cachelines/snmp.rst
-> > @@ -76,6 +76,7 @@ unsigned_long  LINUX_MIB_TCPABORTONLINGER
-> >  unsigned_long  LINUX_MIB_TCPABORTFAILED
-> >  unsigned_long  LINUX_MIB_TCPMEMORYPRESSURES
-> >  unsigned_long  LINUX_MIB_TCPMEMORYPRESSURESCHRONO
-> > +unsigned_long  LINUX_MIB_TCPCGROUPSOCKETPRESSURE
-> >  unsigned_long  LINUX_MIB_TCPSACKDISCARD
-> >  unsigned_long  LINUX_MIB_TCPDSACKIGNOREDOLD
-> >  unsigned_long  LINUX_MIB_TCPDSACKIGNOREDNOUNDO
-> > diff --git a/include/net/tcp.h b/include/net/tcp.h
-> > index 761c4a0ad386..aae3efe24282 100644
-> > --- a/include/net/tcp.h
-> > +++ b/include/net/tcp.h
-> > @@ -267,6 +267,11 @@ extern long sysctl_tcp_mem[3];
-> >  #define TCP_RACK_STATIC_REO_WND  0x2 /* Use static RACK reo wnd */
-> >  #define TCP_RACK_NO_DUPTHRESH    0x4 /* Do not use DUPACK threshold in=
- RACK */
-> >
-> > +#define TCP_INC_STATS(net, field)    SNMP_INC_STATS((net)->mib.tcp_sta=
-tistics, field)
-> > +#define __TCP_INC_STATS(net, field)  __SNMP_INC_STATS((net)->mib.tcp_s=
-tatistics, field)
-> > +#define TCP_DEC_STATS(net, field)    SNMP_DEC_STATS((net)->mib.tcp_sta=
-tistics, field)
-> > +#define TCP_ADD_STATS(net, field, val)       SNMP_ADD_STATS((net)->mib=
-.tcp_statistics, field, val)
-> > +
-> >  extern atomic_long_t tcp_memory_allocated;
-> >  DECLARE_PER_CPU(int, tcp_memory_per_cpu_fw_alloc);
-> >
-> > @@ -277,8 +282,10 @@ extern unsigned long tcp_memory_pressure;
-> >  static inline bool tcp_under_memory_pressure(const struct sock *sk)
-> >  {
-> >       if (mem_cgroup_sockets_enabled && sk->sk_memcg &&
-> > -         mem_cgroup_under_socket_pressure(sk->sk_memcg))
-> > +         mem_cgroup_under_socket_pressure(sk->sk_memcg)) {
-> > +             TCP_INC_STATS(sock_net(sk), LINUX_MIB_TCPCGROUPSOCKETPRES=
-SURE);
-> >               return true;
->
-> Incrementing it here will give a very different semantic to this stat
-> compared to LINUX_MIB_TCPMEMORYPRESSURES. Here the increments mean the
-> number of times the kernel check if a given socket is under memcg
-> pressure for a net namespace. Is that what we want?
+Hi all,
 
-I'm trying to decouple sk_memcg from the global tcp_memory_allocated
-as you and Wei planned before, and the two accounting already have the
-different semantics from day1 and will keep that, so a new stat having a
-different semantics would be fine.
+> -----Original Message-----
+> From: Biju Das <biju.das.jz@bp.renesas.com>
+> Sent: 05 July 2025 18:03
+> Subject: [PATCH net-next] net: stmmac: dwmac-renesas-gbeth: Add PM suspen=
+d/resume callbacks
+>=20
+> Add PM suspend/resume callbacks for RZ/G3E SMARC EVK.
+>=20
+> The PM deep entry is executed by pressing the SLEEP button and exit from =
+entry is by pressing the
+> power button.
+>=20
+> Logs:
+> root@smarc-rzg3e:~# PM: suspend entry (deep) Filesystems sync: 0.115 seco=
+nds Freezing user space
+> processes Freezing user space processes completed (elapsed 0.002 seconds)=
+ OOM killer disabled.
+> Freezing remaining freezable tasks
+> Freezing remaining freezable tasks completed (elapsed 0.001 seconds)
+> printk: Suspending console(s) (use no_console_suspend to debug)
+> NOTICE:  BL2: v2.10.5(release):2.10.5/rz_soc_dev-162-g7148ba838
+> NOTICE:  BL2: Built : 14:23:58, Jul  5 2025
+> NOTICE:  BL2: SYS_LSI_MODE: 0x13e06
+> NOTICE:  BL2: SYS_LSI_DEVID: 0x8679447
+> NOTICE:  BL2: SYS_LSI_PRR: 0x0
+> NOTICE:  BL2: Booting BL31
+> renesas-gbeth 15c30000.ethernet end0: Link is Down Disabling non-boot CPU=
+s ...
+> psci: CPU3 killed (polled 0 ms)
+> psci: CPU2 killed (polled 0 ms)
+> psci: CPU1 killed (polled 0 ms)
+> Enabling non-boot CPUs ...
+> Detected VIPT I-cache on CPU1
+> GICv3: CPU1: found redistributor 100 region 0:0x0000000014960000
+> CPU1: Booted secondary processor 0x0000000100 [0x412fd050]
+> CPU1 is up
+> Detected VIPT I-cache on CPU2
+> GICv3: CPU2: found redistributor 200 region 0:0x0000000014980000
+> CPU2: Booted secondary processor 0x0000000200 [0x412fd050]
+> CPU2 is up
+> Detected VIPT I-cache on CPU3
+> GICv3: CPU3: found redistributor 300 region 0:0x00000000149a0000
+> CPU3: Booted secondary processor 0x0000000300 [0x412fd050]
+> CPU3 is up
+> dwmac4: Master AXI performs fixed burst length 15c30000.ethernet end0: No=
+ Safety Features support
+> found 15c30000.ethernet end0: IEEE 1588-2008 Advanced Timestamp supported=
+ 15c30000.ethernet end0:
+> configuring for phy/rgmii-id link mode
+> dwmac4: Master AXI performs fixed burst length 15c40000.ethernet end1: No=
+ Safety Features support
+> found 15c40000.ethernet end1: IEEE 1588-2008 Advanced Timestamp supported=
+ 15c40000.ethernet end1:
+> configuring for phy/rgmii-id link mode OOM killer enabled.
+> Restarting tasks: Starting
+> Restarting tasks: Done
+> random: crng reseeded on system resumption
+> PM: suspend exit
+>=20
+> 15c30000.ethernet end0: Link is Up - 1Gbps/Full - flow control rx/tx root=
+@smarc-rzg3e:~# ifconfig end0
+> 192.168.10.7 up root@smarc-rzg3e:~# ping 192.168.10.1 PING 192.168.10.1 (=
+192.168.10.1) 56(84) bytes of
+> data.
+> 64 bytes from 192.168.10.1: icmp_seq=3D1 ttl=3D64 time=3D2.05 ms
+> 64 bytes from 192.168.10.1: icmp_seq=3D2 ttl=3D64 time=3D0.928 ms
+>=20
+> Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
+> ---
+> This patch is tested with out-of tree patch for save/restore ethernet OEN=
+ registers in the pinctrl
+> block.
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
+> b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
+> index 9a774046455b..df4ca897a60c 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
+> @@ -136,6 +136,7 @@ static struct platform_driver renesas_gbeth_driver =
+=3D {
+>  	.probe  =3D renesas_gbeth_probe,
+>  	.driver =3D {
+>  		.name		=3D "renesas-gbeth",
+> +		.pm		=3D &stmmac_pltfr_pm_ops,
+>  		.of_match_table	=3D renesas_gbeth_match,
+>  	},
+>  };
 
-But I think per-memcg stat like memory.stat.XXX would be a good fit
-rather than pre-netns because one netns could be shared by multiple
-cgroups and multiple sockets in the same cgroup could be spread across
-multiple netns.
+
+Gentle ping.
+
+Cheers,
+Biju
 
