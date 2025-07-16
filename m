@@ -1,117 +1,172 @@
-Return-Path: <netdev+bounces-207479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04B91B077F4
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 16:26:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB2D6B07818
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 16:30:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05BC23A7317
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 14:25:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44DABA41E8C
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 14:29:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10B7D23E320;
-	Wed, 16 Jul 2025 14:26:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41609263F5E;
+	Wed, 16 Jul 2025 14:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MdvsUVtw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cfowqy7L"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f196.google.com (mail-yb1-f196.google.com [209.85.219.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A511C2335;
-	Wed, 16 Jul 2025 14:26:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F4E0262FF8;
+	Wed, 16 Jul 2025 14:29:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752675965; cv=none; b=dRx0tSIVPVOlvbvPt+cdKYUUiOJw5/MyuhePheTJLjndYWOvYLNZhNikZwfogliguRzkJ7+jtUjRen7g+erT/jrKVkVz1QOpEHqTGwPjInYa4XKPcpz8+4u7bWQSJ9OZUZ5DpNc+B0+qpz1LcW8Glgpe7szwCFs71ftf3r00V58=
+	t=1752676200; cv=none; b=Vd+r2AiNtOqZXL/vzImhhHyfViPPokP05osFD36dv2YDrNYRnYp961C1KmAvQaXROFkC+KDXt81j/IADz2Jw+4kXef7jklw3hMuFd7ZmnEfVomLGJb9yhkd1qBOXfCeJXuBXh7ynJ1o2TEX61RWKxLisKWBlA338Dg501WSBo1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752675965; c=relaxed/simple;
-	bh=N9SUrkNq3KKn2zkzbDNcNNFbAR128RbgvLOba/W9yP4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ef2wKTx7o5SfRms0TdXeaOTaHwmW7DGKhozdctRitbljFbIPKeJo8gPFk7iYYZtDi4+gIw+o3t9ktB7dLFWRb7wZfkyhDVYxJsojU5IdBIoyZMFigFpRM/GCjfSz6VSdwqrsXA4i7SZHL4N5cd6WiA+vDOV4QD/jM1boCXnZYiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MdvsUVtw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D93A4C4CEE7;
-	Wed, 16 Jul 2025 14:26:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752675964;
-	bh=N9SUrkNq3KKn2zkzbDNcNNFbAR128RbgvLOba/W9yP4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MdvsUVtwD7/K4fZw4qsxwDfsfa4G2P48z430/9vSItOs18NVSN/V15Phg1hxiF9B9
-	 xQ42plymaXG4hmUGtDN9PwDvvIs7e9W33RCzzTG3u7PNj96kyDiwr/eLiNcHqA+0iR
-	 gSTn1NwxK9dOS0GxGshLdH654wF8z2BAR91+m16lP9uQn/+QQ/PLR8ovzgdtKsyn5x
-	 QBxpOgr3fSgE81Gx59A7N4/rhTbJefEUOyHJITtpszB0oYpihmk5U3783e/nK66EA7
-	 c3m1ucMb8z10K+fBjSqgeOmC5X0M8eZgh7RfcyXel81eWYzrozWP9pf49j1LseC55M
-	 7ig9rUiLxK7Ig==
-Date: Wed, 16 Jul 2025 07:26:02 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, Geliang
- Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Christoph Paasch
- <cpaasch@openai.com>, Davide Caratti <dcaratti@redhat.com>, Florian
- Westphal <fw@strlen.de>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- stable@vger.kernel.org
-Subject: Re: [PATCH net v2 0/2] selftests: mptcp: connect: cover alt modes
-Message-ID: <20250716072602.386a8963@kernel.org>
-In-Reply-To: <20250715185308.2ad30691@kernel.org>
-References: <20250715-net-mptcp-sft-connect-alt-v2-0-8230ddd82454@kernel.org>
-	<20250715185308.2ad30691@kernel.org>
+	s=arc-20240116; t=1752676200; c=relaxed/simple;
+	bh=R3X47Anq6N11xoa48VLLuGRxi8pi4MkwN/qO2tgC6wE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MeRmhfIIsn5buRp5NLWrTjmYnyoGJ2IFmjdOHGhBbpROQa6/33L7JfLz/SYONaBT3NFwqDomC93dG7P76hoHZPw92NSORmrAT7kNmjQymYu7/4klfwThhx5sof574GkHOKZmQZ3dWaD9H5ST8RabpI9gfbbQW8HjechStILGXWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cfowqy7L; arc=none smtp.client-ip=209.85.219.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f196.google.com with SMTP id 3f1490d57ef6-e75668006b9so6767261276.3;
+        Wed, 16 Jul 2025 07:29:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752676196; x=1753280996; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GncqGP7goJeoYVJ46y/gd3Gd5COzdFRWNNvDrQIFaFQ=;
+        b=cfowqy7Lu7qOIrlsx1qSyVGf9S9xOcvV4qkoXLc/g3tgDe5MOIFdF09Qrr43nSV4IW
+         ybaQx/7rJGEmOv4jW5It2StRTxxjnsJsosBt239p0gl/XOfN+nkzwdSQq6wZR+3khSf/
+         d4B6R0bLG8vPJesS5OHFuvRiSzGqotGaRpkSdCSByhNJVrcDoMNKBpfdmBL+ZDjmMW5v
+         vvvBGhSSKpYBar5gBqrMrfss++FjyUXjfqGVn7NPPa5we0aKWG5jkBh42Wl7VL3aHvFg
+         0j8mqsNjPHYo4czncKD8xoWon/RNXVr4SRHgoJXn/5X0EcV3naUcIWFLAsGEa8RY+IYD
+         e4hQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752676196; x=1753280996;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GncqGP7goJeoYVJ46y/gd3Gd5COzdFRWNNvDrQIFaFQ=;
+        b=NkQ3Rdiqgsue3C88xz+UceRN3HvxzogxYeeLMniKpooh6lCTJnNexdr+NRT2Wt/viR
+         j3+TdfS+3rosoqGNOBAlkUZ1f8OYkZa/GmTCF++4riTvKQ7H+lK8OAPlBIKY7+u+Bzbp
+         c8nn2QNC4lpYVretnOz5+qSNFQJp3/AxYHR8HAmqf4IwloLhP8bKxHjxJlpuUkcjaI9h
+         0LzFWfHJlI6g6uXeHR4/B3/Sd/c3Acfbfadu9bUe845zK7tSnqxMX21SIl7k2If6tQWF
+         GXuaVo2mLsatfBKblJugPhhIXbLvpMBUw3eeXfgVVPACKi9zBghole6GCNWDS0DjIVKb
+         EDhA==
+X-Forwarded-Encrypted: i=1; AJvYcCVVLctc7TPlNyyxQLwDvc30ai0Qb8k+dq/cqXuDxGqBGI5C/v2mENAtfP3ZALXmQMs6jy+iJ9DgnD6gMo4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyy72245e26T7OhAyeFjG4QN1zv4f8oLzNatZNOExWERfdy0/i6
+	RHxy/eKqWKCZwibZBZFc9KiBtv3c7eXZu7j8Ag7SkUEafFS8okCLxIQZ
+X-Gm-Gg: ASbGncvEDXlXcFdqv8yY8gPfC8EvSbyRZYEuEQ3dUSydF176JqaYnwMV4Hf4nPH1Qlc
+	pcVIic0QnONyLmfKuR4/d/j9YxmRnbOiax4cMX0qwrgcDCQgYfLtG0XTz/v57UNzP2bcM395Prl
+	40JU7joCMhAytwT5A8VAHKB2dFF6KYOrY9htoZ3i/Pth0O+4J3aF/leCWyiJJNkSONtkwo1MpZ6
+	Wei97WtXRQBhvNkLXhrBooYRCF70nIa4Vq89I2PRDihdSXeC/lg8eeJQ7Jr7g8tUAiIN0UjhJLq
+	8gKknNhAynclpQeVM+NOsw7j7SKHexLm//1135vfFfmnUP48kobFu6WHugld3I5FCgD15wk+vP3
+	OqAOzxSjrGqSo7ULNiiACAH7VApfHmHKr2Imk0BfQwZCH
+X-Google-Smtp-Source: AGHT+IECZdXPUbZpvN2ZpX2PO+J3L3S4jMhg72Pi4l759WXRROZYGicT98mbxgDJQAus/1z4edwLdw==
+X-Received: by 2002:a05:690c:6f82:b0:718:4511:e173 with SMTP id 00721157ae682-7184512026dmr7358367b3.12.1752676196435;
+        Wed, 16 Jul 2025 07:29:56 -0700 (PDT)
+Received: from [10.102.6.66] ([208.97.243.82])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-717c5d734casm29278127b3.31.2025.07.16.07.29.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Jul 2025 07:29:56 -0700 (PDT)
+Message-ID: <67753866-5237-4758-9bf3-d6a8611ac179@gmail.com>
+Date: Wed, 16 Jul 2025 10:29:55 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net] net: bridge: Do not offload IGMP/MLD messages
+To: Ido Schimmel <idosch@nvidia.com>, Joseph Huang <Joseph.Huang@garmin.com>
+Cc: netdev@vger.kernel.org, Nikolay Aleksandrov <razor@blackwall.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Tobias Waldekranz <tobias@waldekranz.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, bridge@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+References: <20250714150101.1168368-1-Joseph.Huang@garmin.com>
+ <aHdF-1uIp75pqfSG@shredder>
+Content-Language: en-US
+From: Joseph Huang <joseph.huang.2024@gmail.com>
+In-Reply-To: <aHdF-1uIp75pqfSG@shredder>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, 15 Jul 2025 18:53:08 -0700 Jakub Kicinski wrote:
-> On Tue, 15 Jul 2025 20:43:27 +0200 Matthieu Baerts (NGI0) wrote:
-> > mptcp_connect.sh can be executed manually with "-m <MODE>" and "-C" to
-> > make sure everything works as expected when using "mmap" and "sendfile"
-> > modes instead of "poll", and with the MPTCP checksum support.
-> >=20
-> > These modes should be validated, but they are not when the selftests are
-> > executed via the kselftest helpers. It means that most CIs validating
-> > these selftests, like NIPA for the net development trees and LKFT for
-> > the stable ones, are not covering these modes.
-> >=20
-> > To fix that, new test programs have been added, simply calling
-> > mptcp_connect.sh with the right parameters.
-> >=20
-> > The first patch can be backported up to v5.6, and the second one up to
-> > v5.14. =20
->=20
-> Looks like the failures that Paolo flagged yesterday:
->=20
-> https://lore.kernel.org/all/a7a89aa2-7354-42c7-8219-99a3cafd3b33@redhat.c=
-om/
->=20
-> are back as soon as this hit NIPA :(
->=20
-> https://netdev.bots.linux.dev/contest.html?branch=3Dnet-next-2025-07-16--=
-00-00&executor=3Dvmksft-mptcp&pw-n=3D0&pass=3D0
->=20
-> No idea why TBH, the tests run sequentially and connect.sh run before
-> any of the new ones.
->=20
-> I'm gonna leave it in patchwork in case the next run is clean,
-> please use pw-bot to discard them if they keep failing.
+On 7/16/2025 2:26 AM, Ido Schimmel wrote:
+> On Mon, Jul 14, 2025 at 11:01:00AM -0400, Joseph Huang wrote:
+>> Do not offload IGMP/MLD messages as it could lead to IGMP/MLD Reports
+>> being unintentionally flooded to Hosts. Instead, let the bridge decide
+>> where to send these IGMP/MLD messages.
+>>
+>> Consider the case where the local host is sending out reports in response
+>> to a remote querier like the following:
+>>
+>>         mcast-listener-process (IP_ADD_MEMBERSHIP)
+>>            \
+>>            br0
+>>           /   \
+>>        swp1   swp2
+>>          |     |
+>>    QUERIER     SOME-OTHER-HOST
+>>
+>> In the above setup, br0 will want to br_forward() reports for
+>> mcast-listener-process's group(s) via swp1 to QUERIER; but since the
+>> source hwdom is 0, the report is eligible for tx offloading, and is
+>> flooded by hardware to both swp1 and swp2, reaching SOME-OTHER-HOST as
+>> well. (Example and illustration provided by Tobias.)
+>>
+>> Fixes: 472111920f1c ("net: bridge: switchdev: allow the TX data plane forwarding to be offloaded")
+>> Signed-off-by: Joseph Huang <Joseph.Huang@garmin.com>
+> 
+> I don't have personal experience with this offload, but it makes sense
+> to not offload the replication of control packets to the underlying
+> device and instead let the CPU handle it. These shouldn't be sent at an
+> high rate anyway.
+> 
+> 
+> I think you can just early return if the packet is IGMP/MLD. Something
+> like:
+> 
+> diff --git a/net/bridge/br_switchdev.c b/net/bridge/br_switchdev.c
+> index 95d7355a0407..9a910cf0256e 100644
+> --- a/net/bridge/br_switchdev.c
+> +++ b/net/bridge/br_switchdev.c
+> @@ -17,6 +17,9 @@ static bool nbp_switchdev_can_offload_tx_fwd(const struct net_bridge_port *p,
+>   	if (!static_branch_unlikely(&br_switchdev_tx_fwd_offload))
+>   		return false;
+>   
+> +	if (br_multicast_igmp_type(skb))
+> +		return false;
+> +
+>   	return (p->flags & BR_TX_FWD_OFFLOAD) &&
+>   	       (p->hwdom != BR_INPUT_SKB_CB(skb)->src_hwdom);
+>   }
 
-It failed again on the latest run, in a somewhat more concerning way :(
+Talking about these packets being low rate, should I add unlikely() like so:
 
-# (duration 30279ms) [FAIL] file received by server does not match (in, out=
-):
-# -rw------- 1 root root 5171914 Jul 16 05:24 /tmp/tmp.W2c96hxSIz
-# Trailing bytes are:=20
-# w,=D1=90)-rw------- 1 root root 5166208 Jul 16 05:24 /tmp/tmp.s33PNcrN6M
-# Trailing bytes are:=20
-# (<v /&^<=D6=B1rnFsaC7INFO: with peek mode: saveAfterPeek
+diff --git a/net/bridge/br_switchdev.c b/net/bridge/br_switchdev.c
+index 95d7355a0407..9a910cf0256e 100644
+--- a/net/bridge/br_switchdev.c
++++ b/net/bridge/br_switchdev.c
+@@ -17,6 +17,9 @@ static bool nbp_switchdev_can_offload_tx_fwd(const 
+struct net_bridge_port *p,
+   	if (!static_branch_unlikely(&br_switchdev_tx_fwd_offload))
+   		return false;
 
-https://netdev-3.bots.linux.dev/vmksft-mptcp/results/211121/4-mptcp-connect=
--sh/stdout
++	if (unlikely(br_multicast_igmp_type(skb)))
++		return false;
++
+   	return (p->flags & BR_TX_FWD_OFFLOAD) &&
+   	       (p->hwdom != BR_INPUT_SKB_CB(skb)->src_hwdom);
+   }
 
-BTW feeding the random data into hexdump-like formatter seems
-advisable? :P
+Thanks,
+Joseph
 
