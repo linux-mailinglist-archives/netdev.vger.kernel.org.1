@@ -1,94 +1,85 @@
-Return-Path: <netdev+bounces-207335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D6B3B06A9F
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 02:40:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A216EB06AEC
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 02:53:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD9523BAB91
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 00:39:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AD8C1A64202
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 00:53:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84F7A18DF62;
-	Wed, 16 Jul 2025 00:39:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB3B219300;
+	Wed, 16 Jul 2025 00:53:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ak0Pzrpk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P1T5Y14g"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE11189919;
-	Wed, 16 Jul 2025 00:39:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB3D12C544;
+	Wed, 16 Jul 2025 00:53:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752626399; cv=none; b=tTGqHCg8XmU2tl6ffNlgvNJPkb5R5vBg3k/wsEqLnfUQgPFNH4vFcoVe5E3AD1k2Pay0quZ2gngZbZQsq22pUy8913IRe6VdHib/LSLfKo3CWOstrddYp2dIj4UrrGcfUhJ/jIs5CYQWmEdsS2GuswlgtpyVqer80wHCmlGarwA=
+	t=1752627210; cv=none; b=uEcomVyKk2jMrRnB8+KQp7SUH3WJjqvwG44HLYzFoyEoGHhD8BH1S87JJU8u5/6yNBVrj9dlfLWWL1dzkzxBJ7bIxPlYR/rqvspPzp91MnOzljN1l/398A67U3socKIPwyf+sHfGjtkggB0kSCkQKvfzNffkAO9MbvSeoKxP474=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752626399; c=relaxed/simple;
-	bh=sGn/kh7UYq3CB7lRfd66Gr+cg8mX9X81H7GXODQBzEQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PsXHh9W5Kz0jZi0dwPeK7Iw9dpsmj0G08psuZHoNpve3zGnbDfo9iAv/3yhoPcov/KRQrFLdOumQS8jmarOKBRJ8Ao3LqaKuyO+wFoZGELsah+SarJokfqR9hvrMut/VsQfct3GOWWn2PoKylIrcQdwkt6+1gAns6oS8td74Iu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ak0Pzrpk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E79CAC4CEF1;
-	Wed, 16 Jul 2025 00:39:58 +0000 (UTC)
+	s=arc-20240116; t=1752627210; c=relaxed/simple;
+	bh=6xOuTn8B1PCo4diLCbYgO27Euv615aCvJ7kW+gkRqVk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=S7aY7NjxNjfTMCUXPYipf7uF5Idv7CH8XRKwL7sgcMfwADG5SqVZBxe1xM9ErGza5F77OjtIjgF2XZFZLYauAPwevkcxtu15qK1oFwx+HY4dLDPdduywhZ9K/o+EnyYvW1fLFIphpQHYX+ZUh16X1l0pf1vDxbheX2GsGJalM1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P1T5Y14g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E132C4CEE3;
+	Wed, 16 Jul 2025 00:53:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752626398;
-	bh=sGn/kh7UYq3CB7lRfd66Gr+cg8mX9X81H7GXODQBzEQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ak0PzrpkGTSCe+vQtMtNJ4jFZ0iIU+vrM+8JH7jv+2P8SHpoNcWyxqfcwMTQIMj7m
-	 nq+kRCAn1Rv8ApFkaEQNbjdIrI3JDLzU3AQAbJ8yMaJu7azSznBsS29atBL/SkTNGX
-	 b4alTNGdc36xMbaiTleNoiM2uA3b/dp3qJUuLq+4wgjz+owryAd7C+IRsG87TTS6qH
-	 yOntSqnpUjkKdnZMwhmW1cgHN4y4sAuTkZ5TQL86XxqBejynCE9SsULKQZhFf1+61U
-	 QZbxLCxJ5FkUootxXwr9K305aFLmWsX9JbAOPwHEyDte0/0KzfDy/DeFKx+LujKEkJ
-	 OsnlajxJB92HQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE05383BA30;
-	Wed, 16 Jul 2025 00:40:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1752627210;
+	bh=6xOuTn8B1PCo4diLCbYgO27Euv615aCvJ7kW+gkRqVk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=P1T5Y14gRxoXIZktODujBUk0Y0YudkPhaQqs0Rfp6RBPWuii0RvuH4r5kzZXKQbwz
+	 cJYv8UqsWSppo/xfRQQKmUZfCmr26Kx+i152/7Ka0aa9YVRJQhBDvvJEe/ZI/aSaJY
+	 W8r1crMtt1SOHtXJbRL/F8w/NBPHprk/7joApex14oifc32M6vHqWqLe6nQiF9nqzl
+	 SXQa8cWwzh9/QKHUkV/7kzcR608+DFPnl5E9NpUnK4MMsTXWtorOMA2UIPSPMKp8vD
+	 UohTcmhjVho2uIOfjl0i3SARVT6GZ/SIJ5m0UhjkYSDAFeDROHIE48zsOFS3C8I98R
+	 JV53a/jUR+4sw==
+Date: Tue, 15 Jul 2025 17:53:28 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Piotr Kubik <piotr.kubik@adtran.com>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v5 2/2] net: pse-pd: Add Si3474 PSE controller
+ driver
+Message-ID: <20250715175328.43513c21@kernel.org>
+In-Reply-To: <b2361682-05fe-4a38-acfd-2191f7596711@adtran.com>
+References: <be0fb368-79b6-4b99-ad6b-00d7897ca8b0@adtran.com>
+	<b2361682-05fe-4a38-acfd-2191f7596711@adtran.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: libwx: fix multicast packets received count
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175262641925.629458.3835429988961684615.git-patchwork-notify@kernel.org>
-Date: Wed, 16 Jul 2025 00:40:19 +0000
-References: <DA229A4F58B70E51+20250714015656.91772-1-jiawenwu@trustnetic.com>
-In-Reply-To: <DA229A4F58B70E51+20250714015656.91772-1-jiawenwu@trustnetic.com>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- mengyuanlou@net-swift.com, stable@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 14 Jul 2025 09:56:56 +0800 you wrote:
-> Multicast good packets received by PF rings that pass ethternet MAC
-> address filtering are counted for rtnl_link_stats64.multicast. The
-> counter is not cleared on read. Fix the duplicate counting on updating
-> statistics.
+On Fri, 11 Jul 2025 11:25:02 +0000 Piotr Kubik wrote:
+> From: Piotr Kubik <piotr.kubik@adtran.com>
 > 
-> Fixes: 46b92e10d631 ("net: libwx: support hardware statistics")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+> Add a driver for the Skyworks Si3474 I2C Power Sourcing Equipment
+> controller.
 > 
-> [...]
+> Driver supports basic features of Si3474 IC:
+> - get port status,
+> - get port power,
+> - get port voltage,
+> - enable/disable port power.
+> 
+> Only 4p configurations are supported at this moment.
 
-Here is the summary with links:
-  - [net,v2] net: libwx: fix multicast packets received count
-    https://git.kernel.org/netdev/net/c/2b30a3d1ec25
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Hi Kory, it'd be good to have your review tag on this.
 
