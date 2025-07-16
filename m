@@ -1,302 +1,129 @@
-Return-Path: <netdev+bounces-207510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4947B079F8
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 17:35:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86831B079F1
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 17:34:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE2651895D2B
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 15:30:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA766567532
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 15:34:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8590C2727F6;
-	Wed, 16 Jul 2025 15:30:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A05CC24293F;
+	Wed, 16 Jul 2025 15:34:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="qhGR7x9F";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="CDGdDLZf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gfufTYAV"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B47625CC64;
-	Wed, 16 Jul 2025 15:30:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C341F4717;
+	Wed, 16 Jul 2025 15:34:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752679809; cv=none; b=NqaFKzuoZYvzbasuTsgbemgvN1Iu2gZ7dhVem7eug0bDTX6QLrzVH+SQ3nxpoH2ASDOWNqbxJG5+tWGolk6pFjeFJPwO0LCJB2onaDgUDYWuAt6ahPP1CzTU+obSfwVcoZJb8KkvrNGwGPDE3NVLx+iYtPecfwhqzzNVDrWX4TE=
+	t=1752680055; cv=none; b=CcDPlU4xofXlAAkjtkqv3PQaLm0AL5JqFXqsYgCe93EJAdFtXqoCHjQYbJBpOyQOwBPrk4nY41T1HK9tBXASbjT5jSl1ni/D1CGbScA5+vsO3xtPvNosAiVgC90/wT45LPRVkgVK01d8JkJ9Ob4ncNpKcGM4fXBssjydJZktSeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752679809; c=relaxed/simple;
-	bh=q19oPmWx4ndYXqFXTTEyUsJjjhRv7hd5EVZtq80+VRM=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=asjtLnmDu0DuPu+oustD2ZNQL/CQQqGW9/ciDKn1NNW6G2DyEkb33aWO7N9W10/YugMGStV7pymPX69e+uvLSOrdj488sxnNgFPb6TBHFyRZ1bTuTbjP4yjuGH91iY7gkdxqtdMwjEKiYtfZZjrvWaQscSZieS70GRunr34lCSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=qhGR7x9F; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=CDGdDLZf; arc=none smtp.client-ip=103.168.172.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailfout.phl.internal (Postfix) with ESMTP id 4EF3AEC018D;
-	Wed, 16 Jul 2025 11:30:05 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-12.internal (MEProxy); Wed, 16 Jul 2025 11:30:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
-	 t=1752679805; x=1752766205; bh=fM/6R+vfgRGsY/e2e3ZTsuUh1AGxohtC
-	hKt9/g8gh2Q=; b=qhGR7x9FOaEUbeRstB4QHp1l8lxdHfmfG/aE+kntJsrWKtgA
-	kIEK/tVNTHsSbAx8J4VoXWLTMlgFP0vVA5vW65jFRY+U6GMuyS72EPzI3cwktTQn
-	8OLuM1nXOwcWW2LeO8zPVqRMVUrBMSDFeSidkyG4gzl1xNsmYk6MFSpo1c8d46Sk
-	98DkW5shsnEAkywCRQnYnSzvCOpZ6zN507S59cyeHWNeu58qmm6UdnvqCXWUhO4Z
-	RLINSEByJ6tlmEw9lokTFsj6+pyOPQtdiYWVgXJwbzM2z/E1CTOcL7jb21GSEa+B
-	QtO6w0yHTRhDpkzjlfbU3vJMum2HCHLiX4qKOQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1752679805; x=
-	1752766205; bh=fM/6R+vfgRGsY/e2e3ZTsuUh1AGxohtChKt9/g8gh2Q=; b=C
-	DGdDLZfn34ciuyNA68v+v5aEJ4EBSI6al90mSakDNLR3gVv8hzeWq41dbyZ2ze0E
-	5XzZzoWrOJBW/426pO2KVBgZUYWkC5r48+wzkVOncaiP5hBKLRe8upEFeHSgxxgu
-	Q3c212FH5EdUfzTLRsc24lGfe3sY9X8V6Wqhh5gfOQTryShCcI0cUMylCs2VJRB4
-	w1FIv5aP1jk7PS4qR2+XQiErHjCANqSzf+nZQAQ8xyAkBkNtPwXISH5kOVt94Jpa
-	wcCfnOGVqfZFm63LIn3DLdenw1W2MWPpzZVZBurQdF/ssma+KUpZfVq5FRunN+IP
-	O5uDzolCP2H6aunDyIWcQ==
-X-ME-Sender: <xms:fMV3aEmJTztibKi7FV4MEY5mufYmwS7K1lQO46S2ikPDitG3n_vvNg>
-    <xme:fMV3aMdNz4ranuwPiqXrp-2iwO52OgqRIWnn9sMbA5qmHomrdQwV77J4-AZ7_BP6Q
-    Ro4VAf2xgULqY0fsxw>
-X-ME-Received: <xmr:fMV3aKG6fZZfTKjaFFdZNj4ELXAln_I9kPkggrK7ZZcltAMo4JkYCripIz3eTkzhvaZ2VA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdehkedtjecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefhvfevufgjfhfogggtgfffkfesthhqredtredtjeenucfhrhhomheplfgrhicuggho
-    shgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrdhnvghtqeenucggtffrrghtthgvrh
-    hnpeegfefghffghffhjefgveekhfeukeevffethffgtddutdefffeuheelgeelieeuhfen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjvhesjh
-    hvohhssghurhhghhdrnhgvthdpnhgspghrtghpthhtohepuddupdhmohguvgepshhmthhp
-    ohhuthdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpth
-    htohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopegtrghrlhho
-    shdrsghilhgsrghosehkvghrnhgvlhdrohhrghdprhgtphhtthhopehhohhrmhhssehkvg
-    hrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghp
-    thhtohepshhfohhrshhhvggvsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrnhgurh
-    gvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepphgrsggvnhhisehrvggu
-    hhgrthdrtghomhdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvg
-    hrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:fMV3aKg3bIMSZJc8z7hfJHTOq40r7e17s-izlvNz2Wo6uOFPxqBUPQ>
-    <xmx:fMV3aG0NJuu0Uh-B2Y62OotsB38bIOaRzrhexcXG4-51euwE8EExWw>
-    <xmx:fMV3aNfeEP5tbYF07I9s8aPe4mRFVh2OHw6HtMQ7SbUcAFArYKEPfw>
-    <xmx:fMV3aMxIRmgZNZ2lEgpsnc9-fnoJHHKXG31rZ4Z8Q1CLa1Uqp-b5SQ>
-    <xmx:fcV3aI-IXI2mlyOyzmHdo2YbjtM5GADuNEhc2lTSMGTiGpyRcDMCPVEY>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 16 Jul 2025 11:30:04 -0400 (EDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id 0B2EA9FC97; Wed, 16 Jul 2025 08:30:03 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id 0A1129FB65;
-	Wed, 16 Jul 2025 08:30:03 -0700 (PDT)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: Carlos Bilbao <bilbao@vt.edu>
-cc: carlos.bilbao@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-    edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-    horms@kernel.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org, sforshee@kernel.org
-Subject: Re: [PATCH] bonding: Switch periodic LACPDU state machine from counter to jiffies
-In-reply-to: <c9eac8f6-8e7f-4ed0-b34d-5dc50be8078f@vt.edu>
-References: <20250715205733.50911-1-carlos.bilbao@kernel.org> <c9eac8f6-8e7f-4ed0-b34d-5dc50be8078f@vt.edu>
-Comments: In-reply-to Carlos Bilbao <bilbao@vt.edu>
-   message dated "Tue, 15 Jul 2025 15:59:39 -0500."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1752680055; c=relaxed/simple;
+	bh=wyisApwR2KJgRL+YpRHialeVAdbXt2SPFnPpApHzX6A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K98I0x3CWXwAVBsLf4DqCUPi3THvgMSaieWq4F4fSxOgvyRHJWQ1wv1FzADAOwvTKU1JtD3xs4ej717BZj0eSp8XhE5xHKHJVNg5Sa+kmCJtxREuGUjGdvUuvHPfEsRcnZkVwWyEpbVosbaiwiIg+mhXoDFdyQciCd03ON1+Ces=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gfufTYAV; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-313154270bbso48538a91.2;
+        Wed, 16 Jul 2025 08:34:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752680053; x=1753284853; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kK2GS5jiIyNR2fbDCWhr6RAWmH8MnpgTjQZo6BcexN8=;
+        b=gfufTYAVghV7Y2LeGWR7tRSJfqn3PQUo/X9Je1oPQCE1Qgzi/zF6C3HmU7DdKnDAof
+         xxUA5KW0kE0VfFzFR5TJLF5+5CG6wK6DtCLuhslKKzEWu7FHsCuKU3OcZfUjLXaMpSwb
+         f5nbRvbjvlY5zcHvdXmTatwsxXmDScXWQsmDaY9lItsg60eLqppfysQP0sgPl3b3Cz2C
+         CzDuJJ/3SaQikdTLxv+Ugx0CLGOtjk9Ko5Hz0qgtD5MNDEpoZwIXjGhfxknnxBuQNT64
+         etUGkUJl+tAQgd6mMQ4N/flpMAqk65WUi44UZ/kDYYZcC2VFMnLTyGXh8Y45F9oLCMXV
+         5X+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752680053; x=1753284853;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kK2GS5jiIyNR2fbDCWhr6RAWmH8MnpgTjQZo6BcexN8=;
+        b=rNg9HJNhEBfZRFOyn3i7jiQGuyGpgWZWaZ1EZszwmVQHhsLQVwUhFa8/RhDPWH1kRK
+         e5S5B/9LzZaJ73BGOza2M+IqEs5Isvg2YjuTAHKNTadRYbnXNPYwyTHqlYEDwYK0PBB1
+         PGoAQRZL4t89Tm/MyF9LMSVTI+onraG3KIGuYNytu/Gwx57q6QHoUqOXPXxc0XsjOOZ9
+         2yKxyOTbMb9B/+FB/b1C+TPEz/uLUFf8AF3vlBA1HxZubb4XkgAbAX7JkWi2QfLaqRG/
+         VkazM2bT1ECXM3oDnU/PUURbMANoSHjjEUY7KZsVWGvFgc7wAUATuN7Rk7kbBS/u9xeE
+         LJtw==
+X-Forwarded-Encrypted: i=1; AJvYcCVxR+jeeJ2P1zNqi7A5VJKeybctQjffJMdx5bDRfTZ9xCA6IzvARUFpS6yWhmKrvLCi7/fp4oyiaqHOEZk=@vger.kernel.org, AJvYcCW1HPZ2jr23aBEoEdjOLwsaeZGSMyGj5YOHb3o8/zR/OtORHH8eqcBLvvMUcRLhGhspIMm+prYB@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4mSticFhUm8PhO5fMEAvnrrtjn+V2qHarzLBQjBonKeKgIU9I
+	x0OMXkqmEkR+4DzZSUNGM0nyJl0mIAOV/2R1UbTr497+jYiA7eKs2CyV
+X-Gm-Gg: ASbGncv7+YwQU31jCf0mYrHVUYfGFJvtT6aLG+yuBIIxF6bSSVhVM0Opg/EL0ZqD4zG
+	dLv4Yj4/HQkM0WCx0klQ0lrW2fN4uDd4Qijdg2nTFTDOnZEsK8ogbn9cqtqsKI/zV48/FFCchWL
+	CENpgochXzpnoSzcM+HZyi2mjsTX8C5X7mZg8IvaOXmgYEjmR8nePA9z1DdCGIVtxSH0/gbmk2b
+	kYTzTfXJNd+7QbFbZU5h9Dw9kTdYW9CWiiAp8aADCe5L0L+q9bD0x9Y8f4rG68pOjdO952MMn8V
+	YkejdPpx5I4SMNz4bqrpfNVO0/SIotJHZRhUHlOGmMEyqood6VBSRyscXMNIi9n1faTC/bcDTJQ
+	7Cv7+kBOBJfegCKKdICqjg8EVlP+s
+X-Google-Smtp-Source: AGHT+IHsbkBGxL3bE2S2Qc8SHdyb9jAvmdsH+jD4WnQfn8GqhiaRwM4rdCJ+rOhuCkjDq25eMkJKGQ==
+X-Received: by 2002:a17:90b:3b4d:b0:311:f99e:7f4a with SMTP id 98e67ed59e1d1-31c9f47ce96mr4419797a91.26.1752680053190;
+        Wed, 16 Jul 2025 08:34:13 -0700 (PDT)
+Received: from archlinux ([205.254.163.7])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de4283b67sm127946245ad.3.2025.07.16.08.34.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Jul 2025 08:34:12 -0700 (PDT)
+From: Suchit Karunakaran <suchitkarunakaran@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org
+Cc: skhan@linuxfoundation.org,
+	linux-kernel-mentees@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Suchit Karunakaran <suchitkarunakaran@gmail.com>
+Subject: [PATCH] net: stream: add description for sk_stream_write_space()
+Date: Wed, 16 Jul 2025 21:04:04 +0530
+Message-ID: <20250716153404.7385-1-suchitkarunakaran@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 16 Jul 2025 08:30:03 -0700
-Message-ID: <798952.1752679803@famine>
+Content-Transfer-Encoding: 8bit
 
-Carlos Bilbao <bilbao@vt.edu> wrote:
+Add a proper description for the sk_stream_write_space() function as
+previously marked by a FIXME comment.
+No functional changes.
 
->FYI, I was able to test this locally but couldn=E2=80=99t find any kselfte=
-sts to
->stress the bonding state machine. If anyone knows of additional ways to
->test it, I=E2=80=99d be happy to run them.
-
-	Your commit message says this change will "help reduce drift
-under contention," but above you say you're unable to stress the state
-machine.
-
-	How do you induce "drift under contention" to test that your
-patch actually improves something?  What testing has been done to insure
-that the new code doesn't change the behavior in other ways (regressions)?
-
-	Without a specific reproducable bug scenario that this change
-fixes, I'm leery of applying such a refactor to code that has seemingly
-been working fine for 20+ years.
-
-	I gather that what this is intending to do is reduce the current
-dependency on the scheduling accuracy of the workqueue event that runs
-the state machines.  The current implementation works on a "number of
-invocations" basis, assuming that the event is invoked every 100 msec,
-and computes various timeouts based on the number of times the state
-machine runs.
-
-	-J
-
->Thanks!
->
->Carlos
->
->On 7/15/25 15:57, carlos.bilbao@kernel.org wrote:
->> From: Carlos Bilbao <carlos.bilbao@kernel.org>
->>
->> Replace the bonding periodic state machine for LACPDU transmission of
->> function ad_periodic_machine() with a jiffies-based mechanism, which is
->> more accurate and can help reduce drift under contention.
->>
->> Signed-off-by: Carlos Bilbao (DigitalOcean) <carlos.bilbao@kernel.org>
->> ---
->>   drivers/net/bonding/bond_3ad.c | 79 +++++++++++++---------------------
->>   include/net/bond_3ad.h         |  2 +-
->>   2 files changed, 32 insertions(+), 49 deletions(-)
->>
->> diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3=
-ad.c
->> index c6807e473ab7..8654a51266a3 100644
->> --- a/drivers/net/bonding/bond_3ad.c
->> +++ b/drivers/net/bonding/bond_3ad.c
->> @@ -1421,44 +1421,24 @@ static void ad_periodic_machine(struct port *por=
-t, struct bond_params *bond_para
->>   	    (!(port->actor_oper_port_state & LACP_STATE_LACP_ACTIVITY) && !(p=
-ort->partner_oper.port_state & LACP_STATE_LACP_ACTIVITY)) ||
->>   	    !bond_params->lacp_active) {
->>   		port->sm_periodic_state =3D AD_NO_PERIODIC;
->> -	}
->> -	/* check if state machine should change state */
->> -	else if (port->sm_periodic_timer_counter) {
->> -		/* check if periodic state machine expired */
->> -		if (!(--port->sm_periodic_timer_counter)) {
->> -			/* if expired then do tx */
->> -			port->sm_periodic_state =3D AD_PERIODIC_TX;
->> -		} else {
->> -			/* If not expired, check if there is some new timeout
->> -			 * parameter from the partner state
->> -			 */
->> -			switch (port->sm_periodic_state) {
->> -			case AD_FAST_PERIODIC:
->> -				if (!(port->partner_oper.port_state
->> -				      & LACP_STATE_LACP_TIMEOUT))
->> -					port->sm_periodic_state =3D AD_SLOW_PERIODIC;
->> -				break;
->> -			case AD_SLOW_PERIODIC:
->> -				if ((port->partner_oper.port_state & LACP_STATE_LACP_TIMEOUT)) {
->> -					port->sm_periodic_timer_counter =3D 0;
->> -					port->sm_periodic_state =3D AD_PERIODIC_TX;
->> -				}
->> -				break;
->> -			default:
->> -				break;
->> -			}
->> -		}
->> +	} else if (port->sm_periodic_state =3D=3D AD_NO_PERIODIC)
->> +		port->sm_periodic_state =3D AD_FAST_PERIODIC;
->> +	/* check if periodic state machine expired */
->> +	else if (time_after_eq(jiffies, port->sm_periodic_next_jiffies)) {
->> +		/* if expired then do tx */
->> +		port->sm_periodic_state =3D AD_PERIODIC_TX;
->>   	} else {
->> +		/* If not expired, check if there is some new timeout
->> +		 * parameter from the partner state
->> +		 */
->>   		switch (port->sm_periodic_state) {
->> -		case AD_NO_PERIODIC:
->> -			port->sm_periodic_state =3D AD_FAST_PERIODIC;
->> -			break;
->> -		case AD_PERIODIC_TX:
->> -			if (!(port->partner_oper.port_state &
->> -			    LACP_STATE_LACP_TIMEOUT))
->> +		case AD_FAST_PERIODIC:
->> +			if (!(port->partner_oper.port_state & LACP_STATE_LACP_TIMEOUT))
->>   				port->sm_periodic_state =3D AD_SLOW_PERIODIC;
->> -			else
->> -				port->sm_periodic_state =3D AD_FAST_PERIODIC;
->> +			break;
->> +		case AD_SLOW_PERIODIC:
->> +			if ((port->partner_oper.port_state & LACP_STATE_LACP_TIMEOUT))
->> +				port->sm_periodic_state =3D AD_PERIODIC_TX;
->>   			break;
->>   		default:
->>   			break;
->> @@ -1471,21 +1451,24 @@ static void ad_periodic_machine(struct port *por=
-t, struct bond_params *bond_para
->>   			  "Periodic Machine: Port=3D%d, Last State=3D%d, Curr State=3D%d\n",
->>   			  port->actor_port_number, last_state,
->>   			  port->sm_periodic_state);
->> +
->>   		switch (port->sm_periodic_state) {
->> -		case AD_NO_PERIODIC:
->> -			port->sm_periodic_timer_counter =3D 0;
->> -			break;
->> -		case AD_FAST_PERIODIC:
->> -			/* decrement 1 tick we lost in the PERIODIC_TX cycle */
->> -			port->sm_periodic_timer_counter =3D __ad_timer_to_ticks(AD_PERIODIC_=
-TIMER, (u16)(AD_FAST_PERIODIC_TIME))-1;
->> -			break;
->> -		case AD_SLOW_PERIODIC:
->> -			/* decrement 1 tick we lost in the PERIODIC_TX cycle */
->> -			port->sm_periodic_timer_counter =3D __ad_timer_to_ticks(AD_PERIODIC_=
-TIMER, (u16)(AD_SLOW_PERIODIC_TIME))-1;
->> -			break;
->>   		case AD_PERIODIC_TX:
->>   			port->ntt =3D true;
->> -			break;
->> +			if (!(port->partner_oper.port_state &
->> +						LACP_STATE_LACP_TIMEOUT))
->> +				port->sm_periodic_state =3D AD_SLOW_PERIODIC;
->> +			else
->> +				port->sm_periodic_state =3D AD_FAST_PERIODIC;
->> +		fallthrough;
->> +		case AD_SLOW_PERIODIC:
->> +		case AD_FAST_PERIODIC:
->> +			if (port->sm_periodic_state =3D=3D AD_SLOW_PERIODIC)
->> +				port->sm_periodic_next_jiffies =3D jiffies
->> +					+ HZ * AD_SLOW_PERIODIC_TIME;
->> +			else /* AD_FAST_PERIODIC */
->> +				port->sm_periodic_next_jiffies =3D jiffies
->> +					+ HZ * AD_FAST_PERIODIC_TIME;
->>   		default:
->>   			break;
->>   		}
->> @@ -1987,7 +1970,7 @@ static void ad_initialize_port(struct port *port, =
-int lacp_fast)
->>   		port->sm_rx_state =3D 0;
->>   		port->sm_rx_timer_counter =3D 0;
->>   		port->sm_periodic_state =3D 0;
->> -		port->sm_periodic_timer_counter =3D 0;
->> +		port->sm_periodic_next_jiffies =3D 0;
->>   		port->sm_mux_state =3D 0;
->>   		port->sm_mux_timer_counter =3D 0;
->>   		port->sm_tx_state =3D 0;
->> diff --git a/include/net/bond_3ad.h b/include/net/bond_3ad.h
->> index 2053cd8e788a..aabb8c97caf4 100644
->> --- a/include/net/bond_3ad.h
->> +++ b/include/net/bond_3ad.h
->> @@ -227,7 +227,7 @@ typedef struct port {
->>   	rx_states_t sm_rx_state;	/* state machine rx state */
->>   	u16 sm_rx_timer_counter;	/* state machine rx timer counter */
->>   	periodic_states_t sm_periodic_state;	/* state machine periodic state =
-*/
->> -	u16 sm_periodic_timer_counter;	/* state machine periodic timer counter=
- */
->> +	unsigned long sm_periodic_next_jiffies;	/* state machine periodic next=
- expected sent */
->>   	mux_states_t sm_mux_state;	/* state machine mux state */
->>   	u16 sm_mux_timer_counter;	/* state machine mux timer counter */
->>   	tx_states_t sm_tx_state;	/* state machine tx state */
-
+Signed-off-by: Suchit Karunakaran <suchitkarunakaran@gmail.com>
 ---
-	-Jay Vosburgh, jv@jvosburgh.net
+ net/core/stream.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/net/core/stream.c b/net/core/stream.c
+index b16dfa568a2d..7a37e7dd2c43 100644
+--- a/net/core/stream.c
++++ b/net/core/stream.c
+@@ -23,9 +23,13 @@
+ 
+ /**
+  * sk_stream_write_space - stream socket write_space callback.
+- * @sk: socket
++ * @sk: pointer to the socket structure
+  *
+- * FIXME: write proper description
++ * This function is invoked when there's space available in the socket's
++ * send buffer for writing. It first checks if the socket is writable,
++ * clears the SOCK_NOSPACE flag indicating that memory for writing
++ * is now available, wakes up any processes waiting for write operations
++ * and sends asynchronous notifications if needed.
+  */
+ void sk_stream_write_space(struct sock *sk)
+ {
+-- 
+2.50.1
 
 
