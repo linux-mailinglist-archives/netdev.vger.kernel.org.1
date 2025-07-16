@@ -1,152 +1,157 @@
-Return-Path: <netdev+bounces-207462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5D38B07695
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 15:06:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29F0CB076A4
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 15:11:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE8123ACB7D
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 13:06:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FDF31890DAA
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 13:12:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB3562F2708;
-	Wed, 16 Jul 2025 13:06:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4800A2F4304;
+	Wed, 16 Jul 2025 13:11:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="suI7SbnF"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="mSsRorqp"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0009A290D95
-	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 13:06:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B6D7235072;
+	Wed, 16 Jul 2025 13:11:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752671201; cv=none; b=lRwwU+JOAXgO/F0X2Ypm1Ktz8k26doazG6/ZcyWAlaaSYlb7X4V6AoeYwcZX14wBOH6eGZ2eI0NiX2MjQI9k225nVCG2XaxGMoXnb+krx3aq4zf/azvyirLdDHyJG1QyFrvtedU+DXvAZHxr35yQFmtf894nDWtLsWnkWrBGBns=
+	t=1752671497; cv=none; b=mssk2CqFvsqPKe8B9ZFSoK4UtcNzh5mGlDj6GGB/OMU4Qj58ZlpGSS5b6JWoVibt1onlWsoodek4I/Sa9EjxNMIq0rGHAct4svJfWUh35Ln5SchSHsWK06MYiSyP0trgJDpVB77PdI96I2tOC7Fu5ZEyS1FY1r7D/BlJjVXCgNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752671201; c=relaxed/simple;
-	bh=FFprpTDgpxVkV1oUIt6mRMcDCCvCi3FWjUtBxN0SDFE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tNxckuN22fygkq9aOunvuOEq152+jxG3fIsUQ9l+mi+ebv/eYA+/bRAxTeYP7J8urVRK15wtwlm7kYXsCpYbfqCqfMgMXTnjHADaczI8NTGyBbQmOlo2xAxLd3saI0cw8l1txcCzBMz8HAB3mezCBB6/UqOfENa6ij69BP3hrEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=suI7SbnF; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1752671187;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FFprpTDgpxVkV1oUIt6mRMcDCCvCi3FWjUtBxN0SDFE=;
-	b=suI7SbnFGXn4ne1XyK2dgLnzSV11B5f2wH263FrVDwxEbxe5Pj5PU30YUCWCMEj3ZJ6h7q
-	xnOWyQ9IpOaeFnzTG5ZNeQr5gyU7a/GvW4HxIGLZMp9W/5Lynd3zekMWiZT7jW1xKuhbo3
-	qpZCsP/J75bEKlRrRTYq9Fx9Nm4xlck=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Menglong Dong <menglong8.dong@gmail.com>,
- Steven Rostedt <rostedt@goodmis.org>, Jiri Olsa <jolsa@kernel.org>,
- bpf <bpf@vger.kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
- Martin KaFai Lau <martin.lau@linux.dev>,
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- LKML <linux-kernel@vger.kernel.org>,
- Network Development <netdev@vger.kernel.org>
-Subject:
- Re: [PATCH bpf-next v2 02/18] x86,bpf: add bpf_global_caller for global
- trampoline
-Date: Wed, 16 Jul 2025 21:05:25 +0800
-Message-ID: <4737114.cEBGB3zze1@7940hx>
-In-Reply-To:
- <CAADnVQ+7NhegoZGHkiRyNO8ywks3ssPzQd6ipQzumZsWUHJALg@mail.gmail.com>
-References:
- <20250703121521.1874196-1-dongml2@chinatelecom.cn>
- <45f4d349-7b08-45d3-9bec-3ab75217f9b6@linux.dev>
- <CAADnVQ+7NhegoZGHkiRyNO8ywks3ssPzQd6ipQzumZsWUHJALg@mail.gmail.com>
+	s=arc-20240116; t=1752671497; c=relaxed/simple;
+	bh=hzmHkszYAoyXFUYOkAA7oNySXwfEslhstmlGJGO9cFU=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=KDOy0mjUNW3UbhrJPLLAklfp7A5bcH231R1JINdDx6YkJRd+OueXGRI/MMURcEFwhcTGz2mU5JgxMheM5JfVm/1OcapInyutK3bozCv6a9tUwRYI/fBzHUZoqeFlpeRyHtWVa0Vq9NftJ3opTDbTNJvIU14B3Dtjbx6yFRRrRq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=mSsRorqp; arc=none smtp.client-ip=162.240.164.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
+	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=qCz3qkpSM0PaErwoNukZei1+0CUNeJ1oEHCchsaW8T0=; b=mSsRorqpu8GvUFSOiJ0BQI+6mh
+	JPeC9IG0TZWWoUPrYxSxp/HSk4sfNrro88xvoXztLeT2sWWhWHoK/loc6rAKWyNY89ipAUNhTqnvV
+	n0Qx7fc13cSny0+cZlDbSKoYb3QLub0NkXYJjToQuBVCB5iGE9euU8iEWwqbu8xz0rSFxdiN9utnh
+	2xFhX0vZSoaiavvfmR+RoiFlLtv01kpcoxXHB9XtSWKWvH16wGKXPvATqawaiX79n/ZfVbymvdIy1
+	4jXKo4t2Cqck/hLrZVHpm5bswdpAVoLgdFpuyA1b1px9onoRU4A9w93r0On4zBJ2gu2lMB92G5Zsk
+	gtS1oukg==;
+Received: from [122.175.9.182] (port=31570 helo=zimbra.couthit.local)
+	by server.couthit.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <parvathi@couthit.com>)
+	id 1uc1uq-0000000HP1m-0wjn;
+	Wed, 16 Jul 2025 09:11:20 -0400
+Received: from zimbra.couthit.local (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTPS id 5A5831784069;
+	Wed, 16 Jul 2025 18:41:12 +0530 (IST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id 3F13E1784068;
+	Wed, 16 Jul 2025 18:41:12 +0530 (IST)
+Received: from zimbra.couthit.local ([127.0.0.1])
+	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id CYRcvNkisBKt; Wed, 16 Jul 2025 18:41:12 +0530 (IST)
+Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
+	by zimbra.couthit.local (Postfix) with ESMTP id D20231781DBB;
+	Wed, 16 Jul 2025 18:41:11 +0530 (IST)
+Date: Wed, 16 Jul 2025 18:41:11 +0530 (IST)
+From: Parvathi Pudi <parvathi@couthit.com>
+To: parvathi <parvathi@couthit.com>, kuba <kuba@kernel.org>
+Cc: danishanwar <danishanwar@ti.com>, rogerq <rogerq@kernel.org>, 
+	andrew+netdev <andrew+netdev@lunn.ch>, davem <davem@davemloft.net>, 
+	edumazet <edumazet@google.com>, pabeni <pabeni@redhat.com>, 
+	robh <robh@kernel.org>, krzk+dt <krzk+dt@kernel.org>, 
+	conor+dt <conor+dt@kernel.org>, ssantosh <ssantosh@kernel.org>, 
+	richardcochran <richardcochran@gmail.com>, 
+	s hauer <s.hauer@pengutronix.de>, m-karicheri2 <m-karicheri2@ti.com>, 
+	glaroque <glaroque@baylibre.com>, afd <afd@ti.com>, 
+	saikrishnag <saikrishnag@marvell.com>, m-malladi <m-malladi@ti.com>, 
+	jacob e keller <jacob.e.keller@intel.com>, 
+	diogo ivo <diogo.ivo@siemens.com>, 
+	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
+	horms <horms@kernel.org>, s-anna <s-anna@ti.com>, 
+	basharath <basharath@couthit.com>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
+	netdev <netdev@vger.kernel.org>, 
+	devicetree <devicetree@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	pratheesh <pratheesh@ti.com>, Prajith Jayarajan <prajith@ti.com>, 
+	Vignesh Raghavendra <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
+	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
+	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
+	mohan <mohan@couthit.com>
+Message-ID: <1616453705.30524.1752671471644.JavaMail.zimbra@couthit.local>
+In-Reply-To: <723330733.1712525.1752237188810.JavaMail.zimbra@couthit.local>
+References: <20250702140633.1612269-1-parvathi@couthit.com> <20250702151756.1656470-5-parvathi@couthit.com> <20250708180107.7886ea41@kernel.org> <723330733.1712525.1752237188810.JavaMail.zimbra@couthit.local>
+Subject: Re: [PATCH net-next v10 04/11] net: ti: prueth: Adds link
+ detection, RX and TX support.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart5145802.0VBMTVartN";
- micalg="pgp-sha512"; protocol="application/pgp-signature"
-X-Migadu-Flow: FLOW_OUT
-
---nextPart5145802.0VBMTVartN
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"; protected-headers="v1"
-From: Menglong Dong <menglong.dong@linux.dev>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 16 Jul 2025 21:05:25 +0800
-Message-ID: <4737114.cEBGB3zze1@7940hx>
-MIME-Version: 1.0
+X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - GC138 (Linux)/8.8.15_GA_3968)
+Thread-Topic: prueth: Adds link detection, RX and TX support.
+Thread-Index: frcZHpE/y/6hXxyDNRDspT8aDcWlcTdy9M2r
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
+X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-On Wednesday, July 16, 2025 12:35 AM Alexei Starovoitov <alexei.starovoitov=
-@gmail.com> write:
-> On Tue, Jul 15, 2025 at 1:37=E2=80=AFAM Menglong Dong <menglong.dong@linu=
-x.dev> wrote:
-> >
-> >
-> > On 7/15/25 10:25, Alexei Starovoitov wrote:
-[......]
-> >
-> > According to my benchmark, it has ~5% overhead to save/restore
-> > *5* variants when compared with *0* variant. The save/restore of regs
-> > is fast, but it still need 12 insn, which can produce ~6% overhead.
+Hi,
+
+>>> +=09qid =3D icssm_prueth_get_tx_queue_id(emac->prueth, skb);
+>>> +=09ret =3D icssm_prueth_tx_enqueue(emac, skb, qid);
+>>> +=09if (ret) {
+>>> +=09=09if (ret !=3D -ENOBUFS && netif_msg_tx_err(emac) &&
+>>> +=09=09    net_ratelimit())
+>>> +=09=09=09netdev_err(ndev, "packet queue failed: %d\n", ret);
+>>> +=09=09goto fail_tx;
+>>> +=09}
+>>=20
+>>> +=09if (ret =3D=3D -ENOBUFS) {
+>>> +=09=09ret =3D NETDEV_TX_BUSY;
+>>=20
+>>=20
+>> Something needs to stop the queue, right? Otherwise the stack will
+>> send the frame right back to the driver.
+>>=20
 >=20
-> I think it's an ok trade off, because with one global trampoline
-> we do not need to call rhashtable lookup before entering bpf prog.
-> bpf prog will do it on demand if/when it needs to access arguments.
-> This will compensate for a bit of lost performance due to extra save/rest=
-ore.
-
-I don't understand here :/
-
-The rhashtable lookup is done at the beginning of the global trampoline,
-which is called before we enter bpf prog. The bpf progs is stored in the
-kfunc_md, and we need get them from the hash table.
-
-If this is the only change, it is still OK. But according to my previous, t=
-he
-rhashtable can cause ~7% addition overhead. So if we change both
-them, the performance of tracing-multi is a little far from tracing, which
-means ~25% performance gap for the functions that have no arguments.
-About the rhashtable part, I'll do more research on it and feedback late.
-
+> Yes, we will notify upper layer with =E2=80=9Cnetif_tx_stop_queue()=E2=80=
+=9D when returning
+> =E2=80=9CNETDEV_TX_BUSY=E2=80=9D to not push again immediately.
 >=20
-> PS
-> pls don't add your chinatelecom.cn email in cc.
-> gmail just cannot deliver there and it's annoying to keep deleting
-> it manually in every reply.
 
-Sorry about that. I filtered out such message in my gmail, and
-didn't notice it. I'll remove it from the CC in the feature :)
+We reviewed the flow and found that the reason for NETDEV_TX_BUSY being
+notified to the upper layers is due lack of support for reliably detecting
+the TX completion event.
 
-Thanks!
-Menglong Dong
+In case of ICSSM PRU Ethernet, we do not have support for TX complete
+notification back to the driver from firmware and its like store and
+forget approach. So it will be tricky to enable back/resume the queue
+if we stop it when we see busy status.
 
-
---nextPart5145802.0VBMTVartN
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEEfXselyBLFGBR0Mm8PZ2NQ5E0lkFAmh3o5UACgkQ8PZ2NQ5E
-0lkkCwgAlk78qwKwT1vJIddz1SFQrEqPUaTnQ74dM5yRwlhy3vYb3dLRi2Pc8B3F
-OvgsL+oL1BjI2eS64jkfZhs/hyYlbFujf6m59rmQnUsYCbiqEdyxAJC4XsF6Q+fg
-bC2nUyOPt52XUr2sOm460YOVGbKve3W8SdJaruHezBvJgVUzNwhVsiPBD0RWwQaJ
-vSeBzA7isIgXs7hycBwvDU3zRO64EbgpKzEz/pSK5emHyK5V1fvBI9fx6qIP1jnr
-mSZKNOHlh7LaR2S7kx2vA6y8+hfn0b8fYzI49D65jasLqZw84qbrwg6/FTAK2Bvq
-ALZIMhtglEtinMZlz+1n33G3pfAepw==
-=X08I
------END PGP SIGNATURE-----
-
---nextPart5145802.0VBMTVartN--
+Returning NETDEV_TX_BUSY seems to be the best option so that the stack can
+retry as soon as possible.
 
 
-
+Thanks and Regards,
+Parvathi.
 
