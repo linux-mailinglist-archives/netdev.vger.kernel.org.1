@@ -1,63 +1,61 @@
-Return-Path: <netdev+bounces-207545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2B03B07B65
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 18:44:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F35C4B07B83
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 18:50:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B655B4A2503
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 16:43:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 424EA16F8D5
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 16:50:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAAC12F5C3A;
-	Wed, 16 Jul 2025 16:42:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B04C12F5493;
+	Wed, 16 Jul 2025 16:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GXBKh6Bk"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Xqr5SlOS"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 052F32F5C34;
-	Wed, 16 Jul 2025 16:42:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17D4D283FE0
+	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 16:50:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752684167; cv=none; b=UpvCtpGqy/MSvglmIzCRoHy+WFfpfGtZpkphQUa7cOkJ4k16JTK4j7UgYd4UYmJznh7ZA4biBv6lUEIyTVa7h1y085tLjhL9WeemJ88iehENSlIc40cXYuE85AR2JirGdZ9fOrgWxXLiq/Mfe8IByy3R7TIb8WHYF3sNJNj4DDY=
+	t=1752684606; cv=none; b=SU9qZ/hLe7kyKX9GqE75yZfBA3Zkrgf02jsl750TXwI+YHZ9DDimrSIufbGMH2bqpFq9iSvudy9zOV5YbHLUDjTD+M3oGolW+9uI66Pa2mtUDiYuh5tQNvzXXvRETWNOYQ56bZRaeiPhe41lUGAIkToB1WVemAsiPP9EhbDC7Wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752684167; c=relaxed/simple;
-	bh=GUjE5/Z671zGtY7yXDdoFGX6E3uyL/DTB94FNzppBcw=;
+	s=arc-20240116; t=1752684606; c=relaxed/simple;
+	bh=P+k06D7qBbCZm8y3X9WpXeA/zja+4RlUeGc0UOrydo4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kHKlRkJ15/mfJ+grmwdjsEOLmvQ8H35C0YtBvrff+5g9m6nTlKwPsvENOBLma0jrPKvJ3bJqZ4dkUuNnOMT0EV/hiToTtssXA5Xdps4rN730xPbBIAHTRkECx8LIHEYS9qcMkrEKBGKnHvOGp2zKiVneMyciHgmFnplnZabvsU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GXBKh6Bk; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=D1SxE35RjUfzzoDArd7E3eV4u1nAaqmQ4uLUf75JLio=; b=GXBKh6BkAnnCMPiKyBt90fAuUv
-	LbaVnxobMEWC/iYKM44AyRJl0UzrQ4VyUW94TPlPj3Ey2nanzP5Iph7+n4NBY20zrl3EbOZmZ7NmS
-	NuVglBmOTbqA538FR5/N+EE0cpiyDIoLI+JDjWe4kVSTxYc1mRI/22Xx/UIeUI3sR1rY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uc5DI-001hxs-FO; Wed, 16 Jul 2025 18:42:36 +0200
-Date: Wed, 16 Jul 2025 18:42:36 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	Frank.Sae@motor-comm.com, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, shenjian15@huawei.com,
-	liuyonglong@huawei.com, chenhao418@huawei.com,
-	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
-	salil.mehta@huawei.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] net: hibmcge: Add support for PHY LEDs on
- YT8521
-Message-ID: <023a85e4-87e2-4bd3-9727-69a2bfdc4145@lunn.ch>
-References: <20250716100041.2833168-1-shaojijie@huawei.com>
- <20250716100041.2833168-3-shaojijie@huawei.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=E0oQ5ccoUBUyHBZ0Fv3T/IOjMl3z62hL7DdF7sadA4r4TsciuKSyzNA388ikCNEYcuXO1K35eNCQ0osxywj4+vdzUSqNQt4I+hoSLgH4z9FUbiBufW+NbVKCGguTuftZcRuUAn+cwmtBlz5erSwtOXuvZ9mALLgJjuLmSySuMSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Xqr5SlOS; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 16 Jul 2025 09:49:49 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752684599;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eJMpmtlIPf4k+hDO7cbykgh07PoM5NDYPjmc8MkH7/4=;
+	b=Xqr5SlOSNTfFxmkk2StgfhvEBwSew07x8SDxLTfEdxR64duiIBUX0ioQGZCxzF4QLQoE59
+	D42vfchWcmJLG8avGrPG8gDtFkYSPR2iZxgNO8soiJ0FNewbOKNAzx/NgQh2bGCrhWKqgC
+	D5Q9KvyMgt3ghQQFNA4LSRGVa4Aqylw=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Daniel Sedlak <daniel.sedlak@cdn77.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, David Ahern <dsahern@kernel.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org, 
+	netdev@vger.kernel.org, Matyas Hurtik <matyas.hurtik@cdn77.com>
+Subject: Re: [PATCH v2 net-next 1/2] tcp: account for memory pressure
+ signaled by cgroup
+Message-ID: <vlybtuctmjmsfkh4x455q4iokcme4zbowvolvti2ftmcysechr@ydj4uss6vkm2>
+References: <20250714143613.42184-1-daniel.sedlak@cdn77.com>
+ <20250714143613.42184-2-daniel.sedlak@cdn77.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,25 +64,79 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250716100041.2833168-3-shaojijie@huawei.com>
+In-Reply-To: <20250714143613.42184-2-daniel.sedlak@cdn77.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jul 16, 2025 at 06:00:41PM +0800, Jijie Shao wrote:
-> hibmcge is a PCIE EP device, and its controller is
-> not on the board. And board uses ACPI not DTS
-> to create the device tree.
+On Mon, Jul 14, 2025 at 04:36:12PM +0200, Daniel Sedlak wrote:
+> This patch is a result of our long-standing debug sessions, where it all
+> started as "networking is slow", and TCP network throughput suddenly
+> dropped from tens of Gbps to few Mbps, and we could not see anything in
+> the kernel log or netstat counters.
 > 
-> So, this makes it impossible to add a "reg" property(used in of_phy_led())
-> for hibmcge. Therefore, the PHY_LED framework cannot be used directly.
+> Currently, we have two memory pressure counters for TCP sockets [1],
+> which we manipulate only when the memory pressure is signalled through
+> the proto struct [2]. However, the memory pressure can also be signaled
+> through the cgroup memory subsystem, which we do not reflect in the
+> netstat counters. In the end, when the cgroup memory subsystem signals
+> that it is under pressure, we silently reduce the advertised TCP window
+> with tcp_adjust_rcv_ssthresh() to 4*advmss, which causes a significant
+> throughput reduction.
 > 
-> This patch creates a separate LED device for hibmcge
-> and directly calls the phy->drv->led_hw**() function to
-> operate the related LEDs.
+> So this patch adds a new counter to account for memory pressure
+> signaled by the memory cgroup, so it is much easier to spot.
+> 
+> Link: https://elixir.bootlin.com/linux/v6.15.4/source/include/uapi/linux/snmp.h#L231-L232 [1]
+> Link: https://elixir.bootlin.com/linux/v6.15.4/source/include/net/sock.h#L1300-L1301 [2]
+> Co-developed-by: Matyas Hurtik <matyas.hurtik@cdn77.com>
+> Signed-off-by: Matyas Hurtik <matyas.hurtik@cdn77.com>
+> Signed-off-by: Daniel Sedlak <daniel.sedlak@cdn77.com>
+> ---
+>  Documentation/networking/net_cachelines/snmp.rst |  1 +
+>  include/net/tcp.h                                | 14 ++++++++------
+>  include/uapi/linux/snmp.h                        |  1 +
+>  net/ipv4/proc.c                                  |  1 +
+>  4 files changed, 11 insertions(+), 6 deletions(-)
+> 
+> diff --git a/Documentation/networking/net_cachelines/snmp.rst b/Documentation/networking/net_cachelines/snmp.rst
+> index bd44b3eebbef..ed17ff84e39c 100644
+> --- a/Documentation/networking/net_cachelines/snmp.rst
+> +++ b/Documentation/networking/net_cachelines/snmp.rst
+> @@ -76,6 +76,7 @@ unsigned_long  LINUX_MIB_TCPABORTONLINGER
+>  unsigned_long  LINUX_MIB_TCPABORTFAILED
+>  unsigned_long  LINUX_MIB_TCPMEMORYPRESSURES
+>  unsigned_long  LINUX_MIB_TCPMEMORYPRESSURESCHRONO
+> +unsigned_long  LINUX_MIB_TCPCGROUPSOCKETPRESSURE
+>  unsigned_long  LINUX_MIB_TCPSACKDISCARD
+>  unsigned_long  LINUX_MIB_TCPDSACKIGNOREDOLD
+>  unsigned_long  LINUX_MIB_TCPDSACKIGNOREDNOUNDO
+> diff --git a/include/net/tcp.h b/include/net/tcp.h
+> index 761c4a0ad386..aae3efe24282 100644
+> --- a/include/net/tcp.h
+> +++ b/include/net/tcp.h
+> @@ -267,6 +267,11 @@ extern long sysctl_tcp_mem[3];
+>  #define TCP_RACK_STATIC_REO_WND  0x2 /* Use static RACK reo wnd */
+>  #define TCP_RACK_NO_DUPTHRESH    0x4 /* Do not use DUPACK threshold in RACK */
+>  
+> +#define TCP_INC_STATS(net, field)	SNMP_INC_STATS((net)->mib.tcp_statistics, field)
+> +#define __TCP_INC_STATS(net, field)	__SNMP_INC_STATS((net)->mib.tcp_statistics, field)
+> +#define TCP_DEC_STATS(net, field)	SNMP_DEC_STATS((net)->mib.tcp_statistics, field)
+> +#define TCP_ADD_STATS(net, field, val)	SNMP_ADD_STATS((net)->mib.tcp_statistics, field, val)
+> +
+>  extern atomic_long_t tcp_memory_allocated;
+>  DECLARE_PER_CPU(int, tcp_memory_per_cpu_fw_alloc);
+>  
+> @@ -277,8 +282,10 @@ extern unsigned long tcp_memory_pressure;
+>  static inline bool tcp_under_memory_pressure(const struct sock *sk)
+>  {
+>  	if (mem_cgroup_sockets_enabled && sk->sk_memcg &&
+> -	    mem_cgroup_under_socket_pressure(sk->sk_memcg))
+> +	    mem_cgroup_under_socket_pressure(sk->sk_memcg)) {
+> +		TCP_INC_STATS(sock_net(sk), LINUX_MIB_TCPCGROUPSOCKETPRESSURE);
+>  		return true;
 
-Extending what Russell said, please take a look at:
+Incrementing it here will give a very different semantic to this stat
+compared to LINUX_MIB_TCPMEMORYPRESSURES. Here the increments mean the
+number of times the kernel check if a given socket is under memcg
+pressure for a net namespace. Is that what we want?
 
-Documentation/firmware-guide/acpi/dsd/phy.rst
-
-and extend it to cover PHY LEDs.
-
-	Andrew
 
