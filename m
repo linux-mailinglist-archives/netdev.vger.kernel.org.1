@@ -1,132 +1,317 @@
-Return-Path: <netdev+bounces-207406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (unknown [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CFEFB0708E
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 10:30:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E098FB07093
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 10:30:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C61D81897062
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 08:29:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1875E505E02
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 08:29:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F89D299A8A;
-	Wed, 16 Jul 2025 08:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 433942EACF6;
+	Wed, 16 Jul 2025 08:29:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mUoGGzIt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hugj5jDO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E809929B77C;
-	Wed, 16 Jul 2025 08:29:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5896C2EBDE8
+	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 08:29:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752654567; cv=none; b=pAO01sA3qOMoxHzmBsF7s+Qx13pdp/Ds+TQpz74WYTLFBXX0xCQs73pPy6y0DUmfpEMSZniTBnY+8Yk+TVcfM4f/qMvgcPWUuqYTG3zxlMY6W1yKlehJ0xwuPWahlf4RCmzrcp32sHcJEmKTFd73ep1KW6PRiL+pvFb0FnB2abo=
+	t=1752654577; cv=none; b=ebwTN9Kb8+nD4DiLwTXGJC9y362YOtRycWWV8ofn3cjuTTPKUevG+2GalHqKtmwZOWchQUXSOc+/FqJzVtW4XhftjCjW5C7v82cH0l4uPMOtxnw99qquiDrnOrx+n6cCbT5EJtCP4jpYEAJo5pnVmO3rHqRWBuS538Ic5XJVnU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752654567; c=relaxed/simple;
-	bh=ZzTPxrTjTtBIHf8L+7YFcQilbdSi+0RyWcQVSrkPnNk=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=Rb7oamGAj6Rd7ojqlZiOPg6vzD4zbaFnwmwdlrOEwgmF8NRykwM3uLRxGmYH4MWqZH7JA7SWTdCyO3mbexJR4xckUTUzpuBSS5YH4QJmQgTyLGlh63Uit7ZBOosXO2Kjz7jYDPvmEpw8IsOQbFQxHW/Ys6EhTaF96m7MqUfyT+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mUoGGzIt; arc=none smtp.client-ip=209.85.221.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-5313eff2649so3036635e0c.0;
-        Wed, 16 Jul 2025 01:29:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752654565; x=1753259365; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ZzTPxrTjTtBIHf8L+7YFcQilbdSi+0RyWcQVSrkPnNk=;
-        b=mUoGGzItDJYgn3NKG6BKAYz1WsU0kkl3rUdkNP5uitk3tJyF2g5hubJ5+sSBQFG+aG
-         Mvb0b87SLbEJiD8I9cnnV8FR3YpnYVZtgJVGzUB5Zg5zUfICjG+1iWQqKU7qLww4tYHx
-         JDoPH06JH7/xCBRQsOITYfp58wAJXtBCNyazZcbepzN0QL+938R/3HVGqGNhM1EKgLIt
-         zG/AWQD9V4pE/Q5RVPv90xxsu6W/j7M0nn7ChjHYbza6VpabFHOggAEV4YSmQO8eOgwI
-         ZfcIiW3vaXeNICzQ+rRLgQeac2/5MS5+4VYCdkl4L6IdnNQrBH8A9Z3ob/rpqZkkbNmg
-         CWaw==
+	s=arc-20240116; t=1752654577; c=relaxed/simple;
+	bh=RXd93FrMXhD6nQlRw5UhfdK/Fc7hARdOf1IOkW55cdI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=ue5q0ZAsER2Df+CrmETgkwEUZcXlcFmRsev37/XhtpLhJubHAMuSR9RmraIumxdg+urhWp2OYkjEIPQpFu8/AB6CZkaY5OV6SkbrBfE5gnexfb0pO8WfYApAmAw6UX4CVyrRWB4y84Os4TrJYDP6EZZVOTA2BgQlB1R0zbh9NX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hugj5jDO; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752654574;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ffz+MsDbG4Gm1eq6U3qZmEbUy+20PK+4pgl+eju8lOY=;
+	b=hugj5jDOzI4I836/Xrgw1HCqHFAene5hio//8Mx1xm25YdBQGoogYZ/eFYQcqVI8badZgn
+	JhlTQaatjFNf5C+8GBad1eZF1IfTLxNh5f5VWxDjShkJUK/CuAltpfS8F31kle4PwMXlWE
+	G1puZkCs93/fh7kaSR+MnuNQAWt9SP4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-642-owmnrdZpNaOPk7CONyerxA-1; Wed, 16 Jul 2025 04:29:32 -0400
+X-MC-Unique: owmnrdZpNaOPk7CONyerxA-1
+X-Mimecast-MFC-AGG-ID: owmnrdZpNaOPk7CONyerxA_1752654571
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a523ce0bb2so3148074f8f.0
+        for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 01:29:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752654565; x=1753259365;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZzTPxrTjTtBIHf8L+7YFcQilbdSi+0RyWcQVSrkPnNk=;
-        b=XQTRnxCOxnJ8Fwwnn/xeFioezVafOTtaEmGh3zfuTlGa6VIS4CwBKuN0Rmz+l/7YlP
-         nefoxKVJD20/JCWbL4+UGEJOX9u8aCsSBXmpy0czlZDdI9dFiAMjgQPAsLmftAYFDA4M
-         oRB6wVX0EbbhZuBrieL5P+ynnEZ18leWeEYzOvAeiD6Hkj65fl9UelQ6Yjv4yJqIKODA
-         YgoiHGXDtsd+Kl0p7aVmqMBe/I3QApUWzUC4yfev0QW+OpfIi+kTGe4zwhmbEIRaRju2
-         gKqVLk2sdvGqT7efoEHaDeoqYk05A60bZyErN1jwWNu3AHnlj9AOksecTA13OHx7y3oK
-         vnMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUIrL8eb25klliUIlwFig2NLXoAGZB4GuKuHWFu61b7C/FmM+T+N6ud1dkgnG1OFDESNRfRDMgx@vger.kernel.org, AJvYcCUwhBBZxIhiq20VxafY+4TJki7LbQ4P7KfLmdlTOC3iHIRywe6l0jW2H/ARap9WgxQyjtf1PVeGbz1L4sw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1tcLobIZTUbVeYgZqjC7M3fTtt0wjNkgBH93598ndMGWSBGmc
-	6BBIA03lfPQR8AYAU8I/ojpD8KCu5AjWfd9zIQQAzqHEKzmXOtz0p3RzinrbA5K7wmBsKfG1v0g
-	duJOXS9qlqZG+dhsSsj8pfaMIIwwSa30=
-X-Gm-Gg: ASbGnct+66U+X4qnxt+yYIgSyhTx0i8UtH65l9uEiwHh7cc6WsRqGY0xQZQwEXcsRZt
-	EC7a4e0g3xFSjPzF8juHJgVbp/nLaVemujnLTmEq+Pn7Mu+ejgK3aP3NRHOQjPbJDt+9yOhb0vb
-	S3bmvUuKHd8biublhnooJ2ZsWfMbKJI9ilnaz36UP9ndWYwn1/1btgzPRAV2mhm/E+M/SHOsB6J
-	XLaihY=
-X-Google-Smtp-Source: AGHT+IEGo1vyPCYVJ17wL6qZjR3idmkb0poP/0pCwqAO9AniuUm4yL8GABztOwz5TXOfzwdu0zG7CfZHdQSr/6m9aI8=
-X-Received: by 2002:a05:6122:2024:b0:534:69b3:a200 with SMTP id
- 71dfb90a1353d-5373fa4d002mr584684e0c.0.1752654564869; Wed, 16 Jul 2025
- 01:29:24 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752654571; x=1753259371;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ffz+MsDbG4Gm1eq6U3qZmEbUy+20PK+4pgl+eju8lOY=;
+        b=fIw/3nNpWtzLC+km1l9GqQPyKVoKdaS5of3hDDCzelQQ5rRLv7gAaJjvno1oJ5Dd1b
+         gzvFcw45BS4YpMGxn9lfwx9GtbhezPVy7Crvkw5wSHpzzq6wfl3R3C03lxsBaz8arHe1
+         uSfT7ZE51lXy+OIwuSANq2HKr+1mZLs5ircnJijCoQt4Jx+kdF97fMsz8/UTZgGH28D0
+         Xj+XElvi57FxMWEAAK2APoVa6tEvAEFKEnwsRTa5AbsF9+Av7j3V+LiL1OZZmgDO/HmR
+         7BAx07UYJVNRk62oEabCuPbFgE8tsEETIt3UvbU6DTK+ZsxEtet1pyxClXmx+Da64Dik
+         fW7g==
+X-Forwarded-Encrypted: i=1; AJvYcCWEJ/tjVOdZTXtisgHRTw2aWglKwxyxgt0qOf69ZFwhhoRziO0m02HtJxSq+n4JE6OWlbGY//E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxetWC+Ts9NWYWlNpnle6dcyISrnxvCdXfCO+u3Z6xISKBzQ+Uu
+	YTmHptxyk28ySTqyI10Z0rJrcgQoWTOB/sB5HUY5w9bPQzLI2ym28XZJoprDKCldMwzqAT1k/U+
+	tVwYV4uZRJT93xEpiWpd7gytjN8S74pLVvBGmPNTJutMOMaiQ/a+C2epUXA==
+X-Gm-Gg: ASbGncvPv3a0qb9PJqlCeKTHZxiJlIk+0Xl/ssOw6Hg+X0WEFJL/ZRd703nUByXprM4
+	hdakou8z47md+fcjxfX+w+uQhK9lETGRA9rfPl2BstBuSItdZWgbHup0UYhGx5Blm/WF/IAObM6
+	deiqFx/w1xJkiw8R4xGNDw2iFNekspu8oIhQLBmtYO7A0jr1Oo7948NOPMGc7YoWaQvEQASSrSG
+	c/0K1WEzM4p/YeqTnoHQXzlRuiNqcN5BqmDNVJVKgwSPq8mXEP9ujk+FJnUdXPkHzH54nQmtwll
+	CUEfsD6Yks2IBgXRdf9BiUHzAInFgNgl+vwfGj6J0+eQO5EwgIxUChoTECXmx9MUZRzAXjOiixT
+	V9RmnQxM6kV0=
+X-Received: by 2002:a05:6000:3113:b0:3a4:cb4f:ac2a with SMTP id ffacd0b85a97d-3b60e4c225fmr1234124f8f.21.1752654571233;
+        Wed, 16 Jul 2025 01:29:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHLiGksmElCYFmj6deUhZX70Iugn3d4BK4R3BF8eDMEuaPTLbQdgfRYY0kjWfYoS6K8Me3pxQ==
+X-Received: by 2002:a05:6000:3113:b0:3a4:cb4f:ac2a with SMTP id ffacd0b85a97d-3b60e4c225fmr1234094f8f.21.1752654570753;
+        Wed, 16 Jul 2025 01:29:30 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8e1e2cfsm16961144f8f.75.2025.07.16.01.29.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Jul 2025 01:29:30 -0700 (PDT)
+Message-ID: <f60c5ef5-47b6-4132-bd7c-9707c81289a2@redhat.com>
+Date: Wed, 16 Jul 2025 10:29:27 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Xianying Wang <wangxianying546@gmail.com>
-Date: Wed, 16 Jul 2025 16:29:11 +0800
-X-Gm-Features: Ac12FXyI9PsX7ghzeNAGmhjVv0lMdsfIGZUE5ddA1QypxdWfSCdIrhxJkmMCGy0
-Message-ID: <CAOU40uD8Ogy=bLf6gOK1dVJRNBcW5zMDLnwjiEuipHN8j2TPPQ@mail.gmail.com>
-Subject: [BUG] BUG: unable to handle kernel paging request in napi_skb_cache_get
-To: davem@davemloft.net
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 net-next 11/15] tcp: accecn: AccECN option
+To: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "corbet@lwn.net" <corbet@lwn.net>, "horms@kernel.org" <horms@kernel.org>,
+ "dsahern@kernel.org" <dsahern@kernel.org>,
+ "kuniyu@amazon.com" <kuniyu@amazon.com>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "dave.taht@gmail.com" <dave.taht@gmail.com>,
+ "jhs@mojatatu.com" <jhs@mojatatu.com>, "kuba@kernel.org" <kuba@kernel.org>,
+ "stephen@networkplumber.org" <stephen@networkplumber.org>,
+ "xiyou.wangcong@gmail.com" <xiyou.wangcong@gmail.com>,
+ "jiri@resnulli.us" <jiri@resnulli.us>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "donald.hunter@gmail.com" <donald.hunter@gmail.com>,
+ "ast@fiberby.net" <ast@fiberby.net>,
+ "liuhangbin@gmail.com" <liuhangbin@gmail.com>,
+ "shuah@kernel.org" <shuah@kernel.org>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+ "ij@kernel.org" <ij@kernel.org>, "ncardwell@google.com"
+ <ncardwell@google.com>,
+ "Koen De Schepper (Nokia)" <koen.de_schepper@nokia-bell-labs.com>,
+ "g.white@cablelabs.com" <g.white@cablelabs.com>,
+ "ingemar.s.johansson@ericsson.com" <ingemar.s.johansson@ericsson.com>,
+ "mirja.kuehlewind@ericsson.com" <mirja.kuehlewind@ericsson.com>,
+ "cheshire@apple.com" <cheshire@apple.com>, "rs.ietf@gmx.at"
+ <rs.ietf@gmx.at>, "Jason_Livingood@comcast.com"
+ <Jason_Livingood@comcast.com>, "vidhi_goel@apple.com" <vidhi_goel@apple.com>
+References: <20250704085345.46530-1-chia-yu.chang@nokia-bell-labs.com>
+ <20250704085345.46530-12-chia-yu.chang@nokia-bell-labs.com>
+ <0ddc5daf-adb4-4d97-9e8e-e60fdf9a007f@redhat.com>
+ <PAXPR07MB7984F66EB2AD576D2385C351A357A@PAXPR07MB7984.eurprd07.prod.outlook.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <PAXPR07MB7984F66EB2AD576D2385C351A357A@PAXPR07MB7984.eurprd07.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On 7/15/25 4:49 PM, Chia-Yu Chang (Nokia) wrote:
+> On 7/4/25 10:53 AM, chia-yu.chang@nokia-bell-labs.com wrote:
+> [...]
+>>> +}
+>>> +
+>>> +/* Handles AccECN option ECT and CE 24-bit byte counters update into
+>>> + * the u32 value in tcp_sock. As we're processing TCP options, it is
+>>> + * safe to access from - 1.
+>>> + */
+>>> +static inline s32 tcp_update_ecn_bytes(u32 *cnt, const char *from,
+>>> +                                    u32 init_offset) {
+>>> +     u32 truncated = (get_unaligned_be32(from - 1) - init_offset) &
+>>> +                     0xFFFFFFU;
+>>> +     u32 delta = (truncated - *cnt) & 0xFFFFFFU;
+>>> +
+>>> +     /* If delta has the highest bit set (24th bit) indicating
+>>> +      * negative, sign extend to correct an estimation using
+>>> +      * sign_extend32(delta, 24 - 1)
+>>> +      */
+>>> +     delta = sign_extend32(delta, 23);
+>>
+>> I'm under the impression that delta could be simply:
+>>
+>>         delta = (truncated - *cnt)
+>>
+>> What am I missing?
+> 
+> Hi Paolo,
+> 
+> I think this code is necessary to ensure delta will not a super large value in case of wrap adound.
+> 
+> For instance, if truncated = 0x0000001F and *cnt = 0x00FFFFFF, then (truncated - *cnt) = 0xFF000020
+> 
+> But sign_extend32(((truncated - *cnt) & 0xFFFFFFU, 23) = 0x00000020, which shall be corrrect.
+> 
+> Another example, if truncated = 0x0000001F and *cnt = 0x0000003F, then (truncated - *cnt) = 0xFFFFFFE0
+> 
+> And sign_extend32(((truncated - *cnt) & 0xFFFFFFU, 23) = 0xFFFFFFE0.
+> 
+> In this latter example, both are correct.
 
-I discovered a kernel page fault using the Syzkaller framework,
-described as BUG: unable to handle kernel paging request. This issue
-was reproduced on kernel version 6.16.0-rc5.
+Ok, I missed the fact that *cnt is a 24 bit integer, too. Your code
+looks good.
 
-From the dmesg log, the crash occurs directly within the
-napi_skb_cache_get function (net/core/skbuff.c:295) during the network
-softirq context. The page fault itself (#PF: error_code(0x000b) -
-reserved bit violation) indicates that the kernel tried to write to a
-memory address with invalid page table entries, strongly suggesting
-memory corruption.
+> 
+> [...]
+>>> a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c index 
+>>> d98a1a17eb52..2169fd28594e 100644
+>>> --- a/net/ipv4/tcp_output.c
+>>> +++ b/net/ipv4/tcp_output.c
+>>> @@ -385,6 +385,7 @@ static inline bool tcp_urg_mode(const struct tcp_sock *tp)
+>>>  #define OPTION_SMC           BIT(9)
+>>>  #define OPTION_MPTCP         BIT(10)
+>>>  #define OPTION_AO            BIT(11)
+>>> +#define OPTION_ACCECN                BIT(12)
+>>>
+>>>  static void smc_options_write(__be32 *ptr, u16 *options)  { @@ -406,6 
+>>> +407,8 @@ struct tcp_out_options {
+>>>       u16 mss;                /* 0 to disable */
+>>>       u8 ws;                  /* window scale, 0 to disable */
+>>>       u8 num_sack_blocks;     /* number of SACK blocks to include */
+>>> +     u8 num_accecn_fields:7, /* number of AccECN fields needed */
+>>> +        use_synack_ecn_bytes:1; /* Use synack_ecn_bytes or not */
+>>>       u8 hash_size;           /* bytes in hash_location */
+>>>       u8 bpf_opt_len;         /* length of BPF hdr option */
+>>>       __u8 *hash_location;    /* temporary pointer, overloaded */
+>>> @@ -621,6 +624,8 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
+>>>                             struct tcp_out_options *opts,
+>>>                             struct tcp_key *key)  {
+>>> +     u8 leftover_highbyte = TCPOPT_NOP; /* replace 1st NOP if avail */
+>>> +     u8 leftover_lowbyte = TCPOPT_NOP;  /* replace 2nd NOP in 
+>>> + succession */
+>>>       __be32 *ptr = (__be32 *)(th + 1);
+>>>       u16 options = opts->options;    /* mungable copy */
+>>>
+>>> @@ -656,15 +661,79 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
+>>>               *ptr++ = htonl(opts->tsecr);
+>>>       }
+>>>
+>>> +     if (OPTION_ACCECN & options) {
+>>> +             /* Initial values for AccECN option, ordered is based on ECN field bits
+>>> +              * similar to received_ecn_bytes. Used for SYN/ACK AccECN option.
+>>> +              */
+>>> +             static u32 synack_ecn_bytes[3] = { 0, 0, 0 };
+>>
+>> I think this does not address Eric's concern on v9 WRT global variable, as every CPU will still touch the same memory while accessing the above array.
+>>
+>>> +             const u8 ect0_idx = INET_ECN_ECT_0 - 1;
+>>> +             const u8 ect1_idx = INET_ECN_ECT_1 - 1;
+>>> +             const u8 ce_idx = INET_ECN_CE - 1;
+>>> +             u32 e0b;
+>>> +             u32 e1b;
+>>> +             u32 ceb;
+>>> +             u8 len;
+>>> +
+>>> +             if (opts->use_synack_ecn_bytes) {
+>>> +                     e0b = synack_ecn_bytes[ect0_idx] + TCP_ACCECN_E0B_INIT_OFFSET;
+>>> +                     e1b = synack_ecn_bytes[ect1_idx] + TCP_ACCECN_E1B_INIT_OFFSET;
+>>> +                     ceb = synack_ecn_bytes[ce_idx] + 
+>>> + TCP_ACCECN_CEB_INIT_OFFSET;
+>>
+>> On the flip side I don't see such array modified here, not in later patches?!? If so you could make it const and a global variable would be ok.
+> 
+> Sure, I will make it as static const global variable, which I hope this is ok for you.
+> 
+> 
+>>> +/* Calculates how long AccECN option will fit to @remaining option space.
+>>> + *
+>>> + * AccECN option can sometimes replace NOPs used for alignment of 
+>>> +other
+>>> + * TCP options (up to @max_combine_saving available).
+>>> + *
+>>> + * Only solutions with at least @required AccECN fields are accepted.
+>>> + *
+>>> + * Returns: The size of the AccECN option excluding space repurposed 
+>>> +from
+>>> + * the alignment of the other options.
+>>> + */
+>>> +static int tcp_options_fit_accecn(struct tcp_out_options *opts, int required,
+>>> +                               int remaining) {
+>>> +     int size = TCP_ACCECN_MAXSIZE;
+>>> +     int max_combine_saving;
+>>> +
+>>> +     if (opts->use_synack_ecn_bytes)
+>>> +             max_combine_saving = tcp_synack_options_combine_saving(opts);
+>>> +     else
+>>> +             max_combine_saving = opts->num_sack_blocks > 0 ? 2 : 0;
+>>> +     opts->num_accecn_fields = TCP_ACCECN_NUMFIELDS;
+>>> +     while (opts->num_accecn_fields >= required) {
+>>> +             int leftover_size = size & 0x3;
+>>> +             /* Pad to dword if cannot combine */
+>>> +             if (leftover_size > max_combine_saving)
+>>> +                     leftover_size = -((4 - leftover_size) & 0x3);
+>>
+>> I *think* that with the above you mean something alike:
+>>
+>>                         size = ALIGN(size, 4);
+>>                         leftover_size = 0
+>>
+>> ?
+>>
+>> The used code looks quite obscure to me.
+>>
+>> /P
+> 
+> Indeed, I will make below changes in the next version by using ALIGN() and ALIGN_DOWN()
+> 
+> Here the aim is to pad up (if max_combine_saving is not enough) or trim down (if max_combine saving is enough) to DWORD.
+> 
+> And the final return size will be the the a multiple of DWORD.
+> 
+> Would it be more readable?
+> 
+> /* Pad to DWORD if cannot combine. Align_size represents
+>  * the final size to be used by AccECN options.
+>  * +======+=============+====================+============+
+>  * | size | size exceed | max_combine_saving | align_size |
+>  * |      |    DWORD    |                    |            |
+>  * +======+=============+====================+============+
+>  * |   2  |       2     |         < 2        |      4     |
+>  * |   2  |       2     |         >=2        |      0     |
+>  * |   5  |       1     |         < 1        |      8     |
+>  * |   5  |       1     |         >=1        |      4     |
+>  * |   8  |       0     |         Any        |      8     |
+>  * |  11  |       3     |         < 3        |     12     |
+>  * |  11  |       3     |         >=3        |      8     |
+>  * +======+=============+====================+============+
+>  */
+> if ((size & 0x3) > max_combine_saving)
+>         align_size = ALIGN(size, 4);
+> else
+>         align_size = ALIGN_DOWN(size, 4);
+> 
+> if (remaining >= align_size) {
+>         size = align_size;
+>         break;
+> }
 
-Meanwhile, a second stack trace points to the probable source of
-corruption, where kfree is called from the iter_file_splice_write
-function (fs/splice.c:767) during a sendfile system call.
+Yes, IMHO is more readable. No need to add the table, the original
+comment is clear enough.
 
-This crash is likely caused by the interaction between these two
-paths. I suspect this is a use-after-free or double-free
-vulnerability. The sendfile/splice path appears to incorrectly free an
-SKB, corrupting the memory pool (napi_skb_cache). Subsequently, when
-the network receive path attempts to allocate from this corrupted
-pool, it receives an invalid pointer, leading to the page fault.
+Thanks,
 
-Therefore, I recommend reviewing the SKB lifecycle management in the
-sendfile/splice implementation, specifically around
-iter_file_splice_write, and its interaction with the NAPI SKB cache.
+Paolo
 
-This can be reproduced on:
-
-HEAD commit:
-
-d7b8f8e20813f0179d8ef519541a3527e7661d3a
-
-report: https://pastebin.com/raw/X5w3B46p
-
-console output : https://pastebin.com/raw/aDMVEtzw
-
-kernel config : https://pastebin.com/raw/xAVw5DnH
-
-C reproducer : https://pastebin.com/raw/Gu48eTDw
-
-Let me know if you need more details or testing.
-
-Best regards,
-
-Xianying
 
