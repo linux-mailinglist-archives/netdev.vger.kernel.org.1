@@ -1,56 +1,61 @@
-Return-Path: <netdev+bounces-207417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 454F2B0716E
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 11:18:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D38B2B07177
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 11:19:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54A7050095A
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 09:18:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1AF97A5497
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 09:17:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6046A2EA470;
-	Wed, 16 Jul 2025 09:18:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EA2F2BFC85;
+	Wed, 16 Jul 2025 09:19:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kM5pQudW"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="N9udJBz5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 372C328C00D;
-	Wed, 16 Jul 2025 09:18:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C3E28A1C8;
+	Wed, 16 Jul 2025 09:19:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752657523; cv=none; b=W+spXh4BEdarnf+7+73AwqExu7mY83qgpKXRHhdWEPJ2BlzXYpx9nS2fMKY+JqRSbujfKQ8W+aN23CUKvfkZ/Fro64LmdHk1r5Tgi4ae44D0naU8k7b1hD7MqHBsSPwDaXSGd8yFAci/GLaEdp9+CmxyJVi9orIs/JzM0z1iq2M=
+	t=1752657559; cv=none; b=J9qF8wbTTATUEQatOdBw7eIJhTLyzio5dUeOd07CLD6CUIowv9FveVizeo4SXRa2x/VwkrEdSYMVmLbJtukSgUV55sJIar0xCXAwGJX5s+X2usomPI2xJvuD7GJAsU5BKTAPkp1Wp0AdIOvaGFwRXbhzQCBGyzSKcf+cAJICVJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752657523; c=relaxed/simple;
-	bh=4BI5blgxXpjJZIpySaa9qC3PiXN1NyUS2KRhcRVnqJI=;
+	s=arc-20240116; t=1752657559; c=relaxed/simple;
+	bh=g5M4DpBVQH07/jGuPHNWNcGzZLf3cxeneqrXpulpu2k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k68s1DQJgXXqHq5RJT2jJSEPe1goszTkeu43FbZ/M/LxDFqmEbyJnikWZiWkpBda3hxP6vpBAKgHUYgqKjNHICwuhbdEC6v9oANtWMHVgJu9uhbwSopg9fzngsi1O5I1wNwPLmd+yTwU4wcCyP075A1UElI2/3iK7irzxVRGaLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kM5pQudW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28E59C4CEF1;
-	Wed, 16 Jul 2025 09:18:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752657522;
-	bh=4BI5blgxXpjJZIpySaa9qC3PiXN1NyUS2KRhcRVnqJI=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=NVlOtRI55IP1SuL3rsxEu3K13vfh152KLigFNnAnJJ1qMhnBAt4SkA8w5t4JL5/fcYJcafVDU3UYxSIKuHtDzT6Fs2jbm2YdJ9UAAuS0Es3t+5234qAcIdzI8W4kDzePLP15HGXYWltI67h4x1+52JHcwDXYuQbrofJk8UiD8bI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=N9udJBz5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DC09C4CEF0;
+	Wed, 16 Jul 2025 09:19:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1752657557;
+	bh=g5M4DpBVQH07/jGuPHNWNcGzZLf3cxeneqrXpulpu2k=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kM5pQudW4A52yW9aIDDsDMXimRq3AbiOUOD9Yx4soAJlOZ1kCMJICp7nPSmvp1IKo
-	 O56G7LggJQZrDooQb1xPcqPmFoQAUqO6C2fOLvULHl+J2Vas8CdOcLd3jMhpxkYsgt
-	 DMvwidUSy1ITR+DUYlPneMqdyno9QF625PzDZPaqxb/ivGw28AVx4DkPskjhTBsqdb
-	 GG/nF0GHJzoMcUmF0oezL0XEyh/IdCgS2y1JL4P9zx7goh41fv8w5hy9qOr1wsoyjy
-	 2Dx4laZs0Dclanor0ugSbSIL+7XszLX0f+swpZ19uZI9gV4klGWIdxUso9nGhJ6Iy/
-	 3LQPq8AgDghvA==
-Date: Wed, 16 Jul 2025 10:18:39 +0100
-From: Simon Horman <horms@kernel.org>
-To: Zqiang <qiang.zhang@linux.dev>
-Cc: oneukum@suse.com, kuba@kernel.org, andrew+netdev@lunn.ch,
-	davem@davemloft.net, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: usb: Make init_satus() return -ENOMEM if alloc
- failed
-Message-ID: <20250716091839.GM721198@horms.kernel.org>
-References: <20250716001524.168110-1-qiang.zhang@linux.dev>
+	b=N9udJBz5nZcxDfwmUXs+fdNV+8yv55UAEnljdTtgpcm3HIpSkcNCQ/BHMyRqHQVDg
+	 Fb73Ax+AWYbI2Z1cWc8TD/nPIvmQ4AaXkLWMvjjo75YB1WVqYgrlLKCHN82+buQhnz
+	 WPQ50+L/T+7uc9ZR7tNamoSv11/VHYfBa09GSIC8=
+Date: Wed, 16 Jul 2025 11:19:15 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: alex.gaynor@gmail.com, dakr@kernel.org, ojeda@kernel.org,
+	rafael@kernel.org, robh@kernel.org, saravanak@google.com,
+	tmgross@umich.edu, a.hindborg@kernel.org, aliceryhl@google.com,
+	bhelgaas@google.com, bjorn3_gh@protonmail.com, boqun.feng@gmail.com,
+	david.m.ertman@intel.com, devicetree@vger.kernel.org,
+	gary@garyguo.net, ira.weiny@intel.com, kwilczynski@kernel.org,
+	lenb@kernel.org, leon@kernel.org, linux-acpi@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+	lossin@kernel.org, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org
+Subject: Re: [PATCH v4 1/3] rust: device_id: split out index support into a
+ separate trait
+Message-ID: <2025071607-theorize-charting-b29f@gregkh>
+References: <20250711040947.1252162-1-fujita.tomonori@gmail.com>
+ <20250711040947.1252162-2-fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,19 +64,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250716001524.168110-1-qiang.zhang@linux.dev>
+In-Reply-To: <20250711040947.1252162-2-fujita.tomonori@gmail.com>
 
-On Wed, Jul 16, 2025 at 08:15:23AM +0800, Zqiang wrote:
-> This commit make init_status() return -ENOMEM, if invoke
-> kmalloc() return failed.
+On Fri, Jul 11, 2025 at 01:09:45PM +0900, FUJITA Tomonori wrote:
+> Introduce a new trait `RawDeviceIdIndex`, which extends `RawDeviceId`
+> to provide support for device ID types that include an index or
+> context field (e.g., `driver_data`). This separates the concerns of
+> layout compatibility and index-based data embedding, and allows
+> `RawDeviceId` to be implemented for types that do not contain a
+> `driver_data` field. Several such structures are defined in
+> include/linux/mod_devicetable.h.
 > 
-> Signed-off-by: Zqiang <qiang.zhang@linux.dev>
+> Refactor `IdArray::new()` into a generic `build()` function, which
+> takes an optional offset. Based on the presence of `RawDeviceIdIndex`,
+> index writing is conditionally enabled. A new `new_without_index()`
+> constructor is also provided for use cases where no index should be
+> written.
+> 
+> This refactoring is a preparation for enabling the PHY abstractions to
+> use the RawDeviceId trait.
+> 
+> The changes to acpi.rs and driver.rs were made by Danilo.
+> 
+> Acked-by: Danilo Krummrich <dakr@kernel.org>
+> Reviewed-by: Trevor Gross <tmgross@umich.edu>
+> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+> ---
 
-Hi,
-
-It seems to me that the code has been structured so that
-this case is not treated as an error, and rather initialisation
-that depends on it is skipped.
-
-Are you sure this change is correct?
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
