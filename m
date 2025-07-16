@@ -1,154 +1,127 @@
-Return-Path: <netdev+bounces-207422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCA25B07199
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 11:26:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8467B071A8
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 11:29:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DA7616D70D
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 09:26:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00F8E3A37E5
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 09:29:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AA6E2F0C78;
-	Wed, 16 Jul 2025 09:26:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3FE4291C0B;
+	Wed, 16 Jul 2025 09:29:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GV8QBgOV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ri1VwvBt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F8842F0059;
-	Wed, 16 Jul 2025 09:26:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BF8B27144B;
+	Wed, 16 Jul 2025 09:29:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752657989; cv=none; b=qJFg1MGkV3UtkEjffvrhw67dmUvYgZwCSlKr8bJmnECMFhrh6mZsFyTCLt1QMtasl/UWmVbxlXiRHUjPkPOpoeHP5Lm93JdGIAlImRLh5w6cjMDoI1dX8xwwqPcRPxH/7q9RaQKPokJnM7psUzJx0agFTXq/izqJNpC5cksQ2+8=
+	t=1752658171; cv=none; b=p/VKeN5eKLHJR0EZvjmqI/ljgkWNvGQqLCMucDP1KuCf/0eSrZXIy4P91D7pSu9wVt1tzmwQVIZvaES2VvkhgLJbnlLawhrLLtMqGHcAxEIAp7j/TKU0LdSKG8wjO1ENQEarRam0oTEZp+c2s6uLIPO4b7iI6ch9hDWT/Mg9NGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752657989; c=relaxed/simple;
-	bh=rZFV7iCiwcCgWnCKhjPZ1zpfN5fAxekeaBpaYqRspxc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bqYfwCzA29e73UvntFaP32QPy2L4dzCL6ZkicygAWDBd4Qb3m8QY+te0jfxZK19zaICAGMehoOErVt8z2/r71omSBxEDQaDz29jAq58+TiXOa6BE6Wc4WS0V+jFPs5NiveMthzcXWMoI94cQqx0vLbS0i3iTot7aa6u3K3rUKsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GV8QBgOV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75ECEC4CEF0;
-	Wed, 16 Jul 2025 09:26:26 +0000 (UTC)
+	s=arc-20240116; t=1752658171; c=relaxed/simple;
+	bh=Q7MpBxHhLYZtgoKpqrLMIgiJmEI6yYKrcfDI0udeLak=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tG74rg1+Qkz9k8q52Nn1stnYsWYNzjl7eo2ez2lVPjueicTfSAMyC4v1oKzh0F2HAGnOB1vM05r1OTma2Y6kU9zaID1e7b8afxoieNjiHmDf62SEaIyZIzEU0fzgZp7qvmIpzyPPPbCJFJD22RQH6G+x/7aXI+g8CX11+OxIO3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ri1VwvBt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CE42C4CEF0;
+	Wed, 16 Jul 2025 09:29:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752657988;
-	bh=rZFV7iCiwcCgWnCKhjPZ1zpfN5fAxekeaBpaYqRspxc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=GV8QBgOVbpAs4HDllMV5uCVc8Pw02E4JwJg9Au3KHZbyiDW+E9qegDcLn8mXH6p1s
-	 jV1ElzA9RiOwwq3eoa+id2OmrJLN6+BEKV2CbSPBW1ClcaVWWNyTFfrTRRUW0ikyWc
-	 5NAoJJ089zojD4qGVqsDsUIJbw2SI5ZkNsvzK0W9L47Fz9v5HOLtmTGJu7hgfJ0cJp
-	 w09LGsjhtiT+DG2kdXS8t25D15W4/smfKkrhLT8HxVsIYQZN+d+1o8r3NW6AnbCdFu
-	 EN9SWpOz7qD4cHtwLuZa3c4LUE7koGsd0THT3xzGjcM2+coQyzQM5zEP57HEtpiZ/z
-	 5i3CZnvLd9V2g==
-Message-ID: <d0c8c1ce-5bb2-45f5-9d7f-fac734dcfe31@kernel.org>
-Date: Wed, 16 Jul 2025 11:26:24 +0200
+	s=k20201202; t=1752658171;
+	bh=Q7MpBxHhLYZtgoKpqrLMIgiJmEI6yYKrcfDI0udeLak=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ri1VwvBt4b1jw1HFVI0j6JpA2cT5+8zcWOFB4Je55HaxDf+A0OCAVe0x/hN78k13j
+	 o9AYzcsJOHRNJAqcKCJ15m8y9f/vfEAMG9AFVSciJA41/NkMWeiomonFFW6TvpUK72
+	 Rp8u8FWgo89DGhZuGx2p0ggiAv5PzbaLne6O3Yh1xwFmYJMuUyYXseztgJ2Szg2kFj
+	 0Le9/JbY7uvORHda4VcSCtOSapTTDySOaAu/6dkTsffCnetnMwOqZ+Cm5uJrPHVxFR
+	 k8hiTQYnNXw+6QlkKBKSB5EkSy9CA4+sBz26le2wHZR0+n/67wgtj4yaVi7v818AGT
+	 FI216dOBpuotg==
+Date: Wed, 16 Jul 2025 10:29:27 +0100
+From: Simon Horman <horms@kernel.org>
+To: Li Tian <litian@redhat.com>
+Cc: netdev@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Dexuan Cui <decui@microsoft.com>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	Long Li <longli@microsoft.com>, Xin Long <lucien.xin@gmail.com>
+Subject: Re: [PATCH v3] hv_netvsc: Set VF priv_flags to IFF_NO_ADDRCONF
+ before open to prevent IPv6 addrconf
+Message-ID: <20250716092927.GO721198@horms.kernel.org>
+References: <20250716002607.4927-1-litian@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next V4] net: track pfmemalloc drops via
- SKB_DROP_REASON_PFMEMALLOC
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
- Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
- kernel-team@cloudflare.com, mfleming@cloudflare.com
-References: <175146472829.1363787.9293177520571232738.stgit@firesoul>
- <20250707174346.2211c46a@kernel.org>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20250707174346.2211c46a@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250716002607.4927-1-litian@redhat.com>
 
++ Xin Long
 
+On Wed, Jul 16, 2025 at 08:26:05AM +0800, Li Tian wrote:
+> Set an additional flag IFF_NO_ADDRCONF to prevent ipv6 addrconf.
+> 
+> Commit under Fixes added a new flag change that was not made
+> to hv_netvsc resulting in the VF being assinged an IPv6.
+> 
+> Fixes: 8a321cf7becc ("net: add IFF_NO_ADDRCONF and use it in bonding to prevent ipv6 addrconf")
+> Suggested-by: Cathy Avery <cavery@redhat.com>
+> Signed-off-by: Li Tian <litian@redhat.com>
+> ---
+> v3:
+>   - only fixes commit message.
+> v2: https://lore.kernel.org/netdev/20250710024603.10162-1-litian@redhat.com/
+>   - instead of replacing flag, add it.
+> v1: https://lore.kernel.org/netdev/20250710024603.10162-1-litian@redhat.com/
+> ---
+>  drivers/net/hyperv/netvsc_drv.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 
-On 08/07/2025 02.43, Jakub Kicinski wrote:
-> On Wed, 02 Jul 2025 15:59:19 +0200 Jesper Dangaard Brouer wrote:
->> Add a new SKB drop reason (SKB_DROP_REASON_PFMEMALLOC) to track packets
->> dropped due to memory pressure. In production environments, we've observed
->> memory exhaustion reported by memory layer stack traces, but these drops
->> were not properly tracked in the SKB drop reason infrastructure.
->>
->> While most network code paths now properly report pfmemalloc drops, some
->> protocol-specific socket implementations still use sk_filter() without
->> drop reason tracking:
->> - Bluetooth L2CAP sockets
->> - CAIF sockets
->> - IUCV sockets
->> - Netlink sockets
->> - SCTP sockets
->> - Unix domain sockets
-> 
->> @@ -1030,10 +1030,8 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
->>   	}
->>   
->>   	if (tfile->socket.sk->sk_filter &&
->> -	    sk_filter(tfile->socket.sk, skb)) {
->> -		drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
->> +	    (sk_filter_reason(tfile->socket.sk, skb, &drop_reason)))
-> 
-> why the outside brackets?
-> 
+Hi Li Tian,
 
-Good catch, yes the brackets are unnecessary, will remove in V5.
+Thanks for addressing earlier feedback.
 
->> @@ -591,6 +592,10 @@ enum skb_drop_reason {
->>   	 * non conform CAN-XL frame (or device is unable to receive CAN frames)
->>   	 */
->>   	SKB_DROP_REASON_CANXL_RX_INVALID_FRAME,
->> +	/**
->> +	 * @SKB_DROP_REASON_PFMEMALLOC: dropped when under memory pressure
-> 
-> I guess kinda, but in practice not very precise?
-> 
-> How about: packet allocated from memory reserve reached a path or
-> socket not eligible for use of memory reserves.
-> 
+I don't think you need to repost because of this, but for future reference:
 
-I like it, this is a good description, thanks! :-)
+1. Because this is a fix for a commit that is present in net
+   it should be targeted at that tree.
 
-> I could be misremembering the meaning of "memory reserve" TBH.
-> 
->> +	 */
->> +	SKB_DROP_REASON_PFMEMALLOC,
->>   	/**
->>   	 * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
->>   	 * shouldn't be used as a real 'reason' - only for tracing code gen
-> 
->> -	if (unlikely(sk_add_backlog(sk, skb, limit))) {
->> +	if (unlikely((err = sk_add_backlog(sk, skb, limit)))) {
-> 
-> I understand the else if () case but here you can simply:
-> 
-> 	err = sk_add_backlog(sk, skb, limit);
-> 	if (unlikely(err))
+   Subject: [PATCH net vX] ...
 
-Agreed, will fix in V5.
+2. Please use get_maintainers.pl this.patch to generate the CC list. In
+   this case Xin Long (now CCed) should be included as he is the author of the
+   patch cited in the Fixes tag.
 
-> no need to make checkpatch upset.
+   b4 can help you with this and other aspects of patch management.
+
 > 
->> @@ -162,7 +163,7 @@ static int rose_state3_machine(struct sock *sk, struct sk_buff *skb, int framety
->>   		rose_frames_acked(sk, nr);
->>   		if (ns == rose->vr) {
->>   			rose_start_idletimer(sk);
->> -			if (sk_filter_trim_cap(sk, skb, ROSE_MIN_LEN) == 0 &&
->> +			if (sk_filter_trim_cap(sk, skb, ROSE_MIN_LEN, &dr) == 0 &&
+> diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
+> index c41a025c66f0..8be9bce66a4e 100644
+> --- a/drivers/net/hyperv/netvsc_drv.c
+> +++ b/drivers/net/hyperv/netvsc_drv.c
+> @@ -2317,8 +2317,11 @@ static int netvsc_prepare_bonding(struct net_device *vf_netdev)
+>  	if (!ndev)
+>  		return NOTIFY_DONE;
+>  
+> -	/* set slave flag before open to prevent IPv6 addrconf */
+> +	/* Set slave flag and no addrconf flag before open
+> +	 * to prevent IPv6 addrconf.
+> +	 */
+>  	vf_netdev->flags |= IFF_SLAVE;
+> +	vf_netdev->priv_flags |= IFF_NO_ADDRCONF;
+>  	return NOTIFY_DONE;
+>  }
+>  
+> -- 
+> 2.50.0
 > 
-> let's switch to negation rather than comparing to 0 while at it?
-> otherwise we run over 80 chars
 > 
-
-Sure I will adjust code.
-
->>   			    __sock_queue_rcv_skb(sk, skb) == 0) {
->>   				rose->vr = (rose->vr + 1) % ROSE_MODULUS;
->>   				queued = 1;
-
---Jesper
 
