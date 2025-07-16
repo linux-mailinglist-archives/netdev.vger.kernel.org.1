@@ -1,190 +1,200 @@
-Return-Path: <netdev+bounces-207506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A685B078BC
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 16:57:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06161B078F3
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 17:02:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 673E43A475B
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 14:56:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89A9516B98F
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 15:01:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DE85264A60;
-	Wed, 16 Jul 2025 14:55:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98FAF1CAA7B;
+	Wed, 16 Jul 2025 15:01:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n1qYKzn0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I8OyjWnS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465B4199EAD;
-	Wed, 16 Jul 2025 14:55:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F34101A262D;
+	Wed, 16 Jul 2025 15:01:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752677730; cv=none; b=kyCVrH6mWT2ERHc+4ks2i/ruJV0DeaWilROvElMzsrR66FgHloFtR8Hauuft5xwbYrEXMzj7YXGW9L9tqmfIik4WFfOGpUlgeXKcMqdxX1T8sTP8+HLp/HBSO1h6MwP2OaH1EamypmNYVYbkwmYqrMz8peG2D/Nwh5hkaXZax0M=
+	t=1752678104; cv=none; b=bNAXuKK64yZ3LEqioiX9x6hkuO4OxT4f2d2TlYtf2tlSMEj7x8qQNqrnGJ+HGcoMW0BSADRZWMaj9seuL+O7a5rvV1Gk0E/Klm1NPSh+CsrBYUoZaAdCcvooijRDgvDqyY3WhuJfmR/GCjcST8lUjsRxkcVVbeChOPhP3ZXoPQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752677730; c=relaxed/simple;
-	bh=SSReJtbBfV0veA8X/z68WJ/t9z1BMBY8PzraC8gu5yU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YJ/lZPEz3i4An0Uk5TQUWg36DBj2oxqtcG5eJ9SQtNFkIOcKCilRGdkgKpW8ZkM6rql9oeum8pGOiu4rG3J60pehOK9tq0RLKAq605gfLVrMR5IBKTMOdvQkKE3fkVSeQBW6Jg7wHvvO/e0yPTnbX4Gxp3umNiipLU0ZMK1D5RY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n1qYKzn0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5CF0C4CEE7;
-	Wed, 16 Jul 2025 14:55:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752677729;
-	bh=SSReJtbBfV0veA8X/z68WJ/t9z1BMBY8PzraC8gu5yU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=n1qYKzn03Wc9+yFw8JqV8ahTpJfCeQG/DtQ5e2WZ88DPzmzCRj+ykJSkoeW+SpwS7
-	 JZEDMBT4m7b+zEYGViiu2FcdKozcNKUlVr6w1O8VHOn+eOp0JCcazI01fzJYKP/Xc3
-	 MOGB8czviloprHFvxcq2yoBfc4y0ebCHr778FkCfINmVk5/CaRqLp1PufSbRz4ZKEc
-	 CRGiwrDGavzrXSO8yV/olz/dVVkZdgueCNxwNY2l6BoEurYqxINmsamtC5rgeKTcFv
-	 ZBkHRH3l5k1lHEI+G4O7ZJ0+67vIoGFQ48lRwkkONFTQvaFBOG642e1yUrBb62ajxE
-	 j9tSK4qF1O7XA==
-Message-ID: <ae6d333a-f3b2-4463-b930-b4caf56b39f8@kernel.org>
-Date: Wed, 16 Jul 2025 16:55:21 +0200
+	s=arc-20240116; t=1752678104; c=relaxed/simple;
+	bh=m08LelpiD7qCsZ8agtHnu+CRQsWa05JZJpY5kvyJtqA=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=VAPtr9aoWf7uoTsPzDQrTD6x42rJ1k9mPMi10NTX1cjP6pLvk3txCQhi/Xf0iH0bG0gN9rOrgRJLlxtXstoSAIh4lV59n2ZGYcV5HZR3b+C136L314uxVr/Y2yp+mz+6rm87UCVA/cdS0EW2dzFZ5YpeHrUyWkoM1rFPWP7J09g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I8OyjWnS; arc=none smtp.client-ip=209.85.128.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-7183dae66b0so5799167b3.3;
+        Wed, 16 Jul 2025 08:01:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752678102; x=1753282902; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hEd+x+bDp5sBny4LSdoGr3AA4SuCj6wfSFdgKw9fbdY=;
+        b=I8OyjWnSsBUEg3QNrhFmltqfX63EzDL0+Fu1fYZJGxJGo36W7enUCSGtmU5MpOSvgC
+         otzLix8MXz/8O6zIELdLD5wsgjf91hlFG9QOJ2dllrPe6yGYi66HOnCiwQOa/0JPG6WX
+         L0guYyzLUz8DxbazSVnJbRD91uP6JTGH2B+XhRoh+Ys4KcBnkvrSvBLQqrDSNE39DqX8
+         8HTHD8+rb6aU/yGI6153vbb6SVg6r8Hvfw2Lu0yTYAMzzoQnOlsKQ7r2OtArZlmeT7Rb
+         CaefVqOWCGVuHdHAq5lT1HOXb09o34KkmRWvAE3UuufG+dqvI/M+v17rB2l6pJ57srk6
+         tgkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752678102; x=1753282902;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=hEd+x+bDp5sBny4LSdoGr3AA4SuCj6wfSFdgKw9fbdY=;
+        b=RXezsUCdeL1ozE8XP69Kgwja4cnzMdZ6K3n+vjPDHLbaPd6IPnWgo3s4MAa2rnQgU7
+         F7kLQ0575t9r21asPgqqbjfRJgc5iciE+dvVvw5nHcF8NFpWJxDorqJWoeTf8xa4R/n/
+         34cMDBQkgVDyv91ZHbX/UQ08ZoxiEATQOSTvjh8O4T6seR7P5G6IDL/qsEcePu6PmjNG
+         +MVFO99CfOXvRkqMDF2Yi92bFvXzCPY37lLCHCfVtrdecUUcbliE54DGH+k634iEa5Yd
+         ITmGSRj5ptEbmK39Uh/e0TPNUdFc0lLCyVH2HWheIxwAOZxt88UH5UajULlqdzEispFy
+         r9AQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWcAl4sxWlGL26x4+IlCnrQOMFCiVqyk8uuCkzwACAqqIDFmaYaAmYazgYBqZruEzzTbokHtWU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx++duqUHvk4RY4wgcGAi2+GJcYPy6vf0TC76fOyQZS9J7+gr0O
+	dwDLX1rfjnc7O36UNAbYEA8SRv3n0/mJknjYGzRkdHIZRB+4P/T1KH0R
+X-Gm-Gg: ASbGnctWKBWdzLgdwJk7wHPcULPAZQfQOYBItO8kXrCAGvawfJ3QC8fFG2lFUtbRrPT
+	6bmriqR7XrEK/QBv00BqzQYVyXFdWtoqzhhZBzlwE9Yw0RB7Lrdna9sOnMfBVvDONGwYCdg5lvo
+	X59Z6MP+DU8ZZlrTFhfpJuYLkZizi4GxOMOqIOtHGbIssa0FrsCElOlsg984hQwttQFVYLRlIu9
+	bTCnyT7BBduFIZihHIMme7qRpCiU2JObZAfF7buiR9xYmBTTHPdB/Awaf1ect1cBxpRdTCM+z09
+	i6XqVJq2ZgTpQesVvFkPZp0VAYEUCKVV1r9dwDYkzAN9CyykvbiilBVeNvSpOokK5l2G4+/3Frx
+	x7KJ3e69RbrUIxs/ULfphcLb0IZlHFwxe0ekwPQaK9NA97yqH/Us4XxwIeaivHuZM91Qhiw==
+X-Google-Smtp-Source: AGHT+IGEqfrWSmCPYbBS9A8DJKYb73+8Tdg6N1+UfshIY4kL5pXhCzN/lD30SYRwq+428qUOWxJLUw==
+X-Received: by 2002:a05:690c:968c:b0:70a:192d:103 with SMTP id 00721157ae682-71835189457mr50908777b3.28.1752678101714;
+        Wed, 16 Jul 2025 08:01:41 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-71845120353sm756587b3.65.2025.07.16.08.01.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Jul 2025 08:01:40 -0700 (PDT)
+Date: Wed, 16 Jul 2025 11:01:40 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Felix Fietkau <nbd@nbd.name>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ netdev@vger.kernel.org, 
+ Eric Dumazet <edumazet@google.com>, 
+ Neal Cardwell <ncardwell@google.com>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ David Ahern <dsahern@kernel.org>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Richard Gobert <richardbgobert@gmail.com>
+Cc: linux-kernel@vger.kernel.org
+Message-ID: <6877bed46f3a4_6ce6d29469@willemb.c.googlers.com.notmuch>
+In-Reply-To: <ba71e590-6751-49c1-85c9-97e5dc34ee3c@nbd.name>
+References: <20250705150622.10699-1-nbd@nbd.name>
+ <686a7e07728fc_3aa654294f9@willemb.c.googlers.com.notmuch>
+ <ba71e590-6751-49c1-85c9-97e5dc34ee3c@nbd.name>
+Subject: Re: [PATCH net] net: fix segmentation after TCP/UDP fraglist GRO
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net v2 0/2] selftests: mptcp: connect: cover alt modes
-Content-Language: en-GB, fr-BE
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Christoph Paasch <cpaasch@openai.com>, Davide Caratti <dcaratti@redhat.com>,
- Florian Westphal <fw@strlen.de>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- stable@vger.kernel.org
-References: <20250715-net-mptcp-sft-connect-alt-v2-0-8230ddd82454@kernel.org>
- <20250715185308.2ad30691@kernel.org> <20250716072602.386a8963@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20250716072602.386a8963@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hi Jakub,
-
-On 16/07/2025 16:26, Jakub Kicinski wrote:
-> On Tue, 15 Jul 2025 18:53:08 -0700 Jakub Kicinski wrote:
->> On Tue, 15 Jul 2025 20:43:27 +0200 Matthieu Baerts (NGI0) wrote:
->>> mptcp_connect.sh can be executed manually with "-m <MODE>" and "-C" to
->>> make sure everything works as expected when using "mmap" and "sendfile"
->>> modes instead of "poll", and with the MPTCP checksum support.
->>>
->>> These modes should be validated, but they are not when the selftests are
->>> executed via the kselftest helpers. It means that most CIs validating
->>> these selftests, like NIPA for the net development trees and LKFT for
->>> the stable ones, are not covering these modes.
->>>
->>> To fix that, new test programs have been added, simply calling
->>> mptcp_connect.sh with the right parameters.
->>>
->>> The first patch can be backported up to v5.6, and the second one up to
->>> v5.14.  
->>
->> Looks like the failures that Paolo flagged yesterday:
->>
->> https://lore.kernel.org/all/a7a89aa2-7354-42c7-8219-99a3cafd3b33@redhat.com/
->>
->> are back as soon as this hit NIPA :(
->>
->> https://netdev.bots.linux.dev/contest.html?branch=net-next-2025-07-16--00-00&executor=vmksft-mptcp&pw-n=0&pass=0
->>
->> No idea why TBH, the tests run sequentially and connect.sh run before
->> any of the new ones.
-
-And just to be sure, no CPU or IO overload at that moment? I didn't see
-such errors reported by our CI, but I can try to reproduce them locally
-in different conditions.
-
->> I'm gonna leave it in patchwork in case the next run is clean,
->> please use pw-bot to discard them if they keep failing.
-
-Oops, sorry I forgot to reply: when I checked in the morning, the last
-two builds were clean. I wanted to check the next one, then I forgot :)
-
-> It failed again on the latest run, in a somewhat more concerning way :(
+Felix Fietkau wrote:
+> On 06.07.25 15:45, Willem de Bruijn wrote:
+> > Felix Fietkau wrote:
+> >> Since "net: gro: use cb instead of skb->network_header", the skb network
+> >> header is no longer set in the GRO path.
+> >> This breaks fraglist segmentation, which relies on ip_hdr()/tcp_hdr()
+> > 
+> > Only ip_hdr is in scope.
+> > 
+> > Reviewing TCP and UDP GSO, tcp_hdr/transport header is used also
+> > outside segment list. Non segment list GSO also uses ip_hdr in case
+> > pseudo checksum needs to be set.
+> > 
+> > The GSO code is called with skb->data at the relevant header, so L4
+> > helpers are not strictly needed. The main issue is that data will be
+> > at the L4 header, and some GSO code also needs to see the IP header
+> > (e.g., for aforementioned pseudo checksum calculation).
 > 
-> # (duration 30279ms) [FAIL] file received by server does not match (in, out):
-> # -rw------- 1 root root 5171914 Jul 16 05:24 /tmp/tmp.W2c96hxSIz
-> # Trailing bytes are: 
-> # w,ѐ)-rw------- 1 root root 5166208 Jul 16 05:24 /tmp/tmp.s33PNcrN6M
-> # Trailing bytes are: 
-> # (<v /&^<rnFsaC7INFO: with peek mode: saveAfterPeek
+> I just spent some time reviewing the code in order to understand how to 
+> fix it properly, and I still don't fully understand what you wrote 
+> above, especially the part related to "Non segment list GSO".
 > 
-> https://netdev-3.bots.linux.dev/vmksft-mptcp/results/211121/4-mptcp-connect-sh/stdout
+> The issue that I'm trying to fix is that the skb network header is wrong 
+> for all skbs stored in the frag_list of the first skb.
+> The main skb is fine, since the offsets are handled by the network 
+> stack. For all the extra fragment skbs, the offsets are unset because we 
+> bypassed the part of the stack that sets them.
+> 
+> Since non-segment-list GSO skbs don't carry extra frag_list skbs, I 
+> don't see how they can share the same issue.
 
-I see, the error can be a bit scary :)
-
-If I'm not mistaken, there was a poll timeout error before. When it is
-detected, the test is stopped. After each test, even in case of errors,
-the received file is compared with the sending one. So here, this
-concerning error is expected.
-
-Anyway, even if the errors are not caused by this series, I think it is
-better to delay these patches while we are investigating that:
-
-pw-bot: cr
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
 
-> BTW feeding the random data into hexdump-like formatter seems
-> advisable? :P
+Good point.
 
-It is just to check that the CIs can correctly parse random data :-D
+This patch's approach of setting the field in the gro_receive call of
+the inner L4 header (and not the UDP GRO code for the outer encap UDP
+header) is definitely preferable over having to iterate over the list
+of frag_list skbs again later.
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+The only issue is whether the setting is correct and safe in case of
+tunnels.
+
+On rereading, I think it is. Hence the Reviewed-by tag.
+
+
+
+That case is complex enough that ideally we would have a testcase to
+cover it. To be clear, I definitely don't mean to ask you to write
+that. Just a note to self for the future and/or for anyone whose
+workload actually depends on tunneled packets with fraglist GSO (which
+is not me, actually).
+
+The main fix in Richard's series was to have the GRO complete code no
+longer depend on skb_network_header. Whether or not skb_network_header
+is also still set is immaterial to the fix. We just assumed that
+nothing besides that GRO complete code even referenced it.
+
+
+Setting skb_network_offset unconditionally would not be correct for
+the head_skb in the presence of tunneling. Because GSO handling of
+tunneling requires this to be correctly set in the inner fields:
+
+In __skb_udp_tunnel_segment:
+
+        /* setup inner skb. */
+        skb->encapsulation = 0;
+        SKB_GSO_CB(skb)->encap_level = 0;
+        __skb_pull(skb, tnl_hlen);
+        skb_reset_mac_header(skb);
+        skb_set_network_header(skb, skb_inner_network_offset(skb));
+        skb_set_transport_header(skb, skb_inner_transport_offset(skb));
+
+After this tunnel GSO handler, the rest of the GSO stack no longer
+sees the tunnel header and treats the packet as unencapsulated.
+
+The fraglist code is only relevant for the innermost L4 transport
+header. Since nothing touches the frag_list skb headers between GRO
+receive, and L4 GSO fraglist segment handlers __tcp?_gso_segment_list
+and __udpv?_gso_segment_list_csum, it is fine to have network offset
+set, without having to handle encapsulation explicitly.
+
+
+> If I misread what you wrote, please point me at the relevant code 
+> context that I'm missing.
+> 
+> Thanks,
+> 
+> - Felix
+
 
 
