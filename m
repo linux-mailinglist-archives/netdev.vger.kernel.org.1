@@ -1,183 +1,152 @@
-Return-Path: <netdev+bounces-207461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE6DBB07640
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 14:53:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5D38B07695
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 15:06:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A7181C24CA8
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 12:53:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE8123ACB7D
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 13:06:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35A6F26E6EC;
-	Wed, 16 Jul 2025 12:53:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB3562F2708;
+	Wed, 16 Jul 2025 13:06:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cs4XFyE0"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="suI7SbnF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91EB1846F;
-	Wed, 16 Jul 2025 12:53:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0009A290D95
+	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 13:06:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752670392; cv=none; b=j6BIRBBKuMhr0cyaU27ru0In1bphyi+2C8HrueVPe8caUccoKD4A7kjP1I/vcAs3SKoK4WLmnYt3wer3xvmd4jrno6lZys7hDoe28VoqzE79Skr+8ZA1dlTFVclnHy9RaKDCu1Kt53rwclHaIz90htBSNlz2kUjkXeass7XK4RU=
+	t=1752671201; cv=none; b=lRwwU+JOAXgO/F0X2Ypm1Ktz8k26doazG6/ZcyWAlaaSYlb7X4V6AoeYwcZX14wBOH6eGZ2eI0NiX2MjQI9k225nVCG2XaxGMoXnb+krx3aq4zf/azvyirLdDHyJG1QyFrvtedU+DXvAZHxr35yQFmtf894nDWtLsWnkWrBGBns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752670392; c=relaxed/simple;
-	bh=uoEsauAVMPq4TH9wQPbSFLfb7iwluzbXJkbvJwU3CgU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NIpddjyPx6RfE8RtvqXOhikp1TyyRcXwq1rThP1fMLAVGY5lR712x1YWd4h+VkNfLMi6uf424XhU3O/ZVfDcvay/Jt8OjX07A9uJGXAr8JP1R1EtorjsJ+c3tN8rbUDy9sO5cmxrppOqoNhF6COUgRJdp0Td8liQIPM4X4XTWvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cs4XFyE0; arc=none smtp.client-ip=209.85.222.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7e1f3b95449so95524885a.1;
-        Wed, 16 Jul 2025 05:53:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752670389; x=1753275189; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aX1faiI+i8OURiPK+ljiykpWuc4XOaqYSOwyCJ/lxdg=;
-        b=cs4XFyE0nj4Q9EO4TlZ8e73XkYghftXdNdj8GRYqDm1naxZ+i7/hb8Cni4E/8Q+9lw
-         xylebAdC/3x9dK+LIjEIqxvXv4xVgehxKwtK+gk/FhIckrPx4mzFObU3g7mYSRBB5WGX
-         WcqFr6QmVviGGB+hHJCsQKLLLVBr9hQ0r5ZzFDCFuM3CRHFA6LWa2jDZy5G4TbDZU45m
-         h5cydLxSw3kqhORztE7ucjK248wloEHM7TZhfe7hrAI6pXOz1V/+Dw7OtUu/TkJW0B+G
-         HEhLoz7AhnpW7iJZphOlT7fUzV9iBbh1Ir/Adsm+hI1FW+Wb6OhjweCBual9G+zrbklW
-         6lmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752670389; x=1753275189;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aX1faiI+i8OURiPK+ljiykpWuc4XOaqYSOwyCJ/lxdg=;
-        b=IHZvqJJArf3XLSCU7uawjsYpafVWwPpooUBhGpYDLzsT4v1c8fqlb/8TyQez32H2CO
-         KEfcTrManZnEHa5IwcVsgL4vhLzRgXcOCBPDN1KFqDgZojzpvpwA1UX0chJ/sLJP18Xo
-         U/Ma3sKxZbCEf4k7xKYzwgzhJEc9AxuCp2cZNER/x8Pp/TiGDOzXHGvc84m4G8hFyp4v
-         noBZf85AtDK4dU8aQycceNoHoDLfH9W7MxRJaeNZyQ1kXTNqwH3OmgHhg1dpfECGMwCp
-         OtE05cm1KApDbMXsCCRtNpo1JM7Fb3Y2uWy+AOSO1VrPwzlfzSrKU837dmFbqrzay+h3
-         nhFA==
-X-Forwarded-Encrypted: i=1; AJvYcCVUEiXu/+wh19G8RcKgdFdcYs2Zc1IPaKK49kMi9+WORzpavQps9xPZz+ZLb71Y1H+aKsmNBaEx@vger.kernel.org, AJvYcCWniWetwjZ1yj0h1rjgmr660dls8UPKjlCvWuSn02/tCL7S1l9ajlSeLqI2vaesVWD8SShsxUjNcO6Q178=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUtANb0V+tKSYR9mD1ioQTvMcVe7y08ZKaRsqK6J+P0PddltPW
-	fGQdgCLpBfsWQ3fVIHDnsfsoY+eitiMSKISk9rLKz4JduDKH/xYKdBz3E61PPCb6sTrdbaIDmfa
-	yPG/MeYIdccdc9MJi1DtsqEDXt/rMDoM=
-X-Gm-Gg: ASbGncsG0k28X6igpxh4u528PcJr7GN1ZGLnu0ItR8BVyC8E5t/l+UE5/Uu+5s4iVlF
-	Iy4wtQnEzRFxzAGCBjY0iainbbv+gd90qxzVayQrClRSRo3YZFQETkAKYUGj9a82Ng1ebaPMAKL
-	LM28pwpTwymCgZpA5TwKrx96NlCjnw+/Sn8HSisK3tVVB8bUd5c2/h9AzTdEnw29BxaWO6gyRUX
-	54tbZ2nsxPe8tYJX2QesCmwEmAvwKtHMcM8lBl+ABdgSTkt49Qw
-X-Google-Smtp-Source: AGHT+IEGvTRbwNwmUtHoJflO3qdAPSjfdGRUFAFajFyxo8TDC4VY9CMmTHxTTeXuWymwqdIx3SKPBISSDyVxSMrtTdc=
-X-Received: by 2002:a05:620a:1913:b0:7ce:ea9d:5967 with SMTP id
- af79cd13be357-7e337a4c9ffmr1023019985a.15.1752670389041; Wed, 16 Jul 2025
- 05:53:09 -0700 (PDT)
+	s=arc-20240116; t=1752671201; c=relaxed/simple;
+	bh=FFprpTDgpxVkV1oUIt6mRMcDCCvCi3FWjUtBxN0SDFE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tNxckuN22fygkq9aOunvuOEq152+jxG3fIsUQ9l+mi+ebv/eYA+/bRAxTeYP7J8urVRK15wtwlm7kYXsCpYbfqCqfMgMXTnjHADaczI8NTGyBbQmOlo2xAxLd3saI0cw8l1txcCzBMz8HAB3mezCBB6/UqOfENa6ij69BP3hrEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=suI7SbnF; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752671187;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FFprpTDgpxVkV1oUIt6mRMcDCCvCi3FWjUtBxN0SDFE=;
+	b=suI7SbnFGXn4ne1XyK2dgLnzSV11B5f2wH263FrVDwxEbxe5Pj5PU30YUCWCMEj3ZJ6h7q
+	xnOWyQ9IpOaeFnzTG5ZNeQr5gyU7a/GvW4HxIGLZMp9W/5Lynd3zekMWiZT7jW1xKuhbo3
+	qpZCsP/J75bEKlRrRTYq9Fx9Nm4xlck=
+From: Menglong Dong <menglong.dong@linux.dev>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Menglong Dong <menglong8.dong@gmail.com>,
+ Steven Rostedt <rostedt@goodmis.org>, Jiri Olsa <jolsa@kernel.org>,
+ bpf <bpf@vger.kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+ Martin KaFai Lau <martin.lau@linux.dev>,
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ LKML <linux-kernel@vger.kernel.org>,
+ Network Development <netdev@vger.kernel.org>
+Subject:
+ Re: [PATCH bpf-next v2 02/18] x86,bpf: add bpf_global_caller for global
+ trampoline
+Date: Wed, 16 Jul 2025 21:05:25 +0800
+Message-ID: <4737114.cEBGB3zze1@7940hx>
+In-Reply-To:
+ <CAADnVQ+7NhegoZGHkiRyNO8ywks3ssPzQd6ipQzumZsWUHJALg@mail.gmail.com>
+References:
+ <20250703121521.1874196-1-dongml2@chinatelecom.cn>
+ <45f4d349-7b08-45d3-9bec-3ab75217f9b6@linux.dev>
+ <CAADnVQ+7NhegoZGHkiRyNO8ywks3ssPzQd6ipQzumZsWUHJALg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CANZ3JQRRiOdtfQJoP9QM=6LS1Jto8PGBGw6y7-TL=BcnzHQn1Q@mail.gmail.com>
- <20250714181032.GS721198@horms.kernel.org> <db65ea9a-7e23-48b9-a05a-cdd98c084598@intel.com>
- <20250716083731.GI721198@horms.kernel.org>
-In-Reply-To: <20250716083731.GI721198@horms.kernel.org>
-From: Wang Haoran <haoranwangsec@gmail.com>
-Date: Wed, 16 Jul 2025 20:52:57 +0800
-X-Gm-Features: Ac12FXxEvuscnPgDL-cFUWDQ_ZsHTjZIFXXpKL-UAfG1Wc84wxb5I-RyOB-dbpc
-Message-ID: <CANZ3JQRwO=4u24Y17cP3byP8mS9VOP5g=sy_Ch_g0xKSDJLhKA@mail.gmail.com>
-Subject: Re: We found a bug in i40e_debugfs.c for the latest linux
-To: Simon Horman <horms@kernel.org>
-Cc: Jacob Keller <jacob.e.keller@intel.com>, anthony.l.nguyen@intel.com, 
-	przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="nextPart5145802.0VBMTVartN";
+ micalg="pgp-sha512"; protocol="application/pgp-signature"
+X-Migadu-Flow: FLOW_OUT
+
+--nextPart5145802.0VBMTVartN
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"; protected-headers="v1"
+From: Menglong Dong <menglong.dong@linux.dev>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 16 Jul 2025 21:05:25 +0800
+Message-ID: <4737114.cEBGB3zze1@7940hx>
+MIME-Version: 1.0
 
-Thanks for the clarification regarding i40e_dbg_command_buf.
-
-Please let me know if you'd like me to submit a patch to
-remove this interface, or to replace snprintf() with scnprintf().
-
-
-
-
-
-Simon Horman <horms@kernel.org> =E4=BA=8E2025=E5=B9=B47=E6=9C=8816=E6=97=A5=
-=E5=91=A8=E4=B8=89 16:37=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Tue, Jul 15, 2025 at 10:12:43AM -0700, Jacob Keller wrote:
+On Wednesday, July 16, 2025 12:35 AM Alexei Starovoitov <alexei.starovoitov=
+@gmail.com> write:
+> On Tue, Jul 15, 2025 at 1:37=E2=80=AFAM Menglong Dong <menglong.dong@linu=
+x.dev> wrote:
 > >
 > >
-> > On 7/14/2025 11:10 AM, Simon Horman wrote:
-> > > On Thu, Jul 10, 2025 at 10:14:18AM +0800, Wang Haoran wrote:
-> > >> Hi, my name is Wang Haoran. We found a bug in the
-> > >> i40e_dbg_command_read function located in
-> > >> drivers/net/ethernet/intel/i40e/i40e_debugfs.c in the latest Linux
-> > >> kernel (version 6.15.5).
-> > >> The buffer "i40e_dbg_command_buf" has a size of 256. When formatted
-> > >> together with the network device name (name), a newline character, a=
-nd
-> > >> a null terminator, the total formatted string length may exceed the
-> > >> buffer size of 256 bytes.
-> > >> Since "snprintf" returns the total number of bytes that would have
-> > >> been written (the length of  "%s: %s\n" ), this value may exceed the
-> > >> buffer length passed to copy_to_user(), this will ultimatly cause
-> > >> function "copy_to_user" report a buffer overflow error.
-> > >> Replacing snprintf with scnprintf ensures the return value never
-> > >> exceeds the specified buffer size, preventing such issues.
-> > >
-> > > Thanks Wang Haoran.
-> > >
-> > > I agree that using scnprintf() is a better choice here than snprintf(=
-).
-> > >
-> > > But it is not clear to me that this is a bug.
-> > >
-> > > I see that i40e_dbg_command_buf is initialised to be the
-> > > empty string. And I don't see it's contents being updated.
-> > >
-> > > While ->name should be no longer than IFNAMSIZ - 1 (=3D15) bytes long=
-,
-> > > excluding the trailing '\0'.
-> > >
-> > > If so, the string formatted by the line below should always
-> > > comfortably fit within buf_size (256 bytes).
-> > >
+> > On 7/15/25 10:25, Alexei Starovoitov wrote:
+[......]
 > >
-> > the string used to be "hello world" back in the day, but that got
-> > removed. I think it was supposed to be some sort of canary to indicate
-> > the driver interface was working. I really don't understand the logic o=
-f
-> > these buffers as they're *never* used. (I even checked some of our
-> > out-of-tree releases to see if there was a use there for some reason..
-> > nope.)
->
-> Thanks for looking into this.  FWIIW, I was also confused about the
-> intention of the code.
->
-> > We can probably just drop the i40e_dbg_command_buf (and similarly the
-> > i40e_netdev_command_buf) and save ~512K wasted space from the driver
-> > binary. I suppose we could use scnprintf here as well in the off chance
-> > that netdev->name is >256B somehow.
->
-> I think that using scnprintf() over snprintf() is a good practice.
-> Even if there is no bug.
->
-> I also think saving ~512K is a good idea.
->
-> > Or possibly we just drop the ability to read from these command files,
-> > since their entire purpose is to enable the debug interface and reading
-> > does nothing except return "<netdev name>: " right now. It doesn't ever
-> > return data, and there are other ways to get the netdev name than
-> > reading from this command file...
->
-> This seems best to me.  Because we can see that this code, which appears =
-to
-> have minimal utility, does have some maintenance overhead (i.e. this
-> thread).
->
-> Less is more :)
->
-> ...
->
->
+> > According to my benchmark, it has ~5% overhead to save/restore
+> > *5* variants when compared with *0* variant. The save/restore of regs
+> > is fast, but it still need 12 insn, which can produce ~6% overhead.
+>=20
+> I think it's an ok trade off, because with one global trampoline
+> we do not need to call rhashtable lookup before entering bpf prog.
+> bpf prog will do it on demand if/when it needs to access arguments.
+> This will compensate for a bit of lost performance due to extra save/rest=
+ore.
+
+I don't understand here :/
+
+The rhashtable lookup is done at the beginning of the global trampoline,
+which is called before we enter bpf prog. The bpf progs is stored in the
+kfunc_md, and we need get them from the hash table.
+
+If this is the only change, it is still OK. But according to my previous, t=
+he
+rhashtable can cause ~7% addition overhead. So if we change both
+them, the performance of tracing-multi is a little far from tracing, which
+means ~25% performance gap for the functions that have no arguments.
+About the rhashtable part, I'll do more research on it and feedback late.
+
+>=20
+> PS
+> pls don't add your chinatelecom.cn email in cc.
+> gmail just cannot deliver there and it's annoying to keep deleting
+> it manually in every reply.
+
+Sorry about that. I filtered out such message in my gmail, and
+didn't notice it. I'll remove it from the CC in the feature :)
+
+Thanks!
+Menglong Dong
+
+
+--nextPart5145802.0VBMTVartN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEEfXselyBLFGBR0Mm8PZ2NQ5E0lkFAmh3o5UACgkQ8PZ2NQ5E
+0lkkCwgAlk78qwKwT1vJIddz1SFQrEqPUaTnQ74dM5yRwlhy3vYb3dLRi2Pc8B3F
+OvgsL+oL1BjI2eS64jkfZhs/hyYlbFujf6m59rmQnUsYCbiqEdyxAJC4XsF6Q+fg
+bC2nUyOPt52XUr2sOm460YOVGbKve3W8SdJaruHezBvJgVUzNwhVsiPBD0RWwQaJ
+vSeBzA7isIgXs7hycBwvDU3zRO64EbgpKzEz/pSK5emHyK5V1fvBI9fx6qIP1jnr
+mSZKNOHlh7LaR2S7kx2vA6y8+hfn0b8fYzI49D65jasLqZw84qbrwg6/FTAK2Bvq
+ALZIMhtglEtinMZlz+1n33G3pfAepw==
+=X08I
+-----END PGP SIGNATURE-----
+
+--nextPart5145802.0VBMTVartN--
+
+
+
 
