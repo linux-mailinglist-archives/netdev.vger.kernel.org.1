@@ -1,126 +1,184 @@
-Return-Path: <netdev+bounces-207564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB89FB07D4B
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 21:00:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B03C8B07D7A
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 21:16:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B14EA3BAD5B
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 18:59:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB6EE3AC82B
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 19:16:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2E2F29DB68;
-	Wed, 16 Jul 2025 19:00:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1E2529AB15;
+	Wed, 16 Jul 2025 19:16:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ES2aZlZX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ibHrRFc0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D13262FE4;
-	Wed, 16 Jul 2025 19:00:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 245961EEE0
+	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 19:16:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752692406; cv=none; b=dpHDSta4jiog1PlDpenKDSOHeNeQG6gRPkVRdZKnWPYlZmvT4vJFHHuQbQZAQzMub1wrV2BjnBFN43K76yCBC0p4gV4/thNepK0zq5fVeS/mfqmQLFlic1ofPkiyD24i1WaIGsw0YpOUddvQaErsGFaTWUjJX+s5ufpV13tuAsU=
+	t=1752693386; cv=none; b=TSxxma9z18tNKOHocjFq6WN7XKXBup/hT3H54IEg/Mcyo9eiFEs0jpWmEfdPM1dVJrYlNR1M5Xg1oPDc3rXQk4aUxQdoB9CPRgIygPA77JvSG5KbYKKnS/l4MH6wtfeIXogkH75DTY72VKBKSt17S3/TkqSgk2ux35yC+t+W/ms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752692406; c=relaxed/simple;
-	bh=p2+4mqzxD3sDrSRSR0HQQ+5Xty+gSI5dRJC0NlwYk18=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JSat83lbC8vCoS5cUOFR2ZDf0WIGGiifLg+qpVtSkoK1lfmrxnsmaeS5Bvz+HcXP+Herplk/glkMbtVp/r+J/TMPYSkMyTK5yv2uc4lZt39lcGg7n0uwpoY8nbiIamJoYSKckbjgjjXLtSF0Znp+YNjgQzQ5T4+HLZkiWQfF0bE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ES2aZlZX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA0DFC4CEE7;
-	Wed, 16 Jul 2025 19:00:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752692406;
-	bh=p2+4mqzxD3sDrSRSR0HQQ+5Xty+gSI5dRJC0NlwYk18=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ES2aZlZXOdejVK3HMuuPryg8FNHMpK7gBm4VfINlG1DO0gn157INFfhfIB5Yzz7NK
-	 GFV58NkaQLccxWfFs3UmhtRn3OZvRWkM2kqEKhoQfTxs2F4ZwqHhtpllOb0v0zlG6k
-	 yPjIZq6xpYtX1aZNIdHmpH0wzCYb9F52ep/t72T0a3GWcm22jPXLZFZw2JqSThASQF
-	 i8u1/OGekD5+xJc50GG2iVqIfgvyliSX6d3DwDUdDHXuzcPJaIPnUSg0/M3QEBu3GN
-	 4kV7921M8D1K/FgSymJHzgLCJcAoCVJhVQd23ak++ET8Hht0jbmczQg6aCnFakFLhL
-	 MW4c47ovoG8Hw==
-Date: Wed, 16 Jul 2025 20:00:01 +0100
-From: Simon Horman <horms@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Jeffrey Altman <jaltman@auristor.com>,
-	"Junvyyang, Tencent Zhuque Lab" <zhuque@tencent.com>,
-	LePremierHomme <kwqcheii@proton.me>, stable@vger.kernel.org
-Subject: Re: [PATCH net 3/5] rxrpc: Fix notification vs call-release vs
- recvmsg
-Message-ID: <20250716190001.GR721198@horms.kernel.org>
-References: <20250716115307.3572606-1-dhowells@redhat.com>
- <20250716115307.3572606-4-dhowells@redhat.com>
+	s=arc-20240116; t=1752693386; c=relaxed/simple;
+	bh=7a4F/v5t0VTy1cn1BrYaA4E3/yySyypOsX+OzuYTcvQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=W2Hz0KT+nmvZUn468mY5QLQKzfzHkdpOGS8Zd9IGzU0kG/zoypfIT7pjSHDKTmD+wgA5PJvlqL21O09q6Axwz66YNrAxHGuGikSD1pdcdw6acqIbuouv+C3zYFAsMhlO3sLUX3+T9nVx/CzZMo8axPIbqcZcVrAMUwDDM/UepUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ibHrRFc0; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-23dd9ae5aacso30795ad.1
+        for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 12:16:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752693384; x=1753298184; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yCXogAk+cweZ2SJB8bYDRGUnX9Id22JuJKEB410D5Ak=;
+        b=ibHrRFc03Sf8/ldGtJILbmnsOevN4x8rgu12BcksInJYOfZa25kEpCiawb7jO4In1+
+         tfH1rpGPCvnBQXe6h1TE2NvnhZpN5fZD+Osw083MSgFuZr37nWZJJ8qLTpGGiIg9O+R7
+         i2XwGDvoqbkD8sDZJxU1XkfhDaUb+yeNZQVMdyOH6g5YItiB9rvIaBTsw92qknkLOWHZ
+         4hXyg9ZEkqpoUfP69z2uNRUtKmUGBHc3RGrhrHMnhkabEpUluN3VT/dcWiJNMp0HtCbj
+         yVsvXISeFbmXaTatSLuwoMkes3xtMIIZw7f79kVeVLTvkP0axFgtFbv3jnsMhRb9SzC0
+         LLLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752693384; x=1753298184;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yCXogAk+cweZ2SJB8bYDRGUnX9Id22JuJKEB410D5Ak=;
+        b=eHKSQm2peIPv28L989zdiO1pwErwpmSaBPEidNIBI1L7qOCwwbT2iPvWRfwC+zzasS
+         tFaFV1wVqog0+aL4GEAy2Pcg2P+zl/3GI6jE2xs7OqUZvreaG+k+FKRqIkL8wzA97phR
+         oSINveVF36jI+3Gg5eBoLtcyfyjjIgh2D9UKt8pt8DQ4zBQbztiUiKFaW2auBO0G8PNt
+         g4i5d+yRzGxMvw1VyIDF4YpUbR+HcA+o+sB/WUdnsiqYU1sjZpj9e/kLo58G2EZEWUmc
+         sne55DHArsMmkjYtOHWPhUKtQQxtbgcAra/4PilEWI9Oanlv2D3RLC6yJ5obSrYya4rf
+         h3rQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUblG/QKWeQu98Lm40Hp/ypWdTYsr65GpjVDDya0eRYyKMifQ5jIqLi44NeT8bR+gJZ72twc6Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMev5AIGPxssrjCOIsR3cAEh3ROtfPemcn+aY9ipNiWtxvCzkg
+	rN059OffStzHYrtuL5xZV2FsXipr4VnlDcmSHP+q4v+KAXDInK9tLnHQ2rJb+VFb9NQQIgD6tnK
+	alOskPhpUegy5q07aoscz5TtMofQ4+kTTI/XojAG+
+X-Gm-Gg: ASbGnctdyswDbN4io/nEuN1EDlNtUN9g6igL5bJdQk2o2xk9COfG3Rzq2hxOA7ABXlD
+	mBCOwyaln4zNmi/3EHdJb5MVeaKQpAEoXL6GXePq7+Zs5BZq9xcQGkngQLDwIyqP39MyZapctAu
+	IcwO9rUEeA22drHk7RQxQeOSWbVpx4w69k3pTMgDqBQavILx44+1wVxev4c7IuwCqBm3gQ/SSlI
+	R6NzrJe
+X-Google-Smtp-Source: AGHT+IGjz6prczNhR+tpnPf3HqDU6DjfU18vzOHN51hPdE3NBlhP0WNSMfiyXgFly1IMHdVGdlB6xyeXDOHplgNGr7E=
+X-Received: by 2002:a17:903:1b48:b0:223:fd7e:84ab with SMTP id
+ d9443c01a7336-23e2fe9b868mr480835ad.24.1752693384098; Wed, 16 Jul 2025
+ 12:16:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250716115307.3572606-4-dhowells@redhat.com>
+References: <1752649242-147678-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1752649242-147678-1-git-send-email-tariqt@nvidia.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 16 Jul 2025 12:16:11 -0700
+X-Gm-Features: Ac12FXxxij_WhdVUZejr3zF9wy4BTmiPJrkxcdFq014hkkwU57ufFSCs6aIMXQ0
+Message-ID: <CAHS8izOkpcpO0KwtOZb0WE5kw+hec8nN9cWGarjT7dupw3Z+UQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] net/mlx5e: TX, Fix dma unmapping for devmem tx
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, netdev@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Dragos Tatulea <dtatulea@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 16, 2025 at 12:53:02PM +0100, David Howells wrote:
-> When a call is released, rxrpc takes the spinlock and removes it from
-> ->recvmsg_q in an effort to prevent racing recvmsg() invocations from
-> seeing the same call.  Now, rxrpc_recvmsg() only takes the spinlock when
-> actually removing a call from the queue; it doesn't, however, take it in
-> the lead up to that when it checks to see if the queue is empty.  It *does*
-> hold the socket lock, which prevents a recvmsg/recvmsg race - but this
-> doesn't prevent sendmsg from ending the call because sendmsg() drops the
-> socket lock and relies on the call->user_mutex.
-> 
-> Fix this by firstly removing the bit in rxrpc_release_call() that dequeues
-> the released call and, instead, rely on recvmsg() to simply discard
-> released calls (done in a preceding fix).
-> 
-> Secondly, rxrpc_notify_socket() is abandoned if the call is already marked
-> as released rather than trying to be clever by setting both pointers in
-> call->recvmsg_link to NULL to trick list_empty().  This isn't perfect and
-> can still race, resulting in a released call on the queue, but recvmsg()
-> will now clean that up.
-> 
-> Fixes: 17926a79320a ("[AF_RXRPC]: Provide secure RxRPC sockets for use by userspace and kernel both")
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> Reviewed-by: Jeffrey Altman <jaltman@auristor.com>
+On Wed, Jul 16, 2025 at 12:01=E2=80=AFAM Tariq Toukan <tariqt@nvidia.com> w=
+rote:
+>
+> From: Dragos Tatulea <dtatulea@nvidia.com>
+>
+> net_iovs should have the dma address set to 0 so that
+> netmem_dma_unmap_page_attrs() correctly skips the unmap. This was
+> not done in mlx5 when support for devmem tx was added and resulted
+> in the splat below when the platform iommu was enabled.
+>
+> This patch addresses the issue by using netmem_dma_unmap_addr_set()
+> which handles the net_iov case when setting the dma address. A small
+> refactoring of mlx5e_dma_push() was required to be able to use this API.
+> The function was split in two versions and each version called
+> accordingly. Note that netmem_dma_unmap_addr_set() introduces an
+> additional if case.
+>
+> Splat:
+>   WARNING: CPU: 14 PID: 2587 at drivers/iommu/dma-iommu.c:1228 iommu_dma_=
+unmap_page+0x7d/0x90
+>   Modules linked in: [...]
+>   Unloaded tainted modules: i10nm_edac(E):1 fjes(E):1
+>   CPU: 14 UID: 0 PID: 2587 Comm: ncdevmem Tainted: G S          E       6=
+.15.0+ #3 PREEMPT(voluntary)
+>   Tainted: [S]=3DCPU_OUT_OF_SPEC, [E]=3DUNSIGNED_MODULE
+>   Hardware name: HPE ProLiant DL380 Gen10 Plus/ProLiant DL380 Gen10 Plus,=
+ BIOS U46 06/01/2022
+>   RIP: 0010:iommu_dma_unmap_page+0x7d/0x90
+>   Code: [...]
+>   RSP: 0000:ff6b1e3ea0b2fc58 EFLAGS: 00010246
+>   RAX: 0000000000000000 RBX: ff46ef2d0a2340c8 RCX: 0000000000000000
+>   RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000001
+>   RBP: 0000000000000001 R08: 0000000000000000 R09: ffffffff8827a120
+>   R10: 0000000000000000 R11: 0000000000000000 R12: 00000000d8000000
+>   R13: 0000000000000008 R14: 0000000000000001 R15: 0000000000000000
+>   FS:  00007feb69adf740(0000) GS:ff46ef2c779f1000(0000) knlGS:00000000000=
+00000
+>   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>   CR2: 00007feb69cca000 CR3: 0000000154b97006 CR4: 0000000000773ef0
+>   DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>   DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>   PKRU: 55555554
+>   Call Trace:
+>    <TASK>
+>    dma_unmap_page_attrs+0x227/0x250
+>    mlx5e_poll_tx_cq+0x163/0x510 [mlx5_core]
+>    mlx5e_napi_poll+0x94/0x720 [mlx5_core]
+>    __napi_poll+0x28/0x1f0
+>    net_rx_action+0x33a/0x420
+>    ? mlx5e_completion_event+0x3d/0x40 [mlx5_core]
+>    handle_softirqs+0xe8/0x2f0
+>    __irq_exit_rcu+0xcd/0xf0
+>    common_interrupt+0x47/0xa0
+>    asm_common_interrupt+0x26/0x40
+>   RIP: 0033:0x7feb69cd08ec
+>   Code: [...]
+>   RSP: 002b:00007ffc01b8c880 EFLAGS: 00000246
+>   RAX: 00000000c3a60cf7 RBX: 0000000000045e12 RCX: 000000000000000e
+>   RDX: 00000000000035b4 RSI: 0000000000000000 RDI: 00007ffc01b8c8c0
+>   RBP: 00007ffc01b8c8b0 R08: 0000000000000000 R09: 0000000000000064
+>   R10: 00007ffc01b8c8c0 R11: 0000000000000000 R12: 00007feb69cca000
+>   R13: 00007ffc01b90e48 R14: 0000000000427e18 R15: 00007feb69d07000
+>    </TASK>
+>
+> Cc: Mina Almasry <almasrymina@google.com>
+> Reported-by: Stanislav Fomichev <stfomichev@gmail.com>
+> Closes: https://lore.kernel.org/all/aFM6r9kFHeTdj-25@mini-arch/
+> Fixes: 5a842c288cfa ("net/mlx5e: Add TX support for netmems")
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
-...
 
-> diff --git a/net/rxrpc/call_object.c b/net/rxrpc/call_object.c
+Hmm, a couple of issues I see, but I'm not sure if it's really wrong
+or my own non-understanding.
 
-...
+I don't see  netmem_dma_unmap_page_attrs called anywhere in your
+driver. The point of  netmem_dma_unmap_addr_set setting the addr to 0
+is that a later call to netmem_dma_unmap_page_attrs skips the
+dma-unmap call if it's 0.
 
-> @@ -638,6 +628,12 @@ void rxrpc_release_calls_on_socket(struct rxrpc_sock *rx)
->  		rxrpc_put_call(call, rxrpc_call_put_release_sock);
->  	}
->  
-> +	while ((call = list_first_entry_or_null(&rx->recvmsg_q,
-> +						struct rxrpc_call, recvmsg_link))) {
-> +		list_del_init(&call->recvmsg_link);
-> +		rxrpc_put_call(call, rxrpc_call_put_release_recvmsg_q);
-> +	}
-> +
->  	_leave("");
->  }
->  
+I could not understand why the mlx5/core/* files still used the
+non-netmem variant. The netdev->netmem_tx was set to true in
+mlx5/core/en_main.c, so I would have thought at least all the
+mlx5/core/en_tx.c callsites should have gone to that.
 
-Hi David,
-
-I believe it is addressed in patch 5/5.
-But unfortunately this change breaks bisection.
-
-  .../call_object.c:634:24: error: use of undeclared identifier 'rxrpc_call_put_release_recvmsg_q'
-    634 |                 rxrpc_put_call(call, rxrpc_call_put_release_recvmsg_q);
-        |                                      ^
-
--- 
-pw-bot: changes-requested
-
+--=20
+Thanks,
+Mina
 
