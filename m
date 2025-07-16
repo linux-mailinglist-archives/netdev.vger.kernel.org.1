@@ -1,191 +1,242 @@
-Return-Path: <netdev+bounces-207567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D56AB07D93
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 21:26:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE15CB07D9C
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 21:28:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3B1A1897E53
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 19:27:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2897173DA2
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 19:28:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC27129A333;
-	Wed, 16 Jul 2025 19:26:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B957029E0E1;
+	Wed, 16 Jul 2025 19:28:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BY+543XV"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="buJTPI9T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013015.outbound.protection.outlook.com [40.107.162.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C0C2AE6A;
-	Wed, 16 Jul 2025 19:26:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752694013; cv=none; b=hyvUhAzwUzd8/wu9+xqBbiV6mbKXuwOEcSc7zKxN9jYbM4tzmlOfSrC0wc/SwT8rrg68mPI5GJoHNPWWfovB96Ue0DLSuBaronJrDUqlNfxwEc8gNazPFx3ewdo7b/VFBwpQ84Q4hYFai0y8kPGOnAck1Cyr64OEeBQ5cwMSKQA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752694013; c=relaxed/simple;
-	bh=VP3X54e1B36Xv5PL/K+L7jb542DADGIk7+jcWaWteg8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P8o46diuGzPcTShzhZVmmoWtKYYDLB7maY9DBAh/R2S836jpy8pkRuPUq8fSnjec4O+ZY/2gZrbCYzItR/q2ugSswLo3QhtTWLseTutkCpjuM+Q11hzEgL8P4JsLCgRl8BDHhR+8GgS3LN0Xx+iEEm+JBwDZrMv8ABspjtuA7Js=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BY+543XV; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4561ca74829so2316735e9.0;
-        Wed, 16 Jul 2025 12:26:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752694010; x=1753298810; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xDDM8l3h0Fw3qJuqS7zowlihC7cLJKPy3Un6rJmnlMs=;
-        b=BY+543XVrXpcPubzie9W9kYi20gTBHSYLTrSjfGa29afubzxv7IjJlZDt9HrlCSd37
-         1jyFkjs5yyc5tY8ff1LXM+CS4l2XYPLb6ABJPLnId8Fr+QRycA3oEd8+Jliw8Rx6xCS1
-         SuIduHhTTRnYJL4I4htVN5uW/6BrC5y3e2iuOq1LPBDISHjecPTkQ7q5LZ99fNjyX33R
-         8eY6pHM1GQySxJ8UR6iPsfIIoMybBxcAaYwf1GB1N4QJJufsUZXDe5m2zXSGL01VlpB9
-         LCR8G2hK8+oo3T+AZeJEwE1/I98+Rs/lVNJNcrT2hWwBJy5uPn7NXfWTmMf3x1dGF4Vs
-         5WmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752694010; x=1753298810;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xDDM8l3h0Fw3qJuqS7zowlihC7cLJKPy3Un6rJmnlMs=;
-        b=OiC0ywhrxcTcXuQhyW9gCYxiFVxNZ/qFBl2WgWLNI8APnvHSiwhH9Cglp8et/1DSi2
-         yI8mtZUSRSdg+RUyMKXgAFD9P4jXIwOymuok2AGfQ+K5i9e7JBkKSdrCTYKzP+Vw7pJR
-         fjnugXocg6+3Y3GmQSyKEsS+vnUCxhH0knvyFZtcI2bhrV07kUCdrF296EYMoJGigbQj
-         4o6uZOO+UhZGWJt6tafMtCeIg/g1Ehb24ghyIgylzBgSYPAbFEOc8R3oEV6gnjtTRVHb
-         Kry09ZaA/BYNjlV/1xGmzmPNCUzs7PsxQrV6bRrszPpQJTDKm/lZnVo8zpEndqckb2PA
-         JYTA==
-X-Forwarded-Encrypted: i=1; AJvYcCV//Uu//z/FvVhZl7VEoJKBPb6YEBgpIFHMaHj/YJW1oHxKwuxyjaVi6/8bPcy75O7bO+cJUUi6uCcyCbQZ5LXmdTM=@vger.kernel.org, AJvYcCVaCce72pv1WmVIHqM2zGtEg5dRcKNrYvZ/nqLfd0RlUZyojPnFrTavXAQeuMWnpm/ffRfQilmd@vger.kernel.org, AJvYcCVnIOIJwfViAHVUJe1XZ7zUV/huyq2spdUKvHdw921WFXuBREaPwhMAY83JnMXQcuvN/mco9Ac3O87SGTs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKqAJ6EzBSWAM18Xa1n15FBlZScFlp8oPqJEq1peZvM/XA03tP
-	KjgXXDoTCCIcql2U2Pvbil/2H1iBvhpNdWVJDjmAjGwis0y7ooI6gZbFpZbtACXolVeIoRaTvkw
-	lE7n4oAWkSPxswoN+Tz2qbKvvQDbul04=
-X-Gm-Gg: ASbGncsKNLbMaVJFDdC4J59CjGAU7smWDtlq+6ozlKaWCwLRCDrICSOZR5V6wWRF//Z
-	XAzXr9MhJ8n1BFeppXLT8544rKlsTX2hLpQXGsjf0JIM2/ikdlk9R2yf9awbhVk7GSjwqUb5Kki
-	aFcyd+Jo8qhuEdWwxkDTVSG49GjO/6STlPh2tCc1PZZ3/gdJBq67i0qQDf5DFa+QW4EO2+BPbUG
-	UQn0zEzuwPr0b6XiT8=
-X-Google-Smtp-Source: AGHT+IG4hycp+esWmsd2Z1+rpj9/YEraQLvhtZn7APofxtvpj7YLxfhmQfzBkZnpCvMDICpuYr9ivl1mVrd1KFZdmyg=
-X-Received: by 2002:a05:600c:8b67:b0:456:19be:5cc with SMTP id
- 5b1f17b1804b1-4562e38a883mr37986905e9.14.1752694009872; Wed, 16 Jul 2025
- 12:26:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8BF6293C78;
+	Wed, 16 Jul 2025 19:28:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752694111; cv=fail; b=BZmIwRe577OcO7IUshpRqQfCNQkvtXfjUvO/ZwH/Bi2HrP0bG9buKvmS7G/6sEnvcSQFdF+njMa9m7FsOrgH2C6KIje1V0dGlDmC+R8aAfcMkQOEyVJ47+X2YYKiItJb2V7RvEEth8Muo5rWR3UY/O7lybhKhfLlbUuK9vf+/sA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752694111; c=relaxed/simple;
+	bh=7Z9AM10fAOA/5764v/NUqJiwpL/xYXwYgUIHjYhQppU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=c3ik7F8bVlBA3H3RdRdDsfnrRNB7hSHy92Ju+73q2VpFZmqHkJaG0cOuRWzVTt11PkXe8AMql+8DO8D6KZMl8dh7oGAFWr40ywcC0vvzix2AW5YUGlXz2ZNF86bHoRNQ6wvn137UsNxoPW4DJZVL9eZWVNEUKCU9Ka8w7qalXHk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=buJTPI9T; arc=fail smtp.client-ip=40.107.162.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Db+MiDqudUsoxAerVsjV48UN20VDrRDHybL5CKt6J4csDqsUz1f8fWyRcvFH+k8tfuZWB5RgsDuYy/rCJi+i5SpImiOZ7iumUrgpI/k8Fui0AhuSMp+nUTzINjKgmmeP8hBlXmO97p9xuev9t4HIkzX2eILW/AE9XOcsya0vmjDhicQBOrCJfbDC2S729w4Q5DteIOwGFHzV8WANfjef62L+c1LMterIhn6mKyHLgA8VBOowB9m6lJVw+HEsjPvncB5meZAX0m57Pu3a7knbuW81u3ByYpTMwAa5svAhtJVclaj5brAjS1QR6hUZdi1AOvgZVZqusymdMoQ2phjJGQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vDxKg1c4cwCtfQb1Ki5h6PYtrIdWfZLJNsRVOBE2c0E=;
+ b=I1uLxK1CihgvoS1Ee50we7ffzeFXg7csr9hsj/TwC+clUeZ7Zn+kr6Gsr9NNgkZA6ybXpXZdwCXb61PngSSjeTehTjtmQ7RVk2peYAc4Df5NwL7XYvxNxZRIC8Zwx6p0QeBEUn2PWz+XraWl8AksA2KJT5mZ9c3Lx0YaF9R6PmsHRjMj48y1jjRdzg2GZLj9g9vEpFfzHQTM4Ya0X4W38CylTduorTQ2tX92Bt6r2+rDf8K0/+i+gm+kgZJRH1T/ps8qViUDs5Jak4AHWK34KzHQVN3OvqJZ0h4Elygo3Qpt0reNF33KfCkOzPd/pQA9DrPO6KUCVabDTApHlnVG+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vDxKg1c4cwCtfQb1Ki5h6PYtrIdWfZLJNsRVOBE2c0E=;
+ b=buJTPI9Th/3bpqhIwA6zAlFiOI1tEmH3yWtJJqtWAz2IYpN5wf3ylq0Z0PeViu2pkzdxr0dlTMo3ns4SjNC5Uu078goP3tWoCWXyn8sxTie1QdBuzZoxIzDRVcGcmrUEDmEWmmNDh++XJefqJmye8M5Mr7m5z2PFnvrJbin7/VsSpNv5bEob1bT8zt+okhIMFDsE0c1cOgDAwJ/4xMahgRuI2G18MqSE+a/XVnPk6q2F/yAjjsWZbdVpAhSXjcg+xNpGbsN7ylCGCmwBMHctyhIl6gC4nr3FkI/JDH+UQ/EE60we0TVxwvG83+W/dS8GKxUIaIs3U+wi/GPB97bNoA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
+ by GVXPR04MB10022.eurprd04.prod.outlook.com (2603:10a6:150:11a::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.32; Wed, 16 Jul
+ 2025 19:28:24 +0000
+Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
+ ([fe80::9126:a61e:341d:4b06]) by PAXPR04MB9642.eurprd04.prod.outlook.com
+ ([fe80::9126:a61e:341d:4b06%5]) with mapi id 15.20.8922.028; Wed, 16 Jul 2025
+ 19:28:24 +0000
+Date: Wed, 16 Jul 2025 15:28:17 -0400
+From: Frank Li <Frank.li@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	richardcochran@gmail.com, claudiu.manoil@nxp.com,
+	vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, vadim.fedorenko@linux.dev,
+	shawnguo@kernel.org, s.hauer@pengutronix.de, festevam@gmail.com,
+	fushi.peng@nxp.com, devicetree@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev, kernel@pengutronix.de
+Subject: Re: [PATCH v2 net-next 02/14] dt-bindings: net: add nxp,netc-timer
+ property
+Message-ID: <aHf9UfUQggd/Oxh/@lizhi-Precision-Tower-5810>
+References: <20250716073111.367382-1-wei.fang@nxp.com>
+ <20250716073111.367382-3-wei.fang@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250716073111.367382-3-wei.fang@nxp.com>
+X-ClientProxiedBy: AM0PR02CA0022.eurprd02.prod.outlook.com
+ (2603:10a6:208:3e::35) To PAXPR04MB9642.eurprd04.prod.outlook.com
+ (2603:10a6:102:240::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250705170326.106073-1-biju.das.jz@bp.renesas.com>
-In-Reply-To: <20250705170326.106073-1-biju.das.jz@bp.renesas.com>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Wed, 16 Jul 2025 20:26:23 +0100
-X-Gm-Features: Ac12FXzHx2y0J4y7k-9UUt0aRslx85AqxD4tqzLHcP623nHbyWD8RXhTbillqKI
-Message-ID: <CA+V-a8tZKMfDjxmrkTJhN+=WoGBR0711yoZYgQWDKd361f9q_A@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: stmmac: dwmac-renesas-gbeth: Add PM
- suspend/resume callbacks
-To: Biju Das <biju.das.jz@bp.renesas.com>
-Cc: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Biju Das <biju.das.au@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|GVXPR04MB10022:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6956d8b7-fb66-4e6a-fd66-08ddc49eee44
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|52116014|19092799006|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?hEXXrfOgKrgQqSQps4x7RaOOK29zReKAeXjrq0Bc7WrfqVJaVTOin+lAVytP?=
+ =?us-ascii?Q?sgJTJ7dt6FNgXyEohg5dQujpBEI2UD4AALcb+aXv5d1nRSZGwldmsGTp45Is?=
+ =?us-ascii?Q?I6TjSMTc39Wma4IbN4dy9JPH19Mjd7mwGf1Zb1qndNAkzG10wqLyF+zFRzUq?=
+ =?us-ascii?Q?CRVRgy+B3jW7Cq3Ja7mdALGE3o4/p7p2RRCwgMsu/m01fALhoroGfKJJnL1s?=
+ =?us-ascii?Q?mR6sU4tGFMkfWwxb0bPj7a7iLPyC5mzjYYPy0jSW3wlrPJVjmNowkeyWZbiZ?=
+ =?us-ascii?Q?rAeA04RtAkLBy5hCVM0spa90alhr//BiNRTgLElnXGbxIM4h+C2VRkqHN4/y?=
+ =?us-ascii?Q?6dkobRPVtp0njP4JZjVSlcIPu8mDtGSChj4v96sf0Ma86l7XiXK73zm98/V1?=
+ =?us-ascii?Q?/Cm3X5bQxGgm103/Kwy+NVV4if8RWm1zyJiebKvGGCeRWXSURTsLLiqGlvjB?=
+ =?us-ascii?Q?kPrPGUiQowuc7p/hdzYqSdIzZW0TIYP93efE6Jtqn2GsXQBbjrch+R4yK42t?=
+ =?us-ascii?Q?KYi8bccyaPmtCXN37HySK7fi9so8sEbiU0vj+IsgNMVBVALFMOaE3ZwF9dEe?=
+ =?us-ascii?Q?7vfVRZRdAtUztijHgYz0Mudsv/OalCT57pBCtTWWHTSnAWSBJUgm8WuCO/y0?=
+ =?us-ascii?Q?a9NfX95e3Rg1xQ2hw4bmGCWIA8gpQMeMO+lFmHVvDbu2D4MrW1oDuHyAVDx5?=
+ =?us-ascii?Q?dc5QwY4VnhGVDwa1iv4xXPSa66wYXwBSRN5eL6NooWu3aZcyOewXLIeQSlnf?=
+ =?us-ascii?Q?57u8uE+zr/dS/lUYqotndTcwGwHW69gtJLIgom7uCI3qbJ4ni0ZBgp9HDwcP?=
+ =?us-ascii?Q?Yc67VPqcvo5VcgnJZhaxU+gfG63BEHJ6HXUUzkIwiHh9zr/viyYvEGnKn62J?=
+ =?us-ascii?Q?bWW+qYN+bgSXpvDLlR9HIfirZz/4gJ1zjACCvPyh883dub1Wh/5RSoNTpF+a?=
+ =?us-ascii?Q?Lk1teuNxicwxMjAZ9mpWreyb552Jja0ymDdc1BGbEQdFMlNouzfwSYn8TEz8?=
+ =?us-ascii?Q?OZ2EWNp39KpFBlisMCHsDFFegpCdT1s35q0jn0uUDsVvoLLqYnxQ2RVR6vdt?=
+ =?us-ascii?Q?2mM4I7peFFi9eEZZe2YJ/Z2v3cvyguIJz72cvjNJmt9UDqBL2sBrX0TQ0ucb?=
+ =?us-ascii?Q?8miN8y8VCvN/0NJAEJb2+yp3g0UOXvDxTb0Pa5CBP1H9x0IrHL7CYTnK6Z74?=
+ =?us-ascii?Q?idxNHDBtw4In4TOOVkTxWr+dD3BezU1ZhTLFth0EFMlmQyUug9RUiupPBxWp?=
+ =?us-ascii?Q?AIE/1DpS2ugAhET75rTBdfdrkn33OPkmnYdooh+ytWDbnjloib8Y3XG/7HTD?=
+ =?us-ascii?Q?s5L5rzMcGRJF6ikyZioWD0PuLuVoWycB0VitD7po+VB4yH1WIV02vfCGi36t?=
+ =?us-ascii?Q?cWeSGUu7u+IkSmG/Z4xUwKo/yHs5ph7ms3fHvFuuJyJfo+Cy5mcLic8pF0DI?=
+ =?us-ascii?Q?X7MQTgOcNJ2b2Yd/thkJOr05ZSzlbDzHYpQmJUS/5mByqHAhOUHbtA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(52116014)(19092799006)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?kVXlebX2iFpm5MPAvsD9Wmg5rnPvuaLisZAbx80GRrRkiK7fpnRJxYzN6HdA?=
+ =?us-ascii?Q?T92dZjAYAOPYqLzGAteqkneDZ+xANYcyiLUUKaOI/GIUXN7zEvopK4Qp6MmT?=
+ =?us-ascii?Q?2hT3B3Iv1mgpy5SzMGFYELTWKjESWC7NqvBiwwbh/iC/XwPHU3LQUcsGpKv0?=
+ =?us-ascii?Q?DJHzV722I3yB3evPIf9Jrj8nFL4mGwSiHccEnQKpQs8bME6T9sLWUBzCYQSC?=
+ =?us-ascii?Q?mQx1NL72TP/AKtE21+FnUBIlHTgiANWddCDQQlXEU7Mc522tiNVawOg7/jmM?=
+ =?us-ascii?Q?ixYd8tiJIlkp1blPQsMyX6r4A07WA+9LOfLxTpCfvX8cA3Oftet63Djsiv7B?=
+ =?us-ascii?Q?G7rCC4AEpMj7qOPyVo9i8uEU8s2oiqYlXvXIpdrZxVzJEOCpKI+Edo+TCrcr?=
+ =?us-ascii?Q?sLgSRqmY/jscnK3bKx0v2OeD9knMpK7DPNN+74Qv7lOASvtj3UJB0K/Xs1tl?=
+ =?us-ascii?Q?ztWo7f8GWgUgrTm2xWChIeIiWHQvEV9PzgBdsDSNmnmKln5QNjDNPK56JyNS?=
+ =?us-ascii?Q?yy7dqkq3PmlprbRHj1RAUegcWdlgehYv9Si8eREgK8UrLsImh2OTe3AoW5j+?=
+ =?us-ascii?Q?BkIYFKZ3f+ADmhAH0xqzRS6+wQLCA9cLU7GYBy/qxJ0lHWI/OozSYa+Samu+?=
+ =?us-ascii?Q?N7jAMdivqL6xiHgWPxEp4cuXF7NOPH+JAQtE55pOPSQ51YfHyjKBGjBkbTx0?=
+ =?us-ascii?Q?8PRp86HyfuSGWSwUoVMnAGzELy2d41Z3ov6AqxR9c78JFytoEbLFHzYICSUj?=
+ =?us-ascii?Q?dDKUC1JYYI0AyZl+f4PS2tjDEU9v+cs2ENQ3JIGoCs/ESGv90SZ4mQoup/ew?=
+ =?us-ascii?Q?lbyFPI0dqCsoJySpJLBPXNfwEo48RoFpa04OXk4gtNo1698+EN0DHIrpKfL+?=
+ =?us-ascii?Q?CpgcyFhtlDmcrV2lwgExsAtmFQhvFTFdpQ98xxPPHREU9WlBs66cCXlctMvR?=
+ =?us-ascii?Q?tMBAQCVIKNpzt/Xexz+zxwqQ6LK/XM73G0eng/W29KpI7XVrFjFlre0Umu29?=
+ =?us-ascii?Q?x1pcvdY0T5Ow+R8bFg+VeHSzgqQ0eqSt8y3GRl76kNhCFVm46ZdOvJl+fxyM?=
+ =?us-ascii?Q?PY0ja2jst9Gq0rRRnP5YkS8jETTJF7FSnZhhl8QBDz3iU2exVEuyg374ZjSS?=
+ =?us-ascii?Q?Q/4YfCkLoGhJeBfbsGyBOy0WaakTn3SGQbBVdMsbxs9dEzT2yKddmnxqpYDL?=
+ =?us-ascii?Q?sYW7IJvK8bwKYk2vrPKsvD+Owv8oAsE3BDUBol0mF14E4clA66AcqrwnbUZc?=
+ =?us-ascii?Q?/Cd57l6HmnnI4cOAKpq1LNzVrAQAWgHlOmL1huBqAGAo/k8BiiYIzH7sGnhz?=
+ =?us-ascii?Q?WqwMOn+Kp3PJkyZ2kYvtRbOij5GBanmxd5JDLn3nnLqEln6irCpKd47GALzn?=
+ =?us-ascii?Q?+qZyzZgtnxI6GyURJG6Q/ImrG23eVKFMuH8CsdZgSS1q853nFQ+6WLXor+56?=
+ =?us-ascii?Q?xjuNRkdAEAlzj7IZQl9l51lduJTkJ9KRTlqwwrsaSFmZN9avS+MqvwkB0/6H?=
+ =?us-ascii?Q?p7IWRU4YGzBfjNRRr5P2yAo2RH3Utx9ftFLjf9sku4OHp2VNGHPeosgnuoUP?=
+ =?us-ascii?Q?d0wQFgSOc1wp07sb0F2132WXYwC6vmcMZmehcvXC?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6956d8b7-fb66-4e6a-fd66-08ddc49eee44
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2025 19:28:23.9952
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: x00aB8nda0pfUVPfn1Vd3Qr3BqvW3hmiZfSqX0zNVPUZuNTbwNR7DYknEW2EVunzN8lNtozQ0IJwBAvvEpaZEQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB10022
 
-On Sat, Jul 5, 2025 at 6:03=E2=80=AFPM Biju Das <biju.das.jz@bp.renesas.com=
-> wrote:
+On Wed, Jul 16, 2025 at 03:30:59PM +0800, Wei Fang wrote:
+> NETC is a multi-function PCIe Root Complex Integrated Endpoint (RCiEP)
+> that contains multiple PCIe functions, such as ENETC and Timer. Timer
+> provides PTP time synchronization functionality and ENETC provides the
+> NIC functionality.
 >
-> Add PM suspend/resume callbacks for RZ/G3E SMARC EVK.
+> For some platforms, such as i.MX95, it has only one timer instance, so
+> the binding relationship between Timer and ENETC is fixed. But for some
+> platforms, such as i.MX943, it has 3 Timer instances, by setting the
+> EaTBCR registers of the IERB module, we can specify any Timer instance
+> to be bound to the ENETC instance.
 >
-> The PM deep entry is executed by pressing the SLEEP button and exit from
-> entry is by pressing the power button.
+> Therefore, add "nxp,netc-timer" property to bind ENETC instance to a
+> specified Timer instance so that ENETC can support PTP synchronization
+> through Timer.
 >
-> Logs:
-> root@smarc-rzg3e:~# PM: suspend entry (deep)
-> Filesystems sync: 0.115 seconds
-> Freezing user space processes
-> Freezing user space processes completed (elapsed 0.002 seconds)
-> OOM killer disabled.
-> Freezing remaining freezable tasks
-> Freezing remaining freezable tasks completed (elapsed 0.001 seconds)
-> printk: Suspending console(s) (use no_console_suspend to debug)
-> NOTICE:  BL2: v2.10.5(release):2.10.5/rz_soc_dev-162-g7148ba838
-> NOTICE:  BL2: Built : 14:23:58, Jul  5 2025
-> NOTICE:  BL2: SYS_LSI_MODE: 0x13e06
-> NOTICE:  BL2: SYS_LSI_DEVID: 0x8679447
-> NOTICE:  BL2: SYS_LSI_PRR: 0x0
-> NOTICE:  BL2: Booting BL31
-> renesas-gbeth 15c30000.ethernet end0: Link is Down
-> Disabling non-boot CPUs ...
-> psci: CPU3 killed (polled 0 ms)
-> psci: CPU2 killed (polled 0 ms)
-> psci: CPU1 killed (polled 0 ms)
-> Enabling non-boot CPUs ...
-> Detected VIPT I-cache on CPU1
-> GICv3: CPU1: found redistributor 100 region 0:0x0000000014960000
-> CPU1: Booted secondary processor 0x0000000100 [0x412fd050]
-> CPU1 is up
-> Detected VIPT I-cache on CPU2
-> GICv3: CPU2: found redistributor 200 region 0:0x0000000014980000
-> CPU2: Booted secondary processor 0x0000000200 [0x412fd050]
-> CPU2 is up
-> Detected VIPT I-cache on CPU3
-> GICv3: CPU3: found redistributor 300 region 0:0x00000000149a0000
-> CPU3: Booted secondary processor 0x0000000300 [0x412fd050]
-> CPU3 is up
-> dwmac4: Master AXI performs fixed burst length
-> 15c30000.ethernet end0: No Safety Features support found
-> 15c30000.ethernet end0: IEEE 1588-2008 Advanced Timestamp supported
-> 15c30000.ethernet end0: configuring for phy/rgmii-id link mode
-> dwmac4: Master AXI performs fixed burst length
-> 15c40000.ethernet end1: No Safety Features support found
-> 15c40000.ethernet end1: IEEE 1588-2008 Advanced Timestamp supported
-> 15c40000.ethernet end1: configuring for phy/rgmii-id link mode
-> OOM killer enabled.
-> Restarting tasks: Starting
-> Restarting tasks: Done
-> random: crng reseeded on system resumption
-> PM: suspend exit
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
 >
-> 15c30000.ethernet end0: Link is Up - 1Gbps/Full - flow control rx/tx
-> root@smarc-rzg3e:~# ifconfig end0 192.168.10.7 up
-> root@smarc-rzg3e:~# ping 192.168.10.1
-> PING 192.168.10.1 (192.168.10.1) 56(84) bytes of data.
-> 64 bytes from 192.168.10.1: icmp_seq=3D1 ttl=3D64 time=3D2.05 ms
-> 64 bytes from 192.168.10.1: icmp_seq=3D2 ttl=3D64 time=3D0.928 ms
->
-> Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
 > ---
-> This patch is tested with out-of tree patch for save/restore
-> ethernet OEN registers in the pinctrl block.
+> v2 changes:
+> new patch
 > ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c | 1 +
->  1 file changed, 1 insertion(+)
+>  .../devicetree/bindings/net/fsl,enetc.yaml    | 23 +++++++++++++++++++
+>  1 file changed, 23 insertions(+)
 >
-Reviewed-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> diff --git a/Documentation/devicetree/bindings/net/fsl,enetc.yaml b/Documentation/devicetree/bindings/net/fsl,enetc.yaml
+> index ca70f0050171..ae05f2982653 100644
+> --- a/Documentation/devicetree/bindings/net/fsl,enetc.yaml
+> +++ b/Documentation/devicetree/bindings/net/fsl,enetc.yaml
+> @@ -44,6 +44,13 @@ properties:
+>      unevaluatedProperties: false
+>      description: Optional child node for ENETC instance, otherwise use NETC EMDIO.
+>
+> +  nxp,netc-timer:
+> +    $ref: /schemas/types.yaml#/definitions/phandle
+> +    description:
+> +      Specifies a reference to a node representing a NETC Timer device,
+> +      which provides time synchronization as required for IEEE 1588 and
+> +      IEEE 802.1AS-2020.
+> +
 
-Cheers,
-Prabhakar
+I think it is quite common. add ptp-timer ethernet-controller.yaml?
 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c b/=
-drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
-> index 9a774046455b..df4ca897a60c 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
-> @@ -136,6 +136,7 @@ static struct platform_driver renesas_gbeth_driver =
-=3D {
->         .probe  =3D renesas_gbeth_probe,
->         .driver =3D {
->                 .name           =3D "renesas-gbeth",
-> +               .pm             =3D &stmmac_pltfr_pm_ops,
->                 .of_match_table =3D renesas_gbeth_match,
->         },
->  };
+Frank
+
+>  required:
+>    - compatible
+>    - reg
+> @@ -62,6 +69,7 @@ allOf:
+>        properties:
+>          clocks: false
+>          clock-names: false
+> +        nxp,netc-timer: false
+>
+>  unevaluatedProperties: false
+>
+> @@ -86,3 +94,18 @@ examples:
+>              };
+>          };
+>      };
+> +  - |
+> +    pcie {
+> +      #address-cells = <3>;
+> +      #size-cells = <2>;
+> +
+> +      ethernet@0,0 {
+> +          compatible = "pci1131,e101";
+> +          reg = <0x000000 0 0 0 0>;
+> +          clocks = <&scmi_clk 102>;
+> +          clock-names = "ref";
+> +          nxp,netc-timer = <&netc_timer>;
+> +          phy-handle = <&ethphy0>;
+> +          phy-mode = "rgmii-id";
+> +      };
+> +    };
 > --
-> 2.43.0
->
+> 2.34.1
 >
 
