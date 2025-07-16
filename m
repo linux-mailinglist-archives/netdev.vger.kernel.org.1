@@ -1,93 +1,126 @@
-Return-Path: <netdev+bounces-207563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15313B07D31
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 20:54:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB89FB07D4B
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 21:00:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C57DC7A353A
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 18:52:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B14EA3BAD5B
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 18:59:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C8E5285C8A;
-	Wed, 16 Jul 2025 18:54:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2E2F29DB68;
+	Wed, 16 Jul 2025 19:00:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cX8FA7jP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ES2aZlZX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7586D2AE6A;
-	Wed, 16 Jul 2025 18:54:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D13262FE4;
+	Wed, 16 Jul 2025 19:00:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752692040; cv=none; b=tK8S/2CrN7xmX5ZPUuYvPtEg9XB69VfPHZ/t1pG3m1gWTAIiIRggAIRhJ4hoShvt4rXSBdusWRm+VLNPRIaSBgQF3OwpXrjiZNHWvaQzMgeWQqojEvt/ZylnT5bQNhJMAYoGAqakfZaikkvl/YEUcMJ1gBejaElKM4UYmr+dSPY=
+	t=1752692406; cv=none; b=dpHDSta4jiog1PlDpenKDSOHeNeQG6gRPkVRdZKnWPYlZmvT4vJFHHuQbQZAQzMub1wrV2BjnBFN43K76yCBC0p4gV4/thNepK0zq5fVeS/mfqmQLFlic1ofPkiyD24i1WaIGsw0YpOUddvQaErsGFaTWUjJX+s5ufpV13tuAsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752692040; c=relaxed/simple;
-	bh=5mOnNit1N35Hk5nS6VQeUoZgz0OtTIv1co2eNRp812s=;
+	s=arc-20240116; t=1752692406; c=relaxed/simple;
+	bh=p2+4mqzxD3sDrSRSR0HQQ+5Xty+gSI5dRJC0NlwYk18=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bB9b8uPW098/k3ulhY02zYasZy59oNfszQj6UH07FW4iI15/JO2nDBRh27ZrQOB0Sqc+0scf/8gvFVtxQdfI20fbW1le9m9I72U1A7+VKFprEqNdl7PqNIo7jWSq1J24oN8z1cZG8oJEgk0WMbglKcvJTxpk1VepflWQx/6dDJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cX8FA7jP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C93EAC4CEE7;
-	Wed, 16 Jul 2025 18:53:57 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=JSat83lbC8vCoS5cUOFR2ZDf0WIGGiifLg+qpVtSkoK1lfmrxnsmaeS5Bvz+HcXP+Herplk/glkMbtVp/r+J/TMPYSkMyTK5yv2uc4lZt39lcGg7n0uwpoY8nbiIamJoYSKckbjgjjXLtSF0Znp+YNjgQzQ5T4+HLZkiWQfF0bE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ES2aZlZX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA0DFC4CEE7;
+	Wed, 16 Jul 2025 19:00:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752692039;
-	bh=5mOnNit1N35Hk5nS6VQeUoZgz0OtTIv1co2eNRp812s=;
+	s=k20201202; t=1752692406;
+	bh=p2+4mqzxD3sDrSRSR0HQQ+5Xty+gSI5dRJC0NlwYk18=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cX8FA7jPaHmvuGv2dgCGMn26JXOQKwKk3kIMfn3s1ybWX5ZQcSEwfQB7hTuXA3kgX
-	 u9UN0z07gPiY6183gvS+AdKGgG9hE3B4aerfniol8wZk9wKN85b8YAesGKBuhiQaSD
-	 9CXbPOzQcnPjAIMy1A3WaMiYM9myRwSLXuZXrF3cjWMBBPPC689mCQjlDbEIkEdh3r
-	 YoqOtigzPVBIuPb/QN1X/W53oVrHehxzBX/yqEHInsDcQB7JACHL03vRsHs4i4b4fB
-	 dr3/Hm2bTaIqiMowA+agv2CNhCIsP9qH+KAMBmVuDiyPoQnBLppfZiaRXGIEdRGHiR
-	 Bees3gy9RGGQQ==
-Date: Wed, 16 Jul 2025 19:53:55 +0100
+	b=ES2aZlZXOdejVK3HMuuPryg8FNHMpK7gBm4VfINlG1DO0gn157INFfhfIB5Yzz7NK
+	 GFV58NkaQLccxWfFs3UmhtRn3OZvRWkM2kqEKhoQfTxs2F4ZwqHhtpllOb0v0zlG6k
+	 yPjIZq6xpYtX1aZNIdHmpH0wzCYb9F52ep/t72T0a3GWcm22jPXLZFZw2JqSThASQF
+	 i8u1/OGekD5+xJc50GG2iVqIfgvyliSX6d3DwDUdDHXuzcPJaIPnUSg0/M3QEBu3GN
+	 4kV7921M8D1K/FgSymJHzgLCJcAoCVJhVQd23ak++ET8Hht0jbmczQg6aCnFakFLhL
+	 MW4c47ovoG8Hw==
+Date: Wed, 16 Jul 2025 20:00:01 +0100
 From: Simon Horman <horms@kernel.org>
-To: mark.einon@gmail.com
-Cc: Thomas Fourier <fourier.thomas@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ingo Molnar <mingo@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] et131x: Add missing check after DMA map
-Message-ID: <20250716185355.GQ721198@horms.kernel.org>
-References: <20250716094733.28734-2-fourier.thomas@gmail.com>
- <9ba42e9ae61e8274bf5d677f8d53c84f6841ccd8.camel@gmail.com>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Jeffrey Altman <jaltman@auristor.com>,
+	"Junvyyang, Tencent Zhuque Lab" <zhuque@tencent.com>,
+	LePremierHomme <kwqcheii@proton.me>, stable@vger.kernel.org
+Subject: Re: [PATCH net 3/5] rxrpc: Fix notification vs call-release vs
+ recvmsg
+Message-ID: <20250716190001.GR721198@horms.kernel.org>
+References: <20250716115307.3572606-1-dhowells@redhat.com>
+ <20250716115307.3572606-4-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <9ba42e9ae61e8274bf5d677f8d53c84f6841ccd8.camel@gmail.com>
+In-Reply-To: <20250716115307.3572606-4-dhowells@redhat.com>
 
-On Wed, Jul 16, 2025 at 12:19:50PM +0100, mark.einon@gmail.com wrote:
-> On Wed, 2025-07-16 at 11:47 +0200, Thomas Fourier wrote:
-> > The DMA map functions can fail and should be tested for errors.
-> > If the mapping fails, unmap and return an error.
-> > 
-> > Fixes: 38df6492eb51 ("et131x: Add PCIe gigabit ethernet driver et131x
-> > to drivers/net")
-> > Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
-> > ---
-> > v1 -> v2:
-> >   - Fix subject
-> >   - Fix double decrement of frag
-> >   - Make comment more explicit about why there are two loops
+On Wed, Jul 16, 2025 at 12:53:02PM +0100, David Howells wrote:
+> When a call is released, rxrpc takes the spinlock and removes it from
+> ->recvmsg_q in an effort to prevent racing recvmsg() invocations from
+> seeing the same call.  Now, rxrpc_recvmsg() only takes the spinlock when
+> actually removing a call from the queue; it doesn't, however, take it in
+> the lead up to that when it checks to see if the queue is empty.  It *does*
+> hold the socket lock, which prevents a recvmsg/recvmsg race - but this
+> doesn't prevent sendmsg from ending the call because sendmsg() drops the
+> socket lock and relies on the call->user_mutex.
 > 
-> Thanks for the updates Thomas, LGTM (also CC'd Simon who provided the
-> initial comments).
+> Fix this by firstly removing the bit in rxrpc_release_call() that dequeues
+> the released call and, instead, rely on recvmsg() to simply discard
+> released calls (done in a preceding fix).
 > 
-> Acked-by: Mark Einon <mark.einon@gmail.com>
+> Secondly, rxrpc_notify_socket() is abandoned if the call is already marked
+> as released rather than trying to be clever by setting both pointers in
+> call->recvmsg_link to NULL to trick list_empty().  This isn't perfect and
+> can still race, resulting in a released call on the queue, but recvmsg()
+> will now clean that up.
+> 
+> Fixes: 17926a79320a ("[AF_RXRPC]: Provide secure RxRPC sockets for use by userspace and kernel both")
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> Reviewed-by: Jeffrey Altman <jaltman@auristor.com>
 
-Thanks, also LGTM.
+...
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+> diff --git a/net/rxrpc/call_object.c b/net/rxrpc/call_object.c
+
+...
+
+> @@ -638,6 +628,12 @@ void rxrpc_release_calls_on_socket(struct rxrpc_sock *rx)
+>  		rxrpc_put_call(call, rxrpc_call_put_release_sock);
+>  	}
+>  
+> +	while ((call = list_first_entry_or_null(&rx->recvmsg_q,
+> +						struct rxrpc_call, recvmsg_link))) {
+> +		list_del_init(&call->recvmsg_link);
+> +		rxrpc_put_call(call, rxrpc_call_put_release_recvmsg_q);
+> +	}
+> +
+>  	_leave("");
+>  }
+>  
+
+Hi David,
+
+I believe it is addressed in patch 5/5.
+But unfortunately this change breaks bisection.
+
+  .../call_object.c:634:24: error: use of undeclared identifier 'rxrpc_call_put_release_recvmsg_q'
+    634 |                 rxrpc_put_call(call, rxrpc_call_put_release_recvmsg_q);
+        |                                      ^
+
+-- 
+pw-bot: changes-requested
 
 
