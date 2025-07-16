@@ -1,133 +1,117 @@
-Return-Path: <netdev+bounces-207539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 920DDB07B52
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 18:39:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25DCCB07B5B
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 18:42:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96C45508143
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 16:38:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6988E586514
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 16:42:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DF7923FC42;
-	Wed, 16 Jul 2025 16:39:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E8DA2C08A8;
+	Wed, 16 Jul 2025 16:42:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="y5FJ2XgP"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="IGB87/jV"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51061D528;
-	Wed, 16 Jul 2025 16:39:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31FC1A5B8A;
+	Wed, 16 Jul 2025 16:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752683960; cv=none; b=cN7LDKld0ZFYAF4+gMzcvOxSLzyy9cJjsb7caqiRJJV6r7+N1s3ENH8Fr+FJbf6lt9JjpS/IBkXUC5wV3KKnFGheoHDwasN6cMiDza/XIpTSE0Gs968CwIwr8w+sYD1BhjUJ+IYFq/r4uV/uTOg0Fx7avz98adq667TGIIJ6T3s=
+	t=1752684142; cv=none; b=KCDuZZLKWRzDG6gH3+6t5ngAlQ46GaOE9unO8eZZ2bJFL48t9N+PNVFaLtA9wCGHWNFWGX4nkjxXRBI4BjBQuD+qv7piCW60ge/CHj5odRmoetAyuzluiG1uDtllW/Uu38axVtdxaUsw4EQOz51fz+faGg43yt0UOnrIUnn3YXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752683960; c=relaxed/simple;
-	bh=W8xgVhhwZWuTdjr7lS0rwtLzvbY4CBMrrpJ7DWC87Ho=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pzCfmP7gEYvwLenacOaSau6KD9dFbTRPkZfcFQfktMNnwlgq/QIzK3CfqTC8g0qabhMkwBJszM4btTGSwvyorIBcGnoNRi/ibMrIF4PWbxwpg+awq6il+DIH6ftIJgtIp9dHIYcPXZYh0Mlph+3RT0TmGS3KIWHxRAp5zY/sKXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=y5FJ2XgP; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=7EI7/tzVVxb3gkfkxEXZPPT7eC9VGWHM194adz+fKxk=; b=y5FJ2XgPCb7mWK2aDISMIxvNXP
-	RtKFjkvDvvPGTMXJoi1z5hrniOzTgQcMskEXX7a5F2UdynJqyX+noLw/DiFUJSxaEMy1yDBwy32xa
-	GayO+h6h9n2g6gcqCeOqrFBw7fYR8POnhEBeFvdELMInTRXtnsnDp6OfywDtmNUgOl/Q=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uc59o-001hvE-V6; Wed, 16 Jul 2025 18:39:00 +0200
-Date: Wed, 16 Jul 2025 18:39:00 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	Frank.Sae@motor-comm.com, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, shenjian15@huawei.com,
-	liuyonglong@huawei.com, chenhao418@huawei.com,
-	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
-	salil.mehta@huawei.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/2] net: phy: motorcomm: Add support for PHY
- LEDs on YT8521
-Message-ID: <4a622284-66db-49c4-943f-5da1f1a6ba65@lunn.ch>
-References: <20250716100041.2833168-1-shaojijie@huawei.com>
- <20250716100041.2833168-2-shaojijie@huawei.com>
+	s=arc-20240116; t=1752684142; c=relaxed/simple;
+	bh=HLkFSJ3Iqi6kf1r1tXQQ2GlWdxejczsBA1++g4gUyu8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GKnURdjb6yCcFHVFcvq52rx1k5Fnhj5X71q5JKwXfJsx6+A0GJN8koQgG27HyaaiAdFWq+P5yHEoOphCsbNIqmGzFY97Lr5S88e9SazooskC6ecl2aKIpBgqY/hFmA6HQZ9TUdY9hCnMXNqJgXRmFQr0KNxHlY7R+dqsahBhEPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=IGB87/jV; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56GBmFft023111;
+	Wed, 16 Jul 2025 09:42:05 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=RpxdBOIUoSa0bl8YwANvtrn
+	DogE0m/NuwtJtEY7nF+Y=; b=IGB87/jVmYDkMO4IT6mY4FK7OiiCoYVB4/L8wBe
+	2cIVu+XoT7L026faBXgEfJuzN0KvgXM+pBJupjaRMpvzxn+V2+YxgdaIcwJONicj
+	4QRzHa4AhGOytSjap7ruCJNK7N0lfyp/hWL2y7xspDVjtFIbRXfeUDBUd5f4CnLx
+	TV+fKAFXBBMkf6eyYLRDiE6G0MOxIakU5KwRGrS5bCv6mYgpVwljh1GsVrK4MRmF
+	10KdeiILPe7V0B5Sr4LpxKKhS6CE0VWU9pNX8pB3i7cxNj5XF8QdjMhD85gyU19v
+	RSSLmEQSG/gw+EztsRu7FHSJfIjtqgzU5mXKgEEl+9qxelw==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 47x0qjjpmv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 16 Jul 2025 09:42:05 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Wed, 16 Jul 2025 09:42:04 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Wed, 16 Jul 2025 09:42:04 -0700
+Received: from test-OptiPlex-Tower-Plus-7010.marvell.com (unknown [10.29.37.157])
+	by maili.marvell.com (Postfix) with ESMTP id 09F163F7041;
+	Wed, 16 Jul 2025 09:41:59 -0700 (PDT)
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <sgoutham@marvell.com>,
+        <gakula@marvell.com>, <jerinj@marvell.com>, <lcherian@marvell.com>,
+        <sbhatta@marvell.com>, <hkelam@marvell.com>, <naveenm@marvell.com>,
+        <edumazet@google.com>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+        <bbhushan2@marvell.com>
+Subject: [net-next 0/4] Octeontx2-af: RPM: misc feaures
+Date: Wed, 16 Jul 2025 22:11:54 +0530
+Message-ID: <20250716164158.1537269-1-hkelam@marvell.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250716100041.2833168-2-shaojijie@huawei.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE2MDE1MCBTYWx0ZWRfX6P7quBh2WZOU rtCv6kOfoDWtmjOmE7mW7wved5HtyYD0dqv7nkdSl14R1bniOwjgH0q4XqdA3StEhzFXxyXB6NS pL0i/1NyrrFXMTYHDENlmz55dv7W1XpcOGzDT68HTyNZx6l6vMclC1leRu3ybNk93Y+AyYLzJdh
+ dWuCUS+t5HUnFg7ex5zUpJDcKu8pGleACVQkuQWl/Dxt05eTawpRS1MQc78nqgb2LD5e6rp5h+c 9dqsIQMi2BR6DYeRGr0ehafAoRryhdPUQp+5ME7BCX/ZXipXFKCD+4wOdRVy6S/g+ZCUwHlFS9y yA4JFJxOUIbMIKrZH8W1VxdsEosJfC6oRsrR6zvOftDXBY2Sno3o8m3peIt/dNvesy2CWbVxCwr
+ GRM3UFF25gEZfAgJJN7FDQo2cgggC6t00Da6OKrYq4G8tnX1TtULlbLvsKjjwNwj09nzLWwL
+X-Proofpoint-GUID: EmL9eB1p7mKE9tYRZJw4SSo1J2oZRfL2
+X-Proofpoint-ORIG-GUID: EmL9eB1p7mKE9tYRZJw4SSo1J2oZRfL2
+X-Authority-Analysis: v=2.4 cv=beBrUPPB c=1 sm=1 tr=0 ts=6877d65d cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=Wb1JkmetP80A:10 a=56pKTMNPzGyt_i_oFpIA:9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-16_02,2025-07-16_02,2025-03-28_01
 
-On Wed, Jul 16, 2025 at 06:00:40PM +0800, Jijie Shao wrote:
-> Add minimal LED controller driver supporting
-> the most common uses with the 'netdev' trigger.
-> 
-> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-> ---
->  drivers/net/phy/motorcomm.c | 120 ++++++++++++++++++++++++++++++++++++
->  1 file changed, 120 insertions(+)
-> 
-> diff --git a/drivers/net/phy/motorcomm.c b/drivers/net/phy/motorcomm.c
-> index 0e91f5d1a4fd..e1a1c3a1c9d0 100644
-> --- a/drivers/net/phy/motorcomm.c
-> +++ b/drivers/net/phy/motorcomm.c
-> @@ -213,6 +213,23 @@
->  #define YT8521_RC1R_RGMII_2_100_NS		14
->  #define YT8521_RC1R_RGMII_2_250_NS		15
->  
-> +/* LED CONFIG */
-> +#define YT8521_MAX_LEDS				3
-> +#define YT8521_LED0_CFG_REG			0xA00C
-> +#define YT8521_LED1_CFG_REG			0xA00D
-> +#define YT8521_LED2_CFG_REG			0xA00E
-> +#define YT8521_LED_ACT_BLK_IND			BIT(13)
-> +#define YT8521_LED_FDX_ON_EN			BIT(12)
-> +#define YT8521_LED_HDX_ON_EN			BIT(11)
-> +#define YT8521_LED_TXACT_BLK_EN			BIT(10)
-> +#define YT8521_LED_RXACT_BLK_EN			BIT(9)
-> +/* 1000Mbps */
-> +#define YT8521_LED_GT_ON_EN			BIT(6)
-> +/* 100Mbps */
-> +#define YT8521_LED_HT_ON_EN			BIT(5)
-> +/* 10Mbps */
-> +#define YT8521_LED_BT_ON_EN			BIT(4)
+This series patches adds different features like debugfs
+support for shared firmware structure and DMAC filter
+related enhancements.
 
-Rather than comments, why not call these YT8521_LED_1000_ON_EN,
-YT8521_LED_100_ON_EN, YT8521_LED_100_ON_EN ? That makes the rest of
-the driver easier to read.
+Patch1: Saves interface MAC address configured from DMAC filters.
 
-> +static int yt8521_led_hw_control_get(struct phy_device *phydev, u8 index,
-> +				     unsigned long *rules)
-> +{
-> +	int val;
-> +
-> +	if (index >= YT8521_MAX_LEDS)
-> +		return -EINVAL;
-> +
-> +	val = ytphy_read_ext(phydev, YT8521_LED0_CFG_REG + index);
-> +	if (val < 0)
-> +		return val;
-> +
-> +	if (val & YT8521_LED_TXACT_BLK_EN)
-> +		set_bit(TRIGGER_NETDEV_TX, rules);
-> +
-> +	if (val & YT8521_LED_RXACT_BLK_EN)
-> +		set_bit(TRIGGER_NETDEV_RX, rules);
+Patch2: Disables the stale DMAC filters in driver initialization 
 
-This looks to be missing YT8521_LED_ACT_BLK_IND.
+Patch3: Configure dma mask for CGX/RPM drivers
 
-    Andrew
+Patch4: Debugfs support for shared firmware data.
 
----
-pw-bot: cr
+Hariprasad Kelam (3):
+  Octeontx2-af: Add programmed macaddr to RVU pfvf
+  Octeontx2-af: RPM: Update DMA mask
+  Octeontx2-af: Debugfs support for firmware data
+
+Subbaraya Sundeep (1):
+  Octeontx2-af: Disable stale DMAC filters
+
+ .../net/ethernet/marvell/octeontx2/af/cgx.c   |  19 +++
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |   7 +-
+ .../ethernet/marvell/octeontx2/af/rvu_cgx.c   |  23 ++-
+ .../marvell/octeontx2/af/rvu_debugfs.c        | 148 ++++++++++++++++++
+ 4 files changed, 182 insertions(+), 15 deletions(-)
+
+-- 
+2.34.1
+
 
