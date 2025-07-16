@@ -1,155 +1,233 @@
-Return-Path: <netdev+bounces-207534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC2C0B07B15
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 18:24:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31A01B07B28
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 18:27:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4092016D578
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 16:24:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F388318861A0
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 16:26:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4B2A2F508C;
-	Wed, 16 Jul 2025 16:24:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 585061A01BF;
+	Wed, 16 Jul 2025 16:25:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="YdrDG6Nv"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="G4/0+YdK"
 X-Original-To: netdev@vger.kernel.org
-Received: from forwardcorp1d.mail.yandex.net (forwardcorp1d.mail.yandex.net [178.154.239.200])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D0F02F3C3E;
-	Wed, 16 Jul 2025 16:24:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55D681A238C
+	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 16:25:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752683070; cv=none; b=IU7rXkQNA4lauaUZmlPuazYmY7TNtHPlBS4rqfQYSodrRmGm4xwkhyjGWZ/LGCbQfX2SX2hmxT+Vb2I1rEq2GJ0oOFGuHGR5qp5nLdGC3UOV8V3ygHIeLk2f/TFxK6n2YovSEutplzHFOxGmGAR5a00gqC2oSi7itAqJhExD61w=
+	t=1752683157; cv=none; b=Xz//TDGQ8v/ndjd8EtsEmauV1gBPbdCIHF4IiLUNp7FR3lqW8or7xEqLGEAj5KfCoG+QTAQInyyhzR4uV4VvHFcO9XmB2PG+2dRSrQesk1Lw9A+SCt+TBpn84+QTI+Deqe084cWwbS9tzfJWqVRXWaQKDqTNmxbt9/MXZ0oYH8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752683070; c=relaxed/simple;
-	bh=kVoWv3/iwWNxGI8jNRCZPVMbIMQrh2BMtxaTtjHOzdA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=A03xwgHOlMIxSBtV8loomCdf0ShHrID1TYumq9ne0FXyr+aEqy2EVRfMH8xK09c8HXdHaNmypEu4CXAfZO0Nzw7q70Z9d4cRSNgfABU3WX6lPV6k2mYex7fPVOSBAWERVqTcGSFJ4a/6BGpZGd3w15iKanXzv5qLqEvlONTFzPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru; spf=pass smtp.mailfrom=yandex-team.ru; dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b=YdrDG6Nv; arc=none smtp.client-ip=178.154.239.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex-team.ru
-Received: from mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net (mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net [IPv6:2a02:6b8:c42:d42b:0:640:f3fc:0])
-	by forwardcorp1d.mail.yandex.net (Yandex) with ESMTPS id 5A3C060AFE;
-	Wed, 16 Jul 2025 19:22:56 +0300 (MSK)
-Received: from kniv-nix.yandex-team.ru (unknown [2a02:6bf:8080:a75::1:7])
-	by mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id nMP7Db0GwW20-oO643L00;
-	Wed, 16 Jul 2025 19:22:55 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
-	s=default; t=1752682975;
-	bh=/lRCgvKC2NqnnCP6neakgrl2Mgl3BpNaQQjJ8bFZqVM=;
-	h=Message-Id:Date:Cc:Subject:To:From;
-	b=YdrDG6NvtUApDy+jUsqDv7peLcj/w2Jxu3hDLFaZWAk1fINhDPP+RynnBH4Z/MdKI
-	 Kmm90wBRxeiJWZCCI+UmC06pOQVwG+qJSQjZtw2ks8bNqWeqo22q3diIWf5R/HvODm
-	 XoJC15jJgqoVUVeAhtnCNdOpPxpbG6+jCjup6MHw=
-Authentication-Results: mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net; dkim=pass header.i=@yandex-team.ru
-From: Nikolay Kuratov <kniv@yandex-team.ru>
-To: linux-kernel@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	kvm@vger.kernel.org,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Nikolay Kuratov <kniv@yandex-team.ru>,
-	stable@vger.kernel.org,
-	Andrey Ryabinin <arbn@yandex-team.com>,
-	Andrey Smetanin <asmetanin@yandex-team.ru>
-Subject: [PATCH] vhost/net: Replace wait_queue with completion in ubufs reference
-Date: Wed, 16 Jul 2025 19:22:43 +0300
-Message-Id: <20250716162243.1401676-1-kniv@yandex-team.ru>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1752683157; c=relaxed/simple;
+	bh=fUCAaAUcl3fjvpfGRnuWqPaEjtirTBYGuwlRXzRdA1s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BMF/S6S7YKMaJ/9TsLIj2nn0XEffyC4HhD0Shp3Bj1uXfRRJvYN5zxYvT+XTy2DxCQ5Dz5tTGD1wvMzUC6QjBlpxFRFuLZpI24oV44Qkn7NZbVzKteAtfBGIKDWdxkgY9m4119UKA7fqeG7IeOT6aXjTixbkJnApovy2jAOwL7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=G4/0+YdK; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=qjOzeZCl02wZqsFL8kImKs7arIdC+XCdDUfSQNPYotU=; b=G4/0+YdKKYd13y84VrOTEePrYA
+	VAWkv20agae3JTzfHngPenofk6twr6/NQnMiHldJK/uAjbVp5YXzIlmpQd8GLjH1g1TzT0m0KPaSb
+	co8LIXNBHFgJf0iBbXKT68ofxQa5mN/BEClLp4iIPLWNLE+T/W6nBvWDee905RexO/fg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uc4wu-001hp6-7I; Wed, 16 Jul 2025 18:25:40 +0200
+Date: Wed, 16 Jul 2025 18:25:40 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	Philo Lu <lulie@linux.alibaba.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
+	Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Dust Li <dust.li@linux.alibaba.com>
+Subject: Re: [PATCH net-next] eea: Add basic driver framework for Alibaba
+ Elastic Ethernet Adaptor
+Message-ID: <322af656-d359-44d8-9e40-4f997a8b7e0f@lunn.ch>
+References: <20250710112817.85741-1-xuanzhuo@linux.alibaba.com>
+ <7b957110-c675-438a-b0c2-ebc161a5d8e7@lunn.ch>
+ <1752644852.1458855-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1752644852.1458855-1-xuanzhuo@linux.alibaba.com>
 
-When operating on struct vhost_net_ubuf_ref, the following execution
-sequence is theoretically possible:
-CPU0 is finalizing DMA operation                   CPU1 is doing VHOST_NET_SET_BACKEND
-                             // &ubufs->refcount == 2
-vhost_net_ubuf_put()                               vhost_net_ubuf_put_wait_and_free(oldubufs)
-                                                     vhost_net_ubuf_put_and_wait()
-                                                       vhost_net_ubuf_put()
-                                                         int r = atomic_sub_return(1, &ubufs->refcount);
-                                                         // r = 1
-int r = atomic_sub_return(1, &ubufs->refcount);
-// r = 0
-                                                      wait_event(ubufs->wait, !atomic_read(&ubufs->refcount));
-                                                      // no wait occurs here because condition is already true
-                                                    kfree(ubufs);
-if (unlikely(!r))
-  wake_up(&ubufs->wait);  // use-after-free
+On Wed, Jul 16, 2025 at 01:47:32PM +0800, Xuan Zhuo wrote:
+> Thank you for your valuable feedback. We've addressed most of the comments
+> and will include the fixes in the next version. A few remaining items are still
+> under discussion and listed below for reference.
+> 
+> On Thu, 10 Jul 2025 15:45:38 +0200, Andrew Lunn <andrew@lunn.ch> wrote:
+> > > +module_param(aq_timeout, uint, 0644);
+> >
+> > No module params please.
+> >
+> > > +struct eea_aq_host_info_cfg {
+> > > +#ifndef EEA_OS_DISTRO
+> > > +#define EEA_OS_DISTRO		0
+> > > +#endif
+> > > +
+> > > +#ifndef EEA_DRV_TYPE
+> > > +#define EEA_DRV_TYPE		0
+> > > +#endif
+> > > +
+> > > +#define EEA_OS_LINUX		1
+> > > +#define EEA_SPEC_VER_MAJOR	1
+> > > +#define EEA_SPEC_VER_MINOR	0
+> > > +	__le16	os_type;        /* Linux, Win.. */
+> > > +	__le16	os_dist;
+> > > +	__le16	drv_type;
+> > > +
+> > > +	__le16	kern_ver_major;
+> > > +	__le16	kern_ver_minor;
+> > > +	__le16	kern_ver_sub_minor;
+> > > +
+> > > +	__le16	drv_ver_major;
+> > > +	__le16	drv_ver_minor;
+> > > +	__le16	drv_ver_sub_minor;
+> > > +
+> > > +	__le16	spec_ver_major;
+> > > +	__le16	spec_ver_minor;
+> > > +	__le16	pci_bdf;
+> > > +	__le32	pci_domain;
+> > > +
+> > > +	u8      os_ver_str[64];
+> > > +	u8      isa_str[64];
+> >
+> > Why does it care about the OS, kernel version etc?
+> 
+> Then the device can know the version, the dpu can do something for bug of the
+> driver.
 
-This leads to use-after-free on ubufs access. This happens because CPU1
-skips waiting for wake_up() when refcount is already zero.
+That is not a very good explanation. Do you see any other system in
+Linux were the firmware works around bug in Linux drivers using the
+kernel version?
 
-To prevent that use a completion instead of wait_queue as the ubufs
-notification mechanism. wait_for_completion() guarantees that there will
-be complete() call prior to its return.
+You also need to think about enterprise kernels, like RedHat,
+Oracle. They don't give a truthful kernel version, they have thousands
+of patches on top fixing, and creating bugs. How will you handle that?
 
-We also need to reinit completion because refcnt == 0 does not mean
-freeing in case of vhost_net_flush() - it then sets refcnt back to 1.
-AFAIK concurrent calls to vhost_net_ubuf_put_and_wait() with the same
-ubufs object aren't possible since those calls (through vhost_net_flush()
-or vhost_net_set_backend()) are protected by the device mutex.
-So reinit_completion() right after wait_for_completion() should be fine.
+Please drop all this, and just fix the bugs in the driver.
 
-Cc: stable@vger.kernel.org
-Fixes: 0ad8b480d6ee9 ("vhost: fix ref cnt checking deadlock")
-Reported-by: Andrey Ryabinin <arbn@yandex-team.com>
-Suggested-by: Andrey Smetanin <asmetanin@yandex-team.ru>
-Signed-off-by: Nikolay Kuratov <kniv@yandex-team.ru>
----
- drivers/vhost/net.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+> > > +	start = get_jiffies_64();
+> > > +	while (!(cdesc = ering_cq_get_desc(enet->adminq.ring))) {
+> > > +		cond_resched();
+> > > +		cpu_relax();
+> > > +
+> > > +		timeout = secs_to_jiffies(READ_ONCE(aq_timeout));
+> > > +		if (time_after64(get_jiffies_64(), start + timeout)) {
+> > > +			netdev_err(enet->netdev, "admin queue timeout. timeout %d\n",
+> > > +				   READ_ONCE(aq_timeout));
+> > > +			return -1;
+> > > +		}
+> > > +	}
+> >
+> > See if you can one of the macros from iopoll.h
+> 
+> Here we do not access the pci register directly, if we use the iopoll.h
+> we need to break the api ering_cq_get_desc. So I think we should not use
+> the api of iopoll.h here.
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 7cbfc7d718b3..454d179fffeb 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -94,7 +94,7 @@ struct vhost_net_ubuf_ref {
- 	 * >1: outstanding ubufs
- 	 */
- 	atomic_t refcount;
--	wait_queue_head_t wait;
-+	struct completion wait;
- 	struct vhost_virtqueue *vq;
- };
- 
-@@ -240,7 +240,7 @@ vhost_net_ubuf_alloc(struct vhost_virtqueue *vq, bool zcopy)
- 	if (!ubufs)
- 		return ERR_PTR(-ENOMEM);
- 	atomic_set(&ubufs->refcount, 1);
--	init_waitqueue_head(&ubufs->wait);
-+	init_completion(&ubufs->wait);
- 	ubufs->vq = vq;
- 	return ubufs;
- }
-@@ -249,14 +249,15 @@ static int vhost_net_ubuf_put(struct vhost_net_ubuf_ref *ubufs)
- {
- 	int r = atomic_sub_return(1, &ubufs->refcount);
- 	if (unlikely(!r))
--		wake_up(&ubufs->wait);
-+		complete_all(&ubufs->wait);
- 	return r;
- }
- 
- static void vhost_net_ubuf_put_and_wait(struct vhost_net_ubuf_ref *ubufs)
- {
- 	vhost_net_ubuf_put(ubufs);
--	wait_event(ubufs->wait, !atomic_read(&ubufs->refcount));
-+	wait_for_completion(&ubufs->wait);
-+	reinit_completion(&ubufs->wait);
- }
- 
- static void vhost_net_ubuf_put_wait_and_free(struct vhost_net_ubuf_ref *ubufs)
--- 
-2.34.1
+#define read_poll_timeout(op, val, cond, sleep_us, timeout_us, \
+                                sleep_before_read, args...) \
+({ \
+        u64 __timeout_us = (timeout_us); \
+        unsigned long __sleep_us = (sleep_us); \
+        ktime_t __timeout = ktime_add_us(ktime_get(), __timeout_us); \
+        might_sleep_if((__sleep_us) != 0); \
+        if (sleep_before_read && __sleep_us) \
+                usleep_range((__sleep_us >> 2) + 1, __sleep_us); \
+        for (;;) { \
+                (val) = op(args); \
+                if (cond) \
+                        break; \
 
+
+op: ering_cq_get_desc.
+val: cdesc.
+args: enet->adminq.ring
+cond: !cdesc
+
+I might be wrong, but i think you can make this work.
+
+> > > +static void eea_get_drvinfo(struct net_device *netdev,
+> > > +			    struct ethtool_drvinfo *info)
+> > > +{
+> > > +	struct eea_net *enet = netdev_priv(netdev);
+> > > +	struct eea_device *edev = enet->edev;
+> > > +
+> > > +	strscpy(info->driver,   KBUILD_MODNAME,     sizeof(info->driver));
+> > > +	strscpy(info->bus_info, eea_pci_name(edev), sizeof(info->bus_info));
+> > > +	snprintf(info->version, sizeof(info->version), "%d.%d.%d",
+> > > +		 EEA_VER_MAJOR, EEA_VER_MINOR, EEA_VER_SUB_MINOR);
+> >
+> > A hard coded version is pointless, because it never changes, yet the
+> > kernel around the driver changes every week. Don't set version, and
+> > the core will fill in the git hash, which is useful.
+> 
+> In our plan, we will increase this version when we change the code.
+
+So you will be submitting a patch for GregKH for every single stable
+kernel? That will be around 5 patches, every two weeks, for the next
+30 years?
+
+As i said, the driver is not standalone, it is embedded within the
+kernel. Changes to the kernel can break the driver. When you get a bug
+report from a customer, and they say version v42 of the driver is
+broken, isn't the first thing you are going to ask is what kernel
+version? Is it a vendor kernel? Which vendor?
+
+If you leave version unfilled, ethtool will report something like:
+
+version: 6.12.29-amd64
+
+which is much more useful.
+
+> > > +	mtu = le16_to_cpu(cfg->mtu);
+> > > +	if (mtu < netdev->min_mtu) {
+> > > +		dev_err(edev->dma_dev, "device MTU too small. %d < %d", mtu, netdev->min_mtu);
+> > > +		return -EINVAL;
+> > > +	}
+> > > +
+> > > +	netdev->mtu = mtu;
+> > > +	netdev->max_mtu = mtu;
+> >
+> > Setting mtu the same as max_mtu is unusual? Are you defaulting to jumbo?
+> 
+> In the cloud the dpu controls this.
+
+No, linux controls this. This driver controls this, using these line
+here. Userspace can change it later, but this is the default. And 99%
+of Linux systems default to 1500. Is max_mtu 1500? Or is it some jumbo
+value? You at last need to add a comment you are ignoring what
+everybody else does and are setting the MTU to something larger,
+because that is what your use case is.
+
+You are aiming to write an Ethenet driver which looks pretty much like
+every other Ethernet driver in Linux. When you do something different,
+you need to justify it, add a comment why your device is special and
+needs to do something different.
+
+	Andrew
 
