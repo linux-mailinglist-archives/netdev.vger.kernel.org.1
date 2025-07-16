@@ -1,80 +1,88 @@
-Return-Path: <netdev+bounces-207452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A2E7B0751B
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 13:55:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05F0AB07520
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 13:55:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7D385835FB
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 11:55:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32DDA58348D
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 11:55:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DB622F5476;
-	Wed, 16 Jul 2025 11:53:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CBF82F49EA;
+	Wed, 16 Jul 2025 11:55:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HeK5URt1"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="M0GuYFvc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ECD02F533B
-	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 11:53:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1FDF2F0043
+	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 11:55:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752666830; cv=none; b=CND8dyAelN8MlgGgxlOTT8ajVu7QNZ3wXhiTohF508POpDQWYqRZdMon5h0DAqfa40vIHzOaYk258sJjMu8xCOzd7q5BJqwx1v11zbO0v3pDUvNKleufPLGShFq4gYRKRqTM541EssbsGbCRfr/hAk1OJRtN2jN8sEuSMKqAKyY=
+	t=1752666906; cv=none; b=ZrCt2n2CEc8uLLW0t7v5+BWzcI4jBM3I7HYB/U5t/vYgiEvi1kWLFAY7bhvrhH1OKJZfnQn5xVSgniJsfa44eBMAwo4X9PglXZKfmkrdfD83SaoyI8g1+IfpLwwe4/NofaWbE4UEpzOBclwDKrgs00qinIHXbyMXRFSbJty9794=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752666830; c=relaxed/simple;
-	bh=2KW2U/A4gk5SgRyGyeIXAj3+QH8TPX34JpTVHS++XsU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=d0vbmnirvyk/cOAKpOjG2ZUZJnsY4r8TfCOwTO+1I6NBHyLnnYslQS9AdgfEmMcduKPXC2pPtqKT0dViLihb5OiLGE4eilLc2dWrsmyo35pQCgTVxuys31f+uC/heZZ82dHKrjpa6riUBzYGhI5IqjSKWW+dMJ/HBMkwJI4EMVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HeK5URt1; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752666827;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gTjUnh8vzEtgGLxjFhakJRJqQjzQoh5z0pfGHbTFfL8=;
-	b=HeK5URt1yqDCyK/RUkTEClzyP8AkbD1MuSYxPnrP9WJztoSzVXcIr1te53GS0SbmzkeH41
-	iCZzEcY2x3+C+OCTgTw25v5F65KKo7vWOs0WXnDYi5kzlZmGJK7DWBm06ZAvGRZcerxCi3
-	Nt973rYLzx+THCLV5tAgf04u0ff3Okc=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-228-Av5-SLWRMbG6gvHGAc7-Ig-1; Wed,
- 16 Jul 2025 07:53:42 -0400
-X-MC-Unique: Av5-SLWRMbG6gvHGAc7-Ig-1
-X-Mimecast-MFC-AGG-ID: Av5-SLWRMbG6gvHGAc7-Ig_1752666821
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5B32419560AA;
-	Wed, 16 Jul 2025 11:53:41 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.2])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1E5DD195E772;
-	Wed, 16 Jul 2025 11:53:37 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
+	s=arc-20240116; t=1752666906; c=relaxed/simple;
+	bh=b/Qr9fmfhU3zQ+ZlD86/dATEmD0yYa42hN/E8r9sTbM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TDR6k3Eebc5LKZZLD8VnnnJmqtYipp0+h4nqme7Kd987MTfZhUkpPTBD/8MIBy8CmutdIiw4hpBkXQQpu3PS6IHfHSo+3v5V3+vhK+q45IJmnipjrWQ68xnXs8npznY5l82bSXbdiVYPh8m7wfdwIcEnB+EGzNIHlFnQCYqxBLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=M0GuYFvc; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ae3703c2a8bso1210088266b.0
+        for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 04:55:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1752666902; x=1753271702; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/Uy3kYc4RUx4HHgySuBAkgm8TQlGkSMGNPbV3xstLBQ=;
+        b=M0GuYFvcIGHqlIPNAstlG4qkvwG7nDHFd9I+hwwQUXzy3Nl2vY/5rlOK5QJXw6ZhwO
+         fM9JZYn6EG0wkq2MsYo0DI21dQDGMHbFFNyqt8U1uFzOtCPelJa41qWcU37x9AwKjNdY
+         J23dPo7CiJ0d16F4XBz2WzhuEtqR2P0JtP26BchOqiNQfYggUVefjXavp7hGdzXicfVH
+         B7SEyBvBndnjoQ5sZ3BTYNYGbaBYrl9Rt/FZtbIkRSa5JZSH6Dbs66MtcpybA8uXdzNM
+         QjEJm8rTbsTzi/AmIZPY3wjNvuWNO8YR7S6yrXC4lS7aq0sGdpQlx22AXsdmNFtEc12/
+         gH7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752666902; x=1753271702;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/Uy3kYc4RUx4HHgySuBAkgm8TQlGkSMGNPbV3xstLBQ=;
+        b=tiMFKgKz0cEcqmXfJENDI8G6zBhSK6+eJjwCdO3P6RRjAslA+q/fk2/vQXl1OrKHdP
+         WdArSCI0ovECehnmtLCNsIlFCTLVxawaEyiKcyfxXSu8jCL9QqzwQPDd68R0hZzj/GNl
+         0Tj8zihPFGUZvrb5SSUFjW4GC4flZiE4F5Ab1A9oEM6nRQ6QGMgDWIs55ZO/FRxAsh2f
+         VKVwvT/yRvWaJK1FDwnbH57t4snkmv4GyRw44ANj8yb5k3TM8sX5hIaQ7rCnE6avw4Oi
+         hhGw/eKOQb61R0+8s9SU2mDZJ3rZy4DGWwz9nJ7y1AoSBoknJeorynR0YRRroA+tkS9R
+         CCnw==
+X-Gm-Message-State: AOJu0Yyl4spL9WMHnBqIoANPkrP0XDoSfDFACvf/6vRLtZzSF9XcDAL4
+	l5BRsTOKnCpLOlLzlJgVzkfsvrLbjNiEYfvMinTb1yNPe7/Yb3jpjEbJmk7ob69h+xP33MTf+hR
+	8DtA+DcOupZqTYCiJYUUo2LobHPGE/8ud+U51rEYATl2Bplk19eBw5aRfIuBPT1nG
+X-Gm-Gg: ASbGncsy8Q0Sr5iAPKagEWeBBUc4RaTPPmLRwXBQF8KzQgCoa91rSZV4E/ixAucqOBv
+	twIyZo5QlDI+kdBFxw1PKiNM1Zul5Pm88gPh7BSs65T1InrR/yVkHud4+QiU5Uu4hFOhVflcpFJ
+	XBtW0jOBfJCL4CZu/JORUQXDU8au45CQ4MaZCE3K0YsAzh8ms//1p4MihodSKzWXaEElb68WWQs
+	ydKcDTRy9LQRXty/6+X0AaUqFU+obfOSZakrlqVB0F84rm0rfwGD0BqLFLSBOM2cdZToI5NQz8U
+	KBozKFYoJmSFQFNuCIbwJubniGlcF2wufv0j1N1EpMFUswD9P2m0uHNryjlPgxaoUK9eGE9SO99
+	jnScBKNmEpLcdJ0nThgllUy7M898WY7U0U8TgbGxfBCwrxg==
+X-Google-Smtp-Source: AGHT+IFwLwn5Rk9WDJdwgvsKxL6AyZ4UFuWomwB/xKU1sUj1/w6yPjI3y2s/LSJG8itS8Uetfr7clw==
+X-Received: by 2002:a17:907:7b9f:b0:ae0:a590:bc64 with SMTP id a640c23a62f3a-ae9c99aa90cmr311908766b.18.1752666901758;
+        Wed, 16 Jul 2025 04:55:01 -0700 (PDT)
+Received: from inifinity.homelan.mandelbit.com ([2001:67c:2fbc:1:96ff:526e:2192:5194])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae6e8264636sm1169169666b.86.2025.07.16.04.55.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Jul 2025 04:55:01 -0700 (PDT)
+From: Antonio Quartulli <antonio@openvpn.net>
 To: netdev@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
+Cc: Antonio Quartulli <antonio@openvpn.net>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-afs@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Jeffrey Altman <jaltman@auristor.com>,
-	Simon Horman <horms@kernel.org>,
-	stable@vger.kernel.org
-Subject: [PATCH net 5/5] rxrpc: Fix to use conn aborts for conn-wide failures
-Date: Wed, 16 Jul 2025 12:53:04 +0100
-Message-ID: <20250716115307.3572606-6-dhowells@redhat.com>
-In-Reply-To: <20250716115307.3572606-1-dhowells@redhat.com>
-References: <20250716115307.3572606-1-dhowells@redhat.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net 0/3] pull request: ovpn for net 2025-07-16
+Date: Wed, 16 Jul 2025 13:54:40 +0200
+Message-ID: <20250716115443.16763-1-antonio@openvpn.net>
+X-Mailer: git-send-email 2.49.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,190 +90,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Fix rxrpc to use connection-level aborts for things that affect the whole
-connection, such as the service ID not matching a local service.
+Hi netdev-team,
+[2025-07-16: patch 2 reworked to use attribute subsets in yaml spec]
 
-Fixes: 57af281e5389 ("rxrpc: Tidy up abort generation infrastructure")
-Reported-by: Jeffrey Altman <jaltman@auristor.com>
-Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Jeffrey Altman <jaltman@auristor.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Simon Horman <horms@kernel.org>
-cc: linux-afs@lists.infradead.org
-cc: netdev@vger.kernel.org
-cc: stable@vger.kernel.org
----
- include/trace/events/rxrpc.h |  1 +
- net/rxrpc/ar-internal.h      |  3 +++
- net/rxrpc/call_accept.c      | 12 ++++++------
- net/rxrpc/io_thread.c        | 14 ++++++++++++++
- net/rxrpc/output.c           | 19 ++++++++++---------
- net/rxrpc/security.c         |  8 ++++----
- 6 files changed, 38 insertions(+), 19 deletions(-)
+In this batch you can find the following bug fixes:
 
-diff --git a/include/trace/events/rxrpc.h b/include/trace/events/rxrpc.h
-index 8e5a73eb5268..de6f6d25767c 100644
---- a/include/trace/events/rxrpc.h
-+++ b/include/trace/events/rxrpc.h
-@@ -322,6 +322,7 @@
- 	EM(rxrpc_call_put_kernel,		"PUT kernel  ") \
- 	EM(rxrpc_call_put_poke,			"PUT poke    ") \
- 	EM(rxrpc_call_put_recvmsg,		"PUT recvmsg ") \
-+	EM(rxrpc_call_put_release_recvmsg_q,	"PUT rls-rcmq") \
- 	EM(rxrpc_call_put_release_sock,		"PUT rls-sock") \
- 	EM(rxrpc_call_put_release_sock_tba,	"PUT rls-sk-a") \
- 	EM(rxrpc_call_put_sendmsg,		"PUT sendmsg ") \
-diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
-index df1a618dbf7d..5b7342d43486 100644
---- a/net/rxrpc/ar-internal.h
-+++ b/net/rxrpc/ar-internal.h
-@@ -44,6 +44,7 @@ enum rxrpc_skb_mark {
- 	RXRPC_SKB_MARK_SERVICE_CONN_SECURED, /* Service connection response has been verified */
- 	RXRPC_SKB_MARK_REJECT_BUSY,	/* Reject with BUSY */
- 	RXRPC_SKB_MARK_REJECT_ABORT,	/* Reject with ABORT (code in skb->priority) */
-+	RXRPC_SKB_MARK_REJECT_CONN_ABORT, /* Reject with connection ABORT (code in skb->priority) */
- };
- 
- /*
-@@ -1253,6 +1254,8 @@ int rxrpc_encap_rcv(struct sock *, struct sk_buff *);
- void rxrpc_error_report(struct sock *);
- bool rxrpc_direct_abort(struct sk_buff *skb, enum rxrpc_abort_reason why,
- 			s32 abort_code, int err);
-+bool rxrpc_direct_conn_abort(struct sk_buff *skb, enum rxrpc_abort_reason why,
-+			     s32 abort_code, int err);
- int rxrpc_io_thread(void *data);
- void rxrpc_post_response(struct rxrpc_connection *conn, struct sk_buff *skb);
- static inline void rxrpc_wake_up_io_thread(struct rxrpc_local *local)
-diff --git a/net/rxrpc/call_accept.c b/net/rxrpc/call_accept.c
-index a4d76f2da684..00982a030744 100644
---- a/net/rxrpc/call_accept.c
-+++ b/net/rxrpc/call_accept.c
-@@ -374,8 +374,8 @@ bool rxrpc_new_incoming_call(struct rxrpc_local *local,
- 	spin_lock(&rx->incoming_lock);
- 	if (rx->sk.sk_state == RXRPC_SERVER_LISTEN_DISABLED ||
- 	    rx->sk.sk_state == RXRPC_CLOSE) {
--		rxrpc_direct_abort(skb, rxrpc_abort_shut_down,
--				   RX_INVALID_OPERATION, -ESHUTDOWN);
-+		rxrpc_direct_conn_abort(skb, rxrpc_abort_shut_down,
-+					RX_INVALID_OPERATION, -ESHUTDOWN);
- 		goto no_call;
- 	}
- 
-@@ -422,12 +422,12 @@ bool rxrpc_new_incoming_call(struct rxrpc_local *local,
- 
- unsupported_service:
- 	read_unlock_irq(&local->services_lock);
--	return rxrpc_direct_abort(skb, rxrpc_abort_service_not_offered,
--				  RX_INVALID_OPERATION, -EOPNOTSUPP);
-+	return rxrpc_direct_conn_abort(skb, rxrpc_abort_service_not_offered,
-+				       RX_INVALID_OPERATION, -EOPNOTSUPP);
- unsupported_security:
- 	read_unlock_irq(&local->services_lock);
--	return rxrpc_direct_abort(skb, rxrpc_abort_service_not_offered,
--				  RX_INVALID_OPERATION, -EKEYREJECTED);
-+	return rxrpc_direct_conn_abort(skb, rxrpc_abort_service_not_offered,
-+				       RX_INVALID_OPERATION, -EKEYREJECTED);
- no_call:
- 	spin_unlock(&rx->incoming_lock);
- 	read_unlock_irq(&local->services_lock);
-diff --git a/net/rxrpc/io_thread.c b/net/rxrpc/io_thread.c
-index 27b650d30f4d..e939ecf417c4 100644
---- a/net/rxrpc/io_thread.c
-+++ b/net/rxrpc/io_thread.c
-@@ -97,6 +97,20 @@ bool rxrpc_direct_abort(struct sk_buff *skb, enum rxrpc_abort_reason why,
- 	return false;
- }
- 
-+/*
-+ * Directly produce a connection abort from a packet.
-+ */
-+bool rxrpc_direct_conn_abort(struct sk_buff *skb, enum rxrpc_abort_reason why,
-+			     s32 abort_code, int err)
-+{
-+	struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
-+
-+	trace_rxrpc_abort(0, why, sp->hdr.cid, 0, sp->hdr.seq, abort_code, err);
-+	skb->mark = RXRPC_SKB_MARK_REJECT_CONN_ABORT;
-+	skb->priority = abort_code;
-+	return false;
-+}
-+
- static bool rxrpc_bad_message(struct sk_buff *skb, enum rxrpc_abort_reason why)
- {
- 	return rxrpc_direct_abort(skb, why, RX_PROTOCOL_ERROR, -EBADMSG);
-diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
-index 17c33b5cf7dd..8b5903b6e481 100644
---- a/net/rxrpc/output.c
-+++ b/net/rxrpc/output.c
-@@ -829,7 +829,13 @@ void rxrpc_reject_packet(struct rxrpc_local *local, struct sk_buff *skb)
- 	msg.msg_controllen = 0;
- 	msg.msg_flags = 0;
- 
--	memset(&whdr, 0, sizeof(whdr));
-+	whdr = (struct rxrpc_wire_header) {
-+		.epoch		= htonl(sp->hdr.epoch),
-+		.cid		= htonl(sp->hdr.cid),
-+		.callNumber	= htonl(sp->hdr.callNumber),
-+		.serviceId	= htons(sp->hdr.serviceId),
-+		.flags		= ~sp->hdr.flags & RXRPC_CLIENT_INITIATED,
-+	};
- 
- 	switch (skb->mark) {
- 	case RXRPC_SKB_MARK_REJECT_BUSY:
-@@ -837,6 +843,9 @@ void rxrpc_reject_packet(struct rxrpc_local *local, struct sk_buff *skb)
- 		size = sizeof(whdr);
- 		ioc = 1;
- 		break;
-+	case RXRPC_SKB_MARK_REJECT_CONN_ABORT:
-+		whdr.callNumber	= 0;
-+		fallthrough;
- 	case RXRPC_SKB_MARK_REJECT_ABORT:
- 		whdr.type = RXRPC_PACKET_TYPE_ABORT;
- 		code = htonl(skb->priority);
-@@ -850,14 +859,6 @@ void rxrpc_reject_packet(struct rxrpc_local *local, struct sk_buff *skb)
- 	if (rxrpc_extract_addr_from_skb(&srx, skb) == 0) {
- 		msg.msg_namelen = srx.transport_len;
- 
--		whdr.epoch	= htonl(sp->hdr.epoch);
--		whdr.cid	= htonl(sp->hdr.cid);
--		whdr.callNumber	= htonl(sp->hdr.callNumber);
--		whdr.serviceId	= htons(sp->hdr.serviceId);
--		whdr.flags	= sp->hdr.flags;
--		whdr.flags	^= RXRPC_CLIENT_INITIATED;
--		whdr.flags	&= RXRPC_CLIENT_INITIATED;
--
- 		iov_iter_kvec(&msg.msg_iter, WRITE, iov, ioc, size);
- 		ret = do_udp_sendmsg(local->socket, &msg, size);
- 		if (ret < 0)
-diff --git a/net/rxrpc/security.c b/net/rxrpc/security.c
-index 078d91a6b77f..2bfbf2b2bb37 100644
---- a/net/rxrpc/security.c
-+++ b/net/rxrpc/security.c
-@@ -140,15 +140,15 @@ const struct rxrpc_security *rxrpc_get_incoming_security(struct rxrpc_sock *rx,
- 
- 	sec = rxrpc_security_lookup(sp->hdr.securityIndex);
- 	if (!sec) {
--		rxrpc_direct_abort(skb, rxrpc_abort_unsupported_security,
--				   RX_INVALID_OPERATION, -EKEYREJECTED);
-+		rxrpc_direct_conn_abort(skb, rxrpc_abort_unsupported_security,
-+					RX_INVALID_OPERATION, -EKEYREJECTED);
- 		return NULL;
- 	}
- 
- 	if (sp->hdr.securityIndex != RXRPC_SECURITY_NONE &&
- 	    !rx->securities) {
--		rxrpc_direct_abort(skb, rxrpc_abort_no_service_key,
--				   sec->no_key_abort, -EKEYREJECTED);
-+		rxrpc_direct_conn_abort(skb, rxrpc_abort_no_service_key,
-+					sec->no_key_abort, -EKEYREJECTED);
- 		return NULL;
- 	}
- 
+Patch 1: make sure to propagate any socket FW mark set by userspace
+(via SO_MARK) to skbs being sent over that socket.
 
+Patch 2: reject unexpected netlink attributes in user requests.
+This was partly open-coded and partly implemented via ovpn.yaml spec.
+
+Patch 3: reset the skb's GSO state when moving a packet from transport
+to tunnel layer.
+
+Please pull or let me know of any issue!
+
+Thanks a lot.
+Antonio,
+
+The following changes since commit dae7f9cbd1909de2b0bccc30afef95c23f93e477:
+
+  Merge branch 'mptcp-fix-fallback-related-races' (2025-07-15 17:31:30 -0700)
+
+are available in the Git repository at:
+
+  https://github.com/OpenVPN/ovpn-net-next tags/ovpn-net-20250716
+
+for you to fetch changes up to 2022d704014d7a5b19dfe0a1ae5c67be0498e37c:
+
+  ovpn: reset GSO metadata after decapsulation (2025-07-16 11:53:19 +0200)
+
+----------------------------------------------------------------
+This bugfix batch includes the following changes:
+* properly propagate sk mark to skb->mark field
+* reject unexpected incoming netlink attributes
+* reset GSO state when moving skb from transport to tunnel layer
+
+----------------------------------------------------------------
+Antonio Quartulli (1):
+      ovpn: reject unexpected netlink attributes
+
+Ralf Lici (2):
+      ovpn: propagate socket mark to skb in UDP
+      ovpn: reset GSO metadata after decapsulation
+
+ Documentation/netlink/specs/ovpn.yaml | 153 ++++++++++++++++++++++++++++++++--
+ drivers/net/ovpn/io.c                 |   7 ++
+ drivers/net/ovpn/netlink-gen.c        |  61 ++++++++++++--
+ drivers/net/ovpn/netlink-gen.h        |   6 ++
+ drivers/net/ovpn/netlink.c            |  51 ++++++++++--
+ drivers/net/ovpn/udp.c                |   1 +
+ 6 files changed, 259 insertions(+), 20 deletions(-)
 
