@@ -1,88 +1,93 @@
-Return-Path: <netdev+bounces-207453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207454-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05F0AB07520
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 13:55:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EDC3B07526
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 13:56:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32DDA58348D
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 11:55:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 325A37B120A
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 11:54:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CBF82F49EA;
-	Wed, 16 Jul 2025 11:55:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 287C72F4A14;
+	Wed, 16 Jul 2025 11:55:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="M0GuYFvc"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="YfeRpAjo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1FDF2F0043
-	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 11:55:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D682376F7
+	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 11:55:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752666906; cv=none; b=ZrCt2n2CEc8uLLW0t7v5+BWzcI4jBM3I7HYB/U5t/vYgiEvi1kWLFAY7bhvrhH1OKJZfnQn5xVSgniJsfa44eBMAwo4X9PglXZKfmkrdfD83SaoyI8g1+IfpLwwe4/NofaWbE4UEpzOBclwDKrgs00qinIHXbyMXRFSbJty9794=
+	t=1752666907; cv=none; b=SENpM8kzRCtpsFBEkEfEo0V25O3mm12IgASw40R8f3/Pvcg6ONFgp7KBAKejMZGb9Dehl2jaqNOAzdD8nL9F7IjZPSRDo2QydIKMaaXJ9Zjb/NbEcCWqPMzEpr9DiAFOSipdSNjXVjbKbBVYeB1OCMqeL/SU+MDE2BZTwe19RWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752666906; c=relaxed/simple;
-	bh=b/Qr9fmfhU3zQ+ZlD86/dATEmD0yYa42hN/E8r9sTbM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TDR6k3Eebc5LKZZLD8VnnnJmqtYipp0+h4nqme7Kd987MTfZhUkpPTBD/8MIBy8CmutdIiw4hpBkXQQpu3PS6IHfHSo+3v5V3+vhK+q45IJmnipjrWQ68xnXs8npznY5l82bSXbdiVYPh8m7wfdwIcEnB+EGzNIHlFnQCYqxBLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=M0GuYFvc; arc=none smtp.client-ip=209.85.218.43
+	s=arc-20240116; t=1752666907; c=relaxed/simple;
+	bh=PHfqff40ak0nzjYDD0920xW5g6v53AeyEK5zqYbSZWU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=t6qbe6dXsqBylrpCuhGdnefZD97phdkXutfaI+c9Z14eYIMH2J6bhbib9EfGqS5TR0dxv+VFOIZvUPONt4p8dZ2/HhJ8W+H+ty6VQzq/mMad3/5idr+46F4WAuooJNjwjMQ2RjB26ingb4+rukYdBFZo7pjL/N4VUppzJu+WYgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=YfeRpAjo; arc=none smtp.client-ip=209.85.218.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ae3703c2a8bso1210088266b.0
-        for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 04:55:03 -0700 (PDT)
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-ae3c5f666bfso1143645066b.3
+        for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 04:55:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1752666902; x=1753271702; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/Uy3kYc4RUx4HHgySuBAkgm8TQlGkSMGNPbV3xstLBQ=;
-        b=M0GuYFvcIGHqlIPNAstlG4qkvwG7nDHFd9I+hwwQUXzy3Nl2vY/5rlOK5QJXw6ZhwO
-         fM9JZYn6EG0wkq2MsYo0DI21dQDGMHbFFNyqt8U1uFzOtCPelJa41qWcU37x9AwKjNdY
-         J23dPo7CiJ0d16F4XBz2WzhuEtqR2P0JtP26BchOqiNQfYggUVefjXavp7hGdzXicfVH
-         B7SEyBvBndnjoQ5sZ3BTYNYGbaBYrl9Rt/FZtbIkRSa5JZSH6Dbs66MtcpybA8uXdzNM
-         QjEJm8rTbsTzi/AmIZPY3wjNvuWNO8YR7S6yrXC4lS7aq0sGdpQlx22AXsdmNFtEc12/
-         gH7A==
+        d=openvpn.net; s=google; t=1752666903; x=1753271703; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TEUkUqdHmtpvfRO+CHi6jqs94674FUmFpzG0/8wdHBY=;
+        b=YfeRpAjo4NZyuI0IT4r5PMHtJ4T+pD1jD6RE59ZwfmDRPwdfLm4/HzVg63zlbTEk47
+         4NWrTmDWz9VyzOlXgxa7pNjO5pUXdomSMNBEEzOQhauRgzrseJRKPJsTUK7nyN44yYdU
+         BJ3joo5T0opOzXMp/SY3X3EnjrLLu1pDCgX8i03aBl9xVvGS0dnZZ79CmlbkgurxroVY
+         XYRpc3wePZ5EZEY4EZzw0YEJeqBFKcSnTg1hrAZbCmHIsMm6pVjkzBcmFbMuvDB6J+ZA
+         wMVORmW1pxOKfMGb1P+vFsM9SN+tDltjBAJPIeqMH7X0shzndZMf4AA/Z0inC6sFKI76
+         nNxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752666902; x=1753271702;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/Uy3kYc4RUx4HHgySuBAkgm8TQlGkSMGNPbV3xstLBQ=;
-        b=tiMFKgKz0cEcqmXfJENDI8G6zBhSK6+eJjwCdO3P6RRjAslA+q/fk2/vQXl1OrKHdP
-         WdArSCI0ovECehnmtLCNsIlFCTLVxawaEyiKcyfxXSu8jCL9QqzwQPDd68R0hZzj/GNl
-         0Tj8zihPFGUZvrb5SSUFjW4GC4flZiE4F5Ab1A9oEM6nRQ6QGMgDWIs55ZO/FRxAsh2f
-         VKVwvT/yRvWaJK1FDwnbH57t4snkmv4GyRw44ANj8yb5k3TM8sX5hIaQ7rCnE6avw4Oi
-         hhGw/eKOQb61R0+8s9SU2mDZJ3rZy4DGWwz9nJ7y1AoSBoknJeorynR0YRRroA+tkS9R
-         CCnw==
-X-Gm-Message-State: AOJu0Yyl4spL9WMHnBqIoANPkrP0XDoSfDFACvf/6vRLtZzSF9XcDAL4
-	l5BRsTOKnCpLOlLzlJgVzkfsvrLbjNiEYfvMinTb1yNPe7/Yb3jpjEbJmk7ob69h+xP33MTf+hR
-	8DtA+DcOupZqTYCiJYUUo2LobHPGE/8ud+U51rEYATl2Bplk19eBw5aRfIuBPT1nG
-X-Gm-Gg: ASbGncsy8Q0Sr5iAPKagEWeBBUc4RaTPPmLRwXBQF8KzQgCoa91rSZV4E/ixAucqOBv
-	twIyZo5QlDI+kdBFxw1PKiNM1Zul5Pm88gPh7BSs65T1InrR/yVkHud4+QiU5Uu4hFOhVflcpFJ
-	XBtW0jOBfJCL4CZu/JORUQXDU8au45CQ4MaZCE3K0YsAzh8ms//1p4MihodSKzWXaEElb68WWQs
-	ydKcDTRy9LQRXty/6+X0AaUqFU+obfOSZakrlqVB0F84rm0rfwGD0BqLFLSBOM2cdZToI5NQz8U
-	KBozKFYoJmSFQFNuCIbwJubniGlcF2wufv0j1N1EpMFUswD9P2m0uHNryjlPgxaoUK9eGE9SO99
-	jnScBKNmEpLcdJ0nThgllUy7M898WY7U0U8TgbGxfBCwrxg==
-X-Google-Smtp-Source: AGHT+IFwLwn5Rk9WDJdwgvsKxL6AyZ4UFuWomwB/xKU1sUj1/w6yPjI3y2s/LSJG8itS8Uetfr7clw==
-X-Received: by 2002:a17:907:7b9f:b0:ae0:a590:bc64 with SMTP id a640c23a62f3a-ae9c99aa90cmr311908766b.18.1752666901758;
-        Wed, 16 Jul 2025 04:55:01 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752666903; x=1753271703;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TEUkUqdHmtpvfRO+CHi6jqs94674FUmFpzG0/8wdHBY=;
+        b=ZJ8YdWCA25y8mTfklZ4xxuI/Tu0J+SROfg/MFisMRcIdJvXr4I9ALOyTxxdcaVS2aq
+         XOsrVOMwzPVU9Q+1GQO6y3vkfAGqmve1b3TMreq/KJBm4Yk+w1RCRnZ8F3O4BPkpLrW3
+         N7c2h45c4fglpBeEiG6vzJP8IxW3jrcnf0tHQv/574sWQBr6cHBRn2KjCezvE6k1ebMB
+         QrGg4slgRcFZGjMsl2tSZutuTdI9lZv/4eZ+LVVRYU3MR6QV9t7DJq4z1/Hckr6LLvGX
+         52kfVR9aUd3++fu/tf4vB7dZ2vtvKBRHy2PRMfH1ddrmf04cdEjGdsb8Mm+gBlDAQ104
+         J1pg==
+X-Gm-Message-State: AOJu0Yw1LJhhyFY0GYwJMGQdXkGkgT4sgQ+f+gCWbJdZ4RQ7ozQl7Ks7
+	f91NjXZVKO+zcwT1/hzQ17NB3kOvIZbO/87m8bafpRqTJ5wpjnHulwLzxJ/SJhIqdNgR6i312V+
+	BtDwkejpZ9YEV9jPjQJikrfDJgGCE0KNfTdaql4Sh1PwlMDIIOsPFd2S+z5X3c1SR
+X-Gm-Gg: ASbGncscrDgOrSO0nhvoFx7Hx/vUf8TegkivcqZVy9rgNsU1gEW4zApx+3h2uG4JYbx
+	LIRmKVKnZRCjjDF5kOZ0VB+NQctmbs33dfHwh97vzoU+l5u9hQFkduKiWs1DzRkCoYVX6RcYJXS
+	wX42mDHM37sDZR5iETK5uxvDjgfeSos/S6UtitazdbeOwKxDcUkXwrv4wrByhcVOYSB712eniWm
+	LjWMLaHML78flD9MwqE+X0jTnCd0xSwf42F9W6aZb4dJx3G++xOlRQjF2fCVdyN0ZmEsYOrf/Op
+	Y0zaGN9m8GT5OPJGZHaKqCjMGh4nycbvv9/e6srrkOWNeLjb4Lfq7/9vF5yCwMXLRpHAeYZ2/1c
+	hztUL52RTsMa0COXd7FZMBdXRYg31A4p5Q3xZf1JGr6Ec5Q==
+X-Google-Smtp-Source: AGHT+IEFH9T6EfRdlOQfHMc6t3tcujw/RzjKR5kCk0FzCBggX4yjtuoQOOFQChNcJAfNr4hpWHOI5Q==
+X-Received: by 2002:a17:906:8304:b0:ae0:16c5:d429 with SMTP id a640c23a62f3a-ae9c9b9d21fmr232892666b.58.1752666902836;
+        Wed, 16 Jul 2025 04:55:02 -0700 (PDT)
 Received: from inifinity.homelan.mandelbit.com ([2001:67c:2fbc:1:96ff:526e:2192:5194])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae6e8264636sm1169169666b.86.2025.07.16.04.55.00
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae6e8264636sm1169169666b.86.2025.07.16.04.55.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Jul 2025 04:55:01 -0700 (PDT)
+        Wed, 16 Jul 2025 04:55:02 -0700 (PDT)
 From: Antonio Quartulli <antonio@openvpn.net>
 To: netdev@vger.kernel.org
-Cc: Antonio Quartulli <antonio@openvpn.net>,
+Cc: Ralf Lici <ralf@mandelbit.com>,
 	Sabrina Dubroca <sd@queasysnail.net>,
 	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net 0/3] pull request: ovpn for net 2025-07-16
-Date: Wed, 16 Jul 2025 13:54:40 +0200
-Message-ID: <20250716115443.16763-1-antonio@openvpn.net>
+	Paolo Abeni <pabeni@redhat.com>,
+	Antonio Quartulli <antonio@openvpn.net>
+Subject: [PATCH net 1/3] ovpn: propagate socket mark to skb in UDP
+Date: Wed, 16 Jul 2025 13:54:41 +0200
+Message-ID: <20250716115443.16763-2-antonio@openvpn.net>
 X-Mailer: git-send-email 2.49.1
+In-Reply-To: <20250716115443.16763-1-antonio@openvpn.net>
+References: <20250716115443.16763-1-antonio@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,56 +96,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi netdev-team,
-[2025-07-16: patch 2 reworked to use attribute subsets in yaml spec]
+From: Ralf Lici <ralf@mandelbit.com>
 
-In this batch you can find the following bug fixes:
+OpenVPN allows users to configure a FW mark on sockets used to
+communicate with other peers. The mark is set by means of the
+`SO_MARK` Linux socket option.
 
-Patch 1: make sure to propagate any socket FW mark set by userspace
-(via SO_MARK) to skbs being sent over that socket.
+However, in the ovpn UDP code path, the socket's `sk_mark` value is
+currently ignored and it is not propagated to outgoing `skbs`.
 
-Patch 2: reject unexpected netlink attributes in user requests.
-This was partly open-coded and partly implemented via ovpn.yaml spec.
+This commit ensures proper inheritance of the field by setting
+`skb->mark` to `sk->sk_mark` before handing the `skb` to the network
+stack for transmission.
 
-Patch 3: reset the skb's GSO state when moving a packet from transport
-to tunnel layer.
+Fixes: 08857b5ec5d9 ("ovpn: implement basic TX path (UDP)")
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+Signed-off-by: Ralf Lici <ralf@mandelbit.com>
+Link: https://www.mail-archive.com/openvpn-devel@lists.sourceforge.net/msg31877.html
+Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+---
+ drivers/net/ovpn/udp.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Please pull or let me know of any issue!
+diff --git a/drivers/net/ovpn/udp.c b/drivers/net/ovpn/udp.c
+index bff00946eae2..60435a21f29c 100644
+--- a/drivers/net/ovpn/udp.c
++++ b/drivers/net/ovpn/udp.c
+@@ -344,6 +344,7 @@ void ovpn_udp_send_skb(struct ovpn_peer *peer, struct sock *sk,
+ 	int ret;
+ 
+ 	skb->dev = peer->ovpn->dev;
++	skb->mark = READ_ONCE(sk->sk_mark);
+ 	/* no checksum performed at this layer */
+ 	skb->ip_summed = CHECKSUM_NONE;
+ 
+-- 
+2.49.1
 
-Thanks a lot.
-Antonio,
-
-The following changes since commit dae7f9cbd1909de2b0bccc30afef95c23f93e477:
-
-  Merge branch 'mptcp-fix-fallback-related-races' (2025-07-15 17:31:30 -0700)
-
-are available in the Git repository at:
-
-  https://github.com/OpenVPN/ovpn-net-next tags/ovpn-net-20250716
-
-for you to fetch changes up to 2022d704014d7a5b19dfe0a1ae5c67be0498e37c:
-
-  ovpn: reset GSO metadata after decapsulation (2025-07-16 11:53:19 +0200)
-
-----------------------------------------------------------------
-This bugfix batch includes the following changes:
-* properly propagate sk mark to skb->mark field
-* reject unexpected incoming netlink attributes
-* reset GSO state when moving skb from transport to tunnel layer
-
-----------------------------------------------------------------
-Antonio Quartulli (1):
-      ovpn: reject unexpected netlink attributes
-
-Ralf Lici (2):
-      ovpn: propagate socket mark to skb in UDP
-      ovpn: reset GSO metadata after decapsulation
-
- Documentation/netlink/specs/ovpn.yaml | 153 ++++++++++++++++++++++++++++++++--
- drivers/net/ovpn/io.c                 |   7 ++
- drivers/net/ovpn/netlink-gen.c        |  61 ++++++++++++--
- drivers/net/ovpn/netlink-gen.h        |   6 ++
- drivers/net/ovpn/netlink.c            |  51 ++++++++++--
- drivers/net/ovpn/udp.c                |   1 +
- 6 files changed, 259 insertions(+), 20 deletions(-)
 
