@@ -1,233 +1,534 @@
-Return-Path: <netdev+bounces-207535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31A01B07B28
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 18:27:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54C0EB07B29
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 18:27:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F388318861A0
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 16:26:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E43A218848E5
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 16:27:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 585061A01BF;
-	Wed, 16 Jul 2025 16:25:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 521F52F433B;
+	Wed, 16 Jul 2025 16:26:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="G4/0+YdK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ArDo3ZZX"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55D681A238C
-	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 16:25:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 269E11A01BF;
+	Wed, 16 Jul 2025 16:26:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752683157; cv=none; b=Xz//TDGQ8v/ndjd8EtsEmauV1gBPbdCIHF4IiLUNp7FR3lqW8or7xEqLGEAj5KfCoG+QTAQInyyhzR4uV4VvHFcO9XmB2PG+2dRSrQesk1Lw9A+SCt+TBpn84+QTI+Deqe084cWwbS9tzfJWqVRXWaQKDqTNmxbt9/MXZ0oYH8k=
+	t=1752683218; cv=none; b=PA6B2a9QH8qCm1vZmKmTXGsPyffWCc/tw+eE0rbbjoEivwsxC4SqzoSF3oabdsX4ZP/wCD/0fjozvjt3Fsk0EGSkNDZS9guIu/CF5/Nsyig9urVSo7bAmbAjqOdaQGVYY43ofkaZ1g6arqeHk1JlQeEbn5Yl/qcWFMN/61Gxcpk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752683157; c=relaxed/simple;
-	bh=fUCAaAUcl3fjvpfGRnuWqPaEjtirTBYGuwlRXzRdA1s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BMF/S6S7YKMaJ/9TsLIj2nn0XEffyC4HhD0Shp3Bj1uXfRRJvYN5zxYvT+XTy2DxCQ5Dz5tTGD1wvMzUC6QjBlpxFRFuLZpI24oV44Qkn7NZbVzKteAtfBGIKDWdxkgY9m4119UKA7fqeG7IeOT6aXjTixbkJnApovy2jAOwL7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=G4/0+YdK; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=qjOzeZCl02wZqsFL8kImKs7arIdC+XCdDUfSQNPYotU=; b=G4/0+YdKKYd13y84VrOTEePrYA
-	VAWkv20agae3JTzfHngPenofk6twr6/NQnMiHldJK/uAjbVp5YXzIlmpQd8GLjH1g1TzT0m0KPaSb
-	co8LIXNBHFgJf0iBbXKT68ofxQa5mN/BEClLp4iIPLWNLE+T/W6nBvWDee905RexO/fg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uc4wu-001hp6-7I; Wed, 16 Jul 2025 18:25:40 +0200
-Date: Wed, 16 Jul 2025 18:25:40 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Philo Lu <lulie@linux.alibaba.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
-	Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	Dust Li <dust.li@linux.alibaba.com>
-Subject: Re: [PATCH net-next] eea: Add basic driver framework for Alibaba
- Elastic Ethernet Adaptor
-Message-ID: <322af656-d359-44d8-9e40-4f997a8b7e0f@lunn.ch>
-References: <20250710112817.85741-1-xuanzhuo@linux.alibaba.com>
- <7b957110-c675-438a-b0c2-ebc161a5d8e7@lunn.ch>
- <1752644852.1458855-1-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1752683218; c=relaxed/simple;
+	bh=MQ2ZFJ3yqDUXteD66Aciiw8G+hTtg58qXTrdesoNKKM=;
+	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=ZCCIoe4HgSuJyEvFze87sJzTVXFm7NcuvN5M1/SD+Qxf2zHhjvK0JnQHDZUQntZDuw5Jzh+AmVaHGB8lb2sIK5VyrbnqC6wbnOesmiIuP1HHwC7W27jQzABzLQA5gLdW9uMTEyA+Gf7QHadlYWuobJUzSE+Lvl8gVwS+zKTL4yE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ArDo3ZZX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9616DC4CEE7;
+	Wed, 16 Jul 2025 16:26:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752683217;
+	bh=MQ2ZFJ3yqDUXteD66Aciiw8G+hTtg58qXTrdesoNKKM=;
+	h=Subject:From:To:Cc:Date:From;
+	b=ArDo3ZZXg5Dzy1wiQEU2hP/48JrlZVZATSt12D2/L+O4zzQnIrGBMnX32ZYmZ9gTs
+	 yXpCElA+e0EV7GRKr7CGhudPK5PX6YfsdS+HVNm92afMci0ICYjTCTqeMbP8cKI5XV
+	 /QJV6h9VzxPPYgIZ7AbCZYWCGjOoBEUHuhEORC6D/LyH7sfpw2eLgk4Okbksc3suXF
+	 1SRC93iUxS0mgKBquMvRA3zs6ItqTnoe2V+Gg1BWLzPzFj764IeU9VvxlMBR9X7CTR
+	 UrUj7yi5gxWZsOUGDvrg4EWN887236LcMsxhUdPZ4/DFyzB5h3Kq+Bcx3l3Q4r5gVk
+	 so8M+thWI1aQg==
+Subject: [PATCH net-next V5] net: track pfmemalloc drops via
+ SKB_DROP_REASON_PFMEMALLOC
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+To: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
+ Eric Dumazet <eric.dumazet@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+ kernel-team@cloudflare.com, mfleming@cloudflare.com
+Date: Wed, 16 Jul 2025 18:26:53 +0200
+Message-ID: <175268316579.2407873.11634752355644843509.stgit@firesoul>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1752644852.1458855-1-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 16, 2025 at 01:47:32PM +0800, Xuan Zhuo wrote:
-> Thank you for your valuable feedback. We've addressed most of the comments
-> and will include the fixes in the next version. A few remaining items are still
-> under discussion and listed below for reference.
-> 
-> On Thu, 10 Jul 2025 15:45:38 +0200, Andrew Lunn <andrew@lunn.ch> wrote:
-> > > +module_param(aq_timeout, uint, 0644);
-> >
-> > No module params please.
-> >
-> > > +struct eea_aq_host_info_cfg {
-> > > +#ifndef EEA_OS_DISTRO
-> > > +#define EEA_OS_DISTRO		0
-> > > +#endif
-> > > +
-> > > +#ifndef EEA_DRV_TYPE
-> > > +#define EEA_DRV_TYPE		0
-> > > +#endif
-> > > +
-> > > +#define EEA_OS_LINUX		1
-> > > +#define EEA_SPEC_VER_MAJOR	1
-> > > +#define EEA_SPEC_VER_MINOR	0
-> > > +	__le16	os_type;        /* Linux, Win.. */
-> > > +	__le16	os_dist;
-> > > +	__le16	drv_type;
-> > > +
-> > > +	__le16	kern_ver_major;
-> > > +	__le16	kern_ver_minor;
-> > > +	__le16	kern_ver_sub_minor;
-> > > +
-> > > +	__le16	drv_ver_major;
-> > > +	__le16	drv_ver_minor;
-> > > +	__le16	drv_ver_sub_minor;
-> > > +
-> > > +	__le16	spec_ver_major;
-> > > +	__le16	spec_ver_minor;
-> > > +	__le16	pci_bdf;
-> > > +	__le32	pci_domain;
-> > > +
-> > > +	u8      os_ver_str[64];
-> > > +	u8      isa_str[64];
-> >
-> > Why does it care about the OS, kernel version etc?
-> 
-> Then the device can know the version, the dpu can do something for bug of the
-> driver.
+Add a new SKB drop reason (SKB_DROP_REASON_PFMEMALLOC) to track packets
+dropped due to memory pressure. In production environments, we've observed
+memory exhaustion reported by memory layer stack traces, but these drops
+were not properly tracked in the SKB drop reason infrastructure.
 
-That is not a very good explanation. Do you see any other system in
-Linux were the firmware works around bug in Linux drivers using the
-kernel version?
+While most network code paths now properly report pfmemalloc drops, some
+protocol-specific socket implementations still use sk_filter() without
+drop reason tracking:
+- Bluetooth L2CAP sockets
+- CAIF sockets
+- IUCV sockets
+- Netlink sockets
+- SCTP sockets
+- Unix domain sockets
 
-You also need to think about enterprise kernels, like RedHat,
-Oracle. They don't give a truthful kernel version, they have thousands
-of patches on top fixing, and creating bugs. How will you handle that?
+These remaining cases represent less common paths and could be converted
+in a follow-up patch if needed. The current implementation provides
+significantly improved observability into memory pressure events in the
+network stack, especially for key protocols like TCP and UDP, helping to
+diagnose problems in production environments.
 
-Please drop all this, and just fix the bugs in the driver.
+Reported-by: Matt Fleming <mfleming@cloudflare.com>
+Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+---
+V5:
+ - Rebase and adjust for d2527ad3a9e1 ("net: preserve MSG_ZEROCOPY with forwarding")
+ - Address feedback from Jakub/kuba https://lore.kernel.org/all/20250707174346.2211c46a@kernel.org/
+  - Remove unnecessary brackets in if-statement
+  - Improved description of SKB_DROP_REASON_PFMEMALLOC
+  - Move err assignment out of if-statement in tcp_add_backlog
+  - Adjust rose code to use negation to stay below 80 chars
+V4:
+ - Rebase and resend
+ - link: https://lore.kernel.org/all/175146472829.1363787.9293177520571232738.stgit@firesoul/
+V3:
+ - Add some whitespace lines to please checkpatch
+ - Don't correct skb_drop_reason type in __udp4_lib_rcv
+ - drop_reason variable in RX-handler (__netif_receive_skb_core)
+ - link: https://lore.kernel.org/all/174861348802.1621620.12023807708034587582.stgit@firesoul
+V2:
+ - link: https://lore.kernel.org/all/174680137188.1282310.4154030185267079690.stgit@firesoul/
+V1:
+ - link: https://lore.kernel.org/all/174619899817.1075985.12078484570755125058.stgit@firesoul/
 
-> > > +	start = get_jiffies_64();
-> > > +	while (!(cdesc = ering_cq_get_desc(enet->adminq.ring))) {
-> > > +		cond_resched();
-> > > +		cpu_relax();
-> > > +
-> > > +		timeout = secs_to_jiffies(READ_ONCE(aq_timeout));
-> > > +		if (time_after64(get_jiffies_64(), start + timeout)) {
-> > > +			netdev_err(enet->netdev, "admin queue timeout. timeout %d\n",
-> > > +				   READ_ONCE(aq_timeout));
-> > > +			return -1;
-> > > +		}
-> > > +	}
-> >
-> > See if you can one of the macros from iopoll.h
-> 
-> Here we do not access the pci register directly, if we use the iopoll.h
-> we need to break the api ering_cq_get_desc. So I think we should not use
-> the api of iopoll.h here.
+---
+ drivers/net/tun.c             |    6 ++----
+ include/linux/filter.h        |   14 ++++++++++++--
+ include/net/dropreason-core.h |    6 ++++++
+ include/net/tcp.h             |    2 +-
+ net/core/dev.c                |    8 ++++++--
+ net/core/filter.c             |   15 ++++++++++++---
+ net/core/sock.c               |   20 +++++++++++++-------
+ net/ipv4/tcp_ipv4.c           |   26 +++++++++++++++-----------
+ net/ipv4/udp.c                |    6 ++----
+ net/ipv6/tcp_ipv6.c           |    9 +++------
+ net/ipv6/udp.c                |    4 +---
+ net/rose/rose_in.c            |    3 ++-
+ 12 files changed, 75 insertions(+), 44 deletions(-)
 
-#define read_poll_timeout(op, val, cond, sleep_us, timeout_us, \
-                                sleep_before_read, args...) \
-({ \
-        u64 __timeout_us = (timeout_us); \
-        unsigned long __sleep_us = (sleep_us); \
-        ktime_t __timeout = ktime_add_us(ktime_get(), __timeout_us); \
-        might_sleep_if((__sleep_us) != 0); \
-        if (sleep_before_read && __sleep_us) \
-                usleep_range((__sleep_us >> 2) + 1, __sleep_us); \
-        for (;;) { \
-                (val) = op(args); \
-                if (cond) \
-                        break; \
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index 49bcd12a4ac8..e65228ba3fae 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -1002,8 +1002,8 @@ static unsigned int run_ebpf_filter(struct tun_struct *tun,
+ /* Net device start xmit */
+ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+ {
++	enum skb_drop_reason drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
+ 	struct tun_struct *tun = netdev_priv(dev);
+-	enum skb_drop_reason drop_reason;
+ 	int txq = skb->queue_mapping;
+ 	struct netdev_queue *queue;
+ 	struct tun_file *tfile;
+@@ -1032,10 +1032,8 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	}
+ 
+ 	if (tfile->socket.sk->sk_filter &&
+-	    sk_filter(tfile->socket.sk, skb)) {
+-		drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
++	    sk_filter_reason(tfile->socket.sk, skb, &drop_reason))
+ 		goto drop;
+-	}
+ 
+ 	len = run_ebpf_filter(tun, skb, len);
+ 	if (len == 0) {
+diff --git a/include/linux/filter.h b/include/linux/filter.h
+index f5cf4d35d83e..4e82332afe03 100644
+--- a/include/linux/filter.h
++++ b/include/linux/filter.h
+@@ -1073,10 +1073,20 @@ bpf_jit_binary_lock_ro(struct bpf_binary_header *hdr)
+ 	return set_memory_rox((unsigned long)hdr, hdr->size >> PAGE_SHIFT);
+ }
+ 
+-int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb, unsigned int cap);
++int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb, unsigned int cap,
++		       enum skb_drop_reason *reason);
++
+ static inline int sk_filter(struct sock *sk, struct sk_buff *skb)
+ {
+-	return sk_filter_trim_cap(sk, skb, 1);
++	enum skb_drop_reason ignore_reason;
++
++	return sk_filter_trim_cap(sk, skb, 1, &ignore_reason);
++}
++
++static inline int sk_filter_reason(struct sock *sk, struct sk_buff *skb,
++				   enum skb_drop_reason *reason)
++{
++	return sk_filter_trim_cap(sk, skb, 1, reason);
+ }
+ 
+ struct bpf_prog *bpf_prog_select_runtime(struct bpf_prog *fp, int *err);
+diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+index 229bb1826f2a..e19184dd1b0f 100644
+--- a/include/net/dropreason-core.h
++++ b/include/net/dropreason-core.h
+@@ -125,6 +125,7 @@
+ 	FN(CAN_RX_INVALID_FRAME)	\
+ 	FN(CANFD_RX_INVALID_FRAME)	\
+ 	FN(CANXL_RX_INVALID_FRAME)	\
++	FN(PFMEMALLOC)	\
+ 	FNe(MAX)
+ 
+ /**
+@@ -598,6 +599,11 @@ enum skb_drop_reason {
+ 	 * non conform CAN-XL frame (or device is unable to receive CAN frames)
+ 	 */
+ 	SKB_DROP_REASON_CANXL_RX_INVALID_FRAME,
++	/**
++	 * @SKB_DROP_REASON_PFMEMALLOC: packet allocated from memory reserve
++	 * reached a path or socket not eligible for use of memory reserves
++	 */
++	SKB_DROP_REASON_PFMEMALLOC,
+ 	/**
+ 	 * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
+ 	 * shouldn't be used as a real 'reason' - only for tracing code gen
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index bc08de49805c..b3815d104340 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -1559,7 +1559,7 @@ bool tcp_add_backlog(struct sock *sk, struct sk_buff *skb,
+ 		     enum skb_drop_reason *reason);
+ 
+ 
+-int tcp_filter(struct sock *sk, struct sk_buff *skb);
++int tcp_filter(struct sock *sk, struct sk_buff *skb, enum skb_drop_reason *reason);
+ void tcp_set_state(struct sock *sk, int state);
+ void tcp_done(struct sock *sk);
+ int tcp_abort(struct sock *sk, int err);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 621a639aeba1..59a9089117de 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -5749,6 +5749,7 @@ static inline int nf_ingress(struct sk_buff *skb, struct packet_type **pt_prev,
+ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
+ 				    struct packet_type **ppt_prev)
+ {
++	enum skb_drop_reason drop_reason = SKB_DROP_REASON_UNHANDLED_PROTO;
+ 	struct packet_type *ptype, *pt_prev;
+ 	rx_handler_func_t *rx_handler;
+ 	struct sk_buff *skb = *pskb;
+@@ -5840,8 +5841,10 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
+ #endif
+ 	skb_reset_redirect(skb);
+ skip_classify:
+-	if (pfmemalloc && !skb_pfmemalloc_protocol(skb))
++	if (pfmemalloc && !skb_pfmemalloc_protocol(skb)) {
++		drop_reason = SKB_DROP_REASON_PFMEMALLOC;
+ 		goto drop;
++	}
+ 
+ 	if (skb_vlan_tag_present(skb)) {
+ 		if (pt_prev) {
+@@ -5946,7 +5949,8 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
+ 			dev_core_stats_rx_dropped_inc(skb->dev);
+ 		else
+ 			dev_core_stats_rx_nohandler_inc(skb->dev);
+-		kfree_skb_reason(skb, SKB_DROP_REASON_UNHANDLED_PROTO);
++
++		kfree_skb_reason(skb, drop_reason);
+ 		/* Jamal, now you will not able to escape explaining
+ 		 * me how you were going to use this. :-)
+ 		 */
+diff --git a/net/core/filter.c b/net/core/filter.c
+index 7a72f766aacf..2eb8947d8097 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -122,6 +122,7 @@ EXPORT_SYMBOL_GPL(copy_bpf_fprog_from_user);
+  *	@sk: sock associated with &sk_buff
+  *	@skb: buffer to filter
+  *	@cap: limit on how short the eBPF program may trim the packet
++ *	@reason: record drop reason on errors (negative return value)
+  *
+  * Run the eBPF program and then cut skb->data to correct size returned by
+  * the program. If pkt_len is 0 we toss packet. If skb->len is smaller
+@@ -130,7 +131,8 @@ EXPORT_SYMBOL_GPL(copy_bpf_fprog_from_user);
+  * be accepted or -EPERM if the packet should be tossed.
+  *
+  */
+-int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb, unsigned int cap)
++int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb,
++		       unsigned int cap, enum skb_drop_reason *reason)
+ {
+ 	int err;
+ 	struct sk_filter *filter;
+@@ -142,15 +144,20 @@ int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb, unsigned int cap)
+ 	 */
+ 	if (skb_pfmemalloc(skb) && !sock_flag(sk, SOCK_MEMALLOC)) {
+ 		NET_INC_STATS(sock_net(sk), LINUX_MIB_PFMEMALLOCDROP);
++		*reason = SKB_DROP_REASON_PFMEMALLOC;
+ 		return -ENOMEM;
+ 	}
+ 	err = BPF_CGROUP_RUN_PROG_INET_INGRESS(sk, skb);
+-	if (err)
++	if (err) {
++		*reason = SKB_DROP_REASON_SOCKET_FILTER;
+ 		return err;
++	}
+ 
+ 	err = security_sock_rcv_skb(sk, skb);
+-	if (err)
++	if (err) {
++		*reason = SKB_DROP_REASON_SECURITY_HOOK;
+ 		return err;
++	}
+ 
+ 	rcu_read_lock();
+ 	filter = rcu_dereference(sk->sk_filter);
+@@ -162,6 +169,8 @@ int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb, unsigned int cap)
+ 		pkt_len = bpf_prog_run_save_cb(filter->prog, skb);
+ 		skb->sk = save_sk;
+ 		err = pkt_len ? pskb_trim(skb, max(cap, pkt_len)) : -EPERM;
++		if (err)
++			*reason = SKB_DROP_REASON_SOCKET_FILTER;
+ 	}
+ 	rcu_read_unlock();
+ 
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 8b7623c7d547..7c26ec8dce63 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -526,11 +526,10 @@ int sock_queue_rcv_skb_reason(struct sock *sk, struct sk_buff *skb,
+ 	enum skb_drop_reason drop_reason;
+ 	int err;
+ 
+-	err = sk_filter(sk, skb);
+-	if (err) {
+-		drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
++	err = sk_filter_reason(sk, skb, &drop_reason);
++	if (err)
+ 		goto out;
+-	}
++
+ 	err = __sock_queue_rcv_skb(sk, skb);
+ 	switch (err) {
+ 	case -ENOMEM:
+@@ -553,15 +552,18 @@ EXPORT_SYMBOL(sock_queue_rcv_skb_reason);
+ int __sk_receive_skb(struct sock *sk, struct sk_buff *skb,
+ 		     const int nested, unsigned int trim_cap, bool refcounted)
+ {
++	enum skb_drop_reason reason = SKB_DROP_REASON_NOT_SPECIFIED;
+ 	int rc = NET_RX_SUCCESS;
++	int err;
+ 
+-	if (sk_filter_trim_cap(sk, skb, trim_cap))
++	if (sk_filter_trim_cap(sk, skb, trim_cap, &reason))
+ 		goto discard_and_relse;
+ 
+ 	skb->dev = NULL;
+ 
+ 	if (sk_rcvqueues_full(sk, READ_ONCE(sk->sk_rcvbuf))) {
+ 		atomic_inc(&sk->sk_drops);
++		reason = SKB_DROP_REASON_SOCKET_RCVBUFF;
+ 		goto discard_and_relse;
+ 	}
+ 	if (nested)
+@@ -577,8 +579,12 @@ int __sk_receive_skb(struct sock *sk, struct sk_buff *skb,
+ 		rc = sk_backlog_rcv(sk, skb);
+ 
+ 		mutex_release(&sk->sk_lock.dep_map, _RET_IP_);
+-	} else if (sk_add_backlog(sk, skb, READ_ONCE(sk->sk_rcvbuf))) {
++	} else if ((err = sk_add_backlog(sk, skb, READ_ONCE(sk->sk_rcvbuf)))) {
+ 		bh_unlock_sock(sk);
++		if (err == -ENOMEM)
++			reason = SKB_DROP_REASON_PFMEMALLOC;
++		if (err == -ENOBUFS)
++			reason = SKB_DROP_REASON_SOCKET_BACKLOG;
+ 		atomic_inc(&sk->sk_drops);
+ 		goto discard_and_relse;
+ 	}
+@@ -589,7 +595,7 @@ int __sk_receive_skb(struct sock *sk, struct sk_buff *skb,
+ 		sock_put(sk);
+ 	return rc;
+ discard_and_relse:
+-	kfree_skb(skb);
++	sk_skb_reason_drop(sk, skb, reason);
+ 	goto out;
+ }
+ EXPORT_SYMBOL(__sk_receive_skb);
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index a847d894ace3..bb816446e045 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -2025,6 +2025,7 @@ bool tcp_add_backlog(struct sock *sk, struct sk_buff *skb,
+ 	u32 gso_size;
+ 	u64 limit;
+ 	int delta;
++	int err;
+ 
+ 	/* In case all data was pulled from skb frags (in __pskb_pull_tail()),
+ 	 * we can fix skb->truesize to its real value to avoid future drops.
+@@ -2135,21 +2136,27 @@ bool tcp_add_backlog(struct sock *sk, struct sk_buff *skb,
+ 
+ 	limit = min_t(u64, limit, UINT_MAX);
+ 
+-	if (unlikely(sk_add_backlog(sk, skb, limit))) {
++	err = sk_add_backlog(sk, skb, limit);
++	if (unlikely(err)) {
+ 		bh_unlock_sock(sk);
+-		*reason = SKB_DROP_REASON_SOCKET_BACKLOG;
+-		__NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPBACKLOGDROP);
++		if (err == -ENOMEM) {
++			*reason = SKB_DROP_REASON_PFMEMALLOC;
++			__NET_INC_STATS(sock_net(sk), LINUX_MIB_PFMEMALLOCDROP);
++		} else {
++			*reason = SKB_DROP_REASON_SOCKET_BACKLOG;
++			__NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPBACKLOGDROP);
++		}
+ 		return true;
+ 	}
+ 	return false;
+ }
+ EXPORT_IPV6_MOD(tcp_add_backlog);
+ 
+-int tcp_filter(struct sock *sk, struct sk_buff *skb)
++int tcp_filter(struct sock *sk, struct sk_buff *skb, enum skb_drop_reason *reason)
+ {
+ 	struct tcphdr *th = (struct tcphdr *)skb->data;
+ 
+-	return sk_filter_trim_cap(sk, skb, th->doff * 4);
++	return sk_filter_trim_cap(sk, skb, th->doff * 4, reason);
+ }
+ EXPORT_IPV6_MOD(tcp_filter);
+ 
+@@ -2276,14 +2283,12 @@ int tcp_v4_rcv(struct sk_buff *skb)
+ 		}
+ 		refcounted = true;
+ 		nsk = NULL;
+-		if (!tcp_filter(sk, skb)) {
++		if (!tcp_filter(sk, skb, &drop_reason)) {
+ 			th = (const struct tcphdr *)skb->data;
+ 			iph = ip_hdr(skb);
+ 			tcp_v4_fill_cb(skb, iph, th);
+ 			nsk = tcp_check_req(sk, skb, req, false, &req_stolen,
+ 					    &drop_reason);
+-		} else {
+-			drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
+ 		}
+ 		if (!nsk) {
+ 			reqsk_put(req);
+@@ -2339,10 +2344,9 @@ int tcp_v4_rcv(struct sk_buff *skb)
+ 
+ 	nf_reset_ct(skb);
+ 
+-	if (tcp_filter(sk, skb)) {
+-		drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
++	if (tcp_filter(sk, skb, &drop_reason))
+ 		goto discard_and_relse;
+-	}
++
+ 	th = (const struct tcphdr *)skb->data;
+ 	iph = ip_hdr(skb);
+ 	tcp_v4_fill_cb(skb, iph, th);
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 49f43c54cfb0..cc3ce0f762ec 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -2347,7 +2347,7 @@ static int __udp_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
+  */
+ static int udp_queue_rcv_one_skb(struct sock *sk, struct sk_buff *skb)
+ {
+-	int drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
++	enum skb_drop_reason drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
+ 	struct udp_sock *up = udp_sk(sk);
+ 	int is_udplite = IS_UDPLITE(sk);
+ 
+@@ -2436,10 +2436,8 @@ static int udp_queue_rcv_one_skb(struct sock *sk, struct sk_buff *skb)
+ 	    udp_lib_checksum_complete(skb))
+ 			goto csum_error;
+ 
+-	if (sk_filter_trim_cap(sk, skb, sizeof(struct udphdr))) {
+-		drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
++	if (sk_filter_trim_cap(sk, skb, sizeof(struct udphdr), &drop_reason))
+ 		goto drop;
+-	}
+ 
+ 	udp_csum_pull_header(skb);
+ 
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index 8f2c3cba1f1f..7577e7eb2c97 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -1834,14 +1834,12 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
+ 		}
+ 		refcounted = true;
+ 		nsk = NULL;
+-		if (!tcp_filter(sk, skb)) {
++		if (!tcp_filter(sk, skb, &drop_reason)) {
+ 			th = (const struct tcphdr *)skb->data;
+ 			hdr = ipv6_hdr(skb);
+ 			tcp_v6_fill_cb(skb, hdr, th);
+ 			nsk = tcp_check_req(sk, skb, req, false, &req_stolen,
+ 					    &drop_reason);
+-		} else {
+-			drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
+ 		}
+ 		if (!nsk) {
+ 			reqsk_put(req);
+@@ -1897,10 +1895,9 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
+ 
+ 	nf_reset_ct(skb);
+ 
+-	if (tcp_filter(sk, skb)) {
+-		drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
++	if (tcp_filter(sk, skb, &drop_reason))
+ 		goto discard_and_relse;
+-	}
++
+ 	th = (const struct tcphdr *)skb->data;
+ 	hdr = ipv6_hdr(skb);
+ 	tcp_v6_fill_cb(skb, hdr, th);
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index 6bbdadbd5fec..6a68f77da44b 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -894,10 +894,8 @@ static int udpv6_queue_rcv_one_skb(struct sock *sk, struct sk_buff *skb)
+ 	    udp_lib_checksum_complete(skb))
+ 		goto csum_error;
+ 
+-	if (sk_filter_trim_cap(sk, skb, sizeof(struct udphdr))) {
+-		drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
++	if (sk_filter_trim_cap(sk, skb, sizeof(struct udphdr), &drop_reason))
+ 		goto drop;
+-	}
+ 
+ 	udp_csum_pull_header(skb);
+ 
+diff --git a/net/rose/rose_in.c b/net/rose/rose_in.c
+index 4d67f36dce1b..3e99181e759f 100644
+--- a/net/rose/rose_in.c
++++ b/net/rose/rose_in.c
+@@ -101,6 +101,7 @@ static int rose_state2_machine(struct sock *sk, struct sk_buff *skb, int framety
+  */
+ static int rose_state3_machine(struct sock *sk, struct sk_buff *skb, int frametype, int ns, int nr, int q, int d, int m)
+ {
++	enum skb_drop_reason dr; /* ignored */
+ 	struct rose_sock *rose = rose_sk(sk);
+ 	int queued = 0;
+ 
+@@ -162,7 +163,7 @@ static int rose_state3_machine(struct sock *sk, struct sk_buff *skb, int framety
+ 		rose_frames_acked(sk, nr);
+ 		if (ns == rose->vr) {
+ 			rose_start_idletimer(sk);
+-			if (sk_filter_trim_cap(sk, skb, ROSE_MIN_LEN) == 0 &&
++			if (!sk_filter_trim_cap(sk, skb, ROSE_MIN_LEN, &dr) &&
+ 			    __sock_queue_rcv_skb(sk, skb) == 0) {
+ 				rose->vr = (rose->vr + 1) % ROSE_MODULUS;
+ 				queued = 1;
 
 
-op: ering_cq_get_desc.
-val: cdesc.
-args: enet->adminq.ring
-cond: !cdesc
-
-I might be wrong, but i think you can make this work.
-
-> > > +static void eea_get_drvinfo(struct net_device *netdev,
-> > > +			    struct ethtool_drvinfo *info)
-> > > +{
-> > > +	struct eea_net *enet = netdev_priv(netdev);
-> > > +	struct eea_device *edev = enet->edev;
-> > > +
-> > > +	strscpy(info->driver,   KBUILD_MODNAME,     sizeof(info->driver));
-> > > +	strscpy(info->bus_info, eea_pci_name(edev), sizeof(info->bus_info));
-> > > +	snprintf(info->version, sizeof(info->version), "%d.%d.%d",
-> > > +		 EEA_VER_MAJOR, EEA_VER_MINOR, EEA_VER_SUB_MINOR);
-> >
-> > A hard coded version is pointless, because it never changes, yet the
-> > kernel around the driver changes every week. Don't set version, and
-> > the core will fill in the git hash, which is useful.
-> 
-> In our plan, we will increase this version when we change the code.
-
-So you will be submitting a patch for GregKH for every single stable
-kernel? That will be around 5 patches, every two weeks, for the next
-30 years?
-
-As i said, the driver is not standalone, it is embedded within the
-kernel. Changes to the kernel can break the driver. When you get a bug
-report from a customer, and they say version v42 of the driver is
-broken, isn't the first thing you are going to ask is what kernel
-version? Is it a vendor kernel? Which vendor?
-
-If you leave version unfilled, ethtool will report something like:
-
-version: 6.12.29-amd64
-
-which is much more useful.
-
-> > > +	mtu = le16_to_cpu(cfg->mtu);
-> > > +	if (mtu < netdev->min_mtu) {
-> > > +		dev_err(edev->dma_dev, "device MTU too small. %d < %d", mtu, netdev->min_mtu);
-> > > +		return -EINVAL;
-> > > +	}
-> > > +
-> > > +	netdev->mtu = mtu;
-> > > +	netdev->max_mtu = mtu;
-> >
-> > Setting mtu the same as max_mtu is unusual? Are you defaulting to jumbo?
-> 
-> In the cloud the dpu controls this.
-
-No, linux controls this. This driver controls this, using these line
-here. Userspace can change it later, but this is the default. And 99%
-of Linux systems default to 1500. Is max_mtu 1500? Or is it some jumbo
-value? You at last need to add a comment you are ignoring what
-everybody else does and are setting the MTU to something larger,
-because that is what your use case is.
-
-You are aiming to write an Ethenet driver which looks pretty much like
-every other Ethernet driver in Linux. When you do something different,
-you need to justify it, add a comment why your device is special and
-needs to do something different.
-
-	Andrew
 
