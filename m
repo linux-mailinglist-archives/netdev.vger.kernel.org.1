@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-207318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 251A4B06A4D
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 02:05:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F143DB06A4B
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 02:05:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F31301A60C06
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 00:05:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29C07563CB7
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 00:05:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C45DB1A4E70;
-	Wed, 16 Jul 2025 00:04:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4279A1ACECE;
+	Wed, 16 Jul 2025 00:04:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IETvkZJu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vHUZOTf4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A119D7483
-	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 00:04:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F8A31A9B24
+	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 00:04:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752624262; cv=none; b=KZ5BYn3rpnH38afMbtXlLuWdiywszZPgG3Kkf5FVA44Z1k3qbdJDAXVx7Bt5nWv4+yYBj511GxmsRcT4lf/p4Pac/yOQxeSaciWPJhFatqbfOnrO++t0RdvVqEENVN6S35N5uV89Ar7lb2vGjBLTmzJT7Ev4vfCeVOzBdOsLHY8=
+	t=1752624263; cv=none; b=clz8CgK+mYcQAVYy6P0DRCf1v8ePatddnJ248z6ogRRcspReqtMkkXT50FbAN4UboYV3Z8Zu1TY3163MB8h6eJgnUaXSsWPZlEvWRgLiF+UtuTdaXVXdEFwtgTtbH/wYd4cmqrPIjJKPrat39+NlCoVPPHNehjqwbGSzqk2lvX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752624262; c=relaxed/simple;
-	bh=ECn093ogkMLHdxaehEIk93W50h2MFiDyawQcVb56ags=;
+	s=arc-20240116; t=1752624263; c=relaxed/simple;
+	bh=7+wBwbU6dXdaUqeIdyLq2v4VeSYGd18qQ+BvnY0ffsk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aFDzw8Pq72/vFMDjO/yZbwC4Ns1nro+lm1EX6t7WNfGf2XMMtVW+/wOX4r57/d7d+6Mv0vjKsgSLm5CDKgbc8yUGCcnmOlAEIT7bKS7GlVxbVq4GsTfxJVZ4p08hnq813FxAEmfohzmKX3i8bd3zp+C6rQVzOIP2rrQzvrl+uX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IETvkZJu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81CAEC4CEF6;
-	Wed, 16 Jul 2025 00:04:21 +0000 (UTC)
+	 MIME-Version; b=cYhwpBIZd7sfwyzdUD+DOo0ywFtoDFcl2UCAorwjsY8ImHxW83P12Hk/BSQu2A28cPPjN4TkUbdqeGFXWEhELhc5+X47E6LuQ7wZS/+E0xCu85mOC2fReoe4D4l08miRLowpvHXEbC9wDWR1IO6DraNAryyeGf+7zNq8ZoV0/88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vHUZOTf4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FC7AC4CEF8;
+	Wed, 16 Jul 2025 00:04:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752624262;
-	bh=ECn093ogkMLHdxaehEIk93W50h2MFiDyawQcVb56ags=;
+	s=k20201202; t=1752624263;
+	bh=7+wBwbU6dXdaUqeIdyLq2v4VeSYGd18qQ+BvnY0ffsk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IETvkZJu/hi5ogLlpo2pLJYsLzsHYfE+BgUXAZI6mrpVLUxf+9Siej/7sgRg2VEav
-	 XVNQ44WZS0XpN2GVHX+U3o+rGGnhqsoUiwgQKZUW7DHFKoN61Y54RCL+ZNCSqfop7J
-	 G8jj+s1SV8FI3Aj89+aMKXePjyMqBlbuJpEZE6lN9pv1SAH5EfuWf1r2n3z9/nqzIl
-	 trwg39KiX6D+a5UnnRq1O6yEFtZXfCnLyLK/69L8oZd9x48PaUdAlst/2rpt9IoM9y
-	 43IsuDm3JCxZVQCJ+QbKu7ECnl/xlTMjg8d81BiPEI25hY2xAl5YRio3P4BiozHej9
-	 PQfqjy9u1dxmg==
+	b=vHUZOTf40M6XF8FJ7Wk6xKB2HyTf47sURBA8j+ctp/leQ7BFSH/anIgryDAYQFaOi
+	 BUA6mnuU0AZAW8/vNtraRzazU5KkcVjIR7cKFBpyLw1i6jWp6xRvHFlnVf93/AM/+P
+	 x7t4z+MP7pIvpTUrr8sZWHGAXjNQwS3TAVxV8nSp+kVZlZBz9FowFtmwnQooGOQ3fQ
+	 Cz+YtNxdVkMdJqC7HXkUU5ynuxDaqW2gIyWucW1CQ/WOaS/FANLczgNcYOHxO5wABM
+	 lxctTEqinFf13IbPfhFPV4ERJ5dM8SUoQpxMYzu9AchfXrYC2Ux3f4uUWgGcQ9AxTR
+	 lli7gVkfsXSqg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -58,9 +58,9 @@ Cc: netdev@vger.kernel.org,
 	jdamato@fastly.com,
 	andrew@lunn.ch,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v3 10/11] ethtool: rss: support setting flow hashing fields
-Date: Tue, 15 Jul 2025 17:03:30 -0700
-Message-ID: <20250716000331.1378807-11-kuba@kernel.org>
+Subject: [PATCH net-next v3 11/11] selftests: drv-net: rss_api: test input-xfrm and hash fields
+Date: Tue, 15 Jul 2025 17:03:31 -0700
+Message-ID: <20250716000331.1378807-12-kuba@kernel.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250716000331.1378807-1-kuba@kernel.org>
 References: <20250716000331.1378807-1-kuba@kernel.org>
@@ -72,257 +72,188 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add support for ETHTOOL_SRXFH (setting hashing fields) in RSS_SET.
+Test configuring input-xfrm and hash fields with all the limitations.
+Tested on mlx5 (CX6):
 
-The tricky part is dealing with symmetric hashing. In netlink user
-can change the hashing fields and symmetric hash in one request,
-in IOCTL the two used to be set via different uAPI requests.
-Since fields and hash function config are still separate driver
-callbacks - changes to the two are not atomic. Keep things simple
-and validate the settings against both pre- and post- change ones.
-Meaning that we will reject the config request if user tries
-to correct the flow fields and set input_xfrm in one request,
-or disables input_xfrm and makes flow fields non-symmetric.
-
-We can adjust it later if there's a real need. Starting simple feels
-right, and potentially partially applying the settings isn't nice,
-either.
+  # ./ksft-net-drv/drivers/net/hw/rss_api.py
+  TAP version 13
+  1..10
+  ok 1 rss_api.test_rxfh_nl_set_fail
+  ok 2 rss_api.test_rxfh_nl_set_indir
+  ok 3 rss_api.test_rxfh_nl_set_indir_ctx
+  ok 4 rss_api.test_rxfh_indir_ntf
+  ok 5 rss_api.test_rxfh_indir_ctx_ntf
+  ok 6 rss_api.test_rxfh_nl_set_key
+  ok 7 rss_api.test_rxfh_fields
+  ok 8 rss_api.test_rxfh_fields_set
+  ok 9 rss_api.test_rxfh_fields_set_xfrm
+  ok 10 rss_api.test_rxfh_fields_ntf
+  # Totals: pass:10 fail:0 xfail:0 xpass:0 skip:0 error:0
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
+v3:
+ - adjust after input_xfrm became a set
 v2:
- - improve commit msg
+ - make defer() cleanup more intelligent WRT ordering
 ---
- Documentation/netlink/specs/ethtool.yaml     |   1 +
- Documentation/networking/ethtool-netlink.rst |   3 +-
- net/ethtool/netlink.h                        |   2 +-
- net/ethtool/rss.c                            | 111 +++++++++++++++++--
- 4 files changed, 107 insertions(+), 10 deletions(-)
+ .../selftests/drivers/net/hw/rss_api.py       | 143 ++++++++++++++++++
+ 1 file changed, 143 insertions(+)
 
-diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-index 41f26d58f2f9..069269edde01 100644
---- a/Documentation/netlink/specs/ethtool.yaml
-+++ b/Documentation/netlink/specs/ethtool.yaml
-@@ -2679,6 +2679,7 @@ c-version-name: ethtool-genl-version
-             - indir
-             - hkey
-             - input-xfrm
-+            - flow-hash
-     -
-       name: rss-ntf
-       doc: |
-diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
-index 2214d2ce346a..056832c77ffd 100644
---- a/Documentation/networking/ethtool-netlink.rst
-+++ b/Documentation/networking/ethtool-netlink.rst
-@@ -2003,6 +2003,7 @@ RSS_SET
-   ``ETHTOOL_A_RSS_INDIR``              binary  Indir table bytes
-   ``ETHTOOL_A_RSS_HKEY``               binary  Hash key bytes
-   ``ETHTOOL_A_RSS_INPUT_XFRM``         u32     RSS input data transformation
-+  ``ETHTOOL_A_RSS_FLOW_HASH``          nested  Header fields included in hash
- =====================================  ======  ==============================
+diff --git a/tools/testing/selftests/drivers/net/hw/rss_api.py b/tools/testing/selftests/drivers/net/hw/rss_api.py
+index 6d48799a423c..424743bb583b 100755
+--- a/tools/testing/selftests/drivers/net/hw/rss_api.py
++++ b/tools/testing/selftests/drivers/net/hw/rss_api.py
+@@ -247,6 +247,149 @@ from lib.py import NetDrvEnv
+                 comment="Config for " + fl_type)
  
- ``ETHTOOL_A_RSS_INDIR`` is the minimal RSS table the user expects. Kernel and
-@@ -2464,7 +2465,7 @@ are netlink only.
-   ``ETHTOOL_GPFLAGS``                 ``ETHTOOL_MSG_PRIVFLAGS_GET``
-   ``ETHTOOL_SPFLAGS``                 ``ETHTOOL_MSG_PRIVFLAGS_SET``
-   ``ETHTOOL_GRXFH``                   ``ETHTOOL_MSG_RSS_GET``
--  ``ETHTOOL_SRXFH``                   n/a
-+  ``ETHTOOL_SRXFH``                   ``ETHTOOL_MSG_RSS_SET``
-   ``ETHTOOL_GGRO``                    ``ETHTOOL_MSG_FEATURES_GET``
-   ``ETHTOOL_SGRO``                    ``ETHTOOL_MSG_FEATURES_SET``
-   ``ETHTOOL_GRXRINGS``                n/a
-diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
-index 620dd1ab9b3b..ddb2fb00f929 100644
---- a/net/ethtool/netlink.h
-+++ b/net/ethtool/netlink.h
-@@ -484,7 +484,7 @@ extern const struct nla_policy ethnl_module_set_policy[ETHTOOL_A_MODULE_POWER_MO
- extern const struct nla_policy ethnl_pse_get_policy[ETHTOOL_A_PSE_HEADER + 1];
- extern const struct nla_policy ethnl_pse_set_policy[ETHTOOL_A_PSE_MAX + 1];
- extern const struct nla_policy ethnl_rss_get_policy[ETHTOOL_A_RSS_START_CONTEXT + 1];
--extern const struct nla_policy ethnl_rss_set_policy[ETHTOOL_A_RSS_START_CONTEXT + 1];
-+extern const struct nla_policy ethnl_rss_set_policy[ETHTOOL_A_RSS_FLOW_HASH + 1];
- extern const struct nla_policy ethnl_plca_get_cfg_policy[ETHTOOL_A_PLCA_HEADER + 1];
- extern const struct nla_policy ethnl_plca_set_cfg_policy[ETHTOOL_A_PLCA_MAX + 1];
- extern const struct nla_policy ethnl_plca_get_status_policy[ETHTOOL_A_PLCA_HEADER + 1];
-diff --git a/net/ethtool/rss.c b/net/ethtool/rss.c
-index 79de013da288..bf45ebc22347 100644
---- a/net/ethtool/rss.c
-+++ b/net/ethtool/rss.c
-@@ -472,7 +472,41 @@ void ethtool_rss_notify(struct net_device *dev, u32 rss_context)
  
- /* RSS_SET */
++def test_rxfh_fields_set(cfg):
++    """ Test configuring Rx Flow Hash over Netlink. """
++
++    flow_types = ["tcp4", "tcp6", "udp4", "udp6"]
++
++    # Collect current settings
++    cfg_old = cfg.ethnl.rss_get({"header": {"dev-index": cfg.ifindex}})
++    # symmetric hashing is config-order-sensitive make sure we leave
++    # symmetric mode, or make the flow-hash sym-compatible first
++    changes = [{"flow-hash": cfg_old["flow-hash"],},
++               {"input-xfrm": cfg_old.get("input-xfrm", {}),}]
++    if cfg_old.get("input-xfrm"):
++        changes = list(reversed(changes))
++    for old in changes:
++        defer(cfg.ethnl.rss_set, {"header": {"dev-index": cfg.ifindex},} | old)
++
++    # symmetric hashing prevents some of the configs below
++    if cfg_old.get("input-xfrm"):
++        cfg.ethnl.rss_set({"header": {"dev-index": cfg.ifindex},
++                           "input-xfrm": {}})
++
++    for fl_type in flow_types:
++        cur = _ethtool_get_cfg(cfg, fl_type)
++        if cur == "sdfn":
++            change_nl = {"ip-src", "ip-dst"}
++            change_ic = "sd"
++        else:
++            change_nl = {"l4-b-0-1", "l4-b-2-3", "ip-src", "ip-dst"}
++            change_ic = "sdfn"
++
++        cfg.ethnl.rss_set({
++            "header": {"dev-index": cfg.ifindex},
++            "flow-hash": {fl_type: change_nl}
++        })
++        reset = defer(ethtool, f"--disable-netlink -N {cfg.ifname} "
++                      f"rx-flow-hash {fl_type} {cur}")
++
++        cfg_nl = cfg.ethnl.rss_get({"header": {"dev-index": cfg.ifindex}})
++        ksft_eq(change_nl, cfg_nl["flow-hash"][fl_type],
++                comment=f"Config for {fl_type} over Netlink")
++        cfg_ic = _ethtool_get_cfg(cfg, fl_type)
++        ksft_eq(change_ic, cfg_ic,
++                comment=f"Config for {fl_type} over IOCTL")
++
++        reset.exec()
++        cfg_nl = cfg.ethnl.rss_get({"header": {"dev-index": cfg.ifindex}})
++        ksft_eq(cfg_old["flow-hash"][fl_type], cfg_nl["flow-hash"][fl_type],
++                comment=f"Un-config for {fl_type} over Netlink")
++        cfg_ic = _ethtool_get_cfg(cfg, fl_type)
++        ksft_eq(cur, cfg_ic, comment=f"Un-config for {fl_type} over IOCTL")
++
++    # Try to set multiple at once, the defer was already installed at the start
++    change = {"ip-src"}
++    if change == cfg_old["flow-hash"]["tcp4"]:
++        change = {"ip-dst"}
++    cfg.ethnl.rss_set({
++        "header": {"dev-index": cfg.ifindex},
++        "flow-hash": {x: change for x in flow_types}
++    })
++
++    cfg_nl = cfg.ethnl.rss_get({"header": {"dev-index": cfg.ifindex}})
++    for fl_type in flow_types:
++        ksft_eq(change, cfg_nl["flow-hash"][fl_type],
++                comment=f"multi-config for {fl_type} over Netlink")
++
++
++def test_rxfh_fields_set_xfrm(cfg):
++    """ Test changing Rx Flow Hash vs xfrm_input at once.  """
++
++    def set_rss(cfg, xfrm, fh):
++        cfg.ethnl.rss_set({"header": {"dev-index": cfg.ifindex},
++                           "input-xfrm": xfrm, "flow-hash": fh})
++
++    # Install the reset handler
++    cfg_old = cfg.ethnl.rss_get({"header": {"dev-index": cfg.ifindex}})
++    # symmetric hashing is config-order-sensitive make sure we leave
++    # symmetric mode, or make the flow-hash sym-compatible first
++    changes = [{"flow-hash": cfg_old["flow-hash"],},
++               {"input-xfrm": cfg_old.get("input-xfrm", {}),}]
++    if cfg_old.get("input-xfrm"):
++        changes = list(reversed(changes))
++    for old in changes:
++        defer(cfg.ethnl.rss_set, {"header": {"dev-index": cfg.ifindex},} | old)
++
++    # Make sure we start with input-xfrm off, and tcp4 config non-sym
++    set_rss(cfg, {}, {})
++    set_rss(cfg, {}, {"tcp4": {"ip-src"}})
++
++    # Setting sym and fixing tcp4 config not expected to pass right now
++    with ksft_raises(NlError):
++        set_rss(cfg, {"sym-xor"}, {"tcp4": {"ip-src", "ip-dst"}})
++    # One at a time should work, hopefully
++    set_rss(cfg, 0, {"tcp4": {"ip-src", "ip-dst"}})
++    no_support = False
++    try:
++        set_rss(cfg, {"sym-xor"}, {})
++    except NlError:
++        try:
++            set_rss(cfg, {"sym-or-xor"}, {})
++        except NlError:
++            no_support = True
++    if no_support:
++        raise KsftSkipEx("no input-xfrm supported")
++    # Disabling two at once should not work either without kernel changes
++    with ksft_raises(NlError):
++        set_rss(cfg, {}, {"tcp4": {"ip-src"}})
++
++
++def test_rxfh_fields_ntf(cfg):
++    """ Test Rx Flow Hash notifications. """
++
++    cur = _ethtool_get_cfg(cfg, "tcp4")
++    if cur == "sdfn":
++        change = {"ip-src", "ip-dst"}
++    else:
++        change = {"l4-b-0-1", "l4-b-2-3", "ip-src", "ip-dst"}
++
++    ethnl = EthtoolFamily()
++    ethnl.ntf_subscribe("monitor")
++
++    ethnl.rss_set({
++        "header": {"dev-index": cfg.ifindex},
++        "flow-hash": {"tcp4": change}
++    })
++    reset = defer(ethtool,
++                  f"--disable-netlink -N {cfg.ifname} rx-flow-hash tcp4 {cur}")
++
++    ntf = next(ethnl.poll_ntf(duration=0.2), None)
++    if ntf is None:
++        raise KsftFailEx("No notification received after IOCTL change")
++    ksft_eq(ntf["name"], "rss-ntf")
++    ksft_eq(ntf["msg"]["flow-hash"]["tcp4"], change)
++    ksft_eq(next(ethnl.poll_ntf(duration=0.01), None), None)
++
++    reset.exec()
++    ntf = next(ethnl.poll_ntf(duration=0.2), None)
++    if ntf is None:
++        raise KsftFailEx("No notification received after Netlink change")
++    ksft_eq(ntf["name"], "rss-ntf")
++    ksft_ne(ntf["msg"]["flow-hash"]["tcp4"], change)
++    ksft_eq(next(ethnl.poll_ntf(duration=0.01), None), None)
++
++
+ def main() -> None:
+     """ Ksft boiler plate main """
  
--const struct nla_policy ethnl_rss_set_policy[ETHTOOL_A_RSS_START_CONTEXT + 1] = {
-+#define RFH_MASK (RXH_L2DA | RXH_VLAN | RXH_IP_SRC | RXH_IP_DST | \
-+		  RXH_L3_PROTO | RXH_L4_B_0_1 | RXH_L4_B_2_3 |	  \
-+		  RXH_GTP_TEID | RXH_DISCARD)
-+
-+static const struct nla_policy ethnl_rss_flows_policy[] = {
-+	[ETHTOOL_A_FLOW_ETHER]		= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_IP4]		= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_IP6]		= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_TCP4]		= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_UDP4]		= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_SCTP4]		= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_AH_ESP4]	= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_TCP6]		= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_UDP6]		= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_SCTP6]		= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_AH_ESP6]	= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_AH4]		= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_ESP4]		= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_AH6]		= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_ESP6]		= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_GTPU4]		= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_GTPU6]		= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_GTPC4]		= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_GTPC6]		= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_GTPC_TEID4]	= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_GTPC_TEID6]	= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_GTPU_EH4]	= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_GTPU_EH6]	= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_GTPU_UL4]	= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_GTPU_UL6]	= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_GTPU_DL4]	= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+	[ETHTOOL_A_FLOW_GTPU_DL6]	= NLA_POLICY_MASK(NLA_UINT, RFH_MASK),
-+};
-+
-+const struct nla_policy ethnl_rss_set_policy[ETHTOOL_A_RSS_FLOW_HASH + 1] = {
- 	[ETHTOOL_A_RSS_HEADER] = NLA_POLICY_NESTED(ethnl_header_policy),
- 	[ETHTOOL_A_RSS_CONTEXT] = { .type = NLA_U32, },
- 	[ETHTOOL_A_RSS_HFUNC] = NLA_POLICY_MIN(NLA_U32, 1),
-@@ -480,6 +514,7 @@ const struct nla_policy ethnl_rss_set_policy[ETHTOOL_A_RSS_START_CONTEXT + 1] =
- 	[ETHTOOL_A_RSS_HKEY] = NLA_POLICY_MIN(NLA_BINARY, 1),
- 	[ETHTOOL_A_RSS_INPUT_XFRM] =
- 		NLA_POLICY_MAX(NLA_U32, RXH_XFRM_SYM_OR_XOR),
-+	[ETHTOOL_A_RSS_FLOW_HASH] = NLA_POLICY_NESTED(ethnl_rss_flows_policy),
- };
- 
- static int
-@@ -504,6 +539,12 @@ ethnl_rss_set_validate(struct ethnl_req_info *req_info, struct genl_info *info)
- 	if (input_xfrm & ~ops->supported_input_xfrm)
- 		bad_attr = bad_attr ?: tb[ETHTOOL_A_RSS_INPUT_XFRM];
- 
-+	if (tb[ETHTOOL_A_RSS_FLOW_HASH] && !ops->set_rxfh_fields)
-+		bad_attr = bad_attr ?: tb[ETHTOOL_A_RSS_FLOW_HASH];
-+	if (request->rss_context &&
-+	    tb[ETHTOOL_A_RSS_FLOW_HASH] && !ops->rxfh_per_ctx_fields)
-+		bad_attr = bad_attr ?: tb[ETHTOOL_A_RSS_FLOW_HASH];
-+
- 	if (bad_attr) {
- 		NL_SET_BAD_ATTR(info->extack, bad_attr);
- 		return -EOPNOTSUPP;
-@@ -644,6 +685,59 @@ rss_check_rxfh_fields_sym(struct net_device *dev, struct genl_info *info,
- 	return 0;
- }
- 
-+static int
-+ethnl_set_rss_fields(struct net_device *dev, struct genl_info *info,
-+		     u32 rss_context, struct rss_reply_data *data,
-+		     bool xfrm_sym, bool *mod)
-+{
-+	struct nlattr *flow_nest = info->attrs[ETHTOOL_A_RSS_FLOW_HASH];
-+	struct nlattr *flows[ETHTOOL_A_FLOW_MAX + 1];
-+	const struct ethtool_ops *ops;
-+	int i, ret;
-+
-+	ops = dev->ethtool_ops;
-+
-+	ret = rss_check_rxfh_fields_sym(dev, info, data, xfrm_sym);
-+	if (ret)
-+		return ret;
-+
-+	if (!flow_nest)
-+		return 0;
-+
-+	ret = nla_parse_nested(flows, ARRAY_SIZE(ethnl_rss_flows_policy) - 1,
-+			       flow_nest, ethnl_rss_flows_policy, info->extack);
-+	if (ret < 0)
-+		return ret;
-+
-+	for (i = 1; i < __ETHTOOL_A_FLOW_CNT; i++) {
-+		struct ethtool_rxfh_fields fields = {
-+			.flow_type	= ethtool_rxfh_ft_nl2ioctl[i],
-+			.rss_context	= rss_context,
-+		};
-+
-+		if (!flows[i])
-+			continue;
-+
-+		fields.data = nla_get_u32(flows[i]);
-+		if (data->has_flow_hash && data->flow_hash[i] == fields.data)
-+			continue;
-+
-+		if (xfrm_sym && !ethtool_rxfh_config_is_sym(fields.data)) {
-+			NL_SET_ERR_MSG_ATTR(info->extack, flows[i],
-+					    "conflict with xfrm-input");
-+			return -EINVAL;
-+		}
-+
-+		ret = ops->set_rxfh_fields(dev, &fields, info->extack);
-+		if (ret)
-+			return ret;
-+
-+		*mod = true;
-+	}
-+
-+	return 0;
-+}
-+
- static void
- rss_set_ctx_update(struct ethtool_rxfh_context *ctx, struct nlattr **tb,
- 		   struct rss_reply_data *data, struct ethtool_rxfh_param *rxfh)
-@@ -673,11 +767,11 @@ ethnl_rss_set(struct ethnl_req_info *req_info, struct genl_info *info)
- 	struct rss_req_info *request = RSS_REQINFO(req_info);
- 	struct ethtool_rxfh_context *ctx = NULL;
- 	struct net_device *dev = req_info->dev;
-+	bool mod = false, fields_mod = false;
- 	struct ethtool_rxfh_param rxfh = {};
- 	struct nlattr **tb = info->attrs;
- 	struct rss_reply_data data = {};
- 	const struct ethtool_ops *ops;
--	bool mod = false;
- 	int ret;
- 
- 	ops = dev->ethtool_ops;
-@@ -710,14 +804,10 @@ ethnl_rss_set(struct ethnl_req_info *req_info, struct genl_info *info)
- 	 * symmetric hashing is requested.
- 	 */
- 	if (!request->rss_context || ops->rxfh_per_ctx_key)
--		xfrm_sym = !!rxfh.input_xfrm;
-+		xfrm_sym = rxfh.input_xfrm || data.input_xfrm;
- 	if (rxfh.input_xfrm == data.input_xfrm)
- 		rxfh.input_xfrm = RXH_XFRM_NO_CHANGE;
- 
--	ret = rss_check_rxfh_fields_sym(dev, info, &data, xfrm_sym);
--	if (ret)
--		goto exit_clean_data;
--
- 	mutex_lock(&dev->ethtool->rss_lock);
- 	if (request->rss_context) {
- 		ctx = xa_load(&dev->ethtool->rss_ctx, request->rss_context);
-@@ -727,6 +817,11 @@ ethnl_rss_set(struct ethnl_req_info *req_info, struct genl_info *info)
- 		}
- 	}
- 
-+	ret = ethnl_set_rss_fields(dev, info, request->rss_context,
-+				   &data, xfrm_sym, &fields_mod);
-+	if (ret)
-+		goto exit_unlock;
-+
- 	if (!mod)
- 		ret = 0; /* nothing to tell the driver */
- 	else if (!ops->set_rxfh)
-@@ -753,7 +848,7 @@ ethnl_rss_set(struct ethnl_req_info *req_info, struct genl_info *info)
- exit_clean_data:
- 	rss_cleanup_data(&data.base);
- 
--	return ret ?: mod;
-+	return ret ?: mod || fields_mod;
- }
- 
- const struct ethnl_request_ops ethnl_rss_request_ops = {
 -- 
 2.50.1
 
