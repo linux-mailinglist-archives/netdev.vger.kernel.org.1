@@ -1,93 +1,99 @@
-Return-Path: <netdev+bounces-207457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B78FAB07531
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 13:57:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 912D4B0759F
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 14:27:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5B451AA47D3
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 11:58:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7E0516A9F9
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 12:27:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA7432F4331;
-	Wed, 16 Jul 2025 11:57:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7EE22F2C40;
+	Wed, 16 Jul 2025 12:27:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="C3/OtXtD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GNnc0juZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81DDF2F3C1A
-	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 11:57:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42DBD20110B;
+	Wed, 16 Jul 2025 12:27:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752667051; cv=none; b=oYbWQl3xSKpj3iDvdZhVMbA38+lN8i2dRVxVa5vv1imb5hApLgMt/iVWJwxnsxr+xI/ZMSDiLz0/wLTW/ze4y9Ax42fmyhj5J4QvVWOqohR1fraW3kGrEk+oI/s2awvq7aJ0uKoyM/tsZGSUb8jxZ0HA+P7pAdIQhlcS6cS600I=
+	t=1752668856; cv=none; b=TLnO+3LrFVqCi4iylJXoHbUch/UCLGNyB4O3Hgo0EAK2+U5X8KLhMbphmB+hX1crwTRy81YAVhtX9IVE9X8QEPaFC/egpIku/18VlDAnVN9vdv4kF/YXRq2z6J8HPVGMjWd1bkm8oHszrBCzvp6I8STP8dQyYf2eTl+m7mwke4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752667051; c=relaxed/simple;
-	bh=csn7WYtvsUdjHkQMbcST2wsNn0ffcZxw8hDRTLxE6DA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rWcdI2LpjYdzUkB+Rp2e6WxCsKTNV6hhc/PLaVouLPppKb2BqmbnacH5jR8269D9hwtUD5tqUqnsuP3SsCXXY6UPkaEGcbekEaQyakGnG1MmK+61CPdsRSVGaxv3i0xOuG8voTL9Tea721uQtYXtnBrdVEcEpwv9iAiiaeuOR4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=C3/OtXtD; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b31c978688dso3375730a12.1
-        for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 04:57:29 -0700 (PDT)
+	s=arc-20240116; t=1752668856; c=relaxed/simple;
+	bh=xwq/vRLbdM7WL4q5HIsuxXoQO20oEJ8lc3HqoaMuIeM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fhFFJAGS2YNmz4ceTZApkm28sSL+4D7vgzwv4JteFvFTIYq+N5B4INBrfCwOIVHTvSGcAAMPx1mWpJ1J5x7LDuiVSvg40vmux8HrSLEc/8kSIruqshB4nw3uvVxG0BxZ9KrQBqXPbiF2kAaMoltOo0LG68F1BxlDjEfCXPPScOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GNnc0juZ; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-742c7a52e97so5409600b3a.3;
+        Wed, 16 Jul 2025 05:27:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1752667049; x=1753271849; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1752668854; x=1753273654; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hLRTtR8co0X61jWgkdjoqtJ4EJUXMSFsfzr4OSlttHI=;
-        b=C3/OtXtDnvVJGuFJf8nY9NDTgU3fmyHQp+gokBMNUcTRQdRuuGvm4xknpHBMjCRjTJ
-         H3aXCUckswLpQ07ocQDPDHnn9F9UrVECNpBVaNzrowEMiX9XUhqSjPKvESvS7L6qWZxg
-         1pS6nlg9gnHJbjrPSa62EUhJu3gA7NsxliNt/kZ6kvfuL5Qt0IMRYsi0RktLnapiySVp
-         brgzkUvLeOLoJafJXJNMb262efzaEGY8Iz2NqLjhqhVNX2aNYhNUvahnPXzs+wXNbsCC
-         OH408Ru/u0RMmJX9mVn26RVGkQsWIBkV/+iX/A5nWbMZJVlDhpKnEVraBdulh5rPr91/
-         NaaQ==
+        bh=COHxjyd9TVO00pYSe36h0VbD3h6ewBA8auhnHn9D4Vs=;
+        b=GNnc0juZxgbVRGyKoBRKfZNXEe6HEwkbZ13ayBioTK/lepHBZU5eoe6LLH9DAzTN6d
+         dbWL1fSgXPnI5F8PpEUknKMzXaxSHaB0mPlwKwAmBsuF1uXppciVulYgVnVsOCDeWv3l
+         zMLT7sH5es/csMRDOaQYQdHGImCLGrNYpqyZVe5pJfPVPYuFGMvcyJrmy+G+RD0IMteX
+         TNOQ3rrIx9U12vNUDLFP3jjNzZtO5VmolIIy8amvuTbWsCB3p3DyG6VbAoHKrDJTpkyM
+         SETBDBfe0J4GfNzCcQiIgF4y9Uo69iZds7uVx/bSm2DGoSuYRxA1br4PcbNulbAIhRY0
+         r19w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752667049; x=1753271849;
+        d=1e100.net; s=20230601; t=1752668854; x=1753273654;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=hLRTtR8co0X61jWgkdjoqtJ4EJUXMSFsfzr4OSlttHI=;
-        b=Ot4tilEgmkCrKKTK/dkwsa0WJX21Q8SmxYNieFAW40sVLTOc6WAP9Pi2CMdVh/vRXr
-         6h9Gnq96+H6AW8DZPDa0G5Q+68u+EC1hyFgMwJnDpEf/GQZd4cWSF6elQiBhCWcRxbZa
-         dvgIKlMCG4etsJPvr8Y3756IoB2o5KB7l3Ez+nhAhg4CadouDuwlh3niuPBhO/DmeOv0
-         l+8aP2PiI6pH6mYloLPUdDDa3IHi3UIUMnxfui3bd0Z8eJi4CHk13+jOpWktPOKmvxwM
-         rx3Xg64KcCSWSsWsXSH4h789XbKXEWhNxIvKq0urZrh8HcAvpXLX5gmRdJ+fmH08dxso
-         uPJA==
-X-Forwarded-Encrypted: i=1; AJvYcCX7QAn3QCXFZAV0ESVebam4CkJpvo7Uosvt2NRDqeJtSW3VcyQ5D1ZdSz0Qlhmekrk6TDXhCcc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxaDX/UK6QeRbfdfzmcKj3d2jSJpiREgkcF7BYWR9+KNsr4VW7
-	7792moCnjqfptv6QfZsICn+0wqeXtzu0rbJvumlj+qWQCb7U+oNZAMJBcNkSjI3NWDs=
-X-Gm-Gg: ASbGnctwxLy4mE0Ur23OFtowD4eSM2kR+yNX93RZpMOo0fUsMEQxpJsyeDp1paXATJu
-	5zWygmewW17MXJJUwKs8Yz2jr6cmN7DedPis5EncQiYRWRnDHReoVJ17e4Z3+7OYfPCJbloqk/a
-	BIPUnjq8XZmbxxplWShxMNnlcQ2vYQ7s3DrGzQhNEok2XNu1716O3KyYJoeQ2Jro/OoexxWyEvA
-	HJT0UgLHo89grU0XLRKkIi2osXdmMLh4PT0feRpPwzvK5ix8lOfZbj1e/s+i6fJ8ceIgm6ghw6/
-	d4FzvU/RnY8OzJxRJV1y2JGiaFYKH2/PjunoNRIH4pAUockGAPDTE0zlaqdGgu3KqlsYuNl7upS
-	pqMQ8ee4cttDhaC3c2Bw8oiT3oH2LRg0w
-X-Google-Smtp-Source: AGHT+IEQPkNtoh9bRZW+IJ62bS4hVLKInbUmsPl/kIaslUF8mapeIjngutJf68Y6R1ZJMkkbtdUZ7Q==
-X-Received: by 2002:a17:90b:1c89:b0:313:2768:3f6b with SMTP id 98e67ed59e1d1-31c9e77ce91mr4104373a91.27.1752667048532;
-        Wed, 16 Jul 2025 04:57:28 -0700 (PDT)
-Received: from vexas.. ([203.208.189.9])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31c9f29ddcbsm1292668a91.36.2025.07.16.04.57.24
+        bh=COHxjyd9TVO00pYSe36h0VbD3h6ewBA8auhnHn9D4Vs=;
+        b=buiD7w8F12MNhgOTodLbmMvtJ2zrLiO9ZozOv4vO8Jv1F9wi+jCa3d1BzGT3nLiVlR
+         RsEU/Fcv1GqPcUxx3sRrivr6uda5FOplWFTsGBAXc+4c6m0VvQ0KWXHkGrT0dyFDGG5n
+         f/NLzXgpzxZLL1Y2DeClPhl6KoCaaRU/6a58zWgZQs+InQby9aGJkUVdOYcIN11TxdKP
+         1FiyYQ8MwGLuQEvrXS09JqjymcVUAsdY4gLWQpYQ2hqrEXVjvCEpOcUpVtlCNjkrmY8c
+         y0EN56jt9/W/hX4GqDy/Yc8gP39Qd/NgloqNtPv+HycYhwQieR+mtdVZHclRnCv3Tbw0
+         rSfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU9OVIb5c9541N/JbCLdksrE+N9YcV3TH48bDO92rg/8PT14F01eCFoGJITvACaMF70rBBBP0c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGuikNUenaxBGBFeQP5eWKQ8IdZD90/vJP3BGA+UmKtFFgBveT
+	tPyw3sC7CTtKAPbHUH8aXe9c6/1EDWo7JsYHcwi5dtNz1BO+od86jvFJ
+X-Gm-Gg: ASbGncuzngEqmSmYsqnHDschs6cBJSCiAuvbQF+jprx1lUS6pk8Bef/67VQ1dTTnc1O
+	zUCIYFHXwOFTKIraZx6o1lbLIRgvWboD3cGTSRkMAEMVSeW8ZTsX9BUa5oN5XaxXhCyeCVQItro
+	FLjvC5JzTjd89zMbVzxrxlh2O/u4VRd0Xs/a4P0ZGPi0Waj9zmvFhAnaQ8vC0vCIlCWUGgRDmnk
+	JvZD03jn4V7MVCv6VrYLjgak7XLuqYBCUmtL0eaHqYC+spKjs4GW0tVDMmPW3g/mg5lN2Apu37k
+	9aDn15p9z6O8lsYGGNm0gi4BQCXVxmGxv8T2LnQHaIq628EPUDgDdM7/mOBuPCG+NCQvCqX5TzF
+	wHAUXYuAcmmgbdv1TItaYgS6Y9RWJx7EaseaVzzcF+GzMX2DBABaG88T2X4f7pkkQfh7ziA==
+X-Google-Smtp-Source: AGHT+IHyJtLsZB/0aPAdoOaZcA2I1LWb6k5JcJIxHbQDwRstjmQx8MuU8sX1SNxozXJnQaCI2D6eNw==
+X-Received: by 2002:a05:6a00:887:b0:736:50d1:fc84 with SMTP id d2e1a72fcca58-756ea8b5c61mr4275871b3a.21.1752668854345;
+        Wed, 16 Jul 2025 05:27:34 -0700 (PDT)
+Received: from KERNELXING-MB0.tencent.com ([43.132.141.24])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74eb9dd5a94sm14164946b3a.21.2025.07.16.05.27.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Jul 2025 04:57:28 -0700 (PDT)
-From: Zigit Zo <zuozhijie@bytedance.com>
-To: mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com
-Cc: zuozhijie@bytedance.com,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
+        Wed, 16 Jul 2025 05:27:33 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	edumazet@google.com
-Subject: [PATCH net v3] virtio-net: fix recursived rtnl_lock() during probe()
-Date: Wed, 16 Jul 2025 19:57:17 +0800
-Message-ID: <20250716115717.1472430-1-zuozhijie@bytedance.com>
-X-Mailer: git-send-email 2.49.0
+	bjorn@kernel.org,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	jonathan.lemon@gmail.com,
+	sdf@fomichev.me,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	joe@dama.to,
+	willemdebruijn.kernel@gmail.com
+Cc: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next v2] xsk: skip validating skb list in xmit path
+Date: Wed, 16 Jul 2025 20:27:25 +0800
+Message-Id: <20250716122725.6088-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,50 +102,132 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The deadlock appears in a stack trace like:
+From: Jason Xing <kernelxing@tencent.com>
 
-  virtnet_probe()
-    rtnl_lock()
-    virtio_config_changed_work()
-      netdev_notify_peers()
-        rtnl_lock()
+This patch only does one thing that removes validate_xmit_skb_list()
+for xsk.
 
-It happens if the VMM sends a VIRTIO_NET_S_ANNOUNCE request while the
-virtio-net driver is still probing.
+For xsk, it's not needed to validate and check the skb in
+validate_xmit_skb_list() in copy mode because xsk_build_skb() doesn't
+and doesn't need to prepare those requisites to validate. Xsk is just
+responsible for delivering raw data from userspace to the driver.
 
-The config_work in probe() will get scheduled until virtnet_open() enables
-the config change notification via virtio_config_driver_enable().
+The __dev_direct_xmit was taken out of af_packet in commit 865b03f21162
+("dev: packet: make packet_direct_xmit a common function"). And a call
+to validate_xmit_skb_list was added in commit 104ba78c9880 ("packet: on
+direct_xmit, limit tso and csum to supported devices") to support TSO.
+Since we don't support tso/vlan offloads in xsk_build_skb, we can remove
+validate_xmit_skb_list for xsk. Skipping numerous checks somehow
+contributes to the transmission especially in the extremely hot path.
 
-Fixes: df28de7b0050 ("virtio-net: synchronize operstate with admin state on up/down")
-Signed-off-by: Zigit Zo <zuozhijie@bytedance.com>
+Performance-wise, I used './xdpsock -i enp2s0f0np0 -t  -S -s 64' to verify
+the guess and then measured on the machine with ixgbe driver. It stably
+goes up by 5.48%, which can be seen in the shown below:
+Before:
+ sock0@enp2s0f0np0:0 txonly xdp-skb
+                   pps            pkts           1.00
+rx                 0              0
+tx                 1,187,410      3,513,536
+After:
+ sock0@enp2s0f0np0:0 txonly xdp-skb
+                   pps            pkts           1.00
+rx                 0              0
+tx                 1,252,590      2,459,456
+
+This patch also removes total ~4% consumption which can be observed
+by perf:
+|--2.97%--validate_xmit_skb
+|          |
+|           --1.76%--netif_skb_features
+|                     |
+|                      --0.65%--skb_network_protocol
+|
+|--1.06%--validate_xmit_xfrm
+
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
 ---
-v3 -> v2:
-* Simplify the changes.
-v1 -> v2:
-* Check vi->status in virtnet_open().
-* https://lore.kernel.org/netdev/20250702103722.576219-1-zuozhijie@bytedance.com/
-v1:
-* https://lore.kernel.org/netdev/20250630095109.214013-1-zuozhijie@bytedance.com/
+V2
+Link: https://lore.kernel.org/all/20250713025756.24601-1-kerneljasonxing@gmail.com/
+1. avoid adding a new flag
+2. add more descriptions from Stan
 ---
- drivers/net/virtio_net.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/linux/netdevice.h | 30 ++++++++++++++++++++----------
+ net/core/dev.c            |  6 ------
+ 2 files changed, 20 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 5d674eb9a0f2..82b4a2a2b8c4 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -7059,7 +7059,7 @@ static int virtnet_probe(struct virtio_device *vdev)
- 	   otherwise get link status from config. */
- 	netif_carrier_off(dev);
- 	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_STATUS)) {
--		virtnet_config_changed_work(&vi->config_work);
-+		virtio_config_changed(vi->vdev);
- 	} else {
- 		vi->status = VIRTIO_NET_S_LINK_UP;
- 		virtnet_update_settings(vi);
-
-base-commit: dae7f9cbd1909de2b0bccc30afef95c23f93e477
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index a80d21a14612..8e05c99928e1 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -3364,16 +3364,6 @@ static inline int dev_queue_xmit_accel(struct sk_buff *skb,
+ 	return __dev_queue_xmit(skb, sb_dev);
+ }
+ 
+-static inline int dev_direct_xmit(struct sk_buff *skb, u16 queue_id)
+-{
+-	int ret;
+-
+-	ret = __dev_direct_xmit(skb, queue_id);
+-	if (!dev_xmit_complete(ret))
+-		kfree_skb(skb);
+-	return ret;
+-}
+-
+ int register_netdevice(struct net_device *dev);
+ void unregister_netdevice_queue(struct net_device *dev, struct list_head *head);
+ void unregister_netdevice_many(struct list_head *head);
+@@ -4301,6 +4291,26 @@ static __always_inline int ____dev_forward_skb(struct net_device *dev,
+ 	return 0;
+ }
+ 
++static inline int dev_direct_xmit(struct sk_buff *skb, u16 queue_id)
++{
++	struct net_device *dev = skb->dev;
++	struct sk_buff *orig_skb = skb;
++	bool again = false;
++	int ret;
++
++	skb = validate_xmit_skb_list(skb, dev, &again);
++	if (skb != orig_skb) {
++		dev_core_stats_tx_dropped_inc(dev);
++		kfree_skb_list(skb);
++		return NET_XMIT_DROP;
++	}
++
++	ret = __dev_direct_xmit(skb, queue_id);
++	if (!dev_xmit_complete(ret))
++		kfree_skb(skb);
++	return ret;
++}
++
+ bool dev_nit_active_rcu(const struct net_device *dev);
+ static inline bool dev_nit_active(const struct net_device *dev)
+ {
+diff --git a/net/core/dev.c b/net/core/dev.c
+index e365b099484e..793f5d45c6b2 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -4744,19 +4744,13 @@ EXPORT_SYMBOL(__dev_queue_xmit);
+ int __dev_direct_xmit(struct sk_buff *skb, u16 queue_id)
+ {
+ 	struct net_device *dev = skb->dev;
+-	struct sk_buff *orig_skb = skb;
+ 	struct netdev_queue *txq;
+ 	int ret = NETDEV_TX_BUSY;
+-	bool again = false;
+ 
+ 	if (unlikely(!netif_running(dev) ||
+ 		     !netif_carrier_ok(dev)))
+ 		goto drop;
+ 
+-	skb = validate_xmit_skb_list(skb, dev, &again);
+-	if (skb != orig_skb)
+-		goto drop;
+-
+ 	skb_set_queue_mapping(skb, queue_id);
+ 	txq = skb_get_tx_queue(dev, skb);
+ 
 -- 
-2.49.0
+2.41.3
 
 
