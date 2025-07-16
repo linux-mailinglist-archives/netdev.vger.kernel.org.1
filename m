@@ -1,338 +1,307 @@
-Return-Path: <netdev+bounces-207570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3E54B07E3B
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 21:43:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 31D7BB07E47
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 21:44:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1703E1603FE
-	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 19:43:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CA77160F5E
+	for <lists+netdev@lfdr.de>; Wed, 16 Jul 2025 19:44:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4A542DE71A;
-	Wed, 16 Jul 2025 19:41:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF5A1D63C7;
+	Wed, 16 Jul 2025 19:44:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CfjliOAO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JE2kUPjz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E03328ECF9
-	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 19:41:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73C45218858;
+	Wed, 16 Jul 2025 19:44:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752694880; cv=none; b=b/oDpGGRITsxeFD3xQPi0WJqJaQNGz4JST0J+5TH0Bzr3l3Yme041VyLUGf3w4s9Ma3KUcScAEx70U/0GyNu/liLodtNLtHlUdn8n6Zoc0lf913uesqf5rPd7Rco/het5BOSU53kbxEAr5Sw6T11dKjZ6MZlKw+O2Mw0YIvXwx4=
+	t=1752695049; cv=none; b=gUvQ7QYBn3X1TG6Y7HcFAuT+Dpzfn85KiOP4hFbb6sPAOms9oRFL+pLyzSeQkJxqq6+V8iKYPuba3XtJs/2v0qL95ziF8cCbFREYXZLJf4bFVQcOqXjaD3ibzhVG2QOZYIRBsYd7ilYMNug7jBmGS7HRh4ZAk8rKafBwmGLPywU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752694880; c=relaxed/simple;
-	bh=F+pokThyroEh4wA6nO/q9lUgWfwAgwA4isbxDAyY7OM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e5ObI5z/IVCbEbKCUkeIeF2Dhiyf/rClJwntmb0Jl6eLzzK8AKIRsO7MjgSTB09oNKxfQIfRgcigyi7fXGc0ljHSPaTQxLJ5M6Yvl+5W7Ce34IZiUDZ7NgWl5oyNx70idfFBB8Swy+ru2zr9T/TAuh4VZma/W97KkwwhereJrbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CfjliOAO; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-235e389599fso2345ad.0
-        for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 12:41:18 -0700 (PDT)
+	s=arc-20240116; t=1752695049; c=relaxed/simple;
+	bh=/VnGrfVARweMdrKBvQRe10ytz1StrdjfupJlLPy/m8k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OV5YJc3KUo59Yb5cKp6S2cEkknf1WVkPwtdf6LuBPpwHuZKV/ku1cC31vJHE0ds7xviJYMwmroiQkcUcnra4A7grt5u7y0UidqZTGnPtSFNqvnBprQPT9o71z7ifA4yKKM/hwxpZ3+0KbgvpIocNlaRKyL71nySMrBuIFqQKElU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JE2kUPjz; arc=none smtp.client-ip=209.85.167.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-40a4bf1eb0dso173499b6e.3;
+        Wed, 16 Jul 2025 12:44:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752694878; x=1753299678; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6cBcxFpY+leZiSm2ZlkvHJhd+tn3lpuAd2BWjNqwWsU=;
-        b=CfjliOAOHdTU7CryXIhN/TluDC6bJjwIAs2m3nOftmpZgJ4zAeX39tCn3Y8Fa/Ul80
-         HW5cW3XBBqZ6xecW72zvwtd3H5WEAnRsFuyw1DJ5gzWjrLqbuFMKB4azuSmTCUPNBYBy
-         PzlQALBIP5X3C/GWqkJQ/GwbOr8Adlx3Y8q+CxAIxoE4limX/ox0ztvbtRZ2InICvBUd
-         cthpOay0xJGm5Cq+lIfbLHfryW+n1ErwQvy4FfR3IWxBGCBm2iGTVTz0AWIRtGvNN8oM
-         qc3JJTc2x3YKsEL3VeJpi5B2x3ZyHi9mOBwpYSrw2mLsUd6S0zrshacm1ggEt8189Qml
-         XPbw==
+        d=gmail.com; s=20230601; t=1752695046; x=1753299846; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+RJb3K1usff7Zb3trCkpJkm8uKCGrOCVfGuf5HpRnA8=;
+        b=JE2kUPjzwBgcfbEC0Wla7a2LL+9wMWRopm6ZozZ71+g+fVj6r3LCEpBYd/rQqP3lE6
+         FHP1CeEd0U939jDyLagnw2yuR+KgO1JR3m3cAopoWELNMlHcpiRtCSr9ZFuKKUjVyAql
+         Sv9HYbCi1hfCfTShtwxHfeYk/nPLni4MfF5KIbki0tBA7SJmCXM2NvR4U2eZtb17hhC4
+         YEsZDEX6pKuJLBhrXvV/q9LNVM42UYP8GB+ztZGjeRY5qU49QeOAoINv/3itNhmQAE7Z
+         4BG7DQmCwtRX1jH9lA1QKLhWU72rJR9C+cQRO04ijE5loESmmfbBM38PuseaSLpYcSDl
+         na3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752694878; x=1753299678;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6cBcxFpY+leZiSm2ZlkvHJhd+tn3lpuAd2BWjNqwWsU=;
-        b=ZltTmfZH2RlqCvtJFOkAxc5+ITXfY2eaBYF0YxfVtafCBwWBgp/f3V51Qer7Oa32hH
-         DF9zGd2AmneqcWhGsiFjJOc3q/kVmRrFPi6o/lfOSwp2CW4yPT4WnR7UxFJoKaLJ9JgZ
-         AW38wHq/vUWm1+XTCudu6Lpji1BVEvD3bKpw2Xhw8rgRU2uRVvRG9aRmx06F56eqCfED
-         qYhbMFm+AJCddCF3DnO28e4gRjCZr9umgRmgzrPhYm5QuEB3jNXvW9PKZy86EIbdlkF/
-         atAxAb7SZY/Jp6zalFSNk+3wQXvDvQzoFk6XN6OjgEizmziXrjsg/JsYf2muRQ4f37N2
-         dxrA==
-X-Forwarded-Encrypted: i=1; AJvYcCVobtmYFcO8ikPXgUl/JgdRKfZLLYAMMOAeHCjzUtiX0uINabvt3zuvHedlcC53x9mnCU/2USc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/gPurX1itRqBRg+oMbadVyU3JAEFwS9rwTaSrMpedixapZe+k
-	TpAcaCwwo4DgCZtvy7mBQSfjlJtWzQGMCjX7F9LlQ4j++mTTjZaVflNXuN4dg46CcrRPpRVmDqx
-	Cy1FI35rIFPaGiH27+5IO6Zw2RomDTYhSaCEpdj/g
-X-Gm-Gg: ASbGnctszj6RCadsxs8LZZR2H/0oD1UOsuJakYwk4m+s+E6P4wCU4y9MSw6kbQo2dbA
-	k0S3U8ZzspZmDUptgoIvs2l19QvA11Z/+IIVfB/8vBs53qyfM8MZ1Z6dyLjUqjFNIFYFDGMmxZC
-	+RHfo4qI1dcrEviBdj79Ru0LaIGi8+9/Wl433dr2US/QuwEo6SX1JE8sRBPxHY9QWcoLjIfNgkx
-	SwF2vXC
-X-Google-Smtp-Source: AGHT+IFyX+XCNjY83DoIYD6wz3oMr28OgEv5cSQ9ojCgkzsna4P0DmbzE8rFt2raxHhdvl1dI8tDi1DCHzWnQLePCe8=
-X-Received: by 2002:a17:903:174e:b0:234:a734:4ab9 with SMTP id
- d9443c01a7336-23e2fe3a9f6mr605605ad.20.1752694877565; Wed, 16 Jul 2025
- 12:41:17 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752695046; x=1753299846;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+RJb3K1usff7Zb3trCkpJkm8uKCGrOCVfGuf5HpRnA8=;
+        b=LlRujuh776Q/ZHyS+3dRApLqN8feMxo5DUdgQ4H9i281rO9fBkoDROw4lkbaqZDndK
+         KB+wq/UQPCiTvv/fIZViF4KSMcFd18ZYImrivEu7tPfX18wvlFAI0hDD5Dg1JgCAHjAZ
+         7U+ocgsKiMHeZhhDe8nEXCqb6w9C43Qy9j7oLDIE1gfgPuqvikHqYCGs/pp2klkO+dsN
+         NusgzmXBE7SpXuL8VgbMkX5HFZUXdphjseMrCfWhFe24DLKvpitsG3p2vHfru7/zpKL1
+         Yeh77gIpi9DTrHzLCLZCqzhjJZLCJ1HzG/8O96n3r5MKXc0rOxhhMFKSHAKE+AbvG+po
+         JSug==
+X-Forwarded-Encrypted: i=1; AJvYcCXUABcsIP5MXXqG8ms6aeQcI2Hk0OxrgT9Pq7Y4y2+KnVuLR3M2yjqqI7F7omPxaWAi0yHlPj7V@vger.kernel.org, AJvYcCXxkE8plnduBXwqjR5YTu3u7D2vNwR16AD4f1nlGdIA7QTQpIhnLJOdA2MMKdqpPHY0YCHuqF7Yt741WSI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywv7Q8JtoJLZksYLCsLZwGdj+DUY9CxtxpWgF4IouLC5W/UUKbr
+	d0esEcFLAJB+mzNdw08xxAYUudMb9yXbKdlJGnDTT880Lhl/c4TeNukB
+X-Gm-Gg: ASbGncsoafGRPPXjZfeO2SP2SmyFN35muOP2QvBdQfhC0XzjSmZm1GpgGLKXOYKNUbZ
+	v7oBT64guhk3QaHDUNsQ7YRIVqnhnpf3zbJX84NEUI05zKqO9Z2VHMyOz3Thtkj5l1DNQmvmxwr
+	sushX1/wCZLM60Atz3VdWg0Cjx9F7TFDEkLBNJH3sxspXdyGsfHe5tcIGiJrjjMS/AVTKM50R0H
+	+DFKj+f4+Wfl/+qnwdDo0kSMau10alCMF3lBkWGhzMQAYib6wr44XjUcoN0QqDFdS7hm7sr485N
+	46lm4RgPYWGYY5RqSiWXTnhWPXUtNEi6ongP3Tojc06CHufLrK2yz3GMFVHh+NMf7sENrVkl9+a
+	KHm5Xd341qEG17tPNVDdy4jY6On/qz+D1FnQZ5dvFrwfgiEH2fVOW6jzhArd3a2NPU0iEwD5AUu
+	Ty2Y/ezlP8Zg==
+X-Google-Smtp-Source: AGHT+IH7rPU8CPdva5tScZ7spJLADHZI41f7z47LZOz8ijsXYyYSHLF00e7tnDZE6SDaj5d09jFo0Q==
+X-Received: by 2002:a05:6808:189f:b0:408:fbed:c39f with SMTP id 5614622812f47-41d0526cad4mr2996628b6e.26.1752695046312;
+        Wed, 16 Jul 2025 12:44:06 -0700 (PDT)
+Received: from ?IPV6:2603:8080:7400:36da:ada3:14fa:a3ad:9ccf? ([2603:8080:7400:36da:ada3:14fa:a3ad:9ccf])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-4141c78838asm2986824b6e.46.2025.07.16.12.44.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Jul 2025 12:44:05 -0700 (PDT)
+Message-ID: <c1cf6883-a323-40e8-881d-ae7023bbc61a@gmail.com>
+Date: Wed, 16 Jul 2025 14:44:04 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250714120047.35901-1-byungchul@sk.com> <20250714120047.35901-3-byungchul@sk.com>
- <CAHS8izO393X_BDJxnX2d-auhTwrUZK5wYdoAh_tJc0GBf0AqcQ@mail.gmail.com>
- <CAHS8izNh7aCJOb1WKTx7CXNDPv_UBqFyq2XEHHhqHH=5JPmJCQ@mail.gmail.com>
- <20250715013626.GA49874@system.software.com> <CAHS8izNgfrN-MimH1uv349AqNudvQJoeOsyHpoBT_QokF3Zv=w@mail.gmail.com>
- <20250716045124.GB12760@system.software.com>
-In-Reply-To: <20250716045124.GB12760@system.software.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 16 Jul 2025 12:41:04 -0700
-X-Gm-Features: Ac12FXwMabx4wvazw8X8IufyySuAWIkeeHz9sZZKQ1flAeUQa_1pSj5SZBgkO6M
-Message-ID: <CAHS8izMK2JA4rGNMRMqQbZtJVEP8b_QPLXzoKNeVgQFzAmdv3g@mail.gmail.com>
-Subject: Re: [PATCH net-next v10 02/12] netmem: use netmem_desc instead of
- page to access ->pp in __netmem_get_pp()
-To: Byungchul Park <byungchul@sk.com>, "Lobakin, Aleksander" <aleksander.lobakin@intel.com>
-Cc: willy@infradead.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, kernel_team@skhynix.com, ilias.apalodimas@linaro.org, 
-	harry.yoo@oracle.com, akpm@linux-foundation.org, andrew+netdev@lunn.ch, 
-	asml.silence@gmail.com, toke@redhat.com, david@redhat.com, 
-	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org, surenb@google.com, 
-	mhocko@suse.com, linux-rdma@vger.kernel.org, bpf@vger.kernel.org, 
-	vishal.moola@gmail.com, hannes@cmpxchg.org, ziy@nvidia.com, 
-	jackmanb@google.com, wei.fang@nxp.com, shenwei.wang@nxp.com, 
-	xiaoning.wang@nxp.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, anthony.l.nguyen@intel.com, 
-	przemyslaw.kitszel@intel.com, sgoutham@marvell.com, gakula@marvell.com, 
-	sbhatta@marvell.com, hkelam@marvell.com, bbhushan2@marvell.com, 
-	tariqt@nvidia.com, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com, leon@kernel.org, 
-	mbloch@nvidia.com, danishanwar@ti.com, rogerq@kernel.org, nbd@nbd.name, 
-	lorenzo@kernel.org, ryder.lee@mediatek.com, shayne.chen@mediatek.com, 
-	sean.wang@mediatek.com, matthias.bgg@gmail.com, 
-	angelogioacchino.delregno@collabora.com, horms@kernel.org, m-malladi@ti.com, 
-	krzysztof.kozlowski@linaro.org, matthias.schiffer@ew.tq-group.com, 
-	robh@kernel.org, imx@lists.linux.dev, intel-wired-lan@lists.osuosl.org, 
-	linux-arm-kernel@lists.infradead.org, linux-wireless@vger.kernel.org, 
-	linux-mediatek@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] bonding: Switch periodic LACPDU state machine from
+ counter to jiffies
+To: Jay Vosburgh <jv@jvosburgh.net>, Carlos Bilbao <bilbao@vt.edu>
+Cc: carlos.bilbao@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, sforshee@kernel.org
+References: <20250715205733.50911-1-carlos.bilbao@kernel.org>
+ <c9eac8f6-8e7f-4ed0-b34d-5dc50be8078f@vt.edu> <798952.1752679803@famine>
+Content-Language: en-US
+From: Carlos Bilbao <carlos.bilbao.osdev@gmail.com>
+In-Reply-To: <798952.1752679803@famine>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 15, 2025 at 9:51=E2=80=AFPM Byungchul Park <byungchul@sk.com> w=
-rote:
+Hello Jay,
+
+On 7/16/25 10:30, Jay Vosburgh wrote:
+> Carlos Bilbao <bilbao@vt.edu> wrote:
 >
-> On Tue, Jul 15, 2025 at 12:09:34PM -0700, Mina Almasry wrote:
-> > On Mon, Jul 14, 2025 at 6:36=E2=80=AFPM Byungchul Park <byungchul@sk.co=
-m> wrote:
-> > >
-> > > On Mon, Jul 14, 2025 at 12:58:15PM -0700, Mina Almasry wrote:
-> > > > On Mon, Jul 14, 2025 at 12:37=E2=80=AFPM Mina Almasry <almasrymina@=
-google.com> wrote:
-> > > > >
-> > > > > On Mon, Jul 14, 2025 at 5:01=E2=80=AFAM Byungchul Park <byungchul=
-@sk.com> wrote:
-> > > > > >
-> > > > > > To eliminate the use of the page pool fields in struct page, th=
-e page
-> > > > > > pool code should use netmem descriptor and APIs instead.
-> > > > > >
-> > > > > > However, __netmem_get_pp() still accesses ->pp via struct page.=
-  So
-> > > > > > change it to use struct netmem_desc instead, since ->pp no long=
-er will
-> > > > > > be available in struct page.
-> > > > > >
-> > > > > > While at it, add a helper, pp_page_to_nmdesc(), that can be use=
-d to
-> > > > > > extract netmem_desc from page only if it's pp page.  For now th=
-at
-> > > > > > netmem_desc overlays on page, it can be achieved by just castin=
-g.
-> > > > > >
-> > > > > > Signed-off-by: Byungchul Park <byungchul@sk.com>
-> > > > > > ---
-> > > > > >  include/net/netmem.h | 13 ++++++++++++-
-> > > > > >  1 file changed, 12 insertions(+), 1 deletion(-)
-> > > > > >
-> > > > > > diff --git a/include/net/netmem.h b/include/net/netmem.h
-> > > > > > index 535cf17b9134..2b8a7b51ac99 100644
-> > > > > > --- a/include/net/netmem.h
-> > > > > > +++ b/include/net/netmem.h
-> > > > > > @@ -267,6 +267,17 @@ static inline struct net_iov *__netmem_cle=
-ar_lsb(netmem_ref netmem)
-> > > > > >         return (struct net_iov *)((__force unsigned long)netmem=
- & ~NET_IOV);
-> > > > > >  }
-> > > > > >
-> > > > > > +static inline struct netmem_desc *pp_page_to_nmdesc(struct pag=
-e *page)
-> > > > > > +{
-> > > > > > +       DEBUG_NET_WARN_ON_ONCE(!page_pool_page_is_pp(page));
-> > > > > > +
-> > > > > > +       /* XXX: How to extract netmem_desc from page must be ch=
-anged,
-> > > > > > +        * once netmem_desc no longer overlays on page and will=
- be
-> > > > > > +        * allocated through slab.
-> > > > > > +        */
-> > > > > > +       return (struct netmem_desc *)page;
-> > > > > > +}
-> > > > > > +
-> > > > >
-> > > > > Same thing. Do not create a generic looking pp_page_to_nmdesc hel=
-per
-> > > > > which does not check that the page is the correct type. The
-> > > > > DEBUG_NET... is not good enough.
-> > > > >
-> > > > > You don't need to add a generic helper here. There is only one ca=
-ll
-> > > > > site. Open code this in the callsite. The one callsite is marked =
-as
-> > > > > unsafe, only called by code that knows that the netmem is specifi=
-cally
-> > > > > a pp page. Open code this in the unsafe callsite, instead of crea=
-ting
-> > > > > a generic looking unsafe helper and not even documenting it's uns=
-afe.
-> > > > >
-> > > >
-> > > > On second read through the series, I actually now think this is a
-> > > > great idea :-) Adding this helper has simplified the series greatly=
-. I
-> > > > did not realize you were converting entire drivers to netmem just t=
-o
-> > > > get rid of page->pp accesses. Adding a pp_page_to_nmdesc helper mak=
-es
-> > > > the entire series simpler.
-> > > >
-> > > > You're also calling it only from code paths like drivers that alrea=
-dy
-> > > > assumed that the page is a pp page and did page->pp deference witho=
-ut
-> > > > a check, so this should be safe.
-> > > >
-> > > > Only thing I would change is add a comment explaining that the call=
-ing
-> > > > code needs to check the page is pp page or know it's a pp page (lik=
-e a
-> > > > driver that supports pp).
-> > > >
-> > > >
-> > > > > >  /**
-> > > > > >   * __netmem_get_pp - unsafely get pointer to the &page_pool ba=
-cking @netmem
-> > > > > >   * @netmem: netmem reference to get the pointer from
-> > > > > > @@ -280,7 +291,7 @@ static inline struct net_iov *__netmem_clea=
-r_lsb(netmem_ref netmem)
-> > > > > >   */
-> > > > > >  static inline struct page_pool *__netmem_get_pp(netmem_ref net=
-mem)
-> > > > > >  {
-> > > > > > -       return __netmem_to_page(netmem)->pp;
-> > > > > > +       return pp_page_to_nmdesc(__netmem_to_page(netmem))->pp;
-> > > > > >  }
-> > > > >
-> > > > > This makes me very sad. Casting from netmem -> page -> nmdesc...
-> > > > >
-> > > > > Instead, we should be able to go from netmem directly to nmdesc. =
-I
-> > > > > would suggest rename __netmem_clear_lsb to netmem_to_nmdesc and h=
-ave
-> > > > > it return netmem_desc instead of net_iov. Then use it here.
-> > > > >
-> > > > > We could have an unsafe version of netmem_to_nmdesc which convert=
-s the
-> > > > > netmem to netmem_desc without clearing the lsb and mark it unsafe=
-.
-> > > > >
-> > > >
-> > > > This, I think, we should address to keep some sanity in the code an=
-d
-> > > > reduce the casts and make it a bit more maintainable.
-> > >
-> > > I will reflect your suggestions.  To summarize:
-> > >
-> > >    1) The current implementation of pp_page_to_nmdesc() is good enoug=
-h
-> > >       to keep, but add a comment on it like "Check if the page is a p=
-p
-> > >       page before calling this function or know it's a pp page.".
-> > >
-> >
-> > Yes please.
-> >
-> > >    2) Introduce the unsafe version, __netmem_to_nmdesc(), and use it =
-in
-> > >       __netmem_get_pp().
-> > >
-> >
-> > No need following Pavel's feedback. We can just delete
-> > __netmem_get_pp. If we do find a need in the future to extract the
-> > netmem_desc from a netmem_ref, I would rather we do a straight cast
-> > from netmem_ref to netmem_desc rather than netmem_ref -> pages/net_iov
-> > -> netmem_desc.
-> >
-> > But that seems unnecessary for this series.
+>> FYI, I was able to test this locally but couldn’t find any kselftests to
+>> stress the bonding state machine. If anyone knows of additional ways to
+>> test it, I’d be happy to run them.
+> 	Your commit message says this change will "help reduce drift
+> under contention," but above you say you're unable to stress the state
+> machine.
 >
-> No.  The series should remove accessing ->pp through page.
+> 	How do you induce "drift under contention" to test that your
+> patch actually improves something?  What testing has been done to insure
+> that the new code doesn't change the behavior in other ways (regressions)?
+
+
+I tested the bonding driver with and without CPU contention*. With this
+patch, the LACPDU state machine is much more consistent under load, with
+standard deviation of 0.0065 secs between packets. In comparison, the
+current version had a standard deviation of 0.15 secs (~x23 more
+variability). I imagine this gets worsens with greater contention.
+
+When I mentioned a possible kselftest (or similar) to "stress" the state
+machine, I meant whether there's already any testing that checks the
+state machine through different transitions -- e.g., scenarios where the
+switch instruct the bond to change configs (for example, between fast and
+slow LACP modes), resetting the bond under certain conditions, etc. I just
+want to be exhaustive because as you mentioned the state machine has been
+around for long time.
+
+*System was stressed using:
+
+stress-ng --cpu $(nproc) --timeout 60
+
+Metrics were collected with:
+
+sudo tcpdump -e -ni <my interface> ether proto 0x8809 and ether src <mac>
+
+
 >
-> I will kill __netmem_get_pp() as you and I prefer.  However,
-> __netmem_get_pp() users e.i. libeth_xdp_return_va() and
-> libeth_xdp_tx_fill_buf() should be altered.  I will modify the code like:
+> 	Without a specific reproducable bug scenario that this change
+> fixes, I'm leery of applying such a refactor to code that has seemingly
+> been working fine for 20+ years.
 >
-> as is: __netmem_get_pp(netmem)
-> to be: __netmem_nmdesc(netmem)->pp
+> 	I gather that what this is intending to do is reduce the current
+> dependency on the scheduling accuracy of the workqueue event that runs
+> the state machines.  The current implementation works on a "number of
+> invocations" basis, assuming that the event is invoked every 100 msec,
+> and computes various timeouts based on the number of times the state
+
+
+Yep.
+
+
+> machine runs.
 >
-> Is it okay with you?
+> 	-J
 >
-
-When Pavel and I were saying 'remove __netmem_get_pp', I think we
-meant to remove the entire concept of unsafe netmem -> page
-conversions. I think we both don't like them. From this perspective,
-__netmem_nmdesc(netmem)->pp is just as bad as __netmem_get_pp(netmem).
-
-I think since the unsafe netmem-to-page casts are already in mainline,
-lets assume they should stay there until someone feels strongly enough
-to remove them. The logic in Olek's patch is sound:
-
-https://lore.kernel.org/all/20241203173733.3181246-8-aleksander.lobakin@int=
-el.com/
-
-Header buffer page pools do always use pages and will likely remain so
-for a long time, so I guess lets continue to support them rather than
-try to remove them in this series. A followup series could try to
-remove them.
-
-> > >    3) Rename __netmem_clear_lsb() to netmem_to_nmdesc(), and return
-> > >       netmem_desc, and use it in all users of __netmem_clear_lsb().
-> > >
-> >
-> > Following Pavel's comment, this I think also is not necessary for this
-> > series. Cleaning up the return value of __netmem_clear_lsb is good
-> > work I think, but we're already on v10 of this and I think it would
-> > unnecessary to ask for added cleanups. We can do the cleanup on top.
->
-> However, I still need to include 'introduce __netmem_nmdesc() helper'
-
-Yes.
-
-> in this series since it should be used to remove __netmem_get_pp() as I
-
-lets keep __netmem_get_pp, which does a `return
-__netmem_nmdesc(netmem)->pp;` In general we avoid allowing the driver
-to do any netmem casts in the driver code, and we do any casting in
-core.
-
-> described above.  I think I'd better add netmem_nmdesc() too while at it.
+>> Thanks!
+>>
+>> Carlos
+>>
+>> On 7/15/25 15:57, carlos.bilbao@kernel.org wrote:
+>>> From: Carlos Bilbao <carlos.bilbao@kernel.org>
+>>>
+>>> Replace the bonding periodic state machine for LACPDU transmission of
+>>> function ad_periodic_machine() with a jiffies-based mechanism, which is
+>>> more accurate and can help reduce drift under contention.
+>>>
+>>> Signed-off-by: Carlos Bilbao (DigitalOcean) <carlos.bilbao@kernel.org>
+>>> ---
+>>>    drivers/net/bonding/bond_3ad.c | 79 +++++++++++++---------------------
+>>>    include/net/bond_3ad.h         |  2 +-
+>>>    2 files changed, 32 insertions(+), 49 deletions(-)
+>>>
+>>> diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
+>>> index c6807e473ab7..8654a51266a3 100644
+>>> --- a/drivers/net/bonding/bond_3ad.c
+>>> +++ b/drivers/net/bonding/bond_3ad.c
+>>> @@ -1421,44 +1421,24 @@ static void ad_periodic_machine(struct port *port, struct bond_params *bond_para
+>>>    	    (!(port->actor_oper_port_state & LACP_STATE_LACP_ACTIVITY) && !(port->partner_oper.port_state & LACP_STATE_LACP_ACTIVITY)) ||
+>>>    	    !bond_params->lacp_active) {
+>>>    		port->sm_periodic_state = AD_NO_PERIODIC;
+>>> -	}
+>>> -	/* check if state machine should change state */
+>>> -	else if (port->sm_periodic_timer_counter) {
+>>> -		/* check if periodic state machine expired */
+>>> -		if (!(--port->sm_periodic_timer_counter)) {
+>>> -			/* if expired then do tx */
+>>> -			port->sm_periodic_state = AD_PERIODIC_TX;
+>>> -		} else {
+>>> -			/* If not expired, check if there is some new timeout
+>>> -			 * parameter from the partner state
+>>> -			 */
+>>> -			switch (port->sm_periodic_state) {
+>>> -			case AD_FAST_PERIODIC:
+>>> -				if (!(port->partner_oper.port_state
+>>> -				      & LACP_STATE_LACP_TIMEOUT))
+>>> -					port->sm_periodic_state = AD_SLOW_PERIODIC;
+>>> -				break;
+>>> -			case AD_SLOW_PERIODIC:
+>>> -				if ((port->partner_oper.port_state & LACP_STATE_LACP_TIMEOUT)) {
+>>> -					port->sm_periodic_timer_counter = 0;
+>>> -					port->sm_periodic_state = AD_PERIODIC_TX;
+>>> -				}
+>>> -				break;
+>>> -			default:
+>>> -				break;
+>>> -			}
+>>> -		}
+>>> +	} else if (port->sm_periodic_state == AD_NO_PERIODIC)
+>>> +		port->sm_periodic_state = AD_FAST_PERIODIC;
+>>> +	/* check if periodic state machine expired */
+>>> +	else if (time_after_eq(jiffies, port->sm_periodic_next_jiffies)) {
+>>> +		/* if expired then do tx */
+>>> +		port->sm_periodic_state = AD_PERIODIC_TX;
+>>>    	} else {
+>>> +		/* If not expired, check if there is some new timeout
+>>> +		 * parameter from the partner state
+>>> +		 */
+>>>    		switch (port->sm_periodic_state) {
+>>> -		case AD_NO_PERIODIC:
+>>> -			port->sm_periodic_state = AD_FAST_PERIODIC;
+>>> -			break;
+>>> -		case AD_PERIODIC_TX:
+>>> -			if (!(port->partner_oper.port_state &
+>>> -			    LACP_STATE_LACP_TIMEOUT))
+>>> +		case AD_FAST_PERIODIC:
+>>> +			if (!(port->partner_oper.port_state & LACP_STATE_LACP_TIMEOUT))
+>>>    				port->sm_periodic_state = AD_SLOW_PERIODIC;
+>>> -			else
+>>> -				port->sm_periodic_state = AD_FAST_PERIODIC;
+>>> +			break;
+>>> +		case AD_SLOW_PERIODIC:
+>>> +			if ((port->partner_oper.port_state & LACP_STATE_LACP_TIMEOUT))
+>>> +				port->sm_periodic_state = AD_PERIODIC_TX;
+>>>    			break;
+>>>    		default:
+>>>    			break;
+>>> @@ -1471,21 +1451,24 @@ static void ad_periodic_machine(struct port *port, struct bond_params *bond_para
+>>>    			  "Periodic Machine: Port=%d, Last State=%d, Curr State=%d\n",
+>>>    			  port->actor_port_number, last_state,
+>>>    			  port->sm_periodic_state);
+>>> +
+>>>    		switch (port->sm_periodic_state) {
+>>> -		case AD_NO_PERIODIC:
+>>> -			port->sm_periodic_timer_counter = 0;
+>>> -			break;
+>>> -		case AD_FAST_PERIODIC:
+>>> -			/* decrement 1 tick we lost in the PERIODIC_TX cycle */
+>>> -			port->sm_periodic_timer_counter = __ad_timer_to_ticks(AD_PERIODIC_TIMER, (u16)(AD_FAST_PERIODIC_TIME))-1;
+>>> -			break;
+>>> -		case AD_SLOW_PERIODIC:
+>>> -			/* decrement 1 tick we lost in the PERIODIC_TX cycle */
+>>> -			port->sm_periodic_timer_counter = __ad_timer_to_ticks(AD_PERIODIC_TIMER, (u16)(AD_SLOW_PERIODIC_TIME))-1;
+>>> -			break;
+>>>    		case AD_PERIODIC_TX:
+>>>    			port->ntt = true;
+>>> -			break;
+>>> +			if (!(port->partner_oper.port_state &
+>>> +						LACP_STATE_LACP_TIMEOUT))
+>>> +				port->sm_periodic_state = AD_SLOW_PERIODIC;
+>>> +			else
+>>> +				port->sm_periodic_state = AD_FAST_PERIODIC;
+>>> +		fallthrough;
+>>> +		case AD_SLOW_PERIODIC:
+>>> +		case AD_FAST_PERIODIC:
+>>> +			if (port->sm_periodic_state == AD_SLOW_PERIODIC)
+>>> +				port->sm_periodic_next_jiffies = jiffies
+>>> +					+ HZ * AD_SLOW_PERIODIC_TIME;
+>>> +			else /* AD_FAST_PERIODIC */
+>>> +				port->sm_periodic_next_jiffies = jiffies
+>>> +					+ HZ * AD_FAST_PERIODIC_TIME;
+>>>    		default:
+>>>    			break;
+>>>    		}
+>>> @@ -1987,7 +1970,7 @@ static void ad_initialize_port(struct port *port, int lacp_fast)
+>>>    		port->sm_rx_state = 0;
+>>>    		port->sm_rx_timer_counter = 0;
+>>>    		port->sm_periodic_state = 0;
+>>> -		port->sm_periodic_timer_counter = 0;
+>>> +		port->sm_periodic_next_jiffies = 0;
+>>>    		port->sm_mux_state = 0;
+>>>    		port->sm_mux_timer_counter = 0;
+>>>    		port->sm_tx_state = 0;
+>>> diff --git a/include/net/bond_3ad.h b/include/net/bond_3ad.h
+>>> index 2053cd8e788a..aabb8c97caf4 100644
+>>> --- a/include/net/bond_3ad.h
+>>> +++ b/include/net/bond_3ad.h
+>>> @@ -227,7 +227,7 @@ typedef struct port {
+>>>    	rx_states_t sm_rx_state;	/* state machine rx state */
+>>>    	u16 sm_rx_timer_counter;	/* state machine rx timer counter */
+>>>    	periodic_states_t sm_periodic_state;	/* state machine periodic state */
+>>> -	u16 sm_periodic_timer_counter;	/* state machine periodic timer counter */
+>>> +	unsigned long sm_periodic_next_jiffies;	/* state machine periodic next expected sent */
+>>>    	mux_states_t sm_mux_state;	/* state machine mux state */
+>>>    	u16 sm_mux_timer_counter;	/* state machine mux timer counter */
+>>>    	tx_states_t sm_tx_state;	/* state machine tx state */
+> ---
+> 	-Jay Vosburgh, jv@jvosburgh.net
 >
 
-Yes. netmem_nmdesc should replace __netmem_clear_lsb.
-
-> I assume __netmem_nmdesc() is an unsafe version not clearing lsb.  The
-
-Yes.
-
-> safe version, netmem_nmdesc() needs an additional operation clearing lsb.
-
-Yes.
-
-
---
 Thanks,
-Mina
+
+Carlos
+
 
