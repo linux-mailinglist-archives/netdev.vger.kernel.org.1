@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-208044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A57EB0986E
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 01:45:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7096FB0986C
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 01:45:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F7B61C45A95
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 23:45:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B39A73BF759
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 23:44:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36D8E25A353;
-	Thu, 17 Jul 2025 23:44:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D249225D546;
+	Thu, 17 Jul 2025 23:44:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CP7eiAE7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P2kRNOAZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1350925A340
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 23:44:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE46325A340
+	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 23:44:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752795857; cv=none; b=Y8po+ykVnpvNNoUffiAxN1AGez5NfIGyZMZv5t3VA2/7Pv76+80VWdrG/SgyTFoKg0qvvAor6NTm5TchIGzBDYY+ITRw5AIniACPjMEI0wOWDifmVnnI+hw2H1pASCP5X+Q8nyih1UjZE/TK0mTADsOqLwTvKeqPyvtHkKJNT1o=
+	t=1752795858; cv=none; b=cVmtiOIpted+dONVCBZYPrGsf8/taLj1+pKvLojU/q+q0+MPQY8E54Ee3O1TrXSNQWd0zIxL4O44jjkDYIxbAFIJNEBjHS0sYw7FB/i7iDRdHQBkVTzZRhcKXUTfGiitFivc6TUpCwJlc3tV0C5dAeNSSstNbEjbNF3QhODu+6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752795857; c=relaxed/simple;
-	bh=amwakZDRYlkRvshp0cOwc64iAk3mVsw4tW8VDfBzH4s=;
+	s=arc-20240116; t=1752795858; c=relaxed/simple;
+	bh=mQ9lv54Ytd/dODujE8F3M/U6GgtuvRwx+S7Cgi6DzOo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kC0oRlh/VL34YwCFxkvDJ6m5eyySGJqW/Y7v7KxQGg1zh7uENiPsAgDmg8P050hD3PDI5JevSF+/3qaaj/6K5Xtx7NQNwVOr5IVyAU6hbmzrYMiWzFbxB2lOMMBgqdqYFoDlwoqPdnoOnCc8v2jun2ZpeAFvDMyxDwqXDej/4zQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CP7eiAE7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03A03C4CEF4;
-	Thu, 17 Jul 2025 23:44:15 +0000 (UTC)
+	 MIME-Version; b=bMD9jiJcrHez+AJKyX/bqCHXwtrog05XbIFnQga/ENh3xggmRwQYX2CQZeg8vKbddGDCS4wBEONd6QRwcMWQW44fozwPSiDZ58vLpVPdqzizbI8d4XeqMj7FtmGUJLI4VqseBHmKIdXKZlCZx593/v/11Fmwng/ixHY5X+z70IM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P2kRNOAZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE330C4CEF8;
+	Thu, 17 Jul 2025 23:44:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752795856;
-	bh=amwakZDRYlkRvshp0cOwc64iAk3mVsw4tW8VDfBzH4s=;
+	s=k20201202; t=1752795857;
+	bh=mQ9lv54Ytd/dODujE8F3M/U6GgtuvRwx+S7Cgi6DzOo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CP7eiAE7Nh3s1M942RM0wcJvWnMdKgeyTuvOZPfXCHT90mZCtcIP/gZpuMCZ3qNsN
-	 Ssw08jV861UZ4/6Wla7aKwzP3Ys1lbgRDdqqsav1jPTNJOj9ht2nwgXXVlbH9yZ6KX
-	 7zuFPXrCvyZ44wM6DiGVDng/D4M0B/ehbtQnnTJYljIuVxoZlfWMWQwFZ8/goPo5wz
-	 g3Fz4Dn5mdR3ddxt9FH/yjYR1LlSMcrQef/Zh10BKFXKnJOgnCos1pFWreAoimbRge
-	 pGMoJFM6LUjG/OHQbwJT2uOttBt0wr9P70g9SP/qU3yLb+N5hN+fkTA0O8VNAVgxEE
-	 bMXsQf41ugZ7g==
+	b=P2kRNOAZawfWw5smPglnS2DdH+ejE6sz/kdSHrzGBAapO3ZciwA1I0MRwBlhw65e8
+	 VltVhkE0WCKBVveRazOsoSbyCPK8M1OS5qtdVu1yC2suksZcQRQgXi+MB39xukk74a
+	 MHgCfihJmlT/VysTAqHYGoInCroImU2H3482afLG6fQlagabbJSyqFz+iisycb7cOj
+	 KmNx1xL8UcIBFSYv6TK6dEkYh9iKyQVXDHbQu0mug5/+nRKBNNExrB8BYoYlzfcqF5
+	 9UTVdc6mIcqfgvrkP4qxOOH3ntIDoB3V9ZhkQimGHkmfe3wdo0gJ2HoOVAoiE1dboo
+	 hV2HNAqbHhpXw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -55,9 +55,9 @@ Cc: netdev@vger.kernel.org,
 	gal@nvidia.com,
 	ecree.xilinx@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 7/8] ethtool: rss: support removing contexts via Netlink
-Date: Thu, 17 Jul 2025 16:43:42 -0700
-Message-ID: <20250717234343.2328602-8-kuba@kernel.org>
+Subject: [PATCH net-next 8/8] selftests: drv-net: rss_api: context create and delete tests
+Date: Thu, 17 Jul 2025 16:43:43 -0700
+Message-ID: <20250717234343.2328602-9-kuba@kernel.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250717234343.2328602-1-kuba@kernel.org>
 References: <20250717234343.2328602-1-kuba@kernel.org>
@@ -69,305 +69,120 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implement removing additional RSS contexts via Netlink.
-Technically it'd be possible to shoehorn the delete operation
-into ethnl_request_ops-compatible handler. The code ends
-up longer than open coded version, and I think we'll need
-a custom way of sending notifications at some stage (if we
-allow tying the context lifetime to the netlink socket, in
-the future).
+Add test cases for creating and deleting contexts.
+
+  TAP version 13
+  1..12
+  ok 1 rss_api.test_rxfh_nl_set_fail
+  ok 2 rss_api.test_rxfh_nl_set_indir
+  ok 3 rss_api.test_rxfh_nl_set_indir_ctx
+  ok 4 rss_api.test_rxfh_indir_ntf
+  ok 5 rss_api.test_rxfh_indir_ctx_ntf
+  ok 6 rss_api.test_rxfh_nl_set_key
+  ok 7 rss_api.test_rxfh_fields
+  ok 8 rss_api.test_rxfh_fields_set
+  ok 9 rss_api.test_rxfh_fields_set_xfrm # SKIP no input-xfrm supported
+  ok 10 rss_api.test_rxfh_fields_ntf
+  ok 11 rss_api.test_rss_ctx_add
+  ok 12 rss_api.test_rss_ctx_ntf
+  # Totals: pass:11 fail:0 xfail:0 xpass:0 skip:1 error:0
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- Documentation/netlink/specs/ethtool.yaml      |  18 +++
- Documentation/networking/ethtool-netlink.rst  |  14 +++
- .../uapi/linux/ethtool_netlink_generated.h    |   2 +
- net/ethtool/netlink.h                         |   2 +
- net/ethtool/common.c                          |   1 +
- net/ethtool/ioctl.c                           |   1 +
- net/ethtool/netlink.c                         |   7 ++
- net/ethtool/rss.c                             | 109 +++++++++++++++++-
- 8 files changed, 153 insertions(+), 1 deletion(-)
+ .../selftests/drivers/net/hw/rss_api.py       | 73 +++++++++++++++++++
+ 1 file changed, 73 insertions(+)
 
-diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-index 25ffed5fddd5..1063d5d32fea 100644
---- a/Documentation/netlink/specs/ethtool.yaml
-+++ b/Documentation/netlink/specs/ethtool.yaml
-@@ -2706,6 +2706,24 @@ c-version-name: ethtool-genl-version
-       doc: |
-         Notification for creation of an additional RSS context.
-       notify: rss-create-act
-+    -
-+      name: rss-delete-act
-+      doc: Delete an RSS context.
-+      attribute-set: rss
-+      do:
-+        request:
-+          attributes:
-+            - header
-+            - context
-+    -
-+      name: rss-delete-ntf
-+      doc: |
-+        Notification for deletion of an additional RSS context.
-+      attribute-set: rss
-+      event:
-+        attributes:
-+          - header
-+          - context
+diff --git a/tools/testing/selftests/drivers/net/hw/rss_api.py b/tools/testing/selftests/drivers/net/hw/rss_api.py
+index 424743bb583b..19847f3d4a00 100755
+--- a/tools/testing/selftests/drivers/net/hw/rss_api.py
++++ b/tools/testing/selftests/drivers/net/hw/rss_api.py
+@@ -5,6 +5,7 @@
+ API level tests for RSS (mostly Netlink vs IOCTL).
+ """
  
- mcast-groups:
-   list:
-diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
-index 2646fafb8512..ab20c644af24 100644
---- a/Documentation/networking/ethtool-netlink.rst
-+++ b/Documentation/networking/ethtool-netlink.rst
-@@ -241,6 +241,7 @@ All constants identifying message types use ``ETHTOOL_CMD_`` prefix and suffix
-   ``ETHTOOL_MSG_TSCONFIG_SET``          set hw timestamping configuration
-   ``ETHTOOL_MSG_RSS_SET``               set RSS settings
-   ``ETHTOOL_MSG_RSS_CREATE_ACT``        create an additional RSS context
-+  ``ETHTOOL_MSG_RSS_DELETE_ACT``        delete an additional RSS context
-   ===================================== =================================
++import errno
+ import glob
+ import random
+ from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_is, ksft_ne, ksft_raises
+@@ -390,6 +391,78 @@ from lib.py import NetDrvEnv
+     ksft_eq(next(ethnl.poll_ntf(duration=0.01), None), None)
  
- Kernel to userspace:
-@@ -297,6 +298,7 @@ All constants identifying message types use ``ETHTOOL_CMD_`` prefix and suffix
-   ``ETHTOOL_MSG_RSS_NTF``                  RSS settings notification
-   ``ETHTOOL_MSG_RSS_CREATE_ACT_REPLY``     create an additional RSS context
-   ``ETHTOOL_MSG_RSS_CREATE_NTF``           additional RSS context created
-+  ``ETHTOOL_MSG_RSS_DELETE_NTF``           additional RSS context deleted
-   ======================================== =================================
  
- ``GET`` requests are sent by userspace applications to retrieve device
-@@ -2041,6 +2043,18 @@ RSS_CREATE_ACT
- Create an additional RSS context, if ``ETHTOOL_A_RSS_CONTEXT`` is not
- specified kernel will allocate one automatically.
++def test_rss_ctx_add(cfg):
++    """ Test creating an additional RSS context via Netlink """
++
++    _require_2qs(cfg)
++
++    # Test basic creation
++    ctx = cfg.ethnl.rss_create_act({"header": {"dev-index": cfg.ifindex}})
++    d = defer(ethtool, f"-X {cfg.ifname} context {ctx.get('context')} delete")
++    ksft_ne(ctx.get("context", 0), 0)
++    ksft_ne(set(ctx.get("indir", [0])), {0},
++            comment="Driver should init the indirection table")
++
++    # Try requesting the ID we just got allocated
++    with ksft_raises(NlError) as cm:
++        ctx = cfg.ethnl.rss_create_act({
++            "header": {"dev-index": cfg.ifindex},
++            "context": ctx.get("context"),
++        })
++        ethtool(f"-X {cfg.ifname} context {ctx.get('context')} delete")
++    d.exec()
++    ksft_eq(cm.exception.nl_msg.error, -errno.EBUSY)
++
++    # Test creating with a specified RSS table, and context ID
++    ctx_id = ctx.get("context")
++    ctx = cfg.ethnl.rss_create_act({
++        "header": {"dev-index": cfg.ifindex},
++        "context": ctx_id,
++        "indir": [1],
++    })
++    ethtool(f"-X {cfg.ifname} context {ctx.get('context')} delete")
++    ksft_eq(ctx.get("context"), ctx_id)
++    ksft_eq(set(ctx.get("indir", [0])), {1})
++
++
++def test_rss_ctx_ntf(cfg):
++    """ Test notifications for creating additional RSS contexts """
++
++    ethnl = EthtoolFamily()
++    ethnl.ntf_subscribe("monitor")
++
++    # Create / delete via Netlink
++    ctx = cfg.ethnl.rss_create_act({"header": {"dev-index": cfg.ifindex}})
++    cfg.ethnl.rss_delete_act({
++        "header": {"dev-index": cfg.ifindex},
++        "context": ctx["context"],
++    })
++
++    ntf = next(ethnl.poll_ntf(duration=0.2), None)
++    if ntf is None:
++        raise KsftFailEx("[NL] No notification after context creation")
++    ksft_eq(ntf["name"], "rss-create-ntf")
++    ksft_eq(ctx, ntf["msg"])
++
++    ntf = next(ethnl.poll_ntf(duration=0.2), None)
++    if ntf is None:
++        raise KsftFailEx("[NL] No notification after context deletion")
++    ksft_eq(ntf["name"], "rss-delete-ntf")
++
++    # Create / deleve via IOCTL
++    ctx_id = _ethtool_create(cfg, "--disable-netlink -X", "context new")
++    ethtool(f"--disable-netlink -X {cfg.ifname} context {ctx_id} delete")
++    ntf = next(ethnl.poll_ntf(duration=0.2), None)
++    if ntf is None:
++        raise KsftFailEx("[IOCTL] No notification after context creation")
++    ksft_eq(ntf["name"], "rss-create-ntf")
++
++    ntf = next(ethnl.poll_ntf(duration=0.2), None)
++    if ntf is None:
++        raise KsftFailEx("[IOCTL] No notification after context deletion")
++    ksft_eq(ntf["name"], "rss-delete-ntf")
++
++
+ def main() -> None:
+     """ Ksft boiler plate main """
  
-+RSS_DELETE_ACT
-+==============
-+
-+Request contents:
-+
-+=====================================  ======  ==============================
-+  ``ETHTOOL_A_RSS_HEADER``             nested  request header
-+  ``ETHTOOL_A_RSS_CONTEXT``            u32     context number
-+=====================================  ======  ==============================
-+
-+Delete an additional RSS context.
-+
- PLCA_GET_CFG
- ============
- 
-diff --git a/include/uapi/linux/ethtool_netlink_generated.h b/include/uapi/linux/ethtool_netlink_generated.h
-index dea77abd295f..e3b8813465d7 100644
---- a/include/uapi/linux/ethtool_netlink_generated.h
-+++ b/include/uapi/linux/ethtool_netlink_generated.h
-@@ -842,6 +842,7 @@ enum {
- 	ETHTOOL_MSG_TSCONFIG_SET,
- 	ETHTOOL_MSG_RSS_SET,
- 	ETHTOOL_MSG_RSS_CREATE_ACT,
-+	ETHTOOL_MSG_RSS_DELETE_ACT,
- 
- 	__ETHTOOL_MSG_USER_CNT,
- 	ETHTOOL_MSG_USER_MAX = (__ETHTOOL_MSG_USER_CNT - 1)
-@@ -901,6 +902,7 @@ enum {
- 	ETHTOOL_MSG_RSS_NTF,
- 	ETHTOOL_MSG_RSS_CREATE_ACT_REPLY,
- 	ETHTOOL_MSG_RSS_CREATE_NTF,
-+	ETHTOOL_MSG_RSS_DELETE_NTF,
- 
- 	__ETHTOOL_MSG_KERNEL_CNT,
- 	ETHTOOL_MSG_KERNEL_MAX = (__ETHTOOL_MSG_KERNEL_CNT - 1)
-diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
-index b530bf9f85ee..1d4f9ecb3d26 100644
---- a/net/ethtool/netlink.h
-+++ b/net/ethtool/netlink.h
-@@ -487,6 +487,7 @@ extern const struct nla_policy ethnl_pse_set_policy[ETHTOOL_A_PSE_MAX + 1];
- extern const struct nla_policy ethnl_rss_get_policy[ETHTOOL_A_RSS_START_CONTEXT + 1];
- extern const struct nla_policy ethnl_rss_set_policy[ETHTOOL_A_RSS_FLOW_HASH + 1];
- extern const struct nla_policy ethnl_rss_create_policy[ETHTOOL_A_RSS_INPUT_XFRM + 1];
-+extern const struct nla_policy ethnl_rss_delete_policy[ETHTOOL_A_RSS_CONTEXT + 1];
- extern const struct nla_policy ethnl_plca_get_cfg_policy[ETHTOOL_A_PLCA_HEADER + 1];
- extern const struct nla_policy ethnl_plca_set_cfg_policy[ETHTOOL_A_PLCA_MAX + 1];
- extern const struct nla_policy ethnl_plca_get_status_policy[ETHTOOL_A_PLCA_HEADER + 1];
-@@ -510,6 +511,7 @@ int ethnl_tsinfo_start(struct netlink_callback *cb);
- int ethnl_tsinfo_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
- int ethnl_tsinfo_done(struct netlink_callback *cb);
- int ethnl_rss_create_doit(struct sk_buff *skb, struct genl_info *info);
-+int ethnl_rss_delete_doit(struct sk_buff *skb, struct genl_info *info);
- 
- extern const char stats_std_names[__ETHTOOL_STATS_CNT][ETH_GSTRING_LEN];
- extern const char stats_eth_phy_names[__ETHTOOL_A_STATS_ETH_PHY_CNT][ETH_GSTRING_LEN];
-diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-index 2a1d40efb1fc..4f58648a27ad 100644
---- a/net/ethtool/common.c
-+++ b/net/ethtool/common.c
-@@ -1136,5 +1136,6 @@ void ethtool_rxfh_context_lost(struct net_device *dev, u32 context_id)
- 	netdev_err(dev, "device error, RSS context %d lost\n", context_id);
- 	ctx = xa_erase(&dev->ethtool->rss_ctx, context_id);
- 	kfree(ctx);
-+	ethtool_rss_notify(dev, ETHTOOL_MSG_RSS_DELETE_NTF, context_id);
- }
- EXPORT_SYMBOL(ethtool_rxfh_context_lost);
-diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index 4b586b0f18e8..43a7854e784e 100644
---- a/net/ethtool/ioctl.c
-+++ b/net/ethtool/ioctl.c
-@@ -1647,6 +1647,7 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
- 			     !memchr_inv(ethtool_rxfh_context_key(ctx), 0,
- 					 ctx->key_size));
- 	} else if (rxfh_dev.rss_delete) {
-+		ntf = ETHTOOL_MSG_RSS_DELETE_NTF;
- 		ret = ops->remove_rxfh_context(dev, ctx, rxfh.rss_context,
- 					       extack);
- 	} else {
-diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
-index e9696113a96b..2f813f25f07e 100644
---- a/net/ethtool/netlink.c
-+++ b/net/ethtool/netlink.c
-@@ -1527,6 +1527,13 @@ static const struct genl_ops ethtool_genl_ops[] = {
- 		.policy	= ethnl_rss_create_policy,
- 		.maxattr = ARRAY_SIZE(ethnl_rss_create_policy) - 1,
- 	},
-+	{
-+		.cmd	= ETHTOOL_MSG_RSS_DELETE_ACT,
-+		.flags	= GENL_UNS_ADMIN_PERM,
-+		.doit	= ethnl_rss_delete_doit,
-+		.policy	= ethnl_rss_delete_policy,
-+		.maxattr = ARRAY_SIZE(ethnl_rss_delete_policy) - 1,
-+	},
- };
- 
- static const struct genl_multicast_group ethtool_nl_mcgrps[] = {
-diff --git a/net/ethtool/rss.c b/net/ethtool/rss.c
-index be092dfa4407..992e98abe9dd 100644
---- a/net/ethtool/rss.c
-+++ b/net/ethtool/rss.c
-@@ -486,13 +486,49 @@ int ethnl_rss_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
- 
- /* RSS_NTF */
- 
-+static void ethnl_rss_delete_notify(struct net_device *dev, u32 rss_context)
-+{
-+	struct sk_buff *ntf;
-+	size_t ntf_size;
-+	void *hdr;
-+
-+	ntf_size = ethnl_reply_header_size() +
-+		nla_total_size(sizeof(u32));	/* _RSS_CONTEXT */
-+
-+	ntf = genlmsg_new(ntf_size, GFP_KERNEL);
-+	if (!ntf)
-+		goto out_warn;
-+
-+	hdr = ethnl_bcastmsg_put(ntf, ETHTOOL_MSG_RSS_DELETE_NTF);
-+	if (!hdr)
-+		goto out_free_ntf;
-+
-+	if (ethnl_fill_reply_header(ntf, dev, ETHTOOL_A_RSS_HEADER) ||
-+	    nla_put_u32(ntf, ETHTOOL_A_RSS_CONTEXT, rss_context))
-+		goto out_free_ntf;
-+
-+	genlmsg_end(ntf, hdr);
-+	if (ethnl_multicast(ntf, dev))
-+		goto out_warn;
-+
-+	return;
-+
-+out_free_ntf:
-+	nlmsg_free(ntf);
-+out_warn:
-+	pr_warn_once("Failed to send a RSS delete notification");
-+}
-+
- void ethtool_rss_notify(struct net_device *dev, u32 type, u32 rss_context)
- {
- 	struct rss_req_info req_info = {
- 		.rss_context = rss_context,
- 	};
- 
--	ethnl_notify(dev, type, &req_info.base);
-+	if (type == ETHTOOL_MSG_RSS_DELETE_NTF)
-+		ethnl_rss_delete_notify(dev, rss_context);
-+	else
-+		ethnl_notify(dev, type, &req_info.base);
- }
- 
- /* RSS_SET */
-@@ -1096,3 +1132,74 @@ int ethnl_rss_create_doit(struct sk_buff *skb, struct genl_info *info)
- 	kfree(ctx);
- 	goto exit_unlock;
- }
-+
-+/* RSS_DELETE */
-+
-+const struct nla_policy ethnl_rss_delete_policy[ETHTOOL_A_RSS_CONTEXT + 1] = {
-+	[ETHTOOL_A_RSS_HEADER]	= NLA_POLICY_NESTED(ethnl_header_policy),
-+	[ETHTOOL_A_RSS_CONTEXT]	= NLA_POLICY_MIN(NLA_U32, 1),
-+};
-+
-+int ethnl_rss_delete_doit(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct ethtool_rxfh_context *ctx;
-+	struct nlattr **tb = info->attrs;
-+	struct ethnl_req_info req = {};
-+	const struct ethtool_ops *ops;
-+	struct net_device *dev;
-+	u32 rss_context;
-+	int ret;
-+
-+	if (GENL_REQ_ATTR_CHECK(info, ETHTOOL_A_RSS_CONTEXT))
-+		return -EINVAL;
-+	rss_context = nla_get_u32(tb[ETHTOOL_A_RSS_CONTEXT]);
-+
-+	ret = ethnl_parse_header_dev_get(&req, tb[ETHTOOL_A_RSS_HEADER],
-+					 genl_info_net(info), info->extack,
-+					 true);
-+	if (ret < 0)
-+		return ret;
-+
-+	dev = req.dev;
-+	ops = dev->ethtool_ops;
-+
-+	if (!ops->create_rxfh_context)
-+		goto exit_free_dev;
-+
-+	rtnl_lock();
-+	netdev_lock_ops(dev);
-+
-+	ret = ethnl_ops_begin(dev);
-+	if (ret < 0)
-+		goto exit_dev_unlock;
-+
-+	mutex_lock(&dev->ethtool->rss_lock);
-+	ret = ethtool_check_rss_ctx_busy(dev, rss_context);
-+	if (ret)
-+		goto exit_unlock;
-+
-+	ctx = xa_load(&dev->ethtool->rss_ctx, rss_context);
-+	if (!ctx) {
-+		ret = -ENOENT;
-+		goto exit_unlock;
-+	}
-+
-+	ret = ops->remove_rxfh_context(dev, ctx, rss_context, info->extack);
-+	if (ret)
-+		goto exit_unlock;
-+
-+	WARN_ON(xa_erase(&dev->ethtool->rss_ctx, rss_context) != ctx);
-+	kfree(ctx);
-+
-+	ethnl_rss_delete_notify(dev, rss_context);
-+
-+exit_unlock:
-+	mutex_unlock(&dev->ethtool->rss_lock);
-+	ethnl_ops_complete(dev);
-+exit_dev_unlock:
-+	netdev_unlock_ops(dev);
-+	rtnl_unlock();
-+exit_free_dev:
-+	ethnl_parse_header_dev_put(&req);
-+	return ret;
-+}
 -- 
 2.50.1
 
