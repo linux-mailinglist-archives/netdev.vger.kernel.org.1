@@ -1,48 +1,80 @@
-Return-Path: <netdev+bounces-207871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2352B08DDF
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 15:09:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C9E5B08DEC
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 15:14:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5B1A17CE45
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 13:09:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B276218876C6
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 13:14:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E0CD2D541B;
-	Thu, 17 Jul 2025 13:08:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 184282E0908;
+	Thu, 17 Jul 2025 13:14:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Roreyz6l"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="OiiXHJLB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B172063E7;
-	Thu, 17 Jul 2025 13:08:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13A2C2BE059
+	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 13:14:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752757737; cv=none; b=APj0LdmA0i6IrRrJQlSZmgQIROHWTqwdxmuI9GKBtsAmKU33Ke12DEgz0wA3DdqPC3Dtn3n5Uvjjgom2IXq922+sq2igy8G7kSeeI1FTGW4ntK0dDqrejRlyzvr3+QeOtTM0aJrtySGHz0HQOKpBSJrnz8FduwmvSmMRc99xW4Y=
+	t=1752758074; cv=none; b=nEt1LHLbOA7TyQZvR0nqPe7ig7crlrCnzxZv6GBRX4RfzZwR/47Xpif4wYTHD+XE5MBuYQVYvC4nzp2FD63X4wGWApVUn0EHkq/HT4Kl5j1mBgNsQIDdZePdROP/4zBH/TdFVBPo9Lk26US6hZaHT8BfPBcTWkazyq57G0MlJ6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752757737; c=relaxed/simple;
-	bh=Gxdr3RZXteWorE0Y2DFq5UsYlM8TYBwQDD2qhb2K7q8=;
+	s=arc-20240116; t=1752758074; c=relaxed/simple;
+	bh=noMqCXITYyf2FejAm0EKe9cVIK4aYS0QWeRxoaDXEq4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b1rxk8vqf62pmH6JYnBkoVjT3MDHg4uMRqr+4tr2kg+vgR7KKim/hMA9p16zA423rKINyRwqdjDgqZzx81osfbC/3BJKegO3aRfzQDYqkyv3b6PvRq2qCi3a3RD+l+SlkXwYLEYgQ4XSwGaDLmaHJNzDd2k11AB6rwMZIO6LqAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Roreyz6l; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBFDBC4CEE3;
-	Thu, 17 Jul 2025 13:08:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752757735;
-	bh=Gxdr3RZXteWorE0Y2DFq5UsYlM8TYBwQDD2qhb2K7q8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Roreyz6l6LFUeMrm8RCdb5RnOBvxEudhN7Xa+JoGReCxC+FX1N2jcQ9z7IDwIazyT
-	 +F6yKOG8MKX5baGpAi0ynF1llNZLhig/xtp/vKidJQcTB+h+J+omKqN4TX+Jio2gBq
-	 70SPGTN+CAcfVZ7FjLTnyOwvajwzCJDKQ2ox/XcYK++ou4WRt1523WvqmmIf7rWvy+
-	 c+V5BIS409g0ZtSCSkOCDG2ZPUUdRaIvV/XhWnCz8CNl+xTBRgU96ysEmvebVDkYye
-	 CLa91tRqavtSNML1T5vUEjSwVwHzRn40YwEdQ5zixaCdw6YlKp12WGPE2haJl1SMR0
-	 Z0jSbFONExiSQ==
-Message-ID: <fbb026f9-54cf-49ba-b0dc-0df0f54c6961@kernel.org>
-Date: Thu, 17 Jul 2025 15:08:49 +0200
+	 In-Reply-To:Content-Type; b=J5W2is3RM7RFzaQanVd8C9I+a/8Zy5djyNp6v0pDjwKNcADihgC2R7DZDaxe9pIa5NN4vq7FbjHbdVjaqXpjxmWsbVXwl7toscwplR3g0KUcpRqEucQ5Y25aL3CWnZwA5qVO4WpzPQcvKgr/lsexpPs/DiL52aXdEAefCJ1TO+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=OiiXHJLB; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-607cc1a2bd8so1450944a12.2
+        for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 06:14:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1752758070; x=1753362870; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=I0WfmMy3iigRI0GYiSm9ZQNFXSYzMwic5UBPun5KAcs=;
+        b=OiiXHJLBTlLOpVQ2T4Lg76Ssym1R9yMAeOi9qiw2yb4yWzAZqPikGnl9Y1V7X0XM11
+         FlLjLeQxIZwAxcgJQ+X1AmgLw8xTldTQ1DJxOUaPcyKrjKbPYXU6bF9BiXjB0SSMQYjI
+         LXwmw/rvSX3nCgIBxfWE0/C9pT5G0PwQJOHiCb1efdzjtu7j9dQh77HI8PZgd2RU55HE
+         1j47kdtr+LLMSZlJsJarfC0vfnbTZ7wqMSdG5BiWXMdRsZ7UOoLlUg8Au6btldt650Qo
+         PKSD4NbF525Nz/kvqc0QxQ1q90f0WA0vsyXsoCDJEOpnXHS8TGqcOPkkNiAwsRqooGcf
+         XnDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752758070; x=1753362870;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=I0WfmMy3iigRI0GYiSm9ZQNFXSYzMwic5UBPun5KAcs=;
+        b=W9tV3ehHmoumb8avtS3cxosTLWZYfFpBMHbauRXDcmuQYBO9Ef9PmiRYB0Hjin/NoN
+         g47SE3kZel2VESrbIfH9XC2/HYboOtIBVl4EXswMqj4MiBq/Aj3AI+nTrpiHbMt3R0oa
+         CinbEs/e2bCLANh9nDn+kBEt4LNiRDOq4LmZLcHgilCIAtnlxsBHHxCVDYVqpU5mLrA4
+         cG6EKxdeuJY0AJW8mRTl78nnb14au2sxeKyRW567jPe4gfF0D3TD9ZL01N/Rtjik6+Ff
+         CNv3vfQzVgcbjacWN1FhA8XBPugs/PR5edht+NWVl8V9bsr3TxtB/gdnMyUYTcGdpRVz
+         4QmA==
+X-Forwarded-Encrypted: i=1; AJvYcCVo6Fbt0LKtvxvdZDbdXlplXoNLpg7hvw0U+/MqEOowbMzYwzk3rP4w53ro2SghwYBNOsZTLqQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQI7N7oMj4AdvXVnkjBiZXWjpeIKScveSOIt1pDUZ9MT5geJhM
+	IGpWpQzuoiJeddXyTtpZ8bamNDaTvzg7A/cMMjdapo9RdOK6TLWio4tFu3P5Nax7+oc=
+X-Gm-Gg: ASbGncv2nO9CqE0BIPqROihUR5UAr/JA4ZwceabpU5pAjVjkOppTFUgUEPWc20bTvQO
+	a3OE7Ce8bzZF1hmLwbHsgWFwq9L/tW3QjwbQHeRgze5KH+sSr62f45JFfsaf7+W3S3leWf5JFbp
+	A4jZsHH9pi4XIO5z+bDD9wSypWWJ73N8X9M8xGse7SW8gDrwDcG8OpLk744v/mNL53VBLgDNzMr
+	V8d/NIB03EbZGt69A1Fp5APGGjHJVGOZzBfpc/chereBkGQThQSPpQipTdcRtw/7H8aWtP8zc/o
+	3Y8IxC0LwQ+MaUhgHaor2jzaotUPTPwrVw4UuhRfN3D6X2IteVlKnCKN3ym5N0reBCgIF/Y+108
+	ocnfnpz82Pxs+b9nZm41FCoaUgPAUdP4FeMQcW1iZjMaSWtpICZEmng==
+X-Google-Smtp-Source: AGHT+IHEcZ9Lq7/cb1V2ZM6+RGYlF7mnokl2vHK9h25NbdWoz7myvROouYDFEg1aULxIUK8HMk7w7Q==
+X-Received: by 2002:a17:906:6a25:b0:ae6:b006:1be with SMTP id a640c23a62f3a-ae9cdda3d41mr674539366b.5.1752758069723;
+        Thu, 17 Jul 2025 06:14:29 -0700 (PDT)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae6e8264fd2sm1369890066b.108.2025.07.17.06.14.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Jul 2025 06:14:29 -0700 (PDT)
+Message-ID: <451c6ad5-6577-4acc-ba5a-de5c4a85b88e@blackwall.org>
+Date: Thu, 17 Jul 2025 16:14:28 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,132 +82,108 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next V2 0/7] xdp: Allow BPF to set RX hints for
- XDP_REDIRECTed packets
-To: Jakub Kicinski <kuba@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Stanislav Fomichev <stfomichev@gmail.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <borkmann@iogearbox.net>,
- Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, sdf@fomichev.me,
- kernel-team@cloudflare.com, arthur@arthurfabre.com, jakub@cloudflare.com,
- Jesse Brandeburg <jbrandeburg@cloudflare.com>
-References: <175146824674.1421237.18351246421763677468.stgit@firesoul>
- <aGVY2MQ18BWOisWa@mini-arch>
- <b1873a92-747d-4f32-91f8-126779947e42@kernel.org>
- <aGvcb53APFXR8eJb@mini-arch> <aG427EcHHn9yxaDv@lore-desk>
- <aHE2F1FJlYc37eIz@mini-arch> <aHeKYZY7l2i1xwel@lore-desk>
- <20250716142015.0b309c71@kernel.org>
+Subject: Re: [PATCH iproute2-next] bridge: fdb: Add support for FDB activity
+ notification control
+To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
+Cc: dsahern@gmail.com, stephen@networkplumber.org, petrm@nvidia.com
+References: <20250717130509.470850-1-idosch@nvidia.com>
 Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20250716142015.0b309c71@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20250717130509.470850-1-idosch@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-
-
-On 16/07/2025 23.20, Jakub Kicinski wrote:
-> On Wed, 16 Jul 2025 13:17:53 +0200 Lorenzo Bianconi wrote:
->>>> I can't see what the non-redirected use-case could be. Can you please provide
->>>> more details?
->>>> Moreover, can it be solved without storing the rx_hash (or the other
->>>> hw-metadata) in a non-driver specific format?
->>>
->>> Having setters feels more generic than narrowly solving only the redirect,
->>> but I don't have a good use-case in mind.
->>>    
->>>> Storing the hw-metadata in some of hw-specific format in xdp_frame will not
->>>> allow to consume them directly building the skb and we will require to decode
->>>> them again. What is the upside/use-case of this approach? (not considering the
->>>> orthogonality with the get method).
->>>
->>> If we add the store kfuncs to regular drivers, the metadata  won't be stored
->>> in the xdp_frame; it will go into the rx descriptors so regular path that
->>> builds skbs will use it.
->>
->> IIUC, the described use-case would be to modify the hw metadata via a
->> 'setter' kfunc executed by an eBPF program bounded to the NIC and to store
->> the new metadata in the DMA descriptor in order to be consumed by the driver
->> codebase building the skb, right?
->> If so:
->> - we can get the same result just storing (running a kfunc) the modified hw
->>    metadata in the xdp_buff struct using a well-known/generic layout and
->>    consume it in the driver codebase (e.g. if the bounded eBPF program
->>    returns XDP_PASS) using a generic xdp utility routine. This part is not in
->>    the current series.
->> - Using this approach we are still not preserving the hw metadata if we pass
->>    the xdp_frame to a remote CPU returning XDP_REDIRCT (we need to add more
->>    code)
->> - I am not completely sure if can always modify the DMA descriptor directly
->>    since it is DMA mapped.
-
-Let me explain why it is a bad idea of writing into the RX descriptors.
-The DMA descriptors are allocated as coherent DMA (dma_alloc_coherent).
-This is memory that is shared with the NIC hardware device, which
-implies cache-line coherence.  NIC performance is tightly coupled to
-limiting cache misses for descriptors.  One common trick is to pack more
-descriptors into a single cache-line.  Thus, if we start to write into
-the current RX-descriptor, then we invalidate that cache-line seen from
-the device, and next RX-descriptor (from this cache-line) will be in an
-unfortunate coherent state.  Behind the scene this might lead to some
-extra PCIe transactions.
-
-By writing to the xdp_frame, we don't have to modify the DMA descriptors
-directly and risk invalidating cache lines for the NIC.
-
->>
->> What do you think?
+On 7/17/25 16:05, Ido Schimmel wrote:
+> Add support for FDB activity notification control [1].
 > 
-> FWIW I commented on an earlier revision to similar effect as Stanislav.
-> To me the main concern is that we're adding another adhoc scheme, and
-> are making xdp_frame grow into a para-skb. We added XDP to make raw
-> packet access fast, now we're making drivers convert metadata twice :/
+> Users can use this to enable activity notifications on a new FDB entry
+> that was learned on an ES (Ethernet Segment) peer and mark it as locally
+> inactive:
+> 
+>  # bridge fdb add 00:11:22:33:44:55 dev bond1 master static activity_notify inactive
+>  $ bridge -d fdb get 00:11:22:33:44:55 br br1
+>  00:11:22:33:44:55 dev bond1 activity_notify inactive master br1 static
+>  $ bridge -d -j -p fdb get 00:11:22:33:44:55 br br1
+>  [ {
+>          "mac": "00:11:22:33:44:55",
+>          "ifname": "bond1",
+>          "activity_notify": true,
+>          "inactive": true,
+>          "flags": [ ],
+>          "master": "br1",
+>          "state": "static"
+>      } ]
+> 
+> User space will receive a notification when the entry becomes active and
+> the control plane will be able to mark the entry as locally active.
+> 
+> It is also possible to enable activity notifications on an existing
+> dynamic entry:
+> 
+>  $ bridge -d -s -j -p fdb get 00:aa:bb:cc:dd:ee br br1
+>  [ {
+>          "mac": "00:aa:bb:cc:dd:ee",
+>          "ifname": "bond1",
+>          "used": 8,
+>          "updated": 8,
+>          "flags": [ ],
+>          "master": "br1",
+>          "state": ""
+>      } ]
+>  # bridge fdb replace 00:aa:bb:cc:dd:ee dev bond1 master static activity_notify norefresh
+>  $ bridge -d -s -j -p fdb get 00:aa:bb:cc:dd:ee br br1
+>  [ {
+>          "mac": "00:aa:bb:cc:dd:ee",
+>          "ifname": "bond1",
+>          "activity_notify": true,
+>          "used": 3,
+>          "updated": 23,
+>          "flags": [ ],
+>          "master": "br1",
+>          "state": "static"
+>      } ]
+> 
+> The "norefresh" keyword is used to avoid resetting the entry's last
+> active time (i.e., "updated" time).
+> 
+> User space will receive a notification when the entry becomes inactive
+> and the control plane will be able to mark the entry as locally
+> inactive. Note that the entry was converted from a dynamic entry to a
+> static entry to prevent the kernel from automatically deleting it upon
+> inactivity.
+> 
+> An existing inactive entry can only be marked as active by the kernel or
+> by disabling and enabling activity notifications:
+> 
+>  $ bridge -d fdb get 00:11:22:33:44:55 br br1
+>  00:11:22:33:44:55 dev bond1 activity_notify inactive master br1 static
+>  # bridge fdb replace 00:11:22:33:44:55 dev bond1 master static activity_notify
+>  $ bridge -d fdb get 00:11:22:33:44:55 br br1
+>  00:11:22:33:44:55 dev bond1 activity_notify inactive master br1 static
+>  # bridge fdb replace 00:11:22:33:44:55 dev bond1 master static
+>  # bridge fdb replace 00:11:22:33:44:55 dev bond1 master static activity_notify
+>  $ bridge -d fdb get 00:11:22:33:44:55 br br1
+>  00:11:22:33:44:55 dev bond1 activity_notify master br1 static
+> 
+> Marking an entry as inactive while activity notifications are disabled
+> does not make sense and will be rejected by the kernel:
+> 
+>  # bridge fdb replace 00:11:22:33:44:55 dev bond1 master static inactive
+>  RTNETLINK answers: Invalid argument
+> 
+> [1] https://lore.kernel.org/netdev/20200623204718.1057508-1-nikolay@cumulusnetworks.com/
+> 
+> Reviewed-by: Petr Machata <petrm@nvidia.com>
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> ---
+> I have a kernel selftest for this functionality. I will post it after
+> this patch is accepted.
+> ---
+>  bridge/fdb.c      | 69 ++++++++++++++++++++++++++++++++++++++++++++---
+>  man/man8/bridge.8 | 22 ++++++++++++++-
+>  2 files changed, 87 insertions(+), 4 deletions(-)
+> 
 
-Thanks for the feedback. I can see why you'd be concerned about adding
-another adhoc scheme or making xdp_frame grow into a "para-skb".
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-However, I'd like to frame this as part of a long-term plan we've been
-calling the "mini-SKB" concept. This isn't a new idea, but a
-continuation of architectural discussions from as far back as [2016].
-
-The long-term goal, described in these presentations from [2018] and
-[2019], has always been to evolve the xdp_frame to handle more hardware
-offloads, with the ultimate vision of moving SKB allocation out of NIC
-drivers entirely. In the future, the netstack could perform L3
-forwarding (and L2 bridging) directly on these enhanced xdp_frames
-[2019-slide20]. The main blocker for this vision has been the lack of
-hardware metadata in the xdp_frame.
-
-This patchset is a small but necessary first step towards that goal. It
-focuses on the concrete XDP_REDIRECT use-case where we can immediately
-benefit for our production use-case. Storing this metadata in the
-xdp_frame is fundamental to the plan. It's no coincidence the fields are
-compatible with the SKB; they need to be.
-
-I'm certainly open to debating the bigger picture, but I hope we can
-agree that it shouldn't hold up this first step, which solves an
-immediate need. Perhaps we can evaluate the merits of this specific
-change first, and discuss the overall architecture in parallel?
-
---Jesper
-
-
-Links:
-------
-[2019] XDP closer integration with network stack
-  - 
-https://people.netfilter.org/hawk/presentations/KernelRecipes2019/xdp-netstack-concert.pdf
-  - 
-https://github.com/xdp-project/xdp-project/blob/main/conference/KernelRecipes2019/xdp-netstack-concert.org#slide-move-skb-allocations-out-of-nic-drivers
-  - [2019-slide20] 
-https://github.com/xdp-project/xdp-project/blob/main/conference/KernelRecipes2019/xdp-netstack-concert.org#slide-fun-with-xdp_frame-before-skb-alloc
-
-[2018] LPC Networking Track: XDP - challenges and future work
-  - https://people.netfilter.org/hawk/presentations/LinuxPlumbers2018/
-  - 
-https://github.com/xdp-project/xdp-project/blob/main/conference/LinuxPlumbers2018/presentation-lpc2018-xdp-future.org#topic-moving-skb-allocation-out-of-driver
-
-[2016] Network Performance Workshop
-  - 
-https://people.netfilter.org/hawk/presentations/NetDev1.2_2016/net_performance_workshop_netdev1.2.pdf
 
