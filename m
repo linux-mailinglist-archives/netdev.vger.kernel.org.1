@@ -1,97 +1,90 @@
-Return-Path: <netdev+bounces-207653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E09BFB08132
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 01:59:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EC6FB08135
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 02:02:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CE03189A15E
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 00:00:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7411E581458
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 00:02:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 991C62EF671;
-	Wed, 16 Jul 2025 23:59:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A93D12E36FE;
+	Thu, 17 Jul 2025 00:02:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pSYY79Up"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NVrPAsXY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 727DD29AB01
-	for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 23:59:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83FF4635
+	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 00:02:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752710389; cv=none; b=Yc90r1hQptnIMukZaF4IU9lyj9ywxgstPgY4SWuAto5bY+DDl4k+tuCWWW/JSQy4sMBQYhbvnd9W/K2d4KgTfCiydk1Pbtl8VnO0Nlma8RwwFV9BZAlpMCRVenK85kDa/eFggGcvEPLe2dryUowrFZQmPzYwLdEmZO+oS7cLCoQ=
+	t=1752710534; cv=none; b=pDI8mi8gg+xctgMRK7rSfcV0nIEzjXm9vEMn8jH0J8RH/oAWaVZMOBMpz7SIdsaNxRb6L4H+4817u3fX5nWp8yKmRIY4qkPnnuclnohqOSLUpwSjMvfbjPB6Y5BvcuhUdMv1h13yNd4iJpN8ztlBDxx1NCJFUyo4QlxY9lyy0O8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752710389; c=relaxed/simple;
-	bh=wZuf6qmofB28INnWqosx1bgjjiI5BgUO9qDoYRvwPEs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JwK/H74iYkGhLwsQC01GbFiWeYDQG5HQVcAP46RWjQA/rh4wKCdLnDN4hYWwPK/CYojSgLDGb7C/08iraqEbavdSgPAsAri/+NNr1MZpdXlLYwpcMMY0Ny8ESju1ltE8NFwkhgfrtlBYmBUXmoYxa2/dpOiZQTf4khYt9fbSll8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pSYY79Up; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06C78C4CEE7;
-	Wed, 16 Jul 2025 23:59:49 +0000 (UTC)
+	s=arc-20240116; t=1752710534; c=relaxed/simple;
+	bh=p+3AANXMY7wqTjJz7QYMobewTSSlUKwfh/NZ8L25YDI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=u5frsXsEzcv8pqHTNphS7as/DDRLm5iWJrwqJbWpe61q/YBDL/eVOIf5gq+CYhzid4pNFJTwm2IPyjHX1fQKgS/ocnzJ5+8bVseyCeF8JUqvyQ5h06a8uduX11dhMvsVpXttGu5w1CZIvPLoYxVUrzc/LueQdHoIZ3Aw/ZHKqTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NVrPAsXY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5888C4CEE7;
+	Thu, 17 Jul 2025 00:02:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752710389;
-	bh=wZuf6qmofB28INnWqosx1bgjjiI5BgUO9qDoYRvwPEs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pSYY79UpyLK/GCybMk+5/a7CSgOa32ZKS6nI9TlCgpNMjvIbu7SIK5c70aojq9hCc
-	 +3heMmZRSxqkpDq3WF8Hc4XCgbdTEDgHNudGL4NxcnNHUhPMCX5xe2gfVwvkhFwesZ
-	 EouhQhLQ9aYIDD1XBloyBM7qI+D5oDCjkqEfRtqg95nftd9VnmndQp8tKZsHF8mDYO
-	 ZDtgcmTGJHKNCNKolIqfUugfLDAQBVLHlDk2G10XTi7WoOz0WCTvO7V5vuuSxrYeNi
-	 x8aTQcrtMlwbZi0DeqHio926VIQBmPLENFrjRsGAFpeFea8xlVjmcXXiEKY0k/S5Dm
-	 jxgVPaD8Xb9Aw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71113383BA38;
-	Thu, 17 Jul 2025 00:00:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1752710534;
+	bh=p+3AANXMY7wqTjJz7QYMobewTSSlUKwfh/NZ8L25YDI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NVrPAsXY/9L06fR2aRcHoG1EtDvBJQzA1ZJpkkpfRYhVSKhSvcH0SPhCL/mfzyerM
+	 68hfJ/Xpejjs3Vzhno4B/E+vF2dqx/10uj8vAHDJQ0Fq6gS6dTu6hnK5ZXpyctF3y8
+	 RQSQ0Q8iLMoUMmtBXgnQZyCU0DoJ5LVSXkyjJZVX3flDzz8JsO6nPbS8KhU5HLCF3L
+	 27dj5yUe5Db+ga2+Zrc2/uqlBhmbKlFm5sScGtdQ8HuEPiKvqEAmsmjS0Tm8T7agsf
+	 ODi/7ZAsuwb1bzJW9IIMYK1tgy0607OiAmUSD+DB1+oRa4wObTDCEsU6/bqqy/9BWa
+	 xbcWcosCaiGgQ==
+Date: Wed, 16 Jul 2025 17:02:12 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Raju Rangoju <Raju.Rangoju@amd.com>
+Cc: <netdev@vger.kernel.org>, <andrew+netdev@lunn.ch>,
+ <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <richardcochran@gmail.com>, <Shyam-sundar.S-k@amd.com>
+Subject: Re: [PATCH net-next v2] amd-xgbe: add hardware PTP timestamping
+ support
+Message-ID: <20250716170212.2a2cde21@kernel.org>
+In-Reply-To: <20250714065811.464645-1-Raju.Rangoju@amd.com>
+References: <20250714065811.464645-1-Raju.Rangoju@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3][pull request] Intel Wired LAN Driver Updates
- 2025-07-15 (ixgbe, fm10k, i40e, ice)
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175271040926.1368016.3485291934007397973.git-patchwork-notify@kernel.org>
-Date: Thu, 17 Jul 2025 00:00:09 +0000
-References: <20250715202948.3841437-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20250715202948.3841437-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon, 14 Jul 2025 12:28:11 +0530 Raju Rangoju wrote:
+>  	/* For Timestamp config */
+> -	int (*config_tstamp)(struct xgbe_prv_data *, unsigned int);
+> -	void (*update_tstamp_addend)(struct xgbe_prv_data *, unsigned int);
+> -	void (*set_tstamp_time)(struct xgbe_prv_data *, unsigned int sec,
+> +	void (*init_ptp)(struct xgbe_prv_data *pdata);
+> +	void (*config_tstamp)(struct xgbe_prv_data *pdata,
+> +			      unsigned int mac_tscr);
+> +	void (*update_tstamp_addend)(struct xgbe_prv_data *pdata,
+> +				     unsigned int addend);
+> +	void (*set_tstamp_time)(struct xgbe_prv_data *pdata, unsigned int sec,
+>  				unsigned int nsec);
+> +	void (*update_tstamp_time)(struct xgbe_prv_data *pdata,
+> +				   unsigned int sec,
+> +				   unsigned int nsec);
+>  	u64 (*get_tstamp_time)(struct xgbe_prv_data *);
+>  	u64 (*get_tx_tstamp)(struct xgbe_prv_data *);
 
-This series was applied to netdev/net.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+Please start with removing this abstraction / callbacks instead of
+starting to used them. They each seem to have only one function
+assigned, and there isn't even a null check before calling.
+They make the code harder to follow and review.
 
-On Tue, 15 Jul 2025 13:29:43 -0700 you wrote:
-> Arnd Bergmann resolves compile issues with large NR_CPUS for ixgbe, fm10k,
-> and i40e.
-> 
-> For ice:
-> Dave adds a NULL check for LAG netdev.
-> 
-> Michal corrects a pointer check in debugfs initialization.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,1/3] ethernet: intel: fix building with large NR_CPUS
-    https://git.kernel.org/netdev/net/c/24171a5a4a95
-  - [net,2/3] ice: add NULL check in eswitch lag check
-    https://git.kernel.org/netdev/net/c/3ce58b01ada4
-  - [net,3/3] ice: check correct pointer in fwlog debugfs
-    https://git.kernel.org/netdev/net/c/bedd0330a19b
-
-You are awesome, thank you!
+The removal should be a separate patch for ease of review.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
