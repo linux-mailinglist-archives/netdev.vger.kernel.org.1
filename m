@@ -1,157 +1,176 @@
-Return-Path: <netdev+bounces-207832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36094B08BA4
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 13:21:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1585B08BEA
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 13:47:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E09658576C
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 11:21:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2CA3A1AA56A9
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 11:47:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D4F28D8F8;
-	Thu, 17 Jul 2025 11:21:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02D0D29B23C;
+	Thu, 17 Jul 2025 11:47:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="PccVvAbz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NTiH8TwV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28DDD145B27
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 11:21:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 962932CCC5;
+	Thu, 17 Jul 2025 11:47:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752751291; cv=none; b=Ngd75SZAfyarx2fvSVR9kdq+TTA3fDKHFrFxzvNmNWNIcycGbT12HjFKRgRrsyC2q7iWy8RIvU9iHUi8tdGKSpDpQ1CIwxD7KPuhsbhzW3v+jz/1tsC/OIvFdDgyQtl2iKtj/oY4ARfEpTnJuLundwZVcCpvf/jFnVnI0p9PdIE=
+	t=1752752845; cv=none; b=CLArFIyKM0J8WxSYvgppFdDjDzwFD+MrreZe9qNa6Jq7vh/YoQ0CEqDdmJuxIQ6+9X18WQMd1mXpMk6iFmrWtbHdMm8fa1BjgOmfnDJqWxxGxu1H2JXlK02wDRohL746AzjQgFyS/zn4KfJ+BQko/mJISC0Kr6sKQkYId8Y8vq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752751291; c=relaxed/simple;
-	bh=yce9Tv2qC5Lz8GYW5G1Pkcw/EVDTDGEGs/HV9kXUJv8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ak77nsUG3NLtCsdUWlTnf4Z3Io82avIEhZH8kiTEGj2EQmSgpzfOid8uspOl1ZOcb/FLZ2U4jQfYgJBrjA+11byO/0MPI7cBZVPOd/B1iaC+SVr5AgtJV4jFfw8nQDdBHz88Iq2EO34mZVmWnQJA/zy7ImwC6yhX1Urt7p3zqX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=PccVvAbz; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-60c5b8ee2d9so1685483a12.2
-        for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 04:21:29 -0700 (PDT)
+	s=arc-20240116; t=1752752845; c=relaxed/simple;
+	bh=Q1O9ujEI/+5mMPGKVIHuQmTYkvZY6/Ie/ovaWQ6LnNo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pU6unDtRsY+TZ56aeQwinpi8ARiD+WoQuqC+cMnF17hwjO+RGh/YbH1Eq43BJHaKG6n0svE2pIw1GE4vmq71m9LejmIelpJUZfAxTe7gq+qNWBEv/udkRX/KrDWrUopMZMg3iYY5wQLSxn49kSWYeaAAawCJsUfva3bTPmOjsPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NTiH8TwV; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-556fd896c99so797349e87.3;
+        Thu, 17 Jul 2025 04:47:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1752751288; x=1753356088; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=EZYyI6QiKM293rZOzyhMZk4XJt0FqeuxrWWfI/g5n1I=;
-        b=PccVvAbzzsng2f4nve+E3Dxjy+cZ+yvjx28qkc7L5/w79g2XhBOVc9Kb0xIcrmGmW2
-         fSSJeXwZl5JhgNSGWnDJqjYhBtMz051BIEaUMEa59VTvw/QehQuzt32g0zxqWlqWxy+x
-         YF2BCUCya9X+4sIGNiH9VjHhLpfcQG8yxVayurn1FtJDmqNCRJkOR8pZ0v1QC2T6pLVs
-         /wBAKiF53j5MT0X1alRYCP3T1qgG76GMJSCyOMkTkClZTN///CUUK4FC1IYvaNvrph72
-         W2Dfzo72WrgHerHSstgNtzfADhdYjPKtG/kRlnyjP+QR3WK7KqGnND5NhxK5yb0s2chn
-         90fg==
+        d=gmail.com; s=20230601; t=1752752842; x=1753357642; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=hUzQnHUphnbfFgIY49ERlZzZ414PTUWI3wMK+KFf1L8=;
+        b=NTiH8TwVujpGhzNK5mZn7AYCTZsHA4NPGGRNwzhoSfLo6sHNO0t88Ot2g7dHFLXrCW
+         P3AyD+9qAVjBjyGGP6gUfe3+hS9zl5DaKKcuRbCB9XptFC65BJhIfa2cEbWJ/0cT4VX/
+         G0a/U9+K2dL9QBrXD9EZRIfTkDW0Z+IQpXkeibxdwpjRLl8PVvG1tkINH/n8SZNNbVqF
+         U/la1IgQqbJ0MrIr1X/7pqvDaNiI6yXN6C1nHHwjUcV6lAustprLtuS0q2qEJ1bWFnw2
+         0g/zuitiwC9sEde4zuBR5FVBcgw5tkM1TbyIrib1Pwy/P3UIeFYqWDqFUnPXJzOGX5tG
+         2YEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752751288; x=1753356088;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EZYyI6QiKM293rZOzyhMZk4XJt0FqeuxrWWfI/g5n1I=;
-        b=FRFklPhbwO9UkiOsqBmjIV0C0uSMXjQhBJifwhDAIrIMPXW6DpKIS3ShMz78ev1iEs
-         MMilUoyzatU+ON523QAaQE48CapVyjHQ0U+WdzJX54dtiq6GvTyHg5FZU7f2CSR9GDTY
-         zsTXmFJ6KY36q6sZotCLzWcR+pCyvaeBklooPJKsQChbhkSr2BvRe6ukvDefrtoufJLs
-         qbE9KqlxK95S5ldZgfg4LLOQ8uSTY7sQAb46JFOd2aMUqtacnQEojp3GB50BlYvca0rU
-         sVCtBQdcIb32I/7xl5S97Zw7kSnWjbfqPrns7IcGRknUp2jc7WkBj6Md1omERQf693xn
-         xySw==
-X-Forwarded-Encrypted: i=1; AJvYcCWZqvzX9U3Dmb8v7XKoLdrO21K27GhVsa/3+JbqUlRrOKAp88rDX2OsEnLNUUmRqMCDqKH/QS0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDRXQ/uc480O3z9GVWz08qSTS4to6li/ATK7GslrQ/FVnSihqN
-	LCayIAEbcvlrYTBu7+wHKJk2zOtpS/eEIeoXeDFjwt0wrXd1uBIXLpTqqvULpuiAXr8=
-X-Gm-Gg: ASbGncuBu0p55+13iZa16WdBzlKG3epnx/cvNNnYobbTTfitiiryu0ZZG5b2CBa6rN1
-	Qcy6HDkzOh5vKZdeh9b6mqjdzCqOSAyIvkCoSyYhkF9fT1kqb3OU7XXaFtTkEVrAA1NlInKAE+e
-	kDssKJSoV33+rua36Z1WvcFzq2pQ772Y2ah7oJkDyb2XwaMFgonMYdckBNq+BScSUSRiqlGQitm
-	k+TZnOdFVrPtsxlnqxF1UgOCWsOq4KGZ0/1jT2OiLIWFhiQYXoN3rJvEQ1AZAt1lEEoEMm1uxSp
-	+9dgB/hEc1J1+FSXCDxzSh/tut7z+/kwrCrmkb5lrbH4gWJEe84t1NPtxSzR+3zUgCklvQXIgPt
-	cKt0pNWOWZzV6Crk=
-X-Google-Smtp-Source: AGHT+IGVnANx8nLfm/8Y12a9myx+ZNBG7W+NCDHR5ll6pD2Ki1nT/qqtObhiE/yuAntTogF0ndLVbw==
-X-Received: by 2002:a05:6402:27c9:b0:612:a507:5b23 with SMTP id 4fb4d7f45d1cf-612a5075deemr2294587a12.11.1752751287927;
-        Thu, 17 Jul 2025 04:21:27 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:e5])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-611c94f2c0fsm9893900a12.15.2025.07.17.04.21.25
+        d=1e100.net; s=20230601; t=1752752842; x=1753357642;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hUzQnHUphnbfFgIY49ERlZzZ414PTUWI3wMK+KFf1L8=;
+        b=Jc/xBNMSBDfWQt0PXVQsPwbfBB4wOJl/tIyaDHKH01UoPUo4KtY4lNXksH3rj4iCXf
+         sQc/vE9u5MnojZxPp3Fcrq1UPYvmTaPbI3QonjlQuFP9gFhSCW1y+sSilEGvv+ZMlZpN
+         yOHHpCT3XAOkpjuD05+H2sii38C5qvHqKJpa6AUxzKpDP/zznhqYo4DeP3XZ8PWimi0Y
+         efWMebRm5hkrqZhOrNZcyn7fyWImycNeuMyAtMgUVnnbzYiSqTONU2gxB2xAdINX3fii
+         fV/mPA/3oRt+laR/+YRnEeniUdZGxIHsExqdhJhz3bcX+hfmxamKh9YFB2Y+3JaZOboh
+         U2Lw==
+X-Forwarded-Encrypted: i=1; AJvYcCUfNOIGKPdLZARrT/Yp3/7/A17hRvYowNvyXIyI9ePDI5EfWXUkFeJmsUu/yrb6gmuMJU4692eg@vger.kernel.org, AJvYcCWB8kbizR9AqMJtdLsCXPNXbBmxSauavhKlwUowWt6dOQgiNMCVhl5DntSEXHnvaKZk8RtQz3qkhD+PTko=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwiI+KNtvWq8o7dkj24QogvDVb714lzkvJye0BQO4QPFTy81pu0
+	b3dtjIvhVEtQrQmfUGRzr1us9ctBV4ZM/WldQh/4wo15NEVXHDavUA1o
+X-Gm-Gg: ASbGncvKAoyZPANEpxAoIriWazcuNIqE6qVoWew/d2cJRjy5VqA9MajUv7F4v+AzQiG
+	TVk/Q5gztzlxIeZ5NDffw7f6OFIszZKi9tpB2eLlgRJaJ/cAHvHqnjsAvk6hSk31b9Hruc1/OOw
+	aiufBgEqTAo1Ap9TxzuEpFwcB5epYs94DWyHc0N/Bl+8sleIrx03Fu9vAMpc6+aik9jYWu+ay0C
+	vJ59cm1QnqA8kZ2JKU/JbQctoAKZi8koiglJJhuBTtjgF3T7SVtYjhE/KsHbqGn8kMk/hMno6F+
+	an+WqQd9K99dMQ5tQpS6LnRu3GJBSDE+asw82BCWDwrNcjNwpAl8H27FXeKBbwO+s/nVy0EnD5U
+	wdRSMu/r3pxvh/NS72Bf9qB+sjFy/KQ==
+X-Google-Smtp-Source: AGHT+IEeUss8ZBlPkHLakvGxJF2K58yDRc8vQWOCbMdXUi501yCOkwF9vYWrYBaVVUbMnozeWCQi6Q==
+X-Received: by 2002:a05:6512:33c1:b0:553:d910:9340 with SMTP id 2adb3069b0e04-55a23f72cf3mr1951594e87.46.1752752841436;
+        Thu, 17 Jul 2025 04:47:21 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5593c7bca2asm3021540e87.29.2025.07.17.04.47.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Jul 2025 04:21:26 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Eric Dumazet <edumazet@google.com>,  "David S. Miller"
- <davem@davemloft.net>,  Jakub Kicinski <kuba@kernel.org>,  Neal Cardwell
- <ncardwell@google.com>,  Kuniyuki Iwashima <kuniyu@google.com>,
-  netdev@vger.kernel.org,  kernel-team@cloudflare.com,  Lee Valentine
- <lvalentine@cloudflare.com>
-Subject: Re: [PATCH net-next v3 2/3] tcp: Consider every port when
- connecting with IP_LOCAL_PORT_RANGE
-In-Reply-To: <87qzyfdue6.fsf@cloudflare.com> (Jakub Sitnicki's message of
-	"Thu, 17 Jul 2025 11:44:01 +0200")
-References: <20250714-connect-port-search-harder-v3-0-b1a41f249865@cloudflare.com>
-	<20250714-connect-port-search-harder-v3-2-b1a41f249865@cloudflare.com>
-	<00911a84-c4e3-452e-ab51-1275a43ca4b2@redhat.com>
-	<87qzyfdue6.fsf@cloudflare.com>
-Date: Thu, 17 Jul 2025 13:21:24 +0200
-Message-ID: <87ecufdpvv.fsf@cloudflare.com>
+        Thu, 17 Jul 2025 04:47:20 -0700 (PDT)
+Date: Thu, 17 Jul 2025 14:47:14 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: "G Thomas, Rohan" <rohan.g.thomas@altera.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Romain Gantois <romain.gantois@bootlin.com>, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Matthew Gerlach <matthew.gerlach@altera.com>
+Subject: Re: [PATCH net-next 2/3] net: stmmac: xgmac: Correct supported speed
+ modes
+Message-ID: <6fsqayppkyubkucghk5i6m7jjgytajtzm4wxhtdkh7i2v3znk5@vwqbzz5uffyy>
+References: <20250714-xgmac-minor-fixes-v1-0-c34092a88a72@altera.com>
+ <20250714-xgmac-minor-fixes-v1-2-c34092a88a72@altera.com>
+ <b192c96a-2989-4bdf-ba4f-8b7bcfd09cfa@lunn.ch>
+ <e903cb0f-3970-4ad2-a0a2-ee58551779dc@altera.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e903cb0f-3970-4ad2-a0a2-ee58551779dc@altera.com>
 
-On Thu, Jul 17, 2025 at 11:44 AM +02, Jakub Sitnicki wrote:
-> On Thu, Jul 17, 2025 at 11:23 AM +02, Paolo Abeni wrote:
->> On 7/14/25 6:03 PM, Jakub Sitnicki wrote:
->>> Solution
->>> --------
->>> 
->>> If there is no IP address conflict with any socket bound to a given local
->>> port, then from the protocol's perspective, the port can be safely shared.
->>> 
->>> With that in mind, modify the port search during connect(), that is
->>> __inet_hash_connect, to consider all bind buckets (ports) when looking for
->>> a local port for egress.
->>> 
->>> To achieve this, add an extra walk over bhash2 buckets for the port to
->>> check for IP conflicts. The additional walk is not free, so perform it only
->>> once per port - during the second phase of conflict checking, when the
->>> bhash bucket is locked.
->>> 
->>> We enable this changed behavior only if the IP_LOCAL_PORT_RANGE socket
->>> option is set. The rationale is that users are likely to care about using
->>> every possible local port only when they have deliberately constrained the
->>> ephemeral port range.
->>
->> I'm not a big fan of piggybacking additional semantic on existing
->> socketopt, have you considered a new one?
->
-> That's a fair point. Though a dedicated sysctl seems more appropriate in
-> this case. Akin to how we have ip_autobind_reuse to enable amore
-> aggresive port sharing strategy on bind() side. How does that sound?
+On Tue, Jul 15, 2025 at 07:03:58PM +0530, G Thomas, Rohan wrote:
+> Hi Andrew,
+> 
+> Thanks for reviewing the patch.
+> 
+> On 7/14/2025 7:12 PM, Andrew Lunn wrote:
+> > On Mon, Jul 14, 2025 at 03:59:18PM +0800, Rohan G Thomas via B4 Relay wrote:
+> > > From: Rohan G Thomas <rohan.g.thomas@altera.com>
+> > > 
+> > > Correct supported speed modes as per the XGMAC databook.
+> > > Commit 9cb54af214a7 ("net: stmmac: Fix IP-cores specific
+> > > MAC capabilities") removes support for 10M, 100M and
+> > > 1000HD. 1000HD is not supported by XGMAC IP, but it does
+> > > support 10M and 100M FD mode, and it also supports 10M and
+> > > 100M HD mode if the HDSEL bit is set in the MAC_HW_FEATURE0
+> > > reg. This commit adds support for 10M and 100M speed modes
+> > > for XGMAC IP.
+> > 
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+> > > @@ -405,6 +405,7 @@ static int dwxgmac2_get_hw_feature(void __iomem *ioaddr,
+> > >   	dma_cap->sma_mdio = (hw_cap & XGMAC_HWFEAT_SMASEL) >> 5;
+> > >   	dma_cap->vlhash = (hw_cap & XGMAC_HWFEAT_VLHASH) >> 4;
+> > >   	dma_cap->half_duplex = (hw_cap & XGMAC_HWFEAT_HDSEL) >> 3;
+> > > +	dma_cap->mbps_10_100 = (hw_cap & XGMAC_HWFEAT_GMIISEL) >> 1;
+> > 
+> > The commit message does not mention this change.
+> 
+> Agreed. Will do in the next version.
+> 
+> > 
+> > What does XGMAC_HWFEAT_GMIISEL mean? That a SERDES style interface is
+> > not being used? Could that be why Serge removed these speeds? He was
+> > looking at systems with a SERDES, and they don't support slower
+> > speeds?
+> > 
+> > 	Andrew
+> As per the XGMAC databook ver 3.10a, GMIISEL bit of MAC_HW_Feature_0
+> register indicates whether the XGMAC IP on the SOC is synthesized with
+> DWCXG_GMII_SUPPORT. Specifically, it states:
+> "1000/100/10 Mbps Support. This bit is set to 1 when the GMII Interface
+> option is selected."
+> 
+> So yes, it’s likely that Serge was working with a SERDES interface which
+> doesn't support 10/100Mbps speeds. Do you think it would be appropriate
+> to add a check for this bit before enabling 10/100Mbps speeds?
 
-Thinking about this some more - if we're considering a dedicated sysctl
-guard for this, perhaps this merits giving a shot to the more
-comprehensive fix first.
+DW XGMAC IP-core of v2.x and older don't support 10/100Mbps modes
+neither in the XGMII nor in the GMII interfaces. That's why I dropped
+the 10/100Mbps link capabilities retaining 1G, 2.5G and 10G speeds
+only (the only speeds supported for DW XGMAC 1.20a/2.11a Tx in the
+MAC_Tx_Configuration.SS register field). Although I should have
+dropped the MAC_5000FD too since it has been supported since v3.0
+IP-core version. My bad.(
 
-That is to update the inet_bind_bucket state (fastreuse, fastreuseport)
-on socket unbind to reflect the change in bucket owners. IOW, pivot to
-one of the alternatives that I've highlighted:
+Starting from DW XGMAC v3.00a IP-core the list of the supported speeds
+has been extended to: 10/100Mbps (MII), 1G/2.5G (GMII), 2.5G/5G/10G
+(XGMII). Thus the more appropriate fix here should take into account
+the IP-core version. Like this:
+	if (dma_cap->mbps_1000 && MAC_Version.SNPSVER >= 0x30)
+		dma_cap->mbps_10_100 = 1;
 
-| Alternatives
-| ------------
-| 
-| * Update bind bucket state on port release
-| 
-| A valid solution to the described problem would also be to walk the bind
-| bucket owners when releasing the port and recalculate the
-| tb->{reuse,reuseport} state.
-| 
-| However, in comparison to the proposed solution, this alone would not allow
-| sharing the local port with other sockets bound to non-conflicting IPs for
-| as long as they exist.
-| 
-| Another downside is that we'd pay the extra cost on each unbind (more
-| frequent) rather than only when connecting with IP_LOCAL_PORT_RANGE
-| set (less frequent). Due to that we would also likely need to guard it
-| behind a sysctl (see below).
+Then you can use the mbps_1000 and mbps_10_100 flags to set the proper
+MAC-capabilities to hw->link.caps in the dwxgmac2_setup() method. I
+would have added the XGMII 2.5G/5G MAC-capabilities setting up to the
+dwxgmac2_setup() method too for the v3.x IP-cores and newer.
 
-Right now the inet_bind_bucket fastreuse{,port} state is being
-mismanaged, IMO. This would be the fix for the actual root cause here.
+-Serge(y)
+
+> 
+> Best Regards,
+> Rohan
+> 
 
