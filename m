@@ -1,310 +1,298 @@
-Return-Path: <netdev+bounces-207688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CC63B08336
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 05:07:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD097B0833A
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 05:09:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FE024E1E0F
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 03:06:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC2753BF454
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 03:08:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 380521E520A;
-	Thu, 17 Jul 2025 03:07:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=aspeedtech.com header.i=@aspeedtech.com header.b="LkhoDhL6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F21B71E0083;
+	Thu, 17 Jul 2025 03:09:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from TYPPR03CU001.outbound.protection.outlook.com (mail-japaneastazon11022119.outbound.protection.outlook.com [52.101.126.119])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B8A1B4244;
-	Thu, 17 Jul 2025 03:07:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.126.119
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752721629; cv=fail; b=V6T/+l5agLubyuOCbi4oE0/qHejf1h8kCgv/CBAe4Hae1becdR4royy6zQSVdrQ/XUzAaa8p3k9cZLbq1FD1gF3MF7qNMeEguBxXDeFqzHvjb6zjoJfXeMQw3YDfaodMH8Aj0tLWA7KfeaCo6N6m/tqZy6FIJaaRTBjsjj4CdM8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752721629; c=relaxed/simple;
-	bh=J4BtxJPSnYEbJevZUBmY0gdy/xrEr4ADi84uLibmpkU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=JE0q7svZEDpMPjNzGlMA4ygafOeYaN1S6jLeen0gEZKbXKikkoY8b+ic74EGNJvujuh+eD4T1pTjYspJFaCYnXnf0+P6W2athD37GozpOvi6QdlAnCwc9kceRN53J2D4tpunWOdJVHg1urZVaum/T31uqFm/+JbJDtDsOiNtw3s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; dkim=pass (2048-bit key) header.d=aspeedtech.com header.i=@aspeedtech.com header.b=LkhoDhL6; arc=fail smtp.client-ip=52.101.126.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SR580ivfpYAnqgHl2n6Wg7Ho/26t4Ls7WAtUbhGFVv/IehI03y3gISGQwEVuShtRDi6UmKKKNjPKWN7OIpZI2TqsVY+7QFh6TbpRi9XtvVKrNoIxuv8ePv1Cdotqcls0CqqNOU3hFHghZDTLltj2RcODGrTlG5n/p00ZvaglS38y5/jyKpsZ/z660HRd03xUk8zB1IW4tr96HsNRq2Y7oqaZRoo+l1/SoqXPNu8CVnVrlIPqdU4aGHZAfPYdnCO7MAzPa06+g728MDdeCAphmfGA7aviF9H6DcLKPuf2Xd2DKzDgZolDnMLZGoweBjwyNefu/WLd78sLR7Ee3t22Qg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=J4BtxJPSnYEbJevZUBmY0gdy/xrEr4ADi84uLibmpkU=;
- b=uKxEhSAfRv5/F+SopSay33PhBDtZbwQk+mZHSajl750KnmsiUfDZo/A3hj1CXvUrflW4UtBp+ieyYPh00GcsHh44PAkcMxPgI0X+7If0FZfCBXqaIq5RJj2aJUX9d/nMv+fn5nYAhon87LswZsjhX9FRYyCVBKl1liw0wL2jJsRrUUWAVXswltAEJ1dHEecE7K7LDttPLRl1HxvWLfwXge5W2mOD2m4G/OOUiNLO4dQ50OLD5xZ2gMvpJJY/g1TH4mOeWBRiHrIdwnvUs+NSldK4Rnzq44e9fT5cCGFX3cW3m/7OvUYAS4TFXHK6R6V8/LooV+1udY6cHWQ8LY/njg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=aspeedtech.com; dmarc=pass action=none
- header.from=aspeedtech.com; dkim=pass header.d=aspeedtech.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aspeedtech.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=J4BtxJPSnYEbJevZUBmY0gdy/xrEr4ADi84uLibmpkU=;
- b=LkhoDhL6uGZqNkJSye5WVx9u2bbGu0IPP09/SDUyoC9rKGSzMdj9iAfjuVpKeDXNwdoZR4NDIyoaNemfoehABWkBKGtMqAQnR62UgJGrY7D/cUrfEWcvCsSLsXY5VIRLpP4eoQOCbMsX7ddGu0PXNyeYB5GGZbyY5qP1xmDIOButm6pAie2CCRQ8G5En57bmlXt7XppgDdrkCgjcKMgX0QJmxutWDuVW0d8qGoCUorlCnKsRslr7go4tb2Ott4AkLRbQp06nmf+5j9I1wM8WLXvi5hDRWSScQFCnKWRZ2rYpJBfrbgor/NIep5IjNwgKSZgTX2YKmB7zG2F5r87rzA==
-Received: from SEZPR06MB5763.apcprd06.prod.outlook.com (2603:1096:101:ab::9)
- by SEZPR06MB6016.apcprd06.prod.outlook.com (2603:1096:101:f3::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.39; Thu, 17 Jul
- 2025 03:07:01 +0000
-Received: from SEZPR06MB5763.apcprd06.prod.outlook.com
- ([fe80::ba6c:3fc5:c2b5:ee71]) by SEZPR06MB5763.apcprd06.prod.outlook.com
- ([fe80::ba6c:3fc5:c2b5:ee71%4]) with mapi id 15.20.8901.033; Thu, 17 Jul 2025
- 03:07:01 +0000
-From: YH Chung <yh_chung@aspeedtech.com>
-To: Jeremy Kerr <jk@codeconstruct.com.au>, "matt@codeconstruct.com.au"
-	<matt@codeconstruct.com.au>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, BMC-SW <BMC-SW@aspeedtech.com>
-CC: Khang D Nguyen <khangng@amperemail.onmicrosoft.com>
-Subject: RE: [PATCH] net: mctp: Add MCTP PCIe VDM transport driver
-Thread-Topic: [PATCH] net: mctp: Add MCTP PCIe VDM transport driver
-Thread-Index: AQHb9Igk7vn3xpIukEauwkU1/K0+nrQxUL6AgAACe7CAAQ2aAIAAWoUg
-Date: Thu, 17 Jul 2025 03:07:01 +0000
-Message-ID:
- <SEZPR06MB5763AD0FC90DD6AF334555DA9051A@SEZPR06MB5763.apcprd06.prod.outlook.com>
-References: <20250714062544.2612693-1-yh_chung@aspeedtech.com>
-	 <a01f2ed55c69fc22dac9c8e5c2e84b557346aa4d.camel@codeconstruct.com.au>
-	 <SEZPR06MB57635C8B59C4B0C6053BC1C99054A@SEZPR06MB5763.apcprd06.prod.outlook.com>
- <27c18b26e7de5e184245e610b456a497e717365d.camel@codeconstruct.com.au>
-In-Reply-To:
- <27c18b26e7de5e184245e610b456a497e717365d.camel@codeconstruct.com.au>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=aspeedtech.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SEZPR06MB5763:EE_|SEZPR06MB6016:EE_
-x-ms-office365-filtering-correlation-id: 2ea3b4a2-1ca7-405f-c501-08ddc4df0025
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|42112799006|376014|7416014|366016|38070700018|921020;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?CncrsLgqqOquXmfinzt2S0vx8pVChtSwJJ116De8Y6e2/U6v2HImAnUyHD?=
- =?iso-8859-1?Q?zrIXrw8KXLuAJXFGYG5CUuvop3Whn7j9BDRzr5NsWUnDRRkBw4UrwBef0s?=
- =?iso-8859-1?Q?uCU+EOWqnG7E4KGPw1SH6JbPxfam1gJKuL0JTAoUglxGnIaD8Y10EdKAs4?=
- =?iso-8859-1?Q?lkY0QYJSiVFPbQL3eg2UW43LHYAX4edU/wOyE4RWQllxCfiYZllDS0Kxyl?=
- =?iso-8859-1?Q?rxOnv57cKvKAHT8g28ZCwsaqG+ORM7gtxpzOkCa1GSxvKdeZQhMmlOqFtk?=
- =?iso-8859-1?Q?HjEX29p/AsfRgBSUcQdDfMsf9Ey+hJlwByLeYn29rXL2LaHbloqKMLwt5s?=
- =?iso-8859-1?Q?c1b0NwgDxAQ5LCQ2fC1IbuYzGNoFUAqXIbxY/a+znnc/QGGDNseQ8X4Rwc?=
- =?iso-8859-1?Q?UsOBeVPnPrk46wuwcUUv/Y6Y+JQYkhtxWneTDkUcFI+QiUk7/w9+mMpUM2?=
- =?iso-8859-1?Q?IiggJ2O9/8sdWwFxJB15nCm/qnku6c7dOW01zQCWmWzRMz0rjt3pioErXT?=
- =?iso-8859-1?Q?LejE9rhb58PuYnLodjZPbLw/g1H9r0E9uSWX42dHLO5kmiOzuxbhpqme+A?=
- =?iso-8859-1?Q?eqG7CQsKNix9XbQLJ5yuHHP1iCghP5RooQPVRd02s7PjDUp20nSPcOBGlH?=
- =?iso-8859-1?Q?otmbUkEco8QSskdt/Rl/T7jz7QErqMcusm4dhME4Tyz4SeELu5rA6dDd3C?=
- =?iso-8859-1?Q?8oWpyfae3ObqraLhTV7zcs10dG5ySfFnG9IRXJQo3j+pR7Vu20p8bfhY2b?=
- =?iso-8859-1?Q?EYSx60/zF+GW5apuOkHmGjHHYJ7SSYpfcKoJt51KAmF83bVJJHy1UQ0fdy?=
- =?iso-8859-1?Q?SZ3Avkyge3DVk698bV5DZCwzG6txN93qdHvdwbxHmFW9BXfuWhwahi3IUU?=
- =?iso-8859-1?Q?2hEi25hQGcuTJrvFHC5ULQOXINggXi1IinFMCF21VuKAf2ryfwfCHq4WXe?=
- =?iso-8859-1?Q?chOAW7b8y9m0cFyyNpq/isa5aixaesxK+jAqeRjekr9cGTdsGZxPO+xORn?=
- =?iso-8859-1?Q?lzQhl6QD+2Ouq6TZ1AQ/pmlpW720YpD8M1/a+5Qws/rBzovNFkoVx2X7g7?=
- =?iso-8859-1?Q?IxrdgcgLv2LAGQJy4Oqj15NjeZLC841dx3e7w98vuV18Q5wp+2JigSOpYH?=
- =?iso-8859-1?Q?1/qAcuDNlmvS8p+USuNcPhOfNgErNEls54LWl8TAJfW/gEUZymLnkoAi7m?=
- =?iso-8859-1?Q?E/Y/ZNtuVzND8GKdVGD3CBKTvYEDvVE885MRKzNqdK9Ew8zBBw1hzevxia?=
- =?iso-8859-1?Q?5mNFqTDU27CFgSgXtbTTzriTridFvDpYVqt92W1A9PSFeNpSo+czJD4nD1?=
- =?iso-8859-1?Q?GsAk3KQDU7x36u3BdrbLYvOEV2StQWBqE/UWMb/eA8WXWGLyWuC7Ddp90H?=
- =?iso-8859-1?Q?t8I6ER26SW9PS0hwwE2hwFRexvCjP2Ud63z/BGdI4Z3JkiVy5DuiI3Q0DL?=
- =?iso-8859-1?Q?J6+gj2+8zQLR632JNR0pQcM4489NBe9G1pjjRxQm1RpQ4mht3kWFhY522M?=
- =?iso-8859-1?Q?G7giiGKlWwOBb473UZPkxZ8BywQHBx42BZ1gTyyvxvQh3nXT+ZXrjC5tO+?=
- =?iso-8859-1?Q?/1f5s6c=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:zh-tw;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEZPR06MB5763.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(42112799006)(376014)(7416014)(366016)(38070700018)(921020);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?fba+Hv0yVzsqk+yyBYlEEgPqTNVxeVPh5EknjYi5Rge93Cg2y6yHmFjiks?=
- =?iso-8859-1?Q?d9gkU5gLR6sNLv+xo2DOtXjxNt5QoFGZ8aWtA369U2e5/uG9GIp1jS09mZ?=
- =?iso-8859-1?Q?BisVpgWADlihbagRFbrfQP4SFLJzXqV/2Z98S2xyGjf8mv9yVrkXO8McRO?=
- =?iso-8859-1?Q?Kmxl3z1mfm6BNywDpQrrjEpcUR3Qc9nHwu2JYukzUZ170uTOLCxhlJIhG0?=
- =?iso-8859-1?Q?LUviiUlVRmJ4cnZrLT6mJRfUv7/18s4TKncA35+Z9eoy+ucsKxHJ6o/hqh?=
- =?iso-8859-1?Q?DIjC9tO2JiBnIXdo6+bJ4VnyVveh6QBfs7pvy5SEi8g7E1z/kcsGMJ/7s7?=
- =?iso-8859-1?Q?Cy0QcXXan0861Z1II7z3NfSsaX9eeKl2YupNXY7yZZN66DZrpTH4rT92dE?=
- =?iso-8859-1?Q?i0MJnDiJmqT278DCOq+6QTxJkkQ0YXq3xcbE3fkxas3XxHmFU7qz+k45Zt?=
- =?iso-8859-1?Q?h/guLzEFyqwe++2KoEAPOgn6T3orAM117mZgz7WiMdSu5xlIomT+D6G5yc?=
- =?iso-8859-1?Q?fQy9psBkCW5LMDhm0xXC3BRPlj9JulAtum/hG+SVbDfqcXV4afjou9WvI3?=
- =?iso-8859-1?Q?HN7jdx0XEKXj/51eD9D8plBszDuNLm5fS5F1lpRAYCfogMw0CBoxgEFvGS?=
- =?iso-8859-1?Q?8NUMkdyTPL1cWI7eOydYPNtkGLAFs3RpmhXx+eMfdWhEedIgNE+ZOsClBe?=
- =?iso-8859-1?Q?cN0gMgkMgDuMEbZqw6DYWwp1XnSiL6pSV+yBMix9Vz6CoXlAOWR1zTa4MN?=
- =?iso-8859-1?Q?ik6M31brJcn5KPEPAuPZQ1Kg3mw6+Hyj6/1I0eJ5T5SRK+beHFkeIWaJeA?=
- =?iso-8859-1?Q?dq8qODpSzDactL/Md8DZ58XALRUIIuidEdRzC2MZA55gItxTtGCj0Jfmi6?=
- =?iso-8859-1?Q?f20KLmcMeN9tjNsSa6HmhZiUdpJdYMMDeNhMf1FjC5RX1B9XgYoiWYFHU/?=
- =?iso-8859-1?Q?bLdvEdS4jfDeHNNCSXdkZWz0UH0JTsVt+PYHiZCl94AbrnFc4GRSGCF1lz?=
- =?iso-8859-1?Q?j3zRcxc0+A6H5BuKwfoRYt1cBz4h2Hmh2yqO4IAFuNDfB1T7Ro4irIxVWh?=
- =?iso-8859-1?Q?wdeGt2mGVt5mclMW+t0EiyGqnoIs7q6E+H5M0QT95mYgLemUunUgLFMb2D?=
- =?iso-8859-1?Q?XYdM7MyS7WXFx9/Fvfhu4un3vct3TMlqv3+fOGKXPGp9+n1eNfepW4UBbI?=
- =?iso-8859-1?Q?SgVXdWFAjUV4YjJThVdWCTLLAn2AMgwOv5liRc4Itcu/920J9HP4b7Tx/a?=
- =?iso-8859-1?Q?tUiWI/fRcXKawcyO7FbXcFzopFoOOQnSrn7s0KQO3OO5wTJJuwQsLcbfDG?=
- =?iso-8859-1?Q?c1e/EPiAb1mRZkOxensucW+G3yyrQmpNmCEexoXqPE/95c6HT7bwemlYAU?=
- =?iso-8859-1?Q?1e8AlfFpvUXpKR4NbN+GIYw8iwr2yBZB3ajtE0RMIRV3RKmrNOq/EHNnaW?=
- =?iso-8859-1?Q?sX6VNld8VNM/xy7UNyhi/hoOVxFjFNcooA0UK8y1xJjkDAaA7MJCzEObEn?=
- =?iso-8859-1?Q?19YeqW/IDWHM0ceaBEi4xlUxEeAvbyB1L9OIiY7Rbvo3e5eMDR4ES7O7qO?=
- =?iso-8859-1?Q?FnLK7Hrdt72pJMOjeO9l81FFq/3FKlQA4B0U0L9tIJHfqikw3nvsemBnyt?=
- =?iso-8859-1?Q?SR6sNzhy4pyw9K4VpiVcw/sidot/IaR7Uc?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EEA71F95C;
+	Thu, 17 Jul 2025 03:09:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752721758; cv=none; b=pIpBlqZHxlQub+HqACXWJYbixdzJsQCM2yTcmx7EAg9idbdHCOztGgU4EpRagP4dykPEXa3Wz1/VLDz5wXP0NaUd4+V83eDZQyAOzqbK5PvsKBpU6zqFJRgA44Cu2Fv6+ToJVCS72aJgvEEz79+8Wn3+Qr6PBS7Ad3U6DBNP91w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752721758; c=relaxed/simple;
+	bh=/A6dkkboZZCec41Ma72Iyrcv75pL7Zzl0qbmSOdeQL0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bBC3elas4/RWf37y6ecGzWOQV8/s3aH24RVff4UvfoG+du14ZXTwvw6mJ1YjZuuaP3i4Fe0azj+fpFksXYYdmVLhSpoeFbwRY/vCSrI4hHDN4xVsQ2zTGE8auZFQGjygGYqXpyxAdBLvzH02Ew5sAfqSE87f79ZAML4bIEglIPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-681ff7000002311f-57-6878694f2f10
+Date: Thu, 17 Jul 2025 12:08:58 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Mina Almasry <almasrymina@google.com>,
+	David Hildenbrand <david@redhat.com>,
+	"willy@infradead.org" <willy@infradead.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	kernel_team@skhynix.com, kuba@kernel.org,
+	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
+	akpm@linux-foundation.org, davem@davemloft.net,
+	john.fastabend@gmail.com, andrew+netdev@lunn.ch, toke@redhat.com,
+	tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com,
+	saeedm@nvidia.com, leon@kernel.org, ast@kernel.org,
+	daniel@iogearbox.net, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+	surenb@google.com, mhocko@suse.com, horms@kernel.org,
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+	vishal.moola@gmail.com, hannes@cmpxchg.org, ziy@nvidia.com,
+	jackmanb@google.com
+Subject: Re: [PATCH net-next v9 3/8] page_pool: access ->pp_magic through
+ struct netmem_desc in page_pool_page_is_pp()
+Message-ID: <20250717030858.GA26168@system.software.com>
+References: <20250710082807.27402-1-byungchul@sk.com>
+ <20250710082807.27402-4-byungchul@sk.com>
+ <CAHS8izMXkyGvYmf1u6r_kMY_QGSOoSCECkF0QJC4pdKx+DOq0A@mail.gmail.com>
+ <20250711011435.GC40145@system.software.com>
+ <582f41c0-2742-4400-9c81-0d46bf4e8314@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: aspeedtech.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SEZPR06MB5763.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2ea3b4a2-1ca7-405f-c501-08ddc4df0025
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jul 2025 03:07:01.5670
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43d4aa98-e35b-4575-8939-080e90d5a249
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: cj5YRI/Y4egg6FaA+QFAPpag0M2IcMp7UGZGKyPvanBjEUX8Wqq1hR8eQ3Cef1jEWfljS624Bx7+Bs01U9B8Sg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR06MB6016
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <582f41c0-2742-4400-9c81-0d46bf4e8314@gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTcRjG+e+cnXNcDv6tsr8VgasIlOyCH17SrIjg0B2iLxXl1EMbzWWz
+	dBOtVUI20jK7zgWTzGwaqyVzSVot0yRhscjWzdVMQzTN28hMzaNEfnt43uf58X54OEpxVbqA
+	0+iOCXqdSqtkZLTsR3jpip0ag3qVyb8SrI4qBip/GeDOF7cUrHYXgqGRjywMNjQxcKs0RIHV
+	m0fDsOM3BR2NQRYqndshUN5Jw+OzNRQEL7xkoCBvlIK6kV4WTrsrJPDaVSiFy79vU1Bj+sLC
+	m1orA21VE1Lo9BTQ0Gy5S0OgcAM02iIg9KoHQYOjRgKh8zcZKPbZGGjPCyDwPQ/SUHKqEIGj
+	3i+F0V+TjJIXbeyGpfzznj6Kr777XsI/snxmeZvzOP+wIpo3+30U77SfY3jnwCWW/9T6mOFf
+	Xh+l+UfuQQlfcKaX4fs7PtB8X/1bhndUv6X5FlsDu2v2XllCqqDVZAr6lYlJMrW7KESnl603
+	lNaW0CZUv8qMOI7gOFLsjjOjsCn59FofI9o0XkY89hWizeDlxO8foUQ9F8eQ7nceVtQUfseQ
+	cmeiGJ+DDcT+aqopx0B8Y3vNSMYpsFlCHP3dUjEux7NJ841v9HQ1mvjHuyRinsILyZ1xTrTD
+	8Dpiqeuaos/DS8hTV5NE5BDs5sjlsjLp9JeR5FmFn76IsGUG1jIDa/mPtSHKjhQaXWaaSqON
+	i1UbdRpDbMqRNCeaXEt57p99bjTwercHYQ4pw+VJ97PUCqkqM8OY5kGEo5Rz5cW+TLVCnqoy
+	Zgv6Iwf1x7VChgct5GjlfPmaUFaqAh9SHRMOC0K6oP93lXBhC0zoKK7d49JpmqxRmybWGmcl
+	DjQuTqYSwnMeNDyJNy3aHxiuunVg6OSWXO1a/VBXtTLqe7N3oyUpR5MSolq0Eds+umIsV53X
+	o0uftHgvjM2v3J5a5D0U4/BmByPb6zbHRMV/HdPHng4k5LfuS95R2Lo1+LN+64l7csFn3CXL
+	97snrijpDLVqdTSlz1D9BfwjHZcpAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTcRjG+59zdnZcDY7L8jSFYiGBkhoZvHSxUZF/BLtAENSHHHloS121
+	6ZxBZDoq56XsgrUtWlSzLWGxZE5T02leEDIm5krLWhaVknmlua4ror49PO/v93x6GVISpKSM
+	Sp3Ha9SKHBktokQ7NpSs3qnSK5MfP4gFi7OWhrtf9FDzyiMAi8ONYCY4JITpji4abt6YI8HS
+	Z6Bg1jlPwtvOgBDuujJgxPaOgqYz9SQEznXTUGEIkdAc/CSEYs8dAtqv9QjgibtSAJfmb5NQ
+	X/RKCP2NFhpe1v4QwDtvBQU9JjsFI5Vy6LQuhbnecQQdznoC5sqv0XDRZ6XhjWEEga89QIH5
+	VCUCZ4tfAKEvvzbMj14K5XG4fXyCxHX2ZwRuML0QYqsrH9+/E4+Nfh+JXY5SGrumLgjx8NMm
+	GndfCVG4wTNN4IqSTzSefPucwhMtAzS++f4zgZ11A9QuyT7Rxiw+R6XjNUmpmSKlp2qOOnpr
+	s/5Go5kqQi3JRhTBcGwK11o9QRsRw1BsHOd1rA7XNLuK8/uDZDhHsQnc2KBXGM4kO0hzNldq
+	GF/M6jlH729TzALn+7bPiESMhDUSnHNyTBDGxWwk13N1lPqjxnP+7x+IME+yMVzNdyZcR7Cb
+	OFPzh9/rS9iVXKu7iziPxKb/bNN/tumfbUWkA0Wp1LpchSpnXaI2W1moVukTDx7JdaFfD2E7
+	8bXKg2b607yIZZBskTjzXoFSIlDotIW5XsQxpCxKfNGnU0rEWYrC47zmyAFNfg6v9aIYhpJF
+	i9P38pkS9pAij8/m+aO85u+VYCKkRehh3NfLeR3BVQ0xw9qgQR/oGPuoXtD8se16mX3gpGp/
+	9/LW8t3VoWPbl/f0Vc3LY+tN9jTT+tJvsPF0+miG0bhiPHqh133G1iZ9oA+dlR9OS1pWMHp1
+	6zbvdLK8+DRRNvR6uE4q2zJ4YjCxPHLaPNUPblxQmzK73Z8AgeiRPWtllFapWBNParSKn16C
+	57gMAwAA
+X-CFilter-Loop: Reflected
 
-Hi Jeremy,
+On Sat, Jul 12, 2025 at 02:58:14PM +0100, Pavel Begunkov wrote:
+> On 7/11/25 02:14, Byungchul Park wrote:
+> ...>>> +#ifdef CONFIG_PAGE_POOL
+> > > > +/* XXX: This would better be moved to mm, once mm gets its way to
+> > > > + * identify the type of page for page pool.
+> > > > + */
+> > > > +static inline bool page_pool_page_is_pp(struct page *page)
+> > > > +{
+> > > > +       struct netmem_desc *desc = page_to_nmdesc(page);
+> > > > +
+> > > > +       return (desc->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
+> > > > +}
+> > > 
+> > > pages can be pp pages (where they have pp fields inside of them) or
+> > > non-pp pages (where they don't have pp fields inside them, because
+> > > they were never allocated from the page_pool).
+> > > 
+> > > Casting a page to a netmem_desc, and then checking if the page was a
+> > > pp page doesn't makes sense to me on a fundamental level. The
+> > > netmem_desc is only valid if the page was a pp page in the first
+> > > place. Maybe page_to_nmdesc should reject the cast if the page is not
+> > > a pp page or something.
+> > 
+> > Right, as you already know, the current mainline code already has the
+> > same problem but we've been using the werid way so far, in other words,
+> > mm code is checking if it's a pp page or not by using ->pp_magic, but
+> > it's ->lur, ->buddy_list, or ->pcp_list if it's not a pp page.
+> > 
+> > Both the mainline code and this patch can make sense *only if* it's
+> > actually a pp page.  It's unevitable until mm provides a way to identify
+> > the type of page for page pool.  Thoughts?
+> Question to mm folks, can we add a new PGTY for page pool and use
+> that to filter page pool originated pages? Like in the incomplete
+> and untested diff below?
+> 
+> 
+> commit 8fc2347fb3ff4a3fc7929c70a5a21e1128935d4a
+> Author: Pavel Begunkov <asml.silence@gmail.com>
+> Date:   Sat Jul 12 14:29:52 2025 +0100
+> 
+>     net/mm: use PGTY for tracking page pool pages
+> 
+>     Currently, we use page->pp_magic to determine whether a page belongs to
+>     a page pool. It's not ideal as the field is aliased with other page
+>     types, and thus needs to to rely on elaborated rules to work. Add a new
+>     page type for page pool.
 
->> > Do we really need an abstraction for MCTP VDM drivers? How many are
->> > you expecting? Can you point us to a client of the VDM abstraction?
->> >
->> > There is some value in keeping consistency for the MCTP lladdr
->> > formats across PCIe transports, but I'm not convinced we need a
->> > whole abstraction layer for this.
->> >
->> We plan to follow existing upstream MCTP transports-such as I=B2C, I=B3C=
-,
->> and USB-by abstracting the hardware-specific details into a common
->> interface and focus on the transport binding protocol in this patch.
->> This driver has been tested by our AST2600 and AST2700 MCTP driver.
->
->Is that one driver (for both 2600 and 2700) or two?
->
-It's written in one file to reuse common functions, but the behavior is sli=
-ghtly different depending on the hardware.
+Hi Pavel,
 
->I'm still not convinced you need an abstraction layer specifically for VDM
->transports, especially as you're forcing a specific driver model with the =
-deferral
->of TX to a separate thread.
->
-We followed the same implementation pattern as mctp-i2c and mctp-i3c, both =
-of which also abstract the hardware layer via the existing i2c/i3c device i=
-nterface and use a kernel thread for TX data.=20
-That said, I believe it's reasonable to remove the kernel thread and instea=
-d send the packet directly downward after we remove the route table part.
-Could you kindly help to share your thoughts on which approach might be pre=
-ferable?
+I need this work to be done to remove ->pp_magic in struct page.  Will
+you let me work on this work?  Or can you please refine and post this
+work?  If you let me, I will go for this as a separate patch from this
+series.
 
->Even if this abstraction layer is a valid approach, it would not be merged=
- until
->you also have an in-kernel user of it.
->
-We have an MCTP controller driver (mentioned above, which we used for testi=
-ng this driver) that utilizes this abstraction for transmission, which we'r=
-e planning to upstream in the future.
-REF Link: https://github.com/AspeedTech-BMC/linux/blob/aspeed-master-v6.6/d=
-rivers/soc/aspeed/aspeed-mctp.c
+	Byungchul
 
-
-
-
-Since the PCIe VDM driver is implemented as an abstraction layer, our curre=
-nt plan is to submit it separately as we believe the review process for eac=
-h driver can proceed independently.
-Would you recommend submitting both drivers together in the same patch seri=
-es for review, or is it preferable to keep them separate?=20
-
->> > > TX path uses a dedicated kernel thread and ptr_ring: skbs queued
->> > > by the MCTP stack are enqueued on the ring and processed in-thread
->context.
->> >
->> > Is this somehow more suitable than the existing netdev queues?
->> >
->> Our current implementation has two operations that take time: 1)
->> Configure the PCIe VDM routing type as DSP0238 requested if we are
->> sending certain ctrl message command codes like Discovery Notify
->> request or Endpoint Discovery response. 2) Update the BDF/EID routing
->> table.
->
->More on this below, but: you don't need to handle either of those in a tra=
-nsport
->driver.
->
->> > > +struct mctp_pcie_vdm_route_info {
->> > > +=A0=A0=A0=A0=A0=A0 u8 eid;
->> > > +=A0=A0=A0=A0=A0=A0 u8 dirty;
->> > > +=A0=A0=A0=A0=A0=A0 u16 bdf_addr;
->> > > +=A0=A0=A0=A0=A0=A0 struct hlist_node hnode;
->> > > +};
->> >
->> > Why are you keeping your own routing table in the transport driver?
->> > We already have the route and neighbour tables in the MCTP core code.
->> >
->> > Your assumption that you can intercept MCTP control messages to keep
->> > a separate routing table will not work.
->> >
->> We maintain a routing table in the transport driver to record the
->> mapping between BDFs and EIDs, as the BDF is only present in the PCIe
->> VDM header of received Endpoint Discovery Responses. This information
->> is not forwarded to the MCTP core in the MCTP payload. We update the
->> table with this mapping before forwarding the MCTP message to the
->> core.
->
->There is already support for this in the MCTP core - the neighbour table
->maintains mappings between EID and link-layer addresses. In the case of a =
-PCIe
->VDM transport, those link-layer addresses contain the bdf data.
->
->The transport driver only needs to be involved in packet transmit and rece=
-ive.
->Your bdf data is provided to the driver through the
->header_ops->create() op.
->
->Any management of the neighbour table is performed by userspace, which has
->visibility of the link-layer addresses of incoming skbs - assuming your dr=
-ivers are
->properly setting the cb->haddr data on receive.
->
-Agreed, we'll remove the table.
-
->This has already been established through the existing transports that con=
-sume
->lladdr data (i2c and i3c). You should not be handling the lladdr-to-EID ma=
-pping
->*at all* in the transport driver.
->
->> Additionally, if the MCTP Bus Owner operates in Endpoint (EP) role on
->> the PCIe bus, it cannot obtain the physical addresses of other devices
->> from the PCIe bus.
->
->Sure it can, there are mechanisms for discovery. However, that's entirely
->handled by userspace, which can update the existing neighbour table.
->
->> Agreed. In our implement, we always fill in the "Route By ID" type
->> when core asks us to create the header, since we don't know the
->> correct type to fill at that time.=A0 And later we update the Route type
->> based on the ctrl message code when doing TX. I think it would be nice
->> if we can have a uniformed address format to get the actual Route type
->> by passed-in lladdr when creating the header.
->
->OK, so we'd include the routing type in the lladdr data then.
->
-Could you share if there's any preliminary prototype or idea for the format=
- of the lladdr that core plans to implement, particularly regarding how the=
- route type should be encoded or parsed?
-
-For example, should we expect the first byte of the daddr parameter in the =
-create_hdr op to indicate the route type?
-
->Cheers,
->
->
->Jeremy
+> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> index 0ef2ba0c667a..975a013f1f17 100644
+> --- a/include/linux/mm.h
+> +++ b/include/linux/mm.h
+> @@ -4175,7 +4175,7 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
+>  #ifdef CONFIG_PAGE_POOL
+>  static inline bool page_pool_page_is_pp(struct page *page)
+>  {
+> -       return (page->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
+> +       return PageNetpp(page);
+>  }
+>  #else
+>  static inline bool page_pool_page_is_pp(struct page *page)
+> diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+> index 4fe5ee67535b..9bd1dfded2fc 100644
+> --- a/include/linux/page-flags.h
+> +++ b/include/linux/page-flags.h
+> @@ -957,6 +957,7 @@ enum pagetype {
+>        PGTY_zsmalloc           = 0xf6,
+>        PGTY_unaccepted         = 0xf7,
+>        PGTY_large_kmalloc      = 0xf8,
+> +       PGTY_netpp              = 0xf9,
+> 
+>        PGTY_mapcount_underflow = 0xff
+>  };
+> @@ -1101,6 +1102,11 @@ PAGE_TYPE_OPS(Zsmalloc, zsmalloc, zsmalloc)
+>  PAGE_TYPE_OPS(Unaccepted, unaccepted, unaccepted)
+>  FOLIO_TYPE_OPS(large_kmalloc, large_kmalloc)
+> 
+> +/*
+> + * Marks page_pool allocated pages
+> + */
+> +PAGE_TYPE_OPS(Netpp, netpp, netpp)
+> +
+>  /**
+>   * PageHuge - Determine if the page belongs to hugetlbfs
+>   * @page: The page to test.
+> diff --git a/include/net/netmem.h b/include/net/netmem.h
+> index de1d95f04076..20f5dbb08149 100644
+> --- a/include/net/netmem.h
+> +++ b/include/net/netmem.h
+> @@ -113,6 +113,8 @@ static inline bool netmem_is_net_iov(const netmem_ref netmem)
+>   */
+>  static inline struct page *__netmem_to_page(netmem_ref netmem)
+>  {
+> +       DEBUG_NET_WARN_ON_ONCE(netmem_is_net_iov(netmem));
+> +
+>        return (__force struct page *)netmem;
+>  }
+> 
+> diff --git a/net/core/netmem_priv.h b/net/core/netmem_priv.h
+> index cd95394399b4..e38c64da1a78 100644
+> --- a/net/core/netmem_priv.h
+> +++ b/net/core/netmem_priv.h
+> @@ -13,16 +13,11 @@ static inline void netmem_or_pp_magic(netmem_ref netmem, unsigned long pp_magic)
+>        __netmem_clear_lsb(netmem)->pp_magic |= pp_magic;
+>  }
+> 
+> -static inline void netmem_clear_pp_magic(netmem_ref netmem)
+> -{
+> -       WARN_ON_ONCE(__netmem_clear_lsb(netmem)->pp_magic & PP_DMA_INDEX_MASK);
+> -
+> -       __netmem_clear_lsb(netmem)->pp_magic = 0;
+> -}
+> -
+>  static inline bool netmem_is_pp(netmem_ref netmem)
+>  {
+> -       return (netmem_get_pp_magic(netmem) & PP_MAGIC_MASK) == PP_SIGNATURE;
+> +       if (netmem_is_net_iov(netmem))
+> +               return true;
+> +       return page_pool_page_is_pp(netmem_to_page(netmem));
+>  }
+> 
+>  static inline void netmem_set_pp(netmem_ref netmem, struct page_pool *pool)
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index 05e2e22a8f7c..52120e2912a6 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -371,6 +371,13 @@ struct page_pool *page_pool_create(const struct page_pool_params *params)
+>  }
+>  EXPORT_SYMBOL(page_pool_create);
+> 
+> +static void page_pool_set_page_pp_info(struct page_pool *pool,
+> +                                      struct page *page)
+> +{
+> +       __SetPageNetpp(page);
+> +       page_pool_set_pp_info(page_to_netmem(page));
+> +}
+> +
+>  static void page_pool_return_netmem(struct page_pool *pool, netmem_ref netmem);
+> 
+>  static noinline netmem_ref page_pool_refill_alloc_cache(struct page_pool *pool)
+> @@ -534,7 +541,7 @@ static struct page *__page_pool_alloc_page_order(struct page_pool *pool,
+>        }
+> 
+>        alloc_stat_inc(pool, slow_high_order);
+> -       page_pool_set_pp_info(pool, page_to_netmem(page));
+> +       page_pool_set_page_pp_info(pool, page);
+> 
+>        /* Track how many pages are held 'in-flight' */
+>        pool->pages_state_hold_cnt++;
+> @@ -579,7 +586,7 @@ static noinline netmem_ref __page_pool_alloc_netmems_slow(struct page_pool *pool
+>                        continue;
+>                }
+> 
+> -               page_pool_set_pp_info(pool, netmem);
+> +               page_pool_set_page_pp_info(pool, __netmem_to_page(netmem));
+>                pool->alloc.cache[pool->alloc.count++] = netmem;
+>                /* Track how many pages are held 'in-flight' */
+>                pool->pages_state_hold_cnt++;
+> @@ -654,7 +661,6 @@ s32 page_pool_inflight(const struct page_pool *pool, bool strict)
+>  void page_pool_set_pp_info(struct page_pool *pool, netmem_ref netmem)
+>  {
+>        netmem_set_pp(netmem, pool);
+> -       netmem_or_pp_magic(netmem, PP_SIGNATURE);
+> 
+>        /* Ensuring all pages have been split into one fragment initially:
+>         * page_pool_set_pp_info() is only called once for every page when it
+> @@ -669,7 +675,6 @@ void page_pool_set_pp_info(struct page_pool *pool, netmem_ref netmem)
+> 
+>  void page_pool_clear_pp_info(netmem_ref netmem)
+>  {
+> -       netmem_clear_pp_magic(netmem);
+>        netmem_set_pp(netmem, NULL);
+>  }
+> 
+> @@ -730,8 +735,11 @@ static void page_pool_return_netmem(struct page_pool *pool, netmem_ref netmem)
+>        trace_page_pool_state_release(pool, netmem, count);
+> 
+>        if (put) {
+> +               struct page *page = netmem_to_page(netmem);
+> +
+>                page_pool_clear_pp_info(netmem);
+> -               put_page(netmem_to_page(netmem));
+> +               __ClearPageNetpp(page);
+> +               put_page(page);
+>        }
+>        /* An optimization would be to call __free_pages(page, pool->p.order)
+>         * knowing page is not part of page-cache (thus avoiding a
+> 
+> --
+> Pavel Begunkov
 
