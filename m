@@ -1,152 +1,130 @@
-Return-Path: <netdev+bounces-207947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CF47B091EC
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 18:33:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C758B0921B
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 18:43:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B897D4A32A6
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 16:32:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 161781C4557A
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 16:43:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13F02BE039;
-	Thu, 17 Jul 2025 16:33:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B2452FBFE9;
+	Thu, 17 Jul 2025 16:43:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="j+tSECtT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TO9ID6yS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A641DA62E;
-	Thu, 17 Jul 2025 16:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 690F52F8C58;
+	Thu, 17 Jul 2025 16:42:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752769988; cv=none; b=TtfxhfX02pRdyRhEA/B+yUTnjSwsHw4SY5FCWzZvNEaz/tK1Jy06Ljm+IlhAppduWPHN4+CEMJ+Cl2HcjzPsYhd3Ej/zx/PVVfNMT05AsYd6OjHdhTxJFyEbt44Xn8Dl4K11zwXGFd7ObjdvoxMx03Ks5Agu2vFLZUPHFSYuppQ=
+	t=1752770581; cv=none; b=WCqwRxyH9VcaYBLxMaDE9L/bbd4yBbjGDFqYLKDglyjqEPywm6Ypf8DHDFYX5JcCUFpd3mplenmIdLk5sivvvX3SbeJ0d/usryP/Nfee/fsLlO5aXT8hsuJFnWmTrBWthVgrmmZKbTg2N1N76tJ5FVflWMQzB82yruEPA8gNf30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752769988; c=relaxed/simple;
-	bh=eQMhoaVeh9uL/LQThbKAyyzQTwwiWXQJw5qztLmSJSk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eAVJkhJiPG2prbPaWEfwmFVwGpyfd659gJqraJ1590ObUHd0JjwV/gOPK08XVlJ7y/4mgSN2jj+yRvXNs7CJ/rD3kiDSbzOD7mtULwIfwNOEirKtCSVtfp2f8NK8JpyVw6a5oykqhCx5y56gzzQnGNE/qF/oacJXdnhmBVe3hZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=j+tSECtT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9222FC4CEE3;
-	Thu, 17 Jul 2025 16:33:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1752769988;
-	bh=eQMhoaVeh9uL/LQThbKAyyzQTwwiWXQJw5qztLmSJSk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=j+tSECtTPZKlPChTcyEBIOo36vO4qPc2DiJVglGxnRk+nMGfCKdY746T73G0/E5Zc
-	 COlnqXsuowmFMOkB/Z1ReHIzifEwHWWUgxeRqHk78klRgaYkkOK5SxEezL6eZd9S5s
-	 45tN0uR7TCmpHUjwIsAijMprDxVCRfXt8liZsHbY=
-Date: Thu, 17 Jul 2025 18:33:05 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Dave Ertman <david.m.ertman@intel.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Leon Romanovsky <leon@kernel.org>, linux-kernel@vger.kernel.org,
-	Michal Simek <michal.simek@amd.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Ira Weiny <ira.weiny@intel.com>
-Subject: Re: [PATCH net v2 1/4] auxiliary: Support hexadecimal ids
-Message-ID: <2025071726-ramp-friend-a3e5@gregkh>
-References: <20250716000110.2267189-1-sean.anderson@linux.dev>
- <20250716000110.2267189-2-sean.anderson@linux.dev>
- <2025071637-doubling-subject-25de@gregkh>
- <719ff2ee-67e3-4df1-9cec-2d9587c681be@linux.dev>
- <2025071747-icing-issuing-b62a@gregkh>
- <5d8205e1-b384-446b-822a-b5737ea7bd6c@linux.dev>
- <2025071736-viscous-entertain-ff6c@gregkh>
- <03e04d98-e5eb-41c0-8407-23cccd578dbe@linux.dev>
+	s=arc-20240116; t=1752770581; c=relaxed/simple;
+	bh=Od7dkk3jph1mm3CmcokvqbDrt6thd/QGd4Fs6LayE6s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fAUehQCtcGjyHcdRC86UztNJWs+Bf8JEDTgugwfr7Mr4kLUn1hF6df09wvAziFk/r2FqOolCmzgwKZI9briVLGLgPPMio50VYP8kk9GlNb5TzUYUt2ob78UxBiFma+3byqT1eFz84ZdSRz4JKOzO5IDWa7bb6qfs5iiTek1Bsxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TO9ID6yS; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-32f2947ab0cso10210431fa.2;
+        Thu, 17 Jul 2025 09:42:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752770577; x=1753375377; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vzt6ApCXuVfe8L4Nz2o7HCiquyz/+D9Ml7+p/z8zd9E=;
+        b=TO9ID6ySo3JXMfTjuepLTcFVQqKUp5sWkU1j8byk6PnxEIadLklchqrdWDcL8ju1Hc
+         q4QP2R5ADNyySPupEkV7suueW+ozT8zurRFA5fMu7wwtOVtYXCWjJzVJ8vlCkjqcb3og
+         kgZg3Ffht+TAvKvJ1zXacg7Dl8jK6H3BugoJ+kiJP4UirbV6OU6KUaR1v+RDii8STQ5c
+         tKkapMOYgySVs4cAAKWqz//zuat9uio5Vnym6pUWjMCseQRNLjfy5Q51stlalJc8Zft6
+         4r1SkjpHZjhWJBfEs/YeBnNL10xZ3jTSzEOL5ZVcvVgulCZDt7ayBus3D0Qw99eMYQvN
+         5qeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752770577; x=1753375377;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vzt6ApCXuVfe8L4Nz2o7HCiquyz/+D9Ml7+p/z8zd9E=;
+        b=prt+IYKmOQVUPyt/fQvtmL0QJdORMkSak9Zip/Zcy9XT6WkUSDODNNhywZ3MhkgCTd
+         Qb30O78fSpAeOYTG9MU/LXr/+blZjrYro0KC7/UekC2bzv3DODGQco5a9aUfOHN4Nu4T
+         3DjUf+nYOZyHxyBld8zCLDqVIZ1Kqc2t7n9617HCD8uLJ5TLf9hpfPuv8HWqEcso6vIT
+         jcroOREbfD3rCyLdG3JYvCjIQvkL3xiRQcmXVbRSFZJoJNEfVGx+CXXKB2zKZJNBOjC7
+         +/xwjNVT4xfb37LyxSM+C6nuGmvxyRI3eb2E4JHTjSsawWlFJEs6XN8a49tud6yB3cHp
+         OImQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWibv5FN+PzteEAhy6wxExGDAd1xtemrSaKMICozbqZ+JupNR3fFZ/IFOVJ1WdIV13H9X2i5Z2p@vger.kernel.org, AJvYcCXwljX8IFyA878gMcxJhIPdf/fim//k/v4c8oLwhYABkd+rHOVZU9Sv9hP1PqjZ9kwu3fLwlgOQjNGYJ4Obmu4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6mFp7wQxheZAuSEFm2IdNmdQj+Wb1Jwq94O5GDWWImr5RPqsK
+	6nPdL5AsyOjVUTSgAgnnqx0tuJ3z6/S1VbDWZUXW4G0ZmHx63Nn5ffYZH2eDCSiieO5cHI/WGye
+	mBvcOEyQuovdnZdWTSc00+G/wTj7v3CFidjBJ0Kk=
+X-Gm-Gg: ASbGnctnSEXUCqK84DhUHXGlornBOYz57onsOOK/kmKWota7VQow5emfHFFNHXZ12sX
+	Or93APGcKxrD51X5isQH4CEwb7/kt4FwjzoxeblFUT2VobSAhO/rOpTSbaEnH13dOH9/Fx91ikH
+	J8EjbAsP4M7OpuPwtJRSH5FJzpcrClV0IjM0zz2uw0Ao1p2me1TqkFNFoKzYKJcxkpCmxYZ7w8i
+	k3TNw==
+X-Google-Smtp-Source: AGHT+IFPcLHKH6vXZpIDES/q1M+9SWlwibLXgDw7CTD6OowyzG7aAC/7jounxEGSkqExXGA3ts66IEtPP+VP4YkJlac=
+X-Received: by 2002:a2e:bc28:0:b0:32a:8764:ecf1 with SMTP id
+ 38308e7fff4ca-3308f4c5ea7mr21078661fa.4.1752770577112; Thu, 17 Jul 2025
+ 09:42:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <03e04d98-e5eb-41c0-8407-23cccd578dbe@linux.dev>
+References: <20250717142849.537425-1-luiz.dentz@gmail.com> <20250717083857.15b8913a@kernel.org>
+ <CABBYNZKW8aG=sJP+iwk44ozvJwiv0wPkrPrOBrnFZ=39rA7-CA@mail.gmail.com> <20250717085444.2847ac02@kernel.org>
+In-Reply-To: <20250717085444.2847ac02@kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 17 Jul 2025 12:42:44 -0400
+X-Gm-Features: Ac12FXxHLkJ7cUVSgc_6_0vYPp3vFBxUFqMxykJtDXDHtqt6a-Op2qdEGpD0Fn8
+Message-ID: <CABBYNZLRcX_tAupW0BB-7ykioXF96M2wHXMSRv+189gQSffR1w@mail.gmail.com>
+Subject: Re: [GIT PULL] bluetooth 2025-07-17
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 17, 2025 at 12:27:44PM -0400, Sean Anderson wrote:
-> On 7/17/25 12:21, Greg Kroah-Hartman wrote:
-> > On Thu, Jul 17, 2025 at 12:04:15PM -0400, Sean Anderson wrote:
-> >> On 7/17/25 11:59, Greg Kroah-Hartman wrote:
-> >> > On Thu, Jul 17, 2025 at 11:49:37AM -0400, Sean Anderson wrote:
-> >> >> On 7/16/25 01:09, Greg Kroah-Hartman wrote:
-> >> >> > On Tue, Jul 15, 2025 at 08:01:07PM -0400, Sean Anderson wrote:
-> >> >> >> Support creating auxiliary devices with the id included as part of the
-> >> >> >> name. This allows for hexadecimal ids, which may be more appropriate for
-> >> >> >> auxiliary devices created as children of memory-mapped devices. If an
-> >> >> >> auxiliary device's id is set to AUXILIARY_DEVID_NONE, the name must
-> >> >> >> be of the form "name.id".
-> >> >> >> 
-> >> >> >> With this patch, dmesg logs from an auxiliary device might look something
-> >> >> >> like
-> >> >> >> 
-> >> >> >> [    4.781268] xilinx_axienet 80200000.ethernet: autodetected 64-bit DMA range
-> >> >> >> [   21.889563] xilinx_emac.mac xilinx_emac.mac.80200000 net4: renamed from eth0
-> >> >> >> [   32.296965] xilinx_emac.mac xilinx_emac.mac.80200000 net4: PHY [axienet-80200000:05] driver [RTL8211F Gigabit Ethernet] (irq=70)
-> >> >> >> [   32.313456] xilinx_emac.mac xilinx_emac.mac.80200000 net4: configuring for inband/sgmii link mode
-> >> >> >> [   65.095419] xilinx_emac.mac xilinx_emac.mac.80200000 net4: Link is Up - 1Gbps/Full - flow control rx/tx
-> >> >> >> 
-> >> >> >> this is especially useful when compared to what might happen if there is
-> >> >> >> an error before userspace has the chance to assign a name to the netdev:
-> >> >> >> 
-> >> >> >> [    4.947215] xilinx_emac.mac xilinx_emac.mac.1 (unnamed net_device) (uninitialized): incorrect link mode  for in-band status
-> >> >> >> 
-> >> >> >> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
-> >> >> >> ---
-> >> >> >> 
-> >> >> >> Changes in v2:
-> >> >> >> - Add example log output to commit message
-> >> >> > 
-> >> >> > I rejected v1, why is this being sent again?
-> >> >> 
-> >> >> You asked for explanation, I provided it. I specifically pointed out why
-> >> >> I wanted to do things this way. But I got no response. So here in v2.
-> >> > 
-> >> > Again, I said, "do not do that, this is not how ids work in the driver
-> >> > model", and you tried to show lots of reasons why you wanted to do it
-> >> > this way despite me saying so.
-> >> > 
-> >> > So again, no, sorry, this isn't ok.  Don't attempt to encode information
-> >> > in a device id like you are trying to do here, that's not what a device
-> >> > id is for at all.  I need to go dig up my old patch that made all device
-> >> > ids random numbers just to see what foolish assumptions busses and
-> >> > userspace tools are making....
-> >> 
-> >> But it *is* how ids work in platform devices.
-> > 
-> > No one should ever use platform devices/bus as an excuse to do anything,
-> > it's "wrong" in so many ways, but needs to be because of special
-> > reasons.  No other bus should work like that, sorry.
-> > 
-> >> And because my auxiliary
-> >> devices are created by a platform device, it is guaranteed that the
-> >> platform device id is unique and that it will also be unique for
-> >> auxiliary devices. So there is no assumption here about the uniqueness
-> >> of any given id.
-> > 
-> > Then perhaps use the faux device api instead?
-> 
-> There's *another* pseudo bus? OK the reason why is that faux was added
-> four months ago and there is nothing under Documentation for it. So I
-> had no idea it existed. I will have a look, but perhaps you should write
-> up some documentation about why someone might want to use a "faux" bus
-> over the auxiliary bus or MFD.
+Hi Jakub,
 
-"faux" is for when platform devices were being abused because someone
-just wanted a device in the device tree, and did not use any of the
-platform device resources.
+On Thu, Jul 17, 2025 at 11:54=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Thu, 17 Jul 2025 11:47:49 -0400 Luiz Augusto von Dentz wrote:
+> > > On Thu, 17 Jul 2025 10:28:49 -0400 Luiz Augusto von Dentz wrote:
+> > > >       Bluetooth: hci_dev: replace 'quirks' integer by 'quirk_flags'=
+ bitmap
+> > >
+> > > FTR this rename and adding the helpers does not seem to be very
+> > > necessary for the fix? I know Greg says that we shouldn't intentional=
+ly
+> > > try to make fixes small, but there's a fine line between following th=
+at
+> > > and coincidental code refactoring.
+> >
+> > I should have reworded that commit, it is actually a fix, not just
+> > renaming, we run out of bits on a 32 bits system due to usage of int
+> > as storage.
+>
+> Right, but I think if the new bitmap was called quirks the existing
+> set_bit / test_bit call sites would have been just fine, right?
+> The bit ops operate on single ulong and bitmaps all the same.
 
-Yes, more documentation is always a good idea, someday...
+I guess you are talking about the likes of hci_set_quirk vs using
+set_bit directly? hci_set_quirk is just a macro that does use set_bit:
 
-thanks,
+#define hci_set_quirk(hdev, nr) set_bit((nr), (hdev)->quirk_flags)
 
-greg k-h
+I guess we didn't have to introduce it at the same time and calling it
+just quirks would be fine by me, but I find it cleaner this way even
+though we had to fix all the drivers in the process, that said maybe
+it won't be that easy to backport and may affect out of the tree
+drivers just because we change its name.
+
+--=20
+Luiz Augusto von Dentz
 
