@@ -1,211 +1,99 @@
-Return-Path: <netdev+bounces-207768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26C1BB08800
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 10:35:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E465B0880E
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 10:40:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5999F16F4FB
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 08:35:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 913101A64BA6
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 08:40:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BABDD1FAC4E;
-	Thu, 17 Jul 2025 08:35:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7989A27A445;
+	Thu, 17 Jul 2025 08:40:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C90C81B425C
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 08:35:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F4C92749EC;
+	Thu, 17 Jul 2025 08:40:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752741340; cv=none; b=oXw54Q3Y/u3e9HwkGjBZ/Ym7aANkQbJ4X3NVNaPs/YEWZcKR/4mg+Tpdg915Fv5zbppNZFzXDFN75u2vKeutpui+i891OQNtZmCh4JTZEdK8dEA/vwA5QLkP7ZM8nvhVgq2jXkj2f+/i6C1vLtO+QiLkKots3ppuWzHG2R/2vyk=
+	t=1752741607; cv=none; b=fte6+dQb+wHB9t03lAU2Jo+rMbY0AG4umpiCZmPFs7mJDogEIWO9sA04eKLjJXmUz1LUnP+Xu3FUNynBq7G7xaecMh5bpbBLWY3muu1m4L6geFTqUakPKvZxtXJ6I6MhdXBSdue7v7Lp4qPHudNuPhZzPckeC4NY1ItncXaEzuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752741340; c=relaxed/simple;
-	bh=NDWl22rvNbGMEgXAcokGvPPz5akxJAEsqWjlJU/5ZjE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=bhxE7DpeiVztkaA5ZuCXRcvQlAeJf1ormPpFiFRN1vgCnzTXFO3LlR5dDwzItCMZ0j7pOUN4EpdxN1fTASjx/wZjxBMD34pVzfhF80t8qaRJHNSvnkILKZvZ6CeMLPibMJE+20fbwbeItRMHdYupKzWgodGKigWatVQ3z/wW5S4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ucK5P-0007V8-A6; Thu, 17 Jul 2025 10:35:27 +0200
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ucK5O-008snU-0Z;
-	Thu, 17 Jul 2025 10:35:26 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ucK5O-006txp-0L;
-	Thu, 17 Jul 2025 10:35:26 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: [PATCH net-next v3 1/1] net: selftests: add PHY-loopback test for bad TCP checksums
-Date: Thu, 17 Jul 2025 10:35:24 +0200
-Message-Id: <20250717083524.1645069-1-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1752741607; c=relaxed/simple;
+	bh=qmgrTZUU3DNVDCwj2HKkfAB/iYDhGanP7RdwBgEkN4U=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=u5pOMGlRssUld2Ie7F/i/UEGreJ4hm+eYSppLz1NRRG0ekVPDCcIsduca9aSSmcsFXcQNAcvuP0Gvo0Vx/K5Ts9h6JzTnqAOCIVpD89LQD136Dz/WCejWb3wae0iQqxOnJeoyLyOnaZT0hODHO5Tc0S346rZgf2Tnc3QfNOtsNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4bjRBq4Ldkz2RVsX;
+	Thu, 17 Jul 2025 16:37:55 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 218D21400D4;
+	Thu, 17 Jul 2025 16:40:01 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 17 Jul 2025 16:40:00 +0800
+Message-ID: <3e773022-8be8-42c4-9920-48336bf7c365@huawei.com>
+Date: Thu, 17 Jul 2025 16:39:56 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+	<horms@kernel.org>, <Frank.Sae@motor-comm.com>, <hkallweit1@gmail.com>,
+	<linux@armlinux.org.uk>, <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
+	<chenhao418@huawei.com>, <jonathan.cameron@huawei.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 2/2] net: hibmcge: Add support for PHY LEDs on
+ YT8521
+To: Andrew Lunn <andrew@lunn.ch>
+References: <20250716100041.2833168-1-shaojijie@huawei.com>
+ <20250716100041.2833168-3-shaojijie@huawei.com>
+ <023a85e4-87e2-4bd3-9727-69a2bfdc4145@lunn.ch>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <023a85e4-87e2-4bd3-9727-69a2bfdc4145@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-Detect NICs and drivers that either drop frames with a corrupted TCP
-checksum or, worse, pass them up as valid.  The test flips one bit in
-the checksum, transmits the packet in internal loopback, and fails when
-the driver reports CHECKSUM_UNNECESSARY.
 
-Discussed at:
-https://lore.kernel.org/all/20250625132117.1b3264e8@kernel.org/
+on 2025/7/17 0:42, Andrew Lunn wrote:
+> On Wed, Jul 16, 2025 at 06:00:41PM +0800, Jijie Shao wrote:
+>> hibmcge is a PCIE EP device, and its controller is
+>> not on the board. And board uses ACPI not DTS
+>> to create the device tree.
+>>
+>> So, this makes it impossible to add a "reg" property(used in of_phy_led())
+>> for hibmcge. Therefore, the PHY_LED framework cannot be used directly.
+>>
+>> This patch creates a separate LED device for hibmcge
+>> and directly calls the phy->drv->led_hw**() function to
+>> operate the related LEDs.
+> Extending what Russell said, please take a look at:
+>
+> Documentation/firmware-guide/acpi/dsd/phy.rst
+>
+> and extend it to cover PHY LEDs.
+>
+> 	Andrew
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Reviewed-by: Simon Horman <horms@kernel.org>
----
-changes v3:
-- use csum16_sub()
-changes v2:
-- Replaced manual calculation of TCP checksum with standard kernel helper
-  skb_checksum_help().
-- add test documentation
----
- net/core/selftests.c | 67 ++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 65 insertions(+), 2 deletions(-)
+Sure. I'll take a look at this.
 
-diff --git a/net/core/selftests.c b/net/core/selftests.c
-index 406faf8e5f3f..3d79133a91a6 100644
---- a/net/core/selftests.c
-+++ b/net/core/selftests.c
-@@ -27,6 +27,7 @@ struct net_packet_attrs {
- 	int max_size;
- 	u8 id;
- 	u16 queue_mapping;
-+	bool bad_csum;
- };
- 
- struct net_test_priv {
-@@ -165,6 +166,20 @@ static struct sk_buff *net_test_get_skb(struct net_device *ndev,
- 		thdr->check = ~tcp_v4_check(l4len, ihdr->saddr, ihdr->daddr, 0);
- 		skb->csum_start = skb_transport_header(skb) - skb->head;
- 		skb->csum_offset = offsetof(struct tcphdr, check);
-+
-+		if (attr->bad_csum) {
-+			/* Force mangled checksum */
-+			if (skb_checksum_help(skb)) {
-+				kfree_skb(skb);
-+				return NULL;
-+			}
-+
-+			if (thdr->check != CSUM_MANGLED_0)
-+				thdr->check = CSUM_MANGLED_0;
-+			else
-+				thdr->check = csum16_sub(thdr->check,
-+							 cpu_to_be16(1));
-+		}
- 	} else {
- 		udp4_hwcsum(skb, ihdr->saddr, ihdr->daddr);
- 	}
-@@ -239,7 +254,11 @@ static int net_test_loopback_validate(struct sk_buff *skb,
- 	if (tpriv->packet->id != shdr->id)
- 		goto out;
- 
--	tpriv->ok = true;
-+	if (tpriv->packet->bad_csum && skb->ip_summed == CHECKSUM_UNNECESSARY)
-+		tpriv->ok = -EIO;
-+	else
-+		tpriv->ok = true;
-+
- 	complete(&tpriv->comp);
- out:
- 	kfree_skb(skb);
-@@ -285,7 +304,12 @@ static int __net_test_loopback(struct net_device *ndev,
- 		attr->timeout = NET_LB_TIMEOUT;
- 
- 	wait_for_completion_timeout(&tpriv->comp, attr->timeout);
--	ret = tpriv->ok ? 0 : -ETIMEDOUT;
-+	if (tpriv->ok < 0)
-+		ret = tpriv->ok;
-+	else if (!tpriv->ok)
-+		ret = -ETIMEDOUT;
-+	else
-+		ret = 0;
- 
- cleanup:
- 	dev_remove_pack(&tpriv->pt);
-@@ -345,6 +369,42 @@ static int net_test_phy_loopback_tcp(struct net_device *ndev)
- 	return __net_test_loopback(ndev, &attr);
- }
- 
-+/**
-+ * net_test_phy_loopback_tcp_bad_csum - PHY loopback test with a deliberately
-+ *					corrupted TCP checksum
-+ * @ndev: the network device to test
-+ *
-+ * Builds the same minimal Ethernet/IPv4/TCP frame as
-+ * net_test_phy_loopback_tcp(), then flips the least-significant bit of the TCP
-+ * checksum so the resulting value is provably invalid (neither 0 nor 0xFFFF).
-+ * The frame is transmitted through the device’s internal PHY loopback path:
-+ *
-+ *   test code -> MAC driver -> MAC HW -> xMII -> PHY ->
-+ *   internal PHY loopback -> xMII -> MAC HW -> MAC driver -> test code
-+ *
-+ * Result interpretation
-+ * ---------------------
-+ *  0            The frame is delivered to the stack and the driver reports
-+ *               ip_summed as CHECKSUM_NONE or CHECKSUM_COMPLETE - both are
-+ *               valid ways to indicate “bad checksum, let the stack verify.”
-+ *  -ETIMEDOUT   The MAC/PHY silently dropped the frame; hardware checksum
-+ *               verification filtered it out before the driver saw it.
-+ *  -EIO         The driver returned the frame with ip_summed ==
-+ *               CHECKSUM_UNNECESSARY, falsely claiming a valid checksum and
-+ *               indicating a serious RX-path defect.
-+ *
-+ * Return: 0 on success or a negative error code on failure.
-+ */
-+static int net_test_phy_loopback_tcp_bad_csum(struct net_device *ndev)
-+{
-+	struct net_packet_attrs attr = { };
-+
-+	attr.dst = ndev->dev_addr;
-+	attr.tcp = true;
-+	attr.bad_csum = true;
-+	return __net_test_loopback(ndev, &attr);
-+}
-+
- static const struct net_test {
- 	char name[ETH_GSTRING_LEN];
- 	int (*fn)(struct net_device *ndev);
-@@ -368,6 +428,9 @@ static const struct net_test {
- 	}, {
- 		.name = "PHY internal loopback, TCP    ",
- 		.fn = net_test_phy_loopback_tcp,
-+	}, {
-+		.name = "PHY loopback, bad TCP csum    ",
-+		.fn = net_test_phy_loopback_tcp_bad_csum,
- 	}, {
- 		/* This test should be done after all PHY loopback test */
- 		.name = "PHY internal loopback, disable",
--- 
-2.39.5
+Thanks,
+Jijie Shao
+
+
 
 
