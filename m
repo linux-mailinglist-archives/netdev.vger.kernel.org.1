@@ -1,184 +1,185 @@
-Return-Path: <netdev+bounces-208002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33291B09469
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 20:50:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2282DB09476
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 20:52:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F2FA5A59AF
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 18:49:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60C7216CB8A
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 18:52:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC8E72FF499;
-	Thu, 17 Jul 2025 18:47:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="NzUrke6Q"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9659F2FCE3D;
+	Thu, 17 Jul 2025 18:52:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C85052FEE31
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 18:47:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A98F42F8C31
+	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 18:52:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752778071; cv=none; b=rq2Xt1h/yxNU0x2E1ZCPPe14mkgduAoABWwLLqzookTF5ChaQs3BIzZuC1PKNUCwM/g9j+B/gVAg8efFV6p1jZdVMIiICDyHmWT7PN1vFQlCKQ5rp2YiN/nTRrFmQk386w2GvfVp8NY2jGLM3WUm88NYEYqSgVQB2XkdxkYyXyc=
+	t=1752778352; cv=none; b=kWmvJ5FSRsdhSLXp1XL+MDQErzLj3ujfiGRuLsI2wd9v0ILUk7ESjQpJP75jMpgU9uLeS66j+TTQTQ1Pqh7TLKYAcV7TMejdQBOHlNukp+bU5AAcy7x57KGrlDN9m8ApddrSXbsk/0Qn/XhgOdjJZszk8hnzo6DguyryI+VQci4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752778071; c=relaxed/simple;
-	bh=LdBhSp51sgIxbWO70ik51gWkwXQAZkXdQ9kZ0tOT0fE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ksata6Mvlxp4V+qzOTGLlt7YmrRtpUcDiWpo2sZ+LPFaSBEyMhyTGPmITX0a/A0ex/VHu7j0NQrCLJrhRpUwiKIlQmfu1o7VsZhqnSYxN3lxi5nwIDBWhz3k5XMBKs5emGbZYG8/AJoGjSHkE7tBkJXfI/0UETKhO3t+PsW4k0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=NzUrke6Q; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6fb0eb0f0fbso18238846d6.1
-        for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 11:47:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1752778069; x=1753382869; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=JknLTMIxalS8m7aHFC3+s6nvFC/sGZyolLVvw55splI=;
-        b=NzUrke6Q2i7Kz9RJmPyUQqfzbDBjhODTPk4w1gauD+c/kAxCmQE/fNnXNv4KoyEN0N
-         Us+XP4iW9/qSFvP5zOqURbvYSPKFWS34t5GU96xWzCrm6mdu4OVyHLAWX1dbHfAshe7F
-         Km2volV8bc5AqCMcNqfaI/75DNPcVAigJArpE=
+	s=arc-20240116; t=1752778352; c=relaxed/simple;
+	bh=xWoSQ+gngFF2TOSecNJDyH5ybGum8FZowTvwKeBUlXY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=j4nQAGyXtw0ijaHbMZKCSZcNcf2N9iG7DIL3cedS7f7G4AkjBqoqy/upHSA3MXSMvleXAz5yy/nqUsAJ63GfTQ9bfHO8lyXOY/n4JOhF2AO76VJDfZyXWyTzOy6BE/VcUSNTZvJx9TldlbH8fO0fF4ANqIpS73K2zw+b9wWxcgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3ddc0a6d4bdso12968505ab.0
+        for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 11:52:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752778069; x=1753382869;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JknLTMIxalS8m7aHFC3+s6nvFC/sGZyolLVvw55splI=;
-        b=g0GFegpRH6wUWxSBdbNaR7hHNAZcwfdBZ9bneFX76HdM+nFIxoWfXwu/LWgW3j9BLq
-         sqAJapASWhIO/HYzvcEUc8ggXjQuaEOax6PheFd8JFiXKeaVtVaP0zapJDmp1/lKVYtH
-         nkxBhflE2Dheu6DlhFsEE9L02jqdlLysMBs/o8Sy/+6wsP5qs0NdKplZfQaiPJ/4Kjgn
-         C4oaRHc2+QAnVwtE7J6pzvp36wfLgd66pjfcJTgO0Ul98rC/U+HV9JIjt8M7aGlmofBJ
-         bPl1m+w08I4VcjFyco/d0DMco35nHVee1SKuB6P+43CM3EmSgIiuD5OmIpYA01l3MabN
-         D4/g==
-X-Forwarded-Encrypted: i=1; AJvYcCUY0pxZ0CmHpE7Wk9rdx3t+NEJo0uWn6znIaUKGPmqXSj7pkboIzRv0ZpRsA3qQCr9g94urQj4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxJbUUCmtLP3w5fFcWH5Cz8merIrHeRw9BBX7SGaFROxTT/gBP
-	LBnzF05gTw7NexaCQT+6lrg3NdxiRnUGV9YElEiXGu9Hb3JpIfDc3YGKjOWV7FMm4Q==
-X-Gm-Gg: ASbGnct4iDuLPTzQWV8KLnl7gthQLLV4V+rrxMJWVz3NeHD57ZorgFGlPfi/mzrrNB3
-	DgyoMbjV/Z7rhh1Ph30k+WB6dwTNkEd3OSF/AINpi6xbEMOILxfHOXB3qBEUyvNVqWwBynbaw+S
-	vpVp0fYaGZPGYODABmDmbSGp9OCth9dOefmbqYt1tcPr2flg7qjDJ/+aPqthxg4J9waqEzQzRNx
-	aEJJ+k44q7uez996M+ycaL4cUOUrsqwdqu6i3uQny+LODa2yX6qfQcH1YHwxmrWqXl9SRdLICDy
-	eOnOtyp643wv5Tcc3gpgcVX9ASi6WKtmncfsqA5ljD+e9rrXtDcC4c0I/Q1ucU0C8BLG4vsfMUt
-	LiPe8yZc8VEsJS1wFyOVIEncpoH80hWelewDEttSz/4mx+NRgM6BARUfWEkrn6Q==
-X-Google-Smtp-Source: AGHT+IFDwAq1THb3IWIpQF0E9OZ0Tl++RLOgxwEZiStS6SKC57nMiie5HsehYdbEwen2VMn2oam5hw==
-X-Received: by 2002:a05:6214:5098:b0:704:9584:c370 with SMTP id 6a1803df08f44-7050551d1f1mr61874956d6.7.1752778068551;
-        Thu, 17 Jul 2025 11:47:48 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70497db12ecsm87656826d6.102.2025.07.17.11.47.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Jul 2025 11:47:46 -0700 (PDT)
-Message-ID: <af7e4420-b773-48dd-aaf4-269f63c624e1@broadcom.com>
-Date: Thu, 17 Jul 2025 11:47:38 -0700
+        d=1e100.net; s=20230601; t=1752778350; x=1753383150;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0a5KLpmNdbac5z+OdmlpJ82pz3wF32WpMWj2w1Vd7No=;
+        b=GAXLlSkwCfyH6pAvdHrlU1fizUWfxUtTTovNx0Ec4vELbsgqRzlkWbeVzVan2Ii8BB
+         W254Ml942/1HwN7Uk8m3tauA2UPzZzlLK07pRO3tDFu/beHCbaxzYkbE2YLTYG7Y0kh/
+         kAHelfYTgA/S8K3CXPZXXn8tRWlzTqZ3cHybb1DsZ9C7fiDKJv2Nig+FJpBiPTLcjMqS
+         xH60zZapjP7k0JF3o5zUmqmogWvt+HpNF61S484ztIkYD0VhVY63g+85GBGOJwWB5eK3
+         0tk4YwIJllWsVxdsbnvLILjuEI7FiEdrUG5+jY6Gsk4AEeWJQgSKJF6kLpWgtHwhUhLj
+         1GtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVjp4JU93ipQMAOewZXcpI1BmAAl2tP5lD9gY5uHDdIuELicZVTsQQZHT38VeqcdXtyVoeGzDU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2IgdWe3dZ0nvDFYB2TVWCLl5zrOnpyBT+uvfeAl6y9yKR4Hou
+	LFN37WHYWhNVDjw8FwD/1nYeQQPLc7EMu9evwCWLo4HimL4Kq547rhy5lyjsAY22ZvGqfBV1/FI
+	K+s6bHtuajkA4PsL7RrDQIZXTsKW4Qfmhy03S2DUmUfYrjsOEGOWg18+DEsE=
+X-Google-Smtp-Source: AGHT+IGHzl0aKRabmWO10kMpxI9v+rAHfaLHyRnAtNkNDSDsYAVIjbEPSCn0AH3qRkdiBrY/7A3nV1dYNHJNP2xeUHgNQ9yiQQLW
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 5/8] net: dsa: b53: mmap: Add register layout for
- bcm63268
-To: Kyle Hendry <kylehendrydev@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Russell King <linux@armlinux.org.uk>
-Cc: noltari@gmail.com, jonas.gorski@gmail.com,
- Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250716002922.230807-1-kylehendrydev@gmail.com>
- <20250716002922.230807-6-kylehendrydev@gmail.com>
-Content-Language: en-US
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20250716002922.230807-6-kylehendrydev@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:5e89:b0:3df:3afa:28d6 with SMTP id
+ e9e14a558f8ab-3e282d58d74mr57187145ab.2.1752778349820; Thu, 17 Jul 2025
+ 11:52:29 -0700 (PDT)
+Date: Thu, 17 Jul 2025 11:52:29 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6879466d.a00a0220.3af5df.0022.GAE@google.com>
+Subject: [syzbot] [netfilter?] [sctp?] BUG: assuming non migratable context at ./include/linux/filter.h:LINE
+From: syzbot <syzbot+92c5daf9a23f04ccfc99@syzkaller.appspotmail.com>
+To: ast@kernel.org, bpf@vger.kernel.org, davem@davemloft.net, 
+	dsahern@kernel.org, dxu@dxuuu.xyz, edumazet@google.com, fw@strlen.de, 
+	horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, kuniyu@google.com, 
+	linux-kernel@vger.kernel.org, linux-sctp@vger.kernel.org, 
+	llvm@lists.linux.dev, lucien.xin@gmail.com, marcelo.leitner@gmail.com, 
+	nathan@kernel.org, ncardwell@google.com, ndesaulniers@google.com, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
+	pablo@netfilter.org, syzkaller-bugs@googlegroups.com, trix@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 7/15/25 17:29, Kyle Hendry wrote:
-> Add a structure to describe the ephy control register
-> and add register info for bcm63268.
-> 
-> Signed-off-by: Kyle Hendry <kylehendrydev@gmail.com>
-> ---
->   drivers/net/dsa/b53/b53_mmap.c | 21 +++++++++++++++++++++
->   1 file changed, 21 insertions(+)
-> 
-> diff --git a/drivers/net/dsa/b53/b53_mmap.c b/drivers/net/dsa/b53/b53_mmap.c
-> index 09631792049c..35bf39ab2771 100644
-> --- a/drivers/net/dsa/b53/b53_mmap.c
-> +++ b/drivers/net/dsa/b53/b53_mmap.c
-> @@ -27,9 +27,26 @@
->   
->   #include "b53_priv.h"
->   
-> +struct b53_phy_info {
-> +	u32 ephy_enable_mask;
-> +	u32 ephy_port_mask;
-> +	u32 ephy_bias_bit;
-> +	const u32 *ephy_offset;
-> +};
-> +
->   struct b53_mmap_priv {
->   	void __iomem *regs;
->   	struct regmap *gpio_ctrl;
-> +	const struct b53_phy_info *phy_info;
-> +};
-> +
-> +static const u32 bcm63268_ephy_offsets[] = {4, 9, 14};
-> +
-> +static const struct b53_phy_info bcm63268_ephy_info = {
-> +	.ephy_enable_mask = GENMASK(4, 0),
-> +	.ephy_port_mask = GENMASK((ARRAY_SIZE(bcm63268_ephy_offsets) - 1), 0),
-> +	.ephy_bias_bit = 24,
-> +	.ephy_offset = bcm63268_ephy_offsets,
->   };
->   
->   static int b53_mmap_read8(struct b53_device *dev, u8 page, u8 reg, u8 *val)
-> @@ -316,6 +333,10 @@ static int b53_mmap_probe(struct platform_device *pdev)
->   	priv->regs = pdata->regs;
->   
->   	priv->gpio_ctrl = syscon_regmap_lookup_by_phandle(np, "brcm,gpio-ctrl");
-> +	if (!IS_ERR(priv->gpio_ctrl)) {
+Hello,
 
-This check IMHO belongs in patch #2, even though it only starts being 
-useful now. Up to you, and depending upon other comments.
--- 
-Florian
+syzbot found the following issue on:
+
+HEAD commit:    155a3c003e55 Merge tag 'for-6.16/dm-fixes-2' of git://git...
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=161a27d4580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=5ae63460f9c371aa
+dashboard link: https://syzkaller.appspot.com/bug?extid=92c5daf9a23f04ccfc99
+compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15a9d18c580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13f58382580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/dcbbac96d733/disk-155a3c00.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/eec589968921/vmlinux-155a3c00.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/80e95076a622/bzImage-155a3c00.xz
+
+The issue was bisected to:
+
+commit 91721c2d02d3a0141df8a4787c7079b89b0d0607
+Author: Daniel Xu <dxu@dxuuu.xyz>
+Date:   Fri Jul 21 20:22:46 2023 +0000
+
+    netfilter: bpf: Support BPF_F_NETFILTER_IP_DEFRAG in netfilter link
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12c1558c580000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=11c1558c580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=16c1558c580000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+92c5daf9a23f04ccfc99@syzkaller.appspotmail.com
+Fixes: 91721c2d02d3 ("netfilter: bpf: Support BPF_F_NETFILTER_IP_DEFRAG in netfilter link")
+
+BUG: assuming non migratable context at ./include/linux/filter.h:703
+in_atomic(): 0, irqs_disabled(): 0, migration_disabled() 0 pid: 5829, name: sshd-session
+3 locks held by sshd-session/5829:
+ #0: ffff88807b4e4218 (sk_lock-AF_INET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1667 [inline]
+ #0: ffff88807b4e4218 (sk_lock-AF_INET){+.+.}-{0:0}, at: tcp_sendmsg+0x20/0x50 net/ipv4/tcp.c:1395
+ #1: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #1: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ #1: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: __ip_queue_xmit+0x69/0x26c0 net/ipv4/ip_output.c:470
+ #2: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #2: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ #2: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: nf_hook+0xb2/0x680 include/linux/netfilter.h:241
+CPU: 0 UID: 0 PID: 5829 Comm: sshd-session Not tainted 6.16.0-rc6-syzkaller-00002-g155a3c003e55 #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x16c/0x1f0 lib/dump_stack.c:120
+ __cant_migrate kernel/sched/core.c:8860 [inline]
+ __cant_migrate+0x1c7/0x250 kernel/sched/core.c:8834
+ __bpf_prog_run include/linux/filter.h:703 [inline]
+ bpf_prog_run include/linux/filter.h:725 [inline]
+ nf_hook_run_bpf+0x83/0x1e0 net/netfilter/nf_bpf_link.c:20
+ nf_hook_entry_hookfn include/linux/netfilter.h:157 [inline]
+ nf_hook_slow+0xbb/0x200 net/netfilter/core.c:623
+ nf_hook+0x370/0x680 include/linux/netfilter.h:272
+ NF_HOOK_COND include/linux/netfilter.h:305 [inline]
+ ip_output+0x1bc/0x2a0 net/ipv4/ip_output.c:433
+ dst_output include/net/dst.h:459 [inline]
+ ip_local_out net/ipv4/ip_output.c:129 [inline]
+ __ip_queue_xmit+0x1d7d/0x26c0 net/ipv4/ip_output.c:527
+ __tcp_transmit_skb+0x2686/0x3e90 net/ipv4/tcp_output.c:1479
+ tcp_transmit_skb net/ipv4/tcp_output.c:1497 [inline]
+ tcp_write_xmit+0x1274/0x84e0 net/ipv4/tcp_output.c:2838
+ __tcp_push_pending_frames+0xaf/0x390 net/ipv4/tcp_output.c:3021
+ tcp_push+0x225/0x700 net/ipv4/tcp.c:759
+ tcp_sendmsg_locked+0x1870/0x42b0 net/ipv4/tcp.c:1359
+ tcp_sendmsg+0x2e/0x50 net/ipv4/tcp.c:1396
+ inet_sendmsg+0xb9/0x140 net/ipv4/af_inet.c:851
+ sock_sendmsg_nosec net/socket.c:712 [inline]
+ __sock_sendmsg net/socket.c:727 [inline]
+ sock_write_iter+0x4aa/0x5b0 net/socket.c:1131
+ new_sync_write fs/read_write.c:593 [inline]
+ vfs_write+0x6c7/0x1150 fs/read_write.c:686
+ ksys_write+0x1f8/0x250 fs/read_write.c:738
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xcd/0x4c0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fe7d365d407
+Code: 48 89 fa 4c 89 df e8 38 aa 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
+RSP:
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
