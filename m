@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-207817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8358B08A3C
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 12:04:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BB2AB08A41
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 12:06:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 325761A67C69
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 10:04:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCE251A66439
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 10:07:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6B7F2989BC;
-	Thu, 17 Jul 2025 10:04:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCBF22989B4;
+	Thu, 17 Jul 2025 10:06:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bVfw9LxX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WyTzkd0x"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87FF0291C2C;
-	Thu, 17 Jul 2025 10:04:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C1451DE8A3;
+	Thu, 17 Jul 2025 10:06:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752746659; cv=none; b=Ct4PZtUS+Zq6PdMjYgy7uh4CfcyQR3HJWOIfWVmVOd2UhQl2nrnnVzPURqVIVnZ2WGwutzHGMB0kVidhCUFOJWNDTDYRSMAT5nPzaxpUQ7zb4LQdNnM1gr1ORUmJ+H2ihiriKYslUMpWSL9HQPR7WhBlMiQXvRUPk56f8VRkJPc=
+	t=1752746807; cv=none; b=fu8nKc84n/C6Sc8nIr+Ea4N42uknvc8ss46znokpHbh/wGzs/e4TUZVA9EBX+dlzipK6tSt/a61HiOB/wckmx8i6Qaa6WoCtaYbYb5OZN5iXI65qPKIkx5Sw+8op/8z141HiTKnChIeoMrW/RMzsp2RefeJZvUphyhYbYiCqkDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752746659; c=relaxed/simple;
-	bh=tSSfkdba3bi3GKVXCRc3mWOuXzJ1VtXL2k3JRLb74B8=;
+	s=arc-20240116; t=1752746807; c=relaxed/simple;
+	bh=4LG7lHvKvNtxJnEv2fwhP1DwGB3dKz4VjTEbeapa9qk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mTM1/ov3RpU7iObwRdHx7YNrjWeKw5Rswz6Wo2BpZ0nb+94JhrwFXQm1aHoiCi99XGzTKuKM15PpVqprdX8+pDt3aw3iebh7aBeP3d6ZIcADNnfdiyEdMuN4zavz0nhk/dC2c7ndxihFqZYr0iDnybAdjspa+8OCic6f3/u5Qts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bVfw9LxX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16FA9C4CEEB;
-	Thu, 17 Jul 2025 10:04:13 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=pJbJ6BQ4xgdM2ZKHKREza18beDgISeotMqMiY/2wmt7UvaS83j5dBv7yOk+lp1W/Joybe6QdxTaLZabIsLssaGEDa9grvZJvjDAeY+/NNpEcmGMSTJ+vBLZNdyY0XDi5Bkk98xC0rmRSWAbu2UTnH3BepDuBsQPntDzswxV7dHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WyTzkd0x; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1527C4CEE3;
+	Thu, 17 Jul 2025 10:06:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752746659;
-	bh=tSSfkdba3bi3GKVXCRc3mWOuXzJ1VtXL2k3JRLb74B8=;
+	s=k20201202; t=1752746807;
+	bh=4LG7lHvKvNtxJnEv2fwhP1DwGB3dKz4VjTEbeapa9qk=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=bVfw9LxXjM/RJcNWsxL9Z9LXgbkNjpUu1QvXKJxtr6KrZJetO4ivHOcnyG2eQ8+Vh
-	 7db8zk4DpJ27EUinp24oF/cbUoc5nTACZcES1Otvw8c7N26lef7PvRzoFUbZ1YAlOP
-	 HTlKe2tV3wqrh4gB2TSKqAilNT3oaq4lB+G8zJ+zbxk/7y/iDv0PFOjbYOwm7zvsgi
-	 zTwz4li5V0AWR8U++kIv855IftI6PH8Zs13D4ZUQTWLSQOnwA98FQGmCINd/5JCDKf
-	 qZp6I6fOGZy3/ZpS7H4lnO9vH4XeBs3NtgyoBi9Q0uYWpWSeOEvOKJxYSM57dkiLdE
-	 4CqHCKfLtn5mQ==
-Message-ID: <ec01c2f1-7ab8-4830-846d-aa772e6cc853@kernel.org>
-Date: Thu, 17 Jul 2025 12:04:12 +0200
+	b=WyTzkd0x/SxDJrygPtyjibS2Fq94y3StDCJmjc0XvcsiJ/fzirQcUKAqH+7wylUmw
+	 p9n6ezaJARydmDVTawMrJMhQjCwQ6Fll8jsW4N4Md0IvaqGBMSSSkjP6YgEb+FRRTz
+	 8Qb829jMUIe6BfjCvdGWrqwedbvCsWku+5l91NYWjhfYybymVcFHCZB+Q9QVWoq9A2
+	 0roKRQuxZQFRxp+8ddyptDZZ5tiYI7TojetMXonwB69zgcBmTPb0BP64AE57vaVfii
+	 8uYbulsMFwt77P8edQdkDPssZcDtMwShub92mdPCbuSOzasNhhKBLoA8aihy4cndBk
+	 0qSIr4n9uFUCw==
+Message-ID: <af75073c-4ce8-44c1-9e48-b22902373e81@kernel.org>
+Date: Thu, 17 Jul 2025 12:06:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,8 +50,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next 01/14] dt-bindings: ptp: add NETC Timer PTP
- clock
+Subject: Re: [PATCH v2 net-next 02/14] dt-bindings: net: add nxp,netc-timer
+ property
 To: Wei Fang <wei.fang@nxp.com>
 Cc: "robh@kernel.org" <robh@kernel.org>,
  "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
@@ -74,9 +74,11 @@ Cc: "robh@kernel.org" <robh@kernel.org>,
  "imx@lists.linux.dev" <imx@lists.linux.dev>,
  "kernel@pengutronix.de" <kernel@pengutronix.de>
 References: <20250716073111.367382-1-wei.fang@nxp.com>
- <20250716073111.367382-2-wei.fang@nxp.com>
- <20250717-furry-hummingbird-of-growth-4f5f1d@kuoka>
- <PAXPR04MB8510F642E509E915B85062318851A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <20250716073111.367382-3-wei.fang@nxp.com>
+ <20250717-sceptical-quoll-of-protection-9c2104@kuoka>
+ <PAXPR04MB8510EB38C3DCF5713C6AC5C48851A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <20250717-masterful-uppish-impala-b1d256@kuoka>
+ <PAXPR04MB85109FE64C4FCAD6D46895428851A@PAXPR04MB8510.eurprd04.prod.outlook.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -122,61 +124,45 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <PAXPR04MB8510F642E509E915B85062318851A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+In-Reply-To: <PAXPR04MB85109FE64C4FCAD6D46895428851A@PAXPR04MB8510.eurprd04.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 17/07/2025 10:30, Wei Fang wrote:
->> On Wed, Jul 16, 2025 at 03:30:58PM +0800, Wei Fang wrote:
->>> +properties:
->>> +  compatible:
->>> +    enum:
->>> +      - pci1131,ee02
->>> +
->>> +  reg:
->>> +    maxItems: 1
->>> +
->>> +  clocks:
->>> +    maxItems: 1
->>> +    description:
->>> +      The reference clock of NETC Timer, if not present, indicates that
->>> +      the system clock of NETC IP is selected as the reference clock.
+On 17/07/2025 11:49, Wei Fang wrote:
+>>>
+>>> I do not think it is timestamper. Each ENETC has the ability to record
+>>> the sending/receiving timestamp of the packets on the Tx/Rx BD, but
+>>> the timestamp comes from the Timer. For platforms have multiple Timer
 >>
->> If not present...
+>> Isn't this exactly what timestamper is supposed to do?
 >>
->>> +
->>> +  clock-names:
->>
->> ... this also is not present...
->>
->>> +    description:
->>> +      NETC Timer has three reference clock sources, set
->> TMR_CTRL[CK_SEL]
->>> +      by parsing clock name to select one of them as the reference clock.
->>> +      The "system" means that the system clock of NETC IP is used as the
->>> +      reference clock.
->>> +      The "ccm_timer" means another clock from CCM as the reference
->> clock.
->>> +      The "ext_1588" means the reference clock comes from external IO
->> pins.
->>> +    enum:
->>> +      - system
->>
->> So what does system mean?
->>
+> According to the definition, timestamper requires two parameters, one is
+> the node reference and the other is the port, and the timestamper is added
+> to the PHY node, and is used by the gerneric mdio driver. The PTP driver
+
+
+We do not speak about drivers.
+
+> provides the interfaces of mii_timestamping_ctrl. So this property is to
+> provide PTP support for PHY devices.
 > 
-> "system" is the system clock of the NETC subsystem, we can explicitly specify
-> this clock as the PTP reference clock of the Timer in the DT node. Or do not
-> add clock properties to the DT node, it implicitly indicates that the reference
-> clock of the Timer is the "system" clock.
 > 
+> timestamper:	provides control node reference and
+> 			the port channel within the IP core
+> 
+> The "timestamper" property lives in a phy node and links a time
+> stamping channel from the controller device to that phy's MII bus.
+> 
+> But for NETC, we only need the node parameter, and this property is
+> added to the MAC node.
 
-Eh, no. If absence of clock input means you are using specific clock
-input it is contradictory to the first. You cannot use some clock input
-if you claim that it can be missing.
+I think we do not understand each other. I ask if this is the
+timestamper and you explain about arguments of the phandle. The
+arguments are not relevant.
 
-You define here clock inputs. This is what this property is about.
+What is this purpose/role/function of the timer device?
 
+What is the purpose of this new property in the binding here?
 
 Best regards,
 Krzysztof
