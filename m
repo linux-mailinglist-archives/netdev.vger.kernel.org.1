@@ -1,213 +1,314 @@
-Return-Path: <netdev+bounces-207949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82870B09223
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 18:46:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABCC6B09224
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 18:48:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5ABA73B115B
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 16:46:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0AA011C45D20
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 16:49:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1C0B2F94AA;
-	Thu, 17 Jul 2025 16:46:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81C2C2FCE2A;
+	Thu, 17 Jul 2025 16:48:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GuaJBbmZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g3LtFwtj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F7572BCF75
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 16:46:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFC8B2BE039;
+	Thu, 17 Jul 2025 16:48:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752770805; cv=none; b=Cg2mbxQ158bOW6upjG2NSbyIWT0mu8aa52UEtjIP5wAE9M7dpwoVvfo/o8Xk3CjdNdq0RHT7oqv0XG1skJXItHcUvGMRZqlvXVeN5a3Sso97djWG7mSoCuMDFWZShkN/9QvBn3xdNr1bcJyGgcdxFHIPuMt8aaiunOUdG9AKHHI=
+	t=1752770926; cv=none; b=sFe+MRalkmX+IWv/nRyPSOugRD91sjvtPn6sm//XR3H73PYX1ulCNhAjR5Nmtpz3lCLRj+b0/0sUEeDj4z3f22Ru4TDSR2oV0i76u0EmpUzVjhBNf1AxDYH7kwHa7HA0MIX8+tnL50Y53sHNESmrjShYcbDvs0d/nCdnfYxbqMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752770805; c=relaxed/simple;
-	bh=7wu8QTEZHNz1gULv5Hv3MSmbT+2Byw1gmDUOPLJCVOQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NDNLb3Pa+lGPElkubaEqjuLCGOe6GocekBqHnHaa3D9M1JO7wC72tpOr1yeqdXDMAtN5FzO23GMnSVHsv0XnR6FMd0V1VcC2e1zmstqbkZV9/r6OjVN+D163TJQgL6P6Ft26tnBXw0hIA1RSESP0UJMSvvYoXKqEBYD1EJ30xVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GuaJBbmZ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752770803;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O9AMbwwWld/6Yy3pcC72gJCfdHpZ0d8jOe3WOYIplHk=;
-	b=GuaJBbmZDgMamoopjxdtfszSfkeoRtpi/JR7CetaLPBb6gK6ZNnYmyEb5hEW023xnQ5HmC
-	xapXG1n/vjcYWYP9CWz5Bubf8f17tk7sOEKF3m395uk1f/7dFrjkvR+99RT4ugmQ3aGclL
-	4/L6DuIDkXIONGj4v5WJRxpsCqvk0Tk=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-474-7aj9jxGIM_ifhs_GqCcoeA-1; Thu, 17 Jul 2025 12:46:41 -0400
-X-MC-Unique: 7aj9jxGIM_ifhs_GqCcoeA-1
-X-Mimecast-MFC-AGG-ID: 7aj9jxGIM_ifhs_GqCcoeA_1752770800
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-ae0ced7fa79so16026266b.3
-        for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 09:46:41 -0700 (PDT)
+	s=arc-20240116; t=1752770926; c=relaxed/simple;
+	bh=J9OTlutyIDrxyKwrnua/9uUiGYGOBbc673wKtxDGfmo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CdexaI1pBrNoSS0ITtwu5/SYTbLJrklAzrt0s/p+KdoS6lY9rvRlQiUI2rZ1b+G/XOBLQut0VcQp713TPFM9uXSVAY6WU+qB8lhW5MG/tbxvEMdx7PwR8wlG5sHK7L1drBSCN/KRh4ZVwEZBzZ0U+kRIWfBhkhYMQWcOohASfS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g3LtFwtj; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-74264d1832eso1732584b3a.0;
+        Thu, 17 Jul 2025 09:48:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752770924; x=1753375724; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KVdPMbegWLKLiVVq6vlP0k6ssUgjV11Nzyr728pYeK0=;
+        b=g3LtFwtjTOb6SHG31Cga4eSvo0pXhB5mn9qN/r5S2WfMX9geyng47U58WOhN4Ykn/w
+         J0E3Uh118A0aMlY6W8iXWc9dE9N+nv5I6sZ9j8pCLrUH9IPP5A7jpPHE1wU3filCMIvR
+         a6fqtRnhYjjOfLSj4a8uZY8OrsG7staITjtrhf6ltlXEOx9Kk7WRdifT030SS2+X3ECn
+         6/SzjI0ei052V0NIPT+tuWPGB7RE2bgeKmr+a2QhT00zonkxKPivEgSmPVi/DgBDMH98
+         RZ6d5SzeGU4DHwVgIxaIS2wGdHp/OLXq6emcW2NNjvivsguYY8oGcexbRZmkihlzf7EV
+         UNUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752770800; x=1753375600;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=O9AMbwwWld/6Yy3pcC72gJCfdHpZ0d8jOe3WOYIplHk=;
-        b=C+aKco8JdyVC9ukR8Qudc8j/QwE11XL+3XcQdM/BnZOC1xZaWRELQORN/UMMcYRgGN
-         LjMjAi9Is5qrwhKX4gfMb0sI/U2MPkeJ/UdVc2pVY4A3cxGHKkC2G+/oPkPrW9gAwzrc
-         Q3BPh24Q1ET+bJIHbFztJ+31hOdC64R7UHIR08Vqn3yjHzFsF5qXDVLs9VU0qkp59d0W
-         1uHN5HeLUVbEAQ2Qu8C6CWEXt4oYYuZyPyXQsFwCHXQm9lAGsmCyfvX3M9ZnK9kvMoAT
-         MQIy33gcXsTtbYhX/Iey3tN5ebPyuK75dyJmqcdJVgGfXmL5U7c5nvc+EzT/+VGHVV1J
-         +eDw==
-X-Gm-Message-State: AOJu0YxCIoCVpbwFxAfLwFW1IKqsEhtEkwofbvHTzECePtWAT05iPecO
-	wzi0GTo+KFpiCTEnHIvRlOCZQrtzHPDmwKJxyrfTtsTcNhVt8wGe9xn41vDbueXc4LRezKczUcw
-	YX7dO2EFl2Sc9beepmSGrX170MUK4Nlf3PoKZQFSljVyAh79z9OyBHHlsbO2T2a6dc1yuXxsAFr
-	k/r+zyHnguldDINhnMLbXXc1uVW0H1vFU2eVyHlmLeghg=
-X-Gm-Gg: ASbGncvNVztIl+wNOtGugI7ryHxRiOiGeKxgeacU5Zwj72yrfNp8Q1LNmDS4sNV1M68
-	CWnlg+9uINrMTmAbjtFqkARglfAwBgt7Qi98+OaDlkoH4G58HckArMrkgSMnyZWwLJRCkZHf9F2
-	Fyms3HV5a9Mn/jp6v8aQg=
-X-Received: by 2002:a17:907:1b03:b0:ade:328a:95d1 with SMTP id a640c23a62f3a-ae9c9b21003mr288974966b.10.1752770799807;
-        Thu, 17 Jul 2025 09:46:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFTjW4ce8hmC2NksUhSz3E2eZCErP36MU2mJYoolB4YhcKzFvYImUMHIqL+5v0hiRtXUVjIRV0QBxZRa4ZQFNg=
-X-Received: by 2002:a17:907:1b03:b0:ade:328a:95d1 with SMTP id
- a640c23a62f3a-ae9c9b21003mr288973466b.10.1752770799260; Thu, 17 Jul 2025
- 09:46:39 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752770924; x=1753375724;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KVdPMbegWLKLiVVq6vlP0k6ssUgjV11Nzyr728pYeK0=;
+        b=Hqf8FLV9xI0cKpmri4ioSEoQOIFi75bD9ZvyYoYjqOXQFK++p83opmgDxcxrk6129o
+         GYXLIGf7+l0FyIkVeN6PjwjeE7MIGVqgfUb6vhcmJ6HsjXZpjO6gMSwGkhpRh8mW2wbY
+         FdTiqDwByNgSq3p+rsO+lQY1sAD16SKHtxp7b13hMN2bBrLNgRk+H4a0mNGFXQKrLGek
+         M97vFQEeL6nPSwq06vtkD456o1POKm1sK+inlyO5STbjTdWZ6BzhV9qpTShHziRqCWT4
+         VrH2Z7F9P0Rhckvxy5ZriDwehhpa5D9ualDdp6R2MWSBp0TvElgIMj6TXZNWC+59d1TY
+         5SWg==
+X-Gm-Message-State: AOJu0YxAKl/KnghRCSabLK28FhsKllbeRDf3KKv0wouRC2ZEc4zv7AQ6
+	JHnlrmZqI2+FaIk1+/LRqGP/U8xqkS2RdxACi0GFkYvalEcxRIZOronpKBEd/Q==
+X-Gm-Gg: ASbGncvNhgb0+SLu1ex1gwbFHz5uaBjKZtJBRZzQWzWRNCuwSTNT5WbiuLvgwHNCoxW
+	0ooAvNaXHnXdgIVFf3ShMHQTUlrZytJiQrPt4p6HwmpC4uOvzp9JRkukPT3RCjafft7ROVwSWyf
+	UF8wES+z7FHttCVmyy6gwibaGLspOJWnSHrQgE9HOtLedWkGl79DIYXgaVI5/Z9AIYaicyieTfg
+	1Z06R7RcCp+/C9Aol+7PfukS2FzVaAPShfzGi1m/3Zb/tp997SeIhrKniD13Me+tKJONQUQzUaG
+	la/dGNy+labqZos4ttwi+pCpZsA9IN5XayWLT80yPYjbKr8gSmwUWFvXf/0RqYJwrifYN9mzM/p
+	iC3z9IfE4SwUK
+X-Google-Smtp-Source: AGHT+IFq6b31Wu1YNXFIiJKGTA1pYZtFT9TiQjcfZnDxuR872mjoKYtyZyRKDllRc1mhxHMi7Uj7pA==
+X-Received: by 2002:a05:6a00:a8a:b0:740:b5f9:287b with SMTP id d2e1a72fcca58-75723165190mr9355733b3a.1.1752770923587;
+        Thu, 17 Jul 2025 09:48:43 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:1::])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b3bbe7281d5sm15885226a12.65.2025.07.17.09.48.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Jul 2025 09:48:43 -0700 (PDT)
+From: Amery Hung <ameryhung@gmail.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	andrii@kernel.org,
+	daniel@iogearbox.net,
+	tj@kernel.org,
+	memxor@gmail.com,
+	martin.lau@kernel.org,
+	ameryhung@gmail.com,
+	kernel-team@meta.com
+Subject: [PATCH bpf-next v6 0/3] Task local data
+Date: Thu, 17 Jul 2025 09:48:38 -0700
+Message-ID: <20250717164842.1848817-1-ameryhung@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250618195240.95454-1-dechen@redhat.com>
-In-Reply-To: <20250618195240.95454-1-dechen@redhat.com>
-From: Dennis Chen <dechen@redhat.com>
-Date: Thu, 17 Jul 2025 12:46:28 -0400
-X-Gm-Features: Ac12FXzZHc4AoPSdI9mF2kRfJlEnVKTfV5Go-utLaKJ_FKfblhXqL8AuOc8dGWM
-Message-ID: <CAOftDsEnyXZa8arEGL5pRa-0RvfwS5Tv7eb-uhOzCUAZcUxoAQ@mail.gmail.com>
-Subject: Re: [PATCH net] i40e: report VF tx_dropped with tx_errors instead of tx_discards
-To: netdev@vger.kernel.org
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, intel-wired-lan@lists.osuosl.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 18, 2025 at 3:52=E2=80=AFPM Dennis Chen <dechen@redhat.com> wro=
-te:
->
-> Currently the tx_dropped field in VF stats is not updated correctly
-> when reading stats from the PF. This is because it reads from
-> i40e_eth_stats.tx_discards which seems to be unused for per VSI stats,
-> as it is not updated by i40e_update_eth_stats() and the corresponding
-> register, GLV_TDPC, is not implemented[1].
->
-> Use i40e_eth_stats.tx_errors instead, which is actually updated by
-> i40e_update_eth_stats() by reading from GLV_TEPC.
->
-> To test, create a VF and try to send bad packets through it:
->
-> $ echo 1 > /sys/class/net/enp2s0f0/device/sriov_numvfs
-> $ cat test.py
-> from scapy.all import *
->
-> vlan_pkt =3D Ether(dst=3D"ff:ff:ff:ff:ff:ff") / Dot1Q(vlan=3D999) / IP(ds=
-t=3D"192.168.0.1") / ICMP()
-> ttl_pkt =3D IP(dst=3D"8.8.8.8", ttl=3D0) / ICMP()
->
-> print("Send packet with bad VLAN tag")
-> sendp(vlan_pkt, iface=3D"enp2s0f0v0")
-> print("Send packet with TTL=3D0")
-> sendp(ttl_pkt, iface=3D"enp2s0f0v0")
-> $ ip -s link show dev enp2s0f0
-> 16: enp2s0f0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state U=
-P mode DEFAULT group default qlen 1000
->     link/ether 3c:ec:ef:b7:e0:ac brd ff:ff:ff:ff:ff:ff
->     RX:  bytes packets errors dropped  missed   mcast
->              0       0      0       0       0       0
->     TX:  bytes packets errors dropped carrier collsns
->              0       0      0       0       0       0
->     vf 0     link/ether e2:c6:fd:c1:1e:92 brd ff:ff:ff:ff:ff:ff, spoof ch=
-ecking on, link-state auto, trust off
->     RX: bytes  packets  mcast   bcast   dropped
->              0        0       0       0        0
->     TX: bytes  packets   dropped
->              0        0        0
-> $ python test.py
-> Send packet with bad VLAN tag
-> .
-> Sent 1 packets.
-> Send packet with TTL=3D0
-> .
-> Sent 1 packets.
-> $ ip -s link show dev enp2s0f0
-> 16: enp2s0f0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state U=
-P mode DEFAULT group default qlen 1000
->     link/ether 3c:ec:ef:b7:e0:ac brd ff:ff:ff:ff:ff:ff
->     RX:  bytes packets errors dropped  missed   mcast
->              0       0      0       0       0       0
->     TX:  bytes packets errors dropped carrier collsns
->              0       0      0       0       0       0
->     vf 0     link/ether e2:c6:fd:c1:1e:92 brd ff:ff:ff:ff:ff:ff, spoof ch=
-ecking on, link-state auto, trust off
->     RX: bytes  packets  mcast   bcast   dropped
->              0        0       0       0        0
->     TX: bytes  packets   dropped
->              0        0        0
->
-> A packet with non-existent VLAN tag and a packet with TTL =3D 0 are sent,
-> but tx_dropped is not incremented.
->
-> After patch:
->
-> $ ip -s link show dev enp2s0f0
-> 19: enp2s0f0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state U=
-P mode DEFAULT group default qlen 1000
->     link/ether 3c:ec:ef:b7:e0:ac brd ff:ff:ff:ff:ff:ff
->     RX:  bytes packets errors dropped  missed   mcast
->              0       0      0       0       0       0
->     TX:  bytes packets errors dropped carrier collsns
->              0       0      0       0       0       0
->     vf 0     link/ether 4a:b7:3d:37:f7:56 brd ff:ff:ff:ff:ff:ff, spoof ch=
-ecking on, link-state auto, trust off
->     RX: bytes  packets  mcast   bcast   dropped
->              0        0       0       0        0
->     TX: bytes  packets   dropped
->              0        0        2
->
-> Fixes: dc645daef9af5bcbd9c ("i40e: implement VF stats NDO")
-> Signed-off-by: Dennis Chen <dechen@redhat.com>
->     Link: https://www.intel.com/content/www/us/en/content-details/596333/=
-intel-ethernet-controller-x710-tm4-at2-carlsville-datasheet.html
-> ---
->  drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers=
-/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> index 88e6bef69342..2dbe38eb9494 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> @@ -5006,7 +5006,7 @@ int i40e_get_vf_stats(struct net_device *netdev, in=
-t vf_id,
->         vf_stats->broadcast  =3D stats->rx_broadcast;
->         vf_stats->multicast  =3D stats->rx_multicast;
->         vf_stats->rx_dropped =3D stats->rx_discards + stats->rx_discards_=
-other;
-> -       vf_stats->tx_dropped =3D stats->tx_discards;
-> +       vf_stats->tx_dropped =3D stats->tx_errors;
->
->         return 0;
->  }
-> --
-> 2.49.0
->
-Hello,
+* Motivation *
 
-Any update here?
+CPU schedulers can potentially make a better decision with hints from
+user space process. To support experimenting user space hinting with
+sched_ext, there needs a mechanism to pass a "per-task hint" from user
+space to the bpf scheduler "efficiently".
+
+The proposed mechanism is task local data. Similar to pthread key or
+__thread, it allows users to define thread-specific data. In addition,
+the user pages that back task local data are pinned to the kernel to
+share with bpf programs directly. As a result, user space programs
+can directly update per-thread hints, and then bpf program can read
+the hint with little overhead. The diagram in the design section gives
+a sneak peek of how it works.
 
 
-Dennis Chen
+* Overview *
+
+Task local data defines an abstract storage type for storing data specific
+to each task and provides user space and bpf libraries to access it. The
+result is a fast and easy way to share per-task data between user space
+and bpf programs. The intended use case is sched_ext, where user space
+programs will pass hints to sched_ext bpf programs to affect task
+scheduling.
+
+Task local data is built on top of task local storage map and UPTR[0]
+to achieve fast per-task data sharing. UPTR is a type of special field
+supported in task local storage map value. A user page assigned to a UPTR
+will be pinned by the kernel when the map is updated. Therefore, user
+space programs can update data seen by bpf programs without syscalls.
+
+Additionally, unlike most bpf maps, task local data does not require a
+static map value definition. This design is driven by sched_ext, which
+would like to allow multiple developers to share a storage without the
+need to explicitly agree on the layout of it. While a centralized layout
+definition would have worked, the friction of synchronizing it across
+different repos is not desirable. This simplify code base management and
+makes experimenting easier.
+
+In the rest of the cover letter, "task local data" is used to refer to
+the abstract storage and TLD is used to denote a single data entry in
+the storage.
+
+
+* Design *
+
+Task local data library provides simple APIs for user space and bpf
+through two header files, task_local_data.h and task_loca_data.bpf.h,
+respectively. The usage is illustrated in the following diagram.
+An entry of data in the task local data, TLD, first needs to be defined
+with TLD_DEFINE_KEY() with the size of the data and a name associated with
+the data. The macro defines and initialize an opaque key object of
+tld_key_t type, which can be used to locate a TLD. The same key may be
+passed to tld_get_data() in different threads, and a pointer to data
+specific to the calling thread will be returned. The pointer will
+remain valid until the process terminates, so there is not need to call
+tld_get_data() in subsequent accesses.
+
+TLD_DEFINE_KEY() is allowed to define TLDs up to roughly a page. In the
+case when a TLD can only be known and created on the fly,
+tld_create_key() can be called. Since the total TLD size cannot be known
+beforehand, a memory of size TLD_DYN_DATA_SIZE is allocated for each
+thread to accommodate them.
+
+On the bpf side, programs will use also use tld_get_data() to locate
+TLDs. The arugments contain a name and a key to a TLD. The name is
+used for the first tld_get_data() to a TLD, which will lookup the TLD
+by name and save the corresponding key to a task local data map,
+tld_key_map. The map value type, struct tld_keys, __must__ be defined by
+developers. It should contain keys used in the compilation unit.
+
+
+ ┌─ Application ───────────────────────────────────────────────────────┐
+ │ TLD_DEFINE_KEY(kx, "X", 4);      ┌─ library A ─────────────────────┐│
+ │                                  │ void func(...)                  ││
+ │ int main(...)                    │ {                               ││
+ │ {                                │     tld_key_t ky;               ││
+ │      int *x;                     │     bool *y;                    ││
+ │                                  │                                 ││
+ │      x = tld_get_data(fd, kx);   │     ky = tld_create_key("Y", 1);││
+ │      if (x) *x = 123;            │     y = tld_get_data(fd, ky);   ││
+ │                         ┌────────┤     if (y) *y = true;           ││
+ │                         │        └─────────────────────────────────┘│
+ └───────┬─────────────────│───────────────────────────────────────────┘
+         V                 V
+ + ─ Task local data ─ ─ ─ ─ ─ +  ┌─ BPF program ──────────────────────┐
+ | ┌─ tld_data_map ──────────┐ |  │ struct tld_object obj;             │
+ | │ BPF Task local storage  │ |  │ bool *y;                           │
+ | │                         │ |  │ int *x;                            │
+ | │ __uptr *data            │ |  │                                    │
+ | │ __uptr *metadata        │ |  │ if (tld_init_object(task, &obj))   │
+ | └─────────────────────────┘ |  │     return 0;                      │
+ | ┌─ tld_key_map ───────────┐ |  │                                    │
+ | │ BPF Task local storage  │ |  │ x = tld_get_data(&obj, kx, "X", 4);│
+ | │                         │ |<─┤ if (x) /* do something */          │
+ | │ tld_key_t kx;           │ |  │                                    │
+ | │ tld_key_t ky;           │ |  │ y = tld_get_data(&obj, ky, "Y", 1);│
+ | └─────────────────────────┘ |  │ if (y) /* do something */          │
+ + ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ +  └────────────────────────────────────┘
+ 
+
+
+* Implementation *
+
+Task local data defines the storage to be a task local storage map with
+two UPTRs, data and metadata. Data points to a blob of memory for storing
+TLDs individual to every task with the offset of data in a page. Metadata,
+individual to each process and shared by its threads, records the total
+number and size of TLDs and the metadata of each TLD. Metadata for a
+TLD contains the key name and the size of the TLD.
+
+  struct u_tld_data {
+          u64 start;
+          char data[PAGE_SIZE - 8];
+  };
+
+  struct u_tld_metadata {
+          u8 cnt;
+          u16 size;
+          struct metadata data[TLD_DATA_CNT]; 
+  };
+
+Both user space and bpf API follow the same protocol when accessing
+task local data. A pointer to a TLD is located by a key. tld_key_t
+effectively is the offset of a TLD in data. To add a TLD, user space
+API, loops through metadata->data until an empty slot is found and update
+it. It also adds sizes of prior TLDs along the way to derive the offset.
+To locate a TLD in bpf when the first time tld_get_data() is called,
+__tld_fetch_key() also loops through metadata->data until the name is
+found. The offset is also derived by adding sizes. When the TLD is not
+found, the current TLD count is cached instead to skip name comparison
+that has been done. The detail of task local data operations can be found
+in patch 1.
+
+
+* Misc *
+
+The metadata can potentially use run-length encoding for names to reduce
+memory wastage and support save more TLDs. I have a version that works,
+but the selftest takes a bit longer to finish. More investigation needed
+to find the root cause. I will save this for the future when there is a
+need to store more than 63 TLDs.
+
+
+[0] https://lore.kernel.org/bpf/20241023234759.860539-1-martin.lau@linux.dev/
+
+---
+
+v5 -> v6
+  - Address Andrii's comment
+  - Fix verification failure in no_alu32
+  - Some cleanup
+  v5: https://lore.kernel.org/bpf/20250627233958.2602271-1-ameryhung@gmail.com/
+
+v4 -> v5
+  - Add an option to free memory on thread exit to prevent memory leak
+  - Add an option to reduce memory waste if the allocator can
+    use just enough memory to fullfill aligned_alloc() (e.g., glibc)
+  - Tweak bpf API
+      - Remove tld_fetch_key() as it does not work in init_tasl
+      - tld_get_data() now tries to fetch key if it is not cached yet
+  - Optimize bpf side tld_get_data()
+      - Faster fast path
+      - Less code
+  - Use stdatomic.h in user space library with seq_cst order
+  - Introduce TLD_DEFINE_KEY() as the default TLD creation API for
+    easier memory management.
+      - TLD_DEFINE_KEY() can consume memory up to a page and no memory
+        is wasted since their size is known before per-thread data
+        allocation.
+      - tld_create_key() can only use up to TLD_DYN_DATA_SIZE. Since
+        tld_create_key can run any time even after per-thread data
+        allocation, it is impossible to predict the total size. A
+        configurable size of memory is allocated on top of the total
+        size of TLD_DEFINE_KEY() to accommodate dynamic key creation.
+  - Add tld prefix to all macros
+  - Replace map_update(NO_EXIST) in __tld_init_data() with cmpxchg()
+  - No more +1,-1 dance on the bpf side
+  - Reduce printf from ASSERT in race test
+  - Try implementing run-length encoding for name and decide to
+    save it for the future
+  v4: https://lore.kernel.org/bpf/20250515211606.2697271-1-ameryhung@gmail.com/
+
+v3 -> v4
+  - API improvements
+      - Simplify API
+      - Drop string obfuscation
+      - Use opaque type for key
+      - Better documentation
+  - Implementation
+      - Switch to dynamic allocation for per-task data
+      - Now offer as header-only libraries
+      - No TLS map pinning; leave it to users
+  - Drop pthread dependency
+  - Add more invalid tld_create_key() test
+  - Add a race test for tld_create_key()
+  v3: https://lore.kernel.org/bpf/20250425214039.2919818-1-ameryhung@gmail.com/
+
+
+Amery Hung (3):
+  selftests/bpf: Introduce task local data
+  selftests/bpf: Test basic task local data operations
+  selftests/bpf: Test concurrent task local data key creation
+
+ .../bpf/prog_tests/task_local_data.h          | 388 ++++++++++++++++++
+ .../bpf/prog_tests/test_task_local_data.c     | 297 ++++++++++++++
+ .../selftests/bpf/progs/task_local_data.bpf.h | 227 ++++++++++
+ .../bpf/progs/test_task_local_data.c          |  65 +++
+ 4 files changed, 977 insertions(+)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/task_local_data.h
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/test_task_local_data.c
+ create mode 100644 tools/testing/selftests/bpf/progs/task_local_data.bpf.h
+ create mode 100644 tools/testing/selftests/bpf/progs/test_task_local_data.c
+
+-- 
+2.47.1
 
 
