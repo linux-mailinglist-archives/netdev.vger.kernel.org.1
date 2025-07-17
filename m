@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-208041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63AE6B09868
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 01:44:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48FEEB0986B
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 01:44:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D04A817FB28
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 23:44:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25C251AA5E56
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 23:44:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50629252906;
-	Thu, 17 Jul 2025 23:44:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 142182550D2;
+	Thu, 17 Jul 2025 23:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MG3ICdNQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fgpW+PgA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C832250BF2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4A282550CF
 	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 23:44:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752795854; cv=none; b=TxEWzZVogZ/odX4SbYst5dijAYIk7WeObBmi01KyMu5hbGA+S2HN/FBVPyc2a+vZw2o35t8SXFkIXS702Pmsa7W13fQ5xXs3AtgSZF0Fl1MwSgWCL+JNK3sddMWE6Jkebo7sMOSdbglvnH7oiNyO0sTpMxGZwt98MsifVv1izyQ=
+	t=1752795855; cv=none; b=OTwqXj4uUY1ps2Igj+Efg6NtmTb4/gFr6PYn6kPQggBSq21jBpuZKZ/t/+9DesQoMiE2s7tLfY937kelxrQWRib+qLsJpDSoGl2PJ0pNugysKAPUq6OUVtBl5S1EjnddVQXUssbELvjUgU7Ar/HMHokQJLT7boAzC163zhdCOzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752795854; c=relaxed/simple;
-	bh=66Jqz6E/KHud29yEu43XdlTEeRd9r5ON0heSEmeCeDs=;
+	s=arc-20240116; t=1752795855; c=relaxed/simple;
+	bh=TyWWd2WaOkxopc1TUU3gezcy6kr0ptzeppYa5tyS5Kk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PovdjLQlNCo9q1QWD4kcgNX3eJqWUOhPemDxzlqsHtyJIisbaceW4mu28rrPMSKe4dVQqNn0aZg2E8/ZnLrm75h+W7HRlroSMRYSOqyL3ul8b+TKXSN0oGcovYl3DXct4ZeU1Ms7sIQt84ybB0eIRqUiB/OumQmlXuJjYbrWU/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MG3ICdNQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76023C4CEF4;
-	Thu, 17 Jul 2025 23:44:13 +0000 (UTC)
+	 MIME-Version; b=jkEmbNap8ymmHuxfyc3qOLg99Pqnwx/oI4tLV6NLIlt8KKprTkpSDSu4f9EpKT0kjq65reLrhnIykQkHGm3MmpJ80dD616vF38VjWd44In9K+boZMzA6aT0IPUZ5eTyE0xRWTunQp18EFLSsUGjlJvXK6QMJWh+PjvE8J43EsbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fgpW+PgA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3954FC4CEE3;
+	Thu, 17 Jul 2025 23:44:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1752795854;
-	bh=66Jqz6E/KHud29yEu43XdlTEeRd9r5ON0heSEmeCeDs=;
+	bh=TyWWd2WaOkxopc1TUU3gezcy6kr0ptzeppYa5tyS5Kk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MG3ICdNQJD8Srt/vcC8xp0IptYM2o5MmTBy7XHuxxVYl+3Pz5t13rxI8iRmFaNV6n
-	 7MGfhH7rHOUZ2CHSaxFnbqX6ONFJWi5im9SjcXTvjIDAxg9wmgzZJy5Vw+mpfY8RpM
-	 Oi+oMsoV40qPm0RPBpUMwv/iL7yWMInUwDJEwModX+KpzxjIMKmZr8maXvPdiTHH9R
-	 F23LEAsKWzjx21qSBaDDI0KDTyREFu120EptC05pv7/xUydiQRIw5hk5i9x8Q6Dl4U
-	 jbC34DOYm6X1g0RLjahmKb9yd4jN1MJ3WY1B/hgsL0mQsXwylf2bliutqBjEz1+9bU
-	 i+gihLSPvY9Mw==
+	b=fgpW+PgAxM7HGI6meXm0OsVhzEV060CSvILSFOU170EsAIb7mcK6C5oxTNvpzJqBn
+	 PtBDs/qT2+aOaI6mkDLMByiFgVYym4byvGWOHQNtB+AMAJETYN37IEvJUpZbeVkShR
+	 ZbA5HDOf9U9PMDYgMtuH3qvmfVw+OIO4o97EFl2h+thR1Z18HNiVfRhYHisOE5TML5
+	 fMVy/HXJQoq0heYIFLKuvBHooudfN7apU+5COelT9v9Vr947RitIUli552fxhVoBSw
+	 6FPF45/a3uGnvc89A3xM4D5UZlZUGOm/MCib6QGIn+NlgFS/pHjQjXSnFcht4F/DxC
+	 D8qjUVWatZESg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -55,9 +55,9 @@ Cc: netdev@vger.kernel.org,
 	gal@nvidia.com,
 	ecree.xilinx@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 4/8] ethtool: rss: factor out populating response from context
-Date: Thu, 17 Jul 2025 16:43:39 -0700
-Message-ID: <20250717234343.2328602-5-kuba@kernel.org>
+Subject: [PATCH net-next 5/8] ethtool: move ethtool_rxfh_ctx_alloc() to common code
+Date: Thu, 17 Jul 2025 16:43:40 -0700
+Message-ID: <20250717234343.2328602-6-kuba@kernel.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250717234343.2328602-1-kuba@kernel.org>
 References: <20250717234343.2328602-1-kuba@kernel.org>
@@ -69,82 +69,119 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Similarly to previous change, factor out populating the response.
-We will use this after the context was allocated to send a notification
-so this time factor out from the additional context handling, rather
-than context 0 handling (for request context didn't exist, for response
-it does).
+Move ethtool_rxfh_ctx_alloc() to common code, Netlink will need it.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/ethtool/rss.c | 32 ++++++++++++++++++++++----------
- 1 file changed, 22 insertions(+), 10 deletions(-)
+ net/ethtool/common.h |  3 +++
+ net/ethtool/common.c | 34 ++++++++++++++++++++++++++++++++++
+ net/ethtool/ioctl.c  | 34 ----------------------------------
+ 3 files changed, 37 insertions(+), 34 deletions(-)
 
-diff --git a/net/ethtool/rss.c b/net/ethtool/rss.c
-index 07a9d89e1c6b..e5516e529b4a 100644
---- a/net/ethtool/rss.c
-+++ b/net/ethtool/rss.c
-@@ -179,6 +179,25 @@ rss_prepare_get(const struct rss_req_info *request, struct net_device *dev,
+diff --git a/net/ethtool/common.h b/net/ethtool/common.h
+index c8385a268ced..c4d084dde5bf 100644
+--- a/net/ethtool/common.h
++++ b/net/ethtool/common.h
+@@ -43,6 +43,9 @@ bool convert_legacy_settings_to_link_ksettings(
+ int ethtool_check_max_channel(struct net_device *dev,
+ 			      struct ethtool_channels channels,
+ 			      struct genl_info *info);
++struct ethtool_rxfh_context *
++ethtool_rxfh_ctx_alloc(const struct ethtool_ops *ops,
++		       u32 indir_size, u32 key_size);
+ int ethtool_check_rss_ctx_busy(struct net_device *dev, u32 rss_context);
+ int ethtool_rxfh_config_is_sym(u64 rxfh);
+ 
+diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+index 82afe0f2a7cd..2a1d40efb1fc 100644
+--- a/net/ethtool/common.c
++++ b/net/ethtool/common.c
+@@ -806,6 +806,40 @@ int ethtool_check_rss_ctx_busy(struct net_device *dev, u32 rss_context)
+ 	return rc;
+ }
+ 
++struct ethtool_rxfh_context *
++ethtool_rxfh_ctx_alloc(const struct ethtool_ops *ops,
++		       u32 indir_size, u32 key_size)
++{
++	size_t indir_bytes, flex_len, key_off, size;
++	struct ethtool_rxfh_context *ctx;
++	u32 priv_bytes, indir_max;
++	u16 key_max;
++
++	key_max = max(key_size, ops->rxfh_key_space);
++	indir_max = max(indir_size, ops->rxfh_indir_space);
++
++	priv_bytes = ALIGN(ops->rxfh_priv_size, sizeof(u32));
++	indir_bytes = array_size(indir_max, sizeof(u32));
++
++	key_off = size_add(priv_bytes, indir_bytes);
++	flex_len = size_add(key_off, key_max);
++	size = struct_size_t(struct ethtool_rxfh_context, data, flex_len);
++
++	ctx = kzalloc(size, GFP_KERNEL_ACCOUNT);
++	if (!ctx)
++		return NULL;
++
++	ctx->indir_size = indir_size;
++	ctx->key_size = key_size;
++	ctx->key_off = key_off;
++	ctx->priv_size = ops->rxfh_priv_size;
++
++	ctx->hfunc = ETH_RSS_HASH_NO_CHANGE;
++	ctx->input_xfrm = RXH_XFRM_NO_CHANGE;
++
++	return ctx;
++}
++
+ /* Check if fields configured for flow hash are symmetric - if src is included
+  * so is dst and vice versa.
+  */
+diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
+index beb17f3671a2..c53868889969 100644
+--- a/net/ethtool/ioctl.c
++++ b/net/ethtool/ioctl.c
+@@ -1473,40 +1473,6 @@ static noinline_for_stack int ethtool_get_rxfh(struct net_device *dev,
  	return ret;
  }
  
-+static void
-+__rss_prepare_ctx(struct net_device *dev, struct rss_reply_data *data,
-+		  struct ethtool_rxfh_context *ctx)
-+{
-+	if (WARN_ON_ONCE(data->indir_size != ctx->indir_size ||
-+			 data->hkey_size != ctx->key_size))
-+		return;
-+
-+	data->no_key_fields = !dev->ethtool_ops->rxfh_per_ctx_key;
-+
-+	data->hfunc = ctx->hfunc;
-+	data->input_xfrm = ctx->input_xfrm;
-+	memcpy(data->indir_table, ethtool_rxfh_context_indir(ctx),
-+	       data->indir_size * sizeof(u32));
-+	if (data->hkey_size)
-+		memcpy(data->hkey, ethtool_rxfh_context_key(ctx),
-+		       data->hkey_size);
-+}
-+
- static int
- rss_prepare_ctx(const struct rss_req_info *request, struct net_device *dev,
- 		struct rss_reply_data *data, const struct genl_info *info)
-@@ -188,8 +207,6 @@ rss_prepare_ctx(const struct rss_req_info *request, struct net_device *dev,
- 	u8 *rss_config;
- 	int ret;
- 
--	data->no_key_fields = !dev->ethtool_ops->rxfh_per_ctx_key;
+-static struct ethtool_rxfh_context *
+-ethtool_rxfh_ctx_alloc(const struct ethtool_ops *ops,
+-		       u32 indir_size, u32 key_size)
+-{
+-	size_t indir_bytes, flex_len, key_off, size;
+-	struct ethtool_rxfh_context *ctx;
+-	u32 priv_bytes, indir_max;
+-	u16 key_max;
 -
- 	mutex_lock(&dev->ethtool->rss_lock);
- 	ctx = xa_load(&dev->ethtool->rss_ctx, request->rss_context);
- 	if (!ctx) {
-@@ -199,8 +216,6 @@ rss_prepare_ctx(const struct rss_req_info *request, struct net_device *dev,
- 
- 	data->indir_size = ctx->indir_size;
- 	data->hkey_size = ctx->key_size;
--	data->hfunc = ctx->hfunc;
--	data->input_xfrm = ctx->input_xfrm;
- 
- 	indir_bytes = data->indir_size * sizeof(u32);
- 	total_size = indir_bytes + data->hkey_size;
-@@ -211,13 +226,10 @@ rss_prepare_ctx(const struct rss_req_info *request, struct net_device *dev,
- 	}
- 
- 	data->indir_table = (u32 *)rss_config;
--	memcpy(data->indir_table, ethtool_rxfh_context_indir(ctx), indir_bytes);
+-	key_max = max(key_size, ops->rxfh_key_space);
+-	indir_max = max(indir_size, ops->rxfh_indir_space);
 -
--	if (data->hkey_size) {
-+	if (data->hkey_size)
- 		data->hkey = rss_config + indir_bytes;
--		memcpy(data->hkey, ethtool_rxfh_context_key(ctx),
--		       data->hkey_size);
--	}
-+
-+	__rss_prepare_ctx(dev, data, ctx);
- 
- 	ret = 0;
- out_unlock:
+-	priv_bytes = ALIGN(ops->rxfh_priv_size, sizeof(u32));
+-	indir_bytes = array_size(indir_max, sizeof(u32));
+-
+-	key_off = size_add(priv_bytes, indir_bytes);
+-	flex_len = size_add(key_off, key_max);
+-	size = struct_size_t(struct ethtool_rxfh_context, data, flex_len);
+-
+-	ctx = kzalloc(size, GFP_KERNEL_ACCOUNT);
+-	if (!ctx)
+-		return NULL;
+-
+-	ctx->indir_size = indir_size;
+-	ctx->key_size = key_size;
+-	ctx->key_off = key_off;
+-	ctx->priv_size = ops->rxfh_priv_size;
+-
+-	ctx->hfunc = ETH_RSS_HASH_NO_CHANGE;
+-	ctx->input_xfrm = RXH_XFRM_NO_CHANGE;
+-
+-	return ctx;
+-}
+-
+ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
+ 					       void __user *useraddr)
+ {
 -- 
 2.50.1
 
