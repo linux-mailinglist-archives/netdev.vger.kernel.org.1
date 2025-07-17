@@ -1,178 +1,134 @@
-Return-Path: <netdev+bounces-208004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 044A0B09485
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 20:58:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D09FB094CB
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 21:18:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF0273BE7E0
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 18:58:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDCCD1C46D0C
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 19:18:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E82A21018A;
-	Thu, 17 Jul 2025 18:58:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50B762FF492;
+	Thu, 17 Jul 2025 19:17:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zMAUCkuq"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ddttC3Cv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8457820A5F3
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 18:58:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26582FF483
+	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 19:17:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752778725; cv=none; b=YPDOc2/FaKk5EQTG3W6VTe3ZaSIYefa30F/3W/AhvCGQ4Z8isr4XncpGWDfR5wq3qxxOndmtJoTGnuAwQM3jFbTFCAvUySdDs5HVIsI17BK4+gAnrbG0v+6cVMKL4zWvCR5VoarfhVrcaVeJ6bcIWCw81ozhcau9PmzajyEUTOo=
+	t=1752779874; cv=none; b=TbqLSqgfQUpVvnZs2dOlo10pi6F0biVIF4PO0FAAXmts/mkClxqNonIofHsT6yBg+ZJ03NrX7v8liXl+9iNhyze46pWWnAMX0QqD4j53FvKCb6nPm4skQk9JjcdheIKTleaNl/uoCRwdXbvCtZ2c7QBnQPcx0Tw8radq0tZPaFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752778725; c=relaxed/simple;
-	bh=z/s+Nd+w7cZR3Up0kGfFnOTHzWQtLnqFkRxSRfJyj+Y=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=WvojTwqLV4jCWhC5elCag26sfGKCrIQwg3WzeN0hpaXj0wUSU7xmvonsbY8kPured8Njz3uX5yYKDl87sgrHfIw8o8mP4olmSjG4s0QZ7HXbbzt3GIG8qqHobmgcsuyQr9imXDv1aZLYZ8xg6KDMfBPL3Juojz9P6LMhlmLIXRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zMAUCkuq; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b2c37558eccso1072728a12.1
-        for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 11:58:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752778723; x=1753383523; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=pyuipq8yz+na9vKhmstqOdMfH5o7gJKHRjnIEguNlxI=;
-        b=zMAUCkuqElYLzqJZNiMmKDJLi3GkMXjhj/DwVD32egFlDdm2gWiNajMKb+1fGbXUnl
-         h9ouBAW7l3BHW8/runMHXEtuXovWUXygT48nbrcP2vYlilVNsJjemOzegpvlv/J/fPKx
-         wT+SmCpYTGqR38JtC86JfjAftAGhkRhHZLkIXjxwiJ90qiaLOVDIxYvy8qjunnW4AKqO
-         whxaOsiAImpM8J/OmQQV1KAy29UGKjpWusGtzvIIkYA0oKwUqLgchCBiAv6OuYit/QI1
-         jMyNMyJJNfoxiBdFrQLMqmrdh0Fr50GkNbotgi9qOokb9p9O3v23a67YW6RmY6egD5r3
-         Kp1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752778723; x=1753383523;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pyuipq8yz+na9vKhmstqOdMfH5o7gJKHRjnIEguNlxI=;
-        b=sawMbIJnn8bG0zsBnSajnBUgX3u0oV8SihTqqMTLh/6em2+zPMXMVhdHKXWGvv0ZTd
-         MbsJ5ZKpP97QCOhN9cFCWpq+WNLqtSuGM5Czf/RIfBiynuLcGqUDW5MN/8czojjDmEok
-         Nz9jljS8mxjxTsT7fyYbectzTHJ6Uzmsvx6Z9X+IskFmGdASdjn71QouBoORTxqvNyuU
-         xzfLaH2e+0dvl0H6Ihw5tTnATVdoRe/fMzmtoWZzwQrvJ5iIOuLKU9WVkOGQWYyuDacU
-         vckDsskOOhDP2RGmFfhOV+Uir3uTjubhX+cewg+IS2lKS2YnkXatEfcV/Epq1RxjVh4p
-         uIEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWQ88eCLavUZLH6WDenLr7Z+cfCxqxBJPReGCLabCd16fKAVSkbSMkutuQ2SLWah7YVmZpkTdY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQFRl8TUVxS2RU3ELWF0ogoSajBwqt+iwXYl/+qNkSMyrmGOK7
-	tVhH5NKqHNxierQsKgf9HHxfT0UhiZegcQ2dDHH0jXKU4LmEIGeUpMVX+Ds2YTQmjcJwq7bHk5P
-	qY/yQqQ==
-X-Google-Smtp-Source: AGHT+IGapn6EU0fiE/Sefd+N/+nfRpkumvW1GYXlG1+tdhFN+OxF0MZC73N1khjs3KC5LtIjKZsVXK7RXII=
-X-Received: from pjbta7.prod.google.com ([2002:a17:90b:4ec7:b0:30a:31eb:ec8e])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1a84:b0:234:8a4a:ada5
- with SMTP id d9443c01a7336-23e24f59832mr114385265ad.37.1752778722812; Thu, 17
- Jul 2025 11:58:42 -0700 (PDT)
-Date: Thu, 17 Jul 2025 18:58:21 +0000
+	s=arc-20240116; t=1752779874; c=relaxed/simple;
+	bh=TCZ16/m/JcR+KOcW3zLkSxjiy0cw3kk7UNgRMp8JkBI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fk+SCa0YZh2b91273vErIMFqztSx1PqFCU97uBrY/wnuVMkfUOy3nrC8nUwJmC6MYBqPZhOimhVmLZquVR8YgsPgj+KyDcQi57KrM93P0hjHaYmrLeqW1TjNpWCk9CX5G/LQN4gQNXs3r8IJnGShSTmuC28iKkSbTIJTH0VGbVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ddttC3Cv; arc=none smtp.client-ip=91.218.175.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752779869;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=w70L6V3f6rZMpo2My9D3+7foPd+Gh2XyPQDgGDEOEwA=;
+	b=ddttC3CvnuZqBKJ7V5kQVz3uuS4hh2ZFnQTlQDXldYUXxWKonHBZQysl7cCRz0427iTAwB
+	xieBWK05nS/2hg+0wr79ByR5yo0Hv9GQ4TzEXJASnp0xQLcBddAVWDALwLxzAngR8yewRF
+	SY3VKWK3FzYDeKnAC9pwfdO986TtQ4g=
+From: Martin KaFai Lau <martin.lau@linux.dev>
+To: David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@kernel.org>,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: pull-request: bpf-next 2025-07-17
+Date: Thu, 17 Jul 2025 12:17:31 -0700
+Message-ID: <20250717191731.4142326-1-martin.lau@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250717185837.1073456-1-kuniyu@google.com>
-Subject: [PATCH v1 bpf] bpf: Disable migration in nf_hook_run_bpf().
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>
-Cc: Daniel Xu <dxu@dxuuu.xyz>, Pablo Neira Ayuso <pablo@netfilter.org>, 
-	Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	syzbot+40f772d37250b6d10efc@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-syzbot reported that the IP defrag bpf prog can be called without
-migration disabled.
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-Then the assertion in __bpf_prog_run() fails, triggering the splat
-below. [0]
+The following pull-request contains BPF updates for your *net-next* tree.
 
-Let's call migrate_disable() before calling bpf_prog_run() in
-nf_hook_run_bpf().
+We've added 13 non-merge commits during the last 20 day(s) which contain
+a total of 4 files changed, 712 insertions(+), 84 deletions(-).
 
-[0]:
-BUG: assuming non migratable context at ./include/linux/filter.h:703
-in_atomic(): 0, irqs_disabled(): 0, migration_disabled() 0 pid: 5829, name: sshd-session
-3 locks held by sshd-session/5829:
- #0: ffff88807b4e4218 (sk_lock-AF_INET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1667 [inline]
- #0: ffff88807b4e4218 (sk_lock-AF_INET){+.+.}-{0:0}, at: tcp_sendmsg+0x20/0x50 net/ipv4/tcp.c:1395
- #1: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
- #1: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
- #1: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: __ip_queue_xmit+0x69/0x26c0 net/ipv4/ip_output.c:470
- #2: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
- #2: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
- #2: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: nf_hook+0xb2/0x680 include/linux/netfilter.h:241
-CPU: 0 UID: 0 PID: 5829 Comm: sshd-session Not tainted 6.16.0-rc6-syzkaller-00002-g155a3c003e55 #0 PREEMPT(full)
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x16c/0x1f0 lib/dump_stack.c:120
- __cant_migrate kernel/sched/core.c:8860 [inline]
- __cant_migrate+0x1c7/0x250 kernel/sched/core.c:8834
- __bpf_prog_run include/linux/filter.h:703 [inline]
- bpf_prog_run include/linux/filter.h:725 [inline]
- nf_hook_run_bpf+0x83/0x1e0 net/netfilter/nf_bpf_link.c:20
- nf_hook_entry_hookfn include/linux/netfilter.h:157 [inline]
- nf_hook_slow+0xbb/0x200 net/netfilter/core.c:623
- nf_hook+0x370/0x680 include/linux/netfilter.h:272
- NF_HOOK_COND include/linux/netfilter.h:305 [inline]
- ip_output+0x1bc/0x2a0 net/ipv4/ip_output.c:433
- dst_output include/net/dst.h:459 [inline]
- ip_local_out net/ipv4/ip_output.c:129 [inline]
- __ip_queue_xmit+0x1d7d/0x26c0 net/ipv4/ip_output.c:527
- __tcp_transmit_skb+0x2686/0x3e90 net/ipv4/tcp_output.c:1479
- tcp_transmit_skb net/ipv4/tcp_output.c:1497 [inline]
- tcp_write_xmit+0x1274/0x84e0 net/ipv4/tcp_output.c:2838
- __tcp_push_pending_frames+0xaf/0x390 net/ipv4/tcp_output.c:3021
- tcp_push+0x225/0x700 net/ipv4/tcp.c:759
- tcp_sendmsg_locked+0x1870/0x42b0 net/ipv4/tcp.c:1359
- tcp_sendmsg+0x2e/0x50 net/ipv4/tcp.c:1396
- inet_sendmsg+0xb9/0x140 net/ipv4/af_inet.c:851
- sock_sendmsg_nosec net/socket.c:712 [inline]
- __sock_sendmsg net/socket.c:727 [inline]
- sock_write_iter+0x4aa/0x5b0 net/socket.c:1131
- new_sync_write fs/read_write.c:593 [inline]
- vfs_write+0x6c7/0x1150 fs/read_write.c:686
- ksys_write+0x1f8/0x250 fs/read_write.c:738
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0x4c0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fe7d365d407
-Code: 48 89 fa 4c 89 df e8 38 aa 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
-RSP:
+The main changes are:
 
-Fixes: 91721c2d02d3 ("netfilter: bpf: Support BPF_F_NETFILTER_IP_DEFRAG in netfilter link")
-Reported-by: syzbot+40f772d37250b6d10efc@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/6879466d.a00a0220.3af5df.0022.GAE@google.com/
-Tested-by: syzbot+40f772d37250b6d10efc@syzkaller.appspotmail.com
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- net/netfilter/nf_bpf_link.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+1) Avoid skipping or repeating a sk when using a TCP bpf_iter,
+   from Jordan Rife.
 
-diff --git a/net/netfilter/nf_bpf_link.c b/net/netfilter/nf_bpf_link.c
-index 06b0848447003..dffe4cd6f4b0b 100644
---- a/net/netfilter/nf_bpf_link.c
-+++ b/net/netfilter/nf_bpf_link.c
-@@ -16,8 +16,13 @@ static unsigned int nf_hook_run_bpf(void *bpf_prog, struct sk_buff *skb,
- 		.state = s,
- 		.skb = skb,
- 	};
-+	unsigned int ret;
- 
--	return bpf_prog_run(prog, &ctx);
-+	migrate_disable();
-+	ret = bpf_prog_run(prog, &ctx);
-+	migrate_enable();
-+
-+	return ret;
- }
- 
- struct bpf_nf_link {
--- 
-2.50.0.727.gbf7dc18ff4-goog
+2) Clarify the driver requirement on using the XDP metadata,
+   from Song Yoong Siang
 
+Please consider pulling these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
+
+Thanks a lot!
+
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Kuniyuki Iwashima, Stanislav Fomichev
+
+----------------------------------------------------------------
+
+The following changes since commit 8efa26fcbf8a7f783fd1ce7dd2a409e9b7758df0:
+
+  tg3: spelling corrections (2025-06-27 10:25:57 +0100)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
+
+for you to fetch changes up to ef57dc6f52e4949527f82a456cb9a637a55209ea:
+
+  doc: xdp: Clarify driver implementation for XDP Rx metadata (2025-07-16 16:36:11 -0700)
+
+----------------------------------------------------------------
+bpf-next-for-netdev
+
+----------------------------------------------------------------
+Jordan Rife (12):
+      bpf: tcp: Make mem flags configurable through bpf_iter_tcp_realloc_batch
+      bpf: tcp: Make sure iter->batch always contains a full bucket snapshot
+      bpf: tcp: Get rid of st_bucket_done
+      bpf: tcp: Use bpf_tcp_iter_batch_item for bpf_tcp_iter_state batch items
+      bpf: tcp: Avoid socket skips and repeats during iteration
+      selftests/bpf: Add tests for bucket resume logic in listening sockets
+      selftests/bpf: Allow for iteration over multiple ports
+      selftests/bpf: Allow for iteration over multiple states
+      selftests/bpf: Make ehash buckets configurable in socket iterator tests
+      selftests/bpf: Create established sockets in socket iterator tests
+      selftests/bpf: Create iter_tcp_destroy test program
+      selftests/bpf: Add tests for bucket resume logic in established sockets
+
+Martin KaFai Lau (1):
+      Merge branch 'bpf-tcp-exactly-once-socket-iteration'
+
+Song Yoong Siang (1):
+      doc: xdp: Clarify driver implementation for XDP Rx metadata
+
+ Documentation/networking/xdp-rx-metadata.rst       |  33 ++
+ net/ipv4/tcp_ipv4.c                                | 269 ++++++++----
+ .../selftests/bpf/prog_tests/sock_iter_batch.c     | 458 ++++++++++++++++++++-
+ .../testing/selftests/bpf/progs/sock_iter_batch.c  |  36 +-
+ 4 files changed, 712 insertions(+), 84 deletions(-)
 
