@@ -1,78 +1,77 @@
-Return-Path: <netdev+bounces-207837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83CEAB08C56
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 14:01:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECA19B08C3F
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 13:58:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF5667B5E99
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 11:55:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9C8F3A69E4
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 11:56:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64A232BD022;
-	Thu, 17 Jul 2025 11:55:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BE462BDC06;
+	Thu, 17 Jul 2025 11:55:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m4QKO+0W"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Npy2UPfZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F6229B8D2;
-	Thu, 17 Jul 2025 11:55:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C53D136358;
+	Thu, 17 Jul 2025 11:55:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752753304; cv=none; b=jEfcG1cebWEBXEKvaoTaWhwWbAsY271t74Lso3R0ISUHV7JXYM/9JeCZQ2vD8V4sSxyXmk/q0dx1ohCnwNdwNjhssMNlxChqyWxMsl1UOpNEuAiSdBknrF6Da1Bt+KegyJc8FRHHMyz6WGaja9csYs9JuD8+PwZ5bqQeBQ3DXoo=
+	t=1752753315; cv=none; b=oAe9Ke+770CdB0NLf0rs4qfN/LgADzChT+0JShNREwJo4q1MeotWdI100UKho6Le2t3FtP9FjmWV1dnUd3F5H0DzB0uyE6o5p9rdHiiEf725hxxEbRWV9xGBCdQ/7xtckfN1vuVvdiNGtZPFxEICxYqWyLeTERGnFc6isDZaYDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752753304; c=relaxed/simple;
-	bh=ck2YVulw2iEuywaFnIjCn2hm4WJu8P7vguDe3iMiTS4=;
+	s=arc-20240116; t=1752753315; c=relaxed/simple;
+	bh=eE6ITxDuIJfEiD0MPyo74zQJCWbgv/+KNDuj42o3f4o=;
 	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dbzO4einziPJBhqZO/vaF17u9B40GRcO/N4BfXX20xKeSDx+9P3HzbJ51pMb6KRRJR7Ba8tkQL1y3c6AlpF2yt+KqJS88eSOrf3X5CAy0FKpt72OLkhEq+ukD4kYEghFAnnAeSHGTf18CtB2wXuGZ3Dm5MwrLslFhfanuxlHKCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m4QKO+0W; arc=none smtp.client-ip=209.85.214.175
+	 MIME-Version; b=gMiRpCY/izSPxUyUyAKkQfI3/BwU5OJb0IWrblH6dVyD/XMONah41myigErtVsPKkVwfZUQSv/FHFdT3RPKdLLwhin7cl29yr8fgfCWCk0Ld5uIlCtWirmICkmSVtmEZ2YzBlLTjsHuuuAUgzGvHkMiJm4zCp7OoegnrR6Z9K+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Npy2UPfZ; arc=none smtp.client-ip=209.85.221.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-234c5b57557so7139895ad.3;
-        Thu, 17 Jul 2025 04:55:02 -0700 (PDT)
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3a4f379662cso646811f8f.0;
+        Thu, 17 Jul 2025 04:55:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752753302; x=1753358102; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1752753312; x=1753358112; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=sKKOfH1gpvJ1IeaYm9TchsbmE2xV2KT6bJpFjZntGC4=;
-        b=m4QKO+0WwX8Hl1pSVsgdLhwM+9VYD6kq9r1KOqqtqvDS08DefRhAQTXeNKXWJmAIcj
-         GO4HnqX3z8TIpjlsR564mhKBSMiDjO7M2YGIZ2P45OrWmpgE5LnBBzpxBkmfVbT9zekq
-         cDI0rrfNUMW6nAr2hSB8emg8PqiHVYiN8Xf2wlfc77wg9VcrpSwgiv10tmsl1lRMiRr/
-         j+J4EX7SeccYoGXdQBHyvSOv/xlCaBhv1C8934xg98692OtvBBR17XICaERnpAUIWEBc
-         Hd0LWgfVDbog+sulpEDVi6j9BbppNbns12T81UwioLlsM2kxTQg+Kuniia/ubZXaXP0S
-         agIA==
+        bh=flDybFiyCaDc4poe3ad+U4bvumYcoJHYkl7fFvJ0otI=;
+        b=Npy2UPfZJCYjXlP0iE0Z5F1C3DFYW36UXAWAvY+QoQKE9t5f1F/VrP7BAv9XeTR54h
+         Z86YJVkq2SBpBDSx8MCbyWxdcj0KOr13c9Nicx5LNY1w7BasKydyyoLfAUAeNUqngZv6
+         eINQ4CRe31lLwJqyQCDVCJWknkiinepYmlsZGS6qDR5t5Cf5lpkYucdOOEWRzbl2xuoa
+         yx1+xlUxCSWFScqX8dXEUGKBmYcEQoUimeq8HHFEe0GRIgSZkLngbKSDTHSqn/brvjw4
+         1N3pbWiXobtIqEV//ueWMbC4BScz7/gnIeRxTLp3nyl6ZFsX4oeMTX/lbNodWF6AAnSl
+         KfgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752753302; x=1753358102;
+        d=1e100.net; s=20230601; t=1752753312; x=1753358112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sKKOfH1gpvJ1IeaYm9TchsbmE2xV2KT6bJpFjZntGC4=;
-        b=XLG+u/+7KGGypg13WcQ96w5P7OX1ggdN4EP2uZbHYix9NbeMXQydB5w1nbWe4iqaXa
-         0qj7vzWMXmAozaXffBPh0saJCLToAeMKyDwzmWwoSUfktd3yJxBXOD3cjZ4YTM8JSUnU
-         QAO6jxuPXq9bwLhvhHM+tWeyrVcXaHP/bUFZ076FFXS/e+4FfB023Ec0ioQeMfr6itPX
-         9T0qhTepUTylYqKSYD53h8RvcJJhKrK4Fa2MDRYgHatHSVwoveKfpEKguS/n1PhZb0Nx
-         9ktbwUk5fVV+Ac+DLoCp+v3O4+M1k00Y3skaoekpwJ0/LwiAwpFcAkxY7OOXNZlwi2pO
-         UkfA==
-X-Forwarded-Encrypted: i=1; AJvYcCVQlJE5UpjjCQpiiD2R8v8Fzu3aIzp1wACqHSUMrWqjVYsPRVp6IIcZIapfW8bH2ajawQfPdi/5npmLUHU=@vger.kernel.org, AJvYcCXzCGzpxkk8CxgNyZSDvrPFOnfujvrpNIpMbAqNbDl8FmSNNS1igzQHoiX+l4ZZ09S0Azi/INtV@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeXbjoA0xrSAkTcukbm548I6QxkCx8v1cTfXjjPi2eeSAyjDgd
-	hNvhbvSpc3rtF9WPmpC0ruWDMBUJYviVmSS3hwax3MIBtUKPkRyJb4sz
-X-Gm-Gg: ASbGncsfDjlAhu9vlqQAzcKdxkeHj4gKGDUVnZJRk5mXDzn9nj6CBEpFRaKAShWNlDR
-	ZtXOxGoapBx3L3UWm7EENVgyOLAwDGr9YpqAB+d0o5lkdXjtOE7p1xpydPAGIUCjXrM3FiWspua
-	9gxAL5tqc9aCaUHR5QPMP+uEFy8sIOkR3XNoYVgLny97a4aXZrTJ61KyNSPUnUo0qnvDdMxGCpL
-	cDwwRlaY9DIuq1Ba+JOeDO3DFb+gmxniAY+86g/Ejw+3lHU891xxF+ytcO/9bdodyp7htKeZHHy
-	jx51LRJQ+Phok4l4jbuAQ2n95jLyVp/qGuZQ5skViT5s3/Aj+H/+W1A+TXhrGeOdD++Ij3S85A7
-	iBcG9sU7wEA==
-X-Google-Smtp-Source: AGHT+IG5JOx3+z3jkn908wqvYEyARJGcTd4Wq+0SCyTrlBlZpZYwXr4OLdseMQuOeZWlGbwLIQfOxA==
-X-Received: by 2002:a17:903:2a83:b0:237:cadf:9aac with SMTP id d9443c01a7336-23e2572ff8amr99070035ad.29.1752753301937;
-        Thu, 17 Jul 2025 04:55:01 -0700 (PDT)
+        bh=flDybFiyCaDc4poe3ad+U4bvumYcoJHYkl7fFvJ0otI=;
+        b=gKvPjTwnWDPYSJuECMTtlps22UmZLJHus5rV1TzrLnOgCoTJO2i6Ig/qhmzpjOIA/r
+         bghH+nWo0/H6zG6b9jhvK2hTGo2X4X0UeY+nWne9RTAI7nZVZXN+hsZoN8wryVtRCU2k
+         4X90ibF0ufQYfSBcqnnGh+Vb/wTZE+msqBIOhKC5J2e5LQP6kxWnzjTHjw5oVS/7xKeR
+         XLqRqaT4HTPkNU3C8vR+MImJ13e1C1zx3+Mz+7CoQ0vqf7mZzr1lOJo/9yuo4CWna8Sq
+         nbiO90inqvoDp8BGQTJgQ6lfPofNcMpxG43/pGLw/VSqQRjG9THQIMPM3vqKUl5B6dnx
+         NfLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU84KioPw/daJXURBMNPmxpiTKvJO4ldioJv1A2wUmuYEtkHSo23NQXiYJOgIt1R/ZJVeNBnWM47gYhfM0=@vger.kernel.org, AJvYcCWdp+Cyd6Puc0JEqD54wTrJoMNvX6uMwNIk7t5CaXtBY6a5wvzm35aNq+hsh/lNdPvtdZ+7RJ91@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFIrT6Qz6s24gQan2jscW+MmBzIEWMddDy2E9JXjV6DFF4J6Kj
+	uLiD+vk1M8i5OHpnRx0/fUnQHlGXJAt3m3Elm0iKai+fOFRV6VrOW0WX
+X-Gm-Gg: ASbGnctRx3yWhFf7ggVrx2NyIk9rEOL0r/U0KwYAtMyMqdL+zeOzRJkRZ9TfyYmFT73
+	IQdcc03Pvv4f8FSDTiv51prI/3lzHXKpaEKMKKdGUUm6vZuCGtZ0wYJP6A/DhHBKudgKOlbM21+
+	/0x0hQXBOT0Quu0xb/xqvxBEllDqQeAGjbxlz2JhzAfYhp/ODcJ/tP0TTi8DgUP1dV08OSoXQCF
+	Y+QfweFVv55QVM5JHnUTCX70Db+LmqDfztcmhJxr5Eld5UC8qtcJeg57YruoAkB+4ZbL44RTdeO
+	5YTsXI3rjTlT9dV8ypTH9s55Hh3GRoCMnAnfKmVCsCMWAD9gN9HdcvcxBu8amJoF
+X-Google-Smtp-Source: AGHT+IGIKfh4UTQ2Yhz/05JGa5MRm0R4h9gb11NzCJ+FgcdoRBhzp7NO+ZZam7qCZw+LjhLURgBtDQ==
+X-Received: by 2002:a05:6000:4801:b0:3a4:f7d9:3f56 with SMTP id ffacd0b85a97d-3b60e4b831fmr4778902f8f.2.1752753311437;
+        Thu, 17 Jul 2025 04:55:11 -0700 (PDT)
 Received: from localhost ([45.84.137.104])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de433d4a8sm142372375ad.169.2025.07.17.04.54.59
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8dc3a62sm20393530f8f.40.2025.07.17.04.55.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Jul 2025 04:55:01 -0700 (PDT)
+        Thu, 17 Jul 2025 04:55:11 -0700 (PDT)
 From: Richard Gobert <richardbgobert@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -89,9 +88,9 @@ To: davem@davemloft.net,
 	martin.lau@kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4 3/4] net: vxlan: bind vxlan sockets to their local address
-Date: Thu, 17 Jul 2025 13:54:11 +0200
-Message-Id: <20250717115412.11424-4-richardbgobert@gmail.com>
+Subject: [PATCH net-next v4 4/4] net: geneve: enable binding geneve sockets to local addresses
+Date: Thu, 17 Jul 2025 13:54:12 +0200
+Message-Id: <20250717115412.11424-5-richardbgobert@gmail.com>
 In-Reply-To: <20250717115412.11424-1-richardbgobert@gmail.com>
 References: <20250717115412.11424-1-richardbgobert@gmail.com>
 Precedence: bulk
@@ -102,159 +101,249 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Bind VXLAN sockets to the local addresses if the IFLA_VXLAN_LOCALBIND
-option is set. This is the new default.
+Allow binding geneve sockets to local addresses, similar to
+the VXLAN "local" option. Add a netlink option to configure
+the local address.
 
-Change vxlan_find_sock to search for the socket using the listening
-address.
-
-This is implemented by copying the VXLAN local address to the udp_port_cfg
-passed to udp_sock_create. The freebind option is set because VXLAN
-interfaces may be UP before their outgoing interface is.
-
-This fixes multiple VXLAN selftests that fail because of that race.
+Like VXLAN, Geneve sockets can be bound to non-local addresses,
+meaning they may be UP before their outgoing interfaces.
 
 Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
 ---
- drivers/net/vxlan/vxlan_core.c | 58 ++++++++++++++++++++++++++--------
- 1 file changed, 45 insertions(+), 13 deletions(-)
+ drivers/net/geneve.c               | 80 +++++++++++++++++++++++++++---
+ include/net/geneve.h               |  6 +++
+ include/uapi/linux/if_link.h       |  2 +
+ tools/include/uapi/linux/if_link.h |  2 +
+ 4 files changed, 82 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index 667ff17c4569..cc22844fcc4c 100644
---- a/drivers/net/vxlan/vxlan_core.c
-+++ b/drivers/net/vxlan/vxlan_core.c
-@@ -78,18 +78,33 @@ static inline bool vxlan_collect_metadata(struct vxlan_sock *vs)
- }
- 
- /* Find VXLAN socket based on network namespace, address family, UDP port,
-- * enabled unshareable flags and socket device binding (see l3mdev with
-- * non-default VRF).
-+ * bound address, enabled unshareable flags and socket device binding
-+ * (see l3mdev with non-default VRF).
-  */
- static struct vxlan_sock *vxlan_find_sock(struct net *net, sa_family_t family,
--					  __be16 port, u32 flags, int ifindex)
-+					  __be16 port, u32 flags, int ifindex,
-+					  union vxlan_addr *saddr)
- {
- 	struct vxlan_sock *vs;
- 
- 	flags &= VXLAN_F_RCV_FLAGS;
- 
- 	hlist_for_each_entry_rcu(vs, vs_head(net, port), hlist) {
--		if (inet_sk(vs->sock->sk)->inet_sport == port &&
-+		struct sock *sk = vs->sock->sk;
-+		struct inet_sock *inet = inet_sk(sk);
-+
-+		if (flags & VXLAN_F_LOCALBIND) {
-+			if (family == AF_INET &&
-+			    inet->inet_rcv_saddr != saddr->sin.sin_addr.s_addr)
-+				continue;
-+#if IS_ENABLED(CONFIG_IPV6)
-+			else if (ipv6_addr_cmp(&sk->sk_v6_rcv_saddr,
-+					       &saddr->sin6.sin6_addr) != 0)
-+				continue;
-+#endif
-+		}
-+
-+		if (inet->inet_sport == port &&
- 		    vxlan_get_sk_family(vs) == family &&
- 		    vs->flags == flags &&
- 		    vs->sock->sk->sk_bound_dev_if == ifindex)
-@@ -141,11 +156,12 @@ static struct vxlan_dev *vxlan_vs_find_vni(struct vxlan_sock *vs,
- /* Look up VNI in a per net namespace table */
- static struct vxlan_dev *vxlan_find_vni(struct net *net, int ifindex,
- 					__be32 vni, sa_family_t family,
--					__be16 port, u32 flags)
-+					__be16 port, u32 flags,
-+					union vxlan_addr *saddr)
- {
- 	struct vxlan_sock *vs;
- 
--	vs = vxlan_find_sock(net, family, port, flags, ifindex);
-+	vs = vxlan_find_sock(net, family, port, flags, ifindex, saddr);
- 	if (!vs)
- 		return NULL;
- 
-@@ -2309,7 +2325,7 @@ static int encap_bypass_if_local(struct sk_buff *skb, struct net_device *dev,
- 		dst_release(dst);
- 		dst_vxlan = vxlan_find_vni(vxlan->net, dst_ifindex, vni,
- 					   addr_family, dst_port,
--					   vxlan->cfg.flags);
-+					   vxlan->cfg.flags, &vxlan->cfg.saddr);
- 		if (!dst_vxlan) {
- 			DEV_STATS_INC(dev, tx_errors);
- 			vxlan_vnifilter_count(vxlan, vni, NULL,
-@@ -3508,8 +3524,9 @@ static const struct ethtool_ops vxlan_ethtool_ops = {
- 	.get_link_ksettings	= vxlan_get_link_ksettings,
+diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
+index 54384f9b3872..bc88b9a52410 100644
+--- a/drivers/net/geneve.c
++++ b/drivers/net/geneve.c
+@@ -61,6 +61,7 @@ struct geneve_config {
+ 	bool			inner_proto_inherit;
+ 	u16			port_min;
+ 	u16			port_max;
++	union geneve_addr	saddr;
  };
  
--static struct socket *vxlan_create_sock(struct net *net, bool ipv6,
--					__be16 port, u32 flags, int ifindex)
-+static struct socket *vxlan_create_sock(struct net *net, bool ipv6, __be16 port,
-+					u32 flags, int ifindex,
-+					union vxlan_addr *addr)
+ /* Pseudo network device */
+@@ -465,7 +466,8 @@ static int geneve_udp_encap_err_lookup(struct sock *sk, struct sk_buff *skb)
+ }
+ 
+ static struct socket *geneve_create_sock(struct net *net, bool ipv6,
+-					 __be16 port, bool ipv6_rx_csum)
++					 __be16 port, bool ipv6_rx_csum,
++					 union geneve_addr *local_addr)
  {
  	struct socket *sock;
  	struct udp_port_cfg udp_conf;
-@@ -3526,6 +3543,20 @@ static struct socket *vxlan_create_sock(struct net *net, bool ipv6,
+@@ -477,11 +479,20 @@ static struct socket *geneve_create_sock(struct net *net, bool ipv6,
+ 		udp_conf.family = AF_INET6;
+ 		udp_conf.ipv6_v6only = 1;
+ 		udp_conf.use_udp6_rx_checksums = ipv6_rx_csum;
++#if IS_ENABLED(CONFIG_IPV6)
++		memcpy(&udp_conf.local_ip6,
++		       &local_addr->sin6.sin6_addr,
++		       sizeof(local_addr->sin6.sin6_addr));
++#endif
+ 	} else {
  		udp_conf.family = AF_INET;
+ 		udp_conf.local_ip.s_addr = htonl(INADDR_ANY);
++		memcpy(&udp_conf.local_ip,
++		       &local_addr->sin.sin_addr,
++		       sizeof(local_addr->sin.sin_addr));
  	}
  
-+	if (flags & VXLAN_F_LOCALBIND) {
-+		if (ipv6) {
-+#if IS_ENABLED(CONFIG_IPV6)
-+			memcpy(&udp_conf.local_ip6.s6_addr32,
-+			       &addr->sin6.sin6_addr.s6_addr32,
-+			       sizeof(addr->sin6.sin6_addr.s6_addr32));
-+#endif
-+		} else {
-+			udp_conf.local_ip.s_addr = addr->sin.sin_addr.s_addr;
++	udp_conf.freebind = 1;
+ 	udp_conf.local_udp_port = port;
+ 
+ 	/* Open UDP socket */
+@@ -586,7 +597,8 @@ static int geneve_gro_complete(struct sock *sk, struct sk_buff *skb,
+ 
+ /* Create new listen socket if needed */
+ static struct geneve_sock *geneve_socket_create(struct net *net, __be16 port,
+-						bool ipv6, bool ipv6_rx_csum)
++						bool ipv6, bool ipv6_rx_csum,
++						union geneve_addr *local_addr)
+ {
+ 	struct geneve_net *gn = net_generic(net, geneve_net_id);
+ 	struct geneve_sock *gs;
+@@ -598,7 +610,7 @@ static struct geneve_sock *geneve_socket_create(struct net *net, __be16 port,
+ 	if (!gs)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-	sock = geneve_create_sock(net, ipv6, port, ipv6_rx_csum);
++	sock = geneve_create_sock(net, ipv6, port, ipv6_rx_csum, local_addr);
+ 	if (IS_ERR(sock)) {
+ 		kfree(gs);
+ 		return ERR_CAST(sock);
+@@ -657,12 +669,24 @@ static void geneve_sock_release(struct geneve_dev *geneve)
+ 
+ static struct geneve_sock *geneve_find_sock(struct geneve_net *gn,
+ 					    sa_family_t family,
+-					    __be16 dst_port)
++					    __be16 dst_port,
++						union geneve_addr *saddr)
+ {
+ 	struct geneve_sock *gs;
+ 
+ 	list_for_each_entry(gs, &gn->sock_list, list) {
+-		if (inet_sk(gs->sock->sk)->inet_sport == dst_port &&
++		struct sock *sk = gs->sock->sk;
++		struct inet_sock *inet = inet_sk(sk);
++
++		if (family == AF_INET &&
++		    inet->inet_rcv_saddr != saddr->sin.sin_addr.s_addr)
++			continue;
++
++		else if (ipv6_addr_cmp(&sk->sk_v6_rcv_saddr,
++				       &saddr->sin6.sin6_addr) != 0)
++			continue;
++
++		if (inet->inet_sport == dst_port &&
+ 		    geneve_get_sk_family(gs) == family) {
+ 			return gs;
+ 		}
+@@ -679,14 +703,16 @@ static int geneve_sock_add(struct geneve_dev *geneve, bool ipv6)
+ 	__u8 vni[3];
+ 	__u32 hash;
+ 
+-	gs = geneve_find_sock(gn, ipv6 ? AF_INET6 : AF_INET, geneve->cfg.info.key.tp_dst);
++	gs = geneve_find_sock(gn, ipv6 ? AF_INET6 : AF_INET,
++			      geneve->cfg.info.key.tp_dst, &geneve->cfg.saddr);
+ 	if (gs) {
+ 		gs->refcnt++;
+ 		goto out;
+ 	}
+ 
+ 	gs = geneve_socket_create(net, geneve->cfg.info.key.tp_dst, ipv6,
+-				  geneve->cfg.use_udp6_rx_checksums);
++				  geneve->cfg.use_udp6_rx_checksums,
++				  &geneve->cfg.saddr);
+ 	if (IS_ERR(gs))
+ 		return PTR_ERR(gs);
+ 
+@@ -1246,6 +1272,8 @@ static const struct nla_policy geneve_policy[IFLA_GENEVE_MAX + 1] = {
+ 	[IFLA_GENEVE_DF]		= { .type = NLA_U8 },
+ 	[IFLA_GENEVE_INNER_PROTO_INHERIT]	= { .type = NLA_FLAG },
+ 	[IFLA_GENEVE_PORT_RANGE]	= NLA_POLICY_EXACT_LEN(sizeof(struct ifla_geneve_port_range)),
++	[IFLA_GENEVE_LOCAL]	= NLA_POLICY_EXACT_LEN(sizeof_field(struct iphdr, saddr)),
++	[IFLA_GENEVE_LOCAL6]	= NLA_POLICY_EXACT_LEN(sizeof(struct in6_addr)),
+ };
+ 
+ static int geneve_validate(struct nlattr *tb[], struct nlattr *data[],
+@@ -1596,6 +1624,32 @@ static int geneve_nl2info(struct nlattr *tb[], struct nlattr *data[],
+ 		cfg->inner_proto_inherit = true;
+ 	}
+ 
++	if (data[IFLA_GENEVE_LOCAL]) {
++		if (changelink && (ip_tunnel_info_af(info) != AF_INET)) {
++			attrtype = IFLA_GENEVE_LOCAL;
++			goto change_notsup;
 +		}
 +
-+		udp_conf.freebind = 1;
++		cfg->saddr.sin.sin_addr.s_addr = nla_get_in_addr(data[IFLA_GENEVE_LOCAL]);
++		cfg->saddr.sa.sa_family = AF_INET;
 +	}
 +
- 	udp_conf.local_udp_port = port;
- 	udp_conf.bind_ifindex = ifindex;
++	if (data[IFLA_GENEVE_LOCAL6]) {
++#if IS_ENABLED(CONFIG_IPV6)
++		if (changelink && (ip_tunnel_info_af(info) != AF_INET6)) {
++			attrtype = IFLA_GENEVE_LOCAL6;
++			goto change_notsup;
++		}
++
++		cfg->saddr.sin6.sin6_addr = nla_get_in6_addr(data[IFLA_GENEVE_LOCAL6]);
++		cfg->saddr.sa.sa_family = AF_INET6;
++#else
++		NL_SET_ERR_MSG_ATTR(extack, data[IFLA_GENEVE_LOCAL6],
++				    "IPv6 support not enabled in the kernel");
++		return -EPFNOSUPPORT;
++#endif
++	}
++
+ 	return 0;
+ change_notsup:
+ 	NL_SET_ERR_MSG_ATTR(extack, data[attrtype],
+@@ -1782,6 +1836,7 @@ static size_t geneve_get_size(const struct net_device *dev)
+ 		nla_total_size(sizeof(__u8)) + /* IFLA_GENEVE_TTL_INHERIT */
+ 		nla_total_size(0) +	 /* IFLA_GENEVE_INNER_PROTO_INHERIT */
+ 		nla_total_size(sizeof(struct ifla_geneve_port_range)) + /* IFLA_GENEVE_PORT_RANGE */
++		nla_total_size(sizeof(struct in6_addr)) + /* IFLA_GENEVE_LOCAL{6} */
+ 		0;
+ }
  
-@@ -3541,7 +3572,8 @@ static struct socket *vxlan_create_sock(struct net *net, bool ipv6,
- /* Create new listen socket if needed */
- static struct vxlan_sock *vxlan_socket_create(struct net *net, bool ipv6,
- 					      __be16 port, u32 flags,
--					      int ifindex)
-+					      int ifindex,
-+					      union vxlan_addr *addr)
- {
- 	struct vxlan_sock *vs;
- 	struct socket *sock;
-@@ -3557,7 +3589,7 @@ static struct vxlan_sock *vxlan_socket_create(struct net *net, bool ipv6,
- 	for (h = 0; h < VNI_HASH_SIZE; ++h)
- 		INIT_HLIST_HEAD(&vs->vni_list[h]);
- 
--	sock = vxlan_create_sock(net, ipv6, port, flags, ifindex);
-+	sock = vxlan_create_sock(net, ipv6, port, flags, ifindex, addr);
- 	if (IS_ERR(sock)) {
- 		kfree(vs);
- 		return ERR_CAST(sock);
-@@ -3610,7 +3642,7 @@ static int __vxlan_sock_add(struct vxlan_dev *vxlan, bool ipv6)
- 		rcu_read_lock();
- 		vs = vxlan_find_sock(vxlan->net, ipv6 ? AF_INET6 : AF_INET,
- 				     vxlan->cfg.dst_port, vxlan->cfg.flags,
--				     l3mdev_index);
-+				     l3mdev_index, &vxlan->cfg.saddr);
- 		if (vs && !refcount_inc_not_zero(&vs->refcnt)) {
- 			rcu_read_unlock();
- 			return -EBUSY;
-@@ -3620,7 +3652,7 @@ static int __vxlan_sock_add(struct vxlan_dev *vxlan, bool ipv6)
- 	if (!vs)
- 		vs = vxlan_socket_create(vxlan->net, ipv6,
- 					 vxlan->cfg.dst_port, vxlan->cfg.flags,
--					 l3mdev_index);
-+					 l3mdev_index, &vxlan->cfg.saddr);
- 	if (IS_ERR(vs))
- 		return PTR_ERR(vs);
+@@ -1807,16 +1862,25 @@ static int geneve_fill_info(struct sk_buff *skb, const struct net_device *dev)
+ 		if (nla_put_in_addr(skb, IFLA_GENEVE_REMOTE,
+ 				    info->key.u.ipv4.dst))
+ 			goto nla_put_failure;
++
++		if (nla_put_in_addr(skb, IFLA_GENEVE_LOCAL,
++				    info->key.u.ipv4.src))
++			goto nla_put_failure;
++
+ 		if (nla_put_u8(skb, IFLA_GENEVE_UDP_CSUM,
+ 			       test_bit(IP_TUNNEL_CSUM_BIT,
+ 					info->key.tun_flags)))
+ 			goto nla_put_failure;
+-
  #if IS_ENABLED(CONFIG_IPV6)
+ 	} else if (!metadata) {
+ 		if (nla_put_in6_addr(skb, IFLA_GENEVE_REMOTE6,
+ 				     &info->key.u.ipv6.dst))
+ 			goto nla_put_failure;
++
++		if (nla_put_in6_addr(skb, IFLA_GENEVE_LOCAL6,
++				     &info->key.u.ipv6.src))
++			goto nla_put_failure;
++
+ 		if (nla_put_u8(skb, IFLA_GENEVE_UDP_ZERO_CSUM6_TX,
+ 			       !test_bit(IP_TUNNEL_CSUM_BIT,
+ 					 info->key.tun_flags)))
+diff --git a/include/net/geneve.h b/include/net/geneve.h
+index 5c96827a487e..7b12c70db11f 100644
+--- a/include/net/geneve.h
++++ b/include/net/geneve.h
+@@ -62,6 +62,12 @@ struct genevehdr {
+ 	u8 options[];
+ };
+ 
++union geneve_addr {
++	struct sockaddr_in sin;
++	struct sockaddr_in6 sin6;
++	struct sockaddr sa;
++};
++
+ static inline bool netif_is_geneve(const struct net_device *dev)
+ {
+ 	return dev->rtnl_link_ops &&
+diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+index 7350129b1444..ff362d76a0d4 100644
+--- a/include/uapi/linux/if_link.h
++++ b/include/uapi/linux/if_link.h
+@@ -1442,6 +1442,8 @@ enum {
+ 	IFLA_GENEVE_DF,
+ 	IFLA_GENEVE_INNER_PROTO_INHERIT,
+ 	IFLA_GENEVE_PORT_RANGE,
++	IFLA_GENEVE_LOCAL,
++	IFLA_GENEVE_LOCAL6,
+ 	__IFLA_GENEVE_MAX
+ };
+ #define IFLA_GENEVE_MAX	(__IFLA_GENEVE_MAX - 1)
+diff --git a/tools/include/uapi/linux/if_link.h b/tools/include/uapi/linux/if_link.h
+index eee934cc2cf4..894a1aa91133 100644
+--- a/tools/include/uapi/linux/if_link.h
++++ b/tools/include/uapi/linux/if_link.h
+@@ -1438,6 +1438,8 @@ enum {
+ 	IFLA_GENEVE_TTL_INHERIT,
+ 	IFLA_GENEVE_DF,
+ 	IFLA_GENEVE_INNER_PROTO_INHERIT,
++	IFLA_GENEVE_LOCAL,
++	IFLA_GENEVE_LOCAL6,
+ 	__IFLA_GENEVE_MAX
+ };
+ #define IFLA_GENEVE_MAX	(__IFLA_GENEVE_MAX - 1)
 -- 
 2.36.1
 
