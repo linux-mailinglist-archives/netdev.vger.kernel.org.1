@@ -1,175 +1,93 @@
-Return-Path: <netdev+bounces-207898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44047B08F73
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 16:31:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85B02B08F76
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 16:32:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78FBC586C65
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 14:30:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80AA81C425B2
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 14:31:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC4D02F7CF1;
-	Thu, 17 Jul 2025 14:29:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDB292F85D6;
+	Thu, 17 Jul 2025 14:29:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JBIgMhSE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IJMdgrzd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B1E92F7D0D;
-	Thu, 17 Jul 2025 14:29:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA5172F6F9A
+	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 14:29:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752762543; cv=none; b=p53UkEjp/5YS8yNMKmTMKBfdQEcMOJtv6rrfuGfD3ImWLVe2G92FUXuphw1lHk6aZzZpvWXgR4u6h9j9AX5j9Ondaca3/8CIX6qXx8I01iJLFShzJFiem7ojqePNHMZGvruyFIVtmYEl2iRlXiOaGB9s2goDNzR15nmFAVjJZVY=
+	t=1752762593; cv=none; b=itwduFYwM4O7CoxT+cIEZN44w4VvsIMqyY0DZJ/gIFYeYz+nY+Z8XqXTbH4Vo7DpRDxMhoQMI45fIOQGtyoE9X5Ic1Lzy9uGLuHQWm1BDF6bqu4ROD7BH4Mg5ZFwx/mM2AQpfH0zOHjWesO9u0f6P80vP14N+qppNzFtkBfPsZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752762543; c=relaxed/simple;
-	bh=gG1pQuo3681FlNtXtmCgtx9MRugrbwA15ftjuex5B7Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rPwEG9oN8bqg9UZNv1Ho5L/kzJFoYrkycS6v5YVMiON0AH67ZQWPO6XEdK0bO3H3A/nHSugzBjEgk3HDtFSgxydo5T6A1J2Dqq+B8l+1zo4yWXX1HCHlrSEblO4zDYIFq68AJobgmI6UrO6uXj8xrt0C1GBmFcWOaXfufJ5Wkf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JBIgMhSE; arc=none smtp.client-ip=209.85.222.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-87ecdf5f326so1536568241.1;
-        Thu, 17 Jul 2025 07:29:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752762541; x=1753367341; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=GSAFYfPVK6gQeBPeFnr9OOyxIHN3e6W9XaOvPluvrxU=;
-        b=JBIgMhSEw505ge6K+TLm9Jjx6p3uDPQdE32defs9gz0nduaSRAGLzWoULtDV+1NLqG
-         KxsT2nWYXkzQM7sxGWGcpbtiWwiJWoAuGBEQc8JE6fuborf5dDCAUYxAZ0xMRqYV8did
-         0szCo2Em39cZzJ17vsVwqP+YfQqnv75yx8b4OehmHV/RS/53EfUaL67kv4hakWdeN2y7
-         QnkYxJ066kXojvHZLZpUOrvODKPXL+UMyP0+2QbOc64SKuEI/Sw9TBq/q+1yx1haoB9P
-         oWa8vf08O0ikEUN+wRB9XNc5NHAS90VMhFkBxogIiq7cm1BXDHOSCFK3Bv0Wsq3No87E
-         bqQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752762541; x=1753367341;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GSAFYfPVK6gQeBPeFnr9OOyxIHN3e6W9XaOvPluvrxU=;
-        b=GD1wDcqwQ9vpG376cty0yZCkhS55QAUgF5/+FQuFT5NPBdF3AXP6bwYn5wawptWq5V
-         B55XBYen5Pq7IlhYxn0DT277W9qgYiKO+rdKq5nZOlUrLVdjM0O44fdo4fD26IGWMi3c
-         NRpYdgUcIbhrSc3W2s5LNCP8YqtBr2L4hogLxU/ux2qs4XATTtcRbb07AB2iWem5HaVM
-         ENv2dWY5etXif5Y5LOGOPIapqG8mX7spDC7aG5p5CJ93YaD77NFJN52uBQ35nW4QFAMf
-         LCCCLl7qo0MydE9YvkTUlVMRJKYQYrGBxooE7nLqVyVTi+om4Dmje+xj1cQuUea9xluG
-         G8Qw==
-X-Forwarded-Encrypted: i=1; AJvYcCX6I9N4nLGMCc16k5jU79eHAxRsN6QuQrMl1w+TR1hwuaOPwSSclA1Ll4kmra0QUd+Mc+gOats=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxKxk5RaGtE8DxgBgPrhIHEZn8CiV8N1LNR0OIebph4YhfMche
-	rPFyX+Q1nNggFTYISQ7HeRbNOKWJ8gi+/81t9ZHRSZWISJXlI3kp/rHi
-X-Gm-Gg: ASbGncvRObeHB7/n4v9SnkG2v9vonSUIf4MQt/G49cR8Um4jP1mLdjmHm53YUNhgM7+
-	3aqeYZ9DUWaoFiXINerEh8GTyTP+5f2Fd+Vz8E2/Nv3pLW+pA9LGCwkQeBh1yd6QaXSNxum7a+N
-	ocON2Nulx1YoPn9OHagLhVfHd6hFnoC0zZMCjfjQJmpVmxhbLcwh8NNxgKiU1qBgUrvkdt+tq9l
-	GW6LgA3FFegrwmjw33AKTmgmTR0gwVuSeQSPydfmRES4Mey4pqfztQot9uxtPZVysolhYQoh5je
-	4iyOcxDMcZuPM1NMzaDgRUG1fUCutxgmlnLJ5ENMoFR0b5TG1z5rXfANJN75Cm6oVSLeHQVwM/D
-	nnot5x3P08fR45BvnfJ0uO+jBiAF/ISQjthKDFh5x3AeOaPDel5lBxepG7MKQ7Bcm
-X-Google-Smtp-Source: AGHT+IF69VgNAi4Q0G+k2nfVKWOPigu/51+r9uqoaG+TTX/25fIms5cIkv5a41xRKFNLjv931GXFmg==
-X-Received: by 2002:a05:6102:8196:10b0:4e2:e5ec:fa09 with SMTP id ada2fe7eead31-4f996e0f7f5mr1280148137.6.1752762540729;
-        Thu, 17 Jul 2025 07:29:00 -0700 (PDT)
-Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-888ec431c4asm3871552241.22.2025.07.17.07.28.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Jul 2025 07:28:59 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth 2025-07-17
-Date: Thu, 17 Jul 2025 10:28:49 -0400
-Message-ID: <20250717142849.537425-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1752762593; c=relaxed/simple;
+	bh=MQ/V5O4gwMWWZiiQWgLcEa/uMk6GSBagVIe6VFDIR+0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HkL/XQmAh7PKgjdSALr1oeRh+U0lXSAWZDii6tIjXihXyc1L2L/6YCjSNDDfe/aGQHZK0xPtVhRAvzp2QGSTQaRAbZnRFhZ9XepLkGzVtT5gzbVX5iJ0tHnIhachY7rcaeVZpccKqlYgXqzPy0+Spn0ql+U3d38AO2aG1lfrghc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IJMdgrzd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C995EC4CEE3;
+	Thu, 17 Jul 2025 14:29:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752762593;
+	bh=MQ/V5O4gwMWWZiiQWgLcEa/uMk6GSBagVIe6VFDIR+0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IJMdgrzdPS6k5SSgLA/r1SRqj1i6h5d7PqoiQUFITVAd3zPcn9PJIRhansB5qZM7O
+	 XhGSOQmmvOPVBf5+y+ZEzB4jAs8q8mBWeSWxPfTjCB9Vt+1+G0zolH13b8ud0Mpzym
+	 ZoV0ogSgcCMfmE/QF0nUDyckbpJeOyZI6HGuyzr0wmy8UaED6TXgi1QuGtvKN6r0gW
+	 6/P7Gunt4DRCpp3pZ89PZNX8NR+orine35v7uFeqg4kM4a+Gw6kdHDEXOh01TPc4KB
+	 EJMQocNLv7PaKhxPCsRIe+Nh95dItvNJ4rZQvaPS4LohIos9L4XyNaHJByyBZJXrEg
+	 4Ce6yRvOPyZPw==
+Date: Thu, 17 Jul 2025 07:29:51 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Anthoine Bourgeois" <anthoine.bourgeois@vates.tech>
+Cc: "Juergen Gross" <jgross@suse.com>, "Stefano Stabellini"
+ <sstabellini@kernel.org>, "Oleksandr Tyshchenko"
+ <oleksandr_tyshchenko@epam.com>, "Wei Liu" <wei.liu@kernel.org>, "Paul
+ Durrant" <paul@xen.org>, xen-devel@lists.xenproject.org,
+ netdev@vger.kernel.org, "Elliott Mitchell" <ehem+xen@m5p.com>
+Subject: Re: [PATCH v2] xen/netfront: Fix TX response spurious interrupts
+Message-ID: <20250717072951.3bc2122c@kernel.org>
+In-Reply-To: <20250715160902.578844-2-anthoine.bourgeois@vates.tech>
+References: <20250715160902.578844-2-anthoine.bourgeois@vates.tech>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The following changes since commit dae7f9cbd1909de2b0bccc30afef95c23f93e477:
+On Tue, 15 Jul 2025 16:11:29 +0000 Anthoine Bourgeois wrote:
+> Fixes: b27d47950e48 ("xen/netfront: harden netfront against event channel storms")
 
-  Merge branch 'mptcp-fix-fallback-related-races' (2025-07-15 17:31:30 -0700)
+Not entirely sure who you expect to apply this patch, but if networking
+then I wouldn't classify this is a fix. The "regression" happened 4
+years ago. And this patch doesn't seem to be tuning the logic added by
+the cited commit. I think this is an optimization, -next material, and
+therefore there should be no Fixes tag here. You can refer to the commit
+without the tag.
 
-are available in the Git repository at:
+> @@ -849,9 +847,6 @@ static netdev_tx_t xennet_start_xmit(struct sk_buff *skb, struct net_device *dev
+>  	tx_stats->packets++;
+>  	u64_stats_update_end(&tx_stats->syncp);
+>  
+> -	/* Note: It is not safe to access skb after xennet_tx_buf_gc()! */
+> -	xennet_tx_buf_gc(queue);
+> -
+>  	if (!netfront_tx_slot_available(queue))
+>  		netif_tx_stop_queue(netdev_get_tx_queue(dev, queue->id));
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-07-17
-
-for you to fetch changes up to d24e4a7fedae121d33fb32ad785b87046527eedb:
-
-  Bluetooth: L2CAP: Fix attempting to adjust outgoing MTU (2025-07-17 10:26:53 -0400)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - hci_sync: fix connectable extended advertising when using static random address
- - hci_core: fix typos in macros
- - hci_core: add missing braces when using macro parameters
- - hci_core: replace 'quirks' integer by 'quirk_flags' bitmap
- - SMP: If an unallowed command is received consider it a failure
- - SMP: Fix using HCI_ERROR_REMOTE_USER_TERM on timeout
- - L2CAP: Fix null-ptr-deref in l2cap_sock_resume_cb()
- - L2CAP: Fix attempting to adjust outgoing MTU
- - btintel: Check if controller is ISO capable on btintel_classify_pkt_type
- - btusb: QCA: Fix downloading wrong NVM for WCN6855 GF variant without board ID
-
-----------------------------------------------------------------
-Alessandro Gasbarroni (1):
-      Bluetooth: hci_sync: fix connectable extended advertising when using static random address
-
-Christian Eggers (3):
-      Bluetooth: hci_core: fix typos in macros
-      Bluetooth: hci_core: add missing braces when using macro parameters
-      Bluetooth: hci_dev: replace 'quirks' integer by 'quirk_flags' bitmap
-
-Kuniyuki Iwashima (1):
-      Bluetooth: Fix null-ptr-deref in l2cap_sock_resume_cb()
-
-Luiz Augusto von Dentz (4):
-      Bluetooth: btintel: Check if controller is ISO capable on btintel_classify_pkt_type
-      Bluetooth: SMP: If an unallowed command is received consider it a failure
-      Bluetooth: SMP: Fix using HCI_ERROR_REMOTE_USER_TERM on timeout
-      Bluetooth: L2CAP: Fix attempting to adjust outgoing MTU
-
-Zijun Hu (1):
-      Bluetooth: btusb: QCA: Fix downloading wrong NVM for WCN6855 GF variant without board ID
-
- drivers/bluetooth/bfusb.c        |   2 +-
- drivers/bluetooth/bpa10x.c       |   2 +-
- drivers/bluetooth/btbcm.c        |   8 +--
- drivers/bluetooth/btintel.c      |  30 ++++----
- drivers/bluetooth/btintel_pcie.c |   8 +--
- drivers/bluetooth/btmtksdio.c    |   4 +-
- drivers/bluetooth/btmtkuart.c    |   2 +-
- drivers/bluetooth/btnxpuart.c    |   2 +-
- drivers/bluetooth/btqca.c        |   2 +-
- drivers/bluetooth/btqcomsmd.c    |   2 +-
- drivers/bluetooth/btrtl.c        |  10 +--
- drivers/bluetooth/btsdio.c       |   2 +-
- drivers/bluetooth/btusb.c        | 148 +++++++++++++++++++++------------------
- drivers/bluetooth/hci_aml.c      |   2 +-
- drivers/bluetooth/hci_bcm.c      |   4 +-
- drivers/bluetooth/hci_bcm4377.c  |  10 +--
- drivers/bluetooth/hci_intel.c    |   2 +-
- drivers/bluetooth/hci_ldisc.c    |   6 +-
- drivers/bluetooth/hci_ll.c       |   4 +-
- drivers/bluetooth/hci_nokia.c    |   2 +-
- drivers/bluetooth/hci_qca.c      |  14 ++--
- drivers/bluetooth/hci_serdev.c   |   8 +--
- drivers/bluetooth/hci_vhci.c     |   8 +--
- drivers/bluetooth/virtio_bt.c    |  10 +--
- include/net/bluetooth/hci.h      |   2 +
- include/net/bluetooth/hci_core.h |  50 +++++++------
- net/bluetooth/hci_core.c         |   4 +-
- net/bluetooth/hci_debugfs.c      |   8 +--
- net/bluetooth/hci_event.c        |  19 +++--
- net/bluetooth/hci_sync.c         |  63 ++++++++---------
- net/bluetooth/l2cap_core.c       |  26 +++++--
- net/bluetooth/l2cap_sock.c       |   3 +
- net/bluetooth/mgmt.c             |  38 +++++-----
- net/bluetooth/msft.c             |   2 +-
- net/bluetooth/smp.c              |  21 +++++-
- net/bluetooth/smp.h              |   1 +
- 36 files changed, 289 insertions(+), 240 deletions(-)
+I thought normally reaping completions from the Tx path is done
+to prevent the queue from filling up, when the device-generated
+completions are slow or the queue is short. I say "normally" but
+this is relatively a uncommon thing to do in networking.
+Maybe it's my lack of Xen knowledge but it would be good to add to
+the commit message why these calls where here in the first place.
+-- 
+pw-bot: cr
 
