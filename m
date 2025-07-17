@@ -1,96 +1,78 @@
-Return-Path: <netdev+bounces-207996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 023E6B09418
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 20:39:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9B33B0942D
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 20:43:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 256C517B2F7
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 18:39:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65C661C22E65
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 18:43:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A94E3207A20;
-	Thu, 17 Jul 2025 18:39:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACAB2207A20;
+	Thu, 17 Jul 2025 18:43:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vAEc3aHP"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="l6U68Euf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DFDC20ED;
-	Thu, 17 Jul 2025 18:39:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2BC82080E8;
+	Thu, 17 Jul 2025 18:43:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752777586; cv=none; b=D86dlSnQ/ReFBoGdCE3Eh57nB636jPwpXrqSEzmwuWok0mkerIEvCgSs1PXJATMHrvMWODXxO5rS3xKEcmCKR8BdRDwBbfp+UfT3mcfhnGbXl3Dn6T74dCO7VpsDqF4QnoRmvmZQMjOjkVE8+lmwhhMOkYvgNSindUb4GN8w7dM=
+	t=1752777799; cv=none; b=QxBcnWYnCti8XmbJnJzwc6UE4kENwo17tSs6T1BXE7Iuc9iiquF1/Az35014WiaAvMeBobDGastPmfZrHPfvwfSVRXVN6NsoB7P79ES4zbkA2S4+179ckBXeOgvAYXc6240Xc4QUGAre7IFje5ZmRUeP7qhahAGDzhYc1eIuG88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752777586; c=relaxed/simple;
-	bh=yIDpDwqOdxcWlcbJAwGAaOuYScJmwet0ohhW+G52cGc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PPzAo2wYz9MYN4VG6t84OxkTfef06/pBkRraPFLBED0TgVPculgitPlSLC5aKpgAtr0JPW4x8bsV9viFJygwR3bIPKkEjvQD7alb5YbcVEYcGVZpEj/kDqMtkk2gZ/I8NmICWRskPL0G6oCuh8SpEI1PhfgPRMCQm5AkDlwF+cs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vAEc3aHP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E27AC4CEE3;
-	Thu, 17 Jul 2025 18:39:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752777586;
-	bh=yIDpDwqOdxcWlcbJAwGAaOuYScJmwet0ohhW+G52cGc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=vAEc3aHPG2vuslvGAPUQycKmTWThErGerRnmfVBtbH+y6UBSyVbkHbzAA3pbLKSQc
-	 yJIDpmH9I/mpjW7STqxACxl6lSFXVntPq8GMP3JUspSIdzvE05b2SPCQf+gc9kgU73
-	 v8l3hhTxHGnVddGJG5gbQ4er7Vv4NqMSSyVKKnUKQqj4Y6JRzayGxn/CCC0elN+7xX
-	 V7mgG6AapGxm092VTzaAA8AfJ8i/Zralw5uPqcWdvgAOPzDRiSrKDmrM03Ma1smK3J
-	 B5qFeKvF39ZMVJjkW5HFYx7wuJm+lQAJMnlXzZIrc36dd0UQlasLshkw2OIZm902t0
-	 t/GirpIj95yOA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C19383BAC1;
-	Thu, 17 Jul 2025 18:40:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1752777799; c=relaxed/simple;
+	bh=eZquciYh6+vleuLeXd4IYPIBpzHTbHmwoHPNlV4DzOI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=emI8MzkvmyWOnJyuMJqAxck0HFT+UCHpoUpxOG+GWfkKGOQf46toc1D3LUhBIzqk+XldOdAp2VT1Gf9WHib+TJZIj1riB1WINrKML7wy2TclKHe2MevDgwcbYaPoL8FS5N+NQkt1NjO3nvoq35VqekHz4wC/9WgwZkt0TqG10Qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=l6U68Euf; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=3/x82yAFtzziHM7W8fNK7hkRPGR6RbvruwUT9HdauK4=; b=l6U68Euf3t+0Go4pudFdhenDa/
+	SAbohVRDEVKt4Seb5Lv4QX9VdKOGRX3NXPXUkHbpADWg2Y7u0YDUD/xnJDojQQdNIxwUdwJ11UWOu
+	823JBeLpHGtfJ+VXvHtOU0vHZ9e+Wp0no/k9r05ziZNiAU4jfMzKS/U1NKTZunNBlMI4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ucTZT-001v7k-CG; Thu, 17 Jul 2025 20:43:07 +0200
+Date: Thu, 17 Jul 2025 20:43:07 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, Justin Chen <justin.chen@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"open list:BROADCOM ASP 2.0 ETHERNET DRIVER" <bcm-kernel-feedback-list@broadcom.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: bcmasp: Add support for re-starting
+ auto-negotiation
+Message-ID: <c0de05e7-cfe3-40f9-8c8d-8b8fbee235da@lunn.ch>
+References: <20250717180915.2611890-1-florian.fainelli@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next,v5 1/1] doc: xdp: clarify driver implementation
- for
- XDP Rx metadata
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175277760626.2036066.11510521662975521609.git-patchwork-notify@kernel.org>
-Date: Thu, 17 Jul 2025 18:40:06 +0000
-References: <20250716154846.3513575-1-yoong.siang.song@intel.com>
-In-Reply-To: <20250716154846.3513575-1-yoong.siang.song@intel.com>
-To: Song Yoong Siang <yoong.siang.song@intel.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, corbet@lwn.net, ast@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
- sdf@fomichev.me, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250717180915.2611890-1-florian.fainelli@broadcom.com>
 
-Hello:
-
-This patch was applied to bpf/bpf-next.git (net)
-by Martin KaFai Lau <martin.lau@kernel.org>:
-
-On Wed, 16 Jul 2025 23:48:46 +0800 you wrote:
-> Clarify that drivers must remove device-reserved metadata from the
-> data_meta area before passing frames to XDP programs.
+On Thu, Jul 17, 2025 at 11:09:15AM -0700, Florian Fainelli wrote:
+> Wire-up ethtool_ops::nway_reset to phy_ethtool_nway_reset in order to
+> support re-starting auto-negotiation.
 > 
-> Additionally, expand the explanation of how userspace and BPF programs
-> should coordinate the use of METADATA_SIZE, and add a detailed diagram
-> to illustrate pointer adjustments and metadata layout.
-> 
-> [...]
+> Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
 
-Here is the summary with links:
-  - [bpf-next,v5,1/1] doc: xdp: clarify driver implementation for XDP Rx metadata
-    https://git.kernel.org/bpf/bpf-next/c/ef57dc6f52e4
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+    Andrew
 
