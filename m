@@ -1,130 +1,157 @@
-Return-Path: <netdev+bounces-207831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 100D5B08B8B
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 13:10:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36094B08BA4
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 13:21:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E52793A6F38
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 11:10:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E09658576C
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 11:21:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4866D299A80;
-	Thu, 17 Jul 2025 11:10:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D4F28D8F8;
+	Thu, 17 Jul 2025 11:21:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="faZP6oRv"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="PccVvAbz"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE68262FC2
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 11:10:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28DDD145B27
+	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 11:21:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752750634; cv=none; b=Za7WIkDzy3aTUyqM2XvxkKmhIBHt9x0rMULAgXwhNTqp43HfWFlmaWbBognouZaZAJqRD39ViAFiRGN/N6nuB0kjXxuH6i8jbIHtko4MqNtl29dNDer8tR1/vQeUPfGqVmqJpwFKrvUithDkDjaDFe89+TywIafFfSFGXZcMFeM=
+	t=1752751291; cv=none; b=Ngd75SZAfyarx2fvSVR9kdq+TTA3fDKHFrFxzvNmNWNIcycGbT12HjFKRgRrsyC2q7iWy8RIvU9iHUi8tdGKSpDpQ1CIwxD7KPuhsbhzW3v+jz/1tsC/OIvFdDgyQtl2iKtj/oY4ARfEpTnJuLundwZVcCpvf/jFnVnI0p9PdIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752750634; c=relaxed/simple;
-	bh=o9DguUFd9ulRr/nGZ83LjaBmOxL8fPbmtWacXgwjtWA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OMl8v2u2z8vOgQElte1fFKFoYPzVHcNKb2VUbuDb5PFNZKl7LngBGvleYhq4yG5b/2Bo13onSh77twD8+dH9u76fdKTY1inB37iEam50+WU87EhlVcZh8NZvcfH3h5Sf+GQhp1TuGjk86FxAbkVNID0U0XtfMawR0YP1KZHwE/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=faZP6oRv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752750631;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mcuwFP2i4FlUn9FFKBy/90wO5gqfwimly/CV8vM4gi8=;
-	b=faZP6oRvZllCHZ2BIyg9npqUkUKxbYXyU2EMHfW4XfV3o3wYGfRyc87mv9BdcPUrsR0N8z
-	YfCErjllDb4c4AL+ewFJZO7EF2HW+3ObRFCIsNN6Y2rya9k8Q3eumT3XFwHjHjaL6ra/Gm
-	8I1An+c9d3+m3FAU2zbYRG8FTqd/yy4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-223-X4Iynjn9NfaGEFsu2dnycA-1; Thu, 17 Jul 2025 07:10:30 -0400
-X-MC-Unique: X4Iynjn9NfaGEFsu2dnycA-1
-X-Mimecast-MFC-AGG-ID: X4Iynjn9NfaGEFsu2dnycA_1752750629
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-454dee17a91so6935615e9.3
-        for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 04:10:29 -0700 (PDT)
+	s=arc-20240116; t=1752751291; c=relaxed/simple;
+	bh=yce9Tv2qC5Lz8GYW5G1Pkcw/EVDTDGEGs/HV9kXUJv8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ak77nsUG3NLtCsdUWlTnf4Z3Io82avIEhZH8kiTEGj2EQmSgpzfOid8uspOl1ZOcb/FLZ2U4jQfYgJBrjA+11byO/0MPI7cBZVPOd/B1iaC+SVr5AgtJV4jFfw8nQDdBHz88Iq2EO34mZVmWnQJA/zy7ImwC6yhX1Urt7p3zqX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=PccVvAbz; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-60c5b8ee2d9so1685483a12.2
+        for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 04:21:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1752751288; x=1753356088; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EZYyI6QiKM293rZOzyhMZk4XJt0FqeuxrWWfI/g5n1I=;
+        b=PccVvAbzzsng2f4nve+E3Dxjy+cZ+yvjx28qkc7L5/w79g2XhBOVc9Kb0xIcrmGmW2
+         fSSJeXwZl5JhgNSGWnDJqjYhBtMz051BIEaUMEa59VTvw/QehQuzt32g0zxqWlqWxy+x
+         YF2BCUCya9X+4sIGNiH9VjHhLpfcQG8yxVayurn1FtJDmqNCRJkOR8pZ0v1QC2T6pLVs
+         /wBAKiF53j5MT0X1alRYCP3T1qgG76GMJSCyOMkTkClZTN///CUUK4FC1IYvaNvrph72
+         W2Dfzo72WrgHerHSstgNtzfADhdYjPKtG/kRlnyjP+QR3WK7KqGnND5NhxK5yb0s2chn
+         90fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752750629; x=1753355429;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mcuwFP2i4FlUn9FFKBy/90wO5gqfwimly/CV8vM4gi8=;
-        b=UjpY9VQgZQlbjZ0vsHWRJ/QcKGybqt8937mx0HpxyUIh2znosRSzYG5lTKw3Xl0XDX
-         rsz978zn9c6BSL+9yjF9TcuEbEeGlo8QMD4p7/7i6kr1KAJLkTJ5Wod54Mxy+v8Ii27f
-         /EzZC+c70VbamgDHcDuXb3Ume+y4edBQrd576Blvhbj3xNWOOeJTL19sX5x+qrNpXD+M
-         6n2Q7ReizzgK4Sb+aYMdfaYXF+9QX3psQHxrjCVOabB/CWtoqXJn8WULeCk0qz3sS9pV
-         JBzeI6d9+Ckhh4d5wmAkGHF2oTlAZHxC/4YpxKkaRpMp+VrlZRxrR6sSoa/vZj18dcZk
-         uhCw==
-X-Forwarded-Encrypted: i=1; AJvYcCWt+nkr0jJ6SbK0PlFuYYTzeowurUMZ6jRnHt2Q5pORPI8urDbQkKizP6GOF0vVVbu9zOSzkdM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDBL23iwHUVpEFfdjLSIOHWa2qOz0Ld3f/bAPk0vNGe1Gc+FsM
-	wvw/CD71B2NtzahaJ603XtdrNYt6rcLTB19azEkaR+G7/UU0k0+H0DVb/AYGb92QlY9640o8IOS
-	bfe4SzxUmxie9f52F0O3XRa9EIW+khXGlv81vyYQRWjojJiiSwIIVNZ6g4A==
-X-Gm-Gg: ASbGncuw+aZdzU+OI7oZLIwoC9SBCiHRlVUKkcErsKGXrw6Ab74oBFX120/XmRALEDv
-	qTEonNVzRgNMY9uFGd0R6Oz/Asymfsqn/LEbY0oKLnTg7FIb3OX97IHChnneLkALnQmKJSqrV8Z
-	BLtzt26zAYcRks/hBXWBnNZMh1FYIYWGfHH+32Ryy011LrFsxptVZfnZM7gTP+zy9tGVDoHCMoh
-	fFKHQ7itSoSoYNqSByAS7lwGsh74XlbbPAjEmbXjPE4mbdHrk0fyVWxd7vkfO1KlJNQTct7you5
-	lVGU+i2cSIdpkAyh1RB6rh+eAxuO9m69oqzdKn+mWUkL3y0hqbsfBcs+nnIbImxwQAWAOPXas/h
-	X79IgEsSyFfI=
-X-Received: by 2002:a05:600c:3b11:b0:456:1dd9:943 with SMTP id 5b1f17b1804b1-4562e364923mr61991215e9.3.1752750628843;
-        Thu, 17 Jul 2025 04:10:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHxXKe1dFz2jXXAF/w6N+sF1RD95sU2Z+R0uSK0mMsz4eDz0ygxowQ/EwGBBRV415p8rq+tCA==
-X-Received: by 2002:a05:600c:3b11:b0:456:1dd9:943 with SMTP id 5b1f17b1804b1-4562e364923mr61990895e9.3.1752750628413;
-        Thu, 17 Jul 2025 04:10:28 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45627898725sm53301605e9.1.2025.07.17.04.10.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Jul 2025 04:10:27 -0700 (PDT)
-Message-ID: <0f6e9770-1c79-418e-9135-df692f495a91@redhat.com>
-Date: Thu, 17 Jul 2025 13:10:26 +0200
+        d=1e100.net; s=20230601; t=1752751288; x=1753356088;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EZYyI6QiKM293rZOzyhMZk4XJt0FqeuxrWWfI/g5n1I=;
+        b=FRFklPhbwO9UkiOsqBmjIV0C0uSMXjQhBJifwhDAIrIMPXW6DpKIS3ShMz78ev1iEs
+         MMilUoyzatU+ON523QAaQE48CapVyjHQ0U+WdzJX54dtiq6GvTyHg5FZU7f2CSR9GDTY
+         zsTXmFJ6KY36q6sZotCLzWcR+pCyvaeBklooPJKsQChbhkSr2BvRe6ukvDefrtoufJLs
+         qbE9KqlxK95S5ldZgfg4LLOQ8uSTY7sQAb46JFOd2aMUqtacnQEojp3GB50BlYvca0rU
+         sVCtBQdcIb32I/7xl5S97Zw7kSnWjbfqPrns7IcGRknUp2jc7WkBj6Md1omERQf693xn
+         xySw==
+X-Forwarded-Encrypted: i=1; AJvYcCWZqvzX9U3Dmb8v7XKoLdrO21K27GhVsa/3+JbqUlRrOKAp88rDX2OsEnLNUUmRqMCDqKH/QS0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDRXQ/uc480O3z9GVWz08qSTS4to6li/ATK7GslrQ/FVnSihqN
+	LCayIAEbcvlrYTBu7+wHKJk2zOtpS/eEIeoXeDFjwt0wrXd1uBIXLpTqqvULpuiAXr8=
+X-Gm-Gg: ASbGncuBu0p55+13iZa16WdBzlKG3epnx/cvNNnYobbTTfitiiryu0ZZG5b2CBa6rN1
+	Qcy6HDkzOh5vKZdeh9b6mqjdzCqOSAyIvkCoSyYhkF9fT1kqb3OU7XXaFtTkEVrAA1NlInKAE+e
+	kDssKJSoV33+rua36Z1WvcFzq2pQ772Y2ah7oJkDyb2XwaMFgonMYdckBNq+BScSUSRiqlGQitm
+	k+TZnOdFVrPtsxlnqxF1UgOCWsOq4KGZ0/1jT2OiLIWFhiQYXoN3rJvEQ1AZAt1lEEoEMm1uxSp
+	+9dgB/hEc1J1+FSXCDxzSh/tut7z+/kwrCrmkb5lrbH4gWJEe84t1NPtxSzR+3zUgCklvQXIgPt
+	cKt0pNWOWZzV6Crk=
+X-Google-Smtp-Source: AGHT+IGVnANx8nLfm/8Y12a9myx+ZNBG7W+NCDHR5ll6pD2Ki1nT/qqtObhiE/yuAntTogF0ndLVbw==
+X-Received: by 2002:a05:6402:27c9:b0:612:a507:5b23 with SMTP id 4fb4d7f45d1cf-612a5075deemr2294587a12.11.1752751287927;
+        Thu, 17 Jul 2025 04:21:27 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:e5])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-611c94f2c0fsm9893900a12.15.2025.07.17.04.21.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Jul 2025 04:21:26 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Eric Dumazet <edumazet@google.com>,  "David S. Miller"
+ <davem@davemloft.net>,  Jakub Kicinski <kuba@kernel.org>,  Neal Cardwell
+ <ncardwell@google.com>,  Kuniyuki Iwashima <kuniyu@google.com>,
+  netdev@vger.kernel.org,  kernel-team@cloudflare.com,  Lee Valentine
+ <lvalentine@cloudflare.com>
+Subject: Re: [PATCH net-next v3 2/3] tcp: Consider every port when
+ connecting with IP_LOCAL_PORT_RANGE
+In-Reply-To: <87qzyfdue6.fsf@cloudflare.com> (Jakub Sitnicki's message of
+	"Thu, 17 Jul 2025 11:44:01 +0200")
+References: <20250714-connect-port-search-harder-v3-0-b1a41f249865@cloudflare.com>
+	<20250714-connect-port-search-harder-v3-2-b1a41f249865@cloudflare.com>
+	<00911a84-c4e3-452e-ab51-1275a43ca4b2@redhat.com>
+	<87qzyfdue6.fsf@cloudflare.com>
+Date: Thu, 17 Jul 2025 13:21:24 +0200
+Message-ID: <87ecufdpvv.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: skmsg: fix NULL pointer dereference in
- sk_msg_recvmsg()
-To: Pranav Tyagi <pranav.tyagi03@gmail.com>, john.fastabend@gmail.com,
- jakub@cloudflare.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, ast@kernel.org, cong.wang@bytedance.com,
- netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev,
- syzbot+b18872ea9631b5dcef3b@syzkaller.appspotmail.com
-References: <20250715081158.7651-1-pranav.tyagi03@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250715081158.7651-1-pranav.tyagi03@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On 7/15/25 10:11 AM, Pranav Tyagi wrote:
-> A NULL page from sg_page() in sk_msg_recvmsg() can reach
-> __kmap_local_page_prot() and crash the kernel. Add a check for the page
-> before calling copy_page_to_iter() and fail early with -EFAULT to
-> prevent the crash.
+On Thu, Jul 17, 2025 at 11:44 AM +02, Jakub Sitnicki wrote:
+> On Thu, Jul 17, 2025 at 11:23 AM +02, Paolo Abeni wrote:
+>> On 7/14/25 6:03 PM, Jakub Sitnicki wrote:
+>>> Solution
+>>> --------
+>>> 
+>>> If there is no IP address conflict with any socket bound to a given local
+>>> port, then from the protocol's perspective, the port can be safely shared.
+>>> 
+>>> With that in mind, modify the port search during connect(), that is
+>>> __inet_hash_connect, to consider all bind buckets (ports) when looking for
+>>> a local port for egress.
+>>> 
+>>> To achieve this, add an extra walk over bhash2 buckets for the port to
+>>> check for IP conflicts. The additional walk is not free, so perform it only
+>>> once per port - during the second phase of conflict checking, when the
+>>> bhash bucket is locked.
+>>> 
+>>> We enable this changed behavior only if the IP_LOCAL_PORT_RANGE socket
+>>> option is set. The rationale is that users are likely to care about using
+>>> every possible local port only when they have deliberately constrained the
+>>> ephemeral port range.
+>>
+>> I'm not a big fan of piggybacking additional semantic on existing
+>> socketopt, have you considered a new one?
+>
+> That's a fair point. Though a dedicated sysctl seems more appropriate in
+> this case. Akin to how we have ip_autobind_reuse to enable amore
+> aggresive port sharing strategy on bind() side. How does that sound?
 
-Interesting. I thought the sge in this case are build from the kernel, I
-did not expect a null page to be possible. Can you describe in the
-commit message how such bad sges are created?
+Thinking about this some more - if we're considering a dedicated sysctl
+guard for this, perhaps this merits giving a shot to the more
+comprehensive fix first.
 
-> 
-> Reported-by: syzbot+b18872ea9631b5dcef3b@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=b18872ea9631b5dcef3b
-> Fixes: 2bc793e3272a ("skmsg: Extract __tcp_bpf_recvmsg() and tcp_bpf_wait_data()")
-> Signed-off-by: Pranav Tyagi <pranav.tyagi03@gmail.com>
+That is to update the inet_bind_bucket state (fastreuse, fastreuseport)
+on socket unbind to reflect the change in bucket owners. IOW, pivot to
+one of the alternatives that I've highlighted:
 
-Does not apply to net. Please rebase and resend, adding the target tree
-in the subj prefix and specifying a revision number.
+| Alternatives
+| ------------
+| 
+| * Update bind bucket state on port release
+| 
+| A valid solution to the described problem would also be to walk the bind
+| bucket owners when releasing the port and recalculate the
+| tb->{reuse,reuseport} state.
+| 
+| However, in comparison to the proposed solution, this alone would not allow
+| sharing the local port with other sockets bound to non-conflicting IPs for
+| as long as they exist.
+| 
+| Another downside is that we'd pay the extra cost on each unbind (more
+| frequent) rather than only when connecting with IP_LOCAL_PORT_RANGE
+| set (less frequent). Due to that we would also likely need to guard it
+| behind a sysctl (see below).
 
-Thanks,
-
-Paolo
-
+Right now the inet_bind_bucket fastreuse{,port} state is being
+mismanaged, IMO. This would be the fix for the actual root cause here.
 
