@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-207673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11C7EB08289
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 03:40:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65BE1B0828C
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 03:40:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B254D5605A6
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 01:40:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B085C583EC0
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 01:40:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D4E21F1505;
-	Thu, 17 Jul 2025 01:40:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C27DA20468E;
+	Thu, 17 Jul 2025 01:40:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OtQ2rWi2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ldqfj47U"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB5C1EE02F;
-	Thu, 17 Jul 2025 01:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BB8F1EE02F;
+	Thu, 17 Jul 2025 01:40:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752716403; cv=none; b=VOu/H2x7jnBQ71DjULMjDa5PGLpK5/kDFxvdSElFgeW45ZSjjFS4VlTBxY60tDWMnMsgX6xKBoROSn6IK7oh+PH6/JtXjM8m5grtLR6V70oIGe6tgaxXfbHKOyw9qkkKxTBL/i1o6wdMN7Hi9Aq1qUPIIlZ2jJy1H2JD/Yefbzc=
+	t=1752716407; cv=none; b=WCGqq0+LiG/s4YZ/CsCs1XdDLsqbuEPaRF7WH8Oewo4Zlntw5GJbgJXJjA2EvraAT2P4LLlw+3Ty/bAyVEQuo/SSUGXtYrHjlDZZNxYoX+JNlloOcJDlCHTcq0OY7pTk+heD9M02t5piMI/F5x784HXCjCqSwMy7JHyggDeOIVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752716403; c=relaxed/simple;
-	bh=eWAwC1GBJWP4MMsdwqJNitn5FU+zU5RAmgOfK+oLt6U=;
+	s=arc-20240116; t=1752716407; c=relaxed/simple;
+	bh=wZEtqFP7aHwbWMq++OgwAQHYQAR8dahj6q0fkSQ3q2k=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Gx/sk7NtgjWQTQsp1fn58cIYyNQUe3vD1JtuYt2mj7IqL8oBj600D42g4w4iX1H5y0BxLjd+9vCcJKKOBj4mK954uuPiPWrre2BrAUO7HzGrgmYGBNnr9woJ9gZfkT5+rZWSK1hRUsoFQjb1iLPrkFsNBBjnLFgJlbfXt9HuA6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OtQ2rWi2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A8B7C4CEF0;
-	Thu, 17 Jul 2025 01:40:03 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=hsOwF7NrL2uytTAXZmilRbX1Wc8yk2ssbwHOGWA50moTnWZMOJi53ZQRGN+4QWUBnuDoNYJ1vTZDjHt/lNlZN/fy4KytT9ayip53MB49Q56FKwNdW1GeXjFbDPynWJRtgX/333JcIxN6BO1YgkGhQ3sx+JF1lmJisjxrCw6mJck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ldqfj47U; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BE12C4CEE7;
+	Thu, 17 Jul 2025 01:40:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752716403;
-	bh=eWAwC1GBJWP4MMsdwqJNitn5FU+zU5RAmgOfK+oLt6U=;
+	s=k20201202; t=1752716407;
+	bh=wZEtqFP7aHwbWMq++OgwAQHYQAR8dahj6q0fkSQ3q2k=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=OtQ2rWi2AD19Sxm7KcYKZFZWeKSQ1W5wme+BgWW9eF8Yn4jhJQtmlnQa7H5vH5WV9
-	 R1F9oqLeHiG1uYeGU41To4wozRBRXUs7Dc8+mmyfJH8kSwh+GQYb+8Fv8BGb7aVdBj
-	 uMIx/ywBAl1ENrJTrRALWEWjH6GgB8p/aC9VZzSNN3TVA+jgstYgK6kvlJLAh8hdSr
-	 WKu3ald6c4vwduyJQvc4msVUM1g8OvYGuQ7n3yRQW4+RScotFsdrWcP8NfTjmyB1MN
-	 x9ZTFK9fbTVm4S/EqbajhZd8Wr5YEcmDFoVe/AyXDl972If3hPWjDYrhakkPoy/UrV
-	 xgPgUxC1P+Vtg==
+	b=ldqfj47UkfhunCEBN+Oybom1G+4e5Zf4jQ14RVhCB4aJJpw1EhMaNuJ5GM2tUrXwo
+	 daaL/DVgINDyVYCZF5PDqfUkHHxbaUGGR538RBjev/9AI1rBDjR4C3mjGhMRLVsm2E
+	 pKEbmbNmcWyHQ9ib2hiZKvY9gYtsAXYzeL+1KomyZiPrhAH/qu9tGW24oFF2Q1KxV6
+	 XSD+IEx9ui+BkYjerc6n6sOX/aKHVWas0GYcyVLgvRvCHI1tNjPyR1EnuttgvKOgEq
+	 +v45+WSrgNyOcGvHr4wDMes9w4AU7kJOx7OM4wlgkLA0oUFaulYQ7T4em6xAHCsWvD
+	 JNKx3qH4CGPhw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC62383BA38;
-	Thu, 17 Jul 2025 01:40:24 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADF8383BA38;
+	Thu, 17 Jul 2025 01:40:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 bpf-next] bpf: Clean up individual BTF_ID code
+Subject: Re: [PATCH net] ipv6: mcast: Delay put pmc->idev in mld_del_delrec()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175271642326.1391969.12291957818977082467.git-patchwork-notify@kernel.org>
-Date: Thu, 17 Jul 2025 01:40:23 +0000
-References: <20250710055419.70544-1-yangfeng59949@163.com>
-In-Reply-To: <20250710055419.70544-1-yangfeng59949@163.com>
-To: Feng Yang <yangfeng59949@163.com>
-Cc: martin.lau@linux.dev, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
- mattbobrowski@google.com, rostedt@goodmis.org, mhiramat@kernel.org,
- olsajiri@gmail.com, bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org
+ <175271642749.1391969.4135059292314627486.git-patchwork-notify@kernel.org>
+Date: Thu, 17 Jul 2025 01:40:27 +0000
+References: <20250714141957.3301871-1-yuehaibing@huawei.com>
+In-Reply-To: <20250714141957.3301871-1-yuehaibing@huawei.com>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, ap420073@gmail.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to bpf/bpf-next.git (master)
-by Alexei Starovoitov <ast@kernel.org>:
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 10 Jul 2025 13:54:19 +0800 you wrote:
-> From: Feng Yang <yangfeng@kylinos.cn>
+On Mon, 14 Jul 2025 22:19:57 +0800 you wrote:
+> pmc->idev is still used in ip6_mc_clear_src(), so as mld_clear_delrec()
+> does, the reference should be put after ip6_mc_clear_src() return.
 > 
-> Use BTF_ID_LIST_SINGLE(a, b, c) instead of
-> BTF_ID_LIST(a)
-> BTF_ID(b, c)
-> 
-> Signed-off-by: Feng Yang <yangfeng@kylinos.cn>
-> 
-> [...]
+> Fixes: 63ed8de4be81 ("mld: add mc_lock for protecting per-interface mld data")
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+> ---
+>  net/ipv6/mcast.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [v2,bpf-next] bpf: Clean up individual BTF_ID code
-    https://git.kernel.org/bpf/bpf-next/c/62ef449b8d8e
+  - [net] ipv6: mcast: Delay put pmc->idev in mld_del_delrec()
+    https://git.kernel.org/netdev/net/c/ae3264a25a46
 
 You are awesome, thank you!
 -- 
