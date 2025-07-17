@@ -1,139 +1,291 @@
-Return-Path: <netdev+bounces-207678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDABCB082C4
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 04:13:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA281B082C6
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 04:14:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 86B9F7A4F4A
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 02:11:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CDB0E7A0685
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 02:12:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D769C1C8633;
-	Thu, 17 Jul 2025 02:13:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7025F1DC9B1;
+	Thu, 17 Jul 2025 02:14:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kF8JTYY2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 195E3155A59;
-	Thu, 17 Jul 2025 02:13:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.30.148.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F1BE1799F;
+	Thu, 17 Jul 2025 02:14:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752718384; cv=none; b=AdtGn4+MIeK5ZFm7q5K6EwxmhUOz5JRA1u7RVq9VG0PzkkIMV2SQzPdNw2CVmLaus8WCYdFauNUvs1+4hHlErAEiQA4zHe/NRLWTjrthvpU9nrXlvzQrDxi7u4YfXrJqOYrFtZISrVl4wh2CgjMQ65DHGjbQrndNIiWUt46BHdY=
+	t=1752718452; cv=none; b=ATF3cq8Ydc3VsZDJBseKnfl+rtBCfc2LFTfugLW3bDba0qNhL4GbGg8Q+s4lQjrlphlcw42WFTUbLG3wn2jbNBfepzS2IVxbwg/ajplVbZgEo5rsCYJ9bViZoCku7nvVLpSQK51OqkdWPJs07sz65W9azFKXb62PsXuKbe/kcu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752718384; c=relaxed/simple;
-	bh=9NhBKwyrzpmtVxgSk23CnQtxjPIyKvPPzUT0pV/3PCE=;
-	h=Date:Message-ID:In-Reply-To:References:Mime-Version:From:To:Cc:
-	 Subject:Content-Type; b=Vpuiofq04j3QUfSVLWXanAbYAdRwNqByffC3lv+ZmBALiHXxuJSrwZHb8m+L8Dx/o9enZtv9pdmvyWx+mHqj7A7Plp5pOt+60v13D75zR1eUIarAZysJhyd65tfnvvbDkPB5QURey1hauVMYlX73nVhBjBUHtlEe2/vQdPuqeVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=160.30.148.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4bjGfX523rz6Fy5l;
-	Thu, 17 Jul 2025 10:12:52 +0800 (CST)
-Received: from xaxapp01.zte.com.cn ([10.88.99.176])
-	by mse-fl2.zte.com.cn with SMTP id 56H2CeDM090833;
-	Thu, 17 Jul 2025 10:12:40 +0800 (+08)
-	(envelope-from fan.yu9@zte.com.cn)
-Received: from mapi (xaxapp02[null])
-	by mapi (Zmail) with MAPI id mid32;
-	Thu, 17 Jul 2025 10:12:41 +0800 (CST)
-Date: Thu, 17 Jul 2025 10:12:41 +0800 (CST)
-X-Zmail-TransId: 2afa68785c19ffffffffe26-47038
-X-Mailer: Zmail v1.0
-Message-ID: <20250717101241665SpBGi_zaErkDSM2Rgmx3o@zte.com.cn>
-In-Reply-To: <CAAVpQUCDJOnwRhjcwFke2vTZQ8rymopC3hpyPteLA3cRgXFz9Q@mail.gmail.com>
-References: 20250716100006458kPWBPIJB6IdzWuUKlv4tF@zte.com.cn,CAAVpQUCDJOnwRhjcwFke2vTZQ8rymopC3hpyPteLA3cRgXFz9Q@mail.gmail.com
+	s=arc-20240116; t=1752718452; c=relaxed/simple;
+	bh=NNZ6/kasUwk/hZWeuRAfx2RCB4CBwevaseL0TdeUHMQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=T21cijeTa/AJYJfWXM6FubuA4EmV9konhQIRlLKMcTNWVmuOXXhgvV8XFt866BSeJ96hG6PGfQP8c3t3ZFJ3H/1sDJFmpZlq6YuhFCUKv2LTUZsbG17HzuI15s4C0aQY6YyU1/PCufGylL10bFqEgI4PkG8Q6sxN+BgkZ/WkqZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kF8JTYY2; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4555f89b236so3815215e9.1;
+        Wed, 16 Jul 2025 19:14:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752718449; x=1753323249; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NjNilefCSmvk4mMPEA0XCD7CKf2tWX4gBv20NnzP/qk=;
+        b=kF8JTYY21oo5YRagIKOupi+RdTYTdLYl/EbttfDBWxnNo/II9JSsY0BhnIMFMD5qc2
+         lM4MOhSME7PuayMcRhnyPgLsIkZ45OldIcyP1VUdtf4vQIy0P2Of/rGHMeWbpclf4JMG
+         nfX+zc+1/BWA71sWJjpHGlcNuCbKucmGy/eP79murlqZEePlJwkcPdqbUSeTABVaUE+X
+         MtwrLOi9wmA8wasQaQE3KDPpNZhQ/FgZI/rkYfR4B+S50XjRXSGTVP7Xrx3CyTwOXKX+
+         0CPyyEqWfJbQ7tplLv9iNU5JX63GR+Jl5OjV+P1q9KDXe3wWHcyEMFSggOrrH6JdY+oE
+         h84Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752718449; x=1753323249;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NjNilefCSmvk4mMPEA0XCD7CKf2tWX4gBv20NnzP/qk=;
+        b=LQc6qH3+4DV5zGriAAAYf8OKKHIh21O8fhsb7Z7B+vjIOX/znV2zUh7T1oDtwJ+ADR
+         Yb0Ovoxh4Y58X0mFASHMGymxmfTxiHh2R1Z0D1QXDkpOpPeObkMJDPyxrcXYwzINMF3H
+         yT6Zd91+kQxL6Yc6GbW8wEE/yt9rblEMCwtQXaJoCzfK6nHkboiIFLFx/GpktfOhABaE
+         MRW2V1+x7BUM6cFC9Vtpxngs8fFDhxhEtPzG0wYgwDL9WadCZDHKFB/ScYn3zMIQEhr1
+         PvqcQtbldgXQn12yjBUh1AjqItQmZIoYX8pR0M/V5D+wJGdh0wJeDSxblV6Wn1uFOiZE
+         uoFA==
+X-Forwarded-Encrypted: i=1; AJvYcCU8fTeP2/85gyblycZ6OBzoS9MhvZ54C+E3CN5Q+dosXG42AUr2KcLuEsoFFJ3Rq71ewsNOZyjH@vger.kernel.org, AJvYcCUHvZuGk3hljD7vHI1zM23UJ7TWNdEKCa2gDjruOKUzOF+RrOySQgYdzugvc4XxgrWYNM4=@vger.kernel.org, AJvYcCUdPmJQsQZ8ImjoCxU95hdTHjNay5G+ch7loRqsPftDmWpqyxK+Yo34tn5W8s7tBxryidk0ZRYxa3B5KVsp@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9R8KdLJRkhT1NGawoe1BlMVzlg/vWYH2FyEzGiMH+YNlGUhi4
+	nzxkVTWE1hF3rX05qCM7ZyYZgTMXqS4i1oj2B/uDcV46Nlf/4VfqoolRK65AhjxLx3rRNF+7UGx
+	pcMecUzVxFc4WAqx6qn+2KWVqxwMq8M4=
+X-Gm-Gg: ASbGncscIZMDowvxl7VW6h6Adx3CwEZ2oKrr9WwldHvLDXFvtYUhfAeBpW1kUeVuR/h
+	7DhgTf+P68kznNLzY0d2gGq21+Uk0JahTVwtrAfT3+08fTOOnM51oykc+NjEYtZ8NVcIQQEpvI7
+	fnU00mqi0Qqtjth9/S58dONT1HZkXwNKfIVHPBdLgq0prE+ABSyPx12qYZPiSY4GReBWI5bLR8E
+	CsYSUzpqkSlFtF7MSup7Y/qOlzQz8CCtj8T
+X-Google-Smtp-Source: AGHT+IG7qcWBIreCgk1dBskqFfxB/PSeNs/NhA2CiS3i01oxXcftRaFwDe8kMJ96PtDdc00HtE3I9FqTYcRCTAKA+aM=
+X-Received: by 2002:a05:6000:1447:b0:3b3:1e2e:ee07 with SMTP id
+ ffacd0b85a97d-3b60e53fa01mr3918900f8f.56.1752718448513; Wed, 16 Jul 2025
+ 19:14:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <fan.yu9@zte.com.cn>
-To: <kuniyu@google.com>
-Cc: <kuba@kernel.org>, <edumazet@google.com>, <ncardwell@google.com>,
-        <davem@davemloft.net>, <dsahern@kernel.org>, <pabeni@redhat.com>,
-        <horms@kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>,
-        <yang.yang29@zte.com.cn>, <xu.xin16@zte.com.cn>,
-        <tu.qiang35@zte.com.cn>, <jiang.kun2@zte.com.cn>,
-        <qiu.yutan@zte.com.cn>, <wang.yaxin@zte.com.cn>,
-        <he.peilin@zte.com.cn>
-Subject: =?UTF-8?B?UmU6IFtQQVRDSCBuZXQtbmV4dCB2Nl0gdGNwOiB0cmFjZSByZXRyYW5zbWl0IGZhaWx1cmVzIGluIHRjcF9yZXRyYW5zbWl0X3NrYg==?=
-Content-Type: multipart/mixed;
-	boundary="=====_001_next====="
-X-MAIL:mse-fl2.zte.com.cn 56H2CeDM090833
-X-TLS: YES
-X-SPF-DOMAIN: zte.com.cn
-X-ENVELOPE-SENDER: fan.yu9@zte.com.cn
-X-SPF: None
-X-SOURCE-IP: 10.5.228.133 unknown Thu, 17 Jul 2025 10:12:52 +0800
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 68785C24.001/4bjGfX523rz6Fy5l
+MIME-Version: 1.0
+References: <20250703121521.1874196-1-dongml2@chinatelecom.cn>
+ <4737114.cEBGB3zze1@7940hx> <CAADnVQJ47PJXxjqES8BvtWkPq3fj9D0oTF6qqeNNpG66-_MGCg@mail.gmail.com>
+ <3364591.aeNJFYEL58@7940hx>
+In-Reply-To: <3364591.aeNJFYEL58@7940hx>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 16 Jul 2025 19:13:57 -0700
+X-Gm-Features: Ac12FXw4JUJq6YBPrSr49kCIUdQy_pin-_FqDdbtJFi1xmncZx1ElJ_QmUaIJ1c
+Message-ID: <CAADnVQLpAmZG_1827HS1dDaWBGraxY6UO92=tCX6eM9ZbqEBKQ@mail.gmail.com>
+Subject: Re: multi-fentry proposal. Was: [PATCH bpf-next v2 02/18] x86,bpf:
+ add bpf_global_caller for global trampoline
+To: Menglong Dong <menglong.dong@linux.dev>
+Cc: Jiri Olsa <jolsa@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Menglong Dong <menglong8.dong@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	bpf <bpf@vger.kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	LKML <linux-kernel@vger.kernel.org>, Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Jul 16, 2025 at 6:51=E2=80=AFPM Menglong Dong <menglong.dong@linux.=
+dev> wrote:
+>
+> On Thursday, July 17, 2025 8:59 AM Alexei Starovoitov <alexei.starovoitov=
+@gmail.com> write:
+> > On Wed, Jul 16, 2025 at 6:06=E2=80=AFAM Menglong Dong <menglong.dong@li=
+nux.dev> wrote:
+> > >
+> > > On Wednesday, July 16, 2025 12:35 AM Alexei Starovoitov <alexei.staro=
+voitov@gmail.com> write:
+> > > > On Tue, Jul 15, 2025 at 1:37=E2=80=AFAM Menglong Dong <menglong.don=
+g@linux.dev> wrote:
+> > > > >
+> > > > >
+> > > > > On 7/15/25 10:25, Alexei Starovoitov wrote:
+> > > [......]
+> > > > >
+> > > > > According to my benchmark, it has ~5% overhead to save/restore
+> > > > > *5* variants when compared with *0* variant. The save/restore of =
+regs
+> > > > > is fast, but it still need 12 insn, which can produce ~6% overhea=
+d.
+> > > >
+> > > > I think it's an ok trade off, because with one global trampoline
+> > > > we do not need to call rhashtable lookup before entering bpf prog.
+> > > > bpf prog will do it on demand if/when it needs to access arguments.
+> > > > This will compensate for a bit of lost performance due to extra sav=
+e/restore.
+> > >
+> > > I don't understand here :/
+> > >
+> > > The rhashtable lookup is done at the beginning of the global trampoli=
+ne,
+> > > which is called before we enter bpf prog. The bpf progs is stored in =
+the
+> > > kfunc_md, and we need get them from the hash table.
+> >
+> > Ahh. Right.
+> >
+> > Looking at the existing bpf trampoline... It has complicated logic
+> > to handle livepatching and tailcalls. Your global trampoline
+> > doesn't, and once that is added it's starting to feel that it will
+> > look just as complex as the current one.
+> > So I think we better repurpose what we have.
+> > Maybe we can rewrite the existing one in C too.
+>
+> You are right, the tailcalls is not handled yet. But for the livepatching=
+,
+> it is already handled, as we always get the origin ip from the stack
+> and call it, just like how the bpf trampoline handle the livepatching.
+> So no addition handling is needed here.
+>
+> >
+> > How about the following approach.
+> > I think we discussed something like this in the past
+> > and Jiri tried to implement something like this.
+> > Andrii reminded me recently about it.
+> >
+> > Say, we need to attach prog A to 30k functions.
+> > 10k with 2 args, 10k with 3 args, and 10k with 7 args.
+> > We can generate 3 _existing_ bpf trampolines for 2,3,7 args
+> > with hard coded prog A in there (the cookies would need to be
+> > fetched via binary search similar to kprobe-multi).
+> > The arch_prepare_bpf_trampoline() supports BPF_TRAMP_F_ORIG_STACK.
+> > So one 2-arg trampoline will work to invoke prog A in all 10k 2-arg fun=
+ctions.
+> > We don't need to match types, but have to compare that btf_func_model-s
+> > are the same.
+> >
+> > Menglong, your global trampoline for 0,1,..6 args works only for x86,
+> > because btf_func_model doesn't care about sizes of args,
+> > but it's not the correct mental model to use.
+> >
+> > The above "10k with 2 args" is a simplified example.
+> > We will need an arch specific callback is_btf_func_model_equal()
+> > that will compare func models in arch specific ways.
+> > For x86-64 the number of args is all it needs.
+> > For other archs it will compare sizes and flags too.
+> > So 30k functions will be sorted into
+> > 10k with btf_func_model_1, 10k with btf_func_model_2 and so on.
+> > And the corresponding number of equivalent trampolines will be generate=
+d.
+> >
+> > Note there will be no actual BTF types. All args will be untyped and
+> > untrusted unlike current fentry.
+> > We can go further and sort 30k functions by comparing BTFs
+> > instead of btf_func_model-s, but I suspect 30k funcs will be split
+> > into several thousands of exact BTFs. At that point multi-fentry
+> > benefits are diminishing and we might as well generate 30k unique
+> > bpf trampolines for 30k functions and avoid all the complexity.
+> > So I would sort by btf_func_model compared by arch specific comparator.
+> >
+> > Now say prog B needs to be attached to another 30k functions.
+> > If all 30k+30k functions are different then it's the same as
+> > the previous step.
+> > Say, prog A is attached to 10k funcs with btf_func_model_1.
+> > If prog B wants to attach to the exact same func set then we
+> > just regenerate bpf trampoline with hard coded progs A and B
+> > and reattach.
+> > If not then we need to split the set into up to 3 sets.
+> > Say, prog B wants 5k funcs, but only 1k func are common:
+> > (prog_A, 9k func with btf_func_model_1) -> bpf trampoline X
+> > (prog_A, prog_B, 1k funcs with btf_func_model_1) -> bpf trampoline Y
+> > (prog_B, 4k funcs with btf_func_model_1) -> bpf trampoline Z
+> >
+> > And so on when prog C needs to be attached.
+> > At detach time we can merge sets/trampolines,
+> > but for now we can leave it all fragmented.
+> > Unlike regular fentry progs the multi-fentry progs are not going to
+> > be attached for long time. So we can reduce the detach complexity.
+> >
+> > The nice part of the algorithm is that coexistence of fentry
+> > and multi-fentry is easy.
+> > If fentry is already attached to some function we just
+> > attach multi-fentry prog to that bpf trampoline.
+> > If multi-fentry was attached first and fentry needs to be attached,
+> > we create a regular bpf trampoline and add both progs there.
+>
+> This seems not easy, and it is exactly how I handle the
+> coexistence now:
+>
+>   https://lore.kernel.org/bpf/20250528034712.138701-16-dongml2@chinatelec=
+om.cn/
+>   https://lore.kernel.org/bpf/20250528034712.138701-17-dongml2@chinatelec=
+om.cn/
+>   https://lore.kernel.org/bpf/20250528034712.138701-18-dongml2@chinatelec=
+om.cn/
 
+hmm. exactly? That's very different.
+You're relying on kfunc_md for prog list.
+The above proposal doesn't need kfunc_md in the critical path.
+All progs are built into the trampolines.
 
---=====_001_next=====
-Content-Type: multipart/related;
-	boundary="=====_002_next====="
+> The most difficult part is that we need a way to replace the the
+> multi-fentry with fentry for the function in the ftrace atomically. Of
+> course, we can remove the global trampoline first, and then attach
+> the bpf trampoline, which will make things much easier. But a
+> short suspend will happen for the progs in fentry-multi.
 
+I don't follow.
+In the above proposal fentry attach/detach is atomic.
+Prepare a new trampoline, single call to ftrace to modify_fentry().
 
---=====_002_next=====
-Content-Type: multipart/alternative;
-	boundary="=====_003_next====="
+> >
+> > The intersect and sorting by btf_func_model is not trivial,
+> > but we can hold global trampoline_mutex, so no concerns of races.
+> >
+> > Example:
+> > bpf_link_A is a set of:
+> > (prog_A, funcs X,Y with btf_func_model_1)
+> > (prog_A, funcs N,M with btf_func_model_2)
+> >
+> > To attach prog B via bpf_link_B that wants:
+> > (prog_B, funcs Y,Z with btf_func_model_1)
+> > (prog_B, funcs P,Q with btf_func_model_3)
+> >
+> > walk all existing links, intersect and split, and update the links.
+> > At the end:
+> >
+> > bpf_link_A:
+> > (prog_A, funcs X with btf_func_model_1)
+> > (prog_A, prog_B funcs Y with btf_func_model_1)
+> > (prog_A, funcs N,M with btf_func_model_2)
+> >
+> > bpf_link_B:
+> > (prog_A, prog_B funcs Y with btf_func_model_1)
+> > (prog_B, funcs Z with btf_func_model_1)
+> > (prog_B, funcs P,Q with btf_func_model_3)
+> >
+> > When link is detached: walk its own tuples, remove the prog,
+> > if nr_progs =3D=3D 0 -> detach corresponding trampoline,
+> > if nr_progs > 0 -> remove prog and regenerate trampoline.
+> >
+> > If fentry prog C needs to be attached to N it might split bpf_link_A:
+> > (prog_A, funcs X with btf_func_model_1)
+> > (prog_A, prog_B funcs Y with btf_func_model_1)
+> > (prog_A, funcs M with btf_func_model_2)
+> > (prog_A, prog_C funcs N with _fentry_)
+> >
+> > Last time we gave up on it because we discovered that
+> > overlap support was too complicated, but I cannot recall now
+> > what it was :)
+> > Maybe all of the above repeating some old mistakes.
+>
+> In my impression, this is exactly the solution of Jiri's, and this is
+> part of the discussion that I know:
+>
+>   https://lore.kernel.org/bpf/ZfKY6E8xhSgzYL1I@krava/
 
-
---=====_003_next=====
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-
-PiA+IHByaW50IGZtdDogInNrYmFkZHI9JXAgc2thZGRyPSVwIGZhbWlseT0lcyBzcG9ydD0laHUg
-ZHBvcnQ9JWh1IHNhZGRyPSVwSTQgZGFkZHI9JXBJNCBzYWRkcnY2PSVwSTZjIGRhZGRydjY9JXBJ
-NmMgc3RhdGU9JXMgZXJyPSVkIg0KPiA+DQo+ID4gU3VnZ2VzdGVkLWJ5OiBLdW5peXVraUl3YXNo
-aW1hIDxrdW5peXVAZ29vZ2xlLmNvbT4NCj4gDQo+IEkgZG9uJ3QgZGVzZXJ2ZSB0aGlzIHRhZy4g
-IChBbHNvLCBhIHNwYWNlIGJldHdlZW4gZmlyc3QvbGFzdCBuYW1lIGlzIG1pc3NpbmcuKQ0KPiAN
-Cj4gU3VnZ2VzdGVkLWJ5IGNhbiBiZSB1c2VkIHdoZW4gdGhlIGNvcmUgaWRlYSBpcyBwcm92aWRl
-ZCBieSBzb21lb25lLA0KPiBidXQgbm90IHdoZW4gc29tZW9uZSBqdXN0IHJldmlld3MgdGhlIHBh
-dGNoIGFuZCBwb2ludHMgb3V0IHNvbWV0aGluZw0KPiB3cm9uZy4NCj4gDQo+IEJ1dCBjb2RlLXdp
-c2UsIHRoZSBjaGFuZ2UgbG9va3MgZ29vZCB0byBtZS4NCj4gDQo+IFJldmlld2VkLWJ5OiBLdW5p
-eXVraSBJd2FzaGltYSA8a3VuaXl1QGdvb2dsZS5jb20+DQpIaSBLdW5peXVraSwNCg0KVGhhbmsg
-eW91IGZvciB5b3VyIHRob3JvdWdoIHJldmlldyBhbmQgZ3VpZGFuY2UgLSBpdCdzIGdyZWF0bHkg
-YXBwcmVjaWF0ZWQuDQpJJ2xsIHN1Ym1pdCB2NyB3aXRoIGNvcnJlY3RlZCB0YWdzIDopLg==
-
-
---=====_003_next=====
-Content-Type: text/html ;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-
-PGRpdiBjbGFzcz0iemNvbnRlbnRSb3ciPjxwPiZndDsgJmd0OyBwcmludCBmbXQ6ICJza2JhZGRy
-PSVwIHNrYWRkcj0lcCBmYW1pbHk9JXMgc3BvcnQ9JWh1IGRwb3J0PSVodSBzYWRkcj0lcEk0IGRh
-ZGRyPSVwSTQgc2FkZHJ2Nj0lcEk2YyBkYWRkcnY2PSVwSTZjIHN0YXRlPSVzIGVycj0lZCI8L3A+
-PHA+Jmd0OyAmZ3Q7PC9wPjxwPiZndDsgJmd0OyBTdWdnZXN0ZWQtYnk6IEt1bml5dWtpSXdhc2hp
-bWEgJmx0O2t1bml5dUBnb29nbGUuY29tJmd0OzwvcD48cD4mZ3Q7Jm5ic3A7PC9wPjxwPiZndDsg
-SSBkb24ndCBkZXNlcnZlIHRoaXMgdGFnLiZuYnNwOyAoQWxzbywgYSBzcGFjZSBiZXR3ZWVuIGZp
-cnN0L2xhc3QgbmFtZSBpcyBtaXNzaW5nLik8L3A+PHA+Jmd0OyZuYnNwOzwvcD48cD4mZ3Q7IFN1
-Z2dlc3RlZC1ieSBjYW4gYmUgdXNlZCB3aGVuIHRoZSBjb3JlIGlkZWEgaXMgcHJvdmlkZWQgYnkg
-c29tZW9uZSw8L3A+PHA+Jmd0OyBidXQgbm90IHdoZW4gc29tZW9uZSBqdXN0IHJldmlld3MgdGhl
-IHBhdGNoIGFuZCBwb2ludHMgb3V0IHNvbWV0aGluZzwvcD48cD4mZ3Q7IHdyb25nLjwvcD48cD4m
-Z3Q7Jm5ic3A7PC9wPjxwPiZndDsgQnV0IGNvZGUtd2lzZSwgdGhlIGNoYW5nZSBsb29rcyBnb29k
-IHRvIG1lLjwvcD48cD4mZ3Q7Jm5ic3A7PC9wPjxwPiZndDsgUmV2aWV3ZWQtYnk6IEt1bml5dWtp
-IEl3YXNoaW1hICZsdDtrdW5peXVAZ29vZ2xlLmNvbSZndDs8L3A+PHA+SGkgS3VuaXl1a2ksPC9w
-PjxwPjxicj48L3A+PHA+VGhhbmsgeW91IGZvciB5b3VyIHRob3JvdWdoIHJldmlldyBhbmQgZ3Vp
-ZGFuY2UgLSBpdCdzIGdyZWF0bHkgYXBwcmVjaWF0ZWQuPC9wPjxwPkknbGwgc3VibWl0IHY3IHdp
-dGggY29ycmVjdGVkIHRhZ3MgOikuPGJyPjwvcD48L2Rpdj4=
-
-
---=====_003_next=====--
-
---=====_002_next=====--
-
---=====_001_next=====--
-
+Yes. It's similar, but somehow it feels simple enough now.
+The algorithms for both detach and attach fit on one page,
+and everything is uniform. There are no spaghetty of corner cases.
 
