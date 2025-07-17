@@ -1,109 +1,174 @@
-Return-Path: <netdev+bounces-207701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C647BB0853C
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 08:45:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F1FB6B0855D
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 08:49:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D35511C232C0
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 06:46:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CE6E188A318
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 06:49:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 056731A5B8D;
-	Thu, 17 Jul 2025 06:45:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6403620ADEE;
+	Thu, 17 Jul 2025 06:49:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="DxO1GOMJ"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="QYEdiZs1"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2087.outbound.protection.outlook.com [40.107.243.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60097218E99;
-	Thu, 17 Jul 2025 06:45:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752734730; cv=none; b=ppRiIC2vMi48PH6+Hj+KRh8fiuPLtN93N6HlwrNRZBDs83nDUG+/vbdHHZg0lOTewCOorkVbCLfIRLRPYU+V20rA/F5tQRD4tC5Mm6DN1tQVNbHJ9UCl3cRpZynWXJDDSEbbAWZHOaMNRvMJO9lx5XatBvmlim6wYDwNAAzoqlY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752734730; c=relaxed/simple;
-	bh=L/UtpAVRJrUr4OdsplN2woAEgJp68bly2ZEnhRg7ank=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y3hdn8lYTHEjsPZhkPRDInM7EW62W3DdVltZUbThiCn2opuH398VnacVKMhY2VMbDS57eaj5JgnOrm9hG2txFzv/08Q0H22eSms+6Cv3FKEAKgo+zzCE3L+ZFPGHKcl25F0r1aU4aP/50xYM1dWoi8xnfkQZDhkAz/R90dWDfqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=DxO1GOMJ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=nXMaxus8XfDIaPk/PrV9R055UFe2h6R0FRKpTuO5XRQ=; b=DxO1GOMJ+NvrBkIAX8Br+aJ8Q9
-	UVSDgZx6yS6GnqdC6mbMhOo+egX/a4ywDvA/Y7MRENl1PBLe/pQSbKvqGO1wW1Xye0TMIWZ1xKeXW
-	Tyb16/sYf+YqErU0ebo/9wYDSXu/buZ3YR34wYlFdF9UCZ04yqgmgX6ncL9I8r1YkYbgX0AznLY81
-	4IBi2iGczQYKWyluBOEXXUpVUEDpyAUznKrV+5EF14Kyt63iS7bxfsDet6xbKGQ8okRyfv0o0jCY7
-	fxvhI2tw8Ryo77AJW3q7eEyoutc1b+IfXnxrG27npSdqvOO9TrbUANgXOgDc7mpjkdp0lFnOtyjSl
-	sICQEDMw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49690)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1ucIMk-0000fd-1w;
-	Thu, 17 Jul 2025 07:45:14 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1ucIMf-0001xN-1N;
-	Thu, 17 Jul 2025 07:45:09 +0100
-Date: Thu, 17 Jul 2025 07:45:09 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: rohan.g.thomas@altera.com
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Romain Gantois <romain.gantois@bootlin.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Matthew Gerlach <matthew.gerlach@altera.com>
-Subject: Re: [PATCH net-next 2/3] net: stmmac: xgmac: Correct supported speed
- modes
-Message-ID: <aHib9V1_WZfj3S8M@shell.armlinux.org.uk>
-References: <20250714-xgmac-minor-fixes-v1-0-c34092a88a72@altera.com>
- <20250714-xgmac-minor-fixes-v1-2-c34092a88a72@altera.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAEE717B425;
+	Thu, 17 Jul 2025 06:49:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.87
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752734948; cv=fail; b=gUPIVZb7HP0WE1if3+W5KP5TS1Q6Wb9OPIzLbfARYV6ekrazK+CHHW1jOYHJHlxB5KXTpVtR4zcpBRRc/TopG0owEKMxNGSL2VFUhytgq28afMOEgUIGYQdJTfi9k3IfZOqiTra5TA0fNDF0DWFMSXN4y1UoWkBZep+SyKQsB6I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752734948; c=relaxed/simple;
+	bh=7+7ZYHpM3eDpUNG7j0M9E6wQrCw3QStS/SszMvOh3Rw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AqTUh3e31DxPIqMELmKTR+UqP+hi2lCx0fPuWMEF+i4+nIep63U4cn8Q9/5xyyI/EVoYxQSw1t+9lcS6jAgbUheabJiUyWW8rXMLPHLBejQkUgBKDrC08zcOjt9HGAGfP+byIIGkmqkrivdMRo4inM0pJHmahDUcpCvOKq0Wfvc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=QYEdiZs1; arc=fail smtp.client-ip=40.107.243.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZsqS3Ptgh3/wtXv4AkX8HZiutUx1RInG9HYv3qU74crQqpwHaspY+QfhpM0S13WUn464Hgt5Mk9aTGSfhxlvsNUFg/Hdttn0qY/UqKWkTJ867nLfDOAAXk0fOXYF6yEKPMCxIMtsDbYMpEENicXjEOLm6dgP6K8bij5l3k21MKgjLQx4v2vqN+7kQf0jiZ9ACYen/AlESpBH+NzkcByz9G2wFL849tNUWApReipyBoyk2LyL3/+fpcNgc2+qUGVQPtJSuoS4xmRBKkXh08XEwBBdZXGQ/pObUn9JXvEQVQU5I6YQCFnIqmzmUrz6+qlo78HTPpvcrHpcD/yKBwvIbQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=juQxD3G6CYOUToyQHQeTDqbR/JUZsHM0T3QEskU/jOA=;
+ b=o8I5+TBaD/cQvTu0dqykBUxai6KNPIjHABr+EH7ym6Kc7Q6lA+eB3pA+9HgHrLD5IqiOiIZXjNiFM6+XWuvDfykEFLwC7tfLz4xDdTB3uJOTnzeJq+qGI8f3ZhPyoVEjO5QnOstdZqiyzodQXjAd8iEVyIabM+bn/Kuj4ScHlEGktOrdYoHzzxQgZZ5b5F8wtwzsvR01OylcBjiNclDDFJJpZpfpUprn04gT9NjloSmmmni07fCnuGgQImm4s3KD9KbW+XGU7jq72e4NDzrQP/foOmTQfDO/1QuzJ5yh4WOgSCMKqayg1y5XSh8ztCGFroAL8kzkPSX7pnO95B/Kiw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=juQxD3G6CYOUToyQHQeTDqbR/JUZsHM0T3QEskU/jOA=;
+ b=QYEdiZs1Hzgv1mZPs4+qFCVQSxb1egqUIGneY5PcdGmZjhqFNW8tL+NXLNfsmhuxSk+a8hSpIbJN75hb9NXToYsRaLNY3o7TzRAse3Lp+hA4GU5oef0hRbBe55Bsf5AVAtaKTcsZFdxbG9ez5NwXWL0PSU1/GdDTTcws8shZqTGwPrGj8znZyQxGYlF+Ntc+AOLdNjssoydOHdJ1gyE6G2Cc+M8OHPoAwmQnDa9hbMXfcpgPPkM+5qZhsn91lrYqozvwtQhD6Xk8hX/kc99mk9+x/eEQzTUngD2sS+xJzTIn4WfL3j8jrj+exq5zGhjfbFFHVkrGRcqlx3qNQr6lTg==
+Received: from MW4PR03CA0017.namprd03.prod.outlook.com (2603:10b6:303:8f::22)
+ by BL3PR12MB6548.namprd12.prod.outlook.com (2603:10b6:208:38f::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.24; Thu, 17 Jul
+ 2025 06:49:01 +0000
+Received: from CY4PEPF0000E9DB.namprd05.prod.outlook.com
+ (2603:10b6:303:8f:cafe::8c) by MW4PR03CA0017.outlook.office365.com
+ (2603:10b6:303:8f::22) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8922.23 via Frontend Transport; Thu,
+ 17 Jul 2025 06:49:00 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CY4PEPF0000E9DB.mail.protection.outlook.com (10.167.241.74) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8943.21 via Frontend Transport; Thu, 17 Jul 2025 06:49:00 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 16 Jul
+ 2025 23:48:41 -0700
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 16 Jul
+ 2025 23:48:41 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Wed, 16
+ Jul 2025 23:48:37 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: Saeed Mahameed <saeed@kernel.org>, Leon Romanovsky <leon@kernel.org>
+CC: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Gal Pressman <gal@nvidia.com>, "Saeed
+ Mahameed" <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch
+	<mbloch@nvidia.com>, <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH mlx5-next 0/3] mlx5-next updates 2025-07-17
+Date: Thu, 17 Jul 2025 09:48:12 +0300
+Message-ID: <1752734895-257735-1-git-send-email-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.8.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250714-xgmac-minor-fixes-v1-2-c34092a88a72@altera.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9DB:EE_|BL3PR12MB6548:EE_
+X-MS-Office365-Filtering-Correlation-Id: 556207a8-0f32-4d48-8862-08ddc4fe02e4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|82310400026|1800799024|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?MtLWhc2CN/YYe7BHXEaN4IFW2f+oaMj+hRlJWGyCV04mrymZbFYL8e4b65c8?=
+ =?us-ascii?Q?c+PPVoLCF4mHARufVn8O78FOQveG57hZWrFY+J3iwEGuUahpKwZMwqefRKR3?=
+ =?us-ascii?Q?7Vb0EwIe22oHL1ncqzVNslVjKZOqfKjBm/UXYx+BjKpyn5cFACocOf9kJVtP?=
+ =?us-ascii?Q?bogOHZjv3DPR/Et5oGxnuQpr4pl+2Ve5EoJeSGftMEVkfKH+KM9jAjeO8blU?=
+ =?us-ascii?Q?BmXW5IZn0bo+GQ7gt441QdDISh2CILjgshBNW8LUtjZ6b4/hc46cmw28IezU?=
+ =?us-ascii?Q?fzv4dkdC0ysgAt5oNyiybAUo860pQ43vSvZePzi7DYo5WdMm5cAOQguI449t?=
+ =?us-ascii?Q?u0+jXyGtYczixCQt0Pe2O0lRfRlC7rVPa4bVYgCnbxXUonuYlFDMcxWvlz2A?=
+ =?us-ascii?Q?gSrVPZ2SXIr037Uyigj7jKTqTl+RzX71RNZkXjAPhk3CLhNG/gjnf5ISHpeF?=
+ =?us-ascii?Q?IdCiRnVCJYdJAzZ4qa4LAKS3s1KhB22nd8J6jNHIu5Ml7TZKxyEoiP6p8QeW?=
+ =?us-ascii?Q?szv1G5ulQAQ7iC2CdicyLT29AWJDb0ha9MzF7BSkNNq/owDLjWELsb9Odlar?=
+ =?us-ascii?Q?xXAtgj1khlkaJiLSSWF0+vRWbbnyJT3CAA/K1SS6hs5NCMHqXArJ/I+FL2iN?=
+ =?us-ascii?Q?xaqM4aY2vOCNtVu3M7O31vtS0BEPlSStc/wfPx0qFBQvYSPWUPw2z32G562S?=
+ =?us-ascii?Q?A89oPgNyNeWujtSaYsLVwLS9NLmiLFdGc3zFk13uTyMqhe+euvqG1JKtZ2db?=
+ =?us-ascii?Q?08FnRl1t3KM7+LlWuYBwbiNaFNUl9dLzd+SPl82Prfl40l7YuR1Qq7A+uEbR?=
+ =?us-ascii?Q?XPVllcNstHa8kcXbsS1kurGnI3PQBaMzXlO1Y2zEhXdJCtuqeIMB2DBPG7hH?=
+ =?us-ascii?Q?WCbZSHU/WjvvT1CAx2vooieu314pByz0NkBeiCxmEqP0Arr/nbgpkc+WHOMJ?=
+ =?us-ascii?Q?J59NNa1Iag8LLfYAMYhpajlW5375LyDO9EbMvSz/9Q2GtbZ3PKR9vfYq6o9I?=
+ =?us-ascii?Q?y0SGZ0WTdjR3EcWfTOueSCr/1oawp6YuoFJXetOPRK4Oo67wCdbz71i75Crk?=
+ =?us-ascii?Q?FXMtweOM0R14n2E+8bUafW7OxRtexmf6psxHFvE4hfluYqNcJzMHNSFb0BIc?=
+ =?us-ascii?Q?1DnQJISexu9SJG7v6jo1Faf46XQGwnHJfBGA+uK1qzDVtmVoVjqk33PhE9Aj?=
+ =?us-ascii?Q?TvBNiGWgAoeCN8TiF7ELEnscJTfIa4NRgzRiNiUrpnzvHXL/PUIRa/mEdv5Y?=
+ =?us-ascii?Q?BMt9sO59R74QOjqgB/PdqSFo5ySGizeiXxptKPN7Ql1IsLaY35ak8gs5zPEr?=
+ =?us-ascii?Q?qAsEb0Cz5dV7ZzDueSbf89SaW00Qh7RqMLmVsClxQ8luMMDdrzDIywG+xXAy?=
+ =?us-ascii?Q?/yc8MH2kMV4n9lEc/ILWJ9lnVV2xwHJeUajb2njYhVOigGNbL/dQOD+qCX/1?=
+ =?us-ascii?Q?pTv21n+37+GMTVGZKzWR3VHgN6KSHeYYAavMVbTP+Ks9lsdeqe5bA+lZNi9x?=
+ =?us-ascii?Q?8rE0ztkQ1HbA+mZ7hPksfpVW7ocXEk/X1XG9?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(7416014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2025 06:49:00.4707
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 556207a8-0f32-4d48-8862-08ddc4fe02e4
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000E9DB.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6548
 
-On Mon, Jul 14, 2025 at 03:59:18PM +0800, Rohan G Thomas via B4 Relay wrote:
-> @@ -1532,8 +1542,8 @@ int dwxgmac2_setup(struct stmmac_priv *priv)
->  		mac->mcast_bits_log2 = ilog2(mac->multicast_filter_bins);
->  
->  	mac->link.caps = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
-> -			 MAC_1000FD | MAC_2500FD | MAC_5000FD |
-> -			 MAC_10000FD;
-> +			 MAC_10FD | MAC_100FD | MAC_1000FD |
-> +			 MAC_2500FD | MAC_5000FD | MAC_10000FD;
-...
-> @@ -405,6 +405,7 @@ static int dwxgmac2_get_hw_feature(void __iomem *ioaddr,
->  	dma_cap->sma_mdio = (hw_cap & XGMAC_HWFEAT_SMASEL) >> 5;
->  	dma_cap->vlhash = (hw_cap & XGMAC_HWFEAT_VLHASH) >> 4;
->  	dma_cap->half_duplex = (hw_cap & XGMAC_HWFEAT_HDSEL) >> 3;
-> +	dma_cap->mbps_10_100 = (hw_cap & XGMAC_HWFEAT_GMIISEL) >> 1;
+Hi,
 
-What if dma_cap->mbps_10_100 is false? Should MAC_10FD | MAC_100FD
-still be set? What if dma_cap->half_duplex is set but
-dma_cap->mbps_10_100 is not? Should we avoid setting 10HD and 100HD?
+This series contains mlx5 shared updates as preparation for upcoming
+features.
 
+Regards,
+Tariq
+
+
+Jianbo Liu (1):
+  net/mlx5: Add IFC bits to support RSS for IPSec offload
+
+Oren Sidi (2):
+  net/mlx5: Add IFC bits and enums for buf_ownership
+  net/mlx5: Expose cable_length field in PFCC register
+
+ .../mellanox/mlx5/core/steering/hws/definer.c | 13 +++--
+ include/linux/mlx5/mlx5_ifc.h                 | 58 ++++++++++++++-----
+ 2 files changed, 53 insertions(+), 18 deletions(-)
+
+
+base-commit: cd1746cb6555a2238c4aae9f9d60b637a61bf177
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.31.1
+
 
