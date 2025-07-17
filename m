@@ -1,353 +1,310 @@
-Return-Path: <netdev+bounces-207687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C7B6B08332
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 05:06:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CC63B08336
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 05:07:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8BE3A7AEA64
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 03:04:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FE024E1E0F
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 03:06:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE0211DE8BB;
-	Thu, 17 Jul 2025 03:06:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 380521E520A;
+	Thu, 17 Jul 2025 03:07:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=aspeedtech.com header.i=@aspeedtech.com header.b="LkhoDhL6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.35])
+Received: from TYPPR03CU001.outbound.protection.outlook.com (mail-japaneastazon11022119.outbound.protection.outlook.com [52.101.126.119])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB521A254E;
-	Thu, 17 Jul 2025 03:06:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.30.148.35
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752721575; cv=none; b=cF5YCYPgKfaMdjfC2GUwgBtuFFAcnbZ+hFUk8kJBomn/B4gVWeMdcQi/iezoBnssGzw8bInW2aUG2UjK2pWfISLtjuEM90kWxzbUndJrjPC3SiiADc10xOcGnPQATvvupwBs0NkSJeX45Xa/+3c1lSr/ioJgvx0i5ybqLqg/fnE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752721575; c=relaxed/simple;
-	bh=jUBVZHgQrerUN8ZG8PjFnwvrNxoE824NdVlAAvflWpY=;
-	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=c+BaviNaq5rZIqzibzNl9+vIvadu3wAprEoP9fz5Rqh9OxLihrk1Uq49yjibf4IofBm1dVRpNz/LkbS/ZRHAfTBjb/E/D/nqclIWq6kxVFTX0gvDwratnMTxFNVZCbF8KRlHyEQ0FUZLzgJkpYeKUHfD3v3nbBRlhRj15dUagN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=160.30.148.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4bjHr109ZJz8Xs6G;
-	Thu, 17 Jul 2025 11:06:09 +0800 (CST)
-Received: from xaxapp01.zte.com.cn ([10.88.99.176])
-	by mse-fl1.zte.com.cn with SMTP id 56H35xd0039502;
-	Thu, 17 Jul 2025 11:05:59 +0800 (+08)
-	(envelope-from fan.yu9@zte.com.cn)
-Received: from mapi (xaxapp02[null])
-	by mapi (Zmail) with MAPI id mid32;
-	Thu, 17 Jul 2025 11:06:00 +0800 (CST)
-Date: Thu, 17 Jul 2025 11:06:00 +0800 (CST)
-X-Zmail-TransId: 2afa687868983c8-9c584
-X-Mailer: Zmail v1.0
-Message-ID: <202507171106006541El8h8N32LpdnND-lk361@zte.com.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B8A1B4244;
+	Thu, 17 Jul 2025 03:07:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.126.119
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752721629; cv=fail; b=V6T/+l5agLubyuOCbi4oE0/qHejf1h8kCgv/CBAe4Hae1becdR4royy6zQSVdrQ/XUzAaa8p3k9cZLbq1FD1gF3MF7qNMeEguBxXDeFqzHvjb6zjoJfXeMQw3YDfaodMH8Aj0tLWA7KfeaCo6N6m/tqZy6FIJaaRTBjsjj4CdM8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752721629; c=relaxed/simple;
+	bh=J4BtxJPSnYEbJevZUBmY0gdy/xrEr4ADi84uLibmpkU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=JE0q7svZEDpMPjNzGlMA4ygafOeYaN1S6jLeen0gEZKbXKikkoY8b+ic74EGNJvujuh+eD4T1pTjYspJFaCYnXnf0+P6W2athD37GozpOvi6QdlAnCwc9kceRN53J2D4tpunWOdJVHg1urZVaum/T31uqFm/+JbJDtDsOiNtw3s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; dkim=pass (2048-bit key) header.d=aspeedtech.com header.i=@aspeedtech.com header.b=LkhoDhL6; arc=fail smtp.client-ip=52.101.126.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=SR580ivfpYAnqgHl2n6Wg7Ho/26t4Ls7WAtUbhGFVv/IehI03y3gISGQwEVuShtRDi6UmKKKNjPKWN7OIpZI2TqsVY+7QFh6TbpRi9XtvVKrNoIxuv8ePv1Cdotqcls0CqqNOU3hFHghZDTLltj2RcODGrTlG5n/p00ZvaglS38y5/jyKpsZ/z660HRd03xUk8zB1IW4tr96HsNRq2Y7oqaZRoo+l1/SoqXPNu8CVnVrlIPqdU4aGHZAfPYdnCO7MAzPa06+g728MDdeCAphmfGA7aviF9H6DcLKPuf2Xd2DKzDgZolDnMLZGoweBjwyNefu/WLd78sLR7Ee3t22Qg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=J4BtxJPSnYEbJevZUBmY0gdy/xrEr4ADi84uLibmpkU=;
+ b=uKxEhSAfRv5/F+SopSay33PhBDtZbwQk+mZHSajl750KnmsiUfDZo/A3hj1CXvUrflW4UtBp+ieyYPh00GcsHh44PAkcMxPgI0X+7If0FZfCBXqaIq5RJj2aJUX9d/nMv+fn5nYAhon87LswZsjhX9FRYyCVBKl1liw0wL2jJsRrUUWAVXswltAEJ1dHEecE7K7LDttPLRl1HxvWLfwXge5W2mOD2m4G/OOUiNLO4dQ50OLD5xZ2gMvpJJY/g1TH4mOeWBRiHrIdwnvUs+NSldK4Rnzq44e9fT5cCGFX3cW3m/7OvUYAS4TFXHK6R6V8/LooV+1udY6cHWQ8LY/njg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=aspeedtech.com; dmarc=pass action=none
+ header.from=aspeedtech.com; dkim=pass header.d=aspeedtech.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aspeedtech.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=J4BtxJPSnYEbJevZUBmY0gdy/xrEr4ADi84uLibmpkU=;
+ b=LkhoDhL6uGZqNkJSye5WVx9u2bbGu0IPP09/SDUyoC9rKGSzMdj9iAfjuVpKeDXNwdoZR4NDIyoaNemfoehABWkBKGtMqAQnR62UgJGrY7D/cUrfEWcvCsSLsXY5VIRLpP4eoQOCbMsX7ddGu0PXNyeYB5GGZbyY5qP1xmDIOButm6pAie2CCRQ8G5En57bmlXt7XppgDdrkCgjcKMgX0QJmxutWDuVW0d8qGoCUorlCnKsRslr7go4tb2Ott4AkLRbQp06nmf+5j9I1wM8WLXvi5hDRWSScQFCnKWRZ2rYpJBfrbgor/NIep5IjNwgKSZgTX2YKmB7zG2F5r87rzA==
+Received: from SEZPR06MB5763.apcprd06.prod.outlook.com (2603:1096:101:ab::9)
+ by SEZPR06MB6016.apcprd06.prod.outlook.com (2603:1096:101:f3::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.39; Thu, 17 Jul
+ 2025 03:07:01 +0000
+Received: from SEZPR06MB5763.apcprd06.prod.outlook.com
+ ([fe80::ba6c:3fc5:c2b5:ee71]) by SEZPR06MB5763.apcprd06.prod.outlook.com
+ ([fe80::ba6c:3fc5:c2b5:ee71%4]) with mapi id 15.20.8901.033; Thu, 17 Jul 2025
+ 03:07:01 +0000
+From: YH Chung <yh_chung@aspeedtech.com>
+To: Jeremy Kerr <jk@codeconstruct.com.au>, "matt@codeconstruct.com.au"
+	<matt@codeconstruct.com.au>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, BMC-SW <BMC-SW@aspeedtech.com>
+CC: Khang D Nguyen <khangng@amperemail.onmicrosoft.com>
+Subject: RE: [PATCH] net: mctp: Add MCTP PCIe VDM transport driver
+Thread-Topic: [PATCH] net: mctp: Add MCTP PCIe VDM transport driver
+Thread-Index: AQHb9Igk7vn3xpIukEauwkU1/K0+nrQxUL6AgAACe7CAAQ2aAIAAWoUg
+Date: Thu, 17 Jul 2025 03:07:01 +0000
+Message-ID:
+ <SEZPR06MB5763AD0FC90DD6AF334555DA9051A@SEZPR06MB5763.apcprd06.prod.outlook.com>
+References: <20250714062544.2612693-1-yh_chung@aspeedtech.com>
+	 <a01f2ed55c69fc22dac9c8e5c2e84b557346aa4d.camel@codeconstruct.com.au>
+	 <SEZPR06MB57635C8B59C4B0C6053BC1C99054A@SEZPR06MB5763.apcprd06.prod.outlook.com>
+ <27c18b26e7de5e184245e610b456a497e717365d.camel@codeconstruct.com.au>
+In-Reply-To:
+ <27c18b26e7de5e184245e610b456a497e717365d.camel@codeconstruct.com.au>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=aspeedtech.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SEZPR06MB5763:EE_|SEZPR06MB6016:EE_
+x-ms-office365-filtering-correlation-id: 2ea3b4a2-1ca7-405f-c501-08ddc4df0025
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|42112799006|376014|7416014|366016|38070700018|921020;
+x-microsoft-antispam-message-info:
+ =?iso-8859-1?Q?CncrsLgqqOquXmfinzt2S0vx8pVChtSwJJ116De8Y6e2/U6v2HImAnUyHD?=
+ =?iso-8859-1?Q?zrIXrw8KXLuAJXFGYG5CUuvop3Whn7j9BDRzr5NsWUnDRRkBw4UrwBef0s?=
+ =?iso-8859-1?Q?uCU+EOWqnG7E4KGPw1SH6JbPxfam1gJKuL0JTAoUglxGnIaD8Y10EdKAs4?=
+ =?iso-8859-1?Q?lkY0QYJSiVFPbQL3eg2UW43LHYAX4edU/wOyE4RWQllxCfiYZllDS0Kxyl?=
+ =?iso-8859-1?Q?rxOnv57cKvKAHT8g28ZCwsaqG+ORM7gtxpzOkCa1GSxvKdeZQhMmlOqFtk?=
+ =?iso-8859-1?Q?HjEX29p/AsfRgBSUcQdDfMsf9Ey+hJlwByLeYn29rXL2LaHbloqKMLwt5s?=
+ =?iso-8859-1?Q?c1b0NwgDxAQ5LCQ2fC1IbuYzGNoFUAqXIbxY/a+znnc/QGGDNseQ8X4Rwc?=
+ =?iso-8859-1?Q?UsOBeVPnPrk46wuwcUUv/Y6Y+JQYkhtxWneTDkUcFI+QiUk7/w9+mMpUM2?=
+ =?iso-8859-1?Q?IiggJ2O9/8sdWwFxJB15nCm/qnku6c7dOW01zQCWmWzRMz0rjt3pioErXT?=
+ =?iso-8859-1?Q?LejE9rhb58PuYnLodjZPbLw/g1H9r0E9uSWX42dHLO5kmiOzuxbhpqme+A?=
+ =?iso-8859-1?Q?eqG7CQsKNix9XbQLJ5yuHHP1iCghP5RooQPVRd02s7PjDUp20nSPcOBGlH?=
+ =?iso-8859-1?Q?otmbUkEco8QSskdt/Rl/T7jz7QErqMcusm4dhME4Tyz4SeELu5rA6dDd3C?=
+ =?iso-8859-1?Q?8oWpyfae3ObqraLhTV7zcs10dG5ySfFnG9IRXJQo3j+pR7Vu20p8bfhY2b?=
+ =?iso-8859-1?Q?EYSx60/zF+GW5apuOkHmGjHHYJ7SSYpfcKoJt51KAmF83bVJJHy1UQ0fdy?=
+ =?iso-8859-1?Q?SZ3Avkyge3DVk698bV5DZCwzG6txN93qdHvdwbxHmFW9BXfuWhwahi3IUU?=
+ =?iso-8859-1?Q?2hEi25hQGcuTJrvFHC5ULQOXINggXi1IinFMCF21VuKAf2ryfwfCHq4WXe?=
+ =?iso-8859-1?Q?chOAW7b8y9m0cFyyNpq/isa5aixaesxK+jAqeRjekr9cGTdsGZxPO+xORn?=
+ =?iso-8859-1?Q?lzQhl6QD+2Ouq6TZ1AQ/pmlpW720YpD8M1/a+5Qws/rBzovNFkoVx2X7g7?=
+ =?iso-8859-1?Q?IxrdgcgLv2LAGQJy4Oqj15NjeZLC841dx3e7w98vuV18Q5wp+2JigSOpYH?=
+ =?iso-8859-1?Q?1/qAcuDNlmvS8p+USuNcPhOfNgErNEls54LWl8TAJfW/gEUZymLnkoAi7m?=
+ =?iso-8859-1?Q?E/Y/ZNtuVzND8GKdVGD3CBKTvYEDvVE885MRKzNqdK9Ew8zBBw1hzevxia?=
+ =?iso-8859-1?Q?5mNFqTDU27CFgSgXtbTTzriTridFvDpYVqt92W1A9PSFeNpSo+czJD4nD1?=
+ =?iso-8859-1?Q?GsAk3KQDU7x36u3BdrbLYvOEV2StQWBqE/UWMb/eA8WXWGLyWuC7Ddp90H?=
+ =?iso-8859-1?Q?t8I6ER26SW9PS0hwwE2hwFRexvCjP2Ud63z/BGdI4Z3JkiVy5DuiI3Q0DL?=
+ =?iso-8859-1?Q?J6+gj2+8zQLR632JNR0pQcM4489NBe9G1pjjRxQm1RpQ4mht3kWFhY522M?=
+ =?iso-8859-1?Q?G7giiGKlWwOBb473UZPkxZ8BywQHBx42BZ1gTyyvxvQh3nXT+ZXrjC5tO+?=
+ =?iso-8859-1?Q?/1f5s6c=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:zh-tw;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEZPR06MB5763.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(42112799006)(376014)(7416014)(366016)(38070700018)(921020);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?fba+Hv0yVzsqk+yyBYlEEgPqTNVxeVPh5EknjYi5Rge93Cg2y6yHmFjiks?=
+ =?iso-8859-1?Q?d9gkU5gLR6sNLv+xo2DOtXjxNt5QoFGZ8aWtA369U2e5/uG9GIp1jS09mZ?=
+ =?iso-8859-1?Q?BisVpgWADlihbagRFbrfQP4SFLJzXqV/2Z98S2xyGjf8mv9yVrkXO8McRO?=
+ =?iso-8859-1?Q?Kmxl3z1mfm6BNywDpQrrjEpcUR3Qc9nHwu2JYukzUZ170uTOLCxhlJIhG0?=
+ =?iso-8859-1?Q?LUviiUlVRmJ4cnZrLT6mJRfUv7/18s4TKncA35+Z9eoy+ucsKxHJ6o/hqh?=
+ =?iso-8859-1?Q?DIjC9tO2JiBnIXdo6+bJ4VnyVveh6QBfs7pvy5SEi8g7E1z/kcsGMJ/7s7?=
+ =?iso-8859-1?Q?Cy0QcXXan0861Z1II7z3NfSsaX9eeKl2YupNXY7yZZN66DZrpTH4rT92dE?=
+ =?iso-8859-1?Q?i0MJnDiJmqT278DCOq+6QTxJkkQ0YXq3xcbE3fkxas3XxHmFU7qz+k45Zt?=
+ =?iso-8859-1?Q?h/guLzEFyqwe++2KoEAPOgn6T3orAM117mZgz7WiMdSu5xlIomT+D6G5yc?=
+ =?iso-8859-1?Q?fQy9psBkCW5LMDhm0xXC3BRPlj9JulAtum/hG+SVbDfqcXV4afjou9WvI3?=
+ =?iso-8859-1?Q?HN7jdx0XEKXj/51eD9D8plBszDuNLm5fS5F1lpRAYCfogMw0CBoxgEFvGS?=
+ =?iso-8859-1?Q?8NUMkdyTPL1cWI7eOydYPNtkGLAFs3RpmhXx+eMfdWhEedIgNE+ZOsClBe?=
+ =?iso-8859-1?Q?cN0gMgkMgDuMEbZqw6DYWwp1XnSiL6pSV+yBMix9Vz6CoXlAOWR1zTa4MN?=
+ =?iso-8859-1?Q?ik6M31brJcn5KPEPAuPZQ1Kg3mw6+Hyj6/1I0eJ5T5SRK+beHFkeIWaJeA?=
+ =?iso-8859-1?Q?dq8qODpSzDactL/Md8DZ58XALRUIIuidEdRzC2MZA55gItxTtGCj0Jfmi6?=
+ =?iso-8859-1?Q?f20KLmcMeN9tjNsSa6HmhZiUdpJdYMMDeNhMf1FjC5RX1B9XgYoiWYFHU/?=
+ =?iso-8859-1?Q?bLdvEdS4jfDeHNNCSXdkZWz0UH0JTsVt+PYHiZCl94AbrnFc4GRSGCF1lz?=
+ =?iso-8859-1?Q?j3zRcxc0+A6H5BuKwfoRYt1cBz4h2Hmh2yqO4IAFuNDfB1T7Ro4irIxVWh?=
+ =?iso-8859-1?Q?wdeGt2mGVt5mclMW+t0EiyGqnoIs7q6E+H5M0QT95mYgLemUunUgLFMb2D?=
+ =?iso-8859-1?Q?XYdM7MyS7WXFx9/Fvfhu4un3vct3TMlqv3+fOGKXPGp9+n1eNfepW4UBbI?=
+ =?iso-8859-1?Q?SgVXdWFAjUV4YjJThVdWCTLLAn2AMgwOv5liRc4Itcu/920J9HP4b7Tx/a?=
+ =?iso-8859-1?Q?tUiWI/fRcXKawcyO7FbXcFzopFoOOQnSrn7s0KQO3OO5wTJJuwQsLcbfDG?=
+ =?iso-8859-1?Q?c1e/EPiAb1mRZkOxensucW+G3yyrQmpNmCEexoXqPE/95c6HT7bwemlYAU?=
+ =?iso-8859-1?Q?1e8AlfFpvUXpKR4NbN+GIYw8iwr2yBZB3ajtE0RMIRV3RKmrNOq/EHNnaW?=
+ =?iso-8859-1?Q?sX6VNld8VNM/xy7UNyhi/hoOVxFjFNcooA0UK8y1xJjkDAaA7MJCzEObEn?=
+ =?iso-8859-1?Q?19YeqW/IDWHM0ceaBEi4xlUxEeAvbyB1L9OIiY7Rbvo3e5eMDR4ES7O7qO?=
+ =?iso-8859-1?Q?FnLK7Hrdt72pJMOjeO9l81FFq/3FKlQA4B0U0L9tIJHfqikw3nvsemBnyt?=
+ =?iso-8859-1?Q?SR6sNzhy4pyw9K4VpiVcw/sidot/IaR7Uc?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <fan.yu9@zte.com.cn>
-To: <kuba@kernel.org>, <edumazet@google.com>, <ncardwell@google.com>,
-        <davem@davemloft.net>, <dsahern@kernel.org>, <pabeni@redhat.com>,
-        <horms@kernel.org>, <kuniyu@google.com>
-Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-trace-kernel@vger.kernel.org>, <yang.yang29@zte.com.cn>,
-        <xu.xin16@zte.com.cn>, <tu.qiang35@zte.com.cn>,
-        <jiang.kun2@zte.com.cn>, <qiu.yutan@zte.com.cn>,
-        <wang.yaxin@zte.com.cn>, <he.peilin@zte.com.cn>
-Subject: =?UTF-8?B?W1BBVENIIG5ldC1uZXh0IHY3XSB0Y3A6IHRyYWNlIHJldHJhbnNtaXQgZmFpbHVyZXMgaW4gdGNwX3JldHJhbnNtaXRfc2ti?=
-Content-Type: text/plain;
-	charset="UTF-8"
-X-MAIL:mse-fl1.zte.com.cn 56H35xd0039502
-X-TLS: YES
-X-SPF-DOMAIN: zte.com.cn
-X-ENVELOPE-SENDER: fan.yu9@zte.com.cn
-X-SPF: None
-X-SOURCE-IP: 10.5.228.132 unknown Thu, 17 Jul 2025 11:06:09 +0800
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 687868A1.000/4bjHr109ZJz8Xs6G
+MIME-Version: 1.0
+X-OriginatorOrg: aspeedtech.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SEZPR06MB5763.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2ea3b4a2-1ca7-405f-c501-08ddc4df0025
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jul 2025 03:07:01.5670
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43d4aa98-e35b-4575-8939-080e90d5a249
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: cj5YRI/Y4egg6FaA+QFAPpag0M2IcMp7UGZGKyPvanBjEUX8Wqq1hR8eQ3Cef1jEWfljS624Bx7+Bs01U9B8Sg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR06MB6016
 
-From: Fan Yu <fan.yu9@zte.com.cn>
+Hi Jeremy,
 
-Background
-==========
-When TCP retransmits a packet due to missing ACKs, the
-retransmission may fail for various reasons (e.g., packets
-stuck in driver queues, receiver zero windows, or routing issues).
+>> > Do we really need an abstraction for MCTP VDM drivers? How many are
+>> > you expecting? Can you point us to a client of the VDM abstraction?
+>> >
+>> > There is some value in keeping consistency for the MCTP lladdr
+>> > formats across PCIe transports, but I'm not convinced we need a
+>> > whole abstraction layer for this.
+>> >
+>> We plan to follow existing upstream MCTP transports-such as I=B2C, I=B3C=
+,
+>> and USB-by abstracting the hardware-specific details into a common
+>> interface and focus on the transport binding protocol in this patch.
+>> This driver has been tested by our AST2600 and AST2700 MCTP driver.
+>
+>Is that one driver (for both 2600 and 2700) or two?
+>
+It's written in one file to reuse common functions, but the behavior is sli=
+ghtly different depending on the hardware.
 
-The original tcp_retransmit_skb tracepoint:
+>I'm still not convinced you need an abstraction layer specifically for VDM
+>transports, especially as you're forcing a specific driver model with the =
+deferral
+>of TX to a separate thread.
+>
+We followed the same implementation pattern as mctp-i2c and mctp-i3c, both =
+of which also abstract the hardware layer via the existing i2c/i3c device i=
+nterface and use a kernel thread for TX data.=20
+That said, I believe it's reasonable to remove the kernel thread and instea=
+d send the packet directly downward after we remove the route table part.
+Could you kindly help to share your thoughts on which approach might be pre=
+ferable?
 
-  'commit e086101b150a ("tcp: add a tracepoint for tcp retransmission")'
+>Even if this abstraction layer is a valid approach, it would not be merged=
+ until
+>you also have an in-kernel user of it.
+>
+We have an MCTP controller driver (mentioned above, which we used for testi=
+ng this driver) that utilizes this abstraction for transmission, which we'r=
+e planning to upstream in the future.
+REF Link: https://github.com/AspeedTech-BMC/linux/blob/aspeed-master-v6.6/d=
+rivers/soc/aspeed/aspeed-mctp.c
 
-lacks visibility into these failure causes, making production
-diagnostics difficult.
 
-Solution
-========
-Adds the retval("err") to the tcp_retransmit_skb tracepoint.
-Enables users to know why some tcp retransmission failed and
-users can filter retransmission failures by retval.
 
-Compatibility description
-=========================
-This patch extends the tcp_retransmit_skb tracepoint
-by adding a new "err" field at the end of its
-existing structure (within TP_STRUCT__entry). The
-compatibility implications are detailed as follows:
 
-1) Structural compatibility for legacy user-space tools
-Legacy tools/BPF programs accessing existing fields
-(by offset or name) can still work without modification
-or recompilation.The new field is appended to the end,
-preserving original memory layout.
+Since the PCIe VDM driver is implemented as an abstraction layer, our curre=
+nt plan is to submit it separately as we believe the review process for eac=
+h driver can proceed independently.
+Would you recommend submitting both drivers together in the same patch seri=
+es for review, or is it preferable to keep them separate?=20
 
-2) Note: semantic changes
-The original tracepoint primarily only focused on
-successfully retransmitted packets. With this patch,
-the tracepoint now can figure out packets that may
-terminate early due to specific reasons. For accurate
-statistics, users should filter using "err" to
-distinguish outcomes.
+>> > > TX path uses a dedicated kernel thread and ptr_ring: skbs queued
+>> > > by the MCTP stack are enqueued on the ring and processed in-thread
+>context.
+>> >
+>> > Is this somehow more suitable than the existing netdev queues?
+>> >
+>> Our current implementation has two operations that take time: 1)
+>> Configure the PCIe VDM routing type as DSP0238 requested if we are
+>> sending certain ctrl message command codes like Discovery Notify
+>> request or Endpoint Discovery response. 2) Update the BDF/EID routing
+>> table.
+>
+>More on this below, but: you don't need to handle either of those in a tra=
+nsport
+>driver.
+>
+>> > > +struct mctp_pcie_vdm_route_info {
+>> > > +=A0=A0=A0=A0=A0=A0 u8 eid;
+>> > > +=A0=A0=A0=A0=A0=A0 u8 dirty;
+>> > > +=A0=A0=A0=A0=A0=A0 u16 bdf_addr;
+>> > > +=A0=A0=A0=A0=A0=A0 struct hlist_node hnode;
+>> > > +};
+>> >
+>> > Why are you keeping your own routing table in the transport driver?
+>> > We already have the route and neighbour tables in the MCTP core code.
+>> >
+>> > Your assumption that you can intercept MCTP control messages to keep
+>> > a separate routing table will not work.
+>> >
+>> We maintain a routing table in the transport driver to record the
+>> mapping between BDFs and EIDs, as the BDF is only present in the PCIe
+>> VDM header of received Endpoint Discovery Responses. This information
+>> is not forwarded to the MCTP core in the MCTP payload. We update the
+>> table with this mapping before forwarding the MCTP message to the
+>> core.
+>
+>There is already support for this in the MCTP core - the neighbour table
+>maintains mappings between EID and link-layer addresses. In the case of a =
+PCIe
+>VDM transport, those link-layer addresses contain the bdf data.
+>
+>The transport driver only needs to be involved in packet transmit and rece=
+ive.
+>Your bdf data is provided to the driver through the
+>header_ops->create() op.
+>
+>Any management of the neighbour table is performed by userspace, which has
+>visibility of the link-layer addresses of incoming skbs - assuming your dr=
+ivers are
+>properly setting the cb->haddr data on receive.
+>
+Agreed, we'll remove the table.
 
-Before patched:
-# cat /sys/kernel/debug/tracing/events/tcp/tcp_retransmit_skb/format
-field:const void * skbaddr; offset:8; size:8; signed:0;
-field:const void * skaddr; offset:16; size:8; signed:0;
-field:int state; offset:24; size:4; signed:1;
-field:__u16 sport; offset:28; size:2; signed:0;
-field:__u16 dport; offset:30; size:2; signed:0;
-field:__u16 family; offset:32; size:2; signed:0;
-field:__u8 saddr[4]; offset:34; size:4; signed:0;
-field:__u8 daddr[4]; offset:38; size:4; signed:0;
-field:__u8 saddr_v6[16]; offset:42; size:16; signed:0;
-field:__u8 daddr_v6[16]; offset:58; size:16; signed:0;
+>This has already been established through the existing transports that con=
+sume
+>lladdr data (i2c and i3c). You should not be handling the lladdr-to-EID ma=
+pping
+>*at all* in the transport driver.
+>
+>> Additionally, if the MCTP Bus Owner operates in Endpoint (EP) role on
+>> the PCIe bus, it cannot obtain the physical addresses of other devices
+>> from the PCIe bus.
+>
+>Sure it can, there are mechanisms for discovery. However, that's entirely
+>handled by userspace, which can update the existing neighbour table.
+>
+>> Agreed. In our implement, we always fill in the "Route By ID" type
+>> when core asks us to create the header, since we don't know the
+>> correct type to fill at that time.=A0 And later we update the Route type
+>> based on the ctrl message code when doing TX. I think it would be nice
+>> if we can have a uniformed address format to get the actual Route type
+>> by passed-in lladdr when creating the header.
+>
+>OK, so we'd include the routing type in the lladdr data then.
+>
+Could you share if there's any preliminary prototype or idea for the format=
+ of the lladdr that core plans to implement, particularly regarding how the=
+ route type should be encoded or parsed?
 
-print fmt: "skbaddr=%p skaddr=%p family=%s sport=%hu dport=%hu saddr=%pI4 daddr=%pI4 saddrv6=%pI6c daddrv6=%pI6c state=%s"
+For example, should we expect the first byte of the daddr parameter in the =
+create_hdr op to indicate the route type?
 
-After patched:
-# cat /sys/kernel/debug/tracing/events/tcp/tcp_retransmit_skb/format
-field:const void * skbaddr; offset:8; size:8; signed:0;
-field:const void * skaddr; offset:16; size:8; signed:0;
-field:int state; offset:24; size:4; signed:1;
-field:__u16 sport; offset:28; size:2; signed:0;
-field:__u16 dport; offset:30; size:2; signed:0;
-field:__u16 family; offset:32; size:2; signed:0;
-field:__u8 saddr[4]; offset:34; size:4; signed:0;
-field:__u8 daddr[4]; offset:38; size:4; signed:0;
-field:__u8 saddr_v6[16]; offset:42; size:16; signed:0;
-field:__u8 daddr_v6[16]; offset:58; size:16; signed:0;
-field:int err; offset:76; size:4; signed:1;
-
-print fmt: "skbaddr=%p skaddr=%p family=%s sport=%hu dport=%hu saddr=%pI4 daddr=%pI4 saddrv6=%pI6c daddrv6=%pI6c state=%s err=%d"
-
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Co-developed-by: xu xin <xu.xin16@zte.com.cn>
-Signed-off-by: xu xin <xu.xin16@zte.com.cn>
-Signed-off-by: Fan Yu <fan.yu9@zte.com.cn>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
----
-Change Log
-=========
-v6->v7:
-Some fixes according to
-https://lore.kernel.org/all/CAAVpQUCDJOnwRhjcwFke2vTZQ8rymopC3hpyPteLA3cRgXFz9Q@mail.gmail.com/#t
-1. Fixed tags errors.
-2. Add Reviewed-by tag.
-
-v5->v6:
-Some fixes according to
-https://lore.kernel.org/all/20250715183335.860529-1-kuniyu@google.com/
-1. Fixed HTML entity conversion in email and adjusted error counting logic.
-
-v4->v5:
-Some fixes according to
-https://lore.kernel.org/all/20250715072058.12f343bb@kernel.org/
-1. Instead of introducing new TCP_RETRANS_* enums, directly
-passing the retval to the tracepoint.
-
-v3->v4:
-Some fixes according to
-https://lore.kernel.org/all/CANn89i+JGSt=_CtWfhDXypWW-34a6SoP3RAzWQ9B9VL4+PHjDw@mail.gmail.com/
-1. Consolidate ENOMEMs into a unified TCP_RETRANS_NOMEM.
-
-v2->v3:
-Some fixes according to
-https://lore.kernel.org/all/CANn89iJvyYjiweCESQL8E-Si7M=gosYvh1BAVWwAWycXW8GSdg@mail.gmail.com/
-1. Rename "quit_reason" to "result". Also, keep "key=val" format concise(no space in vals).
-
-v1->v2:
-Some fixes according to
-https://lore.kernel.org/all/CANn89iK-6kT-ZUpNRMjPY9_TkQj-dLuKrDQtvO1140q4EUsjFg@mail.gmail.com/
-1.Rename TCP_RETRANS_QUIT_UNDEFINED to TCP_RETRANS_ERR_DEFAULT.
-2.Added detailed compatibility consequences section.
-
----
- include/trace/events/tcp.h | 27 ++++++++--------------
- net/ipv4/tcp_output.c      | 46 ++++++++++++++++++++++++--------------
- 2 files changed, 38 insertions(+), 35 deletions(-)
-
-diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
-index 54e60c6009e3..9d2c36c6a0ed 100644
---- a/include/trace/events/tcp.h
-+++ b/include/trace/events/tcp.h
-@@ -13,17 +13,11 @@
- #include <linux/sock_diag.h>
- #include <net/rstreason.h>
-
--/*
-- * tcp event with arguments sk and skb
-- *
-- * Note: this class requires a valid sk pointer; while skb pointer could
-- *       be NULL.
-- */
--DECLARE_EVENT_CLASS(tcp_event_sk_skb,
-+TRACE_EVENT(tcp_retransmit_skb,
-
--	TP_PROTO(const struct sock *sk, const struct sk_buff *skb),
-+	TP_PROTO(const struct sock *sk, const struct sk_buff *skb, int err),
-
--	TP_ARGS(sk, skb),
-+	TP_ARGS(sk, skb, err),
-
- 	TP_STRUCT__entry(
- 		__field(const void *, skbaddr)
-@@ -36,6 +30,7 @@ DECLARE_EVENT_CLASS(tcp_event_sk_skb,
- 		__array(__u8, daddr, 4)
- 		__array(__u8, saddr_v6, 16)
- 		__array(__u8, daddr_v6, 16)
-+		__field(int, err)
- 	),
-
- 	TP_fast_assign(
-@@ -58,21 +53,17 @@ DECLARE_EVENT_CLASS(tcp_event_sk_skb,
-
- 		TP_STORE_ADDRS(__entry, inet->inet_saddr, inet->inet_daddr,
- 			      sk->sk_v6_rcv_saddr, sk->sk_v6_daddr);
-+
-+		__entry->err = err;
- 	),
-
--	TP_printk("skbaddr=%p skaddr=%p family=%s sport=%hu dport=%hu saddr=%pI4 daddr=%pI4 saddrv6=%pI6c daddrv6=%pI6c state=%s",
-+	TP_printk("skbaddr=%p skaddr=%p family=%s sport=%hu dport=%hu saddr=%pI4 daddr=%pI4 saddrv6=%pI6c daddrv6=%pI6c state=%s err=%d",
- 		  __entry->skbaddr, __entry->skaddr,
- 		  show_family_name(__entry->family),
- 		  __entry->sport, __entry->dport, __entry->saddr, __entry->daddr,
- 		  __entry->saddr_v6, __entry->daddr_v6,
--		  show_tcp_state_name(__entry->state))
--);
--
--DEFINE_EVENT(tcp_event_sk_skb, tcp_retransmit_skb,
--
--	TP_PROTO(const struct sock *sk, const struct sk_buff *skb),
--
--	TP_ARGS(sk, skb)
-+		  show_tcp_state_name(__entry->state),
-+		  __entry->err)
- );
-
- #undef FN
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index b616776e3354..caf11920a878 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -3330,8 +3330,10 @@ int __tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
- 	if (icsk->icsk_mtup.probe_size)
- 		icsk->icsk_mtup.probe_size = 0;
-
--	if (skb_still_in_host_queue(sk, skb))
--		return -EBUSY;
-+	if (skb_still_in_host_queue(sk, skb)) {
-+		err = -EBUSY;
-+		goto out;
-+	}
-
- start:
- 	if (before(TCP_SKB_CB(skb)->seq, tp->snd_una)) {
-@@ -3342,14 +3344,19 @@ int __tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
- 		}
- 		if (unlikely(before(TCP_SKB_CB(skb)->end_seq, tp->snd_una))) {
- 			WARN_ON_ONCE(1);
--			return -EINVAL;
-+			err = -EINVAL;
-+			goto out;
-+		}
-+		if (tcp_trim_head(sk, skb, tp->snd_una - TCP_SKB_CB(skb)->seq)) {
-+			err = -ENOMEM;
-+			goto out;
- 		}
--		if (tcp_trim_head(sk, skb, tp->snd_una - TCP_SKB_CB(skb)->seq))
--			return -ENOMEM;
- 	}
-
--	if (inet_csk(sk)->icsk_af_ops->rebuild_header(sk))
--		return -EHOSTUNREACH; /* Routing failure or similar. */
-+	if (inet_csk(sk)->icsk_af_ops->rebuild_header(sk)) {
-+		err = -EHOSTUNREACH; /* Routing failure or similar. */
-+		goto out;
-+	}
-
- 	cur_mss = tcp_current_mss(sk);
- 	avail_wnd = tcp_wnd_end(tp) - TCP_SKB_CB(skb)->seq;
-@@ -3360,8 +3367,10 @@ int __tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
- 	 * our retransmit of one segment serves as a zero window probe.
- 	 */
- 	if (avail_wnd <= 0) {
--		if (TCP_SKB_CB(skb)->seq != tp->snd_una)
--			return -EAGAIN;
-+		if (TCP_SKB_CB(skb)->seq != tp->snd_una) {
-+			err = -EAGAIN;
-+			goto out;
-+		}
- 		avail_wnd = cur_mss;
- 	}
-
-@@ -3373,11 +3382,15 @@ int __tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
- 	}
- 	if (skb->len > len) {
- 		if (tcp_fragment(sk, TCP_FRAG_IN_RTX_QUEUE, skb, len,
--				 cur_mss, GFP_ATOMIC))
--			return -ENOMEM; /* We'll try again later. */
-+				 cur_mss, GFP_ATOMIC)) {
-+			err = -ENOMEM;  /* We'll try again later. */
-+			goto out;
-+		}
- 	} else {
--		if (skb_unclone_keeptruesize(skb, GFP_ATOMIC))
--			return -ENOMEM;
-+		if (skb_unclone_keeptruesize(skb, GFP_ATOMIC)) {
-+			err = -ENOMEM;
-+			goto out;
-+		}
-
- 		diff = tcp_skb_pcount(skb);
- 		tcp_set_skb_tso_segs(skb, cur_mss);
-@@ -3431,17 +3444,16 @@ int __tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
- 		tcp_call_bpf_3arg(sk, BPF_SOCK_OPS_RETRANS_CB,
- 				  TCP_SKB_CB(skb)->seq, segs, err);
-
--	if (likely(!err)) {
--		trace_tcp_retransmit_skb(sk, skb);
--	} else if (err != -EBUSY) {
-+	if (unlikely(err) && err != -EBUSY)
- 		NET_ADD_STATS(sock_net(sk), LINUX_MIB_TCPRETRANSFAIL, segs);
--	}
-
- 	/* To avoid taking spuriously low RTT samples based on a timestamp
- 	 * for a transmit that never happened, always mark EVER_RETRANS
- 	 */
- 	TCP_SKB_CB(skb)->sacked |= TCPCB_EVER_RETRANS;
-
-+out:
-+	trace_tcp_retransmit_skb(sk, skb, err);
- 	return err;
- }
-
--- 
-2.25.1
+>Cheers,
+>
+>
+>Jeremy
 
