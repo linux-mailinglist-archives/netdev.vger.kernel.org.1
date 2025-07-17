@@ -1,295 +1,200 @@
-Return-Path: <netdev+bounces-207685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 920F2B08304
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 04:39:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C49DB08324
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 04:52:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21C4D7AE292
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 02:37:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A63077A82C9
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 02:50:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 642001CAA79;
-	Thu, 17 Jul 2025 02:38:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 960E91D63D3;
+	Thu, 17 Jul 2025 02:52:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tbDn+RFm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W+LQnLWG"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C3C186A
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 02:38:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0835D1B4244;
+	Thu, 17 Jul 2025 02:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752719934; cv=none; b=Lx0t3p4Kd48wpFXdOwVqsTutAdMSwMFLN3+qcsaUEEPZJGVwUG9Q/vmR8Jr0QJJ3ttdF+X17ifFUnIZFR7Phzj60UUP6AQw90alLWuoroaokpp3M4VDxLycXI3OvqGYGzpL/BAXMqONzG+wMiZqNemmb2f1CEM6BaWs7pJBHBdQ=
+	t=1752720736; cv=none; b=BeFlhri0xvpkIwysYHYAgQRjLiv/IiThVesFPGXzx5iKvY6qu1Xsx1JdJi2oBsBo2uvHBH444l7kBu5YAOUMz+qqtxga/2Ng5t9zkmQUXJjXdTcv+SaQfLcti8CEtZKJVituXPt06XU9+gsq3EqpgpeCCZPaaC2dx1Mj5vNBE4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752719934; c=relaxed/simple;
-	bh=X7EU9oEee9oD4miJuStT9hSRTZ4i2ynWyxm3zI8D50c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u3QR3hI3PALufvE1+6/i2MUf/xQ/lm5cFMy/cCr/x7UFMXq4qiMdkwsRiAVJKfT7LYrl5q7G7TPnubgaA5EvqHdoVpVIS56ZoNrtcf8BmbiGwLMr1TXlV86xWg/wMzQZRXy1Zlra0PDcWNCabumXwbcTperUxKkmMYPzQ4SkK+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tbDn+RFm; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1752719929;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RY0ytnIDZuO0Ep0XUcgWNN7p8LAkaHqP1azq5AefPSA=;
-	b=tbDn+RFmzLUpmv3Q1dhNH2K3g66MNrivL4joRJCVSBziuhYHuHWEgXG8VUxrRCn/mMyPUu
-	LSOw702iIe00IAAlnPYCgXiblRtwBmZAX00yiToAEDQYRRXoCvqrT0wKuniIHRt8BOpz9R
-	XojfCI4iISnHR4N4fH/bMs/dByoVNh4=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Jiri Olsa <jolsa@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Menglong Dong <menglong8.dong@gmail.com>,
- Steven Rostedt <rostedt@goodmis.org>, bpf <bpf@vger.kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>,
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- LKML <linux-kernel@vger.kernel.org>,
- Network Development <netdev@vger.kernel.org>
-Subject:
- Re: multi-fentry proposal. Was: [PATCH bpf-next v2 02/18] x86,bpf: add
- bpf_global_caller for global trampoline
-Date: Thu, 17 Jul 2025 10:37:41 +0800
-Message-ID: <3643244.iIbC2pHGDl@7940hx>
-In-Reply-To:
- <CAADnVQLpAmZG_1827HS1dDaWBGraxY6UO92=tCX6eM9ZbqEBKQ@mail.gmail.com>
-References:
- <20250703121521.1874196-1-dongml2@chinatelecom.cn>
- <3364591.aeNJFYEL58@7940hx>
- <CAADnVQLpAmZG_1827HS1dDaWBGraxY6UO92=tCX6eM9ZbqEBKQ@mail.gmail.com>
+	s=arc-20240116; t=1752720736; c=relaxed/simple;
+	bh=+lJpU2mXa0TyzC21P9ldpmZXpfExs2ldRnSoRpZsCXM=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=dQe4Aw6Eed7vOvWB4l2vOvayTHjPGII0pKGZi9yZNbtnJUmOWUv8LGxwPhB7RU0XLEG672Cahuehre+mKDdBQe+YXkq+p+r6XOimZWZKNfCaC44OmY0c/7dUvuAC73QZhPLTA2HNn+TB777Xky5VzYq/iB4j6Ni+YLb1ixcLhcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W+LQnLWG; arc=none smtp.client-ip=209.85.219.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-e8275f110c6so452805276.2;
+        Wed, 16 Jul 2025 19:52:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752720734; x=1753325534; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+lJpU2mXa0TyzC21P9ldpmZXpfExs2ldRnSoRpZsCXM=;
+        b=W+LQnLWGIpkjPqZMyd/7C1dbqBtImkEpuytl/HxRzrrQ322ihDL249WKxIXBZt7Q5K
+         aGC9S1eKnOHNwhVCpV+PbpSYD8cqEcPCTxuJxLrs8pl6jpIop5vhbbv5lUd0lgPEzOho
+         Bw41ci7/08afQdJN7AsycwBoqWtRCRCpOTGpE3Yn+aUHhRFJMzTmPq59ZG0ERCp+Vq8q
+         D9zK/5O0heYEe4dSjwcVN1715VRGZ/rads8jMuciIHQR2ovaztryGZTb0u3pW0Yon8qf
+         s2YR7mXsv3piE93e+VludkjNneR/OkB7Z2Vvu3M4gRAGR5i886PCufBSyBdVl0LzlLo/
+         qbcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752720734; x=1753325534;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=+lJpU2mXa0TyzC21P9ldpmZXpfExs2ldRnSoRpZsCXM=;
+        b=Gf3VJ8Qmqg8fWzMIBXLygOOJnPVi578MpdSdptt7W5WvNC6Wy3FNNL2Lo8rCOYS+aF
+         QcMIej8Zkf/FAkLifIPwsD7xLDmrQghYGClatkZqELONNY/fo5W9o1V7vU2QIdHFoI9a
+         CO43O1FQDHPjPuL2yECLGWnU7H7xBq7B+Wk/usobqzCTjZYJhzqy6shY8QdSxOcVAQlL
+         nmosv2sL9+CT5SHG2a1ApEYKi0gXLOabFidBMv3B8mVY4sshDhzoFVyrMTFMyZCH80cH
+         1rR4ddFkJPTxIgz6Km8TbRmWCu7RFtE7H/TUP3+fHtef68V8pY0UijzqjN6esUerZE6Z
+         mlGA==
+X-Forwarded-Encrypted: i=1; AJvYcCW0+jpcag802F7O3gRwjCRRWwND1dGNeDkb8R2ohd5aHO+SSH6TzcSHEwU36cOSShiXym8=@vger.kernel.org, AJvYcCXtldKn4aY+xRx9HO4w4qALgZYeLv3nKGB0oCGLlAoBZV5gm4fkSj2UPHjy7SwT59hwbnhpqwC1@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJMSMQ/ADZ1wodloj+0wdFW3AiW00VQWmkIejd1q2Ug5Y7VG9x
+	U+aOl+AXLFXgUQuh6a7SV9ydrFS49i098qt1C2rWZE68rCqPVyWO8Fd7
+X-Gm-Gg: ASbGncusrdoh1BuAKXmDnW8JQWeVCGKhpgoWStaObvOz/HOa2QwyOpLWDPw+eSSmgoc
+	A6E+PyHipi2AiXSZ6ueCoviOJwDS7RspozPNUqzOlNUsOzPLEl8cqBGBpYlC4Xylbi7RmNYLPI7
+	JaGP16t1oxKB7upyy0FVeRBU/oe0h6GDcKX9+W9i7FvdCF6x/kecnmvdryZy/ujgEIBU9LzW/ER
+	wNGrJP3A5tG1x4IwEk81uXJ5MpeUIh7TqukwWpkx+FiYs+KrGPgWIdmF0Yy8ziGJVGfjgoRN7qH
+	zpOtOTiLy0ylHzi0x82TCbWIBBeUIBNb0HPeRaYaWj6BPvTFmuO/uwY0Nk96fLjmKiaGoZA5zyR
+	yAy3MNMsD5KAAamk61oEQTngA/jerhpTqWHeUf10g+5hyynP9XtXewTn1sGmyCzIpgs3FYw==
+X-Google-Smtp-Source: AGHT+IGIv/PNECzN/AP4YQUb37vr5VvmtdSKCMT8TaKIQLlfNS+FyLaApcES2IWkhCWdaq47lrXErg==
+X-Received: by 2002:a05:6902:2602:b0:e8b:bd41:c781 with SMTP id 3f1490d57ef6-e8bc255e3e9mr6502842276.11.1752720733738;
+        Wed, 16 Jul 2025 19:52:13 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with UTF8SMTPSA id 3f1490d57ef6-e8bb928f0edsm1502225276.34.2025.07.16.19.52.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Jul 2025 19:52:13 -0700 (PDT)
+Date: Wed, 16 Jul 2025 22:52:12 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ bjorn@kernel.org, 
+ magnus.karlsson@intel.com, 
+ maciej.fijalkowski@intel.com, 
+ jonathan.lemon@gmail.com, 
+ sdf@fomichev.me, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ hawk@kernel.org, 
+ john.fastabend@gmail.com, 
+ joe@dama.to, 
+ willemdebruijn.kernel@gmail.com, 
+ bpf@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ Jason Xing <kernelxing@tencent.com>
+Message-ID: <6878655ca06c7_9aa0c294c5@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAL+tcoCMQhaZdvbR1p50tuVk0RUdqAiRgjDrO0b+EO1XvM=2qw@mail.gmail.com>
+References: <20250716122725.6088-1-kerneljasonxing@gmail.com>
+ <20250716145645.194db702@kernel.org>
+ <CAL+tcoByyPQX+L3bbAg1hC4YLbnuPrLKidgqKqbyoj0Sny7mxQ@mail.gmail.com>
+ <20250716164312.40a18d2f@kernel.org>
+ <CAL+tcoA1LMjxKgQb4WZZ8LeipbGU038is21M_y+kc93eoUpBCA@mail.gmail.com>
+ <20250716175248.4f626bdb@kernel.org>
+ <CAL+tcoCMQhaZdvbR1p50tuVk0RUdqAiRgjDrO0b+EO1XvM=2qw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] xsk: skip validating skb list in xmit path
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
 
-On Thursday, July 17, 2025 10:13 AM Alexei Starovoitov <alexei.starovoitov@=
-gmail.com> write:
-> On Wed, Jul 16, 2025 at 6:51=E2=80=AFPM Menglong Dong <menglong.dong@linu=
-x.dev> wrote:
+Jason Xing wrote:
+> On Thu, Jul 17, 2025 at 8:52=E2=80=AFAM Jakub Kicinski <kuba@kernel.org=
+> wrote:
 > >
-> > On Thursday, July 17, 2025 8:59 AM Alexei Starovoitov <alexei.starovoit=
-ov@gmail.com> write:
-> > > On Wed, Jul 16, 2025 at 6:06=E2=80=AFAM Menglong Dong <menglong.dong@=
-linux.dev> wrote:
-> > > >
-> > > > On Wednesday, July 16, 2025 12:35 AM Alexei Starovoitov <alexei.sta=
-rovoitov@gmail.com> write:
-> > > > > On Tue, Jul 15, 2025 at 1:37=E2=80=AFAM Menglong Dong <menglong.d=
-ong@linux.dev> wrote:
-> > > > > >
-> > > > > >
-> > > > > > On 7/15/25 10:25, Alexei Starovoitov wrote:
-> > > > [......]
-> > > > > >
-> > > > > > According to my benchmark, it has ~5% overhead to save/restore
-> > > > > > *5* variants when compared with *0* variant. The save/restore o=
-f regs
-> > > > > > is fast, but it still need 12 insn, which can produce ~6% overh=
-ead.
-> > > > >
-> > > > > I think it's an ok trade off, because with one global trampoline
-> > > > > we do not need to call rhashtable lookup before entering bpf prog.
-> > > > > bpf prog will do it on demand if/when it needs to access argument=
-s.
-> > > > > This will compensate for a bit of lost performance due to extra s=
-ave/restore.
-> > > >
-> > > > I don't understand here :/
-> > > >
-> > > > The rhashtable lookup is done at the beginning of the global trampo=
-line,
-> > > > which is called before we enter bpf prog. The bpf progs is stored i=
-n the
-> > > > kfunc_md, and we need get them from the hash table.
+> > On Thu, 17 Jul 2025 08:06:48 +0800 Jason Xing wrote:
+> > > To be honest, this patch really only does one thing as the commit
+> > > says. It might look very complex, but if readers take a deep look t=
+hey
+> > > will find only one removal of that validation for xsk in the hot pa=
+th.
+> > > Nothing more and nothing less. So IMHO, it doesn't bring more compl=
+ex
+> > > codes here.
 > > >
-> > > Ahh. Right.
-> > >
-> > > Looking at the existing bpf trampoline... It has complicated logic
-> > > to handle livepatching and tailcalls. Your global trampoline
-> > > doesn't, and once that is added it's starting to feel that it will
-> > > look just as complex as the current one.
-> > > So I think we better repurpose what we have.
-> > > Maybe we can rewrite the existing one in C too.
+> > > And removal of one validation indeed contributes to the transmissio=
+n.
+> > > I believe there remain a number of applications using copy mode
+> > > currently. And maintainers of xsk don't regard copy mode as orphane=
+d,
+> > > right?
 > >
-> > You are right, the tailcalls is not handled yet. But for the livepatchi=
-ng,
-> > it is already handled, as we always get the origin ip from the stack
-> > and call it, just like how the bpf trampoline handle the livepatching.
-> > So no addition handling is needed here.
-> >
-> > >
-> > > How about the following approach.
-> > > I think we discussed something like this in the past
-> > > and Jiri tried to implement something like this.
-> > > Andrii reminded me recently about it.
-> > >
-> > > Say, we need to attach prog A to 30k functions.
-> > > 10k with 2 args, 10k with 3 args, and 10k with 7 args.
-> > > We can generate 3 _existing_ bpf trampolines for 2,3,7 args
-> > > with hard coded prog A in there (the cookies would need to be
-> > > fetched via binary search similar to kprobe-multi).
-> > > The arch_prepare_bpf_trampoline() supports BPF_TRAMP_F_ORIG_STACK.
-> > > So one 2-arg trampoline will work to invoke prog A in all 10k 2-arg f=
-unctions.
-> > > We don't need to match types, but have to compare that btf_func_model=
-=2Ds
-> > > are the same.
-> > >
-> > > Menglong, your global trampoline for 0,1,..6 args works only for x86,
-> > > because btf_func_model doesn't care about sizes of args,
-> > > but it's not the correct mental model to use.
-> > >
-> > > The above "10k with 2 args" is a simplified example.
-> > > We will need an arch specific callback is_btf_func_model_equal()
-> > > that will compare func models in arch specific ways.
-> > > For x86-64 the number of args is all it needs.
-> > > For other archs it will compare sizes and flags too.
-> > > So 30k functions will be sorted into
-> > > 10k with btf_func_model_1, 10k with btf_func_model_2 and so on.
-> > > And the corresponding number of equivalent trampolines will be genera=
-ted.
-> > >
-> > > Note there will be no actual BTF types. All args will be untyped and
-> > > untrusted unlike current fentry.
-> > > We can go further and sort 30k functions by comparing BTFs
-> > > instead of btf_func_model-s, but I suspect 30k funcs will be split
-> > > into several thousands of exact BTFs. At that point multi-fentry
-> > > benefits are diminishing and we might as well generate 30k unique
-> > > bpf trampolines for 30k functions and avoid all the complexity.
-> > > So I would sort by btf_func_model compared by arch specific comparato=
-r.
-> > >
-> > > Now say prog B needs to be attached to another 30k functions.
-> > > If all 30k+30k functions are different then it's the same as
-> > > the previous step.
-> > > Say, prog A is attached to 10k funcs with btf_func_model_1.
-> > > If prog B wants to attach to the exact same func set then we
-> > > just regenerate bpf trampoline with hard coded progs A and B
-> > > and reattach.
-> > > If not then we need to split the set into up to 3 sets.
-> > > Say, prog B wants 5k funcs, but only 1k func are common:
-> > > (prog_A, 9k func with btf_func_model_1) -> bpf trampoline X
-> > > (prog_A, prog_B, 1k funcs with btf_func_model_1) -> bpf trampoline Y
-> > > (prog_B, 4k funcs with btf_func_model_1) -> bpf trampoline Z
-> > >
-> > > And so on when prog C needs to be attached.
-> > > At detach time we can merge sets/trampolines,
-> > > but for now we can leave it all fragmented.
-> > > Unlike regular fentry progs the multi-fentry progs are not going to
-> > > be attached for long time. So we can reduce the detach complexity.
-> > >
-> > > The nice part of the algorithm is that coexistence of fentry
-> > > and multi-fentry is easy.
-> > > If fentry is already attached to some function we just
-> > > attach multi-fentry prog to that bpf trampoline.
-> > > If multi-fentry was attached first and fentry needs to be attached,
-> > > we create a regular bpf trampoline and add both progs there.
-> >
-> > This seems not easy, and it is exactly how I handle the
-> > coexistence now:
-> >
-> >   https://lore.kernel.org/bpf/20250528034712.138701-16-dongml2@chinatel=
-ecom.cn/
-> >   https://lore.kernel.org/bpf/20250528034712.138701-17-dongml2@chinatel=
-ecom.cn/
-> >   https://lore.kernel.org/bpf/20250528034712.138701-18-dongml2@chinatel=
-ecom.cn/
->=20
-> hmm. exactly? That's very different.
-> You're relying on kfunc_md for prog list.
-> The above proposal doesn't need kfunc_md in the critical path.
-> All progs are built into the trampolines.
->=20
-> > The most difficult part is that we need a way to replace the the
-> > multi-fentry with fentry for the function in the ftrace atomically. Of
-> > course, we can remove the global trampoline first, and then attach
-> > the bpf trampoline, which will make things much easier. But a
-> > short suspend will happen for the progs in fentry-multi.
->=20
-> I don't follow.
-> In the above proposal fentry attach/detach is atomic.
-> Prepare a new trampoline, single call to ftrace to modify_fentry().
+> > First of all, I'm not sure the patch is correct. The XSK skbs can hav=
+e
+> > frags, if device doesn't support or clears _SG we should linearize,
+> > right?
+> =
 
-modify_fentry() is used to operate on the same ftrace_ops. For
-example, we have the bpf trampoline A, and its corresponding
-ftrace_ops is opsA. Now, the image of the trampolineA is updated,
-we call modify_fentry() for opsA to update the direct call of it.
+> But note that there is one more function __skb_linearize() after
+> skb_needs_linearize() in the validate_xmit_skb(). __skb_linearize()
+> tests many members of skbs, which are not used to check the skbs from
+> xsk. For xsk, it's very simple (please see xsk_build_skb())
 
-When we talk about the coexistence, it means the functionA is
-attached with the global trampoline B, whose ftrace_ops is
-opsB. We can't call modify_fentry(trampolineA, new_addr) here,
-as the opsA is not register yet. And we can't call register_fentry
-too, as the functionA is already in the direct_functions when we
-register opsB.
+For single frame xsk skb_needs_linearize will be false and thus
+__skb_linearize is not called?
 
-So we need a way to do such transition.
+More generally, I would also think that the cost of the
+validate_xmit_skb checks are quite cheap in the xsk case where they
+are all false. On the assumption that the touched cachelines are
+likely warm.
+ =
 
->=20
-> > >
-> > > The intersect and sorting by btf_func_model is not trivial,
-> > > but we can hold global trampoline_mutex, so no concerns of races.
-> > >
-> > > Example:
-> > > bpf_link_A is a set of:
-> > > (prog_A, funcs X,Y with btf_func_model_1)
-> > > (prog_A, funcs N,M with btf_func_model_2)
-> > >
-> > > To attach prog B via bpf_link_B that wants:
-> > > (prog_B, funcs Y,Z with btf_func_model_1)
-> > > (prog_B, funcs P,Q with btf_func_model_3)
-> > >
-> > > walk all existing links, intersect and split, and update the links.
-> > > At the end:
-> > >
-> > > bpf_link_A:
-> > > (prog_A, funcs X with btf_func_model_1)
-> > > (prog_A, prog_B funcs Y with btf_func_model_1)
-> > > (prog_A, funcs N,M with btf_func_model_2)
-> > >
-> > > bpf_link_B:
-> > > (prog_A, prog_B funcs Y with btf_func_model_1)
-> > > (prog_B, funcs Z with btf_func_model_1)
-> > > (prog_B, funcs P,Q with btf_func_model_3)
-> > >
-> > > When link is detached: walk its own tuples, remove the prog,
-> > > if nr_progs =3D=3D 0 -> detach corresponding trampoline,
-> > > if nr_progs > 0 -> remove prog and regenerate trampoline.
-> > >
-> > > If fentry prog C needs to be attached to N it might split bpf_link_A:
-> > > (prog_A, funcs X with btf_func_model_1)
-> > > (prog_A, prog_B funcs Y with btf_func_model_1)
-> > > (prog_A, funcs M with btf_func_model_2)
-> > > (prog_A, prog_C funcs N with _fentry_)
-> > >
-> > > Last time we gave up on it because we discovered that
-> > > overlap support was too complicated, but I cannot recall now
-> > > what it was :)
-> > > Maybe all of the above repeating some old mistakes.
 > >
-> > In my impression, this is exactly the solution of Jiri's, and this is
-> > part of the discussion that I know:
+> > Second, we don't understand where the win is coming from, the numbers=
+
+> > you share are a bit vague. What's so expensive about a few skbs
+> =
+
+> To be more accurate, it's not "a few" but "so many" because of the
+> high pps reaching more than 1,000,000. So if people run the xdpsock to
+> test it, it's not hard to see most of time is spent during the skb
+> allocation process.
+
+Right, the alloc or memcpy more than the validate?
+
+> > accesses? Maybe there's an optimization possible to the validation,
+> > which would apply more broadly, instead of skipping it for one trivia=
+l
+> > case.
 > >
-> >   https://lore.kernel.org/bpf/ZfKY6E8xhSgzYL1I@krava/
->=20
-> Yes. It's similar, but somehow it feels simple enough now.
-> The algorithms for both detach and attach fit on one page,
-> and everything is uniform. There are no spaghetty of corner cases.
->=20
+> > Third, I asked you to compare with AF_PACKET, because IIUC it should
+> > have similar properties as AF_XDP in copy mode. So why not use that?
+> =
 
+> I haven't run into AF_PACKET so far. At least, I can confirm that xsk
+> doesn't need it from my side. The whole logic of validation apparently
+> is not designed for xsk case...
+> =
 
+> >
+> > Lastly, the patch is not all that bad, sure. But the experience of
+> > supporting generic XDP is a very mixed. All the paths that pretend
+> > to do XDP on skbs have a bunch of quirks and bugs. I'd prefer that
+> > we push back more broadly on any sort of pretend XDP.
+> =
+
+> Well, sorry, I feel a bit upset when reading this because as I
+> insisted before not everyone can use the advanced zerocopy mode.
+> =
+
+> Thanks,
+> Jason
 
 
 
