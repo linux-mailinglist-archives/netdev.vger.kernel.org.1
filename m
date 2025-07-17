@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-207670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85CB3B0825F
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 03:32:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05F1EB08265
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 03:33:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0F681A624CB
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 01:32:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 717BA3AE3C5
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 01:32:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 402021E47A5;
-	Thu, 17 Jul 2025 01:29:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 580B21F1505;
+	Thu, 17 Jul 2025 01:29:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eUdP0p1L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jTalCS5P"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DAF71DC9B5;
-	Thu, 17 Jul 2025 01:29:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D5451EF092;
+	Thu, 17 Jul 2025 01:29:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752715797; cv=none; b=PxL2IV5zUod4YNr0RLBUJ4YBDN7bmkcZDqKzWQQCQkkBoJF5e9CZ1M0PHlokPwVhS4mTlbg/6RxQlK0/W4Nnrl5qKPoe5UFFcbpwic3Oq1GphVfe+T3rs94kCuxTABJcOJ+rtY86V8YM5DE2kNHDYMxpg7jB9l6dC0j2gvALjNs=
+	t=1752715798; cv=none; b=Tf+sNzR3hii3IjHLSxL2DrUzLn3wPi9LXNAgOuVirb5Y486ZSO3sK156qhpidxr0SyM5CMMzEQtdQo2jNU8TM5kbojrI4oHris2Pw7joDZSu6+W+5Hgc5lWxzXfWq4W9A3aaIjm7jxsQkOQ9CZMX3Mv8uJ6HP1E95EmFPBE0DNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752715797; c=relaxed/simple;
-	bh=CDZJpixjt/dVifw+toCvtL45xMQpY9RXuOW6iUPvOfM=;
+	s=arc-20240116; t=1752715798; c=relaxed/simple;
+	bh=edzSWKCa2PNYzid9Z7i3xsZJb+XNXsnNlEF99MtCEjM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=VF7yyECwcORBMxgJM3LTIv0GORO1Bn7t2EEeYmdQ9w3ma0kPXOPlsqN4Fk6Bfc7eUIRvsf4hJyj8HEneeJFEardKyfqpeX/qQ7HBbcgbN9chmO1gLRdKh2TGtLd0/OxqoHMNdaYklnXQTUvLpNsDfjRxmwwZWvDvh0eUdllGT/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eUdP0p1L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83FF7C4CEE7;
-	Thu, 17 Jul 2025 01:29:56 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=u9/l7IwPZnxHlL7THxOBv7xaXUs3rcD8nJ2YUpj78n8myMQb7F9LPn57ssmVU8Zmd4dWFKR+GRa8cklRSa1C4et9gpnSxkSbwPnAqMi+YoEjQ8q0QzVpGkVzUGCfBw9jzqlRyeWF+2CqFV3odrstIAUf4b4kmJOoIcDXIUJHMGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jTalCS5P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F23FC4CEE7;
+	Thu, 17 Jul 2025 01:29:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752715796;
-	bh=CDZJpixjt/dVifw+toCvtL45xMQpY9RXuOW6iUPvOfM=;
+	s=k20201202; t=1752715798;
+	bh=edzSWKCa2PNYzid9Z7i3xsZJb+XNXsnNlEF99MtCEjM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=eUdP0p1LKfhBHinJrcoI0Tkoogogsl/3olXBiFYzG9vkdb2AgsdSnuJp3QL5yY6Ux
-	 2nJCJw9dKOySnNVKR27Qq0NjBmCI/jAdEBUfylFp0xDV40kOfkZrZKmaKTeXFh7jYu
-	 qgdng8Qn5MxG2vaxjSsCynN53s6QCgsS+05sZ+AF2lTirE/8aqg6ypOcST71eFPc8m
-	 lVvR5vRHffKysX8tPtXF//JQiMuW0pDtr3q2qO0hTJ6fqrQTeQJ7xD7KC/4E9ENG9X
-	 gBCknR4NC80UY1tvAXMQsPvsyInTbWjzWNXRvg1j0s9135AAcNssfyUf+0bbVkU0rg
-	 Gtg2gDpT52d6Q==
+	b=jTalCS5Pfm40u1apBaJsDFYqsHr00l8KZ5e3NqIMDtSRkNn5/9v+hi4R+39JSnrLH
+	 ddb/mT1EAK9L4N3SZwMlsRuHQpSdSQh/AP4n+j6eHRDFsJVWZSOrn/FaLeEcrCEgG6
+	 Eas7S31QhbdpKNnlbx1iZ1iUch/D60fK8VkDEftvyTHDBl4cnbOBW1Nz3g04PXWS5D
+	 0qQPY8qPhWMD8tguhe0lhfp+zClsKmcwGR9GpKYKgDXcmEuBIm7j3uu35GA7vx+h/Y
+	 0WNTKsdgpxMIMRzLNZCFVgOOY20ZytWv3o00BPtHSQXuJYn074NS+jTh7UEULJOBNy
+	 tvCaZwXbTTGqw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADDB383BA38;
-	Thu, 17 Jul 2025 01:30:17 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71110383BA38;
+	Thu, 17 Jul 2025 01:30:19 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next V3 0/2] net/mlx5e: Add support for PCIe
- congestion
- events
+Subject: Re: [PATCH net-next] s390/net: Remove NETIUCV device driver
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175271581674.1388574.10952693075417805401.git-patchwork-notify@kernel.org>
-Date: Thu, 17 Jul 2025 01:30:16 +0000
-References: <1752589821-145787-1-git-send-email-tariqt@nvidia.com>
-In-Reply-To: <1752589821-145787-1-git-send-email-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
- leon@kernel.org, mbloch@nvidia.com, corbet@lwn.net, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, dtatulea@nvidia.com
+ <175271581800.1388574.4454566301754879755.git-patchwork-notify@kernel.org>
+Date: Thu, 17 Jul 2025 01:30:18 +0000
+References: <20250715074210.3999296-1-wintera@linux.ibm.com>
+In-Reply-To: <20250715074210.3999296-1-wintera@linux.ibm.com>
+To: Alexandra Winter <wintera@linux.ibm.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, hca@linux.ibm.com, gor@linux.ibm.com,
+ agordeev@linux.ibm.com, borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ twinkler@linux.ibm.com, horms@kernel.org, corbet@lwn.net,
+ linux-doc@vger.kernel.org, nagamani@linux.ibm.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 15 Jul 2025 17:30:19 +0300 you wrote:
-> Hi,
+On Tue, 15 Jul 2025 09:42:10 +0200 you wrote:
+> From: Nagamani PV <nagamani@linux.ibm.com>
 > 
-> This is V3. Find V2 here:
-> https://lore.kernel.org/all/1752130292-22249-1-git-send-email-tariqt@nvidia.com/
+> The netiucv driver creates TCP/IP interfaces over IUCV between Linux
+> guests on z/VM and other z/VM entities.
 > 
-> Find detailed feature description by Dragos below [1].
+> Rationale for removal:
+> - NETIUCV connections are only supported for compatibility with
+>   earlier versions and not to be used for new network setups,
+>   since at least Linux kernel 4.0.
+> - No known active users, use cases, or product dependencies
+> - The driver is no longer relevant for z/VM networking;
+>   preferred methods include:
+> 	* Device pass-through (e.g., OSA, RoCE)
+> 	* z/VM Virtual Switch (VSWITCH)
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,V3,1/2] net/mlx5e: Create/destroy PCIe Congestion Event object
-    https://git.kernel.org/netdev/net-next/c/ab2b0d4d6394
-  - [net-next,V3,2/2] net/mlx5e: Add device PCIe congestion ethtool stats
-    https://git.kernel.org/netdev/net-next/c/8890ee6dcf6e
+  - [net-next] s390/net: Remove NETIUCV device driver
+    https://git.kernel.org/netdev/net-next/c/727258025b93
 
 You are awesome, thank you!
 -- 
