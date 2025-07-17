@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-207911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86755B08FE2
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 16:51:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C369B08FE7
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 16:51:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 517B41C438F0
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 14:51:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 795F51C43B15
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 14:51:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A8D12F949A;
-	Thu, 17 Jul 2025 14:50:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE09C2FA620;
+	Thu, 17 Jul 2025 14:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f09aUh1G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZwcY1CzA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F39D2F9497;
-	Thu, 17 Jul 2025 14:50:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 963112F94BB;
+	Thu, 17 Jul 2025 14:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752763810; cv=none; b=tQSk8fqKuhRUWTGrJ6RcitK7YPDa8qGCiR2/qsK5s5T9+VkytOsLmLth5Ui1gdkBu+iX2nOOFXFZN1oP4OBf7tCbK4ZXyPu6Q2U8yeIVbGKWDq+dlDx8mEelqfT0D9p8Fgo+94S3VvqYNzJ9/fGk7yXu5WpYFPOzZwflmuWJoGE=
+	t=1752763811; cv=none; b=avTCUk1jYM0OO1boLNHpPeQwuVn/95cgscKxD1mhIO0v4kUVd8lDdx4IZoyqZiqwhlZXDqEkNVorA261tC/SIAkjL+lKoTo20nB/Yqop416z32sDEfwo4Vvhz6tf2tVhpWkYNIB2xA5DkUoGzD2jSqMe9MMyYHNR6KyIXcXLgNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752763810; c=relaxed/simple;
-	bh=vWyQJHUOzV1MpPMbxli/i1xxas1uvgGB5zwciL1fqKc=;
+	s=arc-20240116; t=1752763811; c=relaxed/simple;
+	bh=mIgncsRmQiPT7wJ6VbqzaJZYzg6DVLSBFP2f1woV0Ys=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iepRsCX6lx5XemfJaMRv3NXpGnLWXRwIqFvYTiHz0ho+Uryap2IC9ooexPTbOgdTV36i2dslRLNXOLButPGlgaZRb20n5uo6RHN+CfXcCb3e0E3QhlGOn4u1O8XExs59BTlBWLNuv4qHLvVFSzwEjv0qPf7qum/uHsbpnYbYLXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f09aUh1G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A264BC4CEE3;
-	Thu, 17 Jul 2025 14:50:09 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ErQ5AAvaIKekNmQ67dctF0bCFcUwdl0TggH3B//aNeeZzgpGVM4AG/yREmkwfSbUdH9LZXXfbXVRI4R4Q+8MghwnR3YbiEpHEuIhzxRz2E2v6CPg1b0X8K0kESWth25jK46LBrfV90u9PSvhamYKhUcZKkkFwbG/ihOyLmT0U30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZwcY1CzA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26E12C4CEE3;
+	Thu, 17 Jul 2025 14:50:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752763809;
-	bh=vWyQJHUOzV1MpPMbxli/i1xxas1uvgGB5zwciL1fqKc=;
+	s=k20201202; t=1752763811;
+	bh=mIgncsRmQiPT7wJ6VbqzaJZYzg6DVLSBFP2f1woV0Ys=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=f09aUh1GUvjPCxEcm3r2HPbLVOca9XOGyG7lmrIWwXPUKbQZLqJhHikG5HNDA4p+2
-	 GlIPvjsI3xaIN+titFTw8k6bKXLOXBBTKSbcW+xppaoEpLr1I61VXTW8tpW9T9eWBT
-	 7zEMfJU2yUaAvzfs1VXhwv7PNFJksosDzpdwRLCz+erLNtVGpf8ES97OtcSAnp3Wwn
-	 9oU1clHaPo9+hIdYk+JOYSWps77ABS8grbPhkhdISleT58ThC+P6NBYmReR8efLreu
-	 2QjYBoB6qVPXGU7NAczlX3Cqk9V7eJUMBZITPZdpHfkWHrHZ/FlmNeM75CiuFpwLaI
-	 NoCGnGz88UbDg==
+	b=ZwcY1CzAOwKu5adgJxP56GIG6f4LpRYZ/yiyPZ3/g1gmaQP2NuzLBRqN/CxklVZKb
+	 gULC3/rq5pnq61WhLUEWBakXZ4Jp8m3Eq6dVumJJAVFwDIz9UJcm1DGHYnuja+JHeY
+	 b6QseCt9R+mjIDnpsyhFYotSzlvRlqgz4f1oZXkOzFdnRIPVTsAWuvOuUF08gS4Qei
+	 0J+8RWGPGmGQPExDT6PSw60zbkC5xWokv33j5Nwm55rLrRINa5w6FkLx1Vv6zmzpYP
+	 DCF5SDUlmNkAXRG1czddebhnpTDYOiQnwIEtbMB+ER4tywnsGNllakd358XtjM7wp/
+	 P4smLzX38Cjmw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD7A383BF47;
-	Thu, 17 Jul 2025 14:50:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C93383BF47;
+	Thu, 17 Jul 2025 14:50:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] hv_netvsc: Set VF priv_flags to IFF_NO_ADDRCONF before
- open to prevent IPv6 addrconf
+Subject: Re: [PATCH net v3] virtio-net: fix recursived rtnl_lock() during
+ probe()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175276382950.1959085.7504024045631289038.git-patchwork-notify@kernel.org>
-Date: Thu, 17 Jul 2025 14:50:29 +0000
-References: <20250716002607.4927-1-litian@redhat.com>
-In-Reply-To: <20250716002607.4927-1-litian@redhat.com>
-To: Li Tian <litian@redhat.com>
-Cc: netdev@vger.kernel.org, linux-hyperv@vger.kernel.org,
- linux-kernel@vger.kernel.org, haiyangz@microsoft.com, decui@microsoft.com,
- stephen@networkplumber.org, longli@microsoft.com
+ <175276383099.1959085.14014268800421819820.git-patchwork-notify@kernel.org>
+Date: Thu, 17 Jul 2025 14:50:30 +0000
+References: <20250716115717.1472430-1-zuozhijie@bytedance.com>
+In-Reply-To: <20250716115717.1472430-1-zuozhijie@bytedance.com>
+To: Zigit Zo <zuozhijie@bytedance.com>
+Cc: mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+ eperezma@redhat.com, virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, edumazet@google.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 16 Jul 2025 08:26:05 +0800 you wrote:
-> Set an additional flag IFF_NO_ADDRCONF to prevent ipv6 addrconf.
+On Wed, 16 Jul 2025 19:57:17 +0800 you wrote:
+> The deadlock appears in a stack trace like:
 > 
-> Commit under Fixes added a new flag change that was not made
-> to hv_netvsc resulting in the VF being assinged an IPv6.
-> 
-> Fixes: 8a321cf7becc ("net: add IFF_NO_ADDRCONF and use it in bonding to prevent ipv6 addrconf")
-> Suggested-by: Cathy Avery <cavery@redhat.com>
-> Signed-off-by: Li Tian <litian@redhat.com>
+>   virtnet_probe()
+>     rtnl_lock()
+>     virtio_config_changed_work()
+>       netdev_notify_peers()
+>         rtnl_lock()
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3] hv_netvsc: Set VF priv_flags to IFF_NO_ADDRCONF before open to prevent IPv6 addrconf
-    https://git.kernel.org/netdev/net/c/d7501e076d85
+  - [net,v3] virtio-net: fix recursived rtnl_lock() during probe()
+    https://git.kernel.org/netdev/net/c/be5dcaed694e
 
 You are awesome, thank you!
 -- 
