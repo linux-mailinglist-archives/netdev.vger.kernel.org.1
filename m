@@ -1,88 +1,101 @@
-Return-Path: <netdev+bounces-207883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF802B08E4C
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 15:32:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2209AB08E49
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 15:31:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63CCB189FF4D
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 13:32:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F0E41668F3
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 13:31:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC33C2E8E0B;
-	Thu, 17 Jul 2025 13:31:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2B082E8E1E;
+	Thu, 17 Jul 2025 13:31:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="qUywYP61"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bk0TDF8O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-106102.protonmail.ch (mail-106102.protonmail.ch [79.135.106.102])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF762E88AF;
-	Thu, 17 Jul 2025 13:31:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.102
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7201C2E8E0B;
+	Thu, 17 Jul 2025 13:31:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752759110; cv=none; b=o2pKMm2/cMzNKPYIIVtv/d3jocvywRwd4r/UydreeeUcK5aKewDKMjLfydxYQlfpBa4b/EK/6ro4ET2hEoVmTwK1GDsXX/zF5MHSlSBcJd4qOOgZYg9qMVH06V0gkirTzXRgNz4n8GnaNAHb5wCCG22mO2Z+yn+Obujg4wKAZ/I=
+	t=1752759107; cv=none; b=glvA52Lgd3kqAReccGUs/GYif0NQ2w0s8EssUyDdz83QlJITB2ixa1dOv5rSmdjkK4zgPRKWtVst8abXxfFRCwRDbIWOU/yF5mICjctn7S0Di/+cfeybyVOhEBHGhPonMEHTK6x9JKNKn8ZE18tBz9A3FhV1+Xew+GnihSeSw5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752759110; c=relaxed/simple;
-	bh=aPEWDW3DKbruNkNr+5qftKrpi1xMqYprC+1aHTuSLYw=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RMUMTxdQaRTk15f6Tvk3pkntHFrBV6GiBG9N+NWdLXGZxuo4GGL1mrOBM+e5bOE/eADu7BVxL9NGH7qFr8TtFi0eVpK67ZTKHWjs7OvvoXD+z5HaeJnyAeBnykKEphMY2Zg1RZoBRxo4kKe4Ywof1/bBfD+85eZK+GAMUk9Pn4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=qUywYP61; arc=none smtp.client-ip=79.135.106.102
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1752759105; x=1753018305;
-	bh=aPEWDW3DKbruNkNr+5qftKrpi1xMqYprC+1aHTuSLYw=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=qUywYP613MdGorQ6Skw0P4OHml0OlX7xMq8/HtjRKCM0b4AnphpKQ8UQj05AVyOKq
-	 Jvo/77m/3rzY9zTxNRdadHYf9XjSJ29YEs/9JfkAAl6QOpnDiwU01b8vKud06URERr
-	 z6DV53QMPqWQSKKHKwiJsuahKpuCzzCcVXnqkoZDi+POZzOdrkPMoYbfadJM15V2Kt
-	 8HsLFlM2KSqTviUwbfNyCUm9iFC1OhvF0oNimT4jLkCZZX2jI+834P4C6fi2ienf6d
-	 UE4cObV7oUVTBMGyLXdU6HOJ+KLLzKoH85QIQqF1NsDxbsWnwuGzClUkChQdgqHcZf
-	 4xQy/wPq/eiHg==
-Date: Thu, 17 Jul 2025 13:31:40 +0000
-To: Andy Shevchenko <andy.shevchenko@gmail.com>
-From: Yassine Oudjana <y.oudjana@protonmail.com>
-Cc: Manivannan Sadhasivam <mani@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, Jonathan Cameron <jic23@kernel.org>, David Lechner <dlechner@baylibre.com>, =?utf-8?Q?Nuno_S=C3=A1?= <nuno.sa@analog.com>, Andy Shevchenko <andy@kernel.org>, Luca Weiss <luca@lucaweiss.eu>, linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-iio@vger.kernel.org
-Subject: Re: [PATCH v2 4/4] iio: Add Qualcomm Sensor Manager driver
-Message-ID: <pf5Z61lF8AhA7lEZ3mew6aSShDnuQUe_da_gGIcw6cftOM0kuxDYHrnIbiOA91kHYw2RCQP4MvqOkubyJisqu8MmfcFI8yB5bXagfEO-U_Y=@protonmail.com>
-In-Reply-To: <CAHp75Vf8NzYRMeM=+S4p9LGnOd4iXcdw93hBjd=Rn=LqBXgwgA@mail.gmail.com>
-References: <20250710-qcom-smgr-v2-0-f6e198b7aa8e@protonmail.com> <20250710-qcom-smgr-v2-4-f6e198b7aa8e@protonmail.com> <CAHp75Vf8NzYRMeM=+S4p9LGnOd4iXcdw93hBjd=Rn=LqBXgwgA@mail.gmail.com>
-Feedback-ID: 6882736:user:proton
-X-Pm-Message-ID: c4341d71dd1799d4c6fdd96eeabe45193f82ce56
+	s=arc-20240116; t=1752759107; c=relaxed/simple;
+	bh=WvnZljD9LfE/4t4NQ5QtpY/tagREIet7i/+Hj9YA1r4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KLPEyEeUTlAKnFvo2qnJYzS/3V7YAWIGxcFtnGe+i0X1a2xrz89bM986wRp4kTu0p+un2C/6AU09VXA7aPsj08atF7YDNpJSTAHX/wiFLHRyzmmoIY/vANrW8eSZ72VSTEQvHpJwkEkIPKzmE5/Z5OpbbYhUugWyOuw57apfg6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bk0TDF8O; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91EE6C4CEEB;
+	Thu, 17 Jul 2025 13:31:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752759105;
+	bh=WvnZljD9LfE/4t4NQ5QtpY/tagREIet7i/+Hj9YA1r4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Bk0TDF8O2HqcR3XYji7ZN45eXoESOYckuH/BK/qlMue+WupEQ6UahEUix/ZbLUDw0
+	 NhwA2cLMKFiGA2/wXvtqGT2oFdxdYeppmkt0izZRVrtUBvvr37wLtpuRDhz9Awd0I4
+	 3DeZuiQB0FVVNWYrV3TUAM5S5Kj4OG1SmGlAKsDDccrHQxYYwUWv0+nSuY8DI85JR8
+	 bGFVvfyNEBNR8Jil0UTS1rzvJXPUITcJQo5Z1QaA6R8lU4sJPfrqLsRq0t93QbqLIr
+	 WKh45Tb+h9O1fzjekW2Rpxrri26xYPA0Wsye2SO+V1IbrYF8yjmmMOtprh1wu/rUe6
+	 4xu0ilcuzYonw==
+Date: Thu, 17 Jul 2025 06:31:44 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: Paolo Abeni <pabeni@redhat.com>, Pablo Neira Ayuso
+ <pablo@netfilter.org>, netfilter-devel@vger.kernel.org,
+ davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ horms@kernel.org
+Subject: Re: [PATCH net,v2 0/7] Netfilter fixes for net
+Message-ID: <20250717063144.598f0c98@kernel.org>
+In-Reply-To: <20250717062338.18ed7f69@kernel.org>
+References: <20250717095808.41725-1-pablo@netfilter.org>
+	<33ce1182-00fa-4255-b51c-d4dc927071bc@redhat.com>
+	<aHj0QSJkzexEKE2T@strlen.de>
+	<20250717062338.18ed7f69@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thursday, July 10th, 2025 at 9:58 AM, Andy Shevchenko <andy.shevchenko@g=
-mail.com> wrote:
+On Thu, 17 Jul 2025 06:23:38 -0700 Jakub Kicinski wrote:
+> On Thu, 17 Jul 2025 15:01:53 +0200 Florian Westphal wrote:
+> > Paolo Abeni <pabeni@redhat.com> wrote:  
+> > > # timeout set to 1800
+> > > # selftests: net/netfilter: conntrack_clash.sh
+> > > # got 128 of 128 replies
+> > > # timed out while waiting for reply from thread
+> > > # got 127 of 128 replies
+> > > # FAIL: did not receive expected number of replies for 10.0.1.99:22111
+> > > # FAIL: clash resolution test for 10.0.1.99:22111 on attempt 2
+> > > # got 128 of 128 replies
+> > > # timed out while waiting for reply from thread
+> > > # got 0 of 128 replies
+> > > # FAIL: did not receive expected number of replies for 127.0.0.1:9001
+> > > # FAIL: clash resolution test for 127.0.0.1:9001 on attempt 2
+> > > # SKIP: Clash resolution did not trigger
+> > > not ok 1 selftests: net/netfilter: conntrack_clash.sh # exit=1
+> > > I think the above should not block the PR, but please have a look.    
+> > 
+> > No idea whats happening, I get 100/100 ok :-/
+> > 
+> > I'll send a revert or $ksft_skip for now if I can't figure it out.  
+> 
+> Oh, I see this disembodied thread now, sorry.
+> 
+> No need to send the skip, we can ignore the case when ingesting results.
 
-> On Thu, Jul 10, 2025 at 11:06=E2=80=AFAM Yassine Oudjana via B4 Relay
-> devnull+y.oudjana.protonmail.com@kernel.org wrote:
->=20
-> > Add a driver for sensors exposed by the Qualcomm Sensor Manager service=
-,
-> > which is provided by SLPI or ADSP on Qualcomm SoCs. Supported sensors
-> > include accelerometers, gyroscopes, pressure sensors, proximity sensors
-> > and magnetometers.
->=20
->=20
-> First of all it's almost 2kLoCs, it's on the edge of unreviewable
-> code. Please, try to make 3+ patches out of this one.
-> Second, take your time and check what your code is using from the
-> kernel internal libraries and APIs and follow IWYU principle when
-> including headers.
+FWIW
 
-I can cleanly split it into 2 patches by putting the QMI components
-in a separate patch. Not sure about 3+ patches but will try my best.
-Will review includes.
+# nft --version
+nftables v1.1.3 (Commodore Bullmoose #4)
 
+nftables# git log -1 --format=reference 
+610089f2 (cache: Tolerate object deserialization failures, 2025-05-16)
 
