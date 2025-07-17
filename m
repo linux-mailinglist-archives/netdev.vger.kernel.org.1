@@ -1,284 +1,165 @@
-Return-Path: <netdev+bounces-207803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1628BB089A6
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 11:46:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7005BB0897E
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 11:39:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42ADF4A2054
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 09:46:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4FF17AF69F
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 09:38:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CFDA1F418B;
-	Thu, 17 Jul 2025 09:46:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B232F28C2A1;
+	Thu, 17 Jul 2025 09:39:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="TK/BF7VD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ro/NMiji"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81EBE33086;
-	Thu, 17 Jul 2025 09:46:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00BF428A414
+	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 09:39:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752745598; cv=none; b=tpsvWFoJPHsXGiKp7Ql1rGtJJFoPjYh38+7DhhxjDDVDcjMBDEbnpZKbrcOujr2C6qDAmz9YQG3nxeec9GLgUbNMaZrdonGkxcfiOPx0PS/eJs4EUsGD3BxJIIzM8xwVkm9gXYDQ6rGaDBjOQ23yXmb0Y7nk3VElQdz8qKpN/JE=
+	t=1752745166; cv=none; b=ONUEs0Wa54rfsY7afxF7ZUm7UlhrKshcVFt7i36l5A8T/APzOY/be4huP/XYFpcbwj7b0dUnB5Z8H2Wz13/4aMVRlXxGqtMdf194sGLbNuyVE2OAZeYlBGN2o6rfV8s+JG8oNSvZddIp54AQBvT9x9dc5fE4qXsA6Cp3NUajXew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752745598; c=relaxed/simple;
-	bh=GRo6BqRDVlHbq/t471LD2soyGMfCA8eTw/hdnfLrUv4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N8lO7TWOqDF7QISyd1ZcG1OsAGXOYhrO1PzusNB83NAwNhNReqcaev9xAW54Ehe4t1sZmDDEeGGOWiet9Oo31nuB5Py+4JK+Bh3LcexFksf/IKD2XZ2TNvCDFqSFnjwwAJIEAVUYnquuCSAXkFHQTrFnfxcaO3teSSi5ABNlBqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=TK/BF7VD; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-	Resent-Message-ID:In-Reply-To:References;
-	bh=sNA0xIRmPN1ZnjdIGACVLF6KGztJoPFnWMptz+PKhqI=; t=1752745596; x=1753955196; 
-	b=TK/BF7VDkQtYBwhh33kEHX2dkF/UWfEfDhwXXckwxEkrzPHC+AdkxsG6DHIb7MkOXOpXzqxJdnL
-	HVyJ4iAfZZd5dzGHVrrL7HHBIvvHWNP8YNLhUbtWTy/Mn5kZq0FwsfxiVkfQg27KBGpnstUgSxg4K
-	+gwNNb4IuS6XBE3f1/V/ROs1bbC3mq0huPlUl9pi5wS552rwO4+oqJLXy/zV5lqBL4zceRbDMeBee
-	+nin/k4693nUW/LEg5LCUfsve/0UucVgPOLPrZwbkJRGDUPeBJsgU4QeDpploR9G+ejd5HmsP5UHp
-	9fjti72aj66fCeTZujH3YmFjakYn9hDy/nRw==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1ucLBx-0000000AHJk-19li;
-	Thu, 17 Jul 2025 11:46:21 +0200
-From: Johannes Berg <johannes@sipsolutions.net>
-To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Subject: [GIT PULL] wireless-next-2025-07-17
-Date: Thu, 17 Jul 2025 11:38:02 +0200
-Message-ID: <20250717094610.20106-47-johannes@sipsolutions.net>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1752745166; c=relaxed/simple;
+	bh=dXeJz3vwBSLIWWCWuP+elspZU7SI9LsUKQsf9/I2RiU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oS0OJS8MWW7ceKrpOQ6KqlsT3xvVKmGQHTxCN1GNLQ4NxBFD4y2bSnZRCd0lxMApGvfdsiWlV63bhOsgKLa1uaS8pJIc7mWRialF0wTmlG0IWwC1noozKJN/C0okiFOQ8+JKmYckfFQFtU8XTGpcyxYub24nMMXxfgSrYnHoB4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ro/NMiji; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752745163;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lKvVQQJMq+hy7WZue3QcEAM5iltBaD3HiRA66HLusuo=;
+	b=Ro/NMijiX9eVge9zN5YWfB1dJn68jDbTT8KRkZ4Pw6EHHcG2RGSXWjSmBTp3ip/Az/fTMc
+	QVFGF0nKFvqL/JmSImRO3svU7j126lOokInPWA7sPwQxBP5y6RPksUR9ByOvnDwToGA1N/
+	pDbkNnCXi27X80st/PWNS5ySSFDxtJg=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-50-AKcZDGC0OOC_FEErePjqhw-1; Thu, 17 Jul 2025 05:39:21 -0400
+X-MC-Unique: AKcZDGC0OOC_FEErePjqhw-1
+X-Mimecast-MFC-AGG-ID: AKcZDGC0OOC_FEErePjqhw_1752745161
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7da0850c9e5so116037685a.0
+        for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 02:39:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752745161; x=1753349961;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lKvVQQJMq+hy7WZue3QcEAM5iltBaD3HiRA66HLusuo=;
+        b=woDgR7GoPSW9WxX5JU7XD3RNKstevXFn/IcP8t1lAvKrpXIJrznxd24lbHTmuA45wH
+         8usyd8URdi7vdqzVaLBXG3bDMzN6kC3Ig7d7xLuX3ha3KmtwakFp0dGaVfSbk0VmbpI3
+         /IXDJTTCDBjWmpibF2vPsmnMu+8N0yj3+0XvUNvAEwZ/q7dfZsEMcknR4Pj3NEebOKfs
+         LNdiCObBthZVTI/3LfcWGR5OH8IY/5B4kGrVoEbHZ4+H0U7dJ2PKLbW2CQlT0L/+15Tg
+         Iv3eGk+C+x8onlbUlxdxnhG7mtKq228xytk6xJ0m2Mpx6fu3JsAPiWYKBOBAWhQwXaci
+         28Mw==
+X-Forwarded-Encrypted: i=1; AJvYcCWFBFtafJDZd1vFzbjmcX77esqAIN51Ti4B0msDB9AQsf+hB5p0ZHu+WTata+eTUdlpYvntuZ0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4KTZlptLMUHaokZQBXc4wuX6GPwTRXKyfCvFsqUha31S4Lh2d
+	w746d/F8LrUYZgJpZULWJEiYVZY/WFVy1zc/pyxTQj4jfeQmShZm3nG2lv2SoATcAZZFFZo64b3
+	0+mxPXy8inNQrDiP5KVoX23WFhAJ6KjZUQdVMqoYFqjJzjolO9J5fa2s20g==
+X-Gm-Gg: ASbGncu5hfq763ThRJDHWevhDfZgljlKGak3LRsZgLY99Eo74ulnOZcvacdIE2jBXCL
+	braBlDrk1iCuNyfgDh00TI/qsTzX1l4lBpxvO+gSsBQ2k7b7xcLflfGPjEriDCavk1vPIxOKUs6
+	e9uh0mQouH+Ps0XtPUHcfNI1UdaIVuBWSSuv4ohlRrVk/PqCmC5YjF+mOYdjNZ34W/bvBQx8Pyv
+	E46GLtTl4VXXa4asVkyKRX6wg1UfeHmddL1gt8m8SqfXDU5N3eu1LUkqN3AkWPFbR2ztT6T6h4G
+	HQ9978/ASaoF2TNQAUwnGaqvuWoBFdqG+yqixmiro6bInqT6atA4XLDzzjQJ6Lu7avSbjRzbUHY
+	YLlH6Hh+0VP9QSG4=
+X-Received: by 2002:a05:620a:6542:b0:7e3:4413:e494 with SMTP id af79cd13be357-7e34413e88dmr561235285a.60.1752745160467;
+        Thu, 17 Jul 2025 02:39:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGLjVGLBAruZTnyYcI3XjIk2LiSOrCmNEhnAfiMWz9ibsQjoRXzWcmxwJLI++dPE/3qhXbt3A==
+X-Received: by 2002:a05:620a:6542:b0:7e3:4413:e494 with SMTP id af79cd13be357-7e34413e88dmr561231885a.60.1752745159997;
+        Thu, 17 Jul 2025 02:39:19 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-45-205-118.retail.telecomitalia.it. [79.45.205.118])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e2635b0b2fsm519799085a.0.2025.07.17.02.39.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Jul 2025 02:39:19 -0700 (PDT)
+Date: Thu, 17 Jul 2025 11:39:12 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Will Deacon <will@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Keir Fraser <keirf@google.com>, 
+	Steven Moreland <smoreland@google.com>, Frederick Mayle <fmayle@google.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	netdev@vger.kernel.org, virtualization@lists.linux.dev, stable@vger.kernel.org
+Subject: Re: [PATCH v4 2/9] vsock/virtio: Validate length in packet header
+ before skb_put()
+Message-ID: <y6taqbyskzr4k7tetixgkhdo2z2dgrionsor3jriuo4bxlqdfc@fjnq7tig4bik>
+References: <20250717090116.11987-1-will@kernel.org>
+ <20250717090116.11987-3-will@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250717090116.11987-3-will@kernel.org>
 
-Hi,
+On Thu, Jul 17, 2025 at 10:01:09AM +0100, Will Deacon wrote:
+>When receiving a vsock packet in the guest, only the virtqueue buffer
+>size is validated prior to virtio_vsock_skb_rx_put(). Unfortunately,
+>virtio_vsock_skb_rx_put() uses the length from the packet header as the
+>length argument to skb_put(), potentially resulting in SKB overflow if
+>the host has gone wonky.
+>
+>Validate the length as advertised by the packet header before calling
+>virtio_vsock_skb_rx_put().
+>
+>Cc: <stable@vger.kernel.org>
+>Fixes: 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")
+>Signed-off-by: Will Deacon <will@kernel.org>
+>---
+> net/vmw_vsock/virtio_transport.c | 12 ++++++++++--
+> 1 file changed, 10 insertions(+), 2 deletions(-)
 
-And here's another set of changes for net-next. There will
-be a merge conflict with the material I just sent for net
-due to the BIOS workaround/fix, the resolution should just
-take the -next version.
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-Next week we'll have some more changes (Jeff announced, and
-I have some things pending in patchwork), but things are
-clearly winding down (as they well should.) This is mostly
-now to fix the double-free and RCU regressions.
+>
+>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>index f0e48e6911fc..eb08a393413d 100644
+>--- a/net/vmw_vsock/virtio_transport.c
+>+++ b/net/vmw_vsock/virtio_transport.c
+>@@ -624,8 +624,9 @@ static void virtio_transport_rx_work(struct work_struct *work)
+> 	do {
+> 		virtqueue_disable_cb(vq);
+> 		for (;;) {
+>+			unsigned int len, payload_len;
+>+			struct virtio_vsock_hdr *hdr;
+> 			struct sk_buff *skb;
+>-			unsigned int len;
+>
+> 			if (!virtio_transport_more_replies(vsock)) {
+> 				/* Stop rx until the device processes already
+>@@ -642,12 +643,19 @@ static void virtio_transport_rx_work(struct work_struct *work)
+> 			vsock->rx_buf_nr--;
+>
+> 			/* Drop short/long packets */
+>-			if (unlikely(len < sizeof(struct virtio_vsock_hdr) ||
+>+			if (unlikely(len < sizeof(*hdr) ||
+> 				     len > virtio_vsock_skb_len(skb))) {
+> 				kfree_skb(skb);
+> 				continue;
+> 			}
+>
+>+			hdr = virtio_vsock_hdr(skb);
+>+			payload_len = le32_to_cpu(hdr->len);
+>+			if (unlikely(payload_len > len - sizeof(*hdr))) {
+>+				kfree_skb(skb);
+>+				continue;
+>+			}
+>+
+> 			virtio_vsock_skb_rx_put(skb);
+> 			virtio_transport_deliver_tap_pkt(skb);
+> 			virtio_transport_recv_pkt(&virtio_transport, skb);
+>-- 
+>2.50.0.727.gbf7dc18ff4-goog
+>
 
-Please pull and let us know if there's any problem.
-
-Thanks,
-johannes
-
-
-
-The following changes since commit 0cad34fb7c5d12a9b61862744e7130e9ce3bc58f:
-
-  Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-07-11 11:42:38 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git tags/wireless-next-2025-07-17
-
-for you to fetch changes up to 003322be55c650b30f0c836e1dc99d708d787a32:
-
-  Merge tag 'iwlwifi-next-2025-07-15' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next (2025-07-15 13:21:09 +0200)
-
-----------------------------------------------------------------
-Another set of changes, notably:
- - cfg80211: fix double-free introduced earlier
- - mac80211: fix RCU iteration in CSA
- - iwlwifi: many cleanups (unused FW APIs, PCIe code, WoWLAN)
- - mac80211: some work around how FIPS affects wifi, which was
-             wrong (RC4 is used by TKIP, not only WEP)
- - cfg/mac80211: improvements for unsolicated probe response
-                 handling
-
-----------------------------------------------------------------
-Aditya Kumar Singh (1):
-      wifi: cfg80211: fix off channel operation allowed check for MLO
-
-Alex Gavin (1):
-      wifi: mac80211_hwsim: Update comments in header
-
-Avraham Stern (4):
-      wifi: iwlwifi: mvm: fix scan request validation
-      wifi: iwlwifi: mld: fix scan request validation
-      wifi: iwlwifi: mld: update the P2P device mac before starting the GO
-      wifi: iwlwifi: mld: update expected range response notification version
-
-Emmanuel Grumbach (1):
-      wifi: iwlwifi: mld: support iwl_omi_send_status_notif version 2
-
-Ilan Peer (2):
-      wifi: cfg80211: Fix interface type validation
-      wifi: mac80211_hwsim: Declare support for AP scanning
-
-Itamar Shalev (3):
-      wifi: iwlwifi: simplify iwl_poll_bits_mask return value
-      wifi: iwlwifi: pcie: inform me when op mode leaving
-      wifi: iwlwifi: trans: remove retake_ownership parameter from sw_reset
-
-Johannes Berg (15):
-      wifi: iwlwifi: pcie: accept new devices for MVM-only configs
-      wifi: iwlwifi: mvm: remove regulatory puncturing setup
-      wifi: iwlwifi: mld: restrict puncturing disable to FM
-      wifi: iwlwifi: fix HE/EHT capabilities
-      wifi: iwlwifi: pcie: don't WARN on bad firmware input
-      wifi: iwlwifi: mvm: remove extra link ID
-      wifi: iwlwifi: mvm/mld: use average RSSI for beacons
-      wifi: mac80211: make VHT opmode NSS ignore a debug message
-      wifi: mac80211: don't unreserve never reserved chanctx
-      wifi: mac80211: remove ieee80211_link_unreserve_chanctx() return value
-      wifi: mac80211: don't send keys to driver when fips_enabled
-      wifi: mac80211: clean up cipher suite handling
-      wifi: mac80211: simplify __ieee80211_rx_h_amsdu() loop
-      wifi: mac80211: don't use TPE data from assoc response
-      Merge tag 'iwlwifi-next-2025-07-15' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next
-
-Maharaja Kennadyrajan (1):
-      wifi: mac80211: use RCU-safe iteration in ieee80211_csa_finish
-
-Miri Korenblit (27):
-      wifi: iwlwifi: handle non-overlapping API ranges
-      wifi: iwlwifi: assign a FW API range for JF
-      wifi: iwlwifi: bump minimum API version for SO/MA/TY
-      wifi: iwlwifi: mvm: remove support for iwl_wowlan_info_notif_v2
-      wifi: iwlwifi: add a reference to iwl_wowlan_info_notif_v3
-      wifi: iwlwifi: mvm: remove support for iwl_wowlan_status_v12
-      wifi: iwlwifi: mvm: remove support for iwl_wowlan_status_v9
-      wifi: iwlwifi: assign a FW API range for HR
-      wifi: iwlwifi: assign a FW API range for GF
-      wifi: iwlwifi: pcie: add a missing include
-      wifi: iwlwifi: mvm: set gtk id also in older FWs
-      wifi: iwlwifi: mvm: always set the key idx in gtk_seq
-      wifi: iwlwifi: mvm: don't remove all keys in mcast rekey
-      wifi: iwlwifi: mld: don't remove all keys in mcast rekey
-      wifi: iwlwifi: mvm: remove support for REDUCE_TX_POWER_CMD ver 6 and 7
-      wifi: iwlwifi: mld: remove support for REDUCE_TX_POWER_CMD ver 9
-      wifi: iwlwifi: remove an unused struct
-      wifi: iwlwifi: mld: remove support for iwl_geo_tx_power_profiles_cmd version 4
-      wifi: iwlwifi: mld: Revert "wifi: iwlwifi: mld: add kunit test for emlsr with bt on"
-      wifi: iwlwifi: mld: Revert "wifi: iwlwifi: mld: allow EMLSR with 2.4 GHz when BT is ON"
-      wifi: iwlwifi: mld: remove support for iwl_mcc_update_resp versions
-      wifi: iwlwifi: remove support of versions 4 and 5 of iwl_alive_ntf
-      wifi: iwlwifi: remove support of version 4 of iwl_wowlan_rsc_tsc_params_cmd
-      wifi: iwlwifi: remove support of several iwl_ppag_table_cmd versions
-      wifi: mac80211: only assign chanctx in reconfig
-      wifi: mac80211: don't mark keys for inactive links as uploaded
-      wifi: mac80211: handle WLAN_HT_ACTION_NOTIFY_CHANWIDTH async
-
-Pagadala Yesu Anjaneyulu (3):
-      wifi: iwlwifi: add support for accepting raw DSM tables by firmware
-      wifi: iwlwifi: mvm: remove IWL_MVM_ESR_EXIT_FAIL_ENTRY
-      wifi: iwlwifi: mvm: Add dump handler to iwl_mvm
-
-Rotem Kerem (3):
-      wifi: iwlwifi: add suppress_cmd_error_once() API
-      wifi: iwlwifi: add iwl_trans_device_enabled() API
-      wifi: iwlwifi: add iwl_trans_is_dead() API
-
-Sarika Sharma (1):
-      wifi: cfg80211: fix double free for link_sinfo in nl80211_station_dump()
-
-Thomas Fourier (1):
-      mwl8k: Add missing check after DMA map
-
-Yuvarani V (2):
-      wifi: cfg80211: parse attribute to update unsolicited probe response template
-      wifi: mac80211: parse unsolicited broadcast probe response data
-
- drivers/net/wireless/intel/iwlwifi/Makefile        |   1 +
- drivers/net/wireless/intel/iwlwifi/cfg/22000.c     |  24 ---
- drivers/net/wireless/intel/iwlwifi/cfg/ax210.c     |  34 +----
- drivers/net/wireless/intel/iwlwifi/cfg/bz.c        |   9 --
- drivers/net/wireless/intel/iwlwifi/cfg/rf-gf.c     |  31 ++++
- drivers/net/wireless/intel/iwlwifi/cfg/rf-hr.c     |  49 +++++-
- drivers/net/wireless/intel/iwlwifi/cfg/rf-jf.c     |  29 +++-
- drivers/net/wireless/intel/iwlwifi/cfg/sc.c        |  13 --
- drivers/net/wireless/intel/iwlwifi/dvm/eeprom.c    |  12 +-
- drivers/net/wireless/intel/iwlwifi/fw/api/alive.h  |  15 --
- .../net/wireless/intel/iwlwifi/fw/api/commands.h   |   5 +-
- drivers/net/wireless/intel/iwlwifi/fw/api/d3.h     | 114 --------------
- .../net/wireless/intel/iwlwifi/fw/api/datapath.h   |  20 ++-
- .../net/wireless/intel/iwlwifi/fw/api/nvm-reg.h    |   1 +
- .../net/wireless/intel/iwlwifi/fw/api/offload.h    |   4 +-
- drivers/net/wireless/intel/iwlwifi/fw/api/power.h  |  81 +---------
- drivers/net/wireless/intel/iwlwifi/fw/api/rx.h     |  24 ++-
- drivers/net/wireless/intel/iwlwifi/fw/dbg.c        |   6 +-
- drivers/net/wireless/intel/iwlwifi/fw/debugfs.c    |   6 +
- drivers/net/wireless/intel/iwlwifi/fw/dump.c       |   4 +-
- drivers/net/wireless/intel/iwlwifi/fw/file.h       |   3 +
- drivers/net/wireless/intel/iwlwifi/fw/regulatory.c |  55 ++++---
- drivers/net/wireless/intel/iwlwifi/fw/regulatory.h |   4 +
- drivers/net/wireless/intel/iwlwifi/iwl-drv.c       |  10 +-
- drivers/net/wireless/intel/iwlwifi/iwl-io.c        |   2 +-
- drivers/net/wireless/intel/iwlwifi/iwl-nvm-parse.c |  78 ++--------
- drivers/net/wireless/intel/iwlwifi/iwl-trans.c     |   9 +-
- drivers/net/wireless/intel/iwlwifi/iwl-trans.h     |  17 ++-
- drivers/net/wireless/intel/iwlwifi/mld/ap.c        |  24 ++-
- drivers/net/wireless/intel/iwlwifi/mld/coex.c      |   8 +-
- drivers/net/wireless/intel/iwlwifi/mld/d3.c        | 112 +++++---------
- drivers/net/wireless/intel/iwlwifi/mld/debugfs.c   |   2 +-
- drivers/net/wireless/intel/iwlwifi/mld/key.c       |  12 ++
- drivers/net/wireless/intel/iwlwifi/mld/link.c      |  50 +++++-
- drivers/net/wireless/intel/iwlwifi/mld/link.h      |   6 +
- drivers/net/wireless/intel/iwlwifi/mld/mcc.c       |  66 ++------
- drivers/net/wireless/intel/iwlwifi/mld/mld.c       |   3 +-
- drivers/net/wireless/intel/iwlwifi/mld/mld.h       |   6 +-
- drivers/net/wireless/intel/iwlwifi/mld/mlo.c       |  68 ++-------
- drivers/net/wireless/intel/iwlwifi/mld/mlo.h       |   4 -
- drivers/net/wireless/intel/iwlwifi/mld/notif.c     |   9 +-
- drivers/net/wireless/intel/iwlwifi/mld/power.c     |  10 +-
- .../net/wireless/intel/iwlwifi/mld/regulatory.c    | 102 +++++--------
- drivers/net/wireless/intel/iwlwifi/mld/rx.c        |  73 ++++++++-
- drivers/net/wireless/intel/iwlwifi/mld/scan.c      |   2 +-
- .../net/wireless/intel/iwlwifi/mld/tests/Makefile  |   2 +-
- .../intel/iwlwifi/mld/tests/emlsr_with_bt.c        | 140 -----------------
- .../intel/iwlwifi/mld/tests/link-selection.c       |   6 -
- drivers/net/wireless/intel/iwlwifi/mvm/d3.c        | 169 +++++++--------------
- drivers/net/wireless/intel/iwlwifi/mvm/debugfs.c   |   2 +-
- drivers/net/wireless/intel/iwlwifi/mvm/fw.c        |  67 +++-----
- drivers/net/wireless/intel/iwlwifi/mvm/link.c      |  62 +-------
- drivers/net/wireless/intel/iwlwifi/mvm/mac-ctxt.c  |  34 ++---
- drivers/net/wireless/intel/iwlwifi/mvm/mac80211.c  |  21 +--
- drivers/net/wireless/intel/iwlwifi/mvm/mvm.h       |  31 +---
- drivers/net/wireless/intel/iwlwifi/mvm/ops.c       |  64 +++-----
- drivers/net/wireless/intel/iwlwifi/mvm/rx.c        |  24 ++-
- drivers/net/wireless/intel/iwlwifi/mvm/rxmq.c      |  91 ++++++++++-
- drivers/net/wireless/intel/iwlwifi/mvm/scan.c      |   4 +-
- .../net/wireless/intel/iwlwifi/mvm/time-event.c    |  25 +--
- drivers/net/wireless/intel/iwlwifi/pcie/drv.c      |   4 +-
- .../wireless/intel/iwlwifi/pcie/gen1_2/internal.h  |   1 +
- .../intel/iwlwifi/pcie/gen1_2/trans-gen2.c         |  20 +++
- .../net/wireless/intel/iwlwifi/pcie/gen1_2/trans.c |  12 +-
- .../net/wireless/intel/iwlwifi/pcie/gen1_2/tx.c    |  13 +-
- drivers/net/wireless/intel/iwlwifi/pcie/utils.h    |   2 +
- drivers/net/wireless/marvell/mwl8k.c               |   4 +
- drivers/net/wireless/virtual/mac80211_hwsim.c      |   3 +-
- drivers/net/wireless/virtual/mac80211_hwsim.h      |  14 +-
- include/net/cfg80211.h                             |   6 +-
- net/mac80211/cfg.c                                 |  14 +-
- net/mac80211/chan.c                                |  18 +--
- net/mac80211/driver-ops.c                          |   5 +-
- net/mac80211/driver-ops.h                          |   4 +
- net/mac80211/ht.c                                  |  40 ++++-
- net/mac80211/ieee80211_i.h                         |  25 ++-
- net/mac80211/iface.c                               |  29 ++++
- net/mac80211/key.c                                 |   3 +-
- net/mac80211/main.c                                |  65 ++------
- net/mac80211/mlme.c                                |  36 ++++-
- net/mac80211/rx.c                                  |  58 ++-----
- net/mac80211/vht.c                                 |   5 +-
- net/wireless/nl80211.c                             |  51 ++++++-
- 83 files changed, 1039 insertions(+), 1352 deletions(-)
- delete mode 100644 drivers/net/wireless/intel/iwlwifi/mld/tests/emlsr_with_bt.c
 
