@@ -1,169 +1,211 @@
-Return-Path: <netdev+bounces-207818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BB2AB08A41
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 12:06:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E188DB08A5E
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 12:15:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCE251A66439
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 10:07:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F6987A9912
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 10:14:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCBF22989B4;
-	Thu, 17 Jul 2025 10:06:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WyTzkd0x"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5343728A700;
+	Thu, 17 Jul 2025 10:15:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C1451DE8A3;
-	Thu, 17 Jul 2025 10:06:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 907F520485B
+	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 10:15:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752746807; cv=none; b=fu8nKc84n/C6Sc8nIr+Ea4N42uknvc8ss46znokpHbh/wGzs/e4TUZVA9EBX+dlzipK6tSt/a61HiOB/wckmx8i6Qaa6WoCtaYbYb5OZN5iXI65qPKIkx5Sw+8op/8z141HiTKnChIeoMrW/RMzsp2RefeJZvUphyhYbYiCqkDc=
+	t=1752747341; cv=none; b=Rn24zriAGYqEk+wdKlUVtb00gfd07dItJvKZj4Op7alCA1Lq+OsrMlSI6WmnX/kvOV7BBoM3cEttNB+KhYlln1r6mbQhej8ZZoPO5jHi1dmEX4Pl7s2FPhDJk0BrH0kHI+8bIlBCIuOvJrrNFBj9NaziTMI4LYkQLPS0yHnHubY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752746807; c=relaxed/simple;
-	bh=4LG7lHvKvNtxJnEv2fwhP1DwGB3dKz4VjTEbeapa9qk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pJbJ6BQ4xgdM2ZKHKREza18beDgISeotMqMiY/2wmt7UvaS83j5dBv7yOk+lp1W/Joybe6QdxTaLZabIsLssaGEDa9grvZJvjDAeY+/NNpEcmGMSTJ+vBLZNdyY0XDi5Bkk98xC0rmRSWAbu2UTnH3BepDuBsQPntDzswxV7dHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WyTzkd0x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1527C4CEE3;
-	Thu, 17 Jul 2025 10:06:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752746807;
-	bh=4LG7lHvKvNtxJnEv2fwhP1DwGB3dKz4VjTEbeapa9qk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=WyTzkd0x/SxDJrygPtyjibS2Fq94y3StDCJmjc0XvcsiJ/fzirQcUKAqH+7wylUmw
-	 p9n6ezaJARydmDVTawMrJMhQjCwQ6Fll8jsW4N4Md0IvaqGBMSSSkjP6YgEb+FRRTz
-	 8Qb829jMUIe6BfjCvdGWrqwedbvCsWku+5l91NYWjhfYybymVcFHCZB+Q9QVWoq9A2
-	 0roKRQuxZQFRxp+8ddyptDZZ5tiYI7TojetMXonwB69zgcBmTPb0BP64AE57vaVfii
-	 8uYbulsMFwt77P8edQdkDPssZcDtMwShub92mdPCbuSOzasNhhKBLoA8aihy4cndBk
-	 0qSIr4n9uFUCw==
-Message-ID: <af75073c-4ce8-44c1-9e48-b22902373e81@kernel.org>
-Date: Thu, 17 Jul 2025 12:06:40 +0200
+	s=arc-20240116; t=1752747341; c=relaxed/simple;
+	bh=Kc2TiflgLD8XqwFilb4h7Wvy43ym10UjTuvpKR/YsOY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=dSwxHyAK4sYMYI+pVezOMdxdojtKDTMfiCOtG63Vih2lQcvES5AiTRHw9qjQusc6F2vC8IgJAoj1QhvaOcgn5q8ZfK28gthtwdGg3mUhM60fTiqSn+zaIaRZejDc8AUuR4sOn7kS2pg011OWqXV3sD/mWwKp1MVNjO3CkPkZs40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3ddd03db21cso13816815ab.1
+        for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 03:15:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752747338; x=1753352138;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jwf4VoVCorBa5FpP7xdG1geXYjAyuoZokukQ+KjAL6Y=;
+        b=HtdZOd3RkHQXYi8J4t8Ybd65FtI5AiSOjO+a4kdzwtIDQaVdvN4c9DtYqO2x9tBZ3O
+         ObtvQd10Si7QzI9It7t5cq1lNJhSdUcWcV87qNQV2hOjV52fYzGzbPv8XYmJz7L7ubAT
+         aNPceP4FcYE1vtYzg42rD4ECfdcHQu7KbL4avAah8tUPCUbNEPA9eB7Gqk+X90HwFVbv
+         twva+NmvSJIxhJSbA8ScVgfSIsfkxTBIoo29gYy7z8BjpQhKViMhfJux0mt1eRGO3gE7
+         IYnSP0RFC/efJyGiisDEpNUs0g3npu/X6X3cmIif1LpNUPFCGJSBarRh9BFWmoH3laLE
+         z1vw==
+X-Forwarded-Encrypted: i=1; AJvYcCU9GByOyf4UiS2nvE666v4ynmjq21bfTFSDgHAPA2gHlKbjUz7evSRZVtKBLhE+pex1YBj6dzs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyygqCO4Uk2amPnjSmF8G0AU/nGUy5TKqTCxCLc5cV8WBqjJGIi
+	GWOJi5lgWDI1Gv+4Wab0LlqP0bRrOAGuWOBKUZGOqw6/sevlkKu9CbUX6UTKkYGlQWr2AZkcEQu
+	Nn87HTAXxRFprCrkCbO5FiOFJLZNso/XlqBWT7ewYfGxC8dUl1Qz2Stl7FHY=
+X-Google-Smtp-Source: AGHT+IFNF3LWrTamx8JPdOfhsYOFMQ83W3eg3F+nRozTOHBTiXIwVSVwi+Sy+8nc2ALbQwmhKr9sh9NXhcNglon3qck5mOSVh2IA
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next 02/14] dt-bindings: net: add nxp,netc-timer
- property
-To: Wei Fang <wei.fang@nxp.com>
-Cc: "robh@kernel.org" <robh@kernel.org>,
- "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
- "conor+dt@kernel.org" <conor+dt@kernel.org>,
- "richardcochran@gmail.com" <richardcochran@gmail.com>,
- Claudiu Manoil <claudiu.manoil@nxp.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, Clark Wang
- <xiaoning.wang@nxp.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "vadim.fedorenko@linux.dev"
- <vadim.fedorenko@linux.dev>, Frank Li <frank.li@nxp.com>,
- "shawnguo@kernel.org" <shawnguo@kernel.org>,
- "s.hauer@pengutronix.de" <s.hauer@pengutronix.de>,
- "festevam@gmail.com" <festevam@gmail.com>, "F.S. Peng" <fushi.peng@nxp.com>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "imx@lists.linux.dev" <imx@lists.linux.dev>,
- "kernel@pengutronix.de" <kernel@pengutronix.de>
-References: <20250716073111.367382-1-wei.fang@nxp.com>
- <20250716073111.367382-3-wei.fang@nxp.com>
- <20250717-sceptical-quoll-of-protection-9c2104@kuoka>
- <PAXPR04MB8510EB38C3DCF5713C6AC5C48851A@PAXPR04MB8510.eurprd04.prod.outlook.com>
- <20250717-masterful-uppish-impala-b1d256@kuoka>
- <PAXPR04MB85109FE64C4FCAD6D46895428851A@PAXPR04MB8510.eurprd04.prod.outlook.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <PAXPR04MB85109FE64C4FCAD6D46895428851A@PAXPR04MB8510.eurprd04.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:471a:b0:3df:154d:aa5b with SMTP id
+ e9e14a558f8ab-3e2823a6c2amr71719005ab.5.1752747337872; Thu, 17 Jul 2025
+ 03:15:37 -0700 (PDT)
+Date: Thu, 17 Jul 2025 03:15:37 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6878cd49.a70a0220.693ce.0044.GAE@google.com>
+Subject: [syzbot] [crypto?] BUG: unable to handle kernel paging request in ieee80211_wep_encrypt
+From: syzbot <syzbot+d1008c24929007591b6b@syzkaller.appspotmail.com>
+To: ardb@kernel.org, bp@alien8.de, dave.hansen@linux.intel.com, 
+	ebiggers@kernel.org, hpa@zytor.com, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, mingo@redhat.com, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 17/07/2025 11:49, Wei Fang wrote:
->>>
->>> I do not think it is timestamper. Each ENETC has the ability to record
->>> the sending/receiving timestamp of the packets on the Tx/Rx BD, but
->>> the timestamp comes from the Timer. For platforms have multiple Timer
->>
->> Isn't this exactly what timestamper is supposed to do?
->>
-> According to the definition, timestamper requires two parameters, one is
-> the node reference and the other is the port, and the timestamper is added
-> to the PHY node, and is used by the gerneric mdio driver. The PTP driver
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    5e28d5a3f774 net/sched: sch_qfq: Fix race condition on qfq..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=146550f0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b309c907eaab29da
+dashboard link: https://syzkaller.appspot.com/bug?extid=d1008c24929007591b6b
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/897daa1d604c/disk-5e28d5a3.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/0d5527eee75d/vmlinux-5e28d5a3.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/31ee968efcd7/bzImage-5e28d5a3.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d1008c24929007591b6b@syzkaller.appspotmail.com
+
+BUG: unable to handle page fault for address: ffff8880bfffd000
+#PF: supervisor read access in kernel mode
+#PF: error_code(0x0000) - not-present page
+PGD 1a201067 P4D 1a201067 PUD 23ffff067 PMD 23fffe067 PTE 0
+Oops: Oops: 0000 [#1] SMP KASAN PTI
+CPU: 1 UID: 0 PID: 8097 Comm: syz.1.594 Not tainted 6.16.0-rc5-syzkaller-00183-g5e28d5a3f774 #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+RIP: 0010:crc32_lsb_pclmul_sse+0x8f/0x220 arch/x86/lib/crc32-pclmul.S:6
+Code: 0f 3a 44 c7 11 66 0f ef ec 66 0f ef c5 f3 0f 6f 66 10 66 0f 6f e9 66 0f 3a 44 ef 00 66 0f 3a 44 cf 11 66 0f ef ec 66 0f ef cd <f3> 0f 6f 66 20 66 0f 6f ea 66 0f 3a 44 ef 00 66 0f 3a 44 d7 11 66
+RSP: 0018:ffffc9001bcae6f8 EFLAGS: 00010296
+RAX: e4cc01b02de40500 RBX: fffffffffffffffe RCX: ffffffff8be53dc0
+RDX: ffffffff7301ca7e RSI: ffff8880bfffcfde RDI: 00000000ffffffff
+RBP: 00000000ffffffff R08: ffff88801cb09e07 R09: 1ffff110039613c0
+R10: dffffc0000000000 R11: ffffed10039613c1 R12: fffffffffffffffe
+R13: ffff888033019a5e R14: ffff888033019a5e R15: ffff888067eeec80
+FS:  00007f4779be36c0(0000) GS:ffff888125d1b000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffff8880bfffd000 CR3: 00000000671a8000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ crc32_le_arch+0x56/0xa0 arch/x86/lib/crc32.c:21
+ crc32_le include/linux/crc32.h:18 [inline]
+ ieee80211_wep_encrypt_data net/mac80211/wep.c:114 [inline]
+ ieee80211_wep_encrypt+0x228/0x410 net/mac80211/wep.c:158
+ wep_encrypt_skb net/mac80211/wep.c:277 [inline]
+ ieee80211_crypto_wep_encrypt+0x1f6/0x320 net/mac80211/wep.c:300
+ invoke_tx_handlers_late+0x1145/0x1820 net/mac80211/tx.c:1846
+ ieee80211_tx_dequeue+0x3068/0x4340 net/mac80211/tx.c:3916
+ wake_tx_push_queue net/mac80211/util.c:294 [inline]
+ ieee80211_handle_wake_tx_queue+0x125/0x2a0 net/mac80211/util.c:315
+ drv_wake_tx_queue net/mac80211/driver-ops.h:1367 [inline]
+ schedule_and_wake_txq net/mac80211/driver-ops.h:1374 [inline]
+ ieee80211_queue_skb+0x19e8/0x2180 net/mac80211/tx.c:1648
+ ieee80211_tx+0x297/0x420 net/mac80211/tx.c:1951
+ __ieee80211_tx_skb_tid_band+0x50f/0x680 net/mac80211/tx.c:6103
+ ieee80211_tx_skb_tid+0x266/0x420 net/mac80211/tx.c:6131
+ ieee80211_mgmt_tx+0x1c25/0x21d0 net/mac80211/offchannel.c:1023
+ rdev_mgmt_tx net/wireless/rdev-ops.h:762 [inline]
+ cfg80211_mlme_mgmt_tx+0x7f2/0x1620 net/wireless/mlme.c:938
+ nl80211_tx_mgmt+0x9fd/0xd50 net/wireless/nl80211.c:12921
+ genl_family_rcv_msg_doit+0x215/0x300 net/netlink/genetlink.c:1115
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x205/0x470 net/netlink/af_netlink.c:2552
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+ netlink_unicast+0x75c/0x8e0 net/netlink/af_netlink.c:1346
+ netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
+ sock_sendmsg_nosec net/socket.c:712 [inline]
+ __sock_sendmsg+0x219/0x270 net/socket.c:727
+ ____sys_sendmsg+0x505/0x830 net/socket.c:2566
+ ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
+ __sys_sendmsg net/socket.c:2652 [inline]
+ __do_sys_sendmsg net/socket.c:2657 [inline]
+ __se_sys_sendmsg net/socket.c:2655 [inline]
+ __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f4778d8e929
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f4779be3038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f4778fb6080 RCX: 00007f4778d8e929
+RDX: 0000000024008080 RSI: 0000200000000c00 RDI: 0000000000000005
+RBP: 00007f4778e10b39 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007f4778fb6080 R15: 00007ffff7e551c8
+ </TASK>
+Modules linked in:
+CR2: ffff8880bfffd000
+---[ end trace 0000000000000000 ]---
+RIP: 0010:crc32_lsb_pclmul_sse+0x8f/0x220 arch/x86/lib/crc32-pclmul.S:6
+Code: 0f 3a 44 c7 11 66 0f ef ec 66 0f ef c5 f3 0f 6f 66 10 66 0f 6f e9 66 0f 3a 44 ef 00 66 0f 3a 44 cf 11 66 0f ef ec 66 0f ef cd <f3> 0f 6f 66 20 66 0f 6f ea 66 0f 3a 44 ef 00 66 0f 3a 44 d7 11 66
+RSP: 0018:ffffc9001bcae6f8 EFLAGS: 00010296
+RAX: e4cc01b02de40500 RBX: fffffffffffffffe RCX: ffffffff8be53dc0
+RDX: ffffffff7301ca7e RSI: ffff8880bfffcfde RDI: 00000000ffffffff
+RBP: 00000000ffffffff R08: ffff88801cb09e07 R09: 1ffff110039613c0
+R10: dffffc0000000000 R11: ffffed10039613c1 R12: fffffffffffffffe
+R13: ffff888033019a5e R14: ffff888033019a5e R15: ffff888067eeec80
+FS:  00007f4779be36c0(0000) GS:ffff888125d1b000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffff8880bfffd000 CR3: 00000000671a8000 CR4: 00000000003526f0
+----------------
+Code disassembly (best guess), 1 bytes skipped:
+   0:	3a 44 c7 11          	cmp    0x11(%rdi,%rax,8),%al
+   4:	66 0f ef ec          	pxor   %xmm4,%xmm5
+   8:	66 0f ef c5          	pxor   %xmm5,%xmm0
+   c:	f3 0f 6f 66 10       	movdqu 0x10(%rsi),%xmm4
+  11:	66 0f 6f e9          	movdqa %xmm1,%xmm5
+  15:	66 0f 3a 44 ef 00    	pclmullqlqdq %xmm7,%xmm5
+  1b:	66 0f 3a 44 cf 11    	pclmulhqhqdq %xmm7,%xmm1
+  21:	66 0f ef ec          	pxor   %xmm4,%xmm5
+  25:	66 0f ef cd          	pxor   %xmm5,%xmm1
+* 29:	f3 0f 6f 66 20       	movdqu 0x20(%rsi),%xmm4 <-- trapping instruction
+  2e:	66 0f 6f ea          	movdqa %xmm2,%xmm5
+  32:	66 0f 3a 44 ef 00    	pclmullqlqdq %xmm7,%xmm5
+  38:	66 0f 3a 44 d7 11    	pclmulhqhqdq %xmm7,%xmm2
+  3e:	66                   	data16
 
 
-We do not speak about drivers.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-> provides the interfaces of mii_timestamping_ctrl. So this property is to
-> provide PTP support for PHY devices.
-> 
-> 
-> timestamper:	provides control node reference and
-> 			the port channel within the IP core
-> 
-> The "timestamper" property lives in a phy node and links a time
-> stamping channel from the controller device to that phy's MII bus.
-> 
-> But for NETC, we only need the node parameter, and this property is
-> added to the MAC node.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-I think we do not understand each other. I ask if this is the
-timestamper and you explain about arguments of the phandle. The
-arguments are not relevant.
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-What is this purpose/role/function of the timer device?
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-What is the purpose of this new property in the binding here?
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-Best regards,
-Krzysztof
+If you want to undo deduplication, reply with:
+#syz undup
 
