@@ -1,72 +1,109 @@
-Return-Path: <netdev+bounces-207655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7720EB0813F
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 02:04:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5BD2B08144
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 02:05:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1E817A3279
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 00:02:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA5333A3754
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 00:04:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07E7AC2C9;
-	Thu, 17 Jul 2025 00:04:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF324645;
+	Thu, 17 Jul 2025 00:05:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ifS5K02q"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="u6/ihc39"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB68C2904;
-	Thu, 17 Jul 2025 00:04:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62013383
+	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 00:05:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752710647; cv=none; b=pDLjw/vswQyXy6cGX4Mwu5MYjpHAPaPfamjeisOvm5JC/k7LgLQ/fg1lh2dHq7dkaaWNNAtHo3LFUDfaZaSh+tdM/POYSnEtFJhE/LHfEyt0Ca0oqNjGC3sDWkg0FxbfV95P2QEsSvrFfImSBSpxgkLt0HVcWB/G0SUApnNBgP4=
+	t=1752710707; cv=none; b=CS/RM8qV7pOwWIu1TQOS13iWJI7Wv4FG6Q1FPYXdLgyJ5CjG3qBCHBDeZQcs6vHrO4YtELlvYjBZee5wD5NUeRDH+XeijPyozuq4HBg3O8eAj61w3ddyQ8qZ91RQ/z2zK/dgPTr5zfxPhFdIQ0P4ixLFRVaKbR7PhdO/LqkMoCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752710647; c=relaxed/simple;
-	bh=DpWiesLa7vbS826EtQoWeBav2x/WTnA3BZlee6Q5GQc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hQydECjk+CSqWXhh91MKq7/rFyiKvzvfc1zTlbqj79LcCA3R1K/kCDj+JaEbFD26t2J5+Yg6JRLYI1hN1HnUx9h2gveHM6o0oyeHiGwj+tQ071H4vdzU7e3S6+KAMUi6NmA8Xg3b8xN5OLpK38Zfqo7vB0U7mcWsyJudUNL7eQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ifS5K02q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D81FC4CEE7;
-	Thu, 17 Jul 2025 00:04:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752710647;
-	bh=DpWiesLa7vbS826EtQoWeBav2x/WTnA3BZlee6Q5GQc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ifS5K02q06JStZdhQeWA3FvuMvvuxaR6z3+6afUNNNUbRf6HY+I1ZjF+VEwYTVzIG
-	 48DxVMyuQ7u9DswPj5nWMz9EpuYhKPFE4I/Y5+5onoGiJ/MMQ8zkByaNBT14K08g0G
-	 u78wx0C1pt3a8rbr9Fe+Yd+fmaPg5dzHx/xP4RIKpNHiluW7yxUo78I4yTyF79AekQ
-	 9Px4wXGexik2KuUE9bbxwO0JJWI+pSfCEs+v+csx24kksAqhJLvZfQukDfrqZJlUcq
-	 elNR0LHjdIzYvAJx+OSfQ7rPOusFSM/7TCzBFX2uOCbMHaWVdZS7Kt88+H3hKWCmqB
-	 kQqb4QZ0w7PNw==
-Date: Wed, 16 Jul 2025 17:04:06 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jason Wang <jasowang@redhat.com>
-Cc: mst@redhat.com, eperezma@redhat.com, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, jonah.palmer@oracle.com
-Subject: Re: [PATCH net-next V2 0/3] in order support for vhost-net
-Message-ID: <20250716170406.637e01f5@kernel.org>
-In-Reply-To: <20250714084755.11921-1-jasowang@redhat.com>
-References: <20250714084755.11921-1-jasowang@redhat.com>
+	s=arc-20240116; t=1752710707; c=relaxed/simple;
+	bh=XrI11OlKqo0GkcT2iRh9J4cAMdxAm0O0OQCxALpyLVI=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=cjKA1CdaTYI+PY91D7Mn+uqPikYvV6uynKcGDLN6qs4UMSH7dWMkYAFd2LX5M0ThnC6iq0fwLagK7/6DkAvAQAovTkFR7AdAhCK7sIxM3htUIfZtFYIEb6AxKcvzrxnfCjvWrGPLVodRvO5lJUNm+JiLdm2vpToG/iB/XO65cmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=u6/ihc39; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752710700;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s3LeNNXWYtT9+vzmGvN+VVuby8HV4u2TAQmNVg+niNk=;
+	b=u6/ihc39xZlsUfUvt4uOD4TdtHlmBg6TWearERWsq+0mr5qbWySV8F+T7V6UySwkiNryls
+	a0Gqb5DSGugrVXX/Jj5egO3r4zu6y7p85cf730fLLJLWtv4xlQN+QzDDQXmXPgCdU9495E
+	BtgHk/BJUaMsJFjKpUK/+74YbDwd+ps=
+Date: Thu, 17 Jul 2025 00:04:56 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: qiang.zhang@linux.dev
+Message-ID: <62666ecc6ac9c5217cf5e376424e512a511791fe@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH] net: usb: Make init_satus() return -ENOMEM if alloc
+ failed
+To: "Simon Horman" <horms@kernel.org>
+Cc: oneukum@suse.com, kuba@kernel.org, andrew+netdev@lunn.ch,
+ davem@davemloft.net, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+In-Reply-To: <20250716091839.GM721198@horms.kernel.org>
+References: <20250716001524.168110-1-qiang.zhang@linux.dev>
+ <20250716091839.GM721198@horms.kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 14 Jul 2025 16:47:52 +0800 Jason Wang wrote:
-> This series implements VIRTIO_F_IN_ORDER support for vhost-net. This
-> feature is designed to improve the performance of the virtio ring by
-> optimizing descriptor processing.
-> 
-> Benchmarks show a notable improvement. Please see patch 3 for details.
+>=20
+>=20On Wed, Jul 16, 2025 at 08:15:23AM +0800, Zqiang wrote:
+>=20
+>=20>=20
+>=20> This commit make init_status() return -ENOMEM, if invoke
+> >=20
+>=20>  kmalloc() return failed.
+> >=20
+>=20>=20=20
+>=20>=20
+>=20>  Signed-off-by: Zqiang <qiang.zhang@linux.dev>
+> >=20
+>=20
+> Hi,
+>=20
+>=20It seems to me that the code has been structured so that
+>=20
+>=20this case is not treated as an error, and rather initialisation
+>=20
+>=20that depends on it is skipped.
 
-You tagged these as net-next but just to be clear -- these don't apply
-for us in the current form.
+Yes, your point is also correct, but in theory,
+if usb_alloc_urb() allocation fails, we should
+also return a value of 0, should we keep the
+two behaviors consistent?
+
+>=20
+>=20Are you sure this change is correct?
+
+
+For drivers that have a driver_info->status method, it is generally
+needto allocate an interrupt urb and fill it to obtain some
+status information, but if kmalloc() faild and return 0 in init_status(),
+and some dirvers directly call usbnet_status_start(),
+the WARN_ONCE(dev->interrupt =3D=3D NULL) will be trigger.
+
+Thanks
+Zqiang
+
+
+>
 
