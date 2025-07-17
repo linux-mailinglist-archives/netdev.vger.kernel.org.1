@@ -1,328 +1,265 @@
-Return-Path: <netdev+bounces-207702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9DF0B0855A
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 08:48:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6272CB084BE
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 08:20:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8644517F9FD
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 06:48:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0BFE1A68264
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 06:20:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A0F21A421;
-	Thu, 17 Jul 2025 06:48:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03ECA212B0A;
+	Thu, 17 Jul 2025 06:20:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="HjPg/0PI"
+	dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b="d1D/fBgb"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2040.outbound.protection.outlook.com [40.107.93.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05301EE7B9
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 06:48:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752734888; cv=none; b=EOVmk6pUpIVE5VQDMpI2iwYZlwfRSdoEb8wFxtxdRYUFFd4St7JGgoGMCWatm907w6uKK5RPpYYJkAX2VdHxUZoEMgo81BLzVjRYac/fwSllYTeH/e++AnExqdFYclWK9v7TfoLBEFfMogCtDMovxu2e9/ikskQCthsgHAFRslk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752734888; c=relaxed/simple;
-	bh=k3IOfqIHR0LNmbzW492JUqxcw7yfnJcbs15cVeL+ZfM=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=eD8DbOeh53u0+jkXEIfr00T1j4cKK2w4exdNh4j4GPj+ESTgBn3Q/8saJO/whQ3Std0VmajMO5sHPmgX+oAHPfcS8sYH76uhk9MhAWZKLj6SAj4FEQABM7GeSfWbHlsr5z+Ww2dkk+KldupMQOHM5cyBGOojRLtEdkdfYaAz0PQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=HjPg/0PI; arc=none smtp.client-ip=115.124.30.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1752734883; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=mPaod5drLelf/0HvjwlrijNY1NSEwpTKbNA/WUD4u74=;
-	b=HjPg/0PI0MuiVW+eCJQzUVLg5MRpgpLIN3XEjeK5Z3ciZ6jr6ojGPSwsdl+hYbfQjWEn8rwW47Zb9lhHUYNHCDQnMylFE7AuPssmIYcM3UQLYfVK7bjznuPa/2MKpoJYi5TvVvCRdm9yfXPa5pTcuKDStxndwCQdOPjvDlqn384=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Wj75G.w_1752734881 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 17 Jul 2025 14:48:02 +0800
-Message-ID: <1752733075.7055798-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next] eea: Add basic driver framework for Alibaba Elastic Ethernet Adaptor
-Date: Thu, 17 Jul 2025 14:17:55 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Wen Gu <guwen@linux.alibaba.com>,
- Philo Lu <lulie@linux.alibaba.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Lukas Bulwahn <lukas.bulwahn@redhat.com>,
- Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Alexander Duyck <alexanderduyck@fb.com>,
- Dust Li <dust.li@linux.alibaba.com>
-References: <20250710112817.85741-1-xuanzhuo@linux.alibaba.com>
- <7b957110-c675-438a-b0c2-ebc161a5d8e7@lunn.ch>
- <1752644852.1458855-1-xuanzhuo@linux.alibaba.com>
- <322af656-d359-44d8-9e40-4f997a8b7e0f@lunn.ch>
-In-Reply-To: <322af656-d359-44d8-9e40-4f997a8b7e0f@lunn.ch>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D5E1386C9;
+	Thu, 17 Jul 2025 06:20:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752733221; cv=fail; b=HKWPkmsTo+jQgPx8p69bzH7gLUpGLHydMBxMRvDN2JBU+a7HOqA5wA9dbU8b83wI25F8iGNgaQiqRObaGOpi7Ncgcjg0u/0Nuyexlthc0vz122snUlqYjQ6nI1zZt5le1P9dhT3qle27KNK7qWYmv2I7x957dB3euZVGQPuI+9Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752733221; c=relaxed/simple;
+	bh=iOO7mUwT4YQ3YjKXkb19QrgdXgp9Tunh4bnQLO0XhbI=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=rG4CChbTO7VXo9KKlB05myTtKUl+KE7i1HeyZKWoCppmaFoHjX/UGns5elDcemXpk+an7TrArqB4UHvyTmL5yh6cpFrnlM6OS5ayy2ZZgm0e2zm9Ha3Yw3FVNp79BtTdTSwtn+IikaSaaUSzwaMLH2xFIenjTWwoOOrIo/Q4IB8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=d1D/fBgb; arc=fail smtp.client-ip=40.107.93.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altera.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=mO3gbgESHztCKM72C9qOCQjS1g5sDsu/YjwmThdKQ1JHjo+No2T/bKkUNriKYGsU5ZeaGirh0iCykdsb+m//GlIzyx8rXoTvfpbooMqQ5c7cDvzhzlalPGz0rSUQdKjI+JPuItoDTmIV76awlp10HaSP5aeLPRa2HtMACrMxktx+Q4k2My/LosiNaxJRc1UgRUwO8vPGMThHYr6ffa40RXxLKIWZd42CLR1CZip1nvH2Kmmr+J+VNp4956rlx3Mq2P/Opnb+dAYvSy+q1tSmVVFp+yGZFwe4nYQCf4IcCy41dj/SmSjlyZhsuMBVS+361CkVD5ezEMDHPVJmdGjuOw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=MUH5yPJOzyGcVRMwAN/g6mtZE87dxJNkshIgQkbrXI4=;
+ b=OAVTFSUBTB+zdJ++07fKajBWLk0SEuWFvLMgcHTQydbMdOMOELHPCArbTro8uOtjbOd+NwAdkEHoulvqrKuUz/Vu8/meXQ7SiTbiNHRAfLGNXJP5mzIq+H6myNDZ8UpMdxiPTODvBexhLMyT6DBbcE+hxIsEcg/ZIO7GsjyccOkMzFzfUu0i200ksfC8HE3o9mRwpz31Qs/3Y2SGUD1EQ2k44uwsN2MDLdOslUyxF3VAex+/3hAqBGExJAZZWeO+WajAV6E5V6uNtpsVo2eZsdk4dfm2cRgGdIc1AVgVSDtzD6wk5XyL4FyX3O52K78vy+10yrHBoUG6adO+HLP23g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
+ dkim=pass header.d=altera.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MUH5yPJOzyGcVRMwAN/g6mtZE87dxJNkshIgQkbrXI4=;
+ b=d1D/fBgbqql8t/LYfHzPJJEnFSt/7q1dR/Nipm8NIlUjs+6EQ4D2HyR8bcqQcSCK4nMoNZR1UC4/Hsbr4QjOw+TeTbK3M3poT+IEkeJqkOA0nmLbGoYhyXj32Ur2EMZ1tU9Mv0zFdUN37Vt7glIouCLfDXByuBresfqJG9RKd1iXtw0TETWDx+hjwur5kMDG0nc0OZ24aGlyNdogEdZolPfwuSYoHJyba26cTXfykzE/4RG/laUqhvkxCcOojwOTrDUDdgV19ydBNXBW4fjmGYFonXC0rmPRX5Sh/6r0kizdEQgaJDEVOGm7GiGjVMOk75KD5W6t3nJaLkUVaVOoKg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=altera.com;
+Received: from DM6PR03MB5371.namprd03.prod.outlook.com (2603:10b6:5:24c::21)
+ by DS2PR03MB8160.namprd03.prod.outlook.com (2603:10b6:8:27d::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.39; Thu, 17 Jul
+ 2025 06:20:17 +0000
+Received: from DM6PR03MB5371.namprd03.prod.outlook.com
+ ([fe80::8d3c:c90d:40c:7076]) by DM6PR03MB5371.namprd03.prod.outlook.com
+ ([fe80::8d3c:c90d:40c:7076%3]) with mapi id 15.20.8922.037; Thu, 17 Jul 2025
+ 06:20:16 +0000
+Message-ID: <38d05790-eb4a-482a-89ec-8c17cf2e9680@altera.com>
+Date: Thu, 17 Jul 2025 11:50:06 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 3/3] net: stmmac: Set CIC bit only for TX queues
+ with COE
+To: Simon Horman <horms@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Serge Semin <fancer.lancer@gmail.com>,
+ Romain Gantois <romain.gantois@bootlin.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Matthew Gerlach <matthew.gerlach@altera.com>
+References: <20250714-xgmac-minor-fixes-v1-0-c34092a88a72@altera.com>
+ <20250714-xgmac-minor-fixes-v1-3-c34092a88a72@altera.com>
+ <20250714134012.GN721198@horms.kernel.org>
+ <9f4acd69-12ff-4b2f-bb3a-e8d401b23238@altera.com>
+ <20250716082209.GH721198@horms.kernel.org>
+Content-Language: en-US
+From: "G Thomas, Rohan" <rohan.g.thomas@altera.com>
+In-Reply-To: <20250716082209.GH721198@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MAXP287CA0008.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:a00:49::18) To DM6PR03MB5371.namprd03.prod.outlook.com
+ (2603:10b6:5:24c::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR03MB5371:EE_|DS2PR03MB8160:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9c89833f-4828-4f85-7e1c-08ddc4f9ff3c
+X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?ZzdTVUE0dUpITkVmZ1N2VlpNYldQWUJPVFVKQW9zY2x4c1RzbFVtSm44Vnht?=
+ =?utf-8?B?NlZTNVk5Ukh3M0kybFhNeXo0K1poV0c0WVNwRjl4bThiMGhhblhJREFsS0Za?=
+ =?utf-8?B?MWpuWExSK1Vlajl0RGFTSitkWll1VXpZM0dQcnpEQzkzZFQ4aTJac3B2SW1R?=
+ =?utf-8?B?UkxmZ0NpTm1uTW5wb1ZCdWJmR2gxZUl1TmlZMzJwaExSaTVYVXNsZFoxaGov?=
+ =?utf-8?B?bUxkYmx5dHp4V0NwcDFwY3JQRnpYTHJCaEJYUDRVR2JKaEVLcVM0aTFZTjl2?=
+ =?utf-8?B?bUZ6L1UyY05pdldOQVE2QVAzRWZJOTgrVy9uNHl2blY5S0UySFZ3VTR0SWta?=
+ =?utf-8?B?VzJ0eTR0S2Z3UFlRWXFMR0s1VkNBaVBqRzBScXRPYkRQbVVPUFpUbFlYblNq?=
+ =?utf-8?B?THQrL2pjUDZQSW5Pb3RSRWRqNVgxazFKdWZPcThGOXVvL0d3eXN0NDRBb0dx?=
+ =?utf-8?B?MXdxUnJqeGpobHVIZkV0TWt0VzVlMEVIcTZmbG1PaHB0eTdkU01Qb1hDUm5K?=
+ =?utf-8?B?RDllWStZa1NMS2xWbkxZT0FaVDhLSWZVdW9IZFk3cDYzZkdURVJ0RjVJMVc2?=
+ =?utf-8?B?THVCcjY2TTkrZm85dGFoMG14VmUrMjY0MXJhQ2JLMEF6NTJhQmhEVVYxQmFp?=
+ =?utf-8?B?V1hvWlp6djZ2dDJ2eTVvNmp5a0pQdGhMMlpWYlJ6ZmFiSFJ6V0ZRN2hSMFhM?=
+ =?utf-8?B?RXNIajNqQjMxdCtnZXdXdWhZU3F4VDQ3Mk9FeE13MU9EeEJVRFZmTkc3dTJZ?=
+ =?utf-8?B?aWFuTkhldnNKVFljaEEwQ0d5OWtCTzFqdkRSNXJ1eENRQU4wOXg0cVIvMFda?=
+ =?utf-8?B?Y2ZlVFJub2JrMzdLUkRvWUJ3bmwzeUl3UmJ4YlhreU1GNGdjSktxcFBMay9B?=
+ =?utf-8?B?RWhlTDFzUGdKRDZTYWhqQWkvZ1liRmY5TkY1dVB4cU4rVkhTRnRjTkIxME5v?=
+ =?utf-8?B?TlJwbFFIb3haeGlhNzhJZ3dZb21BWDFtS3NKM1E1RFhDbmcydGcyQWg2ako4?=
+ =?utf-8?B?dU9INTJ0RjdBUmRSOFV0WnhnNENzamthMFdHdnl6WFlTSFM2bTZSSnN1V3h1?=
+ =?utf-8?B?UnNDZXZTRzFVR3ZlMUhOdnh2cnZXMGZBT1A5ZGJ4TXZlQ0lyWWlvTzJLc21J?=
+ =?utf-8?B?SEg5RjZjYjl2N0poSysvMjIxa1c3SlRhY1NJWDVyNVRtOVU1aUxIRkswbzZp?=
+ =?utf-8?B?TEcyYzh5WDFZRVowOW5QSWs3UUkxekNURkFlVmkyZG1xdCtiNXJqTFN5LzN2?=
+ =?utf-8?B?dTN2ZmYxNGlneXhTYjFzUy9tYjJ3ekFKeWxKenRPVktJWStMbk4rT3ZOa0Fw?=
+ =?utf-8?B?R1Z0QzlRdnUrbm4wVGxyUUt3eUR4b2dDODJUKzJmelZwaXdKelc0U1ZIQW1I?=
+ =?utf-8?B?YWsrVE4rY09uNFFXd1dYSk1TUS9yNWdacXRyM0g5YUdtNktDYk9CYk4wUVZY?=
+ =?utf-8?B?WUwveG14bGtaZjg3NnBHRzFhdGZtTUo0UHdRdVdHM1ZHZ2xmVDJTbmxXTTdS?=
+ =?utf-8?B?eWhkT1hzQ0paci82WDF4R1pJL2FGbWVuZDhDMW9XdVdJcjlaU0tBTmFvN214?=
+ =?utf-8?B?bEd5UlliWjBLbys2UnpLNFdPb2NRRTgvTnN1Z3dldW5IdHVReDRzMm5lUUpX?=
+ =?utf-8?B?ejVCYjNLZjRJSmtkOVQvdE5sbEVFdVo5ZmhkNkI4bkRuMFRPaTBYZFdVWGY2?=
+ =?utf-8?B?ZFpEaExRN25qNG9obEduQTN4T3VHT2JVQ3JmOXh2NDA0bGdUbEl4WGg5S1ls?=
+ =?utf-8?B?dSt6cS84bkhRNGdJREhZbWNXcWR0WWNhNll6cHozcWdyVjA0bHI1V1ZpRWxy?=
+ =?utf-8?B?bkRnT3ZybWxLQUtKTlRwaldzVE96eVRsYU1PUXpnSVZab2krY3FSZ0NWYjh5?=
+ =?utf-8?B?Z0FKZytFdzVxaXYyM0JjOXZhQ1hrN096WWJqRUtrS3IyRmc9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR03MB5371.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TDFJRVFTblB5MWQvaDUyRWRwclNTYWp2QU9mRHBKOTlDMUQwYTJCK1RtNDgw?=
+ =?utf-8?B?NjZ4RHlYSDNGeHN3Q1A3ejVXdWhDUFlNOUExWXV0bDZPcjA3TTZUamNrTnVF?=
+ =?utf-8?B?RDJOWitNalRzQ0oyeDVEenU1SVM4dk1XcWVxMDBkV0tJNnNlUVZDczRMbVlV?=
+ =?utf-8?B?K2YxeGZkdWs4WnU1YVJ5eHEyWmJlNHdQamI5dTY3VkJudTN0UkxsYVNXbUll?=
+ =?utf-8?B?ZmVLa0JoSHRvM1c1T0xIdjVYWnRhUzhWMU5KV1NidXZjR2pkK3hCK3ltRzNB?=
+ =?utf-8?B?NGpMYjhONVpFemlxWCtwWlNqcm96ajBPSGZzMGRVUGlieXdjRlpySERnMVJu?=
+ =?utf-8?B?N3RtQU1XcUNHWUNLRmVtU25rL3VBd1pEdU9yR29MQWl0bnhCTHQ0b0gyTEMx?=
+ =?utf-8?B?cWcxVXNrMjNmdXA4UWVxandoMC9YRlpBdUdUcGVCUURZbTFIRDB2bXVEVUhv?=
+ =?utf-8?B?S2hnRmQrRWhZSi9EOWtPRVQ0U3hpYVdQdmlzb3NGS3ZPdXlrZHhpVEJzZTFw?=
+ =?utf-8?B?aXQ1aWt3S0JKZW9rVktHcFRiYjMzT3JLY3orWndRSVo2Rit3ZXMxVmdTazV1?=
+ =?utf-8?B?ZlI1ZGJ3MEdML1RsQzFOT0FRbjFBMlRVRXZONnJpNlRCTkVPZFdmR3E5aDEy?=
+ =?utf-8?B?NDVPa28veVZIbTkyc2YzcklVaVc2YVlaNFJWWXh5OS9PczVuUFIzQkdwREN6?=
+ =?utf-8?B?cGdDbXZpUUQyNmdFZUtZSjNpUHJzQTZ6STR2bTJjR2MzM25rRllKRlZFclYv?=
+ =?utf-8?B?clVFR1ZzMVRpZGprQnBSUGpvcnBYamxUdS9zdWR2WnJrb3dKTU9EajBlQ1dj?=
+ =?utf-8?B?SEE2dHVJSVJFc0RSVmxqc0J6MzI5YjI0NitjeG4ycnFuT2V5ek9YM2UwenhM?=
+ =?utf-8?B?OUphS3JBTitFNmxCelVhZUtiNzFnZ2xHTCtXRmNOVlEwbFNPSUV2NkduaC9X?=
+ =?utf-8?B?UEZPckI2UHNWSTJHZmVUS1VHc3pFRnRXTDlCQmU5bkR5bGNHWTUxNEtnZkps?=
+ =?utf-8?B?M2k2LzlzNVVRVnhyTnhJM2dKdmJmeVlNb0xkV3YyR2EwWSszRU5JSUpsTk81?=
+ =?utf-8?B?OFJPRGNuMG8rcWZZblhEL01EOEVvUERRakJmQUQvNlUwUG51b0ZMQkRsVjdD?=
+ =?utf-8?B?TjAwbzJhSEtWU3MwUFBSY1dlNm1CQWMveUsxanlXd0NiZ3ptUzZzWlAvSEx1?=
+ =?utf-8?B?ZStSU0FhK1E4RmZkcWF5bFBVYWZBUmNmSXRvUTF4L2JxQm16QlhBWWFyYXJU?=
+ =?utf-8?B?c0svWkJtOEtwY3F4M3orSW9XQ3ZhWHNPMTZlNU94Tm9CT1pHckkvclMrREtU?=
+ =?utf-8?B?dWV0RC9QN25tMGlWZE5aMjZ2OFZGdW1IR3phN2dMYXlXWGs1aUdSenNXVU1J?=
+ =?utf-8?B?ZGwrYjhNZmFqZU96cDFsWjg4aTFZOEZKT25kQkZhTnNzaXE0U0hNa2NKUTdV?=
+ =?utf-8?B?TWFEM1ZTNmpkWldUVHBtdTJyZXRrZ01qRHIzbTRNVFp6NTRLWHF1NTA2WDN5?=
+ =?utf-8?B?VGFXbTkyK0tseDl0U3RFUzdvNCtGSjVGaGJrKy9HaWN5ZjNLWm5XSmdVclQr?=
+ =?utf-8?B?dHY4YjRSakpjZzZ3ZThPZmx3TnZVdGtQcm43ZGI2eGp6c1VBa0FPbmhqS1lJ?=
+ =?utf-8?B?Q2RhVTlUY3BtRkI5RHlVa2hSOVJvTDRBQ0xqaHhrSkpVeWlqaHphRWk1VUJt?=
+ =?utf-8?B?ZTc4NVlqY1I5emN6MnVJQzhHUysxMUdxWWNOWkZkaUx0YkY5VkgxL1RGY2k3?=
+ =?utf-8?B?V3E5UGs4QnBSbGlPbkdFUVRzTWRYVjc0OWpYc0hhakNqWTBuMW8zR3Riclhk?=
+ =?utf-8?B?eVo1TjVNOXlrQnlsYnVLRHN0QUZnd0RQTkMzQ01YUDRBc1RGaW4zWUVHdisz?=
+ =?utf-8?B?WDZLMnZtWXEwcHZxdmdybGpCcTNxVXhOVEd5WnhkS3NkTGpwQ3BZN3V2MzhW?=
+ =?utf-8?B?OC9yLy9PWS80YVM5c2UyUWd2eXQrTkdIbWVVUXQ5RU8zVmNaaEM4ckpkMjdZ?=
+ =?utf-8?B?WG9JdmY1aEFMallleUNBM2UweE50R2FENFFBUElRZE5vVzMrczhBbWJPWXFI?=
+ =?utf-8?B?ckhQSWExYmg5K3pFZWVjMWNBbU1hbklER29aK05nRVF0bDNndjRiejhpYXhM?=
+ =?utf-8?B?eGlYOGJwdEVuWGIvTmZGS0o0WTVORjZ3akhXNjlFZEVSN2NBYnpLWi9qbHBS?=
+ =?utf-8?B?cHc9PQ==?=
+X-OriginatorOrg: altera.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9c89833f-4828-4f85-7e1c-08ddc4f9ff3c
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR03MB5371.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2025 06:20:16.8178
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bx61vz0cvfrB+rQ24xrk56jh0GeYWjvGq6t7ZIFeIfWCNgsXuDrv9d6Ehj53fhVVQSoxCGZa9C/dRE7VmTcBepEZJOm5OiYth4F4ezFgXyE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS2PR03MB8160
 
-On Wed, 16 Jul 2025 18:25:40 +0200, Andrew Lunn <andrew@lunn.ch> wrote:
-> On Wed, Jul 16, 2025 at 01:47:32PM +0800, Xuan Zhuo wrote:
-> > Thank you for your valuable feedback. We've addressed most of the comme=
-nts
-> > and will include the fixes in the next version. A few remaining items a=
-re still
-> > under discussion and listed below for reference.
-> >
-> > On Thu, 10 Jul 2025 15:45:38 +0200, Andrew Lunn <andrew@lunn.ch> wrote:
-> > > > +module_param(aq_timeout, uint, 0644);
-> > >
-> > > No module params please.
-> > >
-> > > > +struct eea_aq_host_info_cfg {
-> > > > +#ifndef EEA_OS_DISTRO
-> > > > +#define EEA_OS_DISTRO		0
-> > > > +#endif
-> > > > +
-> > > > +#ifndef EEA_DRV_TYPE
-> > > > +#define EEA_DRV_TYPE		0
-> > > > +#endif
-> > > > +
-> > > > +#define EEA_OS_LINUX		1
-> > > > +#define EEA_SPEC_VER_MAJOR	1
-> > > > +#define EEA_SPEC_VER_MINOR	0
-> > > > +	__le16	os_type;        /* Linux, Win.. */
-> > > > +	__le16	os_dist;
-> > > > +	__le16	drv_type;
-> > > > +
-> > > > +	__le16	kern_ver_major;
-> > > > +	__le16	kern_ver_minor;
-> > > > +	__le16	kern_ver_sub_minor;
-> > > > +
-> > > > +	__le16	drv_ver_major;
-> > > > +	__le16	drv_ver_minor;
-> > > > +	__le16	drv_ver_sub_minor;
-> > > > +
-> > > > +	__le16	spec_ver_major;
-> > > > +	__le16	spec_ver_minor;
-> > > > +	__le16	pci_bdf;
-> > > > +	__le32	pci_domain;
-> > > > +
-> > > > +	u8      os_ver_str[64];
-> > > > +	u8      isa_str[64];
-> > >
-> > > Why does it care about the OS, kernel version etc?
-> >
-> > Then the device can know the version, the dpu can do something for bug =
-of the
-> > driver.
->
-> That is not a very good explanation. Do you see any other system in
-> Linux were the firmware works around bug in Linux drivers using the
-> kernel version?
+Hi Simon,
 
-Actually, there is one, we noticed that the ena driver has a similar mechan=
-ism.
+On 7/16/2025 1:52 PM, Simon Horman wrote:
+> On Tue, Jul 15, 2025 at 07:14:21PM +0530, G Thomas, Rohan wrote:
+>> Hi Simon,
+>>
+>> Thanks for reviewing the patch.
+>>
+>> On 7/14/2025 7:10 PM, Simon Horman wrote:
+>>> On Mon, Jul 14, 2025 at 03:59:19PM +0800, Rohan G Thomas via B4 Relay wrote:
+>>>> From: Rohan G Thomas <rohan.g.thomas@altera.com>
+>>>>
+>>>> Currently, in the AF_XDP transmit paths, the CIC bit of
+>>>> TX Desc3 is set for all packets. Setting this bit for
+>>>> packets transmitting through queues that don't support
+>>>> checksum offloading causes the TX DMA to get stuck after
+>>>> transmitting some packets. This patch ensures the CIC bit
+>>>> of TX Desc3 is set only if the TX queue supports checksum
+>>>> offloading.
+>>>>
+>>>> Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
+>>>> Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
+>>>
+>>> Hi Rohan,
+>>>
+>>> I notice that stmmac_xmit() handles a few other cases where
+>>> checksum offload should not be requested via stmmac_prepare_tx_desc:
+>>>
+>>>           csum_insertion = (skb->ip_summed == CHECKSUM_PARTIAL);
+>>>           /* DWMAC IPs can be synthesized to support tx coe only for a few tx
+>>>            * queues. In that case, checksum offloading for those queues that don't
+>>>            * support tx coe needs to fallback to software checksum calculation.
+>>>            *
+>>>            * Packets that won't trigger the COE e.g. most DSA-tagged packets will
+>>>            * also have to be checksummed in software.
+>>>            */
+>>>           if (csum_insertion &&
+>>>               (priv->plat->tx_queues_cfg[queue].coe_unsupported ||
+>>>                !stmmac_has_ip_ethertype(skb))) {
+>>>                   if (unlikely(skb_checksum_help(skb)))
+>>>                           goto dma_map_err;
+>>>                   csum_insertion = !csum_insertion;
+>>>           }
+>>>
+>>> Do we need to care about them in stmmac_xdp_xmit_zc()
+>>> and stmmac_xdp_xmit_xdpf() too?
+>>
+>> This patch only addresses avoiding the TX DMA hang by ensuring the CIC
+>> bit is only set when the queue supports checksum offload. For DSA tagged
+>> packets checksum offloading is not supported by the DWMAC IPs but no TX
+>> DMA hang. AFAIK, currently AF_XDP paths don't have equivalent handling
+>> like skb_checksum_help(), since they operate on xdp buffers. So this
+>> patch doesn't attempt to implement a sw fallback but just avoids DMA
+>> stall.
+> 
+> Ok, fair enough.
+> 
+> As per Andrew's advice elsewhere in this thread.
+> This patch also looks like it should be a fix for net,
+> and should have a Fixes tag.
 
-	struct ena_admin_host_info
+Thanks for your comments.
 
->
-> You also need to think about enterprise kernels, like RedHat,
-> Oracle. They don't give a truthful kernel version, they have thousands
-> of patches on top fixing, and creating bugs. How will you handle that?
->
-> Please drop all this, and just fix the bugs in the driver.
+You're right—this patch is a fix for the TX DMA hang issue caused by
+setting the CIC bit on queues that don't support checksum offload. But
+I couldn’t pinpoint a specific commit that introduced this behavior in
+the AF_XDP path. Initially, there was no support for DWMAC IPs with COE
+enabled only on specific queues, even though there can be IPs with such
+configuration. Commit 8452a05b2c63 ("net: stmmac: Tx coe sw fallback")
+added software fallback support for the AF_PACKET path. But the AF_XDP
+path has always enabled COE unconditionally even before that. So, do you
+think referencing the commit 8452a05b2c63 in the Fixes tag is
+appropriate and sufficient?
 
+Best Regards,
+Rohan
 
-Fixing bugs in Linux is, of course, the necessary work. However, if certain=
- bugs
-already exist and customers are using such drivers, there is a risk involve=
-d. We
-can record these buggy versions in the DPU, and notify users via dmesg when=
- they
-initialize the driver. This way, customers will be aware that the current
-version might have issues, and they can be guided to upgrade their kernel.
-
-Version-related issues are indeed quite tricky, and we do encounter various
-complications because of them. Therefore, our plan is to manually update our
-version tracking with every code change, combined with some additional
-information.
-
-In the end, if we cannot confidently determine the situation, we will simply
-choose to do nothing =E2=80=94 after all, it won't make things any worse th=
-an they
-already are.
-
->
-> > > > +	start =3D get_jiffies_64();
-> > > > +	while (!(cdesc =3D ering_cq_get_desc(enet->adminq.ring))) {
-> > > > +		cond_resched();
-> > > > +		cpu_relax();
-> > > > +
-> > > > +		timeout =3D secs_to_jiffies(READ_ONCE(aq_timeout));
-> > > > +		if (time_after64(get_jiffies_64(), start + timeout)) {
-> > > > +			netdev_err(enet->netdev, "admin queue timeout. timeout %d\n",
-> > > > +				   READ_ONCE(aq_timeout));
-> > > > +			return -1;
-> > > > +		}
-> > > > +	}
-> > >
-> > > See if you can one of the macros from iopoll.h
-> >
-> > Here we do not access the pci register directly, if we use the iopoll.h
-> > we need to break the api ering_cq_get_desc. So I think we should not use
-> > the api of iopoll.h here.
->
-> #define read_poll_timeout(op, val, cond, sleep_us, timeout_us, \
->                                 sleep_before_read, args...) \
-> ({ \
->         u64 __timeout_us =3D (timeout_us); \
->         unsigned long __sleep_us =3D (sleep_us); \
->         ktime_t __timeout =3D ktime_add_us(ktime_get(), __timeout_us); \
->         might_sleep_if((__sleep_us) !=3D 0); \
->         if (sleep_before_read && __sleep_us) \
->                 usleep_range((__sleep_us >> 2) + 1, __sleep_us); \
->         for (;;) { \
->                 (val) =3D op(args); \
->                 if (cond) \
->                         break; \
->
->
-> op: ering_cq_get_desc.
-> val: cdesc.
-> args: enet->adminq.ring
-> cond: !cdesc
->
-> I might be wrong, but i think you can make this work.
-
-
-Ohhh, You're right. I hadn't thought through this issue in detail before, a=
-nd
-yes, doing it this way is indeed feasible. During testing in certain scenar=
-ios
-=E2=80=94 especially in model environments =E2=80=94 the execution speed ca=
-n be quite slow, so
-we sometimes set a larger timeout value to accommodate that.
-
-However, once we've identified the problem, we would prefer for the operati=
-on to
-time out and exit, so that we can reload the new .ko module. In this proces=
-s, we
-may adjust the module parameters to reduce the originally large timeout val=
-ue,
-forcing it to exit faster. This use case is actually very helpful during our
-development process and significantly improves our efficiency.
-
-That's why you see me using READ_ONCE() when comparing each timeout value =
-=E2=80=94 to
-ensure we always read the latest updated value.
-
-
->
-> > > > +static void eea_get_drvinfo(struct net_device *netdev,
-> > > > +			    struct ethtool_drvinfo *info)
-> > > > +{
-> > > > +	struct eea_net *enet =3D netdev_priv(netdev);
-> > > > +	struct eea_device *edev =3D enet->edev;
-> > > > +
-> > > > +	strscpy(info->driver,   KBUILD_MODNAME,     sizeof(info->driver));
-> > > > +	strscpy(info->bus_info, eea_pci_name(edev), sizeof(info->bus_info=
-));
-> > > > +	snprintf(info->version, sizeof(info->version), "%d.%d.%d",
-> > > > +		 EEA_VER_MAJOR, EEA_VER_MINOR, EEA_VER_SUB_MINOR);
-> > >
-> > > A hard coded version is pointless, because it never changes, yet the
-> > > kernel around the driver changes every week. Don't set version, and
-> > > the core will fill in the git hash, which is useful.
-> >
-> > In our plan, we will increase this version when we change the code.
->
-> So you will be submitting a patch for GregKH for every single stable
-> kernel? That will be around 5 patches, every two weeks, for the next
-> 30 years?
-
-Of course we won't be doing that. Our plan is that whenever we update the c=
-ode
-=E2=80=94 for example, fixing a bug and updating the version from 1.0.0 to =
-1.0.1, or
-introducing a new feature and bumping the version to 1.0.2 =E2=80=94 then w=
-hen this
-change is backported to stable releases, the version should also be backpor=
-ted
-accordingly.
-
->
-> As i said, the driver is not standalone, it is embedded within the
-> kernel. Changes to the kernel can break the driver. When you get a bug
-> report from a customer, and they say version v42 of the driver is
-> broken, isn't the first thing you are going to ask is what kernel
-> version? Is it a vendor kernel? Which vendor?
->
-> If you leave version unfilled, ethtool will report something like:
->
-> version: 6.12.29-amd64
->
-> which is much more useful.
-
-I actually think the approach you mentioned =E2=80=94 printing the hash val=
-ue =E2=80=94 is
-also useful. We may want to reconsider that method as well. But in my opini=
-on,
-this doesn=E2=80=99t affect the current patch. We might adjust that part la=
-ter.
-
->
-> > > > +	mtu =3D le16_to_cpu(cfg->mtu);
-> > > > +	if (mtu < netdev->min_mtu) {
-> > > > +		dev_err(edev->dma_dev, "device MTU too small. %d < %d", mtu, net=
-dev->min_mtu);
-> > > > +		return -EINVAL;
-> > > > +	}
-> > > > +
-> > > > +	netdev->mtu =3D mtu;
-> > > > +	netdev->max_mtu =3D mtu;
-> > >
-> > > Setting mtu the same as max_mtu is unusual? Are you defaulting to jum=
-bo?
-> >
-> > In the cloud the dpu controls this.
->
-> No, linux controls this. This driver controls this, using these line
-> here. Userspace can change it later, but this is the default. And 99%
-> of Linux systems default to 1500. Is max_mtu 1500? Or is it some jumbo
-> value? You at last need to add a comment you are ignoring what
-> everybody else does and are setting the MTU to something larger,
-> because that is what your use case is.
->
-> You are aiming to write an Ethenet driver which looks pretty much like
-> every other Ethernet driver in Linux. When you do something different,
-> you need to justify it, add a comment why your device is special and
-> needs to do something different.
-
-No problem, I'll add a comment to explain this. I didn't realize there was
-anything special about it at first. However, in cloud scenarios, this issue=
- is
-relatively straightforward =E2=80=94 it's a bit different from physical NIC=
- drivers.
-When users purchase a machine or NIC, they=E2=80=99ve already decided wheth=
-er the
-working environment uses 1500 or jumbo frames. Our hardware will return eit=
-her
-1500 or 9000 based on whether jumbo frames are enabled in hardware.
-
-The reason we wrote the driver this way is to automatically configure an MT=
-U of
-9000 in jumbo frame scenarios, so that users don=E2=80=99t have to do much =
-manual
-configuration.
-
-Thanks.
-
->
-> 	Andrew
 
