@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-207987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8073B09321
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 19:24:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB48CB0931D
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 19:24:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 685FFA614D2
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 17:23:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA0D45A2F91
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 17:24:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83CAF2FE333;
-	Thu, 17 Jul 2025 17:23:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 426472FE39D;
+	Thu, 17 Jul 2025 17:23:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D132FE367
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 17:23:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 929752FE392
+	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 17:23:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752773022; cv=none; b=L9FI9RHH6w+wfJXhRZa8932Yqv0GT9FXyo6yvUVtzL+v+ko1yuetPadg+GbGX3cDu1DkAwo/NBZpC5snSkS42kU+mOWE3jHA26kV/xG1kf42EgLjLyHqCoaWugfE49SmQpycFy566g/0KHzWqa1Wmjqs+WDKqSCC2Yh0jhotlSU=
+	t=1752773023; cv=none; b=j7/3iWvNEK5NWxS+m4DRgfbPPe0kjM11glwlEbZwHovFsvakBMgge4P9eoG1s3uNsEP/bMD3BW8WSnCzGCUcGOHzDIvIDoz9hTRFiMGjf77lQNqjoYe24Qt1YaWV17DmqRfZx7TFZzjecuNwNistJXa8OcPz3Z2qOIdcd7ovwqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752773022; c=relaxed/simple;
-	bh=LbaHjH4NiS4Lkhp5InUhgQPMPp2G7N9dOBnBXbyM3mo=;
+	s=arc-20240116; t=1752773023; c=relaxed/simple;
+	bh=sP4hCDI+c1Glj0n5khJy9A+n/emaTnw+rEI8v3P9lpc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gK4uc/ERuNVdkRDICI7FDvH7PPyNM66qENokE30EyqyHxravBEG7pWGpbGKpZedPW2JKQDqVm8ngoqyibsoR47thniqoc2vTmvN1jLrHdM4Qm3s88cVxrarhZmcV+ddZsG+4SVNG+hQW7BTAO6GQd+Igc342AL8Gzt/EkFN/yKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.176
+	 MIME-Version; b=H/i9JmYJ6Z/dTSAQEhrXtm6kKed5ZBVM9HXEfi+VQYclso87oe9pAecEz/DX/WJ36WVVBVpGNDFMeit9eqeFvOjqRj2RnjsKN7aioHs3rRZs1lQ3k2EdvPp4F/z5GcMBmZZRXApaHimo5w1GNYmsWlHl78UZVaR+FZ7F7aTim+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-23dc5bcf49eso15083785ad.2
-        for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 10:23:40 -0700 (PDT)
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-747e41d5469so1533228b3a.3
+        for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 10:23:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752773019; x=1753377819;
+        d=1e100.net; s=20230601; t=1752773021; x=1753377821;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sfXjYidHCRRNlRq8mlOfeeS5i3UWXVdaAr1U3iKCkEU=;
-        b=asoutv5hLchG9E4jqbPK7iW5tgpVhcUGhrWr6kCusJOZAe6tdol5yFxojklIcRLNv2
-         C8WJK0o0ky4EaMfGPJj/b2Y1Z7KKvqCG8zrxty22r/p+iA+Z+vEbeY4NZRXE2u4T2U/w
-         GfNjv/dpwO3Nh29RGoLFsa9lyOW+9oJ8GRbSQNhABiMcAHew4yeDvpFdkuyqG19AAP4g
-         duz5jSQ1lK/RDpR777ZysNj+gusHNgWQ3jHwvu9w8xZnr5QtlCiR9FDYMwcs43IWLcvL
-         8l/s9TsjLRJ4nIWOsWWPSRE9dgyXjRGz9YoqI91ZcntVWbZ88m+FL9OGMBp2fSQMHana
-         iJIA==
-X-Gm-Message-State: AOJu0YzH+UQ73qfkkSod9wfhwS2uXwrbajL8DFz4drXBDydgHfB7JigP
-	P2JR1HmpmpL8ZROwFS090FW/7NSbUdrpCaFSDZRxyImefMf8xn3zzpwDvsph
-X-Gm-Gg: ASbGncsA1LmGWguh23B8gWWSKu9kzJzPPowslnS1JamgNWyC74ELV5gmzVTMcDYCNnW
-	Fh71qjz8ERGHSFyZYRad1CSTv8zvrATUTzk8r48VgDkDod2sZJlNq4AEkbEhsU2TY8HIVQ9RT7G
-	4Up65hE4K11NNiR/hi7rSOICO+6d+4rPynONUKSLtgfr9MvgNUSsZFSqXrgH1gbAkHprf+F3qUe
-	FOR+ngm5D3QELBTeXoNn91jc9um5eTQrc6CZ3UBRUAet6yzS6Wzs8QZq+zQnj0ZFG57GG5yO2ve
-	yS+k9+ndJBGIHeoO9meGVWibilsruHjRTN3hqs8CQrK/O8lx9ONPsoHs/MC6dD8xnuIAsWSJh+6
-	r3yU+xAiVuyeum5Kw9khfIS103Po7Zliul4Fq0E6dvQbsMW0Bl7yUq5Z/iwbrrgGP7/LjWw==
-X-Google-Smtp-Source: AGHT+IHFHnje5rct6x49uVZHF2IT1n65v0zC7kWIhimp1FqM08K+Z8QXCQ5U69DSIrwCX0DG69xyBg==
-X-Received: by 2002:a17:902:f707:b0:236:7079:fafd with SMTP id d9443c01a7336-23e3035f53cmr53365935ad.36.1752773019523;
-        Thu, 17 Jul 2025 10:23:39 -0700 (PDT)
+        bh=j15U2S5H80WwANmC/xcPZqMaOxqq4k/Q957qOI+IXBU=;
+        b=qvp295Zr4Id7fqxpOFNKuiZfyQuF37cctQMXGSJyHnA0b3B+4Qb/Yj5SjmgbEv1OGF
+         aVgma7lqHqkeGxNi4w8IwiwJF9kgprP8M0m9W57gVXG+pPQgnooxH9J2ESPi/NYhnVue
+         6P+TiGt0nX1O9hWyy6aVyJjnN3/+AzqwpxY+1v2uXLS3umFMtMZ0+Zqa1iqBlIarEsQr
+         8PSgy86+RDwIBW+Yqu6R1y9jkuJO/PjiN6Nwf/vVabG7+nw2NkE0+KN9yYkK8sdsOp/O
+         6ZQSTZXH12QlKoy9mOrw3XDCwXLOwNP3xQzEJpUOw/4WkyMjrSN4sd3bBruEhwazLAY6
+         lTJA==
+X-Gm-Message-State: AOJu0YzUIJodQ2HhoCNG/WhY8EG9PDu7sx5vc+Xbkxnm659J2sNV0sM2
+	2reTdrgh7eKkA49ETD6KydzrJGzvxgoYpC0FU/iUcJHkrh+V8Vtjzzuswdoi
+X-Gm-Gg: ASbGncsUMn9duaNggepMvBKt7gcHMqKf6C6krut/M/SN0DO0ISDibrrvoVYGZL25gVN
+	L4afDP12xSdTNbi+lpM2r+jMZWhsOCmIhZjjmEhLAicoMXDEgdtZsdqF4FIOzufzz4awwzjLaUL
+	Vye5Am+GiYIGNU7PP1+5Q36a0ZW3xKBC4FxDLitjYyMZtsPpRirVKrAOY7/5XjIctQZgkY9YX5o
+	JZ2ABsqX0tLKY/D/cRylHt15QHIPZQFloUEbaHHbRWyujN8dCQhKOhpbH/+iH2lbseKxN0osbB7
+	h7Z8WeleK9bFMc2flJANb3zuU03Wc3+ItzYjVkot0rJGktUSnLeaS6+ZI1HySfAutDKBNF41DzG
+	OsLnDGmf4A9E7S/qZiQ6qDlQeNIL/wCwdQSGO5I85TCTAPENfjsbXnSWClPs6KJtTZgNsSA==
+X-Google-Smtp-Source: AGHT+IE8hwYLW7d5NM4xn8kerTakcGCOwl2DK6RXuYzxG/sKnrmsBq89dPHxqzZ2l8Kn+RSySpnwjQ==
+X-Received: by 2002:a05:6a00:1acb:b0:736:35d4:f03f with SMTP id d2e1a72fcca58-7572357ee82mr10680363b3a.6.1752773020601;
+        Thu, 17 Jul 2025 10:23:40 -0700 (PDT)
 Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-23de4341ce1sm148105775ad.181.2025.07.17.10.23.39
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-74eb9e06c72sm16867145b3a.66.2025.07.17.10.23.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Jul 2025 10:23:39 -0700 (PDT)
+        Thu, 17 Jul 2025 10:23:40 -0700 (PDT)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com
-Subject: [PATCH net-next v5 5/7] net: s/dev_get_flags/netif_get_flags/
-Date: Thu, 17 Jul 2025 10:23:31 -0700
-Message-ID: <20250717172333.1288349-6-sdf@fomichev.me>
+Subject: [PATCH net-next v5 6/7] net: s/dev_set_threaded/netif_set_threaded/
+Date: Thu, 17 Jul 2025 10:23:32 -0700
+Message-ID: <20250717172333.1288349-7-sdf@fomichev.me>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250717172333.1288349-1-sdf@fomichev.me>
 References: <20250717172333.1288349-1-sdf@fomichev.me>
@@ -84,249 +84,176 @@ netdev, the latter takes care of the locking. We don't strictly
 follow this semantics on either side, but there are more dev_xxx handlers
 now that don't fit. Rename them to netif_xxx where appropriate.
 
+Note that one dev_set_threaded call still remains in mt76 for debugfs file.
+
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- drivers/infiniband/sw/rxe/rxe_verbs.c |  2 +-
- fs/smb/server/smb2pdu.c               |  2 +-
- include/linux/netdevice.h             |  2 +-
- net/8021q/vlan.c                      |  2 +-
- net/bridge/br_netlink.c               |  2 +-
- net/core/dev.c                        | 10 +++++-----
- net/core/dev_ioctl.c                  |  2 +-
- net/core/rtnetlink.c                  |  4 ++--
- net/ipv4/fib_frontend.c               |  2 +-
- net/ipv4/fib_semantics.c              |  2 +-
- net/ipv4/nexthop.c                    |  2 +-
- net/ipv6/addrconf.c                   |  2 +-
- net/mpls/af_mpls.c                    |  6 +++---
- net/wireless/wext-core.c              |  2 +-
- 14 files changed, 21 insertions(+), 21 deletions(-)
+ .../networking/net_cachelines/net_device.rst         |  2 +-
+ drivers/net/ethernet/atheros/atl1c/atl1c_main.c      |  2 +-
+ drivers/net/ethernet/mellanox/mlxsw/pci.c            |  2 +-
+ drivers/net/ethernet/renesas/ravb_main.c             |  2 +-
+ drivers/net/wireguard/device.c                       |  2 +-
+ drivers/net/wireless/ath/ath10k/snoc.c               |  2 +-
+ include/linux/netdevice.h                            |  1 +
+ net/core/dev.c                                       |  6 +++---
+ net/core/dev_api.c                                   | 12 ++++++++++++
+ net/core/net-sysfs.c                                 |  2 +-
+ 10 files changed, 23 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/infiniband/sw/rxe/rxe_verbs.c b/drivers/infiniband/sw/rxe/rxe_verbs.c
-index 2331e698a65b..4f86b56fee26 100644
---- a/drivers/infiniband/sw/rxe/rxe_verbs.c
-+++ b/drivers/infiniband/sw/rxe/rxe_verbs.c
-@@ -65,7 +65,7 @@ static int rxe_query_port(struct ib_device *ibdev,
- 	attr->state = ib_get_curr_port_state(ndev);
- 	if (attr->state == IB_PORT_ACTIVE)
- 		attr->phys_state = IB_PORT_PHYS_STATE_LINK_UP;
--	else if (dev_get_flags(ndev) & IFF_UP)
-+	else if (netif_get_flags(ndev) & IFF_UP)
- 		attr->phys_state = IB_PORT_PHYS_STATE_POLLING;
- 	else
- 		attr->phys_state = IB_PORT_PHYS_STATE_DISABLED;
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index fafa86273f12..b837535d2bfc 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -7847,7 +7847,7 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
- 		if (!ksmbd_find_netdev_name_iface_list(netdev->name))
- 			continue;
+diff --git a/Documentation/networking/net_cachelines/net_device.rst b/Documentation/networking/net_cachelines/net_device.rst
+index c69cc89c958e..2d3dc4692d20 100644
+--- a/Documentation/networking/net_cachelines/net_device.rst
++++ b/Documentation/networking/net_cachelines/net_device.rst
+@@ -165,7 +165,7 @@ struct sfp_bus*                     sfp_bus
+ struct lock_class_key*              qdisc_tx_busylock
+ bool                                proto_down
+ unsigned:1                          wol_enabled
+-unsigned:1                          threaded                                                            napi_poll(napi_enable,dev_set_threaded)
++unsigned:1                          threaded                                                            napi_poll(napi_enable,netif_set_threaded)
+ unsigned_long:1                     see_all_hwtstamp_requests
+ unsigned_long:1                     change_proto_down
+ unsigned_long:1                     netns_immutable
+diff --git a/drivers/net/ethernet/atheros/atl1c/atl1c_main.c b/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
+index ef1a51347351..3a9ad4a9c1cb 100644
+--- a/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
++++ b/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
+@@ -2688,7 +2688,7 @@ static int atl1c_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	adapter->mii.mdio_write = atl1c_mdio_write;
+ 	adapter->mii.phy_id_mask = 0x1f;
+ 	adapter->mii.reg_num_mask = MDIO_CTRL_REG_MASK;
+-	dev_set_threaded(netdev, true);
++	netif_set_threaded(netdev, true);
+ 	for (i = 0; i < adapter->rx_queue_count; ++i)
+ 		netif_napi_add(netdev, &adapter->rrd_ring[i].napi,
+ 			       atl1c_clean_rx);
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/pci.c b/drivers/net/ethernet/mellanox/mlxsw/pci.c
+index 058dcabfaa2e..a2e97b712a3d 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/pci.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/pci.c
+@@ -156,7 +156,7 @@ static int mlxsw_pci_napi_devs_init(struct mlxsw_pci *mlxsw_pci)
+ 	}
+ 	strscpy(mlxsw_pci->napi_dev_rx->name, "mlxsw_rx",
+ 		sizeof(mlxsw_pci->napi_dev_rx->name));
+-	dev_set_threaded(mlxsw_pci->napi_dev_rx, true);
++	netif_set_threaded(mlxsw_pci->napi_dev_rx, true);
  
--		flags = dev_get_flags(netdev);
-+		flags = netif_get_flags(netdev);
- 		if (!(flags & IFF_RUNNING))
- 			continue;
- ipv6_retry:
+ 	return 0;
+ 
+diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+index c9f4976a3527..4e79bf88688a 100644
+--- a/drivers/net/ethernet/renesas/ravb_main.c
++++ b/drivers/net/ethernet/renesas/ravb_main.c
+@@ -3075,7 +3075,7 @@ static int ravb_probe(struct platform_device *pdev)
+ 	if (info->coalesce_irqs) {
+ 		netdev_sw_irq_coalesce_default_on(ndev);
+ 		if (num_present_cpus() == 1)
+-			dev_set_threaded(ndev, true);
++			netif_set_threaded(ndev, true);
+ 	}
+ 
+ 	/* Network device register */
+diff --git a/drivers/net/wireguard/device.c b/drivers/net/wireguard/device.c
+index 4a529f1f9bea..5afec5a865f4 100644
+--- a/drivers/net/wireguard/device.c
++++ b/drivers/net/wireguard/device.c
+@@ -366,7 +366,7 @@ static int wg_newlink(struct net_device *dev,
+ 	if (ret < 0)
+ 		goto err_free_handshake_queue;
+ 
+-	dev_set_threaded(dev, true);
++	netif_set_threaded(dev, true);
+ 	ret = register_netdevice(dev);
+ 	if (ret < 0)
+ 		goto err_uninit_ratelimiter;
+diff --git a/drivers/net/wireless/ath/ath10k/snoc.c b/drivers/net/wireless/ath/ath10k/snoc.c
+index d51f2e5a79a4..0ee68d3dad12 100644
+--- a/drivers/net/wireless/ath/ath10k/snoc.c
++++ b/drivers/net/wireless/ath/ath10k/snoc.c
+@@ -936,7 +936,7 @@ static int ath10k_snoc_hif_start(struct ath10k *ar)
+ 
+ 	bitmap_clear(ar_snoc->pending_ce_irqs, 0, CE_COUNT_MAX);
+ 
+-	dev_set_threaded(ar->napi_dev, true);
++	netif_set_threaded(ar->napi_dev, true);
+ 	ath10k_core_napi_enable(ar);
+ 	/* IRQs are left enabled when we restart due to a firmware crash */
+ 	if (!test_bit(ATH10K_SNOC_FLAG_RECOVERY, &ar_snoc->flags))
 diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 8978fbfbd644..8370cd0f8f6b 100644
+index 8370cd0f8f6b..7929ddfd4433 100644
 --- a/include/linux/netdevice.h
 +++ b/include/linux/netdevice.h
-@@ -4196,7 +4196,7 @@ int generic_hwtstamp_set_lower(struct net_device *dev,
- 			       struct kernel_hwtstamp_config *kernel_cfg,
- 			       struct netlink_ext_ack *extack);
- int dev_ethtool(struct net *net, struct ifreq *ifr, void __user *userdata);
--unsigned int dev_get_flags(const struct net_device *);
-+unsigned int netif_get_flags(const struct net_device *dev);
- int __dev_change_flags(struct net_device *dev, unsigned int flags,
- 		       struct netlink_ext_ack *extack);
- int netif_change_flags(struct net_device *dev, unsigned int flags,
-diff --git a/net/8021q/vlan.c b/net/8021q/vlan.c
-index 06908e37c3d9..df19a9c0c9d9 100644
---- a/net/8021q/vlan.c
-+++ b/net/8021q/vlan.c
-@@ -459,7 +459,7 @@ static int vlan_device_event(struct notifier_block *unused, unsigned long event,
- 	case NETDEV_UP:
- 		/* Put all VLANs for this dev in the up state too.  */
- 		vlan_group_for_each_dev(grp, i, vlandev) {
--			flgs = dev_get_flags(vlandev);
-+			flgs = netif_get_flags(vlandev);
- 			if (flgs & IFF_UP)
- 				continue;
+@@ -589,6 +589,7 @@ static inline bool napi_complete(struct napi_struct *n)
+ 	return napi_complete_done(n, 0);
+ }
  
-diff --git a/net/bridge/br_netlink.c b/net/bridge/br_netlink.c
-index 6e337937d0d7..4e2d53b27221 100644
---- a/net/bridge/br_netlink.c
-+++ b/net/bridge/br_netlink.c
-@@ -479,7 +479,7 @@ static int br_fill_ifinfo(struct sk_buff *skb,
- 	hdr->__ifi_pad = 0;
- 	hdr->ifi_type = dev->type;
- 	hdr->ifi_index = dev->ifindex;
--	hdr->ifi_flags = dev_get_flags(dev);
-+	hdr->ifi_flags = netif_get_flags(dev);
- 	hdr->ifi_change = 0;
++int netif_set_threaded(struct net_device *dev, bool threaded);
+ int dev_set_threaded(struct net_device *dev, bool threaded);
  
- 	if (nla_put_string(skb, IFLA_IFNAME, dev->name) ||
+ void napi_disable(struct napi_struct *n);
 diff --git a/net/core/dev.c b/net/core/dev.c
-index ac8bca20a19a..40ddeb4e0717 100644
+index 40ddeb4e0717..99f1e87f8274 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -9450,12 +9450,12 @@ void dev_set_rx_mode(struct net_device *dev)
+@@ -4798,7 +4798,7 @@ static inline void ____napi_schedule(struct softnet_data *sd,
+ 
+ 	if (test_bit(NAPI_STATE_THREADED, &napi->state)) {
+ 		/* Paired with smp_mb__before_atomic() in
+-		 * napi_enable()/dev_set_threaded().
++		 * napi_enable()/netif_set_threaded().
+ 		 * Use READ_ONCE() to guarantee a complete
+ 		 * read on napi->thread. Only call
+ 		 * wake_up_process() when it's not NULL.
+@@ -6986,7 +6986,7 @@ int napi_set_threaded(struct napi_struct *napi, bool threaded)
+ 	return 0;
  }
+ 
+-int dev_set_threaded(struct net_device *dev, bool threaded)
++int netif_set_threaded(struct net_device *dev, bool threaded)
+ {
+ 	struct napi_struct *napi;
+ 	int err = 0;
+@@ -7027,7 +7027,7 @@ int dev_set_threaded(struct net_device *dev, bool threaded)
+ 
+ 	return err;
+ }
+-EXPORT_SYMBOL(dev_set_threaded);
++EXPORT_SYMBOL(netif_set_threaded);
  
  /**
-- *	dev_get_flags - get flags reported to userspace
-- *	@dev: device
-+ * netif_get_flags() - get flags reported to userspace
-+ * @dev: device
-  *
-- *	Get the combination of flag bits exported through APIs to userspace.
-+ * Get the combination of flag bits exported through APIs to userspace.
-  */
--unsigned int dev_get_flags(const struct net_device *dev)
-+unsigned int netif_get_flags(const struct net_device *dev)
- {
- 	unsigned int flags;
- 
-@@ -9478,7 +9478,7 @@ unsigned int dev_get_flags(const struct net_device *dev)
- 
- 	return flags;
+  * netif_queue_set_napi - Associate queue with the napi
+diff --git a/net/core/dev_api.c b/net/core/dev_api.c
+index 1bf0153195f2..dd7f57013ce5 100644
+--- a/net/core/dev_api.c
++++ b/net/core/dev_api.c
+@@ -367,3 +367,15 @@ void netdev_state_change(struct net_device *dev)
+ 	netdev_unlock_ops(dev);
  }
--EXPORT_SYMBOL(dev_get_flags);
-+EXPORT_SYMBOL(netif_get_flags);
+ EXPORT_SYMBOL(netdev_state_change);
++
++int dev_set_threaded(struct net_device *dev, bool threaded)
++{
++	int ret;
++
++	netdev_lock(dev);
++	ret = netif_set_threaded(dev, threaded);
++	netdev_unlock(dev);
++
++	return ret;
++}
++EXPORT_SYMBOL(dev_set_threaded);
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index e41ad1890e49..c28cd6665444 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -757,7 +757,7 @@ static int modify_napi_threaded(struct net_device *dev, unsigned long val)
+ 	if (val != 0 && val != 1)
+ 		return -EOPNOTSUPP;
  
- int __dev_change_flags(struct net_device *dev, unsigned int flags,
- 		       struct netlink_ext_ack *extack)
-diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
-index ceb2d63a818a..9c0ad7f4b5d8 100644
---- a/net/core/dev_ioctl.c
-+++ b/net/core/dev_ioctl.c
-@@ -147,7 +147,7 @@ static int dev_ifsioc_locked(struct net *net, struct ifreq *ifr, unsigned int cm
+-	ret = dev_set_threaded(dev, val);
++	ret = netif_set_threaded(dev, val);
  
- 	switch (cmd) {
- 	case SIOCGIFFLAGS:	/* Get interface flags */
--		ifr->ifr_flags = (short) dev_get_flags(dev);
-+		ifr->ifr_flags = (short)netif_get_flags(dev);
- 		return 0;
- 
- 	case SIOCGIFMETRIC:	/* Get the metric on the interface
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index 108995b6eced..094b085cff20 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -2038,7 +2038,7 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
- 	ifm->__ifi_pad = 0;
- 	ifm->ifi_type = READ_ONCE(dev->type);
- 	ifm->ifi_index = READ_ONCE(dev->ifindex);
--	ifm->ifi_flags = dev_get_flags(dev);
-+	ifm->ifi_flags = netif_get_flags(dev);
- 	ifm->ifi_change = change;
- 
- 	if (tgt_netnsid >= 0 && nla_put_s32(skb, IFLA_TARGET_NETNSID, tgt_netnsid))
-@@ -5227,7 +5227,7 @@ int ndo_dflt_bridge_getlink(struct sk_buff *skb, u32 pid, u32 seq,
- 	ifm->__ifi_pad = 0;
- 	ifm->ifi_type = dev->type;
- 	ifm->ifi_index = dev->ifindex;
--	ifm->ifi_flags = dev_get_flags(dev);
-+	ifm->ifi_flags = netif_get_flags(dev);
- 	ifm->ifi_change = 0;
- 
- 
-diff --git a/net/ipv4/fib_frontend.c b/net/ipv4/fib_frontend.c
-index fd1e1507a224..6e1b94796f67 100644
---- a/net/ipv4/fib_frontend.c
-+++ b/net/ipv4/fib_frontend.c
-@@ -1524,7 +1524,7 @@ static int fib_netdev_event(struct notifier_block *this, unsigned long event, vo
- 		fib_disable_ip(dev, event, false);
- 		break;
- 	case NETDEV_CHANGE:
--		flags = dev_get_flags(dev);
-+		flags = netif_get_flags(dev);
- 		if (flags & (IFF_RUNNING | IFF_LOWER_UP))
- 			fib_sync_up(dev, RTNH_F_LINKDOWN);
- 		else
-diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
-index a2f04992f579..a5f3c8459758 100644
---- a/net/ipv4/fib_semantics.c
-+++ b/net/ipv4/fib_semantics.c
-@@ -2087,7 +2087,7 @@ int fib_sync_up(struct net_device *dev, unsigned char nh_flags)
- 		return 0;
- 
- 	if (nh_flags & RTNH_F_DEAD) {
--		unsigned int flags = dev_get_flags(dev);
-+		unsigned int flags = netif_get_flags(dev);
- 
- 		if (flags & (IFF_RUNNING | IFF_LOWER_UP))
- 			nh_flags |= RTNH_F_LINKDOWN;
-diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-index e808801ab9b8..29118c43ebf5 100644
---- a/net/ipv4/nexthop.c
-+++ b/net/ipv4/nexthop.c
-@@ -3884,7 +3884,7 @@ static int nh_netdev_event(struct notifier_block *this,
- 		nexthop_flush_dev(dev, event);
- 		break;
- 	case NETDEV_CHANGE:
--		if (!(dev_get_flags(dev) & (IFF_RUNNING | IFF_LOWER_UP)))
-+		if (!(netif_get_flags(dev) & (IFF_RUNNING | IFF_LOWER_UP)))
- 			nexthop_flush_dev(dev, event);
- 		break;
- 	case NETDEV_CHANGEMTU:
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index c85b1db74b1a..4f1d7d110302 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -6072,7 +6072,7 @@ static int inet6_fill_ifinfo(struct sk_buff *skb, struct inet6_dev *idev,
- 	hdr->ifi_type = dev->type;
- 	ifindex = READ_ONCE(dev->ifindex);
- 	hdr->ifi_index = ifindex;
--	hdr->ifi_flags = dev_get_flags(dev);
-+	hdr->ifi_flags = netif_get_flags(dev);
- 	hdr->ifi_change = 0;
- 
- 	iflink = dev_get_iflink(dev);
-diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
-index 47d7dfd9ad09..25c88cba5c48 100644
---- a/net/mpls/af_mpls.c
-+++ b/net/mpls/af_mpls.c
-@@ -706,7 +706,7 @@ static int mpls_nh_assign_dev(struct net *net, struct mpls_route *rt,
- 	} else {
- 		unsigned int flags;
- 
--		flags = dev_get_flags(dev);
-+		flags = netif_get_flags(dev);
- 		if (!(flags & (IFF_RUNNING | IFF_LOWER_UP)))
- 			nh->nh_flags |= RTNH_F_LINKDOWN;
- 	}
-@@ -1616,14 +1616,14 @@ static int mpls_dev_notify(struct notifier_block *this, unsigned long event,
- 			return notifier_from_errno(err);
- 		break;
- 	case NETDEV_UP:
--		flags = dev_get_flags(dev);
-+		flags = netif_get_flags(dev);
- 		if (flags & (IFF_RUNNING | IFF_LOWER_UP))
- 			mpls_ifup(dev, RTNH_F_DEAD | RTNH_F_LINKDOWN);
- 		else
- 			mpls_ifup(dev, RTNH_F_DEAD);
- 		break;
- 	case NETDEV_CHANGE:
--		flags = dev_get_flags(dev);
-+		flags = netif_get_flags(dev);
- 		if (flags & (IFF_RUNNING | IFF_LOWER_UP)) {
- 			mpls_ifup(dev, RTNH_F_DEAD | RTNH_F_LINKDOWN);
- 		} else {
-diff --git a/net/wireless/wext-core.c b/net/wireless/wext-core.c
-index bea70eb6f034..c32a7c6903d5 100644
---- a/net/wireless/wext-core.c
-+++ b/net/wireless/wext-core.c
-@@ -431,7 +431,7 @@ static struct nlmsghdr *rtnetlink_ifinfo_prep(struct net_device *dev,
- 	r->__ifi_pad = 0;
- 	r->ifi_type = dev->type;
- 	r->ifi_index = dev->ifindex;
--	r->ifi_flags = dev_get_flags(dev);
-+	r->ifi_flags = netif_get_flags(dev);
- 	r->ifi_change = 0;	/* Wireless changes don't affect those flags */
- 
- 	if (nla_put_string(skb, IFLA_IFNAME, dev->name))
+ 	return ret;
+ }
 -- 
 2.50.1
 
