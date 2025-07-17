@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-208037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE52AB09864
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 01:44:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AC4DB09865
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 01:44:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C0963B17E4
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 23:43:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95F743B0855
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 23:43:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 757291F0E32;
-	Thu, 17 Jul 2025 23:44:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A5C9244690;
+	Thu, 17 Jul 2025 23:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZA8D24jH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mj2KLFgJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 518AFBE46
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 23:44:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F47242D7F
+	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 23:44:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752795851; cv=none; b=E1U2NTtCD0Ad6eY/60sKXtqFNj0KpOCdfm0TAgpSs2UPITrjhL9P4p26J4xwqmpzYytgNQcicehp4Ej7upzttAMjgnH9OCDavrrI1Ux9YpC+ICzSfFg3FHuJKY6w/dJzIcek9A2Qe5ZDQ3AHnchUMoyQkGrrPJQ8SHJrfqYvOBU=
+	t=1752795852; cv=none; b=FU71ISUtSgpHe6JUkWLl6mqDEDOAnp3LUkgPLaCvOCvSdHsqRiuFhJnIBOjuKF0yzJSNaQ/y25cu+p9ndoclZ5q4k22G7p1kaI3e524c+GQ7LnbKujxq987k2YTOcJ7UywMW3r5afd8QDZaoYLkjy104S2qOSazrc9AFEL4hzco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752795851; c=relaxed/simple;
-	bh=umImrcTdXQxBS4ltdq5WMtPPW1ueGYCakBO1ttmJtm4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZZP3v8ZZQzQArryxXGTUWCUciaryJp0wGxcytyYv35Rnj+BIJD+wz/5v4kghnjCGWUuOUHMECtHo4AkTVVcBnvuyaHkCzPuOxfAzpxY7RC0U7RV7UQkOb1KrdTlm1xUZRRTfYCBoAli/gsjuQPEyW8eh7dX5jMrIV+xyv94JV4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZA8D24jH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33DDFC4CEE3;
+	s=arc-20240116; t=1752795852; c=relaxed/simple;
+	bh=leKWwje9Kq/GGchGQwLBSeENJaFW+oS1C9Gl+TfrRt0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=fiCdvF7iYupbRV1oybT4+e5oPKFvRYUE+TrFBLQAwDMYHIdJc4if3M+1rJb4qx5zUYYWaPy1U+DleKEaFuaYjO6f0lOetjr1nqjt2fWmxukBcDUxryHmb+0bXQeGBWRMXgosNE/kq9L3Zoe8sQqgRVTb3r6kOU4W4SzUxZgjDfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mj2KLFgJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01AFEC4CEEB;
 	Thu, 17 Jul 2025 23:44:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752795850;
-	bh=umImrcTdXQxBS4ltdq5WMtPPW1ueGYCakBO1ttmJtm4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ZA8D24jHaJbGWAy6CGdO9bgYWKK5NIPIeu2PbKGypdMW+ptBwkiikAkGHw7NO4tYj
-	 dRUvGMYcFEWpyitWun8+m6miB6knYG0oY9Vod3xXknHU2Wxx1FKzcbNck/FqnR4+Mw
-	 36UFmWKziAhWA33ZAyBgx+kXFbeKlAygLWRr3gqKL7N54OibIT98YJOcAQeNKX3TcS
-	 crEBToV2prTrk7TFF8T2PMDhf7i5yYGuIqXQCQGHH65ZIhZCL76QLjTVCcgfyFAUSE
-	 PhPjqkb4yl/gcNpWeLI3hq6FQJztp13rEfPFqyi2x6RvJXH9FXpvwyzuN68OJWTd7f
-	 Msy0pP7t2AkIQ==
+	s=k20201202; t=1752795851;
+	bh=leKWwje9Kq/GGchGQwLBSeENJaFW+oS1C9Gl+TfrRt0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=mj2KLFgJWRlh9yo+kwS9yhsO6Zg1YTfcf6LEmGwBPIy6eLH8UE6VRyZ+FLicpTxdr
+	 cDvpb8qb6LkRzryTquRvtVPYrYP7yFynvtt3xh8hdHVjzFEdpVznm1uL/gyiLzuRer
+	 tz/OWvrtS8p2wv/LBNVeWspXzcomhJ5RF2QIhrZx7XyzJIRmtxlysWeIZ0Y0Dav93Z
+	 DkrnP0FrVy0WxBTMLZDdib34goaGaR5dyLk5bkFkH5Xdz8+NW4SIvNA5uqKNKZIaQU
+	 oa/cblGVIxyzrmWn/hWSQdLANHUxZOnlyaXfPbqda+TmdONKMQR3QwLrJmn79gKG8I
+	 NvPmJvMZ3PbMA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -54,10 +55,12 @@ Cc: netdev@vger.kernel.org,
 	gal@nvidia.com,
 	ecree.xilinx@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 0/8] ethtool: rss: support creating and removing contexts via Netlink
-Date: Thu, 17 Jul 2025 16:43:35 -0700
-Message-ID: <20250717234343.2328602-1-kuba@kernel.org>
+Subject: [PATCH net-next 1/8] ethtool: assert that drivers with sym hash are consistent for RSS contexts
+Date: Thu, 17 Jul 2025 16:43:36 -0700
+Message-ID: <20250717234343.2328602-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20250717234343.2328602-1-kuba@kernel.org>
+References: <20250717234343.2328602-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,42 +69,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series completes support of RSS configuration via Netlink.
-All functionality supported by the IOCTL is now supported by
-Netlink. Future series (time allowing) will add:
- - hashing on the flow label, which started this whole thing;
- - pinning the RSS context to a Netlink socket for auto-cleanup.
+Supporting per-RSS context configuration of hashing fields but
+not the hashing algorithm would complicate the code a lot.
+We'd need to cross check the config against all RSS contexts.
+None of the drivers need this today, so explicitly prevent
+new drivers with such skewed capabilities from registering.
+If such driver appears it will need to first adjust the checks
+in the core.
 
-The first patch is a leftover held back from previous series
-to avoid conflicting with Gal's fix.
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ net/ethtool/common.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Next 4 patches refactor existing code to make reusing it for
-context creation possible. 2 patches after that add create
-and delete commands. Last but not least the test is extended.
-
-Jakub Kicinski (8):
-  ethtool: assert that drivers with sym hash are consistent for RSS
-    contexts
-  ethtool: rejig the RSS notification machinery for more types
-  ethtool: rss: factor out allocating memory for response
-  ethtool: rss: factor out populating response from context
-  ethtool: move ethtool_rxfh_ctx_alloc() to common code
-  ethtool: rss: support creating contexts via Netlink
-  ethtool: rss: support removing contexts via Netlink
-  selftests: drv-net: rss_api: context create and delete tests
-
- Documentation/netlink/specs/ethtool.yaml      |  41 +-
- Documentation/networking/ethtool-netlink.rst  |  41 ++
- .../uapi/linux/ethtool_netlink_generated.h    |   5 +
- net/ethtool/common.h                          |   8 +-
- net/ethtool/netlink.h                         |   5 +
- net/ethtool/common.c                          |  39 ++
- net/ethtool/ioctl.c                           |  48 +--
- net/ethtool/netlink.c                         |  22 +
- net/ethtool/rss.c                             | 393 ++++++++++++++++--
- .../selftests/drivers/net/hw/rss_api.py       |  73 ++++
- 10 files changed, 603 insertions(+), 72 deletions(-)
-
+diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+index 4dcb4194f3ce..82afe0f2a7cd 100644
+--- a/net/ethtool/common.c
++++ b/net/ethtool/common.c
+@@ -829,6 +829,10 @@ int ethtool_check_ops(const struct ethtool_ops *ops)
+ 		return -EINVAL;
+ 	if (WARN_ON(ops->supported_input_xfrm && !ops->get_rxfh_fields))
+ 		return -EINVAL;
++	if (WARN_ON(ops->supported_input_xfrm &&
++		    ops->rxfh_per_ctx_fields != ops->rxfh_per_ctx_key))
++		return -EINVAL;
++
+ 	/* NOTE: sufficiently insane drivers may swap ethtool_ops at runtime,
+ 	 * the fact that ops are checked at registration time does not
+ 	 * mean the ops attached to a netdev later on are sane.
 -- 
 2.50.1
 
