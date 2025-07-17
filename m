@@ -1,264 +1,429 @@
-Return-Path: <netdev+bounces-207936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5668EB09142
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 18:04:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16321B09143
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 18:04:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4CAD16CECF
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 16:01:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0FDA1892EB0
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 16:04:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F70E1F790F;
-	Thu, 17 Jul 2025 16:01:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E26B2F6FBA;
+	Thu, 17 Jul 2025 16:04:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N0AbGyKp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CU+X5i6S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6B9813D53B;
-	Thu, 17 Jul 2025 16:01:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752768111; cv=fail; b=hLIjOmO26RPhCrFmBw341Gb0CKJFKh1om6gewy9AX930SOEzSMF4OANwmzQz9OUMF0+CTmqtPh9JBuyylYhLm7JhiTCHe14/vKO5WDF7sU9+UJFC2IN6Ww4PKq+DtWk9PJ9F8ir0s9VIpsWVkISlI52bzONc+1/4cCl98xgqCl0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752768111; c=relaxed/simple;
-	bh=/WpyiNclAC9xvEMWqZi5cajW+9z1Qogtd+bbqUVJGUs=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=bDt5BOKJG0T81kVlyyYCV6VSSUwRlHLvURZXctnhXB38DVMJ50IAGrhesRS7ph1BPGarbZWBpQtl5LBcWq/xZGxrodzTAUjz1FnTSm5+DJQt2Nw6alFBcTBrHYaWOhmNKPWdfP9E7iYxu2iN7/gLisM0mdXJu0BOyN7Z2xrI11I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N0AbGyKp; arc=fail smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752768110; x=1784304110;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=/WpyiNclAC9xvEMWqZi5cajW+9z1Qogtd+bbqUVJGUs=;
-  b=N0AbGyKpVjwbofEGgxR5nGIrEUgOfYeVCpoBHepH8rOTo9xTIB2FJYtD
-   m2L6Gb/C4zxXuSdvQDkBjtKdhyLQI4bcNegq1J4KRqn7iN84uLpDanql7
-   K/Zv9QhZVYW4jSAYgwa6eDP31cT2qGw58EfrzF0LZ8vrAzItIxUaoxdDs
-   z4rA4DmU7nZYlCxcLZd6H/kJZRgd0jgIDT4AAQt9q7Mqod85kipPsLhQ/
-   4D+AxGV6JiT+HtGXn6LIsd2DzbCN9USkZwdCE5MbiPhhL8xkzPiPivJHt
-   p93ityYRkEYl9uxhpsmLDqT7VOm85Tt3dX3CuYvPPZ5byEzSIm+bR4gmE
-   Q==;
-X-CSE-ConnectionGUID: AAO2rWX4Sq+LA9bGa0tjyA==
-X-CSE-MsgGUID: JXvkqiE1R6K3FKlXW6OqKg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="54987855"
-X-IronPort-AV: E=Sophos;i="6.16,319,1744095600"; 
-   d="scan'208";a="54987855"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 09:01:34 -0700
-X-CSE-ConnectionGUID: Tz9wkFL7T7ekxJoLUmqxjA==
-X-CSE-MsgGUID: UwMwfAOERK6CdQ0gCxiHKg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,319,1744095600"; 
-   d="scan'208";a="188775657"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 09:01:35 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Thu, 17 Jul 2025 09:01:33 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26 via Frontend Transport; Thu, 17 Jul 2025 09:01:33 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (40.107.92.55) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Thu, 17 Jul 2025 09:01:30 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ktnxU3+NYVjgeKsnX9RkWugPK/m+DiHn8rhHJ8IQdKTye8/IaYRCQItNqZDAK4xZjrL24ha5CxL8dhCemcCMq5w45TaoLNnbXywZu7yNH9omGkKCpOKk+0fRD5yhRicQnl0pLScBDJS0RI2wCWqa7lvVJTwWSZEY0l3IY/goDlaP70uIAL4s3FT90CTW6Y06L6Rvi9GaT8Dj+w6qXf/BXE/t+1UzcYuAkEy/wX4ZoXaHfRMmA8bhlgWrlbj0EMCyZoWBE+E7ZFW7MtG8vFdJWUN+NjdQ4BoAfl+gHNoeIU267AQdYGU/W6GH1B9AIF+ISzqQEdQFYvJWvGHqRij4Cw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8+DHnDN5t4ubVbAZPNeZlh6xuAwTkpUx8fPgtBms1js=;
- b=cRf6FMJQRGLc1VYrBgqp/+MiMAFQZjk3LxqT3SmX7n70btuSW9FdEGypK42TG8vV/VCCuleIYxvDNWE3PKTpajwqAXgyTJcadFYhjVorePKz5hDTWOJOX61r6EYPAkYLGtkT8p3iB0DsINHchW6ImI+dONGM/W7vdu/i9FBaxkOQnUrkCBlaTl6FLE7Vn0ufg5dspBED+J7QvcGLDFK8PDs5pX2bU6mSgPdbC4rAdAw3BzGIZKRhVAk/0KJHTWJTKH92fuFjYGR9KXDYQHyUxxNQ5EniirikE60gPG9lmaxmJqUdiXKuIFvBgeZb95KGxeQJnyBF0xDLP0gkuIvHXA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
- by DS0PR11MB6399.namprd11.prod.outlook.com (2603:10b6:8:c8::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8901.35; Thu, 17 Jul 2025 16:01:12 +0000
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::24ab:bc69:995b:e21]) by BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::24ab:bc69:995b:e21%4]) with mapi id 15.20.8857.026; Thu, 17 Jul 2025
- 16:01:12 +0000
-Message-ID: <78d4bf2c-c436-4f7c-8940-6ae9f6241133@intel.com>
-Date: Thu, 17 Jul 2025 09:01:08 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next,rdma-next 0/6][pull request] Add RDMA support for
- Intel IPU E2000 in idpf
-To: Paolo Abeni <pabeni@redhat.com>
-CC: <tatyana.e.nikolova@intel.com>, <joshua.a.hay@intel.com>,
-	<davem@davemloft.net>, <kuba@kernel.org>, <edumazet@google.com>,
-	<jgg@ziepe.ca>, <andrew+netdev@lunn.ch>, <leon@kernel.org>,
-	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>
-References: <20250714181002.2865694-1-anthony.l.nguyen@intel.com>
- <245a03a1-a2a0-4975-a68b-c70d22d01d97@redhat.com>
-Content-Language: en-US
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-In-Reply-To: <245a03a1-a2a0-4975-a68b-c70d22d01d97@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR03CA0206.namprd03.prod.outlook.com
- (2603:10b6:303:b8::31) To BL3PR11MB6435.namprd11.prod.outlook.com
- (2603:10b6:208:3bb::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 457911B4247;
+	Thu, 17 Jul 2025 16:04:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752768249; cv=none; b=mJ1sLxqZzC+nFUWy3E3U0bq5qId1UgIpbAeq24ADO0uoTla2JzJTS/4/z5XHaeZHQx+IyZisb11hW39e3ho1fB89LObUe5jlWYg/vyC4TlbLJhiuQ4uc0pAqL+VmEz2V517mlYcq4zqyi+EqD35QX13PNoJXEd/RF2zHTjkPspU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752768249; c=relaxed/simple;
+	bh=8RHVWtYzQi/sgV9PaCSQc1/swoXUbMQBDPGhbZ978TM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KZMU4biAb6U9SyOpbVIlPujbNjoUss85q13G6Z09AU7IWK9F7gUlVkMH9O3MzCsSHgfh4utBxqVBnm1yRhzSBfYJVA0qVelorcfGPehtrmLDQo7tB8G7wLvgASrv2GlRHCG4GEO9dy3+1uLdRLozBmU1ADeBdHjcTiJ1Pn9xfmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CU+X5i6S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5A3BC4CEE3;
+	Thu, 17 Jul 2025 16:04:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752768249;
+	bh=8RHVWtYzQi/sgV9PaCSQc1/swoXUbMQBDPGhbZ978TM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=CU+X5i6SBFIL8QcCVyXMEK2y5UEtFE6TEuVN0kSBmRA2aUSYHuVKr5m9KUy2j63J4
+	 pFSDeNFrGQvngva2JGYmxWfVFqr9F1LUGxNLjYsqSpv+FWOpgQEY1t08tcGY8xp+yt
+	 c7DGr4VUC55/MBafC1q7x+cMRgLtZTHK4pMc5VYCERG/iq6yUPav22aJSaaak3QDus
+	 UCGfAhOnG2PNd4LgutsbyzKkKi+wtxSgZywDmEB4AqDbpaobA8c3Cm870lYBsPBReb
+	 REKUj2nGAoUWX05leAV8rWOZnK675KYGaEhjeYwp+YWCvU8fuzm/3Wo7lJWW3rdzmN
+	 RODlWwstYenxg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pabeni@redhat.com
+Subject: [GIT PULL] Networking for v6.16-rc7
+Date: Thu, 17 Jul 2025 09:04:08 -0700
+Message-ID: <20250717160408.2981607-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|DS0PR11MB6399:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7ef8ebf2-b63a-4caa-4c69-08ddc54b269c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|13003099007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?RzA0Ym1SRjJzamZXczFab3AyN0Z3S09XNmwvbENCWGhvaXdjODJ5UDdpNFFD?=
- =?utf-8?B?OGdxTXRvdGhqWDJPL0h0eE1XMDNvVWFvWGpDT0huQTJwSVJBMGV6YUhsbHUz?=
- =?utf-8?B?Nzh1VjkrRms5QVJ3Y1I2ZEZZaEd1VXI5S0NHa1A4ZmJrZHl3amZqL3dhQ3Zj?=
- =?utf-8?B?WWIwRE5uQytFV0w4b0xsRHRyUjRMcTN0OXZhdWVzVVIvaE1uc3pMWDJXMlFM?=
- =?utf-8?B?RnI4enNJaWpyc0VvUk1aT3dkY2NDWXJ5RUdqekVxcXVueXBIdE1saGtzeEpN?=
- =?utf-8?B?TFZlSUJXbGJxZnpGYnNNdGplbGR6RXVnUlo2MllnOGtVNmVpd1VYQzY5eGlR?=
- =?utf-8?B?aGhZU1puazc0S2c0UjNiVGRITnJ4KzQ4VUZZQTd2VFRhaGx0aFlDZEpXWS9Q?=
- =?utf-8?B?dHRoU0IrSWkrMTVIeXJFd1U4TUhCVnNyWHlEYVhtRHdNS3QzUFlsWmpFS1FK?=
- =?utf-8?B?c2FBYStHa3FaVUFyUUpxeWVheGtKM094QmpDdlZIL1cxU2l1ZFFKcFVHcktD?=
- =?utf-8?B?R0gySFdmZVhjVk04ajlVbm40OXhBOUthMVJ5T1k3ZkFZRFhZVVZjVi9sT3Q4?=
- =?utf-8?B?bWQ1NWl2eVluM1BjOGxsSnBsYzZuZHQramlyd0NaNnc5Q3NaNmx0WlBFSmlh?=
- =?utf-8?B?SHJIU1AvRzg5VklXZ0JQQWdPeW16NVlTejBIY3RnTVZEbjU4T1FoL0gxcjg5?=
- =?utf-8?B?Mjg3NFN3a1k5eUgzZFZRY1hSOXNiYy9Cd3JLbGo5KytUSjY1anh1dEJWdkZQ?=
- =?utf-8?B?MUJjNzduNENjRDBHUndSbFk2eldJMjh6b0RwMm5CckgyQ0lkQ0NnZ3lNOGF3?=
- =?utf-8?B?aytLRGlmaHFCU0tSR1ExeWZHSVROSEZlK0t1SW42NzlqNlhnQzNTalU0WUli?=
- =?utf-8?B?NEtwelRtRzRUd3dHN1BscFRVZnpqSTMvTEY1VjdENVF6NUw3NWVjZVJEbkxR?=
- =?utf-8?B?cSswWGNZM1lzQXIyNWhhSW1RcFRlQml5TlhlUVUwSTFYaVNadEFLSGVHMnhp?=
- =?utf-8?B?WVNBZ2trYlpUaXpkbm15Z2VpTjNFQm9SeHpVT0k1R2E4NkIwR3NzcWlzckZh?=
- =?utf-8?B?ZnQrTTZGRXl5WFVOS1BDVGY1dlJLK1gzZ2svU3BlMkM0YWx0eWtpYzhiQ0RV?=
- =?utf-8?B?UjRUS1dQMEplWnVMRG1xRVp2emtuejl6YmR2OTE4aFBJQWtxZEtHSUEvUHNL?=
- =?utf-8?B?dS9GWWJXU1RYdmM1WVFkbWZHS3FhSGdzQmhDYVFnOWlGQzNXUTI1eGVOMkZ2?=
- =?utf-8?B?aWpTSGorL3RYZnVYL3VJc1RtUWd4bzhwYWlIY1lqQVlMc1grK3RFVUxGeHpU?=
- =?utf-8?B?Sy9Pckl1R0JLc0ZETXp4S09razZ0MVlmeVZzaitEZENXeWNGTXl4QmRhaXpE?=
- =?utf-8?B?STNyMWY1Q0U5MHR5WTRybHRzVlVsVGlNc0RkTHdpR1RBelZBTzZiU3p5b1hl?=
- =?utf-8?B?akJvS3JxVklqNTJ3ZWc3a3d0RGhXWFNiMmlIUjM0S2RDU3ZNNnl6RVhwRGxk?=
- =?utf-8?B?U1RNYnVvUzlUenhoc1Qyc1NwbEVsYklrcUcrTlFIUGttUVdWSUorNzVrVmtJ?=
- =?utf-8?B?U0JZRDJSZjB6Z0NqRWsyTmNWYmRJRHFUQ2hGOURCUUw3eVhNemdaVXUrS2U1?=
- =?utf-8?B?amE1MGNva0hPR0wxUXFNeUxid3h4ejFEam9JUG91d01PN2VxelhQM3VGa3hY?=
- =?utf-8?B?c3ZnQlZ4Y3RXZzk5SldYQnVjSTZVTW4zdWlRbEdXVWdOcjNSTGJVclZ1Zkda?=
- =?utf-8?B?cXdSY1Z3TE9NV29FbjlTc0VVbzcyZ2dXU0FKT1preDVtb2tNczdWQXB0Zi9n?=
- =?utf-8?B?M3k4bUZPSDRMcjVMaDJoSCsxZld3TVFpbU5KOU9RRmUrWVdTakc2TjN6Y0dX?=
- =?utf-8?B?RU13U0tZRlJOV3I4VmFJVXNCU0JzeWVHZWVRT0hmdWdkelA3djB3TTRFS0FK?=
- =?utf-8?Q?J94cnjz/oD8=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(13003099007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?STBrYUNLSS90TXRPelVHa09hSGNkcDF3WDc4VFRoaHFGSzZsY1MxUUlJRS9a?=
- =?utf-8?B?akMxZTZxbVBqQlFDK21uVk1yZlhVNXNjbkYzaDQrQTJoajVqa2xxMTl2VXVV?=
- =?utf-8?B?S1ljK3E4Vmt4U2FMVVNSdmx4WnFxYnRzTElVNUoyY2srS2Nkd3hZWVZLM09G?=
- =?utf-8?B?NnZhTGRkc3BoWmFpT3dQMTB5NlluZnNCYVpYZ1U2dTJyU2RTNFRUZ0FyQTRh?=
- =?utf-8?B?bUNHN0YvdElja0NrR3VBUDNZaDVEaCtJcmRxOTVLNzI5Sy83eG1XZ3dIRzhS?=
- =?utf-8?B?WDd6Zk5zbHUvTGU3d25YV0FKN2NMbXEwZEQyckhNSzV6MW5qSEJyOFNqMzZq?=
- =?utf-8?B?YlFBNEVGeVdnSmlGZUErMXVoQXV5ZzBicmhwcE9sQzF5SUFzaUhSQTZNTm12?=
- =?utf-8?B?ZnRxVExiVmRJMHdwUk1DQ2lyREhkRFRJQkozUXQzYmViVFE3WUVKK0hJZVNQ?=
- =?utf-8?B?L0xuOW1hMlpDcjduWGtNR1lEeEJrTDYzZk5scmVnb1JtN0o0Q2cwV3U3Q2V5?=
- =?utf-8?B?TlZ6R2hQOWJQMkh4b1h6SGU4ak9kaVNlcjZ1NUE3TWMrNVZseWlCWERCVEl5?=
- =?utf-8?B?OExOR0ltTGpsYWJYdjZ3Y050MjhBeDUxUnZvSEoxeTdaNHlVUlQzWjQvMmdm?=
- =?utf-8?B?ZkZzYnNDVFV6QUhJa0VuejdHc3dkMmp2b2JubUM0VTJVUm94NFV3cTUrTEdI?=
- =?utf-8?B?R0VYR3hYQkNoS1lOK0NDSWtKdFRQUXl0MlY3Y3dTa2E4ajRQNDNqYTArdnJV?=
- =?utf-8?B?emV4Tk0wdFovZlVwV2VJbFNGaUNVdi81UDQ3R29Qam5yY1QxWlBXdGNBZ2Rx?=
- =?utf-8?B?TE9IaFJ0NTdDYjVXSDJsVTJVQmlxeEZ3Z0g5R3JILzBaN2sxUWJ0Nk5OUXVl?=
- =?utf-8?B?WUUyKzVYbC81OEFqdUR0THV4dExwMW9kcUpEU2hOT29NMFNianlNU1N0SFBU?=
- =?utf-8?B?bloxcFJJNE1FMHVlTWsya1QvRVdWSlgxZDkxb1RxWmZSTzllS1E3OFpVVUx0?=
- =?utf-8?B?bWhkdVFvYzNaaUJkeVNEZTYxSThlN0k1MjlyaWtxMEYycU9vczRNNVhlUS9v?=
- =?utf-8?B?UWRWUkhTeDZ4U0w2TmovR1ZVNXp3aFZXNHl0VS9xUERtSkhZLzdzSzVJeFBu?=
- =?utf-8?B?MzBCbldiT1JHR2pSWVF4Q2RkN3VoTENxV245aStreW5wWlV5V2JzVnZTRVo4?=
- =?utf-8?B?RmpwU1ljRmhiemQvbC9xZ0djYXc4ZnMvZlo1RjRtWVJIK1dLWXU0VHo2MG5r?=
- =?utf-8?B?cERGZmFHN2hOSTBrYlg5MFlibFBSUVN4SHFiK0xRdDdHZFkvc0JMVkZKd21B?=
- =?utf-8?B?TkpoUUhaOHB0cm9TeHdSY0JvcHBWRXJFMUdEM051K1BRU0hmc2N2TFFtYURC?=
- =?utf-8?B?QTJlaFNvbUJVaThsNUFXejdPMDFqL3hsbVhxc2lrM2ZGK3poWE94N0lURkEy?=
- =?utf-8?B?ODA4a3A3L2lERXQ3aVgrcnVucTJKMDBmWGtvSCtKaENWZnZHbU9SR3RrMTI0?=
- =?utf-8?B?SHk4eEVlaGF4Ri9aRWhaempBRHFIYi85bUNIZzFueHM2YUJhUE5tUUJyYzYx?=
- =?utf-8?B?OEt3K0dWcjFwWllLbVA2OVkwS3d2dkQ0M0RPK2QwemdLbHg4MGpyWXhCKy9q?=
- =?utf-8?B?QmsrNUZlQzJYT2J3Um1vT3hHRXJDRG9FSHFhRFRLVlUvVFF6VXBQZHVmdHVN?=
- =?utf-8?B?SmZ6cmFsb1J6bUVuNXlIUzdrblh5MEIrZVRzU1hkNllLTFA2aWk1OUhmdHZV?=
- =?utf-8?B?TXNUcGd0WXVHRWwrMG9YUWJYeVkvU09DNk42cHY1L2hHZkk3anZzbUtjMzhs?=
- =?utf-8?B?QTlmRnF4L0VOYmNqYktPWVkvaDJvaFNCaDExTlQ1SDB4ckhUMHZsWlF2dW9h?=
- =?utf-8?B?dCtxdStpVmcvTzBteEhnUnN5OTlNeWlhQWE5NjRzbWloOVFzcGhoM1VLSEc2?=
- =?utf-8?B?UFJuUHN5Z2NjR3lJSXNtYUNtbjRtOG5DUVlJY0hjV25qRTVSSFFxVHhMeGc1?=
- =?utf-8?B?MG02Rm8zK3pBWWwwL0RVN0pDcmJSaVRCTFQrMEI4N0FaNjgxNTJJd3YxenZ0?=
- =?utf-8?B?TXEvdklQb0ROcVNSYkc2eHk5MnU3NjRUTVVzeExnRFlmaHhPWEhPUmFtd1Bl?=
- =?utf-8?B?enlDMExnQ0l4Q3pOZUZPNEwvUUsxSW9CR0FRTVdBWXpRZ0p3aWtSYnB3NTRW?=
- =?utf-8?B?T0E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ef8ebf2-b63a-4caa-4c69-08ddc54b269c
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2025 16:01:12.0748
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4Wumho3Ew8xf51k22JpaoA5ntkBKMYIYk/e6q+glyRtuHzxExZktSGA1sXk8eScnPwIdqYP2MGHQUp2/+paHlNnS+TGxQSPuRXNd3CPhZXc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB6399
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+Hi Linus!
 
+The following changes since commit c7979c3917fa1326dae3607e1c6a04c12057b194:
 
-On 7/17/2025 3:28 AM, Paolo Abeni wrote:
-> On 7/14/25 8:09 PM, Tony Nguyen wrote:
->> This is part two in adding RDMA support for idpf.
->> This shared pull request targets both net-next and rdma-next branches
->> and is based on tag v6.16-rc1.
->>
->> IWL reviews:
->> v3: https://lore.kernel.org/all/20250708210554.1662-1-tatyana.e.nikolova@intel.com/
->> v2: https://lore.kernel.org/all/20250612220002.1120-1-tatyana.e.nikolova@intel.com/
->> v1 (split from previous series):
->>      https://lore.kernel.org/all/20250523170435.668-1-tatyana.e.nikolova@intel.com/
->>
->> v3: https://lore.kernel.org/all/20250207194931.1569-1-tatyana.e.nikolova@intel.com/
->> RFC v2: https://lore.kernel.org/all/20240824031924.421-1-tatyana.e.nikolova@intel.com/
->> RFC: https://lore.kernel.org/all/20240724233917.704-1-tatyana.e.nikolova@intel.com/
->>
->> ----------------------------------------------------------------
->> Tatyana Nikolova says:
->>
->> This idpf patch series is the second part of the staged submission for
->> introducing RDMA RoCEv2 support for the IPU E2000 line of products,
->> referred to as GEN3.
->>
->> To support RDMA GEN3 devices, the idpf driver uses common definitions
->> of the IIDC interface and implements specific device functionality in
->> iidc_rdma_idpf.h.
->>
->> The IPU model can host one or more logical network endpoints called
->> vPorts per PCI function that are flexibly associated with a physical
->> port or an internal communication port.
->>
->> Other features as it pertains to GEN3 devices include:
->> * MMIO learning
->> * RDMA capability negotiation
->> * RDMA vectors discovery between idpf and control plane
->>
->> These patches are split from the submission "Add RDMA support for Intel
->> IPU E2000 (GEN3)" [1]. The patches have been tested on a range of hosts
->> and platforms with a variety of general RDMA applications which include
->> standalone verbs (rping, perftest, etc.), storage and HPC applications.
->>
->> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
->>
->> [1] https://lore.kernel.org/all/20240724233917.704-1-tatyana.e.nikolova@intel.com/
->>
->> ----------------------------------------------------------------
-> 
-> I had some conflict while pulling; the automatic resolution looked
-> correct, but could you please have a look?
+  Merge tag 'net-6.16-rc6-2' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-07-11 10:18:51 -0700)
 
-It looks good to me. Thanks Paolo.
+are available in the Git repository at:
 
-- Tony
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.16-rc7
+
+for you to fetch changes up to a2bbaff6816a1531fd61b07739c3f2a500cd3693:
+
+  Merge tag 'for-net-2025-07-17' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth (2025-07-17 07:54:49 -0700)
+
+----------------------------------------------------------------
+Including fixes from Bluetooth, CAN, WiFi and Netfilter.
+
+More code here than I would have liked. That said, better now than
+next week. Nothing particularly scary stands out. The improvement to
+the OpenVPN input validation is a bit large but better get them in
+before the code makes it to a final release. Some of the changes
+we got from sub-trees could have been split better between the fix
+and -next refactoring, IMHO, that has been communicated.
+
+We have one known regression in a TI AM65 board not getting link.
+The investigation is going a bit slow, a number of people are on
+vacation. We'll try to wrap it up, but don't think it should hold
+up the release.
+
+Current release - fix to a fix:
+
+ - Bluetooth: L2CAP: fix attempting to adjust outgoing MTU, it broke
+   some headphones and speakers
+
+Current release - regressions:
+
+ - wifi: ath12k: fix packets received in WBM error ring with REO LUT
+   enabled, fix Rx performance regression
+
+ - wifi: iwlwifi:
+   - fix crash due to a botched indexing conversion
+   - mask reserved bits in chan_state_active_bitmap, avoid FW assert()
+
+Current release - new code bugs:
+
+ - nf_conntrack: fix crash due to removal of uninitialised entry
+
+ - eth: airoha: fix potential UaF in airoha_npu_get()
+
+Previous releases - regressions:
+
+ - net: fix segmentation after TCP/UDP fraglist GRO
+
+ - af_packet: fix the SO_SNDTIMEO constraint not taking effect and
+   a potential soft lockup waiting for a completion
+
+ - rpl: fix UaF in rpl_do_srh_inline() for sneaky skb geometry
+
+ - virtio-net: fix recursive rtnl_lock() during probe()
+
+ - eth: stmmac: populate entire system_counterval_t in get_time_fn()
+
+ - eth: libwx: fix a number of crashes in the driver Rx path
+
+ - hv_netvsc: prevent IPv6 addrconf after IFF_SLAVE lost that meaning
+
+Previous releases - always broken:
+
+ - mptcp: fix races in handling connection fallback to pure TCP
+
+ - rxrpc: assorted error handling and race fixes
+
+ - sched: another batch of "security" fixes for qdiscs (QFQ, HTB)
+
+ - tls: always refresh the queue when reading sock, avoid UaF
+
+ - phy: don't register LEDs for genphy, avoid deadlock
+
+ - Bluetooth: btintel: check if controller is ISO capable on
+   btintel_classify_pkt_type(), work around FW returning incorrect
+   capabilities
+
+Misc:
+
+ - make OpenVPN Netlink input checking more strict before it makes it
+   to a final release
+
+ - wifi: cfg80211: remove scan request n_channels __counted_by, its only
+   yeilding false positives
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+----------------------------------------------------------------
+Alessandro Gasbarroni (1):
+      Bluetooth: hci_sync: fix connectable extended advertising when using static random address
+
+Alok Tiwari (2):
+      net: emaclite: Fix missing pointer increment in aligned_read()
+      net: airoha: fix potential use-after-free in airoha_npu_get()
+
+Antonio Quartulli (1):
+      ovpn: reject unexpected netlink attributes
+
+Arnd Bergmann (1):
+      ethernet: intel: fix building with large NR_CPUS
+
+Brett Werling (1):
+      can: tcan4x5x: fix reset gpio usage during probe
+
+Christian Eggers (3):
+      Bluetooth: hci_core: fix typos in macros
+      Bluetooth: hci_core: add missing braces when using macro parameters
+      Bluetooth: hci_dev: replace 'quirks' integer by 'quirk_flags' bitmap
+
+Christoph Paasch (1):
+      net/mlx5: Correctly set gso_size when LRO is used
+
+Dave Ertman (1):
+      ice: add NULL check in eswitch lag check
+
+David Howells (5):
+      rxrpc: Fix irq-disabled in local_bh_enable()
+      rxrpc: Fix recv-recv race of completed call
+      rxrpc: Fix notification vs call-release vs recvmsg
+      rxrpc: Fix transmission of an abort in response to an abort
+      rxrpc: Fix to use conn aborts for conn-wide failures
+
+David S. Miller (1):
+      Merge branch 'tpacket_snd-bugs' into main
+
+Dong Chenchen (2):
+      net: vlan: fix VLAN 0 refcount imbalance of toggling filtering during runtime
+      selftests: Add test cases for vlan_filter modification during runtime
+
+Felix Fietkau (1):
+      net: fix segmentation after TCP/UDP fraglist GRO
+
+Florian Westphal (6):
+      selftests: netfilter: conntrack_resize.sh: extend resize test
+      selftests: netfilter: add conntrack clash resolution test case
+      selftests: netfilter: conntrack_resize.sh: also use udpclash tool
+      selftests: netfilter: nft_concat_range.sh: send packets to empty set
+      netfilter: nf_tables: hide clash bit from userspace
+      netfilter: nf_conntrack: fix crash due to removal of uninitialised entry
+
+Jakub Kicinski (9):
+      Merge tag 'linux-can-fixes-for-6.16-20250715' of git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can
+      Merge branch 'fix-rx-fatal-errors'
+      Merge branch 'mptcp-fix-fallback-related-races'
+      Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
+      tls: always refresh the queue when reading sock
+      Merge tag 'ovpn-net-20250716' of https://github.com/OpenVPN/ovpn-net-next
+      Merge branch 'net-vlan-fix-vlan-0-refcount-imbalance-of-toggling-filtering-during-runtime'
+      Merge branch 'rxrpc-miscellaneous-fixes'
+      Merge tag 'for-net-2025-07-17' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth
+
+Jiawen Wu (4):
+      net: libwx: remove duplicate page_pool_put_full_page()
+      net: libwx: fix the using of Rx buffer DMA
+      net: libwx: properly reset Rx ring descriptor
+      net: libwx: fix multicast packets received count
+
+Johannes Berg (4):
+      wifi: iwlwifi: pcie: fix locking on invalid TOP reset
+      Merge tag 'ath-current-20250714' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
+      wifi: cfg80211: remove scan request n_channels counted_by
+      Merge tag 'iwlwifi-fixes-2025-07-15' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next
+
+Joseph Huang (1):
+      net: bridge: Do not offload IGMP/MLD messages
+
+Kuniyuki Iwashima (3):
+      rpl: Fix use-after-free in rpl_do_srh_inline().
+      smc: Fix various oops due to inet_sock type confusion.
+      Bluetooth: Fix null-ptr-deref in l2cap_sock_resume_cb()
+
+Li Tian (1):
+      hv_netvsc: Set VF priv_flags to IFF_NO_ADDRCONF before open to prevent IPv6 addrconf
+
+Luiz Augusto von Dentz (4):
+      Bluetooth: btintel: Check if controller is ISO capable on btintel_classify_pkt_type
+      Bluetooth: SMP: If an unallowed command is received consider it a failure
+      Bluetooth: SMP: Fix using HCI_ERROR_REMOTE_USER_TERM on timeout
+      Bluetooth: L2CAP: Fix attempting to adjust outgoing MTU
+
+Maor Gottlieb (1):
+      net/mlx5: Update the list of the PCI supported devices
+
+Markus Blöchl (1):
+      net: stmmac: intel: populate entire system_counterval_t in get_time_fn() callback
+
+Michal Swiatkowski (1):
+      ice: check correct pointer in fwlog debugfs
+
+Nathan Chancellor (1):
+      phonet/pep: Move call to pn_skb_get_dst_sockaddr() earlier in pep_sock_accept()
+
+Nithyanantham Paramasivam (1):
+      wifi: ath12k: Fix packets received in WBM error ring with REO LUT enabled
+
+Oliver Neukum (1):
+      usb: net: sierra: check for no status endpoint
+
+Pagadala Yesu Anjaneyulu (1):
+      wifi: iwlwifi: mask reserved bits in chan_state_active_bitmap
+
+Paolo Abeni (6):
+      selftests: net: increase inter-packet timeout in udpgro.sh
+      mptcp: make fallback action and fallback decision atomic
+      mptcp: plug races between subflow fail and subflow creation
+      mptcp: reset fallback status gracefully at disconnect() time
+      Merge tag 'nf-25-07-17' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
+      Merge tag 'wireless-2025-07-17' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless
+
+Phil Sutter (1):
+      Revert "netfilter: nf_tables: Add notifications for hook changes"
+
+Ralf Lici (2):
+      ovpn: propagate socket mark to skb in UDP
+      ovpn: reset GSO metadata after decapsulation
+
+Sean Anderson (1):
+      net: phy: Don't register LEDs for genphy
+
+Victor Nogueira (1):
+      selftests/tc-testing: Create test cases for adding qdiscs to invalid qdisc parents
+
+Ville Syrjälä (1):
+      wifi: iwlwifi: Fix botched indexing conversion
+
+William Liu (2):
+      net/sched: Return NULL when htb_lookup_leaf encounters an empty rbtree
+      selftests/tc-testing: Test htb_dequeue_tree with deactivation and row emptying
+
+Xiang Mei (1):
+      net/sched: sch_qfq: Fix race condition on qfq_aggregate
+
+Yue Haibing (1):
+      ipv6: mcast: Delay put pmc->idev in mld_del_delrec()
+
+Yun Lu (2):
+      af_packet: fix the SO_SNDTIMEO constraint not effective on tpacked_snd()
+      af_packet: fix soft lockup issue caused by tpacket_snd()
+
+Zigit Zo (1):
+      virtio-net: fix recursived rtnl_lock() during probe()
+
+Zijun Hu (1):
+      Bluetooth: btusb: QCA: Fix downloading wrong NVM for WCN6855 GF variant without board ID
+
+ Documentation/netlink/specs/ovpn.yaml              | 153 +++++++++++++++++-
+ drivers/bluetooth/bfusb.c                          |   2 +-
+ drivers/bluetooth/bpa10x.c                         |   2 +-
+ drivers/bluetooth/btbcm.c                          |   8 +-
+ drivers/bluetooth/btintel.c                        |  30 ++--
+ drivers/bluetooth/btintel_pcie.c                   |   8 +-
+ drivers/bluetooth/btmtksdio.c                      |   4 +-
+ drivers/bluetooth/btmtkuart.c                      |   2 +-
+ drivers/bluetooth/btnxpuart.c                      |   2 +-
+ drivers/bluetooth/btqca.c                          |   2 +-
+ drivers/bluetooth/btqcomsmd.c                      |   2 +-
+ drivers/bluetooth/btrtl.c                          |  10 +-
+ drivers/bluetooth/btsdio.c                         |   2 +-
+ drivers/bluetooth/btusb.c                          | 148 +++++++++--------
+ drivers/bluetooth/hci_aml.c                        |   2 +-
+ drivers/bluetooth/hci_bcm.c                        |   4 +-
+ drivers/bluetooth/hci_bcm4377.c                    |  10 +-
+ drivers/bluetooth/hci_intel.c                      |   2 +-
+ drivers/bluetooth/hci_ldisc.c                      |   6 +-
+ drivers/bluetooth/hci_ll.c                         |   4 +-
+ drivers/bluetooth/hci_nokia.c                      |   2 +-
+ drivers/bluetooth/hci_qca.c                        |  14 +-
+ drivers/bluetooth/hci_serdev.c                     |   8 +-
+ drivers/bluetooth/hci_vhci.c                       |   8 +-
+ drivers/bluetooth/virtio_bt.c                      |  10 +-
+ drivers/net/can/m_can/tcan4x5x-core.c              |  61 ++++---
+ drivers/net/ethernet/airoha/airoha_npu.c           |   3 +-
+ drivers/net/ethernet/intel/fm10k/fm10k.h           |   3 +-
+ drivers/net/ethernet/intel/i40e/i40e.h             |   2 +-
+ drivers/net/ethernet/intel/ice/ice_debugfs.c       |   2 +-
+ drivers/net/ethernet/intel/ice/ice_lag.c           |   3 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe.h           |   3 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_rx.c    |  12 +-
+ drivers/net/ethernet/mellanox/mlx5/core/main.c     |   1 +
+ drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c  |   8 +-
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c         |   9 +-
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c        |  20 +--
+ drivers/net/ethernet/wangxun/libwx/wx_type.h       |   2 -
+ drivers/net/ethernet/xilinx/xilinx_emaclite.c      |   2 +-
+ drivers/net/hyperv/netvsc_drv.c                    |   5 +-
+ drivers/net/ovpn/io.c                              |   7 +
+ drivers/net/ovpn/netlink-gen.c                     |  61 ++++++-
+ drivers/net/ovpn/netlink-gen.h                     |   6 +
+ drivers/net/ovpn/netlink.c                         |  51 +++++-
+ drivers/net/ovpn/udp.c                             |   1 +
+ drivers/net/phy/phy_device.c                       |   6 +-
+ drivers/net/usb/sierra_net.c                       |   4 +
+ drivers/net/virtio_net.c                           |   2 +-
+ drivers/net/wireless/ath/ath12k/dp_rx.c            |   3 +-
+ .../net/wireless/intel/iwlwifi/fw/api/nvm-reg.h    |   5 +-
+ drivers/net/wireless/intel/iwlwifi/fw/regulatory.c |   1 +
+ .../net/wireless/intel/iwlwifi/mld/regulatory.c    |   4 +-
+ .../net/wireless/intel/iwlwifi/pcie/trans-gen2.c   |   6 +-
+ drivers/net/wireless/intel/iwlwifi/pcie/tx.c       |   8 +-
+ include/net/bluetooth/hci.h                        |   2 +
+ include/net/bluetooth/hci_core.h                   |  50 +++---
+ include/net/cfg80211.h                             |   2 +-
+ include/net/netfilter/nf_conntrack.h               |  15 +-
+ include/net/netfilter/nf_tables.h                  |   5 -
+ include/trace/events/rxrpc.h                       |   6 +-
+ include/uapi/linux/netfilter/nf_tables.h           |  10 --
+ include/uapi/linux/netfilter/nfnetlink.h           |   2 -
+ net/8021q/vlan.c                                   |  42 +++--
+ net/8021q/vlan.h                                   |   1 +
+ net/bluetooth/hci_core.c                           |   4 +-
+ net/bluetooth/hci_debugfs.c                        |   8 +-
+ net/bluetooth/hci_event.c                          |  19 ++-
+ net/bluetooth/hci_sync.c                           |  63 ++++----
+ net/bluetooth/l2cap_core.c                         |  26 ++-
+ net/bluetooth/l2cap_sock.c                         |   3 +
+ net/bluetooth/mgmt.c                               |  38 +++--
+ net/bluetooth/msft.c                               |   2 +-
+ net/bluetooth/smp.c                                |  21 ++-
+ net/bluetooth/smp.h                                |   1 +
+ net/bridge/br_switchdev.c                          |   3 +
+ net/ipv4/tcp_offload.c                             |   1 +
+ net/ipv4/udp_offload.c                             |   1 +
+ net/ipv6/mcast.c                                   |   2 +-
+ net/ipv6/rpl_iptunnel.c                            |   8 +-
+ net/mptcp/options.c                                |   3 +-
+ net/mptcp/pm.c                                     |   8 +-
+ net/mptcp/protocol.c                               |  56 ++++++-
+ net/mptcp/protocol.h                               |  29 +++-
+ net/mptcp/subflow.c                                |  30 ++--
+ net/netfilter/nf_conntrack_core.c                  |  26 ++-
+ net/netfilter/nf_tables_api.c                      |  59 -------
+ net/netfilter/nf_tables_trace.c                    |   3 +
+ net/netfilter/nfnetlink.c                          |   1 -
+ net/netfilter/nft_chain_filter.c                   |   2 -
+ net/packet/af_packet.c                             |  27 ++--
+ net/phonet/pep.c                                   |   2 +-
+ net/rxrpc/ar-internal.h                            |   4 +
+ net/rxrpc/call_accept.c                            |  14 +-
+ net/rxrpc/call_object.c                            |  28 ++--
+ net/rxrpc/io_thread.c                              |  14 ++
+ net/rxrpc/output.c                                 |  22 +--
+ net/rxrpc/peer_object.c                            |   6 +-
+ net/rxrpc/recvmsg.c                                |  23 ++-
+ net/rxrpc/security.c                               |   8 +-
+ net/sched/sch_htb.c                                |   4 +-
+ net/sched/sch_qfq.c                                |  30 ++--
+ net/smc/af_smc.c                                   |  14 ++
+ net/smc/smc.h                                      |   8 +-
+ net/tls/tls_strp.c                                 |   3 +-
+ tools/testing/selftests/net/netfilter/.gitignore   |   1 +
+ tools/testing/selftests/net/netfilter/Makefile     |   3 +
+ .../selftests/net/netfilter/conntrack_clash.sh     | 175 +++++++++++++++++++++
+ .../selftests/net/netfilter/conntrack_resize.sh    |  97 +++++++++++-
+ .../selftests/net/netfilter/nft_concat_range.sh    |   3 +
+ tools/testing/selftests/net/netfilter/udpclash.c   | 158 +++++++++++++++++++
+ tools/testing/selftests/net/udpgro.sh              |   8 +-
+ tools/testing/selftests/net/vlan_hw_filter.sh      |  98 ++++++++++--
+ .../tc-testing/tc-tests/infra/qdiscs.json          |  92 +++++++++++
+ 113 files changed, 1591 insertions(+), 549 deletions(-)
+ create mode 100755 tools/testing/selftests/net/netfilter/conntrack_clash.sh
+ create mode 100644 tools/testing/selftests/net/netfilter/udpclash.c
 
