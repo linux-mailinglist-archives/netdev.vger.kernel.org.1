@@ -1,75 +1,77 @@
-Return-Path: <netdev+bounces-207834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6051BB08C32
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 13:56:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 71050B08C34
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 13:56:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3B251A62A7C
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 11:56:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA47D1A6397C
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 11:56:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13D5B29CB45;
-	Thu, 17 Jul 2025 11:54:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E75A429E0F8;
+	Thu, 17 Jul 2025 11:54:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I3UCuTgM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g+0nAcmy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4367329B792;
-	Thu, 17 Jul 2025 11:54:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D5DF29B792;
+	Thu, 17 Jul 2025 11:54:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752753274; cv=none; b=oRe4kZ9/+3PDeKPaZDPhSxbuQ7h1sYUxPWM8PVgwq+KZKG/Rgeazi26i73t0wrJylTKBJPSvVMmJcmJmWfJ9TxpL9ctkF1Ce7fRrGn11Gpb7WhDBSCeaigWCSpGHCtJlQ4vkYmxT60PbrytxnwH5nHdtwG5JxT61Du9oMLhWolg=
+	t=1752753285; cv=none; b=LonsxT6/i0owKWah+tmMfYXuJoClwmwUO2wkO2AQfZY4vUSA6l0SQ+8QmftRlPW1O9DcHQmGNxx/JQOGdXna6H4RqubeRFW8/wbr/RvGqCLrVz+P4y1cMPjOd03n9GtFk7vpTveHW2DNfQf46TcrE0pQ3aT5vTxwZPGZSCdz4Go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752753274; c=relaxed/simple;
-	bh=bhzLo4ihIrn+GpsC5HFT8T0iXTZd7UtjgYIR68Jg3Lk=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version; b=TRHxR/yjq7ZBIGkmAH1xcqonzbL0y0HM0thMpcJO2OYmQACBrtQP6KFRK2xRrMpRsinHcWdc7scrMbJBcd9ca9ZE4L6liVkG4k+tDkI0WfGP68Qd5R6OoXJCPPtr7n0umYcqBjJM+Yq0Htiic/KGKF/fgp73h/dwc1jySf6zMgA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I3UCuTgM; arc=none smtp.client-ip=209.85.128.43
+	s=arc-20240116; t=1752753285; c=relaxed/simple;
+	bh=+KnzwoKbA1GtBdrTr//kfdTYJsbn0oZ8P1T5y+ypoxk=;
+	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=B1k1rW5W6v8QN8owrmEnuRaCcL/N1/3aNV1Lmvw/wfgSktSSHU4N2uivbLv12YGPXm2PI1SxxnUHC6OkD8OzMwjt76uP/P115ZeJ+Z7ThZ5VTUT6TxdSvHHglJgzCayAkyM0IbmfqTafRmVzMuiTSKZKLH2vjJ0rXGVzI64kZ8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g+0nAcmy; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-455b00339c8so6088775e9.3;
-        Thu, 17 Jul 2025 04:54:33 -0700 (PDT)
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4555f89b236so7937675e9.1;
+        Thu, 17 Jul 2025 04:54:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752753271; x=1753358071; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=OwaDpfJEcRxKOOTWf61oJRadA9tv/V4ej5hL/3XUn7k=;
-        b=I3UCuTgM/4aC1BWqx4IqHCfCFwjEiSV8NqtIdIUX8pNvEccJuUh1N1uPv7UzPk22fW
-         thRc48ykneH3qOCUKqnXDQsrentP3IbnMGauQMUmWgKJ6a6yvtoyPG+mbvhXegRt2C1e
-         Gwcu7JKPkbh47jE6pHNNR2i0Kr+HEC3N7hb+GfHG57nRmLBq5faDdZa6qJZPpPlo4ZPe
-         YktR/PfVi8eWM1xmkrh79EsUWnrEAJRZjdPM1Dw/yuDW4uJmSEzM5Do3sBMLW1ugwFvn
-         KLTWDcc9peGBKuXgxClf9nNh0sCnarbiBAstCX7geVM4XJE20YIf7T3D5meMcUNDwZCQ
-         HfGw==
+        d=gmail.com; s=20230601; t=1752753280; x=1753358080; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gJmbqKfhPmGmgPRu3RIwXN3mEJ4fXgB708Rx4HkKDQU=;
+        b=g+0nAcmySIGbOtGC6kNQZpjGfFADTXayie60AHaRpCGckTZU5IYoqfv3+Upx3xBtnX
+         tWhYDor0v807lCwJHG/12qpR1t2YN6vjym5BLPdkmaLnbCiVDilhU3YTpLbrZ7UFExkj
+         HYpdAdddgx3ccv/+m3XE3c1D21Ix7tuKGXKH9EQjWMZNunCfw0+lp1xVwW493QscYgrK
+         OLfoSqfiNB8jB7p83NqKhATeJdjm43ex/l2JZbLJuRi8ZH5vAuP7XQTRMkBhm8kkXtV2
+         MKMbEZ+g/Q44jQ5KQlGMXSNUyytfNNyYNOPH4cE984EH2QUMX9x7oC5546/oOFvIl6Hx
+         9aQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752753271; x=1753358071;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OwaDpfJEcRxKOOTWf61oJRadA9tv/V4ej5hL/3XUn7k=;
-        b=AvJvaPkTgmR/qxU09Glu+52BbESQF4LuDk6DtDC3FFs5MRCkBUBhJSLaxd9B6FGvd4
-         Nfr0ihgmirXG3n7bKLsjcD2aRAL74R7A3mX2XUWaNPWUnhFsYAa9NMqFbEH3jl9DSYN4
-         HEhiivxpyyRGGBE6m8bg732qETN1wJwyzxke9fmIfKrSlHIGDWCeoR5u3hqM+qFPERrA
-         CemMSGG5eV4KpQSqu7eNxUPr1dei5xPBhD3BFoUkz9S/O8+R9ZX2uV2b6fKn6X+qwUwA
-         8YMkPAk/Kmcdmd6q74PSM90K5DFzy1s3YF6ISpe0GPnOetps5//HxADTMCMO0YWAohHH
-         9Dag==
-X-Forwarded-Encrypted: i=1; AJvYcCVpJJvbmdoM0VZgKHGh3Y2RVYd5XZSrTVJONzcFrA9cp3+QvA2OmaeMMGFQxxqavy8w0no1YpLN@vger.kernel.org, AJvYcCXYdLEHepOa4T3EZ91OD7K93eXUb9agrZOpUrbRmnhstza8UtUPNPA7m192rW2AWs8GmvnFfgrcEm/C584=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgEQAKIzLpyU6PjujAoHiK2Tdq39+iYZzsz5g5zQkgTbl8iiVN
-	IedVhVJwaRyuEanRtb7PksHw3GGTnjJm9NmRLQlIeYTTptGrijlbd4RZ
-X-Gm-Gg: ASbGncurPEnLgdnR0qOzAcCE5CYAnBgEn1+Z2CtZbpe/iuMs/+81nYcDi7JBkbv0dOm
-	MiI5OsF5t+FblhJ6Sd+713iqYMmC7yRmqN4IQtjDJM6aM87sjmeJfEBbLxFGe+Le9h6YF8ApUG+
-	cs7Yfz4twSm8OTPgGMCrjmZj35aTRbjRF5ZKpuUWtDEBaUq4WORa2G9VVfFf0PfQnaEuCcl9bYx
-	jhyFkRLW4S1O8XIsglvbH1SsJ6wj7DtNWFm5cTHMLfVY4j5eC1eS4vUIeNcrFGuJ5cCzrheaKg/
-	Dw3HD3utNi7bw2tZdbdmxInSLq1+Pp37R3BzfozsyRMrxSz88bJMutHqSAkd+kS7FhhBf7iB7vg
-	=
-X-Google-Smtp-Source: AGHT+IHVMOHZH7SPDUNDR3pkPQsudYw75tZGdfYNLGoOhFNu8ZiQi/vIXhS79TTUHfepzvUDm/MRKw==
-X-Received: by 2002:a05:600c:6295:b0:456:29ae:3dbe with SMTP id 5b1f17b1804b1-4562e37c2d8mr62361025e9.24.1752753271257;
-        Thu, 17 Jul 2025 04:54:31 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752753280; x=1753358080;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gJmbqKfhPmGmgPRu3RIwXN3mEJ4fXgB708Rx4HkKDQU=;
+        b=UkN5AvTsMD6CoftuG7g0ioVfHb8uHma0DQwsXYeHwQquddV1JW4SX5Ox5HusUhHG1D
+         QzM4VX17TeszHK+PUfN/udaE51KB3NKTlPFF5tUu624wBCh14lUhpnZLmvcx2DC4sLHD
+         IygXwL8I6s3byWD8tqwgKvrGzX1mAW+fY7k36uDotAD3fd01mAJZIFEHNm3MWOrfkmtS
+         8zAPtMLoZal4kyWQ3xgjsDoYY0uRZoYb3VZWkD2P+QqEBUWvx5UEfTKBRfK8Gnt0cr+6
+         qTc33aRU7EASWju/Cb9q/PIa5vv28bFPRGql1tkC3Tk3M9l0OqD9qK+A9bjSBdmudaN3
+         yjFw==
+X-Forwarded-Encrypted: i=1; AJvYcCWl60ZAsUa+S3aBnP8ZVy/aX/zgwnsaKgHvTLKVl5zh1Rna6uUHn9rYVL/i3b20JawOUbro8PBa@vger.kernel.org, AJvYcCXkZHptDO1qYyEpfVH66N4l7jboGXyqUiy911xzdIkBv/R4hFe5K3FIq+IAiVpnqPXhVfIxzHrM+xN4EMs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8KZzA6EZOKsQMFS8QqdnX/+IJMYncZMBfXiCoiK85sz+EUC6k
+	/cVIyD8rHMGa8kaIIGjmXlzGvap/qpIcs502lIYDq3pogMQCh3sYiv0q
+X-Gm-Gg: ASbGncvojh6C+b8mXaHjv/1o66ILk+mzBj+Eiw32M+vKDa09gXZObZ1Ssx9reXEzeQj
+	5/x5HQOeEEBnPkJL25ENURoAawRJfnIv1mc06YDuF/amlpVyHoBqjs4YZyk8Ugeljp3veNlJTTH
+	p8CY07pZUHkCP9Gy7zygYStB4L5qqbPfS4Wkr81tmNFEBg1qhdDjaTo4EfU31rIpSv9YNKXfM5H
+	WsmjTU8yBCp8fbUcnPx6J9XuWAbNA+ju41+lc+v9Szm1bgSokK++l7UxNZ6bEydd3WmoP78+H+N
+	iHDNiND0whtAl/n+a4AEtwZq3/yepnRhcugh2l41cLsjetHyB8WMw8SsqXauNmwh
+X-Google-Smtp-Source: AGHT+IGWrPQzGiDdX0wG60SM5rZE5oC7xzLcgSv0XPdx+0D3l5a9RscQO3V10lmbQ1ehLAI+6EcAfA==
+X-Received: by 2002:a05:600c:45d1:b0:456:1204:e7ec with SMTP id 5b1f17b1804b1-4562e372643mr78763665e9.10.1752753280096;
+        Thu, 17 Jul 2025 04:54:40 -0700 (PDT)
 Received: from localhost ([45.84.137.104])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4562e88476csm49434155e9.21.2025.07.17.04.54.29
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8e0d727sm20720317f8f.51.2025.07.17.04.54.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Jul 2025 04:54:31 -0700 (PDT)
+        Thu, 17 Jul 2025 04:54:39 -0700 (PDT)
 From: Richard Gobert <richardbgobert@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -86,9 +88,11 @@ To: davem@davemloft.net,
 	martin.lau@kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4 0/4] net: add local address bind support to vxlan and geneve
-Date: Thu, 17 Jul 2025 13:54:08 +0200
-Message-Id: <20250717115412.11424-1-richardbgobert@gmail.com>
+Subject: [PATCH net-next v4 1/4] net: udp: add freebind option to udp_sock_create
+Date: Thu, 17 Jul 2025 13:54:09 +0200
+Message-Id: <20250717115412.11424-2-richardbgobert@gmail.com>
+In-Reply-To: <20250717115412.11424-1-richardbgobert@gmail.com>
+References: <20250717115412.11424-1-richardbgobert@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,42 +101,60 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series adds local address bind support to both vxlan
-and geneve sockets.
+udp_sock_create creates a UDP socket and binds it according to
+udp_port_cfg.
 
-v3 -> v4:
-  - Fix a problem where vxlan socket is bound before its outgoing interface is up
-  - v3: https://lore.kernel.org/netdev/20240711131411.10439-1-richardbgobert@gmail.com/
+Add a freebind option to udp_port_cfg that allows a socket to be bound
+as though IP_FREEBIND is set.
 
-v2 -> v3:
-  - Fix typo and nit problem (Simon)
-  - v2: https://lore.kernel.org/netdev/20240708111103.9742-1-richardbgobert@gmail.com/
+This change is required for binding vxlan sockets to their local address
+when the outgoing interface is down.
 
-v1 -> v2:
-  - Change runtime checking of CONFIG_IPV6 to compile time in geneve
-  - Change {geneve,vxlan}_find_sock to check listening address
-  - Fix incorrect usage of IFLA_VXLAN_LOCAL6 in geneve
-  - Use NLA_POLICY_EXACT_LEN instead of changing strict_start_type in geneve
-  - v1: https://lore.kernel.org/netdev/df300a49-7811-4126-a56a-a77100c8841b@gmail.com/
+Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
+---
+ include/net/udp_tunnel.h   | 3 ++-
+ net/ipv4/udp_tunnel_core.c | 1 +
+ net/ipv6/ip6_udp_tunnel.c  | 1 +
+ 3 files changed, 4 insertions(+), 1 deletion(-)
 
-Richard Gobert (4):
-  net: udp: add freebind option to udp_sock_create
-  net: vxlan: add netlink option to bind vxlan sockets to local
-    addresses
-  net: vxlan: bind vxlan sockets to their local address
-  net: geneve: enable binding geneve sockets to local addresses
-
- drivers/net/geneve.c               | 80 ++++++++++++++++++++++++++---
- drivers/net/vxlan/vxlan_core.c     | 81 ++++++++++++++++++++++++------
- include/net/geneve.h               |  6 +++
- include/net/udp_tunnel.h           |  3 +-
- include/net/vxlan.h                |  1 +
- include/uapi/linux/if_link.h       |  3 ++
- net/ipv4/udp_tunnel_core.c         |  1 +
- net/ipv6/ip6_udp_tunnel.c          |  1 +
- tools/include/uapi/linux/if_link.h |  3 ++
- 9 files changed, 156 insertions(+), 23 deletions(-)
-
+diff --git a/include/net/udp_tunnel.h b/include/net/udp_tunnel.h
+index 9acef2fbd2fd..6c1362aa3576 100644
+--- a/include/net/udp_tunnel.h
++++ b/include/net/udp_tunnel.h
+@@ -34,7 +34,8 @@ struct udp_port_cfg {
+ 	unsigned int		use_udp_checksums:1,
+ 				use_udp6_tx_checksums:1,
+ 				use_udp6_rx_checksums:1,
+-				ipv6_v6only:1;
++				ipv6_v6only:1,
++				freebind:1;
+ };
+ 
+ int udp_sock_create4(struct net *net, struct udp_port_cfg *cfg,
+diff --git a/net/ipv4/udp_tunnel_core.c b/net/ipv4/udp_tunnel_core.c
+index fce945f23069..147fd8ff4f49 100644
+--- a/net/ipv4/udp_tunnel_core.c
++++ b/net/ipv4/udp_tunnel_core.c
+@@ -28,6 +28,7 @@ int udp_sock_create4(struct net *net, struct udp_port_cfg *cfg,
+ 	udp_addr.sin_family = AF_INET;
+ 	udp_addr.sin_addr = cfg->local_ip;
+ 	udp_addr.sin_port = cfg->local_udp_port;
++	inet_assign_bit(FREEBIND, sock->sk, cfg->freebind);
+ 	err = kernel_bind(sock, (struct sockaddr *)&udp_addr,
+ 			  sizeof(udp_addr));
+ 	if (err < 0)
+diff --git a/net/ipv6/ip6_udp_tunnel.c b/net/ipv6/ip6_udp_tunnel.c
+index 0ff547a4bff7..65ff44c274b8 100644
+--- a/net/ipv6/ip6_udp_tunnel.c
++++ b/net/ipv6/ip6_udp_tunnel.c
+@@ -40,6 +40,7 @@ int udp_sock_create6(struct net *net, struct udp_port_cfg *cfg,
+ 	memcpy(&udp6_addr.sin6_addr, &cfg->local_ip6,
+ 	       sizeof(udp6_addr.sin6_addr));
+ 	udp6_addr.sin6_port = cfg->local_udp_port;
++	inet_assign_bit(FREEBIND, sock->sk, cfg->freebind);
+ 	err = kernel_bind(sock, (struct sockaddr *)&udp6_addr,
+ 			  sizeof(udp6_addr));
+ 	if (err < 0)
 -- 
 2.36.1
 
