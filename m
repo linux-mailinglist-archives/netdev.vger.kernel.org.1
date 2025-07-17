@@ -1,103 +1,99 @@
-Return-Path: <netdev+bounces-207662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3432B0816F
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 02:39:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 06719B081EA
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 02:53:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 446595802EC
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 00:39:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 899A64A272E
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 00:53:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 139BC70825;
-	Thu, 17 Jul 2025 00:39:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FB431A23AC;
+	Thu, 17 Jul 2025 00:52:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DuElOaY7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KH9iPIl9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8A162E370C;
-	Thu, 17 Jul 2025 00:39:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C267E9;
+	Thu, 17 Jul 2025 00:52:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752712792; cv=none; b=dTldThIU5Y91Jcq2A1/4tDwrFm8L0yg8/hx1AKoF2xI4p/pWGUWDdT3v+Rg+r+Qcji542SBWp4A3sMR6C1m8HKK3JWTtLX+8h+3m2SZc96CgC3n0mTgSnErAEP5jMKQpVJYqTjMeXe4Fc0FzxNNQngo+bSdhMC0Lak/eQq1eZDM=
+	t=1752713570; cv=none; b=EV9XIMx3iWYkiJLZemqBAuCpvU6HzqHcR/cAT4AB/BH1yKwQCG0coXkt3SJamme86/TfWo9MeRx4n57RvWGrqrZi9J4+UcDPrBchN9P9l+rmro7E1e2qsW/D3v/o0vWTOMfxZVnFC+L/VVTJmwrw6aO9lQ5C7dCKyMRl4vqDNEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752712792; c=relaxed/simple;
-	bh=0oNS4QWWuAKBe/4MiGtK8XIFEH9xPGCkiqUULk4IQ3c=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=onCPUWPHXOIJ32IIl896DB6bsBe5kNEzVpa12sOJ3t00Fin3yolXjDeSpsBbbBabnqGRWoz+PD7u7Nu4S5WsBhIETU2C4NvSKzMqtgVDOwSGwzbK1MSewDExVfqABxeyBgQrio8WOhh/IsoTTIxQUtuV5RrZ7CbmR1Te9v0X/XA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DuElOaY7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D266C4CEE7;
-	Thu, 17 Jul 2025 00:39:51 +0000 (UTC)
+	s=arc-20240116; t=1752713570; c=relaxed/simple;
+	bh=w6fWdXnFLYC/lql+ciw8+sqf3DEzT50/X6ihhi/6CL4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ImtD1i0DwoTqW2LGjH6gJVK7TrDe1j5U20ul92BtjcxqtKTIP0jnd16gV54C1E3GuLLhHfs7DPftj/jvCEdCgP6E87tImCPDqjQj7dEPX3eUYXfXF1P74yTY4NXw0x5lxdJ+zut4oWaEcVITqUZIpGUmBnVJFLFBUojug54i+0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KH9iPIl9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57644C4CEE7;
+	Thu, 17 Jul 2025 00:52:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752712791;
-	bh=0oNS4QWWuAKBe/4MiGtK8XIFEH9xPGCkiqUULk4IQ3c=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DuElOaY7VElFjy6DeOABFGnHEXUoRPEzuSlyqZhb7Nt//JW4FhB+QYikCl3We5Vg4
-	 49I5rwd8mO3MUSbKmY8yd7BcqQHMIVIqPc0AIlXNL5nT4VR8iv6lPM6lPiOn4x6aWr
-	 xUmm3kyF03921beAkmmAxWyNkOF2OnXMKU6NnDwvGPWEntsN9mzQ9yJcVGpjt5AyC6
-	 NIkUh3mtBZu5NQOdA6tgO0yE5ov5l4NrJO6wJ9jZvv9lmyi++1VPfScmnPsjdAvxxW
-	 GH9lCkna8HANkef3CZh4NP1Q2uwT2UJ3rIKmTkKVBrMXYmjk8aQ/vho2D7IQk8U1jj
-	 TycJ5dBxjweAA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE150383BA38;
-	Thu, 17 Jul 2025 00:40:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1752713569;
+	bh=w6fWdXnFLYC/lql+ciw8+sqf3DEzT50/X6ihhi/6CL4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KH9iPIl9ash4n3j00+YlGPDVudA/8L1xYdLLsiKvcw+/jwvIPTxBryWuiGC9+88bi
+	 T7b5QxyQUnmsRJHPIKE76yK59zfOTiUf7lXIDc4teTyhGa55+3MEXIvrR11/7KgmQO
+	 89QKLfVVNKba5Pwc/4pLfgR87lpWxs7TXSedRSuKrFH/i9M53bOhwWqcoAY0dFUUJY
+	 JA0qun8T7wjYKDf1Y8CNUkNXmY7KLDsPK+Bi8Hqiu+FjriKI19zSHlKy7RfcuAd4rw
+	 LClpAfTA7pgUJkLLiXTc5raoSbzihmIHb3jn7nImFMhAF12VKyXNc2zKH0c/a7Qt5/
+	 sFklR4evwUMCw==
+Date: Wed, 16 Jul 2025 17:52:48 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ bjorn@kernel.org, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
+ jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+ joe@dama.to, willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next v2] xsk: skip validating skb list in xmit path
+Message-ID: <20250716175248.4f626bdb@kernel.org>
+In-Reply-To: <CAL+tcoA1LMjxKgQb4WZZ8LeipbGU038is21M_y+kc93eoUpBCA@mail.gmail.com>
+References: <20250716122725.6088-1-kerneljasonxing@gmail.com>
+	<20250716145645.194db702@kernel.org>
+	<CAL+tcoByyPQX+L3bbAg1hC4YLbnuPrLKidgqKqbyoj0Sny7mxQ@mail.gmail.com>
+	<20250716164312.40a18d2f@kernel.org>
+	<CAL+tcoA1LMjxKgQb4WZZ8LeipbGU038is21M_y+kc93eoUpBCA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 0/5] Expose REFCLK for RMII and enable RMII
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175271281150.1376782.14178930908812628013.git-patchwork-notify@kernel.org>
-Date: Thu, 17 Jul 2025 00:40:11 +0000
-References: <cover.1752510727.git.Ryan.Wanner@microchip.com>
-In-Reply-To: <cover.1752510727.git.Ryan.Wanner@microchip.com>
-To: Ryan Wanner <Ryan.Wanner@microchip.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, nicolas.ferre@microchip.com,
- alexandre.belloni@bootlin.com, claudiu.beznea@tuxon.dev,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 14 Jul 2025 09:36:58 -0700 you wrote:
-> From: Ryan Wanner <Ryan.Wanner@microchip.com>
+On Thu, 17 Jul 2025 08:06:48 +0800 Jason Xing wrote:
+> To be honest, this patch really only does one thing as the commit
+> says. It might look very complex, but if readers take a deep look they
+> will find only one removal of that validation for xsk in the hot path.
+> Nothing more and nothing less. So IMHO, it doesn't bring more complex
+> codes here.
 > 
-> This set allows the REFCLK property to be exposed as a dt-property to
-> properly reflect the correct RMII layout. RMII can take an external or
-> internal provided REFCLK, since this is not SoC dependent but board
-> dependent this must be exposed as a DT property for the macb driver.
-> 
-> [...]
+> And removal of one validation indeed contributes to the transmission.
+> I believe there remain a number of applications using copy mode
+> currently. And maintainers of xsk don't regard copy mode as orphaned,
+> right?
 
-Here is the summary with links:
-  - [v2,1/5] dt-bindings: net: cdns,macb: Add external REFCLK property
-    https://git.kernel.org/netdev/net-next/c/1b7531c094c8
-  - [v2,2/5] net: cadence: macb: Expose REFCLK as a device tree property
-    https://git.kernel.org/netdev/net-next/c/dce32ece3bb8
-  - [v2,3/5] net: cadence: macb: Enable RMII for SAMA7 gem
-    https://git.kernel.org/netdev/net-next/c/eb4f50ddfdd3
-  - [v2,4/5] net: cadence: macb: sama7g5_emac: Remove USARIO CLKEN flag
-    https://git.kernel.org/netdev/net-next/c/db400061b5e7
-  - [v2,5/5] ARM: dts: microchip: sama7g5: Add RMII ext refclk flag
-    (no matching commit)
+First of all, I'm not sure the patch is correct. The XSK skbs can have
+frags, if device doesn't support or clears _SG we should linearize,
+right?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Second, we don't understand where the win is coming from, the numbers
+you share are a bit vague. What's so expensive about a few skbs
+accesses? Maybe there's an optimization possible to the validation,
+which would apply more broadly, instead of skipping it for one trivial
+case.
 
+Third, I asked you to compare with AF_PACKET, because IIUC it should
+have similar properties as AF_XDP in copy mode. So why not use that?
 
+Lastly, the patch is not all that bad, sure. But the experience of
+supporting generic XDP is a very mixed. All the paths that pretend
+to do XDP on skbs have a bunch of quirks and bugs. I'd prefer that
+we push back more broadly on any sort of pretend XDP.
 
