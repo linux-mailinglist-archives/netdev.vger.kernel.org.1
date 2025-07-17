@@ -1,110 +1,98 @@
-Return-Path: <netdev+bounces-208003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2282DB09476
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 20:52:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 044A0B09485
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 20:58:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60C7216CB8A
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 18:52:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF0273BE7E0
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 18:58:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9659F2FCE3D;
-	Thu, 17 Jul 2025 18:52:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E82A21018A;
+	Thu, 17 Jul 2025 18:58:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zMAUCkuq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A98F42F8C31
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 18:52:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8457820A5F3
+	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 18:58:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752778352; cv=none; b=kWmvJ5FSRsdhSLXp1XL+MDQErzLj3ujfiGRuLsI2wd9v0ILUk7ESjQpJP75jMpgU9uLeS66j+TTQTQ1Pqh7TLKYAcV7TMejdQBOHlNukp+bU5AAcy7x57KGrlDN9m8ApddrSXbsk/0Qn/XhgOdjJZszk8hnzo6DguyryI+VQci4=
+	t=1752778725; cv=none; b=YPDOc2/FaKk5EQTG3W6VTe3ZaSIYefa30F/3W/AhvCGQ4Z8isr4XncpGWDfR5wq3qxxOndmtJoTGnuAwQM3jFbTFCAvUySdDs5HVIsI17BK4+gAnrbG0v+6cVMKL4zWvCR5VoarfhVrcaVeJ6bcIWCw81ozhcau9PmzajyEUTOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752778352; c=relaxed/simple;
-	bh=xWoSQ+gngFF2TOSecNJDyH5ybGum8FZowTvwKeBUlXY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=j4nQAGyXtw0ijaHbMZKCSZcNcf2N9iG7DIL3cedS7f7G4AkjBqoqy/upHSA3MXSMvleXAz5yy/nqUsAJ63GfTQ9bfHO8lyXOY/n4JOhF2AO76VJDfZyXWyTzOy6BE/VcUSNTZvJx9TldlbH8fO0fF4ANqIpS73K2zw+b9wWxcgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3ddc0a6d4bdso12968505ab.0
-        for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 11:52:30 -0700 (PDT)
+	s=arc-20240116; t=1752778725; c=relaxed/simple;
+	bh=z/s+Nd+w7cZR3Up0kGfFnOTHzWQtLnqFkRxSRfJyj+Y=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=WvojTwqLV4jCWhC5elCag26sfGKCrIQwg3WzeN0hpaXj0wUSU7xmvonsbY8kPured8Njz3uX5yYKDl87sgrHfIw8o8mP4olmSjG4s0QZ7HXbbzt3GIG8qqHobmgcsuyQr9imXDv1aZLYZ8xg6KDMfBPL3Juojz9P6LMhlmLIXRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zMAUCkuq; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b2c37558eccso1072728a12.1
+        for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 11:58:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752778723; x=1753383523; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=pyuipq8yz+na9vKhmstqOdMfH5o7gJKHRjnIEguNlxI=;
+        b=zMAUCkuqElYLzqJZNiMmKDJLi3GkMXjhj/DwVD32egFlDdm2gWiNajMKb+1fGbXUnl
+         h9ouBAW7l3BHW8/runMHXEtuXovWUXygT48nbrcP2vYlilVNsJjemOzegpvlv/J/fPKx
+         wT+SmCpYTGqR38JtC86JfjAftAGhkRhHZLkIXjxwiJ90qiaLOVDIxYvy8qjunnW4AKqO
+         whxaOsiAImpM8J/OmQQV1KAy29UGKjpWusGtzvIIkYA0oKwUqLgchCBiAv6OuYit/QI1
+         jMyNMyJJNfoxiBdFrQLMqmrdh0Fr50GkNbotgi9qOokb9p9O3v23a67YW6RmY6egD5r3
+         Kp1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752778350; x=1753383150;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+        d=1e100.net; s=20230601; t=1752778723; x=1753383523;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=0a5KLpmNdbac5z+OdmlpJ82pz3wF32WpMWj2w1Vd7No=;
-        b=GAXLlSkwCfyH6pAvdHrlU1fizUWfxUtTTovNx0Ec4vELbsgqRzlkWbeVzVan2Ii8BB
-         W254Ml942/1HwN7Uk8m3tauA2UPzZzlLK07pRO3tDFu/beHCbaxzYkbE2YLTYG7Y0kh/
-         kAHelfYTgA/S8K3CXPZXXn8tRWlzTqZ3cHybb1DsZ9C7fiDKJv2Nig+FJpBiPTLcjMqS
-         xH60zZapjP7k0JF3o5zUmqmogWvt+HpNF61S484ztIkYD0VhVY63g+85GBGOJwWB5eK3
-         0tk4YwIJllWsVxdsbnvLILjuEI7FiEdrUG5+jY6Gsk4AEeWJQgSKJF6kLpWgtHwhUhLj
-         1GtQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVjp4JU93ipQMAOewZXcpI1BmAAl2tP5lD9gY5uHDdIuELicZVTsQQZHT38VeqcdXtyVoeGzDU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2IgdWe3dZ0nvDFYB2TVWCLl5zrOnpyBT+uvfeAl6y9yKR4Hou
-	LFN37WHYWhNVDjw8FwD/1nYeQQPLc7EMu9evwCWLo4HimL4Kq547rhy5lyjsAY22ZvGqfBV1/FI
-	K+s6bHtuajkA4PsL7RrDQIZXTsKW4Qfmhy03S2DUmUfYrjsOEGOWg18+DEsE=
-X-Google-Smtp-Source: AGHT+IGHzl0aKRabmWO10kMpxI9v+rAHfaLHyRnAtNkNDSDsYAVIjbEPSCn0AH3qRkdiBrY/7A3nV1dYNHJNP2xeUHgNQ9yiQQLW
+        bh=pyuipq8yz+na9vKhmstqOdMfH5o7gJKHRjnIEguNlxI=;
+        b=sawMbIJnn8bG0zsBnSajnBUgX3u0oV8SihTqqMTLh/6em2+zPMXMVhdHKXWGvv0ZTd
+         MbsJ5ZKpP97QCOhN9cFCWpq+WNLqtSuGM5Czf/RIfBiynuLcGqUDW5MN/8czojjDmEok
+         Nz9jljS8mxjxTsT7fyYbectzTHJ6Uzmsvx6Z9X+IskFmGdASdjn71QouBoORTxqvNyuU
+         xzfLaH2e+0dvl0H6Ihw5tTnATVdoRe/fMzmtoWZzwQrvJ5iIOuLKU9WVkOGQWYyuDacU
+         vckDsskOOhDP2RGmFfhOV+Uir3uTjubhX+cewg+IS2lKS2YnkXatEfcV/Epq1RxjVh4p
+         uIEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWQ88eCLavUZLH6WDenLr7Z+cfCxqxBJPReGCLabCd16fKAVSkbSMkutuQ2SLWah7YVmZpkTdY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQFRl8TUVxS2RU3ELWF0ogoSajBwqt+iwXYl/+qNkSMyrmGOK7
+	tVhH5NKqHNxierQsKgf9HHxfT0UhiZegcQ2dDHH0jXKU4LmEIGeUpMVX+Ds2YTQmjcJwq7bHk5P
+	qY/yQqQ==
+X-Google-Smtp-Source: AGHT+IGapn6EU0fiE/Sefd+N/+nfRpkumvW1GYXlG1+tdhFN+OxF0MZC73N1khjs3KC5LtIjKZsVXK7RXII=
+X-Received: from pjbta7.prod.google.com ([2002:a17:90b:4ec7:b0:30a:31eb:ec8e])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1a84:b0:234:8a4a:ada5
+ with SMTP id d9443c01a7336-23e24f59832mr114385265ad.37.1752778722812; Thu, 17
+ Jul 2025 11:58:42 -0700 (PDT)
+Date: Thu, 17 Jul 2025 18:58:21 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:5e89:b0:3df:3afa:28d6 with SMTP id
- e9e14a558f8ab-3e282d58d74mr57187145ab.2.1752778349820; Thu, 17 Jul 2025
- 11:52:29 -0700 (PDT)
-Date: Thu, 17 Jul 2025 11:52:29 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6879466d.a00a0220.3af5df.0022.GAE@google.com>
-Subject: [syzbot] [netfilter?] [sctp?] BUG: assuming non migratable context at ./include/linux/filter.h:LINE
-From: syzbot <syzbot+92c5daf9a23f04ccfc99@syzkaller.appspotmail.com>
-To: ast@kernel.org, bpf@vger.kernel.org, davem@davemloft.net, 
-	dsahern@kernel.org, dxu@dxuuu.xyz, edumazet@google.com, fw@strlen.de, 
-	horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, kuniyu@google.com, 
-	linux-kernel@vger.kernel.org, linux-sctp@vger.kernel.org, 
-	llvm@lists.linux.dev, lucien.xin@gmail.com, marcelo.leitner@gmail.com, 
-	nathan@kernel.org, ncardwell@google.com, ndesaulniers@google.com, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
-	pablo@netfilter.org, syzkaller-bugs@googlegroups.com, trix@redhat.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
+Message-ID: <20250717185837.1073456-1-kuniyu@google.com>
+Subject: [PATCH v1 bpf] bpf: Disable migration in nf_hook_run_bpf().
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>
+Cc: Daniel Xu <dxu@dxuuu.xyz>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+	Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	syzbot+40f772d37250b6d10efc@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+syzbot reported that the IP defrag bpf prog can be called without
+migration disabled.
 
-syzbot found the following issue on:
+Then the assertion in __bpf_prog_run() fails, triggering the splat
+below. [0]
 
-HEAD commit:    155a3c003e55 Merge tag 'for-6.16/dm-fixes-2' of git://git...
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=161a27d4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=5ae63460f9c371aa
-dashboard link: https://syzkaller.appspot.com/bug?extid=92c5daf9a23f04ccfc99
-compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15a9d18c580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13f58382580000
+Let's call migrate_disable() before calling bpf_prog_run() in
+nf_hook_run_bpf().
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/dcbbac96d733/disk-155a3c00.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/eec589968921/vmlinux-155a3c00.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/80e95076a622/bzImage-155a3c00.xz
-
-The issue was bisected to:
-
-commit 91721c2d02d3a0141df8a4787c7079b89b0d0607
-Author: Daniel Xu <dxu@dxuuu.xyz>
-Date:   Fri Jul 21 20:22:46 2023 +0000
-
-    netfilter: bpf: Support BPF_F_NETFILTER_IP_DEFRAG in netfilter link
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12c1558c580000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=11c1558c580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=16c1558c580000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+92c5daf9a23f04ccfc99@syzkaller.appspotmail.com
-Fixes: 91721c2d02d3 ("netfilter: bpf: Support BPF_F_NETFILTER_IP_DEFRAG in netfilter link")
-
+[0]:
 BUG: assuming non migratable context at ./include/linux/filter.h:703
 in_atomic(): 0, irqs_disabled(): 0, migration_disabled() 0 pid: 5829, name: sshd-session
 3 locks held by sshd-session/5829:
@@ -116,7 +104,7 @@ in_atomic(): 0, irqs_disabled(): 0, migration_disabled() 0 pid: 5829, name: sshd
  #2: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
  #2: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
  #2: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: nf_hook+0xb2/0x680 include/linux/netfilter.h:241
-CPU: 0 UID: 0 PID: 5829 Comm: sshd-session Not tainted 6.16.0-rc6-syzkaller-00002-g155a3c003e55 #0 PREEMPT(full) 
+CPU: 0 UID: 0 PID: 5829 Comm: sshd-session Not tainted 6.16.0-rc6-syzkaller-00002-g155a3c003e55 #0 PREEMPT(full)
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
 Call Trace:
  <TASK>
@@ -156,30 +144,35 @@ RIP: 0033:0x7fe7d365d407
 Code: 48 89 fa 4c 89 df e8 38 aa 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
 RSP:
 
-
+Fixes: 91721c2d02d3 ("netfilter: bpf: Support BPF_F_NETFILTER_IP_DEFRAG in netfilter link")
+Reported-by: syzbot+40f772d37250b6d10efc@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/6879466d.a00a0220.3af5df.0022.GAE@google.com/
+Tested-by: syzbot+40f772d37250b6d10efc@syzkaller.appspotmail.com
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/netfilter/nf_bpf_link.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+diff --git a/net/netfilter/nf_bpf_link.c b/net/netfilter/nf_bpf_link.c
+index 06b0848447003..dffe4cd6f4b0b 100644
+--- a/net/netfilter/nf_bpf_link.c
++++ b/net/netfilter/nf_bpf_link.c
+@@ -16,8 +16,13 @@ static unsigned int nf_hook_run_bpf(void *bpf_prog, struct sk_buff *skb,
+ 		.state = s,
+ 		.skb = skb,
+ 	};
++	unsigned int ret;
+ 
+-	return bpf_prog_run(prog, &ctx);
++	migrate_disable();
++	ret = bpf_prog_run(prog, &ctx);
++	migrate_enable();
++
++	return ret;
+ }
+ 
+ struct bpf_nf_link {
+-- 
+2.50.0.727.gbf7dc18ff4-goog
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
