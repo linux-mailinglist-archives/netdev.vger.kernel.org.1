@@ -1,320 +1,255 @@
-Return-Path: <netdev+bounces-207813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F75DB089D9
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 11:52:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA57AB089F9
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 11:55:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 630EE4E4084
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 09:52:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 164EB18988C5
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 09:55:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E601F29615A;
-	Thu, 17 Jul 2025 09:51:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3C30291C30;
+	Thu, 17 Jul 2025 09:55:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="RuY6/kp/";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="ekoPEF3R"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="atLZUgjb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012027.outbound.protection.outlook.com [52.101.66.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10914295DBA;
-	Thu, 17 Jul 2025 09:51:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752745905; cv=none; b=dNGAzgyQ1Y58scb7qohTVTcWp8SXuUlVrqvxhKnrF8EHViux0I9e4LEmQ0wuJWuazBEGHKkIHMUzzdbs+ELzHqP99yTFlVwnAQlenF4qCaj3VGwZ0XsOkjqlvX+ZuUQ/ikG48iFABhdR3FXs7wtA0mh1IwbkpsJXyCg2+OWDrLw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752745905; c=relaxed/simple;
-	bh=QE1UiBdN71KN/U570UF0sI4tPWfamIWBIk8g/Ar66Z8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=F/lTTMuj7mwdinvNpRMdFZcezG+PCXhHd7Fl6ryxmO+KL08ru/4eUjzpsldLW++x0x8XI0Vfi42KUup2JN0TSjCEobw5wxH+WEOUJEFkGJ8U1aKQ09VcUJ7clFCauWi8Uddnc1pMNOCNBOmStju8JRxOpvWiY4TDUUvzjgxgTlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=RuY6/kp/; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=ekoPEF3R; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id 6D7E5602B3; Thu, 17 Jul 2025 11:51:42 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1752745902;
-	bh=9duX2Xs4AxDpRWsyb+ibP61l/DobpyQi0H25wbjytQY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RuY6/kp/14pvMpyqoTHX3SLGciPIhY2fXJC5xtTTRhqnc9zlzkD1ov2BVVqwt4y1J
-	 RWq3EYyxefIt2LjJ50/b6IvS0nkc6pwhGewcgFijmIfregJXxoS7KEVVRvdhAvHeEU
-	 CkciF1d4U2kQkr4LjR/Lj+uIHccFxd+DBEJeq+uLKSXhPuHA/ZmRe6ESM4F65uM4kZ
-	 Gpwr7HBhhBDtobVt734dgyZQ+N0vgoGqhlYxPfKkw1+IeMtFumAICEtE78AVHmmgkx
-	 Ms6hIaL9+S+C6/1moryEtPms3EATu8ZC2y26ZE1miqbCD2dL8iSK2FM2Ch4xC9YKd0
-	 1/AwBGfFQBDfQ==
-X-Spam-Level: 
-Received: from localhost.localdomain (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 17B90602B9;
-	Thu, 17 Jul 2025 11:51:34 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1752745894;
-	bh=9duX2Xs4AxDpRWsyb+ibP61l/DobpyQi0H25wbjytQY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ekoPEF3R29KSLOIC/wDVG30wedQwXtEzVsS96Rsavmb18XrYAUqk7MbRfc/0UBRzq
-	 rcv8z5Vg36W42LBObal4UtBCw57e7ydwy5jDmpD3TaN9WzIwBx17XUJJBV3rHuPXYc
-	 S8kOUAF13CFp9pt2x75qfEUpuQOpRzz4HM06qIFrDOSOqwRqmFlXHBT6YP6zTnGdhi
-	 O9mQXgSmQ937R3yQrfZBbmR1TbFl0vl0AWhTYXU5m/yN/qDlMIPqACxuR+fy+wIta0
-	 dFzjzrBAqVI+6JPmbBm28Wbg8cx4UXWsbdptjXmByQAJWz2uGXZQZ8iI1gi5O8Y4aw
-	 0vzkk0XP+o8rQ==
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de,
-	horms@kernel.org
-Subject: [PATCH net 7/7] netfilter: nf_conntrack: fix crash due to removal of uninitialised entry
-Date: Thu, 17 Jul 2025 11:51:22 +0200
-Message-Id: <20250717095122.32086-8-pablo@netfilter.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250717095122.32086-1-pablo@netfilter.org>
-References: <20250717095122.32086-1-pablo@netfilter.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69FEC289808;
+	Thu, 17 Jul 2025 09:55:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.27
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752746132; cv=fail; b=X86TdmxwNHGOsNGvZhGKbNrbhBc7zUG1a9+krFyykxDgNeRQgh8I84c2vKaa91arcKJVVRqA+KUJfin/sTA/sjaGHy8daui8XS7vX8OiDVXntEqrkHZRmF8gu3NNHWEikiJeXTPwa79Ewl2I4FY7xWVSBYOZsaFg9GWoQmT+IBg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752746132; c=relaxed/simple;
+	bh=uoxGsRGw8hQilp1RbNODIvNL+AdeGh3CiNPS93w8cn8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=c3GTeWMMCmh6EO7Jvf3EABER7oWW9jkmbBr+bexMk0rC8tnm0Wz66DOGgFVUck54QrmmJypq2ZUyO9urS1QiQw05Gg0rk1oQxCEwijS/1nicbosUNmNcXUUNZpi7KPKeLpTYeBpSy6aSnACkzoWb2VH47FXsD2yJjvB7b1GJOqg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=atLZUgjb; arc=fail smtp.client-ip=52.101.66.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=FmbuPBMrCOuO1zN/SDWhhX1cAjKJ/v+O1Pis3tWASPo4LCZ689NB9we6JjAqih6UrVJv008/5mfl15V1Hoz3AyuID5Aw9fHZXi4g2QVOlu3xrqUdT7x02op2oH+5NdGKCyKTGx8ir8hk3pnS3IsWsBEVt1chATteEyt7DXlerIWKG7AoQxEFgFg1BpAi1dJBS5ZPw63ALpFB8uxgSSOSlaAJ4p5KMbDVEXoMHISS2JBlbVMTju5VdWdeYUE0P4m+fJQixJgmG0PiWnMkLeENgfAXHxGGxwU1XN752NMfs5VpfFQkJLCAvINbFIdoYg5zmZFN9MGnksHtaElhP6oEBA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3TE0Jfsgea3vtBesOG2n1aauV/JHEIZxe6lCGcaU/KE=;
+ b=q26EZxDaOTFY2UyvKGzCTgqED1tVSvbslN+HoQQvQCdTX0vCFg4sjh2vDkCvQAysIuOlsC5M9Z/2MxE3VVqeW++U/sktluRSOsbvKDS4/bwSXzN9tXJTlkBnCorIijES+7EzzhgOWsLPBDTMBtSVyjiwolKM7I1kUli8eKJYoWd9iCZSdnTyUVpPLWYRr5zVr4sVXprAgtJDzbgH6u1KlsB/0iFovyBfklxPTts33D+Pu2wl7hgOVSs56eNK5285DjK3WnJDdaEoR5eHAryQllhMTuUnjJA27KmIo62Rx3gY9Xm2HclJpBQ7u++FfqHjc2JeL6UgaNWb3b1zspZ6Mg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3TE0Jfsgea3vtBesOG2n1aauV/JHEIZxe6lCGcaU/KE=;
+ b=atLZUgjbam63kOBXOvR9AfYDZSQchEUU8YJ9H+uYt4244/aRangaZHmPLYbH5c7z/M5+X901Dr/wIMxPS205zMGeOx6THIZUWO2yOUYhLndmeS6EDM4KV0ZIKrng1TFcXhcmglYxfgzC76gn1amsrkYUsEGakc0/eCIuMy7dv6JjfMJAMemjaxcw/hX2oTzFLEGsYR+r+TQeXQJ1PIq0ja4ht15dm1wTqk444XvIBEQU/0dU/VFlo/vaHZlqTsxEAQF2k4Oi5EPIqgeToXYM3spOZ6u01GnMorMrWVnMYtKdnSifosRx/Npg1t5lZOhe9eIx0Q5UmOfa3Ayo8xMg4g==
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by PA1PR04MB10441.eurprd04.prod.outlook.com (2603:10a6:102:447::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.39; Thu, 17 Jul
+ 2025 09:55:27 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%5]) with mapi id 15.20.8922.028; Thu, 17 Jul 2025
+ 09:55:27 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+CC: Krzysztof Kozlowski <krzk@kernel.org>, "robh@kernel.org"
+	<robh@kernel.org>, "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>, "richardcochran@gmail.com"
+	<richardcochran@gmail.com>, Claudiu Manoil <claudiu.manoil@nxp.com>, Clark
+ Wang <xiaoning.wang@nxp.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>, Frank Li
+	<frank.li@nxp.com>, "shawnguo@kernel.org" <shawnguo@kernel.org>,
+	"s.hauer@pengutronix.de" <s.hauer@pengutronix.de>, "festevam@gmail.com"
+	<festevam@gmail.com>, "F.S. Peng" <fushi.peng@nxp.com>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>, "kernel@pengutronix.de"
+	<kernel@pengutronix.de>
+Subject: RE: [PATCH v2 net-next 01/14] dt-bindings: ptp: add NETC Timer PTP
+ clock
+Thread-Topic: [PATCH v2 net-next 01/14] dt-bindings: ptp: add NETC Timer PTP
+ clock
+Thread-Index: AQHb9iZhkd5V4Hmtg0ufc8muIqXiyLQ178gAgAAHnYCAABBFgIAADJmA
+Date: Thu, 17 Jul 2025 09:55:27 +0000
+Message-ID:
+ <PAXPR04MB851096B3E7F59181C7377A128851A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20250716073111.367382-1-wei.fang@nxp.com>
+ <20250716073111.367382-2-wei.fang@nxp.com>
+ <20250717-furry-hummingbird-of-growth-4f5f1d@kuoka>
+ <PAXPR04MB8510F642E509E915B85062318851A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <20250717090547.f5c46ehp5rzey26b@skbuf>
+In-Reply-To: <20250717090547.f5c46ehp5rzey26b@skbuf>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|PA1PR04MB10441:EE_
+x-ms-office365-filtering-correlation-id: 12f56428-e722-40c3-1a90-08ddc5180e8d
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|7416014|376014|1800799024|366016|19092799006|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?Y2MaY0E9tDayQ8H5ZD/8obEXC3bbDZ6YmXw1zJq/R587dNfolueVvt48tJ3O?=
+ =?us-ascii?Q?L2hkrOYy6sN3hdX8yXR0o7uWV317k+UtVDE7NrelL9eVDTsJoQI5/GcmdRkw?=
+ =?us-ascii?Q?1nda2jd6MMzfOtDXk9q5qCRt18KK3CWSd7gsOardju1mrG/RmxVzwHMksZQE?=
+ =?us-ascii?Q?EILWicIPgWDdwpB1iRKZFX8peJ4vTh4kfXPJXOENmClW4uQhk63KsMMZu47x?=
+ =?us-ascii?Q?Ht+nEZOn3/w2GYw8IzDdrZT5K6q3MrZ4uarunxkUrKtGFg2qZaUhPG0AUayA?=
+ =?us-ascii?Q?lDxO2/a/5tFGk9ihB5aFMB9IE+8yzK9PCIgESKR6/pX4IkN2MpRxOZ6zflXG?=
+ =?us-ascii?Q?ZXX/OnHkmCzJ+53RXy+LB5DVuagO/6uJWtXJN85jdcWIoah6P5B/BZjFBXZw?=
+ =?us-ascii?Q?/YorCoSvwC0qJuUnToN0bVnMpVpPV6DQhfVez2ejkCz/PzHb/g9JIRaz+v8M?=
+ =?us-ascii?Q?SAosrQGY0gCxp06xbZ42e1eNehfVScNW5VQRMCJmLp47qWBpBV/SsPBaIczW?=
+ =?us-ascii?Q?2RpYgwWsp8Qc+ZWXXygICN04h/AqEA3gvi3EylGtHZjtKalGpT2+UrT56L/j?=
+ =?us-ascii?Q?vDmpcbWWBNxaeG+LZJBPl5X3rDODXdvFc9HucwWrHC4t2FWCHLl+CuF8cSjX?=
+ =?us-ascii?Q?CYowMLDJNvgpjRxjd5JPkpgyn5JiAoY9CpkI1FSXlTJvzs3cnCM1JtEyXmsZ?=
+ =?us-ascii?Q?4pNvNxRkhknh2UuDjKIMfzAggvd/2yYkhPmxKoDxFfEgRfziiONekwGEJm55?=
+ =?us-ascii?Q?FoNhic5Aid6JgVc3oUpXfUlzBXSrr3G2EY21PDrv/24LVe/IqbesFJh2Uouu?=
+ =?us-ascii?Q?5BCcF4ZP9tIRtpYgCOj015GzsRU52dZwHeSfwNQB2w7m4MXbWV5dR+9qSR+N?=
+ =?us-ascii?Q?goWD4tr2tF2Mop3Ir+aA/0NQbaiX4WvsGuQleODL3ylqqvCjHl6CRgfde8SB?=
+ =?us-ascii?Q?av5QWTii8dLAEDPHSo8ZkIB4fyyGmTiQxeBdwJLMo0Ra1UfYDsbizJc5ch13?=
+ =?us-ascii?Q?sIWcxwDUhVLZvkxfTABuAfaOyV7qdxh2PmsOBSD7Z9nnXvvYGnXtsfkOlMcF?=
+ =?us-ascii?Q?1Utg/MAyA8HSbXrOBFHkdUBml1clKxxA/1vrzOGV7r8t21gWn6/h+2bhTXMd?=
+ =?us-ascii?Q?5fAEyo3w0jByLkUdEiHZ0/Uo/L/zk7loEhLsPJPkjzb5b5n0pV0wrVw+o+Pa?=
+ =?us-ascii?Q?kR3+9KOfqQuxeCfuDT+YJMvviuTifv+3/bUhhd7ZHDawWtmfA8ZSnYTbsZQA?=
+ =?us-ascii?Q?9Vo8MkxYYFQII37XCbeGn/ygphajAOU0txMP0DNYbwN7BVTKMsNmlx9BJ9AB?=
+ =?us-ascii?Q?HkXkoXV1/GXUjOgsb78cVlfbfiQn2+DnF2rFTa71aLR/6gzCXgqPzlf08KPy?=
+ =?us-ascii?Q?c4WhQpoFNbCejC5icPrU2lmGVp91jk4mnrozYWHnI9UQZAknNv77qDsqfMQV?=
+ =?us-ascii?Q?+8QvvZtTf13gUb2qYJyLveY4+Iz8lz6zmVnsdgWk7r6+3qQVGxlwJg=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(19092799006)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?aQu8R69OKmEJDNPqeQk7cTDhDUlN6wcMEGVymWEGH4RqAj7lWu9IEq+IpKeL?=
+ =?us-ascii?Q?WNQX2Vdx5vdmLyM9b5CnuBE6HPzoFyRTRuCismp52i4yhYkZTyZL16oD2Ls9?=
+ =?us-ascii?Q?yJrv3Dg8GkN41V8OzHBt4kdxSO1ldQKtsXiwSLVB3HmFt2qTgm3DjJiPX1zM?=
+ =?us-ascii?Q?N/uE0LFKGuJnftGGWHRhHKdzNGCtXFuN6NXWp7POmcaIXiI3x5TXiEry/aY6?=
+ =?us-ascii?Q?G1VFPM10rXGd7n5mGGCQiqMHv4h4hRGiZV30OicVaXI3MS5I8B+0msu8ISbq?=
+ =?us-ascii?Q?GIBcHzynlcYO+0zjh6Kf4br9WOfzgfE1TlW5TsF1hrTnxaIGLk2z8bM7+ASg?=
+ =?us-ascii?Q?znTVmdwI2LTvxM5h/6qJaiGkxVa74bLSQjM7zKuMoCiFrgnUqSmPD84iqTko?=
+ =?us-ascii?Q?77NiSuYNa6DVRNABM/vjNpXCgSe7hy4LytyrqzL3lJjoz+sED0Z9VTekyo+K?=
+ =?us-ascii?Q?GahSMRBHwa6vyqftdALuABTqJaguCwDxupsBHgeiCklURMZE8mvaDfOIWPgs?=
+ =?us-ascii?Q?NzubD+svTG0vKWEcrn/Pn/2muc2F8LaMJa+RCcThVPaV04Hbyo93OXM82jsr?=
+ =?us-ascii?Q?ZzRAlIkanvUIGSH0mQnOEQk5ODIttSEVvaVNCiwnAKX1emSoelhTGCfX+tJO?=
+ =?us-ascii?Q?s3SfqzMxLVYTPvbhozXo7EmHFHym7IuR8ZA3AhE8Bn91VdR1ChKuPbFVrv8F?=
+ =?us-ascii?Q?XDATprKXFflRbFNbmTjJ1xXeKBA2pnY4wygo1S1HUMbJKQDueJmf54o9j7+V?=
+ =?us-ascii?Q?WndC7eWaxRCFcyMf6dzDihjVA7q3C/CZ/tw1+Pp5QOLpqX8abo+V/YBvCix5?=
+ =?us-ascii?Q?JbEoG0OtAmX51fJJ0S0DFVRLRqeErsuARBMwMFEAmsaFiThwQem2uy79ZMMy?=
+ =?us-ascii?Q?Y4/LAabrcF20GJY39gT2m/UenOvSc6z6H6pqIl4KJxH6pUl59X+INZyUGQA0?=
+ =?us-ascii?Q?Y44MHHmijkTW8ejx8MiYJhMy2FyV76NdNHMTZTyleDflEz0SFGtNMltQ2Wsx?=
+ =?us-ascii?Q?4ldcktsno3qLIGPGZLjAWDrOjDIRUt6np94QcDohKouQONaO1ghfPYmzUZCH?=
+ =?us-ascii?Q?7EUZDu1GQT5BftXh5PujEgwHXaT4ZIgGoQ+2SQMTpZUfMcK1M85w5DKYcq0l?=
+ =?us-ascii?Q?9lU9F3z4cEdY0S2Au/J5+9Ds0vcJ3maDRsyqQWhIlNvY0hD0/AezGeeg4xbU?=
+ =?us-ascii?Q?F3Ny7wZdiJgDqAwdRe/bMlkUvVJOqKRtb6l1pn6pE0S++hHHROXTrn5CU/G2?=
+ =?us-ascii?Q?iDSWvHyqvtz9qMrQLxA1jjerr1Gi4uOuN5Sz7ZdWPxhcxn30yKHRWP6PYSPz?=
+ =?us-ascii?Q?GFm3aqxPG0P8kP+PtMlO4KOEm2whxHEgBUfbuQovFnWbIcCmH/zzuPzhvZ0B?=
+ =?us-ascii?Q?jIFqUak0r0BBzfDPAQSIWZL3O8rY5pUbj+MA3rbDuBZErzIOs9bySm9lEMzB?=
+ =?us-ascii?Q?hdhgVU0dKQ9TtYJenvfXynxJyMnRYJTGKvPjNNTv9nm7vi+5mkRq4bnluaPM?=
+ =?us-ascii?Q?JG9GL1Y8iCTn09M4Nqf4IT6FXep8j4vzAfVbq8r0HDX/56shq1bnabEXsZka?=
+ =?us-ascii?Q?bGcrS+CEhqMmtdphLUE=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 12f56428-e722-40c3-1a90-08ddc5180e8d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jul 2025 09:55:27.0443
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: WzWCWBmTZmBrDLsUWAvYPXRiiWLLY9GuYnKAuafc9Bq1XOLhq4jhbgQ9+puqG+V9vOYyh8p43mueSF0aGC+JAg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1PR04MB10441
 
-From: Florian Westphal <fw@strlen.de>
+> On Thu, Jul 17, 2025 at 11:30:14AM +0300, Wei Fang wrote:
+> > > On Wed, Jul 16, 2025 at 03:30:58PM +0800, Wei Fang wrote:
+> > > > +properties:
+> > > > +  compatible:
+> > > > +    enum:
+> > > > +      - pci1131,ee02
+> > > > +
+> > > > +  reg:
+> > > > +    maxItems: 1
+> > > > +
+> > > > +  clocks:
+> > > > +    maxItems: 1
+> > > > +    description:
+> > > > +      The reference clock of NETC Timer, if not present, indicates=
+ that
+> > > > +      the system clock of NETC IP is selected as the reference clo=
+ck.
+> > >
+> > > If not present...
+> > >
+> > > > +
+> > > > +  clock-names:
+> > >
+> > > ... this also is not present...
+> > >
+> > > > +    description:
+> > > > +      NETC Timer has three reference clock sources, set
+> TMR_CTRL[CK_SEL]
+> > > > +      by parsing clock name to select one of them as the reference
+> clock.
+> > > > +      The "system" means that the system clock of NETC IP is used =
+as
+> the
+> > > > +      reference clock.
+> > > > +      The "ccm_timer" means another clock from CCM as the referenc=
+e
+> clock.
+> > > > +      The "ext_1588" means the reference clock comes from external
+> IO pins.
+> > > > +    enum:
+> > > > +      - system
+> > >
+> > > So what does system mean?
+> > >
+> >
+> > "system" is the system clock of the NETC subsystem, we can explicitly s=
+pecify
+> > this clock as the PTP reference clock of the Timer in the DT node. Or d=
+o not
+> > add clock properties to the DT node, it implicitly indicates that the r=
+eference
+> > clock of the Timer is the "system" clock.
+>=20
+> It's unusual to name the clock after the source rather than after the
+> destination. When "clock-names" takes any of the above 3 values, it's
+> still the same single IP clock, just taken from 3 different sources.
+>=20
+> I see you need to update TMR_CTRL[CK_SEL] depending on where the IP
+> clock is sourced from. You use the "clock-names" for that. Whereas the
+> very similar ptp-qoriq uses a separate "fsl,cksel" property. Was that
+> not an acceptable solution, do we need a new way of achieving the same
+> thing?
+>=20
 
-A crash in conntrack was reported while trying to unlink the conntrack
-entry from the hash bucket list:
-    [exception RIP: __nf_ct_delete_from_lists+172]
-    [..]
- #7 [ff539b5a2b043aa0] nf_ct_delete at ffffffffc124d421 [nf_conntrack]
- #8 [ff539b5a2b043ad0] nf_ct_gc_expired at ffffffffc124d999 [nf_conntrack]
- #9 [ff539b5a2b043ae0] __nf_conntrack_find_get at ffffffffc124efbc [nf_conntrack]
-    [..]
+This an option, as I also mentioned in v1, either we have to parse the
+clock-names or we need to add a new property.
 
-The nf_conn struct is marked as allocated from slab but appears to be in
-a partially initialised state:
+> Also, why are "clocks" and "clock-names" not required properties? The
+> Linux implementation fails probing if they are absent.
 
- ct hlist pointer is garbage; looks like the ct hash value
- (hence crash).
- ct->status is equal to IPS_CONFIRMED|IPS_DYING, which is expected
- ct->timeout is 30000 (=30s), which is unexpected.
-
-Everything else looks like normal udp conntrack entry.  If we ignore
-ct->status and pretend its 0, the entry matches those that are newly
-allocated but not yet inserted into the hash:
-  - ct hlist pointers are overloaded and store/cache the raw tuple hash
-  - ct->timeout matches the relative time expected for a new udp flow
-    rather than the absolute 'jiffies' value.
-
-If it were not for the presence of IPS_CONFIRMED,
-__nf_conntrack_find_get() would have skipped the entry.
-
-Theory is that we did hit following race:
-
-cpu x 			cpu y			cpu z
- found entry E		found entry E
- E is expired		<preemption>
- nf_ct_delete()
- return E to rcu slab
-					init_conntrack
-					E is re-inited,
-					ct->status set to 0
-					reply tuplehash hnnode.pprev
-					stores hash value.
-
-cpu y found E right before it was deleted on cpu x.
-E is now re-inited on cpu z.  cpu y was preempted before
-checking for expiry and/or confirm bit.
-
-					->refcnt set to 1
-					E now owned by skb
-					->timeout set to 30000
-
-If cpu y were to resume now, it would observe E as
-expired but would skip E due to missing CONFIRMED bit.
-
-					nf_conntrack_confirm gets called
-					sets: ct->status |= CONFIRMED
-					This is wrong: E is not yet added
-					to hashtable.
-
-cpu y resumes, it observes E as expired but CONFIRMED:
-			<resumes>
-			nf_ct_expired()
-			 -> yes (ct->timeout is 30s)
-			confirmed bit set.
-
-cpu y will try to delete E from the hashtable:
-			nf_ct_delete() -> set DYING bit
-			__nf_ct_delete_from_lists
-
-Even this scenario doesn't guarantee a crash:
-cpu z still holds the table bucket lock(s) so y blocks:
-
-			wait for spinlock held by z
-
-					CONFIRMED is set but there is no
-					guarantee ct will be added to hash:
-					"chaintoolong" or "clash resolution"
-					logic both skip the insert step.
-					reply hnnode.pprev still stores the
-					hash value.
-
-					unlocks spinlock
-					return NF_DROP
-			<unblocks, then
-			 crashes on hlist_nulls_del_rcu pprev>
-
-In case CPU z does insert the entry into the hashtable, cpu y will unlink
-E again right away but no crash occurs.
-
-Without 'cpu y' race, 'garbage' hlist is of no consequence:
-ct refcnt remains at 1, eventually skb will be free'd and E gets
-destroyed via: nf_conntrack_put -> nf_conntrack_destroy -> nf_ct_destroy.
-
-To resolve this, move the IPS_CONFIRMED assignment after the table
-insertion but before the unlock.
-
-Pablo points out that the confirm-bit-store could be reordered to happen
-before hlist add resp. the timeout fixup, so switch to set_bit and
-before_atomic memory barrier to prevent this.
-
-It doesn't matter if other CPUs can observe a newly inserted entry right
-before the CONFIRMED bit was set:
-
-Such event cannot be distinguished from above "E is the old incarnation"
-case: the entry will be skipped.
-
-Also change nf_ct_should_gc() to first check the confirmed bit.
-
-The gc sequence is:
- 1. Check if entry has expired, if not skip to next entry
- 2. Obtain a reference to the expired entry.
- 3. Call nf_ct_should_gc() to double-check step 1.
-
-nf_ct_should_gc() is thus called only for entries that already failed an
-expiry check. After this patch, once the confirmed bit check passes
-ct->timeout has been altered to reflect the absolute 'best before' date
-instead of a relative time.  Step 3 will therefore not remove the entry.
-
-Without this change to nf_ct_should_gc() we could still get this sequence:
-
- 1. Check if entry has expired.
- 2. Obtain a reference.
- 3. Call nf_ct_should_gc() to double-check step 1:
-    4 - entry is still observed as expired
-    5 - meanwhile, ct->timeout is corrected to absolute value on other CPU
-      and confirm bit gets set
-    6 - confirm bit is seen
-    7 - valid entry is removed again
-
-First do check 6), then 4) so the gc expiry check always picks up either
-confirmed bit unset (entry gets skipped) or expiry re-check failure for
-re-inited conntrack objects.
-
-This change cannot be backported to releases before 5.19. Without
-commit 8a75a2c17410 ("netfilter: conntrack: remove unconfirmed list")
-|= IPS_CONFIRMED line cannot be moved without further changes.
-
-Cc: Razvan Cojocaru <rzvncj@gmail.com>
-Link: https://lore.kernel.org/netfilter-devel/20250627142758.25664-1-fw@strlen.de/
-Link: https://lore.kernel.org/netfilter-devel/4239da15-83ff-4ca4-939d-faef283471bb@gmail.com/
-Fixes: 1397af5bfd7d ("netfilter: conntrack: remove the percpu dying list")
-Signed-off-by: Florian Westphal <fw@strlen.de>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- include/net/netfilter/nf_conntrack.h | 15 +++++++++++++--
- net/netfilter/nf_conntrack_core.c    | 26 ++++++++++++++++++++------
- 2 files changed, 33 insertions(+), 8 deletions(-)
-
-diff --git a/include/net/netfilter/nf_conntrack.h b/include/net/netfilter/nf_conntrack.h
-index 3f02a45773e8..ca26274196b9 100644
---- a/include/net/netfilter/nf_conntrack.h
-+++ b/include/net/netfilter/nf_conntrack.h
-@@ -306,8 +306,19 @@ static inline bool nf_ct_is_expired(const struct nf_conn *ct)
- /* use after obtaining a reference count */
- static inline bool nf_ct_should_gc(const struct nf_conn *ct)
- {
--	return nf_ct_is_expired(ct) && nf_ct_is_confirmed(ct) &&
--	       !nf_ct_is_dying(ct);
-+	if (!nf_ct_is_confirmed(ct))
-+		return false;
-+
-+	/* load ct->timeout after is_confirmed() test.
-+	 * Pairs with __nf_conntrack_confirm() which:
-+	 * 1. Increases ct->timeout value
-+	 * 2. Inserts ct into rcu hlist
-+	 * 3. Sets the confirmed bit
-+	 * 4. Unlocks the hlist lock
-+	 */
-+	smp_acquire__after_ctrl_dep();
-+
-+	return nf_ct_is_expired(ct) && !nf_ct_is_dying(ct);
- }
- 
- #define	NF_CT_DAY	(86400 * HZ)
-diff --git a/net/netfilter/nf_conntrack_core.c b/net/netfilter/nf_conntrack_core.c
-index 201d3c4ec623..e51f0b441109 100644
---- a/net/netfilter/nf_conntrack_core.c
-+++ b/net/netfilter/nf_conntrack_core.c
-@@ -1124,6 +1124,12 @@ static int nf_ct_resolve_clash_harder(struct sk_buff *skb, u32 repl_idx)
- 
- 	hlist_nulls_add_head_rcu(&loser_ct->tuplehash[IP_CT_DIR_REPLY].hnnode,
- 				 &nf_conntrack_hash[repl_idx]);
-+	/* confirmed bit must be set after hlist add, not before:
-+	 * loser_ct can still be visible to other cpu due to
-+	 * SLAB_TYPESAFE_BY_RCU.
-+	 */
-+	smp_mb__before_atomic();
-+	set_bit(IPS_CONFIRMED_BIT, &loser_ct->status);
- 
- 	NF_CT_STAT_INC(net, clash_resolve);
- 	return NF_ACCEPT;
-@@ -1260,8 +1266,6 @@ __nf_conntrack_confirm(struct sk_buff *skb)
- 	 * user context, else we insert an already 'dead' hash, blocking
- 	 * further use of that particular connection -JM.
- 	 */
--	ct->status |= IPS_CONFIRMED;
--
- 	if (unlikely(nf_ct_is_dying(ct))) {
- 		NF_CT_STAT_INC(net, insert_failed);
- 		goto dying;
-@@ -1293,7 +1297,7 @@ __nf_conntrack_confirm(struct sk_buff *skb)
- 		}
- 	}
- 
--	/* Timer relative to confirmation time, not original
-+	/* Timeout is relative to confirmation time, not original
- 	   setting time, otherwise we'd get timer wrap in
- 	   weird delay cases. */
- 	ct->timeout += nfct_time_stamp;
-@@ -1301,11 +1305,21 @@ __nf_conntrack_confirm(struct sk_buff *skb)
- 	__nf_conntrack_insert_prepare(ct);
- 
- 	/* Since the lookup is lockless, hash insertion must be done after
--	 * starting the timer and setting the CONFIRMED bit. The RCU barriers
--	 * guarantee that no other CPU can find the conntrack before the above
--	 * stores are visible.
-+	 * setting ct->timeout. The RCU barriers guarantee that no other CPU
-+	 * can find the conntrack before the above stores are visible.
- 	 */
- 	__nf_conntrack_hash_insert(ct, hash, reply_hash);
-+
-+	/* IPS_CONFIRMED unset means 'ct not (yet) in hash', conntrack lookups
-+	 * skip entries that lack this bit.  This happens when a CPU is looking
-+	 * at a stale entry that is being recycled due to SLAB_TYPESAFE_BY_RCU
-+	 * or when another CPU encounters this entry right after the insertion
-+	 * but before the set-confirm-bit below.  This bit must not be set until
-+	 * after __nf_conntrack_hash_insert().
-+	 */
-+	smp_mb__before_atomic();
-+	set_bit(IPS_CONFIRMED_BIT, &ct->status);
-+
- 	nf_conntrack_double_unlock(hash, reply_hash);
- 	local_bh_enable();
- 
--- 
-2.39.5
+The current ptp_netc driver will not fail if they are absent, and it will a=
+lways
+use the NETC system clock by default, because the system clock of NETC is
+always available to the Timer.
 
 
