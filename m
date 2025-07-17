@@ -1,59 +1,50 @@
-Return-Path: <netdev+bounces-208005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D09FB094CB
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 21:18:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BCF3B094E0
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 21:22:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDCCD1C46D0C
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 19:18:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F446587810
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 19:22:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50B762FF492;
-	Thu, 17 Jul 2025 19:17:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41C6F2FE389;
+	Thu, 17 Jul 2025 19:19:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ddttC3Cv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OgvTO6yi"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26582FF483
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 19:17:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 162322FE321;
+	Thu, 17 Jul 2025 19:19:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752779874; cv=none; b=TbqLSqgfQUpVvnZs2dOlo10pi6F0biVIF4PO0FAAXmts/mkClxqNonIofHsT6yBg+ZJ03NrX7v8liXl+9iNhyze46pWWnAMX0QqD4j53FvKCb6nPm4skQk9JjcdheIKTleaNl/uoCRwdXbvCtZ2c7QBnQPcx0Tw8radq0tZPaFs=
+	t=1752779988; cv=none; b=CwBLYEp/Z7FZFD1Dl9HkI907trlwpN9RLPwd6UdWRZu1e9V+5EztsRmKB+a+vRJjY7rct3amkSURUfZi+8UmXlQZJbCq650sTGdSjFeNx7N7+JThXkp6Z/kFGm1tBHj81H+LhR03ypF11fjFQOMp8255RkEPVys277B6ArisjEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752779874; c=relaxed/simple;
-	bh=TCZ16/m/JcR+KOcW3zLkSxjiy0cw3kk7UNgRMp8JkBI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fk+SCa0YZh2b91273vErIMFqztSx1PqFCU97uBrY/wnuVMkfUOy3nrC8nUwJmC6MYBqPZhOimhVmLZquVR8YgsPgj+KyDcQi57KrM93P0hjHaYmrLeqW1TjNpWCk9CX5G/LQN4gQNXs3r8IJnGShSTmuC28iKkSbTIJTH0VGbVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ddttC3Cv; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1752779869;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=w70L6V3f6rZMpo2My9D3+7foPd+Gh2XyPQDgGDEOEwA=;
-	b=ddttC3CvnuZqBKJ7V5kQVz3uuS4hh2ZFnQTlQDXldYUXxWKonHBZQysl7cCRz0427iTAwB
-	xieBWK05nS/2hg+0wr79ByR5yo0Hv9GQ4TzEXJASnp0xQLcBddAVWDALwLxzAngR8yewRF
-	SY3VKWK3FzYDeKnAC9pwfdO986TtQ4g=
-From: Martin KaFai Lau <martin.lau@linux.dev>
-To: David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf-next 2025-07-17
-Date: Thu, 17 Jul 2025 12:17:31 -0700
-Message-ID: <20250717191731.4142326-1-martin.lau@linux.dev>
+	s=arc-20240116; t=1752779988; c=relaxed/simple;
+	bh=pb/j8Q5qVbV5DQi8rmEfVT/4W8kYDiyQSOcCQSIcqqU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=twkO07wy0JH645OCbo4KpHvtvHkzubLSAFRlvB2gq0pgpgd376ikGNBfU/1GiOW/tos+pVg3OBWlZRfCaQ/H5JoTIuFz/NMyK5Dk8Ook9ryaChGSh3QDZVjSXRoCCHquh1nbJYI05QlUGJ5yDkvUG8Xhs1PbdBfiz8N8Nz/76aE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OgvTO6yi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C215C4CEE3;
+	Thu, 17 Jul 2025 19:19:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752779987;
+	bh=pb/j8Q5qVbV5DQi8rmEfVT/4W8kYDiyQSOcCQSIcqqU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=OgvTO6yia1qhArh65Z/fn/iEOXQwmAdbq99QDPNyrvv08foI3wcNIfKnHvBYyvpvf
+	 Qj4/e1K/BzxSmWcWtbpIlOVIrPuq4WfDDIhy9vYPq5Vh3sjCvTcej8QKndIhW58qtZ
+	 EOY3gmCW75pztjT2Zw46gy7DpJZK2LTz/n4od9iq2Z52dg+IZr8pgFJtFEwZaLwiXx
+	 eqAKB2noQFAXJZeU+XERI4lZ9pzgcMwESzku1XLqKTTSH6/Z4q6BGhddZn2P3vz65M
+	 ZJ54MtEvo2d3dGNMkbj7YiT6efUqm3zaZPZjG7d7HU9AaXoTWMv++6a7jUoVVA6paG
+	 alL99IubscXjQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD17383BAC1;
+	Thu, 17 Jul 2025 19:20:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,74 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Subject: Re: [PATCH net-next] net/mlx5e: TX, Fix dma unmapping for devmem tx
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175278000627.2046530.16940004452982858685.git-patchwork-notify@kernel.org>
+Date: Thu, 17 Jul 2025 19:20:06 +0000
+References: <1752649242-147678-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1752649242-147678-1-git-send-email-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
+ leon@kernel.org, mbloch@nvidia.com, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dtatulea@nvidia.com, almasrymina@google.com
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
+Hello:
 
-The following pull-request contains BPF updates for your *net-next* tree.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-We've added 13 non-merge commits during the last 20 day(s) which contain
-a total of 4 files changed, 712 insertions(+), 84 deletions(-).
+On Wed, 16 Jul 2025 10:00:42 +0300 you wrote:
+> From: Dragos Tatulea <dtatulea@nvidia.com>
+> 
+> net_iovs should have the dma address set to 0 so that
+> netmem_dma_unmap_page_attrs() correctly skips the unmap. This was
+> not done in mlx5 when support for devmem tx was added and resulted
+> in the splat below when the platform iommu was enabled.
+> 
+> [...]
 
-The main changes are:
+Here is the summary with links:
+  - [net-next] net/mlx5e: TX, Fix dma unmapping for devmem tx
+    https://git.kernel.org/netdev/net-next/c/870bc1aaa0f9
 
-1) Avoid skipping or repeating a sk when using a TCP bpf_iter,
-   from Jordan Rife.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-2) Clarify the driver requirement on using the XDP metadata,
-   from Song Yoong Siang
 
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
-
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Kuniyuki Iwashima, Stanislav Fomichev
-
-----------------------------------------------------------------
-
-The following changes since commit 8efa26fcbf8a7f783fd1ce7dd2a409e9b7758df0:
-
-  tg3: spelling corrections (2025-06-27 10:25:57 +0100)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
-
-for you to fetch changes up to ef57dc6f52e4949527f82a456cb9a637a55209ea:
-
-  doc: xdp: Clarify driver implementation for XDP Rx metadata (2025-07-16 16:36:11 -0700)
-
-----------------------------------------------------------------
-bpf-next-for-netdev
-
-----------------------------------------------------------------
-Jordan Rife (12):
-      bpf: tcp: Make mem flags configurable through bpf_iter_tcp_realloc_batch
-      bpf: tcp: Make sure iter->batch always contains a full bucket snapshot
-      bpf: tcp: Get rid of st_bucket_done
-      bpf: tcp: Use bpf_tcp_iter_batch_item for bpf_tcp_iter_state batch items
-      bpf: tcp: Avoid socket skips and repeats during iteration
-      selftests/bpf: Add tests for bucket resume logic in listening sockets
-      selftests/bpf: Allow for iteration over multiple ports
-      selftests/bpf: Allow for iteration over multiple states
-      selftests/bpf: Make ehash buckets configurable in socket iterator tests
-      selftests/bpf: Create established sockets in socket iterator tests
-      selftests/bpf: Create iter_tcp_destroy test program
-      selftests/bpf: Add tests for bucket resume logic in established sockets
-
-Martin KaFai Lau (1):
-      Merge branch 'bpf-tcp-exactly-once-socket-iteration'
-
-Song Yoong Siang (1):
-      doc: xdp: Clarify driver implementation for XDP Rx metadata
-
- Documentation/networking/xdp-rx-metadata.rst       |  33 ++
- net/ipv4/tcp_ipv4.c                                | 269 ++++++++----
- .../selftests/bpf/prog_tests/sock_iter_batch.c     | 458 ++++++++++++++++++++-
- .../testing/selftests/bpf/progs/sock_iter_batch.c  |  36 +-
- 4 files changed, 712 insertions(+), 84 deletions(-)
 
