@@ -1,218 +1,148 @@
-Return-Path: <netdev+bounces-207895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36AC1B08EEF
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 16:15:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 434E3B08EF5
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 16:19:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEE141C22BD6
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 14:15:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 235F13B5317
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 14:19:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3C142F7CE7;
-	Thu, 17 Jul 2025 14:14:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A0F52D5426;
+	Thu, 17 Jul 2025 14:19:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hQcFq45c"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GlMLWksB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 226902F7CE0
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 14:14:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745732E3700;
+	Thu, 17 Jul 2025 14:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752761677; cv=none; b=qLP10DYs6HL9y2r1sFzZ090gSZcUYErqHE4Y9ksJt1ASSJKDtV/SZJjbYuy7BH0SIUd7CKBF2AjCQKiJiQ2UaQwJTmfqZ3xMQDm9ZE++9o79/n89ySuxYbi+GDXoFyFsxT+uBmvO3GHpYi6qhwaHbCahL8cdmVF6+PbTaTF2osk=
+	t=1752761979; cv=none; b=lZrAePhrbwOpHSd6adV01aYiu3qOZgUMUrBRL3fCxWIQb9NDG7pVwvcCee0ybb8+fd4bnGsls+M0Ck1ssw/aoweY5nOiw0kthUKOY3UgpMqvziLTpaZ3giTERE6AJstwckDZrKBdAhZBsq5N1knCrvKI6A1Kpr7qRARfVmUmCfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752761677; c=relaxed/simple;
-	bh=U+W7V/eBIcH14n9hOuoTsK5rPYAZFYZ37JZDfmjgEj4=;
+	s=arc-20240116; t=1752761979; c=relaxed/simple;
+	bh=nETYC/rTnSj8dVqR0h8qhds0TjNPLeVw1rsC9rAO/jA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nTCP+CC+zqAeE8FWzopL0iPLosyWXZcSCeOGTTG1xHGnYv+A6TI3zJg4ttG/pnqYHvNbQ+4NrvxzHRjiMr4Hu/CuG+VCcYCUS1jrffTiUK7ykotWBlw05IR4+oqHtQ0AawqIUvQz/itQtjYyXqNgNQ94sEIKM41DOV4HZhOzvq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hQcFq45c; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4ab86a29c98so328291cf.0
-        for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 07:14:35 -0700 (PDT)
+	 To:Cc:Content-Type; b=Bw21s40CV6i1Q7Oxn/kZ2lWCA/CdJKD0BfBtc8X3CqC73tDxSzt8cej/0CNBvaemL0xK22FA7JbO8bXO6p1PqT7c1kzvScABC+OnLozQHydYEXWSB5mNvjcnXRiXw+bbW7DlUEJF/1AWX/EPr0qkloeLT3y5GOBAt5TCoXMTVAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GlMLWksB; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-32e14ce168eso11152151fa.1;
+        Thu, 17 Jul 2025 07:19:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752761675; x=1753366475; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1752761975; x=1753366775; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=K9ESjmeueF/M4Xppi4ZUOzJRt1aYtYcUoC7SokY7JSU=;
-        b=hQcFq45cpNWJxpc+h2LMcWFyum13vQgXs5rKUMBfpmVm3STVkglmmi0zyG2X1YwBXo
-         CERGFo035rAe4+3mIT230YG/qSRvDpejnMgOROB8TckT1+9KkP4/2C9lJA5U+zfIODZ3
-         5cyChFU7VesCtltBTYxNvFEzkuw1OJ4jajEFXNpnbpIaMOGxA6B74bF0gSZE1sOeH3Ai
-         xGbGfnKMh6PjiPI+Ty6ldngg885vDX+5bCToZceAv8SKa+dOg2TPa1GHzE2pN4xbHkeH
-         mnotjdaOb9TlsvYLHhUhdPx8Nl9OVSWD4uh82BIY5l3pOA64uMWaIyGmIMW+VxTWMnkc
-         6iHA==
+        bh=Vxu8+bCUtlERkF02ujaWx/bVvcqy/SwbKTN3++d2H8k=;
+        b=GlMLWksBwtSmA56Djovu1PNJJPvQzX5mahOrzR1ubihIGk+ln+42elxSFCJbzMUlcU
+         MeDNGg34boj4/KQCO/NDotVnXUBA+7opIVjlNQ8jw/3JFyHut6wyRe8OjTbxMo1dEToZ
+         YwWzxyCpgEV1vkS/X0F1UwEn7sPlRYRhIg5igsrPqXP5wzRn91mKoi/8gijgd6oydj5W
+         HbZO4H+xCi/qzMx5FuTbN1SUmc45g7leycXR1I5H9mf3e3NbdFVVGm632DGeXd11BZ6d
+         5t0hxgKzAbrV84/H6rtg3bU+MDB/n74e98HDR7iZZsq/3w1e0+mUZl4KoHOcRUYOvhJW
+         iuyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752761675; x=1753366475;
+        d=1e100.net; s=20230601; t=1752761975; x=1753366775;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=K9ESjmeueF/M4Xppi4ZUOzJRt1aYtYcUoC7SokY7JSU=;
-        b=GoSoDK0n8v6bs8/WEgnQ+q9nCFyFw2UaUql3DJVMoLMdBfyZmKihIvrWmm/NWL39F5
-         uTSee66MDrNP0vBdmu2SqEMaRLwBLakQ4vKo/BR9WOZwtkPDOMwiA3q2+w3Qazi7FEWd
-         uiXOfOy7swQ97StyNhtlMJVH6fPQAN8ogMllQ0MLkIZ4Lm5f6jEKXrvOXUTub5RByG7r
-         jwKufmEY0Qq7FxOS2DGsH08xoAkA46UL1futwFSWhxDchZqjed4/rHRR6SHXY5Lfyirl
-         qE6w/EDTTs0h5HnnmcuiLXDlO3WXQQvIZW7ZT781KoEYQHk7ngWFpXhq3yqVfdHU7JXi
-         uCfg==
-X-Forwarded-Encrypted: i=1; AJvYcCWq0neRMUgCBAJOzGovBW+0aCSVPE2Z/OiFUuCrnv2hciAwEUtymxdfyiZqEcm7eUTgLm/Sklw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YycHxGxm95zwRPXWyNFsSf75RK1gdmb6HXBVAOuCMi1q3ean+Tb
-	XR0X8IQt/wSib0R85d2Xj6jRfjl7cN9TRe6UKR7iNn/OWSY6WeuPrbkSgOoZ8S4wEs4eaRxFdU0
-	pCHKR8+rBB/MkUK2BG2Uk4tyC1Zpqr4q6qIY9w1Px
-X-Gm-Gg: ASbGncsk9K4kuvD5B59JH/lBgNb0d/wI66PVs2x3q8KUvi0qU8mgy1llIPQ4miyy4ZQ
-	InYGcvJ61oqJIzNux7vfHEYCKbgAdoUVqLZx5rm241WqLN4svtWSLOp9WAW/v0AslBX1TGVE/ov
-	mgWoLE88pQROjVz9/D5Qsjf1nU/g9looLxAnVsSgo0GldxLlmFS+jDjE2hT1lFmzUB6T5QBqUxi
-	NtCS88=
-X-Google-Smtp-Source: AGHT+IFGs+/HNcY99e2QwQVRt2HyixISJJQKpTcBz8kXHPf6UsQhzu5BIRM7GUTQkIr8p5fP7Z/e5JgqKP3xcxbCA8o=
-X-Received: by 2002:ac8:7e93:0:b0:4a8:ea8:67e with SMTP id d75a77b69052e-4aba2bf7196mr4450451cf.2.1752761674411;
- Thu, 17 Jul 2025 07:14:34 -0700 (PDT)
+        bh=Vxu8+bCUtlERkF02ujaWx/bVvcqy/SwbKTN3++d2H8k=;
+        b=tE09poRBKENG5jyNdMfYodxKw3e0WEIc61QxQH8OyQ9v5Z+zqpk3AJ8IHXZUsKX87N
+         SRkNO6wybaNDRDLI2yAc9RX1unf7cVvVuThQjGxYiJ28XIIyLK3Z63hgtUA3OMbk1pfO
+         W2VWwGP0fL8/20N2KVuYHKnxpg+qTa0UVsKVV0buCL9+6djS5MUzfoh2r6Naq8pVMk8V
+         gdghGnEcZhhZh6i5TDRs7HMCjrDaJ4TN5CruicCavYM26jBDmdPIe+/B2+JrZAqT1B17
+         0bldSMbIolvS6OR1FUQDS33yN0kQiA7TvYfZDDSKS7PlfVbH2cwM6LMWWl2zHMEY5j/C
+         DYZg==
+X-Forwarded-Encrypted: i=1; AJvYcCUJ4V+RBZpJWpKP+BB13wEW3fgW+6ebtSyI2DCxvO4CDkCray8nKBCjVgNZAPe1RtVXhFGJXZqPosoDMpw3LwQ=@vger.kernel.org, AJvYcCXUm8Bi2dzk99PM7jdR+cRhvmprsAGfrtdkb3+TnGTi/mnd1yuR2FmfEpwzJOAa8bHuh7C9zjfN@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZM6/5te4qnmwZi/MvPOqFnn2XDqxF+KPuKvjcoT+sSZiF6AdY
+	41bCBNJ3PKgzrFmCGYFS5+EdYCPDsZ9a4Efgeht/Mu3bSEfYsR6Bd3KyrE6F+73qUNBSDATKJYk
+	OxqFYCfNGwfzTZBiLkbwYU50YUpbtrJJjm7N7
+X-Gm-Gg: ASbGncu8pfIjrjVYzAaiVVoQ2Hr6zQenjuURQ07I63d7PjNPTiLOx4dnrMUznGd8ltC
+	Sixmgr8edHHgS4CffEpvPQODGbFlEaOns6kDY2K4usmoYnJCBXGvv9RfsKqKr2c4f8bj0icHSYR
+	t0B6JznIxwebmskeV2hcEyvZz2s/WJA2DiOAH0MI9IULL4rKqeDnqCY/fAch280LkNJU3dZjr7f
+	Cnyrg==
+X-Google-Smtp-Source: AGHT+IEVAJcOQrBB41MYBcoYH3u3Dgll0keTxcuu/nXXagoS2SFW/BSRXGxiCfcyWMViHZL2IJJBTPTqclukfTnFbvg=
+X-Received: by 2002:a2e:ae18:0:10b0:32f:22f8:a7a1 with SMTP id
+ 38308e7fff4ca-3308f61c682mr16314211fa.32.1752761975022; Thu, 17 Jul 2025
+ 07:19:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250713152253.110107-1-guoxin0309@gmail.com> <9c67190f-62c2-4498-937d-5213de1a3fe0@redhat.com>
- <CAMaK5_jfKogtZhdtBn91W44wrsWjE09Vm=76T1fXxemiA6pSVg@mail.gmail.com>
-In-Reply-To: <CAMaK5_jfKogtZhdtBn91W44wrsWjE09Vm=76T1fXxemiA6pSVg@mail.gmail.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Thu, 17 Jul 2025 10:14:17 -0400
-X-Gm-Features: Ac12FXwtCU3EkR1PkyXKIuFb9Wd4mLlCUJFg0k_FYCGXwusoZJiXkfX6Xkha1UI
-Message-ID: <CADVnQym_hhAoM2nvYyz2vR1zJTcAP0FzOZ-st0SfXE=6g68eVA@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: correct the skip logic in tcp_sacktag_skip()
-To: Xin Guo <guoxin0309@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	edumazet@google.com, davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org
+References: <20250716195124.414683-1-luiz.dentz@gmail.com> <7d445ce0-bf96-441d-8fd9-2ed6b0206b4f@redhat.com>
+In-Reply-To: <7d445ce0-bf96-441d-8fd9-2ed6b0206b4f@redhat.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 17 Jul 2025 10:19:22 -0400
+X-Gm-Features: Ac12FXzzebMNjl9AjKwgWamVkIV3_OD1myHqtjaxTvLz-LWY57-R5fiAsam8y2A
+Message-ID: <CABBYNZJ64MSJWDDWJkVsYh3HqTwVVs=xNCfMj7ZMzzH7Y7q6dw@mail.gmail.com>
+Subject: Re: [GIT PULL] bluetooth 2025-07-16
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 17, 2025 at 9:36=E2=80=AFAM Xin Guo <guoxin0309@gmail.com> wrot=
-e:
+Hi Paolo,
+
+On Thu, Jul 17, 2025 at 6:17=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
 >
-> Hi Paolo,
-> Thanks for your review, let me explain in the thread first.
-> 1)let me start from tcp_sacktag_skip, the definition as below:
-> static struct sk_buff *tcp_sacktag_skip(struct sk_buff *skb, struct sock =
-*sk,
-> u32 skip_to_seq)
-> {
-> if (skb && after(TCP_SKB_CB(skb)->seq, skip_to_seq))
-> return skb;
 >
-> return tcp_sacktag_bsearch(sk, skip_to_seq);
-> }
-> the input skb is a hint to avoid search the RTX tree, and the condition i=
-s:
-> skb->seq > skip_to_seq(so skip_to_seq cannot be included in skb),
-> as below:
-> 0----------------------------------------------|------------------>+ skb-=
->seq
-> 0--------------------|-------------------------------------------->+ skip=
-_to_seq
 >
-> 2)let me check the code snippet in tcp_sacktag_write_queue()
-> the code try to speed up the search by using tcp_highest_sack(),
-> the code is from the rtx queue is a list, but now the rtx queue is a tree=
-.
-> the mean is that if the start_seq >=3Dtcp_highest_sack_seq(), the we use
-> skb=3Dtcp_highest_sack() as a hint to speed up the lookup(avoid to
-> lookup the tree).
-> so we can see that the skb->seq <=3Dstart_seq.
-> then if we use the skb and start_seq to call tcp_sacktag_skip(),
-> the tcp_sacktag_skip will go for rtx tree lookup, so
-> code snippet does not take effect.
->
-> static int
-> tcp_sacktag_write_queue(struct sock *sk, const struct sk_buff *ack_skb,
-> u32 prior_snd_una, struct tcp_sacktag_state *state)
-> {
-> ...
-> while (i < used_sacks) {
->
-> if (!before(start_seq, tcp_highest_sack_seq(tp))) {
-> skb =3D tcp_highest_sack(sk);
-> if (!skb)
-> break;
-> }
-> skb =3D tcp_sacktag_skip(skb, sk, start_seq);
->
-> walk:
-> skb =3D tcp_sacktag_walk(skb, sk, next_dup, state,
-> start_seq, end_seq, dup_sack);
->
-> advance_sp:
-> i++;
-> }
->
-> 3) on the other side, let me show the logic in tcp_sacktag_bsearch, the l=
-ogic is
->    the skb->seq should be met:
->    seq=3D<skb->seq and seq<skb->end_seq
-> so the seq should be included in skb, the log is not consist with
-> tcp_sacktag_skip().
->
-> static struct sk_buff *tcp_sacktag_bsearch(struct sock *sk, u32 seq)
-> {
-> struct rb_node *parent, **p =3D &sk->tcp_rtx_queue.rb_node;
-> struct sk_buff *skb;
->
-> while (*p) {
-> parent =3D *p;
-> skb =3D rb_to_skb(parent);
-> if (before(seq, TCP_SKB_CB(skb)->seq)) {
-> p =3D &parent->rb_left;
-> continue;
-> }
-> //[Xin Guo] at here seq=3D<skb->seq
-> if (!before(seq, TCP_SKB_CB(skb)->end_seq)) {
-> p =3D &parent->rb_right;
-> continue;
-> }
-> //[Xin Guo]at here seq<skb->end_seq
-> return skb;
-> }
-> return NULL;
-> }
->
-> i hope that it is more clear now, thanks.
->
-> Regards
-> Guo Xin.
->
-> On Thu, Jul 17, 2025 at 4:24=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> w=
-rote:
+> On 7/16/25 9:51 PM, Luiz Augusto von Dentz wrote:
+> > The following changes since commit dae7f9cbd1909de2b0bccc30afef95c23f93=
+e477:
 > >
-> > On 7/13/25 5:22 PM, Xin Guo wrote:
-> > > tcp_sacktag_skip() directly return the input skb only
-> > > if TCP_SKB_CB(skb)->seq>skip_to_seq,
-> > > this is not right, and  the logic should be
-> > > TCP_SKB_CB(skb)->seq>=3Dskip_to_seq,
+> >   Merge branch 'mptcp-fix-fallback-related-races' (2025-07-15 17:31:30 =
+-0700)
 > >
-> > Adding Kuniyuki
+> > are available in the Git repository at:
 > >
-> > I'm not sure this statement is actually true. A more clear (and slightl=
-y
-> > more descriptive) commit message could help better understanding the
-> > issue. What is the bad behaviour you are observing?
+> >   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git=
+ tags/for-net-2025-07-16
 > >
-> > Ideally a packetdrill test case to demonstrate it would help
-> sorry that a packetdrill script cannot show the wrong behavior.
+> > for you to fetch changes up to c76d958c3a42de72b3ec1813b5a5fd4206f9f350=
+:
+> >
+> >   Bluetooth: L2CAP: Fix attempting to adjust outgoing MTU (2025-07-16 1=
+5:38:31 -0400)
+> >
+> > ----------------------------------------------------------------
+> > bluetooth pull request for net:
+> >
+> >  - hci_sync: fix connectable extended advertising when using static ran=
+dom address
+> >  - hci_core: fix typos in macros
+> >  - hci_core: add missing braces when using macro parameters
+> >  - hci_core: replace 'quirks' integer by 'quirk_flags' bitmap
+> >  - SMP: If an unallowed command is received consider it a failure
+> >  - SMP: Fix using HCI_ERROR_REMOTE_USER_TERM on timeout
+> >  - L2CAP: Fix null-ptr-deref in l2cap_sock_resume_cb()
+> >  - L2CAP: Fix attempting to adjust outgoing MTU
+>
+> This has issue with fixes tag, the hash looks wrong:
+>
+> Fixes tag: Fixes: d5c2d5e0f1d3 ("Bluetooth: L2CAP: Fix L2CAP MTU
+> negotiation")
+>         Has these problem(s):
+>                 - Target SHA1 does not exist
+>
+> Could you please adjust that and send a pull v2?
 
-I agree with Paolo that having a packetdrill test case for this kind
-of issue would be best.
+Sure, I will send it asap.
 
-Can you please explain why you are saying that a packetdrill script
-cannot show the incorrect behavior for this issue?
+> Thanks,
+>
+> Paolo
+>
 
-Usually packetdrill is a good fit for these kinds of protocol
-processing issues that do not involve performance or race conditions.
 
-Here are examples of test cases that stress SACK processing behavior,
-if that helps:
-  https://github.com/google/packetdrill/tree/master/gtests/net/tcp/sack
-
-Thanks,
-neal
+--=20
+Luiz Augusto von Dentz
 
