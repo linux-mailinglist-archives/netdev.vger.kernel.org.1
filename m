@@ -1,116 +1,139 @@
-Return-Path: <netdev+bounces-207677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE34AB082B7
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 04:03:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDABCB082C4
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 04:13:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B98854E7CA1
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 02:03:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 86B9F7A4F4A
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 02:11:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BA791F8677;
-	Thu, 17 Jul 2025 02:03:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cVugw9V9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D769C1C8633;
+	Thu, 17 Jul 2025 02:13:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5492A1F150A
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 02:03:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 195E3155A59;
+	Thu, 17 Jul 2025 02:13:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.30.148.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752717799; cv=none; b=k3fued0T/BjwNUmYl6kP+Ep4OIT998ZiQXUen9BOt4bs/7xLoqnYy0ikPXkZi+5Q6P4oaU+w/ORURG6CfW8x/ChfPZfyzh0aKkS17QKZMP11K+MA4jUadcS/uagdUmN+5Kwh6GB4gPMD5PfvGNIl9TyMsbY8QJuLyaypWJgCIMg=
+	t=1752718384; cv=none; b=AdtGn4+MIeK5ZFm7q5K6EwxmhUOz5JRA1u7RVq9VG0PzkkIMV2SQzPdNw2CVmLaus8WCYdFauNUvs1+4hHlErAEiQA4zHe/NRLWTjrthvpU9nrXlvzQrDxi7u4YfXrJqOYrFtZISrVl4wh2CgjMQ65DHGjbQrndNIiWUt46BHdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752717799; c=relaxed/simple;
-	bh=nk+vMLXGoyUcWn2gdQ0TtZDnbeL6g7uxU6L7y4/AI3A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fNq1qLd91E9rYAn7/6k87pCtAM1cIdeygcoxZP7MUkt6q2/TkWFZQZtAjQm/k/KGh1aAhqVY+k8DMgh7RHjL6KjXKhw8KzmeNkST38mPhncarR7gtrCo0cq4e2YnusTJ2C/E8MvvoJtM+GpRnmcPf6tE5vlgClu6i83l5JKyUhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cVugw9V9; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752717795;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nk+vMLXGoyUcWn2gdQ0TtZDnbeL6g7uxU6L7y4/AI3A=;
-	b=cVugw9V9vMknb6DHFchGQ6lgpzZ3e3Ub52RlRpsRXIHFpsjITo77bl1zyx/I5ZtsoTvE+d
-	5Y6WdF7yyj8kLRBAh6yI9Ll/PMVRtChOssUC9XmGe8fX+eT2G8TDHZK/se4LCTMZXRUvQ5
-	Pgjm1ZIHys2EPEUSNNA97bcQWvJta7k=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-350-SwWAZANaOXKTjWZtRdlSZw-1; Wed, 16 Jul 2025 22:03:12 -0400
-X-MC-Unique: SwWAZANaOXKTjWZtRdlSZw-1
-X-Mimecast-MFC-AGG-ID: SwWAZANaOXKTjWZtRdlSZw_1752717792
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-3138e64b3f1so707349a91.3
-        for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 19:03:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752717792; x=1753322592;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nk+vMLXGoyUcWn2gdQ0TtZDnbeL6g7uxU6L7y4/AI3A=;
-        b=Q+mGVcllGsyvUCZZu2WWOR6AI9jFnUZaxvJ6cxO7Td/BQ4sJWv2s51JkLB77bS+Ygz
-         NN0jcNmxODMK921wQiqABDDp9e5naHi5uFx2tXKdrYga7VZDTbkIKvGquEGp5oBTjTXN
-         QLaRK4pYaZyevM59H0SNp0d6s29SwTH+GEI13sSlpdEY3F+izOXlRyR6AiKCxuJo1CtE
-         I80NxV57k9BZDVPzA3jUMxLDHX5I1YugBn4BKzHgtzcGdaufg3JZ3inJ2sAyG1aM4H2g
-         /A3Uk5GitWEreQeM7lkS9KkiwzeXC611zyNOFEHvac72ob7m+Ui+yzWHi9Pgmj1Dj9Bi
-         OeWA==
-X-Forwarded-Encrypted: i=1; AJvYcCUHApb7XSfgESobLY71CQQ0Lr/3HulKpFqRo5i2C625/kZrUjZzPdK/1knPlZTAyercZnPj4Oc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYV+FGgOShvnQLnjUt8rL/BwOjW1iMv+W85PzXRR/ZoCCEtk4Q
-	yp2gYyUnkWxLpVHA2fmHfQtrVeU72UyJlO4cPbY8dnopbdITaNROel+ouMPmE2Zvk9FD8yzBDX7
-	zK7X1BYJd6DLh76Q45OsVDNgr0SR5zfqQtgd8B0Jyy3BBMrFxh60PeArwYWysp8Ucx4VUr/QXCB
-	nLwUGsnpnjlV2cjfMV9ToVidYvIhMYOYv5
-X-Gm-Gg: ASbGncs+VwKxLI8r815FACPBh/NJpmbgMLP4lOTlE7nzRzjH375YtOWMoNsfaxG6Ggb
-	BfJ2NWuBY+BH0RjjzVtqsK8TH6T/IjAmICweYx281j+LDxrXrxpMAYXQj2MXsDKCARFs+xJR+qC
-	JPPiZifF8eMxNMdyqgWUin
-X-Received: by 2002:a17:90b:55cb:b0:312:959:dc41 with SMTP id 98e67ed59e1d1-31c9f43747emr6022352a91.27.1752717791917;
-        Wed, 16 Jul 2025 19:03:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGPKGtWTF3J+7pKYaN1LISu1DbprEzZA/aztw/7OAnQNJPFUO3gk780cKvvzbWsO46X8xOSSRM1m2KLbEldd7Y=
-X-Received: by 2002:a17:90b:55cb:b0:312:959:dc41 with SMTP id
- 98e67ed59e1d1-31c9f43747emr6022312a91.27.1752717791421; Wed, 16 Jul 2025
- 19:03:11 -0700 (PDT)
+	s=arc-20240116; t=1752718384; c=relaxed/simple;
+	bh=9NhBKwyrzpmtVxgSk23CnQtxjPIyKvPPzUT0pV/3PCE=;
+	h=Date:Message-ID:In-Reply-To:References:Mime-Version:From:To:Cc:
+	 Subject:Content-Type; b=Vpuiofq04j3QUfSVLWXanAbYAdRwNqByffC3lv+ZmBALiHXxuJSrwZHb8m+L8Dx/o9enZtv9pdmvyWx+mHqj7A7Plp5pOt+60v13D75zR1eUIarAZysJhyd65tfnvvbDkPB5QURey1hauVMYlX73nVhBjBUHtlEe2/vQdPuqeVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=160.30.148.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4bjGfX523rz6Fy5l;
+	Thu, 17 Jul 2025 10:12:52 +0800 (CST)
+Received: from xaxapp01.zte.com.cn ([10.88.99.176])
+	by mse-fl2.zte.com.cn with SMTP id 56H2CeDM090833;
+	Thu, 17 Jul 2025 10:12:40 +0800 (+08)
+	(envelope-from fan.yu9@zte.com.cn)
+Received: from mapi (xaxapp02[null])
+	by mapi (Zmail) with MAPI id mid32;
+	Thu, 17 Jul 2025 10:12:41 +0800 (CST)
+Date: Thu, 17 Jul 2025 10:12:41 +0800 (CST)
+X-Zmail-TransId: 2afa68785c19ffffffffe26-47038
+X-Mailer: Zmail v1.0
+Message-ID: <20250717101241665SpBGi_zaErkDSM2Rgmx3o@zte.com.cn>
+In-Reply-To: <CAAVpQUCDJOnwRhjcwFke2vTZQ8rymopC3hpyPteLA3cRgXFz9Q@mail.gmail.com>
+References: 20250716100006458kPWBPIJB6IdzWuUKlv4tF@zte.com.cn,CAAVpQUCDJOnwRhjcwFke2vTZQ8rymopC3hpyPteLA3cRgXFz9Q@mail.gmail.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250714084755.11921-1-jasowang@redhat.com> <20250716170406.637e01f5@kernel.org>
-In-Reply-To: <20250716170406.637e01f5@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 17 Jul 2025 10:03:00 +0800
-X-Gm-Features: Ac12FXyE_9vIZMY_ERg2TY_jtWvI4UypN_DhHze9LSPtUt7pnoEDW84dnljw5VE
-Message-ID: <CACGkMEvj0W98Jc=AB-g8G0J0u5pGAM4mBVCrp3uPLCkc6CK7Ng@mail.gmail.com>
-Subject: Re: [PATCH net-next V2 0/3] in order support for vhost-net
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: mst@redhat.com, eperezma@redhat.com, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, jonah.palmer@oracle.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+From: <fan.yu9@zte.com.cn>
+To: <kuniyu@google.com>
+Cc: <kuba@kernel.org>, <edumazet@google.com>, <ncardwell@google.com>,
+        <davem@davemloft.net>, <dsahern@kernel.org>, <pabeni@redhat.com>,
+        <horms@kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>,
+        <yang.yang29@zte.com.cn>, <xu.xin16@zte.com.cn>,
+        <tu.qiang35@zte.com.cn>, <jiang.kun2@zte.com.cn>,
+        <qiu.yutan@zte.com.cn>, <wang.yaxin@zte.com.cn>,
+        <he.peilin@zte.com.cn>
+Subject: =?UTF-8?B?UmU6IFtQQVRDSCBuZXQtbmV4dCB2Nl0gdGNwOiB0cmFjZSByZXRyYW5zbWl0IGZhaWx1cmVzIGluIHRjcF9yZXRyYW5zbWl0X3NrYg==?=
+Content-Type: multipart/mixed;
+	boundary="=====_001_next====="
+X-MAIL:mse-fl2.zte.com.cn 56H2CeDM090833
+X-TLS: YES
+X-SPF-DOMAIN: zte.com.cn
+X-ENVELOPE-SENDER: fan.yu9@zte.com.cn
+X-SPF: None
+X-SOURCE-IP: 10.5.228.133 unknown Thu, 17 Jul 2025 10:12:52 +0800
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 68785C24.001/4bjGfX523rz6Fy5l
 
-On Thu, Jul 17, 2025 at 8:04=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Mon, 14 Jul 2025 16:47:52 +0800 Jason Wang wrote:
-> > This series implements VIRTIO_F_IN_ORDER support for vhost-net. This
-> > feature is designed to improve the performance of the virtio ring by
-> > optimizing descriptor processing.
-> >
-> > Benchmarks show a notable improvement. Please see patch 3 for details.
->
-> You tagged these as net-next but just to be clear -- these don't apply
-> for us in the current form.
->
 
-Will rebase and send a new version.
 
-Thanks
+--=====_001_next=====
+Content-Type: multipart/related;
+	boundary="=====_002_next====="
+
+
+--=====_002_next=====
+Content-Type: multipart/alternative;
+	boundary="=====_003_next====="
+
+
+--=====_003_next=====
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+
+PiA+IHByaW50IGZtdDogInNrYmFkZHI9JXAgc2thZGRyPSVwIGZhbWlseT0lcyBzcG9ydD0laHUg
+ZHBvcnQ9JWh1IHNhZGRyPSVwSTQgZGFkZHI9JXBJNCBzYWRkcnY2PSVwSTZjIGRhZGRydjY9JXBJ
+NmMgc3RhdGU9JXMgZXJyPSVkIg0KPiA+DQo+ID4gU3VnZ2VzdGVkLWJ5OiBLdW5peXVraUl3YXNo
+aW1hIDxrdW5peXVAZ29vZ2xlLmNvbT4NCj4gDQo+IEkgZG9uJ3QgZGVzZXJ2ZSB0aGlzIHRhZy4g
+IChBbHNvLCBhIHNwYWNlIGJldHdlZW4gZmlyc3QvbGFzdCBuYW1lIGlzIG1pc3NpbmcuKQ0KPiAN
+Cj4gU3VnZ2VzdGVkLWJ5IGNhbiBiZSB1c2VkIHdoZW4gdGhlIGNvcmUgaWRlYSBpcyBwcm92aWRl
+ZCBieSBzb21lb25lLA0KPiBidXQgbm90IHdoZW4gc29tZW9uZSBqdXN0IHJldmlld3MgdGhlIHBh
+dGNoIGFuZCBwb2ludHMgb3V0IHNvbWV0aGluZw0KPiB3cm9uZy4NCj4gDQo+IEJ1dCBjb2RlLXdp
+c2UsIHRoZSBjaGFuZ2UgbG9va3MgZ29vZCB0byBtZS4NCj4gDQo+IFJldmlld2VkLWJ5OiBLdW5p
+eXVraSBJd2FzaGltYSA8a3VuaXl1QGdvb2dsZS5jb20+DQpIaSBLdW5peXVraSwNCg0KVGhhbmsg
+eW91IGZvciB5b3VyIHRob3JvdWdoIHJldmlldyBhbmQgZ3VpZGFuY2UgLSBpdCdzIGdyZWF0bHkg
+YXBwcmVjaWF0ZWQuDQpJJ2xsIHN1Ym1pdCB2NyB3aXRoIGNvcnJlY3RlZCB0YWdzIDopLg==
+
+
+--=====_003_next=====
+Content-Type: text/html ;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+
+PGRpdiBjbGFzcz0iemNvbnRlbnRSb3ciPjxwPiZndDsgJmd0OyBwcmludCBmbXQ6ICJza2JhZGRy
+PSVwIHNrYWRkcj0lcCBmYW1pbHk9JXMgc3BvcnQ9JWh1IGRwb3J0PSVodSBzYWRkcj0lcEk0IGRh
+ZGRyPSVwSTQgc2FkZHJ2Nj0lcEk2YyBkYWRkcnY2PSVwSTZjIHN0YXRlPSVzIGVycj0lZCI8L3A+
+PHA+Jmd0OyAmZ3Q7PC9wPjxwPiZndDsgJmd0OyBTdWdnZXN0ZWQtYnk6IEt1bml5dWtpSXdhc2hp
+bWEgJmx0O2t1bml5dUBnb29nbGUuY29tJmd0OzwvcD48cD4mZ3Q7Jm5ic3A7PC9wPjxwPiZndDsg
+SSBkb24ndCBkZXNlcnZlIHRoaXMgdGFnLiZuYnNwOyAoQWxzbywgYSBzcGFjZSBiZXR3ZWVuIGZp
+cnN0L2xhc3QgbmFtZSBpcyBtaXNzaW5nLik8L3A+PHA+Jmd0OyZuYnNwOzwvcD48cD4mZ3Q7IFN1
+Z2dlc3RlZC1ieSBjYW4gYmUgdXNlZCB3aGVuIHRoZSBjb3JlIGlkZWEgaXMgcHJvdmlkZWQgYnkg
+c29tZW9uZSw8L3A+PHA+Jmd0OyBidXQgbm90IHdoZW4gc29tZW9uZSBqdXN0IHJldmlld3MgdGhl
+IHBhdGNoIGFuZCBwb2ludHMgb3V0IHNvbWV0aGluZzwvcD48cD4mZ3Q7IHdyb25nLjwvcD48cD4m
+Z3Q7Jm5ic3A7PC9wPjxwPiZndDsgQnV0IGNvZGUtd2lzZSwgdGhlIGNoYW5nZSBsb29rcyBnb29k
+IHRvIG1lLjwvcD48cD4mZ3Q7Jm5ic3A7PC9wPjxwPiZndDsgUmV2aWV3ZWQtYnk6IEt1bml5dWtp
+IEl3YXNoaW1hICZsdDtrdW5peXVAZ29vZ2xlLmNvbSZndDs8L3A+PHA+SGkgS3VuaXl1a2ksPC9w
+PjxwPjxicj48L3A+PHA+VGhhbmsgeW91IGZvciB5b3VyIHRob3JvdWdoIHJldmlldyBhbmQgZ3Vp
+ZGFuY2UgLSBpdCdzIGdyZWF0bHkgYXBwcmVjaWF0ZWQuPC9wPjxwPkknbGwgc3VibWl0IHY3IHdp
+dGggY29ycmVjdGVkIHRhZ3MgOikuPGJyPjwvcD48L2Rpdj4=
+
+
+--=====_003_next=====--
+
+--=====_002_next=====--
+
+--=====_001_next=====--
 
 
