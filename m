@@ -1,123 +1,139 @@
-Return-Path: <netdev+bounces-207990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77678B0932B
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 19:26:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 445C3B0932E
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 19:27:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0DC5172155
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 17:26:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC86B1C470E5
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 17:27:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4840C298CCD;
-	Thu, 17 Jul 2025 17:26:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 233C02FD59D;
+	Thu, 17 Jul 2025 17:27:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oc0wDoxk"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4PMi9+5m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50FA62904
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 17:26:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A613298CCD
+	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 17:27:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752773208; cv=none; b=QcZHiuixG6UK12af07jNAqQRekWzfdzcP1C7Pc0vuLmyrSW3Kqfzq6dHmc9OeMkFc51/XYa/P0tsZCEAhVIMw7xq7xMLJoNrotlaKnPHok1UyRF5msy3G24TCIvJkhSUqo+K6VuBqeV1DTxp6isbZaOHDO3Vf+OLrj/kUe+dRLU=
+	t=1752773232; cv=none; b=lYo62LjFWeKMiS5ESoZvNysHh8YP4VStBwaKCzYo/AGF0lK4J/Ujy8Vf1+3XtKmvLCmifStKZRAYxggjzz0F2xOqOOalJFJIVko1TbdLDAFuPzFKPyFw6mCTWIaRhy7MZEaeVr3dG5YTVVwyFcsaSMxZK0/yaICzc3EDCJxBjoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752773208; c=relaxed/simple;
-	bh=qj6op9ooO9avhscROyh802YN1mGnSBC5p9SY+9e2RsI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JXXdGGLaq7KEBGaEKkVcI0ugG+/G97pe5KEJzWHFUkVVSb3vhVbG+uQldujIsWpSLEPItdeCJcpIi4NnSTaXGnksMnpgUEMNRrMk9zP1IDXukQYZprb8V+Trcv1ibGCsZQZTyHQP0sRQmROz6+yczovRFa+rGLTxurDaKf0ySJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oc0wDoxk; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-b3bad2f99f5so1091764a12.1
-        for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 10:26:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752773205; x=1753378005; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Vk0vPQ5JFT6HSzwpfrKNRusIzyrzK+g9arxPSMLBTvk=;
-        b=oc0wDoxkWHFQDBCOolsrg/jMCFfuqMPGyorTe8wl+y34x/sV3kUdiNaGJe6eX6KocV
-         XjsEac5FrCMinIKVYt+50Ma19L0H7GjIc2k9X59XddVe5Y2oNn31bEie5bj93vbVuXH3
-         Stm1AwtaoeNUTdB06+ddQCa8Wc8M8HK8MBDLg/FxESI4yXZsZ9NVp0gFQegK2sjli2Ja
-         nSiqfMYi9+WxdwprITzk/IKY6NipG5h1LFjerNJNYgITYv5h3Zb6TOt0Y3s9GqKhCz79
-         t07xKaDnRkImJo5tDw7Pln025cSKRrc+Ws9mLJqpx28ik16MsU5fQvQF2k67VMD9kgBz
-         wJxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752773205; x=1753378005;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Vk0vPQ5JFT6HSzwpfrKNRusIzyrzK+g9arxPSMLBTvk=;
-        b=ZaaQuQIFVPV40xhBY5S/lIPw3c9vw8wopkNXjY869/W6MNf9DYpIpDb6H8lnCn8HbX
-         eYyDGd72EGay6YC3lQWVfZF7qNoVnvt5KC8WMsg05ZYswCIJAuLcOKvmQdfqbFRBzZzL
-         YRXtWvcht0jrLjUO+LJ+9+Z6JEBuDhne7SC/bwy+XjzFvPN63xcd0xVhjR+Ya/ijAw1i
-         Lz6DxS+b2QpVr/xAkk9iP1rxizvUIquzmLtiij/0edpYGGz8TtNzS0zDqwiUb2JaFcKs
-         0FYLHxtNRM1Ta3t+7lk6+l+z3M+ryCtMIv2R0krwJWDxrdVfNjLLpOG/wyFBGXbaPKyu
-         oy2A==
-X-Forwarded-Encrypted: i=1; AJvYcCWN+fqLhrNDOZZWPEt5NNgVUlUXLAK8XmcRglj+zVQZu37Jo+ZpIu9SEDkaXsAcZRcOVtXlWNU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQSYnNiFqYfhgMAkN+oyTg9c3BJHQRMUTdELOGXh0+kqT8ruTJ
-	ZfsZYTAsJXKAG09ZnKFyRE/hLFWHlQJOiDjkHSOjsCrLIMQ7djrcpFpiRKqfsGFnGHR5uEmhGBv
-	QV4dGHcXvlmiiqzYrn8NcQnqnVpRa0rj7n61nllAz
-X-Gm-Gg: ASbGncv+tqR/eVRbslB6Qfku7ftYLapbM6CAtOdgLPcsh5r8mcqEoN2/S/nYHeYkkQn
-	RqN4N/SIrHk/WAdVyvda0XM14uOFfzQBtUVqE6hmJrLCwFFkIZ0S3kFOxR/ILB0sjkmbFT7noo2
-	2CDKAhYthzEBWxxei1dfbI7AzcqWUQjJ0llKUh3PYZnwj3/DT5/UNRD/YZR/urMW3u2C6siIgcj
-	WHCxH4C4SVHn2VMCMBkmPcgB3sOMU1PBcz8g7z7
-X-Google-Smtp-Source: AGHT+IEDE2E9koWe5tiexoDmWFLniUP7HmR4+lH9wASTsjepELYfnFxnLqTShLNvSMB8kFVLTopS4ykrCW26H+bj/GQ=
-X-Received: by 2002:a17:90b:5150:b0:311:1617:5bc4 with SMTP id
- 98e67ed59e1d1-31cc04409aamr708670a91.12.1752773205402; Thu, 17 Jul 2025
- 10:26:45 -0700 (PDT)
+	s=arc-20240116; t=1752773232; c=relaxed/simple;
+	bh=RENz42Q8seLIJ2aNX+RNzlOsfx9EeYhCpLCdFsetAWA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BZN2z6VNifgFR2YusNLRjX4RPj5ouOjKigBDXsBZJrMKtY4OQX+1yO0VR3jto6T9NHvvEIwEAdB1TLOOlSfmWHjwsRgXqyBFvwoZCCFY5gL3jLOX2DQY6VU5oFQbcgsMxG0RPlZzl2Q4xuxyQ8hSWTzPnUYetVWWOv8IWZGlDDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4PMi9+5m; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=CC5a/jcBKA0XOeQ219jfJn57rXndSHGi/bKJxTv6FpU=; b=4P
+	Mi9+5mlXX5SEbpDOkTTcD9Yu16e4OrfZB5v8uXPE4cGMjuCT+ITaHci30ESgZJsspcXQFOYQFdUwY
+	bVYLAE2dOF+zhgYthpk3UigHcCgHlRFu2+61pFZ7g1Ae1Ar/0tkwyiJNKaor0s6o5d8iGJbVZt4Bb
+	P2WuQNclJWpjaC4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ucSNr-001usR-OC; Thu, 17 Jul 2025 19:27:03 +0200
+Date: Thu, 17 Jul 2025 19:27:03 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	Philo Lu <lulie@linux.alibaba.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
+	Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Dust Li <dust.li@linux.alibaba.com>
+Subject: Re: [PATCH net-next] eea: Add basic driver framework for Alibaba
+ Elastic Ethernet Adaptor
+Message-ID: <161e69d8-eb8e-4a5d-9b4e-875fa6253c67@lunn.ch>
+References: <20250710112817.85741-1-xuanzhuo@linux.alibaba.com>
+ <7b957110-c675-438a-b0c2-ebc161a5d8e7@lunn.ch>
+ <1752644852.1458855-1-xuanzhuo@linux.alibaba.com>
+ <322af656-d359-44d8-9e40-4f997a8b7e0f@lunn.ch>
+ <1752733075.7055798-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250714143613.42184-1-daniel.sedlak@cdn77.com>
- <20250714143613.42184-2-daniel.sedlak@cdn77.com> <vlybtuctmjmsfkh4x455q4iokcme4zbowvolvti2ftmcysechr@ydj4uss6vkm2>
- <CAAVpQUBNoRgciFXVtqS2rxjCeD44JHOuDNcuN0J__guY33pfjw@mail.gmail.com> <924f57a8-deaa-4f7d-93ee-4030e2445a01@cdn77.com>
-In-Reply-To: <924f57a8-deaa-4f7d-93ee-4030e2445a01@cdn77.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Thu, 17 Jul 2025 10:26:33 -0700
-X-Gm-Features: Ac12FXxCQNMOK3G4zFCbiVejlOaKSkNVx_IcfAJdZCe4N5jxKb0BeR8m5SOxEPc
-Message-ID: <CAAVpQUDSnDLxjL2O0xbOJTuV9CSNTE4XMZQ1Z5wxNteeyiCMwg@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 1/2] tcp: account for memory pressure signaled
- by cgroup
-To: Daniel Sedlak <daniel.sedlak@cdn77.com>
-Cc: Shakeel Butt <shakeel.butt@linux.dev>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Neal Cardwell <ncardwell@google.com>, 
-	David Ahern <dsahern@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org, netdev@vger.kernel.org, 
-	Matyas Hurtik <matyas.hurtik@cdn77.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1752733075.7055798-1-xuanzhuo@linux.alibaba.com>
 
-On Thu, Jul 17, 2025 at 8:31=E2=80=AFAM Daniel Sedlak <daniel.sedlak@cdn77.=
-com> wrote:
->
-> On 7/16/25 8:07 PM, Kuniyuki Iwashima wrote:
-> >> Incrementing it here will give a very different semantic to this stat
-> >> compared to LINUX_MIB_TCPMEMORYPRESSURES. Here the increments mean the
-> >> number of times the kernel check if a given socket is under memcg
-> >> pressure for a net namespace. Is that what we want?
+> > That is not a very good explanation. Do you see any other system in
+> > Linux were the firmware works around bug in Linux drivers using the
+> > kernel version?
+> 
+> Actually, there is one, we noticed that the ena driver has a similar mechanism.
+> 
+> 	struct ena_admin_host_info
+> 
 > >
-> > I'm trying to decouple sk_memcg from the global tcp_memory_allocated
-> > as you and Wei planned before, and the two accounting already have the
-> > different semantics from day1 and will keep that, so a new stat having =
-a
-> > different semantics would be fine.
+> > You also need to think about enterprise kernels, like RedHat,
+> > Oracle. They don't give a truthful kernel version, they have thousands
+> > of patches on top fixing, and creating bugs. How will you handle that?
 > >
-> > But I think per-memcg stat like memory.stat.XXX would be a good fit
-> > rather than pre-netns because one netns could be shared by multiple
-> > cgroups and multiple sockets in the same cgroup could be spread across
-> > multiple netns.
->
-> I can move the counter to memory.stat.XXX in favor of this patch
+> > Please drop all this, and just fix the bugs in the driver.
+> 
+> 
+> Fixing bugs in Linux is, of course, the necessary work. However, if certain bugs
+> already exist and customers are using such drivers, there is a risk involved. We
+> can record these buggy versions in the DPU, and notify users via dmesg when they
+> initialize the driver.
 
-Please do so.  Per-netns stats could be confusing in some setup above.
+This then references the next point. What does 5.4.296 actually mean?
+It is mainline 5.4.296? Is it Debian 5.4.296 with just a few patches
+on top? Is it Redhat with 1000s of patches on top? Is it a vendor
+patch which broke it, or is mainline broken? If the vendor broke it,
+are you going to apply workarounds in your DPU for mainline which is
+not broken? Does you DPU tell the world it is applying a workaround,
+so somebody trying to debug the issue knows the DPU is working against
+them?
 
-Thanks!
+As you pointed out, there might be one driver amongst hundreds which
+reports the kernel version to the firmware. Does ENA actually do
+anything with it? I don't know. But since less an 1% of drivers
+actually do this, it cannot be a useful feature, because others would
+already be do it.
+
+> However, once we've identified the problem, we would prefer for the operation to
+> time out and exit, so that we can reload the new .ko module. In this process, we
+> may adjust the module parameters to reduce the originally large timeout value,
+> forcing it to exit faster. This use case is actually very helpful during our
+> development process and significantly improves our efficiency.
+
+No module parameters. You are doing development work, just use $EDITOR
+and change the timeout.
+
+> > So you will be submitting a patch for GregKH for every single stable
+> > kernel? That will be around 5 patches, every two weeks, for the next
+> > 30 years?
+> 
+> Of course we won't be doing that. Our plan is that whenever we update the code
+> — for example, fixing a bug and updating the version from 1.0.0 to 1.0.1, or
+> introducing a new feature and bumping the version to 1.0.2 — then when this
+> change is backported to stable releases, the version should also be backported
+> accordingly.
+
+So the version is useless. This has long been agreed, and we have been
+NACKing such versions for years.
+
+	Andrew
 
