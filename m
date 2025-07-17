@@ -1,133 +1,106 @@
-Return-Path: <netdev+bounces-207749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B74B5B086BB
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 09:32:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC1B0B0871F
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 09:40:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCB0C170373
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 07:32:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 655071A647A9
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 07:40:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43C9425E44B;
-	Thu, 17 Jul 2025 07:31:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB189253F18;
+	Thu, 17 Jul 2025 07:40:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="G1B9l6E0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JBXJe8xd"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C1025BEE5;
-	Thu, 17 Jul 2025 07:31:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75192215077;
+	Thu, 17 Jul 2025 07:40:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752737467; cv=none; b=VdO6psYG5/Rt9aujQqOCQ5ywX+o/OUij0yujgyUoHkeAv5B9/y5BHT6fDdicbXRbZw6l9KSzbTb+Bps0oNBt7vBsaXHFtGd8CNN52BSCvozw1PXrhTJ0vVc4sB6LSuhJs3Smnhm9mnSZUmARpBYmtcMBPclz0Ar5YKo9ttegRRQ=
+	t=1752738022; cv=none; b=QKYEEJ1YsC0y6GAz5LKaGs8vc/a1B+SFXAFJOomZZyOwXMR9AYDdaUi2zJK2E6xkJmmdEs5BpH9+cNK5UJ8veBknZDd8p2HJtWkzXJ7+J+auIiXHGRjVOz1VhvXENn2MzgyZHwHGAnQJ6WFkUB02GOO8QyFh/TJ5tlFJNJJ8yV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752737467; c=relaxed/simple;
-	bh=TMp26SXyORzd+n/zV0+SamSsljiSBhP4fSKZp0oH2GU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=OFHarwjBtNTr4Cej8FO7ZLokHlbaHwsCtcBKWPTXRAk28mf4fgzLT80o1BfFHfCW4bxpcGlkgV43xVjTrSuxAikYFNMUdA8dTB0HUetc4ShWHLtcFt49MtkyU8fwe3Xq1KXrBeNTTbYN/rVnGdiswsrTSHEO4kRH7cnJGZOzZos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=G1B9l6E0; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1752737462;
-	bh=TMp26SXyORzd+n/zV0+SamSsljiSBhP4fSKZp0oH2GU=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=G1B9l6E0K4QzPszx5EqFcLqac7SwGkUewuoUYM7o0g8/Cq/guuhTVla9eSF6qmcEg
-	 xxCI8QjK/ncbR3H9s28wwgLawwu816IK/fzRlZdmzheE6/9NTG5vfLgdQfM991znFy
-	 U+ALQGnOg4IkH9BnqHmd2cyQIOwl0yvfNHH3rAukI6kxFINsKU1lKDEENhha/2iwys
-	 tif8ZpmvwQmngBwAnrcErjv/E4tI3JyihuTPH3nu+G8nM6rST3CpNwzN2UHa7IUSif
-	 Ao54FDjFSHt2z2YKKVpefkDplaDYu/EuvndeJhS+NT5yx4AP3LHolsBwIv2CnE6Jpj
-	 iCHMxBoORSmQQ==
-Received: from [192.168.72.164] (210-10-213-150.per.static-ipl.aapt.com.au [210.10.213.150])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 53AAE69703;
-	Thu, 17 Jul 2025 15:31:02 +0800 (AWST)
-Message-ID: <2fbeb73a21dc9d9f7cffdb956c712ad28ecf1a7f.camel@codeconstruct.com.au>
-Subject: Re: [PATCH] net: mctp: Add MCTP PCIe VDM transport driver
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: YH Chung <yh_chung@aspeedtech.com>, "matt@codeconstruct.com.au"
- <matt@codeconstruct.com.au>, "andrew+netdev@lunn.ch"
- <andrew+netdev@lunn.ch>,  "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,  "kuba@kernel.org"
- <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, 
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, BMC-SW
- <BMC-SW@aspeedtech.com>
-Cc: Khang D Nguyen <khangng@amperemail.onmicrosoft.com>
-Date: Thu, 17 Jul 2025 15:31:02 +0800
-In-Reply-To: <SEZPR06MB5763125EBCAAA4F0C14C939E9051A@SEZPR06MB5763.apcprd06.prod.outlook.com>
-References: <20250714062544.2612693-1-yh_chung@aspeedtech.com>
-	 <a01f2ed55c69fc22dac9c8e5c2e84b557346aa4d.camel@codeconstruct.com.au>
-	 <SEZPR06MB57635C8B59C4B0C6053BC1C99054A@SEZPR06MB5763.apcprd06.prod.outlook.com>
-	 <27c18b26e7de5e184245e610b456a497e717365d.camel@codeconstruct.com.au>
-	 <SEZPR06MB5763AD0FC90DD6AF334555DA9051A@SEZPR06MB5763.apcprd06.prod.outlook.com>
-	 <7e8f741b24b1426ae71171dff253921315668bf1.camel@codeconstruct.com.au>
-	 <SEZPR06MB5763125EBCAAA4F0C14C939E9051A@SEZPR06MB5763.apcprd06.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1752738022; c=relaxed/simple;
+	bh=4lcM9h9lDrOLXAxtOBFPf6qDURXrVO/LIlAk6Bi0pR4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hiNySlKsJ9JdPofU3isEt77y7cUlAQYoIMk5aKB+0iISmqs3a9oAHOWxQgLXDpdzACTpUCNiYutW/kxyr9X8X7h1BWJzdi3gytwo7hkwWKkWW03WJ3dk6Vwwb3Tr5uqJTXkW78JKai6bD+nLjNrPdlCWd4tskCxAUhd/bPPeXxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JBXJe8xd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71D28C4CEEB;
+	Thu, 17 Jul 2025 07:40:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752738021;
+	bh=4lcM9h9lDrOLXAxtOBFPf6qDURXrVO/LIlAk6Bi0pR4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JBXJe8xdlHKEbbEtXeXnQ2AHFN/1R16Ha5IvjKPonYyD8mM9Dr6Gcc2mk6tkviIJK
+	 PCDN/Qe3aqRKI2m94R1SmqFTWmCDeEGiO0WOiUmkcn9FUaXoSMXPBOiV5hNDW6OZyQ
+	 xwKoJSVdYSOZHdrpgBsDpOr9idUMzJy9PrQOmUJsPNfJ6I99zcynDla4ZSTM6yF0Yl
+	 5vEcY9vGZU2gZVK6PrKFZ90F36B4T+3Dh7USet7cD6vXk4yUl8gPa8mmw5rnugzZph
+	 8gdn4HNloTG2u6uus+/wi+Hc4fKtZuO3gnrxuuhoXpLn8mbGMKLAewM7O50+dj/+1s
+	 q80U9XTZnmx7A==
+Date: Thu, 17 Jul 2025 09:40:18 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
+	richardcochran@gmail.com, claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, 
+	xiaoning.wang@nxp.com, andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, vadim.fedorenko@linux.dev, Frank.Li@nxp.com, 
+	shawnguo@kernel.org, s.hauer@pengutronix.de, festevam@gmail.com, fushi.peng@nxp.com, 
+	devicetree@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	imx@lists.linux.dev, kernel@pengutronix.de
+Subject: Re: [PATCH v2 net-next 01/14] dt-bindings: ptp: add NETC Timer PTP
+ clock
+Message-ID: <20250717-furry-hummingbird-of-growth-4f5f1d@kuoka>
+References: <20250716073111.367382-1-wei.fang@nxp.com>
+ <20250716073111.367382-2-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250716073111.367382-2-wei.fang@nxp.com>
 
-Hi YH,
+On Wed, Jul 16, 2025 at 03:30:58PM +0800, Wei Fang wrote:
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - pci1131,ee02
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  clocks:
+> +    maxItems: 1
+> +    description:
+> +      The reference clock of NETC Timer, if not present, indicates that
+> +      the system clock of NETC IP is selected as the reference clock.
 
-> From my perspective, the other MCTP transport drivers do make use of
-> abstraction layers that already exist in the kernel tree. For example,
-> mctp-i3c uses i3c_device_do_priv_xfers(), which ultimately invokes
-> operations registered by the underlying I3C driver. This is
-> effectively an abstraction layer handling the hardware-specific
-> details of TX packet transmission.
->=20
-> In our case, there is no standard interface=E2=80=94like those for
-> I2C/I3C=E2=80=94that serves PCIe VDM.
+If not present...
 
-But that's not what you're proposing here - your abstraction layer
-serves one type of PCIe VDM messaging (MCTP), for only one PCIe VDM MCTP
-driver.
+> +
+> +  clock-names:
 
-If you were proposing adding a *generic* PCIe VDM interface, that is
-suitable for all messaging types (not just MCTP), and all PCIe VDM
-hardware (not just ASPEED's) that would make more sense. But I think
-that would be a much larger task than what you're intending here.
+... this also is not present...
 
-Start small. If we have other use-cases for an abstraction layer, we can
-introduce it at that point - where we have real-world design inputs for
-it.
+> +    description:
+> +      NETC Timer has three reference clock sources, set TMR_CTRL[CK_SEL]
+> +      by parsing clock name to select one of them as the reference clock.
+> +      The "system" means that the system clock of NETC IP is used as the
+> +      reference clock.
+> +      The "ccm_timer" means another clock from CCM as the reference clock.
+> +      The "ext_1588" means the reference clock comes from external IO pins.
+> +    enum:
+> +      - system
 
-Regardless, we have worked out that there is nothing to actually abstract
-*anyway*.
+So what does system mean?
 
-> > The direct approach would definitely be preferable, if possible.
-> >=20
-> Got it. Then we'll remove the kernel thread and do TX directly.
+Best regards,
+Krzysztof
 
-Super!
-
-> > Excellent question! I suspect we would want a four-byte representation,
-> > being:
-> >=20
-> > [0]: routing type (bits 0:2, others reserved)
-> > [1]: segment (or 0 for non-flit mode)
-> > [2]: bus
-> > [3]: device / function
-> >=20
-> > which assumes there is some value in combining formats between flit- an=
-d
-> > non-flit modes. I am happy to adjust if there are better ideas.
-> >=20
-> This looks good to me=E2=80=94thanks for sharing!
-
-No problem! We'll still want a bit of wider consensus on this, because
-we cannot change it once upstreamed.
-
-Cheers,
-
-
-Jeremy
 
