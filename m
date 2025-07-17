@@ -1,94 +1,208 @@
-Return-Path: <netdev+bounces-208006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BCF3B094E0
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 21:22:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A729B094E6
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 21:22:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F446587810
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 19:22:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3BB41C800C0
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 19:22:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41C6F2FE389;
-	Thu, 17 Jul 2025 19:19:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8B312FF46E;
+	Thu, 17 Jul 2025 19:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OgvTO6yi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IaWqBezb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 162322FE321;
-	Thu, 17 Jul 2025 19:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 319BF2FE32F
+	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 19:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752779988; cv=none; b=CwBLYEp/Z7FZFD1Dl9HkI907trlwpN9RLPwd6UdWRZu1e9V+5EztsRmKB+a+vRJjY7rct3amkSURUfZi+8UmXlQZJbCq650sTGdSjFeNx7N7+JThXkp6Z/kFGm1tBHj81H+LhR03ypF11fjFQOMp8255RkEPVys277B6ArisjEc=
+	t=1752780030; cv=none; b=LVOZ6oSUboiwSPlqRiva65fxzbn5lSOncp02QiHuXt3ulLXNwMbrljL1FK9AC1/Ig8iYeRSRaaXkV9HPdgA3snI/n++9jTe6VvspkI8TMihurcqCnUbfSaWCtXmip5Kfb4xTP+u99zUVwFrprQZce10jxtfcGTS0CWnH7fp8p9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752779988; c=relaxed/simple;
-	bh=pb/j8Q5qVbV5DQi8rmEfVT/4W8kYDiyQSOcCQSIcqqU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=twkO07wy0JH645OCbo4KpHvtvHkzubLSAFRlvB2gq0pgpgd376ikGNBfU/1GiOW/tos+pVg3OBWlZRfCaQ/H5JoTIuFz/NMyK5Dk8Ook9ryaChGSh3QDZVjSXRoCCHquh1nbJYI05QlUGJ5yDkvUG8Xhs1PbdBfiz8N8Nz/76aE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OgvTO6yi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C215C4CEE3;
-	Thu, 17 Jul 2025 19:19:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752779987;
-	bh=pb/j8Q5qVbV5DQi8rmEfVT/4W8kYDiyQSOcCQSIcqqU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=OgvTO6yia1qhArh65Z/fn/iEOXQwmAdbq99QDPNyrvv08foI3wcNIfKnHvBYyvpvf
-	 Qj4/e1K/BzxSmWcWtbpIlOVIrPuq4WfDDIhy9vYPq5Vh3sjCvTcej8QKndIhW58qtZ
-	 EOY3gmCW75pztjT2Zw46gy7DpJZK2LTz/n4od9iq2Z52dg+IZr8pgFJtFEwZaLwiXx
-	 eqAKB2noQFAXJZeU+XERI4lZ9pzgcMwESzku1XLqKTTSH6/Z4q6BGhddZn2P3vz65M
-	 ZJ54MtEvo2d3dGNMkbj7YiT6efUqm3zaZPZjG7d7HU9AaXoTWMv++6a7jUoVVA6paG
-	 alL99IubscXjQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD17383BAC1;
-	Thu, 17 Jul 2025 19:20:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1752780030; c=relaxed/simple;
+	bh=qHNE6ZJsNsPHrMLOVMlNPJ1T9cDi7uaDRJUDA35BTb0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=BRUkCCVK6gOnZCiKIMDI73TtYfAqCPy522d7OlAyldcA9/V+pvwl+OExDuaPMToq0XR+7g1ZAfqyQEnL/iESYO8Orxqnqa7rEbHCvQ6f/SrcZ0ZRxM88jmZWwHbNvH4qbEyLtSIMPyAA3FXN2sdQq7iykwz88Zvhuth7hQco7w4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IaWqBezb; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-748fd21468cso1287777b3a.1
+        for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 12:20:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752780028; x=1753384828; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=HR8MX3mhC9f/vMePEVzAQse8ycjHGoEB8XupYWNC4G4=;
+        b=IaWqBezbXIkLjDNaoGB+MlwdD1pruj2ZbzfmKZ2QiGS5h0VaJ3b0XdeWAJWdJYru22
+         6yoTT4tDf2k0ufGvFa+x7O9AW6pO+14NEQ+sLnx5SI1rVbzAcOsH4hytR6lH2RY96wwW
+         L8PPDGlbtOFcvsZyOnz4CVC801aBxgfbICL/wHYuUYkA13noBKhVtcwECP1rnZJEiqaC
+         FNetg/p8flCbis+oVAlmMOutQN9warI1JFqRGfu7iUMvqxPdmVgNNWY+wqsrPmoQryNk
+         pNiSHamVHUKClXyPcKuI33C7EYTpSjaBN9AOMn/2tG1vwa5col1nraiLlkt/basc/HSa
+         6bvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752780028; x=1753384828;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HR8MX3mhC9f/vMePEVzAQse8ycjHGoEB8XupYWNC4G4=;
+        b=Io+J3ZZViGrlpLnOJokeRyiARSf4PfNuycu2lfqjhy8TBWAXvCfZABwbw0xSw2eccK
+         FuPYkecuF8E7fbPYw+cTJo3mdApS19LgjbKuaPtnSp0Xafg/QCGHhcJV4hPGkUAllF7z
+         EZ4A+nKD41qSLrAlFpz27g3VQ8MBqXLELREGK71+iUP6a4znqYHFIokfN4wH5lz0FYmW
+         /nopwzqv3rGcoYpBOQ9WFEfXKkJV1aqXCEfumhdyPrGUbF3A0ZQJok+8uUA2YSKuc7XK
+         qwm/yxXk1FazZezdeExHZ/5XAp5eDH4NSdsNYUlskGUmEcAZ7b9pxnaRUDE0LaFLOAIC
+         2CWw==
+X-Gm-Message-State: AOJu0YzupEwnJYUHnntYzEo6MfBxBKaUx+/bJ9aT25uDfITUhDrSYFaQ
+	/Ndh7jHGLnywPVzavuwumMEZCWrQbtUfa3mzZNhAsQnUb7SvKQxbdeevaLu+4rRfe5NyqqruQqN
+	4SnegMurhb5R5xVPXrsmwg9H9UchJRFF5jMC409NVFNVgtHt82x23TXmqwXhvd/QdpswQteuO/D
+	WKHmrqk3PpBP05pv2BHEpMzO0HgROf2hWdU33kzpR5b2TOoFhAaLGAU+Cgn3wIkF0=
+X-Google-Smtp-Source: AGHT+IEtBesc2N/Fs+i9lOTd8XbLy9wXA+Q1KV0da06KAym2OQZ4lDK2l1GvqB7GpOLTPoD+KcroaFJ0N6GKz0JNag==
+X-Received: from pfbki26.prod.google.com ([2002:a05:6a00:949a:b0:748:f3b0:4db2])
+ (user=hramamurthy job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:985:b0:74d:247f:faf1 with SMTP id d2e1a72fcca58-756e819fa32mr11350357b3a.6.1752780028251;
+ Thu, 17 Jul 2025 12:20:28 -0700 (PDT)
+Date: Thu, 17 Jul 2025 19:20:24 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net/mlx5e: TX, Fix dma unmapping for devmem tx
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175278000627.2046530.16940004452982858685.git-patchwork-notify@kernel.org>
-Date: Thu, 17 Jul 2025 19:20:06 +0000
-References: <1752649242-147678-1-git-send-email-tariqt@nvidia.com>
-In-Reply-To: <1752649242-147678-1-git-send-email-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
- leon@kernel.org, mbloch@nvidia.com, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- dtatulea@nvidia.com, almasrymina@google.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
+Message-ID: <20250717192024.1820931-1-hramamurthy@google.com>
+Subject: [PATCH net v2] gve: Fix stuck TX queue for DQ queue format
+From: Harshitha Ramamurthy <hramamurthy@google.com>
+To: netdev@vger.kernel.org
+Cc: jeroendb@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	pkaligineedi@google.com, willemb@google.com, joshwash@google.com, 
+	ziweixiao@google.com, jfraker@google.com, awogbemila@google.com, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+	Tim Hostetler <thostet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hello:
+From: Praveen Kaligineedi <pkaligineedi@google.com>
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+gve_tx_timeout was calculating missed completions in a way that is only
+relevant in the GQ queue format. Additionally, it was attempting to
+disable device interrupts, which is not needed in either GQ or DQ queue
+formats.
 
-On Wed, 16 Jul 2025 10:00:42 +0300 you wrote:
-> From: Dragos Tatulea <dtatulea@nvidia.com>
-> 
-> net_iovs should have the dma address set to 0 so that
-> netmem_dma_unmap_page_attrs() correctly skips the unmap. This was
-> not done in mlx5 when support for devmem tx was added and resulted
-> in the splat below when the platform iommu was enabled.
-> 
-> [...]
+As a result, TX timeouts with the DQ queue format likely would have
+triggered early resets without kicking the queue at all.
 
-Here is the summary with links:
-  - [net-next] net/mlx5e: TX, Fix dma unmapping for devmem tx
-    https://git.kernel.org/netdev/net-next/c/870bc1aaa0f9
+This patch drops the check for pending work altogether and always kicks
+the queue after validating the queue has not seen a TX timeout too
+recently.
 
-You are awesome, thank you!
+Cc: stable@vger.kernel.org
+Fixes: 87a7f321bb6a ("gve: Recover from queue stall due to missed IRQ")
+Co-developed-by: Tim Hostetler <thostet@google.com>
+Signed-off-by: Tim Hostetler <thostet@google.com>
+Signed-off-by: Praveen Kaligineedi <pkaligineedi@google.com>
+Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
+---
+Changes in v2:
+-Refactor out gve_tx_timeout_try_q_kick to remove goto statements
+ (Jakub Kicinski)
+---
+ drivers/net/ethernet/google/gve/gve_main.c | 67 ++++++++++++++++++++++++-------------------
+ 1 file changed, 37 insertions(+), 30 deletions(-)
+
+diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
+index c3791cf23c87..2fdb58646132 100644
+--- a/drivers/net/ethernet/google/gve/gve_main.c
++++ b/drivers/net/ethernet/google/gve/gve_main.c
+@@ -1916,49 +1916,56 @@ static void gve_turnup_and_check_status(struct gve_priv *priv)
+ 	gve_handle_link_status(priv, GVE_DEVICE_STATUS_LINK_STATUS_MASK & status);
+ }
+ 
+-static void gve_tx_timeout(struct net_device *dev, unsigned int txqueue)
++static struct gve_notify_block *gve_get_tx_notify_block(struct gve_priv *priv,
++							unsigned int txqueue)
+ {
+-	struct gve_notify_block *block;
+-	struct gve_tx_ring *tx = NULL;
+-	struct gve_priv *priv;
+-	u32 last_nic_done;
+-	u32 current_time;
+ 	u32 ntfy_idx;
+ 
+-	netdev_info(dev, "Timeout on tx queue, %d", txqueue);
+-	priv = netdev_priv(dev);
+ 	if (txqueue > priv->tx_cfg.num_queues)
+-		goto reset;
++		return NULL;
+ 
+ 	ntfy_idx = gve_tx_idx_to_ntfy(priv, txqueue);
+ 	if (ntfy_idx >= priv->num_ntfy_blks)
+-		goto reset;
++		return NULL;
++
++	return &priv->ntfy_blocks[ntfy_idx];
++}
++
++static bool gve_tx_timeout_try_q_kick(struct gve_priv *priv,
++				      unsigned int txqueue)
++{
++	struct gve_notify_block *block;
++	u32 current_time;
+ 
+-	block = &priv->ntfy_blocks[ntfy_idx];
+-	tx = block->tx;
++	block = gve_get_tx_notify_block(priv, txqueue);
++
++	if (!block)
++		return false;
+ 
+ 	current_time = jiffies_to_msecs(jiffies);
+-	if (tx->last_kick_msec + MIN_TX_TIMEOUT_GAP > current_time)
+-		goto reset;
++	if (block->tx->last_kick_msec + MIN_TX_TIMEOUT_GAP > current_time)
++		return false;
+ 
+-	/* Check to see if there are missed completions, which will allow us to
+-	 * kick the queue.
+-	 */
+-	last_nic_done = gve_tx_load_event_counter(priv, tx);
+-	if (last_nic_done - tx->done) {
+-		netdev_info(dev, "Kicking queue %d", txqueue);
+-		iowrite32be(GVE_IRQ_MASK, gve_irq_doorbell(priv, block));
+-		napi_schedule(&block->napi);
+-		tx->last_kick_msec = current_time;
+-		goto out;
+-	} // Else reset.
++	netdev_info(priv->dev, "Kicking queue %d", txqueue);
++	napi_schedule(&block->napi);
++	block->tx->last_kick_msec = current_time;
++	return true;
++}
+ 
+-reset:
+-	gve_schedule_reset(priv);
++static void gve_tx_timeout(struct net_device *dev, unsigned int txqueue)
++{
++	struct gve_notify_block *block;
++	struct gve_priv *priv;
+ 
+-out:
+-	if (tx)
+-		tx->queue_timeout++;
++	netdev_info(dev, "Timeout on tx queue, %d", txqueue);
++	priv = netdev_priv(dev);
++
++	if (!gve_tx_timeout_try_q_kick(priv, txqueue))
++		gve_schedule_reset(priv);
++
++	block = gve_get_tx_notify_block(priv, txqueue);
++	if (block)
++		block->tx->queue_timeout++;
+ 	priv->tx_timeo_cnt++;
+ }
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.50.0.727.gbf7dc18ff4-goog
 
 
