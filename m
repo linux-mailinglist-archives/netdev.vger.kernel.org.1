@@ -1,63 +1,50 @@
-Return-Path: <netdev+bounces-207756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E806B08741
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 09:45:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B03D6B087C8
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 10:19:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 644CD174B00
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 07:45:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E0953BC7FC
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 08:19:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A0D2265637;
-	Thu, 17 Jul 2025 07:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7375B2798EA;
+	Thu, 17 Jul 2025 08:19:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DvVMXJHL"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03EEB2652A4;
-	Thu, 17 Jul 2025 07:44:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 495B435957;
+	Thu, 17 Jul 2025 08:19:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752738275; cv=none; b=QnciFdzLPC/CfTJmNb9P45RT/fa8oIe+NMTQkboBwGRVA9W6NpzMMBiahT7tKGvuMP3G15kPCRQ0aVGvX/NpURBOuwXOuTGl5V+60YoVUpJsK1retUYOJRy7P49KrfG7aOGPzL4OMKgGXEM5TXOeyRInKTUuE118r97Sc/DFO8w=
+	t=1752740386; cv=none; b=jPi0Caws34RXQY3yb+F/w0UrTfwZ5bTlTtqR04FGwCvLx1gUZPcQvNiLz2HFVPaQc2Ost2B32eNbgb3Zc8QXeNf88nDtgL9eMvaqML4/V4eTTpJCdIpEmU4tmXY4HpQO3LdZ7pu+0nmdOI4YCXi1oWQUxPSIrTe1YIf+GarL/R4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752738275; c=relaxed/simple;
-	bh=FJLPW+xkiOM0Q/3rwnBQCTizQkRpW2AF55c+O40YFD0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hTaE9bvijFaBBMdr1OAkoqr4Zvsg63PGS9/8hLrnKKEsYHeuDNHcQQZ3ODtZDHengBRTs85D3NZqAjImXTXAXW9AHBZOgX6oG1s3/lekZIb/x/321ejwSEy1y5A/hOLQXQpBS9Ta381VoQ8otG50dm0nBvp54ieq6QOnmvmMk/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bjPzm6693z6L5H4;
-	Thu, 17 Jul 2025 15:43:16 +0800 (CST)
-Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
-	by mail.maildlp.com (Postfix) with ESMTPS id 41D99140257;
-	Thu, 17 Jul 2025 15:44:30 +0800 (CST)
-Received: from china (10.220.118.114) by frapeml500005.china.huawei.com
- (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 17 Jul
- 2025 09:44:16 +0200
-From: Gur Stavi <gur.stavi@huawei.com>
-To: <kuba@kernel.org>
-CC: <andrew+netdev@lunn.ch>, <christophe.jaillet@wanadoo.fr>,
-	<corbet@lwn.net>, <davem@davemloft.net>, <edumazet@google.com>,
-	<fuguiming@h-partners.com>, <gongfan1@huawei.com>, <guoxin09@huawei.com>,
-	<gur.stavi@huawei.com>, <helgaas@kernel.org>, <horms@kernel.org>,
-	<jdamato@fastly.com>, <lee@trager.us>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <luosifu@huawei.com>,
-	<meny.yossefi@huawei.com>, <mpe@ellerman.id.au>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <przemyslaw.kitszel@intel.com>,
-	<shenchenyang1@hisilicon.com>, <shijing34@huawei.com>, <sumang@marvell.com>,
-	<vadim.fedorenko@linux.dev>, <wulike1@huawei.com>, <zhoushuai28@huawei.com>,
-	<zhuyikai1@h-partners.com>
-Subject: Re: [PATCH net-next v09 1/8] hinic3: Async Event Queue interfaces
-Date: Thu, 17 Jul 2025 11:02:29 +0300
-Message-ID: <20250717080229.1054761-1-gur.stavi@huawei.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250716183208.26b87aa8@kernel.org>
-References: <20250716183208.26b87aa8@kernel.org>
+	s=arc-20240116; t=1752740386; c=relaxed/simple;
+	bh=Md5WNw8ujg/pxCAl4moKw+t7jhdSwpRRG1PB6BznJMU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=dnrMtkbZYkmD4madjBEfMChHxG+MIw17sDfgqxvyTPLCzMvQSsCcqqSl8aQUZFn7digp5xcvljdZ3+DFyNhIry+YbajImDDWnkWgc/mFokdludhNMDPyZBZONKzzUJVPVAkzWN0tTVc4BL7kj4E0uYb+XIT0R8EXZJxBhPoUByw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DvVMXJHL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 154B7C4CEE3;
+	Thu, 17 Jul 2025 08:19:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752740386;
+	bh=Md5WNw8ujg/pxCAl4moKw+t7jhdSwpRRG1PB6BznJMU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=DvVMXJHLkXKGVj6QV7IONQPsfCfZM9+GJoQrf0J3rYLKYB0MEQLXm+PaFsXutWzR3
+	 QYy9ZZaqCsopG02lEyaFMye8SuTD4E75lwegyh4yz0hcaYyqEOLEhD5Ay2/Zqdn52B
+	 rYaG7jnKOSZ//bg1nR4KyRgN5xUBVwNFwLivqRudU5iElxKlHvxDZntp1Pcxex4PfN
+	 xNR7gGFBmLWVDvzCg+mupYaFjZc/NnREs7XOGLKrCO5xyLZVBPEK/Rcn599CPlzixe
+	 Q76fb07iUzE1jRgQVsyke89wnokH7P3NmNG/p1ujY+AW5h/MtWbo/ZVTRWdlVbSImO
+	 2MvQ8hk5tkqAg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F65383BA38;
+	Thu, 17 Jul 2025 08:20:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,56 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- frapeml500005.china.huawei.com (7.182.85.13)
+Subject: Re: [PATCH net] net: fix segmentation after TCP/UDP fraglist GRO
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175274040626.1485472.15419586586867820749.git-patchwork-notify@kernel.org>
+Date: Thu, 17 Jul 2025 08:20:06 +0000
+References: <20250705150622.10699-1-nbd@nbd.name>
+In-Reply-To: <20250705150622.10699-1-nbd@nbd.name>
+To: Felix Fietkau <nbd@nbd.name>
+Cc: netdev@vger.kernel.org, edumazet@google.com, ncardwell@google.com,
+ kuniyu@google.com, davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, willemb@google.com,
+ richardbgobert@gmail.com, linux-kernel@vger.kernel.org
 
-On Tue, 15 Jul 2025 08:28:36 +0800 Fan Gong wrote:
-> +/* Data provided to/by cmdq is arranged in structs with little endian fields but
-> + * every dword (32bits) should be swapped since HW swaps it again when it
-> + * copies it from/to host memory. This is a mandatory swap regardless of the
-> + * CPU endianness.
+Hello:
 
-> This comment makes no sense, FWIW. The device writes a byte steam
-> to host memory. For what you're saying to make sense the device would
-> have to intentionally switch the endian based on the host CPU.
-> And if it could do that why wouldn't it do it in the opposite
-> direction, avoiding the swap ? :/
->
-> I suppose the device is always writing in be32 words, and you should
-> be converting from be32.
->
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Lets assume the following is a simplified PACKED cmdq struct:
+On Sat,  5 Jul 2025 17:06:21 +0200 you wrote:
+> Since "net: gro: use cb instead of skb->network_header", the skb network
+> header is no longer set in the GRO path.
+> This breaks fraglist segmentation, which relies on ip_hdr()/tcp_hdr()
+> to check for address/port changes.
+> Fix this regression by selectively setting the network header for merged
+> segment skbs.
+> 
+> [...]
 
-struct some_cmdq {
-	__le16 a;
-	__le32 b;
-	__le16 c;
-};
+Here is the summary with links:
+  - [net] net: fix segmentation after TCP/UDP fraglist GRO
+    https://git.kernel.org/netdev/net/c/9f735b6f8a77
 
-Lets denote x0 as lsb of field x. x3 as msb of 32 bits field.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Byte stream in CPU memory is:
-a0, a1, b0, b1, b2, b3, c0, c1
 
-The HW expects the following byte stream:
-b1, b0, a1, a0, c1, c0, b3 ,b2
-
-A native struct would be:
-
-struct some_cmdq {
-	__be16 b_lo;
-	__be16 a;
-	__be16 c;
-	__be16 b_hi;
-}
-
-It does not make sense from code readability perspective.
-While this is a simplified example, there are similar problems in real cmdq
-structs.
-Also group of fields that makes sense (based on their names) for being
-logically near each other become separated in "native" big endian arrangements.
-
-This is a case where driver need to compensate for bad HW decisions.
 
