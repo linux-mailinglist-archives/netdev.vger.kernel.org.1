@@ -1,86 +1,127 @@
-Return-Path: <netdev+bounces-207886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE991B08E6A
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 15:39:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DEAAB08E69
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 15:39:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7443EA600EC
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 13:38:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEE20560C48
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 13:39:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 262CA2EBDE2;
-	Thu, 17 Jul 2025 13:39:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D27B2EBDD0;
+	Thu, 17 Jul 2025 13:38:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Q+KJh1Wq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bOKwqE/2"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6F42EBDC6;
-	Thu, 17 Jul 2025 13:39:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 112F92EBB9C;
+	Thu, 17 Jul 2025 13:38:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752759545; cv=none; b=cZRAnmILLx+mEx4KcekwF8MQDMY2bwD2pxVVnhfV6/4SOMzZ1BWc0CXAfaw8hIxt2I+w2QaxQAQS2vvVRobnOkzocs8uGiDr7bB+tKRuK73BD7dglvvSRcL5leFLR1VROm9kFL30uGxD2rHesLdYodilvlo+rdFyfiFNvbe9Z4M=
+	t=1752759537; cv=none; b=mOUGAhhfMFAG0fWxwi//qQSa2M/ee3gwiI05BKfWONXvECXyWFh/6A42hpNowd8newDHPvOv+CYYKtI+4Afr3eamoUZuYvapJAPcy20w+GAp/eLD3skTwiL3SGZYcbxy5NfZMB7aPedJbOFOOJSt7PsxcIbh9wa2J+MatYMCqbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752759545; c=relaxed/simple;
-	bh=yLN7VF//2CVZZPmoMJ7VBKPuAA7aA4dv0y6POh5P3tM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nwgVbnsNUoq2oQaXMw2DjU31zXzTKf1L9ZCuH7TaGYBPEJNLqx2b88oD18zyn3Nec45vQqGJGZ+xcNC6njW2Ai1rbEsR+LinfYuCFe4XvpbTbsdjxxYEk7Nvvs2eQRPDwW0fK435KoHPzd6AjaGe9W4VmDSo2IRhcweu0sv6cKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Q+KJh1Wq; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=lfFBam5+7+XtNm3Zq2vi9q8MGJfF20M+DYWOSgZx/tw=; b=Q+KJh1WqNBwy2WWan3Kc7Aj2yo
-	rAwNzQN0U4ZpVzpocnC7ExYI46KBa7Arun4/bG7JTVA/RIatOEG4UBaREuYWToLZoyKyRKD5qaABD
-	rToD3q+xu/avOqwMy8RTYPoWBLrRvTpukCshNTCkODKC8R6/9iS7Zec5Hr5BNkIZ8ddM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ucOov-001tOr-Un; Thu, 17 Jul 2025 15:38:45 +0200
-Date: Thu, 17 Jul 2025 15:38:45 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Luo Jie <quic_luoj@quicinc.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 1/3] net: phy: qcom: Add PHY counter support
-Message-ID: <a19b72e5-bcee-46c8-9c6e-234af9b103b9@lunn.ch>
-References: <20250715-qcom_phy_counter-v3-0-8b0e460a527b@quicinc.com>
- <20250715-qcom_phy_counter-v3-1-8b0e460a527b@quicinc.com>
+	s=arc-20240116; t=1752759537; c=relaxed/simple;
+	bh=3LZrO8vMbZGyvhhgv5vG1/Sq/nO68bbrkYJu5hEQK7M=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V9xupcb2mip/7u+6MIFU+TIn8+QRPcqNOgt0cYWpslAPpkgJDv8WTlacaLSgix4NsrPp3CJ3oqasIWR3NecKFSszMDd95iHIeJQ+E3NR2+0Optx1n7TSYyRhp1lLE/l45JrSvKrF04r+XRec/Cl6svmoCjBWvB+KRfwXyG4Sqts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bOKwqE/2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E7C6C4CEE3;
+	Thu, 17 Jul 2025 13:38:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752759536;
+	bh=3LZrO8vMbZGyvhhgv5vG1/Sq/nO68bbrkYJu5hEQK7M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bOKwqE/2h5EFdBOAmtOVUSOX3H2z6iexUQiJezwDubzkhywnXGSiu5F13luHO4Wfy
+	 SIBWiVlR8nAve0P5sd4efmvlOZzkYnKL2bzlch5xxTXm+52//uOLBfOv+yXcVLo7am
+	 R8ZqIg6U4ZlfHKuaLZWytk/es0olcHLT1AS/7qAyPPWfahBjIXMBi81eklTWONf7KU
+	 zhhap/qXBGrJWxa5tsr948p2A0FleTkvtJkJflShL3Bt+mV2LTaWNA0nkHRpbBQbX5
+	 wdNmkCM1ZUvb83ebbnSjbqgRUZEMdLwu6RLcNFAluo6neHcY2ze9AJKSVG7ToJphTO
+	 tQ+3yxPa0Ub+g==
+Date: Thu, 17 Jul 2025 06:38:54 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>
+Cc: "alok.a.tiwari@oracle.com" <alok.a.tiwari@oracle.com>,
+ "pctammela@mojatatu.com" <pctammela@mojatatu.com>, "horms@kernel.org"
+ <horms@kernel.org>, "donald.hunter@gmail.com" <donald.hunter@gmail.com>,
+ "xandfury@gmail.com" <xandfury@gmail.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "dave.taht@gmail.com" <dave.taht@gmail.com>,
+ "pabeni@redhat.com" <pabeni@redhat.com>, "jhs@mojatatu.com"
+ <jhs@mojatatu.com>, "stephen@networkplumber.org"
+ <stephen@networkplumber.org>, "xiyou.wangcong@gmail.com"
+ <xiyou.wangcong@gmail.com>, "jiri@resnulli.us" <jiri@resnulli.us>,
+ "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+ <edumazet@google.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "ast@fiberby.net" <ast@fiberby.net>, "liuhangbin@gmail.com"
+ <liuhangbin@gmail.com>, "shuah@kernel.org" <shuah@kernel.org>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+ "ij@kernel.org" <ij@kernel.org>, "ncardwell@google.com"
+ <ncardwell@google.com>, "Koen De Schepper (Nokia)"
+ <koen.de_schepper@nokia-bell-labs.com>, "g.white@cablelabs.com"
+ <g.white@cablelabs.com>, "ingemar.s.johansson@ericsson.com"
+ <ingemar.s.johansson@ericsson.com>, "mirja.kuehlewind@ericsson.com"
+ <mirja.kuehlewind@ericsson.com>, "cheshire@apple.com" <cheshire@apple.com>,
+ "rs.ietf@gmx.at" <rs.ietf@gmx.at>, "Jason_Livingood@comcast.com"
+ <Jason_Livingood@comcast.com>, "vidhi_goel@apple.com"
+ <vidhi_goel@apple.com>
+Subject: Re: [PATCH v23 net-next 1/6] sched: Struct definition and parsing
+ of dualpi2 qdisc
+Message-ID: <20250717063854.52ea7371@kernel.org>
+In-Reply-To: <PAXPR07MB7984AFFA35DA43805C02E542A351A@PAXPR07MB7984.eurprd07.prod.outlook.com>
+References: <20250713105234.11618-1-chia-yu.chang@nokia-bell-labs.com>
+	<20250713105234.11618-2-chia-yu.chang@nokia-bell-labs.com>
+	<20250716164547.6d415024@kernel.org>
+	<PAXPR07MB7984AFFA35DA43805C02E542A351A@PAXPR07MB7984.eurprd07.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250715-qcom_phy_counter-v3-1-8b0e460a527b@quicinc.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 15, 2025 at 07:02:26PM +0800, Luo Jie wrote:
-> Add PHY counter functionality to the shared library. The implementation
-> is identical for the current QCA807X and QCA808X PHYs.
+On Thu, 17 Jul 2025 07:16:21 +0000 Chia-Yu Chang (Nokia) wrote:
+> Thanks for feedback.
+> May I ask is it fine if I put the enum like below?
 > 
-> The PHY counter can be configured to perform CRC checking for both received
-> and transmitted packets. Additionally, the packet counter can be set to
-> automatically clear after it is read.
-> 
-> The PHY counter includes 32-bit packet counters for both RX (received) and
-> TX (transmitted) packets, as well as 16-bit counters for recording CRC
-> error packets for both RX and TX.
-> 
-> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+> enum tc_dualpi2_drop_overload {
+>        TC_DUALPI2_DROP_OVERLOAD_OVERFLOW = 0,
+>        TC_DUALPI2_DROP_OVERLOAD_DROP = 1,
+>        __TCA_DUALPI2_DROP_OVERLOAD_MAX,
+> };
+> #define TCA_DUALPI2_DROP_OVERLOAD_MAX (__TCA_DUALPI2_DROP_OVERLOAD_MAX - 1)
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Missed the TCA_ on the max entry and define?
 
-    Andrew
+> enum tc_dualpi2_drop_early {
+>        TC_DUALPI2_DROP_EARLY_DROP_DEQUEUE = 0,
+>        TC_DUALPI2_DROP_EARLY_DROP_ENQUEUE = 1,
+>        __TCA_DUALPI2_DROP_EARLY_MAX,
+> };
+> #define TCA_DUALPI2_DROP_EARLY_MAX (__TCA_DUALPI2_DROP_EARLY_MAX - 1)
+> 
+> enum tc_dualpi2_ecn_mask {
+>        TC_DUALPI2_ECN_MASK_L4S_ECT = 1,
+>        TC_DUALPI2_ECN_MASK_CLA_ECT = 2,
+>        TC_DUALPI2_ECN_MASK_ANY_ECT = 3,
+>        __TCA_DUALPI2_ECN_MASK_MAX,
+> };
+> #define TCA_DUALPI2_ECN_MASK_MAX (__TCA_DUALPI2_ECN_MASK_MAX - 1)
+> 
+> enum tc_dualpi2_split_gso {
+>        TC_DUALPI2_SPLIT_GSO_NO_SPLIT_GSO = 0,
+>        TC_DUALPI2_SPLIT_GSO_SPLIT_GSO = 1,
+>        __TCA_DUALPI2_SPLIT_GSO_MAX,
+> };
+> #define TCA_DUALPI2_SPLIT_GSO_MAX (__TCA_DUALPI2_SPLIT_GSO_MAX - 1)
+>  
+>  
+> And shall such change also been applied to Dualpi2 attributes below?
+> As these are more attribute-like, so I assume no.
+
+Correct, these stay as they are.
 
