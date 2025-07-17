@@ -1,153 +1,210 @@
-Return-Path: <netdev+bounces-207666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17209B08226
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 03:13:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3372DB08239
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 03:19:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 612A0189C316
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 01:13:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 182583A47AA
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 01:19:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B836818FC86;
-	Thu, 17 Jul 2025 01:13:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 642E51B4F2C;
+	Thu, 17 Jul 2025 01:19:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M18k3886"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xft+Si1O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 302952E371A;
-	Thu, 17 Jul 2025 01:13:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5502AE96
+	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 01:19:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752714813; cv=none; b=gbmCg2J2KyAoB1DsNvi+IhtSDaBOcD5TbYF96vrNKyoa2c1kCgVlgqSTupabgaKZt41yewINwVzFU4SPAYyv0PfvT7T8nlbGD8scBs0krYxlTKyxahk59JvBZ2VsBAgE/JcVRO7mK2hGhtHgwJASVdBRcxE4BnB/8gUHO76MYsU=
+	t=1752715186; cv=none; b=hGGRn9tuh+X78OIDVP5tjHigpAKwHJiMiZce9cJ19a10CZO76im3GJij8H6qNkVKlKN/mie+3IE0JRreaxBOSlI9bZmMvmcC6Ro478hmIrUj667WuWP+PgA84zqpNJKny7Em7sv1mPI7wSGq0ONGt8pQLWM/n7MGIYQdYxw5GYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752714813; c=relaxed/simple;
-	bh=MXoVxG3n4rT3K90u+1ubqCjerqq0R8LcHr5fEXnaUnQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JuEx7Mxdw/bT2Cidy40dsU3yU2OoUibc5MAmkawrrGCDuYO34Q5ES5OCo+Bj6IcoYXdwfLCJs+UDyyyoojpBLUmTcoMGqxcOZTVFt5IBrv5eVnqj5jWNGC6+dDb8bFnMGNrqxFJXODVN/rh0t/AZpW63xCtZcW0/ttxOakXMDg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M18k3886; arc=none smtp.client-ip=209.85.166.43
+	s=arc-20240116; t=1752715186; c=relaxed/simple;
+	bh=k1V2vTZXPTGfpLajyCFbbZLmJzx98KVoJOBwgDWNtjM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rvjIuURwcUv+lkcY++eyKybafBa2IV/GMqDiU0uL4ZJi+JEptR80IS5PaOzy5AvK/Ix3c6Vm8Yc47+gc4hW+SlSfeJ+VFxlvWt9XCxc8ACWA9h5HUB3O57Kxcm0W+SdRM1ME5jisX9fvOIxyu6mBJ3K5sN8xK8tndWVV9zAuoJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xft+Si1O; arc=none smtp.client-ip=209.85.160.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-86a052d7897so38856439f.0;
-        Wed, 16 Jul 2025 18:13:31 -0700 (PDT)
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-2efbbf5a754so343649fac.0
+        for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 18:19:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752714811; x=1753319611; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MXoVxG3n4rT3K90u+1ubqCjerqq0R8LcHr5fEXnaUnQ=;
-        b=M18k3886EAwtuE5lYiKUsUkHWMFWVxRVc8Z2CKjEg/UwmdvF1u0MFFYFCx7DOgNSA+
-         EZdqUkys5onVrpC3IDo/T46PZ5GVtHAtG3RurZP9Ljp5ZaNKtGpA8rYeVyd8r2sV/rHx
-         pndC31A9EWVcpZ/QJKy7TN5zCBl/2/YT0nbxOx4W/0nJf5rAMEj1SH65k8cDvgCkf93w
-         PXg5AAOVErp3NwP45MOhR3LkgbfABcChEBfwhXz1h8wgjkM5SBtsrlYDLxUBLM4kgXhT
-         GEt5yP4O5jH8kOxsBDFNcoros84aU7xiITzkzk92YtN6QMUz2uUO9bfVN2yCCUoxZK14
-         GDvg==
+        d=gmail.com; s=20230601; t=1752715183; x=1753319983; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bgM6aXCZLWtmJsugUeWeDy9+2oMLPqXSBhEbcsi1F5c=;
+        b=Xft+Si1OOX5hO//41ATimTP02tEdrl9LL4Og/IYUtwr6gJQPL+7noOvT9r+pa0w8LK
+         b0isnhrfno0zwALJQX/2wHrtwoWiCYDqQvvcsjmIymwhRcbKbLp8qiguqL5lvkTZ6Xfw
+         xk8mwYkLVEHTyOOQfNEtC2lH7gzDj3C3Cz/6ZWLYuqLg7JPzZzfbJVoetnQcaWeoJ8XS
+         qG2QLzT2EZIGCMpaUc2ojgpq2tZ33X9U0+mBgL8AdhKnGZJmGJ1hoZ1ZFSeiEnToSxOG
+         7Qhd+3jCg/m+v04sDXPdx6N3kyjp7sQkK5HVRKL31LLJvUnEJHu9gyjwzXSmLjrUKGHg
+         Df5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752714811; x=1753319611;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MXoVxG3n4rT3K90u+1ubqCjerqq0R8LcHr5fEXnaUnQ=;
-        b=wL4Qz3rlcQGV54y0ZCX22vWtTEZGHosIASZO58V+UQWjn0tR6eVZaITrg9PdDNuoa8
-         TwX9k8SDjEtPBNfQ3Shuh1xNcn4ZX+vH6YiDxep1vZXW6ki3qMXnrRWsSJSOlPH8SpaG
-         DoH2OaT6MCUS4WW9dF1xJ39zECZdgFKvBeIhdUHON2tFDPThAhvK/X4m/PPcb0H7Zpqi
-         uSsJo66LXb4nJFufEBY/ei8qEH5mwxMEm9eobz47SB33mv1PzIZjRZjLOOf2vGshZGgA
-         7sbWMCs0qdH5SQeeRfXnVx8KChxfMZ1LOLY7g56XksoomQ5azH1gvvS08adI0PeaghRN
-         f7Ig==
-X-Forwarded-Encrypted: i=1; AJvYcCVHbZwxcVM0H5Ddu+IDieeUyKpni2rHtSimWaFT+7Ow/e1MH9sy63jesXUyMlkluS2YEejzBzKf@vger.kernel.org, AJvYcCVMAEojKhNFpvm581FPbfdv1HTRxelD5H4Cmn2918BRVJNk3ioTIhmDmIr8THdsKq88M1M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySN9MNWJN+eAaXldUOksk3EyPQdmQX4s/46Z6QmvYcwmW5mgeT
-	0JnaRpAA4sP7Q4O8AZOXtayIHb3DT1E1MRpHoy7LuAhMIrnW3MkjnQdbrwwSLxRdImUWEVTY1sv
-	7diXwaVR3AOzWGq/Erxz575AbQlcV7Jk=
-X-Gm-Gg: ASbGnctYgpIOsnbIJ0HFzRYnRMSjJf+PkvG/S2SAaBK2i1/F7wTvpGO/dYg+bjcPe1P
-	oQ+0Ljv9Ym8zEgFQqLij/uSavUsZTvwwSFHgosCHVmQJyGkdlpApJLQ2D4dm/DnKHQNJu0/QWKK
-	q8d0C+w8EYqg7wsj2hIAh84nL5bB1VXznLjrseFhFMlkr/S9l+mlljqA9x6jzU3+dW7b7A27aAR
-	3VbSQ==
-X-Google-Smtp-Source: AGHT+IGk6JnR0W2meKWxHrizaj2wksySomjAfMXMb9FQyg09pft6e8rov4boPIkvjYx2Ye6bq7hRgN/SxZMn2RzBTps=
-X-Received: by 2002:a05:6602:6c0d:b0:86c:e686:ca29 with SMTP id
- ca18e2360f4ac-879c0892211mr688495439f.2.1752714811061; Wed, 16 Jul 2025
- 18:13:31 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752715183; x=1753319983;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bgM6aXCZLWtmJsugUeWeDy9+2oMLPqXSBhEbcsi1F5c=;
+        b=hEkmotpLX0/Rt7RuCixSVOCNsdmfjJDHXWPhrn2usPRbLyl2HXYBG6MVhqBqf3bTrh
+         ySUtg+y1BqIQuE2FYScEnR3aqxiCM+YQFHdP5K41SO240kaaTvnQhFKiq5l3JrnPONV0
+         no/lF/EHcdABQKx8P99zXCfyRCez6c3qUkBMBWWymRfbGa4UCkr+Syk6Jx6nljwYzODG
+         rv5okhsYRsDbi9m6+6AVXF1q5uu5aEBPoDZ8yTR2efEczr+lVY3Ea/yGZQd760pVvxVj
+         azTXCdw3kI7/jclFChv/wN6dNtoDyG07a/3KUMfNQ5x+Ua3EDUE1nX14eSiw4N4kfjgD
+         QLaQ==
+X-Gm-Message-State: AOJu0YyWkkwKi3H/naMSWUWTl7yUpuwdMyQ2+KEpYpUAx2ksZnBRVQyC
+	rOBSdweB2v+0bR1tHXdb3t39yw2VL6Tv3lM5LMufhUhBcL8vilRA/M18ytil0YLK0zM=
+X-Gm-Gg: ASbGnctrP9JUDhoywF1pHBAq/4p8AjkfA0uT9lKHeAee45ZXruEHdkxuKPgdodoo0Eo
+	K5tT0rydUNravOcpJJ3yJV/PwJZRbAVwppTgJ6U+O5a4GhD6Ob0bvbM3isjYA5wPrLghOq6dAbu
+	FbriO5C08OYlsSs5bkxdV4Zl5mluMs2kcv4R5q1BW8mEcAsS3/ie/A4EscVovymm6fQp+VEr8RU
+	Cv3ckaBP0tXRoglAmI9gt6lo8mFvV2b2CViGj1188ivxDbqtPm9GBjQPbVJkr2j4KiljCdobb9B
+	O+d1RqZpD8BiUa3zQe9Iqipqh78uYPMnMvjG+AntHk9Ge7ubOM4dCdkakit2sMx4vJ7fU7k4nCZ
+	mp3JW4XWzXjK2EhS55FXFHORM
+X-Google-Smtp-Source: AGHT+IHWncB86dWL7ZsDNuRBKshqNwmDBRZXRwMd1GLyitZETG2zpCwg7RyCB74rdKQa3Ibba2p0sg==
+X-Received: by 2002:a05:687c:2c02:b0:2ff:cb8f:2935 with SMTP id 586e51a60fabf-2ffcb8f2f6dmr1311183fac.19.1752715183259;
+        Wed, 16 Jul 2025 18:19:43 -0700 (PDT)
+Received: from localhost ([2a03:2880:11ff:74::])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-30009d55900sm129561fac.28.2025.07.16.18.19.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Jul 2025 18:19:42 -0700 (PDT)
+From: Tianyi Cui <1997cui@gmail.com>
+To: netdev@vger.kernel.org
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	Tianyi Cui <1997cui@gmail.com>
+Subject: [PATCH net-next v2] selftests/drivers/net: Support ipv6 for napi_id test
+Date: Wed, 16 Jul 2025 18:19:13 -0700
+Message-ID: <20250717011913.1248816-1-1997cui@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250716122725.6088-1-kerneljasonxing@gmail.com>
- <20250716145645.194db702@kernel.org> <CAL+tcoByyPQX+L3bbAg1hC4YLbnuPrLKidgqKqbyoj0Sny7mxQ@mail.gmail.com>
- <20250716164312.40a18d2f@kernel.org> <CAL+tcoA1LMjxKgQb4WZZ8LeipbGU038is21M_y+kc93eoUpBCA@mail.gmail.com>
- <20250716175248.4f626bdb@kernel.org>
-In-Reply-To: <20250716175248.4f626bdb@kernel.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 17 Jul 2025 09:12:54 +0800
-X-Gm-Features: Ac12FXy8BqrE2XsYETu3EEHmmnmj54eqJPs14i393o5p4ojzgbfcO-QqEgErPtU
-Message-ID: <CAL+tcoCMQhaZdvbR1p50tuVk0RUdqAiRgjDrO0b+EO1XvM=2qw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] xsk: skip validating skb list in xmit path
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	bjorn@kernel.org, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
-	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, joe@dama.to, 
-	willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jul 17, 2025 at 8:52=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Thu, 17 Jul 2025 08:06:48 +0800 Jason Xing wrote:
-> > To be honest, this patch really only does one thing as the commit
-> > says. It might look very complex, but if readers take a deep look they
-> > will find only one removal of that validation for xsk in the hot path.
-> > Nothing more and nothing less. So IMHO, it doesn't bring more complex
-> > codes here.
-> >
-> > And removal of one validation indeed contributes to the transmission.
-> > I believe there remain a number of applications using copy mode
-> > currently. And maintainers of xsk don't regard copy mode as orphaned,
-> > right?
->
-> First of all, I'm not sure the patch is correct. The XSK skbs can have
-> frags, if device doesn't support or clears _SG we should linearize,
-> right?
+Add support for IPv6 environment for napi_id test.
 
-But note that there is one more function __skb_linearize() after
-skb_needs_linearize() in the validate_xmit_skb(). __skb_linearize()
-tests many members of skbs, which are not used to check the skbs from
-xsk. For xsk, it's very simple (please see xsk_build_skb())
+Test Plan:
 
->
-> Second, we don't understand where the win is coming from, the numbers
-> you share are a bit vague. What's so expensive about a few skbs
+    ./run_kselftest.sh -t drivers/net:napi_id.py
+    TAP version 13
+    1..1
+    # timeout set to 45
+    # selftests: drivers/net: napi_id.py
+    # TAP version 13
+    # 1..1
+    # ok 1 napi_id.test_napi_id
+    # # Totals: pass:1 fail:0 xfail:0 xpass:0 skip:0 error:0
+    ok 1 selftests: drivers/net: napi_id.py
 
-To be more accurate, it's not "a few" but "so many" because of the
-high pps reaching more than 1,000,000. So if people run the xdpsock to
-test it, it's not hard to see most of time is spent during the skb
-allocation process.
+Signed-off-by: Tianyi Cui <1997cui@gmail.com>
+---
+Changelog:
+ v2:
+   - Use cfg.addr instead of if statement in napi_id.py
+ v1: https://lore.kernel.org/all/20250715212349.2308385-1-1997cui@gmail.com/
 
-> accesses? Maybe there's an optimization possible to the validation,
-> which would apply more broadly, instead of skipping it for one trivial
-> case.
->
-> Third, I asked you to compare with AF_PACKET, because IIUC it should
-> have similar properties as AF_XDP in copy mode. So why not use that?
+ .../testing/selftests/drivers/net/napi_id.py  |  4 +--
+ .../selftests/drivers/net/napi_id_helper.c    | 35 ++++++++++++++-----
+ 2 files changed, 28 insertions(+), 11 deletions(-)
 
-I haven't run into AF_PACKET so far. At least, I can confirm that xsk
-doesn't need it from my side. The whole logic of validation apparently
-is not designed for xsk case...
+diff --git a/tools/testing/selftests/drivers/net/napi_id.py b/tools/testing/selftests/drivers/net/napi_id.py
+index 356bac46ba04..d05eddcad539 100755
+--- a/tools/testing/selftests/drivers/net/napi_id.py
++++ b/tools/testing/selftests/drivers/net/napi_id.py
+@@ -7,10 +7,10 @@ from lib.py import bkg, cmd, rand_port, NetNSEnter
 
->
-> Lastly, the patch is not all that bad, sure. But the experience of
-> supporting generic XDP is a very mixed. All the paths that pretend
-> to do XDP on skbs have a bunch of quirks and bugs. I'd prefer that
-> we push back more broadly on any sort of pretend XDP.
+ def test_napi_id(cfg) -> None:
+     port = rand_port()
+-    listen_cmd = f"{cfg.test_dir}/napi_id_helper {cfg.addr_v['4']} {port}"
++    listen_cmd = f"{cfg.test_dir}/napi_id_helper {cfg.addr} {port}"
 
-Well, sorry, I feel a bit upset when reading this because as I
-insisted before not everyone can use the advanced zerocopy mode.
+     with bkg(listen_cmd, ksft_wait=3) as server:
+-        cmd(f"echo a | socat - TCP:{cfg.addr_v['4']}:{port}", host=cfg.remote, shell=True)
++        cmd(f"echo a | socat - TCP:{cfg.baddr}:{port}", host=cfg.remote, shell=True)
 
-Thanks,
-Jason
+     ksft_eq(0, server.ret)
+
+diff --git a/tools/testing/selftests/drivers/net/napi_id_helper.c b/tools/testing/selftests/drivers/net/napi_id_helper.c
+index eecd610c2109..7f49ca6c8637 100644
+--- a/tools/testing/selftests/drivers/net/napi_id_helper.c
++++ b/tools/testing/selftests/drivers/net/napi_id_helper.c
+@@ -7,41 +7,58 @@
+ #include <unistd.h>
+ #include <arpa/inet.h>
+ #include <sys/socket.h>
++#include <netdb.h>
+
+ #include "../../net/lib/ksft.h"
+
+ int main(int argc, char *argv[])
+ {
+-	struct sockaddr_in address;
++	struct sockaddr_storage address;
++	struct addrinfo *result;
++	struct addrinfo hints;
+ 	unsigned int napi_id;
+-	unsigned int port;
++	socklen_t addr_len;
+ 	socklen_t optlen;
+ 	char buf[1024];
+ 	int opt = 1;
++	int family;
+ 	int server;
+ 	int client;
+ 	int ret;
+
+-	server = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
++	memset(&hints, 0, sizeof(hints));
++	hints.ai_family = AF_UNSPEC;
++	hints.ai_socktype = SOCK_STREAM;
++	hints.ai_flags = AI_PASSIVE;
++
++	ret = getaddrinfo(argv[1], argv[2], &hints, &result);
++	if (ret != 0) {
++		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(ret));
++		return 1;
++	}
++
++	family = result->ai_family;
++	addr_len = result->ai_addrlen;
++
++	server = socket(family, SOCK_STREAM, IPPROTO_TCP);
+ 	if (server < 0) {
+ 		perror("socket creation failed");
++		freeaddrinfo(result);
+ 		if (errno == EAFNOSUPPORT)
+ 			return -1;
+ 		return 1;
+ 	}
+
+-	port = atoi(argv[2]);
+-
+ 	if (setsockopt(server, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
+ 		perror("setsockopt");
++		freeaddrinfo(result);
+ 		return 1;
+ 	}
+
+-	address.sin_family = AF_INET;
+-	inet_pton(AF_INET, argv[1], &address.sin_addr);
+-	address.sin_port = htons(port);
++	memcpy(&address, result->ai_addr, result->ai_addrlen);
++	freeaddrinfo(result);
+
+-	if (bind(server, (struct sockaddr *)&address, sizeof(address)) < 0) {
++	if (bind(server, (struct sockaddr *)&address, addr_len) < 0) {
+ 		perror("bind failed");
+ 		return 1;
+ 	}
+--
+2.47.1
 
