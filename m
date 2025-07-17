@@ -1,189 +1,156 @@
-Return-Path: <netdev+bounces-208045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7096FB0986C
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 01:45:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB13EB098A5
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 01:49:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B39A73BF759
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 23:44:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE1CF3AC832
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 23:49:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D249225D546;
-	Thu, 17 Jul 2025 23:44:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC5E523D282;
+	Thu, 17 Jul 2025 23:49:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P2kRNOAZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IwysKk9h"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE46325A340
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 23:44:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E3C949641;
+	Thu, 17 Jul 2025 23:49:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752795858; cv=none; b=cVmtiOIpted+dONVCBZYPrGsf8/taLj1+pKvLojU/q+q0+MPQY8E54Ee3O1TrXSNQWd0zIxL4O44jjkDYIxbAFIJNEBjHS0sYw7FB/i7iDRdHQBkVTzZRhcKXUTfGiitFivc6TUpCwJlc3tV0C5dAeNSSstNbEjbNF3QhODu+6c=
+	t=1752796170; cv=none; b=dkgy4qG5ZIGgnp5tRtnxXwwqRRhBbVYwqqtCX4+D6pItYxYz9qrVX34re3Ljnb4WAmCHqpexMIuB5ag9GHcCMV9uZaBQtR5667Ir0Cdpi/SW+HkYbpPwgx2F/Z8ZcEYJpZmT1xHkAvTo/tLwhrBFiGfDHErZQ1sN4BK7lAQeql0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752795858; c=relaxed/simple;
-	bh=mQ9lv54Ytd/dODujE8F3M/U6GgtuvRwx+S7Cgi6DzOo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bMD9jiJcrHez+AJKyX/bqCHXwtrog05XbIFnQga/ENh3xggmRwQYX2CQZeg8vKbddGDCS4wBEONd6QRwcMWQW44fozwPSiDZ58vLpVPdqzizbI8d4XeqMj7FtmGUJLI4VqseBHmKIdXKZlCZx593/v/11Fmwng/ixHY5X+z70IM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P2kRNOAZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE330C4CEF8;
-	Thu, 17 Jul 2025 23:44:16 +0000 (UTC)
+	s=arc-20240116; t=1752796170; c=relaxed/simple;
+	bh=Cq5Mb8Ty0pSJRETR6msxyZq2CIyD0ENwG1KIzU6IlZY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FJ6IPCbhJRh1B+DH2iwFbEH76Dbq4DPygsjI2EUV9G0ihnRmivqCYaHwG0h01PR/Le8dbYrbE6RXvjqqnBMLuzKdszfZ1rzOXWlCM9B5yLZ5Prs1tuTcQb/KVmv7EOTLgvZmscAn+0W04EtaGJFYEX6uMnkRm9CHgT5DTZ5kJpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IwysKk9h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 166E5C4CEE3;
+	Thu, 17 Jul 2025 23:49:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752795857;
-	bh=mQ9lv54Ytd/dODujE8F3M/U6GgtuvRwx+S7Cgi6DzOo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=P2kRNOAZawfWw5smPglnS2DdH+ejE6sz/kdSHrzGBAapO3ZciwA1I0MRwBlhw65e8
-	 VltVhkE0WCKBVveRazOsoSbyCPK8M1OS5qtdVu1yC2suksZcQRQgXi+MB39xukk74a
-	 MHgCfihJmlT/VysTAqHYGoInCroImU2H3482afLG6fQlagabbJSyqFz+iisycb7cOj
-	 KmNx1xL8UcIBFSYv6TK6dEkYh9iKyQVXDHbQu0mug5/+nRKBNNExrB8BYoYlzfcqF5
-	 9UTVdc6mIcqfgvrkP4qxOOH3ntIDoB3V9ZhkQimGHkmfe3wdo0gJ2HoOVAoiE1dboo
-	 hV2HNAqbHhpXw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	andrew@lunn.ch,
-	donald.hunter@gmail.com,
-	shuah@kernel.org,
-	kory.maincent@bootlin.com,
-	gal@nvidia.com,
-	ecree.xilinx@gmail.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 8/8] selftests: drv-net: rss_api: context create and delete tests
-Date: Thu, 17 Jul 2025 16:43:43 -0700
-Message-ID: <20250717234343.2328602-9-kuba@kernel.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250717234343.2328602-1-kuba@kernel.org>
-References: <20250717234343.2328602-1-kuba@kernel.org>
+	s=k20201202; t=1752796170;
+	bh=Cq5Mb8Ty0pSJRETR6msxyZq2CIyD0ENwG1KIzU6IlZY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=IwysKk9hK55wp0s40tpFq0FJaGdXT3fBVuRsgcwTY2b4PikHBECgcX7hWobbtH02d
+	 SyCaMenwQY4z2/ELRZUUX+TUOhIjqPJpP1PRz3gwWJiHdn/XuLhAK059cHIsz7yn8s
+	 7g0oIm39p4AIdmaJSKba/msqYMi31gUbrh0swxnCIr9uhwHPNjwVmyn8C/j2MWeLeJ
+	 R+leE+CIC862qdTM9oCLcgJK3afjaudHiWIzODec6ms5GDL+mHH8LQyjCbV53OYzqK
+	 EHQERsD5FBJJneDBbOAGJLKDCac5ZJYBxnoGbTBw9Kz3Lv2yWL34hoc8+gO8rjS5J3
+	 8s0lisJfycLMg==
+Message-ID: <9175b633-b61f-4ca0-9023-c99dff4f53f0@kernel.org>
+Date: Fri, 18 Jul 2025 01:49:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net v2 0/2] selftests: mptcp: connect: cover alt modes
+Content-Language: en-GB, fr-BE
+To: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, Christoph Paasch <cpaasch@openai.com>,
+ Davide Caratti <dcaratti@redhat.com>, Florian Westphal <fw@strlen.de>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20250715-net-mptcp-sft-connect-alt-v2-0-8230ddd82454@kernel.org>
+ <20250715185308.2ad30691@kernel.org> <20250716072602.386a8963@kernel.org>
+ <ae6d333a-f3b2-4463-b930-b4caf56b39f8@kernel.org>
+ <20250716083632.72854bd5@kernel.org>
+ <e46aadbf-51c6-4e09-bdaa-374698b406f3@kernel.org>
+ <20250717074242.1ef5d441@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
+ YBNdx5Xl74NLSgx6y/1NiMQGuKeu+2BmtnkiGxBNanfXcnl4L4Lzz+iXBvvbtCbynnnqDDqU
+ c7SPFMpMesgpcu1xFt0F6bcxE+0ojRtSCZ5HDElKlHJNYtD1uwY4UYVGWUGCF/+cY1YLmtfb
+ WdNb/SFo+Mp0HItfBC12qtDIXYvbfNUGVnA5jXeWMEyYhSNktLnpDL2gBUCsdbkov5VjiOX7
+ CRTkX0UgNWRjyFZwThaZADEvAOo12M5uSBk7h07yJ97gqvBtcx45IsJwfUJE4hy8qZqsA62A
+ nTRflBvp647IXAiCcwWsEgE5AXKwA3aL6dcpVR17JXJ6nwHHnslVi8WesiqzUI9sbO/hXeXw
+ TDSB+YhErbNOxvHqCzZEnGAAFf6ges26fRVyuU119AzO40sjdLV0l6LE7GshddyazWZf0iac
+ nEhX9NKxGnuhMu5SXmo2poIQttJuYAvTVUNwQVEx/0yY5xmiuyqvXa+XT7NKJkOZSiAPlNt6
+ VffjgOP62S7M9wDShUghN3F7CPOrrRsOHWO/l6I/qJdUMW+MHSFYPfYiFXoLUZyPvNVCYSgs
+ 3oQaFhHapq1f345XBtfG3fOYp1K2wTXd4ThFraTLl8PHxCn4ywARAQABzSRNYXR0aGlldSBC
+ YWVydHMgPG1hdHR0YmVAa2VybmVsLm9yZz7CwZEEEwEIADsCGwMFCwkIBwIGFQoJCAsCBBYC
+ AwECHgECF4AWIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZUDpDAIZAQAKCRD2t4JPQmmgcz33
+ EACjROM3nj9FGclR5AlyPUbAq/txEX7E0EFQCDtdLPrjBcLAoaYJIQUV8IDCcPjZMJy2ADp7
+ /zSwYba2rE2C9vRgjXZJNt21mySvKnnkPbNQGkNRl3TZAinO1Ddq3fp2c/GmYaW1NWFSfOmw
+ MvB5CJaN0UK5l0/drnaA6Hxsu62V5UnpvxWgexqDuo0wfpEeP1PEqMNzyiVPvJ8bJxgM8qoC
+ cpXLp1Rq/jq7pbUycY8GeYw2j+FVZJHlhL0w0Zm9CFHThHxRAm1tsIPc+oTorx7haXP+nN0J
+ iqBXVAxLK2KxrHtMygim50xk2QpUotWYfZpRRv8dMygEPIB3f1Vi5JMwP4M47NZNdpqVkHrm
+ jvcNuLfDgf/vqUvuXs2eA2/BkIHcOuAAbsvreX1WX1rTHmx5ud3OhsWQQRVL2rt+0p1DpROI
+ 3Ob8F78W5rKr4HYvjX2Inpy3WahAm7FzUY184OyfPO/2zadKCqg8n01mWA9PXxs84bFEV2mP
+ VzC5j6K8U3RNA6cb9bpE5bzXut6T2gxj6j+7TsgMQFhbyH/tZgpDjWvAiPZHb3sV29t8XaOF
+ BwzqiI2AEkiWMySiHwCCMsIH9WUH7r7vpwROko89Tk+InpEbiphPjd7qAkyJ+tNIEWd1+MlX
+ ZPtOaFLVHhLQ3PLFLkrU3+Yi3tXqpvLE3gO3LM7BTQRV4/npARAA5+u/Sx1n9anIqcgHpA7l
+ 5SUCP1e/qF7n5DK8LiM10gYglgY0XHOBi0S7vHppH8hrtpizx+7t5DBdPJgVtR6SilyK0/mp
+ 9nWHDhc9rwU3KmHYgFFsnX58eEmZxz2qsIY8juFor5r7kpcM5dRR9aB+HjlOOJJgyDxcJTwM
+ 1ey4L/79P72wuXRhMibN14SX6TZzf+/XIOrM6TsULVJEIv1+NdczQbs6pBTpEK/G2apME7vf
+ mjTsZU26Ezn+LDMX16lHTmIJi7Hlh7eifCGGM+g/AlDV6aWKFS+sBbwy+YoS0Zc3Yz8zrdbi
+ Kzn3kbKd+99//mysSVsHaekQYyVvO0KD2KPKBs1S/ImrBb6XecqxGy/y/3HWHdngGEY2v2IP
+ Qox7mAPznyKyXEfG+0rrVseZSEssKmY01IsgwwbmN9ZcqUKYNhjv67WMX7tNwiVbSrGLZoqf
+ Xlgw4aAdnIMQyTW8nE6hH/Iwqay4S2str4HZtWwyWLitk7N+e+vxuK5qto4AxtB7VdimvKUs
+ x6kQO5F3YWcC3vCXCgPwyV8133+fIR2L81R1L1q3swaEuh95vWj6iskxeNWSTyFAVKYYVskG
+ V+OTtB71P1XCnb6AJCW9cKpC25+zxQqD2Zy0dK3u2RuKErajKBa/YWzuSaKAOkneFxG3LJIv
+ Hl7iqPF+JDCjB5sAEQEAAcLBXwQYAQIACQUCVeP56QIbDAAKCRD2t4JPQmmgc5VnD/9YgbCr
+ HR1FbMbm7td54UrYvZV/i7m3dIQNXK2e+Cbv5PXf19ce3XluaE+wA8D+vnIW5mbAAiojt3Mb
+ 6p0WJS3QzbObzHNgAp3zy/L4lXwc6WW5vnpWAzqXFHP8D9PTpqvBALbXqL06smP47JqbyQxj
+ Xf7D2rrPeIqbYmVY9da1KzMOVf3gReazYa89zZSdVkMojfWsbq05zwYU+SCWS3NiyF6QghbW
+ voxbFwX1i/0xRwJiX9NNbRj1huVKQuS4W7rbWA87TrVQPXUAdkyd7FRYICNW+0gddysIwPoa
+ KrLfx3Ba6Rpx0JznbrVOtXlihjl4KV8mtOPjYDY9u+8x412xXnlGl6AC4HLu2F3ECkamY4G6
+ UxejX+E6vW6Xe4n7H+rEX5UFgPRdYkS1TA/X3nMen9bouxNsvIJv7C6adZmMHqu/2azX7S7I
+ vrxxySzOw9GxjoVTuzWMKWpDGP8n71IFeOot8JuPZtJ8omz+DZel+WCNZMVdVNLPOd5frqOv
+ mpz0VhFAlNTjU1Vy0CnuxX3AM51J8dpdNyG0S8rADh6C8AKCDOfUstpq28/6oTaQv7QZdge0
+ JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20250717074242.1ef5d441@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Add test cases for creating and deleting contexts.
+Hi Jakub,
 
-  TAP version 13
-  1..12
-  ok 1 rss_api.test_rxfh_nl_set_fail
-  ok 2 rss_api.test_rxfh_nl_set_indir
-  ok 3 rss_api.test_rxfh_nl_set_indir_ctx
-  ok 4 rss_api.test_rxfh_indir_ntf
-  ok 5 rss_api.test_rxfh_indir_ctx_ntf
-  ok 6 rss_api.test_rxfh_nl_set_key
-  ok 7 rss_api.test_rxfh_fields
-  ok 8 rss_api.test_rxfh_fields_set
-  ok 9 rss_api.test_rxfh_fields_set_xfrm # SKIP no input-xfrm supported
-  ok 10 rss_api.test_rxfh_fields_ntf
-  ok 11 rss_api.test_rss_ctx_add
-  ok 12 rss_api.test_rss_ctx_ntf
-  # Totals: pass:11 fail:0 xfail:0 xpass:0 skip:1 error:0
+On 17/07/2025 16:42, Jakub Kicinski wrote:
+> On Wed, 16 Jul 2025 18:35:11 +0200 Matthieu Baerts wrote:
+>>>> And just to be sure, no CPU or IO overload at that moment? I didn't see
+>>>> such errors reported by our CI, but I can try to reproduce them locally
+>>>> in different conditions.  
+>>>
+>>> None that I can see. The test run ~10min after all the builds completed,
+>>> and we wait now for the CPU load to die down and writeback to finish
+>>> before we kick off VMs. The VMs for various tests are running at that
+>>> point, the CPU util averaged across cores is 66%.  
+>>
+>> Thank you for having checked, and for the explanations!
+>>
+>> OK, so maybe running stress-ng in parallel to be able to reproduce the
+>> issue might not help. We will investigate.
+> 
+> connect tests failed again overnight. Now I see why Paolo was
+> responding on Eric's series, that seems like a more likely culprit..
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- .../selftests/drivers/net/hw/rss_api.py       | 73 +++++++++++++++++++
- 1 file changed, 73 insertions(+)
+Good point, Paolo was certainly right, as always :)
 
-diff --git a/tools/testing/selftests/drivers/net/hw/rss_api.py b/tools/testing/selftests/drivers/net/hw/rss_api.py
-index 424743bb583b..19847f3d4a00 100755
---- a/tools/testing/selftests/drivers/net/hw/rss_api.py
-+++ b/tools/testing/selftests/drivers/net/hw/rss_api.py
-@@ -5,6 +5,7 @@
- API level tests for RSS (mostly Netlink vs IOCTL).
- """
- 
-+import errno
- import glob
- import random
- from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_is, ksft_ne, ksft_raises
-@@ -390,6 +391,78 @@ from lib.py import NetDrvEnv
-     ksft_eq(next(ethnl.poll_ntf(duration=0.01), None), None)
- 
- 
-+def test_rss_ctx_add(cfg):
-+    """ Test creating an additional RSS context via Netlink """
-+
-+    _require_2qs(cfg)
-+
-+    # Test basic creation
-+    ctx = cfg.ethnl.rss_create_act({"header": {"dev-index": cfg.ifindex}})
-+    d = defer(ethtool, f"-X {cfg.ifname} context {ctx.get('context')} delete")
-+    ksft_ne(ctx.get("context", 0), 0)
-+    ksft_ne(set(ctx.get("indir", [0])), {0},
-+            comment="Driver should init the indirection table")
-+
-+    # Try requesting the ID we just got allocated
-+    with ksft_raises(NlError) as cm:
-+        ctx = cfg.ethnl.rss_create_act({
-+            "header": {"dev-index": cfg.ifindex},
-+            "context": ctx.get("context"),
-+        })
-+        ethtool(f"-X {cfg.ifname} context {ctx.get('context')} delete")
-+    d.exec()
-+    ksft_eq(cm.exception.nl_msg.error, -errno.EBUSY)
-+
-+    # Test creating with a specified RSS table, and context ID
-+    ctx_id = ctx.get("context")
-+    ctx = cfg.ethnl.rss_create_act({
-+        "header": {"dev-index": cfg.ifindex},
-+        "context": ctx_id,
-+        "indir": [1],
-+    })
-+    ethtool(f"-X {cfg.ifname} context {ctx.get('context')} delete")
-+    ksft_eq(ctx.get("context"), ctx_id)
-+    ksft_eq(set(ctx.get("indir", [0])), {1})
-+
-+
-+def test_rss_ctx_ntf(cfg):
-+    """ Test notifications for creating additional RSS contexts """
-+
-+    ethnl = EthtoolFamily()
-+    ethnl.ntf_subscribe("monitor")
-+
-+    # Create / delete via Netlink
-+    ctx = cfg.ethnl.rss_create_act({"header": {"dev-index": cfg.ifindex}})
-+    cfg.ethnl.rss_delete_act({
-+        "header": {"dev-index": cfg.ifindex},
-+        "context": ctx["context"],
-+    })
-+
-+    ntf = next(ethnl.poll_ntf(duration=0.2), None)
-+    if ntf is None:
-+        raise KsftFailEx("[NL] No notification after context creation")
-+    ksft_eq(ntf["name"], "rss-create-ntf")
-+    ksft_eq(ctx, ntf["msg"])
-+
-+    ntf = next(ethnl.poll_ntf(duration=0.2), None)
-+    if ntf is None:
-+        raise KsftFailEx("[NL] No notification after context deletion")
-+    ksft_eq(ntf["name"], "rss-delete-ntf")
-+
-+    # Create / deleve via IOCTL
-+    ctx_id = _ethtool_create(cfg, "--disable-netlink -X", "context new")
-+    ethtool(f"--disable-netlink -X {cfg.ifname} context {ctx_id} delete")
-+    ntf = next(ethnl.poll_ntf(duration=0.2), None)
-+    if ntf is None:
-+        raise KsftFailEx("[IOCTL] No notification after context creation")
-+    ksft_eq(ntf["name"], "rss-create-ntf")
-+
-+    ntf = next(ethnl.poll_ntf(duration=0.2), None)
-+    if ntf is None:
-+        raise KsftFailEx("[IOCTL] No notification after context deletion")
-+    ksft_eq(ntf["name"], "rss-delete-ntf")
-+
-+
- def main() -> None:
-     """ Ksft boiler plate main """
- 
+We do need to investigate. Note that it might be hard for me to do that
+the next few days as I'm travelling for work, but we are tracking the issue:
+
+  https://github.com/multipath-tcp/mptcp_net-next/issues/574
+
+I see that you already marked the mptcp-connect-sh selftest as ignored,
+so I guess we are not causing other troubles with the CI. (We could then
+also apply this series here and ignore the new tests, but it is also
+fine for me to wait.)
+
+Cheers,
+Matt
 -- 
-2.50.1
+Sponsored by the NGI0 Core fund.
 
 
