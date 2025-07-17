@@ -1,316 +1,189 @@
-Return-Path: <netdev+bounces-207958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CC2EB09278
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 19:00:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03C3CB092B8
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 19:07:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEC274A2206
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 16:59:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1343A7B903A
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 17:05:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25861301141;
-	Thu, 17 Jul 2025 16:57:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50439301151;
+	Thu, 17 Jul 2025 17:04:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O3XcBYSH"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Yz2YK3wy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2058.outbound.protection.outlook.com [40.107.93.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F40F2FE320
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 16:57:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752771469; cv=none; b=UesYllJymBDjelHNAiRFfoLoLYwn3Q5reFaHO+Wz7nhvlbfUIOmurLExM1Kn2sTsxtBlAPSSFc6/NzF1v3WzmMVMkogwuEtn43sDnIVAHt0faRKe3vEGMFdngd9zbb86HZJitTKgwKJUYbJwIbPgfm7Gai9NUcJ9qOmHFsAXR7M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752771469; c=relaxed/simple;
-	bh=VWXfSpgm0nFcoshv5HB8fhusJAyHwqzvzzhuTfNYcJc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=c+gwbXA+7kW6PlfQY20RxODenZx+NfNwMaUQcymVMlJdeDLIBJW0wP9dlMX6rQ/44eyoj6x/sIsRliducRLfBFKFI+c/7WS4fifQWAzPEAXKwZ41sn1SIXCnoNDW+qrShMd6xHAV2razAOO69t7lgqJNDOYKSYEskXp+vfeYW9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O3XcBYSH; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752771466; x=1784307466;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=VWXfSpgm0nFcoshv5HB8fhusJAyHwqzvzzhuTfNYcJc=;
-  b=O3XcBYSHIpf7xWLp8KXBFIArEx4BthddoJ+fLhAkBfrRIg5l5LJ5BLVY
-   GOlqXgy1WmdnlwTAJAF2VYfIubPHAx9dKYj7tbHFqMibNBIbFijFw0DSu
-   rU3HHJfZx8vgrqLHQNH2TE6HhoWOdKs8lJIRwB1ZUPw/YVT2XrEeXh2LU
-   dKg/10IKsr8GTmg6xlPNQnZ5wKv4X4VRskUliBiY9ULpAHB9HBJ/gPcdj
-   oVsPqDvDAowed4ULc6DZLri4H5eVA3uZisThXZHq2H7W3K4cWVI+gwlRy
-   OCJ8yAPiC/QHcA7lF5gTeYkvkPa3HZQwuLFwcLWKpgdjSWRgD4nVIdSdh
-   Q==;
-X-CSE-ConnectionGUID: NH1esfUAT2SssyOCtW23yA==
-X-CSE-MsgGUID: Vkmay0P8TOyP3FWJyuUPJw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="55211389"
-X-IronPort-AV: E=Sophos;i="6.16,319,1744095600"; 
-   d="scan'208";a="55211389"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 09:57:43 -0700
-X-CSE-ConnectionGUID: yC0u1lUaQ32R9+62+xDLKw==
-X-CSE-MsgGUID: h9lqSHrfTKKZ3p6DMIqKgA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,319,1744095600"; 
-   d="scan'208";a="158199872"
-Received: from jekeller-desk.jf.intel.com ([10.166.241.15])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 09:57:43 -0700
-From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Thu, 17 Jul 2025 09:57:09 -0700
-Subject: [PATCH iwl-net 2/2] ice: don't leave device non-functional if Tx
- scheduler config fails
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54853301148;
+	Thu, 17 Jul 2025 17:04:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752771888; cv=fail; b=ftLBcOa76iidcBwSqP/ntXan8N4Ar4yiLwbIg/e46ke8iM5KzUg8oY4eWwIZHtAcFdrK6tLj+aP5IZi5eMM8xO4KPE2IJob4JQfBOHAUaNS1GJQOUsK9j6OpU5PsDkjBUMNaHe9qNNzkt2aJj36OzylbjFGi+toi/daj6V5060Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752771888; c=relaxed/simple;
+	bh=WmXQQv2UtdJzZWZdVBllO6IB2bXPg2AMdRzmgAddVws=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EMB7QKz91r/2Kd7E2mGfiloHvC5F9TkB67GSTJKNvqmK0b27OF1bCR3Kz6tOapSzyYjkbYMPu2NCj+eNbzshr07dZW5OzHOjEw6+0K7NQ8fm4e+XCdPZiwGYjEliCjvPGAlmqD+qMHCms9BfkVax0bYvblaFsO3KZONjxsBwvlY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Yz2YK3wy; arc=fail smtp.client-ip=40.107.93.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=HKUINbYmPim1O7DZBW3EQpkSMA1Nf5eOpcw9aC0eJHewPGWWSdsYuN6yomYO3Vuo4bWT7BFDQgsLSMk71TEWF/n/LqMgJLwyHKhdf/9apB689BoQemdVBTSM1j9WfIKBjdjmpcvc9sg8QWCQQF5ItTLhnYtC4zKzkhxZX/hrqtmI8oao5Zt27xH/aDgV8UbeErj4wsIeDinJ9KWTatOaPinH3vunYFhnHNN8fYqKPVz5FIrN8wayFGWP7fBwGahMahvBfHwU/+RvCBVwRrhenGx0ll5ko4AYWnVsaqJRmwfSc/xVWq3M0caxn2/pY/Ns0GJ6tmfaZPLKotXIw1VnMA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RswRWyl15MjPYS8nnVsiecSwperUjVvr21Hor323A6A=;
+ b=f7W3w/x2rHLXb9qLSIDA/3QeiflA50l8r88h9zWT4wPKfKAlSoTmKK5XJKOiv0gKHFaDba+Py30PC0hjHluiifPbZY+7JlzTKfdBX6jyqclY2YZ7eeYz0AbR0cUTDa9Elzdu0DS7bzxznmX+mTn+m7LGKbFL4Es32rN/U0UZWv9gIERuTQ2kkq/OC4hCx0fIjXmXXGDNldOHY5XyA1KmERhG0qIWxi2hU3/Vbv+xuULf3PVJDe0f39YUsxvICmhn/9A2lSqxXENt7H6dCj9dzI49yWGE/1pOAy0jgFDyR7cmYwPXVX1HkJmR+P49xip28ej4+kMGED23/Rl2cvp3vw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RswRWyl15MjPYS8nnVsiecSwperUjVvr21Hor323A6A=;
+ b=Yz2YK3wyrDo2SERycabHuN6FqVx55WB17MMQdvLoiHH0EVrYbOFPH7/+EDHFxQdUIWzLi2FLNoDFoR6p+TyICsgzVVExfF1VeEflq9sbeSlGNn5n6877+S7zX/Jhj23Rlo3PToSQ8oCPpiM5IU2ZenyhQouxVle3TVttO5hu4a/cZEd7Sb8ttF6Iga+JmjduCeg/8x4GMSns+3oHyr4aGCGycJXDTrwvckWQoR96IhbZDrvOjspMqQRAVrvqQrpBwcyoRHIm4L2AIiCou0u5//WsIOg+8ey0t1Xf/3/i0+HUdNP9IroLctMF1hDfLcHqb7osfSyw8+Sq5pHMBIZsPA==
+Received: from BN0PR04CA0022.namprd04.prod.outlook.com (2603:10b6:408:ee::27)
+ by LV8PR12MB9417.namprd12.prod.outlook.com (2603:10b6:408:204::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.39; Thu, 17 Jul
+ 2025 17:04:43 +0000
+Received: from BL6PEPF0001AB74.namprd02.prod.outlook.com
+ (2603:10b6:408:ee:cafe::b2) by BN0PR04CA0022.outlook.office365.com
+ (2603:10b6:408:ee::27) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8943.23 via Frontend Transport; Thu,
+ 17 Jul 2025 17:04:43 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BL6PEPF0001AB74.mail.protection.outlook.com (10.167.242.167) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8943.21 via Frontend Transport; Thu, 17 Jul 2025 17:04:43 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 17 Jul
+ 2025 10:04:23 -0700
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Thu, 17 Jul
+ 2025 10:04:23 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Thu, 17
+ Jul 2025 10:04:19 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>
+CC: Saeed Mahameed <saeed@kernel.org>, Gal Pressman <gal@nvidia.com>, "Leon
+ Romanovsky" <leon@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, "Tariq
+ Toukan" <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next 0/3] net/mlx5: misc changes 2025-07-17
+Date: Thu, 17 Jul 2025 20:03:09 +0300
+Message-ID: <1752771792-265762-1-git-send-email-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.8.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250717-jk-ddp-safe-mode-issue-v1-2-e113b2baed79@intel.com>
-References: <20250717-jk-ddp-safe-mode-issue-v1-0-e113b2baed79@intel.com>
-In-Reply-To: <20250717-jk-ddp-safe-mode-issue-v1-0-e113b2baed79@intel.com>
-To: Anthony Nguyen <anthony.l.nguyen@intel.com>, 
- Intel Wired LAN <intel-wired-lan@lists.osuosl.org>, 
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Cc: Jacob Keller <jacob.e.keller@intel.com>, vgrinber@redhat.com, 
- netdev@vger.kernel.org
-X-Mailer: b4 0.15-dev-d4ca8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=10067;
- i=jacob.e.keller@intel.com; h=from:subject:message-id;
- bh=VWXfSpgm0nFcoshv5HB8fhusJAyHwqzvzzhuTfNYcJc=;
- b=owGbwMvMwCWWNS3WLp9f4wXjabUkhoxK7bb7T6Ov5NTGaGfcOuYTdU6x0p75YU5ySMWE57tW8
- dZ0tMR3lLIwiHExyIopsig4hKy8bjwhTOuNsxzMHFYmkCEMXJwCMJGGn4wM5+eZ5jtz202LyOK5
- yTSh3VHD5O7M7S+z3Xmmfetu6FVbzvBP0fxNiY26rH04S75K4Ebf/ntuU/iF0xkOcwX6pb32Oc8
- GAA==
-X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
- fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB74:EE_|LV8PR12MB9417:EE_
+X-MS-Office365-Filtering-Correlation-Id: d4699b32-58b1-4a9b-4102-08ddc5540662
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|1800799024|82310400026|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Zng5ZVhpSHVJK3pNeVA5dEpIWUJ4aXJXWFovVDhXMHh5ZDQ3blFhMHlTSTNw?=
+ =?utf-8?B?NzlSeW41K3ZHT0J1bVMwRUtwVjBZUGh0aDIyaDBySTlWTndOWlRwQlQ5dE1i?=
+ =?utf-8?B?d2FzOFZ6c0JWUFBOVFlzNHlkbmJ3UnZxeHMzZTdGTEY5Vkh0bUt1ZFRHbVVy?=
+ =?utf-8?B?UkdUUFZBbkpNS2Nma1ZTcUF5UXVNVUlYaTg3TXB0aHl6WjduYk1pOHNLTlpk?=
+ =?utf-8?B?RkZadDNuTTMzWnV0KzVHN1d0cFFHcTc2UE5NSllJYmVJNm9aNUJ0K05Ma3ha?=
+ =?utf-8?B?ZVpaQU5zejVWUlIxVmhMRnVUaWhOWTJ6Wm9qMTRjT3NHTHpFYjAyU1p5VFF5?=
+ =?utf-8?B?Tk1JVWd6M2xOYmdKMStvZ2ZUUlp3aGR3UEVQWDJXZGR2eUlRZU5MUFNSR3F3?=
+ =?utf-8?B?WENVaXI3M2xWdWxEV1kwZEE1c1czc2FYRUhrUTIvNkpDTkcwSEkreDg1N3Qx?=
+ =?utf-8?B?MU4xRjRKQ0c4Z2FyTEFwV0k4QzNRZHNrWnptV0Mza1A1Nm9BbVlXOTZOVnV3?=
+ =?utf-8?B?ZC9VL3RHb0dFRUg5OHpJUU9CMmFNeS9iTWN0ckhIM2JRTjJOcCtrZUJqY1dx?=
+ =?utf-8?B?THNseFRSVjVhYk82Q3NHQnQ4NlZqc2lkRnJ6SUtrLzErN2N4d0xJQlJvazhn?=
+ =?utf-8?B?amMvU3RhUGR6dWswSlU0T3dka2dEOGhMVHE3TndRNFlHRWJiSzJTbzkxZUZH?=
+ =?utf-8?B?cXp5QmZwb00vdGlFTlh6MU1ySWVBenBWdG5LWUxjRmxsZFEzaDA4dEhHZTZK?=
+ =?utf-8?B?OEY3anZFUWwraU45ckN0R2VCSjlKaTF0dmhORWpMeFlua2JDdXBQTEo3cEo3?=
+ =?utf-8?B?aFd4RDlCbFZoY0o1dXZCVHU3N0JGMnlZUHU2anNraDgraTgycWlvcDBaRys0?=
+ =?utf-8?B?dVBVb0pOK0hONFhhdW53RCtrYm1vcVJDaDJHUWN0enFpWHdjUU1BQTF2UmpC?=
+ =?utf-8?B?YTJIZlJCeEZpMms0RS9YNXRwYWVRRHR4OFAxMEZZTnNIRjJsc0c1NGh4T3RH?=
+ =?utf-8?B?QWE2enJBMHA3dURHMXhNZXBQeG50VkR6Rzh2Z0wvVUc1VW1WK29KdXNObHJj?=
+ =?utf-8?B?bEZCWG12SXZYL1VvK3c4am9xZXQ2UGdlWUQrSmJrLzN5RU1ZazVUT2YvTTBB?=
+ =?utf-8?B?bGp6b1F0WnRseFByVjZ4dFRkaHNJOEN6cWJRL0orNzd5ZnR3OUFUVENqazgr?=
+ =?utf-8?B?NDJQNFhUanl6YU5DZ2Zub29RWktFM2ZnL21WZTRmRUJ6MHcxMVMwUEl5M01D?=
+ =?utf-8?B?dHlMcThQVXdSSk1jemtFaTVrVUtGOCtHc2NHSEsyWCsybkdpQnBYVyt6Z3hx?=
+ =?utf-8?B?YmhwdFl3YVdzd3FKSWhybEcxZFJ0RDc0VFI1eDNjQXNvZWhtM0xIRzE1OXR2?=
+ =?utf-8?B?aG8rTUZCOW1aVy9YUncwczgyOXpRUi8wN1VDWVlJL2tWS2thaHF2bWNIS1BC?=
+ =?utf-8?B?VHR1RDVFYlAwOUFpb0RiV3ZSdHBDQ3JXMFRVV0lrV0hUQy9YMENoWGNrajRB?=
+ =?utf-8?B?L1ozclVvRHIyTzJETkZpWXk1QzZEYTZpN3FDWVh4WU1MMUNabmdpRFhmOUhH?=
+ =?utf-8?B?M0U0VHdLZ1RYSEx0NWlZM0JuY1FNcDFabGkyTy95V2xEUkF6Q3NId1RBY1U4?=
+ =?utf-8?B?V0pnbFA2WUhZT3pZOTBqcWxuaG52MERZY012VXAzNGdLT2RjeldIRER6dXVT?=
+ =?utf-8?B?aHNZRHoxYVcwN01TNTlSRnkvNERTV21JUksyM2trNnpBZTVmY0pSSHNOckpm?=
+ =?utf-8?B?ZWx4dE1Ed3lNZWhoUHFhY3BLelFxcklMM0RMQjBRczl6b1EwaFNmQVVXeUQ5?=
+ =?utf-8?B?L2FrOVdyT0xCc1JFdGYzSFk5S3h0dG5PSnRHcFgyaHU1cnc0cGxCNVVWSnoz?=
+ =?utf-8?B?WUZQL040NWNqNUt3dHpZTGU5MWJFOEI3bHJKYTFHNFA5SjZjaUxvVmR3RHBD?=
+ =?utf-8?B?TkxBdWtaTGN4SU83aDNDU0hHM0dJUVZkTERrSVpEamZYMFVCL3UyM3o4KzRx?=
+ =?utf-8?B?WHJadlJHU0NSeUZaUXNGYWZmTlVxOGRTNEVlYzBTVFdOcnhrL1Y4Yk1BUXFm?=
+ =?utf-8?Q?dHLEeU?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(82310400026)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2025 17:04:43.0018
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d4699b32-58b1-4a9b-4102-08ddc5540662
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB74.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9417
 
-The ice_cfg_tx_topo function attempts to apply Tx scheduler topology
-configuration based on NVM parameters, selecting either a 5 or 9 layer
-topology.
+Hi,
 
-As part of this flow, the driver acquires the "Global Configuration Lock",
-which is a hardware resource associated with programming the DDP package
-to the device. This "lock" is implemented by firmware as a way to
-guarantee that only one PF can program the DDP for a device. Unlike a
-traditional lock, once a PF has acquired this lock, no other PF will be
-able to acquire it again (including that PF) until a CORER of the device.
-Future requests to acquire the lock report that global configuration has
-already completed.
+This series contains misc enhancements to the mlx5 driver.
 
-The following flow is used to program the Tx topology:
+Regards,
+Tariq
 
- * Read the DDP package for scheduler configuration data
- * Acquire the global configuration lock
- * Program Tx scheduler topology according to DDP package data
- * Trigger a CORER which clears the global configuration lock
+Alexandre Cassen (1):
+  net/mlx5e: Support routed networks during IPsec MACs initialization
 
-This is followed by the flow for programming the DDP package:
+Feng Liu (1):
+  net/mlx5e: Expose TIS via devlink tx reporter diagnose
 
- * Acquire the global configuration lock (again)
- * Download the DDP package to the device
- * Release the global configuration lock.
+Shay Drory (1):
+  net/mlx5: Allocate cpu_mask on heap to fix frame size warning for
+    large NR_CPUS
 
-However, if configuration of the Tx topology fails, (i.e.
-ice_get_set_tx_topo returns an error code), the driver exits
-ice_cfg_tx_topo() immediately, and fails to trigger CORER.
+ .../mellanox/mlx5/core/en/reporter_tx.c       | 25 ++++++
+ .../mellanox/mlx5/core/en_accel/ipsec.c       | 82 ++++++++++++++++++-
+ drivers/net/ethernet/mellanox/mlx5/core/eq.c  | 19 +++--
+ .../mellanox/mlx5/core/irq_affinity.c         | 21 +++--
+ .../net/ethernet/mellanox/mlx5/core/pci_irq.c | 37 ++++++---
+ 5 files changed, 158 insertions(+), 26 deletions(-)
 
-While the global configuration lock is held, the firmware rejects most
-AdminQ commands, as it is waiting for the DDP package download (or Tx
-scheduler topology programming) to occur.
 
-The current driver flows assume that the global configuration lock has been
-reset by CORER after programming the Tx topology. Thus, the same PF
-attempts to acquire the global lock again, and fails. This results in the
-driver reporting "an unknown error occurred when loading the DDP package".
-It then attempts to enter safe mode, but ultimately fails to finish
-ice_probe() since nearly all AdminQ command report error codes, and the
-driver stops loading the device at some point during its initialization.
-
-The only currently known way that ice_get_set_tx_topo() can fail is with
-certain older DDP packages which contain invalid topology configuration, on
-firmware versions which strictly validate this data. The most recent
-releases of the DDP have resolved the invalid data. However, it is still
-poor practice to essentially brick the device, and prevent access to the
-device even through safe mode or recovery mode. It is also plausible that
-this command could fail for some other reason in the future.
-
-We cannot simply release the global lock after a failed call to
-ice_get_set_tx_topo(). Releasing the lock indicates to firmware that global
-configuration (downloading of the DDP) has completed. Future attempts by
-this or other PFs to load the DDP will fail with a report that the DDP
-package has already been downloaded. Then, PFs will enter safe mode as they
-realize that the package on the device does not meet the minimum version
-requirement to load. The reported error messages are confusing, as they
-indicate the version of the default "safe mode" package in the NVM, rather
-than the version of the file loaded from /lib/firmware.
-
-Instead, we need to trigger CORER to clear global configuration. This is
-the lowest level of hardware reset which clears the global configuration
-lock and related state. It also clears any already downloaded DDP.
-Crucially, it does *not* clear the Tx scheduler topology configuration.
-
-Refactor ice_cfg_tx_topo() to always trigger a CORER after acquiring the
-global lock, regardless of success or failure of the topology
-configuration.
-
-We need to re-initialize the HW structure when we trigger the CORER. Thus,
-it makes sense for this to be the responsibility of ice_cfg_tx_topo()
-rather than its caller, ice_init_tx_topology(). This avoids needless
-re-initialization in cases where we don't attempt to update the Tx
-scheduler topology, such as if it has already been programmed.
-
-There is one catch: failure to re-initialize the HW struct should stop
-ice_probe(). If this function fails, we won't have a valid HW structure and
-cannot ensure the device is functioning properly. To handle this, ensure
-ice_cfg_tx_topo() returns a limited set of error codes. Set aside one
-specifically, -ENODEV, to indicate that the ice_init_tx_topology() should
-fail and stop probe.
-
-Other error codes indicate failure to apply the Tx scheduler topology. This
-is treated as a non-fatal error, with an informational message informing
-the system administrator that the updated Tx topology did not apply. This
-allows the device to load and function with the default Tx scheduler
-topology, rather than failing to load entirely.
-
-Note that this use of CORER will not result in loops with future PFs
-attempting to also load the invalid Tx topology configuration. The first PF
-will acquire the global configuration lock as part of programming the DDP.
-Each PF after this will attempt to acquire the global lock as part of
-programming the Tx topology, and will fail with the indication from
-firmware that global configuration is already complete. Tx scheduler
-topology configuration is only performed during driver init (probe or
-devlink reload) and not during cleanup for a CORER that happens after probe
-completes.
-
-Fixes: 91427e6d9030 ("ice: Support 5 layer topology")
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_ddp.c  | 44 ++++++++++++++++++++++---------
- drivers/net/ethernet/intel/ice/ice_main.c | 14 ++++++----
- 2 files changed, 41 insertions(+), 17 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.c b/drivers/net/ethernet/intel/ice/ice_ddp.c
-index 59323c019544..bc525de019de 100644
---- a/drivers/net/ethernet/intel/ice/ice_ddp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ddp.c
-@@ -2374,7 +2374,13 @@ ice_get_set_tx_topo(struct ice_hw *hw, u8 *buf, u16 buf_size,
-  * The function will apply the new Tx topology from the package buffer
-  * if available.
-  *
-- * Return: zero when update was successful, negative values otherwise.
-+ * Return:
-+ * * 0 - Successfully applied topology configuration.
-+ * * -EBUSY - Failed to acquire global configuration lock.
-+ * * -EEXIST - Topology configuration has already been applied.
-+ * * -EIO - Unable to apply topology configuration.
-+ * * -ENODEV - Failed to re-initialize device after applying configuration.
-+ * * Other negative error codes indicate unexpected failures.
-  */
- int ice_cfg_tx_topo(struct ice_hw *hw, const void *buf, u32 len)
- {
-@@ -2407,7 +2413,7 @@ int ice_cfg_tx_topo(struct ice_hw *hw, const void *buf, u32 len)
- 
- 	if (status) {
- 		ice_debug(hw, ICE_DBG_INIT, "Get current topology is failed\n");
--		return status;
-+		return -EIO;
- 	}
- 
- 	/* Is default topology already applied ? */
-@@ -2494,31 +2500,45 @@ int ice_cfg_tx_topo(struct ice_hw *hw, const void *buf, u32 len)
- 				 ICE_GLOBAL_CFG_LOCK_TIMEOUT);
- 	if (status) {
- 		ice_debug(hw, ICE_DBG_INIT, "Failed to acquire global lock\n");
--		return status;
-+		return -EBUSY;
- 	}
- 
- 	/* Check if reset was triggered already. */
- 	reg = rd32(hw, GLGEN_RSTAT);
- 	if (reg & GLGEN_RSTAT_DEVSTATE_M) {
--		/* Reset is in progress, re-init the HW again */
- 		ice_debug(hw, ICE_DBG_INIT, "Reset is in progress. Layer topology might be applied already\n");
- 		ice_check_reset(hw);
--		return 0;
-+		/* Reset is in progress, re-init the HW again */
-+		goto reinit_hw;
- 	}
- 
- 	/* Set new topology */
- 	status = ice_get_set_tx_topo(hw, new_topo, size, NULL, NULL, true);
- 	if (status) {
--		ice_debug(hw, ICE_DBG_INIT, "Failed setting Tx topology\n");
--		return status;
-+		ice_debug(hw, ICE_DBG_INIT, "Failed to set Tx topology, status %pe\n",
-+			  ERR_PTR(status));
-+		/* only report -EIO here as the caller checks the error value
-+		 * and reports an informational error message informing that
-+		 * the driver failed to program Tx topology.
-+		 */
-+		status = -EIO;
- 	}
- 
--	/* New topology is updated, delay 1 second before issuing the CORER */
-+	/* Even if Tx topology config failed, we need to CORE reset here to
-+	 * clear the global configuration lock. Delay 1 second to allow
-+	 * hardware to settle then issue a CORER
-+	 */
- 	msleep(1000);
- 	ice_reset(hw, ICE_RESET_CORER);
--	/* CORER will clear the global lock, so no explicit call
--	 * required for release.
--	 */
-+	ice_check_reset(hw);
- 
--	return 0;
-+reinit_hw:
-+	/* Since we triggered a CORER, re-initialize hardware */
-+	ice_deinit_hw(hw);
-+	if (ice_init_hw(hw)) {
-+		ice_debug(hw, ICE_DBG_INIT, "Failed to re-init hardware after setting Tx topology\n");
-+		return -ENODEV;
-+	}
-+
-+	return status;
- }
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index c44bb8153ad0..b31b3aa2b662 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -4532,17 +4532,21 @@ ice_init_tx_topology(struct ice_hw *hw, const struct firmware *firmware)
- 			dev_info(dev, "Tx scheduling layers switching feature disabled\n");
- 		else
- 			dev_info(dev, "Tx scheduling layers switching feature enabled\n");
--		/* if there was a change in topology ice_cfg_tx_topo triggered
--		 * a CORER and we need to re-init hw
-+		return 0;
-+	} else if (err == -ENODEV) {
-+		/* If we failed to re-initialize the device, we can no longer
-+		 * continue loading.
- 		 */
--		ice_deinit_hw(hw);
--		err = ice_init_hw(hw);
--
-+		dev_warn(dev, "Failed to initialize hardware after applying Tx scheduling configuration.\n");
- 		return err;
- 	} else if (err == -EIO) {
- 		dev_info(dev, "DDP package does not support Tx scheduling layers switching feature - please update to the latest DDP package and try again\n");
-+		return 0;
- 	}
- 
-+	/* Do not treat this as a fatal error. */
-+	dev_info(dev, "Failed to apply Tx scheduling configuration, err %pe\n",
-+		 ERR_PTR(err));
- 	return 0;
- }
- 
-
+base-commit: a96cee9b369ee47b5309311d0d71cb6663b123fc
 -- 
-2.50.0.349.ga842a77808e9
+2.31.1
 
 
