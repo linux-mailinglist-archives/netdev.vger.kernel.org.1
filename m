@@ -1,118 +1,112 @@
-Return-Path: <netdev+bounces-207975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19A26B092DE
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 19:12:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E9EFB092DF
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 19:12:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFED4A624B1
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 17:10:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CD653B720C
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 17:11:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0556C2FEE02;
-	Thu, 17 Jul 2025 17:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EE6B2F94AA;
+	Thu, 17 Jul 2025 17:11:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="VdtixoaO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="faoYpRrV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 707442FD5B0
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 17:10:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 532831A2C06
+	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 17:11:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752772231; cv=none; b=gIUwUrQ3G5gu5EaSAbPpAKBBXnsuaYk9qEE6qadH6+Yb90I3ELMmpKGIXUgkQzJyEgCYEhH/sqNMqc+fzUneyfuIsAHG248hnk9zOwLJ6Y0yr8mxNR5NtY2/VEya4OV88SabHFOFXrC2TH91rNeJEQt/65wTaF9Y+yxyUOjCNS4=
+	t=1752772273; cv=none; b=Xrk6kp8ilMQGr2hvKfwq3BLI/SXsdI3pFuIXYg/GJzh2NV5IImBf+ywDkc9YZdW+0/ziN5GQcErIIcy9ZDO1Upcw9UH16FlZFZ6iQ90YXoa1Vm9jnS4AqI6jE4nsxqDLXp9NnV5FlfwzD3vnkW3V6wyGf64J1TcuZqqAPoP3d1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752772231; c=relaxed/simple;
-	bh=7iTmpEkIucCSGyvx3qB88gP14e5Ca/SnEczrO/VPcSY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DarP08Fw4Rz2E2WUp4PHwNf6Ps/c73x0vAWJ+YS1qyw+pZyWWl3dxzYZsaHakmcPX4CsmIGtvTJxA7PoQsMRXg3VWRMQKOd+Enlbv7WhQO+EffNu0Mxb395KSTZMupsIPNdxXvY8kbTLmLe77hv2Dq8fmFaQNAIGv/0mATjfdYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=VdtixoaO; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56H9e6WR015497;
-	Thu, 17 Jul 2025 10:10:23 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=FJbVGpIOEX5iecJnRPyji5i/i
-	5jqhqNPG2ElIf/+pOI=; b=VdtixoaOo1jqpTMbkRU/AATtSs4IOBR2Ku8j9CdRq
-	XOtwl8rGGERLgqNAq82GOmS3ktiLGa0AuHk+M+LRH9P5yoi6DMKrhLL2HsvFchJG
-	Ja51ApqIfX3A/CA41czPtSSsCPhvZEn8pT4o5dVllkpyhrmNDNR1aW0X8EgvUUyk
-	OM5hnXxZpv1x5wafRRuwpOZDDVi/cu5tEtLuXw/CLAGuLfXjl43qYsryEAAgDnJj
-	sKJbD/bOdKGGLTAYnWELwkn/a7oxKZikNz0PVNRJ9rULOvGGh7iWyTJOOlGsXrqv
-	wdzbiotXMfsBqlAzHDMpDAw0HxNiRf3LSvvO5Y7Sr4XtQ==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 47xxmq0y9g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 17 Jul 2025 10:10:22 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Thu, 17 Jul 2025 10:10:21 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Thu, 17 Jul 2025 10:10:21 -0700
-Received: from hyd1358.marvell.com (unknown [10.29.37.11])
-	by maili.marvell.com (Postfix) with ESMTP id 9F1173F7058;
-	Thu, 17 Jul 2025 10:10:17 -0700 (PDT)
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>
-CC: <gakula@marvell.com>, <hkelam@marvell.com>, <bbhushan2@marvell.com>,
-        <jerinj@marvell.com>, <lcherian@marvell.com>, <sgoutham@marvell.com>,
-        <netdev@vger.kernel.org>, Subbaraya Sundeep <sbhatta@marvell.com>
-Subject: [net-next PATCH v3 11/11] octeontx2-pf: Use new bandwidth profiles in receive queue
-Date: Thu, 17 Jul 2025 22:37:43 +0530
-Message-ID: <1752772063-6160-12-git-send-email-sbhatta@marvell.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1752772063-6160-1-git-send-email-sbhatta@marvell.com>
-References: <1752772063-6160-1-git-send-email-sbhatta@marvell.com>
+	s=arc-20240116; t=1752772273; c=relaxed/simple;
+	bh=GVUHGju2+ZDh6FoEwREwk2SXt0lnoraJ0qlp8NVftCI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T1XH6QW2du9LYc4ksg/pUrK/wvV1fFFfwDp9vGFHrH9q+AEDupXtniQLq10rgyiYyJAGEY5mCletAbEftzlxJeyahzx8uxGaeUlHqcy6S8hC0ialwi8lAZ511HL+N1isjfwK87z5lSW5zww8IzbGse4YlsczBWJH5duZi5cLZ+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=faoYpRrV; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752772270;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=3JDncZPC9OMcQ6vJ0w/uC4y2BfDtUILRnDAHQlRDKF4=;
+	b=faoYpRrVFSJCxJ4MbU5xw//VedGkqdvpkjfTr9WA3WDBEMTQsYJCZqF1msO6U7ocL1frYT
+	BgBlrVPPOqqrpLI6cF7+RZYo1bWNiu8macBBrGAt+lgihj0IcdSz3AMYZah1jb0/ODjsVX
+	6FtlQOKwOgPyBYbbIeEUQTLj/Ucnpog=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-685-gScbiNX9OQaGZX7tjnFFVA-1; Thu,
+ 17 Jul 2025 13:11:07 -0400
+X-MC-Unique: gScbiNX9OQaGZX7tjnFFVA-1
+X-Mimecast-MFC-AGG-ID: gScbiNX9OQaGZX7tjnFFVA_1752772265
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 38B0E19560B6;
+	Thu, 17 Jul 2025 17:11:05 +0000 (UTC)
+Received: from p16v.luc.cera.cz (unknown [10.44.34.5])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6C5CD195608D;
+	Thu, 17 Jul 2025 17:11:01 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Michal Schmidt <mschmidt@redhat.com>,
+	Petr Oros <poros@redhat.com>
+Subject: [PATCH net-next 0/2] dpll: zl3073x: Read clock ID from device property
+Date: Thu, 17 Jul 2025 19:10:58 +0200
+Message-ID: <20250717171100.2245998-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=TMpFS0la c=1 sm=1 tr=0 ts=68792e7e cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=Wb1JkmetP80A:10 a=M5GUcnROAAAA:8 a=VbpyGYBai7zdicxOX80A:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE3MDE1MiBTYWx0ZWRfXz0MYLiDtpreH SzNz4e3G+QuQJHu8cvtZ3RDmIGJMxnhc5Q4S0IPQxTS6loK/zpwmWJIlsWS5nMqkiKFp5lr5NzM 8z5raVO4lQq86TA0cCboDUJurV2Ll8NfK66bKQNyIuK11F9Q7nF/Y/6V4kzjR1mKLTnbvFXf2zw
- UpZKL1NnD/QC0nFp97wBRks52s6UYQeoo/hjl1C0WRlNgZAyRMaqpzW4SiesdBIN58Ir4DyhX5F NUVd8xyfYbTSt8M2tEkX6JtGPVnMF34jGz2rC3T8VWcxGtWnlmruSClwM391xcCDdSaEACa7VP+ ui3PWaHBjt9iGf1HgsEdOKv7Mn9lnCwvzWase4GmHY303GDTgbPbsAWpg+C80FFADZgx+q4xA1f
- syPwkvIVjuUV6chMnfwLXUboyMZZtadPjNwMLMflz4zy275rAPQ7Z28AmBjbEdOW3CtOC9Kl
-X-Proofpoint-ORIG-GUID: YuYiTlhqPIpQOnOA9Q66i2vHnzSIW2_C
-X-Proofpoint-GUID: YuYiTlhqPIpQOnOA9Q66i2vHnzSIW2_C
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-17_02,2025-07-17_02,2025-03-28_01
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Receive queue points to a bandwidth profile for rate limiting.
-Since cn20k has additional bandwidth profiles use them
-too while mapping receive queue to bandwidth profile.
+The current ZL3073x firmware revisions do not provide any information
+unique for the particular chip that could be use to generate clock ID
+necessary for a DPLL device registration.
 
-Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Currently the driver generates random clock ID during probe and a user
+have and option to change this value using devlink interface.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
-index cab157aac251..3e1bf22cba69 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
-@@ -341,6 +341,12 @@ int cn10k_map_unmap_rq_policer(struct otx2_nic *pfvf, int rq_idx,
- 	aq->rq.band_prof_id = policer;
- 	aq->rq_mask.band_prof_id = GENMASK(9, 0);
- 
-+	/* If policer id is greater than 1023 then it implies hardware supports
-+	 * more leaf profiles. In that case use band_prof_id_h for 4 MSBs.
-+	 */
-+	aq->rq.band_prof_id_h = policer >> 10;
-+	aq->rq_mask.band_prof_id_h = GENMASK(3, 0);
-+
- 	/* Fill AQ info */
- 	aq->qidx = rq_idx;
- 	aq->ctype = NIX_AQ_CTYPE_RQ;
+The situation is very similar to network controllers that do not have
+assigned a fixed MAC address.
+
+The purpose of this series is to allow to specify the clock ID property
+through DT. If the property is not provided then the driver will use
+randomly generated value as fallback.
+
+Patch breakdown:
+Patch 1 - adds clock-id property to dpll-device DT schema
+Patch 2 - adds support for this DT property in zl3073x driver
+
+Ivan Vecera (2):
+  dt-bindings: dpll: Add clock ID property
+  dpll: zl3073x: Initialize clock ID from device property
+
+ .../devicetree/bindings/dpll/dpll-device.yaml |  5 +++
+ drivers/dpll/zl3073x/core.c                   | 32 ++++++++++++++++---
+ 2 files changed, 32 insertions(+), 5 deletions(-)
+
 -- 
-2.34.1
+2.49.1
 
 
