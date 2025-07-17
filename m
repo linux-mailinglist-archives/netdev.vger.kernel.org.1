@@ -1,149 +1,197 @@
-Return-Path: <netdev+bounces-207696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDA0CB08476
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 08:01:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E653B084B3
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 08:16:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC6A17AFADE
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 06:00:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5E373BB7EE
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 06:15:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F200204598;
-	Thu, 17 Jul 2025 06:01:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A14E3203706;
+	Thu, 17 Jul 2025 06:15:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SAVl38Jp"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="V8+TY+rG"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDB221F1518
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 06:01:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D39ED86348;
+	Thu, 17 Jul 2025 06:15:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752732083; cv=none; b=bYPVi15OiEphuZbYs5k2B2TtOdWegHmz5B+jx65pxRReZNhWg0kQKeYaadMz2CCzVc/oOfikz5jiSNdkKyBNED+RJiMh3TSOj5hC4ayDeFZaHn90SR4smBiAEjvmhzppYV9bCPOox32g943IS+kfpKzL4Mi31YEGHepRARGKMCE=
+	t=1752732955; cv=none; b=cp6g2h/3FQ9R0IOrjVM6acbCuOr0UnOMQ+tUjPmMIkb+Kvy9/WCNUorhmrY+2C9lH9PgmWYJiRibF8jRttRSj/pYRSWxX0Uum/G/AiElZm0jAQLG+KPaBpE5DFSmcAoyM3Rk14nu3vvNVsv7t7gRoDRlANMXDOYlrdq6gfvm2uc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752732083; c=relaxed/simple;
-	bh=jxOpZ0mtCseo/bSPj1OyB2eE1E7Wq+zP8rpLdjVZc98=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cqxDmRMckD7Gj6R1vr9fzi7MKrtWzr5xmJaKPRUih+jW6ThGDYLlUe6MmQeJ4Sz8GvZ7hlpreMwJ2p/PJuCXQlfhcAHitMVtYmYaoCaGATBziFiG2pDCCZGTjgQ11WEKFoKhGgwUdH8SpV2y8dxd3bU1q2o+6dVrS7dF5wVXnBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SAVl38Jp; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752732080;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jxOpZ0mtCseo/bSPj1OyB2eE1E7Wq+zP8rpLdjVZc98=;
-	b=SAVl38Jptu9v9WoMVTFte9S9k6gG6mO8OXmoNI+5HEEuoYkeVKfhmcSOM0POwIG/KiqzjO
-	aaHhSMwR29ReNnUIIyCLpFniN+ET5Pq3pciog2mE00RTsZsy8mGwDO1bjPti2+Ylplz5IO
-	GOLAJSxzISO2mqKtgj3THTcW4kCptY0=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-70-k7iJo4LEMLiUAou6I5kiGg-1; Thu, 17 Jul 2025 02:01:19 -0400
-X-MC-Unique: k7iJo4LEMLiUAou6I5kiGg-1
-X-Mimecast-MFC-AGG-ID: k7iJo4LEMLiUAou6I5kiGg_1752732078
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-3141a9a6888so615211a91.3
-        for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 23:01:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752732078; x=1753336878;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jxOpZ0mtCseo/bSPj1OyB2eE1E7Wq+zP8rpLdjVZc98=;
-        b=LKCIZK1zUdDfNhlfteOEoHzFcv1D2Bu1A/KS9YkEzkYzoK8bOJ76UmccJq14DwaTSQ
-         NBd9EEAtfAZgHTM9Q3NpXvuZzGA1k4DWSDCrWcuwhxBXnuBGoxM6wfBjEa7TYoU2REF/
-         2LHRtOeY7eQ928CA9N4buhF1GbVKoNG6fpMp+g3wDEIVY+NDikQt5dqtDX8HOp6qqrE6
-         ikOhMC1uuF2A2F+CjppJhWCZuKVggyOVeNZ/9Msv92ebxBr1LxRTd99hNs0y4AHoF/HJ
-         /kNM4g7zaMSGJjlRnDsahh8lof3m5tbUWhYGTyaqt0eVSyKlzJTbG+VDR7TovU0NLtHf
-         BFAw==
-X-Forwarded-Encrypted: i=1; AJvYcCXCLn6zC3PWt1tK54fwP8ePBnn40Y84UbtHmEgOg7MhFN9wb1KZROz2CXlXMKpaM9XuR2Oo8hI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUgysnBEvopR8hwKXxXW+6EWchHBVXPGXRrZzNYQk3dPhOrGH+
-	fYVFp8SDxlQGTNWPnWsJhcchVDgNidVIWaW+C9vCgoEUSXd8wJl6lXU7QPzsvMbKg8KWRa9u/m5
-	iOcN3qGvRNiZT8sl6z+8M3/9tJGdOohHkA0nLNhAkIQwgV8LUBkea/m2qQmNRArn9iUKlpAb1sF
-	4ZT/pjgUI679MDnXnNX0HID6z7nUhCGdeF
-X-Gm-Gg: ASbGncs1XLrYUr3rMvI8DkuyMfn8XMCQP3V/w0SRpkbk5w0RDvxTc01BXs0DOVhz1kH
-	zG6fjhsmoU0BK9BopYjKWKPJgIpDwTcPVBYxE6wSejU/kZVXdTZSrw5qlWdWuOdjk8vtfgr4IMy
-	VohEawc8ijUx16GK/+wylP
-X-Received: by 2002:a17:90b:3d08:b0:311:c93b:3ca2 with SMTP id 98e67ed59e1d1-31c9e6e96fdmr7785020a91.6.1752732078190;
-        Wed, 16 Jul 2025 23:01:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHwj9WmmYZqqcY9e7xgqKnA/kJN103hoaasmkwFwEeUcw9OvLCJ0a3fMKNsQmV80tmXN1QWinAAhZ7uGEl6g/c=
-X-Received: by 2002:a17:90b:3d08:b0:311:c93b:3ca2 with SMTP id
- 98e67ed59e1d1-31c9e6e96fdmr7784953a91.6.1752732077622; Wed, 16 Jul 2025
- 23:01:17 -0700 (PDT)
+	s=arc-20240116; t=1752732955; c=relaxed/simple;
+	bh=Rs3PQs9UhDCFrFotyWbNQEWehdMmELxoeAVZOl53eXo=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=eW4sDUFr3xs5eNkmqbTumG2IFGWY57XrL3OmqfIqnlQe8aeTmSpyO1UUJeTdAm81p5LBytU/w2jNsjXV6MltSNXAxHf0oycuUoTPle0+coQp7ZS17gfdtpxJ7c2iuGEAoOYKI0Yf03YZGqnggUj4A6ezhX8stflPAhQ660BQ188=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=V8+TY+rG; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1752732826;
+	bh=K3xgEak+/uBJv4EPnVQgmEJ/TuEh2d0PsQc0FFVJjB8=;
+	h=Date:From:To:Cc:Subject:From;
+	b=V8+TY+rGeaATwRvwoGurD6pIyTJV2WDsUDY2Dd52xhR6Qbs5wK7neR5emKTUYOfAs
+	 luKckmAryvJ0GJ+oWHDwfEO+UpT+F2wMZx7CodgmglfxuI7sRYu5SBcrab6xIdwPcH
+	 o8edBDW29NGWvTNck6i6mBYjrWpctsCuIWC4aKIbu+IIRpP7x10JoVkKeNRqY6ldl/
+	 uUsBbuKcj2Imh36XqeaugNwu6yVbXZsb/ga4jdm8vh8lNE00Je3vvyE7QBRi8cSZ5s
+	 Zq2fnmEVkMJGLOQ6B32Odpn4ulVhQNLGKbDQia2YsTOG7r3QPvxafaO5QYjnReymH0
+	 4CaTXICuKZM1w==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4bjN0T2LH2z4xPd;
+	Thu, 17 Jul 2025 16:13:45 +1000 (AEST)
+Date: Thu, 17 Jul 2025 16:15:46 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: "Michael S. Tsirkin" <mst@redhat.com>, David Miller
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>
+Cc: Cindy Lu <lulu@redhat.com>, Jason Wang <jasowang@redhat.com>, Networking
+ <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the vhost tree with the net-next tree
+Message-ID: <20250717161546.52ab1a3c@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250714084755.11921-1-jasowang@redhat.com> <20250716170406.637e01f5@kernel.org>
- <CACGkMEvj0W98Jc=AB-g8G0J0u5pGAM4mBVCrp3uPLCkc6CK7Ng@mail.gmail.com> <20250717015341-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20250717015341-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 17 Jul 2025 14:01:06 +0800
-X-Gm-Features: Ac12FXzpdsVwGDtCJSLzaoSwQSJcC8NcxCnl7Zblf_dU7B8OIQV_ThQuhTzi5L0
-Message-ID: <CACGkMEvX==TSK=0gH5WaFecMY1E+o7mbQ6EqJF+iaBx6DyMiJg@mail.gmail.com>
-Subject: Re: [PATCH net-next V2 0/3] in order support for vhost-net
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, eperezma@redhat.com, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, jonah.palmer@oracle.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/K1gPLhNMBx1BU9YXcX/evGE";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/K1gPLhNMBx1BU9YXcX/evGE
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 17, 2025 at 1:55=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
- wrote:
->
-> On Thu, Jul 17, 2025 at 10:03:00AM +0800, Jason Wang wrote:
-> > On Thu, Jul 17, 2025 at 8:04=E2=80=AFAM Jakub Kicinski <kuba@kernel.org=
-> wrote:
-> > >
-> > > On Mon, 14 Jul 2025 16:47:52 +0800 Jason Wang wrote:
-> > > > This series implements VIRTIO_F_IN_ORDER support for vhost-net. Thi=
-s
-> > > > feature is designed to improve the performance of the virtio ring b=
-y
-> > > > optimizing descriptor processing.
-> > > >
-> > > > Benchmarks show a notable improvement. Please see patch 3 for detai=
-ls.
-> > >
-> > > You tagged these as net-next but just to be clear -- these don't appl=
-y
-> > > for us in the current form.
-> > >
-> >
-> > Will rebase and send a new version.
-> >
-> > Thanks
->
-> Indeed these look as if they are for my tree (so I put them in
-> linux-next, without noticing the tag).
+Hi all,
 
-I think that's also fine.
+Today's linux-next merge of the vhost tree got conflicts in:
 
-Do you prefer all vhost/vhost-net patches to go via your tree in the future=
-?
+  drivers/vhost/net.c
+  include/uapi/linux/vhost.h
 
-(Note that the reason for the conflict is because net-next gets UDP
-GSO feature merged).
+between commits:
 
->
-> But I also guess guest bits should be merged in the same cycle
-> as host bits, less confusion.
+  333c515d1896 ("vhost-net: allow configuring extended features")
+  bbca931fce26 ("vhost/net: enable gso over UDP tunnel support.")
 
-Work for me, I will post guest bits.
+from the net-next tree and commits:
 
-Thanks
+  3206300e7af0 ("vhost: Reintroduce kthread API and add mode selection")
+  3f466fdc0b91 ("vhost_net: basic in_order support")
 
->
-> --
-> MST
->
+from the vhost tree.
 
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc drivers/vhost/net.c
+index bfb774c273ea,8ac994b3228a..6edac0c1ba9b
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@@ -69,14 -69,13 +69,15 @@@ MODULE_PARM_DESC(experimental_zcopytx,=20
+ =20
+  #define VHOST_DMA_IS_DONE(len) ((__force u32)(len) >=3D (__force u32)VHOS=
+T_DMA_DONE_LEN)
+ =20
+ -enum {
+ -	VHOST_NET_FEATURES =3D VHOST_FEATURES |
+ -			 (1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
+ -			 (1ULL << VIRTIO_NET_F_MRG_RXBUF) |
+ -			 (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
+ -			 (1ULL << VIRTIO_F_RING_RESET) |
+ -			 (1ULL << VIRTIO_F_IN_ORDER)
+ +static const u64 vhost_net_features[VIRTIO_FEATURES_DWORDS] =3D {
+ +	VHOST_FEATURES |
+ +	(1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
+ +	(1ULL << VIRTIO_NET_F_MRG_RXBUF) |
+ +	(1ULL << VIRTIO_F_ACCESS_PLATFORM) |
+- 	(1ULL << VIRTIO_F_RING_RESET),
+++	(1ULL << VIRTIO_F_RING_RESET) |
+++	(1ULL << VIRTIO_F_IN_ORDER),
+ +	VIRTIO_BIT(VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO) |
+ +	VIRTIO_BIT(VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO),
+  };
+ =20
+  enum {
+diff --cc include/uapi/linux/vhost.h
+index d6ad01fbb8d2,e72f2655459e..c57674a6aa0d
+--- a/include/uapi/linux/vhost.h
++++ b/include/uapi/linux/vhost.h
+@@@ -236,10 -236,32 +236,38 @@@
+  #define VHOST_VDPA_GET_VRING_SIZE	_IOWR(VHOST_VIRTIO, 0x82,	\
+  					      struct vhost_vring_state)
+ =20
+ +/* Extended features manipulation */
+ +#define VHOST_GET_FEATURES_ARRAY _IOR(VHOST_VIRTIO, 0x83, \
+ +				       struct vhost_features_array)
+ +#define VHOST_SET_FEATURES_ARRAY _IOW(VHOST_VIRTIO, 0x83, \
+ +				       struct vhost_features_array)
+ +
++ /* fork_owner values for vhost */
++ #define VHOST_FORK_OWNER_KTHREAD 0
++ #define VHOST_FORK_OWNER_TASK 1
++=20
++ /**
++  * VHOST_SET_FORK_FROM_OWNER - Set the fork_owner flag for the vhost devi=
+ce,
++  * This ioctl must called before VHOST_SET_OWNER.
++  * Only available when CONFIG_VHOST_ENABLE_FORK_OWNER_CONTROL=3Dy
++  *
++  * @param fork_owner: An 8-bit value that determines the vhost thread mode
++  *
++  * When fork_owner is set to VHOST_FORK_OWNER_TASK(default value):
++  *   - Vhost will create vhost worker as tasks forked from the owner,
++  *     inheriting all of the owner's attributes.
++  *
++  * When fork_owner is set to VHOST_FORK_OWNER_KTHREAD:
++  *   - Vhost will create vhost workers as kernel threads.
++  */
+ -#define VHOST_SET_FORK_FROM_OWNER _IOW(VHOST_VIRTIO, 0x83, __u8)
+++#define VHOST_SET_FORK_FROM_OWNER _IOW(VHOST_VIRTIO, 0x84, __u8)
++=20
++ /**
++  * VHOST_GET_FORK_OWNER - Get the current fork_owner flag for the vhost d=
+evice.
++  * Only available when CONFIG_VHOST_ENABLE_FORK_OWNER_CONTROL=3Dy
++  *
++  * @return: An 8-bit value indicating the current thread mode.
++  */
+ -#define VHOST_GET_FORK_FROM_OWNER _IOR(VHOST_VIRTIO, 0x84, __u8)
+++#define VHOST_GET_FORK_FROM_OWNER _IOR(VHOST_VIRTIO, 0x85, __u8)
++=20
+  #endif
+
+--Sig_/K1gPLhNMBx1BU9YXcX/evGE
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmh4lRIACgkQAVBC80lX
+0GyKwgf7BygJxuuUgUzyl5GogIMXHVgZArO64PurUH7IJEE8ZQ4zRZ7/88n/tQSm
+/udTpezjmA/F5Jy9sKsCvKPc2ivEU6wQppo7ki+Q9AtGgU9LDe6srp4ea/mCG2bg
+bDOd+JR5kzVZHdjP0KSri+JRuqCUbC37hEmhRXr3fgX+toD7iuHEAOLksxAMZfCg
+zfSznaGe9aUCLetwITuuwgPOW9KjQL2N1O3ttl8fNDXbeZUfRid1VROugESTEduE
+PP+6npFcQ6MXd00nfnHFhtBfnHBKzwOvut7DmooTiMxkh5jAdQH7dtpt1+N2TT0E
+K03LE5/DdY++guCqKjtzFY6FODmq9A==
+=ctr3
+-----END PGP SIGNATURE-----
+
+--Sig_/K1gPLhNMBx1BU9YXcX/evGE--
 
