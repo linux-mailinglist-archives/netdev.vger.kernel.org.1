@@ -1,208 +1,132 @@
-Return-Path: <netdev+bounces-208007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A729B094E6
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 21:22:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D2ACAB0950E
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 21:36:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3BB41C800C0
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 19:22:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FA071C46667
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 19:37:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8B312FF46E;
-	Thu, 17 Jul 2025 19:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C4E621B9DA;
+	Thu, 17 Jul 2025 19:36:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IaWqBezb"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Q5EHa4ne"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 319BF2FE32F
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 19:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1E52080C4
+	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 19:36:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752780030; cv=none; b=LVOZ6oSUboiwSPlqRiva65fxzbn5lSOncp02QiHuXt3ulLXNwMbrljL1FK9AC1/Ig8iYeRSRaaXkV9HPdgA3snI/n++9jTe6VvspkI8TMihurcqCnUbfSaWCtXmip5Kfb4xTP+u99zUVwFrprQZce10jxtfcGTS0CWnH7fp8p9k=
+	t=1752780998; cv=none; b=lxPKG07tTQZ54mrk2xZ4B/B8lcQDKnJjaHecEJL1xItlGmoiMf4jLVYEP/ESAgeqiXTOT6Wi/wfswdJ2CxiO4aFfgDpisxw9dGK06MEFLUcSDTy1zjp5YgCFaxhOfFzY2okWW8OIns6Iyt32magAWsqin6FtWzDyYlQPniB07v4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752780030; c=relaxed/simple;
-	bh=qHNE6ZJsNsPHrMLOVMlNPJ1T9cDi7uaDRJUDA35BTb0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=BRUkCCVK6gOnZCiKIMDI73TtYfAqCPy522d7OlAyldcA9/V+pvwl+OExDuaPMToq0XR+7g1ZAfqyQEnL/iESYO8Orxqnqa7rEbHCvQ6f/SrcZ0ZRxM88jmZWwHbNvH4qbEyLtSIMPyAA3FXN2sdQq7iykwz88Zvhuth7hQco7w4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IaWqBezb; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-748fd21468cso1287777b3a.1
-        for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 12:20:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752780028; x=1753384828; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=HR8MX3mhC9f/vMePEVzAQse8ycjHGoEB8XupYWNC4G4=;
-        b=IaWqBezbXIkLjDNaoGB+MlwdD1pruj2ZbzfmKZ2QiGS5h0VaJ3b0XdeWAJWdJYru22
-         6yoTT4tDf2k0ufGvFa+x7O9AW6pO+14NEQ+sLnx5SI1rVbzAcOsH4hytR6lH2RY96wwW
-         L8PPDGlbtOFcvsZyOnz4CVC801aBxgfbICL/wHYuUYkA13noBKhVtcwECP1rnZJEiqaC
-         FNetg/p8flCbis+oVAlmMOutQN9warI1JFqRGfu7iUMvqxPdmVgNNWY+wqsrPmoQryNk
-         pNiSHamVHUKClXyPcKuI33C7EYTpSjaBN9AOMn/2tG1vwa5col1nraiLlkt/basc/HSa
-         6bvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752780028; x=1753384828;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HR8MX3mhC9f/vMePEVzAQse8ycjHGoEB8XupYWNC4G4=;
-        b=Io+J3ZZViGrlpLnOJokeRyiARSf4PfNuycu2lfqjhy8TBWAXvCfZABwbw0xSw2eccK
-         FuPYkecuF8E7fbPYw+cTJo3mdApS19LgjbKuaPtnSp0Xafg/QCGHhcJV4hPGkUAllF7z
-         EZ4A+nKD41qSLrAlFpz27g3VQ8MBqXLELREGK71+iUP6a4znqYHFIokfN4wH5lz0FYmW
-         /nopwzqv3rGcoYpBOQ9WFEfXKkJV1aqXCEfumhdyPrGUbF3A0ZQJok+8uUA2YSKuc7XK
-         qwm/yxXk1FazZezdeExHZ/5XAp5eDH4NSdsNYUlskGUmEcAZ7b9pxnaRUDE0LaFLOAIC
-         2CWw==
-X-Gm-Message-State: AOJu0YzupEwnJYUHnntYzEo6MfBxBKaUx+/bJ9aT25uDfITUhDrSYFaQ
-	/Ndh7jHGLnywPVzavuwumMEZCWrQbtUfa3mzZNhAsQnUb7SvKQxbdeevaLu+4rRfe5NyqqruQqN
-	4SnegMurhb5R5xVPXrsmwg9H9UchJRFF5jMC409NVFNVgtHt82x23TXmqwXhvd/QdpswQteuO/D
-	WKHmrqk3PpBP05pv2BHEpMzO0HgROf2hWdU33kzpR5b2TOoFhAaLGAU+Cgn3wIkF0=
-X-Google-Smtp-Source: AGHT+IEtBesc2N/Fs+i9lOTd8XbLy9wXA+Q1KV0da06KAym2OQZ4lDK2l1GvqB7GpOLTPoD+KcroaFJ0N6GKz0JNag==
-X-Received: from pfbki26.prod.google.com ([2002:a05:6a00:949a:b0:748:f3b0:4db2])
- (user=hramamurthy job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:985:b0:74d:247f:faf1 with SMTP id d2e1a72fcca58-756e819fa32mr11350357b3a.6.1752780028251;
- Thu, 17 Jul 2025 12:20:28 -0700 (PDT)
-Date: Thu, 17 Jul 2025 19:20:24 +0000
+	s=arc-20240116; t=1752780998; c=relaxed/simple;
+	bh=Kn/TPW78P3PwWBJuYrIrat0HjRFsy+CagLoM9v8MkPs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=A8i157r2pVFAQxeH5kogjdI+40e73VKeMBe2pV4rnxLQYzOK2ydeYS9snp4x/cl2ZhSp2yEs0hhDEW1Vq07oy4L8tmx1xvdgtdV/S0BYJzdlaDsi1YszMoj/imcYTlGkT8iUcHmuuuKsCYTFpyKRfjp1mF+J54IiRxL63cNRG7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Q5EHa4ne; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56HJXroL006679;
+	Thu, 17 Jul 2025 19:36:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=FVo1KLjLPTWT7opAQqEWttbNzdAC+
+	kkxNL049Dbzfog=; b=Q5EHa4nezqM1autTyzi+rZtJJxXpBwfx4KrfaAN3LPuZC
+	xFO/tVMOCUXT0SPswiEEioYDVqo+fuxZVs3JX3rsp6ho5mRMSGv9KEb4w80IFelG
+	q7psuiHbwIsn9/4a1EX+guZ+iCHrjCiq1HO/rhBmBZLfTEqlMPnqXOdpFbmV2qzn
+	BIqS7trw1BPtdvJP+uT06gtsYKX9XOT3IjfaRcKIN1uNn9w4v5sCPC2yYEqRFCcd
+	+FPU9An9OQv/CZLSrdPj/ZE59p6jJeo337DV8PB9/3zRfCR8sTTyBdqrDn9QlUwk
+	hk7luMV+YXiYDelGKfXgKzh9KwnvJhKpK/Lv2ENpA==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 47uk673j0m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 17 Jul 2025 19:36:24 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 56HJPBUS012951;
+	Thu, 17 Jul 2025 19:36:23 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 47ue5cptaf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 17 Jul 2025 19:36:23 +0000
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 56HJaMHw028854;
+	Thu, 17 Jul 2025 19:36:22 GMT
+Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 47ue5cpt9k-1;
+	Thu, 17 Jul 2025 19:36:22 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: somnath.kotur@broadcom.com, ajit.khaparde@broadcom.com,
+        sriharsha.basavapatna@broadcom.com, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org
+Cc: alok.a.tiwari@oracle.com
+Subject: [PATCH net-next] be2net: Use correct byte order and format string for TCP seq and ack_seq
+Date: Thu, 17 Jul 2025 12:35:47 -0700
+Message-ID: <20250717193552.3648791-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250717192024.1820931-1-hramamurthy@google.com>
-Subject: [PATCH net v2] gve: Fix stuck TX queue for DQ queue format
-From: Harshitha Ramamurthy <hramamurthy@google.com>
-To: netdev@vger.kernel.org
-Cc: jeroendb@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	pkaligineedi@google.com, willemb@google.com, joshwash@google.com, 
-	ziweixiao@google.com, jfraker@google.com, awogbemila@google.com, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
-	Tim Hostetler <thostet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-17_03,2025-07-17_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxscore=0 malwarescore=0
+ phishscore=0 spamscore=0 mlxlogscore=999 bulkscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
+ definitions=main-2507170173
+X-Proofpoint-ORIG-GUID: -qJzwOqQvJQgehRWymNubHuZcl9Ao7Ii
+X-Authority-Analysis: v=2.4 cv=AZGxH2XG c=1 sm=1 tr=0 ts=687950b8 b=1 cx=c_pps a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17 a=Wb1JkmetP80A:10 a=yPCof4ZbAAAA:8 a=cmPuA5mWZHLCR3AKRpAA:9 cc=ntf awl=host:12061
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE3MDE3NCBTYWx0ZWRfX274p82fJ2GCd 7jxl2hWHuJuJffI9u++Kmp+yJgIyNYL+GaDArfaP9O+ybz2B92hrp38zQ7WZySLF7XWKJXAe8/A 6comCGSg6cRccx2wyYsaL2bs1MOtVKmDjLWyeoTppPgnCMiHtoI8q9QETi1KOYvGeYRfrb2MvRs
+ 3wazA3E70ui6OLp3doeX1s5p2ka9P2a0EzDlTM0SGSvyFVls1Qu6jvOnRSwRfZfKxHuu4i4aK35 tqVHdToVbsVh5i0GYE+hbuS6qso7mlkqc9yYCchhmxd8EqSdsRxEAGCLC6za5qY5AuxXEv9/uE4 gnf03uYZ7bnUZUtvfV9tMa/CygZzLOnV15xFETYFVXU49cLIAd86xazMCJe0gIKJzPmXqRyt1Po
+ 8gambwuSyfo3J8vhySyy2HSfhmnnTuAQqYKvzyoV/Lya/BE6Hbp4uziDe9SrbDTYc0boun78
+X-Proofpoint-GUID: -qJzwOqQvJQgehRWymNubHuZcl9Ao7Ii
 
-From: Praveen Kaligineedi <pkaligineedi@google.com>
+The TCP header fields seq and ack_seq are 32-bit values in network
+byte order as (__be32). these fields were earlier printed using
+ntohs(), which converts only 16-bit values and produces incorrect
+results for 32-bit fields. This patch is changeing the conversion
+to ntohl(), ensuring correct interpretation of these sequence numbers.
 
-gve_tx_timeout was calculating missed completions in a way that is only
-relevant in the GQ queue format. Additionally, it was attempting to
-disable device interrupts, which is not needed in either GQ or DQ queue
-formats.
+Notably, the format specifier is updated from %d to %u to reflect the
+unsigned nature of these fields.
 
-As a result, TX timeouts with the DQ queue format likely would have
-triggered early resets without kicking the queue at all.
+improves the accuracy of debug log messages for TCP sequence and
+acknowledgment numbers during TX timeouts.
 
-This patch drops the check for pending work altogether and always kicks
-the queue after validating the queue has not seen a TX timeout too
-recently.
-
-Cc: stable@vger.kernel.org
-Fixes: 87a7f321bb6a ("gve: Recover from queue stall due to missed IRQ")
-Co-developed-by: Tim Hostetler <thostet@google.com>
-Signed-off-by: Tim Hostetler <thostet@google.com>
-Signed-off-by: Praveen Kaligineedi <pkaligineedi@google.com>
-Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
 ---
-Changes in v2:
--Refactor out gve_tx_timeout_try_q_kick to remove goto statements
- (Jakub Kicinski)
----
- drivers/net/ethernet/google/gve/gve_main.c | 67 ++++++++++++++++++++++++-------------------
- 1 file changed, 37 insertions(+), 30 deletions(-)
+ drivers/net/ethernet/emulex/benet/be_main.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index c3791cf23c87..2fdb58646132 100644
---- a/drivers/net/ethernet/google/gve/gve_main.c
-+++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -1916,49 +1916,56 @@ static void gve_turnup_and_check_status(struct gve_priv *priv)
- 	gve_handle_link_status(priv, GVE_DEVICE_STATUS_LINK_STATUS_MASK & status);
- }
- 
--static void gve_tx_timeout(struct net_device *dev, unsigned int txqueue)
-+static struct gve_notify_block *gve_get_tx_notify_block(struct gve_priv *priv,
-+							unsigned int txqueue)
- {
--	struct gve_notify_block *block;
--	struct gve_tx_ring *tx = NULL;
--	struct gve_priv *priv;
--	u32 last_nic_done;
--	u32 current_time;
- 	u32 ntfy_idx;
- 
--	netdev_info(dev, "Timeout on tx queue, %d", txqueue);
--	priv = netdev_priv(dev);
- 	if (txqueue > priv->tx_cfg.num_queues)
--		goto reset;
-+		return NULL;
- 
- 	ntfy_idx = gve_tx_idx_to_ntfy(priv, txqueue);
- 	if (ntfy_idx >= priv->num_ntfy_blks)
--		goto reset;
-+		return NULL;
-+
-+	return &priv->ntfy_blocks[ntfy_idx];
-+}
-+
-+static bool gve_tx_timeout_try_q_kick(struct gve_priv *priv,
-+				      unsigned int txqueue)
-+{
-+	struct gve_notify_block *block;
-+	u32 current_time;
- 
--	block = &priv->ntfy_blocks[ntfy_idx];
--	tx = block->tx;
-+	block = gve_get_tx_notify_block(priv, txqueue);
-+
-+	if (!block)
-+		return false;
- 
- 	current_time = jiffies_to_msecs(jiffies);
--	if (tx->last_kick_msec + MIN_TX_TIMEOUT_GAP > current_time)
--		goto reset;
-+	if (block->tx->last_kick_msec + MIN_TX_TIMEOUT_GAP > current_time)
-+		return false;
- 
--	/* Check to see if there are missed completions, which will allow us to
--	 * kick the queue.
--	 */
--	last_nic_done = gve_tx_load_event_counter(priv, tx);
--	if (last_nic_done - tx->done) {
--		netdev_info(dev, "Kicking queue %d", txqueue);
--		iowrite32be(GVE_IRQ_MASK, gve_irq_doorbell(priv, block));
--		napi_schedule(&block->napi);
--		tx->last_kick_msec = current_time;
--		goto out;
--	} // Else reset.
-+	netdev_info(priv->dev, "Kicking queue %d", txqueue);
-+	napi_schedule(&block->napi);
-+	block->tx->last_kick_msec = current_time;
-+	return true;
-+}
- 
--reset:
--	gve_schedule_reset(priv);
-+static void gve_tx_timeout(struct net_device *dev, unsigned int txqueue)
-+{
-+	struct gve_notify_block *block;
-+	struct gve_priv *priv;
- 
--out:
--	if (tx)
--		tx->queue_timeout++;
-+	netdev_info(dev, "Timeout on tx queue, %d", txqueue);
-+	priv = netdev_priv(dev);
-+
-+	if (!gve_tx_timeout_try_q_kick(priv, txqueue))
-+		gve_schedule_reset(priv);
-+
-+	block = gve_get_tx_notify_block(priv, txqueue);
-+	if (block)
-+		block->tx->queue_timeout++;
- 	priv->tx_timeo_cnt++;
- }
- 
+diff --git a/drivers/net/ethernet/emulex/benet/be_main.c b/drivers/net/ethernet/emulex/benet/be_main.c
+index 3d2e215921191..490af66594294 100644
+--- a/drivers/net/ethernet/emulex/benet/be_main.c
++++ b/drivers/net/ethernet/emulex/benet/be_main.c
+@@ -1465,10 +1465,10 @@ static void be_tx_timeout(struct net_device *netdev, unsigned int txqueue)
+ 						 ntohs(tcphdr->source));
+ 					dev_info(dev, "TCP dest port %d\n",
+ 						 ntohs(tcphdr->dest));
+-					dev_info(dev, "TCP sequence num %d\n",
+-						 ntohs(tcphdr->seq));
+-					dev_info(dev, "TCP ack_seq %d\n",
+-						 ntohs(tcphdr->ack_seq));
++					dev_info(dev, "TCP sequence num %u\n",
++						 ntohl(tcphdr->seq));
++					dev_info(dev, "TCP ack_seq %u\n",
++						 ntohl(tcphdr->ack_seq));
+ 				} else if (ip_hdr(skb)->protocol ==
+ 					   IPPROTO_UDP) {
+ 					udphdr = udp_hdr(skb);
 -- 
-2.50.0.727.gbf7dc18ff4-goog
+2.46.0
 
 
