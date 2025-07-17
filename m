@@ -1,92 +1,258 @@
-Return-Path: <netdev+bounces-207674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65BE1B0828C
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 03:40:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F632B082A0
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 03:52:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B085C583EC0
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 01:40:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAA5B3B661A
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 01:51:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C27DA20468E;
-	Thu, 17 Jul 2025 01:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 190DF1953BB;
+	Thu, 17 Jul 2025 01:51:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ldqfj47U"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YxDPMz+r"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BB8F1EE02F;
-	Thu, 17 Jul 2025 01:40:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08E5A1411EB
+	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 01:51:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752716407; cv=none; b=WCGqq0+LiG/s4YZ/CsCs1XdDLsqbuEPaRF7WH8Oewo4Zlntw5GJbgJXJjA2EvraAT2P4LLlw+3Ty/bAyVEQuo/SSUGXtYrHjlDZZNxYoX+JNlloOcJDlCHTcq0OY7pTk+heD9M02t5piMI/F5x784HXCjCqSwMy7JHyggDeOIVo=
+	t=1752717114; cv=none; b=uwbR/43An+FrlLOKSE74Or+GdWJLHFwy/VDVCHFyBc8s50q20PUN43LQmGJuF/BkhOoDdG7bdEDLpcwV2GNKtvmqZItPY3muIZekNNjdwPR9Cc18HQRMc+WphbOML++266a0mrtEX1IEKauEF0IvP21qU8duCasco9+QJbnOEFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752716407; c=relaxed/simple;
-	bh=wZEtqFP7aHwbWMq++OgwAQHYQAR8dahj6q0fkSQ3q2k=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hsOwF7NrL2uytTAXZmilRbX1Wc8yk2ssbwHOGWA50moTnWZMOJi53ZQRGN+4QWUBnuDoNYJ1vTZDjHt/lNlZN/fy4KytT9ayip53MB49Q56FKwNdW1GeXjFbDPynWJRtgX/333JcIxN6BO1YgkGhQ3sx+JF1lmJisjxrCw6mJck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ldqfj47U; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BE12C4CEE7;
-	Thu, 17 Jul 2025 01:40:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752716407;
-	bh=wZEtqFP7aHwbWMq++OgwAQHYQAR8dahj6q0fkSQ3q2k=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ldqfj47UkfhunCEBN+Oybom1G+4e5Zf4jQ14RVhCB4aJJpw1EhMaNuJ5GM2tUrXwo
-	 daaL/DVgINDyVYCZF5PDqfUkHHxbaUGGR538RBjev/9AI1rBDjR4C3mjGhMRLVsm2E
-	 pKEbmbNmcWyHQ9ib2hiZKvY9gYtsAXYzeL+1KomyZiPrhAH/qu9tGW24oFF2Q1KxV6
-	 XSD+IEx9ui+BkYjerc6n6sOX/aKHVWas0GYcyVLgvRvCHI1tNjPyR1EnuttgvKOgEq
-	 +v45+WSrgNyOcGvHr4wDMes9w4AU7kJOx7OM4wlgkLA0oUFaulYQ7T4em6xAHCsWvD
-	 JNKx3qH4CGPhw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADF8383BA38;
-	Thu, 17 Jul 2025 01:40:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1752717114; c=relaxed/simple;
+	bh=mL5QYa/Zwca7EIKSBoPMk1K2ct8ZAgPdWd6K5y0r3NE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ema0jmMaTLogObact/VTDgfJa51jeKmVHS4YNXzo0LuYFbdN4XvoldaksS4CWIdzFJfvr2M5tY21u0jmxzNO3oa1hFxaJrXaQ2bfJli1EQfZSuZJ9sFhDqDGvATUlZO+dZhE+Dl+0yY6oH64lC3tjHSTrsLxuXzSAqNpVnH1f+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YxDPMz+r; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752717099;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=j+3XIBTSikWJUjf3DkvkgErhbLhZhPJxy2CY5lFvy6E=;
+	b=YxDPMz+rSqvU/fztXNzoBwMFFJ9rj4I2fV4C0hEGaIIJl7cDmQSPyhHiUBR02DaUo0i9l/
+	JPoFFDCsk5RQKYvU8p/JK0YJzEdNeEzkyJAHzNS8jZeZiIR3vGwHVOCoJ0NEX9fk+VmiBy
+	G+9U8gnlcMHLPegS2rmDvc8rgAy3VFc=
+From: Menglong Dong <menglong.dong@linux.dev>
+To: Jiri Olsa <jolsa@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Menglong Dong <menglong8.dong@gmail.com>,
+ Steven Rostedt <rostedt@goodmis.org>, bpf <bpf@vger.kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>,
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ LKML <linux-kernel@vger.kernel.org>,
+ Network Development <netdev@vger.kernel.org>
+Subject:
+ Re: multi-fentry proposal. Was: [PATCH bpf-next v2 02/18] x86,bpf: add
+ bpf_global_caller for global trampoline
+Date: Thu, 17 Jul 2025 09:50:36 +0800
+Message-ID: <3364591.aeNJFYEL58@7940hx>
+In-Reply-To:
+ <CAADnVQJ47PJXxjqES8BvtWkPq3fj9D0oTF6qqeNNpG66-_MGCg@mail.gmail.com>
+References:
+ <20250703121521.1874196-1-dongml2@chinatelecom.cn>
+ <4737114.cEBGB3zze1@7940hx>
+ <CAADnVQJ47PJXxjqES8BvtWkPq3fj9D0oTF6qqeNNpG66-_MGCg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] ipv6: mcast: Delay put pmc->idev in mld_del_delrec()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175271642749.1391969.4135059292314627486.git-patchwork-notify@kernel.org>
-Date: Thu, 17 Jul 2025 01:40:27 +0000
-References: <20250714141957.3301871-1-yuehaibing@huawei.com>
-In-Reply-To: <20250714141957.3301871-1-yuehaibing@huawei.com>
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, ap420073@gmail.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
+X-Migadu-Flow: FLOW_OUT
 
-Hello:
+On Thursday, July 17, 2025 8:59 AM Alexei Starovoitov <alexei.starovoitov@g=
+mail.com> write:
+> On Wed, Jul 16, 2025 at 6:06=E2=80=AFAM Menglong Dong <menglong.dong@linu=
+x.dev> wrote:
+> >
+> > On Wednesday, July 16, 2025 12:35 AM Alexei Starovoitov <alexei.starovo=
+itov@gmail.com> write:
+> > > On Tue, Jul 15, 2025 at 1:37=E2=80=AFAM Menglong Dong <menglong.dong@=
+linux.dev> wrote:
+> > > >
+> > > >
+> > > > On 7/15/25 10:25, Alexei Starovoitov wrote:
+> > [......]
+> > > >
+> > > > According to my benchmark, it has ~5% overhead to save/restore
+> > > > *5* variants when compared with *0* variant. The save/restore of re=
+gs
+> > > > is fast, but it still need 12 insn, which can produce ~6% overhead.
+> > >
+> > > I think it's an ok trade off, because with one global trampoline
+> > > we do not need to call rhashtable lookup before entering bpf prog.
+> > > bpf prog will do it on demand if/when it needs to access arguments.
+> > > This will compensate for a bit of lost performance due to extra save/=
+restore.
+> >
+> > I don't understand here :/
+> >
+> > The rhashtable lookup is done at the beginning of the global trampoline,
+> > which is called before we enter bpf prog. The bpf progs is stored in the
+> > kfunc_md, and we need get them from the hash table.
+>=20
+> Ahh. Right.
+>=20
+> Looking at the existing bpf trampoline... It has complicated logic
+> to handle livepatching and tailcalls. Your global trampoline
+> doesn't, and once that is added it's starting to feel that it will
+> look just as complex as the current one.
+> So I think we better repurpose what we have.
+> Maybe we can rewrite the existing one in C too.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+You are right, the tailcalls is not handled yet. But for the livepatching,
+it is already handled, as we always get the origin ip from the stack
+and call it, just like how the bpf trampoline handle the livepatching.
+So no addition handling is needed here.
 
-On Mon, 14 Jul 2025 22:19:57 +0800 you wrote:
-> pmc->idev is still used in ip6_mc_clear_src(), so as mld_clear_delrec()
-> does, the reference should be put after ip6_mc_clear_src() return.
-> 
-> Fixes: 63ed8de4be81 ("mld: add mc_lock for protecting per-interface mld data")
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
-> ---
->  net/ipv6/mcast.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> How about the following approach.
+> I think we discussed something like this in the past
+> and Jiri tried to implement something like this.
+> Andrii reminded me recently about it.
+>=20
+> Say, we need to attach prog A to 30k functions.
+> 10k with 2 args, 10k with 3 args, and 10k with 7 args.
+> We can generate 3 _existing_ bpf trampolines for 2,3,7 args
+> with hard coded prog A in there (the cookies would need to be
+> fetched via binary search similar to kprobe-multi).
+> The arch_prepare_bpf_trampoline() supports BPF_TRAMP_F_ORIG_STACK.
+> So one 2-arg trampoline will work to invoke prog A in all 10k 2-arg funct=
+ions.
+> We don't need to match types, but have to compare that btf_func_model-s
+> are the same.
+>=20
+> Menglong, your global trampoline for 0,1,..6 args works only for x86,
+> because btf_func_model doesn't care about sizes of args,
+> but it's not the correct mental model to use.
+>=20
+> The above "10k with 2 args" is a simplified example.
+> We will need an arch specific callback is_btf_func_model_equal()
+> that will compare func models in arch specific ways.
+> For x86-64 the number of args is all it needs.
+> For other archs it will compare sizes and flags too.
+> So 30k functions will be sorted into
+> 10k with btf_func_model_1, 10k with btf_func_model_2 and so on.
+> And the corresponding number of equivalent trampolines will be generated.
+>=20
+> Note there will be no actual BTF types. All args will be untyped and
+> untrusted unlike current fentry.
+> We can go further and sort 30k functions by comparing BTFs
+> instead of btf_func_model-s, but I suspect 30k funcs will be split
+> into several thousands of exact BTFs. At that point multi-fentry
+> benefits are diminishing and we might as well generate 30k unique
+> bpf trampolines for 30k functions and avoid all the complexity.
+> So I would sort by btf_func_model compared by arch specific comparator.
+>=20
+> Now say prog B needs to be attached to another 30k functions.
+> If all 30k+30k functions are different then it's the same as
+> the previous step.
+> Say, prog A is attached to 10k funcs with btf_func_model_1.
+> If prog B wants to attach to the exact same func set then we
+> just regenerate bpf trampoline with hard coded progs A and B
+> and reattach.
+> If not then we need to split the set into up to 3 sets.
+> Say, prog B wants 5k funcs, but only 1k func are common:
+> (prog_A, 9k func with btf_func_model_1) -> bpf trampoline X
+> (prog_A, prog_B, 1k funcs with btf_func_model_1) -> bpf trampoline Y
+> (prog_B, 4k funcs with btf_func_model_1) -> bpf trampoline Z
+>=20
+> And so on when prog C needs to be attached.
+> At detach time we can merge sets/trampolines,
+> but for now we can leave it all fragmented.
+> Unlike regular fentry progs the multi-fentry progs are not going to
+> be attached for long time. So we can reduce the detach complexity.
+>=20
+> The nice part of the algorithm is that coexistence of fentry
+> and multi-fentry is easy.
+> If fentry is already attached to some function we just
+> attach multi-fentry prog to that bpf trampoline.
+> If multi-fentry was attached first and fentry needs to be attached,
+> we create a regular bpf trampoline and add both progs there.
 
-Here is the summary with links:
-  - [net] ipv6: mcast: Delay put pmc->idev in mld_del_delrec()
-    https://git.kernel.org/netdev/net/c/ae3264a25a46
+This seems not easy, and it is exactly how I handle the
+coexistence now:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+  https://lore.kernel.org/bpf/20250528034712.138701-16-dongml2@chinatelecom=
+=2Ecn/
+  https://lore.kernel.org/bpf/20250528034712.138701-17-dongml2@chinatelecom=
+=2Ecn/
+  https://lore.kernel.org/bpf/20250528034712.138701-18-dongml2@chinatelecom=
+=2Ecn/
+
+The most difficult part is that we need a way to replace the the
+multi-fentry with fentry for the function in the ftrace atomically. Of
+course, we can remove the global trampoline first, and then attach
+the bpf trampoline, which will make things much easier. But a
+short suspend will happen for the progs in fentry-multi.
+
+>=20
+> The intersect and sorting by btf_func_model is not trivial,
+> but we can hold global trampoline_mutex, so no concerns of races.
+>=20
+> Example:
+> bpf_link_A is a set of:
+> (prog_A, funcs X,Y with btf_func_model_1)
+> (prog_A, funcs N,M with btf_func_model_2)
+>=20
+> To attach prog B via bpf_link_B that wants:
+> (prog_B, funcs Y,Z with btf_func_model_1)
+> (prog_B, funcs P,Q with btf_func_model_3)
+>=20
+> walk all existing links, intersect and split, and update the links.
+> At the end:
+>=20
+> bpf_link_A:
+> (prog_A, funcs X with btf_func_model_1)
+> (prog_A, prog_B funcs Y with btf_func_model_1)
+> (prog_A, funcs N,M with btf_func_model_2)
+>=20
+> bpf_link_B:
+> (prog_A, prog_B funcs Y with btf_func_model_1)
+> (prog_B, funcs Z with btf_func_model_1)
+> (prog_B, funcs P,Q with btf_func_model_3)
+>=20
+> When link is detached: walk its own tuples, remove the prog,
+> if nr_progs =3D=3D 0 -> detach corresponding trampoline,
+> if nr_progs > 0 -> remove prog and regenerate trampoline.
+>=20
+> If fentry prog C needs to be attached to N it might split bpf_link_A:
+> (prog_A, funcs X with btf_func_model_1)
+> (prog_A, prog_B funcs Y with btf_func_model_1)
+> (prog_A, funcs M with btf_func_model_2)
+> (prog_A, prog_C funcs N with _fentry_)
+>=20
+> Last time we gave up on it because we discovered that
+> overlap support was too complicated, but I cannot recall now
+> what it was :)
+> Maybe all of the above repeating some old mistakes.
+
+In my impression, this is exactly the solution of Jiri's, and this is
+part of the discussion that I know:
+
+  https://lore.kernel.org/bpf/ZfKY6E8xhSgzYL1I@krava/
+
+>=20
+> Jiri,
+> How does the above proposal look to you?
+>=20
+
+
 
 
 
