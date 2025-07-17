@@ -1,116 +1,121 @@
-Return-Path: <netdev+bounces-207751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 078E1B08730
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 09:43:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C9BEB08739
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 09:44:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C45193B6556
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 07:42:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48279167E56
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 07:44:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A271B25A34F;
-	Thu, 17 Jul 2025 07:42:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4B8B255F57;
+	Thu, 17 Jul 2025 07:44:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mMajonpa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fMU4cj4y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70DF224EABC;
-	Thu, 17 Jul 2025 07:42:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2762E1DE4F6
+	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 07:44:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752738153; cv=none; b=UWZbjyXbkR4KT0YHpeQ+ABnPLk73uKYqAt5VP6pUrbTWNuhQwPtEe8K4Tml8N27WjzRfkGcWXRjXA8k0OsOpneoF8tnjBuIaO/bfPM8b4LdHYS5zkPl0mbJZIbM3q1zmulJbWeoeSnfLq35Uielkwv19JN7OHGu7XnQ5s623qWk=
+	t=1752738251; cv=none; b=J5Px9wFFnQwWiQnWPNsdGZo47iIAWZktUxBKYffXlsHYsDaNV2Ia9IydaaWwLKmpifxVSlotqnmWxot+aTL9RRh8RvudDKaIla6VQ0lRQpOhcbEhrq6PRuPKBuUXbUduMWkN9AY+CZGn67b8XPQGp1+IALj0segV43BopVao9ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752738153; c=relaxed/simple;
-	bh=gN/m0/5r5AMCq+79cgsCYOoCKxYj3JUcZO98xYntTqg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AdHhyx28K6YJXxiRBWBvNBuGqwu99TrZbL2ypew+I8cIM3oTw35borfjYE7lu1CMT4tUiT70e1s9HMqtmhGjIAjoTPcLEYCBmiIisleUQzVFcAUZMOGmzrNRp8K0U72N+Ndadu33QLnGkRRNF+46E7UAxVN4RcjoDakIQ1d9mSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mMajonpa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68590C4CEE3;
-	Thu, 17 Jul 2025 07:42:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752738153;
-	bh=gN/m0/5r5AMCq+79cgsCYOoCKxYj3JUcZO98xYntTqg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mMajonpaZxgx63F2DnEkcejYhTcgO4pXFfGPU9izLgv7RqIjk20zRn3pMaTeU+ov7
-	 E0wlPW1N5P+wAr9Ktr7MxU7ZDRIShfxIaNYn4AefuPhYyU62Jqu1+d9fICRVWEqKCN
-	 Cte2InCG+cuFFGfsu/ZJx4MH3UomT006pjyXIla//lIqG+EOXcycxITH/pCaN90HF1
-	 6IcLPEwf71gj5ZppD+kYF+NdExyf/ew3RVjOel/PQ2ehuxs+QMAhoDkQIr/0pxDoXs
-	 C+faoKDf8SE0vFTZ5Neom5Ob46HuwKKzWeG/xYRspIpJXCIouiv9K6ohTu7656w/bO
-	 gj856S93FLuiw==
-Date: Thu, 17 Jul 2025 09:42:30 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
-	richardcochran@gmail.com, claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, 
-	xiaoning.wang@nxp.com, andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, vadim.fedorenko@linux.dev, Frank.Li@nxp.com, 
-	shawnguo@kernel.org, s.hauer@pengutronix.de, festevam@gmail.com, fushi.peng@nxp.com, 
-	devicetree@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	imx@lists.linux.dev, kernel@pengutronix.de
-Subject: Re: [PATCH v2 net-next 02/14] dt-bindings: net: add nxp,netc-timer
- property
-Message-ID: <20250717-sceptical-quoll-of-protection-9c2104@kuoka>
-References: <20250716073111.367382-1-wei.fang@nxp.com>
- <20250716073111.367382-3-wei.fang@nxp.com>
+	s=arc-20240116; t=1752738251; c=relaxed/simple;
+	bh=ZM5tD7+0eFKJmyE0cmz84E6oU6+wMlx4Zku9qVJa29U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sfsSb2cJ1iOr75RxrQMpW7tCC8apylBqPMjFAHnJ0kBQdAJhO4GpzjlbKqTbjwJQDAGDyve+mw24KtlZuE0gMEBcs23w+OxCwsN8bvjDxqATI45s+b09wVD835WSd5GKBD4AwWf7e2svOUeZdpIYfTMQxcRfllH7KkQ3vGNIIf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fMU4cj4y; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752738249;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=5JHOkbClq+KJbfrHcBtMiIH4aYWxo1yewDYQHM+bbaM=;
+	b=fMU4cj4yxuhMwvMw0mb4cKuhun1axaZrLV4D8Uu8hcZ8qMDZt5xsD//chMCqcYL8xHK11X
+	FGmCYQpIOItkb8X5dZxcZy/glE/lBiK68Uigwbc/U3fyY8xIMwVj/S5MneQ5eTeM9jilfB
+	C/1EQyisG+oHczr358grPdeamtMfZ4I=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-355-NUiLPwbYPkW-v0qESwr28A-1; Thu,
+ 17 Jul 2025 03:44:05 -0400
+X-MC-Unique: NUiLPwbYPkW-v0qESwr28A-1
+X-Mimecast-MFC-AGG-ID: NUiLPwbYPkW-v0qESwr28A_1752738244
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 91C7D1800282;
+	Thu, 17 Jul 2025 07:44:03 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.2])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 72E3F18016F9;
+	Thu, 17 Jul 2025 07:44:00 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-afs@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v2 0/5] rxrpc: Miscellaneous fixes
+Date: Thu, 17 Jul 2025 08:43:40 +0100
+Message-ID: <20250717074350.3767366-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250716073111.367382-3-wei.fang@nxp.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Wed, Jul 16, 2025 at 03:30:59PM +0800, Wei Fang wrote:
-> NETC is a multi-function PCIe Root Complex Integrated Endpoint (RCiEP)
-> that contains multiple PCIe functions, such as ENETC and Timer. Timer
-> provides PTP time synchronization functionality and ENETC provides the
-> NIC functionality.
-> 
-> For some platforms, such as i.MX95, it has only one timer instance, so
-> the binding relationship between Timer and ENETC is fixed. But for some
-> platforms, such as i.MX943, it has 3 Timer instances, by setting the
-> EaTBCR registers of the IERB module, we can specify any Timer instance
-> to be bound to the ENETC instance.
-> 
-> Therefore, add "nxp,netc-timer" property to bind ENETC instance to a
-> specified Timer instance so that ENETC can support PTP synchronization
-> through Timer.
-> 
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> 
-> ---
-> v2 changes:
-> new patch
-> ---
->  .../devicetree/bindings/net/fsl,enetc.yaml    | 23 +++++++++++++++++++
->  1 file changed, 23 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/fsl,enetc.yaml b/Documentation/devicetree/bindings/net/fsl,enetc.yaml
-> index ca70f0050171..ae05f2982653 100644
-> --- a/Documentation/devicetree/bindings/net/fsl,enetc.yaml
-> +++ b/Documentation/devicetree/bindings/net/fsl,enetc.yaml
-> @@ -44,6 +44,13 @@ properties:
->      unevaluatedProperties: false
->      description: Optional child node for ENETC instance, otherwise use NETC EMDIO.
->  
-> +  nxp,netc-timer:
+Here are some fixes for rxrpc:
 
-Heh, you got comments to use existing properties for PTP devices and
-consumers. I also said to you to use cell arguments how existing
-bindings use it.
+ (1) Fix the calling of IP routing code with IRQs disabled.
 
-You did not respond that you are not going to use existing properties.
+ (2) Fix a recvmsg/recvmsg race when the first completes a call.
 
-So why existing timestamper is not correct? Is this not a timestamper?
-If it is, why do we need to repeat the same discussion...
+ (3) Fix a race between notification, recvmsg and sendmsg releasing a call.
 
-Best regards,
-Krzysztof
+ (4) Fix abort of abort.
+
+ (5) Fix call-level aborts that should be connection-level aborts.
+
+David
+
+The patches can be found here also:
+
+	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=rxrpc-fixes
+
+Changes
+=======
+ver #2)
+ - Moved a trace note from patch 5 to patch 3 where it is used.
+
+David Howells (5):
+  rxrpc: Fix irq-disabled in local_bh_enable()
+  rxrpc: Fix recv-recv race of completed call
+  rxrpc: Fix notification vs call-release vs recvmsg
+  rxrpc: Fix transmission of an abort in response to an abort
+  rxrpc: Fix to use conn aborts for conn-wide failures
+
+ include/trace/events/rxrpc.h |  6 +++++-
+ net/rxrpc/ar-internal.h      |  4 ++++
+ net/rxrpc/call_accept.c      | 14 ++++++++------
+ net/rxrpc/call_object.c      | 28 ++++++++++++----------------
+ net/rxrpc/io_thread.c        | 14 ++++++++++++++
+ net/rxrpc/output.c           | 22 +++++++++++++---------
+ net/rxrpc/peer_object.c      |  6 ++----
+ net/rxrpc/recvmsg.c          | 23 +++++++++++++++++++++--
+ net/rxrpc/security.c         |  8 ++++----
+ 9 files changed, 83 insertions(+), 42 deletions(-)
 
 
