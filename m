@@ -1,197 +1,209 @@
-Return-Path: <netdev+bounces-208018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F404B095F6
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 22:49:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7507CB09603
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 22:54:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5175F4A86ED
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 20:49:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4921BA46500
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 20:54:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE8182343BE;
-	Thu, 17 Jul 2025 20:49:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 449D62264C0;
+	Thu, 17 Jul 2025 20:54:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ZODzgaVF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LOQGoVu6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40BC3226541
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 20:49:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 854B61A314E;
+	Thu, 17 Jul 2025 20:54:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752785347; cv=none; b=ZHRgJRrUFsSX3HNOpGGWNqMPSFuUU3U005WnLYpmaxxobBeh37+/CRBeTBJQcN7DNvC5QORyjnB8sP3EzhjUfszSgDwyde1CQ2Zff44Jkj+CJxNV/x9z4dmwlIvkfxIbpAUppF0A27wHek3eXmc1yPFW7M+LB98di0N6aCtZ+Gs=
+	t=1752785669; cv=none; b=URIJp/WmevKjg8F0UMxWz2nwCTI3aQg002rKxMOFN5XjSGZJbraZu8AwueEmbKbc4dy25j6EfeM4MEZYdsOHXY5Dk58w5mnu/ooDrs5Hg6SpFlKON+CdL7UhR56NLPZ0ZlwgRE6QW0n2wT/MSCvmw/9bnBkzAn5sK1k5loJ1aVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752785347; c=relaxed/simple;
-	bh=Lv5I/l69wbo8RENfJ/KSckfR2rUPD9dYes5xZ4X8ePk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Cf5kGO+8sWhxqAJJCV7F/MaJR1UAcTGLXd/cqnBenUmeSosHlz9/aXMIwUKF2LVmzqdonfBFWGDTf43uUlNiCyNDCoyEgy6AsGqzThAsvV18DBRcDIlMubAXKG8B2zV7F7zyPFSmxOQpBezW+E4YS/oM5pjGbGDcj4QZ7/ategA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ZODzgaVF; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56HCg0wC021705
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 20:49:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	9CmYaonQmugq/A4aPpsk6Yn5qRo2GpUcf9NGF+0jewo=; b=ZODzgaVFXqDSAbAX
-	LfKxIzB6QdXDsZi4ImF0dwBp2TXCcsNhS6UED+aEZlPRNhtTx+6tQZOxmHlyQ0XJ
-	86tClR2BvCALhvt9pu9tfPDf3zwmNgqvytEHRMKqmtgbWbLKHgVyoi2Vpq7U+Uzc
-	mMcXIyQELPGgPM+V2jCUNQZVrluAeHsfIiJNfjNTr2Jkm9POmL2IatCpUImukDlO
-	HQLhVpF0OAt0a5m42K7IRUhwjQCovePyH79Gg3MNkGsA05XbOIK8EwIjBqCyOHSh
-	O2twmTg5nwKnFD6KIFiElguhTQtujDJFqbZbDtx/ylp2NW+CywH9U4iLLEe68oPp
-	Mpg+1g==
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47ufu8gym9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 20:49:05 +0000 (GMT)
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-4ab61b91608so3989611cf.3
-        for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 13:49:04 -0700 (PDT)
+	s=arc-20240116; t=1752785669; c=relaxed/simple;
+	bh=JMh9im/KVTS8T/eZE8dQv0wzuTznjpmC3yQL0UwL+NU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YjUkJaCaf9c+F4F/JbpEgHHxHMvhg9b2oMM2ePZ5Me7tfWUyiGEFad6QSgB5jDN43SMYqzeIcYQT8yCzFDDYS+ZgedzwxbAFswstGKgIkLdzgMW5xskUCHGR0E8geHqMsEzpODOwE456MgvlHbztztnB1YX6kIWcjY7YSXZZOX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LOQGoVu6; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-45611a6a706so7404595e9.1;
+        Thu, 17 Jul 2025 13:54:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752785666; x=1753390466; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7Mf8QZtzSaPJqQaKbs/oV3ypqLS75pOLlLg3S8LzulY=;
+        b=LOQGoVu6zevXZiu4F0tBCsKOCHWe5oHMVEi1WefHWGjyMNN+9ALBkrPgJvXdR07NV7
+         5ttUDA25xM/kqJUopaYtxK4zOk7+2CVob4+YfwV1tp1wKSeaLh+CE0DeX2ROmogn9NMO
+         cq5o3uwh1/GqUF0pLexbe0YfsHmPV5zvYmPexCkjWcy4LuSmudkD0SLSBFbJv9qn3H+i
+         pO177ajIw0i3/Whv5CqZmPdoHb/PjlSFimBO1s9zZLgG8zShODqk15Q8/27IxAy2nkIr
+         nKQG9xQVhosdSAk/n12iJBPohefvkeYdncv6NSs2IrXOA8g1PAL6Cjoi3PCoy6BUXC+m
+         ouYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752785344; x=1753390144;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9CmYaonQmugq/A4aPpsk6Yn5qRo2GpUcf9NGF+0jewo=;
-        b=ELlBQSmK+ASiPt6V2L67x+2hA1uAeFT+QJ7j1Cg99tEMDr76I4Js9DllJIpwld6v2h
-         Wmjva2zPfkgxdb/LehJooTzGYdXHCrvg790zOSmqDJ9WXC2ZgjN06EpaklBPpMCYFu5u
-         XGBxylu2svHFsIRD1Mfz7Dzj9VLlgTYuU92pvqF0KWJeI3MGApAzgpniDCc+H6GXyte9
-         Pmz9nWEJT26qzMrIRaeloOzZIt7uNCOS/vCl59Mac1TYZg0Lp9xV4W2uS5nS6Jb9OEmM
-         Td0OogHX52x+DHJw0bYYX81mTdDqJWjQtyequgDDveIHqxyqfhT9eZpzLKLiOtW/0ITy
-         k+IQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUqM5oAxhSp6x2Q1xQI3I/Z6b/Xak2NwOkFXCBhfXRfmNaXwgrYB92RRQCxjgBBCaHtQZPNHUU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHJHLiKTQx7TxYYcy3PeypGpUsAGfzlaHjBYc/Yt3xbCRrYPnx
-	RFPsHoyTXjCgw23q1vdbjDPCmPIEGtOVjDsHlbhh7nzqJeu0tM6LEdsAOb+AdsoMWCpulkKJ+p4
-	cIDMCc2OOR1cyAf4o9CGlhfJflnCvDFdK9pFlSMLKaTyMyZr7GuP6L7PW+ug=
-X-Gm-Gg: ASbGncs3TNPZrtUu50Uwb6vpafnHlDTfif8CqjQMtGzhJxpTaHeoXsKnTtYwl7K1dvz
-	E7p25rn3L5wTyHoW4PqDhtXU3pcdqQCQZ+2cj1F/FJgYR4YjpYhBGZ7el5UHouoRKRnu7s6WPmx
-	6mcOm4In/9RDUolUgCkGiwnU7YOf3e4vkK8X/flJACJ6CMw0ceqw97ybZcWKtAIlFpw0LKwdsVf
-	bRuajzp6hVFXuQ0NDezm7MhjR0MTaF4mgoDZJlwvQhlLOe3fCpfmfoXvahEQ5LyoScRpdYgt2ez
-	h2TDNeK10RIvKGJN6dSBLSK2EBcBrpdVwcaHoNaNexqXU/2WqBQ74uRHeR//5FJUH0ebvnvEcsW
-	CBVOBFQId4OIZqfjOaG3s
-X-Received: by 2002:ac8:5a50:0:b0:4a9:9695:64c0 with SMTP id d75a77b69052e-4ab90a8b01cmr59189911cf.8.1752785344086;
-        Thu, 17 Jul 2025 13:49:04 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFsdUOD63AuogKrskTaxBSHWwDEDfZBOoSuBlZWtt3hsMXZqbmo6AUjQ6EHFno6axLzFcjgbQ==
-X-Received: by 2002:ac8:5a50:0:b0:4a9:9695:64c0 with SMTP id d75a77b69052e-4ab90a8b01cmr59189571cf.8.1752785343480;
-        Thu, 17 Jul 2025 13:49:03 -0700 (PDT)
-Received: from [192.168.143.225] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-611c95246e2sm10463988a12.17.2025.07.17.13.49.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Jul 2025 13:49:02 -0700 (PDT)
-Message-ID: <793434f9-7cdc-409f-b855-380be7a2b0db@oss.qualcomm.com>
-Date: Thu, 17 Jul 2025 22:48:59 +0200
+        d=1e100.net; s=20230601; t=1752785666; x=1753390466;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7Mf8QZtzSaPJqQaKbs/oV3ypqLS75pOLlLg3S8LzulY=;
+        b=a3jo9+qcj0e7kLHjF5G2js18ybQSNNuN5G7K67VVLXWrUokv8/mLWjLPcq62aHeKR/
+         vY3l04imDMaaYdjuq5tPn/8q7xG/cSMGo77Jwal4ZyWQh8X46InaGLhUvHVSrmaMU4x9
+         9zVFkUc5tXFQbrUBd7SCtjC7r1WoYV8n0DMuWsf/RJPpWg449w4s1akc+h8+seQjBNgl
+         tKvCTih/DwoEQ2xMgAmrtC1fosuX5pOqpNQZnS5XSIP/4CdHCuUovouPU5WkE6jkrFYU
+         KGKFG+e+8gV0DK8kF3Yjf8a33ZPEwp2cCdaW9W/ZKhTpxFAj0UyYxGPxEW2qmoCr8dek
+         rIqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUFfvVjyKnIoHgdcKTEB41zuBhcMLQ30u4b0Dh18ce5LEJw2Kuj1+3N4d9c5jfAhaUlAv4LbnQZJ80LbMgxtK60@vger.kernel.org, AJvYcCVIfyteR39NRLazbu2aq4DYey+zrFacTq5w7cVLONvV90hSGGaMKo9oawAR7stIC8dR4aA=@vger.kernel.org, AJvYcCWlHJOahm/I4HbIcC3dApbR9zJ5KOe1AgL5YXIywO78YyJIiExFzWYpCnIMF0ls3eSUdtJq1wFW@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1XvCgRhQeovXv8ViwMuoMt5PDuoTHfkteojW1z6JKw6eBbKNJ
+	lckDgEFdLUMUDtxHhAc4kzgjm6Ha8UwRVWfVEJMQ8NQzDmUpPtS1rR+qpS9dTKKapefR/bivEdA
+	re+LmI0OfjSNxSQQa7nQFGWxjw5bZd2m4hOXP
+X-Gm-Gg: ASbGnctQZSLjD+Is7kS1FDzRplymstfan9yGXhqUIark7cbVs9aag3teFo/ALk20d9I
+	29zQDOspVkOSylCvliuWFCFiykiRscIPkkuoJfifZT75MbdEu5oeK25M2Cdjr4wdkn/kZmcXGmH
+	93o6RJsmiNSYIQVO2xJc76qaXa2OL/aq/XXNOIVhyrFrfgVISVkEL3IrdcrP3VPgdY8kHtRk/Fc
+	+791K1ZMC1+ct+G06zzcWI=
+X-Google-Smtp-Source: AGHT+IFejYOPGfvN6gq74fNykVCXRsKFiKKdbWkUeYfFL+bm+BFuxRIXPyIzxTLt1AwuwJt39LYhijbchMqnRGCf2ps=
+X-Received: by 2002:a05:600c:35d0:b0:456:76c:84f2 with SMTP id
+ 5b1f17b1804b1-4562e38b13dmr81825875e9.30.1752785665637; Thu, 17 Jul 2025
+ 13:54:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 10/14] net: ethernet: qualcomm: Initialize PPE
- RSS hash settings
-To: Luo Jie <quic_luoj@quicinc.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>, Lei Wei <quic_leiwei@quicinc.com>,
-        Suruchi Agarwal <quic_suruchia@quicinc.com>,
-        Pavithra R <quic_pavir@quicinc.com>, Simon Horman <horms@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>, Kees Cook <kees@kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Philipp Zabel <p.zabel@pengutronix.de>
-Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-hardening@vger.kernel.org,
-        quic_kkumarcs@quicinc.com, quic_linchen@quicinc.com
-References: <20250626-qcom_ipq_ppe-v5-0-95bdc6b8f6ff@quicinc.com>
- <20250626-qcom_ipq_ppe-v5-10-95bdc6b8f6ff@quicinc.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20250626-qcom_ipq_ppe-v5-10-95bdc6b8f6ff@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE3MDE4MyBTYWx0ZWRfX76KT35K3WS0G
- dvVWgsuY6MeFAjiY77eAAOtv5tpLAJsh6Bjt9pHxYGQ8cD235tCqKvcS3cZ6cBrDdP2RNoPkan8
- kM8HPjItBtFpYmTO8EGURQiVJ1+fR9aGb6wRnN5+v4Vbpv4p1EDJ3ZsZ79zwYTHd1O8eH/d1/Cq
- euWXfHRL/Bzgod/WywRWeRZvwhYPufnOLzAPjdROvRy54EwxPMDmAK2oaJXiN/jjJzYqS5CGk6Z
- npC+9GaZadU6f5ZEH77Khta1prr1N5L3QNN9PW0daY9GB1xOQnNykQmvZeIEQRLNh3yG996ypCh
- HyxrWwzwGqTksT8sh88NCaQj0HtYIQHHJxBo1QREQogOXDF7kRUi6bMQDBqx4ugwf2Cu2D2NORL
- jTNqApYBCm44Tp15sV0CCKCeqmZVm/af83AgvIgRui1mZMIGdOmH8/GiU6bIHp90m771faAR
-X-Proofpoint-ORIG-GUID: OLMZYagwaqCwks-1Z-H20gU5UHce7171
-X-Proofpoint-GUID: OLMZYagwaqCwks-1Z-H20gU5UHce7171
-X-Authority-Analysis: v=2.4 cv=f59IBPyM c=1 sm=1 tr=0 ts=687961c1 cx=c_pps
- a=WeENfcodrlLV9YRTxbY/uA==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=COk6AnOGAAAA:8 a=afnzvhLNFvO1QOecfk8A:9
- a=QEXdDO2ut3YA:10 a=kacYvNCVWA4VmyqE58fU:22 a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-17_03,2025-07-17_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 lowpriorityscore=0 malwarescore=0 spamscore=0 mlxscore=0
- bulkscore=0 suspectscore=0 impostorscore=0 adultscore=0 priorityscore=1501
- mlxlogscore=999 phishscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2507170183
+References: <20250717185837.1073456-1-kuniyu@google.com>
+In-Reply-To: <20250717185837.1073456-1-kuniyu@google.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Thu, 17 Jul 2025 13:54:12 -0700
+X-Gm-Features: Ac12FXxxz3u6ONU-gfsjoE0AvP3VD49sp2Vu2W8sPaIYSnbNqFj81PisEAFF3AY
+Message-ID: <CAADnVQJdn5ERUBfmTHAdfmn0dLozcY6FHsHodNnvfOA40GZYWg@mail.gmail.com>
+Subject: Re: [PATCH v1 bpf] bpf: Disable migration in nf_hook_run_bpf().
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>, 
+	Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
+	Florian Westphal <fw@strlen.de>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf <bpf@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, netfilter-devel <netfilter-devel@vger.kernel.org>, 
+	syzbot+40f772d37250b6d10efc@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 6/26/25 4:31 PM, Luo Jie wrote:
-> The PPE RSS hash is generated during PPE receive, based on the packet
-> content (3 tuples or 5 tuples) and as per the configured RSS seed. The
-> hash is then used to select the queue to transmit the packet to the
-> ARM CPU.
-> 
-> This patch initializes the RSS hash settings that are used to generate
-> the hash for the packet during PPE packet receive.
-> 
-> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+On Thu, Jul 17, 2025 at 11:58=E2=80=AFAM Kuniyuki Iwashima <kuniyu@google.c=
+om> wrote:
+>
+> syzbot reported that the IP defrag bpf prog can be called without
+> migration disabled.
+>
+> Then the assertion in __bpf_prog_run() fails, triggering the splat
+> below. [0]
+>
+> Let's call migrate_disable() before calling bpf_prog_run() in
+> nf_hook_run_bpf().
+>
+> [0]:
+> BUG: assuming non migratable context at ./include/linux/filter.h:703
+> in_atomic(): 0, irqs_disabled(): 0, migration_disabled() 0 pid: 5829, nam=
+e: sshd-session
+> 3 locks held by sshd-session/5829:
+>  #0: ffff88807b4e4218 (sk_lock-AF_INET){+.+.}-{0:0}, at: lock_sock includ=
+e/net/sock.h:1667 [inline]
+>  #0: ffff88807b4e4218 (sk_lock-AF_INET){+.+.}-{0:0}, at: tcp_sendmsg+0x20=
+/0x50 net/ipv4/tcp.c:1395
+>  #1: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire i=
+nclude/linux/rcupdate.h:331 [inline]
+>  #1: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock incl=
+ude/linux/rcupdate.h:841 [inline]
+>  #1: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: __ip_queue_xmit+0x=
+69/0x26c0 net/ipv4/ip_output.c:470
+>  #2: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire i=
+nclude/linux/rcupdate.h:331 [inline]
+>  #2: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock incl=
+ude/linux/rcupdate.h:841 [inline]
+>  #2: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: nf_hook+0xb2/0x680=
+ include/linux/netfilter.h:241
+> CPU: 0 UID: 0 PID: 5829 Comm: sshd-session Not tainted 6.16.0-rc6-syzkall=
+er-00002-g155a3c003e55 #0 PREEMPT(full)
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
+oogle 05/07/2025
+> Call Trace:
+>  <TASK>
+>  __dump_stack lib/dump_stack.c:94 [inline]
+>  dump_stack_lvl+0x16c/0x1f0 lib/dump_stack.c:120
+>  __cant_migrate kernel/sched/core.c:8860 [inline]
+>  __cant_migrate+0x1c7/0x250 kernel/sched/core.c:8834
+>  __bpf_prog_run include/linux/filter.h:703 [inline]
+>  bpf_prog_run include/linux/filter.h:725 [inline]
+>  nf_hook_run_bpf+0x83/0x1e0 net/netfilter/nf_bpf_link.c:20
+>  nf_hook_entry_hookfn include/linux/netfilter.h:157 [inline]
+>  nf_hook_slow+0xbb/0x200 net/netfilter/core.c:623
+>  nf_hook+0x370/0x680 include/linux/netfilter.h:272
+>  NF_HOOK_COND include/linux/netfilter.h:305 [inline]
+>  ip_output+0x1bc/0x2a0 net/ipv4/ip_output.c:433
+>  dst_output include/net/dst.h:459 [inline]
+>  ip_local_out net/ipv4/ip_output.c:129 [inline]
+>  __ip_queue_xmit+0x1d7d/0x26c0 net/ipv4/ip_output.c:527
+>  __tcp_transmit_skb+0x2686/0x3e90 net/ipv4/tcp_output.c:1479
+>  tcp_transmit_skb net/ipv4/tcp_output.c:1497 [inline]
+>  tcp_write_xmit+0x1274/0x84e0 net/ipv4/tcp_output.c:2838
+>  __tcp_push_pending_frames+0xaf/0x390 net/ipv4/tcp_output.c:3021
+>  tcp_push+0x225/0x700 net/ipv4/tcp.c:759
+>  tcp_sendmsg_locked+0x1870/0x42b0 net/ipv4/tcp.c:1359
+>  tcp_sendmsg+0x2e/0x50 net/ipv4/tcp.c:1396
+>  inet_sendmsg+0xb9/0x140 net/ipv4/af_inet.c:851
+>  sock_sendmsg_nosec net/socket.c:712 [inline]
+>  __sock_sendmsg net/socket.c:727 [inline]
+>  sock_write_iter+0x4aa/0x5b0 net/socket.c:1131
+>  new_sync_write fs/read_write.c:593 [inline]
+>  vfs_write+0x6c7/0x1150 fs/read_write.c:686
+>  ksys_write+0x1f8/0x250 fs/read_write.c:738
+>  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>  do_syscall_64+0xcd/0x4c0 arch/x86/entry/syscall_64.c:94
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7fe7d365d407
+> Code: 48 89 fa 4c 89 df e8 38 aa 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 f=
+c 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80=
+ 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
+> RSP:
+>
+> Fixes: 91721c2d02d3 ("netfilter: bpf: Support BPF_F_NETFILTER_IP_DEFRAG i=
+n netfilter link")
+
+Fixes tag looks wrong.
+I don't think it's Daniel's defrag series.
+No idea why syzbot bisected it to this commit.
+
+This is just a regular xmit path. Not related to defrag.
+
+> Reported-by: syzbot+40f772d37250b6d10efc@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/all/6879466d.a00a0220.3af5df.0022.GAE@goo=
+gle.com/
+> Tested-by: syzbot+40f772d37250b6d10efc@syzkaller.appspotmail.com
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 > ---
->  drivers/net/ethernet/qualcomm/ppe/ppe_config.c | 194 ++++++++++++++++++++++++-
->  drivers/net/ethernet/qualcomm/ppe/ppe_config.h |  39 +++++
->  drivers/net/ethernet/qualcomm/ppe/ppe_regs.h   |  40 +++++
->  3 files changed, 272 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/qualcomm/ppe/ppe_config.c b/drivers/net/ethernet/qualcomm/ppe/ppe_config.c
-> index dd7a4949f049..3b290eda7633 100644
-> --- a/drivers/net/ethernet/qualcomm/ppe/ppe_config.c
-> +++ b/drivers/net/ethernet/qualcomm/ppe/ppe_config.c
-> @@ -1216,6 +1216,143 @@ int ppe_counter_enable_set(struct ppe_device *ppe_dev, int port)
->  	return regmap_set_bits(ppe_dev->regmap, reg, PPE_PORT_EG_VLAN_TBL_TX_COUNTING_EN);
->  }
->  
-> +static int ppe_rss_hash_ipv4_config(struct ppe_device *ppe_dev, int index,
-> +				    struct ppe_rss_hash_cfg cfg)
-> +{
-> +	u32 reg, val;
-> +
-> +	switch (index) {
-> +	case 0:
-> +		val = FIELD_PREP(PPE_RSS_HASH_MIX_IPV4_VAL, cfg.hash_sip_mix[0]);
-> +		break;
-> +	case 1:
-> +		val = FIELD_PREP(PPE_RSS_HASH_MIX_IPV4_VAL, cfg.hash_dip_mix[0]);
-> +		break;
-> +	case 2:
-> +		val = FIELD_PREP(PPE_RSS_HASH_MIX_IPV4_VAL, cfg.hash_protocol_mix);
-> +		break;
-> +	case 3:
-> +		val = FIELD_PREP(PPE_RSS_HASH_MIX_IPV4_VAL, cfg.hash_dport_mix);
-> +		break;
-> +	case 4:
-> +		val = FIELD_PREP(PPE_RSS_HASH_MIX_IPV4_VAL, cfg.hash_sport_mix);
-> +		break;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	reg = PPE_RSS_HASH_MIX_IPV4_ADDR + index * PPE_RSS_HASH_MIX_IPV4_INC;
-> +
-> +	return regmap_write(ppe_dev->regmap, reg, val);
+>  net/netfilter/nf_bpf_link.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/netfilter/nf_bpf_link.c b/net/netfilter/nf_bpf_link.c
+> index 06b0848447003..dffe4cd6f4b0b 100644
+> --- a/net/netfilter/nf_bpf_link.c
+> +++ b/net/netfilter/nf_bpf_link.c
+> @@ -16,8 +16,13 @@ static unsigned int nf_hook_run_bpf(void *bpf_prog, st=
+ruct sk_buff *skb,
+>                 .state =3D s,
+>                 .skb =3D skb,
+>         };
+> +       unsigned int ret;
+>
+> -       return bpf_prog_run(prog, &ctx);
+> +       migrate_disable();
+> +       ret =3D bpf_prog_run(prog, &ctx);
+> +       migrate_enable();
 
-FWIW you can assign the value in the switch statement and only FIELD_PREP
-it in the regmap_write, since the bitfield is the same
-
-Konrad
+The fix looks correct, but we need to root cause it better.
+Why did it start now ?
+BPF_F_NETFILTER_IP_DEFRAG was there for two years.
 
