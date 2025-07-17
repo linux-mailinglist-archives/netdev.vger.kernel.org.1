@@ -1,258 +1,126 @@
-Return-Path: <netdev+bounces-207675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F632B082A0
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 03:52:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57DA2B082AF
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 04:02:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAA5B3B661A
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 01:51:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98B48177DEB
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 02:02:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 190DF1953BB;
-	Thu, 17 Jul 2025 01:51:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E8B1DF75B;
+	Thu, 17 Jul 2025 02:02:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YxDPMz+r"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OrxjT/iU"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08E5A1411EB
-	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 01:51:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79AF31C8606
+	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 02:02:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752717114; cv=none; b=uwbR/43An+FrlLOKSE74Or+GdWJLHFwy/VDVCHFyBc8s50q20PUN43LQmGJuF/BkhOoDdG7bdEDLpcwV2GNKtvmqZItPY3muIZekNNjdwPR9Cc18HQRMc+WphbOML++266a0mrtEX1IEKauEF0IvP21qU8duCasco9+QJbnOEFg=
+	t=1752717763; cv=none; b=stN/kT/i7nJSic2nxhy57ozPMfbIf9765cheoaUIES+lCcq3VHIC8yetyOMjYbnvbDsrpSiNxjyXLkQfibMptPzGv7CnQdePjXshQk3GnU9VLDqYxiy/ZALrJXs6jyXiQLy8qvpGghH1zayA5CxzMo3wbZ0UU7cJ8HiONbwhehI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752717114; c=relaxed/simple;
-	bh=mL5QYa/Zwca7EIKSBoPMk1K2ct8ZAgPdWd6K5y0r3NE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ema0jmMaTLogObact/VTDgfJa51jeKmVHS4YNXzo0LuYFbdN4XvoldaksS4CWIdzFJfvr2M5tY21u0jmxzNO3oa1hFxaJrXaQ2bfJli1EQfZSuZJ9sFhDqDGvATUlZO+dZhE+Dl+0yY6oH64lC3tjHSTrsLxuXzSAqNpVnH1f+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YxDPMz+r; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1752717099;
+	s=arc-20240116; t=1752717763; c=relaxed/simple;
+	bh=0GZHNVlrO+mmKMgTeSzkW0wKBWAd9//7yTO7Ox115SE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UPnTtDA6vKmIoyPC2rPTgCYwG+b7CvtaUqv1fvAODeY5jUTX7ueeX91yhhg2DAc8e+qYFqy6gwuuhR3XuCuMntMWdwuUn9LgUqmuLa+YDojNf7FGdH1YBtGVoqofS5XWUgfW+ffEcuWjow3wIdtYXdUqcQBuKrxxjddAOJWh7Ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OrxjT/iU; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752717760;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=j+3XIBTSikWJUjf3DkvkgErhbLhZhPJxy2CY5lFvy6E=;
-	b=YxDPMz+rSqvU/fztXNzoBwMFFJ9rj4I2fV4C0hEGaIIJl7cDmQSPyhHiUBR02DaUo0i9l/
-	JPoFFDCsk5RQKYvU8p/JK0YJzEdNeEzkyJAHzNS8jZeZiIR3vGwHVOCoJ0NEX9fk+VmiBy
-	G+9U8gnlcMHLPegS2rmDvc8rgAy3VFc=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: Jiri Olsa <jolsa@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Menglong Dong <menglong8.dong@gmail.com>,
- Steven Rostedt <rostedt@goodmis.org>, bpf <bpf@vger.kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>,
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- LKML <linux-kernel@vger.kernel.org>,
- Network Development <netdev@vger.kernel.org>
-Subject:
- Re: multi-fentry proposal. Was: [PATCH bpf-next v2 02/18] x86,bpf: add
- bpf_global_caller for global trampoline
-Date: Thu, 17 Jul 2025 09:50:36 +0800
-Message-ID: <3364591.aeNJFYEL58@7940hx>
-In-Reply-To:
- <CAADnVQJ47PJXxjqES8BvtWkPq3fj9D0oTF6qqeNNpG66-_MGCg@mail.gmail.com>
-References:
- <20250703121521.1874196-1-dongml2@chinatelecom.cn>
- <4737114.cEBGB3zze1@7940hx>
- <CAADnVQJ47PJXxjqES8BvtWkPq3fj9D0oTF6qqeNNpG66-_MGCg@mail.gmail.com>
+	bh=M14DsGiQtqzXQpY818urP9W5ujH4yY77Exoy3IyUIdA=;
+	b=OrxjT/iUp1hlxjR9D5gMgUvWKzelrxtXctQn5OeLeUn32uR6r/rnpRt2ZpqCZic9NtALig
+	/IgGdpjL+NXztVTYnBvLjpYWEO5yFlwuiZ6pSGeYGwG8G3yJwLt7SVws9QMM12sbPykQcA
+	W2zXOZamSvpgLE8de1vB2Ow8E0apdYg=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-74-BqMK7qhSN863ib9bhqs8-g-1; Wed, 16 Jul 2025 22:02:35 -0400
+X-MC-Unique: BqMK7qhSN863ib9bhqs8-g-1
+X-Mimecast-MFC-AGG-ID: BqMK7qhSN863ib9bhqs8-g_1752717754
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-315af08594fso420818a91.2
+        for <netdev@vger.kernel.org>; Wed, 16 Jul 2025 19:02:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752717754; x=1753322554;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=M14DsGiQtqzXQpY818urP9W5ujH4yY77Exoy3IyUIdA=;
+        b=hyLh57ptNiSi0mpYyobjmqZGry86HNRJoSglJ98v6T0vMeeJqdIJuBwMAAQh6CkFxl
+         EvXHMQl+jbdfh95AZm1xSXkj+AE3+6BBw0+m0Ysks0qjaeK57g6nPtbW9jPDISXpPodp
+         1fXj0WKo0zCDh4kAfAiqgKTp4/C6vTd1BgjBQdH6qRHx+ARHnKeHlOYj5nS2ywdlLIrG
+         5xHXBc8nvDPUyhSNq0pRt1ZsMBPZi9F/n/DxOCd4i3dCw4bWWvP84403tQ5xQgIw+rCq
+         01b6R5qFtfWbi1g1EIls38Xkkpbg0h7oIg6itZAGpYsvF65JsGYIeWw/BfyeQC606ZgN
+         XYXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWKpISYWh0K9kAOfrO6ogX5xk/3MItFfvGpHgsTBALk9fDenc3yPeqZ3BWLLGA8g0qu5jWAFV4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrUMxzvpTyf6pqNUWs3fnoOPHKf17T61m0iFEdWQG9uvV0fKtz
+	wjFGgx7UoCm5YuyHhDAxpLcdvNPXIvKsVGfkTVivvcc5a0p18PO74iHE3BlpZBFWh4cPc7VwZre
+	HBTaTUxT7aiBJeREJpuOtyQAYje/dS2iez8ryPBBsP+PRTVQo7QhxJKYW4dUk/hls8Icftu/8CQ
+	tQ+wKfnsmI6TOCxYZbqM33EscDPOIad5Ws
+X-Gm-Gg: ASbGnctdOXSJ69cYZoBO+QmNQWgl3OQYIUvZfuSci677NvWpuGMatUZYx3MYc14zS4r
+	fr0tAfHuKmUCGN2LatVmS9AiQwFvZgxIxekD86mDd+mUaOvkUcUDplJ7qEf5Kg3DUgSWxYG6WAP
+	EyIa3AoPB7XGcAVMgblCYu
+X-Received: by 2002:a17:90b:1fc3:b0:30c:540b:9ba with SMTP id 98e67ed59e1d1-31c9f44bc2dmr7521582a91.10.1752717754217;
+        Wed, 16 Jul 2025 19:02:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH5iPUiqqpQyBmPLZCPtjid1ls/tJqR3WHYd9f5uSW/9kS6qJ/9PczlVKVSg/orVJ4W9fRrd/6H4sTsVPc7n5k=
+X-Received: by 2002:a17:90b:1fc3:b0:30c:540b:9ba with SMTP id
+ 98e67ed59e1d1-31c9f44bc2dmr7521534a91.10.1752717753774; Wed, 16 Jul 2025
+ 19:02:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+References: <20250716115717.1472430-1-zuozhijie@bytedance.com>
+In-Reply-To: <20250716115717.1472430-1-zuozhijie@bytedance.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 17 Jul 2025 10:02:22 +0800
+X-Gm-Features: Ac12FXxK3fHuuCF0pftokODGN7tkaUVBIGycjF0F-57Uypg4whIM51FXe-X2b_o
+Message-ID: <CACGkMEsSD_r0akWpsP+Xa4_CvCAEVbF2cQ9GrE6VYhZ7m2C9hA@mail.gmail.com>
+Subject: Re: [PATCH net v3] virtio-net: fix recursived rtnl_lock() during probe()
+To: Zigit Zo <zuozhijie@bytedance.com>
+Cc: mst@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com, 
+	andrew+netdev@lunn.ch, edumazet@google.com
 Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: quoted-printable
 
-On Thursday, July 17, 2025 8:59 AM Alexei Starovoitov <alexei.starovoitov@g=
-mail.com> write:
-> On Wed, Jul 16, 2025 at 6:06=E2=80=AFAM Menglong Dong <menglong.dong@linu=
-x.dev> wrote:
-> >
-> > On Wednesday, July 16, 2025 12:35 AM Alexei Starovoitov <alexei.starovo=
-itov@gmail.com> write:
-> > > On Tue, Jul 15, 2025 at 1:37=E2=80=AFAM Menglong Dong <menglong.dong@=
-linux.dev> wrote:
-> > > >
-> > > >
-> > > > On 7/15/25 10:25, Alexei Starovoitov wrote:
-> > [......]
-> > > >
-> > > > According to my benchmark, it has ~5% overhead to save/restore
-> > > > *5* variants when compared with *0* variant. The save/restore of re=
-gs
-> > > > is fast, but it still need 12 insn, which can produce ~6% overhead.
-> > >
-> > > I think it's an ok trade off, because with one global trampoline
-> > > we do not need to call rhashtable lookup before entering bpf prog.
-> > > bpf prog will do it on demand if/when it needs to access arguments.
-> > > This will compensate for a bit of lost performance due to extra save/=
-restore.
-> >
-> > I don't understand here :/
-> >
-> > The rhashtable lookup is done at the beginning of the global trampoline,
-> > which is called before we enter bpf prog. The bpf progs is stored in the
-> > kfunc_md, and we need get them from the hash table.
->=20
-> Ahh. Right.
->=20
-> Looking at the existing bpf trampoline... It has complicated logic
-> to handle livepatching and tailcalls. Your global trampoline
-> doesn't, and once that is added it's starting to feel that it will
-> look just as complex as the current one.
-> So I think we better repurpose what we have.
-> Maybe we can rewrite the existing one in C too.
+On Wed, Jul 16, 2025 at 7:57=E2=80=AFPM Zigit Zo <zuozhijie@bytedance.com> =
+wrote:
+>
+> The deadlock appears in a stack trace like:
+>
+>   virtnet_probe()
+>     rtnl_lock()
+>     virtio_config_changed_work()
+>       netdev_notify_peers()
+>         rtnl_lock()
+>
+> It happens if the VMM sends a VIRTIO_NET_S_ANNOUNCE request while the
+> virtio-net driver is still probing.
+>
+> The config_work in probe() will get scheduled until virtnet_open() enable=
+s
+> the config change notification via virtio_config_driver_enable().
+>
+> Fixes: df28de7b0050 ("virtio-net: synchronize operstate with admin state =
+on up/down")
+> Signed-off-by: Zigit Zo <zuozhijie@bytedance.com>
+> ---
 
-You are right, the tailcalls is not handled yet. But for the livepatching,
-it is already handled, as we always get the origin ip from the stack
-and call it, just like how the bpf trampoline handle the livepatching.
-So no addition handling is needed here.
+Acked-by: Jason Wang <jasowang@redhat.com>
 
->=20
-> How about the following approach.
-> I think we discussed something like this in the past
-> and Jiri tried to implement something like this.
-> Andrii reminded me recently about it.
->=20
-> Say, we need to attach prog A to 30k functions.
-> 10k with 2 args, 10k with 3 args, and 10k with 7 args.
-> We can generate 3 _existing_ bpf trampolines for 2,3,7 args
-> with hard coded prog A in there (the cookies would need to be
-> fetched via binary search similar to kprobe-multi).
-> The arch_prepare_bpf_trampoline() supports BPF_TRAMP_F_ORIG_STACK.
-> So one 2-arg trampoline will work to invoke prog A in all 10k 2-arg funct=
-ions.
-> We don't need to match types, but have to compare that btf_func_model-s
-> are the same.
->=20
-> Menglong, your global trampoline for 0,1,..6 args works only for x86,
-> because btf_func_model doesn't care about sizes of args,
-> but it's not the correct mental model to use.
->=20
-> The above "10k with 2 args" is a simplified example.
-> We will need an arch specific callback is_btf_func_model_equal()
-> that will compare func models in arch specific ways.
-> For x86-64 the number of args is all it needs.
-> For other archs it will compare sizes and flags too.
-> So 30k functions will be sorted into
-> 10k with btf_func_model_1, 10k with btf_func_model_2 and so on.
-> And the corresponding number of equivalent trampolines will be generated.
->=20
-> Note there will be no actual BTF types. All args will be untyped and
-> untrusted unlike current fentry.
-> We can go further and sort 30k functions by comparing BTFs
-> instead of btf_func_model-s, but I suspect 30k funcs will be split
-> into several thousands of exact BTFs. At that point multi-fentry
-> benefits are diminishing and we might as well generate 30k unique
-> bpf trampolines for 30k functions and avoid all the complexity.
-> So I would sort by btf_func_model compared by arch specific comparator.
->=20
-> Now say prog B needs to be attached to another 30k functions.
-> If all 30k+30k functions are different then it's the same as
-> the previous step.
-> Say, prog A is attached to 10k funcs with btf_func_model_1.
-> If prog B wants to attach to the exact same func set then we
-> just regenerate bpf trampoline with hard coded progs A and B
-> and reattach.
-> If not then we need to split the set into up to 3 sets.
-> Say, prog B wants 5k funcs, but only 1k func are common:
-> (prog_A, 9k func with btf_func_model_1) -> bpf trampoline X
-> (prog_A, prog_B, 1k funcs with btf_func_model_1) -> bpf trampoline Y
-> (prog_B, 4k funcs with btf_func_model_1) -> bpf trampoline Z
->=20
-> And so on when prog C needs to be attached.
-> At detach time we can merge sets/trampolines,
-> but for now we can leave it all fragmented.
-> Unlike regular fentry progs the multi-fentry progs are not going to
-> be attached for long time. So we can reduce the detach complexity.
->=20
-> The nice part of the algorithm is that coexistence of fentry
-> and multi-fentry is easy.
-> If fentry is already attached to some function we just
-> attach multi-fentry prog to that bpf trampoline.
-> If multi-fentry was attached first and fentry needs to be attached,
-> we create a regular bpf trampoline and add both progs there.
-
-This seems not easy, and it is exactly how I handle the
-coexistence now:
-
-  https://lore.kernel.org/bpf/20250528034712.138701-16-dongml2@chinatelecom=
-=2Ecn/
-  https://lore.kernel.org/bpf/20250528034712.138701-17-dongml2@chinatelecom=
-=2Ecn/
-  https://lore.kernel.org/bpf/20250528034712.138701-18-dongml2@chinatelecom=
-=2Ecn/
-
-The most difficult part is that we need a way to replace the the
-multi-fentry with fentry for the function in the ftrace atomically. Of
-course, we can remove the global trampoline first, and then attach
-the bpf trampoline, which will make things much easier. But a
-short suspend will happen for the progs in fentry-multi.
-
->=20
-> The intersect and sorting by btf_func_model is not trivial,
-> but we can hold global trampoline_mutex, so no concerns of races.
->=20
-> Example:
-> bpf_link_A is a set of:
-> (prog_A, funcs X,Y with btf_func_model_1)
-> (prog_A, funcs N,M with btf_func_model_2)
->=20
-> To attach prog B via bpf_link_B that wants:
-> (prog_B, funcs Y,Z with btf_func_model_1)
-> (prog_B, funcs P,Q with btf_func_model_3)
->=20
-> walk all existing links, intersect and split, and update the links.
-> At the end:
->=20
-> bpf_link_A:
-> (prog_A, funcs X with btf_func_model_1)
-> (prog_A, prog_B funcs Y with btf_func_model_1)
-> (prog_A, funcs N,M with btf_func_model_2)
->=20
-> bpf_link_B:
-> (prog_A, prog_B funcs Y with btf_func_model_1)
-> (prog_B, funcs Z with btf_func_model_1)
-> (prog_B, funcs P,Q with btf_func_model_3)
->=20
-> When link is detached: walk its own tuples, remove the prog,
-> if nr_progs =3D=3D 0 -> detach corresponding trampoline,
-> if nr_progs > 0 -> remove prog and regenerate trampoline.
->=20
-> If fentry prog C needs to be attached to N it might split bpf_link_A:
-> (prog_A, funcs X with btf_func_model_1)
-> (prog_A, prog_B funcs Y with btf_func_model_1)
-> (prog_A, funcs M with btf_func_model_2)
-> (prog_A, prog_C funcs N with _fentry_)
->=20
-> Last time we gave up on it because we discovered that
-> overlap support was too complicated, but I cannot recall now
-> what it was :)
-> Maybe all of the above repeating some old mistakes.
-
-In my impression, this is exactly the solution of Jiri's, and this is
-part of the discussion that I know:
-
-  https://lore.kernel.org/bpf/ZfKY6E8xhSgzYL1I@krava/
-
->=20
-> Jiri,
-> How does the above proposal look to you?
->=20
-
-
-
+Thanks
 
 
