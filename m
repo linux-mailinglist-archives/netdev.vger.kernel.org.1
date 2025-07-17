@@ -1,139 +1,150 @@
-Return-Path: <netdev+bounces-207682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D69E8B082E9
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 04:25:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A945B082F7
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 04:29:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6E177B6E84
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 02:23:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8D151C219C5
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 02:29:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68FFD1FE47C;
-	Thu, 17 Jul 2025 02:24:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0CCE1DA62E;
+	Thu, 17 Jul 2025 02:28:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="xoH8De6P"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-0201.mail-europe.com (mail-0201.mail-europe.com [51.77.79.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A64581EB9E1;
-	Thu, 17 Jul 2025 02:24:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B471D5151
+	for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 02:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.77.79.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752719051; cv=none; b=HDhOEf77ojD11leKxNxiopwxmRO8QwzzuC3rppalWh1EYsETXr/05VQH4HiNmjSQGhgbAXEaqd/8P4CxzCJE5I6Yf2a7vlBlZLv0hsFi9mjJXn/HDnwWAPNlgrilygvIL4+SAKBj02yFmIyF3SHThnR9EhwE9XLKfbWHeOQJvig=
+	t=1752719336; cv=none; b=mjfx41+8hOs7FRIGfGXNrMBvYbjSHhUspt2Y55AmjBXqWgQknEWUmLF8pugyUhAhsjnU5SNsDSiwT6HX96/n109yO50frZ0RD4S3a9XPqiB2Dmx1z6FlbH5sbjjlnkrJu6smazxjgUbtIwXRVVZEAPNQbGECLFYuP9VlpiJKYHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752719051; c=relaxed/simple;
-	bh=i0em1g0OYljs2NENi+GHha9uquM7drJTCuBSMnI1Uik=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YtK2FPFGlZnXOxNUIvVceotpe07U4llpfrgCGraWClj/RWm9opP8xLV9SB/SHU1LBFmrzaD5XybE+m97ZU/LXjA6z7An5BwKzzJ7kgZj1rp2YAaAT4IfrxCppbWcVk3dqwYkQh51g8oryT5hXGrQFJ1TDpY3IVXH7ddraz0dBSY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from icess-ProLiant-DL380-Gen10.. (unknown [211.71.28.34])
-	by APP-03 (Coremail) with SMTP id rQCowACX74CvXnhoGPjBBA--.29325S4;
-	Thu, 17 Jul 2025 10:23:57 +0800 (CST)
-From: Ma Ke <make24@iscas.ac.cn>
-To: ioana.ciornei@nxp.com,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	akpm@linux-foundation.org,
-	Ma Ke <make24@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH net v2 3/3] dpaa2-switch: Fix device reference count leak in MAC endpoint handling
-Date: Thu, 17 Jul 2025 10:23:09 +0800
-Message-Id: <20250717022309.3339976-3-make24@iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250717022309.3339976-1-make24@iscas.ac.cn>
-References: <20250717022309.3339976-1-make24@iscas.ac.cn>
+	s=arc-20240116; t=1752719336; c=relaxed/simple;
+	bh=yNMrWf+38zkCxPLSNWlGTiuYVS2EgxmEaKWnhJuvkcY=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=CvDRvm3Itpu3LHEKrLHGeRBl3kgMWuNXJzqmwzR1oe25IqLmNHsj3B4P8Whwp/b9HvGqk7WRCf9q34R4DWN9r41SgUak0tSjMgCCimxaaqqjUoNbkxo1gDcRKjQ1EuphrNKmmHVyJ3WSlrUT+pO8q7Q9No1fd8LHi7kpvKUu340=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=xoH8De6P; arc=none smtp.client-ip=51.77.79.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
+	s=protonmail; t=1752719323; x=1752978523;
+	bh=jdzB+BTx958CK5iS3uhuzWdOPSfm87o+wpzNKtLXF48=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=xoH8De6PZRmKjPpIY+kxFZZU8WNz8MNX55I1P3PAmgrw6ebQ1CrOiUkYVhKIQgeIS
+	 G+k0OAbxgv+tpyN1tVgFbEtUYaGyWvpt9LV1ahWGHH/1zkkl8H9PbP7i7KPpOTC2Xb
+	 lbs26wpNOzLqKuBAshpnV3Opn7+NuspXsIB1M10yCWkan3m7xzqcW/CUxwFMtJHavU
+	 dfdWvnXmiJxIx/1I54tKR0uRkrZfuaopcsLP5DACPUK3ZJxYsEV+GvJ0ZhQhCuuoNu
+	 GAL8te7vDfShIhMkb4Lu6uLhiVah/eMMZg0gFgvpDgQfU6XaAPbBkKRnGGee4Qs2YE
+	 DPq60BV7kudpA==
+Date: Thu, 17 Jul 2025 02:28:38 +0000
+To: netdev@vger.kernel.org
+From: William Liu <will@willsroot.io>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, pabeni@redhat.com, kuba@kernel.org, savy@syst3mfailure.io, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, horms@kernel.org, William Liu <will@willsroot.io>
+Subject: [PATCH net v2 1/2] net/sched: Return NULL when htb_lookup_leaf encounters an empty rbtree
+Message-ID: <20250717022816.221364-1-will@willsroot.io>
+Feedback-ID: 42723359:user:proton
+X-Pm-Message-ID: 41bd5a6d3e84dd8707be651a8a0da0f25dc332f8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowACX74CvXnhoGPjBBA--.29325S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7ur1xZw1kJry3Kw13ZrWkWFg_yoW8ZrWfpF
-	W8Aa45XrykJF47Wrs7ua18ZFy5Ca109a4rWFyxu34fZan8X345WrWUtryjvr109rZ7ZrW5
-	JrWqya109FyDCaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUQ214x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
-	x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-	Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UM2
-	8EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVWxJr0_GcWl
-	nxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4
-	CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvj
-	eVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I
-	1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vI
-	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
-	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0
-	cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8V
-	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E
-	14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOzV1UUUUU
-X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The fsl_mc_get_endpoint() function uses device_find_child() for
-localization, which implicitly calls get_device() to increment the
-device's reference count before returning the pointer. However, the
-caller dpaa2_switch_port_connect_mac() fails to properly release this 
-reference in multiple scenarios. We should call put_device() to 
-decrement reference count properly.
+htb_lookup_leaf has a BUG_ON that can trigger with the following:
 
-As comment of device_find_child() says, 'NOTE: you will need to drop
-the reference with put_device() after use'.
+tc qdisc del dev lo root
+tc qdisc add dev lo root handle 1: htb default 1
+tc class add dev lo parent 1: classid 1:1 htb rate 64bit
+tc qdisc add dev lo parent 1:1 handle 2: netem
+tc qdisc add dev lo parent 2:1 handle 3: blackhole
+ping -I lo -c1 -W0.001 127.0.0.1
 
-Found by code review.
+The root cause is the following:
 
-Cc: stable@vger.kernel.org
-Fixes: 84cba72956fd ("dpaa2-switch: integrate the MAC endpoint support")
-Signed-off-by: Ma Ke <make24@iscas.ac.cn>
+1. htb_dequeue calls htb_dequeue_tree which calls the dequeue handler on
+   the selected leaf qdisc
+2. netem_dequeue calls enqueue on the child qdisc
+3. blackhole_enqueue drops the packet and returns a value that is not
+   just NET_XMIT_SUCCESS
+4. Because of this, netem_dequeue calls qdisc_tree_reduce_backlog, and
+   since qlen is now 0, it calls htb_qlen_notify -> htb_deactivate ->
+   htb_deactiviate_prios -> htb_remove_class_from_row -> htb_safe_rb_erase
+5. As this is the only class in the selected hprio rbtree,
+   __rb_change_child in __rb_erase_augmented sets the rb_root pointer to
+   NULL
+6. Because blackhole_dequeue returns NULL, netem_dequeue returns NULL,
+   which causes htb_dequeue_tree to call htb_lookup_leaf with the same
+   hprio rbtree, and fail the BUG_ON
+
+The function graph for this scenario is shown here:
+ 0)               |  htb_enqueue() {
+ 0) + 13.635 us   |    netem_enqueue();
+ 0)   4.719 us    |    htb_activate_prios();
+ 0) # 2249.199 us |  }
+ 0)               |  htb_dequeue() {
+ 0)   2.355 us    |    htb_lookup_leaf();
+ 0)               |    netem_dequeue() {
+ 0) + 11.061 us   |      blackhole_enqueue();
+ 0)               |      qdisc_tree_reduce_backlog() {
+ 0)               |        qdisc_lookup_rcu() {
+ 0)   1.873 us    |          qdisc_match_from_root();
+ 0)   6.292 us    |        }
+ 0)   1.894 us    |        htb_search();
+ 0)               |        htb_qlen_notify() {
+ 0)   2.655 us    |          htb_deactivate_prios();
+ 0)   6.933 us    |        }
+ 0) + 25.227 us   |      }
+ 0)   1.983 us    |      blackhole_dequeue();
+ 0) + 86.553 us   |    }
+ 0) # 2932.761 us |    qdisc_warn_nonwc();
+ 0)               |    htb_lookup_leaf() {
+ 0)               |      BUG_ON();
+ ------------------------------------------
+
+The full original bug report can be seen here [1].
+
+We can fix this just by returning NULL instead of the BUG_ON,
+as htb_dequeue_tree returns NULL when htb_lookup_leaf returns
+NULL.
+
+[1] https://lore.kernel.org/netdev/pF5XOOIim0IuEfhI-SOxTgRvNoDwuux7UHKnE_Y5=
+-zVd4wmGvNk2ceHjKb8ORnzw0cGwfmVu42g9dL7XyJLf1NEzaztboTWcm0Ogxuojoeo=3D@will=
+sroot.io/
+
+Fixes: 512bb43eb542 ("pkt_sched: sch_htb: Optimize WARN_ONs in htb_dequeue_=
+tree() etc.")
+Signed-off-by: William Liu <will@willsroot.io>
+Signed-off-by: Savino Dicanosa <savy@syst3mfailure.io>
 ---
- .../net/ethernet/freescale/dpaa2/dpaa2-switch.c   | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+ net/sched/sch_htb.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-index 147a93bf9fa9..4643a3380618 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-@@ -1448,12 +1448,19 @@ static int dpaa2_switch_port_connect_mac(struct ethsw_port_priv *port_priv)
- 	if (PTR_ERR(dpmac_dev) == -EPROBE_DEFER)
- 		return PTR_ERR(dpmac_dev);
- 
--	if (IS_ERR(dpmac_dev) || dpmac_dev->dev.type != &fsl_mc_bus_dpmac_type)
-+	if (IS_ERR(dpmac_dev))
- 		return 0;
- 
-+	if (dpmac_dev->dev.type != &fsl_mc_bus_dpmac_type) {
-+		err = 0;
-+		goto out_put_device;
-+	}
+diff --git a/net/sched/sch_htb.c b/net/sched/sch_htb.c
+index 14bf71f57057..c968ea763774 100644
+--- a/net/sched/sch_htb.c
++++ b/net/sched/sch_htb.c
+@@ -821,7 +821,9 @@ static struct htb_class *htb_lookup_leaf(struct htb_pri=
+o *hprio, const int prio)
+ =09=09u32 *pid;
+ =09} stk[TC_HTB_MAXDEPTH], *sp =3D stk;
+=20
+-=09BUG_ON(!hprio->row.rb_node);
++=09if (unlikely(!hprio->row.rb_node))
++=09=09return NULL;
 +
- 	mac = kzalloc(sizeof(*mac), GFP_KERNEL);
--	if (!mac)
--		return -ENOMEM;
-+	if (!mac) {
-+		err = -ENOMEM;
-+		goto out_put_device;
-+	}
- 
- 	mac->mc_dev = dpmac_dev;
- 	mac->mc_io = port_priv->ethsw_data->mc_io;
-@@ -1483,6 +1490,8 @@ static int dpaa2_switch_port_connect_mac(struct ethsw_port_priv *port_priv)
- 	dpaa2_mac_close(mac);
- err_free_mac:
- 	kfree(mac);
-+out_put_device:
-+	put_device(&dpmac_dev->dev);
- 	return err;
- }
- 
--- 
-2.25.1
+ =09sp->root =3D hprio->row.rb_node;
+ =09sp->pptr =3D &hprio->ptr;
+ =09sp->pid =3D &hprio->last_ptr_id;
+--=20
+2.43.0
+
 
 
