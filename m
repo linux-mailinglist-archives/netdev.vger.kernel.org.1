@@ -1,77 +1,99 @@
-Return-Path: <netdev+bounces-207660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-207661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56F15B08159
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 02:20:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F009B08166
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 02:29:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCB9C1C264C4
-	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 00:21:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A9305641D0
+	for <lists+netdev@lfdr.de>; Thu, 17 Jul 2025 00:29:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECB5A3B1AB;
-	Thu, 17 Jul 2025 00:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 580BD482EB;
+	Thu, 17 Jul 2025 00:29:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mq7A5PVc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ar/zduBn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52752E3701;
-	Thu, 17 Jul 2025 00:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20E119460;
+	Thu, 17 Jul 2025 00:29:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752711644; cv=none; b=evUdxu98/qQtoa2G9lneGYJARbCIoxuz6BgoZG3jayp9zGBKPWDhKxs0c8ESfhpaU1dI7urEJuZTHrywmG2ZP3Ni+QSWekhkCsYyAbdIJznFgttB71W+AqgTDanV98Ftm0SOZsj3QgqPtteg+NrbKMRBpzCiMxc97VEOIYAzSEg=
+	t=1752712191; cv=none; b=J3K+fv0n3mjTWDD7J8gwXlpItR2xaTG2brKgLJPmmXV+6VyLu47n3GCWsS71uXTnwLqlQnUy37rAnJ9j5y8Bba3oyhIs5Yafkf2RfLK2GiFOiH5UpkXKxDvkyQA2ZuRFxdlIxM1o3TF07kpy0IWN+UHnNzpCQ06HZDz944vwT+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752711644; c=relaxed/simple;
-	bh=nWFxoukiglDbiZqiAdldrvFgESPD+QmMK1CjQSzvmz0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XQVyqTFDrgLCobn77VY+z63ty54myP82O5CQLthHw8CDqChr0iq6Zsh2ydp7LRPFItLLgZNPd0e52/2dVBANuFwgNwUptkHCpcmODnXCczWywGxEEbfgMI3Ek8Xk9PujSyYVfvV4Dj2oTvQ5EDZBWaWdGTk1NPEZ2T+EVoXGKnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mq7A5PVc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CB04C4CEE7;
-	Thu, 17 Jul 2025 00:20:44 +0000 (UTC)
+	s=arc-20240116; t=1752712191; c=relaxed/simple;
+	bh=gL7Z1M0HVgjTlVZJDpBe179+As3uy4yzCurXcAfgnLk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=POJzkBpkx4uZtML+sv3geixVzSCcm/2CPXWO3SwndVm+NkRUvpMHbBJd+3c0UxI1yHY3y2PDrjkZxIwPfZR8+2ekKvq61F3BSGoY+DFwQtdoIZLi0mJ1BjrV77MuiXPznUtVE4ePJlLQSPyi5E4GxpCRI8bgH16fi4GDFCJBMUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ar/zduBn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 859E4C4CEE7;
+	Thu, 17 Jul 2025 00:29:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752711644;
-	bh=nWFxoukiglDbiZqiAdldrvFgESPD+QmMK1CjQSzvmz0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mq7A5PVcQTZotimT/FVBTU6+PvR1SEyfM6CiDgwtXB9wibeU/qWxucBDGVhTNTpFA
-	 Mi3vUw/VKGleuUsSRa5QV2cpfKcqyR2dMlOgj0BTvYp/kxWaaIBd3d8If55qPKx0Ad
-	 PV3gQLhyFjq3m/QAHNQVx7yjlJQK5PsvG7oDCmSt8fdfsyZWySKweo7XnEwZGCCRI/
-	 3EtBNRkcbDfm1plT1NmjappFAGMrz6/++UhWEmEe9RpHey0QZ/DTqXvCBRvfWt2OPv
-	 Y22nQG+ZaJqqX4tC2c5Y1z3mdvtL5NDeiVlR+PAzTsleCBcemreBoGzAI0SN1UzZJD
-	 Muh+frUxwcozw==
-Date: Wed, 16 Jul 2025 17:20:43 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Heiner Kallweit
- <hkallweit1@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- kernel@pengutronix.de, linux-kernel@vger.kernel.org, Russell King
- <linux@armlinux.org.uk>, netdev@vger.kernel.org, Andre Edich
- <andre.edich@microchip.com>, Lukas Wunner <lukas@wunner.de>
-Subject: Re: [PATCH net v4 0/3] net: phy: smsc: use IRQ + relaxed polling to
- fix missed link-up
-Message-ID: <20250716172043.195dd86c@kernel.org>
-In-Reply-To: <20250714095240.2807202-1-o.rempel@pengutronix.de>
-References: <20250714095240.2807202-1-o.rempel@pengutronix.de>
+	s=k20201202; t=1752712190;
+	bh=gL7Z1M0HVgjTlVZJDpBe179+As3uy4yzCurXcAfgnLk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Ar/zduBnFZKEUGQAiOS/78L4Wwm/b9XE3n0wqJ0GF535hiYgTcDtIvhW2HA69rLz7
+	 D1yawRI/tAt3tB2TjkqAYGocT3+K4ToXf0u215bSmREIkdl8QWVV3wYb49MFpN0TDH
+	 B84tPKrQRnRO89MTwP7sRteaHBZAeKX+q4JyZJVH/smNc506KWV2IvC48WSIMFmBlh
+	 PkXAia1IV7jB6YwoNcgWKrqnssAE8yHOmNuUX7n89yMf3GvrV2wPqLnKIOvARk+A9k
+	 U2f4dzPZ67XvDfHqzM21gMqd4MgAVomiwNhwPZ10koHBLaK/XEuqh7zvx7NwGlT+3W
+	 IuieD1wdZJQqg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB147383BA38;
+	Thu, 17 Jul 2025 00:30:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v7 0/3] selftest: net: Add selftest for netpoll
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175271221077.1374954.5388109861761060959.git-patchwork-notify@kernel.org>
+Date: Thu, 17 Jul 2025 00:30:10 +0000
+References: <20250714-netpoll_test-v7-0-c0220cfaa63e@debian.org>
+In-Reply-To: <20250714-netpoll_test-v7-0-c0220cfaa63e@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org, horms@kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, willemdebruijn.kernel@gmail.com,
+ bpf@vger.kernel.org, kernel-team@meta.com, willemb@google.com
 
-On Mon, 14 Jul 2025 11:52:37 +0200 Oleksij Rempel wrote:
-> This series makes the SMSC LAN8700 (as used in LAN9512 and similar USB
-> adapters) reliable again in configurations where it is forced to 10 Mb/s
-> and the link partner still advertises autonegotiation.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 14 Jul 2025 02:56:47 -0700 you wrote:
+> I am submitting a new selftest for the netpoll subsystem specifically
+> targeting the case where the RX is polling in the TX path, which is
+> a case that we don't have any test in the tree today. This is done when
+> netpoll_poll_dev() called, and this test creates a scenario when that is
+> probably.
 > 
-> In this scenario, the PHY may miss the final link-up interrupt, causing
-> the network interface to remain down even though a valid link is
-> present.
+> The test does the following:
+> 
+> [...]
 
-Could we get a PHY maintainer ack on these (especially patch 2)?
+Here is the summary with links:
+  - [net-next,v7,1/3] selftests: drv-net: add helper/wrapper for bpftrace
+    https://git.kernel.org/netdev/net-next/c/3c561c547c39
+  - [net-next,v7,2/3] selftests: drv-net: Strip '@' prefix from bpftrace map keys
+    https://git.kernel.org/netdev/net-next/c/fd2aadcefbac
+  - [net-next,v7,3/3] selftests: net: add netpoll basic functionality test
+    https://git.kernel.org/netdev/net-next/c/b3019343e4bd
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
