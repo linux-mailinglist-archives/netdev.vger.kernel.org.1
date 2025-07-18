@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-208226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B463CB0AA65
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 20:52:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2339B0AA69
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 20:52:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EAA35C11D9
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 18:52:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14E931C4881A
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 18:52:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B13C2E8E0E;
-	Fri, 18 Jul 2025 18:51:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F6902E975B;
+	Fri, 18 Jul 2025 18:51:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aBQ7DI4C"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fJIMdbVh"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0F9D2E92B7
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 18:51:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A892E88AB
+	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 18:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752864692; cv=none; b=j8N1OW9H3fY4a/ihnSELBskCfYHCAl0MLeDLBBn8lPN6Czagb71y10AmaL0BFVni+uQqJ03aoy3b+zcu5RfZktoeNoC6rV/ZyyfhOeOF/Uxd2HPAvaDbLadhakZT0Hgp0MaW0zQ2ecYJbXZZFunWr4210FSX+5Re0SU9+n2Jz7Y=
+	t=1752864693; cv=none; b=hL9NCpecaiVPCnesmtyBBBKt/SXMGfWNPZT0oZvaMINserKbaoB/rddMkZSb6Pgrd/etpVR2e02tXMmt4xzTiOapECcPKC9ryiV7Zcl9IN87RN62u67H5S7W+Esege7LgNsWXYt2abmrwCwsxhm6l6Tunk0Leyok8dCBiHPijUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752864692; c=relaxed/simple;
-	bh=tq8002epkrGoFB5qbixc2N92ov3xim81YvkW2dNjLG0=;
+	s=arc-20240116; t=1752864693; c=relaxed/simple;
+	bh=cykOqrsbgsjq602xlMnmGbwDj5FfMBEAq/MYI35EVIY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CKZf6lPKoLmAH84P9WnMUkynQPFJhnsF/utAVo9oLSAu82o/T4WFzUxRtzvxZSdOReDkoGcEEwvT0ir52vFh+zjGuj9RLwepi4JDcaen7FFZArmDwLhfRyF0NS5oA5YnM3BtpADwGIBgjlff9lxveP56gwzo4q7ZtflNNIgUl3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aBQ7DI4C; arc=none smtp.client-ip=198.175.65.16
+	 MIME-Version; b=SgJt13BtnfDvxq9YE9cva/ht271vd0kS+GG4imbp0aDLOhqiucLwLpD1fQWnnKh76RGAw9WXWQE5V6KYA6vqHeZvSoMscXdCDpGfWk6PHjk0GVsoy+fulXC68X+Errm0HNAOpIkKkdY5d5DWLTmwOTjuziqaKXmnrSmxyXSKvv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fJIMdbVh; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752864690; x=1784400690;
+  t=1752864691; x=1784400691;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=tq8002epkrGoFB5qbixc2N92ov3xim81YvkW2dNjLG0=;
-  b=aBQ7DI4CtcGUG+dc8blWCRO8w3WNyt5ueZFOwQwyltzrhGo9iuBPMtPy
-   F3yuTaExZOqTCbprmaQU8E/95zJlWWSuVVOu8qF0aWJAmkDBkmOi8R8/z
-   WtHTjvW2z12K+SRuMoyfW+RcKE2vfzSJ+cwAlP43U0tmu0NaBm4FrlV0Q
-   uY0mo9c3J3PZyCgu/xQlDlyUxHSQXnVPdy29FTiHHLwVL+X63c9pMRkav
-   wz458GiA3i9YKTQw3qLTCJlQYBU1IvqfpVEwmIaAu49A6gOQ0nKL9B2lT
-   OEsz/wQc4BCrrNX9FwYlRUJgb7VBPtqtpn5BNI9VsptCAKQG5mEd+jEuw
+  bh=cykOqrsbgsjq602xlMnmGbwDj5FfMBEAq/MYI35EVIY=;
+  b=fJIMdbVhxftxqjAundVCY1iC24KKCtdwbAkgZo73lscRN5YsWOAhIgkt
+   e5aBb1sCriZ/mDz4zHU4osCfxozd2bn061EcFm+yFw5AYdjBodYD8IIRY
+   K4z+9ooJ26CBtN0rf8POJKPiYN6Ymawy6L7giJHCf685sWnTKxYd5hhv2
+   TW09ebCm2OVhqj/e/Dn2dYfwwRq5pQ/2ptdtY+b+KAb38N4mcwhU0xgba
+   nYmPyZkVTFlS9oQty8wJVXo42vtPDXSw4SzYilpDMCVrkBV0t8LMcoBus
+   i66GhDsni9iDSY2J97ani6RDuVNY9iSp4krL2HoUj80dajg3JajwUpfQa
    w==;
-X-CSE-ConnectionGUID: 0rzCJCPrRSmsAOZj8y/LZg==
-X-CSE-MsgGUID: +h+uTfkPRJuAA8hHwX1YFw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11496"; a="55320600"
+X-CSE-ConnectionGUID: 4rD/bKGjSsKpRAy7QPoapg==
+X-CSE-MsgGUID: PW6DnA4NRKGEHL5tLvUqQw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11496"; a="55320608"
 X-IronPort-AV: E=Sophos;i="6.16,322,1744095600"; 
-   d="scan'208";a="55320600"
+   d="scan'208";a="55320608"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
   by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2025 11:51:25 -0700
-X-CSE-ConnectionGUID: ZMXg6PcxT1e7Rny6+IODlg==
-X-CSE-MsgGUID: u4IaRFFyQFGGa1jUtTreUA==
+X-CSE-ConnectionGUID: +vkGIVsFTYWVdN2y7i1Uyw==
+X-CSE-MsgGUID: bilj0gluRD2TTDaXXmMUZA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,322,1744095600"; 
-   d="scan'208";a="157506900"
+   d="scan'208";a="157506904"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa006.jf.intel.com with ESMTP; 18 Jul 2025 11:51:25 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -65,16 +65,12 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Jesse Brandeburg <jbrandeburg@cloudflare.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Rinitha S <sx.rinitha@intel.com>
-Subject: [PATCH net-next 08/13] ice: convert ice_add_prof() to bitmap
-Date: Fri, 18 Jul 2025 11:51:09 -0700
-Message-ID: <20250718185118.2042772-9-anthony.l.nguyen@intel.com>
+Cc: Dave Ertman <david.m.ertman@intel.com>,
+	anthony.l.nguyen@intel.com,
+	Marcin Szycik <marcin.szycik@linux.intel.com>
+Subject: [PATCH net-next 09/13] ice: breakout common LAG code into helpers
+Date: Fri, 18 Jul 2025 11:51:10 -0700
+Message-ID: <20250718185118.2042772-10-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250718185118.2042772-1-anthony.l.nguyen@intel.com>
 References: <20250718185118.2042772-1-anthony.l.nguyen@intel.com>
@@ -86,178 +82,190 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jesse Brandeburg <jesse.brandeburg@intel.com>
+From: Dave Ertman <david.m.ertman@intel.com>
 
-Previously the ice_add_prof() took an array of u8 and looped over it with
-for_each_set_bit(), examining each 8 bit value as a bitmap.
-This was just hard to understand and unnecessary, and was triggering
-undefined behavior sanitizers with unaligned accesses within bitmap
-fields (on our internal tools/builds). Since the @ptype being passed in
-was already declared as a bitmap, refactor this to use native types with
-the advantage of simplifying the code to use a single loop.
+In the VF handling code, parts of the code for lag can be broken out into
+helper functions to reduce code duplication. Break this code out into
+helper functions
 
-Co-developed-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-CC: Jesse Brandeburg <jbrandeburg@cloudflare.com>
-Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
+Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+Signed-off-by: Dave Ertman <david.m.ertman@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- .../net/ethernet/intel/ice/ice_flex_pipe.c    | 78 +++++++------------
- .../net/ethernet/intel/ice/ice_flex_pipe.h    |  7 +-
- drivers/net/ethernet/intel/ice/ice_flow.c     |  4 +-
- 3 files changed, 34 insertions(+), 55 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_lag.c      | 42 +++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_lag.h      |  2 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c   | 19 ++-------
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c | 23 ++--------
+ 4 files changed, 51 insertions(+), 35 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_flex_pipe.c b/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
-index ed95072ca6e3..363ae79a3620 100644
---- a/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
-+++ b/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
-@@ -3043,16 +3043,16 @@ ice_disable_fd_swap(struct ice_hw *hw, u8 prof_id)
-  * the ID value used here.
-  */
- int
--ice_add_prof(struct ice_hw *hw, enum ice_block blk, u64 id, u8 ptypes[],
--	     const struct ice_ptype_attributes *attr, u16 attr_cnt,
--	     struct ice_fv_word *es, u16 *masks, bool symm, bool fd_swap)
-+ice_add_prof(struct ice_hw *hw, enum ice_block blk, u64 id,
-+	     unsigned long *ptypes, const struct ice_ptype_attributes *attr,
-+	     u16 attr_cnt, struct ice_fv_word *es, u16 *masks, bool symm,
-+	     bool fd_swap)
+diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c b/drivers/net/ethernet/intel/ice/ice_lag.c
+index d132eb477551..c8b4fa3efbd4 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lag.c
++++ b/drivers/net/ethernet/intel/ice/ice_lag.c
+@@ -822,6 +822,48 @@ ice_lag_cfg_cp_fltr(struct ice_lag *lag, bool add)
+ 	kfree(s_rule);
+ }
+ 
++/**
++ * ice_lag_prepare_vf_reset - helper to adjust vf lag for reset
++ * @lag: lag struct for interface that owns VF
++ *
++ * Context: must be called with the lag_mutex lock held.
++ *
++ * Return: active lport value or ICE_LAG_INVALID_PORT if nothing moved.
++ */
++u8 ice_lag_prepare_vf_reset(struct ice_lag *lag)
++{
++	u8 pri_prt, act_prt;
++
++	if (lag && lag->bonded && lag->primary && lag->upper_netdev) {
++		pri_prt = lag->pf->hw.port_info->lport;
++		act_prt = lag->active_port;
++		if (act_prt != pri_prt && act_prt != ICE_LAG_INVALID_PORT) {
++			ice_lag_move_vf_nodes_cfg(lag, act_prt, pri_prt);
++			return act_prt;
++		}
++	}
++
++	return ICE_LAG_INVALID_PORT;
++}
++
++/**
++ * ice_lag_complete_vf_reset - helper for lag after reset
++ * @lag: lag struct for primary interface
++ * @act_prt: which port should be active for lag
++ *
++ * Context: must be called while holding the lag_mutex.
++ */
++void ice_lag_complete_vf_reset(struct ice_lag *lag, u8 act_prt)
++{
++	u8 pri_prt;
++
++	if (lag && lag->bonded && lag->primary &&
++	    act_prt != ICE_LAG_INVALID_PORT) {
++		pri_prt = lag->pf->hw.port_info->lport;
++		ice_lag_move_vf_nodes_cfg(lag, pri_prt, act_prt);
++	}
++}
++
+ /**
+  * ice_lag_info_event - handle NETDEV_BONDING_INFO event
+  * @lag: LAG info struct
+diff --git a/drivers/net/ethernet/intel/ice/ice_lag.h b/drivers/net/ethernet/intel/ice/ice_lag.h
+index bab2c83142a1..69347d9f986b 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lag.h
++++ b/drivers/net/ethernet/intel/ice/ice_lag.h
+@@ -70,4 +70,6 @@ void ice_deinit_lag(struct ice_pf *pf);
+ void ice_lag_rebuild(struct ice_pf *pf);
+ bool ice_lag_is_switchdev_running(struct ice_pf *pf);
+ void ice_lag_move_vf_nodes_cfg(struct ice_lag *lag, u8 src_prt, u8 dst_prt);
++u8 ice_lag_prepare_vf_reset(struct ice_lag *lag);
++void ice_lag_complete_vf_reset(struct ice_lag *lag, u8 act_prt);
+ #endif /* _ICE_LAG_H_ */
+diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+index c639ce716d32..5ee74f3e82dc 100644
+--- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+@@ -859,16 +859,13 @@ static void ice_notify_vf_reset(struct ice_vf *vf)
+ int ice_reset_vf(struct ice_vf *vf, u32 flags)
  {
--	u32 bytes = DIV_ROUND_UP(ICE_FLOW_PTYPE_MAX, BITS_PER_BYTE);
- 	DECLARE_BITMAP(ptgs_used, ICE_XLT1_CNT);
- 	struct ice_prof_map *prof;
--	u8 byte = 0;
--	u8 prof_id;
- 	int status;
-+	u8 prof_id;
-+	u16 ptype;
+ 	struct ice_pf *pf = vf->pf;
+-	struct ice_lag *lag;
+ 	struct ice_vsi *vsi;
+-	u8 act_prt, pri_prt;
+ 	struct device *dev;
+ 	int err = 0;
++	u8 act_prt;
+ 	bool rsd;
  
- 	bitmap_zero(ptgs_used, ICE_XLT1_CNT);
+ 	dev = ice_pf_to_dev(pf);
+-	act_prt = ICE_LAG_INVALID_PORT;
+-	pri_prt = pf->hw.port_info->lport;
  
-@@ -3102,57 +3102,35 @@ ice_add_prof(struct ice_hw *hw, enum ice_block blk, u64 id, u8 ptypes[],
- 	prof->context = 0;
+ 	if (flags & ICE_VF_RESET_NOTIFY)
+ 		ice_notify_vf_reset(vf);
+@@ -884,16 +881,8 @@ int ice_reset_vf(struct ice_vf *vf, u32 flags)
+ 	else
+ 		lockdep_assert_held(&vf->cfg_lock);
  
- 	/* build list of ptgs */
--	while (bytes && prof->ptg_cnt < ICE_MAX_PTG_PER_PROFILE) {
--		u8 bit;
-+	for_each_set_bit(ptype, ptypes, ICE_FLOW_PTYPE_MAX) {
-+		u8 ptg;
+-	lag = pf->lag;
+ 	mutex_lock(&pf->lag_mutex);
+-	if (lag && lag->bonded && lag->primary) {
+-		act_prt = lag->active_port;
+-		if (act_prt != pri_prt && act_prt != ICE_LAG_INVALID_PORT &&
+-		    lag->upper_netdev)
+-			ice_lag_move_vf_nodes_cfg(lag, act_prt, pri_prt);
+-		else
+-			act_prt = ICE_LAG_INVALID_PORT;
+-	}
++	act_prt = ice_lag_prepare_vf_reset(pf->lag);
  
--		if (!ptypes[byte]) {
--			bytes--;
--			byte++;
-+		/* The package should place all ptypes in a non-zero
-+		 * PTG, so the following call should never fail.
-+		 */
-+		if (ice_ptg_find_ptype(hw, blk, ptype, &ptg))
- 			continue;
--		}
+ 	if (ice_is_vf_disabled(vf)) {
+ 		vsi = ice_get_vf_vsi(vf);
+@@ -979,9 +968,7 @@ int ice_reset_vf(struct ice_vf *vf, u32 flags)
+ 	ice_reset_vf_mbx_cnt(vf);
  
--		/* Examine 8 bits per byte */
--		for_each_set_bit(bit, (unsigned long *)&ptypes[byte],
--				 BITS_PER_BYTE) {
--			u16 ptype;
--			u8 ptg;
--
--			ptype = byte * BITS_PER_BYTE + bit;
--
--			/* The package should place all ptypes in a non-zero
--			 * PTG, so the following call should never fail.
--			 */
--			if (ice_ptg_find_ptype(hw, blk, ptype, &ptg))
--				continue;
-+		/* If PTG is already added, skip and continue */
-+		if (test_bit(ptg, ptgs_used))
-+			continue;
+ out_unlock:
+-	if (lag && lag->bonded && lag->primary &&
+-	    act_prt != ICE_LAG_INVALID_PORT)
+-		ice_lag_move_vf_nodes_cfg(lag, pri_prt, act_prt);
++	ice_lag_complete_vf_reset(pf->lag, act_prt);
+ 	mutex_unlock(&pf->lag_mutex);
  
--			/* If PTG is already added, skip and continue */
--			if (test_bit(ptg, ptgs_used))
--				continue;
-+		set_bit(ptg, ptgs_used);
-+		/* Check to see there are any attributes for this ptype, and
-+		 * add them if found.
-+		 */
-+		status = ice_add_prof_attrib(prof, ptg, ptype, attr, attr_cnt);
-+		if (status == -ENOSPC)
-+			break;
-+		if (status) {
-+			/* This is simple a ptype/PTG with no attribute */
-+			prof->ptg[prof->ptg_cnt] = ptg;
-+			prof->attr[prof->ptg_cnt].flags = 0;
-+			prof->attr[prof->ptg_cnt].mask = 0;
+ 	if (flags & ICE_VF_RESET_LOCK)
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+index 9460b6561b69..05511157c571 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+@@ -1996,24 +1996,13 @@ static int ice_vc_cfg_qs_msg(struct ice_vf *vf, u8 *msg)
+ 	    (struct virtchnl_vsi_queue_config_info *)msg;
+ 	struct virtchnl_queue_pair_info *qpi;
+ 	struct ice_pf *pf = vf->pf;
+-	struct ice_lag *lag;
+ 	struct ice_vsi *vsi;
+-	u8 act_prt, pri_prt;
+ 	int i = -1, q_idx;
+ 	bool ena_ts;
++	u8 act_prt;
  
--			__set_bit(ptg, ptgs_used);
--			/* Check to see there are any attributes for
--			 * this PTYPE, and add them if found.
--			 */
--			status = ice_add_prof_attrib(prof, ptg, ptype,
--						     attr, attr_cnt);
--			if (status == -ENOSPC)
-+			if (++prof->ptg_cnt >= ICE_MAX_PTG_PER_PROFILE)
- 				break;
--			if (status) {
--				/* This is simple a PTYPE/PTG with no
--				 * attribute
--				 */
--				prof->ptg[prof->ptg_cnt] = ptg;
--				prof->attr[prof->ptg_cnt].flags = 0;
--				prof->attr[prof->ptg_cnt].mask = 0;
--
--				if (++prof->ptg_cnt >=
--				    ICE_MAX_PTG_PER_PROFILE)
--					break;
--			}
+-	lag = pf->lag;
+ 	mutex_lock(&pf->lag_mutex);
+-	act_prt = ICE_LAG_INVALID_PORT;
+-	pri_prt = pf->hw.port_info->lport;
+-	if (lag && lag->bonded && lag->primary) {
+-		act_prt = lag->active_port;
+-		if (act_prt != pri_prt && act_prt != ICE_LAG_INVALID_PORT &&
+-		    lag->upper_netdev)
+-			ice_lag_move_vf_nodes_cfg(lag, act_prt, pri_prt);
+-		else
+-			act_prt = ICE_LAG_INVALID_PORT;
+-	}
++	act_prt = ice_lag_prepare_vf_reset(pf->lag);
+ 
+ 	if (!test_bit(ICE_VF_STATE_ACTIVE, vf->vf_states))
+ 		goto error_param;
+@@ -2141,9 +2130,7 @@ static int ice_vc_cfg_qs_msg(struct ice_vf *vf, u8 *msg)
  		}
--
--		bytes--;
--		byte++;
  	}
  
- 	list_add(&prof->list, &hw->blk[blk].es.prof_map);
-diff --git a/drivers/net/ethernet/intel/ice/ice_flex_pipe.h b/drivers/net/ethernet/intel/ice/ice_flex_pipe.h
-index 28b0897adf32..ee5d9f9c9d53 100644
---- a/drivers/net/ethernet/intel/ice/ice_flex_pipe.h
-+++ b/drivers/net/ethernet/intel/ice/ice_flex_pipe.h
-@@ -39,9 +39,10 @@ bool ice_hw_ptype_ena(struct ice_hw *hw, u16 ptype);
+-	if (lag && lag->bonded && lag->primary &&
+-	    act_prt != ICE_LAG_INVALID_PORT)
+-		ice_lag_move_vf_nodes_cfg(lag, pri_prt, act_prt);
++	ice_lag_complete_vf_reset(pf->lag, act_prt);
+ 	mutex_unlock(&pf->lag_mutex);
  
- /* XLT2/VSI group functions */
- int
--ice_add_prof(struct ice_hw *hw, enum ice_block blk, u64 id, u8 ptypes[],
--	     const struct ice_ptype_attributes *attr, u16 attr_cnt,
--	     struct ice_fv_word *es, u16 *masks, bool symm, bool fd_swap);
-+ice_add_prof(struct ice_hw *hw, enum ice_block blk, u64 id,
-+	     unsigned long *ptypes, const struct ice_ptype_attributes *attr,
-+	     u16 attr_cnt, struct ice_fv_word *es, u16 *masks, bool symm,
-+	     bool fd_swap);
- struct ice_prof_map *
- ice_search_prof_id(struct ice_hw *hw, enum ice_block blk, u64 id);
- int
-diff --git a/drivers/net/ethernet/intel/ice/ice_flow.c b/drivers/net/ethernet/intel/ice/ice_flow.c
-index 278e57686274..6d5c939dc8a5 100644
---- a/drivers/net/ethernet/intel/ice/ice_flow.c
-+++ b/drivers/net/ethernet/intel/ice/ice_flow.c
-@@ -1421,7 +1421,7 @@ ice_flow_add_prof_sync(struct ice_hw *hw, enum ice_block blk,
+ 	/* send the response to the VF */
+@@ -2160,9 +2147,7 @@ static int ice_vc_cfg_qs_msg(struct ice_vf *vf, u8 *msg)
+ 				vf->vf_id, i);
  	}
  
- 	/* Add a HW profile for this flow profile */
--	status = ice_add_prof(hw, blk, prof_id, (u8 *)params->ptypes,
-+	status = ice_add_prof(hw, blk, prof_id, params->ptypes,
- 			      params->attr, params->attr_cnt, params->es,
- 			      params->mask, symm, true);
- 	if (status) {
-@@ -1617,7 +1617,7 @@ ice_flow_set_parser_prof(struct ice_hw *hw, u16 dest_vsi, u16 fdir_vsi,
- 		break;
- 	}
+-	if (lag && lag->bonded && lag->primary &&
+-	    act_prt != ICE_LAG_INVALID_PORT)
+-		ice_lag_move_vf_nodes_cfg(lag, pri_prt, act_prt);
++	ice_lag_complete_vf_reset(pf->lag, act_prt);
+ 	mutex_unlock(&pf->lag_mutex);
  
--	status = ice_add_prof(hw, blk, id, (u8 *)prof->ptypes,
-+	status = ice_add_prof(hw, blk, id, prof->ptypes,
- 			      params->attr, params->attr_cnt,
- 			      params->es, params->mask, false, false);
- 	if (status)
+ 	ice_lag_move_new_vf_nodes(vf);
 -- 
 2.47.1
 
