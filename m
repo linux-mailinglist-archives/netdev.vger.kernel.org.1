@@ -1,86 +1,183 @@
-Return-Path: <netdev+bounces-208102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12A33B09DD9
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 10:26:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 55E4CB09DF4
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 10:29:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEA7A176969
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 08:26:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E90E317BE0F
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 08:29:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 455012222B6;
-	Fri, 18 Jul 2025 08:26:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B42A9290DB1;
+	Fri, 18 Jul 2025 08:29:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ro/KtmsA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NKPJcX9J"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C1E820B7F4;
-	Fri, 18 Jul 2025 08:26:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A91B21FF49
+	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 08:29:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752827186; cv=none; b=KmWgBjBmGEJsriH4FDL2dI1L7zJ+QdX12Xs96LXp4RDxytj7fTnCjYM5cjxTj5A55TzOH4xhOnp6gvoXg5FQdJkamNUhEYuDGrP62cDNQdcNCwqkerop9Sd6Fa4yzwieoHQl7DxlMM9Wd1m6KPxKdi9jlDoE4UzgZPYEtRbKpgE=
+	t=1752827374; cv=none; b=kjUvYRD36vJaIrBgo3Lex/DMLZsDEzTa4rZKdtGOmLIsXmLSVrTUns+Vyd5CGAIQl7tlkwDIpWAPJcPtAdN8DobslbTpSPlOoKlSCOss1WZ8izd8WQNc+6FSWS9mYZ7ftg/lJTUpxXtR+c4F3TtYJ2x8OuGels/xEeJUyBBMIU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752827186; c=relaxed/simple;
-	bh=JpnYc7uV3AIPXd+sOIKY0UtAVN0bRV+soVESNbhHoaY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O40vYlSdILdBdGKZ6bcICSNyx654or5o9hUAJ42MMJ+6T1qFhFGBBcUrEDxY1xqrYxSFiHdfMn/dOfzkxzzhNN4x3LewxmcwgqAxhjf7qLBfExfN1NkNxTbH39bdm/AH1IyOcEr6/i/3KMtdw+TeVHZ4j5jHKlpDVbZL2jkHILk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ro/KtmsA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F115CC4CEED;
-	Fri, 18 Jul 2025 08:26:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752827185;
-	bh=JpnYc7uV3AIPXd+sOIKY0UtAVN0bRV+soVESNbhHoaY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ro/KtmsA3WgqsTsECSmfsOAbjr1R2UpST50ZudDNsAvUWfGWspd8EdFCiIRUHXSZ4
-	 XlOxcqBhjrP0z9DP4H315K8/F5JjHtN9c+G0jPVMjZbeaDG3EaFQUiGH92DYKBVL7S
-	 vsF2KD+Ax3cJ/iSFW/suqVyLgXpmgZHjoziLFlfh9SaAaH8rnFSzVO0v6URpBg/853
-	 t0F1zI2c0HFJOR5VLgcNtw/bcuy7N9YPtOpwtavnjgFuQme6GMDWJ9a/7QxmknONU6
-	 akAPT8CYuTF4VbENhFgjGCd1f5VebJvmvZxlqpQI/U4SLBxi/BiRbXLZAdteiW9ehY
-	 Kmdifcx8Z81Xw==
-Date: Fri, 18 Jul 2025 09:26:20 +0100
-From: Simon Horman <horms@kernel.org>
-To: Richard Gobert <richardbgobert@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, dsahern@kernel.org, razor@blackwall.org,
-	idosch@nvidia.com, petrm@nvidia.com, menglong8.dong@gmail.com,
-	daniel@iogearbox.net, martin.lau@kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4 4/4] net: geneve: enable binding geneve
- sockets to local addresses
-Message-ID: <20250718082620.GI27043@horms.kernel.org>
-References: <20250717115412.11424-1-richardbgobert@gmail.com>
- <20250717115412.11424-5-richardbgobert@gmail.com>
- <20250718073141.GG27043@horms.kernel.org>
+	s=arc-20240116; t=1752827374; c=relaxed/simple;
+	bh=2yMZxEoMhzHBRLhDU4mMOZCbhsreVPW3r72uSlrVzME=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=CMlL4AxWRIQAXD2Wy6ebw27rZ2u/UHZXCOvw3u7MrDVm35Wpg8mLlwb5vyiE/JOAmffn2iffNL73pCBVpLFBknVqCq/66huH65YjkfDJo5sZjdCqWVz/4uzRmh3d5YndnW5L04jwiTDDiSEObwClOJHNlipMVlUIOsWZ4dBhek8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NKPJcX9J; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752827372;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=tLxIgdhHiCoIgPGgPwU9stKbvRQ2I1q76Ap/zfjhcII=;
+	b=NKPJcX9JUlNF3MpnAebcOSVPHnOPXUXuXh/UNeT+nOsgmkf24CXmB/GXWD3s+0L03HZiPS
+	lmfprn13yIHR837FaIsHvnKT8hH/Z7gLBwurHBlKJIlh2MHf04M0hmRL4JiWHWXfFvRdXM
+	N8QqncFiPnhJbhYQ7acJ5VhWfFBISxw=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-564-Hq1APPNbMhy3c5iZgPPmNA-1; Fri,
+ 18 Jul 2025 04:29:28 -0400
+X-MC-Unique: Hq1APPNbMhy3c5iZgPPmNA-1
+X-Mimecast-MFC-AGG-ID: Hq1APPNbMhy3c5iZgPPmNA_1752827365
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 575D119560B6;
+	Fri, 18 Jul 2025 08:29:25 +0000 (UTC)
+Received: from server.redhat.com (unknown [10.72.112.34])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AA4E830001B9;
+	Fri, 18 Jul 2025 08:29:14 +0000 (UTC)
+From: Cindy Lu <lulu@redhat.com>
+To: "K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Michael Kelley <mhklinux@outlook.com>,
+	Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	Kees Cook <kees@kernel.org>,
+	Saurabh Sengar <ssengar@linux.microsoft.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Guillaume Nault <gnault@redhat.com>,
+	Joe Damato <jdamato@fastly.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	linux-hyperv@vger.kernel.org (open list:Hyper-V/Azure CORE AND DRIVERS),
+	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+	linux-kernel@vger.kernel.org (open list),
+	lulu@redhat.com,
+	jasowang@redhat.com
+Subject: [PATCH v2] netvsc: transfer lower device max tso size
+Date: Fri, 18 Jul 2025 16:28:44 +0800
+Message-ID: <20250718082909.243488-1-lulu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250718073141.GG27043@horms.kernel.org>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Fri, Jul 18, 2025 at 08:31:41AM +0100, Simon Horman wrote:
-> On Thu, Jul 17, 2025 at 01:54:12PM +0200, Richard Gobert wrote:
-> 
-> ...
-> 
-> > diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-> 
-> ...
-> 
-> >  static struct geneve_sock *geneve_find_sock(struct geneve_net *gn,
-> >  					    sa_family_t family,
-> > -					    __be16 dst_port)
-> > +					    __be16 dst_port,
-> > +						union geneve_addr *saddr)
+From: Jason Wang <jasowang@redhat.com>
 
-Sorry, one more minor thing: the indentatoin on the line above looks off.
+When netvsc is accelerated by the lower device, we can advertise the
+lower device max tso size in order to get better performance.
 
-...
+One example is that when 802.3ad encap is enabled by netvsc, it has a
+lower max tso size than 64K. This will lead to software segmentation
+of forwarding GSO packet (e.g the one from VM/tap).
+
+This patch help to recover the performance.
+
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+Tested-by: Cindy Lu <lulu@redhat.com>
+Signed-off-by: Cindy Lu <lulu@redhat.com>
+---
+ drivers/net/hyperv/netvsc_drv.c |  2 +-
+ include/linux/netdevice.h       |  4 ++++
+ net/core/dev.c                  | 18 ++++++++++++++++++
+ 3 files changed, 23 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
+index c41a025c66f0..7af4aa4f4abe 100644
+--- a/drivers/net/hyperv/netvsc_drv.c
++++ b/drivers/net/hyperv/netvsc_drv.c
+@@ -2440,7 +2440,7 @@ static int netvsc_vf_changed(struct net_device *vf_netdev, unsigned long event)
+ 		 * switched over to the VF
+ 		 */
+ 		if (vf_is_up)
+-			netif_set_tso_max_size(ndev, vf_netdev->tso_max_size);
++			netif_stacked_transfer_tso_max_size(vf_netdev, ndev);
+ 		else
+ 			netif_set_tso_max_size(ndev, netvsc_dev->netvsc_gso_max_size);
+ 	}
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index adb14db25798..c695a3ffecd8 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -5275,6 +5275,9 @@ void netdev_change_features(struct net_device *dev);
+ void netif_stacked_transfer_operstate(const struct net_device *rootdev,
+ 					struct net_device *dev);
+ 
++void netif_stacked_transfer_tso_max_size(const struct net_device *rootdev,
++					 struct net_device *dev);
++
+ netdev_features_t passthru_features_check(struct sk_buff *skb,
+ 					  struct net_device *dev,
+ 					  netdev_features_t features);
+@@ -5326,6 +5329,7 @@ static inline bool netif_needs_gso(struct sk_buff *skb,
+ }
+ 
+ void netif_set_tso_max_size(struct net_device *dev, unsigned int size);
++
+ void netif_set_tso_max_segs(struct net_device *dev, unsigned int segs);
+ void netif_inherit_tso_max(struct net_device *to,
+ 			   const struct net_device *from);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index be97c440ecd5..3bec4284adff 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -3306,6 +3306,24 @@ void netif_set_tso_max_size(struct net_device *dev, unsigned int size)
+ }
+ EXPORT_SYMBOL(netif_set_tso_max_size);
+ 
++/**
++ *	netif_stacked_transfer_tso_max_size - transfer tso max size
++ *	@rootdev: the root or lower level device to transfer tso max size from
++ *	@dev: the device to transfer operstate to
++ *
++ *	Transfer tso max size from root to device. This is normally
++ *	called when a stacking relationship exists between the root
++ *	device and the device(a leaf device).
++ */
++void netif_stacked_transfer_tso_max_size(const struct net_device *rootdev,
++					 struct net_device *dev)
++{
++	dev->tso_max_size = rootdev->tso_max_size;
++	netif_set_gso_max_size(dev, READ_ONCE(rootdev->gso_max_size));
++	netif_set_gso_ipv4_max_size(dev, READ_ONCE(rootdev->gso_ipv4_max_size));
++}
++EXPORT_SYMBOL(netif_stacked_transfer_tso_max_size);
++
+ /**
+  * netif_set_tso_max_segs() - set the max number of segs supported for TSO
+  * @dev:	netdev to update
+-- 
+2.45.0
+
 
