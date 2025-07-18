@@ -1,131 +1,111 @@
-Return-Path: <netdev+bounces-208215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA846B0A9FE
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 20:10:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1E1EB0AA19
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 20:25:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A3C97B65DD
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 18:08:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A86087B66CC
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 18:24:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E270F2E7BAD;
-	Fri, 18 Jul 2025 18:10:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D136E2E6D2E;
+	Fri, 18 Jul 2025 18:25:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eWap06Kh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF86880C1C;
-	Fri, 18 Jul 2025 18:10:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3796C1E0DD8;
+	Fri, 18 Jul 2025 18:25:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752862215; cv=none; b=Ilv2rSSg4FEjYZ9LEuBLF/CQKizIrFz09aavJiZ3DLJ76CJ8OiX0pW2mNfOljh8tYhSveitu9Gbilrw9WmRhyle5x6I8J8Tpp8DJCXboThLZCJh2BEEBWnEFK8S02d86OHODTv0cZv9PPreIMmBlHQtIbqKqzQKYPx49c8HaYnA=
+	t=1752863149; cv=none; b=aAoZTSKvpdSo+f+KF27GJCnIVpTeLH8SU+ahZYGXa8UdZ9mrO1kSoIWCHi1oRG1jinhlstzv9rMyytZ0qdLgdQUuWjVQ1kiU5y/+kXdCyEkgrrc3HvWB+2b8af3KX/4O3JMbaRG2bckZAUv3alLHZ4HJGiyguaL+HRP9WF/Gyh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752862215; c=relaxed/simple;
-	bh=WgxSzovmY/3HN+EA7KrCAS/u+NXYud7/dmBnI4yWUAo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sgl0V3YWtA2LIs5L9aJr0yVfvOHwNkzkuK1gTcE/8T2X5HX7c2R2AzmuO+PAhTaNT69g/laofiovUvh0wY9W4DrMNh7uVesPqX0yoOK1chgtzfCsysQhNVlFEVdAiEVxOaMGnclQGwyd/sRO2lnh4DVfazEWPOa6J7hMZlPzy3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EA27C4CEEB;
-	Fri, 18 Jul 2025 18:10:09 +0000 (UTC)
-Date: Fri, 18 Jul 2025 19:10:06 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Will Deacon <will@kernel.org>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-	llvm@lists.linux.dev, Ingo Molnar <mingo@redhat.com>,
-	Bill Wendling <morbo@google.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Leon Romanovsky <leonro@mellanox.com>, linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Mark Rutland <mark.rutland@arm.com>,
-	Michael Guralnik <michaelgur@mellanox.com>, patches@lists.linux.dev,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Jijie Shao <shaojijie@huawei.com>
-Subject: Re: [PATCH v3 6/6] IB/mlx5: Use __iowrite64_copy() for write
- combining stores
-Message-ID: <aHqN_hpJl84T1Usi@arm.com>
-References: <0-v3-1893cd8b9369+1925-mlx5_arm_wc_jgg@nvidia.com>
- <6-v3-1893cd8b9369+1925-mlx5_arm_wc_jgg@nvidia.com>
- <20250714215504.GA2083014@nvidia.com>
- <aHYqPRqgcl5DQOpq@willie-the-truck>
- <20250715115200.GJ2067380@nvidia.com>
+	s=arc-20240116; t=1752863149; c=relaxed/simple;
+	bh=7rQ/ySqdp7CI20/9emKDXbsHMq5q6rgQBXDslMGiurw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TDSgY2btbYxTbFpLM9yWvCR5GGH04upuTjTNjlvEiSA8dQypRLL02VzloOw9l7hQ8QfRij53OlAlhGXmyFkOB5amT+huCsjjwBB7/iLiCRRXkH8GmtIpQgtZ+uDUusbWZKBXf0quWRI/UI8KEGqTb0NXr2CJsZfr+wJDBXECJz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eWap06Kh; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4561607166aso18865325e9.2;
+        Fri, 18 Jul 2025 11:25:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752863146; x=1753467946; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7rQ/ySqdp7CI20/9emKDXbsHMq5q6rgQBXDslMGiurw=;
+        b=eWap06KhZPKQ1mQLri3yo3sI5wZzoAdh3WJzo9ZCUujR5w5Ga8TTcSyaCRvdpsh2q1
+         S2PAhEdqNE0ty6O1yzQmbU9PPQXyXgFQk/z0otb4xrSTGR7uPN6iPspaa7nWm2dOEXxp
+         4JbRD728FmJdbGvXivAO06GhjlWgEabIl5os1mEAJC2SQDcwcaHxUZcj5JXFqjU9WvxW
+         JNxuNwC9cANbHlL/e01S7aRSFVaOCcg/eOlVWiI+DBtaAVa8kUhaHNT0+74JT7VkHVsf
+         ILSpUCRR0LBbQ7GRZ6EjIqs8IzByg37bGNLoYUwDU0JRWycm+JzXviOU+JRSpQsxtWrz
+         CYXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752863146; x=1753467946;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7rQ/ySqdp7CI20/9emKDXbsHMq5q6rgQBXDslMGiurw=;
+        b=W8jYsMlKyEZNjelYQqmvRqS/mjerCpnbpUsvsFQnSsUTQfFmNH8QeNdHJLZX9km2Q1
+         06LBmIEl+yMAuj8covXQjW3VBvs/sCk7gm+AfgYd8kzwTau17wysmPQhbvwZcOFdTSjs
+         uKjzsgti4Zh50y8yCDVwV2jsK1MRFukoDraHx7By/kWJczwVsrRN8eDghW01NJXxyy0J
+         ZDQfx5HCkUSQ9WgOLAfn1sUMMSnkA5fhJwXvDXz/OpX2IvpPiD+t69dkc7O98ghzJIiF
+         CHL43ig7JBzbKIjrvbsbDr6JYFJLAs2M2op1h6u2OFvDUUT2QGyKOtspsLP0JCm94YSG
+         NztA==
+X-Forwarded-Encrypted: i=1; AJvYcCV7XPc8plBkiyVSn436SP5HhW69WzWa1Atw/HvkpMPj6NT/8wEYzaD2ohQTlxeJuXRVzTSmC+ae++o1g1xB1d82@vger.kernel.org, AJvYcCVEyOMK9+GoUEizE6xvuQ/wsps50Muxcduh05Hh22shMNfChUCFbtvg0Y9KIrT3hp0+7b0=@vger.kernel.org, AJvYcCVtppmJLVrhaxNwzUHJcBu76K9szBkLNzsiaub1KqPQ7wQvN1RX9hB1HOm6r5Qws5gSWkr7L5qa9kEDgIdV@vger.kernel.org, AJvYcCWOGAG5FrLiNpNchPKKPL7cIc38luZgvZnc+nl9A6J3505KUu+W++9DfFbZ3u1eKekG9IGOewAB@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzp6xL5sct5nnGw6rL/4g4J4OEpGKwe8CXMq+KFzcmF9D6BU7hg
+	GnJjVsr27wAKGsxsevdSuJ1+Bqct03nnECiD2wMqEsMIt3pislRrV5Tfn4fSSLrSZoUqzQZ5gY8
+	mffIstVxgA7fATHlr1q+BgRLOiAtYXBc=
+X-Gm-Gg: ASbGncvSuYGtz7aA01NDqO1vTchQE7BHZj7eXAGitrIM64f0Oxlx+XAKENm0XO7bKyE
+	h6A+BA0fA7+w+Z9YOdGCQDVt4FbDc/uFWgHxxXNOvmTz7ggOvuRyG/q6wRjmk4uNtBj1kk+i0Di
+	yRU4sbnHmNlUcRGlreTNELZC0oL31cO9VKsoXFi+Zlwqei/Vu93Lq6wBrnTqdHLDQ7xdp7Zf3Mm
+	cGGGRA+xWPhK1BxuwYyilkoJuZNklH8LfFp
+X-Google-Smtp-Source: AGHT+IEe4rj1cW9cX4tVDm5QTOkimSR766TO9ryjwmojDYGSFepqUgth1+KYXDyOSr1QiZC81Iruk3BcAZ5BEq/lmlY=
+X-Received: by 2002:a05:600c:699a:b0:43c:ec4c:25b4 with SMTP id
+ 5b1f17b1804b1-45636ba6679mr91367775e9.10.1752863146237; Fri, 18 Jul 2025
+ 11:25:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250715115200.GJ2067380@nvidia.com>
+References: <20250718172746.1268813-1-chen.dylane@linux.dev>
+In-Reply-To: <20250718172746.1268813-1-chen.dylane@linux.dev>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Fri, 18 Jul 2025 11:25:35 -0700
+X-Gm-Features: Ac12FXyHvw3SskVaxW4s7-ZTUmg2xXrOApp_s7xLqMkcj0CshSbgMR2_GlhJyOk
+Message-ID: <CAADnVQKMVJ_2SMcm0hvg2GDc-RPVU7GVAWRqbSdGn2ZtwUbUng@mail.gmail.com>
+Subject: Re: [PATCH bpf-next] netfilter: bpf: Disable migrate before bpf_prog run
+To: Tao Chen <chen.dylane@linux.dev>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Florian Westphal <fw@strlen.de>, 
+	netfilter-devel <netfilter-devel@vger.kernel.org>, coreteam@netfilter.org, 
+	Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	bpf <bpf@vger.kernel.org>, syzbot+92c5daf9a23f04ccfc99@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 15, 2025 at 08:52:00AM -0300, Jason Gunthorpe wrote:
-> On Tue, Jul 15, 2025 at 11:15:25AM +0100, Will Deacon wrote:
-> > > Since STP was rejected alread we've only tested the Neon version. It
-> > > does make a huge improvement, but it still somehow fails to combine
-> > > rarely sometimes. The CPU is really bad at this :(
-> > 
-> > I think the thread was from last year so I've forgotten most of the
-> > details, but wasn't STP rejected because it wasn't virtualisable? 
-> 
-> Yes, that was the claim.
-> 
-> > In which case, doesn't NEON suffer from exactly the same (or possibly
-> > worse) problem?
-> 
-> In general yes, in specific no.
+On Fri, Jul 18, 2025 at 10:30=E2=80=AFAM Tao Chen <chen.dylane@linux.dev> w=
+rote:
+>
+>
+> The cant_migrate() check in __bpf_prog_run requires to disable
+> migrate before running the bpf_prog, it seems that migrate is
+> not disabled in the above execution path.
 
-For a generic iowrite function, I wouldn't use STP or Neon since it may
-end up being used on emulated MMIO.
+bpf@vger mailing list exists, so that developers
+read it and participate in the community.
 
-BTW, for Neon, don't you need kernel_neon_begin/end()? This may have its
-own overhead and also BUG_ON for different contexts. Again, not suitable
-for a generic function.
+https://lore.kernel.org/bpf/20250717185837.1073456-1-kuniyu@google.com/
 
-Unfortunately, there's no way to know what this function is called on.
-We might try to infer that the kernel started at EL2 but even that is
-not entirely correct with nested virt. Or the OS may start at EL1 but
-have direct access to mlx5 where we'd want the faster option.
-
-> mlx5 (and other RDMA devices) have long used Neon for MMIO in
-> userspace, so any VMM assigning mlx5 devices simply must make this
-> work - it is already not optional. So we know that all VMs out there
-> with mlx5 support neon for mlx5, and it is safe for mlx5 to use.
-
-I can't think of any generic solution here, it may have to be a hack
-specific to mlx5. We can also add add support for ST64B and have some
-condition on system_supports_st64b() for future systems.
-
-Even if we could handle virtualisation, I wonder whether
-__iowrite64_copy() is the right function to implement 128-bit stores or
-the larger 64-byte atomic stores. At least the comment for the generic
-function suggests that it writes in 64-bit quantities. Some MMIO may
-only handle such writes. A function like memcpy_toio() is more generic,
-it doesn't imply any restrictions on the size of the writes (though I
-think it guarantees natural alignment for the stores).
-
--- 
-Catalin
+--
+pw-bot: cr
 
