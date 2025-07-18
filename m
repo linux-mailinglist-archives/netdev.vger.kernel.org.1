@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-208072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BFC7B0998C
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 04:01:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CBDEB0998B
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 04:01:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83FC75A3431
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 02:01:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 230F17BB87E
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 01:59:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 210CD1F17E8;
-	Fri, 18 Jul 2025 02:00:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3F6B1F584C;
+	Fri, 18 Jul 2025 02:00:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QbmFrJvm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z3/1lhBQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05941F1302
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 02:00:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 959AE1922C4;
+	Fri, 18 Jul 2025 02:00:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752804013; cv=none; b=gkk7EHWo6sDYXHoBM10uDaYCtIi4PycXPs4jXVLLRhhxhcw2nMYWoWCshVQUPQFowQPELEfAhWXqKL9tKTxSUZuL4A2XV1QAlA26izSrGP/c72dykyiHDKGvyvHY7cJ6DFlXKFeFW5jyb+yuCE0qGPi1bjYg6rJ9RTuWRxZEOm0=
+	t=1752804014; cv=none; b=DVL7nMmgDTYoyHWKZfHm6lmQWxOr+Qae/yxXrl5ahXmYbwlT5huKegtkcNk9OVNUgkOopUDx0dtdjci9C8MdI5hF4ZSwmnHeZytJ2rtDY9rJpfRAO4nsIT0AAFCErF85gJEh97N5LfuGdy2LEnzO8HzFmbrCG+6Sk9wo6PVUdxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752804013; c=relaxed/simple;
-	bh=f7SwhsxY+q/CplHgTdHlhpgnXLdgxR+P4k48YjqU2+c=;
+	s=arc-20240116; t=1752804014; c=relaxed/simple;
+	bh=JdglF8LKko74PJaUYYcu6QwtzNQ5YqDLg6ee62sCoaM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Xz3mPOZ5ScU53LYYiDDpnNoYFarlHj7FyBB+UAZLgFad3SS4Y4Nmiz4eT6Y9v+L2TB5hPtSftdG7XUN+bfp0MKpuqKuZQvLbWotKx8OmZFNAg0quroEcw29OkarpYmyXrl4NAERc+/43BHWVbL093D7o1+k5rNI/1qtfdC2jPEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QbmFrJvm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A49AC4CEF0;
-	Fri, 18 Jul 2025 02:00:12 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Dvy7kAzslTnLoUHY4rYTHS0nrUFa3bCHTr4ikHXkHisgnRQOISrBjq+HPhH95i7LKRJWEymy58CiBvsII8aH0MgYCEKxDXYD/dY23fqrg3L44LcTgAssMqcZHHMyCtYhB1RCXM+FzrQidEoIZJlvjFf7VkFcwhOwOvo6WfvWZ8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z3/1lhBQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C885C4CEF5;
+	Fri, 18 Jul 2025 02:00:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752804012;
-	bh=f7SwhsxY+q/CplHgTdHlhpgnXLdgxR+P4k48YjqU2+c=;
+	s=k20201202; t=1752804014;
+	bh=JdglF8LKko74PJaUYYcu6QwtzNQ5YqDLg6ee62sCoaM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QbmFrJvmmyASvnKjs89BzQUItAhMZgm1MiN2er2uGiqAG7zuLtYaT7h61ZFLPtKEH
-	 uXaZhH1o7+mRkzPD4oS+dmhSt7mjfJWaGENgIVJApl3TbAvUoYyvSLlgiGlSGQOHVo
-	 ttUu1Yk6pd4NJ9RQrGZo4Z9KqqFS2eRkf+KojfYP9JsBZKX2Ook6dHMeLF2vJSdwCX
-	 EQoyzMjrSDMpV6qay7Eq7CqT/We0EQJ2lSTrpHeb+dnTBjWDJQniT4La+E7lFrvDn+
-	 wnkopl1lHBpVfDk75MKtPhfCU4q3HAS2Wz091yYwYDwLwpkxaTWTK95xDJGaMm3YZF
-	 yzuaE+FD4R7VA==
+	b=Z3/1lhBQRRudT4IP3aVHDqpSallpSsq7NW2CDo9kPbs87Gt5CJt3zh0ySfxHKyuRT
+	 vYXnmmC2IH5IR5QFpI3RmXTuzFXnmVTyc+gtL6Exq1E8Tx79srEx+vRS8BiRegG4S3
+	 NKwQ7XDwNlLTA7lSbGgTIRR0m7NfEcCHUZ+jTEhj/GKqaFrEX4+ZJemAB7yZeRve8V
+	 3kNwCVzffTGX2ZLXtWifFTqxcXYZlPcukHRzXSRiAO8nTSQgS1tVh4UwoQGshj0i1z
+	 wOq9sqclMEWoLkPraITNyr7l0PR1fuGEh1rKvfbtPrHirX6sYbsqj6Srunwpnkjj4b
+	 XkYhVv21IKelg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC53383BA3C;
-	Fri, 18 Jul 2025 02:00:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 339E3383BA3C;
+	Fri, 18 Jul 2025 02:00:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4] ibmvnic: Use ndo_get_stats64 to fix
- inaccurate
- SAR reporting
+Subject: Re: [PATCH net-next] net/mlx5: Fix an IS_ERR() vs NULL bug in
+ esw_qos_move_node()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175280403224.2141855.2028690524270156677.git-patchwork-notify@kernel.org>
-Date: Fri, 18 Jul 2025 02:00:32 +0000
-References: <20250716152115.61143-1-mmc@linux.ibm.com>
-In-Reply-To: <20250716152115.61143-1-mmc@linux.ibm.com>
-To: Mingming Cao <mmc@linux.ibm.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, horms@kernel.org,
- bjking1@linux.ibm.com, haren@linux.ibm.com, ricklind@linux.ibm.com,
- davemarq@linux.ibm.com
+ <175280403375.2141855.6021349856885843288.git-patchwork-notify@kernel.org>
+Date: Fri, 18 Jul 2025 02:00:33 +0000
+References: <0ce4ec2a-2b5d-4652-9638-e715a99902a7@sabinyo.mountain>
+In-Reply-To: <0ce4ec2a-2b5d-4652-9638-e715a99902a7@sabinyo.mountain>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: cjubran@nvidia.com, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+ mbloch@nvidia.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, cratiu@nvidia.com,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 16 Jul 2025 11:21:15 -0400 you wrote:
-> VNIC testing on multi-core Power systems showed SAR stats drift
-> and packet rate inconsistencies under load.
+On Tue, 15 Jul 2025 18:01:30 -0500 you wrote:
+> The __esw_qos_alloc_node() function returns NULL on error.  It doesn't
+> return error pointers.  Update the error checking to match.
 > 
-> Implements ndo_get_stats64 to provide safe aggregation of queue-level
-> atomic64 counters into rtnl_link_stats64 for use by tools like 'ip -s',
-> 'ifconfig', and 'sar'. Switch to ndo_get_stats64 to align SAR reporting
-> with the standard kernel interface for retrieving netdev stats.
-> 
-> [...]
+> Fixes: 96619c485fa6 ("net/mlx5: Add support for setting tc-bw on nodes")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> ---
+>  drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 
 Here is the summary with links:
-  - [net-next,v4] ibmvnic: Use ndo_get_stats64 to fix inaccurate SAR reporting
-    https://git.kernel.org/netdev/net-next/c/efe28034ea27
+  - [net-next] net/mlx5: Fix an IS_ERR() vs NULL bug in esw_qos_move_node()
+    https://git.kernel.org/netdev/net-next/c/49be1e245ea3
 
 You are awesome, thank you!
 -- 
