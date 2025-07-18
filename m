@@ -1,210 +1,138 @@
-Return-Path: <netdev+bounces-208099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C028B09CF5
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 09:52:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76AA6B09D6B
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 10:11:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF5FC1C43A34
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 07:52:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E0917B7D20
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 08:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECB94291C3A;
-	Fri, 18 Jul 2025 07:52:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FAA92264D2;
+	Fri, 18 Jul 2025 08:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b="Ms8UgGYP";
+	dkim=pass (2048-bit key) header.d=vates.tech header.i=anthoine.bourgeois@vates.tech header.b="Dvgz0M3q"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mail132-21.atl131.mandrillapp.com (mail132-21.atl131.mandrillapp.com [198.2.132.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE1D291882
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 07:52:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F1F220F34
+	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 08:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.2.132.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752825128; cv=none; b=snLP8UqVYj3ys+KCMeG4P7xzXiiCVwRTszS+4BZDMXpM2h2jLnSa+iGO0strEuEdwHm/ZRPIGBuQ+fmgKUVCSYn84ADpUteAyS51vHA9vSbprRihoJk1/oNLiabX5yTHBYBPQhF0uNVQOgnx+/PSbg3Jpq1XuvxTiaTh1w/0vHY=
+	t=1752826232; cv=none; b=lzqQ1xB3ChlequLv/t3x3p3MkTFOPZ+xVygTxDft5CTZJD+BAVP4EXvYbwO2KPUnUZOsYKrrTP9y7Q3tpqEHaHJ0FsnWL5p97UTqaXewgq2CPQpcY2RwpAZJ5OGDXp4kz/ihI/s1HzvVrUAhj3BnYnBHgtkm6jmwk+woKmnB310=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752825128; c=relaxed/simple;
-	bh=AaKcgNe71sb7S6nbkCZavd6gw0BvsHajGOmUPXABzJ8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OgwaaHR7pFoaJ+t9VR+Dh6xu6oZYKRacMaZY2mb2WSGGodWlmyZFTBcIQS8d/p2pXsr0faa+9YvkKhQ6evUVz2/FnDXYq1gftmLBjHYXXXLfL0fkT5j11AVLvijM8DSVPgbOo1lqbe0swgGCs2Ksjy8L2K+G2hmwYN9yjzV2g7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ucfst-0003Vl-MC; Fri, 18 Jul 2025 09:51:59 +0200
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ucfst-0092Ux-0Z;
-	Fri, 18 Jul 2025 09:51:59 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ucfst-001FVi-0M;
-	Fri, 18 Jul 2025 09:51:59 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Steve Glendinning <steve.glendinning@shawell.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: [PATCH net-next v1 1/1] net: usb: smsc95xx: add support for ethtool pause parameters
-Date: Fri, 18 Jul 2025 09:51:56 +0200
-Message-Id: <20250718075157.297923-1-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1752826232; c=relaxed/simple;
+	bh=1d3PpO0q077xRQs9WQqLKRGtVTC/vWISiu3MTSGnUzw=;
+	h=From:Subject:To:Cc:Message-Id:References:In-Reply-To:Date:
+	 MIME-Version:Content-Type; b=FDNKkCJMcPt2zIhiDTrSnvbU4U2zSnZhY4wXGPuz26Y43ovHO2wCEmVhAcJlaI178OJOj90+UR0O/8zJUMyFjDHOgvoqG3KW3Q2U0o/m16bREsiOf3IVW7CiM19QwGty5iapOfsbPcypRULVz3Bz3ukfTXV4jlLje463gkvW3nk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech; spf=pass smtp.mailfrom=bounce.vates.tech; dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b=Ms8UgGYP; dkim=pass (2048-bit key) header.d=vates.tech header.i=anthoine.bourgeois@vates.tech header.b=Dvgz0M3q; arc=none smtp.client-ip=198.2.132.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bounce.vates.tech
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandrillapp.com;
+	s=mte1; t=1752826229; x=1753096229;
+	bh=9v3RvNn3og/vnGMjRNCHbK2EsjnkNsgZix1oMc/Rcns=;
+	h=From:Subject:To:Cc:Message-Id:References:In-Reply-To:Feedback-ID:
+	 Date:MIME-Version:Content-Type:Content-Transfer-Encoding:CC:Date:
+	 Subject:From;
+	b=Ms8UgGYPKIWHXIgawYLIOUOGw3+mP+x1OP6dEPonV0fgHt34+8Mbs/fPwjcm8zBJz
+	 xVxhhdMLyaZZ9kXucXjjmmXpl9e9FN5p25ZX77lZz+L8AUC+bs/p50x4KqRhiDq5Ss
+	 7rKSTyKO/4rEXtuQ8okU0qmv4blTlWsW76Y0vidxBc54ZqOMQso9IIN8pCfgg0knpd
+	 vskyg4m8I4n/R784yCU91p4Hv56FARToVLWBCOoEi1ZPJ6iUQvt2J3ayUf6Ke8jmWX
+	 FMCMZ52F2CP8f8ToQOVndjp6bpcVKgvmdkNfZWOtG2GFgGfttDQRVzv+s5T3+oTtD/
+	 HQ/7le80XOROg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vates.tech; s=mte1;
+	t=1752826229; x=1753086729; i=anthoine.bourgeois@vates.tech;
+	bh=9v3RvNn3og/vnGMjRNCHbK2EsjnkNsgZix1oMc/Rcns=;
+	h=From:Subject:To:Cc:Message-Id:References:In-Reply-To:Feedback-ID:
+	 Date:MIME-Version:Content-Type:Content-Transfer-Encoding:CC:Date:
+	 Subject:From;
+	b=Dvgz0M3qc4LbJ8GzauIZmGqjpLj0CCAAX8UoAV1e/OgdP+SeuMaASAIc+xreRTfSL
+	 5Lh6dTsV9d+lqOs6CnyQ6Y65mr0bFW/n325SRdBdlU3VKtNQLT6uFk6hdc5daCuoT8
+	 7TVjDUUYswne5oC8L5Dx1GxC97WSDGWxdMjIIFnuFUc4vLGEYUvMRtSIYWdgJhnRfJ
+	 4Fg+BU60PuyPEBTG+7KIq/Giui63iUI7ltnFaO4D9z0hiVkvmspVR/GGPAwko6UXMh
+	 jDfahwuWUffynsHhAPXMz2z6pNQ86H/QUVlVWf5KAI0hiCfFcGGVoow4ojJh4hE8Cf
+	 nGdhQVxWnIoOQ==
+Received: from pmta09.mandrill.prod.atl01.rsglab.com (localhost [127.0.0.1])
+	by mail132-21.atl131.mandrillapp.com (Mailchimp) with ESMTP id 4bk2Xj1Jppz1XLF4g
+	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 08:10:29 +0000 (GMT)
+From: "Anthoine Bourgeois" <anthoine.bourgeois@vates.tech>
+Subject: =?utf-8?Q?Re:=20[PATCH=20v2]=20xen/netfront:=20Fix=20TX=20response=20spurious=20interrupts?=
+Received: from [37.26.189.201] by mandrillapp.com id 65a60f28e7d441048fd4f1adbe603a61; Fri, 18 Jul 2025 08:10:29 +0000
+X-Bm-Disclaimer: Yes
+X-Bm-Milter-Handled: 4ffbd6c1-ee69-4e1b-aabd-f977039bd3e2
+X-Bm-Transport-Timestamp: 1752826227429
+To: "Jakub Kicinski" <kuba@kernel.org>
+Cc: "Juergen Gross" <jgross@suse.com>, "Stefano Stabellini" <sstabellini@kernel.org>, "Oleksandr Tyshchenko" <oleksandr_tyshchenko@epam.com>, "Wei Liu" <wei.liu@kernel.org>, "Paul Durrant" <paul@xen.org>, xen-devel@lists.xenproject.org, netdev@vger.kernel.org, "Elliott Mitchell" <ehem+xen@m5p.com>
+Message-Id: <aHoBcULQVVsbx6XO@mail.vates.tech>
+References: <20250715160902.578844-2-anthoine.bourgeois@vates.tech> <20250717072951.3bc2122c@kernel.org>
+In-Reply-To: <20250717072951.3bc2122c@kernel.org>
+X-Native-Encoded: 1
+X-Report-Abuse: =?UTF-8?Q?Please=20forward=20a=20copy=20of=20this=20message,=20including=20all=20headers,=20to=20abuse@mandrill.com.=20You=20can=20also=20report=20abuse=20here:=20https://mandrillapp.com/contact/abuse=3Fid=3D30504962.65a60f28e7d441048fd4f1adbe603a61?=
+X-Mandrill-User: md_30504962
+Feedback-ID: 30504962:30504962.20250718:md
+Date: Fri, 18 Jul 2025 08:10:29 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Implement ethtool .get_pauseparam and .set_pauseparam handlers for
-configuring flow control on smsc95xx. The driver now supports enabling
-or disabling transmit and receive pause frames, with or without
-autonegotiation. Pause settings are applied during link-up based on
-current PHY state and user configuration.
+On Thu, Jul 17, 2025 at 07:29:51AM -0700, Jakub Kicinski wrote:
+>On Tue, 15 Jul 2025 16:11:29 +0000 Anthoine Bourgeois wrote:
+>> Fixes: b27d47950e48 ("xen/netfront: harden netfront against event channel storms")
+>
+>Not entirely sure who you expect to apply this patch, but if networking
+>then I wouldn't classify this is a fix. The "regression" happened 4
+>years ago. And this patch doesn't seem to be tuning the logic added by
+>the cited commit. I think this is an optimization, -next material, and
+>therefore there should be no Fixes tag here. You can refer to the commit
+>without the tag.
 
-Previously, the driver used phy_get_pause() during link-up handling,
-but lacked initialization and an ethtool interface to configure pause
-modes. As a result, flow control support was effectively non-functional.
+Ok, you're right the cited commit exacerbates a problem that was already
+there before.
+I will change this in v3.
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- drivers/net/usb/smsc95xx.c | 72 ++++++++++++++++++++++++++++++++++++--
- 1 file changed, 69 insertions(+), 3 deletions(-)
+>> @@ -849,9 +847,6 @@ static netdev_tx_t xennet_start_xmit(struct sk_buff *skb, struct net_device *dev
+>>  	tx_stats->packets++;
+>>  	u64_stats_update_end(&tx_stats->syncp);
+>>
+>> -	/* Note: It is not safe to access skb after xennet_tx_buf_gc()! */
+>> -	xennet_tx_buf_gc(queue);
+>> -
+>>  	if (!netfront_tx_slot_available(queue))
+>>  		netif_tx_stop_queue(netdev_get_tx_queue(dev, queue->id));
+>
+>I thought normally reaping completions from the Tx path is done
+>to prevent the queue from filling up, when the device-generated
+>completions are slow or the queue is short. I say "normally" but
+>this is relatively a uncommon thing to do in networking.
+>Maybe it's my lack of Xen knowledge but it would be good to add to
+>the commit message why these calls where here in the first place.
 
-diff --git a/drivers/net/usb/smsc95xx.c b/drivers/net/usb/smsc95xx.c
-index 8e82184be5e7..de733e0488bf 100644
---- a/drivers/net/usb/smsc95xx.c
-+++ b/drivers/net/usb/smsc95xx.c
-@@ -63,6 +63,9 @@ struct smsc95xx_priv {
- 	u32 hash_hi;
- 	u32 hash_lo;
- 	u32 wolopts;
-+	bool pause_rx;
-+	bool pause_tx;
-+	bool pause_autoneg;
- 	spinlock_t mac_cr_lock;
- 	u8 features;
- 	u8 suspend_flags;
-@@ -537,16 +540,23 @@ static void smsc95xx_set_multicast(struct net_device *netdev)
- 
- static int smsc95xx_phy_update_flowcontrol(struct usbnet *dev)
- {
--	u32 flow = 0, afc_cfg;
- 	struct smsc95xx_priv *pdata = dev->driver_priv;
--	bool tx_pause, rx_pause;
-+	u32 flow = 0, afc_cfg;
- 
- 	int ret = smsc95xx_read_reg(dev, AFC_CFG, &afc_cfg);
- 	if (ret < 0)
- 		return ret;
- 
- 	if (pdata->phydev->duplex == DUPLEX_FULL) {
--		phy_get_pause(pdata->phydev, &tx_pause, &rx_pause);
-+		bool tx_pause, rx_pause;
-+
-+		if (pdata->phydev->autoneg == AUTONEG_ENABLE &&
-+		    pdata->pause_autoneg) {
-+			phy_get_pause(pdata->phydev, &tx_pause, &rx_pause);
-+		} else {
-+			tx_pause = pdata->pause_tx;
-+			rx_pause = pdata->pause_rx;
-+		}
- 
- 		if (rx_pause)
- 			flow = 0xFFFF0002;
-@@ -772,6 +782,55 @@ static int smsc95xx_ethtool_get_sset_count(struct net_device *ndev, int sset)
- 	}
- }
- 
-+static void smsc95xx_get_pauseparam(struct net_device *ndev,
-+				    struct ethtool_pauseparam *pause)
-+{
-+	struct smsc95xx_priv *pdata;
-+	struct usbnet *dev;
-+
-+	dev = netdev_priv(ndev);
-+	pdata = dev->driver_priv;
-+
-+	pause->autoneg = pdata->pause_autoneg;
-+	pause->rx_pause = pdata->pause_rx;
-+	pause->tx_pause = pdata->pause_tx;
-+}
-+
-+static int smsc95xx_set_pauseparam(struct net_device *ndev,
-+				   struct ethtool_pauseparam *pause)
-+{
-+	bool pause_autoneg_rx, pause_autoneg_tx;
-+	struct smsc95xx_priv *pdata;
-+	struct phy_device *phydev;
-+	struct usbnet *dev;
-+
-+	dev = netdev_priv(ndev);
-+	pdata = dev->driver_priv;
-+	phydev = ndev->phydev;
-+
-+	if (!phydev)
-+		return -ENODEV;
-+
-+	pdata->pause_rx = pause->rx_pause;
-+	pdata->pause_tx = pause->tx_pause;
-+	pdata->pause_autoneg = pause->autoneg;
-+
-+	if (pause->autoneg) {
-+		pause_autoneg_rx = pause->rx_pause;
-+		pause_autoneg_tx = pause->tx_pause;
-+	} else {
-+		pause_autoneg_rx = false;
-+		pause_autoneg_tx = false;
-+	}
-+
-+	phy_set_asym_pause(ndev->phydev, pause_autoneg_rx, pause_autoneg_tx);
-+	if (phydev->link && (!pause->autoneg ||
-+			     phydev->autoneg == AUTONEG_DISABLE))
-+		smsc95xx_mac_update_fullduplex(dev);
-+
-+	return 0;
-+}
-+
- static const struct ethtool_ops smsc95xx_ethtool_ops = {
- 	.get_link	= smsc95xx_get_link,
- 	.nway_reset	= phy_ethtool_nway_reset,
-@@ -791,6 +850,8 @@ static const struct ethtool_ops smsc95xx_ethtool_ops = {
- 	.self_test	= net_selftest,
- 	.get_strings	= smsc95xx_ethtool_get_strings,
- 	.get_sset_count	= smsc95xx_ethtool_get_sset_count,
-+	.get_pauseparam	= smsc95xx_get_pauseparam,
-+	.set_pauseparam	= smsc95xx_set_pauseparam,
- };
- 
- static int smsc95xx_ioctl(struct net_device *netdev, struct ifreq *rq, int cmd)
-@@ -1227,6 +1288,11 @@ static int smsc95xx_bind(struct usbnet *dev, struct usb_interface *intf)
- 	dev->net->max_mtu = ETH_DATA_LEN;
- 	dev->hard_mtu = dev->net->mtu + dev->net->hard_header_len;
- 
-+	pdata->pause_tx = true;
-+	pdata->pause_rx = true;
-+	pdata->pause_autoneg = true;
-+	phy_support_asym_pause(pdata->phydev);
-+
- 	ret = phy_connect_direct(dev->net, pdata->phydev,
- 				 &smsc95xx_handle_link_change,
- 				 PHY_INTERFACE_MODE_MII);
--- 
-2.39.5
+Good to know how it should "normally" works, I'm not an expert.
+The patch also has the advantage of standardizing the network driver
+with other Xen PV drivers that do not have this reponse collection
+outside of the interrupt handler.
+
+As this part of the code is here since the driver was upsteamed and the
+author no longer works on xen, I will do my best to add my guess on why
+this code was there.
+
+Regards,
+Anthoine
+
+
+Anthoine Bourgeois | Vates XCP-ng Developer
+
+XCP-ng & Xen Orchestra - Vates solutions
+
+web: https://vates.tech
 
 
