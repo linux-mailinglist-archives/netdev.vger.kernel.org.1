@@ -1,177 +1,149 @@
-Return-Path: <netdev+bounces-208084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92BCFB09ACB
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 06:58:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 711D1B09AD4
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 07:11:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 083197B81FC
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 04:56:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD1011AA5CDA
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 05:11:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71F671DE4FF;
-	Fri, 18 Jul 2025 04:58:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA2431E51F1;
+	Fri, 18 Jul 2025 05:10:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RKzfAYEy"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=norik.com header.i=@norik.com header.b="bHtpiwwM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cpanel.siel.si (cpanel.siel.si [46.19.9.99])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2FD51DE4E1
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 04:58:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E4791DFE22;
+	Fri, 18 Jul 2025 05:10:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.19.9.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752814700; cv=none; b=SbR5Gt03CZLXu6u8bySlwLjjUxHuNaqO+y448YXiOHsNBaNlRMHHlfNc68H+NnbgXAMlmywdFGhaiACscQv2JNb2MtMmPJQSJqaMHtL4qU+Vew8+DCcdaBy26xH2e2up+O/pc8q3Ssqz3yrOiYnMCul1txCSOhLVJNRV8Kui+Vc=
+	t=1752815457; cv=none; b=lE8g/QkjM4QOJYkJvYR38bL2BfZTm9VVcRWaMlmkQJGfmtCQjO9sqWywsdb5KWHArxKi4EKTSNhKbhsH1/ycS5Zxpzvrus6Uwh6ooxOafwaiKp2Ni5LGYzzDIxz7/Jo/9Z9x4iUWjw+u4a1gKEUKpNkYLkTemZHsEFPCnK3hHRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752814700; c=relaxed/simple;
-	bh=csMfbmkWdSgZGntau+Xy48RzW6LewRdKgVAxCWpIwos=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EBWn0z+AWEArzGSOFVJyAfXoi4a6ir6jY8gFudspTlzVGcX0FMQpAinH7xtcpDL3eyOAdUaBksdBChG7rpV4qEArNTlHIXby1UulQXylI932ku0H05F9LRtOcO3YUDaBb8A/wYNmkEXNFxnR75y0gitOLNH9glUhTrz7X3geqIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RKzfAYEy; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-b31f0ef5f7aso894090a12.3
-        for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 21:58:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752814698; x=1753419498; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iktgh8dc5R2LW6sIGVH6+fpCg9JRn1K/JgrvyYeS/QM=;
-        b=RKzfAYEyMcjWju3m2QfxaOiY5KXC1kZ16GnuOc/vIzlZ7rrRURn9BVF29nYCKiTXi4
-         oNjUiFLZud5JS8lgmb/qC/qE2Q2ljOevzJs/ZbiktkU+7J/21T7T7P0fWDblMJbX2fat
-         JLESunIht+KGEelRoOlRN3YyUb2S/PZtimMI+/mOstQxuACem1cdGqDKS095XhM69dPN
-         y0FnLiYVUHwysP7kmOKrXL2RRBHo+Ut2qdxstILQFfGPZef6E8au3/XShtu2Btc9qYjn
-         0ShAal7X8PmCSLb3E3JcpHK2+K77J8WgP/JCQGzdy0f/XEcRESHFZHR8A4hfLmq/eLR9
-         4TMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752814698; x=1753419498;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iktgh8dc5R2LW6sIGVH6+fpCg9JRn1K/JgrvyYeS/QM=;
-        b=DIaNOIDJp9e7Tp5yo6Vv1f9kVo3JCxUD9O9je9lkTqI5lInV4oLu3GWJX3OWYS1ccY
-         sUzc4lOcb2bIXeXY/lxVg9u0rGW3OflFtAUs9V3v9rHqoVmRb6Jbwi3HW5LA2RZOGmLI
-         6VHzcj0/c3mfoCQ2yAhVZVLfVTJiCRusqoV1BSUCcAZJ+C1prhrZgTImrmN2qF2ILvBe
-         Ckfylt5PbbigyvzNUA00Jdb0vfv21dDn54oK3TFaO0nuk8gRMiUhO9QyCfCKUV8jCCYw
-         3ZehRVAZRYuq9uA5rLvsekUJSjQhmtm521atmIPOLv+cuGjNh3+opkuRsQpVzKD1Y/5m
-         r5+Q==
-X-Gm-Message-State: AOJu0YzZB0OGwBOeyHu++VR90htqJnDsrb9QVlqIDAPlHWw4KB1uEfxO
-	QFu+8xmmsc3R7BJ0rLrVXnc20O8NofrnSL0QNI2kXSstAkEPs956VVY1sVij68mH
-X-Gm-Gg: ASbGncvoei3z7vlaJcyLUfKJgjcecWklFtPc3qSZF6qe5HZrD9JI2d39gAly8VfnaOh
-	r6OHf6g2nyOEFSpL+J1JZmCZcmgipbKoQMMncNsI97fC2rJE2GPoCACV9b2WhPxqI5JsVrd+Qg6
-	kk4G/h7B6/QKMo2ZjJVt/k6zFlizmiB3rk57vfXL5bWdbAUN4btB5e7gR+f2cBT4yHYuVk3oSew
-	dkLaP4ecjruHT6nM16nqvnSA/QSasXXJ5TD1+BJSBmQqtA/dfkUTF+St/eLqdVbbYamanz5NlJf
-	FGVBm41N3mrFdrC6ahhFAPt9A2sifJQcbuTwC+6mwnaBZjCBFlh/4w3RyIuT6RJ545KFLhgAykw
-	c4jg/WyXZmoD/wMfjpBYL/ftZk55kzIa/k4Y=
-X-Google-Smtp-Source: AGHT+IE7ChEMcxNvVyNqUCKOWH3EB3ITNe+neP9dp1eIFalAVdV0GsvXbTpRTuEcz80HxEg/H5TgbQ==
-X-Received: by 2002:a05:6300:6d0b:b0:238:cded:d32d with SMTP id adf61e73a8af0-238cdedd407mr8670708637.23.1752814697697;
-        Thu, 17 Jul 2025 21:58:17 -0700 (PDT)
-Received: from krishna-laptop.localdomain ([49.37.160.43])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b3f2ff62789sm374991a12.44.2025.07.17.21.58.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Jul 2025 21:58:17 -0700 (PDT)
-From: Krishna Kumar <krikku@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	tom@herbertland.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	sdf@fomichev.me,
-	kuniyu@google.com,
-	ahmed.zaki@intel.com,
-	aleksander.lobakin@intel.com,
-	atenart@kernel.org,
-	jdamato@fastly.com,
-	krishna.ku@flipkart.com,
-	krikku@gmail.com
-Subject: [PATCH v4 net-next 2/2] net: Cache hash and flow_id to avoid recalculation
-Date: Fri, 18 Jul 2025 10:27:58 +0530
-Message-ID: <20250718045758.4022899-3-krikku@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250718045758.4022899-1-krikku@gmail.com>
-References: <20250718045758.4022899-1-krikku@gmail.com>
+	s=arc-20240116; t=1752815457; c=relaxed/simple;
+	bh=n/+1h1fSJ7IjErV3BUyMPtlXMl0SjcnOvGwnTapubNg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a4VgZzCwyvkoEAimHdeHLfvNBzZc91SxTvoOsllq6G5CyjtqF+LkKpoEk2sbNrC8nq/uGukxvbd9L2d7smQYQlWuqPNELOAJ+S9fWZ38+Vela/JQdt1xFmx6zZrp8oa1k+iwvT91ydZ9mQB92yNbVayjBMwn5Sofj+TcP94nw3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=norik.com; spf=pass smtp.mailfrom=norik.com; dkim=pass (2048-bit key) header.d=norik.com header.i=@norik.com header.b=bHtpiwwM; arc=none smtp.client-ip=46.19.9.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=norik.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=norik.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=norik.com;
+	s=default; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=W/KPWTypw68rlP2ivlSO9Nj2ROf6caTcYTdVpsWKxvc=; b=bHtpiwwMCcg9TRDTp1vAU0mAOP
+	UjNvWxcSyqSJ1QV/cYhkOdE7c4/VHxifdUj0l19MpDEXumGku8zcyYtRE/wTEdvZMmJBBicB0kTEh
+	Wg5k1ZH2+24DmV/mquzZDK+0fpj65l1nbauMJG6b7w/oJv3LZdhyFJy3dOhRUFG8pypH+zRXWzqDC
+	fGUWkB3gjZAzgGhQ8EMG3d5s0ga0H4gQMlHyQQVTG9fPhWoRIZNXRpVsIEhfA0wq54aCWnnUFK1wc
+	dmH2yiqBHomhi/mzhjf/YKY0q3UlI4McXLMS7XTKkJJBGVIGz1eC1NKy4x1dF3iMmZblqw8P9zDuo
+	UtlbD7jQ==;
+Received: from [89.212.21.243] (port=48060 helo=[192.168.69.116])
+	by cpanel.siel.si with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96.2)
+	(envelope-from <primoz.fiser@norik.com>)
+	id 1ucdN0-000Axh-0k;
+	Fri, 18 Jul 2025 07:10:53 +0200
+Message-ID: <4a882430-877c-40e9-b7bd-21d423340b20@norik.com>
+Date: Fri, 18 Jul 2025 07:10:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/2] Populate of_node for i.MX netdevs
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+ Clark Wang <xiaoning.wang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, imx@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, upstream@lists.phytec.de,
+ Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>,
+ "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+ <devicetree@vger.kernel.org>
+References: <20250717090037.4097520-1-primoz.fiser@norik.com>
+ <20250717070204.66e34588@kernel.org>
+Content-Language: en-US
+From: Primoz Fiser <primoz.fiser@norik.com>
+Autocrypt: addr=primoz.fiser@norik.com; keydata=
+ xjMEZrROOxYJKwYBBAHaRw8BAQdAADVOb5tiLVTUAC9nu/FUl4gj/+4fDLqbc3mk0Vz8riTN
+ JVByaW1veiBGaXNlciA8cHJpbW96LmZpc2VyQG5vcmlrLmNvbT7CiQQTFggAMRYhBK2YFSAH
+ ExsBZLCwJGoLbQEHbnBPBQJmtE47AhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQagttAQducE+T
+ gAD+K4fKlIuvH75fAFwGYG/HT3F9mN64majvqJqvp3gTB9YBAL12gu+cm11m9JMyOyN0l6Os
+ jStsQFghPkzBSDWSDN0NzjgEZrROPBIKKwYBBAGXVQEFAQEHQP2xtEOhbgA+rfzvvcFkV1zK
+ 6ym3/c/OUQObCp50BocdAwEIB8J4BBgWCAAgFiEErZgVIAcTGwFksLAkagttAQducE8FAma0
+ TjwCGwwACgkQagttAQducE8ucAD9F1sXtQD4iA7Qu+SwNUAp/9x7Cqr37CSb2p6hbRmPJP8B
+ AMYR91JYlFmOJ+ScPhQ8/MgFO+V6pa7K2ebk5xYqsCgA
+Organization: Norik systems d.o.o.
+In-Reply-To: <20250717070204.66e34588@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - cpanel.siel.si
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - norik.com
+X-Get-Message-Sender-Via: cpanel.siel.si: authenticated_id: primoz.fiser@norik.com
+X-Authenticated-Sender: cpanel.siel.si: primoz.fiser@norik.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-get_rps_cpu() can cache flow_id and hash as both are required by
-set_rps_cpu() instead of recalculating them twice.
+Hi Jakub,
 
-Signed-off-by: Krishna Kumar <krikku@gmail.com>
----
- net/core/dev.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+On 17. 07. 25 16:02, Jakub Kicinski wrote:
+> On Thu, 17 Jul 2025 11:00:35 +0200 Primoz Fiser wrote:
+>> Recently when working on predictable network names for i.MX SoCs, it
+>> was discovered that of_node sysfs properties are missing for FEC and
+>> EQOS interfaces.
+>>
+>> Without this, udev is unable to expose the OF_* properties (OF_NAME,
+>> OF_FULLNAME, OF_COMPATIBLE, OF_ALIAS, etc.) and thus we cannot identify
+>> interface based on those properties.
+>>
+>> Fix this by populating netdev of_node in respective drivers.
+> 
+> Seems legit, but would be good to CC Open Firmware maintainers.
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 614fa64de84e..db4b52079392 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -4863,7 +4863,8 @@ static bool rps_flow_is_active(struct rps_dev_flow *rflow,
- 
- static struct rps_dev_flow *
- set_rps_cpu(struct net_device *dev, struct sk_buff *skb,
--	    struct rps_dev_flow *rflow, u16 next_cpu)
-+	    struct rps_dev_flow *rflow, u16 next_cpu, u32 hash,
-+	    u32 flow_id)
- {
- 	if (next_cpu < nr_cpu_ids) {
- 		u32 head;
-@@ -4874,8 +4875,6 @@ set_rps_cpu(struct net_device *dev, struct sk_buff *skb,
- 		struct rps_dev_flow *tmp_rflow;
- 		unsigned int tmp_cpu;
- 		u16 rxq_index;
--		u32 flow_id;
--		u32 hash;
- 		int rc;
- 
- 		/* Should we steer this flow to a different hardware queue? */
-@@ -4891,9 +4890,6 @@ set_rps_cpu(struct net_device *dev, struct sk_buff *skb,
- 		if (!flow_table)
- 			goto out;
- 
--		hash = skb_get_hash(skb);
--		flow_id = rfs_slot(hash, flow_table);
--
- 		tmp_rflow = &flow_table->flows[flow_id];
- 		tmp_cpu = READ_ONCE(tmp_rflow->cpu);
- 
-@@ -4967,6 +4963,7 @@ static int get_rps_cpu(struct net_device *dev, struct sk_buff *skb,
- 	struct rps_dev_flow_table *flow_table;
- 	struct rps_map *map;
- 	int cpu = -1;
-+	u32 flow_id;
- 	u32 tcpu;
- 	u32 hash;
- 
-@@ -5013,7 +5010,8 @@ static int get_rps_cpu(struct net_device *dev, struct sk_buff *skb,
- 		/* OK, now we know there is a match,
- 		 * we can look at the local (per receive queue) flow table
- 		 */
--		rflow = &flow_table->flows[rfs_slot(hash, flow_table)];
-+		flow_id = rfs_slot(hash, flow_table);
-+		rflow = &flow_table->flows[flow_id];
- 		tcpu = rflow->cpu;
- 
- 		/*
-@@ -5032,7 +5030,8 @@ static int get_rps_cpu(struct net_device *dev, struct sk_buff *skb,
- 		     ((int)(READ_ONCE(per_cpu(softnet_data, tcpu).input_queue_head) -
- 		      rflow->last_qtail)) >= 0)) {
- 			tcpu = next_cpu;
--			rflow = set_rps_cpu(dev, skb, rflow, next_cpu);
-+			rflow = set_rps_cpu(dev, skb, rflow, next_cpu, hash,
-+					    flow_id);
- 		}
- 
- 		if (tcpu < nr_cpu_ids && cpu_online(tcpu)) {
+Added Rob & Saravana to CC.
+
+> 
+> If we want to make propagating the OF linkage a think I think we should
+> add a flavor of SET_NETDEV_DEV() which does that for the caller.
+> SET_NETDEV_DEV_OF() ?
+
+OK, so you suggest to add MACRO:
+
+#define SET_NETDEV_DEV_OF(net, np)  ((net)->dev.of_node = (np))
+
+I like the idea too.
+
+Way cleaner especially if others will join later.
+
+Shall we do that already for v2 or as a separate series?
+
+BR,
+Primoz
+
+
 -- 
-2.43.0
-
+Primoz Fiser
+phone: +386-41-390-545
+email: primoz.fiser@norik.com
+--
+Norik systems d.o.o.
+Your embedded software partner
+Slovenia, EU
+phone: +386-41-540-545
+email: info@norik.com
 
