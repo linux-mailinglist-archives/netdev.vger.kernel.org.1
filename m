@@ -1,109 +1,140 @@
-Return-Path: <netdev+bounces-208133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A0B9B0A16F
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 13:00:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA83CB0A171
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 13:00:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4D1A3A292D
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 10:59:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C039F5867FC
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 11:00:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EAA31DE89A;
-	Fri, 18 Jul 2025 11:00:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98C9C2BD5BB;
+	Fri, 18 Jul 2025 11:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="FvgTRjRs"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="VPZjAuiC"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8486817BB6;
-	Fri, 18 Jul 2025 11:00:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7AA2192F9
+	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 11:00:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752836409; cv=none; b=MzHB4Qm/wFu/nNIeWNyYNz84vx6w2ke+suLZYEntRbX6r8qSMO/JZalxHbp9nOTgnQZMZfBmUBEIGeBZCZW8aW7lrupDg9OXz0Xx9rkGj3AVVVOG0wR+fSyIudMnfNP8jZLqDRgs9gzHYWbyAk5yONx5tveuLPgqY5zz+KU92PQ=
+	t=1752836427; cv=none; b=Vra58P9C4FVvZwAfUQwqGEhQrSznDVrTF3iXrs7Jtf7t8hg5WbwTiWxN/tjvKIQue/tsRCXqKWzH9sJrYP9KwEeJETC6rYjidO/fK4Pa3EtCWISDRhktbzDX2pn0VivoPENJA7Ct/VBoy7Sy8O7jBcoB/JHOTaMJbq492aOAryI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752836409; c=relaxed/simple;
-	bh=Vnq6X88QjIg7bYh4t4GFpdJU2Tjgif0m4z1qHj5USbM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gue2TKIsMMMt61WEejRwstLpfZx+JxkmovzH8EMwJAXxZITcc2f31QaNFkk0QgUJbnAQGj0SuouTRpUcXpKbYPg/CzoEOHJOSSVAMkpCqJ36so2ZZX0frn8WL1RCUU6u/MDLT5sMX1b949KeXdJWj3EwcxttEnYaOB9sJ0MIaeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=FvgTRjRs; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=yHxkLkXZBZShvGvaq1jQwsUzq9TisX33LrwaTm6o5U4=; b=FvgTRjRsdx+0Dli28VmmJ40Dsd
-	Tfzb2UGmRba5tJZNpTxIQ1lxRrxq05Qc8/+vNSsnxjQ1V1/+hh4NyBvOBaAHwDry7UyG5w8S3DNOm
-	dMGtXS9WUaXCV5GwHzMgR/BVe5IyqRN4jM5TQ5aKmL3PR6eSUsLqUFG21rZYhb4QR5r8+IL8VUH62
-	Wnu19TalmAwuZrK1U5Lm1CNT9WypYk2OiUwBcAkXuKFH49RqCrhlk9kK2W7t8f0WtRhnEOtZepsGN
-	JB5ootSOLWEtkDb7Z3jYum9m6C0IaydiHvI+SIrgRepfyNwaYPhTOJhWJHwVXf73LmV+KhSXjGXxV
-	VEaKmKzA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uciZQ-007ye7-00;
-	Fri, 18 Jul 2025 19:00:01 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Jul 2025 21:00:00 +1000
-Date: Fri, 18 Jul 2025 21:00:00 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: David Howells <dhowells@redhat.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] crypto/krb5: Fix memory leak in krb5_test_one_prf()
-Message-ID: <aHopMLTms2aK7obt@gondor.apana.org.au>
-References: <20250709071140.99461-1-ebiggers@kernel.org>
- <2717585.1752056910@warthog.procyon.org.uk>
+	s=arc-20240116; t=1752836427; c=relaxed/simple;
+	bh=QshWU78gg8gxdee5BtQnCbEaY6Tmctropapxb3/nbNQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kQcDPLtF/V0F04S/WY2QuaBuZQtBmHoTmM957ydd2RYI+ESfY8Sd+S4yv94/gl4Tuht0LTG4AH/2NYYTvPa3zrsiloCKGsSzYDxy+WnQo8hztAp1sMejD/6zVpH5pb6lILk9NLBLx9g8vRv8yZiHChP+fh/EtExqDGVPWLYGELg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=VPZjAuiC; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-60780d74c8cso3416149a12.2
+        for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 04:00:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1752836423; x=1753441223; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8G9viKp190Snv9/y4e9WNoJDJ/21KIBMuhohTjZv+R8=;
+        b=VPZjAuiCRDQlyRZXUbdEEgMkAx5+kvoVXSSkuu5glSS53EFs40C1HE/ejxlVaAFtAZ
+         unrnZOdLNWlPwWdARAxip2qPmmeTfAEwsqresnVKND+NazfMPVsVTWdnX+zxlB390ivo
+         pSu1na3DUHlh2eHQtZ79blm2qo1Nm59CkEqEJvxdqNBjupm5B6yuahdIXKnadPWWTuUL
+         lTpM7/wJucUe7U8qhJMIdDCINh2gXnPEY5spnjCS186c0HC44UMJipjj6HTa7TucSfSK
+         8QCABujtK8GVluGDcIC0vhJmwnDQfhn6Tk/PAsuJL6xWNi6gWxLLy1Zsi/yetlioBARl
+         nWFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752836423; x=1753441223;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8G9viKp190Snv9/y4e9WNoJDJ/21KIBMuhohTjZv+R8=;
+        b=hg3V5/D39WOuQUHqCZ5Hx8s5AkLlpKwEtSNv6UjR/cLkyIi5g8QHIY0PHgYVPWcfcw
+         VrWchVHEB1+z5+ivvhqqwGvueQ4/asSKeo70ET6FGzQWKthfqh8IayB+jaECXyj7Lt1k
+         dWSzSKSLlbNExtCXNuuNni6Q0GpA3gmJXamrbCBTE05achPeGgsMDgDHMTkZiTsFEkhq
+         e4f71Sf2ZTZVHSNChcpYpqQsx8K1ikfwAEYHEUktsZtqoTbEYI+SbBwi2ZSetLy6uQb0
+         68Q7uePZN+hAYTyARbR7NXQuflzcGuSiLc1fMW28/ggSVHrDPFP2s9wuTLqXj1U2iwq0
+         Jzxw==
+X-Gm-Message-State: AOJu0YyZNNKF4pyR4cwg/KdXVOCDaXgOdEGBdK8h9COJ4yv7WZzfKTFN
+	yk6KffUMBK8majTKESlgabwpPIOmKiort3KplkHf1TRXQZrxKIakOnlzEBV9x8Waqa8=
+X-Gm-Gg: ASbGnctODpOmLxMKeV61JU5PKu5D2ihQvaSVcLmXYm0HW4c7tLGAvRkqU6aSf+02GHQ
+	KlQaisSDO6Sg10oGX06dWoPmayXorHYzOgJt0hW2HZqBCZC5JwQSbwb/JhGOPhLSbnbLbVMdsTu
+	jvp3P01MR84A/hgRIXOT3YVUyhIxB/tmEVHJIWEkKgcVh4g2+pOqHs62jWYTBdqiVdKH8ZVQhvd
+	qmCFbHMxt6wgVoUostikEphnb/2/SJzVYMOF2m5co1RSHcVQkPEF/OrKhgiNHwXIceQMneKJMa/
+	T4YSF0JFMI0xuTvJegTg+py4eTWVBymPNqBwuQp9SiNYTMIOwZm1PwvsSrRFnzlUDBoY3e8IK0B
+	zySeJUaILraK2B3gwhPmNtChYoImV5Q==
+X-Google-Smtp-Source: AGHT+IEWR5nv/oQJzwgF0qcajAF2Z8LBQapmjvceGu3HRHJPS7XWZrDCVWw4hyx2KUGl8xQpn1ru3A==
+X-Received: by 2002:a17:907:c5cd:b0:ae3:6744:3661 with SMTP id a640c23a62f3a-ae9ce10c4f9mr786897166b.44.1752836422360;
+        Fri, 18 Jul 2025 04:00:22 -0700 (PDT)
+Received: from [192.168.50.4] ([82.78.167.30])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aec6c79c6a7sm101144766b.26.2025.07.18.04.00.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Jul 2025 04:00:21 -0700 (PDT)
+Message-ID: <fe20bc48-8532-441d-bc40-e80dd6d30ee0@tuxon.dev>
+Date: Fri, 18 Jul 2025 14:00:20 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2717585.1752056910@warthog.procyon.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 4/5] net: cadence: macb: sama7g5_emac: Remove USARIO
+ CLKEN flag
+To: Ryan.Wanner@microchip.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, nicolas.ferre@microchip.com,
+ alexandre.belloni@bootlin.com
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+References: <cover.1752510727.git.Ryan.Wanner@microchip.com>
+ <1e7a8c324526f631f279925aa8a6aa937d55c796.1752510727.git.Ryan.Wanner@microchip.com>
+From: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Content-Language: en-US
+In-Reply-To: <1e7a8c324526f631f279925aa8a6aa937d55c796.1752510727.git.Ryan.Wanner@microchip.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 09, 2025 at 11:28:30AM +0100, David Howells wrote:
-> Hi Herbert,
-> 
-> Can you pick this up?
-> 
-> Eric Biggers <ebiggers@kernel.org> wrote:
-> 
-> > Fix a leak reported by kmemleak:
-> > 
-> >     unreferenced object 0xffff8880093bf7a0 (size 32):
-> >       comm "swapper/0", pid 1, jiffies 4294877529
-> >       hex dump (first 32 bytes):
-> >         9d 18 86 16 f6 38 52 fe 86 91 5b b8 40 b4 a8 86  .....8R...[.@...
-> >         ff 3e 6b b0 f8 19 b4 9b 89 33 93 d3 93 85 42 95  .>k......3....B.
-> >       backtrace (crc 8ba12f3b):
-> >         kmemleak_alloc+0x8d/0xa0
-> >         __kmalloc_noprof+0x3cd/0x4d0
-> >         prep_buf+0x36/0x70
-> >         load_buf+0x10d/0x1c0
-> >         krb5_test_one_prf+0x1e1/0x3c0
-> >         krb5_selftest.cold+0x7c/0x54c
-> >         crypto_krb5_init+0xd/0x20
-> >         do_one_initcall+0xa5/0x230
-> >         do_initcalls+0x213/0x250
-> >         kernel_init_freeable+0x220/0x260
-> >         kernel_init+0x1d/0x170
-> >         ret_from_fork+0x301/0x410
-> >         ret_from_fork_asm+0x1a/0x30
-> > 
-> > Fixes: fc0cf10c04f4 ("crypto/krb5: Implement crypto self-testing")
-> > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> 
-> Acked-by: David Howells <dhowells@redhat.com>
+Hi, Ryan,
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On 14.07.2025 19:37, Ryan.Wanner@microchip.com wrote:
+> From: Ryan Wanner <Ryan.Wanner@microchip.com>
+> 
+> Remove USARIO_CLKEN flag since this is now a device tree argument and
+
+s/USARIO_CLKEN/USRIO_HAS_CLKEN here and in title as well.
+
+> not fixed to the SoC.
+> 
+> This will instead be selected by the "cdns,refclk-ext"
+> device tree property.
+> 
+> Signed-off-by: Ryan Wanner <Ryan.Wanner@microchip.com>
+> ---
+>  drivers/net/ethernet/cadence/macb_main.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+> index 51667263c01d..cd54e4065690 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -5113,8 +5113,7 @@ static const struct macb_config sama7g5_gem_config = {
+>  
+>  static const struct macb_config sama7g5_emac_config = {
+>  	.caps = MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII |
+> -		MACB_CAPS_USRIO_HAS_CLKEN | MACB_CAPS_MIIONRGMII |
+
+Will old DTBs still work with new kernels with this change?
+
+Thank you,
+Claudiu
+
+> -		MACB_CAPS_GEM_HAS_PTP,
+> +		MACB_CAPS_MIIONRGMII | MACB_CAPS_GEM_HAS_PTP,
+>  	.dma_burst_length = 16,
+>  	.clk_init = macb_clk_init,
+>  	.init = macb_init,
+
 
