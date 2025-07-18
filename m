@@ -1,116 +1,298 @@
-Return-Path: <netdev+bounces-208206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDE1CB0A95D
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 19:25:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17096B0A968
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 19:26:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA634A437A3
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 17:25:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4752B5A2CE8
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 17:26:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 243992DC32D;
-	Fri, 18 Jul 2025 17:25:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5383D2E6D26;
+	Fri, 18 Jul 2025 17:26:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hsMm2K+V"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="dxnHCWua"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C1542E7170
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 17:25:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A65A117A586;
+	Fri, 18 Jul 2025 17:26:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752859546; cv=none; b=uQ3rI1E9X2tCIgaM9vEG80orHMbw14LDta6gzeshKaeyxl1Hu5Zpf/oPKEPCD7TrIiVIg9FInityw4jHMtSr+7PNXXI70yj9uJz1S/lMH2UPiLkeZHUW27bmyDxcZG5+YQM065DUSC6YeJT0GT7wPtnDx/VAgYL28tnMIEqPqlw=
+	t=1752859604; cv=none; b=S0p0KrAoGnoiZMvdXsCfsdV75e3XQTiOWTfgoUtg7naXz9uSVpEJ4urXDDfklh2hua93LdPQ9LcRYbvwnH28hUnwsFMt7Te1jW5rxyX3WLvC+ELqjciaOmhYkcgIm30bpOr8wPST38fZb1gB3h9u1BxldR9/EHPvdflCaWQ7nbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752859546; c=relaxed/simple;
-	bh=YX1bhxN+n9TvqqWdmyDvDLEF5Q1clD0vQCL43xziC10=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NUdkDMt3fMkRH4h3xP07XB7fk5MbflGAaV8UislXTMfZ7mnU9Ecxm5vVLx8tES3hMLyRVrmxvIpxCos0zsQeD7C+r3e0qnqnqh4eM0rtLKS69k1IozCe3tA6r/oe0yvwjpBK1qoixEzFd2hQhgwoW/AaPTcXwnPVemw2VbURmKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hsMm2K+V; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752859543;
+	s=arc-20240116; t=1752859604; c=relaxed/simple;
+	bh=da1mvWxza9iINiLn1/BRsDyg7r50P57JvCmMN1cPmWM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IG2NckMtfG/6IDoRaVRtZnZzxmkTgjjfwrJjt17MgSMxhWvxmj+16UaZ3GPdnjDT7DKTFyqt9r/HtKuRrHQmNrrcyjEtU2kbNApwq3J9Z9aQLjvYZ4CODR/NztfxSNwRsXUdbACLbH6d/8jxVAXN0CP+J100aVW7650Y4aP6Pdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dxnHCWua; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 3F08F43988;
+	Fri, 18 Jul 2025 17:26:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1752859599;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=r6z06SNgQkgg/pmS3wf9f6RZQ8DJRjUIKLlUuIYuBis=;
-	b=hsMm2K+Vs47JzHKKxAPxQKuAz4cISaiQ1ZrrVDf8NtCzg7szTS/5NEO9oovF96kqixI4M4
-	nIt/qjJTghGDSBFb4tWgMbZLgV7HvqvyyrbhJyvvcGjJyxMUi6se8oqsfXYIndJ4SvVLtm
-	s9bInKHEi7zHb7O7xq9+RkkzjdCyZJs=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-275-AMnMRhbSO8KIfYCeNy8fjg-1; Fri,
- 18 Jul 2025 13:25:40 -0400
-X-MC-Unique: AMnMRhbSO8KIfYCeNy8fjg-1
-X-Mimecast-MFC-AGG-ID: AMnMRhbSO8KIfYCeNy8fjg_1752859538
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7F25A19541A7;
-	Fri, 18 Jul 2025 17:25:38 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.33.19])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9524718016F9;
-	Fri, 18 Jul 2025 17:25:35 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Matthieu Baerts <matttbe@kernel.org>
-Subject: [PATCH net-next 2/2] tcp: do not increment BeyondWindow MIB for old seq
-Date: Fri, 18 Jul 2025 19:25:13 +0200
-Message-ID: <33f764b857dd28273784da12a3bac8dac039fbcb.1752859383.git.pabeni@redhat.com>
-In-Reply-To: <cover.1752859383.git.pabeni@redhat.com>
-References: <cover.1752859383.git.pabeni@redhat.com>
+	bh=eOm/XILhExfpLJ0fE/lDLC2xmFMxLGZpbBGVUQulu5A=;
+	b=dxnHCWuaujOcfol5xBWDnegkPHq/XumRW9ZPddOFDDgT1MIYfhNWJvCUQ/bzNWn/bhsJ8T
+	7XMQjbdnKZONiFlvJHZaSlyFeKq9BLoUHdSjm0yIPXuU0UoHn5iYw3bpFiKD5jqSmMonQ+
+	+gwfOsDeO/tsNZtVnx/1sCquSgrVmWetb7isuAzuLedpCkF12+T+/+aQDmqt0QeqpBEMGu
+	CNEndGkTnffB6dTJpv9SOsSU5Gd2cSoFNy6dWWXhtwdSTwI2Z9cZoZ5W3WdhE3/WuRWYIy
+	dHTKZbx+zca+TksEBf/nGV+14yXe9cDx/ZdmoHB9Ff0YIUfSlxBlm2WgmxbJ4g==
+Date: Fri, 18 Jul 2025 19:26:38 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Piotr Kubik <piotr.kubik@adtran.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v5 2/2] net: pse-pd: Add Si3474 PSE controller
+ driver
+Message-ID: <20250718192638.681ef327@kmaincent-XPS-13-7390>
+In-Reply-To: <b2361682-05fe-4a38-acfd-2191f7596711@adtran.com>
+References: <be0fb368-79b6-4b99-ad6b-00d7897ca8b0@adtran.com>
+	<b2361682-05fe-4a38-acfd-2191f7596711@adtran.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdeigedtiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefguddtfeevtddugeevgfevtdfgvdfhtdeuleetffefffffhffgteekvdefudeiieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepvdgrtddumegtsgduheemfegvgeemtgehtddtmeekvddttgemiegvtddumeejkegrtgemvdgtugefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduheemfegvgeemtgehtddtmeekvddttgemiegvtddumeejkegrtgemvdgtugefpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedugedprhgtphhtthhopehpihhothhrrdhkuhgsihhksegrughtrhgrnhdrtghomhdprhgtphhtthhopehordhrvghmphgvlhesphgvnhhguhhtrhhonhhigidruggvpdhrtghpthhto
+ heprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehrohgshheskhgvrhhnvghlrdhorhhg
+X-GND-Sasl: kory.maincent@bootlin.com
 
-The mentioned MIB is currently incremented even when a packet
-with an old sequence number (i.e. a zero window probe) is received,
-which is IMHO misleading.
+Le Fri, 11 Jul 2025 11:25:02 +0000,
+Piotr Kubik <piotr.kubik@adtran.com> a =C3=A9crit :
 
-Explicitly restrict such MIB increment at the relevant events.
+> From: Piotr Kubik <piotr.kubik@adtran.com>
+>=20
+> Add a driver for the Skyworks Si3474 I2C Power Sourcing Equipment
+> controller.
+>=20
+> Driver supports basic features of Si3474 IC:
+> - get port status,
+> - get port power,
+> - get port voltage,
+> - enable/disable port power.
+>=20
+> Only 4p configurations are supported at this moment.
+>=20
+> Signed-off-by: Piotr Kubik <piotr.kubik@adtran.com>
+> ---
 
-Fixes: 6c758062c64d ("tcp: add LINUX_MIB_BEYOND_WINDOW")
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
- net/ipv4/tcp_input.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+It would be nice to have the patch changes description here.
 
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index c98de02a3c57..b708287df9b7 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -5911,7 +5911,11 @@ static bool tcp_validate_incoming(struct sock *sk, struct sk_buff *skb,
- 		if (!th->rst) {
- 			if (th->syn)
- 				goto syn_challenge;
--			NET_INC_STATS(sock_net(sk), LINUX_MIB_BEYOND_WINDOW);
-+
-+			if (reason == SKB_DROP_REASON_TCP_INVALID_SEQUENCE ||
-+			    reason == SKB_DROP_REASON_TCP_INVALID_END_SEQUENCE)
-+				NET_INC_STATS(sock_net(sk),
-+					      LINUX_MIB_BEYOND_WINDOW);
- 			if (!tcp_oow_rate_limited(sock_net(sk), skb,
- 						  LINUX_MIB_TCPACKSKIPPEDSEQ,
- 						  &tp->last_oow_ack_time))
--- 
-2.50.0
+...
 
+> +static int si3474_pi_get_admin_state(struct pse_controller_dev *pcdev, i=
+nt
+> id,
+> +				     struct pse_admin_state *admin_state)
+> +{
+> +	struct si3474_priv *priv =3D to_si3474_priv(pcdev);
+> +	struct i2c_client *client;
+> +	s32 ret;
+> +	u8 chan0, chan1;
+> +	bool is_enabled =3D false;
+
+I think you forgot to fix the xmas style here.=20
+
+> +	if (id >=3D SI3474_MAX_CHANS)
+> +		return -ERANGE;
+> +
+> +	si3474_get_channels(priv, id, &chan0, &chan1);
+> +	client =3D si3474_get_chan_client(priv, chan0);
+> +
+> +	ret =3D i2c_smbus_read_byte_data(client, PORT_MODE_REG);
+> +	if (ret < 0) {
+> +		admin_state->c33_admin_state =3D
+> +			ETHTOOL_C33_PSE_ADMIN_STATE_UNKNOWN;
+> +		return ret;
+> +	}
+> +
+> +	is_enabled =3D (ret & CHAN_MASK(chan0)) |
+> +		     (ret & CHAN_MASK(chan1));
+> +
+> +	if (is_enabled)
+> +		admin_state->c33_admin_state =3D
+> +			ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED;
+> +	else
+> +		admin_state->c33_admin_state =3D
+> +			ETHTOOL_C33_PSE_ADMIN_STATE_DISABLED;
+> +
+> +	return 0;
+> +}
+> +
+> +static int si3474_pi_get_pw_status(struct pse_controller_dev *pcdev, int=
+ id,
+> +				   struct pse_pw_status *pw_status)
+> +{
+> +	struct si3474_priv *priv =3D to_si3474_priv(pcdev);
+> +	struct i2c_client *client;
+> +	s32 ret;
+> +	u8 chan0, chan1;
+> +	bool delivering =3D false;
+
+And here.
+
+> +
+> +	if (id >=3D SI3474_MAX_CHANS)
+> +		return -ERANGE;
+> +
+> +	si3474_get_channels(priv, id, &chan0, &chan1);
+> +	client =3D si3474_get_chan_client(priv, chan0);
+> +
+> +	ret =3D i2c_smbus_read_byte_data(client, POWER_STATUS_REG);
+> +	if (ret < 0) {
+> +		pw_status->c33_pw_status =3D
+> ETHTOOL_C33_PSE_PW_D_STATUS_UNKNOWN;
+> +		return ret;
+> +	}
+> +
+> +	delivering =3D ret & (CHAN_UPPER_BIT(chan0) | CHAN_UPPER_BIT(chan1));
+> +
+> +	if (delivering)
+> +		pw_status->c33_pw_status =3D
+> +			ETHTOOL_C33_PSE_PW_D_STATUS_DELIVERING;
+> +	else
+> +		pw_status->c33_pw_status =3D
+> ETHTOOL_C33_PSE_PW_D_STATUS_DISABLED;=20
+> +
+> +	return 0;
+> +}
+> +
+> +static int si3474_get_of_channels(struct si3474_priv *priv)
+> +{
+> +	struct pse_pi *pi;
+> +	u32 chan_id;
+> +	s32 ret;
+> +	u8 pi_no;
+
+And here.
+
+> +
+> +	for (pi_no =3D 0; pi_no < SI3474_MAX_CHANS; pi_no++) {
+> +		pi =3D &priv->pcdev.pi[pi_no];
+> +		u8 pairset_no;
+> +
+> +		for (pairset_no =3D 0; pairset_no < 2; pairset_no++) {
+> +			if (!pi->pairset[pairset_no].np)
+> +				continue;
+> +
+> +			ret =3D
+> of_property_read_u32(pi->pairset[pairset_no].np,
+> +						   "reg", &chan_id);
+> +			if (ret) {
+> +				dev_err(&priv->client[0]->dev,
+> +					"Failed to read channel reg
+> property\n");
+> +				return ret;
+> +			}
+> +			if (chan_id > SI3474_MAX_CHANS) {
+> +				dev_err(&priv->client[0]->dev,
+> +					"Incorrect channel number: %d\n",
+> chan_id);
+> +				return ret;
+> +			}
+> +
+> +			priv->pi[pi_no].chan[pairset_no] =3D chan_id;
+> +			/* Mark as 4-pair if second pairset is present */
+> +			priv->pi[pi_no].is_4p =3D (pairset_no =3D=3D 1);
+> +		}
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int si3474_setup_pi_matrix(struct pse_controller_dev *pcdev)
+> +{
+> +	struct si3474_priv *priv =3D to_si3474_priv(pcdev);
+> +	s32 ret;
+> +
+> +	ret =3D si3474_get_of_channels(priv);
+> +	if (ret < 0) {
+> +		dev_warn(&priv->client[0]->dev,
+> +			 "Unable to parse DT PSE power interface matrix\n");
+> +	}
+> +	return ret;
+> +}
+> +
+> +static int si3474_pi_enable(struct pse_controller_dev *pcdev, int id)
+> +{
+> +	struct si3474_priv *priv =3D to_si3474_priv(pcdev);
+> +	struct i2c_client *client;
+> +	s32 ret;
+> +	u8 chan0, chan1;
+> +	u8 val =3D 0;
+
+And here.
+
+> +
+> +	if (id >=3D SI3474_MAX_CHANS)
+> +		return -ERANGE;
+> +
+> +	si3474_get_channels(priv, id, &chan0, &chan1);
+> +	client =3D si3474_get_chan_client(priv, chan0);
+> +
+> +	/* Release PI from shutdown */
+> +	ret =3D i2c_smbus_read_byte_data(client, PORT_MODE_REG);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	val =3D (u8)ret;
+> +	val |=3D CHAN_MASK(chan0);
+> +	val |=3D CHAN_MASK(chan1);
+> +
+> +	ret =3D i2c_smbus_write_byte_data(client, PORT_MODE_REG, val);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* DETECT_CLASS_ENABLE must be set when using AUTO mode,
+> +	 * otherwise PI does not power up - datasheet section 2.10.2
+> +	 */
+> +	val =3D CHAN_BIT(chan0) | CHAN_UPPER_BIT(chan0) |
+> +	      CHAN_BIT(chan1) | CHAN_UPPER_BIT(chan1);
+> +
+> +	ret =3D i2c_smbus_write_byte_data(client, DETECT_CLASS_ENABLE_REG,
+> val);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return 0;
+> +}
+> +
+> +static int si3474_pi_disable(struct pse_controller_dev *pcdev, int id)
+> +{
+> +	struct si3474_priv *priv =3D to_si3474_priv(pcdev);
+> +	struct i2c_client *client;
+> +	s32 ret;
+> +	u8 chan0, chan1;
+> +	u8 val =3D 0;
+
+And here, and other places in the patch. Are you sure you did it as you
+described in your cover letter?
+The code seems ok otherwise.
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
