@@ -1,189 +1,250 @@
-Return-Path: <netdev+bounces-208130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 455F5B0A0C0
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 12:33:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A61BB0A10C
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 12:50:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E82E7A838EA
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 10:32:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2307F7BCBBB
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 10:47:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED00829DB7F;
-	Fri, 18 Jul 2025 10:33:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A47F52BCF73;
+	Fri, 18 Jul 2025 10:47:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="P7ZOjkLX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="yExcoxNZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1007829B22F
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 10:33:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA821D54EE;
+	Fri, 18 Jul 2025 10:47:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752834801; cv=none; b=uM7L437oEyMAdn7Tk/iOxMozc726edooVBDqZoUGKuOVWVW77SLK73VY9//SbvbMgdCiarnYiZejvX4J9B5rsWO64rUW81bIhnktAg5ghaE4ffUXFL7jat8V5sSltSN6t2dDviaYO6pk3sd+MNYD9D8wFXDHOEuYdL63+IP5634=
+	t=1752835653; cv=none; b=Hh0gZAcWjPo8No3UuctHTT8EPGH+XYgHa8YAqttZ30l/XXANVbSlx2LKbLFQmPQX9p/nNbq7fZPXIi72a+t2K0PgHKTnPOtuNOGe/SEc9NZky/0xHMe7Wq1BawPmU44SSFNj1OqGEIW5U83QQM3fUadRy2IHaHCZXO4645k54c0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752834801; c=relaxed/simple;
-	bh=MZxnnVSvs/0WsHdvQkVxja+tke/AhUx/MmlasdjPGFk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=REe/DOJrfgguGmZucifT4nd2iuYbxNzzs8EmRLGOaUssaA6tvr+iswYkvKAOREhchjhuneaYouMNp8FQvQVfJyyF04GXhwpoIEDldn9NsPXAIAlkW79wlakTeZFA5UFTxlvbrMTwpPGXTvLI4T1GuUrjrkwn6G/ERqU9DInfI8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=P7ZOjkLX; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-612a338aed8so2965234a12.1
-        for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 03:33:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1752834798; x=1753439598; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wPH+MSL3mefkL/YatwG52J+EAfQDGfIWHdPzs+J8XTI=;
-        b=P7ZOjkLXNNcCgpGjrdKGr7UGEWtpWG109mQG35cNg7JndONnv4kfvNKvFEYQPPtyy4
-         7+jVGg5oNnh7IgK9iVgUf6aaldAMW1Y0zGRnu4uCrsTx/UbARjrGBqrIbSJVbA1i3vGi
-         ELpBVWdqoIa/bAWTwH5A1y6Ry0Md88q7Hq2mFZnpfjowkJMewF2k/47fSSe5aztdPIPv
-         10Ie1q5Hes3x47PiXA5ZfVk5Pk0SGrEEFQI6s8+zRjrnOB5hGqOrGZW29eRLmhgrsWvf
-         Ul6bSLN+Ds329q9ot1QVUgFExMyrwYZwySPQ7w4mE7JqwBpFrfyb22jUxG2eWZgD/hbI
-         I4yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752834798; x=1753439598;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wPH+MSL3mefkL/YatwG52J+EAfQDGfIWHdPzs+J8XTI=;
-        b=oztDy7tazHSgBjAp7VePNxqHTXlCK7H7ScIq75Vt/8kAmSkNQu9/V0eOLzphxltNgH
-         nhr2yo66fTCE34OKggr6PyhGcNKgwKy/d8toCJgij1MrnErkOeEQHfv3mw028bB0x+Xz
-         TXy4hBmIDhaB/eCNDgn6tQHRseOSJikiJgVPRBZYPGpcgM07dxoAva0FFRbl8sI57D1Z
-         6jB/281+N8WBt1hxLf0QnDtG0LXkIx134cFXvCHPCd1dxEK9LTlyZIX2Xgk2AukGzoaf
-         hKB3tENis/puPxxevkzYMRg1+30Zj9MMHVs0aj4NjSk3OH1QCcqihpaCuxkLGNX8tHV0
-         ujCA==
-X-Forwarded-Encrypted: i=1; AJvYcCUy7Ta9Zi1Ic0fCJG5zpR2prfm0rOrCsmDMbXoZFzF6Wg2MeyU/dAUXwMsSofWOS5y4+osw5Aw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0k1a6OghRA7rEm7byrI0cr2ppRg8ItHhbQ72L13uAvhnNopQt
-	QhqSBXh3YosOukGWG4PGQfN/Upn3e12nByswtlrdz+WCPnN5MgTZOHa4XsPML5FnU5I=
-X-Gm-Gg: ASbGncuaHd7poXMmLAuH2xAv7RqnkJysFgcJKhp9NK3IUF7I1D3QggJ9DryrMeI4OZq
-	YeuxFtLxtmtDSNR2VqLuZzISs0+LVWJSBMybvWuk/MSSv6xJPOuBx/i2iiL5Q7mK76IOF2S1ZT6
-	LeHKSRhO1fPCtJepxxS/PjeV5Wi/QcjEyq+PioWsZUeCJp6nQbfw7cAcBD1qNWE6ih96B0hbM2I
-	39RWrLxSNi3enX9D06yVXM6UCkBSD4drmcoZ4EsJfqKi3mF8a/+sdnHoA94pBWk9x7uYcPmZXjz
-	kD1XiWJuyC5vC2X8qxmfeCFEi1DvmWjdq81vudZmwKsR86YrRxqX94NNWw0tv1fjH7gn8WxT6rS
-	9ZUrQ2ZvF8te9
-X-Google-Smtp-Source: AGHT+IH+6hYQFYOiAYWIW7j/jrNY1Cumio9CfOWO/zWzNuoianqrzk61GpNfNEJZxcXlgD/39g4ukQ==
-X-Received: by 2002:a17:906:8f12:b0:ae3:64e2:c1e with SMTP id a640c23a62f3a-ae9cdda3d23mr1043328166b.10.1752834798185;
-        Fri, 18 Jul 2025 03:33:18 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:2dc::49:ca])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aec6ca7e069sm95626566b.122.2025.07.18.03.33.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Jul 2025 03:33:17 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: bpf@vger.kernel.org,  netdev@vger.kernel.org,  Jakub Kicinski
- <kuba@kernel.org>,  lorenzo@kernel.org,  Alexei Starovoitov
- <ast@kernel.org>,  Daniel Borkmann <borkmann@iogearbox.net>,  Eric Dumazet
- <eric.dumazet@gmail.com>,  "David S. Miller" <davem@davemloft.net>,  Paolo
- Abeni <pabeni@redhat.com>,  sdf@fomichev.me,  kernel-team@cloudflare.com,
-  arthur@arthurfabre.com
-Subject: Re: [PATCH bpf-next V2 1/7] net: xdp: Add xdp_rx_meta structure
-In-Reply-To: <d0561121-3d36-4c55-8dbb-fc6b802a0f68@kernel.org> (Jesper
-	Dangaard Brouer's message of "Thu, 17 Jul 2025 16:40:47 +0200")
-References: <175146824674.1421237.18351246421763677468.stgit@firesoul>
-	<175146829944.1421237.13943404585579626611.stgit@firesoul>
-	<87v7nrdvi8.fsf@cloudflare.com>
-	<d0561121-3d36-4c55-8dbb-fc6b802a0f68@kernel.org>
-Date: Fri, 18 Jul 2025 12:33:16 +0200
-Message-ID: <871pqdeqkz.fsf@cloudflare.com>
+	s=arc-20240116; t=1752835653; c=relaxed/simple;
+	bh=JTHVLSnHavF1MriWAwn2KcXiYAq6vK5OaGttNwzSG4c=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=dritd/xD4x3fGEBw7I5c4rLPB6CZyJPHTF9omLkf9uWwP3h99AbbMQxXlzZt4EhE9YKVA0z0Sl+rWPU2CeSB+1LjJSoubGDiwPosGe7Qge6I4diZp+jzqN19Y+AQffyetBCqnwbgrgWshSZ+9EEAEhJHBpY6vzidgqXObRhFsbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=yExcoxNZ; arc=none smtp.client-ip=162.240.164.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
+	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=3BbJt3R+qU+ADebZO7TwQrN6GPJxUsIHJ1I8ydh0wcI=; b=yExcoxNZKWTTIZhnRXAYAHso3s
+	OudtLAvDcTsZineRvyQLm8Mk3LEk7dmswSd0DrMJpXqs4zO5baOI9sx511zUkjbG3PpU+DcJHHJGb
+	qtnay2HzS/ObM3zpT689qXRGpiqSIBgSPa+5bOiytoDBv31zNK5GNtr5/pKvcNq3uHvrPiuC9JYQR
+	N4g2kWbIRz4sjdmI+60ZePfIr2IF9ye7OrzE8l2T3plcXOLwW2xQmjF7PtVErns62UraaCYVqWoAe
+	y1fBPB8TYE7z7k5u/FQ7/2quuWsMPxLHIhmVO0NKly1wZ4l86J02YhPyRKeGRXZmjNmrTF+nL1IQF
+	X2T8nAHg==;
+Received: from [122.175.9.182] (port=63508 helo=zimbra.couthit.local)
+	by server.couthit.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <parvathi@couthit.com>)
+	id 1ucicT-00000001fpB-3Gd5;
+	Fri, 18 Jul 2025 06:47:14 -0400
+Received: from zimbra.couthit.local (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTPS id 5381C1783FF6;
+	Fri, 18 Jul 2025 16:17:06 +0530 (IST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id 3796017823F8;
+	Fri, 18 Jul 2025 16:17:06 +0530 (IST)
+Received: from zimbra.couthit.local ([127.0.0.1])
+	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id cWEBUX0fp7Qx; Fri, 18 Jul 2025 16:17:06 +0530 (IST)
+Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
+	by zimbra.couthit.local (Postfix) with ESMTP id EF0841782069;
+	Fri, 18 Jul 2025 16:17:05 +0530 (IST)
+Date: Fri, 18 Jul 2025 16:17:05 +0530 (IST)
+From: Parvathi Pudi <parvathi@couthit.com>
+To: kuba <kuba@kernel.org>
+Cc: parvathi <parvathi@couthit.com>, danishanwar <danishanwar@ti.com>, 
+	rogerq <rogerq@kernel.org>, andrew+netdev <andrew+netdev@lunn.ch>, 
+	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
+	pabeni <pabeni@redhat.com>, robh <robh@kernel.org>, 
+	krzk+dt <krzk+dt@kernel.org>, conor+dt <conor+dt@kernel.org>, 
+	ssantosh <ssantosh@kernel.org>, 
+	richardcochran <richardcochran@gmail.com>, 
+	s hauer <s.hauer@pengutronix.de>, m-karicheri2 <m-karicheri2@ti.com>, 
+	glaroque <glaroque@baylibre.com>, afd <afd@ti.com>, 
+	saikrishnag <saikrishnag@marvell.com>, m-malladi <m-malladi@ti.com>, 
+	jacob e keller <jacob.e.keller@intel.com>, 
+	diogo ivo <diogo.ivo@siemens.com>, 
+	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
+	horms <horms@kernel.org>, s-anna <s-anna@ti.com>, 
+	basharath <basharath@couthit.com>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
+	netdev <netdev@vger.kernel.org>, 
+	devicetree <devicetree@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	pratheesh <pratheesh@ti.com>, Prajith Jayarajan <prajith@ti.com>, 
+	Vignesh Raghavendra <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
+	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
+	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
+	mohan <mohan@couthit.com>
+Message-ID: <3177386.41994.1752835625751.JavaMail.zimbra@couthit.local>
+In-Reply-To: <20250716140926.3aa10894@kernel.org>
+References: <20250702140633.1612269-1-parvathi@couthit.com> <20250702151756.1656470-5-parvathi@couthit.com> <20250708180107.7886ea41@kernel.org> <723330733.1712525.1752237188810.JavaMail.zimbra@couthit.local> <1616453705.30524.1752671471644.JavaMail.zimbra@couthit.local> <20250716140926.3aa10894@kernel.org>
+Subject: Re: [PATCH net-next v10 04/11] net: ti: prueth: Adds link
+ detection, RX and TX support.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - GC138 (Linux)/8.8.15_GA_3968)
+Thread-Topic: prueth: Adds link detection, RX and TX support.
+Thread-Index: WD2ZZiR+YZPLg2Mi+QxyCOGhb2V2/w==
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
+X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-On Thu, Jul 17, 2025 at 04:40 PM +02, Jesper Dangaard Brouer wrote:
-> On 17/07/2025 11.19, Jakub Sitnicki wrote:
->> On Wed, Jul 02, 2025 at 04:58 PM +02, Jesper Dangaard Brouer wrote:
->>> From: Lorenzo Bianconi <lorenzo@kernel.org>
->>>
->>> Introduce the `xdp_rx_meta` structure to serve as a container for XDP RX
->>> hardware hints within XDP packet buffers. Initially, this structure will
->>> accommodate `rx_hash` and `rx_vlan` metadata. (The `rx_timestamp` hint will
->>> get stored in `skb_shared_info`).
->>>
->>> A key design aspect is making this metadata accessible both during BPF
->>> program execution (via `struct xdp_buff`) and later if an `struct
->>> xdp_frame` is materialized (e.g., for XDP_REDIRECT).
->>> To achieve this:
->>>    - The `struct xdp_frame` embeds an `xdp_rx_meta` field directly for
->>>      storage.
->>>    - The `struct xdp_buff` includes an `xdp_rx_meta` pointer. This pointer
->>>      is initialized (in `xdp_prepare_buff`) to point to the memory location
->>>      within the packet buffer's headroom where the `xdp_frame`'s embedded
->>>      `rx_meta` field would reside.
->>>
->>> This setup allows BPF kfuncs, operating on `xdp_buff`, to populate the
->>> metadata in the precise location where it will be found if an `xdp_frame`
->>> is subsequently created.
->>>
->>> The availability of this metadata storage area within the buffer is
->>> indicated by the `XDP_FLAGS_META_AREA` flag in `xdp_buff->flags` (and
->>> propagated to `xdp_frame->flags`). This flag is only set if sufficient
->>> headroom (at least `XDP_MIN_HEADROOM`, currently 192 bytes) is present.
->>> Specific hints like `XDP_FLAGS_META_RX_HASH` and `XDP_FLAGS_META_RX_VLAN`
->>> will then denote which types of metadata have been populated into the
->>> `xdp_rx_meta` structure.
->>>
->>> This patch is a step for enabling the preservation and use of XDP RX
->>> hints across operations like XDP_REDIRECT.
->>>
->>> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
->>> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
->>> ---
->>>   include/net/xdp.h       |   57 +++++++++++++++++++++++++++++++++++------------
->>>   net/core/xdp.c          |    1 +
->>>   net/xdp/xsk_buff_pool.c |    4 ++-
->>>   3 files changed, 47 insertions(+), 15 deletions(-)
->>>
->>> diff --git a/include/net/xdp.h b/include/net/xdp.h
->>> index b40f1f96cb11..f52742a25212 100644
->>> --- a/include/net/xdp.h
->>> +++ b/include/net/xdp.h
->>> @@ -71,11 +71,31 @@ struct xdp_txq_info {
->>>   	struct net_device *dev;
->>>   };
->>>   +struct xdp_rx_meta {
->>> +	struct xdp_rx_meta_hash {
->>> +		u32 val;
->>> +		u32 type; /* enum xdp_rss_hash_type */
->>> +	} hash;
->>> +	struct xdp_rx_meta_vlan {
->>> +		__be16 proto;
->>> +		u16 tci;
->>> +	} vlan;
->>> +};
->>> +
->>> +/* Storage area for HW RX metadata only available with reasonable headroom
->>> + * available. Less than XDP_PACKET_HEADROOM due to Intel drivers.
->>> + */
->>> +#define XDP_MIN_HEADROOM	192
->>> +
->>>   enum xdp_buff_flags {
->>>   	XDP_FLAGS_HAS_FRAGS		= BIT(0), /* non-linear xdp buff */
->>>   	XDP_FLAGS_FRAGS_PF_MEMALLOC	= BIT(1), /* xdp paged memory is under
->>>   						   * pressure
->>>   						   */
->>> +	XDP_FLAGS_META_AREA		= BIT(2), /* storage area available */
->> Idea: Perhaps this could be called *HW*_META_AREA to differentiate from
->> the existing custom metadata area:
->> 
->
-> I agree, that calling it META_AREA can easily be misunderstood and confused with
-> metadata or data_meta.
->
-> What do you think about renaming this to "hints" ?
->  E.g. XDP_FLAGS_HINTS_AREA
->  or   XDP_FLAGS_HINTS_AVAIL
->
-> And also renaming XDP_FLAGS_META_RX_* to
->  e.g XDP_FLAGS_META_RX_HASH -> XDP_FLAGS_HINT_RX_HASH
->                            or  XDP_FLAGS_HW_HINT_RX_HASH
+Hi,
 
-Any name that doesn't lean on the already overloaded "metadata" term is
-a better alternative, in my mind :-)
+> On Wed, 16 Jul 2025 18:41:11 +0530 (IST) Parvathi Pudi wrote:
+>> >> Something needs to stop the queue, right? Otherwise the stack will
+>> >> send the frame right back to the driver.
+>> >=20
+>> > Yes, we will notify upper layer with =E2=80=9Cnetif_tx_stop_queue()=E2=
+=80=9D when returning
+>> > =E2=80=9CNETDEV_TX_BUSY=E2=80=9D to not push again immediately.
+>>=20
+>> We reviewed the flow and found that the reason for NETDEV_TX_BUSY being
+>> notified to the upper layers is due lack of support for reliably detecti=
+ng
+>> the TX completion event.
+>>=20
+>> In case of ICSSM PRU Ethernet, we do not have support for TX complete
+>> notification back to the driver from firmware and its like store and
+>> forget approach. So it will be tricky to enable back/resume the queue
+>> if we stop it when we see busy status.
+>=20
+> IIUC this is all implemented in SW / FW. You either need to add
+> the notification or use a timer to unblock the queue.
+
+We tried out a "hrtimer" based TX queue resume logic whenever
+the driver finds that the queue is busy. The results look good.
+
+Now the driver notifies the upper layer to stop re-queuing and
+a timeout of HR_TIMER_TX_DELAY_US microseconds is used to
+resume the queuing. Currently HR_TIMER_TX_DELAY_US is set as
+100us as the PRU can approximately drain a maximum packet size
+in this window.
+
+Soon after timer expiry, the driver will notify the upper
+layers to resume the queuing by invoking netif_tx_wake_queue().
+
+This helps to avoid the stack from sending the frame right
+back to the driver.
+
+With these changes we have performed throughput tests for
+various packet lengths using "iperf" and there is no
+degradation in throughput for AM57x, AM437x and AM335x.
+
+Below are the "hrtimer" changes for reference. We will post
+the next version of patch series with reduced number of patches
+and with this hrtimer logic.
+
+We appreciate any feedback in the meantime.
+
+diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth.c b/drivers/net/eth=
+ernet/ti/icssm/icssm_prueth.c
+index a263df1fa511..9582246b1d87 100644
+--- a/drivers/net/ethernet/ti/icssm/icssm_prueth.c
++++ b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
+@@ -36,6 +36,7 @@
+=20
+ #define TX_START_DELAY=09=090x40
+ #define TX_CLK_DELAY_100M=090x6
++#define HR_TIMER_TX_DELAY_US=09100
+=20
+ static void icssm_prueth_write_reg(struct prueth *prueth,
+ =09=09=09=09   enum prueth_mem region,
+@@ -1022,6 +1023,7 @@ static int icssm_emac_ndo_stop(struct net_device *nde=
+v)
+ =09phy_stop(emac->phydev);
+=20
+ =09napi_disable(&emac->napi);
++=09hrtimer_cancel(&emac->tx_hrtimer);
+=20
+ =09/* stop the PRU */
+ =09rproc_shutdown(emac->pru);
+@@ -1109,6 +1111,9 @@ static enum netdev_tx icssm_emac_ndo_start_xmit(struc=
+t sk_buff *skb,
+=20
+ fail_tx:
+ =09if (ret =3D=3D -ENOBUFS) {
++=09=09netif_stop_queue(ndev);
++=09=09hrtimer_start(&emac->tx_hrtimer, us_to_ktime(HR_TIMER_TX_DELAY_US),
++=09=09=09      HRTIMER_MODE_REL_PINNED);
+ =09=09ret =3D NETDEV_TX_BUSY;
+ =09} else {
+ =09=09/* error */
+@@ -1161,6 +1166,17 @@ static int icssm_prueth_node_mac(struct device_node =
+*eth_node)
+ =09=09return PRUETH_MAC_INVALID;
+ }
+=20
++static enum hrtimer_restart icssm_emac_tx_timer_callback(struct hrtimer *t=
+imer)
++{
++        struct prueth_emac *emac =3D
++                        container_of(timer, struct prueth_emac, tx_hrtimer=
+);
++
++=09if (netif_queue_stopped(emac->ndev))
++=09=09netif_wake_queue(emac->ndev);
++
++=09return HRTIMER_NORESTART;
++}
++
+ static int icssm_prueth_netdev_init(struct prueth *prueth,
+ =09=09=09=09    struct device_node *eth_node)
+ {
+@@ -1254,6 +1270,9 @@ static int icssm_prueth_netdev_init(struct prueth *pr=
+ueth,
+=20
+ =09netif_napi_add(ndev, &emac->napi, icssm_emac_napi_poll);
+=20
++=09hrtimer_setup(&emac->tx_hrtimer, &icssm_emac_tx_timer_callback,
++=09=09      CLOCK_MONOTONIC, HRTIMER_MODE_REL_PINNED);
++
+ =09return 0;
+ free:
+ =09emac->ndev =3D NULL;
+diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth.h b/drivers/net/eth=
+ernet/ti/icssm/icssm_prueth.h
+index 01586e6dbb66..c3f9c59ac6ff 100644
+--- a/drivers/net/ethernet/ti/icssm/icssm_prueth.h
++++ b/drivers/net/ethernet/ti/icssm/icssm_prueth.h
+@@ -221,6 +221,8 @@ struct prueth_emac {
+ =09 * during link configuration
+ =09 */
+ =09spinlock_t lock;
++
++=09struct hrtimer tx_hrtimer;
+ };
+=20
+ struct prueth {
+
+
+Thanks and Regards,
+Parvathi.
 
