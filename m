@@ -1,193 +1,182 @@
-Return-Path: <netdev+bounces-208106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C63EB09E8A
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 11:00:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35333B09EA7
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 11:06:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79A9216AE47
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 09:00:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE0683AE788
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 09:05:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 178691DE8BE;
-	Fri, 18 Jul 2025 09:00:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41D58295513;
+	Fri, 18 Jul 2025 09:06:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b6ETK/zV"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="gvmy/OZZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266426FB9;
-	Fri, 18 Jul 2025 09:00:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67A2B15278E;
+	Fri, 18 Jul 2025 09:06:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752829249; cv=none; b=KP2pAE3khLjYmbHwH8nVMinymuYzA2Pu4/e6pgYDFY8TtL+asGAIOdrkN85Bi7iYSgotCZpGBBPElZNHWl4qQ3WKuEW8VN/IifQkyB+t8djqTtm25/h3HOzwdMHiYtZOY1FqQstSUSf/Z2gFDE/PZ9vH5sviaZt4zZ8yqWamVgo=
+	t=1752829578; cv=none; b=My1YtUbd6AWapQP5PmYlY1T2VJ5OHs2yu+Z+FKCsFS1SKOT/p5wloPG62uxqwRfUJltb1nLMGqjjcuuP//HMtBIozkSOap3TdK+lPXBJub8pZ8PytDFSVJ8BnwX4iGGR4ChKpswLzlKduLAGYWbGyHxJ//IhdnxjOrPbc/Z69mo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752829249; c=relaxed/simple;
-	bh=yYTHsWKD0UsyKxIDv/FNYZV63fdgd0+A487ofyJJd9I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FbxwCxSCHgW/nspZKPIjbCdAYbvYfj1VYsrAxzke0Ahp2Wt75v82SB4KpsoKQTSOD3GE7NGjAB1JmT2IkPYZGE4XKGBBjwIZdc7XZkBWrTvGx4qA2GAv7vGNgz0U96PAX6XqAdnI75aD5JzNBGwRLC12O4YAhOP7aBv7AFaCCs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b6ETK/zV; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752829246; x=1784365246;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=yYTHsWKD0UsyKxIDv/FNYZV63fdgd0+A487ofyJJd9I=;
-  b=b6ETK/zVgkRAV462Lnc4YwVfN1DAgBWRtOGeknojBIfXWznBvtkP3AiC
-   gRPyGiUzc+0CgsFMGnEePWl/jqeBDoXocWZ4T5rtrWBFJqJkO7GgXbRK/
-   BG7Lfz/byEzSSUb78TFhhXCoc565xL/VBtmk59JlZpKvCXAjUC2OH1Yh/
-   wwR9/9HoZOlwKlR73dgfTSVa97QV4T9veCZFXPnjXCzaCt59UuUsH3xES
-   f9vlDdVSQ//EP419dS7H1ahR4Na7L3zKvEDaQwQDVo0k3WSHWg3DvD/0H
-   p/Dkq0YAseHwLyclQHeLUNmpHJawlv8aFsy1+cWy3Y/vwkiRZHY4dpxqG
-   Q==;
-X-CSE-ConnectionGUID: 3lvSoKrrTseECdpVOmPndA==
-X-CSE-MsgGUID: DipPmWbyQRClfQMusCc3AQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="80563388"
-X-IronPort-AV: E=Sophos;i="6.16,321,1744095600"; 
-   d="scan'208";a="80563388"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2025 02:00:45 -0700
-X-CSE-ConnectionGUID: e55kaXycSjyQhqoUijWgqA==
-X-CSE-MsgGUID: hV0bIggZR2WAPJZoDzagOw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,321,1744095600"; 
-   d="scan'208";a="158362935"
-Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
-  by fmviesa009.fm.intel.com with ESMTP; 18 Jul 2025 02:00:42 -0700
-Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1ucgxL-000ETL-2B;
-	Fri, 18 Jul 2025 09:00:39 +0000
-Date: Fri, 18 Jul 2025 17:00:17 +0800
-From: kernel test robot <lkp@intel.com>
-To: Richard Gobert <richardbgobert@gmail.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, dsahern@kernel.org, razor@blackwall.org,
-	idosch@nvidia.com, petrm@nvidia.com, menglong8.dong@gmail.com,
-	daniel@iogearbox.net, martin.lau@kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev
-Subject: Re: [PATCH net-next v4 4/4] net: geneve: enable binding geneve
- sockets to local addresses
-Message-ID: <202507181610.vgBNLLYf-lkp@intel.com>
-References: <20250717115412.11424-5-richardbgobert@gmail.com>
+	s=arc-20240116; t=1752829578; c=relaxed/simple;
+	bh=z9BUvmWIt7hCxYtCLxNT6F///XMUiL2OyAVIWUDKtzM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=QWDm3RnPydUxSlRAI2BMwjGGn6U83qnIOGsJ9p1h09wI9xsg6/wsaPCYjUeYWiapeX3SkiWHpKIjimqbcSfCFyeOZm8K98usHUi07t+wsDgX2L+NHkE6CIFWBQRhYsnKqS3jofv3ogNNflFnaafTEG3rldJgVa3O0Fpq4ToGN6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=gvmy/OZZ; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56I8h2Bk008487;
+	Fri, 18 Jul 2025 09:05:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	zteTB79X+fUFIDXx8fj+5FQ3KCq88qFTkVFdV3sKo+g=; b=gvmy/OZZ3WysJgWy
+	ZIeKGMdraUZK3CLSKAg4lJmyZT/akQCx8UCrO3VktWYp6qabPJnkOiV31U76rUJA
+	TL3MxzFySkAVyhRuVkKpTJBxBYR0F74yJnwzziUuO6NcUqexemEYJjOhikTPYFbZ
+	O4u/6K+lr19pSzDcOeUFffpyeg5vSoGjioKnT0qkpKSBhH8JCQIj6jxYb06URDEk
+	hI/FTTtDhd1CWCY293nWyClCF5qdeuajIwiUTf7qPgUQDVy+85XEGUfmAOoDh9Ii
+	EyqoMwYGe039OY5cWIQuaBkSdzpgFff+3gQiMjzVpDAuiyGVnJpRy7FbPqm0S4LD
+	A7//tg==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47ufxbavc8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 18 Jul 2025 09:05:58 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 56I95vF1018192
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 18 Jul 2025 09:05:57 GMT
+Received: from [10.253.76.178] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Fri, 18 Jul
+ 2025 02:05:51 -0700
+Message-ID: <49d5d360-6a2f-4dd4-bbd7-1a902e556f00@quicinc.com>
+Date: Fri, 18 Jul 2025 17:05:49 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250717115412.11424-5-richardbgobert@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 07/10] dt-bindings: clock: qcom: Add NSS clock
+ controller for IPQ5424 SoC
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        Rob Herring
+	<robh@kernel.org>
+CC: Georgi Djakov <djakov@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson
+	<andersson@kernel.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        "Stephen
+ Boyd" <sboyd@kernel.org>,
+        Anusha Rao <quic_anusha@quicinc.com>,
+        Konrad Dybcio
+	<konradybcio@kernel.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        "Richard
+ Cochran" <richardcochran@gmail.com>,
+        Catalin Marinas
+	<catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-pm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>,
+        <quic_leiwei@quicinc.com>, <quic_pavir@quicinc.com>,
+        <quic_suruchia@quicinc.com>
+References: <20250710-qcom_ipq5424_nsscc-v3-0-f149dc461212@quicinc.com>
+ <20250710-qcom_ipq5424_nsscc-v3-7-f149dc461212@quicinc.com>
+ <20250710225539.GA29510-robh@kernel.org>
+ <0ef83a1e-38c3-41bb-8fd2-c28565f2a0ba@oss.qualcomm.com>
+Content-Language: en-US
+From: Luo Jie <quic_luoj@quicinc.com>
+In-Reply-To: <0ef83a1e-38c3-41bb-8fd2-c28565f2a0ba@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: AZYG4c9OW3-sedX7DX_sxsCBKToCgLEp
+X-Proofpoint-ORIG-GUID: AZYG4c9OW3-sedX7DX_sxsCBKToCgLEp
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE4MDA3MSBTYWx0ZWRfX5LbihV0UUb0t
+ o21O7oJbdD4zibgNivY2bBbTBmsoB+iplPPmx6rChx/ut7gn7Oak9Xo/Cba0tVImzdtQkjf1JHs
+ oBhPicQoATtb1Fewi02B34i2fBfDyxh3jYR9b0phAg+OD5StpMgfsgLmQYmCOShN9QFNsCKMzOn
+ 26tvTc4F9OyOLprj0x3bKaZAaGpQlEg1fhfuj99i0Q8gwfUgzDY6traYYcPkyKmuIIXwsK17vIe
+ TJCR//Ud9056pCQTdr4hFGqOk1FzaAQpT5pfn+wgYcVmWY2xUQ+wpP1ORBNOzNz25K2QkDbzspP
+ 8DK+tiwNRq5rISN3CmyTieuEroCtcDkvB990oXHNm3lmCjGtGTPDHYuRECylvgScCL67CvfA0CJ
+ m+MV1TXB/J3gdyyDPiGbtHPDnjLNTBAeVONL7gP9/lZJabYnuwN1kjL+WO0vQiEzYhGtlMJj
+X-Authority-Analysis: v=2.4 cv=Xc2JzJ55 c=1 sm=1 tr=0 ts=687a0e76 cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=COk6AnOGAAAA:8
+ a=zwoUeVU6iwdCpd6WVVcA:9 a=QEXdDO2ut3YA:10 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-18_02,2025-07-17_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 mlxscore=0 priorityscore=1501 adultscore=0 mlxlogscore=999
+ phishscore=0 suspectscore=0 spamscore=0 lowpriorityscore=0 impostorscore=0
+ clxscore=1015 malwarescore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507180071
 
-Hi Richard,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Richard-Gobert/net-udp-add-freebind-option-to-udp_sock_create/20250717-200233
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250717115412.11424-5-richardbgobert%40gmail.com
-patch subject: [PATCH net-next v4 4/4] net: geneve: enable binding geneve sockets to local addresses
-config: arm-randconfig-001-20250718 (https://download.01.org/0day-ci/archive/20250718/202507181610.vgBNLLYf-lkp@intel.com/config)
-compiler: arm-linux-gnueabi-gcc (GCC) 8.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250718/202507181610.vgBNLLYf-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507181610.vgBNLLYf-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from include/net/ipv6_stubs.h:11,
-                    from drivers/net/geneve.c:15:
-   drivers/net/geneve.c: In function 'geneve_find_sock':
->> include/net/sock.h:385:37: error: 'struct sock_common' has no member named 'skc_v6_rcv_saddr'; did you mean 'skc_rcv_saddr'?
-    #define sk_v6_rcv_saddr __sk_common.skc_v6_rcv_saddr
-                                        ^~~~~~~~~~~~~~~~
-   drivers/net/geneve.c:685:31: note: in expansion of macro 'sk_v6_rcv_saddr'
-      else if (ipv6_addr_cmp(&sk->sk_v6_rcv_saddr,
-                                  ^~~~~~~~~~~~~~~
---
-   In file included from include/net/ipv6_stubs.h:11,
-                    from geneve.c:15:
-   geneve.c: In function 'geneve_find_sock':
->> include/net/sock.h:385:37: error: 'struct sock_common' has no member named 'skc_v6_rcv_saddr'; did you mean 'skc_rcv_saddr'?
-    #define sk_v6_rcv_saddr __sk_common.skc_v6_rcv_saddr
-                                        ^~~~~~~~~~~~~~~~
-   geneve.c:685:31: note: in expansion of macro 'sk_v6_rcv_saddr'
-      else if (ipv6_addr_cmp(&sk->sk_v6_rcv_saddr,
-                                  ^~~~~~~~~~~~~~~
 
 
-vim +385 include/net/sock.h
+On 7/11/2025 8:16 PM, Konrad Dybcio wrote:
+> On 7/11/25 12:55 AM, Rob Herring wrote:
+>> On Thu, Jul 10, 2025 at 08:28:15PM +0800, Luo Jie wrote:
+>>> NSS clock controller provides the clocks and resets to the networking
+>>> blocks such as PPE (Packet Process Engine) and UNIPHY (PCS) on IPQ5424
+>>> devices.
+>>>
+>>> Add the compatible "qcom,ipq5424-nsscc" support based on the current
+>>> IPQ9574 NSS clock controller DT binding file. ICC clocks are always
+>>> provided by the NSS clock controller of IPQ9574 and IPQ5424, so add
+>>> interconnect-cells as required DT property.
+>>>
+>>> Also add master/slave ids for IPQ5424 networking interfaces, which is
+>>> used by nss-ipq5424 driver for providing interconnect services using
+>>> icc-clk framework.
+>>>
+>>> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+>>> ---
+> 
+> [...]
+> 
+>>>     clocks:
+>>>       items:
+>>> @@ -57,6 +61,7 @@ required:
+>>>     - compatible
+>>>     - clocks
+>>>     - clock-names
+>>> +  - '#interconnect-cells'
+>>
+>> You just made this required for everyone. Again, that's an ABI change.
+> 
+> In this case it's actually valid, but should be a separate fixup change
+> 
+> Konrad
 
-4dc6dc7162c08b Eric Dumazet             2009-07-15  364  
-68835aba4d9b74 Eric Dumazet             2010-11-30  365  #define sk_dontcopy_begin	__sk_common.skc_dontcopy_begin
-68835aba4d9b74 Eric Dumazet             2010-11-30  366  #define sk_dontcopy_end		__sk_common.skc_dontcopy_end
-4dc6dc7162c08b Eric Dumazet             2009-07-15  367  #define sk_hash			__sk_common.skc_hash
-5080546682bae3 Eric Dumazet             2013-10-02  368  #define sk_portpair		__sk_common.skc_portpair
-05dbc7b59481ca Eric Dumazet             2013-10-03  369  #define sk_num			__sk_common.skc_num
-05dbc7b59481ca Eric Dumazet             2013-10-03  370  #define sk_dport		__sk_common.skc_dport
-5080546682bae3 Eric Dumazet             2013-10-02  371  #define sk_addrpair		__sk_common.skc_addrpair
-5080546682bae3 Eric Dumazet             2013-10-02  372  #define sk_daddr		__sk_common.skc_daddr
-5080546682bae3 Eric Dumazet             2013-10-02  373  #define sk_rcv_saddr		__sk_common.skc_rcv_saddr
-^1da177e4c3f41 Linus Torvalds           2005-04-16  374  #define sk_family		__sk_common.skc_family
-^1da177e4c3f41 Linus Torvalds           2005-04-16  375  #define sk_state		__sk_common.skc_state
-^1da177e4c3f41 Linus Torvalds           2005-04-16  376  #define sk_reuse		__sk_common.skc_reuse
-055dc21a1d1d21 Tom Herbert              2013-01-22  377  #define sk_reuseport		__sk_common.skc_reuseport
-9fe516ba3fb29b Eric Dumazet             2014-06-27  378  #define sk_ipv6only		__sk_common.skc_ipv6only
-26abe14379f8e2 Eric W. Biederman        2015-05-08  379  #define sk_net_refcnt		__sk_common.skc_net_refcnt
-^1da177e4c3f41 Linus Torvalds           2005-04-16  380  #define sk_bound_dev_if		__sk_common.skc_bound_dev_if
-^1da177e4c3f41 Linus Torvalds           2005-04-16  381  #define sk_bind_node		__sk_common.skc_bind_node
-8feaf0c0a5488b Arnaldo Carvalho de Melo 2005-08-09  382  #define sk_prot			__sk_common.skc_prot
-07feaebfcc10cd Eric W. Biederman        2007-09-12  383  #define sk_net			__sk_common.skc_net
-efe4208f47f907 Eric Dumazet             2013-10-03  384  #define sk_v6_daddr		__sk_common.skc_v6_daddr
-efe4208f47f907 Eric Dumazet             2013-10-03 @385  #define sk_v6_rcv_saddr	__sk_common.skc_v6_rcv_saddr
-33cf7c90fe2f97 Eric Dumazet             2015-03-11  386  #define sk_cookie		__sk_common.skc_cookie
-70da268b569d32 Eric Dumazet             2015-10-08  387  #define sk_incoming_cpu		__sk_common.skc_incoming_cpu
-8e5eb54d303b7c Eric Dumazet             2015-10-08  388  #define sk_flags		__sk_common.skc_flags
-ed53d0ab761f5c Eric Dumazet             2015-10-08  389  #define sk_rxhash		__sk_common.skc_rxhash
-efe4208f47f907 Eric Dumazet             2013-10-03  390  
-5d4cc87414c5d1 Eric Dumazet             2024-02-16  391  	__cacheline_group_begin(sock_write_rx);
-43f51df4172955 Eric Dumazet             2021-11-15  392  
-9115e8cd2a0c6e Eric Dumazet             2016-12-03  393  	atomic_t		sk_drops;
-5d4cc87414c5d1 Eric Dumazet             2024-02-16  394  	__s32			sk_peek_off;
-9115e8cd2a0c6e Eric Dumazet             2016-12-03  395  	struct sk_buff_head	sk_error_queue;
-b178bb3dfc30d9 Eric Dumazet             2010-11-16  396  	struct sk_buff_head	sk_receive_queue;
-fa438ccfdfd3f6 Eric Dumazet             2007-03-04  397  	/*
-fa438ccfdfd3f6 Eric Dumazet             2007-03-04  398  	 * The backlog queue is special, it is always used with
-fa438ccfdfd3f6 Eric Dumazet             2007-03-04  399  	 * the per-socket spinlock held and requires low latency
-fa438ccfdfd3f6 Eric Dumazet             2007-03-04  400  	 * access. Therefore we special case it's implementation.
-b178bb3dfc30d9 Eric Dumazet             2010-11-16  401  	 * Note : rmem_alloc is in this structure to fill a hole
-b178bb3dfc30d9 Eric Dumazet             2010-11-16  402  	 * on 64bit arches, not because its logically part of
-b178bb3dfc30d9 Eric Dumazet             2010-11-16  403  	 * backlog.
-fa438ccfdfd3f6 Eric Dumazet             2007-03-04  404  	 */
-fa438ccfdfd3f6 Eric Dumazet             2007-03-04  405  	struct {
-b178bb3dfc30d9 Eric Dumazet             2010-11-16  406  		atomic_t	rmem_alloc;
-b178bb3dfc30d9 Eric Dumazet             2010-11-16  407  		int		len;
-fa438ccfdfd3f6 Eric Dumazet             2007-03-04  408  		struct sk_buff	*head;
-fa438ccfdfd3f6 Eric Dumazet             2007-03-04  409  		struct sk_buff	*tail;
-fa438ccfdfd3f6 Eric Dumazet             2007-03-04  410  	} sk_backlog;
-b178bb3dfc30d9 Eric Dumazet             2010-11-16  411  #define sk_rmem_alloc sk_backlog.rmem_alloc
-2c8c56e15df3d4 Eric Dumazet             2014-11-11  412  
-5d4cc87414c5d1 Eric Dumazet             2024-02-16  413  	__cacheline_group_end(sock_write_rx);
-5d4cc87414c5d1 Eric Dumazet             2024-02-16  414  
-5d4cc87414c5d1 Eric Dumazet             2024-02-16  415  	__cacheline_group_begin(sock_read_rx);
-5d4cc87414c5d1 Eric Dumazet             2024-02-16  416  	/* early demux fields */
-5d4cc87414c5d1 Eric Dumazet             2024-02-16  417  	struct dst_entry __rcu	*sk_rx_dst;
-5d4cc87414c5d1 Eric Dumazet             2024-02-16  418  	int			sk_rx_dst_ifindex;
-5d4cc87414c5d1 Eric Dumazet             2024-02-16  419  	u32			sk_rx_dst_cookie;
-5d4cc87414c5d1 Eric Dumazet             2024-02-16  420  
+Making #interconnect-cells a required property does introduce an ABI
+change in the device tree bindings. However, this change is necessary
+to ensure proper functionality and integration with the interconnect
+framework, which increasingly relies on this property for accurate
+configuration and resource management.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Yes, this is a fixup change. Since the current NSS clock controller DTS 
+node for IPQ9574 already includes '#interconnect-cells', I will separate 
+this modification into a standalone fixup patch.
+
+
+
 
