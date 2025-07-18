@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-208221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78B56B0AA62
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 20:52:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0ACDAB0AA61
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 20:51:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C69A83B12F7
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 18:51:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3DE85A4F03
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 18:51:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B16482E8DF8;
-	Fri, 18 Jul 2025 18:51:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3C4D2E8E07;
+	Fri, 18 Jul 2025 18:51:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ew4lnqWT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HAqQGT/g"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465882E8887
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 18:51:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B5A92E8DED
+	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 18:51:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752864688; cv=none; b=nM8XHewaJZP5eNoBq+kNfXFpffE56kc3Jo+wJD9YH+B2GfHU10S4SGRQ8aKuHEStPh5k+byuJT19YAV0SR1Ba+kGVh9vzOM9I+fGPUxrvoZvs08Q+4FqWbwc2q5Yqy89N6fyXj0SAfaO4YcBOJEWsMS1Gs7im6GckSkJXrMfwlc=
+	t=1752864689; cv=none; b=NzuIkSCIPN1O0mH/i4kG5sqSfVyMTzELyCMSzol5jeiZ/EwNfLcGqNbJrxSuas3Jl6DgmJSTSCPgj9Vijw91He+4kfxcI1RnKNDM92xTFnri35afVRMYffic/3NXRiFWqEjdMfAZO6iwHWK+qFKEGCEFwv10oUYGPjcE8V8t5Ss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752864688; c=relaxed/simple;
-	bh=J50SlMa9tj14iNb9kZ8mbrpEx5fiC9vkzluKOQckbTY=;
+	s=arc-20240116; t=1752864689; c=relaxed/simple;
+	bh=bokqwTUgy2D67P8yW4GJ8SKvXKa3jgPlrMsGdG/k1bE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fhIxWPVciY/9k/sUvSXJS0FvTsMBJwC/RqfOz3JNP6YPIBFpBv4PhuX/FFSD0756MB891rTP69FZLnjVFcVv0wD2PUBlH01O4qzvifug7QAvkqhrDZct/YBE8C/3nikg4RaoX7WKjzzp93Z6P5ygsy8M5J3zF5qVJSmhDSbXK/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ew4lnqWT; arc=none smtp.client-ip=198.175.65.16
+	 MIME-Version; b=jJmO7qm3L33b1g6wSi1K7AE5t+V4cl9kAVmsSVLuyLl0zMClCuAXQFBgjKGzf0y9ADNFche+/BKRni086bejodmXLsKkmW9WuRqNF9h1lHmUOH+JbCRZc4uK+4mkljEA45AGELp8FZZHG4smMSNfM3cY1LEqXRDpfNF7QidkvVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HAqQGT/g; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752864686; x=1784400686;
+  t=1752864687; x=1784400687;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=J50SlMa9tj14iNb9kZ8mbrpEx5fiC9vkzluKOQckbTY=;
-  b=ew4lnqWTloKsDNU65hlkbW2s6k0s+D7AncgsIRuGd186p8BAeI5luoQt
-   LD9PAJqnBXCSzTypToVqPVPyYMia3bvvEfv3qSw/ZBRPyUqhsCEce7Pna
-   i/wtDKinAfsL/5wjPd4DeL9+5wqhxzznutx3aGA2SCFKlncIn0R5vYylS
-   EclHT3janSIwdrKE9WMITIRjTGRQjypudQ0Q0Y5Qr77j0AaEyzlGG5wUh
-   vpwMeK416ctODILlLUGRR1OcknNP6md0KR2XgA1CP+fFw8PvjjrMYOEaW
-   kgO4b/f5cdpUq2JyxsDBZkWGBtfGboyza0MU1fND3o1wEf05dt810p1NK
-   w==;
-X-CSE-ConnectionGUID: IO/92yu5S+mBOIt5T7POZQ==
-X-CSE-MsgGUID: 1YrLVBe1SLC57WSq+HEtFQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11496"; a="55320566"
+  bh=bokqwTUgy2D67P8yW4GJ8SKvXKa3jgPlrMsGdG/k1bE=;
+  b=HAqQGT/gtj2zRzG6TfDdbraVBUFUU0BdafvciZ8bPMrS1kaiUjlsthfZ
+   LIP+Kx0fvT1SWLaPErtOvPpj9OCZUwfOpg/wVI3+FzuORkNHLqDSx0eO0
+   hNquQtG93TVJzTRw+PrPmSbeHrhNsc3Y5fJ99iyYyrw0u9ClD+J1eAZOH
+   ChV3tniHyC2Jr+k3dtCBRt3609EI2fc6oBOpw/JK7QTTgrWGRGUgyeJxT
+   gNu2nrYfjl8NMwsESpyJM70Z9maobLLp729qUcgqJaA1NrC5rnjhnoZ0E
+   UvPLbsokK2P+NC34+7Q9lEEc1E6hfvKfZkzFDbkuVuFDmPwiCxTBceJfg
+   A==;
+X-CSE-ConnectionGUID: 2RELeuhwQ6+4AHGOXn6/Cg==
+X-CSE-MsgGUID: 3bijNPKQT2+puqevLbXhDw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11496"; a="55320572"
 X-IronPort-AV: E=Sophos;i="6.16,322,1744095600"; 
-   d="scan'208";a="55320566"
+   d="scan'208";a="55320572"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
   by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2025 11:51:24 -0700
-X-CSE-ConnectionGUID: bivY66cFRGuCjvaiGWdPAw==
-X-CSE-MsgGUID: ki3JpaS2RyeTRJ7q8ZdQbA==
+X-CSE-ConnectionGUID: sQ2wcDJrTKuYjkdCM3us2g==
+X-CSE-MsgGUID: B0oqxBCoTauKa5KwqGlhEQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,322,1744095600"; 
-   d="scan'208";a="157506883"
+   d="scan'208";a="157506886"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa006.jf.intel.com with ESMTP; 18 Jul 2025 11:51:24 -0700
+  by orviesa006.jf.intel.com with ESMTP; 18 Jul 2025 11:51:25 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -65,18 +65,18 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Ahmed Zaki <ahmed.zaki@intel.com>,
+Cc: Milena Olech <milena.olech@intel.com>,
 	anthony.l.nguyen@intel.com,
-	sridhar.samudrala@intel.com,
-	aleksandr.loktionov@intel.com,
-	aleksander.lobakin@intel.com,
-	dinesh.kumar@intel.com,
-	almasrymina@google.com,
-	willemb@google.com,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next 03/13] idpf: add flow steering support
-Date: Fri, 18 Jul 2025 11:51:04 -0700
-Message-ID: <20250718185118.2042772-4-anthony.l.nguyen@intel.com>
+	anton.nadezhdin@intel.com,
+	jstultz@google.com,
+	tglx@linutronix.de,
+	sboyd@kernel.org,
+	richardcochran@gmail.com,
+	Willem de Bruijn <willemb@google.com>,
+	Samuel Salin <Samuel.salin@intel.com>
+Subject: [PATCH net-next 04/13] idpf: add cross timestamping
+Date: Fri, 18 Jul 2025 11:51:05 -0700
+Message-ID: <20250718185118.2042772-5-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250718185118.2042772-1-anthony.l.nguyen@intel.com>
 References: <20250718185118.2042772-1-anthony.l.nguyen@intel.com>
@@ -88,578 +88,335 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Ahmed Zaki <ahmed.zaki@intel.com>
+From: Milena Olech <milena.olech@intel.com>
 
-Use the new virtchnl2 OP codes to communicate with the Control Plane to
-add flow steering filters. We add the basic functionality for add/delete
-with TCP/UDP IPv4 only. Support for other OP codes and protocols will be
-added later.
+Add cross timestamp support through virtchnl mailbox messages and directly,
+through PCIe BAR registers. Cross timestamping assumes that both system
+time and device clock time values are cached simultaneously, what is
+triggered by HW. Feature is enabled for both ARM and x86 archs.
 
-Standard 'ethtool -N|--config-ntuple' should be used, for example:
-
-    # ethtool -N ens801f0d1 flow-type tcp4 src-ip 10.0.0.1 action 6
-
-to route all IPv4/TCP traffic from IP 10.0.0.1 to queue 6.
-
-Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Milena Olech <milena.olech@intel.com>
+Reviewed-by: Karol Kolacinski <karol.kolacinski@intel.com>
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+Tested-by: Samuel Salin <Samuel.salin@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf.h        |  13 +
- .../net/ethernet/intel/idpf/idpf_ethtool.c    | 298 +++++++++++++++++-
- drivers/net/ethernet/intel/idpf/idpf_lib.c    |   5 +
- .../net/ethernet/intel/idpf/idpf_virtchnl.c   | 108 +++++++
- .../net/ethernet/intel/idpf/idpf_virtchnl.h   |   6 +
- 5 files changed, 425 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/intel/idpf/idpf_ptp.c    | 136 ++++++++++++++++++
+ drivers/net/ethernet/intel/idpf/idpf_ptp.h    |  17 +++
+ .../ethernet/intel/idpf/idpf_virtchnl_ptp.c   |  55 ++++++-
+ 3 files changed, 207 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
-index 65d62de7b68e..fe2caff66fdb 100644
---- a/drivers/net/ethernet/intel/idpf/idpf.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf.h
-@@ -269,6 +269,12 @@ struct idpf_port_stats {
- 	struct virtchnl2_vport_stats vport_stats;
- };
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_ptp.c b/drivers/net/ethernet/intel/idpf/idpf_ptp.c
+index 4f8725c85332..ee21f2ff0cad 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_ptp.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_ptp.c
+@@ -42,6 +42,13 @@ void idpf_ptp_get_features_access(const struct idpf_adapter *adapter)
+ 							   direct,
+ 							   mailbox);
  
-+struct idpf_fsteer_fltr {
-+	struct list_head list;
-+	u32 loc;
-+	u32 q_index;
-+};
++	/* Get the cross timestamp */
++	direct = VIRTCHNL2_CAP_PTP_GET_CROSS_TIME;
++	mailbox = VIRTCHNL2_CAP_PTP_GET_CROSS_TIME_MB;
++	ptp->get_cross_tstamp_access = idpf_ptp_get_access(adapter,
++							   direct,
++							   mailbox);
 +
- /**
-  * struct idpf_vport - Handle for netdevices and queue resources
-  * @num_txq: Number of allocated TX queues
-@@ -411,6 +417,8 @@ struct idpf_rss_data {
-  *		      ethtool
-  * @user_flags: User toggled config flags
-  * @mac_filter_list: List of MAC filters
-+ * @num_fsteer_fltrs: number of flow steering filters
-+ * @flow_steer_list: list of flow steering filters
-  *
-  * Used to restore configuration after a reset as the vport will get wiped.
-  */
-@@ -422,6 +430,8 @@ struct idpf_vport_user_config_data {
- 	u32 num_req_rxq_desc;
- 	DECLARE_BITMAP(user_flags, __IDPF_USER_FLAGS_NBITS);
- 	struct list_head mac_filter_list;
-+	u32 num_fsteer_fltrs;
-+	struct list_head flow_steer_list;
- };
+ 	/* Set the device clock time */
+ 	direct = VIRTCHNL2_CAP_PTP_SET_DEVICE_CLK_TIME;
+ 	mailbox = VIRTCHNL2_CAP_PTP_SET_DEVICE_CLK_TIME;
+@@ -171,6 +178,127 @@ static int idpf_ptp_read_src_clk_reg(struct idpf_adapter *adapter, u64 *src_clk,
+ 	return 0;
+ }
  
- /**
-@@ -960,4 +970,7 @@ void idpf_idc_issue_reset_event(struct iidc_rdma_core_dev_info *cdev_info);
- void idpf_idc_vdev_mtu_event(struct iidc_rdma_vport_dev_info *vdev_info,
- 			     enum iidc_rdma_event_type event_type);
- 
-+int idpf_add_del_fsteer_filters(struct idpf_adapter *adapter,
-+				struct virtchnl2_flow_rule_add_del *rule,
-+				enum virtchnl2_op opcode);
- #endif /* !_IDPF_H_ */
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-index eaf7a2606faa..075618a6840e 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-@@ -3,6 +3,7 @@
- 
- #include "idpf.h"
- #include "idpf_ptp.h"
-+#include "idpf_virtchnl.h"
- 
- /**
-  * idpf_get_rxnfc - command to get RX flow classification rules
-@@ -13,26 +14,312 @@
-  * Returns Success if the command is supported.
-  */
- static int idpf_get_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd,
--			  u32 __always_unused *rule_locs)
-+			  u32 *rule_locs)
- {
-+	struct idpf_netdev_priv *np = netdev_priv(netdev);
-+	struct idpf_vport_user_config_data *user_config;
-+	struct idpf_fsteer_fltr *f;
- 	struct idpf_vport *vport;
-+	unsigned int cnt = 0;
-+	int err = 0;
- 
- 	idpf_vport_ctrl_lock(netdev);
- 	vport = idpf_netdev_to_vport(netdev);
-+	user_config = &np->adapter->vport_config[np->vport_idx]->user_config;
- 
- 	switch (cmd->cmd) {
- 	case ETHTOOL_GRXRINGS:
- 		cmd->data = vport->num_rxq;
--		idpf_vport_ctrl_unlock(netdev);
--
--		return 0;
-+		break;
-+	case ETHTOOL_GRXCLSRLCNT:
-+		cmd->rule_cnt = user_config->num_fsteer_fltrs;
-+		cmd->data = idpf_fsteer_max_rules(vport);
-+		break;
-+	case ETHTOOL_GRXCLSRULE:
-+		err = -EINVAL;
-+		list_for_each_entry(f, &user_config->flow_steer_list, list)
-+			if (f->loc == cmd->fs.location) {
-+				cmd->fs.ring_cookie = f->q_index;
-+				err = 0;
-+				break;
-+			}
-+		break;
-+	case ETHTOOL_GRXCLSRLALL:
-+		cmd->data = idpf_fsteer_max_rules(vport);
-+		list_for_each_entry(f, &user_config->flow_steer_list, list) {
-+			if (cnt == cmd->rule_cnt) {
-+				err = -EMSGSIZE;
-+				break;
-+			}
-+			rule_locs[cnt] = f->loc;
-+			cnt++;
-+		}
-+		if (!err)
-+			cmd->rule_cnt = user_config->num_fsteer_fltrs;
-+		break;
- 	default:
- 		break;
- 	}
- 
- 	idpf_vport_ctrl_unlock(netdev);
- 
--	return -EOPNOTSUPP;
-+	return err;
-+}
-+
-+static void idpf_fsteer_fill_ipv4(struct virtchnl2_proto_hdrs *hdrs,
-+				  struct ethtool_rx_flow_spec *fsp)
++#if IS_ENABLED(CONFIG_ARM_ARCH_TIMER) || IS_ENABLED(CONFIG_X86)
++/**
++ * idpf_ptp_get_sync_device_time_direct - Get the cross time stamp values
++ *					  directly
++ * @adapter: Driver specific private structure
++ * @dev_time: 64bit main timer value
++ * @sys_time: 64bit system time value
++ */
++static void idpf_ptp_get_sync_device_time_direct(struct idpf_adapter *adapter,
++						 u64 *dev_time, u64 *sys_time)
 +{
-+	struct iphdr *iph;
++	u32 dev_time_lo, dev_time_hi, sys_time_lo, sys_time_hi;
++	struct idpf_ptp *ptp = adapter->ptp;
 +
-+	hdrs->proto_hdr[0].hdr_type = cpu_to_le32(VIRTCHNL2_PROTO_HDR_IPV4);
++	spin_lock(&ptp->read_dev_clk_lock);
 +
-+	iph = (struct iphdr *)hdrs->proto_hdr[0].buffer_spec;
-+	iph->saddr = fsp->h_u.tcp_ip4_spec.ip4src;
-+	iph->daddr = fsp->h_u.tcp_ip4_spec.ip4dst;
++	idpf_ptp_enable_shtime(adapter);
 +
-+	iph = (struct iphdr *)hdrs->proto_hdr[0].buffer_mask;
-+	iph->saddr = fsp->m_u.tcp_ip4_spec.ip4src;
-+	iph->daddr = fsp->m_u.tcp_ip4_spec.ip4dst;
-+}
++	dev_time_lo = readl(ptp->dev_clk_regs.dev_clk_ns_l);
++	dev_time_hi = readl(ptp->dev_clk_regs.dev_clk_ns_h);
 +
-+static void idpf_fsteer_fill_udp(struct virtchnl2_proto_hdrs *hdrs,
-+				 struct ethtool_rx_flow_spec *fsp,
-+				 bool v4)
-+{
-+	struct udphdr *udph, *udpm;
++	sys_time_lo = readl(ptp->dev_clk_regs.sys_time_ns_l);
++	sys_time_hi = readl(ptp->dev_clk_regs.sys_time_ns_h);
 +
-+	hdrs->proto_hdr[1].hdr_type = cpu_to_le32(VIRTCHNL2_PROTO_HDR_UDP);
++	spin_unlock(&ptp->read_dev_clk_lock);
 +
-+	udph = (struct udphdr *)hdrs->proto_hdr[1].buffer_spec;
-+	udpm = (struct udphdr *)hdrs->proto_hdr[1].buffer_mask;
-+
-+	if (v4) {
-+		udph->source = fsp->h_u.udp_ip4_spec.psrc;
-+		udph->dest = fsp->h_u.udp_ip4_spec.pdst;
-+		udpm->source = fsp->m_u.udp_ip4_spec.psrc;
-+		udpm->dest = fsp->m_u.udp_ip4_spec.pdst;
-+	} else {
-+		udph->source = fsp->h_u.udp_ip6_spec.psrc;
-+		udph->dest = fsp->h_u.udp_ip6_spec.pdst;
-+		udpm->source = fsp->m_u.udp_ip6_spec.psrc;
-+		udpm->dest = fsp->m_u.udp_ip6_spec.pdst;
-+	}
-+}
-+
-+static void idpf_fsteer_fill_tcp(struct virtchnl2_proto_hdrs *hdrs,
-+				 struct ethtool_rx_flow_spec *fsp,
-+				 bool v4)
-+{
-+	struct tcphdr *tcph, *tcpm;
-+
-+	hdrs->proto_hdr[1].hdr_type = cpu_to_le32(VIRTCHNL2_PROTO_HDR_TCP);
-+
-+	tcph = (struct tcphdr *)hdrs->proto_hdr[1].buffer_spec;
-+	tcpm = (struct tcphdr *)hdrs->proto_hdr[1].buffer_mask;
-+
-+	if (v4) {
-+		tcph->source = fsp->h_u.tcp_ip4_spec.psrc;
-+		tcph->dest = fsp->h_u.tcp_ip4_spec.pdst;
-+		tcpm->source = fsp->m_u.tcp_ip4_spec.psrc;
-+		tcpm->dest = fsp->m_u.tcp_ip4_spec.pdst;
-+	} else {
-+		tcph->source = fsp->h_u.tcp_ip6_spec.psrc;
-+		tcph->dest = fsp->h_u.tcp_ip6_spec.pdst;
-+		tcpm->source = fsp->m_u.tcp_ip6_spec.psrc;
-+		tcpm->dest = fsp->m_u.tcp_ip6_spec.pdst;
-+	}
++	*dev_time = (u64)dev_time_hi << 32 | dev_time_lo;
++	*sys_time = (u64)sys_time_hi << 32 | sys_time_lo;
 +}
 +
 +/**
-+ * idpf_add_flow_steer - add a Flow Steering filter
-+ * @netdev: network interface device structure
-+ * @cmd: command to add Flow Steering filter
++ * idpf_ptp_get_sync_device_time_mailbox - Get the cross time stamp values
++ *					   through mailbox
++ * @adapter: Driver specific private structure
++ * @dev_time: 64bit main timer value expressed in nanoseconds
++ * @sys_time: 64bit system time value expressed in nanoseconds
 + *
-+ * Return: 0 on success and negative values for failure
++ * Return: 0 on success, -errno otherwise.
 + */
-+static int idpf_add_flow_steer(struct net_device *netdev,
-+			       struct ethtool_rxnfc *cmd)
++static int idpf_ptp_get_sync_device_time_mailbox(struct idpf_adapter *adapter,
++						 u64 *dev_time, u64 *sys_time)
 +{
-+	struct idpf_fsteer_fltr *fltr, *parent = NULL, *f;
-+	struct idpf_netdev_priv *np = netdev_priv(netdev);
-+	struct idpf_vport_user_config_data *user_config;
-+	struct ethtool_rx_flow_spec *fsp = &cmd->fs;
-+	struct virtchnl2_flow_rule_add_del *rule;
-+	struct idpf_vport_config *vport_config;
-+	struct virtchnl2_rule_action_set *acts;
-+	struct virtchnl2_flow_rule_info *info;
-+	struct virtchnl2_proto_hdrs *hdrs;
-+	struct idpf_vport *vport;
-+	u32 flow_type, q_index;
-+	u16 num_rxq;
++	struct idpf_ptp_dev_timers cross_time;
 +	int err;
 +
-+	vport = idpf_netdev_to_vport(netdev);
-+	vport_config = vport->adapter->vport_config[np->vport_idx];
-+	user_config = &vport_config->user_config;
-+	num_rxq = user_config->num_req_rx_qs;
-+
-+	flow_type = fsp->flow_type & ~(FLOW_EXT | FLOW_MAC_EXT | FLOW_RSS);
-+	if (flow_type != fsp->flow_type)
-+		return -EINVAL;
-+
-+	if (!idpf_sideband_action_ena(vport, fsp) ||
-+	    !idpf_sideband_flow_type_ena(vport, flow_type))
-+		return -EOPNOTSUPP;
-+
-+	if (user_config->num_fsteer_fltrs > idpf_fsteer_max_rules(vport))
-+		return -ENOSPC;
-+
-+	q_index = fsp->ring_cookie;
-+	if (q_index >= num_rxq)
-+		return -EINVAL;
-+
-+	rule = kzalloc(struct_size(rule, rule_info, 1), GFP_KERNEL);
-+	if (!rule)
-+		return -ENOMEM;
-+
-+	rule->vport_id = cpu_to_le32(vport->vport_id);
-+	rule->count = cpu_to_le32(1);
-+	info = &rule->rule_info[0];
-+	info->rule_id = cpu_to_le32(fsp->location);
-+
-+	hdrs = &info->rule_cfg.proto_hdrs;
-+	hdrs->tunnel_level = 0;
-+	hdrs->count = cpu_to_le32(2);
-+
-+	acts = &info->rule_cfg.action_set;
-+	acts->count = cpu_to_le32(1);
-+	acts->actions[0].action_type = cpu_to_le32(VIRTCHNL2_ACTION_QUEUE);
-+	acts->actions[0].act_conf.q_id = cpu_to_le32(q_index);
-+
-+	switch (flow_type) {
-+	case UDP_V4_FLOW:
-+		idpf_fsteer_fill_ipv4(hdrs, fsp);
-+		idpf_fsteer_fill_udp(hdrs, fsp, true);
-+		break;
-+	case TCP_V4_FLOW:
-+		idpf_fsteer_fill_ipv4(hdrs, fsp);
-+		idpf_fsteer_fill_tcp(hdrs, fsp, true);
-+		break;
-+	default:
-+		err = -EINVAL;
-+		goto out;
-+	}
-+
-+	err = idpf_add_del_fsteer_filters(vport->adapter, rule,
-+					  VIRTCHNL2_OP_ADD_FLOW_RULE);
++	err = idpf_ptp_get_cross_time(adapter, &cross_time);
 +	if (err)
-+		goto out;
++		return err;
 +
-+	if (info->status != cpu_to_le32(VIRTCHNL2_FLOW_RULE_SUCCESS)) {
-+		err = -EIO;
-+		goto out;
-+	}
++	*dev_time = cross_time.dev_clk_time_ns;
++	*sys_time = cross_time.sys_time_ns;
 +
-+	fltr = kzalloc(sizeof(*fltr), GFP_KERNEL);
-+	if (!fltr) {
-+		err = -ENOMEM;
-+		goto out;
-+	}
-+
-+	fltr->loc = fsp->location;
-+	fltr->q_index = q_index;
-+	list_for_each_entry(f, &user_config->flow_steer_list, list) {
-+		if (f->loc >= fltr->loc)
-+			break;
-+		parent = f;
-+	}
-+
-+	parent ? list_add(&fltr->list, &parent->list) :
-+		 list_add(&fltr->list, &user_config->flow_steer_list);
-+
-+	user_config->num_fsteer_fltrs++;
-+
-+out:
-+	kfree(rule);
 +	return err;
 +}
 +
 +/**
-+ * idpf_del_flow_steer - delete a Flow Steering filter
-+ * @netdev: network interface device structure
-+ * @cmd: command to add Flow Steering filter
++ * idpf_ptp_get_sync_device_time - Get the cross time stamp info
++ * @device: Current device time
++ * @system: System counter value read synchronously with device time
++ * @ctx: Context provided by timekeeping code
 + *
-+ * Return: 0 on success and negative values for failure
++ * The device and the system clocks time read simultaneously.
++ *
++ * Return: 0 on success, -errno otherwise.
 + */
-+static int idpf_del_flow_steer(struct net_device *netdev,
-+			       struct ethtool_rxnfc *cmd)
++static int idpf_ptp_get_sync_device_time(ktime_t *device,
++					 struct system_counterval_t *system,
++					 void *ctx)
 +{
-+	struct idpf_netdev_priv *np = netdev_priv(netdev);
-+	struct idpf_vport_user_config_data *user_config;
-+	struct ethtool_rx_flow_spec *fsp = &cmd->fs;
-+	struct virtchnl2_flow_rule_add_del *rule;
-+	struct idpf_vport_config *vport_config;
-+	struct virtchnl2_flow_rule_info *info;
-+	struct idpf_fsteer_fltr *f, *iter;
-+	struct idpf_vport *vport;
++	struct idpf_adapter *adapter = ctx;
++	u64 ns_time_dev, ns_time_sys;
 +	int err;
 +
-+	vport = idpf_netdev_to_vport(netdev);
-+	vport_config = vport->adapter->vport_config[np->vport_idx];
-+	user_config = &vport_config->user_config;
-+
-+	if (!idpf_sideband_action_ena(vport, fsp))
++	switch (adapter->ptp->get_cross_tstamp_access) {
++	case IDPF_PTP_NONE:
 +		return -EOPNOTSUPP;
-+
-+	rule = kzalloc(struct_size(rule, rule_info, 1), GFP_KERNEL);
-+	if (!rule)
-+		return -ENOMEM;
-+
-+	rule->vport_id = cpu_to_le32(vport->vport_id);
-+	rule->count = cpu_to_le32(1);
-+	info = &rule->rule_info[0];
-+	info->rule_id = cpu_to_le32(fsp->location);
-+
-+	err = idpf_add_del_fsteer_filters(vport->adapter, rule,
-+					  VIRTCHNL2_OP_DEL_FLOW_RULE);
-+	if (err)
-+		goto out;
-+
-+	if (info->status != cpu_to_le32(VIRTCHNL2_FLOW_RULE_SUCCESS)) {
-+		err = -EIO;
-+		goto out;
-+	}
-+
-+	list_for_each_entry_safe(f, iter,
-+				 &user_config->flow_steer_list, list) {
-+		if (f->loc == fsp->location) {
-+			list_del(&f->list);
-+			kfree(f);
-+			user_config->num_fsteer_fltrs--;
-+			goto out;
-+		}
-+	}
-+	err = -EINVAL;
-+
-+out:
-+	kfree(rule);
-+	return err;
-+}
-+
-+static int idpf_set_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd)
-+{
-+	int ret = -EOPNOTSUPP;
-+
-+	idpf_vport_ctrl_lock(netdev);
-+	switch (cmd->cmd) {
-+	case ETHTOOL_SRXCLSRLINS:
-+		ret = idpf_add_flow_steer(netdev, cmd);
++	case IDPF_PTP_DIRECT:
++		idpf_ptp_get_sync_device_time_direct(adapter, &ns_time_dev,
++						     &ns_time_sys);
 +		break;
-+	case ETHTOOL_SRXCLSRLDEL:
-+		ret = idpf_del_flow_steer(netdev, cmd);
++	case IDPF_PTP_MAILBOX:
++		err = idpf_ptp_get_sync_device_time_mailbox(adapter,
++							    &ns_time_dev,
++							    &ns_time_sys);
++		if (err)
++			return err;
 +		break;
 +	default:
-+		break;
++		return -EOPNOTSUPP;
 +	}
 +
-+	idpf_vport_ctrl_unlock(netdev);
-+	return ret;
++	*device = ns_to_ktime(ns_time_dev);
++
++	system->cs_id = IS_ENABLED(CONFIG_X86) ? CSID_X86_ART
++					       : CSID_ARM_ARCH_COUNTER;
++	system->cycles = ns_time_sys;
++	system->use_nsecs = true;
++
++	return 0;
++}
++
++/**
++ * idpf_ptp_get_crosststamp - Capture a device cross timestamp
++ * @info: the driver's PTP info structure
++ * @cts: The memory to fill the cross timestamp info
++ *
++ * Capture a cross timestamp between the system time and the device PTP hardware
++ * clock.
++ *
++ * Return: cross timestamp value on success, -errno on failure.
++ */
++static int idpf_ptp_get_crosststamp(struct ptp_clock_info *info,
++				    struct system_device_crosststamp *cts)
++{
++	struct idpf_adapter *adapter = idpf_ptp_info_to_adapter(info);
++
++	return get_device_system_crosststamp(idpf_ptp_get_sync_device_time,
++					     adapter, NULL, cts);
++}
++#endif /* CONFIG_ARM_ARCH_TIMER || CONFIG_X86 */
++
+ /**
+  * idpf_ptp_gettimex64 - Get the time of the clock
+  * @info: the driver's PTP info structure
+@@ -661,6 +789,14 @@ static void idpf_ptp_set_caps(const struct idpf_adapter *adapter)
+ 	info->verify = idpf_ptp_verify_pin;
+ 	info->enable = idpf_ptp_gpio_enable;
+ 	info->do_aux_work = idpf_ptp_do_aux_work;
++#if IS_ENABLED(CONFIG_ARM_ARCH_TIMER)
++	info->getcrosststamp = idpf_ptp_get_crosststamp;
++#elif IS_ENABLED(CONFIG_X86)
++	if (pcie_ptm_enabled(adapter->pdev) &&
++	    boot_cpu_has(X86_FEATURE_ART) &&
++	    boot_cpu_has(X86_FEATURE_TSC_KNOWN_FREQ))
++		info->getcrosststamp = idpf_ptp_get_crosststamp;
++#endif /* CONFIG_ARM_ARCH_TIMER */
  }
  
  /**
-@@ -1394,6 +1681,7 @@ static const struct ethtool_ops idpf_ethtool_ops = {
- 	.get_sset_count		= idpf_get_sset_count,
- 	.get_channels		= idpf_get_channels,
- 	.get_rxnfc		= idpf_get_rxnfc,
-+	.set_rxnfc		= idpf_set_rxnfc,
- 	.get_rxfh_key_size	= idpf_get_rxfh_key_size,
- 	.get_rxfh_indir_size	= idpf_get_rxfh_indir_size,
- 	.get_rxfh		= idpf_get_rxfh,
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index 338aa1bab71e..4d6a182346e5 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -804,6 +804,10 @@ static int idpf_cfg_netdev(struct idpf_vport *vport)
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_ptp.h b/drivers/net/ethernet/intel/idpf/idpf_ptp.h
+index a876749d6116..785da03e4cf5 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_ptp.h
++++ b/drivers/net/ethernet/intel/idpf/idpf_ptp.h
+@@ -21,6 +21,8 @@ struct idpf_ptp_cmd {
+  * @dev_clk_ns_h: high part of the device clock register
+  * @phy_clk_ns_l: low part of the PHY clock register
+  * @phy_clk_ns_h: high part of the PHY clock register
++ * @sys_time_ns_l: low part of the system time register
++ * @sys_time_ns_h: high part of the system time register
+  * @incval_l: low part of the increment value register
+  * @incval_h: high part of the increment value register
+  * @shadj_l: low part of the shadow adjust register
+@@ -42,6 +44,10 @@ struct idpf_ptp_dev_clk_regs {
+ 	void __iomem *phy_clk_ns_l;
+ 	void __iomem *phy_clk_ns_h;
  
- 	if (idpf_is_cap_ena_all(adapter, IDPF_RSS_CAPS, IDPF_CAP_RSS))
- 		dflt_features |= NETIF_F_RXHASH;
-+	if (idpf_is_cap_ena(adapter, IDPF_OTHER_CAPS,
-+			    VIRTCHNL2_CAP_FLOW_STEER) &&
-+	    idpf_vport_is_cap_ena(vport, VIRTCHNL2_VPORT_SIDEBAND_FLOW_STEER))
-+		dflt_features |= NETIF_F_NTUPLE;
- 	if (idpf_is_cap_ena_all(adapter, IDPF_CSUM_CAPS, IDPF_CAP_TX_CSUM_L4V4))
- 		csum_offloads |= NETIF_F_IP_CSUM;
- 	if (idpf_is_cap_ena_all(adapter, IDPF_CSUM_CAPS, IDPF_CAP_TX_CSUM_L4V6))
-@@ -1532,6 +1536,7 @@ void idpf_init_task(struct work_struct *work)
- 	spin_lock_init(&vport_config->mac_filter_list_lock);
++	/* System time */
++	void __iomem *sys_time_ns_l;
++	void __iomem *sys_time_ns_h;
++
+ 	/* Main timer adjustments */
+ 	void __iomem *incval_l;
+ 	void __iomem *incval_h;
+@@ -162,6 +168,7 @@ struct idpf_ptp_vport_tx_tstamp_caps {
+  * @dev_clk_regs: the set of registers to access the device clock
+  * @caps: PTP capabilities negotiated with the Control Plane
+  * @get_dev_clk_time_access: access type for getting the device clock time
++ * @get_cross_tstamp_access: access type for the cross timestamping
+  * @set_dev_clk_time_access: access type for setting the device clock time
+  * @adj_dev_clk_time_access: access type for the adjusting the device clock
+  * @tx_tstamp_access: access type for the Tx timestamp value read
+@@ -182,6 +189,7 @@ struct idpf_ptp {
+ 	struct idpf_ptp_dev_clk_regs dev_clk_regs;
+ 	u32 caps;
+ 	enum idpf_ptp_access get_dev_clk_time_access:2;
++	enum idpf_ptp_access get_cross_tstamp_access:2;
+ 	enum idpf_ptp_access set_dev_clk_time_access:2;
+ 	enum idpf_ptp_access adj_dev_clk_time_access:2;
+ 	enum idpf_ptp_access tx_tstamp_access:2;
+@@ -264,6 +272,8 @@ void idpf_ptp_get_features_access(const struct idpf_adapter *adapter);
+ bool idpf_ptp_get_txq_tstamp_capability(struct idpf_tx_queue *txq);
+ int idpf_ptp_get_dev_clk_time(struct idpf_adapter *adapter,
+ 			      struct idpf_ptp_dev_timers *dev_clk_time);
++int idpf_ptp_get_cross_time(struct idpf_adapter *adapter,
++			    struct idpf_ptp_dev_timers *cross_time);
+ int idpf_ptp_set_dev_clk_time(struct idpf_adapter *adapter, u64 time);
+ int idpf_ptp_adj_dev_clk_fine(struct idpf_adapter *adapter, u64 incval);
+ int idpf_ptp_adj_dev_clk_time(struct idpf_adapter *adapter, s64 delta);
+@@ -305,6 +315,13 @@ idpf_ptp_get_dev_clk_time(struct idpf_adapter *adapter,
+ 	return -EOPNOTSUPP;
+ }
  
- 	INIT_LIST_HEAD(&vport_config->user_config.mac_filter_list);
-+	INIT_LIST_HEAD(&vport_config->user_config.flow_steer_list);
++static inline int
++idpf_ptp_get_cross_time(struct idpf_adapter *adapter,
++			struct idpf_ptp_dev_timers *cross_time)
++{
++	return -EOPNOTSUPP;
++}
++
+ static inline int idpf_ptp_set_dev_clk_time(struct idpf_adapter *adapter,
+ 					    u64 time)
+ {
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c
+index bdcc54a5fb56..4f1fb0cefe51 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c
+@@ -30,6 +30,7 @@ int idpf_ptp_get_caps(struct idpf_adapter *adapter)
+ 		.send_buf.iov_len = sizeof(send_ptp_caps_msg),
+ 		.timeout_ms = IDPF_VC_XN_DEFAULT_TIMEOUT_MSEC,
+ 	};
++	struct virtchnl2_ptp_cross_time_reg_offsets cross_tstamp_offsets;
+ 	struct virtchnl2_ptp_clk_adj_reg_offsets clk_adj_offsets;
+ 	struct virtchnl2_ptp_clk_reg_offsets clock_offsets;
+ 	struct idpf_ptp_secondary_mbx *scnd_mbx;
+@@ -71,7 +72,7 @@ int idpf_ptp_get_caps(struct idpf_adapter *adapter)
  
- 	err = idpf_check_supported_desc_ids(vport);
- 	if (err) {
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-index 1b1570026acf..a028c69f7fdc 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-@@ -1015,6 +1015,41 @@ static int idpf_map_lan_mmio_regs(struct idpf_adapter *adapter)
+ 	access_type = ptp->get_dev_clk_time_access;
+ 	if (access_type != IDPF_PTP_DIRECT)
+-		goto discipline_clock;
++		goto cross_tstamp;
+ 
+ 	clock_offsets = recv_ptp_caps_msg->clk_offsets;
+ 
+@@ -90,6 +91,22 @@ int idpf_ptp_get_caps(struct idpf_adapter *adapter)
+ 	temp_offset = le32_to_cpu(clock_offsets.cmd_sync_trigger);
+ 	ptp->dev_clk_regs.cmd_sync = idpf_get_reg_addr(adapter, temp_offset);
+ 
++cross_tstamp:
++	access_type = ptp->get_cross_tstamp_access;
++	if (access_type != IDPF_PTP_DIRECT)
++		goto discipline_clock;
++
++	cross_tstamp_offsets = recv_ptp_caps_msg->cross_time_offsets;
++
++	temp_offset = le32_to_cpu(cross_tstamp_offsets.sys_time_ns_l);
++	ptp->dev_clk_regs.sys_time_ns_l = idpf_get_reg_addr(adapter,
++							    temp_offset);
++	temp_offset = le32_to_cpu(cross_tstamp_offsets.sys_time_ns_h);
++	ptp->dev_clk_regs.sys_time_ns_h = idpf_get_reg_addr(adapter,
++							    temp_offset);
++	temp_offset = le32_to_cpu(cross_tstamp_offsets.cmd_sync_trigger);
++	ptp->dev_clk_regs.cmd_sync = idpf_get_reg_addr(adapter, temp_offset);
++
+ discipline_clock:
+ 	access_type = ptp->adj_dev_clk_time_access;
+ 	if (access_type != IDPF_PTP_DIRECT)
+@@ -162,6 +179,42 @@ int idpf_ptp_get_dev_clk_time(struct idpf_adapter *adapter,
  	return 0;
  }
  
 +/**
-+ * idpf_add_del_fsteer_filters - Send virtchnl add/del Flow Steering message
-+ * @adapter: adapter info struct
-+ * @rule: Flow steering rule to add/delete
-+ * @opcode: VIRTCHNL2_OP_ADD_FLOW_RULE to add filter, or
-+ *          VIRTCHNL2_OP_DEL_FLOW_RULE to delete. All other values are invalid.
++ * idpf_ptp_get_cross_time - Send virtchnl get cross time message
++ * @adapter: Driver specific private structure
++ * @cross_time: Pointer to the device clock structure where the value is set
 + *
-+ * Send ADD/DELETE flow steering virtchnl message and receive the result.
++ * Send virtchnl get cross time message to get the time of the clock and the
++ * system time.
 + *
-+ * Return: 0 on success, negative on failure.
++ * Return: 0 on success, -errno otherwise.
 + */
-+int idpf_add_del_fsteer_filters(struct idpf_adapter *adapter,
-+				struct virtchnl2_flow_rule_add_del *rule,
-+				enum virtchnl2_op opcode)
++int idpf_ptp_get_cross_time(struct idpf_adapter *adapter,
++			    struct idpf_ptp_dev_timers *cross_time)
 +{
-+	int rule_count = le32_to_cpu(rule->count);
-+	struct idpf_vc_xn_params xn_params = {};
-+	ssize_t reply_sz;
-+
-+	if (opcode != VIRTCHNL2_OP_ADD_FLOW_RULE &&
-+	    opcode != VIRTCHNL2_OP_DEL_FLOW_RULE)
-+		return -EINVAL;
-+
-+	xn_params.vc_op = opcode;
-+	xn_params.timeout_ms = IDPF_VC_XN_DEFAULT_TIMEOUT_MSEC;
-+	xn_params.async = false;
-+	xn_params.send_buf.iov_base = rule;
-+	xn_params.send_buf.iov_len = struct_size(rule, rule_info, rule_count);
-+	xn_params.recv_buf.iov_base = rule;
-+	xn_params.recv_buf.iov_len = struct_size(rule, rule_info, rule_count);
++	struct virtchnl2_ptp_get_cross_time cross_time_msg;
++	struct idpf_vc_xn_params xn_params = {
++		.vc_op = VIRTCHNL2_OP_PTP_GET_CROSS_TIME,
++		.send_buf.iov_base = &cross_time_msg,
++		.send_buf.iov_len = sizeof(cross_time_msg),
++		.recv_buf.iov_base = &cross_time_msg,
++		.recv_buf.iov_len = sizeof(cross_time_msg),
++		.timeout_ms = IDPF_VC_XN_DEFAULT_TIMEOUT_MSEC,
++	};
++	int reply_sz;
 +
 +	reply_sz = idpf_vc_xn_exec(adapter, &xn_params);
-+	return reply_sz < 0 ? reply_sz : 0;
++	if (reply_sz < 0)
++		return reply_sz;
++	if (reply_sz != sizeof(cross_time_msg))
++		return -EIO;
++
++	cross_time->dev_clk_time_ns = le64_to_cpu(cross_time_msg.dev_time_ns);
++	cross_time->sys_time_ns = le64_to_cpu(cross_time_msg.sys_time_ns);
++
++	return 0;
 +}
 +
  /**
-  * idpf_vport_alloc_max_qs - Allocate max queues for a vport
+  * idpf_ptp_set_dev_clk_time - Send virtchnl set device time message
   * @adapter: Driver specific private structure
-@@ -3642,6 +3677,79 @@ bool idpf_is_capability_ena(struct idpf_adapter *adapter, bool all,
- 		return !!(*cap_field & flag);
- }
- 
-+/**
-+ * idpf_vport_is_cap_ena - Check if vport capability is enabled
-+ * @vport: Private data struct
-+ * @flag: flag(s) to check
-+ *
-+ * Return: true if the capability is supported, false otherwise
-+ */
-+bool idpf_vport_is_cap_ena(struct idpf_vport *vport, u16 flag)
-+{
-+	struct virtchnl2_create_vport *vport_msg;
-+
-+	vport_msg = vport->adapter->vport_params_recvd[vport->idx];
-+
-+	return !!(le16_to_cpu(vport_msg->vport_flags) & flag);
-+}
-+
-+/**
-+ * idpf_sideband_flow_type_ena - Check if steering is enabled for flow type
-+ * @vport: Private data struct
-+ * @flow_type: flow type to check (from ethtool.h)
-+ *
-+ * Return: true if sideband filters are allowed for @flow_type, false otherwise
-+ */
-+bool idpf_sideband_flow_type_ena(struct idpf_vport *vport, u32 flow_type)
-+{
-+	struct virtchnl2_create_vport *vport_msg;
-+	__le64 caps;
-+
-+	vport_msg = vport->adapter->vport_params_recvd[vport->idx];
-+	caps = vport_msg->sideband_flow_caps;
-+
-+	switch (flow_type) {
-+	case TCP_V4_FLOW:
-+		return !!(caps & cpu_to_le64(VIRTCHNL2_FLOW_IPV4_TCP));
-+	case UDP_V4_FLOW:
-+		return !!(caps & cpu_to_le64(VIRTCHNL2_FLOW_IPV4_UDP));
-+	default:
-+		return false;
-+	}
-+}
-+
-+/**
-+ * idpf_sideband_action_ena - Check if steering is enabled for action
-+ * @vport: Private data struct
-+ * @fsp: flow spec
-+ *
-+ * Return: true if sideband filters are allowed for @fsp, false otherwise
-+ */
-+bool idpf_sideband_action_ena(struct idpf_vport *vport,
-+			      struct ethtool_rx_flow_spec *fsp)
-+{
-+	struct virtchnl2_create_vport *vport_msg;
-+	unsigned int supp_actions;
-+
-+	vport_msg = vport->adapter->vport_params_recvd[vport->idx];
-+	supp_actions = le32_to_cpu(vport_msg->sideband_flow_actions);
-+
-+	/* Actions Drop/Wake are not supported */
-+	if (fsp->ring_cookie == RX_CLS_FLOW_DISC ||
-+	    fsp->ring_cookie == RX_CLS_FLOW_WAKE)
-+		return false;
-+
-+	return !!(supp_actions & VIRTCHNL2_ACTION_QUEUE);
-+}
-+
-+unsigned int idpf_fsteer_max_rules(struct idpf_vport *vport)
-+{
-+	struct virtchnl2_create_vport *vport_msg;
-+
-+	vport_msg = vport->adapter->vport_params_recvd[vport->idx];
-+	return le32_to_cpu(vport_msg->flow_steer_max_rules);
-+}
-+
- /**
-  * idpf_get_vport_id: Get vport id
-  * @vport: virtual port structure
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.h b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.h
-index 7bae09483aed..86f30f0db07a 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.h
-@@ -105,6 +105,12 @@ int idpf_get_reg_intr_vecs(struct idpf_vport *vport,
- int idpf_queue_reg_init(struct idpf_vport *vport);
- int idpf_vport_queue_ids_init(struct idpf_vport *vport);
- 
-+bool idpf_vport_is_cap_ena(struct idpf_vport *vport, u16 flag);
-+bool idpf_sideband_flow_type_ena(struct idpf_vport *vport, u32 flow_type);
-+bool idpf_sideband_action_ena(struct idpf_vport *vport,
-+			      struct ethtool_rx_flow_spec *fsp);
-+unsigned int idpf_fsteer_max_rules(struct idpf_vport *vport);
-+
- int idpf_recv_mb_msg(struct idpf_adapter *adapter);
- int idpf_send_mb_msg(struct idpf_adapter *adapter, u32 op,
- 		     u16 msg_size, u8 *msg, u16 cookie);
 -- 
 2.47.1
 
