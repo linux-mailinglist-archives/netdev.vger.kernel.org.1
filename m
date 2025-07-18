@@ -1,262 +1,213 @@
-Return-Path: <netdev+bounces-208058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACAF7B0990A
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 03:06:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48023B09913
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 03:14:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 146901C410EF
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 01:06:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7800C4A756E
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 01:14:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 394BD3D984;
-	Fri, 18 Jul 2025 01:06:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E75B146588;
+	Fri, 18 Jul 2025 01:14:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6194927453
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 01:06:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EA47143756;
+	Fri, 18 Jul 2025 01:14:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752800791; cv=none; b=uxgrnhFV7Bn4PU1Kz5r5JkVnb/CyrvAqjDDYN4wf3kamom8qsFllJTFlB8g5QIf/WIoiiO+OeWYCvKBEPPQY22hr2h+vOIKeyeUhBF7AimmcnQ/Qtdrp2r4MfC0Sl+0p6c3dy5Perz4zgzyPWtg8xcbLsDg4c16uu8QjJEfYO5g=
+	t=1752801260; cv=none; b=n64JH+SUVo7ofnbRere4N/z4Hb6jVqKTh3tqHOyf+0VhJgeXy+VHOxNiGO98S6Gp89UmPZl5zsI8PFSW8q/4ZxJGDTfoyDGOdPyEEFdKlcx17J7EEI2y46rZSRQVfoHOjHVI60AK60jArvSVB3z59KBveCLz/CpNbMPnv4IahWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752800791; c=relaxed/simple;
-	bh=xes/QDIUIHN8EjLPNglaHTdMVrh+eaR9Yu4cJRkqgvY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=A0Z0wDzg6cVWAfyPLqDhdSCBfGwTOyEc8NLcjaVVsm0XNInRTUVufpN+kbaMUYsu6okTxE3tkHQc8oyc/qXKviHLnTuQQFtryfNv8FJj1dJz40R9zsQDPRIPvgihg/Z2VsiAylfVjWLJ0L3jF584asJI4D9up0yJ3YuKnyNTQAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-86d07944f29so286426539f.0
-        for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 18:06:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752800788; x=1753405588;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eTCmAiawRnsaiyTbtDIy39I8p5t+nIktnBNUX6f7pVs=;
-        b=tOeVzUEx3MMq4CtN4iGqhwxFxZNrChSyQwA2KE2gTgGLWWe8ue0Gy4d6Yf7rCpjmJT
-         uxy3rySlLgH0KcgNVuejA000trEK8LAnx+m7Axn5hjZuH9eHCiUd/r0exmC2zkwBiSIz
-         0UB5oekqsrmLO4JD909Tx8/fBl3ywHbmeyRahz3FwQYiR4FZAb5zFQ20hjXlVDlhIJMn
-         tk7kAVEHxUNzISVqREcdB1HgnLHWKhZ99lWaSjDTGh51DTlzLw/G1nGM8Hy5jOloTrF1
-         S+DgBjpjiSl+7O4wFSKWvhOHHvuU6VGvgUcBJ0/a4v6fgmETvQd8iaAfLMsqQNTT18DW
-         YNcw==
-X-Forwarded-Encrypted: i=1; AJvYcCXw8IHoWovrvj1nmv3vlHZhzEE1Ziz3ItYkJS2xIXrnuh1sf+XzMpVbfHBg3lis82cjmoWCaJs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpWP+DVtoTEWVULXTW57NWJX+5h+lvtGbuSSoEekJ/U4WOIOJn
-	rZZSl85B/Q+H2oXoj91URfvLrn7F92rn0ntoDFOYALIOctpoa2lb+1j7sqNx9Qdnv7gzTK9TjLT
-	2Lwj5im0Bv16OTbqOSsuiZmgPGFf/9zo+ZQ9+phWKOtbZgPzF67PecrJLzNo=
-X-Google-Smtp-Source: AGHT+IH2UKxeeLEZ4G42S5gvaf+QK0Sz21VtE6bhTD8VX4NfAMmMbvpk2Z6joXFekBozKJfmv6fEb2xhh9UmwB5E07gABuBShYgU
+	s=arc-20240116; t=1752801260; c=relaxed/simple;
+	bh=0y9iQTUyFtdmYe9Loisns/6jI5jMfVc/yKfvcepCy4c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jEwolVfskCCt0CUyL4xFLxyfJd2pjpswFZmU2rwiDaV6kOBtDvkfY5vA3ChNRzQ1AO9pC1JJ+XLfREKmGGAu1BNKHIJ2lhB1CEWXILNaO9pfVUDnWpHjQbR0xsg8/48rM2381Bx3a3qPFVi29T6C4vlUwYWMt6+f2pSRulUHpho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-681ff7000002311f-84-68799fe50406
+Date: Fri, 18 Jul 2025 10:14:07 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: kernel test robot <lkp@intel.com>
+Cc: willy@infradead.org, netdev@vger.kernel.org,
+	oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, kernel_team@skhynix.com, almasrymina@google.com,
+	ilias.apalodimas@linaro.org, harry.yoo@oracle.com,
+	akpm@linux-foundation.org, andrew+netdev@lunn.ch,
+	asml.silence@gmail.com, toke@redhat.com, david@redhat.com,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+	surenb@google.com, mhocko@suse.com, linux-rdma@vger.kernel.org,
+	bpf@vger.kernel.org, vishal.moola@gmail.com, hannes@cmpxchg.org,
+	ziy@nvidia.com, jackmanb@google.com, wei.fang@nxp.com,
+	shenwei.wang@nxp.com, xiaoning.wang@nxp.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org
+Subject: Re: [Intel-wired-lan] [PATCH net-next v11 12/12] libeth: xdp: access
+ ->pp through netmem_desc instead of page
+Message-ID: <20250718011407.GB38833@system.software.com>
+References: <20250717070052.6358-13-byungchul@sk.com>
+ <202507180111.jygqJHzk-lkp@intel.com>
+ <20250718004346.GA38833@system.software.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:488a:b0:87c:a93:da20 with SMTP id
- ca18e2360f4ac-87c0a93dc07mr305789739f.10.1752800788459; Thu, 17 Jul 2025
- 18:06:28 -0700 (PDT)
-Date: Thu, 17 Jul 2025 18:06:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68799e14.a00a0220.3af5df.0025.GAE@google.com>
-Subject: [syzbot] [netfilter?] KASAN: slab-out-of-bounds Read in nfacct_mt_checkentry
-From: syzbot <syzbot+4ff165b9251e4d295690@syzkaller.appspotmail.com>
-To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
-	fw@strlen.de, horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250718004346.GA38833@system.software.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SW0iTcRjG+X9nh8Ovdfo3L4JpBEKWKfFPQiS6+C4swq7KC1v51VZuyqZr
+	ywJFC5SU0pRmiyaKh2mJ8zTDQy7bNMPjkpWmU5zYwYmKpWnapkje/Xie533e9+JlcFEGKWbk
+	yhRepZQmSigBIZjzLznmfqmTnbD3BiBDbQ2Fqle0qMJlIZHB1ATQUpedQob+LAIt1/7Bkds2
+	RaNq83k0UT5DoNysNRy1rXpoNNCUR6LmdBeNht8YKDRes0miGWsugb5nTlFoIi8a2YwHkLXK
+	gaGu2mYMjWyuY6hgyEihoXdTBHqekQdQbbuTRAut3lVrK94Ou8PtNd6P09GHuXc/53Guoeoz
+	xrUUf6U5ozmVq68M4Upbv2Gc2ZRNcebFfJobG2mluO5nawQ3W68HXItlCeNyMz0UV+exYNyC
+	+wvBzbd/oi7uvSI4k8AnyjW86njUVYGsaHmWTu4L0xr7C7F0MBuUA/wYyEbArOkOaofNT4q2
+	mGCPwJnhh7SPKfYodDpXcR/v8+qWyXIsBwgYnO0k4XyXw2swzF5WC9cNGl9GyCK44uoFvoyI
+	fQRgXUYrtW3sgT36acLHOBsCnRvfMN8szgbCig3GJ/uxp6HetbEV388GwbdN9q1dkNUz8Ivn
+	L7l96CHYWekkHgO2eFdt8a7a4v+1RoCbgEiu1Cik8sSIUJlOKdeGXk9SmIH3Mcrvr8dZwOLA
+	JStgGSDxF751a2UiUqpR6xRWABlcsk9YMKSRiYQJUt1dXpUUr0pN5NVWEMgQkoPCk7/uJIjY
+	m9IU/jbPJ/OqHRdj/MTpwEhbYpXX+tKWY+PVjgMNUc44XePT4Ch7anR3QsfZtPumbP3vjiJb
+	bADjedHWolgSVpeFBXWqxQE3Ymziy67XWeKUksHSyKl5sqRnMjIoP+Zc+GhZjbPOZmoMdw95
+	Phb2vL41loc/+KD4cUHTF9ftDH0VXLYyd+qeY7Smix6slBBqmTQsBFeppf8AxWAMyxQDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA02RbUhTYRiGec85OzuOVse56qQQOpNgoSUUvGKEUdBLpPSjD6gfOvLQltsc
+	m66tKDUtSVIz0dIWDkJNJ6zNmjOW6NSZRVpqssJ0jjb8KMVMmGnaVkT+u3mu+3qeHw+FC7xE
+	JCVT5rBqpUQuInkELy25MN5Xp5fum9wCDeYWEpoCOtjosXOgodkG4GJPHwkNg0UEXDL/xKHP
+	5eVCkzUVTjT4CVhatILDl8tzXNj9qJ8D39nKOLAt38OFwy8MJBxvWedAv7OUgDOFXhJOlKVA
+	l3EbdDaNYLDH3IbB0fVVDFYOGUk41O0l4MOCMgDNHW4OXHAE760Egjv6RnxB0DvOTYlG3V/n
+	cfSs6SOG2ms/c5HRmotan4jRY8c0hqzNt0lk/X6Pi8ZGHSR69WCFQFOtNQC12xcxVFo4RyLL
+	nB1DC75PBJrv+ECeFJ7jHcxk5TItq957KIMnrV6a4qoGEnXGwSosH0zFloAwiqH3M9aKajKU
+	CTqO8Q/f4oYySe9m3O5lPJSFwbl9sgErATwKp7s4zHzPSBBQVAStY1YN2lCHT0Mm4HkDQh0B
+	fQcwlgIH+ReEM/01X4hQxmkx416bxkIuTkcxjWtUaBxGJzE1nrU/9a10LNNp68PuAn7tBrt2
+	g1373zYCvBkIZUqtQiKTH0jQZEn1Spku4UK2wgqCn2+4tlphBz+GjzkBTQHRJn6nTycVcCRa
+	jV7hBAyFi4T8yiGtVMDPlOivsOrsdHWunNU4QRRFiLbzj59lMwT0RUkOm8WyKlb9j2JUWGQ+
+	2NOatLMuZkmFO0cvhfcHDJG959NNrOr6LlNE0dH6+CH8hOv52unyTjjfxXpfn7E5ytZ70iYU
+	T8cs7tnU5R28kpuxp0rzbsTNLIav+3+Nu5EsJs8s/uYasJh4R3I6rhYZJtnkzW9na6JNh4vf
+	KxK0xYOwPCGlboa87Gmsqr8vIjRSSaIYV2skvwEOxxX/9QIAAA==
+X-CFilter-Loop: Reflected
 
-Hello,
+On Fri, Jul 18, 2025 at 09:43:46AM +0900, Byungchul Park wrote:
+> On Fri, Jul 18, 2025 at 01:42:38AM +0800, kernel test robot wrote:
+> > Hi Byungchul,
+> > 
+> > kernel test robot noticed the following build warnings:
+> > 
+> > [auto build test WARNING on c65d34296b2252897e37835d6007bbd01b255742]
+> > 
+> > url:    https://github.com/intel-lab-lkp/linux/commits/Byungchul-Park/netmem-introduce-struct-netmem_desc-mirroring-struct-page/20250717-150253
+> > base:   c65d34296b2252897e37835d6007bbd01b255742
+> > patch link:    https://lore.kernel.org/r/20250717070052.6358-13-byungchul%40sk.com
+> > patch subject: [Intel-wired-lan] [PATCH net-next v11 12/12] libeth: xdp: access ->pp through netmem_desc instead of page
+> > config: arm-randconfig-r072-20250717 (https://download.01.org/0day-ci/archive/20250718/202507180111.jygqJHzk-lkp@intel.com/config)
+> > compiler: arm-linux-gnueabi-gcc (GCC) 8.5.0
+> > reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250718/202507180111.jygqJHzk-lkp@intel.com/reproduce)
+> > 
+> > If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> > the same patch/commit), kindly add following tags
+> > | Reported-by: kernel test robot <lkp@intel.com>
+> > | Closes: https://lore.kernel.org/oe-kbuild-all/202507180111.jygqJHzk-lkp@intel.com/
+> > 
+> > All warnings (new ones prefixed by >>):
+> > 
+> >    In file included from include/linux/container_of.h:5,
+> >                     from include/linux/list.h:5,
+> >                     from include/linux/timer.h:5,
+> >                     from include/linux/netdevice.h:24,
+> >                     from include/trace/events/xdp.h:8,
+> >                     from include/linux/bpf_trace.h:5,
+> >                     from include/net/libeth/xdp.h:7,
+> >                     from drivers/net/ethernet/intel/libeth/tx.c:6:
+> >    include/net/libeth/xdp.h: In function 'libeth_xdp_prepare_buff':
+> > >> include/net/libeth/xdp.h:1295:23: warning: passing argument 1 of 'page_pool_page_is_pp' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+> >         pp_page_to_nmdesc(page)->pp->p.offset, len, true);
+> >                           ^~~~
+> >    include/linux/build_bug.h:30:63: note: in definition of macro 'BUILD_BUG_ON_INVALID'
+> >     #define BUILD_BUG_ON_INVALID(e) ((void)(sizeof((__force long)(e))))
+> >                                                                   ^
+> >    include/net/netmem.h:301:2: note: in expansion of macro 'DEBUG_NET_WARN_ON_ONCE'
+> >      DEBUG_NET_WARN_ON_ONCE(!page_pool_page_is_pp(p));  \
+> >      ^~~~~~~~~~~~~~~~~~~~~~
+> >    include/net/libeth/xdp.h:1295:5: note: in expansion of macro 'pp_page_to_nmdesc'
+> >         pp_page_to_nmdesc(page)->pp->p.offset, len, true);
+> >         ^~~~~~~~~~~~~~~~~
+> >    In file included from arch/arm/include/asm/cacheflush.h:10,
+> >                     from include/linux/cacheflush.h:5,
+> >                     from include/linux/highmem.h:8,
+> >                     from include/linux/bvec.h:10,
+> >                     from include/linux/skbuff.h:17,
+> >                     from include/net/net_namespace.h:43,
+> >                     from include/linux/netdevice.h:38,
+> >                     from include/trace/events/xdp.h:8,
+> >                     from include/linux/bpf_trace.h:5,
+> >                     from include/net/libeth/xdp.h:7,
+> >                     from drivers/net/ethernet/intel/libeth/tx.c:6:
+> >    include/linux/mm.h:4176:54: note: expected 'struct page *' but argument is of type 'const struct page *'
+> >     static inline bool page_pool_page_is_pp(struct page *page)
+> >                                             ~~~~~~~~~~~~~^~~~
+> 
+> Oh.  page_pool_page_is_pp() in the mainline code already has this issue
+> that the helper cannot take const struct page * as argument.
+> 
+> How should we resolve the issue?  Changing page_pool_page_is_pp() to
+> macro and using _Generic again looks too much.  Or should we?  Any idea?
 
-syzbot found the following issue on:
+option 1. Remove 'const' on declaration of struct page in
+	  libeth_xdp_prepare_buff() but maybe bad.
 
-HEAD commit:    5d5d62298b8b Merge tag 'x86_urgent_for_v6.16_rc6' of git:/..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=1655418c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b309c907eaab29da
-dashboard link: https://syzkaller.appspot.com/bug?extid=4ff165b9251e4d295690
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=156787d4580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=136787d4580000
+option 2. Use __pp_page_to_nmdesc() instead of pp_page_to_nmdesc() in
+	  libeth_xdp_prepare_buff() to skip checking if it's a pp page.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/621a2e2bbe6e/disk-5d5d6229.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/1822022cd8cb/vmlinux-5d5d6229.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/10cee653a6cd/bzImage-5d5d6229.xz
+option 3. Change page_pool_page_is_pp() to macro and use _Generic to
+	  cover const casting.
 
-The issue was bisected to:
+More?
 
-commit 6001a930ce0378b62210d4f83583fc88a903d89d
-Author: Pablo Neira Ayuso <pablo@netfilter.org>
-Date:   Mon Feb 15 11:28:07 2021 +0000
+	Byungchul
 
-    netfilter: nftables: introduce table ownership
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=133e518c580000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=10be518c580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=173e518c580000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4ff165b9251e4d295690@syzkaller.appspotmail.com
-Fixes: 6001a930ce03 ("netfilter: nftables: introduce table ownership")
-
-==================================================================
-BUG: KASAN: slab-out-of-bounds in string_nocheck lib/vsprintf.c:639 [inline]
-BUG: KASAN: slab-out-of-bounds in string+0x231/0x2b0 lib/vsprintf.c:721
-Read of size 1 at addr ffff88801eac95c8 by task syz-executor183/5851
-
-CPU: 0 UID: 0 PID: 5851 Comm: syz-executor183 Not tainted 6.16.0-rc5-syzkaller-00276-g5d5d62298b8b #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0xca/0x230 mm/kasan/report.c:480
- kasan_report+0x118/0x150 mm/kasan/report.c:593
- string_nocheck lib/vsprintf.c:639 [inline]
- string+0x231/0x2b0 lib/vsprintf.c:721
- vsnprintf+0x739/0xf00 lib/vsprintf.c:2874
- vprintk_store+0x3c7/0xd00 kernel/printk/printk.c:2279
- vprintk_emit+0x21e/0x7a0 kernel/printk/printk.c:2426
- _printk+0xcf/0x120 kernel/printk/printk.c:2475
- nfacct_mt_checkentry+0xd2/0xe0 net/netfilter/xt_nfacct.c:41
- xt_check_match+0x3d1/0xab0 net/netfilter/x_tables.c:523
- __nft_match_init+0x63a/0x840 net/netfilter/nft_compat.c:520
- nf_tables_newexpr net/netfilter/nf_tables_api.c:3493 [inline]
- nf_tables_newrule+0x178c/0x2890 net/netfilter/nf_tables_api.c:4324
- nfnetlink_rcv_batch net/netfilter/nfnetlink.c:525 [inline]
- nfnetlink_rcv_skb_batch net/netfilter/nfnetlink.c:648 [inline]
- nfnetlink_rcv+0x1132/0x2520 net/netfilter/nfnetlink.c:666
- netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
- netlink_unicast+0x759/0x8e0 net/netlink/af_netlink.c:1346
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
- sock_sendmsg_nosec net/socket.c:712 [inline]
- __sock_sendmsg+0x219/0x270 net/socket.c:727
- ____sys_sendmsg+0x505/0x830 net/socket.c:2566
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
- __sys_sendmsg net/socket.c:2652 [inline]
- __do_sys_sendmsg net/socket.c:2657 [inline]
- __se_sys_sendmsg net/socket.c:2655 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fa7bbf1c6a9
-Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff7139c908 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fff7139cad8 RCX: 00007fa7bbf1c6a9
-RDX: 0000000000000000 RSI: 0000200000000000 RDI: 0000000000000003
-RBP: 00007fa7bbf8f610 R08: 0000000000000002 R09: 00007fff7139cad8
-R10: 0000000000000009 R11: 0000000000000246 R12: 0000000000000001
-R13: 00007fff7139cac8 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
-
-Allocated by task 5851:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
- __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:394
- kasan_kmalloc include/linux/kasan.h:260 [inline]
- __do_kmalloc_node mm/slub.c:4328 [inline]
- __kmalloc_noprof+0x27a/0x4f0 mm/slub.c:4340
- kmalloc_noprof include/linux/slab.h:909 [inline]
- kzalloc_noprof include/linux/slab.h:1039 [inline]
- nf_tables_newrule+0x1506/0x2890 net/netfilter/nf_tables_api.c:4306
- nfnetlink_rcv_batch net/netfilter/nfnetlink.c:525 [inline]
- nfnetlink_rcv_skb_batch net/netfilter/nfnetlink.c:648 [inline]
- nfnetlink_rcv+0x1132/0x2520 net/netfilter/nfnetlink.c:666
- netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
- netlink_unicast+0x759/0x8e0 net/netlink/af_netlink.c:1346
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
- sock_sendmsg_nosec net/socket.c:712 [inline]
- __sock_sendmsg+0x219/0x270 net/socket.c:727
- ____sys_sendmsg+0x505/0x830 net/socket.c:2566
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
- __sys_sendmsg net/socket.c:2652 [inline]
- __do_sys_sendmsg net/socket.c:2657 [inline]
- __se_sys_sendmsg net/socket.c:2655 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-The buggy address belongs to the object at ffff88801eac9580
- which belongs to the cache kmalloc-cg-96 of size 96
-The buggy address is located 0 bytes to the right of
- allocated 72-byte region [ffff88801eac9580, ffff88801eac95c8)
-
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1eac9
-flags: 0xfff00000000000(node=0|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 00fff00000000000 ffff88801a449640 dead000000000122 0000000000000000
-raw: 0000000000000000 0000000080200020 00000000f5000000 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x52cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 1, tgid 1 (swapper/0), ts 2776913905, free_ts 0
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x240/0x2a0 mm/page_alloc.c:1704
- prep_new_page mm/page_alloc.c:1712 [inline]
- get_page_from_freelist+0x21e4/0x22c0 mm/page_alloc.c:3669
- __alloc_frozen_pages_noprof+0x181/0x370 mm/page_alloc.c:4959
- alloc_pages_mpol+0x232/0x4a0 mm/mempolicy.c:2419
- alloc_slab_page mm/slub.c:2451 [inline]
- allocate_slab+0x8a/0x3b0 mm/slub.c:2619
- new_slab mm/slub.c:2673 [inline]
- ___slab_alloc+0xbfc/0x1480 mm/slub.c:3859
- __slab_alloc mm/slub.c:3949 [inline]
- __slab_alloc_node mm/slub.c:4024 [inline]
- slab_alloc_node mm/slub.c:4185 [inline]
- __do_kmalloc_node mm/slub.c:4327 [inline]
- __kmalloc_noprof+0x305/0x4f0 mm/slub.c:4340
- kmalloc_noprof include/linux/slab.h:909 [inline]
- kzalloc_noprof include/linux/slab.h:1039 [inline]
- __register_sysctl_table+0x72/0x1340 fs/proc/proc_sysctl.c:1380
- user_namespace_sysctl_init+0x25/0x150 kernel/ucount.c:355
- do_one_initcall+0x233/0x820 init/main.c:1274
- do_initcall_level+0x137/0x1f0 init/main.c:1336
- do_initcalls+0x69/0xd0 init/main.c:1352
- kernel_init_freeable+0x3d9/0x570 init/main.c:1584
- kernel_init+0x1d/0x1d0 init/main.c:1474
- ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-page_owner free stack trace missing
-
-Memory state around the buggy address:
- ffff88801eac9480: 00 00 00 00 00 00 00 00 00 00 00 00 fc fc fc fc
- ffff88801eac9500: 00 00 00 00 00 00 00 00 00 00 00 00 fc fc fc fc
->ffff88801eac9580: 00 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc
-                                              ^
- ffff88801eac9600: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff88801eac9680: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-==================================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> 	Byungchul
+> 
+> > vim +1295 include/net/libeth/xdp.h
+> > 
+> >   1263
+> >   1264  bool libeth_xdp_buff_add_frag(struct libeth_xdp_buff *xdp,
+> >   1265                                const struct libeth_fqe *fqe,
+> >   1266                                u32 len);
+> >   1267
+> >   1268  /**
+> >   1269   * libeth_xdp_prepare_buff - fill &libeth_xdp_buff with head FQE data
+> >   1270   * @xdp: XDP buffer to attach the head to
+> >   1271   * @fqe: FQE containing the head buffer
+> >   1272   * @len: buffer len passed from HW
+> >   1273   *
+> >   1274   * Internal, use libeth_xdp_process_buff() instead. Initializes XDP buffer
+> >   1275   * head with the Rx buffer data: data pointer, length, headroom, and
+> >   1276   * truesize/tailroom. Zeroes the flags.
+> >   1277   * Uses faster single u64 write instead of per-field access.
+> >   1278   */
+> >   1279  static inline void libeth_xdp_prepare_buff(struct libeth_xdp_buff *xdp,
+> >   1280                                             const struct libeth_fqe *fqe,
+> >   1281                                             u32 len)
+> >   1282  {
+> >   1283          const struct page *page = __netmem_to_page(fqe->netmem);
+> >   1284
+> >   1285  #ifdef __LIBETH_WORD_ACCESS
+> >   1286          static_assert(offsetofend(typeof(xdp->base), flags) -
+> >   1287                        offsetof(typeof(xdp->base), frame_sz) ==
+> >   1288                        sizeof(u64));
+> >   1289
+> >   1290          *(u64 *)&xdp->base.frame_sz = fqe->truesize;
+> >   1291  #else
+> >   1292          xdp_init_buff(&xdp->base, fqe->truesize, xdp->base.rxq);
+> >   1293  #endif
+> >   1294          xdp_prepare_buff(&xdp->base, page_address(page) + fqe->offset,
+> > > 1295                           pp_page_to_nmdesc(page)->pp->p.offset, len, true);
+> >   1296  }
+> >   1297
+> > 
+> > --
+> > 0-DAY CI Kernel Test Service
+> > https://github.com/intel/lkp-tests/wiki
 
