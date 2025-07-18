@@ -1,220 +1,174 @@
-Return-Path: <netdev+bounces-208190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B19A8B0A6A1
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 16:50:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F76FB0A7D7
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 17:44:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE93C1C81D26
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 14:51:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 615553B39EC
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 15:40:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F8B61A5B8B;
-	Fri, 18 Jul 2025 14:50:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 506982957A7;
+	Fri, 18 Jul 2025 15:40:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PSM0IEi1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e6d2Su4e"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 273E21EF1D;
-	Fri, 18 Jul 2025 14:50:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C9C1AAC9;
+	Fri, 18 Jul 2025 15:40:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752850252; cv=none; b=N1AmkUqBzqREOB7qMn8aoO+vGGr4Rk2UcmihIdtT6fhiCDpPsnUkXc+YMwSF0EeZ85cI04m9kI5RACiRXYg/iNIEt10GDcnxUeViL2Ny9TpQprknH5ConWtO0IgPdzL5F04pLa3llyHISkaPO1Y2Iykdu3sk6srDkArbBCOK3dM=
+	t=1752853225; cv=none; b=RTfhDJJ/vKxTQoHS9Z2tzqvdxyxV8CxiKB0f2X6V5xcbl4bzGwIisDOgJJ4ZjNKplhK3uOScZ1dZ5x3J5AuzkjP0CuedU7mlxQ+l9sdoU7DYm2RRgwlUVDdQnlJZrDHYeK0dNRFgFZxrB3Qh3EXlkHevqxEovQejsuh8a0NVJIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752850252; c=relaxed/simple;
-	bh=C4ovz/A/Jd+4R4Tq7TDb09J4evUXnZy653mAlX63WQ4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B7HWNKxxLwT+DKeij8WEkCm7dQ+XhEiSa9yrMJs9FD8gbC6yw5oW7mJhU/pWeUdElVzyA27YPg6JXuPEsM4aukuDWNyQiTmNkHyL9FWQHiNa7jweLExs6dw8a7c+m+hHQoDBYmFdY+qGu9Hb4Mch1GYJWG/cIrZOBWC6twE+b2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PSM0IEi1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 185B4C4CEEB;
-	Fri, 18 Jul 2025 14:50:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752850251;
-	bh=C4ovz/A/Jd+4R4Tq7TDb09J4evUXnZy653mAlX63WQ4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PSM0IEi1tx7bEX1qXBUFYE2caot+mxUvrFYlX/G6zRaAgn0K8MC/OnpdmD8SmCKqK
-	 1tPc03TyfgmaxLx/bouGf1xmATAUBO9bDx1NRz4/HcdYPJNxoGwWJy9YcbgpkTBCRC
-	 ON6g9KTA71XH35qHMpv8YQCNwPYxEa1EfTubmfyWs0raVfkAsoTW6nr3fmAczFbUji
-	 qaaG4VxgHaR9sqPX0y1thSTSmfXA3Dk9DUSSjSIGiFQS5yGvF+YZHBv1i9LmCgXDSm
-	 XSyS6uk3UHank53Pcol4yE6qrFWsabXHZsDQHsVEXO/L+5bQ2ZaeGz7xoEvebRO0tl
-	 0QYlI4R9uaaxA==
-Date: Fri, 18 Jul 2025 07:50:49 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-wireless@vger.kernel.org,
-	Johannes Berg <johannes@sipsolutions.net>
-Cc: syzbot <syzbot+d1008c24929007591b6b@syzkaller.appspotmail.com>,
-	ardb@kernel.org, bp@alien8.de, dave.hansen@linux.intel.com,
-	hpa@zytor.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, mingo@redhat.com,
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-	tglx@linutronix.de, x86@kernel.org
-Subject: Re: [syzbot] [wireless] BUG: unable to handle kernel paging request
- in ieee80211_wep_encrypt
-Message-ID: <20250718145049.GA1574@quark>
-References: <6878cd49.a70a0220.693ce.0044.GAE@google.com>
+	s=arc-20240116; t=1752853225; c=relaxed/simple;
+	bh=pcqUsgE+BLWnHrNEE8dooKUtCoJC8WbeCJpLfZgtNOM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=W4CXLJGzoLNBzIeqvbUDrhXpheudpVygeuYzX3TGhJHDeyEXK4YldMmrfdh4GW5CkvixTZyFbTKCLDlTpEM6EwKWmKYxjtm4IRzErEM53p4GqLYdIOmv4O7UfArtD84Jmao0mgroi01SpAalwXSMmvQRKjcvqz+sHRDiNisCWWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e6d2Su4e; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-23508d30142so27101955ad.0;
+        Fri, 18 Jul 2025 08:40:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752853223; x=1753458023; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=uEqcCCwkmsmzuXx77UzHQMLnLGaJu6MAflPHml11P10=;
+        b=e6d2Su4epkk9NgJhFL0hKDyTFCNDMvMfs9krwnmJAFeFkvMrEWS8Cp9s3LmcP5Cqfl
+         6vrmVMBJfcvO3x5cv2PVl6qLivatXcPAXK/rkymUIt9+IVCl4GJwcJKX+1bbIcIfk6wY
+         fWv62KY3M+QXGto3w3CWOc9jkHkB0+HjQKROEmb3J+FixPF+DxPK7vTuka5L4Gw9uiO/
+         bWVf+y0B+OMNOpinY0iRQqPCE3LTVWBsQCsavs1fJBVjccWIM7wYYwFtPQ03AnwYY29V
+         CZKHRjSDZQHS61MAxDs2PFy9y0jqYMBO7DSiG/JpPZZSDod1UN+6jeoh/zpamNK/eJSx
+         LSPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752853223; x=1753458023;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uEqcCCwkmsmzuXx77UzHQMLnLGaJu6MAflPHml11P10=;
+        b=rqJfCqBxllbESbycAa4+03VKo3Nbtl0EyPSHz8myZzmO/T/D8p/CuXEVaZg1ajbBqd
+         V7Oe00pLW0UGXVDQiXkHKeD6ZoBzTrqOL6ZYiwa3DYnB1rnYE2GAaQgf5grr1iNA5EuX
+         forLEiQF/dLgX9GRbyjTE1Z8qentmYUgvodhBDEyM7SuHSDV/CHFzIeyI3hxA742ZayB
+         A2ZKD8IS4IwHJ9UK4Zxmb5PzZffagFX4Miusmz8JlPnySvSHP+Dd7yNIxn41PjLHNbSC
+         23VfW5ZDMqWx4f0UDov88GpuIGUWvjwOno0wHH2bVGDhpt6YIPgZppDVpW4Ni9+ccLSf
+         VDUA==
+X-Forwarded-Encrypted: i=1; AJvYcCUotdNEt3eLnAqKW47Cpo+MuLpvir2b7DtBh/7iHBUXhezhbsfvH7sbRLsYPjgLbbXd/zjBfUYZNFo3BW0=@vger.kernel.org, AJvYcCWpJVdGgHCIpKVAXkiTGMGdcpucJvDSm1MAYrJAFCu6AxLLIh3ITv19WJ47n3Fp+K/Ut45WPFmD@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyx8RTThTtzT+qugSV29iYjNRXJygm3H65z8XUHNzzFZw7TJ2NV
+	PcLj8VQBx3cTtToDdHnBqzqysG0G7ngfV7JbGWEHTv8fqeAo/cICLV//HeVN8HF69sh/sMYFnqC
+	qabFmlT9VKbqi0UEi3cD29jRI5itI2RM=
+X-Gm-Gg: ASbGnctGbklMwUIHS8qW3io53LzwYy+v792Q5n2o95XO5Z+Zl0mwHzc4DRLVrCJ6G6q
+	5loZNV6kDkVh7vusj/XcGnV+Hdv93GtKtFQYE/LF6MF8VEjufGEfzuag+LrikBsQCdY6uWn8AP/
+	4qem2alBmsSFESC3J6tpIQJdfOfqrKGmerhkwIeIz+a2GDcxHphaGO8WkHMiTnRSPruMppGtupR
+	bULkeIZDw==
+X-Google-Smtp-Source: AGHT+IFITHlQPUA6LMP3QbkBSAv1GjTijR0k+h23C4Uf96ZYSNEmyTHvaDyBzQlGdYFgM4+f55LcYOvcgSTt5LjpWEY=
+X-Received: by 2002:a17:903:3db5:b0:234:f4da:7eef with SMTP id
+ d9443c01a7336-23e2579ea2cmr139584875ad.52.1752853222873; Fri, 18 Jul 2025
+ 08:40:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6878cd49.a70a0220.693ce.0044.GAE@google.com>
+References: <20250718114958.1473199-1-aha310510@gmail.com> <20250718132500.wq4ahdbiwk2dwwnw@skbuf>
+In-Reply-To: <20250718132500.wq4ahdbiwk2dwwnw@skbuf>
+From: Jeongjun Park <aha310510@gmail.com>
+Date: Sat, 19 Jul 2025 00:40:10 +0900
+X-Gm-Features: Ac12FXzHHA9QEl_INVdfZlKBFH14YJGGi0rvNj31d5OVnMNHSh5Dpmjr7xOk25Q
+Message-ID: <CAO9qdTHt7aip3v6T1LkEXzyqeMWst+CYiinVu6KYJLyfoY-F_A@mail.gmail.com>
+Subject: Re: [PATCH net v2] ptp: prevent possible ABBA deadlock in ptp_clock_freerun()
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, yangbo.lu@nxp.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzbot+7cfb66a237c4a5fb22ad@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-[+linux-wireless and Johannes for ieee80211_wep_encrypt]
+Vladimir Oltean <vladimir.oltean@nxp.com> wrote:
+>
+> On Fri, Jul 18, 2025 at 08:49:58PM +0900, Jeongjun Park wrote:
+> > ABBA deadlock occurs in the following scenario:
+> >
+> >        CPU0                           CPU1
+> >        ----                           ----
+> >   n_vclocks_store()
+> >     lock(&ptp->n_vclocks_mux) [1]
+> >                                      pc_clock_adjtime()
+> >                                        lock(&clk->rwsem) [2]
+> >                                        ...
+> >                                        ptp_clock_freerun()
+> >                                          ptp_vclock_in_use()
+> >                                            lock(&ptp->n_vclocks_mux) [3]
+> >     ptp_clock_unregister()
+> >       posix_clock_unregister()
+> >         lock(&clk->rwsem) [4]
+> >
+> > To solve this with minimal patches, we should change ptp_clock_freerun()
+> > to briefly release the read lock before calling ptp_vclock_in_use() and
+> > then re-lock it when we're done.
+>
+> The most important part of solving a problem is understanding the problem
+> that there is to solve. It appears that you've jumped over that step.
+>
+> The n_vclocks sysfs is exposed for a physical clock, and acquires the
+> physical clock's n_vclocks_mux, as shown in your diagram at step [1].
+>
+> Another process calls pc_clock_adjtime(), acquires &clk->rwsem at step [2],
+> and calls ptp_clock_adjtime(). This further tests ptp_clock_freerun() ->
+> ptp_vclock_in_use(), and the fact that ptp_vclock_in_use() gets to acquire
+> n_vclocks_mux at step [3] means, as per its implementation modified in
+> commit 5ab73b010cad ("ptp: fix breakage after ptp_vclock_in_use() rework"),
+> that the PTP clock modified by pc_clock_adjtime() could have only been a
+> physical clock (ptp->is_virtual_clock == false). This is because we do
+> not acquire n_vclocks_mux on virtual clocks.
+>
+> Back to the CPU0 code path, where we iterate over the physical PTP
+> clock's virtual clocks, and call device_for_each_child_reverse(...,
+> unregister_vclock) -> ptp_vclock_unregister() -> ptp_clock_unregister() ->
+> posix_clock_unregister() on them. During the unregister procedure,
+> posix_clock_unregister() acquires the virtual clock's &clk->rwsem as
+> shown in your final step [4].
+>
+> It is clear that the clock which CPU0 unregisters cannot be the same as
+> the clock which CPU1 adjusts, because the unregistering CPU0 clock is
+> virtual, and the adjusted CPU1 clock is physical.
+>
+> The crucial bit of information from lockdep's message "WARNING: possible
+> circular locking dependency detected" is the word "possible".
+>
+> See Documentation/locking/lockdep-design.rst section "Lock-class" to
+> understand that lockdep does not operate on individual locks, but
+> instead on "classes". Therefore, simply put, it does not see, in lack of
+> any extra annotations, that the &clk->rwsem of the physical clock is
+> different than the &clk->rwsem of a child virtual clock. They have the
+> same class.
+>
+> Therefore, there is no AB/BA ordering between locks themselves, because
+> the first "A" is the &clk->rwsem of a physical clock, and the second "A"
+> is the &clk->rwsem of a virtual clock. The "B" lock may be the same: the
+> &ptp->n_vclocks_mux of the physical clock.
+>
+> Of course, having lockdep be able to validate locking using its
+> class-based algorithm is still important, and a patch is still needed.
+> The solution here is at your choice, but the problem space that needs to
+> be explored in order to fulfill that is extremely different from the
+> patch that you've proposed, to the point that I don't even think I need
+> to mention that a patch that makes an unsafe funtional change (drops a
+> lock and reacquires it), when alternatives having to do with annotating
+> lock subclasses are available and sufficient, is going to get a well
+> justified NACK from maintainers.
 
-On Thu, Jul 17, 2025 at 03:15:37AM -0700, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    5e28d5a3f774 net/sched: sch_qfq: Fix race condition on qfq..
-> git tree:       net
-> console output: https://syzkaller.appspot.com/x/log.txt?x=146550f0580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=b309c907eaab29da
-> dashboard link: https://syzkaller.appspot.com/bug?extid=d1008c24929007591b6b
-> compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/897daa1d604c/disk-5e28d5a3.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/0d5527eee75d/vmlinux-5e28d5a3.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/31ee968efcd7/bzImage-5e28d5a3.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+d1008c24929007591b6b@syzkaller.appspotmail.com
-> 
-> BUG: unable to handle page fault for address: ffff8880bfffd000
-> #PF: supervisor read access in kernel mode
-> #PF: error_code(0x0000) - not-present page
-> PGD 1a201067 P4D 1a201067 PUD 23ffff067 PMD 23fffe067 PTE 0
-> Oops: Oops: 0000 [#1] SMP KASAN PTI
-> CPU: 1 UID: 0 PID: 8097 Comm: syz.1.594 Not tainted 6.16.0-rc5-syzkaller-00183-g5e28d5a3f774 #0 PREEMPT(full) 
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-> RIP: 0010:crc32_lsb_pclmul_sse+0x8f/0x220 arch/x86/lib/crc32-pclmul.S:6
-> Code: 0f 3a 44 c7 11 66 0f ef ec 66 0f ef c5 f3 0f 6f 66 10 66 0f 6f e9 66 0f 3a 44 ef 00 66 0f 3a 44 cf 11 66 0f ef ec 66 0f ef cd <f3> 0f 6f 66 20 66 0f 6f ea 66 0f 3a 44 ef 00 66 0f 3a 44 d7 11 66
-> RSP: 0018:ffffc9001bcae6f8 EFLAGS: 00010296
-> RAX: e4cc01b02de40500 RBX: fffffffffffffffe RCX: ffffffff8be53dc0
-> RDX: ffffffff7301ca7e RSI: ffff8880bfffcfde RDI: 00000000ffffffff
-> RBP: 00000000ffffffff R08: ffff88801cb09e07 R09: 1ffff110039613c0
-> R10: dffffc0000000000 R11: ffffed10039613c1 R12: fffffffffffffffe
-> R13: ffff888033019a5e R14: ffff888033019a5e R15: ffff888067eeec80
-> FS:  00007f4779be36c0(0000) GS:ffff888125d1b000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: ffff8880bfffd000 CR3: 00000000671a8000 CR4: 00000000003526f0
-> Call Trace:
->  <TASK>
->  crc32_le_arch+0x56/0xa0 arch/x86/lib/crc32.c:21
->  crc32_le include/linux/crc32.h:18 [inline]
->  ieee80211_wep_encrypt_data net/mac80211/wep.c:114 [inline]
->  ieee80211_wep_encrypt+0x228/0x410 net/mac80211/wep.c:158
->  wep_encrypt_skb net/mac80211/wep.c:277 [inline]
->  ieee80211_crypto_wep_encrypt+0x1f6/0x320 net/mac80211/wep.c:300
->  invoke_tx_handlers_late+0x1145/0x1820 net/mac80211/tx.c:1846
->  ieee80211_tx_dequeue+0x3068/0x4340 net/mac80211/tx.c:3916
->  wake_tx_push_queue net/mac80211/util.c:294 [inline]
->  ieee80211_handle_wake_tx_queue+0x125/0x2a0 net/mac80211/util.c:315
->  drv_wake_tx_queue net/mac80211/driver-ops.h:1367 [inline]
->  schedule_and_wake_txq net/mac80211/driver-ops.h:1374 [inline]
->  ieee80211_queue_skb+0x19e8/0x2180 net/mac80211/tx.c:1648
->  ieee80211_tx+0x297/0x420 net/mac80211/tx.c:1951
->  __ieee80211_tx_skb_tid_band+0x50f/0x680 net/mac80211/tx.c:6103
->  ieee80211_tx_skb_tid+0x266/0x420 net/mac80211/tx.c:6131
->  ieee80211_mgmt_tx+0x1c25/0x21d0 net/mac80211/offchannel.c:1023
->  rdev_mgmt_tx net/wireless/rdev-ops.h:762 [inline]
->  cfg80211_mlme_mgmt_tx+0x7f2/0x1620 net/wireless/mlme.c:938
->  nl80211_tx_mgmt+0x9fd/0xd50 net/wireless/nl80211.c:12921
->  genl_family_rcv_msg_doit+0x215/0x300 net/netlink/genetlink.c:1115
->  genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
->  genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
->  netlink_rcv_skb+0x205/0x470 net/netlink/af_netlink.c:2552
->  genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
->  netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
->  netlink_unicast+0x75c/0x8e0 net/netlink/af_netlink.c:1346
->  netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
->  sock_sendmsg_nosec net/socket.c:712 [inline]
->  __sock_sendmsg+0x219/0x270 net/socket.c:727
->  ____sys_sendmsg+0x505/0x830 net/socket.c:2566
->  ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
->  __sys_sendmsg net/socket.c:2652 [inline]
->  __do_sys_sendmsg net/socket.c:2657 [inline]
->  __se_sys_sendmsg net/socket.c:2655 [inline]
->  __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
->  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->  do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7f4778d8e929
-> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007f4779be3038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 00007f4778fb6080 RCX: 00007f4778d8e929
-> RDX: 0000000024008080 RSI: 0000200000000c00 RDI: 0000000000000005
-> RBP: 00007f4778e10b39 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> R13: 0000000000000000 R14: 00007f4778fb6080 R15: 00007ffff7e551c8
->  </TASK>
-> Modules linked in:
-> CR2: ffff8880bfffd000
-> ---[ end trace 0000000000000000 ]---
-> RIP: 0010:crc32_lsb_pclmul_sse+0x8f/0x220 arch/x86/lib/crc32-pclmul.S:6
-> Code: 0f 3a 44 c7 11 66 0f ef ec 66 0f ef c5 f3 0f 6f 66 10 66 0f 6f e9 66 0f 3a 44 ef 00 66 0f 3a 44 cf 11 66 0f ef ec 66 0f ef cd <f3> 0f 6f 66 20 66 0f 6f ea 66 0f 3a 44 ef 00 66 0f 3a 44 d7 11 66
-> RSP: 0018:ffffc9001bcae6f8 EFLAGS: 00010296
-> RAX: e4cc01b02de40500 RBX: fffffffffffffffe RCX: ffffffff8be53dc0
-> RDX: ffffffff7301ca7e RSI: ffff8880bfffcfde RDI: 00000000ffffffff
-> RBP: 00000000ffffffff R08: ffff88801cb09e07 R09: 1ffff110039613c0
-> R10: dffffc0000000000 R11: ffffed10039613c1 R12: fffffffffffffffe
-> R13: ffff888033019a5e R14: ffff888033019a5e R15: ffff888067eeec80
-> FS:  00007f4779be36c0(0000) GS:ffff888125d1b000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: ffff8880bfffd000 CR3: 00000000671a8000 CR4: 00000000003526f0
-> ----------------
-> Code disassembly (best guess), 1 bytes skipped:
->    0:	3a 44 c7 11          	cmp    0x11(%rdi,%rax,8),%al
->    4:	66 0f ef ec          	pxor   %xmm4,%xmm5
->    8:	66 0f ef c5          	pxor   %xmm5,%xmm0
->    c:	f3 0f 6f 66 10       	movdqu 0x10(%rsi),%xmm4
->   11:	66 0f 6f e9          	movdqa %xmm1,%xmm5
->   15:	66 0f 3a 44 ef 00    	pclmullqlqdq %xmm7,%xmm5
->   1b:	66 0f 3a 44 cf 11    	pclmulhqhqdq %xmm7,%xmm1
->   21:	66 0f ef ec          	pxor   %xmm4,%xmm5
->   25:	66 0f ef cd          	pxor   %xmm5,%xmm1
-> * 29:	f3 0f 6f 66 20       	movdqu 0x20(%rsi),%xmm4 <-- trapping instruction
->   2e:	66 0f 6f ea          	movdqa %xmm2,%xmm5
->   32:	66 0f 3a 44 ef 00    	pclmullqlqdq %xmm7,%xmm5
->   38:	66 0f 3a 44 d7 11    	pclmulhqhqdq %xmm7,%xmm2
->   3e:	66                   	data16
-> 
-> 
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
-> 
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> 
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
-> 
-> If you want to overwrite report's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
-> 
-> If the report is a duplicate of another one, reply with:
-> #syz dup: exact-subject-of-another-report
-> 
-> If you want to undo deduplication, reply with:
-> #syz undup
+Thanks for the detailed explanation!
 
-syzbot assigned this to the "crypto" subsystem.  However, the crash
-happened in crc32_le() which is not part of the crypto subsystem.  Also,
-crc32_le() is well-tested (e.g. by crc_kunit), and the bug is unlikely
-to be there.  Rather, the calling code in ieee80211_wep_encrypt_data()
-is passing an invalid data buffer to crc32_le().  So let's do:
+Thanks to you, I figured out that I need to add a annotating lockdep
+subclass to some of the locks in vclock. I'll write a v3 patch and send
+it to you right away.
 
-#syz set subsystems: wireless
+Regards,
+
+Jeongjun Park
 
