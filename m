@@ -1,80 +1,87 @@
-Return-Path: <netdev+bounces-208112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E70AB09EFC
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 11:17:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CCA6B09F1F
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 11:19:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCCA1177B4B
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 09:17:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBDE456486C
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 09:19:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A7C0296150;
-	Fri, 18 Jul 2025 09:17:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8946D21FF29;
+	Fri, 18 Jul 2025 09:19:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="co4gKkvF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CbMJwHnl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C91C8207DF7;
-	Fri, 18 Jul 2025 09:17:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC77F296168
+	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 09:19:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752830236; cv=none; b=H6EG8QJ7ufWd2oGwCmvx/l75LbTFJi5mqecrxGPIud6ooLnMedb+atQRTo2SP2WYXXpSF9/WBdZYMNWM0vdGtb1HCYTPzPZvm7yvvVshqR8/JKfUfXaJWQP9cybr+x9rkvIP43ihl5CmhMywCvz1syV7NiPooAj4NCCYxFMFImk=
+	t=1752830374; cv=none; b=bH5l4fnXfPg5R5mHEjaFVWdYeOB1SnkvrjO0F3tDufcNTSLO8SnwvE/ifZVGG9Ut4W05Z4RXsz5mVWG0AZJG15TyRCCNvlvak+C0awiwNbAJdD0y8pHowg6NSu4AV1a/suB4Qix5cBsRBfEOu+etoKEaaw+ybIVdDX2TPDlqRcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752830236; c=relaxed/simple;
-	bh=Fw3ZT2waXkd52WH6dSOHrXUL1IonLYSsmY5LPvFE23I=;
+	s=arc-20240116; t=1752830374; c=relaxed/simple;
+	bh=9OGXC+HPAx7wjOFmvBxnXdWUJNWtIqbDCCH7mHqqr6s=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=srpsS2mSSVkSeVweHjz6NjoZfJ/z7CcivcnABEm1WNpXFCQ1wrmODm6wwAr8EHuHa7zUnLKWHmS+A8LVV0qDaEa54tJE1aZFtXeN20hSBbzFc8WvAhBpSV24nD/BeYpgG/MFQ10JUg/w9Q2OGNaH1N55cIFoh/uTlAPWzEbOW9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=co4gKkvF; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-605b9488c28so3057092a12.2;
-        Fri, 18 Jul 2025 02:17:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752830233; x=1753435033; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DQt5WkoSDJsxA1BJMl3UO35qCdstjQjYzU9xXXTDo18=;
-        b=co4gKkvF6inHK98b6s4f5uK6YO3m/VlU3WN+2+qQaudKb2ZIxxPN0sbC/QV53HAj6l
-         gMcKptL1JI7ssi3rlPBVp6M8deZJ8CmtZfzVjyb6i85X5aIy+LBc5DIlhC4S34KXS7cL
-         54Xe903ECJBJZx9oRs/egbRTKWpLWzCMAY5MWJu/gb2tGjwkbQ4Rh+XcQoIQtp8Hiq2J
-         1uu0v8S6tY3hSysBAI9wv97vcvjQhbuXRivqMunzLaK/PkSn0sbQvLeKEYfziEar7n+w
-         /c1kyV7MxHBRyHAzFw4LQ3se4Dyu+r5rMSDZ1cqK4BdtK4YDdSmz8esT4dXMf/1NUR9t
-         o2ug==
+	 In-Reply-To:Content-Type; b=u/uqsmHv/upSacZFYjtRjWV6sX4qG7z3MyuoAdo9zNi65vvqTgLDAQzdNxbOMEfJk3t0/HZSiV9eZ1aw3wExpFR9io0GzYmw67g95ellgX315eD0ErB/UP5jl1Hm3gMwJC7qfQm5co0rRJTUjHi0S/YBD2JOwpUzOL81A4na2Sg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CbMJwHnl; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752830371;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Rz7VEdzguNgZR75iuoM9tSMqqnHJY/Hj/MLHh0vHLZM=;
+	b=CbMJwHnlkstLQpf5jyc/1JXPdwrjWhd7Jesbu8p1dseqEZ+ga49ps3iZja5hNVQ+N2pcRD
+	3VSaQuT41QPkmkxi2kB2bDEmFZQfkc4zH1JuuNxxt+sac3SIi6VmKFGvTW/ZWcYauWMh+A
+	mV3uq+21LPx44mpNLbBYreKXn+aZ0uI=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-392-XRHycbhRM1C2nmnIjDcDXw-1; Fri, 18 Jul 2025 05:19:30 -0400
+X-MC-Unique: XRHycbhRM1C2nmnIjDcDXw-1
+X-Mimecast-MFC-AGG-ID: XRHycbhRM1C2nmnIjDcDXw_1752830369
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-455f79a2a16so17010695e9.2
+        for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 02:19:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752830233; x=1753435033;
+        d=1e100.net; s=20230601; t=1752830369; x=1753435169;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DQt5WkoSDJsxA1BJMl3UO35qCdstjQjYzU9xXXTDo18=;
-        b=HZyWxmL4kOi98ZrBEgQvNAD6hDRuoijr7jg5/96itIpBP+Yg4e2Ni/iEWCvL57svkI
-         v5398MpVnWdTPB1+y8/t2r0QdT2D6YpLLT3/lbEI7RVJQibv3jcxU9eYWoO6GWYzu9Ls
-         Z9Y3duEhfefyfNiWuNMNcXCzScC3E4oeUpekaq2IijwDDD3wy/HijWx+f5pNKcHnm4qt
-         YQPQN9gVOPfiKs0XKHaH39hnZI8Uwm8pwj4yoNwLB5tVegdfLaSU2OvdXtD+LtD9waX9
-         LVPxuluSVBh52RrH0VOkgoqKMGalvVf1nyj3Bpj+U0X1XkhTpAsLj9WXoZegkeBAWPz4
-         zpyA==
-X-Forwarded-Encrypted: i=1; AJvYcCU7UpcD6ibzjDV10GBP9gyf4QI9TNFgjlDBBnyh7q9glcCA/d1zcfQppZsm33yScTmU3+eOtfrHErYDgQ==@vger.kernel.org, AJvYcCWs/QfPI+CJgJp6VzbFdsUo3lL/961vDNTgfi0NxriDqKLK7OZf+I+FpA7nIdBwPNMwO7QlnvfR@vger.kernel.org, AJvYcCWzC63zWMekgjcF9nQPYkrxbcHOaQM8C5zrV/Xt1FTDJdReeHC7dVAFImdlqtjMgj5uEoH+jtoPJOFkEbQw@vger.kernel.org, AJvYcCXo0Y0u1sqz6ekt7kPnaqyJ/krtMaIFLEEery1NAPNAJMsWF9hiRW9Lol0eFOk6raoE9rw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBzZzDBc/YY6FKzVawFvMXwygXevirdoxgLb2JNddaWFv7Sbmd
-	QSP/DRb8sQswCw1hNt0xXgiXenmZUJT3Q4p3V7MMZRvH+ATDPmHrnfJt
-X-Gm-Gg: ASbGnctGe01sEjlSPl6OW8FESmC6MNEjCeT/gYIGr+WXDOnonvQ9sdqFqt7nfXIxvOB
-	/MAV8wl8h5zvSgixZJHFf3JDWBOKnZNSHKHa4lGW+C/CH2FZrQB3rzW2mlnvZ6/ZyjGk2MWqb7r
-	hv8fNh4liMvrMIivpB/2V+n5EIbOnhPmIRfM4kMlxuIikRflvGLU0eCWsv9lLU9KEUyhR1NC5nH
-	qXcz6mCRXyX70mPF4/7jojBdq6QYxckSg2YxWnQNlhkbNHe3domBwH/hg9d8zjnlyL4LYzNk0/z
-	QQHVxqxexfak6lWRUOCAblkK3L9KTN3w9GE0/+zLMynCIgf4CbCWQ1ls50S1hLIPIkI26egXWRA
-	muLwnmKVBsE9B3fM/FDcww0b/m+UD8CTkZ1Y=
-X-Google-Smtp-Source: AGHT+IHJ6Qkjj0/27EzE9VVfOI7xbm7fY60xnb0OKnLRmHC6l4c5UZ1MzUN+MM+C38ZmrD/ZAYQsDw==
-X-Received: by 2002:a17:907:7f24:b0:adb:229f:6b71 with SMTP id a640c23a62f3a-ae9cddb1d86mr1032671266b.5.1752830232698;
-        Fri, 18 Jul 2025 02:17:12 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325::1ac? ([2620:10d:c092:600::1:6915])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aec6cadd8c7sm84561966b.155.2025.07.18.02.17.10
+        bh=Rz7VEdzguNgZR75iuoM9tSMqqnHJY/Hj/MLHh0vHLZM=;
+        b=ccq09H+5/ghaaLVkYDkcFZzCw1LDsInYbQ/sSbHGd+WnaFM0y/1j1kN8CtiCVRN36X
+         P+b62/vmFvn80/2gx6FIAn0xVYF6bcrwg6HVP9WoLIzL704FSg7MGBgPyiRsXCiC0TQ8
+         MjB/92ydJqHf1f79pVe/rqqOC/jCJIzKxw1ZcriRViEvTIZGaEeST5w10IV1ixSRa+eC
+         TR+fStGWHNx5575ll4tY83u6PCYMv+FNY4GFS58Bc6Wa/IxC5wMMwzz+cIEZVJASDRMw
+         w34CWd7a95WyGERlKmt0M3sDYg+YjK2JaLlHttf4bQ1uqt393RYtljCepBkJcPyXEimW
+         0hzg==
+X-Forwarded-Encrypted: i=1; AJvYcCV5w4N8fxZfWCrOEyb6ia+eW1QL4Px8hIx5kopOUfJviwo71zfmBQ/wWGWJbl3hntw3MS/DPCI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgieJ3ci8SpCAoeAsSy2NU5r5eAk6Alo4fj/i722rehVIScg+8
+	AzgnDP7tYSf8X71brePtFTUh3nZCnJAbTC8p2B3XfWtRNE9JEpPdcNE0YoVA+xlovGNiziwuiaI
+	EOOUKSjmYsZRCBpbIPMEkwxCOPn9VyJcngMsZjvrXTN3R+wW5cn8BFKqlFA==
+X-Gm-Gg: ASbGncvp84dbpR+00pQBthBvdaZLUhjGCc+K1K9iJvZcUaZdz/Ar2Kl1C/9jx745DpY
+	/x/W6yVD1Zt9nUaHrXxUYFqDDF5+IK2HPLyydumFD8m3MKCKHHTN9PbFLJnmsqOZ2sf41rwo+Jq
+	MkjzY1gSAyakyrfzYkqsd4dCl+sBqGW9Xxrrh3MnVGMxyUmkBxkNqT/reBPVnZZrOj42APz7koB
+	l9FcnLkL+SErOg98WO3YstfJ2t5GmmO/x1twUlE1nIoMUjeMSwbnCgU9ruF4IvtWZwYLLib123c
+	B1sXU1H22+DZYlzXeJDEcgl0fiDMc7AnfoNsH9v71Alp7TkvBpjJzj0oSNvqKgf5U6H/rLLiyl3
+	+EoXOsP4vi64=
+X-Received: by 2002:a05:6000:440e:b0:3a5:1222:ac64 with SMTP id ffacd0b85a97d-3b60dd7b02dmr5390086f8f.38.1752830368955;
+        Fri, 18 Jul 2025 02:19:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHTjhEq8p44r045oEYKw5E0umkCtE+yHNEk65pXbCxLQ3y2DbvrtoknVhu/Al+Bpx9xmKqa4Q==
+X-Received: by 2002:a05:6000:440e:b0:3a5:1222:ac64 with SMTP id ffacd0b85a97d-3b60dd7b02dmr5390060f8f.38.1752830368389;
+        Fri, 18 Jul 2025 02:19:28 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca2dfe0sm1288433f8f.36.2025.07.18.02.19.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Jul 2025 02:17:11 -0700 (PDT)
-Message-ID: <35592824-6749-4fa4-89d9-2de9caccc695@gmail.com>
-Date: Fri, 18 Jul 2025 10:18:41 +0100
+        Fri, 18 Jul 2025 02:19:27 -0700 (PDT)
+Message-ID: <7aeff791-f26c-4ae3-adaa-c25f3b98ba56@redhat.com>
+Date: Fri, 18 Jul 2025 11:19:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,83 +89,67 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net-next v11 12/12] libeth: xdp: access
- ->pp through netmem_desc instead of page
-To: Byungchul Park <byungchul@sk.com>, kernel test robot <lkp@intel.com>
-Cc: willy@infradead.org, netdev@vger.kernel.org,
- oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, kernel_team@skhynix.com, almasrymina@google.com,
- ilias.apalodimas@linaro.org, harry.yoo@oracle.com,
- akpm@linux-foundation.org, andrew+netdev@lunn.ch, toke@redhat.com,
- david@redhat.com, Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
- surenb@google.com, mhocko@suse.com, linux-rdma@vger.kernel.org,
- bpf@vger.kernel.org, vishal.moola@gmail.com, hannes@cmpxchg.org,
- ziy@nvidia.com, jackmanb@google.com, wei.fang@nxp.com, shenwei.wang@nxp.com,
- xiaoning.wang@nxp.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org
-References: <20250717070052.6358-13-byungchul@sk.com>
- <202507180111.jygqJHzk-lkp@intel.com>
- <20250718004346.GA38833@system.software.com>
- <20250718011407.GB38833@system.software.com>
+Subject: Re: [PATCH net-next V2 0/3] in order support for vhost-net
+To: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, eperezma@redhat.com,
+ kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, jonah.palmer@oracle.com
+References: <20250714084755.11921-1-jasowang@redhat.com>
+ <20250716170406.637e01f5@kernel.org>
+ <CACGkMEvj0W98Jc=AB-g8G0J0u5pGAM4mBVCrp3uPLCkc6CK7Ng@mail.gmail.com>
+ <20250717015341-mutt-send-email-mst@kernel.org>
+ <CACGkMEvX==TSK=0gH5WaFecMY1E+o7mbQ6EqJF+iaBx6DyMiJg@mail.gmail.com>
+ <bea4ea64-f7ec-4508-a75f-7b69d04f743a@redhat.com>
+ <CACGkMEv3gZLPgimK6=f0Zrt_SSux8ssA5-UeEv+DHPoeSrNBQQ@mail.gmail.com>
 Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20250718011407.GB38833@system.software.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CACGkMEv3gZLPgimK6=f0Zrt_SSux8ssA5-UeEv+DHPoeSrNBQQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 7/18/25 02:14, Byungchul Park wrote:
-...>>>
->>>     In file included from include/linux/container_of.h:5,
->>>                      from include/linux/list.h:5,
->>>                      from include/linux/timer.h:5,
->>>                      from include/linux/netdevice.h:24,
->>>                      from include/trace/events/xdp.h:8,
->>>                      from include/linux/bpf_trace.h:5,
->>>                      from include/net/libeth/xdp.h:7,
->>>                      from drivers/net/ethernet/intel/libeth/tx.c:6:
->>>     include/net/libeth/xdp.h: In function 'libeth_xdp_prepare_buff':
->>>>> include/net/libeth/xdp.h:1295:23: warning: passing argument 1 of 'page_pool_page_is_pp' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
->>>          pp_page_to_nmdesc(page)->pp->p.offset, len, true);
->>>                            ^~~~
->>>     include/linux/build_bug.h:30:63: note: in definition of macro 'BUILD_BUG_ON_INVALID'
->>>      #define BUILD_BUG_ON_INVALID(e) ((void)(sizeof((__force long)(e))))
->>>                                                                    ^
->>>     include/net/netmem.h:301:2: note: in expansion of macro 'DEBUG_NET_WARN_ON_ONCE'
->>>       DEBUG_NET_WARN_ON_ONCE(!page_pool_page_is_pp(p));  \
->>>       ^~~~~~~~~~~~~~~~~~~~~~
->>>     include/net/libeth/xdp.h:1295:5: note: in expansion of macro 'pp_page_to_nmdesc'
->>>          pp_page_to_nmdesc(page)->pp->p.offset, len, true);
->>>          ^~~~~~~~~~~~~~~~~
->>>     In file included from arch/arm/include/asm/cacheflush.h:10,
->>>                      from include/linux/cacheflush.h:5,
->>>                      from include/linux/highmem.h:8,
->>>                      from include/linux/bvec.h:10,
->>>                      from include/linux/skbuff.h:17,
->>>                      from include/net/net_namespace.h:43,
->>>                      from include/linux/netdevice.h:38,
->>>                      from include/trace/events/xdp.h:8,
->>>                      from include/linux/bpf_trace.h:5,
->>>                      from include/net/libeth/xdp.h:7,
->>>                      from drivers/net/ethernet/intel/libeth/tx.c:6:
->>>     include/linux/mm.h:4176:54: note: expected 'struct page *' but argument is of type 'const struct page *'
->>>      static inline bool page_pool_page_is_pp(struct page *page)
->>>                                              ~~~~~~~~~~~~~^~~~
+On 7/18/25 4:04 AM, Jason Wang wrote:
+> On Thu, Jul 17, 2025 at 9:52 PM Paolo Abeni <pabeni@redhat.com> wrote:
+>> On 7/17/25 8:01 AM, Jason Wang wrote:
+>>> On Thu, Jul 17, 2025 at 1:55 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>>>> On Thu, Jul 17, 2025 at 10:03:00AM +0800, Jason Wang wrote:
+>>>>> On Thu, Jul 17, 2025 at 8:04 AM Jakub Kicinski <kuba@kernel.org> wrote:
+>>>>>>
+>>>>>> On Mon, 14 Jul 2025 16:47:52 +0800 Jason Wang wrote:
+>>>>>>> This series implements VIRTIO_F_IN_ORDER support for vhost-net. This
+>>>>>>> feature is designed to improve the performance of the virtio ring by
+>>>>>>> optimizing descriptor processing.
+>>>>>>>
+>>>>>>> Benchmarks show a notable improvement. Please see patch 3 for details.
+>>>>>>
+>>>>>> You tagged these as net-next but just to be clear -- these don't apply
+>>>>>> for us in the current form.
+>>>>>>
+>>>>>
+>>>>> Will rebase and send a new version.
+>>>>>
+>>>>> Thanks
+>>>>
+>>>> Indeed these look as if they are for my tree (so I put them in
+>>>> linux-next, without noticing the tag).
+>>>
+>>> I think that's also fine.
+>>>
+>>> Do you prefer all vhost/vhost-net patches to go via your tree in the future?
+>>>
+>>> (Note that the reason for the conflict is because net-next gets UDP
+>>> GSO feature merged).
 >>
->> Oh.  page_pool_page_is_pp() in the mainline code already has this issue
->> that the helper cannot take const struct page * as argument.
+>> FTR, I thought that such patches should have been pulled into the vhost
+>> tree, too. Did I miss something?
+> 
+> See: https://www.spinics.net/lists/netdev/msg1108896.html
 
-Probably not, and probably for wrong reasons. netmem_ref is define
-as an integer, compilers cast away such const unlike const pointers.
+I'm sorry I likely was not clear in my previous message. My question is:
+any special reason to not pull the UDP tunnel GSO series into the vhost
+tree, too?
 
->> How should we resolve the issue?  Changing page_pool_page_is_pp() to
->> macro and using _Generic again looks too much.  Or should we?  Any idea?
+Thanks,
 
-page_pool_page_is_pp() doesn't change the page, just make the
-argument const.
-
-bool page_pool_page_is_pp(const struct page *page)
-
--- 
-Pavel Begunkov
+Paolo
 
 
