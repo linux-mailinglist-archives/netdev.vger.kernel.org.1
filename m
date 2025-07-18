@@ -1,372 +1,204 @@
-Return-Path: <netdev+bounces-208104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B378DB09E04
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 10:31:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF2ACB09E15
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 10:33:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6C61563E4E
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 08:31:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5BE0A7B9BF6
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 08:31:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF02293B7E;
-	Fri, 18 Jul 2025 08:31:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E4182949E5;
+	Fri, 18 Jul 2025 08:32:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="jcUY6gG9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Akv67P4g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8702224891
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 08:31:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A924293C71
+	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 08:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752827497; cv=none; b=hjgYtlMRu9sYRnxnE8dsznr3Dy64Ta/lWqdOcIjqvEu14ZxdlcrqYJbC+CXk9KLFN6MHGjlbrcKPCsVJmf6VgChHQ3cLA/kzZalJyFa7KNIowdSEPjrdcqaSYc7GvABh0RheLhRgF1rkSrHZVUup9sOJVFLF2xcj2dXnTOTrXgw=
+	t=1752827555; cv=none; b=e3a0Sxu0h8HOZgHI1pJz01kvet5u6PwuVtX/tPaQvFiqyxaXAF3TEZAeyjfUcgdsOuflGTnuupDD3KrxbinssUI3QRloKEOPJ7l4e4z9eoBwHaRN7tHMoX5Bb6J35ArBmcJMRLuIyuPM8OBA8m05gQ2yfJKcRQ8Im+czFaavD/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752827497; c=relaxed/simple;
-	bh=Yba3a+fvg4oQMcRXf/uCECjshMtgdjfwvuJXl0/DER8=;
+	s=arc-20240116; t=1752827555; c=relaxed/simple;
+	bh=u+hOpWXYGqQzlXztN0daxiDWMdTwEOshtpHvQqgxZTU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TbFTHu5JEAwkueIA+KBpv1nHFMRoVS2e1BT8XnB4nUyX6kJzXms/5ZqQOCDconqhArXUVF5tVlCrwL+83Ok881zMFMhLDWS7E8EC2GOJceMOQnO2Lqu4XWzLdKNNjWh1+x7YDKJRC1PPBo8qBfRmE3myUHyDHbyZgmOVd0HTXoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=jcUY6gG9; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-55622414cf4so1625907e87.3
-        for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 01:31:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1752827492; x=1753432292; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S8xwpmkMzspiOongpmX1MNLbl0q1sdU9S7sc4man+Jg=;
-        b=jcUY6gG9UyTDsGt5NDFDkKgfRwiN8UW+nFeFUhG9vDLkla/es1ModDc/h8hjA8PcWh
-         OyZqC3GiT/BNYXRxJRkyFlcBVEXVueeDp1qL3NbCJtWTqbMvD8cqMlAq+uVKcgtuRK6O
-         xavOMth0ovUkEWWN4eC19Lfr6xLh8LLCmIMNY=
+	 To:Cc:Content-Type; b=EBLQPOretDR1GueoP90f010Eqhve1CxcqCjcdYnzT12RSfSDjtloDxVNHMmN9vexm2e7U0VLAjmqfqNZmd6Y7sZcXqfttTSjBY0uJqM8Si0czFeNcVfS/H0Zibdip9lgb9h3UiapidDMXzPZ2HMcuN6hcrEnv36ubT4lXBIynf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Akv67P4g; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752827552;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ClO7vf6ZBePINFWsPRFr/+WGIgiWW+sfd60JVlzDBe8=;
+	b=Akv67P4gdWrlXT3el9DcBoVd/2viIeArNvghPStEE8NL3oJ3osueu62w72Ybg2pIcQU6CF
+	QMvqmGhXIQD/zHkXbAZJZFJ8K0mWz10wZLVdpn+bTyEUspxRoJR/juRgdxJOa4dma+6SUv
+	mbl8bz1BiRKwsVnWnhr3uTDfzAAjTeM=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-642-Q7yF6pkfNWidu0whqsi9AA-1; Fri, 18 Jul 2025 04:32:30 -0400
+X-MC-Unique: Q7yF6pkfNWidu0whqsi9AA-1
+X-Mimecast-MFC-AGG-ID: Q7yF6pkfNWidu0whqsi9AA_1752827550
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-aec53d77a78so106758866b.1
+        for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 01:32:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752827492; x=1753432292;
+        d=1e100.net; s=20230601; t=1752827549; x=1753432349;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=S8xwpmkMzspiOongpmX1MNLbl0q1sdU9S7sc4man+Jg=;
-        b=jZlo0OhXGd4OrBtDoY0mwL6VUNEaw8AmvwOkh+my613lkB1T3SLcRw7PjQExzPfjBH
-         Mgoqles+ltYhP9s/rIFlFp2F3Tlkqf3otI9yDe5v/1be5rw0Iuh0lk1FnR9dl7CmdomP
-         LvFPSS7+QdG04b0BLqBYomOz7ApoY2Xh6JcnaH8iFEj8PpVtizuc8k6/9dU43ikiKlOp
-         /FS0Y6RDYV7MF/KKeZaIoAcEzB3hsZrLO+rTJHfEWDwNyx6BYgDIdloQD/8O6UpVgklC
-         f4c3GXUzElCQHQ/1hwBzS2q5brpCQDUMXeSSNXoJK6w557RoOA5UWq1xV0eFu2Jy7clg
-         bYYg==
-X-Forwarded-Encrypted: i=1; AJvYcCU2oFFYgnoa1kAtp5gxE9UPJETxQP6tcwre9tfcbglF4nASSmMORCeIqDxK0CsU4w2MDMlSJNE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGv2TwBamhYsbI0xdkEUXNiRnKRxKjLpi7y5kJrd7TmIoGrzNu
-	It1c+T68E/g2p2MyCnudlUWRvI0bg73rMpC4Mu1sgoIlKlpa+CoSUHpzi2JfXULfiu8Kc06hQnr
-	VGXQa3oSRWle2bX6LozAUkNfj1VKGHKmaN4OEyGJ9
-X-Gm-Gg: ASbGnctL4zkBUDvNOxUbPr2MoXsl5P3iSp4zJKVQSBatiYoO9+v7XUYqJ/GDFk+jFkt
-	sv3TL/Z/jq1arfvJldjYa+RTcdOZS9EissGlW27lv28i846p58b5ydrVeVpoqFnb8BP/0nRqcAi
-	XFgMB+WmRiKdBeqhzOLVQ2S9CUc+m6ZTR8EZSQN2LbVnxsfM6S9OChHSA3HwPl3J9JhgqLyLe9t
-	eWhtdmU6iMgAV9or+PKTWVydyiC36WUizQ=
-X-Google-Smtp-Source: AGHT+IE2YCP3qtGwbWMMf4nA+VHzKJt73OAglarAy2N4KkRi0JUERUKf9Ryw1zRIfRne1bwjjAb8n8O/WhX1Et2H5P0=
-X-Received: by 2002:ac2:4bd3:0:b0:553:543d:d963 with SMTP id
- 2adb3069b0e04-55a3188f091mr482109e87.36.1752827491972; Fri, 18 Jul 2025
- 01:31:31 -0700 (PDT)
+        bh=ClO7vf6ZBePINFWsPRFr/+WGIgiWW+sfd60JVlzDBe8=;
+        b=qaRSEEE6ArssEqxuH9+n0TUF7XeGH2Zq/hIQqCsAZPtNqgWR40OZuh0H8+MqJNGUjY
+         j/qk/+u6eUj1xAbGoREyc/OPw7tuDuqjLKsYgM8215achQGgQmDowKErzTGcxBNSEPvo
+         h8EBhTnZuryfbaiL6+EzoyY759UPfz38+TzOFkoh7L7JDmP/k8s5MpZ/d9gfSj22yatl
+         yE17yVDxG5jK6ja19AyEnHvpe2X0M6Rr5CEeB3XM98IZTIs3MPzf2TgJWG1MeUAeEK4W
+         1I1RKkz96tSozX1UVk275xBVs634BPeIUKeV2HgUa3+ofBXR07DrGcRxmWL1YaxDq79p
+         G+1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCW1MTVn3AKB1lwumejT1cYb/n1KEscsqg470sVawrs1SNbqZwVbSW1PtX/mt0ffmSilxdDxqX4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/dBLWu9YU9rZeBlz/AqC+NW3mOFXJ1e6GW8745rPvkXVBKkTb
+	1HzIevj0nOLXg7lRxTcIn+2CHFKArkS+zQ9c6QzABfo7ib51egy2sioMpxrf5TEqwkgEpKND3jO
+	M3+gg2zeBqkuNMn4vPrUOfdZnMF4I+vpJ13Xp2hmtEaDqGQjvzCQXQzWLdvJ7///z4yi9qBZfLJ
+	2wkRjbERmI5KC3eFupSqE67ZOWq7rVPgMe
+X-Gm-Gg: ASbGncs48685eiKqKl2InTYZONyldVVQCRBdglZ9j5xJJMsKpPEMRzMDHNSWRJSJTcj
+	QsRYL1NYL3GogyVx+tOGCbdCtVi6Drf7xAtUgpCpykamXFxK886JHu5/y06Z2TVktpxoLT/j74H
+	OvEkQb3HxMN/OD8DKap30/fQ==
+X-Received: by 2002:a17:907:da4:b0:aec:5a33:1573 with SMTP id a640c23a62f3a-aec5a3354femr462487566b.41.1752827549542;
+        Fri, 18 Jul 2025 01:32:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEZRbZf1CSxDdcr2KaS1fw9e3BgI0jPEf8QS4qDJaocQ3CHMAkyjsYYe2SLqnUm1+1w/XSVLxztz/eFpNmyZDs=
+X-Received: by 2002:a17:907:da4:b0:aec:5a33:1573 with SMTP id
+ a640c23a62f3a-aec5a3354femr462485166b.41.1752827549130; Fri, 18 Jul 2025
+ 01:32:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250624143220.244549-1-laura.nao@collabora.com>
- <20250624143220.244549-15-laura.nao@collabora.com> <CAGXv+5EsVOPC+i2=9d-Be1U-DuB8tPDAyokzhTOeVZQtZJ9+CQ@mail.gmail.com>
-In-Reply-To: <CAGXv+5EsVOPC+i2=9d-Be1U-DuB8tPDAyokzhTOeVZQtZJ9+CQ@mail.gmail.com>
-From: Chen-Yu Tsai <wenst@chromium.org>
-Date: Fri, 18 Jul 2025 16:31:18 +0800
-X-Gm-Features: Ac12FXy4SClgcQRcJIHHX9Uew0lkKbfgQ80ydRk_k7muDqm79-Y_wxCCK4MPdyc
-Message-ID: <CAGXv+5ErtDLNf3u5OdHrEBdrA-2bPA5wy32S+Bqd1c_1Z9u1pA@mail.gmail.com>
-Subject: Re: [PATCH v2 14/29] clk: mediatek: Add MT8196 vlpckgen clock support
-To: Laura Nao <laura.nao@collabora.com>
-Cc: mturquette@baylibre.com, sboyd@kernel.org, robh@kernel.org, 
-	krzk+dt@kernel.org, conor+dt@kernel.org, matthias.bgg@gmail.com, 
-	angelogioacchino.delregno@collabora.com, p.zabel@pengutronix.de, 
-	richardcochran@gmail.com, guangjie.song@mediatek.com, 
-	linux-clk@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
-	kernel@collabora.com
+References: <20250716162243.1401676-1-kniv@yandex-team.ru>
+In-Reply-To: <20250716162243.1401676-1-kniv@yandex-team.ru>
+From: Lei Yang <leiyang@redhat.com>
+Date: Fri, 18 Jul 2025 16:31:52 +0800
+X-Gm-Features: Ac12FXz3P7sVlSAVAM9be3FkuV1rX0FLSe-KqiVKeDU_xg3yE_St4sNLJJ0dYVg
+Message-ID: <CAPpAL=xE4ZCyAhc+fkZwREo-cDHS4CG4fq4+sebazJgRzZoDHg@mail.gmail.com>
+Subject: Re: [PATCH] vhost/net: Replace wait_queue with completion in ubufs reference
+To: Nikolay Kuratov <kniv@yandex-team.ru>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	virtualization@lists.linux.dev, kvm@vger.kernel.org, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, stable@vger.kernel.org, 
+	Andrey Ryabinin <arbn@yandex-team.com>, Andrey Smetanin <asmetanin@yandex-team.ru>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 15, 2025 at 3:28=E2=80=AFPM Chen-Yu Tsai <wenst@chromium.org> w=
-rote:
->
-> Hi,
->
->
-> On Tue, Jun 24, 2025 at 10:33=E2=80=AFPM Laura Nao <laura.nao@collabora.c=
-om> wrote:
-> >
-> > Add support for the MT8196 vlpckgen clock controller, which provides
-> > muxes and dividers for clock selection in other IP blocks.
-> >
-> > Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@coll=
-abora.com>
-> > Signed-off-by: Laura Nao <laura.nao@collabora.com>
-> > ---
-> >  drivers/clk/mediatek/Makefile              |   2 +-
-> >  drivers/clk/mediatek/clk-mt8196-vlpckgen.c | 769 +++++++++++++++++++++
-> >  2 files changed, 770 insertions(+), 1 deletion(-)
-> >  create mode 100644 drivers/clk/mediatek/clk-mt8196-vlpckgen.c
-> >
-> > diff --git a/drivers/clk/mediatek/Makefile b/drivers/clk/mediatek/Makef=
-ile
-> > index 0688d7bf4979..24683dd51783 100644
-> > --- a/drivers/clk/mediatek/Makefile
-> > +++ b/drivers/clk/mediatek/Makefile
-> > @@ -161,7 +161,7 @@ obj-$(CONFIG_COMMON_CLK_MT8195_VENCSYS) +=3D clk-mt=
-8195-venc.o
-> >  obj-$(CONFIG_COMMON_CLK_MT8195_VPPSYS) +=3D clk-mt8195-vpp0.o clk-mt81=
-95-vpp1.o
-> >  obj-$(CONFIG_COMMON_CLK_MT8195_WPESYS) +=3D clk-mt8195-wpe.o
-> >  obj-$(CONFIG_COMMON_CLK_MT8196) +=3D clk-mt8196-apmixedsys.o clk-mt819=
-6-topckgen.o \
-> > -                                  clk-mt8196-topckgen2.o
-> > +                                  clk-mt8196-topckgen2.o clk-mt8196-vl=
-pckgen.o
-> >  obj-$(CONFIG_COMMON_CLK_MT8365) +=3D clk-mt8365-apmixedsys.o clk-mt836=
-5.o
-> >  obj-$(CONFIG_COMMON_CLK_MT8365_APU) +=3D clk-mt8365-apu.o
-> >  obj-$(CONFIG_COMMON_CLK_MT8365_CAM) +=3D clk-mt8365-cam.o
-> > diff --git a/drivers/clk/mediatek/clk-mt8196-vlpckgen.c b/drivers/clk/m=
-ediatek/clk-mt8196-vlpckgen.c
-> > new file mode 100644
-> > index 000000000000..23a673dd4c5c
-> > --- /dev/null
-> > +++ b/drivers/clk/mediatek/clk-mt8196-vlpckgen.c
-> > @@ -0,0 +1,769 @@
->
-> [...]
->
-> > +static const char * const vlp_camtg0_parents[] =3D {
-> > +       "clk26m",
-> > +       "univpll_192m_d32",
-> > +       "univpll_192m_d16",
-> > +       "clk13m",
-> > +       "osc_d40",
-> > +       "osc_d32",
-> > +       "univpll_192m_d10",
-> > +       "univpll_192m_d8",
-> > +       "univpll_d6_d16",
-> > +       "ulposc3",
-> > +       "osc_d20",
-> > +       "ck2_tvdpll1_d16",
-> > +       "univpll_d6_d8"
-> > +};
->
-> It seems all the vlp_camtg* parents are the same. Please merge them
-> and just have one list.
->
-> > +static const char * const vlp_sspm_26m_parents[] =3D {
-> > +       "clk26m",
-> > +       "osc_d20"
-> > +};
-> > +
-> > +static const char * const vlp_ulposc_sspm_parents[] =3D {
-> > +       "clk26m",
-> > +       "osc_d2",
-> > +       "mainpll_d4_d2"
-> > +};
-> > +
-> > +static const char * const vlp_vlp_pbus_26m_parents[] =3D {
-> > +       "clk26m",
-> > +       "osc_d20"
-> > +};
-> > +
-> > +static const char * const vlp_debug_err_flag_parents[] =3D {
-> > +       "clk26m",
-> > +       "osc_d20"
-> > +};
-> > +
-> > +static const char * const vlp_dpmsrdma_parents[] =3D {
-> > +       "clk26m",
-> > +       "mainpll_d7_d2"
-> > +};
-> > +
-> > +static const char * const vlp_vlp_pbus_156m_parents[] =3D {
-> > +       "clk26m",
-> > +       "osc_d2",
-> > +       "mainpll_d7_d2",
-> > +       "mainpll_d7"
-> > +};
-> > +
-> > +static const char * const vlp_spm_parents[] =3D {
-> > +       "clk26m",
-> > +       "mainpll_d7_d4"
-> > +};
-> > +
-> > +static const char * const vlp_mminfra_parents[] =3D {
-> > +       "clk26m",
-> > +       "osc_d4",
-> > +       "mainpll_d3"
-> > +};
-> > +
-> > +static const char * const vlp_usb_parents[] =3D {
-> > +       "clk26m",
-> > +       "mainpll_d9"
-> > +};
->
-> The previous and the next one are the same.
->
-> > +static const char * const vlp_usb_xhci_parents[] =3D {
-> > +       "clk26m",
-> > +       "mainpll_d9"
-> > +};
-> > +
-> > +static const char * const vlp_noc_vlp_parents[] =3D {
-> > +       "clk26m",
-> > +       "osc_d20",
-> > +       "mainpll_d9"
-> > +};
-> > +
-> > +static const char * const vlp_audio_h_parents[] =3D {
-> > +       "clk26m",
-> > +       "vlp_apll1",
-> > +       "vlp_apll2"
-> > +};
-> > +
-> > +static const char * const vlp_aud_engen1_parents[] =3D {
-> > +       "clk26m",
-> > +       "apll1_d8",
-> > +       "apll1_d4"
-> > +};
->
-> The previous and the next one are the same.
->
-> > +static const char * const vlp_aud_engen2_parents[] =3D {
-> > +       "clk26m",
-> > +       "apll2_d8",
-> > +       "apll2_d4"
-> > +};
-> > +
-> > +static const char * const vlp_aud_intbus_parents[] =3D {
-> > +       "clk26m",
-> > +       "mainpll_d7_d4",
-> > +       "mainpll_d4_d4"
-> > +};
+Tested this patch with virtio-net regression tests, everything works fine.
 
-Also, all these audio related clocks (audio_h, aud_engen1, aud_engen2
-aud_intbus) have a "vlp_clk26m" clock as their parent. It should be:
+Tested-by: Lei Yang <leiyang@redhat.com>
 
-  - clk26m (clk26m from the top ckgen domain)
-  - vlp_clk26m (clk26m from the VLP domain)
-  - (from PLLs)
-  - (from PLLs)
 
-Moreover, an offline discussion with the audio owner suggests that
-of the two 26 MHz clock parents, we really just want the one from
-the VLP domain, as that one is usable even under suspend. This
-could be done by providing an index table.
+On Thu, Jul 17, 2025 at 12:24=E2=80=AFAM Nikolay Kuratov <kniv@yandex-team.=
+ru> wrote:
+>
+> When operating on struct vhost_net_ubuf_ref, the following execution
+> sequence is theoretically possible:
+> CPU0 is finalizing DMA operation                   CPU1 is doing VHOST_NE=
+T_SET_BACKEND
+>                              // &ubufs->refcount =3D=3D 2
+> vhost_net_ubuf_put()                               vhost_net_ubuf_put_wai=
+t_and_free(oldubufs)
+>                                                      vhost_net_ubuf_put_a=
+nd_wait()
+>                                                        vhost_net_ubuf_put=
+()
+>                                                          int r =3D atomic=
+_sub_return(1, &ubufs->refcount);
+>                                                          // r =3D 1
+> int r =3D atomic_sub_return(1, &ubufs->refcount);
+> // r =3D 0
+>                                                       wait_event(ubufs->w=
+ait, !atomic_read(&ubufs->refcount));
+>                                                       // no wait occurs h=
+ere because condition is already true
+>                                                     kfree(ubufs);
+> if (unlikely(!r))
+>   wake_up(&ubufs->wait);  // use-after-free
+>
+> This leads to use-after-free on ubufs access. This happens because CPU1
+> skips waiting for wake_up() when refcount is already zero.
+>
+> To prevent that use a completion instead of wait_queue as the ubufs
+> notification mechanism. wait_for_completion() guarantees that there will
+> be complete() call prior to its return.
+>
+> We also need to reinit completion because refcnt =3D=3D 0 does not mean
+> freeing in case of vhost_net_flush() - it then sets refcnt back to 1.
+> AFAIK concurrent calls to vhost_net_ubuf_put_and_wait() with the same
+> ubufs object aren't possible since those calls (through vhost_net_flush()
+> or vhost_net_set_backend()) are protected by the device mutex.
+> So reinit_completion() right after wait_for_completion() should be fine.
+>
+> Cc: stable@vger.kernel.org
+> Fixes: 0ad8b480d6ee9 ("vhost: fix ref cnt checking deadlock")
+> Reported-by: Andrey Ryabinin <arbn@yandex-team.com>
+> Suggested-by: Andrey Smetanin <asmetanin@yandex-team.ru>
+> Signed-off-by: Nikolay Kuratov <kniv@yandex-team.ru>
+> ---
+>  drivers/vhost/net.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index 7cbfc7d718b3..454d179fffeb 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -94,7 +94,7 @@ struct vhost_net_ubuf_ref {
+>          * >1: outstanding ubufs
+>          */
+>         atomic_t refcount;
+> -       wait_queue_head_t wait;
+> +       struct completion wait;
+>         struct vhost_virtqueue *vq;
+>  };
+>
+> @@ -240,7 +240,7 @@ vhost_net_ubuf_alloc(struct vhost_virtqueue *vq, bool=
+ zcopy)
+>         if (!ubufs)
+>                 return ERR_PTR(-ENOMEM);
+>         atomic_set(&ubufs->refcount, 1);
+> -       init_waitqueue_head(&ubufs->wait);
+> +       init_completion(&ubufs->wait);
+>         ubufs->vq =3D vq;
+>         return ubufs;
+>  }
+> @@ -249,14 +249,15 @@ static int vhost_net_ubuf_put(struct vhost_net_ubuf=
+_ref *ubufs)
+>  {
+>         int r =3D atomic_sub_return(1, &ubufs->refcount);
+>         if (unlikely(!r))
+> -               wake_up(&ubufs->wait);
+> +               complete_all(&ubufs->wait);
+>         return r;
+>  }
+>
+>  static void vhost_net_ubuf_put_and_wait(struct vhost_net_ubuf_ref *ubufs=
+)
+>  {
+>         vhost_net_ubuf_put(ubufs);
+> -       wait_event(ubufs->wait, !atomic_read(&ubufs->refcount));
+> +       wait_for_completion(&ubufs->wait);
+> +       reinit_completion(&ubufs->wait);
+>  }
+>
+>  static void vhost_net_ubuf_put_wait_and_free(struct vhost_net_ubuf_ref *=
+ubufs)
+> --
+> 2.34.1
+>
+>
 
-ChenYu
-
-> > +
-> > +static const char * const vlp_spvlp_26m
->
-> [...]
->
-> > +static int clk_mt8196_vlp_probe(struct platform_device *pdev)
-> > +{
-> > +       struct clk_hw_onecell_data *clk_data;
-> > +       int r;
-> > +       struct device_node *node =3D pdev->dev.of_node;
-> > +
-> > +       clk_data =3D mtk_alloc_clk_data(ARRAY_SIZE(vlp_muxes) +
-> > +                                     ARRAY_SIZE(vlp_plls));
-> > +       if (!clk_data)
-> > +               return -ENOMEM;
-> > +
-> > +       r =3D mtk_clk_register_muxes(&pdev->dev, vlp_muxes, ARRAY_SIZE(=
-vlp_muxes),
-> > +                                  node, &mt8196_clk_vlp_lock, clk_data=
-);
-> > +       if (r)
-> > +               goto free_clk_data;
-> > +
-> > +       r =3D mtk_clk_register_plls(node, vlp_plls, ARRAY_SIZE(vlp_plls=
-),
-> > +                                 clk_data);
-> > +       if (r)
-> > +               goto unregister_muxes;
-> > +
-> > +       r =3D of_clk_add_hw_provider(node, of_clk_hw_onecell_get, clk_d=
-ata);
-> > +       if (r)
-> > +               goto unregister_plls;
-> > +
-> > +       platform_set_drvdata(pdev, clk_data);
-> > +
-> > +       return r;
-> > +
-> > +unregister_plls:
-> > +       mtk_clk_unregister_plls(vlp_plls, ARRAY_SIZE(vlp_plls), clk_dat=
-a);
-> > +unregister_muxes:
-> > +       mtk_clk_unregister_muxes(vlp_muxes, ARRAY_SIZE(vlp_muxes), clk_=
-data);
-> > +free_clk_data:
-> > +       mtk_free_clk_data(clk_data);
->
-> The AFE driver sets some tuner parameters in the VLPCKGEN block at probe
-> time. Maybe we could do that here instead?
->
-> /* vlp_cksys_clk: 0x1c016000 */
-> #define VLP_APLL1_TUNER_CON0 0x02a4
-> #define VLP_APLL2_TUNER_CON0 0x02a8
->
-> /* vlp apll1 tuner default value*/
-> #define VLP_APLL1_TUNER_CON0_VALUE 0x6f28bd4d
-> /* vlp apll2 tuner default value + 1*/
-> #define VLP_APLL2_TUNER_CON0_VALUE 0x78fd5265
->
->        regmap_write(afe_priv->vlp_ck, VLP_APLL1_TUNER_CON0,
-> VLP_APLL1_TUNER_CON0_VALUE);
->        regmap_write(afe_priv->vlp_ck, VLP_APLL2_TUNER_CON0,
-> VLP_APLL2_TUNER_CON0_VALUE);
->
-> ChenYu
->
-> > +
-> > +       return r;
-> > +}
-> > +
-> > +static void clk_mt8196_vlp_remove(struct platform_device *pdev)
-> > +{
-> > +       struct clk_hw_onecell_data *clk_data =3D platform_get_drvdata(p=
-dev);
-> > +       struct device_node *node =3D pdev->dev.of_node;
-> > +
-> > +       of_clk_del_provider(node);
-> > +       mtk_clk_unregister_plls(vlp_plls, ARRAY_SIZE(vlp_plls), clk_dat=
-a);
-> > +       mtk_clk_unregister_muxes(vlp_muxes, ARRAY_SIZE(vlp_muxes), clk_=
-data);
-> > +       mtk_free_clk_data(clk_data);
-> > +}
-> > +
-> > +static const struct of_device_id of_match_clk_mt8196_vlp_ck[] =3D {
-> > +       { .compatible =3D "mediatek,mt8196-vlpckgen" },
-> > +       { /* sentinel */ }
-> > +};
-> > +MODULE_DEVICE_TABLE(of, of_match_clk_mt8196_vlp_ck);
-> > +
-> > +static struct platform_driver clk_mt8196_vlp_drv =3D {
-> > +       .probe =3D clk_mt8196_vlp_probe,
-> > +       .remove =3D clk_mt8196_vlp_remove,
-> > +       .driver =3D {
-> > +               .name =3D "clk-mt8196-vlpck",
-> > +               .of_match_table =3D of_match_clk_mt8196_vlp_ck,
-> > +       },
-> > +};
-> > +
-> > +MODULE_DESCRIPTION("MediaTek MT8196 VLP clock generator driver");
-> > +module_platform_driver(clk_mt8196_vlp_drv);
-> > +MODULE_LICENSE("GPL");
-> > --
-> > 2.39.5
-> >
 
