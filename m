@@ -1,101 +1,233 @@
-Return-Path: <netdev+bounces-208195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82123B0A823
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 18:11:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECFEEB0A8D7
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 18:47:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B74A1C8139F
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 16:11:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C67E51885297
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 16:47:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADAA22E6125;
-	Fri, 18 Jul 2025 16:11:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DF9B2E888F;
+	Fri, 18 Jul 2025 16:44:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Sc+0nxXh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Lpt1ptDj"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0CA22E611F;
-	Fri, 18 Jul 2025 16:11:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752855072; cv=none; b=dj+F1hJZjOoCpDfPGyYTXyeZYX0+6GEk/JBzLBH/m3RSLovSBIjKQk6imQYESn3DgndnbvXS0oPjoba2cmPs0f21WB1THAyTi4KKCgKKktf3HdwNxhFJbXrOcC4LfUgyiQP8/8ExQjTAxo2YJKt/nJvl0PLF7FZuFofcUnxHfd0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752855072; c=relaxed/simple;
-	bh=edJ75qXqFBPiDqu0QUODDa038aOzTIs/JrrivMJk9pI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iXsAq7N2P6/HzThhY9H2CjJQZ7XRcqJNtg0HnCLcjFVP7OZ+h1IsUs5b0RG6JqQYF5+IAxm82G+nVO0lznvtg2k/ZcFxT0BReqaKnsi5ab3ptij7WEJtHCQlQi0FmMSFZ+jQID66PD2llbakpEdk/gU1isuEyaq/ValuzGwekNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Sc+0nxXh; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=vG3+MphUuzezupsm99ahKL4+T2QuOqPKBUk1bgYCYSQ=; b=Sc+0nxXht8ryQHTDlNkhAhh55T
-	oSktqoiMD7Gt563xejGhByb396WyFQ550CVuiwbcgMopNU9DBry/bQuwsSbNb/U3i9ckXk63IFB3v
-	wF1CdpMNgd8ocKZ9bUPM7MQByEwUB3spy52BVgWXZ0ntPTJOP3dP+gx7dgtoEfBD63pCCglKeHOub
-	plCA01MX2bRgfJbLc/2kXlu3su/Oepirh4KGel2PzFEcapN7HMIloocg0kekKD2Fwvz0rr4ufZpUD
-	2W+k4JhyoCD7fie797vxUbFC4R+q0pOe4klxcJXJZOIKA1t1gMZFoY0GC25IHjorUXkCd0cAD8u3v
-	ZJO4Cyug==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59924)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1ucnfl-0003B0-1w;
-	Fri, 18 Jul 2025 17:10:57 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1ucnfi-0003JC-2w;
-	Fri, 18 Jul 2025 17:10:54 +0100
-Date: Fri, 18 Jul 2025 17:10:54 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Abid Ali <dev.nuvorolabs@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: phy: Fix premature resume by a PHY driver
-Message-ID: <aHpyDpI9PW8wPf6I@shell.armlinux.org.uk>
-References: <20250718-phy_resume-v1-1-9c6b59580bee@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DEE82E8884;
+	Fri, 18 Jul 2025 16:44:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752857073; cv=fail; b=dpj5OoGNFQZgz8WrbiHyr96xgVxwBowdKGZnEIrucV2CTQ7y9W5RIggdD1dYy7OJpo+XCeaEAaIgeWNTFirTHc10meu32iOllPBqqDOHF4i4Xa7AMAKnti9yJGgA5SqOiMg7abVX+t73IS9VZ9ooFpUQO7Vz6q1G+MSZ2M4L97M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752857073; c=relaxed/simple;
+	bh=nP4I8Gf8VanTRwC1n59qMyz+gOB4ILXqu7rbvzOVRAs=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=I86dFw3nJnNRenNsuVWj8HCkAQMNuUaOt5mXZXOl+bdmJqVuK/5S1+cfxRGP4fR7VXKD7yPo0AM/hLn7QOkRtLq1WvNrhvvUJfq6tw9RA4hXfVFElR1Awb8D8Tn7qmkai3v6FRDQoCbD1iiR9nhH0nG2mTUqwck7hYREin8ZVSw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Lpt1ptDj; arc=fail smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752857072; x=1784393072;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=nP4I8Gf8VanTRwC1n59qMyz+gOB4ILXqu7rbvzOVRAs=;
+  b=Lpt1ptDjguOxVtpOSDjM8Xe1LI9kIPcQrVbk7Io9rg8xsS6wAxAiAe1i
+   oP1fyh9v8GvpHq8shmmjg1TLp0Yr38zUDrDllYAestyntYcHRBMHvqfRD
+   HYKfkgnac/CwEoUSSLQ08OrtveiLRmLrH/R0C/XQ52h5xznMMf9t9M5Lh
+   AI8mGyjbUC/3uno9fHxfbIDgXN/Op9Hua8u9Nh6/SaXsnfSa7QiGHYkts
+   hJ5uRfHrgI+MXANrnt+f/Lo/LFh+og1yMjFM5h4m9A4ZDLFg5etfAKEPO
+   DKd191+bZiwFKmXxyULsl4S7GU/1kGk1JZzRTyKJNvLdjAaidJHJAInne
+   w==;
+X-CSE-ConnectionGUID: fB3j0h/qSoWnBDoB6/zFbA==
+X-CSE-MsgGUID: 2uxRT+OHQdWGQAfrvvgllw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11496"; a="54257009"
+X-IronPort-AV: E=Sophos;i="6.16,322,1744095600"; 
+   d="scan'208";a="54257009"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2025 09:44:31 -0700
+X-CSE-ConnectionGUID: Rm5tAIuaSmmCLQoviCguNg==
+X-CSE-MsgGUID: nR16s0TGTi24KZgbsBCVaQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,322,1744095600"; 
+   d="scan'208";a="162414201"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2025 09:44:30 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Fri, 18 Jul 2025 09:44:29 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26 via Frontend Transport; Fri, 18 Jul 2025 09:44:29 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (40.107.237.68)
+ by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Fri, 18 Jul 2025 09:44:28 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=g5pr+iN0k5EuPDJGWfcVA/1UfqlyJc566r+W00ZTfV2Ns/39kMfxfHzqhAeD7xxcbG2QawzUMVKX8bGvC813Jp3vOFhBHGrK6aDKJx9QIyp+cFzlsfqNm1vb5STAELMcD5/o4Xxlq69iqi8ZbesghJ7hIyDBVHTHE9eQaceYXF/CoLYISMBmgJPAosEpbnrMurCMXJJd6JUGcpldPgUU6pbZ5UKEW0d+08HB7YnxcsjGlV9w/k8Cpq6atRm81+5+dmsb1dYy34iETpsVMMUtAnWPmjsuO8RuS0noTEA2AhkFXDW4I9cmj0XywFMN++a0PkMzqTNexBP1V93ztQvX4g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nP4I8Gf8VanTRwC1n59qMyz+gOB4ILXqu7rbvzOVRAs=;
+ b=RKhhv6wvPL/EtKD81rp5OeUe+ma10y/X/sgFgPs5PFTzQoMld9Pe/HPvOa+bveI+T8dLK+QqcrtVe3BY7OamYCc1RPEWS+dBnN3YZvohQ9bfINaOGbl4H4gt5oXZs2cEgeru/kMLMgoxN6EXwK4UGh5Wk0qPoIS6RrnZpXkXPM9pmyhv176VwABLbtUm7TQJQzwzJPgIziYQW9M8QhHU/89EQgolInAtHO88ce2rLXh+4z4mlvl8femz+sfIXM44IPiX6+aE0suWBhIZEVKTPD8yUcY/8h3NrwIjY0ArEfakV2oEGq5W8QX26QUEt9vlIvHOeasrxbQ+prCcH6DzSw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
+ by LV3PR11MB8458.namprd11.prod.outlook.com (2603:10b6:408:1bb::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.39; Fri, 18 Jul
+ 2025 16:44:25 +0000
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::7ac8:884c:5d56:9919]) by IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::7ac8:884c:5d56:9919%6]) with mapi id 15.20.8901.024; Fri, 18 Jul 2025
+ 16:44:25 +0000
+From: "Rinitha, SX" <sx.rinitha@intel.com>
+To: Haoxiang Li <haoxiang_li2024@163.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>, Michal Swiatkowski
+	<michal.swiatkowski@linux.intel.com>, "Loktionov, Aleksandr"
+	<aleksandr.loktionov@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH v2] ice: Fix a null pointer dereference
+ in ice_copy_and_init_pkg()
+Thread-Topic: [Intel-wired-lan] [PATCH v2] ice: Fix a null pointer dereference
+ in ice_copy_and_init_pkg()
+Thread-Index: AQHb7Abn4rGYmj9eY0SOQZPbECypmrQy0OlQ
+Date: Fri, 18 Jul 2025 16:44:25 +0000
+Message-ID: <IA1PR11MB6241087232621133ECB816E48B50A@IA1PR11MB6241.namprd11.prod.outlook.com>
+References: <20250703095232.2539006-1-haoxiang_li2024@163.com>
+In-Reply-To: <20250703095232.2539006-1-haoxiang_li2024@163.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|LV3PR11MB8458:EE_
+x-ms-office365-filtering-correlation-id: ec5f963f-ab80-4eae-cb11-08ddc61a5b12
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014|38070700018|921020;
+x-microsoft-antispam-message-info: =?us-ascii?Q?5WLWWsOSNdJr+SIZMkLtuXYm/nptvMtpaSb3NQcd1rEe69orOG0sjvrXWaBy?=
+ =?us-ascii?Q?oHykNcq+3HRG+/SbW5GcKz+82O4tM1A+yZmNKt8ZMk0tRXSy8+57SZ+N0+UI?=
+ =?us-ascii?Q?2vV5W1vz/xbKdoXVsG+p+Vg+ayr034Jb94BHZMbarPuBZxbw4c/GGFeUz3dF?=
+ =?us-ascii?Q?bcEhcJHPJlhG6tu2LnYgjqmteD15Moi7A628xmf3lK3wOCP4DtaCuMFWTiaw?=
+ =?us-ascii?Q?NzbxdBjB09VKxt42kPdADJrxxFiCu+5sSGfc/DLYjmREAUgtvEaxeIqH7ohX?=
+ =?us-ascii?Q?5aTh2lDTswPpaqWWdk6cV+b//RijmYqETuDQkIVuSlUslquUyDOqIDfoT55j?=
+ =?us-ascii?Q?tZuB3UF3U6izUqGdBVAJ+FpwqZsQmoc8d32VBZRFWwC3kSazlvxOHyUMeeuY?=
+ =?us-ascii?Q?tOkWi1u4yisJLEPrfOL2kVjJbs2Dv/abHzB4/wUhCXq+nOXZibSHTY/1upVX?=
+ =?us-ascii?Q?22NiTOzcbGmSNoh4KiHXnyczJ28fbd0ReK97xZWb6MbBabh4svtofMNgMRUv?=
+ =?us-ascii?Q?K15gM2QBAkYwT0MdQCOXwotsqZlc6a0Znw7EaPEEbGfPyeWyLGYyJwo01lsQ?=
+ =?us-ascii?Q?uyczMNRClsOBtWbCG3CyhE/6WuP6+wxEX19lvFVyuQTSd1d5viC+MWQzNAWV?=
+ =?us-ascii?Q?lKVEBo14+okJkYEr77eG1fXoJV34oFi5nWyRShrQWcjB6AC8p7hlqfUmMzq+?=
+ =?us-ascii?Q?wkBK73cq5StewTjuTgwoLm3/rL0F7Pp/R/Dqhru/fRiT4NVziZxjE5RsjtzA?=
+ =?us-ascii?Q?CieEaYp/gIIyeuJlXDBZLLE3G3v3aVaRAKyfuyqPeKUiZx8rx7cViTegeOT5?=
+ =?us-ascii?Q?b0QeApjv+iFZSRjpvs9F7m+DdO6cv3KU6kEObfcKflY1wWNEv2hRNd2IkUab?=
+ =?us-ascii?Q?XCh9sL8XjlBrMk0TDKd69bKkg8cfiGFDtb/MDA8EFCLWy+giF+sscxcO2uR7?=
+ =?us-ascii?Q?QOs6yywWVYsAi1/GTR8Z7EyG+6DlvnqwIkfoJ978A2xxrz/fm3uPuy//geIT?=
+ =?us-ascii?Q?y+sHdYKc0ohHz6B1xK2GPMDVxeZmXC/hDIMnvqr+LMdo5+BNf96cwkLHwxoF?=
+ =?us-ascii?Q?rNMeMQU0HAImyTambUQgmUJz1z1KsrrvVA5epXvLbjqZk21GFDL9vImMAkyZ?=
+ =?us-ascii?Q?LzMCjbpuvsGcXrM7G2FFpn05NXfV+yzs9u6M38MWrDJKjjhP2aO7xO9jLjpG?=
+ =?us-ascii?Q?i51RefPIMLY8XjTQ+apjhzHBtt2M9TwbsRuuyrx4+FYeERcWL1dDfAswewS5?=
+ =?us-ascii?Q?BqsL6HVlzJj3/Cg4Re1gWNUSYBY6+efDt1aoXjHunKCujrols5IE7HtRCiA1?=
+ =?us-ascii?Q?Hrmv5CkPC5aOCHgOYwbI0+T1OfZs/wxk5i2lct4sZ5i9RbETufvFn8cyxjjG?=
+ =?us-ascii?Q?6vbNU/buFxOgDS27UoTE0O3DXKa0rYp8u0fqybaMxj7azi9tifshhinsI3wh?=
+ =?us-ascii?Q?n8BrWC9ScTa0QAJcTXlZ6sNLxawQ1hFu4FulnJoOKTjl9lMyo1I63Bw/bWA4?=
+ =?us-ascii?Q?q/woWjeMVU1jvbk=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(38070700018)(921020);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?aJCfdgaft0FelkjI/7YzkIcStVweX3MrAV1jXuYPZahIOEVwVZcriaVeECHX?=
+ =?us-ascii?Q?T33HuPigOiF/1EUa0lUA9Xoo0NF/b3IgkB4nkhP+BlXNjecRA+6pLsgZRiuF?=
+ =?us-ascii?Q?U8ti+bN6WtnuJOvGv9GEFLEJtD0sa5BXVK5ScslLlXoRFfoKcJsahVSb7vUm?=
+ =?us-ascii?Q?0XltDRyj36FvBBekTaErn28XpC8v4oI1ptxaiP3yUwDVpAOaXzww26gTWb0i?=
+ =?us-ascii?Q?ZQnwN5ZpflTeOXJM2TOk4RpwNRbZESMJXm8XiYmuTLO2/QmVPE3cml6j3ESM?=
+ =?us-ascii?Q?IRPURua/Cpi3aSgvQHY1zG5eRKfd6U92kknG/Rqr2G622FURbr+AnlB5S/oc?=
+ =?us-ascii?Q?RXe4tIbPZ3hWgKoivnqVWcpBT8BAd0qVd02ntJVfJczrFoYsfDB/+Q7ie6JC?=
+ =?us-ascii?Q?13XwInK72OrdetwZ9tCZdX1gcsu9hhSjxclCCHgKTx8nFp4OITE/GjQHbXGW?=
+ =?us-ascii?Q?8hUsLNZID+4v/OW8MXnL8clgD5w0D3DRTfMUBxUbNwtYNG6z1ePjcQR0nRTS?=
+ =?us-ascii?Q?6oAjeFu0iv4wObSyeNpWFTXJQYzuh1wr9ZgC8eo9UmEcDeexLqmEWYkcc8YK?=
+ =?us-ascii?Q?Si43EEsU8LRiPg3zQ6HHW+JbUp8VxYtQPjenGgZv7yN5V0YwYbrHEpkgLxUm?=
+ =?us-ascii?Q?eitZL9YkplcrT/jx2GPxsDZQbI7KpC3hSlZ1EX5ml4W8DtyL99vu4hMTKrOZ?=
+ =?us-ascii?Q?XSrEj1AcP05EJDdE5J9AEJ6szRS7EH9i3FbzWv6x67rEQ1gxa+LE02JycEub?=
+ =?us-ascii?Q?IwLytWlmEjG1RFmy8NWHTTSLXVn62jhpWs9lZLtBecKqQE2W89D3HOLpYCHP?=
+ =?us-ascii?Q?UOjKA6Nd05YtndtL3R5sk0yDnXzSkCjIOkVesMnUeiONZQmGdqxpcY7P1pBO?=
+ =?us-ascii?Q?/Kpaa0Jgi58n3Ac+Y6U87Cafgy3BjrfezCPmZQ5c6IFJ8yV6gyu6TMNkUMYF?=
+ =?us-ascii?Q?dswijgE9mgFu+H3HiAztWye77v7nIm7RHsPfUHj8/oxRT5Wq44EKqh75idgL?=
+ =?us-ascii?Q?DS3gSdNvvTAK2Cee4zh/ANeLeQF0nEPX81BbsvAbwQVtdovr4jNWmwX9aP/x?=
+ =?us-ascii?Q?6VcUr10pF3Vo44mWgjw2s4KYXPSPUy0oAe1TgPd245p7EQDYSOCbUBFXufQ+?=
+ =?us-ascii?Q?JzzPeflkv2w99kdYz0Gu35P+EAIKDlZkUSWAhs85oJJMZsT3Fcy7028I7hOK?=
+ =?us-ascii?Q?TjMtIKiLhCQ2kefm93cNSCxth2Mdwyl1D+6V4JHYi4EBe5nV6vZmeoXSrGcm?=
+ =?us-ascii?Q?alfgHmpcC2v8fXvxIbMIpAOjxZwgSRkcIkcTWC+s3tmyXM+dQNOM3LIJR9dN?=
+ =?us-ascii?Q?TT9MyqLTIz+ZFHkx3UTjDpf1X6mHCs2jF1FhLzl77qtorN0a/MF6wZk0qnwK?=
+ =?us-ascii?Q?YpjOuyxjaVE0oqqlZgyhQF/JSKetOUYl8O9vkXbm5h+fQLHjYk/ZTEL91efi?=
+ =?us-ascii?Q?1A7pFNUs8KsEKWKX8HATudnE4jvYwiLsN73u2PJWoSasZIZXZljWj6MKjXEN?=
+ =?us-ascii?Q?P9BLNiBfpHI2Msj9e393XyQAsuITmWVJ98+BedkDdrx4VAG2CG4b6NtnDK6c?=
+ =?us-ascii?Q?hzVM1Kq0G7EUL7w4AKnQFHtuKZ6r8/2q2Eofz25h?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250718-phy_resume-v1-1-9c6b59580bee@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ec5f963f-ab80-4eae-cb11-08ddc61a5b12
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jul 2025 16:44:25.5578
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: aGcsnBond/JtKhY9QsFOfKzkhDLbmWW63WLUiRHE3PCmUpRNaH9lrqH8QFo+rSvyLBGTvPtjVb3md6T7cSjM+w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8458
+X-OriginatorOrg: intel.com
 
-On Fri, Jul 18, 2025 at 03:42:22PM +0000, Abid Ali wrote:
-> There are possibilities for phy_resume to be executed when the ethernet
-> interface is initially taken UP after bootup. This is harmless in most
-> cases, but the respective PHY driver`s resume callback cannot have any
-> logic that should only be executed if it was previously suspended.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of H=
+aoxiang Li
+> Sent: 03 July 2025 15:23
+> To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw <=
+przemyslaw.kitszel@intel.com>; andrew+netdev@lunn.ch; davem@davemloft.net; =
+edumazet@google.com; kuba@kernel.org; pabeni@redhat.com
+> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; linux-kerne=
+l@vger.kernel.org; Haoxiang Li <haoxiang_li2024@163.com>; stable@vger.kerne=
+l.org; Michal Swiatkowski <michal.swiatkowski@linux.intel.com>; Loktionov, =
+Aleksandr <aleksandr.loktionov@intel.com>
+> Subject: [Intel-wired-lan] [PATCH v2] ice: Fix a null pointer dereference=
+ in ice_copy_and_init_pkg()
+>
+> Add check for the return value of devm_kmemdup() to prevent potential nul=
+l pointer dereference.
+>
+> Fixes: c76488109616 ("ice: Implement Dynamic Device Personalization (DDP)=
+ download")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
+> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> ---
+> Changes in v2:
+> - modify the Fixes commit number. Thanks, Michal!
+> ---
+> drivers/net/ethernet/intel/ice/ice_ddp.c | 2 ++
+> 1 file changed, 2 insertions(+)
+>
 
-Sorry but no. The PHY will be "resumed" from boot, even if it wasn't
-"suspended". So the idea that resume should only be called if it was
-previously suspended is incorrect.
-
-E.g. .ndo_open -> ... -> phy_attach_direct() -> phy_resume() ->
-	phydrv->resume()
-
-During this path, the PHY may or may not be suspended, depending on
-the state of the hardware when control was passed to the kernel,
-which includes kexec().
-
-PHY drivers must cope with an already functional PHY when their
-resume() method is called.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 
