@@ -1,96 +1,80 @@
-Return-Path: <netdev+bounces-208183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AED45B0A647
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 16:24:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 682F8B0A657
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 16:27:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7DC1168FD9
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 14:23:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF01818841C3
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 14:24:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C412DAFC1;
-	Fri, 18 Jul 2025 14:21:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91F6D2DAFCC;
+	Fri, 18 Jul 2025 14:24:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R5JKeeZX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NViRITx6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C0C189905;
-	Fri, 18 Jul 2025 14:21:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D0E02D94B3
+	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 14:24:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752848501; cv=none; b=JhU1r0sGBNJPRTxHlz3gaxsurr03C4lvrmgl6fd2bTFub5rGIrAX9dpxNUjE2nfYozq0rYUnGfvFc/2ryOZSG1bjoZnQta8JGe7Nt5rdv8NWgDasiV4KcsgyStizc9b4cLlZpMJpuMh0fVZuozHE3Vu2agiiiYwVU3FmkWxNXl4=
+	t=1752848646; cv=none; b=h+jbpffCR/vCYtan+Y2jPDZCoKFBABA81nlG2XdCVmf5C7HiesfDsh1ahe7Mj4BKNAx1PjxsuwSF5fnSIlKwGjAjzZZiQCmSmMlVrfIciHKOnxymeJIZ6Dqd3TVvDXtEGyrZ9/rzRsiGLa5Iy4uwR5YWoqryz5vDdRKd4b+fZKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752848501; c=relaxed/simple;
-	bh=sCBjjY7QqodoG86EUqmrVeqEu70zeo1YRvyYt2qvWdo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EuRTmYtqYt4aTbLguKY36KqbNSD6T/ZEnAWKNc/mlZUy1P8cAtLVBunki4P9CMJBH4NSudidXJYFaX0nso4sdXA2bFqPus9W6mFR7BKqEM4Jq+A+NNJHfKPnyIZbSACDNozseMjPPfhujrQgM7sQBsyoPzGXeRZWq0xbcIRBNTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R5JKeeZX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C43EC4CEEB;
-	Fri, 18 Jul 2025 14:21:39 +0000 (UTC)
+	s=arc-20240116; t=1752848646; c=relaxed/simple;
+	bh=V4VYmzQAN0a9iO2EvpYqv/efxh6I08+dEk6t0GckWv0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X2geZm4H+3tIp7t5VWz46WZGRpVbYqMJV3O0kAsDVFhtVUN6Nzx/WjgMbqPCnPSzqdUc8yt7DbhDaJlqM5aXcI+vOOTo1B0tnnmdrZIGuxO2z/43V4io5FQMwIsleF6l5beh4/z3gQCMuDX5BOH2WqpzR0YOoSNZeoxCHh3HilE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NViRITx6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5F4FC4CEEB;
+	Fri, 18 Jul 2025 14:24:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752848500;
-	bh=sCBjjY7QqodoG86EUqmrVeqEu70zeo1YRvyYt2qvWdo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=R5JKeeZXnKMkJKRBZu0wGhAWp80H45DXTFWxI/X5AEY9IK68WzHjIcT9Q19DFOwrM
-	 kL96WmTqk3UNCsfKspEIf33lu0LBUPU1o57091Lb+DtILnXNljhmewVUO+e2mMzpS8
-	 kjymR0lc3BHjL8yQro79Z8yfvgiDeblPLu/oDNsX34bB4F6CWww8KwD4Thwfxan5uz
-	 Z4FiKmma7FbHxwIS0IMHLdQMrrIjQAnWaVHVqKEH5T8f+i0OEy30mu259Q0fx6Kuwd
-	 R0e7/5bFiT3ktpjFESdVt3BNNLkRL0wu5wX5DGO0Pq/Kdf7n9BrjZmUkHOCbcHAENF
-	 ytihmdWQielzA==
-From: Chuck Lever <cel@kernel.org>
-To: Jeff Layton <jlayton@kernel.org>,
-	NeilBrown <neil@brown.name>,
-	Olga Kornievskaia <okorniev@redhat.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Sergey Bashirov <sergeybashirov@gmail.com>
-Cc: Chuck Lever <chuck.lever@oracle.com>,
-	linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Dan Carpenter <dan.carpenter@linaro.org>
-Subject: Re: [PATCH v2] sunrpc: Change ret code of xdr_stream_decode_opaque_fixed
-Date: Fri, 18 Jul 2025 10:21:36 -0400
-Message-ID: <175284845618.1668826.1570213345042161150.b4-ty@oracle.com>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250718080958.71913-1-sergeybashirov@gmail.com>
-References: <20250718080958.71913-1-sergeybashirov@gmail.com>
+	s=k20201202; t=1752848646;
+	bh=V4VYmzQAN0a9iO2EvpYqv/efxh6I08+dEk6t0GckWv0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NViRITx6rvbHyn7rB8mLccbbHh51pE2i9bprQS2TjHpOLEU5MaxaZM2CGc+Kkg40A
+	 G9ZqD/SRaNLFGbF8bQLzZ/33CvD/WODgBFYcbDMSWhyOKKbvWWw+NeFbdvcJzd6xkW
+	 4KTFzeQ8CEHyJYBJklTOfNhKtvMAtVOiSz7a+ItMumuqHGdZHoquuDEQmLeeaFuzcj
+	 kAT0ZuxHZugRpiVUh7i627fqGtl8AqhnGywZAtCJZ2eI8sy7xaQAiQG/FY6wVDG64k
+	 6x4DFzhz0oxfCu207j7oiKTy7rZXm3Px8rKo6C1rof91OAPVsj7knwAw3Uz4fuKEAA
+	 K/2hOXJivUK3w==
+Date: Fri, 18 Jul 2025 15:24:02 +0100
+From: Simon Horman <horms@kernel.org>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, petrm@nvidia.com
+Subject: Re: [PATCH net-next] selftests: rtnetlink: Add operational state test
+Message-ID: <20250718142402.GC2459@horms.kernel.org>
+References: <20250717125151.466882-1-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250717125151.466882-1-idosch@nvidia.com>
 
-From: Chuck Lever <chuck.lever@oracle.com>
-
-On Fri, 18 Jul 2025 11:09:56 +0300, Sergey Bashirov wrote:
-> Since the XDR field is fixed in size, the caller already knows how many
-> bytes were decoded, on success. Thus, xdr_stream_decode_opaque_fixed()
-> doesn't need to return that value. And, xdr_stream_decode_u32 and _u64
-> both return zero on success.
+On Thu, Jul 17, 2025 at 03:51:51PM +0300, Ido Schimmel wrote:
+> Virtual devices (e.g., VXLAN) that do not have a notion of a carrier are
+> created with an "UNKNOWN" operational state which some users find
+> confusing [1].
 > 
+> It is possible to set the operational state from user space either
+> during device creation or afterwards and some applications will start
+> doing that in order to avoid the above problem.
 > 
+> Add a test for this functionality to ensure it does not regress.
+> 
+> [1] https://lore.kernel.org/netdev/20241119153703.71f97b76@hermes.local/
+> 
+> Reviewed-by: Petr Machata <petrm@nvidia.com>
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 
-Applied to nfsd-testing, thanks!
-
-[1/1] sunrpc: Change ret code of xdr_stream_decode_opaque_fixed
-      commit: 4f48fa0301a4eceee070baa5ca0f0bb470a2a54e
-
---
-Chuck Lever
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
