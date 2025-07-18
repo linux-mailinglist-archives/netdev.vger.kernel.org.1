@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-208222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0ACDAB0AA61
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 20:51:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FA3DB0AA64
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 20:52:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3DE85A4F03
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 18:51:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA67D3BC5C8
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 18:51:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3C4D2E8E07;
-	Fri, 18 Jul 2025 18:51:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 913062E92A5;
+	Fri, 18 Jul 2025 18:51:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HAqQGT/g"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kLKY8lGL"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B5A92E8DED
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 18:51:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3BD72E8DF9
+	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 18:51:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752864689; cv=none; b=NzuIkSCIPN1O0mH/i4kG5sqSfVyMTzELyCMSzol5jeiZ/EwNfLcGqNbJrxSuas3Jl6DgmJSTSCPgj9Vijw91He+4kfxcI1RnKNDM92xTFnri35afVRMYffic/3NXRiFWqEjdMfAZO6iwHWK+qFKEGCEFwv10oUYGPjcE8V8t5Ss=
+	t=1752864690; cv=none; b=QxL8HHNtzvNQSLasK7Y/9W+kzvOfUpM1EDS3c8y6jW3PdC2hD64Ld2VfdH9gA+kQjOZRkzcp1cbBnSI+bf/bidVhJLr6YrJIpyuRwmV3I9t4zQxzpOmUTKKdrjebzxL7//UuxU/COYE7MGW2cQTHUz1UHH5bftpo1jr86egAj7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752864689; c=relaxed/simple;
-	bh=bokqwTUgy2D67P8yW4GJ8SKvXKa3jgPlrMsGdG/k1bE=;
+	s=arc-20240116; t=1752864690; c=relaxed/simple;
+	bh=uFSs0g3o6u33MVlIc+oWCYC8BODUxaTINXL20DiLRoI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jJmO7qm3L33b1g6wSi1K7AE5t+V4cl9kAVmsSVLuyLl0zMClCuAXQFBgjKGzf0y9ADNFche+/BKRni086bejodmXLsKkmW9WuRqNF9h1lHmUOH+JbCRZc4uK+4mkljEA45AGELp8FZZHG4smMSNfM3cY1LEqXRDpfNF7QidkvVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HAqQGT/g; arc=none smtp.client-ip=198.175.65.16
+	 MIME-Version; b=sEpR2EHolCuvZnmD7GcsHuYf1SoAyAcNKXtCkx6uBF/tpCRr06KVB73yrtJu5jznSN2Wb8R7csIEq/2VyPot6Uxvn1cecimB1CxHi6MYpXjNKafuGt707fGIyssDe9uNysgd+yguwWSVvtFNdc3EpXOcVCF1wJn9N7e1yrvCwpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kLKY8lGL; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752864687; x=1784400687;
+  t=1752864689; x=1784400689;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=bokqwTUgy2D67P8yW4GJ8SKvXKa3jgPlrMsGdG/k1bE=;
-  b=HAqQGT/gtj2zRzG6TfDdbraVBUFUU0BdafvciZ8bPMrS1kaiUjlsthfZ
-   LIP+Kx0fvT1SWLaPErtOvPpj9OCZUwfOpg/wVI3+FzuORkNHLqDSx0eO0
-   hNquQtG93TVJzTRw+PrPmSbeHrhNsc3Y5fJ99iyYyrw0u9ClD+J1eAZOH
-   ChV3tniHyC2Jr+k3dtCBRt3609EI2fc6oBOpw/JK7QTTgrWGRGUgyeJxT
-   gNu2nrYfjl8NMwsESpyJM70Z9maobLLp729qUcgqJaA1NrC5rnjhnoZ0E
-   UvPLbsokK2P+NC34+7Q9lEEc1E6hfvKfZkzFDbkuVuFDmPwiCxTBceJfg
-   A==;
-X-CSE-ConnectionGUID: 2RELeuhwQ6+4AHGOXn6/Cg==
-X-CSE-MsgGUID: 3bijNPKQT2+puqevLbXhDw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11496"; a="55320572"
+  bh=uFSs0g3o6u33MVlIc+oWCYC8BODUxaTINXL20DiLRoI=;
+  b=kLKY8lGLGlXozbLsebpFLwzvnzLkSIY/DRPL0EI2r4bc51aKcT1xBIfY
+   klApZ2jnBR3ZaN1czxwegeMF9yuoXoUy2s/Wmmee2jSJCifZJPwlZYtTz
+   bZnr9wYxergB+pRaj2KteSxlOqF8EXjmNvRBTyyCe9ZRHoSebM3R/OGRO
+   pOwIGqXMOY7Yr9WFTUa/zhL2McejZfWMbvq39LkyB4g7yJx5GPsbuY4VW
+   s24toJz4l6jim61I+RZE6e4iL9lKiA6AyCBR533mBhDD+Ml4GhYwVJtyF
+   5j05yjJzm0/jjz9rE7FWZATsHCo8cvhEPO4jV6Ugt199pt4Wi0AlHsfV8
+   Q==;
+X-CSE-ConnectionGUID: +i25ZvjCQiOf/TVOmb0cIA==
+X-CSE-MsgGUID: jwnd3cIjRUeTE0dIJA1cUQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11496"; a="55320580"
 X-IronPort-AV: E=Sophos;i="6.16,322,1744095600"; 
-   d="scan'208";a="55320572"
+   d="scan'208";a="55320580"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
   by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2025 11:51:24 -0700
-X-CSE-ConnectionGUID: sQ2wcDJrTKuYjkdCM3us2g==
-X-CSE-MsgGUID: B0oqxBCoTauKa5KwqGlhEQ==
+X-CSE-ConnectionGUID: orMlD7ITTK2ADAo7NWX7pQ==
+X-CSE-MsgGUID: VOlVAY/NRdyk9DO/+NST/g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,322,1744095600"; 
-   d="scan'208";a="157506886"
+   d="scan'208";a="157506889"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa006.jf.intel.com with ESMTP; 18 Jul 2025 11:51:25 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -65,18 +65,15 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Milena Olech <milena.olech@intel.com>,
+Cc: Ahmed Zaki <ahmed.zaki@intel.com>,
 	anthony.l.nguyen@intel.com,
-	anton.nadezhdin@intel.com,
-	jstultz@google.com,
-	tglx@linutronix.de,
-	sboyd@kernel.org,
-	richardcochran@gmail.com,
+	Madhu Chittim <madhu.chittim@intel.com>,
+	Simon Horman <horms@kernel.org>,
 	Willem de Bruijn <willemb@google.com>,
 	Samuel Salin <Samuel.salin@intel.com>
-Subject: [PATCH net-next 04/13] idpf: add cross timestamping
-Date: Fri, 18 Jul 2025 11:51:05 -0700
-Message-ID: <20250718185118.2042772-5-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 05/13] idpf: preserve coalescing settings across resets
+Date: Fri, 18 Jul 2025 11:51:06 -0700
+Message-ID: <20250718185118.2042772-6-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250718185118.2042772-1-anthony.l.nguyen@intel.com>
 References: <20250718185118.2042772-1-anthony.l.nguyen@intel.com>
@@ -88,335 +85,299 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Milena Olech <milena.olech@intel.com>
+From: Ahmed Zaki <ahmed.zaki@intel.com>
 
-Add cross timestamp support through virtchnl mailbox messages and directly,
-through PCIe BAR registers. Cross timestamping assumes that both system
-time and device clock time values are cached simultaneously, what is
-triggered by HW. Feature is enabled for both ARM and x86 archs.
+The IRQ coalescing config currently reside only inside struct
+idpf_q_vector. However, all idpf_q_vector structs are de-allocated and
+re-allocated during resets. This leads to user-set coalesce configuration
+to be lost.
 
-Signed-off-by: Milena Olech <milena.olech@intel.com>
-Reviewed-by: Karol Kolacinski <karol.kolacinski@intel.com>
+Add new fields to struct idpf_vport_user_config_data to save the user
+settings and re-apply them after reset.
+
+Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
+Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 Tested-by: Samuel Salin <Samuel.salin@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf_ptp.c    | 136 ++++++++++++++++++
- drivers/net/ethernet/intel/idpf/idpf_ptp.h    |  17 +++
- .../ethernet/intel/idpf/idpf_virtchnl_ptp.c   |  55 ++++++-
- 3 files changed, 207 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/intel/idpf/idpf.h        | 19 ++++++++++
+ .../net/ethernet/intel/idpf/idpf_ethtool.c    | 36 ++++++++++++++-----
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    | 18 +++++++++-
+ drivers/net/ethernet/intel/idpf/idpf_main.c   |  1 +
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 13 ++++---
+ 5 files changed, 74 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_ptp.c b/drivers/net/ethernet/intel/idpf/idpf_ptp.c
-index 4f8725c85332..ee21f2ff0cad 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_ptp.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_ptp.c
-@@ -42,6 +42,13 @@ void idpf_ptp_get_features_access(const struct idpf_adapter *adapter)
- 							   direct,
- 							   mailbox);
+diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
+index fe2caff66fdb..f4c0eaf9bde3 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf.h
++++ b/drivers/net/ethernet/intel/idpf/idpf.h
+@@ -405,10 +405,28 @@ struct idpf_rss_data {
+ 	u32 *cached_lut;
+ };
  
-+	/* Get the cross timestamp */
-+	direct = VIRTCHNL2_CAP_PTP_GET_CROSS_TIME;
-+	mailbox = VIRTCHNL2_CAP_PTP_GET_CROSS_TIME_MB;
-+	ptp->get_cross_tstamp_access = idpf_ptp_get_access(adapter,
-+							   direct,
-+							   mailbox);
-+
- 	/* Set the device clock time */
- 	direct = VIRTCHNL2_CAP_PTP_SET_DEVICE_CLK_TIME;
- 	mailbox = VIRTCHNL2_CAP_PTP_SET_DEVICE_CLK_TIME;
-@@ -171,6 +178,127 @@ static int idpf_ptp_read_src_clk_reg(struct idpf_adapter *adapter, u64 *src_clk,
- 	return 0;
- }
- 
-+#if IS_ENABLED(CONFIG_ARM_ARCH_TIMER) || IS_ENABLED(CONFIG_X86)
 +/**
-+ * idpf_ptp_get_sync_device_time_direct - Get the cross time stamp values
-+ *					  directly
-+ * @adapter: Driver specific private structure
-+ * @dev_time: 64bit main timer value
-+ * @sys_time: 64bit system time value
++ * struct idpf_q_coalesce - User defined coalescing configuration values for
++ *			   a single queue.
++ * @tx_intr_mode: Dynamic TX ITR or not
++ * @rx_intr_mode: Dynamic RX ITR or not
++ * @tx_coalesce_usecs: TX interrupt throttling rate
++ * @rx_coalesce_usecs: RX interrupt throttling rate
++ *
++ * Used to restore user coalescing configuration after a reset.
 + */
-+static void idpf_ptp_get_sync_device_time_direct(struct idpf_adapter *adapter,
-+						 u64 *dev_time, u64 *sys_time)
-+{
-+	u32 dev_time_lo, dev_time_hi, sys_time_lo, sys_time_hi;
-+	struct idpf_ptp *ptp = adapter->ptp;
-+
-+	spin_lock(&ptp->read_dev_clk_lock);
-+
-+	idpf_ptp_enable_shtime(adapter);
-+
-+	dev_time_lo = readl(ptp->dev_clk_regs.dev_clk_ns_l);
-+	dev_time_hi = readl(ptp->dev_clk_regs.dev_clk_ns_h);
-+
-+	sys_time_lo = readl(ptp->dev_clk_regs.sys_time_ns_l);
-+	sys_time_hi = readl(ptp->dev_clk_regs.sys_time_ns_h);
-+
-+	spin_unlock(&ptp->read_dev_clk_lock);
-+
-+	*dev_time = (u64)dev_time_hi << 32 | dev_time_lo;
-+	*sys_time = (u64)sys_time_hi << 32 | sys_time_lo;
-+}
-+
-+/**
-+ * idpf_ptp_get_sync_device_time_mailbox - Get the cross time stamp values
-+ *					   through mailbox
-+ * @adapter: Driver specific private structure
-+ * @dev_time: 64bit main timer value expressed in nanoseconds
-+ * @sys_time: 64bit system time value expressed in nanoseconds
-+ *
-+ * Return: 0 on success, -errno otherwise.
-+ */
-+static int idpf_ptp_get_sync_device_time_mailbox(struct idpf_adapter *adapter,
-+						 u64 *dev_time, u64 *sys_time)
-+{
-+	struct idpf_ptp_dev_timers cross_time;
-+	int err;
-+
-+	err = idpf_ptp_get_cross_time(adapter, &cross_time);
-+	if (err)
-+		return err;
-+
-+	*dev_time = cross_time.dev_clk_time_ns;
-+	*sys_time = cross_time.sys_time_ns;
-+
-+	return err;
-+}
-+
-+/**
-+ * idpf_ptp_get_sync_device_time - Get the cross time stamp info
-+ * @device: Current device time
-+ * @system: System counter value read synchronously with device time
-+ * @ctx: Context provided by timekeeping code
-+ *
-+ * The device and the system clocks time read simultaneously.
-+ *
-+ * Return: 0 on success, -errno otherwise.
-+ */
-+static int idpf_ptp_get_sync_device_time(ktime_t *device,
-+					 struct system_counterval_t *system,
-+					 void *ctx)
-+{
-+	struct idpf_adapter *adapter = ctx;
-+	u64 ns_time_dev, ns_time_sys;
-+	int err;
-+
-+	switch (adapter->ptp->get_cross_tstamp_access) {
-+	case IDPF_PTP_NONE:
-+		return -EOPNOTSUPP;
-+	case IDPF_PTP_DIRECT:
-+		idpf_ptp_get_sync_device_time_direct(adapter, &ns_time_dev,
-+						     &ns_time_sys);
-+		break;
-+	case IDPF_PTP_MAILBOX:
-+		err = idpf_ptp_get_sync_device_time_mailbox(adapter,
-+							    &ns_time_dev,
-+							    &ns_time_sys);
-+		if (err)
-+			return err;
-+		break;
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+
-+	*device = ns_to_ktime(ns_time_dev);
-+
-+	system->cs_id = IS_ENABLED(CONFIG_X86) ? CSID_X86_ART
-+					       : CSID_ARM_ARCH_COUNTER;
-+	system->cycles = ns_time_sys;
-+	system->use_nsecs = true;
-+
-+	return 0;
-+}
-+
-+/**
-+ * idpf_ptp_get_crosststamp - Capture a device cross timestamp
-+ * @info: the driver's PTP info structure
-+ * @cts: The memory to fill the cross timestamp info
-+ *
-+ * Capture a cross timestamp between the system time and the device PTP hardware
-+ * clock.
-+ *
-+ * Return: cross timestamp value on success, -errno on failure.
-+ */
-+static int idpf_ptp_get_crosststamp(struct ptp_clock_info *info,
-+				    struct system_device_crosststamp *cts)
-+{
-+	struct idpf_adapter *adapter = idpf_ptp_info_to_adapter(info);
-+
-+	return get_device_system_crosststamp(idpf_ptp_get_sync_device_time,
-+					     adapter, NULL, cts);
-+}
-+#endif /* CONFIG_ARM_ARCH_TIMER || CONFIG_X86 */
++struct idpf_q_coalesce {
++	u32 tx_intr_mode;
++	u32 rx_intr_mode;
++	u32 tx_coalesce_usecs;
++	u32 rx_coalesce_usecs;
++};
 +
  /**
-  * idpf_ptp_gettimex64 - Get the time of the clock
-  * @info: the driver's PTP info structure
-@@ -661,6 +789,14 @@ static void idpf_ptp_set_caps(const struct idpf_adapter *adapter)
- 	info->verify = idpf_ptp_verify_pin;
- 	info->enable = idpf_ptp_gpio_enable;
- 	info->do_aux_work = idpf_ptp_do_aux_work;
-+#if IS_ENABLED(CONFIG_ARM_ARCH_TIMER)
-+	info->getcrosststamp = idpf_ptp_get_crosststamp;
-+#elif IS_ENABLED(CONFIG_X86)
-+	if (pcie_ptm_enabled(adapter->pdev) &&
-+	    boot_cpu_has(X86_FEATURE_ART) &&
-+	    boot_cpu_has(X86_FEATURE_TSC_KNOWN_FREQ))
-+		info->getcrosststamp = idpf_ptp_get_crosststamp;
-+#endif /* CONFIG_ARM_ARCH_TIMER */
- }
- 
+  * struct idpf_vport_user_config_data - User defined configuration values for
+  *					each vport.
+  * @rss_data: See struct idpf_rss_data
++ * @q_coalesce: Array of per queue coalescing data
+  * @num_req_tx_qs: Number of user requested TX queues through ethtool
+  * @num_req_rx_qs: Number of user requested RX queues through ethtool
+  * @num_req_txq_desc: Number of user requested TX queue descriptors through
+@@ -424,6 +442,7 @@ struct idpf_rss_data {
+  */
+ struct idpf_vport_user_config_data {
+ 	struct idpf_rss_data rss_data;
++	struct idpf_q_coalesce *q_coalesce;
+ 	u16 num_req_tx_qs;
+ 	u16 num_req_rx_qs;
+ 	u32 num_req_txq_desc;
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
+index 075618a6840e..0eb812ac19c2 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
+@@ -1377,12 +1377,14 @@ static int idpf_get_per_q_coalesce(struct net_device *netdev, u32 q_num,
  /**
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_ptp.h b/drivers/net/ethernet/intel/idpf/idpf_ptp.h
-index a876749d6116..785da03e4cf5 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_ptp.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_ptp.h
-@@ -21,6 +21,8 @@ struct idpf_ptp_cmd {
-  * @dev_clk_ns_h: high part of the device clock register
-  * @phy_clk_ns_l: low part of the PHY clock register
-  * @phy_clk_ns_h: high part of the PHY clock register
-+ * @sys_time_ns_l: low part of the system time register
-+ * @sys_time_ns_h: high part of the system time register
-  * @incval_l: low part of the increment value register
-  * @incval_h: high part of the increment value register
-  * @shadj_l: low part of the shadow adjust register
-@@ -42,6 +44,10 @@ struct idpf_ptp_dev_clk_regs {
- 	void __iomem *phy_clk_ns_l;
- 	void __iomem *phy_clk_ns_h;
- 
-+	/* System time */
-+	void __iomem *sys_time_ns_l;
-+	void __iomem *sys_time_ns_h;
-+
- 	/* Main timer adjustments */
- 	void __iomem *incval_l;
- 	void __iomem *incval_h;
-@@ -162,6 +168,7 @@ struct idpf_ptp_vport_tx_tstamp_caps {
-  * @dev_clk_regs: the set of registers to access the device clock
-  * @caps: PTP capabilities negotiated with the Control Plane
-  * @get_dev_clk_time_access: access type for getting the device clock time
-+ * @get_cross_tstamp_access: access type for the cross timestamping
-  * @set_dev_clk_time_access: access type for setting the device clock time
-  * @adj_dev_clk_time_access: access type for the adjusting the device clock
-  * @tx_tstamp_access: access type for the Tx timestamp value read
-@@ -182,6 +189,7 @@ struct idpf_ptp {
- 	struct idpf_ptp_dev_clk_regs dev_clk_regs;
- 	u32 caps;
- 	enum idpf_ptp_access get_dev_clk_time_access:2;
-+	enum idpf_ptp_access get_cross_tstamp_access:2;
- 	enum idpf_ptp_access set_dev_clk_time_access:2;
- 	enum idpf_ptp_access adj_dev_clk_time_access:2;
- 	enum idpf_ptp_access tx_tstamp_access:2;
-@@ -264,6 +272,8 @@ void idpf_ptp_get_features_access(const struct idpf_adapter *adapter);
- bool idpf_ptp_get_txq_tstamp_capability(struct idpf_tx_queue *txq);
- int idpf_ptp_get_dev_clk_time(struct idpf_adapter *adapter,
- 			      struct idpf_ptp_dev_timers *dev_clk_time);
-+int idpf_ptp_get_cross_time(struct idpf_adapter *adapter,
-+			    struct idpf_ptp_dev_timers *cross_time);
- int idpf_ptp_set_dev_clk_time(struct idpf_adapter *adapter, u64 time);
- int idpf_ptp_adj_dev_clk_fine(struct idpf_adapter *adapter, u64 incval);
- int idpf_ptp_adj_dev_clk_time(struct idpf_adapter *adapter, s64 delta);
-@@ -305,6 +315,13 @@ idpf_ptp_get_dev_clk_time(struct idpf_adapter *adapter,
- 	return -EOPNOTSUPP;
- }
- 
-+static inline int
-+idpf_ptp_get_cross_time(struct idpf_adapter *adapter,
-+			struct idpf_ptp_dev_timers *cross_time)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- static inline int idpf_ptp_set_dev_clk_time(struct idpf_adapter *adapter,
- 					    u64 time)
+  * __idpf_set_q_coalesce - set ITR values for specific queue
+  * @ec: ethtool structure from user to update ITR settings
++ * @q_coal: per queue coalesce settings
+  * @qv: queue vector for which itr values has to be set
+  * @is_rxq: is queue type rx
+  *
+  * Returns 0 on success, negative otherwise.
+  */
+ static int __idpf_set_q_coalesce(const struct ethtool_coalesce *ec,
++				 struct idpf_q_coalesce *q_coal,
+ 				 struct idpf_q_vector *qv, bool is_rxq)
  {
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c
-index bdcc54a5fb56..4f1fb0cefe51 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c
-@@ -30,6 +30,7 @@ int idpf_ptp_get_caps(struct idpf_adapter *adapter)
- 		.send_buf.iov_len = sizeof(send_ptp_caps_msg),
- 		.timeout_ms = IDPF_VC_XN_DEFAULT_TIMEOUT_MSEC,
- 	};
-+	struct virtchnl2_ptp_cross_time_reg_offsets cross_tstamp_offsets;
- 	struct virtchnl2_ptp_clk_adj_reg_offsets clk_adj_offsets;
- 	struct virtchnl2_ptp_clk_reg_offsets clock_offsets;
- 	struct idpf_ptp_secondary_mbx *scnd_mbx;
-@@ -71,7 +72,7 @@ int idpf_ptp_get_caps(struct idpf_adapter *adapter)
+ 	u32 use_adaptive_coalesce, coalesce_usecs;
+@@ -1426,20 +1428,25 @@ static int __idpf_set_q_coalesce(const struct ethtool_coalesce *ec,
  
- 	access_type = ptp->get_dev_clk_time_access;
- 	if (access_type != IDPF_PTP_DIRECT)
--		goto discipline_clock;
-+		goto cross_tstamp;
+ 	if (is_rxq) {
+ 		qv->rx_itr_value = coalesce_usecs;
++		q_coal->rx_coalesce_usecs = coalesce_usecs;
+ 		if (use_adaptive_coalesce) {
+ 			qv->rx_intr_mode = IDPF_ITR_DYNAMIC;
++			q_coal->rx_intr_mode = IDPF_ITR_DYNAMIC;
+ 		} else {
+ 			qv->rx_intr_mode = !IDPF_ITR_DYNAMIC;
+-			idpf_vport_intr_write_itr(qv, qv->rx_itr_value,
+-						  false);
++			q_coal->rx_intr_mode = !IDPF_ITR_DYNAMIC;
++			idpf_vport_intr_write_itr(qv, coalesce_usecs, false);
+ 		}
+ 	} else {
+ 		qv->tx_itr_value = coalesce_usecs;
++		q_coal->tx_coalesce_usecs = coalesce_usecs;
+ 		if (use_adaptive_coalesce) {
+ 			qv->tx_intr_mode = IDPF_ITR_DYNAMIC;
++			q_coal->tx_intr_mode = IDPF_ITR_DYNAMIC;
+ 		} else {
+ 			qv->tx_intr_mode = !IDPF_ITR_DYNAMIC;
+-			idpf_vport_intr_write_itr(qv, qv->tx_itr_value, true);
++			q_coal->tx_intr_mode = !IDPF_ITR_DYNAMIC;
++			idpf_vport_intr_write_itr(qv, coalesce_usecs, true);
+ 		}
+ 	}
  
- 	clock_offsets = recv_ptp_caps_msg->clk_offsets;
- 
-@@ -90,6 +91,22 @@ int idpf_ptp_get_caps(struct idpf_adapter *adapter)
- 	temp_offset = le32_to_cpu(clock_offsets.cmd_sync_trigger);
- 	ptp->dev_clk_regs.cmd_sync = idpf_get_reg_addr(adapter, temp_offset);
- 
-+cross_tstamp:
-+	access_type = ptp->get_cross_tstamp_access;
-+	if (access_type != IDPF_PTP_DIRECT)
-+		goto discipline_clock;
-+
-+	cross_tstamp_offsets = recv_ptp_caps_msg->cross_time_offsets;
-+
-+	temp_offset = le32_to_cpu(cross_tstamp_offsets.sys_time_ns_l);
-+	ptp->dev_clk_regs.sys_time_ns_l = idpf_get_reg_addr(adapter,
-+							    temp_offset);
-+	temp_offset = le32_to_cpu(cross_tstamp_offsets.sys_time_ns_h);
-+	ptp->dev_clk_regs.sys_time_ns_h = idpf_get_reg_addr(adapter,
-+							    temp_offset);
-+	temp_offset = le32_to_cpu(cross_tstamp_offsets.cmd_sync_trigger);
-+	ptp->dev_clk_regs.cmd_sync = idpf_get_reg_addr(adapter, temp_offset);
-+
- discipline_clock:
- 	access_type = ptp->adj_dev_clk_time_access;
- 	if (access_type != IDPF_PTP_DIRECT)
-@@ -162,6 +179,42 @@ int idpf_ptp_get_dev_clk_time(struct idpf_adapter *adapter,
- 	return 0;
- }
- 
-+/**
-+ * idpf_ptp_get_cross_time - Send virtchnl get cross time message
-+ * @adapter: Driver specific private structure
-+ * @cross_time: Pointer to the device clock structure where the value is set
-+ *
-+ * Send virtchnl get cross time message to get the time of the clock and the
-+ * system time.
-+ *
-+ * Return: 0 on success, -errno otherwise.
-+ */
-+int idpf_ptp_get_cross_time(struct idpf_adapter *adapter,
-+			    struct idpf_ptp_dev_timers *cross_time)
-+{
-+	struct virtchnl2_ptp_get_cross_time cross_time_msg;
-+	struct idpf_vc_xn_params xn_params = {
-+		.vc_op = VIRTCHNL2_OP_PTP_GET_CROSS_TIME,
-+		.send_buf.iov_base = &cross_time_msg,
-+		.send_buf.iov_len = sizeof(cross_time_msg),
-+		.recv_buf.iov_base = &cross_time_msg,
-+		.recv_buf.iov_len = sizeof(cross_time_msg),
-+		.timeout_ms = IDPF_VC_XN_DEFAULT_TIMEOUT_MSEC,
-+	};
-+	int reply_sz;
-+
-+	reply_sz = idpf_vc_xn_exec(adapter, &xn_params);
-+	if (reply_sz < 0)
-+		return reply_sz;
-+	if (reply_sz != sizeof(cross_time_msg))
-+		return -EIO;
-+
-+	cross_time->dev_clk_time_ns = le64_to_cpu(cross_time_msg.dev_time_ns);
-+	cross_time->sys_time_ns = le64_to_cpu(cross_time_msg.sys_time_ns);
-+
-+	return 0;
-+}
-+
+@@ -1452,6 +1459,7 @@ static int __idpf_set_q_coalesce(const struct ethtool_coalesce *ec,
  /**
-  * idpf_ptp_set_dev_clk_time - Send virtchnl set device time message
-  * @adapter: Driver specific private structure
+  * idpf_set_q_coalesce - set ITR values for specific queue
+  * @vport: vport associated to the queue that need updating
++ * @q_coal: per queue coalesce settings
+  * @ec: coalesce settings to program the device with
+  * @q_num: update ITR/INTRL (coalesce) settings for this queue number/index
+  * @is_rxq: is queue type rx
+@@ -1459,6 +1467,7 @@ static int __idpf_set_q_coalesce(const struct ethtool_coalesce *ec,
+  * Return 0 on success, and negative on failure
+  */
+ static int idpf_set_q_coalesce(const struct idpf_vport *vport,
++			       struct idpf_q_coalesce *q_coal,
+ 			       const struct ethtool_coalesce *ec,
+ 			       int q_num, bool is_rxq)
+ {
+@@ -1467,7 +1476,7 @@ static int idpf_set_q_coalesce(const struct idpf_vport *vport,
+ 	qv = is_rxq ? idpf_find_rxq_vec(vport, q_num) :
+ 		      idpf_find_txq_vec(vport, q_num);
+ 
+-	if (qv && __idpf_set_q_coalesce(ec, qv, is_rxq))
++	if (qv && __idpf_set_q_coalesce(ec, q_coal, qv, is_rxq))
+ 		return -EINVAL;
+ 
+ 	return 0;
+@@ -1488,9 +1497,13 @@ static int idpf_set_coalesce(struct net_device *netdev,
+ 			     struct netlink_ext_ack *extack)
+ {
+ 	struct idpf_netdev_priv *np = netdev_priv(netdev);
++	struct idpf_vport_user_config_data *user_config;
++	struct idpf_q_coalesce *q_coal;
+ 	struct idpf_vport *vport;
+ 	int i, err = 0;
+ 
++	user_config = &np->adapter->vport_config[np->vport_idx]->user_config;
++
+ 	idpf_vport_ctrl_lock(netdev);
+ 	vport = idpf_netdev_to_vport(netdev);
+ 
+@@ -1498,13 +1511,15 @@ static int idpf_set_coalesce(struct net_device *netdev,
+ 		goto unlock_mutex;
+ 
+ 	for (i = 0; i < vport->num_txq; i++) {
+-		err = idpf_set_q_coalesce(vport, ec, i, false);
++		q_coal = &user_config->q_coalesce[i];
++		err = idpf_set_q_coalesce(vport, q_coal, ec, i, false);
+ 		if (err)
+ 			goto unlock_mutex;
+ 	}
+ 
+ 	for (i = 0; i < vport->num_rxq; i++) {
+-		err = idpf_set_q_coalesce(vport, ec, i, true);
++		q_coal = &user_config->q_coalesce[i];
++		err = idpf_set_q_coalesce(vport, q_coal, ec, i, true);
+ 		if (err)
+ 			goto unlock_mutex;
+ 	}
+@@ -1526,20 +1541,25 @@ static int idpf_set_coalesce(struct net_device *netdev,
+ static int idpf_set_per_q_coalesce(struct net_device *netdev, u32 q_num,
+ 				   struct ethtool_coalesce *ec)
+ {
++	struct idpf_netdev_priv *np = netdev_priv(netdev);
++	struct idpf_vport_user_config_data *user_config;
++	struct idpf_q_coalesce *q_coal;
+ 	struct idpf_vport *vport;
+ 	int err;
+ 
+ 	idpf_vport_ctrl_lock(netdev);
+ 	vport = idpf_netdev_to_vport(netdev);
++	user_config = &np->adapter->vport_config[np->vport_idx]->user_config;
++	q_coal = &user_config->q_coalesce[q_num];
+ 
+-	err = idpf_set_q_coalesce(vport, ec, q_num, false);
++	err = idpf_set_q_coalesce(vport, q_coal, ec, q_num, false);
+ 	if (err) {
+ 		idpf_vport_ctrl_unlock(netdev);
+ 
+ 		return err;
+ 	}
+ 
+-	err = idpf_set_q_coalesce(vport, ec, q_num, true);
++	err = idpf_set_q_coalesce(vport, q_coal, ec, q_num, true);
+ 
+ 	idpf_vport_ctrl_unlock(netdev);
+ 
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+index 4d6a182346e5..2c2a3e85d693 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+@@ -1134,8 +1134,10 @@ static struct idpf_vport *idpf_vport_alloc(struct idpf_adapter *adapter,
+ 	if (!vport)
+ 		return vport;
+ 
++	num_max_q = max(max_q->max_txq, max_q->max_rxq);
+ 	if (!adapter->vport_config[idx]) {
+ 		struct idpf_vport_config *vport_config;
++		struct idpf_q_coalesce *q_coal;
+ 
+ 		vport_config = kzalloc(sizeof(*vport_config), GFP_KERNEL);
+ 		if (!vport_config) {
+@@ -1144,6 +1146,21 @@ static struct idpf_vport *idpf_vport_alloc(struct idpf_adapter *adapter,
+ 			return NULL;
+ 		}
+ 
++		q_coal = kcalloc(num_max_q, sizeof(*q_coal), GFP_KERNEL);
++		if (!q_coal) {
++			kfree(vport_config);
++			kfree(vport);
++
++			return NULL;
++		}
++		for (int i = 0; i < num_max_q; i++) {
++			q_coal[i].tx_intr_mode = IDPF_ITR_DYNAMIC;
++			q_coal[i].tx_coalesce_usecs = IDPF_ITR_TX_DEF;
++			q_coal[i].rx_intr_mode = IDPF_ITR_DYNAMIC;
++			q_coal[i].rx_coalesce_usecs = IDPF_ITR_RX_DEF;
++		}
++		vport_config->user_config.q_coalesce = q_coal;
++
+ 		adapter->vport_config[idx] = vport_config;
+ 	}
+ 
+@@ -1153,7 +1170,6 @@ static struct idpf_vport *idpf_vport_alloc(struct idpf_adapter *adapter,
+ 	vport->default_vport = adapter->num_alloc_vports <
+ 			       idpf_get_default_vports(adapter);
+ 
+-	num_max_q = max(max_q->max_txq, max_q->max_rxq);
+ 	vport->q_vector_idxs = kcalloc(num_max_q, sizeof(u16), GFP_KERNEL);
+ 	if (!vport->q_vector_idxs)
+ 		goto free_vport;
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
+index b7422be3e967..dfe9126f1f4a 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_main.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
+@@ -62,6 +62,7 @@ static void idpf_remove(struct pci_dev *pdev)
+ 	destroy_workqueue(adapter->vc_event_wq);
+ 
+ 	for (i = 0; i < adapter->max_vports; i++) {
++		kfree(adapter->vport_config[i]->user_config.q_coalesce);
+ 		kfree(adapter->vport_config[i]);
+ 		adapter->vport_config[i] = NULL;
+ 	}
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index cef9dfb877e8..c976d9e15aca 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -4355,9 +4355,13 @@ static void idpf_vport_intr_napi_add_all(struct idpf_vport *vport)
+ int idpf_vport_intr_alloc(struct idpf_vport *vport)
+ {
+ 	u16 txqs_per_vector, rxqs_per_vector, bufqs_per_vector;
++	struct idpf_vport_user_config_data *user_config;
+ 	struct idpf_q_vector *q_vector;
++	struct idpf_q_coalesce *q_coal;
+ 	u32 complqs_per_vector, v_idx;
++	u16 idx = vport->idx;
+ 
++	user_config = &vport->adapter->vport_config[idx]->user_config;
+ 	vport->q_vectors = kcalloc(vport->num_q_vectors,
+ 				   sizeof(struct idpf_q_vector), GFP_KERNEL);
+ 	if (!vport->q_vectors)
+@@ -4375,14 +4379,15 @@ int idpf_vport_intr_alloc(struct idpf_vport *vport)
+ 
+ 	for (v_idx = 0; v_idx < vport->num_q_vectors; v_idx++) {
+ 		q_vector = &vport->q_vectors[v_idx];
++		q_coal = &user_config->q_coalesce[v_idx];
+ 		q_vector->vport = vport;
+ 
+-		q_vector->tx_itr_value = IDPF_ITR_TX_DEF;
+-		q_vector->tx_intr_mode = IDPF_ITR_DYNAMIC;
++		q_vector->tx_itr_value = q_coal->tx_coalesce_usecs;
++		q_vector->tx_intr_mode = q_coal->tx_intr_mode;
+ 		q_vector->tx_itr_idx = VIRTCHNL2_ITR_IDX_1;
+ 
+-		q_vector->rx_itr_value = IDPF_ITR_RX_DEF;
+-		q_vector->rx_intr_mode = IDPF_ITR_DYNAMIC;
++		q_vector->rx_itr_value = q_coal->rx_coalesce_usecs;
++		q_vector->rx_intr_mode = q_coal->rx_intr_mode;
+ 		q_vector->rx_itr_idx = VIRTCHNL2_ITR_IDX_0;
+ 
+ 		q_vector->tx = kcalloc(txqs_per_vector, sizeof(*q_vector->tx),
 -- 
 2.47.1
 
