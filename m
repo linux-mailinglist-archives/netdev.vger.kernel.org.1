@@ -1,110 +1,132 @@
-Return-Path: <netdev+bounces-208243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72C41B0AAF9
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 22:09:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60482B0AB12
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 22:21:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91E095A5A7F
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 20:09:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6E6F1C285F3
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 20:21:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 761591DF970;
-	Fri, 18 Jul 2025 20:08:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09E1221C9E1;
+	Fri, 18 Jul 2025 20:21:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oVKxT+fT"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="bOMtyzbH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5261DD517
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 20:08:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6584211712;
+	Fri, 18 Jul 2025 20:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752869339; cv=none; b=CI46aQQEhT8BPGNiTcWf7R6GVVOr7xAd7VnnJSz/0AWBw/DGP2exvPj32kN74CmgDJq0gk/IwNn89DSfiZpRbmsVAR8oVaD9OIP/10k9YQpy+FLrI1D9p9XdE475haJV1Gq7TwT5K6C67PSVjloYsRsHzI02nN5Y4MqJYLix29Y=
+	t=1752870061; cv=none; b=oenrdc2pSyseweoUJ5GQDQZkjjayG0ZWbJqTvNCbvbOk2rN0loHxTjUhPGCgeAtTegX5a10pv1OgLrjHJW51Hzyv4jt0BlTJdPEEWveq1+BfZRmXUs/blqKT0lcRJ0fzL/jdDgm/XIFEvhGzSK3yMMdPw4TNJ32OlLTTP9ttWEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752869339; c=relaxed/simple;
-	bh=NIAirv361kSK6wQiQmEm6VjaF36ZiNPPXMjFWF6plVw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dtKx6QTTBe6kPlFzXDoPoq64+AQzQbf+xyn7CKjpJ/K+aMTO6Aop8bpYUTOn3dGoYrEi+urSwIjmyXMN+5HNUuDKiSHdb9Kaoxn/dE4I4J3XavuGovp+IwqDVGyTQIm6EKo7wS3c8MvQs/fVo1ezG+e4hQCjiEw7fa9CQPASTnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oVKxT+fT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D8CDC4CEEB;
-	Fri, 18 Jul 2025 20:08:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752869338;
-	bh=NIAirv361kSK6wQiQmEm6VjaF36ZiNPPXMjFWF6plVw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oVKxT+fTu3BKTXZmbOMbGvbjWZlFeMQZlnIg7O3zbf1V+GSIHoiHklNba75yOYL59
-	 MHzFKlhzZ/+QJfDB7ugDVYY8dcyAQrW9bOvHnpAd6eAgHsV7n+XDHbuHkZvyJMZ0xx
-	 e0wJ0w/Q5hawTXUP0l8tGaPCvOVGjF4IOpSBVkBTT5WxSFF++tyT3zBYYq/uu23wry
-	 NmoHKc0KH33mpwrhcar1FBW43a5+H8/V8xVHUz30t/7m9EZjw026+QZtwsAfjd3B9V
-	 BJXecBSNFqsvibI3WpNVK6TN1C7UDg28LNE2rl/sNDuCi0DYlZhLTfivQy4NSMMLcD
-	 Gszq4HObfooNw==
-Date: Fri, 18 Jul 2025 21:08:55 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Anthony Nguyen <anthony.l.nguyen@intel.com>,
-	Intel Wired LAN <intel-wired-lan@lists.osuosl.org>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	vgrinber@redhat.com, netdev@vger.kernel.org
-Subject: Re: [PATCH iwl-net 2/2] ice: don't leave device non-functional if Tx
- scheduler config fails
-Message-ID: <20250718200855.GN2459@horms.kernel.org>
-References: <20250717-jk-ddp-safe-mode-issue-v1-0-e113b2baed79@intel.com>
- <20250717-jk-ddp-safe-mode-issue-v1-2-e113b2baed79@intel.com>
- <20250718165024.GI2459@horms.kernel.org>
- <95ddc646-d348-45e3-b1f8-b0f114163b11@intel.com>
+	s=arc-20240116; t=1752870061; c=relaxed/simple;
+	bh=5GR/+PDx+U+fOuXcL6gTbXd2bjBLmJST2ztzbRykFBY=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=HtWL/Yv6toQWb58rjINWV7CX3d4XXI/Qb766IDYD4Rmx4wNECgFCzLpuhI6D73ItRPTD2pmYjurr5DGGJvv+5BFtomt/ZLMtuEp3eyPars4ct/R43wPEZmtwyh/CrBL5fFQ/Jt2OFw3PF1Na+KEJ06cKOQnt0f4VlP0C6vv8Zfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=bOMtyzbH; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1006)
+	id CC7BC211FEC6; Fri, 18 Jul 2025 13:20:59 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com CC7BC211FEC6
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1752870059;
+	bh=BOXZHV9y8YTfhsgSAEvvRDJh+qMnYv9KD0BqY7VTGdM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=bOMtyzbHytMrwCOIp2b+xDKjKZAVaMh+hiYhDdO6FX94Z7fZVOXxg1pPanb3lIFNP
+	 m41Jy+bfhctezCJElKS1T6W35wg//egwTdKzwAJQVJ9PZ9uUxKLDlh3L2tcZTD28JV
+	 nwQVWwMv80sgrDTdTHmo2HeCXrrMqaKb57CHZCD4=
+From: Haiyang Zhang <haiyangz@linux.microsoft.com>
+To: linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: haiyangz@microsoft.com, kys@microsoft.com, wei.liu@kernel.org,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, davem@davemloft.net, sdf@fomichev.me,
+	kuniyu@google.com, ahmed.zaki@intel.com,
+	aleksander.lobakin@intel.com, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org, #@linux.microsoft.com,
+	5.4+@linux.microsoft.com
+Subject: [PATCH net] net: core: Fix the loop in default_device_exit_net()
+Date: Fri, 18 Jul 2025 13:20:14 -0700
+Message-Id: <1752870014-28909-1-git-send-email-haiyangz@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <95ddc646-d348-45e3-b1f8-b0f114163b11@intel.com>
 
-On Fri, Jul 18, 2025 at 12:56:29PM -0700, Jacob Keller wrote:
-> 
-> 
-> On 7/18/2025 9:50 AM, Simon Horman wrote:
-> > On Thu, Jul 17, 2025 at 09:57:09AM -0700, Jacob Keller wrote:
-> >>
-> >> Fixes: 91427e6d9030 ("ice: Support 5 layer topology")
-> >> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> > 
-> > Thanks for the extensive explanation.
-> > 
-> 
-> Thanks. This took me forever to track down exactly what went wrong,
-> enough that I had to have the customer send me the card back because we
-> thought the firmware was unrecoverable and bricked.
+From: Haiyang Zhang <haiyangz@microsoft.com>
 
-Ouch!
+The loop in default_device_exit_net() won't be able to properly detect the
+head then stop, and will hit NULL pointer, when a driver, like hv_netvsc,
+automatically moves the slave device together with the master device.
 
-...
+To fix this, add a helper function to return the first migratable netdev
+correctly, no matter one or two devices were removed from this net's list
+in the last iteration.
 
-> >>  	msleep(1000);
-> >>  	ice_reset(hw, ICE_RESET_CORER);
-> >> -	/* CORER will clear the global lock, so no explicit call
-> >> -	 * required for release.
-> >> -	 */
-> >> +	ice_check_reset(hw);
-> >>  
-> >> -	return 0;
-> >> +reinit_hw:
-> > 
-> > nit: I think you can move this label above ice_check_reset().
-> >      As the only place that jumps to this label calls ice_check_reset()
-> >      immediately before doing so. If so, renaming the label might
-> >      also be appropriate (up to you on all fronts:)
-> > 
-> 
-> You're right thats probably slightly better. I'm not sure its worth a
-> re-roll vs getting this fix out since its a pretty minor difference.
+Cc: stable@vger.kernel.org # 5.4+
+Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
+---
+ net/core/dev.c | 31 +++++++++++++++++++++----------
+ 1 file changed, 21 insertions(+), 10 deletions(-)
 
-Yes, agreed. I'm happy to let this lie if you prefer.
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 621a639aeba1..d83f5f12cf70 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -12629,19 +12629,11 @@ static struct pernet_operations __net_initdata netdev_net_ops = {
+ 	.exit = netdev_exit,
+ };
+ 
+-static void __net_exit default_device_exit_net(struct net *net)
++static inline struct net_device *first_migratable_netdev(struct net *net)
+ {
+-	struct netdev_name_node *name_node, *tmp;
+ 	struct net_device *dev, *aux;
+-	/*
+-	 * Push all migratable network devices back to the
+-	 * initial network namespace
+-	 */
+-	ASSERT_RTNL();
+-	for_each_netdev_safe(net, dev, aux) {
+-		int err;
+-		char fb_name[IFNAMSIZ];
+ 
++	for_each_netdev_safe(net, dev, aux) {
+ 		/* Ignore unmoveable devices (i.e. loopback) */
+ 		if (dev->netns_immutable)
+ 			continue;
+@@ -12650,6 +12642,25 @@ static void __net_exit default_device_exit_net(struct net *net)
+ 		if (dev->rtnl_link_ops && !dev->rtnl_link_ops->netns_refund)
+ 			continue;
+ 
++		return dev;
++	}
++
++	return NULL;
++}
++
++static void __net_exit default_device_exit_net(struct net *net)
++{
++	struct netdev_name_node *name_node, *tmp;
++	struct net_device *dev;
++	/*
++	 * Push all migratable network devices back to the
++	 * initial network namespace
++	 */
++	ASSERT_RTNL();
++	while ((dev = first_migratable_netdev(net)) != NULL) {
++		int err;
++		char fb_name[IFNAMSIZ];
++
+ 		/* Push remaining network devices to init_net */
+ 		snprintf(fb_name, IFNAMSIZ, "dev%d", dev->ifindex);
+ 		if (netdev_name_in_use(&init_net, fb_name))
+-- 
+2.34.1
 
-...
 
