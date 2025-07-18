@@ -1,138 +1,156 @@
-Return-Path: <netdev+bounces-208100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76AA6B09D6B
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 10:11:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CF2CB09D70
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 10:12:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E0917B7D20
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 08:09:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D0DE1AA737F
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 08:12:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FAA92264D2;
-	Fri, 18 Jul 2025 08:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65500292B55;
+	Fri, 18 Jul 2025 08:11:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b="Ms8UgGYP";
-	dkim=pass (2048-bit key) header.d=vates.tech header.i=anthoine.bourgeois@vates.tech header.b="Dvgz0M3q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CCTci22U"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail132-21.atl131.mandrillapp.com (mail132-21.atl131.mandrillapp.com [198.2.132.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F1F220F34
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 08:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.2.132.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93CB1220F34;
+	Fri, 18 Jul 2025 08:11:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752826232; cv=none; b=lzqQ1xB3ChlequLv/t3x3p3MkTFOPZ+xVygTxDft5CTZJD+BAVP4EXvYbwO2KPUnUZOsYKrrTP9y7Q3tpqEHaHJ0FsnWL5p97UTqaXewgq2CPQpcY2RwpAZJ5OGDXp4kz/ihI/s1HzvVrUAhj3BnYnBHgtkm6jmwk+woKmnB310=
+	t=1752826309; cv=none; b=MBiwiIbHtSmMIRC9CE8yHd/ViTy7iDMI7wabbP0jNsCy/hmkspWJzSezYSGE9FNtQR5UvYKdQF8Tk6tZ54uRdcH83VVD6iIRXzRuC7AD2FOZsSeOSLDtCacTd33u519q2ntdL8grkebyUgOZQMDsdheVdLOnbhVg6BFhyr/6wgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752826232; c=relaxed/simple;
-	bh=1d3PpO0q077xRQs9WQqLKRGtVTC/vWISiu3MTSGnUzw=;
-	h=From:Subject:To:Cc:Message-Id:References:In-Reply-To:Date:
-	 MIME-Version:Content-Type; b=FDNKkCJMcPt2zIhiDTrSnvbU4U2zSnZhY4wXGPuz26Y43ovHO2wCEmVhAcJlaI178OJOj90+UR0O/8zJUMyFjDHOgvoqG3KW3Q2U0o/m16bREsiOf3IVW7CiM19QwGty5iapOfsbPcypRULVz3Bz3ukfTXV4jlLje463gkvW3nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech; spf=pass smtp.mailfrom=bounce.vates.tech; dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b=Ms8UgGYP; dkim=pass (2048-bit key) header.d=vates.tech header.i=anthoine.bourgeois@vates.tech header.b=Dvgz0M3q; arc=none smtp.client-ip=198.2.132.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bounce.vates.tech
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandrillapp.com;
-	s=mte1; t=1752826229; x=1753096229;
-	bh=9v3RvNn3og/vnGMjRNCHbK2EsjnkNsgZix1oMc/Rcns=;
-	h=From:Subject:To:Cc:Message-Id:References:In-Reply-To:Feedback-ID:
-	 Date:MIME-Version:Content-Type:Content-Transfer-Encoding:CC:Date:
-	 Subject:From;
-	b=Ms8UgGYPKIWHXIgawYLIOUOGw3+mP+x1OP6dEPonV0fgHt34+8Mbs/fPwjcm8zBJz
-	 xVxhhdMLyaZZ9kXucXjjmmXpl9e9FN5p25ZX77lZz+L8AUC+bs/p50x4KqRhiDq5Ss
-	 7rKSTyKO/4rEXtuQ8okU0qmv4blTlWsW76Y0vidxBc54ZqOMQso9IIN8pCfgg0knpd
-	 vskyg4m8I4n/R784yCU91p4Hv56FARToVLWBCOoEi1ZPJ6iUQvt2J3ayUf6Ke8jmWX
-	 FMCMZ52F2CP8f8ToQOVndjp6bpcVKgvmdkNfZWOtG2GFgGfttDQRVzv+s5T3+oTtD/
-	 HQ/7le80XOROg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vates.tech; s=mte1;
-	t=1752826229; x=1753086729; i=anthoine.bourgeois@vates.tech;
-	bh=9v3RvNn3og/vnGMjRNCHbK2EsjnkNsgZix1oMc/Rcns=;
-	h=From:Subject:To:Cc:Message-Id:References:In-Reply-To:Feedback-ID:
-	 Date:MIME-Version:Content-Type:Content-Transfer-Encoding:CC:Date:
-	 Subject:From;
-	b=Dvgz0M3qc4LbJ8GzauIZmGqjpLj0CCAAX8UoAV1e/OgdP+SeuMaASAIc+xreRTfSL
-	 5Lh6dTsV9d+lqOs6CnyQ6Y65mr0bFW/n325SRdBdlU3VKtNQLT6uFk6hdc5daCuoT8
-	 7TVjDUUYswne5oC8L5Dx1GxC97WSDGWxdMjIIFnuFUc4vLGEYUvMRtSIYWdgJhnRfJ
-	 4Fg+BU60PuyPEBTG+7KIq/Giui63iUI7ltnFaO4D9z0hiVkvmspVR/GGPAwko6UXMh
-	 jDfahwuWUffynsHhAPXMz2z6pNQ86H/QUVlVWf5KAI0hiCfFcGGVoow4ojJh4hE8Cf
-	 nGdhQVxWnIoOQ==
-Received: from pmta09.mandrill.prod.atl01.rsglab.com (localhost [127.0.0.1])
-	by mail132-21.atl131.mandrillapp.com (Mailchimp) with ESMTP id 4bk2Xj1Jppz1XLF4g
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 08:10:29 +0000 (GMT)
-From: "Anthoine Bourgeois" <anthoine.bourgeois@vates.tech>
-Subject: =?utf-8?Q?Re:=20[PATCH=20v2]=20xen/netfront:=20Fix=20TX=20response=20spurious=20interrupts?=
-Received: from [37.26.189.201] by mandrillapp.com id 65a60f28e7d441048fd4f1adbe603a61; Fri, 18 Jul 2025 08:10:29 +0000
-X-Bm-Disclaimer: Yes
-X-Bm-Milter-Handled: 4ffbd6c1-ee69-4e1b-aabd-f977039bd3e2
-X-Bm-Transport-Timestamp: 1752826227429
-To: "Jakub Kicinski" <kuba@kernel.org>
-Cc: "Juergen Gross" <jgross@suse.com>, "Stefano Stabellini" <sstabellini@kernel.org>, "Oleksandr Tyshchenko" <oleksandr_tyshchenko@epam.com>, "Wei Liu" <wei.liu@kernel.org>, "Paul Durrant" <paul@xen.org>, xen-devel@lists.xenproject.org, netdev@vger.kernel.org, "Elliott Mitchell" <ehem+xen@m5p.com>
-Message-Id: <aHoBcULQVVsbx6XO@mail.vates.tech>
-References: <20250715160902.578844-2-anthoine.bourgeois@vates.tech> <20250717072951.3bc2122c@kernel.org>
-In-Reply-To: <20250717072951.3bc2122c@kernel.org>
-X-Native-Encoded: 1
-X-Report-Abuse: =?UTF-8?Q?Please=20forward=20a=20copy=20of=20this=20message,=20including=20all=20headers,=20to=20abuse@mandrill.com.=20You=20can=20also=20report=20abuse=20here:=20https://mandrillapp.com/contact/abuse=3Fid=3D30504962.65a60f28e7d441048fd4f1adbe603a61?=
-X-Mandrill-User: md_30504962
-Feedback-ID: 30504962:30504962.20250718:md
-Date: Fri, 18 Jul 2025 08:10:29 +0000
+	s=arc-20240116; t=1752826309; c=relaxed/simple;
+	bh=PeDcfKo7iOlIJb8z5qC+XxMNWd437UxeKUOi7eOo66U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KgTjgBof096rmZiVJUGmG0iAtfldMDw3QMV4WoQAzo0ZUFcYb9azOWdQ7xvB9BK5BxYULow0NBwXSpyrBjYOOt7/rGvO5fdE1Fyd6MztS4bf+cPH9FF11t7bPw/6tMT8LZCXhqTSyXd0sH112YZoH0+byP/IbbEfG6xyQ7tOm/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CCTci22U; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5561c20e2d5so2389633e87.0;
+        Fri, 18 Jul 2025 01:11:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752826305; x=1753431105; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ySl4FDqEuj9CvHJtrc+pdmsbYRO+Kl0sE4pvpggh83k=;
+        b=CCTci22UajDkqbiqofai46tOB2UdU0IxmRfytJE7WvmYPxqyyf6+YzBBveid6cN1eM
+         +u7fzKH9HjeFVcr0R+9Oj7B055Wu9mp/BWvSVY30C3PJ2rdu28j5Zbw1TlbNBKE5XT5m
+         iz9/LDmOSF1ggaDjLxhGRudo5cXc0Ro2SHsxo8sAV+1yUxzfQkUoMioG5PCt/YsirNPb
+         VRnRmFrXhwFRpMl4eXE4uPc21gQA68U+Uq9orhpZ5pmZb7vxTgD1vdcnA65h7dco2DMA
+         Y/5QfA0onFDeef8avpxE80wez+4r28JK8zGLJucVLM1TxR/ltRcwza7QSFQTLHumXUuj
+         4MWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752826305; x=1753431105;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ySl4FDqEuj9CvHJtrc+pdmsbYRO+Kl0sE4pvpggh83k=;
+        b=usmlNJvN9C2SKOrQmQW61SppId0fXp0p+kKkA6/+LGcJkTiVU9VfKSK07cl4TYMQ6w
+         Jb2UApBDZ4uVT//1Ev4Q5/8LO15l+bVO5sw2Ndue6k8IeOKMa+gBMRpFB0D6zHlBassG
+         aSnkSkZN1CbaO7VhKoZXWtpJOZD1mp1gwadt84O7ZF4w5tP9QOW/WmlWinQQOe8aRq9R
+         4u0vhBBIAU4r0DFQhITUjHnh+D9NmIHILR8/kXhLQg+2QInV6AKVHvj/x0VtZYbqz1wM
+         11AnmQBwcSQh0CCzDTrxa1K0yRaLUUGehbdv9WP+VK6lLAwDd1rrOr2OIrCYXSke0Z6c
+         Lh9g==
+X-Forwarded-Encrypted: i=1; AJvYcCWco/BLmh0JNJ3d1oMzosSfloSPuXwKqsqfUPEBuGCwbnksIIiNXjLFdAU6IdsyeKexDqjQ6itQ@vger.kernel.org, AJvYcCXdFmKxPIANdRkhDo63o+vD0Wpk9fyQf/y6hcC9A1dw5GPVR0+tdQ8q+PFY41JE8/sm2ccLdRt7DY64dzc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyd+PWA3cLzjcpKMAq5+DalO80C1zgGxf2KqXbTKqzDhQ4L5gAZ
+	LzocOA5NE4QZSoHGrcfVMQnvu8PmBjip+cGHCsYRYm0V0qgU1e1tmYES
+X-Gm-Gg: ASbGncv0SAOPkOrYw4wfK9qlpa0r/efxS4PZ6q52WG9VdYG0uxObkiSJPWXBF14Xzi8
+	1fwMEAJhXrhrda0NpEuHV31a8iniKsT3P9VO7WOUVWm2xxywIwEAeEqu0oAqugTPi0rd0GBJxyt
+	79hVxGkogzP2WBJYnop8tn1eLFBqbmzZwkv0dn6J4RXESBmyvtZYMMLO8VFHaFgxaQgg3eZuUJH
+	eEABC8gx8d8/SdUNx6GWbU2rQ6lw7EZQhTbmW2Yt08Knc/njtaeUxtM5zak94ReOTIUBTm/zuV2
+	gwiPX4ElNMoo3GC2YR0F1Z/+fvLt4hYngjxKv42l/rCl5eVxGvfNmlUtTDtRvECp71CzjVxfONr
+	x9CGG94R258OcbC1V+HkiWle0+xix7lWI2eGSd3HXz2JRBeoX
+X-Google-Smtp-Source: AGHT+IHgl/+8J3hm2QQjzTMqEUs3tG2qz4i0TsZtDxOTygUv08KcdIxik0KFZaTGm9O9R4HvAv7Otw==
+X-Received: by 2002:a05:6512:3e26:b0:553:accf:d75 with SMTP id 2adb3069b0e04-55a3188f059mr408409e87.26.1752826304334;
+        Fri, 18 Jul 2025 01:11:44 -0700 (PDT)
+Received: from SC-WS-02452.corp.sbercloud.ru ([37.78.122.38])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-55a31a9b1dfsm169921e87.43.2025.07.18.01.11.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Jul 2025 01:11:43 -0700 (PDT)
+From: Sergey Bashirov <sergeybashirov@gmail.com>
+To: Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	NeilBrown <neil@brown.name>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Sergey Bashirov <sergeybashirov@gmail.com>
+Subject: [PATCH v2] sunrpc: Change ret code of xdr_stream_decode_opaque_fixed
+Date: Fri, 18 Jul 2025 11:09:56 +0300
+Message-ID: <20250718080958.71913-1-sergeybashirov@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jul 17, 2025 at 07:29:51AM -0700, Jakub Kicinski wrote:
->On Tue, 15 Jul 2025 16:11:29 +0000 Anthoine Bourgeois wrote:
->> Fixes: b27d47950e48 ("xen/netfront: harden netfront against event channel storms")
->
->Not entirely sure who you expect to apply this patch, but if networking
->then I wouldn't classify this is a fix. The "regression" happened 4
->years ago. And this patch doesn't seem to be tuning the logic added by
->the cited commit. I think this is an optimization, -next material, and
->therefore there should be no Fixes tag here. You can refer to the commit
->without the tag.
+Since the XDR field is fixed in size, the caller already knows how many
+bytes were decoded, on success. Thus, xdr_stream_decode_opaque_fixed()
+doesn't need to return that value. And, xdr_stream_decode_u32 and _u64
+both return zero on success.
 
-Ok, you're right the cited commit exacerbates a problem that was already
-there before.
-I will change this in v3.
+Signed-off-by: Sergey Bashirov <sergeybashirov@gmail.com>
+---
+Changes in v2:
+ - Rebased on nfsd-next
+ - Checks for negative return values are not touched
 
->> @@ -849,9 +847,6 @@ static netdev_tx_t xennet_start_xmit(struct sk_buff *skb, struct net_device *dev
->>  	tx_stats->packets++;
->>  	u64_stats_update_end(&tx_stats->syncp);
->>
->> -	/* Note: It is not safe to access skb after xennet_tx_buf_gc()! */
->> -	xennet_tx_buf_gc(queue);
->> -
->>  	if (!netfront_tx_slot_available(queue))
->>  		netif_tx_stop_queue(netdev_get_tx_queue(dev, queue->id));
->
->I thought normally reaping completions from the Tx path is done
->to prevent the queue from filling up, when the device-generated
->completions are slow or the queue is short. I say "normally" but
->this is relatively a uncommon thing to do in networking.
->Maybe it's my lack of Xen knowledge but it would be good to add to
->the commit message why these calls where here in the first place.
+ include/linux/sunrpc/xdr.h                                    | 4 ++--
+ .../xdrgen/templates/C/typedef/decoder/fixed_length_opaque.j2 | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-Good to know how it should "normally" works, I'm not an expert.
-The patch also has the advantage of standardizing the network driver
-with other Xen PV drivers that do not have this reponse collection
-outside of the interrupt handler.
-
-As this part of the code is here since the driver was upsteamed and the
-author no longer works on xen, I will do my best to add my guess on why
-this code was there.
-
-Regards,
-Anthoine
-
-
-Anthoine Bourgeois | Vates XCP-ng Developer
-
-XCP-ng & Xen Orchestra - Vates solutions
-
-web: https://vates.tech
+diff --git a/include/linux/sunrpc/xdr.h b/include/linux/sunrpc/xdr.h
+index e3358c630ba18..ffb699a02b17d 100644
+--- a/include/linux/sunrpc/xdr.h
++++ b/include/linux/sunrpc/xdr.h
+@@ -730,7 +730,7 @@ xdr_stream_decode_u64(struct xdr_stream *xdr, __u64 *ptr)
+  * @len: size of buffer pointed to by @ptr
+  *
+  * Return values:
+- *   On success, returns size of object stored in @ptr
++ *   %0 on success
+  *   %-EBADMSG on XDR buffer overflow
+  */
+ static inline ssize_t
+@@ -741,7 +741,7 @@ xdr_stream_decode_opaque_fixed(struct xdr_stream *xdr, void *ptr, size_t len)
+ 	if (unlikely(!p))
+ 		return -EBADMSG;
+ 	xdr_decode_opaque_fixed(p, ptr, len);
+-	return len;
++	return 0;
+ }
+ 
+ /**
+diff --git a/tools/net/sunrpc/xdrgen/templates/C/typedef/decoder/fixed_length_opaque.j2 b/tools/net/sunrpc/xdrgen/templates/C/typedef/decoder/fixed_length_opaque.j2
+index 8b4ff08c49e5e..bdc7bd24ffb13 100644
+--- a/tools/net/sunrpc/xdrgen/templates/C/typedef/decoder/fixed_length_opaque.j2
++++ b/tools/net/sunrpc/xdrgen/templates/C/typedef/decoder/fixed_length_opaque.j2
+@@ -13,5 +13,5 @@ xdrgen_decode_{{ name }}(struct xdr_stream *xdr, {{ classifier }}{{ name }} *ptr
+ {% if annotate %}
+ 	/* (fixed-length opaque) */
+ {% endif %}
+-	return xdr_stream_decode_opaque_fixed(xdr, ptr, {{ size }}) >= 0;
++	return xdr_stream_decode_opaque_fixed(xdr, ptr, {{ size }}) == 0;
+ };
+-- 
+2.43.0
 
 
