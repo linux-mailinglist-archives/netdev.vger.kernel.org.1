@@ -1,134 +1,181 @@
-Return-Path: <netdev+bounces-208088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6C63B09B14
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 08:04:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 50D96B09B3E
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 08:19:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A62E1890268
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 06:04:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DB27188182A
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 06:19:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E968F1DE891;
-	Fri, 18 Jul 2025 06:04:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9DC11EB5E3;
+	Fri, 18 Jul 2025 06:19:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="D56kPnDe"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q6oDiMLZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B30E617578;
-	Fri, 18 Jul 2025 06:04:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A7B1E521B
+	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 06:19:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752818650; cv=none; b=W3O94l52/afW92h3NCQAKXnBi+8jvf3MhcNs/xbcpdaIMAwUH4iOs0MCdcf9rQ/skscNAjJvvipE0ozjSMtBp1AJl2wvar2fbBAf5SiovRhzMBRAge2oMAl5qD8LqZIbREZelw7h9OnulI+8qJhIXolJh2DsKqBHma6/G/Be7Dk=
+	t=1752819543; cv=none; b=Ic/YjS+R0m7HlEC1KkGztF0sIjEMOjpA7jNzWQ1PsNPwPcWMmue73mnpJhuWM7zZeqXCp8pN+6XKkWGfWlfWyqCglP5vUp1UaP/SAu3YfZt9/fI6mCZ6FddZh4M5OHPhRoQ7MhySjPQcq2F3LOhW6VRRcLqGs+nWhSncyaeaSJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752818650; c=relaxed/simple;
-	bh=qNfLc7XonEe7gOviJgyr7hrIJ/hagUUZv3GQNeGmMAE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=hRHRxOR9sglFho5H+iWuVCgxYK5dhQ7sOOyydXRGdqZLtfmVJ269d9yQ6EhfL3vFWtvtfJNl9ClISK9FCcmUrPHvNTYrD93KxqzHTUh9oJEyJJfeFBPXVAKCCeAtx3/I+Mrzg5/6MiAqksm+Fs2DghKiYe/TIhbsZbb6gbZ3vHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=D56kPnDe; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1752818640;
-	bh=QuwdC1Tna+trUVMYs7HTIx5JF/YqGy9uHezizJLAtKE=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=D56kPnDePrW9rZX9tzPGAE2AfDG9S2Ub1u68b5Kjcdvfc1xbGxgmTi2eGy6VllcTp
-	 25Pnb2qRTIUP9buFWWCJCjTfl4XAVwNEOcldKWWeqeJy6+1HQWkGXiwBhgid5zPKX1
-	 pvJSgGjflIIfFAaRNXA+lpegfsrS0FoXiUFPwNzoh2oH0F8POUtEPKfMBrfwGGZLtq
-	 e7vm9i+ni+MNIZJHqV7QoWjQ+9sB27OYVWhVHcq4cHgQ4KpHZ7JB+5gr8GgBhD43Xt
-	 UVOC6/eSm0ir/iVJBOtJxH917D8ZoeiNlzX+jFIeKaR6D2qXP0dElKLoTzw/gotfMO
-	 I5fwXFaczv2hA==
-Received: from pecola.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id B729C64C1A;
-	Fri, 18 Jul 2025 14:03:58 +0800 (AWST)
-Message-ID: <59d6a0ee7f47346d8beb0283ee79a493c76dbb45.camel@codeconstruct.com.au>
-Subject: Re: [PATCH] net: mctp: Add MCTP PCIe VDM transport driver
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Khang D Nguyen <khangng@amperemail.onmicrosoft.com>, YH Chung
- <yh_chung@aspeedtech.com>, "matt@codeconstruct.com.au"
- <matt@codeconstruct.com.au>, "andrew+netdev@lunn.ch"
- <andrew+netdev@lunn.ch>,  "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,  "kuba@kernel.org"
- <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, 
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, BMC-SW
- <BMC-SW@aspeedtech.com>
-Cc: Hieu Le <lhieu@os.amperecomputing.com>
-Date: Fri, 18 Jul 2025 14:03:58 +0800
-In-Reply-To: <5182407d-c252-403a-bb62-ebd11b0f126a@amperemail.onmicrosoft.com>
-References: <20250714062544.2612693-1-yh_chung@aspeedtech.com>
-	 <a01f2ed55c69fc22dac9c8e5c2e84b557346aa4d.camel@codeconstruct.com.au>
-	 <SEZPR06MB57635C8B59C4B0C6053BC1C99054A@SEZPR06MB5763.apcprd06.prod.outlook.com>
-	 <27c18b26e7de5e184245e610b456a497e717365d.camel@codeconstruct.com.au>
-	 <SEZPR06MB5763AD0FC90DD6AF334555DA9051A@SEZPR06MB5763.apcprd06.prod.outlook.com>
-	 <7e8f741b24b1426ae71171dff253921315668bf1.camel@codeconstruct.com.au>
-	 <5182407d-c252-403a-bb62-ebd11b0f126a@amperemail.onmicrosoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1752819543; c=relaxed/simple;
+	bh=AoH2pIUWrD5MbUepOmIQK6BEXrzdiV0jm/OvN5qurII=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=hKOU8un6DOUF0TQ2i3VNnaIVUnCJHrrfKuTc0qBMMkKhaazg9F750wQXwENG2YqZGYBDSy+Ib13Hd82ZTZrzE7tHS83hHLpAHpOf9/iXOdShGgR1rloRLJL7/JB+TQ0FOC4RwujKPLlBBySsgadjB+bzl+KxZjJzOb5XTdi/3Co=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q6oDiMLZ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752819541;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=2I8jDNCG0L+52nyGGUbEIAwL2BkN8wDU3xL1GQ5jtVg=;
+	b=Q6oDiMLZAAtQR+E5Dhw5SDupZT+y1XazX5TbuOwvVKAPQT9CItl4TgQLLDOYCyxC8yhMOH
+	LoqUY0r9wBPt/oITHBa/1P+2hDr6F/RF3HyBrKS7ZUHEjnygvLZBWD08NXD9ZlROfmln/6
+	FhCsUgHF6ITYb7YMWpVQCvIaUo8fzDY=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-556-o_vCKiBCOTOiBsc--Rz8LA-1; Fri,
+ 18 Jul 2025 02:18:57 -0400
+X-MC-Unique: o_vCKiBCOTOiBsc--Rz8LA-1
+X-Mimecast-MFC-AGG-ID: o_vCKiBCOTOiBsc--Rz8LA_1752819534
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3FD49195FD2B;
+	Fri, 18 Jul 2025 06:18:53 +0000 (UTC)
+Received: from server.redhat.com (unknown [10.72.112.34])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 637F318002AF;
+	Fri, 18 Jul 2025 06:18:42 +0000 (UTC)
+From: Cindy Lu <lulu@redhat.com>
+To: "K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Michael Kelley <mhklinux@outlook.com>,
+	Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	Kees Cook <kees@kernel.org>,
+	Jason Wang <jasowang@redhat.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Guillaume Nault <gnault@redhat.com>,
+	Joe Damato <jdamato@fastly.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	linux-hyperv@vger.kernel.org (open list:Hyper-V/Azure CORE AND DRIVERS),
+	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+	linux-kernel@vger.kernel.org (open list),
+	lulu@redhat.com
+Subject: [PATCH RESEND] netvsc: transfer lower device max tso size
+Date: Fri, 18 Jul 2025 14:17:55 +0800
+Message-ID: <20250718061812.238412-1-lulu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Hi Khang,
+From: Jason Wang <jasowang@redhat.com>
 
-Thanks for the input, I appreciate it.
+When netvsc is accelerated by the lower device, we can advertise the
+lower device max tso size in order to get better performance.
 
-> > Khang: any inputs from your side there?
->=20
-> I believe segment 0 is a common valid segment and is not reserved.
+One example is that when 802.3ad encap is enabled by netvsc, it has a
+lower max tso size than 64K. This will lead to software segmentation
+of forwarding GSO packet (e.g the one from VM/tap).
 
-0 would not have a special meaning in flit mode (ie, when we're using
-the segment number); this was more a reference to being optional in
-non-flit mode.
+This patch help to recover the performance.
 
-> If we want to combine, we might need another bit in the first byte to
-> represent if it is flit-mode or not. But I am not sure if it is worth
-> the effort, rather than just separate them.
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+Tested-by: Cindy Lu <lulu@redhat.com>
+---
+ drivers/net/hyperv/netvsc_drv.c |  2 +-
+ include/linux/netdevice.h       |  4 ++++
+ net/core/dev.c                  | 18 ++++++++++++++++++
+ 3 files changed, 23 insertions(+), 1 deletion(-)
 
-Yep, had the same line of thinking here too.
+diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
+index c41a025c66f0..7af4aa4f4abe 100644
+--- a/drivers/net/hyperv/netvsc_drv.c
++++ b/drivers/net/hyperv/netvsc_drv.c
+@@ -2440,7 +2440,7 @@ static int netvsc_vf_changed(struct net_device *vf_netdev, unsigned long event)
+ 		 * switched over to the VF
+ 		 */
+ 		if (vf_is_up)
+-			netif_set_tso_max_size(ndev, vf_netdev->tso_max_size);
++			netif_stacked_transfer_tso_max_size(vf_netdev, ndev);
+ 		else
+ 			netif_set_tso_max_size(ndev, netvsc_dev->netvsc_gso_max_size);
+ 	}
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index adb14db25798..c695a3ffecd8 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -5275,6 +5275,9 @@ void netdev_change_features(struct net_device *dev);
+ void netif_stacked_transfer_operstate(const struct net_device *rootdev,
+ 					struct net_device *dev);
+ 
++void netif_stacked_transfer_tso_max_size(const struct net_device *rootdev,
++					 struct net_device *dev);
++
+ netdev_features_t passthru_features_check(struct sk_buff *skb,
+ 					  struct net_device *dev,
+ 					  netdev_features_t features);
+@@ -5326,6 +5329,7 @@ static inline bool netif_needs_gso(struct sk_buff *skb,
+ }
+ 
+ void netif_set_tso_max_size(struct net_device *dev, unsigned int size);
++
+ void netif_set_tso_max_segs(struct net_device *dev, unsigned int segs);
+ void netif_inherit_tso_max(struct net_device *to,
+ 			   const struct net_device *from);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index be97c440ecd5..3bec4284adff 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -3306,6 +3306,24 @@ void netif_set_tso_max_size(struct net_device *dev, unsigned int size)
+ }
+ EXPORT_SYMBOL(netif_set_tso_max_size);
+ 
++/**
++ *	netif_stacked_transfer_tso_max_size - transfer tso max size
++ *	@rootdev: the root or lower level device to transfer tso max size from
++ *	@dev: the device to transfer operstate to
++ *
++ *	Transfer tso max size from root to device. This is normally
++ *	called when a stacking relationship exists between the root
++ *	device and the device(a leaf device).
++ */
++void netif_stacked_transfer_tso_max_size(const struct net_device *rootdev,
++					 struct net_device *dev)
++{
++	dev->tso_max_size = rootdev->tso_max_size;
++	netif_set_gso_max_size(dev, READ_ONCE(rootdev->gso_max_size));
++	netif_set_gso_ipv4_max_size(dev, READ_ONCE(rootdev->gso_ipv4_max_size));
++}
++EXPORT_SYMBOL(netif_stacked_transfer_tso_max_size);
++
+ /**
+  * netif_set_tso_max_segs() - set the max number of segs supported for TSO
+  * @dev:	netdev to update
+-- 
+2.45.0
 
-I agree that it would make sense to have the address format reflect the
-actual hardware transport. Having variation across the binding
-identifier should not be a problem.
-
-> It should be safer and easier to get the format right for each Physical=
-=20
-> Medium Identifier, rather than for each Physical Transport Binding.
->
->=20
-> So my opinion:
->=20
-> - 3-byte for non-Flit (0x08-0x0E medium type)
-> =C2=A0=C2=A0 4-byte for Flit Mode (0x40 medium type)
-> - Drivers should be able to advertise their Physical Medium Identifier
-> =C2=A0=C2=A0 alongside the existing Physical Transport Binding Identifier=
-.
-> - We can document a stable lladdr / Linux kernel physical format used
-> =C2=A0=C2=A0 for sockets for each Physical Medium Identifier, not Physica=
-l
-> =C2=A0=C2=A0 Transport Binding.
-
-Agreed, sounds like a good plan. I'll look at options for the physical
-medium identifier.
-
-YH: so we would just have the three-byte format for your proposed
-driver:
-
-   [0]: routing type (bits 0:2, others reserved)
-   [1]: bus
-   [2]: device / function
-
-- assuming you're only handling non-flit mode for now.
-
-Cheers,
-
-
-Jeremy
 
