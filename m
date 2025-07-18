@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-208264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F20C4B0AC0A
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 00:15:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA77FB0AC11
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 00:16:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11BF616C4B6
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 22:15:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E0273A9CEB
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 22:16:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D82281F09A5;
-	Fri, 18 Jul 2025 22:15:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A0022116F4;
+	Fri, 18 Jul 2025 22:16:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="USHnFs8d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YDEX7oKi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B34CF10957
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 22:15:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65AC117CA17
+	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 22:16:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752876920; cv=none; b=d9wB8X1945x3he1qUseV9Mf2zHE5C9H2ysGZjmVufDmQWiq27niuny/1M9x9M8rBt7aoz8D9UImCaw1FlAJeWMIvR3HIXhR5AvRdtyjwlH4tRWg2H2LNba86Is0JkHruvldPYHum9FnVw9UkjbPeGBDxy7f1oF3fX0RLWb6rw/I=
+	t=1752877013; cv=none; b=kpVHTau53JftmyO51hrpRTBhFohARDouIgTgokfAA/bivsbwwbvee1lLkK4pPdt8xU4ZoEb041UEjIeNFM0vp38CsjfMM6WBcOJASAcTKaR8bjJKor6cUghedyGUvkncB2h/Fvgu1Mt97O90SYf60XkQME6MEpp5SJJTZ0m/Ppg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752876920; c=relaxed/simple;
-	bh=sd7wLQNph1Qqmvk0XV3V/7GbkpHGxCPCSxBrU/LLp9o=;
+	s=arc-20240116; t=1752877013; c=relaxed/simple;
+	bh=rR4BUoAPsmOu7fLsSIO6hi/yca9E39p2ubPvVUOekyk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X3oaYwcuqAtGOkaXVWWHi5NiUV4Ss2KZgxKvvUo2dml87yToIWZq5gQSniNdOhRfzodjABbH9W++rv8RMd6DhEKXARExbt4SX6K3xLUP0s7n+q2BSa4jkGuJvXXz1AUrwkLZKaljvCa9wtBWcPmXsd+v2M5Mi/ihs5ddML4+Brs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=USHnFs8d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6718AC4CEEB;
-	Fri, 18 Jul 2025 22:15:18 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=FF+Lp2ZUhBu4Zr+xW9VhZOrPCon5+Szd+I16OSVPUfU7vGeSjoi2ofPnl1Q6n4vQV97qdUmuEdwS31qx8G8MXCCC+BsnwCyB9dHxh+8L8xctL7+BiQCEZP9EE2/K4cjxC0peXwWAW7Oja/Fm6h3YbTYGb0KwAvrlNQ34Jhm0qBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YDEX7oKi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0D09C4CEEB;
+	Fri, 18 Jul 2025 22:16:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752876920;
-	bh=sd7wLQNph1Qqmvk0XV3V/7GbkpHGxCPCSxBrU/LLp9o=;
+	s=k20201202; t=1752877013;
+	bh=rR4BUoAPsmOu7fLsSIO6hi/yca9E39p2ubPvVUOekyk=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=USHnFs8dZX25PV70APlXgEsC9UAGUBsBei1ZajP5w++RKH6x5QqwtLapofc3fcX2v
-	 e4kfvsNG2l7NGSfzpsqx8BJ6HTTHp9vOeNtOSQ0wcYDfMPLJ1MvV9NbnQdlFEPE7Qi
-	 18ENyeGgK91ScgVNr9FiwuVo3gsE84NkCcNqH71kdroXkfMoq7Fe5IEwIyCzNSLU2S
-	 KTfMqG+bN0jYyo2BGsJ5M+Bv96KlcMadxtkCrQaF5aSFAq1hnIDE3Ty6rO7Dym4dzH
-	 VjIgntFCbh7FLfly0YsPTzbCm0Tu3Q85hFhfstxANONVmRkLI1ze0gd9kZgMwYX5xW
-	 nSmo8Cvm44F+g==
-Message-ID: <4b9bf13b-1c5e-4262-8315-6b88fe3eb32c@kernel.org>
-Date: Sat, 19 Jul 2025 00:15:15 +0200
+	b=YDEX7oKiQ9eBhAw+S+aLO+f64poxs4h6jhMcohv90Vp0qByT9UKO3k5JBedYqxhLf
+	 l4JnfxiM6QtEq07gcTkqOXDyU1uONRTlBE6/bmwu9J1sbkfEVMrW+e4CywSQRScyiV
+	 xEcsZowY2vuC/s3sZ8e9Afi/eT556hwjqHqYwspzlJBtf/d8laNPfvKayiPd/318ja
+	 qDEOpSFfA2zlCYOsoz7AIJaPeVOUWOHdc/ltAJDFXpkuA4hxhPR77xWbGLRwW1+uW4
+	 VWNCqSx2eG1s3IW6yPJwcrdVHN1UktUCcC5LREcZMn4A+CUh+TMILeYg8J0da95aMa
+	 b+F1iV9zLcWxA==
+Message-ID: <22c46310-191e-4a67-bec7-6cb0cb37193b@kernel.org>
+Date: Sat, 19 Jul 2025 00:16:48 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,15 +50,16 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next 1/2] tcp: do not set a zero size receive buffer
+Subject: Re: [PATCH net-next 2/2] tcp: do not increment BeyondWindow MIB for
+ old seq
 Content-Language: en-GB, fr-BE
-To: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
 Cc: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>,
  Kuniyuki Iwashima <kuniyu@google.com>, "David S. Miller"
  <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>
 References: <cover.1752859383.git.pabeni@redhat.com>
- <3e080bdba9981988ff86e120df40a5f0dc6cd033.1752859383.git.pabeni@redhat.com>
+ <33f764b857dd28273784da12a3bac8dac039fbcb.1752859383.git.pabeni@redhat.com>
 From: Matthieu Baerts <matttbe@kernel.org>
 Autocrypt: addr=matttbe@kernel.org; keydata=
  xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
@@ -104,34 +105,22 @@ Autocrypt: addr=matttbe@kernel.org; keydata=
  JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
  lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
 Organization: NGI0 Core
-In-Reply-To: <3e080bdba9981988ff86e120df40a5f0dc6cd033.1752859383.git.pabeni@redhat.com>
+In-Reply-To: <33f764b857dd28273784da12a3bac8dac039fbcb.1752859383.git.pabeni@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 Hi Paolo,
 
 On 18/07/2025 19:25, Paolo Abeni wrote:
-> The nipa CI is reporting frequent failures in the mptcp_connect
-> self-tests.
+> The mentioned MIB is currently incremented even when a packet
+> with an old sequence number (i.e. a zero window probe) is received,
+> which is IMHO misleading.
 > 
-> In the failing scenarios (TCP -> MPTCP) the involved sockets are
-> actually plain TCP ones, as fallback for passive socket at 2whs
-> time cause the MPTCP listener to actually create a TCP socket.
-> 
-> The transfer is stuck due to the receiver buffer being zero.
-> With the stronger check in place, tcp_clamp_window() can be invoked
-> while the TCP socket has sk_rmem_alloc == 0, and the receive buffer
-> will be zeroed, too.
-> 
-> Pass to tcp_clamp_window() even the current skb truesize, so that
-> such helper could compute and use the actual limit enforced by
-> the stack.
+> Explicitly restrict such MIB increment at the relevant events.
 
-Thank you for this fix!
+Good idea, it is less confusing!
 
 Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-
-I guess we can drop "mptcp-connect-sh" from the ignored tests then :)
 
 Cheers,
 Matt
