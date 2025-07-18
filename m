@@ -1,139 +1,185 @@
-Return-Path: <netdev+bounces-208211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55F8EB0A9A7
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 19:40:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4B3DB0A9EF
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 20:03:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5F891C40A38
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 17:40:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A70ADAA707C
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 18:03:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2438C2E7629;
-	Fri, 18 Jul 2025 17:40:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDD672E7625;
+	Fri, 18 Jul 2025 18:03:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CVdRvKlI"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="S8ipk19X"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78DEC156678;
-	Fri, 18 Jul 2025 17:40:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C88F1799F;
+	Fri, 18 Jul 2025 18:03:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752860435; cv=none; b=GrB33lmUKdeePFRF1dt2hg0F4wNZetDQiEaplHutuTqX/g3IpD4whRpoy0aIJnwpvGIDUhuO2JReknQenlsy+4MbUVEv2TO6xZ8JkVz/JeZwt4/cVFBTDCR4WmxBRxAN5QkmupMn3lMRkmR9XlK+VZBESuBr7VLvc3N452tD91w=
+	t=1752861808; cv=none; b=ZSa3TDHcoQ+f/p2zI0PbR6F8n8Ef8Svndr27H2Bnxbvgm1wx+rgfuxFn+CL49hPmczVi3eAsgSROmdxwjM2vzGjSpuv/mK2nQbuuqKirwahU/DkH6lKjfgFK5Iq0mgAQ6maYWMhzZ1SDQS7v653Bk6ZsLp9FIWTnZNP8C68j6jQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752860435; c=relaxed/simple;
-	bh=mQMolIgpTH7FjE+3w+cIHxeevW8RkXD0lhrk1Zqnq1U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o4O/+O6Sr/SwKfuJUYlZnJN4mUnzTo/GZQtaiq63ZZxSwYCWEVgd9LWVjLE5B1J/aJqxbU3W55tXJNC8FPrWX45XSFTsvaioOIO3PqrTEFAHvk5dGGz8zrsYOcnjuTzkg4Srj3ONPVOgxf/PEBb5Odjad204KIj6bxU4vddNlk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CVdRvKlI; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 5FD8E443B3;
-	Fri, 18 Jul 2025 17:40:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1752860425;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fQqUsJ+Qb6MnonChra2CtKhIIlviGmLlJPe1nhDRgAA=;
-	b=CVdRvKlIHFHsWfAgRCHtzqd+wMzGyGeJV7woFCUMSefTHo6gS4gAbmWGFLMC+KtyhK8Sep
-	7mSo0vOFEg1xkQv2/aKJ8M1I+NOfJbKxBXNwO/iXiopx9mRRBngl1EYJMtucYoz3/Ckc3e
-	qGdMo6s7sj/FPzERN7FrV5S5pNO//q3meaQqQ4YyAf0x/K3K4I2X4TjryooGndNCD1CXog
-	wSAvnuP9QxJZ5z/3+UOpSAyL8PV7vbx23Nn7aboo5j8HvfRiFRj1M3/zSF92soI9YTFFo8
-	msJwRCY5Tbz/C9eqdCnQPrhN76K1qnNze4lKNr1tJe5RxthKM4S6M5wfXQE4jw==
-Date: Fri, 18 Jul 2025 19:40:22 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- linux-arm-kernel@lists.infradead.org, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
- <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
- mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
- devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Romain
- Gantois <romain.gantois@bootlin.com>, Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next v9 02/15] net: ethtool: common: Indicate that
- BaseT works on up to 4 lanes
-Message-ID: <20250718194022.4d01088e@kmaincent-XPS-13-7390>
-In-Reply-To: <20250717073020.154010-3-maxime.chevallier@bootlin.com>
-References: <20250717073020.154010-1-maxime.chevallier@bootlin.com>
-	<20250717073020.154010-3-maxime.chevallier@bootlin.com>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1752861808; c=relaxed/simple;
+	bh=KFKBL9lxu9qRH0uSM7O9Zi7SITZuQeQ43sS4hJNZllQ=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Rh7f8FmVtoF9yP218lLpCVjDvBmk43pIGfN6t7kvvugO/ekfLDDzXRoUNBcXBAMr7kG4KW5j9IVGE5IH7Qh3JGtC5uJfyapizdPq3teWDqQXRX2v80opVwdUvp5nFYMjtLgMvukz1/ZQ2xsblX/q9qfmi5CqrEK0peZQrNhonsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=S8ipk19X; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=CTATvulFqJ/iDBKnDw6rem6MuwIVbUfJ3v7HDdYiJto=;
+	t=1752861807; x=1754071407; b=S8ipk19XzR3bEd4Q4LEICTuFg+HlQKgpOyr9l4e1sxqvUwx
+	O7tk+5YOFwZpid7IRtPIfleZTUOrdrwO0d8w7SSNYQsbKp60WdGr5qhd6zezGLLfSdLxmmZvGBSw5
+	O3XH9p+LDjAaN5cKnDErYuI+5dULJgG2wfkXb68U1NI4LeSJjvaAGAI34RyBTJhmwAVKIXo3Z7tAa
+	LVwNJ9EZhzr4baapLJHd5QaUShYk9zbVGQ4qUxLjaqMIwEX7tgzVyf8qol1Mctes6dmryvGC3DXhx
+	m3o9u/QtZoLkygHBfSnhEuE/1LTL8dWO4/x//FMatQqM7DAKEzG9Zmim9Dsosjkw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1ucpQT-0000000D2pj-3LuU;
+	Fri, 18 Jul 2025 20:03:17 +0200
+Message-ID: <753bc16161f9f1024d33b93d6aa984c0b6adf51d.camel@sipsolutions.net>
+Subject: Re: [syzbot] [wireless] BUG: unable to handle kernel paging request
+ in ieee80211_wep_encrypt
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Eric Biggers <ebiggers@kernel.org>, linux-wireless@vger.kernel.org
+Cc: syzbot <syzbot+d1008c24929007591b6b@syzkaller.appspotmail.com>, 
+	ardb@kernel.org, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ mingo@redhat.com, 	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+ tglx@linutronix.de, 	x86@kernel.org
+Date: Fri, 18 Jul 2025 20:03:16 +0200
+In-Reply-To: <2d1a41aa000c8de8f82827bd8c06459e01f10423.camel@sipsolutions.net>
+References: <6878cd49.a70a0220.693ce.0044.GAE@google.com>
+		 <20250718145049.GA1574@quark>
+	 <2d1a41aa000c8de8f82827bd8c06459e01f10423.camel@sipsolutions.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdeigedtkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefguddtfeevtddugeevgfevtdfgvdfhtdeuleetffefffffhffgteekvdefudeiieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepvdgrtddumegtsgduheemfegvgeemtgehtddtmeekvddttgemiegvtddumeejkegrtgemvdgtugefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduheemfegvgeemtgehtddtmeekvddttgemiegvtddumeejkegrtgemvdgtugefpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeefuddprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtp
- hhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgrrhhmqdhmshhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
-X-GND-Sasl: kory.maincent@bootlin.com
+X-malware-bazaar: not-scanned
 
-Le Thu, 17 Jul 2025 09:30:06 +0200,
-Maxime Chevallier <maxime.chevallier@bootlin.com> a =C3=A9crit :
+On Fri, 2025-07-18 at 17:57 +0200, Johannes Berg wrote:
+> On Fri, 2025-07-18 at 07:50 -0700, Eric Biggers wrote:
+> > >=20
+> > > BUG: unable to handle page fault for address: ffff8880bfffd000
+> [...]
+> > > Call Trace:
+> > >  <TASK>
+> > >  crc32_le_arch+0x56/0xa0 arch/x86/lib/crc32.c:21
+> > >  crc32_le include/linux/crc32.h:18 [inline]
+> > >  ieee80211_wep_encrypt_data net/mac80211/wep.c:114 [inline]
+> > >  ieee80211_wep_encrypt+0x228/0x410 net/mac80211/wep.c:158
+> [...]
+> > >  nl80211_tx_mgmt+0x9fd/0xd50 net/wireless/nl80211.c:12921
+> >=20
+> > syzbot assigned this to the "crypto" subsystem.  However, the crash
+> > happened in crc32_le() which is not part of the crypto subsystem.  Also=
+,
+> > crc32_le() is well-tested (e.g. by crc_kunit), and the bug is unlikely
+> > to be there.  Rather, the calling code in ieee80211_wep_encrypt_data()
+> > is passing an invalid data buffer to crc32_le().  So let's do:
+>=20
+> Agree, that makes sense, looks like we never check the frame length
+> correctly. Since there's no reproducer (yet) I guess we won't be testing
+> against it with syzbot though :)
 
-> The way BaseT modes (Ethernet over twisted copper pairs) are represented
-> in the kernel are through the following modes :
->=20
->   ETHTOOL_LINK_MODE_10baseT_Half
->   ETHTOOL_LINK_MODE_10baseT_Full
->   ETHTOOL_LINK_MODE_100baseT_Half
->   ETHTOOL_LINK_MODE_100baseT_Full
->   ETHTOOL_LINK_MODE_1000baseT_Half
->   ETHTOOL_LINK_MODE_1000baseT_Full
->   ETHTOOL_LINK_MODE_2500baseT_Full
->   ETHTOOL_LINK_MODE_5000baseT_Full
->   ETHTOOL_LINK_MODE_10000baseT_Full
->   ETHTOOL_LINK_MODE_100baseT1_Full
->   ETHTOOL_LINK_MODE_1000baseT1_Full
->   ETHTOOL_LINK_MODE_10baseT1L_Full
->   ETHTOOL_LINK_MODE_10baseT1S_Full
->   ETHTOOL_LINK_MODE_10baseT1S_Half
->   ETHTOOL_LINK_MODE_10baseT1S_P2MP_Half
->   ETHTOOL_LINK_MODE_10baseT1BRR_Full
->=20
-> The baseT1* modes explicitly specify that they work on a single,
-> unshielded twister copper pair.
->=20
-> However, the other modes do not state the number of pairs that are used
-> to carry the link. 10 and 100BaseT use 2 twisted copper pairs, while
-> 1GBaseT and higher use 4 pairs.
->=20
-> although 10 and 100BaseT use 2 pairs, they can work on a Cat3/4/5+
-> cables that contain 4 pairs.
->=20
-> Change the number of pairs associated to BaseT modes to indicate the
-> allowable number of pairs for BaseT. Further commits will then refine
-> the minimum number of pairs required for the linkmode to work.
->=20
-> BaseT1 modes aren't affected by this commit.
->=20
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Well, hmm. So we're in
 
-Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
+int ieee80211_wep_encrypt_data(struct arc4_ctx *ctx, u8 *rc4key,
+                               size_t klen, u8 *data, size_t data_len)
+{
+        __le32 icv;
 
-Thank you!
+        icv =3D cpu_to_le32(~crc32_le(~0, data, data_len));
 
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+with presumably data/data_len being garbage. Via
+
+int ieee80211_wep_encrypt(struct ieee80211_local *local,
+                          struct sk_buff *skb,
+                          const u8 *key, int keylen, int keyidx)
+{
+        u8 *iv;
+        size_t len;
+        u8 rc4key[3 + WLAN_KEY_LEN_WEP104];
+
+        if (WARN_ON(skb_tailroom(skb) < IEEE80211_WEP_ICV_LEN))
+                return -1;
+
+        iv =3D ieee80211_wep_add_iv(local, skb, keylen, keyidx);
+        if (!iv)
+                return -1;
+
+        len =3D skb->len - (iv + IEEE80211_WEP_IV_LEN - skb->data);
+
+which _looks_ OK at first, however, looking at
+
+
+static u8 *ieee80211_wep_add_iv(struct ieee80211_local *local,
+                                struct sk_buff *skb,
+                                int keylen, int keyidx)
+{
+        struct ieee80211_hdr *hdr =3D (struct ieee80211_hdr *)skb->data;
+        struct ieee80211_tx_info *info =3D IEEE80211_SKB_CB(skb);
+        unsigned int hdrlen;
+        u8 *newhdr;
+
+        hdr->frame_control |=3D cpu_to_le16(IEEE80211_FCTL_PROTECTED);
+
+        if (WARN_ON(skb_headroom(skb) < IEEE80211_WEP_IV_LEN))
+                return NULL;
+
+        hdrlen =3D ieee80211_hdrlen(hdr->frame_control);
+        newhdr =3D skb_push(skb, IEEE80211_WEP_IV_LEN);
+        memmove(newhdr, newhdr + IEEE80211_WEP_IV_LEN, hdrlen);
+
+        /* the HW only needs room for the IV, but not the actual IV */
+        if (info->control.hw_key &&
+            (info->control.hw_key->flags & IEEE80211_KEY_FLAG_PUT_IV_SPACE)=
+)
+                return newhdr + hdrlen;
+
+        ieee80211_wep_get_iv(local, keylen, keyidx, newhdr + hdrlen);
+        return newhdr + hdrlen;
+}
+
+
+there's no check that the skb->len is actually >=3D hdrlen(), in which
+case we would return an 'iv' that's outside of [skb->data..+len].
+
+Then the
+
+	len =3D skb->len - (iv + IEEE80211_WEP_IV_LEN - skb->data);
+
+subtraction could underflow and result in this issue, I guess.
+
+But the stack dump is strange in that we appear to get here via
+nl80211_tx_mgmt() which only accepts management frames, but
+ieee80211_tx_h_select_key() at least for WEP will NULL out the key for
+!data frames, and then we can't get into the encrypt functions. Data
+frames are always built by the kernel itself, so shouldn't get into some
+kind of weird "header is shorter than the frame" situation.
+
+It's theoretically possible that this is a _different_ frame being
+dequeued than was just enqueued, but that seems like quite a stretch
+since we just immediately dequeue after the enqueue with the hwsim
+implementation ... and I'm not sure where that frame would come from
+anyway.
+
+So right now I have no idea what's going on here, nothing seems right.
+
+johannes
 
