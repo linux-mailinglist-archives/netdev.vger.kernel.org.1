@@ -1,102 +1,101 @@
-Return-Path: <netdev+bounces-208212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 171F9B0A9CF
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 19:50:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 846D1B0A8FB
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 18:59:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A70941C820EF
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 17:51:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A170517BA07
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 16:59:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A2F2E7651;
-	Fri, 18 Jul 2025 17:50:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 819B12135D1;
+	Fri, 18 Jul 2025 16:59:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="EJI6T4j2"
 X-Original-To: netdev@vger.kernel.org
-Received: from pegase1.c-s.fr (pegase1.c-s.fr [93.17.236.30])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DB3A2BDC2D;
-	Fri, 18 Jul 2025 17:50:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.236.30
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE2B61C862C
+	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 16:59:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752861038; cv=none; b=gowPbDiQrCqfmka8D/oqkAmD+wfx/BpqUd1tDYx3O0jfBDuNc8aywgwCJ1egJEu084G8PLw/TQfCzKrYPsMmf2jlLiIJ59LBBJJnKt66JV/bv+D1ryoZ0OhJ5Rm7qbfYaiJtHi7MRBbffGSNbuHZ+kIP6c6IUVwLLIYFZmEkLBw=
+	t=1752857982; cv=none; b=ABVDB5It/yg5e2SgcKcQsiLL53gPTIEQ3dW4wRDx3wU93Zph+yJWZ6bp+Dj+sXFp1b0VlZpocP0Nfbh+ukxXMO43qucezCq10yNYblcsQaxoSZLwImCYVCu+M5BZgAAX9iZcrv7gVmxvtHFBz9QAYexVDX7kVrI5xYOXcOsaIJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752861038; c=relaxed/simple;
-	bh=yeCLiP6QiJxcQgcWHbouvhYw26w7TdYdA/38lgxBvQE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=V0M2Yyps94kbFZkzRzNeka/aW+DRIRlOK5UvPdDiU3Q+6TnYoyzrf7ft6Orv/jbpw70eJRkayyOamUP7OoqEU0svymQFwl0ubTykWkK7s3+z0o9P7exELTDX5dCkAAiwJRmDK+ZvfTS66XTlso3fQHnecSkbRX5DmFqc4XEqB44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.236.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub3.si.c-s.fr [192.168.12.233])
-	by localhost (Postfix) with ESMTP id 4bkGGQ3NFGz9sgJ;
-	Fri, 18 Jul 2025 18:58:54 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase1.c-s.fr ([192.168.12.234])
-	by localhost (pegase1.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CSuC_jtzI8aT; Fri, 18 Jul 2025 18:58:54 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase1.c-s.fr (Postfix) with ESMTP id 4bkGGQ2THLz9sWb;
-	Fri, 18 Jul 2025 18:58:54 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 4B1DF8B783;
-	Fri, 18 Jul 2025 18:58:54 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id zcviEiDUcLOa; Fri, 18 Jul 2025 18:58:54 +0200 (CEST)
-Received: from [192.168.202.221] (unknown [192.168.202.221])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id A03A78B77B;
-	Fri, 18 Jul 2025 18:58:51 +0200 (CEST)
-Message-ID: <2d25448c-2409-4bfb-b900-6f96851df14e@csgroup.eu>
-Date: Fri, 18 Jul 2025 18:58:44 +0200
+	s=arc-20240116; t=1752857982; c=relaxed/simple;
+	bh=6SqLEtUqDD5/BzXbxtgrbLx7ALuw/QQKXBCTlqM0Iq0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ogAxvrtVahvVjmZquijLQu/jkvRyvgJAeVJjtOYfOphKUj+EjAcOLe6atYSFS4W2EUVOGYeZlHHVjYA00uE3TW7AiSJKjKkicPm6km5b45BHQI1hJOTR5LlRSVMrdYzHhxqXdy8LFG9RfmDE0tfq8/fe7bdd9Z96YSoh8l0qNzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=EJI6T4j2; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=WRkDyy57U7Cb31/cmiG2E1pEbzORxnsJtuw5hKbmRIU=; b=EJI6T4j2yc16oZOMO1gpL4QJRn
+	HaOjCSNO1Cqh4E9QhP8BzdUfcQcO/067fQCHp0IostKyMKTtomB2Jr04EkSf4rcZy/q5ZtgaDe44x
+	YEN5PjU/5bKOJXNY4ekajc2Bw0ZYMlmSowQy2xiBDqNkURzFB/rUscHEKiJifSIA1kY4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ucoQm-0020xr-Rv; Fri, 18 Jul 2025 18:59:32 +0200
+Date: Fri, 18 Jul 2025 18:59:32 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	Philo Lu <lulie@linux.alibaba.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
+	Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Dust Li <dust.li@linux.alibaba.com>
+Subject: Re: [PATCH net-next] eea: Add basic driver framework for Alibaba
+ Elastic Ethernet Adaptor
+Message-ID: <9e208e97-23ef-41e7-94d0-0a391cba9b59@lunn.ch>
+References: <20250710112817.85741-1-xuanzhuo@linux.alibaba.com>
+ <7b957110-c675-438a-b0c2-ebc161a5d8e7@lunn.ch>
+ <1752644852.1458855-1-xuanzhuo@linux.alibaba.com>
+ <322af656-d359-44d8-9e40-4f997a8b7e0f@lunn.ch>
+ <1752733075.7055798-1-xuanzhuo@linux.alibaba.com>
+ <161e69d8-eb8e-4a5d-9b4e-875fa6253c67@lunn.ch>
+ <1752803672.0477452-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 00/15] net: phy: Introduce PHY ports
- representation
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, thomas.petazzoni@bootlin.com,
- Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org,
- Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
- =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
- Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
- Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
- Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
- Romain Gantois <romain.gantois@bootlin.com>,
- Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-References: <20250717073020.154010-1-maxime.chevallier@bootlin.com>
-Content-Language: fr-FR
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-In-Reply-To: <20250717073020.154010-1-maxime.chevallier@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1752803672.0477452-1-xuanzhuo@linux.alibaba.com>
 
+> We have our own distribution "Anolis".
 
+This driver can be used with any distribution. So it needs to work
+equally well for all distributions.
 
-Le 17/07/2025 à 09:30, Maxime Chevallier a écrit :
-> Hi everyone,
+If you want this feature in Anolis, you can take the upstream version
+and hack in the feature in your downstream kernel.
+
+> > No module parameters. You are doing development work, just use $EDITOR
+> > and change the timeout.
 > 
-> Here's a V9 for the phy port work, that includes some fixes from Rob's
-> reviews, by addressing a typo and the mediums item list.
+> Our use case has already been explained. We will set a long timeout to help with
+> issue diagnosis, and once the problem is identified, we will immediately adjust
+> the timeout to let the driver exit quickly. Honestly, this is a very useful
+> feature for us during the development process. Of course, it seems that you are
+> strongly opposed to it, so we will remove it in the next version.
 
-For the series:
+We have been pushing back on module parameters for years. You should
+of seen this in multiple review comments on the netdev list.
 
-Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-
-Christophe
+	Andrew
 
