@@ -1,132 +1,91 @@
-Return-Path: <netdev+bounces-208244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60482B0AB12
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 22:21:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9771AB0AB21
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 22:27:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6E6F1C285F3
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 20:21:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B6E71C807FB
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 20:27:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09E1221C9E1;
-	Fri, 18 Jul 2025 20:21:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46E73597E;
+	Fri, 18 Jul 2025 20:26:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="bOMtyzbH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YYQS8nMI"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6584211712;
-	Fri, 18 Jul 2025 20:21:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9C6611712;
+	Fri, 18 Jul 2025 20:26:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752870061; cv=none; b=oenrdc2pSyseweoUJ5GQDQZkjjayG0ZWbJqTvNCbvbOk2rN0loHxTjUhPGCgeAtTegX5a10pv1OgLrjHJW51Hzyv4jt0BlTJdPEEWveq1+BfZRmXUs/blqKT0lcRJ0fzL/jdDgm/XIFEvhGzSK3yMMdPw4TNJ32OlLTTP9ttWEo=
+	t=1752870419; cv=none; b=h6GxTKt2DzBNFLGsaGJp0ynhYU+R4TLVSWV7AwtzKUYe2YaNdKeIpst4xDi5owENbJ5ayDnlJbGNcGGOyKzD/xdtaD8TBskwsllTVMnYCypvDrvWcoEz8j0pnFsVJ7biY+XvC0N79GE8tAhkScUwozCHjkqiHZ9fKqDii1wOWxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752870061; c=relaxed/simple;
-	bh=5GR/+PDx+U+fOuXcL6gTbXd2bjBLmJST2ztzbRykFBY=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=HtWL/Yv6toQWb58rjINWV7CX3d4XXI/Qb766IDYD4Rmx4wNECgFCzLpuhI6D73ItRPTD2pmYjurr5DGGJvv+5BFtomt/ZLMtuEp3eyPars4ct/R43wPEZmtwyh/CrBL5fFQ/Jt2OFw3PF1Na+KEJ06cKOQnt0f4VlP0C6vv8Zfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=bOMtyzbH; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1006)
-	id CC7BC211FEC6; Fri, 18 Jul 2025 13:20:59 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com CC7BC211FEC6
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1752870059;
-	bh=BOXZHV9y8YTfhsgSAEvvRDJh+qMnYv9KD0BqY7VTGdM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=bOMtyzbHytMrwCOIp2b+xDKjKZAVaMh+hiYhDdO6FX94Z7fZVOXxg1pPanb3lIFNP
-	 m41Jy+bfhctezCJElKS1T6W35wg//egwTdKzwAJQVJ9PZ9uUxKLDlh3L2tcZTD28JV
-	 nwQVWwMv80sgrDTdTHmo2HeCXrrMqaKb57CHZCD4=
-From: Haiyang Zhang <haiyangz@linux.microsoft.com>
-To: linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: haiyangz@microsoft.com, kys@microsoft.com, wei.liu@kernel.org,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, davem@davemloft.net, sdf@fomichev.me,
-	kuniyu@google.com, ahmed.zaki@intel.com,
-	aleksander.lobakin@intel.com, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org, #@linux.microsoft.com,
-	5.4+@linux.microsoft.com
-Subject: [PATCH net] net: core: Fix the loop in default_device_exit_net()
-Date: Fri, 18 Jul 2025 13:20:14 -0700
-Message-Id: <1752870014-28909-1-git-send-email-haiyangz@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
+	s=arc-20240116; t=1752870419; c=relaxed/simple;
+	bh=sP5S1hyxb6E0b3G4KWuQg8VfXJI1dv/IcFmy43EkqRk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p23BRWpXv0mkVLPxrmov4iOUVDn3ao/9ZUINGllt5uL5jebbMoJJP2CeBiBGvLtAkGz/5oY8gjCPqvcKG7EoeY6HHCKjxdHxGgaZ4yWnuVzku1VjEClbfWPQttnyfc0z8W0wJhkh9IFTusZxz/OatS3RtdNS54d8kOx8LeOjC6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YYQS8nMI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66CD8C4CEEB;
+	Fri, 18 Jul 2025 20:26:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752870418;
+	bh=sP5S1hyxb6E0b3G4KWuQg8VfXJI1dv/IcFmy43EkqRk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YYQS8nMIldUQZLbGTAGAEEYVWvsJUWGQrsZ9qQ+xO5SGwWqgtpg7Fhc/lRpA9Elrm
+	 Kb2VAdE3GVG56fwxxeLdK7/iZiv/1KphRbNKZlzpXP+RPrvooINbyik7EFqQWQlnJd
+	 lZz2WTjBOU8IwRbRK59lBrAR2zIvu+sbzgKC8oqBuZl6A2VBfN2spHu44QDMcv1Jep
+	 ITtmWkIeix+QMLbsb7aCZgVFFVw2gX/D/ubrD1Dc0JLTvhwaa8b6oF6ZNfnae4aFve
+	 vfyaVwjb4NS8it6UwOWuAB+cMKiuodQ+Ha/VGys2LP1Xfbm1VgytQ2EP5v3gosHvk5
+	 IlwH2at2eSFIA==
+Date: Fri, 18 Jul 2025 21:26:53 +0100
+From: Simon Horman <horms@kernel.org>
+To: Alexandra Winter <wintera@linux.ibm.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thorsten Winkler <twinkler@linux.ibm.com>,
+	Aswin Karuvally <aswin@linux.ibm.com>
+Subject: Re: [PATCH net-next] s390/qeth: Make hw_trap sysfs attribute
+ idempotent
+Message-ID: <20250718202653.GO2459@horms.kernel.org>
+References: <20250718141711.1141049-1-wintera@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250718141711.1141049-1-wintera@linux.ibm.com>
 
-From: Haiyang Zhang <haiyangz@microsoft.com>
+On Fri, Jul 18, 2025 at 04:17:11PM +0200, Alexandra Winter wrote:
+> From: Aswin Karuvally <aswin@linux.ibm.com>
+> 
+> Update qeth driver to allow writing an existing value to the "hw_trap"
+> sysfs attribute. Attempting such a write earlier resulted in -EINVAL.
+> In other words, make the sysfs attribute idempotent.
+> 
+> After:
+>     $ cat hw_trap
+>     disarm
+>     $ echo disarm > hw_trap
+>     $
+> 
+> Suggested-by: Alexandra Winter <wintera@linux.ibm.com>
+> Signed-off-by: Aswin Karuvally <aswin@linux.ibm.com>
+> Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
+> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
 
-The loop in default_device_exit_net() won't be able to properly detect the
-head then stop, and will hit NULL pointer, when a driver, like hv_netvsc,
-automatically moves the slave device together with the master device.
-
-To fix this, add a helper function to return the first migratable netdev
-correctly, no matter one or two devices were removed from this net's list
-in the last iteration.
-
-Cc: stable@vger.kernel.org # 5.4+
-Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
----
- net/core/dev.c | 31 +++++++++++++++++++++----------
- 1 file changed, 21 insertions(+), 10 deletions(-)
-
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 621a639aeba1..d83f5f12cf70 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -12629,19 +12629,11 @@ static struct pernet_operations __net_initdata netdev_net_ops = {
- 	.exit = netdev_exit,
- };
- 
--static void __net_exit default_device_exit_net(struct net *net)
-+static inline struct net_device *first_migratable_netdev(struct net *net)
- {
--	struct netdev_name_node *name_node, *tmp;
- 	struct net_device *dev, *aux;
--	/*
--	 * Push all migratable network devices back to the
--	 * initial network namespace
--	 */
--	ASSERT_RTNL();
--	for_each_netdev_safe(net, dev, aux) {
--		int err;
--		char fb_name[IFNAMSIZ];
- 
-+	for_each_netdev_safe(net, dev, aux) {
- 		/* Ignore unmoveable devices (i.e. loopback) */
- 		if (dev->netns_immutable)
- 			continue;
-@@ -12650,6 +12642,25 @@ static void __net_exit default_device_exit_net(struct net *net)
- 		if (dev->rtnl_link_ops && !dev->rtnl_link_ops->netns_refund)
- 			continue;
- 
-+		return dev;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void __net_exit default_device_exit_net(struct net *net)
-+{
-+	struct netdev_name_node *name_node, *tmp;
-+	struct net_device *dev;
-+	/*
-+	 * Push all migratable network devices back to the
-+	 * initial network namespace
-+	 */
-+	ASSERT_RTNL();
-+	while ((dev = first_migratable_netdev(net)) != NULL) {
-+		int err;
-+		char fb_name[IFNAMSIZ];
-+
- 		/* Push remaining network devices to init_net */
- 		snprintf(fb_name, IFNAMSIZ, "dev%d", dev->ifindex);
- 		if (netdev_name_in_use(&init_net, fb_name))
--- 
-2.34.1
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
