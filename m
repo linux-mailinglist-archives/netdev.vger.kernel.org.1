@@ -1,128 +1,191 @@
-Return-Path: <netdev+bounces-208095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA38AB09CC8
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 09:39:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B034CB09CD4
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 09:41:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8114D3BCA31
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 07:38:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4D551727B3
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 07:41:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0449B2690E7;
-	Fri, 18 Jul 2025 07:39:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C007B24167C;
+	Fri, 18 Jul 2025 07:41:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="QTy2Kqxm"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC7222A4F6
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 07:39:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF1661A8F97;
+	Fri, 18 Jul 2025 07:41:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752824343; cv=none; b=t6NP4eHTNUf1Nz5QdPQsZcUzsW5jciMUG4f6AtizfITkYjl4Skitmwo6TMRs3DC2rOG0TtFKrQ5VnyLSthQ3dgP569WJElJvhaWoyrLCDFhMvsEXmAtXgwZCQrGwEIHs5+vCibh+ns6oLqsFxnteDZOGngR55lWZXwkz23V0kjo=
+	t=1752824513; cv=none; b=mAHm2QcANWWhxx/hPDVQ8ITfwsS//Du78odCNNxO6yi5xaA7cybgkvo/JulfUbehHEQiS+5v/wsupkQNBhBL2ccGIE+bXUhJONMIfvRgZlHsVM4eCBCY658/ElevdoCyIlGNsHxbe3AFn18PQQPyjVPzwTF8iKzs6VyJUcgf8wE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752824343; c=relaxed/simple;
-	bh=kZ0savlK8hmTukJ61RLvHvHkzYy+aZT8mFDG44NLLIs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JzJuzf5I4TZRWYIHPnXlYtp9nrpwpX5uBSKPgMHwA1jk0Sizg+p1VQ+kt2tBlsRL31PAIRZKZwi0AdKYABY2zWP2TPCENrJzgUhNfJ343yfiRvTrhXPnUp/5PqhJ7O78EdKgl36nig+PbzXFnaiMKk32S/VmFC/T0non11q94c4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ucffU-0005ix-MH; Fri, 18 Jul 2025 09:38:08 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ucffP-0092TR-0n;
-	Fri, 18 Jul 2025 09:38:03 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ucffP-008KaQ-0N;
-	Fri, 18 Jul 2025 09:38:03 +0200
-Date: Fri, 18 Jul 2025 09:38:03 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Lukasz Majewski <lukma@denx.de>, Jonathan Corbet <corbet@lwn.net>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Divya.Koppera@microchip.com
-Subject: Re: [PATCH net-next v1 1/1] Documentation: networking: add detailed
- guide on Ethernet flow control configuration
-Message-ID: <aHn526JuMBpUB_T8@pengutronix.de>
-References: <20250717103702.2112988-1-o.rempel@pengutronix.de>
- <aHkzEalj6tjhQX8N@shell.armlinux.org.uk>
+	s=arc-20240116; t=1752824513; c=relaxed/simple;
+	bh=J5kKqTKlg4ioIqTAnV2dtolGEeERqKQr/KzPEPbUKz8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=UcJGE+H5fJ4tsFyMhaFg/DBF8raW/C6nPGIZny9Ka0VYF/usrsSe9DpjnTj+rJ9NYahCz8sp/AZheL5b49yeKCh87CHGAZWI8xmXazcl7OVBo6alglOJu8LQc3CkwSWx2Et3WFhsEAp74sKMezXB+d95Nm0LFqNgtEa6FsjcL4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=QTy2Kqxm; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56I7cjHo009576;
+	Fri, 18 Jul 2025 07:41:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	FFAOMChFqrKhKYfUFTQm9VW1DmXhkt4PhiDLnZ9VC2M=; b=QTy2Kqxm09sxhe30
+	oq1riXFH+6JvVlsJoFElb+y9/z/QhwqNLKFRBtJjZzmaQWg5tHu//P6+gSglvwBD
+	d/XYDK+zzityzeIoJg8CoPQlhhQrnr/V7pQxxL37da/FUkMQFzhtLsQYT2Iszk6w
+	63YSdnPxT750gWzVEBmmXh8MxwS5tf63HQUUgC3gtwbRYIQ6YEQHiBwlIimpNie/
+	yVuIzzxlgG9DxKQuBn9APVvv1aQGT/hejB78Q/68Jiiw7o8NGcd0h22o7BFBxzAz
+	skWtQLq2Ro78XdLHsk2GBJHmgDSSd8EENrM/w+sbaDuivQsNO+kg1m6yC56GY0yc
+	7LYZIg==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47ufxbam37-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 18 Jul 2025 07:41:34 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 56I7fXVK013574
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 18 Jul 2025 07:41:33 GMT
+Received: from [10.253.76.178] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Fri, 18 Jul
+ 2025 00:41:27 -0700
+Message-ID: <13ca4d6e-d5db-4fd5-af14-9ccda55ddba2@quicinc.com>
+Date: Fri, 18 Jul 2025 15:41:24 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aHkzEalj6tjhQX8N@shell.armlinux.org.uk>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 10/14] net: ethernet: qualcomm: Initialize PPE
+ RSS hash settings
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        Andrew Lunn
+	<andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Eric
+ Dumazet" <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>, Lei Wei
+	<quic_leiwei@quicinc.com>,
+        Suruchi Agarwal <quic_suruchia@quicinc.com>,
+        Pavithra R <quic_pavir@quicinc.com>, Simon Horman <horms@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>, Kees Cook <kees@kernel.org>,
+        "Gustavo A. R.
+ Silva" <gustavoars@kernel.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>
+CC: <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
+        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>
+References: <20250626-qcom_ipq_ppe-v5-0-95bdc6b8f6ff@quicinc.com>
+ <20250626-qcom_ipq_ppe-v5-10-95bdc6b8f6ff@quicinc.com>
+ <793434f9-7cdc-409f-b855-380be7a2b0db@oss.qualcomm.com>
+Content-Language: en-US
+From: Luo Jie <quic_luoj@quicinc.com>
+In-Reply-To: <793434f9-7cdc-409f-b855-380be7a2b0db@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: d_Ee6WCGIkzRAaD8MJrO82z3Rn9nrrvQ
+X-Proofpoint-ORIG-GUID: d_Ee6WCGIkzRAaD8MJrO82z3Rn9nrrvQ
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE4MDA1OSBTYWx0ZWRfXzWtpS0NkR21S
+ bKygKN8oh1IUv8AVDh/vUd/98aZ1oaCRQpBNmnNHVo+bU0S20YIhwjsQfAGy8QYS8WmMWEhjMuh
+ dOEjt7OBI0xihMiqz95prDVSpkl+qR5vNDTqFFu/S5iixN7P4Q7k/dPXBGiu4152Y64ZCT0kgy4
+ IsNKfG6OInSNOWwIGk1E2H5zs0CecuE8LQnvsSa3h8/Bk1kynfcR/EYLONf5ZsGaParQWlh+ZgF
+ 6bFwKiSXXkavGCM0iDeit/p5+CBfc4c5N8BvrbaMeMovs8UT0JHfNz0rA2J1BcLXaCde1PXtTbU
+ OSeDdCdNTQ1CyL+HvZjr+IU6AVKhPnr1440unU7xxT0Ht2vq/MPuQF++CpGHHjclr3DfAWQgh4V
+ kGt0b7fqYgCsDzRrgTV5rnNQrs8tJx5idRSJgbWUJj6ShIHBnq6AWK0QWpwM7pjEN0Jbfnie
+X-Authority-Analysis: v=2.4 cv=Xc2JzJ55 c=1 sm=1 tr=0 ts=6879faae cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=COk6AnOGAAAA:8
+ a=8GLID_3tYxgRnLsb8HMA:9 a=QEXdDO2ut3YA:10 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-18_01,2025-07-17_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 mlxscore=0 priorityscore=1501 adultscore=0 mlxlogscore=999
+ phishscore=0 suspectscore=0 spamscore=0 lowpriorityscore=0 impostorscore=0
+ clxscore=1015 malwarescore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507180059
 
-On Thu, Jul 17, 2025 at 06:29:53PM +0100, Russell King (Oracle) wrote:
-> On Thu, Jul 17, 2025 at 12:37:02PM +0200, Oleksij Rempel wrote:
-> > +Changing the Settings
-> > +---------------------
-> > +Use `ethtool -A <interface>` to change the settings.
-> > +
-> > +.. code-block:: bash
-> > +
-> > +  # Enable RX and TX pause, with autonegotiation
-> > +  ethtool -A eth0 autoneg on rx on tx on
-> > +
-> > +  # Force RX pause on, TX pause off, without autonegotiation
-> > +  ethtool -A eth0 autoneg off rx on tx off
-> > +
-> > +**Key Configuration Concepts**:
-> > +
-> > +* **Autonegotiation Mode**: The recommended mode. The driver programs the PHY
-> > +    to *advertise* the `rx` and `tx` capabilities. The final active state is
-> > +    determined by what both sides of the link agree on.
+
+
+On 7/18/2025 4:48 AM, Konrad Dybcio wrote:
+> On 6/26/25 4:31 PM, Luo Jie wrote:
+>> The PPE RSS hash is generated during PPE receive, based on the packet
+>> content (3 tuples or 5 tuples) and as per the configured RSS seed. The
+>> hash is then used to select the queue to transmit the packet to the
+>> ARM CPU.
+>>
+>> This patch initializes the RSS hash settings that are used to generate
+>> the hash for the packet during PPE packet receive.
+>>
+>> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+>> ---
+>>   drivers/net/ethernet/qualcomm/ppe/ppe_config.c | 194 ++++++++++++++++++++++++-
+>>   drivers/net/ethernet/qualcomm/ppe/ppe_config.h |  39 +++++
+>>   drivers/net/ethernet/qualcomm/ppe/ppe_regs.h   |  40 +++++
+>>   3 files changed, 272 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/ethernet/qualcomm/ppe/ppe_config.c b/drivers/net/ethernet/qualcomm/ppe/ppe_config.c
+>> index dd7a4949f049..3b290eda7633 100644
+>> --- a/drivers/net/ethernet/qualcomm/ppe/ppe_config.c
+>> +++ b/drivers/net/ethernet/qualcomm/ppe/ppe_config.c
+>> @@ -1216,6 +1216,143 @@ int ppe_counter_enable_set(struct ppe_device *ppe_dev, int port)
+>>   	return regmap_set_bits(ppe_dev->regmap, reg, PPE_PORT_EG_VLAN_TBL_TX_COUNTING_EN);
+>>   }
+>>   
+>> +static int ppe_rss_hash_ipv4_config(struct ppe_device *ppe_dev, int index,
+>> +				    struct ppe_rss_hash_cfg cfg)
+>> +{
+>> +	u32 reg, val;
+>> +
+>> +	switch (index) {
+>> +	case 0:
+>> +		val = FIELD_PREP(PPE_RSS_HASH_MIX_IPV4_VAL, cfg.hash_sip_mix[0]);
+>> +		break;
+>> +	case 1:
+>> +		val = FIELD_PREP(PPE_RSS_HASH_MIX_IPV4_VAL, cfg.hash_dip_mix[0]);
+>> +		break;
+>> +	case 2:
+>> +		val = FIELD_PREP(PPE_RSS_HASH_MIX_IPV4_VAL, cfg.hash_protocol_mix);
+>> +		break;
+>> +	case 3:
+>> +		val = FIELD_PREP(PPE_RSS_HASH_MIX_IPV4_VAL, cfg.hash_dport_mix);
+>> +		break;
+>> +	case 4:
+>> +		val = FIELD_PREP(PPE_RSS_HASH_MIX_IPV4_VAL, cfg.hash_sport_mix);
+>> +		break;
+>> +	default:
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	reg = PPE_RSS_HASH_MIX_IPV4_ADDR + index * PPE_RSS_HASH_MIX_IPV4_INC;
+>> +
+>> +	return regmap_write(ppe_dev->regmap, reg, val);
 > 
-> I'm not sure one cal call this "recommended mode", because it doesn't.
-> If one specifies tx=0 rx=1, one would expect that the "recommend mode"
-> would be tx=0 and rx=1, but if the link partner supports symmetric
-> pause, you actually end up with tx=1 and rx=1. If the link partner
-> supports only asymmetric, then you end up with tx=0 rx=1 as requested.
+> FWIW you can assign the value in the switch statement and only FIELD_PREP
+> it in the regmap_write, since the bitfield is the same
 > 
-> Perversely, if you specify tx=1 rx=1, then if the remote supports only
-> asymmetric, you end up with everything disabled. Only tx=1 rx=1 is
-> supported in this configuration, you can't end up with anything else.
-> 
-> Basically, I don't think calling it "recommended" works.
+> Konrad
 
-Ack, I'll drop "recommended".
+Thank you for the suggestion, I'll update the code accordingly.
 
-Would it make sense to also add a short note about the limitations of
-link-level flow control? For example, how pause frames can interfere
-with traffic prioritization and QoS mechanisms.
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
