@@ -1,63 +1,87 @@
-Return-Path: <netdev+bounces-208245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9771AB0AB21
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 22:27:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBE85B0AB48
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 23:12:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B6E71C807FB
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 20:27:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A8755858B2
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 21:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46E73597E;
-	Fri, 18 Jul 2025 20:26:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C6421B9C0;
+	Fri, 18 Jul 2025 21:11:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YYQS8nMI"
+	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="n86ElkGe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9C6611712;
-	Fri, 18 Jul 2025 20:26:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D448D18E20
+	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 21:11:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752870419; cv=none; b=h6GxTKt2DzBNFLGsaGJp0ynhYU+R4TLVSWV7AwtzKUYe2YaNdKeIpst4xDi5owENbJ5ayDnlJbGNcGGOyKzD/xdtaD8TBskwsllTVMnYCypvDrvWcoEz8j0pnFsVJ7biY+XvC0N79GE8tAhkScUwozCHjkqiHZ9fKqDii1wOWxU=
+	t=1752873119; cv=none; b=LB2aXuNPt/1q8aTYkMq9AtqrForZcjjw40QVHeviveor5TnJzAVSbnrX9kFVG8LEN+QqlhcvOi0iZoV3kwiwvPNZVDB0VR42ZXzk0O1awaPDkF9AGE0QfCXQ5HOwQX7vDkYearVE+XYcikqzo37b6uzLVd8bHMo7uzVaTxih9Lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752870419; c=relaxed/simple;
-	bh=sP5S1hyxb6E0b3G4KWuQg8VfXJI1dv/IcFmy43EkqRk=;
+	s=arc-20240116; t=1752873119; c=relaxed/simple;
+	bh=9bTPe6SjZ3jLIqNkPUPfmSBatq1Y/VPwjmEPS76vlGQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p23BRWpXv0mkVLPxrmov4iOUVDn3ao/9ZUINGllt5uL5jebbMoJJP2CeBiBGvLtAkGz/5oY8gjCPqvcKG7EoeY6HHCKjxdHxGgaZ4yWnuVzku1VjEClbfWPQttnyfc0z8W0wJhkh9IFTusZxz/OatS3RtdNS54d8kOx8LeOjC6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YYQS8nMI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66CD8C4CEEB;
-	Fri, 18 Jul 2025 20:26:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752870418;
-	bh=sP5S1hyxb6E0b3G4KWuQg8VfXJI1dv/IcFmy43EkqRk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YYQS8nMIldUQZLbGTAGAEEYVWvsJUWGQrsZ9qQ+xO5SGwWqgtpg7Fhc/lRpA9Elrm
-	 Kb2VAdE3GVG56fwxxeLdK7/iZiv/1KphRbNKZlzpXP+RPrvooINbyik7EFqQWQlnJd
-	 lZz2WTjBOU8IwRbRK59lBrAR2zIvu+sbzgKC8oqBuZl6A2VBfN2spHu44QDMcv1Jep
-	 ITtmWkIeix+QMLbsb7aCZgVFFVw2gX/D/ubrD1Dc0JLTvhwaa8b6oF6ZNfnae4aFve
-	 vfyaVwjb4NS8it6UwOWuAB+cMKiuodQ+Ha/VGys2LP1Xfbm1VgytQ2EP5v3gosHvk5
-	 IlwH2at2eSFIA==
-Date: Fri, 18 Jul 2025 21:26:53 +0100
-From: Simon Horman <horms@kernel.org>
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thorsten Winkler <twinkler@linux.ibm.com>,
-	Aswin Karuvally <aswin@linux.ibm.com>
-Subject: Re: [PATCH net-next] s390/qeth: Make hw_trap sysfs attribute
- idempotent
-Message-ID: <20250718202653.GO2459@horms.kernel.org>
-References: <20250718141711.1141049-1-wintera@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rPoK6RErPihzEFlfSEdx7Egzif9SqjlNuACxYM1SrCA7Mg+K4x4m5i8fu7wGMU2oPhf4QSaRXk9uvNB//ZgOFRIl6A5gy2VdNvfx+0bD/YMwXMvA/mqbxIdldEEpEkCrhtqgaMhr1t9Mip6zzMJ50mgnAfxML+F/K5aRRtThiFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=n86ElkGe; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-73972a54919so2631464b3a.3
+        for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 14:11:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=asu.edu; s=google; t=1752873117; x=1753477917; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QCHEV+1PYeOUmt6doq7l7hxADEu0gnCQxMGvLSxACus=;
+        b=n86ElkGeF8X3l15/IAOTlBdZVIzhGA67XEZCv3ychNpy3aWs37qeRCj1IBH/WEgH/k
+         EPWBKqCP5eJPvjanXo6iCLtzoRxLu0N8qIcAOTZ/rnjIacxp5NiDyeYZeiS0V7fLVCf+
+         GQ/jFo7x0hn1cqOWoL8V2vu9AyW1+nFlDxI+F8xhbY+4zryv6DjheIqHP2UVAbMb9sXL
+         1iIwoJBjYXy0M5NMf814bvQ7c6D8ujNHX0L127hMZrD7mxgUCbLPr38N5xELk8TxflMa
+         yc5KLG9D97Xdp1tV3ZRKmDhVYJf85ecWHrEhRwFXnjLFUtOa9tSywWlcgl3OGjHGMj7j
+         lUFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752873117; x=1753477917;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QCHEV+1PYeOUmt6doq7l7hxADEu0gnCQxMGvLSxACus=;
+        b=O9A9JoUEofOOx1DA5yilC5P1jyAsMFdqHNNtWerL5vpIZ8Qn5T6kBG8PMbqAeSACWY
+         MDPVlu1PzinDDyfvelh+mxlmqCPYWTX6EK2LVaWa4TZBVzN82pwF47zMPY9Tdp0xrsol
+         OrxmP2FbG5GX5B965syNqifacCMe4jPLAzo3Nu0Wj4ueWuwxhUHiYcN03mZGwsOTbIxf
+         wSSnsSd/3u5gkjRncZfvdX4mpfxrMuteZIJF403MxOirjl1qP75MDvJUp4rwDW25PLCo
+         gxAvz20c694rhrL7wj60zTIIqcA1rq4KS413mMO+PxhUhXlCMihH+5hP6zXbVfkmNOK0
+         gQQw==
+X-Forwarded-Encrypted: i=1; AJvYcCV+C/UdiC8e77ktgzgU1RGnAag1eqiPcXmPs6yoLLG8F+LwOls5+6IrHpRxs9yTnLEFwhHTg/U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4gYKYEuDXMi4pN/K8D69fH219WEtNtwU7Ir5haGdiyc8LWEND
+	ZkWNMmlawVuEIg175f9jzGVWtVj16YJsvWpqF9W03ewj0WLr5ByS7VN3TwjOUiyQC+8Fej7Z1Sr
+	0VAQ=
+X-Gm-Gg: ASbGncsgUihiMbZJi6SoPky1irIOADeNStqh5rIACbunrUuBgnNfldTyfkAja6pxXh8
+	p1CBs+vAB3QnJp00sw4dRw+widUPNSf35DIouwgoCKbkhjfROAKpYHaIfGNXFD1T3Lk1zbInqUp
+	JYHtnMWBom7HkSzSqkaltiMoU1aLxpvKgM9GPk6AZCKPlPRXxOB4pqqJzP3wPB066+m/rRLQY39
+	fXWImJzuVBykyjDEaK+m/SI7eYOSD2VeHL3Fpun9ftvmzJZi9lvMHplNzfsyCF/3izPqzaS81e+
+	gzOELLo1QzY3MtjQ2K8xUIZffAMFHDVTR3upkC+hbjusFrEBD1e6DRmjOKd5AKjP/aq8FLdaAfq
+	qQ3r9wGqpBOBEMuzpDdftKffz+IS6soID
+X-Google-Smtp-Source: AGHT+IH8dfewy5f1gZTq/xr8JBjOJT1B813I/tYVut00hs4VR9yAUz1qXKLhEWcETA88a1nO8dHHiQ==
+X-Received: by 2002:a05:6a21:a344:b0:220:10e5:825d with SMTP id adf61e73a8af0-23810e50fe4mr18661180637.8.1752873117052;
+        Fri, 18 Jul 2025 14:11:57 -0700 (PDT)
+Received: from xps (209-147-138-224.nat.asu.edu. [209.147.138.224])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-759cb15699esm1766876b3a.82.2025.07.18.14.11.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Jul 2025 14:11:56 -0700 (PDT)
+Date: Fri, 18 Jul 2025 14:11:54 -0700
+From: Xiang Mei <xmei5@asu.edu>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: xiyou.wangcong@gmail.com, netdev@vger.kernel.org
+Subject: Re: [PATCH v1] net/sched: sch_qfq: Avoid triggering might_sleep in
+ atomic context in qfq_delete_class
+Message-ID: <aHq4miMTk5fyuYIf@xps>
+References: <20250717230128.159766-1-xmei5@asu.edu>
+ <01463f6f-a45b-4122-a7cf-8fbf7889fd48@suswa.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,26 +90,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250718141711.1141049-1-wintera@linux.ibm.com>
+In-Reply-To: <01463f6f-a45b-4122-a7cf-8fbf7889fd48@suswa.mountain>
 
-On Fri, Jul 18, 2025 at 04:17:11PM +0200, Alexandra Winter wrote:
-> From: Aswin Karuvally <aswin@linux.ibm.com>
+On Fri, Jul 18, 2025 at 10:43:22PM +0300, Dan Carpenter wrote:
+> On Thu, Jul 17, 2025 at 04:01:28PM -0700, Xiang Mei wrote:
+> > might_sleep could be trigger in the atomic context in qfq_delete_class.
+> > 
+> > qfq_destroy_class was moved into atomic context locked
+> > by sch_tree_lock to avoid a race condition bug on
+> > qfq_aggregate. However, might_sleep could be triggered by
+> > qfq_destroy_class, which introduced sleeping in atomic context (path:
+> > qfq_destroy_class->qdisc_put->__qdisc_destroy->lockdep_unregister_key
+> > ->might_sleep).
+> > 
+> > Considering the race is on the qfq_aggregate objects, keeping
+> > qfq_rm_from_agg in the lock but moving the left part out can solve
+> > this issue.
+> > 
+> > Fixes: 5e28d5a3f774 ("net/sched: sch_qfq: Fix race condition on qfq_aggregate")
+> > Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> > Signed-off-by: Xiang Mei <xmei5@asu.edu>
+> > Link: https://patch.msgid.link/4a04e0cc-a64b-44e7-9213-2880ed641d77@sabinyo.mountain
+> > ---
+> > v1: Avoid might_sleep in atomic context
 > 
-> Update qeth driver to allow writing an existing value to the "hw_trap"
-> sysfs attribute. Attempting such a write earlier resulted in -EINVAL.
-> In other words, make the sysfs attribute idempotent.
+> No need for this line on the first version of a patch.  It's just to
+> track changes between versions.
 > 
-> After:
->     $ cat hw_trap
->     disarm
->     $ echo disarm > hw_trap
->     $
+> Anyway, looks good.  Thanks!
 > 
-> Suggested-by: Alexandra Winter <wintera@linux.ibm.com>
-> Signed-off-by: Aswin Karuvally <aswin@linux.ibm.com>
-> Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
-> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
-
-Reviewed-by: Simon Horman <horms@kernel.org>
-
+> Reviewed-by: Dan Carpenter <dan.carpenter@linaro.org>
+> 
+> regards,
+> dan carpenter
+> 
+>
+Thanks so much for the tip and both of your reviews.
 
