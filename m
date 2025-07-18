@@ -1,165 +1,110 @@
-Return-Path: <netdev+bounces-208242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89AACB0AAF3
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 22:06:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72C41B0AAF9
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 22:09:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE848A47D7B
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 20:05:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91E095A5A7F
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 20:09:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D1221DED70;
-	Fri, 18 Jul 2025 20:06:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 761591DF970;
+	Fri, 18 Jul 2025 20:08:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y9sovkPL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oVKxT+fT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8DBD517;
-	Fri, 18 Jul 2025 20:06:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5261DD517
+	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 20:08:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752869167; cv=none; b=M63oaJxmDmm38IG8BLhsMximjJwDIaFDZUvguU4vtT+tCHO//CRq97TLH6akv/EZ9jlutw/F5shNlXH/fP9ro/5UMfZYIZEVZXrGReEomnbGPQuF5l75Tl1q8iivJprwLI2tKaCvIiZW3W6WrhWXmU+8Ihp8ayasVvAQuq0v6Tc=
+	t=1752869339; cv=none; b=CI46aQQEhT8BPGNiTcWf7R6GVVOr7xAd7VnnJSz/0AWBw/DGP2exvPj32kN74CmgDJq0gk/IwNn89DSfiZpRbmsVAR8oVaD9OIP/10k9YQpy+FLrI1D9p9XdE475haJV1Gq7TwT5K6C67PSVjloYsRsHzI02nN5Y4MqJYLix29Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752869167; c=relaxed/simple;
-	bh=iM/cBfn6qf7kJPZApTF05wjQcPVP4ARh8oIYFBvOnbQ=;
+	s=arc-20240116; t=1752869339; c=relaxed/simple;
+	bh=NIAirv361kSK6wQiQmEm6VjaF36ZiNPPXMjFWF6plVw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WLhTAetYpHUz7WNX7PMiox39tNGeWcHFPWgqmCStllmv1jypGATXt5Z8zwEEdGMoFpW4IoYaBkRO8QUcEOoV7kzRwlgRFjNh1RqPJEwiK20T2GlBGxM3rauY2HWNcpQim9XMC1rO7/r/JjZxlT5/mCxP6/fQR9pK3ATc28mHxM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y9sovkPL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A2DFC4CEEB;
-	Fri, 18 Jul 2025 20:06:04 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=dtKx6QTTBe6kPlFzXDoPoq64+AQzQbf+xyn7CKjpJ/K+aMTO6Aop8bpYUTOn3dGoYrEi+urSwIjmyXMN+5HNUuDKiSHdb9Kaoxn/dE4I4J3XavuGovp+IwqDVGyTQIm6EKo7wS3c8MvQs/fVo1ezG+e4hQCjiEw7fa9CQPASTnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oVKxT+fT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D8CDC4CEEB;
+	Fri, 18 Jul 2025 20:08:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752869167;
-	bh=iM/cBfn6qf7kJPZApTF05wjQcPVP4ARh8oIYFBvOnbQ=;
+	s=k20201202; t=1752869338;
+	bh=NIAirv361kSK6wQiQmEm6VjaF36ZiNPPXMjFWF6plVw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Y9sovkPL7D4ADsST94stWH0zK+qSnkGSP7rTG4uGBOET4Estd53I+YmUj05eVidQY
-	 Z+vhivYCZzdG4JK+0+6+msMFyJNHK0jd9mJWkgZjsA0rWpbTLQod7CrLL/6t4CGjlg
-	 WrBVfNMJ/dnR3gXbbikXOA620EjvAhW2I3S8j55lPP9Ac0ModgGoAYg7tSOm+89kbx
-	 8KW1iUdiwkv/vYGZ5+SIlNRxNvKXtkEX/dfo3XC8eIJM7pp91a1JUHBYV38eZXUUdO
-	 wRgL1XMesXepYg8WKV12cra7adqTbHIwuMPNInU5hpbA2zD1TOoriaAY73a9RXqiGl
-	 MGp/HZUCpQj3w==
-Date: Fri, 18 Jul 2025 21:06:02 +0100
+	b=oVKxT+fTu3BKTXZmbOMbGvbjWZlFeMQZlnIg7O3zbf1V+GSIHoiHklNba75yOYL59
+	 MHzFKlhzZ/+QJfDB7ugDVYY8dcyAQrW9bOvHnpAd6eAgHsV7n+XDHbuHkZvyJMZ0xx
+	 e0wJ0w/Q5hawTXUP0l8tGaPCvOVGjF4IOpSBVkBTT5WxSFF++tyT3zBYYq/uu23wry
+	 NmoHKc0KH33mpwrhcar1FBW43a5+H8/V8xVHUz30t/7m9EZjw026+QZtwsAfjd3B9V
+	 BJXecBSNFqsvibI3WpNVK6TN1C7UDg28LNE2rl/sNDuCi0DYlZhLTfivQy4NSMMLcD
+	 Gszq4HObfooNw==
+Date: Fri, 18 Jul 2025 21:08:55 +0100
 From: Simon Horman <horms@kernel.org>
-To: "G Thomas, Rohan" <rohan.g.thomas@altera.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Romain Gantois <romain.gantois@bootlin.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Matthew Gerlach <matthew.gerlach@altera.com>
-Subject: Re: [PATCH net-next 3/3] net: stmmac: Set CIC bit only for TX queues
- with COE
-Message-ID: <20250718200602.GM2459@horms.kernel.org>
-References: <20250714-xgmac-minor-fixes-v1-0-c34092a88a72@altera.com>
- <20250714-xgmac-minor-fixes-v1-3-c34092a88a72@altera.com>
- <20250714134012.GN721198@horms.kernel.org>
- <9f4acd69-12ff-4b2f-bb3a-e8d401b23238@altera.com>
- <20250716082209.GH721198@horms.kernel.org>
- <38d05790-eb4a-482a-89ec-8c17cf2e9680@altera.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Anthony Nguyen <anthony.l.nguyen@intel.com>,
+	Intel Wired LAN <intel-wired-lan@lists.osuosl.org>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	vgrinber@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-net 2/2] ice: don't leave device non-functional if Tx
+ scheduler config fails
+Message-ID: <20250718200855.GN2459@horms.kernel.org>
+References: <20250717-jk-ddp-safe-mode-issue-v1-0-e113b2baed79@intel.com>
+ <20250717-jk-ddp-safe-mode-issue-v1-2-e113b2baed79@intel.com>
+ <20250718165024.GI2459@horms.kernel.org>
+ <95ddc646-d348-45e3-b1f8-b0f114163b11@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <38d05790-eb4a-482a-89ec-8c17cf2e9680@altera.com>
+In-Reply-To: <95ddc646-d348-45e3-b1f8-b0f114163b11@intel.com>
 
-On Thu, Jul 17, 2025 at 11:50:06AM +0530, G Thomas, Rohan wrote:
-> Hi Simon,
+On Fri, Jul 18, 2025 at 12:56:29PM -0700, Jacob Keller wrote:
 > 
-> On 7/16/2025 1:52 PM, Simon Horman wrote:
-> > On Tue, Jul 15, 2025 at 07:14:21PM +0530, G Thomas, Rohan wrote:
-> > > Hi Simon,
-> > > 
-> > > Thanks for reviewing the patch.
-> > > 
-> > > On 7/14/2025 7:10 PM, Simon Horman wrote:
-> > > > On Mon, Jul 14, 2025 at 03:59:19PM +0800, Rohan G Thomas via B4 Relay wrote:
-> > > > > From: Rohan G Thomas <rohan.g.thomas@altera.com>
-> > > > > 
-> > > > > Currently, in the AF_XDP transmit paths, the CIC bit of
-> > > > > TX Desc3 is set for all packets. Setting this bit for
-> > > > > packets transmitting through queues that don't support
-> > > > > checksum offloading causes the TX DMA to get stuck after
-> > > > > transmitting some packets. This patch ensures the CIC bit
-> > > > > of TX Desc3 is set only if the TX queue supports checksum
-> > > > > offloading.
-> > > > > 
-> > > > > Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
-> > > > > Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
-> > > > 
-> > > > Hi Rohan,
-> > > > 
-> > > > I notice that stmmac_xmit() handles a few other cases where
-> > > > checksum offload should not be requested via stmmac_prepare_tx_desc:
-> > > > 
-> > > >           csum_insertion = (skb->ip_summed == CHECKSUM_PARTIAL);
-> > > >           /* DWMAC IPs can be synthesized to support tx coe only for a few tx
-> > > >            * queues. In that case, checksum offloading for those queues that don't
-> > > >            * support tx coe needs to fallback to software checksum calculation.
-> > > >            *
-> > > >            * Packets that won't trigger the COE e.g. most DSA-tagged packets will
-> > > >            * also have to be checksummed in software.
-> > > >            */
-> > > >           if (csum_insertion &&
-> > > >               (priv->plat->tx_queues_cfg[queue].coe_unsupported ||
-> > > >                !stmmac_has_ip_ethertype(skb))) {
-> > > >                   if (unlikely(skb_checksum_help(skb)))
-> > > >                           goto dma_map_err;
-> > > >                   csum_insertion = !csum_insertion;
-> > > >           }
-> > > > 
-> > > > Do we need to care about them in stmmac_xdp_xmit_zc()
-> > > > and stmmac_xdp_xmit_xdpf() too?
-> > > 
-> > > This patch only addresses avoiding the TX DMA hang by ensuring the CIC
-> > > bit is only set when the queue supports checksum offload. For DSA tagged
-> > > packets checksum offloading is not supported by the DWMAC IPs but no TX
-> > > DMA hang. AFAIK, currently AF_XDP paths don't have equivalent handling
-> > > like skb_checksum_help(), since they operate on xdp buffers. So this
-> > > patch doesn't attempt to implement a sw fallback but just avoids DMA
-> > > stall.
+> 
+> On 7/18/2025 9:50 AM, Simon Horman wrote:
+> > On Thu, Jul 17, 2025 at 09:57:09AM -0700, Jacob Keller wrote:
+> >>
+> >> Fixes: 91427e6d9030 ("ice: Support 5 layer topology")
+> >> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 > > 
-> > Ok, fair enough.
+> > Thanks for the extensive explanation.
 > > 
-> > As per Andrew's advice elsewhere in this thread.
-> > This patch also looks like it should be a fix for net,
-> > and should have a Fixes tag.
 > 
-> Thanks for your comments.
+> Thanks. This took me forever to track down exactly what went wrong,
+> enough that I had to have the customer send me the card back because we
+> thought the firmware was unrecoverable and bricked.
+
+Ouch!
+
+...
+
+> >>  	msleep(1000);
+> >>  	ice_reset(hw, ICE_RESET_CORER);
+> >> -	/* CORER will clear the global lock, so no explicit call
+> >> -	 * required for release.
+> >> -	 */
+> >> +	ice_check_reset(hw);
+> >>  
+> >> -	return 0;
+> >> +reinit_hw:
+> > 
+> > nit: I think you can move this label above ice_check_reset().
+> >      As the only place that jumps to this label calls ice_check_reset()
+> >      immediately before doing so. If so, renaming the label might
+> >      also be appropriate (up to you on all fronts:)
+> > 
 > 
-> You're right—this patch is a fix for the TX DMA hang issue caused by
-> setting the CIC bit on queues that don't support checksum offload. But
-> I couldn’t pinpoint a specific commit that introduced this behavior in
-> the AF_XDP path. Initially, there was no support for DWMAC IPs with COE
-> enabled only on specific queues, even though there can be IPs with such
-> configuration. Commit 8452a05b2c63 ("net: stmmac: Tx coe sw fallback")
-> added software fallback support for the AF_PACKET path. But the AF_XDP
-> path has always enabled COE unconditionally even before that. So, do you
-> think referencing the commit 8452a05b2c63 in the Fixes tag is
-> appropriate and sufficient?
+> You're right thats probably slightly better. I'm not sure its worth a
+> re-roll vs getting this fix out since its a pretty minor difference.
 
-Hi Rohan,
+Yes, agreed. I'm happy to let this lie if you prefer.
 
-Perhaps I'm missing the point, but my thinking is as follows:
-
-As this patch only addresses the AF_XDP path I think we can take the
-approach of asking "in which patch would a user of AF_XDP with this stmmac
-observe this bug". (Or some variant thereof.) And I think the answer to
-that question is the patch that added AF_XDP support to stmmac driver.
-
-So I think we can use:
-
-Fixes: 132c32ee5bc0 ("net: stmmac: Add TX via XDP zero-copy socket")
+...
 
