@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-208227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB502B0AA67
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 20:52:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B463CB0AA65
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 20:52:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D046D1C489BB
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 18:52:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EAA35C11D9
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 18:52:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0DF32E974C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B13C2E8E0E;
 	Fri, 18 Jul 2025 18:51:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WMXHVGb3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aBQ7DI4C"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 950162E92AB
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0F9D2E92B7
 	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 18:51:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752864692; cv=none; b=Arote9VHQfC2QNMnfF1lt0jrM5ySlGtpSxD6O+iNzqVADOiH1tbde30jOzVacYxzSJzznPU5suTzKcoernp2urgwOUdMUYZj8PpIDKnXbyj658+Bj7vMtmDSMaRa+SQYxwLczSg50SX5r1XV9ho503xWnDofA85e8M0b7TRaPVk=
+	t=1752864692; cv=none; b=j8N1OW9H3fY4a/ihnSELBskCfYHCAl0MLeDLBBn8lPN6Czagb71y10AmaL0BFVni+uQqJ03aoy3b+zcu5RfZktoeNoC6rV/ZyyfhOeOF/Uxd2HPAvaDbLadhakZT0Hgp0MaW0zQ2ecYJbXZZFunWr4210FSX+5Re0SU9+n2Jz7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1752864692; c=relaxed/simple;
-	bh=Tu7SBkY4In4RAY4eyBvHFGljmhfw8osd2Y5k8s5p5Co=;
+	bh=tq8002epkrGoFB5qbixc2N92ov3xim81YvkW2dNjLG0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=j9DMS9rhg6KrH5q+vY2KwLbR0+XCotsP/6PwQCsdroo6OfYYqZAKhgs5t6ebpXerO3h/LrqtekdvXRGDZkREcZpkhwmKkKOcic9oohlepAbwCJf+on0H3+znKHeaRURSkQgAo6p3odFb6644/AF8A+J6LPBiuzglwXJOFIM3gY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WMXHVGb3; arc=none smtp.client-ip=198.175.65.16
+	 MIME-Version; b=CKZf6lPKoLmAH84P9WnMUkynQPFJhnsF/utAVo9oLSAu82o/T4WFzUxRtzvxZSdOReDkoGcEEwvT0ir52vFh+zjGuj9RLwepi4JDcaen7FFZArmDwLhfRyF0NS5oA5YnM3BtpADwGIBgjlff9lxveP56gwzo4q7ZtflNNIgUl3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aBQ7DI4C; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,26 +36,26 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1752864690; x=1784400690;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Tu7SBkY4In4RAY4eyBvHFGljmhfw8osd2Y5k8s5p5Co=;
-  b=WMXHVGb3P5dn+ua6wFWbzYlvovq18Qneb8iwTPWwI4KvnzOWi9sqtA0h
-   ewklhlkv6J7UfUloATjd9FjuftCbbsjuXVllBIa1O4Wz5qzihr8ZZt6qd
-   l7YtlKSQnnxujg6jiv62UbxV0vYlCkdOFZ9rf11WTsVtGVuyUUPPh3mCe
-   lrRuqOWcj9cAaBy4hexS5C1ZJxJ2srylw8xU4uM570WGnWG7DPBPnqYgS
-   6sLvj5Bwn3CVhWgh1PIDVCP5zmSWUbLwsR0L3YvT5GK0vQDIUQm2+Ffjn
-   5Sw9m8fVW5pjtZDx7ZKgHEsVPxb/4luXZKa1ZX4URqmHQC5FmxK6Cmi+D
-   A==;
-X-CSE-ConnectionGUID: Q+t015UJSQOzCuYbGrk1fA==
-X-CSE-MsgGUID: RU0bD4IeQASIX0INAr9C1Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11496"; a="55320593"
+  bh=tq8002epkrGoFB5qbixc2N92ov3xim81YvkW2dNjLG0=;
+  b=aBQ7DI4CtcGUG+dc8blWCRO8w3WNyt5ueZFOwQwyltzrhGo9iuBPMtPy
+   F3yuTaExZOqTCbprmaQU8E/95zJlWWSuVVOu8qF0aWJAmkDBkmOi8R8/z
+   WtHTjvW2z12K+SRuMoyfW+RcKE2vfzSJ+cwAlP43U0tmu0NaBm4FrlV0Q
+   uY0mo9c3J3PZyCgu/xQlDlyUxHSQXnVPdy29FTiHHLwVL+X63c9pMRkav
+   wz458GiA3i9YKTQw3qLTCJlQYBU1IvqfpVEwmIaAu49A6gOQ0nKL9B2lT
+   OEsz/wQc4BCrrNX9FwYlRUJgb7VBPtqtpn5BNI9VsptCAKQG5mEd+jEuw
+   w==;
+X-CSE-ConnectionGUID: 0rzCJCPrRSmsAOZj8y/LZg==
+X-CSE-MsgGUID: +h+uTfkPRJuAA8hHwX1YFw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11496"; a="55320600"
 X-IronPort-AV: E=Sophos;i="6.16,322,1744095600"; 
-   d="scan'208";a="55320593"
+   d="scan'208";a="55320600"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2025 11:51:24 -0700
-X-CSE-ConnectionGUID: RpuCygosSVmLuSszIiGyhw==
-X-CSE-MsgGUID: LoTosDSXQVqlDvJRqPNrgw==
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2025 11:51:25 -0700
+X-CSE-ConnectionGUID: ZMXg6PcxT1e7Rny6+IODlg==
+X-CSE-MsgGUID: u4IaRFFyQFGGa1jUtTreUA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,322,1744095600"; 
-   d="scan'208";a="157506897"
+   d="scan'208";a="157506900"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa006.jf.intel.com with ESMTP; 18 Jul 2025 11:51:25 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -65,15 +65,16 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>,
-	anthony.l.nguyen@intel.com,
-	paul.greenwalt@intel.com,
-	Konrad Knitter <konrad.knitter@intel.com>,
-	Simon Horman <horms@kernel.org>,
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Jesse Brandeburg <jbrandeburg@cloudflare.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
 	Rinitha S <sx.rinitha@intel.com>
-Subject: [PATCH net-next 07/13] ice: add E835 device IDs
-Date: Fri, 18 Jul 2025 11:51:08 -0700
-Message-ID: <20250718185118.2042772-8-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 08/13] ice: convert ice_add_prof() to bitmap
+Date: Fri, 18 Jul 2025 11:51:09 -0700
+Message-ID: <20250718185118.2042772-9-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250718185118.2042772-1-anthony.l.nguyen@intel.com>
 References: <20250718185118.2042772-1-anthony.l.nguyen@intel.com>
@@ -85,103 +86,178 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+From: Jesse Brandeburg <jesse.brandeburg@intel.com>
 
-E835 is an enhanced version of the E830.
-It continues to use the same set of commands, registers and interfaces
-as other devices in the 800 Series.
+Previously the ice_add_prof() took an array of u8 and looped over it with
+for_each_set_bit(), examining each 8 bit value as a bitmap.
+This was just hard to understand and unnecessary, and was triggering
+undefined behavior sanitizers with unaligned accesses within bitmap
+fields (on our internal tools/builds). Since the @ptype being passed in
+was already declared as a bitmap, refactor this to use native types with
+the advantage of simplifying the code to use a single loop.
 
-Following device IDs are added:
-- 0x1248: Intel(R) Ethernet Controller E835-CC for backplane
-- 0x1249: Intel(R) Ethernet Controller E835-CC for QSFP
-- 0x124A: Intel(R) Ethernet Controller E835-CC for SFP
-- 0x1261: Intel(R) Ethernet Controller E835-C for backplane
-- 0x1262: Intel(R) Ethernet Controller E835-C for QSFP
-- 0x1263: Intel(R) Ethernet Controller E835-C for SFP
-- 0x1265: Intel(R) Ethernet Controller E835-L for backplane
-- 0x1266: Intel(R) Ethernet Controller E835-L for QSFP
-- 0x1267: Intel(R) Ethernet Controller E835-L for SFP
-
-Reviewed-by: Konrad Knitter <konrad.knitter@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+Co-developed-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+CC: Jesse Brandeburg <jbrandeburg@cloudflare.com>
+Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_common.c |  9 +++++++++
- drivers/net/ethernet/intel/ice/ice_devids.h | 18 ++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_main.c   |  9 +++++++++
- 3 files changed, 36 insertions(+)
+ .../net/ethernet/intel/ice/ice_flex_pipe.c    | 78 +++++++------------
+ .../net/ethernet/intel/ice/ice_flex_pipe.h    |  7 +-
+ drivers/net/ethernet/intel/ice/ice_flow.c     |  4 +-
+ 3 files changed, 34 insertions(+), 55 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index b4fe096ace08..b542e1e0f0c9 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -171,6 +171,15 @@ static int ice_set_mac_type(struct ice_hw *hw)
- 	case ICE_DEV_ID_E830_XXV_QSFP:
- 	case ICE_DEV_ID_E830C_SFP:
- 	case ICE_DEV_ID_E830_XXV_SFP:
-+	case ICE_DEV_ID_E835CC_BACKPLANE:
-+	case ICE_DEV_ID_E835CC_QSFP56:
-+	case ICE_DEV_ID_E835CC_SFP:
-+	case ICE_DEV_ID_E835C_BACKPLANE:
-+	case ICE_DEV_ID_E835C_QSFP:
-+	case ICE_DEV_ID_E835C_SFP:
-+	case ICE_DEV_ID_E835_L_BACKPLANE:
-+	case ICE_DEV_ID_E835_L_QSFP:
-+	case ICE_DEV_ID_E835_L_SFP:
- 		hw->mac_type = ICE_MAC_E830;
- 		break;
- 	default:
-diff --git a/drivers/net/ethernet/intel/ice/ice_devids.h b/drivers/net/ethernet/intel/ice/ice_devids.h
-index 34fd604132f5..bd4e66df0372 100644
---- a/drivers/net/ethernet/intel/ice/ice_devids.h
-+++ b/drivers/net/ethernet/intel/ice/ice_devids.h
-@@ -6,6 +6,24 @@
+diff --git a/drivers/net/ethernet/intel/ice/ice_flex_pipe.c b/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
+index ed95072ca6e3..363ae79a3620 100644
+--- a/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
++++ b/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
+@@ -3043,16 +3043,16 @@ ice_disable_fd_swap(struct ice_hw *hw, u8 prof_id)
+  * the ID value used here.
+  */
+ int
+-ice_add_prof(struct ice_hw *hw, enum ice_block blk, u64 id, u8 ptypes[],
+-	     const struct ice_ptype_attributes *attr, u16 attr_cnt,
+-	     struct ice_fv_word *es, u16 *masks, bool symm, bool fd_swap)
++ice_add_prof(struct ice_hw *hw, enum ice_block blk, u64 id,
++	     unsigned long *ptypes, const struct ice_ptype_attributes *attr,
++	     u16 attr_cnt, struct ice_fv_word *es, u16 *masks, bool symm,
++	     bool fd_swap)
+ {
+-	u32 bytes = DIV_ROUND_UP(ICE_FLOW_PTYPE_MAX, BITS_PER_BYTE);
+ 	DECLARE_BITMAP(ptgs_used, ICE_XLT1_CNT);
+ 	struct ice_prof_map *prof;
+-	u8 byte = 0;
+-	u8 prof_id;
+ 	int status;
++	u8 prof_id;
++	u16 ptype;
  
- /* Device IDs */
- #define ICE_DEV_ID_E822_SI_DFLT         0x1888
-+/* Intel(R) Ethernet Controller E835-CC for backplane */
-+#define ICE_DEV_ID_E835CC_BACKPLANE	0x1248
-+/* Intel(R) Ethernet Controller E835-CC for QSFP */
-+#define ICE_DEV_ID_E835CC_QSFP56	0x1249
-+/* Intel(R) Ethernet Controller E835-CC for SFP */
-+#define ICE_DEV_ID_E835CC_SFP		0x124A
-+/* Intel(R) Ethernet Controller E835-C for backplane */
-+#define ICE_DEV_ID_E835C_BACKPLANE	0x1261
-+/* Intel(R) Ethernet Controller E835-C for QSFP */
-+#define ICE_DEV_ID_E835C_QSFP		0x1262
-+/* Intel(R) Ethernet Controller E835-C for SFP */
-+#define ICE_DEV_ID_E835C_SFP		0x1263
-+/* Intel(R) Ethernet Controller E835-L for backplane */
-+#define ICE_DEV_ID_E835_L_BACKPLANE	0x1265
-+/* Intel(R) Ethernet Controller E835-L for QSFP */
-+#define ICE_DEV_ID_E835_L_QSFP		0x1266
-+/* Intel(R) Ethernet Controller E835-L for SFP */
-+#define ICE_DEV_ID_E835_L_SFP		0x1267
- /* Intel(R) Ethernet Connection E823-L for backplane */
- #define ICE_DEV_ID_E823L_BACKPLANE	0x124C
- /* Intel(R) Ethernet Connection E823-L for SFP */
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index af68869693ed..204e906af591 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -5897,6 +5897,15 @@ static const struct pci_device_id ice_pci_tbl[] = {
- 	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E830_XXV_QSFP), },
- 	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E830C_SFP), },
- 	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E830_XXV_SFP), },
-+	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E835CC_BACKPLANE), },
-+	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E835CC_QSFP56), },
-+	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E835CC_SFP), },
-+	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E835C_BACKPLANE), },
-+	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E835C_QSFP), },
-+	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E835C_SFP), },
-+	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E835_L_BACKPLANE), },
-+	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E835_L_QSFP), },
-+	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E835_L_SFP), },
- 	/* required last entry */
- 	{}
- };
+ 	bitmap_zero(ptgs_used, ICE_XLT1_CNT);
+ 
+@@ -3102,57 +3102,35 @@ ice_add_prof(struct ice_hw *hw, enum ice_block blk, u64 id, u8 ptypes[],
+ 	prof->context = 0;
+ 
+ 	/* build list of ptgs */
+-	while (bytes && prof->ptg_cnt < ICE_MAX_PTG_PER_PROFILE) {
+-		u8 bit;
++	for_each_set_bit(ptype, ptypes, ICE_FLOW_PTYPE_MAX) {
++		u8 ptg;
+ 
+-		if (!ptypes[byte]) {
+-			bytes--;
+-			byte++;
++		/* The package should place all ptypes in a non-zero
++		 * PTG, so the following call should never fail.
++		 */
++		if (ice_ptg_find_ptype(hw, blk, ptype, &ptg))
+ 			continue;
+-		}
+ 
+-		/* Examine 8 bits per byte */
+-		for_each_set_bit(bit, (unsigned long *)&ptypes[byte],
+-				 BITS_PER_BYTE) {
+-			u16 ptype;
+-			u8 ptg;
+-
+-			ptype = byte * BITS_PER_BYTE + bit;
+-
+-			/* The package should place all ptypes in a non-zero
+-			 * PTG, so the following call should never fail.
+-			 */
+-			if (ice_ptg_find_ptype(hw, blk, ptype, &ptg))
+-				continue;
++		/* If PTG is already added, skip and continue */
++		if (test_bit(ptg, ptgs_used))
++			continue;
+ 
+-			/* If PTG is already added, skip and continue */
+-			if (test_bit(ptg, ptgs_used))
+-				continue;
++		set_bit(ptg, ptgs_used);
++		/* Check to see there are any attributes for this ptype, and
++		 * add them if found.
++		 */
++		status = ice_add_prof_attrib(prof, ptg, ptype, attr, attr_cnt);
++		if (status == -ENOSPC)
++			break;
++		if (status) {
++			/* This is simple a ptype/PTG with no attribute */
++			prof->ptg[prof->ptg_cnt] = ptg;
++			prof->attr[prof->ptg_cnt].flags = 0;
++			prof->attr[prof->ptg_cnt].mask = 0;
+ 
+-			__set_bit(ptg, ptgs_used);
+-			/* Check to see there are any attributes for
+-			 * this PTYPE, and add them if found.
+-			 */
+-			status = ice_add_prof_attrib(prof, ptg, ptype,
+-						     attr, attr_cnt);
+-			if (status == -ENOSPC)
++			if (++prof->ptg_cnt >= ICE_MAX_PTG_PER_PROFILE)
+ 				break;
+-			if (status) {
+-				/* This is simple a PTYPE/PTG with no
+-				 * attribute
+-				 */
+-				prof->ptg[prof->ptg_cnt] = ptg;
+-				prof->attr[prof->ptg_cnt].flags = 0;
+-				prof->attr[prof->ptg_cnt].mask = 0;
+-
+-				if (++prof->ptg_cnt >=
+-				    ICE_MAX_PTG_PER_PROFILE)
+-					break;
+-			}
+ 		}
+-
+-		bytes--;
+-		byte++;
+ 	}
+ 
+ 	list_add(&prof->list, &hw->blk[blk].es.prof_map);
+diff --git a/drivers/net/ethernet/intel/ice/ice_flex_pipe.h b/drivers/net/ethernet/intel/ice/ice_flex_pipe.h
+index 28b0897adf32..ee5d9f9c9d53 100644
+--- a/drivers/net/ethernet/intel/ice/ice_flex_pipe.h
++++ b/drivers/net/ethernet/intel/ice/ice_flex_pipe.h
+@@ -39,9 +39,10 @@ bool ice_hw_ptype_ena(struct ice_hw *hw, u16 ptype);
+ 
+ /* XLT2/VSI group functions */
+ int
+-ice_add_prof(struct ice_hw *hw, enum ice_block blk, u64 id, u8 ptypes[],
+-	     const struct ice_ptype_attributes *attr, u16 attr_cnt,
+-	     struct ice_fv_word *es, u16 *masks, bool symm, bool fd_swap);
++ice_add_prof(struct ice_hw *hw, enum ice_block blk, u64 id,
++	     unsigned long *ptypes, const struct ice_ptype_attributes *attr,
++	     u16 attr_cnt, struct ice_fv_word *es, u16 *masks, bool symm,
++	     bool fd_swap);
+ struct ice_prof_map *
+ ice_search_prof_id(struct ice_hw *hw, enum ice_block blk, u64 id);
+ int
+diff --git a/drivers/net/ethernet/intel/ice/ice_flow.c b/drivers/net/ethernet/intel/ice/ice_flow.c
+index 278e57686274..6d5c939dc8a5 100644
+--- a/drivers/net/ethernet/intel/ice/ice_flow.c
++++ b/drivers/net/ethernet/intel/ice/ice_flow.c
+@@ -1421,7 +1421,7 @@ ice_flow_add_prof_sync(struct ice_hw *hw, enum ice_block blk,
+ 	}
+ 
+ 	/* Add a HW profile for this flow profile */
+-	status = ice_add_prof(hw, blk, prof_id, (u8 *)params->ptypes,
++	status = ice_add_prof(hw, blk, prof_id, params->ptypes,
+ 			      params->attr, params->attr_cnt, params->es,
+ 			      params->mask, symm, true);
+ 	if (status) {
+@@ -1617,7 +1617,7 @@ ice_flow_set_parser_prof(struct ice_hw *hw, u16 dest_vsi, u16 fdir_vsi,
+ 		break;
+ 	}
+ 
+-	status = ice_add_prof(hw, blk, id, (u8 *)prof->ptypes,
++	status = ice_add_prof(hw, blk, id, prof->ptypes,
+ 			      params->attr, params->attr_cnt,
+ 			      params->es, params->mask, false, false);
+ 	if (status)
 -- 
 2.47.1
 
