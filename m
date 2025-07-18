@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-208144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 913EAB0A397
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 13:53:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00A39B0A39A
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 13:54:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 207F31C25890
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 11:54:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 605DC188AD6A
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 11:54:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA442DC347;
-	Fri, 18 Jul 2025 11:52:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B759D2DCF47;
+	Fri, 18 Jul 2025 11:52:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24CB12DAFD2;
-	Fri, 18 Jul 2025 11:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7DB82DC348;
+	Fri, 18 Jul 2025 11:52:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752839542; cv=none; b=Bax1cw3z9BJkMhC1eEr6LNqHT4pCNnBSeeOeCb/d9aCTIL2i81gVHv6BON2CehAW9NrRZRxYJt5wFAvnO7GKuCGC6ckl5hwCM1tPb6vXTRslhoV51HU/yuEzocRGWjoF/JoY0xwa5m+NS8a7Y2X5zHBHI8KUD3Pf0fUyrnHZw+w=
+	t=1752839544; cv=none; b=nAK2xwAhfLW0eZ1HM6L1ZnLOKFIXiRGGy591iAKwgLSsEJ3OHfG94r4STZfeDrgH2Rpsk9HXXGdrL46AzJaqLGsMdpSkFjJ7+NphpMs8CJaagu7qcYDr9P/D97pzyZAlgVnJ2UEHUwyMf0DFlOA3L/NP5klJGkeBiOiUFLIBjq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752839542; c=relaxed/simple;
-	bh=tkg2bjgERJF800sMkU9QziteGVriZ7Ij2VSeuqHCCWs=;
+	s=arc-20240116; t=1752839544; c=relaxed/simple;
+	bh=/7CHHKqdDDOfq9BdS7bFwCjG6K2UKEXfHl/n8vC+iQk=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=lBQ6hbtS/6FOsX+HgzSJkycWIgtdYue7D/x8STXnsZESKCWsgllZy7GmOb+7cooQiFxW07+BoJ4wb9jPchzUOqXpQekyPN6w8ZXi+cta3BBPb2UZa/hSxmi8hbc6SjghFxK0FK9aoHUnMya3LpximZGXGho1XLu8xMeySOcF8+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.45
+	 In-Reply-To:To:Cc; b=u/8XJrmyRKXPOUq9R5WzqgMCZa3nqc0u/e5suWN0aYQsfLFo7UTFR+WV2EDJb2x396jANF9idQnHWDH9G0kODAhqwS83/BmQq99Wzo50j/u6YJiz+Gw1RUYRlZbwtHaaoTx7DO4NWekUMN8rjwTGVfEabDWByyCDxeSJ2Zmippg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-adfb562266cso330219766b.0;
-        Fri, 18 Jul 2025 04:52:20 -0700 (PDT)
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-ae04d3d63e6so370022866b.2;
+        Fri, 18 Jul 2025 04:52:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752839539; x=1753444339;
+        d=1e100.net; s=20230601; t=1752839541; x=1753444341;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NbafC6s8Z9+DMd3ZcAxF/btYBQ3dbcafQYtJ1Hk3lNk=;
-        b=kW80RVDvWotO22oH2Il39akFmx4HGr1mUT1RnJEPJaYkTMNpIBygeAA1xvr/vcQyli
-         8JWuFXY9ogIfr3tbneWeRfx/boFVxEvc3YvPlp1lIAkK91x0jaZKLha4hmMz6LG4Wuxo
-         P3u9h3X4xhN/z6uFWeo+seEhz4QfxTfKZY9e5eEwqIGVT0Q4zjFbGsNunJ3eODUNxjUO
-         XcnDCjk6tebBjLu28/9MgT70yzx1CNbqSU2PQZGSurcHMGn+9GII6Vz+LCxYVnXaK8u6
-         FILGLI4ymGukBnUpLS7/29XyL1jCXXjBsccit0DXvbLj16/T2iuuJcYy+uBW8+fdOrtm
-         K3kA==
-X-Forwarded-Encrypted: i=1; AJvYcCUXUiYrEs32mpMp8QwmSMeggdqkuVbMUn7dYftI+me13ltwNwluiQ0HBPtAJRgy0Wk7ccK3p7jo6ZBW8HQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwI1szj1vHMsIp7eqHYaNbH5wgA/TBNUmXERSOaiYAy7/m/f/T6
-	E/quwOVHRxaAITm0g8rDXFgqFz9Fdzl3v/BlxzwjfnMimylsfRvLBm+l
-X-Gm-Gg: ASbGncvkAf0NCedFT66PmK4P+UtZEKqKLqJCO4P6vCAqCV9CJ+vMau5uOaKF+UxpSqw
-	KyHtbZW7VILvVN7DaeBwnUYZQ7P1DHDyRoO54IqI9R9Z/AXDCqlDTShywEOkuyA+ePnMi6zm7jw
-	IyHNpSv+qxJcNHjIEeJhEQS4m7XLwk5D1g3OtNJxl4IaHMuxxmUSxKUQNq/0d24G5VQfFg2d5ZE
-	Ka7aDYMc4Bmuk6IgC7GK8H0QUHx6uRj/VVWw6J84Dy/WZTN1EARIPmjfYlCZw6T7+fsi9vsQM30
-	FfeVMYT8CtH4IPlVKuu/jzZWEEPZib1ZTiqRM6db4EPhymXSOem8glmv4khnRbvi09NM4VTeCby
-	gX7eYrebjcQ==
-X-Google-Smtp-Source: AGHT+IFxioSGKRKyLPLM3eJBMDnbARqUZZqXwsaH9+NjjhUb+EInhQjMExIxaMaHRLT5C1NdXlkk3w==
-X-Received: by 2002:a17:907:d2d2:b0:ae0:abec:dc13 with SMTP id a640c23a62f3a-ae9c9b59e13mr1050417866b.53.1752839539203;
-        Fri, 18 Jul 2025 04:52:19 -0700 (PDT)
-Received: from localhost ([2a03:2880:30ff::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aec6c7d8fcasm108745366b.68.2025.07.18.04.52.18
+        bh=Zfweb8Lprtz6U1Z0+6B/k2IheTq6ouQOgUs35bz0iNk=;
+        b=mjYxsAyK74pncMbvVEAtHXkFkwcETQH9VzrJikRYZ6DMf3C54DrJrczJqvsgOS2yEO
+         e84HIuFsbMCI8W4DY4xFeYWz5Vt6krV26ChbpoeZ6irjA5/cdy4o92LWFdQqO/InPA69
+         VfRYOJ8jDYMtz8G3oVJ151wN89m1iAv8dpzR27HWB20JxruRGpbZV/kM9xbFiid7dLzm
+         mXG6FAYGlI59lUKwhUjwqD84ig5z/67wIvbICcVXu4R5LVGGpGgtE0gzis5S5hHbHuSD
+         eBOJ7d/8/F7iy8xSk/Ed8oVAkHLNXgSEOe13bTp95+ybnzjqQWpeNDKfNZZdOtTQq9Qa
+         royw==
+X-Forwarded-Encrypted: i=1; AJvYcCXAiDSzfsRBEc+aKIgr4GVk5nXFSd/JhBQaWNpruregxVPqaZY6rzZ2hM/f+xiufGfJpJRfpmX5ZNyez2o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxB7L0gSBIDEk/FOwE7M4YhrtiXksXlS+FWNH8xDIBzhApNdtvk
+	Eh1iXKYKSmUfYKci/2UHYWsCM7wxYubR9YCh7Ni1ctV5Y2mStIhR43/d
+X-Gm-Gg: ASbGnct5tGWbWIIP4Fi6eqemR0PR5IRU19U5PAdYMeJ2e/njfCzcqEhtgNQOiAkXrrf
+	cApI4j3xTz5UJGkismmd278eSgdcOK25hVzVO4G4sIRGKYAzsodg+BQeU1/UlBONNDeV5DZyxZH
+	PBsJKC4AlUo2C5npInhUOfNPqX3EQ9MkHWDMhplaj7RlWAq2aTvDb3dFYq5h6WltwiHYYpr8ovU
+	QQV9ceA8EW0WG4BXRnKb6CqTGxneSgezauOKX7bJN9mW30qzW777cxgf4smN3P5LdpWKaQ+azRM
+	CJJ4FH1/ejqxXJkYB/e8cVB8ASVKg0b5+ClXPjR/Lc+ewwtP1YxjFy3g1tB37kJ6cHH1T3x3aWT
+	5C2dVb+ULvHe3
+X-Google-Smtp-Source: AGHT+IEWheBDBQ2C9Dmm6F0vNrKz03zOHSrvsTFhF4VzvKXKLrzsmYUJKB6IUKVpg65ig+Mg0hU4yw==
+X-Received: by 2002:a17:907:7286:b0:ae3:74be:49ab with SMTP id a640c23a62f3a-ae9cddb3a1fmr1088392066b.10.1752839540921;
+        Fri, 18 Jul 2025 04:52:20 -0700 (PDT)
+Received: from localhost ([2a03:2880:30ff:2::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aec6ca3005bsm106854466b.88.2025.07.18.04.52.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Jul 2025 04:52:18 -0700 (PDT)
+        Fri, 18 Jul 2025 04:52:20 -0700 (PDT)
 From: Breno Leitao <leitao@debian.org>
-Date: Fri, 18 Jul 2025 04:52:04 -0700
-Subject: [PATCH net-next 4/5] netconsole: use netpoll_parse_ip_addr in
+Date: Fri, 18 Jul 2025 04:52:05 -0700
+Subject: [PATCH net-next 5/5] netconsole: use netpoll_parse_ip_addr in
  local_ip_store
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -71,7 +71,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250718-netconsole_ref-v1-4-86ef253b7a7a@debian.org>
+Message-Id: <20250718-netconsole_ref-v1-5-86ef253b7a7a@debian.org>
 References: <20250718-netconsole_ref-v1-0-86ef253b7a7a@debian.org>
 In-Reply-To: <20250718-netconsole_ref-v1-0-86ef253b7a7a@debian.org>
 To: "David S. Miller" <davem@davemloft.net>, 
@@ -81,30 +81,29 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  kernel-team@meta.com
 X-Mailer: b4 0.15-dev-dd21f
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1635; i=leitao@debian.org;
- h=from:subject:message-id; bh=tkg2bjgERJF800sMkU9QziteGVriZ7Ij2VSeuqHCCWs=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBoejVqqvvb1pfYo8JK+NWLmQxzzDEBTt0OQnPh9
- OpuEiPtn8CJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaHo1agAKCRA1o5Of/Hh3
- bSTlEACL6NOxhdD3SgmYzkrd6+VAQD4Y28EcUKx0nQp6IxBo+mWVq5jv/bQO1+f52QrJSgYf4tm
- wnLUgrLekw9NytjBSuqOXxbLzK8uapPER6hY6uMLVWhQyxqAVus5YB4DHASgAEtac8yYOTmV/OC
- PCYwW2jQXxpcTSsvWj9jN4Fu+X7Ip3TwhtOhJU7B4GIP9OHudiVb7p2wjkR8rNawz9A+8fGamdP
- gXmPnS8uZ8DUsfPgoukUin5SKYVUwYW4D0gjH9gFV9ZObDpE8BpWeLBFpJUc9dZzM7h7OCu9IPw
- lc7KVLtpPuMBz+XsiREwXVu3QYyXHcQdUlz3OKy89osMxy6HdTKfDc6u997xNBkZdeTbtBdhx40
- 8HJp/wa9VbyEx/fHfJkje2g2afWFFWPEKyDQwNn+FuiNvlSaH+O2x5Skf4pJgahfzKTGQv02/nf
- 15YWECYiGu6EEh6M4FuW34jotKncGIZZeC6he/sxc2L8KlfNIRVDQSTIhuTZDRocfFAb1WufLQj
- HhOPve2HenvXgLnHGY6CUHG5T0mtYGbqSRCtJ+pctXnMrUZU6dXt/CWQZLUfO7En3i6f55hZYyj
- QW5Dk8ApX6pEDyOtlq7Vd6/pILYrXm/acHL1dsGFWVF6rE2SlWXiSn+e4r2IWeVTuQD04smeNVB
- wR3yChXeBwAdijw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1594; i=leitao@debian.org;
+ h=from:subject:message-id; bh=/7CHHKqdDDOfq9BdS7bFwCjG6K2UKEXfHl/n8vC+iQk=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBoejVqq4JQXiAhsZ3aVkfrRk3XeTMPI38IDOwD8
+ bLHNjpZ7WOJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaHo1agAKCRA1o5Of/Hh3
+ bT2SD/9ev/w8JsXlvdARvaxqs/o87KAJGwZGYrU9fe2CM55TzVuplvXPF1J4Cm0IVI2bBs+wG4l
+ 5uuExjvhODJjs12ma2Ok/wMLEp48MJ4e5oVy+V3jV1jRIBAl5YmliKK8PK72C0Pk86I7yAu/AKc
+ FuA2ff/QqCPi/LqsL+LFxHGHKty4ShNICRco1r2QECKJnoORLEkEq1sIL/myhc/83eJI4Tx5JIF
+ qCMyaANogdpYHl0afBvfrwGMEoH5VOhiJUEAv/VEOxiBo0e/65q+7NP2aVWqBmOh5U7bmCuj5SK
+ NZwo1ha1tgT+X/d0fSmU6kms8A7pCxOVJq85ePn8aGEKHOJhCVpXu5qESpIBQLStdMA5imcG41f
+ G51Sj14Xg1aVRxnBHZD9uAC6FB88XvJG1sPuizKVYiSGm5+hLPcqaIceGJhn63RD12fMc2B9Zec
+ ejjPiC7J6gRyQi1urIJJgbkluTLLRa/fZi+9OwdsPZeLPiuZRYyFB+4JsEhT3wZhyDhqdYiy8RA
+ eIdPIRTDKKzpjLIQse6jTjYl2qAAEMEox+uv2iXzcRcheJHMPJD3tDz78ffiV2Cos1qHoOezmKk
+ hswRFOZ8prFKbrMU+j9PDKnQwfuczE5fQSzVw5sFNzschRey72cZ4li7X1gYr7pGKGdv5ZPaoCd
+ 17KPubzJfMsNJCg==
 X-Developer-Key: i=leitao@debian.org; a=openpgp;
  fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
 Replace manual IP address parsing with a call to netpoll_parse_ip_addr
-in local_ip_store(), simplifying the code and reducing the chance of
+in remote_ip_store(), simplifying the code and reducing the chance of
 errors.
 
-Also, remove the pr_err() if the user enters an invalid value in
-configfs entries. pr_err() is not the best way to alert user that the
-configuration is invalid.
+The error message got removed, since it is not a good practice to
+pr_err() if used pass a wrong value in configfs.
 
 Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
@@ -112,10 +111,10 @@ Signed-off-by: Breno Leitao <leitao@debian.org>
  1 file changed, 5 insertions(+), 17 deletions(-)
 
 diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index 7ea265752e021..3044349c5fe37 100644
+index 3044349c5fe37..de6f1a7c24cc0 100644
 --- a/drivers/net/netconsole.c
 +++ b/drivers/net/netconsole.c
-@@ -751,6 +751,7 @@ static ssize_t local_ip_store(struct config_item *item, const char *buf,
+@@ -776,6 +776,7 @@ static ssize_t remote_ip_store(struct config_item *item, const char *buf,
  {
  	struct netconsole_target *nt = to_target(item);
  	ssize_t ret = -EINVAL;
@@ -123,14 +122,14 @@ index 7ea265752e021..3044349c5fe37 100644
  
  	mutex_lock(&dynamic_netconsole_mutex);
  	if (nt->enabled) {
-@@ -759,23 +760,10 @@ static ssize_t local_ip_store(struct config_item *item, const char *buf,
+@@ -784,23 +785,10 @@ static ssize_t remote_ip_store(struct config_item *item, const char *buf,
  		goto out_unlock;
  	}
  
 -	if (strnchr(buf, count, ':')) {
 -		const char *end;
 -
--		if (in6_pton(buf, count, nt->np.local_ip.in6.s6_addr, -1, &end) > 0) {
+-		if (in6_pton(buf, count, nt->np.remote_ip.in6.s6_addr, -1, &end) > 0) {
 -			if (*end && *end != '\n') {
 -				pr_err("invalid IPv6 address at: <%c>\n", *end);
 -				goto out_unlock;
@@ -140,11 +139,11 @@ index 7ea265752e021..3044349c5fe37 100644
 -			goto out_unlock;
 -	} else {
 -		if (!nt->np.ipv6)
--			nt->np.local_ip.ip = in_aton(buf);
+-			nt->np.remote_ip.ip = in_aton(buf);
 -		else
 -			goto out_unlock;
 -	}
-+	ipv6 = netpoll_parse_ip_addr(buf, &nt->np.local_ip);
++	ipv6 = netpoll_parse_ip_addr(buf, &nt->np.remote_ip);
 +	if (ipv6 == -1)
 +		goto out_unlock;
 +	nt->np.ipv6 = ipv6;
