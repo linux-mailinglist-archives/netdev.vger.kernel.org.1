@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-208228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2339B0AA69
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 20:52:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E4B2B0AA6A
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 20:52:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14E931C4881A
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 18:52:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 461A81C48AF3
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 18:52:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F6902E975B;
-	Fri, 18 Jul 2025 18:51:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B04E2E9EC3;
+	Fri, 18 Jul 2025 18:51:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fJIMdbVh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lcLpoFXP"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A892E88AB
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 18:51:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFADD2E762A
+	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 18:51:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752864693; cv=none; b=hL9NCpecaiVPCnesmtyBBBKt/SXMGfWNPZT0oZvaMINserKbaoB/rddMkZSb6Pgrd/etpVR2e02tXMmt4xzTiOapECcPKC9ryiV7Zcl9IN87RN62u67H5S7W+Esege7LgNsWXYt2abmrwCwsxhm6l6Tunk0Leyok8dCBiHPijUE=
+	t=1752864694; cv=none; b=c4r1enX9PyZY4UQqn8lkTGu4/kiXq5yCCvrEggQdj1wfQEgq4VbDHb+z2P1CSIH/OE4knMCNY6n93GV6bH3gAwT/5IYqZPwMxSlqk2bilWFS2Y/8+vKyzJOYOMj4I0YYrBlA3LTwta2SNt8iTxV8grplJAVIcd0LDy+hgj+1psE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752864693; c=relaxed/simple;
-	bh=cykOqrsbgsjq602xlMnmGbwDj5FfMBEAq/MYI35EVIY=;
+	s=arc-20240116; t=1752864694; c=relaxed/simple;
+	bh=MgEEwQu3Sbusza5Xbsj64HrurRHKDxC/bvn5rfAZRGg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SgJt13BtnfDvxq9YE9cva/ht271vd0kS+GG4imbp0aDLOhqiucLwLpD1fQWnnKh76RGAw9WXWQE5V6KYA6vqHeZvSoMscXdCDpGfWk6PHjk0GVsoy+fulXC68X+Errm0HNAOpIkKkdY5d5DWLTmwOTjuziqaKXmnrSmxyXSKvv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fJIMdbVh; arc=none smtp.client-ip=198.175.65.16
+	 MIME-Version; b=L3GEe/f3iE1siT4taMuKyHbSzvxtWMMQYQ/cZdWobWEeuizi9ocEDwYOZP6vPnOogoDQ0uyp+/lvrTjjE4oWA3lnbjdXXoEOHvetup3z+FCHRnvEYhYhfvVnkwsFtnRA7fMXHfIqT7UW0NNZZZWBA2fZbGkxEtYoCV4ne3Xu6rg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lcLpoFXP; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752864691; x=1784400691;
+  t=1752864693; x=1784400693;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=cykOqrsbgsjq602xlMnmGbwDj5FfMBEAq/MYI35EVIY=;
-  b=fJIMdbVhxftxqjAundVCY1iC24KKCtdwbAkgZo73lscRN5YsWOAhIgkt
-   e5aBb1sCriZ/mDz4zHU4osCfxozd2bn061EcFm+yFw5AYdjBodYD8IIRY
-   K4z+9ooJ26CBtN0rf8POJKPiYN6Ymawy6L7giJHCf685sWnTKxYd5hhv2
-   TW09ebCm2OVhqj/e/Dn2dYfwwRq5pQ/2ptdtY+b+KAb38N4mcwhU0xgba
-   nYmPyZkVTFlS9oQty8wJVXo42vtPDXSw4SzYilpDMCVrkBV0t8LMcoBus
-   i66GhDsni9iDSY2J97ani6RDuVNY9iSp4krL2HoUj80dajg3JajwUpfQa
-   w==;
-X-CSE-ConnectionGUID: 4rD/bKGjSsKpRAy7QPoapg==
-X-CSE-MsgGUID: PW6DnA4NRKGEHL5tLvUqQw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11496"; a="55320608"
+  bh=MgEEwQu3Sbusza5Xbsj64HrurRHKDxC/bvn5rfAZRGg=;
+  b=lcLpoFXPjNu36ufVbqWa2v0p8VzNeQ8xRt2MvR9guTSFCvW4c51nRDDE
+   oO+WlZ7mOCR6mnwB1FCzd7HUGBzRCwxDrii7pM+58w5aNNDOinZ05tJJw
+   nqxRaLW0FNVVPkJe9E660J0yQLvN/qs+qgJ3g/ntfhzd4cgR6TIlisnms
+   mZ9RjPRR7n2haByQfqgJzG0CLJKqPcdH6WwroiS3H/tFaYOVti5rOC49Q
+   GBUisp1iPnFT4UZ49Ww46l5r5HQKEOkffWuTZ9xzb1PpWp1MfrR+8bdvK
+   ZNuxxYCUrUd5hrc5oMbkRQwpeXFj+z3rYR0bonYYTsOV7tbXyXhYcH7Mh
+   A==;
+X-CSE-ConnectionGUID: aie8qig+SM2zV33nXDdiWA==
+X-CSE-MsgGUID: Dq1L74JhTnOsEELEtU1y+A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11496"; a="55320616"
 X-IronPort-AV: E=Sophos;i="6.16,322,1744095600"; 
-   d="scan'208";a="55320608"
+   d="scan'208";a="55320616"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
   by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2025 11:51:25 -0700
-X-CSE-ConnectionGUID: +vkGIVsFTYWVdN2y7i1Uyw==
-X-CSE-MsgGUID: bilj0gluRD2TTDaXXmMUZA==
+X-CSE-ConnectionGUID: SXWw8MkLTraWVN/59pk50g==
+X-CSE-MsgGUID: cgq7YFDZTi+dYfL8VavrfQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,322,1744095600"; 
-   d="scan'208";a="157506904"
+   d="scan'208";a="157506908"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa006.jf.intel.com with ESMTP; 18 Jul 2025 11:51:25 -0700
+  by orviesa006.jf.intel.com with ESMTP; 18 Jul 2025 11:51:26 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -65,12 +65,28 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Dave Ertman <david.m.ertman@intel.com>,
+Cc: Song Yoong Siang <yoong.siang.song@intel.com>,
 	anthony.l.nguyen@intel.com,
-	Marcin Szycik <marcin.szycik@linux.intel.com>
-Subject: [PATCH net-next 09/13] ice: breakout common LAG code into helpers
-Date: Fri, 18 Jul 2025 11:51:10 -0700
-Message-ID: <20250718185118.2042772-10-anthony.l.nguyen@intel.com>
+	vitaly.lifshits@intel.com,
+	dima.ruinskiy@intel.com,
+	hector.blanco.alcaine@intel.com,
+	vinicius.gomes@intel.com,
+	kevin.tian@intel.com,
+	kurt@linutronix.de,
+	richardcochran@gmail.com,
+	john.fastabend@gmail.com,
+	hawk@kernel.org,
+	daniel@iogearbox.net,
+	corbet@lwn.net,
+	brett.creeley@amd.com,
+	srasheed@marvell.com,
+	ast@kernel.org,
+	bcreeley@amd.com,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Mor Bar-Gabay <morx.bar.gabay@intel.com>
+Subject: [PATCH net-next 10/13] igc: Relocate RSS field definitions to igc_defines.h
+Date: Fri, 18 Jul 2025 11:51:11 -0700
+Message-ID: <20250718185118.2042772-11-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250718185118.2042772-1-anthony.l.nguyen@intel.com>
 References: <20250718185118.2042772-1-anthony.l.nguyen@intel.com>
@@ -82,190 +98,60 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Dave Ertman <david.m.ertman@intel.com>
+From: Song Yoong Siang <yoong.siang.song@intel.com>
 
-In the VF handling code, parts of the code for lag can be broken out into
-helper functions to reduce code duplication. Break this code out into
-helper functions
+Move the RSS field definitions related to IPv4 and IPv6 UDP from igc.h to
+igc_defines.h to consolidate the RSS field definitions in a single header
+file, improving code organization and maintainability.
 
-Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-Signed-off-by: Dave Ertman <david.m.ertman@intel.com>
+This refactoring does not alter the functionality of the driver but
+enhances the logical grouping of related constants
+
+Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
+Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Brett Creeley <brett.creeley@amd.com>
+Tested-by: Mor Bar-Gabay <morx.bar.gabay@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_lag.c      | 42 +++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_lag.h      |  2 +
- drivers/net/ethernet/intel/ice/ice_vf_lib.c   | 19 ++-------
- drivers/net/ethernet/intel/ice/ice_virtchnl.c | 23 ++--------
- 4 files changed, 51 insertions(+), 35 deletions(-)
+ drivers/net/ethernet/intel/igc/igc.h         | 4 ----
+ drivers/net/ethernet/intel/igc/igc_defines.h | 3 +++
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c b/drivers/net/ethernet/intel/ice/ice_lag.c
-index d132eb477551..c8b4fa3efbd4 100644
---- a/drivers/net/ethernet/intel/ice/ice_lag.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lag.c
-@@ -822,6 +822,48 @@ ice_lag_cfg_cp_fltr(struct ice_lag *lag, bool add)
- 	kfree(s_rule);
- }
+diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
+index 97b1a2c820ee..fdec66caef4d 100644
+--- a/drivers/net/ethernet/intel/igc/igc.h
++++ b/drivers/net/ethernet/intel/igc/igc.h
+@@ -406,10 +406,6 @@ extern char igc_driver_name[];
+ #define IGC_FLAG_RSS_FIELD_IPV4_UDP	BIT(6)
+ #define IGC_FLAG_RSS_FIELD_IPV6_UDP	BIT(7)
  
-+/**
-+ * ice_lag_prepare_vf_reset - helper to adjust vf lag for reset
-+ * @lag: lag struct for interface that owns VF
-+ *
-+ * Context: must be called with the lag_mutex lock held.
-+ *
-+ * Return: active lport value or ICE_LAG_INVALID_PORT if nothing moved.
-+ */
-+u8 ice_lag_prepare_vf_reset(struct ice_lag *lag)
-+{
-+	u8 pri_prt, act_prt;
-+
-+	if (lag && lag->bonded && lag->primary && lag->upper_netdev) {
-+		pri_prt = lag->pf->hw.port_info->lport;
-+		act_prt = lag->active_port;
-+		if (act_prt != pri_prt && act_prt != ICE_LAG_INVALID_PORT) {
-+			ice_lag_move_vf_nodes_cfg(lag, act_prt, pri_prt);
-+			return act_prt;
-+		}
-+	}
-+
-+	return ICE_LAG_INVALID_PORT;
-+}
-+
-+/**
-+ * ice_lag_complete_vf_reset - helper for lag after reset
-+ * @lag: lag struct for primary interface
-+ * @act_prt: which port should be active for lag
-+ *
-+ * Context: must be called while holding the lag_mutex.
-+ */
-+void ice_lag_complete_vf_reset(struct ice_lag *lag, u8 act_prt)
-+{
-+	u8 pri_prt;
-+
-+	if (lag && lag->bonded && lag->primary &&
-+	    act_prt != ICE_LAG_INVALID_PORT) {
-+		pri_prt = lag->pf->hw.port_info->lport;
-+		ice_lag_move_vf_nodes_cfg(lag, pri_prt, act_prt);
-+	}
-+}
-+
- /**
-  * ice_lag_info_event - handle NETDEV_BONDING_INFO event
-  * @lag: LAG info struct
-diff --git a/drivers/net/ethernet/intel/ice/ice_lag.h b/drivers/net/ethernet/intel/ice/ice_lag.h
-index bab2c83142a1..69347d9f986b 100644
---- a/drivers/net/ethernet/intel/ice/ice_lag.h
-+++ b/drivers/net/ethernet/intel/ice/ice_lag.h
-@@ -70,4 +70,6 @@ void ice_deinit_lag(struct ice_pf *pf);
- void ice_lag_rebuild(struct ice_pf *pf);
- bool ice_lag_is_switchdev_running(struct ice_pf *pf);
- void ice_lag_move_vf_nodes_cfg(struct ice_lag *lag, u8 src_prt, u8 dst_prt);
-+u8 ice_lag_prepare_vf_reset(struct ice_lag *lag);
-+void ice_lag_complete_vf_reset(struct ice_lag *lag, u8 act_prt);
- #endif /* _ICE_LAG_H_ */
-diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-index c639ce716d32..5ee74f3e82dc 100644
---- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-@@ -859,16 +859,13 @@ static void ice_notify_vf_reset(struct ice_vf *vf)
- int ice_reset_vf(struct ice_vf *vf, u32 flags)
- {
- 	struct ice_pf *pf = vf->pf;
--	struct ice_lag *lag;
- 	struct ice_vsi *vsi;
--	u8 act_prt, pri_prt;
- 	struct device *dev;
- 	int err = 0;
-+	u8 act_prt;
- 	bool rsd;
+-#define IGC_MRQC_ENABLE_RSS_MQ		0x00000002
+-#define IGC_MRQC_RSS_FIELD_IPV4_UDP	0x00400000
+-#define IGC_MRQC_RSS_FIELD_IPV6_UDP	0x00800000
+-
+ /* RX-desc Write-Back format RSS Type's */
+ enum igc_rss_type_num {
+ 	IGC_RSS_TYPE_NO_HASH		= 0,
+diff --git a/drivers/net/ethernet/intel/igc/igc_defines.h b/drivers/net/ethernet/intel/igc/igc_defines.h
+index 86b346687196..d80254f2a278 100644
+--- a/drivers/net/ethernet/intel/igc/igc_defines.h
++++ b/drivers/net/ethernet/intel/igc/igc_defines.h
+@@ -383,11 +383,14 @@
+ #define IGC_RXDEXT_STATERR_IPE		0x40000000
+ #define IGC_RXDEXT_STATERR_RXE		0x80000000
  
- 	dev = ice_pf_to_dev(pf);
--	act_prt = ICE_LAG_INVALID_PORT;
--	pri_prt = pf->hw.port_info->lport;
++#define IGC_MRQC_ENABLE_RSS_MQ		0x00000002
+ #define IGC_MRQC_RSS_FIELD_IPV4_TCP	0x00010000
+ #define IGC_MRQC_RSS_FIELD_IPV4		0x00020000
+ #define IGC_MRQC_RSS_FIELD_IPV6_TCP_EX	0x00040000
+ #define IGC_MRQC_RSS_FIELD_IPV6		0x00100000
+ #define IGC_MRQC_RSS_FIELD_IPV6_TCP	0x00200000
++#define IGC_MRQC_RSS_FIELD_IPV4_UDP	0x00400000
++#define IGC_MRQC_RSS_FIELD_IPV6_UDP	0x00800000
  
- 	if (flags & ICE_VF_RESET_NOTIFY)
- 		ice_notify_vf_reset(vf);
-@@ -884,16 +881,8 @@ int ice_reset_vf(struct ice_vf *vf, u32 flags)
- 	else
- 		lockdep_assert_held(&vf->cfg_lock);
- 
--	lag = pf->lag;
- 	mutex_lock(&pf->lag_mutex);
--	if (lag && lag->bonded && lag->primary) {
--		act_prt = lag->active_port;
--		if (act_prt != pri_prt && act_prt != ICE_LAG_INVALID_PORT &&
--		    lag->upper_netdev)
--			ice_lag_move_vf_nodes_cfg(lag, act_prt, pri_prt);
--		else
--			act_prt = ICE_LAG_INVALID_PORT;
--	}
-+	act_prt = ice_lag_prepare_vf_reset(pf->lag);
- 
- 	if (ice_is_vf_disabled(vf)) {
- 		vsi = ice_get_vf_vsi(vf);
-@@ -979,9 +968,7 @@ int ice_reset_vf(struct ice_vf *vf, u32 flags)
- 	ice_reset_vf_mbx_cnt(vf);
- 
- out_unlock:
--	if (lag && lag->bonded && lag->primary &&
--	    act_prt != ICE_LAG_INVALID_PORT)
--		ice_lag_move_vf_nodes_cfg(lag, pri_prt, act_prt);
-+	ice_lag_complete_vf_reset(pf->lag, act_prt);
- 	mutex_unlock(&pf->lag_mutex);
- 
- 	if (flags & ICE_VF_RESET_LOCK)
-diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-index 9460b6561b69..05511157c571 100644
---- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-+++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-@@ -1996,24 +1996,13 @@ static int ice_vc_cfg_qs_msg(struct ice_vf *vf, u8 *msg)
- 	    (struct virtchnl_vsi_queue_config_info *)msg;
- 	struct virtchnl_queue_pair_info *qpi;
- 	struct ice_pf *pf = vf->pf;
--	struct ice_lag *lag;
- 	struct ice_vsi *vsi;
--	u8 act_prt, pri_prt;
- 	int i = -1, q_idx;
- 	bool ena_ts;
-+	u8 act_prt;
- 
--	lag = pf->lag;
- 	mutex_lock(&pf->lag_mutex);
--	act_prt = ICE_LAG_INVALID_PORT;
--	pri_prt = pf->hw.port_info->lport;
--	if (lag && lag->bonded && lag->primary) {
--		act_prt = lag->active_port;
--		if (act_prt != pri_prt && act_prt != ICE_LAG_INVALID_PORT &&
--		    lag->upper_netdev)
--			ice_lag_move_vf_nodes_cfg(lag, act_prt, pri_prt);
--		else
--			act_prt = ICE_LAG_INVALID_PORT;
--	}
-+	act_prt = ice_lag_prepare_vf_reset(pf->lag);
- 
- 	if (!test_bit(ICE_VF_STATE_ACTIVE, vf->vf_states))
- 		goto error_param;
-@@ -2141,9 +2130,7 @@ static int ice_vc_cfg_qs_msg(struct ice_vf *vf, u8 *msg)
- 		}
- 	}
- 
--	if (lag && lag->bonded && lag->primary &&
--	    act_prt != ICE_LAG_INVALID_PORT)
--		ice_lag_move_vf_nodes_cfg(lag, pri_prt, act_prt);
-+	ice_lag_complete_vf_reset(pf->lag, act_prt);
- 	mutex_unlock(&pf->lag_mutex);
- 
- 	/* send the response to the VF */
-@@ -2160,9 +2147,7 @@ static int ice_vc_cfg_qs_msg(struct ice_vf *vf, u8 *msg)
- 				vf->vf_id, i);
- 	}
- 
--	if (lag && lag->bonded && lag->primary &&
--	    act_prt != ICE_LAG_INVALID_PORT)
--		ice_lag_move_vf_nodes_cfg(lag, pri_prt, act_prt);
-+	ice_lag_complete_vf_reset(pf->lag, act_prt);
- 	mutex_unlock(&pf->lag_mutex);
- 
- 	ice_lag_move_new_vf_nodes(vf);
+ /* Header split receive */
+ #define IGC_RFCTL_IPV6_EX_DIS	0x00010000
 -- 
 2.47.1
 
