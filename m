@@ -1,274 +1,143 @@
-Return-Path: <netdev+bounces-208081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFA3FB09A7C
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 06:19:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09D32B09AC7
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 06:58:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 256F81C41AC2
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 04:20:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F8CC1C21CCB
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 04:58:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6394E19F13F;
-	Fri, 18 Jul 2025 04:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20B861DE2C9;
+	Fri, 18 Jul 2025 04:58:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YdmhMfdJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HYUrRsiV"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E3F910942
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 04:19:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A64191DAC95
+	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 04:58:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752812390; cv=none; b=JlfwliGfaV3kciT1mH70po/gXTXywegZlhFcnHtSCMRit2ezcW1/Vzcx9ewHO8MqYKnCYmxKe1YiCTmMTXqgtmXSvDwfdYOY12iVV6fXUZnlQhbQbBH4W4t6XdqdM+/BM4Pqz2gC3cuk8cId8svgLM5kXwByZzSa7ssiUCBPidE=
+	t=1752814689; cv=none; b=sv1ADrHXXlG00hZbzDMiTIy170prcXy16+Ttw45ixa5xO0ABm7t2gWgomLnaxtY8aoVRdeZoMIgSeu77uPKsJDQfh9A7SbsYjYkaSubN96q13d9qL7VfREmomjwNTEnaVXk4i8ckWZExh0WgxKTeoTrCgKOWB9PCH4JkW6VwaJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752812390; c=relaxed/simple;
-	bh=MyoxiHTXx41A/YhteeEMeQgFRlUneVlxGw3R2pA7Eoo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=LOgO1++HwYeGptEb2KeyHFOgSNYYQnZnodwjpWKY4or8yYGrsWGGxnfOXmrmiwvVSV664wxWfC/aHXkdZJtxkm869a6LtxgDv957K4ZxTsvbVneBnnMCUDodd1jE7c03NRlm6+OqchmslzsF3g5O/B+D6x3souups+E9kebaHbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YdmhMfdJ; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <00c14908-a7d1-4832-a4bb-2a42dd55e602@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1752812375;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bEloQbrA9zox8wvU3L8lx2FQrAgJ9PTpTicpkqM4rGk=;
-	b=YdmhMfdJaQ4+UPZFct5c3rAFEU88lErww1iq+GqPmzG4F8vfONNu7VWQTo3XJNDA8lKqxY
-	ZjY9PTwedV1IqHFxXeSJt56JI1xwVljEweGlqAwjN7Ggy/w8tQUWyTu7X3AaVd2OEGVDdc
-	dYGR5wIrLwrsvMk7GV8xImLVTVtSwgo=
-Date: Thu, 17 Jul 2025 21:19:18 -0700
+	s=arc-20240116; t=1752814689; c=relaxed/simple;
+	bh=aZ1vlw0U+xUXBcBkJYnH4XUI5WVoFRGaNjb36SlbmCg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bIM9aCHcwj82hPW6gvvw2+NjHREHywoiK3ugVdJhwvHDqBUfpVm45QJTsIIbXqLWOT0P1DqKZT9x2jqzAe57/wK51JF56xCRU/BzQ7ufGJ/LVkObbCaGTlenSo8V/GHJhtCIicPgM0LfTncLWVTpMrzXSElJoK7hqWkHcnwZdZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HYUrRsiV; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b321bd36a41so1354387a12.2
+        for <netdev@vger.kernel.org>; Thu, 17 Jul 2025 21:58:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752814687; x=1753419487; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2ubegt/Ntsn/2UxEwvuiRUKupjAlt8NVaYUWH21Mb0A=;
+        b=HYUrRsiVeYTt4omj1bHQm92NJisF2mM9gcFBY/XIIAYDYLEp+PhWf2qjf5dGPg1Fcc
+         tZ1BXba5esTVTIZKOVLATgzH0F12jMJpjjAfc59ge7mGn/tIt9Cs8WULVYM0+fGT7dXJ
+         vaSa5MCpM39DPounqOu4aYT2KhlW/hcZcydY4cIUl4dU5nM3P69daEYCHFYp6Wvk6Gud
+         ngOTITqKn3Cfby7CoXE3Q727H1DaYDeZBFLyKoP0R11oAWi/+3Gl2/BrbZJ0/EWHZOGY
+         CTf/MFLGqtbshuUD4LWOJLEoRwNPn9GhuiWqUp6vNqFys6KpzEgKeL0baHZb7iPz1IlB
+         NeGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752814687; x=1753419487;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2ubegt/Ntsn/2UxEwvuiRUKupjAlt8NVaYUWH21Mb0A=;
+        b=r4nKvwzQJDokJsEE6HmoWp5wvmbyJKFtm8uo9hQxJzb4k1g3sqMPRyEzGVrKo2la9x
+         axVK5J504hIe6Wp5ej/2b1s3xM5oPgZZb/5h8xt3yWw53it9/nlTgWeA0mgon/r0TDpV
+         XZBe2NfIeNtsRwKayx0KHYa0c1eXXLKe7DjThoq71yO4Qt/6AXH3nErUZayFK4MvWf+O
+         G6a2H8MYE4hxC7bvqA7MH/k7KrJxOB1v5hpUvX8ALSYiBHizPnLsM9kje7Jd1VA5a79N
+         AWC17dF2Xea7aa3HlmLEgfrF3EqBTnM9vICxRk+mq4FUAvRwO16AaYV/vWoaunONeTFi
+         R7fA==
+X-Gm-Message-State: AOJu0YycyQeA8drkXlpGJw8dZiG38kObZ055p4u6hfgkKfJJRnRo1F6V
+	wLE1bGxyT2t+rCXA9s7/T8ziE60N+wWynU8zelLh6OzxpKUAxaGqD3ghbvrDA+Yo
+X-Gm-Gg: ASbGncs3X4RdpFxuB1YWWkZdfbdx9pOpkcdLu/5AqXa4N8gdgnDlOUm4TN9YBwd9djd
+	0tU/JUNho6XjThOtybRbkm0jQevGbrvJPvRot+vkL8ZJgmWl61cECkjXX1Avp8YUpQIbc9SwX6P
+	zZPAQmXRFqCMSIYkrPCgaqM700Z/vP54yivNxSd4txfmZoZiQ3yaj6JO+/LgncAvizy9ZZqhU0d
+	5sNNVfmLP5jAi1dei63DbwCiIJmVtPwSxiSlIL889IfRqtjOBuvZnNoFrBJi2HGRMre4JlomReG
+	Q2GKk9UWKbLfGs18Sd5sBSWedaWXvgqNL3Iutk8VO7kRjEMOaDUcTOEpRMqnSKZVjpn7LXqFn/U
+	NYmCozE6ODzP+SL/CLffP6JTjgiXi/S6VXW8=
+X-Google-Smtp-Source: AGHT+IE8JHczJFxlvXL3kuvsAHKRmvo+4kAKGMc0sVE4uIvXWjH/MObxTO18KMLE0ORy0+Pf9yB7vA==
+X-Received: by 2002:a05:6a20:7349:b0:1f5:a3e8:64c1 with SMTP id adf61e73a8af0-2380e08ececmr13943127637.0.1752814686526;
+        Thu, 17 Jul 2025 21:58:06 -0700 (PDT)
+Received: from krishna-laptop.localdomain ([49.37.160.43])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b3f2ff62789sm374991a12.44.2025.07.17.21.58.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Jul 2025 21:58:05 -0700 (PDT)
+From: Krishna Kumar <krikku@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	tom@herbertland.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	sdf@fomichev.me,
+	kuniyu@google.com,
+	ahmed.zaki@intel.com,
+	aleksander.lobakin@intel.com,
+	atenart@kernel.org,
+	jdamato@fastly.com,
+	krishna.ku@flipkart.com,
+	krikku@gmail.com
+Subject: [PATCH v4 net-next 0/2] net: RPS table overwrite prevention and flow_id caching
+Date: Fri, 18 Jul 2025 10:27:56 +0530
+Message-ID: <20250718045758.4022899-1-krikku@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCHv2 rdma-next 1/1] net/mlx5: Fix build -Wframe-larger-than
- warnings
-To: saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, netdev@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <20250711030359.4419-1-yanjun.zhu@linux.dev>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <20250711030359.4419-1-yanjun.zhu@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-Gently ping
+This series splits the previous RPS patch [1] into two patches for
+net-next following reviewer feedback. It also addresses a kernel test
+robot warning by ensuring rps_flow_is_active() is defined only when
+aRFS is enabled. I tested v3 with four builds and reboots: two for
+[PATCH 1/2] with aRFS enabled/disabled, and two for [PATCH 2/2].
 
-Zhu Yanjun
+I had also posted v3 as a reply to previous thread [2], posting again
+as v4 in a new thread (apologies for the confusion).
 
-在 2025/7/10 20:03, Zhu Yanjun 写道:
-> When building, the following warnings will appear.
-> "
-> pci_irq.c: In function ‘mlx5_ctrl_irq_request’:
-> pci_irq.c:494:1: warning: the frame size of 1040 bytes is larger than 1024 bytes [-Wframe-larger-than=]
-> 
-> pci_irq.c: In function ‘mlx5_irq_request_vector’:
-> pci_irq.c:561:1: warning: the frame size of 1040 bytes is larger than 1024 bytes [-Wframe-larger-than=]
-> 
-> eq.c: In function ‘comp_irq_request_sf’:
-> eq.c:897:1: warning: the frame size of 1080 bytes is larger than 1024 bytes [-Wframe-larger-than=]
-> 
-> irq_affinity.c: In function ‘irq_pool_request_irq’:
-> irq_affinity.c:74:1: warning: the frame size of 1048 bytes is larger than 1024 bytes [-Wframe-larger-than=]
-> "
-> 
-> These warnings indicate that the stack frame size exceeds 1024 bytes in
-> these functions.
-> 
-> To resolve this, instead of allocating large memory buffers on the stack,
-> it is better to use kvzalloc to allocate memory dynamically on the heap.
-> This approach reduces stack usage and eliminates these frame size warnings.
-> 
-> Signed-off-by: Zhu Yanjun <yanjun.zhu@linux.dev>
-> ---
-> v1 -> v2: Add kvfree to error handler;
-> 
-> 1. This commit only build tests;
-> 2. All the changes are on configuration path, will not make difference
-> on the performance;
-> 3. This commit is just to fix build warnings, not error or bug fixes. So
-> not Fixes tag.
-> ---
->   drivers/net/ethernet/mellanox/mlx5/core/eq.c  | 24 +++++++----
->   .../mellanox/mlx5/core/irq_affinity.c         | 19 +++++++--
->   .../net/ethernet/mellanox/mlx5/core/pci_irq.c | 40 +++++++++++++------
->   3 files changed, 60 insertions(+), 23 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-> index dfb079e59d85..4938dd7c3a09 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-> @@ -873,19 +873,29 @@ static int comp_irq_request_sf(struct mlx5_core_dev *dev, u16 vecidx)
->   {
->   	struct mlx5_irq_pool *pool = mlx5_irq_table_get_comp_irq_pool(dev);
->   	struct mlx5_eq_table *table = dev->priv.eq_table;
-> -	struct irq_affinity_desc af_desc = {};
-> +	struct irq_affinity_desc *af_desc;
->   	struct mlx5_irq *irq;
->   
-> +	af_desc = kvzalloc(sizeof(*af_desc), GFP_KERNEL);
-> +	if (!af_desc)
-> +		return -ENOMEM;
-> +
->   	/* In case SF irq pool does not exist, fallback to the PF irqs*/
-> -	if (!mlx5_irq_pool_is_sf_pool(pool))
-> +	if (!mlx5_irq_pool_is_sf_pool(pool)) {
-> +		kvfree(af_desc);
->   		return comp_irq_request_pci(dev, vecidx);
-> +	}
->   
-> -	af_desc.is_managed = false;
-> -	cpumask_copy(&af_desc.mask, cpu_online_mask);
-> -	cpumask_andnot(&af_desc.mask, &af_desc.mask, &table->used_cpus);
-> -	irq = mlx5_irq_affinity_request(dev, pool, &af_desc);
-> -	if (IS_ERR(irq))
-> +	af_desc->is_managed = false;
-> +	cpumask_copy(&af_desc->mask, cpu_online_mask);
-> +	cpumask_andnot(&af_desc->mask, &af_desc->mask, &table->used_cpus);
-> +	irq = mlx5_irq_affinity_request(dev, pool, af_desc);
-> +	if (IS_ERR(irq)) {
-> +		kvfree(af_desc);
->   		return PTR_ERR(irq);
-> +	}
-> +
-> +	kvfree(af_desc);
->   
->   	cpumask_or(&table->used_cpus, &table->used_cpus, mlx5_irq_get_affinity_mask(irq));
->   	mlx5_core_dbg(pool->dev, "IRQ %u mapped to cpu %*pbl, %u EQs on this irq\n",
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
-> index 2691d88cdee1..82d3c2568244 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
-> @@ -47,29 +47,40 @@ static int cpu_get_least_loaded(struct mlx5_irq_pool *pool,
->   static struct mlx5_irq *
->   irq_pool_request_irq(struct mlx5_irq_pool *pool, struct irq_affinity_desc *af_desc)
->   {
-> -	struct irq_affinity_desc auto_desc = {};
-> +	struct irq_affinity_desc *auto_desc;
->   	struct mlx5_irq *irq;
->   	u32 irq_index;
->   	int err;
->   
-> +	auto_desc = kvzalloc(sizeof(*auto_desc), GFP_KERNEL);
-> +	if (!auto_desc)
-> +		return ERR_PTR(-ENOMEM);
-> +
->   	err = xa_alloc(&pool->irqs, &irq_index, NULL, pool->xa_num_irqs, GFP_KERNEL);
-> -	if (err)
-> +	if (err) {
-> +		kvfree(auto_desc);
->   		return ERR_PTR(err);
-> +	}
-> +
->   	if (pool->irqs_per_cpu) {
->   		if (cpumask_weight(&af_desc->mask) > 1)
->   			/* if req_mask contain more then one CPU, set the least loadad CPU
->   			 * of req_mask
->   			 */
->   			cpumask_set_cpu(cpu_get_least_loaded(pool, &af_desc->mask),
-> -					&auto_desc.mask);
-> +					&auto_desc->mask);
->   		else
->   			cpu_get(pool, cpumask_first(&af_desc->mask));
->   	}
-> +
->   	irq = mlx5_irq_alloc(pool, irq_index,
-> -			     cpumask_empty(&auto_desc.mask) ? af_desc : &auto_desc,
-> +			     cpumask_empty(&auto_desc->mask) ? af_desc : auto_desc,
->   			     NULL);
->   	if (IS_ERR(irq))
->   		xa_erase(&pool->irqs, irq_index);
-> +
-> +	kvfree(auto_desc);
-> +
->   	return irq;
->   }
->   
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
-> index 40024cfa3099..48aad94b0a5d 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
-> @@ -470,26 +470,32 @@ void mlx5_ctrl_irq_release(struct mlx5_core_dev *dev, struct mlx5_irq *ctrl_irq)
->   struct mlx5_irq *mlx5_ctrl_irq_request(struct mlx5_core_dev *dev)
->   {
->   	struct mlx5_irq_pool *pool = ctrl_irq_pool_get(dev);
-> -	struct irq_affinity_desc af_desc;
-> +	struct irq_affinity_desc *af_desc;
->   	struct mlx5_irq *irq;
->   
-> -	cpumask_copy(&af_desc.mask, cpu_online_mask);
-> -	af_desc.is_managed = false;
-> +	af_desc = kvzalloc(sizeof(*af_desc), GFP_KERNEL);
-> +	if (!af_desc)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	cpumask_copy(&af_desc->mask, cpu_online_mask);
-> +	af_desc->is_managed = false;
->   	if (!mlx5_irq_pool_is_sf_pool(pool)) {
->   		/* In case we are allocating a control IRQ from a pci device's pool.
->   		 * This can happen also for a SF if the SFs pool is empty.
->   		 */
->   		if (!pool->xa_num_irqs.max) {
-> -			cpumask_clear(&af_desc.mask);
-> +			cpumask_clear(&af_desc->mask);
->   			/* In case we only have a single IRQ for PF/VF */
-> -			cpumask_set_cpu(cpumask_first(cpu_online_mask), &af_desc.mask);
-> +			cpumask_set_cpu(cpumask_first(cpu_online_mask), &af_desc->mask);
->   		}
->   		/* Allocate the IRQ in index 0. The vector was already allocated */
-> -		irq = irq_pool_request_vector(pool, 0, &af_desc, NULL);
-> +		irq = irq_pool_request_vector(pool, 0, af_desc, NULL);
->   	} else {
-> -		irq = mlx5_irq_affinity_request(dev, pool, &af_desc);
-> +		irq = mlx5_irq_affinity_request(dev, pool, af_desc);
->   	}
->   
-> +	kvfree(af_desc);
-> +
->   	return irq;
->   }
->   
-> @@ -548,16 +554,26 @@ struct mlx5_irq *mlx5_irq_request_vector(struct mlx5_core_dev *dev, u16 cpu,
->   {
->   	struct mlx5_irq_table *table = mlx5_irq_table_get(dev);
->   	struct mlx5_irq_pool *pool = table->pcif_pool;
-> -	struct irq_affinity_desc af_desc;
-> +	struct irq_affinity_desc *af_desc;
->   	int offset = MLX5_IRQ_VEC_COMP_BASE;
-> +	struct mlx5_irq *irq;
-> +
-> +	af_desc = kvzalloc(sizeof(*af_desc), GFP_KERNEL);
-> +	if (!af_desc)
-> +		return ERR_PTR(-ENOMEM);
->   
->   	if (!pool->xa_num_irqs.max)
->   		offset = 0;
->   
-> -	af_desc.is_managed = false;
-> -	cpumask_clear(&af_desc.mask);
-> -	cpumask_set_cpu(cpu, &af_desc.mask);
-> -	return mlx5_irq_request(dev, vecidx + offset, &af_desc, rmap);
-> +	af_desc->is_managed = false;
-> +	cpumask_clear(&af_desc->mask);
-> +	cpumask_set_cpu(cpu, &af_desc->mask);
-> +
-> +	irq = mlx5_irq_request(dev, vecidx + offset, af_desc, rmap);
-> +
-> +	kvfree(af_desc);
-> +
-> +	return irq;
->   }
->   
->   static struct mlx5_irq_pool *
+The first patch prevents RPS table overwrite for active flows thereby
+improving aRFS stability.
+
+The second patch caches hash & flow_id in get_rps_cpu() to avoid
+recalculating it in set_rps_cpu() (this patch depends on the first).
+
+[1] https://lore.kernel.org/netdev/20250708081516.53048-1-krikku@gmail.com/
+[2] https://lore.kernel.org/netdev/20250717064554.3e4d9993@kernel.org/
+
+Signed-off-by: Krishna Kumar <krikku@gmail.com>
+---
+Changes v3->v4:
+  - Same v3 patch sent as a new thread instead of a continuation.
+Changes v2->v3:
+  - Wrapped rps_flow_is_active() in #ifdef CONFIG_RFS_ACCEL to fix
+    unused function warning reported by kernel test robot.
+Changes v1->v2:
+  - Split original patch into two: RPS table overwrite prevention and hash/
+    flow_id caching.
+  - Targeted net-next as per reviewer feedback.
+
+Krishna Kumar (2):
+  net: Prevent RPS table overwrite for active flows
+  net: Cache hash and flow_id to avoid recalculation
+
+ include/net/rps.h    |  5 ++-
+ net/core/dev.c       | 91 ++++++++++++++++++++++++++++++++++++++------
+ net/core/net-sysfs.c |  4 +-
+ 3 files changed, 86 insertions(+), 14 deletions(-)
+
+-- 
+2.43.0
 
 
