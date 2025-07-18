@@ -1,183 +1,372 @@
-Return-Path: <netdev+bounces-208103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55E4CB09DF4
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 10:29:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B378DB09E04
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 10:31:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E90E317BE0F
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 08:29:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6C61563E4E
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 08:31:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B42A9290DB1;
-	Fri, 18 Jul 2025 08:29:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF02293B7E;
+	Fri, 18 Jul 2025 08:31:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NKPJcX9J"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="jcUY6gG9"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A91B21FF49
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 08:29:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8702224891
+	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 08:31:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752827374; cv=none; b=kjUvYRD36vJaIrBgo3Lex/DMLZsDEzTa4rZKdtGOmLIsXmLSVrTUns+Vyd5CGAIQl7tlkwDIpWAPJcPtAdN8DobslbTpSPlOoKlSCOss1WZ8izd8WQNc+6FSWS9mYZ7ftg/lJTUpxXtR+c4F3TtYJ2x8OuGels/xEeJUyBBMIU4=
+	t=1752827497; cv=none; b=hjgYtlMRu9sYRnxnE8dsznr3Dy64Ta/lWqdOcIjqvEu14ZxdlcrqYJbC+CXk9KLFN6MHGjlbrcKPCsVJmf6VgChHQ3cLA/kzZalJyFa7KNIowdSEPjrdcqaSYc7GvABh0RheLhRgF1rkSrHZVUup9sOJVFLF2xcj2dXnTOTrXgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752827374; c=relaxed/simple;
-	bh=2yMZxEoMhzHBRLhDU4mMOZCbhsreVPW3r72uSlrVzME=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=CMlL4AxWRIQAXD2Wy6ebw27rZ2u/UHZXCOvw3u7MrDVm35Wpg8mLlwb5vyiE/JOAmffn2iffNL73pCBVpLFBknVqCq/66huH65YjkfDJo5sZjdCqWVz/4uzRmh3d5YndnW5L04jwiTDDiSEObwClOJHNlipMVlUIOsWZ4dBhek8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NKPJcX9J; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752827372;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=tLxIgdhHiCoIgPGgPwU9stKbvRQ2I1q76Ap/zfjhcII=;
-	b=NKPJcX9JUlNF3MpnAebcOSVPHnOPXUXuXh/UNeT+nOsgmkf24CXmB/GXWD3s+0L03HZiPS
-	lmfprn13yIHR837FaIsHvnKT8hH/Z7gLBwurHBlKJIlh2MHf04M0hmRL4JiWHWXfFvRdXM
-	N8QqncFiPnhJbhYQ7acJ5VhWfFBISxw=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-564-Hq1APPNbMhy3c5iZgPPmNA-1; Fri,
- 18 Jul 2025 04:29:28 -0400
-X-MC-Unique: Hq1APPNbMhy3c5iZgPPmNA-1
-X-Mimecast-MFC-AGG-ID: Hq1APPNbMhy3c5iZgPPmNA_1752827365
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 575D119560B6;
-	Fri, 18 Jul 2025 08:29:25 +0000 (UTC)
-Received: from server.redhat.com (unknown [10.72.112.34])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AA4E830001B9;
-	Fri, 18 Jul 2025 08:29:14 +0000 (UTC)
-From: Cindy Lu <lulu@redhat.com>
-To: "K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Michael Kelley <mhklinux@outlook.com>,
-	Shradha Gupta <shradhagupta@linux.microsoft.com>,
-	Kees Cook <kees@kernel.org>,
-	Saurabh Sengar <ssengar@linux.microsoft.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Guillaume Nault <gnault@redhat.com>,
-	Joe Damato <jdamato@fastly.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	linux-hyperv@vger.kernel.org (open list:Hyper-V/Azure CORE AND DRIVERS),
-	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
-	linux-kernel@vger.kernel.org (open list),
-	lulu@redhat.com,
-	jasowang@redhat.com
-Subject: [PATCH v2] netvsc: transfer lower device max tso size
-Date: Fri, 18 Jul 2025 16:28:44 +0800
-Message-ID: <20250718082909.243488-1-lulu@redhat.com>
+	s=arc-20240116; t=1752827497; c=relaxed/simple;
+	bh=Yba3a+fvg4oQMcRXf/uCECjshMtgdjfwvuJXl0/DER8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TbFTHu5JEAwkueIA+KBpv1nHFMRoVS2e1BT8XnB4nUyX6kJzXms/5ZqQOCDconqhArXUVF5tVlCrwL+83Ok881zMFMhLDWS7E8EC2GOJceMOQnO2Lqu4XWzLdKNNjWh1+x7YDKJRC1PPBo8qBfRmE3myUHyDHbyZgmOVd0HTXoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=jcUY6gG9; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-55622414cf4so1625907e87.3
+        for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 01:31:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1752827492; x=1753432292; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S8xwpmkMzspiOongpmX1MNLbl0q1sdU9S7sc4man+Jg=;
+        b=jcUY6gG9UyTDsGt5NDFDkKgfRwiN8UW+nFeFUhG9vDLkla/es1ModDc/h8hjA8PcWh
+         OyZqC3GiT/BNYXRxJRkyFlcBVEXVueeDp1qL3NbCJtWTqbMvD8cqMlAq+uVKcgtuRK6O
+         xavOMth0ovUkEWWN4eC19Lfr6xLh8LLCmIMNY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752827492; x=1753432292;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=S8xwpmkMzspiOongpmX1MNLbl0q1sdU9S7sc4man+Jg=;
+        b=jZlo0OhXGd4OrBtDoY0mwL6VUNEaw8AmvwOkh+my613lkB1T3SLcRw7PjQExzPfjBH
+         Mgoqles+ltYhP9s/rIFlFp2F3Tlkqf3otI9yDe5v/1be5rw0Iuh0lk1FnR9dl7CmdomP
+         LvFPSS7+QdG04b0BLqBYomOz7ApoY2Xh6JcnaH8iFEj8PpVtizuc8k6/9dU43ikiKlOp
+         /FS0Y6RDYV7MF/KKeZaIoAcEzB3hsZrLO+rTJHfEWDwNyx6BYgDIdloQD/8O6UpVgklC
+         f4c3GXUzElCQHQ/1hwBzS2q5brpCQDUMXeSSNXoJK6w557RoOA5UWq1xV0eFu2Jy7clg
+         bYYg==
+X-Forwarded-Encrypted: i=1; AJvYcCU2oFFYgnoa1kAtp5gxE9UPJETxQP6tcwre9tfcbglF4nASSmMORCeIqDxK0CsU4w2MDMlSJNE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGv2TwBamhYsbI0xdkEUXNiRnKRxKjLpi7y5kJrd7TmIoGrzNu
+	It1c+T68E/g2p2MyCnudlUWRvI0bg73rMpC4Mu1sgoIlKlpa+CoSUHpzi2JfXULfiu8Kc06hQnr
+	VGXQa3oSRWle2bX6LozAUkNfj1VKGHKmaN4OEyGJ9
+X-Gm-Gg: ASbGnctL4zkBUDvNOxUbPr2MoXsl5P3iSp4zJKVQSBatiYoO9+v7XUYqJ/GDFk+jFkt
+	sv3TL/Z/jq1arfvJldjYa+RTcdOZS9EissGlW27lv28i846p58b5ydrVeVpoqFnb8BP/0nRqcAi
+	XFgMB+WmRiKdBeqhzOLVQ2S9CUc+m6ZTR8EZSQN2LbVnxsfM6S9OChHSA3HwPl3J9JhgqLyLe9t
+	eWhtdmU6iMgAV9or+PKTWVydyiC36WUizQ=
+X-Google-Smtp-Source: AGHT+IE2YCP3qtGwbWMMf4nA+VHzKJt73OAglarAy2N4KkRi0JUERUKf9Ryw1zRIfRne1bwjjAb8n8O/WhX1Et2H5P0=
+X-Received: by 2002:ac2:4bd3:0:b0:553:543d:d963 with SMTP id
+ 2adb3069b0e04-55a3188f091mr482109e87.36.1752827491972; Fri, 18 Jul 2025
+ 01:31:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+References: <20250624143220.244549-1-laura.nao@collabora.com>
+ <20250624143220.244549-15-laura.nao@collabora.com> <CAGXv+5EsVOPC+i2=9d-Be1U-DuB8tPDAyokzhTOeVZQtZJ9+CQ@mail.gmail.com>
+In-Reply-To: <CAGXv+5EsVOPC+i2=9d-Be1U-DuB8tPDAyokzhTOeVZQtZJ9+CQ@mail.gmail.com>
+From: Chen-Yu Tsai <wenst@chromium.org>
+Date: Fri, 18 Jul 2025 16:31:18 +0800
+X-Gm-Features: Ac12FXy4SClgcQRcJIHHX9Uew0lkKbfgQ80ydRk_k7muDqm79-Y_wxCCK4MPdyc
+Message-ID: <CAGXv+5ErtDLNf3u5OdHrEBdrA-2bPA5wy32S+Bqd1c_1Z9u1pA@mail.gmail.com>
+Subject: Re: [PATCH v2 14/29] clk: mediatek: Add MT8196 vlpckgen clock support
+To: Laura Nao <laura.nao@collabora.com>
+Cc: mturquette@baylibre.com, sboyd@kernel.org, robh@kernel.org, 
+	krzk+dt@kernel.org, conor+dt@kernel.org, matthias.bgg@gmail.com, 
+	angelogioacchino.delregno@collabora.com, p.zabel@pengutronix.de, 
+	richardcochran@gmail.com, guangjie.song@mediatek.com, 
+	linux-clk@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+	kernel@collabora.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jason Wang <jasowang@redhat.com>
+On Tue, Jul 15, 2025 at 3:28=E2=80=AFPM Chen-Yu Tsai <wenst@chromium.org> w=
+rote:
+>
+> Hi,
+>
+>
+> On Tue, Jun 24, 2025 at 10:33=E2=80=AFPM Laura Nao <laura.nao@collabora.c=
+om> wrote:
+> >
+> > Add support for the MT8196 vlpckgen clock controller, which provides
+> > muxes and dividers for clock selection in other IP blocks.
+> >
+> > Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@coll=
+abora.com>
+> > Signed-off-by: Laura Nao <laura.nao@collabora.com>
+> > ---
+> >  drivers/clk/mediatek/Makefile              |   2 +-
+> >  drivers/clk/mediatek/clk-mt8196-vlpckgen.c | 769 +++++++++++++++++++++
+> >  2 files changed, 770 insertions(+), 1 deletion(-)
+> >  create mode 100644 drivers/clk/mediatek/clk-mt8196-vlpckgen.c
+> >
+> > diff --git a/drivers/clk/mediatek/Makefile b/drivers/clk/mediatek/Makef=
+ile
+> > index 0688d7bf4979..24683dd51783 100644
+> > --- a/drivers/clk/mediatek/Makefile
+> > +++ b/drivers/clk/mediatek/Makefile
+> > @@ -161,7 +161,7 @@ obj-$(CONFIG_COMMON_CLK_MT8195_VENCSYS) +=3D clk-mt=
+8195-venc.o
+> >  obj-$(CONFIG_COMMON_CLK_MT8195_VPPSYS) +=3D clk-mt8195-vpp0.o clk-mt81=
+95-vpp1.o
+> >  obj-$(CONFIG_COMMON_CLK_MT8195_WPESYS) +=3D clk-mt8195-wpe.o
+> >  obj-$(CONFIG_COMMON_CLK_MT8196) +=3D clk-mt8196-apmixedsys.o clk-mt819=
+6-topckgen.o \
+> > -                                  clk-mt8196-topckgen2.o
+> > +                                  clk-mt8196-topckgen2.o clk-mt8196-vl=
+pckgen.o
+> >  obj-$(CONFIG_COMMON_CLK_MT8365) +=3D clk-mt8365-apmixedsys.o clk-mt836=
+5.o
+> >  obj-$(CONFIG_COMMON_CLK_MT8365_APU) +=3D clk-mt8365-apu.o
+> >  obj-$(CONFIG_COMMON_CLK_MT8365_CAM) +=3D clk-mt8365-cam.o
+> > diff --git a/drivers/clk/mediatek/clk-mt8196-vlpckgen.c b/drivers/clk/m=
+ediatek/clk-mt8196-vlpckgen.c
+> > new file mode 100644
+> > index 000000000000..23a673dd4c5c
+> > --- /dev/null
+> > +++ b/drivers/clk/mediatek/clk-mt8196-vlpckgen.c
+> > @@ -0,0 +1,769 @@
+>
+> [...]
+>
+> > +static const char * const vlp_camtg0_parents[] =3D {
+> > +       "clk26m",
+> > +       "univpll_192m_d32",
+> > +       "univpll_192m_d16",
+> > +       "clk13m",
+> > +       "osc_d40",
+> > +       "osc_d32",
+> > +       "univpll_192m_d10",
+> > +       "univpll_192m_d8",
+> > +       "univpll_d6_d16",
+> > +       "ulposc3",
+> > +       "osc_d20",
+> > +       "ck2_tvdpll1_d16",
+> > +       "univpll_d6_d8"
+> > +};
+>
+> It seems all the vlp_camtg* parents are the same. Please merge them
+> and just have one list.
+>
+> > +static const char * const vlp_sspm_26m_parents[] =3D {
+> > +       "clk26m",
+> > +       "osc_d20"
+> > +};
+> > +
+> > +static const char * const vlp_ulposc_sspm_parents[] =3D {
+> > +       "clk26m",
+> > +       "osc_d2",
+> > +       "mainpll_d4_d2"
+> > +};
+> > +
+> > +static const char * const vlp_vlp_pbus_26m_parents[] =3D {
+> > +       "clk26m",
+> > +       "osc_d20"
+> > +};
+> > +
+> > +static const char * const vlp_debug_err_flag_parents[] =3D {
+> > +       "clk26m",
+> > +       "osc_d20"
+> > +};
+> > +
+> > +static const char * const vlp_dpmsrdma_parents[] =3D {
+> > +       "clk26m",
+> > +       "mainpll_d7_d2"
+> > +};
+> > +
+> > +static const char * const vlp_vlp_pbus_156m_parents[] =3D {
+> > +       "clk26m",
+> > +       "osc_d2",
+> > +       "mainpll_d7_d2",
+> > +       "mainpll_d7"
+> > +};
+> > +
+> > +static const char * const vlp_spm_parents[] =3D {
+> > +       "clk26m",
+> > +       "mainpll_d7_d4"
+> > +};
+> > +
+> > +static const char * const vlp_mminfra_parents[] =3D {
+> > +       "clk26m",
+> > +       "osc_d4",
+> > +       "mainpll_d3"
+> > +};
+> > +
+> > +static const char * const vlp_usb_parents[] =3D {
+> > +       "clk26m",
+> > +       "mainpll_d9"
+> > +};
+>
+> The previous and the next one are the same.
+>
+> > +static const char * const vlp_usb_xhci_parents[] =3D {
+> > +       "clk26m",
+> > +       "mainpll_d9"
+> > +};
+> > +
+> > +static const char * const vlp_noc_vlp_parents[] =3D {
+> > +       "clk26m",
+> > +       "osc_d20",
+> > +       "mainpll_d9"
+> > +};
+> > +
+> > +static const char * const vlp_audio_h_parents[] =3D {
+> > +       "clk26m",
+> > +       "vlp_apll1",
+> > +       "vlp_apll2"
+> > +};
+> > +
+> > +static const char * const vlp_aud_engen1_parents[] =3D {
+> > +       "clk26m",
+> > +       "apll1_d8",
+> > +       "apll1_d4"
+> > +};
+>
+> The previous and the next one are the same.
+>
+> > +static const char * const vlp_aud_engen2_parents[] =3D {
+> > +       "clk26m",
+> > +       "apll2_d8",
+> > +       "apll2_d4"
+> > +};
+> > +
+> > +static const char * const vlp_aud_intbus_parents[] =3D {
+> > +       "clk26m",
+> > +       "mainpll_d7_d4",
+> > +       "mainpll_d4_d4"
+> > +};
 
-When netvsc is accelerated by the lower device, we can advertise the
-lower device max tso size in order to get better performance.
+Also, all these audio related clocks (audio_h, aud_engen1, aud_engen2
+aud_intbus) have a "vlp_clk26m" clock as their parent. It should be:
 
-One example is that when 802.3ad encap is enabled by netvsc, it has a
-lower max tso size than 64K. This will lead to software segmentation
-of forwarding GSO packet (e.g the one from VM/tap).
+  - clk26m (clk26m from the top ckgen domain)
+  - vlp_clk26m (clk26m from the VLP domain)
+  - (from PLLs)
+  - (from PLLs)
 
-This patch help to recover the performance.
+Moreover, an offline discussion with the audio owner suggests that
+of the two 26 MHz clock parents, we really just want the one from
+the VLP domain, as that one is usable even under suspend. This
+could be done by providing an index table.
 
-Signed-off-by: Jason Wang <jasowang@redhat.com>
-Tested-by: Cindy Lu <lulu@redhat.com>
-Signed-off-by: Cindy Lu <lulu@redhat.com>
----
- drivers/net/hyperv/netvsc_drv.c |  2 +-
- include/linux/netdevice.h       |  4 ++++
- net/core/dev.c                  | 18 ++++++++++++++++++
- 3 files changed, 23 insertions(+), 1 deletion(-)
+ChenYu
 
-diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
-index c41a025c66f0..7af4aa4f4abe 100644
---- a/drivers/net/hyperv/netvsc_drv.c
-+++ b/drivers/net/hyperv/netvsc_drv.c
-@@ -2440,7 +2440,7 @@ static int netvsc_vf_changed(struct net_device *vf_netdev, unsigned long event)
- 		 * switched over to the VF
- 		 */
- 		if (vf_is_up)
--			netif_set_tso_max_size(ndev, vf_netdev->tso_max_size);
-+			netif_stacked_transfer_tso_max_size(vf_netdev, ndev);
- 		else
- 			netif_set_tso_max_size(ndev, netvsc_dev->netvsc_gso_max_size);
- 	}
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index adb14db25798..c695a3ffecd8 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -5275,6 +5275,9 @@ void netdev_change_features(struct net_device *dev);
- void netif_stacked_transfer_operstate(const struct net_device *rootdev,
- 					struct net_device *dev);
- 
-+void netif_stacked_transfer_tso_max_size(const struct net_device *rootdev,
-+					 struct net_device *dev);
-+
- netdev_features_t passthru_features_check(struct sk_buff *skb,
- 					  struct net_device *dev,
- 					  netdev_features_t features);
-@@ -5326,6 +5329,7 @@ static inline bool netif_needs_gso(struct sk_buff *skb,
- }
- 
- void netif_set_tso_max_size(struct net_device *dev, unsigned int size);
-+
- void netif_set_tso_max_segs(struct net_device *dev, unsigned int segs);
- void netif_inherit_tso_max(struct net_device *to,
- 			   const struct net_device *from);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index be97c440ecd5..3bec4284adff 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -3306,6 +3306,24 @@ void netif_set_tso_max_size(struct net_device *dev, unsigned int size)
- }
- EXPORT_SYMBOL(netif_set_tso_max_size);
- 
-+/**
-+ *	netif_stacked_transfer_tso_max_size - transfer tso max size
-+ *	@rootdev: the root or lower level device to transfer tso max size from
-+ *	@dev: the device to transfer operstate to
-+ *
-+ *	Transfer tso max size from root to device. This is normally
-+ *	called when a stacking relationship exists between the root
-+ *	device and the device(a leaf device).
-+ */
-+void netif_stacked_transfer_tso_max_size(const struct net_device *rootdev,
-+					 struct net_device *dev)
-+{
-+	dev->tso_max_size = rootdev->tso_max_size;
-+	netif_set_gso_max_size(dev, READ_ONCE(rootdev->gso_max_size));
-+	netif_set_gso_ipv4_max_size(dev, READ_ONCE(rootdev->gso_ipv4_max_size));
-+}
-+EXPORT_SYMBOL(netif_stacked_transfer_tso_max_size);
-+
- /**
-  * netif_set_tso_max_segs() - set the max number of segs supported for TSO
-  * @dev:	netdev to update
--- 
-2.45.0
-
+> > +
+> > +static const char * const vlp_spvlp_26m
+>
+> [...]
+>
+> > +static int clk_mt8196_vlp_probe(struct platform_device *pdev)
+> > +{
+> > +       struct clk_hw_onecell_data *clk_data;
+> > +       int r;
+> > +       struct device_node *node =3D pdev->dev.of_node;
+> > +
+> > +       clk_data =3D mtk_alloc_clk_data(ARRAY_SIZE(vlp_muxes) +
+> > +                                     ARRAY_SIZE(vlp_plls));
+> > +       if (!clk_data)
+> > +               return -ENOMEM;
+> > +
+> > +       r =3D mtk_clk_register_muxes(&pdev->dev, vlp_muxes, ARRAY_SIZE(=
+vlp_muxes),
+> > +                                  node, &mt8196_clk_vlp_lock, clk_data=
+);
+> > +       if (r)
+> > +               goto free_clk_data;
+> > +
+> > +       r =3D mtk_clk_register_plls(node, vlp_plls, ARRAY_SIZE(vlp_plls=
+),
+> > +                                 clk_data);
+> > +       if (r)
+> > +               goto unregister_muxes;
+> > +
+> > +       r =3D of_clk_add_hw_provider(node, of_clk_hw_onecell_get, clk_d=
+ata);
+> > +       if (r)
+> > +               goto unregister_plls;
+> > +
+> > +       platform_set_drvdata(pdev, clk_data);
+> > +
+> > +       return r;
+> > +
+> > +unregister_plls:
+> > +       mtk_clk_unregister_plls(vlp_plls, ARRAY_SIZE(vlp_plls), clk_dat=
+a);
+> > +unregister_muxes:
+> > +       mtk_clk_unregister_muxes(vlp_muxes, ARRAY_SIZE(vlp_muxes), clk_=
+data);
+> > +free_clk_data:
+> > +       mtk_free_clk_data(clk_data);
+>
+> The AFE driver sets some tuner parameters in the VLPCKGEN block at probe
+> time. Maybe we could do that here instead?
+>
+> /* vlp_cksys_clk: 0x1c016000 */
+> #define VLP_APLL1_TUNER_CON0 0x02a4
+> #define VLP_APLL2_TUNER_CON0 0x02a8
+>
+> /* vlp apll1 tuner default value*/
+> #define VLP_APLL1_TUNER_CON0_VALUE 0x6f28bd4d
+> /* vlp apll2 tuner default value + 1*/
+> #define VLP_APLL2_TUNER_CON0_VALUE 0x78fd5265
+>
+>        regmap_write(afe_priv->vlp_ck, VLP_APLL1_TUNER_CON0,
+> VLP_APLL1_TUNER_CON0_VALUE);
+>        regmap_write(afe_priv->vlp_ck, VLP_APLL2_TUNER_CON0,
+> VLP_APLL2_TUNER_CON0_VALUE);
+>
+> ChenYu
+>
+> > +
+> > +       return r;
+> > +}
+> > +
+> > +static void clk_mt8196_vlp_remove(struct platform_device *pdev)
+> > +{
+> > +       struct clk_hw_onecell_data *clk_data =3D platform_get_drvdata(p=
+dev);
+> > +       struct device_node *node =3D pdev->dev.of_node;
+> > +
+> > +       of_clk_del_provider(node);
+> > +       mtk_clk_unregister_plls(vlp_plls, ARRAY_SIZE(vlp_plls), clk_dat=
+a);
+> > +       mtk_clk_unregister_muxes(vlp_muxes, ARRAY_SIZE(vlp_muxes), clk_=
+data);
+> > +       mtk_free_clk_data(clk_data);
+> > +}
+> > +
+> > +static const struct of_device_id of_match_clk_mt8196_vlp_ck[] =3D {
+> > +       { .compatible =3D "mediatek,mt8196-vlpckgen" },
+> > +       { /* sentinel */ }
+> > +};
+> > +MODULE_DEVICE_TABLE(of, of_match_clk_mt8196_vlp_ck);
+> > +
+> > +static struct platform_driver clk_mt8196_vlp_drv =3D {
+> > +       .probe =3D clk_mt8196_vlp_probe,
+> > +       .remove =3D clk_mt8196_vlp_remove,
+> > +       .driver =3D {
+> > +               .name =3D "clk-mt8196-vlpck",
+> > +               .of_match_table =3D of_match_clk_mt8196_vlp_ck,
+> > +       },
+> > +};
+> > +
+> > +MODULE_DESCRIPTION("MediaTek MT8196 VLP clock generator driver");
+> > +module_platform_driver(clk_mt8196_vlp_drv);
+> > +MODULE_LICENSE("GPL");
+> > --
+> > 2.39.5
+> >
 
