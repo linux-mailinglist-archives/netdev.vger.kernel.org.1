@@ -1,58 +1,59 @@
-Return-Path: <netdev+bounces-208275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B70AB0AC95
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 01:34:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0208B0AC96
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 01:37:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 111FF188A62A
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 23:34:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 558B24E526C
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 23:37:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26E231DDC37;
-	Fri, 18 Jul 2025 23:34:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03D2521D5BE;
+	Fri, 18 Jul 2025 23:37:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nSCkiorf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mj4qVPGm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02BAD33985
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 23:34:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7EC15479B;
+	Fri, 18 Jul 2025 23:37:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752881649; cv=none; b=Hn9zJdhox4/oq4jw5khUlsgXuxoRZWuhdZZnInpsLB00cGQSMFU/mDB2MX0aLPAHnogRjA/EHnIK7E+fvJDLQWgMefMRbI3lcU0zU5dQ8gc3OvZivIbRaXXq8UeJeokMjvRwH7iQHu5i25MM9YtBswcIc67AZir2cVdjYgn5Jao=
+	t=1752881844; cv=none; b=eBHWs8hoX8q1HggxEYx4Sv5WfcYggo8/wHaLijsH9fFS4w+97IpGv/2fEvqHhn9G66pa89OTJJeOv1HkA3ZwTRusEkSOzUFmRPhZ1ze+VdPKn4IwH9LgLKgOV2KWvGd7l2UN2GFb1u0CXHZPKXfRJUTbmJCv03P547g8T6OQaKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752881649; c=relaxed/simple;
-	bh=NYIQV5H2RdyZzTzBrYdYW5kl51yDCJtGSFUNVCLPMU0=;
+	s=arc-20240116; t=1752881844; c=relaxed/simple;
+	bh=i/DZrEEXHs8Q2rMc5+5X5kEhFG1UD6Uqa/oIKPuu3sk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HSMQo54NbuJBuLdaUOS1F+mnAmMtK1ps85Ujtgyf38twrs7d4xfHNRtX0Jl8CCFFLncFUYWB/6+nDBq9Prxe0j2STFo12EjgjPITEmkWuY5QmQXv/Cw5BsEaelEVzn440zzbUX1CKXX+GYcECan+nXQK+fOjP0226y+mXKTKZf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nSCkiorf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 446F1C4CEEB;
-	Fri, 18 Jul 2025 23:34:08 +0000 (UTC)
+	 MIME-Version:Content-Type; b=fgFXngTAIZ5KtcgCPJcEwGw9QBnOA15LLfYjn8xALblvidc4L2k0OkLji/l/RrN8hG+yk6kejijRcEbX0RQtdcykE2fXcBRyPN/5vQxXnySC5KjsfwV4iyaV5BRyYJsMmwWtdf4qSjtMjmxCSBjoEoMCW+uA9jXHsI3S0Aun8fE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mj4qVPGm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE177C4CEEB;
+	Fri, 18 Jul 2025 23:37:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752881648;
-	bh=NYIQV5H2RdyZzTzBrYdYW5kl51yDCJtGSFUNVCLPMU0=;
+	s=k20201202; t=1752881844;
+	bh=i/DZrEEXHs8Q2rMc5+5X5kEhFG1UD6Uqa/oIKPuu3sk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nSCkiorfOTqVTRsmfjp23key05iCy5DLyQvPk0NryqF8oJJptj4weZtj/Y1I/K9Cm
-	 kDfWFaSge1SaInRtXHCKMZqH/4AKHTZdeDF/RtXwHeUE0bxRJj3qDov3Ef2kPP0SsF
-	 HuzJkytPz2nK6kNeHCrXOCs3wy0ANFSlcVfHzvWReRzeuG+FCoTj4DUFZR2+vJu0SK
-	 FUoYMa9UmvpcphGMnCTYd72lJrCgEJnSxXBBWJcYyXQ7kqJYYjnC9Ncgfl9VPUkItb
-	 9iNRTEEsH01746+JhSc5BJSdFk3nUSvV9jb/QhLa5b9gIZ2gcbxH5u/u2hEaKQ/3sn
-	 jqiLJEbwNQD0Q==
-Date: Fri, 18 Jul 2025 16:34:07 -0700
+	b=Mj4qVPGmWmNQQrdnHAUdYzajX0sjKDMW40Eo97OX5sQwSOfHNgE7rPJq3SE9GQ009
+	 S751fReuKalJHFKOUAZMXH/OlvLbmCLwlLJoEF3/AXjQsggREFe5gdHKd8241bGvON
+	 oQ7YeDMkM/lAShwlB5f0CyPF+S+G7N08LDprISYGvztBj1b0pBUYGOD1g3ONVtq8P1
+	 p6RA6my4+NXMXO8fXICdG2tay9nH83+9WDBIkNIqIhrf4WpknNKuw4OKWc/Yugikar
+	 /4cAMRWST2ccjcMfoth4CJ3JIubteRouFFEGcFV6W5gYCcpaZVbyTtjK8ZI3/OXSoc
+	 o7quIgv6QzsdA==
+Date: Fri, 18 Jul 2025 16:37:23 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: <davem@davemloft.net>, <pabeni@redhat.com>, <edumazet@google.com>,
- <andrew+netdev@lunn.ch>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next 00/13][pull request] Intel Wired LAN Driver
- Updates 2025-07-18 (idpf, ice, igc, igbvf, ixgbevf)
-Message-ID: <20250718163407.1246b5fe@kernel.org>
-In-Reply-To: <842e0cbe-57cf-42e0-8659-81f96e29d7bd@intel.com>
-References: <20250718185118.2042772-1-anthony.l.nguyen@intel.com>
-	<9d2817f0-5ee8-4133-a139-80e894f32c9f@intel.com>
-	<842e0cbe-57cf-42e0-8659-81f96e29d7bd@intel.com>
+To: Haiyang Zhang <haiyangz@linux.microsoft.com>, kuniyu@google.com
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ haiyangz@microsoft.com, kys@microsoft.com, wei.liu@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+ davem@davemloft.net, sdf@fomichev.me, ahmed.zaki@intel.com,
+ aleksander.lobakin@intel.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: core: Fix the loop in
+ default_device_exit_net()
+Message-ID: <20250718163723.4390bd7d@kernel.org>
+In-Reply-To: <1752870014-28909-1-git-send-email-haiyangz@linux.microsoft.com>
+References: <1752870014-28909-1-git-send-email-haiyangz@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,23 +63,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 18 Jul 2025 15:36:36 -0700 Tony Nguyen wrote:
-> On 7/18/2025 2:37 PM, Tony Nguyen wrote:
-> > On 7/18/2025 11:51 AM, Tony Nguyen wrote:  
-> >> For idpf:
-> >> Ahmed and Sudheer add support for flow steering via ntuple filters.
-> >> Current support is for IPv4 and TCP/UDP only.  
-> > 
-> > I blanked on the .get_rxfh_fields and .set_rxfh_fields ethtool 
-> > callbacks; we'll need to adjust for that.  
+On Fri, 18 Jul 2025 13:20:14 -0700 Haiyang Zhang wrote:
+> The loop in default_device_exit_net() won't be able to properly detect the
+> head then stop, and will hit NULL pointer, when a driver, like hv_netvsc,
+> automatically moves the slave device together with the master device.
 > 
-> Sorry, long week :( Looks like this functionality stayed in this call so 
-> we don't need adjust this after all.
-> 
-> Did you want me to resubmit this one later or did you want to change the 
-> status back?
+> To fix this, add a helper function to return the first migratable netdev
+> correctly, no matter one or two devices were removed from this net's list
+> in the last iteration.
 
-I'll revive it, no worries :)
--- 
-pw-bot: new
+FTR I think that what the driver is trying to do is way too hacky, and
+it should be fixed instead. But I defer to Kuniyuki for the final word,
+maybe this change is useful for other reasons..
 
