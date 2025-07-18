@@ -1,98 +1,101 @@
-Return-Path: <netdev+bounces-208194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6861B0A808
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 17:57:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82123B0A823
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 18:11:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 718701C42597
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 15:58:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B74A1C8139F
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 16:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74DC22E5B13;
-	Fri, 18 Jul 2025 15:57:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADAA22E6125;
+	Fri, 18 Jul 2025 16:11:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="b2Wv6gID"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Sc+0nxXh"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59EA26ADD;
-	Fri, 18 Jul 2025 15:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0CA22E611F;
+	Fri, 18 Jul 2025 16:11:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752854260; cv=none; b=d/Ltm/BsZGwyFPZy0qRV/uwUpCy0nzKnWOJrGHHCsihl04UpijAos6/XTPjqO4Ogz7UJHgy3z3aJGvhCw6uZLr/YAxcLAckl39sAALZGcu7TNieP/3+7DG+7M5mIk/UAtXDQfAXa2bT32GkXAkPo+Q0eGLmEq+KUQ27nqrINVDk=
+	t=1752855072; cv=none; b=dj+F1hJZjOoCpDfPGyYTXyeZYX0+6GEk/JBzLBH/m3RSLovSBIjKQk6imQYESn3DgndnbvXS0oPjoba2cmPs0f21WB1THAyTi4KKCgKKktf3HdwNxhFJbXrOcC4LfUgyiQP8/8ExQjTAxo2YJKt/nJvl0PLF7FZuFofcUnxHfd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752854260; c=relaxed/simple;
-	bh=LHLqqJFovhgxSpklvL5XVrRNk8HTcb+MZcN/GxLQd6s=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=fYwev+9B0UA1LQ3W7UVgfccJXErWGWx5MiHdbVhGIsZVmWApCpk01if08LgNyIRMRirV5CX0VDe9xm6r/GheRzhb9vKZ2rRUkiltopNZUFptIEkNl0fRF/j9TImWobqy4lXP2MY5EuTvZleO2ruu5oHW5lwF4gNJqEpp8TvVqBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=b2Wv6gID; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+	s=arc-20240116; t=1752855072; c=relaxed/simple;
+	bh=edJ75qXqFBPiDqu0QUODDa038aOzTIs/JrrivMJk9pI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iXsAq7N2P6/HzThhY9H2CjJQZ7XRcqJNtg0HnCLcjFVP7OZ+h1IsUs5b0RG6JqQYF5+IAxm82G+nVO0lznvtg2k/ZcFxT0BReqaKnsi5ab3ptij7WEJtHCQlQi0FmMSFZ+jQID66PD2llbakpEdk/gU1isuEyaq/ValuzGwekNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Sc+0nxXh; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=SulPe+WYKJoxLSlyxNtx26YPColW+wIyanOtCwJbKL8=;
-	t=1752854258; x=1754063858; b=b2Wv6gID4qx47/Ra62pddlMHvZIShPIjavkQuMNjQEMNgD5
-	/Ex43RsUFS+SodbCgD3nx29U1jDKV1Hk2aXMFKaV2v6C+y4/jg448OFq+u7tplKoFaw1dWlxbnvW2
-	luq3qouoegRSAoDOmmpqHyx97tvZaq+U9bOf1PcBsnCMB5jziLMB7pnI4tNUrSu0/Q+wegmFKi1QG
-	C9CEVRc5JDqDWt2fiQW0MJIapu4GihkEhEAX46R+Mg2W/SeJjLy/eVlFKuXyie1900wtOxW1JzLAR
-	U99JHV7WE9rf+Zn3f+fENTQW2MKV5g1f7o5FyQT9yKvWm2/M7f8PBCFO/RnA+aSg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1ucnSi-0000000CwCr-1R0U;
-	Fri, 18 Jul 2025 17:57:28 +0200
-Message-ID: <2d1a41aa000c8de8f82827bd8c06459e01f10423.camel@sipsolutions.net>
-Subject: Re: [syzbot] [wireless] BUG: unable to handle kernel paging request
- in ieee80211_wep_encrypt
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Eric Biggers <ebiggers@kernel.org>, linux-wireless@vger.kernel.org
-Cc: syzbot <syzbot+d1008c24929007591b6b@syzkaller.appspotmail.com>, 
-	ardb@kernel.org, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- mingo@redhat.com, 	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
- tglx@linutronix.de, 	x86@kernel.org
-Date: Fri, 18 Jul 2025 17:57:27 +0200
-In-Reply-To: <20250718145049.GA1574@quark>
-References: <6878cd49.a70a0220.693ce.0044.GAE@google.com>
-	 <20250718145049.GA1574@quark>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=vG3+MphUuzezupsm99ahKL4+T2QuOqPKBUk1bgYCYSQ=; b=Sc+0nxXht8ryQHTDlNkhAhh55T
+	oSktqoiMD7Gt563xejGhByb396WyFQ550CVuiwbcgMopNU9DBry/bQuwsSbNb/U3i9ckXk63IFB3v
+	wF1CdpMNgd8ocKZ9bUPM7MQByEwUB3spy52BVgWXZ0ntPTJOP3dP+gx7dgtoEfBD63pCCglKeHOub
+	plCA01MX2bRgfJbLc/2kXlu3su/Oepirh4KGel2PzFEcapN7HMIloocg0kekKD2Fwvz0rr4ufZpUD
+	2W+k4JhyoCD7fie797vxUbFC4R+q0pOe4klxcJXJZOIKA1t1gMZFoY0GC25IHjorUXkCd0cAD8u3v
+	ZJO4Cyug==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59924)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1ucnfl-0003B0-1w;
+	Fri, 18 Jul 2025 17:10:57 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1ucnfi-0003JC-2w;
+	Fri, 18 Jul 2025 17:10:54 +0100
+Date: Fri, 18 Jul 2025 17:10:54 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Abid Ali <dev.nuvorolabs@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: Fix premature resume by a PHY driver
+Message-ID: <aHpyDpI9PW8wPf6I@shell.armlinux.org.uk>
+References: <20250718-phy_resume-v1-1-9c6b59580bee@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250718-phy_resume-v1-1-9c6b59580bee@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, 2025-07-18 at 07:50 -0700, Eric Biggers wrote:
-> >=20
-> > BUG: unable to handle page fault for address: ffff8880bfffd000
-[...]
-> > Call Trace:
-> >  <TASK>
-> >  crc32_le_arch+0x56/0xa0 arch/x86/lib/crc32.c:21
-> >  crc32_le include/linux/crc32.h:18 [inline]
-> >  ieee80211_wep_encrypt_data net/mac80211/wep.c:114 [inline]
-> >  ieee80211_wep_encrypt+0x228/0x410 net/mac80211/wep.c:158
-[...]
-> >  nl80211_tx_mgmt+0x9fd/0xd50 net/wireless/nl80211.c:12921
->=20
-> syzbot assigned this to the "crypto" subsystem.  However, the crash
-> happened in crc32_le() which is not part of the crypto subsystem.  Also,
-> crc32_le() is well-tested (e.g. by crc_kunit), and the bug is unlikely
-> to be there.  Rather, the calling code in ieee80211_wep_encrypt_data()
-> is passing an invalid data buffer to crc32_le().  So let's do:
+On Fri, Jul 18, 2025 at 03:42:22PM +0000, Abid Ali wrote:
+> There are possibilities for phy_resume to be executed when the ethernet
+> interface is initially taken UP after bootup. This is harmless in most
+> cases, but the respective PHY driver`s resume callback cannot have any
+> logic that should only be executed if it was previously suspended.
 
-Agree, that makes sense, looks like we never check the frame length
-correctly. Since there's no reproducer (yet) I guess we won't be testing
-against it with syzbot though :)
+Sorry but no. The PHY will be "resumed" from boot, even if it wasn't
+"suspended". So the idea that resume should only be called if it was
+previously suspended is incorrect.
 
-johannes
+E.g. .ndo_open -> ... -> phy_attach_direct() -> phy_resume() ->
+	phydrv->resume()
+
+During this path, the PHY may or may not be suspended, depending on
+the state of the hardware when control was passed to the kernel,
+which includes kexec().
+
+PHY drivers must cope with an already functional PHY when their
+resume() method is called.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
