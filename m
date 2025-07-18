@@ -1,87 +1,63 @@
-Return-Path: <netdev+bounces-208109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFB7FB09EB1
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 11:09:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 091B1B09EC3
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 11:12:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 165ED1C446D1
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 09:10:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2F0BA434EC
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 09:12:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BE02295531;
-	Fri, 18 Jul 2025 09:09:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B324D295531;
+	Fri, 18 Jul 2025 09:12:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PAKsCNRb"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="eITdS1Wj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D852D293C71
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 09:09:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 317A92949E5;
+	Fri, 18 Jul 2025 09:12:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752829778; cv=none; b=mzT/PEVWeEvLJ5nLzNVEt5SDOSZd3v074PMYkR8c0QwcktMK+hMSKrp098/MtK5DVi+v1PzJV+C1zJJkMuqofd4BvqGBFh2s3kZPBEgC85wnozOMLpJjhpejo9w6Kqto5TyCLHrLPUo6Cv1llNMiZLnxd2/qFbRwrFF3FiQa+gc=
+	t=1752829952; cv=none; b=YxLBhQPmjkKsr/WfQnVvtwl3GZTH8rebqQIO3xl9Ep2TTS/LK94P2M0BjCpWfCXk/0I1N3638g1QOfg4nv1eMHTkXipC5Et9QydvGjFVVVDKKxZg7uOon6gh1QiIZ27mMaDaJDUWHUe95VTIJSJVjSDiEmBt+tfDBP/JJDtKxMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752829778; c=relaxed/simple;
-	bh=UtCb0XEENQrhwIrwSyIf3fzwd5mpbrwW2EYLLnWjwOw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oDQHVapqLDMhFyJNbki2N82jXgvq3PbYqJepPTaYOHBfWjq0WqtNN8Dx6ILDJpmbsh6yKos+rkDGfHIdPIccmv5Dre7LiWqt8QsSHQ+4oPGFnrunhuPBkKCRmZsacHRsU27TanXi0Fc98HBy8nrtv6JM2P6+CbeLBMXFUqM54pw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PAKsCNRb; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752829775;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kLyNWUZYLntH6kzg6fsWrkbR7v6uvcRiHtF10eyX+X4=;
-	b=PAKsCNRb7DyPDRIesa5Ups8UWhE+kn4UMy1OuBKP+lWtuqHqN9Kw3WW9el71bnVatjt36V
-	dLaNuM/t6FR91CPw8258Ikr8GYbBvozv780ELYDYO0SA3d7xbp0816X2lriwv0mLTMuc6U
-	8jb5W4CSyonFcwOHgnUcNtjbKj4n4bI=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-572-hyThFg0SOjybrtKaiCdWUw-1; Fri, 18 Jul 2025 05:09:32 -0400
-X-MC-Unique: hyThFg0SOjybrtKaiCdWUw-1
-X-Mimecast-MFC-AGG-ID: hyThFg0SOjybrtKaiCdWUw_1752829771
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-456013b59c1so11441405e9.3
-        for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 02:09:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752829771; x=1753434571;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kLyNWUZYLntH6kzg6fsWrkbR7v6uvcRiHtF10eyX+X4=;
-        b=bGb97tbVqwZTlMNW/72qbMSwGQeNTBZkE6ynZnCXX5//D24i1DKsPhREA7zycwF/xO
-         MVVKAa6qZBZwZ0239dfRq3cFgDFdUOPwNAyhi9T9pg/gEFBuAIkUubX0tJrU1Lhf3mjX
-         ReuAqg5Uk/7m3ASQ1gnCbKZz9mAE+Nq8uz5zyx4h6qjfM1Y/Cg/9cHUC1GroVt5e7vwv
-         +S7fR1dMSpdP1EFL4GxeBDVgXYV4sbgCzhXaCCXXtpUiofQpm56joE9Z+63F6n0u4Xmh
-         tgGMVJOYSp07UqcCAyQPomwH2icXyHvZxT5NEQWOz99F52X4eRj8dsCKGM8/5Og4TQep
-         HrIw==
-X-Forwarded-Encrypted: i=1; AJvYcCV0lBJQPYNCS4AHSNcEdOhdL+Dp8rudU8V7oxHwbC2tlJZhv5wDIKVei4en01JYE0XzOSnLQRQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMMPIM8uGTAhrFYDRuNl0xleWy5CGamkcIKANvn9wYpkIn2Ggq
-	CkoI8I8ptOUSZDdlnEHQKB7x6QDuhg/O+G9QlWm0aRlNWh0ww+1H6etQYNyCIVSXZf5zYUZRAR0
-	BsJFKv2/nV3xUsJPSfDTIN4GdOWO49w2X1YNIpjgQqSUmQ3hIIMn8DLOX3w==
-X-Gm-Gg: ASbGnctbiDrDF1KTkRWpUCCRQc5DuO2ZpilwtPc+qBJfxdzQi/pLvQp1dtLMOemKXyf
-	kSdmTuteTi2/CZXwog/LwYjUbu8nd1A6A8Gqd5Pj+8gaOFpU3djX1XUl3WwClNfGNXerkNNrOYh
-	PpVsuWS7fPxELTNFE51yk3bS7XYT6Sscbgm6kdfxjte8tuKiebe1V06QpGfWMaoREk5nimT+YxS
-	mIG9CK887iQldsPkjF/NjXYehua/trGml32a0V6LZmbmgTuNhu6fu1K+67AVjsTBeKPFTG6oWPa
-	1cqRPYWNu9vxLN36MlTLTtf78MQXPkwXn4i0z+3Lz2TuCYgMiFgqGojouf3cyXhMhVhkh2BhyYl
-	A1ShldAVeQ0g=
-X-Received: by 2002:a05:600c:4709:b0:456:f1e:205c with SMTP id 5b1f17b1804b1-4562e32e598mr89675325e9.4.1752829770943;
-        Fri, 18 Jul 2025 02:09:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFGN/Cv3drNsF8UaKNdX/NfxKGTgGum22Q8FGNtEDQQFlxthmY+ud4BApn5/n0KWmB/pCzOcw==
-X-Received: by 2002:a05:600c:4709:b0:456:f1e:205c with SMTP id 5b1f17b1804b1-4562e32e598mr89674875e9.4.1752829770415;
-        Fri, 18 Jul 2025 02:09:30 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4562e818525sm72859355e9.16.2025.07.18.02.09.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Jul 2025 02:09:29 -0700 (PDT)
-Message-ID: <0becc009-68a8-452f-9115-a5df3ca998ed@redhat.com>
-Date: Fri, 18 Jul 2025 11:09:28 +0200
+	s=arc-20240116; t=1752829952; c=relaxed/simple;
+	bh=mwlHdCo5VQ4Al2nKOWOqc5TpeVdGnVMZSc73zjxOe1A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=saD69wWLPOB2vnTaB05PRgfEgsCpLJx29h7wucRE59AAOuLAMhF/Uz/YwIjOtx6HB1kB+sUJFmYunDDFmsHlnIbz+X4MjoXi7O/e5mw777Uc4L2Lx62kzuzPrgDQI1q+XOUrygsY94SxENuxT5aUK3jKI5mlxt5VGLN4z3OAkO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=eITdS1Wj; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56I7cZFw022401;
+	Fri, 18 Jul 2025 09:12:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	cc6uhBZa+QEXX/Qb71ytouO88dLtvjhvhRyBBx7gsWs=; b=eITdS1Wjo6OiS+PL
+	qFdwJJ08m5RUcrnn3sKT+gEzNsa0IvNxUcif2/mduaLVijVQQYhmRDds36iHSbsK
+	QOlao7IwzEOXQoSRlsNBvUiwmtQoVfzIfFCPU5ot7ILFpzxY/81HQ/hprvhgHNMf
+	Bzbr/FXp0qnk5yT/OvtdIpEUkXMCautSRJRPSoCZ+IlqbXRjOfCdL3Ayv/T+Rf/H
+	Ufxlb4vgMLTtWXLvzl7eeTYaCWELf5dWkmbt9qtaaBRh5ZDEoOlX84F86ayGRJt0
+	yVYg/zg4wmHshzyNjhW/Ea5no6bq1dzORkUSnkFDaSyvKW/1Rgw+YzK1LP5MjDpQ
+	7/VjwA==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47wqsyavtr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 18 Jul 2025 09:12:16 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 56I9CG8q013258
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 18 Jul 2025 09:12:16 GMT
+Received: from [10.253.76.178] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Fri, 18 Jul
+ 2025 02:12:10 -0700
+Message-ID: <2f37c7e7-b07b-47c7-904b-5756c4cf5887@quicinc.com>
+Date: Fri, 18 Jul 2025 17:12:08 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,78 +65,110 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/3] net/mlx5: Support getcyclesx and
- getcrosscycles
-To: Carolina Jubran <cjubran@nvidia.com>,
- Richard Cochran <richardcochran@gmail.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Mark Bloch <mbloch@nvidia.com>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>
-References: <1752556533-39218-1-git-send-email-tariqt@nvidia.com>
- <1752556533-39218-4-git-send-email-tariqt@nvidia.com>
- <650be1b7-a175-4e89-b7ea-808ec0d2a8b3@redhat.com>
- <4b81bea4-ef05-4801-8903-2affa02d2366@nvidia.com>
+Subject: Re: [PATCH v3 05/10] dt-bindings: clock: ipq9574: Rename NSS CC
+ source clocks to drop rate
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        Rob Herring
+	<robh@kernel.org>
+CC: Georgi Djakov <djakov@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson
+	<andersson@kernel.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        "Stephen
+ Boyd" <sboyd@kernel.org>,
+        Anusha Rao <quic_anusha@quicinc.com>,
+        Konrad Dybcio
+	<konradybcio@kernel.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        "Richard
+ Cochran" <richardcochran@gmail.com>,
+        Catalin Marinas
+	<catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-pm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>,
+        <quic_leiwei@quicinc.com>, <quic_pavir@quicinc.com>,
+        <quic_suruchia@quicinc.com>
+References: <20250710-qcom_ipq5424_nsscc-v3-0-f149dc461212@quicinc.com>
+ <20250710-qcom_ipq5424_nsscc-v3-5-f149dc461212@quicinc.com>
+ <20250710225412.GA25762-robh@kernel.org>
+ <93082ccd-40d2-4a6b-a526-c118c1730a45@oss.qualcomm.com>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <4b81bea4-ef05-4801-8903-2affa02d2366@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: Luo Jie <quic_luoj@quicinc.com>
+In-Reply-To: <93082ccd-40d2-4a6b-a526-c118c1730a45@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE4MDA3MiBTYWx0ZWRfX3JmeaI0LT5FI
+ uz7mN8D8nDtHvumEG58B81P67eV3jDqu6eiC/Yo44PdVN36nakuDbvpzmZtCnx3i6e6SRBzJGaB
+ r3kz3pXYqLNA9GuMZ1NUFZqtID5asWmUiF06pqtA/grTBJMzdlkhXDOk5fDyxn8GbyicRpHXctH
+ zB8JqLHq05+COqiwuguKyV3L5trkjwh8OwIDTzEPsDXvemeCq5HGRVVNYznKLOHaO5XU8uVRJvu
+ zkB/GuayFK2tBG426DNkg1JYZC4A+yjL3f0oyX1YrDuiJCUgcZseQ3rJzsNaWNJWsqZoY8mdZly
+ /HnG9HSVA3LD3uQ9+qTdLRRbLnYgVem6hdNXtzQ+kkv9KBXQedjVGydmks1hdlHhbyfj0Vvyqj0
+ hSGC0X5RHK9I6lECV6WdvfwmlgL1nwl6fElWVJKsghAxwpmOC352jTS7OK8LYmTw0Te9rMN5
+X-Proofpoint-GUID: CIAh2fAIHPX-nVhQkxfBjm0Ybtf69cNn
+X-Proofpoint-ORIG-GUID: CIAh2fAIHPX-nVhQkxfBjm0Ybtf69cNn
+X-Authority-Analysis: v=2.4 cv=McZsu4/f c=1 sm=1 tr=0 ts=687a0ff0 cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10
+ a=1Pu0kYrAtJ1scJCjQtgA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-18_02,2025-07-17_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 mlxlogscore=999 impostorscore=0 mlxscore=0 phishscore=0
+ adultscore=0 lowpriorityscore=0 bulkscore=0 clxscore=1015 suspectscore=0
+ spamscore=0 priorityscore=1501 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507180072
 
-On 7/17/25 5:56 PM, Carolina Jubran wrote:
-> On 17/07/2025 13:55, Paolo Abeni wrote:
->> On 7/15/25 7:15 AM, Tariq Toukan wrote:
->>> From: Carolina Jubran <cjubran@nvidia.com>
->>>
->>> Implement the getcyclesx64 and getcrosscycles callbacks in ptp_info to
->>> expose the device’s raw free-running counter.
->>>
->>> Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
->>> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
->>> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
->>> ---
->>>   .../ethernet/mellanox/mlx5/core/lib/clock.c   | 74 ++++++++++++++++++-
->>>   1 file changed, 73 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
->>> index b1e2deeefc0c..2f75726674a9 100644
->>> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
->>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
->>> @@ -306,6 +306,23 @@ static int mlx5_mtctr_syncdevicetime(ktime_t *device_time,
->>>   	return 0;
->>>   }
->>>   
->>> +static int
->>> +mlx5_mtctr_syncdevicecyclestime(ktime_t *device_time,
->>> +				struct system_counterval_t *sys_counterval,
->>> +				void *ctx)
->>> +{
->>> +	struct mlx5_core_dev *mdev = ctx;
->>> +	u64 device;
->>> +	int err;
->>> +
->>> +	err = mlx5_mtctr_read(mdev, false, sys_counterval, &device);
->>> +	if (err)
->>> +		return err;
->>> +	*device_time = ns_to_ktime(device);
+
+
+On 7/11/2025 8:15 PM, Konrad Dybcio wrote:
+> On 7/11/25 12:54 AM, Rob Herring wrote:
+>> On Thu, Jul 10, 2025 at 08:28:13PM +0800, Luo Jie wrote:
+>>> Drop the clock rate suffix from the NSS Clock Controller clock names for
+>>> PPE and NSS clocks. A generic name allows for easier extension of support
+>>> to additional SoCs that utilize same hardware design.
 >>
->> If the goal is providing a raw cycle counter, why still using a timespec
->> to the user space? A plain u64 would possibly be less ambiguous.
->>
->> /P
->>
+>> This is an ABI change. You must state that here and provide a reason the
+>> change is okay (assuming it is). Otherwise, you are stuck with the name
+>> even if not optimal.
 > 
-> getcycles64 and getcrosscycles already return the cycle counter in a 
-> timespec64/ktime format, so I kept the new ioctls consistent with them.
+> The reason here seems to be simplifying the YAML.. which is not a good
+> reason really..
+> 
+> I would instead suggest keeping the clocks list as-is for ipq9574 (this
+> existing case), whereas improving it for any new additions
+> 
+> Konrad
 
-Ah, sorry I missed that context. Looks good to me than.
+Thanks Rob and Konrad for the comments.
 
-Thanks,
+"nss_1200" and "nss" refer to the same clock pin on different SoC.
+As per Krzystof's previous comment on V2, including the frequency
+as a suffix in the clock name is not required, since only the
+frequencies vary across different IPQ SoCs, while the source clock
+pins for 'PPE' and 'NSS' clocks are the same. Hence this ABI change
+was deemed necessary.
 
-Paolo
+By removing the frequency suffix, the device tree bindings becomes
+more flexible and easier to extend for supporting new hardware
+variants in the future.
 
+Impact due to this ABI change: The NSS clock controller node is only
+enabled for the IPQ9574 DTS. In this patch series, the corresponding
+DTS changes for IPQ9574 are also included to align with this ABI
+change.
 
+Please let me know if further clarification or adjustments are needed.
 
 
