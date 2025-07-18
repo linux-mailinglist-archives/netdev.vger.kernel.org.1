@@ -1,67 +1,62 @@
-Return-Path: <netdev+bounces-208064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 952B8B0992F
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 03:34:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5498EB0996F
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 03:53:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F5EA5A15F5
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 01:33:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB5261C47EA3
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 01:53:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79855191F72;
-	Fri, 18 Jul 2025 01:33:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51DFB1A23A0;
+	Fri, 18 Jul 2025 01:52:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N5ITosej"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kRUffZBi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 449AD18CC1D;
-	Fri, 18 Jul 2025 01:33:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26A4F1A0BE1;
+	Fri, 18 Jul 2025 01:52:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752802428; cv=none; b=G3fmwhh6TAmv8sMyX+seME+LVEIUVFvJ9VZmJEp7uMJfWRYmH4VgijdV6jizNuA3qIyKFm7Sfeq7X/Dxp21wl2XM+6Qh0CVEPfVD5vRwl8ijszpmeJNl3NoTg1KEBXEaH/SMUWxOvcdAyuXHiRr8Znl3Hw5/ZbTaBae09ovVdVY=
+	t=1752803566; cv=none; b=o7sk3+yFJzMfC055roOu2bjmsXS/cSF8tLHXJUX26Tjuhj+lZ7QU7TdvdGoS7T9+trydbou+CKiYMSEPVzoPUBOBf0k6ppfK3H0A94CuhX0OFYWaLjgfJ4Cc180w40fDow6WcBFBgbjQ1Q6SJuh+RaUDdqqk4P4V/fsdvkcxh+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752802428; c=relaxed/simple;
-	bh=sW4Vrjc4tMf4nUOY5B4U0mIARiZwu9fFJqT+gzf5HaM=;
+	s=arc-20240116; t=1752803566; c=relaxed/simple;
+	bh=1cjPQZG49ULYWlm40rtP4WEZcJmw5m9FE/5gQLfKUIA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Hp06KPfuVx6VoQUKPlpELT3/SuxgP7QkJWkqYIkru10WuefXZvcVAgmQkOBFJK11JvX+i17W/saNbzSD2+0bW0U60NrcKsmvUwrovRJfpuQnOVycKub82zlFIV7IFFQxAnQR1XRjzx5PGYRhaVTHrNqgeEwKS+/rM0AOWEpHtzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N5ITosej; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CFB0C4CEF0;
-	Fri, 18 Jul 2025 01:33:46 +0000 (UTC)
+	 MIME-Version:Content-Type; b=diGGV5frH8LUdIngNfrrgB7EYt19SIs1DvS2i9Zw2uDp6s5D+Ip+ZkWLW9PyDY/eAMJ1L9JPcpdsA3sDu72lE7lVCAuYe3D7wd4bWqwlB3nhEbWvujsso9S1Pjjq4LLsIl3NxyA5GoS3W6FVnxGWK1h4Ek2WGXoOu21IUJA5i9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kRUffZBi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C30E9C4CEE3;
+	Fri, 18 Jul 2025 01:52:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752802427;
-	bh=sW4Vrjc4tMf4nUOY5B4U0mIARiZwu9fFJqT+gzf5HaM=;
+	s=k20201202; t=1752803565;
+	bh=1cjPQZG49ULYWlm40rtP4WEZcJmw5m9FE/5gQLfKUIA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=N5ITosejOjpgqJZB1zDWN1Y+EnurkQiIyrj297hKgMha/BvNABeWIrCsR5Tx9hgJN
-	 gqlWhoRv4eOgSQVTHxYE/bkExZEZicn+8oj1oZzjdzmjLJMe74pEn/JOiEoRqiQoTq
-	 DKa9WB6xzcoSOLMUOmX97Sr+rbggI8V9xaPBoTnqvONE5ixSKkjQHX+4SWKX2IkYRo
-	 ekxqc1/N3zt/qW1Hj66AtLXaL6lHUzt8/UMU+KtgtHmpGwX4y7eqi8UIfNRHsHxfRz
-	 gZaDqQ2+3A5V6p8twtZKiZMiMnne0Pct4y1KRM8ywRwSuuewCj/etJXliRsl1W2jYr
-	 OvWkEvcbDe3Lw==
-Date: Thu, 17 Jul 2025 18:33:46 -0700
+	b=kRUffZBi/nLRcXjM5TX7AGvwwEt2KTuk9Qhnudj6xyNAJ+NIzQ0PFuyI9HvuNwRT2
+	 ReQq22zorTaVgw8OEcQFeIT3aVu6AlliVJZUwAkZ/FaWQ7HGl4xW7CtOHObTWn880E
+	 snT+hFUSKIBRs/NpQJDxeGpeMc4dki3qrjP5MHmlXiDSIodjUGByVX4VAPRRgEEYIj
+	 EvsJ9pbXrlx+z3TeJ4YdA98udVLwGo7K7rCjP3czmnK7xrgtGVvUG2T+Sc4TEEuRu9
+	 PKrYb0sO+Ofx3x51qmqFQgYWzQmkbNr4FBw0c+9+oEbK01Oq98bP4DvWK0XuO0LvFE
+	 VQ25DsokWnLiA==
+Date: Thu, 17 Jul 2025 18:52:42 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, mptcp@lists.linux.dev, Mat Martineau
- <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Simon
- Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Christoph Paasch
- <cpaasch@openai.com>, Davide Caratti <dcaratti@redhat.com>, Florian
- Westphal <fw@strlen.de>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net v2 0/2] selftests: mptcp: connect: cover alt modes
-Message-ID: <20250717183346.06576698@kernel.org>
-In-Reply-To: <9175b633-b61f-4ca0-9023-c99dff4f53f0@kernel.org>
-References: <20250715-net-mptcp-sft-connect-alt-v2-0-8230ddd82454@kernel.org>
-	<20250715185308.2ad30691@kernel.org>
-	<20250716072602.386a8963@kernel.org>
-	<ae6d333a-f3b2-4463-b930-b4caf56b39f8@kernel.org>
-	<20250716083632.72854bd5@kernel.org>
-	<e46aadbf-51c6-4e09-bdaa-374698b406f3@kernel.org>
-	<20250717074242.1ef5d441@kernel.org>
-	<9175b633-b61f-4ca0-9023-c99dff4f53f0@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Saeed Mahameed <saeed@kernel.org>, Gal Pressman
+ <gal@nvidia.com>, "Leon Romanovsky" <leon@kernel.org>, Saeed Mahameed
+ <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+ <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, Lama Kayal <lkayal@nvidia.com>
+Subject: Re: [PATCH net-next V2 4/6] net/mlx5e: SHAMPO, Cleanup reservation
+ size formula
+Message-ID: <20250717185242.68891d37@kernel.org>
+In-Reply-To: <1752675472-201445-5-git-send-email-tariqt@nvidia.com>
+References: <1752675472-201445-1-git-send-email-tariqt@nvidia.com>
+	<1752675472-201445-5-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,12 +66,19 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 18 Jul 2025 01:49:24 +0200 Matthieu Baerts wrote:
-> I see that you already marked the mptcp-connect-sh selftest as ignored,
-> so I guess we are not causing other troubles with the CI. (We could then
-> also apply this series here and ignore the new tests, but it is also
-> fine for me to wait.)
+On Wed, 16 Jul 2025 17:17:50 +0300 Tariq Toukan wrote:
+> -	int rsrv_size = BIT(mlx5e_shampo_get_log_rsrv_size(mdev, params)) *
+> -		MLX5E_SHAMPO_WQ_BASE_RESRV_SIZE;
+>  	u16 num_strides = BIT(mlx5e_mpwqe_get_log_num_strides(mdev, params, xsk));
+> -	int pkt_per_rsrv = BIT(mlx5e_shampo_get_log_pkt_per_rsrv(mdev, params));
+> +	int pkt_per_rsrv = BIT(mlx5e_shampo_get_log_pkt_per_rsrv(params));
+>  	u8 log_stride_sz = mlx5e_mpwqe_get_log_stride_size(mdev, params, xsk);
+>  	int wq_size = BIT(mlx5e_mpwqe_get_log_rq_size(mdev, params, xsk));
+>  	int wqe_size = BIT(log_stride_sz) * num_strides;
+> +	int rsrv_size = MLX5E_SHAMPO_WQ_RESRV_SIZE;
 
-If you're okay either way I'd rather wait. From our perspective the new
-tests would go straight into the ignore bucket.
+So you fixed placement of rsrv_size for RCT but the change
+to pkt_per_rsrv is still breaking the order :(
+
+I'll pick the first 3 patches up, they look unrelated.
 
