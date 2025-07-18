@@ -1,143 +1,174 @@
-Return-Path: <netdev+bounces-208124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FC51B0A03E
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 12:02:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 152B3B0A096
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 12:27:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8040517659A
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 10:02:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C89783ABB70
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 10:26:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DB7B2980B8;
-	Fri, 18 Jul 2025 10:02:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42EF529CB52;
+	Fri, 18 Jul 2025 10:26:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Z5vAC6Wm"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="dUTptwpj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7413F1F0992
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 10:02:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 863981EF0B9
+	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 10:26:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752832925; cv=none; b=om2srbIMO/QSjeHi0XRRY5dN/SazhDAsuWSgn715rX4wNUD1kaki7BZQhP57dqHSc5WgCPjQ5dDIrfmvg2bOaQunsmOnCZqFFMvJ3Zm5grQZnU83NDpW9vBDZy0DwfruUYFmHyQimhpwgFRatHEYcu1HGOoDD37CJkSF/2EyQps=
+	t=1752834418; cv=none; b=GgH2lNGUpDIv1Z85N8wL5lWzRiYQ9WTr+wLldH847FKPkx+xEW3H4jbmaX3kz87vmMRJTa2sRFX1MZBvbPg7x+p4EqOSnhOyXA13hWIj330Ci5O4vcv3aSkmBAbXcAdZu8nFFX+6oUqM30KmC/68t0N35dAieeihwHMRINMk9/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752832925; c=relaxed/simple;
-	bh=/yRxMaBFbLjVXqz7GM9pN30yeoya9gtzSlwfdG4uCRY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=n8ClLgZx9IahyY2s5bJ0VVa3VXacW+K6goirqvh28dMDiTMXkZ5V9qc/MWp9NUBJXHQma2nyAUmuA+0qT37I6NQcxQo1u8ZkawDVsYckJ/pPfBwnxlJqZh9kHQgj0eKW9/+ZAWQqX6Ykssw93H7Z776ayqg+Yvzve63tiBQwM5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=Z5vAC6Wm; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-60c60f7eeaaso3216564a12.0
-        for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 03:02:03 -0700 (PDT)
+	s=arc-20240116; t=1752834418; c=relaxed/simple;
+	bh=iOuJFTTwJt339tYjnwcMIWFz/RUheBu5DfdHuCk8cH8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rFzD/ywh0dXL1L8/ymBuGN5NQZzhJDK8MlCA3IJmd2uqtgG6XHM84bZm9g/5lNl1QBfShIuzvXV8gtMF03caa/c4iJCw9YglH1JTEAOpH5NATu1ILzHRcklOaMAk7PkTEsGk1avK2CaPE4X8g14QCEzANt+hfSidc323H5oRuyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=dUTptwpj; arc=none smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7e33fa45065so158337285a.1
+        for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 03:26:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1752832922; x=1753437722; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=y3dM5w5cLFSL0sY5rQUowY8lCUWz8H01o33zPOvel0s=;
-        b=Z5vAC6Wm8gEpDAoCvB2XzpWKXcWASPBxOX2WHwonrfyFSkygkded0s9Ra9Qign/8Ld
-         ERcrfGqnYZ1C0FfZEGbI2clm9o4i1yfO2gzWNtjmN2n4QyXiS79VqI7XVl0zxvw/jiTQ
-         AtlofNYG0SEQ5cAFpGtJ1UsEkB30ZZQRWeTV6i9Jz+7XzkiNAEaeOA3TXcjX6mVJJHDF
-         SsopFQMa6HPSwPkPP37G9oAHoyr2CCfeDmYyF0xbR0ISeftp9MybrRz1n4w0R1yGfsnx
-         O8iDUP402qaTiTatYjL1ubGhi1nJttHN9Yu6pQbfWlfNmKeydmnrbNA020N4KCDzUzR/
-         kmIQ==
+        d=broadcom.com; s=google; t=1752834415; x=1753439215; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Tceb6O3nBrebvy+ZDwLDwrGTRdGaZ8naYMQfV4XKrrU=;
+        b=dUTptwpjD2CfWgUwDgumV9Tyfz2J3Z3D//IIMS18fws4cPiZA2fx1VBTwps4t/jEb9
+         ce4d7Y/dZsDx1GP27VILaf+yJECvizSWN3gLf0cOGptwlnblfGiDp0ATqNAVB2t4PDu1
+         Zha58DZmeXu/50FEdP6btJbsGdAIM/+Ufh8uU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752832922; x=1753437722;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y3dM5w5cLFSL0sY5rQUowY8lCUWz8H01o33zPOvel0s=;
-        b=WAl7b2xyX3XyEWgFNQOFdyQsAXZbuDW3vPBa9Y0/GFMudjgMF2mWiV9b8C7NqFMWxt
-         jBCvOW/yjBoZYwntnUiRt8zN9F4hRIwUHVq+d9sInSaVorc0oC3Hh4vfmjZjgWcwR/Cm
-         0EbXBB7VCBriSlr6zF1Cae02ncvLykH2RVb68AN0LnhOrALNvhVKrvFi+ZGPl1xpICO0
-         8Z0Q0LKFuIHR/wVuKE3uqj5mum9/uFTRI/ukvAtIBxQ/RxObjSPnLCSIXXxqZHnYymT5
-         cg2AOzPcih1AHCnP+vk0fDqSLWz5jNEbJdST+fNB2PnUTTRexXcVruxdhIrdodwI98x3
-         uBqg==
-X-Forwarded-Encrypted: i=1; AJvYcCX5B0CBKSf4+RXX4utHNXhwFTFialX9R5mYMVNA0+qX/2J5VoyiN3LFVmcP4kyaAKh+yRL3Pfw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw16jFnFkFlrWMmRJ1AO7Riou75DU8xAWlEpDC+dSJ6yTflr1bz
-	VdF5xIm90nLovSmxZXhiRbr282VZCalXsLsPgGIqpzK3x1IEWasAuC3vF60htZpzsp0=
-X-Gm-Gg: ASbGncsCqHXvI8BuXp85awV9bF/UvFcleYG9wjg0reYYxTytbfqe8ZaWg/L5IWN7SVM
-	zUH53t6h0INpnv21btCmc4UN+vZSdCZVHOIQsdCD1yK4uyUWIfXN9Sv+7AKWmXRHmTzz6gOuBWL
-	uFc9ontR8wwS65958hsjReANtPPwliB8nMGE/egU39VKquk1jtOTJRtVt0WEf34ScIn3vKFt0no
-	tENt2vpWbi85Ax6WjDAi635Xt6GYkcbTFvHOHLLcXXkRpF7ZVfXZ+ZtDo1C119j+Jsyb/Iq4rYy
-	wfbflOJ4sTJ2fb+lEPblO599MPBV5DyomOULChLuetBOcjwaadRmXgtlJAaxGTJSXKsWYtc+Gpr
-	YiHBehzNt3b9P
-X-Google-Smtp-Source: AGHT+IErQpP/f5UuJHDS5oYePExlcwMb0yScDJ9SoNB1SiWmqqp1PpQM31HlCg0sIE2WjdLkZZNZLg==
-X-Received: by 2002:a05:6402:3510:b0:612:d5b9:bb41 with SMTP id 4fb4d7f45d1cf-612d5b9bca9mr797210a12.22.1752832921624;
-        Fri, 18 Jul 2025 03:02:01 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:2dc::49:ca])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-612c8f36f49sm751077a12.22.2025.07.18.03.02.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Jul 2025 03:02:00 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Alexei Starovoitov <ast@kernel.org>,  Andrii Nakryiko
- <andrii@kernel.org>,  Arthur Fabre <arthur@arthurfabre.com>,  Daniel
- Borkmann <daniel@iogearbox.net>,  Eric Dumazet <edumazet@google.com>,
-  Jakub Kicinski <kuba@kernel.org>,  Jesper Dangaard Brouer
- <hawk@kernel.org>,  Jesse Brandeburg <jbrandeburg@cloudflare.com>,  Joanne
- Koong <joannelkoong@gmail.com>,  Lorenzo Bianconi <lorenzo@kernel.org>,
-  Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <thoiland@redhat.com>,  Yan
- Zhai
- <yan@cloudflare.com>,  kernel-team@cloudflare.com,
-  netdev@vger.kernel.org,  Stanislav Fomichev <sdf@fomichev.me>,
-  bpf@vger.kernel.org
-Subject: Re: [PATCH bpf-next v2 01/13] bpf: Add dynptr type for skb metadata
-In-Reply-To: <9aa1f2b0-0f63-45e8-b787-e14d53cac75a@linux.dev> (Martin KaFai
-	Lau's message of "Thu, 17 Jul 2025 17:06:21 -0700")
-References: <20250716-skb-metadata-thru-dynptr-v2-0-5f580447e1df@cloudflare.com>
-	<20250716-skb-metadata-thru-dynptr-v2-1-5f580447e1df@cloudflare.com>
-	<9aa1f2b0-0f63-45e8-b787-e14d53cac75a@linux.dev>
-Date: Fri, 18 Jul 2025 12:01:59 +0200
-Message-ID: <875xfpes14.fsf@cloudflare.com>
+        d=1e100.net; s=20230601; t=1752834415; x=1753439215;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Tceb6O3nBrebvy+ZDwLDwrGTRdGaZ8naYMQfV4XKrrU=;
+        b=rVjnJzYlycad8jyGtiOgLptR+GOze733oEkztpXjh0lDu0S8lVgmZTIbUx3QnVY1M7
+         MX2vQ0dGwuxPMzGtJMZ18y8ssb8SuzEIpD2ZOSILLnMqfEtSL4ujmydadCf6j0e7wRaC
+         EMfc3k0jhQeMuClVCezX9SIA/8lDENBE3N4DFkfkAcmRUAWhpjVPo3tAMxbEstXSTGNd
+         qZXeGinmlA044ShBsFhrGMMyRO9fTnY4bYUCs6sthObsLnbRXstsiuqKtZiFv95r1Dmy
+         HU/EjH3dFwWjJDz2Fw20VeemvemXLkA6Z38cK3WZMINukUffjBr9yclE9dBJ4IOIvTLB
+         MYHw==
+X-Forwarded-Encrypted: i=1; AJvYcCUszrhv9c7Duf/+HKTkvPg0pVGvgEUOvJ2b7+kFm9JiNVwGWLMkWIia0qGZqRj3ViL+UTsuUv0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxObutUYasRXNMu3kieA5HJFe7C8n9oyNCh+9loAPOZpxOkNPeo
+	FdMlWMdcwk5RHUGS+eXQbgaFpuQNK8huV3d7F/7mqNIIW30YU6rrJnU+kWvR6mFlAg==
+X-Gm-Gg: ASbGnculQfelm3xrxal3chOqakr7AK4TMZ2AI0H/7iL7U+pY7Ugkj4h4tVdz3+iGU8e
+	w8FEdNmq2qsRDgm4LPWKGzQaKwSJPozU1Brw1iyb6+7cSzHLzEtF+Q3gIvJpqe/JskcbdgEBRLh
+	lMM7iesYALfJyhiQsNX8l3cONLjzzH0Os5JSvAytb0A60QbPbSXL0wge6WQsOt2tyxc8pUUYRWT
+	xY+YfidxEu65a9n3NXUJmRnBU+/lwEvO2PWBtAH4xl08OcBPBYqtWFh5xTq2ormgJuXAa2fDm8P
+	QTv+JYHKZwPvcYcYIfUsri2A7fb34tRMBEPTp+E8Fccq+WFPHPVRjZXG5h1DBvCCVNPG64TFtnl
+	T3HOJMKNLf7GcgXmVdLQCG4gW1s0IgEG+dCg9lhH4i2uQCwphT9k=
+X-Google-Smtp-Source: AGHT+IEqo4UAFanleVPdYl4dXVyU1lZnXf1z6whg+8xWt/p2QDWx5PJ8H+d/5db0hyJyi9WF5q8VPA==
+X-Received: by 2002:a05:620a:19a5:b0:7e3:52f6:66e5 with SMTP id af79cd13be357-7e352f6672amr568859885a.35.1752834415217;
+        Fri, 18 Jul 2025 03:26:55 -0700 (PDT)
+Received: from [10.229.41.1] ([192.19.176.250])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e356b46814sm68537885a.30.2025.07.18.03.26.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Jul 2025 03:26:54 -0700 (PDT)
+Message-ID: <4445c7ec-a580-4c28-89cf-2df5790de6ac@broadcom.com>
+Date: Fri, 18 Jul 2025 12:26:43 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 5/8] wifi: brcmfmac: Fix typo "notifer"
+To: WangYuli <wangyuli@uniontech.com>
+Cc: airlied@gmail.com, akpm@linux-foundation.org, alison.schofield@intel.com,
+ andrew+netdev@lunn.ch, andriy.shevchenko@linux.intel.com, bp@alien8.de,
+ brcm80211-dev-list.pdl@broadcom.com, brcm80211@lists.linux.dev,
+ colin.i.king@gmail.com, cvam0000@gmail.com, dan.j.williams@intel.com,
+ dave.hansen@linux.intel.com, dave.jiang@intel.com, dave@stgolabs.net,
+ davem@davemloft.net, dri-devel@lists.freedesktop.org, edumazet@google.com,
+ gregkh@linuxfoundation.org, guanwentao@uniontech.com, hpa@zytor.com,
+ ilpo.jarvinen@linux.intel.com, intel-xe@lists.freedesktop.org,
+ ira.weiny@intel.com, j@jannau.net, jeff.johnson@oss.qualcomm.com,
+ jgross@suse.com, jirislaby@kernel.org, johannes.berg@intel.com,
+ jonathan.cameron@huawei.com, kuba@kernel.org, kvalo@kernel.org,
+ kvm@vger.kernel.org, linux-cxl@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-serial@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux@treblig.org, lucas.demarchi@intel.com,
+ marcin.s.wojtas@gmail.com, ming.li@zohomail.com, mingo@kernel.org,
+ mingo@redhat.com, netdev@vger.kernel.org, niecheng1@uniontech.com,
+ oleksandr_tyshchenko@epam.com, pabeni@redhat.com, pbonzini@redhat.com,
+ quic_ramess@quicinc.com, ragazenta@gmail.com, rodrigo.vivi@intel.com,
+ seanjc@google.com, shenlichuan@vivo.com, simona@ffwll.ch,
+ sstabellini@kernel.org, tglx@linutronix.de,
+ thomas.hellstrom@linux.intel.com, vishal.l.verma@intel.com, x86@kernel.org,
+ xen-devel@lists.xenproject.org, yujiaoliang@vivo.com, zhanjun@uniontech.com
+References: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
+ <F92035B0A9123150+20250715134407.540483-5-wangyuli@uniontech.com>
+Content-Language: en-US
+From: Arend van Spriel <arend.vanspriel@broadcom.com>
+Autocrypt: addr=arend.vanspriel@broadcom.com; keydata=
+ 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
+In-Reply-To: <F92035B0A9123150+20250715134407.540483-5-wangyuli@uniontech.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 17, 2025 at 05:06 PM -07, Martin KaFai Lau wrote:
-> On 7/16/25 9:16 AM, Jakub Sitnicki wrote:
->> +__bpf_kfunc int bpf_dynptr_from_skb_meta(struct __sk_buff *skb, u64 flags,
->> +					 struct bpf_dynptr *ptr__uninit)
->> +{
->> +	return dynptr_from_skb_meta(skb, flags, ptr__uninit, false);
->> +}
->> +
->>   __bpf_kfunc int bpf_dynptr_from_xdp(struct xdp_md *x, u64 flags,
->>   				    struct bpf_dynptr *ptr__uninit)
->>   {
->> @@ -12165,8 +12190,15 @@ int bpf_dynptr_from_skb_rdonly(struct __sk_buff *skb, u64 flags,
->>   	return 0;
->>   }
->>   +int bpf_dynptr_from_skb_meta_rdonly(struct __sk_buff *skb, u64 flags,
->> +				    struct bpf_dynptr *ptr__uninit)
->> +{
->> +	return dynptr_from_skb_meta(skb, flags, ptr__uninit, true);
->> +}
->> +
->>   BTF_KFUNCS_START(bpf_kfunc_check_set_skb)
->>   BTF_ID_FLAGS(func, bpf_dynptr_from_skb, KF_TRUSTED_ARGS)
->> +BTF_ID_FLAGS(func, bpf_dynptr_from_skb_meta, KF_TRUSTED_ARGS)
->
-> I looked at the high level of the set. I have a quick question.
->
-> Have you considered to create another bpf_kfunc_check_set_xxx that is only for
-> the tc and tracing prog type? No need to expose this kfunc to other prog types
-> if the skb_meta is not available now at those hooks.
->
-> It seems patch 5 is to ensure other prog types has meta_len 0 and some of the
-> tests are to ensure that the other prog types cannot do useful things with the
-> new skb_meta kfunc. The tests will also be different eventually when the
-> skb_meta can be preserved beyond tc.
+On 7/15/2025 3:44 PM, WangYuli wrote:
+> There is a spelling mistake of 'notifer' in the comment which
+> should be 'notifier'.
+> 
+> Link:https://lore.kernel.org/all/B3C019B63C93846F+20250715071245.398846-1- 
+> wangyuli@uniontech.com/
 
-That is a neat idea!
+I think it has been said on other patches but it is not common to link 
+to obsolete version of the patch series. Apart from that:
 
-It will let me drop three patches from this series.  Let me do that.
+Acked-by: Arend van Spriel <arend.vanspriel@broadcom.com>> 
+Signed-off-by: WangYuli<wangyuli@uniontech.com>
+> ---
+>   drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks for taking a look.
 
