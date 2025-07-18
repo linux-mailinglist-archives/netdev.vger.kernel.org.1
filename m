@@ -1,92 +1,181 @@
-Return-Path: <netdev+bounces-208164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0C2EB0A5BD
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 15:59:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAE2DB0A5CE
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 16:03:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8AD85A7036
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 13:59:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B2D8189FA53
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 14:03:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6D162DC35D;
-	Fri, 18 Jul 2025 13:59:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68CF196C7C;
+	Fri, 18 Jul 2025 14:03:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j2h6XiNe"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="YRG1f+xG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897BA2DC337;
-	Fri, 18 Jul 2025 13:59:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 098D34317D;
+	Fri, 18 Jul 2025 14:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752847154; cv=none; b=RESIab3ykyeuZ4ul9XlHEQRe4QWctZJ6wdKwb7cLTz5SEOP3lZtTwA6zwOJGH7ZLo88l5nHr+bk6M/858psEypaMMS8DFolXi/R+1PC8cYEL4Rovq2ZN6w6cr1fAxkxEY+Z8TIS6ngh+fEK4rnuSiG1QGgvRkPyYCdw4sQ+60pc=
+	t=1752847393; cv=none; b=Q6j25WyKdw13EZ3gb4YSzp6Pwwv0sDxBj5Wnj6R3o7J+btbCrcyAtjZ61a02a9qZvh2lNORGSD5bK9HxpSmHtvGNHu1Nna2eCKrH9IVu8mqQrGvIRUcqx5WiTS31x/V5z2MHNLqUVe0jI8niGsDsHuirju4HLKkzLTJlxAd2ICk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752847154; c=relaxed/simple;
-	bh=UJ3UCdbYr6DZ8AR+X7jU/IAtrwmerjFEQ6XfAsgcsNg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d7h2SFCZssjbSYVW9ubqelJfv2NKt9yWv+86XCKKXpIrmI8HAtRM5R8gT1aeNaBKGLV799GSvOkdnwZ4MDkuLhuggXKGp7eLC36RUdZNGFFzKrRdbWFiwUEfz7DwyB/Nc6eh4v+G03QeqZ7aVTbCy8oXXGYVVc/rxwujzwZlyc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j2h6XiNe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51798C4CEEB;
-	Fri, 18 Jul 2025 13:59:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752847154;
-	bh=UJ3UCdbYr6DZ8AR+X7jU/IAtrwmerjFEQ6XfAsgcsNg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=j2h6XiNeDdZXYNJXAZLmn3d9A80w9sgI5bvlQoXTQKHl12zivloo1v4cduTmXt4Tb
-	 4Uj/OJSKSnwCDNTRdJRhT1HmPe5qlGWFid4CZRuWOdnTfQYyFk6d8qcjgeEn9ViYyo
-	 vek9Si3g4NiTv1NoNcH6B7rXY1/RqCyMCEqVEnfQNgkVkroB2mp4mQgz9oSp+ZsMt/
-	 6yZQljUFUIEDS4BJIkkNMowuoa53jYdeyufLuLGM/AGFHwLcTQXryRRM/oDog9SbZn
-	 hpnLxZH/RnDKu4WjXaqnfnWuh0/qJgbAc8PrScw15YKWBNF3DdAdjp02RyGHpX4QwW
-	 Jg68iuC5XCIIQ==
-Date: Fri, 18 Jul 2025 14:59:09 +0100
-From: Simon Horman <horms@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Saeed Mahameed <saeed@kernel.org>, Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Shahar Shitrit <shshitrit@nvidia.com>
-Subject: Re: [PATCH net 2/2] net/mlx5: E-Switch, Fix peer miss rules to use
- peer eswitch
-Message-ID: <20250718135909.GB2459@horms.kernel.org>
-References: <1752753970-261832-1-git-send-email-tariqt@nvidia.com>
- <1752753970-261832-3-git-send-email-tariqt@nvidia.com>
+	s=arc-20240116; t=1752847393; c=relaxed/simple;
+	bh=7EtjiaCnsOaFwvUj7+2v568CxGwGBUZ9Oh5In+ed6ak=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=tvgsLH9u5x70uqGXTN/+qcJHOdO/jER/82uhsctOWzOEdYZMchyLQIdtbWGMqc1/CsNwaA0cBUAguLrYDq/UqHe4/cy4LSG9xjlSsI5cp4EkfOiFpLC3O2iJMebOYKkn40UNsdT4eRsXt9522okfM6G/fef62NIa91jqK1wO0SU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=YRG1f+xG; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56I8rYXF007293;
+	Fri, 18 Jul 2025 14:02:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	JB+LnHjXE+q6ZfeW7JvS/qwLUqdA+SfN8MEMhEN8De4=; b=YRG1f+xGP/2isvYE
+	xIrzHBfl8aTWuAxoPv3qU2G2sMrJN7oHRVY0rAWLoBC6suiqXGjxBdWiKXy/7L8m
+	l8KNbAB+ZBCLLO5wkJfPKP5kUtijKvtnWmvSd0O1xWmVv7jN+Piq+lxWWuvVTK1c
+	TntNUVwJVpLnpd3XehYYacqfm1eX8fcOlCsvO1FQt+KGIprHTXrOG9kcuSCHbfgi
+	F80EJrOwAnGQiF/k0fvbgLqFijYTT4HAe0VaiJ8jHCrEb0eEnh7z3wtGkL/bC+DM
+	pdCBMW+xq50HewAvkb0qvhVgrFmUeZbMjHVSym5O2BCERoYe+quGwMOUbpuYzte2
+	WdRRvg==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47wfcacy9d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 18 Jul 2025 14:02:57 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 56IE2tiN026939
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 18 Jul 2025 14:02:55 GMT
+Received: from [10.253.76.178] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Fri, 18 Jul
+ 2025 07:02:52 -0700
+Message-ID: <d2a686fb-1320-4702-8bd3-0d2d823d3839@quicinc.com>
+Date: Fri, 18 Jul 2025 22:02:49 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1752753970-261832-3-git-send-email-tariqt@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 1/3] net: phy: qcom: Add PHY counter support
+To: Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>
+CC: Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King
+	<linux@armlinux.org.uk>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        <netdev@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20250715-qcom_phy_counter-v3-0-8b0e460a527b@quicinc.com>
+ <20250715-qcom_phy_counter-v3-1-8b0e460a527b@quicinc.com>
+ <e4b01f45-c282-4cc9-8b31-0869bdd1aae1@lunn.ch>
+ <23ab18e6-517a-48da-926a-acfcaa76a4e7@quicinc.com>
+ <87cace03-dd5e-4624-9615-15f3babd1848@redhat.com>
+ <c34607d0-fb25-471d-a28d-8e759e148a0b@lunn.ch>
+Content-Language: en-US
+From: Luo Jie <quic_luoj@quicinc.com>
+In-Reply-To: <c34607d0-fb25-471d-a28d-8e759e148a0b@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE4MDEwNyBTYWx0ZWRfX0gezylLbqJ1j
+ FOJMgIBZ23gfvP+kogmSflKviAwwG49usqR5tuVDHvRS9oe+c0E3e0QwQYeBebRvArmbVVtfJbH
+ BXS5nxOr1rLwCzRo8jYjhdWz4jVP+G+V3efVgJNYAROmnIyiktpB3kfWKo9vfGG77uM6ji7MM0K
+ mihJ0nMTbGdMAodaf7lFSU7hiMnFv4eWZsqjDccJJVhwMk2S2j+QwWnQbY0MNouQNr7qX3SN5fb
+ p+K7W0uAnxn9Chkk9IC+uIjVy+mi2+WsF13YbPIh0QHkTJGb9eg6c2m3p/16NqfKHcS7SePawY4
+ VObBzfKs0L8ggA4tAjdIBZ20poFhXDinyj1ljHtkhjjp/qbyf1etkG9v7vULn8zeH0tFJyduxwE
+ TvX8N9t+BMu0FrSkXI/oq6c+krgVNum1+PZagPDC6CjESzBAKOLAFpyNVAbfdyzR2tEVwlmQ
+X-Proofpoint-GUID: h02htuvjx6mehoO-FzaU-PyKEJ7L2OLh
+X-Authority-Analysis: v=2.4 cv=SeX3duRu c=1 sm=1 tr=0 ts=687a5411 cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10
+ a=Piafd2y1WuyyOIu429wA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: h02htuvjx6mehoO-FzaU-PyKEJ7L2OLh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-18_03,2025-07-17_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 mlxscore=0 priorityscore=1501 bulkscore=0 phishscore=0
+ lowpriorityscore=0 mlxlogscore=999 impostorscore=0 clxscore=1015 adultscore=0
+ suspectscore=0 malwarescore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507180107
 
-On Thu, Jul 17, 2025 at 03:06:10PM +0300, Tariq Toukan wrote:
-> From: Shahar Shitrit <shshitrit@nvidia.com>
-> 
-> In the original design, it is assumed local and peer eswitches have the
-> same number of vfs. However, in new firmware, local and peer eswitches
-> can have different number of vfs configured by mlxconfig.  In such
-> configuration, it is incorrect to derive the number of vfs from the
-> local device's eswitch.
-> 
-> Fix this by updating the peer miss rules add and delete functions to use
-> the peer device's eswitch and vf count instead of the local device's
-> information, ensuring correct behavior regardless of vf configuration
-> differences.
-> 
-> Fixes: ac004b832128 ("net/mlx5e: E-Switch, Add peer miss rules")
-> Signed-off-by: Shahar Shitrit <shshitrit@nvidia.com>
-> Reviewed-by: Mark Bloch <mbloch@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+
+On 7/17/2025 9:46 PM, Andrew Lunn wrote:
+> On Thu, Jul 17, 2025 at 03:23:16PM +0200, Paolo Abeni wrote:
+>> On 7/16/25 12:15 PM, Luo Jie wrote:
+>>> On 7/16/2025 12:11 AM, Andrew Lunn wrote:
+>>>>> +int qcom_phy_update_stats(struct phy_device *phydev,
+>>>>> +			  struct qcom_phy_hw_stats *hw_stats)
+>>>>> +{
+>>>>> +	int ret;
+>>>>> +	u32 cnt;
+>>>>> +
+>>>>> +	/* PHY 32-bit counter for RX packets. */
+>>>>> +	ret = phy_read_mmd(phydev, MDIO_MMD_AN, QCA808X_MMD7_CNT_RX_PKT_15_0);
+>>>>> +	if (ret < 0)
+>>>>> +		return ret;
+>>>>> +
+>>>>> +	cnt = ret;
+>>>>> +
+>>>>> +	ret = phy_read_mmd(phydev, MDIO_MMD_AN, QCA808X_MMD7_CNT_RX_PKT_31_16);
+>>>>> +	if (ret < 0)
+>>>>> +		return ret;
+>>>>
+>>>> Does reading QCA808X_MMD7_CNT_RX_PKT_15_0 cause
+>>>> QCA808X_MMD7_CNT_RX_PKT_31_16 to latch?
+>>>
+>>> Checked with the hardware design team: The high 16-bit counter register
+>>> does not latch when reading the low 16 bits.
+>>>
+>>>>
+>>>> Sometimes you need to read the high part, the low part, and then
+>>>> reread the high part to ensure it has not incremented. But this is
+>>>> only needed if the hardware does not latch.
+>>>>
+>>>> 	Andrew
+>>>
+>>> Since the counter is configured to clear after reading, the clear action
+>>> takes priority over latching the count. This means that when reading the
+>>> low 16 bits, the high 16-bit counter value cannot increment, any new
+>>> packet events occurring during the read will be recorded after the
+>>> 16-bit counter is cleared.
+>>
+>> Out of sheer ignorance and language bias on my side, based on the above
+>> I would have assumed that the registers do latch ;)
+> 
+> I interpret it differently. The register is set to clear on read. So
+> you read and clear the least significant word. Even if that word
+> starts incriminating, you have 65535 increments before it will
+> overflow into the next word. So you can read the most significant word
+> before such an overflow happens. It does not latch, you just have a
+> time window when it is safe.
+> 
+> What i actually find odd is that clear on read works on words, not the
+> full counter. I assume that is documented in the datasheet, and
+> tested, because i've never seen hardware do that before.
+> 
+> 	Andrew
+
+Thank you for the review. The PHY counter functionality is also used in
+the downstream code, and this patch series has been validated
+accordingly. However, please note that the PHY counter is intended as a
+debug feature and may not be documented in the datasheet. I will share
+this feedback with the hardware team in the hope that we can include
+documentation for this feature in the datasheet for future chips.
 
 
