@@ -1,204 +1,193 @@
-Return-Path: <netdev+bounces-208105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF2ACB09E15
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 10:33:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C63EB09E8A
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 11:00:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5BE0A7B9BF6
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 08:31:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79A9216AE47
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 09:00:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E4182949E5;
-	Fri, 18 Jul 2025 08:32:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 178691DE8BE;
+	Fri, 18 Jul 2025 09:00:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Akv67P4g"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b6ETK/zV"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A924293C71
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 08:32:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266426FB9;
+	Fri, 18 Jul 2025 09:00:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752827555; cv=none; b=e3a0Sxu0h8HOZgHI1pJz01kvet5u6PwuVtX/tPaQvFiqyxaXAF3TEZAeyjfUcgdsOuflGTnuupDD3KrxbinssUI3QRloKEOPJ7l4e4z9eoBwHaRN7tHMoX5Bb6J35ArBmcJMRLuIyuPM8OBA8m05gQ2yfJKcRQ8Im+czFaavD/Q=
+	t=1752829249; cv=none; b=KP2pAE3khLjYmbHwH8nVMinymuYzA2Pu4/e6pgYDFY8TtL+asGAIOdrkN85Bi7iYSgotCZpGBBPElZNHWl4qQ3WKuEW8VN/IifQkyB+t8djqTtm25/h3HOzwdMHiYtZOY1FqQstSUSf/Z2gFDE/PZ9vH5sviaZt4zZ8yqWamVgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752827555; c=relaxed/simple;
-	bh=u+hOpWXYGqQzlXztN0daxiDWMdTwEOshtpHvQqgxZTU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EBLQPOretDR1GueoP90f010Eqhve1CxcqCjcdYnzT12RSfSDjtloDxVNHMmN9vexm2e7U0VLAjmqfqNZmd6Y7sZcXqfttTSjBY0uJqM8Si0czFeNcVfS/H0Zibdip9lgb9h3UiapidDMXzPZ2HMcuN6hcrEnv36ubT4lXBIynf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Akv67P4g; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752827552;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ClO7vf6ZBePINFWsPRFr/+WGIgiWW+sfd60JVlzDBe8=;
-	b=Akv67P4gdWrlXT3el9DcBoVd/2viIeArNvghPStEE8NL3oJ3osueu62w72Ybg2pIcQU6CF
-	QMvqmGhXIQD/zHkXbAZJZFJ8K0mWz10wZLVdpn+bTyEUspxRoJR/juRgdxJOa4dma+6SUv
-	mbl8bz1BiRKwsVnWnhr3uTDfzAAjTeM=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-642-Q7yF6pkfNWidu0whqsi9AA-1; Fri, 18 Jul 2025 04:32:30 -0400
-X-MC-Unique: Q7yF6pkfNWidu0whqsi9AA-1
-X-Mimecast-MFC-AGG-ID: Q7yF6pkfNWidu0whqsi9AA_1752827550
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-aec53d77a78so106758866b.1
-        for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 01:32:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752827549; x=1753432349;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ClO7vf6ZBePINFWsPRFr/+WGIgiWW+sfd60JVlzDBe8=;
-        b=qaRSEEE6ArssEqxuH9+n0TUF7XeGH2Zq/hIQqCsAZPtNqgWR40OZuh0H8+MqJNGUjY
-         j/qk/+u6eUj1xAbGoREyc/OPw7tuDuqjLKsYgM8215achQGgQmDowKErzTGcxBNSEPvo
-         h8EBhTnZuryfbaiL6+EzoyY759UPfz38+TzOFkoh7L7JDmP/k8s5MpZ/d9gfSj22yatl
-         yE17yVDxG5jK6ja19AyEnHvpe2X0M6Rr5CEeB3XM98IZTIs3MPzf2TgJWG1MeUAeEK4W
-         1I1RKkz96tSozX1UVk275xBVs634BPeIUKeV2HgUa3+ofBXR07DrGcRxmWL1YaxDq79p
-         G+1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCW1MTVn3AKB1lwumejT1cYb/n1KEscsqg470sVawrs1SNbqZwVbSW1PtX/mt0ffmSilxdDxqX4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/dBLWu9YU9rZeBlz/AqC+NW3mOFXJ1e6GW8745rPvkXVBKkTb
-	1HzIevj0nOLXg7lRxTcIn+2CHFKArkS+zQ9c6QzABfo7ib51egy2sioMpxrf5TEqwkgEpKND3jO
-	M3+gg2zeBqkuNMn4vPrUOfdZnMF4I+vpJ13Xp2hmtEaDqGQjvzCQXQzWLdvJ7///z4yi9qBZfLJ
-	2wkRjbERmI5KC3eFupSqE67ZOWq7rVPgMe
-X-Gm-Gg: ASbGncs48685eiKqKl2InTYZONyldVVQCRBdglZ9j5xJJMsKpPEMRzMDHNSWRJSJTcj
-	QsRYL1NYL3GogyVx+tOGCbdCtVi6Drf7xAtUgpCpykamXFxK886JHu5/y06Z2TVktpxoLT/j74H
-	OvEkQb3HxMN/OD8DKap30/fQ==
-X-Received: by 2002:a17:907:da4:b0:aec:5a33:1573 with SMTP id a640c23a62f3a-aec5a3354femr462487566b.41.1752827549542;
-        Fri, 18 Jul 2025 01:32:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEZRbZf1CSxDdcr2KaS1fw9e3BgI0jPEf8QS4qDJaocQ3CHMAkyjsYYe2SLqnUm1+1w/XSVLxztz/eFpNmyZDs=
-X-Received: by 2002:a17:907:da4:b0:aec:5a33:1573 with SMTP id
- a640c23a62f3a-aec5a3354femr462485166b.41.1752827549130; Fri, 18 Jul 2025
- 01:32:29 -0700 (PDT)
+	s=arc-20240116; t=1752829249; c=relaxed/simple;
+	bh=yYTHsWKD0UsyKxIDv/FNYZV63fdgd0+A487ofyJJd9I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FbxwCxSCHgW/nspZKPIjbCdAYbvYfj1VYsrAxzke0Ahp2Wt75v82SB4KpsoKQTSOD3GE7NGjAB1JmT2IkPYZGE4XKGBBjwIZdc7XZkBWrTvGx4qA2GAv7vGNgz0U96PAX6XqAdnI75aD5JzNBGwRLC12O4YAhOP7aBv7AFaCCs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b6ETK/zV; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752829246; x=1784365246;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=yYTHsWKD0UsyKxIDv/FNYZV63fdgd0+A487ofyJJd9I=;
+  b=b6ETK/zVgkRAV462Lnc4YwVfN1DAgBWRtOGeknojBIfXWznBvtkP3AiC
+   gRPyGiUzc+0CgsFMGnEePWl/jqeBDoXocWZ4T5rtrWBFJqJkO7GgXbRK/
+   BG7Lfz/byEzSSUb78TFhhXCoc565xL/VBtmk59JlZpKvCXAjUC2OH1Yh/
+   wwR9/9HoZOlwKlR73dgfTSVa97QV4T9veCZFXPnjXCzaCt59UuUsH3xES
+   f9vlDdVSQ//EP419dS7H1ahR4Na7L3zKvEDaQwQDVo0k3WSHWg3DvD/0H
+   p/Dkq0YAseHwLyclQHeLUNmpHJawlv8aFsy1+cWy3Y/vwkiRZHY4dpxqG
+   Q==;
+X-CSE-ConnectionGUID: 3lvSoKrrTseECdpVOmPndA==
+X-CSE-MsgGUID: DipPmWbyQRClfQMusCc3AQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="80563388"
+X-IronPort-AV: E=Sophos;i="6.16,321,1744095600"; 
+   d="scan'208";a="80563388"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2025 02:00:45 -0700
+X-CSE-ConnectionGUID: e55kaXycSjyQhqoUijWgqA==
+X-CSE-MsgGUID: hV0bIggZR2WAPJZoDzagOw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,321,1744095600"; 
+   d="scan'208";a="158362935"
+Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
+  by fmviesa009.fm.intel.com with ESMTP; 18 Jul 2025 02:00:42 -0700
+Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1ucgxL-000ETL-2B;
+	Fri, 18 Jul 2025 09:00:39 +0000
+Date: Fri, 18 Jul 2025 17:00:17 +0800
+From: kernel test robot <lkp@intel.com>
+To: Richard Gobert <richardbgobert@gmail.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, dsahern@kernel.org, razor@blackwall.org,
+	idosch@nvidia.com, petrm@nvidia.com, menglong8.dong@gmail.com,
+	daniel@iogearbox.net, martin.lau@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev
+Subject: Re: [PATCH net-next v4 4/4] net: geneve: enable binding geneve
+ sockets to local addresses
+Message-ID: <202507181610.vgBNLLYf-lkp@intel.com>
+References: <20250717115412.11424-5-richardbgobert@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250716162243.1401676-1-kniv@yandex-team.ru>
-In-Reply-To: <20250716162243.1401676-1-kniv@yandex-team.ru>
-From: Lei Yang <leiyang@redhat.com>
-Date: Fri, 18 Jul 2025 16:31:52 +0800
-X-Gm-Features: Ac12FXz3P7sVlSAVAM9be3FkuV1rX0FLSe-KqiVKeDU_xg3yE_St4sNLJJ0dYVg
-Message-ID: <CAPpAL=xE4ZCyAhc+fkZwREo-cDHS4CG4fq4+sebazJgRzZoDHg@mail.gmail.com>
-Subject: Re: [PATCH] vhost/net: Replace wait_queue with completion in ubufs reference
-To: Nikolay Kuratov <kniv@yandex-team.ru>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	virtualization@lists.linux.dev, kvm@vger.kernel.org, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, stable@vger.kernel.org, 
-	Andrey Ryabinin <arbn@yandex-team.com>, Andrey Smetanin <asmetanin@yandex-team.ru>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250717115412.11424-5-richardbgobert@gmail.com>
 
-Tested this patch with virtio-net regression tests, everything works fine.
+Hi Richard,
 
-Tested-by: Lei Yang <leiyang@redhat.com>
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Richard-Gobert/net-udp-add-freebind-option-to-udp_sock_create/20250717-200233
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250717115412.11424-5-richardbgobert%40gmail.com
+patch subject: [PATCH net-next v4 4/4] net: geneve: enable binding geneve sockets to local addresses
+config: arm-randconfig-001-20250718 (https://download.01.org/0day-ci/archive/20250718/202507181610.vgBNLLYf-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 8.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250718/202507181610.vgBNLLYf-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202507181610.vgBNLLYf-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from include/net/ipv6_stubs.h:11,
+                    from drivers/net/geneve.c:15:
+   drivers/net/geneve.c: In function 'geneve_find_sock':
+>> include/net/sock.h:385:37: error: 'struct sock_common' has no member named 'skc_v6_rcv_saddr'; did you mean 'skc_rcv_saddr'?
+    #define sk_v6_rcv_saddr __sk_common.skc_v6_rcv_saddr
+                                        ^~~~~~~~~~~~~~~~
+   drivers/net/geneve.c:685:31: note: in expansion of macro 'sk_v6_rcv_saddr'
+      else if (ipv6_addr_cmp(&sk->sk_v6_rcv_saddr,
+                                  ^~~~~~~~~~~~~~~
+--
+   In file included from include/net/ipv6_stubs.h:11,
+                    from geneve.c:15:
+   geneve.c: In function 'geneve_find_sock':
+>> include/net/sock.h:385:37: error: 'struct sock_common' has no member named 'skc_v6_rcv_saddr'; did you mean 'skc_rcv_saddr'?
+    #define sk_v6_rcv_saddr __sk_common.skc_v6_rcv_saddr
+                                        ^~~~~~~~~~~~~~~~
+   geneve.c:685:31: note: in expansion of macro 'sk_v6_rcv_saddr'
+      else if (ipv6_addr_cmp(&sk->sk_v6_rcv_saddr,
+                                  ^~~~~~~~~~~~~~~
 
 
-On Thu, Jul 17, 2025 at 12:24=E2=80=AFAM Nikolay Kuratov <kniv@yandex-team.=
-ru> wrote:
->
-> When operating on struct vhost_net_ubuf_ref, the following execution
-> sequence is theoretically possible:
-> CPU0 is finalizing DMA operation                   CPU1 is doing VHOST_NE=
-T_SET_BACKEND
->                              // &ubufs->refcount =3D=3D 2
-> vhost_net_ubuf_put()                               vhost_net_ubuf_put_wai=
-t_and_free(oldubufs)
->                                                      vhost_net_ubuf_put_a=
-nd_wait()
->                                                        vhost_net_ubuf_put=
-()
->                                                          int r =3D atomic=
-_sub_return(1, &ubufs->refcount);
->                                                          // r =3D 1
-> int r =3D atomic_sub_return(1, &ubufs->refcount);
-> // r =3D 0
->                                                       wait_event(ubufs->w=
-ait, !atomic_read(&ubufs->refcount));
->                                                       // no wait occurs h=
-ere because condition is already true
->                                                     kfree(ubufs);
-> if (unlikely(!r))
->   wake_up(&ubufs->wait);  // use-after-free
->
-> This leads to use-after-free on ubufs access. This happens because CPU1
-> skips waiting for wake_up() when refcount is already zero.
->
-> To prevent that use a completion instead of wait_queue as the ubufs
-> notification mechanism. wait_for_completion() guarantees that there will
-> be complete() call prior to its return.
->
-> We also need to reinit completion because refcnt =3D=3D 0 does not mean
-> freeing in case of vhost_net_flush() - it then sets refcnt back to 1.
-> AFAIK concurrent calls to vhost_net_ubuf_put_and_wait() with the same
-> ubufs object aren't possible since those calls (through vhost_net_flush()
-> or vhost_net_set_backend()) are protected by the device mutex.
-> So reinit_completion() right after wait_for_completion() should be fine.
->
-> Cc: stable@vger.kernel.org
-> Fixes: 0ad8b480d6ee9 ("vhost: fix ref cnt checking deadlock")
-> Reported-by: Andrey Ryabinin <arbn@yandex-team.com>
-> Suggested-by: Andrey Smetanin <asmetanin@yandex-team.ru>
-> Signed-off-by: Nikolay Kuratov <kniv@yandex-team.ru>
-> ---
->  drivers/vhost/net.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index 7cbfc7d718b3..454d179fffeb 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -94,7 +94,7 @@ struct vhost_net_ubuf_ref {
->          * >1: outstanding ubufs
->          */
->         atomic_t refcount;
-> -       wait_queue_head_t wait;
-> +       struct completion wait;
->         struct vhost_virtqueue *vq;
->  };
->
-> @@ -240,7 +240,7 @@ vhost_net_ubuf_alloc(struct vhost_virtqueue *vq, bool=
- zcopy)
->         if (!ubufs)
->                 return ERR_PTR(-ENOMEM);
->         atomic_set(&ubufs->refcount, 1);
-> -       init_waitqueue_head(&ubufs->wait);
-> +       init_completion(&ubufs->wait);
->         ubufs->vq =3D vq;
->         return ubufs;
->  }
-> @@ -249,14 +249,15 @@ static int vhost_net_ubuf_put(struct vhost_net_ubuf=
-_ref *ubufs)
->  {
->         int r =3D atomic_sub_return(1, &ubufs->refcount);
->         if (unlikely(!r))
-> -               wake_up(&ubufs->wait);
-> +               complete_all(&ubufs->wait);
->         return r;
->  }
->
->  static void vhost_net_ubuf_put_and_wait(struct vhost_net_ubuf_ref *ubufs=
-)
->  {
->         vhost_net_ubuf_put(ubufs);
-> -       wait_event(ubufs->wait, !atomic_read(&ubufs->refcount));
-> +       wait_for_completion(&ubufs->wait);
-> +       reinit_completion(&ubufs->wait);
->  }
->
->  static void vhost_net_ubuf_put_wait_and_free(struct vhost_net_ubuf_ref *=
-ubufs)
-> --
-> 2.34.1
->
->
+vim +385 include/net/sock.h
 
+4dc6dc7162c08b Eric Dumazet             2009-07-15  364  
+68835aba4d9b74 Eric Dumazet             2010-11-30  365  #define sk_dontcopy_begin	__sk_common.skc_dontcopy_begin
+68835aba4d9b74 Eric Dumazet             2010-11-30  366  #define sk_dontcopy_end		__sk_common.skc_dontcopy_end
+4dc6dc7162c08b Eric Dumazet             2009-07-15  367  #define sk_hash			__sk_common.skc_hash
+5080546682bae3 Eric Dumazet             2013-10-02  368  #define sk_portpair		__sk_common.skc_portpair
+05dbc7b59481ca Eric Dumazet             2013-10-03  369  #define sk_num			__sk_common.skc_num
+05dbc7b59481ca Eric Dumazet             2013-10-03  370  #define sk_dport		__sk_common.skc_dport
+5080546682bae3 Eric Dumazet             2013-10-02  371  #define sk_addrpair		__sk_common.skc_addrpair
+5080546682bae3 Eric Dumazet             2013-10-02  372  #define sk_daddr		__sk_common.skc_daddr
+5080546682bae3 Eric Dumazet             2013-10-02  373  #define sk_rcv_saddr		__sk_common.skc_rcv_saddr
+^1da177e4c3f41 Linus Torvalds           2005-04-16  374  #define sk_family		__sk_common.skc_family
+^1da177e4c3f41 Linus Torvalds           2005-04-16  375  #define sk_state		__sk_common.skc_state
+^1da177e4c3f41 Linus Torvalds           2005-04-16  376  #define sk_reuse		__sk_common.skc_reuse
+055dc21a1d1d21 Tom Herbert              2013-01-22  377  #define sk_reuseport		__sk_common.skc_reuseport
+9fe516ba3fb29b Eric Dumazet             2014-06-27  378  #define sk_ipv6only		__sk_common.skc_ipv6only
+26abe14379f8e2 Eric W. Biederman        2015-05-08  379  #define sk_net_refcnt		__sk_common.skc_net_refcnt
+^1da177e4c3f41 Linus Torvalds           2005-04-16  380  #define sk_bound_dev_if		__sk_common.skc_bound_dev_if
+^1da177e4c3f41 Linus Torvalds           2005-04-16  381  #define sk_bind_node		__sk_common.skc_bind_node
+8feaf0c0a5488b Arnaldo Carvalho de Melo 2005-08-09  382  #define sk_prot			__sk_common.skc_prot
+07feaebfcc10cd Eric W. Biederman        2007-09-12  383  #define sk_net			__sk_common.skc_net
+efe4208f47f907 Eric Dumazet             2013-10-03  384  #define sk_v6_daddr		__sk_common.skc_v6_daddr
+efe4208f47f907 Eric Dumazet             2013-10-03 @385  #define sk_v6_rcv_saddr	__sk_common.skc_v6_rcv_saddr
+33cf7c90fe2f97 Eric Dumazet             2015-03-11  386  #define sk_cookie		__sk_common.skc_cookie
+70da268b569d32 Eric Dumazet             2015-10-08  387  #define sk_incoming_cpu		__sk_common.skc_incoming_cpu
+8e5eb54d303b7c Eric Dumazet             2015-10-08  388  #define sk_flags		__sk_common.skc_flags
+ed53d0ab761f5c Eric Dumazet             2015-10-08  389  #define sk_rxhash		__sk_common.skc_rxhash
+efe4208f47f907 Eric Dumazet             2013-10-03  390  
+5d4cc87414c5d1 Eric Dumazet             2024-02-16  391  	__cacheline_group_begin(sock_write_rx);
+43f51df4172955 Eric Dumazet             2021-11-15  392  
+9115e8cd2a0c6e Eric Dumazet             2016-12-03  393  	atomic_t		sk_drops;
+5d4cc87414c5d1 Eric Dumazet             2024-02-16  394  	__s32			sk_peek_off;
+9115e8cd2a0c6e Eric Dumazet             2016-12-03  395  	struct sk_buff_head	sk_error_queue;
+b178bb3dfc30d9 Eric Dumazet             2010-11-16  396  	struct sk_buff_head	sk_receive_queue;
+fa438ccfdfd3f6 Eric Dumazet             2007-03-04  397  	/*
+fa438ccfdfd3f6 Eric Dumazet             2007-03-04  398  	 * The backlog queue is special, it is always used with
+fa438ccfdfd3f6 Eric Dumazet             2007-03-04  399  	 * the per-socket spinlock held and requires low latency
+fa438ccfdfd3f6 Eric Dumazet             2007-03-04  400  	 * access. Therefore we special case it's implementation.
+b178bb3dfc30d9 Eric Dumazet             2010-11-16  401  	 * Note : rmem_alloc is in this structure to fill a hole
+b178bb3dfc30d9 Eric Dumazet             2010-11-16  402  	 * on 64bit arches, not because its logically part of
+b178bb3dfc30d9 Eric Dumazet             2010-11-16  403  	 * backlog.
+fa438ccfdfd3f6 Eric Dumazet             2007-03-04  404  	 */
+fa438ccfdfd3f6 Eric Dumazet             2007-03-04  405  	struct {
+b178bb3dfc30d9 Eric Dumazet             2010-11-16  406  		atomic_t	rmem_alloc;
+b178bb3dfc30d9 Eric Dumazet             2010-11-16  407  		int		len;
+fa438ccfdfd3f6 Eric Dumazet             2007-03-04  408  		struct sk_buff	*head;
+fa438ccfdfd3f6 Eric Dumazet             2007-03-04  409  		struct sk_buff	*tail;
+fa438ccfdfd3f6 Eric Dumazet             2007-03-04  410  	} sk_backlog;
+b178bb3dfc30d9 Eric Dumazet             2010-11-16  411  #define sk_rmem_alloc sk_backlog.rmem_alloc
+2c8c56e15df3d4 Eric Dumazet             2014-11-11  412  
+5d4cc87414c5d1 Eric Dumazet             2024-02-16  413  	__cacheline_group_end(sock_write_rx);
+5d4cc87414c5d1 Eric Dumazet             2024-02-16  414  
+5d4cc87414c5d1 Eric Dumazet             2024-02-16  415  	__cacheline_group_begin(sock_read_rx);
+5d4cc87414c5d1 Eric Dumazet             2024-02-16  416  	/* early demux fields */
+5d4cc87414c5d1 Eric Dumazet             2024-02-16  417  	struct dst_entry __rcu	*sk_rx_dst;
+5d4cc87414c5d1 Eric Dumazet             2024-02-16  418  	int			sk_rx_dst_ifindex;
+5d4cc87414c5d1 Eric Dumazet             2024-02-16  419  	u32			sk_rx_dst_cookie;
+5d4cc87414c5d1 Eric Dumazet             2024-02-16  420  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
