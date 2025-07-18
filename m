@@ -1,808 +1,198 @@
-Return-Path: <netdev+bounces-208056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95373B098D6
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 02:15:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75DE6B098FB
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 02:44:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5526CA43FF0
-	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 00:14:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 854E617F97C
+	for <lists+netdev@lfdr.de>; Fri, 18 Jul 2025 00:44:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FC82D517;
-	Fri, 18 Jul 2025 00:14:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J/SXol3/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C28825336D;
+	Fri, 18 Jul 2025 00:44:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C436224FA
-	for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 00:14:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1233D2AD2C;
+	Fri, 18 Jul 2025 00:43:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752797667; cv=none; b=UoKf5sz3/HwaPTAlGkTULfcDmArhDbzeBT0uXhKa3rLksD76YCovqC6vIM5FP1TDYqtff9nE/WbOtqWsPx2cVavQnAXv7V/7fT776l+DA7mlArSpIkuWEw6PoTue/2P3X8ZrY8dM/GtoGzoEEVyG1vZwtaTP0emUAHZk9iYg/dY=
+	t=1752799440; cv=none; b=V1g3nzaFQ/A2zQsdzDXykpMZpEvBDtHdB4UEAgOxskfljXwRs6qAQm1snU14FhJCZwjgoilqrmYttotJ9JI3bPfLoGyVLR2upFvIPz7wEUPfnDDjeV4uevxWSDIC0CWB1RBLgUN1qQnaIr8rWQi3/RIoS1fIA1465MTufWnfp9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752797667; c=relaxed/simple;
-	bh=5Ta0SNxtHCspkj/bhUWmTkorIU46+UKCQQSMoWLnkKA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qATNMlT/ANLx4fWc/cUdEucgNrvQPjdvGyoVsNibVSlLpbNDAFxlNGxcToyIpX30yTzqDz/RK2dA61H5z+UbSuj90l4gtHNJg5lGCuDFcPa3JgmJhJmchUMKr0heC0jMLRDTIVg4LwdES0F/3UWAJ6kHJ2vKNDkOQm6YuhCH1YM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J/SXol3/; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752797666; x=1784333666;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=5Ta0SNxtHCspkj/bhUWmTkorIU46+UKCQQSMoWLnkKA=;
-  b=J/SXol3/kEnw7P6p1kMjd+GJBMxLP3VHE7r2UkCAK/oh0y9iCpRnprV7
-   SFLKjQ8I5mCP83csvE8ns3bXjLTqzZjHvySaQ6qxLQnpDdSNI0UzaqklE
-   h2wnPiFz8OjGIk4dI/7ptsY/5QomAk8phZpHrRjdxgfZHML30g4ZM9j9k
-   7h4pKn0pI3YPdFptfwtdK5TyJi8xyh66Qu5Opnq3liUUbFppxTLDVgjTR
-   2huej5r8btoipMn/k9Er36UgG0JO038T8Gfv5PgKb2JO22Yy5Uiq/1bQV
-   SNlnsMZZPOAT1I5CFI25BMLcuZHYvN0fNQe4FxjS9sIbkF79I40CNOHY3
-   g==;
-X-CSE-ConnectionGUID: DFabFE1lSoi9e1Ug7+reKg==
-X-CSE-MsgGUID: 54a71j8RQmitJCGUDWpi2w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="65345440"
-X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
-   d="scan'208";a="65345440"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 17:14:24 -0700
-X-CSE-ConnectionGUID: wigq1F4dTQWCRqcMeT23eQ==
-X-CSE-MsgGUID: JXNhbiXMSci8vvPTKRSF7g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
-   d="scan'208";a="188908872"
-Received: from dcskidmo-m40.jf.intel.com ([10.166.241.13])
-  by fmviesa001.fm.intel.com with ESMTP; 17 Jul 2025 17:14:23 -0700
-From: Joshua Hay <joshua.a.hay@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Joshua Hay <joshua.a.hay@intel.com>,
-	Madhu Chittim <madhu.chittim@intel.com>
-Subject: [Intel-wired-lan] [PATCH net v2 6/6] idpf: remove obsolete stashing code
-Date: Thu, 17 Jul 2025 17:21:50 -0700
-Message-Id: <20250718002150.2724409-7-joshua.a.hay@intel.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250718002150.2724409-1-joshua.a.hay@intel.com>
-References: <20250718002150.2724409-1-joshua.a.hay@intel.com>
+	s=arc-20240116; t=1752799440; c=relaxed/simple;
+	bh=Ox2D1goCtlPhcg2S8wC1ZqhkF53ndLC5sNkhZmMWolw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iwIJ2BVE6bu20i9cl8OXxOhGHChNoAF1Ti4DiirosG+L0kJO45VvtefFh+cNgSg5KY7kZlqzyWYtt3c6vcB+asQYU3yx+lMHM0/H+d01idoGDm8OB83CMYoUXa/S3zQRty6r61nT8+LSBMxUk5q9v0PsfA9yYcv6iIg+tDM159U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-681ff7000002311f-41-687998c8062f
+Date: Fri, 18 Jul 2025 09:43:46 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: kernel test robot <lkp@intel.com>
+Cc: willy@infradead.org, netdev@vger.kernel.org,
+	oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, kernel_team@skhynix.com, almasrymina@google.com,
+	ilias.apalodimas@linaro.org, harry.yoo@oracle.com,
+	akpm@linux-foundation.org, andrew+netdev@lunn.ch,
+	asml.silence@gmail.com, toke@redhat.com, david@redhat.com,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+	surenb@google.com, mhocko@suse.com, linux-rdma@vger.kernel.org,
+	bpf@vger.kernel.org, vishal.moola@gmail.com, hannes@cmpxchg.org,
+	ziy@nvidia.com, jackmanb@google.com, wei.fang@nxp.com,
+	shenwei.wang@nxp.com, xiaoning.wang@nxp.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org
+Subject: Re: [Intel-wired-lan] [PATCH net-next v11 12/12] libeth: xdp: access
+ ->pp through netmem_desc instead of page
+Message-ID: <20250718004346.GA38833@system.software.com>
+References: <20250717070052.6358-13-byungchul@sk.com>
+ <202507180111.jygqJHzk-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202507180111.jygqJHzk-lkp@intel.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUhTUQCGOffe3V3Hlrf5ddKgmGghqSn+OELEfvTjQhiGRJBFjXZxK50y
+	dU2hslT6UjMlmDZwUsxPsKbN+ZHpZjorTHTpEtMpzjJKmZr4MbRNkfz38L7nPO/5cShcmMcJ
+	puSKLFapkKSKSB7B+8OvjrRqcmQnOywBSNvUSKKGNTWqcZg4SFtvBGi5t59E2i8FBPrbtIEj
+	Z98MFzUYEtCUfo5AxQWbOHq3vsBFQ8YSDmrNc3DRSLuWRJON2xw0Zy4m0K/8GRJNlYhRny4Q
+	metsGOptasXQ6LYbQ+XDOhINW2YI9OJeCUBNXXYOcnV6pjbXPI5+m9NTfJjkio8wlt+LONNS
+	9w1j2iq/cxmdIZtpro1gXnbOY4yh/hHJGJbKuMzEaCfJWDWbBPOzuQIwbaZljCnOXyCZNwsm
+	jHE5xwlmsesrmeh3iXdKyqbKVawy+vQ1nqzVbuZmfD6hrh97jecB/dHHwIeCdBysKJ0l9/ip
+	xQq8TNBh0Gktw7xM0seg3b6Oe9nfk5um9Z6cR+F0Dwcu9to8BUX50Wro1qq8ZwQ0gkXm9h2n
+	kL4CjVVj+G5+EA5UzBJexukIaN+ax7xXcToE1mxR3tiHjoXu6dWd2QA6FHYb+3emIP2cggOa
+	Wu7uOw/Bnlo7UQroyn3ayn3ayv9aHcDrgVCuUKVJ5KlxUbIchVwddT09zQA8/0J/251sAktD
+	SWZAU0DEF3Q71TIhR6LKzEkzA0jhIn9B+bBKJhRIJTm5rDL9qjI7lc00gxCKEAUJYldvSYV0
+	iiSLvcmyGaxyr8Uon+A8IF9yiJP75RdtHYcj+a67LUkNuYNFZxwSDeipi48ZW9wg3W5954/A
+	ovigAzOF4eLLGfE3REu9xpXRwXMJiZ/moG0l1OU7ckE4COzSs5EptskwpAi3uHlvX02Mnx+V
+	PyicCruvcUdbw5/4vx/nG47f+egzrqpSSp89rPWNL60WEZkySUwErsyU/APdXmvcEwMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA02RfUhTYRTGe++9u7sOR7c566IEsojKylSK3rBEEOqtKEqEwIocenHDOW3T
+	tUWBoYVZ01QyPxZqwdQpTafplGW6mc4IEj9n5NdollGamaH51VZE/vc7z3Oe8/xxKFzgJPwo
+	qTyVVcjFMhHJI3hnwzL224s0kuA7ZRyoM9aSsGZRDSsnzO7J0ATgfGc3CXVvMwm4YPyFQ1eX
+	kwtrTGfguH6KgNrMZRy+WJrhQtvjHg7sbcrhwOb0CS7sb9WRcKx2nQOnrFoCfs5wknA8JwJ2
+	lW+F1uoBDHYamzE4tL6CwYK+chL22ZwELL2VA6CxzcGBcxZ33/Ki+0b3gMttvBrjRgQg25dZ
+	HDVWj2CopWSUi8pNaaihKhA9tUxjyGS4SyLT93wuej9kIZG9aJlAnxqKAWoxz2NImzFDovoZ
+	M4bmXO8INNs2SJ4TxvCOxrMyqYpVHAiP5UmaHVZuypt9asNwHZ4O9AHZwIti6INMrs0OPEzQ
+	OxmXPR/zMEnvYhyOJdzDQrduntS7dR6F0x0cZrZzwG1QlA+tZlZ0Ks8On4bMfWsr6WEBfZlp
+	KhvG/+pbmJ7iD4SHcTqQcaxNY54oTvszlWuUR/aiQ5mVyZ9/an3pHUx7Uzf2APBLNqRLNqRL
+	/qfLAW4AQqlclSSWyg4FKRMlGrlUHRSXnGQC7s/rb67kmcGP/hNWQFNA5M1vd6klAo5YpdQk
+	WQFD4SIhv6BPJRHw48Wa66wi+YoiTcYqrcCfIkTb+KcusLECOkGcyiaybAqr+OdilJdfOoio
+	/1blbckasEfffqZ5Xvo6anvQkZPh1cLlPXU3tLqQ0MAs78ZNE4qLX01LCUXc1eNEYVG2yQxH
+	e9dkIoM9Lmavein1YeQl39yP+vNy67HI04+mF3yqS9HVsSe2em1hMHBZOq6JczfnrQ7uvlch
+	a6yoqjn8csQYFR22ViuyFeIiQikRhwTiCqX4N/Q2WRj1AgAA
+X-CFilter-Loop: Reflected
 
-With the new Tx buffer management scheme, there is no need for all of
-the stashing mechanisms, the hash table, the reserve buffer stack, etc.
-Remove all of that.
+On Fri, Jul 18, 2025 at 01:42:38AM +0800, kernel test robot wrote:
+> Hi Byungchul,
+> 
+> kernel test robot noticed the following build warnings:
+> 
+> [auto build test WARNING on c65d34296b2252897e37835d6007bbd01b255742]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Byungchul-Park/netmem-introduce-struct-netmem_desc-mirroring-struct-page/20250717-150253
+> base:   c65d34296b2252897e37835d6007bbd01b255742
+> patch link:    https://lore.kernel.org/r/20250717070052.6358-13-byungchul%40sk.com
+> patch subject: [Intel-wired-lan] [PATCH net-next v11 12/12] libeth: xdp: access ->pp through netmem_desc instead of page
+> config: arm-randconfig-r072-20250717 (https://download.01.org/0day-ci/archive/20250718/202507180111.jygqJHzk-lkp@intel.com/config)
+> compiler: arm-linux-gnueabi-gcc (GCC) 8.5.0
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250718/202507180111.jygqJHzk-lkp@intel.com/reproduce)
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202507180111.jygqJHzk-lkp@intel.com/
+> 
+> All warnings (new ones prefixed by >>):
+> 
+>    In file included from include/linux/container_of.h:5,
+>                     from include/linux/list.h:5,
+>                     from include/linux/timer.h:5,
+>                     from include/linux/netdevice.h:24,
+>                     from include/trace/events/xdp.h:8,
+>                     from include/linux/bpf_trace.h:5,
+>                     from include/net/libeth/xdp.h:7,
+>                     from drivers/net/ethernet/intel/libeth/tx.c:6:
+>    include/net/libeth/xdp.h: In function 'libeth_xdp_prepare_buff':
+> >> include/net/libeth/xdp.h:1295:23: warning: passing argument 1 of 'page_pool_page_is_pp' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+>         pp_page_to_nmdesc(page)->pp->p.offset, len, true);
+>                           ^~~~
+>    include/linux/build_bug.h:30:63: note: in definition of macro 'BUILD_BUG_ON_INVALID'
+>     #define BUILD_BUG_ON_INVALID(e) ((void)(sizeof((__force long)(e))))
+>                                                                   ^
+>    include/net/netmem.h:301:2: note: in expansion of macro 'DEBUG_NET_WARN_ON_ONCE'
+>      DEBUG_NET_WARN_ON_ONCE(!page_pool_page_is_pp(p));  \
+>      ^~~~~~~~~~~~~~~~~~~~~~
+>    include/net/libeth/xdp.h:1295:5: note: in expansion of macro 'pp_page_to_nmdesc'
+>         pp_page_to_nmdesc(page)->pp->p.offset, len, true);
+>         ^~~~~~~~~~~~~~~~~
+>    In file included from arch/arm/include/asm/cacheflush.h:10,
+>                     from include/linux/cacheflush.h:5,
+>                     from include/linux/highmem.h:8,
+>                     from include/linux/bvec.h:10,
+>                     from include/linux/skbuff.h:17,
+>                     from include/net/net_namespace.h:43,
+>                     from include/linux/netdevice.h:38,
+>                     from include/trace/events/xdp.h:8,
+>                     from include/linux/bpf_trace.h:5,
+>                     from include/net/libeth/xdp.h:7,
+>                     from drivers/net/ethernet/intel/libeth/tx.c:6:
+>    include/linux/mm.h:4176:54: note: expected 'struct page *' but argument is of type 'const struct page *'
+>     static inline bool page_pool_page_is_pp(struct page *page)
+>                                             ~~~~~~~~~~~~~^~~~
 
-Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
-Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 376 ++------------------
- drivers/net/ethernet/intel/idpf/idpf_txrx.h |  47 +--
- 2 files changed, 23 insertions(+), 400 deletions(-)
+Oh.  page_pool_page_is_pp() in the mainline code already has this issue
+that the helper cannot take const struct page * as argument.
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index cfda566270c7..2fc1ef880bc3 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -8,48 +8,12 @@
- #include "idpf_ptp.h"
- #include "idpf_virtchnl.h"
- 
--struct idpf_tx_stash {
--	struct hlist_node hlist;
--	struct libeth_sqe buf;
--};
--
- #define idpf_tx_buf_next(buf)		(*(u32 *)&(buf)->priv)
--#define idpf_tx_buf_compl_tag(buf)	(*(u32 *)&(buf)->priv)
- LIBETH_SQE_CHECK_PRIV(u32);
- 
- static bool idpf_chk_linearize(struct sk_buff *skb, unsigned int max_bufs,
- 			       unsigned int count);
- 
--/**
-- * idpf_buf_lifo_push - push a buffer pointer onto stack
-- * @stack: pointer to stack struct
-- * @buf: pointer to buf to push
-- *
-- * Returns 0 on success, negative on failure
-- **/
--static int idpf_buf_lifo_push(struct idpf_buf_lifo *stack,
--			      struct idpf_tx_stash *buf)
--{
--	if (unlikely(stack->top == stack->size))
--		return -ENOSPC;
--
--	stack->bufs[stack->top++] = buf;
--
--	return 0;
--}
--
--/**
-- * idpf_buf_lifo_pop - pop a buffer pointer from stack
-- * @stack: pointer to stack struct
-- **/
--static struct idpf_tx_stash *idpf_buf_lifo_pop(struct idpf_buf_lifo *stack)
--{
--	if (unlikely(!stack->top))
--		return NULL;
--
--	return stack->bufs[--stack->top];
--}
--
- /**
-  * idpf_tx_timeout - Respond to a Tx Hang
-  * @netdev: network interface device structure
-@@ -78,14 +42,11 @@ void idpf_tx_timeout(struct net_device *netdev, unsigned int txqueue)
- static void idpf_tx_buf_rel_all(struct idpf_tx_queue *txq)
- {
- 	struct libeth_sq_napi_stats ss = { };
--	struct idpf_buf_lifo *buf_stack;
--	struct idpf_tx_stash *stash;
- 	struct libeth_cq_pp cp = {
- 		.dev	= txq->dev,
- 		.ss	= &ss,
- 	};
--	struct hlist_node *tmp;
--	u32 i, tag;
-+	u32 i;
- 
- 	/* Buffers already cleared, nothing to do */
- 	if (!txq->tx_buf)
-@@ -97,33 +58,6 @@ static void idpf_tx_buf_rel_all(struct idpf_tx_queue *txq)
- 
- 	kfree(txq->tx_buf);
- 	txq->tx_buf = NULL;
--
--	if (!idpf_queue_has(FLOW_SCH_EN, txq))
--		return;
--
--	buf_stack = &txq->stash->buf_stack;
--	if (!buf_stack->bufs)
--		return;
--
--	/*
--	 * If a Tx timeout occurred, there are potentially still bufs in the
--	 * hash table, free them here.
--	 */
--	hash_for_each_safe(txq->stash->sched_buf_hash, tag, tmp, stash,
--			   hlist) {
--		if (!stash)
--			continue;
--
--		libeth_tx_complete(&stash->buf, &cp);
--		hash_del(&stash->hlist);
--		idpf_buf_lifo_push(buf_stack, stash);
--	}
--
--	for (i = 0; i < buf_stack->size; i++)
--		kfree(buf_stack->bufs[i]);
--
--	kfree(buf_stack->bufs);
--	buf_stack->bufs = NULL;
- }
- 
- /**
-@@ -199,9 +133,6 @@ static void idpf_tx_desc_rel_all(struct idpf_vport *vport)
-  */
- static int idpf_tx_buf_alloc_all(struct idpf_tx_queue *tx_q)
- {
--	struct idpf_buf_lifo *buf_stack;
--	int i;
--
- 	/* Allocate book keeping buffers only. Buffers to be supplied to HW
- 	 * are allocated by kernel network stack and received as part of skb
- 	 */
-@@ -213,29 +144,6 @@ static int idpf_tx_buf_alloc_all(struct idpf_tx_queue *tx_q)
- 	if (!tx_q->tx_buf)
- 		return -ENOMEM;
- 
--	if (!idpf_queue_has(FLOW_SCH_EN, tx_q))
--		return 0;
--
--	buf_stack = &tx_q->stash->buf_stack;
--
--	/* Initialize tx buf stack for out-of-order completions if
--	 * flow scheduling offload is enabled
--	 */
--	buf_stack->bufs = kcalloc(tx_q->desc_count, sizeof(*buf_stack->bufs),
--				  GFP_KERNEL);
--	if (!buf_stack->bufs)
--		return -ENOMEM;
--
--	buf_stack->size = tx_q->desc_count;
--	buf_stack->top = tx_q->desc_count;
--
--	for (i = 0; i < tx_q->desc_count; i++) {
--		buf_stack->bufs[i] = kzalloc(sizeof(*buf_stack->bufs[i]),
--					     GFP_KERNEL);
--		if (!buf_stack->bufs[i])
--			return -ENOMEM;
--	}
--
- 	return 0;
- }
- 
-@@ -349,8 +257,6 @@ static int idpf_tx_desc_alloc_all(struct idpf_vport *vport)
- 	for (i = 0; i < vport->num_txq_grp; i++) {
- 		for (j = 0; j < vport->txq_grps[i].num_txq; j++) {
- 			struct idpf_tx_queue *txq = vport->txq_grps[i].txqs[j];
--			u8 gen_bits = 0;
--			u16 bufidx_mask;
- 
- 			err = idpf_tx_desc_alloc(vport, txq);
- 			if (err) {
-@@ -359,34 +265,6 @@ static int idpf_tx_desc_alloc_all(struct idpf_vport *vport)
- 					i);
- 				goto err_out;
- 			}
--
--			if (!idpf_is_queue_model_split(vport->txq_model))
--				continue;
--
--			txq->compl_tag_cur_gen = 0;
--
--			/* Determine the number of bits in the bufid
--			 * mask and add one to get the start of the
--			 * generation bits
--			 */
--			bufidx_mask = txq->desc_count - 1;
--			while (bufidx_mask >> 1) {
--				txq->compl_tag_gen_s++;
--				bufidx_mask = bufidx_mask >> 1;
--			}
--			txq->compl_tag_gen_s++;
--
--			gen_bits = IDPF_TX_SPLITQ_COMPL_TAG_WIDTH -
--							txq->compl_tag_gen_s;
--			txq->compl_tag_gen_max = GETMAXVAL(gen_bits);
--
--			/* Set bufid mask based on location of first
--			 * gen bit; it cannot simply be the descriptor
--			 * ring size-1 since we can have size values
--			 * where not all of those bits are set.
--			 */
--			txq->compl_tag_bufid_m =
--				GETMAXVAL(txq->compl_tag_gen_s);
- 		}
- 
- 		if (!idpf_is_queue_model_split(vport->txq_model))
-@@ -1041,9 +919,6 @@ static void idpf_txq_group_rel(struct idpf_vport *vport)
- 
- 		kfree(txq_grp->complq);
- 		txq_grp->complq = NULL;
--
--		if (flow_sch_en)
--			kfree(txq_grp->stashes);
- 	}
- 	kfree(vport->txq_grps);
- 	vport->txq_grps = NULL;
-@@ -1404,7 +1279,6 @@ static int idpf_txq_group_alloc(struct idpf_vport *vport, u16 num_txq)
- 	for (i = 0; i < vport->num_txq_grp; i++) {
- 		struct idpf_txq_group *tx_qgrp = &vport->txq_grps[i];
- 		struct idpf_adapter *adapter = vport->adapter;
--		struct idpf_txq_stash *stashes;
- 		int j;
- 
- 		tx_qgrp->vport = vport;
-@@ -1417,15 +1291,6 @@ static int idpf_txq_group_alloc(struct idpf_vport *vport, u16 num_txq)
- 				goto err_alloc;
- 		}
- 
--		if (split && flow_sch_en) {
--			stashes = kcalloc(num_txq, sizeof(*stashes),
--					  GFP_KERNEL);
--			if (!stashes)
--				goto err_alloc;
--
--			tx_qgrp->stashes = stashes;
--		}
--
- 		for (j = 0; j < tx_qgrp->num_txq; j++) {
- 			struct idpf_tx_queue *q = tx_qgrp->txqs[j];
- 
-@@ -1445,11 +1310,6 @@ static int idpf_txq_group_alloc(struct idpf_vport *vport, u16 num_txq)
- 			if (!flow_sch_en)
- 				continue;
- 
--			if (split) {
--				q->stash = &stashes[j];
--				hash_init(q->stash->sched_buf_hash);
--			}
--
- 			idpf_queue_set(FLOW_SCH_EN, q);
- 
- 			q->refillq = kzalloc(sizeof(*q->refillq), GFP_KERNEL);
-@@ -1741,87 +1601,6 @@ static void idpf_tx_read_tstamp(struct idpf_tx_queue *txq, struct sk_buff *skb)
- 	spin_unlock_bh(&tx_tstamp_caps->status_lock);
- }
- 
--/**
-- * idpf_tx_clean_stashed_bufs - clean bufs that were stored for
-- * out of order completions
-- * @txq: queue to clean
-- * @compl_tag: completion tag of packet to clean (from completion descriptor)
-- * @cleaned: pointer to stats struct to track cleaned packets/bytes
-- * @budget: Used to determine if we are in netpoll
-- */
--static void idpf_tx_clean_stashed_bufs(struct idpf_tx_queue *txq,
--				       u16 compl_tag,
--				       struct libeth_sq_napi_stats *cleaned,
--				       int budget)
--{
--	struct idpf_tx_stash *stash;
--	struct hlist_node *tmp_buf;
--	struct libeth_cq_pp cp = {
--		.dev	= txq->dev,
--		.ss	= cleaned,
--		.napi	= budget,
--	};
--
--	/* Buffer completion */
--	hash_for_each_possible_safe(txq->stash->sched_buf_hash, stash, tmp_buf,
--				    hlist, compl_tag) {
--		if (unlikely(idpf_tx_buf_compl_tag(&stash->buf) != compl_tag))
--			continue;
--
--		hash_del(&stash->hlist);
--
--		if (stash->buf.type == LIBETH_SQE_SKB &&
--		    (skb_shinfo(stash->buf.skb)->tx_flags & SKBTX_IN_PROGRESS))
--			idpf_tx_read_tstamp(txq, stash->buf.skb);
--
--		libeth_tx_complete(&stash->buf, &cp);
--
--		/* Push shadow buf back onto stack */
--		idpf_buf_lifo_push(&txq->stash->buf_stack, stash);
--	}
--}
--
--/**
-- * idpf_stash_flow_sch_buffers - store buffer parameters info to be freed at a
-- * later time (only relevant for flow scheduling mode)
-- * @txq: Tx queue to clean
-- * @tx_buf: buffer to store
-- */
--static int idpf_stash_flow_sch_buffers(struct idpf_tx_queue *txq,
--				       struct idpf_tx_buf *tx_buf)
--{
--	struct idpf_tx_stash *stash;
--
--	if (unlikely(tx_buf->type <= LIBETH_SQE_CTX))
--		return 0;
--
--	stash = idpf_buf_lifo_pop(&txq->stash->buf_stack);
--	if (unlikely(!stash)) {
--		net_err_ratelimited("%s: No out-of-order TX buffers left!\n",
--				    netdev_name(txq->netdev));
--
--		return -ENOMEM;
--	}
--
--	/* Store buffer params in shadow buffer */
--	stash->buf.skb = tx_buf->skb;
--	stash->buf.bytes = tx_buf->bytes;
--	stash->buf.packets = tx_buf->packets;
--	stash->buf.type = tx_buf->type;
--	stash->buf.nr_frags = tx_buf->nr_frags;
--	dma_unmap_addr_set(&stash->buf, dma, dma_unmap_addr(tx_buf, dma));
--	dma_unmap_len_set(&stash->buf, len, dma_unmap_len(tx_buf, len));
--	idpf_tx_buf_compl_tag(&stash->buf) = idpf_tx_buf_compl_tag(tx_buf);
--
--	/* Add buffer to buf_hash table to be freed later */
--	hash_add(txq->stash->sched_buf_hash, &stash->hlist,
--		 idpf_tx_buf_compl_tag(&stash->buf));
--
--	tx_buf->type = LIBETH_SQE_EMPTY;
--
--	return 0;
--}
--
- #define idpf_tx_splitq_clean_bump_ntc(txq, ntc, desc, buf)	\
- do {								\
- 	if (unlikely(++(ntc) == (txq)->desc_count)) {		\
-@@ -1849,14 +1628,8 @@ do {								\
-  * Separate packet completion events will be reported on the completion queue,
-  * and the buffers will be cleaned separately. The stats are not updated from
-  * this function when using flow-based scheduling.
-- *
-- * Furthermore, in flow scheduling mode, check to make sure there are enough
-- * reserve buffers to stash the packet. If there are not, return early, which
-- * will leave next_to_clean pointing to the packet that failed to be stashed.
-- *
-- * Return: false in the scenario above, true otherwise.
-  */
--static bool idpf_tx_splitq_clean(struct idpf_tx_queue *tx_q, u16 end,
-+static void idpf_tx_splitq_clean(struct idpf_tx_queue *tx_q, u16 end,
- 				 int napi_budget,
- 				 struct libeth_sq_napi_stats *cleaned,
- 				 bool descs_only)
-@@ -1870,12 +1643,11 @@ static bool idpf_tx_splitq_clean(struct idpf_tx_queue *tx_q, u16 end,
- 		.napi	= napi_budget,
- 	};
- 	struct idpf_tx_buf *tx_buf;
--	bool clean_complete = true;
- 
- 	if (descs_only) {
- 		/* Bump ring index to mark as cleaned. */
- 		tx_q->next_to_clean = end;
--		return true;
-+		return;
- 	}
- 
- 	tx_desc = &tx_q->flex_tx[ntc];
-@@ -1896,53 +1668,24 @@ static bool idpf_tx_splitq_clean(struct idpf_tx_queue *tx_q, u16 end,
- 			break;
- 
- 		eop_idx = tx_buf->rs_idx;
-+		libeth_tx_complete(tx_buf, &cp);
- 
--		if (descs_only) {
--			if (IDPF_TX_BUF_RSV_UNUSED(tx_q) < tx_buf->nr_frags) {
--				clean_complete = false;
--				goto tx_splitq_clean_out;
--			}
--
--			idpf_stash_flow_sch_buffers(tx_q, tx_buf);
-+		/* unmap remaining buffers */
-+		while (ntc != eop_idx) {
-+			idpf_tx_splitq_clean_bump_ntc(tx_q, ntc,
-+						      tx_desc, tx_buf);
- 
--			while (ntc != eop_idx) {
--				idpf_tx_splitq_clean_bump_ntc(tx_q, ntc,
--							      tx_desc, tx_buf);
--				idpf_stash_flow_sch_buffers(tx_q, tx_buf);
--			}
--		} else {
-+			/* unmap any remaining paged data */
- 			libeth_tx_complete(tx_buf, &cp);
--
--			/* unmap remaining buffers */
--			while (ntc != eop_idx) {
--				idpf_tx_splitq_clean_bump_ntc(tx_q, ntc,
--							      tx_desc, tx_buf);
--
--				/* unmap any remaining paged data */
--				libeth_tx_complete(tx_buf, &cp);
--			}
- 		}
- 
- fetch_next_txq_desc:
- 		idpf_tx_splitq_clean_bump_ntc(tx_q, ntc, tx_desc, tx_buf);
- 	}
- 
--tx_splitq_clean_out:
- 	tx_q->next_to_clean = ntc;
--
--	return clean_complete;
- }
- 
--#define idpf_tx_clean_buf_ring_bump_ntc(txq, ntc, buf)	\
--do {							\
--	(buf)++;					\
--	(ntc)++;					\
--	if (unlikely((ntc) == (txq)->desc_count)) {	\
--		buf = (txq)->tx_buf;			\
--		ntc = 0;				\
--	}						\
--} while (0)
--
- /**
-  * idpf_tx_clean_bufs - clean flow scheduling TX queue buffers
-  * @txq: queue to clean
-@@ -1953,18 +1696,16 @@ do {							\
-  * Clean all buffers associated with the packet starting at buf_id. Returns the
-  * byte/segment count for the cleaned packet.
-  */
--static bool idpf_tx_clean_bufs(struct idpf_tx_queue *txq, u32 buf_id,
-+static void idpf_tx_clean_bufs(struct idpf_tx_queue *txq, u32 buf_id,
- 			       struct libeth_sq_napi_stats *cleaned,
- 			       int budget)
- {
--	u32 idx = buf_id & txq->compl_tag_bufid_m;
- 	struct idpf_tx_buf *tx_buf = NULL;
- 	struct libeth_cq_pp cp = {
- 		.dev	= txq->dev,
- 		.ss	= cleaned,
- 		.napi	= budget,
- 	};
--	u16 ntc, orig_idx = idx;
- 
- 	tx_buf = &txq->tx_buf[buf_id];
- 	if (tx_buf->type == LIBETH_SQE_SKB) {
-@@ -1982,67 +1723,6 @@ static bool idpf_tx_clean_bufs(struct idpf_tx_queue *txq, u32 buf_id,
- 		libeth_tx_complete(tx_buf, &cp);
- 		idpf_post_buf_refill(txq->refillq, buf_id);
- 	}
--
--	return true;
--
--	tx_buf = &txq->tx_buf[idx];
--
--	if (unlikely(tx_buf->type <= LIBETH_SQE_CTX ||
--		     idpf_tx_buf_compl_tag(tx_buf) != buf_id))
--		return false;
--
--	if (tx_buf->type == LIBETH_SQE_SKB) {
--		if (skb_shinfo(tx_buf->skb)->tx_flags & SKBTX_IN_PROGRESS)
--			idpf_tx_read_tstamp(txq, tx_buf->skb);
--
--		libeth_tx_complete(tx_buf, &cp);
--	}
--
--	idpf_tx_clean_buf_ring_bump_ntc(txq, idx, tx_buf);
--
--	while (idpf_tx_buf_compl_tag(tx_buf) == buf_id) {
--		libeth_tx_complete(tx_buf, &cp);
--		idpf_tx_clean_buf_ring_bump_ntc(txq, idx, tx_buf);
--	}
--
--	/*
--	 * It's possible the packet we just cleaned was an out of order
--	 * completion, which means we can stash the buffers starting from
--	 * the original next_to_clean and reuse the descriptors. We need
--	 * to compare the descriptor ring next_to_clean packet's "first" buffer
--	 * to the "first" buffer of the packet we just cleaned to determine if
--	 * this is the case. Howevever, next_to_clean can point to either a
--	 * reserved buffer that corresponds to a context descriptor used for the
--	 * next_to_clean packet (TSO packet) or the "first" buffer (single
--	 * packet). The orig_idx from the packet we just cleaned will always
--	 * point to the "first" buffer. If next_to_clean points to a reserved
--	 * buffer, let's bump ntc once and start the comparison from there.
--	 */
--	ntc = txq->next_to_clean;
--	tx_buf = &txq->tx_buf[ntc];
--
--	if (tx_buf->type == LIBETH_SQE_CTX)
--		idpf_tx_clean_buf_ring_bump_ntc(txq, ntc, tx_buf);
--
--	/*
--	 * If ntc still points to a different "first" buffer, clean the
--	 * descriptor ring and stash all of the buffers for later cleaning. If
--	 * we cannot stash all of the buffers, next_to_clean will point to the
--	 * "first" buffer of the packet that could not be stashed and cleaning
--	 * will start there next time.
--	 */
--	if (unlikely(tx_buf != &txq->tx_buf[orig_idx] &&
--		     !idpf_tx_splitq_clean(txq, orig_idx, budget, cleaned,
--					   true)))
--		return true;
--
--	/*
--	 * Otherwise, update next_to_clean to reflect the cleaning that was
--	 * done above.
--	 */
--	txq->next_to_clean = idx;
--
--	return true;
- }
- 
- /**
-@@ -2061,22 +1741,18 @@ static void idpf_tx_handle_rs_completion(struct idpf_tx_queue *txq,
- 					 struct libeth_sq_napi_stats *cleaned,
- 					 int budget)
- {
--	u16 compl_tag;
-+	/*
-+	 * RS completion contains queue head for queue based scheduling or
-+	 * completion tag for flow based scheduling.
-+	 */
-+	u16 rs_compl_val = le16_to_cpu(desc->q_head_compl_tag.q_head);
- 
- 	if (!idpf_queue_has(FLOW_SCH_EN, txq)) {
--		u16 head = le16_to_cpu(desc->q_head_compl_tag.q_head);
--
--		idpf_tx_splitq_clean(txq, head, budget, cleaned, false);
-+		idpf_tx_splitq_clean(txq, rs_compl_val, budget, cleaned, false);
- 		return;
- 	}
- 
--	compl_tag = le16_to_cpu(desc->q_head_compl_tag.compl_tag);
--
--	/* If we didn't clean anything on the ring, this packet must be
--	 * in the hash table. Go clean it there.
--	 */
--	if (!idpf_tx_clean_bufs(txq, compl_tag, cleaned, budget))
--		idpf_tx_clean_stashed_bufs(txq, compl_tag, cleaned, budget);
-+	idpf_tx_clean_bufs(txq, rs_compl_val, cleaned, budget);
- }
- 
- /**
-@@ -2193,8 +1869,7 @@ static bool idpf_tx_clean_complq(struct idpf_compl_queue *complq, int budget,
- 		/* Update BQL */
- 		nq = netdev_get_tx_queue(tx_q->netdev, tx_q->idx);
- 
--		dont_wake = !complq_ok || IDPF_TX_BUF_RSV_LOW(tx_q) ||
--			    np->state != __IDPF_VPORT_UP ||
-+		dont_wake = !complq_ok || np->state != __IDPF_VPORT_UP ||
- 			    !netif_carrier_ok(tx_q->netdev);
- 		/* Check if the TXQ needs to and can be restarted */
- 		__netif_txq_completed_wake(nq, tx_q->cleaned_pkts, tx_q->cleaned_bytes,
-@@ -2265,7 +1940,6 @@ static int idpf_txq_has_room(struct idpf_tx_queue *tx_q, u32 descs_needed,
- 	if (IDPF_DESC_UNUSED(tx_q) < descs_needed ||
- 	    IDPF_TX_COMPLQ_PENDING(tx_q->txq_grp) >
- 		IDPF_TX_COMPLQ_OVERFLOW_THRESH(tx_q->txq_grp->complq) ||
--	    IDPF_TX_BUF_RSV_LOW(tx_q) ||
- 	    idpf_tx_splitq_get_free_bufs(tx_q->refillq) < bufs_needed)
- 		return 0;
- 	return 1;
-@@ -2389,10 +2063,8 @@ static unsigned int idpf_tx_splitq_bump_ntu(struct idpf_tx_queue *txq, u16 ntu)
- {
- 	ntu++;
- 
--	if (ntu == txq->desc_count) {
-+	if (ntu == txq->desc_count)
- 		ntu = 0;
--		txq->compl_tag_cur_gen = IDPF_TX_ADJ_COMPL_TAG_GEN(txq);
--	}
- 
- 	return ntu;
- }
-@@ -2574,8 +2246,6 @@ static void idpf_tx_splitq_map(struct idpf_tx_queue *tx_q,
- 			if (unlikely(++i == tx_q->desc_count)) {
- 				tx_desc = &tx_q->flex_tx[0];
- 				i = 0;
--				tx_q->compl_tag_cur_gen =
--					IDPF_TX_ADJ_COMPL_TAG_GEN(tx_q);
- 			} else {
- 				tx_desc++;
- 			}
-@@ -2606,7 +2276,6 @@ static void idpf_tx_splitq_map(struct idpf_tx_queue *tx_q,
- 		if (unlikely(++i == tx_q->desc_count)) {
- 			tx_desc = &tx_q->flex_tx[0];
- 			i = 0;
--			tx_q->compl_tag_cur_gen = IDPF_TX_ADJ_COMPL_TAG_GEN(tx_q);
- 		} else {
- 			tx_desc++;
- 		}
-@@ -3040,10 +2709,9 @@ static netdev_tx_t idpf_tx_splitq_frame(struct sk_buff *skb,
- 
- 		tx_params.dtype = IDPF_TX_DESC_DTYPE_FLEX_FLOW_SCHE;
- 		tx_params.eop_cmd = IDPF_TXD_FLEX_FLOW_CMD_EOP;
--		/* Set the RE bit to catch any packets that may have not been
--		 * stashed during RS completion cleaning. MIN_GAP is set to
--		 * MIN_RING size to ensure it will be set at least once each
--		 * time around the ring.
-+		/* Set the RE bit to periodically "clean" the descriptor ring.
-+		 * MIN_GAP is set to MIN_RING size to ensure it will be set at
-+		 * least once each time around the ring.
- 		 */
- 		if (idpf_tx_splitq_need_re(tx_q)) {
- 			tx_params.eop_cmd |= IDPF_TXD_FLEX_FLOW_CMD_RE;
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-index 36020db47880..256aa3a10463 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-@@ -117,10 +117,6 @@ do {								\
- 	((((txq)->next_to_clean > (txq)->next_to_use) ? 0 : (txq)->desc_count) + \
- 	(txq)->next_to_clean - (txq)->next_to_use - 1)
- 
--#define IDPF_TX_BUF_RSV_UNUSED(txq)	((txq)->stash->buf_stack.top)
--#define IDPF_TX_BUF_RSV_LOW(txq)	(IDPF_TX_BUF_RSV_UNUSED(txq) < \
--					 (txq)->desc_count >> 2)
--
- #define IDPF_TX_COMPLQ_OVERFLOW_THRESH(txcq)	((txcq)->desc_count >> 1)
- /* Determine the absolute number of completions pending, i.e. the number of
-  * completions that are expected to arrive on the TX completion queue.
-@@ -130,12 +126,6 @@ do {								\
- 	0 : U32_MAX) + \
- 	(txq)->num_completions_pending - (txq)->complq->num_completions)
- 
--#define IDPF_TX_SPLITQ_COMPL_TAG_WIDTH	16
--/* Adjust the generation for the completion tag and wrap if necessary */
--#define IDPF_TX_ADJ_COMPL_TAG_GEN(txq) \
--	((++(txq)->compl_tag_cur_gen) >= (txq)->compl_tag_gen_max ? \
--	0 : (txq)->compl_tag_cur_gen)
--
- #define IDPF_TXBUF_NULL			U32_MAX
- 
- #define IDPF_TXD_LAST_DESC_CMD (IDPF_TX_DESC_CMD_EOP | IDPF_TX_DESC_CMD_RS)
-@@ -153,18 +143,6 @@ union idpf_tx_flex_desc {
- 
- #define idpf_tx_buf libeth_sqe
- 
--/**
-- * struct idpf_buf_lifo - LIFO for managing OOO completions
-- * @top: Used to know how many buffers are left
-- * @size: Total size of LIFO
-- * @bufs: Backing array
-- */
--struct idpf_buf_lifo {
--	u16 top;
--	u16 size;
--	struct idpf_tx_stash **bufs;
--};
--
- /**
-  * struct idpf_tx_offload_params - Offload parameters for a given packet
-  * @tx_flags: Feature flags enabled for this packet
-@@ -475,17 +453,6 @@ struct idpf_tx_queue_stats {
- #define IDPF_ITR_IDX_SPACING(spacing, dflt)	(spacing ? spacing : dflt)
- #define IDPF_DIM_DEFAULT_PROFILE_IX		1
- 
--/**
-- * struct idpf_txq_stash - Tx buffer stash for Flow-based scheduling mode
-- * @buf_stack: Stack of empty buffers to store buffer info for out of order
-- *	       buffer completions. See struct idpf_buf_lifo
-- * @sched_buf_hash: Hash table to store buffers
-- */
--struct idpf_txq_stash {
--	struct idpf_buf_lifo buf_stack;
--	DECLARE_HASHTABLE(sched_buf_hash, 12);
--} ____cacheline_aligned;
--
- /**
-  * struct idpf_rx_queue - software structure representing a receive queue
-  * @rx: universal receive descriptor array
-@@ -630,11 +597,7 @@ libeth_cacheline_set_assert(struct idpf_rx_queue, 64,
-  *		   only once at the end of the cleaning routine.
-  * @clean_budget: singleq only, queue cleaning budget
-  * @cleaned_pkts: Number of packets cleaned for the above said case
-- * @stash: Tx buffer stash for Flow-based scheduling mode
-  * @refillq: Pointer to refill queue
-- * @compl_tag_bufid_m: Completion tag buffer id mask
-- * @compl_tag_cur_gen: Used to keep track of current completion tag generation
-- * @compl_tag_gen_max: To determine when compl_tag_cur_gen should be reset
-  * @cached_tstamp_caps: Tx timestamp capabilities negotiated with the CP
-  * @tstamp_task: Work that handles Tx timestamp read
-  * @stats_sync: See struct u64_stats_sync
-@@ -665,7 +628,6 @@ struct idpf_tx_queue {
- 	u16 desc_count;
- 
- 	u16 tx_min_pkt_len;
--	u16 compl_tag_gen_s;
- 
- 	struct net_device *netdev;
- 	__cacheline_group_end_aligned(read_mostly);
-@@ -682,13 +644,8 @@ struct idpf_tx_queue {
- 	};
- 	u16 cleaned_pkts;
- 
--	struct idpf_txq_stash *stash;
- 	struct idpf_sw_queue *refillq;
- 
--	u16 compl_tag_bufid_m;
--	u16 compl_tag_cur_gen;
--	u16 compl_tag_gen_max;
--
- 	struct idpf_ptp_vport_tx_tstamp_caps *cached_tstamp_caps;
- 	struct work_struct *tstamp_task;
- 
-@@ -706,7 +663,7 @@ struct idpf_tx_queue {
- 	__cacheline_group_end_aligned(cold);
- };
- libeth_cacheline_set_assert(struct idpf_tx_queue, 64,
--			    120 + sizeof(struct u64_stats_sync),
-+			    104 + sizeof(struct u64_stats_sync),
- 			    32);
- 
- /**
-@@ -917,7 +874,6 @@ struct idpf_rxq_group {
-  * @vport: Vport back pointer
-  * @num_txq: Number of TX queues associated
-  * @txqs: Array of TX queue pointers
-- * @stashes: array of OOO stashes for the queues
-  * @complq: Associated completion queue pointer, split queue only
-  * @num_completions_pending: Total number of completions pending for the
-  *			     completion queue, acculumated for all TX queues
-@@ -932,7 +888,6 @@ struct idpf_txq_group {
- 
- 	u16 num_txq;
- 	struct idpf_tx_queue *txqs[IDPF_LARGE_MAX_Q];
--	struct idpf_txq_stash *stashes;
- 
- 	struct idpf_compl_queue *complq;
- 
--- 
-2.39.2
+How should we resolve the issue?  Changing page_pool_page_is_pp() to
+macro and using _Generic again looks too much.  Or should we?  Any idea?
 
+	Byungchul
+
+> vim +1295 include/net/libeth/xdp.h
+> 
+>   1263
+>   1264  bool libeth_xdp_buff_add_frag(struct libeth_xdp_buff *xdp,
+>   1265                                const struct libeth_fqe *fqe,
+>   1266                                u32 len);
+>   1267
+>   1268  /**
+>   1269   * libeth_xdp_prepare_buff - fill &libeth_xdp_buff with head FQE data
+>   1270   * @xdp: XDP buffer to attach the head to
+>   1271   * @fqe: FQE containing the head buffer
+>   1272   * @len: buffer len passed from HW
+>   1273   *
+>   1274   * Internal, use libeth_xdp_process_buff() instead. Initializes XDP buffer
+>   1275   * head with the Rx buffer data: data pointer, length, headroom, and
+>   1276   * truesize/tailroom. Zeroes the flags.
+>   1277   * Uses faster single u64 write instead of per-field access.
+>   1278   */
+>   1279  static inline void libeth_xdp_prepare_buff(struct libeth_xdp_buff *xdp,
+>   1280                                             const struct libeth_fqe *fqe,
+>   1281                                             u32 len)
+>   1282  {
+>   1283          const struct page *page = __netmem_to_page(fqe->netmem);
+>   1284
+>   1285  #ifdef __LIBETH_WORD_ACCESS
+>   1286          static_assert(offsetofend(typeof(xdp->base), flags) -
+>   1287                        offsetof(typeof(xdp->base), frame_sz) ==
+>   1288                        sizeof(u64));
+>   1289
+>   1290          *(u64 *)&xdp->base.frame_sz = fqe->truesize;
+>   1291  #else
+>   1292          xdp_init_buff(&xdp->base, fqe->truesize, xdp->base.rxq);
+>   1293  #endif
+>   1294          xdp_prepare_buff(&xdp->base, page_address(page) + fqe->offset,
+> > 1295                           pp_page_to_nmdesc(page)->pp->p.offset, len, true);
+>   1296  }
+>   1297
+> 
+> --
+> 0-DAY CI Kernel Test Service
+> https://github.com/intel/lkp-tests/wiki
 
