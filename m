@@ -1,133 +1,95 @@
-Return-Path: <netdev+bounces-208347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A775B0B19C
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 21:02:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31EC9B0B1AF
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 22:00:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DEF1565144
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 19:02:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7441C3B4903
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 19:59:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEDE428B7FC;
-	Sat, 19 Jul 2025 18:59:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 392C822D7A5;
+	Sat, 19 Jul 2025 20:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ionic.de header.i=@ionic.de header.b="WspLDH8S"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="DqffrOIH";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="KVNZ9gc3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ionic.de (ionic.de [145.239.234.145])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DA9E28983A;
-	Sat, 19 Jul 2025 18:59:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.239.234.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC64622D7B1;
+	Sat, 19 Jul 2025 20:00:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752951587; cv=none; b=FxHFAtXKtcxZNbKmsTgMkH4INWsf+WkojW0POJAjo3+xLkI14CGzR0nxYi7me8SnNJBe9TWNRMzWgFEew5KUUpkoDrMYc3cY5p7//0qACHS2aqfsQuLcBI6PYB06jRNklSEgomlc1fn8gYl03jTZxQX4ifEejTOtp45YqBruRvM=
+	t=1752955207; cv=none; b=k/1PUi5FUhAL4QwbwdMMcKMulZqxQsU7kkcitu63ek+h/Q0IPexSNpHpHIPLkN63HNnuQXvW2uF5m5cT2CcMBYXRz8PjgI+bpSCaAeuFfAqKhqqpUdSLPfqUxl+izb0pSb2xwJV1vl7YMjzRzlqrI03bqprPHYJKiPAQPQzHCkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752951587; c=relaxed/simple;
-	bh=zBfaiZsRaBX1mtg6/PbLsiFZPxTKFf0eWcU8N5i1va8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BTNcywtNYfZpLQCTPoc9eYiv9GGVUpSKV4jVJD4z683og2rx6/YmQUzUS1OqhWbZTsTNyqnrqzLnswHrVnG5en5EDAp8YOJqSS9qzsZMnGVBAyDQUIUcRrCAmvuYJYfquCJxV+Bh0ds46BkfVg26w34LbUb3D0soKombS/4Hhg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ionic.de; spf=pass smtp.mailfrom=ionic.de; dkim=pass (1024-bit key) header.d=ionic.de header.i=@ionic.de header.b=WspLDH8S; arc=none smtp.client-ip=145.239.234.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ionic.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionic.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ionic.de; s=default;
-	t=1752951579; bh=zBfaiZsRaBX1mtg6/PbLsiFZPxTKFf0eWcU8N5i1va8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WspLDH8SSU2tVrQQEDz7/WV1OTAC6k6rAZzUXRjWnsjUoMRSuDQmN3PRXdfYphU/g
-	 XBXo93oOlq3D7gFkYdEItvu6ms3OgJC7qga5hcU7wKLQPMJyoQ14mMBKYJViFPHJbo
-	 rHPpk1xnDTuvD79bBVgD+UHtrniu/hAdXOZ24Nyk=
-Received: from grml.local.home.ionic.de (unknown [IPv6:2a00:11:fb41:7a00:21b:21ff:fe5e:dddc])
-	by mail.ionic.de (Postfix) with ESMTPSA id 322C3148A06A;
-	Sat, 19 Jul 2025 20:59:39 +0200 (CEST)
-From: Mihai Moldovan <ionic@ionic.de>
-To: linux-arm-msm@vger.kernel.org,
-	Manivannan Sadhasivam <mani@kernel.org>
-Cc: Denis Kenzior <denkenz@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v2 10/10] net: qrtr: mhi: Report endpoint id in sysfs
-Date: Sat, 19 Jul 2025 20:59:30 +0200
-Message-ID: <1a49dec96d5c2c5258c9df935d8c9381793d4ddd.1752947108.git.ionic@ionic.de>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <cover.1752947108.git.ionic@ionic.de>
-References: <cover.1752947108.git.ionic@ionic.de>
+	s=arc-20240116; t=1752955207; c=relaxed/simple;
+	bh=trKgn9wFZ9o39XTS77tPA/b9wbDJPWjgDVHnBcgVX6g=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=f7BU8LI2587jdPWN+iFuogdogxSoEOj0F2x8UyTdsYf+V7hanL/Z/kOB5MheJWG2B+CbxiIxGWPNghxYQMpHPC4AdslAEgjRPSxdOKQd+zkaFKzvnI04IXu9HkInEzXDb9CND1viDBqYlKbfcB9pv7GnMaYy/AgjPORwvjkdMJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=DqffrOIH; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=KVNZ9gc3; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1752955203;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=trKgn9wFZ9o39XTS77tPA/b9wbDJPWjgDVHnBcgVX6g=;
+	b=DqffrOIH5d/T0eaNuzXb24+AOr6tqWAIFA1kNE5nbjesD9vJWq+g2pJ50/9NGQojFURx7Y
+	dtM+HbJ3pSjcOHaSKKZCzc87PuLxb+Bwk1veq/8hnxAgDTfu5KCIuCEMj649nLLhRPcnsS
+	4KbRJuUoWSpOfb6mZ78lMQq0iGmn2fcLcgy2vFsQLxry8TDs7DYJJwbnNYG9fQwrLwOk9Q
+	eS+EYRmT5MFYMDMlFwXj36R/sP11IWD6jSqmDLmuv1kDhHMRq4wOcSUKdC+n74gEl3oI3c
+	lWDnXL5Y2FGlOfHsaInhM5dfgOP9rd/esONpN2k6owDSNtu07zJ45LzsskURww==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1752955203;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=trKgn9wFZ9o39XTS77tPA/b9wbDJPWjgDVHnBcgVX6g=;
+	b=KVNZ9gc3y71iyqP9P6vcq8GnI2oZ677aSw+q5/n7M22IkOMMcWklu5t8dmY5hLtCmAfvZi
+	xLKrLtM0/JO9FWDg==
+To: Markus =?utf-8?Q?Bl=C3=B6chl?= <markus@blochl.de>, Andrew Lunn
+ <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>
+Cc: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>, Richard Cochran
+ <richardcochran@gmail.com>, John Stultz <jstultz@google.com>,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ markus.bloechl@ipetronik.com, Markus =?utf-8?Q?Bl=C3=B6chl?=
+ <markus@blochl.de>
+Subject: Re: [PATCH net] net: stmmac: intel: populate entire
+ system_counterval_t in get_time_fn() callback
+In-Reply-To: <20250713-stmmac_crossts-v1-1-31bfe051b5cb@blochl.de>
+References: <20250713-stmmac_crossts-v1-1-31bfe051b5cb@blochl.de>
+Date: Sat, 19 Jul 2025 22:00:02 +0200
+Message-ID: <87o6tguf25.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Denis Kenzior <denkenz@gmail.com>
+On Sun, Jul 13 2025 at 22:21, Markus Bl=C3=B6chl wrote:
+> get_time_fn() callback implementations are expected to fill out the
+> entire system_counterval_t struct as it may be initially uninitialized.
+>
+> This broke with the removal of convert_art_to_tsc() helper functions
+> which left use_nsecs uninitialized.
 
-Add a read-only 'endpoint' sysfs entry that contains the qrtr endpoint
-identifier assigned to this mhi device.  Can be used to direct / receive
-qrtr traffic only from a particular MHI device.
-
-Signed-off-by: Denis Kenzior <denkenz@gmail.com>
-Reviewed-by: Marcel Holtmann <marcel@holtmann.org>
-Reviewed-by: Andy Gross <agross@kernel.org>
-Signed-off-by: Mihai Moldovan <ionic@ionic.de>
-
----
-
-v2:
-  - rebase against current master
-  - use %u formatter instead of %d when printing endpoint id (u32) as
-    per review comment
----
- net/qrtr/mhi.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
-
-diff --git a/net/qrtr/mhi.c b/net/qrtr/mhi.c
-index 69f53625a049..9a23c888e234 100644
---- a/net/qrtr/mhi.c
-+++ b/net/qrtr/mhi.c
-@@ -72,6 +72,16 @@ static int qcom_mhi_qrtr_send(struct qrtr_endpoint *ep, struct sk_buff *skb)
- 	return rc;
- }
- 
-+static ssize_t endpoint_show(struct device *dev,
-+			     struct device_attribute *attr, char *buf)
-+{
-+	struct qrtr_mhi_dev *qdev = dev_get_drvdata(dev);
-+
-+	return sprintf(buf, "%u\n", qdev->ep.id);
-+}
-+
-+static DEVICE_ATTR_RO(endpoint);
-+
- static int qcom_mhi_qrtr_probe(struct mhi_device *mhi_dev,
- 			       const struct mhi_device_id *id)
- {
-@@ -91,6 +101,9 @@ static int qcom_mhi_qrtr_probe(struct mhi_device *mhi_dev,
- 	if (rc)
- 		return rc;
- 
-+	if (device_create_file(&mhi_dev->dev, &dev_attr_endpoint) < 0)
-+		dev_err(qdev->dev, "Failed to create endpoint attribute\n");
-+
- 	/* start channels */
- 	rc = mhi_prepare_for_transfer_autoqueue(mhi_dev);
- 	if (rc) {
-@@ -107,6 +120,7 @@ static void qcom_mhi_qrtr_remove(struct mhi_device *mhi_dev)
- {
- 	struct qrtr_mhi_dev *qdev = dev_get_drvdata(&mhi_dev->dev);
- 
-+	device_remove_file(&mhi_dev->dev, &dev_attr_endpoint);
- 	qrtr_endpoint_unregister(&qdev->ep);
- 	mhi_unprepare_from_transfer(mhi_dev);
- 	dev_set_drvdata(&mhi_dev->dev, NULL);
--- 
-2.50.0
+Sigh. As I explained in the other thread, the proper fix is to
+zero initialize the data structure at the call site and fix this whole
+class of issues in one go.
 
 
