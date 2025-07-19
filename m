@@ -1,116 +1,179 @@
-Return-Path: <netdev+bounces-208333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02F7CB0B0EB
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 18:31:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F2EEB0B10D
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 19:19:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 917B93B5D42
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 16:31:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37BFBAA27B0
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 17:19:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03BED15530C;
-	Sat, 19 Jul 2025 16:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9CE521B9E7;
+	Sat, 19 Jul 2025 17:19:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CujU4ZOP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lsy82JPl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DA1C3FE4
-	for <netdev@vger.kernel.org>; Sat, 19 Jul 2025 16:31:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70A4D42AA4;
+	Sat, 19 Jul 2025 17:19:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752942689; cv=none; b=lcCMxnk7WLzd6C1GnaEehqhEM6eZjVG3/Uz3fJApBBBumpzp6LYjc+k1AhTqKljlYROQI386Mn1rzVwlFA/28rUH4HwWMuasBx55UGjdmlQQxRPJwU9veSPDGRguHmEdYbyW8Bq4FGZk9xbeUOJGvyjSjb6HkgboUnjzsrMUZ/w=
+	t=1752945568; cv=none; b=LJxzw/Z2Fv3ARDtbm5nBye3EWJHCtFFSrm5r1yu4U5RpTAZuJfHY7RUzOvq4nzL+FI7Wmq2QfTYvAjGWc2PPUbTXMuHsWy3/OTG9+b3uUAswZ4lNPnMqQ9nLmD5kNDfO4Vjl6Z3DemDnxLFrBA0gZjG2Hlsf0ySjIf3vkxAHUCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752942689; c=relaxed/simple;
-	bh=IrYvn5biWXIdLFpxgF8Yf/zACDnE28NXSPwyCg/Cep4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=g9HKlwWoMX/6IMnBGcR5h+BDHLj7qyQuJB5JAg1didLCtY8CoD81eGJvuOIxwGS1FX835+zYe6T3M5mmYgH/X58Kf5Iomx76Y3jPtI+y/8FD06h7bV5YxoAH3HwUtKlLDOCuPjQZcJzLHUDQlVw/nIXXmFMv2Y76WVgDEt2gPoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CujU4ZOP; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5562838ce68so2997382e87.2
-        for <netdev@vger.kernel.org>; Sat, 19 Jul 2025 09:31:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752942686; x=1753547486; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rf7QGnPxn5F918fDzWsKmHGlaa63Dr/AbfLbHJLeBzw=;
-        b=CujU4ZOPQ8USuT6wFBJLugeY1NmUE5+aIRmuENNbjb2eHszEEwvRBoQEzMDia6igBn
-         EqEho9IHY80/wqycSn2NZSGdaU2L+eyNt0PWS9Etth8hnE/nC/XBCkHQxWUqvh9SmDbb
-         vbwaTRSw2gyZi15mI6WhZukSfh1UYvMzSc8YL0V9mGvi2DbxxmDk2jM3nQmH4l9Zrngs
-         SxC/+T/NNBu4hc6XVjRm3+oqUj6YpH4GbxnNpY0ZWK5z4GnF0o0pUmE8VkjDX07Yexo/
-         87m27Ck4sdaKZoCZZxdQGn/3scX8o7YVkN9FQBfTlsa/xxCjZxIxFnph8CpxCJUSYskS
-         43lw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752942686; x=1753547486;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rf7QGnPxn5F918fDzWsKmHGlaa63Dr/AbfLbHJLeBzw=;
-        b=YlmCwK/AnDTxLVjF4eU8DxU8dLAuorTBAnMl3CILCjE5KuMdPU69gXQzLDmXn91IvL
-         mk0Kvg365EgH8MsdUrJvNTIxRRpvvS/RWsXpkBiRhCwWRvoWxDu+I0WmXFlxUFQgmJ1g
-         Vkvil2VnMdyqxUsTToEdLXzLMchbBGTrtQsFowLMI6L6B5yxY6eucNCHeWdQBx1qQPXq
-         Teol7N8WQ0ZZp1lj2yEXPS2h+la2EcT1iQFzbkPio6kPWHcyhcz1ladec4sTDWKV901S
-         o2IPTCj8pOM3eVAxHDTMgA9S97w9KmeCKbnv7oc6ZQ3UlviGgTDK92VThSy4C0j9eo8x
-         KdGA==
-X-Gm-Message-State: AOJu0YzTll9l60/UkZe4RcXyidn9mrhUnQbLqNK5AoquwPuqRITpad0d
-	RFxrVpeIGbFQxs4VcGo4aUSGrOtxL0BTF/tSZ4Q2u7qcSMJMtyBuHMgj/g3q/pmify4=
-X-Gm-Gg: ASbGncuebZ+BcI8Rj9Qv/mKL6/2AiCN+ZUFkScUdeB5yGcQc4+IxHg6ty2MrwchwrgS
-	qpZDMCtdm8E2zYjS2UzOxV3HwbG9FrqHvozRWy2DLc89wH5okNlxPJ3NbXlleOIb0ut/Nbvc+tu
-	7nOcjXRCBQCi08eTQC1lIbJDKY33ULqOH9W5h2RPv0wG43XA7prvQQr8oxUbm+s9aR+PTYa9gnO
-	WgCUji2GHaG+uDGyl+RM3l2K1qSTKPkGKfqrtkSSrD+AYVY49LfItwruCldiJaVhj1oiKkiwYOR
-	pUeUapCXCVjZpI56Ayp9h6gnjsR/LnkGpjPoJMh+Na2K1fZKBA/7tQAfwmgvVWCXTUWpbvIH/Yo
-	ci22HAX/Iq8HC8PDCQ8Z5lheUN2dXtPel1iNJiHhQGP390n2VFYG8qapbGBN4B44JRI1JFSBJ
-X-Google-Smtp-Source: AGHT+IGHf1cTbYGyApesO24EzHyHrEEzEovpdjDDqLYhVduLJcr/Zi1fJBbVbhaziKA7vuBb3pkHyg==
-X-Received: by 2002:a05:6512:39c7:b0:553:2868:635e with SMTP id 2adb3069b0e04-55a23f03c38mr3740584e87.23.1752942685751;
-        Sat, 19 Jul 2025 09:31:25 -0700 (PDT)
-Received: from lnb0tqzjk.rasu.local (109-252-120-31.nat.spd-mgts.ru. [109.252.120.31])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-55a31daf9ddsm766384e87.222.2025.07.19.09.31.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Jul 2025 09:31:25 -0700 (PDT)
-From: Anton Moryakov <ant.v.moryakov@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Anton Moryakov <ant.v.moryakov@gmail.com>
-Subject: [PATCH iproute2-next] misc: ss.c: fix logical error in main function
-Date: Sat, 19 Jul 2025 19:31:22 +0300
-Message-Id: <20250719163122.51904-1-ant.v.moryakov@gmail.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1752945568; c=relaxed/simple;
+	bh=e5rgUdJo2dK/e+OmbOI/EEyI0Fxk0Q4aGrlatS6p2ok=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dUq94xyyaTOjkCdTvI6lfUxw7cnrA1ZPPUHrV8F77r1C+6/gh2jm15fK66ptwrqXa4FeMu9Ied3+SJIF+c+6fTOQ8Oqapb8ECW9qbvnwWoD5DRAxVvimUcD9doOZC7pF7yD+M9m6NkwR/TOEQeoN9s7gZeZKlpK7IiLtAXUytoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lsy82JPl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37CD5C4CEE3;
+	Sat, 19 Jul 2025 17:19:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752945567;
+	bh=e5rgUdJo2dK/e+OmbOI/EEyI0Fxk0Q4aGrlatS6p2ok=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lsy82JPlf8Wai9HWzJKO1NQn6YwlCKng9fQBt6r64/v8Qng6dDOKMM8omkS9D1cdr
+	 Py0yF3kh5CrW3WVJgfnUSyhqsWJCoGJdQT3hJNuHDkdPigYPhkyMESUQEjwiJ0IX8i
+	 U0pRV5dVS27OunE/EaSL/0fsviyeKdudIulg/C+CWeFmkg0gfO0TKH72VEoUcgNzzc
+	 UD/XM2u9HtVQ4mCBrw54k1zW390nZAX0zRjUaqqRNs0vAtnNOzKtKFT2tpscjre1q7
+	 vTGGVzkQeYpi1cfjS0Vz3wg6HqkdbchW2BDuP4pX5Vm8eA+Xm7TaduV+GFiEu32x8J
+	 Chxuw66Q8E03Q==
+Date: Sat, 19 Jul 2025 18:19:15 +0100
+From: Jonathan Cameron <jic23@kernel.org>
+To: Yassine Oudjana <y.oudjana@protonmail.com>
+Cc: Yassine Oudjana via B4 Relay
+ <devnull+y.oudjana.protonmail.com@kernel.org>, Manivannan Sadhasivam
+ <mani@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Bjorn Andersson
+ <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, Masahiro
+ Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
+ Nicolas Schier <nicolas.schier@linux.dev>, David Lechner
+ <dlechner@baylibre.com>, Nuno =?UTF-8?B?U8Oh?= <nuno.sa@analog.com>, Andy
+ Shevchenko <andy@kernel.org>, Luca Weiss <luca@lucaweiss.eu>,
+ linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+ linux-iio@vger.kernel.org
+Subject: Re: [PATCH v2 4/4] iio: Add Qualcomm Sensor Manager driver
+Message-ID: <20250719181915.499d5c4d@jic23-huawei>
+In-Reply-To: <nSoiRmruHeLNNxpRCxJ5M5aQ-Vx7lE3U9wtVwYh6MVZHr0pkk9Cwl5ggSN3xAZ09zA8bk_RJS6mRAgxWkCIrNGogaElh4x8VKaQPO_Rzrqs=@protonmail.com>
+References: <20250710-qcom-smgr-v2-0-f6e198b7aa8e@protonmail.com>
+	<20250710-qcom-smgr-v2-4-f6e198b7aa8e@protonmail.com>
+	<20250713164033.3488db3c@jic23-huawei>
+	<nSoiRmruHeLNNxpRCxJ5M5aQ-Vx7lE3U9wtVwYh6MVZHr0pkk9Cwl5ggSN3xAZ09zA8bk_RJS6mRAgxWkCIrNGogaElh4x8VKaQPO_Rzrqs=@protonmail.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-In the line if (!dump_tcpdiag) { there was a logical error 
-in checking the descriptor, which the static analyzer complained 
-about (this action is always false)
+> > > +static int qcom_smgr_iio_read_raw(struct iio_dev *iio_dev,
+> > > + struct iio_chan_spec const *chan, int *val,
+> > > + int *val2, long mask)
+> > > +{
+> > > + struct qcom_smgr_iio_priv *priv = iio_priv(iio_dev);
+> > > +
+> > > + switch (mask) {  
+> > 
+> > 
+> > No sysfs access at all to data is unusual but not completely unheard of.  
+> 
+> There is no (known) method to request a single reading from the QMI
+> service. The only known way to get sensor data is to send a buffering
+> request to initiate sending data, then the remoteproc sends QMI
+> indications at a regular interval carrying sensor data which I am
+> pushing to the IIO buffers. The only way to implement direct sysfs
+> access would be to store the last received value somewhere then pass
+> it to sysfs when requested. This will also require enabling buffering
+> if disabled at the time of reading, then waiting until new data is
+> received. I didn't like this solution so I skipped direct sysfs access
+> altogether. Buffer access is enough for the current use case with
+> iio-sensor-proxy in userspace.
 
-fixed by replacing !dump_tcpdiag with !dump_fp
+This is absolutely fine.   I have mulled in the past implementing core
+code to deal with cases where we are in buffered mode but want to still
+provide sysfs access.  That applies for cases like ADCs where a couple
+of channels are used for a touchscreen but where there is a hardware
+restriction on accessing other channels on a oneshot basis whilst streaming
+data on the others.  Maybe one day we'll have that support and it will
+also help here, but it's not a high priority thing.
 
-Reported-by: SVACE static analyzer
-Signed-off-by: Anton Moryakov <ant.v.moryakov@gmail.com>
----
- misc/ss.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> > > +static const struct iio_chan_spec qcom_smgr_pressure_iio_channels[] = {
+> > > + {
+> > > + .type = IIO_PRESSURE,
+> > > + .scan_index = 0,
+> > > + .scan_type = {
+> > > + .sign = 'u',
+> > > + .realbits = 32,
+> > > + .storagebits = 32,
+> > > + .endianness = IIO_LE,
+> > > + },
+> > > + .info_mask_separate = BIT(IIO_CHAN_INFO_SCALE) |
+> > > + BIT(IIO_CHAN_INFO_SAMP_FREQ)
+> > > + },
+> > > + {
+> > > + .type = IIO_TIMESTAMP,
+> > > + .channel = -1,
+> > > + .scan_index = 3,  
+> > 
+> > 
+> > Why 3?  
+> 
+> Because the same struct is used for this and 3-axis sensors, so we should
+> skip the unused values.
 
-diff --git a/misc/ss.c b/misc/ss.c
-index de02fccb..20d0766d 100644
---- a/misc/ss.c
-+++ b/misc/ss.c
-@@ -6228,7 +6228,7 @@ int main(int argc, char *argv[])
- 		}
- 		if (dump_tcpdiag[0] != '-') {
- 			dump_fp = fopen(dump_tcpdiag, "w");
--			if (!dump_tcpdiag) {
-+			if (!dump_fp) {
- 				perror("fopen dump file");
- 				exit(-1);
- 			}
--- 
-2.39.2
+I'm not sure how that is related to this value.  These are effectively monotonic
+but shouldn't be used to index anything driver side.  So there is nothing
+wrong with the value 3, it's just a bit odd.
 
+> 
+> >   
+> > > + .scan_type = {
+> > > + .sign = 'u',
+> > > + .realbits = 32,  
+> > 
+> > 
+> > If it's realbits 32 and no shift, why not store it in a 32 bit value?
+> > I assume this is a hardware provided timestamp rather than typical software
+> > filled in one? Anyhow, I'm not immediately spotting it being used yet
+> > so for now perhaps best to drop the channel descriptions.  
+> 
+> The hardware (or firmware rather) passes an unsigned 32-bit timestamp
+> value in a 64-bit QMI field. I was previously passing it as-is to IIO
+> but now since I introduced a new struct I can make it 32-bit storagebits.
+> 
+> But below you said s64 for timestamp so which is it going to be?
+
+I wasn't sure if it was a software or hardware timestamp. Given it's coming
+from the QMI thing it's 'hardware' so 32 bit is correct here.
+
+> 
+> > > + {
+> > > + .service = SNS_SMGR_QMI_SVC_ID,
+> > > + / Found on MSM8996 and SDM660 */
+> > > + .instance = QRTR_INSTANCE_CONST(1, 50)
+> > > + },
+> > > + { },  
+> > 
+> > 
+> > No comma on a terminating entry like this.  
+> 
+> Ok. Gotta keep track of all the conventions used in different subsystems.
+I'm curious - have you ever had anyone request the comma?
+
+I know some don't care, but it seems like an odd thing to insist on.
+
+> 
+> >   
+> > > +};
+> > > +MODULE_DEVICE_TABLE(qrtr, qcom_smgr_qrtr_match);  
+
+Jonathan
 
