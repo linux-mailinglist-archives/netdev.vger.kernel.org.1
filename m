@@ -1,124 +1,119 @@
-Return-Path: <netdev+bounces-208331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D88BDB0B0A1
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 17:32:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6758CB0B0C8
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 17:57:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84B331AA2197
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 15:33:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A6F418960EE
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 15:57:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1CA96EB79;
-	Sat, 19 Jul 2025 15:32:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CA3E1E0DCB;
+	Sat, 19 Jul 2025 15:57:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="e0N9W+k1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DA59yGsc"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13B8A881E;
-	Sat, 19 Jul 2025 15:32:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D77A1862A
+	for <netdev@vger.kernel.org>; Sat, 19 Jul 2025 15:57:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752939167; cv=none; b=GPky4OqIrUSUYhJzAGg/GJ6lbuRELuOO+sibyfZOm+AM5k3ylgAqxFFzY6QhKGoEP48XCNOnEBJa3AknAwzVXwyAQE5yf6amrrXImkJyp1t46vZ8H0WDGZvt7gKV1ArxhTTWuG2iKswvHC5L1AYtfBnxJKuqIwdXTMJ7H5UvYCk=
+	t=1752940634; cv=none; b=fdFjPArlZZhUccuWT6ylmYdRcWPLstq9gdllG/9kyA9OhKsWIgkFedXHtnDRLlpgPzALDSdWUozU1RN1E3WoOzsRyZZxg+2W77fbORAeehByHkclzZYs+6XEKyQhsWjWLcMt78a5uKoo2PLIDb29F1t6LYl4UNEmD9YTrJCrw/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752939167; c=relaxed/simple;
-	bh=NowXulcDyhLjvzO8P4ocT6rsCzUOJjJShXip+oT1o80=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EFLj9TWufCLAZ/OS+vQfU680XN5vDse6gPSW5Vz10vGsQ9h2daSvQYKZer4beV4/vRMOF7sVCWcVyi2/03HwIj6ZIXq19SUorsccJazFxbdYdx0NKYo5/nT/Kf9bp+EY0vCbiiDRPOFJ0YreFUFz/BsammpKcBmDEs8fJJDNcxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=e0N9W+k1; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=MtfWON3kDQoM6dS1kLPkqz9QkAisiUnLOBjGND3FEJQ=; b=e0N9W+k1h0aXygjkBeAS61wQng
-	4ZhrHsopcFkTMkSASynwneiTcl/SiF1DQ0ytKlKTcl4hb3C+gmAjQVl5L6jA1rGiaNdg4Le2w7nBC
-	eWFNg9um1iAXx022j4iJvZarPMYTEF9OOoaYPNWd9C2WMHwNPjz5IwgO3mgN898XLmpuhTbl2QOlH
-	JFLHqz4TUC5ES3iBriyfohZncysqCudh/4Q/Gr+04bvhd2HnYZJ7jn27eLdtBQtKNVB7TCs6TwYZ3
-	s0QJNE+kZo90mPB9s7peNz7CSxRvCDgMQdRUDzaPEpdM1xCyEuQqcyyNAG0AyIZMwlNdLExvKNwsJ
-	eyrt8MCA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36746)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1ud9YE-0004TM-1q;
-	Sat, 19 Jul 2025 16:32:38 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1ud9YB-0004HL-34;
-	Sat, 19 Jul 2025 16:32:35 +0100
-Date: Sat, 19 Jul 2025 16:32:35 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Abid Ali <dev.nuvorolabs@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: phy: Fix premature resume by a PHY driver
-Message-ID: <aHu6kzOpaoDFR8BM@shell.armlinux.org.uk>
-References: <aHtNxLODmEHRVfdn@shell.armlinux.org.uk>
- <20250719113452.7701-1-dev.nuvorolabs@gmail.com>
+	s=arc-20240116; t=1752940634; c=relaxed/simple;
+	bh=8ZmHTMzdzJWW8l//MP5bYP5ZTsGv0sKZSp0fif8BxYE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GlXYoBg541YVYeTc6IlheusR5Qbk0KII60FqlEhIJuA4k4vPUrpy9SQErrgjI7dxhZmGgW/jyy+oc0seQx8H84gigzLJnesLi18/YdP16Mr3koNTwzfz0PhHz3hcllJA8AXoxIbHQg0JQzv94/EpBDI/B7B3bAbthF/cAUg8CTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DA59yGsc; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-553b16a0e38so2730566e87.1
+        for <netdev@vger.kernel.org>; Sat, 19 Jul 2025 08:57:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752940630; x=1753545430; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YabWw2GQsU48bBEwQ0juEK8dQ1heIt75lW1SGo1qck0=;
+        b=DA59yGscbA41hIDyGi9eXzuUTv1lFtU4LM7YslJokgrShrqhFDIFHSEtWBJByOgrYr
+         rQ1ZlDWFOW/0z14oc6SfmXcPLBovegh4B3Mrmg/M88s28QK7vupikETvMpywEdfZz7c0
+         Dmvp37r3qpeOZ2C4WQNq9bFcLqKJa0liB6rku0pGPEKbJR7BB24X+FLpILsYvCpnCUyW
+         zmX+IC1wSbe/pyy2/ykKKTZqrMNQ3JMhKVJfZmeYkvOJG4eHWET4kAlbStXm3xnWEw2P
+         AYke9Ax0cOY14KtqwrXRSAIPYJxgIXEjC0K6D678vRAgmJDGB5Bf8QYHvgTtopT6tGXW
+         xTnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752940630; x=1753545430;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YabWw2GQsU48bBEwQ0juEK8dQ1heIt75lW1SGo1qck0=;
+        b=SunlTG5ayt5FLLIhVFkawdNLy6n1pOUWyLgeMwbcdKz4tS5Mrj2Bvxz9mq70Z4oU/0
+         XXDcBZxCyIYv6JgRdqYcSI6chSbQqum+fbW1g4AJtCeZNugJfcxzjNbo8Ia0D2e7kuWn
+         p0kYRRP7mL1FR0mKHfWA2b6dhF2SWuE4C2Fg1E3kv7mCM4GePaeeh3Cxexytv6qvlifQ
+         fIY28wsnrmKNvaQatOzcmkrNp0l8MbGynod0zriGsEz8riYvZK7eFLOFWKrfZWttKHYi
+         R/OUBXjpuI5FZYMU7pJq167xRV5KxbfiWn/ojdWpHwCiS+PuhHHQCeOMasHiBgP452We
+         8+aQ==
+X-Gm-Message-State: AOJu0Yz4nlQvBgqEPOY5pxAaYzdB/vNY5gCA5LB//cak8QBjw5IZnR+r
+	S7a34K5pkm/kQg8ygEOPRMEgVaS+x3b9yw3czsUO1PYm9atd66wjVgHfq6h0PkCYGpA=
+X-Gm-Gg: ASbGnctRSyxr2JNCFUTOvE/ZCz959TKC4/C5uhxWkNi9Lb98YsCvO/NPytH8rP0Cuo0
+	kQPYD38zigQdW86TJUMz36Ewb1/qflm6M5agXAm84K8JFcNi/r7acx9BFKDwZj9H6fY2HSm5a3F
+	f0s5GzwKc88uTfDpBTS42HDM9uHTETfGor7VwyZIGt/4lqy0tm79dIFqdN0fpK66Yt5wq4udY8L
+	ka6dPUr3OvKR6MfMPhF6pyZJ+5rwwo8Y7iQdLspKGauHs4z/pW8OBiR1w8ZXRRdVwIoYpbcPpdq
+	VRYgAhov5cT4nQngfrBoUsS7Qa8tuzBKQ3ETDV3N8lLqZXIPR17rr5PqxskIBI9tSt+yw/eKDpn
+	MNjKvuWlyMwqE4YEHtwECdVIM9cYjwsppShvZKg6THqFI+2VeNr22MO8CQ+Tm2DOmq/HKkh1H
+X-Google-Smtp-Source: AGHT+IFXiefnqbtNzFHbvAQFYU7+F0PJVMZMLWD26EFFDuzsR9eohOdAab1iIOY+suuIcWSKSipAJg==
+X-Received: by 2002:a05:6512:68a:b0:553:390a:e1e3 with SMTP id 2adb3069b0e04-55a31897a91mr1590445e87.44.1752940629933;
+        Sat, 19 Jul 2025 08:57:09 -0700 (PDT)
+Received: from lnb0tqzjk.rasu.local (109-252-120-31.nat.spd-mgts.ru. [109.252.120.31])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-55a31da2c8csm756348e87.184.2025.07.19.08.57.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 19 Jul 2025 08:57:09 -0700 (PDT)
+From: Anton Moryakov <ant.v.moryakov@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Anton Moryakov <ant.v.moryakov@gmail.com>
+Subject: [PATCH iproute2-next] ip: ipmaddr.c: Fix possible integer underflow in read_igmp()
+Date: Sat, 19 Jul 2025 18:57:05 +0300
+Message-Id: <20250719155705.44929-1-ant.v.moryakov@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250719113452.7701-1-dev.nuvorolabs@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Sat, Jul 19, 2025 at 11:34:50AM +0000, Abid Ali wrote:
-> The PHY we have loses power when the kernel PM goes to suspend and we
-> need have a hardware reset upon its bootup in resume.
+Static analyzer pointed out a potential error:
 
-Other PHY drivers are fine with this.
+	Possible integer underflow: left operand is tainted. An integer underflow 
+	may occur due to arithmetic operation (unsigned subtraction) between variable 
+	'len' and value '1', when 'len' is tainted { [0, 18446744073709551615] }
 
-> As an unintentional consequence this ended with 2 additional
-> resets (reset-delay-us in dts + 2 PHY resume) at boot->interface-UP.
+The fix adds a check for 'len == 0' before accessing the last character of
+the name, and skips the current line in such cases to avoid the underflow.
 
-Presumably, the resets occur because your PHY driver (which phy driver,
-and are the patches for this merged?) is causing the hardware reset to
-occur?
+Reported-by: SVACE static analyzer
+Signed-off-by: Anton Moryakov <ant.v.moryakov@gmail.com>
+---
+ ip/ipmaddr.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> In the end the "phydev->state" in the driver`s resume callback was used to
-> prevent it and checking further, it was evident that there were 2
-> intentional calls for phy_resume from .ndo_open which didnt look obvious.
-> 
-> This particular scenario was not the point of the commit but rather
-> having some protection for phy_resume but I guess its not possible.
-> To keep it simple, these would be my present understanding.
-> 
-> 1. Should the PHY driver be able handle consecutive resume callbacks?
-> a. yes. It would have to be taken care in the driver.
-
-Correct, but I think we need full details.
-
-> 2. Why does phy_resume exec twice in .ndo_open with PHYLINK API?
-> a. can happen but still dont have clarity on why .ndo_open does this.
-
-Nothing to do with phylink. Exactly the same would happen with drivers
-that use the phylib API, attaching the PHY in .ndo_open and then
-calling phy_start(). Phylink is just a wrapper around these.
-
-The problem I have with the idea of changing the behaviour in core
-code is that we can't test every driver that is making use of phylib
-(whether directly or via phylink.) It would be a monumental task to
-do that level of testing.
-
-So, if there's another clean way to solve the issue, I would much
-rather that approach was taken.
-
-
+diff --git a/ip/ipmaddr.c b/ip/ipmaddr.c
+index 2418b303..2feb916a 100644
+--- a/ip/ipmaddr.c
++++ b/ip/ipmaddr.c
+@@ -150,6 +150,8 @@ static void read_igmp(struct ma_info **result_p)
+ 
+ 			sscanf(buf, "%d%s", &m.index, m.name);
+ 			len = strlen(m.name);
++			if(len == 0)
++				continue;
+ 			if (m.name[len - 1] == ':')
+ 				m.name[len - 1] = '\0';
+ 			continue;
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.39.2
+
 
