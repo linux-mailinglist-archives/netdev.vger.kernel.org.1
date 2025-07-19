@@ -1,85 +1,102 @@
-Return-Path: <netdev+bounces-208280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12E4EB0ACBF
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 02:18:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDE9DB0ACC2
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 02:19:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51456585C7C
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 00:18:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B6D43BD24D
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 00:19:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18B28BA45;
-	Sat, 19 Jul 2025 00:18:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAD8F9461;
+	Sat, 19 Jul 2025 00:19:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="brBANwRe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gaW/S/Z1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D42482110;
-	Sat, 19 Jul 2025 00:18:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 802AC10957;
+	Sat, 19 Jul 2025 00:19:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752884324; cv=none; b=AmQHQQKYhqFh8agQBvYW268ouT2tCYirKIzEj7uDuTuDcJ+B7ubCfWAPSUxwHXDmo+TP3Ty2BT047I2Hn48/zngsYH1sW7+HLMOGl+V+QRUPXqf9LDjfF5Qxp9XEcbGWjPr19hrNXm9LYiIskpaJyyoQkGy+bS8qTUhs+dZ4aRY=
+	t=1752884393; cv=none; b=aUW7eF9QvcJLeflqfVlBB/XZONZ07K/EL5gnTCVLoFB7glj+OhB84tBneRlCtlM9uoXBK3Trchk7dIWeYY36JKqXPVUyajeFnIPkfqb5u8+DSVMPjk3Vv6kpwH/FtxLId4ubUp/zhBfBewebRhyqmWk3Z07wML6DUwwSn2XTRb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752884324; c=relaxed/simple;
-	bh=i8kfI0t8YXJOh7Nta4MzjlKHughkKRcvCBx/fiPnVeo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gf7jVPwSAL1oL2Gnft9AuQL7JCgu0VDjwP7jtERTppWXUu7NtbBKjBFm6MR63Rq7DOz6E1KjKFAjIr3TnJ0suQLAaiz1Z9J+wX/QtwzVopcBpppUe4ZrVnx3Fu+BFNFwvCbgzIqkGkyjM7FTt0/zfcITnZmdpN3xqgk6iashVa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=brBANwRe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77940C4CEEB;
-	Sat, 19 Jul 2025 00:18:42 +0000 (UTC)
+	s=arc-20240116; t=1752884393; c=relaxed/simple;
+	bh=E+17LaBUs6OjQnYqc0HJB1Ya5gyH9Km7O9Y5EqWdP40=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=L2zGQ2EK4puVfECcgbJtct9ms7sTStp6+JKm4ffFOcYjKNjM8t1n9E7P5dk8z7Z7kvwfuxCpY+otbV0MSyqj9DqEFOKsTg5+lXv6NrvZv4E6YnPNi0mPQeE8JjE1G+vRzQsfPlkvsmhYO8Q8381oSWJT895wxxjM4tuJiG0BA+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gaW/S/Z1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E88EC4CEEB;
+	Sat, 19 Jul 2025 00:19:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752884323;
-	bh=i8kfI0t8YXJOh7Nta4MzjlKHughkKRcvCBx/fiPnVeo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=brBANwRehx9lpmB3NmOOG1AesXtgHe4kuApPMYeE2FSONLgLd5na4A6qhLMnrO9q0
-	 GxyF/JljKYZJDuLHMuj+8yIHFsdrY4psW3zaZbxCNR1ibtKBXUmelLxYh6hKMwh7HM
-	 nkfrCDhgwtyPcKfjIG/IaZJK9iXunMuwJ+GtDi4bxUIbkMb8vMKqelc6UCt55cDDmK
-	 rPiGTJHCSaelCPgMw9ypOSEWC6FMWZ/EPN1nFB57NRLXreVkVmz77Iu9BjQrgZUjos
-	 XA4T8bHp4WP4iA2l+entG9kIN3eti01D/wKFcGmQJnEXpW5/rM13CFPClMIowxPhbn
-	 DUBHlLPqDuUKg==
-Date: Fri, 18 Jul 2025 17:18:41 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
- <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Christophe
- Leroy <christophe.leroy@csgroup.eu>, Herve Codina
- <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
- Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
- <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
- mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
- devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Romain
- Gantois <romain.gantois@bootlin.com>, Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next v9 00/15] net: phy: Introduce PHY ports
- representation
-Message-ID: <20250718171841.795daa9b@kernel.org>
-In-Reply-To: <20250717073020.154010-1-maxime.chevallier@bootlin.com>
-References: <20250717073020.154010-1-maxime.chevallier@bootlin.com>
+	s=k20201202; t=1752884393;
+	bh=E+17LaBUs6OjQnYqc0HJB1Ya5gyH9Km7O9Y5EqWdP40=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=gaW/S/Z1ReBuc0AAhjOyXSItcuij0h/+/kTM4vvgynYsPciI889oJpHyT7mJQusru
+	 90HJmh6cMeXNl0Mjick7CNJAuucv96GO3u7u73ugo1L+SUhIATTZRStqb8ir5hjMYx
+	 b0/Z7MSLf+UNmEAwwjFIsz37vx4DlYMmTf6M1ujvJ68SWWXMdtMdPAGOyzSu10i+pm
+	 +FtzsCfQtOn5Kz15hEHFXqjMnPcnWJ340o1bWxwGzZZhAaEZWF83JRoCfbYhmlb2Wr
+	 Cf8px6rJ3tgTymHb3yXd3YxgLgVyZ2Sed76jq11LrFbFTYHvyADrDaekGeSNaZjypC
+	 D5owAcx4J3FQw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FAD383BA3C;
+	Sat, 19 Jul 2025 00:20:14 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2 1/3] bus: fsl-mc: Fix potential double device
+ reference
+ in fsl_mc_get_endpoint()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175288441299.2833543.14707347919961717043.git-patchwork-notify@kernel.org>
+Date: Sat, 19 Jul 2025 00:20:12 +0000
+References: <20250717022309.3339976-1-make24@iscas.ac.cn>
+In-Reply-To: <20250717022309.3339976-1-make24@iscas.ac.cn>
+To: Ma Ke <make24@iscas.ac.cn>
+Cc: ioana.ciornei@nxp.com, davem@davemloft.net, andrew+netdev@lunn.ch,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ akpm@linux-foundation.org, stable@vger.kernel.org
 
-On Thu, 17 Jul 2025 09:30:04 +0200 Maxime Chevallier wrote:
-> Here's a V9 for the phy port work, that includes some fixes from Rob's
-> reviews, by addressing a typo and the mediums item list.
+Hello:
 
-Sorry to report but this doesn't apply any more.
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 17 Jul 2025 10:23:07 +0800 you wrote:
+> The fsl_mc_get_endpoint() function may call fsl_mc_device_lookup()
+> twice, which would increment the device's reference count twice if
+> both lookups find a device. This could lead to a reference count leak.
+> 
+> Found by code review.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: 1ac210d128ef ("bus: fsl-mc: add the fsl_mc_get_endpoint function")
+> Signed-off-by: Ma Ke <make24@iscas.ac.cn>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2,1/3] bus: fsl-mc: Fix potential double device reference in fsl_mc_get_endpoint()
+    https://git.kernel.org/netdev/net/c/bddbe13d36a0
+  - [net,v2,2/3] dpaa2-eth: Fix device reference count leak in MAC endpoint handling
+    https://git.kernel.org/netdev/net/c/ee9f3a81ab08
+  - [net,v2,3/3] dpaa2-switch: Fix device reference count leak in MAC endpoint handling
+    https://git.kernel.org/netdev/net/c/96e056ffba91
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
