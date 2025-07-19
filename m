@@ -1,166 +1,124 @@
-Return-Path: <netdev+bounces-208330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61C23B0B097
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 17:17:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D88BDB0B0A1
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 17:32:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B96BC3AE677
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 15:16:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84B331AA2197
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 15:33:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 788241DE8BE;
-	Sat, 19 Jul 2025 15:17:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1CA96EB79;
+	Sat, 19 Jul 2025 15:32:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Y/EV+ckb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="e0N9W+k1"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 215DD1EB3D
-	for <netdev@vger.kernel.org>; Sat, 19 Jul 2025 15:17:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13B8A881E;
+	Sat, 19 Jul 2025 15:32:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752938228; cv=none; b=K1SCaj+umhVZd1ULt6CLrWOVCayB0SAGL7x1+xa4PaHXc4V8qcW5B5J8vOXP0JfDykoJhm5WFrLYUUWj1Tys+VQ3wYa2gY3Ap1mTIYJ0BAGv0QmCQgfCGpHA68H75bvoxgzybeEOi1erk2h/JyCmG/nRiqoL/4CSB7fkPM7bUXQ=
+	t=1752939167; cv=none; b=GPky4OqIrUSUYhJzAGg/GJ6lbuRELuOO+sibyfZOm+AM5k3ylgAqxFFzY6QhKGoEP48XCNOnEBJa3AknAwzVXwyAQE5yf6amrrXImkJyp1t46vZ8H0WDGZvt7gKV1ArxhTTWuG2iKswvHC5L1AYtfBnxJKuqIwdXTMJ7H5UvYCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752938228; c=relaxed/simple;
-	bh=IHwbvCz1zDamw2mairfQORXsN8jGBSDQs5nizcpprvk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=mQyG58i4K9bZ7nW7Bx+vm4228IAka98JyyPaN+PbcPpvO4/tutCLKv2BqmnDQLeylyXamDmqiCSVXA2AHScYric/MJCsmncFjLegaen75xvLeRcCpWVLE9Z3oIoCwe7cSmWYqbzbPO41xKYCapRSOUcPzQow3YlHkGdNbTLcIAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Y/EV+ckb; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <509add4e-5dff-4f30-b96b-488919fedb77@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1752938211;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Xk5P+fAr8LMRJWfH3D/mBbRYfZMtip1HO6juhnoIxBM=;
-	b=Y/EV+ckbbNQVvUL5aVpnV+d9009/TlvtMJ0Eln5GB5rU7Qy8/UVEdkLPOZ4LbFOdP6yrqS
-	gk5+GjlGTihHxaSG2yoIYmmAQm7BJGAvNKxlgm9cejdCBHDiUOhAevASkJu96HT+w8MKkT
-	JHxU52K+ntlrtd0xXPN+sPeWXLJ5zQc=
-Date: Sat, 19 Jul 2025 16:16:49 +0100
+	s=arc-20240116; t=1752939167; c=relaxed/simple;
+	bh=NowXulcDyhLjvzO8P4ocT6rsCzUOJjJShXip+oT1o80=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EFLj9TWufCLAZ/OS+vQfU680XN5vDse6gPSW5Vz10vGsQ9h2daSvQYKZer4beV4/vRMOF7sVCWcVyi2/03HwIj6ZIXq19SUorsccJazFxbdYdx0NKYo5/nT/Kf9bp+EY0vCbiiDRPOFJ0YreFUFz/BsammpKcBmDEs8fJJDNcxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=e0N9W+k1; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=MtfWON3kDQoM6dS1kLPkqz9QkAisiUnLOBjGND3FEJQ=; b=e0N9W+k1h0aXygjkBeAS61wQng
+	4ZhrHsopcFkTMkSASynwneiTcl/SiF1DQ0ytKlKTcl4hb3C+gmAjQVl5L6jA1rGiaNdg4Le2w7nBC
+	eWFNg9um1iAXx022j4iJvZarPMYTEF9OOoaYPNWd9C2WMHwNPjz5IwgO3mgN898XLmpuhTbl2QOlH
+	JFLHqz4TUC5ES3iBriyfohZncysqCudh/4Q/Gr+04bvhd2HnYZJ7jn27eLdtBQtKNVB7TCs6TwYZ3
+	s0QJNE+kZo90mPB9s7peNz7CSxRvCDgMQdRUDzaPEpdM1xCyEuQqcyyNAG0AyIZMwlNdLExvKNwsJ
+	eyrt8MCA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36746)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1ud9YE-0004TM-1q;
+	Sat, 19 Jul 2025 16:32:38 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1ud9YB-0004HL-34;
+	Sat, 19 Jul 2025 16:32:35 +0100
+Date: Sat, 19 Jul 2025 16:32:35 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Abid Ali <dev.nuvorolabs@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: Fix premature resume by a PHY driver
+Message-ID: <aHu6kzOpaoDFR8BM@shell.armlinux.org.uk>
+References: <aHtNxLODmEHRVfdn@shell.armlinux.org.uk>
+ <20250719113452.7701-1-dev.nuvorolabs@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RESEND PATCH net-next] amd-xgbe: Configure and retrieve
- 'tx-usecs' for Tx coalescing
-To: Vishal Badole <Vishal.Badole@amd.com>, Shyam-sundar.S-k@amd.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250719072608.4048494-1-Vishal.Badole@amd.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250719072608.4048494-1-Vishal.Badole@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250719113452.7701-1-dev.nuvorolabs@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 19.07.2025 08:26, Vishal Badole wrote:
-> Ethtool has advanced with additional configurable options, but the
-> current driver does not support tx-usecs configuration.
+On Sat, Jul 19, 2025 at 11:34:50AM +0000, Abid Ali wrote:
+> The PHY we have loses power when the kernel PM goes to suspend and we
+> need have a hardware reset upon its bootup in resume.
+
+Other PHY drivers are fine with this.
+
+> As an unintentional consequence this ended with 2 additional
+> resets (reset-delay-us in dts + 2 PHY resume) at boot->interface-UP.
+
+Presumably, the resets occur because your PHY driver (which phy driver,
+and are the patches for this merged?) is causing the hardware reset to
+occur?
+
+> In the end the "phydev->state" in the driver`s resume callback was used to
+> prevent it and checking further, it was evident that there were 2
+> intentional calls for phy_resume from .ndo_open which didnt look obvious.
 > 
-> Add support to configure and retrieve 'tx-usecs' using ethtool, which
-> specifies the wait time before servicing an interrupt for Tx coalescing.
+> This particular scenario was not the point of the commit but rather
+> having some protection for phy_resume but I guess its not possible.
+> To keep it simple, these would be my present understanding.
 > 
-> Signed-off-by: Vishal Badole <Vishal.Badole@amd.com>
-> Acked-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-> ---
->   drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c | 19 +++++++++++++++++--
->   drivers/net/ethernet/amd/xgbe/xgbe.h         |  1 +
->   2 files changed, 18 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c b/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
-> index 12395428ffe1..362f8623433a 100644
-> --- a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
-> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
-> @@ -450,6 +450,7 @@ static int xgbe_get_coalesce(struct net_device *netdev,
->   	ec->rx_coalesce_usecs = pdata->rx_usecs;
->   	ec->rx_max_coalesced_frames = pdata->rx_frames;
->   
-> +	ec->tx_coalesce_usecs = pdata->tx_usecs;
->   	ec->tx_max_coalesced_frames = pdata->tx_frames;
->   
->   	return 0;
-> @@ -463,7 +464,7 @@ static int xgbe_set_coalesce(struct net_device *netdev,
->   	struct xgbe_prv_data *pdata = netdev_priv(netdev);
->   	struct xgbe_hw_if *hw_if = &pdata->hw_if;
->   	unsigned int rx_frames, rx_riwt, rx_usecs;
-> -	unsigned int tx_frames;
-> +	unsigned int tx_frames, tx_usecs;
->   
->   	rx_riwt = hw_if->usec_to_riwt(pdata, ec->rx_coalesce_usecs);
->   	rx_usecs = ec->rx_coalesce_usecs;
-> @@ -485,9 +486,22 @@ static int xgbe_set_coalesce(struct net_device *netdev,
->   		return -EINVAL;
->   	}
->   
-> +	tx_usecs = ec->tx_coalesce_usecs;
->   	tx_frames = ec->tx_max_coalesced_frames;
->   
-> +	/* Check if both tx_usecs and tx_frames are set to 0 simultaneously */
-> +	if (!tx_usecs && !tx_frames) {
-> +		netdev_err(netdev,
-> +			   "tx_usecs and tx_frames must not be 0 together\n");
-> +		return -EINVAL;
-> +	}
-> +
->   	/* Check the bounds of values for Tx */
-> +	if (tx_usecs > XGMAC_MAX_COAL_TX_TICK) {
-> +		netdev_err(netdev, "tx-usecs is limited to %d usec\n",
-> +			   XGMAC_MAX_COAL_TX_TICK);
-> +		return -EINVAL;
-> +	}
->   	if (tx_frames > pdata->tx_desc_count) {
->   		netdev_err(netdev, "tx-frames is limited to %d frames\n",
->   			   pdata->tx_desc_count);
-> @@ -499,6 +513,7 @@ static int xgbe_set_coalesce(struct net_device *netdev,
->   	pdata->rx_frames = rx_frames;
->   	hw_if->config_rx_coalesce(pdata);
->   
-> +	pdata->tx_usecs = tx_usecs;
->   	pdata->tx_frames = tx_frames;
->   	hw_if->config_tx_coalesce(pdata);
->
+> 1. Should the PHY driver be able handle consecutive resume callbacks?
+> a. yes. It would have to be taken care in the driver.
 
-I'm not quite sure, but it looks like it never works. config_tx_coalesce()
-callback equals to xgbe_config_tx_coalesce() which is implemented as:
+Correct, but I think we need full details.
 
-static int xgbe_config_tx_coalesce(struct xgbe_prv_data *pdata)
-{
-         return 0;
-}
+> 2. Why does phy_resume exec twice in .ndo_open with PHYLINK API?
+> a. can happen but still dont have clarity on why .ndo_open does this.
 
-How is it expected to change anything from HW side?
+Nothing to do with phylink. Exactly the same would happen with drivers
+that use the phylib API, attaching the PHY in .ndo_open and then
+calling phy_start(). Phylink is just a wrapper around these.
 
-> @@ -830,7 +845,7 @@ static int xgbe_set_channels(struct net_device *netdev,
->   }
->   
->   static const struct ethtool_ops xgbe_ethtool_ops = {
-> -	.supported_coalesce_params = ETHTOOL_COALESCE_RX_USECS |
-> +	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
->   				     ETHTOOL_COALESCE_MAX_FRAMES,
->   	.get_drvinfo = xgbe_get_drvinfo,
->   	.get_msglevel = xgbe_get_msglevel,
-> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe.h b/drivers/net/ethernet/amd/xgbe/xgbe.h
-> index 42fa4f84ff01..e330ae9ea685 100755
-> --- a/drivers/net/ethernet/amd/xgbe/xgbe.h
-> +++ b/drivers/net/ethernet/amd/xgbe/xgbe.h
-> @@ -272,6 +272,7 @@
->   /* Default coalescing parameters */
->   #define XGMAC_INIT_DMA_TX_USECS		1000
->   #define XGMAC_INIT_DMA_TX_FRAMES	25
-> +#define XGMAC_MAX_COAL_TX_TICK		100000
->   
->   #define XGMAC_MAX_DMA_RIWT		0xff
->   #define XGMAC_INIT_DMA_RX_USECS		30
+The problem I have with the idea of changing the behaviour in core
+code is that we can't test every driver that is making use of phylib
+(whether directly or via phylink.) It would be a monumental task to
+do that level of testing.
 
+So, if there's another clean way to solve the issue, I would much
+rather that approach was taken.
+
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
