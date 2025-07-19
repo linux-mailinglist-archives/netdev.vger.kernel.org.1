@@ -1,95 +1,93 @@
-Return-Path: <netdev+bounces-208326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AA11B0AF9B
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 13:35:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BE36B0AFF0
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 14:41:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B16BAA0C84
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 11:34:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F26F41AA0BE5
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 12:41:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B3C22256F;
-	Sat, 19 Jul 2025 11:35:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4654F222566;
+	Sat, 19 Jul 2025 12:40:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JnMviboH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BxCigReU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com [209.85.221.65])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3CC41E7C10;
-	Sat, 19 Jul 2025 11:34:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B132179CD;
+	Sat, 19 Jul 2025 12:40:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752924900; cv=none; b=Hgzn6hdB6jJhGrRDFcl1rOCW67ZnhnPL2WHzJu6nD1d9V1QYwPYb2/t+ikY0QvSlfklZ6EFPyFueCB2OJrL4FT5qHTEEaTBZnAnl6DEw4zNftPK5fnX4fqopJ8+kLptm/khljCTrWh0tvDTTebJlp0MFz0w7HSkYK7q76J0e4yA=
+	t=1752928848; cv=none; b=oWa/63gNYBvBFeU1F8HdB98jvrAJMqfhokmeiZUHsJjcEA0jM9VVVhI/2IDOOTy8TDk0xsEACfN0purlN82LziDlpw3XvIrEpNiAY09aDbdk6z2WetngoQ8sODPUra2jh330ejzmUC0WGXRxJlPZ3ZZB3kld9w/9TunNsADGLZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752924900; c=relaxed/simple;
-	bh=pI/Wu4VJD4vdRub6/Z5Gz2RtKzMxqQmEx7I+Ec3VubU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VypRfKdtcFA4+2XXyJ1b5zrgW1k3lE7Pgnyi/nWzchpxxaODFSv9j35sK6vqSQDXpzbuP4w/N/vNqi0iBZdg+CpT9QSVRko3+zpeVvKtqgHuKGOek58g6bpmeb5w7DzGSkWoux5xZ7Vklnp0K2L8i3o9zJfdNV/AxPEpu/EcJjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JnMviboH; arc=none smtp.client-ip=209.85.221.65
+	s=arc-20240116; t=1752928848; c=relaxed/simple;
+	bh=POOKiELi+GdlAqJjsQHw6ZyuOJyr7R8My1xl6e7qJ0g=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lk7Gsk27BsbodnHil4U6C17XDJned4YmGOC8p/sdK8+EV5ARv2EaP0b2u/SI5hvkNqU/eLUImYRFcrSjTXYs/4EVPWVlA96Flwu+2ItCmPlCQar37lkG9NlJ+syih3oP9At1+TiaK7NcQKHxu4RE+vNtTFJsX3YtLa+w6GuCeSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BxCigReU; arc=none smtp.client-ip=209.85.215.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f65.google.com with SMTP id ffacd0b85a97d-3a57c8e247cso2672138f8f.1;
-        Sat, 19 Jul 2025 04:34:58 -0700 (PDT)
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-b271f3ae786so2184101a12.3;
+        Sat, 19 Jul 2025 05:40:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752924897; x=1753529697; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pI/Wu4VJD4vdRub6/Z5Gz2RtKzMxqQmEx7I+Ec3VubU=;
-        b=JnMviboHs4KILsKUgkt4Y16ZapGISts+KOKPL52ESSS8BAscV1M0/uRl4scS7S80Rt
-         hJuAhs6HE7c1Go2Wdo+WS9r1Mc77LenC1cv53JeSqBVp9RyP4omWFCtorCg5uQBVWh+R
-         yFW1BZuIJR9XW1i6Lru9v9hdRKISTWixdjlSysxEIc552mZLYwWpAbfnTFlgqvGTW2iD
-         vtCK3BNiIf1UrWelEPEFV9Rb0NSc/OIsxkPJlrhNdWqKXkrrnu3PScW31zoDsM/fJeCR
-         S0p617X2ianijhzVlP9Ps/JYSghChXzgrhIYGxGdpRy5h6oUJYP0WfnVRyQggIdzRROT
-         3qWA==
+        d=gmail.com; s=20230601; t=1752928846; x=1753533646; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BQfdgdkRBWe5TVjNpBGDG5q7sQM2q/hqv2mJrxoFnZQ=;
+        b=BxCigReUdN7dIgRQJVxIvS20L1G2XAnlpkCpFOv32hIV0hKqttOYdZAafsjuEAhoGo
+         lOmmsmT8V7iSt/VBrX5vAJYClS5NTlvsbJMmEiLK0atWHMZJ6H5OmUJ+tmLZyUuPgXuR
+         mnxrJoSmNw2ajVC1sVwxUmOWbEs4Gk7THt6L/0AdoDOmSyUM/qhB6lwiTkXJTDt5LdgE
+         MSpDOLw7MsdlUwLtWBNyKpX7Z666Apuno+J43GnSYinNczOCak1DX5T3gEsjxyE+U2ri
+         64q7AZwmccke8G1DfF4+0YinFbk1hUA4JIrYVcit34HYYO/nHNvNsBvo23qy1N3gjnau
+         WxgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752924897; x=1753529697;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pI/Wu4VJD4vdRub6/Z5Gz2RtKzMxqQmEx7I+Ec3VubU=;
-        b=k9IFuopbtGtRxa1vfH/4dhdcPDUIG62NJLPHPFCyZHfQEINjoN0nTSE9Kj5yQvQCJU
-         ntXyaDt69FS7oaBb8SSqL0KMQHLnKsVf1ChmDTrRSj5Jg5S+1m87E0b+IuDwahD8N/Qi
-         nkQU13keRN/lkub9Gvw6lBzDr5V45/dVe+tEZIlpmX2Hq6wwypscvUC+liKnmsk5ce4b
-         3lOH62hjIett3v8LakSEtbHHeELUkHWFf8Id4NJ2FvoKHudiuB92r4vWWTGxyxcqhnnz
-         2sdI1AKN35eRZoRkzfszVEVg3A/VXvnE0xRnDOzknrsD06A25Ul0kAXKzsfypymuHaMz
-         py2w==
-X-Forwarded-Encrypted: i=1; AJvYcCVsOqAS0dq+1fjDOxdtcdAUH8UbtGYpMRKADb6cZkdwjOVG8BCWoyho/3u7wcYcZrr2gXltV6iMLNypS40=@vger.kernel.org, AJvYcCX74jPxORrbJd1RTU0mhhazvqb87WFeUMfRlf2bOreXjicfFbrgliXL2Nk4oRe1UVc3u7thTQ1M@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsWkNxm/c+dEePnJyFY3CSWSWw4i5vgBF0OZIJ7xX8nNftFMIr
-	PlKMSKx2DirrbSZn/Eu7io9pz2HKvanXxTTg2y79OYVFWGiRWsV1BTDr
-X-Gm-Gg: ASbGncvV5beMvcMot312dj08Z45IiDPw8irf7kkpi9sI+r6A8YKL6GClsOEKp6am7qB
-	BXyFVa7hctFzK/uUlHfJFmzo+tePEpdTIsV99vPD1bQWHv9H01hX0MJ4s3nAYTtL/9zyNF3z4dV
-	JCeBYpkjszDNPo3PFCMCekfwhXM6DCBgoFS+jUNBaFyl4UfT9pAJfT9AsRToVt1vwOwWit+Upit
-	ZW/pWxgXGXKXcep1R4+Az6flJHs9DrWZ6jG/sPYpZN/JEJjczMXD+0TdDx/MIKsw8Zk5ait4M/a
-	77By/TUQDYr9BGMcW0jznn1VzOZRhf0Ghbx5YRUSZKLNGFhl4/4YZB/PcUX0W/jAQVNOgELzT+R
-	5d5ZoeinGzgYICj8jeuvS5ijP6tu0nw+U13CR6G0fdJ+spyU7ejlY1xjEdPG0f/rHQzaY0YxP
-X-Google-Smtp-Source: AGHT+IE6g19+dUycquzad6W/cE38ba4tQ7W22bnkBUjwXHT8HNV6H9kA6IReaLnHzsPSz4zYawmCGg==
-X-Received: by 2002:a05:6000:1ac7:b0:3b6:d94:d62b with SMTP id ffacd0b85a97d-3b60e4d28e9mr12485560f8f.15.1752924896790;
-        Sat, 19 Jul 2025 04:34:56 -0700 (PDT)
-Received: from INBSWN167928.ad.harman.com (bba-86-98-199-117.alshamil.net.ae. [86.98.199.117])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4563b740c51sm45073575e9.19.2025.07.19.04.34.54
+        d=1e100.net; s=20230601; t=1752928846; x=1753533646;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BQfdgdkRBWe5TVjNpBGDG5q7sQM2q/hqv2mJrxoFnZQ=;
+        b=HsiH5spRHQrVRSYwss55q411W7jGAyZ9Ai7YzoS+Gx0xY56BMYwsC5NxDwM0ua8dRi
+         h6maybw4UWO3YmcHH7qrkPKi1Nr+qqPmrfaNPRRGwc/Fk47pVzjcvJH0hsuiIz6Bkf0z
+         8swyI4NYJyCONaqybnXPLAt2+bM0fqtfdDRH6vbsoIAaed5kJJd4PHvDJA8b1J3v4qmL
+         uF7uWBrMypNFVouYRP9JSOLvuX7mwGNAKz8W+6yylw6UewPkP9wPDhBZIkp4QcjsJjbV
+         0oxRMgwwApVAu8WSRsdsRg/GMReAwVnAELzIydF6Gf2t3Ycgpn9TPa9SbzUW30OEtHLh
+         hBVw==
+X-Forwarded-Encrypted: i=1; AJvYcCVd0qciO5fg1sqRO3uHCTz+nd/fMZy67kACzVGSnJUdSMXQu791RdbN29PPjVVsZX6jOzCAc1LotVxxmTM=@vger.kernel.org, AJvYcCWZmfSMyJ/trXG+eT2YQ3KlDxndHuVDBUHrOY2H1m7aYNYRjKkCOTDYandTzMwHnEsLyhR4FEwn@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyzq6dIqT3Y7RMSl+1B7Y7XNv1OyLAB6Csx7GDz7NCaufO+sRVU
+	BkurK/XzYFFVAsOig8zCB4fYJyVNeRrldDTzatHfW4uiSIonpZOGg5Jg
+X-Gm-Gg: ASbGnctw0gHmgdFpR2A2hG98o7yN3P7RGWau9WwIcGRsFJGOBje9r2ffGD+fOp5XxLm
+	Mc0Mrspd+o5+B4JwUbG5CLvBykpReq2qUzkB0P9/xpwcVOSnxn3y7fSuIwD6r+6nF56/dgVut2y
+	QSTtIwMcpOtnR89A+9c99ahy8NicES/jmdDqOQQI/o9AZRki6kYHHdwZcY0BcdvwBuTyNLZoUQH
+	zdCNjRB+L+TL0mdQyvHHGlkW9du+ogGY6pJu9RqpC4bUuWCSGZCK1NmsS+oMYbXT6dRNfRU7Xo8
+	oX058Zcz6qBnhrXDQsL4IdwvH82jVH1p0XbHpwJvvVIj1b1OONIm9p3WqGNOaIemNJM+Ly7ODft
+	ULlBgbUWW1D45nGbt0cNAtGSm00guA3Y+emhFCbJslOfh7GzcIQ==
+X-Google-Smtp-Source: AGHT+IGJLabOuao1TExGeMbmwrpLcuQArmlji57Wwb1no1QTxnH0aii27+o4KkJ3Xa0K2e34n4iFGw==
+X-Received: by 2002:a17:90b:5289:b0:315:af43:12ee with SMTP id 98e67ed59e1d1-31c9e761501mr23718931a91.16.1752928845850;
+        Sat, 19 Jul 2025 05:40:45 -0700 (PDT)
+Received: from name2965-Precision-7820-Tower.. ([121.185.186.233])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31cc3f44970sm2985883a91.39.2025.07.19.05.40.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Jul 2025 04:34:56 -0700 (PDT)
-From: Abid Ali <dev.nuvorolabs@gmail.com>
-To: Abid Ali <dev.nuvorolabs@gmail.com>
-Cc: Russell King <linux@armlinux.org.uk>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+        Sat, 19 Jul 2025 05:40:44 -0700 (PDT)
+From: Jeongjun Park <aha310510@gmail.com>
+To: richardcochran@gmail.com
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	yangbo.lu@nxp.com,
+	vladimir.oltean@nxp.com,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: phy: Fix premature resume by a PHY driver
-Date: Sat, 19 Jul 2025 11:34:50 +0000
-Message-ID: <20250719113452.7701-1-dev.nuvorolabs@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <aHtNxLODmEHRVfdn@shell.armlinux.org.uk>
-References: <aHtNxLODmEHRVfdn@shell.armlinux.org.uk>
+	linux-kernel@vger.kernel.org,
+	syzbot+7cfb66a237c4a5fb22ad@syzkaller.appspotmail.com,
+	Jeongjun Park <aha310510@gmail.com>
+Subject: [PATCH net v3] ptp: prevent possible ABBA deadlock in ptp_clock_freerun()
+Date: Sat, 19 Jul 2025 21:40:22 +0900
+Message-Id: <20250719124022.1536524-1-aha310510@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,49 +96,104 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-On Sat, Jul 19, 2025 at 08:48:20 AM +0100, Russell King (Oracle) wrote:
-> > I do point this path out and there is also a second call
-> > (2) .ndo_open -> phylink_start -> phy_start -> __phy_resume
-> > This would mean 2 calls to the PHY resume every time an interface is
-> > taken UP is expected behaviour?.
->
-> The whole point is this:
->
-> > > During this path, the PHY may or may not be suspended, depending on
-> > > the state of the hardware when control was passed to the kernel,
-> > > which includes kexec().
->
-> Thus, the resume function *must* cope with an already resumed PHY,
-> and thus adding extra complexity to try to ignore calling the resume
-> function if it wasn't previously suspended is likely to cause
-> regressions - phydrv->suspended will be clear for the initial call
-> to ->resume(). Thus, if the PHY was suspended at boot time, it won't
-> be resumed when one attempts to bring up the interface initially.
+syzbot reported the following ABBA deadlock:
 
-yea, I get your point.
+       CPU0                           CPU1
+       ----                           ----
+  n_vclocks_store()
+    lock(&ptp->n_vclocks_mux) [1]
+        (physical clock)
+                                     pc_clock_adjtime()
+                                       lock(&clk->rwsem) [2]
+                                        (physical clock)
+                                       ...
+                                       ptp_clock_freerun()
+                                         ptp_vclock_in_use()
+                                           lock(&ptp->n_vclocks_mux) [3]
+                                              (physical clock)
+    ptp_clock_unregister()
+      posix_clock_unregister()
+        lock(&clk->rwsem) [4]
+          (virtual clock)
 
-> Hardware or software reset?
->
-> How much a software reset disrupts the PHY is PHY dependent. E.g. there
-> are PHYs that need to be software reset for configuration and
-> advertisement changes, but all the software configuration is preserved
-> over such a reset.
+Functions like clock_adjtime() can only be called with physical clocks.
+Therefore, all structures used in this function are physical clocks.
 
-The PHY we have loses power when the kernel PM goes to suspend and we
-need have a hardware reset upon its bootup in resume.
-As an unintentional consequence this ended with 2 additional
-resets (reset-delay-us in dts + 2 PHY resume) at boot->interface-UP.
-In the end the "phydev->state" in the driver`s resume callback was used to
-prevent it and checking further, it was evident that there were 2
-intentional calls for phy_resume from .ndo_open which didnt look obvious.
+However, when unregistering vclocks in n_vclocks_store(),
+ptp->n_vclocks_mux is a physical clock lock, but clk->rwsem of
+ptp_clock_unregister() called through device_for_each_child_reverse()
+is a virtual clock lock.
 
-This particular scenario was not the point of the commit but rather
-having some protection for phy_resume but I guess its not possible.
-To keep it simple, these would be my present understanding.
+Therefore, clk->rwsem used in CPU0 and clk->rwsem used in CPU1 are
+different locks, but in lockdep, a false positive occurs because the
+possibility of deadlock is determined through lock-class.
 
-1. Should the PHY driver be able handle consecutive resume callbacks?
-a. yes. It would have to be taken care in the driver.
+Therefore, to prevent such false positive in lockdep, a subclass
+annotation must be added to the lock used in the virtual clock structure.
 
-2. Why does phy_resume exec twice in .ndo_open with PHYLINK API?
-a. can happen but still dont have clarity on why .ndo_open does this.
+Reported-by: syzbot+7cfb66a237c4a5fb22ad@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=7cfb66a237c4a5fb22ad
+Fixes: 73f37068d540 ("ptp: support ptp physical/virtual clocks conversion")
+Signed-off-by: Jeongjun Park <aha310510@gmail.com>
+---
+v3: Annotate lock subclass to prevent false positives of lockdep
+- Link to v2: https://lore.kernel.org/all/20250718114958.1473199-1-aha310510@gmail.com/
+v2: Add CC Vladimir
+- Link to v1: https://lore.kernel.org/all/20250705145031.140571-1-aha310510@gmail.com/
+---
+ drivers/ptp/ptp_private.h |  5 +++++
+ drivers/ptp/ptp_vclock.c  | 16 ++++++++++++++++
+ 2 files changed, 21 insertions(+)
+
+diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
+index a6aad743c282..b352df4cd3f9 100644
+--- a/drivers/ptp/ptp_private.h
++++ b/drivers/ptp/ptp_private.h
+@@ -24,6 +24,11 @@
+ #define PTP_DEFAULT_MAX_VCLOCKS 20
+ #define PTP_MAX_CHANNELS 2048
+ 
++enum {
++	PTP_LOCK_PHYSICAL = 0,
++	PTP_LOCK_VIRTUAL,
++};
++
+ struct timestamp_event_queue {
+ 	struct ptp_extts_event buf[PTP_MAX_TIMESTAMPS];
+ 	int head;
+diff --git a/drivers/ptp/ptp_vclock.c b/drivers/ptp/ptp_vclock.c
+index 7febfdcbde8b..b16c66c254ae 100644
+--- a/drivers/ptp/ptp_vclock.c
++++ b/drivers/ptp/ptp_vclock.c
+@@ -154,6 +154,20 @@ static long ptp_vclock_refresh(struct ptp_clock_info *ptp)
+ 	return PTP_VCLOCK_REFRESH_INTERVAL;
+ }
+ 
++#ifdef CONFIG_LOCKDEP
++static void ptp_vclock_set_subclass(struct ptp_clock *ptp)
++{
++	lockdep_set_subclass(&ptp->n_vclocks_mux, PTP_LOCK_VIRTUAL);
++	lockdep_set_subclass(&ptp->clock.rwsem, PTP_LOCK_VIRTUAL);
++	lockdep_set_subclass(&ptp->tsevqs_lock, PTP_LOCK_VIRTUAL);
++	lockdep_set_subclass(&ptp->pincfg_mux, PTP_LOCK_VIRTUAL);
++}
++#else
++static void ptp_vclock_set_subclass(struct ptp_clock *ptp)
++{
++}
++#endif
++
+ static const struct ptp_clock_info ptp_vclock_info = {
+ 	.owner		= THIS_MODULE,
+ 	.name		= "ptp virtual clock",
+@@ -213,6 +227,8 @@ struct ptp_vclock *ptp_vclock_register(struct ptp_clock *pclock)
+ 		return NULL;
+ 	}
+ 
++	ptp_vclock_set_subclass(vclock->clock);
++
+ 	timecounter_init(&vclock->tc, &vclock->cc, 0);
+ 	ptp_schedule_worker(vclock->clock, PTP_VCLOCK_REFRESH_INTERVAL);
+ 
+--
 
