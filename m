@@ -1,223 +1,160 @@
-Return-Path: <netdev+bounces-208328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ED85B0B02F
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 15:13:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 28671B0B031
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 15:15:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96A53174096
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 13:13:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63D8A562472
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 13:15:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A39BC1CAA6D;
-	Sat, 19 Jul 2025 13:13:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C16992874E7;
+	Sat, 19 Jul 2025 13:15:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="pOB/7KmK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="knA3+jwx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C906CDDC1
-	for <netdev@vger.kernel.org>; Sat, 19 Jul 2025 13:13:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC32286D7A;
+	Sat, 19 Jul 2025 13:15:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752930804; cv=none; b=qV2r3KLvd/1i9niCn7MOMpW1jDIfMZUFlcbA57i8nlRV2CHix6FSJmk8ef9jd0mcrd2GUPUKR+YxK13XuKbTfkZ0dhZnxDMalqjNecnGYfZDYLFCYHSrwKBcLoPHdNXMNfLohLAHkH7WJJhoIHbFwAmJ6q4dx/vzlhRnIyZ5aAw=
+	t=1752930912; cv=none; b=K7dgOdm7RF88UeZkHW8zIrJOmtwBRhZPmK8w2KC6tH72bxP3K1fCF9X9eT8aKayLCgD0B5dtyzUOhibQi1F4bQ4h9m5D9F13A/RWgE5ZF806K6SUlvCkvyuKKBp3/Lux+fwyUPTzfW15xiYfScFoMmWLG2/j5H+244EHe9tCKK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752930804; c=relaxed/simple;
-	bh=6CbBzjMceiMY88kzwiUExps8t9oKfxO6A8kFy3sjiRs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZVFYJ6Sat/aWoAlukX0vaJZUCnELjJVWP7GDa9JS+tnkIiueayEHiEKK3Pnk3Ta1LWidcq6Eo8Iw+L3IIeXc6GJ5b7CcEaZpIVkESouP7Zn4P/GaXnncmfqnMriDlicx3o8vh0jdfZnznwK652GiMadFY+CBco+8srFCkfSQ+yU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=pOB/7KmK; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3a54690d369so2421628f8f.3
-        for <netdev@vger.kernel.org>; Sat, 19 Jul 2025 06:13:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1752930800; x=1753535600; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rjrT7fBM1CejmVuXSiK1DKP0OJHqogK/eV94u8ISPy4=;
-        b=pOB/7KmKZJmOJnYNH0dKfmT7k2Z/J9isi0cWnV8MFiozUBY4yT++MYCV3lSu/WSCZ3
-         +TGyInL0hqz34ySzO8+qms1XooTEtFioIQHk50QJ0SySjb09HRLa+AJ6cmGKs2eWuNy1
-         sZ446kdoBvBjwxw2Te/9SFAhId4ohWvtjBzAJqteBhwRV56HhX6yDBfhiSTYxP3R7B0M
-         HyH7+xoAu7Mr0/bOOnnm0VhY6frpapH30an17pkTwpkKOBikTkYB9ko60t20Jk+5VYfg
-         su7sDjYTZl0vGhuSqDPvX+zjZkrh18uqSf4qMS/rj+IkOQ+PLt8Y2ntIOnftHkYy0ueK
-         d4sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752930800; x=1753535600;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rjrT7fBM1CejmVuXSiK1DKP0OJHqogK/eV94u8ISPy4=;
-        b=SPWzLBa0qwA9wrGe8IALW2AhDr+sqeXU74d+UeumOIYk0eG3CatnQoyC5hXgQq3+Gw
-         m7Crp/wncwfVn9DPijc1cjfLjzv811+6Pxif5GIPJAcmXD1fzAaNBBa9VNIAduvqV4Gr
-         XsiuyySXN5IrxbdW9meMq2B7Rr/8xpYyplkipO6gQl3ZAHUC0/jAIOxRPE4qManouhPS
-         aFNJSA4A1rySk0439FPd9lgi/NBw0vQ/Cb2GWOnv6vYRlFVE/Hxqzat1W+a/vaUYRqYi
-         wiABDcY55FmMMAD1lN24t7zTLc9AS8VDRr7gnru7PFqAFZ4sDuRpN5p+FqqDwoRcI2uU
-         3Xhw==
-X-Gm-Message-State: AOJu0YzoSsiFGDwTn1ppG7KRCedWc3oX2YXhJeV2KKgmdXQmG/UZN3tX
-	AoW7+87Zbb04rKWR1TNcY+LvAbyJ+wO+HeYs0A2gTuUe6wfnl/U3AbwK0vgq2pbgjSWk1X5d/YY
-	Xpln8
-X-Gm-Gg: ASbGncvPUkzXuDw0Fa2hw6ouWZTRONAk/v//GXov05C70fvZ8e6agezsTstHnvWf/W0
-	a4HBZcw+otEOYg1iDhxgPhjSVx+ODjDZt1ragKJpmuAa9nIHelCc1cGogGLKOhTTOP/YTA1nsRU
-	P10EKusPpRBHev4MxUIEUnfy8w0HGER85o2WhdSX+YnJ9jkGxHpjjcvW41FrqmGb8v+p8TJpKh4
-	qi56pE0gScPrw4tPBb+Bnn4laVxyJOK62J/XRIyWd87iBLdrIxCH03UJ/qJQyz3Kpzwrbv/iE/e
-	EXiQRneObSMojuPBLDX3PidziW3wKWnEzVc1IkHwrqAml7BD1sfL96OfxM13E0Z9geDh+PUO9zF
-	8gSe9oVWrGZ5pylw=
-X-Google-Smtp-Source: AGHT+IHXHdGw7jdaPQF/MVxxheB34JPp92Jbr436cnby8v7OJ15RMjuI2cDy6038ZesGerDMjnbkpA==
-X-Received: by 2002:a05:6000:2c08:b0:3a4:fbd9:58e6 with SMTP id ffacd0b85a97d-3b60e517ff8mr11374881f8f.50.1752930799284;
-        Sat, 19 Jul 2025 06:13:19 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4562e81ccb4sm107032515e9.17.2025.07.19.06.13.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Jul 2025 06:13:18 -0700 (PDT)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch
-Subject: [PATCH net-next] netdevsim: add couple of fw_update_flash_* debugfs knobs
-Date: Sat, 19 Jul 2025 15:13:15 +0200
-Message-ID: <20250719131315.353975-1-jiri@resnulli.us>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1752930912; c=relaxed/simple;
+	bh=Y56Y9TszFLVMWinBCZFOHZxvFqKUs/k3AHWrTwYXNBI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Hu/bMnjaZrVZToIzftaVycHSpLZkw5uXt63gWuKArNvaHD8wT9oYhJGGUVP2evgmjBGNaK+US3eWrFLdR0ITvSCfv51x0Iu+dWvcPl9uyz6OY0+Y/wXHCdElYy9SJ/DzCd37P5t4/tmjbv+Jp/dy8i1ZHqtzhRpSgNnc2xXdkZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=knA3+jwx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CC0AC4CEE3;
+	Sat, 19 Jul 2025 13:15:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752930912;
+	bh=Y56Y9TszFLVMWinBCZFOHZxvFqKUs/k3AHWrTwYXNBI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=knA3+jwxJ5/pPrzTMnyfUBfKL1V+3ZIfj6r1GGRWjfwBiKnjAuDznBaXjQsa1Dh0b
+	 ObE3uIAwdhux6+4Yjk313yDknHRfADprbR0oNEbrYTP399z4+xIYGjJc8azdxFbF+F
+	 UmwnxH+tj5kT2IJrgVk81w3nLnV4mRYdWwzKbDoxYtWuTeF80xHPDMaKWVC/ketKdr
+	 NsnZ3zWsqMUUABAI8HJwiiU3cakyDe8vO9JJs0mEiFtdv0FBIIYemXINpD5s7L4n4L
+	 agNBid3yCcvCfV7n6zgACi5P1ogwui64zpkSiWi/ME3lOixtn7pbgBNLLKkVA7Uvud
+	 KUVvYyiVznBUg==
+Message-ID: <81cd8749-6212-4fcf-8e1a-5eba5a8e2a73@kernel.org>
+Date: Sat, 19 Jul 2025 15:15:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] selftests/bpf: Add LPM trie microbenchmarks
+To: Matt Fleming <matt@readmodwrite.com>, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Martin KaFai Lau <martin.lau@kernel.org>
+Cc: Shuah Khan <shuah@kernel.org>, kernel-team@cloudflare.com,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, Matt Fleming <mfleming@cloudflare.com>,
+ Yonghong Song <yonghong.song@linux.dev>, Netdev <netdev@vger.kernel.org>
+References: <20250718150554.48210-1-matt@readmodwrite.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20250718150554.48210-1-matt@readmodwrite.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-From: Jiri Pirko <jiri@nvidia.com>
 
-Netdevsim emulates firmware update and it takes 5 seconds to complete.
-For some usecases, this is too long and unnecessary. Allow user to
-configure the time by exposing debugfs knobs to set flash size, chunk
-size and chunk time.
 
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
- drivers/net/netdevsim/dev.c                   | 32 +++++++++++++------
- drivers/net/netdevsim/netdevsim.h             |  3 ++
- .../drivers/net/netdevsim/devlink.sh          |  4 +++
- 3 files changed, 29 insertions(+), 10 deletions(-)
+On 18/07/2025 17.05, Matt Fleming wrote:
+> From: Matt Fleming <mfleming@cloudflare.com>
+> 
+> Add benchmarks for the standard set of operations: lookup, update,
+> delete. Also, include a benchmark for trie_free() which is known to have
+> terrible performance for maps with many entries.
+> 
+> Benchmarks operate on tries without gaps in the key range, i.e. each
+> test begins with a trie with valid keys in the range [0, nr_entries).
+> This is intended to cause maximum branching when traversing the trie.
+> 
+> All measurements are recorded inside the kernel to remove syscall
+> overhead.
+> 
+> Most benchmarks run an XDP program to generate stats but free needs to
+> collect latencies using fentry/fexit on map_free_deferred() because it's
+> not possible to use fentry directly on lpm_trie.c since commit
+> c83508da5620 ("bpf: Avoid deadlock caused by nested kprobe and fentry
+> bpf programs") and there's no way to create/destroy a map from within an
+> XDP program.
+> 
+> Here is example output from an AMD EPYC 9684X 96-Core machine for each
+> of the benchmarks using a trie with 10K entries and a 32-bit prefix
+> length, e.g.
+> 
+>    $ ./bench lpm-trie-$op \
+>    	--prefix_len=32  \
+> 	--producers=1     \
+> 	--nr_entries=10000
+> 
+>    lookup: throughput    7.423 ± 0.023 M ops/s (  7.423M ops/prod), latency  134.710 ns/op
+>    update: throughput    2.643 ± 0.015 M ops/s (  2.643M ops/prod), latency  378.310 ns/op
+>    delete: throughput    0.712 ± 0.008 M ops/s (  0.712M ops/prod), latency 1405.152 ns/op
+>      free: throughput    0.574 ± 0.003 K ops/s (  0.574K ops/prod), latency    1.743 ms/op
+> 
+> Signed-off-by: Matt Fleming <mfleming@cloudflare.com>
+> ---
+>   tools/testing/selftests/bpf/Makefile          |   2 +
+>   tools/testing/selftests/bpf/bench.c           |  10 +
+>   tools/testing/selftests/bpf/bench.h           |   1 +
+>   .../selftests/bpf/benchs/bench_lpm_trie_map.c | 345 ++++++++++++++++++
+>   .../selftests/bpf/progs/lpm_trie_bench.c      | 175 +++++++++
+>   .../selftests/bpf/progs/lpm_trie_map.c        |  19 +
+>   6 files changed, 552 insertions(+)
+>   create mode 100644 tools/testing/selftests/bpf/benchs/bench_lpm_trie_map.c
+>   create mode 100644 tools/testing/selftests/bpf/progs/lpm_trie_bench.c
+>   create mode 100644 tools/testing/selftests/bpf/progs/lpm_trie_map.c
+> 
 
-diff --git a/drivers/net/netdevsim/dev.c b/drivers/net/netdevsim/dev.c
-index 01c7edb28d96..e0cb09193c72 100644
---- a/drivers/net/netdevsim/dev.c
-+++ b/drivers/net/netdevsim/dev.c
-@@ -314,6 +314,12 @@ static int nsim_dev_debugfs_init(struct nsim_dev *nsim_dev)
- 			    &nsim_dev->fw_update_status);
- 	debugfs_create_u32("fw_update_overwrite_mask", 0600, nsim_dev->ddir,
- 			    &nsim_dev->fw_update_overwrite_mask);
-+	debugfs_create_u32("fw_update_flash_size", 0600, nsim_dev->ddir,
-+			   &nsim_dev->fw_update_flash_size);
-+	debugfs_create_u32("fw_update_flash_chunk_size", 0600, nsim_dev->ddir,
-+			   &nsim_dev->fw_update_flash_chunk_size);
-+	debugfs_create_u32("fw_update_flash_chunk_time_ms", 0600, nsim_dev->ddir,
-+			   &nsim_dev->fw_update_flash_chunk_time_ms);
- 	debugfs_create_u32("max_macs", 0600, nsim_dev->ddir,
- 			   &nsim_dev->max_macs);
- 	debugfs_create_bool("test1", 0600, nsim_dev->ddir,
-@@ -1015,15 +1021,14 @@ static int nsim_dev_info_get(struct devlink *devlink,
- 						    DEVLINK_INFO_VERSION_TYPE_COMPONENT);
- }
- 
--#define NSIM_DEV_FLASH_SIZE 500000
--#define NSIM_DEV_FLASH_CHUNK_SIZE 1000
--#define NSIM_DEV_FLASH_CHUNK_TIME_MS 10
--
- static int nsim_dev_flash_update(struct devlink *devlink,
- 				 struct devlink_flash_update_params *params,
- 				 struct netlink_ext_ack *extack)
- {
- 	struct nsim_dev *nsim_dev = devlink_priv(devlink);
-+	u32 flash_size = nsim_dev->fw_update_flash_size;
-+	u32 flash_chunk_size = nsim_dev->fw_update_flash_chunk_size;
-+	u32 flash_chunk_time_ms = nsim_dev->fw_update_flash_chunk_time_ms;
- 	int i;
- 
- 	if ((params->overwrite_mask & ~nsim_dev->fw_update_overwrite_mask) != 0)
-@@ -1035,20 +1040,20 @@ static int nsim_dev_flash_update(struct devlink *devlink,
- 						   params->component, 0, 0);
- 	}
- 
--	for (i = 0; i < NSIM_DEV_FLASH_SIZE / NSIM_DEV_FLASH_CHUNK_SIZE; i++) {
-+	for (i = 0; i < flash_size / flash_chunk_size; i++) {
- 		if (nsim_dev->fw_update_status)
- 			devlink_flash_update_status_notify(devlink, "Flashing",
- 							   params->component,
--							   i * NSIM_DEV_FLASH_CHUNK_SIZE,
--							   NSIM_DEV_FLASH_SIZE);
--		msleep(NSIM_DEV_FLASH_CHUNK_TIME_MS);
-+							   i * flash_chunk_size,
-+							   flash_size);
-+		msleep(flash_chunk_time_ms);
- 	}
- 
- 	if (nsim_dev->fw_update_status) {
- 		devlink_flash_update_status_notify(devlink, "Flashing",
- 						   params->component,
--						   NSIM_DEV_FLASH_SIZE,
--						   NSIM_DEV_FLASH_SIZE);
-+						   flash_size,
-+						   flash_size);
- 		devlink_flash_update_timeout_notify(devlink, "Flash select",
- 						    params->component, 81);
- 		devlink_flash_update_status_notify(devlink, "Flashing done",
-@@ -1567,6 +1572,10 @@ static int nsim_dev_reload_create(struct nsim_dev *nsim_dev,
- 	return err;
- }
- 
-+#define NSIM_DEV_FLASH_SIZE_DEFAULT 500000
-+#define NSIM_DEV_FLASH_CHUNK_SIZE_DEFAULT 1000
-+#define NSIM_DEV_FLASH_CHUNK_TIME_MS_DEFAULT 10
-+
- int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
- {
- 	struct nsim_dev *nsim_dev;
-@@ -1585,6 +1594,9 @@ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
- 	INIT_LIST_HEAD(&nsim_dev->port_list);
- 	nsim_dev->fw_update_status = true;
- 	nsim_dev->fw_update_overwrite_mask = 0;
-+	nsim_dev->fw_update_flash_size = NSIM_DEV_FLASH_SIZE_DEFAULT;
-+	nsim_dev->fw_update_flash_chunk_size = NSIM_DEV_FLASH_CHUNK_SIZE_DEFAULT;
-+	nsim_dev->fw_update_flash_chunk_time_ms = NSIM_DEV_FLASH_CHUNK_TIME_MS_DEFAULT;
- 	nsim_dev->max_macs = NSIM_DEV_MAX_MACS_DEFAULT;
- 	nsim_dev->test1 = NSIM_DEV_TEST1_DEFAULT;
- 	spin_lock_init(&nsim_dev->fa_cookie_lock);
-diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
-index 8eeeb9256077..78a0f07e4088 100644
---- a/drivers/net/netdevsim/netdevsim.h
-+++ b/drivers/net/netdevsim/netdevsim.h
-@@ -317,6 +317,9 @@ struct nsim_dev {
- 	struct list_head port_list;
- 	bool fw_update_status;
- 	u32 fw_update_overwrite_mask;
-+	u32 fw_update_flash_size;
-+	u32 fw_update_flash_chunk_size;
-+	u32 fw_update_flash_chunk_time_ms;
- 	u32 max_macs;
- 	bool test1;
- 	bool dont_allow_reload;
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/devlink.sh b/tools/testing/selftests/drivers/net/netdevsim/devlink.sh
-index a102803ff74f..92cc5cbb7d83 100755
---- a/tools/testing/selftests/drivers/net/netdevsim/devlink.sh
-+++ b/tools/testing/selftests/drivers/net/netdevsim/devlink.sh
-@@ -40,6 +40,10 @@ fw_flash_test()
- 		return
- 	fi
- 
-+	echo "1024"> $DEBUGFS_DIR/fw_update_flash_size
-+	echo "128"> $DEBUGFS_DIR/fw_update_flash_chunk_size
-+	echo "10"> $DEBUGFS_DIR/fw_update_flash_chunk_time_ms
-+
- 	devlink dev flash $DL_HANDLE file $DUMMYFILE
- 	check_err $? "Failed to flash with status updates on"
- 
--- 
-2.50.1
+I've already tested + reviewed this and different version of this 
+benchmark during internal development.  Thanks to Matt for working on this.
+
+Tested-by: Jesper Dangaard Brouer <hawk@kernel.org>
+
+You can add my reviewed by when we resolve below comment.
+
+Reviewed-by: Jesper Dangaard Brouer <hawk@kernel.org>
+
+
+> [...]
+> diff --git a/tools/testing/selftests/bpf/progs/lpm_trie_bench.c b/tools/testing/selftests/bpf/progs/lpm_trie_bench.c
+> new file mode 100644
+> index 000000000000..c335718cc240
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/progs/lpm_trie_bench.c
+> @@ -0,0 +1,175 @@
+[...]
+> +
+> +static __always_inline void atomic_inc(long *cnt)
+> +{
+> +	__atomic_add_fetch(cnt, 1, __ATOMIC_SEQ_CST);
+> +}
+> +
+> +static __always_inline long atomic_swap(long *cnt, long val)
+> +{
+> +	return __atomic_exchange_n(cnt, val, __ATOMIC_SEQ_CST);
+> +}
+
+For userspace includes we have similar defines in bench.h.
+Except they use __ATOMIC_RELAXED and here __ATOMIC_SEQ_CST.
+Which is the correct to use?
+
+For BPF kernel-side do selftests have another header file that define
+these `atomic_inc` and `atomic_swap` ?
+
+--Jesper
+
+
 
 
