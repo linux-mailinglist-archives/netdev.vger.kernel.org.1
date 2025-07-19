@@ -1,92 +1,98 @@
-Return-Path: <netdev+bounces-208291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8D02B0AD15
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 02:50:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4193FB0AD1A
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 02:51:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98BEF7AC450
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 00:48:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F9CA3AD105
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 00:51:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAB1E1422DD;
-	Sat, 19 Jul 2025 00:50:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BD877260F;
+	Sat, 19 Jul 2025 00:51:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rC94RXIE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tUkcr6sP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C35A2130A73;
-	Sat, 19 Jul 2025 00:50:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E8407FD;
+	Sat, 19 Jul 2025 00:51:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752886209; cv=none; b=GF5pA61buu8iL02pc2/03h6Bh3FJTwfBxth4ecy9WAezfGlqJ4ogD4TaR7ETVkIQpqRDbhFaaK7/UsteKpN6YWWbQYxAGr9lFSAADKGdQ0nhThPP+DcVZq/o9TiSOpBhw6AD1gkmenvM2jomjw7AaIeB/1VTfJSnlSj+KzPLOlw=
+	t=1752886299; cv=none; b=WugXFkUs7JH9F40FasdnWZG71GsfBEY1MP3ZvsjqCZqJvFWcsDthZX7JQh7dacRz/m3bU/BNLCGodUOVEpP+GEEL6CICFeriCbkWHvM6I8I2pbTNc2oPYr0gAszuRr5IQg//B2EHw2I7XBl98+9P+HTSvH9eKR4iCu8Rfwh/ABs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752886209; c=relaxed/simple;
-	bh=pOCNF97ddEfHE3C6e1BqT8r5RSsqtKDXSC1RWom9FfM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Md5FYLSpdDMkWgAYyF0CcwGWobd/EOKsC6Wq7g0k6wKtfuJ4lRiTsST8QLDFnxz91bpKs+8np0Is1GXX3o7+N2dWhvec44U78BuFEnPWNH/ypAFz0XJ/aKOQaaLRKGcEp6hBvNdcVtaPthHspW2T+VVI81V5T7J/pc1f53p+IwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rC94RXIE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A1F0C4CEEB;
-	Sat, 19 Jul 2025 00:50:09 +0000 (UTC)
+	s=arc-20240116; t=1752886299; c=relaxed/simple;
+	bh=9kJxhZth6grHo3I0CSXBwom48o2ExKgGl5rWqerKBiQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rVhCXXD64Cazvsv07+fy8dpZ9ffocWYoBO6+ML7zGRzojd/kqt4nsUuoboGXU80loWJKaLg1jdF4UTWEsnTxgWAzV9dNFXcUsIaWiQ308CSPD/ZsewwQfpQoW35CGSNX9Bwg0C9N4gP142EY6q0dL1Rvm/xoXS68s7M/4Wgkm1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tUkcr6sP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5882C4CEEB;
+	Sat, 19 Jul 2025 00:51:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752886209;
-	bh=pOCNF97ddEfHE3C6e1BqT8r5RSsqtKDXSC1RWom9FfM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=rC94RXIEMUncfeEvJepabphkkE6u6sKlfhBFkYQqTrrSPNs2IAncl8R99ayeTz7SH
-	 TR2Tu+GwlxgVPsMnKOVDIlL6LaJFawyrWFPPTdxhEK8fFvMsEjrqIgxry9N6TL9a/u
-	 PsSLMdxBwa/OpKuGDIRVMPeKTmkmH/zFdLImL5gOkbSaXWps3fw29iol6v96LappeP
-	 sZI8yETIlSnyLUjekpsopHLWQ64HjLqmeuDrpKFTDIiPFWl1Sa2rBQMz9QTPFt39R4
-	 WR5tRNqA2wtktkIpoveqUeN0SiWnpzv2xPklB9XoZk7S46jbF6bke1yx/oO94nUvTG
-	 aO9zV9luAfoDw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BA7383BA3C;
-	Sat, 19 Jul 2025 00:50:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1752886297;
+	bh=9kJxhZth6grHo3I0CSXBwom48o2ExKgGl5rWqerKBiQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tUkcr6sPsug/hB3yPND7FFHxRVfOfHwN1Aqkgeb1Mimp1m8HUXIYRsdijzn+uaYlx
+	 JjWmGmAoMAQNi4gfHEcVtbVbA4QcHbRNr+KdkXV3VsvrYHiQMQFe8+K7Mi1AUOZRyb
+	 F3czf9k/JukXjWroE8xqyO8kr5tu5Zm9FDm2ITtSsUgosLGFflMwIrpTh9lNI82nla
+	 6B1Y1GrX7Grlxmm8cubOAT1Z5iyKBfxtnPLMTMPrCvyUs0PFckWd//n43aSeUs0r35
+	 G4+h+NP6AXbZaSECVQPFeMhFDbrTWCn0EHBfyDfoFZ6EPLrt9RdVJIealii11cN4o4
+	 NSYDUizP/6jlA==
+Date: Fri, 18 Jul 2025 17:51:36 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Jiri Pirko <jiri@resnulli.us>, Jiri Pirko
+ <jiri@nvidia.com>, Saeed Mahameed <saeed@kernel.org>, Gal Pressman
+ <gal@nvidia.com>, "Leon Romanovsky" <leon@kernel.org>, Shahar Shitrit
+ <shshitrit@nvidia.com>, "Donald Hunter" <donald.hunter@gmail.com>, Jonathan
+ Corbet <corbet@lwn.net>, "Brett Creeley" <brett.creeley@amd.com>, Michael
+ Chan <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>,
+ Cai Huoqing <cai.huoqing@linux.dev>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, "Przemek Kitszel"
+ <przemyslaw.kitszel@intel.com>, Sunil Goutham <sgoutham@marvell.com>, Linu
+ Cherian <lcherian@marvell.com>, Geetha sowjanya <gakula@marvell.com>, Jerin
+ Jacob <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>, "Subbaraya
+ Sundeep" <sbhatta@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>, Mark
+ Bloch <mbloch@nvidia.com>, Ido Schimmel <idosch@nvidia.com>, Petr Machata
+ <petrm@nvidia.com>, Manish Chopra <manishc@marvell.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-doc@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
+ <linux-rdma@vger.kernel.org>
+Subject: Re: [PATCH net-next 4/5] devlink: Make health reporter grace period
+ delay configurable
+Message-ID: <20250718175136.265a64aa@kernel.org>
+In-Reply-To: <1752768442-264413-5-git-send-email-tariqt@nvidia.com>
+References: <1752768442-264413-1-git-send-email-tariqt@nvidia.com>
+	<1752768442-264413-5-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: bcmasp: Add support for re-starting
- auto-negotiation
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175288622900.2839493.11455333079632181551.git-patchwork-notify@kernel.org>
-Date: Sat, 19 Jul 2025 00:50:29 +0000
-References: <20250717180915.2611890-1-florian.fainelli@broadcom.com>
-In-Reply-To: <20250717180915.2611890-1-florian.fainelli@broadcom.com>
-To: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: netdev@vger.kernel.org, justin.chen@broadcom.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- bcm-kernel-feedback-list@broadcom.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 17 Jul 2025 19:07:21 +0300 Tariq Toukan wrote:
+> diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
+> index e72bcc239afd..42a11b7e4a70 100644
+> --- a/include/uapi/linux/devlink.h
+> +++ b/include/uapi/linux/devlink.h
+> @@ -634,6 +634,8 @@ enum devlink_attr {
+>  
+>  	DEVLINK_ATTR_REGION_DIRECT,		/* flag */
+>  
+> +	DEVLINK_ATTR_HEALTH_REPORTER_GRACEFUL_PERIOD_DELAY,	/* u64 */
+> +
+>  	DEVLINK_ATTR_RATE_TC_BWS,		/* nested */
+>  	DEVLINK_ATTR_RATE_TC_INDEX,		/* u8 */
+>  	DEVLINK_ATTR_RATE_TC_BW,		/* u32 */
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 17 Jul 2025 11:09:15 -0700 you wrote:
-> Wire-up ethtool_ops::nway_reset to phy_ethtool_nway_reset in order to
-> support re-starting auto-negotiation.
-> 
-> Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
-> ---
->  drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c | 1 +
->  1 file changed, 1 insertion(+)
-
-Here is the summary with links:
-  - [net-next] net: bcmasp: Add support for re-starting auto-negotiation
-    https://git.kernel.org/netdev/net-next/c/190ccb817637
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+BTW the patch from Carolina to cut the TC attributes from the main enum
+is higher prio that this.
 
