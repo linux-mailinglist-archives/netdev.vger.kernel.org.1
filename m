@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-208332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6758CB0B0C8
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 17:57:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02F7CB0B0EB
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 18:31:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A6F418960EE
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 15:57:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 917B93B5D42
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 16:31:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CA3E1E0DCB;
-	Sat, 19 Jul 2025 15:57:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03BED15530C;
+	Sat, 19 Jul 2025 16:31:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DA59yGsc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CujU4ZOP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D77A1862A
-	for <netdev@vger.kernel.org>; Sat, 19 Jul 2025 15:57:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DA1C3FE4
+	for <netdev@vger.kernel.org>; Sat, 19 Jul 2025 16:31:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752940634; cv=none; b=fdFjPArlZZhUccuWT6ylmYdRcWPLstq9gdllG/9kyA9OhKsWIgkFedXHtnDRLlpgPzALDSdWUozU1RN1E3WoOzsRyZZxg+2W77fbORAeehByHkclzZYs+6XEKyQhsWjWLcMt78a5uKoo2PLIDb29F1t6LYl4UNEmD9YTrJCrw/I=
+	t=1752942689; cv=none; b=lcCMxnk7WLzd6C1GnaEehqhEM6eZjVG3/Uz3fJApBBBumpzp6LYjc+k1AhTqKljlYROQI386Mn1rzVwlFA/28rUH4HwWMuasBx55UGjdmlQQxRPJwU9veSPDGRguHmEdYbyW8Bq4FGZk9xbeUOJGvyjSjb6HkgboUnjzsrMUZ/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752940634; c=relaxed/simple;
-	bh=8ZmHTMzdzJWW8l//MP5bYP5ZTsGv0sKZSp0fif8BxYE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GlXYoBg541YVYeTc6IlheusR5Qbk0KII60FqlEhIJuA4k4vPUrpy9SQErrgjI7dxhZmGgW/jyy+oc0seQx8H84gigzLJnesLi18/YdP16Mr3koNTwzfz0PhHz3hcllJA8AXoxIbHQg0JQzv94/EpBDI/B7B3bAbthF/cAUg8CTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DA59yGsc; arc=none smtp.client-ip=209.85.167.45
+	s=arc-20240116; t=1752942689; c=relaxed/simple;
+	bh=IrYvn5biWXIdLFpxgF8Yf/zACDnE28NXSPwyCg/Cep4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=g9HKlwWoMX/6IMnBGcR5h+BDHLj7qyQuJB5JAg1didLCtY8CoD81eGJvuOIxwGS1FX835+zYe6T3M5mmYgH/X58Kf5Iomx76Y3jPtI+y/8FD06h7bV5YxoAH3HwUtKlLDOCuPjQZcJzLHUDQlVw/nIXXmFMv2Y76WVgDEt2gPoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CujU4ZOP; arc=none smtp.client-ip=209.85.167.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-553b16a0e38so2730566e87.1
-        for <netdev@vger.kernel.org>; Sat, 19 Jul 2025 08:57:12 -0700 (PDT)
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5562838ce68so2997382e87.2
+        for <netdev@vger.kernel.org>; Sat, 19 Jul 2025 09:31:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752940630; x=1753545430; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1752942686; x=1753547486; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YabWw2GQsU48bBEwQ0juEK8dQ1heIt75lW1SGo1qck0=;
-        b=DA59yGscbA41hIDyGi9eXzuUTv1lFtU4LM7YslJokgrShrqhFDIFHSEtWBJByOgrYr
-         rQ1ZlDWFOW/0z14oc6SfmXcPLBovegh4B3Mrmg/M88s28QK7vupikETvMpywEdfZz7c0
-         Dmvp37r3qpeOZ2C4WQNq9bFcLqKJa0liB6rku0pGPEKbJR7BB24X+FLpILsYvCpnCUyW
-         zmX+IC1wSbe/pyy2/ykKKTZqrMNQ3JMhKVJfZmeYkvOJG4eHWET4kAlbStXm3xnWEw2P
-         AYke9Ax0cOY14KtqwrXRSAIPYJxgIXEjC0K6D678vRAgmJDGB5Bf8QYHvgTtopT6tGXW
-         xTnQ==
+        bh=rf7QGnPxn5F918fDzWsKmHGlaa63Dr/AbfLbHJLeBzw=;
+        b=CujU4ZOPQ8USuT6wFBJLugeY1NmUE5+aIRmuENNbjb2eHszEEwvRBoQEzMDia6igBn
+         EqEho9IHY80/wqycSn2NZSGdaU2L+eyNt0PWS9Etth8hnE/nC/XBCkHQxWUqvh9SmDbb
+         vbwaTRSw2gyZi15mI6WhZukSfh1UYvMzSc8YL0V9mGvi2DbxxmDk2jM3nQmH4l9Zrngs
+         SxC/+T/NNBu4hc6XVjRm3+oqUj6YpH4GbxnNpY0ZWK5z4GnF0o0pUmE8VkjDX07Yexo/
+         87m27Ck4sdaKZoCZZxdQGn/3scX8o7YVkN9FQBfTlsa/xxCjZxIxFnph8CpxCJUSYskS
+         43lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752940630; x=1753545430;
+        d=1e100.net; s=20230601; t=1752942686; x=1753547486;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=YabWw2GQsU48bBEwQ0juEK8dQ1heIt75lW1SGo1qck0=;
-        b=SunlTG5ayt5FLLIhVFkawdNLy6n1pOUWyLgeMwbcdKz4tS5Mrj2Bvxz9mq70Z4oU/0
-         XXDcBZxCyIYv6JgRdqYcSI6chSbQqum+fbW1g4AJtCeZNugJfcxzjNbo8Ia0D2e7kuWn
-         p0kYRRP7mL1FR0mKHfWA2b6dhF2SWuE4C2Fg1E3kv7mCM4GePaeeh3Cxexytv6qvlifQ
-         fIY28wsnrmKNvaQatOzcmkrNp0l8MbGynod0zriGsEz8riYvZK7eFLOFWKrfZWttKHYi
-         R/OUBXjpuI5FZYMU7pJq167xRV5KxbfiWn/ojdWpHwCiS+PuhHHQCeOMasHiBgP452We
-         8+aQ==
-X-Gm-Message-State: AOJu0Yz4nlQvBgqEPOY5pxAaYzdB/vNY5gCA5LB//cak8QBjw5IZnR+r
-	S7a34K5pkm/kQg8ygEOPRMEgVaS+x3b9yw3czsUO1PYm9atd66wjVgHfq6h0PkCYGpA=
-X-Gm-Gg: ASbGnctRSyxr2JNCFUTOvE/ZCz959TKC4/C5uhxWkNi9Lb98YsCvO/NPytH8rP0Cuo0
-	kQPYD38zigQdW86TJUMz36Ewb1/qflm6M5agXAm84K8JFcNi/r7acx9BFKDwZj9H6fY2HSm5a3F
-	f0s5GzwKc88uTfDpBTS42HDM9uHTETfGor7VwyZIGt/4lqy0tm79dIFqdN0fpK66Yt5wq4udY8L
-	ka6dPUr3OvKR6MfMPhF6pyZJ+5rwwo8Y7iQdLspKGauHs4z/pW8OBiR1w8ZXRRdVwIoYpbcPpdq
-	VRYgAhov5cT4nQngfrBoUsS7Qa8tuzBKQ3ETDV3N8lLqZXIPR17rr5PqxskIBI9tSt+yw/eKDpn
-	MNjKvuWlyMwqE4YEHtwECdVIM9cYjwsppShvZKg6THqFI+2VeNr22MO8CQ+Tm2DOmq/HKkh1H
-X-Google-Smtp-Source: AGHT+IFXiefnqbtNzFHbvAQFYU7+F0PJVMZMLWD26EFFDuzsR9eohOdAab1iIOY+suuIcWSKSipAJg==
-X-Received: by 2002:a05:6512:68a:b0:553:390a:e1e3 with SMTP id 2adb3069b0e04-55a31897a91mr1590445e87.44.1752940629933;
-        Sat, 19 Jul 2025 08:57:09 -0700 (PDT)
+        bh=rf7QGnPxn5F918fDzWsKmHGlaa63Dr/AbfLbHJLeBzw=;
+        b=YlmCwK/AnDTxLVjF4eU8DxU8dLAuorTBAnMl3CILCjE5KuMdPU69gXQzLDmXn91IvL
+         mk0Kvg365EgH8MsdUrJvNTIxRRpvvS/RWsXpkBiRhCwWRvoWxDu+I0WmXFlxUFQgmJ1g
+         Vkvil2VnMdyqxUsTToEdLXzLMchbBGTrtQsFowLMI6L6B5yxY6eucNCHeWdQBx1qQPXq
+         Teol7N8WQ0ZZp1lj2yEXPS2h+la2EcT1iQFzbkPio6kPWHcyhcz1ladec4sTDWKV901S
+         o2IPTCj8pOM3eVAxHDTMgA9S97w9KmeCKbnv7oc6ZQ3UlviGgTDK92VThSy4C0j9eo8x
+         KdGA==
+X-Gm-Message-State: AOJu0YzTll9l60/UkZe4RcXyidn9mrhUnQbLqNK5AoquwPuqRITpad0d
+	RFxrVpeIGbFQxs4VcGo4aUSGrOtxL0BTF/tSZ4Q2u7qcSMJMtyBuHMgj/g3q/pmify4=
+X-Gm-Gg: ASbGncuebZ+BcI8Rj9Qv/mKL6/2AiCN+ZUFkScUdeB5yGcQc4+IxHg6ty2MrwchwrgS
+	qpZDMCtdm8E2zYjS2UzOxV3HwbG9FrqHvozRWy2DLc89wH5okNlxPJ3NbXlleOIb0ut/Nbvc+tu
+	7nOcjXRCBQCi08eTQC1lIbJDKY33ULqOH9W5h2RPv0wG43XA7prvQQr8oxUbm+s9aR+PTYa9gnO
+	WgCUji2GHaG+uDGyl+RM3l2K1qSTKPkGKfqrtkSSrD+AYVY49LfItwruCldiJaVhj1oiKkiwYOR
+	pUeUapCXCVjZpI56Ayp9h6gnjsR/LnkGpjPoJMh+Na2K1fZKBA/7tQAfwmgvVWCXTUWpbvIH/Yo
+	ci22HAX/Iq8HC8PDCQ8Z5lheUN2dXtPel1iNJiHhQGP390n2VFYG8qapbGBN4B44JRI1JFSBJ
+X-Google-Smtp-Source: AGHT+IGHf1cTbYGyApesO24EzHyHrEEzEovpdjDDqLYhVduLJcr/Zi1fJBbVbhaziKA7vuBb3pkHyg==
+X-Received: by 2002:a05:6512:39c7:b0:553:2868:635e with SMTP id 2adb3069b0e04-55a23f03c38mr3740584e87.23.1752942685751;
+        Sat, 19 Jul 2025 09:31:25 -0700 (PDT)
 Received: from lnb0tqzjk.rasu.local (109-252-120-31.nat.spd-mgts.ru. [109.252.120.31])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-55a31da2c8csm756348e87.184.2025.07.19.08.57.09
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-55a31daf9ddsm766384e87.222.2025.07.19.09.31.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Jul 2025 08:57:09 -0700 (PDT)
+        Sat, 19 Jul 2025 09:31:25 -0700 (PDT)
 From: Anton Moryakov <ant.v.moryakov@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Anton Moryakov <ant.v.moryakov@gmail.com>
-Subject: [PATCH iproute2-next] ip: ipmaddr.c: Fix possible integer underflow in read_igmp()
-Date: Sat, 19 Jul 2025 18:57:05 +0300
-Message-Id: <20250719155705.44929-1-ant.v.moryakov@gmail.com>
+Subject: [PATCH iproute2-next] misc: ss.c: fix logical error in main function
+Date: Sat, 19 Jul 2025 19:31:22 +0300
+Message-Id: <20250719163122.51904-1-ant.v.moryakov@gmail.com>
 X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -85,34 +85,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Static analyzer pointed out a potential error:
+In the line if (!dump_tcpdiag) { there was a logical error 
+in checking the descriptor, which the static analyzer complained 
+about (this action is always false)
 
-	Possible integer underflow: left operand is tainted. An integer underflow 
-	may occur due to arithmetic operation (unsigned subtraction) between variable 
-	'len' and value '1', when 'len' is tainted { [0, 18446744073709551615] }
-
-The fix adds a check for 'len == 0' before accessing the last character of
-the name, and skips the current line in such cases to avoid the underflow.
+fixed by replacing !dump_tcpdiag with !dump_fp
 
 Reported-by: SVACE static analyzer
 Signed-off-by: Anton Moryakov <ant.v.moryakov@gmail.com>
 ---
- ip/ipmaddr.c | 2 ++
- 1 file changed, 2 insertions(+)
+ misc/ss.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/ip/ipmaddr.c b/ip/ipmaddr.c
-index 2418b303..2feb916a 100644
---- a/ip/ipmaddr.c
-+++ b/ip/ipmaddr.c
-@@ -150,6 +150,8 @@ static void read_igmp(struct ma_info **result_p)
- 
- 			sscanf(buf, "%d%s", &m.index, m.name);
- 			len = strlen(m.name);
-+			if(len == 0)
-+				continue;
- 			if (m.name[len - 1] == ':')
- 				m.name[len - 1] = '\0';
- 			continue;
+diff --git a/misc/ss.c b/misc/ss.c
+index de02fccb..20d0766d 100644
+--- a/misc/ss.c
++++ b/misc/ss.c
+@@ -6228,7 +6228,7 @@ int main(int argc, char *argv[])
+ 		}
+ 		if (dump_tcpdiag[0] != '-') {
+ 			dump_fp = fopen(dump_tcpdiag, "w");
+-			if (!dump_tcpdiag) {
++			if (!dump_fp) {
+ 				perror("fopen dump file");
+ 				exit(-1);
+ 			}
 -- 
 2.39.2
 
