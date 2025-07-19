@@ -1,242 +1,146 @@
-Return-Path: <netdev+bounces-208325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7376B0AF6D
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 12:56:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AA11B0AF9B
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 13:35:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36F081AA5FAF
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 10:56:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B16BAA0C84
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 11:34:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93BE9221F01;
-	Sat, 19 Jul 2025 10:56:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B3C22256F;
+	Sat, 19 Jul 2025 11:35:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="P4HrsYYq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JnMviboH"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com [209.85.221.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB8E33086;
-	Sat, 19 Jul 2025 10:56:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3CC41E7C10;
+	Sat, 19 Jul 2025 11:34:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752922593; cv=none; b=NnwUHfygPPjxIxkTkzMOh43BpvcBsU+yEyl6AAgzUK9tmbKy1J8NCcIYLqAQzTNYCewfEN2UGzsdW+ruRo9aOgPzwQbOfU9zxpsKlfcFa7kPD8h5Xex2fq8Iu51++E9MIhwzj0/5Hr8HM5x+D41vsL30oQvn/d0V7wBHEvTh5ZE=
+	t=1752924900; cv=none; b=Hgzn6hdB6jJhGrRDFcl1rOCW67ZnhnPL2WHzJu6nD1d9V1QYwPYb2/t+ikY0QvSlfklZ6EFPyFueCB2OJrL4FT5qHTEEaTBZnAnl6DEw4zNftPK5fnX4fqopJ8+kLptm/khljCTrWh0tvDTTebJlp0MFz0w7HSkYK7q76J0e4yA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752922593; c=relaxed/simple;
-	bh=8CDwXX3HzreVp6VcPV55yzgMZETSE5j2+/qjBNZKVYU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QbMDJJStegxpfMgGKPY99PbjOAgTchS9nSG+fBOAQ2mNztesihdhrUp3oGKF8xxt2S1UrWIsW2S2CoAhJx56UHz4QZh0cidnJMp5EKxUUJffuM6EUzbIFH2d8dCuoX5dcr9U3xm725EgxqGNUKlhhLbIFR5mLYHfU/fS/k2Vwx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=P4HrsYYq; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 0EAF71F68D;
-	Sat, 19 Jul 2025 10:56:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1752922581;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=u+V4okcQg5oev0dJo7W9WyupRbgSuk/hNGg+xMr7j5I=;
-	b=P4HrsYYqAhmsXl1kclEkZQG9JsrFGmEV54vH98kLPctV2Q6P14yJc5XQdbugAbDGEtBefU
-	2NTFBx17uTgNhAYS8OJVSkgsFIvVErk9re1JfRlxzl3+hD2o8zk2VQP0f3jLaluiueuONu
-	UVhOoySTeVWarG+s3JB/khD9TQ8H56+sC4O4tyyBtgflwXHXeD7yHuddsZI3yw1DT5EFJe
-	IzQXU1/czG/fPBdnlEg3P0GVQ2T1nxUBq2DhTojmRUGwYVA4DtjYev5rQiCtlgMJWimVu8
-	tX9GkfkKqqVB1nR3UuiircLA7AoVjiB5yBitGLYqAUEZU9V/MgefpOvQ0X7nqA==
-Date: Sat, 19 Jul 2025 12:56:16 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- linux-arm-kernel@lists.infradead.org, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
- <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
- mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
- devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Romain
- Gantois <romain.gantois@bootlin.com>, Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next v9 05/15] net: phy: dp83822: Add support for
- phy_port representation
-Message-ID: <20250719125616.336ece14@kmaincent-XPS-13-7390>
-In-Reply-To: <20250717073020.154010-6-maxime.chevallier@bootlin.com>
-References: <20250717073020.154010-1-maxime.chevallier@bootlin.com>
-	<20250717073020.154010-6-maxime.chevallier@bootlin.com>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1752924900; c=relaxed/simple;
+	bh=pI/Wu4VJD4vdRub6/Z5Gz2RtKzMxqQmEx7I+Ec3VubU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=VypRfKdtcFA4+2XXyJ1b5zrgW1k3lE7Pgnyi/nWzchpxxaODFSv9j35sK6vqSQDXpzbuP4w/N/vNqi0iBZdg+CpT9QSVRko3+zpeVvKtqgHuKGOek58g6bpmeb5w7DzGSkWoux5xZ7Vklnp0K2L8i3o9zJfdNV/AxPEpu/EcJjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JnMviboH; arc=none smtp.client-ip=209.85.221.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f65.google.com with SMTP id ffacd0b85a97d-3a57c8e247cso2672138f8f.1;
+        Sat, 19 Jul 2025 04:34:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752924897; x=1753529697; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pI/Wu4VJD4vdRub6/Z5Gz2RtKzMxqQmEx7I+Ec3VubU=;
+        b=JnMviboHs4KILsKUgkt4Y16ZapGISts+KOKPL52ESSS8BAscV1M0/uRl4scS7S80Rt
+         hJuAhs6HE7c1Go2Wdo+WS9r1Mc77LenC1cv53JeSqBVp9RyP4omWFCtorCg5uQBVWh+R
+         yFW1BZuIJR9XW1i6Lru9v9hdRKISTWixdjlSysxEIc552mZLYwWpAbfnTFlgqvGTW2iD
+         vtCK3BNiIf1UrWelEPEFV9Rb0NSc/OIsxkPJlrhNdWqKXkrrnu3PScW31zoDsM/fJeCR
+         S0p617X2ianijhzVlP9Ps/JYSghChXzgrhIYGxGdpRy5h6oUJYP0WfnVRyQggIdzRROT
+         3qWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752924897; x=1753529697;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pI/Wu4VJD4vdRub6/Z5Gz2RtKzMxqQmEx7I+Ec3VubU=;
+        b=k9IFuopbtGtRxa1vfH/4dhdcPDUIG62NJLPHPFCyZHfQEINjoN0nTSE9Kj5yQvQCJU
+         ntXyaDt69FS7oaBb8SSqL0KMQHLnKsVf1ChmDTrRSj5Jg5S+1m87E0b+IuDwahD8N/Qi
+         nkQU13keRN/lkub9Gvw6lBzDr5V45/dVe+tEZIlpmX2Hq6wwypscvUC+liKnmsk5ce4b
+         3lOH62hjIett3v8LakSEtbHHeELUkHWFf8Id4NJ2FvoKHudiuB92r4vWWTGxyxcqhnnz
+         2sdI1AKN35eRZoRkzfszVEVg3A/VXvnE0xRnDOzknrsD06A25Ul0kAXKzsfypymuHaMz
+         py2w==
+X-Forwarded-Encrypted: i=1; AJvYcCVsOqAS0dq+1fjDOxdtcdAUH8UbtGYpMRKADb6cZkdwjOVG8BCWoyho/3u7wcYcZrr2gXltV6iMLNypS40=@vger.kernel.org, AJvYcCX74jPxORrbJd1RTU0mhhazvqb87WFeUMfRlf2bOreXjicfFbrgliXL2Nk4oRe1UVc3u7thTQ1M@vger.kernel.org
+X-Gm-Message-State: AOJu0YwsWkNxm/c+dEePnJyFY3CSWSWw4i5vgBF0OZIJ7xX8nNftFMIr
+	PlKMSKx2DirrbSZn/Eu7io9pz2HKvanXxTTg2y79OYVFWGiRWsV1BTDr
+X-Gm-Gg: ASbGncvV5beMvcMot312dj08Z45IiDPw8irf7kkpi9sI+r6A8YKL6GClsOEKp6am7qB
+	BXyFVa7hctFzK/uUlHfJFmzo+tePEpdTIsV99vPD1bQWHv9H01hX0MJ4s3nAYTtL/9zyNF3z4dV
+	JCeBYpkjszDNPo3PFCMCekfwhXM6DCBgoFS+jUNBaFyl4UfT9pAJfT9AsRToVt1vwOwWit+Upit
+	ZW/pWxgXGXKXcep1R4+Az6flJHs9DrWZ6jG/sPYpZN/JEJjczMXD+0TdDx/MIKsw8Zk5ait4M/a
+	77By/TUQDYr9BGMcW0jznn1VzOZRhf0Ghbx5YRUSZKLNGFhl4/4YZB/PcUX0W/jAQVNOgELzT+R
+	5d5ZoeinGzgYICj8jeuvS5ijP6tu0nw+U13CR6G0fdJ+spyU7ejlY1xjEdPG0f/rHQzaY0YxP
+X-Google-Smtp-Source: AGHT+IE6g19+dUycquzad6W/cE38ba4tQ7W22bnkBUjwXHT8HNV6H9kA6IReaLnHzsPSz4zYawmCGg==
+X-Received: by 2002:a05:6000:1ac7:b0:3b6:d94:d62b with SMTP id ffacd0b85a97d-3b60e4d28e9mr12485560f8f.15.1752924896790;
+        Sat, 19 Jul 2025 04:34:56 -0700 (PDT)
+Received: from INBSWN167928.ad.harman.com (bba-86-98-199-117.alshamil.net.ae. [86.98.199.117])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4563b740c51sm45073575e9.19.2025.07.19.04.34.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 19 Jul 2025 04:34:56 -0700 (PDT)
+From: Abid Ali <dev.nuvorolabs@gmail.com>
+To: Abid Ali <dev.nuvorolabs@gmail.com>
+Cc: Russell King <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: Fix premature resume by a PHY driver
+Date: Sat, 19 Jul 2025 11:34:50 +0000
+Message-ID: <20250719113452.7701-1-dev.nuvorolabs@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <aHtNxLODmEHRVfdn@shell.armlinux.org.uk>
+References: <aHtNxLODmEHRVfdn@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdeiieduhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefguddtfeevtddugeevgfevtdfgvdfhtdeuleetffefffffhffgteekvdefudeiieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepvdgrtddumegtsgduheemfegvgeemtgehtddtmeejtggsvgemiedtieeimeeirgdufhemtggsuggunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduheemfegvgeemtgehtddtmeejtggsvgemiedtieeimeeirgdufhemtggsuggupdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeefuddprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtp
- hhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgrrhhmqdhmshhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 8bit
 
-Le Thu, 17 Jul 2025 09:30:09 +0200,
-Maxime Chevallier <maxime.chevallier@bootlin.com> a =C3=A9crit :
+On Sat, Jul 19, 2025 at 08:48:20 AM +0100, Russell King (Oracle) wrote:
+> > I do point this path out and there is also a second call
+> > (2) .ndo_open -> phylink_start -> phy_start -> __phy_resume
+> > This would mean 2 calls to the PHY resume every time an interface is
+> > taken UP is expected behaviour?.
+>
+> The whole point is this:
+>
+> > > During this path, the PHY may or may not be suspended, depending on
+> > > the state of the hardware when control was passed to the kernel,
+> > > which includes kexec().
+>
+> Thus, the resume function *must* cope with an already resumed PHY,
+> and thus adding extra complexity to try to ignore calling the resume
+> function if it wasn't previously suspended is likely to cause
+> regressions - phydrv->suspended will be clear for the initial call
+> to ->resume(). Thus, if the PHY was suspended at boot time, it won't
+> be resumed when one attempts to bring up the interface initially.
 
-> With the phy_port representation intrduced, we can use .attach_port to
+yea, I get your point.
 
-*introduced
+> Hardware or software reset?
+>
+> How much a software reset disrupts the PHY is PHY dependent. E.g. there
+> are PHYs that need to be software reset for configuration and
+> advertisement changes, but all the software configuration is preserved
+> over such a reset.
 
-As you will have to resend a new version ;)
+The PHY we have loses power when the kernel PM goes to suspend and we
+need have a hardware reset upon its bootup in resume.
+As an unintentional consequence this ended with 2 additional
+resets (reset-delay-us in dts + 2 PHY resume) at boot->interface-UP.
+In the end the "phydev->state" in the driver`s resume callback was used to
+prevent it and checking further, it was evident that there were 2
+intentional calls for phy_resume from .ndo_open which didnt look obvious.
 
-else
-Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
+This particular scenario was not the point of the commit but rather
+having some protection for phy_resume but I guess its not possible.
+To keep it simple, these would be my present understanding.
 
-Thank you!
+1. Should the PHY driver be able handle consecutive resume callbacks?
+a. yes. It would have to be taken care in the driver.
 
-> populate the port information based on either the straps or the
-> ti,fiber-mode property. This allows simplifying the probe function and
-> allow users to override the strapping configuration.
->=20
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> ---
->  drivers/net/phy/dp83822.c | 71 +++++++++++++++++++++++++--------------
->  1 file changed, 45 insertions(+), 26 deletions(-)
->=20
-> diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
-> index 33db21251f2e..2657be2e9034 100644
-> --- a/drivers/net/phy/dp83822.c
-> +++ b/drivers/net/phy/dp83822.c
-> @@ -11,6 +11,7 @@
->  #include <linux/module.h>
->  #include <linux/of.h>
->  #include <linux/phy.h>
-> +#include <linux/phy_port.h>
->  #include <linux/netdevice.h>
->  #include <linux/bitfield.h>
-> =20
-> @@ -811,17 +812,6 @@ static int dp83822_of_init(struct phy_device *phydev)
->  	int i, ret;
->  	u32 val;
-> =20
-> -	/* Signal detection for the PHY is only enabled if the FX_EN and the
-> -	 * SD_EN pins are strapped. Signal detection can only enabled if
-> FX_EN
-> -	 * is strapped otherwise signal detection is disabled for the PHY.
-> -	 */
-> -	if (dp83822->fx_enabled && dp83822->fx_sd_enable)
-> -		dp83822->fx_signal_det_low =3D device_property_present(dev,
-> -
-> "ti,link-loss-low");
-> -	if (!dp83822->fx_enabled)
-> -		dp83822->fx_enabled =3D device_property_present(dev,
-> -
-> "ti,fiber-mode"); -
->  	if (!device_property_read_string(dev, "ti,gpio2-clk-out", &of_val)) {
->  		if (strcmp(of_val, "mac-if") =3D=3D 0) {
->  			dp83822->gpio2_clk_out =3D DP83822_CLK_SRC_MAC_IF;
-> @@ -950,6 +940,48 @@ static int dp83822_read_straps(struct phy_device *ph=
-ydev)
->  	return 0;
->  }
-> =20
-> +static int dp83822_attach_port(struct phy_device *phydev, struct phy_port
-> *port) +{
-> +	struct dp83822_private *dp83822 =3D phydev->priv;
-> +	int ret;
-> +
-> +	if (port->mediums) {
-> +		if (phy_port_is_fiber(port))
-> +			dp83822->fx_enabled =3D true;
-> +	} else {
-> +		ret =3D dp83822_read_straps(phydev);
-> +		if (ret)
-> +			return ret;
-> +
-> +#if IS_ENABLED(CONFIG_OF_MDIO)
-> +		if (dp83822->fx_enabled && dp83822->fx_sd_enable)
-> +			dp83822->fx_signal_det_low =3D
-> +				device_property_present(&phydev->mdio.dev,
-> +							"ti,link-loss-low");
-> +
-> +		/* ti,fiber-mode is still used for backwards compatibility,
-> but
-> +		 * has been replaced with the mdi node definition, see
-> +		 * ethernet-port.yaml
-> +		 */
-> +		if (!dp83822->fx_enabled)
-> +			dp83822->fx_enabled =3D
-> +				device_property_present(&phydev->mdio.dev,
-> +							"ti,fiber-mode");
-> +#endif /* CONFIG_OF_MDIO */
-> +
-> +		if (dp83822->fx_enabled) {
-> +			port->lanes =3D 1;
-> +			port->mediums =3D BIT(ETHTOOL_LINK_MEDIUM_BASEF);
-> +		} else {
-> +			/* This PHY can only to 100BaseTX max, so on 2 lanes
-> */
-> +			port->lanes =3D 2;
-> +			port->mediums =3D BIT(ETHTOOL_LINK_MEDIUM_BASET);
-> +		}
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static int dp8382x_probe(struct phy_device *phydev)
->  {
->  	struct dp83822_private *dp83822;
-> @@ -968,27 +1000,13 @@ static int dp8382x_probe(struct phy_device *phydev)
-> =20
->  static int dp83822_probe(struct phy_device *phydev)
->  {
-> -	struct dp83822_private *dp83822;
->  	int ret;
-> =20
->  	ret =3D dp8382x_probe(phydev);
->  	if (ret)
->  		return ret;
-> =20
-> -	dp83822 =3D phydev->priv;
-> -
-> -	ret =3D dp83822_read_straps(phydev);
-> -	if (ret)
-> -		return ret;
-> -
-> -	ret =3D dp83822_of_init(phydev);
-> -	if (ret)
-> -		return ret;
-> -
-> -	if (dp83822->fx_enabled)
-> -		phydev->port =3D PORT_FIBRE;
-> -
-> -	return 0;
-> +	return dp83822_of_init(phydev);
->  }
-> =20
->  static int dp83826_probe(struct phy_device *phydev)
-> @@ -1172,6 +1190,7 @@ static int dp83822_led_hw_control_get(struct phy_de=
-vice
-> *phydev, u8 index, .led_hw_is_supported =3D dp83822_led_hw_is_supported,
-> \ .led_hw_control_set =3D dp83822_led_hw_control_set,	\
->  		.led_hw_control_get =3D dp83822_led_hw_control_get,	\
-> +		.attach_port =3D dp83822_attach_port		\
->  	}
-> =20
->  #define DP83825_PHY_DRIVER(_id, _name)				\
-
-
-
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+2. Why does phy_resume exec twice in .ndo_open with PHYLINK API?
+a. can happen but still dont have clarity on why .ndo_open does this.
 
