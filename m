@@ -1,493 +1,118 @@
-Return-Path: <netdev+bounces-208321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AAC4B0AEF4
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 11:14:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07463B0AF4E
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 12:19:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EE05AA245F
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 09:14:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7B673B9E8D
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 10:18:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96314238C2C;
-	Sat, 19 Jul 2025 09:14:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72B931F8725;
+	Sat, 19 Jul 2025 10:19:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="AgvGYcQn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TeG4TdXa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774B923507E
-	for <netdev@vger.kernel.org>; Sat, 19 Jul 2025 09:14:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B433AC8EB
+	for <netdev@vger.kernel.org>; Sat, 19 Jul 2025 10:18:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752916468; cv=none; b=dceNMyeiZGDQp95CaUrdG4TMUZrW0bY7MkEm1cjuSJ+prS0r8VMtzJZ8w8lGiqPf48J1+gJXYOb351WbF3rwFU06cYF9fvD0Ir0//R0YD4+HvpyCVpaz+DXDjJoV7ng63+Q9WW/F7rETfU3fO8Q0/+YwoJD6cUu9tmFz65Hnh5M=
+	t=1752920340; cv=none; b=HXvT8A8tA0DtpWagbsmO0mQ4s0DSJEyFvXzazn60UY4HPR1WkzGNlpnosOEfHJouRnrdxgLwqt2oWGYP2+UpPwX6whr1qXIUO6jRwc7qkt+eQbc4l0sC+0CoxFclX10IijFpXoW7WiOdMV5XyP+XoefNsPCQH4Zm+AQ+yEy1FBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752916468; c=relaxed/simple;
-	bh=nVXKuPPL1gJ9OIsmHngNFnykU1uaFrUSK6TCxmZNuQE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=d4I5OBJhksEJfYQeS6TFVSKbdBsmRFdpZ1e/OeSFHz6FMW7aXeG+q8XkI4ytQiHFlpuosGiYHdvkMopJXvW79GvnooBAc+JgPdw16+gUqEYdnijs0e54CBAGszoovWFz7iNPqkIJy3728C9FqPdF/pfCGzRcf6Fk1GC450TK4DY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=AgvGYcQn; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56J5xvmj020232;
-	Sat, 19 Jul 2025 09:14:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pp1; bh=v2sZY0f0KtfxtIWOixGUTxeWwWGn
-	aOoGQS5HE8Mt42E=; b=AgvGYcQniMRUrtTlgB5vu23SHUucWms7EbCs1+98FYTL
-	yp0s851ztXEtAQSBtslr1Nr2pNJymQnRXWbUuRK2AT2w9l4gZTUbyM4Gk+YuU26i
-	8JU/pH64SFpyLXmx+Ic8dcQBG/w9MRWmj5BO26ki9fFupZsTOP98rvqEmB/gpdYY
-	NDxza/74WWFYE9smGe8+6kpB9TwaA1Ahq7WGdTsmyijZKP3vJie/tCdwfYnqmpJJ
-	7G3su6lZ740NbjweDR4atihaEvhwYUD2k/Js9gLfRZqloHL8ndQFUMcm3Z4fzg+X
-	MT/Ln/xuCXQKOoeEzGZVPSKKJsfGxN62goBqhdKoeA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4805hfggvq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 19 Jul 2025 09:14:03 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 56J9E2Om012008;
-	Sat, 19 Jul 2025 09:14:02 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4805hfggvn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 19 Jul 2025 09:14:02 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56J7UGpl031922;
-	Sat, 19 Jul 2025 09:14:01 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 47v21uncma-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 19 Jul 2025 09:14:01 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56J9E0dc9699982
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 19 Jul 2025 09:14:00 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B38A858058;
-	Sat, 19 Jul 2025 09:14:00 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7C9EE58057;
-	Sat, 19 Jul 2025 09:13:59 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.61.243.79])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Sat, 19 Jul 2025 09:13:59 +0000 (GMT)
-From: Mingming Cao <mmc@linux.ibm.com>
+	s=arc-20240116; t=1752920340; c=relaxed/simple;
+	bh=MhpEgvgj6Vg1T/xy5dxQYSQnZ2t3W6+e35aAoVn1YI0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=M2DGSUMnOFLJnmVTk/E9ybymReeOXa+qz+VZQQvSwrWar7l2UemSpkNf7F9bWCrg9C0RM8zqRC1vSu+xUyD7pYCFQWMnhka8PS6sKKiHCd7T5SA5gv47a0X65wWIvv0SKghS44DMTeITOiulFrV5qCDqoVRyC5H2m/ZE9nugP3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TeG4TdXa; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-55a33eecc35so1459945e87.2
+        for <netdev@vger.kernel.org>; Sat, 19 Jul 2025 03:18:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752920336; x=1753525136; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TO+NdEZN/z6Y3MR7TZVDzCn04AtXiokspHTpyURVY/s=;
+        b=TeG4TdXaZmQfVbkTmcOPG+qzevvE3uDoXpEo5cEanaFN4bFjPsGtsjvwLg3RJgh+qP
+         Pq6uN/yzoH2hit8CYGHVuJmNyfHqvThdo9IXc9FVl021SyzuRE2li4BZSFx3OJ/W505e
+         fTvLOL9yG6rZpIXp+ks45PZV2+DqQ58TpMuL3fTfsSl/n99zVT8eGzZQx6Vuf94hlcga
+         4toyGvHOrB9PbF/gOJ0OdNzmGvC7KRBOUL6e4MO+NYSRQyBnLxL7rA0OaqL8a2lROb4h
+         A8puJBS4VkqcmIiQAE6zB6SEKK1AhpWniZwPr+QhZPiW25KaCYmQhWeHS824iCLtaoND
+         OYwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752920336; x=1753525136;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TO+NdEZN/z6Y3MR7TZVDzCn04AtXiokspHTpyURVY/s=;
+        b=fiU2vWBtb7gbSQwrnG3ypkKPYjsIM9Yst/Gvtrpem24lts3edi4JlAesBhL4cChWTH
+         2QnAurOW/FGI9MOjhQHInPq/mpV9uPYZN3JeO9sw919pAM2BGqX0SrnmTjZHRpPJMVsm
+         2PMXKpUe/aFR/OBoBhUj1BC8vlA3BKcJ7+aHtgvXA7qGC5jHMTh6OPIssVx4zti7XSjX
+         Kg8CQQTPkdDE22FKyRYf/+LUKFYBHoyn3adzA0Qt4zZIb2qn3vaS64NCh6Cq2AxKWCKC
+         hAIFNmzbeTgyx43IwU49YY3bP19LlIVopiApJbU0LfQ4oKJu/jr3Sg7fDPxzXb/+ENe8
+         exwA==
+X-Gm-Message-State: AOJu0Yxuxuu3DTtLajVhHGYUtIFSoj0Eu9HgQNrzWwo5DEW+G17E/Z7X
+	KY/T9a0AQkCZflDGOomX5ciSPhwF5qOJEdcKn3ZjtVGIZZzbOQUU9XDTL6YEjOJQVYY=
+X-Gm-Gg: ASbGnctGl1a5SMNsv1PeYoUvoUcEb9w6+2az5e7DxS7k4EJNiVgx82YcM3/3vXg3l1q
+	aO+HU7puXww3UevQMTpGFUYMR3GClqBwXieYWpUFy2K9tjCLOtI82UuMYhmtXIL/oUYdViW+z5Y
+	2GfhEEe/vUg7dUtIA1U4vtRX7G/ivqBNBGBuwDWht65sJZe208065SzuirxT7oikRKATWDH6Ks0
+	HCqR/N49Wyq/c/PE0Hubnlp9XerhSieTeMXpeeyMzy37OnfDZrAh56R+7Ro8iYNf5580/XWnk4r
+	ZQKegvK2FQH9Nvu6wOL0dkmfaA+ixG5LJOseVq1xpjfcnF7ya6Q3IVZzTEnONFwjyzsWxS9UyOO
+	xC7OuJeVeHzL/WEp1QQ9sVsF7PaZ7qAFJt5c15QD85u3yQtKtTCE27+nMPEifWXZQjwRg2HW9
+X-Google-Smtp-Source: AGHT+IHAIy4+2Rrm9dygiaMuuShux6GApMm8u03Yt6s4G+n9HFNfWoDBKKwarARZZJnLCzOQ28cs7g==
+X-Received: by 2002:a05:6512:1310:b0:54e:81ec:2c83 with SMTP id 2adb3069b0e04-55a295a0943mr2995226e87.18.1752920336094;
+        Sat, 19 Jul 2025 03:18:56 -0700 (PDT)
+Received: from lnb0tqzjk.rasu.local (109-252-120-31.nat.spd-mgts.ru. [109.252.120.31])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-55a31dab938sm660221e87.203.2025.07.19.03.18.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 19 Jul 2025 03:18:55 -0700 (PDT)
+From: Anton Moryakov <ant.v.moryakov@gmail.com>
 To: netdev@vger.kernel.org
-Cc: horms@kernel.org, bjking1@linux.ibm.com, haren@linux.ibm.com,
-        ricklind@linux.ibm.com, davemarq@linux.ibm.com, mmc@linux.ibm.com,
-        maddy@linux.ibm.com, mpe@ellerman.id.au, npiggin@gmail.com,
-        christophe.leroy@csgroup.eu, andrew+netdev@lunn.ch,
-        davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
-        pabeni@redhat.com, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH net-next v2] ibmveth: Add multi buffers rx replenishment hcall support
-Date: Sat, 19 Jul 2025 05:13:56 -0400
-Message-Id: <20250719091356.57252-1-mmc@linux.ibm.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+Cc: Anton Moryakov <ant.v.moryakov@gmail.com>
+Subject: [PATCH iproute2-next] misc: fix memory leak in ifstat.c
+Date: Sat, 19 Jul 2025 13:18:52 +0300
+Message-Id: <20250719101852.31514-1-ant.v.moryakov@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE5MDA5MCBTYWx0ZWRfX5N4MpLAQ8hiC
- dSuNX1wlk/zxewohe3Ors/GIGIm2hTujEAv897yHac0IJAzdTEyglNNR1QO2qeA1tX/NZtyEMpY
- G3K8lJFARAIvQb5+soiwWaqsnCxe6LJ65UOAPvACTRSGKx4v8Vl2qdUZfVSo5G35d8ZIeOL90BB
- ripn8VU75FE6KnstzbWF5J8OMR6GhwdQSL+mXR5pz6Pzns19azCgfu5l0lxc8t6PS2NkOY7SZ5y
- jMVEoeiJyy6mqmgg6SU/qmtmyfj+Pz2YexxPUQMNLAG3xBjDuscmLz7YY1rXmtAg7Ui5nLYhm2b
- 04kLKoMqqTBDvMdTy5YhqbuiafbjJk5nMLnGhhW8cr0B4AZgY/2hazM4DGLU/hj8Fqoc/OvSNaS
- JpMpwqwymJEZYkRvhPmMo7CviTxPjmILAjkc81fcDNXYlflM+9tKF9gsZKQB/kP/hwruocSn
-X-Proofpoint-GUID: aO8YaWJmtWbVP4eprk-VbRVCMXRExj7r
-X-Proofpoint-ORIG-GUID: RHvBNk0w3JB9BygYSIGj_5RDZTMIEfW0
-X-Authority-Analysis: v=2.4 cv=X9RSKHTe c=1 sm=1 tr=0 ts=687b61db cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VnNF1IyMAAAA:8 a=fljhNFjLKTGLiRJvVM8A:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-19_01,2025-07-17_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 priorityscore=1501 adultscore=0 lowpriorityscore=0
- phishscore=0 malwarescore=0 clxscore=1015 mlxscore=0 spamscore=0
- suspectscore=0 mlxlogscore=999 bulkscore=0 classifier=spam authscore=0
- authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505280000 definitions=main-2507190090
 
-This patch enables batched RX buffer replenishment in ibmveth by
-using the new firmware-supported h_add_logical_lan_buffers() hcall
- to submit up to 8 RX buffers in a single call, instead of repeatedly
-calling the single-buffer h_add_logical_lan_buffer() hcall.
+A memory leak was detected by the static analyzer SVACE in the function
+get_nlmsg_extended(). The issue occurred when parsing extended interface
+statistics failed due to a missing nested attribute. In this case,
+memory allocated for 'n->name' via strdup() was not freed before returning,
+resulting in a leak.
 
-During the probe, with the patch, the driver queries ILLAN attributes
-to detect IBMVETH_ILLAN_RX_MULTI_BUFF_SUPPORT bit. If the attribute is
-present, rx_buffers_per_hcall is set to 8, enabling batched replenishment.
-Otherwise, it defaults to 1, preserving the original upstream behavior
- with no change in code flow for unsupported systems.
+The fix adds an explicit 'free(n->name)' call before freeing the containing
+structure in the error path.
 
-The core rx replenish logic remains the same. But when batching
-is enabled, the driver aggregates up to 8 fully prepared descriptors
-into a single h_add_logical_lan_buffers() hypercall. If any allocation
-or DMA mapping fails while preparing a batch, only the successfully
-prepared buffers are submitted, and the remaining are deferred for
-the next replenish cycle.
-
-If at runtime the firmware stops accepting the batched hcall—e,g,
-after a Live Partition Migration (LPM) to a host that does not
-support h_add_logical_lan_buffers(), the hypercall returns H_FUNCTION.
-In that case, the driver transparently disables batching, resets
-rx_buffers_per_hcall to 1, and falls back to the single-buffer hcall
-in next future replenishments to take care of these and future buffers.
-
-Test were done on systems with firmware that both supports and
-does not support the new h_add_logical_lan_buffers hcall.
-
-On supported firmware, this reduces hypercall overhead significantly
-over multiple buffers. SAR measurements showed about a 15% improvement
-in packet processing rate under moderate RX load, with heavier traffic
-seeing gains more than 30%
-
-Signed-off-by: Mingming Cao <mmc@linux.ibm.com>
-Reviewed-by: Brian King <bjking1@linux.ibm.com>
-Reviewed-by: Haren Myneni <haren@linux.ibm.com>
-Reviewed-by: Dave Marquardt <davemarq@linux.ibm.com>
+Reported-by: SVACE static analyzer
+Signed-off-by: Anton Moryakov <ant.v.moryakov@gmail.com>
 ---
- arch/powerpc/include/asm/hvcall.h  |   1 +
- drivers/net/ethernet/ibm/ibmveth.c | 220 ++++++++++++++++++++---------
- drivers/net/ethernet/ibm/ibmveth.h |  21 +++
- 3 files changed, 174 insertions(+), 68 deletions(-)
+ misc/ifstat.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/powerpc/include/asm/hvcall.h b/arch/powerpc/include/asm/hvcall.h
-index 6df6dbbe1e7c..ea6c8dc400d2 100644
---- a/arch/powerpc/include/asm/hvcall.h
-+++ b/arch/powerpc/include/asm/hvcall.h
-@@ -270,6 +270,7 @@
- #define H_QUERY_INT_STATE       0x1E4
- #define H_POLL_PENDING		0x1D8
- #define H_ILLAN_ATTRIBUTES	0x244
-+#define H_ADD_LOGICAL_LAN_BUFFERS 0x248
- #define H_MODIFY_HEA_QP		0x250
- #define H_QUERY_HEA_QP		0x254
- #define H_QUERY_HEA		0x258
-diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
-index 24046fe16634..6f0821f1e798 100644
---- a/drivers/net/ethernet/ibm/ibmveth.c
-+++ b/drivers/net/ethernet/ibm/ibmveth.c
-@@ -211,98 +211,169 @@ static inline void ibmveth_flush_buffer(void *addr, unsigned long length)
- static void ibmveth_replenish_buffer_pool(struct ibmveth_adapter *adapter,
- 					  struct ibmveth_buff_pool *pool)
- {
--	u32 i;
--	u32 count = pool->size - atomic_read(&pool->available);
--	u32 buffers_added = 0;
--	struct sk_buff *skb;
--	unsigned int free_index, index;
--	u64 correlator;
-+	union ibmveth_buf_desc descs[IBMVETH_MAX_RX_PER_HCALL] = {0};
-+	u32 remaining = pool->size - atomic_read(&pool->available);
-+	u64 correlators[IBMVETH_MAX_RX_PER_HCALL] = {0};
- 	unsigned long lpar_rc;
-+	u32 buffers_added = 0;
-+	u32 i, filled, batch;
-+	struct vio_dev *vdev;
- 	dma_addr_t dma_addr;
-+	struct device *dev;
-+	u32 index;
-+
-+	vdev = adapter->vdev;
-+	dev = &vdev->dev;
- 
- 	mb();
- 
--	for (i = 0; i < count; ++i) {
--		union ibmveth_buf_desc desc;
-+	batch = adapter->rx_buffers_per_hcall;
- 
--		free_index = pool->consumer_index;
--		index = pool->free_map[free_index];
--		skb = NULL;
-+	while (remaining > 0) {
-+		unsigned int free_index = pool->consumer_index;
- 
--		if (WARN_ON(index == IBM_VETH_INVALID_MAP)) {
--			schedule_work(&adapter->work);
--			goto bad_index_failure;
--		}
-+		/* Fill a batch of descriptors */
-+		for (filled = 0; filled < min(remaining, batch); filled++) {
-+			index = pool->free_map[free_index];
-+			if (WARN_ON(index == IBM_VETH_INVALID_MAP)) {
-+				adapter->replenish_add_buff_failure++;
-+				netdev_info(adapter->netdev,
-+					    "Invalid map index %u, reset\n",
-+					    index);
-+				schedule_work(&adapter->work);
-+				break;
-+			}
-+
-+			if (!pool->skbuff[index]) {
-+				struct sk_buff *skb = NULL;
- 
--		/* are we allocating a new buffer or recycling an old one */
--		if (pool->skbuff[index])
--			goto reuse;
-+				skb = netdev_alloc_skb(adapter->netdev,
-+						       pool->buff_size);
-+				if (!skb) {
-+					adapter->replenish_no_mem++;
-+					adapter->replenish_add_buff_failure++;
-+					break;
-+				}
-+
-+				dma_addr = dma_map_single(dev, skb->data,
-+							  pool->buff_size,
-+							  DMA_FROM_DEVICE);
-+				if (dma_mapping_error(dev, dma_addr)) {
-+					dev_kfree_skb_any(skb);
-+					adapter->replenish_add_buff_failure++;
-+					break;
-+				}
- 
--		skb = netdev_alloc_skb(adapter->netdev, pool->buff_size);
-+				pool->dma_addr[index] = dma_addr;
-+				pool->skbuff[index] = skb;
-+			} else {
-+				/* re-use case */
-+				dma_addr = pool->dma_addr[index];
-+			}
- 
--		if (!skb) {
--			netdev_dbg(adapter->netdev,
--				   "replenish: unable to allocate skb\n");
--			adapter->replenish_no_mem++;
--			break;
--		}
-+			if (rx_flush) {
-+				unsigned int len;
- 
--		dma_addr = dma_map_single(&adapter->vdev->dev, skb->data,
--				pool->buff_size, DMA_FROM_DEVICE);
-+				len = adapter->netdev->mtu + IBMVETH_BUFF_OH;
-+				len = min(pool->buff_size, len);
-+				ibmveth_flush_buffer(pool->skbuff[index]->data,
-+						     len);
-+			}
- 
--		if (dma_mapping_error(&adapter->vdev->dev, dma_addr))
--			goto failure;
-+			descs[filled].fields.flags_len = IBMVETH_BUF_VALID |
-+							  pool->buff_size;
-+			descs[filled].fields.address = dma_addr;
- 
--		pool->dma_addr[index] = dma_addr;
--		pool->skbuff[index] = skb;
-+			correlators[filled] = ((u64)pool->index << 32) | index;
-+			*(u64 *)pool->skbuff[index]->data = correlators[filled];
- 
--		if (rx_flush) {
--			unsigned int len = min(pool->buff_size,
--					       adapter->netdev->mtu +
--					       IBMVETH_BUFF_OH);
--			ibmveth_flush_buffer(skb->data, len);
-+			free_index++;
-+			if (free_index >= pool->size)
-+				free_index = 0;
+diff --git a/misc/ifstat.c b/misc/ifstat.c
+index 4ce5ca8a..5b59fd8f 100644
+--- a/misc/ifstat.c
++++ b/misc/ifstat.c
+@@ -139,6 +139,7 @@ static int get_nlmsg_extended(struct nlmsghdr *m, void *arg)
+ 		attr = parse_rtattr_one_nested(sub_type, tb[filter_type]);
+ 		if (attr == NULL) {
+ 			free(n);
++			free(n->name);
+ 			return 0;
  		}
--reuse:
--		dma_addr = pool->dma_addr[index];
--		desc.fields.flags_len = IBMVETH_BUF_VALID | pool->buff_size;
--		desc.fields.address = dma_addr;
--
--		correlator = ((u64)pool->index << 32) | index;
--		*(u64 *)pool->skbuff[index]->data = correlator;
- 
--		lpar_rc = h_add_logical_lan_buffer(adapter->vdev->unit_address,
--						   desc.desc);
-+		if (!filled)
-+			break;
- 
-+		/* single buffer case*/
-+		if (filled == 1)
-+			lpar_rc = h_add_logical_lan_buffer(vdev->unit_address,
-+							   descs[0].desc);
-+		else
-+			/* Multi-buffer hcall */
-+			lpar_rc = h_add_logical_lan_buffers(vdev->unit_address,
-+							    descs[0].desc,
-+							    descs[1].desc,
-+							    descs[2].desc,
-+							    descs[3].desc,
-+							    descs[4].desc,
-+							    descs[5].desc,
-+							    descs[6].desc,
-+							    descs[7].desc);
- 		if (lpar_rc != H_SUCCESS) {
--			netdev_warn(adapter->netdev,
--				    "%sadd_logical_lan failed %lu\n",
--				    skb ? "" : "When recycling: ", lpar_rc);
--			goto failure;
-+			dev_warn_ratelimited(dev,
-+					     "RX h_add_logical_lan failed: filled=%u, rc=%lu, batch=%u\n",
-+					     filled, lpar_rc, batch);
-+			goto hcall_failure;
- 		}
- 
--		pool->free_map[free_index] = IBM_VETH_INVALID_MAP;
--		pool->consumer_index++;
--		if (pool->consumer_index >= pool->size)
--			pool->consumer_index = 0;
-+		/* Only update pool state after hcall succeeds */
-+		for (i = 0; i < filled; i++) {
-+			free_index = pool->consumer_index;
-+			pool->free_map[free_index] = IBM_VETH_INVALID_MAP;
- 
--		buffers_added++;
--		adapter->replenish_add_buff_success++;
--	}
-+			pool->consumer_index++;
-+			if (pool->consumer_index >= pool->size)
-+				pool->consumer_index = 0;
-+		}
- 
--	mb();
--	atomic_add(buffers_added, &(pool->available));
--	return;
-+		buffers_added += filled;
-+		adapter->replenish_add_buff_success += filled;
-+		remaining -= filled;
- 
--failure:
-+		memset(&descs, 0, sizeof(descs));
-+		memset(&correlators, 0, sizeof(correlators));
-+		continue;
- 
--	if (dma_addr && !dma_mapping_error(&adapter->vdev->dev, dma_addr))
--		dma_unmap_single(&adapter->vdev->dev,
--		                 pool->dma_addr[index], pool->buff_size,
--		                 DMA_FROM_DEVICE);
--	dev_kfree_skb_any(pool->skbuff[index]);
--	pool->skbuff[index] = NULL;
--bad_index_failure:
--	adapter->replenish_add_buff_failure++;
-+hcall_failure:
-+		for (i = 0; i < filled; i++) {
-+			index = correlators[i] & 0xffffffffUL;
-+			dma_addr =  pool->dma_addr[index];
-+
-+			if (pool->skbuff[index]) {
-+				if (dma_addr &&
-+				    !dma_mapping_error(dev, dma_addr))
-+					dma_unmap_single(dev, dma_addr,
-+							 pool->buff_size,
-+							 DMA_FROM_DEVICE);
-+
-+				dev_kfree_skb_any(pool->skbuff[index]);
-+				pool->skbuff[index] = NULL;
-+			}
-+		}
-+		adapter->replenish_add_buff_failure += filled;
-+
-+		/*
-+		 * If multi rx buffers hcall is no longer supported by FW
-+		 * e.g. in the case of Live Parttion Migration
-+		 */
-+		if (batch > 1 && lpar_rc == H_FUNCTION) {
-+			/*
-+			 * Instead of retry submit single buffer individually
-+			 * here just set the max rx buffer per hcall to 1
-+			 * buffers will be respleshed next time
-+			 * when ibmveth_replenish_buffer_pool() is called again
-+			 * with single-buffer case
-+			 */
-+			netdev_info(adapter->netdev,
-+				    "RX Multi buffers not supported by FW, rc=%lu\n",
-+				    lpar_rc);
-+			adapter->rx_buffers_per_hcall = 1;
-+			netdev_info(adapter->netdev,
-+				    "Next rx replesh will fall back to single-buffer hcall\n");
-+		}
-+		break;
-+	}
- 
- 	mb();
- 	atomic_add(buffers_added, &(pool->available));
-@@ -1783,6 +1854,19 @@ static int ibmveth_probe(struct vio_dev *dev, const struct vio_device_id *id)
- 		netdev->features |= NETIF_F_FRAGLIST;
- 	}
- 
-+	if (ret == H_SUCCESS &&
-+	    (ret_attr & IBMVETH_ILLAN_RX_MULTI_BUFF_SUPPORT)) {
-+		adapter->rx_buffers_per_hcall = IBMVETH_MAX_RX_PER_HCALL;
-+		netdev_dbg(netdev,
-+			   "RX Multi-buffer hcall supported by FW, batch set to %u\n",
-+			    adapter->rx_buffers_per_hcall);
-+	} else {
-+		adapter->rx_buffers_per_hcall = 1;
-+		netdev_dbg(netdev,
-+			   "RX Single-buffer hcall mode, batch set to %u\n",
-+			   adapter->rx_buffers_per_hcall);
-+	}
-+
- 	netdev->min_mtu = IBMVETH_MIN_MTU;
- 	netdev->max_mtu = ETH_MAX_MTU - IBMVETH_BUFF_OH;
- 
-diff --git a/drivers/net/ethernet/ibm/ibmveth.h b/drivers/net/ethernet/ibm/ibmveth.h
-index b0a2460ec9f9..068f99df133e 100644
---- a/drivers/net/ethernet/ibm/ibmveth.h
-+++ b/drivers/net/ethernet/ibm/ibmveth.h
-@@ -28,6 +28,7 @@
- #define IbmVethMcastRemoveFilter     0x2UL
- #define IbmVethMcastClearFilterTable 0x3UL
- 
-+#define IBMVETH_ILLAN_RX_MULTI_BUFF_SUPPORT	0x0000000000040000UL
- #define IBMVETH_ILLAN_LRG_SR_ENABLED	0x0000000000010000UL
- #define IBMVETH_ILLAN_LRG_SND_SUPPORT	0x0000000000008000UL
- #define IBMVETH_ILLAN_PADDED_PKT_CSUM	0x0000000000002000UL
-@@ -46,6 +47,24 @@
- #define h_add_logical_lan_buffer(ua, buf) \
-   plpar_hcall_norets(H_ADD_LOGICAL_LAN_BUFFER, ua, buf)
- 
-+static inline long h_add_logical_lan_buffers(unsigned long unit_address,
-+					     unsigned long desc1,
-+					     unsigned long desc2,
-+					     unsigned long desc3,
-+					     unsigned long desc4,
-+					     unsigned long desc5,
-+					     unsigned long desc6,
-+					     unsigned long desc7,
-+					     unsigned long desc8)
-+{
-+	unsigned long retbuf[PLPAR_HCALL9_BUFSIZE];
-+
-+	return plpar_hcall9(H_ADD_LOGICAL_LAN_BUFFERS,
-+			    retbuf, unit_address,
-+			    desc1, desc2, desc3, desc4,
-+			    desc5, desc6, desc7, desc8);
-+}
-+
- /* FW allows us to send 6 descriptors but we only use one so mark
-  * the other 5 as unused (0)
-  */
-@@ -101,6 +120,7 @@ static inline long h_illan_attributes(unsigned long unit_address,
- #define IBMVETH_MAX_TX_BUF_SIZE (1024 * 64)
- #define IBMVETH_MAX_QUEUES 16U
- #define IBMVETH_DEFAULT_QUEUES 8U
-+#define IBMVETH_MAX_RX_PER_HCALL 8U
- 
- static int pool_size[] = { 512, 1024 * 2, 1024 * 16, 1024 * 32, 1024 * 64 };
- static int pool_count[] = { 256, 512, 256, 256, 256 };
-@@ -151,6 +171,7 @@ struct ibmveth_adapter {
- 	int rx_csum;
- 	int large_send;
- 	bool is_active_trunk;
-+	unsigned int rx_buffers_per_hcall;
- 
- 	u64 fw_ipv6_csum_support;
- 	u64 fw_ipv4_csum_support;
+ 		memcpy(&n->val, RTA_DATA(attr), sizeof(n->val));
 -- 
-2.39.3 (Apple Git-146)
+2.39.2
 
 
