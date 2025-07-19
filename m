@@ -1,544 +1,493 @@
-Return-Path: <netdev+bounces-208320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80F51B0AEC2
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 10:32:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AAC4B0AEF4
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 11:14:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B006C3AB16B
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 08:31:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EE05AA245F
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 09:14:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F3E02367D7;
-	Sat, 19 Jul 2025 08:31:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96314238C2C;
+	Sat, 19 Jul 2025 09:14:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BQqbG2Xp"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="AgvGYcQn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7130239562;
-	Sat, 19 Jul 2025 08:31:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774B923507E
+	for <netdev@vger.kernel.org>; Sat, 19 Jul 2025 09:14:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752913900; cv=none; b=oqsS3KPrsiZDrFTHcpyzg2DDQaosYz+ZHWju3NAW9Kh5UlwKta82pjMfWweu3eS1qWNCIVY7TGtsC3KBaJMJyn/hYHYQwSgUySypeE8ZR/P2pgPB0XaqZwbik8EXNkIDGgqfyKHf23ZpeZGhOosuByk+9xr2EFVmtbux/JNl6VI=
+	t=1752916468; cv=none; b=dceNMyeiZGDQp95CaUrdG4TMUZrW0bY7MkEm1cjuSJ+prS0r8VMtzJZ8w8lGiqPf48J1+gJXYOb351WbF3rwFU06cYF9fvD0Ir0//R0YD4+HvpyCVpaz+DXDjJoV7ng63+Q9WW/F7rETfU3fO8Q0/+YwoJD6cUu9tmFz65Hnh5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752913900; c=relaxed/simple;
-	bh=iH8ItoasH1gDaQiUxl4+YF41U4VkVXOT+Mi0Dz79yuU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bPo3fjZFQtLoZVHS6oClGy0uY2p2wzd7unbbKu69xIYWrOGQXPfthz1Bxm+EyJTbDy2OUeTlc0jYUy6KIkshRUqMw6KZgtsUMhz11ed1P2PhlSRiWLyMqVtu8VGV14w4hN77+t5wS7KOA7b1pnpqULRqsuOxtE6sY0GWqpeCQ54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BQqbG2Xp; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4560add6cd2so22602475e9.0;
-        Sat, 19 Jul 2025 01:31:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752913896; x=1753518696; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HUckn10WlK4XE41fAiCWrfhz3MjSrJu7ubH6Em5MS6k=;
-        b=BQqbG2Xp93b34IHiNpfOMrUk1FHInYnuiDKqJg8sSuNMVyck25MMtKublhrzJCor8n
-         CWRpAXBhvq0srTgZEWYZ17lZf0HGql4TtwXQ8goMwYMKQhRw/cSb+Q1VkP/0mZu9bcyQ
-         X4AC7i7fIELP55dp/jScxI9f+eQY0Jmho12Yh7ceQYuom3yowuUBoIgAd32ESqon/dl7
-         ks5INowW3Qlpeqz+G7qaAjdLvrKuXiTY1/Pnxnn041pKpcDgB/UFRukQ7Pw2N7DKtF6P
-         livmxtGzhCL2WcMTnUL2Z9vzP0pMKg1Vho7/P2RPB0D1xreteJj6eqoJ9JKF0vxF5qDj
-         ekyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752913896; x=1753518696;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HUckn10WlK4XE41fAiCWrfhz3MjSrJu7ubH6Em5MS6k=;
-        b=Tbl+KkWVLr5MKmsTbCgqDNxWDhlsjX4xd3IfiiL9K1U82vL4c9o6KYwuwm0cmeKLsb
-         AFf0oNgt6eKZWXC8OAjPtszJ0Za8IhWqfsf3lH7SfAzc+J8EoIYR2oZdu9IHkOraq7rr
-         TxFiFB5fTXzTU7OjueB00DG+yVIZIzHXJRczF3WGOYtTDd9nQPx0vhotSiXCxNtzdwI8
-         Q4c/dlSaAd3J5/M5eG++q2YLKMVdP9jozPuC82a23ZTpZna/FFWrpuSO3q+eFlHv8v14
-         fPbWd40kTGPr4m1LmeigpeOX9YpEgF2hil4N1WrPMdxJk+wNflaZWkRQHcI+hjJHoBpq
-         yP3w==
-X-Forwarded-Encrypted: i=1; AJvYcCWynvTblB89HNkWuPef6Z+o6XidEFKBFUSS2UtWTh4xouS400l8WTla1u/7I6zZQKawcFwpWrO4pjBtoczG+qSg@vger.kernel.org, AJvYcCXWgJgGYQUyfV36gE40DK7tXUKmQqlynb+N3+hMb6a3QWkN7GzFZfB2+gzSoOKlWfn9RT0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSmMWa2qL2yrxaIxrDbOu7beCw+SCMN02fRW2/d3F+34DwYK5D
-	P43wp+ququvW5TAUc2Gr2ojnKfEa2iRHHYtdjFROXSuGmpa0GmNslHBHRTZpAqul
-X-Gm-Gg: ASbGncsBrsseMZE4oRxV02Ex8BPZrVe3dRTKAcn+2/7dMJ4e1xLr47YS3vdQkZ0DxS/
-	zFXaVGlXmBEKPIUBsUSC0dXYZxSxYuwsqfeRbA3jLAx4eePCJqz5M0Vk9YxcSOn4jhhHN0Jf6+l
-	1kUH9G+cqFPmBXu1esq5kTH4itDBv78Rfzk8Na3+1kcrDPG/yu3xZr7QSjnLIdvIfOH9LJ8VlUw
-	PFBoOVzmi4K/eBAn3/doj2p+pVj09VaHlhivrkjYjmhJ9VFFqH/6SzRO4R4AS2dshZnOUVrEEyk
-	+nDJ5DvkLC0X72T2IMtHUDA19hDW3zpa3ger0w1/cWwTW0GtF6t6xPrMrpNSDUlG3UdQitmD13P
-	S1T1jPPp+e9E1VOoPnuA=
-X-Google-Smtp-Source: AGHT+IH5Q26+H41r3NHPhRFJ9oFciblkZ+X5Ax24q1lTH2LOiioNMepoybfAnuVwZ5xwheWkV4g9Fg==
-X-Received: by 2002:a05:600c:4e06:b0:456:2139:456a with SMTP id 5b1f17b1804b1-45634c82b45mr103429725e9.15.1752913895431;
-        Sat, 19 Jul 2025 01:31:35 -0700 (PDT)
-Received: from localhost ([2a03:2880:31ff:1::])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca5c952sm4139356f8f.86.2025.07.19.01.31.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Jul 2025 01:31:34 -0700 (PDT)
-From: Mohsin Bashir <mohsin.bashr@gmail.com>
+	s=arc-20240116; t=1752916468; c=relaxed/simple;
+	bh=nVXKuPPL1gJ9OIsmHngNFnykU1uaFrUSK6TCxmZNuQE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=d4I5OBJhksEJfYQeS6TFVSKbdBsmRFdpZ1e/OeSFHz6FMW7aXeG+q8XkI4ytQiHFlpuosGiYHdvkMopJXvW79GvnooBAc+JgPdw16+gUqEYdnijs0e54CBAGszoovWFz7iNPqkIJy3728C9FqPdF/pfCGzRcf6Fk1GC450TK4DY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=AgvGYcQn; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56J5xvmj020232;
+	Sat, 19 Jul 2025 09:14:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=v2sZY0f0KtfxtIWOixGUTxeWwWGn
+	aOoGQS5HE8Mt42E=; b=AgvGYcQniMRUrtTlgB5vu23SHUucWms7EbCs1+98FYTL
+	yp0s851ztXEtAQSBtslr1Nr2pNJymQnRXWbUuRK2AT2w9l4gZTUbyM4Gk+YuU26i
+	8JU/pH64SFpyLXmx+Ic8dcQBG/w9MRWmj5BO26ki9fFupZsTOP98rvqEmB/gpdYY
+	NDxza/74WWFYE9smGe8+6kpB9TwaA1Ahq7WGdTsmyijZKP3vJie/tCdwfYnqmpJJ
+	7G3su6lZ740NbjweDR4atihaEvhwYUD2k/Js9gLfRZqloHL8ndQFUMcm3Z4fzg+X
+	MT/Ln/xuCXQKOoeEzGZVPSKKJsfGxN62goBqhdKoeA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4805hfggvq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 19 Jul 2025 09:14:03 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 56J9E2Om012008;
+	Sat, 19 Jul 2025 09:14:02 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4805hfggvn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 19 Jul 2025 09:14:02 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56J7UGpl031922;
+	Sat, 19 Jul 2025 09:14:01 GMT
+Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 47v21uncma-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 19 Jul 2025 09:14:01 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56J9E0dc9699982
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 19 Jul 2025 09:14:00 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B38A858058;
+	Sat, 19 Jul 2025 09:14:00 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7C9EE58057;
+	Sat, 19 Jul 2025 09:13:59 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.61.243.79])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Sat, 19 Jul 2025 09:13:59 +0000 (GMT)
+From: Mingming Cao <mmc@linux.ibm.com>
 To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	horms@kernel.org,
-	cratiu@nvidia.com,
-	noren@nvidia.com,
-	cjubran@nvidia.com,
-	mbloch@nvidia.com,
-	mohsin.bashr@gmail.com,
-	jdamato@fastly.com,
-	gal@nvidia.com,
-	sdf@fomichev.me,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	nathan@kernel.org,
-	nick.desaulniers+lkml@gmail.com,
-	morbo@google.com,
-	justinstitt@google.com,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: [PATCH net-next V6 5/5] selftests: drv-net: Test head-adjustment support
-Date: Sat, 19 Jul 2025 01:30:59 -0700
-Message-ID: <20250719083059.3209169-6-mohsin.bashr@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250719083059.3209169-1-mohsin.bashr@gmail.com>
-References: <20250719083059.3209169-1-mohsin.bashr@gmail.com>
+Cc: horms@kernel.org, bjking1@linux.ibm.com, haren@linux.ibm.com,
+        ricklind@linux.ibm.com, davemarq@linux.ibm.com, mmc@linux.ibm.com,
+        maddy@linux.ibm.com, mpe@ellerman.id.au, npiggin@gmail.com,
+        christophe.leroy@csgroup.eu, andrew+netdev@lunn.ch,
+        davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+        pabeni@redhat.com, linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH net-next v2] ibmveth: Add multi buffers rx replenishment hcall support
+Date: Sat, 19 Jul 2025 05:13:56 -0400
+Message-Id: <20250719091356.57252-1-mmc@linux.ibm.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE5MDA5MCBTYWx0ZWRfX5N4MpLAQ8hiC
+ dSuNX1wlk/zxewohe3Ors/GIGIm2hTujEAv897yHac0IJAzdTEyglNNR1QO2qeA1tX/NZtyEMpY
+ G3K8lJFARAIvQb5+soiwWaqsnCxe6LJ65UOAPvACTRSGKx4v8Vl2qdUZfVSo5G35d8ZIeOL90BB
+ ripn8VU75FE6KnstzbWF5J8OMR6GhwdQSL+mXR5pz6Pzns19azCgfu5l0lxc8t6PS2NkOY7SZ5y
+ jMVEoeiJyy6mqmgg6SU/qmtmyfj+Pz2YexxPUQMNLAG3xBjDuscmLz7YY1rXmtAg7Ui5nLYhm2b
+ 04kLKoMqqTBDvMdTy5YhqbuiafbjJk5nMLnGhhW8cr0B4AZgY/2hazM4DGLU/hj8Fqoc/OvSNaS
+ JpMpwqwymJEZYkRvhPmMo7CviTxPjmILAjkc81fcDNXYlflM+9tKF9gsZKQB/kP/hwruocSn
+X-Proofpoint-GUID: aO8YaWJmtWbVP4eprk-VbRVCMXRExj7r
+X-Proofpoint-ORIG-GUID: RHvBNk0w3JB9BygYSIGj_5RDZTMIEfW0
+X-Authority-Analysis: v=2.4 cv=X9RSKHTe c=1 sm=1 tr=0 ts=687b61db cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VnNF1IyMAAAA:8 a=fljhNFjLKTGLiRJvVM8A:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-19_01,2025-07-17_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 priorityscore=1501 adultscore=0 lowpriorityscore=0
+ phishscore=0 malwarescore=0 clxscore=1015 mlxscore=0 spamscore=0
+ suspectscore=0 mlxlogscore=999 bulkscore=0 classifier=spam authscore=0
+ authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2505280000 definitions=main-2507190090
 
-Add test to validate the headroom adjustment support for both extension
-and the shrinking cases. For the extension part, eat up space from
-the start of payload data whereas, for the shrinking part, populate
-the newly available space with a tag. In the user-space, validate that a
-test string is manipulated accordingly.
-The negative and positive offset values result in shrinking and growing of
-headroom (growing and shrinking of payload) respectively.
+This patch enables batched RX buffer replenishment in ibmveth by
+using the new firmware-supported h_add_logical_lan_buffers() hcall
+ to submit up to 8 RX buffers in a single call, instead of repeatedly
+calling the single-buffer h_add_logical_lan_buffer() hcall.
 
-TAP version 13
-1..9
-ok 1 xdp.test_xdp_native_pass_sb
-ok 2 xdp.test_xdp_native_pass_mb
-ok 3 xdp.test_xdp_native_drop_sb
-ok 4 xdp.test_xdp_native_drop_mb
-ok 5 xdp.test_xdp_native_tx_mb
-\# Failed run: pkt_sz 512, ... offset 1. Reason: Adjustment failed
-ok 6 xdp.test_xdp_native_adjst_tail_grow_data
-ok 7 xdp.test_xdp_native_adjst_tail_shrnk_data
-\# Failed run: pkt_sz 512, ... offset -128. Reason: Adjustment failed
-ok 8 xdp.test_xdp_native_adjst_head_grow_data
-\# Failed run: pkt_sz (512) > HDS threshold (0) and offset 64 > 48
-ok 9 xdp.test_xdp_native_adjst_head_shrnk_data
-\# Totals: pass:9 fail:0 xfail:0 xpass:0 skip:0 error:0
+During the probe, with the patch, the driver queries ILLAN attributes
+to detect IBMVETH_ILLAN_RX_MULTI_BUFF_SUPPORT bit. If the attribute is
+present, rx_buffers_per_hcall is set to 8, enabling batched replenishment.
+Otherwise, it defaults to 1, preserving the original upstream behavior
+ with no change in code flow for unsupported systems.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
+The core rx replenish logic remains the same. But when batching
+is enabled, the driver aggregates up to 8 fully prepared descriptors
+into a single h_add_logical_lan_buffers() hypercall. If any allocation
+or DMA mapping fails while preparing a batch, only the successfully
+prepared buffers are submitted, and the remaining are deferred for
+the next replenish cycle.
+
+If at runtime the firmware stops accepting the batched hcall—e,g,
+after a Live Partition Migration (LPM) to a host that does not
+support h_add_logical_lan_buffers(), the hypercall returns H_FUNCTION.
+In that case, the driver transparently disables batching, resets
+rx_buffers_per_hcall to 1, and falls back to the single-buffer hcall
+in next future replenishments to take care of these and future buffers.
+
+Test were done on systems with firmware that both supports and
+does not support the new h_add_logical_lan_buffers hcall.
+
+On supported firmware, this reduces hypercall overhead significantly
+over multiple buffers. SAR measurements showed about a 15% improvement
+in packet processing rate under moderate RX load, with heavier traffic
+seeing gains more than 30%
+
+Signed-off-by: Mingming Cao <mmc@linux.ibm.com>
+Reviewed-by: Brian King <bjking1@linux.ibm.com>
+Reviewed-by: Haren Myneni <haren@linux.ibm.com>
+Reviewed-by: Dave Marquardt <davemarq@linux.ibm.com>
 ---
- tools/testing/selftests/drivers/net/xdp.py    | 147 +++++++++++++-
- .../selftests/net/lib/xdp_native.bpf.c        | 181 ++++++++++++++++++
- 2 files changed, 327 insertions(+), 1 deletion(-)
+ arch/powerpc/include/asm/hvcall.h  |   1 +
+ drivers/net/ethernet/ibm/ibmveth.c | 220 ++++++++++++++++++++---------
+ drivers/net/ethernet/ibm/ibmveth.h |  21 +++
+ 3 files changed, 174 insertions(+), 68 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/xdp.py b/tools/testing/selftests/drivers/net/xdp.py
-index 85b5db0a1121..887d662ad128 100755
---- a/tools/testing/selftests/drivers/net/xdp.py
-+++ b/tools/testing/selftests/drivers/net/xdp.py
-@@ -12,7 +12,7 @@ from dataclasses import dataclass
- from enum import Enum
- 
- from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_ne, ksft_pr
--from lib.py import KsftFailEx, NetDrvEpEnv
-+from lib.py import KsftFailEx, NetDrvEpEnv, EthtoolFamily, NlError
- from lib.py import bkg, cmd, rand_port
- from lib.py import ip, bpftool, defer
- 
-@@ -31,6 +31,7 @@ class XDPAction(Enum):
-     DROP = 1  # Drop the packet
-     TX = 2    # Route the packet to the remote host
-     TAIL_ADJST = 3  # Adjust the tail of the packet
-+    HEAD_ADJST = 4  # Adjust the head of the packet
- 
- 
- class XDPStats(Enum):
-@@ -483,6 +484,147 @@ def test_xdp_native_adjst_tail_shrnk_data(cfg):
-     _validate_res(res, offset_lst, pkt_sz_lst)
- 
- 
-+def get_hds_thresh(cfg):
-+    """
-+    Retrieves the header data split (HDS) threshold for a network interface.
-+
-+    Args:
-+        cfg: Configuration object containing network settings.
-+
-+    Returns:
-+        The HDS threshold value. If the threshold is not supported or an error occurs,
-+        a default value of 1500 is returned.
-+    """
-+    netnl = cfg.netnl
-+    hds_thresh = 1500
-+
-+    try:
-+        rings = netnl.rings_get({'header': {'dev-index': cfg.ifindex}})
-+        if 'hds-thresh' not in rings:
-+            ksft_pr(f'hds-thresh not supported. Using default: {hds_thresh}')
-+            return hds_thresh
-+        hds_thresh = rings['hds-thresh']
-+    except NlError as e:
-+        ksft_pr(f"Failed to get rings: {e}. Using default: {hds_thresh}")
-+
-+    return hds_thresh
-+
-+
-+def _test_xdp_native_head_adjst(cfg, prog, pkt_sz_lst, offset_lst):
-+    """
-+    Tests the XDP head adjustment action for a multi-buffer case.
-+
-+    Args:
-+        cfg: Configuration object containing network settings.
-+        netnl: Network namespace or link object (not used in this function).
-+
-+    This function sets up the packet size and offset lists, then performs
-+    the head adjustment test by sending and receiving UDP packets.
-+    """
-+    cfg.require_cmd("socat", remote=True)
-+
-+    prog_info = _load_xdp_prog(cfg, BPFProgInfo(prog, "xdp_native.bpf.o", "xdp.frags", 9000))
-+    port = rand_port()
-+
-+    _set_xdp_map("map_xdp_setup", TestConfig.MODE.value, XDPAction.HEAD_ADJST.value)
-+    _set_xdp_map("map_xdp_setup", TestConfig.PORT.value, port)
-+
-+    hds_thresh = get_hds_thresh(cfg)
-+    for offset in offset_lst:
-+        for pkt_sz in pkt_sz_lst:
-+            # The "head" buffer must contain at least the Ethernet header
-+            # after we eat into it. We send large-enough packets, but if HDS
-+            # is enabled head will only contain headers. Don't try to eat
-+            # more than 28 bytes (UDPv4 + eth hdr left: (14 + 20 + 8) - 14)
-+            l2_cut_off = 28 if cfg.addr_ipver == 4 else 48
-+            if pkt_sz > hds_thresh and offset > l2_cut_off:
-+                ksft_pr(
-+                f"Failed run: pkt_sz ({pkt_sz}) > HDS threshold ({hds_thresh}) and "
-+                f"offset {offset} > {l2_cut_off}"
-+                )
-+                return {"status": "pass"}
-+
-+            test_str = ''.join(random.choice(string.ascii_lowercase) for _ in range(pkt_sz))
-+            tag = format(random.randint(65, 90), '02x')
-+
-+            _set_xdp_map("map_xdp_setup",
-+                     TestConfig.ADJST_OFFSET.value,
-+                     offset)
-+            _set_xdp_map("map_xdp_setup", TestConfig.ADJST_TAG.value, int(tag, 16))
-+            _set_xdp_map("map_xdp_setup", TestConfig.ADJST_OFFSET.value, offset)
-+
-+            recvd_str = _exchg_udp(cfg, port, test_str)
-+
-+            # Check for failures around adjustment and data exchange
-+            failure = _check_for_failures(recvd_str, _get_stats(prog_info['maps']['map_xdp_stats']))
-+            if failure is not None:
-+                return {
-+                    "status": "fail",
-+                    "reason": failure,
-+                    "offset": offset,
-+                    "pkt_sz": pkt_sz
-+                }
-+
-+            # Validate data content based on offset direction
-+            expected_data = None
-+            if offset < 0:
-+                expected_data = chr(int(tag, 16)) * (0 - offset) + test_str
-+            else:
-+                expected_data = test_str[offset:]
-+
-+            if recvd_str != expected_data:
-+                return {
-+                    "status": "fail",
-+                    "reason": "Data mismatch",
-+                    "offset": offset,
-+                    "pkt_sz": pkt_sz
-+                }
-+
-+    return {"status": "pass"}
-+
-+
-+def test_xdp_native_adjst_head_grow_data(cfg):
-+    """
-+    Tests the XDP headroom growth support.
-+
-+    Args:
-+        cfg: Configuration object containing network settings.
-+
-+    This function sets up the packet size and offset lists, then calls the
-+    _test_xdp_native_head_adjst_mb function to perform the actual test. The
-+    test is passed if the headroom is successfully extended for given packet
-+    sizes and offsets.
-+    """
-+    pkt_sz_lst = [512, 1024, 2048]
-+
-+    # Negative values result in headroom shrinking, resulting in growing of payload
-+    offset_lst = [-16, -32, -64, -128, -256]
-+    res = _test_xdp_native_head_adjst(cfg, "xdp_prog_frags", pkt_sz_lst, offset_lst)
-+
-+    _validate_res(res, offset_lst, pkt_sz_lst)
-+
-+
-+def test_xdp_native_adjst_head_shrnk_data(cfg):
-+    """
-+    Tests the XDP headroom shrinking support.
-+
-+    Args:
-+        cfg: Configuration object containing network settings.
-+
-+    This function sets up the packet size and offset lists, then calls the
-+    _test_xdp_native_head_adjst_mb function to perform the actual test. The
-+    test is passed if the headroom is successfully shrunk for given packet
-+    sizes and offsets.
-+    """
-+    pkt_sz_lst = [512, 1024, 2048]
-+
-+    # Positive values result in headroom growing, resulting in shrinking of payload
-+    offset_lst = [16, 32, 64, 128, 256]
-+    res = _test_xdp_native_head_adjst(cfg, "xdp_prog_frags", pkt_sz_lst, offset_lst)
-+
-+    _validate_res(res, offset_lst, pkt_sz_lst)
-+
-+
- def main():
-     """
-     Main function to execute the XDP tests.
-@@ -493,6 +635,7 @@ def main():
-     function to execute the tests.
-     """
-     with NetDrvEpEnv(__file__) as cfg:
-+        cfg.netnl = EthtoolFamily()
-         ksft_run(
-             [
-                 test_xdp_native_pass_sb,
-@@ -502,6 +645,8 @@ def main():
-                 test_xdp_native_tx_mb,
-                 test_xdp_native_adjst_tail_grow_data,
-                 test_xdp_native_adjst_tail_shrnk_data,
-+                test_xdp_native_adjst_head_grow_data,
-+                test_xdp_native_adjst_head_shrnk_data,
-             ],
-             args=(cfg,))
-     ksft_exit()
-diff --git a/tools/testing/selftests/net/lib/xdp_native.bpf.c b/tools/testing/selftests/net/lib/xdp_native.bpf.c
-index 7bb2dff86d8f..521ba38f2ddd 100644
---- a/tools/testing/selftests/net/lib/xdp_native.bpf.c
-+++ b/tools/testing/selftests/net/lib/xdp_native.bpf.c
-@@ -26,6 +26,7 @@ enum {
- 	XDP_MODE_DROP = 1,
- 	XDP_MODE_TX = 2,
- 	XDP_MODE_TAIL_ADJST = 3,
-+	XDP_MODE_HEAD_ADJST = 4,
- } xdp_map_modes;
- 
- enum {
-@@ -395,6 +396,184 @@ static int xdp_adjst_tail(struct xdp_md *ctx, __u16 port)
- 	return XDP_ABORTED;
- }
- 
-+static int xdp_adjst_head_shrnk_data(struct xdp_md *ctx, __u64 hdr_len,
-+				     __u32 offset)
-+{
-+	char tmp_buff[MAX_ADJST_OFFSET];
-+	struct udphdr *udph;
-+	void *offset_ptr;
-+	__u32 udp_csum = 0;
-+
-+	/* Update the length information in the IP and UDP headers before
-+	 * adjusting the headroom. This simplifies accessing the relevant
-+	 * fields in the IP and UDP headers for fragmented packets. Any
-+	 * failure beyond this point will result in the packet being aborted,
-+	 * so we don't need to worry about incorrect length information for
-+	 * passed packets.
-+	 */
-+	udph = update_pkt(ctx, (__s16)(0 - offset), &udp_csum);
-+	if (!udph)
-+		return -1;
-+
-+	offset = (offset & 0x1ff) >= MAX_ADJST_OFFSET ? MAX_ADJST_OFFSET :
-+				     offset & 0xff;
-+	if (offset == 0)
-+		return -1;
-+
-+	if (bpf_xdp_load_bytes(ctx, hdr_len, tmp_buff, offset) < 0)
-+		return -1;
-+
-+	udp_csum = bpf_csum_diff((__be32 *)tmp_buff, offset, 0, 0, udp_csum);
-+
-+	udph->check = (__u16)csum_fold_helper(udp_csum);
-+
-+	if (bpf_xdp_load_bytes(ctx, 0, tmp_buff, MAX_ADJST_OFFSET) < 0)
-+		return -1;
-+
-+	if (bpf_xdp_adjust_head(ctx, offset) < 0)
-+		return -1;
-+
-+	if (offset > MAX_ADJST_OFFSET)
-+		return -1;
-+
-+	if (hdr_len > MAX_ADJST_OFFSET || hdr_len == 0)
-+		return -1;
-+
-+	/* Added here to handle clang complain about negative value */
-+	hdr_len = hdr_len & 0xff;
-+
-+	if (hdr_len == 0)
-+		return -1;
-+
-+	if (bpf_xdp_store_bytes(ctx, 0, tmp_buff, hdr_len) < 0)
-+		return -1;
-+
-+	return 0;
-+}
-+
-+static int xdp_adjst_head_grow_data(struct xdp_md *ctx, __u64 hdr_len,
-+				    __u32 offset)
-+{
-+	char hdr_buff[MAX_HDR_LEN];
-+	char data_buff[MAX_ADJST_OFFSET];
-+	void *offset_ptr;
-+	__s32 *val;
-+	__u32 key;
-+	__u8 tag;
-+	__u32 udp_csum = 0;
-+	struct udphdr *udph;
-+
-+	udph = update_pkt(ctx, (__s16)(offset), &udp_csum);
-+	if (!udph)
-+		return -1;
-+
-+	key = XDP_ADJST_TAG;
-+	val = bpf_map_lookup_elem(&map_xdp_setup, &key);
-+	if (!val)
-+		return -1;
-+
-+	tag = (__u8)(*val);
-+	for (int i = 0; i < MAX_ADJST_OFFSET; i++)
-+		__builtin_memcpy(&data_buff[i], &tag, 1);
-+
-+	offset = (offset & 0x1ff) >= MAX_ADJST_OFFSET ? MAX_ADJST_OFFSET :
-+				     offset & 0xff;
-+	if (offset == 0)
-+		return -1;
-+
-+	udp_csum = bpf_csum_diff(0, 0, (__be32 *)data_buff, offset, udp_csum);
-+	udph->check = (__u16)csum_fold_helper(udp_csum);
-+
-+	if (hdr_len > MAX_ADJST_OFFSET || hdr_len == 0)
-+		return -1;
-+
-+	/* Added here to handle clang complain about negative value */
-+	hdr_len = hdr_len & 0xff;
-+
-+	if (hdr_len == 0)
-+		return -1;
-+
-+	if (bpf_xdp_load_bytes(ctx, 0, hdr_buff, hdr_len) < 0)
-+		return -1;
-+
-+	if (offset > MAX_ADJST_OFFSET)
-+		return -1;
-+
-+	if (bpf_xdp_adjust_head(ctx, 0 - offset) < 0)
-+		return -1;
-+
-+	if (bpf_xdp_store_bytes(ctx, 0, hdr_buff, hdr_len) < 0)
-+		return -1;
-+
-+	if (bpf_xdp_store_bytes(ctx, hdr_len, data_buff, offset) < 0)
-+		return -1;
-+
-+	return 0;
-+}
-+
-+static int xdp_head_adjst(struct xdp_md *ctx, __u16 port)
-+{
-+	void *data_end = (void *)(long)ctx->data_end;
-+	void *data = (void *)(long)ctx->data;
-+	struct udphdr *udph_ptr = NULL;
-+	__u32 key, size, hdr_len;
-+	__s32 *val;
-+	int res;
-+
-+	/* Filter packets based on UDP port */
-+	udph_ptr = filter_udphdr(ctx, port);
-+	if (!udph_ptr)
-+		return XDP_PASS;
-+
-+	hdr_len = (void *)udph_ptr - data + sizeof(struct udphdr);
-+
-+	key = XDP_ADJST_OFFSET;
-+	val = bpf_map_lookup_elem(&map_xdp_setup, &key);
-+	if (!val)
-+		return XDP_PASS;
-+
-+	switch (*val) {
-+	case -16:
-+	case 16:
-+		size = 16;
-+		break;
-+	case -32:
-+	case 32:
-+		size = 32;
-+		break;
-+	case -64:
-+	case 64:
-+		size = 64;
-+		break;
-+	case -128:
-+	case 128:
-+		size = 128;
-+		break;
-+	case -256:
-+	case 256:
-+		size = 256;
-+		break;
-+	default:
-+		bpf_printk("Invalid adjustment offset: %d\n", *val);
-+		goto abort;
-+	}
-+
-+	if (*val < 0)
-+		res = xdp_adjst_head_grow_data(ctx, hdr_len, size);
-+	else
-+		res = xdp_adjst_head_shrnk_data(ctx, hdr_len, size);
-+
-+	if (res)
-+		goto abort;
-+
-+	record_stats(ctx, STATS_PASS);
-+	return XDP_PASS;
-+
-+abort:
-+	record_stats(ctx, STATS_ABORT);
-+	return XDP_ABORTED;
-+}
-+
- static int xdp_prog_common(struct xdp_md *ctx)
+diff --git a/arch/powerpc/include/asm/hvcall.h b/arch/powerpc/include/asm/hvcall.h
+index 6df6dbbe1e7c..ea6c8dc400d2 100644
+--- a/arch/powerpc/include/asm/hvcall.h
++++ b/arch/powerpc/include/asm/hvcall.h
+@@ -270,6 +270,7 @@
+ #define H_QUERY_INT_STATE       0x1E4
+ #define H_POLL_PENDING		0x1D8
+ #define H_ILLAN_ATTRIBUTES	0x244
++#define H_ADD_LOGICAL_LAN_BUFFERS 0x248
+ #define H_MODIFY_HEA_QP		0x250
+ #define H_QUERY_HEA_QP		0x254
+ #define H_QUERY_HEA		0x258
+diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
+index 24046fe16634..6f0821f1e798 100644
+--- a/drivers/net/ethernet/ibm/ibmveth.c
++++ b/drivers/net/ethernet/ibm/ibmveth.c
+@@ -211,98 +211,169 @@ static inline void ibmveth_flush_buffer(void *addr, unsigned long length)
+ static void ibmveth_replenish_buffer_pool(struct ibmveth_adapter *adapter,
+ 					  struct ibmveth_buff_pool *pool)
  {
- 	__u32 key, *port;
-@@ -419,6 +598,8 @@ static int xdp_prog_common(struct xdp_md *ctx)
- 		return xdp_mode_tx_handler(ctx, (__u16)(*port));
- 	case XDP_MODE_TAIL_ADJST:
- 		return xdp_adjst_tail(ctx, (__u16)(*port));
-+	case XDP_MODE_HEAD_ADJST:
-+		return xdp_head_adjst(ctx, (__u16)(*port));
+-	u32 i;
+-	u32 count = pool->size - atomic_read(&pool->available);
+-	u32 buffers_added = 0;
+-	struct sk_buff *skb;
+-	unsigned int free_index, index;
+-	u64 correlator;
++	union ibmveth_buf_desc descs[IBMVETH_MAX_RX_PER_HCALL] = {0};
++	u32 remaining = pool->size - atomic_read(&pool->available);
++	u64 correlators[IBMVETH_MAX_RX_PER_HCALL] = {0};
+ 	unsigned long lpar_rc;
++	u32 buffers_added = 0;
++	u32 i, filled, batch;
++	struct vio_dev *vdev;
+ 	dma_addr_t dma_addr;
++	struct device *dev;
++	u32 index;
++
++	vdev = adapter->vdev;
++	dev = &vdev->dev;
+ 
+ 	mb();
+ 
+-	for (i = 0; i < count; ++i) {
+-		union ibmveth_buf_desc desc;
++	batch = adapter->rx_buffers_per_hcall;
+ 
+-		free_index = pool->consumer_index;
+-		index = pool->free_map[free_index];
+-		skb = NULL;
++	while (remaining > 0) {
++		unsigned int free_index = pool->consumer_index;
+ 
+-		if (WARN_ON(index == IBM_VETH_INVALID_MAP)) {
+-			schedule_work(&adapter->work);
+-			goto bad_index_failure;
+-		}
++		/* Fill a batch of descriptors */
++		for (filled = 0; filled < min(remaining, batch); filled++) {
++			index = pool->free_map[free_index];
++			if (WARN_ON(index == IBM_VETH_INVALID_MAP)) {
++				adapter->replenish_add_buff_failure++;
++				netdev_info(adapter->netdev,
++					    "Invalid map index %u, reset\n",
++					    index);
++				schedule_work(&adapter->work);
++				break;
++			}
++
++			if (!pool->skbuff[index]) {
++				struct sk_buff *skb = NULL;
+ 
+-		/* are we allocating a new buffer or recycling an old one */
+-		if (pool->skbuff[index])
+-			goto reuse;
++				skb = netdev_alloc_skb(adapter->netdev,
++						       pool->buff_size);
++				if (!skb) {
++					adapter->replenish_no_mem++;
++					adapter->replenish_add_buff_failure++;
++					break;
++				}
++
++				dma_addr = dma_map_single(dev, skb->data,
++							  pool->buff_size,
++							  DMA_FROM_DEVICE);
++				if (dma_mapping_error(dev, dma_addr)) {
++					dev_kfree_skb_any(skb);
++					adapter->replenish_add_buff_failure++;
++					break;
++				}
+ 
+-		skb = netdev_alloc_skb(adapter->netdev, pool->buff_size);
++				pool->dma_addr[index] = dma_addr;
++				pool->skbuff[index] = skb;
++			} else {
++				/* re-use case */
++				dma_addr = pool->dma_addr[index];
++			}
+ 
+-		if (!skb) {
+-			netdev_dbg(adapter->netdev,
+-				   "replenish: unable to allocate skb\n");
+-			adapter->replenish_no_mem++;
+-			break;
+-		}
++			if (rx_flush) {
++				unsigned int len;
+ 
+-		dma_addr = dma_map_single(&adapter->vdev->dev, skb->data,
+-				pool->buff_size, DMA_FROM_DEVICE);
++				len = adapter->netdev->mtu + IBMVETH_BUFF_OH;
++				len = min(pool->buff_size, len);
++				ibmveth_flush_buffer(pool->skbuff[index]->data,
++						     len);
++			}
+ 
+-		if (dma_mapping_error(&adapter->vdev->dev, dma_addr))
+-			goto failure;
++			descs[filled].fields.flags_len = IBMVETH_BUF_VALID |
++							  pool->buff_size;
++			descs[filled].fields.address = dma_addr;
+ 
+-		pool->dma_addr[index] = dma_addr;
+-		pool->skbuff[index] = skb;
++			correlators[filled] = ((u64)pool->index << 32) | index;
++			*(u64 *)pool->skbuff[index]->data = correlators[filled];
+ 
+-		if (rx_flush) {
+-			unsigned int len = min(pool->buff_size,
+-					       adapter->netdev->mtu +
+-					       IBMVETH_BUFF_OH);
+-			ibmveth_flush_buffer(skb->data, len);
++			free_index++;
++			if (free_index >= pool->size)
++				free_index = 0;
+ 		}
+-reuse:
+-		dma_addr = pool->dma_addr[index];
+-		desc.fields.flags_len = IBMVETH_BUF_VALID | pool->buff_size;
+-		desc.fields.address = dma_addr;
+-
+-		correlator = ((u64)pool->index << 32) | index;
+-		*(u64 *)pool->skbuff[index]->data = correlator;
+ 
+-		lpar_rc = h_add_logical_lan_buffer(adapter->vdev->unit_address,
+-						   desc.desc);
++		if (!filled)
++			break;
+ 
++		/* single buffer case*/
++		if (filled == 1)
++			lpar_rc = h_add_logical_lan_buffer(vdev->unit_address,
++							   descs[0].desc);
++		else
++			/* Multi-buffer hcall */
++			lpar_rc = h_add_logical_lan_buffers(vdev->unit_address,
++							    descs[0].desc,
++							    descs[1].desc,
++							    descs[2].desc,
++							    descs[3].desc,
++							    descs[4].desc,
++							    descs[5].desc,
++							    descs[6].desc,
++							    descs[7].desc);
+ 		if (lpar_rc != H_SUCCESS) {
+-			netdev_warn(adapter->netdev,
+-				    "%sadd_logical_lan failed %lu\n",
+-				    skb ? "" : "When recycling: ", lpar_rc);
+-			goto failure;
++			dev_warn_ratelimited(dev,
++					     "RX h_add_logical_lan failed: filled=%u, rc=%lu, batch=%u\n",
++					     filled, lpar_rc, batch);
++			goto hcall_failure;
+ 		}
+ 
+-		pool->free_map[free_index] = IBM_VETH_INVALID_MAP;
+-		pool->consumer_index++;
+-		if (pool->consumer_index >= pool->size)
+-			pool->consumer_index = 0;
++		/* Only update pool state after hcall succeeds */
++		for (i = 0; i < filled; i++) {
++			free_index = pool->consumer_index;
++			pool->free_map[free_index] = IBM_VETH_INVALID_MAP;
+ 
+-		buffers_added++;
+-		adapter->replenish_add_buff_success++;
+-	}
++			pool->consumer_index++;
++			if (pool->consumer_index >= pool->size)
++				pool->consumer_index = 0;
++		}
+ 
+-	mb();
+-	atomic_add(buffers_added, &(pool->available));
+-	return;
++		buffers_added += filled;
++		adapter->replenish_add_buff_success += filled;
++		remaining -= filled;
+ 
+-failure:
++		memset(&descs, 0, sizeof(descs));
++		memset(&correlators, 0, sizeof(correlators));
++		continue;
+ 
+-	if (dma_addr && !dma_mapping_error(&adapter->vdev->dev, dma_addr))
+-		dma_unmap_single(&adapter->vdev->dev,
+-		                 pool->dma_addr[index], pool->buff_size,
+-		                 DMA_FROM_DEVICE);
+-	dev_kfree_skb_any(pool->skbuff[index]);
+-	pool->skbuff[index] = NULL;
+-bad_index_failure:
+-	adapter->replenish_add_buff_failure++;
++hcall_failure:
++		for (i = 0; i < filled; i++) {
++			index = correlators[i] & 0xffffffffUL;
++			dma_addr =  pool->dma_addr[index];
++
++			if (pool->skbuff[index]) {
++				if (dma_addr &&
++				    !dma_mapping_error(dev, dma_addr))
++					dma_unmap_single(dev, dma_addr,
++							 pool->buff_size,
++							 DMA_FROM_DEVICE);
++
++				dev_kfree_skb_any(pool->skbuff[index]);
++				pool->skbuff[index] = NULL;
++			}
++		}
++		adapter->replenish_add_buff_failure += filled;
++
++		/*
++		 * If multi rx buffers hcall is no longer supported by FW
++		 * e.g. in the case of Live Parttion Migration
++		 */
++		if (batch > 1 && lpar_rc == H_FUNCTION) {
++			/*
++			 * Instead of retry submit single buffer individually
++			 * here just set the max rx buffer per hcall to 1
++			 * buffers will be respleshed next time
++			 * when ibmveth_replenish_buffer_pool() is called again
++			 * with single-buffer case
++			 */
++			netdev_info(adapter->netdev,
++				    "RX Multi buffers not supported by FW, rc=%lu\n",
++				    lpar_rc);
++			adapter->rx_buffers_per_hcall = 1;
++			netdev_info(adapter->netdev,
++				    "Next rx replesh will fall back to single-buffer hcall\n");
++		}
++		break;
++	}
+ 
+ 	mb();
+ 	atomic_add(buffers_added, &(pool->available));
+@@ -1783,6 +1854,19 @@ static int ibmveth_probe(struct vio_dev *dev, const struct vio_device_id *id)
+ 		netdev->features |= NETIF_F_FRAGLIST;
  	}
  
- 	/* Default action is to simple pass */
++	if (ret == H_SUCCESS &&
++	    (ret_attr & IBMVETH_ILLAN_RX_MULTI_BUFF_SUPPORT)) {
++		adapter->rx_buffers_per_hcall = IBMVETH_MAX_RX_PER_HCALL;
++		netdev_dbg(netdev,
++			   "RX Multi-buffer hcall supported by FW, batch set to %u\n",
++			    adapter->rx_buffers_per_hcall);
++	} else {
++		adapter->rx_buffers_per_hcall = 1;
++		netdev_dbg(netdev,
++			   "RX Single-buffer hcall mode, batch set to %u\n",
++			   adapter->rx_buffers_per_hcall);
++	}
++
+ 	netdev->min_mtu = IBMVETH_MIN_MTU;
+ 	netdev->max_mtu = ETH_MAX_MTU - IBMVETH_BUFF_OH;
+ 
+diff --git a/drivers/net/ethernet/ibm/ibmveth.h b/drivers/net/ethernet/ibm/ibmveth.h
+index b0a2460ec9f9..068f99df133e 100644
+--- a/drivers/net/ethernet/ibm/ibmveth.h
++++ b/drivers/net/ethernet/ibm/ibmveth.h
+@@ -28,6 +28,7 @@
+ #define IbmVethMcastRemoveFilter     0x2UL
+ #define IbmVethMcastClearFilterTable 0x3UL
+ 
++#define IBMVETH_ILLAN_RX_MULTI_BUFF_SUPPORT	0x0000000000040000UL
+ #define IBMVETH_ILLAN_LRG_SR_ENABLED	0x0000000000010000UL
+ #define IBMVETH_ILLAN_LRG_SND_SUPPORT	0x0000000000008000UL
+ #define IBMVETH_ILLAN_PADDED_PKT_CSUM	0x0000000000002000UL
+@@ -46,6 +47,24 @@
+ #define h_add_logical_lan_buffer(ua, buf) \
+   plpar_hcall_norets(H_ADD_LOGICAL_LAN_BUFFER, ua, buf)
+ 
++static inline long h_add_logical_lan_buffers(unsigned long unit_address,
++					     unsigned long desc1,
++					     unsigned long desc2,
++					     unsigned long desc3,
++					     unsigned long desc4,
++					     unsigned long desc5,
++					     unsigned long desc6,
++					     unsigned long desc7,
++					     unsigned long desc8)
++{
++	unsigned long retbuf[PLPAR_HCALL9_BUFSIZE];
++
++	return plpar_hcall9(H_ADD_LOGICAL_LAN_BUFFERS,
++			    retbuf, unit_address,
++			    desc1, desc2, desc3, desc4,
++			    desc5, desc6, desc7, desc8);
++}
++
+ /* FW allows us to send 6 descriptors but we only use one so mark
+  * the other 5 as unused (0)
+  */
+@@ -101,6 +120,7 @@ static inline long h_illan_attributes(unsigned long unit_address,
+ #define IBMVETH_MAX_TX_BUF_SIZE (1024 * 64)
+ #define IBMVETH_MAX_QUEUES 16U
+ #define IBMVETH_DEFAULT_QUEUES 8U
++#define IBMVETH_MAX_RX_PER_HCALL 8U
+ 
+ static int pool_size[] = { 512, 1024 * 2, 1024 * 16, 1024 * 32, 1024 * 64 };
+ static int pool_count[] = { 256, 512, 256, 256, 256 };
+@@ -151,6 +171,7 @@ struct ibmveth_adapter {
+ 	int rx_csum;
+ 	int large_send;
+ 	bool is_active_trunk;
++	unsigned int rx_buffers_per_hcall;
+ 
+ 	u64 fw_ipv6_csum_support;
+ 	u64 fw_ipv4_csum_support;
 -- 
-2.47.1
+2.39.3 (Apple Git-146)
 
 
