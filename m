@@ -1,128 +1,238 @@
-Return-Path: <netdev+bounces-208299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0397B0AD42
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 03:22:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D9B5EB0AD53
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 03:28:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72F06588423
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 01:22:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B2A15656AA
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 01:28:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A7B71F3D58;
-	Sat, 19 Jul 2025 01:21:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33599193079;
+	Sat, 19 Jul 2025 01:28:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Ux6+uGi/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lfPZkFoA"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF03C1D9663;
-	Sat, 19 Jul 2025 01:21:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9892E62C;
+	Sat, 19 Jul 2025 01:28:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752888102; cv=none; b=LaWDUmBqMIIxYnXohmAeezkWUzcmNRTS+xxW3QPo6DFE+QYP7k6HxhD/Mib3EaDE4EIEv1ASeSL2vPs5jwFMl6P79q/02nJ2g1eeDtqZKtoJb7JfA4j8ARwIfxYPV2cJB43IqjEMlJmw0afvdcFZ2Lo0506MA5InQ4hRL/zRw7E=
+	t=1752888524; cv=none; b=W/eX3e8mO60Q62xjMB9b9tkAkIvj59nxrgOPBTDu3MGHg1kOiThHlUoaZKHdgdx4bVtK2EpOVzwOAfhiDqEIp03N3Tm6XonY9q7Be76CP1O69+O2P/qvTXjssapsvjKvbe8ZdcCb8nUMPw0A+ume4lH0M/+GcZTHoIrbnTVRI7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752888102; c=relaxed/simple;
-	bh=+15FpSPkrACA+ciSacePLD07LJ6qgZseg7M8b2CYqv0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BxzDOGfWbn9c+9Hw+ATLKPWV6ZC0REq5UwRx3vG8fC8aSvOqwz1tYSf1tI7UUnfSjHF+mdjhGdSusC4aO5edMOXN88gfg/Q7XqAns2TUM6KZdDBrTkQOIR8q0We9lLPp+mKnV2ylk2u2SzWG1gLbSAG/XmBfMRL442hNuRGJGgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Ux6+uGi/; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1752888101; x=1784424101;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=+15FpSPkrACA+ciSacePLD07LJ6qgZseg7M8b2CYqv0=;
-  b=Ux6+uGi/o5N2yEZNwsn5hIgdOQYDzJ2xQdxHC4odkU6/XqlkHFEW76qT
-   z9i2Fe7sZaO5dpByMe3cy+EKJzxjE1KATj0vZXpL3wMqp4JGaC8KSV+Nl
-   Syqrc5s0xA+/4MTt6HG6iEXUcgNXBH3FwuqvEDN8t5gAsz2bmjueCYPwg
-   8wJZtHJbiNF7dxdO3m4NuhQ/B79I4idCVhW9oML+yN+sRWxmLv8uJZ/rb
-   Q8Gj+wHTg22dzZIy2Dgen/IJ0pt4/eIYPp0D1qxkiTwhnncH9CmZlLZyN
-   dwDbejLPwdghuLD8+PtXN7Ql1WFDIMiI6CXv/4Wqu01HEaGHhU0xwsxPT
-   A==;
-X-CSE-ConnectionGUID: nNeMYTH9S7+QK+h8shmrqw==
-X-CSE-MsgGUID: lGzN1hEtQlWgjPNfy49msA==
-X-IronPort-AV: E=Sophos;i="6.16,323,1744095600"; 
-   d="scan'208";a="44154238"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Jul 2025 18:21:37 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Fri, 18 Jul 2025 18:21:07 -0700
-Received: from pop-os.microchip.com (10.10.85.11) by chn-vm-ex01.mchp-main.com
- (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
- Transport; Fri, 18 Jul 2025 18:21:06 -0700
-From: <Tristram.Ha@microchip.com>
-To: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>, Rob Herring <robh@kernel.org>,
-	"Krzysztof Kozlowski" <krzk+dt@kernel.org>, Conor Dooley
-	<conor+dt@kernel.org>
-CC: Maxime Chevallier <maxime.chevallier@bootlin.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Marek Vasut
-	<marex@denx.de>, <UNGLinuxDriver@microchip.com>,
-	<devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Tristram Ha <tristram.ha@microchip.com>
-Subject: [PATCH net-next v4 7/7] net: dsa: microchip: Disable PTP function of KSZ8463
-Date: Fri, 18 Jul 2025 18:21:06 -0700
-Message-ID: <20250719012106.257968-8-Tristram.Ha@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250719012106.257968-1-Tristram.Ha@microchip.com>
-References: <20250719012106.257968-1-Tristram.Ha@microchip.com>
+	s=arc-20240116; t=1752888524; c=relaxed/simple;
+	bh=Xgk+Vyd7x+6zQrEAnXg5atZzEmalN4PkM8Ip/CYxqwQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WAdzsmeULWkR7ofedd56wiSJB6DACf5fsn+2dVqZb+tdBKSTRQ+3IwWrDD4Y1P0DaBbouH+KuhR/X8aGs/Fiz9nqNJK1oZybgP3vWMZ+QNykPPfy1N2ie4FTllhqnb+ATAItvKfSMEEAHWNtJIylKg2IZm3rGjykLlb9oHXl8FE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lfPZkFoA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7E19C4CEEB;
+	Sat, 19 Jul 2025 01:28:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752888521;
+	bh=Xgk+Vyd7x+6zQrEAnXg5atZzEmalN4PkM8Ip/CYxqwQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lfPZkFoA3Z24WBBd9MMRnhKZMdp5gnVosdYE8Q/i9PYWIAZzRroRFMzV8QnwfDvt4
+	 kz+/Jv8t7a2RGS2sWVjDCYSqG47HmNk6ye1KTrG5zhMf9Ns8LsdwbvDkHU/lW0WM57
+	 ATL1F175Bz0rUtgcrTp65YYpio0cbeoRyAO4bv5i88hiGDLdj6D03jGgsyR4L5+/DS
+	 kUz8MkJ2autaMOIDVk1fMopa3pRG1uEEUigHlDcnvJioMxW6vhhLTCWYVXyHV5pcWA
+	 HURmrr9AXzwN6pqvM/E+SS11bhWPDrvd+ybRm5wGr4PDF/XZUBnCbKGrS8dQUACnRO
+	 Va2gPWTaJ+UxA==
+Date: Fri, 18 Jul 2025 18:28:40 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
+ <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, Richard Cochran
+ <richardcochran@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
+ <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>
+Subject: Re: [net-next v15 06/12] net: mtip: Add net_device_ops functions to
+ the L2 switch driver
+Message-ID: <20250718182840.7ab7e202@kernel.org>
+In-Reply-To: <20250716214731.3384273-7-lukma@denx.de>
+References: <20250716214731.3384273-1-lukma@denx.de>
+	<20250716214731.3384273-7-lukma@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Tristram Ha <tristram.ha@microchip.com>
+On Wed, 16 Jul 2025 23:47:25 +0200 Lukasz Majewski wrote:
+> +static netdev_tx_t mtip_start_xmit_port(struct sk_buff *skb,
+> +					struct net_device *dev, int port)
+> +{
+> +	struct mtip_ndev_priv *priv = netdev_priv(dev);
+> +	struct switch_enet_private *fep = priv->fep;
+> +	unsigned short status;
+> +	struct cbd_t *bdp;
+> +	void *bufaddr;
+> +
+> +	spin_lock(&fep->hw_lock);
 
-The PTP function of KSZ8463 is on by default.  However, its proprietary
-way of storing timestamp directly in a reserved field inside the PTP
-message header is not suitable for use with the current Linux PTP stack
-implementation.  It is necessary to disable the PTP function to not
-interfere the normal operation of the MAC.
+I see some inconsistencies in how you take this lock.
+Bunch of bare spin_lock() calls from BH context, but there's also
+a _irqsave() call in mtip_adjust_link(). Please align to the strictest
+context (not sure if the irqsave is actually needed, at a glance, IOW
+whether the lock is taken from an IRQ)
 
-Note the PTP driver for KSZ switches does not work for KSZ8463 and is not
-activated for it.
+> +	if (!fep->link[0] && !fep->link[1]) {
+> +		/* Link is down or autonegotiation is in progress. */
+> +		netif_stop_queue(dev);
+> +		spin_unlock(&fep->hw_lock);
+> +		return NETDEV_TX_BUSY;
+> +	}
+> +
+> +	/* Fill in a Tx ring entry */
+> +	bdp = fep->cur_tx;
+> +
+> +	/* Force read memory barier on the current transmit description */
 
-Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
----
- drivers/net/dsa/microchip/ksz8.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Barrier are between things. What is this barrier separating, and what
+write barrier does it pair with? As far as I can tell cur_tx is just
+a value in memory, and accesses are under ->hw_lock, so there should
+be no ordering concerns.
 
-diff --git a/drivers/net/dsa/microchip/ksz8.c b/drivers/net/dsa/microchip/ksz8.c
-index 1fb0ebd0c50d..59e7960a754d 100644
---- a/drivers/net/dsa/microchip/ksz8.c
-+++ b/drivers/net/dsa/microchip/ksz8.c
-@@ -1761,6 +1761,17 @@ void ksz8_config_cpu_port(struct dsa_switch *ds)
- 					   reg16(dev, KSZ8463_REG_DSP_CTRL_6),
- 					   COPPER_RECEIVE_ADJUSTMENT, 0);
- 		}
-+
-+		/* Turn off PTP function as the switch's proprietary way of
-+		 * handling timestamp is not supported in current Linux PTP
-+		 * stack implementation.
-+		 */
-+		regmap_update_bits(ksz_regmap_16(dev),
-+				   reg16(dev, KSZ8463_PTP_MSG_CONF1),
-+				   PTP_ENABLE, 0);
-+		regmap_update_bits(ksz_regmap_16(dev),
-+				   reg16(dev, KSZ8463_PTP_CLK_CTRL),
-+				   PTP_CLK_ENABLE, 0);
- 	}
- }
- 
--- 
-2.34.1
+> +	rmb();
+> +	status = bdp->cbd_sc;
+> +
+> +	if (status & BD_ENET_TX_READY) {
+> +		/* All transmit buffers are full. Bail out.
+> +		 * This should not happen, since dev->tbusy should be set.
+> +		 */
+> +		netif_stop_queue(dev);
+> +		dev_err(&fep->pdev->dev, "%s: tx queue full!.\n", dev->name);
 
+This needs to be rate limited, we don't want to flood the logs in case
+there's a bug.
+
+Also at a glance it seems like you have one fep for multiple netdevs.
+So stopping one netdev's Tx queue when fep fills up will not stop the
+other ports from pushing frames, right?
+
+> +		spin_unlock(&fep->hw_lock);
+> +		return NETDEV_TX_BUSY;
+> +	}
+> +
+> +	/* Clear all of the status flags */
+> +	status &= ~BD_ENET_TX_STATS;
+> +
+> +	/* Set buffer length and buffer pointer */
+> +	bufaddr = skb->data;
+> +	bdp->cbd_datlen = skb->len;
+> +
+> +	/* On some FEC implementations data must be aligned on
+> +	 * 4-byte boundaries. Use bounce buffers to copy data
+> +	 * and get it aligned.spin
+> +	 */
+> +	if ((unsigned long)bufaddr & MTIP_ALIGNMENT) {
+
+I think you should add 
+
+	if ... ||
+           fep->quirks & FEC_QUIRK_SWAP_FRAME)
+
+here. You can't modify skb->data without calling skb_cow_data()
+but you already have buffers allocated so can as well use them.
+
+> +		unsigned int index;
+> +
+> +		index = bdp - fep->tx_bd_base;
+> +		memcpy(fep->tx_bounce[index],
+> +		       (void *)skb->data, skb->len);
+
+this fits on one 80 char line BTW, quite easily:
+
+		memcpy(fep->tx_bounce[index], (void *)skb->data, skb->len);
+
+Also the cast to void * is not necessary in C.
+
+> +		bufaddr = fep->tx_bounce[index];
+> +	}
+> +
+> +	if (fep->quirks & FEC_QUIRK_SWAP_FRAME)
+> +		swap_buffer(bufaddr, skb->len);
+> +
+> +	/* Save skb pointer. */
+> +	fep->tx_skbuff[fep->skb_cur] = skb;
+> +
+> +	fep->skb_cur = (fep->skb_cur + 1) & TX_RING_MOD_MASK;
+
+Not sure if this is buggy, but maybe delay updating things until the
+mapping succeeds? Fewer things to unwind.
+
+> +	/* Push the data cache so the CPM does not get stale memory
+> +	 * data.
+> +	 */
+> +	bdp->cbd_bufaddr = dma_map_single(&fep->pdev->dev, bufaddr,
+> +					  MTIP_SWITCH_TX_FRSIZE,
+> +					  DMA_TO_DEVICE);
+> +	if (unlikely(dma_mapping_error(&fep->pdev->dev, bdp->cbd_bufaddr))) {
+> +		dev_err(&fep->pdev->dev,
+> +			"Failed to map descriptor tx buffer\n");
+> +		dev->stats.tx_errors++;
+> +		dev->stats.tx_dropped++;
+
+dropped and errors are two different counters
+I'd stick to dropped
+
+> +		dev_kfree_skb_any(skb);
+> +		goto err;
+> +	}
+> +
+> +	/* Send it on its way.  Tell FEC it's ready, interrupt when done,
+> +	 * it's the last BD of the frame, and to put the CRC on the end.
+> +	 */
+> +
+> +	status |= (BD_ENET_TX_READY | BD_ENET_TX_INTR
+> +			| BD_ENET_TX_LAST | BD_ENET_TX_TC);
+
+The | goes at the end of the previous line, start of new line adjusts 
+to the opening brackets..
+
+> +
+> +	/* Synchronize all descriptor writes */
+> +	wmb();
+> +	bdp->cbd_sc = status;
+> +
+> +	netif_trans_update(dev);
+
+Is this call necessary?
+
+> +	skb_tx_timestamp(skb);
+> +
+> +	/* Trigger transmission start */
+> +	writel(MCF_ESW_TDAR_X_DES_ACTIVE, fep->hwp + ESW_TDAR);
+> +
+> +	dev->stats.tx_bytes += skb->len;
+> +	/* If this was the last BD in the ring,
+> +	 * start at the beginning again.
+> +	 */
+> +	if (status & BD_ENET_TX_WRAP)
+> +		bdp = fep->tx_bd_base;
+> +	else
+> +		bdp++;
+> +
+> +	if (bdp == fep->dirty_tx) {
+> +		fep->tx_full = 1;
+> +		netif_stop_queue(dev);
+> +	}
+> +
+> +	fep->cur_tx = bdp;
+> + err:
+> +	spin_unlock(&fep->hw_lock);
+> +
+> +	return NETDEV_TX_OK;
+> +}
 
