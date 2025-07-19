@@ -1,192 +1,125 @@
-Return-Path: <netdev+bounces-208295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 162DCB0AD2C
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 03:10:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E7B5B0AD46
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 03:22:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB3551C45B76
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 01:10:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D21C5885D0
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 01:22:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E457260A;
-	Sat, 19 Jul 2025 01:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D3619007D;
+	Sat, 19 Jul 2025 01:22:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eHkrsRYm"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="CZ7FP1xL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E42EBA45;
-	Sat, 19 Jul 2025 01:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEB187260A;
+	Sat, 19 Jul 2025 01:22:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752887430; cv=none; b=ZKdD8Ifyvskw57nFIqVz/l8oK3FD6XIMyUveA+rKDws6uO8RGx0upgs1VRqtwZQU0Ud/6amD0ggWHDIO7YwPFUKeQScq5EdTqK19/bWuuQcezmBP0fsCwp+E4LZFZBjLUyAtOmzV/lFj4fkAwsIFIHCUWxaZRXcyarGvK+4yu3g=
+	t=1752888152; cv=none; b=H4if3wGrvfOkqB9NQDCWjoNY8HQ5TAycgLl+Mv3hfEz0jmpEvb9VgeF3dLgkkyZdLUSJvccnA4dRbChy1jeq6/h3P27Y1t63Q8Q271S6Sg16ew/q5ZJzQ2umTTM9iSAMo8lGYu4gAQCQQ9mUDiFX+GG8GNTFMIGaVeCgxXk4VRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752887430; c=relaxed/simple;
-	bh=YgyJXRQCWe/ppuZUdi3oQsWjYtd7cJWOV5GRrEP4tkg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GRXQTF7j0WRCyOBk3gn3OxHG4yB7A7rSPA6Spmn421YP5J3SDvuGbxYvQdkbzsou+5eeidOjO88u5c9BJ9yxCEFKh+Us8sf595SLS7m/W0+zFzmw5bnS9SWj/MMj/zP/ZNfy73uVEF651NoSYcVmII0A1val1KUCssghPKlSkYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eHkrsRYm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30BD6C4CEEB;
-	Sat, 19 Jul 2025 01:10:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752887429;
-	bh=YgyJXRQCWe/ppuZUdi3oQsWjYtd7cJWOV5GRrEP4tkg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eHkrsRYmWJgNnpXYK7n+ARDjeG5/Oj3FXrAhg2YDW/cArhshfmCNBm5T5r1IQYFyI
-	 iPwXwaBObc7NTS10OOhd9c2hU8+G4ZNcaylejIHyD747TrCEyXXCK9RQR8tK402OUV
-	 TYtEPK/ATn96lvDKTQtRVP1Ano8u08sHx3ykE3uniBh4tpcWDLFJ4r2CN8k4OFmgZ8
-	 7RYXEGHp7PAojyPGXWjZEf4NdHBAHsQUCHeKTE+u7EsMISs3NxTyqQfujYlE7NyDJL
-	 ADQ5uqMIwjCjNHLE2tYw5czj82xsF6jaRGFuAW5PnGaU3t73ZFVx5VfegVnu6mPYPy
-	 PmDIJTUdImfAA==
-Date: Fri, 18 Jul 2025 18:10:28 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
- <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, Richard Cochran
- <richardcochran@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
- <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>, Andrew Lunn
- <andrew@lunn.ch>
-Subject: Re: [net-next v15 04/12] net: mtip: The L2 switch driver for imx287
-Message-ID: <20250718181028.00cda754@kernel.org>
-In-Reply-To: <20250716214731.3384273-5-lukma@denx.de>
-References: <20250716214731.3384273-1-lukma@denx.de>
-	<20250716214731.3384273-5-lukma@denx.de>
+	s=arc-20240116; t=1752888152; c=relaxed/simple;
+	bh=OVbbYkCBcZ+CNDoO6CgnMGQXExnG7/i7qu3C3IVJKkE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UtwsejbMTZBOWsd5H4BI6FaUyATvEEp4PBBxQbbBVQCvgSvSeqN/dquMQT+4/Xd6ADPArWF9o8HnF5oIyZPMZfwB2mkeHL3xmjLNVfLjHY4Fyf/nRQQFuvpcXzOiVKe27VyPUZ+IhycLNp7J2YHzWIJdG6CzgWEj7Iqfn7FkGKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=CZ7FP1xL; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1752888151; x=1784424151;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=OVbbYkCBcZ+CNDoO6CgnMGQXExnG7/i7qu3C3IVJKkE=;
+  b=CZ7FP1xLqHhNaPJU7oYzZEHvk9S1RwAoMKb4UnCn+274Xfdek4LzgWRe
+   N/Sfj7VB2yPmHjXUZyrZu/qcz8dGrRCJjd/S9DrZF7XKR49g+ELaTo5eY
+   VbT71AXyW/JS4wIprLCxEiuYoMeAdldwluFDanXMwapto09o3gsAWnLnm
+   /4zhJJB2p8+YFGJtPRMCJGlJCKmL+kcQsP1K8JyUn/87cJ5KDuJtG0ZP4
+   VHVH15aOXnlK7b1NuUGw3WL93TXI7M5Fnh7Ue5qX7AsyrFPV+DW41w692
+   8WFcDnLYKctQy5SVKbIi28gU4YdGS9x0aMBHVU7pnB4p3+Pa6BDkgH/W3
+   g==;
+X-CSE-ConnectionGUID: ddxsHBV8SmSEFdelM5WBgw==
+X-CSE-MsgGUID: zNzCk4BARD2ljdhwTloXvw==
+X-IronPort-AV: E=Sophos;i="6.16,323,1744095600"; 
+   d="scan'208";a="275554253"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Jul 2025 18:21:23 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Fri, 18 Jul 2025 18:21:02 -0700
+Received: from pop-os.microchip.com (10.10.85.11) by chn-vm-ex01.mchp-main.com
+ (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
+ Transport; Fri, 18 Jul 2025 18:21:02 -0700
+From: <Tristram.Ha@microchip.com>
+To: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>, Rob Herring <robh@kernel.org>,
+	"Krzysztof Kozlowski" <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>
+CC: Maxime Chevallier <maxime.chevallier@bootlin.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Marek Vasut
+	<marex@denx.de>, <UNGLinuxDriver@microchip.com>,
+	<devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Tristram Ha <tristram.ha@microchip.com>
+Subject: [PATCH net-next v4 0/7] net: dsa: microchip: Add KSZ8463 switch support
+Date: Fri, 18 Jul 2025 18:20:59 -0700
+Message-ID: <20250719012106.257968-1-Tristram.Ha@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Wed, 16 Jul 2025 23:47:23 +0200 Lukasz Majewski wrote:
-> +static void mtip_ndev_cleanup(struct switch_enet_private *fep)
-> +{
-> +	struct mtip_ndev_priv *priv;
-> +	int i;
-> +
-> +	for (i = 0; i < SWITCH_EPORT_NUMBER; i++) {
-> +		if (fep->ndev[i]) {
+From: Tristram Ha <tristram.ha@microchip.com>
 
-this just checks if netdev is NULL
+This series of patches is to add KSZ8463 switch support to the KSZ DSA
+driver.
 
-> +			priv = netdev_priv(fep->ndev[i]);
-> +			cancel_work_sync(&priv->tx_timeout_work);
-> +
-> +			unregister_netdev(fep->ndev[i]);
+v4
+- Fix a typo in ksz8_reg.h
+- Fix logic in ksz8463_r_phy()
 
-and if not unregisters
+v3
+- Replace cpu_to_be16() with swab16() to avoid compiler warning
+- Disable PTP function in a separate patch
 
-> +			free_netdev(fep->ndev[i]);
-> +		}
-> +	}
-> +}
-> +
-> +static int mtip_ndev_init(struct switch_enet_private *fep,
-> +			  struct platform_device *pdev)
-> +{
-> +	struct mtip_ndev_priv *priv;
-> +	int i, ret = 0;
-> +
-> +	for (i = 0; i < SWITCH_EPORT_NUMBER; i++) {
-> +		fep->ndev[i] = alloc_netdev(sizeof(struct mtip_ndev_priv),
+v2
+- Break the KSZ8463 driver code into several patches for easy review
+- Replace ntohs with cpu_to_be16
 
-but we assign the pointer immediatelly
 
-> +					    fep->ndev_name[i], NET_NAME_USER,
-> +					    ether_setup);
-> +		if (!fep->ndev[i]) {
-> +			ret = -ENOMEM;
-> +			break;
-> +		}
-> +
-> +		fep->ndev[i]->ethtool_ops = &mtip_ethtool_ops;
-> +		fep->ndev[i]->netdev_ops = &mtip_netdev_ops;
-> +		SET_NETDEV_DEV(fep->ndev[i], &pdev->dev);
-> +
-> +		priv = netdev_priv(fep->ndev[i]);
-> +		priv->dev = fep->ndev[i];
-> +		priv->fep = fep;
-> +		priv->portnum = i + 1;
-> +		fep->ndev[i]->irq = fep->irq;
-> +
-> +		mtip_setup_mac(fep->ndev[i]);
-> +
-> +		ret = register_netdev(fep->ndev[i]);
+Tristram Ha (7):
+  dt-bindings: net: dsa: microchip: Add KSZ8463 switch support
+  net: dsa: microchip: Add KSZ8463 switch support to KSZ DSA driver
+  net: dsa: microchip: Transform register for use with KSZ8463
+  net: dsa: microchip: Use different registers for KSZ8463
+  net: dsa: microchip: Write switch MAC address differently for KSZ8463
+  net: dsa: microchip: Setup fiber ports for KSZ8463
+  net: dsa: microchip: Disable PTP function of KSZ8463
 
-and don't clear it when register fails
+ .../bindings/net/dsa/microchip,ksz.yaml       |   1 +
+ drivers/net/dsa/microchip/ksz8.c              | 195 +++++++++++++++---
+ drivers/net/dsa/microchip/ksz8.h              |   4 +
+ drivers/net/dsa/microchip/ksz8_reg.h          |  49 +++++
+ drivers/net/dsa/microchip/ksz_common.c        | 168 ++++++++++++++-
+ drivers/net/dsa/microchip/ksz_common.h        | 104 ++++++++--
+ drivers/net/dsa/microchip/ksz_dcb.c           |  10 +-
+ drivers/net/dsa/microchip/ksz_spi.c           |  14 ++
+ include/linux/platform_data/microchip-ksz.h   |   1 +
+ 9 files changed, 497 insertions(+), 49 deletions(-)
 
-> +		if (ret) {
-> +			dev_err(&fep->ndev[i]->dev,
-> +				"%s: ndev %s register err: %d\n", __func__,
-> +				fep->ndev[i]->name, ret);
-> +			break;
-> +		}
-> +
-> +		dev_dbg(&fep->ndev[i]->dev, "%s: MTIP eth L2 switch %pM\n",
-> +			fep->ndev[i]->name, fep->ndev[i]->dev_addr);
-> +	}
-> +
-> +	if (ret)
-> +		mtip_ndev_cleanup(fep);
-
-You're probably better off handling the unwind on error separately from
-the full cleanup function, but I guess that's subjective.
-
-> +	return ret;
-> +}
-
-> +static int mtip_sw_probe(struct platform_device *pdev)
-> +{
-
-> +	ret = mtip_ndev_init(fep, pdev);
-> +	if (ret) {
-> +		dev_err(&pdev->dev, "%s: Failed to create virtual ndev (%d)\n",
-> +			__func__, ret);
-> +		goto ndev_init_err;
-> +	}
-> +
-> +	ret = mtip_switch_dma_init(fep);
-
-> +	ret = mtip_mii_init(fep, pdev);
-
-Seems like we're registering the netdevs before fully initializing 
-the HW? Is it safe if user (or worse, some other kernel subsystem) 
-tries to open the netdevs before the driver finished the init?
- 
-
-> +	if (ret) {
-> +		dev_err(&pdev->dev, "%s: Cannot init phy bus (%d)!\n", __func__,
-> +			ret);
-> +		goto mii_init_err;
-> +	}
-> +	/* setup timer for learning aging function */
-> +	timer_setup(&fep->timer_mgnt, mtip_mgnt_timer, 0);
-> +	mod_timer(&fep->timer_mgnt,
-> +		  jiffies + msecs_to_jiffies(LEARNING_AGING_INTERVAL));
-> +
-> +	return 0;
-> +
-> + mii_init_err:
-> + dma_init_err:
-> +	mtip_ndev_cleanup(fep);
-
-Please name the labels after the action they jump to, not the location
-where they jump from.
-
-> + ndev_init_err:
-> +
-> +	return ret;
 -- 
-pw-bot: cr
+2.34.1
+
 
