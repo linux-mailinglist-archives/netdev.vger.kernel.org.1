@@ -1,236 +1,145 @@
-Return-Path: <netdev+bounces-208307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC902B0AE17
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 07:27:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBBF2B0AE1B
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 07:37:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 241CA1AA16B8
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 05:27:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39224AA7FC3
+	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 05:37:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6628C17BED0;
-	Sat, 19 Jul 2025 05:26:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BFCF221F04;
+	Sat, 19 Jul 2025 05:37:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MIt+2CWX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ePvz9Fsz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A442D613
-	for <netdev@vger.kernel.org>; Sat, 19 Jul 2025 05:26:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8920DA920;
+	Sat, 19 Jul 2025 05:37:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752902817; cv=none; b=kTg1/fi0kvWjUZVciHfcM126JnxCC9qzzaZ2aLD575lKh+ysHPQcvSh5zcDMcdxbvc7v0Gf6ypbHudv0yem+OI4U2K7uT8i/ZhlYW+WJFWHpeSBDH6uWjwEvjTyqL/I9WTzO2PtXrvfE4Yd3qcJ/Y8A9PSdTEtB/W1RjaXhZG44=
+	t=1752903462; cv=none; b=DjFHVJare2Jk44t1CdY3BufP5VvHlmurTYBoPcglvT4wGPkGk+KD+iEadqhXSMn5cHWzIqPc42olP9eNO20j4mga+z1MoFO7cmXT/tQk5aJ1d5armsz0gdDgMysF1Fs+kOKLdkPK84rbm9iYVlJLzmvOOJn2esudUU5INBhcXnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752902817; c=relaxed/simple;
-	bh=s1sYdC31x8d3/EdpQVvZKihX6rX2qh3nddpatp3CFJk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mRNKXSILZT9sXGFE/nTQJY8nVwfhDggzUJkFkFFCjkhSmbuc93fc+7nFtO8BRrvgnbp6H8MMU4wmzDVzStPgwdw5JMJQFjROABRlHsUlg5C/6EEgqZIIYtFqu7fH3hK5XrrLNYqsDJWciNRkvGPHWohWKR9AxL221BfgfXZ/Pww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MIt+2CWX; arc=none smtp.client-ip=209.85.166.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3df210930f7so12962515ab.1
-        for <netdev@vger.kernel.org>; Fri, 18 Jul 2025 22:26:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752902815; x=1753507615; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+ooeLQ4zGTNne86A0UA5I+phnmQ0cuyVzXhSfouJGCk=;
-        b=MIt+2CWXP2kAH9iueov1tevnZF/hQ0lhWEWrIJTFyWccWa9fnk7tyVKboTNp6jZXtt
-         +TQ8hLvrwgR2URC6yppuWddZ3YnIoA0Gpn97mpX97Te5l1fv1QtDualKEtsLkrie797i
-         zhZmaC6BXGvPv1c68LvsqLjeG2g7ckwteE/xqyEtlfLPemrprWeBWbmoDT2O6pWsbH73
-         coOWZunQLR7iitHtbu9z99Huvv9sIfoGKGz4EVIy5PnebmWUiHE9DUVPImQbr1u02Cgz
-         7LyOd8KepPcMsEFPBi3h5b2V7V8z4P3h0T7XEDTQWzlidYlNsLWWemYUcxA6FTRXmIw7
-         +QWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752902815; x=1753507615;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+ooeLQ4zGTNne86A0UA5I+phnmQ0cuyVzXhSfouJGCk=;
-        b=e8PLiFKP8oxP3JNH7Ji8HEVGgYg8l/UqocIgr/1VIZkHrhTxDsM+wjuN4YoM+YL1Rd
-         rN9Hu4tdVViG5yweaXwiMVS5DozcY9BKLWeKvabQKqICZhhR2b2P0CROQ5YnyEg8cLX9
-         mGDgcj9phW9xVVUr5eJfjmBbJBciaCL158WBTgliocd1r97NpyirRLiyySHqBCLyDmbV
-         ssMcWD2x4doP7o1JMm6SXpdZpy+DoM60DJnrCMlonGjS1G89jJvDXKblNjgfggWLh0K+
-         dTZqUW211ZYEcTsLZiEZOxPBbnHBrHXH1qFkjvrMu2jaKn3Sa+y8dcfFYX3zuURnomWk
-         Xp3A==
-X-Forwarded-Encrypted: i=1; AJvYcCV5NcMT8nrwHrsOCxitl4buCePsnleAWM7vUFpmzNZR+T9LT5RE/RsL1vpIZ1EmiXMJ5184cpQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxeWYFcbriuIjPbAUatmrWyMmxEw6cbLsYfCQKMxy5NXUE5Yrez
-	e+Q+KGfG8ZiZhea1f3hb3XxzQtTsUqPxuuiS/JYAwWm1tDH9mbToDNXn4U5liv4Qh4Iksisqzo4
-	pAXv9AeAoVvIYpY8MwaudNLmY+aQvWWU=
-X-Gm-Gg: ASbGncvSkhneSYqtvZPXmEoOdQjCgKb2RC8dQzHtxKn9LKMcctnl03LcW9XZVOabUuz
-	hmK8g7A4tBxbEODfT33H6QJfd4bJlP6noELoak/MDqNI3ozm7oMn8fK7kpvCPaCYRgMHrK4MDB3
-	NeRS9wLtweT6aCR6qZtFlDnavQr0dTsmkSP+IfxrnKKb+P0+3rE/JH7JPQnPJkNjEKNuESoyMtb
-	j8Yp7I=
-X-Google-Smtp-Source: AGHT+IHd5v0jT6NG2kgqyG4EeeCtSp7LmOVQY2GbX6PDeBeo69dTItMmMe8E6wuAAaeJbQp2XUYa5BmkfaBjO0diLX0=
-X-Received: by 2002:a05:6e02:4513:b0:3dd:bb43:1fc0 with SMTP id
- e9e14a558f8ab-3e295a89951mr35283525ab.11.1752902814490; Fri, 18 Jul 2025
- 22:26:54 -0700 (PDT)
+	s=arc-20240116; t=1752903462; c=relaxed/simple;
+	bh=MJon/TZYWADZmZDD9hceG9yEzZZXNwLvFdal03egBqE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DhE+UIAG0+d27FuEUcK65w3QhE6CJJ/8jDYaRg59MvatrmXxzy455K7dm95spnWQX0gfnd82UMU/Jdy2nWvy2XzbFUCGf7xeoUbSnWpQHzw822xkOOsUmMfOY236f1cywsGFlqXcn5+IGizchxM1/W/dCso4qq/7OSHk1yp4CzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ePvz9Fsz; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752903460; x=1784439460;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=MJon/TZYWADZmZDD9hceG9yEzZZXNwLvFdal03egBqE=;
+  b=ePvz9FszYccziLjvBka58iTlF6iZpZbaxGFfWNAdJZd2prBnV06J6dXR
+   VS9ZSflmKv0zozcTkSwJZ+8nZw2X5/YF4F4PlwlqyY41DRncKXlrXuFlP
+   ThpDSYJNHpbDA81/x9Bp4fZBmuZignL/5srGWfq4giQZ0phPhYTwPnTy3
+   TQ4+/zrOUU3UHYE8qzO1hdR96QUoGg3A+TFqR14J8BTMLdtgxUsTG3xDn
+   RD7UzOnkfEWCx1pWkpS3eX03oNVH0vQhze8qkrYuTlnmSYJ+A+vMdohXV
+   TbIFX3DTLJEU8UhpLQ2oWr+ooosRLfeSIpdTljCvZTtnZ0K5pxDlUgKrL
+   g==;
+X-CSE-ConnectionGUID: nh1gCXudRZuig76fITt5VQ==
+X-CSE-MsgGUID: oI1eZtQFTb27Z/NdsGWe3Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11496"; a="66544341"
+X-IronPort-AV: E=Sophos;i="6.16,323,1744095600"; 
+   d="scan'208";a="66544341"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2025 22:37:40 -0700
+X-CSE-ConnectionGUID: tGCe+fNpRMSY7yrO8L13EA==
+X-CSE-MsgGUID: NyrmdtgnTS2lacFieNxAJg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,323,1744095600"; 
+   d="scan'208";a="189375078"
+Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 18 Jul 2025 22:37:36 -0700
+Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1ud0GM-000FGd-1D;
+	Sat, 19 Jul 2025 05:37:34 +0000
+Date: Sat, 19 Jul 2025 13:37:05 +0800
+From: kernel test robot <lkp@intel.com>
+To: Abid Ali <dev.nuvorolabs@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Abid Ali <dev.nuvorolabs@gmail.com>
+Subject: Re: [PATCH] net: phy: Fix premature resume by a PHY driver
+Message-ID: <202507191322.YG6cNwF6-lkp@intel.com>
+References: <20250718-phy_resume-v1-1-9c6b59580bee@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAL+tcoCTHTptwmok9vhp7GEwQgMhNsBJxT3PStJDeVOLR_-Q3g@mail.gmail.com>
- <aHohbwWCF0ccpmtj@soc-5CG4396X81.clients.intel.com>
-In-Reply-To: <aHohbwWCF0ccpmtj@soc-5CG4396X81.clients.intel.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sat, 19 Jul 2025 13:26:18 +0800
-X-Gm-Features: Ac12FXwvfdEfdJ8HKmQX2AmC9Tuh52YC6mQkso_YplQU3aLWryMOSoSsL89nCp8
-Message-ID: <CAL+tcoCJ9ghWVQ1afD_WJmx-3n+80Th7jPw-N-k9Z6ZjJErSkw@mail.gmail.com>
-Subject: Re: ixgbe driver stops sending normal data when using xsk
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, 
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, przemyslaw.kitszel@intel.com, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, intel-wired-lan@lists.osuosl.org, 
-	netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250718-phy_resume-v1-1-9c6b59580bee@gmail.com>
 
-On Fri, Jul 18, 2025 at 6:27=E2=80=AFPM Larysa Zaremba <larysa.zaremba@inte=
-l.com> wrote:
->
-> On Wed, Jul 16, 2025 at 11:41:42AM +0800, Jason Xing wrote:
-> > Hi all,
-> >
-> > I'm currently faced with one tough issue caused by zero copy mode in
-> > xsk with ixgbe driver loaded. The case is that if we use xdpsock to
-> > send descs, nearly at the same time normal packets from other tx
-> > queues cannot be transmitted/completed at all.
-> >
-> > Here is how I try:
-> > 1. run iperf or ping to see if the transmission is successful.
-> > 2. then run "timeout 5 ./xdpsock -i enp2s0f0 -t  -z -s 64"
-> >
-> > You will obviously find the whole machine loses connection. It can
-> > only recover as soon as the xdpsock is stopped due to timeout.
-> >
-> > I tried a lot and then traced down to this line in ixgbe driver:
-> > ixgbe_clean_tx_irq()
-> >     -> if (!(eop_desc->wb.status & cpu_to_le32(IXGBE_TXD_STAT_DD)))
-> >             break;
-> > The above line always 'breaks' the sending process.
-> >
-> > I also managed to make the external ixgbe 6.15 work and it turned out
-> > to be the same issue as before.
-> >
-> > I have no idea on how to analyze further in this driver. Could someone
-> > point out a direction that I can take? Is it a known issue?
-> >
-> > Thanks,
-> > Jason
-> >
->
-> I was able to reproduce the described behaviour, xdpsock does break the I=
-P
-> communication. However, in my case this was not because of ixgbe not bein=
-g able
-> to send, but because of queue 0 RX packets being dropped, which is the in=
-dended
-> outcome in xdpsock, even in Tx only mode.
+Hi Abid,
 
-Thanks for your feedback. It would be great if you could elaborate
-more on this. How did you spot that it's queue 0 that causes the
-problem? Why is xdpsock breaking IP communication intended?
+kernel test robot noticed the following build warnings:
 
-When you try i40e, you will find the connection behaves normally. Ping
-can work as usual. As I depicted before, with ixgbe driver, ping even
-doesn't work at all.
+[auto build test WARNING on 347e9f5043c89695b01e66b3ed111755afcf1911]
 
-iperf is the one that I should not list... Because I find iperf always
-doesn't work with either of them loaded.
+url:    https://github.com/intel-lab-lkp/linux/commits/Abid-Ali/net-phy-Fix-premature-resume-by-a-PHY-driver/20250718-234858
+base:   347e9f5043c89695b01e66b3ed111755afcf1911
+patch link:    https://lore.kernel.org/r/20250718-phy_resume-v1-1-9c6b59580bee%40gmail.com
+patch subject: [PATCH] net: phy: Fix premature resume by a PHY driver
+config: i386-buildonly-randconfig-004-20250719 (https://download.01.org/0day-ci/archive/20250719/202507191322.YG6cNwF6-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250719/202507191322.YG6cNwF6-lkp@intel.com/reproduce)
 
->
-> When I run `tcpdump -nn -e -p -i <ifname>` on the link partner, I see tha=
-t the
-> ixgbe host spams ARP packets just fine.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202507191322.YG6cNwF6-lkp@intel.com/
 
-Interesting. I managed to see the same phenomenon.
+All warnings (new ones prefixed by >>):
 
-I debugged the ixgbe and saw the following code breaks the whole
-sending process:
-ixgbe_clean_tx_irq()
-     -> if (!(eop_desc->wb.status & cpu_to_le32(IXGBE_TXD_STAT_DD)))
-             break;
+>> drivers/net/phy/phy_device.c:1849:33: warning: '&&' within '||' [-Wlogical-op-parentheses]
+    1849 |         if (!phydrv || !phydrv->resume && phydev->suspended)
+         |                     ~~ ~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~
+   drivers/net/phy/phy_device.c:1849:33: note: place parentheses around the '&&' expression to silence this warning
+    1849 |         if (!phydrv || !phydrv->resume && phydev->suspended)
+         |                                        ^                   
+         |                        (                                   )
+   1 warning generated.
 
-Do you have any idea why?
 
->
-> When debugging low-level stuff such as XDP, I advise you to send packets =
-at the
-> lower level, e.g. with scapy's sendp().
->
-> In case you have a different problem, please provide lspci card descripti=
-on and
-> some truncated output of the commands that you are running and the result=
-ing
-> dmesg.
+vim +1849 drivers/net/phy/phy_device.c
 
-I'm not that sure if they are the same.
+  1841	
+  1842	int __phy_resume(struct phy_device *phydev)
+  1843	{
+  1844		const struct phy_driver *phydrv = phydev->drv;
+  1845		int ret;
+  1846	
+  1847		lockdep_assert_held(&phydev->lock);
+  1848	
+> 1849		if (!phydrv || !phydrv->resume && phydev->suspended)
+  1850			return 0;
+  1851	
+  1852		ret = phydrv->resume(phydev);
+  1853		if (!ret)
+  1854			phydev->suspended = false;
+  1855	
+  1856		return ret;
+  1857	}
+  1858	EXPORT_SYMBOL(__phy_resume);
+  1859	
 
-One of ixgbe machines that I manipulate looks like this:
-# lspci -vv | grep -i ether
-02:00.0 Ethernet controller: Intel Corporation Ethernet Controller
-10-Gigabit X540-AT2 (rev 01)
-02:00.1 Ethernet controller: Intel Corporation Ethernet Controller
-10-Gigabit X540-AT2 (rev 01)
-
-# dmesg -T|grep -i ixgbe
-[Fri Jul 18 16:20:29 2025] ixgbe: Intel(R) 10 Gigabit PCI Express Network D=
-river
-[Fri Jul 18 16:20:29 2025] ixgbe: Copyright (c) 1999-2016 Intel Corporation=
-.
-[Fri Jul 18 16:20:29 2025] ixgbe 0000:02:00.0: Multiqueue Enabled: Rx
-Queue count =3D 48, Tx Queue count =3D 48 XDP Queue count =3D 0
-[Fri Jul 18 16:20:29 2025] ixgbe 0000:02:00.0: 32.000 Gb/s available
-PCIe bandwidth (5.0 GT/s PCIe x8 link)
-[Fri Jul 18 16:20:29 2025] ixgbe 0000:02:00.0: MAC: 3, PHY: 0, PBA No:
-000000-000
-[Fri Jul 18 16:20:29 2025] ixgbe 0000:02:00.0: f0:98:38:1a:5d:4e
-[Fri Jul 18 16:20:29 2025] ixgbe 0000:02:00.0: Intel(R) 10 Gigabit
-Network Connection
-[Fri Jul 18 16:20:30 2025] ixgbe 0000:02:00.1: Multiqueue Enabled: Rx
-Queue count =3D 48, Tx Queue count =3D 48 XDP Queue count =3D 0
-[Fri Jul 18 16:20:30 2025] ixgbe 0000:02:00.1: 32.000 Gb/s available
-PCIe bandwidth (5.0 GT/s PCIe x8 link)
-[Fri Jul 18 16:20:30 2025] ixgbe 0000:02:00.1: MAC: 3, PHY: 0, PBA No:
-000000-000
-[Fri Jul 18 16:20:30 2025] ixgbe 0000:02:00.1: f0:98:38:1a:5d:4f
-[Fri Jul 18 16:20:30 2025] ixgbe 0000:02:00.1: Intel(R) 10 Gigabit
-Network Connection
-[Fri Jul 18 16:20:30 2025] ixgbe 0000:02:00.0 enp2s0f0np0: renamed from eth=
-0
-[Fri Jul 18 16:20:30 2025] ixgbe 0000:02:00.1 enp2s0f1np1: renamed from eth=
-1
-[Fri Jul 18 16:20:38 2025] ixgbe 0000:02:00.0: registered PHC device
-on enp2s0f0np0
-[Fri Jul 18 16:20:38 2025] ixgbe 0000:02:00.0 enp2s0f0np0: NIC Link is
-Up 1 Gbps, Flow Control: None
-[Fri Jul 18 16:20:38 2025] ixgbe 0000:02:00.1: registered PHC device
-on enp2s0f1np1
-[Sat Jul 19 13:11:30 2025] ixgbe 0000:02:00.0: removed PHC on enp2s0f0np0
-[Sat Jul 19 13:11:31 2025] ixgbe 0000:02:00.0: Multiqueue Enabled: Rx
-Queue count =3D 48, Tx Queue count =3D 48 XDP Queue count =3D 48
-[Sat Jul 19 13:11:31 2025] ixgbe 0000:02:00.0: registered PHC device
-on enp2s0f0np0
-[Sat Jul 19 13:11:31 2025] ixgbe 0000:02:00.0 enp2s0f0np0: NIC Link is
-Up 1 Gbps, Flow Control: None
-[Sat Jul 19 13:11:34 2025] ixgbe 0000:02:00.0: removed PHC on enp2s0f0np0
-[Sat Jul 19 13:11:34 2025] ixgbe 0000:02:00.0: Multiqueue Enabled: Rx
-Queue count =3D 48, Tx Queue count =3D 48 XDP Queue count =3D 0
-[Sat Jul 19 13:11:35 2025] ixgbe 0000:02:00.0: registered PHC device
-on enp2s0f0np0
-[Sat Jul 19 13:11:35 2025] ixgbe 0000:02:00.0 enp2s0f0np0: NIC Link is
-Up 1 Gbps, Flow Control: None
-
-reproduce process:
-1. timeout 3 ./xdpsock -i enp2s0f0np0 -t  -z -s 64
-2. ping <another IP address>
-
-Thanks,
-Jason
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
