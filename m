@@ -1,128 +1,139 @@
-Return-Path: <netdev+bounces-208400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29414B0B4D4
-	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 12:11:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F39FB0B4D9
+	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 12:17:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33A307A8FFF
-	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 10:10:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAE141899CD9
+	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 10:17:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D1BA1EB5F8;
-	Sun, 20 Jul 2025 10:11:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E07451DE3C0;
+	Sun, 20 Jul 2025 10:17:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QI5A7Idw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C49xHYPw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B7A2AD24;
-	Sun, 20 Jul 2025 10:11:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1CFE3BB48;
+	Sun, 20 Jul 2025 10:17:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753006295; cv=none; b=mmGRM95GeNqHdxooGUGeUN0V6YT8kbhagl00MsGfHvDLFgHX0vCXvXZWN8LByL6a76yjhnQe0cd9Yq1Z7ckRiNqGfZze+iwQbzDllh95N3nnTWzZc4yBKOpd7o9xrTEwDIz56u82QMxnTZyDMtJDPnRddKIB8OPX70LBY1Phorc=
+	t=1753006629; cv=none; b=jdha/0Z2jeGschrjQE5RXzBBidYM+JF/1Kg06T6ceZ5Qf6qM4bUOR3pUB9yCFvR/PBj9ze6RvcUTCE3z94H4brKYBh2AEZIkjngqVv2uzqe/rTVMZtwlerdK7PzI9seVSfzON3JdR3Uo3HxcjJyfjxSsU/SEAEOzPDQyPVUSRDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753006295; c=relaxed/simple;
-	bh=MEmze2/KZRm/Fg7Y6ZlAMO/Flv4J768QynVfXRHbNaU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RsLO8rygu9lski0zsec6tYP8j+lgahaJV6AfCytaAZ0vl62V2jCqxb6Rnq3mgM4mZtw3vcDVafj/9BmPfOBG0alCMsWYJITJ94v37H6knYuCJPwrZZybOLYZQnrMmZhEEKPQwHmZqJJuIvmkjgFO6QlIByvTozHXcFF8rMZUfSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QI5A7Idw; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4555f89b236so33413885e9.1;
-        Sun, 20 Jul 2025 03:11:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753006293; x=1753611093; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JdRTpizrrU5e3G8Qae8BhJ1GHYpNCsEA8s4Rmi93U9U=;
-        b=QI5A7IdwFyg533ugC5W3TcdWitsVLj/Kfni9xIAEUAIZH1cJ61PnlqX+4Mvzbms+gM
-         mWE+BcH4tgWfCCK1Y7Qtu5j2nk37rLMteZIr8ZcBRELKEKWmJGm6DfIwiu0U/19PXoMp
-         YfF03vHRwbFO7lzvf0gLnaPFthKu3b4dYzIeIRPJ1JCvt8Bbqm0JiojWK3xujfXBSOUV
-         OJZyEZADV22FnjeKtv9ozr8BMtuQbJdjapZdtct8vdCxftKhRj/WAx0044AxwaeUTfyw
-         px2qJpaywoQ3Bw9EPIkAnxVO7Y6xUwdkUAZDHApksZLuqHqDDk6iOc/Jl8RUq/eoK9No
-         HiEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753006293; x=1753611093;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JdRTpizrrU5e3G8Qae8BhJ1GHYpNCsEA8s4Rmi93U9U=;
-        b=Zsi8EhY9dHAm+fOe2STos9ktrsaIru1tNQFkrVTa2b+jmoFY8KHbT+791xJLzhucZG
-         yAVJ4PhHq52ZTkFS0qLLF7mvKdwb04pexaS/cAhK8dZ7nJ/h1kUFmOsXgBMqbw0J7SIp
-         mtY5nawR/5nrFGJ2/a9Dy8m7mYxMTOUjxfW2W3fzaHRyLfKA08ahjppUnF2aQ6xNRVEu
-         /tenIvcHhfWl3lp0+1SkF4QXBxdXxm5AFOVekqMb9HZ1BKLMVH8HBSSrO64MB+NQJdGt
-         fE3SzIrv7MfeJTG0oB7Sg5x+AUQGhrjDoMMINGYYDZgLHTS8H7jCLcdm7H+d3LltoDN8
-         Pd5g==
-X-Forwarded-Encrypted: i=1; AJvYcCUROAmIlafjjH0aHHFGm8KiphxQ4CwTydwTiWNDWXV13aDPIEoIlAwhro+RkmSvpnOaPn27tnKZMEk=@vger.kernel.org, AJvYcCWHUsBIOyCzaGW8g6DOvnUIlkugAxrTr7urYPFVnDLeZUtvGSVZCMDF91V+OK7UNXr9/5mUB1TK@vger.kernel.org, AJvYcCXcslcLQpTX6YAgw4VFzFRSvKtr+lb9cFgWhLzJbF74nOduHwj+EX3jaWsOmhXqN4NsFlVP2yFugevRKw==@vger.kernel.org, AJvYcCXiH+l5hNGB9FDSxj4HxgIhQbSmY93cciqtDwRhM8dRPxPeScG9f3I3/iIEeL1cudivUe9gq/X/WWDVjSZy@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPv9sApn+samv1nWJeV/+ej4c+VJjmAQAKIcgMyMNBLdcP4SW3
-	WEljSWlKpiA65Bl2GP9ppdeurRAhECcCoVmQFHO/EKZ30lzTXAMa4gK5
-X-Gm-Gg: ASbGnctuOCPi15wnI3OnUPdqRNQIPznUGr5ziZfTnBjKHa7D2iJOuC2C08f5Bw7ZZVs
-	cxQm0DkZrhfoyKl8FcAZPvi+Kacehn8RQMnUKItXXCSLquKwNuyICi/kHYF2oaW503cyVlAfGDq
-	AZYXjWQZbQ9zG5/vwFdR+pF20ZJU4FJPqdW39M2ox9cINqSceEjVlDfyxrwJIAiDIujgWE4OEDL
-	vZticupxflp26yd7Vv4OeLAQUKAt8t1XJSg7p+jaoMeeJFtsEv55qglfhdHuefTVYd8e+oNqrHa
-	ZjGBDFGeg+pZlIOqqZ6yTxf0NeK9yKDnuok0Md4WLuK5udu9jG/KHImAEXBiztU2m5NDSPNqZe3
-	BdCBReS3QCFtn/0W0aAHCFssu9MComSo519Fmr4dfZ2sxlR/CK36x7kIPjQ==
-X-Google-Smtp-Source: AGHT+IF2s+ysLSvlfEeRDPjVCEmq+qa5T5BlTc61WRYN/BrMqkjiw4nWQHAfv2AZZ83vJjydX+cmVA==
-X-Received: by 2002:a05:600c:64ca:b0:456:1752:2b43 with SMTP id 5b1f17b1804b1-4562e39ba8dmr145529555e9.21.1753006292314;
-        Sun, 20 Jul 2025 03:11:32 -0700 (PDT)
-Received: from [172.27.57.153] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45627898725sm114520565e9.1.2025.07.20.03.11.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 20 Jul 2025 03:11:31 -0700 (PDT)
-Message-ID: <f132d14c-0d82-495f-8f6d-bf87ecb4bc75@gmail.com>
-Date: Sun, 20 Jul 2025 13:11:27 +0300
+	s=arc-20240116; t=1753006629; c=relaxed/simple;
+	bh=qSu/fVLvTpTjNXmoaaXZmuvU+HNTptap35jxCNKV8JM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JB7ufY2r+oqFh3LdtBQ5P+DUEHP/8vDnZ++J4768vWEPCTwWcD6RtMRA5s9QNQQF2pU7WbMlmr13EfXyBtRh1IBEsq++M7rBcesBy/V/Y/aiLwl27jiLtKy3OhC/9piPLiaS9RjIZsqL/qgMCVrxJqnLl4TON07t/8n0GczyOOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C49xHYPw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A2E6C4CEF6;
+	Sun, 20 Jul 2025 10:17:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753006629;
+	bh=qSu/fVLvTpTjNXmoaaXZmuvU+HNTptap35jxCNKV8JM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=C49xHYPw8EcrXNvn5NbHoP17B/RrVTBcOYSgsNvuP54YYe7xEnruCpHX2biLUK/1l
+	 euNoozdlYwKNM6WgrseLWzO/OKxjBfJ44uAGn9YiM3XhoC8Ks4cMX9VVFZDD7M36rI
+	 gBFm0IX0PVnTn2X45+ZxZuz0q8JdLRCTn6zIcj7qYib1c+Pu8iAH0mBiZVYB6wtnXq
+	 Cr79spYmxltgHdnw5Bt6VO/xIvifUq85vbnbEkt94iDiOvXkBeT3NAGA/vaN7CTAnO
+	 tngSL9XJrg2cpznS0WhyNYVoLRBIhPSaCm1zhsNObyIp2PAsFg/ktclJRacn3qyS5Z
+	 u6xrNzyr8Ubiw==
+Date: Sun, 20 Jul 2025 11:17:03 +0100
+From: Simon Horman <horms@kernel.org>
+To: Tristram.Ha@microchip.com
+Cc: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Marek Vasut <marex@denx.de>, UNGLinuxDriver@microchip.com,
+	devicetree@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4 4/7] net: dsa: microchip: Use different
+ registers for KSZ8463
+Message-ID: <20250720101703.GQ2459@horms.kernel.org>
+References: <20250719012106.257968-1-Tristram.Ha@microchip.com>
+ <20250719012106.257968-5-Tristram.Ha@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 4/5] devlink: Make health reporter grace period
- delay configurable
-To: Jakub Kicinski <kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Jiri Pirko <jiri@resnulli.us>,
- Jiri Pirko <jiri@nvidia.com>, Saeed Mahameed <saeed@kernel.org>,
- Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Shahar Shitrit <shshitrit@nvidia.com>,
- Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
- Brett Creeley <brett.creeley@amd.com>,
- Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>, Cai Huoqing
- <cai.huoqing@linux.dev>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Sunil Goutham <sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>,
- Geetha sowjanya <gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>,
- hariprasad <hkelam@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>,
- Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
- Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
- Manish Chopra <manishc@marvell.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org
-References: <1752768442-264413-1-git-send-email-tariqt@nvidia.com>
- <1752768442-264413-5-git-send-email-tariqt@nvidia.com>
- <20250718174844.71062bc9@kernel.org>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20250718174844.71062bc9@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250719012106.257968-5-Tristram.Ha@microchip.com>
 
-
-
-On 19/07/2025 3:48, Jakub Kicinski wrote:
-> On Thu, 17 Jul 2025 19:07:21 +0300 Tariq Toukan wrote:
->> +	DEVLINK_ATTR_HEALTH_REPORTER_GRACEFUL_PERIOD_DELAY,	/* u64 */
+On Fri, Jul 18, 2025 at 06:21:03PM -0700, Tristram.Ha@microchip.com wrote:
+> From: Tristram Ha <tristram.ha@microchip.com>
 > 
-> /me pulls out a ruler
+> KSZ8463 does not use same set of registers as KSZ8863 so it is necessary
+> to change some registers when using KSZ8463.
 > 
-> 50 characters, -ENAMETOOLONG
+> Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
+> ---
+> v3
+> - Replace cpu_to_be16() with swab16() to avoid compiler warning
 
-We'll address.
+...
+
+> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+
+...
+
+> @@ -2980,10 +2981,15 @@ static int ksz_setup(struct dsa_switch *ds)
+>  	}
+>  
+>  	/* set broadcast storm protection 10% rate */
+> -	regmap_update_bits(ksz_regmap_16(dev), regs[S_BROADCAST_CTRL],
+> -			   BROADCAST_STORM_RATE,
+> -			   (BROADCAST_STORM_VALUE *
+> -			   BROADCAST_STORM_PROT_RATE) / 100);
+> +	storm_mask = BROADCAST_STORM_RATE;
+> +	storm_rate = (BROADCAST_STORM_VALUE * BROADCAST_STORM_PROT_RATE) / 100;
+> +	if (ksz_is_ksz8463(dev)) {
+> +		storm_mask = swab16(storm_mask);
+> +		storm_rate = swab16(storm_rate);
+> +	}
+> +	regmap_update_bits(ksz_regmap_16(dev),
+> +			   reg16(dev, regs[S_BROADCAST_CTRL]),
+> +			   storm_mask, storm_rate);
+
+Hi Tristram,
+
+I am confused by the use of swab16() here.
+
+Let us say that we are running on a little endian host (likely).
+Then the effect of this is to pass big endian values to regmap_update_bits().
+
+But if we are running on a big endian host, the opposite will be true:
+little endian values will be passed to regmap_update_bits().
+
+
+Looking at KSZ_REGMAP_ENTRY() I see:
+
+#define KSZ_REGMAP_ENTRY(width, swp, regbits, regpad, regalign)         \
+        {                                                               \
+		...
+                .reg_format_endian = REGMAP_ENDIAN_BIG,                 \
+                .val_format_endian = REGMAP_ENDIAN_BIG                  \
+        }
+
+Which based on a skimming the regmap code implies to me that
+regmap_update_bits() should be passed host byte order values
+which regmap will convert to big endian when writing out
+these values.
+
+It is unclear to me why changing the byte order of storm_mask
+and storm_rate is needed here. But it does seem clear that
+it will lead to inconsistent results on big endian and little
+endian hosts.
+
+...
 
