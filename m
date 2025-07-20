@@ -1,118 +1,91 @@
-Return-Path: <netdev+bounces-208385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50622B0B394
-	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 06:53:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A24C5B0B407
+	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 09:03:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F248B189C5EE
-	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 04:54:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C552189CB5E
+	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 07:03:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E90A19DF66;
-	Sun, 20 Jul 2025 04:53:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA1941C84A0;
+	Sun, 20 Jul 2025 07:03:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WvDXH/WL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fqMoLfKH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8C81C32
-	for <netdev@vger.kernel.org>; Sun, 20 Jul 2025 04:53:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABEDB4A23;
+	Sun, 20 Jul 2025 07:03:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752987220; cv=none; b=b4aU3zKxpAHG+5aot9w/l9fkrmqXgSemsJ6hXAjOEqHmofi0ZZUAq7MWxaacFVXa+PGbc686ujNCe60JxLLZBtvd7VVhcfyEdcvAW5jktM1dibv3mM4GI8omtTNy1/6VM4LxRK+Tk/buTFrATNzl8/5cWfpac05b7WMYNakQaMU=
+	t=1752994996; cv=none; b=Qjh1MygXB+mwE7d1mga++KYPYQflZ402qzD+iX9jxcOJ8snZ5dUtC59cxCXSVrs/gZ6rKtirzElcPP+z3nrTdEmtGRwXs3vqYzoUtelSrPy9ECSdeXsRTWH0C+OxbZkTpGQGmsGTwsPJkU/da/0mVDqLjuniYHK2v9XBzr9n784=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752987220; c=relaxed/simple;
-	bh=1pbmUFZkS6Rn8eyuak4flVQ/+1I09AKCZZT24rE+7PA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ni0H3jinwQ7od0pUnoNTEBll8D4k6KpeJIUC3NeeJ/JVZb83euOKjz5MQ/9OjwZiU8I56EXfrdDps/hKv7530XSp0p54stiRLZq4bKhWnAeyIHd/lVaLeFOhmZtCzH/Q3Ot4szoxJO+ffrz4PHYyLmi0ls1gKJOAXYoeodT6p7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WvDXH/WL; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-313154270bbso3315499a91.2
-        for <netdev@vger.kernel.org>; Sat, 19 Jul 2025 21:53:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752987218; x=1753592018; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TunjkI95IMphLR1F3DEmcSNcHuqiDjdUWsmvhl/oSFY=;
-        b=WvDXH/WLI8OM26IEmSQI7CyD66JJIyBWrZQmx48Fa7Q1psb68eNc4NLcdUFCjWm6uk
-         RuEjrxcKNn4vi9a2vjCQQeQWF8ytu9KeG/8HmqzqFigZwEWY6DpUI/JfeW3PWsuw+tzB
-         VJ2dYYP07K8l6syq2sOHZbXEKri6tU2w80bSaBmf0lxVJncB+2n2mxcU+mJDHsVI5K9i
-         9v+U29IG12bCCFQ4nzxn1GAfQ0qyQg4kIOxV7fxOQMy554rgGeHMMjJa2MGMelhpA/UD
-         qZJM/BOn/Q8EwILX2OtAjNTg1AMWmmkLvcPK2bcUvVQZwqmRJYiU58IOl12ion4LIE6f
-         27mQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752987218; x=1753592018;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TunjkI95IMphLR1F3DEmcSNcHuqiDjdUWsmvhl/oSFY=;
-        b=WY1T74hIo35n2mylXSJyqjz0sShQCgPD0eWKi1E3c0lzW+fV0iwjz3wZILyVs4jJYc
-         bwfKL2AM8fz6zV8yA8CK/JjOin+PEusf8Rr89pnrNuteQhWsmYn8s5CiSZzpzkx+Wgtz
-         Q/qlohqH87NVK+MGBX3crZ5fnpaF7TdJ+KovqW3aViEFz57Feqkna0CGEbGsPQv6ioHm
-         dspRbmrfV29nG1csoc7bz9e8Pva2BRqsyqE04MQexpb0tJEdnNXOLBbrpdpH0G8AK4IH
-         7uo3vHKqKP4l7TSadrLVxOrWkFA57jtH/7c9L6oXg4wouxwznz4HY+vpXInFxOdZOgVr
-         laQQ==
-X-Gm-Message-State: AOJu0YwZSaRe5LuGrNIB886vvKNqqN4xzVXzBlaIPDl7bTAY3aWP9Suk
-	biap12euYFiXurNlwu00MTeo/9KtA0CHLPTnM/IS8zwXVOWfJWocXamQLaNnwlTNp9u447wMpHS
-	Ne8jZhvIP2gYtXEJ93Bb+y4NFt20oHV8=
-X-Gm-Gg: ASbGncttWSLU+cKbXkszJau/YAdOKcwhljl7wSA51VCVsOF2OOIi4WcBu9f53ZxEyZB
-	YpmOmOIQtdhx7wShkYAHmNo9UsapQtcuJIOXyfAU4qjstyT3zjT3T7wZk+DEoZ/ZCza4E7CMQEN
-	pMI0duIBXMUq/b7NV6rQ7YdZ7D2fwBBTeXriRJ/f3Q9ync/FsFdBgmm08HVvI8jW+BORYqRXBmJ
-	DmZtQ==
-X-Google-Smtp-Source: AGHT+IEVGIAPYT1CpQi6h+NQ+HllxEdUZ8h5B5er7u5BHtAQasr1UW/VtHh+u6gtno2vLTc7vBMKzlWUbKcwS5+q+kg=
-X-Received: by 2002:a17:90b:5307:b0:313:db0b:75e4 with SMTP id
- 98e67ed59e1d1-31c9f48a241mr29150949a91.33.1752987218240; Sat, 19 Jul 2025
- 21:53:38 -0700 (PDT)
+	s=arc-20240116; t=1752994996; c=relaxed/simple;
+	bh=KrHbmEeIzqyXY1EX4RYscC1LkQaWORQxYXkfbeaojgs=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=Px2yffEVTJqIx60tj0G4vgsQD7pS6kQJfK8i7059yR1ddpwYFAEqptutPplFVfrHBf2ERRquQRfecqb6fzX7V33sbvWCYnbCGM1Qe2KiOYOxawA2UwJE7MyIrunpd1SflfOOqJZIoZULwHE2AISAE7tazROdeM/1b7tRECNkQm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fqMoLfKH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 959D5C4CEE7;
+	Sun, 20 Jul 2025 07:03:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752994996;
+	bh=KrHbmEeIzqyXY1EX4RYscC1LkQaWORQxYXkfbeaojgs=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=fqMoLfKHhY9Fy4jKoiUqiiT+/pEPCGF/+2brV0e1TCSmY+tY7LQehfz6MoY1UbiAV
+	 eF837YlmYzMT6iDJnIqimwqN/1CtnqEdK0jxqPbd4FOGNdVedEEeeYl4Y3XB+leRoH
+	 0iz3ycJTLhgU//Ohh5RUpjBH7ZID1puSXE2pCEomJz0aI8NJg/rcc1uw468P0QHeWA
+	 IDSbpUEa2MZjvmEc4dCjx8ZxyhtcYf2ddwIsHsj8AooIawuHB/QRWSx//L20p9KYZU
+	 fJvRCAXZdn8YmPMpjFcY0LDjFKiXa1NmP1Tqf2A+YsqZFtjryeuh4+rXS/CJfZ4tRO
+	 Y7B0dfNjbrKmg==
+From: Leon Romanovsky <leon@kernel.org>
+To: Saeed Mahameed <saeed@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Gal Pressman <gal@nvidia.com>, 
+ Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+In-Reply-To: <1752734895-257735-1-git-send-email-tariqt@nvidia.com>
+References: <1752734895-257735-1-git-send-email-tariqt@nvidia.com>
+Subject: Re: [PATCH mlx5-next 0/3] mlx5-next updates 2025-07-17
+Message-Id: <175299499263.667508.14308656303084331740.b4-ty@kernel.org>
+Date: Sun, 20 Jul 2025 03:03:12 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250715112431.2178100-1-krikku@gmail.com> <20250717075659.2725245-1-krikku@gmail.com>
- <20250717075659.2725245-2-krikku@gmail.com> <20250718175847.4f4a834c@kernel.org>
-In-Reply-To: <20250718175847.4f4a834c@kernel.org>
-From: Krishna Kumar <krikku@gmail.com>
-Date: Sun, 20 Jul 2025 10:23:01 +0530
-X-Gm-Features: Ac12FXzVvBD3okmLtvZGXsuu0v13BhYU7sV8HDWOi95Y00TSwd68_5lF291UM-U
-Message-ID: <CACLgkEZVa7+uvK9hn43=jAne-8X+3b=vUV-gSR8zGQtvrZbjUw@mail.gmail.com>
-Subject: Re: [PATCH v3 net-next 1/2] net: Prevent RPS table overwrite for
- active flows
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	tom@herbertland.com, pabeni@redhat.com, horms@kernel.org, sdf@fomichev.me, 
-	kuniyu@google.com, ahmed.zaki@intel.com, aleksander.lobakin@intel.com, 
-	atenart@kernel.org, jdamato@fastly.com, krishna.ku@flipkart.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15-dev-37811
 
-Ack. Thanks for your feedback.
 
-Regards,
-- Krishna
+On Thu, 17 Jul 2025 09:48:12 +0300, Tariq Toukan wrote:
+> This series contains mlx5 shared updates as preparation for upcoming
+> features.
+> 
+> Regards,
+> Tariq
+> 
+> 
+> [...]
 
-On Sat, Jul 19, 2025 at 6:28=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Thu, 17 Jul 2025 13:26:57 +0530 Krishna Kumar wrote:
-> > + * Return values:
-> > + *   True:  Flow has recent activity.
-> > + *   False: Flow does not have recent activity.
->
-> This is not recognized as valid kdoc formatting:
->
-> Warning: net/core/dev.c:4856 No description found for return value of 'rp=
-s_flow_is_active'
->
-> I don't think we need to enumerate this trivial set of possibilities,
-> how about:
->
->  * Return: true if flow was recently active.
-> --
-> pw-bot: cr
+Applied, thanks!
+
+[1/3] net/mlx5: Add IFC bits to support RSS for IPSec offload
+      https://git.kernel.org/rdma/rdma/c/438794e93f6271
+[2/3] net/mlx5: Add IFC bits and enums for buf_ownership
+      https://git.kernel.org/rdma/rdma/c/6f09ee0b583cad
+[3/3] net/mlx5: Expose cable_length field in PFCC register
+      https://git.kernel.org/rdma/rdma/c/9a0048e0ae14cb
+
+Best regards,
+-- 
+Leon Romanovsky <leon@kernel.org>
+
 
