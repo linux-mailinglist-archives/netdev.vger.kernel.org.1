@@ -1,222 +1,121 @@
-Return-Path: <netdev+bounces-208441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C52DB0B6EF
-	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 18:33:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47ECEB0B6F9
+	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 18:37:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 995C93A2B7D
-	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 16:32:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0679D18967E6
+	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 16:37:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F6F91EDA0F;
-	Sun, 20 Jul 2025 16:33:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C53E721D5AA;
+	Sun, 20 Jul 2025 16:37:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WpVDtJXI"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="k8Bz38xd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B01AE1ACED5;
-	Sun, 20 Jul 2025 16:33:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B261B423D;
+	Sun, 20 Jul 2025 16:37:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753029183; cv=none; b=rfWAZOqKC48ZJ4TMHaHJJBEHoi/gm1k1e691v3heBB2wXIcAfWqAcci+oLMgszzPilRUmyW0DIDrnldF7gjDyU3irIvCwVFdtYNTd8hB6tXA35p5yrXERqR0CdRX82iCZ2TRbVAeBPedbvl+NSAPAAFJHMpk3l3za+y7wajCe9E=
+	t=1753029429; cv=none; b=RXZ4/JeJmW1ggA8cPrGrHEk2q9jfuerk5Kadj1zVGlDFyuFwcfXOLY8z784FPMexe7rKQZN62hBE5DzidvqtNEcO8NlHHJEloOIOmCj9c+5lKrlWi3mpvw1mJj4sNpg0Bz4vqQGuGiandLH+XHYKbrt8ufhku1V6o7bKLN8aSMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753029183; c=relaxed/simple;
-	bh=qUJk48jtUKEAw/MslwK7j0CvoduppN0NcJm4wds+mh4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cS8Yl0YjDlRAG6Jb/0EIA8dnocLvc9gRO4Mp5w7n/o4t6X9FABe4zbVxbVEXbA0jTk8E7RGuiWwbo7wZB6Us2Ki1qzHWQ+68wJ7uHiXII3/hrpaFZGQ5QYQMOCU/oSp+YBSdykteRWcCwSpcWZWzOjJ39eC6gUFauMxqGoqwWSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WpVDtJXI; arc=none smtp.client-ip=209.85.166.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3dda399db09so45131135ab.3;
-        Sun, 20 Jul 2025 09:33:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753029181; x=1753633981; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a+56cb37M9xr882rSl73dpaeL2aKKNDupS6npCA0l6U=;
-        b=WpVDtJXITHzEOg4YPrpdSt3JWXPC+lKN/4xnd39SKYTRonXeB4ZaJr3oo+AkFsHPXJ
-         de2QrILgo5rGRsZ7bGp2II46ZajAkS6+25jIYc91dw/EpYI0yeFiyhBRfntBan4LVpRW
-         CkCiUSDpcz1lpYuAmgJ31gnAM805TvZJo89p4DyNP4CMkivUxhchyFsK29Yrtk2224r+
-         lHZQgtOWBymsD6cgJTcA1EBYDVjSQGA10Vv0JOZjZYcRUtX7mZKive10w3OuIB2t/Pbc
-         Z6MsXrPMmq0ze/K+rXuUQsu3dIH+xofNwy6J+F0542r8UexQItz2IbAz6tUHH3aCTAOH
-         HRtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753029181; x=1753633981;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=a+56cb37M9xr882rSl73dpaeL2aKKNDupS6npCA0l6U=;
-        b=ftiUwnvCk1xW3/AW4HTJ4EHTFnD+LUbCgSfUyGcqQc+j0wdtOfm3U5ynvCMXzH8NwH
-         1sSOHepC6cON2s8U5KPpI+nx0bJOdezcIOPLTHqwKD9eYanXOt2WK2oEctEgQ526+w+v
-         uSkHcgcWNHVliUSq4jtHDwjv1cxg513UcB7bpV+2OA6Xs3wxSduY8MsfwUaZ7Y90ctDQ
-         imkF9rBqpktwUId2KWCJTg1O8/qrjRiG0XX2hAbVbedIOl32WWcTaf99eYA1uHe4uixy
-         BTuZ+KrT7onefN0S9Kl6zxSevoRcXPOXuSscOZ6vNvk46XXYtJ61sObcUyiQhz8U0qka
-         fiUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUHy8Z7HO1NsSRXaWpQnSbPhe/VlYJz6JD/pQbbj8919nIRmbZbCf3bnEXBESC7dxdm6k/OK0tQgpoqdS8=@vger.kernel.org, AJvYcCUN0ykuYR3sa9fz3YF9TnIW1CrQOyq0ElUZyU4EnQZU9M5dRLmerOA3tqHFj9IsbYrTORwhXulW/Lza50z0xR/x@vger.kernel.org, AJvYcCUhXZLnELeuYtfwWIsMLQkovlHJ19kXgaRB65Cn1jER9ymemAVq9w2d9DiYIFnAQCG9G41BDCTI@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxucvoUXxdqJlUyxDzZ+yzGMaAuhjcesfRYppVwcSEYkG5za6m
-	GqioBEEj1+Mw2V+RmURHFsCCu0hZK2O6Ij01SuJGqjCECzk0tn4hnbKQ7VtaVclwoGX0kbdNT1z
-	OwUjOHclnEhKJ2k3QffgYNx+VXwXfAa4=
-X-Gm-Gg: ASbGncupDUiQxGDmglHEK7SmUB5lL3qXHkexKK1Y23+SPjVe3n9HHk3B6c0TlRtvnrW
-	tA/zPgfbmji5dqk3B7vcJzcdeF7siA2qd5WTfA7DWyRhOQXkcj64Dp7ikbEy8b/zrwYpjlZ6MX7
-	mXV5cq7EWPwflWD/DaKl6PUTwDRhdwPTkP9aErdM57iIwVH57oV4d6yJfl8j2CXSH6MF3zd5DMV
-	++JmG4AgbnHRTugQBUu
-X-Google-Smtp-Source: AGHT+IH7R74bM/DR3bE8CnVCBdDKl45iZr8XjYjDMkWtgicO4pmWVyjMjPluvkR5XbdGjT4cBag+2yTJ/P0b4kFRjFI=
-X-Received: by 2002:a05:6e02:349e:b0:3e2:9e1b:2e4 with SMTP id
- e9e14a558f8ab-3e29e1b04f6mr81167245ab.15.1753029180522; Sun, 20 Jul 2025
- 09:33:00 -0700 (PDT)
+	s=arc-20240116; t=1753029429; c=relaxed/simple;
+	bh=qTtuyUqSLRCyOJYOisYZDpKsrNhWdTwJSyxTfg1qlHY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PqCxRf3cjvs7sdDMTbnc8/NO0jhSbkKJ8THB6LqmXRF64o0PyxSpV3BhQAlPlIcfF3ftmhL9OhgAMXx6q59JF9+pKNgn6rVEBR8eCGeacePDfX0sPHTyy3TUeh3GeNScLLrxB0ktmPngW60BclW6dK1BnFK/w1vQd8jCG1rfQDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=k8Bz38xd; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56KGBZPK016012;
+	Sun, 20 Jul 2025 09:36:46 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=ndP80q4rdPUOCMPfCTkgzo7
+	PXQ7AuDgzzhEFUN9/BFQ=; b=k8Bz38xdDguUoOM4w8kLTTnM8D6TiFJnGqoUsHf
+	dsN3LiznHVWNt+85+wx6GdMjxd1Mw6UKP6pNsz39I+JRmR7NngKmY1Yvvmc/aQcs
+	ulXVIbb2MYyx4Asj48ZmMXE0M/5OPPRr7+heXtA81QE6IhBgiHxdiwYACJwoZuhz
+	AsKo6SDYO2KyfU+jJRMsF5Xmy0lwgtvLXJ4JeNsG1K8ACb6aN5FzgNdgl9k9YMNL
+	hXNU4wArjVnGHOGFPVCO6mgNLv+eI7gzg9pMPWbsHVvsMDwYuYqNyfsr+zJ3eFkU
+	K1gYq1xbSjdGbD6MViAxR1SSpeSTevPYqzQhE7VnXouZ6nA==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 480ymbg8p6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 20 Jul 2025 09:36:45 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Sun, 20 Jul 2025 09:36:44 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Sun, 20 Jul 2025 09:36:44 -0700
+Received: from test-OptiPlex-Tower-Plus-7010.marvell.com (unknown [10.29.37.157])
+	by maili.marvell.com (Postfix) with ESMTP id D1C893F7057;
+	Sun, 20 Jul 2025 09:36:39 -0700 (PDT)
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <sgoutham@marvell.com>,
+        <gakula@marvell.com>, <jerinj@marvell.com>, <lcherian@marvell.com>,
+        <sbhatta@marvell.com>, <hkelam@marvell.com>, <naveenm@marvell.com>,
+        <edumazet@google.com>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+        <bbhushan2@marvell.com>
+Subject: [net-next PatchV2 0/4] Octeontx2-af: RPM: misc feaures
+Date: Sun, 20 Jul 2025 22:06:34 +0530
+Message-ID: <20250720163638.1560323-1-hkelam@marvell.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1f354a1afd60f29bbbf02bd60cb52ecfc0b6bd17.1752848172.git.shuali@redhat.com>
-In-Reply-To: <1f354a1afd60f29bbbf02bd60cb52ecfc0b6bd17.1752848172.git.shuali@redhat.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Sun, 20 Jul 2025 12:32:49 -0400
-X-Gm-Features: Ac12FXzGN6Nx5Iu-9nw959TpqbsEu1X3tFnDxpAqE8LqO30VJDATUwKgw4dcyy4
-Message-ID: <CADvbK_f8Uz82t96jXWFB-72A1_+qJGysfAhFKA1aWssiwdO+ww@mail.gmail.com>
-Subject: Re: [PATCH net-next] selftests: tc: Add generic erspan_opts matching
- support for tc-flower
-To: shuali@redhat.com
-Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Simon Horman <horms@kernel.org>, xiyou.wangcong@gmail.com, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=VtgjA/2n c=1 sm=1 tr=0 ts=687d1b1d cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=Wb1JkmetP80A:10 a=rTa-d_mVba20Wz9wDAAA:9
+X-Proofpoint-ORIG-GUID: cZBOi1dBX5SkxLzjSSxap834h9Ir7myG
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzIwMDE2MCBTYWx0ZWRfXzILNIiy6ySOQ tc1J6wUpPt+cr59XPWgOxd6jsbnY5JE5OeCQF28ZmYdfbTvudMRLGA2PNadbSCweJ3BfK9Y7Lai Cvs9i/wvvDLYekgpbK/Ep45unGe8Y8mbFXiGDqt7I2o7kNxRMmHAeRdE3px/9JW2QqQq4eOoNGR
+ zHbNtvWowMW7Vi5SbnHnHxxa7O2vusmbQbt5F+N6EWl2uoaPWDk+CW7shg9T2qdRLBWnk4Ekb2E hazn0/biZu4i2TFb0Bp22Ye3WEcXs+XxDVnAIsH/A+fEKS/IY+G+tBnr5DKZxy9ZP99mOKx6hZu Zq16i4e39xS8uiBrqy0rS5ssc5h2dRXhJJe2xC18me7PEk/drTR4S56Cz3pMOYJfQtdNXqTJYwq
+ 8IVspfbeo4moq8TzqAgdZkqtHlyOWgyRFSO9ykR7SABpXehLXrY/4MAvtj2YStT3St9mh/Nh
+X-Proofpoint-GUID: cZBOi1dBX5SkxLzjSSxap834h9Ir7myG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-20_01,2025-07-17_02,2025-03-28_01
 
-On Fri, Jul 18, 2025 at 10:16=E2=80=AFAM <shuali@redhat.com> wrote:
->
-> From: Li Shuang <shuali@redhat.com>
->
-> Add test cases to tc_flower.sh to validate generic matching on ERSPAN
-> options. Both ERSPAN Type II and Type III are covered.
->
-> Also add check_tc_erspan_support() to verify whether tc supports
-> erspan_opts.
->
-> Signed-off-by: Li Shuang <shuali@redhat.com>
-> ---
->  tools/testing/selftests/net/forwarding/lib.sh | 14 +++++
->  .../selftests/net/forwarding/tc_flower.sh     | 52 ++++++++++++++++++-
->  2 files changed, 65 insertions(+), 1 deletion(-)
->
-> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testin=
-g/selftests/net/forwarding/lib.sh
-> index 9308b2f77fed..890b3374dacd 100644
-> --- a/tools/testing/selftests/net/forwarding/lib.sh
-> +++ b/tools/testing/selftests/net/forwarding/lib.sh
-> @@ -142,6 +142,20 @@ check_tc_version()
->         fi
->  }
->
-> +check_tc_erspan_support()
-> +{
-> +       local dev=3D$1; shift
-> +
-> +       tc filter add dev $dev ingress pref 1 handle 1 flower \
-> +               erspan_opts 1:0:0:0 &> /dev/null
-> +       if [[ $? -ne 0 ]]; then
-> +               echo "SKIP: iproute2 too old; tc is missing erspan suppor=
-t"
-> +               return $ksft_skip
-> +       fi
-> +       tc filter del dev $dev ingress pref 1 handle 1 flower \
-> +               erspan_opts 1:0:0:0 &> /dev/null
-> +}
-> +
->  # Old versions of tc don't understand "mpls_uc"
->  check_tc_mpls_support()
->  {
-> diff --git a/tools/testing/selftests/net/forwarding/tc_flower.sh b/tools/=
-testing/selftests/net/forwarding/tc_flower.sh
-> index b1daad19b01e..b58909a93112 100755
-> --- a/tools/testing/selftests/net/forwarding/tc_flower.sh
-> +++ b/tools/testing/selftests/net/forwarding/tc_flower.sh
-> @@ -6,7 +6,7 @@ ALL_TESTS=3D"match_dst_mac_test match_src_mac_test match_=
-dst_ip_test \
->         match_ip_tos_test match_indev_test match_ip_ttl_test
->         match_mpls_label_test \
->         match_mpls_tc_test match_mpls_bos_test match_mpls_ttl_test \
-> -       match_mpls_lse_test"
-> +       match_mpls_lse_test match_erspan_opts_test"
->  NUM_NETIFS=3D2
->  source tc_common.sh
->  source lib.sh
-> @@ -676,6 +676,56 @@ match_mpls_lse_test()
->         log_test "mpls lse match ($tcflags)"
->  }
->
-> +match_erspan_opts_test()
-> +{
-> +       RET=3D0
-> +
-> +       check_tc_erspan_support $h2 || return 0
-> +
-> +       # h1 erspan setup
-> +       tunnel_create erspan1 erspan 192.0.2.1 192.0.2.2 dev $h1 seq key =
-1001 \
-> +               tos C ttl 64 erspan_ver 1 erspan 6789 # ERSPAN Type II
-> +       tunnel_create erspan2 erspan 192.0.2.1 192.0.2.2 dev $h1 seq key =
-1002 \
-> +               tos C ttl 64 erspan_ver 2 erspan_dir egress erspan_hwid 6=
-3 \
-> +               # ERSPAN Type III
-> +       ip link set dev erspan1 master v$h1
-> +       ip link set dev erspan2 master v$h1
-> +       # h2 erspan setup
-> +       ip link add ep-ex type erspan ttl 64 external # To collect tunnel=
- info
-> +       ip link set ep-ex up
-> +       ip link set dev ep-ex master v$h2
-> +       tc qdisc add dev ep-ex clsact
-> +
-> +       # ERSPAN Type II [decap direction]
-> +       tc filter add dev ep-ex ingress protocol ip  handle 101 flower \
-> +               $tcflags enc_src_ip 192.0.2.1 enc_dst_ip 192.0.2.2 \
-> +               enc_key_id 1001 erspan_opts 1:6789:0:0 \
-> +               action drop
-> +       # ERSPAN Type III [decap direction]
-> +       tc filter add dev ep-ex ingress protocol ip  handle 102 flower \
-> +               $tcflags enc_src_ip 192.0.2.1 enc_dst_ip 192.0.2.2 \
-> +               enc_key_id 1002 erspan_opts 2:0:1:63 action drop
-> +
-> +       ep1mac=3D$(mac_get erspan1)
-> +       $MZ erspan1 -c 1 -p 64 -a $ep1mac -b $h2mac -t ip -q
-> +       tc_check_packets "dev ep-ex ingress" 101 1
-> +       check_err $? "ERSPAN Type II"
-> +
-> +       ep2mac=3D$(mac_get erspan2)
-> +       $MZ erspan2 -c 1 -p 64 -a $ep1mac -b $h2mac -t ip -q
-> +       tc_check_packets "dev ep-ex ingress" 102 1
-> +       check_err $? "ERSPAN Type III"
-> +
-> +       # h2 erspan cleanup
-> +       tc qdisc del dev ep-ex clsact
-> +       tunnel_destroy ep-ex
-> +       # h1 erspan cleanup
-> +       tunnel_destroy erspan2 # ERSPAN Type III
-> +       tunnel_destroy erspan1 # ERSPAN Type II
-> +
-> +       log_test "erspan_opts match ($tcflags)"
-> +}
-> +
->  setup_prepare()
->  {
->         h1=3D${NETIFS[p1]}
-> --
-> 2.50.1
->
-Reviewed-by: Xin Long <lucien.xin@gmail.com>
+This series patches adds different features like debugfs
+support for shared firmware structure and DMAC filter
+related enhancements.
 
-It would be great to also add test cases for matching VXLAN and
-GENEVE options in tc flower in the future.
+Patch1: Saves interface MAC address configured from DMAC filters.
 
-Thanks.
+Patch2: Disables the stale DMAC filters in driver initialization 
+
+Patch3: Configure dma mask for CGX/RPM drivers
+
+Patch4: Debugfs support for shared firmware data.
+---
+V2:
+   1. Use  ether_addr_copy instead of memcpy
+   2. fix max line length warnings and typo 
+
+Hariprasad Kelam (3):
+  Octeontx2-af: Add programmed macaddr to RVU pfvf
+  Octeontx2-af: RPM: Update DMA mask
+  Octeontx2-af: Debugfs support for firmware data
+
+Subbaraya Sundeep (1):
+  Octeontx2-af: Disable stale DMAC filters
+
+ .../net/ethernet/marvell/octeontx2/af/cgx.c   |  19 ++
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |   7 +-
+ .../ethernet/marvell/octeontx2/af/rvu_cgx.c   |  23 +--
+ .../marvell/octeontx2/af/rvu_debugfs.c        | 162 ++++++++++++++++++
+ 4 files changed, 196 insertions(+), 15 deletions(-)
+
+-- 
+2.34.1
+
 
