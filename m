@@ -1,95 +1,385 @@
-Return-Path: <netdev+bounces-208447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAF9CB0B70E
-	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 18:55:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98411B0B768
+	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 19:35:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EAA318956FE
-	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 16:55:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 393477A7926
+	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 17:33:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D68822156D;
-	Sun, 20 Jul 2025 16:55:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3D742222D7;
+	Sun, 20 Jul 2025 17:33:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ofP0STnR"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZS+aeAxk"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F9A21CC48
-	for <netdev@vger.kernel.org>; Sun, 20 Jul 2025 16:55:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E86112236F0
+	for <netdev@vger.kernel.org>; Sun, 20 Jul 2025 17:33:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753030520; cv=none; b=g1SVr3hgsr7yL7I7R5FaW9JePTVIKsltOTfV5TARtt5XavqymzYLGNtgG6ta4gHUbcMzCOm+gsaPZ0kMRTL4ndMZ1kHaHzYUDfxfvzob7sZxxYyDYHf0rN84hO+2YHi1VmJoFAgENcb5uoNBnoHd3jqTBdmG6Aby7P0Stub1NCw=
+	t=1753032819; cv=none; b=d9xc/8x8CM10t05/GGj3foHPIPTNwQ1atYv+ETiZD6wqCtGehrCVXKTWBR9jNbB44yyNjfI5V6S8Y8dPEJag2cWBTaR93X1xliOY3AFhQNFMDaEle4qtqRx2LsLWcCMWUj72z0FP5npP83jl2n8Qv+ey906eZ3iwqsSOfadxFiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753030520; c=relaxed/simple;
-	bh=nFhs36PsggzZ2S4l9X3zF8agI99OSEplT6czX5kHmS0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hcJi0jmcyhyESXSuSWdNdLM+RAfpFuXqdIG5C+F/JkXv2ZVL8pt0WewhTx7PZT2vTAd5gQdvKjwR7uRvxegY/hnQ/s4mZ0dNzfiYIOSmD5pkXu1ZNNEvyX69jwBCIH8Uju57NFOXdOqQmOePF/eMbnNOqPCK5TrGaGFD5tgf010=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ofP0STnR; arc=none smtp.client-ip=95.215.58.189
+	s=arc-20240116; t=1753032819; c=relaxed/simple;
+	bh=efGEOMzuUX4aGBxZbcZg6BYAW+PpoMm9658Aw/rmSoQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eiBe2YTnDdz+hTfv9C7xyM2CmL97f1Ea0rE7TkkHnyp7ruNL+NO+FO6Nc/xF07AZSJOKsx+rgvlKLKzi2+hayswOQgtAkJL2J1XhH2MHsy8b5JW4MyNsP/Y3F2UPUdqdhqKu6zXSnAdv12vWCsHo4U05fy6ualDZ7YC6IeYiDp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZS+aeAxk; arc=none smtp.client-ip=91.218.175.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <4105903a-470c-4808-b0b8-aa32eb36191d@linux.dev>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753030504;
+	t=1753032805;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gNDS5QyE6DXcHr+EMDsjwO4EjpUASLLtOxWcFEtzaAE=;
-	b=ofP0STnR6yKsGLz69L8WJNemTHWD6p+3iwl/GXebUAqJ5MvnbP2Dt8mpy2iQ780326Gyst
-	1niJnluSQ1kHb7xN0GY4dBJGYV9TgJKCqkZOIABCYLijWYyj2d8RHVkxVcHxNGL6wwqcLz
-	0HqjIEyyE2tEecS6DWoSUUVwyWlksYg=
-Date: Mon, 21 Jul 2025 00:54:50 +0800
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ZT1tbWUCIaakrbBiwN1i+FcbISz90VMo5MHyX3yLgXc=;
+	b=ZS+aeAxkOin6PhC52HlbY1e4qdrDiu4OWYlJQ5D0pugUZ0rZfzC16jOYt8+e2d169tGaP3
+	59FbeSfB7dqgVWZHFQ5lYZZpa6ypU0jHutLhTrYmhtpMVOSZ9J4tpxv3C3M6BR6CU5X/Nf
+	dsl4Er+BYO5QUTPlCTm8/vuK9LijAwI=
+From: Tao Chen <chen.dylane@linux.dev>
+To: qmo@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@fomichev.me,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	hawk@kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Tao Chen <chen.dylane@linux.dev>
+Subject: [PATCH bpf-next 1/2] bpftool: Add bpf_token show
+Date: Mon, 21 Jul 2025 01:33:09 +0800
+Message-ID: <20250720173310.1334483-1-chen.dylane@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next] netfilter: bpf: Disable migrate before bpf_prog
- run
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Florian Westphal <fw@strlen.de>,
- netfilter-devel <netfilter-devel@vger.kernel.org>, coreteam@netfilter.org,
- Network Development <netdev@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
- syzbot+92c5daf9a23f04ccfc99@syzkaller.appspotmail.com
-References: <20250718172746.1268813-1-chen.dylane@linux.dev>
- <CAADnVQKMVJ_2SMcm0hvg2GDc-RPVU7GVAWRqbSdGn2ZtwUbUng@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Tao Chen <chen.dylane@linux.dev>
-In-Reply-To: <CAADnVQKMVJ_2SMcm0hvg2GDc-RPVU7GVAWRqbSdGn2ZtwUbUng@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-在 2025/7/19 02:25, Alexei Starovoitov 写道:
-> On Fri, Jul 18, 2025 at 10:30 AM Tao Chen <chen.dylane@linux.dev> wrote:
->>
->>
->> The cant_migrate() check in __bpf_prog_run requires to disable
->> migrate before running the bpf_prog, it seems that migrate is
->> not disabled in the above execution path.
-> 
-> bpf@vger mailing list exists, so that developers
-> read it and participate in the community.
-> 
-> https://lore.kernel.org/bpf/20250717185837.1073456-1-kuniyu@google.com/
-> 
-> --
-> pw-bot: cr
+Add `bpftool token show` command to get token info
+from bpf fs in /proc/mounts.
 
-well, since it's already under review, I'm happy to drop my version. Thanks.
+Example plain output for `token show`:
+token_info:
+        /sys/fs/bpf/token
 
+allowed_cmds:
+        map_create          prog_load
+
+allowed_maps:
+
+allowed_progs:
+        kprobe
+
+allowed_attachs:
+        xdp
+
+Example json output for `token show`:
+{
+    "token_info": "/sys/fs/bpf/token",
+    "allowed_cmds": ["map_create","prog_load"
+    ],
+    "allowed_maps":
+    "allowed_progs": ["kprobe"
+    ],
+    "allowed_attachs": ["xdp"
+    ]
+}
+
+Signed-off-by: Tao Chen <chen.dylane@linux.dev>
+---
+ tools/bpf/bpftool/main.c  |   3 +-
+ tools/bpf/bpftool/main.h  |   1 +
+ tools/bpf/bpftool/token.c | 229 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 232 insertions(+), 1 deletion(-)
+ create mode 100644 tools/bpf/bpftool/token.c
+
+diff --git a/tools/bpf/bpftool/main.c b/tools/bpf/bpftool/main.c
+index 2b7f2bd3a7d..0f1183b2ed0 100644
+--- a/tools/bpf/bpftool/main.c
++++ b/tools/bpf/bpftool/main.c
+@@ -61,7 +61,7 @@ static int do_help(int argc, char **argv)
+ 		"       %s batch file FILE\n"
+ 		"       %s version\n"
+ 		"\n"
+-		"       OBJECT := { prog | map | link | cgroup | perf | net | feature | btf | gen | struct_ops | iter }\n"
++		"       OBJECT := { prog | map | link | cgroup | perf | net | feature | btf | gen | struct_ops | iter | token }\n"
+ 		"       " HELP_SPEC_OPTIONS " |\n"
+ 		"                    {-V|--version} }\n"
+ 		"",
+@@ -87,6 +87,7 @@ static const struct cmd commands[] = {
+ 	{ "gen",	do_gen },
+ 	{ "struct_ops",	do_struct_ops },
+ 	{ "iter",	do_iter },
++	{ "token",	do_token },
+ 	{ "version",	do_version },
+ 	{ 0 }
+ };
+diff --git a/tools/bpf/bpftool/main.h b/tools/bpf/bpftool/main.h
+index 6db704fda5c..a2bb0714b3d 100644
+--- a/tools/bpf/bpftool/main.h
++++ b/tools/bpf/bpftool/main.h
+@@ -166,6 +166,7 @@ int do_tracelog(int argc, char **arg) __weak;
+ int do_feature(int argc, char **argv) __weak;
+ int do_struct_ops(int argc, char **argv) __weak;
+ int do_iter(int argc, char **argv) __weak;
++int do_token(int argc, char **argv) __weak;
+ 
+ int parse_u32_arg(int *argc, char ***argv, __u32 *val, const char *what);
+ int prog_parse_fd(int *argc, char ***argv);
+diff --git a/tools/bpf/bpftool/token.c b/tools/bpf/bpftool/token.c
+new file mode 100644
+index 00000000000..2fcaff4f2ba
+--- /dev/null
++++ b/tools/bpf/bpftool/token.c
+@@ -0,0 +1,229 @@
++// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++
++#ifndef _GNU_SOURCE
++#define _GNU_SOURCE
++#endif
++#include <errno.h>
++#include <fcntl.h>
++#include <stdbool.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <mntent.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++
++#include "json_writer.h"
++#include "main.h"
++
++#define MOUNTS_FILE "/proc/mounts"
++
++#define zclose(fd) do { if (fd >= 0) close(fd); fd = -1; } while (0)
++
++static bool has_delegate_options(const char *mnt_ops)
++{
++	return strstr(mnt_ops, "delegate_cmds") != NULL ||
++	       strstr(mnt_ops, "delegate_maps") != NULL ||
++	       strstr(mnt_ops, "delegate_progs") != NULL ||
++	       strstr(mnt_ops, "delegate_attachs") != NULL;
++}
++
++static char *get_delegate_value(const char *opts, const char *key)
++{
++	char *token, *rest, *ret = NULL;
++	char *opts_copy = strdup(opts);
++
++	if (!opts_copy)
++		return NULL;
++
++	for (token = strtok_r(opts_copy, ",", &rest); token != NULL;
++			token = strtok_r(NULL, ",", &rest)) {
++		if (strncmp(token, key, strlen(key)) == 0 &&
++				token[strlen(key)] == '=') {
++			ret = token + strlen(key) + 1;
++			break;
++		}
++	}
++	free(opts_copy);
++
++	return ret;
++}
++
++static void print_items_per_line(const char *input, int items_per_line)
++{
++	char *str, *rest;
++	int cnt = 0;
++	char *strs = strdup(input);
++
++	if (!strs)
++		return;
++
++	for (str = strtok_r(strs, ":", &rest); str != NULL;
++			str = strtok_r(NULL, ":", &rest)) {
++		if (cnt % items_per_line == 0)
++			printf("\n\t");
++
++		printf("%-20s", str);
++		cnt++;
++	}
++
++	free(strs);
++}
++
++#define ITEMS_PER_LINE 4
++static void show_token_info_plain(struct mntent *mntent)
++{
++	char *value;
++
++	printf("\ntoken_info:");
++	printf("\n\t%s\n", mntent->mnt_dir);
++
++	printf("\nallowed_cmds:");
++	value = get_delegate_value(mntent->mnt_opts, "delegate_cmds");
++	if (value)
++		print_items_per_line(value, ITEMS_PER_LINE);
++	printf("\n");
++
++	printf("\nallowed_maps:");
++	value = get_delegate_value(mntent->mnt_opts, "delegate_maps");
++	if (value)
++		print_items_per_line(value, ITEMS_PER_LINE);
++	printf("\n");
++
++	printf("\nallowed_progs:");
++	value = get_delegate_value(mntent->mnt_opts, "delegate_progs");
++	if (value)
++		print_items_per_line(value, ITEMS_PER_LINE);
++	printf("\n");
++
++	printf("\nallowed_attachs:");
++	value = get_delegate_value(mntent->mnt_opts, "delegate_attachs");
++	if (value)
++		print_items_per_line(value, ITEMS_PER_LINE);
++	printf("\n");
++}
++
++static void __json_array_str(const char *input)
++{
++	char *str, *rest;
++	char *strs = strdup(input);
++
++	if (!strs)
++		return;
++
++	jsonw_start_array(json_wtr);
++	for (str = strtok_r(strs, ":", &rest); str != NULL;
++			str = strtok_r(NULL, ":", &rest)) {
++		jsonw_string(json_wtr, str);
++	}
++	jsonw_end_array(json_wtr);
++
++	free(strs);
++}
++
++static void show_token_info_json(struct mntent *mntent)
++{
++	char *value;
++
++	jsonw_start_object(json_wtr);
++
++	jsonw_string_field(json_wtr, "token_info", mntent->mnt_dir);
++
++	jsonw_name(json_wtr, "allowed_cmds");
++	value = get_delegate_value(mntent->mnt_opts, "delegate_cmds");
++	if (value)
++		__json_array_str(value);
++
++	jsonw_name(json_wtr, "allowed_maps");
++	value = get_delegate_value(mntent->mnt_opts, "delegate_maps");
++	if (value)
++		__json_array_str(value);
++
++	jsonw_name(json_wtr, "allowed_progs");
++	value = get_delegate_value(mntent->mnt_opts, "delegate_progs");
++	if (value)
++		__json_array_str(value);
++
++	jsonw_name(json_wtr, "allowed_attachs");
++	value = get_delegate_value(mntent->mnt_opts, "delegate_attachs");
++	if (value)
++		__json_array_str(value);
++
++	jsonw_end_object(json_wtr);
++}
++
++static int __show_token_info(struct mntent *mntent)
++{
++
++	if (json_output)
++		show_token_info_json(mntent);
++	else
++		show_token_info_plain(mntent);
++
++	return 0;
++}
++
++static int show_token_info(void)
++{
++	FILE *fp;
++	struct mntent *ent;
++	bool hit = false;
++
++	fp = setmntent(MOUNTS_FILE, "r");
++	if (!fp) {
++		p_err("Failed to open:%s", MOUNTS_FILE);
++		return -1;
++	}
++
++	while ((ent = getmntent(fp)) != NULL) {
++		if (strcmp(ent->mnt_type, "bpf") == 0) {
++			if (has_delegate_options(ent->mnt_opts)) {
++				hit = true;
++				break;
++			}
++		}
++	}
++
++	if (hit)
++		__show_token_info(ent);
++	endmntent(fp);
++
++	return 0;
++}
++
++static int do_show(int argc, char **argv)
++{
++	if (argc)
++		return BAD_ARG();
++
++	return show_token_info();
++}
++
++static int do_help(int argc, char **argv)
++{
++	if (json_output) {
++		jsonw_null(json_wtr);
++		return 0;
++	}
++
++	fprintf(stderr,
++		"Usage: %1$s %2$s { show | list }\n"
++		"	%1$s %2$s help\n"
++		"\n"
++		"",
++		bin_name, argv[-2]);
++	return 0;
++}
++
++static const struct cmd cmds[] = {
++	{ "show",	do_show },
++	{ "help",	do_help },
++	{ "list",	do_show },
++	{ 0 }
++};
++
++int do_token(int argc, char **argv)
++{
++	return cmd_select(cmds, argc, argv, do_help);
++}
 -- 
-Best Regards
-Tao Chen
+2.48.1
+
 
