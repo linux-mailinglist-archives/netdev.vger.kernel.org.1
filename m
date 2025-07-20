@@ -1,216 +1,193 @@
-Return-Path: <netdev+bounces-208457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0FCAB0B84E
-	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 23:12:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A41C7B0B859
+	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 23:36:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 85B42188FFC9
-	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 21:12:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9585D171977
+	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 21:36:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3754122069A;
-	Sun, 20 Jul 2025 21:12:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 720BA1DED52;
+	Sun, 20 Jul 2025 21:35:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gPINocQd"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jWPYcm8S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83952382;
-	Sun, 20 Jul 2025 21:11:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46EA61A3150
+	for <netdev@vger.kernel.org>; Sun, 20 Jul 2025 21:35:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753045920; cv=none; b=BvZjE5JKCO6EOup5JvviHBmQS6OSyFmYX6SuQ37UfRVJ9T95W1Sf52WrmKVNAF+n7RkPdQTiQXdItJ1HNE8tLdyGFYV2C0d0q4WqqaijQ54IoueVvjH0vj6i/WWXcSLo2WWeePm3n3MvICFUiVItm8L53uC9X62hTAaRjasMJxo=
+	t=1753047357; cv=none; b=B69IJLn1KXYn3SZwXgWnthN7T5CDbcPAL4uYcdG5lrj5YRLEiSSLY/GcjFW0riwMl7a9AUFaBy9zY4miy9OIOARrBD4nuEzqytguX2Iroz/EwGMWogGfzYIF8uaPUE6D1qni7UkV5he6H4q/yqNJGFcQ0A0bJiaajw0hHS15Jek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753045920; c=relaxed/simple;
-	bh=+RYJ0uwX/zw8nqvpp0fJDSFLWYQQ70j0FHtcEbEAAQQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=anhYmkl/BGqnhV/i16i8ocNcbmQ7a+H9z/DdJ66TT+BwOvKWqPPxsYCFLL0ePRSioJ0Ro04LyijZKK1QGRatdl4VaXP8myXTcyrWGKPh6jpk3MMWXL4S6ypFz7rDvOBxCj/zIC15K8e82oUcZKidVpB6QiTzwtr15gIPAbt29Z8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gPINocQd; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56KJbbx8010184;
-	Sun, 20 Jul 2025 21:11:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=P3zOlRzIaZNMSPHi9ly3Guwl7F068VzL0s3I/dzFF
-	Dc=; b=gPINocQdX6mad3SLpCo4UVyli5u6ZL9RBcZPe1j7JLK1jG2hNzbXQ9mGC
-	9GSi2VPBPE9jDsep/sdGGcIUqbzxsZ+v7auGq2wwRw/mWB8OGrEO9G/VL6xMuKVL
-	ec3dyhUpjTGUu5fa1zQpQCpH7CxIzc+1ANuZcQusvttM7kpKBJMDkCgHShgiDyVB
-	d6kCpU+vz2oXzKAxA2r0ZOiDcz3nNyC7kyS+kwe4878UQL//IJC0uec87atxnAhm
-	qtYnWokt1/EUlP3iQxhymLkssC0Rk+VTpYHijFA2ysVrOOicfQxolGjxbLhMeNWQ
-	7cjSTvzZKTu7npozzMqSBlRceDVbw==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4805hfnjkt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 20 Jul 2025 21:11:49 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 56KLBmmj012353;
-	Sun, 20 Jul 2025 21:11:48 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4805hfnjkr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 20 Jul 2025 21:11:48 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56KGQNrv025138;
-	Sun, 20 Jul 2025 21:11:47 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 480nptbeta-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 20 Jul 2025 21:11:47 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56KLBf6D34472334
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 20 Jul 2025 21:11:41 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0954C20043;
-	Sun, 20 Jul 2025 21:11:41 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BB74F20040;
-	Sun, 20 Jul 2025 21:11:40 +0000 (GMT)
-Received: from tuxmaker.lnxne.boe (unknown [9.152.85.9])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Sun, 20 Jul 2025 21:11:40 +0000 (GMT)
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Alexandra Winter <wintera@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        Ursula Braun <ubraun@linux.ibm.com>, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Halil Pasic <pasic@linux.ibm.com>,
-        Aliaksei Makarau <Aliaksei.Makarau@ibm.com>,
-        Mahanta Jambigi <mjambigi@linux.ibm.com>
-Subject: [PATCH 1/1] s390/ism: fix concurrency management in ism_cmd()
-Date: Sun, 20 Jul 2025 23:11:09 +0200
-Message-ID: <20250720211110.1962169-1-pasic@linux.ibm.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1753047357; c=relaxed/simple;
+	bh=b4Z74NuZYX02vUEEbDNIZ6r046XXi26X/l8LNz8RVaw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=IALdhN4nUOzvmEaxk9K/Rh9a9uFSUQgbrAixWfoGOogws/zTJq1IasAnpqIv6LJb/69i0O8mUeIPk/U9iV6RvYsz2sUEnZckZFYgJ60ZyVOP0Hk4HfSuTpw0IJFRTMcSKiLZXDmlGpT2lX8qaNYRt3BIohjxPUNZ6ympRA8OzOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jWPYcm8S; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <f5e40d58-c956-4ade-9de8-f88c834772f1@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753047351;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yv081/txZuysT+wxl5AYc5FYJLhLSpKXz8nW3yIQPSA=;
+	b=jWPYcm8Slye/lYknIlX7JFTMaT+kYK12dyKq3PF+UpBroRnHPxLJGqdaCXG/KadGOBUCQR
+	bo56ivB/JavT3l3kmRKAZcIpE0rnWBeFwR285kCjJjR0vSBtPQ9nUiAXf2tLV0AG/uh7AM
+	pMs48w/nOSPhSNpOE+HSy28p5No4kBE=
+Date: Sun, 20 Jul 2025 22:35:49 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [RESEND PATCH net-next] amd-xgbe: Configure and retrieve
+ 'tx-usecs' for Tx coalescing
+To: "Badole, Vishal" <vishal.badole@amd.com>, Shyam-sundar.S-k@amd.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250719072608.4048494-1-Vishal.Badole@amd.com>
+ <509add4e-5dff-4f30-b96b-488919fedb77@linux.dev>
+ <e2ee64c4-4923-4691-bcfd-df9222f2c30b@amd.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <e2ee64c4-4923-4691-bcfd-df9222f2c30b@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzIwMDIwMyBTYWx0ZWRfX6s5dvxnjZSqi
- +MkDIPLKEK0Wn5nxJxuVPXQyS/QtN4dCbc4ZmFezxHfm3FBVOhPc+slASebCGykmIeoMS6L+d88
- /yVLQURwu463r0GvFL6LGNjyxrNhs2lhQ/WsCsrUtdVNB9cidIt8Fg7dLrwWjrawo/hjFTrR5l/
- c3OYCVvtRFSw/YQy1/MISDOYQ3RlErzzCD9c5hqUSQrUMqqijo3chYo6jvyRTRlT7lfNKLISyWv
- 3IRO5ezD/8hYG/qqfyjoysIvgVd1rEig39RxjyS5O5noP90W2U3eonOyf05PZuwD9xoyZV0de9n
- ZKGrhZF12V7v98ySuBPEWAcspm42zW/wWq4Fi2ZVfNRgPkuusrZOesrqrzBhPm64kgOmEmAGxPy
- fwH2Io8YoN+nI75n8x5onFwTcpbhGJlX7zPbmdnQXqPCvP2UvjAl1GkvpDw8ASJD0sxvHOVQ
-X-Proofpoint-GUID: NmpMoyYLtCPmimDwCl2_27Nx-io7ZIRY
-X-Proofpoint-ORIG-GUID: L4y0NCyNFhSvVCMg5pD5FXsPwnD-N3Z7
-X-Authority-Analysis: v=2.4 cv=X9RSKHTe c=1 sm=1 tr=0 ts=687d5b95 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=Wb1JkmetP80A:10 a=VnNF1IyMAAAA:8 a=qzj1OK7t_Lbxma-giU4A:9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-20_01,2025-07-17_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 priorityscore=1501 adultscore=0 lowpriorityscore=0
- phishscore=0 malwarescore=0 clxscore=1015 mlxscore=0 spamscore=0
- suspectscore=0 mlxlogscore=999 bulkscore=0 classifier=spam authscore=0
- authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505280000 definitions=main-2507200203
+X-Migadu-Flow: FLOW_OUT
 
-The s390x ISM device data sheet clearly states that only one
-request-response sequence is allowable per ISM function at any point in
-time.  Unfortunately as of today the s390/ism driver in Linux does not
-honor that requirement. This patch aims to rectify that.
+On 20.07.2025 19:28, Badole, Vishal wrote:
+> 
+> 
+> On 7/19/2025 8:46 PM, Vadim Fedorenko wrote:
+>> On 19.07.2025 08:26, Vishal Badole wrote:
+>>> Ethtool has advanced with additional configurable options, but the
+>>> current driver does not support tx-usecs configuration.
+>>>
+>>> Add support to configure and retrieve 'tx-usecs' using ethtool, which
+>>> specifies the wait time before servicing an interrupt for Tx coalescing.
+>>>
+>>> Signed-off-by: Vishal Badole <Vishal.Badole@amd.com>
+>>> Acked-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+>>> ---
+>>>   drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c | 19 +++++++++++++++++--
+>>>   drivers/net/ethernet/amd/xgbe/xgbe.h         |  1 +
+>>>   2 files changed, 18 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c b/drivers/ net/ 
+>>> ethernet/amd/xgbe/xgbe-ethtool.c
+>>> index 12395428ffe1..362f8623433a 100644
+>>> --- a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
+>>> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
+>>> @@ -450,6 +450,7 @@ static int xgbe_get_coalesce(struct net_device *netdev,
+>>>       ec->rx_coalesce_usecs = pdata->rx_usecs;
+>>>       ec->rx_max_coalesced_frames = pdata->rx_frames;
+>>> +    ec->tx_coalesce_usecs = pdata->tx_usecs;
+>>>       ec->tx_max_coalesced_frames = pdata->tx_frames;
+>>>       return 0;
+>>> @@ -463,7 +464,7 @@ static int xgbe_set_coalesce(struct net_device *netdev,
+>>>       struct xgbe_prv_data *pdata = netdev_priv(netdev);
+>>>       struct xgbe_hw_if *hw_if = &pdata->hw_if;
+>>>       unsigned int rx_frames, rx_riwt, rx_usecs;
+>>> -    unsigned int tx_frames;
+>>> +    unsigned int tx_frames, tx_usecs;
+>>>       rx_riwt = hw_if->usec_to_riwt(pdata, ec->rx_coalesce_usecs);
+>>>       rx_usecs = ec->rx_coalesce_usecs;
+>>> @@ -485,9 +486,22 @@ static int xgbe_set_coalesce(struct net_device *netdev,
+>>>           return -EINVAL;
+>>>       }
+>>> +    tx_usecs = ec->tx_coalesce_usecs;
+>>>       tx_frames = ec->tx_max_coalesced_frames;
+>>> +    /* Check if both tx_usecs and tx_frames are set to 0 simultaneously */
+>>> +    if (!tx_usecs && !tx_frames) {
+>>> +        netdev_err(netdev,
+>>> +               "tx_usecs and tx_frames must not be 0 together\n");
+>>> +        return -EINVAL;
+>>> +    }
+>>> +
+>>>       /* Check the bounds of values for Tx */
+>>> +    if (tx_usecs > XGMAC_MAX_COAL_TX_TICK) {
+>>> +        netdev_err(netdev, "tx-usecs is limited to %d usec\n",
+>>> +               XGMAC_MAX_COAL_TX_TICK);
+>>> +        return -EINVAL;
+>>> +    }
+>>>       if (tx_frames > pdata->tx_desc_count) {
+>>>           netdev_err(netdev, "tx-frames is limited to %d frames\n",
+>>>                  pdata->tx_desc_count);
+>>> @@ -499,6 +513,7 @@ static int xgbe_set_coalesce(struct net_device *netdev,
+>>>       pdata->rx_frames = rx_frames;
+>>>       hw_if->config_rx_coalesce(pdata);
+>>> +    pdata->tx_usecs = tx_usecs;
+>>>       pdata->tx_frames = tx_frames;
+>>>       hw_if->config_tx_coalesce(pdata);
+>>>
+>>
+>> I'm not quite sure, but it looks like it never works. config_tx_coalesce()
+>> callback equals to xgbe_config_tx_coalesce() which is implemented as:
+>>
+>> static int xgbe_config_tx_coalesce(struct xgbe_prv_data *pdata)
+>> {
+>>          return 0;
+>> }
+>>
+>> How is it expected to change anything from HW side?
+>>
+> 
+> The code analysis reveals that pdata, a pointer to xgbe_prv_data, is obtained 
+> via netdev_priv(netdev). The tx_usecs member of the xgbe_prv_data structure is 
+> then updated with the user-specified value through this pdata pointer. This 
+> updated tx_usecs value propagates throughout the codebase wherever TX coalescing 
+> functionality is referenced.
+> 
+> We have validated this behavior through log analysis and transmission 
+> timestamps, confirming the parameter updates are taking effect.
+> 
+> Since this is a legacy driver implementation where xgbe_config_tx_coalesce() 
+> currently lacks actual hardware configuration logic for TX coalescing 
+> parameters, we plan to modernize the xgbe driver and eliminate redundant code 
+> segments in future releases.
 
-This problem was discovered based on Aliaksei's bug report which states
-that for certain workloads the ISM functions end up entering error state
-(with PEC 2 as seen from the logs) after a while and as a consequence
-connections handled by the respective function break, and for future
-connection requests the ISM device is not considered -- given it is in a
-dysfunctional state. During further debugging PEC 31 was observed as
-well.
+Effectively, when the user asks for the coalescing configuration, the driver 
+reports values which are not really HW-configured values. At the same time
+driver reports correct configuration even though the configuration is not
+actually supported by the driver and it doesn't configure HW. This sounds odd.
 
-The kernel message
-zpci: XXXX:00:00.0: Event 0x2 reports an error for PCI function XXXX
-is a reliable indicator of the stated function entering error state
-with PEC 2. Let me also point out that the kernel message
-zpci: XXXX:00:00.0: The ism driver bound to the device does not support error recovery
-is a reliable indicator that the ISM function won't be auto-recovered
-because the ISM driver currently lacks support for it.
+Why didn't you start with the actual implementation instead of doing this
+useless copying of values?
 
-On a technical level, without this synchronization, commands (inputs to
-the FW) may be partially or fully overwritten (corrupted) by another CPU
-trying to issue commands on the same function. There is hard evidence that
-this can lead to DMB token values being used as DMB IOVAs, leading to
-PEC 2 PCI events indicating invalid DMA. But this is only one of the
-failure modes imaginable. In theory even completely losing one command
-and executing another one twice and then trying to interpret the outputs
-as if the command we intended to execute was actually executed and not
-the other one is also possible.  Frankly I don't feel confident about
-providing an exhaustive list of possible consequences.
 
-Fixes: 684b89bc39ce ("s390/ism: add device driver for internal shared memory")
-Reported-by: Aliaksei Makarau <Aliaksei.Makarau@ibm.com>
-Tested-by: Mahanta Jambigi <mjambigi@linux.ibm.com>
-Tested-by: Aliaksei Makarau <Aliaksei.Makarau@ibm.com>
-Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
----
- drivers/s390/net/ism_drv.c | 4 ++++
- include/linux/ism.h        | 1 +
- 2 files changed, 5 insertions(+)
-
-diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
-index b7f15f303ea2..c3b79e22044c 100644
---- a/drivers/s390/net/ism_drv.c
-+++ b/drivers/s390/net/ism_drv.c
-@@ -129,7 +129,9 @@ static int ism_cmd(struct ism_dev *ism, void *cmd)
- {
- 	struct ism_req_hdr *req = cmd;
- 	struct ism_resp_hdr *resp = cmd;
-+	unsigned long flags;
- 
-+	spin_lock_irqsave(&ism->cmd_lock, flags);
- 	__ism_write_cmd(ism, req + 1, sizeof(*req), req->len - sizeof(*req));
- 	__ism_write_cmd(ism, req, 0, sizeof(*req));
- 
-@@ -143,6 +145,7 @@ static int ism_cmd(struct ism_dev *ism, void *cmd)
- 	}
- 	__ism_read_cmd(ism, resp + 1, sizeof(*resp), resp->len - sizeof(*resp));
- out:
-+	spin_unlock_irqrestore(&ism->cmd_lock, flags);
- 	return resp->ret;
- }
- 
-@@ -606,6 +609,7 @@ static int ism_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 		return -ENOMEM;
- 
- 	spin_lock_init(&ism->lock);
-+	spin_lock_init(&ism->cmd_lock);
- 	dev_set_drvdata(&pdev->dev, ism);
- 	ism->pdev = pdev;
- 	ism->dev.parent = &pdev->dev;
-diff --git a/include/linux/ism.h b/include/linux/ism.h
-index 5428edd90982..8358b4cd7ba6 100644
---- a/include/linux/ism.h
-+++ b/include/linux/ism.h
-@@ -28,6 +28,7 @@ struct ism_dmb {
- 
- struct ism_dev {
- 	spinlock_t lock; /* protects the ism device */
-+	spinlock_t cmd_lock; /* serializes cmds */
- 	struct list_head list;
- 	struct pci_dev *pdev;
- 
-
-base-commit: 07fa9cad54609df3eea00cd5b167df6088ce01a6
--- 
-2.48.1
+> 
+>>> @@ -830,7 +845,7 @@ static int xgbe_set_channels(struct net_device *netdev,
+>>>   }
+>>>   static const struct ethtool_ops xgbe_ethtool_ops = {
+>>> -    .supported_coalesce_params = ETHTOOL_COALESCE_RX_USECS |
+>>> +    .supported_coalesce_params = ETHTOOL_COALESCE_USECS |
+>>>                        ETHTOOL_COALESCE_MAX_FRAMES,
+>>>       .get_drvinfo = xgbe_get_drvinfo,
+>>>       .get_msglevel = xgbe_get_msglevel,
+>>> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe.h b/drivers/net/ ethernet/ 
+>>> amd/xgbe/xgbe.h
+>>> index 42fa4f84ff01..e330ae9ea685 100755
+>>> --- a/drivers/net/ethernet/amd/xgbe/xgbe.h
+>>> +++ b/drivers/net/ethernet/amd/xgbe/xgbe.h
+>>> @@ -272,6 +272,7 @@
+>>>   /* Default coalescing parameters */
+>>>   #define XGMAC_INIT_DMA_TX_USECS        1000
+>>>   #define XGMAC_INIT_DMA_TX_FRAMES    25
+>>> +#define XGMAC_MAX_COAL_TX_TICK        100000
+>>>   #define XGMAC_MAX_DMA_RIWT        0xff
+>>>   #define XGMAC_INIT_DMA_RX_USECS        30
+>>
+> 
 
 
