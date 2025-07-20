@@ -1,155 +1,100 @@
-Return-Path: <netdev+bounces-208380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7604BB0B2BD
-	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 01:22:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77F93B0B2E2
+	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 02:03:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E0ED189AB02
-	for <lists+netdev@lfdr.de>; Sat, 19 Jul 2025 23:22:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56F671608C8
+	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 00:03:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF8C28A1F2;
-	Sat, 19 Jul 2025 23:22:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BF02148FE6;
+	Sun, 20 Jul 2025 00:02:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JowmF4+o"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kbslBJWI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E7DC288CBA;
-	Sat, 19 Jul 2025 23:22:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6839D7E110;
+	Sun, 20 Jul 2025 00:02:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752967337; cv=none; b=opg3xO+rwUNcbLGpCYg7j9XVBemX+1p4IeknzUOzbCkaT+Og7mxTmd+DzoDOatgKxPnwfNDyjVqag5PKUKdT8yoXLh6A1gv8VZUoN2/QbZAE6vOe90pp0b1oCr59s6yL/5gfJm4ZXqTSWLVcshbxQ/gAfWB6VfoLf7g9te65qsE=
+	t=1752969738; cv=none; b=a3azm0KXVn5pH/Fovgrn+YbelQIBuk9C7pQzobKhFaqr/BoHeitfi4ovMJGpJKuQvRNh9VOpg2UEkH0CNn4Ao3b4zhml1yzGe23X77+GHCt9NDa3ReFC5Wfp0r/AbvdUirGyHFG7vzFW/9YI8HJ9x3Eno9WghdLWwomnZ3ZH9uM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752967337; c=relaxed/simple;
-	bh=592mduOSIIbjRo6QOG1O1f748urmA9UgcK+qaVVszxw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ic9vlKTTcZTq2uBaeFOGPp0vnZ8cNMxbL6rfxnEsljjxJhT+UfIb71uh/Wp1SdK0+RXBMuQeewh8nzTxbFPcbcHC98gvk1j3en425dyNYolm6KyepyAiMYXWjK+5pMDjGW4xSVFmkj+4C7mLJftgOEeHoVV4iYqqCVj+LiLgwrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JowmF4+o; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752967335; x=1784503335;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=592mduOSIIbjRo6QOG1O1f748urmA9UgcK+qaVVszxw=;
-  b=JowmF4+oMR7uc/bvahy8yNe8EWGt2QwNKwpPn6EixHr+bnwASfsWCXtj
-   kC1oa+grz2lRZg4OFLcLBSfK+FpyYJEYR0NLNFoPoJWkQuCNQzPAQb6Xr
-   k2byGpbJQEKV4MCRKe8zEO+nWDS6tdiYlV3rsMWS6KotpsGPXpxnagBip
-   5jYqpoofU0tp+rOykkU4fzvDLSC2N3MEY1ec+2RyppKy+3apkjrccsmFh
-   9QQkxt7VMjzbsA+MLG/XtP8/nVl4z2u2ATMia7/f0gc+NMs6xvfHiN54l
-   oG9SqFBV3rwpt+IWnJszYDWjzpchnRpfF61e0eTQ+LfJw7NgjaFrTQcXE
-   w==;
-X-CSE-ConnectionGUID: 7Hx6cFLMTq+KQ8zITO7gMQ==
-X-CSE-MsgGUID: 47SZ4qeTTzKgSN3xM9C0cQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11497"; a="55105536"
-X-IronPort-AV: E=Sophos;i="6.16,325,1744095600"; 
-   d="scan'208";a="55105536"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2025 16:22:15 -0700
-X-CSE-ConnectionGUID: DE2RZxVNR9maiV7c8OKcRw==
-X-CSE-MsgGUID: 5djQIU38Qxqxg9c80EihYA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,325,1744095600"; 
-   d="scan'208";a="158560564"
-Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
-  by fmviesa006.fm.intel.com with ESMTP; 19 Jul 2025 16:22:11 -0700
-Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1udGsb-000Fpx-0q;
-	Sat, 19 Jul 2025 23:22:09 +0000
-Date: Sun, 20 Jul 2025 07:22:05 +0800
-From: kernel test robot <lkp@intel.com>
-To: Mihai Moldovan <ionic@ionic.de>, linux-arm-msm@vger.kernel.org,
-	Manivannan Sadhasivam <mani@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, Denis Kenzior <denkenz@gmail.com>,
+	s=arc-20240116; t=1752969738; c=relaxed/simple;
+	bh=zlyJkcyPx+QqnGxt75+emm+zjMLSFKeChOckA3Xba54=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QobN6K+Gthb0XlzVuS+xD/0jv/dNVOg3UfqUZjHsV/+Cvh3xcliepVRwgFgPsBVhYObgF2E45jes2CQLpyVMKfiSSO66PHe9XjWNj6C7DeTWUR5fHBtHj0VptR8PKKnPlvul+nkfpZyksE1P7pLE8JzlS/rJu1lBNzZPHHDC1qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=kbslBJWI; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=+gndcKUK+fXS/lReEEHvsa3zmUksOF29DdwtGn9N5gk=; b=kbslBJWIZbyIplwhgMiqFlAKxh
+	+V0B5PqSBAkiO726nWk5x4Rxkl2oUWt7YLMyTGqCE12Qxs7dAyy74KW4uYM/jNPjwQtivm/h5FTLt
+	Z02w6AP6FeBIBmCij7a6BM8gcXDa3lDX4uMkQphG48/YyZqH72pAU1OyD63aa7oui3vglxeOZ20jt
+	bHGQx7Mq/+NG/9p9+jhfndUFh4NSjQ2TB2xi+2NXVcPX+3AGQSKZIYTKL5lbfhRv2ni5oHZ+wkfep
+	LM+YoPftfZofx1p/VsVU1pdz6vjoFZ76uN8zpfPi333qD/l30Zrl8amxSOZ4RE1tSDJB0NaW8uOoI
+	0FxdUSyA==;
+Received: from [50.53.25.54] (helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1udHVN-0000000EkPP-3snN;
+	Sun, 20 Jul 2025 00:02:13 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: netdev@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	"Andre B. Oliveira" <anbadeol@gmail.com>,
+	linux-can@vger.kernel.org,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 03/10] net: qrtr: support identical node ids
-Message-ID: <202507200739.pd0Gkp22-lkp@intel.com>
-References: <4d0fe1eab4b38fb85e2ec53c07289bc0843611a2.1752947108.git.ionic@ionic.de>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH] can: tscan1: CAN_TSCAN1 can depend on PC104
+Date: Sat, 19 Jul 2025 17:02:13 -0700
+Message-ID: <20250720000213.2934416-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4d0fe1eab4b38fb85e2ec53c07289bc0843611a2.1752947108.git.ionic@ionic.de>
+Content-Transfer-Encoding: 8bit
 
-Hi Mihai,
+Add a dependency on PC104 to limit (restrict) this driver kconfig
+prompt to kernel configs that have PC104 set.
 
-kernel test robot noticed the following build warnings:
+Fixes: 2d3359f8b9e6 ("can: tscan1: add driver for TS-CAN1 boards")
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Andre B. Oliveira <anbadeol@gmail.com>
+Cc: linux-can@vger.kernel.org
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+---
+ drivers/net/can/sja1000/Kconfig |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-[auto build test WARNING on mani-mhi/mhi-next]
-[also build test WARNING on net-next/main net/main linus/master v6.16-rc6 next-20250718]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Mihai-Moldovan/net-qrtr-ns-validate-msglen-before-ctrl_pkt-use/20250720-030426
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/mani/mhi.git mhi-next
-patch link:    https://lore.kernel.org/r/4d0fe1eab4b38fb85e2ec53c07289bc0843611a2.1752947108.git.ionic%40ionic.de
-patch subject: [PATCH v2 03/10] net: qrtr: support identical node ids
-config: arc-randconfig-002-20250720 (https://download.01.org/0day-ci/archive/20250720/202507200739.pd0Gkp22-lkp@intel.com/config)
-compiler: arc-linux-gcc (GCC) 8.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250720/202507200739.pd0Gkp22-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507200739.pd0Gkp22-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   net/qrtr/af_qrtr.c: In function 'qrtr_node_assign':
->> net/qrtr/af_qrtr.c:429:36: warning: left shift count >= width of type [-Wshift-count-overflow]
-     key = (unsigned long)node->ep->id << 32 | nid;
-                                       ^~
-
-
-vim +429 net/qrtr/af_qrtr.c
-
-   412	
-   413	/* Assign node id to node.
-   414	 *
-   415	 * This is mostly useful for automatic node id assignment, based on
-   416	 * the source id in the incoming packet.
-   417	 */
-   418	static void qrtr_node_assign(struct qrtr_node *node, unsigned int nid)
-   419	{
-   420		unsigned long flags;
-   421		unsigned long key;
-   422	
-   423		if (nid == QRTR_EP_NID_AUTO)
-   424			return;
-   425	
-   426		spin_lock_irqsave(&qrtr_nodes_lock, flags);
-   427	
-   428		/* Always insert with the endpoint_id + node_id */
- > 429		key = (unsigned long)node->ep->id << 32 | nid;
-   430		radix_tree_insert(&qrtr_nodes, key, node);
-   431	
-   432		if (!radix_tree_lookup(&qrtr_nodes, nid))
-   433			radix_tree_insert(&qrtr_nodes, nid, node);
-   434	
-   435		if (node->nid == QRTR_EP_NID_AUTO)
-   436			node->nid = nid;
-   437		spin_unlock_irqrestore(&qrtr_nodes_lock, flags);
-   438	}
-   439	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+--- linux-next-20250718.orig/drivers/net/can/sja1000/Kconfig
++++ linux-next-20250718/drivers/net/can/sja1000/Kconfig
+@@ -105,7 +105,7 @@ config CAN_SJA1000_PLATFORM
+ 
+ config CAN_TSCAN1
+ 	tristate "TS-CAN1 PC104 boards"
+-	depends on ISA
++	depends on ISA && PC104
+ 	help
+ 	  This driver is for Technologic Systems' TSCAN-1 PC104 boards.
+ 	  https://www.embeddedts.com/products/TS-CAN1
 
