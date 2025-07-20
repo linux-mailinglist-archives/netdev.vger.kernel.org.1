@@ -1,278 +1,122 @@
-Return-Path: <netdev+bounces-208461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4F28B0B8F0
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 00:42:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C8F3B0B935
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 01:30:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CD4518995E7
-	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 22:42:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0B127A397A
+	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 23:28:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF973221F2F;
-	Sun, 20 Jul 2025 22:42:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D526A22F764;
+	Sun, 20 Jul 2025 23:29:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PpJQzdT+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r8V/zCiy"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33D2421421A
-	for <netdev@vger.kernel.org>; Sun, 20 Jul 2025 22:42:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DB1212CDA5;
+	Sun, 20 Jul 2025 23:29:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753051326; cv=none; b=RmCOZR+FiGTSyBpF/0girQ+tdA+XaqH9XDHuTw9TM5P+3VuZRj8QZKGi9OTEgkqYOMNQ4Uns3cMsrKCjw7Pd5ujsBmHYk6bDMigC6sKLQwtuGeIwGWz+0SL8ukL61xCVGOaXAhNUte3JxLtnmDck1D/CZ5qcERhn3a4jleFb2rA=
+	t=1753054193; cv=none; b=CGYVq/8qLSOSCF0qYU0kE6nucQzGCJOpt1Qb2Kadi2PaxTnNuUillVAPtf3KB62B/4whCX0UJcOv5xiKfDgo7oYbEhlZtzdUpqmiqAvs0r/4oP6o9We5ZeJgTGJIV5QyYFEwM1FQHWzrV3UQYu0m5KvOVfZxqMMf2zv6S1Rr2CY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753051326; c=relaxed/simple;
-	bh=1cxaJIbBbtj3ourT0u3mMHk65E3IKf89BfkWcFvPdxU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=C0pgoqh85D6Y9OmDeMrUxwT/gy1rIWf+KKfNT7HVGbzss4j6WDuK7ghBCvSKyseKCZMWX+HL9hI/Nc9E9Pw6j8q8xHnhoXUMEM9UoW9CJ+1lPiUuHKBwyHGxgwXodUGqShMXApj0HaTMU8Ca1GzdPJpy4LU2tgEMoPTdnwm8Hws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PpJQzdT+; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <48c13c2c-56f2-42f7-9a03-d5bdfd8e8dfb@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753051312;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d6vOFSOSZWrPmn9yjc0x19f0VotRKph1uZHa3Yvk2+Y=;
-	b=PpJQzdT+PvRfcuAJyPSAVOnuUiwoVN1b7pTO4h2xOMlrg3ZuEPBCJHCWy9yCpb9Cgl4VPo
-	LPlF88BN9TaV1IGqwVOUkD4F882bGf4ASBT4YORDTpfWuk2NKz5mU9WnyOJs+OhEFtMI5Y
-	VyjlArCjV7kLau7oeT5SwMyZtPiCB9w=
-Date: Sun, 20 Jul 2025 15:41:27 -0700
+	s=arc-20240116; t=1753054193; c=relaxed/simple;
+	bh=9vRFi57eCNNn/RDG1UsnpLJA0b2NK9C+iSXFxF1Bsu4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V1FrqveAG5O50zY4x126Ffp40SI63pGNJ+hLMKuGbD5Dk+gsYNCN2IUVuIIhg/3UmGPh1R/uuvKPqoenjfwlAF3/kGc8uKvQWcKZ3SeLoHgCSHmO/oAH/JJHNdNkxS8q0I0n7JzlPa8YUo/CCQs6BCDCzSKgWtrHQmbLKPteDuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r8V/zCiy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9C0CC4CEE7;
+	Sun, 20 Jul 2025 23:29:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753054193;
+	bh=9vRFi57eCNNn/RDG1UsnpLJA0b2NK9C+iSXFxF1Bsu4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=r8V/zCiyA4u/5PyfBrhpwGiPbXUwMo0HTAx+K7zSRwdmp+PKBPT2vii+6hPfcbAjy
+	 2E+uTWZ8QZjdX4Z8defLdoE1RtHOnwdeMWfjGsGtRSXdWPp+pMDXXBmabMPFi0t7X5
+	 MTeg9th7oSkxf7MG4+Gj/EC+h26qOlzDV9EYcDUzPD1z6ls4lI+4MwTFzBqICzXShD
+	 7BLvUbAPGD84WrSLNxuwEP9AFhXNN7/0qmkEwJX5EABaJ2MSfEeTWET8LKrSJZcXeQ
+	 5uKxFu29ob4YwEuI5dYLikVQDIyrjpBvw2WgVNlD1qxkp1PFkSuYTK8vxJhWkGC+Yv
+	 UE+r0AgmhZ79w==
+Date: Sun, 20 Jul 2025 18:29:52 -0500
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: =?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	davem@davemloft.net, Conor Dooley <conor+dt@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Antoine Tenart <atenart@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	Daniel Golle <daniel@makrotopia.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	linux-arm-msm@vger.kernel.org,
+	Romain Gantois <romain.gantois@bootlin.com>, mwojtas@chromium.org,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: [PATCH net-next v9 01/15] dt-bindings: net: Introduce the
+ ethernet-connector description
+Message-ID: <175305419142.3067276.17489545129976520306.robh@kernel.org>
+References: <20250717073020.154010-1-maxime.chevallier@bootlin.com>
+ <20250717073020.154010-2-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCHv3 next-next 1/1] net/mlx5: Fix build -Wframe-larger-than
- warnings
-To: saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, netdev@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <20250720160849.508014-1-yanjun.zhu@linux.dev>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <20250720160849.508014-1-yanjun.zhu@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250717073020.154010-2-maxime.chevallier@bootlin.com>
 
-在 2025/7/20 9:08, Zhu Yanjun 写道:
-> When building, the following warnings will appear.
-> "
-> pci_irq.c: In function ‘mlx5_ctrl_irq_request’:
-> pci_irq.c:494:1: warning: the frame size of 1040 bytes is larger than 1024 bytes [-Wframe-larger-than=]
-> 
-> pci_irq.c: In function ‘mlx5_irq_request_vector’:
-> pci_irq.c:561:1: warning: the frame size of 1040 bytes is larger than 1024 bytes [-Wframe-larger-than=]
-> 
-> eq.c: In function ‘comp_irq_request_sf’:
-> eq.c:897:1: warning: the frame size of 1080 bytes is larger than 1024 bytes [-Wframe-larger-than=]
-> 
-> irq_affinity.c: In function ‘irq_pool_request_irq’:
-> irq_affinity.c:74:1: warning: the frame size of 1048 bytes is larger than 1024 bytes [-Wframe-larger-than=]
-> "
-> 
-> These warnings indicate that the stack frame size exceeds 1024 bytes in
-> these functions.
-> 
-> To resolve this, instead of allocating large memory buffers on the stack,
-> it is better to use kvzalloc to allocate memory dynamically on the heap.
-> This approach reduces stack usage and eliminates these frame size warnings.
-> 
-> Signed-off-by: Zhu Yanjun <yanjun.zhu@linux.dev>
 
-Sorry. Missing the following Acked-by.
-
-Acked-by: Junxian Huang <huangjunxian6@hisilicon.com>
-
-Zhu Yanjun
-
+On Thu, 17 Jul 2025 09:30:05 +0200, Maxime Chevallier wrote:
+> The ability to describe the physical ports of Ethernet devices is useful
+> to describe multi-port devices, as well as to remove any ambiguity with
+> regard to the nature of the port.
+> 
+> Moreover, describing ports allows for a better description of features
+> that are tied to connectors, such as PoE through the PSE-PD devices.
+> 
+> Introduce a binding to allow describing the ports, for now with 2
+> attributes :
+> 
+>  - The number of lanes, which is a quite generic property that allows
+>    differentating between multiple similar technologies such as BaseT1
+>    and "regular" BaseT (which usually means BaseT4).
+> 
+>  - The media that can be used on that port, such as BaseT for Twisted
+>    Copper, BaseC for coax copper, BaseS/L for Fiber, BaseK for backplane
+>    ethernet, etc. This allows defining the nature of the port, and
+>    therefore avoids the need for vendor-specific properties such as
+>    "micrel,fiber-mode" or "ti,fiber-mode".
+> 
+> The port description lives in its own file, as it is intended in the
+> future to allow describing the ports for phy-less devices.
+> 
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 > ---
-> v2 -> v3: No changes, just send out target net-next;
-> v1 -> v2: Add kvfree to error handler;
+>  .../bindings/net/ethernet-connector.yaml      | 45 +++++++++++++++++++
+>  .../devicetree/bindings/net/ethernet-phy.yaml | 18 ++++++++
+>  MAINTAINERS                                   |  1 +
+>  3 files changed, 64 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/ethernet-connector.yaml
 > 
-> 1. This commit only build tests;
-> 2. All the changes are on configuration path, will not make difference
-> on the performance;
-> 3. This commit is just to fix build warnings, not error or bug fixes. So
-> not Fixes tag.
-> ---
->   drivers/net/ethernet/mellanox/mlx5/core/eq.c  | 24 +++++++----
->   .../mellanox/mlx5/core/irq_affinity.c         | 19 +++++++--
->   .../net/ethernet/mellanox/mlx5/core/pci_irq.c | 40 +++++++++++++------
->   3 files changed, 60 insertions(+), 23 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-> index dfb079e59d85..4938dd7c3a09 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-> @@ -873,19 +873,29 @@ static int comp_irq_request_sf(struct mlx5_core_dev *dev, u16 vecidx)
->   {
->   	struct mlx5_irq_pool *pool = mlx5_irq_table_get_comp_irq_pool(dev);
->   	struct mlx5_eq_table *table = dev->priv.eq_table;
-> -	struct irq_affinity_desc af_desc = {};
-> +	struct irq_affinity_desc *af_desc;
->   	struct mlx5_irq *irq;
->   
-> +	af_desc = kvzalloc(sizeof(*af_desc), GFP_KERNEL);
-> +	if (!af_desc)
-> +		return -ENOMEM;
-> +
->   	/* In case SF irq pool does not exist, fallback to the PF irqs*/
-> -	if (!mlx5_irq_pool_is_sf_pool(pool))
-> +	if (!mlx5_irq_pool_is_sf_pool(pool)) {
-> +		kvfree(af_desc);
->   		return comp_irq_request_pci(dev, vecidx);
-> +	}
->   
-> -	af_desc.is_managed = false;
-> -	cpumask_copy(&af_desc.mask, cpu_online_mask);
-> -	cpumask_andnot(&af_desc.mask, &af_desc.mask, &table->used_cpus);
-> -	irq = mlx5_irq_affinity_request(dev, pool, &af_desc);
-> -	if (IS_ERR(irq))
-> +	af_desc->is_managed = false;
-> +	cpumask_copy(&af_desc->mask, cpu_online_mask);
-> +	cpumask_andnot(&af_desc->mask, &af_desc->mask, &table->used_cpus);
-> +	irq = mlx5_irq_affinity_request(dev, pool, af_desc);
-> +	if (IS_ERR(irq)) {
-> +		kvfree(af_desc);
->   		return PTR_ERR(irq);
-> +	}
-> +
-> +	kvfree(af_desc);
->   
->   	cpumask_or(&table->used_cpus, &table->used_cpus, mlx5_irq_get_affinity_mask(irq));
->   	mlx5_core_dbg(pool->dev, "IRQ %u mapped to cpu %*pbl, %u EQs on this irq\n",
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
-> index 2691d88cdee1..82d3c2568244 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
-> @@ -47,29 +47,40 @@ static int cpu_get_least_loaded(struct mlx5_irq_pool *pool,
->   static struct mlx5_irq *
->   irq_pool_request_irq(struct mlx5_irq_pool *pool, struct irq_affinity_desc *af_desc)
->   {
-> -	struct irq_affinity_desc auto_desc = {};
-> +	struct irq_affinity_desc *auto_desc;
->   	struct mlx5_irq *irq;
->   	u32 irq_index;
->   	int err;
->   
-> +	auto_desc = kvzalloc(sizeof(*auto_desc), GFP_KERNEL);
-> +	if (!auto_desc)
-> +		return ERR_PTR(-ENOMEM);
-> +
->   	err = xa_alloc(&pool->irqs, &irq_index, NULL, pool->xa_num_irqs, GFP_KERNEL);
-> -	if (err)
-> +	if (err) {
-> +		kvfree(auto_desc);
->   		return ERR_PTR(err);
-> +	}
-> +
->   	if (pool->irqs_per_cpu) {
->   		if (cpumask_weight(&af_desc->mask) > 1)
->   			/* if req_mask contain more then one CPU, set the least loadad CPU
->   			 * of req_mask
->   			 */
->   			cpumask_set_cpu(cpu_get_least_loaded(pool, &af_desc->mask),
-> -					&auto_desc.mask);
-> +					&auto_desc->mask);
->   		else
->   			cpu_get(pool, cpumask_first(&af_desc->mask));
->   	}
-> +
->   	irq = mlx5_irq_alloc(pool, irq_index,
-> -			     cpumask_empty(&auto_desc.mask) ? af_desc : &auto_desc,
-> +			     cpumask_empty(&auto_desc->mask) ? af_desc : auto_desc,
->   			     NULL);
->   	if (IS_ERR(irq))
->   		xa_erase(&pool->irqs, irq_index);
-> +
-> +	kvfree(auto_desc);
-> +
->   	return irq;
->   }
->   
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
-> index 40024cfa3099..48aad94b0a5d 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
-> @@ -470,26 +470,32 @@ void mlx5_ctrl_irq_release(struct mlx5_core_dev *dev, struct mlx5_irq *ctrl_irq)
->   struct mlx5_irq *mlx5_ctrl_irq_request(struct mlx5_core_dev *dev)
->   {
->   	struct mlx5_irq_pool *pool = ctrl_irq_pool_get(dev);
-> -	struct irq_affinity_desc af_desc;
-> +	struct irq_affinity_desc *af_desc;
->   	struct mlx5_irq *irq;
->   
-> -	cpumask_copy(&af_desc.mask, cpu_online_mask);
-> -	af_desc.is_managed = false;
-> +	af_desc = kvzalloc(sizeof(*af_desc), GFP_KERNEL);
-> +	if (!af_desc)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	cpumask_copy(&af_desc->mask, cpu_online_mask);
-> +	af_desc->is_managed = false;
->   	if (!mlx5_irq_pool_is_sf_pool(pool)) {
->   		/* In case we are allocating a control IRQ from a pci device's pool.
->   		 * This can happen also for a SF if the SFs pool is empty.
->   		 */
->   		if (!pool->xa_num_irqs.max) {
-> -			cpumask_clear(&af_desc.mask);
-> +			cpumask_clear(&af_desc->mask);
->   			/* In case we only have a single IRQ for PF/VF */
-> -			cpumask_set_cpu(cpumask_first(cpu_online_mask), &af_desc.mask);
-> +			cpumask_set_cpu(cpumask_first(cpu_online_mask), &af_desc->mask);
->   		}
->   		/* Allocate the IRQ in index 0. The vector was already allocated */
-> -		irq = irq_pool_request_vector(pool, 0, &af_desc, NULL);
-> +		irq = irq_pool_request_vector(pool, 0, af_desc, NULL);
->   	} else {
-> -		irq = mlx5_irq_affinity_request(dev, pool, &af_desc);
-> +		irq = mlx5_irq_affinity_request(dev, pool, af_desc);
->   	}
->   
-> +	kvfree(af_desc);
-> +
->   	return irq;
->   }
->   
-> @@ -548,16 +554,26 @@ struct mlx5_irq *mlx5_irq_request_vector(struct mlx5_core_dev *dev, u16 cpu,
->   {
->   	struct mlx5_irq_table *table = mlx5_irq_table_get(dev);
->   	struct mlx5_irq_pool *pool = table->pcif_pool;
-> -	struct irq_affinity_desc af_desc;
-> +	struct irq_affinity_desc *af_desc;
->   	int offset = MLX5_IRQ_VEC_COMP_BASE;
-> +	struct mlx5_irq *irq;
-> +
-> +	af_desc = kvzalloc(sizeof(*af_desc), GFP_KERNEL);
-> +	if (!af_desc)
-> +		return ERR_PTR(-ENOMEM);
->   
->   	if (!pool->xa_num_irqs.max)
->   		offset = 0;
->   
-> -	af_desc.is_managed = false;
-> -	cpumask_clear(&af_desc.mask);
-> -	cpumask_set_cpu(cpu, &af_desc.mask);
-> -	return mlx5_irq_request(dev, vecidx + offset, &af_desc, rmap);
-> +	af_desc->is_managed = false;
-> +	cpumask_clear(&af_desc->mask);
-> +	cpumask_set_cpu(cpu, &af_desc->mask);
-> +
-> +	irq = mlx5_irq_request(dev, vecidx + offset, af_desc, rmap);
-> +
-> +	kvfree(af_desc);
-> +
-> +	return irq;
->   }
->   
->   static struct mlx5_irq_pool *
+
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
 
