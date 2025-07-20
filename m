@@ -1,121 +1,118 @@
-Return-Path: <netdev+bounces-208384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5A9AB0B38D
-	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 06:51:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50622B0B394
+	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 06:53:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 499793C20B9
-	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 04:50:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F248B189C5EE
+	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 04:54:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB6A719C540;
-	Sun, 20 Jul 2025 04:51:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E90A19DF66;
+	Sun, 20 Jul 2025 04:53:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="Me6ZcTGr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WvDXH/WL"
 X-Original-To: netdev@vger.kernel.org
-Received: from out.smtpout.orange.fr (out-72.smtpout.orange.fr [193.252.22.72])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C50BED299;
-	Sun, 20 Jul 2025 04:51:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8C81C32
+	for <netdev@vger.kernel.org>; Sun, 20 Jul 2025 04:53:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752987065; cv=none; b=nY4xpaGfULOnMPthlPrDTCVm2mAdzVcA8tR36NAieeAnvD7kTvPNML3VSiwGbjqJxFkBHQwM5DNFkWuD3MXDuizO8cVuxMPx56IeHrVjOzsbVNVevK6UwoV/nulTYatVMDtboggvaxF7Jmrrca2XqiJFTeEDI+UAZ4PBHs45vmE=
+	t=1752987220; cv=none; b=b4aU3zKxpAHG+5aot9w/l9fkrmqXgSemsJ6hXAjOEqHmofi0ZZUAq7MWxaacFVXa+PGbc686ujNCe60JxLLZBtvd7VVhcfyEdcvAW5jktM1dibv3mM4GI8omtTNy1/6VM4LxRK+Tk/buTFrATNzl8/5cWfpac05b7WMYNakQaMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752987065; c=relaxed/simple;
-	bh=X2VRJTxNQyY91tfVK/IAKHg5Xsb8+sJWzkjkXodWz/k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WXq1x6HMzxhvIWrM+Q/lpGiMml0OPe7FWA3ZCX+ZpCVDHkFnUsIdQ0e3+ZKFIPAsBwyw6cGmkkTY1COvaBkAWLlIZ8gidMAYca6HIvtKGVj7dgYBcUGST74j21K/cEAQjw/sY2X0Iszzl+sgo0d0AMD4kfaI+im0VVXmYqIWvnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=Me6ZcTGr; arc=none smtp.client-ip=193.252.22.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [172.16.82.72] ([124.33.176.97])
-	by smtp.orange.fr with ESMTPA
-	id dM0duYZ4uMzjqdM0euFkjV; Sun, 20 Jul 2025 06:50:53 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1752987053;
-	bh=IaHGPBToEuHYujpU2aUAxomrlknUBKKmqIUvLYtaIC0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=Me6ZcTGrXMxKM+oWlsS839+BYTTXA9sISQc0X86SOSu8VPC1dIlCLU6at/is7P8Ga
-	 djxE19FI0WrmUO3DLMUZDis2cGWS1vng8wg/JllIX9oG3gGQaUhT7AEzibtxAx/LHD
-	 qUlYuVzrW4sHtPA6jLrHkFFdOFLyN0rUznukzgi3fdGRQzv7SQ/QndbAKLhwFV7NYh
-	 M12bLHa2n8Li+l8QUiLGS9WMi2YzA28J6xNj7OWXYWonMoQxXz/eJTPKmEeYC4wgud
-	 hpjnJ4tF8UDITCWUV4/r8nBipO8O0seQcpwMtz1cVEeFheWkV/ImBd7SxSuiHe4gs4
-	 v/YVj7LHAl0qQ==
-X-ME-Helo: [172.16.82.72]
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Sun, 20 Jul 2025 06:50:53 +0200
-X-ME-IP: 124.33.176.97
-Message-ID: <9ce81806-3434-492f-b255-fad592be8904@wanadoo.fr>
-Date: Sun, 20 Jul 2025 13:50:46 +0900
+	s=arc-20240116; t=1752987220; c=relaxed/simple;
+	bh=1pbmUFZkS6Rn8eyuak4flVQ/+1I09AKCZZT24rE+7PA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ni0H3jinwQ7od0pUnoNTEBll8D4k6KpeJIUC3NeeJ/JVZb83euOKjz5MQ/9OjwZiU8I56EXfrdDps/hKv7530XSp0p54stiRLZq4bKhWnAeyIHd/lVaLeFOhmZtCzH/Q3Ot4szoxJO+ffrz4PHYyLmi0ls1gKJOAXYoeodT6p7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WvDXH/WL; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-313154270bbso3315499a91.2
+        for <netdev@vger.kernel.org>; Sat, 19 Jul 2025 21:53:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752987218; x=1753592018; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TunjkI95IMphLR1F3DEmcSNcHuqiDjdUWsmvhl/oSFY=;
+        b=WvDXH/WLI8OM26IEmSQI7CyD66JJIyBWrZQmx48Fa7Q1psb68eNc4NLcdUFCjWm6uk
+         RuEjrxcKNn4vi9a2vjCQQeQWF8ytu9KeG/8HmqzqFigZwEWY6DpUI/JfeW3PWsuw+tzB
+         VJ2dYYP07K8l6syq2sOHZbXEKri6tU2w80bSaBmf0lxVJncB+2n2mxcU+mJDHsVI5K9i
+         9v+U29IG12bCCFQ4nzxn1GAfQ0qyQg4kIOxV7fxOQMy554rgGeHMMjJa2MGMelhpA/UD
+         qZJM/BOn/Q8EwILX2OtAjNTg1AMWmmkLvcPK2bcUvVQZwqmRJYiU58IOl12ion4LIE6f
+         27mQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752987218; x=1753592018;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TunjkI95IMphLR1F3DEmcSNcHuqiDjdUWsmvhl/oSFY=;
+        b=WY1T74hIo35n2mylXSJyqjz0sShQCgPD0eWKi1E3c0lzW+fV0iwjz3wZILyVs4jJYc
+         bwfKL2AM8fz6zV8yA8CK/JjOin+PEusf8Rr89pnrNuteQhWsmYn8s5CiSZzpzkx+Wgtz
+         Q/qlohqH87NVK+MGBX3crZ5fnpaF7TdJ+KovqW3aViEFz57Feqkna0CGEbGsPQv6ioHm
+         dspRbmrfV29nG1csoc7bz9e8Pva2BRqsyqE04MQexpb0tJEdnNXOLBbrpdpH0G8AK4IH
+         7uo3vHKqKP4l7TSadrLVxOrWkFA57jtH/7c9L6oXg4wouxwznz4HY+vpXInFxOdZOgVr
+         laQQ==
+X-Gm-Message-State: AOJu0YwZSaRe5LuGrNIB886vvKNqqN4xzVXzBlaIPDl7bTAY3aWP9Suk
+	biap12euYFiXurNlwu00MTeo/9KtA0CHLPTnM/IS8zwXVOWfJWocXamQLaNnwlTNp9u447wMpHS
+	Ne8jZhvIP2gYtXEJ93Bb+y4NFt20oHV8=
+X-Gm-Gg: ASbGncttWSLU+cKbXkszJau/YAdOKcwhljl7wSA51VCVsOF2OOIi4WcBu9f53ZxEyZB
+	YpmOmOIQtdhx7wShkYAHmNo9UsapQtcuJIOXyfAU4qjstyT3zjT3T7wZk+DEoZ/ZCza4E7CMQEN
+	pMI0duIBXMUq/b7NV6rQ7YdZ7D2fwBBTeXriRJ/f3Q9ync/FsFdBgmm08HVvI8jW+BORYqRXBmJ
+	DmZtQ==
+X-Google-Smtp-Source: AGHT+IEVGIAPYT1CpQi6h+NQ+HllxEdUZ8h5B5er7u5BHtAQasr1UW/VtHh+u6gtno2vLTc7vBMKzlWUbKcwS5+q+kg=
+X-Received: by 2002:a17:90b:5307:b0:313:db0b:75e4 with SMTP id
+ 98e67ed59e1d1-31c9f48a241mr29150949a91.33.1752987218240; Sat, 19 Jul 2025
+ 21:53:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] can: tscan1: CAN_TSCAN1 can depend on PC104
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: "Andre B. Oliveira" <anbadeol@gmail.com>, linux-can@vger.kernel.org,
- Marc Kleine-Budde <mkl@pengutronix.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org
-References: <20250720000213.2934416-1-rdunlap@infradead.org>
-Content-Language: en-US
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
- xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
- LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
- GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
- bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
- BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
- 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
- yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
- CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
- ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
-In-Reply-To: <20250720000213.2934416-1-rdunlap@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250715112431.2178100-1-krikku@gmail.com> <20250717075659.2725245-1-krikku@gmail.com>
+ <20250717075659.2725245-2-krikku@gmail.com> <20250718175847.4f4a834c@kernel.org>
+In-Reply-To: <20250718175847.4f4a834c@kernel.org>
+From: Krishna Kumar <krikku@gmail.com>
+Date: Sun, 20 Jul 2025 10:23:01 +0530
+X-Gm-Features: Ac12FXzVvBD3okmLtvZGXsuu0v13BhYU7sV8HDWOi95Y00TSwd68_5lF291UM-U
+Message-ID: <CACLgkEZVa7+uvK9hn43=jAne-8X+3b=vUV-gSR8zGQtvrZbjUw@mail.gmail.com>
+Subject: Re: [PATCH v3 net-next 1/2] net: Prevent RPS table overwrite for
+ active flows
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	tom@herbertland.com, pabeni@redhat.com, horms@kernel.org, sdf@fomichev.me, 
+	kuniyu@google.com, ahmed.zaki@intel.com, aleksander.lobakin@intel.com, 
+	atenart@kernel.org, jdamato@fastly.com, krishna.ku@flipkart.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 20/07/2025 at 09:02, Randy Dunlap wrote:
-> Add a dependency on PC104 to limit (restrict) this driver kconfig
-> prompt to kernel configs that have PC104 set.
-> 
-> Fixes: 2d3359f8b9e6 ("can: tscan1: add driver for TS-CAN1 boards")
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Cc: Andre B. Oliveira <anbadeol@gmail.com>
-> Cc: linux-can@vger.kernel.org
-> Cc: Marc Kleine-Budde <mkl@pengutronix.de>
-> Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> ---
->  drivers/net/can/sja1000/Kconfig |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> --- linux-next-20250718.orig/drivers/net/can/sja1000/Kconfig
-> +++ linux-next-20250718/drivers/net/can/sja1000/Kconfig
-> @@ -105,7 +105,7 @@ config CAN_SJA1000_PLATFORM
->  
->  config CAN_TSCAN1
->  	tristate "TS-CAN1 PC104 boards"
-> -	depends on ISA
-> +	depends on ISA && PC104
+Ack. Thanks for your feedback.
 
-A bit unrelated but ISA depends on X86_32 so I would suggest to add a
-COMPILE_TEST so that people can still do test builds on x86_64.
+Regards,
+- Krishna
 
-  depends on (ISA && PC104) || COMPILE_TEST
-
-
-Yours sincerely,
-Vincent Mailhol
-
+On Sat, Jul 19, 2025 at 6:28=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Thu, 17 Jul 2025 13:26:57 +0530 Krishna Kumar wrote:
+> > + * Return values:
+> > + *   True:  Flow has recent activity.
+> > + *   False: Flow does not have recent activity.
+>
+> This is not recognized as valid kdoc formatting:
+>
+> Warning: net/core/dev.c:4856 No description found for return value of 'rp=
+s_flow_is_active'
+>
+> I don't think we need to enumerate this trivial set of possibilities,
+> how about:
+>
+>  * Return: true if flow was recently active.
+> --
+> pw-bot: cr
 
