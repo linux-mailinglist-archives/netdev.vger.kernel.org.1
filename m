@@ -1,274 +1,222 @@
-Return-Path: <netdev+bounces-208440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F107DB0B6D9
-	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 18:09:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C52DB0B6EF
+	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 18:33:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E55931772DA
-	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 16:09:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 995C93A2B7D
+	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 16:32:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC481F4CAA;
-	Sun, 20 Jul 2025 16:09:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F6F91EDA0F;
+	Sun, 20 Jul 2025 16:33:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XjnT9Ol+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WpVDtJXI"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E2B6BA27
-	for <netdev@vger.kernel.org>; Sun, 20 Jul 2025 16:09:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B01AE1ACED5;
+	Sun, 20 Jul 2025 16:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753027749; cv=none; b=ijqFSQD+gqAstKb4IuAbdZVSCh3C8fSMFdpJF3LVjTgeHB3tbc01n8Oomy6Gsb6MBTb9NbitE6a4HCQKAYPKUVbeMLHJ9Ryf8Czwf1G0xGjkcIlzuJ8RB+RtgJZxK0eLOqWk4E+6oZ3GM08OgrtVBczUJ2/QMDL2kiHnfOGdCzs=
+	t=1753029183; cv=none; b=rfWAZOqKC48ZJ4TMHaHJJBEHoi/gm1k1e691v3heBB2wXIcAfWqAcci+oLMgszzPilRUmyW0DIDrnldF7gjDyU3irIvCwVFdtYNTd8hB6tXA35p5yrXERqR0CdRX82iCZ2TRbVAeBPedbvl+NSAPAAFJHMpk3l3za+y7wajCe9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753027749; c=relaxed/simple;
-	bh=MBWYlIeGyty3aDnZuV0H89p7B2UW5/8B3/yHDpJLrSs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=sXoe0JKqjBuh7TZ7DHA5a+PnHJ6BmEkX2dPqf9dmn5UXNKaYN/hBR97Hy0L5/EoXcar7ZjkXJ6mdIkbqoMGNBvfgBj72uavkHm6xwsk6koGzYrGnXhnnVYU3RHLL8O5CTgMLVU4Uo56yIj3YBF1AJ/ehqloAEotu5JZx4Mypl24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XjnT9Ol+; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753027744;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=YRyNqrr1W6WlBW6CYgDEdqpWbB1wN5oGzrLXeXeQviw=;
-	b=XjnT9Ol+ElZFZumtxrm/tgXnCgKPXiFdcTKZPmeokfanrSvIwGvNRK0tKF1Khn1nymQFCN
-	yL7aDK8Sc+hdN+aGU7LUaibHFtTGwQrtBElQyoHlpPrIeCNqnbXjIiaEDig5h2Qgrvjmpz
-	mhxQA84Gge8EtomytfgzO6l/se0HFgg=
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-To: saeedm@nvidia.com,
-	leon@kernel.org,
-	tariqt@nvidia.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Zhu Yanjun <yanjun.zhu@linux.dev>
-Subject: [PATCHv3 next-next 1/1] net/mlx5: Fix build -Wframe-larger-than warnings
-Date: Sun, 20 Jul 2025 18:08:49 +0200
-Message-Id: <20250720160849.508014-1-yanjun.zhu@linux.dev>
+	s=arc-20240116; t=1753029183; c=relaxed/simple;
+	bh=qUJk48jtUKEAw/MslwK7j0CvoduppN0NcJm4wds+mh4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cS8Yl0YjDlRAG6Jb/0EIA8dnocLvc9gRO4Mp5w7n/o4t6X9FABe4zbVxbVEXbA0jTk8E7RGuiWwbo7wZB6Us2Ki1qzHWQ+68wJ7uHiXII3/hrpaFZGQ5QYQMOCU/oSp+YBSdykteRWcCwSpcWZWzOjJ39eC6gUFauMxqGoqwWSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WpVDtJXI; arc=none smtp.client-ip=209.85.166.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3dda399db09so45131135ab.3;
+        Sun, 20 Jul 2025 09:33:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753029181; x=1753633981; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=a+56cb37M9xr882rSl73dpaeL2aKKNDupS6npCA0l6U=;
+        b=WpVDtJXITHzEOg4YPrpdSt3JWXPC+lKN/4xnd39SKYTRonXeB4ZaJr3oo+AkFsHPXJ
+         de2QrILgo5rGRsZ7bGp2II46ZajAkS6+25jIYc91dw/EpYI0yeFiyhBRfntBan4LVpRW
+         CkCiUSDpcz1lpYuAmgJ31gnAM805TvZJo89p4DyNP4CMkivUxhchyFsK29Yrtk2224r+
+         lHZQgtOWBymsD6cgJTcA1EBYDVjSQGA10Vv0JOZjZYcRUtX7mZKive10w3OuIB2t/Pbc
+         Z6MsXrPMmq0ze/K+rXuUQsu3dIH+xofNwy6J+F0542r8UexQItz2IbAz6tUHH3aCTAOH
+         HRtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753029181; x=1753633981;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=a+56cb37M9xr882rSl73dpaeL2aKKNDupS6npCA0l6U=;
+        b=ftiUwnvCk1xW3/AW4HTJ4EHTFnD+LUbCgSfUyGcqQc+j0wdtOfm3U5ynvCMXzH8NwH
+         1sSOHepC6cON2s8U5KPpI+nx0bJOdezcIOPLTHqwKD9eYanXOt2WK2oEctEgQ526+w+v
+         uSkHcgcWNHVliUSq4jtHDwjv1cxg513UcB7bpV+2OA6Xs3wxSduY8MsfwUaZ7Y90ctDQ
+         imkF9rBqpktwUId2KWCJTg1O8/qrjRiG0XX2hAbVbedIOl32WWcTaf99eYA1uHe4uixy
+         BTuZ+KrT7onefN0S9Kl6zxSevoRcXPOXuSscOZ6vNvk46XXYtJ61sObcUyiQhz8U0qka
+         fiUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUHy8Z7HO1NsSRXaWpQnSbPhe/VlYJz6JD/pQbbj8919nIRmbZbCf3bnEXBESC7dxdm6k/OK0tQgpoqdS8=@vger.kernel.org, AJvYcCUN0ykuYR3sa9fz3YF9TnIW1CrQOyq0ElUZyU4EnQZU9M5dRLmerOA3tqHFj9IsbYrTORwhXulW/Lza50z0xR/x@vger.kernel.org, AJvYcCUhXZLnELeuYtfwWIsMLQkovlHJ19kXgaRB65Cn1jER9ymemAVq9w2d9DiYIFnAQCG9G41BDCTI@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxucvoUXxdqJlUyxDzZ+yzGMaAuhjcesfRYppVwcSEYkG5za6m
+	GqioBEEj1+Mw2V+RmURHFsCCu0hZK2O6Ij01SuJGqjCECzk0tn4hnbKQ7VtaVclwoGX0kbdNT1z
+	OwUjOHclnEhKJ2k3QffgYNx+VXwXfAa4=
+X-Gm-Gg: ASbGncupDUiQxGDmglHEK7SmUB5lL3qXHkexKK1Y23+SPjVe3n9HHk3B6c0TlRtvnrW
+	tA/zPgfbmji5dqk3B7vcJzcdeF7siA2qd5WTfA7DWyRhOQXkcj64Dp7ikbEy8b/zrwYpjlZ6MX7
+	mXV5cq7EWPwflWD/DaKl6PUTwDRhdwPTkP9aErdM57iIwVH57oV4d6yJfl8j2CXSH6MF3zd5DMV
+	++JmG4AgbnHRTugQBUu
+X-Google-Smtp-Source: AGHT+IH7R74bM/DR3bE8CnVCBdDKl45iZr8XjYjDMkWtgicO4pmWVyjMjPluvkR5XbdGjT4cBag+2yTJ/P0b4kFRjFI=
+X-Received: by 2002:a05:6e02:349e:b0:3e2:9e1b:2e4 with SMTP id
+ e9e14a558f8ab-3e29e1b04f6mr81167245ab.15.1753029180522; Sun, 20 Jul 2025
+ 09:33:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <1f354a1afd60f29bbbf02bd60cb52ecfc0b6bd17.1752848172.git.shuali@redhat.com>
+In-Reply-To: <1f354a1afd60f29bbbf02bd60cb52ecfc0b6bd17.1752848172.git.shuali@redhat.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Sun, 20 Jul 2025 12:32:49 -0400
+X-Gm-Features: Ac12FXzGN6Nx5Iu-9nw959TpqbsEu1X3tFnDxpAqE8LqO30VJDATUwKgw4dcyy4
+Message-ID: <CADvbK_f8Uz82t96jXWFB-72A1_+qJGysfAhFKA1aWssiwdO+ww@mail.gmail.com>
+Subject: Re: [PATCH net-next] selftests: tc: Add generic erspan_opts matching
+ support for tc-flower
+To: shuali@redhat.com
+Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Simon Horman <horms@kernel.org>, xiyou.wangcong@gmail.com, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When building, the following warnings will appear.
-"
-pci_irq.c: In function ‘mlx5_ctrl_irq_request’:
-pci_irq.c:494:1: warning: the frame size of 1040 bytes is larger than 1024 bytes [-Wframe-larger-than=]
+On Fri, Jul 18, 2025 at 10:16=E2=80=AFAM <shuali@redhat.com> wrote:
+>
+> From: Li Shuang <shuali@redhat.com>
+>
+> Add test cases to tc_flower.sh to validate generic matching on ERSPAN
+> options. Both ERSPAN Type II and Type III are covered.
+>
+> Also add check_tc_erspan_support() to verify whether tc supports
+> erspan_opts.
+>
+> Signed-off-by: Li Shuang <shuali@redhat.com>
+> ---
+>  tools/testing/selftests/net/forwarding/lib.sh | 14 +++++
+>  .../selftests/net/forwarding/tc_flower.sh     | 52 ++++++++++++++++++-
+>  2 files changed, 65 insertions(+), 1 deletion(-)
+>
+> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testin=
+g/selftests/net/forwarding/lib.sh
+> index 9308b2f77fed..890b3374dacd 100644
+> --- a/tools/testing/selftests/net/forwarding/lib.sh
+> +++ b/tools/testing/selftests/net/forwarding/lib.sh
+> @@ -142,6 +142,20 @@ check_tc_version()
+>         fi
+>  }
+>
+> +check_tc_erspan_support()
+> +{
+> +       local dev=3D$1; shift
+> +
+> +       tc filter add dev $dev ingress pref 1 handle 1 flower \
+> +               erspan_opts 1:0:0:0 &> /dev/null
+> +       if [[ $? -ne 0 ]]; then
+> +               echo "SKIP: iproute2 too old; tc is missing erspan suppor=
+t"
+> +               return $ksft_skip
+> +       fi
+> +       tc filter del dev $dev ingress pref 1 handle 1 flower \
+> +               erspan_opts 1:0:0:0 &> /dev/null
+> +}
+> +
+>  # Old versions of tc don't understand "mpls_uc"
+>  check_tc_mpls_support()
+>  {
+> diff --git a/tools/testing/selftests/net/forwarding/tc_flower.sh b/tools/=
+testing/selftests/net/forwarding/tc_flower.sh
+> index b1daad19b01e..b58909a93112 100755
+> --- a/tools/testing/selftests/net/forwarding/tc_flower.sh
+> +++ b/tools/testing/selftests/net/forwarding/tc_flower.sh
+> @@ -6,7 +6,7 @@ ALL_TESTS=3D"match_dst_mac_test match_src_mac_test match_=
+dst_ip_test \
+>         match_ip_tos_test match_indev_test match_ip_ttl_test
+>         match_mpls_label_test \
+>         match_mpls_tc_test match_mpls_bos_test match_mpls_ttl_test \
+> -       match_mpls_lse_test"
+> +       match_mpls_lse_test match_erspan_opts_test"
+>  NUM_NETIFS=3D2
+>  source tc_common.sh
+>  source lib.sh
+> @@ -676,6 +676,56 @@ match_mpls_lse_test()
+>         log_test "mpls lse match ($tcflags)"
+>  }
+>
+> +match_erspan_opts_test()
+> +{
+> +       RET=3D0
+> +
+> +       check_tc_erspan_support $h2 || return 0
+> +
+> +       # h1 erspan setup
+> +       tunnel_create erspan1 erspan 192.0.2.1 192.0.2.2 dev $h1 seq key =
+1001 \
+> +               tos C ttl 64 erspan_ver 1 erspan 6789 # ERSPAN Type II
+> +       tunnel_create erspan2 erspan 192.0.2.1 192.0.2.2 dev $h1 seq key =
+1002 \
+> +               tos C ttl 64 erspan_ver 2 erspan_dir egress erspan_hwid 6=
+3 \
+> +               # ERSPAN Type III
+> +       ip link set dev erspan1 master v$h1
+> +       ip link set dev erspan2 master v$h1
+> +       # h2 erspan setup
+> +       ip link add ep-ex type erspan ttl 64 external # To collect tunnel=
+ info
+> +       ip link set ep-ex up
+> +       ip link set dev ep-ex master v$h2
+> +       tc qdisc add dev ep-ex clsact
+> +
+> +       # ERSPAN Type II [decap direction]
+> +       tc filter add dev ep-ex ingress protocol ip  handle 101 flower \
+> +               $tcflags enc_src_ip 192.0.2.1 enc_dst_ip 192.0.2.2 \
+> +               enc_key_id 1001 erspan_opts 1:6789:0:0 \
+> +               action drop
+> +       # ERSPAN Type III [decap direction]
+> +       tc filter add dev ep-ex ingress protocol ip  handle 102 flower \
+> +               $tcflags enc_src_ip 192.0.2.1 enc_dst_ip 192.0.2.2 \
+> +               enc_key_id 1002 erspan_opts 2:0:1:63 action drop
+> +
+> +       ep1mac=3D$(mac_get erspan1)
+> +       $MZ erspan1 -c 1 -p 64 -a $ep1mac -b $h2mac -t ip -q
+> +       tc_check_packets "dev ep-ex ingress" 101 1
+> +       check_err $? "ERSPAN Type II"
+> +
+> +       ep2mac=3D$(mac_get erspan2)
+> +       $MZ erspan2 -c 1 -p 64 -a $ep1mac -b $h2mac -t ip -q
+> +       tc_check_packets "dev ep-ex ingress" 102 1
+> +       check_err $? "ERSPAN Type III"
+> +
+> +       # h2 erspan cleanup
+> +       tc qdisc del dev ep-ex clsact
+> +       tunnel_destroy ep-ex
+> +       # h1 erspan cleanup
+> +       tunnel_destroy erspan2 # ERSPAN Type III
+> +       tunnel_destroy erspan1 # ERSPAN Type II
+> +
+> +       log_test "erspan_opts match ($tcflags)"
+> +}
+> +
+>  setup_prepare()
+>  {
+>         h1=3D${NETIFS[p1]}
+> --
+> 2.50.1
+>
+Reviewed-by: Xin Long <lucien.xin@gmail.com>
 
-pci_irq.c: In function ‘mlx5_irq_request_vector’:
-pci_irq.c:561:1: warning: the frame size of 1040 bytes is larger than 1024 bytes [-Wframe-larger-than=]
+It would be great to also add test cases for matching VXLAN and
+GENEVE options in tc flower in the future.
 
-eq.c: In function ‘comp_irq_request_sf’:
-eq.c:897:1: warning: the frame size of 1080 bytes is larger than 1024 bytes [-Wframe-larger-than=]
-
-irq_affinity.c: In function ‘irq_pool_request_irq’:
-irq_affinity.c:74:1: warning: the frame size of 1048 bytes is larger than 1024 bytes [-Wframe-larger-than=]
-"
-
-These warnings indicate that the stack frame size exceeds 1024 bytes in
-these functions.
-
-To resolve this, instead of allocating large memory buffers on the stack,
-it is better to use kvzalloc to allocate memory dynamically on the heap.
-This approach reduces stack usage and eliminates these frame size warnings.
-
-Signed-off-by: Zhu Yanjun <yanjun.zhu@linux.dev>
----
-v2 -> v3: No changes, just send out target net-next;
-v1 -> v2: Add kvfree to error handler;
-
-1. This commit only build tests;
-2. All the changes are on configuration path, will not make difference
-on the performance;
-3. This commit is just to fix build warnings, not error or bug fixes. So
-not Fixes tag.
----
- drivers/net/ethernet/mellanox/mlx5/core/eq.c  | 24 +++++++----
- .../mellanox/mlx5/core/irq_affinity.c         | 19 +++++++--
- .../net/ethernet/mellanox/mlx5/core/pci_irq.c | 40 +++++++++++++------
- 3 files changed, 60 insertions(+), 23 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-index dfb079e59d85..4938dd7c3a09 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-@@ -873,19 +873,29 @@ static int comp_irq_request_sf(struct mlx5_core_dev *dev, u16 vecidx)
- {
- 	struct mlx5_irq_pool *pool = mlx5_irq_table_get_comp_irq_pool(dev);
- 	struct mlx5_eq_table *table = dev->priv.eq_table;
--	struct irq_affinity_desc af_desc = {};
-+	struct irq_affinity_desc *af_desc;
- 	struct mlx5_irq *irq;
- 
-+	af_desc = kvzalloc(sizeof(*af_desc), GFP_KERNEL);
-+	if (!af_desc)
-+		return -ENOMEM;
-+
- 	/* In case SF irq pool does not exist, fallback to the PF irqs*/
--	if (!mlx5_irq_pool_is_sf_pool(pool))
-+	if (!mlx5_irq_pool_is_sf_pool(pool)) {
-+		kvfree(af_desc);
- 		return comp_irq_request_pci(dev, vecidx);
-+	}
- 
--	af_desc.is_managed = false;
--	cpumask_copy(&af_desc.mask, cpu_online_mask);
--	cpumask_andnot(&af_desc.mask, &af_desc.mask, &table->used_cpus);
--	irq = mlx5_irq_affinity_request(dev, pool, &af_desc);
--	if (IS_ERR(irq))
-+	af_desc->is_managed = false;
-+	cpumask_copy(&af_desc->mask, cpu_online_mask);
-+	cpumask_andnot(&af_desc->mask, &af_desc->mask, &table->used_cpus);
-+	irq = mlx5_irq_affinity_request(dev, pool, af_desc);
-+	if (IS_ERR(irq)) {
-+		kvfree(af_desc);
- 		return PTR_ERR(irq);
-+	}
-+
-+	kvfree(af_desc);
- 
- 	cpumask_or(&table->used_cpus, &table->used_cpus, mlx5_irq_get_affinity_mask(irq));
- 	mlx5_core_dbg(pool->dev, "IRQ %u mapped to cpu %*pbl, %u EQs on this irq\n",
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
-index 2691d88cdee1..82d3c2568244 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
-@@ -47,29 +47,40 @@ static int cpu_get_least_loaded(struct mlx5_irq_pool *pool,
- static struct mlx5_irq *
- irq_pool_request_irq(struct mlx5_irq_pool *pool, struct irq_affinity_desc *af_desc)
- {
--	struct irq_affinity_desc auto_desc = {};
-+	struct irq_affinity_desc *auto_desc;
- 	struct mlx5_irq *irq;
- 	u32 irq_index;
- 	int err;
- 
-+	auto_desc = kvzalloc(sizeof(*auto_desc), GFP_KERNEL);
-+	if (!auto_desc)
-+		return ERR_PTR(-ENOMEM);
-+
- 	err = xa_alloc(&pool->irqs, &irq_index, NULL, pool->xa_num_irqs, GFP_KERNEL);
--	if (err)
-+	if (err) {
-+		kvfree(auto_desc);
- 		return ERR_PTR(err);
-+	}
-+
- 	if (pool->irqs_per_cpu) {
- 		if (cpumask_weight(&af_desc->mask) > 1)
- 			/* if req_mask contain more then one CPU, set the least loadad CPU
- 			 * of req_mask
- 			 */
- 			cpumask_set_cpu(cpu_get_least_loaded(pool, &af_desc->mask),
--					&auto_desc.mask);
-+					&auto_desc->mask);
- 		else
- 			cpu_get(pool, cpumask_first(&af_desc->mask));
- 	}
-+
- 	irq = mlx5_irq_alloc(pool, irq_index,
--			     cpumask_empty(&auto_desc.mask) ? af_desc : &auto_desc,
-+			     cpumask_empty(&auto_desc->mask) ? af_desc : auto_desc,
- 			     NULL);
- 	if (IS_ERR(irq))
- 		xa_erase(&pool->irqs, irq_index);
-+
-+	kvfree(auto_desc);
-+
- 	return irq;
- }
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
-index 40024cfa3099..48aad94b0a5d 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
-@@ -470,26 +470,32 @@ void mlx5_ctrl_irq_release(struct mlx5_core_dev *dev, struct mlx5_irq *ctrl_irq)
- struct mlx5_irq *mlx5_ctrl_irq_request(struct mlx5_core_dev *dev)
- {
- 	struct mlx5_irq_pool *pool = ctrl_irq_pool_get(dev);
--	struct irq_affinity_desc af_desc;
-+	struct irq_affinity_desc *af_desc;
- 	struct mlx5_irq *irq;
- 
--	cpumask_copy(&af_desc.mask, cpu_online_mask);
--	af_desc.is_managed = false;
-+	af_desc = kvzalloc(sizeof(*af_desc), GFP_KERNEL);
-+	if (!af_desc)
-+		return ERR_PTR(-ENOMEM);
-+
-+	cpumask_copy(&af_desc->mask, cpu_online_mask);
-+	af_desc->is_managed = false;
- 	if (!mlx5_irq_pool_is_sf_pool(pool)) {
- 		/* In case we are allocating a control IRQ from a pci device's pool.
- 		 * This can happen also for a SF if the SFs pool is empty.
- 		 */
- 		if (!pool->xa_num_irqs.max) {
--			cpumask_clear(&af_desc.mask);
-+			cpumask_clear(&af_desc->mask);
- 			/* In case we only have a single IRQ for PF/VF */
--			cpumask_set_cpu(cpumask_first(cpu_online_mask), &af_desc.mask);
-+			cpumask_set_cpu(cpumask_first(cpu_online_mask), &af_desc->mask);
- 		}
- 		/* Allocate the IRQ in index 0. The vector was already allocated */
--		irq = irq_pool_request_vector(pool, 0, &af_desc, NULL);
-+		irq = irq_pool_request_vector(pool, 0, af_desc, NULL);
- 	} else {
--		irq = mlx5_irq_affinity_request(dev, pool, &af_desc);
-+		irq = mlx5_irq_affinity_request(dev, pool, af_desc);
- 	}
- 
-+	kvfree(af_desc);
-+
- 	return irq;
- }
- 
-@@ -548,16 +554,26 @@ struct mlx5_irq *mlx5_irq_request_vector(struct mlx5_core_dev *dev, u16 cpu,
- {
- 	struct mlx5_irq_table *table = mlx5_irq_table_get(dev);
- 	struct mlx5_irq_pool *pool = table->pcif_pool;
--	struct irq_affinity_desc af_desc;
-+	struct irq_affinity_desc *af_desc;
- 	int offset = MLX5_IRQ_VEC_COMP_BASE;
-+	struct mlx5_irq *irq;
-+
-+	af_desc = kvzalloc(sizeof(*af_desc), GFP_KERNEL);
-+	if (!af_desc)
-+		return ERR_PTR(-ENOMEM);
- 
- 	if (!pool->xa_num_irqs.max)
- 		offset = 0;
- 
--	af_desc.is_managed = false;
--	cpumask_clear(&af_desc.mask);
--	cpumask_set_cpu(cpu, &af_desc.mask);
--	return mlx5_irq_request(dev, vecidx + offset, &af_desc, rmap);
-+	af_desc->is_managed = false;
-+	cpumask_clear(&af_desc->mask);
-+	cpumask_set_cpu(cpu, &af_desc->mask);
-+
-+	irq = mlx5_irq_request(dev, vecidx + offset, af_desc, rmap);
-+
-+	kvfree(af_desc);
-+
-+	return irq;
- }
- 
- static struct mlx5_irq_pool *
--- 
-2.49.0
-
+Thanks.
 
