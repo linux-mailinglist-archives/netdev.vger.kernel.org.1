@@ -1,164 +1,216 @@
-Return-Path: <netdev+bounces-208456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD148B0B7EF
-	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 21:30:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0FCAB0B84E
+	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 23:12:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32C863BA488
-	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 19:29:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 85B42188FFC9
+	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 21:12:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3321221720;
-	Sun, 20 Jul 2025 19:30:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3754122069A;
+	Sun, 20 Jul 2025 21:12:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="XQxvSgoj"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gPINocQd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 302EB221F1C
-	for <netdev@vger.kernel.org>; Sun, 20 Jul 2025 19:30:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83952382;
+	Sun, 20 Jul 2025 21:11:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753039820; cv=none; b=YgcfGF/6B24yrsEk+kS0C6JdfIvvS4LmgnxakCHfnZRrBorOctNV2rGPFMYMf6r+pbXjmAp4rhSsoKLCUodHCU51ipNS511a+qcjm8DdoZHeJasUHRtpTA4LYfwKOp41mNwVwGeYP74i554oxpF/HG6ZPHgnljg3v7QgHIyOVX0=
+	t=1753045920; cv=none; b=BvZjE5JKCO6EOup5JvviHBmQS6OSyFmYX6SuQ37UfRVJ9T95W1Sf52WrmKVNAF+n7RkPdQTiQXdItJ1HNE8tLdyGFYV2C0d0q4WqqaijQ54IoueVvjH0vj6i/WWXcSLo2WWeePm3n3MvICFUiVItm8L53uC9X62hTAaRjasMJxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753039820; c=relaxed/simple;
-	bh=ghqmh3TE//hyt6GyPI3uOU0dAX4yL2Qg3jl94n9vAgM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ivywxQfRJJ9L2nB52kaUoSEoKOk/dDM3orE1kOwhfomxm7IXOVrXcaDPSlWS3HCmtUv7G4nf64U3CNSep/X8arj7kF6R9i5jNJhnRyaqmshBuflL5PAcK/OVHwmcacs6o5j6pnd+32Khg++EitbH8RQ+dhjmY6z+ML6g2POLOmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=XQxvSgoj; arc=none smtp.client-ip=209.85.161.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-615a4b504b2so754599eaf.1
-        for <netdev@vger.kernel.org>; Sun, 20 Jul 2025 12:30:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1753039817; x=1753644617; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mgCpQGFdNKfFxGlOj3n44UsvhM4SmScTq7fqsGjnsnI=;
-        b=XQxvSgojdrlJ21QWdBTOuapCEdefjUdjFVmdcooUGxYYoVvl+jd5P1/Gh9cUw1F76A
-         T0VgutCbLTiCFHY9EXtJA6Qfyz8MIZ+uJGf8OyMVFhz25wWATipL3LFwww4WLersOdIL
-         k6PhbyusX6enIWkJnngy9c6lJATV+Nz656vrWDrJQKe6FICsMtZ+F+T04HNqIoMCmGvv
-         yTkH4q//MrXAZhl1fxHo/g+Rl9xuHVqUfx4E1kP8qN9iukC21kg0+bHt2zBIsdSnB3uh
-         yI9qEmE9AII3rSaeukC/mot907rJA6jM47MvwTmwh14pZW7GcMt5sfHS/03R3UpzI7lx
-         FgOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753039817; x=1753644617;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mgCpQGFdNKfFxGlOj3n44UsvhM4SmScTq7fqsGjnsnI=;
-        b=SBacdLSwVNoRZhqhnoDqbnHAFamWtUIvJ7xf/S40xEcP90NgV+272Lb2J3rALpMxXH
-         PqNSUwFZdYY8HbsklX2VXvpULbNPly/qUsKHudZ4dRqgxckeFbnQqQnLreJqgzi3U9ll
-         z5gZHoXJuJgxwW/Vuvw2lI5OBG8Hq+gWtODgr0Z4FLQaDg0lOSfD9SGrW/tXSCFikerF
-         XA7MkvMP6i/iOPPIuW3AE9ddnNQv3rRL8yM8jha3pGkjBX7z6pk0B82eGxYA78j1rV/M
-         OeaGxU0EngmQpetx84CiPhPdAsRIA59tJDxyCD3/p5oeurdJ8s9GFC3PyYV7Q2aSakUT
-         +eoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWYJFwwI0HKyf4xO0VYqRqRzG212Lx1JKg2NjyvRP2hXXQ1OqZDJWh40GVr/XenKLqAmmQYxLI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUZkFSLhGOY8eka6WyGjDa5mgj3J0Q+jqV8EvfsOKIfaj9VIoC
-	z3sVYDRki9xBG6kw+S7ZzG0H6pqJr7gsbNUVljxIIbHkl2LI/fU4Sts3y0H9tSbeI0k=
-X-Gm-Gg: ASbGnctkefpZjod6u/zn6OaOzCyymWLcZY5/MgfBoMjeuAMSHUnNytZGZRwoQKWkDDU
-	rssWSFThawDoTUMzWXxhH17afqP/Aum+uSgp7Oh30PY7ROBXM9emUua8YU3f9N1IuOjBpiHxzBb
-	ZdDVoQccQbA5P0hAk4/1kmWFJsYbQTIgflmYpPc5Gv45vMPl96g29Q5RvmKhrC6SN+zXP4cI157
-	pD55rdQ+/yotPd21awhfD41bs+zHK+vEK83HQ5WLLsCPRpZb0hoogj2d4GLZgHPCuCLuRrx9aAk
-	9GrcY0LUPchueYfRQbYSOn3dntlmTa0dM4Z9Ewt/egWSrpX1yd962fsHTD/xk7BDxMJRLU9Jx95
-	6VegmlTijBEyPlDc+D2mqEFdFvAwZ9AZWxxvUdrT44+dxYEmtegZwIaxgRd7l3FYdlOFNCUIbJF
-	c=
-X-Google-Smtp-Source: AGHT+IHYlwxJWcEbEzE218c+xTVkYKK8Z8wtqJxL+cWGCmY4FshNpm6DDdkY0i7NRft8/tk1CqodKQ==
-X-Received: by 2002:a05:6830:2aac:b0:727:423c:95d5 with SMTP id 46e09a7af769-73e66114315mr14839191a34.3.1753039816972;
-        Sun, 20 Jul 2025 12:30:16 -0700 (PDT)
-Received: from ?IPV6:2600:8803:e7e4:1d00:6b9c:951d:3d17:9e9d? ([2600:8803:e7e4:1d00:6b9c:951d:3d17:9e9d])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-73e83be07c4sm2291733a34.61.2025.07.20.12.30.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 20 Jul 2025 12:30:16 -0700 (PDT)
-Message-ID: <84ad0f66-311e-4560-870d-851852c6f902@baylibre.com>
-Date: Sun, 20 Jul 2025 14:30:15 -0500
+	s=arc-20240116; t=1753045920; c=relaxed/simple;
+	bh=+RYJ0uwX/zw8nqvpp0fJDSFLWYQQ70j0FHtcEbEAAQQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=anhYmkl/BGqnhV/i16i8ocNcbmQ7a+H9z/DdJ66TT+BwOvKWqPPxsYCFLL0ePRSioJ0Ro04LyijZKK1QGRatdl4VaXP8myXTcyrWGKPh6jpk3MMWXL4S6ypFz7rDvOBxCj/zIC15K8e82oUcZKidVpB6QiTzwtr15gIPAbt29Z8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gPINocQd; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56KJbbx8010184;
+	Sun, 20 Jul 2025 21:11:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=P3zOlRzIaZNMSPHi9ly3Guwl7F068VzL0s3I/dzFF
+	Dc=; b=gPINocQdX6mad3SLpCo4UVyli5u6ZL9RBcZPe1j7JLK1jG2hNzbXQ9mGC
+	9GSi2VPBPE9jDsep/sdGGcIUqbzxsZ+v7auGq2wwRw/mWB8OGrEO9G/VL6xMuKVL
+	ec3dyhUpjTGUu5fa1zQpQCpH7CxIzc+1ANuZcQusvttM7kpKBJMDkCgHShgiDyVB
+	d6kCpU+vz2oXzKAxA2r0ZOiDcz3nNyC7kyS+kwe4878UQL//IJC0uec87atxnAhm
+	qtYnWokt1/EUlP3iQxhymLkssC0Rk+VTpYHijFA2ysVrOOicfQxolGjxbLhMeNWQ
+	7cjSTvzZKTu7npozzMqSBlRceDVbw==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4805hfnjkt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 20 Jul 2025 21:11:49 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 56KLBmmj012353;
+	Sun, 20 Jul 2025 21:11:48 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4805hfnjkr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 20 Jul 2025 21:11:48 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56KGQNrv025138;
+	Sun, 20 Jul 2025 21:11:47 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 480nptbeta-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 20 Jul 2025 21:11:47 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56KLBf6D34472334
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 20 Jul 2025 21:11:41 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0954C20043;
+	Sun, 20 Jul 2025 21:11:41 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BB74F20040;
+	Sun, 20 Jul 2025 21:11:40 +0000 (GMT)
+Received: from tuxmaker.lnxne.boe (unknown [9.152.85.9])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Sun, 20 Jul 2025 21:11:40 +0000 (GMT)
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Alexandra Winter <wintera@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        Ursula Braun <ubraun@linux.ibm.com>, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Halil Pasic <pasic@linux.ibm.com>,
+        Aliaksei Makarau <Aliaksei.Makarau@ibm.com>,
+        Mahanta Jambigi <mjambigi@linux.ibm.com>
+Subject: [PATCH 1/1] s390/ism: fix concurrency management in ism_cmd()
+Date: Sun, 20 Jul 2025 23:11:09 +0200
+Message-ID: <20250720211110.1962169-1-pasic@linux.ibm.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re:
-To: ">" <sanjaysuthar661996@gmail.com>, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org, linux-iio@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-amlogic@lists.infradead.org
-Cc: ribalda@kernel.org, jic23@kernel.org, nuno.sa@analog.com,
- andy@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, neil.armstrong@linaro.org,
- khilman@baylibre.com, jbrunet@baylibre.com,
- martin.blumenstingl@googlemail.com
-References: <CADU64hCr7mshqfBRE2Wp8zf4BHBdJoLLH=VJt2MrHeR+zHOV4w@mail.gmail.com>
- <20250720182627.39384-1-sanjaysuthar661996@gmail.com>
-Content-Language: en-US
-From: David Lechner <dlechner@baylibre.com>
-In-Reply-To: <20250720182627.39384-1-sanjaysuthar661996@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzIwMDIwMyBTYWx0ZWRfX6s5dvxnjZSqi
+ +MkDIPLKEK0Wn5nxJxuVPXQyS/QtN4dCbc4ZmFezxHfm3FBVOhPc+slASebCGykmIeoMS6L+d88
+ /yVLQURwu463r0GvFL6LGNjyxrNhs2lhQ/WsCsrUtdVNB9cidIt8Fg7dLrwWjrawo/hjFTrR5l/
+ c3OYCVvtRFSw/YQy1/MISDOYQ3RlErzzCD9c5hqUSQrUMqqijo3chYo6jvyRTRlT7lfNKLISyWv
+ 3IRO5ezD/8hYG/qqfyjoysIvgVd1rEig39RxjyS5O5noP90W2U3eonOyf05PZuwD9xoyZV0de9n
+ ZKGrhZF12V7v98ySuBPEWAcspm42zW/wWq4Fi2ZVfNRgPkuusrZOesrqrzBhPm64kgOmEmAGxPy
+ fwH2Io8YoN+nI75n8x5onFwTcpbhGJlX7zPbmdnQXqPCvP2UvjAl1GkvpDw8ASJD0sxvHOVQ
+X-Proofpoint-GUID: NmpMoyYLtCPmimDwCl2_27Nx-io7ZIRY
+X-Proofpoint-ORIG-GUID: L4y0NCyNFhSvVCMg5pD5FXsPwnD-N3Z7
+X-Authority-Analysis: v=2.4 cv=X9RSKHTe c=1 sm=1 tr=0 ts=687d5b95 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=Wb1JkmetP80A:10 a=VnNF1IyMAAAA:8 a=qzj1OK7t_Lbxma-giU4A:9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-20_01,2025-07-17_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 priorityscore=1501 adultscore=0 lowpriorityscore=0
+ phishscore=0 malwarescore=0 clxscore=1015 mlxscore=0 spamscore=0
+ suspectscore=0 mlxlogscore=999 bulkscore=0 classifier=spam authscore=0
+ authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2505280000 definitions=main-2507200203
 
-On 7/20/25 1:26 PM, > wrote:
-> Changes in v2:
-> - Fixed commit message grammar
-> - Fixed subject line style as per DT convention
-> - Added missing reviewers/maintainers in CC
-> 
+The s390x ISM device data sheet clearly states that only one
+request-response sequence is allowable per ISM function at any point in
+time.  Unfortunately as of today the s390/ism driver in Linux does not
+honor that requirement. This patch aims to rectify that.
 
-By placing this before the headers, our email clients think this
-message doesn't have a subject. It should go after the ---.
+This problem was discovered based on Aliaksei's bug report which states
+that for certain workloads the ISM functions end up entering error state
+(with PEC 2 as seen from the logs) after a while and as a consequence
+connections handled by the respective function break, and for future
+connection requests the ISM device is not considered -- given it is in a
+dysfunctional state. During further debugging PEC 31 was observed as
+well.
 
-> From 5c00524cbb47e30ee04223fe9502af2eb003ddf1 Mon Sep 17 00:00:00 2001
-> From: sanjay suthar <sanjaysuthar661996@gmail.com>
-> Date: Sun, 20 Jul 2025 01:11:00 +0530
-> Subject: [PATCH v2] dt-bindings: cleanup: fix duplicated 'is is' in YAML docs
-> 
-> Fix minor grammatical issues by removing duplicated "is" in two devicetree
-> binding documents:
-> 
-> - net/amlogic,meson-dwmac.yaml
-> - iio/dac/ti,dac7612.yaml
-> 
-> Signed-off-by: sanjay suthar <sanjaysuthar661996@gmail.com>
-> ---
+The kernel message
+zpci: XXXX:00:00.0: Event 0x2 reports an error for PCI function XXXX
+is a reliable indicator of the stated function entering error state
+with PEC 2. Let me also point out that the kernel message
+zpci: XXXX:00:00.0: The ism driver bound to the device does not support error recovery
+is a reliable indicator that the ISM function won't be auto-recovered
+because the ISM driver currently lacks support for it.
 
-This is where the changelog belongs.
+On a technical level, without this synchronization, commands (inputs to
+the FW) may be partially or fully overwritten (corrupted) by another CPU
+trying to issue commands on the same function. There is hard evidence that
+this can lead to DMB token values being used as DMB IOVAs, leading to
+PEC 2 PCI events indicating invalid DMA. But this is only one of the
+failure modes imaginable. In theory even completely losing one command
+and executing another one twice and then trying to interpret the outputs
+as if the command we intended to execute was actually executed and not
+the other one is also possible.  Frankly I don't feel confident about
+providing an exhaustive list of possible consequences.
 
->  Documentation/devicetree/bindings/iio/dac/ti,dac7612.yaml      | 2 +-
->  Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/iio/dac/ti,dac7612.yaml b/Documentation/devicetree/bindings/iio/dac/ti,dac7612.yaml
-> index 20dd1370660d..624c640be4c8 100644
-> --- a/Documentation/devicetree/bindings/iio/dac/ti,dac7612.yaml
-> +++ b/Documentation/devicetree/bindings/iio/dac/ti,dac7612.yaml
-> @@ -9,7 +9,7 @@ title: Texas Instruments DAC7612 family of DACs
->  description:
->    The DAC7612 is a dual, 12-bit digital-to-analog converter (DAC) with
->    guaranteed 12-bit monotonicity performance over the industrial temperature
-> -  range. Is is programmable through an SPI interface.
-> +  range. It is programmable through an SPI interface.
->  
->  maintainers:
->    - Ricardo Ribalda Delgado <ricardo@ribalda.com>
-> diff --git a/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml b/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml
-> index 0cd78d71768c..5c91716d1f21 100644
-> --- a/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml
-> @@ -149,7 +149,7 @@ properties:
->        - description:
->            The first register range should be the one of the DWMAC controller
->        - description:
-> -          The second range is is for the Amlogic specific configuration
-> +          The second range is for the Amlogic specific configuration
->            (for example the PRG_ETHERNET register range on Meson8b and newer)
->  
->    interrupts:
+Fixes: 684b89bc39ce ("s390/ism: add device driver for internal shared memory")
+Reported-by: Aliaksei Makarau <Aliaksei.Makarau@ibm.com>
+Tested-by: Mahanta Jambigi <mjambigi@linux.ibm.com>
+Tested-by: Aliaksei Makarau <Aliaksei.Makarau@ibm.com>
+Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+---
+ drivers/s390/net/ism_drv.c | 4 ++++
+ include/linux/ism.h        | 1 +
+ 2 files changed, 5 insertions(+)
 
-I would be tempted to split this into two patches. It's a bit odd to have
-a single patch touching two unrelated bindings.
+diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
+index b7f15f303ea2..c3b79e22044c 100644
+--- a/drivers/s390/net/ism_drv.c
++++ b/drivers/s390/net/ism_drv.c
+@@ -129,7 +129,9 @@ static int ism_cmd(struct ism_dev *ism, void *cmd)
+ {
+ 	struct ism_req_hdr *req = cmd;
+ 	struct ism_resp_hdr *resp = cmd;
++	unsigned long flags;
+ 
++	spin_lock_irqsave(&ism->cmd_lock, flags);
+ 	__ism_write_cmd(ism, req + 1, sizeof(*req), req->len - sizeof(*req));
+ 	__ism_write_cmd(ism, req, 0, sizeof(*req));
+ 
+@@ -143,6 +145,7 @@ static int ism_cmd(struct ism_dev *ism, void *cmd)
+ 	}
+ 	__ism_read_cmd(ism, resp + 1, sizeof(*resp), resp->len - sizeof(*resp));
+ out:
++	spin_unlock_irqrestore(&ism->cmd_lock, flags);
+ 	return resp->ret;
+ }
+ 
+@@ -606,6 +609,7 @@ static int ism_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 		return -ENOMEM;
+ 
+ 	spin_lock_init(&ism->lock);
++	spin_lock_init(&ism->cmd_lock);
+ 	dev_set_drvdata(&pdev->dev, ism);
+ 	ism->pdev = pdev;
+ 	ism->dev.parent = &pdev->dev;
+diff --git a/include/linux/ism.h b/include/linux/ism.h
+index 5428edd90982..8358b4cd7ba6 100644
+--- a/include/linux/ism.h
++++ b/include/linux/ism.h
+@@ -28,6 +28,7 @@ struct ism_dmb {
+ 
+ struct ism_dev {
+ 	spinlock_t lock; /* protects the ism device */
++	spinlock_t cmd_lock; /* serializes cmds */
+ 	struct list_head list;
+ 	struct pci_dev *pdev;
+ 
+
+base-commit: 07fa9cad54609df3eea00cd5b167df6088ce01a6
+-- 
+2.48.1
+
 
