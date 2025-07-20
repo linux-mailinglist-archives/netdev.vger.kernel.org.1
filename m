@@ -1,102 +1,127 @@
-Return-Path: <netdev+bounces-208392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64057B0B474
-	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 11:04:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99552B0B47A
+	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 11:11:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D38503BA147
-	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 09:04:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4AC75189B380
+	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 09:11:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 703671E3772;
-	Sun, 20 Jul 2025 09:04:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD5921DFDAB;
+	Sun, 20 Jul 2025 09:11:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ED+vLG6Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCF5D17741
-	for <netdev@vger.kernel.org>; Sun, 20 Jul 2025 09:04:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FDDA1EA65;
+	Sun, 20 Jul 2025 09:11:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753002272; cv=none; b=uITRCyZ7HmkpoY4MYb46m6pOANswODlqFJiKPioPL+KGOoV7gcqmwfLgCPIxRW8wLwvhENdwhEHfQZkJkdgeoNWe2Rt8keLv+Ddm0JQ8R/y/fy/6jkVujescs4vY150cL6Xw9WfJlhVv2r8S5ffUaNYiF6SlgxJO354Ubm2ACts=
+	t=1753002693; cv=none; b=lOYa9n0RD8HO2/mdRveyBKsiZOupxZ/R0YmhoExL2jC9Hntpz8Nl2eFnZ3OSNSfj0NXOZ8qdyPrH5FP8AIaWtNRCChwr/Z+e5aS7J/1QDoMz4OmFBiH5+do2tg/+O0H3gio09t5cFxq7KUU/9VPMmQAPGUbq6G3h44UliQ/SIQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753002272; c=relaxed/simple;
-	bh=oSQNqavC00MRshvUBI+GKy0AQT9Ig5DxZU/9NteZ0TA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Nv7QoZAMkmZNgBw+hlpAO/087lTa8FYaaYxoxBNgsB/X3YzzUw9hIIXU8Zi8GNwFXlgM8CSu2/VhWflxrjQyk67eXEUTga9eclV1fZlnZT5affPs4DAl8Ojstwv4zino1o9Dn8ZerHNed75H4tP8DxkO7Wd2K7ybyvsFb67qSHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3e29c2eba6fso21169255ab.0
-        for <netdev@vger.kernel.org>; Sun, 20 Jul 2025 02:04:30 -0700 (PDT)
+	s=arc-20240116; t=1753002693; c=relaxed/simple;
+	bh=wie3zAjgVALuc7NjlqJG/3+QLcMwoX5yvQ3EwfDjXTE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=erOq5Mz1PBsOFzns8XIAUnl43B7dqGFYLx/MuuE+loPjs42jrIhKUsWX8ICJFwt1RKXXHEKBc0Voth/xbtWFdzIJBuqdJfm+NtImkg/0RRJQj8cxCnzscl7ok0VONOoXQPQJtO+0brQpP6F94MhV8vJQCwF9y8TRbdi/5APMD6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ED+vLG6Q; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-74ce477af25so2178182b3a.3;
+        Sun, 20 Jul 2025 02:11:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753002691; x=1753607491; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=iWrXKbM+G34xoKVnK1eplahDGaVhKpTnihCDqzU7Q9c=;
+        b=ED+vLG6QCmNV/JiC5zDP998zetskJwaW8IczlFr6IAVEzt96pAybV9UTRUNC95Z0pM
+         7aXjTF2izbf8FCAF06C7EA7J8p0afLV6LwAFOveVeRO/G4EK7odOiEBfwyOB4KfCGpK4
+         mhfI7GTcTyflc1tTY3S6ityTnrCooSZsde0jl3swBzpAv9IDTLykMK+7nMPSNrfOBB02
+         AQiq+l/q9HcA9ehQ4GrdvucjRhGhc+v+fWC00ddwTK+7DytCRhZu4HLamsGUzr7F3TE0
+         3qiZpgxqv1BO/Q1ThXrR2NiM+U2yhzaJVI0vQKE+5zeFDPw6qN89h87bmommh3E9MKOT
+         IGEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753002270; x=1753607070;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DCYVbM74Z35SaOYrZa8wTkxPos+S0J6bbFwSjep4ia8=;
-        b=tKEnOWc8cp2y5bcRwKqhvPT7BHFTIsdcrVTduCy5YzECUp6qVjK9J3MLYUZ54FvViI
-         AUTknvDXeMhlqLE00d4b1BXN+9rAJ5PMa8+xI+Ma/+wD+4u8TFWsZ8xYfyvh0sXbtjWu
-         z2n5+1vKeEWtOC4JPLz5mEgfzC+vc9QIHN8g0TD9+97KY9muNtu/HOoQRyAkRISpXK0q
-         rEydmv3dVsjH89+kdftB607VoazP1ZaM52ZowX8F4K+RRIXwRuC9thimmv8UAbVLbJ8S
-         WJ4d7yAOsO/CPG/f0D511u22OZon/Fl5/h1OPWyUqRWQMRrWCrNV2ZeT2zuVI4ei5D5C
-         QuOg==
-X-Forwarded-Encrypted: i=1; AJvYcCWZ5EDvPe/0B5vjjDA6D9yfKSGcx5t592sG90IWxu0HToUTQ/V/68IglNvlKJVsUzjFxAv0eOk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxR2NwTbADdkaagUtXQjq1hZCaJxs3whdXzgoeh34iezFB3w0f+
-	g7rM4nS3ZvNwWw9RKhBYe3Kk4rPDAroohH245vikrUsDrhZTlVcNht63ec9ANeMObfZQHOebUwF
-	IcujSk+r0hu+OuSrmTyEt6Uij/3Y8JWyqRG6zrh1z+tZ5zP097XTghVHSMwQ=
-X-Google-Smtp-Source: AGHT+IHeCaV+O9MUs6hHmTbSG11DDfmrBFqvwQ1fWkTRjVJE36pej0SyGDBncV8Gb4kGukriCBJBaUkSwFb+PADLILruSjMPmfQX
+        d=1e100.net; s=20230601; t=1753002691; x=1753607491;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iWrXKbM+G34xoKVnK1eplahDGaVhKpTnihCDqzU7Q9c=;
+        b=famTTb8akimh3OFKBPzFZ/lytU0+7d9SFHx+7Ne7FAUOjSpyC+QHm8K1UjfTKgCZad
+         6DBJLGH2WKxSB5VAJX4PIL0QrLASsUg08bxrtf3kWMAb7f0blraTipBybYq5cjMGZe9e
+         mXQoo3SbHlpWapK5Z50MeuNmpA/TnYCHMp1kmVfwcKo7DdK7qdGRf98DVYb2PfRvQdFg
+         WcJ4sF+QEATzAXqhsPJVN6VdRmtCwxx12R3R5vHh0pn02j1RVm8xi/SwlVJl0z12AyC3
+         F/MjjOsT3fryrWj1lAdFXYpWzIEcL6j7dornI8RwwN3TzYXV9uxY73K1UNER5HVAPbOn
+         LCDg==
+X-Forwarded-Encrypted: i=1; AJvYcCV3qsFf5nwpulfMewRA81a1pG4RZTQe72ZA3gRPRzIZthl0WvdK6nLmoAr7rpoKQe+uFVYS8fU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YythS9J69SCoBsLBAB1rv0BydVoMQu7oXH/XRVDXF/uF416DAHo
+	9tOdYvtvwLj/JDdt/1kgSXPEwK2hDH9Kr4VdPcO+7Ejnp2AYODUmwVhx
+X-Gm-Gg: ASbGncs8m0XYqugiY9PJmVCPFgl3/E9RUscPFWK/kM75Mn2P95D7oYjbCJgHFGlDZTz
+	H5e+1IP8Yf6WU/uzpQMzpcKYrLtdCHheMqn/qbsq+CqeblmRAAF77ao07/gJ4xIitvIHyr+QLo8
+	8pQCUCd+2ysemX3alWkBK8qriJXMM3Do9D3XykWAPQkj9iZuW9fba/uJSYIlzFEhM9PzdnEIoGx
+	5ZpHm07jDBaQAfmvQmo127/3QlT7ZcM5wdWHExCG2cnlIgnC+sdwJ/+NoFU0CVu2UhFT8tGhAyv
+	7JNDVVdTcGcAl9KqdTBn9Q/v491aFT8awUcOuyYyLxwOXiqqg6ucZAAco23KD7sfvwSszXZW3Ks
+	zOsdrq8BjANBVCc4fBAAUnTw9HDmB+Spu8ToHyaFb7CY82CwyfL+fecQOUc0=
+X-Google-Smtp-Source: AGHT+IFxnWK1x+9KvMP+PbmzAvTkrGWlhYtcdtm8EXw47+H9FngwkBEW6Wbvc53qUZM+VZOp33M0dw==
+X-Received: by 2002:a05:6a20:9389:b0:234:3932:2958 with SMTP id adf61e73a8af0-2381245729dmr24494413637.20.1753002691445;
+        Sun, 20 Jul 2025 02:11:31 -0700 (PDT)
+Received: from KERNELXING-MC1.tencent.com ([111.201.24.59])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-759cb76d53fsm3902585b3a.105.2025.07.20.02.11.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 20 Jul 2025 02:11:31 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	bjorn@kernel.org,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	jonathan.lemon@gmail.com,
+	sdf@fomichev.me,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com
+Cc: bpf@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next 0/5] ixgbe: xsk: a couple of changes for zerocopy
+Date: Sun, 20 Jul 2025 17:11:18 +0800
+Message-Id: <20250720091123.474-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:cdaf:0:b0:3e2:956a:3a64 with SMTP id
- e9e14a558f8ab-3e2956a3c83mr105114065ab.18.1753002270059; Sun, 20 Jul 2025
- 02:04:30 -0700 (PDT)
-Date: Sun, 20 Jul 2025 02:04:30 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <687cb11e.a70a0220.693ce.00b7.GAE@google.com>
-Subject: [syzbot] Monthly netfilter report (Jul 2025)
-From: syzbot <syzbot+lista2316b751ebb20114d19@syzkaller.appspotmail.com>
-To: kadlec@netfilter.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, pablo@netfilter.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello netfilter maintainers/developers,
+From: Jason Xing <kernelxing@tencent.com>
 
-This is a 31-day syzbot report for the netfilter subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/netfilter
+The series mostly follows the development of i40e/ice to improve the
+performance for zerocopy mode in the tx path.
 
-During the period, 2 new issues were detected and 1 were fixed.
-In total, 12 issues are still open and 186 have already been fixed.
+Jason Xing (5):
+  ixgbe: xsk: remove budget from ixgbe_clean_xdp_tx_irq
+  ixgbe: xsk: resolve the underflow of budget in ixgbe_xmit_zc
+  ixgbe: xsk: use ixgbe_desc_unused as the budget in ixgbe_xmit_zc
+  ixgbe: xsk: support batched xsk Tx interfaces to increase performance
+  ixgbe: xsk: add TX multi-buffer support
 
-Some of the still happening issues:
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |   6 +-
+ .../ethernet/intel/ixgbe/ixgbe_txrx_common.h  |   2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c  | 121 ++++++++++++------
+ 3 files changed, 86 insertions(+), 43 deletions(-)
 
-Ref Crashes Repro Title
-<1> 540     Yes   INFO: rcu detected stall in addrconf_rs_timer (6)
-                  https://syzkaller.appspot.com/bug?extid=fecf8bd19c1f78edb255
-<2> 184     Yes   INFO: rcu detected stall in gc_worker (3)
-                  https://syzkaller.appspot.com/bug?extid=eec403943a2a2455adaa
-<3> 100     Yes   INFO: rcu detected stall in NF_HOOK (2)
-                  https://syzkaller.appspot.com/bug?extid=34c2df040c6cfa15fdfe
-<4> 11      Yes   KMSAN: uninit-value in ip6table_mangle_hook (3)
-                  https://syzkaller.appspot.com/bug?extid=6023ea32e206eef7920a
+-- 
+2.41.3
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
 
