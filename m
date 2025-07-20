@@ -1,346 +1,237 @@
-Return-Path: <netdev+bounces-208510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25F00B0BE6A
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 10:05:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97721B0C0D6
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 12:08:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 773CD189E3B0
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 08:06:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B604E18C0054
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 10:08:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9468286410;
-	Mon, 21 Jul 2025 08:05:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCE7428BA92;
+	Mon, 21 Jul 2025 10:07:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R5YW/cJ3"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="yf55tk1E"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD0828504C
-	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 08:05:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D62618FC91
+	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 10:07:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753085135; cv=none; b=tP4BMbinBzZR/+hxijB7fKldMjN5+Ptqb8Iz6Fumc2PrFPglYo2xxF3nQqmLD/4XdWcT9/HBISRtgLfOCBO9N1BDYDGl5kPsKEcBC017L1VIqQnvc4rHQehUhvx+CQuZA9x+ccYimiIn0+ynpROsuW22FGDSiD8Fx9wocJm5nt8=
+	t=1753092472; cv=none; b=lVQJzVZAgfF6P2w2QU/QYmtFoIG25qXbKTNcKksdfA5dhEHCFUa6VrKSPV88WPzOZJtmT4txKNim2arh8XMSMsVzreyq8vv9ZK/DEgBkpJHis9WkqSJzvpGy8ybdlCxvFzrxpH3v6NL+vMwBOYfMmQTzjDBMrPIpzeUSWmOEBtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753085135; c=relaxed/simple;
-	bh=OmacDHOgisi4/R/uJWi3N1yuxQnUS7GhOJDuFiXyVLA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b5P8HPbKnF8JtLndMaMwPqIumZSuqcQSHiVjLlAuzM5AAO+/pj2qfdZ/dd/35lnAq5oT4DFxF0rFTsf1Y6PuDANaGTaHwBPIkkPhbu2v8TRg149va9d9Ss1rqzQSVPlLNx4uNlnIxYMWxV6rLdYkpd6PAGwa7npBaCi8rLlQGGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R5YW/cJ3; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1753085132;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=YZwimYc/XbFaUcGJkln+p9HtaqBU8QoZiA7E2Ky46WU=;
-	b=R5YW/cJ3a/PSn8GXIFL8YY9QyV74ji0ruqvf+zxSW2YwlNvuC6kD34j2n/aVk8bZjjKckA
-	oW4PQpA11YvZLNMvGLWePsMtRLkqVDgtTrTPx33DGlUnGQsMFYcY9SBwPCoinwIu1e3lyJ
-	4ojZDc82YLbgOE/TiwDnAL8dJT+9IDk=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-606-B4MiFoE8P-G9Ag8bdSwFlg-1; Mon, 21 Jul 2025 04:05:30 -0400
-X-MC-Unique: B4MiFoE8P-G9Ag8bdSwFlg-1
-X-Mimecast-MFC-AGG-ID: B4MiFoE8P-G9Ag8bdSwFlg_1753085129
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4561c67daebso14280565e9.1
-        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 01:05:30 -0700 (PDT)
+	s=arc-20240116; t=1753092472; c=relaxed/simple;
+	bh=1FGBxsq44SdTzLltTrnO+dtQlXrqC+a/rAIwXdlkigA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l1jfjFJ91iyWv+Rcsz7hWNz2TRdbSscHCrrzbdHKtOzLQ3+65GXFeJwqrQN/FA5LiIbzNwE0D6GwKQpevp3IsZm1w+QYEnwpKGDPs+M/Gap/Qb7HvKNC4I/lMehr0kY2LveqGS1cFrx3nWfQYJSKWiPondwrxZhtxIOfne8xA88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=yf55tk1E; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3a575a988f9so2399320f8f.0
+        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 03:07:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1753092468; x=1753697268; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=R0S+bBFMxckuEqPp10mWPmd4+x8/NMYbq/zd/l7gB/U=;
+        b=yf55tk1E3JAmbO28Euu2BGSpRIDsTfkIRwrLvHuxUZI0ugA2Ty1FZU3v+RyPswnPea
+         ZLTzV9xFEl3sTFrTcfmOd2AKTE98xBRr1gzut1z/hX5DnbWXKADrey1lUwKdN0nhBtyV
+         wMKcfinKq8ZIaGFlCqpRPFokta1SOo+m0vu8APa2mQ9/EFvtdPVUiWOrKf5dDTHJll8e
+         MifmQaUsHtQdwfZ4ZimL0mdnSUI9+63vzYPJnaOR0SYb5IwpU38vQI7cd3zSKBLUTgsp
+         gCbAG0lHoIx9UhKnFu94kQg6k6xSkRuu7pYvL7XesaOlgVfhf3OlD4Ku+ZbFvpKHJjVY
+         NEeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753085129; x=1753689929;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=YZwimYc/XbFaUcGJkln+p9HtaqBU8QoZiA7E2Ky46WU=;
-        b=wtxFhWmkLoSboiVfScJvhUY20Rv3dPzvSfuPsPAeOln93CRFCPXFt4FqO3uTjELYCI
-         Q8aPL4ctROff+AG1/2N1jQHFquKTVSwOc7Or7l3jT7hA1+heRJ2PHAEl1166/6YPQc3/
-         jg0dnAMa5ojk4mCLcqdY53xPnv4MSMWIeB4haw5M1x34iF/pavPtIeo+0V8BkvMnm0d9
-         9BFfdEc1GzaQHTDS1dyeqnXysBMe0/pZLQx9ewxt85e8uxcpa1jAP0bFifiDJvPSde5g
-         XX9ohekGfzxJoOEm7oFA+wadb1emFw4E8DQT2tzFOngphyZ2Y0RNSMStkm0MHyKQslE9
-         X51Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVvqRJgYts0nG1ZRAbGDE4mjfemaRJF6PZF6TpMUwIGN1UTfReAkh5KmoHkk718CyQYLTJUJOE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVf9h5tO3g6Y8JYU9fN14/2E3bbC4Vz/l47M2ZhlJCVrmlsqqX
-	hp0BCjtVbrEu8FkuwyDTymvryraC/Q0XMzgDcBwcQ6eTgeJ9ofzxVB9aEUFbkwa5imPjs6SRD6N
-	WkgFLsWqLefvgW4VKHScMFyhBi721yqweGxpD5Z92YmxgADlM6698JjEdKw==
-X-Gm-Gg: ASbGnctRFALd5HOMpapkAIw0z71HqVSMWzRGHqexxVF838gHPE4sH13v5i0HxV95tqf
-	94+bISs74U4qvzYMNDiOyTw3upwgItULzjN3XvlAPZWVXy0REEBHWuPaJfdjtkvwu1LMqeYCeW4
-	Hn3qHte0E7CAG/cFzmcLPrsozbBgZYp8J2w2O8xOT5jB3pH5qrCYFSWm8qvabwY5DJqKPC80Jiq
-	mBzs3EsiDbB9jLcGiqWJtMrYoQK/zhWVlwVt7ye9GA1DDrg2s5oGYUluEt64OBJuwtheyaqP9af
-	CEIxnky3uDzhyipG2SdsXpZR3ZJthl1/fDYGJDbBl9ZZGZv13iuQ2h92hFH5AR+d0fPLnwJMO7L
-	igKbPhlniy1svTYbot6NZEFUIqvDBGiFWYbjIhXJCLj70yZws60qOF9tHAMCe0syt
-X-Received: by 2002:a05:600c:6610:b0:456:942:b162 with SMTP id 5b1f17b1804b1-45637bc1e8fmr147848605e9.11.1753085128935;
-        Mon, 21 Jul 2025 01:05:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEaqPaRa97Ws7y+SPufWF2ofN23cpKrkKJ1mE+QB0PaxxEWaWruM697N59u6maQfQXxXtGBSA==
-X-Received: by 2002:a05:600c:6610:b0:456:942:b162 with SMTP id 5b1f17b1804b1-45637bc1e8fmr147847785e9.11.1753085128261;
-        Mon, 21 Jul 2025 01:05:28 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f4c:df00:a9f5:b75b:33c:a17f? (p200300d82f4cdf00a9f5b75b033ca17f.dip0.t-ipconnect.de. [2003:d8:2f4c:df00:a9f5:b75b:33c:a17f])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45635fe6a92sm84696565e9.2.2025.07.21.01.05.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Jul 2025 01:05:27 -0700 (PDT)
-Message-ID: <e897e784-4403-467c-b3e4-4ac4dc7b2e25@redhat.com>
-Date: Mon, 21 Jul 2025 10:05:25 +0200
+        d=1e100.net; s=20230601; t=1753092468; x=1753697268;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=R0S+bBFMxckuEqPp10mWPmd4+x8/NMYbq/zd/l7gB/U=;
+        b=crWfQBdR2ANjGcBj4J5bePTPtsjmIiC3KG6mOfo3SF6x+5rStH+XYZdm92VGQKCQcP
+         sIUx4cKiVsn7NPekOaJ8bnNJmdEbSG/isBWc3RalpMtKZahyFxoa69PX0p0ZgAbf2pum
+         P95aYhdeFojtWMD4P4nq/tTiu3344uflCn6Y1lt4GYDXlNfk/trNWoiHegkiD45KK7o5
+         vzs57jbUcM9nKCTafFkVlOwkOO/BwN+LpbsNb8ALqbj1ybFJSfaVQpJcj8hlVRKJ9N6S
+         iILTTw883pz0ge6XOu0XdrbuDzJO++KsxyMVmhjsRCScRd9eHF2198mpJFnYG1atBk4O
+         2tUw==
+X-Gm-Message-State: AOJu0YwaAumT/arx/g2B+vHuItos4JArQKC8PSPDuk1BeZQzBVR34kw9
+	omZEPQ1vm6TiPEQiKeApOc2mhhn622aeH0aoagiQyZrBciaf6bOT6bkgcJP4EfH7xFzP6k9QriW
+	kLTwf
+X-Gm-Gg: ASbGnctt2fOe9qrH+zyAlL2VhR3LJjkq83YAeTgRbRJ2ix93bHVojOchidOVWpC3CLb
+	+NWnLpcriHFgTHSTGqragNz2u7O9uTzxCRPG6sJ/cYBR5Q9YmdFOOaxB28B2tUbJTYoDpaCrhfz
+	/XqzO0Uop34thvBdcxRUB1Vr6VA7Ux6zBpIB+T8ImcF+8U20i3oC+Be6SXG4PAaccOOtt4PZPFz
+	B1CS1ct4ll5R22rB90OhlI49YVvxJR3cZpW6eiFoo3F08TBlvh+4dwo/KJJCIiPWcVvWxtfpedT
+	nXvU4cbCnV4Ks6YMLdlFB2InZIbUgkDspl5RBAwkTKHsyS1ZEmNbauwhcqJEHinzqrUw19xH9vF
+	AWGn92VaeWmcqBHg=
+X-Google-Smtp-Source: AGHT+IFGdTCnMiQ4V6nLRryg5jCWy74XnosXig0E1SjhzKHoROyIcxSOm53EslKYUh+pHjWIeBECjA==
+X-Received: by 2002:a5d:5f8f:0:b0:3a5:2208:41d9 with SMTP id ffacd0b85a97d-3b61b2214a2mr9057051f8f.40.1753092467985;
+        Mon, 21 Jul 2025 03:07:47 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4562e89c87esm153905065e9.33.2025.07.21.03.07.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Jul 2025 03:07:47 -0700 (PDT)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org
+Subject: [PATCH net-next v2] netdevsim: add couple of fw_update_flash_* debugfs knobs
+Date: Sun, 20 Jul 2025 23:27:34 +0200
+Message-ID: <20250720212734.25605-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] mm, page_pool: introduce a new page type for page pool in
- page type
-To: Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org,
- netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
- harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
- davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
- john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com,
- leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
- andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
- akpm@linux-foundation.org, lorenzo.stoakes@oracle.com,
- Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org, surenb@google.com,
- mhocko@suse.com, horms@kernel.org, jackmanb@google.com, hannes@cmpxchg.org,
- ziy@nvidia.com, ilias.apalodimas@linaro.org, willy@infradead.org,
- brauner@kernel.org, kas@kernel.org, yuzhao@google.com,
- usamaarif642@gmail.com, baolin.wang@linux.alibaba.com,
- almasrymina@google.com, toke@redhat.com, asml.silence@gmail.com,
- bpf@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <20250721054903.39833-1-byungchul@sk.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- g3eXuA==
-Organization: Red Hat
-In-Reply-To: <20250721054903.39833-1-byungchul@sk.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 21.07.25 07:49, Byungchul Park wrote:
-> Hi,
-> 
-> I focused on converting the existing APIs accessing ->pp_magic field to
-> page type APIs.  However, yes.  Additional works would better be
-> considered on top like:
-> 
->     1. Adjust how to store and retrieve dma index.  Maybe network guys
->        can work better on top.
-> 
->     2. Move the sanity check for page pool in mm/page_alloc.c to on free.
-> 
->     Byungchul
-> 
-> ---8<---
->  From 7d207a1b3e9f4ff2a72f5b54b09e3ed0c4aaaca3 Mon Sep 17 00:00:00 2001
-> From: Byungchul Park <byungchul@sk.com>
-> Date: Mon, 21 Jul 2025 14:05:20 +0900
-> Subject: [PATCH] mm, page_pool: introduce a new page type for page pool in page type
-> 
-> ->pp_magic field in struct page is current used to identify if a page
-> belongs to a page pool.  However, page type e.i. PGTY_netpp can be used
-> for that purpose.
-> 
-> Use the page type APIs e.g. PageNetpp(), __SetPageNetpp(), and
-> __ClearPageNetpp() instead, and remove the existing APIs accessing
-> ->pp_magic e.g. page_pool_page_is_pp(), netmem_or_pp_magic(), and
-> netmem_clear_pp_magic() since they are totally replaced.
-> 
-> This work was inspired by the following link by Pavel:
-> 
-> [1] https://lore.kernel.org/all/582f41c0-2742-4400-9c81-0d46bf4e8314@gmail.com/
+From: Jiri Pirko <jiri@nvidia.com>
 
-I'm, sure you saw my comment (including my earlier suggestion for using 
-a page type), in particular around ...
+Netdevsim emulates firmware update and it takes 5 seconds to complete.
+For some usecases, this is too long and unnecessary. Allow user to
+configure the time by exposing debugfs knobs to set flash size, chunk
+size and chunk time.
 
-> ---
->   .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |  2 +-
->   include/linux/mm.h                            | 28 ++-----------------
->   include/linux/page-flags.h                    |  6 ++++
->   include/net/netmem.h                          |  2 +-
->   mm/page_alloc.c                               |  4 +--
->   net/core/netmem_priv.h                        | 16 ++---------
->   net/core/page_pool.c                          | 10 +++++--
->   7 files changed, 24 insertions(+), 44 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-> index 5d51600935a6..def274f5c1ca 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-> @@ -707,7 +707,7 @@ static void mlx5e_free_xdpsq_desc(struct mlx5e_xdpsq *sq,
->   				xdpi = mlx5e_xdpi_fifo_pop(xdpi_fifo);
->   				page = xdpi.page.page;
->   
-> -				/* No need to check page_pool_page_is_pp() as we
-> +				/* No need to check PageNetpp() as we
->   				 * know this is a page_pool page.
->   				 */
->   				page_pool_recycle_direct(pp_page_to_nmdesc(page)->pp,
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index ae50c1641bed..736061749535 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -4135,10 +4135,9 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
->    * DMA mapping IDs for page_pool
->    *
->    * When DMA-mapping a page, page_pool allocates an ID (from an xarray) and
-> - * stashes it in the upper bits of page->pp_magic. We always want to be able to
-> - * unambiguously identify page pool pages (using page_pool_page_is_pp()). Non-PP
-> - * pages can have arbitrary kernel pointers stored in the same field as pp_magic
-> - * (since it overlaps with page->lru.next), so we must ensure that we cannot
-> + * stashes it in the upper bits of page->pp_magic. Non-PP pages can have
-> + * arbitrary kernel pointers stored in the same field as pp_magic (since
-> + * it overlaps with page->lru.next), so we must ensure that we cannot
->    * mistake a valid kernel pointer with any of the values we write into this
->    * field.
->    *
-> @@ -4168,25 +4167,4 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
->   
->   #define PP_DMA_INDEX_MASK GENMASK(PP_DMA_INDEX_BITS + PP_DMA_INDEX_SHIFT - 1, \
->   				  PP_DMA_INDEX_SHIFT)
-> -
-> -/* Mask used for checking in page_pool_page_is_pp() below. page->pp_magic is
-> - * OR'ed with PP_SIGNATURE after the allocation in order to preserve bit 0 for
-> - * the head page of compound page and bit 1 for pfmemalloc page, as well as the
-> - * bits used for the DMA index. page_is_pfmemalloc() is checked in
-> - * __page_pool_put_page() to avoid recycling the pfmemalloc page.
-> - */
-> -#define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
-> -
-> -#ifdef CONFIG_PAGE_POOL
-> -static inline bool page_pool_page_is_pp(const struct page *page)
-> -{
-> -	return (page->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
-> -}
-> -#else
-> -static inline bool page_pool_page_is_pp(const struct page *page)
-> -{
-> -	return false;
-> -}
-> -#endif
-> -
->   #endif /* _LINUX_MM_H */
-> diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
-> index 4fe5ee67535b..906ba7c9e372 100644
-> --- a/include/linux/page-flags.h
-> +++ b/include/linux/page-flags.h
-> @@ -957,6 +957,7 @@ enum pagetype {
->   	PGTY_zsmalloc		= 0xf6,
->   	PGTY_unaccepted		= 0xf7,
->   	PGTY_large_kmalloc	= 0xf8,
-> +	PGTY_netpp		= 0xf9,
->   
->   	PGTY_mapcount_underflow = 0xff
->   };
-> @@ -1101,6 +1102,11 @@ PAGE_TYPE_OPS(Zsmalloc, zsmalloc, zsmalloc)
->   PAGE_TYPE_OPS(Unaccepted, unaccepted, unaccepted)
->   FOLIO_TYPE_OPS(large_kmalloc, large_kmalloc)
->   
-> +/*
-> + * Marks page_pool allocated pages.
-> + */
-> +PAGE_TYPE_OPS(Netpp, netpp, netpp)
-> +
->   /**
->    * PageHuge - Determine if the page belongs to hugetlbfs
->    * @page: The page to test.
-> diff --git a/include/net/netmem.h b/include/net/netmem.h
-> index f7dacc9e75fd..3667334e16e7 100644
-> --- a/include/net/netmem.h
-> +++ b/include/net/netmem.h
-> @@ -298,7 +298,7 @@ static inline struct net_iov *__netmem_clear_lsb(netmem_ref netmem)
->    */
->   #define pp_page_to_nmdesc(p)						\
->   ({									\
-> -	DEBUG_NET_WARN_ON_ONCE(!page_pool_page_is_pp(p));		\
-> +	DEBUG_NET_WARN_ON_ONCE(!PageNetpp(p));				\
->   	__pp_page_to_nmdesc(p);						\
->   })
->   
-> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-> index 2ef3c07266b3..71c7666e48a9 100644
-> --- a/mm/page_alloc.c
-> +++ b/mm/page_alloc.c
-> @@ -898,7 +898,7 @@ static inline bool page_expected_state(struct page *page,
->   #ifdef CONFIG_MEMCG
->   			page->memcg_data |
->   #endif
-> -			page_pool_page_is_pp(page) |
-> +			PageNetpp(page) |
->   			(page->flags & check_flags)))
->   		return false;
->   
-> @@ -925,7 +925,7 @@ static const char *page_bad_reason(struct page *page, unsigned long flags)
->   	if (unlikely(page->memcg_data))
->   		bad_reason = "page still charged to cgroup";
->   #endif
-> -	if (unlikely(page_pool_page_is_pp(page)))
-> +	if (unlikely(PageNetpp(page)))
->   		bad_reason = "page_pool leak";
->   	return bad_reason;
->   }
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+---
+v1->v2:
+- added sanitiazation of the tunables before using them
+---
+ drivers/net/netdevsim/dev.c                   | 42 ++++++++++++++-----
+ drivers/net/netdevsim/netdevsim.h             |  3 ++
+ .../drivers/net/netdevsim/devlink.sh          |  4 ++
+ 3 files changed, 39 insertions(+), 10 deletions(-)
 
-^ this
-
-This will not work they way you want it once you rebase on top of 
-linux-next, where we have (from mm/mm-stable)
-
-
-commit 2dfcd1608f3a96364f10de7fcfe28727c0292e5d
-Author: David Hildenbrand <david@redhat.com>
-Date:   Fri Jul 4 12:24:58 2025 +0200
-
-     mm/page_alloc: let page freeing clear any set page type
-
-
-I commented what to do already.
-
+diff --git a/drivers/net/netdevsim/dev.c b/drivers/net/netdevsim/dev.c
+index 01c7edb28d96..c9a99eb6f5d5 100644
+--- a/drivers/net/netdevsim/dev.c
++++ b/drivers/net/netdevsim/dev.c
+@@ -314,6 +314,12 @@ static int nsim_dev_debugfs_init(struct nsim_dev *nsim_dev)
+ 			    &nsim_dev->fw_update_status);
+ 	debugfs_create_u32("fw_update_overwrite_mask", 0600, nsim_dev->ddir,
+ 			    &nsim_dev->fw_update_overwrite_mask);
++	debugfs_create_u32("fw_update_flash_size", 0600, nsim_dev->ddir,
++			   &nsim_dev->fw_update_flash_size);
++	debugfs_create_u32("fw_update_flash_chunk_size", 0600, nsim_dev->ddir,
++			   &nsim_dev->fw_update_flash_chunk_size);
++	debugfs_create_u32("fw_update_flash_chunk_time_ms", 0600, nsim_dev->ddir,
++			   &nsim_dev->fw_update_flash_chunk_time_ms);
+ 	debugfs_create_u32("max_macs", 0600, nsim_dev->ddir,
+ 			   &nsim_dev->max_macs);
+ 	debugfs_create_bool("test1", 0600, nsim_dev->ddir,
+@@ -1015,15 +1021,14 @@ static int nsim_dev_info_get(struct devlink *devlink,
+ 						    DEVLINK_INFO_VERSION_TYPE_COMPONENT);
+ }
+ 
+-#define NSIM_DEV_FLASH_SIZE 500000
+-#define NSIM_DEV_FLASH_CHUNK_SIZE 1000
+-#define NSIM_DEV_FLASH_CHUNK_TIME_MS 10
+-
+ static int nsim_dev_flash_update(struct devlink *devlink,
+ 				 struct devlink_flash_update_params *params,
+ 				 struct netlink_ext_ack *extack)
+ {
+ 	struct nsim_dev *nsim_dev = devlink_priv(devlink);
++	u32 flash_size = nsim_dev->fw_update_flash_size;
++	u32 flash_chunk_size = nsim_dev->fw_update_flash_chunk_size;
++	u32 flash_chunk_time_ms = nsim_dev->fw_update_flash_chunk_time_ms;
+ 	int i;
+ 
+ 	if ((params->overwrite_mask & ~nsim_dev->fw_update_overwrite_mask) != 0)
+@@ -1035,20 +1040,30 @@ static int nsim_dev_flash_update(struct devlink *devlink,
+ 						   params->component, 0, 0);
+ 	}
+ 
+-	for (i = 0; i < NSIM_DEV_FLASH_SIZE / NSIM_DEV_FLASH_CHUNK_SIZE; i++) {
++	/* Sanitize flash sizes and time. */
++	if (!flash_chunk_size)
++		flash_chunk_size = 1;
++	if (flash_chunk_size > flash_size)
++		flash_chunk_size = flash_size;
++	else if (flash_size % flash_chunk_size)
++		flash_size = flash_size / flash_chunk_size * flash_chunk_size;
++	if (!flash_chunk_time_ms)
++		flash_chunk_time_ms = 1;
++
++	for (i = 0; i < flash_size / flash_chunk_size; i++) {
+ 		if (nsim_dev->fw_update_status)
+ 			devlink_flash_update_status_notify(devlink, "Flashing",
+ 							   params->component,
+-							   i * NSIM_DEV_FLASH_CHUNK_SIZE,
+-							   NSIM_DEV_FLASH_SIZE);
+-		msleep(NSIM_DEV_FLASH_CHUNK_TIME_MS);
++							   i * flash_chunk_size,
++							   flash_size);
++		msleep(flash_chunk_time_ms);
+ 	}
+ 
+ 	if (nsim_dev->fw_update_status) {
+ 		devlink_flash_update_status_notify(devlink, "Flashing",
+ 						   params->component,
+-						   NSIM_DEV_FLASH_SIZE,
+-						   NSIM_DEV_FLASH_SIZE);
++						   flash_size,
++						   flash_size);
+ 		devlink_flash_update_timeout_notify(devlink, "Flash select",
+ 						    params->component, 81);
+ 		devlink_flash_update_status_notify(devlink, "Flashing done",
+@@ -1567,6 +1582,10 @@ static int nsim_dev_reload_create(struct nsim_dev *nsim_dev,
+ 	return err;
+ }
+ 
++#define NSIM_DEV_FLASH_SIZE_DEFAULT 500000
++#define NSIM_DEV_FLASH_CHUNK_SIZE_DEFAULT 1000
++#define NSIM_DEV_FLASH_CHUNK_TIME_MS_DEFAULT 10
++
+ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
+ {
+ 	struct nsim_dev *nsim_dev;
+@@ -1585,6 +1604,9 @@ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
+ 	INIT_LIST_HEAD(&nsim_dev->port_list);
+ 	nsim_dev->fw_update_status = true;
+ 	nsim_dev->fw_update_overwrite_mask = 0;
++	nsim_dev->fw_update_flash_size = NSIM_DEV_FLASH_SIZE_DEFAULT;
++	nsim_dev->fw_update_flash_chunk_size = NSIM_DEV_FLASH_CHUNK_SIZE_DEFAULT;
++	nsim_dev->fw_update_flash_chunk_time_ms = NSIM_DEV_FLASH_CHUNK_TIME_MS_DEFAULT;
+ 	nsim_dev->max_macs = NSIM_DEV_MAX_MACS_DEFAULT;
+ 	nsim_dev->test1 = NSIM_DEV_TEST1_DEFAULT;
+ 	spin_lock_init(&nsim_dev->fa_cookie_lock);
+diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
+index 8eeeb9256077..78a0f07e4088 100644
+--- a/drivers/net/netdevsim/netdevsim.h
++++ b/drivers/net/netdevsim/netdevsim.h
+@@ -317,6 +317,9 @@ struct nsim_dev {
+ 	struct list_head port_list;
+ 	bool fw_update_status;
+ 	u32 fw_update_overwrite_mask;
++	u32 fw_update_flash_size;
++	u32 fw_update_flash_chunk_size;
++	u32 fw_update_flash_chunk_time_ms;
+ 	u32 max_macs;
+ 	bool test1;
+ 	bool dont_allow_reload;
+diff --git a/tools/testing/selftests/drivers/net/netdevsim/devlink.sh b/tools/testing/selftests/drivers/net/netdevsim/devlink.sh
+index a102803ff74f..92cc5cbb7d83 100755
+--- a/tools/testing/selftests/drivers/net/netdevsim/devlink.sh
++++ b/tools/testing/selftests/drivers/net/netdevsim/devlink.sh
+@@ -40,6 +40,10 @@ fw_flash_test()
+ 		return
+ 	fi
+ 
++	echo "1024"> $DEBUGFS_DIR/fw_update_flash_size
++	echo "128"> $DEBUGFS_DIR/fw_update_flash_chunk_size
++	echo "10"> $DEBUGFS_DIR/fw_update_flash_chunk_time_ms
++
+ 	devlink dev flash $DL_HANDLE file $DUMMYFILE
+ 	check_err $? "Failed to flash with status updates on"
+ 
 -- 
-Cheers,
-
-David / dhildenb
+2.50.1
 
 
