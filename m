@@ -1,177 +1,154 @@
-Return-Path: <netdev+bounces-208594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89AF2B0C403
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 14:23:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E004B0C425
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 14:31:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DBDC189083C
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 12:24:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 397057A31C7
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 12:29:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3F332D373C;
-	Mon, 21 Jul 2025 12:23:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C179329B23B;
+	Mon, 21 Jul 2025 12:31:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s7fGIw3N"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CPDqX0u7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1AC6176AC8;
-	Mon, 21 Jul 2025 12:23:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22CAC288C80
+	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 12:31:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753100632; cv=none; b=A/31OfZPzCi5h/hOWUM7goRgfjZ3gI6l8sV6+UKXIxCoXhZ6jmqF+mVTR8hhomconEkSJdtca/uE9OYk+bh62NdsxeHP5SwADkQabH6cqfNbnYlomfsmMYB7J8MNqOfHzA0SgRRJV+SrdzZEWOuQXdDixR1O+7JwlM2gmMlheJ0=
+	t=1753101064; cv=none; b=ISJx9RjE8rmC/r1NtAa1jCpZGexLdiqcUol3nh1TANgJ7aceBBpsmCmvP1uEmlWg6rzKmxUkudLPcxvH3qXUh7jAbCjbkvEuaXyyeSpURqAuEAscZsKr87iDwgHK/fnXztofLCF2hvQFeslHgQ63SFkETHo6XJr6KbCwa8S2uAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753100632; c=relaxed/simple;
-	bh=lK05y5EfyxlFdSQJMti7U0pF1916g64aU29cskH7E+E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZQG77On6In6+53CEQCutU2Jo0rlwo72q/TNfn5KdzgyANjmuLUgA9oNPhWjcgtjDKtM05DY4LryqrY7g5Vs0YC85vL6IdZQo8bUrG321j2VhLwArgkqSvjKmvik+gLquoAK/COJ9U2ZIYf6/JQ0c3U8dfxe3YHXSA6QSrLzKyb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s7fGIw3N; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FFF3C4CEED;
-	Mon, 21 Jul 2025 12:23:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753100632;
-	bh=lK05y5EfyxlFdSQJMti7U0pF1916g64aU29cskH7E+E=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=s7fGIw3NZXpV2Fk5Vf1Kp4PwBNjcUE/L3hCyjNwqc3Ozv0XfB3nd9uMQK7Bg/O6SY
-	 OYtkV655pHUDzzj1Wwkl6wtoCxSHtAtLpt9xyro42qX8YPEyMEveR2d1rOE71j7jzU
-	 hQm2zEAgDgYkqLzGELqH0oawrBvuVgntZCUEtIWBvQaZNQ+9U2PY4V3anZJBvKsSbt
-	 p8KaRnJJTUXrwQHmCdGDIr+uX8no7K8V/gDFsPLSul2hohIXNarZ991ImIBE6senma
-	 +nXfWRemvRin4baWmcZh4STewq3NEjhwDChCH28sQgN5q6W6msTKXq4APBo+b+opzp
-	 uYfmOfjWQcxQA==
-Message-ID: <79e28c65-8dbe-4449-b795-645029c37f88@kernel.org>
-Date: Mon, 21 Jul 2025 14:23:45 +0200
+	s=arc-20240116; t=1753101064; c=relaxed/simple;
+	bh=8nenQ53s+cHDNk/eJ6AsD0FRHplg+zBhNK1F3i6c+2E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kH55iX55kMwaU4Z4pkM2rniy68B+4lfn04Px4j3Kj+evxoqL+70uxstKrtobih7ZgoJJijvYthwVADrjYSdo0sg4xv1ntfxA53fDAjgZLF1kR/j7I9DBJPhj14u6I0q9TwJNge3nQUUqZEAhywUjgNW117Wr/qABVgQOmVp3KUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CPDqX0u7; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4ab5e2ae630so50395741cf.3
+        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 05:31:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753101062; x=1753705862; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oG3s6mUPko8JmKCEZA0jAx+ufejcC0f/4tYeTxDXVYU=;
+        b=CPDqX0u7v7lsYfzUP/jOS7sBlWt6FONjeVk4rmW7MChHWNumXKM53SSzrMQnRkmglM
+         LRrvXsGS38MG0AMlvJ8G1w1rMNzdANy7OdLsTw2IK6YpXviXbAAgYdvlAzKtkkNees7Y
+         aviWmsZQbDrjQTiaZhUDe383zsqYb0/GbSofwnBMg17QSVAvY8mnhNUVTcXR8rphJWRg
+         sAXA6CK6LacKXWw4npKk6Rlf0+M/U1LIwsnjUJGk0vUHS0s7yJkg0rfzJJUBrCS7pUc4
+         Dt9koJoo6MONhpTGsE2W8ha5kNLmj4TxnbCcaLSnF9FJbPYyFdfeNZk5CfoO0dF5DisS
+         zkgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753101062; x=1753705862;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oG3s6mUPko8JmKCEZA0jAx+ufejcC0f/4tYeTxDXVYU=;
+        b=L8ajGdLlmurqOgOwi5w8hW8En6kyZ74amqtrUw5OzK0+q0YrWvXU7x3jY3PZ9/faw/
+         IOU9YJK3ZBrcmXJWz3syDLBD2s7iuJtFYRQrZIX/3ItOJvnt/uG6VWHUu/dcrKbseHy1
+         9DGGOKcsFHZc52YTTFa7zpUOa7FAAgAjtcYO0gVvvHsi8egLXpQNgaOC1EBjLGb1SJi/
+         LWiQpfZZxljqbyhBgUtq+s3epeWbkRrXjodFHXLnkhwVloiAMkiKggJfK1H/xbIZM503
+         pvdizPNOk36XWnkz1TEcc1IPqPBId3AynfeRTusXfkOBDUBU12zO6EepP/A6u+vVMEG0
+         4DuQ==
+X-Gm-Message-State: AOJu0YyR87nS72U0MCU7hJCsMjNf+72tt/DA4Y8ND9bQq8HCqsKy+aiF
+	uFz5unwVfOt+4dE6dfXfGnSOWXhOZzKenvoFng4Ku5YsgUW9DItCOHKb2aU368zgXSv2TCj1tkM
+	2Jbr3k7gxwoLtIn1qw3MSwSgrKCaWNdT1jUvw6mpA
+X-Gm-Gg: ASbGncvbyNs5ndmpIpl45m6tW7RSMNxarj3CLIo9Xuldx96SdTvNAyMWklmgRQF8Foq
+	SO6aRoDMKtuSj6Ff42o0nAyPIMQx01NsOTURP62KkYr20vDBNrg38qM91vhS62hmi2tUEBJOfHo
+	T/+QlOM4aMAa48JE6NdxPkhhla7pU1JGdQ6u+9C+jA40eAWwN2rSG8EvuGtzG8f5VJILeuqUkP7
+	NlpCrc=
+X-Google-Smtp-Source: AGHT+IHhbEV6R+HtlpXyKfOSyb1h/u1IDSZpj8U6vH3hJNm9xkFT+VxIOL+HYM1+PbyRuW73amTekCzMdVEBk9X4dLs=
+X-Received: by 2002:ac8:5a10:0:b0:4ab:78a8:195c with SMTP id
+ d75a77b69052e-4ab93cb7272mr342892451cf.19.1753101061452; Mon, 21 Jul 2025
+ 05:31:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next 02/14] dt-bindings: net: add nxp,netc-timer
- property
-To: Vladimir Oltean <vladimir.oltean@nxp.com>,
- "richardcochran@gmail.com" <richardcochran@gmail.com>
-Cc: Wei Fang <wei.fang@nxp.com>, "robh@kernel.org" <robh@kernel.org>,
- "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
- "conor+dt@kernel.org" <conor+dt@kernel.org>,
- Claudiu Manoil <claudiu.manoil@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
- "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "vadim.fedorenko@linux.dev"
- <vadim.fedorenko@linux.dev>, Frank Li <frank.li@nxp.com>,
- "shawnguo@kernel.org" <shawnguo@kernel.org>,
- "s.hauer@pengutronix.de" <s.hauer@pengutronix.de>,
- "festevam@gmail.com" <festevam@gmail.com>, "F.S. Peng" <fushi.peng@nxp.com>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "imx@lists.linux.dev" <imx@lists.linux.dev>,
- "kernel@pengutronix.de" <kernel@pengutronix.de>
-References: <20250716073111.367382-1-wei.fang@nxp.com>
- <20250716073111.367382-3-wei.fang@nxp.com>
- <20250717-sceptical-quoll-of-protection-9c2104@kuoka>
- <PAXPR04MB8510EB38C3DCF5713C6AC5C48851A@PAXPR04MB8510.eurprd04.prod.outlook.com>
- <20250717-masterful-uppish-impala-b1d256@kuoka>
- <PAXPR04MB85109FE64C4FCAD6D46895428851A@PAXPR04MB8510.eurprd04.prod.outlook.com>
- <af75073c-4ce8-44c1-9e48-b22902373e81@kernel.org>
- <PAXPR04MB8510426F58E3065B22943D8C8851A@PAXPR04MB8510.eurprd04.prod.outlook.com>
- <20250718-enchanted-cornflower-llama-f7baea@kuoka>
- <20250718120105.b42gyo7ywj42fcw4@skbuf>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20250718120105.b42gyo7ywj42fcw4@skbuf>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <cover.1752859383.git.pabeni@redhat.com> <3e080bdba9981988ff86e120df40a5f0dc6cd033.1752859383.git.pabeni@redhat.com>
+ <CANn89i+KCsw+LH1X1yzmgr1wg5Vxm47AbAEOeOnY5gqq4ngH4w@mail.gmail.com> <f8178814-cf90-4021-a3e2-f2494dbf982a@redhat.com>
+In-Reply-To: <f8178814-cf90-4021-a3e2-f2494dbf982a@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 21 Jul 2025 05:30:49 -0700
+X-Gm-Features: Ac12FXy1RHX2yaNiJGR3GfeQSGanKLyPojueB3VBY-EeT_sR8FwYNfAZ2-Hp3lE
+Message-ID: <CANn89i+baSpvbJM6gcbSjZMmWVyvwsFotvH1czui9ARVRjS5Bw@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] tcp: do not set a zero size receive buffer
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Matthieu Baerts <matttbe@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 18/07/2025 14:01, Vladimir Oltean wrote:
->> Maybe there is another property describing a time provider in the
->> kernel or dtschema. Please look for it. This all looks like you are
->> implementing typical use case in non-typical, but vendor-like, way.
->>
->> Best regards,
->> Krzysztof
-> 
-> An MII timestamper and a PTP clock (as integrated in a MAC or a PHY) are
-> similar but have some notable differences.
-> 
-> A timestamper is an external device with a free-running counter, which
-> sniffs the MII bus between the MAC and the PHY, and provides timestamps
-> when the first octet of a packet hits the wire.
-> 
-> A PTP clock is also a high precision counter, which can be free-running
-> or it can be precisely adjusted. It does not have packet timestamping
-> capabilities itself, instead the Ethernet MAC can snapshot this counter
-> when it places the first octet of a packet on the MII bus. PTP clocks
-> frequently have other auxiliary functions, like emitting external
-> signals based on the internal time, or snapshotting external signals.
-> 
-> The timestamper is not required to have these functions. In fact, I am
-> looking at ptp_ines.c, the only non-PHY MII timestamper supported by the
-> kernel, and I am noting the fact that it does not call ptp_clock_register()
-> at all, presumably because it has no controllable PTP clock to speak of.
-> 
-> That being said, my understanding is based on analyzing the public code
-> available to me, and I do not have practical experience with MII bus
-> snooping devices, so if Richard could chime in, it would be great.
-> 
-> I am also in favor of using the "ptp-timer" phandle to describe the link
+On Mon, Jul 21, 2025 at 3:50=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> On 7/21/25 10:04 AM, Eric Dumazet wrote:
+> > On Fri, Jul 18, 2025 at 10:25=E2=80=AFAM Paolo Abeni <pabeni@redhat.com=
+> wrote:
+> >>
+> >> The nipa CI is reporting frequent failures in the mptcp_connect
+> >> self-tests.
+> >>
+> >> In the failing scenarios (TCP -> MPTCP) the involved sockets are
+> >> actually plain TCP ones, as fallback for passive socket at 2whs
+> >> time cause the MPTCP listener to actually create a TCP socket.
+> >>
+> >> The transfer is stuck due to the receiver buffer being zero.
+> >> With the stronger check in place, tcp_clamp_window() can be invoked
+> >> while the TCP socket has sk_rmem_alloc =3D=3D 0, and the receive buffe=
+r
+> >> will be zeroed, too.
+> >>
+> >> Pass to tcp_clamp_window() even the current skb truesize, so that
+> >> such helper could compute and use the actual limit enforced by
+> >> the stack.
+> >>
+> >> Fixes: 1d2fbaad7cd8 ("tcp: stronger sk_rcvbuf checks")
+> >> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> >> ---
+> >>  net/ipv4/tcp_input.c | 12 ++++++------
+> >>  1 file changed, 6 insertions(+), 6 deletions(-)
+> >>
+> >> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> >> index 672cbfbdcec1..c98de02a3c57 100644
+> >> --- a/net/ipv4/tcp_input.c
+> >> +++ b/net/ipv4/tcp_input.c
+> >> @@ -610,24 +610,24 @@ static void tcp_init_buffer_space(struct sock *s=
+k)
+> >>  }
+> >>
+> >>  /* 4. Recalculate window clamp after socket hit its memory bounds. */
+> >> -static void tcp_clamp_window(struct sock *sk)
+> >> +static void tcp_clamp_window(struct sock *sk, int truesize)
+> >
+> >
+> > I am unsure about this one. truesize can be 1MB here, do we want that
+> > in general ?
+>
+> I'm unsure either. But I can't think of a different approach?!? If the
+> incoming truesize is 1M the socket should allow for at least 1M rcvbuf
+> size to accept it, right?
 
+What I meant was :
 
-And it is already used in other binding, so yes, that's the candidate.
+This is the generic point, accepting skb->truesize as additional input
+here would make us more vulnerable, or we could risk other
+regressions.
 
-> between the MAC and the internal PTP clock that will be snapshot when
-> taking packet timestamps. The fman-dtsec.yaml schema also uses it for an
-> identical purpose.
+The question is : why does MPTCP end up here in the first place.
+Perhaps an older issue with an incorrectly sized sk_rcvbuf ?
 
-
-Best regards,
-Krzysztof
+Or maybe the test about the receive queue being empty (currently done
+in tcp_data_queue()) should be moved to a more strategic place.
 
