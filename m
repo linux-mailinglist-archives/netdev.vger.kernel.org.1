@@ -1,89 +1,164 @@
-Return-Path: <netdev+bounces-208623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECCA9B0C637
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 16:24:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 431C0B0C64B
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 16:29:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4F393B66FC
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 14:23:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A06091632F9
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 14:28:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24EB62DAFB7;
-	Mon, 21 Jul 2025 14:24:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 864072DBF48;
+	Mon, 21 Jul 2025 14:28:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="yuZy083T"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="GnYMTZ0r"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 891AE2DA767;
-	Mon, 21 Jul 2025 14:24:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8154E2DAFCE
+	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 14:28:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753107849; cv=none; b=EoPqx73CX7U8MmMANpPcNrthqZIWhsKEXYug8nSt40xET1igtKOleJlSX9qgGsEx3iyZ9ypRXkS0/xrznUG7VdAfgZviHA2NGiQfoJ1z8H7yKyzdveaS026ewxLPV5vv4p7g4ynLXNT2v7WyqLL2zCo7S4QZHhL+KeVlbb90U4E=
+	t=1753108090; cv=none; b=Dc3I9GRCjsojcE2IfjYO8eELYL51jZ0HqCmBEBBhTXifJtd462vj+GT1dbHMqxw7I0NjblkCzkT4WEVlsGfq060eGV9wpKaLF7l7NVlwGrDK7yV9AsiOONnKl2/YZfTkF/huU8dhEDHFFUgk5Cvi+tc9Erryf6nwABnOuvTOqHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753107849; c=relaxed/simple;
-	bh=1XwZqdGrESrEbYeqeKIYsPwLevTf/uNHNa8KyPX6EV8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nscRUoxKno1xnFWmjmRIcl427xewNdq/Jt6WKoggvKNqVhN5nG2xo+wyQDHffpwim4XpjoWKI00ud9/1PSI+4N2H2KRFMdjugEAzwSX4yRkjxbNlu+OIPDWo/707KtQaJo4b63Mm/KNpbYELqRIAQSqfd5oyA6aaM/hSuSepIJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=yuZy083T; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=hHzpUiLN7Jg4Lz4KXx4NfLv+H9x1eSd9BwpY3gu+U20=; b=yuZy083TIKWJigFiyJMEIO7mEL
-	CW77wF+9YJR9suubJ3/IY4OYuLkd52G6nptaS9fV7lW7Fj7Lkt1mA/V95X650ZAgj2wdFYvoe6Jh0
-	UeN4rX/9MDUAAXnFyZW8Rr+OYnT+phRL+5FFl1AfFJOmVXjgQuyBgzO7I2Mkn/dgetuM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1udrQo-002Mif-LR; Mon, 21 Jul 2025 16:23:54 +0200
-Date: Mon, 21 Jul 2025 16:23:54 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Christophe Roullier <christophe.roullier@foss.st.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Simon Horman <horms@kernel.org>,
-	Tristram Ha <Tristram.Ha@microchip.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 3/4] net: phy: smsc: fix and improve WoL support
-Message-ID: <a3b97fbd-8c4f-4657-aeca-732aee3782c3@lunn.ch>
-References: <20250721-wol-smsc-phy-v1-0-89d262812dba@foss.st.com>
- <20250721-wol-smsc-phy-v1-3-89d262812dba@foss.st.com>
- <cca8e9e6-a063-4e00-87af-f59ea926cce3@lunn.ch>
- <b95e3439-717b-4159-acf9-7ce76d1c43d4@foss.st.com>
+	s=arc-20240116; t=1753108090; c=relaxed/simple;
+	bh=CcccSm3GHzr4qIrGIOI4ZwkyR+VY2PHVFQePrQTlrmg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UuWHziJXl7RndJzbKrFMDmZsxhiuPy1ci49cKVIW6NZQDKqtrbpweBU47KP+gxBX8P/YHV2KAVeB0MAEsSD0iFDrUwvmGFqX9mSh0vUjlW6VeYwGaIRB3sJXYM5bhsblMqcGatZBNRp+TF/bD4piokEJ83fQkJgY/+JET9+RAG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=GnYMTZ0r; arc=none smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-719728a1811so17076517b3.3
+        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 07:28:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1753108087; x=1753712887; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OhKTn69GUZnWk4nkXibJbALsxXvYMvOYTGqKmIh+//A=;
+        b=GnYMTZ0rvmjELkRHryTfxjHm+J49jxn2HTN0zh1xvDBh3DDRpYVt39ZQ8pnayRWHPS
+         Tf1GPVCCFybSoPKwHinKKePaIxYWf2aCqUYrRQ8iOSnq/kM66nHq36uTyilCfiu4rgzk
+         8DisV0QaZRoYlUauovYX8C93yJ3WsZVpAvSTGMGKi2aGao4yoJFAJSdjA6Dv2ogBmkyk
+         hxxZfSzDTZq4iMdZY6HQcrSQy4djSs1wCM1lE/vpVo85metfIMBTZ3zh3x7XJ/+oH3lC
+         JBvV150gfdl556/jHfkFcpwK4vcBoMImNa473/y0dIwFvWQtJJJzSv/KkyhsuKAgIdCA
+         ureg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753108087; x=1753712887;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OhKTn69GUZnWk4nkXibJbALsxXvYMvOYTGqKmIh+//A=;
+        b=klELbqRzEGtsNMix2HjHiDxafkdODTMyQFoM2kOSxqzf4DYpoi0NBahm3WHnhjc7+a
+         k8W0zjOprOjNkq8gDlColCmG/jZ/aHjfsEmwpIwpT6S0gKJHGPVWIvQXd16XdRh23Lbo
+         EvDXk4wDP6Fs9PDmmYzhFRvOWKZcGDfULgUr/EtUeiiuXtmbkA2c3DIUoxFuPMzkx0jc
+         1CBW2/l7psDIbhkCsVdr2iysURYRkRCQ10gyslLb7P9IAoe/H5otL7hH4ffjVqyZ267O
+         u+KaTMQRHePxD3Xd51xBOJpP9HyNpLjLAnxULS/oB3Z2G3KlLU36uSFdXvr4VZWm9YK5
+         nrBg==
+X-Gm-Message-State: AOJu0YxGXO1+0MtyyZquMHhTLhH6ox1QeMveZO+He7WSgn4T8UNkOaVb
+	QPNn70qaQEdSExAiKetFpRJDzgH/KzbfxKu4k53UfmgSCRSd+tYzzppKxsOi5JOVVRMRcHjpw3L
+	woVPndH2oWEWJQ9Ody8LSR6Z+YjDvQIInd7ACvwU5
+X-Gm-Gg: ASbGncsc7RN6y0450aMLOGAUtgWDOPoPWaF4nnZ1mVx+S3zkkJJCijNpzLPW/QkrEvh
+	e1MbYwXvM1mZ1H4IWGfkVA8XcMCmZcIDvLeTxurG5hvvcQRmR5DL/MAF65tokdEM7IwrFisgm2T
+	OcdzFD3GGni0euM6Q69Ipd4cfWDLX0cwatfWEZy+lWWXfyIXPHsRqRc4BfyswjIGE1Rd/7fEui7
+	qkaNXWaapwVhTI=
+X-Google-Smtp-Source: AGHT+IGQFPNa10v/vN+L4iepX0YhUryKkxwCKDZKbOhQMTFk3kOevnDz1qLhW7ecXlEQ/PDhzwvrI89vDqfRrNEuIlo=
+X-Received: by 2002:a05:690c:45ca:b0:70e:326:6aeb with SMTP id
+ 00721157ae682-718a335df8cmr207388597b3.10.1753108087102; Mon, 21 Jul 2025
+ 07:28:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b95e3439-717b-4159-acf9-7ce76d1c43d4@foss.st.com>
+References: <20250719220341.1615951-1-xiyou.wangcong@gmail.com> <CAM0EoMmTZon=nFmLsDPKhDEzHruw701iV9=mq92At9oKo0LGpA@mail.gmail.com>
+In-Reply-To: <CAM0EoMmTZon=nFmLsDPKhDEzHruw701iV9=mq92At9oKo0LGpA@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 21 Jul 2025 10:27:53 -0400
+X-Gm-Features: Ac12FXy1oF_kk-Y_ueH-7JxLovDedNZ7zbLwx9pmQ4ut46BBILQWByQ95MjyXQI
+Message-ID: <CAM0EoMnexkyxN83S_cGh+da2kSCg5sB4g-kE5qqnMH6eF8m5gQ@mail.gmail.com>
+Subject: Re: [Patch v4 net 0/6] netem: Fix skb duplication logic and prevent
+ infinite loops
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: netdev@vger.kernel.org, will@willsroot.io, stephen@networkplumber.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> I wanted to state clearly that the wake up happended because of a WoL
-> event but sure, I understand that it's best if log isn't spammed. Do you
-> prefer it completely removed or dev_info()->dev_dbg() ?
+On Mon, Jul 21, 2025 at 10:00=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com=
+> wrote:
+>
+> On Sat, Jul 19, 2025 at 6:04=E2=80=AFPM Cong Wang <xiyou.wangcong@gmail.c=
+om> wrote:
+> >
+> > This patchset fixes the infinite loops due to duplication in netem, the
+> > real root cause of this problem is enqueuing to the root qdisc, which i=
+s
+> > now changed to enqueuing to the same qdisc. This is more reasonable,
+> > more predictable from users' perspective, less error-proone and more el=
+egant.
+> >
+> > Please see more details in patch 1/6 which contains two pages of detail=
+ed
+> > explanation including why it is safe and better.
+> >
+> > This replaces the patches from William, with much less code and without
+> > any workaround. More importantly, this does not break any use case.
+> >
+>
+> Cong, you are changing user expected behavior.
+> So instead of sending to the root qdisc, you are looping on the same
+> qdisc. I dont recall what the history is for the decision to go back
 
-phydev_dbg() is fine.
+Digging a bit, check the following history:
+Commit ID: d5d75cd6b10d
+Commit ID: 0afb51e72855
 
-	Andrew
+Sorry - in travel mode so cant look closely..
+
+cheers,
+jamal
+
+> to the root qdisc - but one reason that sounds sensible is we want to
+> iterate through the tree hierarchy again. Stephen may remember.
+> The fact that the qfq issue is hit indicates the change has
+> consequences - and given the check a few lines above, more than likely
+> you are affecting the qlen by what you did.
+>
+> cheers,
+> jamal
+> > All the test cases pass with this patchset.
+> >
+> > ---
+> > v4: Added a fix for qfq qdisc (2/6)
+> >     Updated 1/6 patch description
+> >     Added a patch to update the enqueue reentrant behaviour tests
+> >
+> > v3: Fixed the root cause of enqueuing to root
+> >     Switched back to netem_skb_cb safely
+> >     Added two more test cases
+> >
+> > v2: Fixed a typo
+> >     Improved tdc selftest to check sent bytes
+> >
+> >
+> > Cong Wang (6):
+> >   net_sched: Implement the right netem duplication behavior
+> >   net_sched: Check the return value of qfq_choose_next_agg()
+> >   selftests/tc-testing: Add a nested netem duplicate test
+> >   selftests/tc-testing: Add a test case for piro with netem duplicate
+> >   selftests/tc-testing: Add a test case for mq with netem duplicate
+> >   selftests/tc-testing: Update test cases with netem duplicate
+> >
+> >  net/sched/sch_netem.c                         |  26 ++--
+> >  net/sched/sch_qfq.c                           |   2 +
+> >  .../tc-testing/tc-tests/infra/qdiscs.json     | 114 +++++++++++++-----
+> >  .../tc-testing/tc-tests/qdiscs/netem.json     |  25 ++++
+> >  4 files changed, 127 insertions(+), 40 deletions(-)
+> >
+> > --
+> > 2.34.1
+> >
 
