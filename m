@@ -1,351 +1,367 @@
-Return-Path: <netdev+bounces-208497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3852FB0BD8B
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 09:18:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EEBFB0BD9B
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 09:25:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A542189D6D8
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 07:19:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89A1A177A7F
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 07:25:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA0D627F006;
-	Mon, 21 Jul 2025 07:18:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5E6C280A5A;
+	Mon, 21 Jul 2025 07:25:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="JyKx/faa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PAz9E3uZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A8C3594A;
-	Mon, 21 Jul 2025 07:18:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753082319; cv=none; b=HDHANwjCCAe1ZRR3Bv7X2BR7QnnZEm/cKEWmslIHfoNaLhRgJC8k115RpAvCfmxk/90Bs+lsibv24OudHhETxH45IX0llndofeX/gjW1eA0awqnOsyFVegEf6MBEgOaRpcSZyc0z88AIX1hcSXnN3r0Oa5/1BLnNiCTs3PHUzzA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753082319; c=relaxed/simple;
-	bh=M9Xmkv2qVHqWPjHsSh0YdKsAJ8wRcIdOQU7GZVK0pkw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JuUOH0AKWk9KbfHZaCcwiIgjFMsbczwE0+IYLrhN5e23wnBujfbo9EflBmwm/l6jm4e5wEYrDMeHHdn37QMeyKiEJPKmNF19LicqcNP6OqhTgcjSHvDBcd0yuX7ZeV4adKdhm6zWiXwqQyBYnFsDMstQ9YfTkiGJgkZMKOpYvVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=JyKx/faa; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B3D224FD
+	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 07:25:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753082741; cv=fail; b=WGuVfVRrMmuidqbPMe5laBjCk0IDl32nOERh47FbtL6wXvQNWOTJg1sE4mCLOoF88pAmF4nP3xbAkKTlAyR2yIIiH5MYv2BWmaqwHt0t5wA7+HLf2UimZ0Qn7cf3bI2+WvvQAkO3NSB3l0WxB/0JNheXZv8fA4WllExQGnQNZL4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753082741; c=relaxed/simple;
+	bh=/ukR/B77iCTGZ0bTfcrkzK10eORAq+IAk6Ex5Y5hpdE=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=KVgVcEgXy3nuCh1d54iK/zJVVXKUGUCgaPaAuv7p82kyo/NvRuokGBQzm3Qj404MHKjp2Aog5aCqDhfrAqEIcPgc5yFeeTi/EeU4HWNwZ1GqVeZ2yVMZYp+QGe1l1+dqJerTiBiHl+6oWy2U312pd1wE3aCeiFhVvNSxFAkTafE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PAz9E3uZ; arc=fail smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1753082316; x=1784618316;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=M9Xmkv2qVHqWPjHsSh0YdKsAJ8wRcIdOQU7GZVK0pkw=;
-  b=JyKx/faaPt/o3znDzprPgN7yHR9ZtE2w2hHak6kOCJfQmFJ3ByYphnhG
-   SJQzpgn5IMopT4h9QQhzRKnGP38Islwkligj9SACQ8mnZG+C4xaf+zDrp
-   5LQlN6VurSiIwUJEfpKv0qjJ8k2kQO8HPcRLC65MEX31bm+pi0HLsf9sk
-   OgSs98bjaiqZ4KLykN8RoBpOhgwTdO4R6TndYJKauoQL3CPmfkBuZSu6U
-   zsqnI/dT9+DJjdQTaSRjycJI8jfwSA+SHKikY8UBDTWxe9Dm+DL9kAhR3
-   wiN2Xo8TBz+KW2kHGKzsP/8TEUzglpix4TyZ/Pk4/rXS6AIm79RrgaNIl
-   w==;
-X-CSE-ConnectionGUID: jUV/n59CS0i32eQvvYcxeQ==
-X-CSE-MsgGUID: S2PLcvX7RdyKKoNKr+BWbQ==
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753082740; x=1784618740;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=/ukR/B77iCTGZ0bTfcrkzK10eORAq+IAk6Ex5Y5hpdE=;
+  b=PAz9E3uZXA2h3abPrE7PF+qbxkC2dSPwOh7DRhic+IVU1OrhaeJtO1HD
+   2b747Sj3tXI/GW6L7bD0BQnSE/VhAsBmiseOoam6rsURd5bGhTBGHdnIq
+   13IWhfwtIEF5FnKMVsURDVRkUoiGrLezPD/JK/m+BHXoI585KKaNJRovP
+   ZHCxcu9Sd83LKTjfY3es82ovErDBMdT2pMj0BdpMsdtBzbz5cyuCtcfVh
+   j6a2e5cnuhEYYskxEzzkHzSGD3S5TmDuOUIH53qyxoGaHIdMwH2nwoEwm
+   ERRFJeT+InU8FgywjAL+992zFwiW8pLw8J1cQqEKXn8vynscM1IOqwljQ
+   Q==;
+X-CSE-ConnectionGUID: +BDNnEoLQHe//Mc4CmC7+Q==
+X-CSE-MsgGUID: fM0rz+BFRDm0RmVMP8wyFg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11498"; a="72746071"
 X-IronPort-AV: E=Sophos;i="6.16,328,1744095600"; 
-   d="scan'208";a="43694035"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Jul 2025 00:18:27 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Mon, 21 Jul 2025 00:17:57 -0700
-Received: from DEN-DL-M31836.microchip.com (10.10.85.11) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.44 via Frontend Transport; Mon, 21 Jul 2025 00:17:55 -0700
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <o.rempel@pengutronix.de>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>
-Subject: [PATCH net-next] net: phy: micrel: Add support for lan8842
-Date: Mon, 21 Jul 2025 09:14:05 +0200
-Message-ID: <20250721071405.1859491-1-horatiu.vultur@microchip.com>
-X-Mailer: git-send-email 2.34.1
+   d="scan'208";a="72746071"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2025 00:25:37 -0700
+X-CSE-ConnectionGUID: 9jcz++8zS7C4HiTdj5iyhg==
+X-CSE-MsgGUID: U8NlXh9zT/yI6Rjz0vsOIw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,328,1744095600"; 
+   d="scan'208";a="158423166"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2025 00:25:37 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Mon, 21 Jul 2025 00:25:36 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26 via Frontend Transport; Mon, 21 Jul 2025 00:25:36 -0700
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (40.107.100.42)
+ by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Mon, 21 Jul 2025 00:25:34 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JgnE79FmpaMaeHorxjIH6fHXRf3y7sgk3JwVB/4MZRtiuSk654ocqrcDdSRMGRk1JJKL3ZYoMtP8zKpco3WcTAj3+qhitiI3vN5X6cCJr0Z5z87tLLa9PSY0wADtbDUhZiEkdlmHFFvn6bV+5rp/FkG/m8l7tk3MkDNgRiM8ETO6YAWjEkSj8lmub6F6v/yK+zlmWQUbMZjuic9CEGfvdo8bBWEogznRXICkphLrLTmMMy11hNCB/kjfnDjjYDk2weAL26/WUIXkqbgeHI34XMXqduDTTZ91WXubm1i5xrVod/gqkTHBZ66AOy3LLJDUR3fWtoNb3UfeWK6PFYWwwQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bcBQPruc94fJMgzBEwIqZGyeN29eJuIrOPRxC4r+DQY=;
+ b=jEWK+T38Zl3uDS6wwfo73TpVUKyNo5uLswr4Mg7U9phu1zBc85JfsR3yDvO/DvZT8iRprX7xeBxFamor3HmqYTu2tS2OoU/DV8vPT0LM92t+d4iTEkHFR/gr0WGV5b/GKob5JXFIbYNyNXdH2nORRQkKPgAvsB9Z0HDy6Nyz9ut/FrFH5GAnkQgMdHXJs+3sr5XYxctNg0qqsaafxrnnHKD0PK7IKO1lypOL17z97f6dusui48m9P8VmsuoG+MgAE+7jNv67YgVo5UdGu8EqK4rfnveWtCjqaDz81upHJlB7GWNBQuPS8/RP6CqkdktwowtVKchOBjP/QXz7hOnW1Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
+ by SJ5PPFED9C9AC99.namprd11.prod.outlook.com (2603:10b6:a0f:fc02::85d) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.39; Mon, 21 Jul
+ 2025 07:25:05 +0000
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::399f:ff7c:adb2:8d29]) by SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::399f:ff7c:adb2:8d29%4]) with mapi id 15.20.8943.029; Mon, 21 Jul 2025
+ 07:25:04 +0000
+Date: Mon, 21 Jul 2025 09:24:52 +0200
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+CC: Jakub Kicinski <kuba@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	<przemyslaw.kitszel@intel.com>, Maciej Fijalkowski
+	<maciej.fijalkowski@intel.com>, <intel-wired-lan@lists.osuosl.org>, netdev
+	<netdev@vger.kernel.org>
+Subject: Re: ixgbe driver stops sending normal data when using xsk
+Message-ID: <aH3rRHm8rQ35MqMd@soc-5CG4396X81.clients.intel.com>
+References: <CAL+tcoCTHTptwmok9vhp7GEwQgMhNsBJxT3PStJDeVOLR_-Q3g@mail.gmail.com>
+ <aHohbwWCF0ccpmtj@soc-5CG4396X81.clients.intel.com>
+ <CAL+tcoCJ9ghWVQ1afD_WJmx-3n+80Th7jPw-N-k9Z6ZjJErSkw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAL+tcoCJ9ghWVQ1afD_WJmx-3n+80Th7jPw-N-k9Z6ZjJErSkw@mail.gmail.com>
+X-ClientProxiedBy: WA0P291CA0010.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1::12) To SN7PR11MB7540.namprd11.prod.outlook.com
+ (2603:10b6:806:340::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|SJ5PPFED9C9AC99:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8bdb44eb-eeb4-4930-8a7d-08ddc827b660
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|10070799003|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?QStRL2hZdDhsZFRDWHoyeEpZUlQ1RFN1ZlZZcklOWDhYL2d0SFJodDluUkRs?=
+ =?utf-8?B?cklJaThnamVibUpGZE4xTFJyRGpKMFpVUXp0MGJ0ZlpHWmt0U1ZwN0JONTIz?=
+ =?utf-8?B?ako0WlpGK2V3ekVpTHA1M3FLcDlBRmNVVUFXRlhwemhCYmhQWm05VG1OMkJy?=
+ =?utf-8?B?YlNDYm04Q0tRU3VjVHYvbjdlUFBZb3VURWs1WHAyaHJ1NnJVdDN5WSt4cTZO?=
+ =?utf-8?B?WE9TZW9CNjE0Tk1ibnRXNk91Wmx5WHFwUXlZYnNCTlA1N25wR2hYRm9kZkcz?=
+ =?utf-8?B?QjRXaG0vRzQvWFNDVE9VMXVOTHAxK3MzWThFQWQ4SUNIMHl5bnVHZFB4YnBV?=
+ =?utf-8?B?VXl4aEUrWjJBamhFa1VFR1MxbU01M0wrY0VHSnA5bUltZTZjRlZjelRkVXkr?=
+ =?utf-8?B?bXg0LzBXWjJZWFIxVVFyT3Awb3FyNnpaWnVGc3Y0dW5OcElOZmJoZHB6ZU9s?=
+ =?utf-8?B?SW5rUjZ0Uys3STZaTTJ0TmFsR1kwTUQyYWJLQ3I4Ti9VZWN5Nk1SSVdhems5?=
+ =?utf-8?B?RWU5SnE0N1JwVHU0RTJUQW12djBJK1hwNlEvOFpURHJnajBNVi80OTdNM3A4?=
+ =?utf-8?B?eUtYb3RkZWJSWWFrNTVqdHZYWkZVWFB0TDRnMXpDRkpFa0k0Q2RTN1MybzUr?=
+ =?utf-8?B?MFRla3BBZjFGVm95R2VrdDdWV2IzWno5M1RtRk9vVzN5NmYwOUpUTHNHUVVi?=
+ =?utf-8?B?Y1hmaUFRS1UzeUJaK0dHVk9uUnZnTHJJbUthWjYwZXJlQzVnZ3ltdFJ5UU9u?=
+ =?utf-8?B?NGZObFVqaHZXUzZCcmtPR21GU3Q3NWIyWmZKREpLMUd1b0IxSHRpejUrWEtC?=
+ =?utf-8?B?RjJTdUFyVDJyMXdkWE8vWlFZekkvOGsyMXBYMWVETTRnM1UxMys1bjB3NytO?=
+ =?utf-8?B?VlNGQ09iK1l2dGp1aituaUtZMGp0S2YxbC9lK3dSMFFOVmpvR09yN2FCQlNP?=
+ =?utf-8?B?UUlVVk50OXpVVVNXRnpMMnpvdG1ITDlnbGRkUnIrd3VnSGppSzg3MmIrY2Vx?=
+ =?utf-8?B?NkhOK2VwOGs3bG5TVWIwTGJlT3E5YnJJbTQwRklRMVMwRmZaZFNHcE9GTk1h?=
+ =?utf-8?B?UU9JekRONHpTdEhDNWVDTjNBWWlieWI5U081WHd2QllaV3MvVDJpaDRGcng4?=
+ =?utf-8?B?a0xiRFFHYjUxQ2pyOWpvWkpORitGempNU0REQmU1NHRlY2xOWUEzYmQ2U3Q0?=
+ =?utf-8?B?bi91eUczUzhBYzNPYjZiWDNKdXFNRE5Kam5XZmFGeU9hRGc3OWUvQnlKWFZo?=
+ =?utf-8?B?WEE4dlRZYmd5OTJ1aFdUN1J2dXVZb01IU3hoNVJlMG5SNGwrYkxRK3dzeFZs?=
+ =?utf-8?B?bzMwOVNOVmdQSDNNNXl5KzduNTVxQ0pHSFlBbzlGajh3TDZIYjBwWGJBaFNY?=
+ =?utf-8?B?QU1IUHhTMlZsVmxRNXQvaU9UZDJIS1UvNWRiY3dnUVpLRDY2eUtpZ0RDS3li?=
+ =?utf-8?B?bEcvSzRyWVhwVG5BMXVuMlJ6RVhiV0MzRm0zOFdUelR5YUpGTU14cU9lRUZP?=
+ =?utf-8?B?VXVhWXF0THZnM3hDZEZHalJ4bVg2V20wYjlEcnRJWmZTYmdieTVqSnZSMmVS?=
+ =?utf-8?B?aGZUK3RmL1g3UmVaMkJmS3hBdEIxa1ludnkxT3FLU2ZDcGdVK3BmZW5sRDVM?=
+ =?utf-8?B?S3p2cXBUS3NMbWFZZDNoOXpJRjFpZWZINHhsSFlEK3BPZ1VZdmNvTElFYk9V?=
+ =?utf-8?B?SEgwZElLNW5KQnIwNUgxdzFYRHZjQ01HWjQwa0kxQnl6UUVvM0taQ1ZhMlY5?=
+ =?utf-8?B?N3F4VWhQb2hmVGRHVjg5K3RvK3AzeFZwbjYzNW5IMmp3Z3dDZWVHd2dCYzZs?=
+ =?utf-8?B?UmJ4VXhOY0FrMHVSZG1tMDdXUVZJMkN4UktEYWNvZGFBVWNiVjNVM3gwaFpX?=
+ =?utf-8?B?OERPK25jL05uTHFCdmd5ZFhYVEdtekYydVRKVHdWUndnMVJVUkxxcUN0Umpy?=
+ =?utf-8?Q?WDizwMjdgzY=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cTk1R1dzQkUxcW1meFp6R1VvY0gyOEFTay9DS0drelNCd1VUcFdxSHJsT21O?=
+ =?utf-8?B?YWFYSVZia3pDaHNjYzQ3eXJES2RuNnVPWFliTFJCMktxNDRGQmhPSC9jTUhy?=
+ =?utf-8?B?UzV5c2o5RGNZYlArbE1IUmFIWlFCZm9ObmZ4QXdxeWd3ZmZpTWlaWDAzQ0tG?=
+ =?utf-8?B?MTNRQldJQUljU3pxWks1VFJRZmxYWitEaE5QVUJMaVJ6OUZkdkFCYk1aSkZQ?=
+ =?utf-8?B?dFVWRjhGM2o0MkVpdEFwd0hHeVdyNzFCNEloZHArUy81RFBxOGIxa3ZxMUNV?=
+ =?utf-8?B?VE96QUdkNUp2cWNWNGlCMGlKYXVsV3JwanBQRCt3elJaZGxVMXcvWjdZWGhH?=
+ =?utf-8?B?YUpVM1RGTDhlNkdnV0lhSGZacjFSSDgrMFhlL25rNU1QMnliT29VNlVVMXJW?=
+ =?utf-8?B?cTBpSHV1NzVMaGt1b1hwM0NjL2xieG9yMVNFWFZLT0lXajV0L3grQnliZFZp?=
+ =?utf-8?B?L1pMd09RUVhGQWdxYnRpQ1lCalZoSFJwelI3TWExV09LMEJ5clNkek5nV2hR?=
+ =?utf-8?B?SHVXcHRsVG9ET09Md29hYWZwcTJtVzNtWkpCQk5KaGZxQi9HM3FaZEpZVFhX?=
+ =?utf-8?B?NUdEZk1uK2IxMFpVOWFJUTFaU243UjBsVWYxaGN2VGVQSlA0UytDVU5rY0lX?=
+ =?utf-8?B?dXBRMjQ1c0UxMzRIeWFNaHhrcklNeTdFdWJEbUx4ZW02VzVPK3RudTdaRFJ5?=
+ =?utf-8?B?ak9jWmRZSitqYXRqNk9BbTRxb2ZKblRjR3drb2pTRjJKMnJjTkpZQzJ2YWg2?=
+ =?utf-8?B?emhEc1EvNnJ3c1JKNVMxbFJTVUZNSC9sRnJDNHJnQStyeVV5SnZtS0FGZklN?=
+ =?utf-8?B?VVZoZEFNcVlBTTRmMEtaUHNZZ2hBZ1RxVjNYZHVTRjUxY20ramRIeTBWWFV0?=
+ =?utf-8?B?RW5IWmpYYVVVd2JpbllDSjdCd0U0Ni9jcFFwRXRDTFpWUHVMUDBNWHhTbitS?=
+ =?utf-8?B?STdaYUpveC9uVkEzMVRmdGxBRW5DZkUycXNpMDlSVmhROHNGYnlhWU5QcjRX?=
+ =?utf-8?B?NnMza3dMQWNCc1I1SjJXNUNBUzlwamtCVWZITGkrbVg0bWpnd3BqVFpiclJi?=
+ =?utf-8?B?RXErUVVPcHNsQW9rVkxGU2NmWDhoUC84Z0tWZE4rbTNzSkZRaGtsWEFsT09U?=
+ =?utf-8?B?Um9idW9ObmRMMjJ6U2hOSnRIRWplR0Z4RHFZL0kyUlkvRVlKVEI0VUloWTc3?=
+ =?utf-8?B?YmlqaDRUVm5TVktJNllWNjNvNzhySEtyMm9LYVJiQXFCRUV5cTFTeC9EQXJT?=
+ =?utf-8?B?eFB0OFpiSjJWNDlGKzlZTlRDaHcvdlhBNlNIQ1NoOXZTQzhOa2JPSHlzSzZU?=
+ =?utf-8?B?cVkxVGh1SDBBWEhMRTBXbFlqdm5tWVhkS0NPR2RYWTM3UGJSU0Urd3M5Nkxk?=
+ =?utf-8?B?bi9GYzAwdDBjTHV5UHNRcEhBbFJ4OGxiR0FrUXF1QjQxa292aW5ZaHZrRE9D?=
+ =?utf-8?B?UGdXYW9aT1llbUxhQThudlVDS291dXhFTEllOUJMY0pWbW1XT1BIT3RkbU04?=
+ =?utf-8?B?Vk0yZmI0cm9uU0hMdkI0b3o3V09kQTFvRDEzVStGaU1GdWFDOUQ1ZVRSckdp?=
+ =?utf-8?B?eG9TSVJKT2VMbkk4Z1FVaFk3SlE0Z3czc1ZoNm1HTnVyc29CVkVyRVYwYlgy?=
+ =?utf-8?B?dWhNMXJsZkJtNUJwNm5kUjV1UmEyRlVPTXBOcFJUaDRoMjVPU3MveHI0SEhC?=
+ =?utf-8?B?d1VoK2tKczF2YloydHdyM1QydmI5MVBxTnY5NXp6R0MrbmN5dmFjNGU1YmRi?=
+ =?utf-8?B?b1hOZmYxMWQ3bDJQeldFWDhRNE5ZS20yV2tvMGRGRXBjdWRhV1NPaUg1SDA0?=
+ =?utf-8?B?VER3MGxmUlBVRWVndFhoV2NyR2lKZnVTMkpTZmlWUHphWkNlZ2IwWnY0VmxZ?=
+ =?utf-8?B?aDZ3bGMzVmZPaGlCWE1NVzRBMFBpdHYyaVFmbUlqZE4xU1JHdzJXWG4wYUxD?=
+ =?utf-8?B?dVlTbmtHNTQ3VnJ6K0F2NFBDL0NGU3dhZXNOdXJhZ0R1TVFydnhsR1dGc2Vp?=
+ =?utf-8?B?c0FjZExiWm43SGxIWkdxelJnbFlrMC9CbGJTN3RYNkdUdUo0eWRWbGxSeEtG?=
+ =?utf-8?B?RFdKQm1qRDlVSFRmeXVuNUlteVh2Mm9vS2tiSXRURGh6dkZsQTFmM2ZYUFoy?=
+ =?utf-8?B?VS9lQ01RS0I4QkM5N3VXU3JnbURPaEdkSm5WNmROcU12amhvSTlrV2lndU9E?=
+ =?utf-8?B?Q1BzVU1Vck56OEEyVWI1Qlk1Vi9jWjc5WlN5US8ybXU1MUZTYWMzOTVVUTE0?=
+ =?utf-8?B?a2RINW81ckFaUmw1WkhOZ29OcDB3PT0=?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8bdb44eb-eeb4-4930-8a7d-08ddc827b660
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jul 2025 07:25:04.7907
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2dY+0dVHkuaUttooD/SzzsNthN18mNUjhWUdEXa/wLf2U9QTrWwC1LddAtecbYVoEDBPBJcX06IRq6glMsXvSIa8waUgmCFsQMmAEMqanGo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPFED9C9AC99
+X-OriginatorOrg: intel.com
 
-The LAN8842 is a low-power, single port triple-speed (10BASE-T/ 100BASE-TX/
-1000BASE-T) ethernet physical layer transceiver (PHY) that supports
-transmission and reception of data on standard CAT-5, as well as CAT-5e and
-CAT-6, Unshielded Twisted Pair (UTP) cables.
+On Sat, Jul 19, 2025 at 01:26:18PM +0800, Jason Xing wrote:
+> On Fri, Jul 18, 2025 at 6:27 PM Larysa Zaremba <larysa.zaremba@intel.com> wrote:
+> >
+> > On Wed, Jul 16, 2025 at 11:41:42AM +0800, Jason Xing wrote:
+> > > Hi all,
+> > >
+> > > I'm currently faced with one tough issue caused by zero copy mode in
+> > > xsk with ixgbe driver loaded. The case is that if we use xdpsock to
+> > > send descs, nearly at the same time normal packets from other tx
+> > > queues cannot be transmitted/completed at all.
+> > >
+> > > Here is how I try:
+> > > 1. run iperf or ping to see if the transmission is successful.
+> > > 2. then run "timeout 5 ./xdpsock -i enp2s0f0 -t  -z -s 64"
+> > >
+> > > You will obviously find the whole machine loses connection. It can
+> > > only recover as soon as the xdpsock is stopped due to timeout.
+> > >
+> > > I tried a lot and then traced down to this line in ixgbe driver:
+> > > ixgbe_clean_tx_irq()
+> > >     -> if (!(eop_desc->wb.status & cpu_to_le32(IXGBE_TXD_STAT_DD)))
+> > >             break;
+> > > The above line always 'breaks' the sending process.
+> > >
+> > > I also managed to make the external ixgbe 6.15 work and it turned out
+> > > to be the same issue as before.
+> > >
+> > > I have no idea on how to analyze further in this driver. Could someone
+> > > point out a direction that I can take? Is it a known issue?
+> > >
+> > > Thanks,
+> > > Jason
+> > >
+> >
+> > I was able to reproduce the described behaviour, xdpsock does break the IP
+> > communication. However, in my case this was not because of ixgbe not being able
+> > to send, but because of queue 0 RX packets being dropped, which is the indended
+> > outcome in xdpsock, even in Tx only mode.
+> 
+> Thanks for your feedback. It would be great if you could elaborate
+> more on this. How did you spot that it's queue 0 that causes the
+> problem?
 
-The LAN8842 supports industry-standard SGMII (Serial Gigabit Media
-Independent Interface) providing chip-to-chip connection to a Gigabit
-Ethernet MAC using a single serialized link (differential pair) in each
-direction.
+If you do not specify -q parameter, xdpsock loads on the queue pair 0.
 
-There are 2 variants of the lan8842. The one that supports timestamping
-(lan8842) and one that doesn't have timestamping (lan8832).
+> Why is xdpsock breaking IP communication intended?
 
-Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
----
- drivers/net/phy/micrel.c   | 199 +++++++++++++++++++++++++++++++++++++
- include/linux/micrel_phy.h |   1 +
- 2 files changed, 200 insertions(+)
+Because when a packet arrives on the AF_XDP-managed queue (0 in this case), the 
+default xdpsock XDP program provided by libxdp returns XDP_REDIRECT even in 
+tx-only mode, XDP_PASS for all other queues (1-39). XDP_REDIRECT results in a 
+packet leaving the kernel network stack, it is now managed by the AF_XDP 
+userspace program. I think it is possible to modify libxdp to return XDP_PASS 
+when the socket is tx-only.
 
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index f678c1bdacdf0..c5887a23f9941 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -107,6 +107,7 @@
- #define LAN8814_INTC				0x18
- #define LAN8814_INTS				0x1B
- 
-+#define LAN8814_INT_FLF				BIT(15)
- #define LAN8814_INT_LINK_DOWN			BIT(2)
- #define LAN8814_INT_LINK_UP			BIT(0)
- #define LAN8814_INT_LINK			(LAN8814_INT_LINK_UP |\
-@@ -448,6 +449,20 @@ struct kszphy_priv {
- 	struct kszphy_phy_stats phy_stats;
- };
- 
-+struct lan8842_hw_stat {
-+	const char *string;
-+	u8 page;
-+	u8 regs_count;
-+	u8 regs[3];
-+};
-+
-+static struct lan8842_hw_stat lan8842_hw_stats[] = {
-+	{ "phy_rx_correct_count", 2, 3, {88, 61, 60}},
-+	{ "phy_rx_crc_count", 2, 2, {63, 62}},
-+	{ "phy_tx_correct_count", 2, 3, {89, 85, 84}},
-+	{ "phy_tx_crc_count", 2, 2, {87, 86}},
-+};
-+
- static const struct kszphy_type lan8814_type = {
- 	.led_mode_reg		= ~LAN8814_LED_CTRL_1,
- 	.cable_diag_reg		= LAN8814_CABLE_DIAG,
-@@ -5641,6 +5656,174 @@ static int ksz9131_resume(struct phy_device *phydev)
- 	return kszphy_resume(phydev);
- }
- 
-+#define LAN8842_SELF_TEST			14 /* 0x0e */
-+#define LAN8842_SELF_TEST_RX_CNT_ENA		BIT(8)
-+#define LAN8842_SELF_TEST_TX_CNT_ENA		BIT(4)
-+
-+static int lan8842_probe(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	/* Similar to lan8814 this PHY has a pin which needs to be pulled down
-+	 * to enable to pass any traffic through it. Therefore use the same
-+	 * function as lan8814
-+	 */
-+	ret = lan8814_release_coma_mode(phydev);
-+	if (ret)
-+		return ret;
-+
-+	/* Enable to count the RX and TX packets */
-+	lanphy_write_page_reg(phydev, 2, LAN8842_SELF_TEST,
-+			      LAN8842_SELF_TEST_RX_CNT_ENA |
-+			      LAN8842_SELF_TEST_TX_CNT_ENA);
-+
-+	return 0;
-+}
-+
-+#define LAN8842_SGMII_AUTO_ANEG_ENA		69 /* 0x45 */
-+#define LAN8842_FLF				15 /* 0x0e */
-+#define LAN8842_FLF_ENA				BIT(1)
-+#define LAN8842_FLF_ENA_LINK_DOWN		BIT(0)
-+
-+static int lan8842_config_init(struct phy_device *phydev)
-+{
-+	int val;
-+	int ret;
-+
-+	/* Reset the PHY */
-+	val = lanphy_read_page_reg(phydev, 4, LAN8814_QSGMII_SOFT_RESET);
-+	if (val < 0)
-+		return val;
-+	val |= LAN8814_QSGMII_SOFT_RESET_BIT;
-+	lanphy_write_page_reg(phydev, 4, LAN8814_QSGMII_SOFT_RESET, val);
-+
-+	/* Disable ANEG with QSGMII PCS Host side
-+	 * It has the same address as lan8814
-+	 */
-+	val = lanphy_read_page_reg(phydev, 5, LAN8814_QSGMII_PCS1G_ANEG_CONFIG);
-+	if (val < 0)
-+		return val;
-+	val &= ~LAN8814_QSGMII_PCS1G_ANEG_CONFIG_ANEG_ENA;
-+	ret = lanphy_write_page_reg(phydev, 5, LAN8814_QSGMII_PCS1G_ANEG_CONFIG,
-+				    val);
-+	if (ret < 0)
-+		return ret;
-+
-+	/* Disable also the SGMII_AUTO_ANEG_ENA, this will determine what is the
-+	 * PHY autoneg with the other end and then will update the host side
-+	 */
-+	lanphy_write_page_reg(phydev, 4, LAN8842_SGMII_AUTO_ANEG_ENA, 0);
-+
-+	/* To allow the PHY to control the LEDs the GPIOs of the PHY should have
-+	 * a function mode and not the GPIO. Apparently by default the value is
-+	 * GPIO and not function even though the datasheet it says that it is
-+	 * function. Therefore set this value.
-+	 */
-+	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_EN2, 0);
-+
-+	/* Enable the Fast link failure, at the top level, at the bottom level
-+	 * it would be set/cleared inside lan8842_config_intr
-+	 */
-+	val = lanphy_read_page_reg(phydev, 0, LAN8842_FLF);
-+	if (val < 0)
-+		return val;
-+	val |= LAN8842_FLF_ENA | LAN8842_FLF_ENA_LINK_DOWN;
-+	lanphy_write_page_reg(phydev, 0, LAN8842_FLF, val);
-+
-+	return 0;
-+}
-+
-+#define LAN8842_INTR_CTRL_REG			52 /* 0x34 */
-+
-+static int lan8842_config_intr(struct phy_device *phydev)
-+{
-+	int err;
-+
-+	lanphy_write_page_reg(phydev, 4, LAN8842_INTR_CTRL_REG,
-+			      LAN8814_INTR_CTRL_REG_INTR_ENABLE);
-+
-+	/* enable / disable interrupts */
-+	if (phydev->interrupts == PHY_INTERRUPT_ENABLED) {
-+		err = lan8814_ack_interrupt(phydev);
-+		if (err)
-+			return err;
-+
-+		err = phy_write(phydev, LAN8814_INTC,
-+				LAN8814_INT_LINK | LAN8814_INT_FLF);
-+	} else {
-+		err = phy_write(phydev, LAN8814_INTC, 0);
-+		if (err)
-+			return err;
-+
-+		err = lan8814_ack_interrupt(phydev);
-+	}
-+
-+	return err;
-+}
-+
-+static irqreturn_t lan8842_handle_interrupt(struct phy_device *phydev)
-+{
-+	int ret = IRQ_NONE;
-+	int irq_status;
-+
-+	irq_status = phy_read(phydev, LAN8814_INTS);
-+	if (irq_status < 0) {
-+		phy_error(phydev);
-+		return IRQ_NONE;
-+	}
-+
-+	if (irq_status & (LAN8814_INT_LINK | LAN8814_INT_FLF)) {
-+		phy_trigger_machine(phydev);
-+		ret = IRQ_HANDLED;
-+	}
-+
-+	return ret;
-+}
-+
-+static int lan8842_get_sset_count(struct phy_device *phydev)
-+{
-+	return ARRAY_SIZE(lan8842_hw_stats);
-+}
-+
-+static void lan8842_get_strings(struct phy_device *phydev, u8 *data)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(lan8842_hw_stats); i++) {
-+		strscpy(data + i * ETH_GSTRING_LEN,
-+			lan8842_hw_stats[i].string, ETH_GSTRING_LEN);
-+	}
-+}
-+
-+static u64 lan8842_get_stat(struct phy_device *phydev, int i)
-+{
-+	struct lan8842_hw_stat stat = lan8842_hw_stats[i];
-+	int val;
-+	u64 ret = 0;
-+
-+	for (int j = 0; j < stat.regs_count; ++j) {
-+		val = lanphy_read_page_reg(phydev,
-+					   stat.page,
-+					   stat.regs[j]);
-+		if (val < 0)
-+			return U64_MAX;
-+
-+		ret <<= 16;
-+		ret += val;
-+	}
-+
-+	return ret;
-+}
-+
-+static void lan8842_get_stats(struct phy_device *phydev,
-+			      struct ethtool_stats *stats, u64 *data)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(lan8842_hw_stats); i++)
-+		data[i] = lan8842_get_stat(phydev, i);
-+}
-+
- static struct phy_driver ksphy_driver[] = {
- {
- 	.phy_id		= PHY_ID_KS8737,
-@@ -5869,6 +6052,21 @@ static struct phy_driver ksphy_driver[] = {
- 	.resume		= lan8841_resume,
- 	.cable_test_start	= lan8814_cable_test_start,
- 	.cable_test_get_status	= ksz886x_cable_test_get_status,
-+}, {
-+	.phy_id		= PHY_ID_LAN8842,
-+	.phy_id_mask	= MICREL_PHY_ID_MASK,
-+	.name		= "Microchip LAN8842 Gigabit PHY",
-+	.flags		= PHY_POLL_CABLE_TEST,
-+	.driver_data	= &lan8814_type,
-+	.probe		= lan8842_probe,
-+	.config_init	= lan8842_config_init,
-+	.config_intr	= lan8842_config_intr,
-+	.handle_interrupt = lan8842_handle_interrupt,
-+	.get_sset_count	= lan8842_get_sset_count,
-+	.get_strings	= lan8842_get_strings,
-+	.get_stats	= lan8842_get_stats,
-+	.cable_test_start	= lan8814_cable_test_start,
-+	.cable_test_get_status	= ksz886x_cable_test_get_status,
- }, {
- 	.phy_id		= PHY_ID_KSZ9131,
- 	.phy_id_mask	= MICREL_PHY_ID_MASK,
-@@ -5967,6 +6165,7 @@ static const struct mdio_device_id __maybe_unused micrel_tbl[] = {
- 	{ PHY_ID_LAN8814, MICREL_PHY_ID_MASK },
- 	{ PHY_ID_LAN8804, MICREL_PHY_ID_MASK },
- 	{ PHY_ID_LAN8841, MICREL_PHY_ID_MASK },
-+	{ PHY_ID_LAN8842, MICREL_PHY_ID_MASK },
- 	{ }
- };
- 
-diff --git a/include/linux/micrel_phy.h b/include/linux/micrel_phy.h
-index 9af01bdd86d26..ca691641788b8 100644
---- a/include/linux/micrel_phy.h
-+++ b/include/linux/micrel_phy.h
-@@ -32,6 +32,7 @@
- #define PHY_ID_LAN8814		0x00221660
- #define PHY_ID_LAN8804		0x00221670
- #define PHY_ID_LAN8841		0x00221650
-+#define PHY_ID_LAN8842		0x002216C0
- 
- #define PHY_ID_KSZ886X		0x00221430
- #define PHY_ID_KSZ8863		0x00221435
--- 
-2.34.1
+> 
+> When you try i40e, you will find the connection behaves normally. Ping
+> can work as usual. As I depicted before, with ixgbe driver, ping even
+> doesn't work at all.
 
+I think this is due to RSS configuration, ping packets on i40e go to another 
+queue.
+
+> 
+> iperf is the one that I should not list... Because I find iperf always
+> doesn't work with either of them loaded.
+> 
+> >
+> > When I run `tcpdump -nn -e -p -i <ifname>` on the link partner, I see that the
+> > ixgbe host spams ARP packets just fine.
+> 
+> Interesting. I managed to see the same phenomenon.
+> 
+> I debugged the ixgbe and saw the following code breaks the whole
+> sending process:
+> ixgbe_clean_tx_irq()
+>      -> if (!(eop_desc->wb.status & cpu_to_le32(IXGBE_TXD_STAT_DD)))
+>              break;
+> 
+> Do you have any idea why?
+>
+
+This line checks if HW has already sent the packet, so the driver can reclaim 
+resources. If the packet has not yet been sent, there is nothing for driver to 
+do but wait.
+
+> >
+> > When debugging low-level stuff such as XDP, I advise you to send packets at the
+> > lower level, e.g. with scapy's sendp().
+> >
+> > In case you have a different problem, please provide lspci card description and
+> > some truncated output of the commands that you are running and the resulting
+> > dmesg.
+> 
+> I'm not that sure if they are the same.
+> 
+> One of ixgbe machines that I manipulate looks like this:
+> # lspci -vv | grep -i ether
+> 02:00.0 Ethernet controller: Intel Corporation Ethernet Controller
+> 10-Gigabit X540-AT2 (rev 01)
+> 02:00.1 Ethernet controller: Intel Corporation Ethernet Controller
+> 10-Gigabit X540-AT2 (rev 01)
+>
+
+Some device-specific quirks on older cards sometimes result in bad XDP 
+behaviour, but are usually visible in dmesg.
+
+> # dmesg -T|grep -i ixgbe
+> [Fri Jul 18 16:20:29 2025] ixgbe: Intel(R) 10 Gigabit PCI Express Network Driver
+> [Fri Jul 18 16:20:29 2025] ixgbe: Copyright (c) 1999-2016 Intel Corporation.
+> [Fri Jul 18 16:20:29 2025] ixgbe 0000:02:00.0: Multiqueue Enabled: Rx
+> Queue count = 48, Tx Queue count = 48 XDP Queue count = 0
+> [Fri Jul 18 16:20:29 2025] ixgbe 0000:02:00.0: 32.000 Gb/s available
+> PCIe bandwidth (5.0 GT/s PCIe x8 link)
+> [Fri Jul 18 16:20:29 2025] ixgbe 0000:02:00.0: MAC: 3, PHY: 0, PBA No:
+> 000000-000
+> [Fri Jul 18 16:20:29 2025] ixgbe 0000:02:00.0: f0:98:38:1a:5d:4e
+> [Fri Jul 18 16:20:29 2025] ixgbe 0000:02:00.0: Intel(R) 10 Gigabit
+> Network Connection
+> [Fri Jul 18 16:20:30 2025] ixgbe 0000:02:00.1: Multiqueue Enabled: Rx
+> Queue count = 48, Tx Queue count = 48 XDP Queue count = 0
+> [Fri Jul 18 16:20:30 2025] ixgbe 0000:02:00.1: 32.000 Gb/s available
+> PCIe bandwidth (5.0 GT/s PCIe x8 link)
+> [Fri Jul 18 16:20:30 2025] ixgbe 0000:02:00.1: MAC: 3, PHY: 0, PBA No:
+> 000000-000
+> [Fri Jul 18 16:20:30 2025] ixgbe 0000:02:00.1: f0:98:38:1a:5d:4f
+> [Fri Jul 18 16:20:30 2025] ixgbe 0000:02:00.1: Intel(R) 10 Gigabit
+> Network Connection
+> [Fri Jul 18 16:20:30 2025] ixgbe 0000:02:00.0 enp2s0f0np0: renamed from eth0
+> [Fri Jul 18 16:20:30 2025] ixgbe 0000:02:00.1 enp2s0f1np1: renamed from eth1
+> [Fri Jul 18 16:20:38 2025] ixgbe 0000:02:00.0: registered PHC device
+> on enp2s0f0np0
+> [Fri Jul 18 16:20:38 2025] ixgbe 0000:02:00.0 enp2s0f0np0: NIC Link is
+> Up 1 Gbps, Flow Control: None
+> [Fri Jul 18 16:20:38 2025] ixgbe 0000:02:00.1: registered PHC device
+> on enp2s0f1np1
+> [Sat Jul 19 13:11:30 2025] ixgbe 0000:02:00.0: removed PHC on enp2s0f0np0
+> [Sat Jul 19 13:11:31 2025] ixgbe 0000:02:00.0: Multiqueue Enabled: Rx
+> Queue count = 48, Tx Queue count = 48 XDP Queue count = 48
+> [Sat Jul 19 13:11:31 2025] ixgbe 0000:02:00.0: registered PHC device
+> on enp2s0f0np0
+> [Sat Jul 19 13:11:31 2025] ixgbe 0000:02:00.0 enp2s0f0np0: NIC Link is
+> Up 1 Gbps, Flow Control: None
+> [Sat Jul 19 13:11:34 2025] ixgbe 0000:02:00.0: removed PHC on enp2s0f0np0
+> [Sat Jul 19 13:11:34 2025] ixgbe 0000:02:00.0: Multiqueue Enabled: Rx
+> Queue count = 48, Tx Queue count = 48 XDP Queue count = 0
+> [Sat Jul 19 13:11:35 2025] ixgbe 0000:02:00.0: registered PHC device
+> on enp2s0f0np0
+> [Sat Jul 19 13:11:35 2025] ixgbe 0000:02:00.0 enp2s0f0np0: NIC Link is
+> Up 1 Gbps, Flow Control: None
+> 
+> reproduce process:
+> 1. timeout 3 ./xdpsock -i enp2s0f0np0 -t  -z -s 64
+> 2. ping <another IP address>
+> 
+> Thanks,
+> Jason
 
