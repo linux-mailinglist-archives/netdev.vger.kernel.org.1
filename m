@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-208584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51871B0C35D
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 13:41:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C834B0C364
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 13:42:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7F3C7B2205
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 11:38:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D03287B1B90
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 11:38:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A04DD2D5438;
-	Mon, 21 Jul 2025 11:35:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91BDA2D5C6C;
+	Mon, 21 Jul 2025 11:36:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6D32C032C;
-	Mon, 21 Jul 2025 11:35:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C801A28D8DF;
+	Mon, 21 Jul 2025 11:36:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753097758; cv=none; b=bGplNkoAgjGW0FV7EfIHa7B2IEz27E6H+hewbYvdrm0/0bEN9Z2YJsi430a+opaeacCMNwCAphvJJqKEe36UUoaEHo52O+iAEqyV/4Dlj1PHTovI+TNNNQ7lIfe53VFTqZv9vZ649DdpO3++trBWvj9eQQMTRmkStEaPEhE6CQM=
+	t=1753097767; cv=none; b=HIdL4NJOaTGqUyD2UETlwlZqoJ+TrtH1fANiso45TdKUCAC+Sl9V79/HcOdzU49Dg1PAYFrBRs2lnPscTPPc5ZsOPTHcTIk0A1dG1wVM/xu3FYemkiBY0Ytj8EVQth6hMWzpze2jkETHwZWLmlAP3TmDXen3pkt/Ug+Ny/BwhME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753097758; c=relaxed/simple;
-	bh=NGkH8POWMCUvWCC9DCll509gIgZQUqK9dDOtfMu2Zbs=;
+	s=arc-20240116; t=1753097767; c=relaxed/simple;
+	bh=Kj5c1GfTfhhBtsz9aBg/wTpCzwpJO1O/hCu6ppAtlTw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bnz6Y/ZQUD9YgrjvidT4jgekX77f2NZCcX9mFCXVMvNOUNL1qAidqHkvhdaquGHKrXYigUcdjaLBDCUgziqdcq9fUljzvld510fS/ZN5IaC87r65bPVfcDx0Tv4kb0WRSY6K+MN1A8OkhXL+kSIHml0PS+TdgoZXuQOCFByZkec=
+	 MIME-Version; b=W4kaioKg2GTckive97j4MPaL5wO5m3FzIkT86sqXvmSAvhFd4J3cjXOjeWh2rsU+OxP+ik+JassvvXF3NHWVch7YulBlCdQH7P4/+oJUYv6LokgkhnFiMbovOfP7GBbXBhOvCXyRmQ9D8+apgrtp04xwb/2WqqAEdw/X7mZ8WFA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=18.132.163.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: esmtpsz18t1753097622tca2e3512
-X-QQ-Originating-IP: eI9/Mm2GTAz7JMai5LpjBtPjDGhIZrqE87aX0mMU5RE=
+X-QQ-mid: esmtpsz18t1753097627t404d175b
+X-QQ-Originating-IP: r6hz5n/Fs1xR1a5ZNS7SNLJxhaA+ib6nlhbV+fzbnBE=
 Received: from localhost.localdomain ( [203.174.112.180])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 21 Jul 2025 19:33:39 +0800 (CST)
+	id ; Mon, 21 Jul 2025 19:33:44 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 13491831712532506601
+X-BIZMAIL-ID: 43171819546396796
 EX-QQ-RecipientCnt: 23
 From: Dong Yibo <dong100@mucse.com>
 To: andrew+netdev@lunn.ch,
@@ -62,9 +62,9 @@ Cc: netdev@vger.kernel.org,
 	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	dong100@mucse.com
-Subject: [PATCH v2 12/15] net: rnpgbe: Add link up handler
-Date: Mon, 21 Jul 2025 19:32:35 +0800
-Message-Id: <20250721113238.18615-13-dong100@mucse.com>
+Subject: [PATCH v2 13/15] net: rnpgbe: Add base tx functions
+Date: Mon, 21 Jul 2025 19:32:36 +0800
+Message-Id: <20250721113238.18615-14-dong100@mucse.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20250721113238.18615-1-dong100@mucse.com>
 References: <20250721113238.18615-1-dong100@mucse.com>
@@ -77,631 +77,897 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: esmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: NlEtBhRRrtWGOVUahyF4YvGewwCO2RmDbOMPYXn6g8MPfOq4XQgixhiQ
-	P5M0aBeBq1ZWCNxPocSmvG6yMzjiiWpJIaR8NtLcFlvQvA/C4XVN+Tv7gfJVPN7oBe37K+J
-	2Yh2/xGSq9Ep0FRB8+3Ztufv0HtWxLyyb8AvQK+QRKZYn1MJjyaf9d5olM8tFfvVWZNBVni
-	Wa1/g1hM/SPNCt/j9aVS4zgBwTy8Iy0X9gG+tiuN3JH1AehI6JSv/sEFtzhQ4VlymNbbZEL
-	fo6/lMStoCGgQverOJjAHnBm1v+vpQD2/IrCSj72hMPgCq5rkg1kQT/k8Ww64iJ55evXdYs
-	ra6Fc3b+w9ZBSCbNLTCpADdg6Ow9dJMUB3TYMAM3TNseNAdwm32rRL5XdsZSSQ33N7E/5NZ
-	pgQyzD8vGUWhib9lMaSkxx4XZqPbZVCP7sQy0qiZABz+2sg0VaamtBebWKQSWN6oHpX/OOU
-	FieB5EMT7PopdJojYx/c4vakpS+LtDLg/nbyrm0vJ0zXyrE16rtheTMHOfvb6AalbPFaHN8
-	/FPrvUCL+JZa7Mdb2YfDCZ/NkF3PAhadlLxoQTTYHORN6RmceIvH1wHlFHco71DJQBXIj2m
-	LtXL0gAgYB4eeNNq2pxTBPSZKa0SfebqoZZLs1jGIR9WjWVpQY8f+9bm+EaprWvmPWR33pj
-	YoErCLv6X0UX+hWqLPJ790szytEcEYO7pKaNpR6P97daMjRl2LHZBYinGukEe86xkaFX1su
-	RJK/Okd7TMVuXAf/izRe1XEvSdChb2eaRAT6tCoKx2c6xcDGjJdwN6YKdFYwPwhCd7Rbgyf
-	GAbFAN6UexKu4/dlwu3sTg4GlnBYBBMuZhlSx4wfmCD3eLaZTETTQDJ9miqtg2SmAZGVf9l
-	078ETKaeoyb9fg7QFZebE+AHdWV6RwCKHm8o1X9nupk3x9SdczqvqbA77e6selH9J8glB6Q
-	jvn7ZHeHBL17dt0r40/FROIBi5R8fh45gTLKhZ7+wz0vVEx6RrfOaFEryCTkSPKMsYnGFUb
-	d2Yf/1OVk2WQKV2UOQUIlaEb0XPFU5b/krl3TtOFstudETjuGXiPsMIODaT1gay7tANBMjF
-	O7DEE0U031L
-X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
+X-QQ-XMAILINFO: MrcPhcux9cyzzKDM9HanCoABaDT8ioaXPRw7NhlEsZo56BpPq2aMr43Z
+	Ex5q61MR7nIo1fj5aHxd41tJ2Ca6XVakfJG8oQF0waq2FiMvOIGJLEdiyNoEHmWqXAQ9dE0
+	q1hvdrLPzmGd88aYGVWSgpRj48JJTERxd4Dj6CtcOruGQUiLY3Gnvpggdhl3LyNyQqEDQMq
+	itWP6QVF1/ER/QyozSsff6TPPkDaeKmlNkYkB6g9nMUvmME9Q//J3/Ft5oXc88DKlJZpcAK
+	wO+qzd5pCCrrt7PceqZQPad/Hl0H99OhnOV8L5sjeIC9stE+Kku4c3dCTFkUST2FKipmzyp
+	lfzS8L9Wf41PyjF/h1G2uLKlzr43+bGLZna/M1Ne2vClMuAioiEcRtCxmb324qp2HSJG+HQ
+	bUIn1U+tvBxejIL0SEeU+yzq3vmGAKnWTsczm323bo5BD5bBFs/6D5y5H4TNms4BnMY33IU
+	JyJlPObBI8KIxIJLJLJrvvDnX+VBW98Z/XVRuMLcrxtd8Kgqu145KaRitbcQxcVPZmYRDol
+	4io3EV+3nea9+iz5dsi9mIftiR6pcplilY2yoiT/rEmbikAmtZSY78WoTgoDUa+mMxo3NqM
+	MOFF9wAcHpccMuTG4Tlrz9xIw6+ZfpXGXZNgXAq5xAQUB4jcbW0JW+cT8Le7hcKT0EoV+sS
+	rGeXg1A3dR1Qr3ygV6Ey3iAh6PasD3zIo+IRyZc8vM6oQRIXZFzdY/E6rm2PPpAcl5+4HZr
+	YYxRf52CTvVB8mNbddGfcHhp4h3fAZtTww3pehwnOsMQo3D44/fYHahTiYfyXQ9DvQaTLOw
+	nm7I3Hsu4qdyFY6oaedVmvJLOLq2smJOk2krEumuakewmwSZdW6wG55drvbvAmiGly1pxlS
+	+MlPt1W4q9sCSRT7DdZpkOQ+MWb6ZtOHLBYQmksVRFgdkS+jgO7hLnPi5yFg6CGE5fG7coD
+	P67LoTrXuzEBpDsE8kmkMsOzOnefpt6UjiEVZkzIhGMh5VvkuWyaPhzqAnnO42Y8yFHSLNC
+	6Kq9BRKM+b38bLnrsCDEfhJ6tz1TAwU0ubyPuBhtONgI6Gnkxoml78Dox8dbs=
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
 X-QQ-RECHKSPAM: 0
 
-Initialize link status handler
+Initialize tx-map and tx clean functions
 
 Signed-off-by: Dong Yibo <dong100@mucse.com>
 ---
- drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |  53 +++++
- .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   |  26 +++
- .../net/ethernet/mucse/rnpgbe/rnpgbe_lib.c    |   7 +
- .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   | 139 +++++++++++++
- .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h    |   1 +
- .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c | 187 ++++++++++++++++++
- .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h |   7 +
- 7 files changed, 420 insertions(+)
+ drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |  19 +
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   |  65 ++-
+ drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |   6 +
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_lib.c    | 431 +++++++++++++++++-
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_lib.h    |  14 +-
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   |  79 +++-
+ 6 files changed, 607 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-index 624e0eec562a..b241740d9cc5 100644
+index b241740d9cc5..26774c214da0 100644
 --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
 +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-@@ -26,6 +26,15 @@ enum rnpgbe_hw_type {
- 	rnpgbe_hw_unknow
+@@ -51,6 +51,7 @@ struct mucse_eth_operations {
+ 	int (*set_rar)(struct mucse_eth_info *eth, u32 index, u8 *addr);
+ 	int (*clear_rar)(struct mucse_eth_info *eth, u32 index);
+ 	void (*clr_mc_addr)(struct mucse_eth_info *eth);
++	void (*set_rx)(struct mucse_eth_info *eth, bool status);
  };
  
-+enum speed_enum {
-+	speed_10,
-+	speed_100,
-+	speed_1000,
-+	speed_10000,
-+	speed_25000,
-+	speed_40000,
-+};
-+
- struct mucse_dma_info {
- 	u8 __iomem *dma_base_addr;
- 	u8 __iomem *dma_ring_addr;
-@@ -121,6 +130,31 @@ struct mucse_mbx_operations {
- 			  bool enable);
+ #define RNPGBE_MAX_MTA 128
+@@ -80,6 +81,7 @@ struct mucse_mac_info;
+ 
+ struct mucse_mac_operations {
+ 	void (*set_mac)(struct mucse_mac_info *mac, u8 *addr, int index);
++	void (*set_mac_rx)(struct mucse_mac_info *mac, bool status);
  };
  
-+/* Flow Control Settings */
-+enum mucse_fc_mode {
-+	mucse_fc_none = 0,
-+	mucse_fc_rx_pause,
-+	mucse_fc_tx_pause,
-+	mucse_fc_full,
-+	mucse_fc_default
-+};
-+
-+#define PAUSE_TX (0x1)
-+#define PAUSE_RX (0x2)
-+#define PAUSE_AUTO (0x10)
-+#define ASYM_PAUSE BIT(11)
-+#define SYM_PAUSE BIT(10)
-+
-+#define M_MAX_TRAFFIC_CLASS (4)
-+/* Flow control parameters */
-+struct mucse_fc_info {
-+	u32 high_water[M_MAX_TRAFFIC_CLASS];
-+	u32 low_water[M_MAX_TRAFFIC_CLASS];
-+	u16 pause_time;
-+	enum mucse_fc_mode current_mode;
-+	enum mucse_fc_mode requested_mode;
-+};
-+
- struct mucse_mbx_stats {
- 	u32 msgs_tx;
- 	u32 msgs_rx;
-@@ -186,6 +220,8 @@ struct mucse_hw_operations {
- 	void (*set_irq_mode)(struct mucse_hw *hw, bool legacy);
- 	void (*set_mbx_link_event)(struct mucse_hw *hw, int enable);
+ struct mucse_mac_info {
+@@ -222,6 +224,7 @@ struct mucse_hw_operations {
  	void (*set_mbx_ifup)(struct mucse_hw *hw, int enable);
-+	void (*check_link)(struct mucse_hw *hw, u32 *speed, bool *link_up,
-+			   bool *duplex);
+ 	void (*check_link)(struct mucse_hw *hw, u32 *speed, bool *link_up,
+ 			   bool *duplex);
++	void (*set_mac_rx)(struct mucse_hw *hw, bool status);
  };
  
  enum {
-@@ -224,6 +260,7 @@ struct mucse_hw {
- 	struct mucse_dma_info dma;
- 	struct mucse_eth_info eth;
- 	struct mucse_mac_info mac;
-+	struct mucse_fc_info fc;
- 	struct mucse_mbx_info mbx;
- #define M_NET_FEATURE_SG BIT(0)
- #define M_NET_FEATURE_TX_CHECKSUM BIT(1)
-@@ -254,6 +291,9 @@ struct mucse_hw {
- 	u16 max_msix_vectors;
- 	int nr_lane;
- 	struct lldp_status lldp_status;
-+	int speed;
-+	u32 duplex;
-+	u32 tp_mdx;
- 	int link;
- 	u8 addr[ETH_ALEN];
- 	u8 perm_addr[ETH_ALEN];
-@@ -261,6 +301,7 @@ struct mucse_hw {
+@@ -538,6 +541,8 @@ struct mucse_ring {
  
- enum mucse_state_t {
- 	__MUCSE_TESTING,
-+	__MUCSE_RESETTING,
- 	__MUCSE_DOWN,
- 	__MUCSE_SERVICE_SCHED,
- 	__MUCSE_PTP_TX_IN_PROGRESS,
-@@ -544,6 +585,7 @@ struct mucse {
- 	u32 priv_flags;
- #define M_PRIV_FLAG_TX_COALESCE BIT(25)
- #define M_PRIV_FLAG_RX_COALESCE BIT(26)
-+#define M_PRIV_FLAG_LLDP BIT(27)
- 	struct mucse_ring *tx_ring[MAX_TX_QUEUES] ____cacheline_aligned_in_smp;
- 	int tx_ring_item_count;
- 	int num_tx_queues;
-@@ -562,6 +604,9 @@ struct mucse {
- 	u16 rx_frames;
- 	u16 tx_frames;
- 	u16 tx_usecs;
-+	bool link_up;
-+	u32 link_speed;
-+	bool duplex;
- 	unsigned long state;
- 	unsigned long link_check_timeout;
- 	struct timer_list service_timer;
-@@ -610,9 +655,17 @@ static inline unsigned int mucse_rx_bufsz(struct mucse_ring *ring)
- #define M_PKT_TIMEOUT (30)
- #define M_RX_PKT_POLL_BUDGET (64)
+ struct mucse_ring_container {
+ 	struct mucse_ring *ring;
++	unsigned int total_bytes;
++	unsigned int total_packets;
+ 	u16 work_limit;
+ 	u16 count;
+ };
+@@ -620,11 +625,25 @@ struct rnpgbe_info {
+ 	void (*get_invariants)(struct mucse_hw *hw);
+ };
  
-+#define M_LINK_SPEED_UNKNOWN 0
-+#define M_LINK_SPEED_10_FULL BIT(2)
-+#define M_LINK_SPEED_100_FULL BIT(3)
-+#define M_LINK_SPEED_1GB_FULL BIT(4)
++static inline u16 mucse_desc_unused(struct mucse_ring *ring)
++{
++	u16 ntc = ring->next_to_clean;
++	u16 ntu = ring->next_to_use;
 +
-+#define M_TRY_LINK_TIMEOUT (4 * HZ)
++	return ((ntc > ntu) ? 0 : ring->count) + ntc - ntu - 1;
++}
 +
- #define m_rd_reg(reg) readl(reg)
- #define m_wr_reg(reg, val) writel((val), reg)
- #define hw_wr32(hw, reg, val) m_wr_reg((hw)->hw_addr + (reg), (val))
-+#define hw_rd32(hw, reg) m_rd_reg((hw)->hw_addr + (reg))
- #define dma_wr32(dma, reg, val) m_wr_reg((dma)->dma_base_addr + (reg), (val))
- #define dma_rd32(dma, reg) m_rd_reg((dma)->dma_base_addr + (reg))
- #define eth_wr32(eth, reg, val) m_wr_reg((eth)->eth_base_addr + (reg), (val))
+ static inline struct netdev_queue *txring_txq(const struct mucse_ring *ring)
+ {
+ 	return netdev_get_tx_queue(ring->netdev, ring->queue_index);
+ }
+ 
++static inline __le64 build_ctob(u32 vlan_cmd, u32 mac_ip_len, u32 size)
++{
++	return cpu_to_le64(((u64)vlan_cmd << 32) | ((u64)mac_ip_len << 16) |
++			   ((u64)size));
++}
++
+ #define M_RXBUFFER_1536 (1536)
+ static inline unsigned int mucse_rx_bufsz(struct mucse_ring *ring)
+ {
 diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-index b85d4d0e3dbc..16eebe59915e 100644
+index 16eebe59915e..d7894891e098 100644
 --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
 +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-@@ -350,6 +350,31 @@ static void rnpgbe_set_mbx_ifup_hw_ops_n500(struct mucse_hw *hw,
- 	mucse_mbx_ifup_down(hw, enable);
+@@ -85,10 +85,28 @@ static void rnpgbe_eth_clr_mc_addr_n500(struct mucse_eth_info *eth)
+ 		eth_wr32(eth, RNPGBE_ETH_MUTICAST_HASH_TABLE(i), 0);
  }
  
 +/**
-+ * rnpgbe_check_link_hw_ops_n500 - Check link status from hw
-+ * @hw: hw information structure
-+ * @speed: store speed
-+ * @link_up: store link status
-+ * @duplex: store duplex status
++ * rnpgbe_eth_set_rx_n500 - set eth rx status
++ * @eth: pointer to eth structure
++ * @status: true is enable rx, false is disable
 + **/
-+static void rnpgbe_check_link_hw_ops_n500(struct mucse_hw *hw,
-+					  u32 *speed,
-+					  bool *link_up,
-+					  bool *duplex)
++static void rnpgbe_eth_set_rx_n500(struct mucse_eth_info *eth,
++				   bool status)
 +{
-+	if (hw->speed == 10)
-+		*speed = M_LINK_SPEED_10_FULL;
-+	else if (hw->speed == 100)
-+		*speed = M_LINK_SPEED_100_FULL;
-+	else if (hw->speed == 1000)
-+		*speed = M_LINK_SPEED_1GB_FULL;
-+	else
-+		*speed = M_LINK_SPEED_UNKNOWN;
++	if (status) {
++		eth_wr32(eth, RNPGBE_ETH_EXCEPT_DROP_PROC, 0);
++		eth_wr32(eth, RNPGBE_ETH_TX_MUX_DROP, 0);
++	} else {
++		eth_wr32(eth, RNPGBE_ETH_EXCEPT_DROP_PROC, 1);
++		eth_wr32(eth, RNPGBE_ETH_TX_MUX_DROP, 1);
++	}
++}
 +
-+	*link_up = !!hw->link;
-+	*duplex = !!hw->duplex;
+ static struct mucse_eth_operations eth_ops_n500 = {
+ 	.set_rar = &rnpgbe_eth_set_rar_n500,
+ 	.clear_rar = &rnpgbe_eth_clear_rar_n500,
+-	.clr_mc_addr = &rnpgbe_eth_clr_mc_addr_n500
++	.clr_mc_addr = &rnpgbe_eth_clr_mc_addr_n500,
++	.set_rx = &rnpgbe_eth_set_rx_n500,
+ };
+ 
+ /**
+@@ -111,8 +129,31 @@ static void rnpgbe_mac_set_mac_n500(struct mucse_mac_info *mac,
+ 	mac_wr32(mac, RNPGBE_MAC_UNICAST_LOW(index), rar_low);
+ }
+ 
++/**
++ * rnpgbe_mac_set_rx_n500 - Setup mac rx status
++ * @mac: pointer to mac structure
++ * @status: true for rx on / false for rx off
++ *
++ * Setup mac rx status.
++ **/
++static void rnpgbe_mac_set_rx_n500(struct mucse_mac_info *mac,
++				   bool status)
++{
++	u32 value = mac_rd32(mac, R_MAC_CONTROL);
++
++	if (status)
++		value |= MAC_CONTROL_TE | MAC_CONTROL_RE;
++	else
++		value &= ~(MAC_CONTROL_RE);
++
++	mac_wr32(mac, R_MAC_CONTROL, value);
++	value = mac_rd32(mac, R_MAC_FRAME_FILTER);
++	mac_wr32(mac, R_MAC_FRAME_FILTER, value | 1);
++}
++
+ static struct mucse_mac_operations mac_ops_n500 = {
+ 	.set_mac = &rnpgbe_mac_set_mac_n500,
++	.set_mac_rx = &rnpgbe_mac_set_rx_n500,
+ };
+ 
+ /**
+@@ -375,6 +416,27 @@ static void rnpgbe_check_link_hw_ops_n500(struct mucse_hw *hw,
+ 	*duplex = !!hw->duplex;
+ }
+ 
++/**
++ * rnpgbe_set_mac_rx_hw_ops_n500 - Setup hw rx status
++ * @hw: hw information structure
++ * @status: true for rx on / false for rx off
++ *
++ * rnpgbe_set_mac_rx_hw_ops_n500 setup eth, mac rx status.
++ **/
++static void rnpgbe_set_mac_rx_hw_ops_n500(struct mucse_hw *hw, bool status)
++{
++	struct mucse_eth_info *eth = &hw->eth;
++	struct mucse_mac_info *mac = &hw->mac;
++
++	if (status) {
++		mac->ops.set_mac_rx(mac, status);
++		eth->ops.set_rx(eth, status);
++	} else {
++		eth->ops.set_rx(eth, status);
++		mac->ops.set_mac_rx(mac, status);
++	}
 +}
 +
  static struct mucse_hw_operations hw_ops_n500 = {
  	.init_hw = &rnpgbe_init_hw_ops_n500,
  	.reset_hw = &rnpgbe_reset_hw_ops_n500,
-@@ -361,6 +386,7 @@ static struct mucse_hw_operations hw_ops_n500 = {
- 	.set_irq_mode = &rnpgbe_set_irq_mode_n500,
+@@ -387,6 +449,7 @@ static struct mucse_hw_operations hw_ops_n500 = {
  	.set_mbx_link_event = &rnpgbe_set_mbx_link_event_hw_ops_n500,
  	.set_mbx_ifup = &rnpgbe_set_mbx_ifup_hw_ops_n500,
-+	.check_link = &rnpgbe_check_link_hw_ops_n500,
+ 	.check_link = &rnpgbe_check_link_hw_ops_n500,
++	.set_mac_rx = &rnpgbe_set_mac_rx_hw_ops_n500,
  };
  
  /**
+diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
+index 98031600801b..71a408c941e3 100644
+--- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
++++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
+@@ -26,6 +26,8 @@
+ #define RING_VECTOR(n) (0x04 * (n))
+ 
+ /* eth regs */
++#define RNPGBE_ETH_TX_MUX_DROP (0x98)
++#define RNPGBE_ETH_EXCEPT_DROP_PROC (0x0470)
+ #define RNPGBE_ETH_BYPASS (0x8000)
+ #define RNPGBE_HOST_FILTER_EN (0x800c)
+ #define RNPGBE_REDIR_EN (0x8030)
+@@ -43,6 +45,10 @@
+ #define RNPGBE_LEGANCY_ENABLE (0xd004)
+ #define RNPGBE_LEGANCY_TIME (0xd000)
+ /* mac regs */
++#define R_MAC_CONTROL (0)
++#define MAC_CONTROL_TE (0x8)
++#define MAC_CONTROL_RE (0x4)
++#define R_MAC_FRAME_FILTER (0x4)
+ #define M_RAH_AV 0x80000000
+ #define RNPGBE_MAC_UNICAST_LOW(i) (0x44 + (i) * 0x08)
+ #define RNPGBE_MAC_UNICAST_HIGH(i) (0x40 + (i) * 0x08)
 diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c
-index 0686bfbf55bf..b646aba48348 100644
+index b646aba48348..1e1919750a9b 100644
 --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c
 +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c
-@@ -6,6 +6,7 @@
+@@ -152,6 +152,139 @@ static void mucse_add_ring(struct mucse_ring *ring,
+ 	head->count++;
+ }
  
- #include "rnpgbe.h"
- #include "rnpgbe_lib.h"
-+#include "rnpgbe_mbx_fw.h"
++/**
++ * rnpgbe_clean_tx_irq - Reclaim resources after transmit completes
++ * @q_vector: structure containing interrupt and ring information
++ * @tx_ring: tx ring to clean
++ * @napi_budget: how many packets driver is allowed to clean
++ * @return: true is no tx packets.
++ **/
++static bool rnpgbe_clean_tx_irq(struct mucse_q_vector *q_vector,
++				struct mucse_ring *tx_ring,
++				int napi_budget)
++{
++	u64 total_bytes = 0, total_packets = 0;
++	struct mucse *mucse = q_vector->mucse;
++	int budget = q_vector->tx.work_limit;
++	struct mucse_tx_buffer *tx_buffer;
++	struct rnpgbe_tx_desc *tx_desc;
++	int i = tx_ring->next_to_clean;
++
++	if (test_bit(__MUCSE_DOWN, &mucse->state))
++		return true;
++
++	tx_ring->tx_stats.poll_count++;
++	tx_buffer = &tx_ring->tx_buffer_info[i];
++	tx_desc = M_TX_DESC(tx_ring, i);
++	i -= tx_ring->count;
++
++	do {
++		struct rnpgbe_tx_desc *eop_desc = tx_buffer->next_to_watch;
++
++		/* if next_to_watch is not set then there is no work pending */
++		if (!eop_desc)
++			break;
++
++		/* prevent any other reads prior to eop_desc */
++		rmb();
++
++		/* if eop DD is not set pending work has not been completed */
++		if (!(eop_desc->vlan_cmd & cpu_to_le32(M_TXD_STAT_DD)))
++			break;
++		/* clear next_to_watch to prevent false hangs */
++		tx_buffer->next_to_watch = NULL;
++
++		/* update the statistics for this packet */
++		total_bytes += tx_buffer->bytecount;
++		total_packets += tx_buffer->gso_segs;
++
++		/* free the skb */
++		napi_consume_skb(tx_buffer->skb, napi_budget);
++
++		/* unmap skb header data */
++		dma_unmap_single(tx_ring->dev, dma_unmap_addr(tx_buffer, dma),
++				 dma_unmap_len(tx_buffer, len), DMA_TO_DEVICE);
++
++		/* clear tx_buffer data */
++		tx_buffer->skb = NULL;
++		dma_unmap_len_set(tx_buffer, len, 0);
++
++		/* unmap remaining buffers */
++		while (tx_desc != eop_desc) {
++			tx_buffer++;
++			tx_desc++;
++			i++;
++			if (unlikely(!i)) {
++				i -= tx_ring->count;
++				tx_buffer = tx_ring->tx_buffer_info;
++				tx_desc = M_TX_DESC(tx_ring, 0);
++			}
++
++			/* unmap any remaining paged data */
++			if (dma_unmap_len(tx_buffer, len)) {
++				dma_unmap_page(tx_ring->dev,
++					       dma_unmap_addr(tx_buffer, dma),
++					       dma_unmap_len(tx_buffer, len),
++					       DMA_TO_DEVICE);
++				dma_unmap_len_set(tx_buffer, len, 0);
++			}
++			budget--;
++		}
++
++		/* move us one more past the eop_desc for start of next pkt */
++		tx_buffer++;
++		tx_desc++;
++		i++;
++		if (unlikely(!i)) {
++			i -= tx_ring->count;
++			tx_buffer = tx_ring->tx_buffer_info;
++			tx_desc = M_TX_DESC(tx_ring, 0);
++		}
++
++		/* issue prefetch for next Tx descriptor */
++		prefetch(tx_desc);
++
++		/* update budget accounting */
++		budget--;
++	} while (likely(budget > 0));
++	netdev_tx_completed_queue(txring_txq(tx_ring), total_packets,
++				  total_bytes);
++	i += tx_ring->count;
++	tx_ring->next_to_clean = i;
++	u64_stats_update_begin(&tx_ring->syncp);
++	tx_ring->stats.bytes += total_bytes;
++	tx_ring->stats.packets += total_packets;
++	tx_ring->tx_stats.tx_clean_count += total_packets;
++	tx_ring->tx_stats.tx_clean_times++;
++	if (tx_ring->tx_stats.tx_clean_times > 10) {
++		tx_ring->tx_stats.tx_clean_times = 0;
++		tx_ring->tx_stats.tx_clean_count = 0;
++	}
++
++	u64_stats_update_end(&tx_ring->syncp);
++	q_vector->tx.total_bytes += total_bytes;
++	q_vector->tx.total_packets += total_packets;
++	tx_ring->tx_stats.send_done_bytes += total_bytes;
++
++#define TX_WAKE_THRESHOLD (DESC_NEEDED * 2)
++	if (likely(netif_carrier_ok(tx_ring->netdev) &&
++		   (mucse_desc_unused(tx_ring) >= TX_WAKE_THRESHOLD))) {
++		/* Make sure that anybody stopping the queue after this
++		 * sees the new next_to_clean.
++		 */
++		smp_mb();
++		if (__netif_subqueue_stopped(tx_ring->netdev,
++					     tx_ring->queue_index) &&
++		    !test_bit(__MUCSE_DOWN, &mucse->state)) {
++			netif_wake_subqueue(tx_ring->netdev,
++					    tx_ring->queue_index);
++			++tx_ring->tx_stats.restart_queue;
++		}
++	}
++
++	return total_bytes == 0;
++}
++
+ /**
+  * rnpgbe_poll - NAPI polling RX/TX cleanup routine
+  * @napi: napi struct with our devices info in it
+@@ -163,7 +296,31 @@ static void mucse_add_ring(struct mucse_ring *ring,
+  **/
+ static int rnpgbe_poll(struct napi_struct *napi, int budget)
+ {
+-	return 0;
++	struct mucse_q_vector *q_vector =
++		container_of(napi, struct mucse_q_vector, napi);
++	struct mucse *mucse = q_vector->mucse;
++	bool clean_complete = true;
++	struct mucse_ring *ring;
++	int work_done = 0;
++
++	mucse_for_each_ring(ring, q_vector->tx)
++		clean_complete = rnpgbe_clean_tx_irq(q_vector, ring, budget);
++
++	if (!netif_running(mucse->netdev))
++		clean_complete = true;
++	/* force done */
++	if (test_bit(__MUCSE_DOWN, &mucse->state))
++		clean_complete = true;
++
++	if (!clean_complete)
++		return budget;
++	/* all work done, exit the polling mode */
++	if (likely(napi_complete_done(napi, work_done))) {
++		if (!test_bit(__MUCSE_DOWN, &mucse->state))
++			rnpgbe_irq_enable_queues(mucse, q_vector);
++	}
++
++	return min(work_done, budget - 1);
+ }
  
  /**
-  * rnpgbe_set_rss_queues - Allocate queues for RSS
-@@ -1050,6 +1051,12 @@ static int rnpgbe_request_msix_irqs(struct mucse *mucse)
+@@ -896,8 +1053,15 @@ static void rnpgbe_configure_tx_ring(struct mucse *mucse,
   **/
+ void rnpgbe_configure_tx(struct mucse *mucse)
+ {
+-	u32 i;
++	struct mucse_hw *hw = &mucse->hw;
++	struct mucse_dma_info *dma;
++	u32 i, dma_axi_ctl;
+ 
++	dma = &hw->dma;
++	/* dma_axi_en.tx_en must be before Tx queues are enabled */
++	dma_axi_ctl = dma_rd32(dma, DMA_AXI_EN);
++	dma_axi_ctl |= TX_AXI_RW_EN;
++	dma_wr32(dma, DMA_AXI_EN, dma_axi_ctl);
+ 	/* Setup the HW Tx Head and Tail descriptor pointers */
+ 	for (i = 0; i < (mucse->num_tx_queues); i++)
+ 		rnpgbe_configure_tx_ring(mucse, mucse->tx_ring[i]);
+@@ -961,10 +1125,30 @@ static void rnpgbe_configure_rx_ring(struct mucse *mucse,
+  **/
+ void rnpgbe_configure_rx(struct mucse *mucse)
+ {
+-	int i;
++	struct mucse_hw *hw = &mucse->hw;
++	struct mucse_dma_info *dma;
++	int i, dma_axi_ctl;
+ 
++	dma = &hw->dma;
+ 	for (i = 0; i < mucse->num_rx_queues; i++)
+ 		rnpgbe_configure_rx_ring(mucse, mucse->rx_ring[i]);
++
++	/* dma_axi_en.tx_en must be before Tx queues are enabled */
++	dma_axi_ctl = dma_rd32(dma, DMA_AXI_EN);
++	dma_axi_ctl |= RX_AXI_RW_EN;
++	dma_wr32(dma, DMA_AXI_EN, dma_axi_ctl);
++}
++
++/**
++ * rnpgbe_clean_all_tx_rings - Free Tx Buffers for all queues
++ * @mucse: pointer to private structure
++ **/
++void rnpgbe_clean_all_tx_rings(struct mucse *mucse)
++{
++	int i;
++
++	for (i = 0; i < mucse->num_tx_queues; i++)
++		rnpgbe_clean_tx_ring(mucse->tx_ring[i]);
+ }
+ 
+ /**
+@@ -976,6 +1160,13 @@ void rnpgbe_configure_rx(struct mucse *mucse)
+  **/
+ static irqreturn_t rnpgbe_msix_clean_rings(int irq, void *data)
+ {
++	struct mucse_q_vector *q_vector = (struct mucse_q_vector *)data;
++
++	rnpgbe_irq_disable_queues(q_vector);
++
++	if (q_vector->rx.ring || q_vector->tx.ring)
++		napi_schedule_irqoff(&q_vector->napi);
++
+ 	return IRQ_HANDLED;
+ }
+ 
+@@ -1052,11 +1243,17 @@ static int rnpgbe_request_msix_irqs(struct mucse *mucse)
  static irqreturn_t rnpgbe_intr(int irq, void *data)
  {
-+	struct mucse *mucse = (struct mucse *)data;
+ 	struct mucse *mucse = (struct mucse *)data;
++	struct mucse_q_vector *q_vector;
+ 
++	q_vector = mucse->q_vector[0];
++	rnpgbe_irq_disable_queues(q_vector);
+ 	set_bit(__MUCSE_IN_IRQ, &mucse->state);
+ 	/* handle fw req and ack */
+ 	rnpgbe_fw_msg_handler(mucse);
+ 	clear_bit(__MUCSE_IN_IRQ, &mucse->state);
++	if (q_vector->rx.ring || q_vector->tx.ring)
++		napi_schedule_irqoff(&q_vector->napi);
 +
-+	set_bit(__MUCSE_IN_IRQ, &mucse->state);
-+	/* handle fw req and ack */
-+	rnpgbe_fw_msg_handler(mucse);
-+	clear_bit(__MUCSE_IN_IRQ, &mucse->state);
  	return IRQ_HANDLED;
  }
  
+@@ -1251,3 +1448,231 @@ void rnpgbe_configure_msix(struct mucse *mucse)
+ 		}
+ 	}
+ }
++
++/**
++ * rnpgbe_unmap_and_free_tx_resource - Free tx resource
++ * @ring: ring to be freed
++ * @tx_buffer: pointer to tx_buffer
++ **/
++static void rnpgbe_unmap_and_free_tx_resource(struct mucse_ring *ring,
++					      struct mucse_tx_buffer *tx_buffer)
++{
++	if (tx_buffer->skb) {
++		dev_kfree_skb_any(tx_buffer->skb);
++		if (dma_unmap_len(tx_buffer, len))
++			dma_unmap_single(ring->dev,
++					 dma_unmap_addr(tx_buffer, dma),
++					 dma_unmap_len(tx_buffer, len),
++					 DMA_TO_DEVICE);
++	} else if (dma_unmap_len(tx_buffer, len)) {
++		dma_unmap_page(ring->dev, dma_unmap_addr(tx_buffer, dma),
++			       dma_unmap_len(tx_buffer, len), DMA_TO_DEVICE);
++	}
++	tx_buffer->next_to_watch = NULL;
++	tx_buffer->skb = NULL;
++	dma_unmap_len_set(tx_buffer, len, 0);
++}
++
++/**
++ * rnpgbe_tx_map - map skb to desc, and update tx tail
++ * @tx_ring: ring to send
++ * @first: pointer to first tx_buffer for this skb
++ * @mac_ip_len: mac_ip_len value
++ * @tx_flags: tx flags for this skb
++ *
++ * rnpgbe_tx_map tries to map first->skb to multi descs, and
++ * then update tx tail to echo hw.
++ *
++ * @return: 0 on success, negative on failure
++ **/
++static int rnpgbe_tx_map(struct mucse_ring *tx_ring,
++			 struct mucse_tx_buffer *first, u32 mac_ip_len,
++			 u32 tx_flags)
++{
++	u64 fun_id = ((u64)(tx_ring->pfvfnum) << (56));
++	struct mucse_tx_buffer *tx_buffer;
++	struct sk_buff *skb = first->skb;
++	struct rnpgbe_tx_desc *tx_desc;
++	u16 i = tx_ring->next_to_use;
++	unsigned int data_len, size;
++	skb_frag_t *frag;
++	dma_addr_t dma;
++
++	tx_desc = M_TX_DESC(tx_ring, i);
++	size = skb_headlen(skb);
++	data_len = skb->data_len;
++	dma = dma_map_single(tx_ring->dev, skb->data, size, DMA_TO_DEVICE);
++	tx_buffer = first;
++
++	for (frag = &skb_shinfo(skb)->frags[0];; frag++) {
++		if (dma_mapping_error(tx_ring->dev, dma))
++			goto dma_error;
++
++		/* record length, and DMA address */
++		dma_unmap_len_set(tx_buffer, len, size);
++		dma_unmap_addr_set(tx_buffer, dma, dma);
++
++		/* 1st desc */
++		tx_desc->pkt_addr = cpu_to_le64(dma | fun_id);
++
++		while (unlikely(size > M_MAX_DATA_PER_TXD)) {
++			tx_desc->vlan_cmd_bsz = build_ctob(tx_flags,
++							   mac_ip_len,
++							   M_MAX_DATA_PER_TXD);
++			i++;
++			tx_desc++;
++			if (i == tx_ring->count) {
++				tx_desc = M_TX_DESC(tx_ring, 0);
++				i = 0;
++			}
++			dma += M_MAX_DATA_PER_TXD;
++			size -= M_MAX_DATA_PER_TXD;
++			tx_desc->pkt_addr = cpu_to_le64(dma | fun_id);
++		}
++
++		if (likely(!data_len))
++			break;
++		tx_desc->vlan_cmd_bsz = build_ctob(tx_flags, mac_ip_len, size);
++		/* ==== frag== */
++		i++;
++		tx_desc++;
++		if (i == tx_ring->count) {
++			tx_desc = M_TX_DESC(tx_ring, 0);
++			i = 0;
++		}
++
++		size = skb_frag_size(frag);
++		data_len -= size;
++		dma = skb_frag_dma_map(tx_ring->dev, frag, 0, size,
++				       DMA_TO_DEVICE);
++		tx_buffer = &tx_ring->tx_buffer_info[i];
++	}
++
++	/* write last descriptor with RS and EOP bits */
++	tx_desc->vlan_cmd_bsz = build_ctob(tx_flags |
++					   M_TXD_CMD_EOP |
++					   M_TXD_CMD_RS,
++					   mac_ip_len, size);
++	/* set the timestamp */
++	first->time_stamp = jiffies;
++	tx_ring->tx_stats.send_bytes += first->bytecount;
++
++	/*
++	 * Force memory writes to complete before letting h/w know there
++	 * are new descriptors to fetch.  (Only applicable for weak-ordered
++	 * memory model archs, such as IA-64).
++	 *
++	 * We also need this memory barrier to make certain all of the
++	 * status bits have been updated before next_to_watch is written.
++	 */
++	/* timestamp the skb as late as possible, just prior to notifying
++	 * the MAC that it should transmit this packet
++	 */
++	wmb();
++	/* set next_to_watch value indicating a packet is present */
++	first->next_to_watch = tx_desc;
++	i++;
++	if (i == tx_ring->count)
++		i = 0;
++	tx_ring->next_to_use = i;
++	skb_tx_timestamp(skb);
++	netdev_tx_sent_queue(txring_txq(tx_ring), first->bytecount);
++	/* notify HW of packet */
++	m_wr_reg(tx_ring->tail, i);
++	return 0;
++dma_error:
++	/* clear dma mappings for failed tx_buffer_info map */
++	for (;;) {
++		tx_buffer = &tx_ring->tx_buffer_info[i];
++		rnpgbe_unmap_and_free_tx_resource(tx_ring, tx_buffer);
++		if (tx_buffer == first)
++			break;
++		if (i == 0)
++			i += tx_ring->count;
++		i--;
++	}
++	dev_kfree_skb_any(first->skb);
++	first->skb = NULL;
++	tx_ring->next_to_use = i;
++
++	return -1;
++}
++
++/**
++ * rnpgbe_maybe_stop_tx - Stop tx queues if not enough desc count
++ * @tx_ring: tx ring to check
++ * @size: expect desc count
++ *
++ * @return: 0 for enough
++ **/
++static int rnpgbe_maybe_stop_tx(struct mucse_ring *tx_ring, u16 size)
++{
++	if (likely(mucse_desc_unused(tx_ring) >= size))
++		return 0;
++	netif_stop_subqueue(tx_ring->netdev, tx_ring->queue_index);
++	/* Herbert's original patch had:
++	 *  smp_mb__after_netif_stop_queue();
++	 * but since that doesn't exist yet, just open code it.
++	 */
++	smp_mb();
++
++	/* We need to check again in a case another CPU has just
++	 * made room available.
++	 */
++	if (likely(mucse_desc_unused(tx_ring) < size))
++		return -EBUSY;
++
++	/* A reprieve! - use start_queue because it doesn't call schedule */
++	netif_start_subqueue(tx_ring->netdev, tx_ring->queue_index);
++	++tx_ring->tx_stats.restart_queue;
++
++	return 0;
++}
++
++/**
++ * rnpgbe_xmit_frame_ring - Send a skb to tx ring
++ * @skb: skb is to be sent
++ * @mucse: pointer to private structure
++ * @tx_ring: tx ring to check
++ *
++ * @return: NETDEV_TX_OK is ok, or NETDEV_TX_BUSY
++ **/
++netdev_tx_t rnpgbe_xmit_frame_ring(struct sk_buff *skb,
++				   struct mucse *mucse,
++				   struct mucse_ring *tx_ring)
++{
++	u16 count = TXD_USE_COUNT(skb_headlen(skb));
++	struct mucse_tx_buffer *first;
++	/* keep it not zero */
++	u32 mac_ip_len = 20;
++	u32 tx_flags = 0;
++	unsigned short f;
++
++	for (f = 0; f < skb_shinfo(skb)->nr_frags; f++) {
++		skb_frag_t *frag_temp = &skb_shinfo(skb)->frags[f];
++
++		count += TXD_USE_COUNT(skb_frag_size(frag_temp));
++	}
++
++	if (rnpgbe_maybe_stop_tx(tx_ring, count + 3)) {
++		tx_ring->tx_stats.tx_busy++;
++		return NETDEV_TX_BUSY;
++	}
++
++	/* record the location of the first descriptor for this packet */
++	first = &tx_ring->tx_buffer_info[tx_ring->next_to_use];
++	first->skb = skb;
++	first->bytecount = (skb->len > 60) ? skb->len : 60;
++	first->gso_segs = 1;
++	first->priv_tags = 0;
++	first->mss_len_vf_num = 0;
++	first->inner_vlan_tunnel_len = 0;
++	first->ctx_flag = false;
++
++	if (rnpgbe_tx_map(tx_ring, first, mac_ip_len, tx_flags))
++		goto skip_check;
++	rnpgbe_maybe_stop_tx(tx_ring, DESC_NEEDED);
++
++skip_check:
++	return NETDEV_TX_OK;
++}
+diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.h
+index bdb8a393dad8..5a3334789f66 100644
+--- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.h
++++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.h
+@@ -8,6 +8,9 @@
+ 
+ #define RING_OFFSET(n) (0x100 * (n))
+ #define DMA_DUMY (0xc)
++#define DMA_AXI_EN (0x10)
++#define RX_AXI_RW_EN (0x03 << 0)
++#define TX_AXI_RW_EN (0x03 << 2)
+ #define DMA_RX_START (0x10)
+ #define DMA_RX_READY (0x14)
+ #define DMA_TX_START (0x18)
+@@ -52,6 +55,12 @@
+ #define e_info(msglvl, format, arg...)  \
+ 	netif_info(mucse, msglvl, mucse->netdev, format, ##arg)
+ 
++/* now tx max 4k for one desc */
++#define M_MAX_TXD_PWR 12
++#define M_MAX_DATA_PER_TXD (0x1 << M_MAX_TXD_PWR)
++#define TXD_USE_COUNT(S) DIV_ROUND_UP((S), M_MAX_DATA_PER_TXD)
++#define DESC_NEEDED (MAX_SKB_FRAGS + 4)
++
+ enum link_event_mask {
+ 	EVT_LINK_UP = 1,
+ 	EVT_NO_MEDIA = 2,
+@@ -119,6 +128,7 @@ void rnpgbe_clear_interrupt_scheme(struct mucse *mucse);
+ int rnpgbe_setup_txrx(struct mucse *mucse);
+ void rnpgbe_free_txrx(struct mucse *mucse);
+ void rnpgbe_configure_tx(struct mucse *mucse);
++void rnpgbe_clean_all_tx_rings(struct mucse *mucse);
+ void rnpgbe_disable_rx_queue(struct mucse_ring *ring);
+ void rnpgbe_configure_rx(struct mucse *mucse);
+ int rnpgbe_request_irq(struct mucse *mucse);
+@@ -126,5 +136,7 @@ void rnpgbe_free_irq(struct mucse *mucse);
+ void rnpgbe_napi_enable_all(struct mucse *mucse);
+ void rnpgbe_napi_disable_all(struct mucse *mucse);
+ void rnpgbe_configure_msix(struct mucse *mucse);
+-
++netdev_tx_t rnpgbe_xmit_frame_ring(struct sk_buff *skb,
++				   struct mucse *mucse,
++				   struct mucse_ring *tx_ring);
+ #endif /* _RNPGBE_LIB_H */
 diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
-index 27beb0e6e705..90b4858597c1 100644
+index 90b4858597c1..31a191b31c79 100644
 --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
 +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
-@@ -76,12 +76,147 @@ static void rnpgbe_service_timer(struct timer_list *t)
- 		rnpgbe_service_event_schedule(mucse);
- }
- 
-+/**
-+ * rnpgbe_service_event_complete - Call when service_task end
-+ * @mucse: pointer to the device private structure
-+ **/
-+static void rnpgbe_service_event_complete(struct mucse *mucse)
-+{
-+	/* flush memory to make sure state is correct before next watchdog */
-+	smp_mb__before_atomic();
-+	clear_bit(__MUCSE_SERVICE_SCHED, &mucse->state);
-+}
-+
-+/**
-+ * rnpgbe_watchdog_update_link - update the link status
-+ * @mucse: pointer to the device private structure
-+ **/
-+static void rnpgbe_watchdog_update_link(struct mucse *mucse)
-+{
-+	bool flow_rx = true, flow_tx = true;
-+	u32 link_speed = mucse->link_speed;
-+	struct mucse_hw *hw = &mucse->hw;
-+	bool link_up;
-+	bool duplex;
-+
-+	if (!(mucse->flags & M_FLAG_NEED_LINK_UPDATE))
-+		return;
-+
-+	if (hw->ops.check_link) {
-+		hw->ops.check_link(hw, &link_speed, &link_up, &duplex);
-+	} else {
-+		/* always assume link is up, if no check link function */
-+		link_speed = M_LINK_SPEED_1GB_FULL;
-+		link_up = true;
-+		duplex = true;
-+	}
-+
-+	if (link_up || time_after(jiffies, (mucse->link_check_timeout +
-+					    M_TRY_LINK_TIMEOUT))) {
-+		mucse->flags &= ~M_FLAG_NEED_LINK_UPDATE;
-+	}
-+	mucse->link_up = link_up;
-+	mucse->link_speed = link_speed;
-+	mucse->duplex = duplex;
-+
-+	switch (hw->fc.current_mode) {
-+	case mucse_fc_none:
-+		flow_rx = false;
-+		flow_tx = false;
-+		break;
-+	case mucse_fc_tx_pause:
-+		flow_rx = false;
-+		flow_tx = true;
-+		break;
-+	case mucse_fc_rx_pause:
-+		flow_rx = true;
-+		flow_tx = false;
-+		break;
-+
-+	case mucse_fc_full:
-+		flow_rx = true;
-+		flow_tx = true;
-+		break;
-+	default:
-+		flow_rx = false;
-+		flow_tx = false;
-+	}
-+
-+	if (mucse->link_up) {
-+		e_info(drv, "NIC Link is Up %s, %s Duplex, Flow Control: %s\n",
-+		       (link_speed == M_LINK_SPEED_1GB_FULL ? "1000 Mbps" :
-+			(link_speed == M_LINK_SPEED_100_FULL ? "100 Mbps" :
-+			 (link_speed == M_LINK_SPEED_10_FULL ? "10 Mbps" :
-+			  "unknown speed"))),
-+		       ((duplex) ? "Full" : "Half"),
-+		       ((flow_rx && flow_tx) ? "RX/TX" :
-+			(flow_rx ? "RX" : (flow_tx ? "TX" : "None"))));
-+	}
-+}
-+
-+/**
-+ * rnpgbe_watchdog_link_is_up - update netif_carrier status and
-+ * print link up message
-+ * @mucse: pointer to the device private structure
-+ **/
-+static void rnpgbe_watchdog_link_is_up(struct mucse *mucse)
-+{
-+	struct net_device *netdev = mucse->netdev;
-+
-+	/* only continue if link was previously down */
-+	if (netif_carrier_ok(netdev))
-+		return;
-+	netif_carrier_on(netdev);
-+	netif_tx_wake_all_queues(netdev);
-+}
-+
-+/**
-+ * rnpgbe_watchdog_link_is_down - update netif_carrier status and
-+ * print link down message
-+ * @mucse: pointer to the private structure
-+ **/
-+static void rnpgbe_watchdog_link_is_down(struct mucse *mucse)
-+{
-+	struct net_device *netdev = mucse->netdev;
-+
-+	mucse->link_up = false;
-+	mucse->link_speed = 0;
-+	/* only continue if link was up previously */
-+	if (!netif_carrier_ok(netdev))
-+		return;
-+	e_info(drv, "NIC Link is Down\n");
-+	netif_carrier_off(netdev);
-+	netif_tx_stop_all_queues(netdev);
-+}
-+
-+/**
-+ * rnpgbe_watchdog_subtask - check and bring link up
-+ * @mucse: pointer to the device private structure
-+ **/
-+static void rnpgbe_watchdog_subtask(struct mucse *mucse)
-+{
-+	/* if interface is down do nothing */
-+	if (test_bit(__MUCSE_DOWN, &mucse->state) ||
-+	    test_bit(__MUCSE_RESETTING, &mucse->state))
-+		return;
-+
-+	rnpgbe_watchdog_update_link(mucse);
-+	if (mucse->link_up)
-+		rnpgbe_watchdog_link_is_up(mucse);
-+	else
-+		rnpgbe_watchdog_link_is_down(mucse);
-+}
-+
- /**
-  * rnpgbe_service_task - manages and runs subtasks
-  * @work: pointer to work_struct containing our data
-  **/
- static void rnpgbe_service_task(struct work_struct *work)
+@@ -162,12 +162,14 @@ static void rnpgbe_watchdog_update_link(struct mucse *mucse)
+ static void rnpgbe_watchdog_link_is_up(struct mucse *mucse)
  {
-+	struct mucse *mucse = container_of(work, struct mucse, service_task);
-+
-+	rnpgbe_watchdog_subtask(mucse);
-+	rnpgbe_service_event_complete(mucse);
+ 	struct net_device *netdev = mucse->netdev;
++	struct mucse_hw *hw = &mucse->hw;
+ 
+ 	/* only continue if link was previously down */
+ 	if (netif_carrier_ok(netdev))
+ 		return;
+ 	netif_carrier_on(netdev);
+ 	netif_tx_wake_all_queues(netdev);
++	hw->ops.set_mac_rx(hw, true);
  }
  
  /**
-@@ -163,6 +298,8 @@ static int rnpgbe_open(struct net_device *netdev)
- 	if (err)
- 		goto err_set_queues;
- 	rnpgbe_up_complete(mucse);
-+
-+	return 0;
- err_req_irq:
- 	rnpgbe_free_txrx(mucse);
- err_set_queues:
-@@ -311,6 +448,8 @@ static irqreturn_t rnpgbe_msix_other(int irq, void *data)
- 	struct mucse *mucse = (struct mucse *)data;
+@@ -178,6 +180,7 @@ static void rnpgbe_watchdog_link_is_up(struct mucse *mucse)
+ static void rnpgbe_watchdog_link_is_down(struct mucse *mucse)
+ {
+ 	struct net_device *netdev = mucse->netdev;
++	struct mucse_hw *hw = &mucse->hw;
  
- 	set_bit(__MUCSE_IN_IRQ, &mucse->state);
-+	/* handle fw req and ack */
-+	rnpgbe_fw_msg_handler(mucse);
- 	clear_bit(__MUCSE_IN_IRQ, &mucse->state);
- 
- 	return IRQ_HANDLED;
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h
-index 0b4183e53e61..0f554f3eff82 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h
-@@ -8,6 +8,7 @@
- 
- /* 14 words */
- #define MUCSE_VFMAILBOX_SIZE 14
-+#define MUCSE_FW_MAILBOX_SIZE MUCSE_VFMAILBOX_SIZE
- /* ================ PF <--> VF mailbox ================ */
- #define SHARE_MEM_BYTES 64
- static inline u32 PF_VF_SHM(struct mucse_mbx_info *mbx, int vf)
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
-index 291cdfbd16f3..412d9d5da191 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
-@@ -564,3 +564,190 @@ int mucse_mbx_ifup_down(struct mucse_hw *hw, int up)
- 
- 	return err;
+ 	mucse->link_up = false;
+ 	mucse->link_speed = 0;
+@@ -187,6 +190,7 @@ static void rnpgbe_watchdog_link_is_down(struct mucse *mucse)
+ 	e_info(drv, "NIC Link is Down\n");
+ 	netif_carrier_off(netdev);
+ 	netif_tx_stop_all_queues(netdev);
++	hw->ops.set_mac_rx(hw, false);
  }
-+
-+/**
-+ * rnpgbe_link_stat_mark - Mark driver link status in reg
-+ * @hw: Pointer to the HW structure
-+ * @up: true for link up, false for link down
-+ *
-+ * rnpgbe_link_stat_mark echo driver link status to hw by DMA_DUMY.
-+ * Fw will echo true link status if mismatch it.
-+ **/
-+static void rnpgbe_link_stat_mark(struct mucse_hw *hw, int up)
-+{
-+	struct mucse *mucse = (struct mucse *)hw->back;
-+	u32 v;
-+
-+	v = hw_rd32(hw, DMA_DUMY);
-+	v &= ~(0x0f000f11);
-+	v |= 0xa0000000;
-+	if (up) {
-+		v |= BIT(0);
-+		switch (hw->speed) {
-+		case 10:
-+			v |= (speed_10 << 8);
-+			break;
-+		case 100:
-+			v |= (speed_100 << 8);
-+			break;
-+		case 1000:
-+			v |= (speed_1000 << 8);
-+			break;
-+		case 10000:
-+			v |= (speed_10000 << 8);
-+			break;
-+		case 25000:
-+			v |= (speed_25000 << 8);
-+			break;
-+		case 40000:
-+			v |= (speed_40000 << 8);
-+			break;
-+		}
-+		v |= (hw->duplex << 4);
-+		v |= (hw->fc.current_mode << 24);
-+	} else {
-+		v &= ~BIT(0);
-+	}
-+	/* we should update lldp_status */
-+	if (hw->fw_version >= 0x00010500) {
-+		if (mucse->priv_flags & M_PRIV_FLAG_LLDP)
-+			v |= BIT(6);
-+		else
-+			v &= (~BIT(6));
-+	}
-+	hw_wr32(hw, DMA_DUMY, v);
-+}
-+
-+/**
-+ * rnpgbe_mbx_fw_reply_handler - handle fw reply
-+ * @mucse: pointer to the device private structure
-+ * @reply: pointer to reply data
-+ *
-+ * rnpgbe_mbx_fw_reply_handler handler fw reply, it copy reply data
-+ * to cookie->priv if no err.
-+ *
-+ * @return: 0 on success, negative on failure
-+ **/
-+static int rnpgbe_mbx_fw_reply_handler(struct mucse *mucse,
-+				       struct mbx_fw_cmd_reply *reply)
-+{
-+	struct mbx_req_cookie *cookie;
-+
-+	cookie = reply->cookie;
-+	if (!cookie || cookie->magic != COOKIE_MAGIC)
-+		return -EIO;
-+
-+	if (cookie->priv_len > 0)
-+		memcpy(cookie->priv, reply->data, cookie->priv_len);
-+
-+	cookie->done = 1;
-+
-+	if (reply->flags & FLAGS_ERR)
-+		cookie->errcode = -EIO;
-+	else
-+		cookie->errcode = 0;
-+	wake_up_interruptible(&cookie->wait);
-+	return 0;
-+}
-+
-+/**
-+ * rnpgbe_mbx_fw_req_handler - handle fw req
-+ * @mucse: pointer to the device private structure
-+ * @req: pointer to req data
-+ *
-+ * rnpgbe_mbx_fw_req_handler handler fw req, such as a link event req.
-+ *
-+ * @return: 0 on success, negative on failure
-+ **/
-+static int rnpgbe_mbx_fw_req_handler(struct mucse *mucse,
-+				     struct mbx_fw_cmd_req *req)
-+{
-+	u32 magic = le32_to_cpu(req->link_stat.port_st_magic);
-+	struct mucse_hw *hw = &mucse->hw;
-+
-+	switch (le16_to_cpu(req->opcode)) {
-+	case LINK_STATUS_EVENT:
-+		if (le16_to_cpu(req->link_stat.lane_status))
-+			hw->link = 1;
-+		else
-+			hw->link = 0;
-+		port_stat_update_host_endian(&req->link_stat.st[0]);
-+		if (hw->hw_type == rnpgbe_hw_n500 ||
-+		    hw->hw_type == rnpgbe_hw_n210 ||
-+		    hw->hw_type == rnpgbe_hw_n210L) {
-+			if (req->link_stat.st[0].v_host.lldp_status)
-+				mucse->priv_flags |= M_PRIV_FLAG_LLDP;
-+			else
-+				mucse->priv_flags &= (~M_PRIV_FLAG_LLDP);
-+		}
-+		if (magic == SPEED_VALID_MAGIC) {
-+			hw->speed = le16_to_cpu(req->link_stat.st[0].speed);
-+			hw->duplex = req->link_stat.st[0].duplex;
-+			if (hw->hw_type == rnpgbe_hw_n500 ||
-+			    hw->hw_type == rnpgbe_hw_n210 ||
-+			    hw->hw_type == rnpgbe_hw_n210L) {
-+				hw->fc.current_mode =
-+					req->link_stat.st[0].v_host.pause;
-+				hw->tp_mdx = req->link_stat.st[0].v_host.tp_mdx;
-+			}
-+		}
-+		if (req->link_stat.lane_status)
-+			rnpgbe_link_stat_mark(hw, 1);
-+		else
-+			rnpgbe_link_stat_mark(hw, 0);
-+
-+		mucse->flags |= M_FLAG_NEED_LINK_UPDATE;
-+		break;
-+	}
-+	return 0;
-+}
-+
-+/**
-+ * rnpgbe_rcv_msg_from_fw - Read msg from fw and handle it
-+ * @mucse: pointer to the device private structure
-+ *
-+ * rnpgbe_rcv_msg_from_fw tries to read mbx from hw and check
-+ * the mbx is req or reply.
-+ *
-+ * @return: 0 on success, negative on failure
-+ **/
-+static int rnpgbe_rcv_msg_from_fw(struct mucse *mucse)
-+{
-+	u32 msgbuf[MUCSE_FW_MAILBOX_SIZE];
-+	struct mucse_hw *hw = &mucse->hw;
-+	int retval;
-+
-+	retval = mucse_read_mbx(hw, msgbuf, MUCSE_FW_MAILBOX_SIZE, MBX_FW);
-+	if (retval)
-+		return retval;
-+	/* this is a message we already processed, do nothing */
-+	if (((unsigned short *)msgbuf)[0] & FLAGS_DD) {
-+		return rnpgbe_mbx_fw_reply_handler(mucse,
-+				(struct mbx_fw_cmd_reply *)msgbuf);
-+	} else {
-+		return rnpgbe_mbx_fw_req_handler(mucse,
-+				(struct mbx_fw_cmd_req *)msgbuf);
-+	}
-+}
-+
-+static void rnpgbe_rcv_ack_from_fw(struct mucse *mucse)
-+{
-+	/* do-nothing */
-+}
-+
-+/**
-+ * rnpgbe_fw_msg_handler - Irq handler for mbx irq
-+ * @mucse: pointer to the device private structure
-+ * @return: 0 always
-+ **/
-+int rnpgbe_fw_msg_handler(struct mucse *mucse)
-+{
-+	/* check fw-req */
-+	if (!mucse_check_for_msg(&mucse->hw, MBX_FW))
-+		rnpgbe_rcv_msg_from_fw(mucse);
-+	/* process any acks */
-+	if (!mucse_check_for_ack(&mucse->hw, MBX_FW))
-+		rnpgbe_rcv_ack_from_fw(mucse);
-+
-+	return 0;
-+}
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
-index 08f5e1950ae3..88c140832c5e 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
-@@ -232,6 +232,12 @@ struct port_stat {
- 	};
- } __packed;
  
-+static inline void port_stat_update_host_endian(struct port_stat *stat)
-+{
-+	u16 host_val = le16_to_cpu(stat->stat);
+ /**
+@@ -317,6 +321,7 @@ static void rnpgbe_down(struct mucse *mucse)
+ 	struct net_device *netdev = mucse->netdev;
+ 
+ 	set_bit(__MUCSE_DOWN, &mucse->state);
++	hw->ops.set_mac_rx(hw, false);
+ 	hw->ops.set_mbx_link_event(hw, 0);
+ 	hw->ops.set_mbx_ifup(hw, 0);
+ 	if (netif_carrier_ok(netdev))
+@@ -324,6 +329,7 @@ static void rnpgbe_down(struct mucse *mucse)
+ 	netif_tx_stop_all_queues(netdev);
+ 	netif_carrier_off(netdev);
+ 	rnpgbe_irq_disable(mucse);
 +
-+	stat->v_host = *(typeof(stat->v_host) *)&host_val;
+ 	netif_tx_disable(netdev);
+ 	rnpgbe_napi_disable_all(mucse);
+ 	mucse->flags &= ~M_FLAG_NEED_LINK_UPDATE;
+@@ -359,14 +365,83 @@ static int rnpgbe_close(struct net_device *netdev)
+ static netdev_tx_t rnpgbe_xmit_frame(struct sk_buff *skb,
+ 				     struct net_device *netdev)
+ {
+-	dev_kfree_skb_any(skb);
+-	return NETDEV_TX_OK;
++	struct mucse *mucse = netdev_priv(netdev);
++	struct mucse_ring *tx_ring;
++
++	if (!netif_carrier_ok(netdev)) {
++		dev_kfree_skb_any(skb);
++		return NETDEV_TX_OK;
++	}
++	if (skb->len < 33) {
++		if (skb_padto(skb, 33))
++			return NETDEV_TX_OK;
++		skb->len = 33;
++	}
++	if (skb->len > 65535) {
++		dev_kfree_skb_any(skb);
++		return NETDEV_TX_OK;
++	}
++	tx_ring = mucse->tx_ring[skb->queue_mapping];
++	return rnpgbe_xmit_frame_ring(skb, mucse, tx_ring);
 +}
- #define FLAGS_DD BIT(0) /* driver clear 0, FW must set 1 */
- /* driver clear 0, FW must set only if it reporting an error */
- #define FLAGS_ERR BIT(2)
-@@ -685,4 +691,5 @@ int mucse_fw_get_macaddr(struct mucse_hw *hw, int pfvfnum,
- 			 u8 *mac_addr, int nr_lane);
- int mucse_mbx_link_event_enable(struct mucse_hw *hw, int enable);
- int mucse_mbx_ifup_down(struct mucse_hw *hw, int up);
-+int rnpgbe_fw_msg_handler(struct mucse *mucse);
- #endif /* _RNPGBE_MBX_FW_H */
++
++/**
++ * rnpgbe_get_stats64 - Get stats for this netdev
++ * @netdev: network interface device structure
++ * @stats: stats data
++ **/
++static void rnpgbe_get_stats64(struct net_device *netdev,
++			       struct rtnl_link_stats64 *stats)
++{
++	struct mucse *mucse = netdev_priv(netdev);
++	int i;
++
++	rcu_read_lock();
++	for (i = 0; i < mucse->num_rx_queues; i++) {
++		struct mucse_ring *ring = READ_ONCE(mucse->rx_ring[i]);
++		u64 bytes, packets;
++		unsigned int start;
++
++		if (ring) {
++			do {
++				start = u64_stats_fetch_begin(&ring->syncp);
++				packets = ring->stats.packets;
++				bytes = ring->stats.bytes;
++			} while (u64_stats_fetch_retry(&ring->syncp, start));
++			stats->rx_packets += packets;
++			stats->rx_bytes += bytes;
++		}
++	}
++
++	for (i = 0; i < mucse->num_tx_queues; i++) {
++		struct mucse_ring *ring = READ_ONCE(mucse->tx_ring[i]);
++		u64 bytes, packets;
++		unsigned int start;
++
++		if (ring) {
++			do {
++				start = u64_stats_fetch_begin(&ring->syncp);
++				packets = ring->stats.packets;
++				bytes = ring->stats.bytes;
++			} while (u64_stats_fetch_retry(&ring->syncp, start));
++			stats->tx_packets += packets;
++			stats->tx_bytes += bytes;
++		}
++	}
++	rcu_read_unlock();
++	/* following stats updated by rnpgbe_watchdog_task() */
++	stats->multicast = netdev->stats.multicast;
++	stats->rx_errors = netdev->stats.rx_errors;
++	stats->rx_length_errors = netdev->stats.rx_length_errors;
++	stats->rx_crc_errors = netdev->stats.rx_crc_errors;
++	stats->rx_missed_errors = netdev->stats.rx_missed_errors;
+ }
+ 
+ const struct net_device_ops rnpgbe_netdev_ops = {
+ 	.ndo_open = rnpgbe_open,
+ 	.ndo_stop = rnpgbe_close,
+ 	.ndo_start_xmit = rnpgbe_xmit_frame,
++	.ndo_get_stats64 = rnpgbe_get_stats64,
+ };
+ 
+ /**
 -- 
 2.25.1
 
