@@ -1,86 +1,48 @@
-Return-Path: <netdev+bounces-208649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4FA3B0C87D
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 18:17:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7499B0C891
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 18:24:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D80FA1681F3
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 16:17:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF2357A1C24
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 16:22:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7756205E26;
-	Mon, 21 Jul 2025 16:17:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF3D42874E5;
+	Mon, 21 Jul 2025 16:23:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cRZ8N+ps"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tH3N33YN"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3416A1F5834
-	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 16:17:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 790D81F37D3;
+	Mon, 21 Jul 2025 16:23:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753114657; cv=none; b=uUHKrC9a4g7IPzOaNwFBzW5CIDYtKZciyZRvDTM/+USuMegUbqcUKs58LqpqtaEb+WPbbDF0v9SbrknCqjjR5B4dl9uQrjr96Y9xoiGQ211TD3gWjxPigoL7wZ9fDYhRMWZZlKR63vqxFxgQpuPk+uf6U55Mz98xujzkSRQMktQ=
+	t=1753115035; cv=none; b=Wu37EebPak7vbVUMDQzm1/EuRYR6+vD0xanFsYHk+28QtBGPkhtmqxLr0fU222mH2/kujQkukSjuGaityHDiuSuVYEJs+v9RAhWvOIkVcOearlpgIymoKNKsHgltcmwyXE+JxLBvGH0V3dsWe1YrB9bvgPYYA4gN2sv5SbomGmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753114657; c=relaxed/simple;
-	bh=fwv5H/Io0ydPlEB6QDN1RAfsQ3KsKiaX6o7bG+kYmEQ=;
+	s=arc-20240116; t=1753115035; c=relaxed/simple;
+	bh=kO/ojY0PKE/G0K4Aubf2edaZj4LmwtMDF2WwLrQ1IUU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZMHe7OpcT0pMbXgL4tikk8eJ/a9vk8LpqvxM77qcAK/K+Ji5lAYwneTj4TDWATzdnFjs+U0LZhyXeDQDLhf+Rzr6FZD4MgxqFeubyHRbSSbYPmvov1EuQk8RQqbBIhkyIYULVbm1hPNhJySYzOOw6siP8gAF7U6CSPkYZ/49TV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cRZ8N+ps; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1753114654;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6ovrmvUv5UZX43qqZLj6iuFt06QVDpvYJAVq9IaEEx0=;
-	b=cRZ8N+psDk1P9OHAyLKAqnPIZo39k1xvSSqMNYY8ODybXJYxy7Ik34bwKwaN6OGvLjIg7B
-	91cbJLYIAd8EPqGHv89knYcmXVRlqmmCmbZ95uF3M1b8FTwmWdhf28wB1JvykBBOnFtJ2Z
-	64O/KbkxmgPP36Au6+JD+0wwxi/edZw=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-652-Ih12SUyuPEK5-cdc6dIo3g-1; Mon, 21 Jul 2025 12:17:32 -0400
-X-MC-Unique: Ih12SUyuPEK5-cdc6dIo3g-1
-X-Mimecast-MFC-AGG-ID: Ih12SUyuPEK5-cdc6dIo3g_1753114652
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3b20f50da27so2189843f8f.0
-        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 09:17:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753114651; x=1753719451;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6ovrmvUv5UZX43qqZLj6iuFt06QVDpvYJAVq9IaEEx0=;
-        b=xLA9l1Vh6uo1AKaKEXM5RMr1Le6Gzt4delSuDinQwqdyDgBfs5ogO12vSzbl1oGTSI
-         5P03sDhzkk7Nb7XQOel3dy4YodDiLWQ8UVvv08K05Yn07cXw9ihO4gH5bCX9iKwYeJjb
-         IhJvgz6MtyGZ5lgOiwtGd6XG3KEJ6R7CjC6ObQOV2KuLr6aLj/olPPquG4jnUJ8M2Zja
-         bGmNe5Q4WptQ24sfBs3B3oM5dY3G6VOh9qlEZToM3RfDd/5r9DhDe9igdtlYJvVXr+cp
-         KFO4o7id5UhiWt7gHu5l82rT21WWq9NA8QIER62gm/LrZNkYQP1/io3p6pM3zDD9zk+O
-         512A==
-X-Gm-Message-State: AOJu0YynfqU6unZSiTjSPAvBzTxZO1m1qWXRbcXGMc+ekmCpBHctdmGv
-	lBQQN6Nkt6pk02Pys7OailCsrKgx4PfIZhz9MjO+yME4607piajPxXzgK9zhtMuC5V4tR72unfz
-	pyxq3/qyWUVj6ecuBz2hRvg62r1EBmcBTGdgJXPSzKWR182ggMb8UA+NRsg==
-X-Gm-Gg: ASbGncviGlCke0PcwJg2P63Dh5ME9vPh4W6wYvzTsQVgbJcQo1wEoAxO27wp1T4u3YY
-	d9XRk+bgxfyfVO+7O5oRhAUvGYDWUme8xU/dCl2iHGPlPcqb0rUjJT7/ZwG10ebG0+EgQ/ZGZ5k
-	2oTmWY+xIL9QAtVuuDHd1uizRRd6yLIHXXULgEXWxY+zwjz8PCnTQjb4wv4qsXCtEX4ABlWZ2jo
-	p7bBO1PG2pWsAtxjY06Kb3HcT6SS2YI0eVAvifkfV9U+R6rrCFibJ55zE1laiuI7LmKyLrkncN7
-	vQ76gT1Jfr4MSC1TpNIhkb/BjfeJi8b34toiVvUmXnFvG9X+0G0LyoZCpEjLzLJHkJHMBmEOek8
-	/hYfduiynJBs=
-X-Received: by 2002:a05:6000:2382:b0:3b7:5a57:edf2 with SMTP id ffacd0b85a97d-3b7634edfacmr144746f8f.20.1753114651350;
-        Mon, 21 Jul 2025 09:17:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEq6kYqjrT2QenFGgBTrntQaZWis1tg0Ki3G9FMyGsTDi/Dci66bx+nIQe7P3XVkygsGhw7Yg==
-X-Received: by 2002:a05:6000:2382:b0:3b7:5a57:edf2 with SMTP id ffacd0b85a97d-3b7634edfacmr144706f8f.20.1753114650793;
-        Mon, 21 Jul 2025 09:17:30 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca25443sm10939178f8f.9.2025.07.21.09.17.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Jul 2025 09:17:30 -0700 (PDT)
-Message-ID: <cc1cb5c2-9652-4b01-9008-22965685b73b@redhat.com>
-Date: Mon, 21 Jul 2025 18:17:29 +0200
+	 In-Reply-To:Content-Type; b=Hhu8Sl+C+UdrIHA8USTKdBpScS3OQ6GqatnXL0SZgPQBzSinyTppswccKIMb8R7rcFfjeqGFk2u8Osz92qo37dgiNmHwD3i/tuyiVHe5qrz6CHmAYhFeL9cmjaa0I0KtzrUwKONMyz2NXcwDxVgaypDTfYdfSAKgNOxF71Cte88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tH3N33YN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44C41C4CEED;
+	Mon, 21 Jul 2025 16:23:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753115035;
+	bh=kO/ojY0PKE/G0K4Aubf2edaZj4LmwtMDF2WwLrQ1IUU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=tH3N33YNAGoUDzxav2ywGWPKinOWFxIp5t3GbrgF0ubIvy0u7H+GFTQZ/SZ5xj5iI
+	 9j0IQjlAVKDQXzuWqikwXYAWcE9ZhLBFrGa1HnEB3TI+jjUUyIdnEdf1XmfGjwkDVU
+	 5BgBRAh4x3Ndp+JlaBucVjjTrLBVqgyYYxACVob5jE3rBEGsrUC+1ajEDlqbWeMt0z
+	 4Po82Ff13FhV44Y0hoYeL4zL3xhR2/gd3z1xQSp3Rk4rTvMPGbrd1EL26uUcXC29nf
+	 MEj6+KfSnXS3PQXRX7ka+LcmYmUtGVjtsUUKVr782yFISn1KFYiP5EZCPmOKSyieiJ
+	 RuAHqpSNCm+ug==
+Message-ID: <6b0669fd-fef6-4f4e-b80d-512769e86938@kernel.org>
+Date: Mon, 21 Jul 2025 17:23:50 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,135 +50,388 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] tcp: do not set a zero size receive buffer
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, Neal Cardwell <ncardwell@google.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, "David S. Miller"
- <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- Matthieu Baerts <matttbe@kernel.org>
-References: <cover.1752859383.git.pabeni@redhat.com>
- <3e080bdba9981988ff86e120df40a5f0dc6cd033.1752859383.git.pabeni@redhat.com>
- <CANn89i+KCsw+LH1X1yzmgr1wg5Vxm47AbAEOeOnY5gqq4ngH4w@mail.gmail.com>
- <f8178814-cf90-4021-a3e2-f2494dbf982a@redhat.com>
- <CANn89i+baSpvbJM6gcbSjZMmWVyvwsFotvH1czui9ARVRjS5Bw@mail.gmail.com>
- <ebc7890c-e239-4a64-99af-df5053245b28@redhat.com>
- <CANn89iJeXXJV-D5g3+hqStM1sH0UZ3jDeZmOu9mM_E_i9ZYaeA@mail.gmail.com>
- <1d78b781-5cca-440c-b9d0-bdf40a410a3d@redhat.com>
- <CANn89iLwpjs7-1qZ+wvFsav_Th9_PJvHvgfWPhz3wxUJwRx70Q@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CANn89iLwpjs7-1qZ+wvFsav_Th9_PJvHvgfWPhz3wxUJwRx70Q@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 1/2] bpftool: Add bpf_token show
+To: Tao Chen <chen.dylane@linux.dev>, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
+ kuba@kernel.org, hawk@kernel.org
+Cc: linux-kernel@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20250720173310.1334483-1-chen.dylane@linux.dev>
+From: Quentin Monnet <qmo@kernel.org>
+Content-Language: en-GB
+In-Reply-To: <20250720173310.1334483-1-chen.dylane@linux.dev>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 7/21/25 5:21 PM, Eric Dumazet wrote:
-> On Mon, Jul 21, 2025 at 7:56 AM Paolo Abeni <pabeni@redhat.com> wrote:
->> On 7/21/25 3:52 PM, Eric Dumazet wrote:
->>> On Mon, Jul 21, 2025 at 6:32 AM Paolo Abeni <pabeni@redhat.com> wrote:
->>>> On 7/21/25 2:30 PM, Eric Dumazet wrote:
->>>>> On Mon, Jul 21, 2025 at 3:50 AM Paolo Abeni <pabeni@redhat.com> wrote:
->>>>>> On 7/21/25 10:04 AM, Eric Dumazet wrote:
->>>>>>> On Fri, Jul 18, 2025 at 10:25 AM Paolo Abeni <pabeni@redhat.com> wrote:
->>>>>>>>
->>>>>>>> The nipa CI is reporting frequent failures in the mptcp_connect
->>>>>>>> self-tests.
->>>>>>>>
->>>>>>>> In the failing scenarios (TCP -> MPTCP) the involved sockets are
->>>>>>>> actually plain TCP ones, as fallback for passive socket at 2whs
->>>>>>>> time cause the MPTCP listener to actually create a TCP socket.
->>>>>>>>
->>>>>>>> The transfer is stuck due to the receiver buffer being zero.
->>>>>>>> With the stronger check in place, tcp_clamp_window() can be invoked
->>>>>>>> while the TCP socket has sk_rmem_alloc == 0, and the receive buffer
->>>>>>>> will be zeroed, too.
->>>>>>>>
->>>>>>>> Pass to tcp_clamp_window() even the current skb truesize, so that
->>>>>>>> such helper could compute and use the actual limit enforced by
->>>>>>>> the stack.
->>>>>>>>
->>>>>>>> Fixes: 1d2fbaad7cd8 ("tcp: stronger sk_rcvbuf checks")
->>>>>>>> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
->>>>>>>> ---
->>>>>>>>  net/ipv4/tcp_input.c | 12 ++++++------
->>>>>>>>  1 file changed, 6 insertions(+), 6 deletions(-)
->>>>>>>>
->>>>>>>> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
->>>>>>>> index 672cbfbdcec1..c98de02a3c57 100644
->>>>>>>> --- a/net/ipv4/tcp_input.c
->>>>>>>> +++ b/net/ipv4/tcp_input.c
->>>>>>>> @@ -610,24 +610,24 @@ static void tcp_init_buffer_space(struct sock *sk)
->>>>>>>>  }
->>>>>>>>
->>>>>>>>  /* 4. Recalculate window clamp after socket hit its memory bounds. */
->>>>>>>> -static void tcp_clamp_window(struct sock *sk)
->>>>>>>> +static void tcp_clamp_window(struct sock *sk, int truesize)
->>>>>>>
->>>>>>>
->>>>>>> I am unsure about this one. truesize can be 1MB here, do we want that
->>>>>>> in general ?
->>>>>>
->>>>>> I'm unsure either. But I can't think of a different approach?!? If the
->>>>>> incoming truesize is 1M the socket should allow for at least 1M rcvbuf
->>>>>> size to accept it, right?
->>>>>
->>>>> What I meant was :
->>>>>
->>>>> This is the generic point, accepting skb->truesize as additional input
->>>>> here would make us more vulnerable, or we could risk other
->>>>> regressions.
->>>>
->>>> Understood, thanks for the clarification.
->>>>
->>>>> The question is : why does MPTCP end up here in the first place.
->>>>> Perhaps an older issue with an incorrectly sized sk_rcvbuf ?
->>>>
->>>> I collected a few more data. The issue happens even with plain TCP
->>>> sockets[1].
->>>>
->>>> The relevant transfer is on top of the loopback device. The scaling_rate
->>>> rapidly grows to 254 - that is `truesize` and `len` are very near.
->>>>
->>>> The stall happens when the received get in a packet with a slightly less
->>>> 'efficient' layout (in the experiment I have handy len is 71424,
->>>> truesize 72320) (almost) filling the receiver window.
->>>>
->>>> On such input, tcp_clamp_window() shrinks the receiver buffer to the
->>>> current rmem usage. The same happens on retransmissions until rcvbuf
->>>> becomes 0.
->>>>
->>>> I *think* that catching only the !sk_rmem_alloc case would avoid the
->>>> stall, but I think it's a bit 'late'.
->>>
->>> A packetdrill test here would help understanding your concern.
->>
->> I fear like a complete working script would take a lot of time, let me
->> try to sketch just the relevant part:
->>
->> # receiver state is:
->> # rmem=110592 rcvbuf=174650 scaling_ratio=253 rwin=63232
->> # no OoO data, no memory pressure,
->>
->> # the incoming packet is in sequence
->> +0 > P. 109297:172528(63232) ack 1
->>
->> With just the 0 rmem check in tcp_prune_queue(), such function will
->> still invoke tcp_clamp_window() that will shrink the receive buffer to
->> 110592.
+Thanks a lot for this!
+
+
+2025-07-21 01:33 UTC+0800 ~ Tao Chen <chen.dylane@linux.dev>
+> Add `bpftool token show` command to get token info
+> from bpf fs in /proc/mounts.
 > 
-> As long as an ACK is sent back with a smaller RWIN, I think this would
-> be reasonable in this case.
+> Example plain output for `token show`:
+> token_info:
+>         /sys/fs/bpf/token
+> 
+> allowed_cmds:
+>         map_create          prog_load
+> 
+> allowed_maps:
+> 
+> allowed_progs:
+>         kprobe
+> 
+> allowed_attachs:
+>         xdp
+> 
+> Example json output for `token show`:
+> {
+>     "token_info": "/sys/fs/bpf/token",
+>     "allowed_cmds": ["map_create","prog_load"
+>     ],
+>     "allowed_maps":
 
-I fear some possible regression, as the sender will see some unexpected
-drops, even on loopback and while not misbehaving.
 
-But I tested your proposed code here and AFAICS solves the issue and I
-could not spot anything suspicious so far.
+This is not valid JSON. You're missing a value for "allowed_maps" (here
+it should likely be an empty array), and the comma:
 
-So I'll send a v2 using that.
+	"allowed_maps": [],
 
-Thanks!
 
-Paolo
+>     "allowed_progs": ["kprobe"
+>     ],
+>     "allowed_attachs": ["xdp"
+>     ]
+> }
+> 
+> Signed-off-by: Tao Chen <chen.dylane@linux.dev>
+> ---
+>  tools/bpf/bpftool/main.c  |   3 +-
+>  tools/bpf/bpftool/main.h  |   1 +
+>  tools/bpf/bpftool/token.c | 229 ++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 232 insertions(+), 1 deletion(-)
+>  create mode 100644 tools/bpf/bpftool/token.c
+> 
+> diff --git a/tools/bpf/bpftool/main.c b/tools/bpf/bpftool/main.c
+> index 2b7f2bd3a7d..0f1183b2ed0 100644
+> --- a/tools/bpf/bpftool/main.c
+> +++ b/tools/bpf/bpftool/main.c
+> @@ -61,7 +61,7 @@ static int do_help(int argc, char **argv)
+>  		"       %s batch file FILE\n"
+>  		"       %s version\n"
+>  		"\n"
+> -		"       OBJECT := { prog | map | link | cgroup | perf | net | feature | btf | gen | struct_ops | iter }\n"
+> +		"       OBJECT := { prog | map | link | cgroup | perf | net | feature | btf | gen | struct_ops | iter | token }\n"
+>  		"       " HELP_SPEC_OPTIONS " |\n"
+>  		"                    {-V|--version} }\n"
+>  		"",
+> @@ -87,6 +87,7 @@ static const struct cmd commands[] = {
+>  	{ "gen",	do_gen },
+>  	{ "struct_ops",	do_struct_ops },
+>  	{ "iter",	do_iter },
+> +	{ "token",	do_token },
+>  	{ "version",	do_version },
+>  	{ 0 }
+>  };
+> diff --git a/tools/bpf/bpftool/main.h b/tools/bpf/bpftool/main.h
+> index 6db704fda5c..a2bb0714b3d 100644
+> --- a/tools/bpf/bpftool/main.h
+> +++ b/tools/bpf/bpftool/main.h
+> @@ -166,6 +166,7 @@ int do_tracelog(int argc, char **arg) __weak;
+>  int do_feature(int argc, char **argv) __weak;
+>  int do_struct_ops(int argc, char **argv) __weak;
+>  int do_iter(int argc, char **argv) __weak;
+> +int do_token(int argc, char **argv) __weak;
+>  
+>  int parse_u32_arg(int *argc, char ***argv, __u32 *val, const char *what);
+>  int prog_parse_fd(int *argc, char ***argv);
+> diff --git a/tools/bpf/bpftool/token.c b/tools/bpf/bpftool/token.c
+> new file mode 100644
+> index 00000000000..2fcaff4f2ba
+> --- /dev/null
+> +++ b/tools/bpf/bpftool/token.c
+> @@ -0,0 +1,229 @@
+> +// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +
+> +#ifndef _GNU_SOURCE
+> +#define _GNU_SOURCE
+> +#endif
+> +#include <errno.h>
+> +#include <fcntl.h>
+> +#include <stdbool.h>
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <string.h>
+> +#include <unistd.h>
+> +#include <mntent.h>
+> +#include <sys/types.h>
+> +#include <sys/stat.h>
+> +
+> +#include "json_writer.h"
+> +#include "main.h"
+> +
+> +#define MOUNTS_FILE "/proc/mounts"
+> +
+> +#define zclose(fd) do { if (fd >= 0) close(fd); fd = -1; } while (0)
+
+
+Seems unused?
+
+
+> +
+> +static bool has_delegate_options(const char *mnt_ops)
+> +{
+> +	return strstr(mnt_ops, "delegate_cmds") != NULL ||
+> +	       strstr(mnt_ops, "delegate_maps") != NULL ||
+> +	       strstr(mnt_ops, "delegate_progs") != NULL ||
+> +	       strstr(mnt_ops, "delegate_attachs") != NULL;
+> +}
+> +
+> +static char *get_delegate_value(const char *opts, const char *key)
+> +{
+> +	char *token, *rest, *ret = NULL;
+> +	char *opts_copy = strdup(opts);
+> +
+> +	if (!opts_copy)
+> +		return NULL;
+> +
+> +	for (token = strtok_r(opts_copy, ",", &rest); token != NULL;
+> +			token = strtok_r(NULL, ",", &rest)) {
+> +		if (strncmp(token, key, strlen(key)) == 0 &&
+> +				token[strlen(key)] == '=') {
+> +			ret = token + strlen(key) + 1;
+> +			break;
+> +		}
+> +	}
+> +	free(opts_copy);
+> +
+> +	return ret;
+> +}
+> +
+> +static void print_items_per_line(const char *input, int items_per_line)
+> +{
+> +	char *str, *rest;
+> +	int cnt = 0;
+> +	char *strs = strdup(input);
+> +
+> +	if (!strs)
+> +		return;
+> +
+> +	for (str = strtok_r(strs, ":", &rest); str != NULL;
+> +			str = strtok_r(NULL, ":", &rest)) {
+> +		if (cnt % items_per_line == 0)
+> +			printf("\n\t");
+> +
+> +		printf("%-20s", str);
+> +		cnt++;
+> +	}
+> +
+> +	free(strs);
+> +}
+> +
+> +#define ITEMS_PER_LINE 4
+> +static void show_token_info_plain(struct mntent *mntent)
+> +{
+> +	char *value;
+> +
+> +	printf("\ntoken_info:");
+> +	printf("\n\t%s\n", mntent->mnt_dir);
+> +
+> +	printf("\nallowed_cmds:");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_cmds");
+> +	if (value)
+> +		print_items_per_line(value, ITEMS_PER_LINE);
+> +	printf("\n");
+> +
+> +	printf("\nallowed_maps:");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_maps");
+> +	if (value)
+> +		print_items_per_line(value, ITEMS_PER_LINE);
+> +	printf("\n");
+> +
+> +	printf("\nallowed_progs:");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_progs");
+> +	if (value)
+> +		print_items_per_line(value, ITEMS_PER_LINE);
+> +	printf("\n");
+> +
+> +	printf("\nallowed_attachs:");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_attachs");
+> +	if (value)
+> +		print_items_per_line(value, ITEMS_PER_LINE);
+> +	printf("\n");
+> +}
+> +
+> +static void __json_array_str(const char *input)
+
+
+Nit: Why the double underscore in the function name? Let's use a more
+explicit name also, maybe something like "split_to_json_array"?
+
+
+> +{
+> +	char *str, *rest;
+> +	char *strs = strdup(input);
+> +
+> +	if (!strs)
+> +		return;
+> +
+> +	jsonw_start_array(json_wtr);
+> +	for (str = strtok_r(strs, ":", &rest); str != NULL;
+> +			str = strtok_r(NULL, ":", &rest)) {
+> +		jsonw_string(json_wtr, str);
+> +	}
+> +	jsonw_end_array(json_wtr);
+> +
+> +	free(strs);
+> +}
+> +
+> +static void show_token_info_json(struct mntent *mntent)
+> +{
+> +	char *value;
+> +
+> +	jsonw_start_object(json_wtr);
+> +
+> +	jsonw_string_field(json_wtr, "token_info", mntent->mnt_dir);
+> +
+> +	jsonw_name(json_wtr, "allowed_cmds");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_cmds");
+> +	if (value)
+> +		__json_array_str(value);
+
+
+As mentioned above, you need to change __json_array_str() to print
+something when you don't get a "value" here - just have it print an
+empty array.
+
+
+> +
+> +	jsonw_name(json_wtr, "allowed_maps");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_maps");
+> +	if (value)
+> +		__json_array_str(value);
+> +
+> +	jsonw_name(json_wtr, "allowed_progs");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_progs");
+> +	if (value)
+> +		__json_array_str(value);
+> +
+> +	jsonw_name(json_wtr, "allowed_attachs");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_attachs");
+> +	if (value)
+> +		__json_array_str(value);
+> +
+> +	jsonw_end_object(json_wtr);
+> +}
+> +
+> +static int __show_token_info(struct mntent *mntent)
+> +{
+> +
+> +	if (json_output)
+> +		show_token_info_json(mntent);
+> +	else
+> +		show_token_info_plain(mntent);
+> +
+> +	return 0;
+> +}
+> +
+> +static int show_token_info(void)
+> +{
+> +	FILE *fp;
+> +	struct mntent *ent;
+> +	bool hit = false;
+> +
+> +	fp = setmntent(MOUNTS_FILE, "r");
+> +	if (!fp) {
+> +		p_err("Failed to open:%s", MOUNTS_FILE);
+
+
+Missing space after the colon, in the error message.
+
+
+> +		return -1;
+> +	}
+> +
+> +	while ((ent = getmntent(fp)) != NULL) {
+> +		if (strcmp(ent->mnt_type, "bpf") == 0) {
+
+
+File common.c has:
+
+		if (strncmp(mntent->mnt_type, "bpf", 3) != 0)
+			continue;
+
+Maybe do the same for consistency, and to avoid indenting too far right?
+
+
+> +			if (has_delegate_options(ent->mnt_opts)) {
+> +				hit = true;
+> +				break;
+
+
+Apologies, my knowledge of BPF tokens is limited. Can you have only one
+token exposed through a bpffs at a time? Asking because I know you can
+have several bpffs on your system, if each can have delegate options
+then why stop after the first bpffs mount point you find?
+
+
+> +			}
+> +		}
+> +	}
+> +
+> +	if (hit)
+> +		__show_token_info(ent);
+
+
+Maybe at least a p_info() message if you don't find anything to print?
+
+
+> +	endmntent(fp);
+> +
+> +	return 0;
+> +}
+> +
+> +static int do_show(int argc, char **argv)
+> +{
+> +	if (argc)
+> +		return BAD_ARG();
+> +
+> +	return show_token_info();
+> +}
+> +
+> +static int do_help(int argc, char **argv)
+> +{
+> +	if (json_output) {
+> +		jsonw_null(json_wtr);
+> +		return 0;
+> +	}
+> +
+> +	fprintf(stderr,
+> +		"Usage: %1$s %2$s { show | list }\n"
+> +		"	%1$s %2$s help\n"
+> +		"\n"
+> +		"",
+> +		bin_name, argv[-2]);
+> +	return 0;
+> +}
+> +
+> +static const struct cmd cmds[] = {
+> +	{ "show",	do_show },
+> +	{ "help",	do_help },
+> +	{ "list",	do_show },
+
+
+Nit: Can we have "help" coming third, below both "show" and "list" please?
+
+
+> +	{ 0 }
+> +};
+> +
+> +int do_token(int argc, char **argv)
+> +{
+> +	return cmd_select(cmds, argc, argv, do_help);
+> +}
 
 
