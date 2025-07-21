@@ -1,220 +1,149 @@
-Return-Path: <netdev+bounces-208556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 358B7B0C1CC
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 12:55:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D8D5B0C216
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 13:02:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02C3117DD73
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 10:54:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21F051890D7C
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 11:03:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3041F290D83;
-	Mon, 21 Jul 2025 10:53:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0397B284B2E;
+	Mon, 21 Jul 2025 11:02:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="fCKJB0wX"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KTqlP+OS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60BB0294A03
-	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 10:53:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27C521EA7EB
+	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 11:02:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753095223; cv=none; b=giZVOvMgGgGrxICUq1bNgcRr3wXakyFD4D47fOgn4un+141q7z/INtcnRZPfL3vrJ80DeVdogiv0tGKRw3RKz4gRZjJW5BshTvyTGnDkiHnhubqAe7SlTs2q36qJKZFbgPnWvb1fuaT6WT6ODe1nLPRbfc2C/6k3zDlxhYwLioM=
+	t=1753095762; cv=none; b=C7q8rCKi4to+0UMfCwJj9vzv6Prt42soUb18kx83eR6yhdeW2ayTIZ9TYf8ND+EK4QgAo4xTpr+qOHURF3jvsRTk5RNxh6tvZZAEA+W44HLsW5wxXDxQgGcIByZtsAl8bsVEsPnEyavUEK5eb0gbLFNvHM1NESnfVsQEakQWrDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753095223; c=relaxed/simple;
-	bh=duMKK44JnKpe4MGN8M6YKC4qDTC52JONh/TP9d9AdL4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Ew8uCnFnuhpXfYYCuXMJfAhi5AsdFlZRKIR6hLc7tbk4TOVByjmtzq+lKpz+aFEIddcTu1nsH6JwdbbtqG4rLM+ZmwYVelDHJL1etKEmIwmN/xmkc9hjAyZnGogK2+BHx3HPsheNeHH/hsDph3yGsvOku30nfAtaXJtR9BSnO/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=fCKJB0wX; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-612b67dcb89so5666036a12.1
-        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 03:53:41 -0700 (PDT)
+	s=arc-20240116; t=1753095762; c=relaxed/simple;
+	bh=o66KmS0dvmnVwV9kRV+A231A5UVb86BycA3XuJzDjm4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XeEuac1hHTQkLivHLivGwXqYzkveVY3p3U+ICFn01sUCuXS8AoFKGw8Qc++Qfq9hO91sqtCzEg2Cj1V0o930qCQGBnr8DLyHooEAwpnmWKxjnJ+xHkAJBSLSlENSQzVBSlQ+4ySt8Vz0kSDGpQ+5uUWzbNr5Vr0lAdBqRYy7jbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KTqlP+OS; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3a4f72cba73so3140801f8f.1
+        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 04:02:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1753095220; x=1753700020; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xvuGGpBWHPa+xyjonBcXXcpvK68Zk52Wi7ziORp+6ao=;
-        b=fCKJB0wXFagYmy1Rov8SNNaQLjZWL/M2JC5yJpV/aVRp3kdpQDAhTgj3SViR2ExHo4
-         I2tIPDA6J7tV6BuIBnYoB8BbSOzUzDhDRF5a8Gz0HHq+9CYWcjxk06dXUjXIQACkERZb
-         fTaNAsz0zz5HtOVwuqxJutqtT7yoxO38GwgAbrH7a4UbCTzc6oSuaFSl0neORWYP5YCU
-         VejAWnIB8Dc/lGvrYrGI6f3r9BqrFU3nfOEZsA3HKpmOCwrW+VPc441BVYL8EkhRYSEc
-         YIGCnRQnRpXr3hQ3MxSkzgMWPdsXvWdoUQYGNmZHFst7lROGnmXD+K6/LCFVYSfmAfSF
-         GVjA==
+        d=linaro.org; s=google; t=1753095759; x=1753700559; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wnPN47nMXqCMa/5FKC3NpcQPBDzZo2b6pouXJ5vXunM=;
+        b=KTqlP+OSRxVjlnfssrIEeIY12LzBXd6h37WeZB407j/gVsJfryA0UNnU/TaU9bR/sc
+         0EU1rEqwCm5iTeCZRDThLdGIZSqGqwrKE1uR5OhjhY/HjJ26pcs1gZtg4al7HiIpxJ+O
+         To7HTHFJyA/xYHNXzZEvumpE+bIkgVpGvcwQiZnlP5rWm9VrNWG+sm7wXsD+xE66uBsm
+         9ksUqANj1zVNk8trXeAIl6tp+rM8JZ395kapvOyVmy45CEuRAMjCfpGLiQe8Y4POHthp
+         nTuq05JW0jmA/MhU2MjC3f9jIMVRbYVjRibcxw8M1gbp35oL2CEoCWZP0HKLJiXo8/LG
+         zSYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753095220; x=1753700020;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xvuGGpBWHPa+xyjonBcXXcpvK68Zk52Wi7ziORp+6ao=;
-        b=OxWmERVjaifFmzV1LVXH8qTq/npN/l3fp753UEJmve7n0604odVHllgjF/CLtqFb6m
-         D7WghiSxB1m3sMqix6WvpwDe2Tey0+yIn54Jj7bj1oLfAP6IXqugQgKKxckJRN29n/+J
-         qyks3VfX454F44lCqpKiwO1C7HKW36QCg1Bq2q9dQEKN0vSV4xE8rXBxi3db+IGs7q42
-         7USKa2qRmXk1zMCt6oDLVQknB5fBRomaxWNz0Mkjb9mLrsFQAr5KBKWEqThPbe1mrnL3
-         B1gUpoiDHFYrx9l7B/BmRMaUyXavQEsFIZyxMPfe3q87iLR9Sj8Rgq6FP/CLSTj9YBoQ
-         u6ig==
-X-Forwarded-Encrypted: i=1; AJvYcCVtAcbsPguLvyfdClPrHDztIeOl1LGmXQUfuYvKHotarj0MyKYK6v9LOFAZjZZ4qTygQrfZMEU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxchI38zSAVHgQKsobWyXMCAX1E5fc3keN9HCiE3r/Mkzez6fd
-	oVu/RSm7fPnBG7dorBQpXH8nXCsT/v5q3/3fGrwLjmP6sjH7SgiNzf0tZRdOH+lOQxM=
-X-Gm-Gg: ASbGnctFKjGqvQcXy3RtlUv88NZawO3w6sCRuvj8jcAkz0XpBYRFK3vIHlEIjWFwres
-	qKslWf0K1BYEeOcZPZyaqKmQyZyFrMf4RrZhevt5P+qKu3nxxRfJTpvIUNrVCHJJ9zGi5BehXsw
-	xchaeoyImYKXquNb2Q338rRpvQJvaK3UkZfDTPV11Enmmy7dt86kcOGtyGH0wt0KKogOGDXweqX
-	A/uh7wHQFfy8a3aXTbcMmak8wVE+9ZmiZ87s4vBvh5Yy29g9h7yrICmHszL9MiRiqlYtEjkipRu
-	V6xYfzfJOOn96qjHzoxMy2dmQveYU91wdr6g5T40LxdmaCJw0VGoN39tkJLRsnc4hDUMtk/gxs4
-	bpHehT2c8q2qtYA==
-X-Google-Smtp-Source: AGHT+IFAoidyNVqKZ7GAejKUZ+B0AVj6CgjEFfUPywn4GX2Om1tQCrB3MkvYFjo6kxay0MG6toDHew==
-X-Received: by 2002:a17:906:c105:b0:ae4:107f:dba2 with SMTP id a640c23a62f3a-ae9cddf128dmr1900275066b.13.1753095219671;
-        Mon, 21 Jul 2025 03:53:39 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:2dc::49:217])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aec6ca2f19csm652127766b.70.2025.07.21.03.53.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Jul 2025 03:53:38 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Mon, 21 Jul 2025 12:52:48 +0200
-Subject: [PATCH bpf-next v3 10/10] selftests/bpf: Cover read/write to skb
- metadata at an offset
+        d=1e100.net; s=20230601; t=1753095759; x=1753700559;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wnPN47nMXqCMa/5FKC3NpcQPBDzZo2b6pouXJ5vXunM=;
+        b=mn9TfQVIG+Zw8v6WmErxheGo3WEzhI04V5dnqxKsmkisSLxK9ff4yuQ/ohFYtwCUi7
+         P3vj2LNC+DVdcovi4UFw9pfP/v/AvIeYWLTgYrMtk4HiAKdvwKlDmOaTAmoeYUvaWvbD
+         J+ttjbFM9vG/S3Fm3drCLJc92yvIS/jxP6amLqLempappfTfUDgJwye2ArgEDaBOTnD2
+         2lBT5834ErMFZ9vMH56GkuhAU7DHhTsK5rhb1qkpPmNMyTE5GE8+rBlVO0sAmfL6X4GW
+         LkvHtlafpC6apqVg8DIded5nUx9qofXtQHqzHJVvX8tTHfrxpkGjwLJdxhoxU+yWT5Rz
+         q4nQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV4+UsI/kTFoFv3/8wkR+PNEBh77pn+niqfQjWaoPb809pFGVKeTdjrmFXQd04Q91tMkNuHrcw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlF33uIokskU04iZesrd1kxI5lxVdG4TA0Xyd71UnFropCGTxk
+	kBpADbUIqb8bwK7e+wPvH1FlJsssuKxSQ01pmPPVfK0G2n4qMIh5JFJdNm6x1SQJ6uo=
+X-Gm-Gg: ASbGncvqXT/WamtNoAcRMfGgwmIw24mmRuaKRC/TusQKFM7YxBaPZ0av7TLkrakUzLQ
+	j2NGdqVWMaQ41u2ozwNTmEAbIC9dPwGa88cB8MxULJs2Wb/pnPV2WKdh9MknvNi0H/5aitBIZhH
+	5k3Vp6/06emtYuCXa6/5e6Mw59mgGDIDqSIxCqo7gmwtrYN8JxDI5bMAP2XDJuOyQhX2S0ECEgE
+	TIv+Rj66tssGk0dOWCkYHSOJzOmKEI6KptcAxZ90Ad9Ct9RrPJPAlrubfNUWCw9QCOmMHywxOan
+	S+MdTInJwCmbnquDJ1MbnlnkRDvpnxp/Mweh2vanKyVRGY5do4k2/JkOdlmiYYzpUCDX/Pxz1YF
+	u5lkTciXJBU+R7XJkFw92C6gdzHgwx/HFwSbrgn0Oj89TViOgnR+aqxlB5jFilZU=
+X-Google-Smtp-Source: AGHT+IFGN8mRXN/kZxyJyfdLFb/YDnz/Qv7FQJ0+kN5BasGH8tzT//CVFFtZf1yRBXL9BZ2mDjJbAw==
+X-Received: by 2002:a05:6000:2383:b0:3a3:64b9:773 with SMTP id ffacd0b85a97d-3b613ab2bb8mr12942274f8f.10.1753095759171;
+        Mon, 21 Jul 2025 04:02:39 -0700 (PDT)
+Received: from [192.168.1.36] (p549d4bd0.dip0.t-ipconnect.de. [84.157.75.208])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca486edsm10204994f8f.56.2025.07.21.04.02.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Jul 2025 04:02:38 -0700 (PDT)
+Message-ID: <985111fc-3301-4c0a-a13e-ab65e94bdcbb@linaro.org>
+Date: Mon, 21 Jul 2025 13:02:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 01/10] net: qrtr: ns: validate msglen before ctrl_pkt
+ use
+Content-Language: en-US
+To: Mihai Moldovan <ionic@ionic.de>, linux-arm-msm@vger.kernel.org,
+ Manivannan Sadhasivam <mani@kernel.org>
+Cc: Denis Kenzior <denkenz@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <cover.1752947108.git.ionic@ionic.de>
+ <866f309e9739d770dce7e8c648b562d37db1d8b5.1752947108.git.ionic@ionic.de>
+From: Casey Connolly <casey.connolly@linaro.org>
+In-Reply-To: <866f309e9739d770dce7e8c648b562d37db1d8b5.1752947108.git.ionic@ionic.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250721-skb-metadata-thru-dynptr-v3-10-e92be5534174@cloudflare.com>
-References: <20250721-skb-metadata-thru-dynptr-v3-0-e92be5534174@cloudflare.com>
-In-Reply-To: <20250721-skb-metadata-thru-dynptr-v3-0-e92be5534174@cloudflare.com>
-To: bpf@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>, 
- Andrii Nakryiko <andrii@kernel.org>, Arthur Fabre <arthur@arthurfabre.com>, 
- Daniel Borkmann <daniel@iogearbox.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
- Jesse Brandeburg <jbrandeburg@cloudflare.com>, 
- Joanne Koong <joannelkoong@gmail.com>, 
- Lorenzo Bianconi <lorenzo@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <thoiland@redhat.com>, 
- Yan Zhai <yan@cloudflare.com>, kernel-team@cloudflare.com, 
- netdev@vger.kernel.org, Jakub Sitnicki <jakub@cloudflare.com>, 
- Stanislav Fomichev <sdf@fomichev.me>
-X-Mailer: b4 0.15-dev-07fe9
 
-Exercise r/w access to skb metadata through an offset-adjusted dynptr,
-read/write helper with an offset argument, and a slice starting at an
-offset.
+Hi Mihai
 
-Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
----
- .../bpf/prog_tests/xdp_context_test_run.c          |  5 ++
- tools/testing/selftests/bpf/progs/test_xdp_meta.c  | 73 ++++++++++++++++++++++
- 2 files changed, 78 insertions(+)
+On 19/07/2025 20:59, Mihai Moldovan wrote:
+> From: Denis Kenzior <denkenz@gmail.com>
+> 
+> The qrtr_ctrl_pkt structure is currently accessed without checking
+> if the received payload is large enough to hold the structure's fields.
+> Add a check to ensure the payload length is sufficient.
+> 
+> Signed-off-by: Denis Kenzior <denkenz@gmail.com>
+> Reviewed-by: Marcel Holtmann <marcel@holtmann.org>
+> Reviewed-by: Andy Gross <agross@kernel.org>
+> Signed-off-by: Mihai Moldovan <ionic@ionic.de>
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-index 79c4c58276e6..602fa69afecb 100644
---- a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-+++ b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-@@ -375,6 +375,11 @@ void test_xdp_context_tuntap(void)
- 			    skel->progs.ing_cls_dynptr_slice_rdwr,
- 			    skel->progs.ing_cls_dynptr_slice,
- 			    skel->maps.test_result);
-+	if (test__start_subtest("dynptr_offset"))
-+		test_tuntap(skel->progs.ing_xdp_zalloc_meta,
-+			    skel->progs.ing_cls_dynptr_offset_wr,
-+			    skel->progs.ing_cls_dynptr_offset_rd,
-+			    skel->maps.test_result);
- 
- 	test_xdp_meta__destroy(skel);
- }
-diff --git a/tools/testing/selftests/bpf/progs/test_xdp_meta.c b/tools/testing/selftests/bpf/progs/test_xdp_meta.c
-index e7879860f403..8f61aa997f74 100644
---- a/tools/testing/selftests/bpf/progs/test_xdp_meta.c
-+++ b/tools/testing/selftests/bpf/progs/test_xdp_meta.c
-@@ -122,6 +122,79 @@ int ing_cls_dynptr_slice_rdwr(struct __sk_buff *ctx)
- 	return TC_ACT_UNSPEC; /* pass */
- }
- 
-+/*
-+ * Read skb metadata in chunks from various offsets in different ways.
-+ */
-+SEC("tc")
-+int ing_cls_dynptr_offset_rd(struct __sk_buff *ctx)
-+{
-+	struct bpf_dynptr meta;
-+	const __u32 chunk_len = META_SIZE / 4;
-+	const __u32 zero = 0;
-+	__u8 *dst, *src;
-+
-+	dst = bpf_map_lookup_elem(&test_result, &zero);
-+	if (!dst)
-+		return TC_ACT_SHOT;
-+
-+	/* 1. Regular read */
-+	bpf_dynptr_from_skb_meta(ctx, 0, &meta);
-+	bpf_dynptr_read(dst, chunk_len, &meta, 0, 0);
-+	dst += chunk_len;
-+
-+	/* 2. Read from an offset-adjusted dynptr */
-+	bpf_dynptr_adjust(&meta, chunk_len, bpf_dynptr_size(&meta));
-+	bpf_dynptr_read(dst, chunk_len, &meta, 0, 0);
-+	dst += chunk_len;
-+
-+	/* 3. Read at an offset */
-+	bpf_dynptr_read(dst, chunk_len, &meta, chunk_len, 0);
-+	dst += chunk_len;
-+
-+	/* 4. Read from a slice starting at an offset */
-+	src = bpf_dynptr_slice(&meta, 2 * chunk_len, NULL, chunk_len);
-+	if (!src)
-+		return TC_ACT_SHOT;
-+	__builtin_memcpy(dst, src, chunk_len);
-+
-+	return TC_ACT_SHOT;
-+}
-+
-+/* Write skb metadata in chunks at various offsets in different ways. */
-+SEC("tc")
-+int ing_cls_dynptr_offset_wr(struct __sk_buff *ctx)
-+{
-+	const __u32 chunk_len = META_SIZE / 4;
-+	__u8 payload[META_SIZE];
-+	struct bpf_dynptr meta;
-+	__u8 *dst, *src;
-+
-+	bpf_skb_load_bytes(ctx, sizeof(struct ethhdr), payload, sizeof(payload));
-+	src = payload;
-+
-+	/* 1. Regular write */
-+	bpf_dynptr_from_skb_meta(ctx, 0, &meta);
-+	bpf_dynptr_write(&meta, 0, src, chunk_len, 0);
-+	src += chunk_len;
-+
-+	/* 2. Write to an offset-adjusted dynptr */
-+	bpf_dynptr_adjust(&meta, chunk_len, bpf_dynptr_size(&meta));
-+	bpf_dynptr_write(&meta, 0, src, chunk_len, 0);
-+	src += chunk_len;
-+
-+	/* 3. Write at an offset */
-+	bpf_dynptr_write(&meta, chunk_len, src, chunk_len, 0);
-+	src += chunk_len;
-+
-+	/* 4. Write to a slice starting at an offset */
-+	dst = bpf_dynptr_slice_rdwr(&meta, 2 * chunk_len, NULL, chunk_len);
-+	if (!dst)
-+		return TC_ACT_SHOT;
-+	__builtin_memcpy(dst, src, chunk_len);
-+
-+	return TC_ACT_UNSPEC; /* pass */
-+}
-+
- /* Reserve and clear space for metadata but don't populate it */
- SEC("xdp")
- int ing_xdp_zalloc_meta(struct xdp_md *ctx)
+I think this is missing a Fixes: tag?
+
+Kind regards,
+
+> 
+> ---
+> 
+> v2:
+>   - rebase against current master
+>   - use correct size of packet structure as per review comment
+> ---
+>  net/qrtr/ns.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/net/qrtr/ns.c b/net/qrtr/ns.c
+> index 3de9350cbf30..2bcfe539dc3e 100644
+> --- a/net/qrtr/ns.c
+> +++ b/net/qrtr/ns.c
+> @@ -619,6 +619,9 @@ static void qrtr_ns_worker(struct work_struct *work)
+>  			break;
+>  		}
+>  
+> +		if ((size_t)msglen < sizeof(*pkt))
+> +			break;
+> +
+>  		pkt = recv_buf;
+>  		cmd = le32_to_cpu(pkt->cmd);
+>  		if (cmd < ARRAY_SIZE(qrtr_ctrl_pkt_strings) &&
 
 -- 
-2.43.0
+// Casey (she/her)
 
 
