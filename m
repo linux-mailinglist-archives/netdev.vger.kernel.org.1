@@ -1,172 +1,337 @@
-Return-Path: <netdev+bounces-208703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D78B6B0CCC9
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 23:39:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81D47B0CCD3
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 23:44:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8616B17059A
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 21:39:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE39F6C120D
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 21:44:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD7CA23E325;
-	Mon, 21 Jul 2025 21:37:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C634241693;
+	Mon, 21 Jul 2025 21:44:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ikMcdFsO"
+	dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b="dxtVD5+Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9281117996;
-	Mon, 21 Jul 2025 21:37:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAA761917F1
+	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 21:44:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753133873; cv=none; b=BPznwCULci3GW2um0GHbzZoTHkf7MSFTUiWiNpQWwlctrtze3hlAJnc1um5RF8JSismwa7E/upCe/tZeoDK5acDgu0ItQtfTSF1qo1nGDhf1OWM3DTSolUURAjsj1NggyWTFZll91ugrhC2asHCMclYm7ulYDworIUQngaLUfaI=
+	t=1753134273; cv=none; b=roICVbhp1HQU3FefHgRolxO1Xi/hEQXLVKV/dJuXjT4JOH0sJUNPuJC5/+U2W4lyoj6tB/LPHzA0hl0IVqs+oSDZu6eAO+FRqyvXvm6zr+xGim0i8dXXS1xJXQNR+xBzIM/8S53X63MXaoWL4L/QHm/b1OBBa+5/xJjCkUqDDV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753133873; c=relaxed/simple;
-	bh=vux3ljHQL8fINu3c42OPgphrlmfOj/Zy4tR5XX6EUKY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dVn6tbg7MzdLaAdi8Ze+pMzgt6oSxRLc179pPfS0ZUd91g7kpuwTsbemzk1Vs7chVMeTgfmz5yhnyUuTLwxHvmhezpggwBMQKrqHgFs5rwwDyIxgWad6VchMOIclVma+7Ab1cuE0Rrop3o9FPRvweQQ1WKipQs6AmO0IxiJyLmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ikMcdFsO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 845E0C4CEED;
-	Mon, 21 Jul 2025 21:37:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753133873;
-	bh=vux3ljHQL8fINu3c42OPgphrlmfOj/Zy4tR5XX6EUKY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ikMcdFsOXsniDPlwnCm9s0WBgVm7AhZSiIVBtQ2F2Wq/5Wx9q66k6m5aFWIcCS5Or
-	 aVPwKoEGEbw8Ti2J2QNRUVdyh98CUdrBp6U4eMkRA7daYn90+b0ceqNQnHPGYacTAu
-	 PokDc6V6oTuz3DGNfh040y59WIoQR7o0nAOPBRcACuLDGkkTg1y7RzMrkoE0jrfapZ
-	 6V3oCj/fLFprr6w+etUoIzWIe2GyXcjcClF4OJuCvDpkvugGeWtbSkDwdxQJEs0Mn8
-	 qSWcLjzdverDlDPda5J5hXKhnoqUbtxEPhJJeJrZngkgGMZi/eOlR0GbrFu8EZaNFF
-	 yw/pi3FG4Or9w==
-Date: Mon, 21 Jul 2025 23:37:50 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, Felix Fietkau <nbd@nbd.name>
-Subject: Re: [PATCH net-next v4 1/7] dt-bindings: net: airoha: npu: Add
- memory regions used for wlan offload
-Message-ID: <aH6zLo17TOSZID37@lore-desk>
-References: <20250717-airoha-en7581-wlan-offlaod-v4-0-6db178391ed2@kernel.org>
- <20250717-airoha-en7581-wlan-offlaod-v4-1-6db178391ed2@kernel.org>
- <20250718-sceptical-blue-bird-7e96e3@kuoka>
- <aHoWY6iGN-lJnu60@lore-desk>
+	s=arc-20240116; t=1753134273; c=relaxed/simple;
+	bh=xj1YyEfkHgBd8Ct/L8B6Hf+DQ/ewdy2Kb5+tgH9/9xY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EwdYqBHqHqaoI+hAqUTn7ttoD+T9CuBOXyxXcqCQ/sGUJ9Xb+wLawX/Hm1mfn2buaBUowwwVsPEJKmVUQRoqn+qwJISK7NekFIu0SyN5F03QDHat0OVX5nyHT+fJLVxk/Z7+aUj1cb3Ri2RlzSrM6s3j7bI+o/+Jr0pnpd8BtQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com; spf=pass smtp.mailfrom=openai.com; dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b=dxtVD5+Y; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openai.com
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-555163cd09aso3906738e87.3
+        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 14:44:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openai.com; s=google; t=1753134269; x=1753739069; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jED/IH2okMQBhZCF5xmT+94Tr+oj/M/1ra8B1IJxlvo=;
+        b=dxtVD5+YCi5BqazOXIVRPMhJFPOB/k3c5QJcS1Mr244O3LWRgTPjJb+nsX2s3cTWtG
+         6kHsGQRVLfZimEjRPTs0tz8dQN4a/fxEo0GV1hQ7ASjGkHJHwCeaR3XRXk1IiEPl71dq
+         w3nYG/Uf0zWEiS+kEzelKfNN8xCFJq7dMnuYM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753134269; x=1753739069;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jED/IH2okMQBhZCF5xmT+94Tr+oj/M/1ra8B1IJxlvo=;
+        b=sbJjZAa/XeS3eV/MzWsiu8WJa7qI8FoFL143id7nDxrHL0R12XgKSSWmr/O+RGszgZ
+         4KLxXMRo+BMr+0907/hkJeoWRXk1kczhLTnHVfnwx9O2waKmyKrHW6VEfyzwpSitVu86
+         ASLf1jCOZFCuOt8BdEBIkRz8TZJQfzRr2hWHEWKGcIgXtK6Vh7u75ABpu30R4rWsbiai
+         qDP3yr54R/xiUQWOl4EPJO+uab4j/6NDI4ICrM2oBVoY35i6HZgrCzfPF3yabPTZXaas
+         iviaY8E5WuFzoXwvso9t2qz1rE6ZpbvyPQvjCY0It6ulCimF9Pty4JtqwndqScYpXNNG
+         Xa0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUVyp0PWMY2hg/CbZ2QsMkYaL54lTMrBBBquFTlfpJlqlP9OEnC7NENYXxK8YeAQpPJULOhpoQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIfzuUMg8MQbqZ3+6qrMOepmyl27OjGZRt7mGGqiGnXqYRDW7v
+	7CGFuXmjpE/gMQJNKKTTZMONU0N/yvU6FvHkkmfG0atyWVWyCZLn8W4tIxq/9gObsLU/xDwnUUs
+	3rGNbvbYRNovZD+uJzPhIRmDZyFuPQ8i91tj7Qfj7qw==
+X-Gm-Gg: ASbGnctEEE52vNpqo4Na8J/RbiYbMlVi1qEuPj8NLLsECH5SFTzYX1dL0EPJkIZYaTZ
+	+GNMa4pP6cOlP/89eg8bCJjGS0Ww8byu43jsRdYIgYhF0CeJyEpaQfZbMAGyyf7Cqxyd0VSbq21
+	aV3k7tOAAZMbrOKZCehjAM+IU3nNjhtI+GxR3+FVXUlt+q3Phz0PjbjZYlWIRDJcSuMIgT4EOaS
+	YT6h9Lf
+X-Google-Smtp-Source: AGHT+IF1Ol7BKzqchQQ+Ra+jf/HGcte/MBFPJxD1DcjbCbR0vFmNQkZF+jTYansB4MR7YQ8V/RMQmElFZmTg59uy7VI=
+X-Received: by 2002:a05:6512:2391:b0:553:ac4e:c41 with SMTP id
+ 2adb3069b0e04-55a296fd1ebmr5815783e87.28.1753134268954; Mon, 21 Jul 2025
+ 14:44:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="hDFEHIRXI0z6CbSS"
-Content-Disposition: inline
-In-Reply-To: <aHoWY6iGN-lJnu60@lore-desk>
-
-
---hDFEHIRXI0z6CbSS
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20250713-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v1-0-ecaed8c2844e@openai.com>
+ <20250713-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v1-2-ecaed8c2844e@openai.com>
+ <befdca60-f9e5-486d-8df4-eafe4f338d79@gmail.com>
+In-Reply-To: <befdca60-f9e5-486d-8df4-eafe4f338d79@gmail.com>
+From: Christoph Paasch <cpaasch@openai.com>
+Date: Mon, 21 Jul 2025 14:44:17 -0700
+X-Gm-Features: Ac12FXwSzjDW53mNA7ER5nj9SREiZSplWFyLA2ehkv_ZfndALm1pIGsjbEbWfXc
+Message-ID: <CADg4-L9XoY_dwqicTLb62xbiy3+b3Wwf__qX97WSA9S8tuNjjQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/2] net/mlx5: Avoid copying payload to the skb's
+ linear part
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
+	Mark Bloch <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-rdma@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-> > On Thu, Jul 17, 2025 at 08:57:42AM +0200, Lorenzo Bianconi wrote:
-> > > Document memory regions used by Airoha EN7581 NPU for wlan traffic
-> > > offloading. The brand new added memory regions do not introduce any
-> > > backward compatibility issues since they will be used just to offload
-> > > traffic to/from the MT76 wireless NIC and the MT76 probing will not f=
-ail
-> > > if these memory regions are not provide, it will just disable offload=
-ing
-> > > via the NPU module.
-> >=20
-> > That's not what I see entirely. I see the same problem I told you alrea=
-dy.
-> > of_reserved_mem_region_to_resource_byname returns error ->
-> > airoha_npu_wlan_init_memory returns error -> your other patchset prints
-> > big fat warning in mt7996_pci_probe().
->=20
-> Is it ok to use dev_info() instead dev_warn() or do you prefer to complet=
-ely
-> remove the log?
->=20
-> >=20
-> > So all correct DTS now gets a warning. Warning is a state of failure,
-> > even if probe proceeds.
-> >=20
-> > I don't understand why you can't make it fully optional, so also fully
-> > backwards compatible.
->=20
-> I am completely fine to make it fully optional, but can you please explain
-> what you mean here with 'optional'?
->=20
-> At the moment in mt76_npu_init() we first look for the "airoha,npu" prope=
-rty
-> in mt76 node to load the NPU pointer running airoha_npu_get():
->=20
-> wifi@0,0 {
-> 	compatible =3D "mediatek,mt76";
-> 	...
-> 	airoha,npu =3D <&npu>;
-> 	...
-> };
+Hello!
 
-According to my understanding it is enough to get rid of the dev_warn() in =
-the
-MT76 series in order to avoid any backward compatibility issues. Am I wrong?
-Moreover, we have the NPU phandle in the MT76 DTS node in order to check if=
- the
-reserved-memory properties are mandatory or not (if the MT76 node is config=
-ured
-with the NPU phandle it is expected to have the reserved-memory properties =
-properly
-configured).
-If my understanding is correct the NPU series does not require any change (=
-the
-only required change is in MT76 series). Since the current series is marked=
- as
-"Changes Requested' in patchwork, do I need to repost?
+On Mon, Jul 14, 2025 at 12:29=E2=80=AFAM Tariq Toukan <ttoukan.linux@gmail.=
+com> wrote:
+>
+>
+>
+> On 14/07/2025 2:33, Christoph Paasch via B4 Relay wrote:
+> > From: Christoph Paasch <cpaasch@openai.com>
+> >
+> > mlx5e_skb_from_cqe_mpwrq_nonlinear() copies MLX5E_RX_MAX_HEAD (256)
+> > bytes from the page-pool to the skb's linear part. Those 256 bytes
+> > include part of the payload.
+> >
+> > When attempting to do GRO in skb_gro_receive, if headlen > data_offset
+> > (and skb->head_frag is not set), we end up aggregating packets in the
+> > frag_list.
+> >
+> > This is of course not good when we are CPU-limited. Also causes a worse
+> > skb->len/truesize ratio,...
+> >
+> > So, let's avoid copying parts of the payload to the linear part. The
+> > goal here is to err on the side of caution and prefer to copy too littl=
+e
+> > instead of copying too much (because once it has been copied over, we
+> > trigger the above described behavior in skb_gro_receive).
+> >
+> > So, we can do a rough estimate of the header-space by looking at
+> > cqe_l3/l4_hdr_type and kind of do a lower-bound estimate. This is now
+> > done in mlx5e_cqe_get_min_hdr_len(). We always assume that TCP timestam=
+ps
+> > are present, as that's the most common use-case.
+> >
+> > That header-len is then used in mlx5e_skb_from_cqe_mpwrq_nonlinear for
+> > the headlen (which defines what is being copied over). We still
+> > allocate MLX5E_RX_MAX_HEAD for the skb so that if the networking stack
+> > needs to call pskb_may_pull() later on, we don't need to reallocate
+> > memory.
+> >
+> > This gives a nice throughput increase (ARM Neoverse-V2 with CX-7 NIC an=
+d
+> > LRO enabled):
+> >
+> > BEFORE:
+> > =3D=3D=3D=3D=3D=3D=3D
+> > (netserver pinned to core receiving interrupts)
+> > $ netperf -H 10.221.81.118 -T 80,9 -P 0 -l 60 -- -m 256K -M 256K
+> >   87380  16384 262144    60.01    32547.82
+> >
+> > (netserver pinned to adjacent core receiving interrupts)
+> > $ netperf -H 10.221.81.118 -T 80,10 -P 0 -l 60 -- -m 256K -M 256K
+> >   87380  16384 262144    60.00    52531.67
+> >
+> > AFTER:
+> > =3D=3D=3D=3D=3D=3D
+> > (netserver pinned to core receiving interrupts)
+> > $ netperf -H 10.221.81.118 -T 80,9 -P 0 -l 60 -- -m 256K -M 256K
+> >   87380  16384 262144    60.00    52896.06
+> >
+> > (netserver pinned to adjacent core receiving interrupts)
+> >   $ netperf -H 10.221.81.118 -T 80,10 -P 0 -l 60 -- -m 256K -M 256K
+> >   87380  16384 262144    60.00    85094.90
+> >
+>
+> Nice improvement.
+>
+> Did you test impact on other archs?
+>
+> Did you test impact on non-LRO flows?
+> Specifically:
+> a. Large MTU, tcp stream.
+> b. Large MTU, small UDP packets.
 
-Regards,
-Lorenzo
+took a minute, but I have extended my benchmarks to a much larger test matr=
+ix:
 
->=20
-> If this property is defined in the wifi node I guess it is fine to assume
-> even the NPU memory regions are properly defined int the DTS.
->=20
-> Is it ok to use dev_info() instead of dev_warn() in mt7996_pci_probe() if
-> the mt76_npu_init() returns an error (e.g. if the "airoha,npu" is not def=
-ined)
-> or do you prefer to do something else to make this process optional?
->=20
-> Regards,
-> Lorenzo
->=20
-> >=20
-> > Best regards,
-> > Krzysztof
-> >=20
+With / Without LRO
+With / Without IPv6 encap
+MTU: 1500, 4096, 9000
+IRQs on same core as the app / IRQs on adjacent core as the app
+TCP with write/read-size 64KB and 512KB
+UDP with 64B and 1400B
+
+A full matrix across all of the above for a total of 96 tests.
+
+No measurable significant regressions (10% threshold).
+
+Numerous improvements (above 10% threshold) in the TCP workloads:
+
+  TCP 512-Kbyte, core 8, MTU 1500, LRO on, tunnel off     49810.51  ->
+   61924.39  ( +24.3% =E2=86=91)
+  TCP 512-Kbyte, core 8, MTU 1500, LRO on, tunnel on      24897.29  ->
+   42404.18  ( +70.3% =E2=86=91)
+  TCP 512-Kbyte, core 8, MTU 4096, LRO off, tunnel on     35218.00  ->
+   41608.82  ( +18.1% =E2=86=91)
+  TCP 512-Kbyte, core 8, MTU 4096, LRO on, tunnel on      25056.58  ->
+   42231.90  ( +68.5% =E2=86=91)
+  TCP 512-Kbyte, core 8, MTU 9000, LRO off, tunnel off    38688.81  ->
+   50152.49  ( +29.6% =E2=86=91)
+  TCP 512-Kbyte, core 8, MTU 9000, LRO off, tunnel on     23067.36  ->
+   42593.14  ( +84.6% =E2=86=91)
+  TCP 512-Kbyte, core 8, MTU 9000, LRO on, tunnel on      24671.25  ->
+   41276.60  ( +67.3% =E2=86=91)
+  TCP 512-Kbyte, core 9, MTU 1500, LRO on, tunnel on      25078.41  ->
+   42473.55  ( +69.4% =E2=86=91)
+  TCP 512-Kbyte, core 9, MTU 4096, LRO off, tunnel off    36962.68  ->
+   40727.38  ( +10.2% =E2=86=91)
+  TCP 512-Kbyte, core 9, MTU 4096, LRO on, tunnel on      24890.12  ->
+   42248.13  ( +69.7% =E2=86=91)
+  TCP 512-Kbyte, core 9, MTU 9000, LRO off, tunnel off    45620.36  ->
+   58454.83  ( +28.1% =E2=86=91)
+  TCP 512-Kbyte, core 9, MTU 9000, LRO off, tunnel on     23006.81  ->
+   42985.67  ( +86.8% =E2=86=91)
+  TCP 512-Kbyte, core 9, MTU 9000, LRO on, tunnel on      24539.75  ->
+   42295.60  ( +72.4% =E2=86=91)
+  TCP 64-Kbyte, core 8, MTU 1500, LRO on, tunnel off      38187.87  ->
+   45568.38  ( +19.3% =E2=86=91)
+  TCP 64-Kbyte, core 8, MTU 1500, LRO on, tunnel on       22683.89  ->
+   43351.23  ( +91.1% =E2=86=91)
+  TCP 64-Kbyte, core 8, MTU 4096, LRO on, tunnel on       23653.41  ->
+   43988.30  ( +86.0% =E2=86=91)
+  TCP 64-Kbyte, core 8, MTU 9000, LRO off, tunnel off     37677.10  ->
+   48778.02  ( +29.5% =E2=86=91)
+  TCP 64-Kbyte, core 8, MTU 9000, LRO off, tunnel on      23960.71  ->
+   41828.04  ( +74.6% =E2=86=91)
+  TCP 64-Kbyte, core 8, MTU 9000, LRO on, tunnel off      57001.62  ->
+   68577.28  ( +20.3% =E2=86=91)
+  TCP 64-Kbyte, core 8, MTU 9000, LRO on, tunnel on       24068.93  ->
+   43836.63  ( +82.1% =E2=86=91)
+  TCP 64-Kbyte, core 9, MTU 1500, LRO on, tunnel off      60887.66  ->
+   68647.38  ( +12.7% =E2=86=91)
+  TCP 64-Kbyte, core 9, MTU 1500, LRO on, tunnel on       22463.53  ->
+   34560.19  ( +53.9% =E2=86=91)
+  TCP 64-Kbyte, core 9, MTU 4096, LRO on, tunnel on       23253.21  ->
+   43358.30  ( +86.5% =E2=86=91)
+  TCP 64-Kbyte, core 9, MTU 9000, LRO off, tunnel off     40471.13  ->
+   55189.89  ( +36.4% =E2=86=91)
+  TCP 64-Kbyte, core 9, MTU 9000, LRO off, tunnel on      23880.19  ->
+   42457.94  ( +77.8% =E2=86=91)
+  TCP 64-Kbyte, core 9, MTU 9000, LRO on, tunnel on       22040.72  ->
+   30249.36  ( +37.2% =E2=86=91)
+
+(and I learned that even when LRO is off,
+mlx5e_skb_from_cqe_mpwrq_nonlinear() is being used when MTU is large,
+which is why we see improvements above even when LRO is off)
+
+(I will include the additional benchmark data in a resubmission)
+
+The primary remaining question is how to handle the IB-case. If
+get_cqe_l3_hdr_type() will be 0x0 in case of IB, I can key off of
+that.
+
+Thoughts ?
+
+
+Thanks,
+Christoph
 
 
 
---hDFEHIRXI0z6CbSS
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaH6zLgAKCRA6cBh0uS2t
-rG2RAQCuL5YPTsDFkr426LnD5RkvUOkMsaYTElmnbIYT4uE1UAEA0n0KABJw+pOs
-JmKHhsz291dIAM3tsXOOyatOEJIqFwc=
-=83D7
------END PGP SIGNATURE-----
-
---hDFEHIRXI0z6CbSS--
+>
+>
+> > Signed-off-by: Christoph Paasch <cpaasch@openai.com>
+> > ---
+> >   drivers/net/ethernet/mellanox/mlx5/core/en_rx.c | 33 ++++++++++++++++=
+++++++++-
+> >   1 file changed, 32 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/=
+net/ethernet/mellanox/mlx5/core/en_rx.c
+> > index 2bb32082bfccdc85d26987f792eb8c1047e44dd0..2de669707623882058e3e77=
+f82d74893e5d6fefe 100644
+> > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> > @@ -1986,13 +1986,40 @@ mlx5e_shampo_fill_skb_data(struct sk_buff *skb,=
+ struct mlx5e_rq *rq,
+> >       } while (data_bcnt);
+> >   }
+> >
+> > +static u16
+> > +mlx5e_cqe_get_min_hdr_len(const struct mlx5_cqe64 *cqe)
+> > +{
+> > +     u16 min_hdr_len =3D sizeof(struct ethhdr);
+> > +     u8 l3_type =3D get_cqe_l3_hdr_type(cqe);
+> > +     u8 l4_type =3D get_cqe_l4_hdr_type(cqe);
+> > +
+> > +     if (cqe_has_vlan(cqe))
+> > +             min_hdr_len +=3D VLAN_HLEN;
+> > +
+> > +     if (l3_type =3D=3D CQE_L3_HDR_TYPE_IPV4)
+> > +             min_hdr_len +=3D sizeof(struct iphdr);
+> > +     else if (l3_type =3D=3D CQE_L3_HDR_TYPE_IPV6)
+> > +             min_hdr_len +=3D sizeof(struct ipv6hdr);
+> > +
+> > +     if (l4_type =3D=3D CQE_L4_HDR_TYPE_UDP)
+> > +             min_hdr_len +=3D sizeof(struct udphdr);
+> > +     else if (l4_type & (CQE_L4_HDR_TYPE_TCP_NO_ACK |
+> > +                         CQE_L4_HDR_TYPE_TCP_ACK_NO_DATA |
+> > +                         CQE_L4_HDR_TYPE_TCP_ACK_AND_DATA))
+> > +             /* Previous condition works because we know that
+> > +              * l4_type !=3D 0x2 (CQE_L4_HDR_TYPE_UDP)
+> > +              */
+> > +             min_hdr_len +=3D sizeof(struct tcphdr) + TCPOLEN_TSTAMP_A=
+LIGNED;
+> > +
+> > +     return min_hdr_len;
+> > +}
+> > +
+> >   static struct sk_buff *
+> >   mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_rq *rq, struct mlx5e_=
+mpw_info *wi,
+> >                                  struct mlx5_cqe64 *cqe, u16 cqe_bcnt, =
+u32 head_offset,
+> >                                  u32 page_idx)
+>
+> BTW, this function handles IPoIB as well, not only Eth.
+>
+> >   {
+> >       struct mlx5e_frag_page *frag_page =3D &wi->alloc_units.frag_pages=
+[page_idx];
+> > -     u16 headlen =3D min_t(u16, MLX5E_RX_MAX_HEAD, cqe_bcnt);
+> >       struct mlx5e_frag_page *head_page =3D frag_page;
+> >       struct mlx5e_xdp_buff *mxbuf =3D &rq->mxbuf;
+> >       u32 frag_offset    =3D head_offset;
+> > @@ -2004,10 +2031,14 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e=
+_rq *rq, struct mlx5e_mpw_info *w
+> >       u32 linear_frame_sz;
+> >       u16 linear_data_len;
+> >       u16 linear_hr;
+> > +     u16 headlen;
+> >       void *va;
+> >
+> >       prog =3D rcu_dereference(rq->xdp_prog);
+> >
+> > +     headlen =3D min3(mlx5e_cqe_get_min_hdr_len(cqe), cqe_bcnt,
+> > +                    (u16)MLX5E_RX_MAX_HEAD);
+> > +
+> >       if (prog) {
+> >               /* area for bpf_xdp_[store|load]_bytes */
+> >               net_prefetchw(netmem_address(frag_page->netmem) + frag_of=
+fset);
+> >
+>
 
