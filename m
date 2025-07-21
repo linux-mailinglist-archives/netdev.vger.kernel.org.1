@@ -1,354 +1,168 @@
-Return-Path: <netdev+bounces-208646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D8D1B0C800
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 17:48:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 336C4B0C85C
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 18:00:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEDA63AA453
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 15:48:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04B45189A044
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 16:00:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EA442DECBB;
-	Mon, 21 Jul 2025 15:48:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD3AF2DFF17;
+	Mon, 21 Jul 2025 16:00:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BNHch8TK"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="UvbfVzpu"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E9A2DEA67
-	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 15:48:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D48CA1A5BA4;
+	Mon, 21 Jul 2025 16:00:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753112933; cv=none; b=J9lDKCmtbLQ0dZPtkEQtMJq7QLnWinrVZ4eTx/kMiVtd3e3yV1uLHRhdZv2dXlqnOJRZPaaNK+Zkfmc1o5EkZTcnPr6OxWHSEwB0HW6uE+hzeQLCPVj1V6DvwnHzLwuT7Q4ch6q8/LuIjbFDqqrNvkh6WR3WWuYMYi0IBDQFc9s=
+	t=1753113617; cv=none; b=bD5DhypN4nhkIor0H7lgkuZnKRd3LiEsidOXLh+t5IzSpTOzOjaXg7QCWjwLrav1ZR+fb9bkXSBN3Ugsw87QbrKpPVesbN9wE1I/NB2NciWfg4UY3dk0N/U5HqmyJj9aRmVnXIRtlOWz/6sQKzcjZkQL9nmwA9qwfNYgbm/Ii1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753112933; c=relaxed/simple;
-	bh=fhdH12JwskVl75heHVJPFFqzx/Rxu4oE/wPZsfkACf0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=pqkpX3w2/jDTYDoicKneN8uvPySapi4MpV+PlNWDBTlR1lisRtPF20PguaTK9ja/NXSsD81eC71Io3w8ZOVQkq3Qvwh1Y+dOJohuUbISETa3Xq3rXR4vpali+0kNAM5b8tuJCGYMD5ivmj+NpZaoi1AihRvgj4HCBujs79YOob8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BNHch8TK; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <8ecabd38-bf6c-4ebc-8ccb-afd701db6c82@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753112927;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=erL1Q7Ylmqq+eJsj9AKdL/oW5rQg8JUQ4Yd0b2FxrXI=;
-	b=BNHch8TKwgZcZ9sm3/WdfNh/e5WgtkIFrkVHwk1ZO8342w/0eMWm6UANbYcZQp4WRB8ZYF
-	m+BMYUXflaeR+tRq7jtyHDOlHIKbOsvSmNZ9qkTLcr9nb30YqVYR0LfOHDs3j8J69mYzBy
-	oSXAnHuLMjQBL1H+TxGXWIDQStB6uJk=
-Date: Mon, 21 Jul 2025 08:48:29 -0700
+	s=arc-20240116; t=1753113617; c=relaxed/simple;
+	bh=0u/FkNt313+bbH04ZJjnyQgStvvud8cR+f/8Ru2O9/M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=VjTyUuTZUY4uf3P3SKMSOSBE3+PxLv0Q4ba9uvpmNNIIDqLCQYLTaFnmaM72rTLfm9NbNLmbutB7kk+DrvrpIn89qQkUUeJByREKeMKRX79KdGqfPrP6fMo3r1sTSL29JBgiVy3eRfYdqIeq5++psX7S+Lbn30wmjEt8uk+tKLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=UvbfVzpu; arc=none smtp.client-ip=91.207.212.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56LF5RUS011179;
+	Mon, 21 Jul 2025 17:59:52 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=selector1; bh=
+	rsxdTCztBKYXlx+C4LuG8AeZggJrpJdUJ0Xm76EVhB4=; b=UvbfVzpuufx4byKp
+	qcX7btJ++p/Dy6hnVJx1aUaEKMxpo1BBXfeXWmxfbJ1FmZnGrmlKIR21eP62pD3a
+	Xt7q5wtTkXo7k3/l9DPZMxYeZGnqnkFzbo+zlGTbs83v4JhpISvnaDaqs/c8+Fmz
+	WPGuk9MwHDXlF/xKTKnQ+9ieU5I/cjaGcsjLlgk8fwEvlLy3TV9NKigRQP94CTKq
+	XlIpIXEBxXv8/KMUp3Zyyf2HI8+58l6IR4Ykhgkbn31gV+Wytx78wXmnacjBM+sR
+	cM4tNVzKKl8At5JokIGjLbSPJH9dDz9ksPFtC+etuglhlBKhOXmswwzs8MzbtcT6
+	IbCvgw==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 48028g1d9g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Jul 2025 17:59:51 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id A0CE040046;
+	Mon, 21 Jul 2025 17:58:12 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 34BFE76EA8F;
+	Mon, 21 Jul 2025 17:56:19 +0200 (CEST)
+Received: from [10.48.87.141] (10.48.87.141) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 21 Jul
+ 2025 17:56:18 +0200
+Message-ID: <38278e2a-5a1b-4908-907e-7d45a08ea3b7@foss.st.com>
+Date: Mon, 21 Jul 2025 17:56:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCHv3 next-next 1/1] net/mlx5: Fix build -Wframe-larger-than
- warnings
-To: Tariq Toukan <ttoukan.linux@gmail.com>, saeedm@nvidia.com,
- leon@kernel.org, tariqt@nvidia.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <20250720160849.508014-1-yanjun.zhu@linux.dev>
- <48c13c2c-56f2-42f7-9a03-d5bdfd8e8dfb@linux.dev>
- <8aa75912-d1e3-4865-a723-ae1517e9322c@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <8aa75912-d1e3-4865-a723-ae1517e9322c@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/4] dt-bindings: net: document st,phy-wol
+ property
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Krzysztof Kozlowski <krzk@kernel.org>,
+        Andrew Lunn
+	<andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Christophe Roullier <christophe.roullier@foss.st.com>,
+        Heiner Kallweit
+	<hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>, Simon Horman
+	<horms@kernel.org>,
+        Tristram Ha <Tristram.Ha@microchip.com>,
+        Florian Fainelli
+	<florian.fainelli@broadcom.com>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+References: <20250721-wol-smsc-phy-v1-0-89d262812dba@foss.st.com>
+ <20250721-wol-smsc-phy-v1-1-89d262812dba@foss.st.com>
+ <faea23d5-9d5d-4fbb-9c6a-a7bc38c04866@kernel.org>
+ <f5c4bb6d-4ff1-4dc1-9d27-3bb1e26437e3@foss.st.com>
+ <e3c99bdb-649a-4652-9f34-19b902ba34c1@lunn.ch>
+Content-Language: en-US
+From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+In-Reply-To: <e3c99bdb-649a-4652-9f34-19b902ba34c1@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-21_04,2025-07-21_02,2025-03-28_01
 
+Hello Andrew,
 
-在 2025/7/20 23:37, Tariq Toukan 写道:
->
->
-> On 21/07/2025 1:41, Zhu Yanjun wrote:
->> 在 2025/7/20 9:08, Zhu Yanjun 写道:
->>> When building, the following warnings will appear.
->>> "
->>> pci_irq.c: In function ‘mlx5_ctrl_irq_request’:
->>> pci_irq.c:494:1: warning: the frame size of 1040 bytes is larger 
->>> than 1024 bytes [-Wframe-larger-than=]
->>>
->>> pci_irq.c: In function ‘mlx5_irq_request_vector’:
->>> pci_irq.c:561:1: warning: the frame size of 1040 bytes is larger 
->>> than 1024 bytes [-Wframe-larger-than=]
->>>
->>> eq.c: In function ‘comp_irq_request_sf’:
->>> eq.c:897:1: warning: the frame size of 1080 bytes is larger than 
->>> 1024 bytes [-Wframe-larger-than=]
->>>
->>> irq_affinity.c: In function ‘irq_pool_request_irq’:
->>> irq_affinity.c:74:1: warning: the frame size of 1048 bytes is larger 
->>> than 1024 bytes [-Wframe-larger-than=]
->>> "
->>>
->>> These warnings indicate that the stack frame size exceeds 1024 bytes in
->>> these functions.
->>>
->>> To resolve this, instead of allocating large memory buffers on the 
->>> stack,
->>> it is better to use kvzalloc to allocate memory dynamically on the 
->>> heap.
->>> This approach reduces stack usage and eliminates these frame size 
->>> warnings.
->>>
->>> Signed-off-by: Zhu Yanjun <yanjun.zhu@linux.dev>
+On 7/21/25 15:18, Andrew Lunn wrote:
+> On Mon, Jul 21, 2025 at 02:10:48PM +0200, Gatien CHEVALLIER wrote:
+>> Hello Krzysztof,
 >>
->> Sorry. Missing the following Acked-by.
->>
->> Acked-by: Junxian Huang <huangjunxian6@hisilicon.com>
->>
->> Zhu Yanjun
->>
->>> ---
->>> v2 -> v3: No changes, just send out target net-next;
->
-> You wrote next-next by mistake.
-
-
-Will fix it.
-
-
->
->>> v1 -> v2: Add kvfree to error handler;
+>> On 7/21/25 13:30, Krzysztof Kozlowski wrote:
+>>> On 21/07/2025 13:14, Gatien Chevallier wrote:
+>>>> The "st,phy-wol" property can be set to use the wakeup capability of
+>>>> the PHY instead of the MAC.
 >>>
->>> 1. This commit only build tests;
->>> 2. All the changes are on configuration path, will not make difference
->>> on the performance;
->>> 3. This commit is just to fix build warnings, not error or bug 
->>> fixes. So
->>> not Fixes tag.
->>> ---
->>>   drivers/net/ethernet/mellanox/mlx5/core/eq.c  | 24 +++++++----
->>>   .../mellanox/mlx5/core/irq_affinity.c         | 19 +++++++--
->>>   .../net/ethernet/mellanox/mlx5/core/pci_irq.c | 40 
->>> +++++++++++++------
->>>   3 files changed, 60 insertions(+), 23 deletions(-)
 >>>
->>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/ 
->>> net/ethernet/mellanox/mlx5/core/eq.c
->>> index dfb079e59d85..4938dd7c3a09 100644
->>> --- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
->>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
->>> @@ -873,19 +873,29 @@ static int comp_irq_request_sf(struct 
->>> mlx5_core_dev *dev, u16 vecidx)
->>>   {
->>>       struct mlx5_irq_pool *pool = 
->>> mlx5_irq_table_get_comp_irq_pool(dev);
->>>       struct mlx5_eq_table *table = dev->priv.eq_table;
->>> -    struct irq_affinity_desc af_desc = {};
->>> +    struct irq_affinity_desc *af_desc;
->>>       struct mlx5_irq *irq;
->
-> Keep an empty line.
-
-
-An empty line has already been there.
-
-
->
->
->>> +    af_desc = kvzalloc(sizeof(*af_desc), GFP_KERNEL);
->>> +    if (!af_desc)
->>> +        return -ENOMEM;
->>> +
->
-> Better move the alloc after the early-return block 
-> (mlx5_irq_pool_is_sf_pool).
-
-
-Thanks, will fix it.
-
-
->
->>>       /* In case SF irq pool does not exist, fallback to the PF irqs*/
->>> -    if (!mlx5_irq_pool_is_sf_pool(pool))
->>> +    if (!mlx5_irq_pool_is_sf_pool(pool)) {
->>> +        kvfree(af_desc);
->>>           return comp_irq_request_pci(dev, vecidx);
->>> +    }
->>> -    af_desc.is_managed = false;
->>> -    cpumask_copy(&af_desc.mask, cpu_online_mask);
->>> -    cpumask_andnot(&af_desc.mask, &af_desc.mask, &table->used_cpus);
->>> -    irq = mlx5_irq_affinity_request(dev, pool, &af_desc);
->>> -    if (IS_ERR(irq))
->>> +    af_desc->is_managed = false;
->>> +    cpumask_copy(&af_desc->mask, cpu_online_mask);
->>> +    cpumask_andnot(&af_desc->mask, &af_desc->mask, &table->used_cpus);
->>> +    irq = mlx5_irq_affinity_request(dev, pool, af_desc);
->>> +    if (IS_ERR(irq)) {
->>> +        kvfree(af_desc);
->>>           return PTR_ERR(irq);
->>> +    }
->>> +
->>> +    kvfree(af_desc);
->
-> I would free it only before return.
-
-
-Thanks, I will move kvfree before return.
-
-
->
->>> cpumask_or(&table->used_cpus, &table->used_cpus, 
->>> mlx5_irq_get_affinity_mask(irq));
->>>       mlx5_core_dbg(pool->dev, "IRQ %u mapped to cpu %*pbl, %u EQs 
->>> on this irq\n",
->>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c 
->>> b/ drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
->>> index 2691d88cdee1..82d3c2568244 100644
->>> --- a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
->>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
->>> @@ -47,29 +47,40 @@ static int cpu_get_least_loaded(struct 
->>> mlx5_irq_pool *pool,
->>>   static struct mlx5_irq *
->>>   irq_pool_request_irq(struct mlx5_irq_pool *pool, struct 
->>> irq_affinity_desc *af_desc)
->>>   {
->>> -    struct irq_affinity_desc auto_desc = {};
->>> +    struct irq_affinity_desc *auto_desc;
->>>       struct mlx5_irq *irq;
->>>       u32 irq_index;
->>>       int err;
->>> +    auto_desc = kvzalloc(sizeof(*auto_desc), GFP_KERNEL);
->>> +    if (!auto_desc)
->>> +        return ERR_PTR(-ENOMEM);
->>> +
->>>       err = xa_alloc(&pool->irqs, &irq_index, NULL, 
->>> pool->xa_num_irqs, GFP_KERNEL);
->>> -    if (err)
->>> +    if (err) {
->>> +        kvfree(auto_desc);
->>>           return ERR_PTR(err);
->>> +    }
->>> +
->>>       if (pool->irqs_per_cpu) {
->>>           if (cpumask_weight(&af_desc->mask) > 1)
->>>               /* if req_mask contain more then one CPU, set the 
->>> least loadad CPU
->>>                * of req_mask
->>>                */
->>>               cpumask_set_cpu(cpu_get_least_loaded(pool, 
->>> &af_desc->mask),
->>> -                    &auto_desc.mask);
->>> +                    &auto_desc->mask);
->>>           else
->>>               cpu_get(pool, cpumask_first(&af_desc->mask));
->>>       }
->>> +
->>>       irq = mlx5_irq_alloc(pool, irq_index,
->>> -                 cpumask_empty(&auto_desc.mask) ? af_desc : 
->>> &auto_desc,
->>> +                 cpumask_empty(&auto_desc->mask) ? af_desc : 
->>> auto_desc,
->>>                    NULL);
->>>       if (IS_ERR(irq))
->>>           xa_erase(&pool->irqs, irq_index);
->>> +
->>> +    kvfree(auto_desc);
->>> +
->>>       return irq;
->>>   }
->>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c b/ 
->>> drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
->>> index 40024cfa3099..48aad94b0a5d 100644
->>> --- a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
->>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
->>> @@ -470,26 +470,32 @@ void mlx5_ctrl_irq_release(struct 
->>> mlx5_core_dev *dev, struct mlx5_irq *ctrl_irq)
->>>   struct mlx5_irq *mlx5_ctrl_irq_request(struct mlx5_core_dev *dev)
->>>   {
->>>       struct mlx5_irq_pool *pool = ctrl_irq_pool_get(dev);
->>> -    struct irq_affinity_desc af_desc;
->>> +    struct irq_affinity_desc *af_desc;
->>>       struct mlx5_irq *irq;
->>> -    cpumask_copy(&af_desc.mask, cpu_online_mask);
->>> -    af_desc.is_managed = false;
->>> +    af_desc = kvzalloc(sizeof(*af_desc), GFP_KERNEL);
->>> +    if (!af_desc)
->>> +        return ERR_PTR(-ENOMEM);
->>> +
->>> +    cpumask_copy(&af_desc->mask, cpu_online_mask);
->>> +    af_desc->is_managed = false;
->>>       if (!mlx5_irq_pool_is_sf_pool(pool)) {
->>>           /* In case we are allocating a control IRQ from a pci 
->>> device's pool.
->>>            * This can happen also for a SF if the SFs pool is empty.
->>>            */
->>>           if (!pool->xa_num_irqs.max) {
->>> -            cpumask_clear(&af_desc.mask);
->>> +            cpumask_clear(&af_desc->mask);
->>>               /* In case we only have a single IRQ for PF/VF */
->>> -            cpumask_set_cpu(cpumask_first(cpu_online_mask), 
->>> &af_desc.mask);
->>> +            cpumask_set_cpu(cpumask_first(cpu_online_mask), 
->>> &af_desc- >mask);
->>>           }
->>>           /* Allocate the IRQ in index 0. The vector was already 
->>> allocated */
->>> -        irq = irq_pool_request_vector(pool, 0, &af_desc, NULL);
->>> +        irq = irq_pool_request_vector(pool, 0, af_desc, NULL);
->>>       } else {
->>> -        irq = mlx5_irq_affinity_request(dev, pool, &af_desc);
->>> +        irq = mlx5_irq_affinity_request(dev, pool, af_desc);
->>>       }
->>> +    kvfree(af_desc);
->>> +
->>>       return irq;
->>>   }
->>> @@ -548,16 +554,26 @@ struct mlx5_irq 
->>> *mlx5_irq_request_vector(struct mlx5_core_dev *dev, u16 cpu,
->>>   {
->>>       struct mlx5_irq_table *table = mlx5_irq_table_get(dev);
->>>       struct mlx5_irq_pool *pool = table->pcif_pool;
->>> -    struct irq_affinity_desc af_desc;
->>> +    struct irq_affinity_desc *af_desc;
->
-> While here, fix broken RCT.
-
-
-Thanks. Will fix this RCT.
-
-Yanjun.Zhu
-
->
->
->>>       int offset = MLX5_IRQ_VEC_COMP_BASE;
->>> +    struct mlx5_irq *irq;
->>> +
->>> +    af_desc = kvzalloc(sizeof(*af_desc), GFP_KERNEL);
->>> +    if (!af_desc)
->>> +        return ERR_PTR(-ENOMEM);
->>>       if (!pool->xa_num_irqs.max)
->>>           offset = 0;
->>> -    af_desc.is_managed = false;
->>> -    cpumask_clear(&af_desc.mask);
->>> -    cpumask_set_cpu(cpu, &af_desc.mask);
->>> -    return mlx5_irq_request(dev, vecidx + offset, &af_desc, rmap);
->>> +    af_desc->is_managed = false;
->>> +    cpumask_clear(&af_desc->mask);
->>> +    cpumask_set_cpu(cpu, &af_desc->mask);
->>> +
->>> +    irq = mlx5_irq_request(dev, vecidx + offset, af_desc, rmap);
->>> +
->>> +    kvfree(af_desc);
->>> +
->>> +    return irq;
->>>   }
->>>   static struct mlx5_irq_pool *
+>>> And why would that be property of a SoC or board? Word "can" suggests
+>>> you are documenting something which exists, but this does not exist.
+>> Can you elaborate a bit more on the "not existing" part please?
 >>
->>
->
--- 
-Best Regards,
-Yanjun.Zhu
+>> For the WoL from PHY to be supported, the PHY line that is raised
+>> (On nPME pin for this case) when receiving a wake up event has to be
+>> wired to a wakeup event input of the Extended interrupt and event
+>> controller(EXTI), and that's implementation dependent.
+> 
+> How does this differ from normal interrupts from the PHY? Isn't the
+> presence of an interrupt in DT sufficient to indicate the PHY can wake
+> the system?
+> 
+> 	Andrew
+
+Here's an extract from the Microchip datasheet for the LAN8742A PHY:
+
+"In addition to the main interrupts described in this section, an nPME
+pin is provided exclusively for WoL specific interrupts."
+
+I'm not an expert of the different PHYs, but I guess there may be a
+distinction needed between some "main" PHY interrupts and the WoL one
+at least for deep low-power use cases.
+
+Because this line is wired to a peripheral managed by our
+TEE, the ultimate goal here would be to declare the OP-TEE node as
+an interrupt provider and to forward the interrupt to the kernel using
+the asynchronous notification mechanism. Then, reference the OP-TEE
+node in the "interrupts-extended" property in the PHY node so that it
+can be acked by the PHY driver. As of now, this patch set at least allow
+to wakeup from a deep low power mode using the WoL capability of the
+PHY.
+
+Regarding this property, somewhat similar to "mediatek,mac-wol",
+I need to position a flag at the mac driver level. I thought I'd go
+using the same approach.
+
+Best regards,
+Gatien
+
+
 
 
