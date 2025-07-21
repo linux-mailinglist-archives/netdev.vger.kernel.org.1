@@ -1,75 +1,161 @@
-Return-Path: <netdev+bounces-208711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF91EB0CD82
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 01:05:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B42BB0CD87
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 01:06:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E55DE5464C5
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 23:05:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F9325465C3
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 23:06:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38A6622CBE9;
-	Mon, 21 Jul 2025 23:04:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35CD824169A;
+	Mon, 21 Jul 2025 23:06:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U23L1I6s"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JXjVF5mz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13289221F09
-	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 23:04:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94DC018D643;
+	Mon, 21 Jul 2025 23:06:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753139099; cv=none; b=E7NgfsTfWiu1P7imhSSOjYWStrauTSUX8r9sVpYe8MC4hO0PumULJyxOaTGAOirtPFTIKoenV7WwlcKwOA1+p/SHophUlQTany5EaQYL3+XDlr/nDKyO/NyMN326mMFbJw12jDI0hZcVD75CVggXDJVf2ew56KIWSEOyamAULAU=
+	t=1753139174; cv=none; b=AksJXZ3yHD28V44d7mBl9AFBp8dgpIFh82dtWE7iqxlewM3XrNkSdjIMTn6CA+G5kGBs3o3zQ6AY7OU1lNmCHHCNaw7TfLDHHfOPj0wH/NVYZRezOghFVm2sbNM5nLvPAVb9wpuj6Ih+DFiTOynJ8BYZhJBvp4kqezEcJtNrPdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753139099; c=relaxed/simple;
-	bh=Lh7KL3p4HW5GpQMuX3H+u1SzC2+vFjphx+qAYUwPGEw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HrpV7kGDL2fD1cGsd5yiZNdTK28UmaJMBvY+SF+zxVRVn31LdqTAszPnGWmgeCrCtm24r3EJSOO+5VCXldgqRgICyBfB36s2VHtWR//hacSVSWIxIUt/916XJscT4QSCcKlRzii3oXzYb8Y/jAnf4vKk6H70Wk83yMX8F1QmpgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U23L1I6s; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2453BC4CEED;
-	Mon, 21 Jul 2025 23:04:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753139098;
-	bh=Lh7KL3p4HW5GpQMuX3H+u1SzC2+vFjphx+qAYUwPGEw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=U23L1I6sQjUb5p0bp1rAWk2ACWxCHsAqeQCOhnvqKMQnQutd4S73bDzdoNMj5mXd2
-	 zDDixZBUdX5LfVsc4p80e9z6yzw/5JzjQnp5msRVV0ivLTDNO9bBMFJa2jHaLO888X
-	 gYbRKNj4vowKmPx3j9bbNK5vmNBwh5hnq7D539Pptp/nY/AAaQ6QnTc92lEeo2fy7V
-	 2LYq+F6dSz/b4ZhE+SzLqqDHPJ5iBz/5gx0oWW9XctIZSbOhE68wbUgcJU1YzcpWAO
-	 wHjBr85eZD1haM8KH0HH7JjX9bpAqiNYePRG3hgOKM0Zgg0faZwvsvD0ADOW51ywus
-	 yNHrdu7kbm0Fg==
-Date: Mon, 21 Jul 2025 16:04:57 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
-Subject: Re: [PATCH net-next v2] netdevsim: add couple of fw_update_flash_*
- debugfs knobs
-Message-ID: <20250721160457.407df671@kernel.org>
-In-Reply-To: <20250720212734.25605-1-jiri@resnulli.us>
-References: <20250720212734.25605-1-jiri@resnulli.us>
+	s=arc-20240116; t=1753139174; c=relaxed/simple;
+	bh=v1GzKQ/2OH/U4QZ6QZG/B49zrfbUhnYprM4zjVWA5l0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N8agI7wzEzfECVRchZxHonVFcPWenwQFR8eOhr29XrEfm1aML1/d10lNsDABwF91TaSmmgKQovEu67BEQJlJxlTKr1RNfgp4AdddFSDemB06Ok+esss9jqmEBZRyQ0p5/CsCyaFooBXCyRXBqAb9C4jVwi4nH+vufg1hT1oqi8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JXjVF5mz; arc=none smtp.client-ip=209.85.166.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3de252f75d7so46634355ab.3;
+        Mon, 21 Jul 2025 16:06:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753139172; x=1753743972; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KEFwVf9DCXPYhb5E+L2S2B43pN/gLrA3tUcn9Sv1yes=;
+        b=JXjVF5mzSJkMkYaplfh5tM8ssSFBiMd9LCszS9nBN1lP114R618AxMStrNHsyGkPxx
+         M+4bgDheO5g8vcYrzEnmu1mU7fRoi86kbb7emsoCqm3JlEGl8Lv2VayBWRzwRZYoiWdc
+         v6BHbXKgowVMkDjIvRpgQAZ9A+ptj68DsNWPS0ITBn+QWGagn2RBkK8fX1tZA+Sn1Fc8
+         6m0oiCBqEF3Zhe72k6thQrp5IMzvyp3uo5/9lHOf97CZ9LsRAVddelBiyoV9ulOBWoL0
+         LYScSRa3m7DYT993cxfTQAUmy7Aqu2dTpmUMwkCY3ZkMfOKgmwb3+DQV0uFObW/q3Wty
+         yQMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753139172; x=1753743972;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KEFwVf9DCXPYhb5E+L2S2B43pN/gLrA3tUcn9Sv1yes=;
+        b=IY5OKk1uUP5rgWwV7523U6BOaH/OhTRqHWhlX2t+Yg5aIXh/vWFVeQTnCkTrJ0z41d
+         uAIu6jNCX9ek1Y7sWezY0HAH+I0QPlEiX7fbskcqcoirj7UKUH5XxOLZsRkftcwlGboU
+         INU/LXmRIZ3BlkJ6mTLPAK+XlB6unKGMc+O6seMBZK1g7KzTkahhuBPr4XykrwUyyB/T
+         KUAfzHk/BMTHT0dYKQ9UFKmArpZ8KE471ea0FmdFP7WtCBv/M8Hh/jRYMsur+uUYJlHA
+         E+ht74uMSOMO5QqW/oEO+/yRhUGGiwuisByH7z2ho2xqI4IFOEWg9m3SdHA4xCRrDSv4
+         OXEw==
+X-Forwarded-Encrypted: i=1; AJvYcCVAdKhaKrrUaP67BKIvtoXciTZxpu/8uCH0kEacMyb8XLxhVZP0kicQH7l1pU8FHFp3UNs=@vger.kernel.org, AJvYcCVOT5jvY7zaRXIYZ3AiI3hTGjLvdTq6HiZlLM78HzX3bYdUo9a+EBqU75TdH1UKN6xiAap3+7Mk@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXu3ArbkmnpWv1DQhUbABfRtdQ1x7or9AXZl/vbQja9V3leDm7
+	9yL+GRMiyhxGDHpcX2dsfh+HoUeOC4oFX45Jk73WWuM6YfWUIx5Qq2sXTL4KHV79DBVi91ZjthX
+	x9NdgUKUj9KmULtI859Q3GxYUmc7rYys=
+X-Gm-Gg: ASbGnctPUT496obUOwQRHS+DQSetsDyab0YhAy7SsXO/QVq59Dhz9ie5DI0gLeiarXN
+	Kw6jL6eYkEJl6Gr63U4aXps503Oa4zS+tKGOhssXsPMSU/W2SK05Nq64xmiDLFdXOC5vsQ9pkUw
+	KQqVKq4fnAOBlriDksm7xLVIBsCqIE6V63rYPWJ2X948f7UuIRmTBuSseeChYTeg/ygFjxXvrwJ
+	gR/hwM=
+X-Google-Smtp-Source: AGHT+IG5RIx4CUBqOhyC6+z/etJI6PdiSzvihPpHLIk0ADX/H+hEWkFMYdf4iuelppqsril2kN/LOnjdXOMfNu/RNqM=
+X-Received: by 2002:a05:6e02:1d9d:b0:3e2:8ddd:b406 with SMTP id
+ e9e14a558f8ab-3e28dddb51amr192280595ab.17.1753139171561; Mon, 21 Jul 2025
+ 16:06:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250721083343.16482-1-kerneljasonxing@gmail.com>
+ <20250721083343.16482-2-kerneljasonxing@gmail.com> <aH5exXo_BdonTfmf@mini-arch>
+In-Reply-To: <aH5exXo_BdonTfmf@mini-arch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 22 Jul 2025 07:05:35 +0800
+X-Gm-Features: Ac12FXzrl82q1J1EBI4gPmmpTws7FVNkFQm2LLp1FtXXiWxpRliUiuaDdNslSpc
+Message-ID: <CAL+tcoB9U-YnJ7MPn7FQ4+ZsW5cgQXE3Tks-7=kGMhUE6nNprg@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] stmmac: xsk: fix underflow of budget in
+ zerocopy mode
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, bjorn@kernel.org, 
+	magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
+	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
+	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com, 
+	linux-stm32@st-md-mailman.stormreply.com, bpf@vger.kernel.org, 
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 20 Jul 2025 23:27:34 +0200 Jiri Pirko wrote:
-> Netdevsim emulates firmware update and it takes 5 seconds to complete.
-> For some usecases, this is too long and unnecessary. Allow user to
-> configure the time by exposing debugfs knobs to set flash size, chunk
-> size and chunk time.
+On Mon, Jul 21, 2025 at 11:37=E2=80=AFPM Stanislav Fomichev
+<stfomichev@gmail.com> wrote:
+>
+> On 07/21, Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > The issue can happen when the budget number of descs are consumed. As
+> > long as the budget is decreased to zero, it will again go into
+> > while (budget-- > 0) statement and get decreased by one, so the
+> > underflow issue can happen. It will lead to returning true whereas the
+> > expected value should be false.
+> >
+> > In this case where all the budget are used up, it means zc function
+> > should return false to let the poll run again because normally we
+> > might have more data to process.
+> >
+> > Fixes: 132c32ee5bc0 ("net: stmmac: Add TX via XDP zero-copy socket")
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > ---
+> >  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/driver=
+s/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > index f350a6662880..ea5541f9e9a6 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > @@ -2596,7 +2596,7 @@ static bool stmmac_xdp_xmit_zc(struct stmmac_priv=
+ *priv, u32 queue, u32 budget)
+> >
+> >       budget =3D min(budget, stmmac_tx_avail(priv, queue));
+> >
+> > -     while (budget-- > 0) {
+> > +     while (budget > 0) {
+>
+> There is a continue on line 2621.
 
-FWIW I also find the long delays annoying when running the test
-manually. But do we need knobs for all the constants? Maybe cut
-down the size to something more reasonable and expose just one
-knob to control the length of the msleep()?
--- 
-pw-bot: cr
+Thanks for catching this!
+
+> Should we do 'for (; budget > 0; budget--)'
+> instead? And maybe the same for ixgbe [0]?
+
+Not really. I think I can move the 'budget--' just before the
+'continue' part. If we convert it to use 'for' loop and then we end up
+with one of 'break' statements, the budget still gets accidently
+increased by one whereas ixgbe driver even doesn't handle the desc
+this time. IIUC, it should not happen, right?
+
+>
+> 0: https://lore.kernel.org/netdev/20250720091123.474-3-kerneljasonxing@gm=
+ail.com/
+
+The same logic as above can be applied here as well. There are three
+'break' statements in ixgbe_xmit_zc().
+
+Hence, IMHO, I prefer to use while(...) in this case but I ought to
+adjust the position of budget--.
+
+Thanks,
+Jason
 
