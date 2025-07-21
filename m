@@ -1,164 +1,111 @@
-Return-Path: <netdev+bounces-208624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 431C0B0C64B
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 16:29:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45144B0C652
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 16:30:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A06091632F9
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 14:28:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73FF74E7BBD
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 14:29:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 864072DBF48;
-	Mon, 21 Jul 2025 14:28:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90E242DD61B;
+	Mon, 21 Jul 2025 14:29:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="GnYMTZ0r"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gGKh0sBy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8154E2DAFCE
-	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 14:28:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF5642DBF40
+	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 14:29:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753108090; cv=none; b=Dc3I9GRCjsojcE2IfjYO8eELYL51jZ0HqCmBEBBhTXifJtd462vj+GT1dbHMqxw7I0NjblkCzkT4WEVlsGfq060eGV9wpKaLF7l7NVlwGrDK7yV9AsiOONnKl2/YZfTkF/huU8dhEDHFFUgk5Cvi+tc9Erryf6nwABnOuvTOqHs=
+	t=1753108191; cv=none; b=XAfzN91gh04KPqiErWXgZ7VmEfH/MtTSko8GjbnVYmN3JPEh8wlKAWrXl1u7dA0lzPW1yy0+PIN0hLYtDDHYqfsuQysFNEkiv200aSRh/acPRPz8AbRz5j+gUJjPf9aEnGrCXehGB2hXfetyz6ZIbP4XdE+zWZYIfceVQqWNGEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753108090; c=relaxed/simple;
-	bh=CcccSm3GHzr4qIrGIOI4ZwkyR+VY2PHVFQePrQTlrmg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UuWHziJXl7RndJzbKrFMDmZsxhiuPy1ci49cKVIW6NZQDKqtrbpweBU47KP+gxBX8P/YHV2KAVeB0MAEsSD0iFDrUwvmGFqX9mSh0vUjlW6VeYwGaIRB3sJXYM5bhsblMqcGatZBNRp+TF/bD4piokEJ83fQkJgY/+JET9+RAG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=GnYMTZ0r; arc=none smtp.client-ip=209.85.128.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-719728a1811so17076517b3.3
-        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 07:28:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1753108087; x=1753712887; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OhKTn69GUZnWk4nkXibJbALsxXvYMvOYTGqKmIh+//A=;
-        b=GnYMTZ0rvmjELkRHryTfxjHm+J49jxn2HTN0zh1xvDBh3DDRpYVt39ZQ8pnayRWHPS
-         Tf1GPVCCFybSoPKwHinKKePaIxYWf2aCqUYrRQ8iOSnq/kM66nHq36uTyilCfiu4rgzk
-         8DisV0QaZRoYlUauovYX8C93yJ3WsZVpAvSTGMGKi2aGao4yoJFAJSdjA6Dv2ogBmkyk
-         hxxZfSzDTZq4iMdZY6HQcrSQy4djSs1wCM1lE/vpVo85metfIMBTZ3zh3x7XJ/+oH3lC
-         JBvV150gfdl556/jHfkFcpwK4vcBoMImNa473/y0dIwFvWQtJJJzSv/KkyhsuKAgIdCA
-         ureg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753108087; x=1753712887;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OhKTn69GUZnWk4nkXibJbALsxXvYMvOYTGqKmIh+//A=;
-        b=klELbqRzEGtsNMix2HjHiDxafkdODTMyQFoM2kOSxqzf4DYpoi0NBahm3WHnhjc7+a
-         k8W0zjOprOjNkq8gDlColCmG/jZ/aHjfsEmwpIwpT6S0gKJHGPVWIvQXd16XdRh23Lbo
-         EvDXk4wDP6Fs9PDmmYzhFRvOWKZcGDfULgUr/EtUeiiuXtmbkA2c3DIUoxFuPMzkx0jc
-         1CBW2/l7psDIbhkCsVdr2iysURYRkRCQ10gyslLb7P9IAoe/H5otL7hH4ffjVqyZ267O
-         u+KaTMQRHePxD3Xd51xBOJpP9HyNpLjLAnxULS/oB3Z2G3KlLU36uSFdXvr4VZWm9YK5
-         nrBg==
-X-Gm-Message-State: AOJu0YxGXO1+0MtyyZquMHhTLhH6ox1QeMveZO+He7WSgn4T8UNkOaVb
-	QPNn70qaQEdSExAiKetFpRJDzgH/KzbfxKu4k53UfmgSCRSd+tYzzppKxsOi5JOVVRMRcHjpw3L
-	woVPndH2oWEWJQ9Ody8LSR6Z+YjDvQIInd7ACvwU5
-X-Gm-Gg: ASbGncsc7RN6y0450aMLOGAUtgWDOPoPWaF4nnZ1mVx+S3zkkJJCijNpzLPW/QkrEvh
-	e1MbYwXvM1mZ1H4IWGfkVA8XcMCmZcIDvLeTxurG5hvvcQRmR5DL/MAF65tokdEM7IwrFisgm2T
-	OcdzFD3GGni0euM6Q69Ipd4cfWDLX0cwatfWEZy+lWWXfyIXPHsRqRc4BfyswjIGE1Rd/7fEui7
-	qkaNXWaapwVhTI=
-X-Google-Smtp-Source: AGHT+IGQFPNa10v/vN+L4iepX0YhUryKkxwCKDZKbOhQMTFk3kOevnDz1qLhW7ecXlEQ/PDhzwvrI89vDqfRrNEuIlo=
-X-Received: by 2002:a05:690c:45ca:b0:70e:326:6aeb with SMTP id
- 00721157ae682-718a335df8cmr207388597b3.10.1753108087102; Mon, 21 Jul 2025
- 07:28:07 -0700 (PDT)
+	s=arc-20240116; t=1753108191; c=relaxed/simple;
+	bh=1qRXyIN+3+TFXy30A4Y/3F/v4Qgs/YpJ1iDImQB/Tcw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FtqOAz+4YaVNP7COARoZuJrR9MY5DxQQwmBM51WaPs/I8oJRYkN18MrCVtR2eVx6DM0hc0XiRDGdL2Lz2OM0zre08XCeGKtW/Ob0DK4vSSh3iHfeDAp7RzC3VfXnVoAOXF24DFmohSFKURpS3j/dQO2ks+CIxWLiPMZewFgm+gQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gGKh0sBy; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <e4b5e4fa-45c4-4b67-b8f1-7d9ff9f8654f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753108177;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZEUThsSpCMUbwMYhQ5KetKy8D1sXeNWxSdmUlfQSjfQ=;
+	b=gGKh0sByoEfCusDPYDneYqYDDtCK981D27SuDhdK1Ixp787h2480p0CgfM/vjALi68PWt0
+	zP91EVutwm8w0xObTCjpJ2olmJx3SK3q8+WFB+Fep0wyQv4Fx+QwckhdeTVMgINSWDoBq0
+	69KICTRAgIckMRGVMUmR9aWZqsf9IvY=
+Date: Mon, 21 Jul 2025 10:29:32 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250719220341.1615951-1-xiyou.wangcong@gmail.com> <CAM0EoMmTZon=nFmLsDPKhDEzHruw701iV9=mq92At9oKo0LGpA@mail.gmail.com>
-In-Reply-To: <CAM0EoMmTZon=nFmLsDPKhDEzHruw701iV9=mq92At9oKo0LGpA@mail.gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 21 Jul 2025 10:27:53 -0400
-X-Gm-Features: Ac12FXy1oF_kk-Y_ueH-7JxLovDedNZ7zbLwx9pmQ4ut46BBILQWByQ95MjyXQI
-Message-ID: <CAM0EoMnexkyxN83S_cGh+da2kSCg5sB4g-kE5qqnMH6eF8m5gQ@mail.gmail.com>
-Subject: Re: [Patch v4 net 0/6] netem: Fix skb duplication logic and prevent
- infinite loops
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, will@willsroot.io, stephen@networkplumber.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net v2 1/4] auxiliary: Support hexadecimal ids
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, Dave Ertman <david.m.ertman@intel.com>,
+ Saravana Kannan <saravanak@google.com>, linux-kernel@vger.kernel.org,
+ Michal Simek <michal.simek@amd.com>, linux-arm-kernel@lists.infradead.org,
+ Ira Weiny <ira.weiny@intel.com>
+References: <20250716000110.2267189-1-sean.anderson@linux.dev>
+ <20250716000110.2267189-2-sean.anderson@linux.dev>
+ <2025071637-doubling-subject-25de@gregkh>
+ <719ff2ee-67e3-4df1-9cec-2d9587c681be@linux.dev>
+ <2025071747-icing-issuing-b62a@gregkh>
+ <5d8205e1-b384-446b-822a-b5737ea7bd6c@linux.dev>
+ <2025071736-viscous-entertain-ff6c@gregkh>
+ <03e04d98-e5eb-41c0-8407-23cccd578dbe@linux.dev>
+ <2025071726-ramp-friend-a3e5@gregkh>
+ <5ee4bac4-957b-481a-8608-15886da458c2@linux.dev>
+ <20250720081705.GE402218@unreal>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <20250720081705.GE402218@unreal>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Jul 21, 2025 at 10:00=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com=
-> wrote:
->
-> On Sat, Jul 19, 2025 at 6:04=E2=80=AFPM Cong Wang <xiyou.wangcong@gmail.c=
-om> wrote:
-> >
-> > This patchset fixes the infinite loops due to duplication in netem, the
-> > real root cause of this problem is enqueuing to the root qdisc, which i=
-s
-> > now changed to enqueuing to the same qdisc. This is more reasonable,
-> > more predictable from users' perspective, less error-proone and more el=
-egant.
-> >
-> > Please see more details in patch 1/6 which contains two pages of detail=
-ed
-> > explanation including why it is safe and better.
-> >
-> > This replaces the patches from William, with much less code and without
-> > any workaround. More importantly, this does not break any use case.
-> >
->
-> Cong, you are changing user expected behavior.
-> So instead of sending to the root qdisc, you are looping on the same
-> qdisc. I dont recall what the history is for the decision to go back
+On 7/20/25 04:17, Leon Romanovsky wrote:
+> On Thu, Jul 17, 2025 at 01:12:08PM -0400, Sean Anderson wrote:
+>> On 7/17/25 12:33, Greg Kroah-Hartman wrote:
+> 
+> <...>
+> 
+>> Anyway, if you really think ids should be random or whatever, why not
+>> just ida_alloc one in axiliary_device_init and ignore whatever's
+>> provided? I'd say around half the auxiliary drivers just use 0 (or some
+>> other constant), which is just as deterministic as using the device
+>> address.
+> 
+> I would say that auxiliary bus is not right fit for such devices. This
+> bus was introduced for more complex devices, like the one who has their
+> own ida_alloc logic.
 
-Digging a bit, check the following history:
-Commit ID: d5d75cd6b10d
-Commit ID: 0afb51e72855
+I'd say that around 2/3 of the auxiliary drivers that have non-constant
+ids use ida_alloc solely for the auxiliary bus and for no other purpose.
+I don't think that's the kind of complexity you're referring to.
 
-Sorry - in travel mode so cant look closely..
+>> Another third use ida_alloc (or xa_alloc) so all that could be
+>> removed.
+> 
+> These ID numbers need to be per-device.
 
-cheers,
-jamal
+Why? They are arbitrary with no semantic meaning, right?
 
-> to the root qdisc - but one reason that sounds sensible is we want to
-> iterate through the tree hierarchy again. Stephen may remember.
-> The fact that the qfq issue is hit indicates the change has
-> consequences - and given the check a few lines above, more than likely
-> you are affecting the qlen by what you did.
->
-> cheers,
-> jamal
-> > All the test cases pass with this patchset.
-> >
-> > ---
-> > v4: Added a fix for qfq qdisc (2/6)
-> >     Updated 1/6 patch description
-> >     Added a patch to update the enqueue reentrant behaviour tests
-> >
-> > v3: Fixed the root cause of enqueuing to root
-> >     Switched back to netem_skb_cb safely
-> >     Added two more test cases
-> >
-> > v2: Fixed a typo
-> >     Improved tdc selftest to check sent bytes
-> >
-> >
-> > Cong Wang (6):
-> >   net_sched: Implement the right netem duplication behavior
-> >   net_sched: Check the return value of qfq_choose_next_agg()
-> >   selftests/tc-testing: Add a nested netem duplicate test
-> >   selftests/tc-testing: Add a test case for piro with netem duplicate
-> >   selftests/tc-testing: Add a test case for mq with netem duplicate
-> >   selftests/tc-testing: Update test cases with netem duplicate
-> >
-> >  net/sched/sch_netem.c                         |  26 ++--
-> >  net/sched/sch_qfq.c                           |   2 +
-> >  .../tc-testing/tc-tests/infra/qdiscs.json     | 114 +++++++++++++-----
-> >  .../tc-testing/tc-tests/qdiscs/netem.json     |  25 ++++
-> >  4 files changed, 127 insertions(+), 40 deletions(-)
-> >
-> > --
-> > 2.34.1
-> >
+--Sean
+
 
