@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-208505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B66ECB0BE58
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C34F0B0BE5A
 	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 10:03:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04A7716D1EC
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 08:02:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5CD217C669
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 08:03:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0354520C009;
-	Mon, 21 Jul 2025 08:02:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E961285C8D;
+	Mon, 21 Jul 2025 08:02:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
+Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E1D6469D
-	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 08:02:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6A7F1D07BA
+	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 08:02:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753084970; cv=none; b=H92WDcaDNAvQuVoEdjqtL/AYyULu9BpFmxFfEtuJuWXcMQDItLjcFZjb0wjMDzJoxN+Prj/Wi6IM3iQuqM2xdr2Nzdm1ctPtt0y2WX8WTxosR5Qub1FJWH7UEFi2iN8BxKdoTN3QVeHX1r3J2kbeGY9bIU4V7XJb2Or315COLtM=
+	t=1753084971; cv=none; b=mK2IPs5eqhf41iztHMo0VOXnVeS3haGdNIVzMqc+O/VLOGDg8lC9JABmS8WrzF2SAIYm+H/kz/UG5ncGIR9a6dP10Dkyz2AyMqyO8QVbMkqwuXTDysOhe9ERYNrpfyqi9KxrZjKngMKMTkXb7oyOhVfJYECMKe9pmfGm4EWk9bM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753084970; c=relaxed/simple;
-	bh=8pjqn7Plrn+id9IfY8/4DIYjODFkHMG+uWBAlpHYTtk=;
+	s=arc-20240116; t=1753084971; c=relaxed/simple;
+	bh=SbGmQQ1y7qkGa6lDhn0o9uDPhwgVPZeLJZWLZp143GA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lE4x/ohCTiVbLsnpKFV8uvcETkq3lSBbPE/Fkky4QH8Iu+E0jPbUNazjDvn7vAD3kny8K+L8l/KEHZ9p+LuHM2azzHnuWaGixalv/i9x4+QezKd4hTWDRMC2GJMoPsRu96CXkpZQaC6JQVckZkdlBDbWxcPc7WfGU7REfSyHKt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.204.34.130
+	 MIME-Version; b=Ykn0lCyEngUkws8W5Asl8Qp4gelHKeLaJZUtXaPEqg5lorGEUY0+aD1sezKW0uhn8vhCtGuhsiTK+6YsyEHWmL75VGCG6V598AreuD+6fCX3Uf+qsuJHqv8xvahMnerocwTk8y+LDKSJ5r9/QHgSlTFtI7n5xXnJtArTYf2ajDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=15.184.224.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: esmtpsz21t1753084895t79760790
-X-QQ-Originating-IP: lMoZS5z64F4I2OKInSG8LFMKWTHBk6GlMbgficM0jQ8=
+X-QQ-mid: esmtpsz21t1753084898t78fbdf15
+X-QQ-Originating-IP: Q53yNFsnmzab3s4Zzn3C9QJ/Xk7iiHUrr8EJ+7pJZy8=
 Received: from lap-jiawenwu.trustnetic.com ( [36.24.205.22])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 21 Jul 2025 16:01:34 +0800 (CST)
+	id ; Mon, 21 Jul 2025 16:01:36 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 14552170565156338871
+X-BIZMAIL-ID: 17187120897850885930
 EX-QQ-RecipientCnt: 9
 From: Jiawen Wu <jiawenwu@trustnetic.com>
 To: netdev@vger.kernel.org,
@@ -48,9 +48,9 @@ To: netdev@vger.kernel.org,
 	Simon Horman <horms@kernel.org>
 Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v2 1/3] net: wangxun: change the default ITR setting
-Date: Mon, 21 Jul 2025 16:01:01 +0800
-Message-Id: <20250721080103.30964-2-jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v2 2/3] net: wangxun: limit tx_max_coalesced_frames_irq
+Date: Mon, 21 Jul 2025 16:01:02 +0800
+Message-Id: <20250721080103.30964-3-jiawenwu@trustnetic.com>
 X-Mailer: git-send-email 2.21.0.windows.1
 In-Reply-To: <20250721080103.30964-1-jiawenwu@trustnetic.com>
 References: <20250721080103.30964-1-jiawenwu@trustnetic.com>
@@ -63,107 +63,63 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: esmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: Nw9C1WBu09hPmMTJZZ0EIrpHJV2/KLqC68VTWz+2jxlFL3buGDv1f8uh
-	0OQKK+b12em4nD2ofxmLiFaTF3/4x9AR9EI5aFK1/Bm3lLCZZ3At7MdQEWCrEOjmzyqpA/G
-	Gb7UQeyMT/LlAdTW1z6fcoxzWVTBJoBMb2VZS+7zubGZQUjozct90U8FrwMxuknBkolEOgG
-	O2/JPE79SU1SxuqlI3gklj6h8qqzOOZ8oTKnu0ew00kTuPH21cTVQaY7fpn4gj5KwjIToQq
-	0I3fYNbNOLa3jWPmgXV6CpjN2F4k9egHyXZHisB7HPszdwI5mKzGyDWf+22VnUFfUdxIcFV
-	c2sSCjB2hleQmq+QXpE5z9mxdE3n/MAy6U8g67RKihRM4TGz2LwtWJnjU2yAazNHqzKhf5T
-	COoHnYhji/NbJgurT6swPfi82x546JsaLe510+ZszjVOWRNR0/x/3ATLlICFRrVnaPKWakw
-	VXDupuRvItLlHv3zJWTt931FUrMiGCcUk4s8AU5bavc1EHJlQPeWaMzKDy7zLpscZTyBp6/
-	EuHIhacsLfb4Kks+gksb1nJx7Pv6dUhIUWtL8pls+K1UvSZUOulpiMBWtq+9JA5rDpNDD+a
-	/+zX4RyaoiWdGgwuOU7mFXRpdcNi+GqAPBjOzqGS0KzbYr+zCRiQZaUvECnzxlJ176Qq6hZ
-	Fw3vs1TCXnu+mDoFnssMIJV56Rl8gRuYN/PFCPzMq3dd1Vt71eGhSHo+bDm8N3+bXXzgfr1
-	y/4C1mMWiYnBDz5EbYJPSlIH4MqV1YF8ZNXXKr7wK5/gMsLvLDIV6cE9fxRXJmJhRikXFqO
-	KWoagiEfz7LPPMmBqsEg6ohmmV98ZaVpDSEMU4rvbFLA7Il2nk/FbE5wkd780bkGZDsK6V0
-	84wpHiRnZNeo9sXV4FRTytqLdR+rFO/9Qsqtj2dPeyVielO4iE+0JHNjnjvc1z8FJZYTYlV
-	C1fDK7iSNK5j6ZMsag+u/oXdaNsToY+5p7kH6LFzkDhuMr1e+I4cVp3CjYyxkc8O2eNnQSA
-	wc+CplQcOe3o9spz2XsyCe7yDJyXU=
-X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+X-QQ-XMAILINFO: MhFAoh6gmjppLfDDiQj2CRS6Gjia8QuE0Xv46vxRiI0U9es3IGqGjUVx
+	jKc7mlClJNym8Cr4lVDwFiUsLvqjxxwJNNeeJuG8aMkYH62l6Xg0FT733WxGrOz35vozFD1
+	Z958DOxjeuf2ipVeUhD1xRurl6oOgMBNxjdmkAUvEI+LirKv62KeItlKustHFHKHeYvd9IM
+	PVR8vb1LxV3oQfbDOiUeYb7n8xxvZriY5Hk6pH4KXuORIlXcQVorWDyudHOHSygwlb+5HWh
+	yj1T8ZDBiuF959RDSPZb8SGQTOsYGu4tUu7ErBvgXbDOv14uNTIlbn3D8pZtVMruhkiUU5T
+	oWSEpgenzj/hryiVPNxmPF1SHXatKtTvWorVJ8w9615y8VLB55hAfwmFEwFJk+VuWuflHWg
+	7VVDXX9+iTRhXUVjPE6kJyOWZTZwWr7Y6bgzhkfyxLAGfXNF730TjTeB9wNdhDRbeMfnG+I
+	zc82341frJaeP84SRokKK1HW3CBkDb3KuEWq9yUPAW3fvxeng2YTVf8tWt/FGbX9xSN4cjb
+	rk/wxw78nysDXf3gHP4JlHxWK6uc0ejQjwlw4TZ0wWsXeg/A5Vs588PqZPRFIvQSUmXNMr4
+	TMT2NfdLtv9evkBjH5gHW7mz0j4kQIzYNwhI1dp0zWueB1AY5XImMNPq5xK2vEbBmwHYF12
+	AxWeWpjmspO26PTVRlhfggsOiMlGdF8clLTOCjnVdShETXOQoCnhu15A0a+YOszM5B43u7W
+	+3g2Lwy4ezZsHDqe56Dk/lNOckNu4x8Dwj0rSNWPp3WWz5m2n7XlDo3oXmRchgvmKfjJlIR
+	X/iW49M13dEqGL513LgMjioNgTxebOyX6vMbNkF6gla1Zp2pVGeiThQ0xF9pchethU38BcU
+	ua5Zs3YFB5oHDYW991cua8/63LliZEMcW2F6espeBUtcjmUMJ2k4iKVDvGApb85NDbzyhni
+	eO6w1ez05U+p1S6FDOpAaiSi+H71CWlm5oLt7XElzqG8eKiuAQS5zbRdKLD70bAJtpmgs7t
+	dycVpSCHeBwCTV2Fw4CE/IaNA3zQM=
+X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
 X-QQ-RECHKSPAM: 0
 
-For various types of devices, change their default ITR settings
-according to their hardware design.
+Add limitation on tx_max_coalesced_frames_irq as 0 ~ 65535.
 
 Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 ---
- .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 24 +++++++------------
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  5 ++--
- 2 files changed, 10 insertions(+), 19 deletions(-)
+ drivers/net/ethernet/wangxun/libwx/wx_ethtool.c | 7 +++++--
+ drivers/net/ethernet/wangxun/libwx/wx_type.h    | 1 +
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-index c12a4cb951f6..85fb23b238d1 100644
+index 85fb23b238d1..ebef99185bca 100644
 --- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
 +++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-@@ -340,13 +340,19 @@ int wx_set_coalesce(struct net_device *netdev,
- 	switch (wx->mac.type) {
- 	case wx_mac_sp:
- 		max_eitr = WX_SP_MAX_EITR;
-+		rx_itr_param = WX_20K_ITR;
-+		tx_itr_param = WX_12K_ITR;
- 		break;
- 	case wx_mac_aml:
- 	case wx_mac_aml40:
- 		max_eitr = WX_AML_MAX_EITR;
-+		rx_itr_param = WX_20K_ITR;
-+		tx_itr_param = WX_12K_ITR;
- 		break;
- 	default:
- 		max_eitr = WX_EM_MAX_EITR;
-+		rx_itr_param = WX_7K_ITR;
-+		tx_itr_param = WX_7K_ITR;
- 		break;
+@@ -334,8 +334,11 @@ int wx_set_coalesce(struct net_device *netdev,
+ 			return -EOPNOTSUPP;
  	}
  
-@@ -359,9 +365,7 @@ int wx_set_coalesce(struct net_device *netdev,
- 	else
- 		wx->rx_itr_setting = ec->rx_coalesce_usecs;
+-	if (ec->tx_max_coalesced_frames_irq)
+-		wx->tx_work_limit = ec->tx_max_coalesced_frames_irq;
++	if (ec->tx_max_coalesced_frames_irq > WX_MAX_TX_WORK ||
++	    !ec->tx_max_coalesced_frames_irq)
++		return -EINVAL;
++
++	wx->tx_work_limit = ec->tx_max_coalesced_frames_irq;
  
--	if (wx->rx_itr_setting == 1)
--		rx_itr_param = WX_20K_ITR;
--	else
-+	if (wx->rx_itr_setting != 1)
- 		rx_itr_param = wx->rx_itr_setting;
- 
- 	if (ec->tx_coalesce_usecs > 1)
-@@ -369,20 +373,8 @@ int wx_set_coalesce(struct net_device *netdev,
- 	else
- 		wx->tx_itr_setting = ec->tx_coalesce_usecs;
- 
--	if (wx->tx_itr_setting == 1) {
--		switch (wx->mac.type) {
--		case wx_mac_sp:
--		case wx_mac_aml:
--		case wx_mac_aml40:
--			tx_itr_param = WX_12K_ITR;
--			break;
--		default:
--			tx_itr_param = WX_20K_ITR;
--			break;
--		}
--	} else {
-+	if (wx->tx_itr_setting != 1)
- 		tx_itr_param = wx->tx_itr_setting;
--	}
- 
- 	/* mixed Rx/Tx */
- 	if (wx->q_vector[0]->tx.count && wx->q_vector[0]->rx.count)
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-index e0fc897b0a58..3fff73ae44af 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-@@ -119,9 +119,8 @@ static int ngbe_sw_init(struct wx *wx)
- 						   num_online_cpus());
- 	wx->rss_enabled = true;
- 
--	/* enable itr by default in dynamic mode */
--	wx->rx_itr_setting = 1;
--	wx->tx_itr_setting = 1;
-+	wx->rx_itr_setting = WX_7K_ITR;
-+	wx->tx_itr_setting = WX_7K_ITR;
- 
- 	/* set default ring sizes */
- 	wx->tx_ring_count = NGBE_DEFAULT_TXD;
+ 	switch (wx->mac.type) {
+ 	case wx_mac_sp:
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+index 9d5d10f9e410..5c52a1db4024 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+@@ -411,6 +411,7 @@ enum WX_MSCA_CMD_value {
+ #define WX_7K_ITR                    595
+ #define WX_12K_ITR                   336
+ #define WX_20K_ITR                   200
++#define WX_MAX_TX_WORK               65535
+ #define WX_SP_MAX_EITR               0x00000FF8U
+ #define WX_AML_MAX_EITR              0x00000FFFU
+ #define WX_EM_MAX_EITR               0x00007FFCU
 -- 
 2.48.1
 
