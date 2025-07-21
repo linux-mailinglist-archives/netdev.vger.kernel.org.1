@@ -1,183 +1,290 @@
-Return-Path: <netdev+bounces-208512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72B30B0BE9E
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 10:18:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91850B0BEAE
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 10:20:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2F21179413
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 08:18:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7C473BC9A0
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 08:19:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FFD7284B50;
-	Mon, 21 Jul 2025 08:17:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YksZrAQE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 712F52874E8;
+	Mon, 21 Jul 2025 08:19:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C557BA27;
-	Mon, 21 Jul 2025 08:17:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 775BD22D781;
+	Mon, 21 Jul 2025 08:19:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753085870; cv=none; b=DijMuWHjCvhWEZni0n5BvEnRLVt1nAmbq0w1hHFlXxjNkPzzi/Lc+f/2I2cJmiZE6i+2Lr3nb4kvSoESHM+Wl02bAIpSMes0uYPcy9AdLTRR2biU/OqBugZDxGbAsyaOBp6wdZ/j+8a0suZC1uuNdZfHFtVGHf7DMPWHpgDVNj8=
+	t=1753085968; cv=none; b=mzhohovBqsmaheCbLFnjMPZMUw11iul1pA+hGwgH0aZEtsAMwT+E0+MOAwcqd2t+baNw0ENnkNrEjx17peG9k0eV+FIrPxpHijWqEMKI4jfYgVSWSOJ94zwSVs5wIoTKBuzm8n4IlzfXfJLSmX1XX7+smiD5Pg5zmLNhs+o8cE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753085870; c=relaxed/simple;
-	bh=a804sze2eSEvabyJeJGTtXcPhavwSfNkfdmAlQPR0Jg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=L4eq7fx93PXZJAb3REWdPOqHB1d5ekR2kRbQ3gh8lT90JL6MF9oQUOTnktgrWE91K/EUVm0bWnGb7Y3BNOA4934S6FhK+ivylQs1gPk4xVMONspN4MiB/HAe3DEqj0JnIkOSjcDmK46+KPyhm45jqJz7BShaPqeqWuUfrdIUKAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=YksZrAQE; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56L65xmV008027;
-	Mon, 21 Jul 2025 08:17:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=Q48Npr
-	QEGhXIinQIM8N4K8V2AgpIZDRX3PPG5pO3Pvo=; b=YksZrAQEih0AHdlyxeLnyd
-	9R90OVLAABpbKDYrAf5WHtplHDz2Hytq9j+MgYGJjgKFyhMM6OHck3jxzihl4d6I
-	l0KLdfiZ7aPDZBr5b4kFlilux7pqWu80tA2/lDmIIfxgacwBO8zLofYPYBcFd+6x
-	wyZIFP/JzdVgFrjSweGasEsoZi3H2+TnbT5ACWNS6MUI/YB3VrpH5ODG4ezkGoWS
-	0xj7wfMS72pCTyMbBcY2RgQRFHTnEHui7nIvfjR+XpHcck5TKKaFht5zh0UsGsLy
-	n8ttbdLRUqA+IICVFT/Ecb/BMlcIYqKw+KRjzQ/YYI3SXvVJiLkYtlCtwyrWJVVQ
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4805hfqduf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 21 Jul 2025 08:17:39 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 56L8GXpA012126;
-	Mon, 21 Jul 2025 08:17:39 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4805hfqdub-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 21 Jul 2025 08:17:39 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56L8HRlu004046;
-	Mon, 21 Jul 2025 08:17:38 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 480tvqmcs3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 21 Jul 2025 08:17:38 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56L8HVEc51970406
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 21 Jul 2025 08:17:31 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5F6AD20049;
-	Mon, 21 Jul 2025 08:17:31 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1D57F20040;
-	Mon, 21 Jul 2025 08:17:31 +0000 (GMT)
-Received: from [9.152.224.240] (unknown [9.152.224.240])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 21 Jul 2025 08:17:31 +0000 (GMT)
-Message-ID: <af7298f5-08a0-4492-834d-a348144c909e@linux.ibm.com>
-Date: Mon, 21 Jul 2025 10:17:30 +0200
+	s=arc-20240116; t=1753085968; c=relaxed/simple;
+	bh=3qogy6Eu124weeVZ0Zp2cNlMb4SiB0GBWDEiO6+5yyc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F2neEhN74Hkj23wc5MnM7fxhiEfgvuv/6uFwykQDSW4UqjaK0gczCFEC0wVlusePNSuD3O06BfW1l97491yOg50EowAWxX6g3dHQFtfNG2o29Tvr0WG0eUMd/ff63wyvI4kpXh+XX2ZgLZjjDFnmZSdcphg2elGqaX81IDFRIAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-681ff7000002311f-91-687df80446e0
+Date: Mon, 21 Jul 2025 17:19:10 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-mm@kvack.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
+	harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
+	davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
+	john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com,
+	leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
+	andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
+	akpm@linux-foundation.org, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+	surenb@google.com, mhocko@suse.com, horms@kernel.org,
+	jackmanb@google.com, hannes@cmpxchg.org, ziy@nvidia.com,
+	ilias.apalodimas@linaro.org, willy@infradead.org,
+	brauner@kernel.org, kas@kernel.org, yuzhao@google.com,
+	usamaarif642@gmail.com, baolin.wang@linux.alibaba.com,
+	almasrymina@google.com, toke@redhat.com, asml.silence@gmail.com,
+	bpf@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH] mm, page_pool: introduce a new page type for page pool
+ in page type
+Message-ID: <20250721081910.GA21207@system.software.com>
+References: <20250721054903.39833-1-byungchul@sk.com>
+ <e897e784-4403-467c-b3e4-4ac4dc7b2e25@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1] s390/ism: fix concurrency management in ism_cmd()
-To: Alexander Gordeev <agordeev@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
- <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Heiko Carstens
- <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        Ursula Braun <ubraun@linux.ibm.com>, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Aliaksei Makarau <Aliaksei.Makarau@ibm.com>,
-        Mahanta Jambigi <mjambigi@linux.ibm.com>
-References: <20250720211110.1962169-1-pasic@linux.ibm.com>
- <6b09d374-528a-4a6d-a6c6-2be840e8a52b-agordeev@linux.ibm.com>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <6b09d374-528a-4a6d-a6c6-2be840e8a52b-agordeev@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzIxMDA3MCBTYWx0ZWRfX+kuysjCkc8TG
- hlNBHlxFXDAuDK+SfkI5wlIJMTfa5jIaC0BW6P/yZY0ZzF+eAcnZXlMC8yEXbL379Vk2/sl8IQW
- ZNp+ezIPSg/XMpBY1gRUmrFegA45M/93rXjuxfzRDkltNX2zYqt1mkp6XGq0UoXjBk+GZ0EhV1d
- Jcsm01Xl7azHh1JK2xwS08TeKCt6W9AVE844NV5ama8Ds+/7bQ+FQ74iedpQinHJn66d2xTAQeU
- AGcR7tMCK/i2BcAvG0vNUYNt4JDWaCFnzS58EkTGETeAG3k6tg5Cpat9Rajo59mH8B2H5VrTWET
- x2mNlX5fd+CL93f8H6NHDSXqIumvFKw8LWW12ZapIo8/it+1tFQGOhJxjQrFXMo4to4hyflptJK
- gnnHVegopkEB6wNNS2Sj3lgzXrAto6v3RyOdLHCw1m94Q+Uo8a+XE6BlmM8mDh1kQJgVbZWE
-X-Proofpoint-GUID: Fr7qEZE_Y6tNPL_DsKWroJAaamlfoA4n
-X-Proofpoint-ORIG-GUID: IbThzE3dxjrHS0PyoWR5wMWtAnF-ownJ
-X-Authority-Analysis: v=2.4 cv=X9RSKHTe c=1 sm=1 tr=0 ts=687df7a4 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=n0eagUHsWyY7jrG6XxkA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-21_02,2025-07-21_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 priorityscore=1501 adultscore=0 lowpriorityscore=0
- phishscore=0 malwarescore=0 clxscore=1011 mlxscore=0 spamscore=0
- suspectscore=0 mlxlogscore=658 bulkscore=0 classifier=spam authscore=0
- authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505280000 definitions=main-2507210070
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e897e784-4403-467c-b3e4-4ac4dc7b2e25@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sf0zMcRjHfb6f732/327Ovs7hI3+w83O3Ob+yPQzT/OHjD783mx+TU1/d
+	TZ3bpXSmOQpJHaPbdC4iP1JNXOkuU7jSDzZS005SVJhRqKSTxV0Y/732PM/79Tx/PAJWumWh
+	gsG4RzIbdTFqTs7Ku0ZenMUOJOnnpH+eDs6iQg4KBhLh6iuPDJz5pQj6/C94+FlejaC3qoaD
+	D5U9CHIv9GNwPklh4WvRdwxvqtt5KHCtgrYrb1m4c9SNof1ELQcZKYMYyv3dPBzy5DHgLLby
+	UF9qk0Hm98sY3NZXPDTednLQWvhTBm+9GSzUOa6x8NlehaHNtgyqc8ZB/6OPCKqK3Az0p2dz
+	8CzrNgOnG3I46EhpQ9BQ2c6C/UcqB2cP2hAMDgRs3Sf7ZHD2QSu/TEMrP37CtOTac4b6Kh4y
+	tMzxkqc5rnhanKehab4GTF35xzjq6jnF05amOxytPTPI0rLXC2mZp5ehGcndHP3yppmlnyqe
+	cWvHbJYvjpJiDAmSefbS7XJ9XXYGNuWGJyb7e3kr+qZNQyECEcPI9XdD/F/uKqllgsyK04g9
+	6wkKMifOID6fHwdZJc4kriM3AiwXsOjkSYMtezg8RtxM6q3lw2GFCORMctpwQCkaiP30b5FC
+	HE3qsjrZIGNRQ3xD7wPzQoAnkqtDQrAcIi4ll5psw5qx4hRyr7SGCe4iYotAOppv/jl0Armf
+	52NPItHxn9bxn9bxT5uDcD5SGowJsTpDTJhWbzEaErWRu2NdKPBOV5J+bPGgnvoNXiQKSD1S
+	YWKT9EqZLiHOEutFRMBqlYLW7NMrFVE6yz7JvDvCHB8jxXnRRIFVj1fM698bpRSjdXukXZJk
+	ksx/u4wQEmpFa1u3teU+tqw8tzp1vvv4iLQbByftUIV/9SRv3JuSvq7k/IUlHVst97WtLYYK
+	7YKoUWuKCxZVT9d2xkfLmn34aU2oSaUKj9AoPyxvaYw0Nhd22e5mPh3nP27aNPkAN7U99fn6
+	zMbSzseHo+1JW96rbkmj9+sjb15cUemNjSh7uWHn9j41G6fXzdVgc5zuFxYBtBZKAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRjHec97ds5xtDgtq1NK0SIqI7Po8pRdKeilKMIgQ4o85Kkt3ZSt
+	RANhqd0s13WUa4a1vEvGvE1xUmrq6kM1L6yrZllkaqVmXqLajKhvP57///f/9HBYmSGbwWl0
+	RyS9ToxRMXJaviM0ZRE9nKQOcZbIwVpcxEDhcALkdjhkYC0oRzA48oKFX84GBAP1jQx8qutH
+	YLs5hMH6OJWGb8WjGLoaOlkotG+H9pz3NFSfqsDQeb6JgfTUMQzOkT4Wkh15FFhLjCzUZbpk
+	8KTcJIMro9kYKowdLDRXWRl4XfRLBu9r02lwWfJp+GKux9Bu2gANWVNh6FEPgvriCgqGzmUy
+	0JpRRcFldxYDb1PbEbjrOmkw/zjNwPXjJgRjw961vguDMrj+4DW7YSGp6/mMSWn+M4p4ah5S
+	pNLyiiVZ9qOkJC+IpHncmNgLzjDE3n+JJS/bqhnSdG2MJpVvVpFKxwBF0lP6GPK16zlNPte0
+	Mjv9I+RroqQYTbykX7wuUq52ZabjONvGhJSRAdaIvgenIT9O4JcJvaVNlI9pfq5gzniMfMzw
+	8wSPZwT72J+fL9hP3vWynMO8lRXcpkzWF0zmI4QnRue4rOBBuJaSNi4oeY1gvvxnSMFPElwZ
+	72gfYz5I8Pz86O1zXg4Qcn9yvrMfv0643WYan5nCzxHulTdSF5DC8p9t+c+2/LOzEC5A/hpd
+	vFbUxCwPNkSrE3WahOADsVo78j5MTtKPiw402LylFvEcUk1QxNFJaqVMjDckamuRwGGVv4I0
+	HlMrFVFi4jFJH7tffzRGMtSiAI5WTVNsDZcilfwh8YgULUlxkv5vSnF+M4woMrAs0Nay9ur9
+	544Vro6nZw9GO6Xcw3sCWw5GrC7b1HKjOnS3raOgBk33Cw3JKzFv7+pa2Z08MeTjiakvV53b
+	uytsVHc2eJI6oHx9s/zQ930LxJNNS79VvvswrE12o1kV1Y8+hIVjbUNbbz/S980u7p3j6t5s
+	mXvrzsxtPVsviknZNhVtUItLgrDeIP4GDJeV7SwDAAA=
+X-CFilter-Loop: Reflected
 
-
-
-On 21.07.25 09:30, Alexander Gordeev wrote:
-> On Sun, Jul 20, 2025 at 11:11:09PM +0200, Halil Pasic wrote:
+On Mon, Jul 21, 2025 at 10:05:25AM +0200, David Hildenbrand wrote:
+> On 21.07.25 07:49, Byungchul Park wrote:
+> > Hi,
+> > 
+> > I focused on converting the existing APIs accessing ->pp_magic field to
+> > page type APIs.  However, yes.  Additional works would better be
+> > considered on top like:
+> > 
+> >     1. Adjust how to store and retrieve dma index.  Maybe network guys
+> >        can work better on top.
+> > 
+> >     2. Move the sanity check for page pool in mm/page_alloc.c to on free.
+> > 
+> >     Byungchul
+> > 
+> > ---8<---
+> >  From 7d207a1b3e9f4ff2a72f5b54b09e3ed0c4aaaca3 Mon Sep 17 00:00:00 2001
+> > From: Byungchul Park <byungchul@sk.com>
+> > Date: Mon, 21 Jul 2025 14:05:20 +0900
+> > Subject: [PATCH] mm, page_pool: introduce a new page type for page pool in page type
+> > 
+> > ->pp_magic field in struct page is current used to identify if a page
+> > belongs to a page pool.  However, page type e.i. PGTY_netpp can be used
+> > for that purpose.
+> > 
+> > Use the page type APIs e.g. PageNetpp(), __SetPageNetpp(), and
+> > __ClearPageNetpp() instead, and remove the existing APIs accessing
+> > ->pp_magic e.g. page_pool_page_is_pp(), netmem_or_pp_magic(), and
+> > netmem_clear_pp_magic() since they are totally replaced.
+> > 
+> > This work was inspired by the following link by Pavel:
+> > 
+> > [1] https://lore.kernel.org/all/582f41c0-2742-4400-9c81-0d46bf4e8314@gmail.com/
 > 
-> Hi Halil,
-> 
-> ...
->> @@ -129,7 +129,9 @@ static int ism_cmd(struct ism_dev *ism, void *cmd)
->>  {
->>  	struct ism_req_hdr *req = cmd;
->>  	struct ism_resp_hdr *resp = cmd;
->> +	unsigned long flags;
->>  
->> +	spin_lock_irqsave(&ism->cmd_lock, flags);
-> 
-> I only found smcd_handle_irq() scheduling a tasklet, but no commands issued.
-> Do we really need disable interrupts?
+> I'm, sure you saw my comment (including my earlier suggestion for using
+> a page type), in particular around ...
 
-You are right in current code, the interrupt and event handlers of ism and smcd
-never issue a control command that calls ism_cmd().
-OTOH, future ism clients could do that.
-The control commands are not part of the data path, but of connection establish.
-So I don't really expect a performance impact.
-I have it on my ToDo list, to change this to threaded interrupts in the future.
-So no strong opinion on my side.
-Simple spin_lock is fine with me.
+Honestly, I was too confused to understand exactly what you meant.
+Maybe my bad but I was and I'm still so.  Lemme add a question below.
 
-
-
+> > ---
+> >   .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |  2 +-
+> >   include/linux/mm.h                            | 28 ++-----------------
+> >   include/linux/page-flags.h                    |  6 ++++
+> >   include/net/netmem.h                          |  2 +-
+> >   mm/page_alloc.c                               |  4 +--
+> >   net/core/netmem_priv.h                        | 16 ++---------
+> >   net/core/page_pool.c                          | 10 +++++--
+> >   7 files changed, 24 insertions(+), 44 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+> > index 5d51600935a6..def274f5c1ca 100644
+> > --- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+> > @@ -707,7 +707,7 @@ static void mlx5e_free_xdpsq_desc(struct mlx5e_xdpsq *sq,
+> >                               xdpi = mlx5e_xdpi_fifo_pop(xdpi_fifo);
+> >                               page = xdpi.page.page;
+> > 
+> > -                             /* No need to check page_pool_page_is_pp() as we
+> > +                             /* No need to check PageNetpp() as we
+> >                                * know this is a page_pool page.
+> >                                */
+> >                               page_pool_recycle_direct(pp_page_to_nmdesc(page)->pp,
+> > diff --git a/include/linux/mm.h b/include/linux/mm.h
+> > index ae50c1641bed..736061749535 100644
+> > --- a/include/linux/mm.h
+> > +++ b/include/linux/mm.h
+> > @@ -4135,10 +4135,9 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
+> >    * DMA mapping IDs for page_pool
+> >    *
+> >    * When DMA-mapping a page, page_pool allocates an ID (from an xarray) and
+> > - * stashes it in the upper bits of page->pp_magic. We always want to be able to
+> > - * unambiguously identify page pool pages (using page_pool_page_is_pp()). Non-PP
+> > - * pages can have arbitrary kernel pointers stored in the same field as pp_magic
+> > - * (since it overlaps with page->lru.next), so we must ensure that we cannot
+> > + * stashes it in the upper bits of page->pp_magic. Non-PP pages can have
+> > + * arbitrary kernel pointers stored in the same field as pp_magic (since
+> > + * it overlaps with page->lru.next), so we must ensure that we cannot
+> >    * mistake a valid kernel pointer with any of the values we write into this
+> >    * field.
+> >    *
+> > @@ -4168,25 +4167,4 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
+> > 
+> >   #define PP_DMA_INDEX_MASK GENMASK(PP_DMA_INDEX_BITS + PP_DMA_INDEX_SHIFT - 1, \
+> >                                 PP_DMA_INDEX_SHIFT)
+> > -
+> > -/* Mask used for checking in page_pool_page_is_pp() below. page->pp_magic is
+> > - * OR'ed with PP_SIGNATURE after the allocation in order to preserve bit 0 for
+> > - * the head page of compound page and bit 1 for pfmemalloc page, as well as the
+> > - * bits used for the DMA index. page_is_pfmemalloc() is checked in
+> > - * __page_pool_put_page() to avoid recycling the pfmemalloc page.
+> > - */
+> > -#define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
+> > -
+> > -#ifdef CONFIG_PAGE_POOL
+> > -static inline bool page_pool_page_is_pp(const struct page *page)
+> > -{
+> > -     return (page->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
+> > -}
+> > -#else
+> > -static inline bool page_pool_page_is_pp(const struct page *page)
+> > -{
+> > -     return false;
+> > -}
+> > -#endif
+> > -
+> >   #endif /* _LINUX_MM_H */
+> > diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+> > index 4fe5ee67535b..906ba7c9e372 100644
+> > --- a/include/linux/page-flags.h
+> > +++ b/include/linux/page-flags.h
+> > @@ -957,6 +957,7 @@ enum pagetype {
+> >       PGTY_zsmalloc           = 0xf6,
+> >       PGTY_unaccepted         = 0xf7,
+> >       PGTY_large_kmalloc      = 0xf8,
+> > +     PGTY_netpp              = 0xf9,
+> > 
+> >       PGTY_mapcount_underflow = 0xff
+> >   };
+> > @@ -1101,6 +1102,11 @@ PAGE_TYPE_OPS(Zsmalloc, zsmalloc, zsmalloc)
+> >   PAGE_TYPE_OPS(Unaccepted, unaccepted, unaccepted)
+> >   FOLIO_TYPE_OPS(large_kmalloc, large_kmalloc)
+> > 
+> > +/*
+> > + * Marks page_pool allocated pages.
+> > + */
+> > +PAGE_TYPE_OPS(Netpp, netpp, netpp)
+> > +
+> >   /**
+> >    * PageHuge - Determine if the page belongs to hugetlbfs
+> >    * @page: The page to test.
+> > diff --git a/include/net/netmem.h b/include/net/netmem.h
+> > index f7dacc9e75fd..3667334e16e7 100644
+> > --- a/include/net/netmem.h
+> > +++ b/include/net/netmem.h
+> > @@ -298,7 +298,7 @@ static inline struct net_iov *__netmem_clear_lsb(netmem_ref netmem)
+> >    */
+> >   #define pp_page_to_nmdesc(p)                                                \
+> >   ({                                                                  \
+> > -     DEBUG_NET_WARN_ON_ONCE(!page_pool_page_is_pp(p));               \
+> > +     DEBUG_NET_WARN_ON_ONCE(!PageNetpp(p));                          \
+> >       __pp_page_to_nmdesc(p);                                         \
+> >   })
+> > 
+> > diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+> > index 2ef3c07266b3..71c7666e48a9 100644
+> > --- a/mm/page_alloc.c
+> > +++ b/mm/page_alloc.c
+> > @@ -898,7 +898,7 @@ static inline bool page_expected_state(struct page *page,
+> >   #ifdef CONFIG_MEMCG
+> >                       page->memcg_data |
+> >   #endif
+> > -                     page_pool_page_is_pp(page) |
+> > +                     PageNetpp(page) |
+> >                       (page->flags & check_flags)))
+> >               return false;
+> > 
+> > @@ -925,7 +925,7 @@ static const char *page_bad_reason(struct page *page, unsigned long flags)
+> >       if (unlikely(page->memcg_data))
+> >               bad_reason = "page still charged to cgroup";
+> >   #endif
+> > -     if (unlikely(page_pool_page_is_pp(page)))
+> > +     if (unlikely(PageNetpp(page)))
+> >               bad_reason = "page_pool leak";
+> >       return bad_reason;
+> >   }
 > 
->>  	__ism_write_cmd(ism, req + 1, sizeof(*req), req->len - sizeof(*req));
->>  	__ism_write_cmd(ism, req, 0, sizeof(*req));
->>  
->> @@ -143,6 +145,7 @@ static int ism_cmd(struct ism_dev *ism, void *cmd)
->>  	}
->>  	__ism_read_cmd(ism, resp + 1, sizeof(*resp), resp->len - sizeof(*resp));
->>  out:
->> +	spin_unlock_irqrestore(&ism->cmd_lock, flags);
->>  	return resp->ret;
->>  }
->>  
-> ...
+> ^ this
 > 
-> Thanks!
-> 
+> This will not work they way you want it once you rebase on top of
+> linux-next, where we have (from mm/mm-stable)
+>
+> commit 2dfcd1608f3a96364f10de7fcfe28727c0292e5d
 
+I just checked this.
+
+So is it sufficient that I rebase on mm/mm-stable?  Or should I wait for
+something else?  Or should I achieve this in other ways?
+
+	Byungchul
+
+> Author: David Hildenbrand <david@redhat.com>
+> Date:   Fri Jul 4 12:24:58 2025 +0200
+> 
+>     mm/page_alloc: let page freeing clear any set page type
+> 
+> 
+> I commented what to do already.
+> 
+> --
+> Cheers,
+> 
+> David / dhildenb
 
