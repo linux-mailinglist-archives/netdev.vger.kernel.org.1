@@ -1,104 +1,123 @@
-Return-Path: <netdev+bounces-208676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43556B0CB56
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 22:08:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62410B0CBAB
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 22:20:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A2AA542AFC
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 20:08:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93FA916763C
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 20:20:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC65F238157;
-	Mon, 21 Jul 2025 20:08:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36ADA238C3D;
+	Mon, 21 Jul 2025 20:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dqI3VtLZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TNTs3Ys8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8A86EAC6
-	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 20:08:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD45D19CC28;
+	Mon, 21 Jul 2025 20:20:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753128481; cv=none; b=B573cgHl9UwA9rXZfZuq0PTMjJuhO5e0v+MIvCAVdk0BZknQJD6q2cuhqn8t3CKWuBTZL+MH2CvUWNSb8QdTWFzVt2HAg4k2Xqyczx/bhZ9VJqOmuudyJRyBkgb1P35Qhvu7I3zFtygjcniWiRjADZwIYfewhV36/cVO/uetbMw=
+	t=1753129216; cv=none; b=WIAw/Mbr8N8BLvUi2j3wzKFvIiH6d+OjzPnl7WyZl9vGxwbaGgmz+aN1XmkP4CPhoQ6XK4H/59+bHoR+UmZ8G2XMSKLCcp1Z4L6yCkY88nkWlit902WDY1KGH2k7KfOArEDRszAjfViqNHHXyU10llH+5Fx5kIx4y0bRH2l6vTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753128481; c=relaxed/simple;
-	bh=pgzpr4307hHT4m1uZB5LVv1aroEIL3zPPiKIY1i4F4Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oJFratJysp3E5A9YuCzTkzQi4GNQiUCD8vAz0MZW3pacOiUCSOIQx2udXviMuFZwMALF3F8vxT79mDZyflKBq7un7l5hifNGR/ltFnPHDXKKJXpiCV66dxPAJex7xwe2NZov0Qi/Tisnl1AmbZrymVf+9UNY+P2iUhTV7TSelSY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dqI3VtLZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1596C4CEF4;
-	Mon, 21 Jul 2025 20:08:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753128481;
-	bh=pgzpr4307hHT4m1uZB5LVv1aroEIL3zPPiKIY1i4F4Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dqI3VtLZZN3LDw1OFNXXlf9dJHG7VlVEON2odEpmoL5p2b/rPI+1OxhNtMpsOQhuG
-	 NkxvJaTunryz8WLIX7mOIrOFc2eCp6zs3BmzUIqj6VKagmbGSlTy5ohViKnx1Fxk/b
-	 sWWZrea5H5AvX0yFOgKHBJMOTTreUz4w5BldtuY8da5rKE6LbN3vpIM4y+DMpDcimY
-	 kdnbIjOi50nm9kjSDlvKPpbSQmqs7nF+4QujsO8Hg2XKFtnSH4rCsWvh6TkN40/qhN
-	 gjU0ypcrphpAB1tCMb00p86cth+MzVKXRQfxieSmiAv6Rnpf2afiw1it6G3s/Se2Jr
-	 IcBchBgw9I+zg==
-Date: Mon, 21 Jul 2025 13:08:00 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Wilder <wilder@us.ibm.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jv@jvosburgh.net"
- <jv@jvosburgh.net>, "pradeeps@linux.vnet.ibm.com"
- <pradeeps@linux.vnet.ibm.com>, Pradeep Satyanarayana <pradeep@us.ibm.com>,
- "i.maximets@ovn.org" <i.maximets@ovn.org>, Adrian Moreno Zapata
- <amorenoz@redhat.com>, Hangbin Liu <haliu@redhat.com>,
- "stephen@networkplumber.org" <stephen@networkplumber.org>,
- "horms@kernel.org" <horms@kernel.org>
-Subject: Re: [PATCH net-next v6 7/7] bonding: Selftest and documentation for
- the arp_ip_target parameter.
-Message-ID: <20250721130800.021609ee@kernel.org>
-In-Reply-To: <MW3PR15MB3913774256A62C63A607245EFA5DA@MW3PR15MB3913.namprd15.prod.outlook.com>
-References: <20250718212430.1968853-1-wilder@us.ibm.com>
-	<20250718212430.1968853-8-wilder@us.ibm.com>
-	<20250718183313.227c00f4@kernel.org>
-	<MW3PR15MB3913774256A62C63A607245EFA5DA@MW3PR15MB3913.namprd15.prod.outlook.com>
+	s=arc-20240116; t=1753129216; c=relaxed/simple;
+	bh=QhoaQFtxNxausfHipJnOzeN1CL5MUK8zNLHiVu3g8n8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rGplBa72K1BD9NC5C3agOqWtGzA6zA02rAXFdL5IcuAmBVjocfQsU+XDjIyCP7PByDi0OZITQgiojLIvjvQjQCOCMCUTuMVbG+uu88bTSFRWcx5LPtfPr89caAbXjXFk8mqjE0uLLLFd8b7oU8VpKZeQR+C+CUeC1L2fhCDGn3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TNTs3Ys8; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-31384c8ba66so48736a91.1;
+        Mon, 21 Jul 2025 13:20:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753129214; x=1753734014; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QhoaQFtxNxausfHipJnOzeN1CL5MUK8zNLHiVu3g8n8=;
+        b=TNTs3Ys8eBGIIjsrjlhnaYufJnrq99cmDn7o8GfI1i3u7cv806dHTXqS9/uHR1f7JL
+         MeznwZg1nBEwjlu0rkjZwi7CmCKBV5SXsf8pVyGVX9BGR5c0C16zunPjJX2e9D2atbxi
+         JKB0QL5e/ikEz9nI6mEP1IsAeem2uPFF3dnDN/OAWx/xelHehKzkHRjo6eiO3bj4xI88
+         D5Nk2IcMkg0HW9ZRuAyXPp90CyDaQVgQlfVMp5mlyalLyhQn3/b3R+KS+44sc0VZ3g58
+         aiq8nkkPbEf3rhzkXpWdZnzUJ4LJEHSKbYuIHiTPRtpGlpCpcGyR0W7+xj2fkD58tObh
+         n+wQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753129214; x=1753734014;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QhoaQFtxNxausfHipJnOzeN1CL5MUK8zNLHiVu3g8n8=;
+        b=lBetLDCKfsUdCL/pkD396yycrjBYvtykgm1WXnoxWLSZU/ylbpDbvSKGmamx9yO5Bu
+         cGGPawEtF4aKZmRFk8TXJVCqdQRYHROwDydiZ8ShNj+QujsUsRHZEGfOC7lF/aCS21gL
+         mbKpoqbdV5da2FovTnidY0GISH94A/wkvEoq+WCui03wWG5mBX06l19cDOO+nGKswxkL
+         viGUoxHWQhChlZd+U8RofFZ/mRH0KQDWpTkO4N6wtKHe5SKAWj1xkyTdRggPIZUX2wNj
+         Afzl8zYx/jMLpuGvJU3A51GuQM4SNyPXn4fQQTLtxfv9L3P8oVzj9s1kXSJ07E3nSdj2
+         WzYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUvuPLFFM7Oo0Kj9qUGFZTF1e2XtTXPOaAWcPtaFhMKJWnerKMSQvTnFVkZeScGiC0U4CzWTgzSMbxZTP8JayKD@vger.kernel.org, AJvYcCUwucxTAENt8OWohoYuxPFWOSP1ZltU75Dyukqshx7n+uZpyehJUd4fWRse/KkXdhr7VdINcJEkYW2J/wonz3I=@vger.kernel.org, AJvYcCWFJ2XijynbTlFvXQuYNI3tHx8fQRHkcMIInfSoVGoAjA0dPGr/Hok0ftkLxeIrFEyaAw+qjkMjhNrD@vger.kernel.org, AJvYcCWSwPtDuF0nOlzFiVS4DpQxdZxM6OQTePhcGT2RZDZsZw6buJl8HLDlh0fFbw/wwwswOXEvJaNxH95HDVRY@vger.kernel.org, AJvYcCXuM5ONCpq68oLolwZMBA12je+WFsCN6dYUIUKLKxYePbUitCTSHBpjCwN8iuypKbNRWGUnfoSP6IM=@vger.kernel.org, AJvYcCXvC2UKbmpv9uh/rjOJ/LbequIE4IfzrwfjBwHgD0P6htu8fPamEjLMZP7CkwwRkfv0RRUxYlp0@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGP6BJJy2aYxL5MUAfeEiwqW3eRH824/Xx2yOtcCmCxE+3xnYb
+	KHXLUVxq6WiJYAnnlUAsFtDPskoNzhewp+4NmbLZCCZNkAhZEoQOGN3kqgh22KSVtQrvymv0LTV
+	HEP6KX9TP6fhVFPDVpXq/eV1+jE8gvoo=
+X-Gm-Gg: ASbGncuuLAbuvk2QygkKto1xHoaQe1OVxnsqAasMKAaN2lrollhNE8AgOKdw2MeJAba
+	oGXpqfKgfrRJFh+7yJQohMGwkrqh4mUiMVWuFWBS0YI/iDoBoQGSDJ7e+AWNY/zgihYPd0OV9h2
+	25TP0Ke2UIj/eWCWiodnSgUd5TU4FEAfQdJ7Gs1zm5MobEEo/2e8WKjh9JYwphswbfXbhooGZFT
+	ETMdp9f
+X-Google-Smtp-Source: AGHT+IGYWFzzB+EaA1sUPW0yxlHljqythmWNIpx8bVOSX58qriu4XgVDPxfn17/Rmpvzl5eSATKzzBGxAaQbrkHzpc8=
+X-Received: by 2002:a17:90b:57cf:b0:311:a314:c2c9 with SMTP id
+ 98e67ed59e1d1-31c9e6e5debmr12843850a91.1.1753129213894; Mon, 21 Jul 2025
+ 13:20:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250719-core-cstr-fanout-1-v2-0-e1cb53f6d233@gmail.com>
+In-Reply-To: <20250719-core-cstr-fanout-1-v2-0-e1cb53f6d233@gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Mon, 21 Jul 2025 22:20:01 +0200
+X-Gm-Features: Ac12FXwTjwqkUOe19S3QjijBkelsLmO-zTtTU8nCjXVYR5x32YJPDBd3Xx-BAUU
+Message-ID: <CANiq72mRWuQRFaouOSazi3GTXoHFaeVpyNMZcP0Lkymb+aXrqA@mail.gmail.com>
+Subject: Re: [PATCH v2 00/10] rust: use `core::ffi::CStr` method names
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
+	Leon Romanovsky <leon@kernel.org>, Breno Leitao <leitao@debian.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
+	Rae Moar <rmoar@google.com>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+	Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, dri-devel@lists.freedesktop.org, 
+	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-pm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	kunit-dev@googlegroups.com, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 21 Jul 2025 19:23:19 +0000 David Wilder wrote:
-> >This test seems to reliably trigger a crash in our CI. Not sure if
-> >something is different in our build... or pebkac?
-> >
-> >[   17.977269] RIP: 0010:bond_fill_info+0x21b/0x890
-> >[   17.977325] Code: b3 38 0b 00 00 31 d2 41 8b 06 85 c0 0f 84 2a 06 00 00 89 44 24 0c 41 f6 46 10 02 74 5c 49 8b 4e 08 31 c0 ba 04 00 00 00 eb 16 <8b> 34 01 83 c2 04 89 74 04 10 48 83 c0 04 66 83 7c 01 fc ff 74 3e  
-> 
-> Hi Jakub
-> 
-> What version of iproute2 is running in your CI?
-> Has my iproute2 change been applied? it's ok if not.
-> 
-> Send:
-> ip -V (please)
+On Sun, Jul 20, 2025 at 12:42=E2=80=AFAM Tamir Duberstein <tamird@gmail.com=
+> wrote:
+>
+> Subsystem maintainers: I would appreciate your `Acked-by`s so that this
+> can be taken through Miguel's tree (where the other series must go).
 
-iproute2 is built from source a month ago, with some pending patches,
-but not yours. Presumably building from source without your patches
-should give similar effect (IIRC the patches I applied related
-to MC routing)
+Did you apply this with `b4`? I think you picked Danilo's Acked-by,
+which was for a subset, for other patches too. I can remove it when I
+apply it.
 
-> Can I access the logs from the CI run?
+(Greg's Acked-by may also have been just for his bits back in the
+previous series, but in his case he didn't say anything explicitly)
 
-Yes
-
-https://netdev.bots.linux.dev/contest.html?pw-n=0&branch=net-next-2025-07-19--00-00
-
-> Is there a way I can debug in you CI environment?
-
-Not at this point, unfortunately.
-
-> Can I submit debug patches?
-
-https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
+Cheers,
+Miguel
 
