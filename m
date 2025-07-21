@@ -1,65 +1,48 @@
-Return-Path: <netdev+bounces-208591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4671AB0C3EC
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 14:14:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA68AB0C3F4
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 14:17:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAAC63BB8AF
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 12:14:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F15B0189F318
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 12:17:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A13E12D3ED0;
-	Mon, 21 Jul 2025 12:14:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C2AF2BEC3F;
+	Mon, 21 Jul 2025 12:17:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="nfDgjGed"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kqXwlcND"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E115C29E118;
-	Mon, 21 Jul 2025 12:14:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D49A542A9D;
+	Mon, 21 Jul 2025 12:17:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753100086; cv=none; b=t2GouTezEPr08UTaagt2QViMJJqPysGDY19uKrMtWXhSSN2aTQafpGLS261rSNhCiVSdfstOvxyDqiCQEFCahax1TZNFlZ5jTFcpgWCz9DluGx9SZzptCQcIgjZqIfwDzhNeVyNFzobfVCVco0DzGC4moGfVOSNleDDjoI3BR+I=
+	t=1753100224; cv=none; b=d613ptq3I/3TqR6hMw95D4iCLphrozmESiDTJVmnkuD/V+rPiNartADKvnVsUF7dq4gKqrxn3HTiSFKFdIneeIDmr/R2e6M4rmfCTLXefhB8IBtxXo4BBHCyyWSO2CdYLgDmdKQLb3jIMG7gFHIvubMjWm5yj3Rnoe1jYq1uKnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753100086; c=relaxed/simple;
-	bh=pgXl5KqLuQH7o5JIOTqTdfkbgIO+MeyUkuPddaZGmUE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Wfw9TsfBGUae5rsZCopt1Q3C30XeKnx4kK0m+Y6+AeAkHj6nSIYmv5kxz5mggXDq/uQGHzmjQBuuRKrzAu9PwoIpvJpqlQ6s/sDA0kuDkOZph8kYfXFSPNbKNqg3LrbCxHpY8bJaUwHvY+ntu9iA6n8Kjjj3i6qK9cAC1+b+Vo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=nfDgjGed; arc=none smtp.client-ip=185.132.182.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56LC5CAG018486;
-	Mon, 21 Jul 2025 14:14:21 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	IbLO7yjcp13kgrbLMrtPsgFowoaqk261CAPX88WxiV0=; b=nfDgjGedwxd5bWa9
-	NsZdWaCUY3TXRY5k6E72h1w+zNKywB4A0/XE33NGR7muKiXNosUtj28QRr/VU2xb
-	9KLPQ2UDIdnhw7iVmy7/g0SL1U7rsI7NxYN9InjJyKnFI17fUpEDBQzKm4Xwx/Lp
-	hzNSgJbW4nL6/bUXqwaWLOgZBKqneJafjGGIPVxZEz5UD1ZO8bKfn3yS3zt4rcAk
-	syHDwt6zvexxg0ERTSKAkgv6psGf32BliwvVL5Azr6aOOw5JtEsbn1aaQzfDx/Wa
-	PWEhfhoGKpb5V8IvchroZDmFIBjFSBNEk1KWeEq7oJAQm8W0gUxKWUrJZis/h5U7
-	GmKraA==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 4802q20v4v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 21 Jul 2025 14:14:21 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id B4BED40051;
-	Mon, 21 Jul 2025 14:12:22 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id A35B6787C05;
-	Mon, 21 Jul 2025 14:10:54 +0200 (CEST)
-Received: from [10.48.87.141] (10.48.87.141) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 21 Jul
- 2025 14:10:53 +0200
-Message-ID: <f5c4bb6d-4ff1-4dc1-9d27-3bb1e26437e3@foss.st.com>
-Date: Mon, 21 Jul 2025 14:10:48 +0200
+	s=arc-20240116; t=1753100224; c=relaxed/simple;
+	bh=kgCjEGYS3HgjeN51ZAILuplVfvuuUImf1jdln2dlVxE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CxU6cW7WPMoTRObfckcALN4P7bKZBOa2+731+7YgQdk9FWVOhYmHeooyk2LNzLAQVeDYGaHCFcMMcdyRA9zc3bcmkjNi3nKvjenjZ+mUUhXR5VqcjA3j6hIbfXaWRFqoIVzEPBR6RhZAet0Yzm9CIef3LAAo4HzNgL7ewyxZF1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kqXwlcND; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A62DC4CEED;
+	Mon, 21 Jul 2025 12:16:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753100224;
+	bh=kgCjEGYS3HgjeN51ZAILuplVfvuuUImf1jdln2dlVxE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=kqXwlcNDa8JGGSlsevmKYZhWbE23aU+f9svTwzwiIcqLsWDdct4bHek5aFzxEEKan
+	 gBZLI5H3UWS8SB/VvBjk8/aQdEqqKSYpcmkfaqkd1gm7XsE6R9JlE5fK00v/DFevj2
+	 2odB5ohz9nVO0BpSfuUvlmWo1IDQlak1aC+W6gFoZ4bsdW10ASRQEYPzyuyzrwcnek
+	 eUizkd+gLTByOdmFrUUnyZjS20LP4YOgZIY9ehXryJb2oTg9LJmJVP+VOJDFk8pVi5
+	 QctZvUxO7Ye4FpaGphEvNs/P8hO+spS2PF5P9tyCiJ/Pd2qXUsbJi1KJekmYU9UnwQ
+	 43j47QS/uP03A==
+Message-ID: <b220ae01-81b5-47f1-bf99-9aa0903995e1@kernel.org>
+Date: Mon, 21 Jul 2025 14:16:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,67 +52,104 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH net-next 1/4] dt-bindings: net: document st,phy-wol
  property
-To: Krzysztof Kozlowski <krzk@kernel.org>,
-        Andrew Lunn
-	<andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Christophe Roullier <christophe.roullier@foss.st.com>,
-        Andrew Lunn
-	<andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-        Russell King
-	<linux@armlinux.org.uk>, Simon Horman <horms@kernel.org>,
-        Tristram Ha
-	<Tristram.Ha@microchip.com>,
-        Florian Fainelli <florian.fainelli@broadcom.com>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+To: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Christophe Roullier <christophe.roullier@foss.st.com>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Simon Horman <horms@kernel.org>,
+ Tristram Ha <Tristram.Ha@microchip.com>,
+ Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 References: <20250721-wol-smsc-phy-v1-0-89d262812dba@foss.st.com>
  <20250721-wol-smsc-phy-v1-1-89d262812dba@foss.st.com>
  <faea23d5-9d5d-4fbb-9c6a-a7bc38c04866@kernel.org>
+ <f5c4bb6d-4ff1-4dc1-9d27-3bb1e26437e3@foss.st.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
-From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <faea23d5-9d5d-4fbb-9c6a-a7bc38c04866@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <f5c4bb6d-4ff1-4dc1-9d27-3bb1e26437e3@foss.st.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-21_03,2025-07-21_01,2025-03-28_01
 
-Hello Krzysztof,
-
-On 7/21/25 13:30, Krzysztof Kozlowski wrote:
-> On 21/07/2025 13:14, Gatien Chevallier wrote:
->> The "st,phy-wol" property can be set to use the wakeup capability of
->> the PHY instead of the MAC.
+On 21/07/2025 14:10, Gatien CHEVALLIER wrote:
+> Hello Krzysztof,
 > 
-> 
-> And why would that be property of a SoC or board? Word "can" suggests
-> you are documenting something which exists, but this does not exist.
-Can you elaborate a bit more on the "not existing" part please?
+> On 7/21/25 13:30, Krzysztof Kozlowski wrote:
+>> On 21/07/2025 13:14, Gatien Chevallier wrote:
+>>> The "st,phy-wol" property can be set to use the wakeup capability of
+>>> the PHY instead of the MAC.
+>>
+>>
+>> And why would that be property of a SoC or board? Word "can" suggests
+>> you are documenting something which exists, but this does not exist.
+> Can you elaborate a bit more on the "not existing" part please?
 
-For the WoL from PHY to be supported, the PHY line that is raised
-(On nPME pin for this case) when receiving a wake up event has to be
-wired to a wakeup event input of the Extended interrupt and event
-controller(EXTI), and that's implementation dependent.
+
+Where does this property exist that you suggest that a new binding "can"
+use it?
+
+> 
+> For the WoL from PHY to be supported, the PHY line that is raised
+> (On nPME pin for this case) when receiving a wake up event has to be
+> wired to a wakeup event input of the Extended interrupt and event
+> controller(EXTI), and that's implementation dependent.
+
+
+So it is not "can" but some implementations do not have proper wiring.
+You need to justify your commits and changes.
+
+
 
 Best regards,
-Gatien
-
-> 
-> Best regards,
-> Krzysztof
-
+Krzysztof
 
