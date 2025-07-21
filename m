@@ -1,153 +1,121 @@
-Return-Path: <netdev+bounces-208572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC640B0C31D
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 13:35:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B902B0C352
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 13:40:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E98B7188AA89
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 11:35:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CEA83AAD0E
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 11:40:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83F2E2BEC50;
-	Mon, 21 Jul 2025 11:34:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29B602C08C2;
+	Mon, 21 Jul 2025 11:36:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h5XN1cyQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hva4HOgr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EE452BEC24
-	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 11:34:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A452C324E;
+	Mon, 21 Jul 2025 11:36:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753097657; cv=none; b=apelTwaRBhznCKVkzRxyPxdsN96DvPPTCJAnwrXNwwSASezGj/lGT7SwpZlmDUyyHAdXqrZ5d9q63pxXR6VSiyJXV0+kcnwVkcmU/lXgn+l7wulk9NEppV0FGqqTQo8T4J6HrOfb6LATI7JFjSSN/asY/riG91QOdkpQ/GYHnBg=
+	t=1753097790; cv=none; b=XStBsiEENdZNaLcTZsfbIwQYw0FhwFuNMWYxwPkbIVxtd/DhtpB1u89zGaTZ8bx+m0+m4Vd7f6OuToXHsHjIROICHWkYu+yakAijQZVu2y7+fAc6g0TAHjEQM39Y3ta9lkp4czH1/wlvLnDMsCe2aNTV9JXmCyjev8XDS406PsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753097657; c=relaxed/simple;
-	bh=D/3TRU93QDlnGqM8rs8fsEt1nNdoNWfnlTe/xWO88dI=;
+	s=arc-20240116; t=1753097790; c=relaxed/simple;
+	bh=cv3cZimFRbih3moFYugSjrM7hRVrA1WVZg4pUK+6P4U=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jvDwGNu9S+5BotUXs1uvDSxmHaNkYjUrkWtkbE1RAWyH/WivVP90+AgVqG0D4VCb0QcuBoFMkm9hZfvbffu/0tBUvwFEh7UDEbYdMJrcqpNgP7xw1Q8L3Q3Tau8XvGRt7IOROzvxEB8v+2aJKitRoo1H6pVeC2cnWiCHG6sycWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h5XN1cyQ; arc=none smtp.client-ip=209.85.216.50
+	 To:Cc:Content-Type; b=s+Om9wRM7FaxdjUV7Xtlca0Uq3RGguKFBIcRQOEVqiwdHcDV7/dEp142CPwFsEDmGudXoUACanqxbOyXAbRygI4S9Ro2axU3Z7tMHGtqbG59f6rf67WldRVTPyDt3D9re6X+rGpn54llEwQA+6nm9EQed2AcrEHba0SOFH0PUAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hva4HOgr; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-31329098ae8so3553713a91.1
-        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 04:34:15 -0700 (PDT)
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7490702fc7cso2536525b3a.1;
+        Mon, 21 Jul 2025 04:36:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753097655; x=1753702455; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X7NvsUpRwHEpiLn/u1yLLyuPoU1r/z6Q2UVm6GiDEfE=;
-        b=h5XN1cyQ6RqfOoOLqyg5WmqK2DF4KkjdHSOJVV0DzfjdCwBFr+IiXsFlFqLO8DGg5S
-         2e1jJBKFpDYMCJc0wjyfov0LS1Desa7tRfbMU+gJFH2pWz3zvrMZmzKQMSldg/i70OVx
-         HsQuhzycQqUzGOgx7ag6VcLvbrJ8H6WNfoStSatks97ofI0E+RZJyi/pa9M4PpOL5dOk
-         UDwtDtaoL/wLOvelc4n6VhlWraKvIZOuVwDyf1jXCBWpd6d1WD2TgHxK1QT+BMtzlG1b
-         HA6JhvjMuja07q8fOQqn+1TbB34MhT6W4PEruhyd3vjr3y6EfeqmVTMc4t6IgmryEZCD
-         LDNA==
+        d=gmail.com; s=20230601; t=1753097788; x=1753702588; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=9Ok31vjZ6354uwz9oviPoQ4N7zKiZWIkMurk9Gv3QM8=;
+        b=hva4HOgrYtW3fo6rfFT5SxfiThNRlJm4t4U8znzXQYv8WuPMp/i3bbVZlpEobbIqee
+         DCLx+nj9U2gNLUCDV57O9wx5gMVDJu76cRufp8LZgJ3IZONFqqTVfFn0o83QAjbsfuVD
+         K/tW8KWi6ntvSZFpInwiPqsxSFis74HAi8zVis+PjuZIemPKUsSvNV5EzpL4nwuQSP92
+         Trp2zQsr5hQBly7EO64SePY80BKhGUCrsi5DWXYdSU/RvFVx5YMnYi10Td9gxPuFf+5F
+         J/otliHTCBpYbg43SLfztEHVcsy5OOE2dFQph3B0u0nyYpaeKsDoXqb1V8rycgxFBQrb
+         mlsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753097655; x=1753702455;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=X7NvsUpRwHEpiLn/u1yLLyuPoU1r/z6Q2UVm6GiDEfE=;
-        b=Vp99foSPWQkjmVwBMZbv1Gs9+Nifm9HrC0Qaws546ybBZPJI/8+dKDtVCNDBcP98UV
-         MVnk1SgK9oAd9HcWuInfS3mjeJjX1a4yde57lg4EdH3o7J4Z+O9BVqfHjsF1tTpvi5sR
-         kQMV4aeBHPjHFqwTNcZFfHx7Eu5gw5d4CS738wJRjWKJWFvYivar3k35NCTn2BZrKTYV
-         9a21d2aSE9+kBo7UkocY+mRoHAA/zbMun1Kut+IHmnKW/htgvh5Ib7ECGKnqYM3X7P8t
-         4iSB0PVKf62z788aJ69+brCHJQNGUmV22ojfHwmw7OWJwrLnxRq3NUBXcFbU6K8hli1W
-         LLxQ==
-X-Gm-Message-State: AOJu0YzIUEXmX+lp627+iMaC5HZIbaLryc8XChbQmkIsbr2fRFutQHnP
-	+UprrdkDfX4X87cqvGEdrkltUybAERRyii84FJ5TTQVmNHSSnoCdfDb2QcyxmlXHkVE68kb3aHQ
-	gTZ7vQB6sPkgWRyJVKqswwBG/yAIuI7g=
-X-Gm-Gg: ASbGncshx/ufTnCeXKFzkye7zaFAso+YSGBqiOXubWRA5W0ELnjgUsD0khV0dQYFjzm
-	jhfxKduYSQTIKk0p98Gr57RvtwlnLScvK+EhSaZWORRTjqq2vOJ7SipdGSG5nPSgen6K4KGfqZC
-	1uE0nvvWt1SLpLBflWQy5OJue51kQpQUuXUWLfdzHogRiiHSrPL87dzE5EH/ygGszdKAGAZ1zsZ
-	Aw60fk=
-X-Google-Smtp-Source: AGHT+IFUPQtFegKyekMt55UmhbndBliKZCkdQ2lEkY+tKDYKl0OLdQUYg4czXBRWKB6RbEPlCsK2/fMMi8++32wKqFw=
-X-Received: by 2002:a17:90b:57ec:b0:31c:39c2:b027 with SMTP id
- 98e67ed59e1d1-31caeb7769emr25497514a91.7.1753097655198; Mon, 21 Jul 2025
- 04:34:15 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753097788; x=1753702588;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9Ok31vjZ6354uwz9oviPoQ4N7zKiZWIkMurk9Gv3QM8=;
+        b=lX4ZG8g47I5BfDBS7niCaoZlWJhjQTphYS4DZdN/AI3tHLCZnlFEXo0NavJQ6Dswia
+         hhHG1kIPs54lXRULGuJ2P4MgISZdFgHY2Hsong6tas5MOnR9CsHfUtdTpUq9lB4rFpML
+         QulOpB/AKZZAVJ57e6BCUOr4wL2If21aC/NxmjFAARplL7b5edgzrxdTbeDx8hmUCypa
+         6Co6Zi2wCMz05ytcBSLLk1oxTb2JgY3b0iWkUh/88m2xDmM91P4/q+Pcubcf8smbS7GO
+         JupUAFKCQKZefKHHK5V2fcixlVAWIosvStXfZDvO11VIaoO6TCdIo8BjRnAM0MntD5ng
+         MdOA==
+X-Forwarded-Encrypted: i=1; AJvYcCUYeNCUvu+7uVyqQ8zNQO84wZxigGSxxt1zwcYgWsOh+6F0HH2Jr+JqjssYDoR/pKgYTgWbW9owEewTfXY=@vger.kernel.org, AJvYcCWx0rWimYCeffPPHIfEl0yGHUwL9NDTlTj7PgP70PZuwWb1B8zYiQc1/oxbLvaCdLI7ZKydBSni@vger.kernel.org
+X-Gm-Message-State: AOJu0YwiEtMLFYKda/YN2c0TNxPaqkk2W8pd1SEZXnoQvm+LP8PRhO9a
+	Ij4yYR9DwNWUlnqz48yLfYG/0WmHhe4W122GUj1T6XQjVrB/hAq25u1boh/FaWsTIyUZ4sSzLBP
+	hvlyYtjC1UhLC864+r5/bufWGX1DqSec=
+X-Gm-Gg: ASbGncvy14zBjNm3d6/TtI/fLLE4hBgLc1YVtiMcuuZmVCnKAZTeqDAqoOliXpbfiYP
+	NfZ4ejReJ/RXj+Mamw/FvnhRHSCLt7QX8pes5VU02aVWj1XEPcwQWd01T7n0k0waWFLKBflMavh
+	aAy/Gwyv3yluw7LFEnvx/opSJgo1BBO9aU0mN9OmT59TZkpgDz6qTbaVplsUDFki1yTdwMUnzZv
+	oB+RHb/pg==
+X-Google-Smtp-Source: AGHT+IFA/pxFwryEf96K2Gee5sUiTxsekg8JQt2ES6cbvDkaPIRTiDbHon0i4EFoC/ytGXXHizhyN6waHxbKULiUcvk=
+X-Received: by 2002:a17:90b:52c5:b0:31e:3bbc:e9e6 with SMTP id
+ 98e67ed59e1d1-31e3bbcea8fmr655973a91.19.1753097787776; Mon, 21 Jul 2025
+ 04:36:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250721031609.132217-1-krikku@gmail.com> <20250721031609.132217-2-krikku@gmail.com>
- <CANn89iLXMK0edE0xdZgD9aqLkGr32tOjOyyHKAnBbgCYhZt+jw@mail.gmail.com>
-In-Reply-To: <CANn89iLXMK0edE0xdZgD9aqLkGr32tOjOyyHKAnBbgCYhZt+jw@mail.gmail.com>
-From: Krishna Kumar <krikku@gmail.com>
-Date: Mon, 21 Jul 2025 17:03:38 +0530
-X-Gm-Features: Ac12FXycnAeoAkB3LuXJeIMXc6tO4PgAsAsLGuYmOdJVpO09EkYiNHTlhi4xRUU
-Message-ID: <CACLgkEbBFCoUBMu5x3Gezx8nihSnn3BB9cH51T3LahVii1FspQ@mail.gmail.com>
-Subject: Re: [PATCH v5 net-next 1/2] net: Prevent RPS table overwrite for
- active flows
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, tom@herbertland.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, sdf@fomichev.me, 
-	kuniyu@google.com, ahmed.zaki@intel.com, aleksander.lobakin@intel.com, 
-	atenart@kernel.org, jdamato@fastly.com, krishna.ku@flipkart.com
+References: <20250719124022.1536524-1-aha310510@gmail.com> <20250721083011.zesywxhisw435g73@skbuf>
+In-Reply-To: <20250721083011.zesywxhisw435g73@skbuf>
+From: Jeongjun Park <aha310510@gmail.com>
+Date: Mon, 21 Jul 2025 20:36:17 +0900
+X-Gm-Features: Ac12FXzfA_mMHbGFP-kfTY7ETFr-C3kCCGfIhbY2olDYnWYzNFUV6JbJROL59jI
+Message-ID: <CAO9qdTFwFpQh8O-sQuLDXj2eH7L_yBGTk6jdinZVGg9ShQtssw@mail.gmail.com>
+Subject: Re: [PATCH net v3] ptp: prevent possible ABBA deadlock in ptp_clock_freerun()
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, yangbo.lu@nxp.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzbot+7cfb66a237c4a5fb22ad@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 21, 2025 at 1:51=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
+Vladimir Oltean <vladimir.oltean@nxp.com> wrote:
 >
-> > +static bool rps_flow_is_active(struct rps_dev_flow *rflow,
-> > +                              struct rps_dev_flow_table *flow_table,
-> > +                              unsigned int cpu)
+> On Sat, Jul 19, 2025 at 09:40:22PM +0900, Jeongjun Park wrote:
+> > diff --git a/drivers/ptp/ptp_vclock.c b/drivers/ptp/ptp_vclock.c
+> > index 7febfdcbde8b..b16c66c254ae 100644
+> > --- a/drivers/ptp/ptp_vclock.c
+> > +++ b/drivers/ptp/ptp_vclock.c
+> > @@ -154,6 +154,20 @@ static long ptp_vclock_refresh(struct ptp_clock_info *ptp)
+> >       return PTP_VCLOCK_REFRESH_INTERVAL;
+> >  }
+> >
+> > +#ifdef CONFIG_LOCKDEP
+> > +static void ptp_vclock_set_subclass(struct ptp_clock *ptp)
 > > +{
-> > +       return cpu < nr_cpu_ids &&
-> > +              ((int)(READ_ONCE(per_cpu(softnet_data, cpu).input_queue_=
-head) -
-> > +               READ_ONCE(rflow->last_qtail)) < (int)(10 << flow_table-=
->log));
-> > +}
-> > +#endif
+> > +     lockdep_set_subclass(&ptp->n_vclocks_mux, PTP_LOCK_VIRTUAL);
+> > +     lockdep_set_subclass(&ptp->clock.rwsem, PTP_LOCK_VIRTUAL);
+> > +     lockdep_set_subclass(&ptp->tsevqs_lock, PTP_LOCK_VIRTUAL);
+> > +     lockdep_set_subclass(&ptp->pincfg_mux, PTP_LOCK_VIRTUAL);
 >
-> This notion of active flow is kind of weird.
-> It might be time to make it less obscure, less expensive and time
-> (jiffies ?) deterministic.
+> Every other lock except &ptp->clock.rwsem is unrelated, and I wouldn't
+> touch what is unrelated as part of a bug fix. That, plus I believe this
+> breaks the data encapsulation of struct posix_clock. At least CC the
+> "POSIX CLOCKS and TIMERS" maintainers in v4, so that they're aware of
+> your intentions.
 
-My first internal attempt had this approach (not submitted as I felt
-it was doing two
-things in the same patch - fixing an issue we are seeing in Flipkart
-production servers
-vs improving an existing function):
+Okay, I'll CC the posix_clock maintainers.
 
-struct rps_dev_flow {
-        u16 cpu;
-        u16 filter;
-        unsigned int last_qtail;
-        unsigned long last_active; /* Last activity timestamp (jiffies) */
-        u32 hash;
-};
-
-I had not considered removing last_qtail or its implication of packet
-reordering at
-this time, so I had both last_qtail and last_active in the structure
-(have to understand
-this better).
-
-and:
-#define RFS_ACCEL_FLOW_TIMEOUT (HZ / 4)
-static bool rps_flow_is_active(struct rps_dev_flow *rflow, unsigned int cpu=
-)
-{
-    /*
-     * Check if the flow is for a valid, online CPU and if the current
-time is before
-       the flow's expiration time.
-     */
-    return cpu < nr_cpu_ids &&
-              time_before(jiffies, rflow->last_use + RFS_ACCEL_FLOW_TIMEOUT=
-);
-}
-
-Please let me know if this approach is correct, and whether it should
-be a separate patch.
-
-Thanks,
-- Krishna
+However, I think ptp->n_vclocks_mux also needs to be annotating lock
+subclass because there may be false positives due to recursive locking
+between physical and virtual clocks.
 
