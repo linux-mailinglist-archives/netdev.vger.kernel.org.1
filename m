@@ -1,293 +1,148 @@
-Return-Path: <netdev+bounces-208667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A2E3B0CA21
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 19:49:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8328B0CA50
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 20:09:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E2D318943C1
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 17:49:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0773A7A3FD3
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 18:07:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81BA12E264B;
-	Mon, 21 Jul 2025 17:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26D9229A9ED;
+	Mon, 21 Jul 2025 18:08:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="rFuUQhTT"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="WKFj66y7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8417A2C08D0
-	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 17:47:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.158.5
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753120077; cv=fail; b=dMiOE5xfr+u+DmX+pbDIyx+6yjODB1gim6m5r1E28gduUzdoJC0cvx/QWJ64+EKVASCYv3IsWRgDeunNwHbcjYeD5pIBcWjGpN340Dpo0knO8CiN6jO6xdZqomykOSB5SRnN4omkbCm2H6sx+D7tVY8wZOW+/xzuTyCk9I04fTg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753120077; c=relaxed/simple;
-	bh=hAWvN2DJCqG6nGZY8spI11nhU423Fbx4P3wKcBkgT2E=;
-	h=From:To:CC:Date:Message-ID:References:In-Reply-To:Content-Type:
-	 MIME-Version:Subject; b=B8qTou6QkoQ7GW7px0o2/Xao5C0HJ+byrYNOZ6o8MN0WQq4QEBFk1VHTBmwub8dLCmUoajfSDdubicOV7G5Z/ZPv/voVx6WMR2QJ+1m1G1uhVaYLDMrF/CCUCwdevsXE/KRBQpyodb+JJTBXF0cPn3G8I67SMnZIh6S1fgPacO8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=us.ibm.com; spf=pass smtp.mailfrom=us.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=rFuUQhTT; arc=fail smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=us.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=us.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56LCBigK008818
-	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 17:47:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=OzH3H6
-	e8IBUIXPL5GfQpO0Up3XuIu8xRQWLHOUnuiuo=; b=rFuUQhTT9a7LP7FfNOuevX
-	8GkVLvA2XHkJDiP03Vlg8AdhO5ZpclHqspzFlAqGWIMrSm0WT4UhLWxvmaxgZEm8
-	Lj+SdE9zaKwbopdzZRiKBsq7IYzqdXK3IFePhc5L43RS84+NzZLs1i1dq/6gch7e
-	L+6HJtWSpWHqKAiM4gYNN4pfc7m8pPFRJv/27F7K91A+KwHDUSbti/znBOaK3zqd
-	qtwDvsFsMg8bDogZZiq2MbjEjmMe6f2aKDpJDw35vPEQ3h+jDbN6m3YJm83l2R8+
-	CPCGPxjRj63QP4aNZQOIKBIpwu2VqnFx3+yeVjEFIoolJwLQQpI8dQZh6/ZoyJ4w
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4805ut21td-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 17:47:54 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 56LHasCY010047
-	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 17:47:54 GMT
-Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10on2045.outbound.protection.outlook.com [40.107.94.45])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4805ut21t5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 21 Jul 2025 17:47:53 +0000 (GMT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=EgsPtIOTqEy5YWSbIUimR6rvIIClDDhRCHkfgzRL5UIfJr2QXJKg0lANhdELvg6u3so8GYhAyTt7rzccS8qtNuED42/GnlUIoITrsxW/YYPZEtY4j9Bez5X6UcEO9XN6Vo6RcDe0rNoaqb7A65mfzymDfx4cvLM/e0s4QwHNfJGh+FHb91AGoziTi+FliJEGuZ2QvMQczcCtH4kiPOAisntH3Tb7It7kNu4xzYc+MdKxNTiBWtr+ZLLl+1mmgf0CvTSyKYWbuQ+DK75d71qiBnP4s405VFxY9VQhQyy9h5WC0SgNzzoA3Rp/75trv+udh6zp8FS2kP0kObvwDXrTZg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Me1mPWQn5mWDuW3oR5DUSNg8ZF5ZHBQ+oz8ojpc1OMI=;
- b=X0Bsi/0Ay3TfAy/I39eeqtiW2rvGaSYre4Ssbkrv6W7vtB9AoMTULy2DZUSawM/OrcFUPE9YFnvjvCeYJyeE1TvWnQqPQVCOgeNGS3mKnPW//9tDAVGEatCX6Ra/+Zno9FcB+VeIfc6R5bkwxMc3P+mTD8Oo4WkqwMiHvE8G9401Ki3shFwLwbVGAOw5abypobiJbU228uoFbQGeog7J6IK6jr3c5xqiMqz9ysadeyMJnJnncEu7p6cIo74rIXZDxNo7mEHbwcfxzX0X63gn/qy+4UPxPLFsxYDu9vOufCeHdXetz0YFP67iWXXNECeEMfz4zcVT7VJ01GbpIDsTmw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=us.ibm.com; dmarc=pass action=none header.from=us.ibm.com;
- dkim=pass header.d=us.ibm.com; arc=none
-Received: from MW3PR15MB3913.namprd15.prod.outlook.com (2603:10b6:303:42::22)
- by DS1PR15MB6732.namprd15.prod.outlook.com (2603:10b6:8:1ed::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8943.30; Mon, 21 Jul
- 2025 17:47:50 +0000
-Received: from MW3PR15MB3913.namprd15.prod.outlook.com
- ([fe80::a1f8:4258:a99:3490]) by MW3PR15MB3913.namprd15.prod.outlook.com
- ([fe80::a1f8:4258:a99:3490%4]) with mapi id 15.20.8943.029; Mon, 21 Jul 2025
- 17:47:50 +0000
-From: David Wilder <wilder@us.ibm.com>
-To: Simon Horman <horms@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "jv@jvosburgh.net"
-	<jv@jvosburgh.net>,
-        "pradeeps@linux.vnet.ibm.com"
-	<pradeeps@linux.vnet.ibm.com>,
-        Pradeep Satyanarayana <pradeep@us.ibm.com>,
-        "i.maximets@ovn.org" <i.maximets@ovn.org>,
-        Adrian Moreno Zapata
-	<amorenoz@redhat.com>,
-        Hangbin Liu <haliu@redhat.com>,
-        "stephen@networkplumber.org" <stephen@networkplumber.org>
-Thread-Topic: [EXTERNAL] Re: [PATCH net-next v6 7/7] bonding: Selftest and
- documentation for the arp_ip_target parameter.
-Thread-Index: AQHb+CplwNRQMj38hkSi0WfLDuwVmrQ61FsAgAIGEgY=
-Date: Mon, 21 Jul 2025 17:47:50 +0000
-Message-ID:
- <MW3PR15MB391369040A414B4AED6F5301FA5DA@MW3PR15MB3913.namprd15.prod.outlook.com>
-References: <20250718212430.1968853-1-wilder@us.ibm.com>
- <20250718212430.1968853-8-wilder@us.ibm.com>
- <20250720103752.GT2459@horms.kernel.org>
-In-Reply-To: <20250720103752.GT2459@horms.kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW3PR15MB3913:EE_|DS1PR15MB6732:EE_
-x-ms-office365-filtering-correlation-id: beafb815-b067-453f-beda-08ddc87eb656
-x-ld-processed: fcf67057-50c9-4ad4-98f3-ffca64add9e9,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?A7x/ScYlqSWgfj8SGOFC8TypiTdC9Ua3PH93TsWIDWj+myyQHvhvS5PXQu?=
- =?iso-8859-1?Q?QUYdQFPOJUQizj17Qt2TA2CDQi1kJgIdmRYxRgwo5cTo8Q1AyqLKXlBZDM?=
- =?iso-8859-1?Q?Lyg8t3FL4r0ehbYaTiWEmve6Rfzn4veGSEK6PHRXnyMjXitxcQdIm5clwe?=
- =?iso-8859-1?Q?9lVM1cOlZeax/TYVVHWQ8BHP8Zy7FlOZ6h4QkEDWZkIMAmw05nECyUxjQs?=
- =?iso-8859-1?Q?vs3hXgiz0ZgJCkUKdYwZvWmJX8HtC0ydnOs6FE7jBSlmcT/PJJ8TyMQS9q?=
- =?iso-8859-1?Q?zRcdN7x8f2bVcmJHXPqgFfSvFjy0O9ydgtOaSkSyu1ZSzPDduNdYq1Ct7+?=
- =?iso-8859-1?Q?ErVAF/GMd66OJ+cxaAV72/PU2WAvnhsh//5KNpTUX1y3OCza3Bj8UCI8Jw?=
- =?iso-8859-1?Q?Jhp15RlLEVUv5HlBPcqYwXajP9hYAltcqfisXwd+TxPm+odY5AouZT4nk/?=
- =?iso-8859-1?Q?2NL0fxPtjyVfizU5tAjUvmRw/trnvilXnELNtEVLT4phOouoqkzRzEwm5f?=
- =?iso-8859-1?Q?+5mitAB0kQNs/iXCEuo4TYlbbJcG6fqfi+Fp7lIvTvrDfqRE8rNF/PDLbI?=
- =?iso-8859-1?Q?cPPhLgN7ft+fdwFogV7KygZ/ZRBVno2rgO2NgEktnpHII8vVG+/W44Eyjt?=
- =?iso-8859-1?Q?uh6EQf+SWvZ4av9XexMi7tDDVirqNMh+EYD2xYwJO/xNslOmS3AfjyESip?=
- =?iso-8859-1?Q?sNJwmO7eSYh0w1nNmMSq7cYO0fZBUlY+I2zB/qdFe1meJbqpo9811/nVHS?=
- =?iso-8859-1?Q?gkdMhg4fa3ihptNb31ugPzQvj6oVG0N/ONYZ+H55mBGd6jz4tFofN0Lcxy?=
- =?iso-8859-1?Q?wEmn2QZzov7tlYYPnp3gsd3CpRpXz6/4Ea5Q4EEfWpD4Gapbj77OcwXTZZ?=
- =?iso-8859-1?Q?BcAFIBWNnKh94BHmxQJ+G+HF/JT4NUFcy1/5Egb9APugnjFtSWrhUhpLMA?=
- =?iso-8859-1?Q?D2G6Lx/FGJm5MSBoPNxOtFfc1LAtPcK8yPXk6FhXgxGpA8tG35BRb5xXM1?=
- =?iso-8859-1?Q?Ql03YkM6VmKDzlR+sYkJp4rEQjAakSGXrOjkPzzM+XCZoVA173bG3VRdBL?=
- =?iso-8859-1?Q?xctuP5WrA82ewF8+pTqEfiXCPmazg4g78wq5GUOLnxvgOolfw7vkdvw6zz?=
- =?iso-8859-1?Q?+iVGpx7JyxQj463GWfenY9XhQlYcI5OeCvZu1HjEq3Ialbum/clG+9OM55?=
- =?iso-8859-1?Q?w/OhoB3OIO+jpgkbBak8XQH/Wd/k1QyB2k1/o/ec7KzLiKqbwKjsRdxTke?=
- =?iso-8859-1?Q?v7JEEqpd/QRBt1VrwNVn6pIVSozSsURYnJNvz0bebxyEAqMsfP7hqwRkwZ?=
- =?iso-8859-1?Q?QjVQljQeZyagFBtkqKpVClcdqHu9RnkBVZCEB0iWKn96jZ1vsZBDdlWRmR?=
- =?iso-8859-1?Q?wg0Bwk2KbZeODc/OlwEXPDPkhHaMHuj8HmjJipHOEnEZsR3MqFx6yS/sO/?=
- =?iso-8859-1?Q?KUOuOzHFrkaUN4z/KoC8ZaXWujHS0VEqQCb8XRbiT/7xDf/NZ+r9nKmSJj?=
- =?iso-8859-1?Q?o=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR15MB3913.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?fHCYipI5NTKTJ+bRPEWkycDFEPFnPAGkU/Kz8OmI+mGFjnT9D+834CaRff?=
- =?iso-8859-1?Q?xplMcBqdTms1ZH05zFmDpijyhQ1AU7CaAR21jLzzvNv2DqE5NTUJKSKGbl?=
- =?iso-8859-1?Q?On9hL3S4gFXxhspIEK9Z5ZCJ2NhyuZUcW1pvtIf8FfaH0N/BB3twQ5xg9G?=
- =?iso-8859-1?Q?D/hPOAlFNWode6j3EJ+QE9yqBs3eG7qE8sFY8LmRaroGie32VkX0f6O41l?=
- =?iso-8859-1?Q?OeLm5HjGMrGTqt4JJ6p992TtoGawJvwqoOdUUhReV2n1qfRZHcySt9SBNi?=
- =?iso-8859-1?Q?yUEYMMCfBZXUo+p6TvcuDbi3fp5pX1Lw/R3Tt+ndPjAXmuV+ZIXp4Eu0z+?=
- =?iso-8859-1?Q?+oWJMlc5eW+27OE6Sg9glr1LdggrySAIR3h3hlwLk3RHpE1lYm757HPFCp?=
- =?iso-8859-1?Q?Uvdg2i/cntPXyPU+iYv4jB2034ZIZZsh0MR2glZLa016vTii9kmHCjShfy?=
- =?iso-8859-1?Q?38NjXkMwWk9zeM2vzEQpR14VwdxYqcQJzZUqs3e7S882i5c5BRT+x6jaDz?=
- =?iso-8859-1?Q?Co8Ea6Vpr1GzdtKUy0CmZ+X3TYBkTxCLP6Ds+624+am5FkRE+LR2gm6vUr?=
- =?iso-8859-1?Q?Y4r0w7R/suodkP+SWEQ4v3tFgC4UXt5VK5B6CTr2DHnAb8RrRfBSYuMQCX?=
- =?iso-8859-1?Q?Npnk2bb7mLwha53No+FTtPi7y++aB96Gd4v76JnLeLCb7VvhG2cH4i0XLg?=
- =?iso-8859-1?Q?qK3K05saO8W2I6n5sLoVLE6gmvn0toIH82xwgxHNtn314+u7SNbXup5CFJ?=
- =?iso-8859-1?Q?h4qfdB8qKwe1D3Iivo/0DVgVzRo472wwPrTL5fDQUpEgvOUuwTdq61ttuH?=
- =?iso-8859-1?Q?32l9c+sOJg5OrSNbj2OtlUPZDyCeEtYadBLLVwfNYOGxAzY7UwuxDamtG6?=
- =?iso-8859-1?Q?0kkCU1AFXD5rxBVCPMOpu6na0i91OhRj37xEiYCSgYfwo2cjXGnB016t53?=
- =?iso-8859-1?Q?Gc91zS9MD31PtFNGNx8xcvBRJH6BuZJ3ADUO08QGvas8oWtYeO4ku2/vBv?=
- =?iso-8859-1?Q?CPD8H4MClcUqRiu1ktN/PZZMfqDAYfsCTzQranVKrQptuWdIS2w9bBGDBA?=
- =?iso-8859-1?Q?fTkYtibqoUjcV5zxC+1T6i3UEChiu20FYAYfjgvOQlO3o8paxEAqnFsLmr?=
- =?iso-8859-1?Q?2RLO7murep2Y08qbt61Jkep8jIRwrIiZQG1sTirqcglx08xNI8X/rtku/W?=
- =?iso-8859-1?Q?/EHPWjyiieAFQ3px2uxcZf6ShqM5SP7OIm8lAX3iLIDKb/ibMhpHr5lbID?=
- =?iso-8859-1?Q?48smULdHvukVSKFZigE4rvsjn31fKsJawp472buSncOukpiVA1FsjrtVgO?=
- =?iso-8859-1?Q?1NZVjV5sERVTZbM+5RVk+GopGXC0zp59j+nTSQfCvAOvnxz7q+dda+gI6X?=
- =?iso-8859-1?Q?WEQlohzRSFyY9zqjZrAzNp1f9QvUdvwgDs3hO9WTYt2+yt7uiyyi6GHVfB?=
- =?iso-8859-1?Q?mqmFqHna3huuPgF2Wcqd0Kj9FfV0lJxxt1+yZGJ8MFFVLVxt/GXd3HfEeh?=
- =?iso-8859-1?Q?SrPBtMXpXv0YdXPbzASyvstBeDk7z6xMGyNB9yDmAGy61gUcb9z2adw2Fm?=
- =?iso-8859-1?Q?lMUajKhaiMEuRz7qhZ5DFXobm8osLosSMwCF/Xa/eU61zq5q/CSYMuPBJk?=
- =?iso-8859-1?Q?3x91oBJx89Fs8=3D?=
-X-OriginatorOrg: us.ibm.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW3PR15MB3913.namprd15.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: beafb815-b067-453f-beda-08ddc87eb656
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jul 2025 17:47:50.6600
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: fcf67057-50c9-4ad4-98f3-ffca64add9e9
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: SRiLn8CRAOf2d2PWljFjohxf/jhL7gN/wLfZ1Mpx195sVitpTtrWG7w8K5QLkHnbFJsAz/e7dGQla9M/tqKLSw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS1PR15MB6732
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzIxMDE1NyBTYWx0ZWRfX/FPsBzonqG2A
- aoRik60SE9VV3JCC7YimefRUUHAD0vrbVmbzqimJLGUh1DP6D4+ZQ8PcfmzhVSldxlq0LY0+CK8
- uxYwSQS6KMZYF4gA1vJ779igQWFg8Mn+jIkMoNuPqVYJxOXYOlFYl+ZAucDwsZYZNeN5pGCT04H
- 0Ql2KiWZjyUScYd91fh4CZqLRdXD1VrMfM0ygIKBX9toQpIe4R7s8oD48jxZUyQZLh60yFmiqkQ
- CmEgFQlKtR+UyxWht8lPntK66Mi/lX4aB/u/cqF4HXMYmByFA5oHzikXnypbdclaoU83pFTOdUr
- vZbPT4h8WgHqnZpy/iU5BFioWft/xRoGfJOy7Tr1tcjPuTLEO5QtawU27K9IgU6/oQsnZMDuZTW
- DJN2ldTaTPgObxOUnqKIivKD32FRxVprjZpV6kY7YSt7MQX2YjFDlPVBsz/206fW7LR9BUZs
-X-Proofpoint-ORIG-GUID: LKDGUqboEHe5MV_eCK35nduckFmODDr9
-X-Authority-Analysis: v=2.4 cv=cIDgskeN c=1 sm=1 tr=0 ts=687e7d49 cx=c_pps
- a=MPfW0GtrrVyaQwIB9FVG4Q==:117 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
- a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19
- a=QtvRY4xpf1MSlWN2:21 a=xqWC_Br6kY4A:10 a=8nJEP1OIZ-IA:10 a=Wb1JkmetP80A:10
- a=H9VqmB7XAAAA:8 a=VwQbUJbxAAAA:8 a=2OjVGFKQAAAA:8 a=VnNF1IyMAAAA:8
- a=P8mRVJMrAAAA:8 a=jZVsG21pAAAA:8 a=ZIorKJXxz9Hzxp-OjtwA:9 a=wPNLvfGTeEIA:10
- a=v3k57InNul7ldpsxCyLV:22 a=IYbNqeBGBecwsX3Swn6O:22 a=Vc1QvrjMcIoGonisw6Ob:22
- a=3Sh2lD0sZASs_lUdrUhf:22
-X-Proofpoint-GUID: LKDGUqboEHe5MV_eCK35nduckFmODDr9
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D4F2E093C
+	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 18:08:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753121305; cv=none; b=cRWo4FdCsnllcloIZ2876vZAEwwgSkKl/ESbWyUQHVIwhudYsxtAgEsFW68hrO3dGJOhwcSPRZWIlf0PNUfDnhjWcLRrcGkNTfrST6GO/88XiVeot6E6oOexPOtFdHQZfTmDTcPDmovmQYcqIKCPlcyr21jCNJVsXnEa9T01sfs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753121305; c=relaxed/simple;
+	bh=92+Q39EW0fbLTpEgLkOhiI/YwGHlNATxM4RpKtbF9Vk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YRPPLCtfqzHq0w684auFNkEOo+WhdqXc80qLzuEMpsk5FyVKUseZfeU9qvk4DImwewjBfAy+fe7XXz+HmjDDs6iKO+52b/YXmuMsuyMTILRQdrF0TRfMcWaNAT6VjiG2/8bO1gTOtJiWWrzZsXKFOqSZcNI5z1nYHcD4g3oMgWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=WKFj66y7; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-748e63d4b05so2771252b3a.2
+        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 11:08:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1753121303; x=1753726103; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OQau27tiFbgxeFSGF9XUGR95YzgyQaSOU0OlzzUWZMQ=;
+        b=WKFj66y7fg08NTjqsExRyN4/HYJvmzOjn1pjVz2G4vIdrbJ3yYAoN+PG7BBbighft7
+         C/gcsYy118Qz6nafIvPSWZ7u+W3Lft1TtzM/qQfhlnkHyXC+WqgKW8wZy08EBjxta/dA
+         1dm03V9nqZbU6XK0Ei6e40HVKqer0G4YrQMx8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753121303; x=1753726103;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OQau27tiFbgxeFSGF9XUGR95YzgyQaSOU0OlzzUWZMQ=;
+        b=PdWKtmZ2vlBnNajqBTBQTYHGwmvZkW7U+Ynl9BY7oPfVnzjyJX+hGXATIq123HlXB5
+         Ajc49cEOcMXnD/mpO2phyPIxycjTrp0gVhEzSCwWhNqwnpJlYh3yCwl9t9ujh8rQ4XuJ
+         /KafNNLHc/QIH2vSxohZr7Nyawp/kAQzuMHbZ5jGl4z2BbS+AudyiRMPC+BMfSpVDENI
+         fSBiXeGP7i6lNvuBtXFQIFKwnUVxaC1YbzRLTfXrim371CqNdFlGs3sVQ/FGXgSKj2gm
+         rh1Q9Y4zTSXlWjjerBL+aWHcU08iS/3v29qxIZHC/e5esjynIVsvpGhfdf9uaURlAMgF
+         gcig==
+X-Forwarded-Encrypted: i=1; AJvYcCUSR+zxoJV5YGop8nMCSrw6mNlb2a40v5u8oSAYhauRKsiEjcJPDX2fgeNk/BvfZ9bSHJUiwz0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyiybwcW8UBIPY+ZIHa/ITNviAOlkytn18tSZiqbnpaM2Dgl08V
+	kxj4GEwxj8qv75OaCzCFOBBr9HzP2ZSovXal+hbF56LRJA6HyHaoK3lCNh1GZ8iSFQ==
+X-Gm-Gg: ASbGncvI5+2uB80h0mBPWtkMzebIdqA5uYLv99GZOvqbW9QPy/2bXEznStU/OoljH8e
+	E81IPp/xBmErsXsmmr34bqyqycSNwyon2gkvFHh/OjKc1VwPCl1gJsEYcVz+Wi5kk1zZtQQWmwB
+	1rparj7EUKHIjEsEeRBkDmWYDqfWSI4KyMHIkhUpKTppR0Dvf0bBY1UOpg4PiI9ok8Rz15LN+4n
+	MzXYxD5kTWUwKkshBrDZ50/56D2avdzNmIbfYoyyUrJ6tU1IvwLkT2sS3rZxt9eLArdIJtJKssL
+	cLyQv4ue5XkhlVhx58/4w0howcLacA2yfmr2n6/vPhJoR7TD2G5M8s9t879yip206z0j7UXcwKq
+	VFIjUOH1b9Kp5YexlCFwRP87f7Fgb40AcY+RAh9dK9z20ybfOQZEHoaMbdYMOsUm2f8Kx0h/+Q/
+	+w
+X-Google-Smtp-Source: AGHT+IH3Pl8hly1TQfln2anufJFdUC5B1Ir4HZCUoycIdoSWzeF9avLSYC/Imq9DCATPu80vE9gR5A==
+X-Received: by 2002:a05:6a00:4b43:b0:749:8c3:873e with SMTP id d2e1a72fcca58-75724876b0bmr33128549b3a.24.1753121302713;
+        Mon, 21 Jul 2025 11:08:22 -0700 (PDT)
+Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-759c84e24c8sm5845796b3a.15.2025.07.21.11.08.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Jul 2025 11:08:21 -0700 (PDT)
+Message-ID: <7bebb6b5-d527-4621-9438-8a8d0ab9d970@broadcom.com>
+Date: Mon, 21 Jul 2025 11:08:20 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: RE: [PATCH net-next v6 7/7] bonding: Selftest and documentation for
- the arp_ip_target parameter.
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-21_05,2025-07-21_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 mlxlogscore=999 mlxscore=0 spamscore=0 suspectscore=0
- adultscore=0 phishscore=0 impostorscore=0 lowpriorityscore=0 bulkscore=0
- priorityscore=1501 clxscore=1015 classifier=spam authscore=0 authtc=n/a
- authcc= route=outbound adjust=0 reason=mlx scancount=2
- engine=8.19.0-2505280000 definitions=main-2507210157
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/4] dt-bindings: net: document st,phy-wol
+ property
+To: Andrew Lunn <andrew@lunn.ch>,
+ Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Christophe Roullier <christophe.roullier@foss.st.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Simon Horman <horms@kernel.org>,
+ Tristram Ha <Tristram.Ha@microchip.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20250721-wol-smsc-phy-v1-0-89d262812dba@foss.st.com>
+ <20250721-wol-smsc-phy-v1-1-89d262812dba@foss.st.com>
+ <faea23d5-9d5d-4fbb-9c6a-a7bc38c04866@kernel.org>
+ <f5c4bb6d-4ff1-4dc1-9d27-3bb1e26437e3@foss.st.com>
+ <e3c99bdb-649a-4652-9f34-19b902ba34c1@lunn.ch>
+ <38278e2a-5a1b-4908-907e-7d45a08ea3b7@foss.st.com>
+ <5b8608cb-1369-4638-9cda-1cf90412fc0f@lunn.ch>
+Content-Language: en-US
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+In-Reply-To: <5b8608cb-1369-4638-9cda-1cf90412fc0f@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
 
+On 7/21/2025 10:07 AM, Andrew Lunn wrote:
+>> Regarding this property, somewhat similar to "mediatek,mac-wol",
+>> I need to position a flag at the mac driver level. I thought I'd go
+>> using the same approach.
+> 
+> Ideally, you don't need such a flag. WoL should be done as low as
+> possible. If the PHY can do the WoL, the PHY should be used. If not,
+> fall back to MAC.
+> 
+> Many MAC drivers don't support this, or they get the implementation
+> wrong. So it could be you need to fix the MAC driver.
+> 
+> MAC get_wol() should ask the PHY what it supports, and then OR in what
+> the MAC supports.
+> 
+> When set_wol() is called, the MAC driver should ask the PHY driver to
+> do it. If it return 0, all is good, and the MAC driver can be
+> suspended when times comes. If the PHY driver returns EOPNOTSUPP, it
+> means it cannot support all the enabled WoL operations, so the MAC
+> driver needs to do some of them. The MAC driver then needs to ensure
+> it is not suspended.
+> 
+> If the PHY driver is missing the interrupt used to wake the system,
+> the get_wol() call should not return any supported WoL modes. The MAC
+> will then do WoL. Your "vendor,mac-wol" property is then pointless.
+> 
+> Correctly describe the PHY in DT, list the interrupt it uses for
+> waking the system.
 
-________________________________________
-From: Simon Horman <horms@kernel.org>
-Sent: Sunday, July 20, 2025 3:37 AM
-To: David Wilder
-Cc: netdev@vger.kernel.org; jv@jvosburgh.net; pradeeps@linux.vnet.ibm.com; =
-Pradeep Satyanarayana; i.maximets@ovn.org; Adrian Moreno Zapata; Hangbin Li=
-u; stephen@networkplumber.org
-Subject: [EXTERNAL] Re: [PATCH net-next v6 7/7] bonding: Selftest and docum=
-entation for the arp_ip_target parameter.
++1
+-- 
+Florian
 
->On Fri, Jul 18, 2025 at 02:23:43PM -0700, David Wilder wrote:
->> This selftest provided a functional test for the arp_ip_target parameter
->> both with and without user supplied vlan tags.
->>
->> and
->>
->> Updates to the bonding documentation.
->>
->> Signed-off-by: David Wilder <wilder@us.ibm.com>
->> ---
->>  Documentation/networking/bonding.rst          |  11 ++
->>  .../selftests/drivers/net/bonding/Makefile    |   3 +-
->>  .../drivers/net/bonding/bond-arp-ip-target.sh | 178 ++++++++++++++++++
->
->Hi David,
->
->Recently we have started running shellcheck as part of our CI for Networki=
-ng.
->
->Excluding SC2317, which flagges code as unreachable due to
->the structure of many sleftests, including this one, I think it is trivial
->to make bond-arp-ip-target.sh selftest-clean.
->
->As I see there will be a v7 anyway, could you take a look at doing so?
->
->  $ shellcheck -e SC2317 ./tools/testing/selftests/drivers/net/bonding/bon=
-d-arp-ip-target.sh
->
->  In ./tools/testing/selftests/drivers/net/bonding/bond-arp-ip-target.sh l=
-ine 133:
->                  if [ $RET -ne 0 ]; then
->                       ^--^ SC2086 (info): Double quote to prevent globbin=
-g and word splitting.
->
->  Did you mean:
->                  if [ "$RET" -ne 0 ]; then
->
->
->  In ./tools/testing/selftests/drivers/net/bonding/bond-arp-ip-target.sh l=
-ine 160:
->                  if [ $RET -ne 0 ]; then
->                       ^--^ SC2086 (info): Double quote to prevent globbin=
-g and word splitting.
->
->  Did you mean:
->                  if [ "$RET" -ne 0 ]; then
->
->  For more information:
->    https://www.shellcheck.net/wiki/SC2086   -- Double quote to prevent gl=
-obbing ...
->
->
->And sorry for not flagging this earlier.
->For some reason it seemed less clear to me the last time I checked.
-
-Hi Simon
-Thanks for flagging the shellcheck errors.  I apparently had
-installed old version of shellcheck that was not flagging SC2317
-or the un-quoted $RET.  After upgrading to V0.10.0. I see them now.
-I fixed the $RET issue and added # shellcheck disable=3DSC2317.
-Runs clean now.  I will update the test script for V7.
 
