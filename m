@@ -1,113 +1,303 @@
-Return-Path: <netdev+bounces-208528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24544B0C01F
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 11:23:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9ADBB0C035
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 11:25:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D33163C0F6B
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 09:23:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 072BB17D2A4
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 09:25:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E97B528C84A;
-	Mon, 21 Jul 2025 09:23:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65FF8289E0C;
+	Mon, 21 Jul 2025 09:25:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KOMVstTG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N4O537Am"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCCC528B4F0;
-	Mon, 21 Jul 2025 09:23:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753089814; cv=none; b=pZOpNOs8l+hKOYYr7ib4usmyhmtnnTWMK+nNL9Y6FQQbcIOikFUpsgpmceY8pNcBhVsiQ1QDJy0HzZZ3bX4p1Kb3X79C/88awDVDqaqch1dtxmKNsB6B4t9qS9OJK+Y4O9yKxSEhB7RMAH9rkH6SsYBFe906ZQ9x3uYLLt73qLc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753089814; c=relaxed/simple;
-	bh=uxjP2gEJbOBmQlv81I1IvKh2j8a6dIhhumYLQw1WC38=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jm/5OcDF9GJl/zknxE+o6TpHX6hI/EydTuIimK4682wrpL2beR57lSbYspMHpfYos9tmAjOpwXehbOtcSXIg2Mz0t7SkqKyuDyXVoFEFq+POSPKH6co+ZPbwLZxZuaehLQpkYBN3SZBZvnhdxX8VsT1nu8p8LDs8acn6F5yGNZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KOMVstTG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCD45C4CEF1;
-	Mon, 21 Jul 2025 09:23:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753089814;
-	bh=uxjP2gEJbOBmQlv81I1IvKh2j8a6dIhhumYLQw1WC38=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KOMVstTGQRd2VVqlltIRirx/UjZsTgs+tGRJ2vk9tPMTNIthsL3LwKRCl2Nzc5gQS
-	 NrTF7WBojA/mhex9+9B1H3irU+dS0N6T/Hsj4GjMrd+OMH1CNCbVPMSegQxqTDKiWG
-	 Wf/jyUwF46O8oJacFEjy1aj/5y3TCAfTyiaiWfkEqePtk6vrP7e2TzRpFmj3QrJ8KO
-	 ISLrGoW1tBPlYRw4MCfyPRB5TJasGkxQD/shwa2ekiT6uZuelmmtimiIDrdEWAdsn5
-	 zZKjzFto9RUnrtypGKGECkudk5+Ba+or3Z6h9hrVKhtVleG3svcxI4WsmyktbWWm4k
-	 xFJWfSDwX8aDA==
-Date: Mon, 21 Jul 2025 11:23:31 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Prathosh Satish <Prathosh.Satish@microchip.com>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>
-Subject: Re: [PATCH net-next 1/2] dt-bindings: dpll: Add clock ID property
-Message-ID: <20250721-lean-strong-sponge-7ab0be@kuoka>
-References: <20250717171100.2245998-1-ivecera@redhat.com>
- <20250717171100.2245998-2-ivecera@redhat.com>
- <5ff2bb3e-789e-4543-a951-e7f2c0cde80d@kernel.org>
- <6937b833-4f3b-46cc-84a6-d259c5dc842a@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F4964A0F
+	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 09:25:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753089906; cv=fail; b=UZAK6brZk2lEqZs7BI9V9fJ1vcPjaon2gRChtocZImn9mUxUuIKS/0MuVN8w92nCXA9ZEXehcuDIRT0PIXanGlXfdL7lmAzE42icPtM1WdnvlKG/g/SjVKI2AT4R/5rINTjJqf3v8Q2LKQquIn+KsBLoKCVjPMkjnx0rNSQHeCc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753089906; c=relaxed/simple;
+	bh=Axx4og4h4Yz2wOemaWYFPbzuR+IaimivCNdtOaHdLaA=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=SgkMEJXVbUfP7yMujGwMLK96kRT0JaAm05lKzfSeRtuFwcpLH0vKRi4wQ4Qc2RdLFeBpTZbZB8aUfcppaZjP8hupAz6/7XMmSzeCCUNw5yFLI8kPlW68VmS8DlxA6u7G9StgFteFL8w7J3aIR+FkaQyff8OAetNVgBGDE7LRfCE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N4O537Am; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753089904; x=1784625904;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=Axx4og4h4Yz2wOemaWYFPbzuR+IaimivCNdtOaHdLaA=;
+  b=N4O537AmCsJtxtQAAKF7nwUWZ05wTojBk6pcuDyQm0DBPCNPKnDFfT5N
+   k2gsxQUQHah095UsB3aUv3wSxh3imDB7dIRsieAMyZEVdN9AHZf3M/e8r
+   ZkvVJjEVvjvCSDDpBug1aV4eom0gIRWTTr/As8sQ0tbvEZnxgW4viDZGT
+   EkflvDLuarCys1oCQT5hTjfhcImxN4ymdoQXijotbfSreXpBuBHMVlKkw
+   +/OUQdi2KO4T4hvjkr3NnEZmC+rdLvPpU5W3S/qrI3YwbElKgZyzG1lHd
+   AZ3800giQMnx3nVwjoMnPBsKKlCKsoeDZ0XyRt79I7ZLaYf1A+6gxwguP
+   g==;
+X-CSE-ConnectionGUID: GUpq4/xnTdaA3fs138xnVA==
+X-CSE-MsgGUID: YUH7r5cPS/aMLdYFLTCXBg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11498"; a="65558176"
+X-IronPort-AV: E=Sophos;i="6.16,328,1744095600"; 
+   d="scan'208";a="65558176"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2025 02:25:04 -0700
+X-CSE-ConnectionGUID: z3gAaeK1SmeWmgsu6MnsNA==
+X-CSE-MsgGUID: g4ay1Lc+QfKqjoVbyUpFkQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,328,1744095600"; 
+   d="scan'208";a="182492118"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2025 02:25:04 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Mon, 21 Jul 2025 02:25:03 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26 via Frontend Transport; Mon, 21 Jul 2025 02:25:03 -0700
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (40.107.102.73)
+ by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Mon, 21 Jul 2025 02:25:03 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=n4o2Vl8IEFJjjKbfyJzN7uhoNAWXqiZXahP+PAhjoeLXZ69zrmOo2RBh+P+m6KTCp+8AZVR4RKxOunEEBDHgg8uOggL/z/dUhcNG3c81Q9a9vrJpb/V4jMOFCRl4AjQv28311JmZ0qDVoFZCBptdhcy8KVAP0DQK/g5MvsN/JcrSm1a4Z156RZjXFlDULYfOpwBy5Au6CiAt7JzI2PObkwEl+Pn6HudiYnlCMrqYydN6v5OsA+eLWuT+wBMouquQMxwvP1HxuiG37nAvCHquo8XZZafVyRoYmODUiqrpTBGzYDDKmN/hSFG+xejTJdmAQeGpF25at4PRVpz7qhOgHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hjYha4zoBWE5EB3I4/+VU0TE+00fk65mmBBZ4ulQA24=;
+ b=D18TzEsBXMfxdqmrLfSB2O/Ix71fu6C45KtciCQ+PDAgmhxgHVu58Z2IadriYO6J9q0NpzaWUxazPn/9sNA8SgaXgygGtlqkYl/CFoFEJpDV0RAFvAUXwjJzHQURxXDzMi6goToL7qsTKP+shVP2ljoXre0ierriLLSOOpt5W5x8Ppbko3eLptlHrGNDtE550Bt9Bm3hDqFWxaUI0TMYgA4xK7K9v8OscDR/PgrB23QBAwXoVZTIEZcLzJRHL26Yqms0hxWAsWUnzHNHXJkk1tZKYTr7V9UFx42EfvoYxJDHjOln3Uk/udi0BrPFWXK3OpJ5UzH/fNH5TSheTVCGNw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
+ by DS0PR11MB8052.namprd11.prod.outlook.com (2603:10b6:8:122::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8943.30; Mon, 21 Jul
+ 2025 09:24:18 +0000
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::399f:ff7c:adb2:8d29]) by SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::399f:ff7c:adb2:8d29%4]) with mapi id 15.20.8943.029; Mon, 21 Jul 2025
+ 09:24:18 +0000
+Date: Mon, 21 Jul 2025 11:24:06 +0200
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+CC: Jakub Kicinski <kuba@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	<przemyslaw.kitszel@intel.com>, Maciej Fijalkowski
+	<maciej.fijalkowski@intel.com>, <intel-wired-lan@lists.osuosl.org>, netdev
+	<netdev@vger.kernel.org>
+Subject: Re: ixgbe driver stops sending normal data when using xsk
+Message-ID: <aH4HNquLzjagCLeX@soc-5CG4396X81.clients.intel.com>
+References: <CAL+tcoCTHTptwmok9vhp7GEwQgMhNsBJxT3PStJDeVOLR_-Q3g@mail.gmail.com>
+ <aHohbwWCF0ccpmtj@soc-5CG4396X81.clients.intel.com>
+ <CAL+tcoCJ9ghWVQ1afD_WJmx-3n+80Th7jPw-N-k9Z6ZjJErSkw@mail.gmail.com>
+ <aH3rRHm8rQ35MqMd@soc-5CG4396X81.clients.intel.com>
+ <CAL+tcoAQF_Aom4dn--RQzowiUO1haNPw=_Rzw2C7MJRF_sSUOw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAL+tcoAQF_Aom4dn--RQzowiUO1haNPw=_Rzw2C7MJRF_sSUOw@mail.gmail.com>
+X-ClientProxiedBy: WA2P291CA0044.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1f::20) To SN7PR11MB7540.namprd11.prod.outlook.com
+ (2603:10b6:806:340::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <6937b833-4f3b-46cc-84a6-d259c5dc842a@redhat.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|DS0PR11MB8052:EE_
+X-MS-Office365-Filtering-Correlation-Id: 814d1992-c2cc-45f7-2d51-08ddc8385e62
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|10070799003;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?YjBnaUI5bkhYRkx0RStXZVkwT0dhSy9yRk1Edk1HVkptR0xSZVVLeUNIa1VD?=
+ =?utf-8?B?MU8rUUN1Rmd5NTEyMTJyOEtiTkwycStqQmwzYWtUbFg3KzVVcHpvdDdHSE9G?=
+ =?utf-8?B?RHE3NnVzU2RON1JlbUJmZE0xdU11M0xvOXZYUTE5cHdnZU8xb1YweTVLOGVK?=
+ =?utf-8?B?dVpaaEFMYWlsTG9INXA5WG41QzJVYXRseTZqNmRvQlBEKzg5ZWdzVisvK2hT?=
+ =?utf-8?B?UjkvZHNQSWN1ajNyZUVWSk1nSjVXWmt3bVFaWmJtVHNDbmJ1ZHpKN3grVC9a?=
+ =?utf-8?B?QjVSbkI4eUJWeHp5UmcxSFNPZFByMS9TRGhHZU5yOEc1K3JYNENwQXpCdk9l?=
+ =?utf-8?B?V0tDM2lFNGtvOStUWmpjZTB4OXZ0blZEVVFLT21POTBIVXJvWGdaaENsSnlT?=
+ =?utf-8?B?VzNkR0lVdkRZc051RnZDMGh3Mzk5QTg2b0c5dkdWWWVGVk9HZjZhUWNLTFdK?=
+ =?utf-8?B?SGQ3VHA3ZE5BUkkxSVZCV0lHbVhiOXd1R2sxMkp4K1hrZHBrWURqRmN0b3Ji?=
+ =?utf-8?B?Qk5ZbzQ5NmRqMGdiOW9CRGNrdFo4ZStOWGxVUHEvNzcyRklaZkMyU3pHbmds?=
+ =?utf-8?B?WDVqQmxseWJmZUtkS1JaOGM4bWpNanlNNWdIOGVTSE1ZdXBSTGI4NHBrK0ds?=
+ =?utf-8?B?TjNpZnV5SEJlOEJNbHU2eG9QeFVjSEtMbEpSSTJSQUh2aEdsRk5OR2trOHFP?=
+ =?utf-8?B?ZUUzUzl1Q29vWCswR0E1MEthRGdNSEFHc1Z3YlNPMEtEQXRRMG5FUjZLZGky?=
+ =?utf-8?B?TURGeG5rVVErUFdYUEU0VWRLb1lnd0kvSkRIUmlqOEt3eVhzYnNpMVY2b3Vv?=
+ =?utf-8?B?YnhXQTJ5TTBpR2tzbTdQNkc5QlY1ZkdIbllLZm83c1NnNE9hV0JGWEYzUHFW?=
+ =?utf-8?B?N3ZaQ2k5bFhFQmVvSkFiRHV5VUJwaFV3Uy91dmh0c0k4andDTWJYRStmbG5o?=
+ =?utf-8?B?eWgxQ3FuUjNXVXVvZDkybUpMcnh3NHFKQjhYdFEwcUwxUlRRNzdjRHk2eHc1?=
+ =?utf-8?B?enNkaWRpK2VFOUxZaFRiVHp5M0Q1M2IwRFRmd0dCNFY1UlVXWXNHa1F4NnV2?=
+ =?utf-8?B?RFEzUjdxZ2JkM29RbytZajRZZTVudGswREEwOGYwSGIxejE1eUxUdjZpMStD?=
+ =?utf-8?B?T2JlS2RobmpSZVk2N2xEQVJOZ2tqM3dDQW1vbTdPVjk5UE94Wk1iRm5hTERG?=
+ =?utf-8?B?L3RRejJvV2RiMnkwVjBGOThaNVdEQWlkQXNtT2k3ZStRdzZweUpTNElBcTRK?=
+ =?utf-8?B?YlZDLzZ2QWdISmVINWhCZXl3SGRoQ3Zjc01rQy94QnVMeWFVNzV5UG9LN3Qx?=
+ =?utf-8?B?ZWYyY3EzY2FYWXRLWnpFM1p3UWJiZFFqL2E3M3hHMlZ0bGhYWUVhSmpxMURS?=
+ =?utf-8?B?Z2pPa2ZHWVJ1L0U4aXVjV0RaMzZBdEVDUjRhYm1rVkxtVGMvby9MZFBDQXN1?=
+ =?utf-8?B?MmJCK0paWDJVb0hpNEs0Z01tMy9GakVBTXpWekV4YlVyM3M0b1RWaW5VOXNj?=
+ =?utf-8?B?dkRFdlZlRjN5WG14T1BaUHV1RkpMSi9RTEhhRnR2SEVWMS9MZ2p1Mnp2c0NR?=
+ =?utf-8?B?WXFKQ2ZscXpUeW92WUwrZlhIWWdrN3JPYk4wa1hCNU02NnN6SzVlMzRHZW9Q?=
+ =?utf-8?B?TmhhQTBBT3VPR3NJZ3dqMFBmMWhYV1JPVUw3UDRXOE0zVUJ6T29qZ09QNTFT?=
+ =?utf-8?B?bm9Tcmk3TnRTTG1DaUhYd1g2Q3RROUdTWU9xQllzM29zZzVCM0NqcklWOWVG?=
+ =?utf-8?B?MjlpMzFNVVVmeEM2RVl0OUdlU3o2bEtpN2FMMjVLSGFSY0NTN1AvU2ZMMUdk?=
+ =?utf-8?B?dUc0Q1h1K2FMY3QwUlhNZmdlUGxPRGxmd3p6L2pxQStZb20zcytzaUpXUVFa?=
+ =?utf-8?B?L1dndzREWG5uS3dzczFJa3pqQjhnSVhwdklqSWg2VHR1R1E9PQ==?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(10070799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UXBzNi92dUkxMTQ1elpPMkRlRmpWWGI3VWsrN3k4dlJjeVhhZ29zRFhxT3ky?=
+ =?utf-8?B?K1FnejlQUWt1Zzk0YlY5aTVVWWdXQTNGTU9jOWRHWHoxMk5IeUlLVFFDSUFx?=
+ =?utf-8?B?M3VqR0ZPL3JoVnNlWDQxT0YzbnExSjlndmdLTnNUUXRXVVEvNjN3a29RdEUw?=
+ =?utf-8?B?c2lveGRLbWU0Y2Jucjcyc2E4NC9uL0RUVERYdzRqZUY2ZkRSbTViRUtSSTNL?=
+ =?utf-8?B?bExZV2xWNlNnMTF0UGtQZkYyeTlRb0l3b1JVYUpoRHNaNE92UE9NUTA5Q0Fn?=
+ =?utf-8?B?SmxQS3h4Yy9YZGszdkE1UTVQVDdNdkxWaXpxRjR6ODh4L1ZlbWJEODdsU2RQ?=
+ =?utf-8?B?U1NlQ01nY1ZPK3RFTFhEa0k1eXd0UXNDdVJPYjRxd1ZrWTBhUHYvc1UzWmdV?=
+ =?utf-8?B?TDFaalZsZ0NxTlVxVlBRL3h0amxhRXB1Y1BodWg1cWRYYm4rY2N1MVhuV2pt?=
+ =?utf-8?B?ZllDeWNCWGFmWHROR21LdzFrN1VBMElVSDFCTmprQ3FtRzhvL3NtUWtVQjNv?=
+ =?utf-8?B?QTFMeEN6WHh0YmY4T0o3djhuV0dyWTZzVUgxa3JRNDhheWVzTms3WXpkL1kv?=
+ =?utf-8?B?c2djRjBtSktkSUlwNXZNU2NMOUVZLy9mNTRNU0pwUlk2UWVJUndueEZMcVNJ?=
+ =?utf-8?B?ckRmZkdVdzZ1ckQ5ZUpNdS93QVJSRUQzSFBZVkhGczloeEE5Uzd4UTl1b3dN?=
+ =?utf-8?B?OHpQUEgrWVZhVG9ucTlabWUvaHdRaFp4Q2VxNHhKaTZIRGovN050bjhnNVcw?=
+ =?utf-8?B?WnJ6UlBEM3NlS1hheWhmZnhIZWVtSUNLS3VxVXp4Zlo2T0x5VUo2L3F2dmoz?=
+ =?utf-8?B?ZWphZ3FlbkVrVkZYRnBtMit3aWF4MlBNZEMwRTF6bDQ4M0pQcElmekxMRk9W?=
+ =?utf-8?B?Snh1WGV3WkdHOVdac0pTQ0RyY3VJUGZMSXhXOWJOMFNXV2ZXQXNjMEhVSDZE?=
+ =?utf-8?B?cENHSDZBazFFT0p3TU81T0NobkNmeG1NdlFJUVNEbUVIUGE0VHlpWjhpMnFY?=
+ =?utf-8?B?VUJxbmVEcUJyU0FvdEQvSzBvTXBKMkdtcmtjRUt4bzdlRElxWEFNTjRvOWhT?=
+ =?utf-8?B?Zk1SRHdVYkMyMVpHazkxU0lPSXpheFBMTFdkdmE4WUx3YzdkS282SVVGbFJ1?=
+ =?utf-8?B?Qzhpa2J6Y25TVjVlSjVRMU1pckZYQTNXRkpuT05PK0NhNC92NG5RcUl1QTk3?=
+ =?utf-8?B?N3N6UVUxQXNjM0dac2ducEJvRC82d2pjN2Y5T3JKMUpBekJ2U042djZ2L1BW?=
+ =?utf-8?B?WmVkcTM3YmxqZlR1MHlwcURScjRJN0pCMWk2aFl5OGx5dW83UG1JdW9BdTd6?=
+ =?utf-8?B?UlZjQmJGRWRIZGF6UnlVd21ja0J2WGtTOVJyQkE3TWdQTENmQjVZY1RsSW56?=
+ =?utf-8?B?UUxhYjBlLzVvemw5alI0Z2lBYnFGbTIrbXhjY2FFNUZBb0w2dG9yeFljRE5r?=
+ =?utf-8?B?emxVNkZhTmFZWHdrUjkxRmEzcFN0RkM1c1VzR2Y0TFBpa0RyL3o1LzBWMnJF?=
+ =?utf-8?B?dG5wOEVVNlk0cG9jWkZyY1RpL2sya3FXU01hRHE3UHRsaGFjeFEva2w5NldW?=
+ =?utf-8?B?TGZ2UTM5d0RpeUFFUnUza3NqR1BkUmVLYm1RV1FYVHZuOThnWXVBSnU1VVRJ?=
+ =?utf-8?B?Sm55VHlIQ2RYR1hwd2R0eTVuRGU0SUoycGlFeHVQNXp4Nm8wYktDeVhOSkdJ?=
+ =?utf-8?B?dHpPMWZjUk53MkFGQmlrZlRsT1NIYkxxdjVHRkNVV25ncU1pNDZ0Y3E3bllu?=
+ =?utf-8?B?ZmtZMkJqUGloaDVOOVRzRnhmSG1KbmxObmNxcFFNa3lTQjlzN2lPSU1oclRp?=
+ =?utf-8?B?SHdNM0h1cFMwVFhlQjIxNnFta2V2THArYWJldTN0VGNKSnFaemZQWVE0aGFN?=
+ =?utf-8?B?S0NWUGRtdWROQTE4V01kS256dkJSTFNtejFQQi82QVVPZFc5YkFLemx4ZHN5?=
+ =?utf-8?B?UVI4Y1lSVk1XT0pIQXNPZ0lUQ2JpK3hpbkgwQzlueXRySUl2RDlwWGRhc3BG?=
+ =?utf-8?B?QlR4SzUxSVBxZ1VxUTZvUXFXT0YwQ21iNTdyNi9VK1U1ZmNuSHdoeUZNb1NX?=
+ =?utf-8?B?U3NHMDVTZDh5aHp2ditpQ0lZSm9SMXJaRkJVWEJzN1czQlBiS29yVUhVQm1D?=
+ =?utf-8?B?NEtmbm9wc0xLT2h0M3ZNOVFaVlVOczUyYjdtVDRMVk15MlMxOWR5bWpBMEF0?=
+ =?utf-8?B?UHdjQWxLd0NMVFluL1lEVTFIR2lla1EyaWd0Z2MyV0RINUlvblVSTVRwQ2lx?=
+ =?utf-8?B?dkJMUW5mc2xYQlBwNkZqaWMvNXRBPT0=?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 814d1992-c2cc-45f7-2d51-08ddc8385e62
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jul 2025 09:24:18.6572
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Q5s1b++sffr/Tti0FpVpaaKOGXpcv1sw8Hznm7thj7DSX36ZGrcAgBn0IC/ql4Tpx3TcHyMwBPAxU1l83lR7xOihk9OscguMfhcNs7GpkbU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8052
+X-OriginatorOrg: intel.com
 
-On Fri, Jul 18, 2025 at 02:16:41PM +0200, Ivan Vecera wrote:
-> Hi Krzysztof,
+On Mon, Jul 21, 2025 at 05:03:07PM +0800, Jason Xing wrote:
+> On Mon, Jul 21, 2025 at 3:25 PM Larysa Zaremba <larysa.zaremba@intel.com> wrote:
+> >
+> > On Sat, Jul 19, 2025 at 01:26:18PM +0800, Jason Xing wrote:
+> > > On Fri, Jul 18, 2025 at 6:27 PM Larysa Zaremba <larysa.zaremba@intel.com> wrote:
+> > > >
+> > > > On Wed, Jul 16, 2025 at 11:41:42AM +0800, Jason Xing wrote:
+> > > > > Hi all,
+> > > > >
+> > > > > I'm currently faced with one tough issue caused by zero copy mode in
+> > > > > xsk with ixgbe driver loaded. The case is that if we use xdpsock to
+> > > > > send descs, nearly at the same time normal packets from other tx
+> > > > > queues cannot be transmitted/completed at all.
+> > > > >
+> > > > > Here is how I try:
+> > > > > 1. run iperf or ping to see if the transmission is successful.
+> > > > > 2. then run "timeout 5 ./xdpsock -i enp2s0f0 -t  -z -s 64"
+> > > > >
+> > > > > You will obviously find the whole machine loses connection. It can
+> > > > > only recover as soon as the xdpsock is stopped due to timeout.
+> > > > >
+> > > > > I tried a lot and then traced down to this line in ixgbe driver:
+> > > > > ixgbe_clean_tx_irq()
+> > > > >     -> if (!(eop_desc->wb.status & cpu_to_le32(IXGBE_TXD_STAT_DD)))
+> > > > >             break;
+> > > > > The above line always 'breaks' the sending process.
+> > > > >
+> > > > > I also managed to make the external ixgbe 6.15 work and it turned out
+> > > > > to be the same issue as before.
+> > > > >
+> > > > > I have no idea on how to analyze further in this driver. Could someone
+> > > > > point out a direction that I can take? Is it a known issue?
+> > > > >
+> > > > > Thanks,
+> > > > > Jason
+> > > > >
+> > > >
+> > > > I was able to reproduce the described behaviour, xdpsock does break the IP
+> > > > communication. However, in my case this was not because of ixgbe not being able
+> > > > to send, but because of queue 0 RX packets being dropped, which is the indended
+> > > > outcome in xdpsock, even in Tx only mode.
+> > >
+> > > Thanks for your feedback. It would be great if you could elaborate
+> > > more on this. How did you spot that it's queue 0 that causes the
+> > > problem?
+> >
+> > If you do not specify -q parameter, xdpsock loads on the queue pair 0.
+> >
+> > > Why is xdpsock breaking IP communication intended?
+> >
+> > Because when a packet arrives on the AF_XDP-managed queue (0 in this case), the
+> > default xdpsock XDP program provided by libxdp returns XDP_REDIRECT even in
+> > tx-only mode, XDP_PASS for all other queues (1-39). XDP_REDIRECT results in a
+> > packet leaving the kernel network stack, it is now managed by the AF_XDP
+> > userspace program. I think it is possible to modify libxdp to return XDP_PASS
+> > when the socket is tx-only.
+> >
+> > >
+> > > When you try i40e, you will find the connection behaves normally. Ping
+> > > can work as usual. As I depicted before, with ixgbe driver, ping even
+> > > doesn't work at all.
+> >
+> > I think this is due to RSS configuration, ping packets on i40e go to another
+> > queue.
 > 
-> On 18. 07. 25 8:55 dop., Krzysztof Kozlowski wrote:
-> > On 17/07/2025 19:10, Ivan Vecera wrote:
-> > > Add property to specify the ID of the clock that the DPLL device
-> > > drives. The ID value represents Unique Clock Identified (EUI-64)
-> > > defined by IEEE 1588 standard.
-> > 
-> > With the exception of clock-output-names and gpio-hogs, we do not define
-> > how the output looks like in the provider bindings.
-> > 
-> > I also don't understand how this maps to channels and what "device
-> > drives a clock" means. Plus how this is not deducible from the compatible...
+> Thanks so much for your detailed explanation.
 > 
-> The clock-id property name may have been poorly chosen. This ID is used by
-> the DPLL subsystem during the registration of a DPLL channel, along with its
-> channel ID. A driver that provides DPLL functionality can compute this
-> clock-id from any unique chip information, such as a serial number.
+> But, I still doubt it's not the reason why xdpsock breaks with ixgbe
+> driver loaded because I tried the following commands:
+> 1. ping <ip>
+> 2. timeout 3 ./xdpsock -i enp2s0f0np0 -t -q 11  -z -s 64
+> Whatever the queue value I adjusted, ping always fails with
+> "Destination Host Unreachable" warning.
+
+First I would make sure, if the problem is from Rx or Tx. This is hard to do 
+with IP-level applications, because they fail if any of those does not work.
+
+Please, try sending MAC packet with scapy using a following command:
+sendp(Ether(src="<src MAC>", dst="<dst MAC>")/IP(src="<any IP>", dst="<another IP>")/UDP(sport=2000, dport=9091)/Raw(load="xdp"), iface="<src ifname>")
+
+First, send this from host to link partner while running `tcpdump -nn -e -p -i 
+<ifname>` on link partner.
+
+Then send this from LK to host while running tcpdump on host.
+
+In both cases, note whether the packet shows up in tcpdump with and without 
+xdpsock loaded on the host.
+
 > 
-> Currently, other drivers that implement DPLL functionality are network
-> drivers, and they generate the clock-id from one of their MAC addresses by
-> extending it to an EUI-64.
-> 
-> A standalone DPLL device, like the zl3073x, could use a unique property such
-> as its serial number, but the zl3073x does not have one. This patch-set is
-> motivated by the need to support such devices by allowing the DPLL device ID
-> to be passed via the Device Tree (DT), which is similar to how NICs without
-> an assigned MAC address are handled.
-
-You use words like "unique" and MAC, thus I fail to see how one fixed
-string for all boards matches this. MACs are unique. Property value set
-in DTS for all devices is not.
-
-You also need to explain who assigns this value (MACs are assigned) or
-if no one, then why you cannot use random? I also do not see how this
-property solves this...  One person would set it to value "1", other to
-"2" but third decide to reuse "1"? How do you solve it for all projects
-in the upstream?
-
-All this must be clearly explained when you add new, generic property.
-
-Best regards,
-Krzysztof
-
+> Thanks,
+> Jason
 
