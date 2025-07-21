@@ -1,496 +1,282 @@
-Return-Path: <netdev+bounces-208716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F858B0CE4C
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 01:38:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AECCEB0CE56
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 01:42:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D477A1AA08E4
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 23:38:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 640171AA20D8
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 23:43:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE1CC1EF1D;
-	Mon, 21 Jul 2025 23:38:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB37E2475F7;
+	Mon, 21 Jul 2025 23:42:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X24l26NH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CyWO8+ib"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 067AE1607A4
-	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 23:38:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753141111; cv=none; b=GDkQJwaSl1mf8unjGmvPNKAMa/y6JpWKuVb7okAz3H00ROpPOsb0R696QD+KZhLNIUW02VcKZ1QYo8kjQHz8IxxNkJsuu+S+BUu++z30P57IGoj56X9TbyxRWjEgstUqP82UoPtfvIpkFx/pT/2Z9b0PDhqWaS8nWRqiVyeYCYk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753141111; c=relaxed/simple;
-	bh=3ab3M0DVyHZ7ddSTICJrCR4NymjyFq4/6xT7Dyzmya0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V21BsNvFJ7PFYdiIWxQhlemdc4GxNg7bVC33XrQHAmqqTFVTN8lMEPre/O93ZvRzslPj/dp74zsvHk5kt0hEu66J/Hz32smvVQ93Sn1L9lUOvrtdP2VL9LNyUQvkhWnKqdcdbQ4QQTNfD+7MmgALW/Qbm9iIh1BylN8qDoTArG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X24l26NH; arc=none smtp.client-ip=209.85.166.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3e2a60aeb26so18737815ab.1
-        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 16:38:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753141109; x=1753745909; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/JT6YoHghmCB+Hx16i7/LKIxflOlUkpaE8fOzaVw+dA=;
-        b=X24l26NHCnsk9hLhyvBHGdb9dWWMGQaWiwSyq55Ab69b7IaO6O8P0T2sozJmZwOM/j
-         mV8aAuYvnAj5z6TsHs3rwi2Vp2Xo/uXt4yO15SLXqX6IqpnVZ6/ZGhKHi5cBlHwdPCe2
-         eUAyL3ZuKL6FZDgBWn97Mc4CTGxjHppZbo7rKQJJ3+zbxIovKzPu5Z9Ysnt8LHGsICSD
-         CJS+r0U+Q4ZB34DtuPSCgyCEmszMD3KxhAvQNBnh8scnHGK5I2kT0urXVXs7lMKcdKwB
-         AtIDJqJ3cKfV1kfLci1TYj3Dr8MsxrIRsE7xqC4FRpulVb5c0UQTSrJ5jkhew6O5TZtm
-         q8lQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753141109; x=1753745909;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/JT6YoHghmCB+Hx16i7/LKIxflOlUkpaE8fOzaVw+dA=;
-        b=QGtEHSkpTiDBftejxeqzHoDtz4Kbosi52VkRVAMWFasQp/nUDhwW4erjlF/JRsoyjU
-         675ud8rwOWm8nEjWWw3obAlrxN+oyl68FhbwSDP8y5f9Yx7OXjBJB3dWppqvq3StrzZf
-         cgnhixxKEDpPjVq2sopdqZ1aV89+UkG3q7CZijQhfpLca1RBQoXJADTcehK6s74CXHDD
-         khKIVvHsiVm2kT3iLt4vS84sF8Ew7kY3q1xJ1ovVE+BvUmpMo1ISeWOZsugeeI9aUi+A
-         X+8FXWcQzIKygJE/eL1FZTLWX6ygN/V+702Z9XrhAdXYZ+7eAIQKGLZUKpH+Hg73O37f
-         48YQ==
-X-Gm-Message-State: AOJu0YzqcGVNu7vt9B5cR9XparbqjQYLSJwimuzL1b3Z2sjkuEEPTnkx
-	dMA8+hwHN1f5cbSq3hlbryODddIBK2dteG2S5wKUPGerHvAexTQArdQxva+bKfiJWiMv1L4+Kep
-	D1UQM64HyiHzXn0vWTlL+CTNUlNiv9OhxiOh20AVLHg==
-X-Gm-Gg: ASbGncsZL5Ax5cts2HQTJy6KJWttdRo4EKFLLkMwDL0bEHoye1Kx28ZpSuDAmc+1lgK
-	2zdK7WTdCRMhOcrYAMIQdaq7OrW/KHiGtnbJfWpqAkOUglB6g7Ga7ees6l2CVSWQvzdd2iz/765
-	QmQwT67tM5eYBvVx06zat6vibobZdjUDIM5JLvRrSk+V2MYHEuZcv1YwUwi+xWsg4ylsFkeAz63
-	EORFA==
-X-Google-Smtp-Source: AGHT+IESAXkYeeARhM3Nd+MFW4bkL2kMVRjWwQzV9UalCj14DKQ2+ZQQVZgs7SAsgA8s8Nc/y8QVqK2V2zsp7RbW2dU=
-X-Received: by 2002:a05:6e02:168a:b0:3e2:9db8:b10c with SMTP id
- e9e14a558f8ab-3e29db8b2demr196069225ab.18.1753141108713; Mon, 21 Jul 2025
- 16:38:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AE732441AF;
+	Mon, 21 Jul 2025 23:42:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753141355; cv=fail; b=aMXivcdo8cp9ugWssz1OgbYLTOCSM06t5iQH76rob2lesij2aN/4aiN3w3TffapiNYU5HtmDASE0BPuNYjt5wN7RBD4RfL0fheHnUvf2e4f2Ya9n84ZZGPZ/QpEQTHI+V5mWiWV0J6CS3iScwcYRXKinXEsD6XLtswK6CK2jbe4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753141355; c=relaxed/simple;
+	bh=qApd2Ilxvx3HiChINBuTSj/5ytkZglU9ZOaMLw9G1ls=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=JJjSc097tHEXlhvCVPaNW1WTVUhuw1Kc0ObOHBrHLkFcWMGhB5/yujmXAzSsWf4+jMwSqHgoEYuRVirGLgNukFrKeXwPnDa9456S6wxikmmRD34UnK0z+WtMBjypWSsPm6LG7qcCUmQ/eCyvMyAikpxl22XciNuuxtHJtlIXL5M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CyWO8+ib; arc=fail smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753141355; x=1784677355;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:mime-version;
+  bh=qApd2Ilxvx3HiChINBuTSj/5ytkZglU9ZOaMLw9G1ls=;
+  b=CyWO8+ibWpW/v1DsjC1LfupR+KJWD3X0l8mRxCt9RGrSKUJ5FIHFuFAm
+   Eq7iXdSY8kQ4S56sFIeI16z30Msyuhz3omyvX7MK9kNRtHRswsTqUPoZn
+   cL0Sq9GqAgwCp0gmj8cSzhI8H3h+ZL2c71W9946NDG24/C+Ook9QL/6Ol
+   yhIoNWN91FtmXJmnaHzFgoL1BiV3M8ozs6J6WA5fkS2/slyyI1emQojm/
+   DgfTBWxjonV+9ebOqUmJB8+v+9/Wkywivn7DGJOZ4vpGIio7LqEljW72g
+   dBYJBrK2yPMQNNqOMGvVJIRyOV9L7F9wEiBFguR5FPaO2/x+p523Xu/Bf
+   Q==;
+X-CSE-ConnectionGUID: LVpwCsMPRBSQ83QXCDAYJg==
+X-CSE-MsgGUID: ERASWfBoSmWFFwCwDFQHtQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11499"; a="55486328"
+X-IronPort-AV: E=Sophos;i="6.16,330,1744095600"; 
+   d="asc'?scan'208";a="55486328"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2025 16:42:34 -0700
+X-CSE-ConnectionGUID: c+OB/nWPQvOX91T/obKLOA==
+X-CSE-MsgGUID: 9gkQ7rKjTySyucmaCfte2w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,330,1744095600"; 
+   d="asc'?scan'208";a="189924787"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2025 16:42:33 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Mon, 21 Jul 2025 16:42:32 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26 via Frontend Transport; Mon, 21 Jul 2025 16:42:32 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (40.107.93.44) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 21 Jul 2025 16:42:32 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AUDH+Nm1K/VzdkRaejV9BPpXrCrje761TJ/vgR3JiP1fxgHvB8jdnCSlVTBFguNub5doLTNJDYfkqoParWTs7qtjRnnNHrL6BIknR8W0nE0pZ7Ch3LVtp+G8TK6RSf9v+jBsBZEtTDJ9DDqmK5nD0G34QRRJtHIkyU3pQZlw8krCtqxZZ67qd1KdniaxX4Eq3JgYQAy4YeMAzCXDK8yzWjDeL1JVIz4cxBaNAW+2/eE5bzi7JWLo/JIA6dJLqMKjkl9I5x/FhkTmlcHjPgN5hBlkJ3pSw8BTkdQ7Dlc2bDqI6ibnhu00I9hs/samVG5VEWtVZwl7tvUfkEOQnUflqQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qApd2Ilxvx3HiChINBuTSj/5ytkZglU9ZOaMLw9G1ls=;
+ b=FH+IKyop6vP3Tnbo/vOXw1yom9tsCfJ/XlI/wfeq9Ql55KacRcxxw1xsE9Nk3fT/pvL80m2vtCjkTzZv07FwFQ/j44m/43+eQV20FAH+071y97GL3CXdTX+nwdq0JRBoVjwTydC3CwmtYR//Mq4qOyou9v+rEb5BuUqYnC9JGLiOwbDIJuwitRIQXnlCuAHcKCrtVrTcHk7vBXihMT9SXe+IZYx17i89GjvuPE70ximarLWso44PwwS1XAKN9C/pdF4P2QrEbhgw/6dWOWcDckNUneGhtttvgKkUn/GBSdVtnx6nm3wIPJO4haHOp0alJRnGI1RAJjpHqQjKmmIynw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by MW6PR11MB8391.namprd11.prod.outlook.com (2603:10b6:303:243::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8943.30; Mon, 21 Jul
+ 2025 23:42:30 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3%5]) with mapi id 15.20.8943.029; Mon, 21 Jul 2025
+ 23:42:30 +0000
+Message-ID: <1bacca22-06d4-4b22-99cb-2023cabb45ae@intel.com>
+Date: Mon, 21 Jul 2025 16:42:22 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next V3 1/3] net/mlx5e: SHAMPO, Cleanup reservation
+ size formula
+To: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
+CC: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	Mark Bloch <mbloch@nvidia.com>, <netdev@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Lama Kayal
+	<lkayal@nvidia.com>
+References: <1753081999-326247-1-git-send-email-tariqt@nvidia.com>
+ <1753081999-326247-2-git-send-email-tariqt@nvidia.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+Autocrypt: addr=jacob.e.keller@intel.com; keydata=
+ xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
+ J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
+ qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
+ CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
+ UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
+ MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
+ apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
+ cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
+In-Reply-To: <1753081999-326247-2-git-send-email-tariqt@nvidia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="------------90ObT6dBLZnN5Hx06oetO0Nn"
+X-ClientProxiedBy: MW4P220CA0029.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:303:115::34) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250717152839.973004-1-jeroendb@google.com> <20250717152839.973004-5-jeroendb@google.com>
-In-Reply-To: <20250717152839.973004-5-jeroendb@google.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 22 Jul 2025 07:37:51 +0800
-X-Gm-Features: Ac12FXzSUAXWIHZdTGOzdSOYkJokq_zNCsT0nxaXY3DsHBXhmACXT6WEjcXEDoM
-Message-ID: <CAL+tcoBu0ZQzLA0MvwAzsYYpz=Z=xR7LiLmFwJUXcHFDvFZVPg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 4/5] gve: implement DQO TX datapath for AF_XDP zero-copy
-To: Jeroen de Borst <jeroendb@google.com>
-Cc: netdev@vger.kernel.org, hramamurthy@google.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, willemb@google.com, pabeni@redhat.com, 
-	Joshua Washington <joshwash@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|MW6PR11MB8391:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6c6c4b85-f437-4548-8a8b-08ddc8b041f8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?MldDa3I2dkJpUWJMbVF4Yk9QY2MvYU9pZ2orOW9CUDNhMkppUlVXQWdVUmQw?=
+ =?utf-8?B?MGluWHVTOW5leldaUkFnRHU0NHZtV1pBRlBZNlh4a2lvWE9KZWRaaVgrbnpQ?=
+ =?utf-8?B?VXArL2RqV3ZldFRwSlR6UVY2MzV2VU54YVIyR0h4VGFxN0gveFVLVk9QUkRU?=
+ =?utf-8?B?blU1ckNEZDFqMm91S0RmUGNNNG5KQmgzTDJ2ajdGVTg5bWR4dmJGV3ZhZ3ds?=
+ =?utf-8?B?eXZFZ3J6Z3pyaitpd3ZLclFmLzA3ZzNBYzVHSHpRTWR1Z2RZSUpnVUlLcVMw?=
+ =?utf-8?B?aXBXdDQrWXZiaUpudklsRnhIT2c4bEorOEVqRkowQnRQZ2JHVldQWmgvVjhV?=
+ =?utf-8?B?RDhsVEtiR3NJN0RYd0x6dVVSWjB6aHBqb0NWT3VjUzJzK0pYcHlwWER1bEdt?=
+ =?utf-8?B?dHlSRTh0S1BjaE9HZ3I1Z1VLOUhkMWZta1FBbDJkR3Y1Mk1iWFdXbThUZHF0?=
+ =?utf-8?B?Vnk1Y2V5bnoxTC80SXBlWlpiYkUrZndZVmFoSHMyVFpuRnltZlNVV1ovU0Jt?=
+ =?utf-8?B?WTZYNmE2dG9MRWhyZkM0Y3JVbVRVMWhVTTRnN0FPaDdDWkNhTWtOdWplUWxt?=
+ =?utf-8?B?N0tSNC9KTmIwSlBRQ3IvVHNtbzVxajFvaFN3WnRPdWNqbS8zTmRSLzJONHRU?=
+ =?utf-8?B?VkRENENwTGdBRi9pS2xXUG1tcFJjZFp6ZS9FN3ZjVXhOVzBCSUQzTXR6Q01Z?=
+ =?utf-8?B?YzRJcmpCNWNIY3NPdkkxZWYvTU5mUWxEbEM1SG4rdFgzQTlLZU9RQTZKV1pM?=
+ =?utf-8?B?cVkzTFdSUDFpSmJ4d2tHOVRwZXU0RU16eEZvMkRQRUl3VGN2cGZXWWJQY2Zy?=
+ =?utf-8?B?ZnlqR3NuNmVmeHUyMFBVYk9Dcm5Jclc1V1RYaDJHZXQ4dUtHWEtTYWEvR1BY?=
+ =?utf-8?B?RGF5TmlBYTl5MnNOYW9NZXgxNlVrdkdUd1JtNkFqYm5OdlpML1FlRlVKbW1m?=
+ =?utf-8?B?bnlKUFFVRm5WRXFGUFQva3daRFRBZXhPSnVvSHhSbkRYRk5iUHk3ZVdCcGRr?=
+ =?utf-8?B?T25nRURnVTQ4TFhqQWhHcUZ0cEswVUwwS2pzeEZ5YSs5SnR4azFKZDQ3cC9Y?=
+ =?utf-8?B?Z3MzU2JLYlE0NzVZZjBQQjV5ZDByK0w2VG5jRFExTWpYdFJJeTRnODJrRnJF?=
+ =?utf-8?B?NG0xMFh2c1V5QXkzWEVBdG1KZ0RyN2lXV0VXZUtvcHhuam9kT0NQOGpIMUVO?=
+ =?utf-8?B?bzkvTjU3ZFo1MTlGc3Bzd1FNNlNSTW55ZzN5Skh0dFhQZFRoUFZkdjRjWm9I?=
+ =?utf-8?B?eEVqbHZqaDRSYXFCblBBMlF2OEQrU3NUWW5PSTJjaWRKV3dDc3Mra1NqcEhW?=
+ =?utf-8?B?dUlYdHRSZXpkcm4zNmkxdWg5UG9maXJndHBYZWt2dUo2UFlzbUJ0blV1dlRu?=
+ =?utf-8?B?U1E0NGNNL21mNHcxNnBVZlo3clBpQzYxWkRWWHkraFlPdnBnK3FoZGF1Zjc0?=
+ =?utf-8?B?dURNR2hkWW0rdldPK2NCVWdCMUlLdXN2bzBUMlBJNWlLYTd0MzdOWnM5Mkhn?=
+ =?utf-8?B?MXo0NkhxbnVuR2VlWWtFMk50NkRpbWtCWXBEYmNpKzRqUksxdFFBaDd3WWdH?=
+ =?utf-8?B?ZFdKRWlIbW5BVjIzeXNDbzYvU1JIR0Jkb0Q3MmVnd1dEcHZRdjR2VndqaEpG?=
+ =?utf-8?B?bWZoa281YW9yZjhHZXFDZUlva3VyaVFxTFNhWlR2VlhvL05USEJ0NkJzNkVo?=
+ =?utf-8?B?bldrUXM3OFp5TEZSd0pmblRLdVVTbDZoT3Q1V05OUlJ3RkpOdXdVK1hFNHNS?=
+ =?utf-8?B?VEVSSmRUMFRwelVhRFEvY0dwcm51VzU4NVB3U3MrSTNKTEVHaStKN0UyTzho?=
+ =?utf-8?B?cC9FNmc4WmZucC9IbEpFc253S2J0cm92eHZEN2grOTJmZ1QvaHY2OVdWQURC?=
+ =?utf-8?B?UWZsRFVKd0pybWFLek5nQTlaRTh3aS9OWWZYSi9KTU0wOGE3M2hUVUJaUktH?=
+ =?utf-8?Q?OxJ4L1jlk7g=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TDNyT3ZKUXg5bUZSMm5OUURtMzA1ZS9xRGRSODVqcjU1Mi96ZS9YazF1M0tX?=
+ =?utf-8?B?a09UMm03Z0tZaGh4RHM1NUVPemF0K1dnSlFhSXZxVTE1NE5lTHNEcWt6MFRl?=
+ =?utf-8?B?b0tpOXhsYkZCSFFIM0tDRjhyQXNUOVAxdUI1UllFcHJuNEQ1M2JZL2x0T1hD?=
+ =?utf-8?B?cStMVjNmN0RueUI3SUsyYVEzM2JxM2J6djVGV0tEb1QxeU1IQWUyRXBDOFVS?=
+ =?utf-8?B?bXlqUUFMZ3RUcGNSd1UwdFNScUYzT1NjUmRTNW1LR2c5aCtHOFArRjVxeWJF?=
+ =?utf-8?B?cis3bllOb0YxVFFvdXBiMm1WeW9ucnA2MGd4RFFLbG1ZNEl0U2FDNGlxbS9U?=
+ =?utf-8?B?NHdLdHRzQ1FoL2hUNENFUGtXS214czR2Nm9taWVpOUJWTUp1R0NBUWYxVXI2?=
+ =?utf-8?B?SndvMjYxMWtKZFdEZC81V0VWVWJkWGZOaWZBR01pL1N3TjVuSUxBNTNGMDcr?=
+ =?utf-8?B?SytJUDNWejYrVktLWnk1aVBIZ2dIQ2ZSdnBKNHpEKzN6Q3BnT3RtME9nY1lD?=
+ =?utf-8?B?RXlYUEtYWllxcktHd0ZuZGozeXNpNmJMNU4ybGtBRGxRUjBVQnpVRGxBUmNs?=
+ =?utf-8?B?YWM4THdnbDBBcHVpMFIyYWl0OFpmS3ZHZ1JUQjdGdTZES2d0S2lUZ3BNelZi?=
+ =?utf-8?B?K0pDRGpOUHovZmZYeDV3d2NvZFd3V05od0tqUzNkS3Y4MVlQRC83NHkwZ2t1?=
+ =?utf-8?B?ZkoxeDdqR2FDeUVIcGVuR083QmJ2aVNBYjFsTTc2M0tEUG1uY3VVbW51L1ZR?=
+ =?utf-8?B?VG9nRVRvdEN4L1JQQzFtZHRtK3lETjFUOFdER2s5djVyUTdOajcwWE4zZmJC?=
+ =?utf-8?B?cEk3QkdZc0tKTlkwVTcwWXR4WUJzNDVSRUNRaFQwS1JjMHBrdnRLKzNaZXNv?=
+ =?utf-8?B?QkdLR0c1RS9zZkRPQjFpL0VFN3VVblVabDNFRjZGODVRZWV5ZElmY3FBMytQ?=
+ =?utf-8?B?YXY1c3c5RjA1WlhOWExta3h5cGVlNHJITGVyYjJCcVlOdmZ4dFlnTnE4d1hD?=
+ =?utf-8?B?ZFFMTnhXK1pabFR2Z2pJdkpQc1hrOVJkMzlqbFljY213Ny90ZW5wSzJRU0h5?=
+ =?utf-8?B?ck5EekVDcWZkNUo3aW1FVXJwWnArbmJrcThJa2JDTmE0UG5PSkdaYVJhSWs5?=
+ =?utf-8?B?bXlGb1NHdndkdHNQNXpzeU11UTdRWDRWVURHR3JISWxSd2FsUmFyNzJ3UDZO?=
+ =?utf-8?B?RHl3MlBtT0JHL3R2aVdEKzdYVXcyUEsyVTFmcFNCUHlFeUlrV2k2bFRtUE5i?=
+ =?utf-8?B?L0xXUERxNkxiL3RReFQ5cU1DUWJuWUg3WEphK2xuOThIRURTbDBZbXVoQTJ2?=
+ =?utf-8?B?Q2hwdUFQQmdCWG5QUTZFdTZ5elg1VDJCZGhXdnduWnRZYXZueFo0cjBBb2VO?=
+ =?utf-8?B?bXdHMU5rcll0MWhmTVNnRnJZbVVpSUJLM05FTjI0R0lXQXhYU1d6US90QWti?=
+ =?utf-8?B?K3dQOUMyQnh4NHIwcXovOXJkOGFTM0hLRFZuMCttcFBPKzhLcjliNXFST2dn?=
+ =?utf-8?B?RExtV0p5UzZjUFh5a1BoSjA2QzFuMHpmR0sxa1hCbkgrV09oWFQyZjgwa1Zw?=
+ =?utf-8?B?YzdhRkE3NmVKTkFsUnpBd1Z3Kyt5UEVTYTFrUUovZmU2Rkk2OFcyOEcxd1Js?=
+ =?utf-8?B?SHdsTGtiTnRPVWdpd1AwTG44a3Y3RlZ6TUxnR1o4RlBlMklhWkt1QVE5Qm5h?=
+ =?utf-8?B?Y0pyT0ErMmFhdjFNNTZDOEJZbTI5TUgxbzgwV0tWQWVsejlBWnJEWWtGb2Jq?=
+ =?utf-8?B?UW4zN096Mno2dm1PeXZhd1hZVzY0MmdxL3pUdWo1eXpaKzNwa1daNm1zM0lh?=
+ =?utf-8?B?VUQxaTR6bEdyM09xaFhWY0paQ1VVOWFNWXpDczUvdXpnSnVxUlRRaDQ2MUhT?=
+ =?utf-8?B?QmhtTUg4MEMyNDFhOTR5a1IvM2QwV3BleTJuSmowbVhyaW1iTEIrQkY5b0M3?=
+ =?utf-8?B?MzFMRjVUaGhXZGNaZTlqRVJXOUtTVjhqWjNzSmFURFVCTTdBdWtvOUFyZ2xQ?=
+ =?utf-8?B?aGRneDJIUWxza2pPcTFRMXZCbU9GeXl5aUNWZU05YkVjOHNxSUlsWEh4WS83?=
+ =?utf-8?B?bmU1bmFGNHNRdWl0eDlOdTMxZDNtellhaEJudnY4b3FSczNzOU4vU1FrejlI?=
+ =?utf-8?B?cnpzaGtPRXhXOEFTQnd5YWlnbjRVT3BWOWJnSmFnKyszb0hudW9IRXkvMDda?=
+ =?utf-8?B?UFE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6c6c4b85-f437-4548-8a8b-08ddc8b041f8
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jul 2025 23:42:30.4944
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: KejVOvMWM+zUXLqXCXreZjGmNLPJfWsSNldbj3K8M4PR1WbUvlkDK+prlpw/v2a1X2XQKAho9ZtP2rJuYK2ub38+KUPKJ9/cynU+WAPw6Mc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR11MB8391
+X-OriginatorOrg: intel.com
+
+--------------90ObT6dBLZnN5Hx06oetO0Nn
+Content-Type: multipart/mixed; boundary="------------c9AyhRwTeXRG0KJRqBifQz9w";
+ protected-headers="v1"
+From: Jacob Keller <jacob.e.keller@intel.com>
+To: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Mark Bloch <mbloch@nvidia.com>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Lama Kayal <lkayal@nvidia.com>
+Message-ID: <1bacca22-06d4-4b22-99cb-2023cabb45ae@intel.com>
+Subject: Re: [PATCH net-next V3 1/3] net/mlx5e: SHAMPO, Cleanup reservation
+ size formula
+References: <1753081999-326247-1-git-send-email-tariqt@nvidia.com>
+ <1753081999-326247-2-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1753081999-326247-2-git-send-email-tariqt@nvidia.com>
+
+--------------c9AyhRwTeXRG0KJRqBifQz9w
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jeroen,
 
-On Thu, Jul 17, 2025 at 11:29=E2=80=AFPM Jeroen de Borst <jeroendb@google.c=
-om> wrote:
->
-> From: Joshua Washington <joshwash@google.com>
->
-> In the descriptor clean path, a number of changes need to be made to
-> accommodate out of order completions and double completions.
->
-> The XSK stack can only handle completions being processed in order, as a
-> single counter is incremented in xsk_tx_completed to sigify how many XSK
-> descriptors have been completed. Because completions can come back out
-> of order in DQ, a separate queue of XSK descriptors must be maintained.
-> This queue keeps the pending packets in the order that they were written
-> so that the descriptors can be counted in xsk_tx_completed in the same
-> order.
->
-> For double completions, a new pending packet state and type are
-> introduced. The new type, GVE_TX_PENDING_PACKET_DQO_XSK, plays an
-> anlogous role to pre-existing _SKB and _XDP_FRAME pending packet types
-> for XSK descriptors. The new state, GVE_PACKET_STATE_XSK_COMPLETE,
-> represents packets for which no more completions are expected. This
-> includes packets which have received a packet completion or reinjection
-> completion, as well as packets whose reinjection completion timer have
-> timed out. At this point, such packets can be counted as part of
-> xsk_tx_completed() and freed.
->
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
-> Signed-off-by: Praveen Kaligineedi <pkaligineedi@google.com>
-> Signed-off-by: Joshua Washington <joshwash@google.com>
-> Signed-off-by: Jeroen de Borst <jeroendb@google.com>
+
+On 7/21/2025 12:13 AM, Tariq Toukan wrote:
+> From: Lama Kayal <lkayal@nvidia.com>
+>=20
+> The reservation size formula can be reduced to a simple evaluation of
+> MLX5E_SHAMPO_WQ_RESRV_SIZE. This leaves mlx5e_shampo_get_log_rsrv_size(=
+)
+> with one single use, which can be replaced with a macro for simplicity.=
+
+>=20
+> Also, function mlx5e_shampo_get_log_rsrv_size() is used only throughout=
+
+> params.c, make it static.
+>=20
+> Signed-off-by: Lama Kayal <lkayal@nvidia.com>
+> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 > ---
->  drivers/net/ethernet/google/gve/gve.h        |  19 ++-
->  drivers/net/ethernet/google/gve/gve_dqo.h    |   1 +
->  drivers/net/ethernet/google/gve/gve_main.c   |   6 +
->  drivers/net/ethernet/google/gve/gve_tx_dqo.c | 148 +++++++++++++++++++
->  4 files changed, 171 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet=
-/google/gve/gve.h
-> index 9925c08e595e..ff7dc06e7fa4 100644
-> --- a/drivers/net/ethernet/google/gve/gve.h
-> +++ b/drivers/net/ethernet/google/gve/gve.h
-> @@ -399,11 +399,17 @@ enum gve_packet_state {
->         GVE_PACKET_STATE_PENDING_REINJECT_COMPL,
->         /* No valid completion received within the specified timeout. */
->         GVE_PACKET_STATE_TIMED_OUT_COMPL,
-> +       /* XSK pending packet has received a packet/reinjection completio=
-n, or
-> +        * has timed out. At this point, the pending packet can be counte=
-d by
-> +        * xsk_tx_complete and freed.
-> +        */
-> +       GVE_PACKET_STATE_XSK_COMPLETE,
->  };
->
->  enum gve_tx_pending_packet_dqo_type {
->         GVE_TX_PENDING_PACKET_DQO_SKB,
-> -       GVE_TX_PENDING_PACKET_DQO_XDP_FRAME
-> +       GVE_TX_PENDING_PACKET_DQO_XDP_FRAME,
-> +       GVE_TX_PENDING_PACKET_DQO_XSK,
->  };
->
->  struct gve_tx_pending_packet_dqo {
-> @@ -440,10 +446,10 @@ struct gve_tx_pending_packet_dqo {
->         /* Identifies the current state of the packet as defined in
->          * `enum gve_packet_state`.
->          */
-> -       u8 state : 2;
-> +       u8 state : 3;
->
->         /* gve_tx_pending_packet_dqo_type */
-> -       u8 type : 1;
-> +       u8 type : 2;
->
->         /* If packet is an outstanding miss completion, then the packet i=
-s
->          * freed if the corresponding re-injection completion is not rece=
-ived
-> @@ -512,6 +518,8 @@ struct gve_tx_ring {
->                                 /* Cached value of `dqo_compl.free_tx_qpl=
-_buf_cnt` */
->                                 u32 free_tx_qpl_buf_cnt;
->                         };
-> +
-> +                       atomic_t xsk_reorder_queue_tail;
->                 } dqo_tx;
->         };
->
-> @@ -545,6 +553,9 @@ struct gve_tx_ring {
->                         /* Last TX ring index fetched by HW */
->                         atomic_t hw_tx_head;
->
-> +                       u16 xsk_reorder_queue_head;
-> +                       u16 xsk_reorder_queue_tail;
-> +
->                         /* List to track pending packets which received a=
- miss
->                          * completion but not a corresponding reinjection=
-.
->                          */
-> @@ -598,6 +609,8 @@ struct gve_tx_ring {
->                         struct gve_tx_pending_packet_dqo *pending_packets=
-;
->                         s16 num_pending_packets;
->
-> +                       u16 *xsk_reorder_queue;
-> +
->                         u32 complq_mask; /* complq size is complq_mask + =
-1 */
->
->                         /* QPL fields */
-> diff --git a/drivers/net/ethernet/google/gve/gve_dqo.h b/drivers/net/ethe=
-rnet/google/gve/gve_dqo.h
-> index bb278727f4d9..6eb442096e02 100644
-> --- a/drivers/net/ethernet/google/gve/gve_dqo.h
-> +++ b/drivers/net/ethernet/google/gve/gve_dqo.h
-> @@ -38,6 +38,7 @@ netdev_features_t gve_features_check_dqo(struct sk_buff=
- *skb,
->                                          netdev_features_t features);
->  bool gve_tx_poll_dqo(struct gve_notify_block *block, bool do_clean);
->  bool gve_xdp_poll_dqo(struct gve_notify_block *block);
-> +bool gve_xsk_tx_poll_dqo(struct gve_notify_block *block, int budget);
->  int gve_rx_poll_dqo(struct gve_notify_block *block, int budget);
->  int gve_tx_alloc_rings_dqo(struct gve_priv *priv,
->                            struct gve_tx_alloc_rings_cfg *cfg);
-> diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/eth=
-ernet/google/gve/gve_main.c
-> index d5953f5d1895..c6ccc0bb40c9 100644
-> --- a/drivers/net/ethernet/google/gve/gve_main.c
-> +++ b/drivers/net/ethernet/google/gve/gve_main.c
-> @@ -427,6 +427,12 @@ int gve_napi_poll_dqo(struct napi_struct *napi, int =
-budget)
->
->         if (block->rx) {
->                 work_done =3D gve_rx_poll_dqo(block, budget);
-> +
-> +               /* Poll XSK TX as part of RX NAPI. Setup re-poll based on=
- if
-> +                * either datapath has more work to do.
-> +                */
-> +               if (priv->xdp_prog)
-> +                       reschedule |=3D gve_xsk_tx_poll_dqo(block, budget=
-);
->                 reschedule |=3D work_done =3D=3D budget;
->         }
->
-> diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/e=
-thernet/google/gve/gve_tx_dqo.c
-> index ce5370b741ec..6f1d515673d2 100644
-> --- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-> +++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-> @@ -13,6 +13,7 @@
->  #include <linux/tcp.h>
->  #include <linux/slab.h>
->  #include <linux/skbuff.h>
-> +#include <net/xdp_sock_drv.h>
->
->  /* Returns true if tx_bufs are available. */
->  static bool gve_has_free_tx_qpl_bufs(struct gve_tx_ring *tx, int count)
-> @@ -241,6 +242,9 @@ static void gve_tx_free_ring_dqo(struct gve_priv *pri=
-v, struct gve_tx_ring *tx,
->                 tx->dqo.tx_ring =3D NULL;
->         }
->
-> +       kvfree(tx->dqo.xsk_reorder_queue);
-> +       tx->dqo.xsk_reorder_queue =3D NULL;
-> +
->         kvfree(tx->dqo.pending_packets);
->         tx->dqo.pending_packets =3D NULL;
->
-> @@ -345,6 +349,17 @@ static int gve_tx_alloc_ring_dqo(struct gve_priv *pr=
-iv,
->
->         tx->dqo.pending_packets[tx->dqo.num_pending_packets - 1].next =3D=
- -1;
->         atomic_set_release(&tx->dqo_compl.free_pending_packets, -1);
-> +
-> +       /* Only alloc xsk pool for XDP queues */
-> +       if (idx >=3D cfg->qcfg->num_queues && cfg->num_xdp_rings) {
-> +               tx->dqo.xsk_reorder_queue =3D
-> +                       kvcalloc(tx->dqo.complq_mask + 1,
-> +                                sizeof(tx->dqo.xsk_reorder_queue[0]),
-> +                                GFP_KERNEL);
-> +               if (!tx->dqo.xsk_reorder_queue)
-> +                       goto err;
-> +       }
-> +
->         tx->dqo_compl.miss_completions.head =3D -1;
->         tx->dqo_compl.miss_completions.tail =3D -1;
->         tx->dqo_compl.timed_out_completions.head =3D -1;
-> @@ -992,6 +1007,38 @@ static int gve_try_tx_skb(struct gve_priv *priv, st=
-ruct gve_tx_ring *tx,
->         return 0;
->  }
->
-> +static void gve_xsk_reorder_queue_push_dqo(struct gve_tx_ring *tx,
-> +                                          u16 completion_tag)
-> +{
-> +       u32 tail =3D atomic_read(&tx->dqo_tx.xsk_reorder_queue_tail);
-> +
-> +       tx->dqo.xsk_reorder_queue[tail] =3D completion_tag;
-> +       tail =3D (tail + 1) & tx->dqo.complq_mask;
-> +       atomic_set_release(&tx->dqo_tx.xsk_reorder_queue_tail, tail);
-> +}
-> +
-> +static struct gve_tx_pending_packet_dqo *
-> +gve_xsk_reorder_queue_head(struct gve_tx_ring *tx)
-> +{
-> +       u32 head =3D tx->dqo_compl.xsk_reorder_queue_head;
-> +
-> +       if (head =3D=3D tx->dqo_compl.xsk_reorder_queue_tail) {
-> +               tx->dqo_compl.xsk_reorder_queue_tail =3D
-> +                       atomic_read_acquire(&tx->dqo_tx.xsk_reorder_queue=
-_tail);
-> +
-> +               if (head =3D=3D tx->dqo_compl.xsk_reorder_queue_tail)
-> +                       return NULL;
-> +       }
-> +
-> +       return &tx->dqo.pending_packets[tx->dqo.xsk_reorder_queue[head]];
-> +}
-> +
-> +static void gve_xsk_reorder_queue_pop_dqo(struct gve_tx_ring *tx)
-> +{
-> +       tx->dqo_compl.xsk_reorder_queue_head++;
-> +       tx->dqo_compl.xsk_reorder_queue_head &=3D tx->dqo.complq_mask;
-> +}
-> +
->  /* Transmit a given skb and ring the doorbell. */
->  netdev_tx_t gve_tx_dqo(struct sk_buff *skb, struct net_device *dev)
->  {
-> @@ -1015,6 +1062,62 @@ netdev_tx_t gve_tx_dqo(struct sk_buff *skb, struct=
- net_device *dev)
->         return NETDEV_TX_OK;
->  }
->
-> +static bool gve_xsk_tx_dqo(struct gve_priv *priv, struct gve_tx_ring *tx=
-,
-> +                          int budget)
-> +{
-> +       struct xsk_buff_pool *pool =3D tx->xsk_pool;
-> +       struct xdp_desc desc;
-> +       bool repoll =3D false;
-> +       int sent =3D 0;
-> +
-> +       spin_lock(&tx->dqo_tx.xdp_lock);
-> +       for (; sent < budget; sent++) {
-> +               struct gve_tx_pending_packet_dqo *pkt;
-> +               s16 completion_tag;
-> +               dma_addr_t addr;
-> +               u32 desc_idx;
-> +
-> +               if (unlikely(!gve_has_avail_slots_tx_dqo(tx, 1, 1))) {
-> +                       repoll =3D true;
-> +                       break;
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 
-If the whole 'for' loop breaks here, the sent should not be increased
-by one, right?
+--------------c9AyhRwTeXRG0KJRqBifQz9w--
 
-> +               }
-> +
-> +               if (!xsk_tx_peek_desc(pool, &desc))
-> +                       break;
+--------------90ObT6dBLZnN5Hx06oetO0Nn
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-The same logic here.
+-----BEGIN PGP SIGNATURE-----
 
-I would use a while() or do..while() loop like how i40e_clean_tx_irq()
-manipulates the budget.
+wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaH7QXwUDAAAAAAAKCRBqll0+bw8o6I5q
+AP9f3cQ7GdNVA4AEEGxE5Ig3UKbQZCw5bwR3m49s1LtltAD/escmpjYJsrxBuLZbQDRsxamGOfyY
+lRquynPlZziOpgg=
+=WFcD
+-----END PGP SIGNATURE-----
 
-> +
-> +               pkt =3D gve_alloc_pending_packet(tx);
-
-I checked gve_alloc_pending_packet() and noticed there is one slight
-chance to return NULL? If so, it will trigger a NULL dereference
-issue.
-
-Thanks,
-Jason
-
-> +               pkt->type =3D GVE_TX_PENDING_PACKET_DQO_XSK;
-> +               pkt->num_bufs =3D 0;
-> +               completion_tag =3D pkt - tx->dqo.pending_packets;
-> +
-> +               addr =3D xsk_buff_raw_get_dma(pool, desc.addr);
-> +               xsk_buff_raw_dma_sync_for_device(pool, addr, desc.len);
-> +
-> +               desc_idx =3D tx->dqo_tx.tail;
-> +               gve_tx_fill_pkt_desc_dqo(tx, &desc_idx,
-> +                                        true, desc.len,
-> +                                        addr, completion_tag, true,
-> +                                        false);
-> +               ++pkt->num_bufs;
-> +               gve_tx_update_tail(tx, desc_idx);
-> +               tx->dqo_tx.posted_packet_desc_cnt +=3D pkt->num_bufs;
-> +               gve_xsk_reorder_queue_push_dqo(tx, completion_tag);
-> +       }
-> +
-> +       if (sent) {
-> +               gve_tx_put_doorbell_dqo(priv, tx->q_resources, tx->dqo_tx=
-.tail);
-> +               xsk_tx_release(pool);
-> +       }
-> +
-> +       spin_unlock(&tx->dqo_tx.xdp_lock);
-> +
-> +       u64_stats_update_begin(&tx->statss);
-> +       tx->xdp_xsk_sent +=3D sent;
-> +       u64_stats_update_end(&tx->statss);
-> +
-> +       return (sent =3D=3D budget) || repoll;
-> +}
-> +
->  static void add_to_list(struct gve_tx_ring *tx, struct gve_index_list *l=
-ist,
->                         struct gve_tx_pending_packet_dqo *pending_packet)
->  {
-> @@ -1152,6 +1255,9 @@ static void gve_handle_packet_completion(struct gve=
-_priv *priv,
->                 pending_packet->xdpf =3D NULL;
->                 gve_free_pending_packet(tx, pending_packet);
->                 break;
-> +       case GVE_TX_PENDING_PACKET_DQO_XSK:
-> +               pending_packet->state =3D GVE_PACKET_STATE_XSK_COMPLETE;
-> +               break;
->         default:
->                 WARN_ON_ONCE(1);
->         }
-> @@ -1251,8 +1357,34 @@ static void remove_timed_out_completions(struct gv=
-e_priv *priv,
->
->                 remove_from_list(tx, &tx->dqo_compl.timed_out_completions=
-,
->                                  pending_packet);
-> +
-> +               /* Need to count XSK packets in xsk_tx_completed. */
-> +               if (pending_packet->type =3D=3D GVE_TX_PENDING_PACKET_DQO=
-_XSK)
-> +                       pending_packet->state =3D GVE_PACKET_STATE_XSK_CO=
-MPLETE;
-> +               else
-> +                       gve_free_pending_packet(tx, pending_packet);
-> +       }
-> +}
-> +
-> +static void gve_tx_process_xsk_completions(struct gve_tx_ring *tx)
-> +{
-> +       u32 num_xsks =3D 0;
-> +
-> +       while (true) {
-> +               struct gve_tx_pending_packet_dqo *pending_packet =3D
-> +                       gve_xsk_reorder_queue_head(tx);
-> +
-> +               if (!pending_packet ||
-> +                   pending_packet->state !=3D GVE_PACKET_STATE_XSK_COMPL=
-ETE)
-> +                       break;
-> +
-> +               num_xsks++;
-> +               gve_xsk_reorder_queue_pop_dqo(tx);
->                 gve_free_pending_packet(tx, pending_packet);
->         }
-> +
-> +       if (num_xsks)
-> +               xsk_tx_completed(tx->xsk_pool, num_xsks);
->  }
->
->  int gve_clean_tx_done_dqo(struct gve_priv *priv, struct gve_tx_ring *tx,
-> @@ -1333,6 +1465,9 @@ int gve_clean_tx_done_dqo(struct gve_priv *priv, st=
-ruct gve_tx_ring *tx,
->         remove_miss_completions(priv, tx);
->         remove_timed_out_completions(priv, tx);
->
-> +       if (tx->xsk_pool)
-> +               gve_tx_process_xsk_completions(tx);
-> +
->         u64_stats_update_begin(&tx->statss);
->         tx->bytes_done +=3D pkt_compl_bytes + reinject_compl_bytes;
->         tx->pkt_done +=3D pkt_compl_pkts + reinject_compl_pkts;
-> @@ -1365,6 +1500,19 @@ bool gve_tx_poll_dqo(struct gve_notify_block *bloc=
-k, bool do_clean)
->         return compl_desc->generation !=3D tx->dqo_compl.cur_gen_bit;
->  }
->
-> +bool gve_xsk_tx_poll_dqo(struct gve_notify_block *rx_block, int budget)
-> +{
-> +       struct gve_rx_ring *rx =3D rx_block->rx;
-> +       struct gve_priv *priv =3D rx->gve;
-> +       struct gve_tx_ring *tx;
-> +
-> +       tx =3D &priv->tx[gve_xdp_tx_queue_id(priv, rx->q_num)];
-> +       if (tx->xsk_pool)
-> +               return gve_xsk_tx_dqo(priv, tx, budget);
-> +
-> +       return 0;
-> +}
-> +
->  bool gve_xdp_poll_dqo(struct gve_notify_block *block)
->  {
->         struct gve_tx_compl_desc *compl_desc;
-> --
-> 2.50.0.727.gbf7dc18ff4-goog
->
->
+--------------90ObT6dBLZnN5Hx06oetO0Nn--
 
