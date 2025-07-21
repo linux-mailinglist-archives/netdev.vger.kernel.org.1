@@ -1,221 +1,113 @@
-Return-Path: <netdev+bounces-208527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA03CB0BFC8
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 11:16:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24544B0C01F
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 11:23:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E67F189E30F
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 09:16:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D33163C0F6B
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 09:23:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA5521E5711;
-	Mon, 21 Jul 2025 09:16:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E97B528C84A;
+	Mon, 21 Jul 2025 09:23:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FI1nVT0U"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KOMVstTG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01B40EAC6;
-	Mon, 21 Jul 2025 09:16:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCCC528B4F0;
+	Mon, 21 Jul 2025 09:23:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753089382; cv=none; b=nIiEqd18DVUJsN9436LLQ/mLqIeoS+UUJu5bChFDE+/y3aSQ0PDhfFxUWra5RF8jZ71BCZG3TP3YOfAIxH7mnsxrEl7+WcfB3i5Ts4EKHlkHuP3CPuSDrsMMBJ4IrNTQ1mAgPWC9pQmjnv0CN1D9LD9EPjI0/9PC0DTrpZYfFnc=
+	t=1753089814; cv=none; b=pZOpNOs8l+hKOYYr7ib4usmyhmtnnTWMK+nNL9Y6FQQbcIOikFUpsgpmceY8pNcBhVsiQ1QDJy0HzZZ3bX4p1Kb3X79C/88awDVDqaqch1dtxmKNsB6B4t9qS9OJK+Y4O9yKxSEhB7RMAH9rkH6SsYBFe906ZQ9x3uYLLt73qLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753089382; c=relaxed/simple;
-	bh=lZztgRWc++8D+GdQu/vkTNbkXwp0jOO0RZ1Iu+pizso=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TlyqPfkAoHB+hx+JwBXyRW6k+dVrPUXN/6sQ1uqrPqegB7wNnX+hmohHxZ+GTfTLwr2arRAc1t9B9hc5hYy3KYqyLny/ifvBRLgxa2pBYJWu/bXEAAjVdmjZqXYelgbIeGWK7kLDVVtYU1Dpi+a2IgFNI1aYPk3zDqwppf3yVWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FI1nVT0U; arc=none smtp.client-ip=209.85.166.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3dda399db09so54677665ab.3;
-        Mon, 21 Jul 2025 02:16:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753089378; x=1753694178; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aWTCrJr+jkFbr7yY/GDDx9r5qnemW4sfX9ZnAt73ZW0=;
-        b=FI1nVT0U/rdP42vMlvPmxVKIb8jGJLiJBuIF4Apba0oFot/wkSegVO9ym+8JrfbT2F
-         JT8ytpErXDX1PsPu3RwtE2hnzYwKW0aBMpkfoK30s9wKFA8vcM+f1JPKA0O+8GfwiRkw
-         SXEaYxQeIK8bDHKa5/TSEuiXGqH9TK88XZNunf0eCgS12JV5LJEfgLSqGGuApWfo6Zqx
-         zZ7KrV0q4k//sy3af28sNem9Oxg2Rs5sHDMWfXkUfwX4dOwcBrciCS4cmgsSMHBoiaIv
-         XS8zA+1AG2KkjwOlEJvXZFPNH0EtsuOvnw2AP3SnZLMKecpGHq36UMSdIeY/CNmAgnXo
-         7fgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753089378; x=1753694178;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aWTCrJr+jkFbr7yY/GDDx9r5qnemW4sfX9ZnAt73ZW0=;
-        b=xPSWo/QqqRPKH9J00MW2IzT0DKW2P/P25YYF05/laH85239JpBp/fdjJUGSWz29oF/
-         7zGG3he5Mt2SuYPsWeF0J/SFtC0zQSN9DKm1lcKTboVE6jvdJdwIatVKPIt5yzWQRo3e
-         ummTwtKJBzhQYj1WJNCNUAh+9mQ885eYsCrVZfw/PqfP5QuGsRRHtc3y8XBco13KAKyw
-         3kdAyiBoNDwWU+/UBfekPwtuSGbTNB7EWz3P3w3hbwVeQhi/f6Q3vnNx2b3wHtPrMVoa
-         XcumiMZZj+4XiFBpGtEHLiT0YHy9fWxPW4U776o9BPZU9fcDrjmYSIlVCHS+C3DS2h8L
-         KVyA==
-X-Forwarded-Encrypted: i=1; AJvYcCUHRY5a4BfrvQOp1I5DhJ51AzUQK1UOooze1p3MRlwKxZ3BPLC7DjbFnJVtLXkgtou+eRU=@vger.kernel.org, AJvYcCVHtPLVl3LyL2Q9y5CvF1SxTMeuoiNSHTk7rzu8JMkkBACCB8Rjji7BcgvWsaJDM7P/bzynOPyI@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxt7dWRGs2BV/Bnsq4ZQB2y3eaRAXKMKSYM5XxDCbiqq7xTSoLm
-	Im91NiCY8wwV2iPcpZbXpb03jIEwbzxZkQUO82/lVT1peMVIHrLBP1VCb0xJ8BK5lX8SeIwbOyQ
-	qCMyEx1R3ri2yNroWLSswBJrhJtdp9O8=
-X-Gm-Gg: ASbGncuCC35Up7hRXminea+zOLPmyAGYcpO+Bv2nAwqpWrz9EBwzkRRKDB5rDzacb0j
-	40upvpWwRFfbworz4d5Db/PIM/QDjs2LhZO5u8Q4MmHoDArTV3satN4ZinSQFr5qY/CJvrIDRvh
-	wnmrq/LOVho8doQZEmt9Q47C1n6/nMgjTEW4KYSJu6Qf1iaFabn2P63Wy90VgdPF4+/sBvMBwlf
-	jKTDg==
-X-Google-Smtp-Source: AGHT+IG2nZhptU5sMShiQM05wOmbJqhauf2H0RI8O2kKSAiSqbryj8HoWrcq2C8YGYvMd2oBpjurux1VpzbYVEFH93k=
-X-Received: by 2002:a05:6e02:19c7:b0:3dd:e7d6:18bb with SMTP id
- e9e14a558f8ab-3e2824f58c8mr214595465ab.17.1753089377803; Mon, 21 Jul 2025
- 02:16:17 -0700 (PDT)
+	s=arc-20240116; t=1753089814; c=relaxed/simple;
+	bh=uxjP2gEJbOBmQlv81I1IvKh2j8a6dIhhumYLQw1WC38=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jm/5OcDF9GJl/zknxE+o6TpHX6hI/EydTuIimK4682wrpL2beR57lSbYspMHpfYos9tmAjOpwXehbOtcSXIg2Mz0t7SkqKyuDyXVoFEFq+POSPKH6co+ZPbwLZxZuaehLQpkYBN3SZBZvnhdxX8VsT1nu8p8LDs8acn6F5yGNZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KOMVstTG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCD45C4CEF1;
+	Mon, 21 Jul 2025 09:23:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753089814;
+	bh=uxjP2gEJbOBmQlv81I1IvKh2j8a6dIhhumYLQw1WC38=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KOMVstTGQRd2VVqlltIRirx/UjZsTgs+tGRJ2vk9tPMTNIthsL3LwKRCl2Nzc5gQS
+	 NrTF7WBojA/mhex9+9B1H3irU+dS0N6T/Hsj4GjMrd+OMH1CNCbVPMSegQxqTDKiWG
+	 Wf/jyUwF46O8oJacFEjy1aj/5y3TCAfTyiaiWfkEqePtk6vrP7e2TzRpFmj3QrJ8KO
+	 ISLrGoW1tBPlYRw4MCfyPRB5TJasGkxQD/shwa2ekiT6uZuelmmtimiIDrdEWAdsn5
+	 zZKjzFto9RUnrtypGKGECkudk5+Ba+or3Z6h9hrVKhtVleG3svcxI4WsmyktbWWm4k
+	 xFJWfSDwX8aDA==
+Date: Mon, 21 Jul 2025 11:23:31 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Prathosh Satish <Prathosh.Satish@microchip.com>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>
+Subject: Re: [PATCH net-next 1/2] dt-bindings: dpll: Add clock ID property
+Message-ID: <20250721-lean-strong-sponge-7ab0be@kuoka>
+References: <20250717171100.2245998-1-ivecera@redhat.com>
+ <20250717171100.2245998-2-ivecera@redhat.com>
+ <5ff2bb3e-789e-4543-a951-e7f2c0cde80d@kernel.org>
+ <6937b833-4f3b-46cc-84a6-d259c5dc842a@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250721083343.16482-1-kerneljasonxing@gmail.com>
- <20250721083343.16482-2-kerneljasonxing@gmail.com> <8c9e97e4-3590-49a8-940b-717deac0078d@molgen.mpg.de>
-In-Reply-To: <8c9e97e4-3590-49a8-940b-717deac0078d@molgen.mpg.de>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 21 Jul 2025 17:15:41 +0800
-X-Gm-Features: Ac12FXxJ1BHePlaT48Hqw0KdfZnHkKmI2oq2Xb6hjs7o-cBEjOG5DrUKN96fo1c
-Message-ID: <CAL+tcoAP7Zk7A4pzK-za+_NMoX11SGR3ubtY6R+aaywoEq_H+g@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] [PATCH net-next 1/2] stmmac: xsk: fix underflow
- of budget in zerocopy mode
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, bjorn@kernel.org, 
-	magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
-	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
-	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com, 
-	linux-stm32@st-md-mailman.stormreply.com, bpf@vger.kernel.org, 
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <6937b833-4f3b-46cc-84a6-d259c5dc842a@redhat.com>
 
-Hi Paul,
+On Fri, Jul 18, 2025 at 02:16:41PM +0200, Ivan Vecera wrote:
+> Hi Krzysztof,
+> 
+> On 18. 07. 25 8:55 dop., Krzysztof Kozlowski wrote:
+> > On 17/07/2025 19:10, Ivan Vecera wrote:
+> > > Add property to specify the ID of the clock that the DPLL device
+> > > drives. The ID value represents Unique Clock Identified (EUI-64)
+> > > defined by IEEE 1588 standard.
+> > 
+> > With the exception of clock-output-names and gpio-hogs, we do not define
+> > how the output looks like in the provider bindings.
+> > 
+> > I also don't understand how this maps to channels and what "device
+> > drives a clock" means. Plus how this is not deducible from the compatible...
+> 
+> The clock-id property name may have been poorly chosen. This ID is used by
+> the DPLL subsystem during the registration of a DPLL channel, along with its
+> channel ID. A driver that provides DPLL functionality can compute this
+> clock-id from any unique chip information, such as a serial number.
+> 
+> Currently, other drivers that implement DPLL functionality are network
+> drivers, and they generate the clock-id from one of their MAC addresses by
+> extending it to an EUI-64.
+> 
+> A standalone DPLL device, like the zl3073x, could use a unique property such
+> as its serial number, but the zl3073x does not have one. This patch-set is
+> motivated by the need to support such devices by allowing the DPLL device ID
+> to be passed via the Device Tree (DT), which is similar to how NICs without
+> an assigned MAC address are handled.
 
-On Mon, Jul 21, 2025 at 4:56=E2=80=AFPM Paul Menzel <pmenzel@molgen.mpg.de>=
- wrote:
->
-> Dear Jason,
->
->
-> Thank you for your patch.
+You use words like "unique" and MAC, thus I fail to see how one fixed
+string for all boards matches this. MACs are unique. Property value set
+in DTS for all devices is not.
 
-Thanks for your quick response and review :)
+You also need to explain who assigns this value (MACs are assigned) or
+if no one, then why you cannot use random? I also do not see how this
+property solves this...  One person would set it to value "1", other to
+"2" but third decide to reuse "1"? How do you solve it for all projects
+in the upstream?
 
->
-> Am 21.07.25 um 10:33 schrieb Jason Xing:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > The issue can happen when the budget number of descs are consumed. As
->
-> Instead of =E2=80=9CThe issue=E2=80=9D, I=E2=80=99d use =E2=80=9CAn under=
-flow =E2=80=A6=E2=80=9D.
+All this must be clearly explained when you add new, generic property.
 
-Will change it.
+Best regards,
+Krzysztof
 
->
-> > long as the budget is decreased to zero, it will again go into
-> > while (budget-- > 0) statement and get decreased by one, so the
-> > underflow issue can happen. It will lead to returning true whereas the
-> > expected value should be false.
->
-> What is =E2=80=9Cit=E2=80=9D?
-
-It means 'underflow of budget' behavior.
-
->
-> > In this case where all the budget are used up, it means zc function
->
-> *is* used?
-
-Got it.
-
->
-> > should return false to let the poll run again because normally we
-> > might have more data to process.
->
-> Do you have a reproducer, you could add to the commit message?
-
-Sorry, I didn't have a reproducer. I cooked this patch after analyzing
-the whole logic (because recently I'm reading the zc xmit
-implementation among various drivers.)
-
->
-> > Fixes: 132c32ee5bc0 ("net: stmmac: Add TX via XDP zero-copy socket")
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >   drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 4 +++-
-> >   1 file changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/driver=
-s/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > index f350a6662880..ea5541f9e9a6 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > @@ -2596,7 +2596,7 @@ static bool stmmac_xdp_xmit_zc(struct stmmac_priv=
- *priv, u32 queue, u32 budget)
-> >
-> >       budget =3D min(budget, stmmac_tx_avail(priv, queue));
-> >
-> > -     while (budget-- > 0) {
-> > +     while (budget > 0) {
->
-> So, if the while loop should not be entered with budget being 0, then
-> the line could  be changed to `while (--budget > 0) {`? But then it
-> wouldn=E2=80=99t be called for budget being 1.
-
-Right, so it shouldn't be '--budget'.
-
->
-> A for loop might be the better choice for a loop with budget as counting
-> variable?
-
-Sorry, I didn't follow you.
-
->
-> >               struct stmmac_metadata_request meta_req;
-> >               struct xsk_tx_metadata *meta =3D NULL;
-> >               dma_addr_t dma_addr;
-> > @@ -2681,6 +2681,8 @@ static bool stmmac_xdp_xmit_zc(struct stmmac_priv=
- *priv, u32 queue, u32 budget)
-> >
-> >               tx_q->cur_tx =3D STMMAC_GET_ENTRY(tx_q->cur_tx, priv->dma=
-_conf.dma_tx_size);
-> >               entry =3D tx_q->cur_tx;
-> > +
-> > +             budget--;
-> >       }
-> >       u64_stats_update_begin(&txq_stats->napi_syncp);
-> >       u64_stats_add(&txq_stats->napi.tx_set_ic_bit, tx_set_ic_bit);
->
-> Excuse my ignorance, but I do not yet see the problem that the while
-> loop is entered and buffer is set to 0. Is it later the return condition?
-
-Let me give a simple example. Supposing the budget is one initially,
-at the first round, the budget will be zero. Later, after this desc
-being processed, the 'while (budget-- > 0)' statement will be accessed
-again, and then the budget will be decreased by one which is u32(0 -
-1), namely, UINT_MAX. !!UINT_MAX is true while the expected return
-value is false (!!0, 0 is the expected budget value).
-
-i40e_clean_tx_irq() handles this correctly, FYI.
-
-Thanks,
-Jason
-
->
->      return !!budget && work_done;
->
->
-> Kind regards,
->
-> Paul
 
