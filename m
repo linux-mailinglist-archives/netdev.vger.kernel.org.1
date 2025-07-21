@@ -1,367 +1,160 @@
-Return-Path: <netdev+bounces-208498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EEBFB0BD9B
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 09:25:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C04F1B0BDA2
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 09:30:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89A1A177A7F
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 07:25:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F5FB18869E3
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 07:30:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5E6C280A5A;
-	Mon, 21 Jul 2025 07:25:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEAFC1AF0C8;
+	Mon, 21 Jul 2025 07:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PAz9E3uZ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="pi4F+Q+K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B3D224FD
-	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 07:25:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753082741; cv=fail; b=WGuVfVRrMmuidqbPMe5laBjCk0IDl32nOERh47FbtL6wXvQNWOTJg1sE4mCLOoF88pAmF4nP3xbAkKTlAyR2yIIiH5MYv2BWmaqwHt0t5wA7+HLf2UimZ0Qn7cf3bI2+WvvQAkO3NSB3l0WxB/0JNheXZv8fA4WllExQGnQNZL4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753082741; c=relaxed/simple;
-	bh=/ukR/B77iCTGZ0bTfcrkzK10eORAq+IAk6Ex5Y5hpdE=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=KVgVcEgXy3nuCh1d54iK/zJVVXKUGUCgaPaAuv7p82kyo/NvRuokGBQzm3Qj404MHKjp2Aog5aCqDhfrAqEIcPgc5yFeeTi/EeU4HWNwZ1GqVeZ2yVMZYp+QGe1l1+dqJerTiBiHl+6oWy2U312pd1wE3aCeiFhVvNSxFAkTafE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PAz9E3uZ; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753082740; x=1784618740;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=/ukR/B77iCTGZ0bTfcrkzK10eORAq+IAk6Ex5Y5hpdE=;
-  b=PAz9E3uZXA2h3abPrE7PF+qbxkC2dSPwOh7DRhic+IVU1OrhaeJtO1HD
-   2b747Sj3tXI/GW6L7bD0BQnSE/VhAsBmiseOoam6rsURd5bGhTBGHdnIq
-   13IWhfwtIEF5FnKMVsURDVRkUoiGrLezPD/JK/m+BHXoI585KKaNJRovP
-   ZHCxcu9Sd83LKTjfY3es82ovErDBMdT2pMj0BdpMsdtBzbz5cyuCtcfVh
-   j6a2e5cnuhEYYskxEzzkHzSGD3S5TmDuOUIH53qyxoGaHIdMwH2nwoEwm
-   ERRFJeT+InU8FgywjAL+992zFwiW8pLw8J1cQqEKXn8vynscM1IOqwljQ
-   Q==;
-X-CSE-ConnectionGUID: +BDNnEoLQHe//Mc4CmC7+Q==
-X-CSE-MsgGUID: fM0rz+BFRDm0RmVMP8wyFg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11498"; a="72746071"
-X-IronPort-AV: E=Sophos;i="6.16,328,1744095600"; 
-   d="scan'208";a="72746071"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2025 00:25:37 -0700
-X-CSE-ConnectionGUID: 9jcz++8zS7C4HiTdj5iyhg==
-X-CSE-MsgGUID: U8NlXh9zT/yI6Rjz0vsOIw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,328,1744095600"; 
-   d="scan'208";a="158423166"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2025 00:25:37 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Mon, 21 Jul 2025 00:25:36 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26 via Frontend Transport; Mon, 21 Jul 2025 00:25:36 -0700
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (40.107.100.42)
- by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Mon, 21 Jul 2025 00:25:34 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JgnE79FmpaMaeHorxjIH6fHXRf3y7sgk3JwVB/4MZRtiuSk654ocqrcDdSRMGRk1JJKL3ZYoMtP8zKpco3WcTAj3+qhitiI3vN5X6cCJr0Z5z87tLLa9PSY0wADtbDUhZiEkdlmHFFvn6bV+5rp/FkG/m8l7tk3MkDNgRiM8ETO6YAWjEkSj8lmub6F6v/yK+zlmWQUbMZjuic9CEGfvdo8bBWEogznRXICkphLrLTmMMy11hNCB/kjfnDjjYDk2weAL26/WUIXkqbgeHI34XMXqduDTTZ91WXubm1i5xrVod/gqkTHBZ66AOy3LLJDUR3fWtoNb3UfeWK6PFYWwwQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bcBQPruc94fJMgzBEwIqZGyeN29eJuIrOPRxC4r+DQY=;
- b=jEWK+T38Zl3uDS6wwfo73TpVUKyNo5uLswr4Mg7U9phu1zBc85JfsR3yDvO/DvZT8iRprX7xeBxFamor3HmqYTu2tS2OoU/DV8vPT0LM92t+d4iTEkHFR/gr0WGV5b/GKob5JXFIbYNyNXdH2nORRQkKPgAvsB9Z0HDy6Nyz9ut/FrFH5GAnkQgMdHXJs+3sr5XYxctNg0qqsaafxrnnHKD0PK7IKO1lypOL17z97f6dusui48m9P8VmsuoG+MgAE+7jNv67YgVo5UdGu8EqK4rfnveWtCjqaDz81upHJlB7GWNBQuPS8/RP6CqkdktwowtVKchOBjP/QXz7hOnW1Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
- by SJ5PPFED9C9AC99.namprd11.prod.outlook.com (2603:10b6:a0f:fc02::85d) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.39; Mon, 21 Jul
- 2025 07:25:05 +0000
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::399f:ff7c:adb2:8d29]) by SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::399f:ff7c:adb2:8d29%4]) with mapi id 15.20.8943.029; Mon, 21 Jul 2025
- 07:25:04 +0000
-Date: Mon, 21 Jul 2025 09:24:52 +0200
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-CC: Jakub Kicinski <kuba@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	<przemyslaw.kitszel@intel.com>, Maciej Fijalkowski
-	<maciej.fijalkowski@intel.com>, <intel-wired-lan@lists.osuosl.org>, netdev
-	<netdev@vger.kernel.org>
-Subject: Re: ixgbe driver stops sending normal data when using xsk
-Message-ID: <aH3rRHm8rQ35MqMd@soc-5CG4396X81.clients.intel.com>
-References: <CAL+tcoCTHTptwmok9vhp7GEwQgMhNsBJxT3PStJDeVOLR_-Q3g@mail.gmail.com>
- <aHohbwWCF0ccpmtj@soc-5CG4396X81.clients.intel.com>
- <CAL+tcoCJ9ghWVQ1afD_WJmx-3n+80Th7jPw-N-k9Z6ZjJErSkw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL+tcoCJ9ghWVQ1afD_WJmx-3n+80Th7jPw-N-k9Z6ZjJErSkw@mail.gmail.com>
-X-ClientProxiedBy: WA0P291CA0010.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:1::12) To SN7PR11MB7540.namprd11.prod.outlook.com
- (2603:10b6:806:340::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DE8E126BF7;
+	Mon, 21 Jul 2025 07:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753083029; cv=none; b=HjbcVV0d8qPQjYxK6nZ5MS+gRIiQ50H1bdaNkys72s5jmvAqClxtF3eUy1qWeIaXEjpSMw7BLMTb612MA3ysmIBcRqfaLsbQzi1CBexcBa9dgkxFSXrhfDVma7ku5aDQONCWaL28cAB1N/DSMxZC4R7HLNSyxo+83lkkeK2GXoU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753083029; c=relaxed/simple;
+	bh=k77l9xXP68qxhTzw/OxMss+wmcpGLj2vPrIcvEW4Ozo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=piA22bOpk44+twwrXeSLeoF32Ty4XOpLtBp3C9kFW1RW2rOAbfGiJg6kfVu4CybSafRYQU16/c34IvksGaICWOQc2qZ0Mn3nsF3Z2MFmG19hODAgt+D18Ghpxwnvlb8FCVCrPbRQoidp80EY2FRpeHY6ooRC2Y4a1wa1EOlhBEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=pi4F+Q+K; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56L1rZwj030943;
+	Mon, 21 Jul 2025 07:30:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=sXwypK2wofLaLIWqEGEwkCwUqotA0G
+	XBM0MSXIpmbS8=; b=pi4F+Q+KWPhCOygJL/5lmPVTeT/ssFf1v41q8xQnx1iBiD
+	wfhjlLlk7F7NDYxUw90e+LDLHTNdcWwd2Tg0uRyaN77RRHSogXdSJEOGnxEKBfvn
+	EqMFD6DV3N6ZxqGfufk6nIL7r1bVkLzLfDgC+b1TmW/VfvIgmcWCC/IwBjgTRAAW
+	uhwRsgMrJIPaz7ucqZf8VfuJbo948LdanXEyPdkSrvyMGiCTMRDqWj5FvI2HPvD2
+	2pt77ZQ7mPxz+Z91P1pcv1HEiq35EbWYbBvaM4SUE7AVd+4USZJeR8DeatpKRPZc
+	NMXIZ+5dKODk9L8EwhDyWJQDRd8366lhERfsRxYw==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48069v7ac3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Jul 2025 07:30:20 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 56L7SmNY020127;
+	Mon, 21 Jul 2025 07:30:19 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48069v7abx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Jul 2025 07:30:19 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56L5T2hQ024975;
+	Mon, 21 Jul 2025 07:30:18 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 480rd24rsv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Jul 2025 07:30:18 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56L7UBH537618016
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 21 Jul 2025 07:30:11 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 354022004E;
+	Mon, 21 Jul 2025 07:30:11 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1A88E2004B;
+	Mon, 21 Jul 2025 07:30:10 +0000 (GMT)
+Received: from li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com (unknown [9.87.132.117])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon, 21 Jul 2025 07:30:10 +0000 (GMT)
+Date: Mon, 21 Jul 2025 09:30:08 +0200
+From: Alexander Gordeev <agordeev@linux.ibm.com>
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Alexandra Winter <wintera@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        Ursula Braun <ubraun@linux.ibm.com>, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Aliaksei Makarau <Aliaksei.Makarau@ibm.com>,
+        Mahanta Jambigi <mjambigi@linux.ibm.com>
+Subject: Re: [PATCH 1/1] s390/ism: fix concurrency management in ism_cmd()
+Message-ID: <6b09d374-528a-4a6d-a6c6-2be840e8a52b-agordeev@linux.ibm.com>
+References: <20250720211110.1962169-1-pasic@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|SJ5PPFED9C9AC99:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8bdb44eb-eeb4-4930-8a7d-08ddc827b660
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|10070799003|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?QStRL2hZdDhsZFRDWHoyeEpZUlQ1RFN1ZlZZcklOWDhYL2d0SFJodDluUkRs?=
- =?utf-8?B?cklJaThnamVibUpGZE4xTFJyRGpKMFpVUXp0MGJ0ZlpHWmt0U1ZwN0JONTIz?=
- =?utf-8?B?ako0WlpGK2V3ekVpTHA1M3FLcDlBRmNVVUFXRlhwemhCYmhQWm05VG1OMkJy?=
- =?utf-8?B?YlNDYm04Q0tRU3VjVHYvbjdlUFBZb3VURWs1WHAyaHJ1NnJVdDN5WSt4cTZO?=
- =?utf-8?B?WE9TZW9CNjE0Tk1ibnRXNk91Wmx5WHFwUXlZYnNCTlA1N25wR2hYRm9kZkcz?=
- =?utf-8?B?QjRXaG0vRzQvWFNDVE9VMXVOTHAxK3MzWThFQWQ4SUNIMHl5bnVHZFB4YnBV?=
- =?utf-8?B?VXl4aEUrWjJBamhFa1VFR1MxbU01M0wrY0VHSnA5bUltZTZjRlZjelRkVXkr?=
- =?utf-8?B?bXg0LzBXWjJZWFIxVVFyT3Awb3FyNnpaWnVGc3Y0dW5OcElOZmJoZHB6ZU9s?=
- =?utf-8?B?SW5rUjZ0Uys3STZaTTJ0TmFsR1kwTUQyYWJLQ3I4Ti9VZWN5Nk1SSVdhems5?=
- =?utf-8?B?RWU5SnE0N1JwVHU0RTJUQW12djBJK1hwNlEvOFpURHJnajBNVi80OTdNM3A4?=
- =?utf-8?B?eUtYb3RkZWJSWWFrNTVqdHZYWkZVWFB0TDRnMXpDRkpFa0k0Q2RTN1MybzUr?=
- =?utf-8?B?MFRla3BBZjFGVm95R2VrdDdWV2IzWno5M1RtRk9vVzN5NmYwOUpUTHNHUVVi?=
- =?utf-8?B?Y1hmaUFRS1UzeUJaK0dHVk9uUnZnTHJJbUthWjYwZXJlQzVnZ3ltdFJ5UU9u?=
- =?utf-8?B?NGZObFVqaHZXUzZCcmtPR21GU3Q3NWIyWmZKREpLMUd1b0IxSHRpejUrWEtC?=
- =?utf-8?B?RjJTdUFyVDJyMXdkWE8vWlFZekkvOGsyMXBYMWVETTRnM1UxMys1bjB3NytO?=
- =?utf-8?B?VlNGQ09iK1l2dGp1aituaUtZMGp0S2YxbC9lK3dSMFFOVmpvR09yN2FCQlNP?=
- =?utf-8?B?UUlVVk50OXpVVVNXRnpMMnpvdG1ITDlnbGRkUnIrd3VnSGppSzg3MmIrY2Vx?=
- =?utf-8?B?NkhOK2VwOGs3bG5TVWIwTGJlT3E5YnJJbTQwRklRMVMwRmZaZFNHcE9GTk1h?=
- =?utf-8?B?UU9JekRONHpTdEhDNWVDTjNBWWlieWI5U081WHd2QllaV3MvVDJpaDRGcng4?=
- =?utf-8?B?a0xiRFFHYjUxQ2pyOWpvWkpORitGempNU0REQmU1NHRlY2xOWUEzYmQ2U3Q0?=
- =?utf-8?B?bi91eUczUzhBYzNPYjZiWDNKdXFNRE5Kam5XZmFGeU9hRGc3OWUvQnlKWFZo?=
- =?utf-8?B?WEE4dlRZYmd5OTJ1aFdUN1J2dXVZb01IU3hoNVJlMG5SNGwrYkxRK3dzeFZs?=
- =?utf-8?B?bzMwOVNOVmdQSDNNNXl5KzduNTVxQ0pHSFlBbzlGajh3TDZIYjBwWGJBaFNY?=
- =?utf-8?B?QU1IUHhTMlZsVmxRNXQvaU9UZDJIS1UvNWRiY3dnUVpLRDY2eUtpZ0RDS3li?=
- =?utf-8?B?bEcvSzRyWVhwVG5BMXVuMlJ6RVhiV0MzRm0zOFdUelR5YUpGTU14cU9lRUZP?=
- =?utf-8?B?VXVhWXF0THZnM3hDZEZHalJ4bVg2V20wYjlEcnRJWmZTYmdieTVqSnZSMmVS?=
- =?utf-8?B?aGZUK3RmL1g3UmVaMkJmS3hBdEIxa1ludnkxT3FLU2ZDcGdVK3BmZW5sRDVM?=
- =?utf-8?B?S3p2cXBUS3NMbWFZZDNoOXpJRjFpZWZINHhsSFlEK3BPZ1VZdmNvTElFYk9V?=
- =?utf-8?B?SEgwZElLNW5KQnIwNUgxdzFYRHZjQ01HWjQwa0kxQnl6UUVvM0taQ1ZhMlY5?=
- =?utf-8?B?N3F4VWhQb2hmVGRHVjg5K3RvK3AzeFZwbjYzNW5IMmp3Z3dDZWVHd2dCYzZs?=
- =?utf-8?B?UmJ4VXhOY0FrMHVSZG1tMDdXUVZJMkN4UktEYWNvZGFBVWNiVjNVM3gwaFpX?=
- =?utf-8?B?OERPK25jL05uTHFCdmd5ZFhYVEdtekYydVRKVHdWUndnMVJVUkxxcUN0Umpy?=
- =?utf-8?Q?WDizwMjdgzY=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cTk1R1dzQkUxcW1meFp6R1VvY0gyOEFTay9DS0drelNCd1VUcFdxSHJsT21O?=
- =?utf-8?B?YWFYSVZia3pDaHNjYzQ3eXJES2RuNnVPWFliTFJCMktxNDRGQmhPSC9jTUhy?=
- =?utf-8?B?UzV5c2o5RGNZYlArbE1IUmFIWlFCZm9ObmZ4QXdxeWd3ZmZpTWlaWDAzQ0tG?=
- =?utf-8?B?MTNRQldJQUljU3pxWks1VFJRZmxYWitEaE5QVUJMaVJ6OUZkdkFCYk1aSkZQ?=
- =?utf-8?B?dFVWRjhGM2o0MkVpdEFwd0hHeVdyNzFCNEloZHArUy81RFBxOGIxa3ZxMUNV?=
- =?utf-8?B?VE96QUdkNUp2cWNWNGlCMGlKYXVsV3JwanBQRCt3elJaZGxVMXcvWjdZWGhH?=
- =?utf-8?B?YUpVM1RGTDhlNkdnV0lhSGZacjFSSDgrMFhlL25rNU1QMnliT29VNlVVMXJW?=
- =?utf-8?B?cTBpSHV1NzVMaGt1b1hwM0NjL2xieG9yMVNFWFZLT0lXajV0L3grQnliZFZp?=
- =?utf-8?B?L1pMd09RUVhGQWdxYnRpQ1lCalZoSFJwelI3TWExV09LMEJ5clNkek5nV2hR?=
- =?utf-8?B?SHVXcHRsVG9ET09Md29hYWZwcTJtVzNtWkpCQk5KaGZxQi9HM3FaZEpZVFhX?=
- =?utf-8?B?NUdEZk1uK2IxMFpVOWFJUTFaU243UjBsVWYxaGN2VGVQSlA0UytDVU5rY0lX?=
- =?utf-8?B?dXBRMjQ1c0UxMzRIeWFNaHhrcklNeTdFdWJEbUx4ZW02VzVPK3RudTdaRFJ5?=
- =?utf-8?B?ak9jWmRZSitqYXRqNk9BbTRxb2ZKblRjR3drb2pTRjJKMnJjTkpZQzJ2YWg2?=
- =?utf-8?B?emhEc1EvNnJ3c1JKNVMxbFJTVUZNSC9sRnJDNHJnQStyeVV5SnZtS0FGZklN?=
- =?utf-8?B?VVZoZEFNcVlBTTRmMEtaUHNZZ2hBZ1RxVjNYZHVTRjUxY20ramRIeTBWWFV0?=
- =?utf-8?B?RW5IWmpYYVVVd2JpbllDSjdCd0U0Ni9jcFFwRXRDTFpWUHVMUDBNWHhTbitS?=
- =?utf-8?B?STdaYUpveC9uVkEzMVRmdGxBRW5DZkUycXNpMDlSVmhROHNGYnlhWU5QcjRX?=
- =?utf-8?B?NnMza3dMQWNCc1I1SjJXNUNBUzlwamtCVWZITGkrbVg0bWpnd3BqVFpiclJi?=
- =?utf-8?B?RXErUVVPcHNsQW9rVkxGU2NmWDhoUC84Z0tWZE4rbTNzSkZRaGtsWEFsT09U?=
- =?utf-8?B?Um9idW9ObmRMMjJ6U2hOSnRIRWplR0Z4RHFZL0kyUlkvRVlKVEI0VUloWTc3?=
- =?utf-8?B?YmlqaDRUVm5TVktJNllWNjNvNzhySEtyMm9LYVJiQXFCRUV5cTFTeC9EQXJT?=
- =?utf-8?B?eFB0OFpiSjJWNDlGKzlZTlRDaHcvdlhBNlNIQ1NoOXZTQzhOa2JPSHlzSzZU?=
- =?utf-8?B?cVkxVGh1SDBBWEhMRTBXbFlqdm5tWVhkS0NPR2RYWTM3UGJSU0Urd3M5Nkxk?=
- =?utf-8?B?bi9GYzAwdDBjTHV5UHNRcEhBbFJ4OGxiR0FrUXF1QjQxa292aW5ZaHZrRE9D?=
- =?utf-8?B?UGdXYW9aT1llbUxhQThudlVDS291dXhFTEllOUJMY0pWbW1XT1BIT3RkbU04?=
- =?utf-8?B?Vk0yZmI0cm9uU0hMdkI0b3o3V09kQTFvRDEzVStGaU1GdWFDOUQ1ZVRSckdp?=
- =?utf-8?B?eG9TSVJKT2VMbkk4Z1FVaFk3SlE0Z3czc1ZoNm1HTnVyc29CVkVyRVYwYlgy?=
- =?utf-8?B?dWhNMXJsZkJtNUJwNm5kUjV1UmEyRlVPTXBOcFJUaDRoMjVPU3MveHI0SEhC?=
- =?utf-8?B?d1VoK2tKczF2YloydHdyM1QydmI5MVBxTnY5NXp6R0MrbmN5dmFjNGU1YmRi?=
- =?utf-8?B?b1hOZmYxMWQ3bDJQeldFWDhRNE5ZS20yV2tvMGRGRXBjdWRhV1NPaUg1SDA0?=
- =?utf-8?B?VER3MGxmUlBVRWVndFhoV2NyR2lKZnVTMkpTZmlWUHphWkNlZ2IwWnY0VmxZ?=
- =?utf-8?B?aDZ3bGMzVmZPaGlCWE1NVzRBMFBpdHYyaVFmbUlqZE4xU1JHdzJXWG4wYUxD?=
- =?utf-8?B?dVlTbmtHNTQ3VnJ6K0F2NFBDL0NGU3dhZXNOdXJhZ0R1TVFydnhsR1dGc2Vp?=
- =?utf-8?B?c0FjZExiWm43SGxIWkdxelJnbFlrMC9CbGJTN3RYNkdUdUo0eWRWbGxSeEtG?=
- =?utf-8?B?RFdKQm1qRDlVSFRmeXVuNUlteVh2Mm9vS2tiSXRURGh6dkZsQTFmM2ZYUFoy?=
- =?utf-8?B?VS9lQ01RS0I4QkM5N3VXU3JnbURPaEdkSm5WNmROcU12amhvSTlrV2lndU9E?=
- =?utf-8?B?Q1BzVU1Vck56OEEyVWI1Qlk1Vi9jWjc5WlN5US8ybXU1MUZTYWMzOTVVUTE0?=
- =?utf-8?B?a2RINW81ckFaUmw1WkhOZ29OcDB3PT0=?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8bdb44eb-eeb4-4930-8a7d-08ddc827b660
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jul 2025 07:25:04.7907
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2dY+0dVHkuaUttooD/SzzsNthN18mNUjhWUdEXa/wLf2U9QTrWwC1LddAtecbYVoEDBPBJcX06IRq6glMsXvSIa8waUgmCFsQMmAEMqanGo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPFED9C9AC99
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250720211110.1962169-1-pasic@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 3GmzfO-BSTdSXuFDegVhwVwXfqB8OFMu
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzIxMDA2MSBTYWx0ZWRfXyCeMuDv8ZDrU
+ uM8OeEmyTQ2bQx6eO8DI9PQQZ4l5f40FazlwojWdlwS8Ow7AA9pQk+mp5quELutL2Qh48pOO0xQ
+ vAlBw/rEKIsqAdiSyjwgyN0Npur2OFfgWQFKh0ZzmMVTImJZ7nJnvfoZ1v3Dsf21pPJ9+IT/C0+
+ uKyn16eWY19BIOOLIG7NnyiHuEvo/zkNrtd4fEzPspu4xUACa5XO0cWVthuQHnAWY600whUn0Yb
+ tXXOkZBlviF0zFKHaji1r+/dLo0j4LgZ37mqgej2A8dk6QY4NVMI6lrTF6ObIbX3jtj9cLSGJXy
+ iegUpJI9Cq7Z+i9OMuwwusipk9HBm7+ZNoz4jpOyf67Grm6BLnVhRIcfe4qbI94ww8RLcmRrrVd
+ dzVPlKsfVHDrsVdOpfhjaIfkKtaqfTR1rLaTyfJ8t8rvYbrYr7l1pqZ57eFPKggwSs2wWDoR
+X-Proofpoint-ORIG-GUID: df7rZEZntQfbLMuEvI2lAZhstJctZs0y
+X-Authority-Analysis: v=2.4 cv=JJQ7s9Kb c=1 sm=1 tr=0 ts=687dec8c cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=kj9zAlcOel0A:10 a=Wb1JkmetP80A:10 a=GnHWBbGKwIfp_8QMzc4A:9
+ a=CjuIK1q_8ugA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-21_02,2025-07-21_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxlogscore=720 impostorscore=0 clxscore=1011 mlxscore=0 spamscore=0
+ malwarescore=0 lowpriorityscore=0 phishscore=0 adultscore=0 bulkscore=0
+ priorityscore=1501 suspectscore=0 classifier=spam authscore=0 authtc=n/a
+ authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2505280000 definitions=main-2507210061
 
-On Sat, Jul 19, 2025 at 01:26:18PM +0800, Jason Xing wrote:
-> On Fri, Jul 18, 2025 at 6:27 PM Larysa Zaremba <larysa.zaremba@intel.com> wrote:
-> >
-> > On Wed, Jul 16, 2025 at 11:41:42AM +0800, Jason Xing wrote:
-> > > Hi all,
-> > >
-> > > I'm currently faced with one tough issue caused by zero copy mode in
-> > > xsk with ixgbe driver loaded. The case is that if we use xdpsock to
-> > > send descs, nearly at the same time normal packets from other tx
-> > > queues cannot be transmitted/completed at all.
-> > >
-> > > Here is how I try:
-> > > 1. run iperf or ping to see if the transmission is successful.
-> > > 2. then run "timeout 5 ./xdpsock -i enp2s0f0 -t  -z -s 64"
-> > >
-> > > You will obviously find the whole machine loses connection. It can
-> > > only recover as soon as the xdpsock is stopped due to timeout.
-> > >
-> > > I tried a lot and then traced down to this line in ixgbe driver:
-> > > ixgbe_clean_tx_irq()
-> > >     -> if (!(eop_desc->wb.status & cpu_to_le32(IXGBE_TXD_STAT_DD)))
-> > >             break;
-> > > The above line always 'breaks' the sending process.
-> > >
-> > > I also managed to make the external ixgbe 6.15 work and it turned out
-> > > to be the same issue as before.
-> > >
-> > > I have no idea on how to analyze further in this driver. Could someone
-> > > point out a direction that I can take? Is it a known issue?
-> > >
-> > > Thanks,
-> > > Jason
-> > >
-> >
-> > I was able to reproduce the described behaviour, xdpsock does break the IP
-> > communication. However, in my case this was not because of ixgbe not being able
-> > to send, but because of queue 0 RX packets being dropped, which is the indended
-> > outcome in xdpsock, even in Tx only mode.
-> 
-> Thanks for your feedback. It would be great if you could elaborate
-> more on this. How did you spot that it's queue 0 that causes the
-> problem?
+On Sun, Jul 20, 2025 at 11:11:09PM +0200, Halil Pasic wrote:
 
-If you do not specify -q parameter, xdpsock loads on the queue pair 0.
+Hi Halil,
 
-> Why is xdpsock breaking IP communication intended?
+...
+> @@ -129,7 +129,9 @@ static int ism_cmd(struct ism_dev *ism, void *cmd)
+>  {
+>  	struct ism_req_hdr *req = cmd;
+>  	struct ism_resp_hdr *resp = cmd;
+> +	unsigned long flags;
+>  
+> +	spin_lock_irqsave(&ism->cmd_lock, flags);
 
-Because when a packet arrives on the AF_XDP-managed queue (0 in this case), the 
-default xdpsock XDP program provided by libxdp returns XDP_REDIRECT even in 
-tx-only mode, XDP_PASS for all other queues (1-39). XDP_REDIRECT results in a 
-packet leaving the kernel network stack, it is now managed by the AF_XDP 
-userspace program. I think it is possible to modify libxdp to return XDP_PASS 
-when the socket is tx-only.
+I only found smcd_handle_irq() scheduling a tasklet, but no commands issued.
+Do we really need disable interrupts?
 
-> 
-> When you try i40e, you will find the connection behaves normally. Ping
-> can work as usual. As I depicted before, with ixgbe driver, ping even
-> doesn't work at all.
+>  	__ism_write_cmd(ism, req + 1, sizeof(*req), req->len - sizeof(*req));
+>  	__ism_write_cmd(ism, req, 0, sizeof(*req));
+>  
+> @@ -143,6 +145,7 @@ static int ism_cmd(struct ism_dev *ism, void *cmd)
+>  	}
+>  	__ism_read_cmd(ism, resp + 1, sizeof(*resp), resp->len - sizeof(*resp));
+>  out:
+> +	spin_unlock_irqrestore(&ism->cmd_lock, flags);
+>  	return resp->ret;
+>  }
+>  
+...
 
-I think this is due to RSS configuration, ping packets on i40e go to another 
-queue.
-
-> 
-> iperf is the one that I should not list... Because I find iperf always
-> doesn't work with either of them loaded.
-> 
-> >
-> > When I run `tcpdump -nn -e -p -i <ifname>` on the link partner, I see that the
-> > ixgbe host spams ARP packets just fine.
-> 
-> Interesting. I managed to see the same phenomenon.
-> 
-> I debugged the ixgbe and saw the following code breaks the whole
-> sending process:
-> ixgbe_clean_tx_irq()
->      -> if (!(eop_desc->wb.status & cpu_to_le32(IXGBE_TXD_STAT_DD)))
->              break;
-> 
-> Do you have any idea why?
->
-
-This line checks if HW has already sent the packet, so the driver can reclaim 
-resources. If the packet has not yet been sent, there is nothing for driver to 
-do but wait.
-
-> >
-> > When debugging low-level stuff such as XDP, I advise you to send packets at the
-> > lower level, e.g. with scapy's sendp().
-> >
-> > In case you have a different problem, please provide lspci card description and
-> > some truncated output of the commands that you are running and the resulting
-> > dmesg.
-> 
-> I'm not that sure if they are the same.
-> 
-> One of ixgbe machines that I manipulate looks like this:
-> # lspci -vv | grep -i ether
-> 02:00.0 Ethernet controller: Intel Corporation Ethernet Controller
-> 10-Gigabit X540-AT2 (rev 01)
-> 02:00.1 Ethernet controller: Intel Corporation Ethernet Controller
-> 10-Gigabit X540-AT2 (rev 01)
->
-
-Some device-specific quirks on older cards sometimes result in bad XDP 
-behaviour, but are usually visible in dmesg.
-
-> # dmesg -T|grep -i ixgbe
-> [Fri Jul 18 16:20:29 2025] ixgbe: Intel(R) 10 Gigabit PCI Express Network Driver
-> [Fri Jul 18 16:20:29 2025] ixgbe: Copyright (c) 1999-2016 Intel Corporation.
-> [Fri Jul 18 16:20:29 2025] ixgbe 0000:02:00.0: Multiqueue Enabled: Rx
-> Queue count = 48, Tx Queue count = 48 XDP Queue count = 0
-> [Fri Jul 18 16:20:29 2025] ixgbe 0000:02:00.0: 32.000 Gb/s available
-> PCIe bandwidth (5.0 GT/s PCIe x8 link)
-> [Fri Jul 18 16:20:29 2025] ixgbe 0000:02:00.0: MAC: 3, PHY: 0, PBA No:
-> 000000-000
-> [Fri Jul 18 16:20:29 2025] ixgbe 0000:02:00.0: f0:98:38:1a:5d:4e
-> [Fri Jul 18 16:20:29 2025] ixgbe 0000:02:00.0: Intel(R) 10 Gigabit
-> Network Connection
-> [Fri Jul 18 16:20:30 2025] ixgbe 0000:02:00.1: Multiqueue Enabled: Rx
-> Queue count = 48, Tx Queue count = 48 XDP Queue count = 0
-> [Fri Jul 18 16:20:30 2025] ixgbe 0000:02:00.1: 32.000 Gb/s available
-> PCIe bandwidth (5.0 GT/s PCIe x8 link)
-> [Fri Jul 18 16:20:30 2025] ixgbe 0000:02:00.1: MAC: 3, PHY: 0, PBA No:
-> 000000-000
-> [Fri Jul 18 16:20:30 2025] ixgbe 0000:02:00.1: f0:98:38:1a:5d:4f
-> [Fri Jul 18 16:20:30 2025] ixgbe 0000:02:00.1: Intel(R) 10 Gigabit
-> Network Connection
-> [Fri Jul 18 16:20:30 2025] ixgbe 0000:02:00.0 enp2s0f0np0: renamed from eth0
-> [Fri Jul 18 16:20:30 2025] ixgbe 0000:02:00.1 enp2s0f1np1: renamed from eth1
-> [Fri Jul 18 16:20:38 2025] ixgbe 0000:02:00.0: registered PHC device
-> on enp2s0f0np0
-> [Fri Jul 18 16:20:38 2025] ixgbe 0000:02:00.0 enp2s0f0np0: NIC Link is
-> Up 1 Gbps, Flow Control: None
-> [Fri Jul 18 16:20:38 2025] ixgbe 0000:02:00.1: registered PHC device
-> on enp2s0f1np1
-> [Sat Jul 19 13:11:30 2025] ixgbe 0000:02:00.0: removed PHC on enp2s0f0np0
-> [Sat Jul 19 13:11:31 2025] ixgbe 0000:02:00.0: Multiqueue Enabled: Rx
-> Queue count = 48, Tx Queue count = 48 XDP Queue count = 48
-> [Sat Jul 19 13:11:31 2025] ixgbe 0000:02:00.0: registered PHC device
-> on enp2s0f0np0
-> [Sat Jul 19 13:11:31 2025] ixgbe 0000:02:00.0 enp2s0f0np0: NIC Link is
-> Up 1 Gbps, Flow Control: None
-> [Sat Jul 19 13:11:34 2025] ixgbe 0000:02:00.0: removed PHC on enp2s0f0np0
-> [Sat Jul 19 13:11:34 2025] ixgbe 0000:02:00.0: Multiqueue Enabled: Rx
-> Queue count = 48, Tx Queue count = 48 XDP Queue count = 0
-> [Sat Jul 19 13:11:35 2025] ixgbe 0000:02:00.0: registered PHC device
-> on enp2s0f0np0
-> [Sat Jul 19 13:11:35 2025] ixgbe 0000:02:00.0 enp2s0f0np0: NIC Link is
-> Up 1 Gbps, Flow Control: None
-> 
-> reproduce process:
-> 1. timeout 3 ./xdpsock -i enp2s0f0np0 -t  -z -s 64
-> 2. ping <another IP address>
-> 
-> Thanks,
-> Jason
+Thanks!
 
