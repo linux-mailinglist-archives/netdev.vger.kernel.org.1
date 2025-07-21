@@ -1,148 +1,248 @@
-Return-Path: <netdev+bounces-208559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 224ACB0C250
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 13:11:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F28CCB0C258
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 13:13:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1C424E2CC9
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 11:10:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5055A4E0011
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 11:12:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99142951D3;
-	Mon, 21 Jul 2025 11:11:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3434296176;
+	Mon, 21 Jul 2025 11:13:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LHb8qXEc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D6NHMzeP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA615293C6A;
-	Mon, 21 Jul 2025 11:11:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1054B296169
+	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 11:13:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753096275; cv=none; b=Z+50s1MP5EcoaePIoBMKhuhs7PXnDZDwf85YvNhzTvd0izV10fr3cu9SYKxk8qmn1671QVMaQ+jdoqTCsn6z2nJK1L7ezz7qpsrO0UoRLAM21H/WczcTCj6BIm92V7dlcDOrzI6PCnfBUdETeN0anyo2VYp8wMgj3Mwu6OdthgA=
+	t=1753096401; cv=none; b=BAXZru+kl29+g+4mVjWyi0WKgUJGDmuJhjfow1vmAXhvDc+GSk6w8HAts+u3ViElIPDlzpScBvAry3/mLVXAjL1A/EzZn5RKhsOBIBBPjHenPiFAqVar/271qzpMWUpsWgt5/6PWosz6u21V3nOEIgQvic42+3Fbwolk3ymLUy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753096275; c=relaxed/simple;
-	bh=JcNSWwvJTwhT64Y0/KqSF1ww+wIie45ZsLTs8CIlKao=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J9ifJ9JxMrm/igRnsSK1TvUKxmdoEAow+dMuqJvw1vXLzQNLQ8jZSikX186/JhQ7Hvw5KZ9PmnFE4WhbRIUSVzgqDV6qJ/m4KMNrqsCzoLyRlalMq3AO2GrpZPy5gH79GLYF69WNx61XZILYesKejY4F1vCs2CwP4MOvDksAOU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LHb8qXEc; arc=none smtp.client-ip=209.85.208.43
+	s=arc-20240116; t=1753096401; c=relaxed/simple;
+	bh=23AcwQCZUt69cf0CCcXWbYnrJER6xqzlXvwurIDttjs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dj7PwBpPnN0q15SuXVJnSt35+8tNpxPdOMZm5tRLw9+TWkzyu5kyr4M1HgrcvZR+GZEpkmfAdRrBOYNpd19+BV1twS1NIqzKZiisap18C3aTFeYElr+sQmJlXirwKlx1lVb8h1JXyvmNh6RszD5TTdTxSzM5jrEBrHcZRwSr6xU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D6NHMzeP; arc=none smtp.client-ip=209.85.215.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-60bfcada295so6734298a12.1;
-        Mon, 21 Jul 2025 04:11:13 -0700 (PDT)
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b34c068faf8so4284006a12.2
+        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 04:13:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753096272; x=1753701072; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DnIbqCqg7JUChrhPkDwkGlZxQxz27HWtx39eq2JQF6U=;
-        b=LHb8qXEc699j7ANv/nV2+jdueCE5Xs8hiuBrQysDQ4uI1EMDxa2KmA0zph08Rj+lht
-         9gsS5absPvgookIua7oq12cKkRrOKSmfNribKiPF7u5/iNEGO5wuD9Ssm5OXxlDTIBbV
-         EvypjEYGeCM81JN39IUo9+yrU3fv2jeSov66zkbX48IBqFrW+64rttfdTk5J068w4vp3
-         RBQz7ABNbqbCNW6s1umlwH7ZdX+VuOug/m7PwadtYgH5bVKXbTguzW7TORxTMnq/6D+3
-         0pN8NS7l2deMFrjTUqdLft8KuwCkk8CVSS8jC2Hu6vNempqvIruPfNdo4gMCuoUQrbIE
-         RgeQ==
+        d=gmail.com; s=20230601; t=1753096398; x=1753701198; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3U9wm0Do+jx4Z2yqieKGcsGI+6sxi4y6gqJAEBtvKf4=;
+        b=D6NHMzePIXtJqyQQ/L/psTLrRfjuOBUpAikrCfqPpbDXvOUJpH+9BjZmG5CM3RGF9e
+         82HTbnhnuBcf+9sPdKfyXq61Cm6hwS+ha3DtmiWgqiVxtPJiLnmyagfvYtnd9Qrh47h2
+         6iUqzFwuZe/qHbDHZEW3rsQ8D6Fxh4n4MKaWrKJVjxz5g45R7gu4PZxohoNKn3bk6CqD
+         zNLtChR0bACE9LR8SZ6fbLZIxRpR7c/cjPvgrFsGB1L7ZMtpTL/90Tbsh39q+L0g+XRJ
+         tiz9lmaR9GaZtazd+oo4zmE5ApR2IiLQsL4l/sYlWxOME9Paft7HBlFuB/dg6iQ4i67B
+         +iUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753096272; x=1753701072;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DnIbqCqg7JUChrhPkDwkGlZxQxz27HWtx39eq2JQF6U=;
-        b=llU87+Nwvc3zxWYeUBJFqSFKdvWBohw1iaYbZT0yXGgJSJBnPoCF0CvQN2dqalX0yB
-         2CW8maLT1Vj6JSnzWUZRh808vQK4bdA8j0dWJTXvIyOsZ2YEuBAckSNWjbAYkEWeu9fE
-         a946sGCshK9bJRxGK9dkKsF5QANdPeity04UrDQD32SUC0bUabtoZcmtqbMA94QmGAOn
-         cvzltbQ/kdavdggN7HmjSy+JtLWo3I6yWGBq5MkoGj4+vwqWJBuNkLeeOQm2qtzjD0uS
-         tqjUBz5DRnZIrHkpo11B2tICh0Q6mlJHv8I+qESowERe43nNcC17nU9DToujUOtpsi+n
-         rm0A==
-X-Forwarded-Encrypted: i=1; AJvYcCWFEQvWhbh5rJ2ti8arfPxMXgYQZw4Y28tB4asjW65g91gNyvQNAm5ku5oSEhhxSSZVU+T7SoQF@vger.kernel.org, AJvYcCWYri5qv0K8WVrZ4r8d9sKHau0b6fRj97zxYlE33Z2sw+FO9X64b4naHamAsYC3f3jf0ED2sexe7obxWg==@vger.kernel.org, AJvYcCX9aiUblRWsqginD0dplou9GBnwbvjF/PSTWFVnecUm+5RxH+OhD/qZ7N2aU2NXVlIekAU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJ/aeDHO6FjruMohZYDY20NRv0ZU50HxCSQycZAEVMznFqFbFO
-	bSQUCPWksZJ0hfxQNsvbLvwIm2yuJLPdh0GRNpPMNYJ5dwu1cwh6US1p
-X-Gm-Gg: ASbGnct7nf+nFytWMs8FB9A2obf2t2CkCe8cmPp2joSOwC4zSbVW04n+XpcPVH2Vz0M
-	spj5rQGONsq0z/IGNUiOyFtoXvGtsjkiRgIV5/MZpbfBpo6iwdYoMomrcmOYvja7qDUOtnJrINx
-	MJIwyjqgxu76fJer2AYqxWWiJ74YDhwQPhSXoKzfc7w+v0Xyfi4y8um3w3N+z8e69DECOKUO/ZO
-	fcfrktpxjOcUy27Uc7a2c6y88NAxmuST67DeA0KdsKDsEOkFmeyysNYlQyChiO4ONrXRjFRkAMe
-	Bw2hJc6eZ5CmbUrjt56PliNHbhVbkeh5HucctfMEtyv8qN3L9Dj6Ib0z2D+ETflTPCUIUhR84B/
-	UY6Fkmd0Rk/j/vb2KaGfW1WI4rgDpxe0WUW4=
-X-Google-Smtp-Source: AGHT+IHZCiqaXpmflAtItwVaPlH3VjQHk/jBIB6Bq5oI/tEB5I4tXMP1diqfcZBAAFQiHufovShJUw==
-X-Received: by 2002:a05:6402:524e:b0:607:425c:3c23 with SMTP id 4fb4d7f45d1cf-6128590ba42mr17312482a12.5.1753096271896;
-        Mon, 21 Jul 2025 04:11:11 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325::1ac? ([2620:10d:c092:600::1:23d3])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-612c907a5b1sm5274092a12.53.2025.07.21.04.11.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Jul 2025 04:11:11 -0700 (PDT)
-Message-ID: <77ee68c4-f265-4e55-9889-43ab08f26efd@gmail.com>
-Date: Mon, 21 Jul 2025 12:12:39 +0100
+        d=1e100.net; s=20230601; t=1753096398; x=1753701198;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3U9wm0Do+jx4Z2yqieKGcsGI+6sxi4y6gqJAEBtvKf4=;
+        b=AtSS08RA2er3R6V6FOTD+5aLvAfxmPeLvGZGgmKOnv51ex73+IJRLyvG5H4HwyDlMB
+         HeS/wYcFfWYiodR1vIoDhTPwHoa9NG9+KldR/YUCTA13ZdZysEENuoDUkiyVZKDhg7ZA
+         VzNumEgbIyrMzikFvc48ck6VXP0BSr8lpN1zmiQG1IqwZRnjPU9OJA0mMjOANUzEEDD9
+         w8TNJO6vezyfF6GVLvUw2AvcRaWZGYyjPRDUjmkgn9Rlm+lExlw7R02NUpLb5/P/tJkW
+         ch18Lr30458gMcbCzwOEn6ZAEpkOh+3sMocAD8XqHqEjxZ2FI1nujWAhtW08HU3qY8xW
+         JuTQ==
+X-Gm-Message-State: AOJu0YxmTKV0nAvz5z9T7S8mRhksRTts+RwiuWIce6+qCFNVV2TUxcpY
+	otI8bXMSwylpfLK3gZpEUv1foUX0yklvUYeK/Fe5QtMVpE30BKLR5Fk2PkqDlkGa7CJQ/D18f4M
+	8R4/qXXUV5kbFQHukZmKl1jzsch8FGZlfJrseGiY=
+X-Gm-Gg: ASbGncvROu0UZ8ZQmylQjITf+Yg6DdH4HDxHp3fbyRl/CKFuxDuryF9pWd43OEKjbri
+	Qy+bRcUWdCCVZiJXBBZ3qUW/8+aSTQbziKzl9zPJ/g0yMxa0swyx7lXJPR4coWYCXY6Gl2TDyzr
+	Sr2XRWsQrMT6P9sKPprnea+zMR406hAR1l6I++aIAyZ5q5m7peLQ4iIZWaALMDNCz3ZRQ50njYI
+	Me9kgI=
+X-Google-Smtp-Source: AGHT+IE2xDGNRzom4B5Y4WcO0INmNKLOfYp0Siie44fJ5iCC9C8R24sSWd0LIVApUXiOBZG5r7GfjHPbAnqqe9q5iXE=
+X-Received: by 2002:a17:90b:5823:b0:311:f05b:86a5 with SMTP id
+ 98e67ed59e1d1-31caf72a0dbmr25531882a91.0.1753096398224; Mon, 21 Jul 2025
+ 04:13:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] mm, page_pool: introduce a new page type for page pool in
- page type
-To: Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org,
- netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
- harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
- davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
- john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com,
- leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
- andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
- akpm@linux-foundation.org, david@redhat.com, lorenzo.stoakes@oracle.com,
- Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org, surenb@google.com,
- mhocko@suse.com, horms@kernel.org, jackmanb@google.com, hannes@cmpxchg.org,
- ziy@nvidia.com, ilias.apalodimas@linaro.org, willy@infradead.org,
- brauner@kernel.org, kas@kernel.org, yuzhao@google.com,
- usamaarif642@gmail.com, baolin.wang@linux.alibaba.com,
- almasrymina@google.com, toke@redhat.com, bpf@vger.kernel.org,
- linux-rdma@vger.kernel.org
-References: <20250721054903.39833-1-byungchul@sk.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20250721054903.39833-1-byungchul@sk.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250721031609.132217-1-krikku@gmail.com> <20250721031609.132217-2-krikku@gmail.com>
+ <CANn89i+vhTeqgTPr+suupJNLMHp-RAX89aBrFhiQnu58233bAw@mail.gmail.com>
+In-Reply-To: <CANn89i+vhTeqgTPr+suupJNLMHp-RAX89aBrFhiQnu58233bAw@mail.gmail.com>
+From: Krishna Kumar <krikku@gmail.com>
+Date: Mon, 21 Jul 2025 16:42:41 +0530
+X-Gm-Features: Ac12FXwM6kcASgnBarMqYpEhVGnNrBIo1M40kSMb6YJVDldo2oxIB3gRaIJQLjs
+Message-ID: <CACLgkEbcbWBs+ma3rq7d6B7nBtOzVVEogy0aEJX5hd6PV9790g@mail.gmail.com>
+Subject: Re: [PATCH v5 net-next 1/2] net: Prevent RPS table overwrite for
+ active flows
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, tom@herbertland.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, sdf@fomichev.me, 
+	kuniyu@google.com, ahmed.zaki@intel.com, aleksander.lobakin@intel.com, 
+	atenart@kernel.org, jdamato@fastly.com, krishna.ku@flipkart.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 7/21/25 06:49, Byungchul Park wrote:
-> Hi,
-> 
-> I focused on converting the existing APIs accessing ->pp_magic field to
-> page type APIs.  However, yes.  Additional works would better be
-> considered on top like:
-> 
->     1. Adjust how to store and retrieve dma index.  Maybe network guys
->        can work better on top.
-> 
->     2. Move the sanity check for page pool in mm/page_alloc.c to on free.
+Thanks Eric.
 
-Don't be in a hurry, I've got a branch, but as mentioned before,
-it'll be for-6.18. And there will also be more time for testing.
+1. I will move hash under aRFS (addressing your next comment separately)?
+2. There's no point (actually may harm) in moving the existing
+"filter" under aRFS
+    though that's also used in aRFS code - it is u16 and pairs well
+with the "u16 cpu".
 
-> This work was inspired by the following link by Pavel:
+I hope #1 is sufficient?
 
-The idea came from David, let's add
+Thanks,
+- Krishna
 
-Suggested-by: David Hildenbrand <david@redhat.com>
-
-...> -
->   static inline bool netmem_is_pp(netmem_ref netmem)
->   {
-> -	return (netmem_get_pp_magic(netmem) & PP_MAGIC_MASK) == PP_SIGNATURE;
-> +	if (netmem_is_net_iov(netmem))
-
-This needs to return false for tx niovs. Seems like all callers are
-gated on ->pp_recycle, so maybe it's fine, but we can at least
-check pp. Mina, you've been checking tx doesn't mix with rx, any
-opinion on that?
-
-Question to net maintainers, can a ->pp_recycle marked skb contain
-not page pool originated pages or a mix?
-
--- 
-Pavel Begunkov
-
+On Mon, Jul 21, 2025 at 1:44=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Sun, Jul 20, 2025 at 8:16=E2=80=AFPM Krishna Kumar <krikku@gmail.com> =
+wrote:
+> >
+> > This patch fixes an issue where two different flows on the same RXq
+> > produce the same hash resulting in continuous flow overwrites.
+> >
+> > Flow #1: A packet for Flow #1 comes in, kernel calls the steering
+> >          function. The driver gives back a filter id. The kernel saves
+> >          this filter id in the selected slot. Later, the driver's
+> >          service task checks if any filters have expired and then
+> >          installs the rule for Flow #1.
+> > Flow #2: A packet for Flow #2 comes in. It goes through the same steps.
+> >          But this time, the chosen slot is being used by Flow #1. The
+> >          driver gives a new filter id and the kernel saves it in the
+> >          same slot. When the driver's service task runs, it runs throug=
+h
+> >          all the flows, checks if Flow #1 should be expired, the kernel
+> >          returns True as the slot has a different filter id, and then
+> >          the driver installs the rule for Flow #2.
+> > Flow #1: Another packet for Flow #1 comes in. The same thing repeats.
+> >          The slot is overwritten with a new filter id for Flow #1.
+> >
+> > This causes a repeated cycle of flow programming for missed packets,
+> > wasting CPU cycles while not improving performance. This problem happen=
+s
+> > at higher rates when the RPS table is small, but tests show it still
+> > happens even with 12,000 connections and an RPS size of 16K per queue
+> > (global table size =3D 144x16K =3D 64K).
+> >
+> > This patch prevents overwriting an rps_dev_flow entry if it is active.
+> > The intention is that it is better to do aRFS for the first flow instea=
+d
+> > of hurting all flows on the same hash. Without this, two (or more) flow=
+s
+> > on one RX queue with the same hash can keep overwriting each other. Thi=
+s
+> > causes the driver to reprogram the flow repeatedly.
+> >
+> > Changes:
+> >   1. Add a new 'hash' field to struct rps_dev_flow.
+> >   2. Add rps_flow_is_active(): a helper function to check if a flow is
+> >      active or not, extracted from rps_may_expire_flow().
+> >   3. In set_rps_cpu():
+> >      - Avoid overwriting by programming a new filter if:
+> >         - The slot is not in use, or
+> >         - The slot is in use but the flow is not active, or
+> >         - The slot has an active flow with the same hash, but target CP=
+U
+> >           differs.
+> >      - Save the hash in the rps_dev_flow entry.
+> >   4. rps_may_expire_flow(): Use earlier extracted rps_flow_is_active().
+> >
+> > Testing & results:
+> >   - Driver: ice (E810 NIC), Kernel: net-next
+> >   - #CPUs =3D #RXq =3D 144 (1:1)
+> >   - Number of flows: 12K
+> >   - Eight RPS settings from 256 to 32768. Though RPS=3D256 is not ideal=
+,
+> >     it is still sufficient to cover 12K flows (256*144 rx-queues =3D 64=
+K
+> >     global table slots)
+> >   - Global Table Size =3D 144 * RPS (effectively equal to 256 * RPS)
+> >   - Each RPS test duration =3D 8 mins (org code) + 8 mins (new code).
+> >   - Metrics captured on client
+> >
+> > Legend for following tables:
+> > Steer-C: #times ndo_rx_flow_steer() was Called by set_rps_cpu()
+> > Steer-L: #times ice_arfs_flow_steer() Looped over aRFS entries
+> > Add:     #times driver actually programmed aRFS (ice_arfs_build_entry()=
+)
+> > Del:     #times driver deleted the flow (ice_arfs_del_flow_rules())
+> > Units:   K =3D 1,000 times, M =3D 1 million times
+> >
+> >   |-------|---------|------|     Org Code    |---------|---------|
+> >   | RPS   | Latency | CPU  | Add    |  Del   | Steer-C | Steer-L |
+> >   |-------|---------|------|--------|--------|---------|---------|
+> >   | 256   | 227.0   | 93.2 | 1.6M   | 1.6M   | 121.7M  | 267.6M  |
+> >   | 512   | 225.9   | 94.1 | 11.5M  | 11.2M  | 65.7M   | 199.6M  |
+> >   | 1024  | 223.5   | 95.6 | 16.5M  | 16.5M  | 27.1M   | 187.3M  |
+> >   | 2048  | 222.2   | 96.3 | 10.5M  | 10.5M  | 12.5M   | 115.2M  |
+> >   | 4096  | 223.9   | 94.1 | 5.5M   | 5.5M   | 7.2M    | 65.9M   |
+> >   | 8192  | 224.7   | 92.5 | 2.7M   | 2.7M   | 3.0M    | 29.9M   |
+> >   | 16384 | 223.5   | 92.5 | 1.3M   | 1.3M   | 1.4M    | 13.9M   |
+> >   | 32768 | 219.6   | 93.2 | 838.1K | 838.1K | 965.1K  | 8.9M    |
+> >   |-------|---------|------|   New Code      |---------|---------|
+> >   | 256   | 201.5   | 99.1 | 13.4K  | 5.0K   | 13.7K   | 75.2K   |
+> >   | 512   | 202.5   | 98.2 | 11.2K  | 5.9K   | 11.2K   | 55.5K   |
+> >   | 1024  | 207.3   | 93.9 | 11.5K  | 9.7K   | 11.5K   | 59.6K   |
+> >   | 2048  | 207.5   | 96.7 | 11.8K  | 11.1K  | 15.5K   | 79.3K   |
+> >   | 4096  | 206.9   | 96.6 | 11.8K  | 11.7K  | 11.8K   | 63.2K   |
+> >   | 8192  | 205.8   | 96.7 | 11.9K  | 11.8K  | 11.9K   | 63.9K   |
+> >   | 16384 | 200.9   | 98.2 | 11.9K  | 11.9K  | 11.9K   | 64.2K   |
+> >   | 32768 | 202.5   | 98.0 | 11.9K  | 11.9K  | 11.9K   | 64.2K   |
+> >   |-------|---------|------|--------|--------|---------|---------|
+> >
+> > Some observations:
+> >   1. Overall Latency improved: (1790.19-1634.94)/1790.19*100 =3D 8.67%
+> >   2. Overall CPU increased:    (777.32-751.49)/751.45*100    =3D 3.44%
+> >   3. Flow Management (add/delete) remained almost constant at ~11K
+> >      compared to values in millions.
+> >
+> > Reported-by: kernel test robot <lkp@intel.com>
+> > Closes: https://lore.kernel.org/oe-kbuild-all/202507161125.rUCoz9ov-lkp=
+@intel.com/
+> > Signed-off-by: Krishna Kumar <krikku@gmail.com>
+> > ---
+> >  include/net/rps.h    |  5 +--
+> >  net/core/dev.c       | 82 ++++++++++++++++++++++++++++++++++++++++----
+> >  net/core/net-sysfs.c |  4 ++-
+> >  3 files changed, 81 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/include/net/rps.h b/include/net/rps.h
+> > index d8ab3a08bcc4..8e33dbea9327 100644
+> > --- a/include/net/rps.h
+> > +++ b/include/net/rps.h
+> > @@ -25,13 +25,14 @@ struct rps_map {
+> >
+> >  /*
+> >   * The rps_dev_flow structure contains the mapping of a flow to a CPU,=
+ the
+> > - * tail pointer for that CPU's input queue at the time of last enqueue=
+, and
+> > - * a hardware filter index.
+> > + * tail pointer for that CPU's input queue at the time of last enqueue=
+, a
+> > + * hardware filter index, and the hash of the flow.
+> >   */
+> >  struct rps_dev_flow {
+> >         u16             cpu;
+> >         u16             filter;
+> >         unsigned int    last_qtail;
+> > +       u32             hash;
+>
+> This is problematic, because adds an extra potential cache line miss in R=
+PS.
+>
+> Some of us do not use CONFIG_RFS_ACCEL, make sure to not add extra
+> costs for this configuration ?
 
