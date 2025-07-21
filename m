@@ -1,143 +1,237 @@
-Return-Path: <netdev+bounces-208524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28A6AB0BF90
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 11:03:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F0CBCB0BF81
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 10:58:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67C383BBFD0
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 09:02:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 943863B4AC7
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 08:58:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17CDB287260;
-	Mon, 21 Jul 2025 09:02:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 891A2286D62;
+	Mon, 21 Jul 2025 08:58:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="HofZH/Ct"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FAC91D63E8;
-	Mon, 21 Jul 2025 09:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C3EE284687;
+	Mon, 21 Jul 2025 08:58:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753088576; cv=none; b=dhwArgvP+OiHlH2gqWhgzCCECk5kCF+5unn3nHHQkO1V3m3a/M2o8nQnYFQKARMQq78M9QLSBTykja33/XsIfQMr7V7UFN3PCc8IhOpy3mle1jI9F4X1M/4EzbxvO3c4K1Vth3IPchUirnSFrSUFP055/Xzc9/DQgQ8Kr0269E4=
+	t=1753088328; cv=none; b=FACGaMVWiAtZrMDBKLMkqwvzK/WLiu6AsgsafYbbfX2NqM6IFT73ZYU/n4XtNysKPXfM4xRQp98t4Nw2RgrTMqvJJ7kCaYM8GuFbsrwjYsWC2Y8LJXtNWyMBXLBYdbX7ItVLRjGi+2vBHLmv2grC3Max1FaNiz4O0b/PssCEUXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753088576; c=relaxed/simple;
-	bh=ZdThKZSm+1hzPQTXdTtWibDdW5Gde4dZ7oXUpmiIEl0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EA7YIOZy5VzqqmOEOl4KoD0oraighhnsn/V8rs2wXpkHLQcZB6wVneFv0ET7OYLa3r/cPEoUz4H/YiygppbATutr/f3NkY7vYoB1UR2AwNZAekCL4cm1Dkdg9eF/pm5sTmEc5+p5hPZHao5wrIohynAWsP7Av1zL5H9FPs6i7aM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.202] (p5dc55eaf.dip0.t-ipconnect.de [93.197.94.175])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 9118D61E64844;
-	Mon, 21 Jul 2025 10:56:34 +0200 (CEST)
-Message-ID: <8c9e97e4-3590-49a8-940b-717deac0078d@molgen.mpg.de>
-Date: Mon, 21 Jul 2025 10:56:33 +0200
+	s=arc-20240116; t=1753088328; c=relaxed/simple;
+	bh=t6UeY4u7JL5ZMvuvo5Ief6AALkrgXuEuINx+l0QwRhA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=M/iM+Pykao62UIW5Rk8BJIx3xvBvOuguXCRyK1nhXaOHFsIlJQ6bZN8QwUSbhDiPqywk4X/GyORx55ZeTh3IyA4N/Zp7Nl2ujZVqCNgNGCrN8VDS5TK5gK94dqOmPXNfpiJVPF72KLToI2dzt/44v0jMf1dRnThQAw2wJz3I8D0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=HofZH/Ct; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56L3Ox3I013501;
+	Mon, 21 Jul 2025 01:58:31 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=Ij3m+FfWKb3GvCthETYkRFT
+	z05vr4rtLfLipjuOODcA=; b=HofZH/CtxbT8GPyXAde6ROsmO4sIrDCz6U7hP63
+	LRYvsUqOBgxNMio/7Vx6TgUvqrFvD2Tj8mhiC/uiXVGDTnmJF4N/2pEyDIk72Rfb
+	LInQg+X288Td8QONsMPd8n0blsiFvhMRjkFEBNmzgCFVQlWAm+7TqeAI/vtqn1E1
+	4/WnC0Fygt01wK9wXwLIGI4r8pEIp72ed0R8Vxbcp49Wsit79/GrBYw/8N05fDtd
+	GHanjOTomZ+oFVYB1pxNu1/IR9sKL+ZW2Hi39k0+7yj9qbLn5Hkd9tE1eQGd+YA8
+	O0NAgW5bPyqjWlTBgPUF4LzWlid/NPktFlg9nsssfief7Rw==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4808qq32k4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Jul 2025 01:58:31 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 21 Jul 2025 01:58:31 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 21 Jul 2025 01:58:31 -0700
+Received: from test-OptiPlex-Tower-Plus-7010.marvell.com (unknown [10.29.37.157])
+	by maili.marvell.com (Postfix) with ESMTP id 6837D3F703F;
+	Mon, 21 Jul 2025 01:58:24 -0700 (PDT)
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Hariprasad Kelam <hkelam@marvell.com>,
+        Sunil Goutham
+	<sgoutham@marvell.com>,
+        Geetha sowjanya <gakula@marvell.com>,
+        "Subbaraya
+ Sundeep" <sbhatta@marvell.com>,
+        Bharat Bhushan <bbhushan2@marvell.com>,
+        "Andrew Lunn" <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        "Eric Dumazet" <edumazet@google.com>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Tomasz Duszynski
+	<tduszynski@marvell.com>,
+        Simon Horman <horms@kernel.org>
+Subject: [net PatchV3] Octeontx2-vf: Fix max packet length errors
+Date: Mon, 21 Jul 2025 14:28:15 +0530
+Message-ID: <20250721085815.1720485-1-hkelam@marvell.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net-next 1/2] stmmac: xsk: fix underflow
- of budget in zerocopy mode
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, bjorn@kernel.org,
- magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
- jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
- mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
- linux-stm32@st-md-mailman.stormreply.com, bpf@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- Jason Xing <kernelxing@tencent.com>
-References: <20250721083343.16482-1-kerneljasonxing@gmail.com>
- <20250721083343.16482-2-kerneljasonxing@gmail.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250721083343.16482-2-kerneljasonxing@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzIxMDA3OCBTYWx0ZWRfX4MnWBFJznIsv W+V74Def4qnHJoRxmJ9tUppVxfqOFt0WrHMq3bT6XUCCprQRoTytARJ6F/WJJN1nhfh6LdIhqa6 j45nOno02B7/HRwYPa/1K84r4o+PG/7l2HCu0wUAepeO15h9UB8QokWNsey93tkyh4+mig8FKdp
+ XoDB3at4jcSxVcTHxNOHT2xhQ06mmGZiRWnTcqIQkVTuAAKYW5/cAokzQN+u2vhJPbqEt1NVY3R j+G8xYQ8jpVnBjAVL9IDK2laHu1y0rudN7S8WF9Lcvehii/09EmJ3FYPFRO3zMy5lEdwOK9ZdRm 4/JY15dsboIGBlpsQZLMKtA1OEgs7I7vj1/tFLL5yelShuCiQvKQNc2jft+pwWN85UzYT6fl6d3
+ O4tDfAW4hq7/X96G7eEMGEju/Xf3TSZu13O5xaCH3vwgUF2ba2fk1oOxXZ60nABJ38d1hkOw
+X-Proofpoint-GUID: kI5JLaXWSGrEfvZRHRXNokWHcxNO737V
+X-Proofpoint-ORIG-GUID: kI5JLaXWSGrEfvZRHRXNokWHcxNO737V
+X-Authority-Analysis: v=2.4 cv=TuLmhCXh c=1 sm=1 tr=0 ts=687e0137 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=Wb1JkmetP80A:10 a=M5GUcnROAAAA:8 a=PXy8wwuK2GTSNTtyd78A:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-21_02,2025-07-21_01,2025-03-28_01
 
-Dear Jason,
+Implement packet length validation before submitting packets to
+the hardware to prevent MAXLEN_ERR. Increment tx_dropped counter
+on failure.
 
+Fixes: 3184fb5ba96e ("octeontx2-vf: Virtual function driver support")
+Fixes: 22f858796758 ("octeontx2-pf: Add basic net_device_ops")
+Fixes: 3ca6c4c882a7 ("octeontx2-pf: Add packet transmission support")
+Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+---
+v3 * Define driver specific counter for storing dropped packets
 
-Thank you for your patch.
+v2 * Add the packet length check for rep dev
+     Increment tx_dropped counter on failure
 
-Am 21.07.25 um 10:33 schrieb Jason Xing:
-> From: Jason Xing <kernelxing@tencent.com>
-> 
-> The issue can happen when the budget number of descs are consumed. As
+ .../net/ethernet/marvell/octeontx2/nic/otx2_common.c |  3 ++-
+ .../net/ethernet/marvell/octeontx2/nic/otx2_common.h |  1 +
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c |  3 +++
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c | 10 ++++++++++
+ drivers/net/ethernet/marvell/octeontx2/nic/rep.c     | 12 +++++++++++-
+ drivers/net/ethernet/marvell/octeontx2/nic/rep.h     |  1 +
+ 6 files changed, 28 insertions(+), 2 deletions(-)
 
-Instead of “The issue”, I’d use “An underflow …”.
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+index 6b5c9536d26d..e480c8692baa 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+@@ -124,7 +124,8 @@ void otx2_get_dev_stats(struct otx2_nic *pfvf)
+ 			       dev_stats->rx_ucast_frames;
+ 
+ 	dev_stats->tx_bytes = OTX2_GET_TX_STATS(TX_OCTS);
+-	dev_stats->tx_drops = OTX2_GET_TX_STATS(TX_DROP);
++	dev_stats->tx_drops = OTX2_GET_TX_STATS(TX_DROP) +
++			      dev_stats->tx_discards;
+ 	dev_stats->tx_bcast_frames = OTX2_GET_TX_STATS(TX_BCAST);
+ 	dev_stats->tx_mcast_frames = OTX2_GET_TX_STATS(TX_MCAST);
+ 	dev_stats->tx_ucast_frames = OTX2_GET_TX_STATS(TX_UCAST);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+index ca0e6ab12ceb..a58c902eb75d 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+@@ -149,6 +149,7 @@ struct otx2_dev_stats {
+ 	u64 tx_bcast_frames;
+ 	u64 tx_mcast_frames;
+ 	u64 tx_drops;
++	u64 tx_discards;
+ };
+ 
+ /* Driver counted stats */
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index db7c466fdc39..f9cf6a8f2f9b 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -2153,6 +2153,7 @@ static netdev_tx_t otx2_xmit(struct sk_buff *skb, struct net_device *netdev)
+ {
+ 	struct otx2_nic *pf = netdev_priv(netdev);
+ 	int qidx = skb_get_queue_mapping(skb);
++	struct otx2_dev_stats *dev_stats;
+ 	struct otx2_snd_queue *sq;
+ 	struct netdev_queue *txq;
+ 	int sq_idx;
+@@ -2165,6 +2166,8 @@ static netdev_tx_t otx2_xmit(struct sk_buff *skb, struct net_device *netdev)
+ 	/* Check for minimum and maximum packet length */
+ 	if (skb->len <= ETH_HLEN ||
+ 	    (!skb_shinfo(skb)->gso_size && skb->len > pf->tx_max_pktlen)) {
++		dev_stats = &pf->hw.dev_stats;
++		dev_stats->tx_discards++;
+ 		dev_kfree_skb(skb);
+ 		return NETDEV_TX_OK;
+ 	}
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
+index 8a8b598bd389..3bb55e4a11d3 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
+@@ -391,9 +391,19 @@ static netdev_tx_t otx2vf_xmit(struct sk_buff *skb, struct net_device *netdev)
+ {
+ 	struct otx2_nic *vf = netdev_priv(netdev);
+ 	int qidx = skb_get_queue_mapping(skb);
++	struct otx2_dev_stats *dev_stats;
+ 	struct otx2_snd_queue *sq;
+ 	struct netdev_queue *txq;
+ 
++	/* Check for minimum and maximum packet length */
++	if (skb->len <= ETH_HLEN ||
++	    (!skb_shinfo(skb)->gso_size && skb->len > vf->tx_max_pktlen)) {
++		dev_stats = &vf->hw.dev_stats;
++		dev_stats->tx_discards++;
++		dev_kfree_skb(skb);
++		return NETDEV_TX_OK;
++	}
++
+ 	sq = &vf->qset.sq[qidx];
+ 	txq = netdev_get_tx_queue(netdev, qidx);
+ 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
+index 2cd3da3b6843..d2412d027f6f 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
+@@ -371,7 +371,7 @@ static void rvu_rep_get_stats(struct work_struct *work)
+ 	stats->rx_mcast_frames = rsp->rx.mcast;
+ 	stats->tx_bytes = rsp->tx.octs;
+ 	stats->tx_frames = rsp->tx.ucast + rsp->tx.bcast + rsp->tx.mcast;
+-	stats->tx_drops = rsp->tx.drop;
++	stats->tx_drops = rsp->tx.drop + stats->tx_discards;
+ exit:
+ 	mutex_unlock(&priv->mbox.lock);
+ }
+@@ -418,6 +418,16 @@ static netdev_tx_t rvu_rep_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	struct otx2_nic *pf = rep->mdev;
+ 	struct otx2_snd_queue *sq;
+ 	struct netdev_queue *txq;
++	struct rep_stats *stats;
++
++	/* Check for minimum and maximum packet length */
++	if (skb->len <= ETH_HLEN ||
++	    (!skb_shinfo(skb)->gso_size && skb->len > pf->tx_max_pktlen)) {
++		stats = &rep->stats;
++		stats->tx_discards++;
++		dev_kfree_skb(skb);
++		return NETDEV_TX_OK;
++	}
+ 
+ 	sq = &pf->qset.sq[rep->rep_id];
+ 	txq = netdev_get_tx_queue(dev, 0);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/rep.h b/drivers/net/ethernet/marvell/octeontx2/nic/rep.h
+index 38446b3e4f13..277615ed7174 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/rep.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/rep.h
+@@ -27,6 +27,7 @@ struct rep_stats {
+ 	u64 tx_bytes;
+ 	u64 tx_frames;
+ 	u64 tx_drops;
++	u64 tx_discards;
+ };
+ 
+ struct rep_dev {
+-- 
+2.34.1
 
-> long as the budget is decreased to zero, it will again go into
-> while (budget-- > 0) statement and get decreased by one, so the
-> underflow issue can happen. It will lead to returning true whereas the
-> expected value should be false.
-
-What is “it”?
-
-> In this case where all the budget are used up, it means zc function
-
-*is* used?
-
-> should return false to let the poll run again because normally we
-> might have more data to process.
-
-Do you have a reproducer, you could add to the commit message?
-
-> Fixes: 132c32ee5bc0 ("net: stmmac: Add TX via XDP zero-copy socket")
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> ---
->   drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index f350a6662880..ea5541f9e9a6 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -2596,7 +2596,7 @@ static bool stmmac_xdp_xmit_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
->   
->   	budget = min(budget, stmmac_tx_avail(priv, queue));
->   
-> -	while (budget-- > 0) {
-> +	while (budget > 0) {
-
-So, if the while loop should not be entered with budget being 0, then 
-the line could  be changed to `while (--budget > 0) {`? But then it 
-wouldn’t be called for budget being 1.
-
-A for loop might be the better choice for a loop with budget as counting 
-variable?
-
->   		struct stmmac_metadata_request meta_req;
->   		struct xsk_tx_metadata *meta = NULL;
->   		dma_addr_t dma_addr;
-> @@ -2681,6 +2681,8 @@ static bool stmmac_xdp_xmit_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
->   
->   		tx_q->cur_tx = STMMAC_GET_ENTRY(tx_q->cur_tx, priv->dma_conf.dma_tx_size);
->   		entry = tx_q->cur_tx;
-> +
-> +		budget--;
->   	}
->   	u64_stats_update_begin(&txq_stats->napi_syncp);
->   	u64_stats_add(&txq_stats->napi.tx_set_ic_bit, tx_set_ic_bit);
-
-Excuse my ignorance, but I do not yet see the problem that the while 
-loop is entered and buffer is set to 0. Is it later the return condition?
-
-     return !!budget && work_done;
-
-
-Kind regards,
-
-Paul
 
