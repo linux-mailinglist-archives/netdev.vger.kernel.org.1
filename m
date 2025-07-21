@@ -1,248 +1,153 @@
-Return-Path: <netdev+bounces-208560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F28CCB0C258
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 13:13:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01D77B0C25D
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 13:14:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5055A4E0011
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 11:12:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8261218C3455
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 11:14:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3434296176;
-	Mon, 21 Jul 2025 11:13:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D04E2298CAC;
+	Mon, 21 Jul 2025 11:13:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D6NHMzeP"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K3yCEvZ/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1054B296169
-	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 11:13:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8969F2980B7
+	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 11:13:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753096401; cv=none; b=BAXZru+kl29+g+4mVjWyi0WKgUJGDmuJhjfow1vmAXhvDc+GSk6w8HAts+u3ViElIPDlzpScBvAry3/mLVXAjL1A/EzZn5RKhsOBIBBPjHenPiFAqVar/271qzpMWUpsWgt5/6PWosz6u21V3nOEIgQvic42+3Fbwolk3ymLUy8=
+	t=1753096434; cv=none; b=bL/nwCngftwkDU4mvg96Yk0JO6R4SjE3vLlK8H4P8Kx12jksuv7gbCs8L5HYd6PQ+0y12iYn8LMsRPF6cLEEEpwyh0iKOksMqaFbl/Jotr7VI3jhi6hysiFToUJs67yn4pX2Binrm/V3v0ak+DNBVuXmMMvSWCn55fJVt+rNMKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753096401; c=relaxed/simple;
-	bh=23AcwQCZUt69cf0CCcXWbYnrJER6xqzlXvwurIDttjs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dj7PwBpPnN0q15SuXVJnSt35+8tNpxPdOMZm5tRLw9+TWkzyu5kyr4M1HgrcvZR+GZEpkmfAdRrBOYNpd19+BV1twS1NIqzKZiisap18C3aTFeYElr+sQmJlXirwKlx1lVb8h1JXyvmNh6RszD5TTdTxSzM5jrEBrHcZRwSr6xU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D6NHMzeP; arc=none smtp.client-ip=209.85.215.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b34c068faf8so4284006a12.2
-        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 04:13:18 -0700 (PDT)
+	s=arc-20240116; t=1753096434; c=relaxed/simple;
+	bh=3LePUhZLqMHmMSA1GfKcOrJBLnHS9teMOpXWN0q2aMI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DSznmy8nuiedDB8AEIKUqcCfksj5E3J2moDGPudOhf7knTw9Km15Xnq23+LXimvstCfhMpaMDSsjyJRbgY4DT8oEjMLHORfE5TIu7dTG8Pi+bKD8Syq7Zb2DLvwswT7jNxm/cCn2NjMdHJxZZckJK8G63sBjcnibc0mY69+hRks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=K3yCEvZ/; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3a522224582so2062049f8f.3
+        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 04:13:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753096398; x=1753701198; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3U9wm0Do+jx4Z2yqieKGcsGI+6sxi4y6gqJAEBtvKf4=;
-        b=D6NHMzePIXtJqyQQ/L/psTLrRfjuOBUpAikrCfqPpbDXvOUJpH+9BjZmG5CM3RGF9e
-         82HTbnhnuBcf+9sPdKfyXq61Cm6hwS+ha3DtmiWgqiVxtPJiLnmyagfvYtnd9Qrh47h2
-         6iUqzFwuZe/qHbDHZEW3rsQ8D6Fxh4n4MKaWrKJVjxz5g45R7gu4PZxohoNKn3bk6CqD
-         zNLtChR0bACE9LR8SZ6fbLZIxRpR7c/cjPvgrFsGB1L7ZMtpTL/90Tbsh39q+L0g+XRJ
-         tiz9lmaR9GaZtazd+oo4zmE5ApR2IiLQsL4l/sYlWxOME9Paft7HBlFuB/dg6iQ4i67B
-         +iUw==
+        d=linaro.org; s=google; t=1753096430; x=1753701230; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qCpk9GjmCqOqyvs+4Z7EUdmuqAEP2pxTsgkUzsyKDEo=;
+        b=K3yCEvZ/DbLZYArDvEFschm5fG6TaXd8DDVie+6xzKntLEHLI50c92iV1XvGo/Us/G
+         YIGoG0XHQJ8sShww3CwVnfdJeWTs3cbYiHWqsZJzT0vc0V28hXKGoswRBQOIT7A9gAu/
+         eqfSk+5iGhP1jbfWlsazv28vw1HgAYRyvddIsBhdHW2MNtcdZ0MfSY0xE1DF4+IrchNp
+         XMo8lto8Uym1MQ17aBusYX10uuv3gP0xfIrUyM9kypeCFsuwyUG7GYGBWKOFqnK/kX2w
+         oVc8zYWRxQs4/qGLEvT8wMbuyhce06N6uTqdmdoBMxn4fLIk1BR8CyuTKMnxaqfTCk5f
+         Jv+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753096398; x=1753701198;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3U9wm0Do+jx4Z2yqieKGcsGI+6sxi4y6gqJAEBtvKf4=;
-        b=AtSS08RA2er3R6V6FOTD+5aLvAfxmPeLvGZGgmKOnv51ex73+IJRLyvG5H4HwyDlMB
-         HeS/wYcFfWYiodR1vIoDhTPwHoa9NG9+KldR/YUCTA13ZdZysEENuoDUkiyVZKDhg7ZA
-         VzNumEgbIyrMzikFvc48ck6VXP0BSr8lpN1zmiQG1IqwZRnjPU9OJA0mMjOANUzEEDD9
-         w8TNJO6vezyfF6GVLvUw2AvcRaWZGYyjPRDUjmkgn9Rlm+lExlw7R02NUpLb5/P/tJkW
-         ch18Lr30458gMcbCzwOEn6ZAEpkOh+3sMocAD8XqHqEjxZ2FI1nujWAhtW08HU3qY8xW
-         JuTQ==
-X-Gm-Message-State: AOJu0YxmTKV0nAvz5z9T7S8mRhksRTts+RwiuWIce6+qCFNVV2TUxcpY
-	otI8bXMSwylpfLK3gZpEUv1foUX0yklvUYeK/Fe5QtMVpE30BKLR5Fk2PkqDlkGa7CJQ/D18f4M
-	8R4/qXXUV5kbFQHukZmKl1jzsch8FGZlfJrseGiY=
-X-Gm-Gg: ASbGncvROu0UZ8ZQmylQjITf+Yg6DdH4HDxHp3fbyRl/CKFuxDuryF9pWd43OEKjbri
-	Qy+bRcUWdCCVZiJXBBZ3qUW/8+aSTQbziKzl9zPJ/g0yMxa0swyx7lXJPR4coWYCXY6Gl2TDyzr
-	Sr2XRWsQrMT6P9sKPprnea+zMR406hAR1l6I++aIAyZ5q5m7peLQ4iIZWaALMDNCz3ZRQ50njYI
-	Me9kgI=
-X-Google-Smtp-Source: AGHT+IE2xDGNRzom4B5Y4WcO0INmNKLOfYp0Siie44fJ5iCC9C8R24sSWd0LIVApUXiOBZG5r7GfjHPbAnqqe9q5iXE=
-X-Received: by 2002:a17:90b:5823:b0:311:f05b:86a5 with SMTP id
- 98e67ed59e1d1-31caf72a0dbmr25531882a91.0.1753096398224; Mon, 21 Jul 2025
- 04:13:18 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753096430; x=1753701230;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qCpk9GjmCqOqyvs+4Z7EUdmuqAEP2pxTsgkUzsyKDEo=;
+        b=jP+PN8T+YWNqTp0wtP2MVkfLbaGaODmv7SHOKV+AQpfIDn12noDLx4j2iy/u3kQv/z
+         lhZCGsGfe00lL+daMOplvv//z1ErLNCdKKucpsXVi5m6JEWZnEUosTxqxRvigf74pLaq
+         O0k/aDQytmJ8+RnlLz+h2GUdalx/AdAZlZVWOkXGlgogjRJLbDligB3e7Rm1zO7cfk+e
+         QT0ApCbaYQHbTz7EJpXmVSlOFXI7TZEgsUXYoEosDboC7zfPNy3Y9hb2KxT6WWGardPX
+         /I+bKjA61SX2xXA1GonPKO47SvhNsyiIanMzLGS0T0YZPAalGEG3XZRz3kqytP342w6F
+         YT9g==
+X-Forwarded-Encrypted: i=1; AJvYcCV4UfC67g+dHy7VFca6biRRZ7jC6k4EH9315YloI1xx4BWKK/MeXfpkuOQlFcJffaUnA8PZSkc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHpe5qpM/rwF3bzztQqsCYiGeLsZWzAB1737dQK7i5Wwq9eEVq
+	nUIbFnXc96ntm6SVOM/wU2p90tfFdjMIssa+1vchOh2py99lHDXRkMyXD5GOc3hIPGc=
+X-Gm-Gg: ASbGnctsj2vkRgXAU1WuGLZ1PWFioXFJTMVlJ6dphAqtxLtE8eLYj6+qOPH2zPs1bsK
+	ISpS6jVj2I1HRsT41h+lWD1njvUCeixM9q0krxZnct+vlIn95unb93sVVMUtfhNIbxinu/xlvRS
+	GFpmRlCQ/PhNf0q52Bn6nKyeA25y5xz4phY6ZX0VnYl88ClXl5+zz8MRzAjqI5OqLDSbbSmtZWW
+	OHbI9SKu8sQVIX91YvqYLXo4TILMGo+sJRVbB8z5nB/XxXu7gvDzmurpIyiFKfmEMVmEVcwIzoz
+	ZHkr8IWvv/z+HpZL1GAXwjwnu1XWg725TprYAZRPd8UfzvLNaHOXIjAAHZmH2Gwza3kkDvAaPV3
+	KDjX2YJ1XWkvcgRP+3xyosWE+ut5qx8UtAV3ak6BTLlCHY1YZXWtWfy84IcqxUHQ=
+X-Google-Smtp-Source: AGHT+IGphSZ4nqGy3QQspzTFvacskBSUZG+3aCT88SVK0C+HxQ5ng+J8deaVhU6sjyoaTxsnS6cTNg==
+X-Received: by 2002:a05:6000:144a:b0:3a8:310a:b1dc with SMTP id ffacd0b85a97d-3b60ddc64e3mr16113819f8f.56.1753096429728;
+        Mon, 21 Jul 2025 04:13:49 -0700 (PDT)
+Received: from [192.168.1.36] (p549d4bd0.dip0.t-ipconnect.de. [84.157.75.208])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca5c9e2sm10284808f8f.89.2025.07.21.04.13.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Jul 2025 04:13:49 -0700 (PDT)
+Message-ID: <b38accf6-c7f5-4728-9507-2d380207935f@linaro.org>
+Date: Mon, 21 Jul 2025 13:13:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250721031609.132217-1-krikku@gmail.com> <20250721031609.132217-2-krikku@gmail.com>
- <CANn89i+vhTeqgTPr+suupJNLMHp-RAX89aBrFhiQnu58233bAw@mail.gmail.com>
-In-Reply-To: <CANn89i+vhTeqgTPr+suupJNLMHp-RAX89aBrFhiQnu58233bAw@mail.gmail.com>
-From: Krishna Kumar <krikku@gmail.com>
-Date: Mon, 21 Jul 2025 16:42:41 +0530
-X-Gm-Features: Ac12FXwM6kcASgnBarMqYpEhVGnNrBIo1M40kSMb6YJVDldo2oxIB3gRaIJQLjs
-Message-ID: <CACLgkEbcbWBs+ma3rq7d6B7nBtOzVVEogy0aEJX5hd6PV9790g@mail.gmail.com>
-Subject: Re: [PATCH v5 net-next 1/2] net: Prevent RPS table overwrite for
- active flows
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, tom@herbertland.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, sdf@fomichev.me, 
-	kuniyu@google.com, ahmed.zaki@intel.com, aleksander.lobakin@intel.com, 
-	atenart@kernel.org, jdamato@fastly.com, krishna.ku@flipkart.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 4/4] iio: Add Qualcomm Sensor Manager driver
+Content-Language: en-US
+To: y.oudjana@protonmail.com, Manivannan Sadhasivam <mani@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>,
+ Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor
+ <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>,
+ Jonathan Cameron <jic23@kernel.org>, David Lechner <dlechner@baylibre.com>,
+ =?UTF-8?Q?Nuno_S=C3=A1?= <nuno.sa@analog.com>,
+ Andy Shevchenko <andy@kernel.org>, Luca Weiss <luca@lucaweiss.eu>
+Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+ linux-iio@vger.kernel.org
+References: <20250710-qcom-smgr-v2-0-f6e198b7aa8e@protonmail.com>
+ <20250710-qcom-smgr-v2-4-f6e198b7aa8e@protonmail.com>
+From: Casey Connolly <casey.connolly@linaro.org>
+In-Reply-To: <20250710-qcom-smgr-v2-4-f6e198b7aa8e@protonmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Thanks Eric.
+Hi Yassine,
 
-1. I will move hash under aRFS (addressing your next comment separately)?
-2. There's no point (actually may harm) in moving the existing
-"filter" under aRFS
-    though that's also used in aRFS code - it is u16 and pairs well
-with the "u16 cpu".
+On 10/07/2025 10:06, Yassine Oudjana via B4 Relay wrote:
+> From: Yassine Oudjana <y.oudjana@protonmail.com>
+> 
+> Add a driver for sensors exposed by the Qualcomm Sensor Manager service,
+> which is provided by SLPI or ADSP on Qualcomm SoCs. Supported sensors
+> include accelerometers, gyroscopes, pressure sensors, proximity sensors
+> and magnetometers.
+> 
+> Signed-off-by: Yassine Oudjana <y.oudjana@protonmail.com>
+> ---
+>  MAINTAINERS                                     |  13 +
+>  drivers/iio/accel/qcom_smgr_accel.c             | 138 ++++
+>  drivers/iio/common/Kconfig                      |   1 +
+>  drivers/iio/common/Makefile                     |   1 +
+>  drivers/iio/common/qcom_smgr/Kconfig            |  16 +
+>  drivers/iio/common/qcom_smgr/Makefile           |   8 +
+>  drivers/iio/common/qcom_smgr/qcom_smgr.c        | 840 ++++++++++++++++++++++++
+>  drivers/iio/common/qcom_smgr/qmi/Makefile       |   3 +
+>  drivers/iio/common/qcom_smgr/qmi/qmi_sns_smgr.c | 713 ++++++++++++++++++++
+>  drivers/iio/common/qcom_smgr/qmi/qmi_sns_smgr.h | 161 +++++
+>  include/linux/iio/common/qcom_smgr.h            |  80 +++
+>  11 files changed, 1974 insertions(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index b5a472a544cfe2ad87691209c34d7bafe058ba42..0fb91c9bce431fc899776ff10b728ecdc957f51a 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -20702,6 +20702,19 @@ F:	Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
+>  F:	drivers/net/ethernet/qualcomm/rmnet/
+>  F:	include/linux/if_rmnet.h
+>  
+> +QUALCOMM SENSOR MANAGER IIO DRIVER
+> +M:	Yassine Oudjana <y.oudjana@protonmail.com>
+> +L:	linux-iio@vger.kernel.org
+> +L:	linux-arm-msm@vger.kernel.org
+> +S:	Maintained
 
-I hope #1 is sufficient?
+Missing drivers/iio/accel/qcom_smgr_accel.c here
 
-Thanks,
-- Krishna
+Kind regards,
 
-On Mon, Jul 21, 2025 at 1:44=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Sun, Jul 20, 2025 at 8:16=E2=80=AFPM Krishna Kumar <krikku@gmail.com> =
-wrote:
-> >
-> > This patch fixes an issue where two different flows on the same RXq
-> > produce the same hash resulting in continuous flow overwrites.
-> >
-> > Flow #1: A packet for Flow #1 comes in, kernel calls the steering
-> >          function. The driver gives back a filter id. The kernel saves
-> >          this filter id in the selected slot. Later, the driver's
-> >          service task checks if any filters have expired and then
-> >          installs the rule for Flow #1.
-> > Flow #2: A packet for Flow #2 comes in. It goes through the same steps.
-> >          But this time, the chosen slot is being used by Flow #1. The
-> >          driver gives a new filter id and the kernel saves it in the
-> >          same slot. When the driver's service task runs, it runs throug=
-h
-> >          all the flows, checks if Flow #1 should be expired, the kernel
-> >          returns True as the slot has a different filter id, and then
-> >          the driver installs the rule for Flow #2.
-> > Flow #1: Another packet for Flow #1 comes in. The same thing repeats.
-> >          The slot is overwritten with a new filter id for Flow #1.
-> >
-> > This causes a repeated cycle of flow programming for missed packets,
-> > wasting CPU cycles while not improving performance. This problem happen=
-s
-> > at higher rates when the RPS table is small, but tests show it still
-> > happens even with 12,000 connections and an RPS size of 16K per queue
-> > (global table size =3D 144x16K =3D 64K).
-> >
-> > This patch prevents overwriting an rps_dev_flow entry if it is active.
-> > The intention is that it is better to do aRFS for the first flow instea=
-d
-> > of hurting all flows on the same hash. Without this, two (or more) flow=
-s
-> > on one RX queue with the same hash can keep overwriting each other. Thi=
-s
-> > causes the driver to reprogram the flow repeatedly.
-> >
-> > Changes:
-> >   1. Add a new 'hash' field to struct rps_dev_flow.
-> >   2. Add rps_flow_is_active(): a helper function to check if a flow is
-> >      active or not, extracted from rps_may_expire_flow().
-> >   3. In set_rps_cpu():
-> >      - Avoid overwriting by programming a new filter if:
-> >         - The slot is not in use, or
-> >         - The slot is in use but the flow is not active, or
-> >         - The slot has an active flow with the same hash, but target CP=
-U
-> >           differs.
-> >      - Save the hash in the rps_dev_flow entry.
-> >   4. rps_may_expire_flow(): Use earlier extracted rps_flow_is_active().
-> >
-> > Testing & results:
-> >   - Driver: ice (E810 NIC), Kernel: net-next
-> >   - #CPUs =3D #RXq =3D 144 (1:1)
-> >   - Number of flows: 12K
-> >   - Eight RPS settings from 256 to 32768. Though RPS=3D256 is not ideal=
-,
-> >     it is still sufficient to cover 12K flows (256*144 rx-queues =3D 64=
-K
-> >     global table slots)
-> >   - Global Table Size =3D 144 * RPS (effectively equal to 256 * RPS)
-> >   - Each RPS test duration =3D 8 mins (org code) + 8 mins (new code).
-> >   - Metrics captured on client
-> >
-> > Legend for following tables:
-> > Steer-C: #times ndo_rx_flow_steer() was Called by set_rps_cpu()
-> > Steer-L: #times ice_arfs_flow_steer() Looped over aRFS entries
-> > Add:     #times driver actually programmed aRFS (ice_arfs_build_entry()=
-)
-> > Del:     #times driver deleted the flow (ice_arfs_del_flow_rules())
-> > Units:   K =3D 1,000 times, M =3D 1 million times
-> >
-> >   |-------|---------|------|     Org Code    |---------|---------|
-> >   | RPS   | Latency | CPU  | Add    |  Del   | Steer-C | Steer-L |
-> >   |-------|---------|------|--------|--------|---------|---------|
-> >   | 256   | 227.0   | 93.2 | 1.6M   | 1.6M   | 121.7M  | 267.6M  |
-> >   | 512   | 225.9   | 94.1 | 11.5M  | 11.2M  | 65.7M   | 199.6M  |
-> >   | 1024  | 223.5   | 95.6 | 16.5M  | 16.5M  | 27.1M   | 187.3M  |
-> >   | 2048  | 222.2   | 96.3 | 10.5M  | 10.5M  | 12.5M   | 115.2M  |
-> >   | 4096  | 223.9   | 94.1 | 5.5M   | 5.5M   | 7.2M    | 65.9M   |
-> >   | 8192  | 224.7   | 92.5 | 2.7M   | 2.7M   | 3.0M    | 29.9M   |
-> >   | 16384 | 223.5   | 92.5 | 1.3M   | 1.3M   | 1.4M    | 13.9M   |
-> >   | 32768 | 219.6   | 93.2 | 838.1K | 838.1K | 965.1K  | 8.9M    |
-> >   |-------|---------|------|   New Code      |---------|---------|
-> >   | 256   | 201.5   | 99.1 | 13.4K  | 5.0K   | 13.7K   | 75.2K   |
-> >   | 512   | 202.5   | 98.2 | 11.2K  | 5.9K   | 11.2K   | 55.5K   |
-> >   | 1024  | 207.3   | 93.9 | 11.5K  | 9.7K   | 11.5K   | 59.6K   |
-> >   | 2048  | 207.5   | 96.7 | 11.8K  | 11.1K  | 15.5K   | 79.3K   |
-> >   | 4096  | 206.9   | 96.6 | 11.8K  | 11.7K  | 11.8K   | 63.2K   |
-> >   | 8192  | 205.8   | 96.7 | 11.9K  | 11.8K  | 11.9K   | 63.9K   |
-> >   | 16384 | 200.9   | 98.2 | 11.9K  | 11.9K  | 11.9K   | 64.2K   |
-> >   | 32768 | 202.5   | 98.0 | 11.9K  | 11.9K  | 11.9K   | 64.2K   |
-> >   |-------|---------|------|--------|--------|---------|---------|
-> >
-> > Some observations:
-> >   1. Overall Latency improved: (1790.19-1634.94)/1790.19*100 =3D 8.67%
-> >   2. Overall CPU increased:    (777.32-751.49)/751.45*100    =3D 3.44%
-> >   3. Flow Management (add/delete) remained almost constant at ~11K
-> >      compared to values in millions.
-> >
-> > Reported-by: kernel test robot <lkp@intel.com>
-> > Closes: https://lore.kernel.org/oe-kbuild-all/202507161125.rUCoz9ov-lkp=
-@intel.com/
-> > Signed-off-by: Krishna Kumar <krikku@gmail.com>
-> > ---
-> >  include/net/rps.h    |  5 +--
-> >  net/core/dev.c       | 82 ++++++++++++++++++++++++++++++++++++++++----
-> >  net/core/net-sysfs.c |  4 ++-
-> >  3 files changed, 81 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/include/net/rps.h b/include/net/rps.h
-> > index d8ab3a08bcc4..8e33dbea9327 100644
-> > --- a/include/net/rps.h
-> > +++ b/include/net/rps.h
-> > @@ -25,13 +25,14 @@ struct rps_map {
-> >
-> >  /*
-> >   * The rps_dev_flow structure contains the mapping of a flow to a CPU,=
- the
-> > - * tail pointer for that CPU's input queue at the time of last enqueue=
-, and
-> > - * a hardware filter index.
-> > + * tail pointer for that CPU's input queue at the time of last enqueue=
-, a
-> > + * hardware filter index, and the hash of the flow.
-> >   */
-> >  struct rps_dev_flow {
-> >         u16             cpu;
-> >         u16             filter;
-> >         unsigned int    last_qtail;
-> > +       u32             hash;
->
-> This is problematic, because adds an extra potential cache line miss in R=
-PS.
->
-> Some of us do not use CONFIG_RFS_ACCEL, make sure to not add extra
-> costs for this configuration ?
+-- 
+// Casey (she/her)
+
 
