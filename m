@@ -1,157 +1,175 @@
-Return-Path: <netdev+bounces-208543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DFD4B0C133
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 12:22:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFF79B0C148
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 12:36:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 431205402E3
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 10:22:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92D6818C18D1
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 10:36:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DA9828E5F8;
-	Mon, 21 Jul 2025 10:22:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B05D28DF33;
+	Mon, 21 Jul 2025 10:36:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ByCMYwry"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hz/ejtxO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C975628D8EB;
-	Mon, 21 Jul 2025 10:22:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCD77285C87;
+	Mon, 21 Jul 2025 10:36:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753093364; cv=none; b=ZQK/N/uuxdk7QD8uTHNVkTYS5itAifOaKAkIe7c4uQJzJK7WeTMEiMAFvNdjETF0+8tmzMN+t6uu7aXZ5lJ+boM2Piunz0phrJXy8nwiWaTXiCITIsowX1yte5uN413s/79PHaz1XmJlzVsrAVoTLGLg2s8rWoCQzrdXGIJYVfo=
+	t=1753094170; cv=none; b=L9zCKMMz8cEhQhyEqzneywyrenoVxrxWu649JXkANrw+/UvN4wd79vgnL2D4koRR+5xliwuO4qpWjsmLiFMfzprHcr+/UYf4GCAxocV2ArJQV+G5PWsAOD3a+mmBgFOuqmeqYjOBuyVXmpp7sXyk0tQxQkiubqPHIkYadTPaG9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753093364; c=relaxed/simple;
-	bh=9kolATwxanaQ4eXtJNZBmhJ9zzf7x+nrcF3EIRCywBQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=H26/8S8P3HFX4D84qN7ioxadVM9eXutQR/SkNhSl4iP1RuDaUOkTvfhv5QFnPHwtiDzgE7PNDzE6lgfqDBBX+iagd8GNiNZ0wIFCVlGkQwqD7JdXb+3BuwzPpjWs6JwHFI9tHRGgF4Vx0qqFiA80OjnzoCzhuR+HFGpcz0HFnJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ByCMYwry; arc=none smtp.client-ip=209.85.166.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-87c14e0675dso86935039f.2;
-        Mon, 21 Jul 2025 03:22:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753093362; x=1753698162; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VHEm6bHDLYflRAkB3nDyc8N9yM14dw/BsI6dT8qL9b8=;
-        b=ByCMYwryX9lhUydg+HGHHwESnRoHFSxrCVq+0gJxlxmexw+tARDhU1ArCmXjQtmm4c
-         UJZrT+hPChVxA0fyjxqSmzD4ehjNZQrhp6xDQs6A9WGi//CGcsaVFh/LzxnZEykzt0lf
-         w+aMmM0/HTYTwbQRyJf1yyLa7rciFjbuj24DYM+jDmFV6kz4PPffzF1M9Ue2WrOlq8Dn
-         52G+RqTsEHSYr7C1nOhhKyncEo3YF8BdRcSmMWoV2UNgfqL4JDwsPzjWmR2N9w/jt6YP
-         7e4xF1qTqg+NkXnNmcvG2RkEwWB67GG3pTUbr5WrZwrJdUxTUo2bT7Y2UAAAlMZxTTIg
-         g4iQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753093362; x=1753698162;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VHEm6bHDLYflRAkB3nDyc8N9yM14dw/BsI6dT8qL9b8=;
-        b=bV1IlzT4a3dsMxAG2Xt+5dgGLU1Qzy8KpupMVmWQ6NiT8oWZzlpufbCQWSK1RO39Qs
-         688BJdayn5g5hKclUyhXiD1Kd41BnXwViytbuNjDOhIQVvrE2LszVtZdCIdX+G8p/g2f
-         voLyHgyFrNcdEABjTdOst63CYCnB67e/SK8anILGSDhm/hPPIYMzOE8uslpv2s+9ecxH
-         ZIO1QnlmT/fRUuL6D8c6vKbc638wI9CcYjppeShu7I0GvTt8D+/k9JBbZ0PdkAQI9qtx
-         NRb2YERRlOkn0lC8G7cJOnqQX9+c+V+EAMinIQ24njT7cd+OtE56Hpery5YhufWK452l
-         dMTw==
-X-Forwarded-Encrypted: i=1; AJvYcCUkUlkY5xp4Z7rqSnVepw7OUKTV3FRNtiDVtC9IFA/e1IZBHEsv0UIsk+MdjVg9jW7txZU=@vger.kernel.org, AJvYcCWOmll4AvHNyBXasEwIxOPkyiSx+em6ev0ehIk4XvOikzJkL8xURzqThA8MLPYzbYNCAyUS5pph@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuDERI7W2yILdlVM0pgr0TaGgshKfgU9YGkPSMP+uJUhisNJ3g
-	V/3FtXAae5JqZGHY9Q9+7/ddeR5gyEVcaNPSZMxRdB0iJe/bwxq8BsTEmmwr5M4GFcUFXGllxuY
-	59nEyH6WEh0fE6L90cMrg9b0PMWqkZxo=
-X-Gm-Gg: ASbGncubBlXiMl2TroIpNZhhSCRhrRnP4soGZHlX78FP51z9qXKXLL1uwxEelVYxKpH
-	82gDMvblj2uLG5xFrKCXTuwAwMzc/jndm5Z+3hqGvNS046MU+PCjYaRmk35ENPJR+aETyntMd/k
-	SkrYfvb3uIW4omnCIDv5q6ZxTyIov5OVwzPZKSzK0uZuSq4xXheZMOwpJAm+uWlAxP0fpj+W7wE
-	8E0qyi+yu2xJQb9FA==
-X-Google-Smtp-Source: AGHT+IFXBPH0yx8S02iqQkJZIi4L0Jm+RaJLQnvPek++YwE2QGcqsWI+nl8r2YrcQAJo6zGNTHvEyQhndIVsVoiBNsI=
-X-Received: by 2002:a05:6e02:1806:b0:3e2:9e93:b673 with SMTP id
- e9e14a558f8ab-3e29e93b68cmr100435465ab.1.1753093361694; Mon, 21 Jul 2025
- 03:22:41 -0700 (PDT)
+	s=arc-20240116; t=1753094170; c=relaxed/simple;
+	bh=F4DWEShYlgi+O2vngYEWDDPz+7ETvlg5Z1pg7zYX228=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oeZ1AOqyaBMBolEBbcXfIudYL5JKUH9VgcWwtq0puQUBu3kPWd3WESs1x00pj+u3ieJ3Hn1rua/FQauO+nFL7UCb0Ev/KaRPbY4ztYO9lnXtsFjSsdBc0hRlmImqaBvdmo0l2E2/QurrLvyHHSjHtqaenDmz8JmL37oIORlgvBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=hz/ejtxO; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56KMcqpT000727;
+	Mon, 21 Jul 2025 10:36:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=WV4O+A
+	BuIlGQ3hQz6gkTQy3zpggdnbsZnocNbHSe898=; b=hz/ejtxOTHs5/gGtvBNXzO
+	cg7TVmcRs6NpmvWWXCvkSBl5aZKyRhFn5ORbMWQwKze5NjVPRQUB0TUfK4eUS2zl
+	8qJA1buh6qqhXXcHdvsxg3TLQDQcbNa8jg3rzkGZdM/bdIUxDz8OuACOXLgxkTPm
+	AIbO+tT5klFPNjk/+Z2LOFjx0oKOyMKRtglj96LGqnxmbJqt0Uz7IoVIVvgAxKYk
+	l+WoB7uZqGNFKkS8D6IMZxa8xA5P34m9K76dxNovT/CQ1xZzVkWqjSG1dGhIrTkp
+	Tp6pNbtFWvxhJUDL1yawnw7qLXG1LoauwsewE8fOwFj41mfVhyQOVzJFfiehjVEA
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4805hfr0kn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Jul 2025 10:36:00 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 56LAU8bW028724;
+	Mon, 21 Jul 2025 10:36:00 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4805hfr0kh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Jul 2025 10:35:59 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56L8knCe004732;
+	Mon, 21 Jul 2025 10:35:59 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 480u8fmt18-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Jul 2025 10:35:59 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56LAZpM350069864
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 21 Jul 2025 10:35:51 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9E5152004D;
+	Mon, 21 Jul 2025 10:35:51 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 95D5420040;
+	Mon, 21 Jul 2025 10:35:50 +0000 (GMT)
+Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.111.43.101])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Mon, 21 Jul 2025 10:35:50 +0000 (GMT)
+Date: Mon, 21 Jul 2025 12:35:48 +0200
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Alexandra Winter <wintera@linux.ibm.com>
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andrew Lunn
+ <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo
+ Abeni <pabeni@redhat.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Heiko
+ Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Christian
+ Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle
+ <svens@linux.ibm.com>,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        Ursula Braun
+ <ubraun@linux.ibm.com>, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Aliaksei Makarau <Aliaksei.Makarau@ibm.com>,
+        Mahanta Jambigi <mjambigi@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH 1/1] s390/ism: fix concurrency management in ism_cmd()
+Message-ID: <20250721123548.31401ac2.pasic@linux.ibm.com>
+In-Reply-To: <af7298f5-08a0-4492-834d-a348144c909e@linux.ibm.com>
+References: <20250720211110.1962169-1-pasic@linux.ibm.com>
+	<6b09d374-528a-4a6d-a6c6-2be840e8a52b-agordeev@linux.ibm.com>
+	<af7298f5-08a0-4492-834d-a348144c909e@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250721083343.16482-1-kerneljasonxing@gmail.com>
- <20250721083343.16482-3-kerneljasonxing@gmail.com> <20250721101217.GC2459@horms.kernel.org>
-In-Reply-To: <20250721101217.GC2459@horms.kernel.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 21 Jul 2025 18:22:05 +0800
-X-Gm-Features: Ac12FXxglQj0R4EkMw3SzP0qFiFwMjjIS-PnIkKo_EqhulukoCpP4A9yL3kNbVo
-Message-ID: <CAL+tcoAEtRVvX5YkK980OtfaKHAf2+dw+WFR-HwPO2GO0nemyA@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/2] igb: xsk: solve underflow of nb_pkts in
- zerocopy mode
-To: Simon Horman <horms@kernel.org>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, bjorn@kernel.org, 
-	magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
-	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
-	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com, 
-	linux-stm32@st-md-mailman.stormreply.com, bpf@vger.kernel.org, 
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzIxMDA4OSBTYWx0ZWRfX6FeVIKVayOkS
+ S/WcbnzdSs9yCZNdP9qIugIlJoaSQXou+BDhVAuD/W2kNp3cYthyLyz5CkhTEMW0vHmsuIpbdQZ
+ PQYpPizpY1F0OQP4zW63RfKdQkaBNiGnCVSZrzY68nCq9925R61z6BjUYpIBFm/1HbfUHDaa41M
+ EEq4jPs1pGLTtYiXtwuPMBboXF0hRPJ0tnFrQ/5BT5iU14ZIwuWV3qzTVrJuCVM97N2OkmzmUE8
+ RbL+4WiL/LiEGy6rOMgC9NNtHEqYbHP/L4u1LZtyFUHx/3CFwptZCsHaq52wp31V8NuIUwFOwuu
+ ZB2fLJFcjK2SRoqiN+cz63KYZm8p4fgyb8QM2wDSiDzckWO1HQ6JAOsvCsGsHVqNypey79/lneS
+ w9CEOQ3guSNy4BJR6tU/TQkiEXAI519mHL92wCRM9zRJmL69W9PrdTf8Ydo6zUve2Y/sqa7C
+X-Proofpoint-GUID: NEZNiAB_40OMK-ZM02ykhqsmLTEvM3KM
+X-Proofpoint-ORIG-GUID: l1MHd4f7ZxURLXhPrHMGUxm4ilWZHldc
+X-Authority-Analysis: v=2.4 cv=X9RSKHTe c=1 sm=1 tr=0 ts=687e1810 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=kj9zAlcOel0A:10 a=Wb1JkmetP80A:10 a=VnNF1IyMAAAA:8 a=pGFWBfxQ5TguR4G5NxIA:9
+ a=CjuIK1q_8ugA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-21_03,2025-07-21_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 priorityscore=1501 adultscore=0 lowpriorityscore=0
+ phishscore=0 malwarescore=0 clxscore=1015 mlxscore=0 spamscore=0
+ suspectscore=0 mlxlogscore=585 bulkscore=0 classifier=spam authscore=0
+ authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2505280000 definitions=main-2507210089
 
-Hi Simon,
+On Mon, 21 Jul 2025 10:17:30 +0200
+Alexandra Winter <wintera@linux.ibm.com> wrote:
 
-On Mon, Jul 21, 2025 at 6:12=E2=80=AFPM Simon Horman <horms@kernel.org> wro=
-te:
->
-> On Mon, Jul 21, 2025 at 04:33:43PM +0800, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > There is no break time in the while() loop, so every time at the end of
-> > igb_xmit_zc(), underflow of nb_pkts will occur, which renders the retur=
-n
-> > value always false. But theoretically, the result should be set after
-> > calling xsk_tx_peek_release_desc_batch(). We can take i40e_xmit_zc() as
-> > a good example.
-> >
-> > Returning false means we're not done with transmission and we need one
-> > more poll, which is exactly what igb_xmit_zc() always did before this
-> > patch. After this patch, the return value depends on the nb_pkts value.
-> > Two cases might happen then:
-> > 1. if (nb_pkts < budget), it means we process all the possible data, so
-> >    return true and no more necessary poll will be triggered because of
-> >    this.
-> > 2. if (nb_pkts =3D=3D budget), it means we might have more data, so ret=
-urn
-> >    false to let another poll run again.
-> >
-> > Fixes: f8e284a02afc ("igb: Add AF_XDP zero-copy Tx support")
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >  drivers/net/ethernet/intel/igb/igb_xsk.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/ethernet/intel/igb/igb_xsk.c b/drivers/net/eth=
-ernet/intel/igb/igb_xsk.c
-> > index 5cf67ba29269..243f4246fee8 100644
-> > --- a/drivers/net/ethernet/intel/igb/igb_xsk.c
-> > +++ b/drivers/net/ethernet/intel/igb/igb_xsk.c
-> > @@ -482,7 +482,7 @@ bool igb_xmit_zc(struct igb_ring *tx_ring, struct x=
-sk_buff_pool *xsk_pool)
-> >       if (!nb_pkts)
-> >               return true;
-> >
-> > -     while (nb_pkts-- > 0) {
-> > +     while (i < nb_pkts) {
->
-> Hi Jason,
->
-> FWIIW, I think using a for loop is a more idiomatic way
-> of handling the relationship between i, nb_pkts, and
-> the iterations of this loop.
+> >> +	spin_lock_irqsave(&ism->cmd_lock, flags);  
+> > 
+> > I only found smcd_handle_irq() scheduling a tasklet, but no commands issued.
+> > Do we really need disable interrupts?  
+> 
+> You are right in current code, the interrupt and event handlers of ism and smcd
+> never issue a control command that calls ism_cmd().
+> OTOH, future ism clients could do that.
+> The control commands are not part of the data path, but of connection establish.
+> So I don't really expect a performance impact.
+> I have it on my ToDo list, to change this to threaded interrupts in the future.
+> So no strong opinion on my side.
+> Simple spin_lock is fine with me.
 
-Sure, I can turn it into 'for (i =3D 0; i < nb_pkts; i++)' in the next vers=
-ion.
+I agree!
 
-Thanks,
-Jason
+My train of thought was, lets go with the safe option and look if the
+maintainers want something different. I didn't feel confident about
+trying to understand the details including the contract between the
+clients and the driver.
+
+I will change to simple spin_lock() at the end of the day if nobody
+objects since the sentiment seems to be going into this direction and
+spin a v2 no later than on Wed.
+
+Thanks for having a look!
+
+Regards,
+Halil
 
