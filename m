@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-208622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64578B0C62C
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 16:23:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECCA9B0C637
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 16:24:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FBE33B68F3
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 14:22:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4F393B66FC
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 14:23:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 837C62DC356;
-	Mon, 21 Jul 2025 14:22:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24EB62DAFB7;
+	Mon, 21 Jul 2025 14:24:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mExpQ9Hi"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="yuZy083T"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D27A02DA77B;
-	Mon, 21 Jul 2025 14:22:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 891AE2DA767;
+	Mon, 21 Jul 2025 14:24:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753107772; cv=none; b=YuYdpyaz8eRC3RgobWDEcB6g2n6Y3xq/SC8c/e/7qQKAl8eMV6dQDMxgRs8GvED4xOOY/clh7wUkIa69HskVNbXMCqS/iTf7HV+bO3sVv/rjIJ2RkLesWKvl7Mu9jEKteD0EFmxXTZzE3822P7Mh/YfRIxVaJF8nTu9bBVJPOPA=
+	t=1753107849; cv=none; b=EoPqx73CX7U8MmMANpPcNrthqZIWhsKEXYug8nSt40xET1igtKOleJlSX9qgGsEx3iyZ9ypRXkS0/xrznUG7VdAfgZviHA2NGiQfoJ1z8H7yKyzdveaS026ewxLPV5vv4p7g4ynLXNT2v7WyqLL2zCo7S4QZHhL+KeVlbb90U4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753107772; c=relaxed/simple;
-	bh=xzItkeRrbcsA7vr8YA6l+8FKhQJ22uASZV+GlNgFXQY=;
+	s=arc-20240116; t=1753107849; c=relaxed/simple;
+	bh=1XwZqdGrESrEbYeqeKIYsPwLevTf/uNHNa8KyPX6EV8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CADja0bf0/VTQnBY1ryn0OgP4zFRJ23HfWaMt1cIKT3aFiVzEPfFpe6SMKIQ8PtiMq5R70eTgCYYWfYBImuwkEjywsKQYI3p/SYK312g1whfMJcPOF+++kHsBTlEI/fb34QiE2sKwqKi6OWlSTqgNaM/Z/MAZBPfQJe+6FiCp2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mExpQ9Hi; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=nscRUoxKno1xnFWmjmRIcl427xewNdq/Jt6WKoggvKNqVhN5nG2xo+wyQDHffpwim4XpjoWKI00ud9/1PSI+4N2H2KRFMdjugEAzwSX4yRkjxbNlu+OIPDWo/707KtQaJo4b63Mm/KNpbYELqRIAQSqfd5oyA6aaM/hSuSepIJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=yuZy083T; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,22 +36,39 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ZM0jXh/69aSK5O/qFPL6WwO8DTU6rGWPNC15GTR25mw=; b=mExpQ9HiAC++gjjmqVf4jktAXv
-	5a2enOybfuUeppqdllVT4opgV+Eh3IOWD6jbk/LltMA67PjGA0F+H2tES970SJXfiILQsc8tXDGRf
-	WygSYtW7mrMRk5xUT6TgequMFn/RAN2qWltQZxA7R30/w6yN7YTNZt/jv5Zm63fhunI0=;
+	bh=hHzpUiLN7Jg4Lz4KXx4NfLv+H9x1eSd9BwpY3gu+U20=; b=yuZy083TIKWJigFiyJMEIO7mEL
+	CW77wF+9YJR9suubJ3/IY4OYuLkd52G6nptaS9fV7lW7Fj7Lkt1mA/V95X650ZAgj2wdFYvoe6Jh0
+	UeN4rX/9MDUAAXnFyZW8Rr+OYnT+phRL+5FFl1AfFJOmVXjgQuyBgzO7I2Mkn/dgetuM=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1udrPZ-002MhS-4Y; Mon, 21 Jul 2025 16:22:37 +0200
-Date: Mon, 21 Jul 2025 16:22:37 +0200
+	id 1udrQo-002Mif-LR; Mon, 21 Jul 2025 16:23:54 +0200
+Date: Mon, 21 Jul 2025 16:23:54 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Horatiu Vultur <horatiu.vultur@microchip.com>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	o.rempel@pengutronix.de, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy: micrel: Add support for lan8842
-Message-ID: <4dd62a56-517a-4011-8a13-95f6c9ad2198@lunn.ch>
-References: <20250721071405.1859491-1-horatiu.vultur@microchip.com>
+To: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Christophe Roullier <christophe.roullier@foss.st.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Simon Horman <horms@kernel.org>,
+	Tristram Ha <Tristram.Ha@microchip.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 3/4] net: phy: smsc: fix and improve WoL support
+Message-ID: <a3b97fbd-8c4f-4657-aeca-732aee3782c3@lunn.ch>
+References: <20250721-wol-smsc-phy-v1-0-89d262812dba@foss.st.com>
+ <20250721-wol-smsc-phy-v1-3-89d262812dba@foss.st.com>
+ <cca8e9e6-a063-4e00-87af-f59ea926cce3@lunn.ch>
+ <b95e3439-717b-4159-acf9-7ce76d1c43d4@foss.st.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,43 +77,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250721071405.1859491-1-horatiu.vultur@microchip.com>
+In-Reply-To: <b95e3439-717b-4159-acf9-7ce76d1c43d4@foss.st.com>
 
-> +static struct lan8842_hw_stat lan8842_hw_stats[] = {
-> +	{ "phy_rx_correct_count", 2, 3, {88, 61, 60}},
-> +	{ "phy_rx_crc_count", 2, 2, {63, 62}},
-> +	{ "phy_tx_correct_count", 2, 3, {89, 85, 84}},
-> +	{ "phy_tx_crc_count", 2, 2, {87, 86}},
-> +};
+> I wanted to state clearly that the wake up happended because of a WoL
+> event but sure, I understand that it's best if log isn't spammed. Do you
+> prefer it completely removed or dev_info()->dev_dbg() ?
 
-Hi Horatiu
-
-Please could you look at using ethtool_phy_stats via the
-.get_phy_stats() phy driver op.
-
-> +static int lan8842_config_init(struct phy_device *phydev)
-> +{
-> +	int val;
-> +	int ret;
-> +
-> +	/* Reset the PHY */
-> +	val = lanphy_read_page_reg(phydev, 4, LAN8814_QSGMII_SOFT_RESET);
-> +	if (val < 0)
-> +		return val;
-> +	val |= LAN8814_QSGMII_SOFT_RESET_BIT;
-> +	lanphy_write_page_reg(phydev, 4, LAN8814_QSGMII_SOFT_RESET, val);
-
-It looks like there are sufficient pairs of
-lanphy_read_page_reg()/lanphy_write_page_reg() you would be justified
-adding a lanphy_modify_page_reg().
-
-> +}, {
-> +	.phy_id		= PHY_ID_LAN8842,
-> +	.phy_id_mask	= MICREL_PHY_ID_MASK,
-
-I think you could use PHY_ID_MATCH_MODEL() here.  It would make it
-different to every other PHY, but maybe you could start with some
-cleanup patches, adding the _modify_ call etc?
+phydev_dbg() is fine.
 
 	Andrew
 
