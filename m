@@ -1,153 +1,160 @@
-Return-Path: <netdev+bounces-208561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01D77B0C25D
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 13:14:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74AF6B0C2B5
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 13:21:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8261218C3455
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 11:14:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AE243A7AAB
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 11:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D04E2298CAC;
-	Mon, 21 Jul 2025 11:13:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36381298248;
+	Mon, 21 Jul 2025 11:21:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K3yCEvZ/"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="f+MNoPkA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8969F2980B7
-	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 11:13:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82710289E38;
+	Mon, 21 Jul 2025 11:20:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753096434; cv=none; b=bL/nwCngftwkDU4mvg96Yk0JO6R4SjE3vLlK8H4P8Kx12jksuv7gbCs8L5HYd6PQ+0y12iYn8LMsRPF6cLEEEpwyh0iKOksMqaFbl/Jotr7VI3jhi6hysiFToUJs67yn4pX2Binrm/V3v0ak+DNBVuXmMMvSWCn55fJVt+rNMKQ=
+	t=1753096860; cv=none; b=Ay8XdigfRMsL/HG++Q+QA5XPdsthaCsXrgvhiu0DObLR6dfAfxoQQB4AdEBUK6aSIud2sGN6kXRIMBrZ92wbShDqApQA3Mf1mEMmS/R3AKysNlXmG7kHrnvlsp5TPHdRrox25K7duGCIyz9PpZhjkxfqmonDrR3NyJ9j1n2xrVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753096434; c=relaxed/simple;
-	bh=3LePUhZLqMHmMSA1GfKcOrJBLnHS9teMOpXWN0q2aMI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DSznmy8nuiedDB8AEIKUqcCfksj5E3J2moDGPudOhf7knTw9Km15Xnq23+LXimvstCfhMpaMDSsjyJRbgY4DT8oEjMLHORfE5TIu7dTG8Pi+bKD8Syq7Zb2DLvwswT7jNxm/cCn2NjMdHJxZZckJK8G63sBjcnibc0mY69+hRks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=K3yCEvZ/; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3a522224582so2062049f8f.3
-        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 04:13:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1753096430; x=1753701230; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qCpk9GjmCqOqyvs+4Z7EUdmuqAEP2pxTsgkUzsyKDEo=;
-        b=K3yCEvZ/DbLZYArDvEFschm5fG6TaXd8DDVie+6xzKntLEHLI50c92iV1XvGo/Us/G
-         YIGoG0XHQJ8sShww3CwVnfdJeWTs3cbYiHWqsZJzT0vc0V28hXKGoswRBQOIT7A9gAu/
-         eqfSk+5iGhP1jbfWlsazv28vw1HgAYRyvddIsBhdHW2MNtcdZ0MfSY0xE1DF4+IrchNp
-         XMo8lto8Uym1MQ17aBusYX10uuv3gP0xfIrUyM9kypeCFsuwyUG7GYGBWKOFqnK/kX2w
-         oVc8zYWRxQs4/qGLEvT8wMbuyhce06N6uTqdmdoBMxn4fLIk1BR8CyuTKMnxaqfTCk5f
-         Jv+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753096430; x=1753701230;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qCpk9GjmCqOqyvs+4Z7EUdmuqAEP2pxTsgkUzsyKDEo=;
-        b=jP+PN8T+YWNqTp0wtP2MVkfLbaGaODmv7SHOKV+AQpfIDn12noDLx4j2iy/u3kQv/z
-         lhZCGsGfe00lL+daMOplvv//z1ErLNCdKKucpsXVi5m6JEWZnEUosTxqxRvigf74pLaq
-         O0k/aDQytmJ8+RnlLz+h2GUdalx/AdAZlZVWOkXGlgogjRJLbDligB3e7Rm1zO7cfk+e
-         QT0ApCbaYQHbTz7EJpXmVSlOFXI7TZEgsUXYoEosDboC7zfPNy3Y9hb2KxT6WWGardPX
-         /I+bKjA61SX2xXA1GonPKO47SvhNsyiIanMzLGS0T0YZPAalGEG3XZRz3kqytP342w6F
-         YT9g==
-X-Forwarded-Encrypted: i=1; AJvYcCV4UfC67g+dHy7VFca6biRRZ7jC6k4EH9315YloI1xx4BWKK/MeXfpkuOQlFcJffaUnA8PZSkc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHpe5qpM/rwF3bzztQqsCYiGeLsZWzAB1737dQK7i5Wwq9eEVq
-	nUIbFnXc96ntm6SVOM/wU2p90tfFdjMIssa+1vchOh2py99lHDXRkMyXD5GOc3hIPGc=
-X-Gm-Gg: ASbGnctsj2vkRgXAU1WuGLZ1PWFioXFJTMVlJ6dphAqtxLtE8eLYj6+qOPH2zPs1bsK
-	ISpS6jVj2I1HRsT41h+lWD1njvUCeixM9q0krxZnct+vlIn95unb93sVVMUtfhNIbxinu/xlvRS
-	GFpmRlCQ/PhNf0q52Bn6nKyeA25y5xz4phY6ZX0VnYl88ClXl5+zz8MRzAjqI5OqLDSbbSmtZWW
-	OHbI9SKu8sQVIX91YvqYLXo4TILMGo+sJRVbB8z5nB/XxXu7gvDzmurpIyiFKfmEMVmEVcwIzoz
-	ZHkr8IWvv/z+HpZL1GAXwjwnu1XWg725TprYAZRPd8UfzvLNaHOXIjAAHZmH2Gwza3kkDvAaPV3
-	KDjX2YJ1XWkvcgRP+3xyosWE+ut5qx8UtAV3ak6BTLlCHY1YZXWtWfy84IcqxUHQ=
-X-Google-Smtp-Source: AGHT+IGphSZ4nqGy3QQspzTFvacskBSUZG+3aCT88SVK0C+HxQ5ng+J8deaVhU6sjyoaTxsnS6cTNg==
-X-Received: by 2002:a05:6000:144a:b0:3a8:310a:b1dc with SMTP id ffacd0b85a97d-3b60ddc64e3mr16113819f8f.56.1753096429728;
-        Mon, 21 Jul 2025 04:13:49 -0700 (PDT)
-Received: from [192.168.1.36] (p549d4bd0.dip0.t-ipconnect.de. [84.157.75.208])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca5c9e2sm10284808f8f.89.2025.07.21.04.13.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Jul 2025 04:13:49 -0700 (PDT)
-Message-ID: <b38accf6-c7f5-4728-9507-2d380207935f@linaro.org>
-Date: Mon, 21 Jul 2025 13:13:47 +0200
+	s=arc-20240116; t=1753096860; c=relaxed/simple;
+	bh=tdvpUOKEzaCuWOlkS6WWclQSY25kc0lUfypoOsiSomo=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=g/9RNEw3tzjpL/4G5/gt7AnUUSJG37yzAX+wS7VdJ8OprTxoZKoRlJKQdDdgEigNaQLe+es5ROwMrYYqHWolJG+dRRW16CiZwFTR/7HhXn6x6BHRX7cIrrw+4WPMS32HIpmDjJmwTLiUdKgT636yZWZW+ieoyC0eron1NeDY5VU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=f+MNoPkA; arc=none smtp.client-ip=91.207.212.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56LBF4uV010018;
+	Mon, 21 Jul 2025 13:20:20 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=selector1; bh=QoQzhe6ekd1hJ/ZaGFBf7S
+	uWNDyQBUmJcxHnIpw3sJo=; b=f+MNoPkA81GS0ddC+vRkWKScn7mJWfwYPUyRW7
+	XZJmRdGSwTMUE5uvYHglUdBFeVAhFVGXAbuILaIcG+hyScev0nWbGxGecVIx5RiI
+	8cLwbfUiotFU7Ps6qYpabzHGtkubsNLnVSYwX6OcrCfMtXF/8pjyxnfUlBx+OXZl
+	lH2u9kn+2/UE4tuo3ZDFUbPA/j6HQ1icM1WxzJ2twf2YHevb+IClmcIH9emng2cd
+	KyiS5scrri0zbfnGxmP9pRO0dTdirw86qHN6Ts/tgCE4nfG0oW64qcto+cK9YEaj
+	nv99cq/rqBYlMZcA/Dy/8lOR9a8jDiEI2CvVGPo5OFj9s+cg==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 48028g06fj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Jul 2025 13:20:20 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 829A34005A;
+	Mon, 21 Jul 2025 13:18:35 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 31CEA7A16C6;
+	Mon, 21 Jul 2025 13:17:46 +0200 (CEST)
+Received: from localhost (10.48.87.141) by SHFDAG1NODE1.st.com (10.75.129.69)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 21 Jul
+ 2025 13:17:45 +0200
+From: Gatien Chevallier <gatien.chevallier@foss.st.com>
+Subject: [PATCH net-next 0/4] net: add WoL from PHY support for
+ stm32mp135f-dk
+Date: Mon, 21 Jul 2025 13:14:42 +0200
+Message-ID: <20250721-wol-smsc-phy-v1-0-89d262812dba@foss.st.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 4/4] iio: Add Qualcomm Sensor Manager driver
-Content-Language: en-US
-To: y.oudjana@protonmail.com, Manivannan Sadhasivam <mani@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor
- <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>,
- Jonathan Cameron <jic23@kernel.org>, David Lechner <dlechner@baylibre.com>,
- =?UTF-8?Q?Nuno_S=C3=A1?= <nuno.sa@analog.com>,
- Andy Shevchenko <andy@kernel.org>, Luca Weiss <luca@lucaweiss.eu>
-Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
- linux-iio@vger.kernel.org
-References: <20250710-qcom-smgr-v2-0-f6e198b7aa8e@protonmail.com>
- <20250710-qcom-smgr-v2-4-f6e198b7aa8e@protonmail.com>
-From: Casey Connolly <casey.connolly@linaro.org>
-In-Reply-To: <20250710-qcom-smgr-v2-4-f6e198b7aa8e@protonmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIACMhfmgC/x3MTQ5AMBBA4avIrE1SRTSuIhZ+pkxCSUeoiLtrL
+ L/Few8IeSaBOnnA08nCm4vI0gSGuXMTIY/RoJUuVaUzvLYFZZUB9/lGa/O+UKYwptQQk92T5fD
+ vGnB0oKNwQPu+H00czfVoAAAA
+X-Change-ID: 20250721-wol-smsc-phy-ff3b40848852
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre
+ Torgue <alexandre.torgue@foss.st.com>,
+        Christophe Roullier
+	<christophe.roullier@foss.st.com>,
+        Andrew Lunn <andrew@lunn.ch>, Heiner
+ Kallweit <hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>, Simon
+ Horman <horms@kernel.org>,
+        Tristram Ha <Tristram.Ha@microchip.com>,
+        Florian
+ Fainelli <florian.fainelli@broadcom.com>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        Gatien Chevallier <gatien.chevallier@foss.st.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1625;
+ i=gatien.chevallier@foss.st.com; h=from:subject:message-id;
+ bh=tdvpUOKEzaCuWOlkS6WWclQSY25kc0lUfypoOsiSomo=;
+ b=owEB7QES/pANAwAKAar3Rq6G8cMoAcsmYgBofiHXy5WQo9qc1HiPHV335Rofl8r2vNOuoDj9F
+ zaycVnIc9SJAbMEAAEKAB0WIQRuDsu+jpEBc9gaoV2q90auhvHDKAUCaH4h1wAKCRCq90auhvHD
+ KEoyDACpQVS5/Izrchq3yuy2z2bCLfPWIGikxbq7ATHBiU+P9gSlnbZGyf7i6NVMoNzKpO5pMbM
+ MUfCKhHbWFK3hUTf03KEejPD9xFPir09Se0oxxSlWb1EvWth5tLq9ggZrKi+Qbyi6G4fBLYQyO2
+ UkBVYClMWPeH9oBQY+9XLH2oT27hKzOX/R1P5F53EmzylJdOj4VoX4IszXNHKsU/BHoNi2j2yuC
+ iXRKns9uhl2LzqG6MCxxRxf+IQ6cdxxwbVy9DOHFjzP3vRj+4/5yuTAOWTtt4zKzTwtwHEGU2+V
+ JjJQazacVp/t8PhugNingGDOQnl/FkA9A0QpCammNBF5UODs0ulrQOLvASf6AabV2bp4I4FXyaP
+ t+wESNtmNix3gC/DyrZL7CahvvXuynI5/3sBHgSuNr0jvq1ThWpVx96nj5Iu/rNLKaIo+B0Wc6f
+ keGvnelxrUzjdZzN/bfbRqta/U7m6mGiuPYp5AZxdUcHv/yks4EyQt6Bq9wuaUIN2U3OE=
+X-Developer-Key: i=gatien.chevallier@foss.st.com; a=openpgp;
+ fpr=6E0ECBBE8E910173D81AA15DAAF746AE86F1C328
+X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-21_03,2025-07-21_01,2025-03-28_01
 
-Hi Yassine,
+A previous patchset in drivers/net/phy/smsc.c introduced the WoL
+from PHY capability of some PHYs. The Microchip LAN8742 PHY is
+present on the stm32mp135f-dk board and posesses this capability.
 
-On 10/07/2025 10:06, Yassine Oudjana via B4 Relay wrote:
-> From: Yassine Oudjana <y.oudjana@protonmail.com>
-> 
-> Add a driver for sensors exposed by the Qualcomm Sensor Manager service,
-> which is provided by SLPI or ADSP on Qualcomm SoCs. Supported sensors
-> include accelerometers, gyroscopes, pressure sensors, proximity sensors
-> and magnetometers.
-> 
-> Signed-off-by: Yassine Oudjana <y.oudjana@protonmail.com>
-> ---
->  MAINTAINERS                                     |  13 +
->  drivers/iio/accel/qcom_smgr_accel.c             | 138 ++++
->  drivers/iio/common/Kconfig                      |   1 +
->  drivers/iio/common/Makefile                     |   1 +
->  drivers/iio/common/qcom_smgr/Kconfig            |  16 +
->  drivers/iio/common/qcom_smgr/Makefile           |   8 +
->  drivers/iio/common/qcom_smgr/qcom_smgr.c        | 840 ++++++++++++++++++++++++
->  drivers/iio/common/qcom_smgr/qmi/Makefile       |   3 +
->  drivers/iio/common/qcom_smgr/qmi/qmi_sns_smgr.c | 713 ++++++++++++++++++++
->  drivers/iio/common/qcom_smgr/qmi/qmi_sns_smgr.h | 161 +++++
->  include/linux/iio/common/qcom_smgr.h            |  80 +++
->  11 files changed, 1974 insertions(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index b5a472a544cfe2ad87691209c34d7bafe058ba42..0fb91c9bce431fc899776ff10b728ecdc957f51a 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -20702,6 +20702,19 @@ F:	Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
->  F:	drivers/net/ethernet/qualcomm/rmnet/
->  F:	include/linux/if_rmnet.h
->  
-> +QUALCOMM SENSOR MANAGER IIO DRIVER
-> +M:	Yassine Oudjana <y.oudjana@protonmail.com>
-> +L:	linux-iio@vger.kernel.org
-> +L:	linux-arm-msm@vger.kernel.org
-> +S:	Maintained
+Therefore, add the possibility to specify in the device tree that,
+for a MAC instance, we want to use the WoL from PHY capability
+instead of the MAC one.
 
-Missing drivers/iio/accel/qcom_smgr_accel.c here
+However, when testing multiple power sequences with magic packets,
+the first one succeeded but the following ones failed. This was
+caused by uncleared flags in a PHY register. Therefore, I added
+a patch to add suspend()/resume() callbacks that handle these.
+These callbacks are only implemented for the Microchip LAN8742 as I
+have no way of testing it for other WoL capable PHYs.
 
-Kind regards,
+Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+---
+Gatien Chevallier (4):
+      dt-bindings: net: document st,phy-wol property
+      net: stmmac: stm32: add WoL from PHY support
+      net: phy: smsc: fix and improve WoL support
+      arm: dts: st: activate ETH1 WoL from PHY on stm32mp135f-dk
 
+ .../devicetree/bindings/net/stm32-dwmac.yaml       |  6 ++++
+ arch/arm/boot/dts/st/stm32mp135f-dk.dts            |  1 +
+ drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c  |  5 +++
+ drivers/net/phy/smsc.c                             | 42 +++++++++++++++++++---
+ include/linux/smscphy.h                            |  2 ++
+ 5 files changed, 52 insertions(+), 4 deletions(-)
+---
+base-commit: 4701ee5044fb3992f1c910630a9673c2dc600ce5
+change-id: 20250721-wol-smsc-phy-ff3b40848852
+
+Best regards,
 -- 
-// Casey (she/her)
+Gatien Chevallier <gatien.chevallier@foss.st.com>
 
 
