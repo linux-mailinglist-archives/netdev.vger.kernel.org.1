@@ -1,290 +1,133 @@
-Return-Path: <netdev+bounces-208627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79004B0C69F
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 16:41:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 84951B0C706
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 16:56:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 213D21890328
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 14:41:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8A461887C08
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 14:55:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8683D1E7C08;
-	Mon, 21 Jul 2025 14:40:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97ABA2874E5;
+	Mon, 21 Jul 2025 14:55:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="X7472c1K"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="Dg9KglOZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12D9C1DA10B
-	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 14:40:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E718F6C
+	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 14:55:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753108859; cv=none; b=o5oJQ4W8e2hPBaFL9wH2ZaIrIqYVUIyBw097ShqAn5GFgziJcL8BzJ36TF5YpDIvHWSCANyRXBEnggtYA3gjn2ABWnUGYLmQDEUvvwSS7bkjTMULsm9ZChk7yvEbIrq3hIX/ZQkT++H6HOHS2foB6JGjBx6fxBecUNvik6oWLyQ=
+	t=1753109702; cv=none; b=QVDm1ZtIJ6wQ7hcj3ASSchEUgVFa38ULJwLRlkG3nxHb6jz77vm/s17oTOE+HFCII0uAS7At4tRH0MsHENMTdPTZP+7mrEbB4IGmKt2wVHh77c+ZCremxLsrd2DfhaaDeh9YL1nsGp0mnHL1j7RMPUn7dFFWUrP649/Bj/QM620=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753108859; c=relaxed/simple;
-	bh=1RtQBzOEC4Zl0bIPrchjsS6gz98G25dZlBbimhRn9mg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KFLQ2tgrUhEuZV3K3QpOFwfu8Nc+MVd63Kz6tsMyUiLz8QD9aXymNvBH39D3i6uv0R5HEu99xm+J2v65kS/zkV0mWFjZtCsiwLfUzZ3xKzhMXlJNfkkWZDyVAx7eyWQPRwf49m7PZDqxcMf3Mh3BjAjqJqZcoEj+Ts8nRo9/P20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=X7472c1K; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <165897af-fa84-428d-9e93-52be1f2d09e5@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753108854;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bDQ+R+MAd9ERvWMuuaknZR5JiVowZsZ4r7mCULkiSX0=;
-	b=X7472c1K55Kef8FN/3V41ZpFASwDxZ8NEelc6muTh7Lu1Nm6YpbFJHDyDkDCVqN3IMYd/c
-	zbqnCPhoaO5c5TGY1nmUO0Yw4W+zcrB4y1cgVz1aAAwv7As8hSkEm0MZVEb4/ZpoC0JUFB
-	asN2qpTveEFrXeu6TtAmRfIdC4yWNBE=
-Date: Mon, 21 Jul 2025 15:40:51 +0100
+	s=arc-20240116; t=1753109702; c=relaxed/simple;
+	bh=B5/SeSeHzxWetKPd+pOdRh7jpeM3SVOOiV/6Res8kr0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OSL7EVY9/b8TguR2/vLHSqlXwLHCHBDFd/XqeuKmQ2eM5LGGTsl9lC57MjHWvB416TN4VBk8wEO23Yo0AdPCr1QKoUzS0gR+6y/oxTF5GANer05NFq9sjeiI6J52BnpUjQGSqMntvmFSZyRqQGIPFkj3Dz2HIEgrTjsR35Rq1X0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=Dg9KglOZ; arc=none smtp.client-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7e334de8df9so497062785a.0
+        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 07:55:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1753109699; x=1753714499; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B5/SeSeHzxWetKPd+pOdRh7jpeM3SVOOiV/6Res8kr0=;
+        b=Dg9KglOZPfUTf1flskOCnl4kMjadjJjQSMLrYkddT/t4xMVgp6hajhss+ZhMUkR5F1
+         yU5JDK/2B2LTq60zMR9SnWRf1wpVWQ1MXttuPrlGvUGDFNdZ7JNHeIwOfAUEM4UCqNjy
+         dXO+aVgMuJlyEnz1eCrR9yrbzdoMgGZ0sDG8OqsHEI4wQEoGFJcOX/pQuIsuCqWH1qL/
+         cmLKwpQ2LTPK4+ADV2A6CZy48iCdqT6p4mFy84XYZWtIEc6iBvd3RaoJz5tkusFGb9Dp
+         Tuy+0MGks2m21xpCx55ZDGGnaApuVHH/2cvU5a9yVajRwqvLp8vxN2RS7OyOgfpb576i
+         Z4TQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753109699; x=1753714499;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=B5/SeSeHzxWetKPd+pOdRh7jpeM3SVOOiV/6Res8kr0=;
+        b=NepmAGGP/YlGuRxYiww19mu1nQOZI6Uzm8Yv4+r9mnDruFXuWG3O0jU7Mq2SgqY6aK
+         jp9k2qfsrraiI1KC5ZJfijYfLQNPMgZH1beKTIGMTOz1SdgEYr+vNMpFeIaWUgf8q9UD
+         HtM5mhM9hBf5uvEg5K92Sa3yxzfNiP14gnKnwfQm4B4JFlUkLp8yeyjBwsyB5m6EWL/4
+         PD5u3bbKAkJvRHJtp55RvfiG2k/JKSrb0HhyNoxvJa+nlcbNxbB70Qryk4b1EOeatWMr
+         6gjpkwBviYS1y3fE8d6wYbkzhph7+60swbCYZVmtye7JVs9+f8EcHs/qoo5MOTnpi7AW
+         ksCg==
+X-Forwarded-Encrypted: i=1; AJvYcCXp8uey2Iv5MTSgnns74D6lFrCmKSyXNCtYDHB/IHeZfRxcruW1XcgvixlhZbu0NuN+QlmRKyY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQWwlNUNoRojkX7lwdYYFbq4j+x0lWP/Bspft2qyeV1rYjIGKh
+	pgi4WWv8auzYL+hCJRb4z5RU29C2ujfeU/3lry8ZNvSLxEXtc9yy9MJV43JOhPwEprFecgJKzwo
+	N0j1e
+X-Gm-Gg: ASbGncu9/DZBn58mVCNS2DAu2gTbX3cpT7hEIysAr1ydVLMaDqu10rZYnVoKarLjKJz
+	go7Y+NP41ZGOlkfYyjWJq8eFw2f5Gh1debOgaZ9wLtg8zSI//ZcdSI4BkGa/O3DQe/O1fR56PDs
+	/LbmDNt/cwd7jKLegK+neO1Du7j1Vx5LR2lKanm0eBAzc3Il3eGT7sy5ddp8OzHMZAk8I4bLBK0
+	zG9CKaAWZ3uuFn9WYtKjGRXnZpECjo6Qrv9FTuqNr6YYTqzWjjgusZGpe1OmAx1ytS91uNg+WLp
+	+2Uc2i3tlJX9mpsjxG4P0QnqILyBMA0UhmvNAZ3ArFKA5vAtwmrFshoRx/M7SJqbzdCyeC/FSAj
+	qQVJZ/PrlxkEFAeNZdkULrQ66QqY9HmuhnNJJL1hwHayz51otip92iKCry3tNHWN1nrYzyk2lAL
+	U=
+X-Google-Smtp-Source: AGHT+IHH9FgDdZLV44C3cyMSMZJIbe8ZPLPzKhjrS/XfNBoMPd2ohwieV09F54hs0VcpFll6BjiQ8A==
+X-Received: by 2002:a05:620a:618c:b0:7e3:3935:ec0c with SMTP id af79cd13be357-7e34356544bmr3015947885a.19.1753109699394;
+        Mon, 21 Jul 2025 07:54:59 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e356c3f872sm421999585a.53.2025.07.21.07.54.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Jul 2025 07:54:59 -0700 (PDT)
+Date: Mon, 21 Jul 2025 07:54:56 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, netdev@vger.kernel.org,
+ will@willsroot.io
+Subject: Re: [Patch v4 net 0/6] netem: Fix skb duplication logic and prevent
+ infinite loops
+Message-ID: <20250721075456.6cf6bf7c@hermes.local>
+In-Reply-To: <CAM0EoMmTZon=nFmLsDPKhDEzHruw701iV9=mq92At9oKo0LGpA@mail.gmail.com>
+References: <20250719220341.1615951-1-xiyou.wangcong@gmail.com>
+	<CAM0EoMmTZon=nFmLsDPKhDEzHruw701iV9=mq92At9oKo0LGpA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 03/15] net: rnpgbe: Add basic mbx ops support
-To: Dong Yibo <dong100@mucse.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, corbet@lwn.net, gur.stavi@huawei.com,
- maddy@linux.ibm.com, mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
- gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
- Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
- alexanderduyck@fb.com, richardcochran@gmail.com
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250721113238.18615-1-dong100@mucse.com>
- <20250721113238.18615-4-dong100@mucse.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250721113238.18615-4-dong100@mucse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On 21/07/2025 12:32, Dong Yibo wrote:
-> Initialize basic mbx function.
-> 
-> Signed-off-by: Dong Yibo <dong100@mucse.com>
-> ---
->   drivers/net/ethernet/mucse/rnpgbe/Makefile    |   5 +-
->   drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |  46 ++
->   .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   |   5 +-
->   drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |   2 +
->   .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   |   1 +
->   .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c    | 623 ++++++++++++++++++
->   .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h    |  48 ++
->   7 files changed, 727 insertions(+), 3 deletions(-)
->   create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
->   create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h
-> 
-> diff --git a/drivers/net/ethernet/mucse/rnpgbe/Makefile b/drivers/net/ethernet/mucse/rnpgbe/Makefile
-> index 42c359f459d9..41177103b50c 100644
-> --- a/drivers/net/ethernet/mucse/rnpgbe/Makefile
-> +++ b/drivers/net/ethernet/mucse/rnpgbe/Makefile
-> @@ -5,5 +5,6 @@
->   #
->   
->   obj-$(CONFIG_MGBE) += rnpgbe.o
-> -rnpgbe-objs := rnpgbe_main.o\
-> -	       rnpgbe_chip.o
-> +rnpgbe-objs := rnpgbe_main.o \
-> +	       rnpgbe_chip.o \
-> +	       rnpgbe_mbx.o
-> diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-> index 2ae836fc8951..46e2bb2fe71e 100644
-> --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-> +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-> @@ -63,9 +63,51 @@ struct mucse_mac_info {
->   	int clk_csr;
->   };
->   
-> +struct mucse_hw;
-> +
-> +enum MBX_ID {
-> +	MBX_VF0 = 0,
-> +	MBX_VF1,
-> +	MBX_VF2,
-> +	MBX_VF3,
-> +	MBX_VF4,
-> +	MBX_VF5,
-> +	MBX_VF6,
-> +	MBX_VF7,
-> +	MBX_CM3CPU,
-> +	MBX_FW = MBX_CM3CPU,
-> +	MBX_VFCNT
-> +};
-> +
-> +struct mucse_mbx_operations {
-> +	void (*init_params)(struct mucse_hw *hw);
-> +	int (*read)(struct mucse_hw *hw, u32 *msg,
-> +		    u16 size, enum MBX_ID id);
-> +	int (*write)(struct mucse_hw *hw, u32 *msg,
-> +		     u16 size, enum MBX_ID id);
-> +	int (*read_posted)(struct mucse_hw *hw, u32 *msg,
-> +			   u16 size, enum MBX_ID id);
-> +	int (*write_posted)(struct mucse_hw *hw, u32 *msg,
-> +			    u16 size, enum MBX_ID id);
-> +	int (*check_for_msg)(struct mucse_hw *hw, enum MBX_ID id);
-> +	int (*check_for_ack)(struct mucse_hw *hw, enum MBX_ID id);
-> +	void (*configure)(struct mucse_hw *hw, int num_vec,
-> +			  bool enable);
-> +};
-> +
-> +struct mucse_mbx_stats {
-> +	u32 msgs_tx;
-> +	u32 msgs_rx;
-> +	u32 acks;
-> +	u32 reqs;
-> +	u32 rsts;
-> +};
-> +
->   #define MAX_VF_NUM (8)
->   
->   struct mucse_mbx_info {
-> +	struct mucse_mbx_operations ops;
-> +	struct mucse_mbx_stats stats;
->   	u32 timeout;
->   	u32 usec_delay;
->   	u32 v2p_mailbox;
-> @@ -99,6 +141,8 @@ struct mucse_mbx_info {
->   	int share_size;
->   };
->   
-> +#include "rnpgbe_mbx.h"
-> +
->   struct mucse_hw {
->   	void *back;
->   	u8 pfvfnum;
-> @@ -110,6 +154,8 @@ struct mucse_hw {
->   	u16 vendor_id;
->   	u16 subsystem_device_id;
->   	u16 subsystem_vendor_id;
-> +	int max_vfs;
-> +	int max_vfs_noari;
->   	enum rnpgbe_hw_type hw_type;
->   	struct mucse_dma_info dma;
->   	struct mucse_eth_info eth;
-> diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-> index 38c094965db9..b0e5fda632f3 100644
-> --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-> +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-> @@ -6,6 +6,7 @@
->   
->   #include "rnpgbe.h"
->   #include "rnpgbe_hw.h"
-> +#include "rnpgbe_mbx.h"
->   
->   /**
->    * rnpgbe_get_invariants_n500 - setup for hw info
-> @@ -67,7 +68,7 @@ static void rnpgbe_get_invariants_n500(struct mucse_hw *hw)
->   	mbx->fw_pf_mbox_mask = 0x2e200;
->   	mbx->fw_vf_share_ram = 0x2b000;
->   	mbx->share_size = 512;
-> -
-> +	memcpy(&hw->mbx.ops, &mucse_mbx_ops_generic, sizeof(hw->mbx.ops));
+On Mon, 21 Jul 2025 10:00:30 -0400
+Jamal Hadi Salim <jhs@mojatatu.com> wrote:
 
-that's bad pattern. it's better to have a constant set of callbacks per
-device type and assign const pointer to it. It will make further debugs
-much easier.
+> On Sat, Jul 19, 2025 at 6:04=E2=80=AFPM Cong Wang <xiyou.wangcong@gmail.c=
+om> wrote:
+> >
+> > This patchset fixes the infinite loops due to duplication in netem, the
+> > real root cause of this problem is enqueuing to the root qdisc, which is
+> > now changed to enqueuing to the same qdisc. This is more reasonable,
+> > more predictable from users' perspective, less error-proone and more el=
+egant.
+> >
+> > Please see more details in patch 1/6 which contains two pages of detail=
+ed
+> > explanation including why it is safe and better.
+> >
+> > This replaces the patches from William, with much less code and without
+> > any workaround. More importantly, this does not break any use case.
+> > =20
+>=20
+> Cong, you are changing user expected behavior.
+> So instead of sending to the root qdisc, you are looping on the same
+> qdisc. I dont recall what the history is for the decision to go back
+> to the root qdisc - but one reason that sounds sensible is we want to
+> iterate through the tree hierarchy again. Stephen may remember.
+> The fact that the qfq issue is hit indicates the change has
+> consequences - and given the check a few lines above, more than likely
+> you are affecting the qlen by what you did.
+>=20
+> cheers,
+> jamal
 
->   	/* setup net feature here */
->   	hw->feature_flags |= M_NET_FEATURE_SG |
->   			     M_NET_FEATURE_TX_CHECKSUM |
-> @@ -83,6 +84,7 @@ static void rnpgbe_get_invariants_n500(struct mucse_hw *hw)
->   			     M_NET_FEATURE_STAG_OFFLOAD;
->   	/* start the default ahz, update later */
->   	hw->usecstocount = 125;
-> +	hw->max_vfs = 7;
->   }
->   
->   /**
-> @@ -117,6 +119,7 @@ static void rnpgbe_get_invariants_n210(struct mucse_hw *hw)
->   	/* update hw feature */
->   	hw->feature_flags |= M_HW_FEATURE_EEE;
->   	hw->usecstocount = 62;
-> +	hw->max_vfs_noari = 7;
->   }
->   
->   const struct rnpgbe_info rnpgbe_n500_info = {
-> diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
-> index 2c7372a5e88d..ff7bd9b21550 100644
-> --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
-> +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
-> @@ -14,6 +14,8 @@
->   #define RNPGBE_RING_BASE (0x1000)
->   #define RNPGBE_MAC_BASE (0x20000)
->   #define RNPGBE_ETH_BASE (0x10000)
-> +
-> +#define RNPGBE_DMA_DUMY (0x000c)
->   /* chip resourse */
->   #define RNPGBE_MAX_QUEUES (8)
->   /* multicast control table */
-> diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
-> index 08f773199e9b..1e8360cae560 100644
-> --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
-> +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
-> @@ -114,6 +114,7 @@ static int rnpgbe_add_adapter(struct pci_dev *pdev,
->   	hw->hw_addr = hw_addr;
->   	hw->dma.dma_version = dma_version;
->   	ii->get_invariants(hw);
-> +	hw->mbx.ops.init_params(hw);
->   
->   	return 0;
->   
-> diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
-> new file mode 100644
-> index 000000000000..56ace3057fea
-> --- /dev/null
-> +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
-> @@ -0,0 +1,623 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright(c) 2022 - 2025 Mucse Corporation. */
-> +
-> +#include <linux/pci.h>
-> +#include <linux/errno.h>
-> +#include <linux/delay.h>
-> +#include <linux/iopoll.h>
-> +#include "rnpgbe.h"
-> +#include "rnpgbe_mbx.h"
-> +#include "rnpgbe_hw.h"
-> +
-> +/**
-> + * mucse_read_mbx - Reads a message from the mailbox
-> + * @hw: Pointer to the HW structure
-> + * @msg: The message buffer
-> + * @size: Length of buffer
-> + * @mbx_id: Id of vf/fw to read
-> + *
-> + * @return: 0 on success, negative on failure
-> + **/
-> +int mucse_read_mbx(struct mucse_hw *hw, u32 *msg, u16 size,
-> +		   enum MBX_ID mbx_id)
-> +{
-> +	struct mucse_mbx_info *mbx = &hw->mbx;
-> +
-> +	/* limit read to size of mailbox */
-> +	if (size > mbx->size)
-> +		size = mbx->size;
-> +
-> +	if (!mbx->ops.read)
-> +		return -EIO;
-
-is it even possible? you control the set of callbacks, and these
-operations must be setup to have HW working. avoid defensive programming
-here and in other places you use callbacks.
-
-> +
-> +	return mbx->ops.read(hw, msg, size, mbx_id);
-> +}
-> +
-
-[...]
+I don't remember why the original version re-queued to the root.
+But probably related to trying to keep proper semantics and accounting
+especially when doing rate limits.
 
