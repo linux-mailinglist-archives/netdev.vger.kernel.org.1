@@ -1,81 +1,65 @@
-Return-Path: <netdev+bounces-208619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 514D7B0C5D9
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 16:09:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17FDBB0C629
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 16:23:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21F5D16F266
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 14:09:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 208473B76AD
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 14:22:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A1EF2DA77F;
-	Mon, 21 Jul 2025 14:09:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 012FD2DA76E;
+	Mon, 21 Jul 2025 14:22:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="z5K6lEMl"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="5iIxQfL4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A616E2DAFA1
-	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 14:09:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB2582D6617;
+	Mon, 21 Jul 2025 14:22:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753106967; cv=none; b=QR7uSiKGzXsuM/m1Qk7Cl3zPE1L1rUa1raaMRtenHd8isI06hW9Uv1STWTTW67rkkCsGKJtQMRwmhNknU3Pr3MJ32EloZvvYC6UFRTYWwiaZ/DCItcdKdAFyVhasknftQE5Lzy8iYbvJfLrQGMHyJdfhuzxvhWjcgO/+1CW42u4=
+	t=1753107768; cv=none; b=sooTnhuoVDyNms92lBfQsxSkE5rGB4ubYGTqpCn+Hva7t80eeo+JRtJPfzj+BBkhJ9acg8hYelGgs10mvQD7bzFzUKPjQdKFAX0kL9J6KHpX+py5cYIGbFA7Xesl8jRW7wr+691atpNFJGhSTm7/bBfnSkBwvoz1gaBY8Pg4OUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753106967; c=relaxed/simple;
-	bh=++Ox7gKvHdwky39WdQJFmk0HB160GJNorAa3/n8tZP0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bHuEKip5q7gwpVJ73Cw/o8NfGU/4dG83NvGi8wWkPhvlKOtQpw0a4cD4DpF7yAkl3U+lGqQ1xliS3c3M8UAUk9XwFQXg4QPReoyyL7mlcaydw4LqJq/M8Fr1BJnJWlpgL3igLzydrPCBe754BRwhuPr8fF0B1J2NUg8LAxIhjR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=z5K6lEMl; arc=none smtp.client-ip=209.85.210.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-73e82d2ec52so429585a34.1
-        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 07:09:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1753106964; x=1753711764; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+LnLWJUsAr+JAkpxUkcXadAzf96B3tnYqEVcIVAbTvg=;
-        b=z5K6lEMl8JmkEUT/7Ok1G0iQxZb6TAGi9hc3Gt48hT/ZgTT3YKcTBUai8YkopcbpvF
-         mxwi6k1EJkqez7O7uD4BgGZ7bNeUo3YQOtlDZryCx1vrQgytASP0vndrc4qV+EzSgYVa
-         q85iw736SXmkEWipZjlY8XWTfXrmuGuCOpxPP+WXzKV/gm2Z1ebR6O8cr4VwacvuBUHR
-         HozkpzdGWoDNtbon+i2/X23UkBHg4DyGoWViVKDFhDjmsK82gsrHWVa+WCK9xAG7J+my
-         xwz+Kn1/h20pFzhx08zQ77QjYGLqFopn4maqP15AGb+y+zHxZmskqM/RbJdyWSlx9YZv
-         51TQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753106964; x=1753711764;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+LnLWJUsAr+JAkpxUkcXadAzf96B3tnYqEVcIVAbTvg=;
-        b=InfksNzzMYwiWUr6LQc8WLFBC1Q3Ws0ENEJEIcHIaCUHg3pvvd6TJ30zm2K/pYcosd
-         LjUALvylbCjk3OLJkApFyzVhsc2PTQaUCeL5a6CcX0K/OnyCY+H7agHgZem5IACm/FPe
-         TR8vEvroZqLa7Z7OrhnngeVnzWrHWMRGAR+/Obu5d6MMpqqnZtF6hc2kh693bz8tFHBw
-         3/FRAoX9kjgSOa0oYo3jlbRxglZA6jcBhXQNK3m4/gllACSojgIpZ/i5lqDrwh2CfWpk
-         +9UGxaxqITzhdlFgh0FIFZEm0FETIf8nosJc5eBJmsKeTKkBIvRubhc1khEqaGOFlU+Y
-         xAqA==
-X-Forwarded-Encrypted: i=1; AJvYcCWW0pmDPNLOa89fzkzFyVVBzbimVY+V8UW8NfcUsGeBc6eIbI+FvSoCefcovF6J9gIz22JOCXw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzsNs4OyYYDyqmByiTJ9Kvb5fduRmsJ23xyCivNZ+j8Xnbgkd/
-	MOq3DPl4MFaoFyrOGVzEKYEbyqfkLfUQDMfPYAqfM9cNrmKcj043dRZDL2o7vHlPfTA=
-X-Gm-Gg: ASbGncvgHE/QAX8BKyYvkG7EmDI4adNPshCfL5dIf92mkV+obnTT/86cifjOTLKgFrZ
-	EQi4EGvYLDc14GzGELrBxR9hl4vtVtyH8P7VasEeEkRRdGRQkfafoeo8oEkZ4cAxYvWQbwhyG4w
-	v7Ad6obPonkdsinv4tQW966KgyN0ty1WVCB21noedVyTc6SrI/13UUjW3oCcFzSmPCSLzhpAh+x
-	NBauC1Hq1ZWgWEC4lC/36MhYe+hK6GFXNbF7wBMmvx3YR7Y68zaQwkZjog+jLp8O8F8TyoQV8/n
-	b2A4JDJ1E8rokmH1LyN2L0MU8oBDQ+lY4Yv0kWC8jZ+oaRe/S5tAcSkEe/F/FmPqaF1f53TAHCI
-	2xEo9h4QnpE/2A7iwGzBZQhoGVZzEs7dAyuxUTPdSTXRClnBG092WMRenPqbpsPaQDGP764OESI
-	A=
-X-Google-Smtp-Source: AGHT+IEYJ69qw8hWrbyhfCDdoYCGwahdtxo+pfFxwMph5mSmiJShT9DMVnokAtIY6hWFVoiT1iMVrw==
-X-Received: by 2002:a05:6830:3e8b:b0:735:af51:5ea5 with SMTP id 46e09a7af769-73e665b9181mr11113510a34.22.1753106963677;
-        Mon, 21 Jul 2025 07:09:23 -0700 (PDT)
-Received: from ?IPV6:2600:8803:e7e4:1d00:3bea:f296:60f2:c6cb? ([2600:8803:e7e4:1d00:3bea:f296:60f2:c6cb])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-73e83bf667fsm2820418a34.65.2025.07.21.07.09.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Jul 2025 07:09:23 -0700 (PDT)
-Message-ID: <35eba285-2c49-49ac-9da2-29636e257196@baylibre.com>
-Date: Mon, 21 Jul 2025 09:09:22 -0500
+	s=arc-20240116; t=1753107768; c=relaxed/simple;
+	bh=4mTsBe71F88u3XVMXKY9/rSzIS8TxslEt+Beazy+yD4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=o3yIw1GEV1c83HkaZO7pn45jX11wRRUUm0FyLN9xLGk8kh6lcmNYA1bSe/0yBhsSuwDt2CJCqj7VlQOMG7UV1QK7J84xrvc2LlzwhhNtOxoPJ51bxFJpI1R5XaJzHAqrmjDYhgcX7jQzFDCouEdBhXhexiAjAz4up/nTygZTyPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=5iIxQfL4; arc=none smtp.client-ip=185.132.182.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56LCPm57020352;
+	Mon, 21 Jul 2025 16:22:16 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=selector1; bh=
+	MlPUcJGCX9eGUJmog410SGdHvgab8UL6u6jJvem96Jg=; b=5iIxQfL4YWN2yOno
+	Nav6nT0ot5lu7hhSPyXgIerU2aur1+pWl2zGqeVjwo5/MoRbNadUTCrznjLT6TA2
+	TaNHCcQbUg79u4zgfZ1O9g9Vzdl9kvccvLpIX9bvOJJaLruoh8epwg9EXkyX5bZI
+	HBffxDudJzyO/nBTZnXGGRTuIBlzLysZ8qs1DiKVOZiSbSdG/gSZSIL+QQcDwfNM
+	8lHkW+sNsPxrhPb3JUzOj/Fg5nvwoylJ3DKlGL8PWv6cyARyZE2P2qxSoGTxpeJ8
+	ClX+EVBlHiLtWapJDla7SIQTQ2zQW1eT6/lUrBSu7KW2M741cnudg2Mve0D671uW
+	QvzB2A==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 4802q21em4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Jul 2025 16:22:16 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 2B30240054;
+	Mon, 21 Jul 2025 16:20:32 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 2988376EA8E;
+	Mon, 21 Jul 2025 16:19:09 +0200 (CEST)
+Received: from [10.48.87.141] (10.48.87.141) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 21 Jul
+ 2025 16:19:08 +0200
+Message-ID: <b95e3439-717b-4159-acf9-7ce76d1c43d4@foss.st.com>
+Date: Mon, 21 Jul 2025 16:19:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,59 +67,92 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re:
-To: Sanjay Suthar <sanjaysuthar661996@gmail.com>,
- Krzysztof Kozlowski <krzk@kernel.org>
-Cc: linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
- linux-iio@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-amlogic@lists.infradead.org,
- ribalda@kernel.org, jic23@kernel.org, nuno.sa@analog.com, andy@kernel.org,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, neil.armstrong@linaro.org,
- khilman@baylibre.com, jbrunet@baylibre.com,
- martin.blumenstingl@googlemail.com
-References: <CADU64hCr7mshqfBRE2Wp8zf4BHBdJoLLH=VJt2MrHeR+zHOV4w@mail.gmail.com>
- <20250720182627.39384-1-sanjaysuthar661996@gmail.com>
- <84ad0f66-311e-4560-870d-851852c6f902@baylibre.com>
- <9574826f-3023-4fe1-9346-eacd70990d73@kernel.org>
- <CADU64hDZeyaCpHXBmSG1rtHjpxmjejT7asK9oGBUMF55eYeh4w@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/4] net: phy: smsc: fix and improve WoL support
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre
+ Torgue <alexandre.torgue@foss.st.com>,
+        Christophe Roullier
+	<christophe.roullier@foss.st.com>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>, Simon Horman <horms@kernel.org>,
+        Tristram Ha <Tristram.Ha@microchip.com>,
+        Florian Fainelli
+	<florian.fainelli@broadcom.com>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+References: <20250721-wol-smsc-phy-v1-0-89d262812dba@foss.st.com>
+ <20250721-wol-smsc-phy-v1-3-89d262812dba@foss.st.com>
+ <cca8e9e6-a063-4e00-87af-f59ea926cce3@lunn.ch>
 Content-Language: en-US
-From: David Lechner <dlechner@baylibre.com>
-In-Reply-To: <CADU64hDZeyaCpHXBmSG1rtHjpxmjejT7asK9oGBUMF55eYeh4w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+In-Reply-To: <cca8e9e6-a063-4e00-87af-f59ea926cce3@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-21_04,2025-07-21_01,2025-03-28_01
 
-On 7/21/25 5:15 AM, Sanjay Suthar wrote:
-> On Mon, Jul 21, 2025 at 12:22 PM Krzysztof Kozlowski <krzk@kernel.org <mailto:krzk@kernel.org>> wrote:
->>
->> On 20/07/2025 21:30, David Lechner wrote:
->> >>    - Ricardo Ribalda Delgado <ricardo@ribalda.com <mailto:ricardo@ribalda.com>>
->> >> diff --git a/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml b/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml
->> >> index 0cd78d71768c..5c91716d1f21 100644
->> >> --- a/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml
->> >> +++ b/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml
->> >> @@ -149,7 +149,7 @@ properties:
->> >>        - description:
->> >>            The first register range should be the one of the DWMAC controller
->> >>        - description:
->> >> -          The second range is is for the Amlogic specific configuration
->> >> +          The second range is for the Amlogic specific configuration
->> >>            (for example the PRG_ETHERNET register range on Meson8b and newer)
->> >>
->> >>    interrupts:
->> >
->> > I would be tempted to split this into two patches. It's a bit odd to have
->>
->>
->> No, it's a churn to split this into more than one patch.
->>
-> 
-> Thanks for the reply. Since there are suggestions on patch split as it is touching different subsystems, still not clear if I should split the patch or single patch is fine. I would appreciate if you can guide on the next steps to be taken
-> 
-> Best Regards,
-> Sanjay Suthar
+Hello Andrew,
 
-Krzysztof is one of the devicetree maintainers and I am not, so you
-should do what Krzysztof says - leave it as one patch. :-)
+On 7/21/25 15:26, Andrew Lunn wrote:
+>> +static int smsc_phy_suspend(struct phy_device *phydev)
+>> +{
+>> +	if (!phydev->wol_enabled)
+>> +		return genphy_suspend(phydev);
+>> +
+>> +	return 0;
+>> +}
+> 
+> Suspend/resume is somewhat complex, and i don't know all the
+> details. But this looks odd. Why does the phylib core call suspend
+> when phydev->wol_enabled is true? That at least needs an explanation
+> in the commit message.
+> 
+
+As stated by Russel, this callback is not needed because phy_suspend()
+will not call this suspend() callback if phydev->wol_enabled is set.
+Therefore, I'm removing it vor V2.
+
+>> +static int smsc_phy_resume(struct phy_device *phydev)
+>> +{
+>> +	int rc;
+>> +
+>> +	if (!phydev->wol_enabled)
+>> +		return genphy_resume(phydev);
+>> +
+>> +	rc = phy_read_mmd(phydev, MDIO_MMD_PCS, MII_LAN874X_PHY_MMD_WOL_WUCSR);
+>> +	if (rc < 0)
+>> +		return rc;
+>> +
+>> +	if (!(rc & MII_LAN874X_PHY_WOL_STATUS_MASK))
+>> +		return 0;
+>> +
+>> +	dev_info(&phydev->mdio.dev, "Woke up from LAN event.\n");
+> 
+> Please don't spam the log. It is clear the system woke up, there are
+> messages in the log...
+
+I wanted to state clearly that the wake up happended because of a WoL
+event but sure, I understand that it's best if log isn't spammed. Do you
+prefer it completely removed or dev_info()->dev_dbg() ?
+
+Best regards,
+Gatien
+
+> 
+> 	Andrew
 
