@@ -1,80 +1,48 @@
-Return-Path: <netdev+bounces-208488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A668B0BCC9
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 08:39:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA07EB0BCFF
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 08:52:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C608F7A4090
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 06:36:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99C1318940ED
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 06:53:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E267D21D3C0;
-	Mon, 21 Jul 2025 06:37:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6616627F4CB;
+	Mon, 21 Jul 2025 06:52:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c9NUT0Hp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t9G7JeCG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D4227E05F;
-	Mon, 21 Jul 2025 06:37:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC0219DF62;
+	Mon, 21 Jul 2025 06:52:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753079836; cv=none; b=qbdlePAklYsS5PErlcTYUO2e+lIj3TjjdtryRr2w38C09Wb084LArq6C2joBgl8erivFnV2BL6f4K13SB6pPUf2PHUW9izbVA0PScsb+jyIG4cCi05tePXpFfn6EOoqx16Rq//6SqsDNW1nk1V3kmEEO0crT39BrfyC1woHaH44=
+	t=1753080762; cv=none; b=QZW5EeBnw1l9bLsWFQhgk7ZhtSf4ooJSODtfK6f5/yPWQK5pT3mtY126U5B0gspAdU5iqjj1nhB3jyAPcwQQsY1BWykR22VFM/pSk25dBxTr+4Y7dz/M3Ue+hyLVGrmUit+5sLsTgPko+LI/DtpDyausF0iMJbHrSHqfFl2bqcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753079836; c=relaxed/simple;
-	bh=6JHqbgSymbDH3c6jE1m6mbPu/7G8iSkWEUY3vi510Xo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=UB/RBAYc87b91C+7Q34G+nDywpGFiXn98D6WPI/U9IF4kpNRdkkla05490+T9jGpKMK8+AiF51WENI80M/qYNoxp5BOPaHgSX97wAuaIdfypIEsOZrrBPYVs4aojmHiw9qDK5pZx1ocMrTdDLnhON0msMl2D6Uap69fVOgmKA30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c9NUT0Hp; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-45619d70c72so37316465e9.0;
-        Sun, 20 Jul 2025 23:37:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753079832; x=1753684632; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=sXTNOF4KFV28cQXMK1Lk7BerkO9mexqmD/nfJUgjfjU=;
-        b=c9NUT0HpCcVCw18uYmdZqcVADLkXjlssdhQu+aFcs5nCJLSPGv7GXNXsZKOwWAte3O
-         86bG/X8QRdlceHG7UlMIjGQ5Wm5LTD3o22VdT8OtkLsmDkru4Qh5Ir8JWb2vFw8BWqg2
-         QHK63J2n+GtC9Kn/11N8AV5D+4YGdXH/E1kryTI0TgeEcK2GA98ewT7tQ1ymiJyQ8WiD
-         nU7NevWCgE8vp9twdU0SQMHPw9yzc5sVex4+Y/Trol1+TulxLRA/q7EMM6aeqCvzX6T+
-         vF1sMd4KyMyYLd2LZJszOlagKZH08qWYGlHHBJN6Md4QwBqW39dl/w1x47LRJjtttLxc
-         p57A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753079832; x=1753684632;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sXTNOF4KFV28cQXMK1Lk7BerkO9mexqmD/nfJUgjfjU=;
-        b=MSjQsVcdFBaR+3/zvE1RshRn/rLF/gbY0Xkfs1t1wpFcfsK/+m6DknTyx2XAXkvFjD
-         8vPyaTFM72RPsHcVhDJDyTXhjnUeMiY7Yasxg1SKYBATWgtDWfzFHWwMBRQOX8YnUF/d
-         CqnfGS7k0ulLMD12RMpAzx7m4MZ7kkNep/xrqKAhn6822+wQTw5dJMqeC8Rdr3RWeESB
-         jQV/xtO2phmIkNu6Zd9scejOYEG5DJXpFXE1cXeHF5YTAyWSTSuW7aqIAd/v4rNrAViy
-         Nu1w7uGxRe5qgh2V1LX/M/PpEUkB19Q4E6g6Ch2XF5HQJtpFPuMunkBZ/nQvc9fkz7Z7
-         Dmew==
-X-Forwarded-Encrypted: i=1; AJvYcCUaoKNyBGvYyBfiqJGAd0SF5CuPfD1msyEi/bSCsigvofbzOhBXMb7vZz/VXZlMx6GwUZT9UJsx@vger.kernel.org, AJvYcCXIxynnf1DJmx21BluVgj2W9cbieWy2UHkGUAJ9pA/Y+xc9ShlRcLSJ+cEoOiNNPwVRxpRyqHd0wn6p@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGj626p6HSsfPyoTDFCigkYvTMT2R85djieIF3DRZq3DX3jSU4
-	VoAomZLVQKWpdPhm5be3kDFeocGr/TG+iNe6fv/iYw6FmcSzMcrN2c9y
-X-Gm-Gg: ASbGncuDH6bBkzTEq2FbWDuP5J59SWAvoMnMMJVNN97M0epgPVffwSkdF54rsD7QsbY
-	ly3AWl1QXHy8idrAc/n3FKrHMQPCHUjHskpnQspSiMDMVVoM5H5SVruOI09BKQ3VlrQRBh2l5Wb
-	wTM6/7K+EqHgCLrIRUD8RMgLOTt6cpPx4SkiPIo0fcBGcWoMHGyrYh3ZtsmEo0a+/KJx19F+UXH
-	FHFopekDILD57Ymuoket2mz/WNW/3m9NjDxbGNZoDMemYeDiYU4DFUUDIzqnkca8xkFmB6+iP0J
-	ztZSvy93VeHIbnuBa3/UDoopqMJqxNQFZQH+yFL19+igHrkA0OSI1B9bKppQyhhT/6Q/Vo73x+4
-	lBrCAL9z0W1GOAlDkFapQQhnELEwn8dNQ/XP1mGvn2oM=
-X-Google-Smtp-Source: AGHT+IFmOdeTCHtfdxB8X2g9F2gbLY8T0s52TuQSTwrB17PwpyjaQjAq0Llqep9eVUrKW8Yw9vHa5Q==
-X-Received: by 2002:a05:600c:8216:b0:456:ed3:a488 with SMTP id 5b1f17b1804b1-45637a7679bmr143787205e9.1.1753079831242;
-        Sun, 20 Jul 2025 23:37:11 -0700 (PDT)
-Received: from [10.80.3.86] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca25437sm9190734f8f.10.2025.07.20.23.37.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 20 Jul 2025 23:37:10 -0700 (PDT)
-Message-ID: <8aa75912-d1e3-4865-a723-ae1517e9322c@gmail.com>
-Date: Mon, 21 Jul 2025 09:37:09 +0300
+	s=arc-20240116; t=1753080762; c=relaxed/simple;
+	bh=Fj2B+JNw6UkLmg+kDNy6fM5RkSwPiSm8KCZnRQSQWss=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XT4YwvO63PCzHXhNnsqHljsc8HrrjkXMeJERAI3wIfAO4bBgtMLHf/FnX5Jy5P1ZQooGaHgVkjBiXbV5xsC9nk3Ii2+d8rUyGo0rqdD5dwChbbDRcqt8APO4kHJHNbPogpAtYz/kctfdh6aXee2plpg5eQrl4RYmDdj4ICnN6KY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t9G7JeCG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8065DC4CEED;
+	Mon, 21 Jul 2025 06:52:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753080761;
+	bh=Fj2B+JNw6UkLmg+kDNy6fM5RkSwPiSm8KCZnRQSQWss=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=t9G7JeCGjETBbBP5rsHRIZo0lCY01I/emLq5/di0udM/ulJsYhAuzB09xkp1atpLt
+	 tZlTpNevJ7rDxKm6EbgqR8Xg66c5aeaQmfKJUuNCY3Hcm0qbLiajaMOGoyUAdv2111
+	 JboHLReaD4JA09x/9Mtfo8/O1W/ZOsduvoOr+4OtTXUUjE7L4YkPjkXqweRaL8hWZK
+	 OivoX+yF0GZTTgxWIJmnpJAe35LDYaFroyXB1e/UvgsCoKnw94F5lxrt06fXHcJaw3
+	 7kiLPSfvKbkWzqpGR1324EyDQ85mBwLyEG7LzbvZtVIhvkZoFPkMNimWFfheBuWbPi
+	 kf6GWNzVquXzg==
+Message-ID: <9574826f-3023-4fe1-9346-eacd70990d73@kernel.org>
+Date: Mon, 21 Jul 2025 08:52:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,262 +50,96 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv3 next-next 1/1] net/mlx5: Fix build -Wframe-larger-than
- warnings
-To: Zhu Yanjun <yanjun.zhu@linux.dev>, saeedm@nvidia.com, leon@kernel.org,
- tariqt@nvidia.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org
-References: <20250720160849.508014-1-yanjun.zhu@linux.dev>
- <48c13c2c-56f2-42f7-9a03-d5bdfd8e8dfb@linux.dev>
+Subject: Re:
+To: David Lechner <dlechner@baylibre.com>, ">"
+ <sanjaysuthar661996@gmail.com>, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-iio@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-amlogic@lists.infradead.org
+Cc: ribalda@kernel.org, jic23@kernel.org, nuno.sa@analog.com,
+ andy@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, neil.armstrong@linaro.org,
+ khilman@baylibre.com, jbrunet@baylibre.com,
+ martin.blumenstingl@googlemail.com
+References: <CADU64hCr7mshqfBRE2Wp8zf4BHBdJoLLH=VJt2MrHeR+zHOV4w@mail.gmail.com>
+ <20250720182627.39384-1-sanjaysuthar661996@gmail.com>
+ <84ad0f66-311e-4560-870d-851852c6f902@baylibre.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <48c13c2c-56f2-42f7-9a03-d5bdfd8e8dfb@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <84ad0f66-311e-4560-870d-851852c6f902@baylibre.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-
-
-On 21/07/2025 1:41, Zhu Yanjun wrote:
-> 在 2025/7/20 9:08, Zhu Yanjun 写道:
->> When building, the following warnings will appear.
->> "
->> pci_irq.c: In function ‘mlx5_ctrl_irq_request’:
->> pci_irq.c:494:1: warning: the frame size of 1040 bytes is larger than 
->> 1024 bytes [-Wframe-larger-than=]
->>
->> pci_irq.c: In function ‘mlx5_irq_request_vector’:
->> pci_irq.c:561:1: warning: the frame size of 1040 bytes is larger than 
->> 1024 bytes [-Wframe-larger-than=]
->>
->> eq.c: In function ‘comp_irq_request_sf’:
->> eq.c:897:1: warning: the frame size of 1080 bytes is larger than 1024 
->> bytes [-Wframe-larger-than=]
->>
->> irq_affinity.c: In function ‘irq_pool_request_irq’:
->> irq_affinity.c:74:1: warning: the frame size of 1048 bytes is larger 
->> than 1024 bytes [-Wframe-larger-than=]
->> "
->>
->> These warnings indicate that the stack frame size exceeds 1024 bytes in
->> these functions.
->>
->> To resolve this, instead of allocating large memory buffers on the stack,
->> it is better to use kvzalloc to allocate memory dynamically on the heap.
->> This approach reduces stack usage and eliminates these frame size 
->> warnings.
->>
->> Signed-off-by: Zhu Yanjun <yanjun.zhu@linux.dev>
+On 20/07/2025 21:30, David Lechner wrote:
+>>    - Ricardo Ribalda Delgado <ricardo@ribalda.com>
+>> diff --git a/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml b/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml
+>> index 0cd78d71768c..5c91716d1f21 100644
+>> --- a/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml
+>> +++ b/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml
+>> @@ -149,7 +149,7 @@ properties:
+>>        - description:
+>>            The first register range should be the one of the DWMAC controller
+>>        - description:
+>> -          The second range is is for the Amlogic specific configuration
+>> +          The second range is for the Amlogic specific configuration
+>>            (for example the PRG_ETHERNET register range on Meson8b and newer)
+>>  
+>>    interrupts:
 > 
-> Sorry. Missing the following Acked-by.
-> 
-> Acked-by: Junxian Huang <huangjunxian6@hisilicon.com>
-> 
-> Zhu Yanjun
-> 
->> ---
->> v2 -> v3: No changes, just send out target net-next;
+> I would be tempted to split this into two patches. It's a bit odd to have
 
-You wrote next-next by mistake.
 
->> v1 -> v2: Add kvfree to error handler;
->>
->> 1. This commit only build tests;
->> 2. All the changes are on configuration path, will not make difference
->> on the performance;
->> 3. This commit is just to fix build warnings, not error or bug fixes. So
->> not Fixes tag.
->> ---
->>   drivers/net/ethernet/mellanox/mlx5/core/eq.c  | 24 +++++++----
->>   .../mellanox/mlx5/core/irq_affinity.c         | 19 +++++++--
->>   .../net/ethernet/mellanox/mlx5/core/pci_irq.c | 40 +++++++++++++------
->>   3 files changed, 60 insertions(+), 23 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/ 
->> net/ethernet/mellanox/mlx5/core/eq.c
->> index dfb079e59d85..4938dd7c3a09 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
->> @@ -873,19 +873,29 @@ static int comp_irq_request_sf(struct 
->> mlx5_core_dev *dev, u16 vecidx)
->>   {
->>       struct mlx5_irq_pool *pool = mlx5_irq_table_get_comp_irq_pool(dev);
->>       struct mlx5_eq_table *table = dev->priv.eq_table;
->> -    struct irq_affinity_desc af_desc = {};
->> +    struct irq_affinity_desc *af_desc;
->>       struct mlx5_irq *irq;
+No, it's a churn to split this into more than one patch.
 
-Keep an empty line.
+> a single patch touching two unrelated bindings.
 
->> +    af_desc = kvzalloc(sizeof(*af_desc), GFP_KERNEL);
->> +    if (!af_desc)
->> +        return -ENOMEM;
->> +
 
-Better move the alloc after the early-return block 
-(mlx5_irq_pool_is_sf_pool).
 
->>       /* In case SF irq pool does not exist, fallback to the PF irqs*/
->> -    if (!mlx5_irq_pool_is_sf_pool(pool))
->> +    if (!mlx5_irq_pool_is_sf_pool(pool)) {
->> +        kvfree(af_desc);
->>           return comp_irq_request_pci(dev, vecidx);
->> +    }
->> -    af_desc.is_managed = false;
->> -    cpumask_copy(&af_desc.mask, cpu_online_mask);
->> -    cpumask_andnot(&af_desc.mask, &af_desc.mask, &table->used_cpus);
->> -    irq = mlx5_irq_affinity_request(dev, pool, &af_desc);
->> -    if (IS_ERR(irq))
->> +    af_desc->is_managed = false;
->> +    cpumask_copy(&af_desc->mask, cpu_online_mask);
->> +    cpumask_andnot(&af_desc->mask, &af_desc->mask, &table->used_cpus);
->> +    irq = mlx5_irq_affinity_request(dev, pool, af_desc);
->> +    if (IS_ERR(irq)) {
->> +        kvfree(af_desc);
->>           return PTR_ERR(irq);
->> +    }
->> +
->> +    kvfree(af_desc);
 
-I would free it only before return.
-
->>       cpumask_or(&table->used_cpus, &table->used_cpus, 
->> mlx5_irq_get_affinity_mask(irq));
->>       mlx5_core_dbg(pool->dev, "IRQ %u mapped to cpu %*pbl, %u EQs on 
->> this irq\n",
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c b/ 
->> drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
->> index 2691d88cdee1..82d3c2568244 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
->> @@ -47,29 +47,40 @@ static int cpu_get_least_loaded(struct 
->> mlx5_irq_pool *pool,
->>   static struct mlx5_irq *
->>   irq_pool_request_irq(struct mlx5_irq_pool *pool, struct 
->> irq_affinity_desc *af_desc)
->>   {
->> -    struct irq_affinity_desc auto_desc = {};
->> +    struct irq_affinity_desc *auto_desc;
->>       struct mlx5_irq *irq;
->>       u32 irq_index;
->>       int err;
->> +    auto_desc = kvzalloc(sizeof(*auto_desc), GFP_KERNEL);
->> +    if (!auto_desc)
->> +        return ERR_PTR(-ENOMEM);
->> +
->>       err = xa_alloc(&pool->irqs, &irq_index, NULL, pool->xa_num_irqs, 
->> GFP_KERNEL);
->> -    if (err)
->> +    if (err) {
->> +        kvfree(auto_desc);
->>           return ERR_PTR(err);
->> +    }
->> +
->>       if (pool->irqs_per_cpu) {
->>           if (cpumask_weight(&af_desc->mask) > 1)
->>               /* if req_mask contain more then one CPU, set the least 
->> loadad CPU
->>                * of req_mask
->>                */
->>               cpumask_set_cpu(cpu_get_least_loaded(pool, &af_desc->mask),
->> -                    &auto_desc.mask);
->> +                    &auto_desc->mask);
->>           else
->>               cpu_get(pool, cpumask_first(&af_desc->mask));
->>       }
->> +
->>       irq = mlx5_irq_alloc(pool, irq_index,
->> -                 cpumask_empty(&auto_desc.mask) ? af_desc : &auto_desc,
->> +                 cpumask_empty(&auto_desc->mask) ? af_desc : auto_desc,
->>                    NULL);
->>       if (IS_ERR(irq))
->>           xa_erase(&pool->irqs, irq_index);
->> +
->> +    kvfree(auto_desc);
->> +
->>       return irq;
->>   }
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c b/ 
->> drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
->> index 40024cfa3099..48aad94b0a5d 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
->> @@ -470,26 +470,32 @@ void mlx5_ctrl_irq_release(struct mlx5_core_dev 
->> *dev, struct mlx5_irq *ctrl_irq)
->>   struct mlx5_irq *mlx5_ctrl_irq_request(struct mlx5_core_dev *dev)
->>   {
->>       struct mlx5_irq_pool *pool = ctrl_irq_pool_get(dev);
->> -    struct irq_affinity_desc af_desc;
->> +    struct irq_affinity_desc *af_desc;
->>       struct mlx5_irq *irq;
->> -    cpumask_copy(&af_desc.mask, cpu_online_mask);
->> -    af_desc.is_managed = false;
->> +    af_desc = kvzalloc(sizeof(*af_desc), GFP_KERNEL);
->> +    if (!af_desc)
->> +        return ERR_PTR(-ENOMEM);
->> +
->> +    cpumask_copy(&af_desc->mask, cpu_online_mask);
->> +    af_desc->is_managed = false;
->>       if (!mlx5_irq_pool_is_sf_pool(pool)) {
->>           /* In case we are allocating a control IRQ from a pci 
->> device's pool.
->>            * This can happen also for a SF if the SFs pool is empty.
->>            */
->>           if (!pool->xa_num_irqs.max) {
->> -            cpumask_clear(&af_desc.mask);
->> +            cpumask_clear(&af_desc->mask);
->>               /* In case we only have a single IRQ for PF/VF */
->> -            cpumask_set_cpu(cpumask_first(cpu_online_mask), 
->> &af_desc.mask);
->> +            cpumask_set_cpu(cpumask_first(cpu_online_mask), &af_desc- 
->> >mask);
->>           }
->>           /* Allocate the IRQ in index 0. The vector was already 
->> allocated */
->> -        irq = irq_pool_request_vector(pool, 0, &af_desc, NULL);
->> +        irq = irq_pool_request_vector(pool, 0, af_desc, NULL);
->>       } else {
->> -        irq = mlx5_irq_affinity_request(dev, pool, &af_desc);
->> +        irq = mlx5_irq_affinity_request(dev, pool, af_desc);
->>       }
->> +    kvfree(af_desc);
->> +
->>       return irq;
->>   }
->> @@ -548,16 +554,26 @@ struct mlx5_irq *mlx5_irq_request_vector(struct 
->> mlx5_core_dev *dev, u16 cpu,
->>   {
->>       struct mlx5_irq_table *table = mlx5_irq_table_get(dev);
->>       struct mlx5_irq_pool *pool = table->pcif_pool;
->> -    struct irq_affinity_desc af_desc;
->> +    struct irq_affinity_desc *af_desc;
-
-While here, fix broken RCT.
-
->>       int offset = MLX5_IRQ_VEC_COMP_BASE;
->> +    struct mlx5_irq *irq;
->> +
->> +    af_desc = kvzalloc(sizeof(*af_desc), GFP_KERNEL);
->> +    if (!af_desc)
->> +        return ERR_PTR(-ENOMEM);
->>       if (!pool->xa_num_irqs.max)
->>           offset = 0;
->> -    af_desc.is_managed = false;
->> -    cpumask_clear(&af_desc.mask);
->> -    cpumask_set_cpu(cpu, &af_desc.mask);
->> -    return mlx5_irq_request(dev, vecidx + offset, &af_desc, rmap);
->> +    af_desc->is_managed = false;
->> +    cpumask_clear(&af_desc->mask);
->> +    cpumask_set_cpu(cpu, &af_desc->mask);
->> +
->> +    irq = mlx5_irq_request(dev, vecidx + offset, af_desc, rmap);
->> +
->> +    kvfree(af_desc);
->> +
->> +    return irq;
->>   }
->>   static struct mlx5_irq_pool *
-> 
-> 
-
+Best regards,
+Krzysztof
 
