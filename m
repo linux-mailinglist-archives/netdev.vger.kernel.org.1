@@ -1,129 +1,106 @@
-Return-Path: <netdev+bounces-208679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 304F2B0CBD8
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 22:32:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A74DB0CBDE
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 22:33:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64AD77A644F
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 20:30:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DC67170B0C
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 20:33:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A435237717;
-	Mon, 21 Jul 2025 20:31:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E684823BD0B;
+	Mon, 21 Jul 2025 20:33:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jqvP+GEz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rmql/4N5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662427DA7F;
-	Mon, 21 Jul 2025 20:31:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6475238C21;
+	Mon, 21 Jul 2025 20:33:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753129915; cv=none; b=oiPpWp3fp+YLsCGKT55v1+GTrZ3GYDT0aqftfzyMsXc1l5xYbFiaNYAheYq1WTOeP7vK8+G2J7bJ5xIY3JaBqg44Tnc2BGM63ja7B7us1G7eW6JrRlm5/IQtCnSuFEOhl/VWoVeAZ4xrAnqhA4rKgTwaKaM+U557zDxXgb9DG9Q=
+	t=1753130007; cv=none; b=OTpopedD8YcgBdUv8FLaIO3utQymWH+64zcYm7lhD6ubARFf6Q+F8jlreF5Q7Qifv6HfA6PtYmBDnAVvz6g+TCRAQ7PsgYTsXwGxRdVgcTq2D8iDNUUDbg56BOdflL+7T9u57fuf9Di08RZilEUWF/75ZekXwhBwyVOejf7uUv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753129915; c=relaxed/simple;
-	bh=g5A9KOanO+cfCnC2DzKbBgwUK1XEgUVRRT2guId11mE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ge45oDoSYOwGC90zFQGIFwjfVlV9qp4tMZRfXB10h9tMsHzdtC2LM7cjn/MOhE6zLHLJSZkCExb5/RVhY6/BY2T4JWIe2vejkxs0SOzi27B6mJm8EWTGu2YnWLYkHGRO179lY61F8HAU0KwThhePXGUcvJbdjW81mNAkOEcnxDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jqvP+GEz; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-555163cd09aso3869018e87.3;
-        Mon, 21 Jul 2025 13:31:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753129911; x=1753734711; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g5A9KOanO+cfCnC2DzKbBgwUK1XEgUVRRT2guId11mE=;
-        b=jqvP+GEzmMIcut//TyCN8goYafOKEx7WWtTZlUZZw9DTkw+S8CtShjFEYm5TUdU7X1
-         lt8bA5t1sidQzh6fOtaSkDkYd8zKKQvVH6toSft9n5Pe5DQ1k/8BsaELg1R8XDpxq1BJ
-         9kFA3OULtLj7ta5BofKRTL0/UwLy3rXHIUCifiN03cbylhAg+FKOiUerazazoS3Tqb01
-         wzkec3UTd5GMarJrAu+zS32hSK83HNVLIn4Tx1fMEbeWUVVQLg440ygux5pT7+h7h7yv
-         dY+x6fX/r9o+iktyJWUtdlfc7/p7YbifSGz36Fbs33+oPdH+k1RvI3fH2V6MXS+i74DV
-         LSmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753129911; x=1753734711;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=g5A9KOanO+cfCnC2DzKbBgwUK1XEgUVRRT2guId11mE=;
-        b=ZhSDU55M6JUs+tCmXCmDpRaTQ2htQy5GRMbY+SZu6m0Z9eegjOBuU2OZvg8+7vSp8D
-         Nam0hDxd8HLxQ1+A+nLhxQaf59Eu5Ivk3jGnqTp6RbgWiORQZBZ+DMlVlAlU2eFEFxo5
-         hV1Lc9RkIM4g48gN/ndZlfIc6ZZ9k5IuOUpBnbqLHoKH2yIxGKuoaT3WuzZrGC4ykSO+
-         TaRkQAyWk7IO2Nx6J0qxq0MbJigTPo/KvjPvvAjHZBWo6Fbo06y6bcLz/MSUJI7+K3WU
-         lUEff4ZTcTDKqFCrSfoyYSV5ktd1mAQhPWWi8snaQ7iWJnw1xr/ON5ARKxixT9uMRDNC
-         ryTw==
-X-Forwarded-Encrypted: i=1; AJvYcCUiiuO8Wuctfe/jzEhK4bLRU+I1AH//FHLJWmYyn0nqa/KbMwYIXyW7Ecq8MqFhn6KO5DOQnfuM@vger.kernel.org, AJvYcCUwyfeHnzEhA13mSyrkfVDBO8SsWAb1czJBhWt6uM1aSv4tnBX0JB4mgGFVc8fZNjgTwymliEin2UPG@vger.kernel.org, AJvYcCWBtxK2QE2Y/tZenAhzz/2U8icLMDLSu7D0eyi3O6FaDqyMwKyWNusaYC5Xv2EBw9HHhbu8W9tu3LSmIuMKQWnI@vger.kernel.org, AJvYcCWIeBbz8zNDSbPVMB5grQdD4rmv4Q0QWx/g0g5XBYcuQyg6WXz1DTgQHj3Q2f3hMt2Z5p8R3VNfBiOm3uhVHL8=@vger.kernel.org, AJvYcCXMBJfeVWwNtv1TJXqGaa3y7wEDBbEk6+eG2jLxLlsls966lRWPtTEK8MVzOSIM84XPIWPefF+MohI=@vger.kernel.org, AJvYcCXoPs77LppdhX7FpPr4QU1IzlnSXJYfbJYZwUlkwqwrajA2QblNjEV4e6OwYLa5t1q8hzIMqblc+HV3RxH7@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWJFGOigDcRLBY+2kS97lJn2JomPtG5euRRER8uE27Tmse27+3
-	eu+c3wNFzf2EOvIh+OoON2mxTilm5qLpAGhtCnVcA7KaxZLI3fDNlblT8edZLDk6d6Rau2eN0dP
-	FUNtHWXg11p4CPkA1QQYrL5G9wQ6NKtg=
-X-Gm-Gg: ASbGncvrXVb/eHF7D1gciTIGxsQJRrNOVgyUP5LpEsZOfMeuQ2wHI0WcpC52tIVXS/C
-	XCPZ0zp31ljm2L05qv828rXQfnPVCiB+lZwpOuT1XW2Zb4tA1L+WjPClow+eoH0esGwgvclSC3t
-	MSgguEte4t/XIVIrP85lzDJ2nSwUrBQJkWZ5DsHXNBqXCbwr39wqfUgHcQ6ScRCS4sefugvlkZ3
-	zWjf5gJC2xWvIvLxCM=
-X-Google-Smtp-Source: AGHT+IFR2lRHIzOwJj3JIlIo6gx45Mp51Ht2b7RDYiFrG52gvnrp+p/uZ3Tj+777Jg5nVJOtwaPjIzJjlMYwrAVYkHM=
-X-Received: by 2002:a05:6512:398d:b0:553:35ad:2f45 with SMTP id
- 2adb3069b0e04-55a29729104mr5367527e87.50.1753129911239; Mon, 21 Jul 2025
- 13:31:51 -0700 (PDT)
+	s=arc-20240116; t=1753130007; c=relaxed/simple;
+	bh=NkElqSwao4iqS7o3LqdWn2vxjTj6xjtIto9GSbXCCUo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tKOA/bNdylrC0Shhcs8p9x2gV4BaxSOHacl89HHZpOb6zQyAYqq0KHqoCC5EnOP2g4wBM2Mv+uix/jN87lX3mJCBconZK7IsTpxoGt7lNlrvJuIYTcd+uBa4vfNRiWEk484dWymY9ICGKJnLrUs4JRWdRWUcIe9/YofcbmkpjZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rmql/4N5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56AE6C4CEED;
+	Mon, 21 Jul 2025 20:33:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753130007;
+	bh=NkElqSwao4iqS7o3LqdWn2vxjTj6xjtIto9GSbXCCUo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rmql/4N57BK1Zo7FOFbT340tlIQIjV7l0g1tU3+GZsZ7Qn5xSbYr0byGj8risLuwa
+	 tymrLiMydZlBAfONMHKcV1ngQDThmnKsdGaIs2IxyAhxkynOlXe6kp8J2yVr2uyd2a
+	 WphCzcbjl7uhtvlbK6EaB0iNM7R2CUNc9/AMgRcTxQ0USef24eT6fTkSXk8JAgkv88
+	 ptxl8AxJTwxxXTMr0VXuj2A+8WiP6oirOywWN5m2UritGQiq9U+wlCASXnJ/OhKRTU
+	 ZGPEkSJPK/gBWAdMqGTEvtkazVj2mxbZAfyYflmLFRqn7YISs/gl+s1PdRXVqYaoIo
+	 SqzTmopklmEtQ==
+Date: Mon, 21 Jul 2025 13:33:25 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Gal Pressman <gal@nvidia.com>
+Cc: Nimrod Oren <noren@nvidia.com>, Mohsin Bashir <mohsin.bashr@gmail.com>,
+ netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, shuah@kernel.org, horms@kernel.org,
+ cratiu@nvidia.com, cjubran@nvidia.com, mbloch@nvidia.com,
+ jdamato@fastly.com, sdf@fomichev.me, ast@kernel.org, daniel@iogearbox.net,
+ hawk@kernel.org, john.fastabend@gmail.com, nathan@kernel.org,
+ nick.desaulniers+lkml@gmail.com, morbo@google.com, justinstitt@google.com,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
+ tariqt@nvidia.com, thoiland@redhat.com
+Subject: Re: [PATCH net-next V6 2/5] selftests: drv-net: Test XDP_PASS/DROP
+ support
+Message-ID: <20250721133325.73e2f076@kernel.org>
+In-Reply-To: <eaca90db-897c-45a0-8eed-92c36dbec825@nvidia.com>
+References: <20250719083059.3209169-1-mohsin.bashr@gmail.com>
+	<20250719083059.3209169-3-mohsin.bashr@gmail.com>
+	<ab65545f-c79c-492b-a699-39f7afa984ea@nvidia.com>
+	<20250721084046.5659971c@kernel.org>
+	<eaca90db-897c-45a0-8eed-92c36dbec825@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250719-core-cstr-fanout-1-v2-0-e1cb53f6d233@gmail.com> <CANiq72mRWuQRFaouOSazi3GTXoHFaeVpyNMZcP0Lkymb+aXrqA@mail.gmail.com>
-In-Reply-To: <CANiq72mRWuQRFaouOSazi3GTXoHFaeVpyNMZcP0Lkymb+aXrqA@mail.gmail.com>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Mon, 21 Jul 2025 16:31:15 -0400
-X-Gm-Features: Ac12FXwThiyNWkPFtuHHqyDRKx2RF3BqA4YU0Qjx3AoUK2MCPhmxxwTXBXJI9Qc
-Message-ID: <CAJ-ks9ne+YFezFvQ8nZH2UTjwqb3+3JtG0ztqecN-A46tC5SSw@mail.gmail.com>
-Subject: Re: [PATCH v2 00/10] rust: use `core::ffi::CStr` method names
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
-	Leon Romanovsky <leon@kernel.org>, Breno Leitao <leitao@debian.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
-	Rae Moar <rmoar@google.com>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
-	Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, dri-devel@lists.freedesktop.org, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-pm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kunit-dev@googlegroups.com, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 21, 2025 at 4:20=E2=80=AFPM Miguel Ojeda
-<miguel.ojeda.sandonis@gmail.com> wrote:
->
-> On Sun, Jul 20, 2025 at 12:42=E2=80=AFAM Tamir Duberstein <tamird@gmail.c=
-om> wrote:
-> >
-> > Subsystem maintainers: I would appreciate your `Acked-by`s so that this
-> > can be taken through Miguel's tree (where the other series must go).
->
-> Did you apply this with `b4`? I think you picked Danilo's Acked-by,
-> which was for a subset, for other patches too. I can remove it when I
-> apply it.
+IOn Mon, 21 Jul 2025 21:34:05 +0300 Gal Pressman wrote:
+> > That's a reasonable way to modify the test. But I'm not sure it's
+> > something that should be blocking merging the patches.
+> > Or for that matter whether it's Mohsin's responsibility to make the
+> > test cater to quirks of mlx5,  =20
+>=20
+> Definitely not a quirk, you cannot assume the headers are in the linear
+> part, especially if you're going to put this program as reference in the
+> kernel tree.
+>=20
+> This issue has nothing to do with mlx5, but a buggy XDP program.
 
-Yes, please do. I did indeed use b4 - and Alice also let me know that
-this was not correct. Sorry about that! Same is true for 2a, I'll
-reply to that email as well.
+We put the tests in the tree to foster collaboration. If you think the
+test should be improved please send patches. I don't think the kernel
+will allow pulling headers if they are not in the linear section.
+But that's your problem to solve.
 
-> (Greg's Acked-by may also have been just for his bits back in the
-> previous series, but in his case he didn't say anything explicitly)
+> > which is not even part of NIPA testing -
+> > we have no way of knowing what passes for mlx5, what regresses it etc. =
+=20
+>=20
+> People have been developing XDP code that runs on mlx5 long before NIPA
+> even existed =F0=9F=A4=B7=E2=80=8D=E2=99=82=EF=B8=8F..
+> And as you know we run these selftests on mlx5 hardware, as evident by
+> Nimrod's mail, and others you've seen on the list. You know what regresse=
+s.
 
-I believe it was for everything, as he didn't specify otherwise.
+No, please don't try to dispute facts. It's not integrated, if you go
+on a vacation upstream will have no idea what broke in mlx5. Either you
+are reporting the results upstream or our guarantees on regressions are
+best effort. BTW I don't understand how you can claim that a new test
+regresses something. It never passed on mlx5 =3D=3D not a regression.
 
