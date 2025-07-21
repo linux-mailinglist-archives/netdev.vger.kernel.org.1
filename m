@@ -1,105 +1,177 @@
-Return-Path: <netdev+bounces-208643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D51A5B0C7D2
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 17:40:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AD4CB0C7E3
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 17:44:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3211E3AB43B
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 15:40:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E37407A3407
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 15:42:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D05A2DECB1;
-	Mon, 21 Jul 2025 15:40:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 214762DF3FD;
+	Mon, 21 Jul 2025 15:44:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DgbipwdA"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="y5pWmjO9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CD9F1ADC90;
-	Mon, 21 Jul 2025 15:40:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E31D149DFF;
+	Mon, 21 Jul 2025 15:44:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753112449; cv=none; b=YEYB+JDgpVHjUf17TH+LGBShIq/XX7Hpt47BVlTUw7IDq14dRVKhhSzJ3h848jxSvePhTApPIkInaw24f81A7+n3h+6DqIrUNeU2KFpDKCfQPhQVwAHHpldiNg7q1BBZ60k6uGY99djma1zbXc+//q7AQnl8CP+uOTI8hxjkgL0=
+	t=1753112661; cv=none; b=P3yVUJit3lDxpo60QLWxSWjoMXAE4HfbZa8VS/51cDr1c2Muzwb0pskjqicTOaW6MPMXA+RaGeDAsH7CPKNA0W32t7Ee7/yta7SrGn82p3Ql4UvYToIOK/+MOtxHuKBXJTfmHjoQfqKlZQqR5PUDvopTWx9zkjfeSYkUQud1nu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753112449; c=relaxed/simple;
-	bh=DgSOmx6CYfdPt7+e2WdBwvaKwxEtjgphHOCiRnjXtZo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=h+GbIOmG/xJvQCRep8HLDNNOmwq3PM0Citp361a3zm7K9ruOM9qaMKQxt5n9fa/8BbXg9xp2LszU4lOy5pjejjpuPxapeU2sVuXsTa5Tw6Q2G9cE9WVfOoDZqe0yekRBL7ZjZcZ2AZbjES1filRjD9c0+8VYPta+t06a6kYtMh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DgbipwdA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D713C4CEED;
-	Mon, 21 Jul 2025 15:40:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753112448;
-	bh=DgSOmx6CYfdPt7+e2WdBwvaKwxEtjgphHOCiRnjXtZo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DgbipwdAAx2zGAN2XoiTG4uovy2DPLWpJcb64mQnfoxOeUK4DUxxArYiam1/bie/N
-	 OjFIbjr3d/gRfefLGE21r1h1FlwRCC5off8vGDRaNBcBjSmzzBckwVdxdYp3xVE3OF
-	 4n6pM+W2nhqvarobVMm76vv4KGBvCDbcBWWAKSiWSEnYh5tg5ibRsmoFIJZhWpJfip
-	 YgTkcM14e94Eg3U0sXLdADgBHbjY1UlazUOHP80+ahVb6ZDKfZBMqrLXT+HYZ+D/XR
-	 SBZrcVHoqVBqJ3JLoXNolzd3J3nfXhywFOfLJUYQSjSzR+7Qk8ddGJl5wMcEnVDruR
-	 as1CoggGZroCA==
-Date: Mon, 21 Jul 2025 08:40:46 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Nimrod Oren <noren@nvidia.com>
-Cc: Mohsin Bashir <mohsin.bashr@gmail.com>, netdev@vger.kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, shuah@kernel.org, horms@kernel.org, cratiu@nvidia.com,
- cjubran@nvidia.com, mbloch@nvidia.com, jdamato@fastly.com, gal@nvidia.com,
- sdf@fomichev.me, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
- john.fastabend@gmail.com, nathan@kernel.org,
- nick.desaulniers+lkml@gmail.com, morbo@google.com, justinstitt@google.com,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
- tariqt@nvidia.com, thoiland@redhat.com
-Subject: Re: [PATCH net-next V6 2/5] selftests: drv-net: Test XDP_PASS/DROP
- support
-Message-ID: <20250721084046.5659971c@kernel.org>
-In-Reply-To: <ab65545f-c79c-492b-a699-39f7afa984ea@nvidia.com>
-References: <20250719083059.3209169-1-mohsin.bashr@gmail.com>
-	<20250719083059.3209169-3-mohsin.bashr@gmail.com>
-	<ab65545f-c79c-492b-a699-39f7afa984ea@nvidia.com>
+	s=arc-20240116; t=1753112661; c=relaxed/simple;
+	bh=JWtyl6NjEoCsBn+cHwU9hfZTPWDVqi/ScvfaoZVO39A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hsH6QwQExm2r/Lvm4BkRnazt9D82Y8hCmjOKCJ46YF4TkDuQr9uSe1oS32TlCeeDEgg283femoLyvIIvhXFtZ3Pkwn3rVGw233rqOqqtqQZ0rFTd5jBBrGXXb/j7dl7g/fzN4imhOLLg3Ezdjmm5AA6NTwG7BWo1RnXc18spqs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=y5pWmjO9; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=vsxqkfNTc3Im8bZ4TMV6iFTxe9a53JxZhT5n91A2kGo=; b=y5pWmjO9fAJWV6NTwGi6RWk/l/
+	+uIzkJOdXWua/bwZ3YHA8ZvMVfgXNu6MuFzXjvdonSPauXHqPQUKe2/l/o59M2PXBdW+qW0WvbZCG
+	b/kwPH0pLAAoa122fbd3J9HSOJHD8yis2TdKrbLgGl3KeiTeIoWW27EdXp7sF0zOFG3g=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1udsg1-002NDF-FJ; Mon, 21 Jul 2025 17:43:41 +0200
+Date: Mon, 21 Jul 2025 17:43:41 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Dong Yibo <dong100@mucse.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
+	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
+	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, richardcochran@gmail.com,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 03/15] net: rnpgbe: Add basic mbx ops support
+Message-ID: <e66591a1-0ffa-4135-9347-52dc7745728f@lunn.ch>
+References: <20250721113238.18615-1-dong100@mucse.com>
+ <20250721113238.18615-4-dong100@mucse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250721113238.18615-4-dong100@mucse.com>
 
-On Mon, 21 Jul 2025 14:43:15 +0300 Nimrod Oren wrote:
-> > +static struct udphdr *filter_udphdr(struct xdp_md *ctx, __u16 port)
-> > +{
-> > +	void *data_end = (void *)(long)ctx->data_end;
-> > +	void *data = (void *)(long)ctx->data;
-> > +	struct udphdr *udph = NULL;
-> > +	struct ethhdr *eth = data;
-> > +
-> > +	if (data + sizeof(*eth) > data_end)
-> > +		return NULL;
-> > +  
-> 
-> This check assumes that the packet headers reside in the linear part of
-> the xdp_buff. However, this assumption does not hold across all drivers.
-> For example, in mlx5, the linear part is empty when using multi-buffer
-> mode with striding rq configuration. This causes all multi-buffer test
-> cases to fail over mlx5.
-> 
-> To ensure correctness across all drivers, all direct accesses to packet
-> data should use these safer helper functions instead:
-> bpf_xdp_load_bytes() and bpf_xdp_store_bytes().
-> 
-> Related discussion and context can be found here:
-> https://github.com/xdp-project/xdp-tools/pull/409
+>  #define MAX_VF_NUM (8)
 
-That's a reasonable way to modify the test. But I'm not sure it's
-something that should be blocking merging the patches.
-Or for that matter whether it's Mohsin's responsibility to make the
-test cater to quirks of mlx5, which is not even part of NIPA testing -
-we have no way of knowing what passes for mlx5, what regresses it etc.
+> +	hw->max_vfs = 7;
 
-Not related to this series, but I'd be curious what the perf hit is for
-having to load the headers.
+???
+
+
+>  }
+>  
+>  /**
+> @@ -117,6 +119,7 @@ static void rnpgbe_get_invariants_n210(struct mucse_hw *hw)
+>  	/* update hw feature */
+>  	hw->feature_flags |= M_HW_FEATURE_EEE;
+>  	hw->usecstocount = 62;
+> +	hw->max_vfs_noari = 7;
+
+???
+
+> +int mucse_read_mbx(struct mucse_hw *hw, u32 *msg, u16 size,
+> +		   enum MBX_ID mbx_id)
+> +{
+> +	struct mucse_mbx_info *mbx = &hw->mbx;
+> +
+> +	/* limit read to size of mailbox */
+> +	if (size > mbx->size)
+> +		size = mbx->size;
+> +
+> +	if (!mbx->ops.read)
+> +		return -EIO;
+
+How would that happen?
+
+> +
+> +	return mbx->ops.read(hw, msg, size, mbx_id);
+
+> +int mucse_write_mbx(struct mucse_hw *hw, u32 *msg, u16 size,
+> +		    enum MBX_ID mbx_id)
+> +{
+> +	struct mucse_mbx_info *mbx = &hw->mbx;
+> +
+> +	if (size > mbx->size)
+> +		return -EINVAL;
+> +
+> +	if (!mbx->ops.write)
+> +		return -EIO;
+
+How would either of these two conditions happen.
+
+> +static u16 mucse_mbx_get_req(struct mucse_hw *hw, int reg)
+> +{
+> +	/* force memory barrier */
+> +	mb();
+> +	return ioread32(hw->hw_addr + reg) & GENMASK(15, 0);
+
+I'm no expert on memory barriers, but what are you trying to achieve
+here? Probably the most used pattern of an mb() is to flush out writes
+to hardware before doing a special write which triggers the hardware
+to do something. That is not what is happening here.
+
+> +static void mucse_mbx_inc_pf_req(struct mucse_hw *hw,
+> +				 enum MBX_ID mbx_id)
+> +{
+> +	struct mucse_mbx_info *mbx = &hw->mbx;
+> +	u32 reg, v;
+> +	u16 req;
+> +
+> +	reg = (mbx_id == MBX_FW) ? PF2FW_COUNTER(mbx) :
+> +				   PF2VF_COUNTER(mbx, mbx_id);
+> +	v = mbx_rd32(hw, reg);
+> +	req = (v & GENMASK(15, 0));
+> +	req++;
+> +	v &= GENMASK(31, 16);
+> +	v |= req;
+> +	/* force before write to hw */
+> +	mb();
+> +	mbx_wr32(hw, reg, v);
+> +	/* update stats */
+> +	hw->mbx.stats.msgs_tx++;
+
+What are you forcing? As i said, i'm no expert on memory barriers, but
+to me, it looks like whoever wrote this code also does not understand
+memory barriers.
+
+> +static int mucse_obtain_mbx_lock_pf(struct mucse_hw *hw, enum MBX_ID mbx_id)
+> +{
+> +	struct mucse_mbx_info *mbx = &hw->mbx;
+> +	int try_cnt = 5000, ret;
+> +	u32 reg;
+> +
+> +	reg = (mbx_id == MBX_FW) ? PF2FW_MBOX_CTRL(mbx) :
+> +				   PF2VF_MBOX_CTRL(mbx, mbx_id);
+> +	while (try_cnt-- > 0) {
+> +		/* Take ownership of the buffer */
+> +		mbx_wr32(hw, reg, MBOX_PF_HOLD);
+> +		/* force write back before check */
+> +		wmb();
+> +		if (mbx_rd32(hw, reg) & MBOX_PF_HOLD)
+> +			return 0;
+> +		udelay(100);
+> +	}
+> +	return ret;
+
+I've not compiled this, but isn't ret uninitialized here? I would also
+expect it to return -ETIMEDOUT?
+
+	Andrew
 
