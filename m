@@ -1,132 +1,204 @@
-Return-Path: <netdev+bounces-208568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC1BEB0C2F8
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 13:30:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9721AB0C30F
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 13:34:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1F6F18874A4
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 11:31:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C82D77A40F6
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 11:32:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C075F293C56;
-	Mon, 21 Jul 2025 11:30:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uNYSJelq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF3652BCF5B;
+	Mon, 21 Jul 2025 11:34:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92C2228DB68;
-	Mon, 21 Jul 2025 11:30:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816C8288C39;
+	Mon, 21 Jul 2025 11:33:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.19.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753097452; cv=none; b=g7IfVmuE8PNaxtzxauG87q32WDOCRa39wRBHmQdbjQ0Dy+jAr37eKTEGUcqw5367N40wpMC/0EObLutw41jfhyRAgId41xcbez6KZs2/SzdDl/JKMq6jp9REkF6dJSY1+IIdzsY/hNCCfSkWQjh+E1/EI/fci/ywNmWObckHBlI=
+	t=1753097646; cv=none; b=O0N3Rv5IidPHzJTOnn4G5rnf+Sdh5Up06w0CERRIOT3sDftJolrzsa+iLou3jybtsHrC7HuH5Si5qw6MLqTrF24IDVeSTOYBrv3ANx6gz/F86BETjRjxntNgVkNrCQ1m4L+dwOrptklviSiZhzARbd8MAwlErxHedEd7rmP6GLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753097452; c=relaxed/simple;
-	bh=19237Phl5a29kIuQoBtWKWdcClHzbHbn1GScbMbhpvc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Kyob9tYI/Q/MoJx/WpjBb12MZv2+xGPupSMiBoSZKs818bUjnvVbIDnOWqVYnJJ65cMEgeUWhJrEKvSbT/WEcuWb+dGttvwv6ICZqyDhPUSvi2eC6tiS8stnXvl+HRvHbjjJnYjdezS6W59BHSe3w/tpIob/t8Yn4vA7JmowpYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uNYSJelq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23914C4CEED;
-	Mon, 21 Jul 2025 11:30:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753097452;
-	bh=19237Phl5a29kIuQoBtWKWdcClHzbHbn1GScbMbhpvc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=uNYSJelqAC+hxrFwcnPAuuSDfWXTFSu7GuAjjiQ3WoI3EYGEjn7nTuDtFtsbCRbgn
-	 YxOyFaVZ56HeIi3ZJ7Eq87K69wLG/1sKH47O/nZVDgdU05MqtqhKEEl73pzVocOuaC
-	 ljeCCP54vjQ/HLIMQnFhFEHiHUBhSzz2QhiVz0P8VOZvKRvz4IpXR1qWYqAq2dF0gS
-	 nIca35Qxj2pp3Ss2JlwJxQdFvr7oT6fzmod0Q9PKgbM2I/oG0nxav7wJMrzfeuOzZD
-	 asiy/Pwf+rjLnn8CIDAmSrnRBQwxNBMK2hc91TrAeJOFORk+Dir0c80uKac+NnVWhr
-	 w5J93GnGcjBYQ==
-Message-ID: <faea23d5-9d5d-4fbb-9c6a-a7bc38c04866@kernel.org>
-Date: Mon, 21 Jul 2025 13:30:45 +0200
+	s=arc-20240116; t=1753097646; c=relaxed/simple;
+	bh=j8aY/HBVyMKEbAghmMkHagyrNS3Jy8oKX+FgGydDVp4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Awxg3LGX6PNP0Q6NCQ3mbBTJz2V31yjsg4jg/lojVC8f+LAQQwDslVq/7tfMcpHf4qOjIp8UlNeTqdBRpS6MQseGmbZ6iviyngM6833ut5cJNaX1KBxx5sK5qswpdx4TdHvlcmz51iYZKeg5An+rKsrAd70Caragpr/dEssJtuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.207.19.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: esmtpsz18t1753097566tdcc2b135
+X-QQ-Originating-IP: EHBGWkQh/64FOUdl32kETefme0DkHinNY03bd1hqlU4=
+Received: from localhost.localdomain ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 21 Jul 2025 19:32:41 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 13591894588143972826
+EX-QQ-RecipientCnt: 23
+From: Dong Yibo <dong100@mucse.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	corbet@lwn.net,
+	gur.stavi@huawei.com,
+	maddy@linux.ibm.com,
+	mpe@ellerman.id.au,
+	danishanwar@ti.com,
+	lee@trager.us,
+	gongfan1@huawei.com,
+	lorenzo@kernel.org,
+	geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com,
+	lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com,
+	richardcochran@gmail.com
+Cc: netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	dong100@mucse.com
+Subject: [PATCH v2 00/15] Add driver for 1Gbe network chips from MUCSE
+Date: Mon, 21 Jul 2025 19:32:23 +0800
+Message-Id: <20250721113238.18615-1-dong100@mucse.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/4] dt-bindings: net: document st,phy-wol
- property
-To: Gatien Chevallier <gatien.chevallier@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Christophe Roullier <christophe.roullier@foss.st.com>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Simon Horman <horms@kernel.org>,
- Tristram Ha <Tristram.Ha@microchip.com>,
- Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20250721-wol-smsc-phy-v1-0-89d262812dba@foss.st.com>
- <20250721-wol-smsc-phy-v1-1-89d262812dba@foss.st.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20250721-wol-smsc-phy-v1-1-89d262812dba@foss.st.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: M/pyXQiX8GHdj2F4Iuks4wDMVbrgsifgprzT/uPKyJJVIVcpaJ87O/Lh
+	wWfBnHY6D/kKWqoyvDjUGgkqFQa0BQ5Pyc1OVoeGuTpgd27rqyQJKQQH9OIspFtPJe495y8
+	mnvd6HWMR0TfCuibUYlnqXE9GulfuoH8cvruMBxPF31r8QkCk90An1huzjkGN68p7iRvZbW
+	w23IX9dEU8cHoOUQQueqdHCBFXktzVmDC+wUk5ZefLH8ZI7k6qkqos+ZY6umVCBGI8PTgzK
+	rM5trOElWEeuy/24RW2RpxaJIeAVn9h3jK+O2i0bWWB4TgRD9xZnXvVHjXcFlCGZMxLKGIf
+	sAYhAwc3zMUwdHfOSnbRHLV7FTgsM9DtgxHf19fmGClcCbwUidJzO8yifKKcnAGicsUdmsW
+	SciYvyf//Jb4faqKbdGmCwSLvhfqWONeFoVLl7XA90t/AXykxFMXsFbLaED6mM4GfPeL6BK
+	9KRutoh8i+O7dq3WOxeLx9cK0UWtPYb/X91+QN58oYVQKEipvje4ajNfwoR6U15WAcbK0Kn
+	L6XHXuvVDAheBvtfyRNzenLokxsFrHPAHxnORybIxOhwp/dgznsay6duIY8u4qC9gAik+UX
+	18HpDBb77dRU8VPeXXk3+OBnsiVEpNJxAWMBhDErF+6q+EKKwsO4jVldu0r+9EPLwfsBVs3
+	isrEXtdlJUcPHSS9dAKP8fIBNRiKKvpH0YcwR3masRZ6qcd/nLyLDr+oToOMiUKtoBRHW4g
+	fMoAEpKlJXGXkrwjbHFzw5+xbl2uc5lWfLDXdebPjoAFx3kthDb9anA2PsF7Ch5l/qtjSPm
+	XRIG4gaTd+28eYxY7OAepvc0YNRVQA+6EV8X6FLn5AQfTC4xBVRsso0bEA5B4yIY9UVnx3e
+	aashTl3uJKwMgyk9kYWXG+fQyOGC1Qn23JQFL7pbgBDZErS8eC6k79IJx2SKbXBE/XE+2Fy
+	GrlH2LfVldc+UoGRiouYpyxdhU/T7EpQKN6OEQZT7m3H9Khamdc8a+BhuNyUwSfgFh6Skwl
+	elHtKf6iQAfDBdMUYYl0EuXrQdl1v6ALpJc50IGxMEZOFnBl5Vkoi5kEaVO7c=
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+X-QQ-RECHKSPAM: 0
 
-On 21/07/2025 13:14, Gatien Chevallier wrote:
-> The "st,phy-wol" property can be set to use the wakeup capability of
-> the PHY instead of the MAC.
+Hi maintainers,
+
+This patch series introduces support for MUCSE N500/N210 1Gbps Ethernet
+controllers. Only basic tx/rx is included, more features can be added in
+the future.
+
+The driver has been tested on the following platform:
+   - Kernel version: 6.16.0-rc3
+   - Intel Xeon Processor
+
+Changelog:
+v1 -> v2: 
+  [patch 01/15]:
+  1. Fix changed section in MAINTAINERs file by mistake.
+  2. Fix odd indentaition in 'drivers/net/ethernet/mucse/Kconfig'.
+  3. Drop pointless driver version.
+  4. Remove pr_info prints.
+  5. Remove no need 'memset' for priv after alloc_etherdev_mq.
+  6. Fix __ function names.
+  7. Fix description errors from 'kdoc summry'.
+  [patch 02/15]:
+  1. Fix define by using the BIT() macro.
+  2. Remove wrong 'void *' cast.
+  3. Fix 'reverse Christmas tree' format for local variables.
+  4. Fix description errors from 'kdoc summry'.
+  [patch 03/15]:
+  1. Remove inline functions in C files.
+  2. Remove use s32, use int.
+  3. Use iopoll to instead rolling own.
+  4. Fix description errors from 'kdoc summry'.
+  [patch 04/15]:
+  1. Using __le32/__le16 in little endian define.
+  2. Remove all defensive code.
+  3. Remove pcie hotplug relative code.
+  4. Fix 'replace one error code with another' error.
+  5. Turn 'fw error code' to 'linux/POSIX error code'.
+  6. Fix description errors from 'kdoc summry'.
+  [patch 05/15]:
+  1. Use iopoll to instead rolling own.
+  2. Use 'linux/POSIX error code'.
+  3. Use devlink to download flash.
+  4. Fix description errors from 'kdoc summry'.
+  [patch 06/15] - [patch 15/15]:
+  1. Check errors similar to the patches [1-5].
+  2. Fix description errors from 'kdoc summry'.
+
+v1: Initial submission
+  https://lore.kernel.org/netdev/20250703014859.210110-1-dong100@mucse.com/T/#t
 
 
-And why would that be property of a SoC or board? Word "can" suggests
-you are documenting something which exists, but this does not exist.
+Dong Yibo (15):
+  net: rnpgbe: Add build support for rnpgbe
+  net: rnpgbe: Add n500/n210 chip support
+  net: rnpgbe: Add basic mbx ops support
+  net: rnpgbe: Add get_capability mbx_fw ops support
+  net: rnpgbe: Add download firmware for n210 chip
+  net: rnpgbe: Add some functions for hw->ops
+  net: rnpgbe: Add get mac from hw
+  net: rnpgbe: Add irq support
+  net: rnpgbe: Add netdev register and init tx/rx memory
+  net: rnpgbe: Add netdev irq in open
+  net: rnpgbe: Add setup hw ring-vector, true up/down hw
+  net: rnpgbe: Add link up handler
+  net: rnpgbe: Add base tx functions
+  net: rnpgbe: Add base rx function
+  net: rnpgbe: Add ITR for rx
 
-Best regards,
-Krzysztof
+ .../device_drivers/ethernet/index.rst         |    1 +
+ .../device_drivers/ethernet/mucse/rnpgbe.rst  |   21 +
+ MAINTAINERS                                   |    8 +
+ drivers/net/ethernet/Kconfig                  |    1 +
+ drivers/net/ethernet/Makefile                 |    1 +
+ drivers/net/ethernet/mucse/Kconfig            |   35 +
+ drivers/net/ethernet/mucse/Makefile           |    7 +
+ drivers/net/ethernet/mucse/rnpgbe/Makefile    |   13 +
+ drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |  733 ++++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   |  593 +++++
+ drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |   66 +
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_lib.c    | 2320 +++++++++++++++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_lib.h    |  175 ++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   |  901 +++++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c    |  623 +++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h    |   49 +
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c |  753 ++++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h |  695 +++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_sfc.c    |  476 ++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_sfc.h    |   30 +
+ 20 files changed, 7501 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/mucse/rnpgbe.rst
+ create mode 100644 drivers/net/ethernet/mucse/Kconfig
+ create mode 100644 drivers/net/ethernet/mucse/Makefile
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/Makefile
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.h
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_sfc.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_sfc.h
+
+-- 
+2.25.1
+
 
