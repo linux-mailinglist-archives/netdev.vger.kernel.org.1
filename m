@@ -1,92 +1,116 @@
-Return-Path: <netdev+bounces-208537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D710CB0C0AC
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 11:49:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B7897B0C0C5
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 11:56:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C204B16658F
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 09:49:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA88217E139
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 09:56:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1CD528D841;
-	Mon, 21 Jul 2025 09:49:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0C1428C868;
+	Mon, 21 Jul 2025 09:56:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WXIs09SE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mso03xDB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAD3C5579E;
-	Mon, 21 Jul 2025 09:49:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B116420E71C;
+	Mon, 21 Jul 2025 09:56:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753091387; cv=none; b=ui2vUOs/JmcJX1mz6y7X23YIqBdMC6pLgBo/mc5g9Tqm7mb0msh2Mk1zvgG8/oUF4ctnary34DxNjF5cdykjYwpPOqvoMcp0DN6r+NFVndRBzN2ILM3gmd+aHTjVSDB9FoGzOJMj2ou7IP68e/horhtiwc+vHHe67qT9Zd60m5Q=
+	t=1753091787; cv=none; b=gsmPE7prKOf9DjdGvdvuNGj8JDhDWBiJGO38ncQayZ3UwrduQ17P1MK1x30Q+p7CojxRhAlaQxZnoWmdKft8ibEWOQAeZ3hrCKqZ1DEJ6U3CtQ46Mb9cmFlwo7KhTuDtQ7LJg/AxL6v+D+H/b3/53k0LJKvXmPScGLZqjNsw0k0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753091387; c=relaxed/simple;
-	bh=Q38v6aY+FokTWJGa+hakCqfR9CY7WHzyzp3v3NxqYfk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=aUi/EKO9MzxIM75TzUCbiT31ib5dIcqi/jcKpphvf+PcI3in0dmGNfjaiFlLGo4yKvTs7b4uFlQeEa1fxtW/4kG8pkREIM9vW1gfOYcxQ1L+MJIvDvrlxUJ6StoLZZ8d47VKLJxzonnYs2UouiuUHvi7wQw4B5t1svPuK2aPTYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WXIs09SE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57D09C4CEF5;
-	Mon, 21 Jul 2025 09:49:47 +0000 (UTC)
+	s=arc-20240116; t=1753091787; c=relaxed/simple;
+	bh=Zd7hDLGDNQaGB73auAur4qnLMLuyfBETAW2PxNXW6ko=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LDgT6FOEJxAmXOTvpUPQ71iL1IPtMvcbUWJ7mJRRKK4XAzy+TJI+CdkuCdb17iGt1yVqObjgulw+BXZhu2yTj5uH13VOIaCqINYobNpCGxH2UZzcuZ0LrbRaXy8GhhtFnhoYqkUbM7i7Q2yq29i0Y+vx/khOTCsJ5DjOV0ncwJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mso03xDB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AD1DC4CEED;
+	Mon, 21 Jul 2025 09:56:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753091387;
-	bh=Q38v6aY+FokTWJGa+hakCqfR9CY7WHzyzp3v3NxqYfk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WXIs09SEydGeWXiTs+Wg1pMe0tgkm3NbZgNz6N2IIUOyS6N0REN/h3TL+lRo9U8Ws
-	 mON3Oayu2BPRynVukzngyJcadnBNUdvzWvSUcF/We0xN8ZDJLSNPFl8E8Rens+IdmG
-	 oKBo+aA7hC67+TPzUKTlVwXTjSlOAlsm80V+d4Ak2YvQIMvOMPb1wA57hCzfxjdqsu
-	 vDLhscRQIBIKAIl5J9SelSKlZoMG72Xjt9UXbaGOazjb7dbv+aDmJpSXZK1sijIIwd
-	 oVMg9E5qi53UYfMFZnAYvHe9+4yOsQU0uoigK+EJat3A+eocu9snq6fPU33xm0uCu5
-	 aI0Yn83IRr1Ww==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70EB5383BF4E;
-	Mon, 21 Jul 2025 09:50:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1753091787;
+	bh=Zd7hDLGDNQaGB73auAur4qnLMLuyfBETAW2PxNXW6ko=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mso03xDBoI8keg0R8yYWYvb2974vQ9K3sP857POnCHr9tR64d+vrnl81gF1vIPJfo
+	 Q8cgbXLwXmjIJ9mIxOq42X5T8DzIZ1+fpx1rGwzaQaUZtSknUXQGOiNmjv07e9NgxA
+	 WqUVTpGx3Et+G6sOjGT/vtC3aDKYiaGyYmXwyDssDcnuG7keIs6IgPGstUY9d1yWul
+	 UfvDp7D0GH9thC/Wuw2DDAUSvBR+N2qzijabyjpvEs0jO2KdoH99NIUxjZwglgIM3H
+	 XNIyiPn/83lWv4ENRNij0PggEIxa9QZOO+S5IX7X4Rcrutbk0TNBKEsWrUkhdRI6xJ
+	 B0vThDBnujOag==
+Date: Mon, 21 Jul 2025 10:56:21 +0100
+From: Simon Horman <horms@kernel.org>
+To: Alexandra Winter <wintera@linux.ibm.com>
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Thorsten Winkler <twinkler@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Sebastian Ott <sebott@linux.ibm.com>,
+	Ursula Braun <ubraun@linux.ibm.com>, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Aliaksei Makarau <Aliaksei.Makarau@ibm.com>,
+	Mahanta Jambigi <mjambigi@linux.ibm.com>
+Subject: Re: [PATCH 1/1] s390/ism: fix concurrency management in ism_cmd()
+Message-ID: <20250721095621.GB2459@horms.kernel.org>
+References: <20250720211110.1962169-1-pasic@linux.ibm.com>
+ <6b09d374-528a-4a6d-a6c6-2be840e8a52b-agordeev@linux.ibm.com>
+ <af7298f5-08a0-4492-834d-a348144c909e@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: usb: Remove duplicate assignments for
- net->pcpu_stat_type
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175309140626.4174808.4938048621331802399.git-patchwork-notify@kernel.org>
-Date: Mon, 21 Jul 2025 09:50:06 +0000
-References: <20250716001524.168110-2-qiang.zhang@linux.dev>
-In-Reply-To: <20250716001524.168110-2-qiang.zhang@linux.dev>
-To: Zqiang <qiang.zhang@linux.dev>
-Cc: oneukum@suse.com, kuba@kernel.org, andrew+netdev@lunn.ch,
- davem@davemloft.net, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <af7298f5-08a0-4492-834d-a348144c909e@linux.ibm.com>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Wed, 16 Jul 2025 08:15:24 +0800 you wrote:
-> This commit remove duplicate assignments for net->pcpu_stat_type
-> in usbnet_probe().
+On Mon, Jul 21, 2025 at 10:17:30AM +0200, Alexandra Winter wrote:
 > 
-> Signed-off-by: Zqiang <qiang.zhang@linux.dev>
-> ---
->  drivers/net/usb/usbnet.c | 1 -
->  1 file changed, 1 deletion(-)
+> 
+> On 21.07.25 09:30, Alexander Gordeev wrote:
+> > On Sun, Jul 20, 2025 at 11:11:09PM +0200, Halil Pasic wrote:
+> > 
+> > Hi Halil,
+> > 
+> > ...
+> >> @@ -129,7 +129,9 @@ static int ism_cmd(struct ism_dev *ism, void *cmd)
+> >>  {
+> >>  	struct ism_req_hdr *req = cmd;
+> >>  	struct ism_resp_hdr *resp = cmd;
+> >> +	unsigned long flags;
+> >>  
+> >> +	spin_lock_irqsave(&ism->cmd_lock, flags);
+> > 
+> > I only found smcd_handle_irq() scheduling a tasklet, but no commands issued.
+> > Do we really need disable interrupts?
+> 
+> You are right in current code, the interrupt and event handlers of ism and smcd
+> never issue a control command that calls ism_cmd().
+> OTOH, future ism clients could do that.
+> The control commands are not part of the data path, but of connection establish.
+> So I don't really expect a performance impact.
+> I have it on my ToDo list, to change this to threaded interrupts in the future.
+> So no strong opinion on my side.
+> Simple spin_lock is fine with me.
 
-Here is the summary with links:
-  - net: usb: Remove duplicate assignments for net->pcpu_stat_type
-    https://git.kernel.org/netdev/net-next/c/dd500e4aecf2
+I would suggest using spin_lock() if it is sufficient.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I think it is generally assumed that the minimal locking primitive is used
+given the context code is executed in.  And we can it can always be updated
+if the contexts in which this code executes subsequently changes.
 
+IOW, I'm suggesting avoiding confusion if someone looks over this code.
 
+...
 
