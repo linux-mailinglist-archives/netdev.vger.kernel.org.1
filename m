@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-208603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F293EB0C4AF
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 15:02:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E119AB0C4B4
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 15:03:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A2CD1AA4C5D
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 13:02:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8218F1AA50F0
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 13:03:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A972D8DDF;
-	Mon, 21 Jul 2025 13:02:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E2132D9ED0;
+	Mon, 21 Jul 2025 13:02:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13CF92D780A;
-	Mon, 21 Jul 2025 13:02:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AF772D7805;
+	Mon, 21 Jul 2025 13:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753102934; cv=none; b=Wz0ASdAGz4a53Uyld6d6ll8nL2TwEtIx9BWcxkV84K5fDoRFeJANeSbjCbWoccJIlmH56XwU65AXtmx7nobcG1pTZqqdqeKzaXUjOwwbUkSnfb/XZx1ojTaIo9b9mzASPwQolh9WL9JAEQIQdKmO8zmaBymXPaEpqXMMyqNHsbY=
+	t=1753102937; cv=none; b=icq7J55/nhbdnv7F2hDiGLaCiqfhVyWzL4Kj+KyoWhe4P++8uQohFbmXvhXpg2s8dXED+f8r/MEtb2Qu+oygrqqVbVLL6dMVrEW+5n1Cog0c6pXUADgC8cAmFdEMzV0RSay54hcEyzblNsz271fmSzjsnLyNyF3PXvFbaqso/OE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753102934; c=relaxed/simple;
-	bh=oagYvLPRp2ebesljFuBIVfa937xZLmXWPbPvbJX8Vb4=;
+	s=arc-20240116; t=1753102937; c=relaxed/simple;
+	bh=UeTGUYRKeuwDXve/GI/R0QfycaffmuY7Dt+7pG5Ntrk=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dx2tQJjGB7pU/1Q0X0KCbGdbi4odsoJ/cBJNgNNL9XwYdxwM9PRzkVXF1b7aq7+9ziiyySW47QBWks1eYQnFQoHuXBiXwfdQLOxD7FcBVD7YXxN/XA85EoK8vD4yM6EqwZxjGq/N1Rfv6TWmAW9MWrj71vEZozs+OJdABfO6mEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.50
+	 In-Reply-To:To:Cc; b=Icf5U8flsPEe+VJuoV4afKXHfAFb+0U/V5M74DlTnfNrf5Smwg7TKZYDyXAXDzoKsoXFsGeu1oEwjg5NMIVZQBEcNtAKd8dKntQb7jX+GsJFqYhH/Oev++3mNR5hVtjbF/oOZGA1G/UaYr4tbSTp4MxJNUFJhqpfI0679jN2oe0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-ae0c4945c76so577383966b.3;
-        Mon, 21 Jul 2025 06:02:12 -0700 (PDT)
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-60c4521ae2cso7608268a12.0;
+        Mon, 21 Jul 2025 06:02:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753102931; x=1753707731;
+        d=1e100.net; s=20230601; t=1753102933; x=1753707733;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BsLTxz4UURCNf6IGkttLdx17vKela2kG3TZHARmy8BA=;
-        b=jka0m/b8zqXGHzbaf0s2reem5D2lo5hly4ZoesW1ruXIkT13iyKE8JmStOg+YDPuqK
-         YV5XcuyDYelOW26BIsOk3xBE9OYXPIJlhbheUW822IP0Tvvo8cWuZQ5jBIc8TDu9EHzf
-         Kh0FlvbxaFpbRDOU8NlkLKvwVViyVvJSLkGpYjAXg+ARcsavio0fe2BNocw26l0WXCvW
-         tc0Jogir2Ts0qGQ30BiTv4cNd0M5RCCvPlLbJJvJK5R2PmO4pYWdquVsMnOUCr4uxrIW
-         xZn/dd8+PgfVt3/Xyu4uOlqX/kGfjTpyFd7oPAaotTKyEcsOU1Gy08rf0xHwy6RT9aaC
-         VoKg==
-X-Forwarded-Encrypted: i=1; AJvYcCXUmOcUYKNvZzR9I2yyswBPZHvLjJfRmKye5joP6Oc45H0BvO18e4Cc2sKfYpqTNNn3NtsMoI/hZxrR2pA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz46Z6OBfHQfrwms9mPvCEzfolgcn6kovAc4LsTUobsEwPrjId0
-	hBUGSgXYEQ0W2xHF0rxt97nD+TLcjh3NpCxvi781pHqquTBkhOz1TuZcUWhzWQ==
-X-Gm-Gg: ASbGncuPsONk4peTgTz5Y7pX9FZlpaviQpwm3N1yMZtI4JNqfvY1qutct94c1tZqMAf
-	nPpCUg3uwpQCKx57pfmmOO6ZGpnEIEOqFUykJgFL5IjsDNmnEHg8fdKXvL44JCOx1H7SYG4fS62
-	MNxZECjHggSvVDSbo5ik8GxKtdqs+iHCUtTQvAcvnn3xjPZnMg7SrHI5jPitAl8KrBKwgfxaOn8
-	Wxwux0INs5eQK6IQ/NkT+/J0e7NZk0zDpvPowsGVFUOS3klzqZHU55Aqk6vDYkNRQusiXOd/ity
-	aQxo0eyz/H2PM/cd15RBLAUj0G4yYJ+klr9CF0GnoR57+zlNkFclGPqtN7Yjs83o0ow0IAqVCq1
-	227XJ1mAwQV7F
-X-Google-Smtp-Source: AGHT+IHRZVLcxa3SeMX6xPW1KQHsxQWWjiWfUsPZq8WyrGXDn9EV3khlqnaV7H3n9rQ0IkTAdRchtw==
-X-Received: by 2002:a17:906:6a25:b0:ae6:b006:1be with SMTP id a640c23a62f3a-ae9cdda3d41mr1993116466b.5.1753102930486;
-        Mon, 21 Jul 2025 06:02:10 -0700 (PDT)
-Received: from localhost ([2a03:2880:30ff:6::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aec6ca7ae11sm677073066b.108.2025.07.21.06.02.09
+        bh=2UQvlecl24zUyb5wtS3n9sQxu6Li+ODjsFHxe5Ob9Ag=;
+        b=K412awtZpdCx8HyxYOUcpmFZe0ZZWPkEhT55FuchYIaGzzRrVTBIPhx5sP1WI1f5cw
+         os8R1IDpo9a5M1j9W/4I4CkpaM0qhYYH+dAIx+Xpw15AtUXj5r4Mjc5L3LvlKO+Cb3AR
+         6H8l+OnbW1TaUZP57c4IHSgPRXF6c1YlMrBYSnD1lbchLCwlSWh/6Si/i/3d2JqqFi3c
+         hJFrt1rfIBjzrAwJkTtBe85OErDXwYWSRUY5NHwiOr+cnkOBjdRBzqw/dyvDT3/O96wC
+         o583swnVYdTrFkgBHKUs+shQvatPtQKLVveE5eUw2j/CeDvdyAaEyyKqa72fokuDK/Sy
+         hmlA==
+X-Forwarded-Encrypted: i=1; AJvYcCW2aBRA+2P6MNQSaF1bfggpyva6NxiyVPV5Iny21ARH0jPy9IT2RAlaRJL9i3xrV95QLBJtu1v5aiCN+Ys=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+DIS24m35p2FaK2VOMdTNYXgZ/whQWUi/Fdf8CbohutZ3+aZ/
+	FwHJ4mJGS9WAW32TGmXlBOTvkl2vr6ceLosPwDQeCP+nmj1UyTkCsvC9YfOHzA==
+X-Gm-Gg: ASbGncuz3KqW2ppsmM8uH94UtSpp/Xules8y86sYGHctHfIJmJlx/TsJx8S3iVbMVTV
+	Yn/gxQ39v8+KiPdkArOwV2k6HfUw5YXllXXcyVoB+FmGEoA+v9xRrgiH2mU7DkxUaAPc0+KH+E0
+	cPcf2DXMW9G7yCnVH61Ffv3pAv0MR4tLKKEUoNYAUTBCrpazjCd8TRyVGDFhiIGbEic49u550mI
+	fkYhlXkbJLz6apW20LRVttuMCpoOt82nyyDLrhDFS7dD8fNfbpAVtw3q6RH2NXo1ajJ7qPqB79D
+	iH4Aosr5TCuJ9Mm2c98Nnqcwa7XmEzpi+sEABSUcvPLyrrhWiXzuJ1hiztgQQEBVa1whpROzPPp
+	aFWvzpstzoHXQ
+X-Google-Smtp-Source: AGHT+IFaMoG7c16tc3oC12jUw+W7U0SiaL7+1I8pv6CofVmHpJx3sJasoucoBfeiBOf2deoWQog8Hg==
+X-Received: by 2002:a17:906:f5a3:b0:ae3:7255:ba53 with SMTP id a640c23a62f3a-aec6a672a23mr1143845366b.53.1753102931969;
+        Mon, 21 Jul 2025 06:02:11 -0700 (PDT)
+Received: from localhost ([2a03:2880:30ff:9::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aec6c7d7b9csm672901266b.61.2025.07.21.06.02.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Jul 2025 06:02:10 -0700 (PDT)
+        Mon, 21 Jul 2025 06:02:11 -0700 (PDT)
 From: Breno Leitao <leitao@debian.org>
-Date: Mon, 21 Jul 2025 06:02:01 -0700
-Subject: [PATCH net-next v2 1/5] netpoll: Remove unused fields from
- inet_addr union
+Date: Mon, 21 Jul 2025 06:02:02 -0700
+Subject: [PATCH net-next v2 2/5] netconsole: move netpoll_parse_ip_addr()
+ earlier for reuse
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,7 +71,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250721-netconsole_ref-v2-1-b42f1833565a@debian.org>
+Message-Id: <20250721-netconsole_ref-v2-2-b42f1833565a@debian.org>
 References: <20250721-netconsole_ref-v2-0-b42f1833565a@debian.org>
 In-Reply-To: <20250721-netconsole_ref-v2-0-b42f1833565a@debian.org>
 To: "David S. Miller" <davem@davemloft.net>, 
@@ -81,49 +81,93 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  kernel-team@meta.com
 X-Mailer: b4 0.15-dev-dd21f
-X-Developer-Signature: v=1; a=openpgp-sha256; l=714; i=leitao@debian.org;
- h=from:subject:message-id; bh=oagYvLPRp2ebesljFuBIVfa937xZLmXWPbPvbJX8Vb4=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBofjpOWKitypCa5Jn+jdxZ9bJxqnYDHoXwR9jfJ
- SjGCeEQyUSJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaH46TgAKCRA1o5Of/Hh3
- bepkEACZIExgS+ni+R+3NYK4IS0M/JhkTrDZwhU2V90JAjjkX54m8tBi/YY0T/VdiXech3YDJ0r
- S2KXRR4QFkGU+A5Q4D83gE5xfNPeQ6bKNxOHszGRzRDLktt/MCClxGdmqpMajjRDbCaanHAmhpb
- Obgxz4nhn7gAmjdz6oHV8XSa9CDc1kxxQZ4pyZby+dJfstNHhJAZK5ADOZ6z0MyPDe3JHL5n3Jz
- BBihgvdviu8aGcVDSoOg09zscZG+byo3vBhYFdFBLJm+NIiGj3Ls6bT5BIESI5ylCSmf4gQBR48
- DTL2kIk961RYQfnm541FfJAheYPCfizFAauO8yoFqw0j5/DU0qHVDKUyLgNO6P79pNFibKs/8l6
- yNBsKmepoAyhRZ1T9tUFyT58k8RF2mdkPGWcyhcsnWnAKtf9eAFPj6XAFqAxSK5yE+STF9OpFp9
- zNrG2y/gkjBzp8BSs6f8KN97cm+HUqEt/czjQsAxYQiaAkmX30pOJaMKO76L9xcbRi7RAcx9uH2
- QHvMSgV1WCqaQA0xIIVYwpawi2B62RtjqXNLocBP6/oPPh7JASjqURnVkfrcg76KIqi2WLZiuPP
- ZxIQ8d6nlOcNE/OJb7fPoG1uSPlHalD+oe69G/Y1H1jD2jnP+dEDu09qU5MJL8jitsXTUzXWElF
- BEHVL2XtpqnytlQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1886; i=leitao@debian.org;
+ h=from:subject:message-id; bh=UeTGUYRKeuwDXve/GI/R0QfycaffmuY7Dt+7pG5Ntrk=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBofjpOyLAo0ONXYxLsaCtLYZeLoQ8PQJcJ/Yj7W
+ zyXhMLDOQWJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaH46TgAKCRA1o5Of/Hh3
+ bbuSD/4gFbWhzeR+tVZuf0kiaqgTVijBmROJRRucZPMDRgtNQrGZ/Evlr35NrgjW14xVqH6eLQR
+ Vb7bWxOuSi03FxOdGvneY07SpwkTXoPhSuscXU1eSnzFlQ5xtmpNITyNzr8m73wpjolF22L0bsl
+ lne+LSJyadDFwV3aR2xIQcHXgVZoZ0iRZ9T1VkYVL2Z8la5VkpV/3B6MMkI58vR91KFzKUV/sry
+ X7NW2D+hAhEl1Ueq+pB40aTseh1qSlwMfGfWzQMQGWxTOQlkr+FCBlOH4UMpSzIpyESW7aed3S5
+ g3hWTyebIk18qQkkJYJjbPloofir3Sb1mKocOQn6SE5iHhD2Z3O1tlVjKJvziaLe1UD7TUv92XJ
+ vGMiplNaP25HJBTg5hCjbIoI7kgbFQgX3jvB5dZsMyfNYBmQV1hX94BOpfefoQ+FCy/bErTpCtX
+ vUni/BT2amLY12I+qP76fMvsrpJvElrikAVOt8RAxPZJh71UFOXRd88fJjV0FXcUR1lzzO3S5FO
+ 9MhQ3IVg9ngivVOG8gcUV+4CIsaoK+JoasI9unsBvxBPtTI79ju9oAIwtf+k7SbE9gKtpmtvzld
+ HJprD8lfAAYnAUYiZrdUrIKMJpXwOM545EGFvA7dGNiJc8oAoX6h/pcHJwfSKrGcCAPDimdezYw
+ mNyHIazYlv6bhFA==
 X-Developer-Key: i=leitao@debian.org; a=openpgp;
  fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Clean up the inet_addr union by removing unused fields that are
-redundant with existing members:
+Move netpoll_parse_ip_addr() earlier in the file to be reused in
+other functions, such as local_ip_store(). This avoids duplicate
+address parsing logic and centralizes validation for both IPv4
+and IPv6 string input.
 
-This simplifies the union structure while maintaining all necessary
-functionality for both IPv4 and IPv6 address handling.
+No functional changes intended.
 
 Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- include/linux/netpoll.h | 3 ---
- 1 file changed, 3 deletions(-)
+ drivers/net/netconsole.c | 40 ++++++++++++++++++++--------------------
+ 1 file changed, 20 insertions(+), 20 deletions(-)
 
-diff --git a/include/linux/netpoll.h b/include/linux/netpoll.h
-index 735e65c3cc114..b5ea9882eda8b 100644
---- a/include/linux/netpoll.h
-+++ b/include/linux/netpoll.h
-@@ -15,10 +15,7 @@
- #include <linux/refcount.h>
+diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+index e3722de08ea9f..8d1b93264e0fd 100644
+--- a/drivers/net/netconsole.c
++++ b/drivers/net/netconsole.c
+@@ -300,6 +300,26 @@ static void netconsole_print_banner(struct netpoll *np)
+ 	np_info(np, "remote ethernet address %pM\n", np->remote_mac);
+ }
  
- union inet_addr {
--	__u32		all[4];
- 	__be32		ip;
--	__be32		ip6[4];
--	struct in_addr	in;
- 	struct in6_addr	in6;
- };
++static int netpoll_parse_ip_addr(const char *str, union inet_addr *addr)
++{
++	const char *end;
++
++	if (!strchr(str, ':') &&
++	    in4_pton(str, -1, (void *)addr, -1, &end) > 0) {
++		if (!*end)
++			return 0;
++	}
++	if (in6_pton(str, -1, addr->in6.s6_addr, -1, &end) > 0) {
++#if IS_ENABLED(CONFIG_IPV6)
++		if (!*end)
++			return 1;
++#else
++		return -1;
++#endif
++	}
++	return -1;
++}
++
+ #ifdef	CONFIG_NETCONSOLE_DYNAMIC
  
+ /*
+@@ -1742,26 +1762,6 @@ static void write_msg(struct console *con, const char *msg, unsigned int len)
+ 	spin_unlock_irqrestore(&target_list_lock, flags);
+ }
+ 
+-static int netpoll_parse_ip_addr(const char *str, union inet_addr *addr)
+-{
+-	const char *end;
+-
+-	if (!strchr(str, ':') &&
+-	    in4_pton(str, -1, (void *)addr, -1, &end) > 0) {
+-		if (!*end)
+-			return 0;
+-	}
+-	if (in6_pton(str, -1, addr->in6.s6_addr, -1, &end) > 0) {
+-#if IS_ENABLED(CONFIG_IPV6)
+-		if (!*end)
+-			return 1;
+-#else
+-		return -1;
+-#endif
+-	}
+-	return -1;
+-}
+-
+ static int netconsole_parser_cmdline(struct netpoll *np, char *opt)
+ {
+ 	bool ipversion_set = false;
 
 -- 
 2.47.1
