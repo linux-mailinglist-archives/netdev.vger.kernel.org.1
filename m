@@ -1,286 +1,195 @@
-Return-Path: <netdev+bounces-208611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 009FBB0C53A
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 15:31:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D48CB0C53D
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 15:32:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 174067A2FBC
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 13:29:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 570A117EC40
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 13:32:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 493652D46A4;
-	Mon, 21 Jul 2025 13:31:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D68AB191F92;
+	Mon, 21 Jul 2025 13:32:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ap3DUfUF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wd3+3m4X"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A7215227
-	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 13:30:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E73E847F4A
+	for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 13:32:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753104660; cv=none; b=JNnuvHZYqvJYQTcrCXdz7+0EpL1VvKxzU/dU1OIjQNcSWjfSMMGcIeqhfVTtd7OyvyDfFX5Bm6s+fe5baCDBsJpQcD85dlsTcE0tCO6j3nBULtmRoTxt0UGV3gWYQWZvT4Yr1zElAOjfK3SXGR/zgdnpLeND1OhcvWYy253nXHI=
+	t=1753104746; cv=none; b=JWPywTyBAlGOxlso6qrlhAK8GmbC9b/v1iJyw3gSk//Q3wq95wpj/lqHwkjPqS1Ong83SdHNcQ4aENzqyUUNDmAV4jgSZVQazVKsXIMEVIr8GxxHwBValiRexexLN/8oRe8vdOn7C88mGrRMwjDCfLORWjuguG8fILrZfLsNjQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753104660; c=relaxed/simple;
-	bh=7F46WqsFvxAkaMC61oQQHlHQS0W2XJyVo1IJvx8xMm8=;
+	s=arc-20240116; t=1753104746; c=relaxed/simple;
+	bh=sL/WSEaLvUvXoFA0Bk5OKzRJTaW/F8v/BbslWje6YiU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Mhlmr/iK6Jrl0Abplr+MtS4Kh/LYmNWoQzjgaRsoP0C74fosvN6LHCEEwGb7ipBTa0IEY9d16T6Kf6knFCEP1HLwcWE6M1PpuHD9yUJkPm3fc45L0TF+HrEJWQZh8HPB8X/M1+TXaowWygOgqP8SJvXenrBmQMHu0oSZuq1YgKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ap3DUfUF; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <32fc367c-46a4-4c76-b8a8-494bf79a6409@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753104645;
+	 In-Reply-To:Content-Type; b=XHbFY8GiBYjQCGjAOsDrjCEeMKmvvO0wbClf9g60C7nB6rjvkn5Un82F2x0XxkIQlP7h0RkJI/ycSIRvMhbExE24YMnuSX25L7bkkW+JDAVzR8X6hJ2MWivtFB5ardc9VTRqrwwM5cPnM2OkoyBpPEhfuUz8eZqT3F/pmhhFgxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wd3+3m4X; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753104744;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VsHGAxrG6cxSaMcuW0htUsPVqP/hCDwEeZCIAG9Dz/E=;
-	b=ap3DUfUFcKPtB5NdI0b2/5Y1cz46Or4gxlewqJ6ZoHV1gDxc2Fzx+e6EE7eBiWQ5Mz4/Vs
-	l0jfnLNro8y3G3W/Q7Kmgep2HnlR1yKrD7sgmmxYHUH/pYoUwXVKKDpuDgR4VNPfps4jhP
-	WE88tjuLTRroJc4NApm92mvtGZJGjbU=
-Date: Mon, 21 Jul 2025 14:30:40 +0100
+	bh=zndILsIpeYd+Oj83BYP5FYO7Mz/Z3y71Bx4P/KT11Fw=;
+	b=Wd3+3m4XlR4ZyoEfAKm/J05F3uEzTEgO5VovwaMu9LJ+ka2wU86Ryym5RemnUE71V7syXj
+	AiDRTemzPfS21sqDamxIApRYU2uaOtQdbT1V37iY3Mp+hisyoEwSzy5nbe/sRATUouO/b0
+	LxibbiamHzdigr3dt3qZvfVbju0csTA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-686-XsRjmakPPPiyLmVpOQaWjQ-1; Mon, 21 Jul 2025 09:32:19 -0400
+X-MC-Unique: XsRjmakPPPiyLmVpOQaWjQ-1
+X-Mimecast-MFC-AGG-ID: XsRjmakPPPiyLmVpOQaWjQ_1753104739
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-45526e19f43so17268425e9.3
+        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 06:32:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753104738; x=1753709538;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zndILsIpeYd+Oj83BYP5FYO7Mz/Z3y71Bx4P/KT11Fw=;
+        b=T/CmouOPgYg4uwW25TiJNPQrSV2fQguIu9fiycOy5H3UWO3ZYkdd+yqX1OZzn13O0c
+         1/UyZ4Pyizh6FrWPDNroPkJeU/csvZQLOJ644xzKRBXQHJPghVlREw3o5G30GPRESd7O
+         /+VIvDDhKovZENLtRB/E3uxFHm0ZxZHV/Wd9fXvV06JTXyaTUudKchlnF1MWYiNsPfC4
+         QBh/YVTLIXx2Hce0aJzP5k18Bc/RqGl6u4e6RZADCWhLnhojBEwrj8pne2UyIhVx63yY
+         q3i9PHClzyaRvEaAOMnnlT7+cAcfxVyVogNATKfae/oukAjJfp4p8vZp5E2iXKUI3D7n
+         FBkg==
+X-Gm-Message-State: AOJu0Yx/AGRymFrHzM5mQZZstpGBOReT+swEI89orMdB1N4LunejnOAe
+	t4W2bbYGjvokfNDXVxMLl2fU9n9iD9EQC13+InO59MPcUG1LHzrUKoxsiK4yiZjbbrPJWL3l0je
+	nru8hBNm2dQXvymVaSr2ujxqranHSl9VUY+IupPM0B6GMOMDNzRld1M7YPQ==
+X-Gm-Gg: ASbGncsdmOW8lGQbRSeSz6tfYlRt4Qg/3IWJsZT/Atqs4L+hkMtmBCrCBct+lmXPDbO
+	1QVjpJa6u0IuUq/QWHhuVhFNLhOdEs1jYo/vhlWtQicw5w2wLS4wItegvSX8ONnvR6Qi/vz+/xY
+	nwTXFxZQ9avmEc68IDXQLZNBDTbBcWU6V99CmxA0GxLe3IOOF75Ki98EnpuRYB+IUesKvM7mvYB
+	zwreKA32SE06DkmQ+9u8d14jwF1lgulHnuxrjnjBK88j7SYghYCqzKsbZM2c05Gh8VUMMTTRM+m
+	DjWVps0UIrLw/ntYrIRBy2milB2BPGy36wwWDzLeAEsaE0tG8P0tDZuYx4jlat25+fGledUvKjg
+	MTD0a6zNDsX0=
+X-Received: by 2002:a05:600c:6298:b0:442:e9eb:1b48 with SMTP id 5b1f17b1804b1-4563b8f6167mr99357855e9.24.1753104738400;
+        Mon, 21 Jul 2025 06:32:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IExnLjbn9CK0DDuUcxcpA72LDIS2FZ7EhyyitaDg8Q6kjgRnaCac6i1PNNl3OYldlLIienvqQ==
+X-Received: by 2002:a05:600c:6298:b0:442:e9eb:1b48 with SMTP id 5b1f17b1804b1-4563b8f6167mr99357485e9.24.1753104737901;
+        Mon, 21 Jul 2025 06:32:17 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4563b75ca42sm99007245e9.31.2025.07.21.06.32.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Jul 2025 06:32:17 -0700 (PDT)
+Message-ID: <ebc7890c-e239-4a64-99af-df5053245b28@redhat.com>
+Date: Mon, 21 Jul 2025 15:32:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 01/15] net: rnpgbe: Add build support for rnpgbe
-To: Dong Yibo <dong100@mucse.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, corbet@lwn.net, gur.stavi@huawei.com,
- maddy@linux.ibm.com, mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
- gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
- Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
- alexanderduyck@fb.com, richardcochran@gmail.com
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250721113238.18615-1-dong100@mucse.com>
- <20250721113238.18615-2-dong100@mucse.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] tcp: do not set a zero size receive buffer
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, Neal Cardwell <ncardwell@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, "David S. Miller"
+ <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ Matthieu Baerts <matttbe@kernel.org>
+References: <cover.1752859383.git.pabeni@redhat.com>
+ <3e080bdba9981988ff86e120df40a5f0dc6cd033.1752859383.git.pabeni@redhat.com>
+ <CANn89i+KCsw+LH1X1yzmgr1wg5Vxm47AbAEOeOnY5gqq4ngH4w@mail.gmail.com>
+ <f8178814-cf90-4021-a3e2-f2494dbf982a@redhat.com>
+ <CANn89i+baSpvbJM6gcbSjZMmWVyvwsFotvH1czui9ARVRjS5Bw@mail.gmail.com>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250721113238.18615-2-dong100@mucse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CANn89i+baSpvbJM6gcbSjZMmWVyvwsFotvH1czui9ARVRjS5Bw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 21/07/2025 12:32, Dong Yibo wrote:
-> Add build options and doc for mucse.
-> Initialize pci device access for MUCSE devices.
+On 7/21/25 2:30 PM, Eric Dumazet wrote:
+> On Mon, Jul 21, 2025 at 3:50 AM Paolo Abeni <pabeni@redhat.com> wrote:
+>> On 7/21/25 10:04 AM, Eric Dumazet wrote:
+>>> On Fri, Jul 18, 2025 at 10:25 AM Paolo Abeni <pabeni@redhat.com> wrote:
+>>>>
+>>>> The nipa CI is reporting frequent failures in the mptcp_connect
+>>>> self-tests.
+>>>>
+>>>> In the failing scenarios (TCP -> MPTCP) the involved sockets are
+>>>> actually plain TCP ones, as fallback for passive socket at 2whs
+>>>> time cause the MPTCP listener to actually create a TCP socket.
+>>>>
+>>>> The transfer is stuck due to the receiver buffer being zero.
+>>>> With the stronger check in place, tcp_clamp_window() can be invoked
+>>>> while the TCP socket has sk_rmem_alloc == 0, and the receive buffer
+>>>> will be zeroed, too.
+>>>>
+>>>> Pass to tcp_clamp_window() even the current skb truesize, so that
+>>>> such helper could compute and use the actual limit enforced by
+>>>> the stack.
+>>>>
+>>>> Fixes: 1d2fbaad7cd8 ("tcp: stronger sk_rcvbuf checks")
+>>>> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+>>>> ---
+>>>>  net/ipv4/tcp_input.c | 12 ++++++------
+>>>>  1 file changed, 6 insertions(+), 6 deletions(-)
+>>>>
+>>>> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+>>>> index 672cbfbdcec1..c98de02a3c57 100644
+>>>> --- a/net/ipv4/tcp_input.c
+>>>> +++ b/net/ipv4/tcp_input.c
+>>>> @@ -610,24 +610,24 @@ static void tcp_init_buffer_space(struct sock *sk)
+>>>>  }
+>>>>
+>>>>  /* 4. Recalculate window clamp after socket hit its memory bounds. */
+>>>> -static void tcp_clamp_window(struct sock *sk)
+>>>> +static void tcp_clamp_window(struct sock *sk, int truesize)
+>>>
+>>>
+>>> I am unsure about this one. truesize can be 1MB here, do we want that
+>>> in general ?
+>>
+>> I'm unsure either. But I can't think of a different approach?!? If the
+>> incoming truesize is 1M the socket should allow for at least 1M rcvbuf
+>> size to accept it, right?
 > 
-> Signed-off-by: Dong Yibo <dong100@mucse.com>
-> ---
->   .../device_drivers/ethernet/index.rst         |   1 +
->   .../device_drivers/ethernet/mucse/rnpgbe.rst  |  21 ++
->   MAINTAINERS                                   |   8 +
->   drivers/net/ethernet/Kconfig                  |   1 +
->   drivers/net/ethernet/Makefile                 |   1 +
->   drivers/net/ethernet/mucse/Kconfig            |  34 +++
->   drivers/net/ethernet/mucse/Makefile           |   7 +
->   drivers/net/ethernet/mucse/rnpgbe/Makefile    |   9 +
->   drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |  33 +++
->   .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   | 226 ++++++++++++++++++
->   10 files changed, 341 insertions(+)
->   create mode 100644 Documentation/networking/device_drivers/ethernet/mucse/rnpgbe.rst
->   create mode 100644 drivers/net/ethernet/mucse/Kconfig
->   create mode 100644 drivers/net/ethernet/mucse/Makefile
->   create mode 100644 drivers/net/ethernet/mucse/rnpgbe/Makefile
->   create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
->   create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
+> What I meant was :
 > 
-> diff --git a/Documentation/networking/device_drivers/ethernet/index.rst b/Documentation/networking/device_drivers/ethernet/index.rst
-> index 40ac552641a3..0e03c5c10d30 100644
-> --- a/Documentation/networking/device_drivers/ethernet/index.rst
-> +++ b/Documentation/networking/device_drivers/ethernet/index.rst
-> @@ -61,6 +61,7 @@ Contents:
->      wangxun/txgbevf
->      wangxun/ngbe
->      wangxun/ngbevf
-> +   mucse/rnpgbe
->   
->   .. only::  subproject and html
->   
-> diff --git a/Documentation/networking/device_drivers/ethernet/mucse/rnpgbe.rst b/Documentation/networking/device_drivers/ethernet/mucse/rnpgbe.rst
-> new file mode 100644
-> index 000000000000..7562fb6b8f61
-> --- /dev/null
-> +++ b/Documentation/networking/device_drivers/ethernet/mucse/rnpgbe.rst
-> @@ -0,0 +1,21 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +===========================================================
-> +Linux Base Driver for MUCSE(R) Gigabit PCI Express Adapters
-> +===========================================================
-> +
-> +MUCSE Gigabit Linux driver.
-> +Copyright (c) 2020 - 2025 MUCSE Co.,Ltd.
-> +
-> +Identifying Your Adapter
-> +========================
-> +The driver is compatible with devices based on the following:
-> +
-> + * MUCSE(R) Ethernet Controller N500 series
-> + * MUCSE(R) Ethernet Controller N210 series
-> +
-> +Support
-> +=======
-> + If you have problems with the software or hardware, please contact our
-> + customer support team via email at techsupport@mucse.com or check our
-> + website at https://www.mucse.com/en/
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 1bc1698bc5ae..da0d12e77ddc 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -17033,6 +17033,14 @@ T:	git git://linuxtv.org/media.git
->   F:	Documentation/devicetree/bindings/media/i2c/aptina,mt9v111.yaml
->   F:	drivers/media/i2c/mt9v111.c
->   
-> +MUCSE ETHERNET DRIVER
-> +M:	Yibo Dong <dong100@mucse.com>
-> +L:	netdev@vger.kernel.org
-> +S:	Maintained
-> +W:	https://www.mucse.com/en/
-> +F:	Documentation/networking/device_drivers/ethernet/mucse/*
-> +F:	drivers/net/ethernet/mucse/*
-> +
->   MULTIFUNCTION DEVICES (MFD)
->   M:	Lee Jones <lee@kernel.org>
->   S:	Maintained
-> diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
-> index f86d4557d8d7..77c55fa11942 100644
-> --- a/drivers/net/ethernet/Kconfig
-> +++ b/drivers/net/ethernet/Kconfig
-> @@ -202,5 +202,6 @@ source "drivers/net/ethernet/wangxun/Kconfig"
->   source "drivers/net/ethernet/wiznet/Kconfig"
->   source "drivers/net/ethernet/xilinx/Kconfig"
->   source "drivers/net/ethernet/xircom/Kconfig"
-> +source "drivers/net/ethernet/mucse/Kconfig"
->   
->   endif # ETHERNET
-> diff --git a/drivers/net/ethernet/Makefile b/drivers/net/ethernet/Makefile
-> index 67182339469a..696825bd1211 100644
-> --- a/drivers/net/ethernet/Makefile
-> +++ b/drivers/net/ethernet/Makefile
-> @@ -107,3 +107,4 @@ obj-$(CONFIG_NET_VENDOR_XIRCOM) += xircom/
->   obj-$(CONFIG_NET_VENDOR_SYNOPSYS) += synopsys/
->   obj-$(CONFIG_NET_VENDOR_PENSANDO) += pensando/
->   obj-$(CONFIG_OA_TC6) += oa_tc6.o
-> +obj-$(CONFIG_NET_VENDOR_MUCSE) += mucse/
-> diff --git a/drivers/net/ethernet/mucse/Kconfig b/drivers/net/ethernet/mucse/Kconfig
-> new file mode 100644
-> index 000000000000..be0fdf268484
-> --- /dev/null
-> +++ b/drivers/net/ethernet/mucse/Kconfig
-> @@ -0,0 +1,34 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +#
-> +# Mucse network device configuration
-> +#
-> +
-> +config NET_VENDOR_MUCSE
-> +	bool "Mucse devices"
-> +	default y
-> +	help
-> +	  If you have a network (Ethernet) card from Mucse(R), say Y.
-> +
-> +	  Note that the answer to this question doesn't directly affect the
-> +	  kernel: saying N will just cause the configurator to skip all
-> +	  the questions about Mucse(R) cards. If you say Y, you will
-> +	  be asked for your specific card in the following questions.
-> +
-> +if NET_VENDOR_MUCSE
-> +
-> +config MGBE
-> +	tristate "Mucse(R) 1GbE PCI Express adapters support"
-> +	depends on PCI
-> +	select PAGE_POOL
-> +	help
-> +	  This driver supports Mucse(R) 1GbE PCI Express family of
-> +	  adapters.
-> +
-> +	  More specific information on configuring the driver is in
-> +	  <file:Documentation/networking/device_drivers/ethernet/mucse/rnpgbe.rst>.
-> +
-> +	  To compile this driver as a module, choose M here. The module
-> +	  will be called rnpgbe.
-> +
-> +endif # NET_VENDOR_MUCSE
-> +
-> diff --git a/drivers/net/ethernet/mucse/Makefile b/drivers/net/ethernet/mucse/Makefile
-> new file mode 100644
-> index 000000000000..f0bd79882488
-> --- /dev/null
-> +++ b/drivers/net/ethernet/mucse/Makefile
-> @@ -0,0 +1,7 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +#
-> +# Makefile for the Mucse(R) network device drivers.
-> +#
-> +
-> +obj-$(CONFIG_MGBE) += rnpgbe/
-> +
-> diff --git a/drivers/net/ethernet/mucse/rnpgbe/Makefile b/drivers/net/ethernet/mucse/rnpgbe/Makefile
-> new file mode 100644
-> index 000000000000..0942e27f5913
-> --- /dev/null
-> +++ b/drivers/net/ethernet/mucse/rnpgbe/Makefile
-> @@ -0,0 +1,9 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +# Copyright(c) 2020 - 2025 MUCSE Corporation.
-> +#
-> +# Makefile for the MUCSE(R) 1GbE PCI Express ethernet driver
-> +#
-> +
-> +obj-$(CONFIG_MGBE) += rnpgbe.o
-> +
-> +rnpgbe-objs := rnpgbe_main.o
-> diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-> new file mode 100644
-> index 000000000000..224e395d6be3
-> --- /dev/null
-> +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-> @@ -0,0 +1,33 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/* Copyright(c) 2020 - 2025 Mucse Corporation. */
-> +
-> +#ifndef _RNPGBE_H
-> +#define _RNPGBE_H
-> +
-> +enum rnpgbe_boards {
-> +	board_n500,
-> +	board_n210,
-> +	board_n210L,
-> +};
-> +
-> +struct mucse {
-> +	struct net_device *netdev;
-> +	struct pci_dev *pdev;
-> +	/* board number */
-> +	u16 bd_number;
-> +
-> +	char name[60];
-> +};
-> +
-> +/* Device IDs */
-> +#ifndef PCI_VENDOR_ID_MUCSE
-> +#define PCI_VENDOR_ID_MUCSE 0x8848
-> +#endif /* PCI_VENDOR_ID_MUCSE */
+> This is the generic point, accepting skb->truesize as additional input
+> here would make us more vulnerable, or we could risk other
+> regressions.
 
-this should go to include/linux/pci_ids.h without any ifdefs
+Understood, thanks for the clarification.
 
-> +
-> +#define PCI_DEVICE_ID_N500_QUAD_PORT 0x8308
-> +#define PCI_DEVICE_ID_N500_DUAL_PORT 0x8318
-> +#define PCI_DEVICE_ID_N500_VF 0x8309
-> +#define PCI_DEVICE_ID_N210 0x8208
-> +#define PCI_DEVICE_ID_N210L 0x820a
-> +
-> +#endif /* _RNPGBE_H */
+> The question is : why does MPTCP end up here in the first place.
+> Perhaps an older issue with an incorrectly sized sk_rcvbuf ?
 
-[...]
+I collected a few more data. The issue happens even with plain TCP
+sockets[1].
+
+The relevant transfer is on top of the loopback device. The scaling_rate
+rapidly grows to 254 - that is `truesize` and `len` are very near.
+
+The stall happens when the received get in a packet with a slightly less
+'efficient' layout (in the experiment I have handy len is 71424,
+truesize 72320) (almost) filling the receiver window.
+
+On such input, tcp_clamp_window() shrinks the receiver buffer to the
+current rmem usage. The same happens on retransmissions until rcvbuf
+becomes 0.
+
+I *think* that catching only the !sk_rmem_alloc case would avoid the
+stall, but I think it's a bit 'late'. I'm unsure if we could
+preventing/forbidding 'too high' values of scaling_rate? (also I'm
+unsure where to draw the line exactly.
+
+Cheers,
+
+Paolo
+
+
+[1] You can run the relevant test by adding '-t' on the mptcp_connect.sh
+command line, but it will take a lot of time to run the 10-20 iterations
+I need to observe the issue. To make it faster I manually trimmed the
+not relevant test-cases.
+
 
