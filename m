@@ -1,138 +1,105 @@
-Return-Path: <netdev+bounces-208463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66725B0B940
-	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 01:34:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7302B0B98F
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 02:28:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 799FB177631
-	for <lists+netdev@lfdr.de>; Sun, 20 Jul 2025 23:34:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A9DA18975AF
+	for <lists+netdev@lfdr.de>; Mon, 21 Jul 2025 00:28:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C04001EE019;
-	Sun, 20 Jul 2025 23:34:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDE9C39FCE;
+	Mon, 21 Jul 2025 00:28:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="HtzYOxvi"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="0jMgH5A4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C018F40
-	for <netdev@vger.kernel.org>; Sun, 20 Jul 2025 23:34:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B33439ACC;
+	Mon, 21 Jul 2025 00:28:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753054489; cv=none; b=V4wGZxHNQOGMjUUAWNWXKkRV0dXUS5QEvYJyOCfnQMhEWG3lkJtcfZem+Et/IMBro75v4vsnlYebq7b70s/G1d4eUgQ6IPlejIquh96exrMG6ge6ndKU7Mj0JlrHmz9srLlZ24z+23vu8YN1zZyW+1fv8DpMnBWqbeEro9JoH74=
+	t=1753057710; cv=none; b=Ky9Ln96OonWITo+V03kR/Jb9lJP5p6HkNfXw9zh+xE2fx6skKgx0+56W4l9sXVJaKObPa64qZiV3ULMzbBkt3rIgsUiOx3TRcSQHFwjFF5xvU/EeH7UB3afJvsDFw348LUbtZZ+D+JCCkhiFkR3RVPn+S/1MhHFK1Pbxkb58LNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753054489; c=relaxed/simple;
-	bh=NI+8Eq4VSliHky/97RpUFj10olRS0U40xtcVuNx/xxU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NPU2MUcwFkeP2zxH6zdyFPpMV90zxXXcPFLvqiSSQLj0binnvjKn6tLqJaLuC0nhid8lz8nROogVbj2NzMxKdH+YrertNgG3SFCE4qNDLpMIh8dCyTgNHFSY5qXIac0E2HqNFlrcBf/J15hmGjE31rR3+fo6Ukv2suCPgAAHWts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=HtzYOxvi; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2350b1b9129so25179975ad.0
-        for <netdev@vger.kernel.org>; Sun, 20 Jul 2025 16:34:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1753054487; x=1753659287; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jcPHC4qI6byWzbb9o0WBjUc93hSd0obXTbOb6mbjz1M=;
-        b=HtzYOxviS0l+o4JaZuJirQjwYllf4c2wQW9JMk2Pz9xiaZt/BLfu8rVVGQIsXzF8Ca
-         dti2cvhfEMNfnmwSYBhUs527gv7XPQhQ9/8TGHhaAkwUOuxD30K6OURzHltu8IfCvZNY
-         oO10/44orFcpZ/Aj/7N+tH9pYrRffJr2yQm+X0gHhUQyI5bEbBv753av1zAVg8e60+Cb
-         xxlr9VROXWwq3f8gXLxNVHF4RZNdCKc5i5wkP6km/GYQmD9moQNxoQ+JBWd23p6I1Tkz
-         RH1vUKIjk2UqYy4UzbvgNQIslx3srHmpp8dVQWyC6V5k6kr4GeoC721VA9x10MEjYXN6
-         pCIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753054487; x=1753659287;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jcPHC4qI6byWzbb9o0WBjUc93hSd0obXTbOb6mbjz1M=;
-        b=Dqy6IUA7gzngnslzMI6h/TJ2sYSEE9YB+fOBlhOFMVN1sxLzilvtRezsg8TL51hWCI
-         SAcKz0ShSrYxwGp+y7/lY8Q0Pao6U+0FaqCBHbMw79rFkrq10r9uweI1/Yk0L5N1N1bE
-         uNwz//UtcpAh029lvbiqZJof9UvOlVXsmPgLAim8RtkkSghcP0lSC9zrnVadDb9weZJa
-         uF5ACYTc881HypI3isI0uirPoCCOsbbRmmPoe74LxDKOh4H7fdosw68b+zBQKFYQdeRK
-         VMXixbwvZQ+oTIqfKO+khs4P1mgBaAMCDWZdKqqaX1P6qhubbUZFH5res9+qoFt7pPtI
-         bULQ==
-X-Gm-Message-State: AOJu0YyBPlZPxLvlkRPRMqXFM26EZrIAs6Z4KHIBC+QfNmOs0cFmQBMI
-	SNOB2vG98iqZ7HSdK9mZ+fvrL2vcMLhXCwKXCqK9QL6BkoxfVQUIURPi9ev3mmfO4Q==
-X-Gm-Gg: ASbGncv9qpIat0tHCukfrYkHm8Yu0mSTfDRO+jYPND8xvT2IXDt9SzXOUcvkif8jaCv
-	/QcZqd5sLCnbIvqAaUP7+iIsmKQ3lmoV7QcYNMd3EXH8xTu23kC/wvxBIvwC+7e+JEXqIpxBbYm
-	AYiJhcp8TmlRoBlc+76ocMpPy+a6H7yqkOgYKkMEkUmD/VBWpiSknwcQRXhKxDZQd0RTvPWLx+T
-	uPf39GZ8gKHgjqU1FhnbnPub6/ZgXf6E9JiUmWNsJEQfzws8GtJvlwYVnkIDiN8oWg7op0NCVq9
-	xRbqOyqygpUR16CNkAzKgz8RaDdRemXcksCfTz8EExfPBeEw+Y61fOMnREB44bIlDD2gKaRZUSw
-	j3wqvab9jMjL/SyDxD8vqk04nYd+HHOaCkyteY8zOT1s=
-X-Google-Smtp-Source: AGHT+IGnY2n5r+87wwh+diAw6MEDPDp2L9ZVx3jiXiguCPHPEkPuCYIVa1RWwl21HajbqUJCvt0FDw==
-X-Received: by 2002:a17:902:ea01:b0:235:2403:77c7 with SMTP id d9443c01a7336-23e2576e462mr206184985ad.37.1753054487233;
-        Sun, 20 Jul 2025 16:34:47 -0700 (PDT)
-Received: from xps (209-147-138-224.nat.asu.edu. [209.147.138.224])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23e3b5e3d5asm46380775ad.15.2025.07.20.16.34.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 20 Jul 2025 16:34:46 -0700 (PDT)
-Date: Sun, 20 Jul 2025 16:34:44 -0700
-From: Xiang Mei <xmei5@asu.edu>
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, will@willsroot.io,
-	stephen@networkplumber.org
-Subject: Re: [Patch v4 net 2/6] net_sched: Check the return value of
- qfq_choose_next_agg()
-Message-ID: <aH19FKJmOfHHbdYo@xps>
-References: <20250719220341.1615951-1-xiyou.wangcong@gmail.com>
- <20250719220341.1615951-3-xiyou.wangcong@gmail.com>
+	s=arc-20240116; t=1753057710; c=relaxed/simple;
+	bh=7Kd51o6k1umbr4n0ph28myP06Rt8DtYIA2utamP1OEk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OezVy6VM4g62s4K1DOWsQ9CbFsIdgT1d4diY1pun0GdqOmRNKjVB6uj5umNIT0Kljl2q9B/ogM0fQ5Ua1Mj9kT4zdoQwa7Y1u+2auGdWIT7s6DqV1RKPa1EUL4jgl9YnM6sxBp1dQ2+lUzMEyS8onPzIDFYBqEjaE4MmeCF6UFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=0jMgH5A4; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=v0zTumylF7NIXq2YP49hGb5aJyiZ1Yk/J9XUzX2Z1tQ=; b=0jMgH5A4jPtcD2vuEhjKCzYmC1
+	KwHNdV4yKPMyd3eHDjJy9tcDsWPkT4yRtRywXkuWgBc/0v9OruiCdY6+Fh9B385AjVSzFFHFQr4VF
+	qK2W4pmLSSCaogYLrHYcXnmu3EwOH0cAhxKUmcXwFfVgaf1F8H0GuLUjP1y6nkurrLX+yWQTfoNql
+	sBrNgg2KnsfZKNl/ijwlOIDwSFxj5QiBUqo9B4pBiu4ffOkREeP6iLyd0WuweKTNzFThiPpWx6C1I
+	vc3sHB+T8kOl5xv2NxPXjKaE3iDKjTGt9i3B6uvchFC7ydAGcRS4F0L8xn5g24jMNevaD2MD1hu5H
+	aN+0m0cA==;
+Received: from [50.53.25.54] (helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1udeOF-0000000FsLp-46YY;
+	Mon, 21 Jul 2025 00:28:24 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: netdev@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	"Andre B. Oliveira" <anbadeol@gmail.com>,
+	linux-can@vger.kernel.org,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH v2] can: tscan1: CAN_TSCAN1 can depend on PC104
+Date: Sun, 20 Jul 2025 17:28:23 -0700
+Message-ID: <20250721002823.3548945-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250719220341.1615951-3-xiyou.wangcong@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Sat, Jul 19, 2025 at 03:03:37PM -0700, Cong Wang wrote:
-> qfq_choose_next_agg() could return NULL so its return value should be
-> properly checked unless NULL is acceptable.
-> 
-> There are two cases we need to deal with:
-> 
-> 1) q->in_serv_agg, which is okay with NULL since it is either checked or
->    just compared with other pointer without dereferencing. In fact, it
->    is even intentionally set to NULL in one of the cases.
-> 
-> 2) in_serv_agg, which is a temporary local variable, which is not okay
->    with NULL, since it is dereferenced immediately, hence must be checked.
-> 
-> This fix corrects one of the 2nd cases, and leaving the 1st case as they are.
-> 
-> Although this bug is triggered with the netem duplicate change, the root
-> cause is still within qfq qdisc.
-> 
-> Fixes: 462dbc9101ac ("pkt_sched: QFQ Plus: fair-queueing service at DRR cost")
-> Cc: Xiang Mei <xmei5@asu.edu>
-> Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
-> ---
->  net/sched/sch_qfq.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/net/sched/sch_qfq.c b/net/sched/sch_qfq.c
-> index f0eb70353744..f328a58c7b98 100644
-> --- a/net/sched/sch_qfq.c
-> +++ b/net/sched/sch_qfq.c
-> @@ -1147,6 +1147,8 @@ static struct sk_buff *qfq_dequeue(struct Qdisc *sch)
->  		 * choose the new aggregate to serve.
->  		 */
->  		in_serv_agg = q->in_serv_agg = qfq_choose_next_agg(q);
-> +		if (!in_serv_agg)
-> +			return NULL;
->  		skb = qfq_peek_skb(in_serv_agg, &cl, &len);
->  	}
->  	if (!skb)
-> -- 
-> 2.34.1
->
-Reviewed-by: Xiang Mei <xmei5@asu.edu>
+Add a dependency on PC104 to limit (restrict) this driver kconfig
+prompt to kernel configs that have PC104 set.
 
-Thanks for the explanations and fix. The fix makes sense to me.
+Add COMPILE_TEST as a possibility for more complete build coverage.
+I tested this build config on x86_64 5 times without problems.
+
+Fixes: 2d3359f8b9e6 ("can: tscan1: add driver for TS-CAN1 boards")
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Andre B. Oliveira <anbadeol@gmail.com>
+Cc: linux-can@vger.kernel.org
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+---
+v2: add "|| COMPILE_TEST" for build coverage (Vincent)
+
+ drivers/net/can/sja1000/Kconfig |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- linux-next-20250718.orig/drivers/net/can/sja1000/Kconfig
++++ linux-next-20250718/drivers/net/can/sja1000/Kconfig
+@@ -105,7 +105,7 @@ config CAN_SJA1000_PLATFORM
+ 
+ config CAN_TSCAN1
+ 	tristate "TS-CAN1 PC104 boards"
+-	depends on ISA
++	depends on (ISA && PC104) || COMPILE_TEST
+ 	help
+ 	  This driver is for Technologic Systems' TSCAN-1 PC104 boards.
+ 	  https://www.embeddedts.com/products/TS-CAN1
 
