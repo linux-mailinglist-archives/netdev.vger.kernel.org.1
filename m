@@ -1,125 +1,173 @@
-Return-Path: <netdev+bounces-208840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 452E9B0D5B7
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 11:19:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76B8AB0D5CD
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 11:22:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AAFC3B68EB
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 09:19:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71D947A2BD7
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 09:20:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD7223A564;
-	Tue, 22 Jul 2025 09:19:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 773992D5437;
+	Tue, 22 Jul 2025 09:22:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="xRhYhWVS"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="X80OWRUn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC76F2D9793
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 09:19:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ADE31DFFC
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 09:22:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753175993; cv=none; b=VKuyUzK6xH3IA9xclIlemcxzGb4cU5sqv+M1wi5SXsD75dYVkxXHLddSX6RQsTcrRW/634MW/0HE+JoTKYg7Sufa/BkTXzSIyoxGkVg0duMEl1jOXxf47SrYFvoxqoza5IQZL2Z2ItlkILVDrp1IQ5Ig1eJKUUuuL9HOy0JyONk=
+	t=1753176140; cv=none; b=dF6YgkAsKD/2Dk0PEFMibstsQ9NqzP1n0tAWyBlqS2Fvae6y7IbuGk3DAs/x4H6K/eMUWDwXmROAy/Chm+nOVq51L4JaAR4g30G0hTwYko18W27X8k5zaOqPZrAirOr9ldPMFF/vH/SsapULccRJYUE7tmpsxzQYZTl6uWtNHG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753175993; c=relaxed/simple;
-	bh=Nc5LsYBLDXrRSjWDibQSsMSXJGDOtTLIeSfPdkJxZWI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=V6ihW7poTLCqfOuRARedANuUOAvcoNGT/7UbUSngm7WiFxR0B78o6ybSjfOlzWpwH+3QgkEDHAMlnAo4M1YxWlcZGF8kd8EttqwMJ0ZM4hipxF7Y7LoKcYq/2hPN09nuCoDLItam1blJwfBALGHoNujsn7TvbdnMep4Jezk2LV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=xRhYhWVS; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-611f74c1837so10084481a12.3
-        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 02:19:51 -0700 (PDT)
+	s=arc-20240116; t=1753176140; c=relaxed/simple;
+	bh=uYr/vN/QU33ReSJvEevEB5MK/+NOdjeWQPyffLoa+I8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=akZmab6w6/Y8VltPAd5MzoG513XOhofvRsDxtNjxZV1W9HAMGHy9WYpGX28KuqKV0WMfbaaC08xnKCgfRdMchjX3CEQC7J/utdSCIsrVX3IeWRE1XhrP+s3loOYS1fOP/s5k9H7wgYFs2JKUBbniv585ydAmJ+ItKOcxIU8nZzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=X80OWRUn; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-45619d70c72so48042965e9.0
+        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 02:22:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1753175990; x=1753780790; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5CkWrUi8y/EeZjQzOxkKkRJZhHj+VflbRA1dCfIf7WA=;
-        b=xRhYhWVS8QeZaBQINDkLcin1O8O6Ccql0ujdbSE6TdX/PAzWOkP3NviIeEhit3nmJ8
-         ByehyUmgABAcwdJ1RY1JrFRsVtg4Fi9XO4z2CGB/7SASHcV3uGaQ6uFX6XVtfJXIT8V1
-         VSkY/MbcNMv29/kx0ut1fE4Uc31uYxsrqwpPuG2tSUrnVeyEUqDdyCo5wKPd2h1IvHOv
-         QosXQSR8ruuxzOUz+HWOgUsSwlXtd3Kqp3b/VIsp+NEtrmUBJv5l279qOmAkS8sPrB7s
-         NpxvxXVbc8l8LB+m53jGdOlpiRAoHMYGsZflXU+eeGIIRLOuYwbXzyqhQ6qoxzxWoxRG
-         h5Bw==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1753176137; x=1753780937; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=68LTZPICfvpdeBNlynhA03OE6AbJLyW/A+yzTWLxPgc=;
+        b=X80OWRUnsxH1FGHcf5NZWzUZuyf/aRV+Mg7HmAcm8+aaJee9ftRo/nscJ8K6udhYG3
+         0Flexox+s9Ihpi1cF6g1woUQMXZ85bPh1ngGFHjs/MKK3CWp5dsMaLXFakLvw3plE1jJ
+         LR2cZ4iIKGXkyqGTR3gW1AnKrHDMFPlr7W7PfB6osEaOe6lyzVyD28hByrw9x8xkga2f
+         mLwMubqu45XatAyC/DLlINTquocnIN2k9SKQFEMWBMNuFlqBdkT6rkjicr9JKhJD0vwa
+         c7p0++tImueIIC5bzOATFRnAeOXPJ5MmOiuiy3imX0ic84eNGreqmHoYW0952OUtKKGT
+         0ZGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753175990; x=1753780790;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5CkWrUi8y/EeZjQzOxkKkRJZhHj+VflbRA1dCfIf7WA=;
-        b=rKwvfMe5BiT3hA4O6IcJcZAKDNeSy99WE0YI9IRUhqSLD6VohKR6UdP2CkMlfHVVvQ
-         zF/XuNwmDVTYWmRjzGzv5//LN3WDAR3dqYep9IapZVoLtS/+FWfw/irG3l1TJjYZX3we
-         7TRKLZBDxk8SDKvRcKzF0O/EynjowjFU+iDO8vlu5UZI7uRy06SxycMaVkxdebcjVlyH
-         Th8Y3SIDOQbrqn+0bw2tXIz6nq4W8h9g5IOxkah3/iH/lS1/70MI8W+11m6QNJ0lcDqz
-         bAWqR8JtVFZE0K7xIEUPpyu+LRvTVhQG6E4AL9wtYxdDW/V6ODDCQSFw9uIa5DyW3bBV
-         Ay9w==
-X-Forwarded-Encrypted: i=1; AJvYcCXewj9VAqBio8TsrV/b5pkB2uxnfq5OtIjhzfJgo66kkaU0FnrA7QjRkue7KDL9P/kgcRKUeX4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKGZQqpcm0JlyLyPPiJ+t8HtUhkGFpQabc2YZ4ZTaQXfk38W+F
-	cgdAPEE2J35nSOR1V3SUlqgvUJ/M5GMw7lsrumahS9Po1hIPqcoX1Y97ABQj+I4Hf8w=
-X-Gm-Gg: ASbGnctC3KKZInGJKBTrImaZmHSSEGd2g2gNbCC83X8yjpK0sOZn1pTzgZZXkX99M7q
-	ft5clhjaLt52mRVJ7v4mYmRdJlQmoIY46Bb7myoNdiCB1VTetopbalyn/OyqA0/eLAKnIroHTmq
-	/vVDmnvZL93CC+ER7g5uscSK3xCI7OHHAF22AvI+702KFXHXw9SD75WPiyUTpBlCvP9BVyIwUM7
-	TJuqWBlIiWa01z0DkIyFmAb9N2nEUnP/RxYTXhGNWi0f+kJYCA0kK0TvgXki3hLebHBXW3TXFrL
-	sPnHJG4LEwf7zq3gaAWvzRnCXV6sOjdHa5klrF+GmvgPDW6EAQYhVVf9+UQRIxlpTkQiiv0LXhU
-	f+KA6kYTPK62sOzgXtwq27pPEir7n8Aej/BvenUwQD1CWrC2gALvEsA==
-X-Google-Smtp-Source: AGHT+IE/B2CTrIdQjnB1vPNgmhIwDU5QOPxOiUS6LHTb8kkqvCAeLFSRTFWBar5inQPkIGesfWAM1A==
-X-Received: by 2002:a17:907:6095:b0:ae3:bb0a:1cc6 with SMTP id a640c23a62f3a-aec6a4e0c16mr1346682966b.16.1753175989485;
-        Tue, 22 Jul 2025 02:19:49 -0700 (PDT)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aecd96537d7sm729370066b.18.2025.07.22.02.19.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Jul 2025 02:19:49 -0700 (PDT)
-Message-ID: <97be4c1a-f097-4780-b5e6-71c0530f3f49@blackwall.org>
-Date: Tue, 22 Jul 2025 12:19:47 +0300
+        d=1e100.net; s=20230601; t=1753176137; x=1753780937;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=68LTZPICfvpdeBNlynhA03OE6AbJLyW/A+yzTWLxPgc=;
+        b=PsIxyaJJ6rZZHQLmZA8ycB0ToXHqjltrZHiQHrpW4jah/NG34J2g39rqjd6/ao9Fen
+         0QGBFeM8mggrgdj1mr2t4ZoFxuUgYLLpm0umXnHP3/O6dlTkLYRsDWu/R1Bxt8O8oRx3
+         I35sn0Z7AMhEqfsLmZtR8eq0nMPnL268jjT3CLeE4S8cUZiWD/GnkWGJn0VrBzJEJu7z
+         TqGMAnaFWbZXiUzrAqZR/J/tgAhevPEu4zmie3qnKfohmKQCks+bmDVh8ObbdrgTvnr0
+         AOMKXfR/jpDqZ0LZws9E04PRT3IYyKXT2RriBAcVLfab27loGcqugGiQyhiegcFyUq+L
+         V9eA==
+X-Forwarded-Encrypted: i=1; AJvYcCXfEIqN7xWeqEhnxFJDctAbAy8iuU9Dpga+pSSY2LE8j2zqBQebMghY1CY4vrzSVxsDx28c0HQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxg7HK0bNlglpcZAvXkmMj2tJMq3TWIjWDGkx9kYq67RQkMqH2y
+	jU/PINQfzJJr5NNTJmek4LM0HRdwK2Lno+o/TmIN5SMaOEC29eexKKOcbij13g76t8g=
+X-Gm-Gg: ASbGnct5gjP4uggYveJyDNHTrlPsBT+6ar5oagKpWnm9UlEeYAEMXeFjUkK9hQYVSNc
+	C4r9umIklv29Dl6zdaphX91Tar4Z3CJKA6EDOFZ3z8F31d4a0/SV3x+5eVPPNCiJ3pfHHUK2yAo
+	dXi0N/a66zjAdlf0fIgH5WiApR/4lPtNwkZOQIrX8xGheQ94KxehdSmRDENTwnyELU2tC1mFOKh
+	N/J37Bw8XfTKe1SHVvK21vuQDdZFyKzDKt9NTFMRydTwmL1+6Gkp6MFhQ4MIKbvp+k85hoSnEBm
+	SH5MHD7B9XJkIcmGxoIsHKVQlxny4N7+Kfo0AU8ODd50W47GwGbZ/ZSzD0UDXqdFDEeuC07B7Xr
+	+rNmyE2+v/Hz4cJ1tdm2SfTT6
+X-Google-Smtp-Source: AGHT+IFVMdgI84AAnBBQz6sZmRWv62oz1HqGcw1SLKt4wi8dXsCWBwHYMMj3blV9NJZQxxpoW0Qdkw==
+X-Received: by 2002:a05:6000:2012:b0:3b7:590d:ac7d with SMTP id ffacd0b85a97d-3b763488cc5mr2270468f8f.1.1753176136501;
+        Tue, 22 Jul 2025 02:22:16 -0700 (PDT)
+Received: from jiri-mlt ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca2b803sm12548484f8f.19.2025.07.22.02.22.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Jul 2025 02:22:16 -0700 (PDT)
+Date: Tue, 22 Jul 2025 11:22:08 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>, 
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Mark Bloch <mbloch@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, 
+	Cosmin Ratiu <cratiu@nvidia.com>, Gal Pressman <gal@nvidia.com>, 
+	Carolina Jubran <cjubran@nvidia.com>
+Subject: Re: [PATCH net-next] devlink: Fix excessive stack usage in rate TC
+ bandwidth parsing
+Message-ID: <vabulcn5q5hm4qhiol75cwuztq4wijcjkiw4oy4wjckaybbq5m@54xt4qxhwnls>
+References: <1753175609-330621-1-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] vxlan: remove redundant conversion of vni in
- vxlan_nl2conf
-To: Wang Liang <wangliang74@huawei.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, idosch@nvidia.com, petrm@nvidia.com,
- menglong8.dong@gmail.com
-Cc: yuehaibing@huawei.com, zhangchangzhong@huawei.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250722093049.1527505-1-wangliang74@huawei.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250722093049.1527505-1-wangliang74@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1753175609-330621-1-git-send-email-tariqt@nvidia.com>
 
-On 7/22/25 12:30, Wang Liang wrote:
-> The IFLA_VXLAN_ID data has been converted to local variable vni in
-> vxlan_nl2conf(), there is no need to do it again when set conf->vni.
-> 
-> Signed-off-by: Wang Liang <wangliang74@huawei.com>
-> ---
->  drivers/net/vxlan/vxlan_core.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-> index 97792de896b7..77dbfe9a6b13 100644
-> --- a/drivers/net/vxlan/vxlan_core.c
-> +++ b/drivers/net/vxlan/vxlan_core.c
-> @@ -4036,7 +4036,7 @@ static int vxlan_nl2conf(struct nlattr *tb[], struct nlattr *data[],
->  			NL_SET_ERR_MSG_ATTR(extack, tb[IFLA_VXLAN_ID], "Cannot change VNI");
->  			return -EOPNOTSUPP;
->  		}
-> -		conf->vni = cpu_to_be32(nla_get_u32(data[IFLA_VXLAN_ID]));
-> +		conf->vni = vni;
->  	}
->  
->  	if (data[IFLA_VXLAN_GROUP]) {
+Tue, Jul 22, 2025 at 11:13:29AM +0200, tariqt@nvidia.com wrote:
+>From: Carolina Jubran <cjubran@nvidia.com>
+>
+>The devlink_nl_rate_tc_bw_parse function uses a large stack array for
+>devlink attributes, which triggers a warning about excessive stack
+>usage:
+>
+>net/devlink/rate.c: In function 'devlink_nl_rate_tc_bw_parse':
+>net/devlink/rate.c:382:1: error: the frame size of 1648 bytes is larger than 1536 bytes [-Werror=frame-larger-than=]
+>
+>Introduce a separate attribute set specifically for rate TC bandwidth
+>parsing that only contains the two attributes actually used: index
+>and bandwidth. This reduces the stack array from DEVLINK_ATTR_MAX
+>entries to just 2 entries, solving the stack usage issue.
+>
+>Update devlink selftest to use the new 'index' and 'bw' attribute names
+>consistent with the YAML spec.
+>
+>Example usage with ynl with the new spec:
+>
+>    ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml \
+>      --do rate-set --json '{
+>      "bus-name": "pci",
+>      "dev-name": "0000:08:00.0",
+>      "port-index": 1,
+>      "rate-tc-bws": [
+>        {"index": 0, "bw": 50},
+>        {"index": 1, "bw": 50},
+>        {"index": 2, "bw": 0},
+>        {"index": 3, "bw": 0},
+>        {"index": 4, "bw": 0},
+>        {"index": 5, "bw": 0},
+>        {"index": 6, "bw": 0},
+>        {"index": 7, "bw": 0}
+>      ]
+>    }'
+>
+>    ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml \
+>      --do rate-get --json '{
+>      "bus-name": "pci",
+>      "dev-name": "0000:08:00.0",
+>      "port-index": 1
+>    }'
+>
+>    output for rate-get:
+>    {'bus-name': 'pci',
+>     'dev-name': '0000:08:00.0',
+>     'port-index': 1,
+>     'rate-tc-bws': [{'bw': 50, 'index': 0},
+>                     {'bw': 50, 'index': 1},
+>                     {'bw': 0, 'index': 2},
+>                     {'bw': 0, 'index': 3},
+>                     {'bw': 0, 'index': 4},
+>                     {'bw': 0, 'index': 5},
+>                     {'bw': 0, 'index': 6},
+>                     {'bw': 0, 'index': 7}],
+>     'rate-tx-max': 0,
+>     'rate-tx-priority': 0,
+>     'rate-tx-share': 0,
+>     'rate-tx-weight': 0,
+>     'rate-type': 'leaf'}
+>
+>Fixes: 566e8f108fc7 ("devlink: Extend devlink rate API with traffic classes bandwidth management")
+>Reported-by: Arnd Bergmann <arnd@arndb.de>
+>Closes: https://lore.kernel.org/netdev/20250708160652.1810573-1-arnd@kernel.org/
+>Reported-by: kernel test robot <lkp@intel.com>
+>Closes: https://lore.kernel.org/oe-kbuild-all/202507171943.W7DJcs6Y-lkp@intel.com/
+>Suggested-by: Jakub Kicinski <kuba@kernel.org>
+>Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+>Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
+>Tested-by: Carolina Jubran <cjubran@nvidia.com>
+>Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
-
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
