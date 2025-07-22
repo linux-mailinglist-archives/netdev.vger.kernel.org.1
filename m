@@ -1,237 +1,163 @@
-Return-Path: <netdev+bounces-209083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C284B0E3A0
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 20:44:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2C0CB0E3A3
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 20:46:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32B5B16472F
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 18:44:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2A373AFBC5
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 18:46:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1A8927FD48;
-	Tue, 22 Jul 2025 18:44:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFCB1221297;
+	Tue, 22 Jul 2025 18:46:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M5UhMngi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZWbrD07b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C18CF27A90A
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 18:44:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425AB1422DD;
+	Tue, 22 Jul 2025 18:46:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753209888; cv=none; b=NWkROxpLG9LfOhVgQnITTmVYQLSlKdaQH/+duSSjbAwWHbdB3k9DjlZ9RB1SGnnBIXciKnH1aXO0Y6E2693XBDXz4dMH8gz73ZGWT7khAvAMhq3/LIFfmgIgTy3F7MC2BwHjeHdnydSr0weFCYG3dWufFKIoExF+S02ZnkiHWu4=
+	t=1753209989; cv=none; b=dbTCi1o9W3pJJz+8A4rxqHcnPl1AgG9maTiLPuKwZL+Spi8cLKPCEkNbdy+iS6cFZemGMU14RsWxy8pR3M+BxK/gDHDxpXZGrKWvvR4yC/gP3RhEViwOOvHPo26wZH1LWHz79If2Ejl9gDjAf/oGoRcAD9nPby+bxWgkNRjgp4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753209888; c=relaxed/simple;
-	bh=itrNcKQhudxlHz6nnxf1jQLZwfWmm8kG7hBtF03s2no=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=WGs6VhZK5uuEdHErSMIKt4euZ+T9Wm4qvMkdlpcESyAxFI0X3kEBTY/j9tH5Mdm+jRF29gxrmSw07+D1FdfBEBUDPEfJfkwdzfhSeS5KUl1S9Gn9kKdNt7tcDJZheMKR9sa/9onKjBq6q1fJ+x4+vbxE77fAI0XtZNf/sZznByM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M5UhMngi; arc=none smtp.client-ip=209.85.128.44
+	s=arc-20240116; t=1753209989; c=relaxed/simple;
+	bh=s6iHcO7ev7x6SMN/DJPhm0XzVwaWbWWNZcK0pgfVgYg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=WqziB6BsrMKhRhZ3+tWfdNQpg7VMFBymUMxr6dQWKmp1Bx57GtDpZQ1pbwDlf/MAPUQno04fLgdMT7IVAC20jKcirLYNOvUCoD2ESVMdjVtf4KJTvTAFVju+MPnKQIOM8/cbsBUlEbp3uUfMqZNnchJ0xok4EudwfLPlASBlfEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZWbrD07b; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-454f428038eso50815195e9.2
-        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 11:44:46 -0700 (PDT)
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-74b27c1481bso3688876b3a.2;
+        Tue, 22 Jul 2025 11:46:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753209885; x=1753814685; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HOTCcA0sVJmWbrWvruuQSxg0FNsXESwarjl9iM7Q4Xc=;
-        b=M5UhMngiMjfgGkHUbM08+ANkWEP4gmYiv+XuVHkhfv4GwMGVY6B2jVjDNqr1wfKBF1
-         GeZ4uyT1GnhSlHvCZPFbvSeh+qdRbNgjgfY1Ac+jltadJB7MVpQgb7A1JcB5eVN4//9E
-         /saoPrnmFhpNikjvOmghGt+crVIa5eE8yRXPyhNDO0pJKT3uhnbpMaeFCiD2OP/3YaTe
-         nSz8ybUfRKaTq43KJbHpSInqlEkYlFvCivNMXpceKvN990CSmvyIT/QLxpH3fivZoa67
-         7+ZVRreVTOx5WtbOh/u0QV6X8FcU9uwUSNq7GIqnhLrhDypkmSCLqo32av4R+EEZh9RI
-         jhSg==
+        d=gmail.com; s=20230601; t=1753209987; x=1753814787; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=65Az4Wxdxvqs4dOM93HUOKOPXtzUe2vIUQScfGOXooY=;
+        b=ZWbrD07bbO3abNTg//4sacgJGeI1ub3waq4FkTq4cY1o95bmY+y5qbeh1Zjo2AojBT
+         ZEBLRvN/TjP2M9QDiDRU+GKAjLiHZNNyPapaAaVBdn0WyIY9w/+2cBNSbCht5QmKh/1c
+         oIusr7LJcZYInEB8aqewufEGbKGBDU2SqL033A8OKXRYGEgaao/CUcdt6YS6yZl+vHWC
+         Ym7278mhByMLfgvCCBWwzYX4+yQBGmxeMseDQ9LRU8GGyCt4PeDEqssM11LStp0XPQ3V
+         UY0wKuPH7yNZraEq1zP/GwGAeLEEGSZYkaFscs1Ros7SGckp1G3RX1t5ljG1j8PGV5jW
+         ImRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753209885; x=1753814685;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HOTCcA0sVJmWbrWvruuQSxg0FNsXESwarjl9iM7Q4Xc=;
-        b=fSING4x/SydeIRviTp3tZ4+/t4eJqypOngx5RQ7WgsvIj3vTyOQbBAg58+ivAjWMrW
-         b6P4VswNQ8vXp77to5Hm5tBisNdbBUldcJRYL38gxUAifpCYUiP0WEsP2+yShAjjDG8V
-         TQtvvZz6Jh8UBphhCM3quHYcOw0pcjoXNI2nP9PWgSS8ogkI8rggnxPmzx0ufXUim4yu
-         C3ZMO0gnnGhhT7XnNKrP1ml5+bJYWJFQdTQoo0KEQut4uIp7JUa4zG5vmgsahX/lz4T/
-         /NUZQxW/Vo80A7HyMBPNiz1rzQWWsUYnwCdL3If+4Lu/FOKZnRlnkd6lTXMssKDKe3QO
-         eeAw==
-X-Gm-Message-State: AOJu0YxbNWbLiGMhF8sYIOJScdMVZGEl0gqVHqcNS3kGQsjk+4l5lr0I
-	8s5ViIS+VOLqQJ49LW/EMv9tXEEoYMbO2LSdFTC7BLvezIs+YXILmRTeWNeU/NMqoS4=
-X-Gm-Gg: ASbGncukDiwMaWEUrLqfVcLKgAdDwt/f/ItHXo0E0Y0GZ7zDFzD8t2MehlpG5DknF9q
-	3PbAVrgRHictaQ/1h7f+GfLZu70FjtXtRuItTT6USyintBjV4+TJCBC54oKMDnbTeUQZszRol1Y
-	Gnb2jJT9aeLCw+JU4y5/9u1KpIFGmu2Rt/RIn51jAfkO3f+BPiPsNRcdcyu45Uo3ZJQoZp7xLrt
-	00NoKeh96xp9paFg2U6z5TBvOyijrfz8Ir1rKqOBXVLIrzbSmczkBg+yTAnJWTkiPEVOZDkq9Z1
-	HzCO3TGod8xLnn9UJXMCSp3fWRJIS+xg24l1jvjceeNnK1BlyODCVkQAW5ecCAMAzlIwSbJURDf
-	iuCa8fH6VlBT8ymqGUxI6ovsfPPe58aiD2jzGzKpViz4NM69lAG6ywhM=
-X-Google-Smtp-Source: AGHT+IHP0xxji5zFuwBIjarduysoa3wax/GuTDk9vJdn7+616XTdL3/X4MYusoHJLfSNCEbEt/8Mig==
-X-Received: by 2002:a05:6000:4212:b0:3b5:e6bf:8379 with SMTP id ffacd0b85a97d-3b768ef95a4mr263342f8f.28.1753209884766;
-        Tue, 22 Jul 2025 11:44:44 -0700 (PDT)
-Received: from gmail.com (deskosmtp.auranext.com. [195.134.167.217])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca4897bsm14226594f8f.53.2025.07.22.11.44.43
+        d=1e100.net; s=20230601; t=1753209987; x=1753814787;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=65Az4Wxdxvqs4dOM93HUOKOPXtzUe2vIUQScfGOXooY=;
+        b=NTdN1GZy8VHvQEYYV9F6CLI9CkpzW5HHCz6dql+Nk2ixAg3jQQSEoi66sD9+s961rO
+         cEjM9zdKBNb13PCW5+mU98uejfqupDbQMvtux3DeySRQccMAVj6t8Ip0BoPPdeHYMsXK
+         Zb+nGvIP8OpWRzI9pwfwBQCg2GlMhnqHOhQ8/TuKViRYrmEsvAduCtMDrFvRSKLCw3dE
+         +LczD9+nyWZ5iKHm51wu/ov4EdJ8YduemdQoSwFxLlB9KlBy4/er6QGPVCCgXndRnL9p
+         h/6f+ZiOPRfNqIGEDwyv7hzOcRDr9nKLwlC4gVp8vwV5fEGCnwWMDxW0JC+wyWdEjW6J
+         7iFw==
+X-Forwarded-Encrypted: i=1; AJvYcCUDYGb+ZQlTta9CH9OfFlWcpoMca+HSaC3BcU3zxXVIYx5nnwP9tki997Yd4Yn0qQgJfzK64Aql@vger.kernel.org, AJvYcCWbMko6bixHVohGjrdSiVColEU8deZE55625QzFiNtCrHfz4Gz1NiaookNLJwxOEsoB4Vg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYHmzxgMzyBz7+CmSVdbh/LUvAH7z1/ef7Ph6HV5p6u9WTikfq
+	aZLyTL6GQVnRIX2Sm5Y1EilOb6WxzwHMBG5eUeQJ9DNbWJheWRP+JN+3
+X-Gm-Gg: ASbGncstO50jmOdzoBlcu3QKB0Wz0iFJe+NHNm0ySTcWakUHxmBFVNtayUiaYv3Cq1s
+	GVqs7dW9X9GnsxvVXNevy/ZBPLv1d9+qqKnvt4K6fxtvEZ6+IVyVoYHhd3zC43wQTyyE37HA4El
+	6gymscnKrIw5ZTbMq4KUllEhsW3xMD8/Ptu+4DnGOZYAFO/IJM3sXe/AYO0PfWX+zE+NQG4Gpm6
+	q+bSC+aDwArx6xmcAJ8sxwBTgvrcMcybKPS/GjkkjLukYHwzQSQUDAK3iozorStoZES8pzgFFCH
+	FT/YA9wAlZZm0uk4vMLd7SIfE7WcR2lSY/lCQ1HknaYFtos6l1uWAX2VOnnQzQ7qOqwTG31x7Cc
+	mW5sTURsL+11qETDTA/UwytlcRbyab1i8R/MdKuY=
+X-Google-Smtp-Source: AGHT+IESzTrDH63hwTIDvXOMM1+xCLoYCntl6AgTqPbcvSscvyMk3XFrln3OrEiJmMOSjbumuLhTRw==
+X-Received: by 2002:a05:6a21:e85:b0:235:51b8:8d9f with SMTP id adf61e73a8af0-237d701a492mr43974605637.25.1753209987390;
+        Tue, 22 Jul 2025 11:46:27 -0700 (PDT)
+Received: from ?IPv6:2620:10d:c096:14a::281? ([2620:10d:c090:600::1:e6e1])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b3f2fe67facsm7562966a12.9.2025.07.22.11.46.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Jul 2025 11:44:44 -0700 (PDT)
-Date: Tue, 22 Jul 2025 20:44:42 +0200
-From: Mahe Tardy <mahe.tardy@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Yonghong Song <yhs@fb.com>, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>
-Subject: bpf: LLVM BTF inner map struct type def missing
-Message-ID: <aH_cGvgC20iD8qs9@gmail.com>
+        Tue, 22 Jul 2025 11:46:26 -0700 (PDT)
+Message-ID: <83977f81df181ba05a6388f3f542ec027ff44189.camel@gmail.com>
+Subject: Re: [PATCH bpf-next v3 01/10] bpf: Add dynptr type for skb metadata
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Jakub Sitnicki <jakub@cloudflare.com>, bpf@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko
+ <andrii@kernel.org>,  Arthur Fabre <arthur@arthurfabre.com>, Daniel
+ Borkmann <daniel@iogearbox.net>, Eric Dumazet	 <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer	 <hawk@kernel.org>,
+ Jesse Brandeburg <jbrandeburg@cloudflare.com>, Joanne Koong	
+ <joannelkoong@gmail.com>, Lorenzo Bianconi <lorenzo@kernel.org>, Martin
+ KaFai Lau <martin.lau@linux.dev>, Toke
+ =?ISO-8859-1?Q?H=F8iland-J=F8rgensen?= <thoiland@redhat.com>,  Yan Zhai
+ <yan@cloudflare.com>, kernel-team@cloudflare.com, netdev@vger.kernel.org,
+ Stanislav Fomichev	 <sdf@fomichev.me>
+Date: Tue, 22 Jul 2025 11:46:24 -0700
+In-Reply-To: <20250721-skb-metadata-thru-dynptr-v3-1-e92be5534174@cloudflare.com>
+References: 
+	<20250721-skb-metadata-thru-dynptr-v3-0-e92be5534174@cloudflare.com>
+	 <20250721-skb-metadata-thru-dynptr-v3-1-e92be5534174@cloudflare.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
-Hello,
+On Mon, 2025-07-21 at 12:52 +0200, Jakub Sitnicki wrote:
+> Add a dynptr type, similar to skb dynptr, but for the skb metadata access=
+.
+>=20
+> The dynptr provides an alternative to __sk_buff->data_meta for accessing
+> the custom metadata area allocated using the bpf_xdp_adjust_meta() helper=
+.
+>=20
+> More importantly, it abstracts away the fact where the storage for the
+> custom metadata lives, which opens up the way to persist the metadata by
+> relocating it as the skb travels through the network stack layers.
+>=20
+> A notable difference between the skb and the skb_meta dynptr is that writ=
+es
+> to the skb_meta dynptr don't invalidate either skb or skb_meta dynptr
+> slices, since they cannot lead to a skb->head reallocation.
+>=20
+> skb_meta dynptr ops are stubbed out and implemented by subsequent changes=
+.
+>=20
+> Only the program types which can access __sk_buff->data_meta today are
+> allowed to create a dynptr for skb metadata at the moment. We need to
+> modify the network stack to persist the metadata across layers before
+> opening up access to other BPF hooks.
+>=20
+> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+> ---
 
-While writing a BPF prog using map of maps I bumped into this compiler
-bug that GitHub user thediveo and Isovalent colleague Timo Beckers
-already discussed in the cilium/ebpf discussions [^1].
+Acked-by: Eduard Zingerman <eddyz87@gmail.com>
 
-The issue is that a struct only used in a inner map is not included in
-the program BTF, so it needs a dummy declaration elsewhere to work.
 
-For example such program:
+> @@ -2274,7 +2278,8 @@ static bool reg_is_pkt_pointer_any(const struct bpf=
+_reg_state *reg)
+>  static bool reg_is_dynptr_slice_pkt(const struct bpf_reg_state *reg)
+>  {
+>  	return base_type(reg->type) =3D=3D PTR_TO_MEM &&
+> -		(reg->type & DYNPTR_TYPE_SKB || reg->type & DYNPTR_TYPE_XDP);
+> +	       (reg->type &
+> +		(DYNPTR_TYPE_SKB | DYNPTR_TYPE_XDP | DYNPTR_TYPE_SKB_META));
+>  }
 
-	#include "vmlinux.h"
-	#include <bpf/bpf_helpers.h>
+Note: This function is used to identify pointers to packet data that
+      might be stale after call to one of the functions in list [1].
+      Once such pointers are identified, verifier would disallow
+      access through these pointers.
+      dynptr_from_skb_meta() is implemented as:
 
-	struct missing_type {
-		uint64_t foo;
-	};
+        bpf_dynptr_init(ptr, skb, BPF_DYNPTR_TYPE_SKB_META, 0, skb_metadata=
+_len(skb));
 
-	// struct missing_type bar; // commented on purpose
+      here any read or write goes through skb object, not a pointer derived=
+ from it.
+      Given above, is it still necessary to list DYNPTR_FROM_SKB_META here?
+      Or some functions from [1] can change skb_metadata_len(skb)?
 
-	struct {
-		__uint(type, BPF_MAP_TYPE_ARRAY_OF_MAPS);
-		__type(key, uint32_t);
-		__type(value, uint32_t);
-		__uint(max_entries, 16);
-		__array(
-			values, struct {
-				__uint(type, BPF_MAP_TYPE_HASH);
-				__type(key, uint64_t);
-				__type(value, struct missing_type);
-				__uint(max_entries, 32);
-			});
-	} outer_map SEC(".maps");
+[1] https://elixir.bootlin.com/linux/v6.15.7/source/net/core/filter.c#L7989
 
-Then do:
-
-	bpftool btf dump file /sys/kernel/btf/vmlinux format c > vmlinux.h
-	clang -target bpf -g -O2 -c prog.c -o prog.o
-	bpftool btf dump file prog.o
-
-Will result in:
-
-	[1] PTR '(anon)' type_id=3
-	[2] INT 'int' size=4 bits_offset=0 nr_bits=32 encoding=SIGNED
-	[3] ARRAY '(anon)' type_id=2 index_type_id=4 nr_elems=12
-	[4] INT '__ARRAY_SIZE_TYPE__' size=4 bits_offset=0 nr_bits=32 encoding=(none)
-	[5] PTR '(anon)' type_id=6
-	[6] TYPEDEF 'uint32_t' type_id=7
-	[7] TYPEDEF 'u32' type_id=8
-	[8] TYPEDEF '__u32' type_id=9
-	[9] INT 'unsigned int' size=4 bits_offset=0 nr_bits=32 encoding=(none)
-	[10] PTR '(anon)' type_id=11
-	[11] ARRAY '(anon)' type_id=2 index_type_id=4 nr_elems=16
-	[12] PTR '(anon)' type_id=13
-	[13] STRUCT '(anon)' size=32 vlen=4
-		'type' type_id=14 bits_offset=0
-		'key' type_id=16 bits_offset=64
-		'value' type_id=21 bits_offset=128
-		'max_entries' type_id=22 bits_offset=192
-	[14] PTR '(anon)' type_id=15
-	[15] ARRAY '(anon)' type_id=2 index_type_id=4 nr_elems=1
-	[16] PTR '(anon)' type_id=17
-	[17] TYPEDEF 'uint64_t' type_id=18
-	[18] TYPEDEF 'u64' type_id=19
-	[19] TYPEDEF '__u64' type_id=20
-	[20] INT 'unsigned long long' size=8 bits_offset=0 nr_bits=64 encoding=(none)
-	[21] PTR '(anon)' type_id=28
-	[22] PTR '(anon)' type_id=23
-	[23] ARRAY '(anon)' type_id=2 index_type_id=4 nr_elems=32
-	[24] ARRAY '(anon)' type_id=12 index_type_id=4 nr_elems=0
-	[25] STRUCT '(anon)' size=32 vlen=5
-		'type' type_id=1 bits_offset=0
-		'key' type_id=5 bits_offset=64
-		'value' type_id=5 bits_offset=128
-		'max_entries' type_id=10 bits_offset=192
-		'values' type_id=24 bits_offset=256
-	[26] VAR 'outer_map' type_id=25, linkage=global
-	[27] DATASEC '.maps' size=0 vlen=1
-		type_id=26 offset=0 size=32 (VAR 'outer_map')
-	[28] FWD 'missing_type' fwd_kind=struct
-
-You can see that the outer map is [25], with values [24] with type to
-[12] thus [13] and then the value of [13] is [21] which points to type
-[28]. And [28] is a forward declaration. Thus if we try to load this
-program (there's no program but the libbpf error msg is explicit):
-
-	bpftool prog load prog.o /sys/fs/bpf/prog
-
-Output is
-
-	libbpf: map 'outer_map.inner': can't determine value size for type [28]: -22.
-
-Now if you uncomment the commented line in the example (or use this type
-in a function as suggested by Timo), the BTF looks like this:
-
-	[1] PTR '(anon)' type_id=3
-	[2] INT 'int' size=4 bits_offset=0 nr_bits=32 encoding=SIGNED
-	[3] ARRAY '(anon)' type_id=2 index_type_id=4 nr_elems=12
-	[4] INT '__ARRAY_SIZE_TYPE__' size=4 bits_offset=0 nr_bits=32 encoding=(none)
-	[5] PTR '(anon)' type_id=6
-	[6] TYPEDEF 'uint32_t' type_id=7
-	[7] TYPEDEF 'u32' type_id=8
-	[8] TYPEDEF '__u32' type_id=9
-	[9] INT 'unsigned int' size=4 bits_offset=0 nr_bits=32 encoding=(none)
-	[10] PTR '(anon)' type_id=11
-	[11] ARRAY '(anon)' type_id=2 index_type_id=4 nr_elems=16
-	[12] PTR '(anon)' type_id=13
-	[13] STRUCT '(anon)' size=32 vlen=4
-		'type' type_id=14 bits_offset=0
-		'key' type_id=16 bits_offset=64
-		'value' type_id=21 bits_offset=128
-		'max_entries' type_id=22 bits_offset=192
-	[14] PTR '(anon)' type_id=15
-	[15] ARRAY '(anon)' type_id=2 index_type_id=4 nr_elems=1
-	[16] PTR '(anon)' type_id=17
-	[17] TYPEDEF 'uint64_t' type_id=18
-	[18] TYPEDEF 'u64' type_id=19
-	[19] TYPEDEF '__u64' type_id=20
-	[20] INT 'unsigned long long' size=8 bits_offset=0 nr_bits=64 encoding=(none)
-	[21] PTR '(anon)' type_id=27
-	[22] PTR '(anon)' type_id=23
-	[23] ARRAY '(anon)' type_id=2 index_type_id=4 nr_elems=32
-	[24] ARRAY '(anon)' type_id=12 index_type_id=4 nr_elems=0
-	[25] STRUCT '(anon)' size=32 vlen=5
-		'type' type_id=1 bits_offset=0
-		'key' type_id=5 bits_offset=64
-		'value' type_id=5 bits_offset=128
-		'max_entries' type_id=10 bits_offset=192
-		'values' type_id=24 bits_offset=256
-	[26] VAR 'outer_map' type_id=25, linkage=global
-	[27] STRUCT 'missing_type' size=8 vlen=1
-		'foo' type_id=17 bits_offset=0
-	[28] VAR 'bar' type_id=27, linkage=global
-	[29] DATASEC '.bss' size=0 vlen=1
-		type_id=28 offset=0 size=8 (VAR 'bar')
-	[30] DATASEC '.maps' size=0 vlen=1
-		type_id=26 offset=0 size=32 (VAR 'outer_map')
-
-And then the type [27] exists, loading can now proceed.
-
-I tested it with latest LLVM-project head when writing this e789f8bdf369
-("[libc][math] Add Generic Comparison Operations for floating point
-types (#144983)").
-
-If you think it's reasonable to fix, I would be interested looking into
-this.
-
-[^1]: https://github.com/cilium/ebpf/discussions/1658#discussioncomment-12491339
+[...]
 
