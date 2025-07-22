@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-208811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35622B0D3A7
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 09:44:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E854B0D3A6
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 09:44:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AE5756325A
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 07:41:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF85E1886584
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 07:42:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4B0B2D9EF4;
-	Tue, 22 Jul 2025 07:37:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E91AC2E5414;
+	Tue, 22 Jul 2025 07:37:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="hh9mf8Mc"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="PhtDPLo9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 615B228DEE4
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 07:37:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.59.177.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BAFD2D3723
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 07:37:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753169841; cv=none; b=jpbXGCog+tVT3NmbJhK+qwdPYnGZe6/CvfjSfU3W9OoiYVvIScxpC1IkbIcTsEho0h6s4PcDlv4Rt4+67LBx+nctIdvlKcUrRpwFZ6yZ9hjT0+P5cqBUDzXypGYR/8FWmpkKo8LnPidoJvCyz6Ndr/PCcXHiWb96/vtJTfDHScc=
+	t=1753169855; cv=none; b=E0cwlYzSBGNIs7xWDKyXtNAqnMsCTaufFsPGNoJqrdJ2puGaC/2JzDfsLI90lrk9NBVRiOeBFVchxLH6kbvY8cn0hn+r7fWXsZLt3zBP/UKJ8QbEm8aC2ptCm0Dgi23fg3oBdimY8JRfqsdsgIFSSXMK0bCuOK5q3Y793hkeHNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753169841; c=relaxed/simple;
-	bh=TJadM9LJS2tCelUETqRvuerhKGeMiYlqvJ5GxFuV5tY=;
+	s=arc-20240116; t=1753169855; c=relaxed/simple;
+	bh=kbyo0H2bbsDviUujpmI40aEKink0Gsb1aIkKzjjCyK0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AxogWbwC/6MnRsmNZufBuRaT+T4bVPzimU8GAl3r3AcOhK9E7dvx4n6t+Bw2pa6vF7IhLR8cMiMg/VVF8g+iBRle1Erq/GWwuJhV6kyH1TuC05m4FYpaUxy6eJpkloal9LS/cXVhe3za27Tt0+r3vmKSfFFx7iYHn4ln6LF/F+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=hh9mf8Mc; arc=none smtp.client-ip=52.59.177.22
+	 MIME-Version; b=pf8WKTvH1Sy7ggn92rTZYIMf/yIJoxXCJAWtrZDNYZaF+BjY3nYG2/NKFwZXwqMQkGTUsLY/AzKsUCBXsoCgAyeo1Q18MjVfmfnD1dzY9NwhwtEdygg4p3MM/WUJKQNiCaeFTZ2tCq7zXeryfaMLbsmrDD05gLkpPEpYXJmo8jY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=PhtDPLo9; arc=none smtp.client-ip=54.254.200.128
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1753169773;
-	bh=+qa2f3QEhHEuh4QOwcxSpKUWx1Ey8PdHAyuKdLKK9Qg=;
+	s=onoh2408; t=1753169780;
+	bh=m+UXxlrjT5dODP8ALqZgjPieqq+D0qMqbX8YRGfdS4A=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=hh9mf8Mc39i+ypXzkOsf4eXv2b0nYXHjypO6K51HtClWMOgoe8WiUCUOKgNrC7lSO
-	 kswBdHwDqCHODQZxZ6qIfnz8LZ4/eguAmnzJfkAWwhxgggEZRer794/zfwygBOEXsy
-	 Bh700+3qb0A6kf23H6xbSevPD5NtzbaKY2SbGXGs=
-X-QQ-mid: zesmtpip2t1753169713ta05aff85
-X-QQ-Originating-IP: 65xfAki0jxPR9TUF1QvLcfebtVmeg84+TUXILAN6dYc=
+	b=PhtDPLo9y6c3GyaY1DjEYaUY76U9ml1O7VRtDndXyrbmN86To21pHgveN2eryVQJg
+	 2c5sOxBKVLeW2Wpy+Lz7eMoTpl4dD2lKHQvsmUo0HFfMTdLBa06pvmm2psvj23btGW
+	 /Ee+AzhWHJVNqNGDDQ/cB+TWNcM52e0rOCN7vnDE=
+X-QQ-mid: zesmtpip2t1753169721t82d79e29
+X-QQ-Originating-IP: VhBpf0Yvw5Lj6PbKLNVVhr1ZGW55NX9MRAkCLXPkiaM=
 Received: from avenger-e500 ( [localhost])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 22 Jul 2025 15:35:09 +0800 (CST)
+	id ; Tue, 22 Jul 2025 15:35:17 +0800 (CST)
 X-QQ-SSF: 0002000000000000000000000000000
 X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 13454134674662907572
+X-BIZMAIL-ID: 15702502862464076907
 EX-QQ-RecipientCnt: 64
 From: WangYuli <wangyuli@uniontech.com>
 To: wangyuli@uniontech.com
@@ -112,9 +112,9 @@ Cc: airlied@gmail.com,
 	xen-devel@lists.xenproject.org,
 	yujiaoliang@vivo.com,
 	zhanjun@uniontech.com
-Subject: [PATCH v3 5/8] wifi: brcmfmac: Fix typo "notifer"
-Date: Tue, 22 Jul 2025 15:34:28 +0800
-Message-ID: <6CA31F0821E6687F+20250722073431.21983-5-wangyuli@uniontech.com>
+Subject: [PATCH v3 6/8] serial: 8250_dw: Fix typo "notifer"
+Date: Tue, 22 Jul 2025 15:34:29 +0800
+Message-ID: <BD4804BF4FBA1648+20250722073431.21983-6-wangyuli@uniontech.com>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <576F0D85F6853074+20250722072734.19367-1-wangyuli@uniontech.com>
 References: <576F0D85F6853074+20250722072734.19367-1-wangyuli@uniontech.com>
@@ -127,48 +127,48 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: M/0PeaSZFgmfDRY2PH2bScTqkyV/iy+V6VADbsPJ8tC2z1DZyfJx9xoL
-	SKRjJk6SU3TQ54qgg6gYDknA43ANygYmoNRRk5wBFTay5Yx5tD7hnzsoocxTpZ6IR4FHeq3
-	fftvaFKMtl2h7opf+ZrA8pnzutlM0AKlTAE3dxbC5UGmTSFz/nCBZU0YyULVFIhlV/hFATJ
-	WBqQen4PKI1sDevqrBn3u4l5p7/D4788THQGfMBkX2B94KXinRQislG19bv7TrlmEXSf4y1
-	Z/mSFbss76cCTnMemB/gqTrgiblOi3sJmnRDElG60w7IXSNVImh5laRiOK3DB929hDDKfiM
-	8Lf8TMW96cj754g8ix0pmBVGI2tJ3BjhuQTrJFvLSPvEedq5fe9qlxvD7xG2TqxCmOtOYnE
-	no3SmYxivhEWCa9D4jSjo4bbbJ2cm3RDHiDG9me7z5My+WF7B9bR48z+k6hqVG5DAlhCZca
-	ogdjPrUSk6FGl3Hc/efIA+Gh0AsSc8vwwukjkW7KTczTJvA0OS76CqImZqwhv+t+5bhKIk0
-	h19+QI26pb2KkxzWsE+tqSkrdameOQoDllGEEhwRUzIJFBh9Q/Ljg0PyCb9lskndmYgMUv0
-	7Qxu7DTmr9zpMAJxGS3RDIuo0E+dN/pLaCXMl5PZUlxzEBzcn7w2+v4GKrXF4SJLPYa0Ge9
-	IWORIABItuyHkqiWR93lfFJQ4WojL+0p0rz6XZgN+1qSnqjUKssIZSnaf8MLD2GEitPyZRq
-	QDJjaMkKPOHcEzt8oOeRb2UnMFqSeawVIEHh+u7A29CJhxSkglfN/CNMPzf0E+WDvTggpQk
-	i0HNvwZkJKExqMUz6ftC71ud6CLY11IQgZ+JFmaJyvtnrHd8SGHp3ZvRMhGWZD6sDAPk+7S
-	qkORI1RshF9/i15fE4uZbEG3f8+iaLEpQJEW8ulk+6d9Z1V/cBgXWRbgb8euZPwYqsyCBKR
-	H7wU/pvi4HQhwWtKRw7zU9pr6wQ+9oH5MB9ZGQAwb19dMTFu/gqTep+cX3FLlMaOYfvJbUI
-	QvcZcrOuAEPCiL0XZjrc0365mD1yaMoOq64op5/y9Zx9Ei5qZN6sjhEshtWy37ij/YZ2Ghr
-	dA02JSpFcPeVQAdOUeAYBS73VLL7EnFpDhyQqsQhpSGQa9ytZU+sDI=
-X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+X-QQ-XMAILINFO: NUD6C8ibrP4BlpyOlLDI06chYZekOUCZTlSlcpL8dzVHHwru8SSCc+Yf
+	uclUpL6SNW+PshL7oaMfB38E3p9RutDk/H/p+fLXg6OLwHGseLsqad9viM6TvN1ioul8Lqn
+	EHKSRtFC9/zEmyD4nq7HbiUNr6o20OLXsfPgDde8sPosaCWamUMOsfRsuOQFwiL9iWrgTz9
+	WQnx4W6FMtEhEJa0f7ZHQv9AzWNWWPYBxFf/GxFv0SVCWYfe/LDhs+L1RdjrgNDTwhX4uPW
+	TytUw1RsNAngUBWGQio8cl54YfP1KAb3HfrXoSqc/DOCH9l7xs4tvQ2X51QI8JkypQJ3HE5
+	0zvedK5LvOFBDNm5Bvt8lIRjnCoTcbDa3BCB4paP4LuWpl500TOTEo9zuhprepk8ZVe92Kx
+	bvthcCZ2E/IY8EbbXHev2hzsmG3nV78hEIILHUxmTA2fR5ZIovhaoQV/1sLCTYaF0T9tV1F
+	CNmgWgb0JlTHyGeSHE1yWvRxKqYDIITNpKlY8UFR+k7ebW8ZSkAwdYhYnvy6ib5eq4lPLTK
+	F/ojPixmhoHSSl5G6LzYND27bG13jmukknrO3y9KBgsq1SF4BBC6ROaP1S/FLIoW5oNyyWw
+	OeHslp/jNu9uvp8hIRsCI3+CkcFIfJ4XcZHZuWHmswvLcVOHblZJbZWumhH2t+g2OUZ7IFg
+	34O6dCZ718Qmek0M7D5hCUTYKT+DjbiYQ2QouycFLCAdXZUL5ve36UgaeacvuyntJyy6pDF
+	54RV1rXJ/0/60j7CCwEGtERi1V00Hn+H+artdgVdZlXayfHG8omeUFjeWKjXo2N+TB7+OGO
+	UECNUZ3OkYIfksg34le9OlWzACOk/zuGWg3hnMr9is/MNhlI17hvhi/s9JWGs9jzX7je50C
+	sJYnXkFnWVUe6J7GkMN+GY/89bR159kRRyPj+k9wH9L7HMJyDhB/EbJYpSySUfDEIJGxvi1
+	eM4oF4O0MjcDEUpFJ8xFsAaxzaOeC+RQDgcblV6eVUsjLedMxAHQ4Hw1WOWoX605LTVFauJ
+	T6irZALqHy/Y84jN5k7tWxSSItgaNA2qwqVmc8QG0ff9Mg0UKAt3EQbxluYffUQuPcd4gqT
+	AkT/a0rXK+afAttcWoOrdzUMv/XukhMZy0yxgr56bzdo5x99p9yVJ4=
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
 X-QQ-RECHKSPAM: 0
 
 There is a spelling mistake of 'notifer' in the comment which
 should be 'notifier'.
 
-Acked-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 Signed-off-by: WangYuli <wangyuli@uniontech.com>
 ---
- drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.c | 2 +-
+ drivers/tty/serial/8250/8250_dw.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.c b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.c
-index b94c3619526c..bcd56c7c4e42 100644
---- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.c
-+++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.c
-@@ -8313,7 +8313,7 @@ struct brcmf_cfg80211_info *brcmf_cfg80211_attach(struct brcmf_pub *drvr,
- 	cfg->d11inf.io_type = (u8)io_type;
- 	brcmu_d11_attach(&cfg->d11inf);
- 
--	/* regulatory notifer below needs access to cfg so
-+	/* regulatory notifier below needs access to cfg so
- 	 * assign it now.
- 	 */
- 	drvr->config = cfg;
+diff --git a/drivers/tty/serial/8250/8250_dw.c b/drivers/tty/serial/8250/8250_dw.c
+index 1902f29444a1..6d9af6417620 100644
+--- a/drivers/tty/serial/8250/8250_dw.c
++++ b/drivers/tty/serial/8250/8250_dw.c
+@@ -392,7 +392,7 @@ static void dw8250_set_termios(struct uart_port *p, struct ktermios *termios,
+ 	rate = clk_round_rate(d->clk, newrate);
+ 	if (rate > 0) {
+ 		/*
+-		 * Note that any clock-notifer worker will block in
++		 * Note that any clock-notifier worker will block in
+ 		 * serial8250_update_uartclk() until we are done.
+ 		 */
+ 		ret = clk_set_rate(d->clk, newrate);
 -- 
 2.50.0
 
