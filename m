@@ -1,159 +1,158 @@
-Return-Path: <netdev+bounces-208790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E356B0D246
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 08:58:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60E80B0D25D
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 09:12:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A85A3B5B30
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 06:57:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96B055468C9
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 07:12:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D361F2D321F;
-	Tue, 22 Jul 2025 06:56:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6DE728B3E8;
+	Tue, 22 Jul 2025 07:12:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="OOkC2QXm";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Ww7uH3OR"
+	dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b="VqGXw/tv"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
+Received: from mail-internal.sh.cz (mail-internal.sh.cz [95.168.196.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF0B288531;
-	Tue, 22 Jul 2025 06:56:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4865EE56A;
+	Tue, 22 Jul 2025 07:12:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.168.196.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753167398; cv=none; b=AqTS00lP+lbRVvVN6QJ8vxWiz02PEC1VloRieeUs328fz+b3d+gnutnPpn3RSY+Q7eMeA+rZfXVXmghOHifF60wAE4lu61p6/nZms3J70vYiKO4qE9bXpnvG88raIlfmPTCe1/FQvxsdRZqABB3UoaWkD9OqQwF2HEWVhCP5ifk=
+	t=1753168371; cv=none; b=ugJqP8jn0llzE3Kyu5pmJf728V/3xNovw2Sw/zo5VTqfNq9ZCRDHbtfa7KTliH2ObisuFyduFI+5OkQIgehmljkg6VxPhLtP45ArObF9zuBDzI8E7wec4S81cjaHjAOWss2nKSEd00HNb/GoTrlK1RoGQb5qfGGF27yOHn5jaY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753167398; c=relaxed/simple;
-	bh=hFs7T04GEFGyITmeVPHN+VfTjB0+neCcUNoRHF/j2dg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TtoERtbwjhDQMEePIxiDZ/hDCMud3LMtYGyCvXeskM6mmRLaUoPFd6gDHa0WOhiree+7Vf8gZsu7LC2k8pEEkWjPsg8kgRhEdmZiKqiglTcaUI5fpyOjpElnnfsaU90vlJEfgFIsi3uGWGhGs+kFWDBP4/HhU2sAOObGNHavuTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=OOkC2QXm; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Ww7uH3OR; arc=none smtp.client-ip=202.12.124.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfout.stl.internal (Postfix) with ESMTP id 9B4431D0025A;
-	Tue, 22 Jul 2025 02:56:34 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Tue, 22 Jul 2025 02:56:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm2; t=1753167394; x=1753253794; bh=uGY9BsEeIL
-	KTrH/0zTBWPPYxfOItM7EoqFgUX4QR+vU=; b=OOkC2QXmSdiicQajDmYA/yo/y+
-	pJ26TfFIWa4OuTMr14EhG93wRzzplTZbypFFp/HN1T8wJJwgm8aNmX5lfWPI77BI
-	mUobAM+xq3yZqEC2bmGQjjWC6jgVWAE39lKmxpda8nU2CmfKDtklky9z02Q2sVzQ
-	eolG8VvCi/K79Iw9KTa4qaFQORtI++iY8r9RA4EH8vlvEkPkUlal5kMGOt9c+pBy
-	A4k0RDJs2iq3FpOzlk79Ee08xI0qK86pOwESRct/Pj7JUj3yJ12niiVXJqHmRdbe
-	bFINSya2KFNK5EGnstqV+fB9mOJaM1ULVCZwBC09gFLjHQrFKKso1pKjyexg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1753167394; x=1753253794; bh=uGY9BsEeILKTrH/0zTBWPPYxfOItM7EoqFg
-	UX4QR+vU=; b=Ww7uH3OR2njUXo131ozux7laVC8TL6L9TRRLUN9T4CvYbKTOPm9
-	1lJfZD7wFaDJRqfSgl3VBFlXazH+zWcA7z011Uq/WELnUgKmjSlkAOLPxhtz46Su
-	GfGB9AYRXns0oUs6Pz85QGx6Xs2k1kZO9ZeCQZ9X/Ab+il4eEY2Hj6BgDi6n6MHc
-	ZJq3xUxWAL9YPDy5Ww2KemxdpMiFTnln6a6ymaxceXdL7y1ng0ImK1nYFATjCEMM
-	lxTu8IqJcdPKqDIaYcWdmDyjTteUiN3hfZqaePmYc3ev+EFczVio30+CBetKvx6S
-	nuCxefy/xSxulM8o2h3l5h7bgZDDW4YpaGA==
-X-ME-Sender: <xms:ITZ_aIhJSBN057YNdh7MoLh3GwSmM6wbt6LFWIVTUr_0tYwwZRks5g>
-    <xme:ITZ_aBIQ8yNF42Fkp77xf1J0HusOLoGQwhppYUwttkW11xexO_RXr6wkiOI_yqKdj
-    IHvnZlWQrturw>
-X-ME-Received: <xmr:ITZ_aHgYu6KowRxuICXLVmTKAuuY7pBefDioRZdDhV_aBEK_7EOXUdUTwy87-vOdyVNr5mAqrH92K-zbbR6lH-i8UKsKLKghyWD9Cg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdejgedvjecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecunecujfgurhepfffhvfevuffkfhggtggujgesthdtredttd
-    dtvdenucfhrhhomhepifhrvghgucfmjfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecu
-    ggftrfgrthhtvghrnhepheegvdevvdeljeeugfdtudduhfekledtiefhveejkeejuefhtd
-    eufefhgfehkeetnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhf
-    rhhomhepghhrvghgsehkrhhorghhrdgtohhmpdhnsggprhgtphhtthhopedugedpmhhoug
-    gvpehsmhhtphhouhhtpdhrtghpthhtohephihitghonhhgshhrfhihseduieefrdgtohhm
-    pdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtth
-    hopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheplhhinhhugidq
-    uhhssgesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvh
-    hgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehonhgvuhhkuhhmsehsuhhsvgdr
-    tghomhdprhgtphhtthhopeihihgtohhngheskhihlhhinhhoshdrtghn
-X-ME-Proxy: <xmx:ITZ_aP3aC60cyfiH5BO-nMWCdQhauL0TVv73hlmKo4bp96mMRwk6qg>
-    <xmx:ITZ_aNivbrdePE1yK46yePf4vrnAyF0VzdWFTXyM0CJ0zWxrf6A6Iw>
-    <xmx:ITZ_aA_0Z4uBTyoW4_MMbyyTF37JO-eJUaJGPTC3VfTrFlYeMQX-0A>
-    <xmx:ITZ_aJLXBvSlZYERDg1vuIPmM7OgIHoZkvtenaaRM7fel1WOw0dqCw>
-    <xmx:IjZ_aB9EbzJ18qKb2aD9Q7x4cT3KAlO7PjctL8Xb_F0EJAetUYbzGLJH>
-Feedback-ID: i787e41f1:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 22 Jul 2025 02:56:33 -0400 (EDT)
-Date: Tue, 22 Jul 2025 08:56:31 +0200
-From: Greg KH <greg@kroah.com>
-To: yicongsrfy@163.com
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org, oneukum@suse.com, yicong@kylinos.cn
-Subject: Re: [PATCH] net: cdc_ncm: Fix spelling mistakes
-Message-ID: <2025072223-frugally-dish-fcdf@gregkh>
-References: <2025072210-spherical-grating-a779@gregkh>
- <20250722065143.1272366-1-yicongsrfy@163.com>
+	s=arc-20240116; t=1753168371; c=relaxed/simple;
+	bh=utRuUgk1dUsACGv3NH/GunBOaa5y/TynhaYYqHE4lYA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=StQl7PXy1xcbvQ4izpyBAQlIfh9z6aZ3Gcv5pv/btGtq+xeR8c2/3TSf9S4WFd8kxzNgU6ozI0QyKeDKt6wgSOA0oYwo6pfwnT0+XVxo73Nsz5i9XjUO7oWTCncUtWKhDKji9Z4Cxwxq0rDFnoNfJfPJ9AQ0sllQVxCEwWBmgS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com; spf=pass smtp.mailfrom=cdn77.com; dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b=VqGXw/tv; arc=none smtp.client-ip=95.168.196.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cdn77.com
+DKIM-Signature: a=rsa-sha256; t=1753168360; x=1753773160; s=dkim2019; d=cdn77.com; c=relaxed/relaxed; v=1; bh=G9jb3st1obP8Gd9xyUJPV6c8IdsyENVMCWvoYCoWByc=; h=From:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Transfer-Encoding;
+   b=VqGXw/tvesgG2gtVuhtJPArWgMROI/mJTgqt4ysZzUMxE4eZ+kpBLHKXDksPjpIGJU681T4/wa9AiBHeyCX8D9opXNgKO/xIdL9B1hKZ0LifSKviL7bloYmI32xmTnXnrhhGi+ngUmgp6+8JQbLPG2kkczyvAUdI0u9CNZ6W6j4=
+Received: from osgiliath.superhosting.cz ([80.250.18.198])
+        by mail.sh.cz (14.1.0 build 16 ) with ASMTP (SSL) id 202507220912390266;
+        Tue, 22 Jul 2025 09:12:39 +0200
+From: Daniel Sedlak <daniel.sedlak@cdn77.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Yosry Ahmed <yosry.ahmed@linux.dev>,
+	linux-mm@kvack.org,
+	netdev@vger.kernel.org,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Michal Hocko <mhocko@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Muchun Song <muchun.song@linux.dev>,
+	cgroups@vger.kernel.org
+Cc: Daniel Sedlak <daniel.sedlak@cdn77.com>,
+	Matyas Hurtik <matyas.hurtik@cdn77.com>
+Subject: [PATCH v3] memcg: expose socket memory pressure in a cgroup
+Date: Tue, 22 Jul 2025 09:11:46 +0200
+Message-ID: <20250722071146.48616-1-daniel.sedlak@cdn77.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250722065143.1272366-1-yicongsrfy@163.com>
+Content-Transfer-Encoding: 8bit
+X-CTCH: RefID="str=0001.0A002102.687F39E7.007F,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0"; Spam="Unknown"; VOD="Unknown"
 
-On Tue, Jul 22, 2025 at 02:51:43PM +0800, yicongsrfy@163.com wrote:
-> On Tue, 22 Jul 2025 07:46:34 +0200	[thread overview] Greg <greg@kroah.com> wrote:
-> >
-> > On Tue, Jul 22, 2025 at 10:32:59AM +0800, yicongsrfy@163.com wrote:
-> > > From: Yi Cong <yicong@kylinos.cn>
-> > >
-> > > According to the Universal Serial Bus Class Definitions for
-> > > Communications Devices v1.2, in chapter 6.3.3 table-21:
-> > > DLBitRate(downlink bit rate) seems like spelling error.
-> > >
-> > > Signed-off-by: Yi Cong <yicong@kylinos.cn>
-> > > ---
-> > >  drivers/net/usb/cdc_ncm.c    | 2 +-
-> > >  include/uapi/linux/usb/cdc.h | 2 +-
-> > >  2 files changed, 2 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/drivers/net/usb/cdc_ncm.c b/drivers/net/usb/cdc_ncm.c
-> > > index 34e82f1e37d9..057ad1cf0820 100644
-> > > --- a/drivers/net/usb/cdc_ncm.c
-> > > +++ b/drivers/net/usb/cdc_ncm.c
-> > > @@ -1847,7 +1847,7 @@ cdc_ncm_speed_change(struct usbnet *dev,
-> > >  		     struct usb_cdc_speed_change *data)
-> > >  {
-> > >  	/* RTL8156 shipped before 2021 sends notification about every 32ms. */
-> > > -	dev->rx_speed = le32_to_cpu(data->DLBitRRate);
-> > > +	dev->rx_speed = le32_to_cpu(data->DLBitRate);
-> > >  	dev->tx_speed = le32_to_cpu(data->ULBitRate);
-> > >  }
-> > >
-> > > diff --git a/include/uapi/linux/usb/cdc.h b/include/uapi/linux/usb/cdc.h
-> > > index 1924cf665448..f528c8e0a04e 100644
-> > > --- a/include/uapi/linux/usb/cdc.h
-> > > +++ b/include/uapi/linux/usb/cdc.h
-> > > @@ -316,7 +316,7 @@ struct usb_cdc_notification {
-> > >  #define USB_CDC_SERIAL_STATE_OVERRUN		(1 << 6)
-> > >
-> > >  struct usb_cdc_speed_change {
-> > > -	__le32	DLBitRRate;	/* contains the downlink bit rate (IN pipe) */
-> > > +	__le32	DLBitRate;	/* contains the downlink bit rate (IN pipe) */
-> > >  	__le32	ULBitRate;	/* contains the uplink bit rate (OUT pipe) */
-> > >  } __attribute__ ((packed));
-> >
-> > You are changing a structure that userspace sees.  How did you verify
-> > that this is not going to break any existing code out there?
-> 
-> Your question is very valid. I can only guarantee that the devices
-> in my possession do not involve references to the relevant structures,
-> but I'm not sure the behavior of other vendors' implementations,
-> which may vary.
-> 
-> So, perhaps it would be better to keep things as they are?
+This patch is a result of our long-standing debug sessions, where it all
+started as "networking is slow", and TCP network throughput suddenly
+dropped from tens of Gbps to few Mbps, and we could not see anything in
+the kernel log or netstat counters.
 
-Yes please.
+Currently, we have two memory pressure counters for TCP sockets [1],
+which we manipulate only when the memory pressure is signalled through
+the proto struct [2]. However, the memory pressure can also be signaled
+through the cgroup memory subsystem, which we do not reflect in the
+netstat counters. In the end, when the cgroup memory subsystem signals
+that it is under pressure, we silently reduce the advertised TCP window
+with tcp_adjust_rcv_ssthresh() to 4*advmss, which causes a significant
+throughput reduction.
+
+Keep in mind that when the cgroup memory subsystem signals the socket
+memory pressure, it affects all sockets used in that cgroup.
+
+This patch exposes a new file for each cgroup in sysfs which signals
+the cgroup socket memory pressure. The file is accessible in
+the following path.
+
+  /sys/fs/cgroup/**/<cgroup name>/memory.net.socket_pressure
+
+The output value is an integer matching the internal semantics of the
+struct mem_cgroup for socket_pressure. It is a periodic re-arm clock,
+representing the end of the said socket memory pressure, and once the
+clock is re-armed it is set to jiffies + HZ.
+
+Link: https://elixir.bootlin.com/linux/v6.15.4/source/include/uapi/linux/snmp.h#L231-L232 [1]
+Link: https://elixir.bootlin.com/linux/v6.15.4/source/include/net/sock.h#L1300-L1301 [2]
+Co-developed-by: Matyas Hurtik <matyas.hurtik@cdn77.com>
+Signed-off-by: Matyas Hurtik <matyas.hurtik@cdn77.com>
+Signed-off-by: Daniel Sedlak <daniel.sedlak@cdn77.com>
+---
+Changes:
+v2 -> v3:
+- Expose the socket memory pressure on the cgroups instead of netstat
+- Split patch
+- Link: https://lore.kernel.org/netdev/20250714143613.42184-1-daniel.sedlak@cdn77.com/
+
+v1 -> v2:
+- Add tracepoint
+- Link: https://lore.kernel.org/netdev/20250707105205.222558-1-daniel.sedlak@cdn77.com/
+
+
+ mm/memcontrol.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+index 902da8a9c643..8e8808fb2d7a 100644
+--- a/mm/memcontrol.c
++++ b/mm/memcontrol.c
+@@ -4647,6 +4647,15 @@ static ssize_t memory_reclaim(struct kernfs_open_file *of, char *buf,
+ 	return nbytes;
+ }
+ 
++static int memory_socket_pressure_show(struct seq_file *m, void *v)
++{
++	struct mem_cgroup *memcg = mem_cgroup_from_seq(m);
++
++	seq_printf(m, "%lu\n", READ_ONCE(memcg->socket_pressure));
++
++	return 0;
++}
++
+ static struct cftype memory_files[] = {
+ 	{
+ 		.name = "current",
+@@ -4718,6 +4727,11 @@ static struct cftype memory_files[] = {
+ 		.flags = CFTYPE_NS_DELEGATABLE,
+ 		.write = memory_reclaim,
+ 	},
++	{
++		.name = "net.socket_pressure",
++		.flags = CFTYPE_NOT_ON_ROOT,
++		.seq_show = memory_socket_pressure_show,
++	},
+ 	{ }	/* terminate */
+ };
+ 
+
+base-commit: e96ee511c906c59b7c4e6efd9d9b33917730e000
+-- 
+2.39.5
+
 
