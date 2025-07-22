@@ -1,142 +1,119 @@
-Return-Path: <netdev+bounces-208737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A100B0CEC1
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 02:30:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA14EB0CEC4
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 02:34:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9DD5189C159
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 00:30:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F35AE3B8B4D
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 00:33:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B74D1149C4A;
-	Tue, 22 Jul 2025 00:30:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7885347A2;
+	Tue, 22 Jul 2025 00:33:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hNvVM2IL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fv/EL6ZD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B42A2AEFD;
-	Tue, 22 Jul 2025 00:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 198412E36E8
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 00:33:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753144208; cv=none; b=VZGM0d3IPaDQhu3x379odcmK+bVMjmTYUWDTU7HMM1V6H2BCa8hESk0rElXUrHl0JDIfP0L1I3/60pzYkBaRVL1C/HTjgFLf83Y7q+hWZcb/+MSshL+7N/mN6kEttx+m58bzOz77+8yU5dbx8FGDAGnZaeA6ilOuWSLFpnyKwgI=
+	t=1753144439; cv=none; b=KYpdIC40IAYSVLv+j/o2WmbytDclC6fyXcXkdWwW9oWSK72YRDuC+3AmqmR30/ZqDcLOjmoc4ysEs5C46HhpeIqv25Qx1061rU872kqZAFfZX2Zp597j7yE5UJL/GMOI9QKg8+ENP0t6u/9jDQuIk1hgYJYxw3G04NdevoS4464=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753144208; c=relaxed/simple;
-	bh=EuXF+5F3Ni9nk0OZtht9On3rD4KnpjFnW5CiFlFPJ4U=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hqa3FjlFckMqaCMnhW7J6VMlRX9NGOihisqqslpHLZ8ZrmYU9Cr4P9X0sgPmik5dY1Y215KmFKHIKOm6ut0rueI5Ue9IWogtczVx5+9kNVrCpnsFxKlpu8eQiujCKHuD6wFE4WTscypIgXU+1Hj4x5KCt72dAM300paYa8A54PY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hNvVM2IL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18B36C4CEF7;
-	Tue, 22 Jul 2025 00:30:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753144208;
-	bh=EuXF+5F3Ni9nk0OZtht9On3rD4KnpjFnW5CiFlFPJ4U=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hNvVM2ILTkgT2tJhvZUztstWQeW8RdLLShELouOYs4IMW5F81FnEhAePJrVZN1iZA
-	 LnRxGkRwfNx1V3F+vHpPpLbycJ52oZx4as5KD1Mq/OP2a3Mp8141w1YZdOnd6DVZsv
-	 V7ml8aNpHm+5fYhrOWAfCYOCD8sVDD/1+RTYoz8DZFh9IrkYDIgCQCH65Mte84SzNq
-	 LvYA3Xp8xB8zNX49Dx0UTdQhQup4aNiOkynqE5qbV7M+m/hZ8ufSOrMG6F1QJYTJjD
-	 ulTMxFwpCH14Ze7CDqzNDZkRO9nxNX9K8ycX14X03wId75FQ0nHQNR6aiNoKXTLf+J
-	 xYHdQ/G1KxnzQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE02383B267;
-	Tue, 22 Jul 2025 00:30:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1753144439; c=relaxed/simple;
+	bh=wZtlK/fCCRI+E9S5gNjgoVTfYtUgS2d8yDeWriMrCBU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XvGiaj8yTetDFiBNpIK2L+LUvNui/JIQxyCU7AdVYXHZVYqaffUR3qiI+NCaRk1bzg0QPUErEeWA3psZKcFKSmrS5djoQAsEt1L83xC4FNFSch1Wo89+/NNNGgPLQSw64djwnOwq/Om/Dq3XjdReFG4wAWJFM/bdyk1Mn9d+zS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fv/EL6ZD; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-54b10594812so4811380e87.1
+        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 17:33:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753144436; x=1753749236; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wZtlK/fCCRI+E9S5gNjgoVTfYtUgS2d8yDeWriMrCBU=;
+        b=fv/EL6ZDBnfmSYERbg2qrC3CwrB1yg+Hy2wJ0KzR0VO7RUAsDRLdgZADseWOW9EGn9
+         dcujOJt9YaZEbvOBlWQFFx+wj9wbsl20hmbrzmz3xmIpkaZVfbE0rwdQ3fAVZDkBuZLA
+         AHvUQZiru6hOo+Jl+rxOZnDrLWCeMmzIa1qETrQu6i9t8R5pdYURKOjbYEIttwdZQJLb
+         sePwNk4usZtMBIHjVwSb8xD5B8nQXKglZg4FHQEE0WsvV53hq0RehsF7hpYr/zkvaBet
+         bgSPN9SS8HwQlSzjlwN8K06STxhT/Za7i3af8XIqThPEp2kW6MuqHA1W1JWZJA4/92Ps
+         vRZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753144436; x=1753749236;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wZtlK/fCCRI+E9S5gNjgoVTfYtUgS2d8yDeWriMrCBU=;
+        b=owLID8ylnLAx9/uUHn/KSy5I37OB3oNja8shbhUtS1T7ukUgieJF23OMdkll894RCO
+         oLao7kYRPRg0922dkMu9RTaVgaXR90lEbdk4ZHUYXRLKSmWZLJLGD8E2sARbAcfdyDJ7
+         Lhk6tvFmB2GnTrQsAByq88+NvJrmzXvPlSsOdBR2ym1JZJw/t3iOb0rQY8flWRleHL6N
+         l0xRrUYrIqUajRfK3lXRdRk+SZbp51dzqeDXHtf7YJ1uPj6hyBMlQyU9a/UkkdFtn2DL
+         3a8SZoFsZk4nzqU7g5jNxl2lNTrXQUdqgaVWhtXEE8y86s0raDoRrAi1kv5Czh2LePym
+         26ew==
+X-Forwarded-Encrypted: i=1; AJvYcCX6cF25BTAShXgETmDD7/UsyWQNaRc/5/mL5AiUOplg2gxeqJwF2gcx4oYrw3jMHDyinScSvJQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+MnFOPz8rNxcMR50qjYyDniEwUTmsjmNv2baH02mtVaNseBmI
+	pdj11AZfUrLpMb6vA+Kiyd6uQBo1mVxOy7NflAUKDvastbiLm0bzcJ6fFyFo4Fph0AA9MANOP+R
+	M6hXVVu5HeFqiVtWO0w78o6PQJ3t62GEflbZ3t6sK2XRNV+1OMsGF
+X-Gm-Gg: ASbGncvgJZSVHriqQsxilArElR3BqkwVVmcw+1f6VYVJkJWXMGqM7kgGqKJAjZ7RMVK
+	vexZUqN/X/KQGFbBTetHdWx11XVorj0G3Eco8qIPdp2I/rkY8YPDWYtnLyVUooCy+ouJsxlMP9A
+	yEGRrprLaMM98iMIoZctHxnkVLWrIJXsRFn1AhtLXhHIMAPHbJQhYYOqzGMFfXqu6s0qzA2pgCH
+	i+wtKeHsAzv2PXc3eNuwU605e32HJ5jpj8=
+X-Google-Smtp-Source: AGHT+IFPkdz/j0WmlQPf9eirRVv4pzrJfVe9XcNeD9iftAmBq9pNEGWwscLQQrIDHxFF73EFaTg30vEM0mhYbaxj0hs=
+X-Received: by 2002:a05:6512:60f:10b0:553:2645:4e90 with SMTP id
+ 2adb3069b0e04-55a23f903a8mr3918362e87.52.1753144436009; Mon, 21 Jul 2025
+ 17:33:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: stmmac: dwmac-renesas-gbeth: Add PM
- suspend/resume callbacks
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175314422650.243210.16859795582435366531.git-patchwork-notify@kernel.org>
-Date: Tue, 22 Jul 2025 00:30:26 +0000
-References: <20250717071109.8213-1-biju.das.jz@bp.renesas.com>
-In-Reply-To: <20250717071109.8213-1-biju.das.jz@bp.renesas.com>
-To: Biju Das <biju.das.jz@bp.renesas.com>
-Cc: prabhakar.mahadev-lad.rj@bp.renesas.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
- netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- geert+renesas@glider.be, biju.das.au@gmail.com, rmk+kernel@armlinux.org.uk
+References: <20250720-timekeeping_uninit_crossts-v2-1-f513c885b7c2@blochl.de>
+In-Reply-To: <20250720-timekeeping_uninit_crossts-v2-1-f513c885b7c2@blochl.de>
+From: John Stultz <jstultz@google.com>
+Date: Mon, 21 Jul 2025 17:33:43 -0700
+X-Gm-Features: Ac12FXzw8e_7tK347TOtMoDcf7inbuDAbjNTfhyZDD3X2xHKbAXOB6AX_06IwXo
+Message-ID: <CANDhNCpE5KPjdJVsB_UszmA0eePnZTtQ9P-Vye2rJQRhBGFTLw@mail.gmail.com>
+Subject: Re: [PATCH v2] timekeeping: Always initialize use_nsecs when querying
+ time from phc drivers
+To: =?UTF-8?Q?Markus_Bl=C3=B6chl?= <markus@blochl.de>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Stephen Boyd <sboyd@kernel.org>, 
+	Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>, 
+	"Christopher S. Hall" <christopher.s.hall@intel.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, markus.bloechl@ipetronik.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Sun, Jul 20, 2025 at 6:56=E2=80=AFAM Markus Bl=C3=B6chl <markus@blochl.d=
+e> wrote:
+>
+> Most drivers only populate the fields cycles and cs_id in their
+> get_time_fn() callback for get_device_system_crosststamp() unless
+> they explicitly provide nanosecond values.
+> When this new use_nsecs field was added and used most drivers did not
+> care.
+> Clock sources other than CSID_GENERIC could then get converted in
+> convert_base_to_cs() based on an uninitialized use_nsecs which usually
+> results in -EINVAL during the following range check.
+>
+> Pass in a fully initialized system_counterval_t.
+>
+> Fixes: 6b2e29977518 ("timekeeping: Provide infrastructure for converting =
+to/from a base clock")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Markus Bl=C3=B6chl <markus@blochl.de>
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Sounds good. Sorry for sending you down the wrong path, and thanks to
+tglx for lighting the way. :)
+Acked-by: John Stultz <jstultz@google.com>
 
-On Thu, 17 Jul 2025 08:11:06 +0100 you wrote:
-> Add PM suspend/resume callbacks for RZ/G3E SMARC EVK.
-> 
-> The PM deep entry is executed by pressing the SLEEP button and exit from
-> entry is by pressing the power button.
-> 
-> Logs:
-> root@smarc-rzg3e:~# PM: suspend entry (deep)
-> Filesystems sync: 0.115 seconds
-> Freezing user space processes
-> Freezing user space processes completed (elapsed 0.002 seconds)
-> OOM killer disabled.
-> Freezing remaining freezable tasks
-> Freezing remaining freezable tasks completed (elapsed 0.001 seconds)
-> printk: Suspending console(s) (use no_console_suspend to debug)
-> NOTICE:  BL2: v2.10.5(release):2.10.5/rz_soc_dev-162-g7148ba838
-> NOTICE:  BL2: Built : 14:23:58, Jul  5 2025
-> NOTICE:  BL2: SYS_LSI_MODE: 0x13e06
-> NOTICE:  BL2: SYS_LSI_DEVID: 0x8679447
-> NOTICE:  BL2: SYS_LSI_PRR: 0x0
-> NOTICE:  BL2: Booting BL31
-> renesas-gbeth 15c30000.ethernet end0: Link is Down
-> Disabling non-boot CPUs ...
-> psci: CPU3 killed (polled 0 ms)
-> psci: CPU2 killed (polled 0 ms)
-> psci: CPU1 killed (polled 0 ms)
-> Enabling non-boot CPUs ...
-> Detected VIPT I-cache on CPU1
-> GICv3: CPU1: found redistributor 100 region 0:0x0000000014960000
-> CPU1: Booted secondary processor 0x0000000100 [0x412fd050]
-> CPU1 is up
-> Detected VIPT I-cache on CPU2
-> GICv3: CPU2: found redistributor 200 region 0:0x0000000014980000
-> CPU2: Booted secondary processor 0x0000000200 [0x412fd050]
-> CPU2 is up
-> Detected VIPT I-cache on CPU3
-> GICv3: CPU3: found redistributor 300 region 0:0x00000000149a0000
-> CPU3: Booted secondary processor 0x0000000300 [0x412fd050]
-> CPU3 is up
-> dwmac4: Master AXI performs fixed burst length
-> 15c30000.ethernet end0: No Safety Features support found
-> 15c30000.ethernet end0: IEEE 1588-2008 Advanced Timestamp supported
-> 15c30000.ethernet end0: configuring for phy/rgmii-id link mode
-> dwmac4: Master AXI performs fixed burst length
-> 15c40000.ethernet end1: No Safety Features support found
-> 15c40000.ethernet end1: IEEE 1588-2008 Advanced Timestamp supported
-> 15c40000.ethernet end1: configuring for phy/rgmii-id link mode
-> OOM killer enabled.
-> Restarting tasks: Starting
-> Restarting tasks: Done
-> random: crng reseeded on system resumption
-> PM: suspend exit
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v2] net: stmmac: dwmac-renesas-gbeth: Add PM suspend/resume callbacks
-    https://git.kernel.org/netdev/net-next/c/72b4612af36f
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+thanks
+-john
 
