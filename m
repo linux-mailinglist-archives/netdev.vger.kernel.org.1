@@ -1,112 +1,108 @@
-Return-Path: <netdev+bounces-208818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B29E2B0D400
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 09:57:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 275BCB0D405
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 09:58:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F971188E9A8
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 07:58:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B62F73A66D0
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 07:57:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB41A2C326E;
-	Tue, 22 Jul 2025 07:57:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE58C2BEFF3;
+	Tue, 22 Jul 2025 07:57:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="JdcFf6pg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ci6IK1UI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535C32BE057;
-	Tue, 22 Jul 2025 07:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57DF228AAE7
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 07:57:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753171057; cv=none; b=b0QgwqwmSRtaM6jviIDragRELjFQzj77bdVaPz9f4OlqpfvJzo5OkEwEyEab/UIBFVZkGQ081Q0ZzNk1XZkch3jz9dMfatnUR11xfWe+d1/q6j7+kI13Pxlch2Ut4/hTaWDGF5muGkglcuZYCgnJSXM0bchjIM1RSzdSFcwTBF8=
+	t=1753171071; cv=none; b=JZn9rbgRr7wW3osoWRp7E+J0JcvMFcY6BmJagLFUu7eeY6xoA42KvZ82aqiwzGB5kMKMJ0CpynOYHLRFszaSZ82p3sndwoGh02jhTiajSCEt4nmRMLtgMBzT5hKgpMa/EZh83Qv1c9pAbK9TLx5cxCRu3gMT7Iql7e6Ryi2uTgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753171057; c=relaxed/simple;
-	bh=wEUHDmsgHVPe5kSmdb1Wec3UqL9t1n89LTQEk85htD0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c+bjYFj5zhts9XqsCmalseJtrMDO/k1FW8hik5jNKWqA9Rmq2m4ZOXUT7WRueMinpHMuWvY5h3g989Um6Kssa8PnGHBwFvXNJMhauuBEAvj+ZQI+ybpLp3U3oEvymHGBZw+Od20RaAa1xjvOPZF4zrmYnuJovCP8sulZaR3ruqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=JdcFf6pg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E9B5C4CEEB;
-	Tue, 22 Jul 2025 07:57:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1753171056;
-	bh=wEUHDmsgHVPe5kSmdb1Wec3UqL9t1n89LTQEk85htD0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JdcFf6pgjhk/nGBgS+COUsHqDSedZPrRp7PmpD9jj0Sy18W7SgAXvzKROr973tS19
-	 GmDs4Z2sApDs+Xt0VQpiOqw2NeYSo/wv/f2IDtHwKTBYe7ze0KkyW9m1MQ29aRc7hI
-	 g+r9qkREXxILI6FRvwKRc9d4sfo0vJI9m3c+MSdQ=
-Date: Tue, 22 Jul 2025 09:57:33 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: WangYuli <wangyuli@uniontech.com>
-Cc: airlied@gmail.com, akpm@linux-foundation.org,
-	alison.schofield@intel.com, andrew+netdev@lunn.ch,
-	andriy.shevchenko@linux.intel.com, arend.vanspriel@broadcom.com,
-	bp@alien8.de, brcm80211-dev-list.pdl@broadcom.com,
-	brcm80211@lists.linux.dev, colin.i.king@gmail.com,
-	cvam0000@gmail.com, dan.j.williams@intel.com,
-	dave.hansen@linux.intel.com, dave.jiang@intel.com,
-	dave@stgolabs.net, davem@davemloft.net,
-	dri-devel@lists.freedesktop.org, edumazet@google.com,
-	guanwentao@uniontech.com, hpa@zytor.com,
-	ilpo.jarvinen@linux.intel.com, intel-xe@lists.freedesktop.org,
-	ira.weiny@intel.com, j@jannau.net, jeff.johnson@oss.qualcomm.com,
-	jgross@suse.com, jirislaby@kernel.org, johannes.berg@intel.com,
-	jonathan.cameron@huawei.com, kuba@kernel.org, kvalo@kernel.org,
-	kvm@vger.kernel.org, linux-cxl@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-serial@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux@treblig.org,
-	lucas.demarchi@intel.com, marcin.s.wojtas@gmail.com,
-	ming.li@zohomail.com, mingo@kernel.org, mingo@redhat.com,
-	netdev@vger.kernel.org, niecheng1@uniontech.com,
-	oleksandr_tyshchenko@epam.com, pabeni@redhat.com,
-	pbonzini@redhat.com, quic_ramess@quicinc.com, ragazenta@gmail.com,
-	rodrigo.vivi@intel.com, seanjc@google.com, shenlichuan@vivo.com,
-	simona@ffwll.ch, sstabellini@kernel.org, tglx@linutronix.de,
-	thomas.hellstrom@linux.intel.com, vishal.l.verma@intel.com,
-	x86@kernel.org, xen-devel@lists.xenproject.org,
-	yujiaoliang@vivo.com, zhanjun@uniontech.com
-Subject: Re: [PATCH v2 6/8] serial: 8250_dw: Fix typo "notifer"
-Message-ID: <2025072252-halves-sadness-18dc@gregkh>
-References: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
- <2BF1749F02ADE664+20250715134407.540483-6-wangyuli@uniontech.com>
- <2025071607-outbid-heat-b0ba@gregkh>
- <634BA467821D37FE+0b2ace38-07d9-4500-8bb7-5a4fa65c4b9f@uniontech.com>
+	s=arc-20240116; t=1753171071; c=relaxed/simple;
+	bh=YbX2SuCv9kohVPOE5H49XJHYjDUoiAEpAoIvflUwGZY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kJMNM51GCEKtWqwgDBdsV7S57/bEhxb3C665s/9mQsZEvVCvgp34ddYWRWTXtrQjyYohUcSMdBIXOGntByfGTAVmAMa3yeXrnkojxeA9jOO98be0JJo4a/P3R6pZPCGyGXBLMT4sB62ePfsraYcWaRu0sX7+J+ORhZYUNoVAuZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ci6IK1UI; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4ab3802455eso68013811cf.2
+        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 00:57:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753171069; x=1753775869; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Zq8b+Loz1K89tfD9iGwwhI73OX1oOOF1Fuc/hSZ/ALA=;
+        b=Ci6IK1UIjTk/aDsHtwUS4W5dwvdOYATLoRlm8+cAzdeZrzbfvX/60v4EXBLhpzPbeQ
+         oAcARMsdFIXTCXSWFgr9i3WRjuuTc2VUVKu3WcheQt0Ri8Xnf10/RjbRNKJAgffwU0Eq
+         1P54CrVP5lF97BKALP+L50hHt/hAyWEJb4C7t+ctLTJK2QpUrBDZDgEsFw80NqtpaHc7
+         h47WnAaOZFA8Jt2snyA2SDW5KoE4SzxTYDMSn0q5o3OMEsN/pB4vsNBV6K+oN7GAyu7K
+         2StYFNvt0SPMiXX8WMD8cvyxxSd4vtuHb733XoXohmWDxJeBSfh4ojrMgDR0/xoaj/2h
+         lIlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753171069; x=1753775869;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Zq8b+Loz1K89tfD9iGwwhI73OX1oOOF1Fuc/hSZ/ALA=;
+        b=oRqhXJsYL91v2twDUJR/9ug3aDfCd3rHiTKFg55tvBg/zF2G+s/zAAN4BQ7yV7z3DT
+         MWTMlNVoQNcFZJiCZEEWZIV1xHwMCouyr4pIzFRL7Jjn/GFlkzSPPapeVx2q3pXiZmb3
+         IfQGhWa0vc6axhs1Rmoz8qFv6/+G82+bjG92Zdvj8LJCef7lEAkNtNz1Yjpab9zBGS8g
+         tnp+YVjh25qoCNMDZBmJf+xn4hpq30tPwy3ON4c9/qkrugTO2dgdJgNHzMKC0ut6SMCx
+         buCbuiRnlFnsiF4cRnVCVT8xsCShHPTy9UzQ/zFm+2T385eu+805sIWm73JBL9aHyVhM
+         Gibw==
+X-Forwarded-Encrypted: i=1; AJvYcCX9A+ywHluVoa1p0YOex3JO9sAVB7rPMupYYcoWkNi2lBf3xDEP4DuvcelPvji4Qy74Po/eBK8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3iBSE3n8Q43ralOE/lzKleDSq0SK3AH8fnYGHGfwMsUehOo/j
+	KVNRaVmNNdOOms0ymgCNHoswedEC7QAqeGqrmIiUZpKfk2Rrvb7zjWt36yDrbype9WW2YUg2vNQ
+	WbVgzmKsNKbjLQzPiLPd5COGDFq5tUx+46gq6e4p6
+X-Gm-Gg: ASbGncs6fCySzDCRko02JvrjkoAfIYk/7M4AEkK4qBo77dWt2DZq+9MfQ5eF2KlVU4+
+	kw5yB8rx3Nr7dCkIUYfG2mo0WwpUsedJRPp8rqtW8ENkYJwwUvNbwE1Qy2B+bowkmNHeB6ccBAX
+	uXGAjwdn/L5HbMUS/UkEIovhFQQnZyHx2WZKZJNHBhqCDWObpw7ou5Hpb6SoymIYZaDckNlmO18
+	r6/pg==
+X-Google-Smtp-Source: AGHT+IH5JT501c03HpS5tYWvBZUUIsqAWCnI0IFwDHukriQgcfTKFZ0Tt34HFIdkazhCLwFipSwNs+2WND7h/Ha9DQg=
+X-Received: by 2002:ac8:57d3:0:b0:4ab:6d9a:5057 with SMTP id
+ d75a77b69052e-4aba3e1a2dfmr272475181cf.42.1753171068870; Tue, 22 Jul 2025
+ 00:57:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <634BA467821D37FE+0b2ace38-07d9-4500-8bb7-5a4fa65c4b9f@uniontech.com>
+References: <20250722030727.1033487-1-skhawaja@google.com>
+In-Reply-To: <20250722030727.1033487-1-skhawaja@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 22 Jul 2025 00:57:37 -0700
+X-Gm-Features: Ac12FXzEZJVoyvhHVY9U6eoQAoQQ_a98L48Gbwd-LiPKHEQRQSQLlRhZbMY09WU
+Message-ID: <CANn89iLB8=8NdjD2TPd_Tt22q-z1zBfgY=Spm5K1n1+M93HF+A@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 1/3] net: Create separate gro_flush_normal function
+To: Samiullah Khawaja <skhawaja@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, willemb@google.com, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 22, 2025 at 03:22:18PM +0800, WangYuli wrote:
-> Hi greg k-h,
-> 
-> On 2025/7/16 16:08, Greg KH wrote:
-> > > Signed-off-by: WangYuli <wangyuli@uniontech.com>
-> > Is your name all one word like that, or should there be a " " between
-> > them?
-> 
-> If I were to follow Western naming conventions, my name would be written as
-> 'Yuli Wang'.
-> 
-> However, frankly, I find it unnecessary and can't be bothered to follow
-> their customs, unless a maintainer strongly insists. (For example, you can
-> see that my signature on commits for the LoongArch subsystem is different
-> from my other contributions).
-> 
-> Since Chinese names are written without any spaces in Chinese characters, I
-> don't think it matters.
+On Mon, Jul 21, 2025 at 8:07=E2=80=AFPM Samiullah Khawaja <skhawaja@google.=
+com> wrote:
+>
+> Move multiple copies of same code snippet doing `gro_flush` and
+> `gro_normal_list` into separate helper function.
+>
+> Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> ---
+>
+> v6:
+>  - gro_flush_helper renamed to gro_flush_normal and moved to gro.h. Also
+>    used it in kernel/bpf/cpumap.c
+>
 
-Then use your Chinese name, don't feel like you need to change it to any
-other naming convention.  There's no requirement here at all to do so.
-
-thanks,
-
-greg k-h
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
