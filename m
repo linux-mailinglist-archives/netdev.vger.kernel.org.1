@@ -1,246 +1,101 @@
-Return-Path: <netdev+bounces-208949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5378BB0DAA2
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 15:19:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92709B0DAA5
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 15:19:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8839B1655F4
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 13:19:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7D6997A2D29
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 13:18:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7504828BA96;
-	Tue, 22 Jul 2025 13:19:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEEE12C08B6;
+	Tue, 22 Jul 2025 13:19:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iq+lxiGc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="llEK+/Tj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48285242D94;
-	Tue, 22 Jul 2025 13:19:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB03228BA96
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 13:19:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753190358; cv=none; b=FoQxHKLJEZcIuN1YY4P85whwYL9Lz0O2IlRlH0cQHYIjV4fYtunvu9KjRdOvXxSBUVxlE61hUhhA/sZxB9kHmQJ1hGcfkLV4NCuV3gslM9Oin7hhH/+s95M8l+8eUv1En9lD62KNOXym6mzVfAaCC+Iqzyv9V05LyN50eX4sxXk=
+	t=1753190388; cv=none; b=YBvJRa7hj+PkmmvXUfByO/j3V3CI6/ClOMSSmwV1xO7GWVB6S1tMmNV7nR3Vqg3fbdW1pXwAPJcpOz9f3LY3zRllRcy+at0X+WimF4Zp4WyLXOscxKCWCpQ2RDmDFQXlxzXG0e38xLh1cQl8WXlqHmpiAlbCWhVURWge8DcBqMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753190358; c=relaxed/simple;
-	bh=P/WzJ2D9t/ao8VHQl5uRNGISLH+oh58TVVF1a3iiIzk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qqur/ILUC63w07MfGmcGt68qf6ctkR6y404BZ/HiBhF3j5XAE4NG554yQ4OkFkDrr681/xyeyhkb58eM5obvXSGJg5rpsf8MhQeLw0pbF3Q/PnIfxomUgCJWayBkrhr+WxaEdtANG4f0vat00ZEA04SZku4gnbHX6xZFBGBzgH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iq+lxiGc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D72FFC4CEF1;
-	Tue, 22 Jul 2025 13:19:13 +0000 (UTC)
+	s=arc-20240116; t=1753190388; c=relaxed/simple;
+	bh=EOUEFcX5YMS0VQlMFjStfuaBMv69udOXsuXdiFYXua0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=YQDzIkN234TPrGuiMEm1L+uqZgrvW3/I+JENPIh5ClEqSKBnZGqKu5F1RY5Yg41GIeg6fmRbnYQyDlFwaTnKkscJLTTD+VbZwZtgbQUBVcbGn1nLWj/1ZikWecL9lyRkDhwfl6KqBMCptkHtYwOiNK8Zwo7LLyN3xU2vCRTL2mM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=llEK+/Tj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C970C4CEEB;
+	Tue, 22 Jul 2025 13:19:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753190357;
-	bh=P/WzJ2D9t/ao8VHQl5uRNGISLH+oh58TVVF1a3iiIzk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iq+lxiGcFWezWsXBtQ//ad86nasH9e1YuE6TQ2fxJB2uKgCqHG646V9iQjX+E7yaw
-	 ya1Nr28lfdtv83ebYJRcEb0J1glIRtoTJn83Z+GoFb3Iv2Y365Tlbf5VCMNGKsuL7X
-	 QQZPPgn86YflmG81yBbJhplRD7hzSCBlKE6ifE6THzvvZG5oETKlsIz2TyEK5JRyrU
-	 CzdxvfF0/IcG5WLoqMw4IZnGUSefpDwKp9p9UaecrnHp1JZPe86dcq7n46w3ZAR4RZ
-	 S3I5L7k+7T+uB/CXdIMWszW7a4Owjy362YSHHjfdqCsuIdgPfsty1qiFBDtc7jvvry
-	 a8TBzP7gZ+scw==
-Date: Tue, 22 Jul 2025 14:19:11 +0100
-From: Simon Horman <horms@kernel.org>
-To: Dong Yibo <dong100@mucse.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
-	gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au,
-	danishanwar@ti.com, lee@trager.us, gongfan1@huawei.com,
-	lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 04/15] net: rnpgbe: Add get_capability mbx_fw ops
- support
-Message-ID: <20250722131911.GH2459@horms.kernel.org>
-References: <20250721113238.18615-1-dong100@mucse.com>
- <20250721113238.18615-5-dong100@mucse.com>
+	s=k20201202; t=1753190388;
+	bh=EOUEFcX5YMS0VQlMFjStfuaBMv69udOXsuXdiFYXua0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=llEK+/TjVjIbZT20yjBUA72UyE338a49pBeh3LR+0wGjbmeI3yhyKhrPajmD8MDDz
+	 WUGdtoKnb+XxHldyHRRtqO3XoREotJ0TxL1ZGkjf5C33Wz6mNVAldHqirC3A56JJSp
+	 W76vpFIjVhLVbPe2rY+73eB8TGSqVMuZ0t82N+ld5BWrQ9Kl4rYbkheAyqjAc5HDKn
+	 yTdMmlw3n3bi5/xQ0XNE5Iyin16XNfFcSHNm27EXk5BQwcWZ3C6p6zigtuO045ULN6
+	 odsDpOHzn8SbDuvl78NtX22+mNU5mGF8QfwFzkuOMa3AATdk606rirTWRupYmO3rn6
+	 5TRWq5YaYu7lg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB325383BF5D;
+	Tue, 22 Jul 2025 13:20:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250721113238.18615-5-dong100@mucse.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2] ibmveth: Add multi buffers rx replenishment
+ hcall
+ support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175319040676.805808.11285306488247395666.git-patchwork-notify@kernel.org>
+Date: Tue, 22 Jul 2025 13:20:06 +0000
+References: <20250719091356.57252-1-mmc@linux.ibm.com>
+In-Reply-To: <20250719091356.57252-1-mmc@linux.ibm.com>
+To: Mingming Cao <mmc@linux.ibm.com>
+Cc: netdev@vger.kernel.org, horms@kernel.org, bjking1@linux.ibm.com,
+ haren@linux.ibm.com, ricklind@linux.ibm.com, davemarq@linux.ibm.com,
+ maddy@linux.ibm.com, mpe@ellerman.id.au, npiggin@gmail.com,
+ christophe.leroy@csgroup.eu, andrew+netdev@lunn.ch, davem@davemloft.net,
+ kuba@kernel.org, edumazet@google.com, pabeni@redhat.com,
+ linuxppc-dev@lists.ozlabs.org
 
-On Mon, Jul 21, 2025 at 07:32:27PM +0800, Dong Yibo wrote:
-> Initialize get hw capability from mbx_fw ops.
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Sat, 19 Jul 2025 05:13:56 -0400 you wrote:
+> This patch enables batched RX buffer replenishment in ibmveth by
+> using the new firmware-supported h_add_logical_lan_buffers() hcall
+>  to submit up to 8 RX buffers in a single call, instead of repeatedly
+> calling the single-buffer h_add_logical_lan_buffer() hcall.
 > 
-> Signed-off-by: Dong Yibo <dong100@mucse.com>
+> During the probe, with the patch, the driver queries ILLAN attributes
+> to detect IBMVETH_ILLAN_RX_MULTI_BUFF_SUPPORT bit. If the attribute is
+> present, rx_buffers_per_hcall is set to 8, enabling batched replenishment.
+> Otherwise, it defaults to 1, preserving the original upstream behavior
+>  with no change in code flow for unsupported systems.
+> 
+> [...]
 
-...
+Here is the summary with links:
+  - [net-next,v2] ibmveth: Add multi buffers rx replenishment hcall support
+    https://git.kernel.org/netdev/net-next/c/2094200b5f77
 
-> diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-...
 
-> +struct hw_abilities {
-> +	u8 link_stat;
-> +	u8 lane_mask;
-> +	__le32 speed;
-> +	__le16 phy_type;
-> +	__le16 nic_mode;
-> +	__le16 pfnum;
-> +	__le32 fw_version;
-> +	__le32 axi_mhz;
-> +	union {
-> +		u8 port_id[4];
-> +		__le32 port_ids;
-> +	};
-> +	__le32 bd_uid;
-> +	__le32 phy_id;
-> +	__le32 wol_status;
-> +	union {
-> +		__le32 ext_ability;
-> +		struct {
-> +			__le32 valid : 1; /* 0 */
-> +			__le32 wol_en : 1; /* 1 */
-> +			__le32 pci_preset_runtime_en : 1; /* 2 */
-> +			__le32 smbus_en : 1; /* 3 */
-> +			__le32 ncsi_en : 1; /* 4 */
-> +			__le32 rpu_en : 1; /* 5 */
-> +			__le32 v2 : 1; /* 6 */
-> +			__le32 pxe_en : 1; /* 7 */
-> +			__le32 mctp_en : 1; /* 8 */
-> +			__le32 yt8614 : 1; /* 9 */
-> +			__le32 pci_ext_reset : 1; /* 10 */
-> +			__le32 rpu_availble : 1; /* 11 */
-> +			__le32 fw_lldp_ability : 1; /* 12 */
-> +			__le32 lldp_enabled : 1; /* 13 */
-> +			__le32 only_1g : 1; /* 14 */
-> +			__le32 force_down_en: 1; /* 15 */
-> +		} e;
-
-I am not sure how __le32 bitfields work on big endian hosts. Do they?
-
-I would suggest using some combination of BIT/GENMASK,
-FIELD_PREP/FIELT_GET, and le32_from_cpu/cpu_from_le32 instead.
-
-Flagged by Sparse.
-
-> +		struct {
-> +			u32 valid : 1; /* 0 */
-> +			u32 wol_en : 1; /* 1 */
-> +			u32 pci_preset_runtime_en : 1; /* 2 */
-> +			u32 smbus_en : 1; /* 3 */
-> +			u32 ncsi_en : 1; /* 4 */
-> +			u32 rpu_en : 1; /* 5 */
-> +			u32 v2 : 1; /* 6 */
-> +			u32 pxe_en : 1; /* 7 */
-> +			u32 mctp_en : 1; /* 8 */
-> +			u32 yt8614 : 1; /* 9 */
-> +			u32 pci_ext_reset : 1; /* 10 */
-> +			u32 rpu_availble : 1; /* 11 */
-> +			u32 fw_lldp_ability : 1; /* 12 */
-> +			u32 lldp_enabled : 1; /* 13 */
-> +			u32 only_1g : 1; /* 14 */
-> +			u32 force_down_en: 1; /* 15 */
-> +		} e_host;
-> +	};
-> +} __packed;
-
-...
-
-> +/* req is little endian. bigendian should be conserened */
-> +struct mbx_fw_cmd_req {
-
-...
-
-> +		struct {
-> +			__le32 lane;
-> +			__le32 op;
-> +			__le32 enable;
-> +			__le32 inteval;
-
-interval
-
-Flagged by checkpatch.pl --codespell
-
-...
-
-> +/* firmware -> driver */
-> +struct mbx_fw_cmd_reply {
-> +	/* fw must set: DD, CMP, Error(if error), copy value */
-> +	__le16 flags;
-> +	/* from command: LB,RD,VFC,BUF,SI,EI,FE */
-> +	__le16 opcode; /* 2-3: copy from req */
-> +	__le16 error_code; /* 4-5: 0 if no error */
-> +	__le16 datalen; /* 6-7: */
-> +	union {
-> +		struct {
-> +			__le32 cookie_lo; /* 8-11: */
-> +			__le32 cookie_hi; /* 12-15: */
-> +		};
-> +		void *cookie;
-> +	};
-> +	/* ===== data ==== [16-64] */
-> +	union {
-> +		u8 data[40];
-> +
-> +		struct version {
-> +			__le32 major;
-> +			__le32 sub;
-> +			__le32 modify;
-> +		} version;
-> +
-> +		struct {
-> +			__le32 value[4];
-> +		} r_reg;
-> +
-> +		struct {
-> +			__le32 new_value;
-> +		} modify_reg;
-> +
-> +		struct get_temp {
-> +			__le32 temp;
-> +			__le32 volatage;
-
-voltage
-
-> +		} get_temp;
-> +
-> +		struct {
-> +#define MBX_SFP_READ_MAX_CNT 32
-> +			u8 value[MBX_SFP_READ_MAX_CNT];
-> +		} sfp_read;
-> +
-> +		struct mac_addr {
-> +			__le32 lanes;
-> +			struct _addr {
-> +				/*
-> +				 * for macaddr:01:02:03:04:05:06
-> +				 * mac-hi=0x01020304 mac-lo=0x05060000
-> +				 */
-> +				u8 mac[8];
-> +			} addrs[4];
-> +		} mac_addr;
-> +
-> +		struct get_dump_reply {
-> +			__le32 flags;
-> +			__le32 version;
-> +			__le32 bytes;
-> +			__le32 data[4];
-> +		} get_dump;
-> +
-> +		struct get_lldp_reply {
-> +			__le32 value;
-> +			__le32 inteval;
-
-interval
-
-> +		} get_lldp;
-> +
-> +		struct rnpgbe_eee_cap phy_eee_abilities;
-> +		struct lane_stat_data lanestat;
-> +		struct hw_abilities hw_abilities;
-> +		struct phy_statistics phy_statistics;
-> +	};
-> +} __packed;
-
-...
 
