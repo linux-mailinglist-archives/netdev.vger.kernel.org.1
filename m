@@ -1,143 +1,176 @@
-Return-Path: <netdev+bounces-209024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97079B0E08E
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 17:34:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31F4AB0E0AD
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 17:37:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B71801C818DF
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 15:34:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37244561405
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 15:37:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6C9527877D;
-	Tue, 22 Jul 2025 15:34:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2350278E5A;
+	Tue, 22 Jul 2025 15:37:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sOiQZgSt"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="TntS18SD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D13C278156
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 15:34:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7166124DCE1;
+	Tue, 22 Jul 2025 15:37:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753198456; cv=none; b=lzHxvOtdh53a6T4oYO4oJ8UsFEw3sgonIstBdovxuC/WJViAXfXPvVIEHJXbBVHSW+wfsP0S4FhaUtc+bw7U5Je5lcVt2nq+quoP3wUl2cuzNFvqUf0hcjG1zf+ky2MT+p/GsmV+JP8ficcObJUXmpBy5ECtjm5kbV+bKSHN0to=
+	t=1753198639; cv=none; b=AH4xoLuooCjuKusGk7kzEUaEdU64QQg46Z0RE5ZWDpvM17v5kiKy1AHnGDJJmX1N2RH7kvhrb8yhTrFPNTUStdhhRGXLeC85z4eToXWyItfazBTcYH/9uOS2EfeTm+Qc1gDVPzXkRbQlR9TwcdLuQkL8XygeLpE1bFf1p6iVhzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753198456; c=relaxed/simple;
-	bh=6huNDu8PBiF4Td2REk21Di2p4ZXL2OnE0DDZsCTZnFE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SkTf2a+XbTradO7qLawZkwkllwOHk/Kunc7S+t+ixzPmihCtfYA/9IU/zod/AbCB8JA4dz5PkJYmsKE1+ZtvIdTdmHQrxsycxAntX9eD60clRh2R68PH8SzH/m72Nq+ES3x7/2VGUon3tqS6iVht69Pr2PwBE5DxlY8rzggM4hY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sOiQZgSt; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4a9bff7fc6dso53098491cf.1
-        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 08:34:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753198454; x=1753803254; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6huNDu8PBiF4Td2REk21Di2p4ZXL2OnE0DDZsCTZnFE=;
-        b=sOiQZgSt1cxtf3sU73R3MoUBw0Btp7mx41W4G2hBu+N/t3FbCvZsLroNL5YNRvjd+P
-         VA02EnuIu+Er+03JqtNZH96LQNsr8FTcCzrSePhOfQ7ur2EBU8ksVbXa8yzhB3OWh1dw
-         H/5yuZjFS46Y+ibg6PQjXdV7geG4PjXPsrsWU81V7XjfWkqdaqfitKuqXeglsCI3Sy4s
-         6zzYKRYmzBRRxCaV22/rcC1s2za2wImZeiy8fHUIu0EL8eyFkVnu9X/Zo/N/veAnr1vw
-         E4LBilU07paWEQBPahghEzKjxU8KiEqLGp2EI05Gpvtixre1zL4e5qUK915snOVJLa/u
-         rDKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753198454; x=1753803254;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6huNDu8PBiF4Td2REk21Di2p4ZXL2OnE0DDZsCTZnFE=;
-        b=eNTodc706c5yAG+i2uuJq4KWHezvNZQLVroVUi8ruadtC1/XEhSDtQ/o41CBcwrHHc
-         +19RAVkH5Gyf/Lfir30pCqybJOxJueC1NfYh1p7FOfLvqoH91Hr+24jEUhq46UZdpuAI
-         yKhMTVlmsjHCLGdSsXn7rgNnZPquNF6fDjYD7Mk/vy9JdIoXwXA8WfNceQx8PZdqKCtV
-         EzanNaLth68V0B4nKTBkd+QZNdQjq3lGu3D80c+0KTeAM7BTCm/y4XWj5Z6NstzYjAu/
-         Eosbc2ey3gg85GqokS3jhXLmd8H/5AU0glwoUNsi6kR6IKQ/UPlR6QD3gPNJlACHUEod
-         ykBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWkYQcpYf5z/8jDHd4u5jcDPjKgPnMeEivRolJgYC6w7SLMfRb9cu1kukSOrjcJrpqZGNUIWdo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLpxykO3ZL45rHC6o4w37sPsjVspk+/IHsDITVDD+mAOT7S1Op
-	RK9A2wbpXLnDese8YNB4o+627h7YbTcYYPdEbgTwQuApbvxAO7m/8nuucpPS6bjDBNyTjDf/H4Q
-	eKTwoaDRZlYshcEOz7ImssEpnizKFeK/oJM8QYJm9
-X-Gm-Gg: ASbGncvUcJkuqty/QSqIkZj6W/bJ8hAh3nxBBtciAuArAnBOzSk1HCSyqhJTQ2xZwcL
-	QSnPHmdfKSmUF6jky4+0HWNdm6zE41Tdg9D+3P2aDnONGW+EIaKsSkSZXfNsxXZRQBcCYEWPKPW
-	3emT1miOtnZUD7mcVdryGcJbEl4erAMpymI//A88oq/jGw9pomxCtlL1Ncwvu5V3gIpoorf7pa/
-	QJweA==
-X-Google-Smtp-Source: AGHT+IHT/XoMTVLR/CLnQtYrPx5F5saubWGu+acQeXgnXHryN0gYdGmeEzUDX46mVUnYlwqL4F5dGGyi/ToV0NINlD4=
-X-Received: by 2002:a05:622a:549a:b0:4ab:c0d5:6f63 with SMTP id
- d75a77b69052e-4ae5b68cda6mr48360891cf.4.1753198453672; Tue, 22 Jul 2025
- 08:34:13 -0700 (PDT)
+	s=arc-20240116; t=1753198639; c=relaxed/simple;
+	bh=9vRudx1kT9fm0OhYSnpTEwatIGsSFR9B5AOqsXa3Mdw=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=DllkTSwPDjcqD6b8yta85UsKdzH5mBt961ONF6X5lEvhDPhL0mKVnCDLlyW750/OG+G7oMxvzrWWmaD1/xlKsIA6mrhJIEnQ7bRxKlPrA431sLJOqKL68lYVWwui/Dtu4Qiz2ZFw9X1/B0qxsye9T26sg9t8d46hrdbL30t1dNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=TntS18SD; arc=none smtp.client-ip=212.227.15.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1753198618; x=1753803418; i=markus.elfring@web.de;
+	bh=NaK6/RFxq9QNHVkIk7snI9Kx/nnfVL4eDyfpZlhWR6s=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=TntS18SDmVH+ZTtQOt5/4Q6XyHUPsnU2rp8adTXXxk0ZW7WARSngDd1SbgD9j09L
+	 G80+CKxJ33SuqaJGsrz3eOieG7SBA5oSKgvBdnQuI+vWPQIz27o2jbxbo58NHoyY6
+	 ELiBhnyZKZlJX0DEsitQ5PdLBlt5RkjX0ozDPdNR8swFhnktC3Kur3v+47QJohADO
+	 RIIqfuTP/8A/P1d+DtgaPk2SMF0sHUACx8hf3n4PJxuKI4YcHM5qhVOtQPDQCyiAq
+	 9OLILo/CZoR3yOhDv0jy3TLT5cIjgdaMHLmgl9WmH5WHKXBnr3qzf/SpHP44bdrK/
+	 tRiZVR51TSkFwqm1qw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.92.215]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1Mf3qY-1v698l2nn8-00i12h; Tue, 22
+ Jul 2025 17:36:57 +0200
+Message-ID: <46fb997f-ba83-44af-aad3-c8406fc7cbea@web.de>
+Date: Tue, 22 Jul 2025 17:36:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250721203624.3807041-1-kuniyu@google.com> <vokpyz3p5pbv7ja4ltipxapq4xjemqmv26gayezeekcyq7llyq@6kahz7tldhfz>
-In-Reply-To: <vokpyz3p5pbv7ja4ltipxapq4xjemqmv26gayezeekcyq7llyq@6kahz7tldhfz>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 22 Jul 2025 08:34:02 -0700
-X-Gm-Features: Ac12FXzA4jvGkBqd2_ryawomXPZvKp3tJLaT4sW3pMPuwr_h2pU1RQnRsS7pTbc
-Message-ID: <CANn89iK0zqP0OYa4S=5-X4seUG6wAsK+-qGEpbpXQgSzNJQaog@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 00/13] net-memcg: Allow decoupling memcg from sk->sk_prot->memory_allocated.
-To: Shakeel Butt <shakeel.butt@linux.dev>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	Mat Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
-	Andrew Morton <akpm@linux-foundation.org>, Simon Horman <horms@kernel.org>, 
-	Geliang Tang <geliang@kernel.org>, Muchun Song <muchun.song@linux.dev>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, mptcp@lists.linux.dev, 
-	cgroups@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+To: "Andrew F. Davis" <afd@ti.com>,
+ Basharath Hussain Khaja <basharath@couthit.com>,
+ Parvathi Pudi <parvathi@couthit.com>, Roger Quadros <rogerq@ti.com>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Conor Dooley <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Diogo Ivo <diogo.ivo@siemens.com>, Eric Dumazet <edumazet@google.com>,
+ Guillaume La Roque <glaroque@baylibre.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>,
+ Javier Carrasco <javier.carrasco.cruz@gmail.com>,
+ Kory Maincent <kory.maincent@bootlin.com>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ MD Danish Anwar <danishanwar@ti.com>, Meghana Malladi <m-malladi@ti.com>,
+ Murali Karicheri <m-karicheri2@ti.com>, Paolo Abeni <pabeni@redhat.com>,
+ Richard Cochran <richardcochran@gmail.com>, Rob Herring <robh@kernel.org>,
+ Sai Krishna <saikrishnag@marvell.com>,
+ Santosh Shilimkar <ssantosh@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>, Simon Horman <horms@kernel.org>,
+ Suman Anna <s-anna@ti.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, krishna@couthit.com,
+ mohan@couthit.com, pmohan@couthit.com, prajith@ti.com,
+ Praneeth Bajjuri <praneeth@ti.com>, Pratheesh Gangadhar <pratheesh@ti.com>,
+ Sriramakrishnan <srk@ti.com>, Roger Quadros <rogerq@kernel.org>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Vignesh Raghavendra <vigneshr@ti.com>
+References: <20250722132700.2655208-3-parvathi@couthit.com>
+Subject: Re: [PATCH net-next v11 2/5] net: ti: prueth: Adds ICSSM Ethernet
+ driver
+Content-Language: en-GB, de-DE
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20250722132700.2655208-3-parvathi@couthit.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:Q4vxNDLCNYUx/MWdxPaTqvyXy0TYyiEQrItXy+6yjhKJeurUc39
+ iabfAOmXG6R1Xij5VZILZVi7owC38NoG9RQqTd8jQo5OTvqZOfsSslyjU806hovQC1yUsoS
+ arWmk5++wRYYiZNSh2RbYYajjEWMp/cYSi2YtXLSPzhhFNRXNyztmCHgBynh1dQzAB5amxh
+ LR67e9vxzYMKjqKVsKR+w==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:N1nOrVbTMis=;/rgcWO5i1NflaRGjsOEhKmS3+02
+ 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
 
-On Tue, Jul 22, 2025 at 8:04=E2=80=AFAM Shakeel Butt <shakeel.butt@linux.de=
-v> wrote:
->
-> On Mon, Jul 21, 2025 at 08:35:19PM +0000, Kuniyuki Iwashima wrote:
-> > Some protocols (e.g., TCP, UDP) has their own memory accounting for
-> > socket buffers and charge memory to global per-protocol counters such
-> > as /proc/net/ipv4/tcp_mem.
-> >
-> > When running under a non-root cgroup, this memory is also charged to
-> > the memcg as sock in memory.stat.
-> >
-> > Sockets using such protocols are still subject to the global limits,
-> > thus affected by a noisy neighbour outside cgroup.
-> >
-> > This makes it difficult to accurately estimate and configure appropriat=
-e
-> > global limits.
-> >
-> > If all workloads were guaranteed to be controlled under memcg, the issu=
-e
-> > can be worked around by setting tcp_mem[0~2] to UINT_MAX.
-> >
-> > However, this assumption does not always hold, and a single workload th=
-at
-> > opts out of memcg can consume memory up to the global limit, which is
-> > problematic.
-> >
-> > This series introduces a new per-memcg know to allow decoupling memcg
-> > from the global memory accounting, which simplifies the memcg
-> > configuration while keeping the global limits within a reasonable range=
-.
->
-> Sorry, the above para is confusing. What is per-memcg know? Or maybe it
-> is knob. Also please go a bit in more detail how decoupling helps the
-> global limits within a reasonable range?
+=E2=80=A6
+> +++ b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
+> @@ -0,0 +1,609 @@
+=E2=80=A6
+> +static int icssm_prueth_probe(struct platform_device *pdev)
+> +{
+=E2=80=A6
+> +	/* register the network devices */
+> +	if (eth0_node) {
+=E2=80=A6
+> +	}
+> +
+> +	if (eth1_node) {
+=E2=80=A6
+> +	}
+> +
+> +	if (eth1_node)
+> +		of_node_put(eth1_node);
+> +	if (eth0_node)
+> +		of_node_put(eth0_node);
+> +	return 0;
+=E2=80=A6
 
-The intent is to no longer have to increase tcp_mem[0..2] just to
-allow a big job to use 90 % of physical memory all for TCP sockets and
-buffers.
+I suggest to avoid duplicate condition checks for such a function implemen=
+tation.
+Can any code be reused from another function?
 
-Leave the linux default values. They have been considered reasonable
-for decades.
-
-They will only be used by applications not using memcg to limit TCP
-memory usage.
+Regards,
+Markus
 
