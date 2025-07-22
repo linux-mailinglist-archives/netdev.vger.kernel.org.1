@@ -1,185 +1,211 @@
-Return-Path: <netdev+bounces-208944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7DEBB0DA77
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 15:02:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6275CB0DA35
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 14:57:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C96017FA88
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 13:02:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B549189DC80
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 12:57:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 699C92EA499;
-	Tue, 22 Jul 2025 13:01:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB08B2E9742;
+	Tue, 22 Jul 2025 12:57:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="d51c9IbV"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013004.outbound.protection.outlook.com [52.101.83.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7C92E9EB3;
-	Tue, 22 Jul 2025 13:01:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753189305; cv=none; b=F7cVKbfts6ElnQt8i89w7f7DImkjVhfcxHntR5UolMGni8kzhTXohF+b6HJ/ZmbmaXITMgrfbFMZmVU/7T/0XeL4csIu7ohuMs+RfuwxyGwy7eCt4NhrYgMXBJC9cqfwjTmhhPjg1zfkJbH7L/5StYAczbtmYmJkpdZp1Q3DyLM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753189305; c=relaxed/simple;
-	bh=dszFGtW+Te4PST7MdphqIHU1b5o5LV/pqetfG6W/1QY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oKgPofIOeHC1yHd0qCftVzCGwOcW5GAgHNJAVKAfJj0vmjvCTUVs2C4dVpgQ3bZTbeti49uF7vW1+N5xQShi+ACPw1L1LQQLW7f/3YkJZdWX5UJX3M/6Sc2rwJyAmdHMl2h8kojBOG07LhGQ10F0yTfh4co3JrYdw4W7ykpiGr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4bmcnZ2pfDztSvB;
-	Tue, 22 Jul 2025 21:00:34 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 545101402C4;
-	Tue, 22 Jul 2025 21:01:38 +0800 (CST)
-Received: from localhost.localdomain (10.90.31.46) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 22 Jul 2025 21:01:37 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
-CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <jonathan.cameron@huawei.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<shaojijie@huawei.com>
-Subject: [PATCH V2 net 4/4] net: hns3: default enable tx bounce buffer when smmu enabled
-Date: Tue, 22 Jul 2025 20:54:23 +0800
-Message-ID: <20250722125423.1270673-5-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20250722125423.1270673-1-shaojijie@huawei.com>
-References: <20250722125423.1270673-1-shaojijie@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC2971A0712;
+	Tue, 22 Jul 2025 12:57:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.4
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753189056; cv=fail; b=XaXYU62DXAxmzoUyIPISLaQgC++HG2BDnm2+12XRiGn394YXZydBlPYbCm8vQeQzgbtU8XCyhcaPYUe66DNlez1+BLwxuTT4ZWLqCs52jnwYoO8ZaBu9Zru7FnDvXifGd+xQPiUGyB7Sp7ifLFXVzpVPJ7/6zGpSttpmep3D7U4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753189056; c=relaxed/simple;
+	bh=eY1z1dQgbEhDX6cvqhHOKqn65OGZJ6vFLW4RG6cNb2Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=jW9vsOSaqMUa1vMKdwfvZzqWLjyt2wDSAFGoFId3dwxm4MrVTKKPYIQlUcMXxL7VPwTPPTs/RYES8aB2Vv3m7MwtzMPVRNAEU1D/hQ1l4XvcKQqxOgfWaG+o4LKEkz+xQy0gc6lmRPM8ShrJXf9wHOCGc3QNEEoPh9AYNmzySk8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=d51c9IbV; arc=fail smtp.client-ip=52.101.83.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZWTxekk4MMPfA3WQ+mUSD3jqG5Ee0q08c9HBB1LcczxaXDY5kc2ig8f/TCyUFQyHhCGEt8mavf+Nvpxdkyn5a1rEGdxzG13JasnhNtMxvQjNdi1huovpzG23rQZw3T4ZZ9Z/bxgDytRDmwul/TIaflYXAl6j/07cDTDqT7cON978yBcGOOGAD0NVaZZiLi6ASYLpAuMWoLimGBQoW6xOqdGLCLd4rLHbwvZp+URiRhwaVrYXKyxjftD6/kv7z/VekNP9mltSjL39soesO90Oovc3+serv2bxO24q0g2EB0Chhi0Rkq+7CcwDfENiNsEIwvA9bkN4MZ45rEwjgwHCcQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ks1dgIkEU8bQYMIfrLVnf94jaVk/5VGg897dP+bJ7Vs=;
+ b=o04OuwnLTvWFeMhaxT/1E/05YvhHKj2ZS8VOpnvYKiKOTVk+xDw1YU7f2eZS/FiIdwX5dJu+7GTJDAUge8FDMJWt4sQ/MgzD+M3HUWUgvqZNgbobipVOU7M18/1zaFJbzibh7PWFmY/fQs/Y7cUTqKRJ49XvH/L2HO51sOU995A4SPicn6/OdyAKqbCe26ES5hXuNRWfOm9/5CIub5GWTkLmolqm/nTRCGtrZ3ccse1u2OUfO5YSKk2Jm5fkgXcDh00XmxVCJb/cSEdS6Gf7s9nXdCqeXCfm1Hnu0EkWNGR2h56dFAOEJtZIteYkO30uTGdMWWgCd3NPcGZ7mOMpVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ks1dgIkEU8bQYMIfrLVnf94jaVk/5VGg897dP+bJ7Vs=;
+ b=d51c9IbVv2bfRRlMxzeVHaHYGSiIpHMNBCWYPEJlkKpgU0ebqDaFieeIjcAbenH7V1A38FLjt5RgZwFZ0RcB4MZZrgHJwxAf5kKflEkkB5M/Xd9NzLvtVNSP0zMIPqPJQXAFjaQUw5Jqe+moyjG0yl81EYrjYmbvfyH8xvzZwZKaFHaRUNt+UIoCd6tYsm7O46TTCCtyN3uNNcjJLrd4mIubiUzcHRJt9AUt/pAJP2y5PZm3fXbBjd1IvG0jOLdJc76OajuUa3DjgpfM1AfFC3ImM2J5xfIjQhgyjJ2HhV1Mfg7/BezQbFlO3ErqkPHag4HSiFKicrzcNE2Hto8pyA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PA4PR04MB7790.eurprd04.prod.outlook.com (2603:10a6:102:cc::8)
+ by DU4PR04MB11435.eurprd04.prod.outlook.com (2603:10a6:10:5ee::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8943.30; Tue, 22 Jul
+ 2025 12:57:31 +0000
+Received: from PA4PR04MB7790.eurprd04.prod.outlook.com
+ ([fe80::6861:40f7:98b3:c2bc]) by PA4PR04MB7790.eurprd04.prod.outlook.com
+ ([fe80::6861:40f7:98b3:c2bc%4]) with mapi id 15.20.8943.029; Tue, 22 Jul 2025
+ 12:57:31 +0000
+Date: Tue, 22 Jul 2025 15:57:28 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: Frank Li <frank.li@nxp.com>, "robh@kernel.org" <robh@kernel.org>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"richardcochran@gmail.com" <richardcochran@gmail.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
+	"shawnguo@kernel.org" <shawnguo@kernel.org>,
+	"s.hauer@pengutronix.de" <s.hauer@pengutronix.de>,
+	"festevam@gmail.com" <festevam@gmail.com>,
+	"F.S. Peng" <fushi.peng@nxp.com>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>,
+	"kernel@pengutronix.de" <kernel@pengutronix.de>
+Subject: Re: [PATCH v2 net-next 12/14] net: enetc: add PTP synchronization
+ support for ENETC v4
+Message-ID: <20250722125728.qut45qn5uia6pj4f@skbuf>
+References: <20250716073111.367382-1-wei.fang@nxp.com>
+ <20250716073111.367382-13-wei.fang@nxp.com>
+ <aHgTG1hIXoN45cQo@lizhi-Precision-Tower-5810>
+ <PAXPR04MB85104A1A15F6BD7399E746718851A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <aHl0KvQwLC9ZCdtM@lizhi-Precision-Tower-5810>
+ <PAXPR04MB8510D86B82F03530769569958850A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <PAXPR04MB8510D86B82F03530769569958850A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+X-ClientProxiedBy: VI1P189CA0029.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:802:2a::42) To PA4PR04MB7790.eurprd04.prod.outlook.com
+ (2603:10a6:102:cc::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PA4PR04MB7790:EE_|DU4PR04MB11435:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5543e214-5e54-41b5-ddbb-08ddc91f51e9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|19092799006|10070799003;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?vgSElaoNwQlufWuFiKN6WBgpERhkLR3LOtnV3SRsWCX/Va68BXzBLUcW+G4n?=
+ =?us-ascii?Q?GZZkK/fAlNv16oyZHY/kfx3Je7C0tWw4z5OLVVTm8OB/4jmu0Oo4HIQxLn38?=
+ =?us-ascii?Q?VzXgN6yAnkSOUpcYoq7uIapMl/G57YDRJ8sQ92BtpEgQppOTpwI191M5c11p?=
+ =?us-ascii?Q?42sN3UeIpXazF/W2NJyyZXZLjSFc9etqmisgJ0xUnsLBX03BSShCLtXmDbao?=
+ =?us-ascii?Q?xz/P/Md56OoYnPrCZNCfnntCVBdIIcxGP6wLUZxHQfK1Mdx7ve/3tnrqVpq3?=
+ =?us-ascii?Q?7S2McoN4oG3Gc8PL/ksur5Iad8HEcEKfnt1xhYB1Jn1AN5XiGuQ9jorqWbhY?=
+ =?us-ascii?Q?es+SoJ6REAifj7Oe3KC107AukTiwcQr+BCzPGY+2AxxE8yYtvt8dbGIKJch7?=
+ =?us-ascii?Q?KbiQRrUvunY28g8XUQxIVqRDUnu0PkXnJZwyauP6VWChmPz/Bk8HGZOlPyZq?=
+ =?us-ascii?Q?M5kRk1bamLxePpaim+Al1qsTb2rBSqHdQk6dQ1rG8pY3KfsOYtrSkDAdnW8a?=
+ =?us-ascii?Q?y/ZwzBAimmJNihc5ORBJrUBLoDirxhUNUyWmZmLbHJPiDHvjokaMUX6Xm3CL?=
+ =?us-ascii?Q?4xq2QXRQyoTZb6oIe25yDJ8diVlA14tfqDZYvMVnjJwU6RL1uz/kGq7U4n7X?=
+ =?us-ascii?Q?jWNeSrHL44kD4vI1kNNkhxKTk53ffWrujmGjwarFAVz5lWfvfpLu6VeJUDWD?=
+ =?us-ascii?Q?ut/gSomZmcKvRoO0hm+EMOhP5pDG6oV8U6+mQClyO/My7yB0B/XnpKXYwbB9?=
+ =?us-ascii?Q?M/SIJpWRyGmRgmiLpJHvUSxZDuHJdP6XQIgbMOj0r6oaMGMqHuC6RuABdjlP?=
+ =?us-ascii?Q?h81CLVvPAAVq0sqzdXfn4ukQgjwSIhESFotU2ItlpgFf6q5DenMe3oKzyQDy?=
+ =?us-ascii?Q?RHaZO+ZB+oNTPg8DvaiE1ZN6TK7lMtly8c6QRGTIXV15mCJVpyDgwtK83VD7?=
+ =?us-ascii?Q?sYGSYFQkKF6tmwNxLqEBUSSddTmc3e5KaM457wFUcddlv2wRN+Tq/3vGXwXp?=
+ =?us-ascii?Q?lng9gwgK601fnqASmv5yyA1CogRur3lYb01PM7lKr6YO+dNJpLm/ah2YOyNA?=
+ =?us-ascii?Q?1Pl8NFqsWbrwH6e6bbZahOvn9d2IILbQOSptnK/IzZ3TJ6Vc8/rIm9AVT7oj?=
+ =?us-ascii?Q?XiwRZ3GKmoX7G3zrSRW7H8pouQLCKDjbLTtLVJ8jzQPfmVKVh53ofVNGW91P?=
+ =?us-ascii?Q?NgaqsOoVJO/CdN834QtId/RcJ5lrWjQhfwUp3+dWdEuJz5MwihFpkDABL6Jx?=
+ =?us-ascii?Q?JYSHoX5WgS18DmoEUlKbnUm/baxB7idCsjil/CbSHWpFGOaNWEQmH+PvB4Xg?=
+ =?us-ascii?Q?s4uC1i4mG9AmSppVQxDJkagGOfLwOeB3eKbqafM4nbzrhVpS363uhxAluKAy?=
+ =?us-ascii?Q?aU2d9C9e6G/zew1W110fi8Q3nYQWXWwPt85X5OyXWMdK3Plcb/g2nkYSzxCW?=
+ =?us-ascii?Q?Kx+uzTsZD6o=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB7790.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(19092799006)(10070799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?Ar2FNcFFmMeI5xeo7dpzO481r6Wdqj3uolQdU7DL+8/K+X7v/JRMzZJf91ci?=
+ =?us-ascii?Q?13cP0pYnh1GeJYhw7o4Zoh0nigmj8CeeK5keopqTjWlLQ21STkuoJxEBy/B0?=
+ =?us-ascii?Q?Ia8NVxViRj1VvUusFrhs20bZTnwZDMdKf2N7xbIMi/AP8uSFRZYvozwEvhMV?=
+ =?us-ascii?Q?nl+swMoKwhNDTCw+HgFeSDt5Yy0WckgM01B5aYNGGfLrGMaQy/2EoQV9Vh3q?=
+ =?us-ascii?Q?5s0aDT6b+IbHTiDkDh7F0TiVp/T2LLftd6otLf5rW3bnY6Zt/6jsWAH7TinF?=
+ =?us-ascii?Q?Y1Z9sTfoDfBWKZPX9rfNlZNqA4PgQYnR5xCtkdm8zuMo7eyVzRc7SE7EkkgW?=
+ =?us-ascii?Q?8B8GJGu2uBwE5Xme9S9rbt1ST/DkRBt06i374mWqVbYpK5ed8PIfYSn9Ujfh?=
+ =?us-ascii?Q?8VT54XRl+0vnh8lycwWtJQjztmkiMp3kxZNcMcsQtZfrLC9FQgRzdK8QJi85?=
+ =?us-ascii?Q?e1qBT+dvwjq8TvTS3A/ACjtV3lBkLjPaz0U1lg0Zxd7wOHAAALDEIoOQZvnT?=
+ =?us-ascii?Q?058X2z0p+/hj/s5ldHNXol4b4jmEBuIVLSv4pk5dJkrJPuaP1U0nxs7eK/4X?=
+ =?us-ascii?Q?N5GWXkYXhPq0Hxh9VZJ8q46DVcG7cDy0I0ZV3os1NP8FN0p9DWpdCJ56A0Ow?=
+ =?us-ascii?Q?a32svovEkad7S7vWjHCDhJgfAUZHLHHLApzpsQhXs8VMKPBy9qjXGaTTLBf5?=
+ =?us-ascii?Q?FnSTRydqmlxOL4m6QrwUQG0nBAl7xg3IPIp6oyhDv/itBQ8BCzL5tpDYQBEg?=
+ =?us-ascii?Q?kFU2EpC7Ao7VJmrHsxnUQv0D6Ym+deKxCM3xy0srXZ4uS8KCjJWsaT/V6mUY?=
+ =?us-ascii?Q?W4La7mVQ+12OZQFsChxiyw93zSpejgNGr1qEZVhX9aW0TS0bo+oaIhIL3ydx?=
+ =?us-ascii?Q?e6OuhueGPu7SXCyczlv1asnhxXK/KhXKHoyFcfal3Y669fZKJrw15PSNin1v?=
+ =?us-ascii?Q?QUTz57ECENZbDFZrMkj7rQZzCi7RK1yUkwosV2UiXGXZp53+8/+Iyo+ZK5gb?=
+ =?us-ascii?Q?VWGIZZrbTtkujTYU0XobF7DGT8dPkkpQj7+uW0H4Sb3yTS0kYTlXB8bGZdXx?=
+ =?us-ascii?Q?1uJ9sTPqbCts857DNbnMrBAkEpI5JhlYegcRZNAUGQFC+Sx5RTP0/mZEL3vf?=
+ =?us-ascii?Q?w8y8oXUzqPR37J/MQttZ/nA+/WEGtSLvlo+C+bwNZ4t7j5cawmYghHNv5Khh?=
+ =?us-ascii?Q?UrpApqEYgektv3tGQvQcJJ/SNcNVSiW/tVEPPjgCUt4Tb7h9BskvAecevrcj?=
+ =?us-ascii?Q?J8JbLqv5aCeT6jgOXaOGlj1IisWspcVxZniQ5wXh/gR5KmplJiyCXBKqtKKG?=
+ =?us-ascii?Q?RB61Y6SKLyJXLfnvYvKGQxEfQyn0cd1UOTx9eiTK3qmvsu5BKKkbxItC1rHs?=
+ =?us-ascii?Q?QA+GADr+er9clLEBLs2cjIdsfi+/aFWqljR4bpmptdgIQ7wYwo7GYgUR/qAq?=
+ =?us-ascii?Q?xY8zelncPMUXlE1kChT52deRyR6FDZL7s2LeLOioumk00X0lx8wZJIi7V54O?=
+ =?us-ascii?Q?8KwLG5CRotkX8XtuJPN/wW5Kcm+sJe23AE1xXb/CBYb1zZapaMWtirMpF/FO?=
+ =?us-ascii?Q?EnZrb8SV5rW6zho5IHhK2GDeHy+x/xDHPLP4wFM5z6dS/n+lgfCJJ3owjMh7?=
+ =?us-ascii?Q?bYY8h2uZ/Qi8rhNYkWT8/7RwAAmSzyHCnh1nQmKn4+CGItx61/mxdjbcrwzU?=
+ =?us-ascii?Q?ALZN9Q=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5543e214-5e54-41b5-ddbb-08ddc91f51e9
+X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB7790.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2025 12:57:31.3705
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: eAvF+0NYgb5UgwI53q9qOMFe9lhPL6qV1oE6qOSBkBgp89FC2dpRRXofiolQXPZKNRlAKDmNa+Kp6eJdQvKg6w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR04MB11435
 
-The SMMU engine on HIP09 chip has a hardware issue.
-SMMU pagetable prefetch features may prefetch and use a invalid PTE
-even the PTE is valid at that time. This will cause the device trigger
-fake pagefaults. The solution is to avoid prefetching by adding a
-SYNC command when smmu mapping a iova. But the performance of nic has a
-sharp drop. Then we do this workaround, always enable tx bounce buffer,
-avoid mapping/unmapping on TX path.
+On Fri, Jul 18, 2025 at 05:08:09AM +0300, Wei Fang wrote:
+> > > > > +static inline bool enetc_ptp_clock_is_enabled(struct enetc_si *si) {
+> > > > > +	if (is_enetc_rev1(si))
+> > > > > +		return IS_ENABLED(CONFIG_FSL_ENETC_PTP_CLOCK);
+> > > > > +
+> > > > > +	return IS_ENABLED(CONFIG_PTP_1588_CLOCK_NETC);
+> > > > > +}
+> > > > > +
+> > > >
+> > > > why v1 check CONFIG_FSL_ENETC_PTP_CLOCK and other check
+> > > > CONFIG_PTP_1588_CLOCK_NETC
+> > >
+> > > Because they use different PTP drivers, so the configs are different.
+> > 
+> > But name CONFIG_FSL_ENETC_PTP_CLOCK and
+> > CONFIG_PTP_1588_CLOCK_NETC is quite
+> > similar, suppose CONFIG_PTP_1588_CLOCK_NETC should be
+> > CONFIG_PTP_1588_CLOCK_NETC_V4
+> > 
+> Okay, it looks good
 
-This issue only affects HNS3, so we always enable
-tx bounce buffer when smmu enabled to improve performance.
+The help text is also very confusing, nowhere is it specified that the
+new driver is for NETCv4, the reader can just as well interpret it that
+the LS1028A ENETC can use this PTP timer driver.
 
-Fixes: 295ba232a8c3 ("net: hns3: add device version to replace pci revision")
-Signed-off-by: Jian Shen <shenjian15@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
-ChangeLog:
-v1 -> v2:
-  - Split this patch, omits the ethtool changes,
-    ethtool changes will be sent to net-next, suggested by Simon Horman
-  v1: https://lore.kernel.org/all/20250702130901.2879031-1-shaojijie@huawei.com/
----
- .../net/ethernet/hisilicon/hns3/hns3_enet.c   | 31 +++++++++++++++++++
- .../net/ethernet/hisilicon/hns3/hns3_enet.h   |  2 ++
- 2 files changed, 33 insertions(+)
-
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-index b03b8758c777..aaa803563bd2 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-@@ -11,6 +11,7 @@
- #include <linux/irq.h>
- #include <linux/ip.h>
- #include <linux/ipv6.h>
-+#include <linux/iommu.h>
- #include <linux/module.h>
- #include <linux/pci.h>
- #include <linux/skbuff.h>
-@@ -1039,6 +1040,8 @@ static bool hns3_can_use_tx_sgl(struct hns3_enet_ring *ring,
- static void hns3_init_tx_spare_buffer(struct hns3_enet_ring *ring)
- {
- 	u32 alloc_size = ring->tqp->handle->kinfo.tx_spare_buf_size;
-+	struct net_device *netdev = ring_to_netdev(ring);
-+	struct hns3_nic_priv *priv = netdev_priv(netdev);
- 	struct hns3_tx_spare *tx_spare;
- 	struct page *page;
- 	dma_addr_t dma;
-@@ -1080,6 +1083,7 @@ static void hns3_init_tx_spare_buffer(struct hns3_enet_ring *ring)
- 	tx_spare->buf = page_address(page);
- 	tx_spare->len = PAGE_SIZE << order;
- 	ring->tx_spare = tx_spare;
-+	ring->tx_copybreak = priv->tx_copybreak;
- 	return;
- 
- dma_mapping_error:
-@@ -4874,6 +4878,30 @@ static void hns3_nic_dealloc_vector_data(struct hns3_nic_priv *priv)
- 	devm_kfree(&pdev->dev, priv->tqp_vector);
- }
- 
-+static void hns3_update_tx_spare_buf_config(struct hns3_nic_priv *priv)
-+{
-+#define HNS3_MIN_SPARE_BUF_SIZE (2 * 1024 * 1024)
-+#define HNS3_MAX_PACKET_SIZE (64 * 1024)
-+
-+	struct iommu_domain *domain = iommu_get_domain_for_dev(priv->dev);
-+	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(priv->ae_handle);
-+	struct hnae3_handle *handle = priv->ae_handle;
-+
-+	if (ae_dev->dev_version < HNAE3_DEVICE_VERSION_V3)
-+		return;
-+
-+	if (!(domain && iommu_is_dma_domain(domain)))
-+		return;
-+
-+	priv->min_tx_copybreak = HNS3_MAX_PACKET_SIZE;
-+	priv->min_tx_spare_buf_size = HNS3_MIN_SPARE_BUF_SIZE;
-+
-+	if (priv->tx_copybreak < priv->min_tx_copybreak)
-+		priv->tx_copybreak = priv->min_tx_copybreak;
-+	if (handle->kinfo.tx_spare_buf_size < priv->min_tx_spare_buf_size)
-+		handle->kinfo.tx_spare_buf_size = priv->min_tx_spare_buf_size;
-+}
-+
- static void hns3_ring_get_cfg(struct hnae3_queue *q, struct hns3_nic_priv *priv,
- 			      unsigned int ring_type)
- {
-@@ -5107,6 +5135,7 @@ int hns3_init_all_ring(struct hns3_nic_priv *priv)
- 	int i, j;
- 	int ret;
- 
-+	hns3_update_tx_spare_buf_config(priv);
- 	for (i = 0; i < ring_num; i++) {
- 		ret = hns3_alloc_ring_memory(&priv->ring[i]);
- 		if (ret) {
-@@ -5311,6 +5340,8 @@ static int hns3_client_init(struct hnae3_handle *handle)
- 	priv->ae_handle = handle;
- 	priv->tx_timeout_count = 0;
- 	priv->max_non_tso_bd_num = ae_dev->dev_specs.max_non_tso_bd_num;
-+	priv->min_tx_copybreak = 0;
-+	priv->min_tx_spare_buf_size = 0;
- 	set_bit(HNS3_NIC_STATE_DOWN, &priv->state);
- 
- 	handle->msg_enable = netif_msg_init(debug, DEFAULT_MSG_LEVEL);
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.h b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.h
-index d36c4ed16d8d..caf7a4df8585 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.h
-@@ -596,6 +596,8 @@ struct hns3_nic_priv {
- 	struct hns3_enet_coalesce rx_coal;
- 	u32 tx_copybreak;
- 	u32 rx_copybreak;
-+	u32 min_tx_copybreak;
-+	u32 min_tx_spare_buf_size;
- };
- 
- union l3_hdr_info {
--- 
-2.33.0
-
++         This driver adds support for using the NXP NETC Timer as a PTP
++         clock. This clock is used by ENETC MAC or NETC Switch for PTP
++         synchronization. It also supports periodic output signal (e.g.
++         PPS) and external trigger timestamping.
 
