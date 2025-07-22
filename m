@@ -1,283 +1,173 @@
-Return-Path: <netdev+bounces-209111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D0FEB0E559
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 23:20:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92631B0E5A6
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 23:40:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DF86547B21
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 21:20:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 230621C88404
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 21:40:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C598F2857D2;
-	Tue, 22 Jul 2025 21:20:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9818F285C8B;
+	Tue, 22 Jul 2025 21:40:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JGY2PAaE"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="aX37a1Rz"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970D62836BE
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 21:20:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8BBE284B5D;
+	Tue, 22 Jul 2025 21:40:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753219250; cv=none; b=WxoNBR5mHWg6RpvDhH5ZNkibaHG2HTT85+JNgITJqSzZ5WW7k5p5EKzi1zkoUTBnemdGLU5jIKzzyTNibWGfuqfGA+h638/R1G0WXLM9/ybx6jCS8PYuchVp40rAO+oF6VCwdG+YjUuPKuNsvPllODNplqggbiSr6XSGAjWyj6A=
+	t=1753220417; cv=none; b=rehuOiW/uibbINar82zBXxRVaZ4YqyG+3EFU7Xai8i1I6taZ4M7LDQNkxgjnoVPE+w0n8iEDY6YOxjsDfljOognVVHo5mf3YbciSISxioCB3l1kzB3TxRzn1vXFNf3rq/YXO4BZ+o3ozgghEazfvaFK1m5I/0XINfB7QOhDyLww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753219250; c=relaxed/simple;
-	bh=z/OhGgsF1pE/r+aeIeh6DQcnFi8zIwFrEDVeAmNbFTw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uy1QXZ0Lf3ok6VmT8vGxkGyx4VAaAPTWX++XiUoQrv2pHWVBWWFomEsDnQKWvL7+4Rv9cnOENRI1ZW7EBac4jENxNGvEoOG+Qgvpdpx+7w6VDNA+A9kdQbR+HUGwFQtXF4k7Pey+0LI+uf1fvkeeNvnbJ4iFFjJgDCnO+RX/S4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JGY2PAaE; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753219245;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=PdZ6RiU4H5BFI/C+tcoAC3Ox0L8a9MaMnCm2qq9VFhU=;
-	b=JGY2PAaEG5oAeA82qOS+0JS/6sthyAzs5Pv3STJsA9tLjQX9gOKeaMaiK7gLyJJOrQJJEa
-	bnJVrwfSHg0aMHUy9CM7WGcCqpgyS7fIyiZRddyPTB8cY9IZqWvlN+uYRZGLB1h6eilwwQ
-	Z4hZyxm8c5aVjr77mmvuEpW2EFMIMW8=
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-To: saeedm@nvidia.com,
-	leon@kernel.org,
-	tariqt@nvidia.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Zhu Yanjun <yanjun.zhu@linux.dev>,
-	Junxian Huang <huangjunxian6@hisilicon.com>
-Subject: [PATCHv4 net-next 1/1] net/mlx5: Fix build -Wframe-larger-than warnings
-Date: Tue, 22 Jul 2025 14:20:23 -0700
-Message-ID: <20250722212023.244296-1-yanjun.zhu@linux.dev>
+	s=arc-20240116; t=1753220417; c=relaxed/simple;
+	bh=bCHXTqLhFd6VRoxKB9pYjZ6+JNbveHiRWnOYS/2Xryo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fa7Nx4L16ou/wFwJNYaR+2JqrE34SJNVeTtbPKOUub2koPIpZV87emUvPT2j22t4U4HEZIeS5AQYGF6vv+g+e9SqRBCjZzKHvT6kuS/ClDMu+uz56R1hdqOqplgQ/WcAbeC9Zxni29EzEFmOpBn24DHORxKZn0rJJVHtzLQI79c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=aX37a1Rz; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=QekdXNQU2gB5u6wAx4HFWIhwWvDRVo65LWC/6zm1k0s=; b=aX37a1Rz2YzyNrGAowMhxVDcRg
+	arIHJPBJkAEkkPtbjiC0svOsEC4EvGT0Z0R8NoxNQYMfpulErUWNaBuh/yKy7odP2J7DkW083mbIM
+	CPAMjoE9TGoJHHTUNHnS5qnY5uSz2WCPorKksvp8dASKu9BU69Ymtp6HQXCiRnI8BXNWH2LPnCOz4
+	lxrrbmd7P47utevVl/XfQqwnlTF0Tup/8OckYwp1zGawnPLhorxrkS8nUhDX287pGn1Xc4Ci8hoiH
+	E94mOUnJHd2N9YQJW9i/E753Dy/mj7PDOhsMMwhnBYZlUv47rhBy8ZBtnH/+wXCqQv5C+YgdZWivq
+	Abd//GWw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53462)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1ueKiM-0000f5-0Q;
+	Tue, 22 Jul 2025 22:39:58 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1ueKiH-0007U5-22;
+	Tue, 22 Jul 2025 22:39:53 +0100
+Date: Tue, 22 Jul 2025 22:39:53 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Christophe Roullier <christophe.roullier@foss.st.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Tristram Ha <Tristram.Ha@microchip.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/4] dt-bindings: net: document st,phy-wol
+ property
+Message-ID: <aIAFKcJApcl5r7tL@shell.armlinux.org.uk>
+References: <20250721-wol-smsc-phy-v1-1-89d262812dba@foss.st.com>
+ <faea23d5-9d5d-4fbb-9c6a-a7bc38c04866@kernel.org>
+ <f5c4bb6d-4ff1-4dc1-9d27-3bb1e26437e3@foss.st.com>
+ <e3c99bdb-649a-4652-9f34-19b902ba34c1@lunn.ch>
+ <38278e2a-5a1b-4908-907e-7d45a08ea3b7@foss.st.com>
+ <5b8608cb-1369-4638-9cda-1cf90412fc0f@lunn.ch>
+ <383299bb-883c-43bf-a52a-64d7fda71064@foss.st.com>
+ <2563a389-4e7c-4536-b956-476f98e24b37@lunn.ch>
+ <aH_yiKJURZ80gFEv@shell.armlinux.org.uk>
+ <ae31d10f-45cf-47c8-a717-bb27ba9b7fbe@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ae31d10f-45cf-47c8-a717-bb27ba9b7fbe@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-When building, the following warnings will appear.
-"
-pci_irq.c: In function ‘mlx5_ctrl_irq_request’:
-pci_irq.c:494:1: warning: the frame size of 1040 bytes is larger than 1024 bytes [-Wframe-larger-than=]
+On Tue, Jul 22, 2025 at 10:59:51PM +0200, Andrew Lunn wrote:
+> >         if (!priv->plat->pmt) {
+> 
+> Let me start with maybe a dumb question. What does pmt mean? Why would
+> it be true?
 
-pci_irq.c: In function ‘mlx5_irq_request_vector’:
-pci_irq.c:561:1: warning: the frame size of 1040 bytes is larger than 1024 bytes [-Wframe-larger-than=]
+->pmt being true means the MAC supports remote wakeup (in other words,
+magic packet or unicast), and the glue driver has not set the
+STMMAC_FLAG_USE_PHY_WOL flag to force the use of PHY WoL.
 
-eq.c: In function ‘comp_irq_request_sf’:
-eq.c:897:1: warning: the frame size of 1080 bytes is larger than 1024 bytes [-Wframe-larger-than=]
+->pmt being false means that the MAC doesn't support remote wakeup
+(in other words, has no ability to wake the system itself) _or_ the
+platform wishes to force the use of PHY WoL when the MAC does support
+remote wakeup.
 
-irq_affinity.c: In function ‘irq_pool_request_irq’:
-irq_affinity.c:74:1: warning: the frame size of 1048 bytes is larger than 1024 bytes [-Wframe-larger-than=]
-"
+> 
+> >                 struct ethtool_wolinfo wol = { .cmd = ETHTOOL_GWOL };
+> > 
+> >                 phylink_ethtool_get_wol(priv->phylink, &wol);
+> >                 device_set_wakeup_capable(priv->device, !!wol.supported);
+> >                 device_set_wakeup_enable(priv->device, !!wol.wolopts);
+> 
+> Without knowing what pmt means, this is pure speculation....  Maybe it
+> means the WoL output from the PHY is connected to a pin of the stmmac.
+> It thus needs stmmac to perform the actual wakeup of the system, as a
+> proxy for the PHY?
 
-These warnings indicate that the stack frame size exceeds 1024 bytes in
-these functions.
+stmmac itself doesn't have an input for PHY interrupts, so a PHY
+which signals WoL via its interrupt pin (e.g. AR8035) wouldn't go
+through stmmac.
 
-To resolve this, instead of allocating large memory buffers on the stack,
-it is better to use kvzalloc to allocate memory dynamically on the heap.
-This approach reduces stack usage and eliminates these frame size warnings.
 
-Acked-by: Junxian Huang <huangjunxian6@hisilicon.com>
-Signed-off-by: Zhu Yanjun <yanjun.zhu@linux.dev>
----
-v3 -> v4: Relocate the kvzalloc call to a more appropriate place following Tariq's advice.
-v2 -> v3: No changes, just send out target net-next;
-v1 -> v2: Add kvfree to error handler;
+I mentioned above the STMMAC_FLAG_USE_PHY_WOL flag. To see why this
+flag is needed, on the Jetson Xavier NX platform, a RTL8211 PHY is used
+with stmmac - I think it's RTL8211F (without powering it back up, I
+can't check.) This PHY supports WoL, but signals wake-up through a
+dedicated PMEB pin. If a platform decides not to wire the PMEB pin, WoL
+on the PHY is unusable.
 
-1. This commit only build tests;
-2. All the changes are on configuration path, will not make difference
-on the performance;
-3. This commit is just to fix build warnings, not error or bug fixes. So
-not Fixes tag.
----
- drivers/net/ethernet/mellanox/mlx5/core/eq.c  | 22 ++++++----
- .../mellanox/mlx5/core/irq_affinity.c         | 19 +++++++--
- .../net/ethernet/mellanox/mlx5/core/pci_irq.c | 40 +++++++++++++------
- 3 files changed, 58 insertions(+), 23 deletions(-)
+rtl8211f_get_wol() does not take account of whether the PMEB pin is
+wired or not. Thus, stmmac can't just forward the get_wol() and
+set_wol() ops to the PHY driver and let it decide, as suggested
+earlier. As stmmac gets used with multiple PHYs, (and hey, we can't
+tell what they are, because DT doesn't list what the PHY actually is!)
+we can't know how many other PHY drivers also have this problem.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-index dfb079e59d85..9c5b4beabfac 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-@@ -873,19 +873,25 @@ static int comp_irq_request_sf(struct mlx5_core_dev *dev, u16 vecidx)
- {
- 	struct mlx5_irq_pool *pool = mlx5_irq_table_get_comp_irq_pool(dev);
- 	struct mlx5_eq_table *table = dev->priv.eq_table;
--	struct irq_affinity_desc af_desc = {};
-+	struct irq_affinity_desc *af_desc;
- 	struct mlx5_irq *irq;
- 
--	/* In case SF irq pool does not exist, fallback to the PF irqs*/
-+	/* In case SF irq pool does not exist, fallback to the PF irqs */
- 	if (!mlx5_irq_pool_is_sf_pool(pool))
- 		return comp_irq_request_pci(dev, vecidx);
- 
--	af_desc.is_managed = false;
--	cpumask_copy(&af_desc.mask, cpu_online_mask);
--	cpumask_andnot(&af_desc.mask, &af_desc.mask, &table->used_cpus);
--	irq = mlx5_irq_affinity_request(dev, pool, &af_desc);
--	if (IS_ERR(irq))
-+	af_desc = kvzalloc(sizeof(*af_desc), GFP_KERNEL);
-+	if (!af_desc)
-+		return -ENOMEM;
-+
-+	af_desc->is_managed = false;
-+	cpumask_copy(&af_desc->mask, cpu_online_mask);
-+	cpumask_andnot(&af_desc->mask, &af_desc->mask, &table->used_cpus);
-+	irq = mlx5_irq_affinity_request(dev, pool, af_desc);
-+	if (IS_ERR(irq)) {
-+		kvfree(af_desc);
- 		return PTR_ERR(irq);
-+	}
- 
- 	cpumask_or(&table->used_cpus, &table->used_cpus, mlx5_irq_get_affinity_mask(irq));
- 	mlx5_core_dbg(pool->dev, "IRQ %u mapped to cpu %*pbl, %u EQs on this irq\n",
-@@ -893,6 +899,8 @@ static int comp_irq_request_sf(struct mlx5_core_dev *dev, u16 vecidx)
- 		      cpumask_pr_args(mlx5_irq_get_affinity_mask(irq)),
- 		      mlx5_irq_read_locked(irq) / MLX5_EQ_REFS_PER_IRQ);
- 
-+	kvfree(af_desc);
-+
- 	return xa_err(xa_store(&table->comp_irqs, vecidx, irq, GFP_KERNEL));
- }
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
-index 2691d88cdee1..82d3c2568244 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
-@@ -47,29 +47,40 @@ static int cpu_get_least_loaded(struct mlx5_irq_pool *pool,
- static struct mlx5_irq *
- irq_pool_request_irq(struct mlx5_irq_pool *pool, struct irq_affinity_desc *af_desc)
- {
--	struct irq_affinity_desc auto_desc = {};
-+	struct irq_affinity_desc *auto_desc;
- 	struct mlx5_irq *irq;
- 	u32 irq_index;
- 	int err;
- 
-+	auto_desc = kvzalloc(sizeof(*auto_desc), GFP_KERNEL);
-+	if (!auto_desc)
-+		return ERR_PTR(-ENOMEM);
-+
- 	err = xa_alloc(&pool->irqs, &irq_index, NULL, pool->xa_num_irqs, GFP_KERNEL);
--	if (err)
-+	if (err) {
-+		kvfree(auto_desc);
- 		return ERR_PTR(err);
-+	}
-+
- 	if (pool->irqs_per_cpu) {
- 		if (cpumask_weight(&af_desc->mask) > 1)
- 			/* if req_mask contain more then one CPU, set the least loadad CPU
- 			 * of req_mask
- 			 */
- 			cpumask_set_cpu(cpu_get_least_loaded(pool, &af_desc->mask),
--					&auto_desc.mask);
-+					&auto_desc->mask);
- 		else
- 			cpu_get(pool, cpumask_first(&af_desc->mask));
- 	}
-+
- 	irq = mlx5_irq_alloc(pool, irq_index,
--			     cpumask_empty(&auto_desc.mask) ? af_desc : &auto_desc,
-+			     cpumask_empty(&auto_desc->mask) ? af_desc : auto_desc,
- 			     NULL);
- 	if (IS_ERR(irq))
- 		xa_erase(&pool->irqs, irq_index);
-+
-+	kvfree(auto_desc);
-+
- 	return irq;
- }
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
-index 40024cfa3099..692ef9c2f729 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
-@@ -470,26 +470,32 @@ void mlx5_ctrl_irq_release(struct mlx5_core_dev *dev, struct mlx5_irq *ctrl_irq)
- struct mlx5_irq *mlx5_ctrl_irq_request(struct mlx5_core_dev *dev)
- {
- 	struct mlx5_irq_pool *pool = ctrl_irq_pool_get(dev);
--	struct irq_affinity_desc af_desc;
-+	struct irq_affinity_desc *af_desc;
- 	struct mlx5_irq *irq;
- 
--	cpumask_copy(&af_desc.mask, cpu_online_mask);
--	af_desc.is_managed = false;
-+	af_desc = kvzalloc(sizeof(*af_desc), GFP_KERNEL);
-+	if (!af_desc)
-+		return ERR_PTR(-ENOMEM);
-+
-+	cpumask_copy(&af_desc->mask, cpu_online_mask);
-+	af_desc->is_managed = false;
- 	if (!mlx5_irq_pool_is_sf_pool(pool)) {
- 		/* In case we are allocating a control IRQ from a pci device's pool.
- 		 * This can happen also for a SF if the SFs pool is empty.
- 		 */
- 		if (!pool->xa_num_irqs.max) {
--			cpumask_clear(&af_desc.mask);
-+			cpumask_clear(&af_desc->mask);
- 			/* In case we only have a single IRQ for PF/VF */
--			cpumask_set_cpu(cpumask_first(cpu_online_mask), &af_desc.mask);
-+			cpumask_set_cpu(cpumask_first(cpu_online_mask), &af_desc->mask);
- 		}
- 		/* Allocate the IRQ in index 0. The vector was already allocated */
--		irq = irq_pool_request_vector(pool, 0, &af_desc, NULL);
-+		irq = irq_pool_request_vector(pool, 0, af_desc, NULL);
- 	} else {
--		irq = mlx5_irq_affinity_request(dev, pool, &af_desc);
-+		irq = mlx5_irq_affinity_request(dev, pool, af_desc);
- 	}
- 
-+	kvfree(af_desc);
-+
- 	return irq;
- }
- 
-@@ -548,16 +554,26 @@ struct mlx5_irq *mlx5_irq_request_vector(struct mlx5_core_dev *dev, u16 cpu,
- {
- 	struct mlx5_irq_table *table = mlx5_irq_table_get(dev);
- 	struct mlx5_irq_pool *pool = table->pcif_pool;
--	struct irq_affinity_desc af_desc;
- 	int offset = MLX5_IRQ_VEC_COMP_BASE;
-+	struct irq_affinity_desc *af_desc;
-+	struct mlx5_irq *irq;
-+
-+	af_desc = kvzalloc(sizeof(*af_desc), GFP_KERNEL);
-+	if (!af_desc)
-+		return ERR_PTR(-ENOMEM);
- 
- 	if (!pool->xa_num_irqs.max)
- 		offset = 0;
- 
--	af_desc.is_managed = false;
--	cpumask_clear(&af_desc.mask);
--	cpumask_set_cpu(cpu, &af_desc.mask);
--	return mlx5_irq_request(dev, vecidx + offset, &af_desc, rmap);
-+	af_desc->is_managed = false;
-+	cpumask_clear(&af_desc->mask);
-+	cpumask_set_cpu(cpu, &af_desc->mask);
-+
-+	irq = mlx5_irq_request(dev, vecidx + offset, af_desc, rmap);
-+
-+	kvfree(af_desc);
-+
-+	return irq;
- }
- 
- static struct mlx5_irq_pool *
+So, the idea put forward that ethernet drivers should forward get_wol()
+and set_wol() to the PHY driver and only do WoL at the MAC if the PHY
+doesn't support it is, I'm afraid, now fundamentally flawed.
+
+We can't retrofit such detection into PHY drivers - if we do so, we'll
+break WoL on lots of boards (we'd need to e.g. describe PMEB in DT for
+RTL8211F PHYs. While we can add it, if a newer kernel that expects
+PMEB to be described to allow WoL is run with an older DT, then that
+will be a regression.) Thus, I don't see how we could retrofit PHY
+WoL support detection to MAC drivers.
+
+So, while it is undesirable to have a flag in DT to say "we can use
+PHY WoL on this platform" and we can whinge that it isn't "describing
+hardware", DT _hasn't_ been describing the hardware, and trying to fix
+DT to properly describe the hardware now is going to cause _lots_ of
+breakage.
+
+I can't see a way forward on this unless someone is willing to relax
+over what seem to be hard requirements (e.g. no we don't want a flag
+in DT to say use PHY WoL.) We have collectively boxed ourselves into
+a corner on this.
+
 -- 
-2.50.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
