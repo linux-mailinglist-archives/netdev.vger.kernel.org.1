@@ -1,127 +1,113 @@
-Return-Path: <netdev+bounces-208747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED163B0CEF8
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 03:04:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EBD4B0CF02
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 03:13:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A0211AA3A53
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 01:05:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F0601AA3FF6
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 01:14:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA5BF15624B;
-	Tue, 22 Jul 2025 01:04:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 632AB191493;
+	Tue, 22 Jul 2025 01:13:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QMOjBZ8i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tj3iW3d8"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15C1714A60D
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 01:04:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 355D6156677;
+	Tue, 22 Jul 2025 01:13:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753146277; cv=none; b=rqsEfv44t5k0U4xKKdoXJvwDlOLmaQOTBDG2OijdYQl4Iq9vBPh/vlhLFvxkZkZJhF7EJE8mIkJhj/ZQYh1POeJMyw+AIgATp3eoKez6cPc/gCl6gpu3iUMvTJPg3FoD89HSd5omQC5VOiHVzxR7nbUvx7JymrTu0Lyef5YD6LA=
+	t=1753146827; cv=none; b=D2DyCjpfhNmYvTvLnDRe2OoR+bZBE/jiGux/S6jb/dio8nzrxxsaW1x7al3WHjUvXEg9QomXpimuqEkJi0izZeCpsjoIZvOO0ehd2GmM+WleP9WlU/Gs77WRMZO/vNRjR80TGzaOEOH4x7DmsMp1sQtUxNsdPuG8Zy6rFJshKaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753146277; c=relaxed/simple;
-	bh=QSHfY6/I45E7VoqU71vjWN2GGh3FR7Hqm6Zx+uwE1oU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SPB42KWuMnSOfCYWe9xxaw4h7BJ5FfiCOMtba3blm1R7qTMuyIyG7Y/t8/Yb4dHEH0yAInH1STsGsXORIGx/rnlnT/umsR0XPeYgaRE7qXfqI5SmY4K54Sq1L4zT7jtJI4JYMFspCJUg5MhhpuuCMkSw8dRPLg3ww2wL2OxS2S4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QMOjBZ8i; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1753146275;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QSHfY6/I45E7VoqU71vjWN2GGh3FR7Hqm6Zx+uwE1oU=;
-	b=QMOjBZ8iP55yzOKdWdq460M7cocSn05CTBUIIKF1ZaMFaztzH3wX8bGMcWH9C82TDRKB0H
-	/BWsKACpwRP7zdXAYuRnxD9zzqE1BCVyHEPKXE82pwEzoLvgsJlZyh38guSWKXKydrzoCy
-	8d/w1qeU8FQhPXn3hxTzyiWUbeIboVo=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-324-SHwYhWbqNJie-FcOckzJCg-1; Mon, 21 Jul 2025 21:04:33 -0400
-X-MC-Unique: SHwYhWbqNJie-FcOckzJCg-1
-X-Mimecast-MFC-AGG-ID: SHwYhWbqNJie-FcOckzJCg_1753146272
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-311d670ad35so4533997a91.3
-        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 18:04:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753146272; x=1753751072;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QSHfY6/I45E7VoqU71vjWN2GGh3FR7Hqm6Zx+uwE1oU=;
-        b=jcCo9o42TBGLYNhCec2hyqTlMNPop0TE1aHfgxNcLQY5LhpHEop5p5DUL+2aELh9Fi
-         Cae041hVhi7EQV7JsmIamZSGz3afnYn7ZtK0prg+a/RkXhWEVuw3us7T8pORiFIz13Do
-         AiO5P496C5gxJ0CD0ZdNSF8xvO1ZIrttkHvLI5kUhLsY799FNV4cTGGXJgf4RJPHyw47
-         Tj+k3kbmRgiXhW7rbH8FGEGDDZXftFlv6ovgfj7sRgKIfYXBs6n5ZUOgcC9Mn0aGevfW
-         qIN5bZAyM06vBS7iN6CKFa8YGXhs27Dtni51NlCGYCasbW1O4h6RdkZqDmGSyCJWiFtF
-         Jm7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU3mI9u8V4OiByX1LdvDRTZagj8+QbM3aHvOg4WUmi+sz4YPbwNT6QKbEXMjMkK/r565E4L36o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFosdLnUXNp7F8PiVNrofjpe+NctWcFZE8mWhJvtw8QkKtkPpl
-	5cuKat0nDJtyuoR9UNx6w0h2b0pqyrYPYJPbgUy2kuPb8CZIBF7a/8nWQZbSkzMbKSAnBExDy8s
-	c5JJS63hSNsKB/vZwcohVQ5uhwv/rdJ+qq/JLs2F6reWaBBUoqFgKk8WemeGNs13hhthAMfbbyE
-	rwlset0tyRt0+qgr41zPb5iLB/cTyubaua
-X-Gm-Gg: ASbGncsIr92eFEr+I+rwVQg40huxCYfPtx5P73etwbb9lL2Z+SFXCwja1tWkn8NAqtS
-	L/xQHBXxIyl/wDRqlX4PctJeXiB6NapckOMTUQJatLCq64H5Ubuoy3wH3DphzfyaN6Kc32/SmVI
-	2QpzTtX5EJSz5FQ4M6888o
-X-Received: by 2002:a17:90b:3fc4:b0:311:c1ec:7cfb with SMTP id 98e67ed59e1d1-31c9f4c33d3mr30854057a91.21.1753146272145;
-        Mon, 21 Jul 2025 18:04:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFHbGV5ZoUz9R/WO/NmCH4wsvyzuXu8KWNfORxHSTj8M2vI5FKY2tXFlD0N7kPl5yOe5oFtODb2u9iLGbeS7Yc=
-X-Received: by 2002:a17:90b:3fc4:b0:311:c1ec:7cfb with SMTP id
- 98e67ed59e1d1-31c9f4c33d3mr30854021a91.21.1753146271717; Mon, 21 Jul 2025
- 18:04:31 -0700 (PDT)
+	s=arc-20240116; t=1753146827; c=relaxed/simple;
+	bh=IomN0U2iNd6WXxaGDGSojq3NGe3wnNTxSPa5F+b6tOI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZlVqBEYx4Qg1GGUC59IRjwLt56+8kMfgghx8DHxV7j/AHVwAxnzuSzAEqDuVPsibJmqDPWp01GNFavO8RYBJ0Ea3rXPEdfrzkFySoEdcaedJni5gpk3HWuTLBhRD351vwdDgjCT90AtXEJz6Vr3fJIssxKP+VJ18B6DN2mfLKXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tj3iW3d8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3086EC4CEED;
+	Tue, 22 Jul 2025 01:13:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753146825;
+	bh=IomN0U2iNd6WXxaGDGSojq3NGe3wnNTxSPa5F+b6tOI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tj3iW3d84vaWooxanhe3gZe4OhbeAC4pXf7FX9oQoarMNgB/Yux+mLxmTvu+d1I3d
+	 1AsFWfUgbnDWRNXBXxlLrK6ZMwdN/w/jXQi0a/ShdC5Od/+PSUYAxJnC+KCF7M74UM
+	 qtYLzvbCIaMi9pjoUw4j+Ib+cN2qamBPTY3GsxdD57r3AbZokbNHrDDXcCpPqMaicJ
+	 UWGyqpA1xfnYihhD+BuMGnA6a9IsCkkiGXp0gP+wNzNOwn64Cx9BrNM5WnJGW9RpGg
+	 5HH9gm5Fss2tHHwq/9zzhEBvC2dFZ2coFQtau7pKJpI51iybWXHXoCkAyeW1dqlZlw
+	 H/ObSTHSVjpzw==
+Date: Mon, 21 Jul 2025 18:13:44 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: Lorenzo Bianconi <lorenzo@kernel.org>, Stanislav Fomichev
+ <stfomichev@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <borkmann@iogearbox.net>,
+ Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, sdf@fomichev.me,
+ kernel-team@cloudflare.com, arthur@arthurfabre.com, jakub@cloudflare.com,
+ Jesse Brandeburg <jbrandeburg@cloudflare.com>
+Subject: Re: [PATCH bpf-next V2 0/7] xdp: Allow BPF to set RX hints for
+ XDP_REDIRECTed packets
+Message-ID: <20250721181344.24d47fa3@kernel.org>
+In-Reply-To: <ebc18aba-d832-4eb6-b626-4ca3a2f27fe2@kernel.org>
+References: <175146824674.1421237.18351246421763677468.stgit@firesoul>
+	<aGVY2MQ18BWOisWa@mini-arch>
+	<b1873a92-747d-4f32-91f8-126779947e42@kernel.org>
+	<aGvcb53APFXR8eJb@mini-arch>
+	<aG427EcHHn9yxaDv@lore-desk>
+	<aHE2F1FJlYc37eIz@mini-arch>
+	<aHeKYZY7l2i1xwel@lore-desk>
+	<20250716142015.0b309c71@kernel.org>
+	<fbb026f9-54cf-49ba-b0dc-0df0f54c6961@kernel.org>
+	<20250717182534.4f305f8a@kernel.org>
+	<ebc18aba-d832-4eb6-b626-4ca3a2f27fe2@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250718061812.238412-1-lulu@redhat.com> <20250721162834.484d352a@kernel.org>
-In-Reply-To: <20250721162834.484d352a@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 22 Jul 2025 09:04:20 +0800
-X-Gm-Features: Ac12FXz7bcSA4tc5LblLvTxBTyr6TPXP7yPwK31t1GMBpJ5P5WuM1Cl6XkRbI94
-Message-ID: <CACGkMEtqhjTjdxPc=eqMxPNKFsKKA+5YP+uqWtonm=onm0gCrg@mail.gmail.com>
-Subject: Re: [PATCH RESEND] netvsc: transfer lower device max tso size
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Cindy Lu <lulu@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Michael Kelley <mhklinux@outlook.com>, Shradha Gupta <shradhagupta@linux.microsoft.com>, 
-	Kees Cook <kees@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Guillaume Nault <gnault@redhat.com>, 
-	Joe Damato <jdamato@fastly.com>, Ahmed Zaki <ahmed.zaki@intel.com>, 
-	"open list:Hyper-V/Azure CORE AND DRIVERS" <linux-hyperv@vger.kernel.org>, 
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 22, 2025 at 7:28=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Fri, 18 Jul 2025 14:17:55 +0800 Cindy Lu wrote:
-> > Subject: [PATCH RESEND] netvsc: transfer lower device max tso size
->
-> You say RESEND but I don't see a link to previous posting anywhere.
->
-> I'd rather we didn't extend the magic behavior of hyperv/netvsc any
-> further.
+On Fri, 18 Jul 2025 12:56:46 +0200 Jesper Dangaard Brouer wrote:
+> >> Thanks for the feedback. I can see why you'd be concerned about adding
+> >> another adhoc scheme or making xdp_frame grow into a "para-skb".
+> >>
+> >> However, I'd like to frame this as part of a long-term plan we've been
+> >> calling the "mini-SKB" concept. This isn't a new idea, but a
+> >> continuation of architectural discussions from as far back as [2016].  
+> > 
+> > My understanding is that while this was floated as a plan by some,
+> > nobody came up with a clean way of implementing it.  
+> 
+> I can see why you might think that, but from my perspective, the
+> xdp_frame *is* the implementation of the mini-SKB concept. We've been
+> building it incrementally for years. It started as the most minimal
+> structure possible and has gradually gained more context (e.g. dev_rx,
+> mem_info/rxq_info, flags, and also uses skb_shared_info with same layout
+> as SKB).
 
-Are you referring to the netdev coupling model of the VF acceleration?
+My understanding was that just adding all the fields to xdp_frame was
+considered too wasteful. Otherwise we would have done something along
+those lines ~10 years ago :S
 
-> We have enough problems with it.
->
+> This patch is simply the next logical step in that existing evolution:
+> adding hardware metadata to make it more capable, starting with enabling
+> XDP_REDIRECT offloads. The xdp_frame is our mini-SKB, and this patchset
+> continues its evolution.
 
-But this fixes a real problem, otherwise nested VM performance will be
-broken due to the GSO software segmentation.
+I thought one of the goals for mini-skb was to move the skb allocation
+out of the drivers. The patches as posted seem to make it the
+responsibility of the XDP program to save the metadata. If you're
+planning to make drivers populate this metadata by default - why add
+the helpers.
 
-Thanks
-
+Again, I just don't understand how these logically fit into place
+vis-a-vis the existing metadata "get" callbacks.
 
