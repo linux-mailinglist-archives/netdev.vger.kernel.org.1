@@ -1,109 +1,128 @@
-Return-Path: <netdev+bounces-208784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA86DB0D1D6
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 08:27:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DBBBB0D200
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 08:42:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1BBE1AA6C91
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 06:28:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 182991C213FD
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 06:43:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFC002BEFE3;
-	Tue, 22 Jul 2025 06:27:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A7CE2BE634;
+	Tue, 22 Jul 2025 06:42:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gmvgTlJr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 813AE1DF246;
-	Tue, 22 Jul 2025 06:27:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB1071C5D6A
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 06:42:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753165648; cv=none; b=ReqH6zHM1od+CR6oVA0ZF3rmhpVgFGVUxVO/y3K9QBASr78at8wCEUxkIh3bX8+C45qLk1T9iTyq9XWpjn+PUC2dhL5niYDVbPIJTpxcoIX64TYJkfR0+q7z02ukiCHCCp6MFJV05dFGQqhGVbjdzeq2BSHO1SJM0DTiUwIWIlw=
+	t=1753166562; cv=none; b=SQEGYbOQ8s44SX0sr9o5LsWQic3SB316jHk7V2Iyx7xqWHedXQhjn7ZdB1iHuBrXZ9s4br41fsO9XbBwyzRYsdLwVqqwhpLxw4Wz+V67IUPr2Rz/AKm2LGdu/AOzQrGx0wv1Gi3DwOWJpBe4tldmud5vJ5Qa69HiLqxw8xR+260=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753165648; c=relaxed/simple;
-	bh=2I7wcjB5020T/1e8E1MNHCvajb2TFC13MQwLsNrz8fs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KhUmyztx2xEPrusC1FB20gIJf7l9p2lS+6Ntbts/dalmR9KJwEBPI7T5fM3/FMDwcqH2trAkZPfYIZjj6IH7rbJlQXqTn+uGv1EKxpGVF3mtVz57oT+L311CQZEG3hfC0wIBcxVFtkTn4wiBCi5+Gk7SpOuBfu7ZeROyqoJWgOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [113.200.148.30])
-	by gateway (Coremail) with SMTP id _____8DxzOJLL39oFWgvAQ--.30012S3;
-	Tue, 22 Jul 2025 14:27:23 +0800 (CST)
-Received: from linux.localdomain (unknown [113.200.148.30])
-	by front1 (Coremail) with SMTP id qMiowJAxvsFFL39oIIchAA--.2200S4;
-	Tue, 22 Jul 2025 14:27:20 +0800 (CST)
-From: Tiezhu Yang <yangtiezhu@loongson.cn>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 2/2] net: stmmac: Check stmmac_hw_setup() in stmmac_resume()
-Date: Tue, 22 Jul 2025 14:27:16 +0800
-Message-ID: <20250722062716.29590-3-yangtiezhu@loongson.cn>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20250722062716.29590-1-yangtiezhu@loongson.cn>
-References: <20250722062716.29590-1-yangtiezhu@loongson.cn>
+	s=arc-20240116; t=1753166562; c=relaxed/simple;
+	bh=NA36uYIdstJH2uG8YyMNqBz92Za5P96z2ySsI/waiio=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Asr90yu7bkvp+C86BhMK/YcbH8n332YNMh4wpvtp8ApMXJ4g+m7kwqdYgQvjz8rNHknZs/NtGGoya25KURV/dI24/4glGAE9n5nABuyL7e188EY/ATEg0vo5HkpvWwDbLyRQDZJKanA2NUUBIz/xLGDPsldXg/9CT+mPVRyASGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gmvgTlJr; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4ab9ba884c6so65412831cf.0
+        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 23:42:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753166560; x=1753771360; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B6h6Sd7T3RH+CtFzxBNwU/jmY2fsZCbhu4Ru+TS9LQU=;
+        b=gmvgTlJrfSwoMG+fZ6QguOUaMrznQ9U5KIahdOlJ3wRGrGLCXHM0qyFYwPRD+rI/a+
+         XS/gXR8ZaYh01KSI2tzV5jOV/g2cBxl00wOYsHDDKV/D2xcgWPQ/nrMe1NFtnneX+I+e
+         HD/f1AVKr8ArPSjmjj9uValiyrkIpciejl7CqyGMNhxOjdlB/E/6lw2u5qKqR7Md7zNj
+         5ewSt9R2YDEowO33Yiaz19Z+YSKyPDpTlOqwYfmqzFBTD1dPRSJzRixrC+29+2jabjve
+         J8I7UCgCW9ba1K2Yphw80AtXXGhOh+AFIsHdHMbMf4+vR/0H0ZDRomPZUSWTHOqxqdp6
+         fq4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753166560; x=1753771360;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=B6h6Sd7T3RH+CtFzxBNwU/jmY2fsZCbhu4Ru+TS9LQU=;
+        b=H7D6nCHfECITFLSgW32LFJ3iJhvifDnjFATr87cgsYkT95K1d9y2ieHMXhqAgZGAqG
+         6xjxOwHXXvl7/+0lvudc9Uz9hRESFEzzsoP1oXe4e1G2bIu02KOWVZT2KcEZGlJrpFy5
+         BoIugzt3vPzw4YA3gjcCa/m2HjXwr5dsAF8OqTIufwFp0QhT6W4fJMnFewkrLYCe3sVk
+         Dl9CZzkTuXS3VGvcea+7VbBtrPnhKWcFAKBsDk5ExyI7hBndvO7h9sOCxXh6lgmrdvuu
+         jnewzi4D2GA+9eDZsbPb/18A1p3te7c5xc0N+IxVIREv2AzLyeTIDjDWaMAJzXQhubuj
+         jA3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCW1r/doDzYvY+yYye249EvcdDvoU3bTV2rRG78coLQUGBGOYyNyaYHYz5gJIzO/+a9lYrPa5dY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyTePzsVQCYUw6ZKTHrJ9rE2v13KmwUJVWjYZE4/ArxJdh4ZUg
+	Z71gsRfbs6XHgpGddcObox0xAvV139SfXVnVHFLSMvBlVPbLHkijJ1vQy+40j6+ut7Tqu+qDMv5
+	1TIjVXmmZbMSFQTmZpp0my0FhOfZGhOAZF44ycvF0
+X-Gm-Gg: ASbGnctmfPhCaxBllAk87/Icai/fR+FofqxPL3CaYt54J/Y+RlBUGrgOqbS7RqYkQ9/
+	YB6rfCA+IDczitAJ/P+Kx3qyGEEVJ9AfTWkTI0B71WIH+wP5stsfZG2KpQwefaj3eFjcS8qjSqj
+	qzRDLfSfIr2+PxfTd7b1G7Pv/oA7b686KJNPQZNzp3giFd24skaB/iy6+8qlen1AuhGzVIv8+Rl
+	ONf5Q==
+X-Google-Smtp-Source: AGHT+IFE18i3ZNkbmsrw1BuD3fHiD6gRMvLpTbu/niAOFe34mLrrmfHvaIzaR08VQ8lZs6la4mlmVt+dTDNJFyAXP1Y=
+X-Received: by 2002:a05:622a:4acb:b0:4ab:41a7:18da with SMTP id
+ d75a77b69052e-4ae5b99f102mr36129921cf.26.1753166559335; Mon, 21 Jul 2025
+ 23:42:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJAxvsFFL39oIIchAA--.2200S4
-X-CM-SenderInfo: p1dqw3xlh2x3gn0dqz5rrqw2lrqou0/
-X-Coremail-Antispam: 1Uk129KBj9xXoW7JF4xXr17uw1rZF4DWFW7GFX_yoWktrcEgF
-	1Ivrn5Xw1UGF43KryUKr43Zry09F4Du3W09F4UGayfu3Z7Was8XF98Wr9xAF1rZry5CFyD
-	Wr1xtr1fAw45KosvyTuYvTs0mTUanT9S1TB71UUUUj7qnTZGkaVYY2UrUUUUj1kv1TuYvT
-	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
-	cSsGvfJTRUUUbS8YFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
-	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	W8JVWxJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6F4UJVW0owAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
-	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jw0_
-	WrylYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
-	xGrwCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
-	JVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
-	vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IY
-	x2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26c
-	xKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAF
-	wI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jz5lbUUUUU=
+References: <20250721111607626_BDnIJB0ywk6FghN63bor@zte.com.cn>
+In-Reply-To: <20250721111607626_BDnIJB0ywk6FghN63bor@zte.com.cn>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 21 Jul 2025 23:42:27 -0700
+X-Gm-Features: Ac12FXywVAz49IpEFRm5TGn9QbbuypsOmwnVNfzN6cH9wGhw3rlyrS0T17qYW08
+Message-ID: <CANn89iJiLC6ZRXqJU82vsH0Lu+-o-GP_1WAK=2bcfdGmu7nKrg@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 RESEND] tcp: trace retransmit failures in tcp_retransmit_skb
+To: fan.yu9@zte.com.cn
+Cc: kuba@kernel.org, ncardwell@google.com, davem@davemloft.net, 
+	dsahern@kernel.org, pabeni@redhat.com, horms@kernel.org, kuniyu@google.com, 
+	rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, yang.yang29@zte.com.cn, 
+	xu.xin16@zte.com.cn, tu.qiang35@zte.com.cn, jiang.kun2@zte.com.cn, 
+	qiu.yutan@zte.com.cn, wang.yaxin@zte.com.cn, he.peilin@zte.com.cn
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-stmmac_hw_setup() may return 0 on success and an appropriate negative
-integer as defined in errno.h file on failure, just check it and then
-return early if failed in stmmac_resume().
+On Sun, Jul 20, 2025 at 8:16=E2=80=AFPM <fan.yu9@zte.com.cn> wrote:
+>
+> From: Fan Yu <fan.yu9@zte.com.cn>
+>
+> Background
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> When TCP retransmits a packet due to missing ACKs, the
+> retransmission may fail for various reasons (e.g., packets
+> stuck in driver queues, receiver zero windows, or routing issues).
+>
+> The original tcp_retransmit_skb tracepoint:
+>
+>   'commit e086101b150a ("tcp: add a tracepoint for tcp retransmission")'
+>
+> lacks visibility into these failure causes, making production
+> diagnostics difficult.
+>
+>
 
-Signed-off-by: Tiezhu Yang <yangtiezhu@loongson.cn>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Co-developed-by: xu xin <xu.xin16@zte.com.cn>
+> Signed-off-by: xu xin <xu.xin16@zte.com.cn>
+> Signed-off-by: Fan Yu <fan.yu9@zte.com.cn>
+> Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index b948df1bff9a..2bfacab71ab9 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -7975,7 +7975,14 @@ int stmmac_resume(struct device *dev)
- 	stmmac_free_tx_skbufs(priv);
- 	stmmac_clear_descriptors(priv, &priv->dma_conf);
- 
--	stmmac_hw_setup(ndev, false);
-+	ret = stmmac_hw_setup(ndev, false);
-+	if (ret < 0) {
-+		netdev_err(priv->dev, "%s: Hw setup failed\n", __func__);
-+		mutex_unlock(&priv->lock);
-+		rtnl_unlock();
-+		return ret;
-+	}
-+
- 	stmmac_init_coalesce(priv);
- 	phylink_rx_clk_stop_block(priv->phylink);
- 	stmmac_set_rx_mode(ndev);
--- 
-2.42.0
+Please do not add a Suggested-by tag when the original idea did not
+come from someone else.
 
+I only made suggestions to make your patch better.
+
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
