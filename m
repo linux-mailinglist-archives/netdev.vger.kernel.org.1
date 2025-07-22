@@ -1,126 +1,102 @@
-Return-Path: <netdev+bounces-209075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C99DB0E2A1
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 19:32:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B074AB0E2BA
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 19:41:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B8ED567C37
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 17:32:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9EF7563EF5
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 17:41:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E1CA27D780;
-	Tue, 22 Jul 2025 17:32:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E970827E7DD;
+	Tue, 22 Jul 2025 17:41:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1Fx9kkWq"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bSgLNiBV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 168055234
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 17:32:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4106919D082;
+	Tue, 22 Jul 2025 17:41:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753205568; cv=none; b=bwQvf4LpbhfmbCuuMasICeLMB1FMT37VVs7SZLiqtcgYKROPUg8vqkhFFO6C9sKj7T7OvP/f7x4+2MwoTVmQQMWB4pBNE5VrH80xb1UrlKSLfQ5dWlwU4WiOO9T3zQmFiwC+PJ2uEQ0oqehCHHjF0OEFeiE2nRZbJqKCuLrz4cs=
+	t=1753206077; cv=none; b=PYT3IQUIb5HsJ2MRY7Rau6WobCyszjRnZbCaDskopBXtawzKhvARKLPwxyAgcJqtYZj4hRkwfxsNXNhWslqpcRkTyQkYB7k+kZIs0XhNE/TBhPrxFF+waOfYkeN8SWcfJfWPZ11D+MBVpGDKQ0sXWopQsCyojz0kJk9+9+IvL9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753205568; c=relaxed/simple;
-	bh=skEIStYLex0IwNhjVxYvbiFwZQTi/ZIk9jt1jDlyWBI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=f/dXUx0Ay6mjgkYqLe3ytsDrCrk2c0jkqy6YaNnzDPyxDFU1qNE7NctZU+tLrGZJ2UyaHvj2MnwDyodf0NEGYmIlohpsHAhZqB+/phjyyY+aYFjLzSJAKgFiyvwlBs0Ehn9d9cd9OImI9CeP1PXjgoqZfZO97lfkqyxfhW3Twi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1Fx9kkWq; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-237f18108d2so17155ad.0
-        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 10:32:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753205566; x=1753810366; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GDbGckRNTh0QXSl5QzqdDA70mHJnKu7+uiyGYXkKED4=;
-        b=1Fx9kkWqg7sgrD+0GZ3VIN1lV82XUF8wcSHQvIY2xcBgT6BW9pkJGkLJ/YfcQ4rOgy
-         1GIlpjEXcURWV0zNyGZMtFaWkmEwsQAHpdb2MDRs1DVVhEKT+EWoHoBuUPYUqpdfO02K
-         ObxFiaVojKj3aVr61nhTEEytL1oOlgcZpRnhI+D3nMP1syaGTTb5w3jIqia7f/m17Ub8
-         cQy8cNghN4N4u5EmijwNRtQAjgqU+F1Jz4sndQ2NF92HVmX7VoFVjn2HECKD+LeQ7VQq
-         keqcQgKbBzwK5KCXOdwV0ZsdxV31mjW02DHsbx8xPaKgZ4Hk/GJHdjgAMrXprvZLr5b/
-         JRMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753205566; x=1753810366;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GDbGckRNTh0QXSl5QzqdDA70mHJnKu7+uiyGYXkKED4=;
-        b=r+OZ+AbYDND4KLRsRgxRfv5uiDm8hqz63twNo9lcV7nsGJN9PppgFiJ2jH2GsRL3+D
-         4L9CQuBwNruI9xOjyDDuAiQ4LDceXitMo7jmxLmbHE7pVeIzaV/9yj5cJs6G7DM2fIdl
-         VTNG8PyEmTiZaxkqyaqa0IIyVDBqr9UHvWLdcDx9bWYnFJS4XehniSf65Vo36x2uLd9R
-         qWnF2rVvIE5vE7KwVuxlV1aISo3QsvkJH9EwwulRXQXQeB/XGQpTkFf12h7xu9pm/NpZ
-         vjBlxMhZPfC5cwx3gVDP0lFhk+Zyj3wyybjlNyD9jytfv7MKmAsl0r/Bls+INMzTSe9O
-         2H0A==
-X-Forwarded-Encrypted: i=1; AJvYcCWkiPHgE6XzdCOR9W1CvihCci2EyQAnDBP/+Fym2DCa+ih5FVtSWHKb50wPpUewY73VqZ2Z3nU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx9S7yA1XqcTWtcnQO9DKt0HYCUK+FqlWRRZdrquIlB7oADPzVx
-	Uz7fzc4jiXE3Qw1aoS98fynnGSVdJlKQhZai27kSeOYikzdlSCP9xZX/u0W+/EXz9ElwC/BzA1G
-	QXVhU3bogWvW9m8rXdSzFr94QsPCQ6ND/Mul5R1VB
-X-Gm-Gg: ASbGncsh/OCR3kGnHh1NHc2VQmqFz7N6UTuM11+JLc0qR6D5mrvOJ45wXp+TkF/6wmX
-	47pqjFoBjVcw8N0p8GTdqCDlVqYw+GQE4wnSS1AMW1+NSAaZuu1chM7/rDPyd8CBHpfVZ4n7R3W
-	zKUYLrI8AeBdK6AZahvUduewwv4HUyMmvol6UeGeLw9b+ko8lSFAh2reSYqEVE+ZdgHIoT8SIlx
-	Bzy+p1CqZ4x6zi3sRBNKUJOLrwU9gvNnS6iyls=
-X-Google-Smtp-Source: AGHT+IF1JA2yCcl12vlpGwwWEZGA7Y9a1TPAogTq0q+/p5UgxdK4OFqYBGkvUNOK64f+17OZUjfeux/KSzhO876kqaE=
-X-Received: by 2002:a17:902:f745:b0:234:b2bf:e67f with SMTP id
- d9443c01a7336-23f8cf8598cmr3467295ad.9.1753205566005; Tue, 22 Jul 2025
- 10:32:46 -0700 (PDT)
+	s=arc-20240116; t=1753206077; c=relaxed/simple;
+	bh=skUXd2YpZcbtREi+ucT+2NZdJ3FgLZdJLotsihlVZ5A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iytS8x2yR5Ew8Fe9iXUQsG2UdSIRnWz7dGyRXRVgjdLEQnEdRpPKuVSlTY/KWLLTfTOEnXxoTZtniMkQvQwPhdal7VIAO0okkZeblMQxsn3oytIIez1pr5W4sNbHgjK0l6V46I0WBWPMWpJN2/3VUUXPG5zWqxwScvU/VdFAb7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bSgLNiBV; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Pgop0txGfgW9l2DjzVuSEIR9yTyTyHdsNlzGiM7qYPo=; b=bSgLNiBV49l/s1yUKU36xZZRw5
+	yKcx50prGOU/c13C+7MlLpp48sGhntPPIcsjIh+yDt7CePH+MtDSkLpTIQW5JLXI+4OQ+XCgLorj5
+	Yq3Jg4FzRMCm2siGT5SObmqF2EjWZI2+ifCodMvoB328VzjoGg6J+YC8bmGChDIFf298=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ueGz7-002UfS-Ri; Tue, 22 Jul 2025 19:41:01 +0200
+Date: Tue, 22 Jul 2025 19:41:01 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Kees Cook <kees@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next] net: Document sockaddr safety in ARP and
+ routing UAPI structures
+Message-ID: <7577b0f5-2b43-4e5d-89fe-7129c32acb47@lunn.ch>
+References: <20250722165836.work.418-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250717152839.973004-1-jeroendb@google.com> <20250717152839.973004-5-jeroendb@google.com>
- <CAL+tcoBu0ZQzLA0MvwAzsYYpz=Z=xR7LiLmFwJUXcHFDvFZVPg@mail.gmail.com> <534146d9-53b1-4b4a-8978-206f6ad4f77e@redhat.com>
-In-Reply-To: <534146d9-53b1-4b4a-8978-206f6ad4f77e@redhat.com>
-From: Harshitha Ramamurthy <hramamurthy@google.com>
-Date: Tue, 22 Jul 2025 10:32:35 -0700
-X-Gm-Features: Ac12FXzQVZxOFJVBW-sncCa5oU29UZ6LwRW91wRIab6ANgcCaA5eRGVKvbkpjxs
-Message-ID: <CAEAWyHcLHfyvnLogdqWZR_am9ed+SSOfTp7GfOXBB89Duv_N4Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 4/5] gve: implement DQO TX datapath for AF_XDP zero-copy
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jason Xing <kerneljasonxing@gmail.com>, Jeroen de Borst <jeroendb@google.com>, 
-	netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, willemb@google.com, Joshua Washington <joshwash@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250722165836.work.418-kees@kernel.org>
 
-On Tue, Jul 22, 2025 at 2:32=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 7/22/25 1:37 AM, Jason Xing wrote:
-> > On Thu, Jul 17, 2025 at 11:29=E2=80=AFPM Jeroen de Borst <jeroendb@goog=
-le.com> wrote:
-> >> +
-> >> +               pkt =3D gve_alloc_pending_packet(tx);
-> >
-> > I checked gve_alloc_pending_packet() and noticed there is one slight
-> > chance to return NULL? If so, it will trigger a NULL dereference
-> > issue.
->
-> IIRC, a similar thing was already mentioned on an older patch. Still
-> IIRC, the trick is that there is a previous, successful call to
-> gve_has_avail_slots_tx_dqo() that ensures there are free TX packets
-> avail and operations racing in between on other CPUs could only add more
-> free pkts.
->
-> So the above looks safe to me.
->
-> Side note: since this looks like a recurrining topic, I guess it would
-> be nice a follow-up adding some comments above the relevant functions.
+On Tue, Jul 22, 2025 at 09:58:37AM -0700, Kees Cook wrote:
+> Add documentation clarifying that ARP and routing UAPI structures are
+> constrained to IPv4-only usage, making them safe for the coming fixed-size
+> sockaddr conversion (with the 14-byte struct sockaddr::sa_data). These
+> are fine as-is, but their use was non-obvious to me, so I figured they
+> could use a little more documentation:
+> 
+> - struct arpreq: ARP protocol is IPv4-only by design
+> - struct rtentry: Legacy IPv4 routing API, IPv6 uses different structures
 
-Sounds good, will do in a follow up patch.
+I'm not sure this second statement is strictly true:
 
-Thanks for the discussion and feedback.
->
-> Thanks,
->
-> Paolo
->
+https://elixir.bootlin.com/linux/v6.15.7/source/net/appletalk/ddp.c#L918
+atrtr_ioctl() ->
+  atrtr_create()->
+	struct sockaddr_at *ta = (struct sockaddr_at *)&r->rt_dst;
+
+where:
+
+struct sockaddr_at {
+	__kernel_sa_family_t sat_family;
+	__u8		  sat_port;
+	struct atalk_addr sat_addr;
+	char		  sat_zero[8];
+};
+
+This is not an IPv4 address.
+
+Maybe this does fit with a 14 byte sockaddr::sa_data, so it is not an
+issue, but the comment and commit message should be expanded to
+explain this. And i only looked at the first SIOCADDRT i came across,
+there are many other protocols using this ioctl.
+
+	Andrew
 
