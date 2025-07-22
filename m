@@ -1,128 +1,257 @@
-Return-Path: <netdev+bounces-209097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95D74B0E494
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 22:11:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B9A0CB0E4D4
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 22:19:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B59763B2310
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 20:11:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D88FA60264
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 20:18:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC0DA2820B2;
-	Tue, 22 Jul 2025 20:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DF6027FD51;
+	Tue, 22 Jul 2025 20:18:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pvnEYZCf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZcwIoJTR"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B09521FF3E;
-	Tue, 22 Jul 2025 20:11:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753215086; cv=none; b=n18Ss5YKHfi4w6+o3us8orb8Klv6+oE0ANGn2g2XNnw7jsl2D9UPfXxYGiF4bKD9+BehaLeXKedM0PaEPY+VPonqAvvlXZPhEY/rmfWKfOcJIRrjDypHAA7IzSkL0PXySX8PA1qWCpAPOX7leKMNkjlHJj6m+Ioh09Di3wwlEdk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753215086; c=relaxed/simple;
-	bh=0Qwtgxyaz/MU98YODWiCzWg+bq2Mg4CEgVlz2Tvj5ZQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fYWiEG7wM7Jm8Vw3872bB1XnsfPqhjB/nz22pOv/GUu0I3lJNSBE9WN23v5s+wf6undsoC4c2mNQa1TVmtYWPgLH7byXDKeYx4NvMCyayL3VU0zfZ/7BuCdhrTWqUyycfrSmzwn4PeOyZzXgJjW0Z7zpsLji4HEB1bJVXL8DNDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pvnEYZCf; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 22 Jul 2025 13:11:05 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753215082;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EPFqfHTW5KnsxiLhz9edf6zd7pMuKzXqFyyNT5kggzo=;
-	b=pvnEYZCfK3MecfMLXiRT+/VBf/gnC1CrODQcJgLu+gew4ylNM+KkrPU8jIY4fvk1lzJAGb
-	YmlDQBm42VvhBFv25vTXlGEGoO672LgRt4BYCZan0C7xoAqek55/rGXP6r28kd7dP7pmVg
-	G7oAHarBwLNFnoV5Mj1liOV+B1zjRrE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Daniel Sedlak <daniel.sedlak@cdn77.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Neal Cardwell <ncardwell@google.com>, 
-	David Ahern <dsahern@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org, netdev@vger.kernel.org, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, Muchun Song <muchun.song@linux.dev>, cgroups@vger.kernel.org, 
-	Matyas Hurtik <matyas.hurtik@cdn77.com>
-Subject: Re: [PATCH v3] memcg: expose socket memory pressure in a cgroup
-Message-ID: <jj5w7cpjjyzxasuweiz64jqqxcz23tm75ca22h3wvfj3u4aums@gnjarnf5gpgq>
-References: <20250722071146.48616-1-daniel.sedlak@cdn77.com>
- <ni4axiks6hvap3ixl6i23q7grjbki3akeea2xxzhdlkmrj5hpb@qt3vtmiayvpz>
- <telhuoj5bj5eskhicysxkblc4vr6qlcq3vx7pgi6p34g4zfwxw@6vm2r2hg3my4>
- <CAAVpQUBwS3DFs9BENNNgkKFcMtc7tjZBA0PZ-EZ0WY+dCw8hrA@mail.gmail.com>
- <4g63mbix4aut7ye7b7s4m5q7aewfxq542i2vygniow7l5a3zmd@bvis5wmifscy>
- <CAAVpQUCOwFksmo72p_nkr1uJMLRcRo1VAneADon9OxDLoRH0KA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE261D54D8;
+	Tue, 22 Jul 2025 20:18:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753215483; cv=fail; b=Xe4HOOF+D9Xv8eDYCc20mPT9LPzGc1Np+RIq5XPjNF+9MbknWjIxPjBQLWQ/++9GPl/9GmTuW5+yBnygIk1InzHxN2krkVUtd72UUb7yxVch+xURvv5cwxhU/NgMOyBMzECnxYHzcwQeiiBx5PA8R3JDWu5oehqkZO8XVBRb2V4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753215483; c=relaxed/simple;
+	bh=/bKDigkFRsZhfn2vSXypQ+AdcH1UOYAuAIXn09KAhgI=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=SGShyiYKOb7b+S3/9P99Mi27YfN6F772V54ndvlYtNcjHW5SxNXlEEX/uRXWoNTn91TqKRE0FWLJ3QNl1RXcnMe5UOp+FHqGnYd10pS69HxG2dRIaUmyrYOQseBWzAGyPv9DoafdZtEfFNSIOD+VZn6QlaYSHAnAbzSIauuKvOs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZcwIoJTR; arc=fail smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753215482; x=1784751482;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=/bKDigkFRsZhfn2vSXypQ+AdcH1UOYAuAIXn09KAhgI=;
+  b=ZcwIoJTRAcJSkb1+TQ0RHtSVg0hYllOmGuJNxdEAtQN63pJOnXWwWk/w
+   D0JfEtsfEatONYPYb6Bb2H1yB5HSJF6qD5RqIihd6teXB9IetLTUn7b7E
+   6a2HjN0bN51q0VHE/ohVypkZuwEO2XnVsZmlNNOIvM1E/A8x+yG0BtlcM
+   lAtXPnsrMEqZ24/rXyU3BtfRk9T8YH1HejYG3KsaRBA4Sep44bS8JMcxd
+   BiiFVOI9ozHcX/LE44/36EDXhegSXvpeAzf/LV17Oy8oJpn5+iEKMNJHK
+   fPyzX8X1QiuLxxEgLWwBI/6V+VM+X0d9oILG+etXgtXBSoXVKuPVi2X9v
+   Q==;
+X-CSE-ConnectionGUID: SF5DkCvlSuyiatrzVZCe5g==
+X-CSE-MsgGUID: erBA7hsxQvSJiNu/BHWcrA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11500"; a="55577330"
+X-IronPort-AV: E=Sophos;i="6.16,332,1744095600"; 
+   d="scan'208";a="55577330"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2025 13:18:01 -0700
+X-CSE-ConnectionGUID: 69fI9QAySGmVLhVXAGtbKg==
+X-CSE-MsgGUID: E8WMb4O4Q2WGTQzzJwEmeg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,332,1744095600"; 
+   d="scan'208";a="163777190"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2025 13:18:01 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Tue, 22 Jul 2025 13:18:00 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26 via Frontend Transport; Tue, 22 Jul 2025 13:18:00 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (40.107.93.67) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Tue, 22 Jul 2025 13:17:59 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=SxPluGhMm+5yXLkmuvKfKS/ImsS1WHhSbK19CpLybHCMmkj40pod2C79lhQ63si1E0/B2oO7WEU4y2PnSDs4ZOy4pFv4u+Q1EeOoF8ckwQqWXU40jij73dWQnfy5VVGxpk2vbs/Ha9qK4cpMinfy/247Xx1jCFNc97CAkZO21UFNSxzwajuRk+EVBsMVDxR/gT8Kvogg8yghlW5LBEUei7RNIq5IFLN74yFszq+tLuSCSx7/XI9q31L3lZsh8UumOAc7moS4sAaj84xaCbe8XoZs/vaabbgiMU/A5715mxbEAmOKKCXgDlQAiBHhtZvNdSTFIb3y2cWGwUQo1eKBHw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7OJKF01DQMfkTbf/SdHcd4EeBLOi9MwOCsxhmYzNpuI=;
+ b=PqQ82S7nJVDCgorBDPalsYW65eqF72GkXPCYttrxGmJmBmQpxTGSRACPZChoZ5Q2JRo7QPQitCaziiq3WRfsUOvd4omD9PCZHGfF/9iZXp6mgQmScEoKVko2n/W/koxKxa9W6YzKZDLyih1CpZ0lDctbiyGJux82MPWVZhx0v+xpWcgDdS9q1h3OLNyG/TU7BF0ZZ70Xma57kged648ALk9EE5Y+wyQUl7Im4eYmD/p3mXKwSra7FZGi66V4C6L9v4ZbqkL7d1STucrGni2n2905+8YRTx66yuwQ6L1l9BHq0zEmAGtslwzHdjv7uertUjC4LPKoqA82ZddQWDynbw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
+ by PH7PR11MB6836.namprd11.prod.outlook.com (2603:10b6:510:1ef::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.29; Tue, 22 Jul
+ 2025 20:17:43 +0000
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::24ab:bc69:995b:e21]) by BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::24ab:bc69:995b:e21%4]) with mapi id 15.20.8943.028; Tue, 22 Jul 2025
+ 20:17:42 +0000
+Message-ID: <e76d2af6-40d6-4169-8ec9-aeeee31b3aaf@intel.com>
+Date: Tue, 22 Jul 2025 13:17:38 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] i40e: replace snprintf() with scnprintf()
+To: Amir Mohammad Jahangirzad <a.jahangirzad@gmail.com>,
+	<przemyslaw.kitszel@intel.com>, <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20250722115017.206969-1-a.jahangirzad@gmail.com>
+Content-Language: en-US
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+In-Reply-To: <20250722115017.206969-1-a.jahangirzad@gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR04CA0332.namprd04.prod.outlook.com
+ (2603:10b6:303:8a::7) To BL3PR11MB6435.namprd11.prod.outlook.com
+ (2603:10b6:208:3bb::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAVpQUCOwFksmo72p_nkr1uJMLRcRo1VAneADon9OxDLoRH0KA@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|PH7PR11MB6836:EE_
+X-MS-Office365-Filtering-Correlation-Id: aef998c6-8397-442e-b13b-08ddc95cd007
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?UDhicmNaSDdhM3o5blVvWVM0RFFNWjdHNW5rYk5DNFdaVmRhSFJhdUNaS0No?=
+ =?utf-8?B?akZiRWdxSk1FRng0bkxYbFEvM2pCd000TVhYajhWMFRML0duUFg4UlZYRGJC?=
+ =?utf-8?B?U3QvWkFQd2pQZk9FY3pZenN6THB5QnJBbTlwVFQ1ZFdFdXFSWW14SGlTajJD?=
+ =?utf-8?B?TktXcHlPWXVyK0YwWVRsY2Q4cmU2ejAvS1FvSFY2MG9QWEhMeE9uTHNleDVz?=
+ =?utf-8?B?VWVvYmExdDNreGpGbUhBOEhNM3lkTk01NFZidzlqQ3lESUVSejhrR3JqaWFw?=
+ =?utf-8?B?NVRlcW9FdGVzZGR4UUE3K0gxZFRScTBGeWZTaTNJVUpSMjhnQWJRaHQyKzV2?=
+ =?utf-8?B?SHlBZDdjT0ZCMllhRnkrWnF5c0xwYW9DcVFzaGkxVkVwQ2xOQ01ha0NOZUx6?=
+ =?utf-8?B?TzRGdFBLcDlPZ3pTYVg1MDV5Zk9CV29kSWgyc3NJR3lUejRoK01ZcEFCN2RL?=
+ =?utf-8?B?R09qZkx4M01xRVpkWW9UNVJZU0FNNFJBU09xV09TNmxLUHo2VFZ0T1hZTDZx?=
+ =?utf-8?B?SjJJMWF0dW5lby8wd3d2TS91UUFDVitLelFHQkJmQW94OHY5L2gwbmN3Mkk5?=
+ =?utf-8?B?bWJjbjRvOTA5WENmeFM2eFYvdXdtVEFJWHVSTjI2RFFYNW1mRnVwZk80U0p2?=
+ =?utf-8?B?YnFCSGJ3Q3ZrUXV0MFlaSmFFa1hnRDlSVlZtZFVmSVduMEFQK3F2Z085ZWs1?=
+ =?utf-8?B?dUJldm84U29DOVJXdjlRZ1MyVTBkWS83VFl3d3RNbDJFb0lwMVovUW9BMWZE?=
+ =?utf-8?B?S2NyaXdhUEJ6a0JrZ2Q3T2hOd2VvalVtNnB5L2pkU3M3TjRXRUh0R2hGR0Ft?=
+ =?utf-8?B?d0NVNHRPd1RRY010MTlDS3dlNGY4SjlMMEYzTjZVbGt4QjVDb1ZTaHlYZHZZ?=
+ =?utf-8?B?YWhMU05BZi9uQVF6TVVXWnZ6TGRkVS9nTnp2TkVwaFRGUktPRldsV2FDNEQv?=
+ =?utf-8?B?R1BxendESnloMkI4dmt6RE1DL1VSeVVpZnZvZnRPRkFNZFZDQ3BlcVk3eFNX?=
+ =?utf-8?B?VzVBdC9kbUN2ZDFmZlRnaDFMVVN6bnpMa3libGVyMUdlSE44TFQweno1REtN?=
+ =?utf-8?B?VTdMbm9YVjlJeHpsdnl0aExPcEtQVFRLcnFESU9NWWh0NlRwOEVtTk9td3pI?=
+ =?utf-8?B?OUlXdXo4VkJVTnVXL1dvQThqN3VSTitsQXBDSGdhZmtITHl2UlRORXBNdGZH?=
+ =?utf-8?B?ai9CVzRpRlZZSHBoaXdPYXpDVldkUnEvL05vMXBCazR6M2RmYmE3ekZCWXpy?=
+ =?utf-8?B?OUtYOXp0T3JNZGVYUjZPTlZKRVd2aDRhdlJDWGNpL2tJd3VILy9WbksrQ083?=
+ =?utf-8?B?YmRic1BKRS9hRXRUUGxUMk04K0hFdU40ZUhjYUVOQXVNeTBudVQ2bGNJZi9S?=
+ =?utf-8?B?Ny9zdFZ2ZUpxS1NFUjdjMC9Wb2lDV1VIZUorclJMRzFxK2gyMjFEMkJNSCtr?=
+ =?utf-8?B?K0txdFhmeTlHOEdzdFFXMzU2LzBhY1lwU3QyY2YxYzl2Y0s2Nk5TbnE0Y3My?=
+ =?utf-8?B?Y3VSZzdUTkdUSzk3UU85T2JUejhha1RqZ2N3eWFtemVDUm9ObDkxbUY0KzlL?=
+ =?utf-8?B?MDgyVk9BaDdnY0ZCb2FXZTlKRDJSNzI2aVFGOXM5UU9sczBOenFvc0FUaEVN?=
+ =?utf-8?B?RHBmdVRrMHJxVTlrb1lJNW9uZ1A4blFzK2lNQ25Dcm5oTWVuSWM4KzhsKzhN?=
+ =?utf-8?B?cWd4RVlhSWhjY1h0NzlaTHZzeCs5WWdDNS9xT3MwTnk3NGVibmxDSUx3QzND?=
+ =?utf-8?B?RVRZOGxGVDh3NENHNE5SOUl1MXVKS2toZm1iMDhxNXM1QVBZL29ENjFSTDZu?=
+ =?utf-8?B?WXlwSEJQZFdRbjkya0xsYktxUVFkM2FQWGV1U2Y3L1JZZ0gyMFZMOE95VXZR?=
+ =?utf-8?B?NWROR3M2MHR5OGtxMHVoQjMwdUlyNUlrdDFTV2h2N3BqYVJxZ09XQXQ0SU1u?=
+ =?utf-8?Q?DV6eBc5aaFE=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?U0liZGFNY2hTL0EyejNKV05xL2FsSnRBeGZrby9NOStLUDZaZjRBSm15NzlU?=
+ =?utf-8?B?anJSY1hJdE1mVUN5VUZzS1FnUTQ5K0lPL0IvdTc5eHFjNHdacHhmY01CME5J?=
+ =?utf-8?B?VXo0dzR0UjA2c0xQOTNyckxIL1BwOWRpZkp0YmhNSW5BYmtNWU5OVHBMQmJu?=
+ =?utf-8?B?V0hTQ2h2cTJ1L1RqR0tZV2h6LzlqaitqUmNCRE95V2VtUEhmUERyN0tGTjN5?=
+ =?utf-8?B?SUUzbGoyaTRnc1haSnhvSmdET24yZDFlYkhMUTE2VGhHRmJ6MlF3QU4yWnJJ?=
+ =?utf-8?B?cTkrODhSZVZncjJVcUhoWFAwRVU2ZVRrRWFyOUs4bTIvS1NhM3ZOWXVNTEZW?=
+ =?utf-8?B?V2xUWkhIek9nbEpEUnRuOFdnM0ZqY1R5WFFJcFJYVGJqTndMUDUweVdHYUdX?=
+ =?utf-8?B?QTlYS1hWeTNuNm5VZ1ZwQmJVUVJkd0VLbFllRkRMaTd2VHpNWWFkMDhiaGNn?=
+ =?utf-8?B?UkVTTmRBOVNhcmRhZHVJQ2JadnZlampDczNQNDFxanBEU3p4aVBBaGhIdzJo?=
+ =?utf-8?B?S3JoeDZ4QzJWSnF2ODBKaGFZL09OMk5mNGw3eTdQOVk2a0l5MStaTXBHZTBl?=
+ =?utf-8?B?QWJSNm1xSTZocEJvNE1KRVdxSndhOUp5QU0vQnBMaHpZT3hXN0NSWWdweUdh?=
+ =?utf-8?B?bmRISFluYUV6UHh3dlpZM0hQRzJHVXpVZ0I5ODBXejZkbnkzTWN3QWE2VXVq?=
+ =?utf-8?B?OS8xMEtHenIzbitVL0RGUGI2eFhMYWszV2poYS9kcVNuNVVRcjFtZzZXMlpV?=
+ =?utf-8?B?ZjVUWlZFQzFXTSttN3R1eHRGRnZoS3VzZ0sweHNYbXd5RnFjb0FuYm1menFi?=
+ =?utf-8?B?b25oZm5SZUhtTkU1a3BwSmhPalZmejZDYVlTbWdYVkZPbGZBdWlCR1Jubnhi?=
+ =?utf-8?B?bms2Zm96a3dLVFhhUVpIQklIazFOVW5wZ2MvOGJNRDRGeFVwSEtTVmxFSVBY?=
+ =?utf-8?B?M25JS2xLUWNnRDlaek9pcm5KNk8vVE1aaUtZUkFqYlRHRlVLYmh1bTBkNTI3?=
+ =?utf-8?B?THpWcTIwRXNnZ2VKTXZraElzWXpWUnl6UGRjeXYzR3EyaTR3N2NTV1BsUGh0?=
+ =?utf-8?B?VkhndldTd3U2OFE2aVlUYk55YlZxdlJreUd6QU93VEJtZ2g4d05sbFRNc21X?=
+ =?utf-8?B?VXk5MEtVeUhrSWJLWm12c1dCTHZvSW92ZDdYcjBuTDlURWlzWm95UnZmMFhn?=
+ =?utf-8?B?Wk5rVDZLdkJzZ0lWWEVKVWJ6ajBTVk52OENKTTVKeGZ4YzVCeHJMcWlyWU9h?=
+ =?utf-8?B?bVhxUW90bUxKMUFPNUQxV3RaTm5JMXNaSWdyRlUxSlRpb1pXa05kYTE2M3Vn?=
+ =?utf-8?B?RnRaOENrVDFOMnRBWjlzekd0S0VFZzNmRmd3S1dyWjlDMVFJSytkaUEreWRT?=
+ =?utf-8?B?MmxlUnAvaDJqVWhiQkNnb3l6eEd2N0djcjVNYkJxRTBKQjBWRklRdm5oVHRB?=
+ =?utf-8?B?bXh3clhLZ2J3L1RGbkpVWkZHWTNRempPU3IrQU1vWkxQYmFyMTR5aFpUZU5h?=
+ =?utf-8?B?K1lobzFIc2VvV2ZYUVo4SWwzNnVCYlJta3QvN0p6TEtWS1J1MUt4VWZTalpT?=
+ =?utf-8?B?NC9nQzM3V3hzbDF4a3dGTVVnQlplRUtVVGhUYTYxdUR6Z0NpYUIyK3J2UzNj?=
+ =?utf-8?B?RXhqRXp2S1RCM0l3M1BVendaRmdIWjM0MmNScXNQNnJrYTBmM3hzcEQvQVB1?=
+ =?utf-8?B?SGNWdHlZS3phQ1BSUUhyb2RMRW0xcU1LekJHRWNvaTYvM1JGd3dMemF0V2or?=
+ =?utf-8?B?alFXWENHSzhyUHVzbWxmVVhCaTM1VU52WjVRa0tHdysxK3FGMnFnRzM4RG41?=
+ =?utf-8?B?dEVxTVZYeUs4VmdHd1llazB1SmJyOVgzcjVSRC80SGVHWEVuYlgxc0NtMHA3?=
+ =?utf-8?B?VGxXWU5RaTBoUjVrN1pHWHBNK3J2L0tCNkx0aFZsSjZOVWFmZDcyYXNpU2No?=
+ =?utf-8?B?OGZsS2gwK1dEbzk2S1dON3B1cGZnZXlvUm5vNjVPelByYUxrYVRHMUlDWkhR?=
+ =?utf-8?B?THh4NTFBNWdHcVpCTEdRQkZMcXpjdGFORmt5MUI4MW51b3J6bktwd1BrOERL?=
+ =?utf-8?B?MWlXWDkwRE5wYkNlVzlJU0JGaEIxWS9OK0JhVkdhQTZidGdxZ1F3Z2xDZnBR?=
+ =?utf-8?B?VDZJWHViU3FxcXhrQm5BSlBVSlQ1NVp1UGxyTTROZFFHbVNDakxNY09kVmZX?=
+ =?utf-8?B?V2c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: aef998c6-8397-442e-b13b-08ddc95cd007
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2025 20:17:42.3382
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OMNC8Wv39d0DiDysZzlD0ZINBtxNvr+D4993H/i6/j8f669D5pYPHc82/U7uSxtCp+xW7gOaL6FBcTzL7XG8vAsWBGWcnYGyJ1t42P+BdEo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6836
+X-OriginatorOrg: intel.com
 
-On Tue, Jul 22, 2025 at 12:58:17PM -0700, Kuniyuki Iwashima wrote:
-> On Tue, Jul 22, 2025 at 12:05 PM Shakeel Butt <shakeel.butt@linux.dev> wrote:
-> >
-> > On Tue, Jul 22, 2025 at 11:27:39AM -0700, Kuniyuki Iwashima wrote:
-> > > On Tue, Jul 22, 2025 at 10:50 AM Shakeel Butt <shakeel.butt@linux.dev> wrote:
-> > > >
-> > > > On Tue, Jul 22, 2025 at 10:57:31AM +0200, Michal Koutný wrote:
-> > > > > Hello Daniel.
-> > > > >
-> > > > > On Tue, Jul 22, 2025 at 09:11:46AM +0200, Daniel Sedlak <daniel.sedlak@cdn77.com> wrote:
-> > > > > >   /sys/fs/cgroup/**/<cgroup name>/memory.net.socket_pressure
-> > > > > >
-> > > > > > The output value is an integer matching the internal semantics of the
-> > > > > > struct mem_cgroup for socket_pressure. It is a periodic re-arm clock,
-> > > > > > representing the end of the said socket memory pressure, and once the
-> > > > > > clock is re-armed it is set to jiffies + HZ.
-> > > > >
-> > > > > I don't find it ideal to expose this value in its raw form that is
-> > > > > rather an implementation detail.
-> > > > >
-> > > > > IIUC, the information is possibly valid only during one jiffy interval.
-> > > > > How would be the userspace consuming this?
-> > > > >
-> > > > > I'd consider exposing this as a cummulative counter in memory.stat for
-> > > > > simplicity (or possibly cummulative time spent in the pressure
-> > > > > condition).
-> > > > >
-> > > > > Shakeel, how useful is this vmpressure per-cgroup tracking nowadays? I
-> > > > > thought it's kind of legacy.
-> > > >
-> > > >
-> > > > Yes vmpressure is legacy and we should not expose raw underlying number
-> > > > to the userspace. How about just 0 or 1 and use
-> > > > mem_cgroup_under_socket_pressure() underlying? In future if we change
-> > > > the underlying implementation, the output of this interface should be
-> > > > consistent.
-> > >
-> > > But this is available only for 1 second, and it will not be useful
-> > > except for live debugging ?
-> >
-> > 1 second is the current implementation and it can be more if the memcg
-> > remains in memory pressure. Regarding usefullness I think the periodic
-> > stat collectors (like cadvisor or Google's internal borglet+rumbo) would
-> > be interested in scraping this interface.
+
+
+On 7/22/2025 4:50 AM, Amir Mohammad Jahangirzad wrote:
+> In i40e_dbg_command_read(), a 256-byte buffer is allocated and filled
+> using snprintf(), then copied to userspace via copy_to_user().
 > 
-> I think the cumulative counter suggested above is better at least.
+> The issue is that snprintf() returns the number of characters that
+> *Would* have been written, not the number that actually fit in the buffer.
+> If the combined length of the netdev name and i40e_dbg_command_buf is
+> long (e.g. 288 + 3 bytes), snprintf() still returns 291 - even though only
+> 256 bytes were written.
 
-It is tied to the underlying implementation. If we decide to use, for
-example, PSI in future, what should this interface show?
+Hi Amir,
+
+Thank you for the patch. In practice, this won't overflow [1]. However, 
+this code can be improved. If you follow the thread, there's 
+conversation of the changes that will be made.
+
+Thanks,
+Tony
+
+[1] https://lore.kernel.org/netdev/20250714181032.GS721198@horms.kernel.org/
+
+> This value is passed to copy_to_user(), which may read past the end of
+> the buffer and leak kernel memory to userspace.
+> 
+> Replacing snprintf() with scnprintf() fixes this. It returns the actual
+> number of bytes written, ensuring we only copy valid data.
+> 
+> Signed-off-by: Amir Mohammad Jahangirzad <a.jahangirzad@gmail.com>
+> ---
+>   drivers/net/ethernet/intel/i40e/i40e_debugfs.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
+> index 6cd9da662ae1..19a78052800f 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
+> @@ -70,7 +70,7 @@ static ssize_t i40e_dbg_command_read(struct file *filp, char __user *buffer,
+>   		return -ENOSPC;
+>   
+>   	main_vsi = i40e_pf_get_main_vsi(pf);
+> -	len = snprintf(buf, buf_size, "%s: %s\n", main_vsi->netdev->name,
+> +	len = scnprintf(buf, buf_size, "%s: %s\n", main_vsi->netdev->name,
+>   		       i40e_dbg_command_buf);
+>   
+>   	bytes_not_copied = copy_to_user(buffer, buf, len);
 
 
