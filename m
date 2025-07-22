@@ -1,73 +1,95 @@
-Return-Path: <netdev+bounces-208739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62A28B0CECD
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 02:40:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6471FB0CEDE
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 02:49:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 994765440DC
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 00:40:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9573817A610
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 00:49:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51E6A487BE;
-	Tue, 22 Jul 2025 00:40:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF8DE13D8B1;
+	Tue, 22 Jul 2025 00:49:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LWgJKxD0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DhTYHwIR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4E31754B
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 00:40:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DB8D13C81B;
+	Tue, 22 Jul 2025 00:49:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753144855; cv=none; b=j/jVxCOWIK6JUZ95rg7yUA8JFWPqIGGGPiEAFxbDWZsEf1PYfNw5hde1n+Tigzs8AfLmAivteBuU8gbtI9pFdl43z9xaF5CfIh+NuRzNSK9up4qC426UyFPCn9Z15Mv6VRcy6ASutJNq1365EYOawcOoetNkldikuhuT1FBpHvo=
+	t=1753145390; cv=none; b=S7ht1t3MnXzEHPe9RCXiHNp+ouXidOJ36GcL3jsmDB3M5Nk1yAdcChFYvWu5z8cuKWDr+8dBNLZL3Ky6nXJc1EqkYAv6wIgkPOHvbhh/h5QVz/2XHCf9c9gX0xNKwbEgOky/87FxGLlCM85zG55Ln7m+6Btborfwu6t0YuJXMU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753144855; c=relaxed/simple;
-	bh=GRHn55+CU1BItczv4bYVVkRA/dy4kQArU89e11+PYuk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mqJsnFVdxk6f8sqWC+hGynRqG99iC8x5SAcVlRBY8fRbjMPrh7PGFRERLicRbNU/xAxCVRtWKaIG2Zo05bMRBMRZiAad0+qgMNUSX/FGOnlSdKUgVCWqwDlV9EfZtiiQLdxXJdws1RC39gHp8IgiEIjv7RoG4XaU4i/QINNl6o4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LWgJKxD0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CD9CC4CEED;
-	Tue, 22 Jul 2025 00:40:54 +0000 (UTC)
+	s=arc-20240116; t=1753145390; c=relaxed/simple;
+	bh=qqVtg7wIZdHVzZMMsK9AjxJx4S/Xq3p0wGOEHw6p0V4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=uCY52bX0RUXAG+izheYhhSvPY+RSVqYczvXkECPm5oeVqoH5i/1fDC6CMm4O974LGqpNr/znf0NRoPxcevjJX4dxea5G54EbV8ondKYDlSugD9MM8ijLxWdKeUnzxpZ9V+n1+3s0G5wr5FNWvKNYHG7rRN944yteCLb1eYncGNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DhTYHwIR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00C89C4CEED;
+	Tue, 22 Jul 2025 00:49:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753144854;
-	bh=GRHn55+CU1BItczv4bYVVkRA/dy4kQArU89e11+PYuk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LWgJKxD0/81LXB5KFjqbPt4k3TpIhqNLsPbHHJnszut9NXposO0nIhtbAEtA3bgvG
-	 poxDtsfMI3Qn8HFRpVCGziGgeER4oOqdfwcvWdJ+iQP8cF2jvKyx22m1Uu+IjlB0MT
-	 7rhdpYr23rm4rKx7uSTX0jXzRDOq4wDU/jQ2m9METcSwDivG2VlDFEsLvYHGY4Uzid
-	 hEiDOU3fvHx0cLrkGDh83tmUp8CXuDHyWkQv0+FbT3lNfUfPi7bz5WWeP+YQ/Mjixb
-	 ek50WfgTuU05LVy28AQfgB/kAfw/2Ztu3cKMOC5rnvYKY0aa3fiUWi36NRmtxqn779
-	 gWoPCJiK/WF5Q==
-Date: Mon, 21 Jul 2025 17:40:53 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Subbaraya Sundeep <sbhatta@marvell.com>
-Cc: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
- <pabeni@redhat.com>, <horms@kernel.org>, <gakula@marvell.com>,
- <hkelam@marvell.com>, <bbhushan2@marvell.com>, <jerinj@marvell.com>,
- <lcherian@marvell.com>, <sgoutham@marvell.com>, <netdev@vger.kernel.org>
-Subject: Re: [net-next PATCH v3 07/11] octeontx2-pf: Initialize cn20k
- specific aura and pool contexts
-Message-ID: <20250721174053.1e39307f@kernel.org>
-In-Reply-To: <1752772063-6160-8-git-send-email-sbhatta@marvell.com>
-References: <1752772063-6160-1-git-send-email-sbhatta@marvell.com>
-	<1752772063-6160-8-git-send-email-sbhatta@marvell.com>
+	s=k20201202; t=1753145390;
+	bh=qqVtg7wIZdHVzZMMsK9AjxJx4S/Xq3p0wGOEHw6p0V4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=DhTYHwIRAQuW4LM7++mtXEFNLpWYAjOi0dkD4mGH/Az+QiTol5w/HG6Cu0ARKO/NF
+	 qw/+DC+3c5eksZhZmV9AFsXploQrV+hjHiAxdr1z1Cm3OHqT8eKVlf4kSk0ee1Dzgx
+	 LJVHbWa1yWNNO0c9Dqr9t/ujCrJP7zZ3tmuBaDzI0ak3C2OBcgHJcXsCbWEPUymHlm
+	 34MHuY67ipSRXUDxJz43vRz6uBaS7p8Pk0T/Xo3rQ8IrINrmotTPMFagJDqZSjoagC
+	 MLzHgklQmR5iTMiFxC0pqKPzD3IFTbC21LM6wJPbC9F9BKWjbn+ZZHq/UIZqQQeTIt
+	 v0f0MVA50XDeg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id E1767383B267;
+	Tue, 22 Jul 2025 00:50:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: phy: qcom: qca807x: Enable WoL support
+ using
+ shared library
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175314540876.247888.8839150831029400214.git-patchwork-notify@kernel.org>
+Date: Tue, 22 Jul 2025 00:50:08 +0000
+References: <20250718-qca807x_wol_support-v1-1-cfe323cbb4e8@quicinc.com>
+In-Reply-To: <20250718-qca807x_wol_support-v1-1-cfe323cbb4e8@quicinc.com>
+To: Luo Jie <quic_luoj@quicinc.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, maxime.chevallier@bootlin.com
 
-On Thu, 17 Jul 2025 22:37:39 +0530 Subbaraya Sundeep wrote:
-> +	sz = ALIGN(ALIGN(SKB_DATA_ALIGN(buf_size), OTX2_ALIGN), PAGE_SIZE);
-> +	pp_params.order = (sz / PAGE_SIZE) - 1;
+Hello:
 
-This doesn't look right - order means log2(), not page count
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri, 18 Jul 2025 21:57:48 +0800 you wrote:
+> The Wake-on-LAN (WoL) functionality for the QCA807x series is identical
+> to that of the AT8031. WoL support for QCA807x is enabled by utilizing
+> the at8031_set_wol() function provided in the shared library.
+> 
+> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] net: phy: qcom: qca807x: Enable WoL support using shared library
+    https://git.kernel.org/netdev/net-next/c/14e710d7080f
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
