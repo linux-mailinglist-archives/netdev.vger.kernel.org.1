@@ -1,119 +1,141 @@
-Return-Path: <netdev+bounces-209089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A2C2B0E3DA
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 21:06:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91037B0E3EA
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 21:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F3151C8420A
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 19:06:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B00733A6F38
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 19:10:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE7A3280CC9;
-	Tue, 22 Jul 2025 19:05:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B85428467F;
+	Tue, 22 Jul 2025 19:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bsjxRM8W"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TOk/9/kZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C00427F18B
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 19:05:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B65C4283FFB;
+	Tue, 22 Jul 2025 19:10:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753211152; cv=none; b=h71kkTiDCbVXKsGAgnK7jbwpn15QTIhmTOa3vPIoUva2a1OFLKijauUujf41+aPma4JDnrrF8jhl9NEE3rWHHJmcno+s8RHdP/iWpDwPskvVEU7kuG6Bf2ST07hIuagYV4uGqmeTdu5jwKDh1DXHUaOurVtjzlcl4yayEySuyMY=
+	t=1753211426; cv=none; b=QFpMtmtci74a6EoPp0/rqdNkbVCV33VROvVFOpY/vF42mALfbXY1dDFgtbtn3kamdbT+JZ7l/qAQuTDO2YAvPlzDo4rR/u7GP7BtFklvKZnvtjZ9yVVRfOxV7WEtrkGYKLNDkHz3pLYLB0XCxzUsA1iq3/pO3EQFfCHHzWHmtPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753211152; c=relaxed/simple;
-	bh=T5NMkizmECXIX8UgoMKkY7obBeJloNgRGmuTwj+0xbM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E6abMgChlzfO74lti2Jjdt6UjD2XzUF2iQLvwIhC3PSS/hLsRFEhRLnHHVgaSjgWls3CbgdjwA3WxzY7f1rfxKttKJnU/1I9NdMHckIxgEhdRVXw7hDNj5C1hVRkyh4Tn7+0r0xDvKDqj7ZeR2d8mMbfRxfcDvTADtwR3PJgSXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bsjxRM8W; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 22 Jul 2025 12:05:41 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753211148;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YR5doc3ubATFIwFqCTAQj7mEB5SIW2AFvm6iIjBaed8=;
-	b=bsjxRM8WfX6Y/hUmZzPYJH3CThZq9cHvRIsrKdAIOKH6kYfPmQQU3ccX6o8xRli3BDvuGX
-	H1X1NqHpg0kyCmcreBFRHAoB2aeNqGSWfxXWU9nIMgHnMgWk6BPAacJJ2q3d35iSWiDNHp
-	gY0xmbFWlTp6IyWIv9lYzxOQmqBIka0=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Daniel Sedlak <daniel.sedlak@cdn77.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Neal Cardwell <ncardwell@google.com>, 
-	David Ahern <dsahern@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org, netdev@vger.kernel.org, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, Muchun Song <muchun.song@linux.dev>, cgroups@vger.kernel.org, 
-	Matyas Hurtik <matyas.hurtik@cdn77.com>
-Subject: Re: [PATCH v3] memcg: expose socket memory pressure in a cgroup
-Message-ID: <4g63mbix4aut7ye7b7s4m5q7aewfxq542i2vygniow7l5a3zmd@bvis5wmifscy>
-References: <20250722071146.48616-1-daniel.sedlak@cdn77.com>
- <ni4axiks6hvap3ixl6i23q7grjbki3akeea2xxzhdlkmrj5hpb@qt3vtmiayvpz>
- <telhuoj5bj5eskhicysxkblc4vr6qlcq3vx7pgi6p34g4zfwxw@6vm2r2hg3my4>
- <CAAVpQUBwS3DFs9BENNNgkKFcMtc7tjZBA0PZ-EZ0WY+dCw8hrA@mail.gmail.com>
+	s=arc-20240116; t=1753211426; c=relaxed/simple;
+	bh=mnpBLtJWdm2k9I873fT/Z5PirhHnkPVy+YBvGqaU01k=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=lfDB1CbcpoCwMVrKomTh8apvCQCuYK/qyswcLbtRsCc/HNKz141T9R+MULi8JeJSzNL8iWdtnzwIjNslwW71VAlP2iMbptZKhXxjvHQ6vHZVYw+YRttCCA248LUYPQ96nLmkmUv4yC/Vdrkq5L7AW+3SiuKwTSORHKhmgQTv00E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TOk/9/kZ; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-75001b1bd76so3716343b3a.2;
+        Tue, 22 Jul 2025 12:10:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753211424; x=1753816224; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=LJv1+TF2aY1G9+2B34MvYv5nXQt0E2zq0MVGsD3E+pE=;
+        b=TOk/9/kZpjRDNUS65bXEDAUMjU7dTKzuPjapG8POVFjjZmjVPdqppJ0z4w+jdlShCm
+         eQRq17yuTwykYYYHd2IjsYSMuTsnNKTL0HFtM31nB3pWgLj6k8NEPPitLbFpaUNc0BOS
+         tr4MjzzoJ4qb0OuCkzGqK5+geFXGRRBruj3TYn37/DQrrnxLy2Y+8/trM78HOjICFsoF
+         nncAirJnk5WZ7ZxbIDbRQ+ZtsFhy/CIP/sC84ROEjqzk/YGkW8B2K0rlMj3I5wUOPT0g
+         NClwSBvtEEBJAtoKAyLpNOVop+gG3ip7MiDNqKpGlA7DMb+QNOD6fRcpCNhKyfQ6sOFw
+         2E7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753211424; x=1753816224;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LJv1+TF2aY1G9+2B34MvYv5nXQt0E2zq0MVGsD3E+pE=;
+        b=MOTFiWtmnQyuwy9JVH1xqBwt3XmCbvtLef/XD7UdkNI+MrIhLBunGu32nehUZgg+xJ
+         SwQKD1rp1M2od3mlTLHR6FBWgals44BfcX/bWDGuswLL1jUzFSrIupsvJS876DoomRhh
+         P3MLKjlDvKrlLe9D+soaEKcmUWmtZ7o3vnOwscCr+sbyD5jBEFb5ArjZ2MS6/gTO+V35
+         II71c6VTrOAMXXcdVtwhfe0tgxrVAg6t5qDUgrgjGdXb7f2A/7OSoRTqVQyw8eFFfDIT
+         JnhaxPFTmwkjtqBaQcVAsWH6SPIrzGvG0ZPo0UiaYPggkMNFL6RCXKhhf+r1+hQ7CxOR
+         ZxnA==
+X-Forwarded-Encrypted: i=1; AJvYcCUdujb2T6xaRKErZgye9vRGLAwe1HRq9zzUFsOw8QJIK7IK2tiaESpdrOyX9GKXN7G0smHbK7Qc@vger.kernel.org, AJvYcCVyF/a4JAgEP14NTPrTyrULchKJIAHFyJ6EQj/92fRy/W42WLnrKf11Jp3of1+0buX3QeA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFH+GZdJ3EyQAiM3r7PFQNpkplctIfsFkJ4BAPYv+D67SZmNxb
+	hJklbPNhIrS95SoCDHH0ydB3aZT3dBMZlqWNqAcFf6P+be7sU+Ih2b8s
+X-Gm-Gg: ASbGncvqKrEQb6h+xgai3x+XbukN3rIsxhnZ2iH3kV4WtzDkfUif5gS+vAiwwlaNSsq
+	3//7mcaw/br0vxRg5pbSQcc+gRHgFleG4mTvwUOUHKcmCA2vgfc9GwOywk6LspfqPuAueQX4wnu
+	9WSeh0lt8GE5857VgmLvGLuLpR/ydNdIjVSUrLFSgl9MJi+JHcUNJYl4xeIGjWu6khFRaewUzqf
+	aIu/fVfUjHrup06daaKk9RVk6LgsEfUQbteCJ/uvZAf3wxutWL6abaQpgC9iGD39AtcG1kpoIyj
+	UhBOa5AEAl+IQCbtSaZisXLiPoljhoQAV/S2ak0lT8LjIGQvniLHFaQtCmaoOXmh+DMT1ubw8cm
+	qG+dq+Y4X70gWnqovNvsItttagEqf
+X-Google-Smtp-Source: AGHT+IEnvjDmNv7m8y9nymLWTnp8judq/PMEKd5Ke5G6clP9QC+qdfNfGwBUxZC8urDNK3ry5T+VNA==
+X-Received: by 2002:a05:6a00:2da0:b0:748:ff4d:b585 with SMTP id d2e1a72fcca58-760363f404emr566381b3a.19.1753211423818;
+        Tue, 22 Jul 2025 12:10:23 -0700 (PDT)
+Received: from ?IPv6:2620:10d:c096:14a::281? ([2620:10d:c090:600::1:e6e1])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-759cbf5a13csm7977381b3a.162.2025.07.22.12.10.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Jul 2025 12:10:23 -0700 (PDT)
+Message-ID: <65744a70c11106a54ca2df212a9fd264e4340e2c.camel@gmail.com>
+Subject: Re: [PATCH bpf-next v3 01/10] bpf: Add dynptr type for skb metadata
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Jakub Sitnicki <jakub@cloudflare.com>, bpf@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko
+ <andrii@kernel.org>,  Arthur Fabre <arthur@arthurfabre.com>, Daniel
+ Borkmann <daniel@iogearbox.net>, Eric Dumazet	 <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer	 <hawk@kernel.org>,
+ Jesse Brandeburg <jbrandeburg@cloudflare.com>, Joanne Koong	
+ <joannelkoong@gmail.com>, Lorenzo Bianconi <lorenzo@kernel.org>, Martin
+ KaFai Lau <martin.lau@linux.dev>, Toke
+ =?ISO-8859-1?Q?H=F8iland-J=F8rgensen?= <thoiland@redhat.com>,  Yan Zhai
+ <yan@cloudflare.com>, kernel-team@cloudflare.com, netdev@vger.kernel.org,
+ Stanislav Fomichev	 <sdf@fomichev.me>
+Date: Tue, 22 Jul 2025 12:10:21 -0700
+In-Reply-To: <83977f81df181ba05a6388f3f542ec027ff44189.camel@gmail.com>
+References: 
+	<20250721-skb-metadata-thru-dynptr-v3-0-e92be5534174@cloudflare.com>
+		 <20250721-skb-metadata-thru-dynptr-v3-1-e92be5534174@cloudflare.com>
+	 <83977f81df181ba05a6388f3f542ec027ff44189.camel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAVpQUBwS3DFs9BENNNgkKFcMtc7tjZBA0PZ-EZ0WY+dCw8hrA@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jul 22, 2025 at 11:27:39AM -0700, Kuniyuki Iwashima wrote:
-> On Tue, Jul 22, 2025 at 10:50 AM Shakeel Butt <shakeel.butt@linux.dev> wrote:
-> >
-> > On Tue, Jul 22, 2025 at 10:57:31AM +0200, Michal Koutný wrote:
-> > > Hello Daniel.
-> > >
-> > > On Tue, Jul 22, 2025 at 09:11:46AM +0200, Daniel Sedlak <daniel.sedlak@cdn77.com> wrote:
-> > > >   /sys/fs/cgroup/**/<cgroup name>/memory.net.socket_pressure
-> > > >
-> > > > The output value is an integer matching the internal semantics of the
-> > > > struct mem_cgroup for socket_pressure. It is a periodic re-arm clock,
-> > > > representing the end of the said socket memory pressure, and once the
-> > > > clock is re-armed it is set to jiffies + HZ.
-> > >
-> > > I don't find it ideal to expose this value in its raw form that is
-> > > rather an implementation detail.
-> > >
-> > > IIUC, the information is possibly valid only during one jiffy interval.
-> > > How would be the userspace consuming this?
-> > >
-> > > I'd consider exposing this as a cummulative counter in memory.stat for
-> > > simplicity (or possibly cummulative time spent in the pressure
-> > > condition).
-> > >
-> > > Shakeel, how useful is this vmpressure per-cgroup tracking nowadays? I
-> > > thought it's kind of legacy.
-> >
-> >
-> > Yes vmpressure is legacy and we should not expose raw underlying number
-> > to the userspace. How about just 0 or 1 and use
-> > mem_cgroup_under_socket_pressure() underlying? In future if we change
-> > the underlying implementation, the output of this interface should be
-> > consistent.
-> 
-> But this is available only for 1 second, and it will not be useful
-> except for live debugging ?
+On Tue, 2025-07-22 at 11:46 -0700, Eduard Zingerman wrote:
 
-1 second is the current implementation and it can be more if the memcg
-remains in memory pressure. Regarding usefullness I think the periodic
-stat collectors (like cadvisor or Google's internal borglet+rumbo) would
-be interested in scraping this interface. If this is still not useful,
-what will be better? Some kind of trace which tracks the state of socket
-pressure state of a memcg (i.e. going into and out of pressure)?
+[...]
+
+> > @@ -2274,7 +2278,8 @@ static bool reg_is_pkt_pointer_any(const struct b=
+pf_reg_state *reg)
+> >  static bool reg_is_dynptr_slice_pkt(const struct bpf_reg_state *reg)
+> >  {
+> >  	return base_type(reg->type) =3D=3D PTR_TO_MEM &&
+> > -		(reg->type & DYNPTR_TYPE_SKB || reg->type & DYNPTR_TYPE_XDP);
+> > +	       (reg->type &
+> > +		(DYNPTR_TYPE_SKB | DYNPTR_TYPE_XDP | DYNPTR_TYPE_SKB_META));
+> >  }
+>=20
+> Note: This function is used to identify pointers to packet data that
+>       might be stale after call to one of the functions in list [1].
+>       Once such pointers are identified, verifier would disallow
+>       access through these pointers.
+>       dynptr_from_skb_meta() is implemented as:
+>=20
+>         bpf_dynptr_init(ptr, skb, BPF_DYNPTR_TYPE_SKB_META, 0, skb_metada=
+ta_len(skb));
+>=20
+>       here any read or write goes through skb object, not a pointer deriv=
+ed from it.
+>       Given above, is it still necessary to list DYNPTR_FROM_SKB_META her=
+e?
+>       Or some functions from [1] can change skb_metadata_len(skb)?
+>=20
+> [1] https://elixir.bootlin.com/linux/v6.15.7/source/net/core/filter.c#L79=
+89
+
+Nevermind, it is necessary, otherwise your tests skb_meta_invalid_data_slic=
+e*
+would be accepted. Sorry for the noise.
 
