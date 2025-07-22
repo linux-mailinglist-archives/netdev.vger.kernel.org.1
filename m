@@ -1,125 +1,113 @@
-Return-Path: <netdev+bounces-208966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DF82B0DBC6
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 15:54:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0994B0DC23
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 15:58:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9BF567A4C59
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 13:52:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75A0C18885C2
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 13:56:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9163D2EA46A;
-	Tue, 22 Jul 2025 13:53:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E03F72EA478;
+	Tue, 22 Jul 2025 13:56:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uWpCDDLR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QyasHfEo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7692DC32B;
-	Tue, 22 Jul 2025 13:53:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64B3A230D0E;
+	Tue, 22 Jul 2025 13:56:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753192436; cv=none; b=Elo/0mqRCwHOPYpsJs24n+AlTrVShMPcIWZZrKalJE0z9Gz7xnbNsigX4/2usJL54c5OP4LvHdjNzKtFxLkn28gU8j7acNyGUK6O02lmNXXAw6tCoVnG9XrQ1QDP5CZMeJGqjZ3PrjQGWLPmOYttIFzzECiIK8JOW7J71WUBN/Y=
+	t=1753192575; cv=none; b=LYvekB7NoLXtZNHBsKX89kTEOpqqsBjzAiOs3+PDl2UEHRWp4oiZ8/HUUTQfxHwxhzOpZJhd0TtzbBySil/LaC0ehpeaVsyOzqGPRImDq9wFuxIY+IdkJxsQ0oPgsFj7FLT1NUrHlzQT1iiXmLyiiA93MuKMEbJGHvAjv1Eg1qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753192436; c=relaxed/simple;
-	bh=sKOSzmoXKV5Kfr4cS4RUMoOpfNEeyYuAI8ozcq6VyA0=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=s3AD/qtquqLZfgQrdpy6OWw40H6dB2WNTwl5WhTK/J01nf8ajhH2GTrKZp1EpFfhBCH8Qv1AclIFOgkKEGPq+KJjk01hZrvJ0kIn7dsYkOB+8aFzJFkcJAq50/HUdUuprHWjZwJYXXOOdAhT3OyzZAMKLNvPSq1sNeT8nLaiIDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uWpCDDLR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7999EC4CEF1;
-	Tue, 22 Jul 2025 13:53:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753192436;
-	bh=sKOSzmoXKV5Kfr4cS4RUMoOpfNEeyYuAI8ozcq6VyA0=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=uWpCDDLRO2Z0u6HJowBcQDf42JEFbzr/+a3lq1WpbbXQ2mb1Wjf542yL4+hKeTlCM
-	 lNlJPhAn6m/JTj73UZl257EF9anQpLdqnX91uUCGLVvoPFaTuYFumyMfu4HCFw+HPJ
-	 SZ6zEUdAOlrOZ0aWSIsNkX8p3O7MVYFJW19oTT3zkouthRC//1v1OorVc/AYTknXmf
-	 eBrWEgJAB3TBVAdTrsDYhb9QGx2JwfHdTXri6yzNfoj4JBTac47dotKcNI5bsQPWFo
-	 DUB0h9tDxk6R/JiODhWV58Vr0MCPx7zD/iNKanJs3Q7QuGehzvb10oAxc8jxOkathY
-	 B0DhCyQ12RT8Q==
-From: Leon Romanovsky <leon@kernel.org>
-To: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
- Bernard Metzler <bmt@zurich.ibm.com>, Bjorn Helgaas <bhelgaas@google.com>, 
- Bryan Tan <bryan-bt.tan@broadcom.com>, 
- Chengchang Tang <tangchengchang@huawei.com>, 
- Cheng Xu <chengyou@linux.alibaba.com>, 
- Christian Benvenuti <benve@cisco.com>, 
- Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, 
- Edward Srouji <edwards@nvidia.com>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Junxian Huang <huangjunxian6@hisilicon.com>, 
- Kai Shen <kaishen@linux.alibaba.com>, 
- Kalesh AP <kalesh-anakkur.purayil@broadcom.com>, 
- Konstantin Taranov <kotaranov@microsoft.com>, linux-pci@vger.kernel.org, 
- linux-rdma@vger.kernel.org, Long Li <longli@microsoft.com>, 
- Michael Margolin <mrgolin@amazon.com>, 
- Michal Kalderon <mkalderon@marvell.com>, Moshe Shemesh <moshe@nvidia.com>, 
- Mustafa Ismail <mustafa.ismail@intel.com>, 
- Nelson Escobar <neescoba@cisco.com>, netdev@vger.kernel.org, 
- Paolo Abeni <pabeni@redhat.com>, Potnuri Bharat Teja <bharat@chelsio.com>, 
- Saeed Mahameed <saeedm@nvidia.com>, 
- Selvin Xavier <selvin.xavier@broadcom.com>, 
- Tariq Toukan <tariqt@nvidia.com>, 
- Tatyana Nikolova <tatyana.e.nikolova@intel.com>, 
- Vishnu Dasa <vishnu.dasa@broadcom.com>, Yishai Hadas <yishaih@nvidia.com>, 
- Zhu Yanjun <zyjzyj2000@gmail.com>
-In-Reply-To: <cover.1752752567.git.leon@kernel.org>
-References: <cover.1752752567.git.leon@kernel.org>
-Subject: Re: [PATCH rdma-next v2 0/8] RDMA support for DMA handle
-Message-Id: <175319243278.1064286.6299486242708282132.b4-ty@kernel.org>
-Date: Tue, 22 Jul 2025 09:53:52 -0400
+	s=arc-20240116; t=1753192575; c=relaxed/simple;
+	bh=DhzF5l7I2J9PMPvJauS2hdz6oE81hLeHaGvhhBQ0rcQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iFzhVnoy1cyw/B6SkUkNjcskSMWgNrBJ1QvJYhSu7twUA7P+I9gMMEk6cca7xNSgpTEUK/2ox2KqMZUDPL3+PpOqMcDZgzGxChB2u7TlP6m4gNqXmGrQqsDxvtAU8djZhv4k0lRDW25rQk81BfA6DhFVxw1yimO4UHm0KenIC1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QyasHfEo; arc=none smtp.client-ip=209.85.210.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-73e810dc03bso788102a34.3;
+        Tue, 22 Jul 2025 06:56:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753192573; x=1753797373; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1Cx7Gr4DreWZzf57vT5GiVKqhh9yn9qywfvm6GXChIo=;
+        b=QyasHfEoniwNEZ/WZ4vEw+Yb5U0nuMBSUDVmwr7UvuS41TC4Mhh1NNszvoPHXmC53Q
+         ThxBUmXiOVCZTL4et0DFG8YLBBzw9Akj/bglpTm50//woDIOp3S2QwURUv9PZAIk2A9P
+         ZjdTw0RarJNiJmjoZqaC1Ms6BwTTKAezHepe+L7gE06BjAtuiisxyXBJgwvGWRiFJJ1m
+         E0LpGf2cMvEUVqc3SinfIjk4cOjqUAO4nLX4vj/4KuYKADG2UXoSZFApS0WmtxIq3uBT
+         hxz7xekUOzpGXK28R0xC0wWcEOiR8kQbo+Br63K188O8/hmuL4qC8f4hZoJAjdIznIuS
+         o0VA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753192573; x=1753797373;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1Cx7Gr4DreWZzf57vT5GiVKqhh9yn9qywfvm6GXChIo=;
+        b=QqyUGzpHKo+P0RFkrC0Nixn6p4Hv2dreqM/6MGE08/QBGb9ojGnXLTjst8u3JRLXxa
+         jS9oHRjuN9LR529ijh1FzDpcOVz6XIkMZW3uigbhVlXBder6v75MagLG12xP/MDPCgS1
+         jakuuQg/vYt7MBX+CDjLED5ooG4xDHTnCY35Iem5Tka58x4Bzb6Foupqr8PuaY+/MTZ3
+         qwlZrOJWEfgCIkrtGMUoMm6UM81SpbCxVIqC+9GMKibAASQyJZTYCn0VTYh0h3pYpKqM
+         we6wIORzNyKIWzLrPXOAP/xSp4Wvi47uvEc9KR/M9L33jer765+8YdRQbKamI+zFEo6g
+         VwWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUipxcBZW6T9RUeesb949bPbaqYoLqi2O4kwBa9pWDitPVmn+VH+fREWdInX0lhI0JAXew/fTD8@vger.kernel.org, AJvYcCX2Qeo+DM6O06/V0sG6qmZJpKbjoCRkZNhDyrahcYGyPOEK2nLRsWMYe2fLmlbIFCoGzTj7w85UQjuNhr4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxz0BIRTkGYU+VSUnmgL64G6dlNMIW65Aa6MrZaWjzI5n514rjg
+	XBNoAMp4a4kr1hWhbzukwdloXDBG0zqhlkGCGQaxzmxuTRLaOg+SAtmnMchaLyD6EFX6ne0tFsA
+	igi01CvBNjUSulP93pFgjdGQsDT7k1t4=
+X-Gm-Gg: ASbGncsFc+632p1Tj281BuIv/o0aGBRt7A1G5DtUjntCZgOBV7HpKJ1tQLRc5LnvA6x
+	8AgW2yHqBMttm/oEufa30Y406R5x6/eHs+u4CRW2erTG2Jx5Kz2VSYVfs5BFqZ4AB1fEHI1jHsB
+	Bpc2PxvIA5rXiEWQcK85qLl6yWzeRAswZ/BONuw/OOCmZEmvPdEZKZHJcGb8cROLY4bthzdLe6J
+	R89mjOS
+X-Google-Smtp-Source: AGHT+IFNCuAiMFBJ+qLVy6zUGnB/dKh48G/ViCbOJGiiFqe/aDQhU/3ZxV4HrZVa0+3fH4m9NVoCspjXq3ql+dJ3ppY=
+X-Received: by 2002:a05:6830:4d95:b0:73e:93a2:3ab1 with SMTP id
+ 46e09a7af769-73e93a2430bmr8842207a34.18.1753192573261; Tue, 22 Jul 2025
+ 06:56:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15-dev-37811
+References: <20250722071508.12497-1-suchitkarunakaran@gmail.com> <20250722063659.3a439879@kernel.org>
+In-Reply-To: <20250722063659.3a439879@kernel.org>
+From: Suchit K <suchitkarunakaran@gmail.com>
+Date: Tue, 22 Jul 2025 19:26:01 +0530
+X-Gm-Features: Ac12FXwq_HIr-ERaVbidZeD0S6zF25cECaoEambmLTcpXNj5Hl8y43qwAqmpj3Q
+Message-ID: <CAO9wTFhghrrzH2ysTiBqNrZ1dbb001Y6rWYiKRTC2R8PBm-Zog@mail.gmail.com>
+Subject: Re: [PATCH] net: Revert tx queue length on partial failure in dev_qdisc_change_tx_queue_len()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	horms@kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com, 
+	jiri@resnulli.us, sdf@fomichev.me, kuniyu@google.com, 
+	aleksander.lobakin@intel.com, netdev@vger.kernel.org, 
+	skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, 22 Jul 2025 at 19:07, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Tue, 22 Jul 2025 12:45:08 +0530 Suchit Karunakaran wrote:
+> > +             while (i >=3D 0) {
+> > +                     qdisc_change_tx_queue_len(dev, &dev->_tx[i]);
+> > +                     i--;
+>
+> i is unsigned, this loop will never end
+> --
+> pw-bot: cr
 
-On Thu, 17 Jul 2025 15:17:24 +0300, Leon Romanovsky wrote:
-> Changelog:
-> v2:
->  * Removed check of existence of function pointers in favour of uverbs macro.
-> v1: https://lore.kernel.org/all/cover.1752388126.git.leon@kernel.org
->  * Added Bjorn's Acked-by on PCI patch.
->  * Changed title of first PCI patch.
->  * Changed hns and efa to count not-supported commands.
->  * Slightly changed protection of mlx5 SF parent_mdev access.
->  * Moved SIW debug print to be before dmah check.
-> v0:https://lore.kernel.org/all/cover.1751907231.git.leon@kernel.org
-> --------------------------------------------------------------------
-> 
-> [...]
-
-Applied, thanks!
-
-[1/8] PCI/TPH: Expose pcie_tph_get_st_table_size()
-      https://git.kernel.org/rdma/rdma/c/723f8b98c6a538
-[2/8] net/mlx5: Expose IFC bits for TPH
-      https://git.kernel.org/rdma/rdma/c/b0409b4e14b651
-[3/8] net/mlx5: Add support for device steering tag
-      https://git.kernel.org/rdma/rdma/c/d3a2ef08a0ed60
-[4/8] IB/core: Add UVERBS_METHOD_REG_MR on the MR object
-      https://git.kernel.org/rdma/rdma/c/0c90560d0d66ea
-[5/8] RDMA/core: Introduce a DMAH object and its alloc/free APIs
-      https://git.kernel.org/rdma/rdma/c/9261a3b61acc20
-[6/8] RDMA/mlx5: Add DMAH object support
-      https://git.kernel.org/rdma/rdma/c/f8bfd61adf2957
-[7/8] IB: Extend UVERBS_METHOD_REG_MR to get DMAH
-      https://git.kernel.org/rdma/rdma/c/d0c4964d1fb1c0
-[8/8] RDMA/mlx5: Add DMAH support for reg_user_mr/reg_user_dmabuf_mr
-      https://git.kernel.org/rdma/rdma/c/ff2f4dcf7f645b
-
-Best regards,
--- 
-Leon Romanovsky <leon@kernel.org>
-
+Hi Jakub,
+I'm sorry for the oversight. I'll send a v2 patch shortly to fix it.
+In the meantime, could you please give me some insights on testing
+this change? Also, apart from the unsigned int blunder, does the
+overall approach look reasonable? I=E2=80=99d be grateful for any suggestio=
+ns
+or comments. Thank you.
 
