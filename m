@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-208757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A607EB0CF4D
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 03:49:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61715B0CF4E
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 03:49:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF8EF3B51DD
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 01:49:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8442C173C77
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 01:49:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55FFC1DB377;
-	Tue, 22 Jul 2025 01:49:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1006D1DF247;
+	Tue, 22 Jul 2025 01:49:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zl73LZ2c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sjmbqdhE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 326CC1D90DF
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 01:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1431DEFE7;
+	Tue, 22 Jul 2025 01:49:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753148974; cv=none; b=Z20bZA5Ps6mO0ruM0ZrZa8GyLiSgDfRSTI/iMq9waQlviJQ8ex7kz+q7trq6AXjOnm9kRLG2/R6q0PJzB4d88VcfJZso6yna7h/4lAlK3HwxLswcpIx1/ZrmFZ704SwO7HpQ7q6iwQIBauijjnhF2xH6j32ZRNFOh/N3UUYCkZQ=
+	t=1753148977; cv=none; b=nxFb73Hdx6rsnEYd0Meaa4MrHs3+bmMBKmTZ/6JerJukI9gpE4pwiMWAyBdXSrId3+MCqWvIKgguUsCEbXqCPnJJIWnCXopgW8KhCvfufe0CUA59nPJBDczhmnh/AoG/euwvKCbySJGZqEWm/E89+5wHvaVQFlYLIEEXEk+K31Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753148974; c=relaxed/simple;
-	bh=1dPRQzI9HIlzlh2l0ZM6UeRNyHUvhmKvsj0ivhE7RuI=;
+	s=arc-20240116; t=1753148977; c=relaxed/simple;
+	bh=gZrr2/TXUrDgtGvyBBgOtJ1IlIj07JowaDCMipkaHVY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bKeK++lakVm+QQWfcUF2kjR0J6zcJS24hegTEyugkssvTxuO6pAObRvRKORLr0R1L/RXeshEhV/8/ZHSzOgXkGOp+ZVN4S8q2+U1ezHvE4tPtpKje5g7tS32ulZuyspjL5rBX7yajS3L5F2ThNJYj07MajcwbEXN2hnrYwebKk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zl73LZ2c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53B65C4CEF9;
+	 MIME-Version; b=cgncyhqUsG8TtSYECknnLFWm5HU180IGupEubOZtcv1sOpOzO+wk6GQ5+ZejOMjZWQEYPduHzSv0Ni4InUabWrP1XRyWXVEBAkAXrvn9uznlMvj6FtTGH0p7i8CnoTGCfYa/d6TSF4hIhBKMof2kHSaNpf7xZZNTBwwqiT9RI3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sjmbqdhE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D54DCC4CEF6;
 	Tue, 22 Jul 2025 01:49:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753148973;
-	bh=1dPRQzI9HIlzlh2l0ZM6UeRNyHUvhmKvsj0ivhE7RuI=;
+	s=k20201202; t=1753148974;
+	bh=gZrr2/TXUrDgtGvyBBgOtJ1IlIj07JowaDCMipkaHVY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Zl73LZ2c1kSil81OCMcvZV6Zcunqtpws6BNvhpgXq/xH9zyJ1GrkrjGc+vlDDCRB/
-	 6pMYcCPlXtDqOnw579w8NdBsvEICJvd5GkpIhlESLJuTbv6rigitxvyxUAu6abWRY2
-	 mFs5yJMBJVeCQdSheiJG/Fsk589/3r8wLJxx/j3BRRnv5+02HZjDR3cW466nVceQ4J
-	 y+dSUsU5/VUxcwfP1KCAm1J0i7qTzfrftCP1h2l3Ceko4xolNb8Irh50d6Qm9w7juz
-	 rTNT8kRcbq1xFmALmv4v05jgWj4j8yUd7e/Z4Z0/qaoWD1GI9e9vU7q3earL1upBql
-	 N/WSbaP2bjdwg==
+	b=sjmbqdhEwwRj5eH5FT3iuDMkr+z2BYJqyRwHJc+lI3BzwPsWuPSs9t8g57/A0Rrbl
+	 /XOr7aVFq7rcE8AyqoW2+LZYRLWUl72ww9O4/JjxzJVG2J6ogTdtuZZB8+5+yHyL9N
+	 yt3LOMhzR/4KvQljj64qKWERwrIcIw7oSmDQcjcrrXrw3o9Gbo64ykmnOETjr4i0tq
+	 vQOS0+L3wJ3ej7c+ppWCc0aSx9LALr9Cq5oLeYYAoq1sIIyCpiTAm18LB0J9WSpfa5
+	 o1XHdfyFfmijCVZEHVwJZe4GX26YBIKR/uYiixubXJIkk61T+Wl699GEzZY9D9fLJ8
+	 dQ/QA1RSepEzg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -54,10 +54,13 @@ Cc: netdev@vger.kernel.org,
 	gal@nvidia.com,
 	andrew@lunn.ch,
 	willemdebruijn.kernel@gmail.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 3/4] eth: bnxt: support RSS on IPv6 Flow Label
-Date: Mon, 21 Jul 2025 18:49:14 -0700
-Message-ID: <20250722014915.3365370-4-kuba@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	shuah@kernel.org,
+	sdf@fomichev.me,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next v2 4/4] selftests: drv-net: add test for RSS on flow label
+Date: Mon, 21 Jul 2025 18:49:15 -0700
+Message-ID: <20250722014915.3365370-5-kuba@kernel.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250722014915.3365370-1-kuba@kernel.org>
 References: <20250722014915.3365370-1-kuba@kernel.org>
@@ -69,99 +72,196 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-It appears that the bnxt FW API has the relevant bit for Flow Label
-hashing. Plumb in the support. Obey the capability bit.
+Add a simple test for checking that RSS on flow label works,
+and that its rejected for IPv4 flows.
+
+ # ./tools/testing/selftests/drivers/net/hw/rss_flow_label.py
+ TAP version 13
+ 1..2
+ ok 1 rss_flow_label.test_rss_flow_label
+ ok 2 rss_flow_label.test_rss_flow_label_6only
+ # Totals: pass:2 fail:0 xfail:0 xpass:0 skip:0 error:0
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-CC: michael.chan@broadcom.com
-CC: pavan.chebbi@broadcom.com
+CC: shuah@kernel.org
+CC: sdf@fomichev.me
+CC: linux-kselftest@vger.kernel.org
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  1 +
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  2 ++
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 23 ++++++++++++++++---
- 3 files changed, 23 insertions(+), 3 deletions(-)
+ .../testing/selftests/drivers/net/hw/Makefile |   1 +
+ .../drivers/net/hw/rss_flow_label.py          | 151 ++++++++++++++++++
+ 2 files changed, 152 insertions(+)
+ create mode 100755 tools/testing/selftests/drivers/net/hw/rss_flow_label.py
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index fda0d3cc6227..40ae34923511 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -2407,6 +2407,7 @@ struct bnxt {
- #define BNXT_RSS_CAP_ESP_V4_RSS_CAP		BIT(6)
- #define BNXT_RSS_CAP_ESP_V6_RSS_CAP		BIT(7)
- #define BNXT_RSS_CAP_MULTI_RSS_CTX		BIT(8)
-+#define BNXT_RSS_CAP_IPV6_FLOW_LABEL_RSS_CAP	BIT(9)
- 
- 	u8			rss_hash_key[HW_HASH_KEY_SIZE];
- 	u8			rss_hash_key_valid:1;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index de8080df69a8..6425955c06d6 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -6957,6 +6957,8 @@ static int bnxt_hwrm_vnic_qcaps(struct bnxt *bp)
- 			bp->rss_cap |= BNXT_RSS_CAP_ESP_V4_RSS_CAP;
- 		if (flags & VNIC_QCAPS_RESP_FLAGS_RSS_IPSEC_ESP_SPI_IPV6_CAP)
- 			bp->rss_cap |= BNXT_RSS_CAP_ESP_V6_RSS_CAP;
-+		if (flags & VNIC_QCAPS_RESP_FLAGS_RSS_IPV6_FLOW_LABEL_CAP)
-+			bp->rss_cap |= BNXT_RSS_CAP_IPV6_FLOW_LABEL_RSS_CAP;
- 		if (flags & VNIC_QCAPS_RESP_FLAGS_RE_FLUSH_CAP)
- 			bp->fw_cap |= BNXT_FW_CAP_VNIC_RE_FLUSH;
- 	}
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index 1b37612b1c01..4b7213908b76 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -1582,9 +1582,14 @@ static u64 get_ethtool_ipv4_rss(struct bnxt *bp)
- 
- static u64 get_ethtool_ipv6_rss(struct bnxt *bp)
- {
-+	u64 rss = 0;
+diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
+index fdc97355588c..5159fd34cb33 100644
+--- a/tools/testing/selftests/drivers/net/hw/Makefile
++++ b/tools/testing/selftests/drivers/net/hw/Makefile
+@@ -18,6 +18,7 @@ TEST_PROGS = \
+ 	pp_alloc_fail.py \
+ 	rss_api.py \
+ 	rss_ctx.py \
++	rss_flow_label.py \
+ 	rss_input_xfrm.py \
+ 	tso.py \
+ 	xsk_reconfig.py \
+diff --git a/tools/testing/selftests/drivers/net/hw/rss_flow_label.py b/tools/testing/selftests/drivers/net/hw/rss_flow_label.py
+new file mode 100755
+index 000000000000..e471e13160ae
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/hw/rss_flow_label.py
+@@ -0,0 +1,151 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0
 +
- 	if (bp->rss_hash_cfg & VNIC_RSS_CFG_REQ_HASH_TYPE_IPV6)
--		return RXH_IP_SRC | RXH_IP_DST;
--	return 0;
-+		rss |= RXH_IP_SRC | RXH_IP_DST;
-+	if (bp->rss_hash_cfg & VNIC_RSS_CFG_REQ_HASH_TYPE_IPV6_FLOW_LABEL)
-+		rss |= RXH_IP6_FL;
++"""
++Tests for RSS hashing on IPv6 Flow Label.
++"""
 +
-+	return rss;
- }
- 
- static int bnxt_get_rxfh_fields(struct net_device *dev,
-@@ -1662,13 +1667,18 @@ static int bnxt_set_rxfh_fields(struct net_device *dev,
- 
- 	if (cmd->data == RXH_4TUPLE)
- 		tuple = 4;
--	else if (cmd->data == RXH_2TUPLE)
-+	else if (cmd->data == RXH_2TUPLE ||
-+		 cmd->data == (RXH_2TUPLE | RXH_IP6_FL))
- 		tuple = 2;
- 	else if (!cmd->data)
- 		tuple = 0;
- 	else
- 		return -EINVAL;
- 
-+	if (cmd->data & RXH_IP6_FL &&
-+	    !(bp->rss_cap & BNXT_RSS_CAP_IPV6_FLOW_LABEL_RSS_CAP))
-+		return -EINVAL;
++import glob
++import socket
++from lib.py import CmdExitFailure
++from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_ge, ksft_in, \
++    ksft_not_in, ksft_raises, KsftSkipEx
++from lib.py import bkg, cmd, defer, fd_read_timeout, rand_port
++from lib.py import NetDrvEpEnv
 +
- 	if (cmd->flow_type == TCP_V4_FLOW) {
- 		rss_hash_cfg &= ~VNIC_RSS_CFG_REQ_HASH_TYPE_TCP_IPV4;
- 		if (tuple == 4)
-@@ -1736,6 +1746,13 @@ static int bnxt_set_rxfh_fields(struct net_device *dev,
- 			rss_hash_cfg |= VNIC_RSS_CFG_REQ_HASH_TYPE_IPV6;
- 		else if (!tuple)
- 			rss_hash_cfg &= ~VNIC_RSS_CFG_REQ_HASH_TYPE_IPV6;
 +
-+		if (cmd->data & RXH_IP6_FL)
-+			rss_hash_cfg |=
-+				VNIC_RSS_CFG_REQ_HASH_TYPE_IPV6_FLOW_LABEL;
-+		else
-+			rss_hash_cfg &=
-+				~VNIC_RSS_CFG_REQ_HASH_TYPE_IPV6_FLOW_LABEL;
- 		break;
- 	}
- 
++def _ethtool_get_cfg(cfg, fl_type):
++    descr = cmd(f"ethtool -n {cfg.ifname} rx-flow-hash {fl_type}").stdout
++
++    converter = {
++        "IP SA": "s",
++        "IP DA": "d",
++        "L3 proto": "t",
++        "L4 bytes 0 & 1 [TCP/UDP src port]": "f",
++        "L4 bytes 2 & 3 [TCP/UDP dst port]": "n",
++        "IPv6 Flow Label": "l",
++    }
++
++    ret = ""
++    for line in descr.split("\n")[1:-2]:
++        # if this raises we probably need to add more keys to converter above
++        ret += converter[line]
++    return ret
++
++
++def _traffic(cfg, one_sock, one_cpu):
++    local_port  = rand_port(socket.SOCK_DGRAM)
++    remote_port = rand_port(socket.SOCK_DGRAM)
++
++    sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
++    sock.bind(("", local_port))
++    sock.connect((cfg.remote_addr_v["6"], 0))
++    if one_sock:
++        send = f"exec 5<>/dev/udp/{cfg.addr_v['6']}/{local_port}; " \
++                "for i in `seq 20`; do echo a >&5; sleep 0.02; done; exec 5>&-"
++    else:
++        send = "for i in `seq 20`; do echo a | socat -t0.02 - UDP6:" \
++              f"[{cfg.addr_v['6']}]:{local_port},sourceport={remote_port}; done"
++
++    cpus = set()
++    with bkg(send, shell=True, host=cfg.remote, exit_wait=True):
++        for _ in range(20):
++            fd_read_timeout(sock.fileno(), 1)
++            cpu = sock.getsockopt(socket.SOL_SOCKET, socket.SO_INCOMING_CPU)
++            cpus.add(cpu)
++
++    if one_cpu:
++        ksft_eq(len(cpus), 1,
++                f"{one_sock=} - expected one CPU, got traffic on: {cpus=}")
++    else:
++        ksft_ge(len(cpus), 2,
++                f"{one_sock=} - expected many CPUs, got traffic on: {cpus=}")
++
++
++def test_rss_flow_label(cfg):
++    """
++    Test hashing on IPv6 flow label. Send traffic over a single socket
++    and over multiple sockets. Depend on the remote having auto-label
++    enabled so that it randomizes the label per socket.
++    """
++
++    cfg.require_ipver("6")
++    cfg.require_cmd("socat", remote=True)
++    if not hasattr(socket, "SO_INCOMING_CPU"):
++        raise KsftSkipEx("socket.SO_INCOMING_CPU was added in Python 3.11")
++
++    # 1 is the default, if someone changed it we probably shouldn"t mess with it
++    af = cmd("cat /proc/sys/net/ipv6/auto_flowlabels", host=cfg.remote).stdout
++    if af.strip() != "1":
++        raise KsftSkipEx("Remote does not have auto_flowlabels enabled")
++
++    qcnt = len(glob.glob(f"/sys/class/net/{cfg.ifname}/queues/rx-*"))
++    if qcnt < 2:
++        raise KsftSkipEx(f"Local has only {qcnt} queues")
++
++    # Enable flow label hashing for UDP6
++    initial = _ethtool_get_cfg(cfg, "udp6")
++    no_lbl = initial.replace("l", "")
++    if "l" not in initial:
++        try:
++            cmd(f"ethtool -N {cfg.ifname} rx-flow-hash udp6 l{no_lbl}")
++        except CmdExitFailure as exc:
++            raise KsftSkipEx("Device doesn't support Flow Label for UDP6") from exc
++
++        defer(cmd, f"ethtool -N {cfg.ifname} rx-flow-hash udp6 {initial}")
++
++    _traffic(cfg, one_sock=True, one_cpu=True)
++    _traffic(cfg, one_sock=False, one_cpu=False)
++
++    # Disable it, we should see no hashing (reset was already defer()ed)
++    cmd(f"ethtool -N {cfg.ifname} rx-flow-hash udp6 {no_lbl}")
++
++    _traffic(cfg, one_sock=False, one_cpu=True)
++
++
++def _check_v4_flow_types(cfg):
++    for fl_type in ["tcp4", "udp4", "ah4", "esp4", "sctp4"]:
++        try:
++            cur = cmd(f"ethtool -n {cfg.ifname} rx-flow-hash {fl_type}").stdout
++            ksft_not_in("Flow Label", cur,
++                        comment=f"{fl_type=} has Flow Label:" + cur)
++        except CmdExitFailure:
++            # Probably does not support this flow type
++            pass
++
++
++def test_rss_flow_label_6only(cfg):
++    """
++    Test interactions with IPv4 flow types. It should not be possible to set
++    IPv6 Flow Label hashing for an IPv4 flow type. The Flow Label should also
++    not appear in the IPv4 "current config".
++    """
++
++    with ksft_raises(CmdExitFailure) as cm:
++        cmd(f"ethtool -N {cfg.ifname} rx-flow-hash tcp4 sdfnl")
++    ksft_in("Invalid argument", cm.exception.cmd.stderr)
++
++    _check_v4_flow_types(cfg)
++
++    # Try to enable Flow Labels and check again, in case it leaks thru
++    initial = _ethtool_get_cfg(cfg, "udp6")
++    changed = initial.replace("l", "") if "l" in initial else initial + "l"
++
++    cmd(f"ethtool -N {cfg.ifname} rx-flow-hash udp6 {changed}")
++    restore = defer(cmd, f"ethtool -N {cfg.ifname} rx-flow-hash udp6 {initial}")
++
++    _check_v4_flow_types(cfg)
++    restore.exec()
++    _check_v4_flow_types(cfg)
++
++
++def main() -> None:
++    with NetDrvEpEnv(__file__, nsim_test=False) as cfg:
++        ksft_run([test_rss_flow_label,
++                  test_rss_flow_label_6only],
++                 args=(cfg, ))
++    ksft_exit()
++
++
++if __name__ == "__main__":
++    main()
 -- 
 2.50.1
 
