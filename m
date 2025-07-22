@@ -1,54 +1,43 @@
-Return-Path: <netdev+bounces-208804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98279B0D2EC
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 09:28:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 818D6B0D2F3
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 09:28:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F4311889301
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 07:26:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5DD91C245C6
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 07:27:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 703FE2D878A;
-	Tue, 22 Jul 2025 07:24:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3221628A718;
+	Tue, 22 Jul 2025 07:27:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="mLe5XmGU"
+	dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b="pC+ynV3W"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
+Received: from mail-internal.sh.cz (mail-internal.sh.cz [95.168.196.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DACD62D0C9B
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 07:24:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDC3128C00C;
+	Tue, 22 Jul 2025 07:27:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.168.196.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753169091; cv=none; b=XlsJRoCAIXseQbkQlly6GNZ/fWZJxmzwLSivm9hZxUY1ALvRIwq8ph48RVncfxcYUDZLa3x38Um1dGCRiBFXnfgoqj3fVaXRowZhx8mHWQardXLitYRX4cIP2u4+CZNN1klRhJU5H8PBzmuRJMR2zovh+3aKlvzh049c1ciCQz4=
+	t=1753169230; cv=none; b=rgCxLccyP7Uqja9+gxRK1Bah3Pj7KPQd6imGSWpMiK1of8VNG3v6sun30HY1Ywvjt709xR8rmgOzJkF6OHNIt3ycy5Kl5i9D+dCAh3VjB+UIq9FILbS+MqoEcUSPFcXrbQ9GQNYHGI+U1v7VL4YcMIwqci5QCTpX42CvIvWNG3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753169091; c=relaxed/simple;
-	bh=4HhP2iNixfpmY9GA50RldzfymFrP5PRb/ex2XnKjRrQ=;
+	s=arc-20240116; t=1753169230; c=relaxed/simple;
+	bh=oW0fsdZpkuDnvUCPp9hj4ntdifZc1tSLSdUkaNgn7C0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jbhN+3X55WatXx9msq3UDIfqm4RPKOqrX3NXro7ejl86hBjyJz1vZb2eCgng1vQMIs71U+MhGyxUiuOeEbzdjQYv5dUTqc/XX1RBnA0e9QXUQ8VmDJyEaJMu5KkeRg284cZg/jFTdlnzKuI8M5+aEtiaiO2O5rMjVgSa+8Ubvmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=mLe5XmGU; arc=none smtp.client-ip=54.254.200.128
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1753168998;
-	bh=4HhP2iNixfpmY9GA50RldzfymFrP5PRb/ex2XnKjRrQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=mLe5XmGUOArSYdy/2/xBjJ8ilefcPJfI7C2P1v5h7B6E8O0V9PMg+NtyBhaDSkeR5
-	 AdzNmtpcZtE+7m1/mxUJSQ0fPLb13pFQBo2xwPv4R9v4GVq8YxQC5Ym2YssnmgJYtA
-	 XQ2tuch7o1eHx/9SfyMctramX02mE4k8SKTPjs9A=
-X-QQ-mid: zesmtpip4t1753168943tb2aa8fc1
-X-QQ-Originating-IP: jlkPh//3cQuVzne1YV9Hj8c3k19VYTQ4PPPWu+FTW/A=
-Received: from [IPV6:240e:668:120a::212:232] ( [localhost])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 22 Jul 2025 15:22:18 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 3880468087656715595
-EX-QQ-RecipientCnt: 62
-Message-ID: <634BA467821D37FE+0b2ace38-07d9-4500-8bb7-5a4fa65c4b9f@uniontech.com>
-Date: Tue, 22 Jul 2025 15:22:18 +0800
+	 In-Reply-To:Content-Type; b=h4DgVzUoGAIfsMdonsmyruRfCTpMF8/0lCZLl31/VDEWM5N9OZCxrvI3COQ4gF+rFWisGGBk4Wu5fyJ1ffNnef312MOQukHnSI5K/G60lZw27LJxFQPFtTAyWEPeIhOfCAZfR+bB2E6Ug6dFoyic2xJVRo+IACu3jhWcU2QryDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com; spf=pass smtp.mailfrom=cdn77.com; dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b=pC+ynV3W; arc=none smtp.client-ip=95.168.196.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cdn77.com
+DKIM-Signature: a=rsa-sha256; t=1753169223; x=1753774023; s=dkim2019; d=cdn77.com; c=relaxed/relaxed; v=1; bh=ugX0/5WzJEWczB5ILEP+4F4o+n6UggNVK+OdbQ/Pz+Q=; h=From:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:In-Reply-To:References;
+   b=pC+ynV3WDz3blBMgxiWi5zE0GR69FRJ8BbStpwr8yhq8Uo43covZlsXTNM333REQhI0Hf5F3EMW2WloK+B7KbJUGFcKc1A6NQ+6/Ydwu5fXkE979cUfmKkh3B3hqWzj7pNQ+sTFL5l7t8gINZ0JtUhNK6EGwFAuPYUGTQC3B13w=
+Received: from [10.26.3.151] ([80.250.18.198])
+        by mail.sh.cz (14.1.0 build 16 ) with ASMTP (SSL) id 202507220927014709;
+        Tue, 22 Jul 2025 09:27:01 +0200
+Message-ID: <42f7889e-7f7e-4056-9d3a-424298e7df87@cdn77.com>
+Date: Tue, 22 Jul 2025 09:27:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,163 +45,117 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 6/8] serial: 8250_dw: Fix typo "notifer"
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: airlied@gmail.com, akpm@linux-foundation.org, alison.schofield@intel.com,
- andrew+netdev@lunn.ch, andriy.shevchenko@linux.intel.com,
- arend.vanspriel@broadcom.com, bp@alien8.de,
- brcm80211-dev-list.pdl@broadcom.com, brcm80211@lists.linux.dev,
- colin.i.king@gmail.com, cvam0000@gmail.com, dan.j.williams@intel.com,
- dave.hansen@linux.intel.com, dave.jiang@intel.com, dave@stgolabs.net,
- davem@davemloft.net, dri-devel@lists.freedesktop.org, edumazet@google.com,
- guanwentao@uniontech.com, hpa@zytor.com, ilpo.jarvinen@linux.intel.com,
- intel-xe@lists.freedesktop.org, ira.weiny@intel.com, j@jannau.net,
- jeff.johnson@oss.qualcomm.com, jgross@suse.com, jirislaby@kernel.org,
- johannes.berg@intel.com, jonathan.cameron@huawei.com, kuba@kernel.org,
- kvalo@kernel.org, kvm@vger.kernel.org, linux-cxl@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-serial@vger.kernel.org,
- linux-wireless@vger.kernel.org, linux@treblig.org, lucas.demarchi@intel.com,
- marcin.s.wojtas@gmail.com, ming.li@zohomail.com, mingo@kernel.org,
- mingo@redhat.com, netdev@vger.kernel.org, niecheng1@uniontech.com,
- oleksandr_tyshchenko@epam.com, pabeni@redhat.com, pbonzini@redhat.com,
- quic_ramess@quicinc.com, ragazenta@gmail.com, rodrigo.vivi@intel.com,
- seanjc@google.com, shenlichuan@vivo.com, simona@ffwll.ch,
- sstabellini@kernel.org, tglx@linutronix.de,
- thomas.hellstrom@linux.intel.com, vishal.l.verma@intel.com, x86@kernel.org,
- xen-devel@lists.xenproject.org, yujiaoliang@vivo.com, zhanjun@uniontech.com
-References: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
- <2BF1749F02ADE664+20250715134407.540483-6-wangyuli@uniontech.com>
- <2025071607-outbid-heat-b0ba@gregkh>
+Subject: Re: [PATCH v3] memcg: expose socket memory pressure in a cgroup
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
+ David Ahern <dsahern@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Yosry Ahmed <yosry.ahmed@linux.dev>,
+ linux-mm@kvack.org, netdev@vger.kernel.org,
+ Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Muchun Song <muchun.song@linux.dev>, cgroups@vger.kernel.org,
+ Matyas Hurtik <matyas.hurtik@cdn77.com>
+References: <20250722071146.48616-1-daniel.sedlak@cdn77.com>
+ <CANn89i+sAgVOOoowNfqxv7+NrAa+8EzkWTVMP8LeGDJ23sFQpg@mail.gmail.com>
 Content-Language: en-US
-From: WangYuli <wangyuli@uniontech.com>
-Autocrypt: addr=wangyuli@uniontech.com; keydata=
- xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSKP+nX39DN
- IVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAxFiEEa1GMzYeuKPkg
- qDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMBAAAKCRDF2h8wRvQL7g0UAQCH
- 3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfPbwD/SrncJwwPAL4GiLPEC4XssV6FPUAY
- 0rA68eNNI9cJLArOOARmgSyJEgorBgEEAZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7
- VTL0dvPDofBTjFYDAQgHwngEGBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIb
- DAAKCRDF2h8wRvQL7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkU
- o9ERi7qS/hbUdUgtitI89efbY0TVetgDsyeQiwU=
-In-Reply-To: <2025071607-outbid-heat-b0ba@gregkh>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------1TBt0IFfjz321DLdIVEctMps"
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: N99Qg+lZy8McGXx0ffJq3rOXsIj0XR0XBhhg3pPLdCHVvSoWiQ9jSxX5
-	yXwkUCxI8kF1fWgwc3H34nIx+NJzXhg1AJUHHkEfIcGKFVRwQVJwlE0TPgFuHhQD83eFqFV
-	KZl1V6dj4p3V5R82ewzRYaLkZPfEVOnKODdIywXC5zEoydWIOtgD3e1f7DPY6uJBll+urzY
-	LV1XzwxamygqixghmMPOlRs8jHn0TP65sp03tkpnJ+gMmDbq8jKIWMYLFTKy7L7ppTMTNm5
-	PuWyiKfs2GWAillZ3Rq8huwkBo5Rp1oUAGt5nM0UZcReu8orBG+EQBKeYMQC6EbTDPvT5aN
-	jNAHGubRkoP87WK59MCBdaOHu6H4H/oXqRSnQBvBjDRUvPLIXDkqFQDj23Mfttfr9MYOFlK
-	H7acVPlDI01uId4bOPyiZQBWeHtq1Gqp4kWpeiK6IUgiFQGre0efNmCyiCwM2gMF/K6NEGE
-	xceND45oWn1s8FzE5V5QC1K2RPg9JBJ9PhghbOmw7y/pvjCYr9F08lPatewtfiCWMf0AEIq
-	DfiTA+jWpCe51gphHt2mA8P4E0yKcppSzliEaZVaEmIt1NNyu8ytFUGafkb9+cEa1o6VNle
-	7wDNAoWRC3yFFBzT3WUVWyjN8t/+vLLJS0xGT4UNzX4cY3R2EIhfsB+h4ah+Hjn9SvGfPWP
-	E/3oArF5XjmDCVO5g4qrPJDfnQizyJPhjOK5bUiRWB37Wp1GjBZT8AeNi0im6SdJGzVDU3+
-	AOd4Bz1jq4oDeDowAjAqGLB+1614Zk48cUrQ4w/TtPNBSuVjwTq6zk6sFSNFo/xcBpECTCF
-	U8TsVFWOcYswRvq0WXkddW+nx/We2cpF99xGXc+gZhbJCDhKcfNQS9/uu5GnVyuZ1LrsL2i
-	jgex+fZx5DIBXETG2zDz6hGBRSWuAqbA7YpQ4v03gGCXSRmpjzXXjnVsy7htRQQVEHalBj1
-	pxSjVhD61q58YhRneCrSNqPXkIDxpuIEk2ungxlkzmqJPHX1omKkbtFMYkotSOH1yTPuCvA
-	YrO55enoNRQE5WDjQmV2n89LCS613dmChBdi69CqEogfnbr7/zEX/DDZla8DwHUDtXoxJyk
-	H/7KzW0lvwHmuguzSrGObDNb5pHWn5HQsH8ckUqdobF
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-X-QQ-RECHKSPAM: 0
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------1TBt0IFfjz321DLdIVEctMps
-Content-Type: multipart/mixed; boundary="------------7NzxUd2CIcc1X22DyUWciByd";
- protected-headers="v1"
-From: WangYuli <wangyuli@uniontech.com>
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: airlied@gmail.com, akpm@linux-foundation.org, alison.schofield@intel.com,
- andrew+netdev@lunn.ch, andriy.shevchenko@linux.intel.com,
- arend.vanspriel@broadcom.com, bp@alien8.de,
- brcm80211-dev-list.pdl@broadcom.com, brcm80211@lists.linux.dev,
- colin.i.king@gmail.com, cvam0000@gmail.com, dan.j.williams@intel.com,
- dave.hansen@linux.intel.com, dave.jiang@intel.com, dave@stgolabs.net,
- davem@davemloft.net, dri-devel@lists.freedesktop.org, edumazet@google.com,
- guanwentao@uniontech.com, hpa@zytor.com, ilpo.jarvinen@linux.intel.com,
- intel-xe@lists.freedesktop.org, ira.weiny@intel.com, j@jannau.net,
- jeff.johnson@oss.qualcomm.com, jgross@suse.com, jirislaby@kernel.org,
- johannes.berg@intel.com, jonathan.cameron@huawei.com, kuba@kernel.org,
- kvalo@kernel.org, kvm@vger.kernel.org, linux-cxl@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-serial@vger.kernel.org,
- linux-wireless@vger.kernel.org, linux@treblig.org, lucas.demarchi@intel.com,
- marcin.s.wojtas@gmail.com, ming.li@zohomail.com, mingo@kernel.org,
- mingo@redhat.com, netdev@vger.kernel.org, niecheng1@uniontech.com,
- oleksandr_tyshchenko@epam.com, pabeni@redhat.com, pbonzini@redhat.com,
- quic_ramess@quicinc.com, ragazenta@gmail.com, rodrigo.vivi@intel.com,
- seanjc@google.com, shenlichuan@vivo.com, simona@ffwll.ch,
- sstabellini@kernel.org, tglx@linutronix.de,
- thomas.hellstrom@linux.intel.com, vishal.l.verma@intel.com, x86@kernel.org,
- xen-devel@lists.xenproject.org, yujiaoliang@vivo.com, zhanjun@uniontech.com
-Message-ID: <0b2ace38-07d9-4500-8bb7-5a4fa65c4b9f@uniontech.com>
-Subject: Re: [PATCH v2 6/8] serial: 8250_dw: Fix typo "notifer"
-References: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
- <2BF1749F02ADE664+20250715134407.540483-6-wangyuli@uniontech.com>
- <2025071607-outbid-heat-b0ba@gregkh>
-In-Reply-To: <2025071607-outbid-heat-b0ba@gregkh>
-
---------------7NzxUd2CIcc1X22DyUWciByd
-Content-Type: multipart/mixed; boundary="------------3ELnNhbpHyc90r6KiSkcbbdY"
-
---------------3ELnNhbpHyc90r6KiSkcbbdY
+From: Daniel Sedlak <daniel.sedlak@cdn77.com>
+In-Reply-To: <CANn89i+sAgVOOoowNfqxv7+NrAa+8EzkWTVMP8LeGDJ23sFQpg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
+X-CTCH: RefID="str=0001.0A002112.687F3D42.0054,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0"; Spam="Unknown"; VOD="Unknown"
 
-SGkgZ3JlZyBrLWgsDQoNCk9uIDIwMjUvNy8xNiAxNjowOCwgR3JlZyBLSCB3cm90ZToNCj4+
-IFNpZ25lZC1vZmYtYnk6IFdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPg0KPiBJ
-cyB5b3VyIG5hbWUgYWxsIG9uZSB3b3JkIGxpa2UgdGhhdCwgb3Igc2hvdWxkIHRoZXJlIGJl
-IGEgIiAiIGJldHdlZW4NCj4gdGhlbT8NCg0KSWYgSSB3ZXJlIHRvIGZvbGxvdyBXZXN0ZXJu
-IG5hbWluZyBjb252ZW50aW9ucywgbXkgbmFtZSB3b3VsZCBiZSB3cml0dGVuIA0KYXMgJ1l1
-bGkgV2FuZycuDQoNCkhvd2V2ZXIsIGZyYW5rbHksIEkgZmluZCBpdCB1bm5lY2Vzc2FyeSBh
-bmQgY2FuJ3QgYmUgYm90aGVyZWQgdG8gZm9sbG93IA0KdGhlaXIgY3VzdG9tcywgdW5sZXNz
-IGEgbWFpbnRhaW5lciBzdHJvbmdseSBpbnNpc3RzLiAoRm9yIGV4YW1wbGUsIHlvdSANCmNh
-biBzZWUgdGhhdCBteSBzaWduYXR1cmUgb24gY29tbWl0cyBmb3IgdGhlIExvb25nQXJjaCBz
-dWJzeXN0ZW0gaXMgDQpkaWZmZXJlbnQgZnJvbSBteSBvdGhlciBjb250cmlidXRpb25zKS4N
-Cg0KU2luY2UgQ2hpbmVzZSBuYW1lcyBhcmUgd3JpdHRlbiB3aXRob3V0IGFueSBzcGFjZXMg
-aW4gQ2hpbmVzZSANCmNoYXJhY3RlcnMsIEkgZG9uJ3QgdGhpbmsgaXQgbWF0dGVycy4NCg0K
-PiBBbHNvLCBhcyBvdGhlcnMgc2FpZCwgZG9uJ3QgbGluayB0byB5b3VyIG93biBwYXRjaC4N
-Ck9LLCBJJ2xsIHNlbmQgdGhlIHBhdGNoc2V0IHYzLg0KDQoNClRoYW5rcywNCg0KLS0gDQrn
-jovmmLHlipsNCg==
---------------3ELnNhbpHyc90r6KiSkcbbdY
-Content-Type: application/pgp-keys; name="OpenPGP_0xC5DA1F3046F40BEE.asc"
-Content-Disposition: attachment; filename="OpenPGP_0xC5DA1F3046F40BEE.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
+On 7/22/25 9:17 AM, Eric Dumazet wrote:
+> On Tue, Jul 22, 2025 at 12:12 AM Daniel Sedlak <daniel.sedlak@cdn77.com> wrote:
+>>
+>> This patch is a result of our long-standing debug sessions, where it all
+>> started as "networking is slow", and TCP network throughput suddenly
+>> dropped from tens of Gbps to few Mbps, and we could not see anything in
+>> the kernel log or netstat counters.
+>>
+>> Currently, we have two memory pressure counters for TCP sockets [1],
+>> which we manipulate only when the memory pressure is signalled through
+>> the proto struct [2]. However, the memory pressure can also be signaled
+>> through the cgroup memory subsystem, which we do not reflect in the
+>> netstat counters. In the end, when the cgroup memory subsystem signals
+>> that it is under pressure, we silently reduce the advertised TCP window
+>> with tcp_adjust_rcv_ssthresh() to 4*advmss, which causes a significant
+>> throughput reduction.
+>>
+>> Keep in mind that when the cgroup memory subsystem signals the socket
+>> memory pressure, it affects all sockets used in that cgroup.
+>>
+>> This patch exposes a new file for each cgroup in sysfs which signals
+>> the cgroup socket memory pressure. The file is accessible in
+>> the following path.
+>>
+>>    /sys/fs/cgroup/**/<cgroup name>/memory.net.socket_pressure
+>>
+>> The output value is an integer matching the internal semantics of the
+>> struct mem_cgroup for socket_pressure. It is a periodic re-arm clock,
+>> representing the end of the said socket memory pressure, and once the
+>> clock is re-armed it is set to jiffies + HZ.
+>>
+>> Link: https://elixir.bootlin.com/linux/v6.15.4/source/include/uapi/linux/snmp.h#L231-L232 [1]
+>> Link: https://elixir.bootlin.com/linux/v6.15.4/source/include/net/sock.h#L1300-L1301 [2]
+>> Co-developed-by: Matyas Hurtik <matyas.hurtik@cdn77.com>
+>> Signed-off-by: Matyas Hurtik <matyas.hurtik@cdn77.com>
+>> Signed-off-by: Daniel Sedlak <daniel.sedlak@cdn77.com>
+>> ---
+>> Changes:
+>> v2 -> v3:
+>> - Expose the socket memory pressure on the cgroups instead of netstat
+>> - Split patch
+>> - Link: https://lore.kernel.org/netdev/20250714143613.42184-1-daniel.sedlak@cdn77.com/
+>>
+>> v1 -> v2:
+>> - Add tracepoint
+>> - Link: https://lore.kernel.org/netdev/20250707105205.222558-1-daniel.sedlak@cdn77.com/
+>>
+>>
+>>   mm/memcontrol.c | 14 ++++++++++++++
+>>   1 file changed, 14 insertions(+)
+>>
+>> diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+>> index 902da8a9c643..8e8808fb2d7a 100644
+>> --- a/mm/memcontrol.c
+>> +++ b/mm/memcontrol.c
+>> @@ -4647,6 +4647,15 @@ static ssize_t memory_reclaim(struct kernfs_open_file *of, char *buf,
+>>          return nbytes;
+>>   }
+>>
+>> +static int memory_socket_pressure_show(struct seq_file *m, void *v)
+>> +{
+>> +       struct mem_cgroup *memcg = mem_cgroup_from_seq(m);
+>> +
+>> +       seq_printf(m, "%lu\n", READ_ONCE(memcg->socket_pressure));
+>> +
+>> +       return 0;
+>> +}
+>> +
+>>   static struct cftype memory_files[] = {
+>>          {
+>>                  .name = "current",
+>> @@ -4718,6 +4727,11 @@ static struct cftype memory_files[] = {
+>>                  .flags = CFTYPE_NS_DELEGATABLE,
+>>                  .write = memory_reclaim,
+>>          },
+>> +       {
+>> +               .name = "net.socket_pressure",
+>> +               .flags = CFTYPE_NOT_ON_ROOT,
+>> +               .seq_show = memory_socket_pressure_show,
+>> +       },
+>>          { }     /* terminate */
+>>   };
+>>
+> 
+> It seems you forgot to update Documentation/admin-guide/cgroup-v2.rst
 
------BEGIN PGP PUBLIC KEY BLOCK-----
+Oops, missed that. I will add it to the v4.
 
-xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSK
-P+nX39DNIVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAx
-FiEEa1GMzYeuKPkgqDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMB
-AAAKCRDF2h8wRvQL7g0UAQCH3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfP
-bwD/SrncJwwPAL4GiLPEC4XssV6FPUAY0rA68eNNI9cJLArOOARmgSyJEgorBgEE
-AZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7VTL0dvPDofBTjFYDAQgHwngE
-GBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIbDAAKCRDF2h8wRvQL
-7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkUo9ERi7qS
-/hbUdUgtitI89efbY0TVetgDsyeQiwU=3D
-=3DBlkq
------END PGP PUBLIC KEY BLOCK-----
+Thanks!
+Daniel
 
---------------3ELnNhbpHyc90r6KiSkcbbdY--
-
---------------7NzxUd2CIcc1X22DyUWciByd--
-
---------------1TBt0IFfjz321DLdIVEctMps
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wnsEABYIACMWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCaH88KgUDAAAAAAAKCRDF2h8wRvQL7pms
-AP9jnuV1Ar3880YbizkuBFljgc3bOdOu/RxLmWu2LJmNBAD/S6F38qLfKIrdjJNkNGO7V3LvW7p0
-ssmAK5aDMMRZzAI=
-=fJ9f
------END PGP SIGNATURE-----
-
---------------1TBt0IFfjz321DLdIVEctMps--
 
