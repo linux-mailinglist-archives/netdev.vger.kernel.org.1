@@ -1,97 +1,111 @@
-Return-Path: <netdev+bounces-208995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE323B0DF9D
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 16:54:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D373FB0DFC6
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 17:01:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 802471C859C6
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 14:50:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B60571C80538
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 14:55:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 556DB2DEA7C;
-	Tue, 22 Jul 2025 14:49:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2883A28C5B4;
+	Tue, 22 Jul 2025 14:54:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gKG6FrnF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="asGNOylE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 287D21DA23;
-	Tue, 22 Jul 2025 14:49:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 031802EA491
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 14:54:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753195789; cv=none; b=EN6T4uIN/BxZRCMTQU+Pp3rV5XkriDq72OzMj86q64vhOpyNZ7DL7dTjpinIzMGsCuOyqqsxyeoumTS4INOorbSY0FNZCW+QMOAahF3yogb7ypBXzG7GiqD0qNYJAjew6VMTYA3Lw3txA5IYV5DknCSYoNb+CUeaDCtLjdRqN0Q=
+	t=1753196072; cv=none; b=frC2PeUp/ZZ45iCC1OgmNm7Wls69ArjRAjzAECRCzQJS5WspmEKANobqcvrXul+2ih8DbwOpZam5zv5iRel5qkI4EN+0ZnwtEGckMhcwtwhetKGLtrywDABbq4JcTL3sQ+Pr5CIl0phA/MLPP9iJ9UtsZw/cSXG87FJQA3jOlls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753195789; c=relaxed/simple;
-	bh=9KedupEOeC1GTtcgABYGZjT7vXJB5Z4qbLfJRo2EeH4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=e1hqMk8b4VO1dMUwdhNR+rDJPUqnNb8RWUa5WvV3ZgfysS1D1JbGyeCD1baoapNr31BSUboRK7qAIqz9chWe6lNXhlI2n2joGzqkOmlSPoD5UtluuimL32hYVD9jnG5U5qzFYdToJcwCxRt9gM2KeP1/hX6J/Uo/bpiBfqWBz0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gKG6FrnF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A72BBC4CEEB;
-	Tue, 22 Jul 2025 14:49:47 +0000 (UTC)
+	s=arc-20240116; t=1753196072; c=relaxed/simple;
+	bh=d5Dgo/SP2frqJQVMsqQJtgDsR0zcroc9Ub5WH+3oids=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LXGJmkRevby4uq6PcNKYrq5ZNINe1gDe1ygZ0xNRwwGyrdavokkdkGtVKxlW09KfOlNz0xNypo39+b+7EHjffyZ2Rsg3z7bjd7Y013FpyYhkFuaI9czKtDTZMhWRZgASAM8DbZsI1gx/uJ30VqIPSXra1QfDDcH/f5zY/8TVXpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=asGNOylE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6155CC4CEEB;
+	Tue, 22 Jul 2025 14:54:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753195787;
-	bh=9KedupEOeC1GTtcgABYGZjT7vXJB5Z4qbLfJRo2EeH4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gKG6FrnFv/rUuwUjHtYDCBgwjD/3x2Oy73jA9euVK96svtLdxnSkeHHbyLksF35Gk
-	 i8wRhmjVlfrcbmyJQqHza3xohK2J/inQUf7GJWddHZBu2mC99YXAnbXXU0B/2XvoCT
-	 3JYxHQ0H8ipa8LLGwGXJVgbq0mRhWCkll/3JzypW0C7wX3hx+62H8s2QaU64dGOSvm
-	 +5pPQC7bk+ZT1e/FdO4xST++TVDObFvVXcQ9RC3YDvac41oAwpSxukbqWqh+BCUEe+
-	 Y96BuhcN2yOHtokyemY6PtWObC+v++dUTYllHpA0p0ISCOCyIId+dl2z9PBlQR8gsn
-	 VhsqK11okoVVw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D6B383BF5D;
-	Tue, 22 Jul 2025 14:50:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1753196071;
+	bh=d5Dgo/SP2frqJQVMsqQJtgDsR0zcroc9Ub5WH+3oids=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=asGNOylE9Z7BKj65LuJd+1BMWxHf8yVl9Hvg2q6sE/15sBS8nONUAgH/tebTcMooE
+	 wU3Bg7Sqi2zAb4rhMmjIkZduzVRl5uGmWd8r+5y25aykVvSTMaY3JXXIvptO+Cfviu
+	 WSiL3S/tXfxiBf4Bvi7Q8wtmGbCpHdBDM1yggQX7QTB6fskrV2BBrdkvFVNhKrZ6EA
+	 FMU95Sii2ju+lG8Bo/RuM74Hcks+xZfFIoNjQz35yY89c4pcwteyWkzSKmqCDiF53t
+	 ziNcUJ32nmp+oN+IFflvHN333zwIBBS5eImK24GNnOhmp7pHCkCmsTs79604QSyqQ/
+	 H6N3ZLfUVbQpg==
+Date: Tue, 22 Jul 2025 15:54:28 +0100
+From: Simon Horman <horms@kernel.org>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	przemyslaw.kitszel@intel.com, dawid.osuchowski@linux.intel.com
+Subject: Re: [PATCH iwl-next v1 09/15] ice: drop driver specific structure
+ from fwlog code
+Message-ID: <20250722145428.GM2459@horms.kernel.org>
+References: <20250722104600.10141-1-michal.swiatkowski@linux.intel.com>
+ <20250722104600.10141-10-michal.swiatkowski@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: Add PA_LINK to distinguish BIG sync and PA
- sync
- connections
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <175319580626.844166.13673275741050259648.git-patchwork-notify@kernel.org>
-Date: Tue, 22 Jul 2025 14:50:06 +0000
-References: <20250710-pa_link-v1-1-88cac0c0b776@amlogic.com>
-In-Reply-To: <20250710-pa_link-v1-1-88cac0c0b776@amlogic.com>
-To: Yang Li <yang.li@amlogic.com>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250722104600.10141-10-michal.swiatkowski@linux.intel.com>
 
-Hello:
-
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Thu, 10 Jul 2025 18:52:47 +0800 you wrote:
-> From: Yang Li <yang.li@amlogic.com>
+On Tue, Jul 22, 2025 at 12:45:54PM +0200, Michal Swiatkowski wrote:
+> In debugfs pass ice_fwlog structure instead of ice_pf.
 > 
-> Currently, BIS_LINK is used for both BIG sync and PA sync connections,
-> which makes it impossible to distinguish them when searching for a PA
-> sync connection.
+> The debgufs dirs specific for fwlog can be stored in fwlog structure.
 > 
-> Adding PA_LINK will make the distinction clearer and simplify future
-> extensions for PA-related features.
+> Add debugfs entry point to fwlog api.
 > 
-> [...]
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-Here is the summary with links:
-  - Bluetooth: Add PA_LINK to distinguish BIG sync and PA sync connections
-    https://git.kernel.org/bluetooth/bluetooth-next/c/1ffee96604de
+...
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> diff --git a/drivers/net/ethernet/intel/ice/ice_debugfs.c b/drivers/net/ethernet/intel/ice/ice_debugfs.c
 
+...
 
+> @@ -580,9 +569,10 @@ static const struct file_operations ice_debugfs_data_fops = {
+>  
+>  /**
+>   * ice_debugfs_fwlog_init - setup the debugfs directory
+> - * @pf: the ice that is starting up
+> + * @fwlog: pointer to the fwlog structure
+> + * @root: debugfs root entry on which fwlog director will be registered
+>   */
+> -void ice_debugfs_fwlog_init(struct ice_pf *pf)
+> +void ice_debugfs_fwlog_init(struct ice_fwlog *fwlog, struct dentry *root)
+>  {
+>  	struct dentry *fw_modules_dir;
+>  	struct dentry **fw_modules;
+> @@ -598,41 +588,39 @@ void ice_debugfs_fwlog_init(struct ice_pf *pf)
+>  
+>  	pf->ice_debugfs_pf_fwlog = debugfs_create_dir("fwlog",
+>  						      pf->ice_debugfs_pf);
+
+pf no longer exists in this context.
+
+> -	if (IS_ERR(pf->ice_debugfs_pf_fwlog))
+> +	if (IS_ERR(fwlog->debugfs))
+>  		goto err_create_module_files;
+>  
+> -	fw_modules_dir = debugfs_create_dir("modules",
+> -					    pf->ice_debugfs_pf_fwlog);
+> +	fw_modules_dir = debugfs_create_dir("modules", fwlog->debugfs);
+>  	if (IS_ERR(fw_modules_dir))
+>  		goto err_create_module_files;
+
+...
 
