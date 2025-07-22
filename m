@@ -1,130 +1,97 @@
-Return-Path: <netdev+bounces-208753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58844B0CF48
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 03:48:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D8B5B0CF4A
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 03:49:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A3436C55FD
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 01:48:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 644D7189338C
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 01:49:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23E1D1A256B;
-	Tue, 22 Jul 2025 01:48:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB9C31A4E9E;
+	Tue, 22 Jul 2025 01:49:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="usR+RQeR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxct.zte.com.cn (mxct.zte.com.cn [183.62.165.209])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6354A191493;
-	Tue, 22 Jul 2025 01:48:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=183.62.165.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9740913AA20
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 01:49:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753148904; cv=none; b=elOlVFHBHl+g1Qp4C+EBxZ88fydh+0ll+ecEAUwiAN2yUMcooS3Vggkgqy6J4JixRbvHDFQt/9Gwun9B8TReYddOvWPPZl+hVBwY1WOthxLZp6CBrYI1IrRkDlL03YJvB6aP307zZBhXy5UiLRV3RlZtHfD/mqhrrBzUTOaGDvY=
+	t=1753148972; cv=none; b=Zq5c/Cr48Q/CHFVinhTu74m0ItGnVtA/1lu0rGMjWaJZOgheqn8XiRM4pXCf1yhfXH6UKAuR49R9nvKGOTbzBGRTABYXwoA50Z43tb6k9f/ELlpHXzZRimjDl4QjToWnEHTMMWvA5tHd3GGp4dy9gj9lxUPfsK4wQG58/GJh0xc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753148904; c=relaxed/simple;
-	bh=bA+R9DffdAGIkPh6d0LbRL52OwjbyFaPjg4ZD3/c4z8=;
-	h=Date:Message-ID:In-Reply-To:References:Mime-Version:From:To:Cc:
-	 Subject:Content-Type; b=ZVys1zmIL5igJEiytTyXaiI9oheapP+Kt7mw6h14sKxceGIxCRxAGUbKzSz1EiKhgjprdXIHoW36suqweTX/20om5j/QbgTsW1epzzLfJAfe+9fgbKIAq/KiX9RN8g3gWaMZZwG/YfJ1fNjojHvZAbV5FpcxUXvaqrYcl2p5VkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=183.62.165.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mxct.zte.com.cn (FangMail) with ESMTPS id 4bmKsr2h3rz59ys5;
-	Tue, 22 Jul 2025 09:48:16 +0800 (CST)
-Received: from xaxapp05.zte.com.cn ([10.99.98.109])
-	by mse-fl1.zte.com.cn with SMTP id 56M1m88x055895;
-	Tue, 22 Jul 2025 09:48:08 +0800 (+08)
-	(envelope-from fan.yu9@zte.com.cn)
-Received: from mapi (xaxapp01[null])
-	by mapi (Zmail) with MAPI id mid32;
-	Tue, 22 Jul 2025 09:48:08 +0800 (CST)
-Date: Tue, 22 Jul 2025 09:48:08 +0800 (CST)
-X-Zmail-TransId: 2af9687eedd8ffffffff9a6-f911e
-X-Mailer: Zmail v1.0
-Message-ID: <20250722094808945ENOLvzY108YsJFz4CqbaI@zte.com.cn>
-In-Reply-To: <20250721171333.6caced4f@kernel.org>
-References: 20250721111607626_BDnIJB0ywk6FghN63bor@zte.com.cn,20250721171333.6caced4f@kernel.org
+	s=arc-20240116; t=1753148972; c=relaxed/simple;
+	bh=n/+CvmvKvVlM2Vfyd/E/Ih/zHTt2GPqSmR+AfFWFigs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OXC1zYjYcjQi2iZe04H5RFan6YiSLepwB090N0TWJaRNqn55e8LyqcG6542H8vOOrN5erCZ2a1h0Di5dh32BxoZnN6AJjTlZYTfIUMzR+SLM4Q68pHfPEtJONg8TjumTE+h2kAk5uBnV71m9FiQJnwJoVUyBcfo0iOT9CWCGer8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=usR+RQeR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC86FC4CEED;
+	Tue, 22 Jul 2025 01:49:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753148972;
+	bh=n/+CvmvKvVlM2Vfyd/E/Ih/zHTt2GPqSmR+AfFWFigs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=usR+RQeRB5of4XA4tGfHzL5XDOp7lcnPKerffI6Vw0rfWI5AuxO2CPee6RFNio9/p
+	 bt1AiyxgbzKociTfzX46NT+wjrkEBrJCBhe5a8FljUbPawt1Rko66s+TAeLZPpNgLY
+	 Tsr5SJ8OrGcflgKswV88Qc0ot4ckyHsBbppfC6GXO+8xgiYp/1kYFcIhh6qKdQwQyZ
+	 MMxeupE8vbL/nMGC8/xB9DPjTUE5NqClDMEH8c81zKzJhUWtoc5Sdp50Cd3LK+L/Y3
+	 j243HqiqN8Ce7c7znxQ820v5XU0C8kIymC0OWRrq1Oe7wufhV7By2njn4EHQ/ltUBk
+	 V1vkOANq4EEAw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	donald.hunter@gmail.com,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	gal@nvidia.com,
+	andrew@lunn.ch,
+	willemdebruijn.kernel@gmail.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next v2 0/4] net: ethtool: support including Flow Label in the flow hash for RSS
+Date: Mon, 21 Jul 2025 18:49:11 -0700
+Message-ID: <20250722014915.3365370-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <fan.yu9@zte.com.cn>
-To: <kuba@kernel.org>
-Cc: <edumazet@google.com>, <ncardwell@google.com>, <davem@davemloft.net>,
-        <dsahern@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
-        <kuniyu@google.com>, <rostedt@goodmis.org>, <mhiramat@kernel.org>,
-        <mathieu.desnoyers@efficios.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>,
-        <yang.yang29@zte.com.cn>, <xu.xin16@zte.com.cn>,
-        <tu.qiang35@zte.com.cn>, <jiang.kun2@zte.com.cn>,
-        <qiu.yutan@zte.com.cn>, <wang.yaxin@zte.com.cn>,
-        <he.peilin@zte.com.cn>
-Subject: =?UTF-8?B?UmU6IFtQQVRDSCBuZXQtbmV4dCB2NyBSRVNFTkRdIHRjcDogdHJhY2UgcmV0cmFuc21pdCBmYWlsdXJlcyBpbiB0Y3BfcmV0cmFuc21pdF9za2I=?=
-Content-Type: multipart/mixed;
-	boundary="=====_001_next====="
-X-MAIL:mse-fl1.zte.com.cn 56M1m88x055895
-X-TLS: YES
-X-SPF-DOMAIN: zte.com.cn
-X-ENVELOPE-SENDER: fan.yu9@zte.com.cn
-X-SPF: None
-X-SOURCE-IP: 10.5.228.132 unknown Tue, 22 Jul 2025 09:48:16 +0800
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 687EEDE0.001/4bmKsr2h3rz59ys5
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
+Add support for using IPv6 Flow Label in Rx hash computation
+and therefore RSS queue selection.
 
+RFC: https://lore.kernel.org/20250609173442.1745856-1-kuba@kernel.org
 
---=====_001_next=====
-Content-Type: multipart/related;
-	boundary="=====_002_next====="
+Jakub Kicinski (4):
+  net: ethtool: support including Flow Label in the flow hash for RSS
+  eth: fbnic: support RSS on IPv6 Flow Label
+  eth: bnxt: support RSS on IPv6 Flow Label
+  selftests: drv-net: add test for RSS on flow label
 
+ Documentation/netlink/specs/ethtool.yaml      |   3 +
+ .../testing/selftests/drivers/net/hw/Makefile |   1 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   1 +
+ include/uapi/linux/ethtool.h                  |   1 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |   2 +
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  23 ++-
+ .../net/ethernet/meta/fbnic/fbnic_ethtool.c   |   2 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_rpc.c   |   2 +
+ net/ethtool/ioctl.c                           |  25 +++
+ net/ethtool/rss.c                             |  27 ++--
+ .../drivers/net/hw/rss_flow_label.py          | 151 ++++++++++++++++++
+ 11 files changed, 221 insertions(+), 17 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/hw/rss_flow_label.py
 
---=====_002_next=====
-Content-Type: multipart/alternative;
-	boundary="=====_003_next====="
-
-
---=====_003_next=====
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-
-PiBPbiBNb24sIDIxIEp1bCAyMDI1IDExOjE2OjA3ICswODAwIChDU1QpIGZhbi55dTlAenRlLmNv
-bS5jbiB3cm90ZToNCj4gPiBTdWJqZWN0OiBbUEFUQ0ggbmV0LW5leHQgdjcgUkVTRU5EXSB0Y3A6
-IHRyYWNlIHJldHJhbnNtaXQgZmFpbHVyZXMgaW4gdGNwX3JldHJhbnNtaXRfc2tiDQo+IA0KPiBX
-aHkgZGlkIHlvdSByZXNlbmQgdGhpcz8/DQoNCkhpIEpha3ViLA0KDQpUaGFua3MgZm9yIGNoZWNr
-aW5nISBJIGp1c3Qgd2FudGVkIHRvIGVuc3VyZSB0aGUgdjcgcGF0Y2ggd2FzbuKAmXQgbWlzc2Vk
-IOKAlCBpdOKAmXMgaWRlbnRpY2FsIHRvIHRoZSBvcmlnaW5hbC4NClBsZWFzZSBsZXQgbWUga25v
-dyBpZiBhbnkgdXBkYXRlcyBhcmUgbmVlZGVkLiBBcHByZWNpYXRlIHlvdXIgdGltZSENCg0KQmVz
-dCByZWdhcmRzLA0KRmFuIFl1
-
-
---=====_003_next=====
-Content-Type: text/html ;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-
-PGRpdiBjbGFzcz0iemNvbnRlbnRSb3ciPjxwPiZndDsgT24gTW9uLCAyMSBKdWwgMjAyNSAxMTox
-NjowNyArMDgwMCAoQ1NUKSBmYW4ueXU5QHp0ZS5jb20uY24gd3JvdGU6PC9wPjxwPiZndDsgJmd0
-OyBTdWJqZWN0OiBbUEFUQ0ggbmV0LW5leHQgdjcgUkVTRU5EXSB0Y3A6IHRyYWNlIHJldHJhbnNt
-aXQgZmFpbHVyZXMgaW4gdGNwX3JldHJhbnNtaXRfc2tiPC9wPjxwPiZndDsmbmJzcDs8L3A+PHA+
-Jmd0OyBXaHkgZGlkIHlvdSByZXNlbmQgdGhpcz8/PC9wPjxwPjxicj48L3A+PHA+SGkgSmFrdWIs
-PC9wPjxwPjxicj48L3A+PHA+VGhhbmtzIGZvciBjaGVja2luZyEgSSBqdXN0IHdhbnRlZCB0byBl
-bnN1cmUgdGhlIHY3IHBhdGNoIHdhc27igJl0IG1pc3NlZCDigJQgaXTigJlzIGlkZW50aWNhbCB0
-byB0aGUgb3JpZ2luYWwuPC9wPjxwPlBsZWFzZSBsZXQgbWUga25vdyBpZiBhbnkgdXBkYXRlcyBh
-cmUgbmVlZGVkLiBBcHByZWNpYXRlIHlvdXIgdGltZSE8L3A+PHA+PGJyPjwvcD48cD5CZXN0IHJl
-Z2FyZHMsPC9wPjxwPkZhbiBZdTwvcD48L2Rpdj4=
-
-
---=====_003_next=====--
-
---=====_002_next=====--
-
---=====_001_next=====--
+-- 
+2.50.1
 
 
