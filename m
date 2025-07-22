@@ -1,227 +1,292 @@
-Return-Path: <netdev+bounces-209135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FA16B0E6FB
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 01:15:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD4C2B0E735
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 01:28:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37170AA15EF
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 23:14:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C62E87AF772
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 23:27:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CE3028A40A;
-	Tue, 22 Jul 2025 23:15:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4944928A73A;
+	Tue, 22 Jul 2025 23:28:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IEt2PGAi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jGOPPSDI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09203284B29;
-	Tue, 22 Jul 2025 23:15:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753226117; cv=none; b=UlewSzW1UkVuIQMHPOZkCdeCsXDTOAk35C/ap8ls8hv1155yZ0d/Bjzs1pcN6YXm+MmJBv5d13VIlGEm0p2wkjGgxAOQeHjzUhrib8fW3XbJWjfGiWvvSh6/c6C7bTddzkZ+jY85sIKPBhKUORS8rPbwaH0ycHWuRmAvgaIi5w0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753226117; c=relaxed/simple;
-	bh=UqlNTA7JpT4KUuNIEYauBrg3bYK6Ig4nUYCq9onOfYU=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=nSTYiV5grti2aoxV0dN38B+OoDJu9n4O7edEEMNdWjD509y3Wi3jMtiBS8E2HvQkgX8Kk72cuekjnsXsV1vRRQWFdl0IsQlVVEeZTZgGRMnYmDxf/LbZA/DttX93N3ix1Mzl9ol+8c0a2PkE+IHrFatXw1Y2gKKuDOhd9yVyqdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IEt2PGAi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6218FC4CEEB;
-	Tue, 22 Jul 2025 23:15:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753226116;
-	bh=UqlNTA7JpT4KUuNIEYauBrg3bYK6Ig4nUYCq9onOfYU=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=IEt2PGAiY0s6KrwUndGjm83jdMfrGtAbGSpYQymWBnrsfQh+7FZvDDbPw62JraU1r
-	 JULf2Ip6aF7eSVlzbpIdj0VAVBxJGYSyi05r+48dTHeL7rBy53W1kjXvW8j/BRSmSL
-	 +xy4hs4LfyFGeYADmRwl+gKCMlwkmPHKcteLzN76mW+9SkBFZT4xYvRDhgdpliVtZe
-	 JsGPyEKj5j/dmFV85jXh1PA6Eyl0Bn1LQqoSs8z+XlhdfC2JRE2WXC1NgmN7blQIHh
-	 Ne4Y+MSak+WkIiFJu4W0LBIA0hkR9EEhREGoV562Qu/jzU0iCu0+rmpX5D8wfzQBIF
-	 XvjqHHCxFI1/Q==
-Date: Tue, 22 Jul 2025 18:15:15 -0500
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDBE128C02F;
+	Tue, 22 Jul 2025 23:28:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753226913; cv=fail; b=Otqut7u963luTLCoe5ZvmUpNJyr+P2hhmcoyrI5myCwPZgvextDkW7AZjdmbm5uYDkYzvhztfmPwJkqIMsIJONivb7AOgq3jpbRBMO+sLomkawQTeMyRaHl0tKJK+HnaA/JGNd5ytA1Y5CxGLcAlOgOLPm5AV/zc9xd2wxrdZR8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753226913; c=relaxed/simple;
+	bh=T5BPK2nOsqk+5QU+EOdQFKdQ4G9dbJkHP7LP57ooJHk=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=LVjSApIq9akxZludYaLOmyp0qSq3XtJJ72ZNo4eSXHL7FD/ryYuYJGTSikWk80NJzc7zpEiBndpLqImUpb5KOT8/QgOyQquAQvpOQ0qt7bdtP+3bTSvM69ZNZkruLwOPy4L937At1KwdInth2yPP7v4eP1U+ZxPxl8T5CabamXg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jGOPPSDI; arc=fail smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753226912; x=1784762912;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:mime-version;
+  bh=T5BPK2nOsqk+5QU+EOdQFKdQ4G9dbJkHP7LP57ooJHk=;
+  b=jGOPPSDIn+jEbEY/CzqdgTv7yPUYNAHyaMPmTqygnNYPAQWs2s0BP4b4
+   IF+5R52AnLpyA1k6NbUg1J6wBESdIu+QnwCk+rTF9NXHveG1ezT2Ucwe5
+   ju1Wm50nQ2SS5AwpmB1CaKoeMJ3X/Sm69G/ltgQfBhoRLBqWezn2mw1T1
+   vW0WiTscSrlrcf7A61BzukkX9yEvqKMjz1BecWNe08FnIDIaxJ0a7fdqe
+   HutcA0D7P2U4N23dfIGLqfS/Gy1sM5Gup33Oi1dLuM+qqxR1YiPvAXF37
+   K/nTeWgWXWP4DRBcP5My6hRx0SSKu1VYRUZ3UZMKTHJgSZhaWSrYtBnN1
+   w==;
+X-CSE-ConnectionGUID: 4pkUo8oSQUSeVpPJtZ3wAA==
+X-CSE-MsgGUID: VyqRtbocQ0aSN369WQqPbA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11500"; a="55199546"
+X-IronPort-AV: E=Sophos;i="6.16,332,1744095600"; 
+   d="asc'?scan'208";a="55199546"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2025 16:28:28 -0700
+X-CSE-ConnectionGUID: qRLuq3mIT3OwCwNkjjRqTg==
+X-CSE-MsgGUID: qr1zXRuPSXm7lgwKht/iOQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,332,1744095600"; 
+   d="asc'?scan'208";a="159831477"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2025 16:28:28 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Tue, 22 Jul 2025 16:28:27 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26 via Frontend Transport; Tue, 22 Jul 2025 16:28:27 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (40.107.220.54)
+ by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Tue, 22 Jul 2025 16:28:26 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=iVPEBuiY/g8tMn5YFFaqdmP68y1yZvv4MvwaR8C+yKzwkO24CCkuEhJztqYrava8XeqzcDWD89RnC+tltGMPAlHrJcMv4g4ybkqP240Y/v4Ywr5WR8CZK5uAscf1GlyPuTGLEmotMQe/av81Ozp3nZ8ozukPFYQF8CvUojCT9s+d9hRg1wk7FvaC98TfMIxxd64Q0sNa9T4yF2GnEWfk+M3FodMZPa0KCifQsc0fOGvV8GdWQrWKwhXAOf9URNGIgy5i7/MQD3lwJFgeEUg/Yy9fihn0OHjKyLFpSl19UPowgDXnHV8g9K7dMM3EvWC3SOoYjitN5JyIXiA0MUCXYw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=T5BPK2nOsqk+5QU+EOdQFKdQ4G9dbJkHP7LP57ooJHk=;
+ b=j0FZIUZMoV0531o1J9RBo4XJxOeLtDIWoJYhzF6YgU8Oy3b7FRtAGZUBPn0coRGpM29b9iBsmEarsWsv+0cEoUvFI3j2GELO7ZIPjVs2iRh8ryHhesZSK/VVA4gaMiSYr2GW9P4jJrvrWdC5MtMB2+S9NGbW6vMhlAdNlRyMN73n2Vi1R4fsamIO/gud2Of5DXFl9Duiyw8+8w6qAUERUZP0dwFfucY4wqIhVC3knFVanL7j/qaxW2NdgP6nQh5KJ0r0bYakdJruP2p64xsywYFn3kL4DHPuZPdB4ExlGTfAOIlzD5KOs4Rnq0jEEmw548UrAIqnnVHe+kbtmI5jmA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by DS0PR11MB7926.namprd11.prod.outlook.com (2603:10b6:8:f9::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.21; Tue, 22 Jul
+ 2025 23:27:58 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3%5]) with mapi id 15.20.8943.029; Tue, 22 Jul 2025
+ 23:27:58 +0000
+Message-ID: <38c52f32-cca9-4458-a285-33bc142d58c1@intel.com>
+Date: Tue, 22 Jul 2025 16:27:56 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH] i40e: replace snprintf() with
+ scnprintf()
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, Amir Mohammad Jahangirzad
+	<a.jahangirzad@gmail.com>, <przemyslaw.kitszel@intel.com>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20250722115017.206969-1-a.jahangirzad@gmail.com>
+ <e76d2af6-40d6-4169-8ec9-aeeee31b3aaf@intel.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+Autocrypt: addr=jacob.e.keller@intel.com; keydata=
+ xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
+ J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
+ qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
+ CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
+ UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
+ MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
+ apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
+ cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
+In-Reply-To: <e76d2af6-40d6-4169-8ec9-aeeee31b3aaf@intel.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="------------AzAKmTInADH04xaAftTcpApv"
+X-ClientProxiedBy: MW4P221CA0015.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:303:8b::20) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: kernel@oss.qualcomm.com, devicetree@vger.kernel.org, 
- Conor Dooley <conor+dt@kernel.org>, linux-kernel@vger.kernel.org, 
- Konrad Dybcio <konradybcio@kernel.org>, 
- Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org, 
- Bjorn Andersson <andersson@kernel.org>, linux-arm-msm@vger.kernel.org, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>
-To: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
-In-Reply-To: <20250722144926.995064-1-wasim.nazir@oss.qualcomm.com>
-References: <20250722144926.995064-1-wasim.nazir@oss.qualcomm.com>
-Message-Id: <175322585194.629714.3675361832955503635.robh@kernel.org>
-Subject: Re: [PATCH 0/7] Refactor sa8775p/qcs9100 to common names
- lemans-auto/lemans
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|DS0PR11MB7926:EE_
+X-MS-Office365-Filtering-Correlation-Id: e87442c8-f7a0-4765-0fac-08ddc9776440
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?UzUrNW9NOVN5UzlMZGF6ZFVsR25TVmo0OHE4b1JodXV1QmZTZlBnQmFTTlZh?=
+ =?utf-8?B?Nnl5OG5hSHlGK3FuSWdmemZOYzZSb1pzU09jR0haRm1TRy9RSnlUZ2dRWW9n?=
+ =?utf-8?B?aWJ5TWRtbXMxZmRUbWRHamZoNGpweVNWanZxOENicFpoV3JlQjIvOElobjhC?=
+ =?utf-8?B?R2lDZkZCeFFkSTRzUy9qdHdoSXFrT2FtYXJ2ZC90b01kNFE3dVdud2RxaWxH?=
+ =?utf-8?B?ZTZWK2RnNUsvSGNWbkY2R0REMmVBRE1MWFkxMVpIREdQY3czWmVMdlVQdlZJ?=
+ =?utf-8?B?RmhjVXZ5OHdGd2twY2lZd3F5NURXUm13dHU2NWhZRVJlNUw1bG1PVDNyQUR5?=
+ =?utf-8?B?ckVNbDFrT1Z5bGFnYW92Y3JjNUJ4UHBYbXdGRFo3UEc5Z095aHc2NFJGb2NN?=
+ =?utf-8?B?YU43UWRxSE9jWmVmZjlnN2E3K2pUUnNrekpPUTAwVDF1OEpaU3pIUll2b0wr?=
+ =?utf-8?B?djJoeisyZG9yUVBWRVllcnd6UXEwRlVZd3dJc1lpUzhIR1ZYNmVsQmVSaXFx?=
+ =?utf-8?B?R3QxYTlsZ3ZBRlQyTEZsRURScGFILzZRV3NFY3Nld3RHNk1oU1JEVldTamlV?=
+ =?utf-8?B?aFVkWVZQUlNmNm8yYkZDRkVUWTh5eW83amZpMmFpbXk3SDkrL3Y4NzBmMlRY?=
+ =?utf-8?B?WGhUVXVZek1zQitOS0JHUXhxaUZqNGtDV29pWXJQUHRMNlRLNEIxcXFiZUFN?=
+ =?utf-8?B?dTVEVlo0RW1FRUltVjNsSUxITFUxdSsva3pqSURHeW1NeDA5cmxaQUh6T01I?=
+ =?utf-8?B?RTJKWkdpY3JXWENvLyt3OXZzSE90MXZCSzJhb1V6RlJjYmRRRkN3NVBreFow?=
+ =?utf-8?B?KzhtbGYySEFRZFJyOUVYS2JoUVZSSEl2dVBxYzZ5d213Q0dWQ25kOHBWL2lj?=
+ =?utf-8?B?MyszeHlGcHp4VnduUnM4SGgwOWZzUFdldHFod2ttUVA3b2hmSHRMdGV3R0Q1?=
+ =?utf-8?B?THRHVXVsZ2YyWlFlc3lXcXJPYnUvRFB0a0VyT2c2NlFjMHlUTEVtUGVIQ0VS?=
+ =?utf-8?B?ZjFWYVZDRGwxSUU3bW1INWJPN0dkQ3RxZE15YVdmTDZJYUlkdUEzNEF4QjdW?=
+ =?utf-8?B?OHk0YkVHTWpkS09LRGFpSTJmSC9qb1F3R2pzS0NuTFVTeWJTUTZmemFuZkpv?=
+ =?utf-8?B?ZTNFb1QrVUxJRXBraFpzM1B0MkRaTWpNR3ZrWVJlRWp2UTcxWjNUUlhmT3BH?=
+ =?utf-8?B?aDhuNCtFeWVONm5QYkd3azFkYVlyZmVOdDVzK0s4dHlLd0liR2ozcDgveHFz?=
+ =?utf-8?B?MjRaazA4ajVJSmpuaklhWVo4Qkh5Mk5CMHFhY25uWWVwbjhDdWhHYlZydThF?=
+ =?utf-8?B?UzllZ0hGbHorTUVZcU9iYzVYY3c2QnJobkswSHMyTytraTNkS0RlUVRydGpl?=
+ =?utf-8?B?NHhQOGNoQzRBVGdrK1Qyc21uaFJ0YW1iOGlDRHhLVTR6YnNnbDZoQlVSSnUr?=
+ =?utf-8?B?cUVDQUR1T09qKzV4RXVETXJYWldkNWNNWE9TRzdzLzQ0NW5vR0ZWLzhXdnZm?=
+ =?utf-8?B?RDlqbFQyUUxJMkc2N3QxVWU4SDJkbTg1M2ZLVCt0a1A1bjFrZENjNVpuOFcv?=
+ =?utf-8?B?N3NYQ1FwUlZNbVZ5aERBTkkzWXNmc2VCYXozZUx5M2JhQjJTV3BsclowcjZl?=
+ =?utf-8?B?czJ0bkRwRGZiRFFtbHQzQm01aHYzZmtHMXJFVHcvbUMrdk9mOWFDNDBqc3NV?=
+ =?utf-8?B?TnIwZGZpM1lYWWQ3cm0xZi9IV240WHp2Q1h1ejQ0eFBRbXVZMVBYNnFwR2lv?=
+ =?utf-8?B?R3lsc2ZxWnIvQ21RRStwZ0Z4eDFCZ0hvcXYwNzdYR01rZFMvWHU0QXZjUnBt?=
+ =?utf-8?B?NXpEV2Vic0x6VXoyVjhOdDBQMitLVkYyWmw5Ui9DWDM4TUI5Snl4bTJoeHVE?=
+ =?utf-8?B?M3NMZUs3YzU3OEhFdkdFb1pzSkh3MmtaSnBSamZxdGNXZE1ZUUtqTVhXeXRx?=
+ =?utf-8?Q?vdKC4l4utjc=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dDVKbjY2VHlyYWZ5RHF2cytTOU5uRStSK1N2WFdxL2xzeDdOdEt2RzlaSUdK?=
+ =?utf-8?B?WkdYaC9jMGpFc0JNNVJlSXJPbGI0SksyUEEvRDJCYTduY01NVHVZaXRtRjM3?=
+ =?utf-8?B?aFAwZmcxMzVvK1ZtLzZ4R2xxMmpVQnhVUmdEZ20xNnRwRzhWNS96SVRpcVNP?=
+ =?utf-8?B?aSs0MVk4WExET3Vzclh1VXRUS2dzTzZSZWVkQWlxcFRzZ29FL0plWVpvbXkx?=
+ =?utf-8?B?ODk5NnFRSElhazQ5WndDamhldDVIRWtRN3JyQytNWVZlQzlJMi9lR0VDWW94?=
+ =?utf-8?B?YkVpL3JVeC9na1NYY2lpUWRMWFlQdWt2bS90VVE1aFVxU0l2K0RzTlQ1Si9q?=
+ =?utf-8?B?WEdJZUpnRGpaQUpORldObzNMb1RoRHkzYlRCNmE4T3ljY29qNi9OSmFPTk5Y?=
+ =?utf-8?B?clphWGRLMThySjRJaEhNWHNBZW5uaGJ2SFRxd0F2Nnhwanl0OEwrWG1YQ1du?=
+ =?utf-8?B?c3o3MDZSMHFGL01CZnEwWC9zS01PeGR5NEtBR201ajl1UW9MZjE3Rjc3Zmhq?=
+ =?utf-8?B?ekdtczd5QnZ4RnZiVk9CV0o1b3FPQ1FZYmFhUkRqMHdTMVBGRmduQUxIaXps?=
+ =?utf-8?B?T0pBNGVReXM2bEpMc3JKOUpYci8wbE0rNlIwNzZnLzA2OU1iT3BXNTh4elhS?=
+ =?utf-8?B?NStjT1VXSlh3dnhIM0FtN0ZhNFlLWjYxc0ladEhtUzBYZ1FwMk10bkUycVJo?=
+ =?utf-8?B?OFMvUVZtMnZqVGptVFZwc1RHNUZTS3JxT2NhNUdiS3UzR0F1NVZQVnFZbE9i?=
+ =?utf-8?B?L3lLakxkWW5kNjVuc0ZaMmZCS0pZRTNuSTZ4dHAxVHY2S29FWXBsR280ZmJG?=
+ =?utf-8?B?eGJZZ0Z6eUZzMFB4aWZHWTJRRFhOb3daVXZVcklUQVQvSlk4dkJrMDNzMTY2?=
+ =?utf-8?B?Qmo5L1IzbUVFQnBJMGxZZkYrdmtrWTJHNk1qQzllRENpRzJZOXZ4UHdFZWEr?=
+ =?utf-8?B?dEdiQmIyYnI4RFVrcTNNaC93ZWFka3Z1SjZhK1B0MEQvSVdqZDh0d0ErZEZU?=
+ =?utf-8?B?UE9jcDIvSWxXWHIySTlPaXRPZG5ZQjNxdXRwTzJET0lhbkJ0TGRzR2Y0ZWlG?=
+ =?utf-8?B?WWg1TXQyV096YWZ6bWNuRUozc1ozQ1BGVnlvcmpYVFI2YzYveVBHaGZiU3J4?=
+ =?utf-8?B?UVJPRE9Say9KaUdqOEhpT2FFTlhETUcySFV2czZHbXJreUR2Nk5YUTNRcW15?=
+ =?utf-8?B?cmdLaXoyeHhkek4xNkFHbGNLeEF5eU9Udm1LNTMxdnM4M3dvU2lGSXMvVGto?=
+ =?utf-8?B?WWpnNW90cHV2clQ5eWR2NDQ1SWhWTnROQkJmbWs0MGpObVVpK2lYV0h3QTdx?=
+ =?utf-8?B?OVo1WHJDbVZYNVpIOTd0bXU3NzlLaTViL090REhGN3hKVDlJV0pPUkt5Qnhw?=
+ =?utf-8?B?ak5aVmRndkhya1BYYVhXSnBDSW1aRU0yMWZIaEhPeU55YWN2WXdoU05OUnNP?=
+ =?utf-8?B?RkxVSTFGblZSVFBTdzFFVGJCb25MQzVCVitQZnFMcmFMUXhkOVN5QllCMDUv?=
+ =?utf-8?B?QUF3MTZJN0JyV3ZFVnlYUStjbStnNUE1SitaTlFwK1Zackh4WHdYRW5kd0Fy?=
+ =?utf-8?B?TUErL3gyVXpweUJ2cUxha0cxUUFXdGRxd1hyc3dyUkJyRTMrWk1qbEgyOUxQ?=
+ =?utf-8?B?ajlyeG5MYk5WV09oRkdiYkZNQWg2ZjJqTVlMdm14VmFKcHR5Qy9OQndOOUxQ?=
+ =?utf-8?B?aEJtdjdZdk9XdStZZGo0ZVhmME5rMkN0MEg2NHpNR01Zc201czFuL3pYZkZH?=
+ =?utf-8?B?Ymh0ZXgzbDVSSXUxVVVMV05IL2lUS1ZRYVdBSUJ2Z0xlN3o5K3ZOcC83OHpR?=
+ =?utf-8?B?Y1ZJVktMbmJ0WXp0MjB0Yys5SnRHdHo4SHVWU0ZDWmxOVEFiRXhiQllKMjJr?=
+ =?utf-8?B?eDZ0WnVDUitURHkvQ2d1T3FqRWxzakg0elk4eWRnR2N3akVJOSt3U3U2UEk1?=
+ =?utf-8?B?eXQ3cExkU2NqUzMyTUE4azFtaElzQmU3L3UrV0pGKzhvQzJFT1FRZW0wSFlo?=
+ =?utf-8?B?S05NYlFkWjNOL1FiWms0bW9NM3pGZlUxVC91WXhPazVvWlRlaU9TR0IzQ2Rt?=
+ =?utf-8?B?Q0t2UjVMRWR2dHdOcU1MZjNJNk1qbndwdVdwWW9TdmkzWWZmbjNlcmFyU2Yr?=
+ =?utf-8?B?SVFUSFlUV0laK0xLYnF4U0hlQVUrQVVUK1J1NlF2K1lNSWY5RHhXb3BESWU4?=
+ =?utf-8?B?VXc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: e87442c8-f7a0-4765-0fac-08ddc9776440
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2025 23:27:57.8791
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Avp/1Vu8i/ZN4xa/dA+34W0Cdg0cuh/b6nKVwE3GChNc651xBJ0dDuwG+EkokUPn7oqA8ROMTLBvIRqFs1GHvVYuXv5PrjVvFojxEQG2/b8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7926
+X-OriginatorOrg: intel.com
 
+--------------AzAKmTInADH04xaAftTcpApv
+Content-Type: multipart/mixed; boundary="------------wy9LDulJgNKCRbt2sfIq7Fq8";
+ protected-headers="v1"
+From: Jacob Keller <jacob.e.keller@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Amir Mohammad Jahangirzad <a.jahangirzad@gmail.com>,
+ przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Message-ID: <38c52f32-cca9-4458-a285-33bc142d58c1@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH] i40e: replace snprintf() with
+ scnprintf()
+References: <20250722115017.206969-1-a.jahangirzad@gmail.com>
+ <e76d2af6-40d6-4169-8ec9-aeeee31b3aaf@intel.com>
+In-Reply-To: <e76d2af6-40d6-4169-8ec9-aeeee31b3aaf@intel.com>
 
-On Tue, 22 Jul 2025 20:19:19 +0530, Wasim Nazir wrote:
-> This patch series refactors the sa8775p and qcs9100 platforms and introduces
-> a unified naming convention for current and future platforms (qcs9075).
-> 
-> The motivation behind this change is to group similar platforms under a
-> consistent naming scheme and to avoid using numeric identifiers.
-> For example, qcs9100 and qcs9075 differ only in safety features provided by
-> the Safety-Island (SAIL) subsystem but safety features are currently
-> unsupported, so both can be categorized as the same chip today.
-> 
-> Since, most of our platforms are IoT-based so "lemans" can be served as the
-> default IoT variant, with "lemans-auto" derived from it. Accordingly:
->   - qcs9100/qcs9075 and its associated IoT platforms are renamed to lemans
->     which needs different memory-map. So, latest memory-map is updated
->     here as per IOT requirements.
->   - sa8775p and its associated platforms are renamed to "lemans-auto", which
->     is derived from "lemans", that retains the old automotive memory map to
->     support legacy use cases.
->   - Both lemans & lemans-auto are serving as non-safe chip and if needed
->     additional dtsi can be appended in the future to enable safety features.
-> 
-> Additionally:
->   - Refactor common daughter cards used in Ride/Ride-R3 platforms into a
->     common configuration. Also, introduce new files for different ethernet
->     capabilities in Ride/Ride-r3. Since Ethernet functionality in Ride/Ride-r3
->     is currently broken upstream, this patch focuses only on refactoring.
->   - Include support for qcs9075 EVK[1] platform as lemans-evk. Currently,
->     basic features are enabled supporting 'boot to shell'.
->   - Remove support for qcs9100-ride, as no platform currently exists for it.
-> 
-> Funtional impact to current boards with refactoring:
->   - No functional change on auto boards i.e sa8775p ride/ride-r3 boards
->     (renamed as lemans-auto ride/ride-r3), and it is verified by comparing
->     decompiled DTB (dtx_diff).
->   - qcs9100 ride-r3 (renamed as lemans-ride-r3) is having new memory-map
->     and rest other functionalities are still same.
-> 
-> [1] https://lore.kernel.org/all/20250612155437.146925-1-quic_wasimn@quicinc.com/
-> 
-> 
-> ---
-> Wasim Nazir (7):
->   arm64: dts: qcom: Rename sa8775p SoC to "lemans"
->   arm64: dts: qcom: Update memory-map for IoT platforms in lemans
->   arm64: dts: qcom: lemans: Separate out ethernet card for ride &
->     ride-r3
->   arm64: dts: qcom: lemans: Refactor ride/ride-r3 boards based on
->     daughter cards
->   arm64: dts: qcom: lemans: Rename boards and clean up unsupported
->     platforms
->   dt-bindings: arm: qcom: Refactor QCS9100 and SA8775P board names to
->     reflect Lemans variants
->   arm64: dts: qcom: Add lemans evaluation kit (EVK) initial board
->     support
-> 
->  .../devicetree/bindings/arm/qcom.yaml         |  16 +-
->  arch/arm64/boot/dts/qcom/Makefile             |   8 +-
->  ...8775p-ride.dts => lemans-auto-ride-r3.dts} |  44 +--
->  ...{qcs9100-ride.dts => lemans-auto-ride.dts} |  14 +-
->  arch/arm64/boot/dts/qcom/lemans-auto.dtsi     | 104 +++++++
->  arch/arm64/boot/dts/qcom/lemans-evk.dts       | 291 ++++++++++++++++++
->  .../{sa8775p-pmics.dtsi => lemans-pmics.dtsi} |   0
->  ...775p-ride.dtsi => lemans-ride-common.dtsi} | 168 ----------
->  .../qcom/lemans-ride-ethernet-88ea1512.dtsi   | 205 ++++++++++++
->  .../qcom/lemans-ride-ethernet-aqr115c.dtsi    | 205 ++++++++++++
->  ...qcs9100-ride-r3.dts => lemans-ride-r3.dts} |  12 +-
->  .../dts/qcom/{sa8775p.dtsi => lemans.dtsi}    |  75 +++--
->  arch/arm64/boot/dts/qcom/sa8775p-ride-r3.dts  |  47 ---
->  13 files changed, 884 insertions(+), 305 deletions(-)
->  rename arch/arm64/boot/dts/qcom/{sa8775p-ride.dts => lemans-auto-ride-r3.dts} (11%)
->  rename arch/arm64/boot/dts/qcom/{qcs9100-ride.dts => lemans-auto-ride.dts} (18%)
->  create mode 100644 arch/arm64/boot/dts/qcom/lemans-auto.dtsi
->  create mode 100644 arch/arm64/boot/dts/qcom/lemans-evk.dts
->  rename arch/arm64/boot/dts/qcom/{sa8775p-pmics.dtsi => lemans-pmics.dtsi} (100%)
->  rename arch/arm64/boot/dts/qcom/{sa8775p-ride.dtsi => lemans-ride-common.dtsi} (87%)
->  create mode 100644 arch/arm64/boot/dts/qcom/lemans-ride-ethernet-88ea1512.dtsi
->  create mode 100644 arch/arm64/boot/dts/qcom/lemans-ride-ethernet-aqr115c.dtsi
->  rename arch/arm64/boot/dts/qcom/{qcs9100-ride-r3.dts => lemans-ride-r3.dts} (36%)
->  rename arch/arm64/boot/dts/qcom/{sa8775p.dtsi => lemans.dtsi} (99%)
->  delete mode 100644 arch/arm64/boot/dts/qcom/sa8775p-ride-r3.dts
-> 
-> 
-> base-commit: 05adbee3ad528100ab0285c15c91100e19e10138
-> --
-> 2.49.0
-> 
-> 
-> 
-
-
-My bot found new DTB warnings on the .dts files added or changed in this
-series.
-
-Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
-are fixed by another series. Ultimately, it is up to the platform
-maintainer whether these warnings are acceptable or not. No need to reply
-unless the platform maintainer has comments.
-
-If you already ran DT checks and didn't see these error(s), then
-make sure dt-schema is up to date:
-
-  pip3 install dtschema --upgrade
-
-
-This patch series was applied (using b4) to base:
- Base: using specified base-commit 05adbee3ad528100ab0285c15c91100e19e10138
-
-If this is not the correct base, please add 'base-commit' tag
-(or use b4 which does this automatically)
-
-New warnings running 'make CHECK_DTBS=y for arch/arm64/boot/dts/qcom/' for 20250722144926.995064-1-wasim.nazir@oss.qualcomm.com:
-
-arch/arm64/boot/dts/qcom/lemans-auto-ride.dtb: bluetooth (qcom,wcn6855-bt): 'vddwlcx-supply' is a required property
-	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
-arch/arm64/boot/dts/qcom/lemans-auto-ride.dtb: bluetooth (qcom,wcn6855-bt): 'vddwlmx-supply' is a required property
-	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
-arch/arm64/boot/dts/qcom/lemans-auto-ride.dtb: bluetooth (qcom,wcn6855-bt): 'vddrfa1p8-supply' is a required property
-	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
-arch/arm64/boot/dts/qcom/lemans-auto-ride.dtb: ethernet@23000000 (qcom,sa8775p-ethqos): Unevaluated properties are not allowed ('interconnect-names', 'interconnects' were unexpected)
-	from schema $id: http://devicetree.org/schemas/net/qcom,ethqos.yaml#
-arch/arm64/boot/dts/qcom/lemans-auto-ride.dtb: ethernet@23040000 (qcom,sa8775p-ethqos): Unevaluated properties are not allowed ('interconnect-names', 'interconnects' were unexpected)
-	from schema $id: http://devicetree.org/schemas/net/qcom,ethqos.yaml#
-arch/arm64/boot/dts/qcom/lemans-auto-ride.dtb: wcn6855-pmu (qcom,wcn6855-pmu): 'vddpmumx-supply' is a required property
-	from schema $id: http://devicetree.org/schemas/regulator/qcom,qca6390-pmu.yaml#
-arch/arm64/boot/dts/qcom/lemans-auto-ride.dtb: wcn6855-pmu (qcom,wcn6855-pmu): 'vddpmucx-supply' is a required property
-	from schema $id: http://devicetree.org/schemas/regulator/qcom,qca6390-pmu.yaml#
-arch/arm64/boot/dts/qcom/lemans-ride-r3.dtb: bluetooth (qcom,wcn6855-bt): 'vddwlcx-supply' is a required property
-	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
-arch/arm64/boot/dts/qcom/lemans-ride-r3.dtb: bluetooth (qcom,wcn6855-bt): 'vddwlmx-supply' is a required property
-	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
-arch/arm64/boot/dts/qcom/lemans-ride-r3.dtb: bluetooth (qcom,wcn6855-bt): 'vddrfa1p8-supply' is a required property
-	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
-arch/arm64/boot/dts/qcom/lemans-auto-ride-r3.dtb: bluetooth (qcom,wcn6855-bt): 'vddwlcx-supply' is a required property
-	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
-arch/arm64/boot/dts/qcom/lemans-auto-ride-r3.dtb: bluetooth (qcom,wcn6855-bt): 'vddwlmx-supply' is a required property
-	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
-arch/arm64/boot/dts/qcom/lemans-auto-ride-r3.dtb: bluetooth (qcom,wcn6855-bt): 'vddrfa1p8-supply' is a required property
-	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
-arch/arm64/boot/dts/qcom/lemans-ride-r3.dtb: ethernet@23000000 (qcom,sa8775p-ethqos): Unevaluated properties are not allowed ('interconnect-names', 'interconnects' were unexpected)
-	from schema $id: http://devicetree.org/schemas/net/qcom,ethqos.yaml#
-arch/arm64/boot/dts/qcom/lemans-ride-r3.dtb: ethernet@23040000 (qcom,sa8775p-ethqos): Unevaluated properties are not allowed ('interconnect-names', 'interconnects' were unexpected)
-	from schema $id: http://devicetree.org/schemas/net/qcom,ethqos.yaml#
-arch/arm64/boot/dts/qcom/lemans-auto-ride-r3.dtb: ethernet@23000000 (qcom,sa8775p-ethqos): Unevaluated properties are not allowed ('interconnect-names', 'interconnects' were unexpected)
-	from schema $id: http://devicetree.org/schemas/net/qcom,ethqos.yaml#
-arch/arm64/boot/dts/qcom/lemans-auto-ride-r3.dtb: ethernet@23040000 (qcom,sa8775p-ethqos): Unevaluated properties are not allowed ('interconnect-names', 'interconnects' were unexpected)
-	from schema $id: http://devicetree.org/schemas/net/qcom,ethqos.yaml#
-arch/arm64/boot/dts/qcom/lemans-ride-r3.dtb: wcn6855-pmu (qcom,wcn6855-pmu): 'vddpmumx-supply' is a required property
-	from schema $id: http://devicetree.org/schemas/regulator/qcom,qca6390-pmu.yaml#
-arch/arm64/boot/dts/qcom/lemans-ride-r3.dtb: wcn6855-pmu (qcom,wcn6855-pmu): 'vddpmucx-supply' is a required property
-	from schema $id: http://devicetree.org/schemas/regulator/qcom,qca6390-pmu.yaml#
-arch/arm64/boot/dts/qcom/lemans-auto-ride-r3.dtb: wcn6855-pmu (qcom,wcn6855-pmu): 'vddpmumx-supply' is a required property
-	from schema $id: http://devicetree.org/schemas/regulator/qcom,qca6390-pmu.yaml#
-arch/arm64/boot/dts/qcom/lemans-auto-ride-r3.dtb: wcn6855-pmu (qcom,wcn6855-pmu): 'vddpmucx-supply' is a required property
-	from schema $id: http://devicetree.org/schemas/regulator/qcom,qca6390-pmu.yaml#
+--------------wy9LDulJgNKCRbt2sfIq7Fq8
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
 
 
+On 7/22/2025 1:17 PM, Tony Nguyen wrote:
+>=20
+>=20
+> On 7/22/2025 4:50 AM, Amir Mohammad Jahangirzad wrote:
+>> In i40e_dbg_command_read(), a 256-byte buffer is allocated and filled
+>> using snprintf(), then copied to userspace via copy_to_user().
+>>
+>> The issue is that snprintf() returns the number of characters that
+>> *Would* have been written, not the number that actually fit in the buf=
+fer.
+>> If the combined length of the netdev name and i40e_dbg_command_buf is
+>> long (e.g. 288 + 3 bytes), snprintf() still returns 291 - even though =
+only
+>> 256 bytes were written.
+>=20
+> Hi Amir,
+>=20
+> Thank you for the patch. In practice, this won't overflow [1]. However,=
+=20
+> this code can be improved. If you follow the thread, there's=20
+> conversation of the changes that will be made.
+>=20
+> Thanks,
+> Tony
+>=20
+> [1] https://lore.kernel.org/netdev/20250714181032.GS721198@horms.kernel=
+=2Eorg/
+>=20
 
+Yep. I have patches to just remove this read interface entirely. I hope
+to post them later today.
 
+--------------wy9LDulJgNKCRbt2sfIq7Fq8--
+
+--------------AzAKmTInADH04xaAftTcpApv
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaIAefAUDAAAAAAAKCRBqll0+bw8o6DoA
+AP9fokmC2FDStG8y9lTK0o3pvDf/MUvrXYI2nQQ7gvUWqgEA+9MdCaw4BY8reFLeThFmkh/K/JbR
+fB2oo1WEfl/dmAQ=
+=1J+u
+-----END PGP SIGNATURE-----
+
+--------------AzAKmTInADH04xaAftTcpApv--
 
