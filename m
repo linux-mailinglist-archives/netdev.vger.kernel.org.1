@@ -1,101 +1,118 @@
-Return-Path: <netdev+bounces-208769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBA81B0D040
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 05:25:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5CBEB0D05E
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 05:33:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0F111AA33CF
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 03:25:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99F081C21D1E
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 03:33:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A14BC1DF991;
-	Tue, 22 Jul 2025 03:25:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC5731F2B90;
+	Tue, 22 Jul 2025 03:33:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="LVHFLvCC";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="T9uXlCKt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DSEAYWik"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F2232E3701;
-	Tue, 22 Jul 2025 03:25:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74AFDEEDE;
+	Tue, 22 Jul 2025 03:33:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753154718; cv=none; b=WLEWqgf8/IzfsyOJpPaL4txFGfc9n7PP6ox3+MjUNb33GV/wPhf4q/bHdP6K8AaoM6b1vPpMe6qsaEcGC3uOUG3QOLSUnxQjRT7uWPxu1ePekRqW61cYOJplZtZxEMYp60dVPlaTrNJ7MU0ObQAbBOmAxNGBdQVQQGUeckCz+/Q=
+	t=1753155210; cv=none; b=lSgcb12+mGrBRsSTmlDVWv/r9AnPb1W3owydrgurfNp+wxOsOjYuqrl8oMGfokt7MmYTlpi2HerS8z4yM5IAqhg9v9P6ZJE1T0T5d9W+emBCtOyp/ka446+LVynPD+XaRQQ+NGwkjB0IQDOizz6Wouk7ESeJKy+cY2h9ChikD+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753154718; c=relaxed/simple;
-	bh=MkHa2Rdf1jArpN8hWytBpulfVw27vR2vgyRxDMy6PZo=;
+	s=arc-20240116; t=1753155210; c=relaxed/simple;
+	bh=q3hKmaMrZ0L5NaNR6ey9DaShjQVldI4T02wH0eSa5Z4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ThnMRzsWh2vmUFdkDWb0F6TFAns0x0G3qOBwF0B5715LULE8VEOtrHk/DsInA+Vd8iAj7/GHtRxu1g7l2ukuIqAmiNqlUgijuNoH1sonzFEMHqj/kJuvYgGx0n+/MdBXFWtGXV8KcHTcxnx3kceqtZyfBMXInR9z7N/7pM3Uzt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=LVHFLvCC; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=T9uXlCKt; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id 6FFED600B5; Tue, 22 Jul 2025 05:25:14 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1753154714;
-	bh=vSmlOCs6gbQah62oYlIxODdqyVaW5UP6v8LmxDYaaKo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LVHFLvCCcHNTAHRzbn95RxCrd74PD6GFF8aR3tBeJZTNhqIC0CRjQXEcP3BCCAm2m
-	 u3+p1N4abgGxYHtNsdlmlptkCAa6RKurZlmFM75o5/fk2vi049eb8gxWTxfnNEeIs/
-	 hD7nYdX0Q2TxI9tTvyIAG7hnP13cUqD4dU5a1eUx4t75u0FrU9lbuAflkn8NSyUOGD
-	 jGVVFzgtxnv4VF64einUQ9aUSGw46RIqz/I+N03e05tG9oK528LVjK7sDfKe5Tv0nK
-	 m/7TuyF7e8/W2dQpd7jaOg8pe+134N2x01DS4WqGjczC27cPeFAOGskHjZCvDUS5er
-	 yPt+8AK4tw16Q==
-X-Spam-Level: 
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 64652600B5;
-	Tue, 22 Jul 2025 05:25:11 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1753154711;
-	bh=vSmlOCs6gbQah62oYlIxODdqyVaW5UP6v8LmxDYaaKo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=T9uXlCKtDZASD999IgqgLU6aw90CeEfxIsYDOvODaqu4pzvNsocV9HVZMrC34y256
-	 wXnahlMO90OXKGQFbZRDAFSWzw7NUBsg5ALj2VHT4ZsQbkZxJIragcypeJ1uiGIJDB
-	 1xJwI7j9xta7bhpwYWHXsOZD+ySgRil2ZiCjf/eQlJjIdpoNI01lrYL9shcEz/kb6e
-	 HlAbiKRyPd94PUXXcZylXyyHxMYcyRGTlFz9RzfSvATNz7qGI/QTgvUPZ8j7ksHdvr
-	 HSef6jMkYibxo5d+4fw0YulLfTP4sX50dYiR5hhYS0xwujxDvPuT+ZuHWQ9waGuiHk
-	 +jwLP0gDh48Fw==
-Date: Tue, 22 Jul 2025 05:25:07 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: WangYuli <wangyuli@uniontech.com>
-Cc: horms@verge.net.au, ja@ssi.bg, kadlec@netfilter.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, linux-kernel@vger.kernel.org,
-	zhanjun@uniontech.com, niecheng1@uniontech.com,
-	guanwentao@uniontech.com, wangyuli@deepin.org
-Subject: Re: [PATCH RESEND] ipvs: ip_vs_conn_expire_now: Rename del_timer in
- comment
-Message-ID: <aH8Ek6XA_EFr_XWh@calendula>
-References: <E5403EE80920424D+20250704083553.313144-1-wangyuli@uniontech.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=KRYA0u0+5WB559XYj/T7d2/kiy1Za7KrG4DX6d4EvxIxmXY2pFOcGQKTJlol1RhzBA7sopCdKBPdWPUkbTGuQXn0aLIxkgV0B2YBYaRx/JxJEmO16yAPGVZxrAI3MrhsItzWBk6PaxV0CscxZ24oGDlnSB8veor4bE2+9indBFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DSEAYWik; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2350fc2591dso48052535ad.1;
+        Mon, 21 Jul 2025 20:33:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753155209; x=1753760009; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8mqLPH+vvkTrp66iDC0pafoB/PxrdvC2+NALO7RkLns=;
+        b=DSEAYWikO3fMTxJGAZCGWWiLOi2FnFLDTFrEP8qn0ByxXiQ2XODB/u8shJlRUWXUi9
+         M+8WN22P55zaCHEcNnaR4gA1+poNLpyRLiGVFn07eL4jDDA2Ulieh4g99qcIy8OhYPHl
+         JMfo8rpjHf1t5p962WBHP0GfRi+4IsgTesYLUBkevPq7VqiK+FyAyUtic1IKCBACHtwF
+         GsuFNSN3Zfg5SFF7PYGmLa5t2XqbbkANoSRwPXfSOwCr2bWe6WZ6W/KZ3KAVCn0mV5Ho
+         ZUW2wbcC6HzGPRg6qqNypvqOHEWAYECCZztP21oW6izmZxYRikEFQfoIUZSrpW5IMeF0
+         l4tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753155209; x=1753760009;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8mqLPH+vvkTrp66iDC0pafoB/PxrdvC2+NALO7RkLns=;
+        b=CO519zY5bGRss+jBLRyff6sy33nP3c/8/IZTc+zJTk6GilHFuHGh2bcoNdPq5kXzwW
+         7Uz4cPt2PcXXVAN0KfzL0SQuWhlyRUHvwuQj8VGFsm1Ci3+YV/R8mWxBJQAmh3wI8RYD
+         YtLYmBX/aFuJ4aDB1qKY1U4/8phSZ7tUXYbnNZb1zXmizHAD4J9Pf3UF6G2n/43BHP8S
+         OoPbI06JNA5j5s1ezbqqhP1W1XjkPNi40cXLOKjaHK6ywc6K968dI8AaF3Ls/O+1agVV
+         72z1TX0uIfTaoVn9i3TQIJPHTNnJoMFTly1FDFyk2MDEHj5BHSoLErOu6FVjIJ6M1x5f
+         77mQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXQQbFPDPbCGSgTA7pQhILFz8WPlHv0SD0CrHzqBdZpvEaCxLEm5akKuHK0h4NSdCVA9badvlve@vger.kernel.org, AJvYcCXaI9IIxWcYkKzt4OBFKaJ00O6+ajhJcDFU7sLm0V36kny9R6816jMuyCRs7JCblFPxja0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzwfft8lxBeiWNjlEJBzLHTITUpGWuEEGasEIDHVOwVMfRO6UuS
+	5BGL/joOw6a6Zf6qHMJcL6368qzahbF7vJpeWgbZ+JbqAhtISeMFRYRiqJZkYA==
+X-Gm-Gg: ASbGncsyaSY/o/rwPLIPpMsNs2M64QWydYKFIahgY5otFsRH7u52NkRDyHdM3VRXmpw
+	I8vzv9XihE5By8UfKQx6bXjUMGnlr+gSznv16Jup5VfFRk+w53BgJ6IE/wKZFy+LLimEdxQZla5
+	Y//vmn2sKCkPasmwIFNPXlO6laiMmk9/Oxr15kdTRTMKdMtH460Q5DJiG2CbIlAxoN/IMuesgdJ
+	QTn8STmj+iw1ds7XYSw5sMSH0ynwyoSaLkMfb9NEZtds87f2FwOiNueZCGl4p+OULamI1kdngh9
+	e8f4SdjzfeZio3MwmPl8qa+OFfBA/fAqy81v+ja51FNPnleUV95tmTCIP1eZ0Du861I2tIQ+0Fw
+	GJnvs6B9r2/v7LktRLX7XBpmNMB8F4zc/
+X-Google-Smtp-Source: AGHT+IHV1yp8ldhAr9wCelUSHUXdCY7rvjNvQmXxZIVSyyDKFFWc6LabCe/zYvqXxmW6o1EZI00sMQ==
+X-Received: by 2002:a17:902:c94d:b0:234:8a4a:ad89 with SMTP id d9443c01a7336-23f8ac4173amr25183385ad.1.1753155208647;
+        Mon, 21 Jul 2025 20:33:28 -0700 (PDT)
+Received: from gmail.com ([98.97.38.28])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23e3b6d23b5sm66247595ad.146.2025.07.21.20.33.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Jul 2025 20:33:28 -0700 (PDT)
+Date: Mon, 21 Jul 2025 20:33:10 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Vincent Whitchurch via B4 Relay <devnull+vincent.whitchurch.datadoghq.com@kernel.org>,
+	vincent.whitchurch@datadoghq.com,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH bpf-next v3 0/5] sockmap: Fix reading with splice(2)
+Message-ID: <20250722033310.geuc34ln2ie55zqq@gmail.com>
+References: <20250709-sockmap-splice-v3-0-b23f345a67fc@datadoghq.com>
+ <20250711160931.12ec952a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E5403EE80920424D+20250704083553.313144-1-wangyuli@uniontech.com>
+In-Reply-To: <20250711160931.12ec952a@kernel.org>
 
-On Fri, Jul 04, 2025 at 04:35:53PM +0800, WangYuli wrote:
-> Commit 8fa7292fee5c ("treewide: Switch/rename to timer_delete[_sync]()")
-> switched del_timer to timer_delete, but did not modify the comment for
-> ip_vs_conn_expire_now(). Now fix it.
+On 2025-07-11 16:09:31, Jakub Kicinski wrote:
+> On Wed, 09 Jul 2025 14:47:56 +0200 Vincent Whitchurch via B4 Relay
+> wrote:
+> > I noticed that if the verdict callback returns SK_PASS, using splice(2)
+> > to read from a socket in a sockmap does not work since it never sees the
+> > data queued on to it.  As far as I can see, this is not a regression but
+> > just something that has never worked, but it does make sockmap unusable
+> > if you can't guarantee that the programs using the socket will not use
+> > splice(2).
+> 
+> On v2 you should you can't replace ops for passively opened
+> connections. Can that not be addressed instead of adding
+> an indirect call on the data path?
 
-$ git grep del_timer net/netfilter/
-net/netfilter/ipvs/ip_vs_lblc.c: *     Julian Anastasov        :    replaced del_timer call with del_timer_sync
-net/netfilter/ipvs/ip_vs_lblc.c: *                                   handler and del_timer thread in SMP
+I guess I missed above? We can create the psock and add the socket
+to a map on the accept()?
 
-Wider search, in the net tree:
+It would be good to get some fix for this.
 
-net/ipv4/igmp.c: *                                      which caused a "del_timer() called
-net/ipv4/igmp.c: *              Christian Daudt :       removed del_timer from
-
-Maybe these are only for historical purpose, so leaving them untouched
-is fine.
+Thanks,
+John
 
