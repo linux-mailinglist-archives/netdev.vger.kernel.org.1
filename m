@@ -1,152 +1,470 @@
-Return-Path: <netdev+bounces-208775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78E94B0D15B
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 07:46:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C16CB0D160
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 07:49:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B461540106
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 05:46:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E4D217EA54
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 05:49:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD53321CC43;
-	Tue, 22 Jul 2025 05:46:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FCF128B4F8;
+	Tue, 22 Jul 2025 05:48:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="Uu9YoWEN";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="EMfwrdP0"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jkr7B2K3"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C957B2AE8B;
-	Tue, 22 Jul 2025 05:46:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B94978F32
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 05:48:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753163202; cv=none; b=T4kp2XFAmx6Lm0ln6MGpSLktjrQivH9/5M3xJ1Mifj3aA1M2Zyz970fX2oHOTXc/SPdkqOvL7DryctN2ZjLFruQE7M2iTRnM2Xk7YrNtd0DvEg4c3xAIUrIb5lxqct1zKMjfuBLTY66ZMuydLYGWQ6xLvHzAakG48evArMlVFT0=
+	t=1753163336; cv=none; b=QFFHNjZMi5/kV4ryTWBde7v6FcX+QO0tDZYM3TW/34Hws2ag9TvRRq0DMVh4TVgoj9YeTOrf3Pk2lXU0qIwffyRNIJVTammQ6e/XUaO+tRel8QJ2m/UI8R5Q5Gxk4rVHJAPVoOcNQE4z2KIqf4aUx4gcF04FW5hIIykcqFn0pdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753163202; c=relaxed/simple;
-	bh=7s/9THL+pva5ta7A1N4beUww8mQiHWpz9djvOtt5jY0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WORiZunyF42GyV7jrgEIXPV5tEwgF3St5plSN9M5g1smRxPX8At+7f19tyvfeVeA2NwW2rNex+mpMc9ADCm4D6dXVvQHpgCOhsPZeQfYa5Rv0kR3984Qe602KNI9P8V4h97uJUtJKutsv1HspwBT9bC+LcLZ4U/DNDfiO6WoDc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=Uu9YoWEN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=EMfwrdP0; arc=none smtp.client-ip=103.168.172.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
-Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
-	by mailfout.phl.internal (Postfix) with ESMTP id 9D52FEC022E;
-	Tue, 22 Jul 2025 01:46:37 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Tue, 22 Jul 2025 01:46:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm2; t=1753163197; x=1753249597; bh=uR7w+rk1IP
-	LBNFKRvuJDo+Irx9SQicd4yP1XI2gUdEQ=; b=Uu9YoWENxMVR+YibCwsQQ3UjbJ
-	1e6c/m7U95AVvYqEGlrJo1J4GWHagd0ldVqMUXCC/swWxTl7Ffnbc6sA5iCtqOvN
-	+TUGJo/A5/TCK/dvAabXx965gGiKA8xVBW+OQdO9yRdfHBxO2OiL+DEmFMTJXhnP
-	kb4oGRZkbTbyCe905a3vSXT+ax8Ku17qKko9UoImb0uY0pnB3VgJ+XMhguPai74x
-	eCadtPDVvZnEljznfm/cfT3bimQ6bvzNwn0XOppZGHHqEp2Z8RVo9PHjY7CncWmo
-	1Sj3N6firLpKep5GFGxtTnKABpO+PLqmtUIQBjb3QojHJvo+6szI0LnlzSmQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1753163197; x=1753249597; bh=uR7w+rk1IPLBNFKRvuJDo+Irx9SQicd4yP1
-	XI2gUdEQ=; b=EMfwrdP0Xj1koZRUFnM1svCC+UvZnhsgRmV//i4d9jCUvLtnbyd
-	ExctFGoICY928wIenePyHxcFy/5g3bYEqksAxGoiE6auFCeMpWcVLHcjv46JdP52
-	XcVWvyJ3Aq78sAUCD1RFFvXqoFSVrnjPMeG6I9li+8eSXybS7m5PJ5SHNCj2qlCs
-	WGNdOF1S3ncPGrkbQ5hhX3F0MK+tRC9AY4focuebtr86qkSkO8BV3oLN/kWxrtES
-	ggpQyyH3n1FY0Rn73DIFl29O5W9sHOqj3X5UaOKUEV2TG48E6mD/U32lYP9VdpZC
-	5zRi/wp+cWx0eJHZ9L7oCgfqN/F9mVTKawQ==
-X-ME-Sender: <xms:vCV_aBgTOhncGcTEjmJr_CWZGSHeqGZbPhAQMgX73zcEUW3Os0b9lw>
-    <xme:vCV_aGJCvZd2318FohAYOqPsmLzt3YixHUHxCYFe-eicyKw9pUFIUWlGVN22gNT3r
-    amg7HmmgLyFcQ>
-X-ME-Received: <xmr:vCV_aIhkxloVCPMeI9g7jRERnDORDogKjpmAr2DjrrQGFjKWhxZhi5aNUxC4-vcY0EAFvKzTqp9ZJgPPXbL5ZXtACXSJN0FJ81ZNHw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdejgeduhecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgvghcumffj
-    uceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeehgedvvedvle
-    ejuefgtdduudfhkeeltdeihfevjeekjeeuhfdtueefhffgheekteenucevlhhushhtvghr
-    ufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehgrhgvgheskhhrohgrhhdrtg
-    homhdpnhgspghrtghpthhtohepudegpdhmohguvgepshhmthhpohhuthdprhgtphhtthho
-    peihihgtohhnghhsrhhfhiesudeifedrtghomhdprhgtphhtthhopehonhgvuhhkuhhmse
-    hsuhhsvgdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdr
-    tghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtth
-    hopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhn
-    uhigqdhushgssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohephihitghonh
-    hgsehkhihlihhnohhsrdgtnh
-X-ME-Proxy: <xmx:vCV_aM2d8S4sGNmcr8vbTa4Ds4Ri55JU3wDkWuuOlg4zPoqsiXiJ5g>
-    <xmx:vCV_aGiCCWsE6n_LxY7JPsq1WjslZN474DXJG1CZ1D7m_HX83acxQA>
-    <xmx:vCV_aF_7QBp7K7OYM7KhR0fniCqrBGaAkl6qMejV-9UQiuCjVay_CQ>
-    <xmx:vCV_aKLUwOAoXU77gUI-8fPcJbG8EXLxzZu3Ce8Z2Oa6QWCteY3HUA>
-    <xmx:vSV_aEgptUDHF3WR-tAgdWLJSQra_oLkHT875FNkvIuoOqS08Ko7vnRE>
-Feedback-ID: i787e41f1:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 22 Jul 2025 01:46:36 -0400 (EDT)
-Date: Tue, 22 Jul 2025 07:46:34 +0200
-From: Greg KH <greg@kroah.com>
-To: yicongsrfy@163.com
-Cc: oneukum@suse.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-	Yi Cong <yicong@kylinos.cn>
-Subject: Re: [PATCH] net: cdc_ncm: Fix spelling mistakes
-Message-ID: <2025072210-spherical-grating-a779@gregkh>
-References: <20250722023259.1228935-1-yicongsrfy@163.com>
+	s=arc-20240116; t=1753163336; c=relaxed/simple;
+	bh=C3xpCXSwydRrWzTdRceLtbVq+xVHgKzdzMnpKU5QheM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hsGL+vhpfwSTN6r/uyQiW+jzP9UPIsmopLxdTqTOVaIyiNfr/pNSTztKXq0ElTaAsT0p9iN99itQcAbvL9bDKuCHFyGQZk1anEWoLKtqyaA0nb+8oNw7zHOXtH9PNvmRulPyzB95yJyCkvkDq+ePys9ZubuZseZ9lyRk0RAH9A0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jkr7B2K3; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <06387128-8d34-49fd-a409-d35f5d60b094@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753163321;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=m/iwLPdiIBFi6lp1IENj7q/2PClonPRpthSmWe4Tk/c=;
+	b=jkr7B2K3bc55GgaXWR4zwgbI1qDEq33XvAeRPGQONKTIqbOL+Egj3NJ6SWLapcygwaXrC4
+	sMssxCc7+JR962mGrWBwE9HosZGL+IsI/VHm5euAQ8z6uxER/1eth+FE9WRa5sKl01Cf5V
+	MKlHMuZ1HcNgfrqxzO1Xx1PC9fX8aYk=
+Date: Tue, 22 Jul 2025 13:48:28 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250722023259.1228935-1-yicongsrfy@163.com>
+Subject: Re: [PATCH bpf-next 1/2] bpftool: Add bpf_token show
+To: Quentin Monnet <qmo@kernel.org>, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
+ kuba@kernel.org, hawk@kernel.org
+Cc: linux-kernel@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20250720173310.1334483-1-chen.dylane@linux.dev>
+ <6b0669fd-fef6-4f4e-b80d-512769e86938@kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Tao Chen <chen.dylane@linux.dev>
+In-Reply-To: <6b0669fd-fef6-4f4e-b80d-512769e86938@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jul 22, 2025 at 10:32:59AM +0800, yicongsrfy@163.com wrote:
-> From: Yi Cong <yicong@kylinos.cn>
+在 2025/7/22 00:23, Quentin Monnet 写道:
+> Thanks a lot for this!
 > 
-> According to the Universal Serial Bus Class Definitions for
-> Communications Devices v1.2, in chapter 6.3.3 table-21:
-> DLBitRate(downlink bit rate) seems like spelling error.
+
+Hi Quenin,
+
 > 
-> Signed-off-by: Yi Cong <yicong@kylinos.cn>
-> ---
->  drivers/net/usb/cdc_ncm.c    | 2 +-
->  include/uapi/linux/usb/cdc.h | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+> 2025-07-21 01:33 UTC+0800 ~ Tao Chen <chen.dylane@linux.dev>
+>> Add `bpftool token show` command to get token info
+>> from bpf fs in /proc/mounts.
+>>
+>> Example plain output for `token show`:
+>> token_info:
+>>          /sys/fs/bpf/token
+>>
+>> allowed_cmds:
+>>          map_create          prog_load
+>>
+>> allowed_maps:
+>>
+>> allowed_progs:
+>>          kprobe
+>>
+>> allowed_attachs:
+>>          xdp
+>>
+>> Example json output for `token show`:
+>> {
+>>      "token_info": "/sys/fs/bpf/token",
+>>      "allowed_cmds": ["map_create","prog_load"
+>>      ],
+>>      "allowed_maps":
 > 
-> diff --git a/drivers/net/usb/cdc_ncm.c b/drivers/net/usb/cdc_ncm.c
-> index 34e82f1e37d9..057ad1cf0820 100644
-> --- a/drivers/net/usb/cdc_ncm.c
-> +++ b/drivers/net/usb/cdc_ncm.c
-> @@ -1847,7 +1847,7 @@ cdc_ncm_speed_change(struct usbnet *dev,
->  		     struct usb_cdc_speed_change *data)
->  {
->  	/* RTL8156 shipped before 2021 sends notification about every 32ms. */
-> -	dev->rx_speed = le32_to_cpu(data->DLBitRRate);
-> +	dev->rx_speed = le32_to_cpu(data->DLBitRate);
->  	dev->tx_speed = le32_to_cpu(data->ULBitRate);
->  }
->  
-> diff --git a/include/uapi/linux/usb/cdc.h b/include/uapi/linux/usb/cdc.h
-> index 1924cf665448..f528c8e0a04e 100644
-> --- a/include/uapi/linux/usb/cdc.h
-> +++ b/include/uapi/linux/usb/cdc.h
-> @@ -316,7 +316,7 @@ struct usb_cdc_notification {
->  #define USB_CDC_SERIAL_STATE_OVERRUN		(1 << 6)
->  
->  struct usb_cdc_speed_change {
-> -	__le32	DLBitRRate;	/* contains the downlink bit rate (IN pipe) */
-> +	__le32	DLBitRate;	/* contains the downlink bit rate (IN pipe) */
->  	__le32	ULBitRate;	/* contains the uplink bit rate (OUT pipe) */
->  } __attribute__ ((packed));
+> 
+> This is not valid JSON. You're missing a value for "allowed_maps" (here
+> it should likely be an empty array), and the comma:
+> 
+> 	"allowed_maps": [],
+> 
+> 
+>>      "allowed_progs": ["kprobe"
+>>      ],
+>>      "allowed_attachs": ["xdp"
+>>      ]
+>> }
+>>
+>> Signed-off-by: Tao Chen <chen.dylane@linux.dev>
+>> ---
+>>   tools/bpf/bpftool/main.c  |   3 +-
+>>   tools/bpf/bpftool/main.h  |   1 +
+>>   tools/bpf/bpftool/token.c | 229 ++++++++++++++++++++++++++++++++++++++
+>>   3 files changed, 232 insertions(+), 1 deletion(-)
+>>   create mode 100644 tools/bpf/bpftool/token.c
+>>
+>> diff --git a/tools/bpf/bpftool/main.c b/tools/bpf/bpftool/main.c
+>> index 2b7f2bd3a7d..0f1183b2ed0 100644
+>> --- a/tools/bpf/bpftool/main.c
+>> +++ b/tools/bpf/bpftool/main.c
+>> @@ -61,7 +61,7 @@ static int do_help(int argc, char **argv)
+>>   		"       %s batch file FILE\n"
+>>   		"       %s version\n"
+>>   		"\n"
+>> -		"       OBJECT := { prog | map | link | cgroup | perf | net | feature | btf | gen | struct_ops | iter }\n"
+>> +		"       OBJECT := { prog | map | link | cgroup | perf | net | feature | btf | gen | struct_ops | iter | token }\n"
+>>   		"       " HELP_SPEC_OPTIONS " |\n"
+>>   		"                    {-V|--version} }\n"
+>>   		"",
+>> @@ -87,6 +87,7 @@ static const struct cmd commands[] = {
+>>   	{ "gen",	do_gen },
+>>   	{ "struct_ops",	do_struct_ops },
+>>   	{ "iter",	do_iter },
+>> +	{ "token",	do_token },
+>>   	{ "version",	do_version },
+>>   	{ 0 }
+>>   };
+>> diff --git a/tools/bpf/bpftool/main.h b/tools/bpf/bpftool/main.h
+>> index 6db704fda5c..a2bb0714b3d 100644
+>> --- a/tools/bpf/bpftool/main.h
+>> +++ b/tools/bpf/bpftool/main.h
+>> @@ -166,6 +166,7 @@ int do_tracelog(int argc, char **arg) __weak;
+>>   int do_feature(int argc, char **argv) __weak;
+>>   int do_struct_ops(int argc, char **argv) __weak;
+>>   int do_iter(int argc, char **argv) __weak;
+>> +int do_token(int argc, char **argv) __weak;
+>>   
+>>   int parse_u32_arg(int *argc, char ***argv, __u32 *val, const char *what);
+>>   int prog_parse_fd(int *argc, char ***argv);
+>> diff --git a/tools/bpf/bpftool/token.c b/tools/bpf/bpftool/token.c
+>> new file mode 100644
+>> index 00000000000..2fcaff4f2ba
+>> --- /dev/null
+>> +++ b/tools/bpf/bpftool/token.c
+>> @@ -0,0 +1,229 @@
+>> +// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>> +
+>> +#ifndef _GNU_SOURCE
+>> +#define _GNU_SOURCE
+>> +#endif
+>> +#include <errno.h>
+>> +#include <fcntl.h>
+>> +#include <stdbool.h>
+>> +#include <stdio.h>
+>> +#include <stdlib.h>
+>> +#include <string.h>
+>> +#include <unistd.h>
+>> +#include <mntent.h>
+>> +#include <sys/types.h>
+>> +#include <sys/stat.h>
+>> +
+>> +#include "json_writer.h"
+>> +#include "main.h"
+>> +
+>> +#define MOUNTS_FILE "/proc/mounts"
+>> +
+>> +#define zclose(fd) do { if (fd >= 0) close(fd); fd = -1; } while (0)
+> 
+> 
+> Seems unused?
+> 
+My fault, will remove it in v2, thanks.
 
-You are changing a structure that userspace sees.  How did you verify
-that this is not going to break any existing code out there?
+> 
+>> +
+>> +static bool has_delegate_options(const char *mnt_ops)
+>> +{
+>> +	return strstr(mnt_ops, "delegate_cmds") != NULL ||
+>> +	       strstr(mnt_ops, "delegate_maps") != NULL ||
+>> +	       strstr(mnt_ops, "delegate_progs") != NULL ||
+>> +	       strstr(mnt_ops, "delegate_attachs") != NULL;
+>> +}
+>> +
+>> +static char *get_delegate_value(const char *opts, const char *key)
+>> +{
+>> +	char *token, *rest, *ret = NULL;
+>> +	char *opts_copy = strdup(opts);
+>> +
+>> +	if (!opts_copy)
+>> +		return NULL;
+>> +
+>> +	for (token = strtok_r(opts_copy, ",", &rest); token != NULL;
+>> +			token = strtok_r(NULL, ",", &rest)) {
+>> +		if (strncmp(token, key, strlen(key)) == 0 &&
+>> +				token[strlen(key)] == '=') {
+>> +			ret = token + strlen(key) + 1;
+>> +			break;
+>> +		}
+>> +	}
+>> +	free(opts_copy);
+>> +
+>> +	return ret;
+>> +}
+>> +
+>> +static void print_items_per_line(const char *input, int items_per_line)
+>> +{
+>> +	char *str, *rest;
+>> +	int cnt = 0;
+>> +	char *strs = strdup(input);
+>> +
+>> +	if (!strs)
+>> +		return;
+>> +
+>> +	for (str = strtok_r(strs, ":", &rest); str != NULL;
+>> +			str = strtok_r(NULL, ":", &rest)) {
+>> +		if (cnt % items_per_line == 0)
+>> +			printf("\n\t");
+>> +
+>> +		printf("%-20s", str);
+>> +		cnt++;
+>> +	}
+>> +
+>> +	free(strs);
+>> +}
+>> +
+>> +#define ITEMS_PER_LINE 4
+>> +static void show_token_info_plain(struct mntent *mntent)
+>> +{
+>> +	char *value;
+>> +
+>> +	printf("\ntoken_info:");
+>> +	printf("\n\t%s\n", mntent->mnt_dir);
+>> +
+>> +	printf("\nallowed_cmds:");
+>> +	value = get_delegate_value(mntent->mnt_opts, "delegate_cmds");
+>> +	if (value)
+>> +		print_items_per_line(value, ITEMS_PER_LINE);
+>> +	printf("\n");
+>> +
+>> +	printf("\nallowed_maps:");
+>> +	value = get_delegate_value(mntent->mnt_opts, "delegate_maps");
+>> +	if (value)
+>> +		print_items_per_line(value, ITEMS_PER_LINE);
+>> +	printf("\n");
+>> +
+>> +	printf("\nallowed_progs:");
+>> +	value = get_delegate_value(mntent->mnt_opts, "delegate_progs");
+>> +	if (value)
+>> +		print_items_per_line(value, ITEMS_PER_LINE);
+>> +	printf("\n");
+>> +
+>> +	printf("\nallowed_attachs:");
+>> +	value = get_delegate_value(mntent->mnt_opts, "delegate_attachs");
+>> +	if (value)
+>> +		print_items_per_line(value, ITEMS_PER_LINE);
+>> +	printf("\n");
+>> +}
+>> +
+>> +static void __json_array_str(const char *input)
+> 
+> 
+> Nit: Why the double underscore in the function name? Let's use a more
+> explicit name also, maybe something like "split_to_json_array"?
+> 
 
-thanks,
+Well, it looks better, will change it in v2.
 
-greg k-h
+> >> +{
+>> +	char *str, *rest;
+>> +	char *strs = strdup(input);
+>> +
+>> +	if (!strs)
+>> +		return;
+>> +
+>> +	jsonw_start_array(json_wtr);
+>> +	for (str = strtok_r(strs, ":", &rest); str != NULL;
+>> +			str = strtok_r(NULL, ":", &rest)) {
+>> +		jsonw_string(json_wtr, str);
+>> +	}
+>> +	jsonw_end_array(json_wtr);
+>> +
+>> +	free(strs);
+>> +}
+>> +
+>> +static void show_token_info_json(struct mntent *mntent)
+>> +{
+>> +	char *value;
+>> +
+>> +	jsonw_start_object(json_wtr);
+>> +
+>> +	jsonw_string_field(json_wtr, "token_info", mntent->mnt_dir);
+>> +
+>> +	jsonw_name(json_wtr, "allowed_cmds");
+>> +	value = get_delegate_value(mntent->mnt_opts, "delegate_cmds");
+>> +	if (value)
+>> +		__json_array_str(value);
+> 
+> 
+> As mentioned above, you need to change __json_array_str() to print
+> something when you don't get a "value" here - just have it print an
+> empty array.
+> 
+
+As you mentioned, the 'value' will be checked within the 
+__json_array_str, and print empty array if it is NULL in v2.
+
+> 
+>> +
+>> +	jsonw_name(json_wtr, "allowed_maps");
+>> +	value = get_delegate_value(mntent->mnt_opts, "delegate_maps");
+>> +	if (value)
+>> +		__json_array_str(value);
+>> +
+>> +	jsonw_name(json_wtr, "allowed_progs");
+>> +	value = get_delegate_value(mntent->mnt_opts, "delegate_progs");
+>> +	if (value)
+>> +		__json_array_str(value);
+>> +
+>> +	jsonw_name(json_wtr, "allowed_attachs");
+>> +	value = get_delegate_value(mntent->mnt_opts, "delegate_attachs");
+>> +	if (value)
+>> +		__json_array_str(value);
+>> +
+>> +	jsonw_end_object(json_wtr);
+>> +}
+>> +
+>> +static int __show_token_info(struct mntent *mntent)
+>> +{
+>> +
+>> +	if (json_output)
+>> +		show_token_info_json(mntent);
+>> +	else
+>> +		show_token_info_plain(mntent);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int show_token_info(void)
+>> +{
+>> +	FILE *fp;
+>> +	struct mntent *ent;
+>> +	bool hit = false;
+>> +
+>> +	fp = setmntent(MOUNTS_FILE, "r");
+>> +	if (!fp) {
+>> +		p_err("Failed to open:%s", MOUNTS_FILE);
+> 
+> 
+> Missing space after the colon, in the error message.
+> 
+
+will fix it in v2.
+
+> 
+>> +		return -1;
+>> +	}
+>> +
+>> +	while ((ent = getmntent(fp)) != NULL) {
+>> +		if (strcmp(ent->mnt_type, "bpf") == 0) {
+> 
+> 
+> File common.c has:
+> 
+> 		if (strncmp(mntent->mnt_type, "bpf", 3) != 0)
+> 			continue;
+> 
+> Maybe do the same for consistency, and to avoid indenting too far right?
+> 
+
+Yes, i will refrence that, thanks.
+
+> 
+>> +			if (has_delegate_options(ent->mnt_opts)) {
+>> +				hit = true;
+>> +				break;
+> 
+> 
+> Apologies, my knowledge of BPF tokens is limited. Can you have only one
+> token exposed through a bpffs at a time? Asking because I know you can
+> have several bpffs on your system, if each can have delegate options
+> then why stop after the first bpffs mount point you find?
+> 
+
+Yes it is, only the first bpffs with token info will be showed above.
+Actually, it will not be limited how many bpffs ceated in kernel, it 
+depends on the user scenarios. In most cases, only one will be created. 
+But, maybe it's better to show all. I will change it in v2.
+
+> 
+>> +			}
+>> +		}
+>> +	}
+>> +
+>> +	if (hit)
+>> +		__show_token_info(ent);
+> 
+> 
+> Maybe at least a p_info() message if you don't find anything to print?
+> 
+Ok, will add it in v2.
+
+> 
+>> +	endmntent(fp);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int do_show(int argc, char **argv)
+>> +{
+>> +	if (argc)
+>> +		return BAD_ARG();
+>> +
+>> +	return show_token_info();
+>> +}
+>> +
+>> +static int do_help(int argc, char **argv)
+>> +{
+>> +	if (json_output) {
+>> +		jsonw_null(json_wtr);
+>> +		return 0;
+>> +	}
+>> +
+>> +	fprintf(stderr,
+>> +		"Usage: %1$s %2$s { show | list }\n"
+>> +		"	%1$s %2$s help\n"
+>> +		"\n"
+>> +		"",
+>> +		bin_name, argv[-2]);
+>> +	return 0;
+>> +}
+>> +
+>> +static const struct cmd cmds[] = {
+>> +	{ "show",	do_show },
+>> +	{ "help",	do_help },
+>> +	{ "list",	do_show },
+> 
+> 
+> Nit: Can we have "help" coming third, below both "show" and "list" please?
+> 
+
+will change it in v2.
+
+> 
+>> +	{ 0 }
+>> +};
+>> +
+>> +int do_token(int argc, char **argv)
+>> +{
+>> +	return cmd_select(cmds, argc, argv, do_help);
+>> +}
+> 
+-- 
+Best Regards
+Tao Chen
 
