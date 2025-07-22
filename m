@@ -1,262 +1,223 @@
-Return-Path: <netdev+bounces-208900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05896B0D806
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 13:19:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDF14B0D80D
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 13:22:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 311463BD1B5
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 11:19:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00CB0547DC5
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 11:22:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43FC82E0417;
-	Tue, 22 Jul 2025 11:19:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A3A02E3B1E;
+	Tue, 22 Jul 2025 11:21:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d0XOO0+r"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="y03WOVm4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11CDB7080C;
-	Tue, 22 Jul 2025 11:19:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2DBC2E3B07;
+	Tue, 22 Jul 2025 11:21:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753183177; cv=none; b=t4JmlLa+8qOxa54BGHRiNhsh98Us1CXMLwrRBdjxvRgMXGZ+OJIpxDvvmHXyu7tv2FWuuxaufRBhUP0Hj5XlCZccXoLxtLbxos6UvJ1L7WMao+cmq7/AlITCPGvoF2LEjNrlz9CyELzBeQoeR6D3dnPYR+zv77BQ1NXkcne9LUo=
+	t=1753183311; cv=none; b=K/QpmQW5C4+7sbwkyFWcI2cy+Td4x+UcBVCiWmx1qXRagLJck/kAZsVvaCr97ASyQj/6p9WfOjqLNO4Ue+AJ8mxM2lkxb89tjdfGRdbTQRb8VlWMhX9Ry9lcZUirkVpGqBzavRMeY3Jssg60VRA3OkhaFPY3fYket0lgCEqxXBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753183177; c=relaxed/simple;
-	bh=2miBTodTuvA5czJ/0Egx0TFlpE3uye94c6AudsbNSUo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L6Kbp1wkkEBT/2skZ75PQ64BUD7MiFwk61y/IICfiaoa6Edi32N2pzGRsXKQbi9GE1L2stagofWJBnBE+oa8Y2CdGd47vvXnNKsYWdnd170nx05UFyO2BihBHJeuK3XqIpn+yqe/HIKhoJ+E1RkD4Z795xMIgTq5fb0la/tr7mY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d0XOO0+r; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB809C4CEEB;
-	Tue, 22 Jul 2025 11:19:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753183176;
-	bh=2miBTodTuvA5czJ/0Egx0TFlpE3uye94c6AudsbNSUo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=d0XOO0+rGGEGiV1JHMYVEKkhnGwyy+40jnkGGVqu+hvsU2Rn6TDKHuul1lkaCgzf2
-	 FFmbSaroynvwk+OmXO7zYNNUaqyxVcaZp2ydO+SWJK+gnCPMilwGAg8C01f0zTckY3
-	 6+F9JAbllIPsNZausRN2zZgxXjA2xDwTFHp5vzDrmTSjsARi9StRmLnA+o6x9zuZ52
-	 JohdYqwMD3IM5oyrzmYfMT8PiQo2vwzSSOSFO1yB4DU5Yl2iGIi4vhqTnxFXU82NdI
-	 bwpL+Ca4sYfzROXXqDY19eA918P3vIQvTZBxGO9ph1lAnXSYyJ5umkLy1s9Q9pJWH4
-	 mNWZsNdKDb2xg==
-Date: Tue, 22 Jul 2025 12:19:29 +0100
-From: Simon Horman <horms@kernel.org>
-To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-Cc: kuba@kernel.org, kys@microsoft.com, haiyangz@microsoft.com,
-	wei.liu@kernel.org, decui@microsoft.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	longli@microsoft.com, kotaranov@microsoft.com, ast@kernel.org,
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
-	sdf@fomichev.me, lorenzo@kernel.org, michal.kubiak@intel.com,
-	ernis@linux.microsoft.com, shradhagupta@linux.microsoft.com,
-	shirazsaleem@microsoft.com, rosenp@gmail.com,
-	netdev@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
-	ssengar@linux.microsoft.com
-Subject: Re: [PATCH] net: mana: Use page pool fragments for RX buffers
- instead of full pages to improve memory efficiency and throughput.
-Message-ID: <20250722111929.GE2459@horms.kernel.org>
-References: <20250721101417.GA18873@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	s=arc-20240116; t=1753183311; c=relaxed/simple;
+	bh=rbdZjDSLrpVj5DtG98YpTOBmbGpCsBPfCraJQUpvKpo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=B9N4ZblTS2ox2nh3F7lizACn+IScGHljw8+WTkNZJVgSJR69YZtWyvac6xjFkq9tCnTk85FbHIC9v1KvrVo04skVCm3rgYdrWhMDAWOOh1z3o7WtFW59NVN2EuagXY1yOqydjKLrfi+KHpWTkIQ0Lqj7eOc0jZiLvQNjrkZQZAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=y03WOVm4; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelvem-sh01.itg.ti.com ([10.180.77.71])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 56MBKvXT1034159;
+	Tue, 22 Jul 2025 06:20:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1753183257;
+	bh=gd/G+IQueW+F6ETdxeKKpMhqSGQPrgsgg0P5duEJ5SA=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=y03WOVm4GTfsZ8+Axl8kFzgwMK9S660vb2o80D9BFYjYcr06rjXeEFGKCXZ6/Nkeb
+	 m9uIwgj13SFznWzVaWUUnnz66MjovSq1AxO8MR0gaf59YOa9DJuXA+ZuRs2JrowmWU
+	 0nTaIZ8db5LpJeIA8mO1xiQjQzY8Ek29vWGS7ka8=
+Received: from DLEE105.ent.ti.com (dlee105.ent.ti.com [157.170.170.35])
+	by lelvem-sh01.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 56MBKvM84059187
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
+	Tue, 22 Jul 2025 06:20:57 -0500
+Received: from DLEE115.ent.ti.com (157.170.170.26) by DLEE105.ent.ti.com
+ (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Tue, 22
+ Jul 2025 06:20:56 -0500
+Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE115.ent.ti.com
+ (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
+ Frontend Transport; Tue, 22 Jul 2025 06:20:55 -0500
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 56MBKnoe1243770;
+	Tue, 22 Jul 2025 06:20:50 -0500
+Message-ID: <5bce6424-51f9-4cc1-9289-93a2c15aa0c1@ti.com>
+Date: Tue, 22 Jul 2025 16:50:48 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250721101417.GA18873@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 00/15] Add driver for 1Gbe network chips from MUCSE
+To: Dong Yibo <dong100@mucse.com>, <andrew+netdev@lunn.ch>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <horms@kernel.org>, <corbet@lwn.net>,
+        <gur.stavi@huawei.com>, <maddy@linux.ibm.com>, <mpe@ellerman.id.au>,
+        <lee@trager.us>, <gongfan1@huawei.com>, <lorenzo@kernel.org>,
+        <geert+renesas@glider.be>, <Parthiban.Veerasooran@microchip.com>,
+        <lukas.bulwahn@redhat.com>, <alexanderduyck@fb.com>,
+        <richardcochran@gmail.com>
+CC: <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20250721113238.18615-1-dong100@mucse.com>
+Content-Language: en-US
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <20250721113238.18615-1-dong100@mucse.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Mon, Jul 21, 2025 at 03:14:17AM -0700, Dipayaan Roy wrote:
-> This patch enhances RX buffer handling in the mana driver by allocating
-> pages from a page pool and slicing them into MTU-sized fragments, rather
-> than dedicating a full page per packet. This approach is especially
-> beneficial on systems with 64KB page sizes.
+Hi Dong,
+
+On 21/07/25 5:02 pm, Dong Yibo wrote:
+> Hi maintainers,
 > 
-> Key improvements:
+> This patch series introduces support for MUCSE N500/N210 1Gbps Ethernet
+> controllers. Only basic tx/rx is included, more features can be added in
+> the future.
 > 
-> - Proper integration of page pool for RX buffer allocations.
-> - MTU-sized buffer slicing to improve memory utilization.
-> - Reduce overall per Rx queue memory footprint.
-> - Automatic fallback to full-page buffers when:
->    * Jumbo frames are enabled (MTU > PAGE_SIZE / 2).
->    * The XDP path is active, to avoid complexities with fragment reuse.
-> - Removal of redundant pre-allocated RX buffers used in scenarios like MTU
->   changes, ensuring consistency in RX buffer allocation.
+> The driver has been tested on the following platform:
+>    - Kernel version: 6.16.0-rc3
+>    - Intel Xeon Processor
 > 
-> Testing on VMs with 64KB pages shows around 200% throughput improvement.
-> Memory efficiency is significantly improved due to reduced wastage in page
-> allocations. Example: We are now able to fit 35 Rx buffers in a single 64KB
-> page for MTU size of 1500, instead of 1 Rx buffer per page previously.
+> Changelog:
+> v1 -> v2: 
+>   [patch 01/15]:
+>   1. Fix changed section in MAINTAINERs file by mistake.
+>   2. Fix odd indentaition in 'drivers/net/ethernet/mucse/Kconfig'.
+>   3. Drop pointless driver version.
+>   4. Remove pr_info prints.
+>   5. Remove no need 'memset' for priv after alloc_etherdev_mq.
+>   6. Fix __ function names.
+>   7. Fix description errors from 'kdoc summry'.
+>   [patch 02/15]:
+>   1. Fix define by using the BIT() macro.
+>   2. Remove wrong 'void *' cast.
+>   3. Fix 'reverse Christmas tree' format for local variables.
+>   4. Fix description errors from 'kdoc summry'.
+>   [patch 03/15]:
+>   1. Remove inline functions in C files.
+>   2. Remove use s32, use int.
+>   3. Use iopoll to instead rolling own.
+>   4. Fix description errors from 'kdoc summry'.
+>   [patch 04/15]:
+>   1. Using __le32/__le16 in little endian define.
+>   2. Remove all defensive code.
+>   3. Remove pcie hotplug relative code.
+>   4. Fix 'replace one error code with another' error.
+>   5. Turn 'fw error code' to 'linux/POSIX error code'.
+>   6. Fix description errors from 'kdoc summry'.
+>   [patch 05/15]:
+>   1. Use iopoll to instead rolling own.
+>   2. Use 'linux/POSIX error code'.
+>   3. Use devlink to download flash.
+>   4. Fix description errors from 'kdoc summry'.
+>   [patch 06/15] - [patch 15/15]:
+>   1. Check errors similar to the patches [1-5].
+>   2. Fix description errors from 'kdoc summry'.
 > 
-> Tested:
+> v1: Initial submission
+>   https://lore.kernel.org/netdev/20250703014859.210110-1-dong100@mucse.com/T/#t
 > 
-> - iperf3, iperf2, and nttcp benchmarks.
-> - Jumbo frames with MTU 9000.
-> - Native XDP programs (XDP_PASS, XDP_DROP, XDP_TX, XDP_REDIRECT) for
->   testing the driver’s XDP path.
-> - Page leak detection (kmemleak).
-> - Driver load/unload, reboot, and stress scenarios.
 > 
-> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+> Dong Yibo (15):
+>   net: rnpgbe: Add build support for rnpgbe
+>   net: rnpgbe: Add n500/n210 chip support
+>   net: rnpgbe: Add basic mbx ops support
+>   net: rnpgbe: Add get_capability mbx_fw ops support
+>   net: rnpgbe: Add download firmware for n210 chip
+>   net: rnpgbe: Add some functions for hw->ops
+>   net: rnpgbe: Add get mac from hw
+>   net: rnpgbe: Add irq support
+>   net: rnpgbe: Add netdev register and init tx/rx memory
+>   net: rnpgbe: Add netdev irq in open
+>   net: rnpgbe: Add setup hw ring-vector, true up/down hw
+>   net: rnpgbe: Add link up handler
+>   net: rnpgbe: Add base tx functions
+>   net: rnpgbe: Add base rx function
+>   net: rnpgbe: Add ITR for rx
+> 
 
-Hi,
+This series has lots of checkpatch errors / warnings.
 
-Some minor feedback from my side.
+Before posting the series please try to run checkpatch on all patches.
 
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+	./scripts/checkpatch.pl --strict --codespell <PATH_TO_PATCHES>
 
-...
+For patches within net subsystem, for declaring variables, please follow
+https://www.kernel.org/doc/html/v6.3/process/maintainer-netdev.html#local-variable-ordering-reverse-xmas-tree-rcs
 
-> -int mana_pre_alloc_rxbufs(struct mana_port_context *mpc, int new_mtu, int num_queues)
-> -{
-> -	struct device *dev;
-> -	struct page *page;
-> -	dma_addr_t da;
-> -	int num_rxb;
-> -	void *va;
-> -	int i;
-> -
-> -	mana_get_rxbuf_cfg(new_mtu, &mpc->rxbpre_datasize,
-> -			   &mpc->rxbpre_alloc_size, &mpc->rxbpre_headroom);
-> -
-> -	dev = mpc->ac->gdma_dev->gdma_context->dev;
-> -
-> -	num_rxb = num_queues * mpc->rx_queue_size;
-> -
-> -	WARN(mpc->rxbufs_pre, "mana rxbufs_pre exists\n");
-> -	mpc->rxbufs_pre = kmalloc_array(num_rxb, sizeof(void *), GFP_KERNEL);
-> -	if (!mpc->rxbufs_pre)
-> -		goto error;
->  
-> -	mpc->das_pre = kmalloc_array(num_rxb, sizeof(dma_addr_t), GFP_KERNEL);
-> -	if (!mpc->das_pre)
-> -		goto error;
-> -
-> -	mpc->rxbpre_total = 0;
-> -
-> -	for (i = 0; i < num_rxb; i++) {
-> -		page = dev_alloc_pages(get_order(mpc->rxbpre_alloc_size));
-> -		if (!page)
-> -			goto error;
-> -
-> -		va = page_to_virt(page);
-> -
-> -		da = dma_map_single(dev, va + mpc->rxbpre_headroom,
-> -				    mpc->rxbpre_datasize, DMA_FROM_DEVICE);
-> -		if (dma_mapping_error(dev, da)) {
-> -			put_page(page);
-> -			goto error;
-> +	/* For xdp and jumbo frames make sure only one packet fits per page */
-> +	if (((mtu + MANA_RXBUF_PAD) > PAGE_SIZE / 2) || rcu_access_pointer(apc->bpf_prog)) {
+You can use https://github.com/ecree-solarflare/xmastree to verify
+locally before posting.
 
-The line above seems to have unnecessary parentheses.
-And should be line wrapped to be 80 columns wide or less,
-as is still preferred by Networking code.
-The latter condition is flagged by checkpatch.pl --max-line-length=80
+The series also has kdoc warnings, please run below script on all the
+files that the series is modifying.
+	./scripts/kernel-doc -none -Wall
 
-	if (mtu + MANA_RXBUF_PAD > PAGE_SIZE / 2 ||
-	    rcu_access_pointer(apc->bpf_prog)) {
+>  .../device_drivers/ethernet/index.rst         |    1 +
+>  .../device_drivers/ethernet/mucse/rnpgbe.rst  |   21 +
+>  MAINTAINERS                                   |    8 +
+>  drivers/net/ethernet/Kconfig                  |    1 +
+>  drivers/net/ethernet/Makefile                 |    1 +
+>  drivers/net/ethernet/mucse/Kconfig            |   35 +
+>  drivers/net/ethernet/mucse/Makefile           |    7 +
+>  drivers/net/ethernet/mucse/rnpgbe/Makefile    |   13 +
+>  drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |  733 ++++++
+>  .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   |  593 +++++
+>  drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |   66 +
+>  .../net/ethernet/mucse/rnpgbe/rnpgbe_lib.c    | 2320 +++++++++++++++++
+>  .../net/ethernet/mucse/rnpgbe/rnpgbe_lib.h    |  175 ++
+>  .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   |  901 +++++++
+>  .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c    |  623 +++++
+>  .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h    |   49 +
+>  .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c |  753 ++++++
+>  .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h |  695 +++++
+>  .../net/ethernet/mucse/rnpgbe/rnpgbe_sfc.c    |  476 ++++
+>  .../net/ethernet/mucse/rnpgbe/rnpgbe_sfc.h    |   30 +
+>  20 files changed, 7501 insertions(+)
 
-(The above is completely untested)
+7.5K Lines of change is a too much for a series. It becomes very
+difficult for maintainers to review a series like this.
 
-Also, I am a little confused by the use of rcu_access_pointer()
-above and below, as bpf_prog does not seem to be managed by RCU.
+Please try to split this into multiple series if possible.
 
-Flagged by Sparse.
+>  create mode 100644 Documentation/networking/device_drivers/ethernet/mucse/rnpgbe.rst
+>  create mode 100644 drivers/net/ethernet/mucse/Kconfig
+>  create mode 100644 drivers/net/ethernet/mucse/Makefile
+>  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/Makefile
+>  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
+>  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
+>  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
+>  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c
+>  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.h
+>  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
+>  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
+>  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h
+>  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
+>  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
+>  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_sfc.c
+>  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_sfc.h
+> 
 
-> +		if (rcu_access_pointer(apc->bpf_prog)) {
-> +			*headroom = XDP_PACKET_HEADROOM;
-> +			*alloc_size = PAGE_SIZE;
-> +		} else {
-> +			*headroom = 0; /* no support for XDP */
-> +			*alloc_size = SKB_DATA_ALIGN(mtu + MANA_RXBUF_PAD + *headroom);
->  		}
->  
-> -		mpc->rxbufs_pre[i] = va;
-> -		mpc->das_pre[i] = da;
-> -		mpc->rxbpre_total = i + 1;
-> +		*frag_count = 1;
-> +		return;
->  	}
->  
-> -	return 0;
-> +	/* Standard MTU case - optimize for multiple packets per page */
-> +	*headroom = 0;
->  
-> -error:
-> -	netdev_err(mpc->ndev, "Failed to pre-allocate RX buffers for %d queues\n", num_queues);
-> -	mana_pre_dealloc_rxbufs(mpc);
-> -	return -ENOMEM;
-> +	/* Calculate base buffer size needed */
-> +	u32 len = SKB_DATA_ALIGN(mtu + MANA_RXBUF_PAD + *headroom);
-> +	u32 buf_size = ALIGN(len, MANA_RX_FRAG_ALIGNMENT);
-> +
-> +	/* Calculate how many packets can fit in a page */
-> +	*frag_count = PAGE_SIZE / buf_size;
-> +	*alloc_size = buf_size;
->  }
-
-...
-
-> -static void *mana_get_rxfrag(struct mana_rxq *rxq, struct device *dev,
-> -			     dma_addr_t *da, bool *from_pool)
-> +static void *mana_get_rxfrag(struct mana_rxq *rxq,
-> +			     struct device *dev, dma_addr_t *da, bool *from_pool)
->  {
->  	struct page *page;
-> +	u32 offset;
->  	void *va;
-> -
->  	*from_pool = false;
->  
-> -	/* Reuse XDP dropped page if available */
-> -	if (rxq->xdp_save_va) {
-> -		va = rxq->xdp_save_va;
-> -		rxq->xdp_save_va = NULL;
-> -	} else {
-> -		page = page_pool_dev_alloc_pages(rxq->page_pool);
-> -		if (!page)
-> +	/* Don't use fragments for jumbo frames or XDP (i.e when fragment = 1 per page) */
-> +	if (rxq->frag_count == 1) {
-> +		/* Reuse XDP dropped page if available */
-> +		if (rxq->xdp_save_va) {
-> +			va = rxq->xdp_save_va;
-> +			rxq->xdp_save_va = NULL;
-> +		} else {
-> +			page = page_pool_dev_alloc_pages(rxq->page_pool);
-> +			if (!page)
-> +				return NULL;
-> +
-> +			*from_pool = true;
-> +			va = page_to_virt(page);
-> +		}
-> +
-> +		*da = dma_map_single(dev, va + rxq->headroom, rxq->datasize,
-> +				     DMA_FROM_DEVICE);
-> +		if (dma_mapping_error(dev, *da)) {
-> +			if (*from_pool)
-> +				page_pool_put_full_page(rxq->page_pool, page, false);
-> +			else
-> +				put_page(virt_to_head_page(va));
-
-The put logic above seems to appear in this patch
-more than once. IMHO a helper would be nice.
-
-> +
->  			return NULL;
-> +		}
->  
-> -		*from_pool = true;
-> -		va = page_to_virt(page);
-> +		return va;
->  	}
-
-...
 
 -- 
-pw-bot: changes-requested
+Thanks and Regards,
+Danish
 
