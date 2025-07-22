@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-208776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C16CB0D160
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 07:49:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEA31B0D1A4
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 08:07:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E4D217EA54
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 05:49:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08D073AB7E2
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 06:06:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FCF128B4F8;
-	Tue, 22 Jul 2025 05:48:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BE1A28C85B;
+	Tue, 22 Jul 2025 06:07:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jkr7B2K3"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rDFVuPNO"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B94978F32
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 05:48:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21EDA4502F
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 06:07:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753163336; cv=none; b=QFFHNjZMi5/kV4ryTWBde7v6FcX+QO0tDZYM3TW/34Hws2ag9TvRRq0DMVh4TVgoj9YeTOrf3Pk2lXU0qIwffyRNIJVTammQ6e/XUaO+tRel8QJ2m/UI8R5Q5Gxk4rVHJAPVoOcNQE4z2KIqf4aUx4gcF04FW5hIIykcqFn0pdE=
+	t=1753164441; cv=none; b=KKyQ8yGXNZ5NKruZ5PQbD5dgA9MyzD+5PKcuS4tstx5KfviAmJAezcbBYuJ7EXhLYBmEAgnvHtJYyAhwgYDCJY0DjsOkmnxABjJGeREaxE+Z/+KgU0Sdbdtn6sX39Ef46K8pKW5xMeIdpW31D0UV0puLp15U2WscM2/Xhbwu0Ig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753163336; c=relaxed/simple;
-	bh=C3xpCXSwydRrWzTdRceLtbVq+xVHgKzdzMnpKU5QheM=;
+	s=arc-20240116; t=1753164441; c=relaxed/simple;
+	bh=Xu1S1FDHVkYe1QdoHx9idY6UjirqhGUv/g8oY+JSOV0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hsGL+vhpfwSTN6r/uyQiW+jzP9UPIsmopLxdTqTOVaIyiNfr/pNSTztKXq0ElTaAsT0p9iN99itQcAbvL9bDKuCHFyGQZk1anEWoLKtqyaA0nb+8oNw7zHOXtH9PNvmRulPyzB95yJyCkvkDq+ePys9ZubuZseZ9lyRk0RAH9A0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jkr7B2K3; arc=none smtp.client-ip=91.218.175.184
+	 In-Reply-To:Content-Type; b=BR/rFxdP9egRW7oXWYCTrYeiOcjfNNyl3TfjE8LRKj3X/eamWNwW5yYvD6IK6LNMBSQqASSK+RUh5UZZIHohz7IYCYxrmeyRgbwHL4L6jg2617aiRGf27eSxdymC0pwqovFe4nnaNq+DOEs4Kus5WcLaQJgGjOt087rkPDhWvUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rDFVuPNO; arc=none smtp.client-ip=95.215.58.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <06387128-8d34-49fd-a409-d35f5d60b094@linux.dev>
+Message-ID: <629f59b1-9760-4233-bb17-6be12c0965ba@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753163321;
+	t=1753164425;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=m/iwLPdiIBFi6lp1IENj7q/2PClonPRpthSmWe4Tk/c=;
-	b=jkr7B2K3bc55GgaXWR4zwgbI1qDEq33XvAeRPGQONKTIqbOL+Egj3NJ6SWLapcygwaXrC4
-	sMssxCc7+JR962mGrWBwE9HosZGL+IsI/VHm5euAQ8z6uxER/1eth+FE9WRa5sKl01Cf5V
-	MKlHMuZ1HcNgfrqxzO1Xx1PC9fX8aYk=
-Date: Tue, 22 Jul 2025 13:48:28 +0800
+	bh=xVjS0EudrLw88Tcwso/HMMGV5sllQzXKCupSAMsbJFo=;
+	b=rDFVuPNOYPRnROToXhdjs7ERmlcD4uk9CFgs7AO/zgMz7EonF1Yk+nmuOITj7DfRP+3aRu
+	Q7tZ6pVAswPuABXBe3+RVp2yr+7hCOJaYrxADP5rx3SIpkR+iCacS4g3fIKFiKgk7N+qVA
+	cTDr9oWk5A4yBf59KjG+PQqJG3tZgfE=
+Date: Tue, 22 Jul 2025 14:06:51 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next 1/2] bpftool: Add bpf_token show
+Subject: Re: [PATCH bpf-next 2/2] bpftool: Add bpftool-token manpage
 To: Quentin Monnet <qmo@kernel.org>, ast@kernel.org, daniel@iogearbox.net,
  andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
  yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
@@ -57,412 +57,150 @@ To: Quentin Monnet <qmo@kernel.org>, ast@kernel.org, daniel@iogearbox.net,
  kuba@kernel.org, hawk@kernel.org
 Cc: linux-kernel@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org
 References: <20250720173310.1334483-1-chen.dylane@linux.dev>
- <6b0669fd-fef6-4f4e-b80d-512769e86938@kernel.org>
+ <20250720173310.1334483-2-chen.dylane@linux.dev>
+ <ab308d9e-a0dc-4b57-b498-93a0f56771c4@kernel.org>
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Tao Chen <chen.dylane@linux.dev>
-In-Reply-To: <6b0669fd-fef6-4f4e-b80d-512769e86938@kernel.org>
+In-Reply-To: <ab308d9e-a0dc-4b57-b498-93a0f56771c4@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
 在 2025/7/22 00:23, Quentin Monnet 写道:
-> Thanks a lot for this!
-> 
-
-Hi Quenin,
-
-> 
 > 2025-07-21 01:33 UTC+0800 ~ Tao Chen <chen.dylane@linux.dev>
->> Add `bpftool token show` command to get token info
->> from bpf fs in /proc/mounts.
->>
->> Example plain output for `token show`:
->> token_info:
->>          /sys/fs/bpf/token
->>
->> allowed_cmds:
->>          map_create          prog_load
->>
->> allowed_maps:
->>
->> allowed_progs:
->>          kprobe
->>
->> allowed_attachs:
->>          xdp
->>
->> Example json output for `token show`:
->> {
->>      "token_info": "/sys/fs/bpf/token",
->>      "allowed_cmds": ["map_create","prog_load"
->>      ],
->>      "allowed_maps":
-> 
-> 
-> This is not valid JSON. You're missing a value for "allowed_maps" (here
-> it should likely be an empty array), and the comma:
-> 
-> 	"allowed_maps": [],
-> 
-> 
->>      "allowed_progs": ["kprobe"
->>      ],
->>      "allowed_attachs": ["xdp"
->>      ]
->> }
+>> Add bpftool-token manpage with information and examples of token-related
+>> commands.
 >>
 >> Signed-off-by: Tao Chen <chen.dylane@linux.dev>
 >> ---
->>   tools/bpf/bpftool/main.c  |   3 +-
->>   tools/bpf/bpftool/main.h  |   1 +
->>   tools/bpf/bpftool/token.c | 229 ++++++++++++++++++++++++++++++++++++++
->>   3 files changed, 232 insertions(+), 1 deletion(-)
->>   create mode 100644 tools/bpf/bpftool/token.c
+>>   .../bpftool/Documentation/bpftool-token.rst   | 68 +++++++++++++++++++
+>>   1 file changed, 68 insertions(+)
+>>   create mode 100644 tools/bpf/bpftool/Documentation/bpftool-token.rst
 >>
->> diff --git a/tools/bpf/bpftool/main.c b/tools/bpf/bpftool/main.c
->> index 2b7f2bd3a7d..0f1183b2ed0 100644
->> --- a/tools/bpf/bpftool/main.c
->> +++ b/tools/bpf/bpftool/main.c
->> @@ -61,7 +61,7 @@ static int do_help(int argc, char **argv)
->>   		"       %s batch file FILE\n"
->>   		"       %s version\n"
->>   		"\n"
->> -		"       OBJECT := { prog | map | link | cgroup | perf | net | feature | btf | gen | struct_ops | iter }\n"
->> +		"       OBJECT := { prog | map | link | cgroup | perf | net | feature | btf | gen | struct_ops | iter | token }\n"
->>   		"       " HELP_SPEC_OPTIONS " |\n"
->>   		"                    {-V|--version} }\n"
->>   		"",
->> @@ -87,6 +87,7 @@ static const struct cmd commands[] = {
->>   	{ "gen",	do_gen },
->>   	{ "struct_ops",	do_struct_ops },
->>   	{ "iter",	do_iter },
->> +	{ "token",	do_token },
->>   	{ "version",	do_version },
->>   	{ 0 }
->>   };
->> diff --git a/tools/bpf/bpftool/main.h b/tools/bpf/bpftool/main.h
->> index 6db704fda5c..a2bb0714b3d 100644
->> --- a/tools/bpf/bpftool/main.h
->> +++ b/tools/bpf/bpftool/main.h
->> @@ -166,6 +166,7 @@ int do_tracelog(int argc, char **arg) __weak;
->>   int do_feature(int argc, char **argv) __weak;
->>   int do_struct_ops(int argc, char **argv) __weak;
->>   int do_iter(int argc, char **argv) __weak;
->> +int do_token(int argc, char **argv) __weak;
->>   
->>   int parse_u32_arg(int *argc, char ***argv, __u32 *val, const char *what);
->>   int prog_parse_fd(int *argc, char ***argv);
->> diff --git a/tools/bpf/bpftool/token.c b/tools/bpf/bpftool/token.c
+>> diff --git a/tools/bpf/bpftool/Documentation/bpftool-token.rst b/tools/bpf/bpftool/Documentation/bpftool-token.rst
 >> new file mode 100644
->> index 00000000000..2fcaff4f2ba
+>> index 00000000000..177f93c0bc7
 >> --- /dev/null
->> +++ b/tools/bpf/bpftool/token.c
->> @@ -0,0 +1,229 @@
->> +// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>> +++ b/tools/bpf/bpftool/Documentation/bpftool-token.rst
+>> @@ -0,0 +1,68 @@
+>> +.. SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 >> +
->> +#ifndef _GNU_SOURCE
->> +#define _GNU_SOURCE
->> +#endif
->> +#include <errno.h>
->> +#include <fcntl.h>
->> +#include <stdbool.h>
->> +#include <stdio.h>
->> +#include <stdlib.h>
->> +#include <string.h>
->> +#include <unistd.h>
->> +#include <mntent.h>
->> +#include <sys/types.h>
->> +#include <sys/stat.h>
->> +
->> +#include "json_writer.h"
->> +#include "main.h"
->> +
->> +#define MOUNTS_FILE "/proc/mounts"
->> +
->> +#define zclose(fd) do { if (fd >= 0) close(fd); fd = -1; } while (0)
+>> +================
+>> +bpftool-token
+>> +================
+>> +-------------------------------------------------------------------------------
+>> +tool for inspection and simple manipulation of eBPF progs
 > 
 > 
-> Seems unused?
-> 
-My fault, will remove it in v2, thanks.
-
-> 
->> +
->> +static bool has_delegate_options(const char *mnt_ops)
->> +{
->> +	return strstr(mnt_ops, "delegate_cmds") != NULL ||
->> +	       strstr(mnt_ops, "delegate_maps") != NULL ||
->> +	       strstr(mnt_ops, "delegate_progs") != NULL ||
->> +	       strstr(mnt_ops, "delegate_attachs") != NULL;
->> +}
->> +
->> +static char *get_delegate_value(const char *opts, const char *key)
->> +{
->> +	char *token, *rest, *ret = NULL;
->> +	char *opts_copy = strdup(opts);
->> +
->> +	if (!opts_copy)
->> +		return NULL;
->> +
->> +	for (token = strtok_r(opts_copy, ",", &rest); token != NULL;
->> +			token = strtok_r(NULL, ",", &rest)) {
->> +		if (strncmp(token, key, strlen(key)) == 0 &&
->> +				token[strlen(key)] == '=') {
->> +			ret = token + strlen(key) + 1;
->> +			break;
->> +		}
->> +	}
->> +	free(opts_copy);
->> +
->> +	return ret;
->> +}
->> +
->> +static void print_items_per_line(const char *input, int items_per_line)
->> +{
->> +	char *str, *rest;
->> +	int cnt = 0;
->> +	char *strs = strdup(input);
->> +
->> +	if (!strs)
->> +		return;
->> +
->> +	for (str = strtok_r(strs, ":", &rest); str != NULL;
->> +			str = strtok_r(NULL, ":", &rest)) {
->> +		if (cnt % items_per_line == 0)
->> +			printf("\n\t");
->> +
->> +		printf("%-20s", str);
->> +		cnt++;
->> +	}
->> +
->> +	free(strs);
->> +}
->> +
->> +#define ITEMS_PER_LINE 4
->> +static void show_token_info_plain(struct mntent *mntent)
->> +{
->> +	char *value;
->> +
->> +	printf("\ntoken_info:");
->> +	printf("\n\t%s\n", mntent->mnt_dir);
->> +
->> +	printf("\nallowed_cmds:");
->> +	value = get_delegate_value(mntent->mnt_opts, "delegate_cmds");
->> +	if (value)
->> +		print_items_per_line(value, ITEMS_PER_LINE);
->> +	printf("\n");
->> +
->> +	printf("\nallowed_maps:");
->> +	value = get_delegate_value(mntent->mnt_opts, "delegate_maps");
->> +	if (value)
->> +		print_items_per_line(value, ITEMS_PER_LINE);
->> +	printf("\n");
->> +
->> +	printf("\nallowed_progs:");
->> +	value = get_delegate_value(mntent->mnt_opts, "delegate_progs");
->> +	if (value)
->> +		print_items_per_line(value, ITEMS_PER_LINE);
->> +	printf("\n");
->> +
->> +	printf("\nallowed_attachs:");
->> +	value = get_delegate_value(mntent->mnt_opts, "delegate_attachs");
->> +	if (value)
->> +		print_items_per_line(value, ITEMS_PER_LINE);
->> +	printf("\n");
->> +}
->> +
->> +static void __json_array_str(const char *input)
-> 
-> 
-> Nit: Why the double underscore in the function name? Let's use a more
-> explicit name also, maybe something like "split_to_json_array"?
+> Copy-pasted from bpftool-prog.rst, please update.
 > 
 
-Well, it looks better, will change it in v2.
-
-> >> +{
->> +	char *str, *rest;
->> +	char *strs = strdup(input);
->> +
->> +	if (!strs)
->> +		return;
->> +
->> +	jsonw_start_array(json_wtr);
->> +	for (str = strtok_r(strs, ":", &rest); str != NULL;
->> +			str = strtok_r(NULL, ":", &rest)) {
->> +		jsonw_string(json_wtr, str);
->> +	}
->> +	jsonw_end_array(json_wtr);
->> +
->> +	free(strs);
->> +}
->> +
->> +static void show_token_info_json(struct mntent *mntent)
->> +{
->> +	char *value;
->> +
->> +	jsonw_start_object(json_wtr);
->> +
->> +	jsonw_string_field(json_wtr, "token_info", mntent->mnt_dir);
->> +
->> +	jsonw_name(json_wtr, "allowed_cmds");
->> +	value = get_delegate_value(mntent->mnt_opts, "delegate_cmds");
->> +	if (value)
->> +		__json_array_str(value);
-> 
-> 
-> As mentioned above, you need to change __json_array_str() to print
-> something when you don't get a "value" here - just have it print an
-> empty array.
-> 
-
-As you mentioned, the 'value' will be checked within the 
-__json_array_str, and print empty array if it is NULL in v2.
+will update it in v2, thanks.
 
 > 
+>> +-------------------------------------------------------------------------------
 >> +
->> +	jsonw_name(json_wtr, "allowed_maps");
->> +	value = get_delegate_value(mntent->mnt_opts, "delegate_maps");
->> +	if (value)
->> +		__json_array_str(value);
+>> +:Manual section: 8
 >> +
->> +	jsonw_name(json_wtr, "allowed_progs");
->> +	value = get_delegate_value(mntent->mnt_opts, "delegate_progs");
->> +	if (value)
->> +		__json_array_str(value);
+>> +.. include:: substitutions.rst
 >> +
->> +	jsonw_name(json_wtr, "allowed_attachs");
->> +	value = get_delegate_value(mntent->mnt_opts, "delegate_attachs");
->> +	if (value)
->> +		__json_array_str(value);
+>> +SYNOPSIS
+>> +========
 >> +
->> +	jsonw_end_object(json_wtr);
->> +}
+>> +**bpftool** [*OPTIONS*] **token** *COMMAND*
 >> +
->> +static int __show_token_info(struct mntent *mntent)
->> +{
+>> +*OPTIONS* := { |COMMON_OPTIONS| }
 >> +
->> +	if (json_output)
->> +		show_token_info_json(mntent);
->> +	else
->> +		show_token_info_plain(mntent);
+>> +*COMMANDS* := { **show** | **list** | **help** }
 >> +
->> +	return 0;
->> +}
+>> +TOKEN COMMANDS
+>> +===============
 >> +
->> +static int show_token_info(void)
->> +{
->> +	FILE *fp;
->> +	struct mntent *ent;
->> +	bool hit = false;
+>> +| **bpftool** **token** { **show** | **list** }
+>> +| **bpftool** **token help**
+>> +|
 >> +
->> +	fp = setmntent(MOUNTS_FILE, "r");
->> +	if (!fp) {
->> +		p_err("Failed to open:%s", MOUNTS_FILE);
+>> +DESCRIPTION
+>> +===========
+>> +bpftool token { show | list }
+>> +    List all the concrete allowed_types for cmds maps progs attachs
+>> +    and the bpffs mount_point used to set the token info.
 > 
 > 
-> Missing space after the colon, in the error message.
+> This is not a summary, please let's use a more verbose description and
+> avoid abbreviations:
+> 
+> 	List all the concrete allowed types for **bpf**\ () system call
+> 	commands, maps, programs, and attach types, as well as the
+> 	*bpffs* mount point used to set the token information.
+> 
+> What is a "concrete" allowed_type?
 > 
 
-will fix it in v2.
-
-> 
->> +		return -1;
->> +	}
+Uh... I wanted to say speciafic allowed_type, sorry for the poor english.
+  > >> +
+>> +bpftool prog help
+>> +    Print short help message.
 >> +
->> +	while ((ent = getmntent(fp)) != NULL) {
->> +		if (strcmp(ent->mnt_type, "bpf") == 0) {
-> 
-> 
-> File common.c has:
-> 
-> 		if (strncmp(mntent->mnt_type, "bpf", 3) != 0)
-> 			continue;
-> 
-> Maybe do the same for consistency, and to avoid indenting too far right?
-> 
-
-Yes, i will refrence that, thanks.
-
-> 
->> +			if (has_delegate_options(ent->mnt_opts)) {
->> +				hit = true;
->> +				break;
-> 
-> 
-> Apologies, my knowledge of BPF tokens is limited. Can you have only one
-> token exposed through a bpffs at a time? Asking because I know you can
-> have several bpffs on your system, if each can have delegate options
-> then why stop after the first bpffs mount point you find?
-> 
-
-Yes it is, only the first bpffs with token info will be showed above.
-Actually, it will not be limited how many bpffs ceated in kernel, it 
-depends on the user scenarios. In most cases, only one will be created. 
-But, maybe it's better to show all. I will change it in v2.
-
-> 
->> +			}
->> +		}
->> +	}
+>> +OPTIONS
+>> +========
+>> +.. include:: common_options.rst
 >> +
->> +	if (hit)
->> +		__show_token_info(ent);
+>> +EXAMPLES
+>> +========
+>> +|
+>> +| **# mkdir -p /sys/fs/bpf/token**
+>> +| **# mount -t bpf bpffs /sys/fs/bpf/token** \
+>> +|         **-o delegate_cmds=prog_load:map_create** \
+>> +|         **-o delegate_progs=kprobe** \
+>> +|         **-o delegate_attachs=xdp**
+>> +| **# bpftool token list**
+>> +
+>> +::
+>> +
+>> +    token_info:
+>> +            /sys/fs/bpf/token
+>> +
+>> +    allowed_cmds:
+>> +            map_create          prog_load
+>> +
+>> +    allowed_maps:
+>> +
+>> +    allowed_progs:
+>> +            kprobe
+>> +
+>> +    allowed_attachs:
+>> +            xdp
+>> +
 > 
 > 
-> Maybe at least a p_info() message if you don't find anything to print?
-> 
-Ok, will add it in v2.
-
-> 
->> +	endmntent(fp);
->> +
->> +	return 0;
->> +}
->> +
->> +static int do_show(int argc, char **argv)
->> +{
->> +	if (argc)
->> +		return BAD_ARG();
->> +
->> +	return show_token_info();
->> +}
->> +
->> +static int do_help(int argc, char **argv)
->> +{
->> +	if (json_output) {
->> +		jsonw_null(json_wtr);
->> +		return 0;
->> +	}
->> +
->> +	fprintf(stderr,
->> +		"Usage: %1$s %2$s { show | list }\n"
->> +		"	%1$s %2$s help\n"
->> +		"\n"
->> +		"",
->> +		bin_name, argv[-2]);
->> +	return 0;
->> +}
->> +
->> +static const struct cmd cmds[] = {
->> +	{ "show",	do_show },
->> +	{ "help",	do_help },
->> +	{ "list",	do_show },
-> 
-> 
-> Nit: Can we have "help" coming third, below both "show" and "list" please?
+> Please also update bpftool's bash completion file. I think it should be:
 > 
 
-will change it in v2.
+will add it in v2.
 
-> 
->> +	{ 0 }
->> +};
->> +
->> +int do_token(int argc, char **argv)
->> +{
->> +	return cmd_select(cmds, argc, argv, do_help);
->> +}
+>      diff --git i/tools/bpf/bpftool/bash-completion/bpftool w/tools/bpf/bpftool/bash-completion/bpftool
+>      index a759ba24471d..3f119d7eae96 100644
+>      --- i/tools/bpf/bpftool/bash-completion/bpftool
+>      +++ w/tools/bpf/bpftool/bash-completion/bpftool
+>      @@ -1215,6 +1215,17 @@ _bpftool()
+>                           ;;
+>                   esac
+>                   ;;
+>      +        token)
+>      +            case $command in
+>      +                show|list)
+>      +                    return 0
+>      +                    ;;
+>      +                *)
+>      +                    [[ $prev == $object ]] && \
+>      +                        COMPREPLY=( $( compgen -W 'help show list' -- "$cur" ) )
+>      +                    ;;
+>      +            esac
+>      +            ;;
+>           esac
+>       } &&
+>       complete -F _bpftool bpftool
 > 
 -- 
 Best Regards
