@@ -1,119 +1,182 @@
-Return-Path: <netdev+bounces-208807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94FC1B0D373
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 09:39:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE894B0D3A5
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 09:44:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19EBD188A66B
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 07:37:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5390156281F
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 07:40:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2117C2D3EE6;
-	Tue, 22 Jul 2025 07:33:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 289542E11D6;
+	Tue, 22 Jul 2025 07:37:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="qChRxj60"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="iSi/eWuq"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 275232C15B5;
-	Tue, 22 Jul 2025 07:33:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51DDD2E3AFF
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 07:37:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753169596; cv=none; b=frn0aYG8qqmktA3QSXi2A9LQJJyuorwYeuWhI0BNU2DsMWz63CEcyhk1iKy7PjRHSdptgu7/gKdDmqTHsbU0r2aROb7qbn1nVexL16s54AWYCvR5cvJGnFZ8R9qi4ETvGl0bF+noVFmiHnDh3q242b6eEFFQU/fdNVG6FsM8m1k=
+	t=1753169825; cv=none; b=hQeAnPw++X6FSZTGbITe8z8MtUuUdpnXIqKYO526WfuwNyPdjSvJWGWmX/evvoK4sC8pqxey9o0Bz1OUpIj8diFIfZNwC5Oqek9WXgzvGuCpXHj4e+lxIPVb6slVJmBgRdCrrKrofUD8y/zfrjU4+oN2iWuwg2lltHjGrh0YH4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753169596; c=relaxed/simple;
-	bh=dvySKgvwnT8oBcTa6En/DVNoUV2aJy3BPu8eNsOzWfs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NHirN1G8cvtWgQ1mZ+picddzYreYQQGnyFIw927tLLL+1AAatYAtseNp/sA+0yDELmwWf3gDnrGqkpMnwEAd284N6tMnxbV2hUIi+GHUVHoW/PmS8NWep+peKqkGy9dE9PM4jBmKMxWZ3ZZtbjA8xOACnZ6yEh6vEBBxpqi8ebs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=qChRxj60; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=U6YMzP+2dWgWiUnFlZiTb7wmZcswaZFKOx7Tx9ijr9I=; b=qChRxj60ECKPufnRYt+Lj+Pjgw
-	4TtJYFrn2SbRTyUb9OZTtSuALjGdYgGwFaZsBPTCeKc1UhF8PGXaNXFgQpMNfJehBOL2TsAL/JghM
-	ztZwOoy8KrecDxpV68upEIUo/CEEl2t3T3hj/P9Q6T4EzawJgEcd0UDh8/jZ6Sr0C9lVlg3a4H6Gb
-	d9LwXuv/9y/bt/y3NF0gTq7tbVSCwErt4++t9G4cxQcUsiMzltqJu/i3KBZewhechX+QwOdB2XPdk
-	drEU2x4ZHNlUpT4+y0OW3BJtZth18KWYGfy35nNbllatWoDjzItAg3AMxi8bq0F1wKCK3SjGRVvm6
-	v4O4NA0w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50216)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1ue7UX-0007zl-2z;
-	Tue, 22 Jul 2025 08:32:49 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1ue7UT-0006y6-1K;
-	Tue, 22 Jul 2025 08:32:45 +0100
-Date: Tue, 22 Jul 2025 08:32:45 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Krzysztof Kozlowski <krzk@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Christophe Roullier <christophe.roullier@foss.st.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Tristram Ha <Tristram.Ha@microchip.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/4] dt-bindings: net: document st,phy-wol
- property
-Message-ID: <aH8-nQtNVuewNuwU@shell.armlinux.org.uk>
-References: <20250721-wol-smsc-phy-v1-0-89d262812dba@foss.st.com>
- <20250721-wol-smsc-phy-v1-1-89d262812dba@foss.st.com>
- <faea23d5-9d5d-4fbb-9c6a-a7bc38c04866@kernel.org>
- <f5c4bb6d-4ff1-4dc1-9d27-3bb1e26437e3@foss.st.com>
- <e3c99bdb-649a-4652-9f34-19b902ba34c1@lunn.ch>
- <38278e2a-5a1b-4908-907e-7d45a08ea3b7@foss.st.com>
+	s=arc-20240116; t=1753169825; c=relaxed/simple;
+	bh=XoTSReRIWl23BljKqA2YUSyIT3NJWPVLgQNbiD9Lm4k=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=WXW7GkfdO+M6E8B8fqlLA7lR4l+TkeQeYcS4tJ8wHLnJ7zk+lqAZfAEASYXfFrdBmcrKtuHqDOu99x73dyV4HMYE2xQJKRrJoiedxd/4vU8EiOMmUGTO+r4Xq8gjB3vz6ZHcPTRUJHJMgIp2AH5XcQkBzf7g5jWbOIKSjTQqkZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=iSi/eWuq; arc=none smtp.client-ip=18.194.254.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1753169746;
+	bh=1DFykB4IGMZc95pr0nP6WV8K6S5/SNh6P26mZWnTYNc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=iSi/eWuqri2aE/KeHOMA4MRHdoWkRYYQwalQht4ELhrq3ORP7LSlCPnBsE75bthE8
+	 6mQKY+VT7g4mvlxYm4hhce2FAp01CCqw5r18ibyNvS4w3/Welf2dNvgSgMf8UUmREd
+	 yEyyUmvLnhfSqLwqvoy7rZ5ha/vWIv8R9x34PEWQ=
+X-QQ-mid: zesmtpip2t1753169680t1d8848d9
+X-QQ-Originating-IP: /2Vqiv1DKGDiDTOeHrTcoDDvJdzpiY2SWG31K/OjoKo=
+Received: from avenger-e500 ( [localhost])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 22 Jul 2025 15:34:34 +0800 (CST)
+X-QQ-SSF: 0002000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 12305455310709652104
+EX-QQ-RecipientCnt: 64
+From: WangYuli <wangyuli@uniontech.com>
+To: wangyuli@uniontech.com
+Cc: airlied@gmail.com,
+	akpm@linux-foundation.org,
+	alison.schofield@intel.com,
+	andrew+netdev@lunn.ch,
+	andriy.shevchenko@linux.intel.com,
+	arend.vanspriel@broadcom.com,
+	bp@alien8.de,
+	brcm80211-dev-list.pdl@broadcom.com,
+	brcm80211@lists.linux.dev,
+	colin.i.king@gmail.com,
+	cvam0000@gmail.com,
+	dan.j.williams@intel.com,
+	dave.hansen@linux.intel.com,
+	dave.jiang@intel.com,
+	dave@stgolabs.net,
+	davem@davemloft.net,
+	dri-devel@lists.freedesktop.org,
+	edumazet@google.com,
+	gregkh@linuxfoundation.org,
+	guanwentao@uniontech.com,
+	hpa@zytor.com,
+	ilpo.jarvinen@linux.intel.com,
+	intel-xe@lists.freedesktop.org,
+	ira.weiny@intel.com,
+	j@jannau.net,
+	jeff.johnson@oss.qualcomm.com,
+	jgross@suse.com,
+	jirislaby@kernel.org,
+	johannes.berg@intel.com,
+	jonathan.cameron@huawei.com,
+	kuba@kernel.org,
+	kvalo@kernel.org,
+	kvm@vger.kernel.org,
+	linux-cxl@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	linux@treblig.org,
+	lucas.demarchi@intel.com,
+	marcin.s.wojtas@gmail.com,
+	ming.li@zohomail.com,
+	mingo@kernel.org,
+	mingo@redhat.com,
+	netdev@vger.kernel.org,
+	niecheng1@uniontech.com,
+	oleksandr_tyshchenko@epam.com,
+	pabeni@redhat.com,
+	pbonzini@redhat.com,
+	quic_ramess@quicinc.com,
+	ragazenta@gmail.com,
+	rodrigo.vivi@intel.com,
+	seanjc@google.com,
+	shenlichuan@vivo.com,
+	simona@ffwll.ch,
+	sstabellini@kernel.org,
+	tglx@linutronix.de,
+	thomas.hellstrom@linux.intel.com,
+	vishal.l.verma@intel.com,
+	wangyuli@deepin.org,
+	x86@kernel.org,
+	xen-devel@lists.xenproject.org,
+	yujiaoliang@vivo.com,
+	zhanjun@uniontech.com
+Subject: [PATCH v3 1/8] KVM: x86: Fix typo "notifer"
+Date: Tue, 22 Jul 2025 15:34:24 +0800
+Message-ID: <7F05778C3A1A9F8B+20250722073431.21983-1-wangyuli@uniontech.com>
+X-Mailer: git-send-email 2.50.0
+In-Reply-To: <576F0D85F6853074+20250722072734.19367-1-wangyuli@uniontech.com>
+References: <576F0D85F6853074+20250722072734.19367-1-wangyuli@uniontech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <38278e2a-5a1b-4908-907e-7d45a08ea3b7@foss.st.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: NgaJKxROpQTjpj1dawfBAp5BSKyrzx32+b+lvgiwlIqmeOnmN6gaJuqT
+	kpPq0Tcw7FjvzfD1y4yMicxRTECnWGhe243OBCOx8JWCkHjVmCV0lj2Xz2WhGCyxSL75MqN
+	juLqDstsXTzc33gWmclCnZb/vwt5cxfXDIncp4wEzQ0NDhaCyTxsEsqGWRbWTX2slZ1z2Yy
+	RFOy8avkO3moq6N4JCG7enVElGkKifijhIwEp8EP9n40czRfGtDLVkijXF7pLHhw7daaybO
+	0afXA4YR8+5A8ZSvooyf8jDET6QdgtuUl8cxmKADIkNQbLV0s20ruREzEgTs8+SLFjixcFs
+	xQDw39cadCJQ6k/Gh8uM5ahHYKHmoLPwX9SLZkn5ojEZC6ZVyF6cTBGIiYVe2sSmUtTeQAO
+	nfUfUrrpTtBM9i96G48SJiObIHL6F57CroFxye9WSPXvEkvuF/nG7AAo2Xze+B0zs15UFdD
+	4B501bEOL39ZdD5b2C3JU8Dcm4usU5q/LInKoUfk4x9eSnueX8jrSnhNi4nWLOrIYw/jR/m
+	jY67P/6CkRlYZ0dqzJPWibJKRQ0Y7rh+gGuBVRPAfef7OHAfXYuyKv6acBFbpq18C38U5cn
+	z9Zd5/JFd7hta74MCQrcrLTKiDhouCxVWUN9BHvqyCX4I2bizlLwS94O2tjJYrl1PmmsvgK
+	uxvPWOH7FLeFiVDM7YUZWzIMenAsK21hn644n39QmyQh91BNxBQDsz4UbWK37qoQK3+JT2d
+	MduKFEFT1DDJpNB2HMyMAtNO7UCToLbn/3+T0+mZ84bB0Q405t22J5LmddoskZn/HT2M0Q9
+	EcetZVVDyOOM+3gNrh3TZpXPVrIjZHHX/q+fe1SWLtwlqauJEmSbTZkLHqEPZOooUOgxBUa
+	mdSEyATRlytmE6+ppkWvxz2KZeGHjBCSp7NuP3/0m8fI7AU2f7hnp/mv9NNrzLXRoAzu/SM
+	SyF5icDmtTMGyMcEQqUThYyQspC9RIHWIBmUIo61NAhmXRZqlf/2BKrIKPB4mNOyEFYN68G
+	EyQCIp+FRUY9qAleIOnpCT+0W7BctHf4f5j6fzmgb5uqp5jCMhTTaUbQGfrBltB+wJJgwaO
+	n5De1kXZg+J1GTPt5CtLvs=
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
+X-QQ-RECHKSPAM: 0
 
-On Mon, Jul 21, 2025 at 05:56:17PM +0200, Gatien CHEVALLIER wrote:
-> Here's an extract from the Microchip datasheet for the LAN8742A PHY:
-> 
-> "In addition to the main interrupts described in this section, an nPME
-> pin is provided exclusively for WoL specific interrupts."
+There are some spelling mistakes of 'notifer' which should be 'notifier'.
 
-So the pin on the PHY for WoL is called nPME? If this pin isn't wired
-to an interrupt controller, then the PHY doesn't support WoL. If it is
-wired, then could it be inferred that WoL is supported?
+Signed-off-by: WangYuli <wangyuli@uniontech.com>
+---
+ arch/x86/kvm/i8254.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-If so, then it seems to me the simple solution here is for the PHY
-driver to say "if the nPME pin is connected to an interrupt controller,
-then PHY-side WoL is supported, otherwise PHY-side WoL is not
-supported".
-
-Then, I wonder if the detection of the WoL capabilities of the PHY
-in stmmac_init_phy() could be used to determine whether PHY WoL
-should be used or not.
-
+diff --git a/arch/x86/kvm/i8254.c b/arch/x86/kvm/i8254.c
+index 739aa6c0d0c3..9ff55112900a 100644
+--- a/arch/x86/kvm/i8254.c
++++ b/arch/x86/kvm/i8254.c
+@@ -641,7 +641,7 @@ static void kvm_pit_reset(struct kvm_pit *pit)
+ 	kvm_pit_reset_reinject(pit);
+ }
+ 
+-static void pit_mask_notifer(struct kvm_irq_mask_notifier *kimn, bool mask)
++static void pit_mask_notifier(struct kvm_irq_mask_notifier *kimn, bool mask)
+ {
+ 	struct kvm_pit *pit = container_of(kimn, struct kvm_pit, mask_notifier);
+ 
+@@ -694,7 +694,7 @@ struct kvm_pit *kvm_create_pit(struct kvm *kvm, u32 flags)
+ 
+ 	pit_state->irq_ack_notifier.gsi = 0;
+ 	pit_state->irq_ack_notifier.irq_acked = kvm_pit_ack_irq;
+-	pit->mask_notifier.func = pit_mask_notifer;
++	pit->mask_notifier.func = pit_mask_notifier;
+ 
+ 	kvm_pit_reset(pit);
+ 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.50.0
+
 
