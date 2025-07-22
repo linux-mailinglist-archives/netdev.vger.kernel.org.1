@@ -1,114 +1,89 @@
-Return-Path: <netdev+bounces-209007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86FE5B0DFBA
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 16:59:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC31CB0DFC3
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 17:01:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC4F37B835E
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 14:57:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 09DFC7B827F
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 14:57:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A320A2E9EAF;
-	Tue, 22 Jul 2025 14:58:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48C952DEA7C;
+	Tue, 22 Jul 2025 14:59:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uapqRshc"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1mRleX5Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C12E2DFA46
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 14:58:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43C56239E9E;
+	Tue, 22 Jul 2025 14:59:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753196294; cv=none; b=Idl3lJ3XuQiNaLaTe0YXYQ6FG800BgUyrer4cPa2lo19xy8fX1nDRGFRqa9XxSLvlmBDfRpPd/itS5Yc2A9YhrbLTQODBjNdmBa0Pnlc4qsRT4MXJQZweCOtbyEGDNCSn5tSmusWXN/pKEAbp8QFirEa3b3upn/eD2Bj36M7w+A=
+	t=1753196360; cv=none; b=Wxv5sQeImTKOJt+Etse2A0eKZ9iNdvG7fez4pV4Tv7tPDjVGh/US4P/y+Ld5X8wxOE2PJeGN0/czdIuAGcP/GjAOpkzZoSlrJLx15DH97NTaY/L0qe48BOal1i2+KGhL18qu9iBJo8TW6BMql414dcXOwfJvmGshygyn3W2wW/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753196294; c=relaxed/simple;
-	bh=NB1BVYhS+7MybxuCFsZv3QiZHTdAuScy85Aimnn5Du0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gvdrdTd1ainjcAQ96WEWaamn5ScKstpybGfKTH7w+/mO/SXSt/9byo1/k0pFWnEq0dHq2HF9T5hy4MBC+S8efqqlAnGLNbfkyeVoBiLofaiTSpx4uKbbQhapJBt5uw0CqMpTCK2GkUpXhXaP/bHXMEIXcYaId+MfXMoDd4TILfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uapqRshc; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4abc0a296f5so48951661cf.0
-        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 07:58:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753196292; x=1753801092; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NB1BVYhS+7MybxuCFsZv3QiZHTdAuScy85Aimnn5Du0=;
-        b=uapqRshcyhtRKuXIKnEOy4fZ1kvKq7wWaYlB+W3sszOu1Tj35mf/6ocW2c6eKPC19f
-         MCxHRKUYjjuM9MEc4GyZbpEKKqn+lGKfXwYGvU3gVY+85S8xF6zoa9ay/47EmmBx8fEg
-         jbc4uc523PvnT1jpFmA+Plc46XzbL0JbcD2/KYZvD9FJbZnzvln1LlBnKmiKOG/jI9h3
-         n2ti/O+4Hy3S+x25Bim7DRGE1AnrQBUVaVoyO20VOd176i7Ta3aB9wTLKOn2/zFnmf1w
-         9RC9xocPFUIuFn8ur+3K8OT0IchYSE8gfku1DaS2UxsXz3HV8Nc4fkCC3pqAcSdWyoXo
-         v5yA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753196292; x=1753801092;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NB1BVYhS+7MybxuCFsZv3QiZHTdAuScy85Aimnn5Du0=;
-        b=xKzlvNvxVtQ6JOuhkUUy4aPmmjLg2c5bcI75TNZvAsW0QrlpyBJMdL47u9Od+Jc2jh
-         Lw+nGQk2WZaQ1nsgKeKNrEwHwCDOx/pDFENJlM4YfUPNuBAUyFCpGU6zHMurwKIM4fIx
-         jaxnvOEpvFQUpPiUjiNjwWVK4JeRS9u4ip5hw+xQbnebQliTbc/5Yo4n35UQ7Bn24oqO
-         KaYAURFtlicl8Zv9YJAm38xkROyG6Dy4YmDmFTeLbNAsodONKr4TQTN2eqTlzch73/tI
-         RzlerKTDUOYQtXWm+P15yO8n96MnM6vl8Eo0eAb0PloQgMQBNoyyOOddMeDG6COjbpHY
-         mJuA==
-X-Forwarded-Encrypted: i=1; AJvYcCUeMzg3yvyzjmJqHdkrqiMM8EcyApGMjJ4wDbBzUFq/TlSQB4y4QnwwOnUzkvyWaYXeSzlxMKg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkgfajhwIF7ex7WLSVJwN10cwAx3VXH6i+CONS57QHAG1RxBNv
-	oVtChpE3nFKFO6MuiaOJVozHzs05Z2m/B/7Vj6c4qUTvBmWJ7mSlLNsEfPDxJ19d3XX/BIZRzKQ
-	pBVQwd1cZCkibhKtNxzd+aSNlRRcsZSabHNJcb+Ft
-X-Gm-Gg: ASbGncvumerAt0+apILmIWDDhzBa9pwGp2tEdm8s47EfuMD06Wc2sQJu0B8by8fsjQX
-	CsHtDOwwetOYNEC/XSGEJ9noXXTWnJ1G1DBPDE8ehRFfGOGB/ID85g5c0AvfRL6uMdRacvbH54K
-	On5KZkJ7mAxfEjk+FeiQ5dexwonC/1zDAThbJlhY+714fZtbNrDbrlQQudQRiAfbvUY8yI1hmqI
-	BBpIw==
-X-Google-Smtp-Source: AGHT+IHbvsTmXoMJ90OlEJkh3KhkwboNSzW3FyySqD4AsNrmtWHLtCL62ueTgeIousB3XPBSsSCTtP6ho6CBB51apSk=
-X-Received: by 2002:a05:622a:1999:b0:4ab:4d30:564f with SMTP id
- d75a77b69052e-4ab93df21dcmr375890231cf.47.1753196291532; Tue, 22 Jul 2025
- 07:58:11 -0700 (PDT)
+	s=arc-20240116; t=1753196360; c=relaxed/simple;
+	bh=ou7A8dCtajtd2EqlFdUb122ILRZkFdkN1YbKnDqV3tA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W6XQ/7alryNKgmauJB0ixB7cZ+0CWxM0KE2El60rO8K5gFGUTcfkpq0kDQEZEHt+cxLFQYAH/o3MhwPZnaIPRAeAld9Ro+TF5IJvn4j/sJXtD48uyNYZox85pwhK4gP0EDf7w7KtBU5XZGxsFjoFq1t4gMAQgXmgQG6+DPzSPR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1mRleX5Q; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=qXqgH+7Pf8+YOQt42JO04/xiRlrY25OPKvo6NdI8jhU=; b=1mRleX5QRWQZbkWvtmnIFJ4XZ/
+	gt9P3d9AJKA4hTjBiS+wkEwXnqHsh0AyuXqXN5pxL//H5Kc/lNw4YAwfa9YRZyM/+xdH/LJ7lW6NA
+	1aZd7S4UKw4KmsczXyW6B9tGPHNu22aqewBOoN5Kv3lRdruVtQ5vYa01a2qn6a5mCAB0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ueERs-002Tkl-HD; Tue, 22 Jul 2025 16:58:32 +0200
+Date: Tue, 22 Jul 2025 16:58:32 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Yibo Dong <dong100@mucse.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
+	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
+	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, richardcochran@gmail.com,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 01/15] net: rnpgbe: Add build support for rnpgbe
+Message-ID: <53710a91-a4b1-4ce9-a9f7-b32a74dec3fc@lunn.ch>
+References: <20250721113238.18615-1-dong100@mucse.com>
+ <20250721113238.18615-2-dong100@mucse.com>
+ <552cb3f0-bf17-449b-b113-02202127e650@lunn.ch>
+ <146B634370ED44A0+20250722033841.GB96891@nic-Precision-5820-Tower>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250721203624.3807041-1-kuniyu@google.com> <20250721203624.3807041-10-kuniyu@google.com>
-In-Reply-To: <20250721203624.3807041-10-kuniyu@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 22 Jul 2025 07:58:00 -0700
-X-Gm-Features: Ac12FXyjA2hCizSwjNeIJfXQ3m0aOkPNJ6whPVh_v503OAB4UKe5n9M4BBBTIQU
-Message-ID: <CANn89iJckRO1b6_pdgq1dY+wE_6M1SBgzenR4wtggiykv9B3FQ@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 09/13] net-memcg: Pass struct sock to mem_cgroup_sk_under_memory_pressure().
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	Mat Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Andrew Morton <akpm@linux-foundation.org>, 
-	Simon Horman <horms@kernel.org>, Geliang Tang <geliang@kernel.org>, 
-	Muchun Song <muchun.song@linux.dev>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	mptcp@lists.linux.dev, cgroups@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <146B634370ED44A0+20250722033841.GB96891@nic-Precision-5820-Tower>
 
-On Mon, Jul 21, 2025 at 1:36=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.co=
-m> wrote:
->
-> We will store a flag in the lowest bit of sk->sk_memcg.
->
-> Then, we cannot pass the raw pointer to mem_cgroup_under_socket_pressure(=
-).
->
-> Let's pass struct sock to it and rename the function to match other
-> functions starting with mem_cgroup_sk_.
->
-> Note that the helper is moved to sock.h to use mem_cgroup_from_sk().
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> > > +#include <linux/types.h>
+> > > +#include <linux/module.h>
+> > > +#include <linux/pci.h>
+> > > +#include <linux/netdevice.h>
+> > > +#include <linux/string.h>
+> > > +#include <linux/etherdevice.h>
+> > 
+> > It is also reasonably normal to sort includes.
+> > 
+> 
+> Got it, I will also check all other files. But what rules should be
+> followed? General to specific?
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+All global imports first, and then local.
+
+    Andrew
 
