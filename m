@@ -1,226 +1,214 @@
-Return-Path: <netdev+bounces-209041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03936B0E172
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 18:15:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE37AB0E18A
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 18:19:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2805A3A47F6
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 16:15:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A84761C85EF1
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 16:19:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B0901E260D;
-	Tue, 22 Jul 2025 16:15:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59A462798FD;
+	Tue, 22 Jul 2025 16:18:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="A3Tb6X/J"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bxeVVGzE"
 X-Original-To: netdev@vger.kernel.org
-Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11020138.outbound.protection.outlook.com [52.101.56.138])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AF868836;
-	Tue, 22 Jul 2025 16:15:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.138
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753200950; cv=fail; b=EljTgvcAWRyHLFQO70/hsCEtPT3sGrcVHdrvAH57iEPFJGtD6kdovpgoCLLs0hMQBaGLELR22GwN73KV5PFHFdXhKSbZzVyr+kgegTqIy2WG6l6Z8/90Ys5lDs93lZahQ140v6Sy/OMcYABUuXlCWkhD27t8aLDnC3c3rlpNX8M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753200950; c=relaxed/simple;
-	bh=0+ETi6vsFbOYcp58XdvQ34lXRXRPlN+iZnzRTRfgldQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Iz8CQaWVOA0H9g+F8BecjLoFlCA9aWbjcbBZxaoevWBVdSaBgKqWT2oOhBe3HMRGU1TnNjQidNXW/GUFwdJTDQ3nkcnM73j3isApmNpMaYlx/XsJYuh52CSsUEEySDlCBU89iZWN70Er2hy4BX2Iwq2+F0uUq8Zoo+zI21GPgzM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=A3Tb6X/J; arc=fail smtp.client-ip=52.101.56.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mwIbK7KLpwBqFCmJ1Ym2t0z50OJOtab0I8ql4XBONOt+zz7O1j0E7olMuHWbOcY/8QrsfDyKAuQLlwA7DW/CZO/HeorE4CvqVLsY9/AbO3ZJ1x17VvfkXMgymiYyR3LI7offez5uakLqr7qonW4wbgdGoG9K/w+fvkm3e07p0Uz59UbA9srwEvBEdjsUcJbDZtxPrgJswmVJ3gQnEqSlTByCajetCkeowJLb/ySp0pF+vtHEhXs5ZMlN80Ya6kZLYxYfPiOE9qtDauVjlGZmpdTPNm0EkStcJwCWVwx1TkTCC9566ffV0ooQck2/szS/CgHnbSO/FDO3hJieCLlk7w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0+ETi6vsFbOYcp58XdvQ34lXRXRPlN+iZnzRTRfgldQ=;
- b=b/UEwyOlig90nP+9oOWenydy9Qi9XKoU+XGCYHJick+SQDF917ZWWm57lIgiP8GSrb5aq7gmF8WpsWsOZWItLlWb/QE1Se/oRwZMlxOKShH4FkhcsR9kplaXNpgIMWjlvr8M19lnbvddkIb4ibvaWJzxR0tE9V8AJ/rcy8pkTqpLZJPFRvNNui0WIXnc8M3teRnrIVWDCY7d/1GXZZk3hvVhv0nXC66/Z6XJF8hYOe97AX+YLyDhtC/LcHrC+N9hTgdckOtqWCA4Jjd261/8GlpHpA60lR3zF7m7J5eFet8EgCR6k4YGXitHScW8veBc8QjM9p/dWFnOpgXPOUqlwA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0+ETi6vsFbOYcp58XdvQ34lXRXRPlN+iZnzRTRfgldQ=;
- b=A3Tb6X/Js9kMMUCtYO5LyxRy4iO3BiWDWthvEVBqAgtcA/pHXhPU9YV1NT6xW0zXhGVaQQtLRfGR3y5GxB0ZJ4EerzsJZvgmoEFWeCcyndpyv1IW+W19l8eVUaC1RC/jbUFVYsIVcIdUt2BS9w9CEsHuqbaUJ0mh5P9C5sqT/XM=
-Received: from SJ2PR21MB4013.namprd21.prod.outlook.com (2603:10b6:a03:546::14)
- by SJ0PR21MB2055.namprd21.prod.outlook.com (2603:10b6:a03:399::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.18; Tue, 22 Jul
- 2025 16:15:43 +0000
-Received: from SJ2PR21MB4013.namprd21.prod.outlook.com
- ([fe80::3c6d:58dc:1516:f18]) by SJ2PR21MB4013.namprd21.prod.outlook.com
- ([fe80::3c6d:58dc:1516:f18%4]) with mapi id 15.20.8964.004; Tue, 22 Jul 2025
- 16:15:43 +0000
-From: Haiyang Zhang <haiyangz@microsoft.com>
-To: Eric Dumazet <edumazet@google.com>, Haiyang Zhang
-	<haiyangz@linux.microsoft.com>
-CC: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, KY Srinivasan
-	<kys@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>, "davem@davemloft.net"
-	<davem@davemloft.net>, "sdf@fomichev.me" <sdf@fomichev.me>,
-	"kuniyu@google.com" <kuniyu@google.com>, "ahmed.zaki@intel.com"
-	<ahmed.zaki@intel.com>, "aleksander.lobakin@intel.com"
-	<aleksander.lobakin@intel.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>, "#@linux.microsoft.com" <#@linux.microsoft.com>,
-	"5.4+@linux.microsoft.com" <5.4+@linux.microsoft.com>
-Subject: RE: [EXTERNAL] Re: [PATCH net] net: core: Fix the loop in
- default_device_exit_net()
-Thread-Topic: [EXTERNAL] Re: [PATCH net] net: core: Fix the loop in
- default_device_exit_net()
-Thread-Index: AQHb+CF8hOfRUrm9+kmaxTYS2+tsGbQ9ufGAgACc8aA=
-Date: Tue, 22 Jul 2025 16:15:43 +0000
-Message-ID:
- <SJ2PR21MB401368342203BE4EFF0C6494CA5CA@SJ2PR21MB4013.namprd21.prod.outlook.com>
-References: <1752870014-28909-1-git-send-email-haiyangz@linux.microsoft.com>
- <CANn89iJLnprFvLpRpJ7_br5EiyCF0xqcMM7seUVQNAfroc4Taw@mail.gmail.com>
-In-Reply-To:
- <CANn89iJLnprFvLpRpJ7_br5EiyCF0xqcMM7seUVQNAfroc4Taw@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=9c9f0666-7477-482a-a06a-d6235bc06977;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-07-22T16:13:34Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
- 3, 0, 1;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ2PR21MB4013:EE_|SJ0PR21MB2055:EE_
-x-ms-office365-filtering-correlation-id: 13d440a3-2671-4d3f-be32-08ddc93b0250
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|376014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?cnZYbTIrUDdOYzlkdEI5dXd6bmF2TUtMRG5ubzJoNGpBaUxLdFUvMkNGYjVP?=
- =?utf-8?B?VWxSUVBTTUlmcS9lTlpPQmFzVUtpK3ZFcmJaWmtla1JDYTAwcUNTNkpIR0xP?=
- =?utf-8?B?WEFrTFU1Rmx5Q3JiY1VjRzl1Nlh1Q3lHcVZWM01UTTNlLys1bUVxTDhsMnky?=
- =?utf-8?B?R1F5WmxKbmIrbEZ3aUltbjFlNG1YWGlsODVvRDVjN0FXaFZlWmlrZlBjWUF4?=
- =?utf-8?B?UXBCV3hnem9oRGJyS3BpdlQ3Qm1zcDE4cTNHelFRdGdhOXJBQVIvZ08xVjI2?=
- =?utf-8?B?QWdGOXdONVVaV2xWQ2N3SzBmeGViS0VHMTB0OUJUK2NXcVgxRkN2a1BQUGE4?=
- =?utf-8?B?K3VnMW9XVlhuRkpWQitONVpQbEFUSHRDWVpyQXNScFFyMWs0UWhSSnplU2tL?=
- =?utf-8?B?V3B5TVUxZzFCWjRFYmVRRXA0QS9tckkrNFM4MVQ3RzZBYVFKZENOYzhiaHBK?=
- =?utf-8?B?N0xHOHk3Z1Y1NVl1U01CQ1RzQTM1TnlIOWNaTHF6anVUd1NrT0c5RitQbi9v?=
- =?utf-8?B?a0h4RlJTeWxTSDdON041dXBmdXBrSTd3SXh0OTk3ckM4ZVZ3bURid1ovV0NR?=
- =?utf-8?B?b3p4Nzl1eWZIdUtIWUFqb05wMGVLQU5qaFdORUJSRzNCcWNyTktYVVB3NzVW?=
- =?utf-8?B?akR5R3psdndjU3JFT3hPTXVCbSsyUUZHM3FpUEhJWTRsMVBmS1RFaWcwbkZO?=
- =?utf-8?B?dXlDdjZERm52UFVyZ283ZXZ0elRTMjBRZG82VEw2a2pnNm9QeCs3OEYvV2cw?=
- =?utf-8?B?UHg3bWtnR2pLbitUMmFaZk5NcUppOGhFd3hBSlIwM1U1cERsSGlpa3FiZkEx?=
- =?utf-8?B?aWpxTXBYaFhGeVhtQ05qalFmbmgremFNM1F0cDlmR0dEUC9QcmsvVEs4akN6?=
- =?utf-8?B?UXVZeitKdXBOZnhIaHJMbWk5eGtENG9UamtlMmFMeFAxZ2QweHlsRk1RSFJp?=
- =?utf-8?B?b0NtZE05YWd2Tzk1NHZJc3hWTTd1U2MvYVFLdEtja3BiRlA0NUZIRFBqSGxa?=
- =?utf-8?B?bXpWdG5EbWd4OCtPYXdjUW1nM0laTnhZOVVCS3gyS3VMSW50WkJpVGtkZDNF?=
- =?utf-8?B?RDdaUHNuTjJWbngwaU9DOG85WndKeDdBeXR4YkFsTXFIL0ZHQnRKNmtrbjJH?=
- =?utf-8?B?YmMxUnYwb012SGw1c0k4ZVVlSXI5OXNFanJ0em5PVHpHTlFaS1NsUVhMck9U?=
- =?utf-8?B?SGhCZnNJNHZLVUVtaC9Za3VGTGRyZzZiM3AxaFRtdmQrNlZ2RTdleEg2ZXVj?=
- =?utf-8?B?TG4welJNcFpZUlZIK2V4TzdEYTRuYTljaFNoV3ErS0hDRjR0cXZrNTF3d3h4?=
- =?utf-8?B?Z3R2MUhDVU1Zdmp2WVZxZ0UxaGpTOFBWQkpReU43TGlPbzZtVlBBZUxucVNv?=
- =?utf-8?B?Rk9kOFpmcVVMendWdmk5eDZ6UFFwbm8rYXBwc1EyUkJSakFmWXVWV1l6R0J0?=
- =?utf-8?B?WUF3ZmhNNGl2UzZqNnFkN210bkw4c1l6THZZVGVmMW8vZEJ5Sm5WZTFVL3BQ?=
- =?utf-8?B?SGVzd0xOU2oxK0xXUm9aUGJTQng0c0V4eDlkMVlvejBKSnd0L2lEZm5wRVpz?=
- =?utf-8?B?MEZ4VXVvTUZXWktGeXBIdDhMVVdoTGw3NDFkU2FuV05WekpFWDRVUVUycXp0?=
- =?utf-8?B?MEZrOHpqN2U1aXc4amkzbnhFL2lac3liN2hWUGF4T1d3NVNVeGJ6MFJHSk52?=
- =?utf-8?B?M0JjNGV6cGEwY2VnaS9mUk02bTgvWDdYU3NtMWw4TEFwcnd5T2diVHI3SC9F?=
- =?utf-8?B?bkF3ODN0cnNtQnhHQlFnNWp2a3ZxRHMrSG40RjhYQUZ3dnZicWE4NU5iK0tY?=
- =?utf-8?B?MGFrVkJNb0dxd2o0UFRhL2duTDNDV0tidjVOa045alYwT0NaQVVQaS9GSzVi?=
- =?utf-8?B?WHhxb3pKZi9zS2UwdEJNZE1ldzhlRmIrQ1ZtVHN5Y1V0ODlFUXp1eGdtbUxo?=
- =?utf-8?B?RFI3RmlIWWRBYWcxTzVMZm1iYTNUNG9MOS81Q25INFNqQllENW52cVNqN2pJ?=
- =?utf-8?B?bWNtNDUzN09RPT0=?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR21MB4013.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?WTlLRWxYRjI5dE95aDROQzM0M1dDeHNnSFZBaVZzdkp6Y1BkTUJYSzUxUTBY?=
- =?utf-8?B?emk2RENNL0ZGVW4rREkxZEJFTkNVamdRZG1kMmRHTklLdWl0YzNJZWhnVFZB?=
- =?utf-8?B?U2ExSEYxUVRDRHNVM01PRE90S0lKMnNoemlxQTkzVjlQR2poVnF1RkcxNndz?=
- =?utf-8?B?TU5rWjQrZVUwVWdOcmdjdmlRa09hbVIvaHZvZ2hMTWlFUm1vWVp1K2VVSlhW?=
- =?utf-8?B?dmpOZkxKM1JFcWxFVkQ4a0xzK3hROHp2OWJzNmlrcFVSZmVNYS9HOHJJZnVQ?=
- =?utf-8?B?RkljTGZmWlp2djV6d2NQWTZ2NktNUUhGNE9BSnpQN2lHcjhjQXJORXRrL3FE?=
- =?utf-8?B?TDlhR2MvUXJOaE5pUUU1U0RvRXhITC9CaGlhRnZaeGRxQmxvVFFZRk5SODNX?=
- =?utf-8?B?dTR1empabU5qWUVLMWRmNzRTL1RoRHB3SENZb1NXRncxRlU2VDlEQVBZdDJI?=
- =?utf-8?B?Y2wzN2pJV1J5U0FwNmI2a05vSTdWZWthbENLK09GREdFV0cyTlltVFBjeWVF?=
- =?utf-8?B?WksxUG5BQm9rQ1NHcDZBQ0JXazRLMEU0ZDM1VzVweFJKS3h4OWk2T3BmT2d3?=
- =?utf-8?B?c2VlNGREaVUzaytNYkRFSDlNRFpaOEJqMURnNENSYXBqMTMvZXU0WmZISVM5?=
- =?utf-8?B?cHVLVUpEQzJMa3R0cUJiWEZqNjFuMG0ySjNsb2x4Y2xaZlo5cUdVQWdabWNF?=
- =?utf-8?B?eHRXbWVlSFBYODFpeUQxa253MkJYaTZweVdYaFNIemVBNTJkcDl0UGJ0YVJu?=
- =?utf-8?B?ekcxRkMyVkNUaFplaWZtb0xTMXFIQXZYOUE4WUdmUzJaZFE5Ri9lVmFPWkln?=
- =?utf-8?B?cDd6NEkvZXQxYkRHaHZ3NTd6enBNY3RkanQvT3luZHFlbU8xaDM1Y1dNUEJC?=
- =?utf-8?B?K04yWll5eTRoZ213R0tMLzRhcHkrdEt3aXMwRTVvYTQ1WVpHc09YVHowNk5w?=
- =?utf-8?B?M1FaSHhHekVicmZwV1NjR25PMHZSZDkzYzlKaHYzZDBjclArcWM4amgxSm5u?=
- =?utf-8?B?WjhJcmdNKy9LSDZxTUF6NzB1UU55UUc4MnFQK0tWejV3emxmSDdza3JUd3lw?=
- =?utf-8?B?b01VOWs1OXNDdzVVaHZJUTRGSFhXNmhRY1BDU1lINlg0anI2bS9STVV3M2Ir?=
- =?utf-8?B?Z0RHOGhFNGtYa0R1dE5xRTV4NmMvSjVzOEI4c1BsNXpqWC9mTVE4eUdrT3Yr?=
- =?utf-8?B?a2c3emJ5NlUrdTd4VXdkZ1gvZ0EvM2h2L0xndU03ZkxJejRNR0Y5ZTRSNVI5?=
- =?utf-8?B?VFJlcVhLUFJMVHE4SjZCakZRY251UlV6YXpJM0taaWVERE44UVFUaVVXQ0pL?=
- =?utf-8?B?elhaY2doUFczTjgxL0xYeVp2OWxXK1JlM2ltSnNGM1FXQ3UvL21NU2REL0xF?=
- =?utf-8?B?Qy94TVdQRW5RS0tLZGtaNHl5bVNZaC8wK05scUNtTlFXUjYzSjNuUURNZ3gz?=
- =?utf-8?B?TE9kWm9FbllDRE5tNFdldUpMYzByU2E2NzRyd3ZvbE1lZW1vL1dNSzAwQWxs?=
- =?utf-8?B?bjVPdExMc2lCYnZtQWNYNkY5dmdLTkw3djRTODgrMlhqaFJLUXNVR0pPQ0pB?=
- =?utf-8?B?SXR4Z1lPZlVHVTBZc0l5eHBUTWpxckIrbFZYOUVsSzAzc0RFV0IrTEdHUHhz?=
- =?utf-8?B?c1ErOGY3NWY4R0pFam1rOUpRQStKTm1DRDlFcnBGZ01ZQlZuMjBkRXpnTjI0?=
- =?utf-8?B?TW9CbUE2bCs0bjVGZDZmem5QK21xRE5XbHFWSnFkK1dFNEVLMVBFVURuVmNQ?=
- =?utf-8?B?RXRUSUtsSzhzaFE5QU5zRTArZDVDNkhOc1Y3MVYxMXVZWnd6bS9DQ2ZJNXE2?=
- =?utf-8?B?Y2xlb3A5OTl3QVNGYVhLVmlIRHRMRjN1NG0wM3R5UldFZzZUNnpjWjJqK2FX?=
- =?utf-8?B?TjNXdlZxaUZOcm1tVzdBQ2l0cTAyT00zTFdobzhUdHBJM2dJUDJFUWVhbldB?=
- =?utf-8?B?TnZyL1Z4SC91ZlBCYXVEWFhsbmZwM1doNEkvdllaOHBkNGxJWG8xNU51NWRC?=
- =?utf-8?B?SU5ic3hCY3NUbEFJOGtqSVlpYmdheUgyZUxTNEZEU2RGTzVVMDBISFhUbENU?=
- =?utf-8?B?YWQwOW1FYWxYNis3RER1K0IzRlVMT25IVkZoT1J5RHZNblRqS3FYbUg2ME1m?=
- =?utf-8?Q?c0jwRTPcXBOQHAmEB3vWoH8Me?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B1291DDA32;
+	Tue, 22 Jul 2025 16:18:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753201126; cv=none; b=QjuS7OToIgiWuN9nrAdvPTRAr10dUsAwifNcwU/VeOkmWDZXmR52ewMVQ86hd57v4ijBeZgnsX0fZjPMj+vam4PgIVKDyBl/KRZS/h+K1qy5EN/zovVtsPy+oONDXLa8oVSUdTpmOWoRkLQf6bQmqzL8IdavB+t6LrgrLWI1gxA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753201126; c=relaxed/simple;
+	bh=wC2QBmKD1GTiNhv+rPLf7dvvsC36d9AYwBdxKUY5G1w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Hzd67NuVQJj548yX2lmleTMWzrSFxvTfxAc+xA7oJO2t40azkxEM4rEPQEWhmZvCIgTpor6xOjNAspl/RsRVjRYEmPN1tJQSU8UOSvKetDX4xJ2UBPaBSIOC9vg56PJlDRblVZCPlR+Gly4APQpVQTsrjujnpSEpMRO3m3eEjpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bxeVVGzE; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56MG8o3f025065;
+	Tue, 22 Jul 2025 16:18:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=FrBUCus7BzHqtCvlsfkIewdsWUpoQYpZWe9EbvaOH
+	rM=; b=bxeVVGzEv2aQ8j1pNhoybAwQnp1prdoJ/fJambV7teSFyPlmC1dF3UdqJ
+	32iXxzGGWwMR4zfOm1e3diq9awmKSIeQR48WDllrri/EG0IOg1dmV9+O4z0fuaj5
+	R5WVRxq43LKltmHbxkSJeHRNKnkZ08MiBk/LlzbC11Ij6IJQLNfqUy68ZwwbfUKT
+	1AzIa0OtU64RL/yEcxt1Q5MunXLCKe/th9mSIx/dQDpfKMV1siMLKH+9NovZjIPE
+	wz5ZnMOgOHm5KH2Az0DJUdjV08IPLb5VAsyTr1G4a27Qb44saDx/wHePUFNav3UN
+	+4BjrP4R582mV9Ij6P7MWTLOmkHgQ==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4805ut7tu9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 22 Jul 2025 16:18:24 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 56MGBEms030471;
+	Tue, 22 Jul 2025 16:18:23 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4805ut7tu4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 22 Jul 2025 16:18:23 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56MEwLuU024972;
+	Tue, 22 Jul 2025 16:18:21 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 480nptku1v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 22 Jul 2025 16:18:21 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56MGIHEB34799924
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 22 Jul 2025 16:18:17 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 936672004D;
+	Tue, 22 Jul 2025 16:18:17 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 80F7E20043;
+	Tue, 22 Jul 2025 16:18:17 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 22 Jul 2025 16:18:17 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55271)
+	id 50AC3E03BC; Tue, 22 Jul 2025 18:18:17 +0200 (CEST)
+From: Alexandra Winter <wintera@linux.ibm.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Simon Horman <horms@kernel.org>, Halil Pasic <pasic@linux.ibm.com>,
+        Aliaksei Makarau <Aliaksei.Makarau@ibm.com>,
+        Mahanta Jambigi <mjambigi@linux.ibm.com>
+Subject: [PATCH net v2] s390/ism: fix concurrency management in ism_cmd()
+Date: Tue, 22 Jul 2025 18:18:17 +0200
+Message-ID: <20250722161817.1298473-1-wintera@linux.ibm.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ2PR21MB4013.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 13d440a3-2671-4d3f-be32-08ddc93b0250
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jul 2025 16:15:43.5074
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: dN3X8fS9E16/n140dw48zxXKabpLpUXRoIT+MnihBfHcueidsdKilt4okkSXJyBYE7mGexrw7MdPapQ5eHOG7Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR21MB2055
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzIyMDEzNSBTYWx0ZWRfX5Ydx/ykd9rnp
+ sXmuvN2jYY//1d1zmICdyCTGOFSd0DCyOLkeSOF8dzja4O82Ryor24/lqXdM29svW9bIeajp8px
+ goHkWKtC8P3xw9UfMLPX8TcOCM07wYEWqEtU+jYKhEprjHUuypnW5aI0Vcv4/MGgHE2MVS4a18u
+ fQGUFl7iS7wzHOR9lT5D8Htijyv4wazymRh2TRo55YrSfEw+C4OXGP3H6LyUtE/Rxutrvqt3bv8
+ B6yfnFE6/If3AxvxpX32TXgTkngOenPbFxtfvapuTHu64FApEKjUF29AzhPn0RsojQV5npK4ak6
+ 8y9HapPB76k6Hf8F3eBx9jWF/PlmmJ2xiXi4N7OZvp3vHQVD5bnssym70SYEuKJuuIN/KqL6Hpx
+ gR66Jj4An1/l2sKY8wYbhMUWf8BAgNC8eEbbYIl+yL9qjOoW4N6iXD3XqlPo395cjQxJb3T+
+X-Authority-Analysis: v=2.4 cv=Nd/m13D4 c=1 sm=1 tr=0 ts=687fb9d0 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=Wb1JkmetP80A:10 a=VnNF1IyMAAAA:8 a=qzj1OK7t_Lbxma-giU4A:9
+X-Proofpoint-ORIG-GUID: _j6Io_zSFu_arDUvDmqp8N3lbMkZYYCS
+X-Proofpoint-GUID: yY_nvzCCWQVugYrAVL_p68T5xZHZ9Smg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-22_02,2025-07-21_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 mlxscore=0 priorityscore=1501 bulkscore=0 clxscore=1015
+ mlxlogscore=999 malwarescore=0 lowpriorityscore=0 suspectscore=0 adultscore=0
+ impostorscore=0 phishscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507220135
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogRXJpYyBEdW1hemV0IDxl
-ZHVtYXpldEBnb29nbGUuY29tPg0KPiBTZW50OiBUdWVzZGF5LCBKdWx5IDIyLCAyMDI1IDI6NTIg
-QU0NCj4gVG86IEhhaXlhbmcgWmhhbmcgPGhhaXlhbmd6QGxpbnV4Lm1pY3Jvc29mdC5jb20+DQo+
-IENjOiBsaW51eC1oeXBlcnZAdmdlci5rZXJuZWwub3JnOyBuZXRkZXZAdmdlci5rZXJuZWwub3Jn
-OyBIYWl5YW5nIFpoYW5nDQo+IDxoYWl5YW5nekBtaWNyb3NvZnQuY29tPjsgS1kgU3Jpbml2YXNh
-biA8a3lzQG1pY3Jvc29mdC5jb20+Ow0KPiB3ZWkubGl1QGtlcm5lbC5vcmc7IGt1YmFAa2VybmVs
-Lm9yZzsgcGFiZW5pQHJlZGhhdC5jb207IGhvcm1zQGtlcm5lbC5vcmc7DQo+IGRhdmVtQGRhdmVt
-bG9mdC5uZXQ7IHNkZkBmb21pY2hldi5tZTsga3VuaXl1QGdvb2dsZS5jb207DQo+IGFobWVkLnph
-a2lAaW50ZWwuY29tOyBhbGVrc2FuZGVyLmxvYmFraW5AaW50ZWwuY29tOyBsaW51eC0NCj4ga2Vy
-bmVsQHZnZXIua2VybmVsLm9yZzsgc3RhYmxlQHZnZXIua2VybmVsLm9yZzsgI0BsaW51eC5taWNy
-b3NvZnQuY29tOw0KPiA1LjQrQGxpbnV4Lm1pY3Jvc29mdC5jb20NCj4gU3ViamVjdDogW0VYVEVS
-TkFMXSBSZTogW1BBVENIIG5ldF0gbmV0OiBjb3JlOiBGaXggdGhlIGxvb3AgaW4NCj4gZGVmYXVs
-dF9kZXZpY2VfZXhpdF9uZXQoKQ0KPiANCj4gT24gRnJpLCBKdWwgMTgsIDIwMjUgYXQgMToyMeKA
-r1BNIEhhaXlhbmcgWmhhbmcNCj4gPGhhaXlhbmd6QGxpbnV4Lm1pY3Jvc29mdC5jb20+IHdyb3Rl
-Og0KPiA+DQo+ID4gRnJvbTogSGFpeWFuZyBaaGFuZyA8aGFpeWFuZ3pAbWljcm9zb2Z0LmNvbT4N
-Cj4gPg0KPiA+IFRoZSBsb29wIGluIGRlZmF1bHRfZGV2aWNlX2V4aXRfbmV0KCkgd29uJ3QgYmUg
-YWJsZSB0byBwcm9wZXJseSBkZXRlY3QNCj4gdGhlDQo+ID4gaGVhZCB0aGVuIHN0b3AsIGFuZCB3
-aWxsIGhpdCBOVUxMIHBvaW50ZXIsIHdoZW4gYSBkcml2ZXIsIGxpa2UNCj4gaHZfbmV0dnNjLA0K
-PiA+IGF1dG9tYXRpY2FsbHkgbW92ZXMgdGhlIHNsYXZlIGRldmljZSB0b2dldGhlciB3aXRoIHRo
-ZSBtYXN0ZXIgZGV2aWNlLg0KPiA+DQo+ID4gVG8gZml4IHRoaXMsIGFkZCBhIGhlbHBlciBmdW5j
-dGlvbiB0byByZXR1cm4gdGhlIGZpcnN0IG1pZ3JhdGFibGUgbmV0ZGV2DQo+ID4gY29ycmVjdGx5
-LCBubyBtYXR0ZXIgb25lIG9yIHR3byBkZXZpY2VzIHdlcmUgcmVtb3ZlZCBmcm9tIHRoaXMgbmV0
-J3MNCj4gbGlzdA0KPiA+IGluIHRoZSBsYXN0IGl0ZXJhdGlvbi4NCj4gPg0KPiA+IENjOiBzdGFi
-bGVAdmdlci5rZXJuZWwub3JnICMgNS40Kw0KPiANCj4gV2UgKG5ldHdvcmsgbWFpbnRhaW5lcnMp
-IHByZWZlciBhIEZpeGVzOiB0YWcsIHNvIHRoYXQgd2UgY2FuIGxvb2sgYXQNCj4gdGhlIGJsYW1l
-ZCBwYXRjaCwgcmF0aGVyIHRoYW4gdHJ1c3RpbmcgeW91ciAnNS40JyBoaW50Lg0KPiANCj4gV2l0
-aG91dCBhIEZpeGVzIHRhZywgeW91IGFyZSBmb3JjaW5nIGVhY2ggcmV2aWV3ZXIgdG8gZG8gdGhl
-DQo+IGFyY2hlb2xvZ3kgd29yaywgYW5kIHBvc3NpYmx5IGNvbXBsZXRlbHkgbWlzcyB5b3VyIHBv
-aW50Lg0KDQpUaGFua3MuIEkgd2lsbCBoYXZlIHRoZSBGaXhlcyB0YWcgaW4gdGhlIG5ldyBwYXRj
-aC4NCg0KLSBIYWl5YW5nDQo=
+From: Halil Pasic <pasic@linux.ibm.com>
+
+The s390x ISM device data sheet clearly states that only one
+request-response sequence is allowable per ISM function at any point in
+time.  Unfortunately as of today the s390/ism driver in Linux does not
+honor that requirement. This patch aims to rectify that.
+
+This problem was discovered based on Aliaksei's bug report which states
+that for certain workloads the ISM functions end up entering error state
+(with PEC 2 as seen from the logs) after a while and as a consequence
+connections handled by the respective function break, and for future
+connection requests the ISM device is not considered -- given it is in a
+dysfunctional state. During further debugging PEC 3A was observed as
+well.
+
+A kernel message like
+[ 1211.244319] zpci: 061a:00:00.0: Event 0x2 reports an error for PCI function 0x61a
+is a reliable indicator of the stated function entering error state
+with PEC 2. Let me also point out that a kernel message like
+[ 1211.244325] zpci: 061a:00:00.0: The ism driver bound to the device does not support error recovery
+is a reliable indicator that the ISM function won't be auto-recovered
+because the ISM driver currently lacks support for it.
+
+On a technical level, without this synchronization, commands (inputs to
+the FW) may be partially or fully overwritten (corrupted) by another CPU
+trying to issue commands on the same function. There is hard evidence that
+this can lead to DMB token values being used as DMB IOVAs, leading to
+PEC 2 PCI events indicating invalid DMA. But this is only one of the
+failure modes imaginable. In theory even completely losing one command
+and executing another one twice and then trying to interpret the outputs
+as if the command we intended to execute was actually executed and not
+the other one is also possible.  Frankly, I don't feel confident about
+providing an exhaustive list of possible consequences.
+
+Fixes: 684b89bc39ce ("s390/ism: add device driver for internal shared memory")
+Reported-by: Aliaksei Makarau <Aliaksei.Makarau@ibm.com>
+Tested-by: Mahanta Jambigi <mjambigi@linux.ibm.com>
+Tested-by: Aliaksei Makarau <Aliaksei.Makarau@ibm.com>
+Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
+Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
+---
+ drivers/s390/net/ism_drv.c | 3 +++
+ include/linux/ism.h        | 1 +
+ 2 files changed, 4 insertions(+)
+
+diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
+index b7f15f303ea2..967dc4f9eea8 100644
+--- a/drivers/s390/net/ism_drv.c
++++ b/drivers/s390/net/ism_drv.c
+@@ -130,6 +130,7 @@ static int ism_cmd(struct ism_dev *ism, void *cmd)
+ 	struct ism_req_hdr *req = cmd;
+ 	struct ism_resp_hdr *resp = cmd;
+ 
++	spin_lock(&ism->cmd_lock);
+ 	__ism_write_cmd(ism, req + 1, sizeof(*req), req->len - sizeof(*req));
+ 	__ism_write_cmd(ism, req, 0, sizeof(*req));
+ 
+@@ -143,6 +144,7 @@ static int ism_cmd(struct ism_dev *ism, void *cmd)
+ 	}
+ 	__ism_read_cmd(ism, resp + 1, sizeof(*resp), resp->len - sizeof(*resp));
+ out:
++	spin_unlock(&ism->cmd_lock);
+ 	return resp->ret;
+ }
+ 
+@@ -606,6 +608,7 @@ static int ism_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 		return -ENOMEM;
+ 
+ 	spin_lock_init(&ism->lock);
++	spin_lock_init(&ism->cmd_lock);
+ 	dev_set_drvdata(&pdev->dev, ism);
+ 	ism->pdev = pdev;
+ 	ism->dev.parent = &pdev->dev;
+diff --git a/include/linux/ism.h b/include/linux/ism.h
+index 5428edd90982..8358b4cd7ba6 100644
+--- a/include/linux/ism.h
++++ b/include/linux/ism.h
+@@ -28,6 +28,7 @@ struct ism_dmb {
+ 
+ struct ism_dev {
+ 	spinlock_t lock; /* protects the ism device */
++	spinlock_t cmd_lock; /* serializes cmds */
+ 	struct list_head list;
+ 	struct pci_dev *pdev;
+ 
+-- 
+2.48.1
+
 
