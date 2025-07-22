@@ -1,268 +1,150 @@
-Return-Path: <netdev+bounces-208758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61715B0CF4E
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 03:49:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4AD4B0CF84
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 04:05:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8442C173C77
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 01:49:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD0083A685E
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 02:04:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1006D1DF247;
-	Tue, 22 Jul 2025 01:49:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5B5F1DB377;
+	Tue, 22 Jul 2025 02:04:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sjmbqdhE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DE2Xj4zX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1431DEFE7;
-	Tue, 22 Jul 2025 01:49:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AFA919AD8C
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 02:04:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753148977; cv=none; b=nxFb73Hdx6rsnEYd0Meaa4MrHs3+bmMBKmTZ/6JerJukI9gpE4pwiMWAyBdXSrId3+MCqWvIKgguUsCEbXqCPnJJIWnCXopgW8KhCvfufe0CUA59nPJBDczhmnh/AoG/euwvKCbySJGZqEWm/E89+5wHvaVQFlYLIEEXEk+K31Y=
+	t=1753149898; cv=none; b=geKM/OBcWSZ7IoBUstHxaOQrGgAobkIQl7AneaxrX6bLkzeif4keOsg/Kdl3RN7PUjqZw1hM/fB4Zd7Ck/gVO3JY/somPpVB3Ff9L8ReRTz1VKtIGPPW3URGMxiK74xtUSez2jTU9lC5QkzbBbtWFWRT03eKy6kJ9uOMvVo9KjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753148977; c=relaxed/simple;
-	bh=gZrr2/TXUrDgtGvyBBgOtJ1IlIj07JowaDCMipkaHVY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cgncyhqUsG8TtSYECknnLFWm5HU180IGupEubOZtcv1sOpOzO+wk6GQ5+ZejOMjZWQEYPduHzSv0Ni4InUabWrP1XRyWXVEBAkAXrvn9uznlMvj6FtTGH0p7i8CnoTGCfYa/d6TSF4hIhBKMof2kHSaNpf7xZZNTBwwqiT9RI3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sjmbqdhE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D54DCC4CEF6;
-	Tue, 22 Jul 2025 01:49:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753148974;
-	bh=gZrr2/TXUrDgtGvyBBgOtJ1IlIj07JowaDCMipkaHVY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sjmbqdhEwwRj5eH5FT3iuDMkr+z2BYJqyRwHJc+lI3BzwPsWuPSs9t8g57/A0Rrbl
-	 /XOr7aVFq7rcE8AyqoW2+LZYRLWUl72ww9O4/JjxzJVG2J6ogTdtuZZB8+5+yHyL9N
-	 yt3LOMhzR/4KvQljj64qKWERwrIcIw7oSmDQcjcrrXrw3o9Gbo64ykmnOETjr4i0tq
-	 vQOS0+L3wJ3ej7c+ppWCc0aSx9LALr9Cq5oLeYYAoq1sIIyCpiTAm18LB0J9WSpfa5
-	 o1XHdfyFfmijCVZEHVwJZe4GX26YBIKR/uYiixubXJIkk61T+Wl699GEzZY9D9fLJ8
-	 dQ/QA1RSepEzg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	donald.hunter@gmail.com,
-	michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com,
-	gal@nvidia.com,
-	andrew@lunn.ch,
-	willemdebruijn.kernel@gmail.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	sdf@fomichev.me,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next v2 4/4] selftests: drv-net: add test for RSS on flow label
-Date: Mon, 21 Jul 2025 18:49:15 -0700
-Message-ID: <20250722014915.3365370-5-kuba@kernel.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250722014915.3365370-1-kuba@kernel.org>
-References: <20250722014915.3365370-1-kuba@kernel.org>
+	s=arc-20240116; t=1753149898; c=relaxed/simple;
+	bh=bIjUT1U7Vz8QnmyjIn9UODVHrfNoZzjGGz0TU5LVdwI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lagg/JyxC2dO4Hvpikot1V5245DOKhdGh7K7KxbBRNg1GJbicGIWaXO9nr/FGefsF/hE8OGmMPTzv05ssRGDs4ZMyesMIHQc7JanUMROCvlvD5T4n4a5Lk7icg6Ew9ngNoOfvNA7Ep8dYNjWzG/jSB2FawcMak3iAiQIyZaqu2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DE2Xj4zX; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753149892;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bIjUT1U7Vz8QnmyjIn9UODVHrfNoZzjGGz0TU5LVdwI=;
+	b=DE2Xj4zXcB91WkWZT5HCDpd2rlu2XxR9bghiEQTv3r6+dBEl4xFCahu6gJmI+rjLu2XIth
+	toAJRujfMwHdEQbI98opcCaE5NymkqnMvgF6KKU8BvshqCBmBjuOSSebfxmQJWDl2yL89A
+	g8hqI+SzkwhjxrzdBzTlqasKnaefw9o=
+Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com
+ [209.85.217.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-602-X3rqEkW6MZOpsC2VrvJNCA-1; Mon, 21 Jul 2025 22:04:51 -0400
+X-MC-Unique: X3rqEkW6MZOpsC2VrvJNCA-1
+X-Mimecast-MFC-AGG-ID: X3rqEkW6MZOpsC2VrvJNCA_1753149890
+Received: by mail-vs1-f70.google.com with SMTP id ada2fe7eead31-4e8161d0400so220446137.2
+        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 19:04:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753149890; x=1753754690;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bIjUT1U7Vz8QnmyjIn9UODVHrfNoZzjGGz0TU5LVdwI=;
+        b=RorV9158SfQVu14w2ODwtS6aA86BZC8yikprEcLfyTQxQoESDL3zaJDd31aIRcLobb
+         ta1MzW7AJ6LjmQYB1EYJBkiPZ81ysBcp0tVkc+nmItEeiuzmnB46o7jGBKOu+yOryH2i
+         SjSRV0oAH5B7YHCIqhzh8Wu6h/l7mt+f2c5InLTIxtYBjhu4RqlRbUFeSbZnw/PbeirA
+         JgGuHenT7l+seSuyheLJglQbNUkCUIYeCaJi/Y9/fPzmc13VEKubHdoJxRuVtcTWR6+b
+         EKt+Izyr8YgMgQlbFVgoWgEVU6vD0VoRweManxWgBW+uRqN0B2iwJ+QNOC3/xQHJnnhC
+         WKHg==
+X-Forwarded-Encrypted: i=1; AJvYcCXZ2kddeedrXcv8jZTIMMWCy9OJdonFAbFLUpLkt9hG3ZI+20zPaH9RaVcNVH5CSgM22JIWTeA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGDwYKZnpbse7c4DqGChAl9GzxGa7RNc+Knlqaogy6e/tbP0wf
+	p8QVbxwHHIYOt6zdb0+KlA7hKDkVkfDastaa9qX/6DXUD0RTG0A3SRm8f85GvD6VjyW5EkqFVHs
+	/65jx7GaOBCS1e9JTdCGmeUkAFddJvKmmNhrA9XCaB68SfjQxkuVmSuVBGKU6LQPth3E1OjFHm7
+	JwpijsLN59pSSWEQE34y+rbWNABHgOo9XR
+X-Gm-Gg: ASbGnctjBzofmi+4bDVduCvoHIkD1GqXO/JyvXOZGLU8xWwT28zVUQjvhHFeujUvFXB
+	hXqGxcFGIEuObTRB9/VeIdks5PRVCdAcPUeVJu5nfZMcwd3CFZKL2m7p4F4NoWWiLIKgc42D+lX
+	eIvwPRl4PW8mgzXTukClGQbw==
+X-Received: by 2002:a05:6102:ccb:b0:4dd:b82d:e0de with SMTP id ada2fe7eead31-4f9ab36d3d8mr6612154137.17.1753149890418;
+        Mon, 21 Jul 2025 19:04:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEzkyjLEZd6sf+Ej+AUlulyAL0R4JIzoMwrGqi8s+KIvdvWhpHy011avGsCSL6qTpWhViHyY43qbrYraDMw+QU=
+X-Received: by 2002:a05:6102:ccb:b0:4dd:b82d:e0de with SMTP id
+ ada2fe7eead31-4f9ab36d3d8mr6612124137.17.1753149889948; Mon, 21 Jul 2025
+ 19:04:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250718061812.238412-1-lulu@redhat.com> <20250721162834.484d352a@kernel.org>
+ <CACGkMEtqhjTjdxPc=eqMxPNKFsKKA+5YP+uqWtonm=onm0gCrg@mail.gmail.com> <20250721181807.752af6a4@kernel.org>
+In-Reply-To: <20250721181807.752af6a4@kernel.org>
+From: Cindy Lu <lulu@redhat.com>
+Date: Tue, 22 Jul 2025 10:04:10 +0800
+X-Gm-Features: Ac12FXwbctLUtOGy2Wpgo513rvoL7lTRBVB3h49HlisYxpbYr28YuZNNY6OZJsc
+Message-ID: <CACLfguXG7Mpsp=z4zCE7H4CMA_s9qV86SkeL7Q=WxChXcFpNfA@mail.gmail.com>
+Subject: Re: [PATCH RESEND] netvsc: transfer lower device max tso size
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jason Wang <jasowang@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+	Dexuan Cui <decui@microsoft.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Michael Kelley <mhklinux@outlook.com>, Shradha Gupta <shradhagupta@linux.microsoft.com>, 
+	Kees Cook <kees@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Alexander Lobakin <aleksander.lobakin@intel.com>, Guillaume Nault <gnault@redhat.com>, 
+	Joe Damato <jdamato@fastly.com>, Ahmed Zaki <ahmed.zaki@intel.com>, 
+	"open list:Hyper-V/Azure CORE AND DRIVERS" <linux-hyperv@vger.kernel.org>, 
+	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add a simple test for checking that RSS on flow label works,
-and that its rejected for IPv4 flows.
+On Tue, Jul 22, 2025 at 9:18=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Tue, 22 Jul 2025 09:04:20 +0800 Jason Wang wrote:
+> > On Tue, Jul 22, 2025 at 7:28=E2=80=AFAM Jakub Kicinski <kuba@kernel.org=
+> wrote:
+> > > On Fri, 18 Jul 2025 14:17:55 +0800 Cindy Lu wrote:
+> > > > Subject: [PATCH RESEND] netvsc: transfer lower device max tso size
+> > >
+> > > You say RESEND but I don't see a link to previous posting anywhere.
+>
+> Someone should respond to this part, please.
+>
+Hi Jakub,
+sorry for the confusion. I previously sent this mail
+(https://lore.kernel.org/all/20250718060615.237986-1-lulu@redhat.com/)
+to the wrong mailing list, so I'm resended it here.
+I've also submitted a v2 of this patch:
+https://lore.kernel.org/all/20250718082909.243488-1-lulu@redhat.com/
+Sorry again for the mix-up.
+thanks
 
- # ./tools/testing/selftests/drivers/net/hw/rss_flow_label.py
- TAP version 13
- 1..2
- ok 1 rss_flow_label.test_rss_flow_label
- ok 2 rss_flow_label.test_rss_flow_label_6only
- # Totals: pass:2 fail:0 xfail:0 xpass:0 skip:0 error:0
+cindy
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: shuah@kernel.org
-CC: sdf@fomichev.me
-CC: linux-kselftest@vger.kernel.org
----
- .../testing/selftests/drivers/net/hw/Makefile |   1 +
- .../drivers/net/hw/rss_flow_label.py          | 151 ++++++++++++++++++
- 2 files changed, 152 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/hw/rss_flow_label.py
-
-diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-index fdc97355588c..5159fd34cb33 100644
---- a/tools/testing/selftests/drivers/net/hw/Makefile
-+++ b/tools/testing/selftests/drivers/net/hw/Makefile
-@@ -18,6 +18,7 @@ TEST_PROGS = \
- 	pp_alloc_fail.py \
- 	rss_api.py \
- 	rss_ctx.py \
-+	rss_flow_label.py \
- 	rss_input_xfrm.py \
- 	tso.py \
- 	xsk_reconfig.py \
-diff --git a/tools/testing/selftests/drivers/net/hw/rss_flow_label.py b/tools/testing/selftests/drivers/net/hw/rss_flow_label.py
-new file mode 100755
-index 000000000000..e471e13160ae
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/rss_flow_label.py
-@@ -0,0 +1,151 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+"""
-+Tests for RSS hashing on IPv6 Flow Label.
-+"""
-+
-+import glob
-+import socket
-+from lib.py import CmdExitFailure
-+from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_ge, ksft_in, \
-+    ksft_not_in, ksft_raises, KsftSkipEx
-+from lib.py import bkg, cmd, defer, fd_read_timeout, rand_port
-+from lib.py import NetDrvEpEnv
-+
-+
-+def _ethtool_get_cfg(cfg, fl_type):
-+    descr = cmd(f"ethtool -n {cfg.ifname} rx-flow-hash {fl_type}").stdout
-+
-+    converter = {
-+        "IP SA": "s",
-+        "IP DA": "d",
-+        "L3 proto": "t",
-+        "L4 bytes 0 & 1 [TCP/UDP src port]": "f",
-+        "L4 bytes 2 & 3 [TCP/UDP dst port]": "n",
-+        "IPv6 Flow Label": "l",
-+    }
-+
-+    ret = ""
-+    for line in descr.split("\n")[1:-2]:
-+        # if this raises we probably need to add more keys to converter above
-+        ret += converter[line]
-+    return ret
-+
-+
-+def _traffic(cfg, one_sock, one_cpu):
-+    local_port  = rand_port(socket.SOCK_DGRAM)
-+    remote_port = rand_port(socket.SOCK_DGRAM)
-+
-+    sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
-+    sock.bind(("", local_port))
-+    sock.connect((cfg.remote_addr_v["6"], 0))
-+    if one_sock:
-+        send = f"exec 5<>/dev/udp/{cfg.addr_v['6']}/{local_port}; " \
-+                "for i in `seq 20`; do echo a >&5; sleep 0.02; done; exec 5>&-"
-+    else:
-+        send = "for i in `seq 20`; do echo a | socat -t0.02 - UDP6:" \
-+              f"[{cfg.addr_v['6']}]:{local_port},sourceport={remote_port}; done"
-+
-+    cpus = set()
-+    with bkg(send, shell=True, host=cfg.remote, exit_wait=True):
-+        for _ in range(20):
-+            fd_read_timeout(sock.fileno(), 1)
-+            cpu = sock.getsockopt(socket.SOL_SOCKET, socket.SO_INCOMING_CPU)
-+            cpus.add(cpu)
-+
-+    if one_cpu:
-+        ksft_eq(len(cpus), 1,
-+                f"{one_sock=} - expected one CPU, got traffic on: {cpus=}")
-+    else:
-+        ksft_ge(len(cpus), 2,
-+                f"{one_sock=} - expected many CPUs, got traffic on: {cpus=}")
-+
-+
-+def test_rss_flow_label(cfg):
-+    """
-+    Test hashing on IPv6 flow label. Send traffic over a single socket
-+    and over multiple sockets. Depend on the remote having auto-label
-+    enabled so that it randomizes the label per socket.
-+    """
-+
-+    cfg.require_ipver("6")
-+    cfg.require_cmd("socat", remote=True)
-+    if not hasattr(socket, "SO_INCOMING_CPU"):
-+        raise KsftSkipEx("socket.SO_INCOMING_CPU was added in Python 3.11")
-+
-+    # 1 is the default, if someone changed it we probably shouldn"t mess with it
-+    af = cmd("cat /proc/sys/net/ipv6/auto_flowlabels", host=cfg.remote).stdout
-+    if af.strip() != "1":
-+        raise KsftSkipEx("Remote does not have auto_flowlabels enabled")
-+
-+    qcnt = len(glob.glob(f"/sys/class/net/{cfg.ifname}/queues/rx-*"))
-+    if qcnt < 2:
-+        raise KsftSkipEx(f"Local has only {qcnt} queues")
-+
-+    # Enable flow label hashing for UDP6
-+    initial = _ethtool_get_cfg(cfg, "udp6")
-+    no_lbl = initial.replace("l", "")
-+    if "l" not in initial:
-+        try:
-+            cmd(f"ethtool -N {cfg.ifname} rx-flow-hash udp6 l{no_lbl}")
-+        except CmdExitFailure as exc:
-+            raise KsftSkipEx("Device doesn't support Flow Label for UDP6") from exc
-+
-+        defer(cmd, f"ethtool -N {cfg.ifname} rx-flow-hash udp6 {initial}")
-+
-+    _traffic(cfg, one_sock=True, one_cpu=True)
-+    _traffic(cfg, one_sock=False, one_cpu=False)
-+
-+    # Disable it, we should see no hashing (reset was already defer()ed)
-+    cmd(f"ethtool -N {cfg.ifname} rx-flow-hash udp6 {no_lbl}")
-+
-+    _traffic(cfg, one_sock=False, one_cpu=True)
-+
-+
-+def _check_v4_flow_types(cfg):
-+    for fl_type in ["tcp4", "udp4", "ah4", "esp4", "sctp4"]:
-+        try:
-+            cur = cmd(f"ethtool -n {cfg.ifname} rx-flow-hash {fl_type}").stdout
-+            ksft_not_in("Flow Label", cur,
-+                        comment=f"{fl_type=} has Flow Label:" + cur)
-+        except CmdExitFailure:
-+            # Probably does not support this flow type
-+            pass
-+
-+
-+def test_rss_flow_label_6only(cfg):
-+    """
-+    Test interactions with IPv4 flow types. It should not be possible to set
-+    IPv6 Flow Label hashing for an IPv4 flow type. The Flow Label should also
-+    not appear in the IPv4 "current config".
-+    """
-+
-+    with ksft_raises(CmdExitFailure) as cm:
-+        cmd(f"ethtool -N {cfg.ifname} rx-flow-hash tcp4 sdfnl")
-+    ksft_in("Invalid argument", cm.exception.cmd.stderr)
-+
-+    _check_v4_flow_types(cfg)
-+
-+    # Try to enable Flow Labels and check again, in case it leaks thru
-+    initial = _ethtool_get_cfg(cfg, "udp6")
-+    changed = initial.replace("l", "") if "l" in initial else initial + "l"
-+
-+    cmd(f"ethtool -N {cfg.ifname} rx-flow-hash udp6 {changed}")
-+    restore = defer(cmd, f"ethtool -N {cfg.ifname} rx-flow-hash udp6 {initial}")
-+
-+    _check_v4_flow_types(cfg)
-+    restore.exec()
-+    _check_v4_flow_types(cfg)
-+
-+
-+def main() -> None:
-+    with NetDrvEpEnv(__file__, nsim_test=False) as cfg:
-+        ksft_run([test_rss_flow_label,
-+                  test_rss_flow_label_6only],
-+                 args=(cfg, ))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
--- 
-2.50.1
+> > > I'd rather we didn't extend the magic behavior of hyperv/netvsc any
+> > > further.
+> >
+> > Are you referring to the netdev coupling model of the VF acceleration?
+>
+> Yes, it tries to apply whole bunch of policy automatically in
+> the kernel.
+>
+> > > We have enough problems with it.
+> >
+> > But this fixes a real problem, otherwise nested VM performance will be
+> > broken due to the GSO software segmentation.
+>
+> Perhaps, possibly, a migration plan can be devised, away from the
+> netvsc model, so we don't have to deal with nuggets of joy like:
+> https://lore.kernel.org/all/1752870014-28909-1-git-send-email-haiyangz@li=
+nux.microsoft.com/
+>
 
 
