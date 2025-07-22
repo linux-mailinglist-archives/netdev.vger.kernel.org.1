@@ -1,120 +1,116 @@
-Return-Path: <netdev+bounces-208789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E71C4B0D21D
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 08:52:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CEE28B0D216
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 08:52:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D7B23B33AB
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 06:52:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FA283ACF80
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 06:51:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12812289825;
-	Tue, 22 Jul 2025 06:52:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 307B628937F;
+	Tue, 22 Jul 2025 06:52:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="KTob0Jx2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="enbUI7IS"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A19228937F;
-	Tue, 22 Jul 2025 06:52:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88949289E15
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 06:52:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753167134; cv=none; b=LamgCWHVx48Oha7XlA9mp44eczMq5/tOm9o4JFKOPjEFQJzeH5pPPeUwU8CEwDHl0TPPjteRa8SAL1R4gHQbAgx1JrSnIOIrLR67l1xPiKC3lPtrOC50mQHjYrkCq8krfmRP1Q/LNE4uoeQWA50GIlSQSKxES4n12dMESZTRyGQ=
+	t=1753167126; cv=none; b=kKDnq/TnTKEZIyFLkYL7EMh0YOvz52ivGQ4surEyO0P0nkjcIkRGUl5IeKPNptKMisVR4kLIE5ihgXIPOTbZcdhK1kUwmIrDMFXGxoHEJkx9j9/JRsaqIfeyx149zvtsuNhPBLiIwr3DQE6Dp4SCy6LTDsEkaYt0cZU/oW2n9BM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753167134; c=relaxed/simple;
-	bh=0IuwptWdpym6clpItyDXKXWMQcO684yPDmzDWcQI0cI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=eZJ2RoWHmJlCf/lIVYNgUbJQb//zoGJcM/WBAVwgPiSxAHHwJWwdPm9zazOOiZ9yC832HPYW12Q/Ej//nyNKuC0gB8YrKWLaDjnbLYKy1GrKrGAu7LvAGuZ/6dmTj6uNkkuw/FWoRPUjvnNIuwtx4u1PpMT4qnyl+gMTEC482JQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=KTob0Jx2; arc=none smtp.client-ip=117.135.210.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=0T
-	pDUQ830hMTN/h2gtHBh5uvsH0UJwbSz9gBHzv+if8=; b=KTob0Jx2rWa2PhTG+y
-	UzzOqC0GQO0YleaVQDOgHbRsvj264bCJPGOKlWysztPiKABia5hemYJiebrtGB3r
-	MMV+rMA7RROsXd3ia1UfZRYzVwQbACpaR/OtwOYMjgm15HEJOcHMD0e3rF/ep6pb
-	fmtWI8Y6d5UBTyOkQ6gt/9ncs=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wD3oJ__NH9oTxLlGQ--.37444S2;
-	Tue, 22 Jul 2025 14:51:44 +0800 (CST)
-From: yicongsrfy@163.com
-To: greg@kroah.com
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	oneukum@suse.com,
-	yicong@kylinos.cn
-Subject: Re: [PATCH] net: cdc_ncm: Fix spelling mistakes
-Date: Tue, 22 Jul 2025 14:51:43 +0800
-Message-Id: <20250722065143.1272366-1-yicongsrfy@163.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <2025072210-spherical-grating-a779@gregkh>
-References: <2025072210-spherical-grating-a779@gregkh>
+	s=arc-20240116; t=1753167126; c=relaxed/simple;
+	bh=PeWIbC1zji8Rcv82/MombFa1BJRmw7d2fz/ARauiscU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fD1ZxJnQtqMZHIBe+Fj3vXH3H3acJiahLL1M9JAmRVZgjEqoSAujN7NAM6OIsMvZzkt/n92phOc85w48gvSYqduXdYcOHiu6+QMh7VaFtQI4Kk6GkR3z3Stg1xaK1SAmeyug9ykcGK68aOB6kBOAL6tlUOBdoOrZjCkH8BzGJNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=enbUI7IS; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4ab554fd8fbso49892531cf.1
+        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 23:52:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753167123; x=1753771923; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PeWIbC1zji8Rcv82/MombFa1BJRmw7d2fz/ARauiscU=;
+        b=enbUI7IS3Pdgii2vPn5xqVAV9iHcIBaXnKm8rDsTZxZmYkOsObKA9Wbx9YgYU5u+uB
+         QHbXRHYM4ZDkl74xsJ/ItRDA8z5Esf8vZvQYgl0hImphZxc8HGnv4dhmXOlgryRfMU8e
+         Vo5xjCKhokd948J5DnZ79YsdH2hueS8+ngC4yjBoMiUQArUWCgFYmQkvHUisJFmdo9UG
+         eb1MdWwcLwblChsl0TTZcC8t4vF0ONHHexnNy/zfLp0+Y5YfroN7AwqJjg2vfs7F7Swb
+         ZJbpfkdk+UBXvW4qT+MIUqt7pY+sqc8tPONwm3fz8+bFrXOXSrCiLxW0BiYu6bMYOtVh
+         ExUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753167123; x=1753771923;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PeWIbC1zji8Rcv82/MombFa1BJRmw7d2fz/ARauiscU=;
+        b=foyILSC5X0gsFE7W30nsC0KU5nQCf98QiGIkJf7JhoElsfCvgpG/Ao/VjYvyGjsdTw
+         hDWrd/GbRq5zYevnh8+kRbyozNHK9KCmUO1QpQC87RbcUiKhLmcfq/EKAc6Y78Acqtjc
+         zStYDnZEha3zaaBlexo3aJVVyvNjT3YD3hxQJAF9yMseuRa6GYFRbQ3XPa1p63CS8D0Q
+         lgyVqUuShroFRPuo3QeoPpYsQOkS5iF7vNmfuyT8Bj1JT+fHiGHKpLbp2y2TjiyhJttk
+         yqBt76fOJpWKWm+TYLA3F/LBTM+qO9rukSG4GK3hx8q5ol/+xqIRFqc4KlkYdEpQgRy/
+         eZPg==
+X-Forwarded-Encrypted: i=1; AJvYcCVlTlKjnc+/1GkZNEBa1XoE4elhC7j19uQos25luMcKdLwP60/yYUatR54zGQO54PPb0PaM7RE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyO5F/qi3YwAp4B6t9bz1A4sBzJX9pgrk1v9MhLD9sXw3URSC2a
+	hgA4XxBX91k+y4me7GT23FvhaM3J5J8jfkr3sF1lrl/dHRgYl0NVpC+yJuXAU6ULH/Bmxiob7Kh
+	ouqm6ruN6LM8qlb91WWipKo7uWLd5sIK3WhNK2xaQ
+X-Gm-Gg: ASbGncs4G07UbXt38aRx/ApbENh3w5s+0W6fwFTkaB8aW5NuA/4/r0A1AMPJL7t8Lv7
+	AFVcgIBrtfOhFYA0Vyourgq+5lTNXRoQ3Llk0mu/0N9UJafetwDdsWY6tzAhdMm+OU8qns4sj6g
+	R8Twt+topKtXbqNqbDpmzRdCuniXkxX7NikHRA6UfPyrZW0eVb+vrGYD2GkfCZ//GHdJsnI7VhS
+	4sRuQ==
+X-Google-Smtp-Source: AGHT+IHQtTROmOPjtYKNp3LrKieED28s9Ihtni6NoFl6cfc5Sc0h1mgzJXsDX15qgWH4HGDMdRBDDSThTKbNVJHA4jg=
+X-Received: by 2002:a05:622a:114f:b0:49a:4fc0:56ff with SMTP id
+ d75a77b69052e-4ae5b7e22bdmr37705791cf.12.1753167123226; Mon, 21 Jul 2025
+ 23:52:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3oJ__NH9oTxLlGQ--.37444S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7ZFWDKr45Cw15ArW5AF15twb_yoW8uw18pF
-	WkCFW5CFnrJrWUuw40qw4I9ryYvas8GFW5GrW8Z3Z8ZFnIyFn7uF4jqrWSka4Sgr4UCry2
-	vF1jgrWfWw4DA3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jso7tUUUUU=
-X-CM-SenderInfo: p1lf00xjvuw5i6rwjhhfrp/1tbiUA2S22h-LnKvTQAAs9
+References: <1752870014-28909-1-git-send-email-haiyangz@linux.microsoft.com>
+In-Reply-To: <1752870014-28909-1-git-send-email-haiyangz@linux.microsoft.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 21 Jul 2025 23:51:51 -0700
+X-Gm-Features: Ac12FXz4iUeeGipOp3D_tB6KFKYfqAFLlbaMGXZvPSx57DSINr_rpmIyL81k98Y
+Message-ID: <CANn89iJLnprFvLpRpJ7_br5EiyCF0xqcMM7seUVQNAfroc4Taw@mail.gmail.com>
+Subject: Re: [PATCH net] net: core: Fix the loop in default_device_exit_net()
+To: Haiyang Zhang <haiyangz@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org, 
+	haiyangz@microsoft.com, kys@microsoft.com, wei.liu@kernel.org, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, davem@davemloft.net, 
+	sdf@fomichev.me, kuniyu@google.com, ahmed.zaki@intel.com, 
+	aleksander.lobakin@intel.com, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org, #@linux.microsoft.com, 5.4+@linux.microsoft.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 22 Jul 2025 07:46:34 +0200	[thread overview] Greg <greg@kroah.com> wrote:
+On Fri, Jul 18, 2025 at 1:21=E2=80=AFPM Haiyang Zhang
+<haiyangz@linux.microsoft.com> wrote:
 >
-> On Tue, Jul 22, 2025 at 10:32:59AM +0800, yicongsrfy@163.com wrote:
-> > From: Yi Cong <yicong@kylinos.cn>
-> >
-> > According to the Universal Serial Bus Class Definitions for
-> > Communications Devices v1.2, in chapter 6.3.3 table-21:
-> > DLBitRate(downlink bit rate) seems like spelling error.
-> >
-> > Signed-off-by: Yi Cong <yicong@kylinos.cn>
-> > ---
-> >  drivers/net/usb/cdc_ncm.c    | 2 +-
-> >  include/uapi/linux/usb/cdc.h | 2 +-
-> >  2 files changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/net/usb/cdc_ncm.c b/drivers/net/usb/cdc_ncm.c
-> > index 34e82f1e37d9..057ad1cf0820 100644
-> > --- a/drivers/net/usb/cdc_ncm.c
-> > +++ b/drivers/net/usb/cdc_ncm.c
-> > @@ -1847,7 +1847,7 @@ cdc_ncm_speed_change(struct usbnet *dev,
-> >  		     struct usb_cdc_speed_change *data)
-> >  {
-> >  	/* RTL8156 shipped before 2021 sends notification about every 32ms. */
-> > -	dev->rx_speed = le32_to_cpu(data->DLBitRRate);
-> > +	dev->rx_speed = le32_to_cpu(data->DLBitRate);
-> >  	dev->tx_speed = le32_to_cpu(data->ULBitRate);
-> >  }
-> >
-> > diff --git a/include/uapi/linux/usb/cdc.h b/include/uapi/linux/usb/cdc.h
-> > index 1924cf665448..f528c8e0a04e 100644
-> > --- a/include/uapi/linux/usb/cdc.h
-> > +++ b/include/uapi/linux/usb/cdc.h
-> > @@ -316,7 +316,7 @@ struct usb_cdc_notification {
-> >  #define USB_CDC_SERIAL_STATE_OVERRUN		(1 << 6)
-> >
-> >  struct usb_cdc_speed_change {
-> > -	__le32	DLBitRRate;	/* contains the downlink bit rate (IN pipe) */
-> > +	__le32	DLBitRate;	/* contains the downlink bit rate (IN pipe) */
-> >  	__le32	ULBitRate;	/* contains the uplink bit rate (OUT pipe) */
-> >  } __attribute__ ((packed));
+> From: Haiyang Zhang <haiyangz@microsoft.com>
 >
-> You are changing a structure that userspace sees.  How did you verify
-> that this is not going to break any existing code out there?
+> The loop in default_device_exit_net() won't be able to properly detect th=
+e
+> head then stop, and will hit NULL pointer, when a driver, like hv_netvsc,
+> automatically moves the slave device together with the master device.
+>
+> To fix this, add a helper function to return the first migratable netdev
+> correctly, no matter one or two devices were removed from this net's list
+> in the last iteration.
+>
+> Cc: stable@vger.kernel.org # 5.4+
 
-Your question is very valid. I can only guarantee that the devices
-in my possession do not involve references to the relevant structures,
-but I'm not sure the behavior of other vendors' implementations,
-which may vary.
+We (network maintainers) prefer a Fixes: tag, so that we can look at
+the blamed patch, rather than trusting your '5.4' hint.
 
-So, perhaps it would be better to keep things as they are?
-
+Without a Fixes tag, you are forcing each reviewer to do the
+archeology work, and possibly completely miss your point.
 
