@@ -1,257 +1,195 @@
-Return-Path: <netdev+bounces-209098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9A0CB0E4D4
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 22:19:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2D94B0E4E4
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 22:21:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D88FA60264
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 20:18:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 896781C8804B
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 20:21:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DF6027FD51;
-	Tue, 22 Jul 2025 20:18:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28D9628507D;
+	Tue, 22 Jul 2025 20:20:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZcwIoJTR"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="V4QT5v6a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE261D54D8;
-	Tue, 22 Jul 2025 20:18:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753215483; cv=fail; b=Xe4HOOF+D9Xv8eDYCc20mPT9LPzGc1Np+RIq5XPjNF+9MbknWjIxPjBQLWQ/++9GPl/9GmTuW5+yBnygIk1InzHxN2krkVUtd72UUb7yxVch+xURvv5cwxhU/NgMOyBMzECnxYHzcwQeiiBx5PA8R3JDWu5oehqkZO8XVBRb2V4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753215483; c=relaxed/simple;
-	bh=/bKDigkFRsZhfn2vSXypQ+AdcH1UOYAuAIXn09KAhgI=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=SGShyiYKOb7b+S3/9P99Mi27YfN6F772V54ndvlYtNcjHW5SxNXlEEX/uRXWoNTn91TqKRE0FWLJ3QNl1RXcnMe5UOp+FHqGnYd10pS69HxG2dRIaUmyrYOQseBWzAGyPv9DoafdZtEfFNSIOD+VZn6QlaYSHAnAbzSIauuKvOs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZcwIoJTR; arc=fail smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753215482; x=1784751482;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=/bKDigkFRsZhfn2vSXypQ+AdcH1UOYAuAIXn09KAhgI=;
-  b=ZcwIoJTRAcJSkb1+TQ0RHtSVg0hYllOmGuJNxdEAtQN63pJOnXWwWk/w
-   D0JfEtsfEatONYPYb6Bb2H1yB5HSJF6qD5RqIihd6teXB9IetLTUn7b7E
-   6a2HjN0bN51q0VHE/ohVypkZuwEO2XnVsZmlNNOIvM1E/A8x+yG0BtlcM
-   lAtXPnsrMEqZ24/rXyU3BtfRk9T8YH1HejYG3KsaRBA4Sep44bS8JMcxd
-   BiiFVOI9ozHcX/LE44/36EDXhegSXvpeAzf/LV17Oy8oJpn5+iEKMNJHK
-   fPyzX8X1QiuLxxEgLWwBI/6V+VM+X0d9oILG+etXgtXBSoXVKuPVi2X9v
-   Q==;
-X-CSE-ConnectionGUID: SF5DkCvlSuyiatrzVZCe5g==
-X-CSE-MsgGUID: erBA7hsxQvSJiNu/BHWcrA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11500"; a="55577330"
-X-IronPort-AV: E=Sophos;i="6.16,332,1744095600"; 
-   d="scan'208";a="55577330"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2025 13:18:01 -0700
-X-CSE-ConnectionGUID: 69fI9QAySGmVLhVXAGtbKg==
-X-CSE-MsgGUID: E8WMb4O4Q2WGTQzzJwEmeg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,332,1744095600"; 
-   d="scan'208";a="163777190"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2025 13:18:01 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Tue, 22 Jul 2025 13:18:00 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26 via Frontend Transport; Tue, 22 Jul 2025 13:18:00 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (40.107.93.67) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Tue, 22 Jul 2025 13:17:59 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SxPluGhMm+5yXLkmuvKfKS/ImsS1WHhSbK19CpLybHCMmkj40pod2C79lhQ63si1E0/B2oO7WEU4y2PnSDs4ZOy4pFv4u+Q1EeOoF8ckwQqWXU40jij73dWQnfy5VVGxpk2vbs/Ha9qK4cpMinfy/247Xx1jCFNc97CAkZO21UFNSxzwajuRk+EVBsMVDxR/gT8Kvogg8yghlW5LBEUei7RNIq5IFLN74yFszq+tLuSCSx7/XI9q31L3lZsh8UumOAc7moS4sAaj84xaCbe8XoZs/vaabbgiMU/A5715mxbEAmOKKCXgDlQAiBHhtZvNdSTFIb3y2cWGwUQo1eKBHw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7OJKF01DQMfkTbf/SdHcd4EeBLOi9MwOCsxhmYzNpuI=;
- b=PqQ82S7nJVDCgorBDPalsYW65eqF72GkXPCYttrxGmJmBmQpxTGSRACPZChoZ5Q2JRo7QPQitCaziiq3WRfsUOvd4omD9PCZHGfF/9iZXp6mgQmScEoKVko2n/W/koxKxa9W6YzKZDLyih1CpZ0lDctbiyGJux82MPWVZhx0v+xpWcgDdS9q1h3OLNyG/TU7BF0ZZ70Xma57kged648ALk9EE5Y+wyQUl7Im4eYmD/p3mXKwSra7FZGi66V4C6L9v4ZbqkL7d1STucrGni2n2905+8YRTx66yuwQ6L1l9BHq0zEmAGtslwzHdjv7uertUjC4LPKoqA82ZddQWDynbw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
- by PH7PR11MB6836.namprd11.prod.outlook.com (2603:10b6:510:1ef::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.29; Tue, 22 Jul
- 2025 20:17:43 +0000
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::24ab:bc69:995b:e21]) by BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::24ab:bc69:995b:e21%4]) with mapi id 15.20.8943.028; Tue, 22 Jul 2025
- 20:17:42 +0000
-Message-ID: <e76d2af6-40d6-4169-8ec9-aeeee31b3aaf@intel.com>
-Date: Tue, 22 Jul 2025 13:17:38 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] i40e: replace snprintf() with scnprintf()
-To: Amir Mohammad Jahangirzad <a.jahangirzad@gmail.com>,
-	<przemyslaw.kitszel@intel.com>, <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20250722115017.206969-1-a.jahangirzad@gmail.com>
-Content-Language: en-US
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-In-Reply-To: <20250722115017.206969-1-a.jahangirzad@gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0332.namprd04.prod.outlook.com
- (2603:10b6:303:8a::7) To BL3PR11MB6435.namprd11.prod.outlook.com
- (2603:10b6:208:3bb::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1049180C02;
+	Tue, 22 Jul 2025 20:20:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753215651; cv=none; b=m5qqh/UzSCqCVUSm3wl1zXZmDtaEiWW4dGC1GdScQgpmdFVEC6fsHSVXXTUGReS7csQ62ieqrGxKdhqISKWfUuD0eSWq2eaQs1ve4S+FFTS1yNHZrF5ip8ej4H7UDANUePNgF4pjaZYSJCZA+rhZ5k49r6iZBGFnElwuN/E+onY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753215651; c=relaxed/simple;
+	bh=vO15FQgzetEbZ5YgaOoYGILaqFconc2Gjk5Xwlt8/is=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rSvbInoajfR4ra4iAH6IaQ/NQ/1VhiaMc5hzcFQ+TwbRZCfiExKla8G/gVOmWvtqUnnGFdfVFhyq4twLt2sWC6APrUB5F9g64vtF+CebG3vC2QGKC0M02IEwjzRmfy///NGpGr6ehC5i5ML55KjWwKqW0m0jwSlcbHmPr5hgCY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=V4QT5v6a; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=kbhK64lKfzGoli4FgA99Y7jN3LYJzkq8kXFb4Szyfl4=; b=V4QT5v6a0Feyd72Kw5Aiz/opbu
+	w6blYrG1N35+yEilK7qBcjzE8zdnxuuOyZt1stdsPaQshuXWbw80NGGHcTMWdXoINB39EpoZn9/t6
+	aXgPDyrY/oGclFya19XRVhvmFGU18AEW/qehpAHn7X/L3GuEzqwURhj07XOWeyfcqnhWlTS4TzWHl
+	UQwDqUdWTEsI1/Qv5gnz8v2bNbPrJtlh/A7tvf6bpWyVnQLlQQFdupsoPYPJknNQyszHHAQehBEiR
+	jtnOEtFKWU09sJUjIyax8o3pAa4sMMCCjt+vbriqm018nAzaZpdqH60MrmeaMOaaCk1UNMRcw86lj
+	OKg/N+dQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52434)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1ueJTQ-0000Y8-2A;
+	Tue, 22 Jul 2025 21:20:28 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1ueJTM-0007Qz-0W;
+	Tue, 22 Jul 2025 21:20:24 +0100
+Date: Tue, 22 Jul 2025 21:20:24 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Christophe Roullier <christophe.roullier@foss.st.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Tristram Ha <Tristram.Ha@microchip.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/4] dt-bindings: net: document st,phy-wol
+ property
+Message-ID: <aH_yiKJURZ80gFEv@shell.armlinux.org.uk>
+References: <20250721-wol-smsc-phy-v1-0-89d262812dba@foss.st.com>
+ <20250721-wol-smsc-phy-v1-1-89d262812dba@foss.st.com>
+ <faea23d5-9d5d-4fbb-9c6a-a7bc38c04866@kernel.org>
+ <f5c4bb6d-4ff1-4dc1-9d27-3bb1e26437e3@foss.st.com>
+ <e3c99bdb-649a-4652-9f34-19b902ba34c1@lunn.ch>
+ <38278e2a-5a1b-4908-907e-7d45a08ea3b7@foss.st.com>
+ <5b8608cb-1369-4638-9cda-1cf90412fc0f@lunn.ch>
+ <383299bb-883c-43bf-a52a-64d7fda71064@foss.st.com>
+ <2563a389-4e7c-4536-b956-476f98e24b37@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|PH7PR11MB6836:EE_
-X-MS-Office365-Filtering-Correlation-Id: aef998c6-8397-442e-b13b-08ddc95cd007
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?UDhicmNaSDdhM3o5blVvWVM0RFFNWjdHNW5rYk5DNFdaVmRhSFJhdUNaS0No?=
- =?utf-8?B?akZiRWdxSk1FRng0bkxYbFEvM2pCd000TVhYajhWMFRML0duUFg4UlZYRGJC?=
- =?utf-8?B?U3QvWkFQd2pQZk9FY3pZenN6THB5QnJBbTlwVFQ1ZFdFdXFSWW14SGlTajJD?=
- =?utf-8?B?TktXcHlPWXVyK0YwWVRsY2Q4cmU2ejAvS1FvSFY2MG9QWEhMeE9uTHNleDVz?=
- =?utf-8?B?VWVvYmExdDNreGpGbUhBOEhNM3lkTk01NFZidzlqQ3lESUVSejhrR3JqaWFw?=
- =?utf-8?B?NVRlcW9FdGVzZGR4UUE3K0gxZFRScTBGeWZTaTNJVUpSMjhnQWJRaHQyKzV2?=
- =?utf-8?B?SHlBZDdjT0ZCMllhRnkrWnF5c0xwYW9DcVFzaGkxVkVwQ2xOQ01ha0NOZUx6?=
- =?utf-8?B?TzRGdFBLcDlPZ3pTYVg1MDV5Zk9CV29kSWgyc3NJR3lUejRoK01ZcEFCN2RL?=
- =?utf-8?B?R09qZkx4M01xRVpkWW9UNVJZU0FNNFJBU09xV09TNmxLUHo2VFZ0T1hZTDZx?=
- =?utf-8?B?SjJJMWF0dW5lby8wd3d2TS91UUFDVitLelFHQkJmQW94OHY5L2gwbmN3Mkk5?=
- =?utf-8?B?bWJjbjRvOTA5WENmeFM2eFYvdXdtVEFJWHVSTjI2RFFYNW1mRnVwZk80U0p2?=
- =?utf-8?B?YnFCSGJ3Q3ZrUXV0MFlaSmFFa1hnRDlSVlZtZFVmSVduMEFQK3F2Z085ZWs1?=
- =?utf-8?B?dUJldm84U29DOVJXdjlRZ1MyVTBkWS83VFl3d3RNbDJFb0lwMVovUW9BMWZE?=
- =?utf-8?B?S2NyaXdhUEJ6a0JrZ2Q3T2hOd2VvalVtNnB5L2pkU3M3TjRXRUh0R2hGR0Ft?=
- =?utf-8?B?d0NVNHRPd1RRY010MTlDS3dlNGY4SjlMMEYzTjZVbGt4QjVDb1ZTaHlYZHZZ?=
- =?utf-8?B?YWhMU05BZi9uQVF6TVVXWnZ6TGRkVS9nTnp2TkVwaFRGUktPRldsV2FDNEQv?=
- =?utf-8?B?R1BxendESnloMkI4dmt6RE1DL1VSeVVpZnZvZnRPRkFNZFZDQ3BlcVk3eFNX?=
- =?utf-8?B?VzVBdC9kbUN2ZDFmZlRnaDFMVVN6bnpMa3libGVyMUdlSE44TFQweno1REtN?=
- =?utf-8?B?VTdMbm9YVjlJeHpsdnl0aExPcEtQVFRLcnFESU9NWWh0NlRwOEVtTk9td3pI?=
- =?utf-8?B?OUlXdXo4VkJVTnVXL1dvQThqN3VSTitsQXBDSGdhZmtITHl2UlRORXBNdGZH?=
- =?utf-8?B?ai9CVzRpRlZZSHBoaXdPYXpDVldkUnEvL05vMXBCazR6M2RmYmE3ekZCWXpy?=
- =?utf-8?B?OUtYOXp0T3JNZGVYUjZPTlZKRVd2aDRhdlJDWGNpL2tJd3VILy9WbksrQ083?=
- =?utf-8?B?YmRic1BKRS9hRXRUUGxUMk04K0hFdU40ZUhjYUVOQXVNeTBudVQ2bGNJZi9S?=
- =?utf-8?B?Ny9zdFZ2ZUpxS1NFUjdjMC9Wb2lDV1VIZUorclJMRzFxK2gyMjFEMkJNSCtr?=
- =?utf-8?B?K0txdFhmeTlHOEdzdFFXMzU2LzBhY1lwU3QyY2YxYzl2Y0s2Nk5TbnE0Y3My?=
- =?utf-8?B?Y3VSZzdUTkdUSzk3UU85T2JUejhha1RqZ2N3eWFtemVDUm9ObDkxbUY0KzlL?=
- =?utf-8?B?MDgyVk9BaDdnY0ZCb2FXZTlKRDJSNzI2aVFGOXM5UU9sczBOenFvc0FUaEVN?=
- =?utf-8?B?RHBmdVRrMHJxVTlrb1lJNW9uZ1A4blFzK2lNQ25Dcm5oTWVuSWM4KzhsKzhN?=
- =?utf-8?B?cWd4RVlhSWhjY1h0NzlaTHZzeCs5WWdDNS9xT3MwTnk3NGVibmxDSUx3QzND?=
- =?utf-8?B?RVRZOGxGVDh3NENHNE5SOUl1MXVKS2toZm1iMDhxNXM1QVBZL29ENjFSTDZu?=
- =?utf-8?B?WXlwSEJQZFdRbjkya0xsYktxUVFkM2FQWGV1U2Y3L1JZZ0gyMFZMOE95VXZR?=
- =?utf-8?B?NWROR3M2MHR5OGtxMHVoQjMwdUlyNUlrdDFTV2h2N3BqYVJxZ09XQXQ0SU1u?=
- =?utf-8?Q?DV6eBc5aaFE=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?U0liZGFNY2hTL0EyejNKV05xL2FsSnRBeGZrby9NOStLUDZaZjRBSm15NzlU?=
- =?utf-8?B?anJSY1hJdE1mVUN5VUZzS1FnUTQ5K0lPL0IvdTc5eHFjNHdacHhmY01CME5J?=
- =?utf-8?B?VXo0dzR0UjA2c0xQOTNyckxIL1BwOWRpZkp0YmhNSW5BYmtNWU5OVHBMQmJu?=
- =?utf-8?B?V0hTQ2h2cTJ1L1RqR0tZV2h6LzlqaitqUmNCRE95V2VtUEhmUERyN0tGTjN5?=
- =?utf-8?B?SUUzbGoyaTRnc1haSnhvSmdET24yZDFlYkhMUTE2VGhHRmJ6MlF3QU4yWnJJ?=
- =?utf-8?B?cTkrODhSZVZncjJVcUhoWFAwRVU2ZVRrRWFyOUs4bTIvS1NhM3ZOWXVNTEZW?=
- =?utf-8?B?V2xUWkhIek9nbEpEUnRuOFdnM0ZqY1R5WFFJcFJYVGJqTndMUDUweVdHYUdX?=
- =?utf-8?B?QTlYS1hWeTNuNm5VZ1ZwQmJVUVJkd0VLbFllRkRMaTd2VHpNWWFkMDhiaGNn?=
- =?utf-8?B?UkVTTmRBOVNhcmRhZHVJQ2JadnZlampDczNQNDFxanBEU3p4aVBBaGhIdzJo?=
- =?utf-8?B?S3JoeDZ4QzJWSnF2ODBKaGFZL09OMk5mNGw3eTdQOVk2a0l5MStaTXBHZTBl?=
- =?utf-8?B?QWJSNm1xSTZocEJvNE1KRVdxSndhOUp5QU0vQnBMaHpZT3hXN0NSWWdweUdh?=
- =?utf-8?B?bmRISFluYUV6UHh3dlpZM0hQRzJHVXpVZ0I5ODBXejZkbnkzTWN3QWE2VXVq?=
- =?utf-8?B?OS8xMEtHenIzbitVL0RGUGI2eFhMYWszV2poYS9kcVNuNVVRcjFtZzZXMlpV?=
- =?utf-8?B?ZjVUWlZFQzFXTSttN3R1eHRGRnZoS3VzZ0sweHNYbXd5RnFjb0FuYm1menFi?=
- =?utf-8?B?b25oZm5SZUhtTkU1a3BwSmhPalZmejZDYVlTbWdYVkZPbGZBdWlCR1Jubnhi?=
- =?utf-8?B?bms2Zm96a3dLVFhhUVpIQklIazFOVW5wZ2MvOGJNRDRGeFVwSEtTVmxFSVBY?=
- =?utf-8?B?M25JS2xLUWNnRDlaek9pcm5KNk8vVE1aaUtZUkFqYlRHRlVLYmh1bTBkNTI3?=
- =?utf-8?B?THpWcTIwRXNnZ2VKTXZraElzWXpWUnl6UGRjeXYzR3EyaTR3N2NTV1BsUGh0?=
- =?utf-8?B?VkhndldTd3U2OFE2aVlUYk55YlZxdlJreUd6QU93VEJtZ2g4d05sbFRNc21X?=
- =?utf-8?B?VXk5MEtVeUhrSWJLWm12c1dCTHZvSW92ZDdYcjBuTDlURWlzWm95UnZmMFhn?=
- =?utf-8?B?Wk5rVDZLdkJzZ0lWWEVKVWJ6ajBTVk52OENKTTVKeGZ4YzVCeHJMcWlyWU9h?=
- =?utf-8?B?bVhxUW90bUxKMUFPNUQxV3RaTm5JMXNaSWdyRlUxSlRpb1pXa05kYTE2M3Vn?=
- =?utf-8?B?RnRaOENrVDFOMnRBWjlzekd0S0VFZzNmRmd3S1dyWjlDMVFJSytkaUEreWRT?=
- =?utf-8?B?MmxlUnAvaDJqVWhiQkNnb3l6eEd2N0djcjVNYkJxRTBKQjBWRklRdm5oVHRB?=
- =?utf-8?B?bXh3clhLZ2J3L1RGbkpVWkZHWTNRempPU3IrQU1vWkxQYmFyMTR5aFpUZU5h?=
- =?utf-8?B?K1lobzFIc2VvV2ZYUVo4SWwzNnVCYlJta3QvN0p6TEtWS1J1MUt4VWZTalpT?=
- =?utf-8?B?NC9nQzM3V3hzbDF4a3dGTVVnQlplRUtVVGhUYTYxdUR6Z0NpYUIyK3J2UzNj?=
- =?utf-8?B?RXhqRXp2S1RCM0l3M1BVendaRmdIWjM0MmNScXNQNnJrYTBmM3hzcEQvQVB1?=
- =?utf-8?B?SGNWdHlZS3phQ1BSUUhyb2RMRW0xcU1LekJHRWNvaTYvM1JGd3dMemF0V2or?=
- =?utf-8?B?alFXWENHSzhyUHVzbWxmVVhCaTM1VU52WjVRa0tHdysxK3FGMnFnRzM4RG41?=
- =?utf-8?B?dEVxTVZYeUs4VmdHd1llazB1SmJyOVgzcjVSRC80SGVHWEVuYlgxc0NtMHA3?=
- =?utf-8?B?VGxXWU5RaTBoUjVrN1pHWHBNK3J2L0tCNkx0aFZsSjZOVWFmZDcyYXNpU2No?=
- =?utf-8?B?OGZsS2gwK1dEbzk2S1dON3B1cGZnZXlvUm5vNjVPelByYUxrYVRHMUlDWkhR?=
- =?utf-8?B?THh4NTFBNWdHcVpCTEdRQkZMcXpjdGFORmt5MUI4MW51b3J6bktwd1BrOERL?=
- =?utf-8?B?MWlXWDkwRE5wYkNlVzlJU0JGaEIxWS9OK0JhVkdhQTZidGdxZ1F3Z2xDZnBR?=
- =?utf-8?B?VDZJWHViU3FxcXhrQm5BSlBVSlQ1NVp1UGxyTTROZFFHbVNDakxNY09kVmZX?=
- =?utf-8?B?V2c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: aef998c6-8397-442e-b13b-08ddc95cd007
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2025 20:17:42.3382
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: OMNC8Wv39d0DiDysZzlD0ZINBtxNvr+D4993H/i6/j8f669D5pYPHc82/U7uSxtCp+xW7gOaL6FBcTzL7XG8vAsWBGWcnYGyJ1t42P+BdEo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6836
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2563a389-4e7c-4536-b956-476f98e24b37@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-
-
-On 7/22/2025 4:50 AM, Amir Mohammad Jahangirzad wrote:
-> In i40e_dbg_command_read(), a 256-byte buffer is allocated and filled
-> using snprintf(), then copied to userspace via copy_to_user().
+On Tue, Jul 22, 2025 at 03:40:16PM +0200, Andrew Lunn wrote:
+> I know Russell has also replied about issues with stmmac. Please
+> consider that when reading what i say... It might be not applicable.
 > 
-> The issue is that snprintf() returns the number of characters that
-> *Would* have been written, not the number that actually fit in the buffer.
-> If the combined length of the netdev name and i40e_dbg_command_buf is
-> long (e.g. 288 + 3 bytes), snprintf() still returns 291 - even though only
-> 256 bytes were written.
-
-Hi Amir,
-
-Thank you for the patch. In practice, this won't overflow [1]. However, 
-this code can be improved. If you follow the thread, there's 
-conversation of the changes that will be made.
-
-Thanks,
-Tony
-
-[1] https://lore.kernel.org/netdev/20250714181032.GS721198@horms.kernel.org/
-
-> This value is passed to copy_to_user(), which may read past the end of
-> the buffer and leak kernel memory to userspace.
+> > Seems like a fair and logical approach. It seems reasonable that the
+> > MAC driver relies on the get_wol() API to know what's supported.
+> > 
+> > The tricky thing for the PHY used in this patchset is to get this
+> > information:
+> > 
+> > Extract from the documentation of the LAN8742A PHY:
+> > "The WoL detection can be configured to assert the nINT interrupt pin
+> > or nPME pin"
 > 
-> Replacing snprintf() with scnprintf() fixes this. It returns the actual
-> number of bytes written, ensuring we only copy valid data.
+> https://www.kernel.org/doc/Documentation/devicetree/bindings/power/wakeup-source.txt
 > 
-> Signed-off-by: Amir Mohammad Jahangirzad <a.jahangirzad@gmail.com>
-> ---
->   drivers/net/ethernet/intel/i40e/i40e_debugfs.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+> It is a bit messy, but in the device tree, you could have:
 > 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
-> index 6cd9da662ae1..19a78052800f 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
-> @@ -70,7 +70,7 @@ static ssize_t i40e_dbg_command_read(struct file *filp, char __user *buffer,
->   		return -ENOSPC;
->   
->   	main_vsi = i40e_pf_get_main_vsi(pf);
-> -	len = snprintf(buf, buf_size, "%s: %s\n", main_vsi->netdev->name,
-> +	len = scnprintf(buf, buf_size, "%s: %s\n", main_vsi->netdev->name,
->   		       i40e_dbg_command_buf);
->   
->   	bytes_not_copied = copy_to_user(buffer, buf, len);
+>     interrupts = <&sirq 0 IRQ_TYPE_LEVEL_LOW>
+>                  <&pmic 42 IRQ_TYPE_LEVEL_LOW>;
+>     interrupt-names = "nINT", "wake";
+>     wakeup-source
+> 
+> You could also have:
+> 
+>     interrupts = <&sirq 0 IRQ_TYPE_LEVEL_LOW>;
+>     interrupt-names = "wake";
+>     wakeup-source
+> 
+> In the first example, since there are two interrupts listed, it must
+> be using the nPME. For the second, since there is only one, it must be
+> using nINT.
+> 
+> Where this does not work so well is when you have a board which does
+> not have nINT wired, but does have nPME. The phylib core will see
+> there is an interrupt and request it, and disable polling. And then
+> nothing will work. We might be able to delay solving that until such a
+> board actually exists?
 
+(Officially, I'm still on vacation...)
+
+At this point, I'd like to kick off a discussion about PHY-based
+wakeup that is relevant to this thread.
+
+The kernel has device-based wakeup support. We have:
+
+- device_set_wakeup_capable(dev, flag) - indicates that the is
+  capable of waking the system depending on the flag.
+
+- device_set_wakeup_enable(dev, flag) - indicates whether "dev"
+  has had wake-up enabled or disabled depending on the flag.
+
+- dev*_pm_set_wake_irq(dev, irq) - indicates to the wake core that
+  the indicated IRQ is capable of waking the system, and the core
+  will handle enabling/disabling irq wake capabilities on the IRQ
+  as appropriate (dependent on device_set_wakeup_enable()). Other
+  functions are available for wakeup IRQs that are dedicated to
+  only waking up the system (e.g. the WOL_INT pin on AR8031).
+
+Issue 1. In stmmac_init_phy(), we have this code:
+
+        if (!priv->plat->pmt) {
+                struct ethtool_wolinfo wol = { .cmd = ETHTOOL_GWOL };
+
+                phylink_ethtool_get_wol(priv->phylink, &wol);
+                device_set_wakeup_capable(priv->device, !!wol.supported);
+                device_set_wakeup_enable(priv->device, !!wol.wolopts);
+        }
+
+This reads the WoL state from the PHY (a different struct device)
+and sets the wakeup capability and enable state for the _stmmac_
+device accordingly, but in the case of PHY based WoL, it's the PHY
+doing the wakeup, not the MAC. So this seems wrong on the face of
+it.
+
+Issue 2. no driver in phylib, nor the core, ever uses any of the
+device_set_wakeup_*() functions. As PHYs on their own are capable
+of WoL, isn't this an oversight? Shouldn't phylib be supporting
+this rather than leaving it to MAC drivers to figure something out?
+
+Issue 3. should pins like WOL_INT or nPME be represented as an
+interrupt, and dev_pm_set_dedicated_wake_irq() used to manage that
+interrupt signal if listed as an IRQ in the PHY's DT description?
+
+(Side note: I have tried WoL on the Jetson Xavier NX board I have
+which uses stmmac-based WoL, but it seems non-functional. I've
+dropped a private email to Jon and Thierry to see whether this is
+expected or something that needs fixing. I'm intending to convert
+stmmac to use core wakeirq support, rather than managing
+the enable_irq_wake()/disable_irq_wake() by itself.)
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
