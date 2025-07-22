@@ -1,110 +1,93 @@
-Return-Path: <netdev+bounces-208730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B79CB0CE99
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 02:09:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79F3AB0CE9C
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 02:09:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 915B8545660
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 00:09:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 508261AA0360
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 00:10:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D674CA47;
-	Tue, 22 Jul 2025 00:09:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D36BEC5;
+	Tue, 22 Jul 2025 00:09:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XNLmcEic"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TdKkbVnO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8B4FA2D;
-	Tue, 22 Jul 2025 00:09:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 138EBA32;
+	Tue, 22 Jul 2025 00:09:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753142960; cv=none; b=g9PFdeBN+xzrOCq98vHEaeohQd9kLA86mRdTomrvp266SaYxxMOkwn1I/AVFhW/5FVpwotdWbP/Rq7GuLZ+cXc8dzwoDP8G18p4EEqyD8udQbyI5LSl7HdMCSITsofRcYQ514z9eDhffZAN4gszNudfOdQmdXFr7vnY6HznRQXM=
+	t=1753142988; cv=none; b=sZomCSsdmBWPVRFx44+oZGs9ywH6aY9/ZwQ1zOOiQsOXyVvqSPZ9cCc9IB36bu3X4wMtcaaDP1WXh/ZuUqPEoHIw5QZLqUY/PxxMgXcmbgITDQP5A++MAzeAMwvkRNujdrm9k3QqmcQ5Ql+TTyrHp3z1DTlLDEiDWcWmEHTfMuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753142960; c=relaxed/simple;
-	bh=lbtlLZkbEB/EKwqUWL21/TxtNsN+Km6zXftxmbHKI90=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PR2eTgNJhWik1dmx0N6VoOwJ1WzPHajPjJTjmQcHuMsL80DgpeDIQWbNcPp1eu8GbRkpCfO5Zt9HqjLhnNvBJwLZmW4Hl4oGYzE+styCIo8CFSN8kWRNVoJb2OaOoobccur9VseQx738wXpHlaeakAtCC/xdpTOMjP4XoxgJyBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XNLmcEic; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6346C4CEED;
-	Tue, 22 Jul 2025 00:09:16 +0000 (UTC)
+	s=arc-20240116; t=1753142988; c=relaxed/simple;
+	bh=xElt16jMokiTAI4pjYxxd+MfCABOTQfiea9gnreY4rQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=BZ4UJLgTt1b3Yyib3lWF2V7HI0rSMC4YJzBkfzFHyz3iMLeQ1KmMxo6zYhJvDb2dZbMnyn3kFpSKhMbaCxk+SzBwalVajzjc/AAYq3EjFJ61lZE55W2rF8oh6V6ARoQhZB1Ua71T7BYbXnpoV6tPBltDfKiaZF+ONmAnWcAnbf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TdKkbVnO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88B1CC4CEED;
+	Tue, 22 Jul 2025 00:09:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753142957;
-	bh=lbtlLZkbEB/EKwqUWL21/TxtNsN+Km6zXftxmbHKI90=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XNLmcEicLOwOBti6m2OnAc7zta+ylIXlNd8VxOf1R3PYYahhH3ojAckLK+SssIHEy
-	 NpUlh+PhubS6v8uqeGtHZxOFQKMZsI+dQzfAh1vBwUylt+mIAdNy1jxCRsiSLkYSDz
-	 4UNGJfRgB9FqwItCRIX37w/nqea3rtrfczpy1z0ECkrGJ/88gIWzwXLiXl7xC/EN+s
-	 kzWtmKUkE1GkR+2SaxqqDrzba8mhODTzvQehRSBZq4YZSLnAHTqZB5NcigwpJnTnGH
-	 OsUVbsbvo6LMeyydoWmFWpX4noF1uU59r/NUNJlxL8A+Wpv2YK9Pg6JsQsGPrl2hZh
-	 a+YCA9ZLYSgOA==
-Date: Mon, 21 Jul 2025 17:09:16 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
- <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, "Richard Cochran"
- <richardcochran@gmail.com>, <netdev@vger.kernel.org>,
- <linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Carolina
- Jubran <cjubran@nvidia.com>
-Subject: Re: [PATCH net-next 0/3] Support exposing raw cycle counters in PTP
- and mlx5
-Message-ID: <20250721170916.490ce57e@kernel.org>
-In-Reply-To: <1752556533-39218-1-git-send-email-tariqt@nvidia.com>
-References: <1752556533-39218-1-git-send-email-tariqt@nvidia.com>
+	s=k20201202; t=1753142987;
+	bh=xElt16jMokiTAI4pjYxxd+MfCABOTQfiea9gnreY4rQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=TdKkbVnO5k8mQ3T95tpqRJOJnH/U5+/6TPCe85wRr8ykhYyahriykx6TgIOQITbmJ
+	 y7oATVd2m4mqQ5OC0If0Wa19NT/pGnGszK8AQxA2nITbhs9BOIpfcx8+pnVw5y1hkR
+	 uEM7Vk/roNeKYCiWieZMJebD6+2JHyio0utWuvp6PW7gKACWByykuu7FPmbhD30uYt
+	 7wEIebJGT9K4Ep7B1n4F0VBytGipBV5CE5BUbbahnAQMUsrM5PgNTPKoZ0yS+mY2+5
+	 60DQK4chPtK3WnsqosXv08A5zz0B4GdNMSNjiA79p7ONSb1+Z1BvzWwOoRWS5I+6TJ
+	 ipI5NFCaAjcog==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E21383B267;
+	Tue, 22 Jul 2025 00:10:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] net: appletalk: Fix use-after-free in AARP proxy probe
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175314300625.238860.12795177023377657376.git-patchwork-notify@kernel.org>
+Date: Tue, 22 Jul 2025 00:10:06 +0000
+References: <20250717012843.880423-1-hxzene@gmail.com>
+In-Reply-To: <20250717012843.880423-1-hxzene@gmail.com>
+To: Kito Xu (veritas501) <hxzene@gmail.com>
+Cc: kuba@kernel.org, Yeking@Red54.com, davem@davemloft.net,
+ edumazet@google.com, horms@kernel.org, linux-kernel@vger.kernel.org,
+ mingo@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ tglx@linutronix.de
 
-On Tue, 15 Jul 2025 08:15:30 +0300 Tariq Toukan wrote:
-> This patch series introduces support for exposing the raw free-running
-> cycle counter of PTP hardware clocks. 
+Hello:
 
-Could you say more about use cases? I realized when massaging the cover
-letter to apply the series that all the use cases are vague and
-hypothetical.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> Some telemetry and low-level logging use cycle counter timestamps
-> rather than nanoseconds.
-
-What is that "some telemetry"?
-
-> Currently, there is no generic interface to
-> correlate these raw values with system time.
+On Thu, 17 Jul 2025 01:28:43 +0000 you wrote:
+> The AARP proxy‐probe routine (aarp_proxy_probe_network) sends a probe,
+> releases the aarp_lock, sleeps, then re-acquires the lock.  During that
+> window an expire timer thread (__aarp_expire_timer) can remove and
+> kfree() the same entry, leading to a use-after-free.
 > 
-> To address this, the series introduces two new ioctl commands that
-> allow userspace to query the device's raw cycle counter together with
-> host time:
+> race condition:
 > 
->  - PTP_SYS_OFFSET_PRECISE_CYCLES
-> 
->  - PTP_SYS_OFFSET_EXTENDED_CYCLES
-> 
-> These commands work like their existing counterparts but return the
-> device timestamp in cycle units instead of real-time nanoseconds.
-> 
-> This can also be useful in the XDP fast path: if a driver inserts the
-> raw cycle value into metadata instead of a real-time timestamp, it can
-> avoid the overhead of converting cycles to time in the kernel. Then
-> userspace can resolve the cycle-to-time mapping using this ioctl when
-> needed.
+> [...]
 
-There is no API to achieve that today, right? The XDP access helpers
-are supposed to return converted time. Are you planning to add new
-callbacks?
+Here is the summary with links:
+  - [v2] net: appletalk: Fix use-after-free in AARP proxy probe
+    https://git.kernel.org/netdev/net/c/6c4a92d07b08
 
-If there are solid networking use cases for this I'd prefer we fully
-iron them out before merging this uAPI. If there are RDMA use cases
-please spell them out in more detail.
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
