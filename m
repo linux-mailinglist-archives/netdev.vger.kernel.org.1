@@ -1,128 +1,392 @@
-Return-Path: <netdev+bounces-208918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77CA6B0D91B
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 14:13:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B4FBB0D916
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 14:12:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A74E56C8461
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 12:12:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93874188E8A3
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 12:12:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BEA42E49A7;
-	Tue, 22 Jul 2025 12:13:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF4072E8E0C;
+	Tue, 22 Jul 2025 12:12:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="pUs++OLI"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EUkx/mH7"
 X-Original-To: netdev@vger.kernel.org
-Received: from out.smtpout.orange.fr (out-68.smtpout.orange.fr [193.252.22.68])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 098D52E8E0C;
-	Tue, 22 Jul 2025 12:13:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE7F223C50E
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 12:12:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753186404; cv=none; b=qIteektGCgoN5kQenqBZANzHrYJtDQ+f1VB8PCTWipDacTUgzwZNr2dSJIUmLISUM3DlJEOARQsly1AhevFEsbOUOeOtWdRMll8B/YiSG18GgFXDscYxzyfA2u/JJhyV9EzUs30diHNoTwWwPjdGzO1TrcEO4OorXEpDfK7/+4Y=
+	t=1753186353; cv=none; b=rOoSiaeIITJDfUBwvGQ334Ynr3fg+JvBaxgiKgl/D83kXQScbz9R9/4okutfxC6P6kIhFKDrv65Hju/OgIArZG8o7uXhGFOOuqZJ42UOt1o8IWv+a/0hCOxAKAahWfSb74xe6j/cfHnZEPb+hKF08hwKeNZJPz7+i8RhWb69bk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753186404; c=relaxed/simple;
-	bh=u9CymTeGhHwmHEThjnJA9ifjHjtLz4Cw4C1+RHVvYaw=;
+	s=arc-20240116; t=1753186353; c=relaxed/simple;
+	bh=+S78+FjHB8dvJhJKch1Tzwc69aJrYQst+qk31eIY5bQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q9t7qFdT2iHnCcFz+SsvYd55Ch8aqoFBZseLVa7oGTiKQ/oMOwC08PuX3bnRHM/n+BqbAWxK6DeI46G/rthgfZH6QNprQfD2qZuWmh/yMBPhypxQ0v0/ELsfWZaJ9hrsKREcHclj6l2L4/0BIE6QP7jBj0RUsg5vIK1ag8QR/VM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=pUs++OLI; arc=none smtp.client-ip=193.252.22.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [172.16.82.72] ([124.33.176.97])
-	by smtp.orange.fr with ESMTPA
-	id eBqkutpDDZLLzeBqmuiq1m; Tue, 22 Jul 2025 14:12:10 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1753186330;
-	bh=BInXK0aUIElWXF88CRcdt6heGhuFFOkNCbpfQ3hACD8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=pUs++OLI0bks4sCHIpdkls7A0Welf5n+B01rBxZOJ1c1ZJT/vzC4R5O0UQ3h87B6x
-	 u+nggmHvHFP+ahn/TzBguJHv6JJ9Cm8Ucgu9UxbyXivK4+FDfp0T4rT/N/gqxMIeau
-	 uFNORvAVM4tkU2RNQ2XmYbucTkOrPIAs92vLwPFBuRay1+sUhd7z+P/G38ADLJXt3g
-	 QBKgNHGd9kh3XOM8QOY5JpfuYlrBaYRZT/pb9y4+amqcrhk8r2WSx0A1SHYYCoBRew
-	 K/UYY1YIczMYLAbOBawx8H6lTvUmUJVfDjB11zd+tHb/3Tw4RmDMH4rEcbaFm/jWyD
-	 0ABBiu68VEeFw==
-X-ME-Helo: [172.16.82.72]
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Tue, 22 Jul 2025 14:12:10 +0200
-X-ME-IP: 124.33.176.97
-Message-ID: <266ff6cc-82f6-4e5f-84c5-39a1ff0aa8a2@wanadoo.fr>
-Date: Tue, 22 Jul 2025 21:12:02 +0900
+	 In-Reply-To:Content-Type; b=Eu/WFKLrrZG9+H624f7a9iHR3Epvlmbocf7r5GUqdWMFP2ntYfqCjoTXzNpHqzb6xQG8BD+sZfN5+gnXTdF+3kaQoP5O/cX9KqQSwOOZhQcTXsHrVDR4CN4J/bbVTJFwm6/2WTbjyZpn+bBfw7RNt4i38uLRChTco1zr8k0ITf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EUkx/mH7; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <1ca5906d-3dd9-404b-9347-228e67e614b4@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753186350;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7Oecw12Hs+FGgVUI8SZjr2pXJ95Tchm3iXCJ2CrE87c=;
+	b=EUkx/mH7BDSIMvy4ajMze+XxrB9PO7UueWjQ7YsZ5nlBWZnYIL2lQpCmZm3FKCEW6ZyVia
+	YFl4JAfYB3QCJDpFuyFqrFvb1CeuFwXRH2bxGbJM3PWYpSd9N82d7o0KQMJBFKGHkSa1Hq
+	gMvG4WQyY+HxjyvxwM53iCboAjBLhFE=
+Date: Tue, 22 Jul 2025 20:12:22 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] can: tscan1: CAN_TSCAN1 can depend on PC104
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: netdev@vger.kernel.org, "Andre B. Oliveira" <anbadeol@gmail.com>,
- linux-can@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Randy Dunlap <rdunlap@infradead.org>
-References: <20250721002823.3548945-1-rdunlap@infradead.org>
- <20250722-delectable-porcelain-partridge-a87134-mkl@pengutronix.de>
- <20250722-godlike-discerning-weasel-fbec72-mkl@pengutronix.de>
-Content-Language: en-US
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
- xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
- LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
- GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
- bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
- BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
- 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
- yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
- CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
- ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
-In-Reply-To: <20250722-godlike-discerning-weasel-fbec72-mkl@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH bpf-next v2 1/3] bpftool: Add bpf_token show
+To: qmo@kernel.org, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
+ kuba@kernel.org, hawk@kernel.org
+Cc: linux-kernel@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20250722115815.1390761-1-chen.dylane@linux.dev>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Tao Chen <chen.dylane@linux.dev>
+In-Reply-To: <20250722115815.1390761-1-chen.dylane@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 22/07/2025 at 19:52, Marc Kleine-Budde a écrit :
-> On 22.07.2025 12:48:41, Marc Kleine-Budde wrote:
->> On 20.07.2025 17:28:23, Randy Dunlap wrote:
->>> Add a dependency on PC104 to limit (restrict) this driver kconfig
->>> prompt to kernel configs that have PC104 set.
->>>
->>> Add COMPILE_TEST as a possibility for more complete build coverage.
->>> I tested this build config on x86_64 5 times without problems.
->>
->> I've already Vincent's patch [1] on my tree.
->>
->> [1] https://lore.kernel.org/all/20250715-can-compile-test-v2-3-f7fd566db86f@wanadoo.fr/
+在 2025/7/22 19:58, Tao Chen 写道:
 
-Don't know how I did not realize the conflict when reviewing :D
+Change list not added, please ignore this patchset, and i have resent 
+it. Sorry for the noise.
 
->> So this doesn't apply any more. Fixing the merge conflicts result in:
->>
->> index ba16d7bc09ef..e061e35769bf 100644
->> --- a/drivers/net/can/sja1000/Kconfig
->> +++ b/drivers/net/can/sja1000/Kconfig
->> @@ -105,7 +105,7 @@ config CAN_SJA1000_PLATFORM
->>  
->>  config CAN_TSCAN1
->>          tristate "TS-CAN1 PC104 boards"
->> -        depends on ISA || (COMPILE_TEST && HAS_IOPORT)
->> +        depends on (ISA && PC104) || (COMPILE_TEST && HAS_IOPORT)
->>          help
->>            This driver is for Technologic Systems' TSCAN-1 PC104 boards.
->>            https://www.embeddedts.com/products/TS-CAN1
->>
->> Should be ok?
+> Add `bpftool token show` command to get token info
+> from bpffs in /proc/mounts.
 > 
-> If no-one complains I'll add this to my can-next tree and remove the
-> Fixes tag. Otherwise stable will pick this up, but it won't apply
-> without Vincent's patch.
+> Example plain output for `token show`:
+> token_info  /sys/fs/bpf/token
+> 	allowed_cmds:
+> 	  map_create          prog_load
+> 	allowed_maps:
+> 	allowed_progs:
+> 	  kprobe
+> 	allowed_attachs:
+> 	  xdp
+> token_info  /sys/fs/bpf/token2
+> 	allowed_cmds:
+> 	  map_create          prog_load
+> 	allowed_maps:
+> 	allowed_progs:
+> 	  kprobe
+> 	allowed_attachs:
+> 	  xdp
+> 
+> Example json output for `token show`:
+> [{
+> 	"token_info": "/sys/fs/bpf/token",
+> 	"allowed_cmds": ["map_create", "prog_load"],
+> 	"allowed_maps": [],
+> 	"allowed_progs": ["kprobe"],
+> 	"allowed_attachs": ["xdp"]
+> }, {
+> 	"token_info": "/sys/fs/bpf/token2",
+> 	"allowed_cmds": ["map_create", "prog_load"],
+> 	"allowed_maps": [],
+> 	"allowed_progs": ["kprobe"],
+> 	"allowed_attachs": ["xdp"]
+> }]
+> 
+> Signed-off-by: Tao Chen <chen.dylane@linux.dev>
+> ---
+>   tools/bpf/bpftool/main.c  |   3 +-
+>   tools/bpf/bpftool/main.h  |   1 +
+>   tools/bpf/bpftool/token.c | 232 ++++++++++++++++++++++++++++++++++++++
+>   3 files changed, 235 insertions(+), 1 deletion(-)
+>   create mode 100644 tools/bpf/bpftool/token.c
+> 
+> diff --git a/tools/bpf/bpftool/main.c b/tools/bpf/bpftool/main.c
+> index 2b7f2bd3a7d..0f1183b2ed0 100644
+> --- a/tools/bpf/bpftool/main.c
+> +++ b/tools/bpf/bpftool/main.c
+> @@ -61,7 +61,7 @@ static int do_help(int argc, char **argv)
+>   		"       %s batch file FILE\n"
+>   		"       %s version\n"
+>   		"\n"
+> -		"       OBJECT := { prog | map | link | cgroup | perf | net | feature | btf | gen | struct_ops | iter }\n"
+> +		"       OBJECT := { prog | map | link | cgroup | perf | net | feature | btf | gen | struct_ops | iter | token }\n"
+>   		"       " HELP_SPEC_OPTIONS " |\n"
+>   		"                    {-V|--version} }\n"
+>   		"",
+> @@ -87,6 +87,7 @@ static const struct cmd commands[] = {
+>   	{ "gen",	do_gen },
+>   	{ "struct_ops",	do_struct_ops },
+>   	{ "iter",	do_iter },
+> +	{ "token",	do_token },
+>   	{ "version",	do_version },
+>   	{ 0 }
+>   };
+> diff --git a/tools/bpf/bpftool/main.h b/tools/bpf/bpftool/main.h
+> index 6db704fda5c..a2bb0714b3d 100644
+> --- a/tools/bpf/bpftool/main.h
+> +++ b/tools/bpf/bpftool/main.h
+> @@ -166,6 +166,7 @@ int do_tracelog(int argc, char **arg) __weak;
+>   int do_feature(int argc, char **argv) __weak;
+>   int do_struct_ops(int argc, char **argv) __weak;
+>   int do_iter(int argc, char **argv) __weak;
+> +int do_token(int argc, char **argv) __weak;
+>   
+>   int parse_u32_arg(int *argc, char ***argv, __u32 *val, const char *what);
+>   int prog_parse_fd(int *argc, char ***argv);
+> diff --git a/tools/bpf/bpftool/token.c b/tools/bpf/bpftool/token.c
+> new file mode 100644
+> index 00000000000..f72a116f9c6
+> --- /dev/null
+> +++ b/tools/bpf/bpftool/token.c
+> @@ -0,0 +1,232 @@
+> +// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +/* Copyright (C) 2025 Didi Technology Co., Tao Chen */
+> +
+> +#ifndef _GNU_SOURCE
+> +#define _GNU_SOURCE
+> +#endif
+> +#include <errno.h>
+> +#include <fcntl.h>
+> +#include <stdbool.h>
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <string.h>
+> +#include <unistd.h>
+> +#include <mntent.h>
+> +#include <sys/types.h>
+> +#include <sys/stat.h>
+> +
+> +#include "json_writer.h"
+> +#include "main.h"
+> +
+> +#define MOUNTS_FILE "/proc/mounts"
+> +
+> +static bool has_delegate_options(const char *mnt_ops)
+> +{
+> +	return strstr(mnt_ops, "delegate_cmds") != NULL ||
+> +	       strstr(mnt_ops, "delegate_maps") != NULL ||
+> +	       strstr(mnt_ops, "delegate_progs") != NULL ||
+> +	       strstr(mnt_ops, "delegate_attachs") != NULL;
+> +}
+> +
+> +static char *get_delegate_value(const char *opts, const char *key)
+> +{
+> +	char *token, *rest, *ret = NULL;
+> +	char *opts_copy = strdup(opts);
+> +
+> +	if (!opts_copy)
+> +		return NULL;
+> +
+> +	for (token = strtok_r(opts_copy, ",", &rest); token != NULL;
+> +			token = strtok_r(NULL, ",", &rest)) {
+> +		if (strncmp(token, key, strlen(key)) == 0 &&
+> +				token[strlen(key)] == '=') {
+> +			ret = token + strlen(key) + 1;
+> +			break;
+> +		}
+> +	}
+> +	free(opts_copy);
+> +
+> +	return ret;
+> +}
+> +
+> +static void print_items_per_line(const char *input, int items_per_line)
+> +{
+> +	char *str, *rest, *strs;
+> +	int cnt = 0;
+> +
+> +	if (!input)
+> +		return;
+> +
+> +	strs = strdup(input);
+> +	if (!strs)
+> +		return;
+> +
+> +	for (str = strtok_r(strs, ":", &rest); str != NULL;
+> +			str = strtok_r(NULL, ":", &rest)) {
+> +		if (cnt % items_per_line == 0)
+> +			printf("\n\t  ");
+> +
+> +		printf("%-20s", str);
+> +		cnt++;
+> +	}
+> +
+> +	free(strs);
+> +}
+> +
+> +#define ITEMS_PER_LINE 4
+> +static void show_token_info_plain(struct mntent *mntent)
+> +{
+> +	char *value;
+> +
+> +	printf("token_info  %s", mntent->mnt_dir);
+> +
+> +	printf("\n\tallowed_cmds:");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_cmds");
+> +	print_items_per_line(value, ITEMS_PER_LINE);
+> +
+> +	printf("\n\tallowed_maps:");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_maps");
+> +	print_items_per_line(value, ITEMS_PER_LINE);
+> +
+> +	printf("\n\tallowed_progs:");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_progs");
+> +	print_items_per_line(value, ITEMS_PER_LINE);
+> +
+> +	printf("\n\tallowed_attachs:");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_attachs");
+> +	print_items_per_line(value, ITEMS_PER_LINE);
+> +	printf("\n");
+> +}
+> +
+> +static void split_json_array_str(const char *input)
+> +{
+> +	char *str, *rest, *strs;
+> +
+> +	if (!input) {
+> +		jsonw_start_array(json_wtr);
+> +		jsonw_end_array(json_wtr);
+> +		return;
+> +	}
+> +
+> +	strs = strdup(input);
+> +	if (!strs)
+> +		return;
+> +
+> +	jsonw_start_array(json_wtr);
+> +	for (str = strtok_r(strs, ":", &rest); str != NULL;
+> +			str = strtok_r(NULL, ":", &rest)) {
+> +		jsonw_string(json_wtr, str);
+> +	}
+> +	jsonw_end_array(json_wtr);
+> +
+> +	free(strs);
+> +}
+> +
+> +static void show_token_info_json(struct mntent *mntent)
+> +{
+> +	char *value;
+> +
+> +	jsonw_start_object(json_wtr);
+> +
+> +	jsonw_string_field(json_wtr, "token_info", mntent->mnt_dir);
+> +
+> +	jsonw_name(json_wtr, "allowed_cmds");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_cmds");
+> +	split_json_array_str(value);
+> +
+> +	jsonw_name(json_wtr, "allowed_maps");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_maps");
+> +	split_json_array_str(value);
+> +
+> +	jsonw_name(json_wtr, "allowed_progs");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_progs");
+> +	split_json_array_str(value);
+> +
+> +	jsonw_name(json_wtr, "allowed_attachs");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_attachs");
+> +	split_json_array_str(value);
+> +
+> +	jsonw_end_object(json_wtr);
+> +}
+> +
+> +static int __show_token_info(struct mntent *mntent)
+> +{
+> +
+> +	if (json_output)
+> +		show_token_info_json(mntent);
+> +	else
+> +		show_token_info_plain(mntent);
+> +
+> +	return 0;
+> +}
+> +
+> +static int show_token_info(void)
+> +{
+> +	FILE *fp;
+> +	struct mntent *ent;
+> +	bool hit = false;
+> +
+> +	fp = setmntent(MOUNTS_FILE, "r");
+> +	if (!fp) {
+> +		p_err("Failed to open: %s", MOUNTS_FILE);
+> +		return -1;
+> +	}
+> +
+> +	if (json_output)
+> +		jsonw_start_array(json_wtr);
+> +
+> +	while ((ent = getmntent(fp)) != NULL) {
+> +		if (strncmp(ent->mnt_type, "bpf", 3) == 0) {
+> +			if (has_delegate_options(ent->mnt_opts)) {
+> +				__show_token_info(ent);
+> +				hit = true;
+> +			}
+> +		}
+> +	}
+> +
+> +	if (json_output)
+> +		jsonw_end_array(json_wtr);
+> +
+> +	if (!hit)
+> +		p_info("Token info not found");
+> +
+> +	endmntent(fp);
+> +
+> +	return 0;
+> +}
+> +
+> +static int do_show(int argc, char **argv)
+> +{
+> +	if (argc)
+> +		return BAD_ARG();
+> +
+> +	return show_token_info();
+> +}
+> +
+> +static int do_help(int argc, char **argv)
+> +{
+> +	if (json_output) {
+> +		jsonw_null(json_wtr);
+> +		return 0;
+> +	}
+> +
+> +	fprintf(stderr,
+> +		"Usage: %1$s %2$s { show | list }\n"
+> +		"	%1$s %2$s help\n"
+> +		"\n"
+> +		"",
+> +		bin_name, argv[-2]);
+> +	return 0;
+> +}
+> +
+> +static const struct cmd cmds[] = {
+> +	{ "show",	do_show },
+> +	{ "list",	do_show },
+> +	{ "help",	do_help },
+> +	{ 0 }
+> +};
+> +
+> +int do_token(int argc, char **argv)
+> +{
+> +	return cmd_select(cmds, argc, argv, do_help);
+> +}
 
-I do not really mind if those are not backported. No issue for me to drop the
-fix tag.
 
-Yours sincerely,
-Vincent Mailhol
-
+-- 
+Best Regards
+Tao Chen
 
