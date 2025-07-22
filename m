@@ -1,127 +1,120 @@
-Return-Path: <netdev+bounces-209091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDFF7B0E40C
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 21:23:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3015AB0E44C
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 21:38:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D23361AA83A3
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 19:23:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05EF71C81EBA
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 19:39:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7ED9283C9F;
-	Tue, 22 Jul 2025 19:22:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2872283C92;
+	Tue, 22 Jul 2025 19:38:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nnCD0PPf"
+	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="ENtn9vxk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D85828507E;
-	Tue, 22 Jul 2025 19:22:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2208F156677;
+	Tue, 22 Jul 2025 19:38:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753212170; cv=none; b=WHlcQTS3Kb+JeiT+d2cyTHVzJPYqaCiYRI1zFjduvi4VsIX3o3rlTkMWXAh22f9d3IM+tmBOcOMTVWBS/QD3tawEogf3ZImXUqnPpc5L3dhxaA1eVwpmqWsTbhgh/ACR+iPwwwUIuwluqoFocDSZzOAYPgFjWYYV2d78SYs3ppc=
+	t=1753213124; cv=none; b=OfuaPreOMPeo2lBRLHhmbQDCdz8S4/y2EluMVZmNAXC9/eRKmycOx50GpBniiXpe3tA6ra7R+QjNPYuAm18B6SNqlZV8S+0Bj0uhegYw7K/LHfzQg6UlqhMjBLwD2rpS0nmLa/QDIspOfGuKdLJE6Hu7D17uE+gsx/ltBwfGxGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753212170; c=relaxed/simple;
-	bh=nPRRlFzi/MFAWE4l1h6BQ6YpxRF+fnPS8IT2snHzg+M=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=K7+sdONAty83eyBiYnY2w29EtgXgRMcnZl2t7MMXx5JCl5AGoGc0HoKTAyUuhBLrrtbIzX5B1InNdHkEt1+yl1SMmUY/c7wDCPXx697mnsb2g1kXznIJrY/z6geCHYF/vFRv9EFGJCk1swkZRlnx8PLIZNNFDmA5QG+gazC6/Kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nnCD0PPf; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-235e1d710d8so63802515ad.1;
-        Tue, 22 Jul 2025 12:22:47 -0700 (PDT)
+	s=arc-20240116; t=1753213124; c=relaxed/simple;
+	bh=jwyAwao4oPJjdf7FpSRPigfPtomo1g/hUFFqJP0uxSg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lxeykqw2su8VDeZ1VOhWUToTA14ue5U4Qr6J47Ep9iXXFzvc9s/i2OMyBO9tl1YBh1IxwG0HuauJXCTB68fomPDwV0nSL6Ke6zXWAlg3yO9kOnxFJtwsmWlA4e1Tm4LoTpxctN2QlqaBj2e98mScQAtQusc4VxWYfRnpG6LLv8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com; spf=pass smtp.mailfrom=googlemail.com; dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b=ENtn9vxk; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=googlemail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-237311f5a54so47651465ad.2;
+        Tue, 22 Jul 2025 12:38:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753212166; x=1753816966; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=nPRRlFzi/MFAWE4l1h6BQ6YpxRF+fnPS8IT2snHzg+M=;
-        b=nnCD0PPfy8L8UE0ai/H500OedJWpr94sOpz+xLoKSDhKcMxL8WUzCriimor7QFDl8s
-         G62KlrImgfV57b5nHQS8YSts2UUrzOt6eRQo3f/e6TeJmQzZkkrXl4A8GdPXs9lLaC9b
-         1//nEqTh285LBmrZelHV7fj/DbmXh02CKZw2tKGsV+vCE6ZjKnuwtM8xCwrCRaYwDtGF
-         khjErLAgo9oHQCxqQUsIDEBq2Q4TFNY1EdXGVZYExcZGQrvbsj0tAAmtf2nIYOT93cyX
-         ZGWsDz/wRZqXXlYxJaHAFwQOm4AphdRUssf4CWhcHUAGKmo8fpz8F0JTgmYA4wkwqfT/
-         xkhg==
+        d=googlemail.com; s=20230601; t=1753213121; x=1753817921; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jwyAwao4oPJjdf7FpSRPigfPtomo1g/hUFFqJP0uxSg=;
+        b=ENtn9vxkNbAHTvF8nf6gvg4A9xEj6fv+YiZOODFR9eEd+uctWkcbJqSNhiPO6ZngRc
+         ZE1zHORCcjRND+pwU2VZguvVVhj8WizxXzNorjGZ+Aqrfa4KlMZvLm2BFv01GK2QJND2
+         nVGWxRnShKMH/NWesnbsPcer5DX/v5GwUDqUYd5IJWV/KiYH4jcv7lBIqkf1kcZziKuN
+         xAVCqx0nMYddGWqZCNMPOic388Sh7fXeipLx0yeIjmgLI/yf1Nin3Y6pU78rZQ2qZVh0
+         C85VuN4iYcwj4wzdihSuI2++xG1kVTmIvXyHO4ptxR95/SO/0lVSQRM4GBoVjQ4pFxMi
+         P/QA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753212166; x=1753816966;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nPRRlFzi/MFAWE4l1h6BQ6YpxRF+fnPS8IT2snHzg+M=;
-        b=Y6p11+IO6qf/DgnmdM+Ull7C69r5podZreD5ulWvu49N1g8pRCeuD7D6mgApuRr0UF
-         RLOcG2iJdzuj8LcC3SU77NQIsUqSxbJeXOHjqboPg0tADx8OTScJlUODqccWYu9SHT/R
-         u4QivnOLx95Q2mIN5lU6qmqRPmxhcWXFCHf1jP82eSYS4mfEolvj3SJnmKiCZQC/CgGg
-         J2DK6ozTDZE1v3bsHmkkq5TZtsT4b/SjlgWEkBYXxt8G6c8GtZarmldToefQZ0nH5A3S
-         EX2RZwZkHBv8or5dPD+GF4mUZOxmt5ulUiddr+S7Q7NkznrvCdaArSiD7GOl7a8iY0Vv
-         VckA==
-X-Forwarded-Encrypted: i=1; AJvYcCU93l9PS0I4CHvvKNO8RRbilhb26EHTfmIhMs/YXfycsh0OpLAHdveR/FN4HxX85k2R702NOB4N@vger.kernel.org, AJvYcCUMoGI7kmmghbyDobmFYQ0uwDL5BzIVkpf5vszNzfm3Fw/Zdv4FsF66hHYs7nhi+pdeva8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcGyKGhfSAwhkgD3+w6bCVfj8KkphUZ14aOwf7B4Q1DKSRAqtQ
-	MEdg+KHVHwEPkDCcUeGQvJCIxhXAtISBW5bmhKD6td8FvtxKhJXLFHFo
-X-Gm-Gg: ASbGncuJ6RCjqlf8WInkStliCYRJXsMumQNLwjjDhxrBX84CKWRu+irBbzXNU5qU9cK
-	eGOGG1LxG2j2QqY3HXD4IcXS+QcXb1fywlXfNptmxPZs1g5dB1GlADdgQy2ACB194dXZFZi55UJ
-	dREWdTHXGLw/53O825HgXweD+wuxip/Y21SM7+8wy3zdKufP+ZFtWXXphzFnAaVMV9cMLHS20TI
-	hIABquubgarUkkT+hbSMJPeEk96YxWDKSe0RoLy1S3KMalbhBDPnjhzF2sR62CewggZqOpTP9mV
-	s7MwMgfvlfsi6xbYpe+jHTUPcUIODS5I3N5UU4Gg56R76Jz8QBHvy9B/1PiR9l3ezGf7V6vrfSx
-	xNL/O50qCQUEJzWhQzM6+b4V6N8c3
-X-Google-Smtp-Source: AGHT+IEQy9nRlnkXXcl4GZCMRPbmVoad/npYGc06ZCPKWomnYv/JylvSPwoueVt5TLTE8Cbeh44Gpw==
-X-Received: by 2002:a17:903:fab:b0:235:779:edfe with SMTP id d9443c01a7336-23f981b4139mr2353125ad.43.1753212166414;
-        Tue, 22 Jul 2025 12:22:46 -0700 (PDT)
-Received: from ?IPv6:2620:10d:c096:14a::281? ([2620:10d:c090:600::1:e6e1])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23e3b5e2d7asm81880235ad.1.2025.07.22.12.22.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Jul 2025 12:22:46 -0700 (PDT)
-Message-ID: <6f7ee402cc9c84b8c9a6747141dc3f7ff866e737.camel@gmail.com>
-Subject: Re: [PATCH bpf-next v3 05/10] selftests/bpf: Cover verifier checks
- for skb_meta dynptr type
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Jakub Sitnicki <jakub@cloudflare.com>, bpf@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko
- <andrii@kernel.org>,  Arthur Fabre <arthur@arthurfabre.com>, Daniel
- Borkmann <daniel@iogearbox.net>, Eric Dumazet	 <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer	 <hawk@kernel.org>,
- Jesse Brandeburg <jbrandeburg@cloudflare.com>, Joanne Koong	
- <joannelkoong@gmail.com>, Lorenzo Bianconi <lorenzo@kernel.org>, Martin
- KaFai Lau <martin.lau@linux.dev>, Toke
- =?ISO-8859-1?Q?H=F8iland-J=F8rgensen?= <thoiland@redhat.com>,  Yan Zhai
- <yan@cloudflare.com>, kernel-team@cloudflare.com, netdev@vger.kernel.org,
- Stanislav Fomichev	 <sdf@fomichev.me>
-Date: Tue, 22 Jul 2025 12:22:43 -0700
-In-Reply-To: <20250721-skb-metadata-thru-dynptr-v3-5-e92be5534174@cloudflare.com>
-References: 
-	<20250721-skb-metadata-thru-dynptr-v3-0-e92be5534174@cloudflare.com>
-	 <20250721-skb-metadata-thru-dynptr-v3-5-e92be5534174@cloudflare.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
+        d=1e100.net; s=20230601; t=1753213121; x=1753817921;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jwyAwao4oPJjdf7FpSRPigfPtomo1g/hUFFqJP0uxSg=;
+        b=la0EqY7UpYRC5ABE7amlHIVHxd0HJOPQL3u3VdOLy+E52PrlA2LNjB4ec9Gy0l5f/u
+         QDzrRhXFQyriIEgBKZgUd0SubKFjyTcQnFZD8yLthgMbqIZcPcW3aYDeWLPukojGAiJe
+         XL+1eivNJn4zjMG+cuTO5KULzcGKYnv0Kl1LhuzTVzz2h3/F3sYiragFwqr+ogc6LlIP
+         vQFS1Q8h3YZyDVxI4sA38lguaLFm65ms70ZmB+esyWEMOHD3agePZQnhul6Mt1EY3mg8
+         HmEfN28sroh75wn9YB4phoCk5z9W1TAJtPAuhJLLwaP+84LGJMW0t76re1VQgjiH56P3
+         u1kw==
+X-Forwarded-Encrypted: i=1; AJvYcCVJG2vs/ZAG3gFDC8FKIDyl+vP2SFpxKc0eFGB9gqx1XIh217o86/NB+wql5oBbboT+frpqzvHiDNVC@vger.kernel.org, AJvYcCWwV8Blj1V/fDukFtIVMG+LLwzsYut9SQG39PNKDKYXWgdj7JkITIVjdVw1eSbQYhDY8rLT2fyQ@vger.kernel.org, AJvYcCXa8BcBJZLs9YUmk6vZPB7bYjBUcBpzA9SosNCEQgtRlwpzYtauhTbn0Yy4osIFfm3tCicpmRE3ylVJ@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9qMVIqXxXmSKtud9ytkZVMOgQzTizcP43jIG9K+JfcJbz81r6
+	lb5COPSEyU1Pm5d9FjFzYfftb9tA1ZL8XNdPiwoexfYvsBwk2yKwzWxATE42YzpGJ2omuDc1bCM
+	qJgUcnSv6JJmOTfBcLbXRY75q1mcsT5E=
+X-Gm-Gg: ASbGncsrBlaxx/uKj90e0L6Dh5PHVCVafxeLeFYryV04WCMAub8OrPLCvs/ZQlfOHKj
+	urkXwJ6kwHKj2+6jzUTjLlBy3eSfTEUzE7e9G/3lO78vFNhvNoL20TubquOsMaDq4QqPD9EwY2d
+	Y5LOLOCtiHVW5Huz1Ht4wASRiqaCU1yFjcEDR7BXbu3ttIQnsQVsx01k711izU3YIwVaXyLf6Yt
+	lPU8cPUnlwZQ+ItYb8hew==
+X-Google-Smtp-Source: AGHT+IGsEsP2+Lauu71M+oW4n4HRG//Lxp5u7eb8uK45PKFMboS8RYf4aGCjOdXnbHCp/CGkWd7DOfhjjO/CU0YvNwA=
+X-Received: by 2002:a17:902:cec4:b0:23d:fa76:5c3b with SMTP id
+ d9443c01a7336-23f9814e9a7mr3452365ad.22.1753213121296; Tue, 22 Jul 2025
+ 12:38:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250722170513.5854-1-sanjaysuthar661996@gmail.com>
+In-Reply-To: <20250722170513.5854-1-sanjaysuthar661996@gmail.com>
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Tue, 22 Jul 2025 21:38:30 +0200
+X-Gm-Features: Ac12FXwCtPAOsiQDY47hJ2_tvejllz9nr8xSmIyDW7TLGWTLqhLQAI8E9IianHU
+Message-ID: <CAFBinCCmsw=XGPtrk1XbphOu=OwhxmAiZ+2h4x_M-_f64Vo-7A@mail.gmail.com>
+Subject: Re: [PATCH v3] dt-bindings: cleanup: fix duplicated 'is is' in YAML docs
+To: Sanjay Suthar <sanjaysuthar661996@gmail.com>
+Cc: linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-iio@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-amlogic@lists.infradead.org, 
+	ribalda@kernel.org, jic23@kernel.org, dlechner@baylibre.com, 
+	nuno.sa@analog.com, andy@kernel.org, robh@kernel.org, krzk+dt@kernel.org, 
+	conor+dt@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	neil.armstrong@linaro.org, khilman@baylibre.com, jbrunet@baylibre.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2025-07-21 at 12:52 +0200, Jakub Sitnicki wrote:
-> dynptr for skb metadata behaves the same way as the dynptr for skb data
-> with one exception - writes to skb_meta dynptr don't invalidate existing
-> skb and skb_meta slices.
->=20
-> Duplicate those the skb dynptr tests which we can, since
-> bpf_dynptr_from_skb_meta kfunc can be called only from TC BPF, to cover t=
-he
-> skb_meta dynptr verifier checks.
->=20
-> Also add a couple of new tests (skb_data_valid_*) to ensure we don't
-> invalidate the slices in the mentioned case, which are specific to skb_me=
-ta
-> dynptr.
->=20
-> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
-> ---
+On Tue, Jul 22, 2025 at 7:06=E2=80=AFPM Sanjay Suthar
+<sanjaysuthar661996@gmail.com> wrote:
+>
+> Fix minor grammatical issues by removing duplicated "is" in two devicetre=
+e
+> binding documents:
+>
+> - net/amlogic,meson-dwmac.yaml
+> - iio/dac/ti,dac7612.yaml
+>
+> Signed-off-by: Sanjay Suthar <sanjaysuthar661996@gmail.com>
+Reviewed-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
 
-Acked-by: Eduard Zingerman <eddyz87@gmail.com>
+Thank you for spotting and fixing this!
 
-[...]
+To my knowledge nobody else is currently working on amlogic,meson-dwmac cha=
+nges.
+Meaning: with an ACK from the netdev or iio maintainers this patch can
+go through any tree (iio, netdev, devicetree).
+
+
+Best regards,
+Martin
 
