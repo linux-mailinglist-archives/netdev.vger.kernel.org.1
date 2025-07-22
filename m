@@ -1,132 +1,167 @@
-Return-Path: <netdev+bounces-208972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADF87B0DDB5
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 16:19:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E96F8B0DE9E
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 16:30:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E42FC7B5944
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 14:17:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6732CAC4002
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 14:20:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52A3E2EBDD4;
-	Tue, 22 Jul 2025 14:14:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21F942EA485;
+	Tue, 22 Jul 2025 14:16:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wfih1Qj5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YX4yvHWQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D712EBDCB;
-	Tue, 22 Jul 2025 14:14:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C2A23F413;
+	Tue, 22 Jul 2025 14:16:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753193673; cv=none; b=UwNKS/bv0+DXZHJA+Dl4D/t0jEgiFLHrbwoEUUBZGm4q7bNqG2vcSI9HJ7hxIP1gaouGAINs2jEqBt6vLrLgA3QJ/RM5ZmR1/7yy8OazJHsb3DozVrGz6KDprOGRNgZnEqJAvCPXCaFrOE72RP8B6vdnMWl3N8zxbJh4l6NEjM0=
+	t=1753193809; cv=none; b=q72aQwbm5gyGY9UueOSE9lwd+EDcvU0uu8r47h4oMm91WVYlGonPNFU0JSpxuHqUHEHKvMJS1S87jfGlt5yOx+JwZKVKjtUkmi+gYgjE2AIVwLRhsADM2zYWz2PguUNPBpEe3YnuxbQwpSMvascLHKoqLFFpBonXReRLOS1/hPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753193673; c=relaxed/simple;
-	bh=hzuiwjAJr375VSC/o2t+RI8D3combwUEbaFo9X2LmfY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j2U6tsFPTreKmwNF7sjoxRj41vlIa9Esf7jqXBf1/67FkR3Ypt/pJnYTBZ763cUBqZgS3LcSp73tMzMx3AToqO+41NGCJrL8dEMkCHaWcjxxG7NNoCxFx/wAd3894JI+JQzCCEF8/NfjIs4OHhzTK2Z/BT1AZEcOY7OVbNf0Q98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wfih1Qj5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09C99C4CEEB;
-	Tue, 22 Jul 2025 14:14:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753193672;
-	bh=hzuiwjAJr375VSC/o2t+RI8D3combwUEbaFo9X2LmfY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Wfih1Qj5v4wHeXDEOnOj3fHFeMho/5AsJN2GRWOO+wPf18r68eL71w0NRb3IuM5NG
-	 1HijnDHoiQ3ajejJUNirOs2XSLTbxHjxY+pQGaoLvfjM85PVf1KaSCaqT6YYq1VMuN
-	 2Yp7cnTxtJFSPcDiJc0HRltN+W+6cBxyuGsHH0h4zG95XjbYTiD0dblzaC4ffVIh3I
-	 +cV5k8DAbe+od+qhDyRurdXIE9zNvVDtnlNMkecvi6Jj66PxXmz6LYm+Vn4EEyxfNG
-	 vwZCLKLelzv2QUT10vsGLhNsN7JGnWlWAkqWNumP3y3vXxsCoN066yluUoRqPsxUc0
-	 IoWGQTZGe+niQ==
-Date: Tue, 22 Jul 2025 15:14:26 +0100
-From: Simon Horman <horms@kernel.org>
-To: Dong Yibo <dong100@mucse.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
-	gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au,
-	danishanwar@ti.com, lee@trager.us, gongfan1@huawei.com,
-	lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 14/15] net: rnpgbe: Add base rx function
-Message-ID: <20250722141426.GK2459@horms.kernel.org>
-References: <20250721113238.18615-1-dong100@mucse.com>
- <20250721113238.18615-15-dong100@mucse.com>
+	s=arc-20240116; t=1753193809; c=relaxed/simple;
+	bh=tVf9s+VBrCxFX0/0lHXJexCtjFH2FtKEcOQbNsybb/U=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Zh6Wu5hSOWdzx7VHKwqicq4hYQSzTuTxrWFuYcsV6LMD0BgKdcsREG/VrP7jhZS35BaFxZIgzBGibBd3ePwq2Q2yeLxd4mqIJLMEu53f7XE6vxC4qR/rZhNSb6PUFJTyJPczRm8EDxioWkU9J7+jChVFycHNl2UMYtm3HPR0ZEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YX4yvHWQ; arc=none smtp.client-ip=209.85.219.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e740a09eae0so5433251276.1;
+        Tue, 22 Jul 2025 07:16:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753193806; x=1753798606; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tVf9s+VBrCxFX0/0lHXJexCtjFH2FtKEcOQbNsybb/U=;
+        b=YX4yvHWQ84fejHo6aoCk5oT6uZZF6qCp6bGjA38cuwc5kyrnd3QGkcoiW3tdjgETsX
+         y6olO8LGO50EMox9i9gh3JnnBKdR4/+lLlouTvWYEA0dU0zV+wWl3pbJrCGlgvKcBOcd
+         suwf3o/7isM+qxnXpRXfKcu9FVvpMED22Rhtgjjq0Jw9a7N7YCKvb7d+pFklfOq4RYkh
+         cTy5hX8UVj5ETn7/XMo76JQtuTnWydUd0/enpgfhrSIpAJgOso4YmzVfEI3nVcawGSXB
+         g9Uu5B93hbzAGzGfvL75hPWnUJOVL8KaB17550CrVE06koWmmxCq/dq8yj6HJOqqX5bo
+         IjwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753193806; x=1753798606;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=tVf9s+VBrCxFX0/0lHXJexCtjFH2FtKEcOQbNsybb/U=;
+        b=PAtZR/d4cKmyDdikFWaGsUQB+shWbkeI7EIxt2VLaHeh7bn2W1t2x1YV8NxKsxhDCU
+         hGUD4CzD6XQG20mYPsmeLdDadhG9gVU3KVT9Oh/ZOhrfvrXjqmbyfxOzwjAfxVo0JGJL
+         23sQ5LQMvteWkSDoi46tNhJTkA1DJ2e7sPR6EmhdYDLSqPiT9NSd3DL4OijdyIhuABpN
+         KUe/N1U6YmcLQh0QE8WM9zv9QWRp6sMEqM/MOQaBYmfosGIV3PCm4dElEjf1dJ5vCaLJ
+         1zy4dcjKHOrct9JkPWf1U5JGztyoBDuEqT2vh7YPQYoJspw4CZf+S4biiFMZ6lMat5fp
+         xkAg==
+X-Forwarded-Encrypted: i=1; AJvYcCUa6dXWeuWZpgZOFVPANWh1HR2uPfWKzYbD0EMGHR3uCMuX8jSavJfGqj/7tKyl7tXYBdI=@vger.kernel.org, AJvYcCVt8QiR+Bdnh+tnaYevhxT+7N7VmiMroJcZPP4lgo2zvnEHESkfW1HcseQiTDoX0XIgyDl3fHuD@vger.kernel.org
+X-Gm-Message-State: AOJu0YyD21QcBC/S8S8zQnttKKZwZQufNnasOjw70jB9CHBQI6JRn+Yd
+	EvpQWA+EtNdk9zFGpIx5TTdCcYGqwvmfhHQGQUDAW+6HsC6h17ENb3yw
+X-Gm-Gg: ASbGncu0siLxX4LLkTDzGmiavy76Ff+5vhXi0y7qyyDU39K/KwNrEsCQ06Z7HU71DSk
+	BKA8etKauZ9Zoq43nzjBd2s+EZw54UX89Cx0a4aW6t5lfDRvW8vOavuRaAHloIAM7ZZTi8KZJfb
+	wNkvYpfzsnrUo3qORiY+yO7DpaMjNVhZrVoJ66G5SZ40jWHpdL707KxdViogvh8TaVMdQVQ+gij
+	D+MCLTiUB+OuUpYAeWOP8vMNcymCPC5j+xmcSX4IWdrfS5gd+KJGG4XAJSN1nWe9VTNatejdZVr
+	xzySFak7ctZuOMozGufqJ5g2Qo9yKPJHtuJL7l/PrLjO6TT9enJYIJhI3+l4voyMOeSTa8wem0D
+	eO9OkJZzFIV3tnno/UJBbsZ8Q/+937LB3Ueut0/i6bRMeyW6zFPGPVRxyUoxopoJyDnRKHw==
+X-Google-Smtp-Source: AGHT+IHP7FxitzXESY9w0S6KZhfv95yINoBxcZiXaQntPpFdLn7KC8PXaCXmQQWqLiwrO+Z+Yy7ijA==
+X-Received: by 2002:a05:6902:2210:b0:e8b:b593:b06b with SMTP id 3f1490d57ef6-e8c5f8acfb2mr24476660276.28.1753193806375;
+        Tue, 22 Jul 2025 07:16:46 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with UTF8SMTPSA id 3f1490d57ef6-e8d7cc0b1cesm3206309276.3.2025.07.22.07.16.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Jul 2025 07:16:45 -0700 (PDT)
+Date: Tue, 22 Jul 2025 10:16:44 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, 
+ Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: anthony.l.nguyen@intel.com, 
+ przemyslaw.kitszel@intel.com, 
+ andrew+netdev@lunn.ch, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ bjorn@kernel.org, 
+ magnus.karlsson@intel.com, 
+ maciej.fijalkowski@intel.com, 
+ jonathan.lemon@gmail.com, 
+ sdf@fomichev.me, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ hawk@kernel.org, 
+ john.fastabend@gmail.com, 
+ mcoquelin.stm32@gmail.com, 
+ alexandre.torgue@foss.st.com, 
+ linux-stm32@st-md-mailman.stormreply.com, 
+ bpf@vger.kernel.org, 
+ intel-wired-lan@lists.osuosl.org, 
+ netdev@vger.kernel.org, 
+ Jason Xing <kernelxing@tencent.com>
+Message-ID: <687f9d4cf0b14_2aa7cc29443@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAL+tcoAP7Zk7A4pzK-za+_NMoX11SGR3ubtY6R+aaywoEq_H+g@mail.gmail.com>
+References: <20250721083343.16482-1-kerneljasonxing@gmail.com>
+ <20250721083343.16482-2-kerneljasonxing@gmail.com>
+ <8c9e97e4-3590-49a8-940b-717deac0078d@molgen.mpg.de>
+ <CAL+tcoAP7Zk7A4pzK-za+_NMoX11SGR3ubtY6R+aaywoEq_H+g@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH net-next 1/2] stmmac: xsk: fix underflow
+ of budget in zerocopy mode
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250721113238.18615-15-dong100@mucse.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 21, 2025 at 07:32:37PM +0800, Dong Yibo wrote:
-> Initialize rx clean function.
-> 
-> Signed-off-by: Dong Yibo <dong100@mucse.com>
+Jason Xing wrote:
+> Hi Paul,
+> =
 
-...
+> On Mon, Jul 21, 2025 at 4:56=E2=80=AFPM Paul Menzel <pmenzel@molgen.mpg=
+.de> wrote:
+> >
+> > Dear Jason,
+> >
+> >
+> > Thank you for your patch.
+> =
 
-> diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c
+> Thanks for your quick response and review :)
+> =
 
-...
+> >
+> > Am 21.07.25 um 10:33 schrieb Jason Xing:
+> > > From: Jason Xing <kernelxing@tencent.com>
+> > >
+> > > The issue can happen when the budget number of descs are consumed. =
+As
+> >
+> > Instead of =E2=80=9CThe issue=E2=80=9D, I=E2=80=99d use =E2=80=9CAn u=
+nderflow =E2=80=A6=E2=80=9D.
+> =
 
-> @@ -299,12 +707,27 @@ static int rnpgbe_poll(struct napi_struct *napi, int budget)
->  	struct mucse_q_vector *q_vector =
->  		container_of(napi, struct mucse_q_vector, napi);
->  	struct mucse *mucse = q_vector->mucse;
-> +	int per_ring_budget, work_done = 0;
->  	bool clean_complete = true;
->  	struct mucse_ring *ring;
-> -	int work_done = 0;
-> +	int cleaned_total = 0;
+> Will change it.
+> =
 
-cleaned_total is set but otherwise unused in this function.
+> >
+> > > long as the budget is decreased to zero, it will again go into
+> > > while (budget-- > 0) statement and get decreased by one, so the
+> > > underflow issue can happen. It will lead to returning true whereas =
+the
+> > > expected value should be false.
+> >
+> > What is =E2=80=9Cit=E2=80=9D?
+> =
 
-Flagged by Clang 20.1.8 builds with KCFLAGS=-Wunused-but-set-variable.
+> It means 'underflow of budget' behavior.
 
->  
->  	mucse_for_each_ring(ring, q_vector->tx)
->  		clean_complete = rnpgbe_clean_tx_irq(q_vector, ring, budget);
-> +	if (q_vector->rx.count > 1)
-> +		per_ring_budget = max(budget / q_vector->rx.count, 1);
-> +	else
-> +		per_ring_budget = budget;
-> +
-> +	mucse_for_each_ring(ring, q_vector->rx) {
-> +		int cleaned = 0;
-> +
-> +		cleaned = rnpgbe_clean_rx_irq(q_vector, ring, per_ring_budget);
-> +		work_done += cleaned;
-> +		cleaned_total += cleaned;
-> +		if (cleaned >= per_ring_budget)
-> +			clean_complete = false;
-> +	}
->  
->  	if (!netif_running(mucse->netdev))
->  		clean_complete = true;
+A technicality, but this is (negative) overflow.
 
-...
-
-> @@ -871,6 +1323,8 @@ static int rnpgbe_setup_rx_resources(struct mucse_ring *rx_ring,
->  	memset(rx_ring->desc, 0, rx_ring->size);
->  	rx_ring->next_to_clean = 0;
->  	rx_ring->next_to_use = 0;
-> +	if (mucse_alloc_page_pool(rx_ring)
-
-There is a trailing ')' missing from the line above.
-
-> +		goto err;
->  
->  	return 0;
->  err:
-
-...
+Underflow is a computation that results in a value that is too small
+to be represented by the given type.=
 
