@@ -1,183 +1,125 @@
-Return-Path: <netdev+bounces-208839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C04A0B0D5B6
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 11:19:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 452E9B0D5B7
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 11:19:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D26513ABD97
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 09:19:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AAFC3B68EB
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 09:19:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44DE7238C21;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD7223A564;
 	Tue, 22 Jul 2025 09:19:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="OJFNeYfD"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="xRhYhWVS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4597917741
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 09:19:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC76F2D9793
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 09:19:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753175993; cv=none; b=qDBS45GA7RyJVedO5vjfMSavZpJSYX3i44ixOfoVgEg5oW1RquabelczIjwNxQsljUhsZYM+w1WgH9BJP1OGzDvZvIxrSEetEpyms/YsZJSSpMMIb96XcwX/VYMnkjyxXj8bJP3rYEoMuHDlnavSDL6GndAdsHgb1tLjysAZQn4=
+	t=1753175993; cv=none; b=VKuyUzK6xH3IA9xclIlemcxzGb4cU5sqv+M1wi5SXsD75dYVkxXHLddSX6RQsTcrRW/634MW/0HE+JoTKYg7Sufa/BkTXzSIyoxGkVg0duMEl1jOXxf47SrYFvoxqoza5IQZL2Z2ItlkILVDrp1IQ5Ig1eJKUUuuL9HOy0JyONk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1753175993; c=relaxed/simple;
-	bh=TO1P6UT5t3MBJp5ANznrnFafMxZpYHQbVczkv8ALqv4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jSBIHfrL7jOqgaXn770rGSsyUV+buFEzXVqEtVRTnlnbFIoIvJ9gJzbkCwR1WjxM1cGtZDA5jPdGuD91VrprpTDzG/rhMEdNTTlxLubkD4JEmTr1JtHAtRk8jYz1tQYjmQkCJR03yoQIvIpPTAQ4phv28tnBab5iAs77JMzjWmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=OJFNeYfD; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-451d41e1ad1so36779065e9.1
-        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 02:19:50 -0700 (PDT)
+	bh=Nc5LsYBLDXrRSjWDibQSsMSXJGDOtTLIeSfPdkJxZWI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=V6ihW7poTLCqfOuRARedANuUOAvcoNGT/7UbUSngm7WiFxR0B78o6ybSjfOlzWpwH+3QgkEDHAMlnAo4M1YxWlcZGF8kd8EttqwMJ0ZM4hipxF7Y7LoKcYq/2hPN09nuCoDLItam1blJwfBALGHoNujsn7TvbdnMep4Jezk2LV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=xRhYhWVS; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-611f74c1837so10084481a12.3
+        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 02:19:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1753175989; x=1753780789; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BbHvHSROpYw+ztsx9uVIrc/4QkXVUTWIpFCiJ5QYzZU=;
-        b=OJFNeYfDEuTg0gkPUGfa0PYn5HbfLU0FvrdhhidMXsn/cbwtJoEMZnzsJoBCaZFLbL
-         SMGQEi32BAl1b1p/2SBmTshK5W532h+6QT400+Qr4F1CppCIbo7OYvuNFQPJt/INL1AL
-         TDzS24IYJZvcsVtRGwdUWnLTYJo+2RioGcUO3QEcDtm8oH3XqmFDBn1ToNj2vFORPrfQ
-         +1VyXbiG9oM0glLlYxYWmY0qY84YE1ajpoY7J9RnhOyQP5Z9Byx9wXcM3LV4nkQfipYz
-         aVXFs7yp7QwaoVPErj3rVeMEMHia3eHgzOuAZQyeIqIlIbtJGjnksYywoiD2m53k5YOF
-         j/+Q==
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1753175990; x=1753780790; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5CkWrUi8y/EeZjQzOxkKkRJZhHj+VflbRA1dCfIf7WA=;
+        b=xRhYhWVS8QeZaBQINDkLcin1O8O6Ccql0ujdbSE6TdX/PAzWOkP3NviIeEhit3nmJ8
+         ByehyUmgABAcwdJ1RY1JrFRsVtg4Fi9XO4z2CGB/7SASHcV3uGaQ6uFX6XVtfJXIT8V1
+         VSkY/MbcNMv29/kx0ut1fE4Uc31uYxsrqwpPuG2tSUrnVeyEUqDdyCo5wKPd2h1IvHOv
+         QosXQSR8ruuxzOUz+HWOgUsSwlXtd3Kqp3b/VIsp+NEtrmUBJv5l279qOmAkS8sPrB7s
+         NpxvxXVbc8l8LB+m53jGdOlpiRAoHMYGsZflXU+eeGIIRLOuYwbXzyqhQ6qoxzxWoxRG
+         h5Bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753175989; x=1753780789;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BbHvHSROpYw+ztsx9uVIrc/4QkXVUTWIpFCiJ5QYzZU=;
-        b=XsiKeXFYCnSCfvyv/eVe99BCiawu3JESkaVJ+SZ2pt0LLe5j7ScODE8+xWv82tBIAu
-         EhGbnPKyD3ncAd0us5DoDMpDej1IbTUawWYOd8f3C4w2TfghDmWAcf24am7/YKaL4lEn
-         luzAG0HkYJMUtc6eADqy8noqDKJOz2axrh4E26yEaqUfRW4RgxIgG8wCSMugL7JimCeR
-         2MYmqwOvwjHodMi/Hd/ivaLdIBBfvJOf6Tux2Zk+4iJfJWM3SGBkffn98NQSWEhvKeON
-         7TchC9TQz+k9c+1YLkLOMrHOEoqBD3ps7K25+OFVDA7pB1I5Jc865FuK5uapIxL0W8Pq
-         bASg==
-X-Gm-Message-State: AOJu0YwXWwzT085iSUIvymuF53aE1X/rSHzzbnMLHjaT3EJHm6ROBv6p
-	CogytZfP/LTbLAX64SemqvvGgcMOLqvivKN1mf/O2VhizFA1RsK090DHggvT0DLETwOFWJiPfEy
-	ahcRj
-X-Gm-Gg: ASbGncv8xZSJjjVWGyJHu8HV3vNw+U4yyaHDZS/7sRS9+kCGyYsU/BYQJIpnmbL22Ib
-	CeipPPRz/iK4gmkUWXLKypp0yzGYfz1rziHX+wOasG1dzY5LkncTa1l2NypH+UT6KnqoiZXODyL
-	WICTm2FFEak8FlxpGUrFJkg8nPHNJPFcGmEHZ8YWjGtuqRW26/f2TiVFGn9YdhQJeLHCvDKfLhY
-	VSW9MMM6kKwh5JJYY1PFVWQqa/WRFAFrWwmoGjPTh3p/cfs3gFNSLfzdF78IPUxiFKyAhgNT8fm
-	JMVHzSDgmNjWBn9kfixir7kVuCdzmmoCW4agIUsKPcuTwi8PAXCJWwFbX1uQjfADD2LlW0s1nlb
-	Rh3VI0A3SoT9+YpvhieBjPaqgVw==
-X-Google-Smtp-Source: AGHT+IHWv7rKIlyHvLCbiwoFJ78h26PwQMBdsv1odnsZAnYz74FQ43tQ4WCk0JFRO1/YZV/B7zCSIQ==
-X-Received: by 2002:a05:600c:1c82:b0:456:2ac6:ccc3 with SMTP id 5b1f17b1804b1-4562e28367emr166014315e9.25.1753175989084;
+        d=1e100.net; s=20230601; t=1753175990; x=1753780790;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5CkWrUi8y/EeZjQzOxkKkRJZhHj+VflbRA1dCfIf7WA=;
+        b=rKwvfMe5BiT3hA4O6IcJcZAKDNeSy99WE0YI9IRUhqSLD6VohKR6UdP2CkMlfHVVvQ
+         zF/XuNwmDVTYWmRjzGzv5//LN3WDAR3dqYep9IapZVoLtS/+FWfw/irG3l1TJjYZX3we
+         7TRKLZBDxk8SDKvRcKzF0O/EynjowjFU+iDO8vlu5UZI7uRy06SxycMaVkxdebcjVlyH
+         Th8Y3SIDOQbrqn+0bw2tXIz6nq4W8h9g5IOxkah3/iH/lS1/70MI8W+11m6QNJ0lcDqz
+         bAWqR8JtVFZE0K7xIEUPpyu+LRvTVhQG6E4AL9wtYxdDW/V6ODDCQSFw9uIa5DyW3bBV
+         Ay9w==
+X-Forwarded-Encrypted: i=1; AJvYcCXewj9VAqBio8TsrV/b5pkB2uxnfq5OtIjhzfJgo66kkaU0FnrA7QjRkue7KDL9P/kgcRKUeX4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKGZQqpcm0JlyLyPPiJ+t8HtUhkGFpQabc2YZ4ZTaQXfk38W+F
+	cgdAPEE2J35nSOR1V3SUlqgvUJ/M5GMw7lsrumahS9Po1hIPqcoX1Y97ABQj+I4Hf8w=
+X-Gm-Gg: ASbGnctC3KKZInGJKBTrImaZmHSSEGd2g2gNbCC83X8yjpK0sOZn1pTzgZZXkX99M7q
+	ft5clhjaLt52mRVJ7v4mYmRdJlQmoIY46Bb7myoNdiCB1VTetopbalyn/OyqA0/eLAKnIroHTmq
+	/vVDmnvZL93CC+ER7g5uscSK3xCI7OHHAF22AvI+702KFXHXw9SD75WPiyUTpBlCvP9BVyIwUM7
+	TJuqWBlIiWa01z0DkIyFmAb9N2nEUnP/RxYTXhGNWi0f+kJYCA0kK0TvgXki3hLebHBXW3TXFrL
+	sPnHJG4LEwf7zq3gaAWvzRnCXV6sOjdHa5klrF+GmvgPDW6EAQYhVVf9+UQRIxlpTkQiiv0LXhU
+	f+KA6kYTPK62sOzgXtwq27pPEir7n8Aej/BvenUwQD1CWrC2gALvEsA==
+X-Google-Smtp-Source: AGHT+IE/B2CTrIdQjnB1vPNgmhIwDU5QOPxOiUS6LHTb8kkqvCAeLFSRTFWBar5inQPkIGesfWAM1A==
+X-Received: by 2002:a17:907:6095:b0:ae3:bb0a:1cc6 with SMTP id a640c23a62f3a-aec6a4e0c16mr1346682966b.16.1753175989485;
         Tue, 22 Jul 2025 02:19:49 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4563b74f8a9sm126760425e9.26.2025.07.22.02.19.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Jul 2025 02:19:48 -0700 (PDT)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org
-Subject: [PATCH net-next v3] netdevsim: add fw_update_flash_chunk_time_ms debugfs knobs
-Date: Tue, 22 Jul 2025 11:19:45 +0200
-Message-ID: <20250722091945.79506-1-jiri@resnulli.us>
-X-Mailer: git-send-email 2.50.1
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aecd96537d7sm729370066b.18.2025.07.22.02.19.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Jul 2025 02:19:49 -0700 (PDT)
+Message-ID: <97be4c1a-f097-4780-b5e6-71c0530f3f49@blackwall.org>
+Date: Tue, 22 Jul 2025 12:19:47 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] vxlan: remove redundant conversion of vni in
+ vxlan_nl2conf
+To: Wang Liang <wangliang74@huawei.com>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, idosch@nvidia.com, petrm@nvidia.com,
+ menglong8.dong@gmail.com
+Cc: yuehaibing@huawei.com, zhangchangzhong@huawei.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250722093049.1527505-1-wangliang74@huawei.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20250722093049.1527505-1-wangliang74@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Jiri Pirko <jiri@nvidia.com>
+On 7/22/25 12:30, Wang Liang wrote:
+> The IFLA_VXLAN_ID data has been converted to local variable vni in
+> vxlan_nl2conf(), there is no need to do it again when set conf->vni.
+> 
+> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+> ---
+>  drivers/net/vxlan/vxlan_core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+> index 97792de896b7..77dbfe9a6b13 100644
+> --- a/drivers/net/vxlan/vxlan_core.c
+> +++ b/drivers/net/vxlan/vxlan_core.c
+> @@ -4036,7 +4036,7 @@ static int vxlan_nl2conf(struct nlattr *tb[], struct nlattr *data[],
+>  			NL_SET_ERR_MSG_ATTR(extack, tb[IFLA_VXLAN_ID], "Cannot change VNI");
+>  			return -EOPNOTSUPP;
+>  		}
+> -		conf->vni = cpu_to_be32(nla_get_u32(data[IFLA_VXLAN_ID]));
+> +		conf->vni = vni;
+>  	}
+>  
+>  	if (data[IFLA_VXLAN_GROUP]) {
 
-Netdevsim emulates firmware update and it takes 5 seconds to complete.
-For some use cases, this is too long and unnecessary. Allow user to
-configure the time by exposing debugfs a knob to set chunk time.
-
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
-v2->v3:
-- reduced the exposed knobs to just time_ms, redurect flash size 10
-  times
-v1->v2:
-- added sanitiazation of the tunables before using them
----
- drivers/net/netdevsim/dev.c                              | 9 ++++++---
- drivers/net/netdevsim/netdevsim.h                        | 1 +
- tools/testing/selftests/drivers/net/netdevsim/devlink.sh | 2 ++
- 3 files changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/netdevsim/dev.c b/drivers/net/netdevsim/dev.c
-index 01c7edb28d96..2672d071b325 100644
---- a/drivers/net/netdevsim/dev.c
-+++ b/drivers/net/netdevsim/dev.c
-@@ -314,6 +314,8 @@ static int nsim_dev_debugfs_init(struct nsim_dev *nsim_dev)
- 			    &nsim_dev->fw_update_status);
- 	debugfs_create_u32("fw_update_overwrite_mask", 0600, nsim_dev->ddir,
- 			    &nsim_dev->fw_update_overwrite_mask);
-+	debugfs_create_u32("fw_update_flash_chunk_time_ms", 0600, nsim_dev->ddir,
-+			   &nsim_dev->fw_update_flash_chunk_time_ms);
- 	debugfs_create_u32("max_macs", 0600, nsim_dev->ddir,
- 			   &nsim_dev->max_macs);
- 	debugfs_create_bool("test1", 0600, nsim_dev->ddir,
-@@ -1015,9 +1017,9 @@ static int nsim_dev_info_get(struct devlink *devlink,
- 						    DEVLINK_INFO_VERSION_TYPE_COMPONENT);
- }
- 
--#define NSIM_DEV_FLASH_SIZE 500000
-+#define NSIM_DEV_FLASH_SIZE 50000
- #define NSIM_DEV_FLASH_CHUNK_SIZE 1000
--#define NSIM_DEV_FLASH_CHUNK_TIME_MS 10
-+#define NSIM_DEV_FLASH_CHUNK_TIME_MS_DEFAULT 100
- 
- static int nsim_dev_flash_update(struct devlink *devlink,
- 				 struct devlink_flash_update_params *params,
-@@ -1041,7 +1043,7 @@ static int nsim_dev_flash_update(struct devlink *devlink,
- 							   params->component,
- 							   i * NSIM_DEV_FLASH_CHUNK_SIZE,
- 							   NSIM_DEV_FLASH_SIZE);
--		msleep(NSIM_DEV_FLASH_CHUNK_TIME_MS);
-+		msleep(nsim_dev->fw_update_flash_chunk_time_ms ?: 1);
- 	}
- 
- 	if (nsim_dev->fw_update_status) {
-@@ -1585,6 +1587,7 @@ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
- 	INIT_LIST_HEAD(&nsim_dev->port_list);
- 	nsim_dev->fw_update_status = true;
- 	nsim_dev->fw_update_overwrite_mask = 0;
-+	nsim_dev->fw_update_flash_chunk_time_ms = NSIM_DEV_FLASH_CHUNK_TIME_MS_DEFAULT;
- 	nsim_dev->max_macs = NSIM_DEV_MAX_MACS_DEFAULT;
- 	nsim_dev->test1 = NSIM_DEV_TEST1_DEFAULT;
- 	spin_lock_init(&nsim_dev->fa_cookie_lock);
-diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
-index 8eeeb9256077..bddd24c1389d 100644
---- a/drivers/net/netdevsim/netdevsim.h
-+++ b/drivers/net/netdevsim/netdevsim.h
-@@ -317,6 +317,7 @@ struct nsim_dev {
- 	struct list_head port_list;
- 	bool fw_update_status;
- 	u32 fw_update_overwrite_mask;
-+	u32 fw_update_flash_chunk_time_ms;
- 	u32 max_macs;
- 	bool test1;
- 	bool dont_allow_reload;
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/devlink.sh b/tools/testing/selftests/drivers/net/netdevsim/devlink.sh
-index a102803ff74f..030762b203d7 100755
---- a/tools/testing/selftests/drivers/net/netdevsim/devlink.sh
-+++ b/tools/testing/selftests/drivers/net/netdevsim/devlink.sh
-@@ -40,6 +40,8 @@ fw_flash_test()
- 		return
- 	fi
- 
-+	echo "10"> $DEBUGFS_DIR/fw_update_flash_chunk_time_ms
-+
- 	devlink dev flash $DL_HANDLE file $DUMMYFILE
- 	check_err $? "Failed to flash with status updates on"
- 
--- 
-2.50.1
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
 
