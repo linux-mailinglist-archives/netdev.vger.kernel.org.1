@@ -1,167 +1,163 @@
-Return-Path: <netdev+bounces-208762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52DA0B0CFD2
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 04:41:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ADB08B0CFDB
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 04:47:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A90E1AA7906
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 02:42:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60CD71AA7EC1
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 02:47:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C34F01DED5D;
-	Tue, 22 Jul 2025 02:41:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46D2D270ECF;
+	Tue, 22 Jul 2025 02:47:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sc8Ovpcm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 913B01E47CC
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 02:41:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85B7627146B
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 02:47:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753152109; cv=none; b=re/5HbqgDMEzrIg7uGa4jRb5BxhroH8ILUZo1+h04jfnry6VNYAq9fXFGV5/cnOcL4PTRzC2uSeW9CqBexQkEomxxsdTSte7g7dt5x5Oia9dqbipKcBl8AjMCh3bVVE2WNN774dwniZxHo1GXUBCp4nisrI7FsOLtivGTZum4A8=
+	t=1753152438; cv=none; b=gdxDveNjZAzfnl3iEGLfd9IPciWsFderlDRoHZJEYQNVjmhlOxaBBhFfnr+rRsSpvWK8kQBWtbNpge/OVfeXBU/6NPEg0UFi2MqrykUYtiEpOnZywwtcx0U86Ipvh8h4BO3DznGpBkPry6YT+3GwDdz7G6dLIM81M2q7ip9fmCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753152109; c=relaxed/simple;
-	bh=HlEovfXzbWSxYse9fwuVAeaZsMcFOemBV6rK34fNQYM=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=EAE0ryZnXbFHoEu2069Fap8m7+oDNSmDDjO29FQvZ5FGR0ddZMmxiob1rbeQVdNqgmMyREp6gzFHjRXClqo6KgYKzuTttbsknF2AH0mS9F9V6gnFQrTPbbiuDub8n0XgTvGEt25VxX7yLO4nZnpjhN1dISaG68sHVoBVXkVZFmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.206.34.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas9t1753152024t192t01187
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [36.24.205.22])
-X-QQ-SSF:0001000000000000000000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 4788300256366270627
-To: "'Jacob Keller'" <jacob.e.keller@intel.com>,
-	<netdev@vger.kernel.org>,
-	"'Andrew Lunn'" <andrew+netdev@lunn.ch>,
-	"'David S. Miller'" <davem@davemloft.net>,
-	"'Eric Dumazet'" <edumazet@google.com>,
-	"'Jakub Kicinski'" <kuba@kernel.org>,
-	"'Paolo Abeni'" <pabeni@redhat.com>,
-	"'Simon Horman'" <horms@kernel.org>
-Cc: "'Mengyuan Lou'" <mengyuanlou@net-swift.com>
-References: <20250721080103.30964-1-jiawenwu@trustnetic.com> <20250721080103.30964-2-jiawenwu@trustnetic.com> <d45910fb-f479-4991-85c8-7dd5e2642ff0@intel.com>
-In-Reply-To: <d45910fb-f479-4991-85c8-7dd5e2642ff0@intel.com>
-Subject: RE: [PATCH net-next v2 1/3] net: wangxun: change the default ITR setting
-Date: Tue, 22 Jul 2025 10:40:12 +0800
-Message-ID: <02ae01dbfab1$f30618a0$d91249e0$@trustnetic.com>
+	s=arc-20240116; t=1753152438; c=relaxed/simple;
+	bh=kCKyEvyaME9w7wWZPjOrMFKwm0hXVrCcUoazmS1Oke8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bt2dKm2vqBAog5H4sxdsVKO/wSvokmFr60ZWsfRe8SBMqeq+n/8i58j5EXeIkLpPcS1/Lhbe2+0jjQWbDWXjTVw0nujmTFm0yyQvJK5/BHRWoZEqHW4MwvTe/krJiqZKRERmEGI++8AoAS84dpNASoQ1s7M3FIChCKHrvV0IYVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sc8Ovpcm; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753152435;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kCKyEvyaME9w7wWZPjOrMFKwm0hXVrCcUoazmS1Oke8=;
+	b=Sc8Ovpcm5JMq3fCjg5vzDNfeF5GyBB/2iglH8gKWxtbammGMX3SMI3/yrgzIt1b8ElUjkk
+	NS7YugsNoq8C3GUyTv2oU7N+Ijalf1/70GEnIuYBcrssXwFaSo8c4Ld+kX/YJWVWcOjsiG
+	kgww5ClZB5STvcj38TM2fL7XNK9x9c4=
+Received: from mail-vk1-f199.google.com (mail-vk1-f199.google.com
+ [209.85.221.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-438-cL0zNs8xMGSbEnMfkyV7vg-1; Mon, 21 Jul 2025 22:47:09 -0400
+X-MC-Unique: cL0zNs8xMGSbEnMfkyV7vg-1
+X-Mimecast-MFC-AGG-ID: cL0zNs8xMGSbEnMfkyV7vg_1753152428
+Received: by mail-vk1-f199.google.com with SMTP id 71dfb90a1353d-5331c1d1683so1045436e0c.3
+        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 19:47:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753152428; x=1753757228;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kCKyEvyaME9w7wWZPjOrMFKwm0hXVrCcUoazmS1Oke8=;
+        b=ZMPZUloBGEo9SAZ6RNGmLtPjue+SfEHkGpRajUN84MVB+YmyJOaUOwv7bB3dCk3nxL
+         7HpIP93pOz+cdtKV/zYfnA5lm2ykykJ1c0zp3U76M+Pvk/w0a9rqdzDO6vCLgNzfr+hx
+         W/jjWLMMKIVxbaWqufHVz92FoWP69LDY9l3ykNM71kXjnozckCCvW91NrkQaJBad6gvg
+         i1EaTELahqt4rAPKJD+IZhBxm5+n9lD2G2WMt6vhIemhJ9xWzmYx7ZRPYekZh1qIrgk5
+         yFfyDEsJvfzRKvdmcWUf3k3WwwNQC8Dcq6fBk4TvE94IfBsvBES271luxCPz4d524PPj
+         ltWw==
+X-Forwarded-Encrypted: i=1; AJvYcCXrHKj3+I8ioxyj/y5cb38BPQmMGn+VVST5qZuTVyTXV0WJ+xuCGTOrE5wbsSFHHdJPR4CHHiM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxqakwqjyv1QiTogSKmPz9XyvoppCHCe+YxPnNbxWtvN+qMf0kV
+	FAVR5+ic65cpYwLTRMmxZGSk289Yfm1CRG0rKd9NFp633svVip0husvIzDKi5bOnmltS5mi1cdx
+	n3zzyCJWAQPlw+fYv62Tl6RipQTz0aI2wTU+FaqsP4eyC1FP6HbQfPzK0GRDGY5I7/k/0QArx06
+	1zb+xYVCaKLE/jXXrr24m39WmZrUwhl4KP
+X-Gm-Gg: ASbGncvwgG5k6zrDJ5gT2C+2Ndg8iLZDaSTon3LfyOfQkAWQKFkgEzvmLU65XCX8CTT
+	HShcudNudXUUoDkwiv38l6pAD0dlhcR4oRMg43vLgBQf4+//02Slr4fj01bJ+ddxJGAfupulSAW
+	2NiSv42LzE8ug1lTdAViiGWA==
+X-Received: by 2002:a05:6122:3d10:b0:537:3e5b:9f66 with SMTP id 71dfb90a1353d-5376482147bmr5706735e0c.12.1753152428498;
+        Mon, 21 Jul 2025 19:47:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFV65GEf/DyozjXmm0Me0cAGFvEFM6aRW6c2q/EOZGLutJWdB5Vun7O3DOic039V936BGNXEekLH8idxFs57TU=
+X-Received: by 2002:a05:6122:3d10:b0:537:3e5b:9f66 with SMTP id
+ 71dfb90a1353d-5376482147bmr5706727e0c.12.1753152428170; Mon, 21 Jul 2025
+ 19:47:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQMOVi+96r7/jeT4bPen62fEkV838gHXXZjLAcRge02xu9KmYA==
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: M83iEva+1QDBL3edCA7iDIj509KOQzzUcbo+182Nr1M2zeEZoHcAWVJ2
-	N8/ffM7tcpbTvK4erXSFyNRd2JQJST8qtO7TtTy7g3aQPiovRZD7aBB7hdlqBN/2sbXtXT/
-	UiW4p7OFFRTSaM83B5Vo8RL2UNfXKi6fz5altn5z4voXMqT9JSHG+WzYrTv246vKpSKrv+k
-	lKWDK68W1AnrYMw+3DL8oZfLxUOVCfJOBqkxItm0lGexrE6ToS31tVmZEw0D/nJYphOgcw8
-	bL48zBxlofj1OjMOmIMxGAuyqtg3n34bEIgVkN/S7gAZUztYHOi3MGULKSb0oQRPoihyqML
-	++kDF3Jq905BJj0aHUcox+UABkOUaJ1eN8s8Orai0Mb+F6sq5crv4UacDpuInjyvGEYcEnr
-	uOuleYdRkwTZSYOqgI3fUglCKEtQRNAAUIz8/L7OCcQBpevEZc0iN1MCojFupxiSsBxUGer
-	5QvwsVEPz3IUezuopMn1FS6P4bHE7EzqZh0d6SOYjiX+cSaER78SmtQr+eti0LkO/XsG9pv
-	/qxP3+B4+baDLFAte+exRU8pMoHBtVOEDz/a1WSCgEoLuIazigjUm8+2Qh1dmW9dDcWFHU1
-	GCNj66Pu/lV4UI/ayvppDm049fieZLtDyvaO3Pm6FMwp3HEO5EtY7CyRRUxQUAB3oo5KcAr
-	gYGgfq2T62CSm4GtB/aqloNCw1W+2VM6D8SgeV1lwlnfEvz+qu26SOP2QAu553RFJqpSBys
-	I2su131uNZRHGFVC8idcnOjf0Orhl/HUqyZYl0sX0ktDnvnBO8Qdds/6P9lVIdZbbTNuoOi
-	sZ2h2RzLApKdi3HyMLcj605ppk53kRAEnuFqP6pMQmYLHAEcp+oovmIYwJvM76MEdkztLNe
-	IN5QmTjfmKR59UssOwG9oPvCnqYdzWIgyUEqQlgG1jSXauRzWGdndxP9ajBObIs30wAFVZK
-	iQFsU9pPI7cy+2klFM2b4xbecjsNF7xNGTSn4Td4ZgA9cC3jhgk6GoQ1UekbUEgDNG83Crn
-	jKJJEDzpul+vRMxlmODZGL72S9MGDIjR6pv5khWg==
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-X-QQ-RECHKSPAM: 0
+References: <20250718061812.238412-1-lulu@redhat.com> <20250721162834.484d352a@kernel.org>
+ <CACGkMEtqhjTjdxPc=eqMxPNKFsKKA+5YP+uqWtonm=onm0gCrg@mail.gmail.com>
+ <20250721181807.752af6a4@kernel.org> <CACLfguXG7Mpsp=z4zCE7H4CMA_s9qV86SkeL7Q=WxChXcFpNfA@mail.gmail.com>
+In-Reply-To: <CACLfguXG7Mpsp=z4zCE7H4CMA_s9qV86SkeL7Q=WxChXcFpNfA@mail.gmail.com>
+From: Cindy Lu <lulu@redhat.com>
+Date: Tue, 22 Jul 2025 10:46:29 +0800
+X-Gm-Features: Ac12FXz8Hsd99YwjuM8V3mxzon1LCiQIo6XR6UICD1OlRmKkbYUpCVM_dl99qBs
+Message-ID: <CACLfguVi=+ZtikBwu-5ThEa095gDuCW8bVPo0QGdt6ja3xZjhg@mail.gmail.com>
+Subject: Re: [PATCH RESEND] netvsc: transfer lower device max tso size
+To: Jakub Kicinski <kuba@kernel.org>, Long Li <longli@microsoft.com>, stephen@networkplumber.org
+Cc: Jason Wang <jasowang@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+	Dexuan Cui <decui@microsoft.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Michael Kelley <mhklinux@outlook.com>, Shradha Gupta <shradhagupta@linux.microsoft.com>, 
+	Kees Cook <kees@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Alexander Lobakin <aleksander.lobakin@intel.com>, Guillaume Nault <gnault@redhat.com>, 
+	Joe Damato <jdamato@fastly.com>, Ahmed Zaki <ahmed.zaki@intel.com>, 
+	"open list:Hyper-V/Azure CORE AND DRIVERS" <linux-hyperv@vger.kernel.org>, 
+	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 22, 2025 7:56 AM, Jacob Keller wrote:
-> On 7/21/2025 1:01 AM, Jiawen Wu wrote:
-> > For various types of devices, change their default ITR settings
-> > according to their hardware design.
+On Tue, Jul 22, 2025 at 10:04=E2=80=AFAM Cindy Lu <lulu@redhat.com> wrote:
+>
+> On Tue, Jul 22, 2025 at 9:18=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> =
+wrote:
 > >
-> 
-> I would generally expect a change like this to have a commit message
-> explaining the logic or reasoning behind the change from the old values
-> to the new values. Do you see benefit? Is this cleanup for the other 2
-> patches in the series to make more sense? Is there a good reason the new
-> values make sense?
-> 
-> > Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-> > ---
-> >  .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 24 +++++++------------
-> >  drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  5 ++--
-> >  2 files changed, 10 insertions(+), 19 deletions(-)
+> > On Tue, 22 Jul 2025 09:04:20 +0800 Jason Wang wrote:
+> > > On Tue, Jul 22, 2025 at 7:28=E2=80=AFAM Jakub Kicinski <kuba@kernel.o=
+rg> wrote:
+> > > > On Fri, 18 Jul 2025 14:17:55 +0800 Cindy Lu wrote:
+> > > > > Subject: [PATCH RESEND] netvsc: transfer lower device max tso siz=
+e
+> > > >
+> > > > You say RESEND but I don't see a link to previous posting anywhere.
 > >
-> > diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-> > index c12a4cb951f6..85fb23b238d1 100644
-> > --- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-> > +++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-> > @@ -340,13 +340,19 @@ int wx_set_coalesce(struct net_device *netdev,
-> >  	switch (wx->mac.type) {
-> >  	case wx_mac_sp:
-> >  		max_eitr = WX_SP_MAX_EITR;
-> > +		rx_itr_param = WX_20K_ITR;
-> > +		tx_itr_param = WX_12K_ITR;
-> >  		break;
-> >  	case wx_mac_aml:
-> >  	case wx_mac_aml40:
-> >  		max_eitr = WX_AML_MAX_EITR;
-> > +		rx_itr_param = WX_20K_ITR;
-> > +		tx_itr_param = WX_12K_ITR;
-> >  		break;
-> >  	default:
-> >  		max_eitr = WX_EM_MAX_EITR;
-> > +		rx_itr_param = WX_7K_ITR;
-> > +		tx_itr_param = WX_7K_ITR;
-> >  		break;
-> >  	}
+> > Someone should respond to this part, please.
 > >
-> > @@ -359,9 +365,7 @@ int wx_set_coalesce(struct net_device *netdev,
-> >  	else
-> >  		wx->rx_itr_setting = ec->rx_coalesce_usecs;
+> Hi Jakub,
+> sorry for the confusion. I previously sent this mail
+> (https://lore.kernel.org/all/20250718060615.237986-1-lulu@redhat.com/)
+> to the wrong mailing list, so I'm resended it here.
+> I've also submitted a v2 of this patch:
+> https://lore.kernel.org/all/20250718082909.243488-1-lulu@redhat.com/
+> Sorry again for the mix-up.
+> thanks
+>
+> cindy
+>
+> > > > I'd rather we didn't extend the magic behavior of hyperv/netvsc any
+> > > > further.
+> > >
+> > > Are you referring to the netdev coupling model of the VF acceleration=
+?
 > >
-> > -	if (wx->rx_itr_setting == 1)
-> > -		rx_itr_param = WX_20K_ITR;
-> > -	else
+> > Yes, it tries to apply whole bunch of policy automatically in
+> > the kernel.
+> >
+> > > > We have enough problems with it.
+> > >
+> > > But this fixes a real problem, otherwise nested VM performance will b=
+e
+> > > broken due to the GSO software segmentation.
+> >
+> > Perhaps, possibly, a migration plan can be devised, away from the
+> > netvsc model, so we don't have to deal with nuggets of joy like:
+> > https://lore.kernel.org/all/1752870014-28909-1-git-send-email-haiyangz@=
+linux.microsoft.com/
 
-default rx_itr_param here
+I'm also including Stephen Hemminger and Long Li in this thread and
+would greatly appreciate any suggestions.
 
-> > +	if (wx->rx_itr_setting != 1)
-> >  		rx_itr_param = wx->rx_itr_setting;
+Thanks
+cindy
+
 > >
-> >  	if (ec->tx_coalesce_usecs > 1)
-> > @@ -369,20 +373,8 @@ int wx_set_coalesce(struct net_device *netdev,
-> >  	else
-> >  		wx->tx_itr_setting = ec->tx_coalesce_usecs;
-> >
-> > -	if (wx->tx_itr_setting == 1) {
-> > -		switch (wx->mac.type) {
-> > -		case wx_mac_sp:
-> > -		case wx_mac_aml:
-> > -		case wx_mac_aml40:
-> > -			tx_itr_param = WX_12K_ITR;
-> > -			break;
-> > -		default:
-> > -			tx_itr_param = WX_20K_ITR;
-> > -			break;
-> 
-> It looks like you previously set some of these values here, but now you
-> set them higher up in the function.
-> 
-> Its a bit hard to tell whats actually being changed here because of that.
-
-In fact, here it's just a change of default rx/tx itr for wx_mac_em from
-20k to 7k. It's an experience value from out-of-tree ngbe driver, to get
-higher performance on various platforms.
-
-As for the other changes, just cleanup the code for the next patches.
-
 
 
