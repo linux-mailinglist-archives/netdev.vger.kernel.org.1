@@ -1,89 +1,109 @@
-Return-Path: <netdev+bounces-209009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC31CB0DFC3
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 17:01:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A8FCB0DFCD
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 17:02:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 09DFC7B827F
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 14:57:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 572E3173D43
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 14:59:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48C952DEA7C;
-	Tue, 22 Jul 2025 14:59:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42F882D8DCA;
+	Tue, 22 Jul 2025 14:59:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1mRleX5Q"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3Y0GlSAr"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43C56239E9E;
-	Tue, 22 Jul 2025 14:59:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD8A42BF010
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 14:58:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753196360; cv=none; b=Wxv5sQeImTKOJt+Etse2A0eKZ9iNdvG7fez4pV4Tv7tPDjVGh/US4P/y+Ld5X8wxOE2PJeGN0/czdIuAGcP/GjAOpkzZoSlrJLx15DH97NTaY/L0qe48BOal1i2+KGhL18qu9iBJo8TW6BMql414dcXOwfJvmGshygyn3W2wW/0=
+	t=1753196341; cv=none; b=F7WkFSh79gkN660/vMPiC/9sKrPL1pEcdZDDq244pJXv28j+W2vciL9EVe8FIkD2kMgIPxLRhFwRXO9ufRuR3GhJPJXIAy3DvnVzvEEcMPEv0fRDOfV676le+y0+CLbkxKD1L5oCXeECdFgqwCudAl+TwM/cjfea3SVhG2MYz3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753196360; c=relaxed/simple;
-	bh=ou7A8dCtajtd2EqlFdUb122ILRZkFdkN1YbKnDqV3tA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W6XQ/7alryNKgmauJB0ixB7cZ+0CWxM0KE2El60rO8K5gFGUTcfkpq0kDQEZEHt+cxLFQYAH/o3MhwPZnaIPRAeAld9Ro+TF5IJvn4j/sJXtD48uyNYZox85pwhK4gP0EDf7w7KtBU5XZGxsFjoFq1t4gMAQgXmgQG6+DPzSPR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1mRleX5Q; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=qXqgH+7Pf8+YOQt42JO04/xiRlrY25OPKvo6NdI8jhU=; b=1mRleX5QRWQZbkWvtmnIFJ4XZ/
-	gt9P3d9AJKA4hTjBiS+wkEwXnqHsh0AyuXqXN5pxL//H5Kc/lNw4YAwfa9YRZyM/+xdH/LJ7lW6NA
-	1aZd7S4UKw4KmsczXyW6B9tGPHNu22aqewBOoN5Kv3lRdruVtQ5vYa01a2qn6a5mCAB0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ueERs-002Tkl-HD; Tue, 22 Jul 2025 16:58:32 +0200
-Date: Tue, 22 Jul 2025 16:58:32 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yibo Dong <dong100@mucse.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 01/15] net: rnpgbe: Add build support for rnpgbe
-Message-ID: <53710a91-a4b1-4ce9-a9f7-b32a74dec3fc@lunn.ch>
-References: <20250721113238.18615-1-dong100@mucse.com>
- <20250721113238.18615-2-dong100@mucse.com>
- <552cb3f0-bf17-449b-b113-02202127e650@lunn.ch>
- <146B634370ED44A0+20250722033841.GB96891@nic-Precision-5820-Tower>
+	s=arc-20240116; t=1753196341; c=relaxed/simple;
+	bh=CiqwsXqS9XffgcdUNt4OEyIxE8kyMoj+z790mtcu3ik=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m/k4BuH7WoPA9ux8GOQbrw1b30NINkk0VUaK07SoHonldWzFeC0+gP5gGVWoPBe7kpow+CZRmKFDGfXPuAZ8n5otgKTCFzD0AT7J9XsjAqD+N4RFAkeiLZW1e0nOXts3aBThfMLOuRiDJ5FXXwHJTvxnkDh0EwYenaX4TdYT+9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3Y0GlSAr; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4ab3802455eso72731651cf.2
+        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 07:58:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753196338; x=1753801138; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CiqwsXqS9XffgcdUNt4OEyIxE8kyMoj+z790mtcu3ik=;
+        b=3Y0GlSAr8a8utCCIcJujOzlyTHCc3LmLw52nYSunHLEXJW3H0KCe6LXQnN18Q2qilM
+         6/tPJA9w2oTay3yufSueM1yH7kPgE0SSuYAUUONwcM9uUNXzoOmo20p7UB/m7F/WqAQc
+         ZNFVAMOCjaXORWHLrrkXe5c7xaSGy2w6VZPn1Nx+s0EweEC6phi1rafoHMz5NqlQ6P1T
+         +snaxOLkCIrsExxcnw37+iH8L4oKDd9e8s9qJ6mGMmqZGDukPrghTzRoMxzyylTwFdB4
+         sN/uj2FW2Pm5B8LXYyshytNAVOZe/IoXBCASeyGh5CCsbnZQnK3Qkvt+hQurZuqC5sKo
+         iBTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753196338; x=1753801138;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CiqwsXqS9XffgcdUNt4OEyIxE8kyMoj+z790mtcu3ik=;
+        b=YRvELjZQ95JhOj2CBw3YrtJbDL/VMZPdysjAQWFmMYIZ3nfwMQ+/tnm7PRoy5wKSQm
+         +nKa4zqqsDGvv2kduB41FIGwdS6z7ISZbul3Wv17uw9N2r5nHzrYEu5LMWx1Ft8xDeNE
+         ShN2dA1kXH9iEc69jR5odB2ke3oSgL3/AryQXzGy65RFU/MitzkoascIeMEotd2Sg0vZ
+         GOJNgn+9+eHSSd+ezsLO7M6110wiB8JglFOFZyTlUBbNTxqrCBwO4SYgnHGdh8GCfo2y
+         YtsPoj7uGkbxwPoa3hGmBH/eBUVg+idc20tyVI4y0ffHaVvo0IZSoj01wNt+v7h6USpv
+         doQw==
+X-Forwarded-Encrypted: i=1; AJvYcCVMG/MIavyA7dIOqQsYqs0vs9pm3Kq/VCDb4aKruS7v3GP6Pmtkm6EVmdpZesxrKVFm8Lcea4Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwroZMVeCevsKzDgGqJG8RnAmdET95da6ACQQu9/d0ROobqnL4v
+	QbHJUXsWX0LIJ0BkBtHilzWCnjVW+bz8xhmppYvlm2pTUwkqQ31h9TgqUW13kuf+adNy9pAyiqL
+	y2yJB0WTOE+jNixhXE3XXxM9WhcdyD6V0kvqmwr4/
+X-Gm-Gg: ASbGncteOnJT/MnWDgUpsMmd3k2oGB8HvGERI0junNV6wB7QSJLYSXvAJuag18HHOEM
+	MWtbIZgXE3W2wuTk/D6RUxS5yqp2jn3vlPCiEztDwmjiwICYivwagR/3F3lgvnhvehbHwFcHgSL
+	I76LqHeMyHpYIqcaKKIrWECUd8gSRXjTXFMD++XjxSTKV9TpRtaYB6fdG8oFPp1tx6uVk4XAc/M
+	0uqpQ==
+X-Google-Smtp-Source: AGHT+IG2yg147JK4Oinx02ez69SdDMukiZsmWmT/iPx1WpvOc0p35m3lKJjL6O102z1pXoYruFzug+iTBIemqmhssxc=
+X-Received: by 2002:ac8:7d12:0:b0:4ab:7125:99aa with SMTP id
+ d75a77b69052e-4aba3e33f4bmr306580691cf.49.1753196338060; Tue, 22 Jul 2025
+ 07:58:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <146B634370ED44A0+20250722033841.GB96891@nic-Precision-5820-Tower>
+References: <20250721203624.3807041-1-kuniyu@google.com> <20250721203624.3807041-11-kuniyu@google.com>
+In-Reply-To: <20250721203624.3807041-11-kuniyu@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 22 Jul 2025 07:58:46 -0700
+X-Gm-Features: Ac12FXxT4R5nqDZoq6He5N2XHgjugFXTSeJd14lK7mmXsqA2ix7EK8BukOpBfNg
+Message-ID: <CANn89iKo45xre19BCkTRQSym7WCWxAbXOD77+F35OJ0eubmdew@mail.gmail.com>
+Subject: Re: [PATCH v1 net-next 10/13] net: Define sk_memcg under CONFIG_MEMCG.
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	Mat Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, Andrew Morton <akpm@linux-foundation.org>, 
+	Simon Horman <horms@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+	Muchun Song <muchun.song@linux.dev>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	mptcp@lists.linux.dev, cgroups@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> > > +#include <linux/types.h>
-> > > +#include <linux/module.h>
-> > > +#include <linux/pci.h>
-> > > +#include <linux/netdevice.h>
-> > > +#include <linux/string.h>
-> > > +#include <linux/etherdevice.h>
-> > 
-> > It is also reasonably normal to sort includes.
-> > 
-> 
-> Got it, I will also check all other files. But what rules should be
-> followed? General to specific?
+On Mon, Jul 21, 2025 at 1:36=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.co=
+m> wrote:
+>
+> Except for sk_clone_lock(), all accesses to sk->sk_memcg
+> is done under CONFIG_MEMCG.
+>
+> As a bonus, let's define sk->sk_memcg under CONFIG_MEMCG.
+>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 
-All global imports first, and then local.
-
-    Andrew
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
