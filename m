@@ -1,88 +1,87 @@
-Return-Path: <netdev+bounces-208826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27BD2B0D4C2
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 10:36:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8389B0D4C7
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 10:36:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D25C41AA7D32
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 08:36:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB8577A6D55
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 08:35:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EB802D3EDA;
-	Tue, 22 Jul 2025 08:35:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD1152BEFE8;
+	Tue, 22 Jul 2025 08:36:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Q1lI7noR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a1f7NY5C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E873C2D3EDD
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 08:35:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90602D23BC
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 08:36:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753173356; cv=none; b=Ohv2lP1PZIiOfXzQkFl1nmyUT+66mVyXF1H/eWfiVlUozmfdGp3Jn4j0q1rzkZiY2Sum1tPDejSfnAZBv7CWLA7PjVnhizXHvk+DMI9uUwxPQxHePIKQs+ktp7tPpRvTYnNRDba6myx5+mViguCgOd6DMKWCFMWs93Pl9rjaeEs=
+	t=1753173401; cv=none; b=W5zeNs95A09au2U6RcH4xJpkWM7cVkvKL/GU2zdyUiR+2reaGAiLDAoMe38gbwCmXpLyyu6jyY1nTY5kCsBuLy84K8z6PudclK5cWLKNxV3guo9KvOzOWgXs7tnTlAHqhC7bJONETzBSIqNn+w5rBB4VxyuyikwrGPFENht3uVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753173356; c=relaxed/simple;
-	bh=foXUIgStGDglp8soaKzHpgchVPakvD0gG4XkkGSqNIU=;
+	s=arc-20240116; t=1753173401; c=relaxed/simple;
+	bh=wNliSoTcua4ZI5Uh3yJ1tul76CVVgm+R8c7tgQHEW0c=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JjTgRbTcBvsJ/MK+TMjabG7SHLSSxshxLDjlj5hB0iSkdGAUKLJxGGxQ4m0ADeb9Oxn3HGe3L5pBkua4JB3l3meU6JB+Pq3pwgxt5exepf7/IKZrPAsft8gCDt6RdzVTFoXQmD2/eIY3eqf/wn9vVyMI32rdCJpZrJk+FjoyG98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Q1lI7noR; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56M7lXkW004629
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 08:35:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	v1CPlPbwtTVjIc8HWeOwVxWexCvpUqlAqvq7jTFTfSM=; b=Q1lI7noRzvDFvPCU
-	3M4pyUqyo1Z5L85dZNCwP2tRgZ6Ll7/0wsZObSzkJRJkYfPx8ot0nWCk5nZelo4p
-	DjqwhWvqJPJGTxgy9USzzfvGnZh6HVCnvXJODTdwJy04RlOINBsym3ih2itgH/AT
-	r8+1CTwFQkyV8GY8zDRNr+fF2jQt9u9qkXHGMaj4dp4EkJ7b8ewo9DhIvhuq640a
-	P3cLJuTnmWC6BsEbfU2zGEfhmyFQGCZYc8Wrf9xe71fiBc0ezq31KnLIH/f2gMl6
-	HXRy68e9hiGcHKXXWkCVBh38jy28J4dX6MXv+OO9o36TiZHWDqR999IcXvbr9rQ+
-	amBX9g==
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48048v72rj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 08:35:53 +0000 (GMT)
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-b00e4358a34so3404643a12.0
-        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 01:35:53 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=E2ER3BTT9NHYTLfz6GXeE4eTxGDmpd3J7PPkm2j2cv+vhoSKP35sUIULTj5sbXKZTJ8dZa/HLz2h+j73Zs13Sky76dkcaaTPpsdzPALPoAMJ1fj0EiB9bT7VWU6/a7ZEiGpMBeFT6iu170zDQiRV715XYuC8QweaZgIhpIllBhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a1f7NY5C; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753173396;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=h7XQEQoPcNWIcIvp9Ofoqco5TAp1Io1j1Kf8hikrefc=;
+	b=a1f7NY5C183nfxKcgjlorgHQ9hBnODCIE4NDo9oB5MWTVT7Kc8Y0fcWplkB/HEbq+jIhoE
+	ELS6Tx8Gy4IxzeRu9sdCtSqokUr0cE5yuK9jPfURLVqZ7vXQdTFZWp8wRWWKrFWREqliuK
+	x9qPOaWasN/s88ZfPWaembCC48bK3Fs=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-249-L-P14zjSNkuFE0-cDLsHGw-1; Tue, 22 Jul 2025 04:36:35 -0400
+X-MC-Unique: L-P14zjSNkuFE0-cDLsHGw-1
+X-Mimecast-MFC-AGG-ID: L-P14zjSNkuFE0-cDLsHGw_1753173394
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4538f375e86so47837905e9.3
+        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 01:36:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753173353; x=1753778153;
+        d=1e100.net; s=20230601; t=1753173394; x=1753778194;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=v1CPlPbwtTVjIc8HWeOwVxWexCvpUqlAqvq7jTFTfSM=;
-        b=mf2iffLRF2yTwo9Q9hggcQLIyIN54YcWLML0XZme3cf34TElb8oMDKROTJd2LBH9cF
-         6hNU4LGuhrIDZAk0AuvugO2SVTwX5TE4UYPiE3d3N/MiJo03BBcvF0C0emEvU2oTtm30
-         k6u4wbXkVqZ7qMnYj4K0Vcj3F+GJxvlAyrWinn/+tQhUDR7mwFbjusaDwHUlqjNn7vA2
-         Vvf+Kpxds5VL/zAbTIlE8xeLO8RmubDOReJH01jOnjOsiEUY2IkdmFXNp7daELONF8Um
-         zFV1EBoFtlK7+kRIFCSqCt9JFYdAxI0JqBIov7cFDyZrABWeCFCKdWZPi84APFFF2SCw
-         6+Qg==
-X-Forwarded-Encrypted: i=1; AJvYcCWRGDa8xzSoXBqdwnCB6wG3uhChwU4E2b3IZWTVedaijkPo8ilEp4DLZoSgF7w+SfRgWAPCFow=@vger.kernel.org
-X-Gm-Message-State: AOJu0YztAlMqVLEcbwhRu9Xqwm4t3AIKlzFQs5GO7DDF1yRgN5yvTnRk
-	5fiEnbaZ0FJMRt70+XcYbbUbhU43uV4rrJystkjDiXsDYQt6QclEKBJ2dOqQSPSXwZijzgo68HD
-	5O0gGty/et0IhuCHsIowHkzkhPomxIsydur2NJI/TCK8MjdqVVI7CbJl0G/M=
-X-Gm-Gg: ASbGnct271KpMf+oAKfiX7/2kpFIswzeG5iWooQSukNAiOBH7arjEr5xK5uNjLQ6Ium
-	JJZEpo+rz/xFH44XBVpjo52v3nebHadjvAEq68LpyaT6gx+rzd31gbNifEm3UOiqufIMpk5wISp
-	O4Tw635oO9VP0V42ol8b9FsSh8H4yoMN5fv9wgd7Ay8c/ITeWv7qruJJHZI2nDEzOJkKEBnqTd8
-	1ZuJ6FgQ7ZCbZqRjG4iMLCsxW9GSJ68j+oRZ6ccjKYjE42CEabx1Q+9lFJdTWquoxPPE+gN7Av/
-	0/pC0LfXV2KudNGypqwzlihpnYb5t81jmmm/vvUSoj3gge3+j0cZ6S2gZp4KY4ZEZLlydNuKFb9
-	2EGa3i0GKHk+3/Aa53DjMzh2PrH3RTY8=
-X-Received: by 2002:a05:6a20:2588:b0:220:1ca5:957c with SMTP id adf61e73a8af0-23814269fa7mr47543363637.31.1753173352921;
-        Tue, 22 Jul 2025 01:35:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGxQoVSL6iDytp5HaUmhxPmpFMPPetP7b0Xmv7yoM9vlNb9LHyBBh/GNPcPF++PFFEUqYTYnw==
-X-Received: by 2002:a05:6a20:2588:b0:220:1ca5:957c with SMTP id adf61e73a8af0-23814269fa7mr47543312637.31.1753173352439;
-        Tue, 22 Jul 2025 01:35:52 -0700 (PDT)
-Received: from [10.133.33.45] (tpe-colo-wan-fw-bordernet.qualcomm.com. [103.229.16.4])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-759cbd66eecsm7175486b3a.142.2025.07.22.01.35.50
+        bh=h7XQEQoPcNWIcIvp9Ofoqco5TAp1Io1j1Kf8hikrefc=;
+        b=ca/ZHG7ur/HA4j7epbJZIgufdp+s8BH7EXlb30xnVGktDBxaAl1GmKdLYBDE3A/ywt
+         CtRIUzOdyqtpJt+f+tBOAl+KdzS8dGMkBhQ/getXa5gGAeB58aQ0HwyTXkpaCdVxY9Ew
+         awfzQa9Z+bdLgqs7N94JXPeB5+t5P4K3CYhe5aPcQUIx8V8n57DRExPQEvojn6nVD1cV
+         QwpWk7CWE+QF7K8oWX8CoscYNx6TIQMdFoar30PWCi4q4DiNJ26XteMcwBvsyGWR5YdV
+         0c+dWIxN9BCGnB48fjH9Rnwv50PdvYT6tH4noIaMA5N0Edn3zEG1ueZA/2fC6C1dG74y
+         IpRw==
+X-Forwarded-Encrypted: i=1; AJvYcCXY0yJXaVKYq1aSzynFpZ4u1rkozkQBZ4a8OhVRfxI/VsaDT/pYvqvrjyyXishWRsKVkubBNqA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvGG2kqnweJFvEi8bToVkkQOaStsmsHPZmCYVz02ITchLCVVRr
+	TaegNlZQEDeOtybdkjxBiL8C7et9LxdTD63o/S9WNqRE4wKRWNQzL8+fipN+RUdNReojF+4YVq1
+	o9VARBnYFGMCk79bB+4QLpsyGsgfOR+AZDBrckSZ0boWu5GoYyCT6WPUdOQ==
+X-Gm-Gg: ASbGncvCyQbWF8x2SHdSxQLvgUPEor/fGYX5iGJ7B9C2ALo5b96nWlUzBll8Zu/8YU6
+	hE7RHP3UqE6zWkpkwmL46sedJlUzVIKO0KCaXGIElRHdCVJZ8/rVB8uiUvzNklU77KIKvhv0exf
+	UR8bV6LATEK5T1RDun0tZ9YKUmmkFEf87CCKZJ1kulWpDkiwnxWmidjtR6lkB+IVkiv1Rucwnr8
+	hqK1YbTWkwyi3EIgHgomgibLJokxuOBDWCq2T13CyH7EPXZhiUZWyyEuQU7z0BQxX/M9uSvddPC
+	ArTYju4tDVgW6oc4IUZIHBUXhoQrkS37f2OVpQ0B/cND8J2yb6/5e5jhuCpyXWIkXcs9FW/wA4y
+	dxEkT9zTVIwQ=
+X-Received: by 2002:a05:600c:45ce:b0:456:2397:817 with SMTP id 5b1f17b1804b1-4562e2380b9mr237690785e9.13.1753173393902;
+        Tue, 22 Jul 2025 01:36:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH74FWVoogxQd474DB1B8BF7hhbdi5L1dIVdTms3cbtnlf23yWty5IyX9qpejKuhm6BtyG6+Q==
+X-Received: by 2002:a05:600c:45ce:b0:456:2397:817 with SMTP id 5b1f17b1804b1-4562e2380b9mr237690365e9.13.1753173393376;
+        Tue, 22 Jul 2025 01:36:33 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4562e886113sm186536825e9.23.2025.07.22.01.36.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Jul 2025 01:35:52 -0700 (PDT)
-Message-ID: <0b28bb5f-56b3-4be6-b4f4-89ca546a24d0@oss.qualcomm.com>
-Date: Tue, 22 Jul 2025 16:35:48 +0800
+        Tue, 22 Jul 2025 01:36:32 -0700 (PDT)
+Message-ID: <5f250beb-6a81-42b2-bf6f-da02c04cbf15@redhat.com>
+Date: Tue, 22 Jul 2025 10:36:31 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,71 +89,108 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] wifi: ath11k_pci: add a soft dependency on qrtr-mhi
-To: Christoph Hellwig <hch@lst.de>, kvalo@kernel.org, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: ath11k@lists.infradead.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org
-References: <20221202130600.883174-1-hch@lst.de>
+Subject: Re: [PATCH net-next v2] net: pppoe: implement GRO support
+To: Felix Fietkau <nbd@nbd.name>, netdev@vger.kernel.org,
+ Michal Ostrowski <mostrows@earthlink.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: linux-kernel@vger.kernel.org
+References: <20250716081441.93088-1-nbd@nbd.name>
 Content-Language: en-US
-From: Baochen Qiang <baochen.qiang@oss.qualcomm.com>
-In-Reply-To: <20221202130600.883174-1-hch@lst.de>
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250716081441.93088-1-nbd@nbd.name>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: yGzOUPHlXytlpUyIE6T7bSUL9Y1Mcm-a
-X-Authority-Analysis: v=2.4 cv=SYL3duRu c=1 sm=1 tr=0 ts=687f4d6a cx=c_pps
- a=Qgeoaf8Lrialg5Z894R3/Q==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=dBPL878wbgeN_2oxvkwA:9
- a=QEXdDO2ut3YA:10 a=x9snwWr2DeNwDh03kgHS:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzIyMDA2OSBTYWx0ZWRfX9UkmAMdliLjX
- lEzisgWX3tSO1qMFhb5pIel1G9sy+bhPaAsJVjZbUZe6UxfB/wSwTuU7wHVqyIEWxFzQEeDug8Z
- oe4rbrOQ3ciftuwULfI/eQBIKWqRDxNU1JDo9RCRqI0Yqv3tjc73Fs8F24CKv7GKIAZKEzNEK8b
- B9D2WWyBrWwg7KrLq55dVtE4Scnx6n59ulRXOx665hvbQ/sVi7lWCrYlcGzK1MDO8e65QlLkn88
- 8qGyfgBoQUUpoA7fvxW8S8TTSnq1Lp4Rw8BHXnidAEVVqxzSggpAIzyFHE0DmBuhF6B9CtcH9Ln
- LR24jWkfNqQfJ6SPcV/e03jdkahpNS6ma1B2rPociYCGh/3keE3UUVMsUlhXr4WP9o/Blhy+DJo
- d+05zinPI3P11ed/TtXwX9Jc/NqxcYIb07epgyae04sZuNEhDCVHrPpv8IfLMgBNkJu1hSll
-X-Proofpoint-ORIG-GUID: yGzOUPHlXytlpUyIE6T7bSUL9Y1Mcm-a
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-22_01,2025-07-21_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 suspectscore=0 mlxscore=0 bulkscore=0 mlxlogscore=999
- lowpriorityscore=0 phishscore=0 malwarescore=0 spamscore=0 clxscore=1011
- priorityscore=1501 adultscore=0 classifier=spam authscore=0 authtc=n/a
- authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505280000 definitions=main-2507220069
 
+On 7/16/25 10:14 AM, Felix Fietkau wrote:
+> +static struct sk_buff *pppoe_gro_receive(struct list_head *head,
+> +					 struct sk_buff *skb)
+> +{
+> +	const struct packet_offload *ptype;
+> +	unsigned int hlen, off_pppoe;
+> +	struct sk_buff *pp = NULL;
+> +	struct pppoe_hdr *phdr;
+> +	struct sk_buff *p;
+> +	__be16 type;
+> +	int flush = 1;
 
+Minor nit: please respect the reverse christmas tree order above
 
-On 12/2/2022 9:06 PM, Christoph Hellwig wrote:
-> While ath11k_pci can load without qrtr-mhi, probing the actual hardware
-> will fail when qrtr and qrtr-mhi aren't loaded with
-> 
->    failed to initialize qmi handle: -517
-> 
-> Add a MODULE_SOFTDEP statement to bring the module in (and as a hint
-> for kernel packaging) for those cases where it isn't autoloaded already
-> for some reason.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/net/wireless/ath/ath11k/pci.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/net/wireless/ath/ath11k/pci.c b/drivers/net/wireless/ath/ath11k/pci.c
-> index 99cf3357c66e16..9d58856cbf8a94 100644
-> --- a/drivers/net/wireless/ath/ath11k/pci.c
-> +++ b/drivers/net/wireless/ath/ath11k/pci.c
-> @@ -1037,6 +1037,8 @@ module_exit(ath11k_pci_exit);
->  MODULE_DESCRIPTION("Driver support for Qualcomm Technologies 802.11ax WLAN PCIe devices");
->  MODULE_LICENSE("Dual BSD/GPL");
->  
-> +MODULE_SOFTDEP("pre: qrtr-mhi");
+> +	off_pppoe = skb_gro_offset(skb);
+> +	hlen = off_pppoe + sizeof(*phdr) + 2;
+> +	phdr = skb_gro_header(skb, hlen, off_pppoe);
+> +	if (unlikely(!phdr))
+> +		goto out;
 > +
->  /* QCA639x 2.0 firmware files */
->  MODULE_FIRMWARE(ATH11K_FW_DIR "/QCA6390/hw2.0/" ATH11K_BOARD_API2_FILE);
->  MODULE_FIRMWARE(ATH11K_FW_DIR "/QCA6390/hw2.0/" ATH11K_AMSS_FILE);
+> +	/* ignore packets with padding or invalid length */
+> +	if (skb_gro_len(skb) != be16_to_cpu(phdr->length) + hlen - 2)
+> +		goto out;
+> +
+> +	NAPI_GRO_CB(skb)->network_offsets[NAPI_GRO_CB(skb)->encap_mark] = hlen;
+> +
+> +	type = pppoe_hdr_proto(phdr);
+> +	if (!type)
+> +		goto out;
+> +
+> +	ptype = gro_find_receive_by_type(type);
+> +	if (!ptype)
+> +		goto out;
+> +
+> +	flush = 0;
+> +
+> +	list_for_each_entry(p, head, list) {
+> +		struct pppoe_hdr *phdr2;
+> +
+> +		if (!NAPI_GRO_CB(p)->same_flow)
+> +			continue;
+> +
+> +		phdr2 = (struct pppoe_hdr *)(p->data + off_pppoe);
+> +		if (compare_pppoe_header(phdr, phdr2))
+> +			NAPI_GRO_CB(p)->same_flow = 0;
+> +	}
+> +
+> +	skb_gro_pull(skb, sizeof(*phdr) + 2);
+> +	skb_gro_postpull_rcsum(skb, phdr, sizeof(*phdr) + 2);
+> +
+> +	pp = ptype->callbacks.gro_receive(head, skb);
 
-Do we know why this patch is rejected?
+Here you can use INDIRECT_CALL_INET()
+
+> +
+> +out:
+> +	skb_gro_flush_final(skb, pp, flush);
+> +
+> +	return pp;
+> +}
+> +
+> +static int pppoe_gro_complete(struct sk_buff *skb, int nhoff)
+> +{
+> +	struct pppoe_hdr *phdr = (struct pppoe_hdr *)(skb->data + nhoff);
+> +	__be16 type = pppoe_hdr_proto(phdr);
+> +	struct packet_offload *ptype;
+> +	int err = -ENOENT;
+> +
+> +	ptype = gro_find_complete_by_type(type);
+> +	if (ptype)
+> +		err = ptype->callbacks.gro_complete(skb, nhoff +
+> +						    sizeof(*phdr) + 2);
+
+Possibly even here but it's less relevant.
+
+> +
+> +	return err;
+> +}
+> +
+> +static struct packet_offload pppoe_packet_offload __read_mostly = {
+> +	.type = cpu_to_be16(ETH_P_PPP_SES),
+> +	.priority = 10,
+
+The priority value should be IMHO greater then the exiting ones to avoid
+possible regressions on other protocols. i.e. 20 should do.
+
+Thanks,
+
+Paolo
 
 
