@@ -1,130 +1,157 @@
-Return-Path: <netdev+bounces-209034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 102FBB0E0EA
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 17:51:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AA9DB0E0F4
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 17:52:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D938C56724C
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 15:51:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5036456829F
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 15:52:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73D3327990B;
-	Tue, 22 Jul 2025 15:51:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65BEA279DCF;
+	Tue, 22 Jul 2025 15:52:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VcvI7eAT"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ljxgpn9A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4BC9279DBC;
-	Tue, 22 Jul 2025 15:51:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42CFA1E835C
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 15:52:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753199491; cv=none; b=OC+wwbowoLKYZVWdr545B2Dlo0RahZIFShOX6LUSVTr2eCRHVy7UFLLOiWFu0/USzjpriMYTlZ5Na5u1/+igvNou0zA8LBIzMFJkWeT6EEXwLH2mVynNlZTewZ+VykwzXozqxbs2IFQJiQZ/5/5NyH1L9EmgL303RhLMmMRjTis=
+	t=1753199559; cv=none; b=Uf1oXpnLiHkamrSFH4zazKyxn2GYVy3tJAb4FfE3qoYY61W3m1qmJ2FSgrgU50nZRGRFeZLzG9Md7wOyi5glsTeVJn2vag8LDHYAuNwynCijeBPozNb7Gh95zuItFERgphDJJoExU04YoRPy6e1hJZLOd7m9YIWP35McAQT84CM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753199491; c=relaxed/simple;
-	bh=ym9NOmCPOzgC6rUW33bSrOsHFLu9aGDzgv6wvDAJeL4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=bwhqBz45XShWVsV5DLkqMMIMfdfg9Ts70rflD1kH0mz5iX6667srqoWl8c3/SMSGj/F2NpUPJa9kWqTKg71jloTauwLWPvLa5QUWynse3c8WJaz5WGnxn1MHeF6ibP9vp8hquTMC2QypXwFqpkoBrEzsOBXS8oB4yqmBv69o1KM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VcvI7eAT; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3b49ffbb31bso3678606f8f.3;
-        Tue, 22 Jul 2025 08:51:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753199488; x=1753804288; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=C3dPf+ID09MXpLAihBhOzSgvYSZYGtT7LemGPeELFSg=;
-        b=VcvI7eAT/5oubOyJJk7HUaLfILVYthkeBSyAyM6e7BsVeYPFFLMRtaYyQ3JWDUNaGH
-         0tC8W0/WzfrSsNuGM6U2n/uj/qzWTvitAjUwVmvRZr1V5QDTGctcZ5rY0ORBHf8qb51N
-         Gs7JMpBQHhW1ripYHuVdfrU46qcl6yauIyL7CCeOAdomxtRnz5JIzi+7N841sqkcQeTX
-         bGrG9OIM9lA3XscP9bNMbUQv6Z9GD/UzMJwv4wfvTUEn3KdNaKlfpSe4zjYlqMShZgdA
-         k4jVf+aUCwLX4m1ZmGMJshjlkrwswpY3PnEvSyHawUH+8nt4XwfitOco7luaygOC5PnM
-         XFcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753199488; x=1753804288;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=C3dPf+ID09MXpLAihBhOzSgvYSZYGtT7LemGPeELFSg=;
-        b=lhkx2Ngyqbh4eWdr4e2seZS5OgyLy6yY6ypVGR+wmiKrGUymWYtjpc50gwMKPasdE2
-         sXYPGEE69ER0SeGa+9wNoZvL40AbxlTv25YAwwKRTrRqPxlaKjylYJDY+QCGaNsWE1OA
-         IjivQ1odMsaqCweGtlfKiHlFEIvKD7CrHhQ2fyucpj6baXLxgimpYCGfCeA39fkV5Boz
-         nOjtE5Npv97YyRw9hR+xcEUALmsg4IiPQrzDGxJ65i4YY35rWWOE1WFnUqT9onl9yBr0
-         Zvv1QtXPMo2d5l6QondsQXVUWEKGl6hqUxUET8SuisKPksxQcDgUVLtla0ovLvR/qscv
-         6h1g==
-X-Gm-Message-State: AOJu0YzlmAyVa/vJ7mU1775R88YyyOxXcnLwHsRR+aiq5lCrz+efi7HO
-	JEpbaB8UmphheaE56ieUpTq5QE0cJf7n1AhDRRjrC+WWw1ncSw3Rbbv95cV7ecXO
-X-Gm-Gg: ASbGncsVMX5sSr3OkmAN8oLQpwfBVD/PykILOsP6CZMDJ+69M179ruUdXuRCqIg5u1d
-	N/qQw+ZEwY0lyxJtZGFA2SqebkBTH0SJUwcORefB/+UmPfrWrXFhow0NarFl1TCNvvDjM8ItXrc
-	fFQ6KyRqBP9FijsPKGkqK6AR9QqlJeiI+P3GIDcUlzUhItcLPoS2UZXSvZa6N+eXmTOsUGMW2L4
-	dxoplMkpU+0DlnOITI0LZ3soHTNkYQxBaUjsYZ7fOOnPn+pZJM4JBZH4KHCxLeQTT44wnjxNV05
-	ufJAHnpFJz9coC7bYH4XKNhsDOOM31KEctnhtnE/Kl+DBM05GGrouWNYlMJU3oQfKiYHsKr9mNV
-	Vc5G4buFXrHB2eTuY+A==
-X-Google-Smtp-Source: AGHT+IGEjhR//Cs3gU2kdkbJIy7fIHp7e0cieCvDwQJNopDIH1Ghsc8s7s9XP9ZdEZHFO6tc6QGL0g==
-X-Received: by 2002:a05:6000:460a:b0:3b5:dc04:3f59 with SMTP id ffacd0b85a97d-3b613e97badmr14932760f8f.37.1753199487277;
-        Tue, 22 Jul 2025 08:51:27 -0700 (PDT)
-Received: from maher.. ([196.70.143.246])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca4d74asm13646922f8f.63.2025.07.22.08.51.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Jul 2025 08:51:26 -0700 (PDT)
-From: Maher Azzouzi <maherazz04@gmail.com>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	MaherAzzouzi <maherazz04@gmail.com>
-Subject: [PATCH net] net/sched: mqprio: fix stack out-of-bounds write in tc entry parsing
-Date: Tue, 22 Jul 2025 16:51:21 +0100
-Message-Id: <20250722155121.440969-1-maherazz04@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1753199559; c=relaxed/simple;
+	bh=gGf29o3xZl+D/tSZ6cCokp/L2Hj8dFU3BoIR8OgD/Ys=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dk+LynkSWXIRnNNYdo55g6hZ2IT0nFsgJtZvjtEPz09cm7fT1HeqdJapAWtvajAblZ5RHiQ/L3XiisqXDHga2O0wYctlBQtdBdYyns0BFuS4OdrJcXhtBJNHPA17qsMgmnrKjHUnO4wdOdmSwweqwvgUGWBuYN7K77J/sqSxMvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ljxgpn9A; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 22 Jul 2025 08:52:25 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753199554;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=c3XocA49nvohXItD3mzL5WPudh9EWNp7gI9bByeR0sQ=;
+	b=Ljxgpn9AGU0hD67ioPTX6Wihgl2buBotwbluc/8RHH3rd1Bffik+N1YJ7tgTdUxM5u+pmV
+	N1YRZmLvBRdjDW+LNf/fJEUgtgOUIJFW5q6OTGSye3qVuNaHdB28buqAJKgnPY5kUY9B64
+	0UKNcb59Rvn+QH/FM3LtF/KDSQWr8Zg=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	Mat Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
+	Andrew Morton <akpm@linux-foundation.org>, Simon Horman <horms@kernel.org>, 
+	Geliang Tang <geliang@kernel.org>, Muchun Song <muchun.song@linux.dev>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+	cgroups@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v1 net-next 13/13] net-memcg: Allow decoupling memcg from
+ global protocol memory accounting.
+Message-ID: <jc6z5d7d26zunaf6b4qtwegdoljz665jjcigb4glkb6hdy6ap2@2gn6s52s6vfw>
+References: <20250721203624.3807041-1-kuniyu@google.com>
+ <20250721203624.3807041-14-kuniyu@google.com>
+ <z7kkbenhkndwyghwenwk6c4egq3ky4zl36qh3gfiflfynzzojv@qpcazlpe3l7b>
+ <CANn89iLg-VVWqbWvLg__Zz=HqHpQzk++61dbOyuazSah7kWcDg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iLg-VVWqbWvLg__Zz=HqHpQzk++61dbOyuazSah7kWcDg@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-From: MaherAzzouzi <maherazz04@gmail.com>
+On Tue, Jul 22, 2025 at 08:24:23AM -0700, Eric Dumazet wrote:
+> On Tue, Jul 22, 2025 at 8:14 AM Shakeel Butt <shakeel.butt@linux.dev> wrote:
+> >
+> > On Mon, Jul 21, 2025 at 08:35:32PM +0000, Kuniyuki Iwashima wrote:
+> > > Some protocols (e.g., TCP, UDP) implement memory accounting for socket
+> > > buffers and charge memory to per-protocol global counters pointed to by
+> > > sk->sk_proto->memory_allocated.
+> > >
+> > > When running under a non-root cgroup, this memory is also charged to the
+> > > memcg as sock in memory.stat.
+> > >
+> > > Even when memory usage is controlled by memcg, sockets using such protocols
+> > > are still subject to global limits (e.g., /proc/sys/net/ipv4/tcp_mem).
+> > >
+> > > This makes it difficult to accurately estimate and configure appropriate
+> > > global limits, especially in multi-tenant environments.
+> > >
+> > > If all workloads were guaranteed to be controlled under memcg, the issue
+> > > could be worked around by setting tcp_mem[0~2] to UINT_MAX.
+> > >
+> > > In reality, this assumption does not always hold, and a single workload
+> > > that opts out of memcg can consume memory up to the global limit,
+> > > becoming a noisy neighbour.
+> > >
+> >
+> > Sorry but the above is not reasonable. On a multi-tenant system no
+> > workload should be able to opt out of memcg accounting if isolation is
+> > needed. If a workload can opt out then there is no guarantee.
+> 
+> Deployment issue ?
+> 
+> In a multi-tenant system you can not suddenly force all workloads to
+> be TCP memcg charged. This has caused many OMG.
 
-TCA_MQPRIO_TC_ENTRY_INDEX is validated using
-NLA_POLICY_MAX(NLA_U32, TC_QOPT_MAX_QUEUE), which allows the value
-TC_QOPT_MAX_QUEUE (16). This leads to a 4-byte out-of-bounds stack write in
-the fp[] array, which only has room for 16 elements (0–15).
+Let's discuss the above at the end.
 
-Fix this by changing the policy to allow only up to TC_QOPT_MAX_QUEUE - 1.
+> 
+> Also, the current situation of maintaining two limits (memcg one, plus
+> global tcp_memory_allocated) is very inefficient.
 
-Fixes: f62af20bed2d ("net/sched: mqprio: allow per-TC user input of FP adminStatus")
-Reported-by: Maher Azzouzi <maherazz04@gmail.com>
-Signed-off-by: Maher Azzouzi <maherazz04@gmail.com>
----
- net/sched/sch_mqprio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Agree.
 
-diff --git a/net/sched/sch_mqprio.c b/net/sched/sch_mqprio.c
-index 51d4013b6121..f3e5ef9a9592 100644
---- a/net/sched/sch_mqprio.c
-+++ b/net/sched/sch_mqprio.c
-@@ -152,7 +152,7 @@ static int mqprio_parse_opt(struct net_device *dev, struct tc_mqprio_qopt *qopt,
- static const struct
- nla_policy mqprio_tc_entry_policy[TCA_MQPRIO_TC_ENTRY_MAX + 1] = {
- 	[TCA_MQPRIO_TC_ENTRY_INDEX]	= NLA_POLICY_MAX(NLA_U32,
--							 TC_QOPT_MAX_QUEUE),
-+							 TC_QOPT_MAX_QUEUE - 1),
- 	[TCA_MQPRIO_TC_ENTRY_FP]	= NLA_POLICY_RANGE(NLA_U32,
- 							   TC_FP_EXPRESS,
- 							   TC_FP_PREEMPTIBLE),
--- 
-2.34.1
+> 
+> If we trust memcg, then why have an expensive safety belt ?
+> 
+> With this series, we can finally use one or the other limit. This
+> should have been done from day-0 really.
+
+Same, I agree.
+
+> 
+> >
+> > In addition please avoid adding a per-memcg knob. Why not have system
+> > level setting for the decoupling. I would say start with a build time
+> > config setting or boot parameter then if really needed we can discuss if
+> > system level setting is needed which can be toggled at runtime though
+> > there might be challenges there.
+> 
+> Built time or boot parameter ? I fail to see how it can be more convenient.
+
+I think we agree on decoupling the global and memcg accounting of
+network memory. I am still not clear on the need of per-memcg knob. From
+the earlier comment, it seems like you want mix of jobs with memcg
+limited network memory accounting and with global network accounting
+running concurrently on a system. Is that correct?
+
+I expect this state of jobs with different network accounting config
+running concurrently is temporary while the migrationg from one to other
+is happening. Please correct me if I am wrong.
+
+My main concern with the memcg knob is that it is permanent and it
+requires a hierarchical semantics. No need to add a permanent interface
+for a temporary need and I don't see a clear hierarchical semantic for
+this interface.
+
+I am wondering if alternative approches for per-workload settings are
+explore starting with BPF.
+
+
 
 
