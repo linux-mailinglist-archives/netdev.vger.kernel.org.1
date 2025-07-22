@@ -1,98 +1,94 @@
-Return-Path: <netdev+bounces-208742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B29DDB0CEE2
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 02:50:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E8739B0CEE8
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 02:52:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 563AB6C786D
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 00:49:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 398883BE3C4
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 00:52:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF8019ABDE;
-	Tue, 22 Jul 2025 00:49:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD13813D8A4;
+	Tue, 22 Jul 2025 00:52:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ANvOkAkh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W3i4iRt1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958A71624C0;
-	Tue, 22 Jul 2025 00:49:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41B313AA20;
+	Tue, 22 Jul 2025 00:52:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753145393; cv=none; b=Ij/azCKbDHjz5oSyy94ouipUpJATZqDXFgWf14/mOgiUTB7Zwl25P1V57oLi2YkamC3CDSu2Px3ebrnCVeGjJaMMlc3Ei9H9M0Z5hXwCcORDovoPBBDSH71379TSVGGVZH1xt4801stZUz9F6crFbxAczubkOQ7741qduJmb4hY=
+	t=1753145565; cv=none; b=irBxqHJsajViah2L8wO4x5xr6Y+FpzrWy8P6ufD+vbLl8eAwHL/jJq7AZ9lY8gyh3rQVWCrGG+DQUfCKuISO8ZKUUnvjoDCwykYW1dfpdVQxkUm2lMeTbyVM4XD6ar69MiH4MKeYLEgAz6kWbuzLxPzZaGaEsjlqlliQJwE/zGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753145393; c=relaxed/simple;
-	bh=Rintk8p+QWVFS44yRmEWgxkYxlizz2pX+UPGMDe+X/E=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=VcrqlcOlca9P5hyViDYVkBO88oPi0A7v4pktbB7tVBL7vwhSxNmb4sGDy6sjvW7g4GfqQ+0xxT6gBjzWOia+wF3aSEHaOujxYwR86CuLjqcV5EkrmSit9oPkfghHq6yqWCUMLx9FhyD86flhA/X9kmMTMkuU54wk0Z62WtU+K/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ANvOkAkh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BD8BC4CEED;
-	Tue, 22 Jul 2025 00:49:53 +0000 (UTC)
+	s=arc-20240116; t=1753145565; c=relaxed/simple;
+	bh=1oYDVXHkfUMCUI3Hs6/VwGXn5nv999DI1ksZBqpk+eU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FBpAmkwe8HRNXqappWyzKieYML3DHPrWHoq7nQTI6P4VpxeqKly91mD8z0/3ScnRvRH+xITFTq+QyJg1VQiK5gyH033Jujo1K3IOgm3aUHci0eOxFl3p0mn04c99lN4ztAAM4UaP1SZX4Ja8ylxJGg0V7MB0Zez1oyFTbaUQcaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W3i4iRt1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B940C4CEED;
+	Tue, 22 Jul 2025 00:52:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753145393;
-	bh=Rintk8p+QWVFS44yRmEWgxkYxlizz2pX+UPGMDe+X/E=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ANvOkAkhNhGB8Eek/OpGmmeqnewdROAmxERz1lzyQi0NguhRLaeMFz6pm+jqgJark
-	 +ZF6LH6xZTkOBbcqk8eZVk/34nrmFB6OcJmOlgDhFJBQGJqh+5ZeNZprZAHXMAzk7O
-	 jBC+Czo2zlUDnI0w4OTBCStSshb8nrhZyZNNTecydsD95ux2ZUGpmR8KhmNeUbdxWE
-	 hDuyqlSCuK5JnodlQisIqeRRa6i71P/GuYNVhB+sPQDavkF5rkwu8IvIJbETV/fcro
-	 85mFdsJr5RN2lPq143UBl+yy0oJAwhSTmDZv7Y0fXys68bqu9aiAZqMSLQ6nG7rlNq
-	 XgY8fT6B3+8ng==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEB8383B267;
-	Tue, 22 Jul 2025 00:50:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1753145565;
+	bh=1oYDVXHkfUMCUI3Hs6/VwGXn5nv999DI1ksZBqpk+eU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=W3i4iRt1astex1L7wreGCDgQI8iHWjGUredIZq2AHwLFFr4jrklqEaR4I0uqI6yMi
+	 PJa56S+cVq8PFrAOB9BOlDZQXM0dDJ9WXe9oGSdkch3AXf7NVD2YjG163mgpXLwjNq
+	 CqrOBALd443bBsz55UUQmzer5pgERbHcqQVhYgi+TEzhs9lvajOcvwurbwM9JCEqrg
+	 6XrG+K/Q4MFXHcLXJim/DmucjQ9fIpxY6gr9mZ/66SbZTSOs6tFX1BmuSVGiWXIpqn
+	 e5/TinR0DhY9whoeFt2WD1sRyJ+vezOSuOH9T4uyVtpVUVl6Yyv9gHRuu22DnXwRpL
+	 oyvh7NWWSVLUA==
+Date: Mon, 21 Jul 2025 17:52:43 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: chia-yu.chang@nokia-bell-labs.com
+Cc: alok.a.tiwari@oracle.com, pctammela@mojatatu.com, horms@kernel.org,
+ donald.hunter@gmail.com, xandfury@gmail.com, netdev@vger.kernel.org,
+ dave.taht@gmail.com, pabeni@redhat.com, jhs@mojatatu.com,
+ stephen@networkplumber.org, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, andrew+netdev@lunn.ch,
+ ast@fiberby.net, liuhangbin@gmail.com, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org, ij@kernel.org, ncardwell@google.com,
+ koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com,
+ ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
+ cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
+ vidhi_goel@apple.com
+Subject: Re: [PATCH v25 net-next 1/6] sched: Struct definition and parsing
+ of dualpi2 qdisc
+Message-ID: <20250721175243.5e620997@kernel.org>
+In-Reply-To: <20250719204129.15737-2-chia-yu.chang@nokia-bell-labs.com>
+References: <20250719204129.15737-1-chia-yu.chang@nokia-bell-labs.com>
+	<20250719204129.15737-2-chia-yu.chang@nokia-bell-labs.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v1 1/1] net: usb: smsc95xx: add support for
- ethtool
- pause parameters
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175314541150.247888.9267793850029224418.git-patchwork-notify@kernel.org>
-Date: Tue, 22 Jul 2025 00:50:11 +0000
-References: <20250718075157.297923-1-o.rempel@pengutronix.de>
-In-Reply-To: <20250718075157.297923-1-o.rempel@pengutronix.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: steve.glendinning@shawell.net, andrew@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- kernel@pengutronix.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- UNGLinuxDriver@microchip.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Sat, 19 Jul 2025 22:41:24 +0200 chia-yu.chang@nokia-bell-labs.com
+wrote:
+> +	q = qdisc_priv(sch);
+> +	sch_tree_lock(sch);
+> +
+> +	if (tb[TCA_DUALPI2_STEP_THRESH_PKTS] && tb[TCA_DUALPI2_STEP_THRESH_US]) {
+> +		NL_SET_ERR_MSG_MOD(extack, "multiple step thresh attributes");
+> +		sch_tree_unlock(sch);
+> +		return -EINVAL;
+> +	}
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+tb[] is local state on the stack, parsed from the netlink message
+(also local). You can move the:
 
-On Fri, 18 Jul 2025 09:51:56 +0200 you wrote:
-> Implement ethtool .get_pauseparam and .set_pauseparam handlers for
-> configuring flow control on smsc95xx. The driver now supports enabling
-> or disabling transmit and receive pause frames, with or without
-> autonegotiation. Pause settings are applied during link-up based on
-> current PHY state and user configuration.
-> 
-> Previously, the driver used phy_get_pause() during link-up handling,
-> but lacked initialization and an ethtool interface to configure pause
-> modes. As a result, flow control support was effectively non-functional.
-> 
-> [...]
+	q = qdisc_priv(sch);
+	sch_tree_lock(sch);
 
-Here is the summary with links:
-  - [net-next,v1,1/1] net: usb: smsc95xx: add support for ethtool pause parameters
-    https://git.kernel.org/netdev/net-next/c/c521b8c9f212
-
-You are awesome, thank you!
+lines after the check and then you won't have to unlock on the error 
+path.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
