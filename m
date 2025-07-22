@@ -1,131 +1,123 @@
-Return-Path: <netdev+bounces-209054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70177B0E1FE
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 18:36:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DA47B0E200
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 18:36:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40F5C7ADBDF
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 16:34:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81FC016E349
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 16:36:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D99A827C15A;
-	Tue, 22 Jul 2025 16:36:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6A3827AC50;
+	Tue, 22 Jul 2025 16:36:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PTOhhcNa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NOMA9KL7"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06B5C22338
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 16:36:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A78A27816E;
+	Tue, 22 Jul 2025 16:36:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753202170; cv=none; b=a9i3QR36wkZW93xZYnT/JpzDKTFhzuj3FOwumNgv2Qo1qe1MzhJq9QcDUZPeS6ztR1d/lFvgmZp+YxEAe1TeH+7Xtq3UDlP4o6CUHb4d7tlDMdmhLJ/dPzJoHzlIWiaZHfNvp7Fqv2OTn0rz12amgjK27ik8m0boBoBWV30vBlo=
+	t=1753202210; cv=none; b=D3PqgDzOm1o/tQ+sVBJNbUZptNSTbUOA92DsyRUz/2GQTnQroi7i55XMimzlu6AHxIOQo6H9GV6y+8dfH9pKt7ww1ArBOcQE4SW8secemQyLK8RqN7PCqKZuY1TiHnUGg7mayjRGcyYJ6d4SyJhgkflx6oLcdYLuIvNJtmEDui4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753202170; c=relaxed/simple;
-	bh=jD3QayzdcggqoSc8UngUlmjoqdFLiHcnz8zfpitTb8s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fjKjCi4c9sW6Kzli5PfZzHQwM/rB860IsIcZ3fo7MS3ygZshv9TulC5n3JGRSowSX/9g6Is/nRh/94VAEE2HKyF7ha8HtJbnmrCm+DLDUsKrRNPBtHODpcHByJ9kn5QfqwsqWi3vXiOt8/GEHhLIn1NqbJfTiLxNN/5rSnfAId4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PTOhhcNa; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <5681662e-6038-433f-9da7-438b383621b7@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753202163;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=58pvaCs+xgE9yS/q0WEYLSExFzaY39BOzBBTwJRQn7k=;
-	b=PTOhhcNa8/7hDCVVDLT3bn8pDi7Oz/w60ErTXpAs4vHeqmPxYtO/OFDd0CBFcrBzQbn/Ur
-	z8mrjyE5BGWPIRW89NEfX8m4q+vogMx3qFUraCJ27MRxvALFoY3fS05EzJuKyGCWbIoMoD
-	KIMHG19Lz6kVJymemjjDXtEE+QHetHs=
-Date: Wed, 23 Jul 2025 00:35:48 +0800
+	s=arc-20240116; t=1753202210; c=relaxed/simple;
+	bh=8IC9X4ZB0VrVik2Ye+ACM6bdPab587yF0W5iK7IqWaY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=al9PuMvZvpXakDXOybG3Bx2X9jcV9GucUDB5k8quc+sIpguc4BOcG9TuNn1sMMoB/IY9JCHxxJnSDqeTTo1IIe6vRQX7lDjqiZoTVDDI5pgSarWo9G++7P9EX+7A0X+/4EdTUvSsyWWCDYAbdzMEW0JKch26ZJk10L2eOK0Jsdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NOMA9KL7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A79C7C4CEEB;
+	Tue, 22 Jul 2025 16:36:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753202210;
+	bh=8IC9X4ZB0VrVik2Ye+ACM6bdPab587yF0W5iK7IqWaY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NOMA9KL73oysLWi64ODYzAOI47zlxxF4AjjYjCyCOqKPhP/Sj2ZCKmojt2qpPy08o
+	 JJtQEE+StXu7Yk7ikwJ1wETIwp+miTppOc/znDjN0+qqi7kHbqOd6gm6o6u1tPFmbt
+	 SUWoK0zRwCgE9nJG/eDsd+4sSawSF/yLIZMKtJPAc2b5jVowT7ba42lIyl+BbqWezi
+	 FzaSvMGb+z/Ea6hf2CuvcTSJWgWfAhuwkpbK1Ji/rvjJt7tEGR7E9DQGH+8a1OaVGS
+	 tXRaWeTOWGS35u/7103m5VMyU8v4m/O1pD9c/oQZfL53rWWa0D1N6cX1dkldLlbdN/
+	 mKAAHRNiVCCxQ==
+Date: Tue, 22 Jul 2025 17:36:45 +0100
+From: Simon Horman <horms@kernel.org>
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, sd@queasysnail.net,
+	andrew+netdev@lunn.ch, shuah@kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Cosmin Ratiu <cratiu@nvidia.com>
+Subject: Re: [PATCH net 1/2] macsec: set IFF_UNICAST_FLT priv flag
+Message-ID: <20250722163645.GP2459@horms.kernel.org>
+References: <20250721165423.990313-1-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v2 3/3] bpftool: Add bash completion for token
- argument
-To: Quentin Monnet <qmo@kernel.org>, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
- kuba@kernel.org, hawk@kernel.org
-Cc: linux-kernel@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20250722120912.1391604-1-chen.dylane@linux.dev>
- <20250722120912.1391604-3-chen.dylane@linux.dev>
- <ba84629f-5675-4793-9320-25d9029d2a35@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Tao Chen <chen.dylane@linux.dev>
-In-Reply-To: <ba84629f-5675-4793-9320-25d9029d2a35@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250721165423.990313-1-sdf@fomichev.me>
 
-在 2025/7/22 23:02, Quentin Monnet 写道:
-> 2025-07-22 20:09 UTC+0800 ~ Tao Chen <chen.dylane@linux.dev>
->> This commit updates the bash completion script with the new token
->> argument.
->> $ bpftool
->> batch       cgroup      gen         iter        map         perf        struct_ops
->> btf         feature     help        link        net         prog        token
+On Mon, Jul 21, 2025 at 09:54:22AM -0700, Stanislav Fomichev wrote:
+> Cosmin reports the following locking issue:
 > 
+>   # BUG: sleeping function called from invalid context at
+>   kernel/locking/mutex.c:275
+>   #   dump_stack_lvl+0x4f/0x60
+>   #   __might_resched+0xeb/0x140
+>   #   mutex_lock+0x1a/0x40
+>   #   dev_set_promiscuity+0x26/0x90
+>   #   __dev_set_promiscuity+0x85/0x170
+>   #   __dev_set_rx_mode+0x69/0xa0
+>   #   dev_uc_add+0x6d/0x80
+>   #   vlan_dev_open+0x5f/0x120 [8021q]
+>   #  __dev_open+0x10c/0x2a0
+>   #  __dev_change_flags+0x1a4/0x210
+>   #  netif_change_flags+0x22/0x60
+>   #  do_setlink.isra.0+0xdb0/0x10f0
+>   #  rtnl_newlink+0x797/0xb00
+>   #  rtnetlink_rcv_msg+0x1cb/0x3f0
+>   #  netlink_rcv_skb+0x53/0x100
+>   #  netlink_unicast+0x273/0x3b0
+>   #  netlink_sendmsg+0x1f2/0x430
 > 
-> This is a terrible example, offering "token" as completion for just
-> "bpftool [tab]" works without this patch :) The main commands are parsed
-> from the output of "bpftool help" so it should work after your first
-> patch. In this one, we add "list", "show" and "help" for completing
-> "bpftool token [tab]".
+> Which is similar to recent syzkaller reports in [0] and [1] and triggers
+> because macsec does not advertise IFF_UNICAST_FLT although it has proper
+> ndo_set_rx_mode callback that takes care of pushing uc/mc addresses
+> down to the real device.
 > 
+> In general, dev_uc_add call path is problematic for stacking
+> non-IFF_UNICAST_FLT because we might grab netdev instance lock under
+> addr_list_lock spinlock, so this is not a systemic fix.
+> 
+> 0: https://lore.kernel.org/netdev/686d55b4.050a0220.1ffab7.0014.GAE@google.com
+> 1: https://lore.kernel.org/netdev/68712acf.a00a0220.26a83e.0051.GAE@google.com/
+> Link: 2aff4342b0f5b1539c02ffd8df4c7e58dd9746e7.camel@nvidia.com
 
-As you said, how about this one? I will change it in v3, thanks.
-     $ bpftool token
-     help  list  show
+I think that Link: should be followed by a URL
 
-> 
->>
->> Signed-off-by: Tao Chen <chen.dylane@linux.dev>
->> ---
->>   tools/bpf/bpftool/bash-completion/bpftool | 11 +++++++++++
->>   1 file changed, 11 insertions(+)
->>
->> diff --git a/tools/bpf/bpftool/bash-completion/bpftool b/tools/bpf/bpftool/bash-completion/bpftool
->> index a759ba24471..527bb47ac46 100644
->> --- a/tools/bpf/bpftool/bash-completion/bpftool
->> +++ b/tools/bpf/bpftool/bash-completion/bpftool
->> @@ -1215,6 +1215,17 @@ _bpftool()
->>                       ;;
->>               esac
->>               ;;
->> +        token)
->> +            case $command in
->> +               show|list)
->> +                   return 0
->> +                   ;;
->> +               *)
->> +                   [[ $prev == $object ]] && \
->> +                       COMPREPLY=( $( compgen -W 'help show list' -- "$cur" ) )
->> +                   ;;
->> +            esac
->> +            ;;
->>       esac
->>   } &&
->>   complete -F _bpftool bpftool
-> 
-> 
-> Other than the example in the description, this looks good.
-> 
-> Reviewed-by: Quentin Monnet <qmo@kernel.org>
-> 
-> Thanks
+Link: https://lore.kernel.org/netdev/2aff4342b0f5b1539c02ffd8df4c7e58dd9746e7.camel@nvidia.com
 
+> Fixes: 7e4d784f5810 ("net: hold netdev instance lock during rtnetlink operations")
+> Reported-by: Cosmin Ratiu <cratiu@nvidia.com>
+> Tested-by: Cosmin Ratiu <cratiu@nvidia.com>
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 
--- 
-Best Regards
-Tao Chen
+Hi Stan,
+
+I ran the test provided by patch 2/2.
+When run with with a debug kernel using VNG.
+
+It reliably passes with patch 1/2 applied. And fails without patch 1/2 applied.
+Where fails means the kernel panics along the lines of the stack trace in
+the commit message.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+Tested-by: Simon Horman <horms@kernel.org>
+
+...
 
