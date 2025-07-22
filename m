@@ -1,116 +1,139 @@
-Return-Path: <netdev+bounces-209085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A111DB0E3A5
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 20:48:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46C06B0E3A9
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 20:49:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83B351C8522E
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 18:48:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76D524E2EEF
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 18:48:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 780F627FD74;
-	Tue, 22 Jul 2025 18:48:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96829281376;
+	Tue, 22 Jul 2025 18:49:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="px/4UZxU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AMFwqko8"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90A8521B9C1
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 18:47:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3835025C833;
+	Tue, 22 Jul 2025 18:49:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753210080; cv=none; b=FHk/uFVNFGHpCV8+BMnzmCcYAVkFYOne+smBod9pJU/LyZbPJ0I+wimFAewOQVNK5tEGtm7ahTIB2ClESoKt+956CeTfVM8hYyjBOliiYWP2LVfx3zzsNoLM1xJFCvLvdL7vy0yCp9tumIrmw0jZYaNB9yL+k4tnm8Gpo5KriEg=
+	t=1753210160; cv=none; b=bt/GbZ2NhE7RB2KxRVFTvdW6y69YVa85reteh18ZrF8O3oaWknZdZ5ZTWemyphu0xdZkk/g5H0dvPvh+sNoLkEYXlj/uAugX+im4kOq8ZIu8fM1ZQmCOa20LKUf0I79GakOG5IlSSdwXXNHut0nXkO5Mz1s2WSFHqHJpELufgeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753210080; c=relaxed/simple;
-	bh=YGmW3D7ASEelLjgYBUU+VDJhURA4prAt2wQSaMN3LhQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nbsd5X7elxSs3gsTgtxiM6a+iapdSrOY+OWlDhsVBO4oDorKrGvBgUfdBUIjb0hrjN6EpDIALetCgtN3YcoVn5kIDqiQaZ7EtsQcML7xzmb4WZaVPzv/3ncRTbm0W8jxlGmkxFt9ho4eRwQD9LxzpIOAuErt2tpSusspMZgppGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=px/4UZxU; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 22 Jul 2025 11:47:47 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753210074;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5sCklFQeH1wpwJU3c3owakmNQ9FbOcSJOwXrNUCuwsc=;
-	b=px/4UZxUJlH60I/csj7mBusDiqFmR5qMD44hPwbqcQeWS+/juOizvApMMbDvBJ1nexsZzw
-	jO26AzePuLJXHPA+HrDuuFUuo01ntMFCnPe/c8vmwzqC+A9Zgfak7zhOqq4D3L3EeT8QOi
-	1fnx+s/trAF2+75Rr6x/CUG6BZcLMDY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Eric Dumazet <edumazet@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	Mat Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
-	Andrew Morton <akpm@linux-foundation.org>, Simon Horman <horms@kernel.org>, 
-	Geliang Tang <geliang@kernel.org>, Muchun Song <muchun.song@linux.dev>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, mptcp@lists.linux.dev, 
-	cgroups@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v1 net-next 13/13] net-memcg: Allow decoupling memcg from
- global protocol memory accounting.
-Message-ID: <p4fcser5zrjm4ut6lw4ejdr7gn2gejrlhy2u2btmhajiiheoax@ptacajypnvlw>
-References: <20250721203624.3807041-1-kuniyu@google.com>
- <20250721203624.3807041-14-kuniyu@google.com>
- <z7kkbenhkndwyghwenwk6c4egq3ky4zl36qh3gfiflfynzzojv@qpcazlpe3l7b>
- <CANn89iLg-VVWqbWvLg__Zz=HqHpQzk++61dbOyuazSah7kWcDg@mail.gmail.com>
- <jc6z5d7d26zunaf6b4qtwegdoljz665jjcigb4glkb6hdy6ap2@2gn6s52s6vfw>
- <CAAVpQUAJCLaOr7DnOH9op8ySFN_9Ky__easoV-6E=scpRaUiJQ@mail.gmail.com>
+	s=arc-20240116; t=1753210160; c=relaxed/simple;
+	bh=r1+sqIlBADCb6mqjRanffunkgG17o49q2AL4JcEBTOI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=SOHZgf4NvAY5a+5EHvpxmFwDRNfRVoIK4AUIzJSLfOV2vaTS6q4WFrTTvPo5JbL9SaWy0tGQwTBUawquFy11ox7Hd7/xe270H8c7SACkwXtJ/LojjqW7hiKmcRY39N6eWS1VGIF/VQ8sC7jXI88GaL9w6M31ENxQKpp2VZSz+FM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AMFwqko8; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-23636167b30so54753565ad.1;
+        Tue, 22 Jul 2025 11:49:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753210157; x=1753814957; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=EindGHJlktQVX7xZxD8UDEuice7aiYGONICYOdlL4hs=;
+        b=AMFwqko8FGKazRpoR+vaeMHfB5Gfw5qgp3c2TCi2HIrC5VAKY+3+z+D+fMMdF/xcx0
+         RYXTqELdyVQi25osr+ifEYSJcweC2SaOsc65/yQaxV0sGcvc08Dyty45GeZhmNbLZM9q
+         yrHhtMVMehqHPNCtaJlkkYNVj7XOZ+HJ3BAYvAlzEOQufMYGu30RNTcyNIdRVpHJD7oh
+         vUeH5d3xTIWQOKhqVHZY27PuPfLF/FlcZNb4GTTVRp1YikAno8eL4DuB9U3BLWHJBGyb
+         TjKg0Dhfzf2zzGXK659VagCzA5QOzHrQ/mdLBtfdGsZV7H4UHUWn9Be/mYMzS/sMKxF6
+         whkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753210157; x=1753814957;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EindGHJlktQVX7xZxD8UDEuice7aiYGONICYOdlL4hs=;
+        b=m97maS1t0mU6+lXdeWx6zIiFsgfRDcAk0bRprpy9ognvEqBn9YaHFrVtaiMZroQWhE
+         qtbwMNmzj/NjR1IcB66Dbtwwre91pGf4Pl+XNV0aDGSuyvd0ozmBnkRyF5bcXu+2YHYn
+         TSzEnhSnxOPIqEunbm6l4qcFjxQbHHjJDSlVRPmg5pZsFpty4nEhbsIcNeZapNlQvA+a
+         SMbHXMIUc9dUIQTMQ1g+oUT7J8bg8sUsAgRq+PxXJwMVQpNEoR/5avMuLwHrj8K23vjn
+         vHnXGh81iA7znfmRKoVUl3D2appYtwBjEoc6Aek8vpyns59Em8VPNc5Elw29cbcFb6Vi
+         OAmg==
+X-Forwarded-Encrypted: i=1; AJvYcCV+l7IARJWGsjsavh2C/YjMJJDtPuLdhmvmCVma6+SDcIN4rgRgAacuDoPEF4ZeqLa2tIE=@vger.kernel.org, AJvYcCX6TB6jAFAssfWREoC+RREVycWdja1IRkyXiDJYzzRXIIQAVaBgQ6IgUs0BSr1C1wOnXpRSQPGS@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLYBYMvZnG61bvkLWUtpDgLizjvEpSo18vA4VnqW0K6B6k3+ok
+	B/A7aQmgi548+fTpgnw1e+LBmSh8j92Qmu8+BLBJfFizylRE81+uxNO8
+X-Gm-Gg: ASbGnct8imLLsSfQJRnnb0+375jat5wIjM7f7bwEbeYRi8s8qPq07fWjzYJVEG1nuNP
+	tT718AkxLrXeaaUm/UIJ7iGwgzRfdDYQZrGmqdCtLqgzRM64uRPFjQ//dbte23E4gylMpCKurE/
+	8Rm+ARhNi9D8Jrq+c4ULUerClZ3md8OuZBS44ywd6atcjpcv9DbyP2qMPHi1I4y2S5hei/M0pUY
+	mI5ewz/f2sKDa+Q5fcl5nHorAuVHtm/RqQLnAGCCk9mJw0SuC2QvZi0R5zUleTjQC3+Q94uoToO
+	PXJCAO+1Q8bXTqsaFJ9suJvnLWl9GVsD3fTriEVpX/XEgmQzc+NuUAu4iIkoGmMO/podPtmAWwD
+	FP83JI6sqdgFNYCUeb3uLVzIcYtFS
+X-Google-Smtp-Source: AGHT+IGTFymfKW7BmroCxzprZYf2l8q1fweZLWCbI0IqH+5i5m/gFs0nsiGUb9nzOcz+fE44wVvZig==
+X-Received: by 2002:a17:902:cece:b0:234:d292:be72 with SMTP id d9443c01a7336-23f9820c7abmr455945ad.26.1753210157475;
+        Tue, 22 Jul 2025 11:49:17 -0700 (PDT)
+Received: from ?IPv6:2620:10d:c096:14a::281? ([2620:10d:c090:600::1:e6e1])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b3f2fe8dc32sm7551758a12.23.2025.07.22.11.49.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Jul 2025 11:49:16 -0700 (PDT)
+Message-ID: <3d765f43d5b2d186f2de09c1dddeb32d8ff6e46a.camel@gmail.com>
+Subject: Re: [PATCH bpf-next v3 02/10] bpf: Enable read access to skb
+ metadata with bpf_dynptr_read
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Jakub Sitnicki <jakub@cloudflare.com>, bpf@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko
+ <andrii@kernel.org>,  Arthur Fabre <arthur@arthurfabre.com>, Daniel
+ Borkmann <daniel@iogearbox.net>, Eric Dumazet	 <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer	 <hawk@kernel.org>,
+ Jesse Brandeburg <jbrandeburg@cloudflare.com>, Joanne Koong	
+ <joannelkoong@gmail.com>, Lorenzo Bianconi <lorenzo@kernel.org>, Martin
+ KaFai Lau <martin.lau@linux.dev>, Toke
+ =?ISO-8859-1?Q?H=F8iland-J=F8rgensen?= <thoiland@redhat.com>,  Yan Zhai
+ <yan@cloudflare.com>, kernel-team@cloudflare.com, netdev@vger.kernel.org,
+ Stanislav Fomichev	 <sdf@fomichev.me>
+Date: Tue, 22 Jul 2025 11:49:14 -0700
+In-Reply-To: <20250721-skb-metadata-thru-dynptr-v3-2-e92be5534174@cloudflare.com>
+References: 
+	<20250721-skb-metadata-thru-dynptr-v3-0-e92be5534174@cloudflare.com>
+	 <20250721-skb-metadata-thru-dynptr-v3-2-e92be5534174@cloudflare.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAVpQUAJCLaOr7DnOH9op8ySFN_9Ky__easoV-6E=scpRaUiJQ@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jul 22, 2025 at 11:18:40AM -0700, Kuniyuki Iwashima wrote:
-> >
-> > I expect this state of jobs with different network accounting config
-> > running concurrently is temporary while the migrationg from one to other
-> > is happening. Please correct me if I am wrong.
-> 
-> We need to migrate workload gradually and the system-wide config
-> does not work at all.  AFAIU, there are already years of effort spent
-> on the migration but it's not yet completed at Google.  So, I don't think
-> the need is temporary.
-> 
+On Mon, 2025-07-21 at 12:52 +0200, Jakub Sitnicki wrote:
 
-From what I remembered shared borg had completely moved to memcg
-accounting of network memory (with sys container as an exception) years
-ago. Did something change there?
+[...]
 
-> >
-> > My main concern with the memcg knob is that it is permanent and it
-> > requires a hierarchical semantics. No need to add a permanent interface
-> > for a temporary need and I don't see a clear hierarchical semantic for
-> > this interface.
-> 
-> I don't see merits of having hierarchical semantics for this knob.
-> Regardless of this knob, hierarchical semantics is guaranteed
-> by other knobs.  I think such semantics for this knob just complicates
-> the code with no gain.
-> 
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index c17b628c08f5..4b787c56b220 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -11978,6 +11978,18 @@ bpf_sk_base_func_proto(enum bpf_func_id func_id,=
+ const struct bpf_prog *prog)
+>  	return func;
+>  }
+> =20
+> +int bpf_skb_meta_load_bytes(const struct sk_buff *skb, u32 offset,
+> +			    void *dst, u32 len)
+> +{
+> +	u32 meta_len =3D skb_metadata_len(skb);
+> +
+> +	if (len > meta_len || offset > meta_len - len)
+> +		return -E2BIG; /* out of bounds */
+> +
+> +	memmove(dst, skb_metadata_end(skb) - meta_len + offset, len);
+> +	return 0;
+> +}
+> +
 
-Cgroup interfaces are hierarchical and we want to keep it that way.
-Putting non-hierarchical interfaces just makes configuration and setup
-hard to reason about.
+Nit: is it possible to use bpf_skb_meta_pointer() here to avoid
+     duplicating range check in both bpf_skb_meta_load_bytes()
+     and bpf_skb_meta_store_bytes()?
 
-> 
-> >
-> > I am wondering if alternative approches for per-workload settings are
-> > explore starting with BPF.
-> >
-
-Any response on the above? Any alternative approaches explored?
+>  static int dynptr_from_skb_meta(struct __sk_buff *skb_, u64 flags,
+>  				struct bpf_dynptr *ptr_, bool rdonly)
+>  {
 
