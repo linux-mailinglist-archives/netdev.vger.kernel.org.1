@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-208741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78E44B0CEE0
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 02:50:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B29DDB0CEE2
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 02:50:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A70C1895260
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 00:50:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 563AB6C786D
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 00:49:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 355CB17A2F7;
-	Tue, 22 Jul 2025 00:49:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF8019ABDE;
+	Tue, 22 Jul 2025 00:49:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U5xWR6xK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ANvOkAkh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 077CE1624C0;
-	Tue, 22 Jul 2025 00:49:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958A71624C0;
+	Tue, 22 Jul 2025 00:49:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753145392; cv=none; b=iHNkwnNeOUrX/Vi6Rub1E/JonAOoneLtPHsk50EMzQZJo32DqbmE+Rofqej3CyPqYrNVOfS64DxmQXLf67x5GiDrvQd9RTT9k6Xue1ayDPS/6kuA7XP+SaXyEGvKyDSDBTmfi/33i2O0TYXfLHf09rlN2T2n6gbyYWZpUSnqEiM=
+	t=1753145393; cv=none; b=Ij/azCKbDHjz5oSyy94ouipUpJATZqDXFgWf14/mOgiUTB7Zwl25P1V57oLi2YkamC3CDSu2Px3ebrnCVeGjJaMMlc3Ei9H9M0Z5hXwCcORDovoPBBDSH71379TSVGGVZH1xt4801stZUz9F6crFbxAczubkOQ7741qduJmb4hY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753145392; c=relaxed/simple;
-	bh=lh7m0LgtL9aJE/iOfdTHANgA3YGFDv5un0xLUHMKMMU=;
+	s=arc-20240116; t=1753145393; c=relaxed/simple;
+	bh=Rintk8p+QWVFS44yRmEWgxkYxlizz2pX+UPGMDe+X/E=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Tod3dYM7aVVqX1xgOdgLyxkwrnYrU0dQBso5PK04P9ybKt6+OSIHq58603PEU8lB9maFAQa63ymxDWZEnDBH9l1BrqqKbiONfELRJKW9N+57ouDLBpo6g1TRR2sWTzvqMLRkUFDgBJJ6bAURsXlvLD7PIj5ELdGSLF/VgFa6WqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U5xWR6xK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81F0BC4CEED;
-	Tue, 22 Jul 2025 00:49:51 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=VcrqlcOlca9P5hyViDYVkBO88oPi0A7v4pktbB7tVBL7vwhSxNmb4sGDy6sjvW7g4GfqQ+0xxT6gBjzWOia+wF3aSEHaOujxYwR86CuLjqcV5EkrmSit9oPkfghHq6yqWCUMLx9FhyD86flhA/X9kmMTMkuU54wk0Z62WtU+K/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ANvOkAkh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BD8BC4CEED;
+	Tue, 22 Jul 2025 00:49:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753145391;
-	bh=lh7m0LgtL9aJE/iOfdTHANgA3YGFDv5un0xLUHMKMMU=;
+	s=k20201202; t=1753145393;
+	bh=Rintk8p+QWVFS44yRmEWgxkYxlizz2pX+UPGMDe+X/E=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=U5xWR6xK3gRV9FkoOTUARHsXZi1vt7TD3gbGuGCpSAjhGuNqJ9vn8mvJARf7vkeka
-	 Ff41y/8sRxwtY7jOKjw+41ykuqWgpEnHVYTSatYZhpwF7j//YM9pd5zYXD4NPJOMLt
-	 FlmHliRhe3FaCmpz/h1rUu9JSCyth7sfkZBG0fXv67Y8wmcx8kCdOxHLld4s+/tTkx
-	 WOwsN+LQOgygTRu1Z6eS0dUUbC+RtDrA17j4DZxOBlHoMWC/MHuN6IHT5irv427RkY
-	 gcDuTMlTjbummbKEPV7eib6zqtOfhETCEYdLT/x6WsOjZjOH6S5dp2iHnOImvzQcur
-	 YzI1W7Wzjz0qw==
+	b=ANvOkAkhNhGB8Eek/OpGmmeqnewdROAmxERz1lzyQi0NguhRLaeMFz6pm+jqgJark
+	 +ZF6LH6xZTkOBbcqk8eZVk/34nrmFB6OcJmOlgDhFJBQGJqh+5ZeNZprZAHXMAzk7O
+	 jBC+Czo2zlUDnI0w4OTBCStSshb8nrhZyZNNTecydsD95ux2ZUGpmR8KhmNeUbdxWE
+	 hDuyqlSCuK5JnodlQisIqeRRa6i71P/GuYNVhB+sPQDavkF5rkwu8IvIJbETV/fcro
+	 85mFdsJr5RN2lPq143UBl+yy0oJAwhSTmDZv7Y0fXys68bqu9aiAZqMSLQ6nG7rlNq
+	 XgY8fT6B3+8ng==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CC7383B267;
-	Tue, 22 Jul 2025 00:50:11 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEB8383B267;
+	Tue, 22 Jul 2025 00:50:12 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] s390/qeth: Make hw_trap sysfs attribute
- idempotent
+Subject: Re: [PATCH net-next v1 1/1] net: usb: smsc95xx: add support for
+ ethtool
+ pause parameters
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175314540996.247888.18318407456120980462.git-patchwork-notify@kernel.org>
-Date: Tue, 22 Jul 2025 00:50:09 +0000
-References: <20250718141711.1141049-1-wintera@linux.ibm.com>
-In-Reply-To: <20250718141711.1141049-1-wintera@linux.ibm.com>
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, hca@linux.ibm.com, gor@linux.ibm.com,
- agordeev@linux.ibm.com, borntraeger@linux.ibm.com, svens@linux.ibm.com,
- twinkler@linux.ibm.com, horms@kernel.org, aswin@linux.ibm.com
+ <175314541150.247888.9267793850029224418.git-patchwork-notify@kernel.org>
+Date: Tue, 22 Jul 2025 00:50:11 +0000
+References: <20250718075157.297923-1-o.rempel@pengutronix.de>
+In-Reply-To: <20250718075157.297923-1-o.rempel@pengutronix.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: steve.glendinning@shawell.net, andrew@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ kernel@pengutronix.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ UNGLinuxDriver@microchip.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 18 Jul 2025 16:17:11 +0200 you wrote:
-> From: Aswin Karuvally <aswin@linux.ibm.com>
+On Fri, 18 Jul 2025 09:51:56 +0200 you wrote:
+> Implement ethtool .get_pauseparam and .set_pauseparam handlers for
+> configuring flow control on smsc95xx. The driver now supports enabling
+> or disabling transmit and receive pause frames, with or without
+> autonegotiation. Pause settings are applied during link-up based on
+> current PHY state and user configuration.
 > 
-> Update qeth driver to allow writing an existing value to the "hw_trap"
-> sysfs attribute. Attempting such a write earlier resulted in -EINVAL.
-> In other words, make the sysfs attribute idempotent.
-> 
-> After:
->     $ cat hw_trap
->     disarm
->     $ echo disarm > hw_trap
->     $
+> Previously, the driver used phy_get_pause() during link-up handling,
+> but lacked initialization and an ethtool interface to configure pause
+> modes. As a result, flow control support was effectively non-functional.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] s390/qeth: Make hw_trap sysfs attribute idempotent
-    https://git.kernel.org/netdev/net-next/c/1b02c861714b
+  - [net-next,v1,1/1] net: usb: smsc95xx: add support for ethtool pause parameters
+    https://git.kernel.org/netdev/net-next/c/c521b8c9f212
 
 You are awesome, thank you!
 -- 
