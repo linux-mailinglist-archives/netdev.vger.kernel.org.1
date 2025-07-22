@@ -1,108 +1,135 @@
-Return-Path: <netdev+bounces-209107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8502BB0E52B
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 23:00:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B41FAB0E530
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 23:03:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA2C258043F
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 21:00:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E914458062B
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 21:03:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51F68285C8E;
-	Tue, 22 Jul 2025 21:00:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DMD8TWmY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27E6F27E7E1;
+	Tue, 22 Jul 2025 21:03:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F01D22857F0;
-	Tue, 22 Jul 2025 21:00:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B1514F9D6;
+	Tue, 22 Jul 2025 21:02:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753218012; cv=none; b=Z58v2115a9vgU/A4RxgtKTZBNGvrKT8620MAuUxvDcdTqgio4ieho74lQNR6rZEjH25luGI3zj8Uu1g7hiz5Yy9ezvsMOZuY07qpOEGGYuqbyr+D4T7DGbkNj6iJiZaHI6MsFeUhPej4lOrg65nwycP7ElEjXUTILA54HXZr6vQ=
+	t=1753218180; cv=none; b=dySiy8ecqwBFfUkunD1Uw5WTBj6jo6RtTbXWBorlEhUTKja3+oEE55U5qH9jjOebdQde6US7mSTWL7D5uo/CEX5JTwS84ydsSCdEbsOeBOoucCSS9n3ziIO/5tDwQK2IgAjsikGvR6aru3Km4bZVof0cknKqblzgOTDzwr0341M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753218012; c=relaxed/simple;
-	bh=424qtBj7As3BusOn+abIiFBQyCjPATLbPyyiCsGTn/I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T4dDJMiTKqR89eP63vP9R2dyFQxBHspYIdTcWjcjefz36iC6GpEEjg4Htb7G+2YpnuJAD58iDa0d0rhAMR+ewvO85i3NdmdwWGLfhF+MxRvRkLKxXfEVc5lal4idv5QKsWRloxRF9GhVJMV2ouIqDkDyCXKi2U8Lvr3+PFWp04s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=DMD8TWmY; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=eVLbWCzQczw2dFn7K3G8G8HQYlWdsk18wtghWYXLXEs=; b=DMD8TWmYpjGyDAzTKybNamT+9v
-	SMMohcfkCxMGht1XfGZKiyP/Qib/NSMjLLos+LeLQa96Y4GQGSFrjFFwqk/pQ5VgZmgaYiqNsVZi9
-	5T9ER95fROMwNnkI03V/xl204eX2geij4sBPIBBSPkjVK3onQrXq4cPe4MPu/8yU1NOM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ueK5X-002VRl-Bv; Tue, 22 Jul 2025 22:59:51 +0200
-Date: Tue, 22 Jul 2025 22:59:51 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Christophe Roullier <christophe.roullier@foss.st.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Tristram Ha <Tristram.Ha@microchip.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/4] dt-bindings: net: document st,phy-wol
- property
-Message-ID: <ae31d10f-45cf-47c8-a717-bb27ba9b7fbe@lunn.ch>
-References: <20250721-wol-smsc-phy-v1-0-89d262812dba@foss.st.com>
- <20250721-wol-smsc-phy-v1-1-89d262812dba@foss.st.com>
- <faea23d5-9d5d-4fbb-9c6a-a7bc38c04866@kernel.org>
- <f5c4bb6d-4ff1-4dc1-9d27-3bb1e26437e3@foss.st.com>
- <e3c99bdb-649a-4652-9f34-19b902ba34c1@lunn.ch>
- <38278e2a-5a1b-4908-907e-7d45a08ea3b7@foss.st.com>
- <5b8608cb-1369-4638-9cda-1cf90412fc0f@lunn.ch>
- <383299bb-883c-43bf-a52a-64d7fda71064@foss.st.com>
- <2563a389-4e7c-4536-b956-476f98e24b37@lunn.ch>
- <aH_yiKJURZ80gFEv@shell.armlinux.org.uk>
+	s=arc-20240116; t=1753218180; c=relaxed/simple;
+	bh=2jcrmsUMhIjnStACZd80+gw+3X1rP7B4ZqR92ZrO0Ow=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QFgbtQwSOCu2GXUQzd6xtOWuX5R1PodydzYUHR8skggVr8JjyY17dymEMnTLmsmTPziuFSk4iRS3PJojfP518Z5xdVZFVfDBVVhQzhV1+rSVVQnLrPqckEssQL63vd5tWxPfzfsrS1Y/gld9H36R1Tyc97AG4hoZIIyAUjOzAXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-b31e0ead80eso4802343a12.0;
+        Tue, 22 Jul 2025 14:02:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753218177; x=1753822977;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Doz7Qgy4SbD2PQgFZBfn1elNOBFUCyhJJzrXMqMsArI=;
+        b=GkeYrA9fv8ldWvHHq7EA9YjVLOt+dlFAKElijmnBDe6Kqy36DqJWmDF6UCYZ+kkT0d
+         fWGXGnDV8ucl0MHghqA/kd/9Mjb1yyI7f10CJ0N1iTWJC31gK1K1Hhf5pm2A0ctbKJzF
+         3CVfe/KltzxB3REreaV7ChkgeJ4EtRW7Ni6HfJkRF8VtBi2QobYPURoIw8kNxX0qIUd2
+         MqMyNL9RWJGjn5/6QV85iqgwK2nbfi15x74uG44k+L3xW9phzs18DOAUWpfMtcz9/E2y
+         ALOkYbMFxK3JVQeT4mZzIYuvQLyVINVNTGwk6TwgJFhbxCqc8TBEDBXDBE9zbc+zgXmE
+         ixZg==
+X-Forwarded-Encrypted: i=1; AJvYcCVCJlwyMsbrwgLHBb/hURYeBdfxdT/jRHofUwqNXFPYs2zFQ36qg8FipaWdDYlSnV14U94BShe8Tt+gkl8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YygejkDMiWjWh2Tk4be1N2LWyfm9NrPVmy3YbZ3hsjXU2q3pZ86
+	QNQ20Y2zaCnke/jBjwj9bLAtVs5ngN2A6KPNpholBNBOkJ/LD1L9t92Y6Ll0
+X-Gm-Gg: ASbGnctP3e11STa1OAYnw/7LFr8/B361qjI//wc5WUM4q9oT+OdKCrMs0+qtMqP4VLX
+	y+C9gCB5TKr+56AbPs8WczcLQz4koQQrc0uv9dDckQDipZUwZo/v61kyxeYfC7+wgPwI+GVaF1p
+	lvDG63humyOwgfzpr6UaUzQ9DDwkn7C0VPfNZqFwGFvVcpmh2TQ1yOWhm2ows+6Eyex0q3mdNar
+	xV9LA03omhsS8TbdR7EmEUU+TIIzB0f8kfsr8NQuSysxiOWHAjChAl4SuPig8D4XQHjONcgpUbX
+	3Sp6e7KrqS4xE5rRc4pyBOqLaFqd54qM8y9Gax9s+u4E08kdlB7vS4SSl5+j3kYPUOZ50lf0HE3
+	G/cYxU/cqTt69ScUM37p+T7D5WUFyeGsebXpeL9EUcedDy5bliqJDdLKvXQh+PUjkxYAQLQ==
+X-Google-Smtp-Source: AGHT+IE0ih8kn5NJF5bvEqt5uhwMxuiyeGF+uBLjdJV1KKEvUppvCQZsUUaL4Ko05oVm343ep0Svog==
+X-Received: by 2002:a17:903:2342:b0:234:f19a:eead with SMTP id d9443c01a7336-23f981e0aeamr6132715ad.43.1753218177199;
+        Tue, 22 Jul 2025 14:02:57 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-23e3b6b4c8esm82111645ad.94.2025.07.22.14.02.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Jul 2025 14:02:56 -0700 (PDT)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net 1/2] vrf: Drop existing dst reference in vrf_ip6_input_dst
+Date: Tue, 22 Jul 2025 14:02:55 -0700
+Message-ID: <20250722210256.143208-1-sdf@fomichev.me>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aH_yiKJURZ80gFEv@shell.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
->         if (!priv->plat->pmt) {
+Commit 8fba0fc7b3de ("selftests: tc: Add generic erspan_opts matching support
+for tc-flower") started triggering the following kmemleak warning:
 
-Let me start with maybe a dumb question. What does pmt mean? Why would
-it be true?
+unreferenced object 0xffff888015fb0e00 (size 512):
+  comm "softirq", pid 0, jiffies 4294679065
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 40 d2 85 9e ff ff ff ff  ........@.......
+    41 69 59 9d ff ff ff ff 00 00 00 00 00 00 00 00  AiY.............
+  backtrace (crc 30b71e8b):
+    __kmalloc_noprof+0x359/0x460
+    metadata_dst_alloc+0x28/0x490
+    erspan_rcv+0x4f1/0x1160 [ip_gre]
+    gre_rcv+0x217/0x240 [ip_gre]
+    gre_rcv+0x1b8/0x400 [gre]
+    ip_protocol_deliver_rcu+0x31d/0x3a0
+    ip_local_deliver_finish+0x37d/0x620
+    ip_local_deliver+0x174/0x460
+    ip_rcv+0x52b/0x6b0
+    __netif_receive_skb_one_core+0x149/0x1a0
+    process_backlog+0x3c8/0x1390
+    __napi_poll.constprop.0+0xa1/0x390
+    net_rx_action+0x59b/0xe00
+    handle_softirqs+0x22b/0x630
+    do_softirq+0xb1/0xf0
+    __local_bh_enable_ip+0x115/0x150
 
->                 struct ethtool_wolinfo wol = { .cmd = ETHTOOL_GWOL };
-> 
->                 phylink_ethtool_get_wol(priv->phylink, &wol);
->                 device_set_wakeup_capable(priv->device, !!wol.supported);
->                 device_set_wakeup_enable(priv->device, !!wol.wolopts);
+vrf_ip6_input_dst unconditionally sets skb dst entry, add a call to
+skb_dst_drop to drop any existing entry.
 
-Without knowing what pmt means, this is pure speculation....  Maybe it
-means the WoL output from the PHY is connected to a pin of the stmmac.
-It thus needs stmmac to perform the actual wakeup of the system, as a
-proxy for the PHY?
+Cc: David Ahern <dsahern@kernel.org>
+Fixes: 9ff74384600a ("net: vrf: Handle ipv6 multicast and link-local addresses")
+Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+---
+ drivers/net/vrf.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-	Andrew
+diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
+index 9a4beea6ee0c..3ccd649913b5 100644
+--- a/drivers/net/vrf.c
++++ b/drivers/net/vrf.c
+@@ -1302,6 +1302,8 @@ static void vrf_ip6_input_dst(struct sk_buff *skb, struct net_device *vrf_dev,
+ 	struct net *net = dev_net(vrf_dev);
+ 	struct rt6_info *rt6;
+ 
++	skb_dst_drop(skb);
++
+ 	rt6 = vrf_ip6_route_lookup(net, vrf_dev, &fl6, ifindex, skb,
+ 				   RT6_LOOKUP_F_HAS_SADDR | RT6_LOOKUP_F_IFACE);
+ 	if (unlikely(!rt6))
+-- 
+2.50.1
 
 
