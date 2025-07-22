@@ -1,163 +1,301 @@
-Return-Path: <netdev+bounces-208763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADB08B0CFDB
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 04:47:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 01358B0CFEE
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 05:03:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60CD71AA7EC1
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 02:47:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A56591AA5E5F
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 03:03:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46D2D270ECF;
-	Tue, 22 Jul 2025 02:47:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sc8Ovpcm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54CB92853E5;
+	Tue, 22 Jul 2025 03:03:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85B7627146B
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 02:47:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38102877DD
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 03:03:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753152438; cv=none; b=gdxDveNjZAzfnl3iEGLfd9IPciWsFderlDRoHZJEYQNVjmhlOxaBBhFfnr+rRsSpvWK8kQBWtbNpge/OVfeXBU/6NPEg0UFi2MqrykUYtiEpOnZywwtcx0U86Ipvh8h4BO3DznGpBkPry6YT+3GwDdz7G6dLIM81M2q7ip9fmCQ=
+	t=1753153389; cv=none; b=Z+0Kq7yFq3G/8Ya8YvIrcAWGnj2OfQdNH3JbRoF3vJtR/DYUNoUqxVjuUnbdY2wCr/y5GePiQejTd0AcPj+rIruvtuIMY3kRtCGjCX/TNair3ui9iNvRxu2NNmUNWNgsGjEQp1ghGXYg1q0oA4ixOrc7nS+DQ8pVTLFGMi3n++0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753152438; c=relaxed/simple;
-	bh=kCKyEvyaME9w7wWZPjOrMFKwm0hXVrCcUoazmS1Oke8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bt2dKm2vqBAog5H4sxdsVKO/wSvokmFr60ZWsfRe8SBMqeq+n/8i58j5EXeIkLpPcS1/Lhbe2+0jjQWbDWXjTVw0nujmTFm0yyQvJK5/BHRWoZEqHW4MwvTe/krJiqZKRERmEGI++8AoAS84dpNASoQ1s7M3FIChCKHrvV0IYVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sc8Ovpcm; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1753152435;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kCKyEvyaME9w7wWZPjOrMFKwm0hXVrCcUoazmS1Oke8=;
-	b=Sc8Ovpcm5JMq3fCjg5vzDNfeF5GyBB/2iglH8gKWxtbammGMX3SMI3/yrgzIt1b8ElUjkk
-	NS7YugsNoq8C3GUyTv2oU7N+Ijalf1/70GEnIuYBcrssXwFaSo8c4Ld+kX/YJWVWcOjsiG
-	kgww5ClZB5STvcj38TM2fL7XNK9x9c4=
-Received: from mail-vk1-f199.google.com (mail-vk1-f199.google.com
- [209.85.221.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-438-cL0zNs8xMGSbEnMfkyV7vg-1; Mon, 21 Jul 2025 22:47:09 -0400
-X-MC-Unique: cL0zNs8xMGSbEnMfkyV7vg-1
-X-Mimecast-MFC-AGG-ID: cL0zNs8xMGSbEnMfkyV7vg_1753152428
-Received: by mail-vk1-f199.google.com with SMTP id 71dfb90a1353d-5331c1d1683so1045436e0c.3
-        for <netdev@vger.kernel.org>; Mon, 21 Jul 2025 19:47:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753152428; x=1753757228;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kCKyEvyaME9w7wWZPjOrMFKwm0hXVrCcUoazmS1Oke8=;
-        b=ZMPZUloBGEo9SAZ6RNGmLtPjue+SfEHkGpRajUN84MVB+YmyJOaUOwv7bB3dCk3nxL
-         7HpIP93pOz+cdtKV/zYfnA5lm2ykykJ1c0zp3U76M+Pvk/w0a9rqdzDO6vCLgNzfr+hx
-         W/jjWLMMKIVxbaWqufHVz92FoWP69LDY9l3ykNM71kXjnozckCCvW91NrkQaJBad6gvg
-         i1EaTELahqt4rAPKJD+IZhBxm5+n9lD2G2WMt6vhIemhJ9xWzmYx7ZRPYekZh1qIrgk5
-         yFfyDEsJvfzRKvdmcWUf3k3WwwNQC8Dcq6fBk4TvE94IfBsvBES271luxCPz4d524PPj
-         ltWw==
-X-Forwarded-Encrypted: i=1; AJvYcCXrHKj3+I8ioxyj/y5cb38BPQmMGn+VVST5qZuTVyTXV0WJ+xuCGTOrE5wbsSFHHdJPR4CHHiM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxqakwqjyv1QiTogSKmPz9XyvoppCHCe+YxPnNbxWtvN+qMf0kV
-	FAVR5+ic65cpYwLTRMmxZGSk289Yfm1CRG0rKd9NFp633svVip0husvIzDKi5bOnmltS5mi1cdx
-	n3zzyCJWAQPlw+fYv62Tl6RipQTz0aI2wTU+FaqsP4eyC1FP6HbQfPzK0GRDGY5I7/k/0QArx06
-	1zb+xYVCaKLE/jXXrr24m39WmZrUwhl4KP
-X-Gm-Gg: ASbGncvwgG5k6zrDJ5gT2C+2Ndg8iLZDaSTon3LfyOfQkAWQKFkgEzvmLU65XCX8CTT
-	HShcudNudXUUoDkwiv38l6pAD0dlhcR4oRMg43vLgBQf4+//02Slr4fj01bJ+ddxJGAfupulSAW
-	2NiSv42LzE8ug1lTdAViiGWA==
-X-Received: by 2002:a05:6122:3d10:b0:537:3e5b:9f66 with SMTP id 71dfb90a1353d-5376482147bmr5706735e0c.12.1753152428498;
-        Mon, 21 Jul 2025 19:47:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFV65GEf/DyozjXmm0Me0cAGFvEFM6aRW6c2q/EOZGLutJWdB5Vun7O3DOic039V936BGNXEekLH8idxFs57TU=
-X-Received: by 2002:a05:6122:3d10:b0:537:3e5b:9f66 with SMTP id
- 71dfb90a1353d-5376482147bmr5706727e0c.12.1753152428170; Mon, 21 Jul 2025
- 19:47:08 -0700 (PDT)
+	s=arc-20240116; t=1753153389; c=relaxed/simple;
+	bh=/ZT7Fmmg5Mcs5JJJoFuAWdkaveP2C8n5+Dd1XOe2PmQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SlglhwL+G4dc0xU/9vq5vtD+bBqBIeVBU4OngXjth6Xb+5CCMDzSzZDkKeB0d8SozaTMUlYaaumedhIjzvfzCl9X02XmiEyy5PlcJAeT1Qj+G4xuEEwzOwbm4XzcA8Wo4YUrAUZ1RUQqY9GvcjSoyhu1dRJHbXAS097wOVU3jT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=18.194.254.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: zesmtpsz6t1753153367t556783c9
+X-QQ-Originating-IP: aCLWc0Kp2cNwcfNNNDd42scjXvg1W6631ZIaocLO58U=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 22 Jul 2025 11:02:45 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 11057467750546591436
+Date: Tue, 22 Jul 2025 11:02:45 +0800
+From: Yibo Dong <dong100@mucse.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
+	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
+	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, richardcochran@gmail.com,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 01/15] net: rnpgbe: Add build support for rnpgbe
+Message-ID: <D6DDF24A13236761+20250722030245.GA96891@nic-Precision-5820-Tower>
+References: <20250721113238.18615-1-dong100@mucse.com>
+ <20250721113238.18615-2-dong100@mucse.com>
+ <32fc367c-46a4-4c76-b8a8-494bf79a6409@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250718061812.238412-1-lulu@redhat.com> <20250721162834.484d352a@kernel.org>
- <CACGkMEtqhjTjdxPc=eqMxPNKFsKKA+5YP+uqWtonm=onm0gCrg@mail.gmail.com>
- <20250721181807.752af6a4@kernel.org> <CACLfguXG7Mpsp=z4zCE7H4CMA_s9qV86SkeL7Q=WxChXcFpNfA@mail.gmail.com>
-In-Reply-To: <CACLfguXG7Mpsp=z4zCE7H4CMA_s9qV86SkeL7Q=WxChXcFpNfA@mail.gmail.com>
-From: Cindy Lu <lulu@redhat.com>
-Date: Tue, 22 Jul 2025 10:46:29 +0800
-X-Gm-Features: Ac12FXz8Hsd99YwjuM8V3mxzon1LCiQIo6XR6UICD1OlRmKkbYUpCVM_dl99qBs
-Message-ID: <CACLfguVi=+ZtikBwu-5ThEa095gDuCW8bVPo0QGdt6ja3xZjhg@mail.gmail.com>
-Subject: Re: [PATCH RESEND] netvsc: transfer lower device max tso size
-To: Jakub Kicinski <kuba@kernel.org>, Long Li <longli@microsoft.com>, stephen@networkplumber.org
-Cc: Jason Wang <jasowang@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Michael Kelley <mhklinux@outlook.com>, Shradha Gupta <shradhagupta@linux.microsoft.com>, 
-	Kees Cook <kees@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Guillaume Nault <gnault@redhat.com>, 
-	Joe Damato <jdamato@fastly.com>, Ahmed Zaki <ahmed.zaki@intel.com>, 
-	"open list:Hyper-V/Azure CORE AND DRIVERS" <linux-hyperv@vger.kernel.org>, 
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <32fc367c-46a4-4c76-b8a8-494bf79a6409@linux.dev>
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: Mr/o/c6gDciSdzQFgY1VOoJoCFnLcU7TxiMIiXOJdZzmxsVXnA7Hjgg1
+	A1VWiG0pQq+X1vJgpDgRCDzfoBNu6fEbA0DVNCpGDq1fKQwyj1uZbieJRgXvwW8NtOJHwX1
+	vjnObCbHcFQbhdBMI8fMQEaI/Kg4F2jAE15G1GvdUp4SdLxv8tRg+yYVk4flHwuK+xR4opX
+	aYQd1Euu7Y67tEJ7VLYD2959dFOqaX0/Y+t6ooAQHF2UkRQnO7t+U+Bg4E03Kq2vyOAJluh
+	6S4SL6xlE9nNBZMJrrTTySyYT0YRaaeJ/kHG9YCoWsYshWJx+F59x14O5dzlGbs4M8vzjtg
+	Ygsc3Mxc0zSFNVu3EPbiXd3SBwlU26/S8oo8X5rSOPvpzagFVpNNO+qqWzJopS/+2zAKTxd
+	9ZIU9/BJZazgXc/siY22S0014M6XBaVQgDX63Qs/dlsJGCdMndcufaM32unZNimPMIAaXjm
+	G3MPWNssHm8M6ss4TiS7gXfEug4+0fAn3E+oQ8t5Bzn0k+cCC8tgSMjxsrasmgc8QuFaTGE
+	9jJdspQ4LFtaPlm2oJYjFah+1rB0b2AdH9IB0+lzKXnS/6CKLeErQIE4wrNrCXN2r+JFtP0
+	glw8LzVlSk7WPLXYQAzi6d77d0Ml/02+Vx8yiiR3msOkrsIAH4bPC63ryvjTw8FhQ41O5LN
+	1XVD2bV34mPSOuLBrlBgaX/hCUHlMqZZ78zWjj1Vdy8kqltEPZBkvVeoQffGeN8ZcYFtEiP
+	1jxIP3o6fY+xJXhtxaWW9Kv9iSbh/aSOP4skRmGTP8HDJsjufU54buDY4DITJ/mjI8NH/jf
+	W1WeJPs9X41KSk91pn35L6qvV7xUC5WjgXutS85OcRvnlc5FsABQsIyhhDNRZ7SVdoTVKJt
+	bFHPWveNBPmLKitKvP1ueV49u9tpsiI9hmq4R/M7dH+5OO69MsfCL1kQix+pFaxWqaY5VBI
+	+GhjxQJBOe2VXmObbyJtSzyKwH5jHnx+5ETBioBF+4i9q5EoTU1YaVWs2
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
+X-QQ-RECHKSPAM: 0
 
-On Tue, Jul 22, 2025 at 10:04=E2=80=AFAM Cindy Lu <lulu@redhat.com> wrote:
->
-> On Tue, Jul 22, 2025 at 9:18=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> =
-wrote:
-> >
-> > On Tue, 22 Jul 2025 09:04:20 +0800 Jason Wang wrote:
-> > > On Tue, Jul 22, 2025 at 7:28=E2=80=AFAM Jakub Kicinski <kuba@kernel.o=
-rg> wrote:
-> > > > On Fri, 18 Jul 2025 14:17:55 +0800 Cindy Lu wrote:
-> > > > > Subject: [PATCH RESEND] netvsc: transfer lower device max tso siz=
-e
-> > > >
-> > > > You say RESEND but I don't see a link to previous posting anywhere.
-> >
-> > Someone should respond to this part, please.
-> >
-> Hi Jakub,
-> sorry for the confusion. I previously sent this mail
-> (https://lore.kernel.org/all/20250718060615.237986-1-lulu@redhat.com/)
-> to the wrong mailing list, so I'm resended it here.
-> I've also submitted a v2 of this patch:
-> https://lore.kernel.org/all/20250718082909.243488-1-lulu@redhat.com/
-> Sorry again for the mix-up.
-> thanks
->
-> cindy
->
-> > > > I'd rather we didn't extend the magic behavior of hyperv/netvsc any
-> > > > further.
-> > >
-> > > Are you referring to the netdev coupling model of the VF acceleration=
-?
-> >
-> > Yes, it tries to apply whole bunch of policy automatically in
-> > the kernel.
-> >
-> > > > We have enough problems with it.
-> > >
-> > > But this fixes a real problem, otherwise nested VM performance will b=
-e
-> > > broken due to the GSO software segmentation.
-> >
-> > Perhaps, possibly, a migration plan can be devised, away from the
-> > netvsc model, so we don't have to deal with nuggets of joy like:
-> > https://lore.kernel.org/all/1752870014-28909-1-git-send-email-haiyangz@=
-linux.microsoft.com/
+On Mon, Jul 21, 2025 at 02:30:40PM +0100, Vadim Fedorenko wrote:
+> On 21/07/2025 12:32, Dong Yibo wrote:
+> > Add build options and doc for mucse.
+> > Initialize pci device access for MUCSE devices.
+> > 
+> > Signed-off-by: Dong Yibo <dong100@mucse.com>
+> > ---
+> >   .../device_drivers/ethernet/index.rst         |   1 +
+> >   .../device_drivers/ethernet/mucse/rnpgbe.rst  |  21 ++
+> >   MAINTAINERS                                   |   8 +
+> >   drivers/net/ethernet/Kconfig                  |   1 +
+> >   drivers/net/ethernet/Makefile                 |   1 +
+> >   drivers/net/ethernet/mucse/Kconfig            |  34 +++
+> >   drivers/net/ethernet/mucse/Makefile           |   7 +
+> >   drivers/net/ethernet/mucse/rnpgbe/Makefile    |   9 +
+> >   drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |  33 +++
+> >   .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   | 226 ++++++++++++++++++
+> >   10 files changed, 341 insertions(+)
+> >   create mode 100644 Documentation/networking/device_drivers/ethernet/mucse/rnpgbe.rst
+> >   create mode 100644 drivers/net/ethernet/mucse/Kconfig
+> >   create mode 100644 drivers/net/ethernet/mucse/Makefile
+> >   create mode 100644 drivers/net/ethernet/mucse/rnpgbe/Makefile
+> >   create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
+> >   create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
+> > 
+> > diff --git a/Documentation/networking/device_drivers/ethernet/index.rst b/Documentation/networking/device_drivers/ethernet/index.rst
+> > index 40ac552641a3..0e03c5c10d30 100644
+> > --- a/Documentation/networking/device_drivers/ethernet/index.rst
+> > +++ b/Documentation/networking/device_drivers/ethernet/index.rst
+> > @@ -61,6 +61,7 @@ Contents:
+> >      wangxun/txgbevf
+> >      wangxun/ngbe
+> >      wangxun/ngbevf
+> > +   mucse/rnpgbe
+> >   .. only::  subproject and html
+> > diff --git a/Documentation/networking/device_drivers/ethernet/mucse/rnpgbe.rst b/Documentation/networking/device_drivers/ethernet/mucse/rnpgbe.rst
+> > new file mode 100644
+> > index 000000000000..7562fb6b8f61
+> > --- /dev/null
+> > +++ b/Documentation/networking/device_drivers/ethernet/mucse/rnpgbe.rst
+> > @@ -0,0 +1,21 @@
+> > +.. SPDX-License-Identifier: GPL-2.0
+> > +
+> > +===========================================================
+> > +Linux Base Driver for MUCSE(R) Gigabit PCI Express Adapters
+> > +===========================================================
+> > +
+> > +MUCSE Gigabit Linux driver.
+> > +Copyright (c) 2020 - 2025 MUCSE Co.,Ltd.
+> > +
+> > +Identifying Your Adapter
+> > +========================
+> > +The driver is compatible with devices based on the following:
+> > +
+> > + * MUCSE(R) Ethernet Controller N500 series
+> > + * MUCSE(R) Ethernet Controller N210 series
+> > +
+> > +Support
+> > +=======
+> > + If you have problems with the software or hardware, please contact our
+> > + customer support team via email at techsupport@mucse.com or check our
+> > + website at https://www.mucse.com/en/
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index 1bc1698bc5ae..da0d12e77ddc 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -17033,6 +17033,14 @@ T:	git git://linuxtv.org/media.git
+> >   F:	Documentation/devicetree/bindings/media/i2c/aptina,mt9v111.yaml
+> >   F:	drivers/media/i2c/mt9v111.c
+> > +MUCSE ETHERNET DRIVER
+> > +M:	Yibo Dong <dong100@mucse.com>
+> > +L:	netdev@vger.kernel.org
+> > +S:	Maintained
+> > +W:	https://www.mucse.com/en/
+> > +F:	Documentation/networking/device_drivers/ethernet/mucse/*
+> > +F:	drivers/net/ethernet/mucse/*
+> > +
+> >   MULTIFUNCTION DEVICES (MFD)
+> >   M:	Lee Jones <lee@kernel.org>
+> >   S:	Maintained
+> > diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
+> > index f86d4557d8d7..77c55fa11942 100644
+> > --- a/drivers/net/ethernet/Kconfig
+> > +++ b/drivers/net/ethernet/Kconfig
+> > @@ -202,5 +202,6 @@ source "drivers/net/ethernet/wangxun/Kconfig"
+> >   source "drivers/net/ethernet/wiznet/Kconfig"
+> >   source "drivers/net/ethernet/xilinx/Kconfig"
+> >   source "drivers/net/ethernet/xircom/Kconfig"
+> > +source "drivers/net/ethernet/mucse/Kconfig"
+> >   endif # ETHERNET
+> > diff --git a/drivers/net/ethernet/Makefile b/drivers/net/ethernet/Makefile
+> > index 67182339469a..696825bd1211 100644
+> > --- a/drivers/net/ethernet/Makefile
+> > +++ b/drivers/net/ethernet/Makefile
+> > @@ -107,3 +107,4 @@ obj-$(CONFIG_NET_VENDOR_XIRCOM) += xircom/
+> >   obj-$(CONFIG_NET_VENDOR_SYNOPSYS) += synopsys/
+> >   obj-$(CONFIG_NET_VENDOR_PENSANDO) += pensando/
+> >   obj-$(CONFIG_OA_TC6) += oa_tc6.o
+> > +obj-$(CONFIG_NET_VENDOR_MUCSE) += mucse/
+> > diff --git a/drivers/net/ethernet/mucse/Kconfig b/drivers/net/ethernet/mucse/Kconfig
+> > new file mode 100644
+> > index 000000000000..be0fdf268484
+> > --- /dev/null
+> > +++ b/drivers/net/ethernet/mucse/Kconfig
+> > @@ -0,0 +1,34 @@
+> > +# SPDX-License-Identifier: GPL-2.0-only
+> > +#
+> > +# Mucse network device configuration
+> > +#
+> > +
+> > +config NET_VENDOR_MUCSE
+> > +	bool "Mucse devices"
+> > +	default y
+> > +	help
+> > +	  If you have a network (Ethernet) card from Mucse(R), say Y.
+> > +
+> > +	  Note that the answer to this question doesn't directly affect the
+> > +	  kernel: saying N will just cause the configurator to skip all
+> > +	  the questions about Mucse(R) cards. If you say Y, you will
+> > +	  be asked for your specific card in the following questions.
+> > +
+> > +if NET_VENDOR_MUCSE
+> > +
+> > +config MGBE
+> > +	tristate "Mucse(R) 1GbE PCI Express adapters support"
+> > +	depends on PCI
+> > +	select PAGE_POOL
+> > +	help
+> > +	  This driver supports Mucse(R) 1GbE PCI Express family of
+> > +	  adapters.
+> > +
+> > +	  More specific information on configuring the driver is in
+> > +	  <file:Documentation/networking/device_drivers/ethernet/mucse/rnpgbe.rst>.
+> > +
+> > +	  To compile this driver as a module, choose M here. The module
+> > +	  will be called rnpgbe.
+> > +
+> > +endif # NET_VENDOR_MUCSE
+> > +
+> > diff --git a/drivers/net/ethernet/mucse/Makefile b/drivers/net/ethernet/mucse/Makefile
+> > new file mode 100644
+> > index 000000000000..f0bd79882488
+> > --- /dev/null
+> > +++ b/drivers/net/ethernet/mucse/Makefile
+> > @@ -0,0 +1,7 @@
+> > +# SPDX-License-Identifier: GPL-2.0
+> > +#
+> > +# Makefile for the Mucse(R) network device drivers.
+> > +#
+> > +
+> > +obj-$(CONFIG_MGBE) += rnpgbe/
+> > +
+> > diff --git a/drivers/net/ethernet/mucse/rnpgbe/Makefile b/drivers/net/ethernet/mucse/rnpgbe/Makefile
+> > new file mode 100644
+> > index 000000000000..0942e27f5913
+> > --- /dev/null
+> > +++ b/drivers/net/ethernet/mucse/rnpgbe/Makefile
+> > @@ -0,0 +1,9 @@
+> > +# SPDX-License-Identifier: GPL-2.0
+> > +# Copyright(c) 2020 - 2025 MUCSE Corporation.
+> > +#
+> > +# Makefile for the MUCSE(R) 1GbE PCI Express ethernet driver
+> > +#
+> > +
+> > +obj-$(CONFIG_MGBE) += rnpgbe.o
+> > +
+> > +rnpgbe-objs := rnpgbe_main.o
+> > diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
+> > new file mode 100644
+> > index 000000000000..224e395d6be3
+> > --- /dev/null
+> > +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
+> > @@ -0,0 +1,33 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +/* Copyright(c) 2020 - 2025 Mucse Corporation. */
+> > +
+> > +#ifndef _RNPGBE_H
+> > +#define _RNPGBE_H
+> > +
+> > +enum rnpgbe_boards {
+> > +	board_n500,
+> > +	board_n210,
+> > +	board_n210L,
+> > +};
+> > +
+> > +struct mucse {
+> > +	struct net_device *netdev;
+> > +	struct pci_dev *pdev;
+> > +	/* board number */
+> > +	u16 bd_number;
+> > +
+> > +	char name[60];
+> > +};
+> > +
+> > +/* Device IDs */
+> > +#ifndef PCI_VENDOR_ID_MUCSE
+> > +#define PCI_VENDOR_ID_MUCSE 0x8848
+> > +#endif /* PCI_VENDOR_ID_MUCSE */
+> 
+> this should go to include/linux/pci_ids.h without any ifdefs
+> 
 
-I'm also including Stephen Hemminger and Long Li in this thread and
-would greatly appreciate any suggestions.
+Got it, I will update this.
 
-Thanks
-cindy
-
-> >
-
+> > +
+> > +#define PCI_DEVICE_ID_N500_QUAD_PORT 0x8308
+> > +#define PCI_DEVICE_ID_N500_DUAL_PORT 0x8318
+> > +#define PCI_DEVICE_ID_N500_VF 0x8309
+> > +#define PCI_DEVICE_ID_N210 0x8208
+> > +#define PCI_DEVICE_ID_N210L 0x820a
+> > +
+> > +#endif /* _RNPGBE_H */
+> 
+> [...]
+> 
 
