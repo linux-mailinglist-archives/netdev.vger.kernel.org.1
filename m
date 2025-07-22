@@ -1,153 +1,75 @@
-Return-Path: <netdev+bounces-209121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7AB2B0E65A
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 00:20:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FCA5B0E65E
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 00:20:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 211093B0ED8
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 22:19:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6866F3B7E54
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 22:20:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61FF42882D2;
-	Tue, 22 Jul 2025 22:20:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5D572877E6;
+	Tue, 22 Jul 2025 22:20:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KASwnnT1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="grdsoTYN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D16762877E2
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 22:20:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8193A76025
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 22:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753222820; cv=none; b=QO0qVDSO/kuaIFxuyr+E8wqYE0Rkj/QbTV1VolOg7RXQsOTTsChiUARnl8WGuqUQYL8HjmN9rkaK10VSQdZSFzFSb/YrXMor/jCmPn9o7PplouvuF/73CDLPg7HwStIEwJdGd6uiIcnKHuRm5VywX5daPhVrM2bSurGuv0QOnno=
+	t=1753222843; cv=none; b=KzWD+BzefuQ6DclzDAvR83FEJFMNs6YAAu6rZ+6Uiqp2XxN3QcW74hfi8w76PWKkwbdKANcx9vJjPYXTkESA5LLmzoEQA0eQ3KGwPNnvBJFJww+uJHnl+sAXpG5/9JDb+bbyqvGQrhNNsYqgQB/mNuBehF4jCA/wIkN1F57jHdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753222820; c=relaxed/simple;
-	bh=KocGrJA2Ps6aJTENvIIuem9ofzkRJ4o80JKPBVLHtCc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=poVjv4Nz7HIq1ir7UV+0b8/ccVtRHCv1prrcM6JrIuviTgYs+nzW2t1PcwOP7ObBxWiA974le8RRchJSbZdSFnlqZ2ynzd4e6vctxy0ZMB3DNm+OFjPqGDYpuEJ69FGvbNmEEMQ324qWcgnWSSAPI5TffUo8eOep9QgT1+49tX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KASwnnT1; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-235e389599fso88245ad.0
-        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 15:20:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753222818; x=1753827618; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EUgAXknrynl1PVAEbmko9jsFy37xoKt232CbGC5xnSo=;
-        b=KASwnnT1IM0bapm3dBB3dF81HbyN89veE00MpoJJ1OtroNdUXXJNGsBi64zmjp9V5F
-         n7pRoAUpB9JIyIW5H561rHqf7vGcun47h3TWHAXxI1/Y6+ulYnkDKvb/cTz3a/HPzxu8
-         ztUXgEUurG+RGd7KItrM3N8W0bkzekWWQCvy90jYqdrqAJf0GWg4XE48S61rwDJO9QvY
-         pWjilfx+wPYllh12cIMMpOGIYGJuJLk9KJRAfp4ifIGH1GcsbiAPETOjpO56vefNt0Gj
-         GCRfwpz523C4/1jCnCCcIAQPWisXUNBFI8cV4msd1RZm99kerwe7kokTUNJb6efKRShi
-         SKgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753222818; x=1753827618;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EUgAXknrynl1PVAEbmko9jsFy37xoKt232CbGC5xnSo=;
-        b=bb8yxkAEuNAq2tWYYmX4Z9Ja4UUCa8ysivE9JuDKx+rArKkXkFG54x62x3FNz4I8PD
-         Bk0RgkRPcUqEJJ0MVSbWGKOCvk7a5Y1QcC7wlUKGf+GaV9T5guDIPGk8mSpj1BFpORVu
-         NS3WOZ1oCWI0cuoIRueEt605UA+cmqh9hBxqcoET6czTUUGbDNLsh3kZP8HJ5D2hKNN6
-         jJKKFG1t4/r7iNGKdfAyE6YAGwZzQxXsCOMHkgGw75cWadQhferHioFCa8gMkhCYh9qe
-         jo5rMElX0c5Dea0/CVhQGBACQTCeq23/Xzk2/d84YIuCoDf2+8Gw+tKvLqKc1Wots90P
-         myeA==
-X-Forwarded-Encrypted: i=1; AJvYcCULmfTHV/LXNx18h3P/Kwk9Nt/sgHPy0EOqLtU1Vwsyl29yX17C15mLelAWxqZ0wfVKif+DhtM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydthXErDj3SB7GkZUw4jGI2rGso0W8DeoAaPT8GT2Q++aPe79w
-	OufkzG/3mJFdHpkG0UUF3dEsam7c68KlHqBwCpNqOMlEaA90EeLD+eI46druPfKE+D/+CDDmZBQ
-	ymCKGSy63I1kcW14EoXGcVdWYQOn2ATxMI2refFEI
-X-Gm-Gg: ASbGnctP0E2mIEU0UIQCemtPlI1j8z2ByfRE4TAY5fILwnLUitsC/gLbtBEoVz9ueM8
-	W0XP7hgNCIlZ0BvVHKqvDV1a5zW+6KgnBnR4fvpMYzdyC2YvaaF/5m3sTU0nRb/W5PoX6S4CrXg
-	uBI6gZzVlH4B5fnKCMNxe5hJiaYjlSyRB6XkNS4qxCKM10tNvr9oGVlnhfHEwYVI9HSxda3QFyk
-	XMpC89h50ZJ6YrRY2KGszOcGxfzgK3XRnOLgdLrTk+G+87r
-X-Google-Smtp-Source: AGHT+IEJT44DyruhFdmOQYM4W96ZZ3Rqdwh8/66PV5JlsG3oxzJ17BtYsAJ9a8lIS9JPty9YbWXGIDpfJrmGPSXLLK4=
-X-Received: by 2002:a17:903:b4f:b0:234:bca7:2934 with SMTP id
- d9443c01a7336-23f9774a735mr1113195ad.6.1753222817810; Tue, 22 Jul 2025
- 15:20:17 -0700 (PDT)
+	s=arc-20240116; t=1753222843; c=relaxed/simple;
+	bh=KT0ivhVqdG0XQ1zOIvWfZU8FOux3AzURVn+aHGWdJu8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BrMaoAPYXpYCIbWJoLds91jaj1MACUEevuRjg/8WFdUyr/2ml07SmnAB3Jq8XWth4VHB5Mt0Lp0Gv+g8UsdBIwDABdounIXQZjQYPSIz9glF35hLHkxuBGIXjlswh0w31D214JXRLmpPdoibbdXVsPec92whtl5km6bYnnCJnMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=grdsoTYN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C22A6C4CEEB;
+	Tue, 22 Jul 2025 22:20:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753222843;
+	bh=KT0ivhVqdG0XQ1zOIvWfZU8FOux3AzURVn+aHGWdJu8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=grdsoTYNWZk/4DIVLzSacQh6ZLLqmT/1Zj8a6x1bJDut6s08h3e3EPR2YhqnrQ8yn
+	 G7PaVBr75LY/QzxwfvouiKc3+s0SxdG79NIGvTKL+Tr0EwMUYGSYsgFQ8pUDaJP0lB
+	 s76U7dF9z9mibwHNbw1vACGLtlj+VK8UsaZic07jAsbnBqzNIFQTOV3GxoPVTtvbyz
+	 n6TuskpSnBcf7tj3LzfzKBbFNMllJXoQgzc6lfIg4h/a02OKcxO/iOFg3PVMUlCat7
+	 KINzqlTV7PbnBJD2TkfwURdrV0jD3nKunl7jLlGstDsETSI5cO1INu2XYUlbyExH+E
+	 sM9IPPCi6ByWA==
+Date: Tue, 22 Jul 2025 15:20:41 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
+Subject: Re: [PATCH net-next v3] netdevsim: add
+ fw_update_flash_chunk_time_ms debugfs knobs
+Message-ID: <20250722152041.053b3953@kernel.org>
+In-Reply-To: <20250722091945.79506-1-jiri@resnulli.us>
+References: <20250722091945.79506-1-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250721054903.39833-1-byungchul@sk.com> <77ee68c4-f265-4e55-9889-43ab08f26efd@gmail.com>
-In-Reply-To: <77ee68c4-f265-4e55-9889-43ab08f26efd@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 22 Jul 2025 15:20:04 -0700
-X-Gm-Features: Ac12FXzc1yuJwF_iFb86CzQvJ9VHTzSRxkDhmv6GFozlbXOI8GKQHpDpguZKYVU
-Message-ID: <CAHS8izM6h1_qoPnWDHmPiiFj5e_mcJqQFTTLJT9dgBymJuk8rw@mail.gmail.com>
-Subject: Re: [PATCH] mm, page_pool: introduce a new page type for page pool in
- page type
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kernel_team@skhynix.com, harry.yoo@oracle.com, 
-	ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org, 
-	hawk@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com, 
-	leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com, andrew+netdev@lunn.ch, 
-	edumazet@google.com, pabeni@redhat.com, akpm@linux-foundation.org, 
-	david@redhat.com, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, 
-	vbabka@suse.cz, rppt@kernel.org, surenb@google.com, mhocko@suse.com, 
-	horms@kernel.org, jackmanb@google.com, hannes@cmpxchg.org, ziy@nvidia.com, 
-	ilias.apalodimas@linaro.org, willy@infradead.org, brauner@kernel.org, 
-	kas@kernel.org, yuzhao@google.com, usamaarif642@gmail.com, 
-	baolin.wang@linux.alibaba.com, toke@redhat.com, bpf@vger.kernel.org, 
-	linux-rdma@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 21, 2025 at 4:11=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
-com> wrote:
->
-> On 7/21/25 06:49, Byungchul Park wrote:
-> > Hi,
-> >
-> > I focused on converting the existing APIs accessing ->pp_magic field to
-> > page type APIs.  However, yes.  Additional works would better be
-> > considered on top like:
-> >
-> >     1. Adjust how to store and retrieve dma index.  Maybe network guys
-> >        can work better on top.
-> >
-> >     2. Move the sanity check for page pool in mm/page_alloc.c to on fre=
-e.
->
-> Don't be in a hurry, I've got a branch, but as mentioned before,
-> it'll be for-6.18. And there will also be more time for testing.
->
-> > This work was inspired by the following link by Pavel:
->
-> The idea came from David, let's add
->
-> Suggested-by: David Hildenbrand <david@redhat.com>
->
-> ...> -
-> >   static inline bool netmem_is_pp(netmem_ref netmem)
-> >   {
-> > -     return (netmem_get_pp_magic(netmem) & PP_MAGIC_MASK) =3D=3D PP_SI=
-GNATURE;
-> > +     if (netmem_is_net_iov(netmem))
->
-> This needs to return false for tx niovs. Seems like all callers are
-> gated on ->pp_recycle, so maybe it's fine, but we can at least
-> check pp. Mina, you've been checking tx doesn't mix with rx, any
-> opinion on that?
->
-> Question to net maintainers, can a ->pp_recycle marked skb contain
-> not page pool originated pages or a mix?
->
+On Tue, 22 Jul 2025 11:19:45 +0200 Jiri Pirko wrote:
+> From: Jiri Pirko <jiri@nvidia.com>
+> 
+> Netdevsim emulates firmware update and it takes 5 seconds to complete.
+> For some use cases, this is too long and unnecessary. Allow user to
+> configure the time by exposing debugfs a knob to set chunk time.
+> 
+> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 
-IIRC last I looked at the code ->pp_recycle technically means it could
-be a mix. Technically it means "consider this netmem for pp recycling
-when the skb is freed." and non-pp netmems don't get recycled to the
-pp obviously, because napi_pp_put_page rejects recycling them.
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 
-
---=20
-Thanks,
-Mina
+Thanks!
 
