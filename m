@@ -1,110 +1,119 @@
-Return-Path: <netdev+bounces-208750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D143CB0CF2C
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 03:40:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94266B0CF3B
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 03:43:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12D8A172AA0
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 01:40:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D21413B82A6
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 01:42:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16F7B1A3A8A;
-	Tue, 22 Jul 2025 01:40:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E43BB1A76BC;
+	Tue, 22 Jul 2025 01:42:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tmLOp6+v"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="PJNjYPJe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6B4F2E370E
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 01:39:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C16C2E370E;
+	Tue, 22 Jul 2025 01:42:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753148400; cv=none; b=kWtV5Iz0NKXDPXvV7pyWrSFZOPacPb+q+jiZSZ0mO1BrRVjkz6hbycknSKFnYtHHZLfTQ0YjdNjl/BcoXh70Xo+pP0w+3G0iuj8zaF4d+XkX/O/l7R02pWDmujCKlIRlk5SuJ9utsaUyU6cxjmOZw0d0EhhmjvRW4xto5EBMDRE=
+	t=1753148575; cv=none; b=sK9syT07LXBamzyb5dZYzpUx1zDQE2ewG6wrsJ6xSqQ/kvOHMKqXZlCObaweSk22ii8uSH1Rcg+nJjMTEpuPv6e+cTGq+RQBQA68R1M1ksXOBJa6NuGpBaP9giivv9DVRpdRttYVG7qNF6h7ei5X31MMEL6BRzx5qkIkYVCnMx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753148400; c=relaxed/simple;
-	bh=u+Icubsd7Ub1Mh2tVHBNRGVP+xcHzT/4pq4xLIFNuLM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Kep9itQZASsFu/tLFwKnpZqsL2Fyps+joMVb1BOol62A8mb6Ya5tWv3I6veptk0VTa3Iq+xvRTdK5H3L+vZb/Y27Dtqs7zHzQPw2lC3iSiQYgC+V2EqqIb/KND3HmYL8whMjXFa6eOhCQXQsDA82bsJGo0Nv2N/aaoBTmCkqBIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tmLOp6+v; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0A51C4CEED;
-	Tue, 22 Jul 2025 01:39:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753148399;
-	bh=u+Icubsd7Ub1Mh2tVHBNRGVP+xcHzT/4pq4xLIFNuLM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tmLOp6+vRefi6ZslqER6dWtbYnc57hmzu0Rk0xkcHVb+BPD1s+RWLKs89TvsGxpUP
-	 jjVRTJMFz5eGxhlfeAS66kFeLZO15mQqiCHnHr0QYxIiNTc0eS4yByGimQZR7X4nIF
-	 Dj4mBNPMMSxr/Cl9/k2FMZ+VOcz/ailMjVJFqocdDvCqhP7jIac7FiXSlxgeZm89q6
-	 QgmkJ5phJ/2xcq6VfPQyB4fdzfOi1EOgwaZGTvdmjtNdBgIzONtbSldXfW+ApzHRBF
-	 kUvUCprxE6eWMQioRA8AXKbnSbBsTlkg9hypoDRWVFGRiz1jUJI05cI/IRBwXqRd2v
-	 c1M35XUj0S2JA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD23383B267;
-	Tue, 22 Jul 2025 01:40:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1753148575; c=relaxed/simple;
+	bh=CqABq7oz4nWeQWt3WHhA/Ulft6QcCV+wkMFV1Vvum5o=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Shk7h3/85HoBLNRCHufNvT2Tymb/wBIdYkE6W7ZDZND3mbDzA/K27Dt/nrE9i9WYsVEp+CzFCuPO1fBwjXVH2/WaIpyUT0zdt8sfuInw5d/IoqgH9mMJ+bA1Oi8BKC7y+eCfvozoDAIrr27xatYN8cg7/SZIKIaIAmAdfLDYmyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=PJNjYPJe; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1753148411;
+	bh=kW43v2CJU0eh5utNf7+57psv0SEO33wdFHe1bBu69gg=;
+	h=Date:From:To:Cc:Subject:From;
+	b=PJNjYPJer5bfaEzbs04vSKIix41xKer07eqYyBp2ceqe7/HkTwJ9rwvmGrzrEDHUY
+	 tBDbcrwtniCQKLmhnHJFhR2eElV4kOGNqBag1wqocCY9KfCW7dm9HieUQdue68JgZe
+	 9/UXG7D+DyGUIBEHby5CTLFCNNyOUmMVwl0ME2hxuaUGG4TusvbM09X6GWklV7Qxpt
+	 /MbHJ77caDQU9KMQZLe+tHHsBDFjw/RoKURp9MAVRqeU2nQf9zn+MPRe5n3iaehQ+l
+	 DbQBRGljPCzfudFmNnyGaXO6R4tUcZp7XRq50HN1t1jVKBTMMwTCVK8EyTVVqe9o6y
+	 rCkYkUYAu8Xig==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4bmKhV0TcFz4x3p;
+	Tue, 22 Jul 2025 11:40:09 +1000 (AEST)
+Date: Tue, 22 Jul 2025 11:42:46 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>,
+ "H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
+ David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Networking
+ <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Raju Rangoju <Raju.Rangoju@amd.com>
+Subject: linux-next: manual merge of the tip tree with the net-next tree
+Message-ID: <20250722114246.2c683a44@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/8] ethtool: rss: support creating and removing
- contexts via Netlink
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175314841819.257717.8558865688426486771.git-patchwork-notify@kernel.org>
-Date: Tue, 22 Jul 2025 01:40:18 +0000
-References: <20250717234343.2328602-1-kuba@kernel.org>
-In-Reply-To: <20250717234343.2328602-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, andrew@lunn.ch,
- donald.hunter@gmail.com, shuah@kernel.org, kory.maincent@bootlin.com,
- gal@nvidia.com, ecree.xilinx@gmail.com
+Content-Type: multipart/signed; boundary="Sig_/XcVR0con5UQbUHdtB0osM.1";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-Hello:
+--Sig_/XcVR0con5UQbUHdtB0osM.1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Hi all,
 
-On Thu, 17 Jul 2025 16:43:35 -0700 you wrote:
-> This series completes support of RSS configuration via Netlink.
-> All functionality supported by the IOCTL is now supported by
-> Netlink. Future series (time allowing) will add:
->  - hashing on the flow label, which started this whole thing;
->  - pinning the RSS context to a Netlink socket for auto-cleanup.
-> 
-> The first patch is a leftover held back from previous series
-> to avoid conflicting with Gal's fix.
-> 
-> [...]
+Today's linux-next merge of the tip tree got a conflict in:
 
-Here is the summary with links:
-  - [net-next,1/8] ethtool: assert that drivers with sym hash are consistent for RSS contexts
-    https://git.kernel.org/netdev/net-next/c/80e55735d5a5
-  - [net-next,2/8] ethtool: rejig the RSS notification machinery for more types
-    https://git.kernel.org/netdev/net-next/c/5f5c59b78e5a
-  - [net-next,3/8] ethtool: rss: factor out allocating memory for response
-    https://git.kernel.org/netdev/net-next/c/a45f98efa483
-  - [net-next,4/8] ethtool: rss: factor out populating response from context
-    https://git.kernel.org/netdev/net-next/c/5c090d9eae88
-  - [net-next,5/8] ethtool: move ethtool_rxfh_ctx_alloc() to common code
-    https://git.kernel.org/netdev/net-next/c/55ef461ce18f
-  - [net-next,6/8] ethtool: rss: support creating contexts via Netlink
-    https://git.kernel.org/netdev/net-next/c/a166ab7816c5
-  - [net-next,7/8] ethtool: rss: support removing contexts via Netlink
-    https://git.kernel.org/netdev/net-next/c/fbe09277fa63
-  - [net-next,8/8] selftests: drv-net: rss_api: context create and delete tests
-    https://git.kernel.org/netdev/net-next/c/4c86c9fdf6a5
+  drivers/net/ethernet/amd/xgbe/xgbe-ptp.c
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+between commit:
 
+  fbd47be098b5 ("amd-xgbe: add hardware PTP timestamping support")
 
+from the net-next tree and commit:
+
+  e78f70bad29c ("time/timecounter: Fix the lie that struct cyclecounter is =
+const")
+
+from the tip tree.
+
+I fixed it up (the former removed the function updated by the latter) and
+can carry the fix as necessary. This is now fixed as far as linux-next
+is concerned, but any non trivial conflicts should be mentioned to your
+upstream maintainer when your tree is submitted for merging.  You may
+also want to consider cooperating with the maintainer of the conflicting
+tree to minimise any particularly complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/XcVR0con5UQbUHdtB0osM.1
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmh+7JYACgkQAVBC80lX
+0GyFuwf/RbZq0l99iLBm8UGqZe8+80z5boGeiO6iJkiV8u7nBTbuQwVrFLV6oXy3
+6NWFjq/2cQmCkxblGl4JY0gTsNjBQoSGiLXPB7PAEGswdA9yKdkeHPSpD7c0yCRE
+0k0gycTURUS4CH23YuX5Y4sWqI+1C/9UMeBDPhz6RGyi4vsEJj9Bl0D+3P5MNpIS
+qJCGAqU5meuUcLnMbIdnPHdupiFZxFO4eHMYs4T5FEe+KMvFjeNtRr/Appa+oMx4
+ELfKiCv0P+kmJdTy2o4x4fOPjYcpCN2RjH4EafEroN4JUWlszo6VR43KK9X5mjg0
+HB2QZJrVPSQgbP10TEFIPLZLiNkMVA==
+=Cv9s
+-----END PGP SIGNATURE-----
+
+--Sig_/XcVR0con5UQbUHdtB0osM.1--
 
