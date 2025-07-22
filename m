@@ -1,136 +1,160 @@
-Return-Path: <netdev+bounces-209080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BDEBB0E37C
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 20:27:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E7A1B0E381
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 20:29:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 795755662B1
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 18:27:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C38754061D
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 18:29:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9164028000F;
-	Tue, 22 Jul 2025 18:27:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71302280329;
+	Tue, 22 Jul 2025 18:29:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gAqKvuWH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YsWODkJ2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E7F626A1BB
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 18:27:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51F5279DCA;
+	Tue, 22 Jul 2025 18:29:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753208873; cv=none; b=nDzAobJYsoyWWdBPt7JHjqQZSUk3PW+Lp8VuZqGr3pkMWy0exVkpvoyfT072FLK1e4Nvkg6rRVl8/e8FdTwY1PiX7GeyIE0S+zzMHy/tDkXyvAuDLtFvUx8NNhB/Zis8kkHyZ31sC+rEtiQ9t9KK9s61VlQK2+CueAxmSGJGasI=
+	t=1753208944; cv=none; b=kbMoJeVUiA3NCwbJGVJq67WJVBocDE+bt9bNCtfukpXkKPJuCoFTUpQ2fzMoQotGGDmCa1XyxmIuqdEupngSGx3/Av1jOLo6hau2yF2GlPIHhi7XVN79TmvtOtTN1SuOamo/rKxynar9Pzhh1SEMdK9pSY6J+TnGaonBXD0odlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753208873; c=relaxed/simple;
-	bh=kdF5tg8ENJcaojyO3wuhelQPZ6QwZOTEotDF62Wu3Jo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rykbAMyAD/Xb2EwJWIteKhmni989D8W/M51v9kF6iMx+cA+36BM7i8F5AGmq9ZHA8L96s+SKB442x/eBLNxs8yTrEMxar/K3u4/6dEVb0FOkqJXtElqcnWHlcJ2zeAd2YnD+/PPYlTZLwYpyDQ7CGgKYVaEzRFQp7DvHcFf9fIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gAqKvuWH; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2350b1b9129so40534105ad.0
-        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 11:27:51 -0700 (PDT)
+	s=arc-20240116; t=1753208944; c=relaxed/simple;
+	bh=RkkNdI9vuLQPiw+fmWHYyUPaYD/kN0qVxA2pr7pBEqg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dbpgAx5/jnRCx2+iomG7TpD1paITJ7i2q45/cDQgdL2Hqn5udcajfpi5M3RHrU3TAMVqKpLqWzhddifU5Q5JlBYc1YASgGeuVcW9xBIfcW19+yDSnyTOMtJO+XVu0TIezdlJC0aIvhK1e+FVuUdPaHnnUg2PmcLUrrctYnNZe8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YsWODkJ2; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-234bfe37cccso45744515ad.0;
+        Tue, 22 Jul 2025 11:29:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753208871; x=1753813671; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JJ06jcp3N8mk84kkZkPxLydB4nlpZWRtwPoY10l8wjU=;
-        b=gAqKvuWHZ1xibrF1h5kTHZA67Gep9xDkxFZid1e07MUlPv0Yk2F5FPqXCQEZAVoxbg
-         +ty8tRQGMNmQnfG0MTPVmJCafTqHNfEfsKDjW13aE/4TJm5IFrcA1qRbCtf1Hd0uiEIn
-         h35oN7oSA74y4BTiGfO57AK9ew51Zp5xufbJ7lSO6T0neP1zZfLkLq8dkajOtq3DzkVh
-         Yg1ruPccsggBXBIOayiwXe203Xm3GF0arXbunDnkI5o2G/ejTzSHCPDrnO4FdGX2B0RS
-         +1cryPgbQp86tIpNKB/q0XZQzGLnkq7bAzVS5RS3VP12LaJ4tpZ8hb6WzfYklhYJegtR
-         cGGQ==
+        d=gmail.com; s=20230601; t=1753208942; x=1753813742; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ncnqQH/L5XHCltFY0Cw0EuBCxvGsfMZiIzARQQHUSw8=;
+        b=YsWODkJ2KwwgVCs4OkqmvuBqz78mJw1dhm0L3TTTtT5RxYC4Xe+KzT1yjh6gSSnNQ4
+         LYZzilxrOlBJ1qlxrNw1oP7/DYL8d/Vv1LcePh3qyPsAYHen3U6gulXev7aP2GrCquYF
+         pfyhYiN1wKy3CVt9XQfTX0kQCTL2PjMTwUQlOC6mgIjmK4omZYGpUsrIZ4k8tOdHuEvS
+         K4UXf9vgwuYy+0wEdhnLQLOF1ZrIHXPUiOtpt13qb8A0Laz8U+NQ7yM7NTw04+lsJPYg
+         NCSYqD+7thrh6SBV74K1ciSyX5jU+vmENVDzX74petSuFX0VJYR6tme/if6ROh6Cfkqh
+         /n6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753208871; x=1753813671;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JJ06jcp3N8mk84kkZkPxLydB4nlpZWRtwPoY10l8wjU=;
-        b=bpKrozcN/91fbb6JrZF/xODKOx4CMEpF8vUXWIcBwgJW8WcpUImGwylkdpSjr/NBjh
-         JQp6AG1Ox99ls/XZB6fe+WvaxfaKAtLoHvOkZeWnopiAcbMND3cqywTvjIbnk8KFT1jT
-         OjtUfflgyRQX0lhLZZ4Nx8k1Z0kkog5WMZI9hhVHjvr4e/QB2JzRhk7Gl8l3qhcu/zo0
-         NlbProOdyVZF/bEN4KVwmYztcvbjIViUm1XCGRHA6IXIPsZLhKjb/QdxksseciobfTts
-         kkijbpz5F/RJ6pcrfCyOq3Tbw5IYNsfGZ+QayYGTOeoQ+v/Fe2kxxRWGapuiIfcuzSi9
-         E3jQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW9+gjWS9yranjOygobk9Xvd+YMWSbZq2PNeLn+vK4nJbb/9bUk2DqJGKtTi6cazVIJHdMc51A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLLjEkhbZ3sGEs4JmvZLP8LZhgRwrLeYByWOqLBKCEYC/XnbK7
-	fqvy/UukMWzhGx07BZTSnRnBZ9t2APJ7EQ38uP9ZBKs0UNXTQKn2qYCY+AvU/jgs14gMPoVGTnS
-	Ptv1cLA/UuOpCIR7KWGVF+F6ZdQ/+N//z8+WDIkgw
-X-Gm-Gg: ASbGnctRPo6N33b3tWW65uvJHfZ9e3pRwegV2wNTzVsFmSHeS4nPhqVdTEY8FC+QAt1
-	+AKF0et+ErncPoNH1QEecdD9V+pbTaA254uJqyOojLupFpspQZVEySedkVYjzcA8Cs0U0NyFjg+
-	zZqESM9FwkBonTBAr2ZL5rLlEKMObImL1PAtgAtb+jzxNOhei07mFdZsMXWO+2pWar5r1W5UE0R
-	UvmDe9B6Ck/RT/BRUonglhVyiI8AK/PbfA1dg==
-X-Google-Smtp-Source: AGHT+IEsDSi8OkW3pGhx0kurDkEYKeTjeHF2pizFwIotQyNcJvMlToKfbMqC1EaLyBr5Mr/rFszOK4D2GukeMpu05bg=
-X-Received: by 2002:a17:902:ebcb:b0:235:7c6:ebd2 with SMTP id
- d9443c01a7336-23e25730056mr376366275ad.31.1753208871268; Tue, 22 Jul 2025
- 11:27:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753208942; x=1753813742;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ncnqQH/L5XHCltFY0Cw0EuBCxvGsfMZiIzARQQHUSw8=;
+        b=XaG+LHJaQyRiJmOtVtKP4JiYFmW5g222K/nXUDNtOwO/AVV1wlsdAH0Y7wz7HWFhv8
+         /UJzvtj1chRrIN9LQFe9CZ4sW0S7gWf4fIxOWh4tgdW2Abqkd73eo85owha2pdqjEjYg
+         QNpnOASx3yEnYvLkWjycMMQfN0BICDgN3rgQZouxKpT2qleTJ1Ttl/xO23Qfr29SW7XR
+         EOpnQBRQKAX5pOMvvlsaQ3IikoodyYqaMhoxKlit5GF/hxEz3UT13poDX3YPNaJUiJNn
+         vyxbp8ExudwL5lQpqeOc7sQuRCvU9mz+jNhkWv/v4n4xPx+vQ2Us3h6MBKTPgOYF+Ex7
+         5FXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV8xe2wj3LkgtdbFU5PZ0Fq6YdgvoSfy8/XhaYoO11IGeOabbF5OoFjs17c1w0A/wOSs/xCcIhYQXZ9lPFMadmN@vger.kernel.org, AJvYcCVuFnt52sNkMM047SaPP50uJ4BHz/BdBJiFmJVzKbi+xzkMo3+fOaapfPFe7fC7/WJLvHVrGee6cQILt+M=@vger.kernel.org, AJvYcCWMLpzx3/DE4/PFdiNooABCjVnYb2jew9xNFblDN6DOHbVqn+GVtZpu6yPEgf+TzCgUcMoMpKRQ@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+EA+N5uZcZP5P09XxLI3BfsbkqRY8TBffETTflMmIKkdBXw+1
+	Yzh3dycX9yIIb5v/FpqxDJogufVv9kQYmoBAXU4rwQb5QaQzngV5Gtg=
+X-Gm-Gg: ASbGncsnceepDqvE15+Ky45ST5P5PQNVSg8IiLBEv/t7jPXIqGivpv8f+6fhL3E94HF
+	YCnriGV3x3pylHac1DjKp2cguZsyLBUjmg+clzmyDXZIioApvbesYUoYlrJYk05MMilaz1ML7+1
+	KESvzZmpiG7XnwvJrJvuaK+55Ql6P2LVZ5vO0nPmxvJ5z+6qeYUpLEhRHFdizdsEtdHs9vVTXlI
+	ucBtLL8gGaV0gkxT1kiD8yqkc17+MOugpT3MALiiVL19jhURM16PLPed+6jJGJMyVJnZaDHb42O
+	p3AJdkgJSbybeEFIc+lmBVjZqBZZr4kZrWgQhBL5SZepE2kwbtITMz6NRABhRZi6xj0Ff/iRGU7
+	lS+ZhjAFbtxoZHhAlLRyeFLMr47RIQCxAEfTQJ3VkyA6OsFlBp4WFurQcJ4I=
+X-Google-Smtp-Source: AGHT+IFRqRgH5nBI3wyQnIhjc30c5pwMRyVnycr06EYwVUjXAPmUT7KBxaujhM7aPhesuvyYhscZsQ==
+X-Received: by 2002:a17:903:19e4:b0:234:c65f:6c0c with SMTP id d9443c01a7336-23f98171bbbmr47285ad.15.1753208942004;
+        Tue, 22 Jul 2025 11:29:02 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-23e3b6b48e5sm80681325ad.101.2025.07.22.11.29.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Jul 2025 11:29:00 -0700 (PDT)
+Date: Tue, 22 Jul 2025 11:28:59 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, sd@queasysnail.net, andrew+netdev@lunn.ch,
+	shuah@kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, Cosmin Ratiu <cratiu@nvidia.com>
+Subject: Re: [PATCH net 1/2] macsec: set IFF_UNICAST_FLT priv flag
+Message-ID: <aH_Ya_81eYzoiZZT@mini-arch>
+References: <20250721165423.990313-1-sdf@fomichev.me>
+ <20250722163645.GP2459@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250722071146.48616-1-daniel.sedlak@cdn77.com>
- <ni4axiks6hvap3ixl6i23q7grjbki3akeea2xxzhdlkmrj5hpb@qt3vtmiayvpz> <telhuoj5bj5eskhicysxkblc4vr6qlcq3vx7pgi6p34g4zfwxw@6vm2r2hg3my4>
-In-Reply-To: <telhuoj5bj5eskhicysxkblc4vr6qlcq3vx7pgi6p34g4zfwxw@6vm2r2hg3my4>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 22 Jul 2025 11:27:39 -0700
-X-Gm-Features: Ac12FXxLpxDEFMJ1OteDYmd2L-tyFGpDS0pkCtWi7bSCC4GD2tBgGIdi0vnLq7g
-Message-ID: <CAAVpQUBwS3DFs9BENNNgkKFcMtc7tjZBA0PZ-EZ0WY+dCw8hrA@mail.gmail.com>
-Subject: Re: [PATCH v3] memcg: expose socket memory pressure in a cgroup
-To: Shakeel Butt <shakeel.butt@linux.dev>
-Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Daniel Sedlak <daniel.sedlak@cdn77.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Neal Cardwell <ncardwell@google.com>, 
-	David Ahern <dsahern@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org, netdev@vger.kernel.org, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, Muchun Song <muchun.song@linux.dev>, 
-	cgroups@vger.kernel.org, Matyas Hurtik <matyas.hurtik@cdn77.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250722163645.GP2459@horms.kernel.org>
 
-On Tue, Jul 22, 2025 at 10:50=E2=80=AFAM Shakeel Butt <shakeel.butt@linux.d=
-ev> wrote:
->
-> On Tue, Jul 22, 2025 at 10:57:31AM +0200, Michal Koutn=C3=BD wrote:
-> > Hello Daniel.
-> >
-> > On Tue, Jul 22, 2025 at 09:11:46AM +0200, Daniel Sedlak <daniel.sedlak@=
-cdn77.com> wrote:
-> > >   /sys/fs/cgroup/**/<cgroup name>/memory.net.socket_pressure
-> > >
-> > > The output value is an integer matching the internal semantics of the
-> > > struct mem_cgroup for socket_pressure. It is a periodic re-arm clock,
-> > > representing the end of the said socket memory pressure, and once the
-> > > clock is re-armed it is set to jiffies + HZ.
-> >
-> > I don't find it ideal to expose this value in its raw form that is
-> > rather an implementation detail.
-> >
-> > IIUC, the information is possibly valid only during one jiffy interval.
-> > How would be the userspace consuming this?
-> >
-> > I'd consider exposing this as a cummulative counter in memory.stat for
-> > simplicity (or possibly cummulative time spent in the pressure
-> > condition).
-> >
-> > Shakeel, how useful is this vmpressure per-cgroup tracking nowadays? I
-> > thought it's kind of legacy.
->
->
-> Yes vmpressure is legacy and we should not expose raw underlying number
-> to the userspace. How about just 0 or 1 and use
-> mem_cgroup_under_socket_pressure() underlying? In future if we change
-> the underlying implementation, the output of this interface should be
-> consistent.
+On 07/22, Simon Horman wrote:
+> On Mon, Jul 21, 2025 at 09:54:22AM -0700, Stanislav Fomichev wrote:
+> > Cosmin reports the following locking issue:
+> > 
+> >   # BUG: sleeping function called from invalid context at
+> >   kernel/locking/mutex.c:275
+> >   #   dump_stack_lvl+0x4f/0x60
+> >   #   __might_resched+0xeb/0x140
+> >   #   mutex_lock+0x1a/0x40
+> >   #   dev_set_promiscuity+0x26/0x90
+> >   #   __dev_set_promiscuity+0x85/0x170
+> >   #   __dev_set_rx_mode+0x69/0xa0
+> >   #   dev_uc_add+0x6d/0x80
+> >   #   vlan_dev_open+0x5f/0x120 [8021q]
+> >   #  __dev_open+0x10c/0x2a0
+> >   #  __dev_change_flags+0x1a4/0x210
+> >   #  netif_change_flags+0x22/0x60
+> >   #  do_setlink.isra.0+0xdb0/0x10f0
+> >   #  rtnl_newlink+0x797/0xb00
+> >   #  rtnetlink_rcv_msg+0x1cb/0x3f0
+> >   #  netlink_rcv_skb+0x53/0x100
+> >   #  netlink_unicast+0x273/0x3b0
+> >   #  netlink_sendmsg+0x1f2/0x430
+> > 
+> > Which is similar to recent syzkaller reports in [0] and [1] and triggers
+> > because macsec does not advertise IFF_UNICAST_FLT although it has proper
+> > ndo_set_rx_mode callback that takes care of pushing uc/mc addresses
+> > down to the real device.
+> > 
+> > In general, dev_uc_add call path is problematic for stacking
+> > non-IFF_UNICAST_FLT because we might grab netdev instance lock under
+> > addr_list_lock spinlock, so this is not a systemic fix.
+> > 
+> > 0: https://lore.kernel.org/netdev/686d55b4.050a0220.1ffab7.0014.GAE@google.com
+> > 1: https://lore.kernel.org/netdev/68712acf.a00a0220.26a83e.0051.GAE@google.com/
+> > Link: 2aff4342b0f5b1539c02ffd8df4c7e58dd9746e7.camel@nvidia.com
+> 
+> I think that Link: should be followed by a URL
+> 
+> Link: https://lore.kernel.org/netdev/2aff4342b0f5b1539c02ffd8df4c7e58dd9746e7.camel@nvidia.com
 
-But this is available only for 1 second, and it will not be useful
-except for live debugging ?
+Whoops, sorry, forgot to prefix the message id with a URL :-( If this
+gets a CR, I'll repost with a fix. (presumably should be easy to fix
+during git am)
+ 
+> > Fixes: 7e4d784f5810 ("net: hold netdev instance lock during rtnetlink operations")
+> > Reported-by: Cosmin Ratiu <cratiu@nvidia.com>
+> > Tested-by: Cosmin Ratiu <cratiu@nvidia.com>
+> > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> 
+> Hi Stan,
+> 
+> I ran the test provided by patch 2/2.
+> When run with with a debug kernel using VNG.
+> 
+> It reliably passes with patch 1/2 applied. And fails without patch 1/2 applied.
+> Where fails means the kernel panics along the lines of the stack trace in
+> the commit message.
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Tested-by: Simon Horman <horms@kernel.org>
+
+Thank you for testing!
 
