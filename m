@@ -1,177 +1,110 @@
-Return-Path: <netdev+bounces-209124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66EF2B0E68F
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 00:40:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C79BCB0E696
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 00:41:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F59C565022
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 22:40:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80F4F6C6758
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 22:41:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1C68285C80;
-	Tue, 22 Jul 2025 22:40:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 891E9288C30;
+	Tue, 22 Jul 2025 22:41:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DpUEnoGh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VOXVQGI5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 526D810F2
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 22:40:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D162877F2
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 22:41:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753224045; cv=none; b=gVoIuc9ekYwIgsocpAQuJW8NAsenVemPbA22QX12KOn0KqiRKnE0kD0cp+4CZu1bWQdaLVTaLSRyPKC4k87x2gFfh+FQszCIg+gj9Qhv7wfIvuW4P9a8+qnADtsUjPb8+1/WaAJevumaOZ9auU1zMG3453MVcCVvdJS5FySP23c=
+	t=1753224089; cv=none; b=jrs4wgW6YRmtKYZqNA5sth28Q1frzmhmutyENJr3MxTqJwn0eT57ElB9VD+tRd3dlPnjQKPyHHlxhmNwi9Vdo5WwBVaSI1jfyAVF8btYKbOE0Bry73cRw1hpySSmtmIFcedrZ7IRIAfUUd+BAM6Jv9bR/zK/clpaXUSkFjE+GCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753224045; c=relaxed/simple;
-	bh=+42H/9YBeHAzHaoQNt10QggjJXigV7J/rguSjxxDZz4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=nNkYPVw7i+brDm5YDP/6WojXrQ2FvrH2jldUcyz8NtskL1Dg8hORz2fUVIV5xd40zJT94ABG0s4rDoJ3hr0/Vg52dJyG1Uf4Rerqbo+aseJ/rHFB7xaru2nZ2KxQm6Z47+3uIq0TyDAQv56sC/H/iTWUURaPsd064s7XrbFIGug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DpUEnoGh; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2355651d204so53897815ad.2
-        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 15:40:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753224044; x=1753828844; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=wKtcXMxj2OGpCwkPzjUbbWqW4CzJw89SXcZLChO/bm8=;
-        b=DpUEnoGh19srQpsjZhckH4lz+AU4VtYQSxZWBaQ60fXG+D0Ri4vmmKGEM+3f9ut1fn
-         qcC4gyXR4JnoV2XM+R27K2saP8AR9HagXtD19zEtlhdBzNCvD9M2W5QXImwBWq9RCE8E
-         zObYJ380WfClBgmpBZGDT32cxmBAO5SRkoo6PqSzaYYstOOeSQICrHfxyWhvJ8P2J6d4
-         EKwo1vQe6Uwn0HrnbBOp5A3nxPkkuUhI30lFUbRU0O/+6A//9M1HfQFFuC0HBgT0sG3N
-         t+fAgc48oenuE+GFE6hM/nHdMqgpH5pk7bC5ZpP4FVn/fNB/kpAFiSxBwBVIh+ObTp3i
-         9sHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753224044; x=1753828844;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wKtcXMxj2OGpCwkPzjUbbWqW4CzJw89SXcZLChO/bm8=;
-        b=CXLwFxCnCQuhDRTHxDUi5EiRwebX3vkuvTTK7D3EgwZkcMy7ltfPQxbgOI256kL/44
-         W21QBgCCcWgRv4nanqCJl3E2gWcBqkEFmDs/RshC5qRECzMArzxlAsSEQ9DG6N5hHF59
-         CZksJtlvkTrQWfALSGQQY3eJAKl1mD4YhvfNKjujgqPTHWifvMYbSKzoyqu3rShY2Ou4
-         7LCW5Hy3VjInVO02ZC7jFHQ388/mTMkk+fpCb/nyzXYVqvqhtgYuS81R47hfR/xvjI8S
-         l6FCnVFk8K+aK+vBdw0jqoDFriDiZtIv0vxw+gbTZCP5N5m3K6ZT/HGlo2THrbxLUfV3
-         utTA==
-X-Forwarded-Encrypted: i=1; AJvYcCXq555+gehEonniZzpxVlvnKUdCi+cc2UG9iNu3KnmZkaEy5W/fCyvVenSPmgGnSZ5/7CUqqx8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyO9z9EEoS5hm+Y9bHdXRx2yZo0kQCjFo+CwyglpGcXuWbgDwzf
-	xnUh1sGbk1nR6H+8B++W2HXHLQ1e5kpyEqzmLC6dE92cYL4nPoaCB0yPeJ+jjMHv5AXUsq2VgI4
-	dDxow0A==
-X-Google-Smtp-Source: AGHT+IEsypI3rYx6n4459N9W8IgNPRYtXYo2OzxtHcUkEBKajYj3FwY/w6yphT5g1epzz0g3C/aE4kYcOtA=
-X-Received: from plbjj13.prod.google.com ([2002:a17:903:48d:b0:234:2261:8333])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1245:b0:234:a139:11fb
- with SMTP id d9443c01a7336-23f981bb968mr8242035ad.27.1753224043640; Tue, 22
- Jul 2025 15:40:43 -0700 (PDT)
-Date: Tue, 22 Jul 2025 22:40:37 +0000
+	s=arc-20240116; t=1753224089; c=relaxed/simple;
+	bh=LKbzslX13d+yyOW/czAYIqCnBd5xBDogbtiL0Za0tgY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BhdE1npxbwiWd9Q9Lw9sKLcdk8mLp6FiPAmq8qeO1mSRjGbzj7ONC+8jo63HXBkghrk+una2GYZriMv0lVmrugzVZq6uXw3yr3eR0ohRCJXD0XGX86ah3T7S6AHkYD8ZumJ4vhZRANfkJb0a8qBjoabGN54S3XzjTzAogMqpwtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VOXVQGI5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE8FFC4CEEB;
+	Tue, 22 Jul 2025 22:41:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753224088;
+	bh=LKbzslX13d+yyOW/czAYIqCnBd5xBDogbtiL0Za0tgY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VOXVQGI58EVLj4vv/qPUD29mQP+GRgGKI0IaWtPfjXWGEFhtk5DaxqzUIyz9VV6c/
+	 kkSbzIFac2kaKt3kyUgSZYaaIt9CWvZ6Hpt/HhFzaP16PqGn7CW9diO72C94jKtbJL
+	 BQVG0RGQZQdl+AxyEx+BSZjunlnrhNtD6C+/P2LiigI63RBj/dhQ088iYE5Nc/MWRW
+	 KdVpx2QOhj4/27TJ0DT2LN7aL1IWLOeiLT37QByhyTbZKz3UmZKhH2S6m+JNxZHJch
+	 L4faLp/rlWZkxc3z441BlL66jV5umfv/znXd24qq4ak6hBxhEANd8S1NV53lYxzttD
+	 eBJjob3VWmVVQ==
+Date: Tue, 22 Jul 2025 15:41:27 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Samiullah Khawaja <skhawaja@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ almasrymina@google.com, willemb@google.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v7 2/3] net: Use netif_set_threaded_hint
+ instead of netif_set_threaded in drivers
+Message-ID: <20250722154127.2880a12e@kernel.org>
+In-Reply-To: <CANn89i++XK3BFzk4t4bvKeZtqXT-FUCaY_5SkSTOeV0AGNDdZg@mail.gmail.com>
+References: <20250722030727.1033487-1-skhawaja@google.com>
+	<20250722030727.1033487-2-skhawaja@google.com>
+	<CANn89i++XK3BFzk4t4bvKeZtqXT-FUCaY_5SkSTOeV0AGNDdZg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250722224041.112292-1-kuniyu@google.com>
-Subject: [PATCH v2 bpf] bpf: Disable migration in nf_hook_run_bpf().
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>
-Cc: Daniel Xu <dxu@dxuuu.xyz>, Pablo Neira Ayuso <pablo@netfilter.org>, 
-	Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	syzbot+40f772d37250b6d10efc@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-syzbot reported that the netfilter bpf prog can be called without
-migration disabled in xmit path.
+On Tue, 22 Jul 2025 01:21:58 -0700 Eric Dumazet wrote:
+> > diff --git a/drivers/net/ethernet/atheros/atl1c/atl1c_main.c b/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
+> > index 3a9ad4a9c1cb..ee7d07c86dcf 100644
+> > --- a/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
+> > +++ b/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
+> > @@ -2688,7 +2688,7 @@ static int atl1c_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+> >         adapter->mii.mdio_write = atl1c_mdio_write;
+> >         adapter->mii.phy_id_mask = 0x1f;
+> >         adapter->mii.reg_num_mask = MDIO_CTRL_REG_MASK;
+> > -       netif_set_threaded(netdev, true);
+> > +       netif_set_threaded_hint(netdev);  
+> 
+> I have not seen a cover letter for this series ?
+> 
+> netif_set_threaded_hint() name seems a bit strange, it seems drivers
+> intent is to enable threaded mode ?
+> 
+> netif_threaded_enable() might be a better name.
 
-Then the assertion in __bpf_prog_run() fails, triggering the splat
-below. [0]
+Cover letter or at least a link to where this was suggested would indeed
+be useful. I may have suggested the name, and if so the thinking was
+that the API is for the driver to "recommend" that we default to
+threaded NAPI, likely because the device is IRQ-challenged.
+But no strong feelings if you prefer netif_set_threaded_enabled().
 
-Let's use bpf_prog_run_pin_on_cpu() in nf_hook_run_bpf().
+Since this is a driver-facing API a kdoc may be useful:
 
-[0]:
-BUG: assuming non migratable context at ./include/linux/filter.h:703
-in_atomic(): 0, irqs_disabled(): 0, migration_disabled() 0 pid: 5829, name: sshd-session
-3 locks held by sshd-session/5829:
- #0: ffff88807b4e4218 (sk_lock-AF_INET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1667 [inline]
- #0: ffff88807b4e4218 (sk_lock-AF_INET){+.+.}-{0:0}, at: tcp_sendmsg+0x20/0x50 net/ipv4/tcp.c:1395
- #1: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
- #1: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
- #1: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: __ip_queue_xmit+0x69/0x26c0 net/ipv4/ip_output.c:470
- #2: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
- #2: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
- #2: ffffffff8e5c4e00 (rcu_read_lock){....}-{1:3}, at: nf_hook+0xb2/0x680 include/linux/netfilter.h:241
-CPU: 0 UID: 0 PID: 5829 Comm: sshd-session Not tainted 6.16.0-rc6-syzkaller-00002-g155a3c003e55 #0 PREEMPT(full)
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x16c/0x1f0 lib/dump_stack.c:120
- __cant_migrate kernel/sched/core.c:8860 [inline]
- __cant_migrate+0x1c7/0x250 kernel/sched/core.c:8834
- __bpf_prog_run include/linux/filter.h:703 [inline]
- bpf_prog_run include/linux/filter.h:725 [inline]
- nf_hook_run_bpf+0x83/0x1e0 net/netfilter/nf_bpf_link.c:20
- nf_hook_entry_hookfn include/linux/netfilter.h:157 [inline]
- nf_hook_slow+0xbb/0x200 net/netfilter/core.c:623
- nf_hook+0x370/0x680 include/linux/netfilter.h:272
- NF_HOOK_COND include/linux/netfilter.h:305 [inline]
- ip_output+0x1bc/0x2a0 net/ipv4/ip_output.c:433
- dst_output include/net/dst.h:459 [inline]
- ip_local_out net/ipv4/ip_output.c:129 [inline]
- __ip_queue_xmit+0x1d7d/0x26c0 net/ipv4/ip_output.c:527
- __tcp_transmit_skb+0x2686/0x3e90 net/ipv4/tcp_output.c:1479
- tcp_transmit_skb net/ipv4/tcp_output.c:1497 [inline]
- tcp_write_xmit+0x1274/0x84e0 net/ipv4/tcp_output.c:2838
- __tcp_push_pending_frames+0xaf/0x390 net/ipv4/tcp_output.c:3021
- tcp_push+0x225/0x700 net/ipv4/tcp.c:759
- tcp_sendmsg_locked+0x1870/0x42b0 net/ipv4/tcp.c:1359
- tcp_sendmsg+0x2e/0x50 net/ipv4/tcp.c:1396
- inet_sendmsg+0xb9/0x140 net/ipv4/af_inet.c:851
- sock_sendmsg_nosec net/socket.c:712 [inline]
- __sock_sendmsg net/socket.c:727 [inline]
- sock_write_iter+0x4aa/0x5b0 net/socket.c:1131
- new_sync_write fs/read_write.c:593 [inline]
- vfs_write+0x6c7/0x1150 fs/read_write.c:686
- ksys_write+0x1f8/0x250 fs/read_write.c:738
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0x4c0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fe7d365d407
-Code: 48 89 fa 4c 89 df e8 38 aa 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
-RSP:
+/**
+ * netif_set_threaded_hint() - default to using threaded NAPIs
+ * @dev: net_device instance
+ *
+ * Default NAPI instances of the device to run in threaded mode.
+ * This may be useful for devices where multiple NAPI instances
+ * get scheduled by a single interrupt. Threaded NAPI allows moving
+ * the NAPI processing to cores other than the core where IRQ is mapped.
+ *
+ * This function should be called before @dev is registered.
+ */
 
-Fixes: fd9c663b9ad67 ("bpf: minimal support for programs hooked into netfilter framework")
-Reported-by: syzbot+40f772d37250b6d10efc@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/6879466d.a00a0220.3af5df.0022.GAE@google.com/
-Tested-by: syzbot+40f772d37250b6d10efc@syzkaller.appspotmail.com
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
-v2:
-  * Use bpf_prog_run_pin_on_cpu()
-  * Correct Fixes: tag
+Since this is just a hint the function should be void. No caller cares
+about the return value anyway.
 
-v1: https://lore.kernel.org/bpf/20250717185837.1073456-1-kuniyu@google.com/
----
- net/netfilter/nf_bpf_link.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/netfilter/nf_bpf_link.c b/net/netfilter/nf_bpf_link.c
-index 06b0848447003..25bbac8986c22 100644
---- a/net/netfilter/nf_bpf_link.c
-+++ b/net/netfilter/nf_bpf_link.c
-@@ -17,7 +17,7 @@ static unsigned int nf_hook_run_bpf(void *bpf_prog, struct sk_buff *skb,
- 		.skb = skb,
- 	};
- 
--	return bpf_prog_run(prog, &ctx);
-+	return bpf_prog_run_pin_on_cpu(prog, &ctx);
- }
- 
- struct bpf_nf_link {
--- 
-2.50.0.727.gbf7dc18ff4-goog
-
+BTW I think we should delete the debugfs file for threaded config
+from mt76. debugfs is not uAPI, presumably.
 
