@@ -1,98 +1,161 @@
-Return-Path: <netdev+bounces-209059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48D86B0E20C
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 18:40:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D739B0E20B
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 18:40:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73E5C5453C7
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 16:40:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 235323A2079
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 16:40:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FD8227B4FA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84A9327CCC4;
 	Tue, 22 Jul 2025 16:40:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oToRm12z"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C87C27A909
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 16:40:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC29827AC57
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 16:40:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753202433; cv=none; b=ThfoCY84+R3OYfdI4GuWPlBkCqj1lqlKTWdcmO4a6iWc+HJo265nyJJsEygx1Z0BWyw7/7Q1Q8qQkVrTfYEPI6/lRzM2e3KgdFh0cYxkiejtqJZmNYM2svKA96jwxJlkLC5AInMEWIEPOj33S5l6ZME2nnJq162tQYb6Ub/s4SY=
+	t=1753202433; cv=none; b=gFWtdhl6DlQaIiuj4jjr0lm67suLV0tvo0kOBvW7qqSHShsxXIXW/ngozmfhEYbqmHa1IStQOSgnD5pHEd4KmmywuyliTm199Oc3/lTUB8oBsZgfKJ1HSGLQTM+5JaT/UmT/XxeCZdQKZNESZF7/PLIPd0ZxQT/oVdAWGkRB0JI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1753202433; c=relaxed/simple;
-	bh=qTdNZ00bF/QD6U8ntALkccKt9Ovtrx7ev+aHjkvKWyg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iUpvLgdyUvXBX4rRBrPGNuHWzqGDsm+7svgmzLghdriMsLB/dDqFuPibETq3w8SXWvqplpNsttqU7kySbUyJd13j/zcT216jVMw5w41Ss18IVcEW+x9elej/w/AnPXiwAO9uP6zzipXlRtGalzkeM1lR3PJu/1I3ZT+T8m9MHnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oToRm12z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CA51C4CEEB;
-	Tue, 22 Jul 2025 16:40:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753202432;
-	bh=qTdNZ00bF/QD6U8ntALkccKt9Ovtrx7ev+aHjkvKWyg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oToRm12z5+cU5QxafgEtl0Fg5r2lDOFplGvKXjMbzasF++1qumc77/MKDBg2xYAyS
-	 V8oSvjKBA8inSniDSo6DfUTV7Pg685/cXB1St0yz8aXAVObZj3584ORnfd9XxkPWFI
-	 F3G45X5T+bmSogS8Y26xTi9DAjGhG7cGACRLn7nEYxfB/E6bh90A+W4LLOMRxsj0y5
-	 ZbLZVw08OvWlUA873fhu/78F1QP4YeiX9Qz+T9gfnlWi+ir1fZht6X7JY6aWHW9LqX
-	 lQWlcP6VCxstmkOWqDF0+tGYs/Q8negdPtMa6k0/iesOjg2uP8jdgIxyYoV9qkqZHG
-	 aLbOka7+bVrOw==
-Date: Tue, 22 Jul 2025 17:40:27 +0100
-From: Simon Horman <horms@kernel.org>
-To: Subbaraya Sundeep <sbhatta@marvell.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, gakula@marvell.com,
-	hkelam@marvell.com, bbhushan2@marvell.com, jerinj@marvell.com,
-	lcherian@marvell.com, sgoutham@marvell.com, netdev@vger.kernel.org
-Subject: Re: [net-next PATCH v3 03/11] octeontx2-af: Extend debugfs support
- for cn20k NIX
-Message-ID: <20250722164027.GR2459@horms.kernel.org>
-References: <1752772063-6160-1-git-send-email-sbhatta@marvell.com>
- <1752772063-6160-4-git-send-email-sbhatta@marvell.com>
+	bh=7eziT7MHUWuUn04e2QkemV4ozrXV+NW4q8oCaWNFvxc=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Cc:Content-Type; b=aSUlAlB1p5NRfyA79rMNzBRQVW2z9haP7pvavp4AUNh/bxp04miRQNQcVdxYf1V6HAqJGZn316I734jHXxu43FCjk3Th+CLtRUwypCANeKf+UjAnIRkpS/DcVSYMzoeWY0uJ8Ojrq/xwHFsI2R+GMR/2AFlucLjfCjP0N7wzvNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-879c399059eso533554339f.1
+        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 09:40:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753202431; x=1753807231;
+        h=cc:to:from:subject:message-id:reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hYFkI9O/131eW/Sqpoysg4fmtDGObV0slVd4zue++sE=;
+        b=obQCX4G79Yy2WI78yKiCUyc4vsnjpRp973OxyEVKyahtpP9/EbCJrWoJSih7ceSXHw
+         8QGbQ3ph69ec0fBF7Tsys8uUK6wZL0u0lbog+KOKDL0FksOVTC8FzbdBqZ8sP+gZvFth
+         l2BSob10UO7o4nbIUc9yNUXr/+OLiKbSkrJxh+l2YSluOLGmi+dgHqMktP5t+y3LYaqS
+         6Rl+dhUAebNezuDz1xaury0cUfW5iMZvxtgcFONk7ajMiU3q6PsZMLvT5IGk1zTqWyQ7
+         blE07MsjJUrmNEF1asMAagEt2OD2FYzAY4na705eHEWZtOonRzmPl2Vl1gkXmmXzEdmr
+         pAIg==
+X-Forwarded-Encrypted: i=1; AJvYcCUIho2H63bLuiqK657H3s2q88lvoyGZQjbB8NFHSUBKxVjtcORlfkTSOv4cxcPxaaAuIrnWeZc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9wfM3JuaWEOzcui6DEIZB2fslPGpVd35NwjgrJceeAorpgt6a
+	s21/O66PuvpUoDzLmgN17KT+JVn5oFc7d7hcYL4yLzx3XwOYZSqux8H4bDX9oJrA4eq94LmjFNh
+	IAveM7LLFooMe5bHggDmt9UFqgL8kOa4nUArKxlLsJfOf6pJJ2i0W+FwC928=
+X-Google-Smtp-Source: AGHT+IEd/oncA/FTQ3xxathOMJeMCYJEWzy4cGnbIk3x3fjeiD+6SI5m7RkWUytuXSqiwf2BFl3ZqdfXSsjZbKz6mJfmz5DmDXci
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1752772063-6160-4-git-send-email-sbhatta@marvell.com>
+X-Received: by 2002:a05:6602:2d94:b0:87c:4609:d10a with SMTP id
+ ca18e2360f4ac-87c4609d9c6mr1354451639f.9.1753202431060; Tue, 22 Jul 2025
+ 09:40:31 -0700 (PDT)
+Date: Tue, 22 Jul 2025 09:40:31 -0700
+Reply-To: <20250722071508.12497-1-suchitkarunakaran@gmail.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <687fbeff.a70a0220.21b99c.0011.GAE@google.com>
+Subject: [syzbot ci] Re: net: Revert tx queue length on partial failure in dev_qdisc_change_tx_queue_len()
+From: syzbot ci <syzbot+ci9865e4960193441a@syzkaller.appspotmail.com>
+To: aleksander.lobakin@intel.com, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, 
+	kuniyu@google.com, linux-kernel-mentees@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	sdf@fomichev.me, skhan@linuxfoundation.org, suchitkarunakaran@gmail.com, 
+	xiyou.wangcong@gmail.com
+Cc: syzbot@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jul 17, 2025 at 10:37:35PM +0530, Subbaraya Sundeep wrote:
-> Extend debugfs to display CN20K NIX send, receive and
-> completion queue contexts.
-> 
-> Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+syzbot ci has tested the following series
 
-...
+[v1] net: Revert tx queue length on partial failure in dev_qdisc_change_tx_queue_len()
+https://lore.kernel.org/all/<20250722071508.12497-1-suchitkarunakaran@gmail.com>
+* [PATCH] net: Revert tx queue length on partial failure in dev_qdisc_change_tx_queue_len()
 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.c
+and found the following issue:
+BUG: unable to handle kernel paging request in dev_qdisc_change_tx_queue_len
 
-...
+Full report is available here:
+https://ci.syzbot.org/series/75b0a15e-cca4-4e46-8bf9-595c0dd34915
 
-> +void print_nix_cn20k_sq_ctx(struct seq_file *m,
-> +			    struct nix_cn20k_sq_ctx_s *sq_ctx)
-> +{
+***
 
-...
+BUG: unable to handle kernel paging request in dev_qdisc_change_tx_queue_len
 
-> +	seq_printf(m, "W11: octs \t\t\t%llu\n\n", (u64)sq_ctx->octs);
-> +	seq_printf(m, "W12: pkts \t\t\t%llu\n\n", (u64)sq_ctx->pkts);
-> +	seq_printf(m, "W13: aged_drop_octs \t\t\t%llu\n\n", (u64)sq_ctx->aged_drop_octs);
-> +	seq_printf(m, "W13: aged_drop_pkts \t\t\t%llu\n\n", (u64)sq_ctx->aged_drop_pkts);
+tree:      netdev
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
+base:      81e0db8e839822b8380ce4716cd564a593ccbfc5
+arch:      amd64
+compiler:  Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+config:    https://ci.syzbot.org/builds/2ee305f2-ddb8-45c6-8f47-2a150dc6dd22/config
+syz repro: https://ci.syzbot.org/findings/1e75a6d3-11ac-48da-af27-60753abb61c7/syz_repro
 
-nit: please line-wrap the above two lines.
+netlink: 'syz.2.18': attribute type 13 has an invalid length.
+netlink: 'syz.2.18': attribute type 17 has an invalid length.
+BUG: unable to handle page fault for address: ffffed4821fa6a4b
+#PF: supervisor read access in kernel mode
+#PF: error_code(0x0000) - not-present page
+PGD 13ffee067 P4D 13ffee067 PUD 0 
+Oops: Oops: 0000 [#1] SMP KASAN PTI
+CPU: 1 UID: 0 PID: 5980 Comm: syz.2.18 Not tainted 6.16.0-rc6-syzkaller-00128-g81e0db8e8398-dirty #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:dev_qdisc_change_tx_queue_len+0x542/0x640
+Code: be 7f 05 00 00 48 c7 c2 20 d2 95 8c e8 27 db 27 f8 44 89 e0 48 69 c0 c0 01 00 00 49 8d 1c 06 48 83 c3 18 48 89 d8 48 c1 e8 03 <42> 80 3c 28 00 74 08 48 89 df e8 1f af ab f8 48 8b 1b 4c 8d 73 18
+RSP: 0018:ffffc900024beaa0 EFLAGS: 00010a06
+RAX: 1ffff14821fa6a4b RBX: ffff8a410fd35258 RCX: ffff888020f2d640
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
+RBP: ffffc900024beb90 R08: ffffffff8fa1d6f7 R09: 1ffffffff1f43ade
+R10: dffffc0000000000 R11: fffffbfff1f43adf R12: 00000000ffffffff
+R13: dffffc0000000000 R14: ffff88810fd35400 R15: ffff88810ffe2018
+FS:  00007fa854ede6c0(0000) GS:ffff8881a3c23000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffffed4821fa6a4b CR3: 00000000295fa000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ netif_change_tx_queue_len+0x167/0x270
+ do_setlink+0xdfb/0x41c0
+ rtnl_newlink+0x149f/0x1c70
+ rtnetlink_rcv_msg+0x7cf/0xb70
+ netlink_rcv_skb+0x208/0x470
+ netlink_unicast+0x75c/0x8e0
+ netlink_sendmsg+0x805/0xb30
+ __sock_sendmsg+0x21c/0x270
+ ____sys_sendmsg+0x505/0x830
+ ___sys_sendmsg+0x21f/0x2a0
+ __x64_sys_sendmsg+0x19b/0x260
+ do_syscall_64+0xfa/0x3b0
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fa853f8e9a9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fa854ede038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fa8541b5fa0 RCX: 00007fa853f8e9a9
+RDX: 0000000000000000 RSI: 0000200000000180 RDI: 0000000000000003
+RBP: 00007fa854010d69 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007fa8541b5fa0 R15: 00007ffe5a5f8288
+ </TASK>
+Modules linked in:
+CR2: ffffed4821fa6a4b
+---[ end trace 0000000000000000 ]---
+RIP: 0010:dev_qdisc_change_tx_queue_len+0x542/0x640
+Code: be 7f 05 00 00 48 c7 c2 20 d2 95 8c e8 27 db 27 f8 44 89 e0 48 69 c0 c0 01 00 00 49 8d 1c 06 48 83 c3 18 48 89 d8 48 c1 e8 03 <42> 80 3c 28 00 74 08 48 89 df e8 1f af ab f8 48 8b 1b 4c 8d 73 18
+RSP: 0018:ffffc900024beaa0 EFLAGS: 00010a06
+RAX: 1ffff14821fa6a4b RBX: ffff8a410fd35258 RCX: ffff888020f2d640
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
+RBP: ffffc900024beb90 R08: ffffffff8fa1d6f7 R09: 1ffffffff1f43ade
+R10: dffffc0000000000 R11: fffffbfff1f43adf R12: 00000000ffffffff
+R13: dffffc0000000000 R14: ffff88810fd35400 R15: ffff88810ffe2018
+FS:  00007fa854ede6c0(0000) GS:ffff8881a3c23000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffffed4821fa6a4b CR3: 00000000295fa000 CR4: 00000000000006f0
 
-> +	seq_printf(m, "W14: dropped_octs \t\t%llu\n\n",
-> +		   (u64)sq_ctx->dropped_octs);
-> +	seq_printf(m, "W15: dropped_pkts \t\t%llu\n\n",
-> +		   (u64)sq_ctx->dropped_pkts);
-> +}
 
-...
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
