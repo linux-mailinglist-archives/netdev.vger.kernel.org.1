@@ -1,59 +1,90 @@
-Return-Path: <netdev+bounces-209125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C79BCB0E696
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 00:41:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FDB0B0E6B3
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 00:50:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80F4F6C6758
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 22:41:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24F961C8827B
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 22:50:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 891E9288C30;
-	Tue, 22 Jul 2025 22:41:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 592BF280A51;
+	Tue, 22 Jul 2025 22:50:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VOXVQGI5"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="NQbMiq6r"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D162877F2
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 22:41:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC9F44C92
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 22:50:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753224089; cv=none; b=jrs4wgW6YRmtKYZqNA5sth28Q1frzmhmutyENJr3MxTqJwn0eT57ElB9VD+tRd3dlPnjQKPyHHlxhmNwi9Vdo5WwBVaSI1jfyAVF8btYKbOE0Bry73cRw1hpySSmtmIFcedrZ7IRIAfUUd+BAM6Jv9bR/zK/clpaXUSkFjE+GCw=
+	t=1753224624; cv=none; b=WChB8woJ52njxfyJ9P/MVcAP5jEUMnyyxVYROq5ymhIa/nO886GOvB04tZZAoO5Q/nLAevxzN9MwtR6zoATJQMFVPGGpO4AOJGRtZ6KwaHXYdg1EKBC3KSGPbtLjbnBAD1MTKLQrLRrj0+AUzKUibt2oaxZP2njolc6SgmIqoz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753224089; c=relaxed/simple;
-	bh=LKbzslX13d+yyOW/czAYIqCnBd5xBDogbtiL0Za0tgY=;
+	s=arc-20240116; t=1753224624; c=relaxed/simple;
+	bh=enAcN10mvlsFzRAtxkyXhmWPR0Xzn/abi7ke2a+kaZ4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BhdE1npxbwiWd9Q9Lw9sKLcdk8mLp6FiPAmq8qeO1mSRjGbzj7ONC+8jo63HXBkghrk+una2GYZriMv0lVmrugzVZq6uXw3yr3eR0ohRCJXD0XGX86ah3T7S6AHkYD8ZumJ4vhZRANfkJb0a8qBjoabGN54S3XzjTzAogMqpwtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VOXVQGI5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE8FFC4CEEB;
-	Tue, 22 Jul 2025 22:41:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753224088;
-	bh=LKbzslX13d+yyOW/czAYIqCnBd5xBDogbtiL0Za0tgY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VOXVQGI58EVLj4vv/qPUD29mQP+GRgGKI0IaWtPfjXWGEFhtk5DaxqzUIyz9VV6c/
-	 kkSbzIFac2kaKt3kyUgSZYaaIt9CWvZ6Hpt/HhFzaP16PqGn7CW9diO72C94jKtbJL
-	 BQVG0RGQZQdl+AxyEx+BSZjunlnrhNtD6C+/P2LiigI63RBj/dhQ088iYE5Nc/MWRW
-	 KdVpx2QOhj4/27TJ0DT2LN7aL1IWLOeiLT37QByhyTbZKz3UmZKhH2S6m+JNxZHJch
-	 L4faLp/rlWZkxc3z441BlL66jV5umfv/znXd24qq4ak6hBxhEANd8S1NV53lYxzttD
-	 eBJjob3VWmVVQ==
-Date: Tue, 22 Jul 2025 15:41:27 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Samiullah Khawaja <skhawaja@google.com>, "David S . Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- almasrymina@google.com, willemb@google.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v7 2/3] net: Use netif_set_threaded_hint
- instead of netif_set_threaded in drivers
-Message-ID: <20250722154127.2880a12e@kernel.org>
-In-Reply-To: <CANn89i++XK3BFzk4t4bvKeZtqXT-FUCaY_5SkSTOeV0AGNDdZg@mail.gmail.com>
-References: <20250722030727.1033487-1-skhawaja@google.com>
-	<20250722030727.1033487-2-skhawaja@google.com>
-	<CANn89i++XK3BFzk4t4bvKeZtqXT-FUCaY_5SkSTOeV0AGNDdZg@mail.gmail.com>
+	 MIME-Version:Content-Type; b=EwRfuVXvBAHRNXYmWE858I+nFclNy+hfqURelqWVOrk5DhZwqWT4CQ8EG2XpYF8rZ7MV/wNk+KovbGwrPELemcsq3MKtkJq6U0y6IoZ1fXPkMPB1wV5g3UvWDuDV8JV8aOFU9lHXWGDFZriZ+/TosogFWz+N8VlM7nmZ1jLOp00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=NQbMiq6r; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-234b440afa7so56365275ad.0
+        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 15:50:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1753224622; x=1753829422; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g/vhVxMUqtZpT10bNo1OFTBNDsTJRyeeSF2rb6zaHQk=;
+        b=NQbMiq6rS1PHp8uFj5vixSvo4cv/a8Mao0IFy3pq3zpVO8EPwhUFCy22i+GAweZKa1
+         pKgok2iu/x4hOFuG+0q2fX44uvKWxYcFlJ89fu+dFLQ4rV5lxLS/vA+KJlvJ+m288rEV
+         DPRx8qRnL1LZvH33+4oSJuL6Z0GzBww96ZQi+pg4tY7/RWWXsMTHW5NTwMXB2L/Ll3RZ
+         5Hxy8mO0yHWYuyX+Aw5Lm+1yWWC92gBIeLnLi7fajWCiTAApK4hE1BXmnt5bnmQv+y1o
+         nxpNQJpzod/OiQv0nqAdzDSXWLFa93gghh++Rau/d0sr+wsmusjAXKvxf7iQi5Rlw55e
+         x19Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753224622; x=1753829422;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=g/vhVxMUqtZpT10bNo1OFTBNDsTJRyeeSF2rb6zaHQk=;
+        b=O1tgqGrRGGXfCHVxZQaUSuh+OaLhMs1kIP4Q8IDvC1AI+gYUQ6KDTenfLH16U2eS5b
+         MbMXHTMMQzH4wQCo3fPCGis9MYJGR39j6j14Gu6H7qge+g2ks409Ve8+/EmuUprFFfNo
+         j3mCuO7P9BfxovKTtPKDHO/Yr+m8JYcWgd/5mBB9G/j7YLBXoWtXy4VxaH3dC6yX3tN9
+         rVcSLD7LpQFZpve5HdCdxWGdTavxLCcHZ872I01WtRA4GRBnQ6uWslrnzFHY+6gzH096
+         2IIXHxgSvdrv8Rbsul51LghHbQOyqa6x1eCkxZ/81NIrl2oeVKQz7ve9q5mjlnlAYdD2
+         V98A==
+X-Forwarded-Encrypted: i=1; AJvYcCU1l7jux4jqACF5bQ2nwgLuPmoX7BPe+4n42ZQarg97I5CpDJ77Jm7nK5Qy5PJAdC4hNR6sEmo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5DLAX2yA0qmLkmy2DlqZjO9JPMcfLE0tYNdt8zxzFX2FxGZcA
+	cSyCIDWoIrcVC2SBNXCpMJ2hv5dBr83GoDmV5esa7/r5N4fiE4MWP0AYH1j5ZMKtNeY=
+X-Gm-Gg: ASbGncsQgUo5tPL7P4NRnvZEO5zJHd/+14cnYFTVe6WhYnK8IrJD4O0uv9xakmJkhmF
+	FG7jYOnssdk85vJew4cp+hYz4Z5CmlzMaCV6yQ126OTag1FiaSvmvSs15hgzt2eDG+jIRJ2+6d8
+	Lg6gISiUVSV7xx/sqFXnLF//Tf6602ZDhmmPjzIBQ5qAUw7zZ2Wy45N0J86Q3lpxW4ensHxEl5R
+	5m9iUhN/t9HYXd6lf+J75ROt763NZasZ9gPqd4gd3ykfbuDNrMRX+YOmy/OpP4GGYJi8sD66lYk
+	1+x1CZD8IrMEgw2FFiVeI1+GPWFNMZUraG1rJY0RDYcirZU7QZLfxyA8cCT6VnCFtAUa6W7HLpO
+	QOiC8II+6FrSvnH2MA+X7+IwJiKHFUhfZIjtdNn3N741qkvgxG9YboMEzg2NrnVAyqztflmyrt1
+	OtMJfW33mGBQ==
+X-Google-Smtp-Source: AGHT+IH6QdqHikvWWWFS4uMo5fel9o4AvXYJ/Ulv5jITj0xamrgqfX0KU/9j1DVayEGbpYtj3tpDGw==
+X-Received: by 2002:a17:902:d512:b0:235:e9fe:83c0 with SMTP id d9443c01a7336-23f98194d3bmr9282545ad.27.1753224622089;
+        Tue, 22 Jul 2025 15:50:22 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23e3b6d199fsm83474425ad.134.2025.07.22.15.50.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Jul 2025 15:50:21 -0700 (PDT)
+Date: Tue, 22 Jul 2025 15:50:20 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] samples:pktgen: This file was missing shebang line, so
+ added it
+Message-ID: <20250722155020.6f73f632@hermes.local>
+In-Reply-To: <20250722221110.6462-1-unixbhaskar@gmail.com>
+References: <20250722221110.6462-1-unixbhaskar@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,48 +94,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 22 Jul 2025 01:21:58 -0700 Eric Dumazet wrote:
-> > diff --git a/drivers/net/ethernet/atheros/atl1c/atl1c_main.c b/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
-> > index 3a9ad4a9c1cb..ee7d07c86dcf 100644
-> > --- a/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
-> > +++ b/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
-> > @@ -2688,7 +2688,7 @@ static int atl1c_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
-> >         adapter->mii.mdio_write = atl1c_mdio_write;
-> >         adapter->mii.phy_id_mask = 0x1f;
-> >         adapter->mii.reg_num_mask = MDIO_CTRL_REG_MASK;
-> > -       netif_set_threaded(netdev, true);
-> > +       netif_set_threaded_hint(netdev);  
+On Wed, 23 Jul 2025 03:40:18 +0530
+Bhaskar Chowdhury <unixbhaskar@gmail.com> wrote:
+
+> This file was missing the shebang line, so added it.
 > 
-> I have not seen a cover letter for this series ?
-> 
-> netif_set_threaded_hint() name seems a bit strange, it seems drivers
-> intent is to enable threaded mode ?
-> 
-> netif_threaded_enable() might be a better name.
+> Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
 
-Cover letter or at least a link to where this was suggested would indeed
-be useful. I may have suggested the name, and if so the thinking was
-that the API is for the driver to "recommend" that we default to
-threaded NAPI, likely because the device is IRQ-challenged.
-But no strong feelings if you prefer netif_set_threaded_enabled().
-
-Since this is a driver-facing API a kdoc may be useful:
-
-/**
- * netif_set_threaded_hint() - default to using threaded NAPIs
- * @dev: net_device instance
- *
- * Default NAPI instances of the device to run in threaded mode.
- * This may be useful for devices where multiple NAPI instances
- * get scheduled by a single interrupt. Threaded NAPI allows moving
- * the NAPI processing to cores other than the core where IRQ is mapped.
- *
- * This function should be called before @dev is registered.
- */
-
-Since this is just a hint the function should be void. No caller cares
-about the return value anyway.
-
-BTW I think we should delete the debugfs file for threaded config
-from mt76. debugfs is not uAPI, presumably.
+NAK
+This file is not meant to be executed directly. It is sourced from other files.
 
