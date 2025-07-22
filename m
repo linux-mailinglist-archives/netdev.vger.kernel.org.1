@@ -1,140 +1,137 @@
-Return-Path: <netdev+bounces-208780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96957B0D1B8
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 08:13:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8640BB0D1B6
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 08:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0FCAF7AF599
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 06:11:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB7AA5468B5
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 06:10:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B870628D8F5;
-	Tue, 22 Jul 2025 06:13:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="yCLhT4SP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E405428C873;
+	Tue, 22 Jul 2025 06:10:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29F046BF;
-	Tue, 22 Jul 2025 06:13:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 110C01CF7AF;
+	Tue, 22 Jul 2025 06:10:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.30.148.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753164795; cv=none; b=Mu0GbJ+i7oKwlJRsyjBn2UEKyMiSc5Hf9ecVQ6zQPMbMPMZmVip+8a1ytP9ib4Eb0TEnhyPyOqox9KlxEb0P00z89LeWAgraE9fOYv7nDVWfWrpbWlsheN1HyMzdI6lKy0H056cgKu1+NW/HkqTnfMuRejs4UQxsl11CujxXE0Q=
+	t=1753164628; cv=none; b=jvQykfDaId5L+e+AejgEu/Ru9YFC1rsH3gv4u/T0HO2lFEOPEiGOS6N3qmmkb/iUcrAIHannmbEye1qfbzzPAyRJzGdsElbieyeZwd/DxncNCMthsyr6kd5mU5T3ibM+ZVN/ruPEAG1LgpC2jxxqS0+o2HyGUlqsauE05N88VkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753164795; c=relaxed/simple;
-	bh=pKASJsnRlQHlT0s8OZjmjuOTAThIXbH+iclDQTvSs74=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VJ9Ryi0PA7yByqvQCYSHrJu+QkRW8MZanB8fYHwk7gsCA8m1Oat7W2Z+0z8T51QFuwEU0pLCsSnwQaUhGgQDIKdtWjr+H2jnefS+RroLOClSmT8bNZLZQUil+dIMhCnMp23b14d6vrbWFRIBXN7fCnWvKXvmfyQbMgMEj6UXFGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=yCLhT4SP; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1753164793; x=1784700793;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=pKASJsnRlQHlT0s8OZjmjuOTAThIXbH+iclDQTvSs74=;
-  b=yCLhT4SPzm3mME37eekTKONPQVqyfXHQyU8s/olT8K8Jqbcsln6AkhCI
-   sNYmpmWTGgdNBNedLgEABc0lLxdF31FLECO9gXv2rVF1JIgAgfTDBbYaN
-   MpiDiJp+qER1VRXwW4z+11hZcWVtpc0PMmHleWwo0H5YZ+8sB5YUOdOSb
-   KLVcnf2sqVmYL3LUu5WyFLTD/kGkiGhBRPeLHkYQrIwX6PEOQjRynMoGs
-   WT79xWb5fiF0V+KOgtoVuec0cm1Z5UcMveVdwyBJ9NTj8psU6Y0jq+5FI
-   KsVxj6gLv0zJM9c+sj3ZYr4CBmULadEh6FNH0vOm8n++hbI5Uuj0CSCsM
-   A==;
-X-CSE-ConnectionGUID: dZXh1W5OQuqgFbGgCs4DCg==
-X-CSE-MsgGUID: 4l3NpAzISVCH/xkMP0ecYQ==
-X-IronPort-AV: E=Sophos;i="6.16,330,1744095600"; 
-   d="scan'208";a="43736235"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Jul 2025 23:13:12 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Mon, 21 Jul 2025 23:12:44 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex02.mchp-main.com
- (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
- Transport; Mon, 21 Jul 2025 23:12:44 -0700
-Date: Tue, 22 Jul 2025 08:09:54 +0200
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<o.rempel@pengutronix.de>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: phy: micrel: Add support for lan8842
-Message-ID: <20250722060954.ecaxrk7vq5ibuy55@DEN-DL-M31836.microchip.com>
-References: <20250721071405.1859491-1-horatiu.vultur@microchip.com>
- <4dd62a56-517a-4011-8a13-95f6c9ad2198@lunn.ch>
+	s=arc-20240116; t=1753164628; c=relaxed/simple;
+	bh=X3m0bEDpzyejvM3oMqRL6s6ZB4rqOd4i/z4KryWrKS4=;
+	h=Date:Message-ID:In-Reply-To:References:Mime-Version:From:To:Cc:
+	 Subject:Content-Type; b=pzc9ruLSgKcFu8BL1mhAM58Dry9kGLFJHYQwrRqY7LXE5ryxbQVGFnFz2vwf9lFUsflpqsy0yMkzpdvy4+ziY8t0Zx4HRGm/cjPMso7PP3nXmKhAJ3J3SKuwgOaewb2nq0pRt2NZK7bZl+L0AHi6gCo3Y8bLhM393EwotOoKOBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=160.30.148.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4bmRh63sV3z6FyBr;
+	Tue, 22 Jul 2025 14:10:14 +0800 (CST)
+Received: from xaxapp04.zte.com.cn ([10.99.98.157])
+	by mse-fl2.zte.com.cn with SMTP id 56M6A2Th040888;
+	Tue, 22 Jul 2025 14:10:02 +0800 (+08)
+	(envelope-from fan.yu9@zte.com.cn)
+Received: from mapi (xaxapp01[null])
+	by mapi (Zmail) with MAPI id mid32;
+	Tue, 22 Jul 2025 14:10:04 +0800 (CST)
+Date: Tue, 22 Jul 2025 14:10:04 +0800 (CST)
+X-Zmail-TransId: 2af9687f2b3c7ca-68dd4
+X-Mailer: Zmail v1.0
+Message-ID: <20250722141004103ZDPniL4wEAkAUVVhyyQMW@zte.com.cn>
+In-Reply-To: <CAAVpQUDaSccbmOC0sgihBYPTdtSE2OsFOJXC6s58QS81a+8nkA@mail.gmail.com>
+References: 20250721171333.6caced4f@kernel.org,20250722094808945ENOLvzY108YsJFz4CqbaI@zte.com.cn,CAAVpQUDaSccbmOC0sgihBYPTdtSE2OsFOJXC6s58QS81a+8nkA@mail.gmail.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <4dd62a56-517a-4011-8a13-95f6c9ad2198@lunn.ch>
+Mime-Version: 1.0
+From: <fan.yu9@zte.com.cn>
+To: <kuniyu@google.com>
+Cc: <kuba@kernel.org>, <edumazet@google.com>, <ncardwell@google.com>,
+        <davem@davemloft.net>, <dsahern@kernel.org>, <pabeni@redhat.com>,
+        <horms@kernel.org>, <rostedt@goodmis.org>, <mhiramat@kernel.org>,
+        <mathieu.desnoyers@efficios.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>,
+        <yang.yang29@zte.com.cn>, <xu.xin16@zte.com.cn>,
+        <tu.qiang35@zte.com.cn>, <jiang.kun2@zte.com.cn>,
+        <qiu.yutan@zte.com.cn>, <wang.yaxin@zte.com.cn>,
+        <he.peilin@zte.com.cn>
+Subject: =?UTF-8?B?UmU6IFtQQVRDSCBuZXQtbmV4dCB2NyBSRVNFTkRdIHRjcDogdHJhY2UgcmV0cmFuc21pdCBmYWlsdXJlcyBpbiB0Y3BfcmV0cmFuc21pdF9za2I=?=
+Content-Type: multipart/mixed;
+	boundary="=====_001_next====="
+X-MAIL:mse-fl2.zte.com.cn 56M6A2Th040888
+X-TLS: YES
+X-SPF-DOMAIN: zte.com.cn
+X-ENVELOPE-SENDER: fan.yu9@zte.com.cn
+X-SPF: None
+X-SOURCE-IP: 10.5.228.133 unknown Tue, 22 Jul 2025 14:10:14 +0800
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 687F2B46.001/4bmRh63sV3z6FyBr
 
-The 07/21/2025 16:22, Andrew Lunn wrote:
 
-Hi Andrew,
 
-> 
-> > +static struct lan8842_hw_stat lan8842_hw_stats[] = {
-> > +     { "phy_rx_correct_count", 2, 3, {88, 61, 60}},
-> > +     { "phy_rx_crc_count", 2, 2, {63, 62}},
-> > +     { "phy_tx_correct_count", 2, 3, {89, 85, 84}},
-> > +     { "phy_tx_crc_count", 2, 2, {87, 86}},
-> > +};
-> 
-> Hi Horatiu
-> 
-> Please could you look at using ethtool_phy_stats via the
-> .get_phy_stats() phy driver op.
+--=====_001_next=====
+Content-Type: multipart/related;
+	boundary="=====_002_next====="
 
-Yes, definetly I will update this in the next version.
 
-> 
-> > +static int lan8842_config_init(struct phy_device *phydev)
-> > +{
-> > +     int val;
-> > +     int ret;
-> > +
-> > +     /* Reset the PHY */
-> > +     val = lanphy_read_page_reg(phydev, 4, LAN8814_QSGMII_SOFT_RESET);
-> > +     if (val < 0)
-> > +             return val;
-> > +     val |= LAN8814_QSGMII_SOFT_RESET_BIT;
-> > +     lanphy_write_page_reg(phydev, 4, LAN8814_QSGMII_SOFT_RESET, val);
-> 
-> It looks like there are sufficient pairs of
-> lanphy_read_page_reg()/lanphy_write_page_reg() you would be justified
-> adding a lanphy_modify_page_reg().
+--=====_002_next=====
+Content-Type: multipart/alternative;
+	boundary="=====_003_next====="
 
-I agree, I can do that.
 
-> 
-> > +}, {
-> > +     .phy_id         = PHY_ID_LAN8842,
-> > +     .phy_id_mask    = MICREL_PHY_ID_MASK,
-> 
-> I think you could use PHY_ID_MATCH_MODEL() here.  It would make it
-> different to every other PHY, but maybe you could start with some
-> cleanup patches, adding the _modify_ call etc?
+--=====_003_next=====
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
 
-Yes, I will use PHY_ID_MATCH_MODEL().
-I was thinking to start with 2 cleanup patches, one to use
-PHY_ID_MATCH_MODEL in the driver and one to introduce
-lanphy_modify_page_reg and put it to use.
-Do you have other suggestions?
+PiA+IFRoYW5rcyBmb3IgY2hlY2tpbmchIEkganVzdCB3YW50ZWQgdG8gZW5zdXJlIHRoZSB2NyBw
+YXRjaCB3YXNu4oCZdCBtaXNzZWQg4oCUIGl04oCZcyBpZGVudGljYWwgdG8gdGhlIG9yaWdpbmFs
+Lg0KPiANCj4gWW91IGNhbiBjaGVjayB0aGUgcGF0Y2ggc3RhdHVzIGluIHBhdGNod29yaywgYW5k
+IGFjdHVhbGx5IHRoaXMgdjcNCj4gbWFya2VkIHRoZSBwcmV2aW91cyB2NyBhcyBTdXBlcnNlZGVk
+LCBzbyB5b3UgZGlkbid0IG5lZWQgdG8gcmVzZW5kIDopDQo+IA0KPiBodHRwczovL3BhdGNod29y
+ay5rZXJuZWwub3JnL3Byb2plY3QvbmV0ZGV2YnBmL2xpc3QvP3N1Ym1pdHRlcj0yMTc1NDkmc3Rh
+dGU9Kg0KDQpIaSBLdW5peXVraSwNCg0KVGhhbmtzIGZvciB0aGUgY2xhcmlmaWNhdGlvbiEgSeKA
+mXZlIGNoZWNrZWQgdGhlIFBhdGNod29yayBsaW5rIGFuZCBub3cNCnNlZSB0aGUgdjcgc3RhdHVz
+KCJOZXciKS4gTXkgYXBvbG9naWVzIGZvciB0aGUgcmVkdW5kYW50IHJlc2VuZCDigJQgSeKAmWxs
+DQphdm9pZCB0aGlzIGluIHRoZSBmdXR1cmUuDQoNCkFwcHJlY2lhdGUgeW91ciBwYXRpZW5jZSBh
+bmQgZ3VpZGFuY2UhDQoNCkJlc3QgcmVnYXJkcywNCkZhbiBZdQ==
 
-> 
->         Andrew
 
--- 
-/Horatiu
+--=====_003_next=====
+Content-Type: text/html ;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+
+PGRpdiBjbGFzcz0iemNvbnRlbnRSb3ciPjxwPiZndDsgJmd0OyBUaGFua3MgZm9yIGNoZWNraW5n
+ISBJIGp1c3Qgd2FudGVkIHRvIGVuc3VyZSB0aGUgdjcgcGF0Y2ggd2FzbuKAmXQgbWlzc2VkIOKA
+lCBpdOKAmXMgaWRlbnRpY2FsIHRvIHRoZSBvcmlnaW5hbC48L3A+PHA+Jmd0OyZuYnNwOzwvcD48
+cD4mZ3Q7IFlvdSBjYW4gY2hlY2sgdGhlIHBhdGNoIHN0YXR1cyBpbiBwYXRjaHdvcmssIGFuZCBh
+Y3R1YWxseSB0aGlzIHY3PC9wPjxwPiZndDsgbWFya2VkIHRoZSBwcmV2aW91cyB2NyBhcyBTdXBl
+cnNlZGVkLCBzbyB5b3UgZGlkbid0IG5lZWQgdG8gcmVzZW5kIDopPC9wPjxwPiZndDsmbmJzcDs8
+L3A+PHA+Jmd0OyBodHRwczovL3BhdGNod29yay5rZXJuZWwub3JnL3Byb2plY3QvbmV0ZGV2YnBm
+L2xpc3QvP3N1Ym1pdHRlcj0yMTc1NDkmYW1wO3N0YXRlPSo8L3A+PHA+PGJyPjwvcD48cD5IaSBL
+dW5peXVraSw8L3A+PHA+PGJyPjwvcD48cD5UaGFua3MgZm9yIHRoZSBjbGFyaWZpY2F0aW9uISBJ
+4oCZdmUgY2hlY2tlZCB0aGUgUGF0Y2h3b3JrIGxpbmsgYW5kIG5vdzwvcD48cD5zZWUgdGhlIHY3
+IHN0YXR1cygiTmV3IikuIE15IGFwb2xvZ2llcyBmb3IgdGhlIHJlZHVuZGFudCByZXNlbmQg4oCU
+IEnigJlsbDwvcD48cD5hdm9pZCB0aGlzIGluIHRoZSBmdXR1cmUuPC9wPjxwPjxicj48L3A+PHA+
+QXBwcmVjaWF0ZSB5b3VyIHBhdGllbmNlIGFuZCBndWlkYW5jZSE8L3A+PHA+PGJyPjwvcD48cD5C
+ZXN0IHJlZ2FyZHMsPC9wPjxwPkZhbiBZdTwvcD48L2Rpdj4=
+
+
+--=====_003_next=====--
+
+--=====_002_next=====--
+
+--=====_001_next=====--
+
 
