@@ -1,94 +1,96 @@
-Return-Path: <netdev+bounces-208938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63F8BB0DA11
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 14:48:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99078B0DA6D
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 15:01:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E2407A1820
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 12:46:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8596169E1A
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 13:01:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A5EB28C2AA;
-	Tue, 22 Jul 2025 12:48:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="nnmZSk8B"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C387E2E9EB1;
+	Tue, 22 Jul 2025 13:01:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C36724467B;
-	Tue, 22 Jul 2025 12:48:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DCE428C2DE;
+	Tue, 22 Jul 2025 13:01:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753188495; cv=none; b=NqRbbLPpkeAlvz2hqji0TOly7aX9aRmTHNc1Z3o5BiLRAb7CS+t5qjxYYF4/anFSOtj6GDSP0rwfLDceqUV1M4Vnyl3AmjR1ruXyOiakjC2w+QlheIXeuxOnY3zwB/jOM+96QR+N/83Whv3vjWWYkhUElmpDhbfJCaJsBBC3iic=
+	t=1753189302; cv=none; b=AU79KF67AoIIu2FV9gHYL7jyPxAL88c0rTKQseiwjMUFOYnsaNOBwZOMAlEpksdOBkSEiUj9lHYUx6aXhZW3vXO3jO6l6xWjm7gBvz8DcMhjygpJEGONOtVbBBu4AHresQCF/KvHjjWRiWfqurgJ9IgP0tq6pD2/2kC0BvKQLuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753188495; c=relaxed/simple;
-	bh=/yIxqrnzluFHj9TqLjrY/6SyPBFMZXFZI/JpCXQrTiY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oqv2B1KeYncHuXtMfqm4LEiYkIsYVcsuHnPTuuofaha2ry+G8l6sHkEeKN8KKOJhrzCmZWwBxOQlmvQy9qfraMRrhlKFiSRSSOGkUDxOYmeq2tJ7h0bMRgBjXXBaS2ULTM1YisK81YAEEOjDtfvBBOSTAwoKzXOGQ117AtDSVLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=nnmZSk8B; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id DFF7F44418;
-	Tue, 22 Jul 2025 12:48:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1753188485;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OUo8VzMpbPTsIOoCrITkRVF9uqYE50JackCo8hbt3/A=;
-	b=nnmZSk8Bck1Ipn5A3as+/CIaxE3KGooGipDHkJTNG/bOOgB8M+xyUR25t6dzD8zvvumHHC
-	M0mn80Ej3wP2ybOvZHfscdDd02R4lc2NDEj1bZsNx1Ry/SxotWWWJzVzlUBCBXyQJw1LJ6
-	EcdUHMSGMUcH8gaq6XYQG5WD12vHb2zB/qi4+sl+H8bnnQkVaV+y/7WPDKhofm4ab5bEWg
-	l8Etm5VGfHvFjYqs9xRTFtiiIfrEuJa4erAD3eYV/D2643PGwE2wU9z1GbmJasELC0rUAQ
-	ZqnMoViFPqtjMB1AVX+Vj98BX/Fon/Rv/j07SdN6lx1ZefGRGKNx5bXaofjakA==
-Date: Tue, 22 Jul 2025 14:48:02 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Tiezhu Yang <yangtiezhu@loongson.cn>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/2] net: stmmac: Return early if invalid in
- loongson_dwmac_fix_reset()
-Message-ID: <20250722144802.637bfde0@fedora.home>
-In-Reply-To: <20250722062716.29590-2-yangtiezhu@loongson.cn>
-References: <20250722062716.29590-1-yangtiezhu@loongson.cn>
-	<20250722062716.29590-2-yangtiezhu@loongson.cn>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1753189302; c=relaxed/simple;
+	bh=x3ST585+9Q0bgAI/ftBoqhybhQK0Pieo1wn9bMm+NqU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nn4jr866ndSxs3qFuFvxuSNICx3D1GBjZKhUgDph6MVC4vXdIrBWia81P9L9ZSntmriZl3UcMcPzJUeWGgsRfb2PMwW/YLAITEYolA4K53ZVTS8dJ4Qdo8oUR7If8/auTcWOgXN1Ca+dR8i1a0ajP5UlXiUW+FFV8jlaCbLjMG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4bmcjx5qTtzdc29;
+	Tue, 22 Jul 2025 20:57:25 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id C7C61140202;
+	Tue, 22 Jul 2025 21:01:35 +0800 (CST)
+Received: from localhost.localdomain (10.90.31.46) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 22 Jul 2025 21:01:34 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
+CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
+	<chenhao418@huawei.com>, <jonathan.cameron@huawei.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<shaojijie@huawei.com>
+Subject: [PATCH V2 net 0/4] There are some bugfix for the HNS3 ethernet driver
+Date: Tue, 22 Jul 2025 20:54:19 +0800
+Message-ID: <20250722125423.1270673-1-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdejgeelgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepledtrdejiedriedvrddujedunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdejiedriedvrddujedupdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeekpdhrtghpthhtohephigrnhhgthhivgiihhhusehlohhonhhgshhonhdrtghnpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrt
- ghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-On Tue, 22 Jul 2025 14:27:15 +0800
-Tiezhu Yang <yangtiezhu@loongson.cn> wrote:
+There are some bugfix for the HNS3 ethernet driver
 
-> If the DMA_BUS_MODE_SFT_RESET bit is 1 before software reset,
-> there is no need to do anything for this abnormal case, just
-> return -EINVAL immediately in loongson_dwmac_fix_reset().
-> 
-> Signed-off-by: Tiezhu Yang <yangtiezhu@loongson.cn>
+---
+ChangeLog:
+v1 -> v2:
+  - Fix wrong Fixes tag, suggested by Simon Horman
+  - Replace min_t() with min(), suggested by Simon Horman
+  - Split patch4, omits the ethtool changes,
+    ethtool changes will be sent to net-next, suggested by Simon Horman
+  v1: https://lore.kernel.org/all/20250702130901.2879031-1-shaojijie@huawei.com/
+---
 
-Do you know when that could ever happen ? I'm asking because this logic
-for the DMA reset is duplicated in several places in this driver, maybe
-this could be useful for other users as well. I'm guessing this is to
-avoid waiting for the timeout when the DMA reset fails, but that is
-usually when there's a missing clock somewhere (such as the RGMII clock
-from the PHY), in which case I don't think the RST bit will be set.
+Jian Shen (2):
+  net: hns3: fix concurrent setting vlan filter issue
+  net: hns3: fixed vf get max channels bug
 
-Maxime
+Jijie Shao (1):
+  net: hns3: default enable tx bounce buffer when smmu enabled
+
+Yonglong Liu (1):
+  net: hns3: disable interrupt when ptp init failed
+
+ .../net/ethernet/hisilicon/hns3/hns3_enet.c   | 31 ++++++++++++++++
+ .../net/ethernet/hisilicon/hns3/hns3_enet.h   |  2 ++
+ .../hisilicon/hns3/hns3pf/hclge_main.c        | 36 +++++++++++--------
+ .../hisilicon/hns3/hns3pf/hclge_ptp.c         |  9 +++--
+ .../hisilicon/hns3/hns3vf/hclgevf_main.c      |  6 +---
+ 5 files changed, 61 insertions(+), 23 deletions(-)
+
+-- 
+2.33.0
+
 
