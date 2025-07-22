@@ -1,215 +1,156 @@
-Return-Path: <netdev+bounces-209064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8DD9B0E258
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 19:03:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8871DB0E25E
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 19:06:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 757681AA7CB2
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 17:04:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 44F971C83642
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 17:06:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5E627C17E;
-	Tue, 22 Jul 2025 17:03:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF0F27E7EE;
+	Tue, 22 Jul 2025 17:06:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Py79Qm8z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I326v3hJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE58DBA36
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 17:03:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425F220C038;
+	Tue, 22 Jul 2025 17:06:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753203829; cv=none; b=Uv6w7Q/UNkUMw8aNMyo0mtaULLvF4/uZ3sh6xztjpltY4WLstPAb6SVHGyJr91PCohh9kbkwZf3FVYuOF2GVg0ACI7KrVldbEMzq48n/nt9jPJPwjjjo7Ipc2En0upZm/JlLSKS9feazx9IDtR0P5BtJP48U/reM5+bR32ncssQ=
+	t=1753203979; cv=none; b=NoXQO6oZULuvPuqAmp1avVU84EYFP4XYI0ZjnZZW3xn2guiCltkV3GtH2836GjZZl7nHyQ2SQR5H4PeWIzr9VSBbn05z6J4fjPa49bM1vYrKPO+Ww29GaAWL7ut0Tg+P3PAJm8Rd1eiDBffHZ+p8RqO2mG0jF+wEp2PeCWyWRGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753203829; c=relaxed/simple;
-	bh=C4ygKWRUmwX4LLvc4OXae9hOgNNQ1OiBqucIuvTscpI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qrj3go4hshI9tBPsU/uRdzHB3Z15HjELcMIcvyfbbykKeer0cwaTA3eY52mE0fY+VNg4KY4Brs478EaA0Pt/21xFYKvc/fnr1ZYK6CKHYyqWxyi2v7CwJ4PrX0H0yon+/xhsdzLZfWRxWkxYA/XReD9a5JT0UxaDyxtACCkbzgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Py79Qm8z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 530C3C4CEEB;
-	Tue, 22 Jul 2025 17:03:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753203828;
-	bh=C4ygKWRUmwX4LLvc4OXae9hOgNNQ1OiBqucIuvTscpI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Py79Qm8zD1pBwiLPMBvhZiGIgB5bRgEyUsI8BFy6N7KcPrxfgfIy4NwbhEOn8wS0s
-	 yoquk38AGSWaAcOu+wIyFtLD7y91VO46xXGWSpqJsbS6ai87HwPQYQXPwHP7Br2E9R
-	 Ee+AB8es5gVy+9fSKWdMySa64d9piiD7hLC8YW2X0PICP+YS0b84KcMg4hfcmugOGO
-	 ScyHEj6dMYfCCJ8HUrPphrduPPPtoIQKcXmJSfUHGJK1RgTx18LGGoSFaK4Vqht4yx
-	 Q7RAjQt/9FTd9/Ydj4PKm5/UTL8/2nAD4egs2XLXDY/DdpcyBs1nBuexz5+JqSP2Jp
-	 YW0xklBE/Zshw==
-Date: Tue, 22 Jul 2025 18:03:44 +0100
-From: Simon Horman <horms@kernel.org>
-To: Subbaraya Sundeep <sbhatta@marvell.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, gakula@marvell.com,
-	hkelam@marvell.com, bbhushan2@marvell.com, jerinj@marvell.com,
-	lcherian@marvell.com, sgoutham@marvell.com, netdev@vger.kernel.org
-Subject: Re: [net-next PATCH v3 07/11] octeontx2-pf: Initialize cn20k
- specific aura and pool contexts
-Message-ID: <20250722170344.GS2459@horms.kernel.org>
-References: <1752772063-6160-1-git-send-email-sbhatta@marvell.com>
- <1752772063-6160-8-git-send-email-sbhatta@marvell.com>
+	s=arc-20240116; t=1753203979; c=relaxed/simple;
+	bh=+7hq+WLdRqopPF+CFD7fiq+PsdOgDtJNEsq2kRZLNgs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=K7HYnxubJy4JkK/t5gCW3gH80h5ys4Kd6Uod3LpYS2P+gp8zURw7vuR2JM7ETKobsmwZ4tSrWCID+bz8l4eKlqNrqTiNQSTsFsoa/0zCXGpxMVk6CxFRovBez8P3dcDfGMRrqrCw94VxihMatzUohGT0SbP5/iBy46qihC5AK9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I326v3hJ; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-748feca4a61so3201652b3a.3;
+        Tue, 22 Jul 2025 10:06:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753203974; x=1753808774; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GJQH/hF+xiHb5wpOlNLaNq0/n1MDfFBc0fOnEVl8MF0=;
+        b=I326v3hJAFF7Dc+yROokrg8kintpEtwnRxGivtDjRPcTa/blHynghcEG9NdaqUIAvw
+         0VFtNBxv5u2W6mjzhHSckssCVFJDM3eU/9LCM4xYBPlCoP7Es3+EAG8kHnHSP0ofm+Cu
+         Z4b2/AMCR9tKynvDZL+0ITxJFJXMUM0pfOZVn3M+lWaZa00vg+cG/ZNYW7Fe3BtqPMyq
+         3XsoBCex6gzoo2cv75dGFkymkpbLwfXuqrIvh4MTSiHXgXxIueegTP5+cZVCcDv7yeO2
+         wRMEUnCE3ikImq9cMf6UitFjNZz+MAV9WWaLLp32qGYDAHWYUEPFFOvifZdEsUdQR3t1
+         8gqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753203974; x=1753808774;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GJQH/hF+xiHb5wpOlNLaNq0/n1MDfFBc0fOnEVl8MF0=;
+        b=D5sqMsGSGjn3/F9XRATwTyZxrcpXNWXHOJNlNzc5isbRt03jt2e7JXqZegjT9FkqRn
+         0QFI2F+E3HUmBWOJAeSpWR/muU4ByjXQnBx37GrqqYV8Hj5Q8GptLEt8gpD27IRg+ISp
+         1ktBiUJnk3u7v6BW2N1oozR56yVhv8DNbtAPQjdCvKu50CcyYtkNnjnlTtVopT74ZlcY
+         3FjpIXq6fGK8zon35EjeUJh+p1qCP79ay6Vr/KtcaKixaUJsgiZXAClMFKuv0emOce90
+         gaosVBgapDy+v9Jq/ZrJt7TPo9T5WoPydcSmq92q+9r5vrr/CRHNK7Bwh4Zv5EWKc8v3
+         uLVw==
+X-Forwarded-Encrypted: i=1; AJvYcCUQjpko9i+gVf06XxrRFXGTA4JTJMF07qd/ONZ1V70q0UvIsWPHy9kqJgNh4cvcIPHw4esJrdM2HGbS@vger.kernel.org, AJvYcCVOTjcR4u69PxgXPC5W/TSVCiIhKGfD5dEHnjropg1zYdXGJ1PrVLwjfnj6b6M6ZWqEjCPhu6jCfKZO@vger.kernel.org, AJvYcCVgg/7zqglA/ptFk6jxxhVhqYcvzC3KKOwuT80tfYq9PUzVvjuucYnu1lhdmnqWWaIiOw0qMzeX@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnwoZvjLozfJHjtWzhHjfK35ahjWoqr+zfDqJnP9zWaQiOtBrq
+	mCeCQBCIhD4DGhN1C0HzoFJloMeUMzrs6fiZTnYPrU0sv2q2I1mjx4N3JlHTkjvqKxc=
+X-Gm-Gg: ASbGncuLSGoiXe394dWosM/3kS+KAr0zvm1nH+L1u4yi/SS9+r1NVwvoq6GZp/OUlrU
+	ZlE15DlG7gwKa+jIdY0mGAYr1sQpZu5/18ZgeQUoYa4+dG4FOms2kV/1w3t59SLCrL4WWv8pxE4
+	v57b/DdTPMcxG7UMu+j3Yy4GNjSt8LEfC85f5hjmdapYQJL43CF0c3OZRkSFEjju8jwkysFbMlt
+	l04onkrvxwNABMxJ5RClsmelfQkIlFKjYfq9opVny2jlz3aT6iHn8Io5ZERrF8fC6pMFarDMK4t
+	593ylhRkdmJpAOW49tNQxI/xBSQhy1VUVP7TjWHAPRo2Vmzq1fRx1zTf9U3L6ZwVGdT3KLTnle1
+	j4cjNJ6p1rgUlQ0AFep/CgJUo6NaeUVY=
+X-Google-Smtp-Source: AGHT+IEkw8+Vtk94z6sfnq2tvcwIOwJg956iq0XweSQItS4GP7Y0qaUNiQVwgOPzwgaUtt2BcOqzAQ==
+X-Received: by 2002:a05:6a20:6a09:b0:232:6809:d41a with SMTP id adf61e73a8af0-2381244da0bmr42904835637.14.1753203974225;
+        Tue, 22 Jul 2025 10:06:14 -0700 (PDT)
+Received: from km-host.. ([49.207.192.227])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b3f2fe63065sm7350732a12.15.2025.07.22.10.06.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Jul 2025 10:06:13 -0700 (PDT)
+From: Sanjay Suthar <sanjaysuthar661996@gmail.com>
+To: linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-iio@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-amlogic@lists.infradead.org
+Cc: ribalda@kernel.org,
+	jic23@kernel.org,
+	dlechner@baylibre.com,
+	nuno.sa@analog.com,
+	andy@kernel.org,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	neil.armstrong@linaro.org,
+	khilman@baylibre.com,
+	jbrunet@baylibre.com,
+	martin.blumenstingl@googlemail.com,
+	Sanjay Suthar <sanjaysuthar661996@gmail.com>
+Subject: [PATCH v3] dt-bindings: cleanup: fix duplicated 'is is' in YAML docs
+Date: Tue, 22 Jul 2025 22:35:13 +0530
+Message-Id: <20250722170513.5854-1-sanjaysuthar661996@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1752772063-6160-8-git-send-email-sbhatta@marvell.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jul 17, 2025 at 10:37:39PM +0530, Subbaraya Sundeep wrote:
-> From: Linu Cherian <lcherian@marvell.com>
-> 
-> With new CN20K NPA pool and aura contexts supported in AF
-> driver this patch modifies PF driver to use new NPA contexts.
-> Implement new hw_ops for intializing aura and pool contexts
-> for all the silicons.
-> 
-> Signed-off-by: Linu Cherian <lcherian@marvell.com>
-> Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+Fix minor grammatical issues by removing duplicated "is" in two devicetree
+binding documents:
 
-...
+- net/amlogic,meson-dwmac.yaml
+- iio/dac/ti,dac7612.yaml
 
-> @@ -250,3 +239,170 @@ int cn20k_register_pfvf_mbox_intr(struct otx2_nic *pf, int numvfs)
->  
->  	return 0;
->  }
-> +
-> +#define RQ_BP_LVL_AURA   (255 - ((85 * 256) / 100)) /* BP when 85% is full */
-> +
-> +static int cn20k_aura_aq_init(struct otx2_nic *pfvf, int aura_id,
-> +			      int pool_id, int numptrs)
-> +{
-> +	struct npa_cn20k_aq_enq_req *aq;
-> +	struct otx2_pool *pool;
-> +	int err;
-> +
-> +	pool = &pfvf->qset.pool[pool_id];
-> +
-> +	/* Allocate memory for HW to update Aura count.
-> +	 * Alloc one cache line, so that it fits all FC_STYPE modes.
-> +	 */
-> +	if (!pool->fc_addr) {
-> +		err = qmem_alloc(pfvf->dev, &pool->fc_addr, 1, OTX2_ALIGN);
-> +		if (err)
-> +			return err;
-> +	}
-> +
-> +	/* Initialize this aura's context via AF */
-> +	aq = otx2_mbox_alloc_msg_npa_cn20k_aq_enq(&pfvf->mbox);
-> +	if (!aq) {
-> +		/* Shared mbox memory buffer is full, flush it and retry */
-> +		err = otx2_sync_mbox_msg(&pfvf->mbox);
-> +		if (err)
-> +			return err;
-> +		aq = otx2_mbox_alloc_msg_npa_cn20k_aq_enq(&pfvf->mbox);
-> +		if (!aq)
-> +			return -ENOMEM;
-> +	}
-> +
-> +	aq->aura_id = aura_id;
-> +
-> +	/* Will be filled by AF with correct pool context address */
-> +	aq->aura.pool_addr = pool_id;
-> +	aq->aura.pool_caching = 1;
-> +	aq->aura.shift = ilog2(numptrs) - 8;
-> +	aq->aura.count = numptrs;
-> +	aq->aura.limit = numptrs;
-> +	aq->aura.avg_level = 255;
-> +	aq->aura.ena = 1;
-> +	aq->aura.fc_ena = 1;
-> +	aq->aura.fc_addr = pool->fc_addr->iova;
-> +	aq->aura.fc_hyst_bits = 0; /* Store count on all updates */
-> +
-> +	/* Enable backpressure for RQ aura */
-> +	if (aura_id < pfvf->hw.rqpool_cnt && !is_otx2_lbkvf(pfvf->pdev)) {
-> +		aq->aura.bp_ena = 0;
-> +		/* If NIX1 LF is attached then specify NIX1_RX.
-> +		 *
-> +		 * Below NPA_AURA_S[BP_ENA] is set according to the
-> +		 * NPA_BPINTF_E enumeration given as:
-> +		 * 0x0 + a*0x1 where 'a' is 0 for NIX0_RX and 1 for NIX1_RX so
-> +		 * NIX0_RX is 0x0 + 0*0x1 = 0
-> +		 * NIX1_RX is 0x0 + 1*0x1 = 1
-> +		 * But in HRM it is given that
-> +		 * "NPA_AURA_S[BP_ENA](w1[33:32]) - Enable aura backpressure to
-> +		 * NIX-RX based on [BP] level. One bit per NIX-RX; index
-> +		 * enumerated by NPA_BPINTF_E."
-> +		 */
-> +		if (pfvf->nix_blkaddr == BLKADDR_NIX1)
-> +			aq->aura.bp_ena = 1;
-> +#ifdef CONFIG_DCB
-> +		aq->aura.bpid = pfvf->bpid[pfvf->queue_to_pfc_map[aura_id]];
-> +#else
-> +		aq->aura.bpid = pfvf->bpid[0];
-> +#endif
+Signed-off-by: Sanjay Suthar <sanjaysuthar661996@gmail.com>
+---
+Changes since V2:
+- Corrected the subject line
+- link to v2 : https://lore.kernel.org/linux-iio/20250720182627.39384-1-sanjaysuthar661996@gmail.com/T/#u
 
-From a build coverage point of view it is a shame that we can't use
-something like this here (because queue_to_pfc_map doesn't exist
-if CONFIG_DCB isn't enabled).
+ Documentation/devicetree/bindings/iio/dac/ti,dac7612.yaml      | 2 +-
+ Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-		bpid_idx = IS_ENABLED(CONFIG_DCB) ? ...;
-
-But I do wonder if somehow it's nicer to constrain the #ifdef to an
-as-small-as-possible helper. Something like this (compile tested only):
-
-@@ -242,6 +242,15 @@ int cn20k_register_pfvf_mbox_intr(struct otx2_nic *pf, int numvfs)
+diff --git a/Documentation/devicetree/bindings/iio/dac/ti,dac7612.yaml b/Documentation/devicetree/bindings/iio/dac/ti,dac7612.yaml
+index 20dd1370660d..624c640be4c8 100644
+--- a/Documentation/devicetree/bindings/iio/dac/ti,dac7612.yaml
++++ b/Documentation/devicetree/bindings/iio/dac/ti,dac7612.yaml
+@@ -9,7 +9,7 @@ title: Texas Instruments DAC7612 family of DACs
+ description:
+   The DAC7612 is a dual, 12-bit digital-to-analog converter (DAC) with
+   guaranteed 12-bit monotonicity performance over the industrial temperature
+-  range. Is is programmable through an SPI interface.
++  range. It is programmable through an SPI interface.
  
- #define RQ_BP_LVL_AURA   (255 - ((85 * 256) / 100)) /* BP when 85% is full */
+ maintainers:
+   - Ricardo Ribalda Delgado <ricardo@ribalda.com>
+diff --git a/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml b/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml
+index 0cd78d71768c..5c91716d1f21 100644
+--- a/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml
++++ b/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml
+@@ -149,7 +149,7 @@ properties:
+       - description:
+           The first register range should be the one of the DWMAC controller
+       - description:
+-          The second range is is for the Amlogic specific configuration
++          The second range is for the Amlogic specific configuration
+           (for example the PRG_ETHERNET register range on Meson8b and newer)
  
-+static u8 cn20k_aura_bpid_idx(struct otx2_nic *pfvf, int aura_id)
-+{
-+#ifdef CONFIG_DCB
-+	return pfvf->queue_to_pfc_map[aura_id];
-+#else
-+	return 0;
-+#endif
-+}
-+
- static int cn20k_aura_aq_init(struct otx2_nic *pfvf, int aura_id,
- 			      int pool_id, int numptrs)
- {
-@@ -289,6 +298,7 @@ static int cn20k_aura_aq_init(struct otx2_nic *pfvf, int aura_id,
- 	/* Enable backpressure for RQ aura */
- 	if (aura_id < pfvf->hw.rqpool_cnt && !is_otx2_lbkvf(pfvf->pdev)) {
- 		aq->aura.bp_ena = 0;
-+		u8 bpid_idx;
- 		/* If NIX1 LF is attached then specify NIX1_RX.
- 		 *
- 		 * Below NPA_AURA_S[BP_ENA] is set according to the
-@@ -303,11 +313,9 @@ static int cn20k_aura_aq_init(struct otx2_nic *pfvf, int aura_id,
- 		 */
- 		if (pfvf->nix_blkaddr == BLKADDR_NIX1)
- 			aq->aura.bp_ena = 1;
--#ifdef CONFIG_DCB
--		aq->aura.bpid = pfvf->bpid[pfvf->queue_to_pfc_map[aura_id]];
--#else
--		aq->aura.bpid = pfvf->bpid[0];
--#endif
-+
-+		bpid_idx = cn20k_aura_bpid_idx(pfvf, aura_id);
-+		aq->aura.bpid = pfvf->bpid[bpid_idx];
- 
- 		/* Set backpressure level for RQ's Aura */
- 		aq->aura.bp = RQ_BP_LVL_AURA;
+   interrupts:
+-- 
+2.34.1
 
-> +
-> +		/* Set backpressure level for RQ's Aura */
-> +		aq->aura.bp = RQ_BP_LVL_AURA;
-> +	}
-> +
-> +	/* Fill AQ info */
-> +	aq->ctype = NPA_AQ_CTYPE_AURA;
-> +	aq->op = NPA_AQ_INSTOP_INIT;
-> +
-> +	return 0;
-> +}
-
-...
 
