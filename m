@@ -1,238 +1,218 @@
-Return-Path: <netdev+bounces-208803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68463B0D2AE
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 09:23:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98279B0D2EC
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 09:28:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18C68547A68
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 07:22:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F4311889301
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 07:26:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D01912C08D7;
-	Tue, 22 Jul 2025 07:21:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 703FE2D878A;
+	Tue, 22 Jul 2025 07:24:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="RxkidkaG"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="mLe5XmGU"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2087.outbound.protection.outlook.com [40.107.237.87])
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E80F52BF015;
-	Tue, 22 Jul 2025 07:21:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.87
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753168896; cv=fail; b=mehyZ8Woqlz32izi1992v4BSXX1a3kXfCDrgj2t/Z0M3p3GzAL4WcA3cBLelEW5H/2TSInuaeIcPqX8C/3azWjSwpMXiB94BNCyAHbhDyiBEQJNdesxyET3Gu7mHS2eYExEm4EiAsOQdXK3YFenCJYbLWJbT+Ci0bgh3LhK77Lg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753168896; c=relaxed/simple;
-	bh=FTSNTD9H3N4D+4lv929yawkP+uEIHTXHXQvS67Vn2jw=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Qgg+Vt+JzjDmB/qBVKalE2V+IvSppDzbjVEUTDDP78vx9kTMpe3luSzHCtZZkveYt7GC1NfrW9JK+g+ZPEmAmiYIXXiWQIoovkrVzuw8wZ/FcbbNDSGnFrwZsX+m7Z8QRqvYE+0LLi+bu7MaH4qRoujGPc6dUyRwkLnM/GTUFJo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=RxkidkaG; arc=fail smtp.client-ip=40.107.237.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hsLhOAFZbAyGEvqNxFkZEHAjSAbh/Vh6kkRSMbfByZlLJzatigWEgyqDGlXLCnRcioUJZyJKLFsVelS9+DM0tfJecQLXIVhoYbClc1wt1PKH1SpOnhCfd3LJPxfwitQnPsmpQBc1dzkfepWpMUZEYT5dDMlMShVYUqb423mpLV2aWIbNjYbQnqpU0oOL9B4sFUbOSsL1D5BryeTQccvAeS6rnzjoixdu2jO/Cnyppb31J2CvhkOUc5v4XtREXByf71979dexHRYx17qnR3od0GALMjo0yAYz2xczoTNcX2olL/n9uf84u9rJz4fS1P6Xa1rF0hsjpW45Mt6tSMGQ4g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=M60U9KtDzz+Yk5URKC709I2SR2rzi6+QaVe1heuHA8Y=;
- b=T9ciK91vGehXWzmkjzQF97B6NB2bGIY6xSB1pcdFGGl5DXMJ2EVtR6ag3A6NCgZnTYglrQMMYKNqABBA/SKefIFsywmy+R7bx457X7HRPdBuqbDURiQdSzl2pgIBgMexW1dfhsHlRt4cdSPTKDF721Q4lSNiv1yeXTOBGGAnHy505u5qaKPZrVZgJp7jMfjaLwqTn+lyW65pUthIGGlhekJNSdBv9EK57hYz1Fl/RIReexvIY64hSu3vct5Wm42CSG6N/J+IrRaERRpF+I112Dj7zJLFmCbdyDII7NbzgQiPBeRPXxW/ahr1IiipuQBhUHt3L+sWQYhCDTe5qV/QeQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=M60U9KtDzz+Yk5URKC709I2SR2rzi6+QaVe1heuHA8Y=;
- b=RxkidkaGwRANTfRaF+jEP1Nj6U1zHmjaWFElk7KzlU+GGG4iaSqsHgAg+fUZK9VlbEdHPQNiJJEAxEXQmCrS2wXAlFO21Jy+yKHVe92WeNmU0MVrBk/EvTynwBIaSA5o1HnNs8H8JbDUDrt8HHujKAkBBm1V0bx4UbHZJbvgC7tvXac0GrnOiAhkrtHWy94WiOh9n3d+ZcfIpBXiwlxUfoztGho9PKUJIJeenP2mMMHIsR+9+dQqHqTB35e+J0l5Um5kddRP58FxDR7QN5Q1pnDLjDTfw2eHjDhxypPBhbu54OKamTw4b2tRCzr8P6k+ZPTbtSBRyHdbq23pgyxthA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from IA1PR12MB7496.namprd12.prod.outlook.com (2603:10b6:208:418::10)
- by DM4PR12MB7696.namprd12.prod.outlook.com (2603:10b6:8:100::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8943.28; Tue, 22 Jul
- 2025 07:21:31 +0000
-Received: from IA1PR12MB7496.namprd12.prod.outlook.com
- ([fe80::8a53:2522:9d01:ec41]) by IA1PR12MB7496.namprd12.prod.outlook.com
- ([fe80::8a53:2522:9d01:ec41%7]) with mapi id 15.20.8943.029; Tue, 22 Jul 2025
- 07:21:31 +0000
-Message-ID: <60729195-9c48-45fb-99c0-8965c95927df@nvidia.com>
-Date: Tue, 22 Jul 2025 10:21:22 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next V6 2/5] selftests: drv-net: Test XDP_PASS/DROP
- support
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Nimrod Oren <noren@nvidia.com>, Mohsin Bashir <mohsin.bashr@gmail.com>,
- netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, shuah@kernel.org, horms@kernel.org,
- cratiu@nvidia.com, cjubran@nvidia.com, mbloch@nvidia.com,
- jdamato@fastly.com, sdf@fomichev.me, ast@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, john.fastabend@gmail.com, nathan@kernel.org,
- nick.desaulniers+lkml@gmail.com, morbo@google.com, justinstitt@google.com,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
- tariqt@nvidia.com, thoiland@redhat.com
-References: <20250719083059.3209169-1-mohsin.bashr@gmail.com>
- <20250719083059.3209169-3-mohsin.bashr@gmail.com>
- <ab65545f-c79c-492b-a699-39f7afa984ea@nvidia.com>
- <20250721084046.5659971c@kernel.org>
- <eaca90db-897c-45a0-8eed-92c36dbec825@nvidia.com>
- <20250721133325.73e2f076@kernel.org>
-From: Gal Pressman <gal@nvidia.com>
-Content-Language: en-US
-In-Reply-To: <20250721133325.73e2f076@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: TLZP290CA0014.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:9::13) To IA1PR12MB7496.namprd12.prod.outlook.com
- (2603:10b6:208:418::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DACD62D0C9B
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 07:24:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753169091; cv=none; b=XlsJRoCAIXseQbkQlly6GNZ/fWZJxmzwLSivm9hZxUY1ALvRIwq8ph48RVncfxcYUDZLa3x38Um1dGCRiBFXnfgoqj3fVaXRowZhx8mHWQardXLitYRX4cIP2u4+CZNN1klRhJU5H8PBzmuRJMR2zovh+3aKlvzh049c1ciCQz4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753169091; c=relaxed/simple;
+	bh=4HhP2iNixfpmY9GA50RldzfymFrP5PRb/ex2XnKjRrQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jbhN+3X55WatXx9msq3UDIfqm4RPKOqrX3NXro7ejl86hBjyJz1vZb2eCgng1vQMIs71U+MhGyxUiuOeEbzdjQYv5dUTqc/XX1RBnA0e9QXUQ8VmDJyEaJMu5KkeRg284cZg/jFTdlnzKuI8M5+aEtiaiO2O5rMjVgSa+8Ubvmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=mLe5XmGU; arc=none smtp.client-ip=54.254.200.128
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1753168998;
+	bh=4HhP2iNixfpmY9GA50RldzfymFrP5PRb/ex2XnKjRrQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=mLe5XmGUOArSYdy/2/xBjJ8ilefcPJfI7C2P1v5h7B6E8O0V9PMg+NtyBhaDSkeR5
+	 AdzNmtpcZtE+7m1/mxUJSQ0fPLb13pFQBo2xwPv4R9v4GVq8YxQC5Ym2YssnmgJYtA
+	 XQ2tuch7o1eHx/9SfyMctramX02mE4k8SKTPjs9A=
+X-QQ-mid: zesmtpip4t1753168943tb2aa8fc1
+X-QQ-Originating-IP: jlkPh//3cQuVzne1YV9Hj8c3k19VYTQ4PPPWu+FTW/A=
+Received: from [IPV6:240e:668:120a::212:232] ( [localhost])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 22 Jul 2025 15:22:18 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 3880468087656715595
+EX-QQ-RecipientCnt: 62
+Message-ID: <634BA467821D37FE+0b2ace38-07d9-4500-8bb7-5a4fa65c4b9f@uniontech.com>
+Date: Tue, 22 Jul 2025 15:22:18 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA1PR12MB7496:EE_|DM4PR12MB7696:EE_
-X-MS-Office365-Filtering-Correlation-Id: 327f0d65-21e5-42be-a122-08ddc8f06124
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?TlAwcHRDdVhWNldiWUFtaDJwRUlkRWtYRGVZdlNiUnRscFR0NHJLMkN2MGo4?=
- =?utf-8?B?cnpFdktZSVB6Y2ZPbEt5Y0p3RE1RVFdrUkdFOUtJQ1ZRQmJCWDNjTjQra2VO?=
- =?utf-8?B?V1F2M2pQYThCdkFkUTh0WndxMkV4ZGVMbzJlNFE1MWtscXVZSThiczR6YlF1?=
- =?utf-8?B?Q1N3RUFFelJ1bEVma2oxNUNneHhVMHl4c2REdUpnRkVVOEQzeUwyWkRCMU9w?=
- =?utf-8?B?WG5GUnRMTndLL3lXeDlMVFBIWWViMXoyMWpZeTM1L3FIRlZvOWwvS3o3Und6?=
- =?utf-8?B?aTlXZy9iQy9CcFdObjBFS2cxRERkWGwzNTg4SlkwaVI2S2l2MWFieUxDSVl2?=
- =?utf-8?B?WEhNejliaXBESHpHd0YvS2hENjAzeDVSbE9uSU5hd3dsck42WkpiUWlJOGtl?=
- =?utf-8?B?MzFZWDhzd2JWTXNIUytnWXVRRW1GUlpqa2c3SlVWeG04S0I3M293Njc0NGpo?=
- =?utf-8?B?Vk9LbTJxaFNieVRHelEwRWw5TkRLSjR1aHIvdWlnMXdtYzF0MzRXRFN5RjVV?=
- =?utf-8?B?OHhmdXJwT2ZPeGFtN1RqYjFjOS9TZTI2eU9aVHBWdFE4a3ZzdXRYdFFadEdq?=
- =?utf-8?B?Z3Q2bTBrV3J6RXNzM3pRSmZSay96S21WaGNOcW04c3o4S3B2ZVVFK01WYzBB?=
- =?utf-8?B?bGlBTXprRDdkSTBnMlcvM1lmdXBNVWt2KzBRdlFCNXo1YVg3eVZ2VWxsbldW?=
- =?utf-8?B?YUw0aEFJb05wcmNBV1RXbVJTdm5IN3FNc1pNcEF3Szh5VkN3d1VRZkpObFN5?=
- =?utf-8?B?TTRTNGNLQyt3cE9NYVNYTHJUeVZQQ001QURUSmY0M1F5WTBMUytyTFZ5cFht?=
- =?utf-8?B?Yy9QRm5YUFpac0lwYmtMbFFtdzZuWDdsM0NXZ205RnQ3M3IxNDFrc2c2eXpt?=
- =?utf-8?B?Y3ZUM25zSVZqYWcwbEtaMWNvb1h6b2dLZ2dsVmlLbW1SU0FzeWdYMk1ueEt6?=
- =?utf-8?B?MjJJYmRxZE9Ud0dWaGl1MkxicW1rbG1RQVdZWk5PMW0zMHNnR3FybDUyaG5T?=
- =?utf-8?B?eDhIMDdyc0JJZ1ZxTWtMLzAvbTB1akhvcFlSNSszRUtSOG5MTm1DNEpnMU5G?=
- =?utf-8?B?UHRJeGdlL3JtSlBUWFBLemFUMUFsY2NoS0h5ekk2QWpsRnJoelV5UXJrMGZz?=
- =?utf-8?B?MHBWK3I4YndHZDQxRjlwcjMrQjZNSEJubFFjTWhDRnRsdlJmeUFaeEU3aURS?=
- =?utf-8?B?YzdqNktCRm80ek92d3U5eTEwcFQ3ZnU4U1Q0K1FVOEJkMUw5QVE3K3V5b1Jw?=
- =?utf-8?B?Tk41M2VzMlBMd3IrdittZHFoUjlIODVnTEl0WENBdzE0N3FYd3VsdjEyTTAx?=
- =?utf-8?B?K0FncVJmYkFFWE9xRzZjdW9KYzcvc21PNmoxZGw4dXgySmpXbW1QTFVQYlVH?=
- =?utf-8?B?OGh4SUY4dlFVdVJSajBTVU4vd1VoallxNDh0NjIzcDA0bU4vYk1IaHY5L3Y1?=
- =?utf-8?B?RUhaajltdkxaY09WUk4xWS95WU5MSm43ZFRVYld1aFpwYndPbXk4SHY4ZWZK?=
- =?utf-8?B?bHhOSVBrSWJhY3dQaWcwY0NPWHpDNEVDNWcyRGZmc3UxcmtDaWNFZVE3MEFX?=
- =?utf-8?B?SWJZZXkzelFkbzFieFQzUzV2Q0RSdHdKNGdWQkQwb3E0SU5hNXdIVFJEUmxs?=
- =?utf-8?B?K3dDOEVFUjhGUlFCdjFONGRLd21Sa1VVOVI0Wld2aWMrWkxITTN4SFQxNHU5?=
- =?utf-8?B?KzlYSnpwaUNISDIzYnhIS0lwWHJFMVBZMUVYRmxuKzZCcXN2WnFpVDdoOERa?=
- =?utf-8?B?Zk5XTHYrdmpOa3QvUlpFN0M3RE1iM3RBNW85UVVkelMxY0Qza21jcjVCQzBI?=
- =?utf-8?B?VmlRODlOZEFUaGQyTkFOemh3ZnJicWdJZERpeHl6TVY2bFpZa0JLRTJ4R0Nt?=
- =?utf-8?B?V1p0cXIzNWtSbmgvWTRSRjRVVzVIQ3BvSHFWQUtlUXBxVUdGSHZiS3p4UlJj?=
- =?utf-8?Q?0/InDrhCTzs=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB7496.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NUNpc20vNkJaVFJMY1l5R1lGbFJLMUVrcmdCSGFlM1NSRVRQc3VCQWJzZ2Jw?=
- =?utf-8?B?anlDZnh6SlNWN3l6eEhscGZtMnFVSGI3WWxqNG5pRTc3b3VReE50UmE1WkU0?=
- =?utf-8?B?cndMdXVOZUc0RnBjeEp3ZkMyZ2hndGdaWEF2S0xDaUZQQTIydXdpOUlTWXl2?=
- =?utf-8?B?dXJncFcrNms1VWdQcTVwWFhLQklxSGF5Sk05c0RJWkorNFJJaG5GRnV5NnVq?=
- =?utf-8?B?MGczZkpaSHNWTVluQTNVcDh6WGdRTFluc21vcFUvcURxenQrWFlFRWFOS0E1?=
- =?utf-8?B?cUFJb0MwbGJNNEtXUENHaW82dmhIOVFEaWo4dTl1V0Z3d2JaWUdZUXFibUlY?=
- =?utf-8?B?dkVtRGYxYTg1NXBYdmFlcUg1d0ZhQlVqTkU3QlJSbVRKWXo1Vk11NVBIOXpw?=
- =?utf-8?B?UDIxeVNnaW10Q0hsNXdOY0ZUU2txWEx6N0h2YjdPNTBSMWpuL2dUN3htWFkv?=
- =?utf-8?B?ZFRZc1BXUGxsdWtDU0JuWEZ2RWdBNmRkVThIZWlQblN2eURaUFdON1A5TmFP?=
- =?utf-8?B?VTl1SzZjUk80d044bmFMQytWNkIyWlEzbEM3VUZ6RVFFSWNlY2VNd3lsYXM4?=
- =?utf-8?B?OUFsajFNa2xoR3lDN1JEUEtwZlNwQkF1R3YwWVQ1Q1V6ekd5alo4STQzVWZ6?=
- =?utf-8?B?SURxS0dNOG1yN1Y1NEFCN2syS3hlV3VVWkJ6R2IxbFhzQUdNZHVxYTR0M3Mw?=
- =?utf-8?B?YWdDOTRud1VrS1NEYmdLNWtLNWxoU3EvYlNPZm5nR0o5T05ROFFPOTAxZFNY?=
- =?utf-8?B?OGRMNTY5VyswR2VPcFFTNXVMMGQydE9EZGxaN09BRDJVeU55ejhWZmEzZmhB?=
- =?utf-8?B?K2VtcUJFalRFdUk2SFNJRXhTMEtZQTd0OEFNQXY1bE1hQzFnQWxPOTJNMVdy?=
- =?utf-8?B?bVF5K29xejJ2Y0xFbkcxVkRybVBxdlRCL2dTZWkzUEJUeHllbncyZ0pSbWhB?=
- =?utf-8?B?MXhEU2tkWmhJRTZTZHNxTmtzUjZ5LzhxamJQb283amlXZmhJRXByai9OU0wv?=
- =?utf-8?B?MkdvZGN4bjdpTVNXMUM1TytyaURkVUpTWGd2L0FmNWVhNVZZVEJpdTdGc2JZ?=
- =?utf-8?B?eTRDK1d4dFBMVWRxT1g0VzdjWXRzanI4SUNhTmVQSDV1eVp0aXpyWlFMVVRJ?=
- =?utf-8?B?S2lzUklCUVFRbTN3UWFtTzFSOTkwR09VRktGL3MzL1ozWlB0d1ArWXdBR3di?=
- =?utf-8?B?T3MvNk0xVnJSd3ZWK3dWMTZKTE80eDlLcVVQQWk0Q3IrVjlBSTQ3RFN6Mm11?=
- =?utf-8?B?MEVjMzI4cm9aclh1SGJWSG5pK2hEeitSV3VRU0RHVmJLbHFsUFJZOEM3ZmR1?=
- =?utf-8?B?U25xQ1cyelMzc05UNjArSVBrZDFLWVNSYnFuT3F1VHRzQmJQdkhPM0poK0hs?=
- =?utf-8?B?VlUwc3Jwd0Vub0Z5QU8zYmExZVhmQTRHaEE2SDRHbENBSkJJU0N3SGhXUW5M?=
- =?utf-8?B?ajlKRURwQkJKSjRoTFBnbzJhTlN0TzVWRml1cjJiKzhVTm00TUI5T29sSHR3?=
- =?utf-8?B?QXBpOHJZbjMvZDNsSy9iNUd2bE1UMFdQeERUMmdmQlhNbGNBSlFUdTYwM0JY?=
- =?utf-8?B?b3dKUWFkbUZIbVFidk5HeDhJS3h3U3NjSVpXSk92Yjh3ZTZza3A1WjV5Qzdr?=
- =?utf-8?B?OVVTdHBUN1VrdDhSU0FpajVsU3JDNVlOcDVub1hpdlVHKzR4RGl0VUkySlQ1?=
- =?utf-8?B?cjM1TEZMRG9PeGpmSVVNdCt5WkFSaUw0SUVxUjNIazV4bUxKTkZmc3hnYyts?=
- =?utf-8?B?M1VJaUdrdGl2M1QvSmZNdHplNjFoemFvM3NDYld5c2JBMlFRY2JUSTFZMHlN?=
- =?utf-8?B?RFhBS0lxNU9UT3BUbGRybXpicFJySXJ2OEtoMDg0M0xPOGFnYk8xdmdiR0h6?=
- =?utf-8?B?YUxIRTFQN0RTZDVYNnhuWWUxNHFKN2VIaWxZejFQYTZNZWVpb1JROXFmL0NM?=
- =?utf-8?B?YUs0OVd2c29BTlVNNXMzRms4OEt6dHo2VWk0clI5TVE0RjA5K0ljY2NoSlZP?=
- =?utf-8?B?WjBvU1JkaW13YS9CRTVkSVNPc0RIbW5BYkY2WkFmbXVPT3ZwMUJRM3h6Lytr?=
- =?utf-8?B?bkl4aGdwcUR2R2lNZUtsQXVKWHlwK2UvSjBPNnQxOGhYMTBGLzZoTFJuZS82?=
- =?utf-8?Q?INqMojAjTye6CA6gyOH09cSJk?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 327f0d65-21e5-42be-a122-08ddc8f06124
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB7496.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2025 07:21:30.7183
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /KK2Ob6khmmH3UL4oMrqq08ubgubOiSL1FpGhSMUeV8Lk4XMqzKSTLSzlqWP/b9L
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7696
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 6/8] serial: 8250_dw: Fix typo "notifer"
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: airlied@gmail.com, akpm@linux-foundation.org, alison.schofield@intel.com,
+ andrew+netdev@lunn.ch, andriy.shevchenko@linux.intel.com,
+ arend.vanspriel@broadcom.com, bp@alien8.de,
+ brcm80211-dev-list.pdl@broadcom.com, brcm80211@lists.linux.dev,
+ colin.i.king@gmail.com, cvam0000@gmail.com, dan.j.williams@intel.com,
+ dave.hansen@linux.intel.com, dave.jiang@intel.com, dave@stgolabs.net,
+ davem@davemloft.net, dri-devel@lists.freedesktop.org, edumazet@google.com,
+ guanwentao@uniontech.com, hpa@zytor.com, ilpo.jarvinen@linux.intel.com,
+ intel-xe@lists.freedesktop.org, ira.weiny@intel.com, j@jannau.net,
+ jeff.johnson@oss.qualcomm.com, jgross@suse.com, jirislaby@kernel.org,
+ johannes.berg@intel.com, jonathan.cameron@huawei.com, kuba@kernel.org,
+ kvalo@kernel.org, kvm@vger.kernel.org, linux-cxl@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-serial@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux@treblig.org, lucas.demarchi@intel.com,
+ marcin.s.wojtas@gmail.com, ming.li@zohomail.com, mingo@kernel.org,
+ mingo@redhat.com, netdev@vger.kernel.org, niecheng1@uniontech.com,
+ oleksandr_tyshchenko@epam.com, pabeni@redhat.com, pbonzini@redhat.com,
+ quic_ramess@quicinc.com, ragazenta@gmail.com, rodrigo.vivi@intel.com,
+ seanjc@google.com, shenlichuan@vivo.com, simona@ffwll.ch,
+ sstabellini@kernel.org, tglx@linutronix.de,
+ thomas.hellstrom@linux.intel.com, vishal.l.verma@intel.com, x86@kernel.org,
+ xen-devel@lists.xenproject.org, yujiaoliang@vivo.com, zhanjun@uniontech.com
+References: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
+ <2BF1749F02ADE664+20250715134407.540483-6-wangyuli@uniontech.com>
+ <2025071607-outbid-heat-b0ba@gregkh>
+Content-Language: en-US
+From: WangYuli <wangyuli@uniontech.com>
+Autocrypt: addr=wangyuli@uniontech.com; keydata=
+ xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSKP+nX39DN
+ IVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAxFiEEa1GMzYeuKPkg
+ qDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMBAAAKCRDF2h8wRvQL7g0UAQCH
+ 3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfPbwD/SrncJwwPAL4GiLPEC4XssV6FPUAY
+ 0rA68eNNI9cJLArOOARmgSyJEgorBgEEAZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7
+ VTL0dvPDofBTjFYDAQgHwngEGBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIb
+ DAAKCRDF2h8wRvQL7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkU
+ o9ERi7qS/hbUdUgtitI89efbY0TVetgDsyeQiwU=
+In-Reply-To: <2025071607-outbid-heat-b0ba@gregkh>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------1TBt0IFfjz321DLdIVEctMps"
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: N99Qg+lZy8McGXx0ffJq3rOXsIj0XR0XBhhg3pPLdCHVvSoWiQ9jSxX5
+	yXwkUCxI8kF1fWgwc3H34nIx+NJzXhg1AJUHHkEfIcGKFVRwQVJwlE0TPgFuHhQD83eFqFV
+	KZl1V6dj4p3V5R82ewzRYaLkZPfEVOnKODdIywXC5zEoydWIOtgD3e1f7DPY6uJBll+urzY
+	LV1XzwxamygqixghmMPOlRs8jHn0TP65sp03tkpnJ+gMmDbq8jKIWMYLFTKy7L7ppTMTNm5
+	PuWyiKfs2GWAillZ3Rq8huwkBo5Rp1oUAGt5nM0UZcReu8orBG+EQBKeYMQC6EbTDPvT5aN
+	jNAHGubRkoP87WK59MCBdaOHu6H4H/oXqRSnQBvBjDRUvPLIXDkqFQDj23Mfttfr9MYOFlK
+	H7acVPlDI01uId4bOPyiZQBWeHtq1Gqp4kWpeiK6IUgiFQGre0efNmCyiCwM2gMF/K6NEGE
+	xceND45oWn1s8FzE5V5QC1K2RPg9JBJ9PhghbOmw7y/pvjCYr9F08lPatewtfiCWMf0AEIq
+	DfiTA+jWpCe51gphHt2mA8P4E0yKcppSzliEaZVaEmIt1NNyu8ytFUGafkb9+cEa1o6VNle
+	7wDNAoWRC3yFFBzT3WUVWyjN8t/+vLLJS0xGT4UNzX4cY3R2EIhfsB+h4ah+Hjn9SvGfPWP
+	E/3oArF5XjmDCVO5g4qrPJDfnQizyJPhjOK5bUiRWB37Wp1GjBZT8AeNi0im6SdJGzVDU3+
+	AOd4Bz1jq4oDeDowAjAqGLB+1614Zk48cUrQ4w/TtPNBSuVjwTq6zk6sFSNFo/xcBpECTCF
+	U8TsVFWOcYswRvq0WXkddW+nx/We2cpF99xGXc+gZhbJCDhKcfNQS9/uu5GnVyuZ1LrsL2i
+	jgex+fZx5DIBXETG2zDz6hGBRSWuAqbA7YpQ4v03gGCXSRmpjzXXjnVsy7htRQQVEHalBj1
+	pxSjVhD61q58YhRneCrSNqPXkIDxpuIEk2ungxlkzmqJPHX1omKkbtFMYkotSOH1yTPuCvA
+	YrO55enoNRQE5WDjQmV2n89LCS613dmChBdi69CqEogfnbr7/zEX/DDZla8DwHUDtXoxJyk
+	H/7KzW0lvwHmuguzSrGObDNb5pHWn5HQsH8ckUqdobF
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
+X-QQ-RECHKSPAM: 0
 
-On 21/07/2025 23:33, Jakub Kicinski wrote:
-> IOn Mon, 21 Jul 2025 21:34:05 +0300 Gal Pressman wrote:
->>> That's a reasonable way to modify the test. But I'm not sure it's
->>> something that should be blocking merging the patches.
->>> Or for that matter whether it's Mohsin's responsibility to make the
->>> test cater to quirks of mlx5,   
->>
->> Definitely not a quirk, you cannot assume the headers are in the linear
->> part, especially if you're going to put this program as reference in the
->> kernel tree.
->>
->> This issue has nothing to do with mlx5, but a buggy XDP program.
-> 
-> We put the tests in the tree to foster collaboration. If you think the
-> test should be improved please send patches. I don't think the kernel
-> will allow pulling headers if they are not in the linear section.
-> But that's your problem to solve.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------1TBt0IFfjz321DLdIVEctMps
+Content-Type: multipart/mixed; boundary="------------7NzxUd2CIcc1X22DyUWciByd";
+ protected-headers="v1"
+From: WangYuli <wangyuli@uniontech.com>
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: airlied@gmail.com, akpm@linux-foundation.org, alison.schofield@intel.com,
+ andrew+netdev@lunn.ch, andriy.shevchenko@linux.intel.com,
+ arend.vanspriel@broadcom.com, bp@alien8.de,
+ brcm80211-dev-list.pdl@broadcom.com, brcm80211@lists.linux.dev,
+ colin.i.king@gmail.com, cvam0000@gmail.com, dan.j.williams@intel.com,
+ dave.hansen@linux.intel.com, dave.jiang@intel.com, dave@stgolabs.net,
+ davem@davemloft.net, dri-devel@lists.freedesktop.org, edumazet@google.com,
+ guanwentao@uniontech.com, hpa@zytor.com, ilpo.jarvinen@linux.intel.com,
+ intel-xe@lists.freedesktop.org, ira.weiny@intel.com, j@jannau.net,
+ jeff.johnson@oss.qualcomm.com, jgross@suse.com, jirislaby@kernel.org,
+ johannes.berg@intel.com, jonathan.cameron@huawei.com, kuba@kernel.org,
+ kvalo@kernel.org, kvm@vger.kernel.org, linux-cxl@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-serial@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux@treblig.org, lucas.demarchi@intel.com,
+ marcin.s.wojtas@gmail.com, ming.li@zohomail.com, mingo@kernel.org,
+ mingo@redhat.com, netdev@vger.kernel.org, niecheng1@uniontech.com,
+ oleksandr_tyshchenko@epam.com, pabeni@redhat.com, pbonzini@redhat.com,
+ quic_ramess@quicinc.com, ragazenta@gmail.com, rodrigo.vivi@intel.com,
+ seanjc@google.com, shenlichuan@vivo.com, simona@ffwll.ch,
+ sstabellini@kernel.org, tglx@linutronix.de,
+ thomas.hellstrom@linux.intel.com, vishal.l.verma@intel.com, x86@kernel.org,
+ xen-devel@lists.xenproject.org, yujiaoliang@vivo.com, zhanjun@uniontech.com
+Message-ID: <0b2ace38-07d9-4500-8bb7-5a4fa65c4b9f@uniontech.com>
+Subject: Re: [PATCH v2 6/8] serial: 8250_dw: Fix typo "notifer"
+References: <BD5C52D2838AEA48+20250715134050.539234-1-wangyuli@uniontech.com>
+ <2BF1749F02ADE664+20250715134407.540483-6-wangyuli@uniontech.com>
+ <2025071607-outbid-heat-b0ba@gregkh>
+In-Reply-To: <2025071607-outbid-heat-b0ba@gregkh>
 
-Why send patches to fix something that shouldn't be merged broken in the
-first place?
+--------------7NzxUd2CIcc1X22DyUWciByd
+Content-Type: multipart/mixed; boundary="------------3ELnNhbpHyc90r6KiSkcbbdY"
 
-Mohsin made an incorrect *assumption*, it is not based on anything that
-is guaranteed by XDP. Fixing this is trivial, and I don't see any
-technical reasons why not to.
+--------------3ELnNhbpHyc90r6KiSkcbbdY
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-> 
->>> which is not even part of NIPA testing -
->>> we have no way of knowing what passes for mlx5, what regresses it etc.  
->>
->> People have been developing XDP code that runs on mlx5 long before NIPA
->> even existed 🤷‍♂️..
->> And as you know we run these selftests on mlx5 hardware, as evident by
->> Nimrod's mail, and others you've seen on the list. You know what regresses.
-> 
-> No, please don't try to dispute facts. It's not integrated, if you go
-> on a vacation upstream will have no idea what broke in mlx5. Either you
-> are reporting the results upstream or our guarantees on regressions are
-> best effort. BTW I don't understand how you can claim that a new test
-> regresses something. It never passed on mlx5 == not a regression.
+SGkgZ3JlZyBrLWgsDQoNCk9uIDIwMjUvNy8xNiAxNjowOCwgR3JlZyBLSCB3cm90ZToNCj4+
+IFNpZ25lZC1vZmYtYnk6IFdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPg0KPiBJ
+cyB5b3VyIG5hbWUgYWxsIG9uZSB3b3JkIGxpa2UgdGhhdCwgb3Igc2hvdWxkIHRoZXJlIGJl
+IGEgIiAiIGJldHdlZW4NCj4gdGhlbT8NCg0KSWYgSSB3ZXJlIHRvIGZvbGxvdyBXZXN0ZXJu
+IG5hbWluZyBjb252ZW50aW9ucywgbXkgbmFtZSB3b3VsZCBiZSB3cml0dGVuIA0KYXMgJ1l1
+bGkgV2FuZycuDQoNCkhvd2V2ZXIsIGZyYW5rbHksIEkgZmluZCBpdCB1bm5lY2Vzc2FyeSBh
+bmQgY2FuJ3QgYmUgYm90aGVyZWQgdG8gZm9sbG93IA0KdGhlaXIgY3VzdG9tcywgdW5sZXNz
+IGEgbWFpbnRhaW5lciBzdHJvbmdseSBpbnNpc3RzLiAoRm9yIGV4YW1wbGUsIHlvdSANCmNh
+biBzZWUgdGhhdCBteSBzaWduYXR1cmUgb24gY29tbWl0cyBmb3IgdGhlIExvb25nQXJjaCBz
+dWJzeXN0ZW0gaXMgDQpkaWZmZXJlbnQgZnJvbSBteSBvdGhlciBjb250cmlidXRpb25zKS4N
+Cg0KU2luY2UgQ2hpbmVzZSBuYW1lcyBhcmUgd3JpdHRlbiB3aXRob3V0IGFueSBzcGFjZXMg
+aW4gQ2hpbmVzZSANCmNoYXJhY3RlcnMsIEkgZG9uJ3QgdGhpbmsgaXQgbWF0dGVycy4NCg0K
+PiBBbHNvLCBhcyBvdGhlcnMgc2FpZCwgZG9uJ3QgbGluayB0byB5b3VyIG93biBwYXRjaC4N
+Ck9LLCBJJ2xsIHNlbmQgdGhlIHBhdGNoc2V0IHYzLg0KDQoNClRoYW5rcywNCg0KLS0gDQrn
+jovmmLHlipsNCg==
+--------------3ELnNhbpHyc90r6KiSkcbbdY
+Content-Type: application/pgp-keys; name="OpenPGP_0xC5DA1F3046F40BEE.asc"
+Content-Disposition: attachment; filename="OpenPGP_0xC5DA1F3046F40BEE.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
-This thread is more about pushing NIPA agenda than a technical discussion.
+-----BEGIN PGP PUBLIC KEY BLOCK-----
 
-We're not part of NIPA as can be clearly observed by our MAINTAINERS entry.
-Don't confuse our NICs with others that are not accessible to the
-public, many people (inside and outside of NVIDIA) are developing and
-testing mlx5 without NIPA for years.
+xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSK
+P+nX39DNIVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAx
+FiEEa1GMzYeuKPkgqDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMB
+AAAKCRDF2h8wRvQL7g0UAQCH3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfP
+bwD/SrncJwwPAL4GiLPEC4XssV6FPUAY0rA68eNNI9cJLArOOARmgSyJEgorBgEE
+AZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7VTL0dvPDofBTjFYDAQgHwngE
+GBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIbDAAKCRDF2h8wRvQL
+7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkUo9ERi7qS
+/hbUdUgtitI89efbY0TVetgDsyeQiwU=3D
+=3DBlkq
+-----END PGP PUBLIC KEY BLOCK-----
 
-For the record, we run these selftests internally whether I go on
-vacation or not. These tests are running as part of our regression and
-failures are either reported to the list, or fixed by the team.
-You know all that.
+--------------3ELnNhbpHyc90r6KiSkcbbdY--
+
+--------------7NzxUd2CIcc1X22DyUWciByd--
+
+--------------1TBt0IFfjz321DLdIVEctMps
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wnsEABYIACMWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCaH88KgUDAAAAAAAKCRDF2h8wRvQL7pms
+AP9jnuV1Ar3880YbizkuBFljgc3bOdOu/RxLmWu2LJmNBAD/S6F38qLfKIrdjJNkNGO7V3LvW7p0
+ssmAK5aDMMRZzAI=
+=fJ9f
+-----END PGP SIGNATURE-----
+
+--------------1TBt0IFfjz321DLdIVEctMps--
 
