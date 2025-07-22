@@ -1,609 +1,496 @@
-Return-Path: <netdev+bounces-208847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DCF3B0D658
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 11:53:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE50DB0D667
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 11:59:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 737813A2D82
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 09:52:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43C10188EC91
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 09:59:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B29C92DEA89;
-	Tue, 22 Jul 2025 09:52:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 087BE2BF007;
+	Tue, 22 Jul 2025 09:59:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="ZidPMjqH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
+Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011061.outbound.protection.outlook.com [40.107.130.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656DC2E03E1
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 09:52:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753177939; cv=none; b=t7VwhJvdglodHXTtwi1HEyA+Uaq7s5FGi7WwU8PrLb+qy6dDeYev0RdR8tMRh705FBd0ALNpULqBQN+qqNGYGjCrgLiYB7XNfvX626Pg1RsiB6rtzgdb9xRHOfDuaYX2NEIkwkDeFTECbGPyz8xrZ8KkzsKqqlA0OilsjGGBhPw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753177939; c=relaxed/simple;
-	bh=277QhWsgLThKqcczoaSyj1ua8yoGMNFouor4LanU5kE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f/AYOrqAs8+wLixUoWzmdsKndfjFgXFVFAsLsj5agZ1ce4lTMukGFGHMAnrtazlXDKU/+P4A3xFUkDC4b8QdwJfzSQCPdyyx113JlvQd2GUjfaeXqWCcWc9M/JQFDtcDq0rjm7r1g+qu1Zw0905+EtwNBqonrfXRbIxmiSqOb/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.206.34.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: zesmtpgz4t1753177921t0978c379
-X-QQ-Originating-IP: U9ajFXEoJrL6B+DxmWpsePAlXbBZuVmgdJVFDzJbCBA=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 22 Jul 2025 17:51:59 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 13951642469092028887
-Date: Tue, 22 Jul 2025 17:51:59 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 02/15] net: rnpgbe: Add n500/n210 chip support
-Message-ID: <911D202AA380FB7F+20250722095159.GA120552@nic-Precision-5820-Tower>
-References: <20250721113238.18615-1-dong100@mucse.com>
- <20250721113238.18615-3-dong100@mucse.com>
- <b4233af1-7143-402b-a45c-379c39edf274@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2323FFD;
+	Tue, 22 Jul 2025 09:59:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.61
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753178367; cv=fail; b=WQmMTyWsob2p9+ARyD64X/1mPAyU203qn3iokwNCeYw4n1vpk4tpL9WKGMP5hnfqZq54tDS8PlwDwrN9KsNGuje9aDNv/+kgFfrxdq2iOjtGzuQyJjOea6dFqI96PlcslagWKKu2O9eUF3hqLr7prKYpXkAA4vZBkmtY2FlLyF4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753178367; c=relaxed/simple;
+	bh=pEo3YX1fQTHNGQ14D+XrG/FGhaeHOc6i4wwRoToIHgA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=jLJcjm+QnIbII677mEiRh+rOXI0uVtNQtVxpJeANSHJZe1hbFXCxUfYhETsZwJzQ1FpTHObksj425WDvNptgmmO2oSVSx3td58z+P/wR1IQEMi4iMgvT4rysME9h65FdKy3YWeswsbuv+axiT33AxTlOgxVCodAKNMk5hrBqjuw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=ZidPMjqH; arc=fail smtp.client-ip=40.107.130.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=O9xMAlvy7Q2cs3hTuHFQ+nX0rt0orkgWZav4w8MyiFs5zicIFrIDC14O02c6QW3+yHBCbDi4fjDPjf72raouoBY0xmcPI+3Alvry+aCPrdzQuQakX3TNXd1u3Nri5ro2NFqbn/ksARdEH8D37qxPnhM3+PR2NNsNhBqrSg1ie+vwBtC/OFuUs0zrJ3W+ZSxZ66mK11iU4XR4GOSKxQz5Lzqo6TxeYFJcVPJWBBnlBJLP03J60bouSdxnva+FwsCCvf6QYUa9qDogyU4A/Ym6OyNtFgn2CxZC2+TKHcrptPHyOtw9gdpcctVwkl2UJQEwBv4zhxDmXTIpJ1/G8QvObw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Zq8JYXZjVBdBXu47su8WsJoN9AdVDJGH8L9we3rtVUM=;
+ b=HNYG1R1sEehYApLEMkqQIgzuwuZT9Homb5cFlOGrSu2Vd3n/ur0PytQMxG9g/M1XDCK2ZFIqFsrbRqHKhDDf6676uT/+apWxS1P6H+sWW8RvCtC4+P5cYaLJSl60q99vKvnQn9/SPHA21vdWr+tQL3vfhXSZq07wJh1owsLxpg5p65Q7Jt33TNl7tL7zHCLlLQx1SgFWp7wuwii+mZUisgBnEiyW6/4HAkPPSp14Qn5zzr4V4Fn9IM8WLZ2TEZYFkt6HBIgQQbhBCOAR0cNlGXZw4qIQL/F0ehbLaSkFpLeb+aPznx66918BdGhi27uaGMJwccjqdyGp8JF9YJBvQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 131.228.6.100) smtp.rcpttodomain=apple.com smtp.mailfrom=nokia-bell-labs.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none
+ header.from=nokia-bell-labs.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Zq8JYXZjVBdBXu47su8WsJoN9AdVDJGH8L9we3rtVUM=;
+ b=ZidPMjqHQ8/DGxQAnkFulaj1upYqt6OvG0m3OOKgZhXRWiP6HS2H7zejg3hBtAMYFwWHg1l6FSW7VpleX+vUpjvzLiZU0pLZmwrh5YPNAdftRzXX+cwin3tnV+CGh12KawfeWQAj6gR2ww8/FLsgJMg1WE0O/vlS38GkxmTZ1+EmMbTNiThfhJUB07RxO0UQDCZ4E32yDL5qEhXqNR0Z/WML9vYoZYIU21uvf1QVmig8XNzb9g+8WuYvLpaooyRHzvGS073VwbnICau9HXXxb4Eyly6oEFYKUIj3gmk23yOAAjlaivK7V/mEh/05IS53FbLYAZ2H6RN9CU6C2NBeaQ==
+Received: from PA7P264CA0285.FRAP264.PROD.OUTLOOK.COM (2603:10a6:102:373::6)
+ by PA4PR07MB8888.eurprd07.prod.outlook.com (2603:10a6:102:269::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8943.28; Tue, 22 Jul
+ 2025 09:59:19 +0000
+Received: from AM4PEPF00025F9C.EURPRD83.prod.outlook.com
+ (2603:10a6:102:373:cafe::b) by PA7P264CA0285.outlook.office365.com
+ (2603:10a6:102:373::6) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8964.21 via Frontend Transport; Tue,
+ 22 Jul 2025 09:59:19 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 131.228.6.100)
+ smtp.mailfrom=nokia-bell-labs.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nokia-bell-labs.com;
+Received-SPF: Pass (protection.outlook.com: domain of nokia-bell-labs.com
+ designates 131.228.6.100 as permitted sender)
+ receiver=protection.outlook.com; client-ip=131.228.6.100;
+ helo=fr711usmtp2.zeu.alcatel-lucent.com; pr=C
+Received: from fr711usmtp2.zeu.alcatel-lucent.com (131.228.6.100) by
+ AM4PEPF00025F9C.mail.protection.outlook.com (10.167.16.11) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.8989.1
+ via Frontend Transport; Tue, 22 Jul 2025 09:59:18 +0000
+Received: from sarah.nbl.nsn-rdnet.net (sarah.nbl.nsn-rdnet.net [10.0.73.150])
+	by fr711usmtp2.zeu.alcatel-lucent.com (Postfix) with ESMTP id 5E40D680042;
+	Tue, 22 Jul 2025 12:59:17 +0300 (EEST)
+From: chia-yu.chang@nokia-bell-labs.com
+To: alok.a.tiwari@oracle.com,
+	pctammela@mojatatu.com,
+	horms@kernel.org,
+	donald.hunter@gmail.com,
+	xandfury@gmail.com,
+	netdev@vger.kernel.org,
+	dave.taht@gmail.com,
+	pabeni@redhat.com,
+	jhs@mojatatu.com,
+	kuba@kernel.org,
+	stephen@networkplumber.org,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	ast@fiberby.net,
+	liuhangbin@gmail.com,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	ij@kernel.org,
+	ncardwell@google.com,
+	koen.de_schepper@nokia-bell-labs.com,
+	g.white@cablelabs.com,
+	ingemar.s.johansson@ericsson.com,
+	mirja.kuehlewind@ericsson.com,
+	cheshire@apple.com,
+	rs.ietf@gmx.at,
+	Jason_Livingood@comcast.com,
+	vidhi_goel@apple.com
+Cc: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+Subject: [PATCH v26 net-next 0/6] DUALPI2 patch
+Date: Tue, 22 Jul 2025 11:59:09 +0200
+Message-Id: <20250722095915.24485-1-chia-yu.chang@nokia-bell-labs.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b4233af1-7143-402b-a45c-379c39edf274@linux.dev>
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: MLyssK0sPeZUATpi+lhcpEZuaEWS3OPqn5a0OPoPils/lD0PWzyBC5hn
-	dxi4cRNdK1mVmOjY+jU6xfs4+7Q/m7asDvqZDiM0oEN+PBluJGoK0hb7Rg/mCvnQ364hYiq
-	fTuBoD6kpO4Fa9C+95Jl50MDfA/WfRJsuTyWqv0w7t+D09ChlzVELrU7IWnoet/nCwuA8Qq
-	urD3sbTPEHviabqEnPYUrvpzXdA7lGzVBJToI9tLuqk7IXHMORIqkbtfGGtQMI9vKwkJdjX
-	v5kyfKowGO2l7POed9m3UTgMtPp7KPC2MWMXhWakc2ooJNm33L9cVUEKiYFzdpLlHCf7omc
-	l4MlqQvHFJGJq2z7zDOaTkKdw9oVC9KJYdpaaR9xJi0khxOXHqQrRDNLmZlsbZjbrF0au6e
-	Di4jQ6Lgsvmljz1uhczLzxkoproxS64jJ2ky7JvjqdjRdiI39AwKFrxtu4uxiPRPQiORIy1
-	UX5nBQOuWOWevz9WYrvloou/IDGq2YhFDlkMsb6LfXpdFc09qtBCkUyF1hxpqoYQKTsTkl8
-	cwPp6ofQ7LZzb0a96aLHsEFSQVf0uatiYJAKyHe85DBdfqvGqWA1l9IJEXcXdBxnnLTAOuA
-	KBnZwnVzWQOPhS3qe6UWEAV4Nkplj/za3NlGFINofLxXbW1cT84HZbtlXHcgu0W1Jd0Y2zC
-	DtQlYGcV2QOeKCP61sOvfkhDqnzyhxAknInJW2qU+70TY9YiLt674D71zO6gY+U6EByne7W
-	WVrniwALg39Z2mWcX2H2I5hsNv195aGj7WKWp+jk9SL7l3nZUK32YzuU4WmQ04mOyGyxZmp
-	sIJLO6Qpepywjiw3j+Jmy3G+1kwn7j4KukPq6bop/dI6ePN+AHmCZJ7xJr1Qx+/XhnJK/+7
-	l4XrwKXgDhZFOCxgFNrPKCPHOEhi33K/yFpz3LEp4Ohwea2NvCphvZl60j/TZH9ZiY84PP5
-	g882SCFkQLS4bq+sEP38le8ZG6dHFYX1SIeVRQgihu1iXT7ZADCpTLoXwZHnjb+Gk75hvjT
-	rcQLqRVcQzAvmymt5m
-X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM4PEPF00025F9C:EE_|PA4PR07MB8888:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6c637990-b344-4af4-e6dc-08ddc9066ccb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|82310400026|36860700013|376014|7416014|13003099007|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?VlU3VEZRWWVNWFZzNUI1elFqUVB5M3lWNVZKMFBCaTdNeWRLYjNobVBCN3di?=
+ =?utf-8?B?SEgvQWJNeGczd3ZZeFNwWkV5SC9tbVJUd2tzNmRHcUlMb1hwM0VNK2MvYkZB?=
+ =?utf-8?B?c2ZjNnJzdmU0bDBla1pFMUh4R3FybUVQVTNtanMxZ2pxWXZpTFcwa1hxM25Q?=
+ =?utf-8?B?U2h3Rk1NN1NHdXlLQXRiVU1MT0dnSVdUUGZGVHFyclp5UEtISlhjT0NUTGNO?=
+ =?utf-8?B?QlQ3eHNhYy9EMUNxSlI3VUtZTXVTaWhrdUg0MzJsa3d6U2VZRUxLcHZ3aDV3?=
+ =?utf-8?B?L0VZQk1iMDczSHVNSktwamkvNkNYNHZDS1pJeWwwa1RhVU56djM2OU0zVTJu?=
+ =?utf-8?B?bll2bWI4OW9SY3MxQ1hPa2lxb1BJc2VGWjNmaWx0R3VsNzdleDRrRkVBb3VY?=
+ =?utf-8?B?YTVGUUZZbTVhZ1Ewc25PT2RLUW04MjFVMnk0c2M3Sy9WUWlBNGtNRCtuZTRP?=
+ =?utf-8?B?MXFWV1kzT3dyYVRSRVFXNWk4d3BNdFY3ZkJEMG9sTVZQSnp4cXJ6ajVqRzRB?=
+ =?utf-8?B?Rm5leWNnQUd5SGl5dXUydHZvdWlldkxLcll1VVdrU2pxZnZQZllIT3pxR0U3?=
+ =?utf-8?B?eDBFclp1M0pCWWV1YzduSkc5ZVlJbEtXRk44V0RFLzkxWXpGNTIwVXc2eHhi?=
+ =?utf-8?B?VXk5QTFpNmp6NjlzcFRZVWM5Y3NFbU0yYmlwTXF5ZDhIVE5oTFlNZWFwUmx5?=
+ =?utf-8?B?MzREUXROTFdDOE4zemRack1SaGdxSVEwZ0xmaDd1TndnMVJlaEhxVmp1UXYv?=
+ =?utf-8?B?b3BlQzRjWi9JVnJPRXpzWkFKNkZkTnhvbTRoRVc3MjhHaUtqZDZTaFdFc0dN?=
+ =?utf-8?B?SDkrR2FNSWdyTlhRbUd2SkMzRGNZREFmR09NZDlEWEd2Wm40T05jNkVjblFp?=
+ =?utf-8?B?UHBnWWkxSnRvbWM5cTdkaW1NU2xnYTNZMjVua1kvcmVUTmZLTEVpQk9haldy?=
+ =?utf-8?B?YmRMa2pnZWV3TXJFNFBIUG1OdFZZanpLNUVzWTlMK2gxWk1Id3FNbTlHZ21H?=
+ =?utf-8?B?cC9GMlhVd3FSWXcvd0pHN2QvMWZzaHNyeG1zeUNCRU5sakNodXlxQ0xMY3pk?=
+ =?utf-8?B?TjVXa21MRkIybDBMV3dpK0NwV3QxVVVzZ2tyelhxekpEc1FKZUpzK2lRMjZ6?=
+ =?utf-8?B?ZnNQYUZUYnVHRmQrV3h6Lzdic2VGaWlhOWo0bTlmaWFUZjdkQnVQU01WM3Rs?=
+ =?utf-8?B?anhqVkZyMDNEMWJRekZncEQvMFFoUStKdzlac0tLQ2E4a2dNeFNPVXJpTGlx?=
+ =?utf-8?B?MGNNWmQxMysxanlJbkZuVEx3LytyTmJScU8yUXpyUllLbzB6MFNxSXdHQ2tu?=
+ =?utf-8?B?SnBGczB3dTNqckdPUkE2cjljdk5oQ2grVzE2UDJhNlR5UWs1WXBIaW9zNURK?=
+ =?utf-8?B?MVR2TjhqOFVWVFpROS92WDdEVTdXMEordnlna083Z1RsNktoQXUvMXBPR2h6?=
+ =?utf-8?B?blB2aDh1eEVVdnA0VlZiYWg3d3lZVTJVS0w3d2c3SHVmUDJnbkF4aC81Z3Fm?=
+ =?utf-8?B?alpLdmxmOE1lSC8rbzlURmtvSnRxMjgxV0dMeEdmNEcwc1l0ZzYvU3A0SHVa?=
+ =?utf-8?B?OWtObmxDMUtadHJsbmxJVXBHTXpxVzNiazRON2xVOGVSTzFCOVlsSEFEc3Ny?=
+ =?utf-8?B?Tjk3eTExQ2U0bXBqYW56M3Vzdko2aDJxZFJUUGdHcW1NbGRhY3VHOW5WQXdl?=
+ =?utf-8?B?blJleXQwK3RHb05OMFZsTEpTKzFydDUvZWRyRWlYYzNrMzFKWHhVTkJ5eGo1?=
+ =?utf-8?B?dTNTQ3FMZ3ZlTTAxRHlxWmNyYmRLKzhLc3VHMG9hQnhhZit4N0xYZTkwaDVo?=
+ =?utf-8?B?TkZkYmVCeVJOK3ZGSmdpZjlNK0dUUXAyVHdBWGlIUmtIYWptdEErRDFUWW4x?=
+ =?utf-8?B?c2loOUorUU5CY1NubzNRdWJsVFVQM05WcldLOHJDMkJabmpZRmRISGJtUUJU?=
+ =?utf-8?B?QytVL0JVQmd0TmhWbExqaDVjSW1sV2JCeU9nS3k2UHBiT2xkSTlTNk8xSm8y?=
+ =?utf-8?B?aDBsRFh0VkY3dkhFQjl0NzNwUFRQYjd4SmFDL1dMeWQxYUd3aTRSRmY4Mnli?=
+ =?utf-8?B?WGRsL016S0RVSWIvUFQwa2pBMG5iUjFNZ3QxUT09?=
+X-Forefront-Antispam-Report:
+	CIP:131.228.6.100;CTRY:FI;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:fr711usmtp2.zeu.alcatel-lucent.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700013)(376014)(7416014)(13003099007)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: nokia-bell-labs.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2025 09:59:18.8065
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6c637990-b344-4af4-e6dc-08ddc9066ccb
+X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5d471751-9675-428d-917b-70f44f9630b0;Ip=[131.228.6.100];Helo=[fr711usmtp2.zeu.alcatel-lucent.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AM4PEPF00025F9C.EURPRD83.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR07MB8888
 
-On Mon, Jul 21, 2025 at 03:21:23PM +0100, Vadim Fedorenko wrote:
-> On 21/07/2025 12:32, Dong Yibo wrote:
-> > Initialize n500/n210 chip bar resource map and
-> > dma, eth, mbx ... info for future use.
-> > 
-> > Signed-off-by: Dong Yibo <dong100@mucse.com>
-> > ---
-> >   drivers/net/ethernet/mucse/rnpgbe/Makefile    |   4 +-
-> >   drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    | 138 ++++++++++++++++++
-> >   .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   | 138 ++++++++++++++++++
-> >   drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |  27 ++++
-> >   .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   |  68 ++++++++-
-> >   5 files changed, 370 insertions(+), 5 deletions(-)
-> >   create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-> >   create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
-> > 
-> > diff --git a/drivers/net/ethernet/mucse/rnpgbe/Makefile b/drivers/net/ethernet/mucse/rnpgbe/Makefile
-> > index 0942e27f5913..42c359f459d9 100644
-> > --- a/drivers/net/ethernet/mucse/rnpgbe/Makefile
-> > +++ b/drivers/net/ethernet/mucse/rnpgbe/Makefile
-> > @@ -5,5 +5,5 @@
-> >   #
-> >   obj-$(CONFIG_MGBE) += rnpgbe.o
-> > -
-> > -rnpgbe-objs := rnpgbe_main.o
-> > +rnpgbe-objs := rnpgbe_main.o\
-> > +	       rnpgbe_chip.o
-> > diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-> > index 224e395d6be3..2ae836fc8951 100644
-> > --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-> > +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-> > @@ -4,21 +4,156 @@
-> >   #ifndef _RNPGBE_H
-> >   #define _RNPGBE_H
-> > +#include <linux/types.h>
-> > +#include <linux/netdevice.h>
-> > +
-> > +extern const struct rnpgbe_info rnpgbe_n500_info;
-> > +extern const struct rnpgbe_info rnpgbe_n210_info;
-> > +extern const struct rnpgbe_info rnpgbe_n210L_info;
-> > +
-> >   enum rnpgbe_boards {
-> >   	board_n500,
-> >   	board_n210,
-> >   	board_n210L,
-> >   };
-> > +enum rnpgbe_hw_type {
-> > +	rnpgbe_hw_n500 = 0,
-> > +	rnpgbe_hw_n210,
-> > +	rnpgbe_hw_n210L,
-> > +	rnpgbe_hw_unknow
-> > +};
-> > +
-> > +struct mucse_dma_info {
-> > +	u8 __iomem *dma_base_addr;
-> > +	u8 __iomem *dma_ring_addr;
-> > +	void *back;
-> > +	u32 max_tx_queues;
-> > +	u32 max_rx_queues;
-> > +	u32 dma_version;
-> > +};
-> > +
-> > +#define RNPGBE_MAX_MTA 128
-> > +struct mucse_eth_info {
-> > +	u8 __iomem *eth_base_addr;
-> > +	void *back;
-> > +	u32 mta_shadow[RNPGBE_MAX_MTA];
-> > +	int mc_filter_type;
-> > +	u32 mcft_size;
-> > +	u32 vft_size;
-> > +	u32 num_rar_entries;
-> > +};
-> > +
-> > +struct mii_regs {
-> > +	unsigned int addr; /* MII Address */
-> > +	unsigned int data; /* MII Data */
-> > +	unsigned int addr_shift; /* MII address shift */
-> > +	unsigned int reg_shift; /* MII reg shift */
-> > +	unsigned int addr_mask; /* MII address mask */
-> > +	unsigned int reg_mask; /* MII reg mask */
-> > +	unsigned int clk_csr_shift;
-> > +	unsigned int clk_csr_mask;
-> > +};
-> > +
-> > +struct mucse_mac_info {
-> > +	u8 __iomem *mac_addr;
-> > +	void *back;
-> > +	struct mii_regs mii;
-> > +	int phy_addr;
-> > +	int clk_csr;
-> > +};
-> > +
-> > +#define MAX_VF_NUM (8)
-> > +
-> > +struct mucse_mbx_info {
-> > +	u32 timeout;
-> > +	u32 usec_delay;
-> > +	u32 v2p_mailbox;
-> > +	u16 size;
-> > +	u16 vf_req[MAX_VF_NUM];
-> > +	u16 vf_ack[MAX_VF_NUM];
-> > +	u16 fw_req;
-> > +	u16 fw_ack;
-> > +	/* lock for only one use mbx */
-> > +	struct mutex lock;
-> > +	bool irq_enabled;
-> > +	int mbx_size;
-> > +	int mbx_mem_size;
-> > +#define MBX_FEATURE_NO_ZERO BIT(0)
-> > +#define MBX_FEATURE_WRITE_DELAY BIT(1)
-> > +	u32 mbx_feature;
-> > +	/* fw <--> pf mbx */
-> > +	u32 fw_pf_shm_base;
-> > +	u32 pf2fw_mbox_ctrl;
-> > +	u32 pf2fw_mbox_mask;
-> > +	u32 fw_pf_mbox_mask;
-> > +	u32 fw2pf_mbox_vec;
-> > +	/* pf <--> vf mbx */
-> > +	u32 pf_vf_shm_base;
-> > +	u32 pf2vf_mbox_ctrl_base;
-> > +	u32 pf_vf_mbox_mask_lo;
-> > +	u32 pf_vf_mbox_mask_hi;
-> > +	u32 pf2vf_mbox_vec_base;
-> > +	u32 vf2pf_mbox_vec_base;
-> > +	u32 fw_vf_share_ram;
-> > +	int share_size;
-> > +};
-> > +
-> > +struct mucse_hw {
-> > +	void *back;
-> > +	u8 pfvfnum;
-> > +	u8 pfvfnum_system;
-> > +	u8 __iomem *hw_addr;
-> > +	u8 __iomem *ring_msix_base;
-> > +	struct pci_dev *pdev;
-> > +	u16 device_id;
-> > +	u16 vendor_id;
-> > +	u16 subsystem_device_id;
-> > +	u16 subsystem_vendor_id;
-> > +	enum rnpgbe_hw_type hw_type;
-> > +	struct mucse_dma_info dma;
-> > +	struct mucse_eth_info eth;
-> > +	struct mucse_mac_info mac;
-> > +	struct mucse_mbx_info mbx;
-> > +#define M_NET_FEATURE_SG BIT(0)
-> > +#define M_NET_FEATURE_TX_CHECKSUM BIT(1)
-> > +#define M_NET_FEATURE_RX_CHECKSUM BIT(2)
-> > +#define M_NET_FEATURE_TSO BIT(3)
-> > +#define M_NET_FEATURE_TX_UDP_TUNNEL BIT(4)
-> > +#define M_NET_FEATURE_VLAN_FILTER BIT(5)
-> > +#define M_NET_FEATURE_VLAN_OFFLOAD BIT(6)
-> > +#define M_NET_FEATURE_RX_NTUPLE_FILTER BIT(7)
-> > +#define M_NET_FEATURE_TCAM BIT(8)
-> > +#define M_NET_FEATURE_RX_HASH BIT(9)
-> > +#define M_NET_FEATURE_RX_FCS BIT(10)
-> > +#define M_NET_FEATURE_HW_TC BIT(11)
-> > +#define M_NET_FEATURE_USO BIT(12)
-> > +#define M_NET_FEATURE_STAG_FILTER BIT(13)
-> > +#define M_NET_FEATURE_STAG_OFFLOAD BIT(14)
-> > +#define M_NET_FEATURE_VF_FIXED BIT(15)
-> > +#define M_VEB_VLAN_MASK_EN BIT(16)
-> > +#define M_HW_FEATURE_EEE BIT(17)
-> > +#define M_HW_SOFT_MASK_OTHER_IRQ BIT(18)
-> > +	u32 feature_flags;
-> > +	u16 usecstocount;
-> > +};
-> > +
-> >   struct mucse {
-> >   	struct net_device *netdev;
-> >   	struct pci_dev *pdev;
-> > +	struct mucse_hw hw;
-> >   	/* board number */
-> >   	u16 bd_number;
-> >   	char name[60];
-> >   };
-> > +struct rnpgbe_info {
-> > +	int total_queue_pair_cnts;
-> > +	enum rnpgbe_hw_type hw_type;
-> > +	void (*get_invariants)(struct mucse_hw *hw);
-> > +};
-> > +
-> >   /* Device IDs */
-> >   #ifndef PCI_VENDOR_ID_MUCSE
-> >   #define PCI_VENDOR_ID_MUCSE 0x8848
-> > @@ -30,4 +165,7 @@ struct mucse {
-> >   #define PCI_DEVICE_ID_N210 0x8208
-> >   #define PCI_DEVICE_ID_N210L 0x820a
-> > +#define m_rd_reg(reg) readl(reg)
-> > +#define m_wr_reg(reg, val) writel((val), reg)
-> > +
-> >   #endif /* _RNPGBE_H */
-> > diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-> > new file mode 100644
-> > index 000000000000..38c094965db9
-> > --- /dev/null
-> > +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-> > @@ -0,0 +1,138 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/* Copyright(c) 2020 - 2025 Mucse Corporation. */
-> > +
-> > +#include <linux/types.h>
-> > +#include <linux/string.h>
-> > +
-> > +#include "rnpgbe.h"
-> > +#include "rnpgbe_hw.h"
-> > +
-> > +/**
-> > + * rnpgbe_get_invariants_n500 - setup for hw info
-> > + * @hw: hw information structure
-> > + *
-> > + * rnpgbe_get_invariants_n500 initializes all private
-> > + * structure, such as dma, eth, mac and mbx base on
-> > + * hw->addr for n500
-> > + **/
-> > +static void rnpgbe_get_invariants_n500(struct mucse_hw *hw)
-> > +{
-> > +	struct mucse_dma_info *dma = &hw->dma;
-> > +	struct mucse_eth_info *eth = &hw->eth;
-> > +	struct mucse_mac_info *mac = &hw->mac;
-> > +	struct mucse_mbx_info *mbx = &hw->mbx;
-> > +
-> > +	/* setup msix base */
-> > +	hw->ring_msix_base = hw->hw_addr + 0x28700;
-> > +	/* setup dma info */
-> > +	dma->dma_base_addr = hw->hw_addr;
-> > +	dma->dma_ring_addr = hw->hw_addr + RNPGBE_RING_BASE;
-> > +	dma->max_tx_queues = RNPGBE_MAX_QUEUES;
-> > +	dma->max_rx_queues = RNPGBE_MAX_QUEUES;
-> > +	dma->back = hw;
-> > +	/* setup eth info */
-> > +	eth->eth_base_addr = hw->hw_addr + RNPGBE_ETH_BASE;
-> > +	eth->back = hw;
-> > +	eth->mc_filter_type = 0;
-> > +	eth->mcft_size = RNPGBE_MC_TBL_SIZE;
-> > +	eth->vft_size = RNPGBE_VFT_TBL_SIZE;
-> > +	eth->num_rar_entries = RNPGBE_RAR_ENTRIES;
-> > +	/* setup mac info */
-> > +	mac->mac_addr = hw->hw_addr + RNPGBE_MAC_BASE;
-> > +	mac->back = hw;
-> > +	/* set mac->mii */
-> > +	mac->mii.addr = RNPGBE_MII_ADDR;
-> > +	mac->mii.data = RNPGBE_MII_DATA;
-> > +	mac->mii.addr_shift = 11;
-> > +	mac->mii.addr_mask = 0x0000F800;
-> > +	mac->mii.reg_shift = 6;
-> > +	mac->mii.reg_mask = 0x000007C0;
-> > +	mac->mii.clk_csr_shift = 2;
-> > +	mac->mii.clk_csr_mask = GENMASK(5, 2);
-> > +	mac->clk_csr = 0x02; /* csr 25M */
-> > +	/* hw fixed phy_addr */
-> > +	mac->phy_addr = 0x11;
-> > +
-> > +	mbx->mbx_feature |= MBX_FEATURE_NO_ZERO;
-> > +	/* mbx offset */
-> > +	mbx->vf2pf_mbox_vec_base = 0x28900;
-> > +	mbx->fw2pf_mbox_vec = 0x28b00;
-> > +	mbx->pf_vf_shm_base = 0x29000;
-> > +	mbx->mbx_mem_size = 64;
-> > +	mbx->pf2vf_mbox_ctrl_base = 0x2a100;
-> > +	mbx->pf_vf_mbox_mask_lo = 0x2a200;
-> > +	mbx->pf_vf_mbox_mask_hi = 0;
-> > +	mbx->fw_pf_shm_base = 0x2d000;
-> > +	mbx->pf2fw_mbox_ctrl = 0x2e000;
-> > +	mbx->fw_pf_mbox_mask = 0x2e200;
-> > +	mbx->fw_vf_share_ram = 0x2b000;
-> > +	mbx->share_size = 512;
-> > +
-> > +	/* setup net feature here */
-> > +	hw->feature_flags |= M_NET_FEATURE_SG |
-> > +			     M_NET_FEATURE_TX_CHECKSUM |
-> > +			     M_NET_FEATURE_RX_CHECKSUM |
-> > +			     M_NET_FEATURE_TSO |
-> > +			     M_NET_FEATURE_VLAN_FILTER |
-> > +			     M_NET_FEATURE_VLAN_OFFLOAD |
-> > +			     M_NET_FEATURE_RX_NTUPLE_FILTER |
-> > +			     M_NET_FEATURE_RX_HASH |
-> > +			     M_NET_FEATURE_USO |
-> > +			     M_NET_FEATURE_RX_FCS |
-> > +			     M_NET_FEATURE_STAG_FILTER |
-> > +			     M_NET_FEATURE_STAG_OFFLOAD;
-> > +	/* start the default ahz, update later */
-> > +	hw->usecstocount = 125;
-> > +}
-> > +
-> > +/**
-> > + * rnpgbe_get_invariants_n210 - setup for hw info
-> > + * @hw: hw information structure
-> > + *
-> > + * rnpgbe_get_invariants_n210 initializes all private
-> > + * structure, such as dma, eth, mac and mbx base on
-> > + * hw->addr for n210
-> > + **/
-> > +static void rnpgbe_get_invariants_n210(struct mucse_hw *hw)
-> > +{
-> > +	struct mucse_mbx_info *mbx = &hw->mbx;
-> > +	/* get invariants based from n500 */
-> > +	rnpgbe_get_invariants_n500(hw);
-> 
-> it's not a good pattern. if you have some configuration that is
-> shared amoung devices, it's better to create *base() or *common()
-> helper and call it from each specific initializer. BTW, why do you
-> name these functions get_invariants*()? They don't get anything, but
-> rather init/setup configuration values. It's better to rename it
-> according to the function.
-> 
+From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
 
-I try to devide hardware to dma, eth, mac, mbx modules. Different
-chips may use the same mbx module with different reg-offset in bar.
-So I setup reg-offset in get_invariants for each chip. And common code,
-such as mbx achieve functions with the reg-offset.
-Ok, I will rename it.
+Hello,
 
-> > +
-> > +	/* update msix base */
-> > +	hw->ring_msix_base = hw->hw_addr + 0x29000;
-> > +	/* update mbx offset */
-> > +	mbx->vf2pf_mbox_vec_base = 0x29200;
-> > +	mbx->fw2pf_mbox_vec = 0x29400;
-> > +	mbx->pf_vf_shm_base = 0x29900;
-> > +	mbx->mbx_mem_size = 64;
-> > +	mbx->pf2vf_mbox_ctrl_base = 0x2aa00;
-> > +	mbx->pf_vf_mbox_mask_lo = 0x2ab00;
-> > +	mbx->pf_vf_mbox_mask_hi = 0;
-> > +	mbx->fw_pf_shm_base = 0x2d900;
-> > +	mbx->pf2fw_mbox_ctrl = 0x2e900;
-> > +	mbx->fw_pf_mbox_mask = 0x2eb00;
-> > +	mbx->fw_vf_share_ram = 0x2b900;
-> > +	mbx->share_size = 512;
-> > +	/* update hw feature */
-> > +	hw->feature_flags |= M_HW_FEATURE_EEE;
-> > +	hw->usecstocount = 62;
-> > +}
-> > +
-> > +const struct rnpgbe_info rnpgbe_n500_info = {
-> > +	.total_queue_pair_cnts = RNPGBE_MAX_QUEUES,
-> > +	.hw_type = rnpgbe_hw_n500,
-> > +	.get_invariants = &rnpgbe_get_invariants_n500,
-> > +};
-> > +
-> > +const struct rnpgbe_info rnpgbe_n210_info = {
-> > +	.total_queue_pair_cnts = RNPGBE_MAX_QUEUES,
-> > +	.hw_type = rnpgbe_hw_n210,
-> > +	.get_invariants = &rnpgbe_get_invariants_n210,
-> > +};
-> > +
-> > +const struct rnpgbe_info rnpgbe_n210L_info = {
-> > +	.total_queue_pair_cnts = RNPGBE_MAX_QUEUES,
-> > +	.hw_type = rnpgbe_hw_n210L,
-> > +	.get_invariants = &rnpgbe_get_invariants_n210,
-> > +};
-> > diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
-> > new file mode 100644
-> > index 000000000000..2c7372a5e88d
-> > --- /dev/null
-> > +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
-> > @@ -0,0 +1,27 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +/* Copyright(c) 2020 - 2025 Mucse Corporation. */
-> > +
-> > +#ifndef _RNPGBE_HW_H
-> > +#define _RNPGBE_HW_H
-> > +/*                     BAR                   */
-> > +/* ----------------------------------------- */
-> > +/*      module  | size  |  start   |    end  */
-> > +/*      DMA     | 32KB  | 0_0000H  | 0_7FFFH */
-> > +/*      ETH     | 64KB  | 1_0000H  | 1_FFFFH */
-> > +/*      MAC     | 32KB  | 2_0000H  | 2_7FFFH */
-> > +/*      MSIX    | 32KB  | 2_8000H  | 2_FFFFH */
-> > +
-> > +#define RNPGBE_RING_BASE (0x1000)
-> > +#define RNPGBE_MAC_BASE (0x20000)
-> > +#define RNPGBE_ETH_BASE (0x10000)
-> > +/* chip resourse */
-> > +#define RNPGBE_MAX_QUEUES (8)
-> > +/* multicast control table */
-> > +#define RNPGBE_MC_TBL_SIZE (128)
-> > +/* vlan filter table */
-> > +#define RNPGBE_VFT_TBL_SIZE (128)
-> > +#define RNPGBE_RAR_ENTRIES (32)
-> 
-> no need for extra parentheses
-> 
+  Please find the DualPI2 patch v26.
 
-Got it, I will fix it.
+  This patch serise adds DualPI Improved with a Square (DualPI2) with following features:
+* Supports congestion controls that comply with the Prague requirements in RFC9331 (e.g. TCP-Prague)
+* Coupled dual-queue that separates the L4S traffic in a low latency queue (L-queue), without harming remaining traffic that is scheduled in classic queue (C-queue) due to congestion-coupling using PI2 as defined in RFC9332
+* Configurable overload strategies
+* Use of sojourn time to reliably estimate queue delay
+* Supports ECN L4S-identifier (IP.ECN==0b*1) to classify traffic into respective queues
 
-> > +
-> > +#define RNPGBE_MII_ADDR 0x00000010 /* MII Address */
-> > +#define RNPGBE_MII_DATA 0x00000014 /* MII Data */
-> > +#endif /* _RNPGBE_HW_H */
-> > diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
-> > index 13b49875006b..08f773199e9b 100644
-> > --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
-> > +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
-> > @@ -11,6 +11,11 @@
-> >   #include "rnpgbe.h"
-> >   char rnpgbe_driver_name[] = "rnpgbe";
-> > +static const struct rnpgbe_info *rnpgbe_info_tbl[] = {
-> > +	[board_n500] = &rnpgbe_n500_info,
-> > +	[board_n210] = &rnpgbe_n210_info,
-> > +	[board_n210L] = &rnpgbe_n210L_info,
-> > +};
-> >   /* rnpgbe_pci_tbl - PCI Device ID Table
-> >    *
-> > @@ -33,6 +38,7 @@ static struct pci_device_id rnpgbe_pci_tbl[] = {
-> >   /**
-> >    * rnpgbe_add_adapter - add netdev for this pci_dev
-> >    * @pdev: PCI device information structure
-> > + * @ii: chip info structure
-> >    *
-> >    * rnpgbe_add_adapter initializes a netdev for this pci_dev
-> >    * structure. Initializes Bar map, private structure, and a
-> > @@ -40,16 +46,24 @@ static struct pci_device_id rnpgbe_pci_tbl[] = {
-> >    *
-> >    * @return: 0 on success, negative on failure
-> >    **/
-> > -static int rnpgbe_add_adapter(struct pci_dev *pdev)
-> > +static int rnpgbe_add_adapter(struct pci_dev *pdev,
-> > +			      const struct rnpgbe_info *ii)
-> >   {
-> >   	struct mucse *mucse = NULL;
-> > +	struct mucse_hw *hw = NULL;
-> > +	u8 __iomem *hw_addr = NULL;
-> >   	struct net_device *netdev;
-> >   	static int bd_number;
-> > +	u32 dma_version = 0;
-> > +	int err = 0;
-> > +	u32 queues;
-> > -	netdev = alloc_etherdev_mq(sizeof(struct mucse), 1);
-> > +	queues = ii->total_queue_pair_cnts;
-> > +	netdev = alloc_etherdev_mq(sizeof(struct mucse), queues);
-> >   	if (!netdev)
-> >   		return -ENOMEM;
-> > +	SET_NETDEV_DEV(netdev, &pdev->dev);
-> >   	mucse = netdev_priv(netdev);
-> >   	mucse->netdev = netdev;
-> >   	mucse->pdev = pdev;
-> > @@ -58,7 +72,54 @@ static int rnpgbe_add_adapter(struct pci_dev *pdev)
-> >   		 rnpgbe_driver_name, mucse->bd_number);
-> >   	pci_set_drvdata(pdev, mucse);
-> > +	hw = &mucse->hw;
-> > +	hw->back = mucse;
-> > +	hw->hw_type = ii->hw_type;
-> > +
-> > +	switch (hw->hw_type) {
-> > +	case rnpgbe_hw_n500:
-> > +		/* n500 use bar2 */
-> > +		hw_addr = devm_ioremap(&pdev->dev,
-> > +				       pci_resource_start(pdev, 2),
-> > +				       pci_resource_len(pdev, 2));
-> > +		if (!hw_addr) {
-> > +			dev_err(&pdev->dev, "map bar2 failed!\n");
-> > +			return -EIO;
-> > +		}
-> > +
-> > +		/* get dma version */
-> > +		dma_version = m_rd_reg(hw_addr);
-> > +		break;
-> > +	case rnpgbe_hw_n210:
-> > +	case rnpgbe_hw_n210L:
-> > +		/* check bar0 to load firmware */
-> > +		if (pci_resource_len(pdev, 0) == 0x100000)
-> > +			return -EIO;
-> > +		/* n210 use bar2 */
-> > +		hw_addr = devm_ioremap(&pdev->dev,
-> > +				       pci_resource_start(pdev, 2),
-> > +				       pci_resource_len(pdev, 2));
-> > +		if (!hw_addr) {
-> > +			dev_err(&pdev->dev, "map bar2 failed!\n");
-> > +			return -EIO;
-> > +		}
-> > +
-> > +		/* get dma version */
-> > +		dma_version = m_rd_reg(hw_addr);
-> > +		break;
-> > +	default:
-> > +		err = -EIO;
-> > +		goto err_free_net;
-> > +	}
-> > +	hw->hw_addr = hw_addr;
-> > +	hw->dma.dma_version = dma_version;
-> > +	ii->get_invariants(hw);
-> > +
-> >   	return 0;
-> > +
-> > +err_free_net:
-> > +	free_netdev(netdev);
-> > +	return err;
-> >   }
-> 
-> You have err_free_net label, which is used only in really impossible
-> case of unknown device, while other cases can return directly and
-> memleak netdev...
-> 
-> 
+For more details of DualPI2, please refer IETF RFC9332 (https://datatracker.ietf.org/doc/html/rfc9332).
 
-Yes, It is really impossible case of unknown device. But maybe switch
-should always has 'default case'? And if in 'default case', nothing To
-do but free_netdev and return err. 
-Other cases return directly with return 0, and netdev will be freed in
-rnpgbe_rm_adapter() when rmmod. Sorry, I may not have got the memleak
-point? 
+Best regards,
+Chia-Yu
 
-> >   /**
-> > @@ -74,6 +135,7 @@ static int rnpgbe_add_adapter(struct pci_dev *pdev)
-> >    **/
-> >   static int rnpgbe_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-> >   {
-> > +	const struct rnpgbe_info *ii = rnpgbe_info_tbl[id->driver_data];
-> >   	int err;
-> >   	err = pci_enable_device_mem(pdev);
-> > @@ -97,7 +159,7 @@ static int rnpgbe_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-> >   	pci_set_master(pdev);
-> >   	pci_save_state(pdev);
-> > -	err = rnpgbe_add_adapter(pdev);
-> > +	err = rnpgbe_add_adapter(pdev, ii);
-> >   	if (err)
-> >   		goto err_regions;
-> 
-> 
+---
+v25 (19-Jul-2025) and v26 (22-Jul-2025) 
+- Restruct to avoid using lock and unlock when both step_thresh are provided (Jakub Kicinski <kuba@kernel.org>)
 
-Thanks for your feedback.
+v24 (18-Jul-2025)
+- Replace TCA_DUALPI2 prefix with TC_DUALPI2 for enums in pkt_sched.h (Jakub Kicinski <kuba@kernel.org>)
+- Report error if both packet and time step thresholds are provided (Jakub Kicinski <kuba@kernel.org>)
+
+v22 (11-Jul-2025) and v23 (13-Jul-2025)
+- Fix issue when user would like to change DualPI2 but provides an empty TCA_OPTIONS with no nested attributes (Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>)
+
+v21 (02-Jul-2025)
+- Replace STEP_THRESH and STEP_PACKETS with STEP_THRESH_PKTS and STEP_THRESH_US (Jakub Kicinski <kuba@kernel.org>)
+- Move READ_ONCE and WRITE_ONCE to later DualPI2 patches (Jakub Kicinski <kuba@kernel.org>)
+- Replace NLA_POLICY_FULL_RANGE with NLA_POLICY_RANGE (Jakub Kicinski <kuba@kernel.org>)
+- Set extra error message for dualpi2_change (Jakub Kicinski <kuba@kernel.org>)
+- Drop redundant else for better readability (Paolo Abeni <pabeni@redhat.com>)
+- Replace step-thresh and step-packets with step-thresh-pkts and step-thresh-us (Jakub Kicinski <kuba@kernel.org>)
+- Remove redundant name-prefix and simplify entries of dualpi2 enums (Jakub Kicinski <kuba@kernel.org>)
+- Fix some typos and format issues of dualpi2 attributes
+
+v20 (21-Jun-2025)
+- Add one more commit to fix warning and style check on tdc.sh reported by shellcheck
+- Remove double-prefixed of "tc_tc_dualpi2_attrs" in tc-user.h (Donald Hunter <donald.hunter@gmail.com>)
+
+v19 (14-Jun-2025)
+- Fix one typo in the comment of #1 (ALOK TIWARI <alok.a.tiwari@oracle.com>)
+- Update commit message of #4 (ALOK TIWARI <alok.a.tiwari@oracle.com>)
+- Wrap long lines of Documentation/netlink/specs/tc.yaml to within 80 characters (Jakub Kicinski <kuba@kernel.org>)
+
+v18 (13-Jun-2025)
+- Add the num of enum used by DualPI2 and fix name and name-prefix of DualPI2 enum and attribute
+- Replace from_timer() with timer_container_of() (Pedro Tammela <pctammela@mojatatu.com>)
+
+v17 (25-May-2025, Resent at 11-Jun-2025)
+- Replace 0xffffffff with U32_MAX (Paolo Abeni <pabeni@redhat.com>)
+- Use helper function qdisc_dequeue_internal() and add new helper function skb_apply_step() (Paolo Abeni <pabeni@redhat.com>)
+- Add s64 casting when calculating the delta of the PI controller (Paolo Abeni <pabeni@redhat.com>)
+- Change the drop reason into SKB_DROP_REASON_QDISC_CONGESTED for drop_early (Paolo Abeni <pabeni@redhat.com>)
+- Modify the condition to remove the original skb when enqueuing multiple GSO segments (Paolo Abeni <pabeni@redhat.com>)
+- Add READ_ONCE() in dualpi2_dump_stat() (Paolo Abeni <pabeni@redhat.com>)
+- Add comments, brackets, and brackets for readability (Paolo Abeni <pabeni@redhat.com>)
+
+v16 (16-MAy-2025)
+- Add qdisc_lock() to dualpi2_timer() in dualpi2_timer (Paolo Abeni <pabeni@redhat.com>)
+- Introduce convert_ns_to_usec() to convert usec to nsec without overflow in #1 (Paolo Abeni <pabeni@redhat.com>)
+- Update convert_us_tonsec() to convert nsec to usec without overflow in #2 (Paolo Abeni <pabeni@redhat.com>)
+- Add more descriptions with respect to DualPI2 in the cover ltter and add changelog in each patch (Paolo Abeni <pabeni@redhat.com>)
+
+v15 (09-May-2025)
+- Add enum of TCA_DUALPI2_ECN_MASK_CLA_ECT to remove potential leakeage in #1 (Simon Horman <horms@kernel.org>)
+- Fix one typo in comment of #2
+- Update tc.yaml in #5 to aligh with the updated enum of pkt_sched.h
+
+v14 (05-May-2025)
+- Modify tc.yaml: (1) Replace flags with enum and remove enum-as-flags, (2) Remove credit-queue in xstats, and (3) Change attribute types (Donald Hunter <donald.hun
+- Add enum and fix the ordering of variables in pkt_sched.h to align with the modified tc.yaml (Donald Hunter <donald.hunter@gmail.com>)
+- Add validators for DROP_OVERLOAD, DROP_EARLY, ECN_MASK, and SPLIT_GSO in sch_dualpi2.c (Donald Hunter <donald.hunter@gmail.com>)
+- Update dualpi2.json to align with the updated variable order in pkt_sched.h
+- Reorder patches (Donald Hunter <donald.hunter@gmail.com>)
+
+v13 (26-Apr-2025)
+- Use dashes in member names to follow YNL conventions in tc.yaml (Donald Hunter <donald.hunter@gmail.com>)
+- Define enumerations separately for flags of drop-early, drop-overload, ecn-mask, credit-queue in tc.yaml (Donald Hunter <donald.hunter@gmail.com>)
+- Change the types of split-gso and step-packets into flag in tc.yaml (Donald Hunter <donald.hunter@gmail.com>)
+- Revert to u32/u8 types for tc-dualpi2-xstats members in tc.yaml (Donald Hunter <donald.hunter@gmail.com>)
+- Add new test cases in tc-tests/qdiscs/dualpi2.json to cover all dualpi2 parameters (Donald Hunter <donald.hunter@gmail.com>)
+- Change the type of TCA_DUALPI2_STEP_PACKETS into NLA_FLAG (Donald Hunter <donald.hunter@gmail.com>)
+
+
+v12 (22-Apr-2025)
+- Remove anonymous struct in sch_dualpi2.c (Paolo Abeni <pabeni@redhat.com>)
+- Replace u32/u8 with uint and s32 with int in tc spec document (Paolo Abeni <pabeni@redhat.com>)
+- Introduce get_memory_limit function to handle potential overflow when multipling limit with MTU (Paolo Abeni <pabeni@redhat.com>)
+- Double the packet length to further include packet overhead in memory_limit (Paolo Abeni <pabeni@redhat.com>)
+- Remove the check of qdisc_qlen(sch) when calling qdisc_tree_reduce_backlog (Paolo Abeni <pabeni@redhat.com>)
+
+v11 (15-Apr-2025)
+- Replace hstimer_init with hstimer_setup in sch_dualpi2.c
+
+v10 (25-Mar-2025)
+- Remove leftover include in include/linux/netdevice.h and anonymous struct in sch_dualpi2.c (Paolo Abeni <pabeni@redhat.com>)
+- Use kfree_skb_reason() and add SKB_DROP_REASON_DUALPI2_STEP_DROP drop reason (Paolo Abeni <pabeni@redhat.com>)
+- Split sch_dualpi2.c into 3 patches (and overall 5 patches): Struct definition & parsing, Dump stats & configuration, Enqueue/Dequeue (Paolo Abeni <pabeni@redhat.com>)
+
+v9 (16-Mar-2025)
+- Fix mem_usage error in previous version
+- Add min_qlen_step to the dualpi2 attribute as the minimum queue length in number of packets in the L-queue to start step threshold marking.
+  In previous versions, this value was fixed to 2, so the step threshold was applied to mark packets in the L queue only when the queue length of the L queue was greater than or equal to 2 packets.
+  This will cause larger queuing delays for L4S traffic at low rates (<20Mbps). So we parameterize it and change the default value to 0.
+  Comparison of tcp_1down run 'HTB 20Mbit + DUALPI2 + 10ms base delay'
+    Old versions:
+                           avg       median          # data pts
+ Ping (ms) ICMP :        11.55        11.70 ms              350
+ TCP upload avg :        18.96          N/A Mbits/s         350
+ TCP upload sum :        18.96          N/A Mbits/s         350
+
+    New version (v9):
+                           avg       median          # data pts
+ Ping (ms) ICMP :        10.81        10.70 ms              350
+ TCP upload avg :        18.91          N/A Mbits/s         350
+ TCP upload sum :        18.91          N/A Mbits/s         350
+
+
+  Comparison of tcp_1down run 'HTB 10Mbit + DUALPI2 + 10ms base delay'
+    Old versions:
+                           avg       median          # data pts
+ Ping (ms) ICMP :        12.61        12.80 ms              350
+ TCP upload avg :         9.48          N/A Mbits/s         350
+ TCP upload sum :         9.48          N/A Mbits/s         350
+
+    New version (v9):
+                           avg       median          # data pts
+ Ping (ms) ICMP :        11.06        10.80 ms              350
+ TCP upload avg :         9.43          N/A Mbits/s         350
+ TCP upload sum :         9.43          N/A Mbits/s         350
+
+
+  Comparison of tcp_1down run 'HTB 10Mbit + DUALPI2 + 10ms base delay'
+    Old versions:
+                           avg       median          # data pts
+ Ping (ms) ICMP :        40.86        37.45 ms              350
+ TCP upload avg :         0.88          N/A Mbits/s         350
+ TCP upload sum :         0.88          N/A Mbits/s         350
+ TCP upload::1  :         0.88         0.97 Mbits/s         350
+
+    New version (v9):
+                           avg       median          # data pts
+ Ping (ms) ICMP :        11.07        10.40 ms              350
+ TCP upload avg :         0.55          N/A Mbits/s         350
+ TCP upload sum :         0.55          N/A Mbits/s         350
+ TCP upload::1  :         0.55         0.59 Mbits/s         350
+
+v8 (11-Mar-2025)
+- Fix warning messages in v7
+
+v7 (07-Mar-2025)
+- Separate into 3 patches to avoid mixing changes of documentation, selftest, and code. (Cong Wang <xiyou.wangcong@gmail.com>)
+
+v6 (04-Mar-2025)
+- Add modprobe for dulapi2 in tc-testing script tc-testing/tdc.sh (Jakub Kicinski <kuba@kernel.org>)
+- Update test cases in dualpi2.json
+- Update commit message
+
+v5 (22-Feb-2025)
+- A comparison was done between MQ + DUALPI2, MQ + FQ_PIE, MQ + FQ_CODEL:
+  Unshaped 1gigE with 4 download streams test:
+   - Summary of tcp_4down run 'MQ + FQ_CODEL':
+                             avg       median       # data pts
+      Ping (ms) ICMP :       1.19     1.34 ms          349
+      TCP download avg :   235.42      N/A Mbits/s     349
+      TCP download sum :   941.68      N/A Mbits/s     349
+      TCP download::1  :   235.19   235.39 Mbits/s     349
+      TCP download::2  :   235.03   235.35 Mbits/s     349
+      TCP download::3  :   236.89   235.44 Mbits/s     349
+      TCP download::4  :   234.57   235.19 Mbits/s     349
+
+   - Summary of tcp_4down run 'MQ + FQ_PIE'
+                             avg       median        # data pts
+      Ping (ms) ICMP :       1.21     1.37 ms          350
+      TCP download avg :   235.42      N/A Mbits/s     350
+      TCP download sum :   941.61     N/A Mbits/s      350
+      TCP download::1  :   232.54  233.13 Mbits/s      350
+      TCP download::2  :   232.52  232.80 Mbits/s      350
+      TCP download::3  :   233.14  233.78 Mbits/s      350
+      TCP download::4  :   243.41  241.48 Mbits/s      350
+
+   - Summary of tcp_4down run 'MQ + DUALPI2'
+                             avg       median        # data pts
+      Ping (ms) ICMP :       1.19     1.34 ms          349
+      TCP download avg :   235.42      N/A Mbits/s     349
+      TCP download sum :   941.68      N/A Mbits/s     349
+      TCP download::1  :   235.19   235.39 Mbits/s     349
+      TCP download::2  :   235.03   235.35 Mbits/s     349
+      TCP download::3  :   236.89   235.44 Mbits/s     349
+      TCP download::4  :   234.57   235.19 Mbits/s     349
+
+
+  Unshaped 1gigE with 128 download streams test:
+   - Summary of tcp_128down run 'MQ + FQ_CODEL':
+                             avg       median       # data pts
+      Ping (ms) ICMP   :     1.88     1.86 ms          350
+      TCP download avg :     7.39      N/A Mbits/s     350
+      TCP download sum :   946.47      N/A Mbits/s     350
+
+   - Summary of tcp_128down run 'MQ + FQ_PIE':
+                             avg       median       # data pts
+      Ping (ms) ICMP   :     1.88     1.86 ms          350
+      TCP download avg :     7.39      N/A Mbits/s     350
+      TCP download sum :   946.47      N/A Mbits/s     350
+
+   - Summary of tcp_128down run 'MQ + DUALPI2':
+                             avg       median       # data pts
+      Ping (ms) ICMP   :     1.88     1.86 ms          350
+      TCP download avg :     7.39      N/A Mbits/s     350
+      TCP download sum :   946.47      N/A Mbits/s     350
+
+
+  Unshaped 10gigE with 4 download streams test:
+   - Summary of tcp_4down run 'MQ + FQ_CODEL':
+                             avg       median       # data pts
+      Ping (ms) ICMP :       0.22     0.23 ms          350
+      TCP download avg :  2354.08      N/A Mbits/s     350
+      TCP download sum :  9416.31      N/A Mbits/s     350
+      TCP download::1  :  2353.65  2352.81 Mbits/s     350
+      TCP download::2  :  2354.54  2354.21 Mbits/s     350
+      TCP download::3  :  2353.56  2353.78 Mbits/s     350
+      TCP download::4  :  2354.56  2354.45 Mbits/s     350
+
+  - Summary of tcp_4down run 'MQ + FQ_PIE':
+                             avg       median      # data pts
+      Ping (ms) ICMP :       0.20     0.19 ms          350
+      TCP download avg :  2354.76      N/A Mbits/s     350
+      TCP download sum :  9419.04      N/A Mbits/s     350
+      TCP download::1  :  2354.77  2353.89 Mbits/s     350
+      TCP download::2  :  2353.41  2354.29 Mbits/s     350
+      TCP download::3  :  2356.18  2354.19 Mbits/s     350
+      TCP download::4  :  2354.68  2353.15 Mbits/s     350
+
+   - Summary of tcp_4down run 'MQ + DUALPI2':
+                             avg       median      # data pts
+      Ping (ms) ICMP :       0.24     0.24 ms          350
+      TCP download avg :  2354.11      N/A Mbits/s     350
+      TCP download sum :  9416.43      N/A Mbits/s     350
+      TCP download::1  :  2354.75  2353.93 Mbits/s     350
+      TCP download::2  :  2353.15  2353.75 Mbits/s     350
+      TCP download::3  :  2353.49  2353.72 Mbits/s     350
+      TCP download::4  :  2355.04  2353.73 Mbits/s     350
+
+
+  Unshaped 10gigE with 128 download streams test:
+   - Summary of tcp_128down run 'MQ + FQ_CODEL':
+                             avg       median       # data pts
+      Ping (ms) ICMP   :     7.57     8.69 ms          350
+      TCP download avg :    73.97      N/A Mbits/s     350
+      TCP download sum :  9467.82      N/A Mbits/s     350
+
+   - Summary of tcp_128down run 'MQ + FQ_PIE':
+                             avg       median       # data pts
+      Ping (ms) ICMP   :     7.82     8.91 ms          350
+      TCP download avg :    73.97      N/A Mbits/s     350
+      TCP download sum :  9468.42      N/A Mbits/s     350
+
+   - Summary of tcp_128down run 'MQ + DUALPI2':
+                             avg       median       # data pts
+      Ping (ms) ICMP   :     6.87     7.93 ms          350
+      TCP download avg :    73.95      N/A Mbits/s     350
+      TCP download sum :  9465.87      N/A Mbits/s     350
+
+   From the results shown above, we see small differences between combinations.
+- Update commit message to include results of no_split_gso and split_gso (Dave Taht <dave.taht@gmail.com> and Paolo Abeni <pabeni@redhat.com>)
+- Add memlimit in the dualpi2 attribute, and add memory_used, max_memory_used, memory_limit in dualpi2 stats (Dave Taht <dave.taht@gmail.com>)
+- Update note in sch_dualpi2.c related to BBRv3 status (Dave Taht <dave.taht@gmail.com>)
+- Update license identifier (Dave Taht <dave.taht@gmail.com>)
+- Add selftest in tools/testing/selftests/tc-testing (Cong Wang <xiyou.wangcong@gmail.com>)
+- Use netlink policies for parameter checks (Jamal Hadi Salim <jhs@mojatatu.com>)
+- Modify texts & fix typos in Documentation/netlink/specs/tc.yaml (Dave Taht <dave.taht@gmail.com>)
+- Add descriptions of packet counter statistics and the reset function of sch_dualpi2.c
+- Fix step_thresh in packets
+- Update code comments in sch_dualpi2.c
+
+v4 (22-Oct-2024)
+- Update statement in Kconfig for DualPI2 (Stephen Hemminger <stephen@networkplumber.org>)
+- Put a blank line after #define in sch_dualpi2.c (Stephen Hemminger <stephen@networkplumber.org>)
+- Fix line length warning.
+
+v3 (19-Oct-2024)
+- Fix compilaiton error
+- Update Documentation/netlink/specs/tc.yaml (Jakub Kicinski <kuba@kernel.org>)
+
+v2 (18-Oct-2024)
+- Add Documentation/netlink/specs/tc.yaml (Jakub Kicinski <kuba@kernel.org>)
+- Use dualpi2 instead of skb prefix (Jamal Hadi Salim <jhs@mojatatu.com>)
+- Replace nla_parse_nested_deprecated with nla_parse_nested (Jamal Hadi Salim <jhs@mojatatu.com>)
+- Fix line length warning
+
+---
+Chia-Yu Chang (5):
+  sched: Struct definition and parsing of dualpi2 qdisc
+  sched: Dump configuration and statistics of dualpi2 qdisc
+  selftests/tc-testing: Fix warning and style check on tdc.sh
+  selftests/tc-testing: Add selftests for qdisc DualPI2
+  Documentation: netlink: specs: tc: Add DualPI2 specification
+
+Koen De Schepper (1):
+  sched: Add enqueue/dequeue of dualpi2 qdisc
+
+ Documentation/netlink/specs/tc.yaml           |  151 ++-
+ include/net/dropreason-core.h                 |    6 +
+ include/uapi/linux/pkt_sched.h                |   68 +
+ net/sched/Kconfig                             |   12 +
+ net/sched/Makefile                            |    1 +
+ net/sched/sch_dualpi2.c                       | 1175 +++++++++++++++++
+ tools/testing/selftests/tc-testing/config     |    1 +
+ .../tc-testing/tc-tests/qdiscs/dualpi2.json   |  254 ++++
+ tools/testing/selftests/tc-testing/tdc.sh     |    6 +-
+ 9 files changed, 1669 insertions(+), 5 deletions(-)
+ create mode 100644 net/sched/sch_dualpi2.c
+ create mode 100644 tools/testing/selftests/tc-testing/tc-tests/qdiscs/dualpi2.json
+
+-- 
+2.34.1
 
 
