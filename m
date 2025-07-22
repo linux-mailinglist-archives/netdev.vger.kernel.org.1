@@ -1,166 +1,134 @@
-Return-Path: <netdev+bounces-208842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 171DDB0D5DC
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 11:24:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2E68B0D5E3
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 11:24:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8A4E1887C17
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 09:24:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFCDF165855
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 09:24:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8D2D2DA749;
-	Tue, 22 Jul 2025 09:23:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AA9B2DAFCE;
+	Tue, 22 Jul 2025 09:24:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hnpr+OvF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MjJRYeJZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFBCB1D5CD4;
-	Tue, 22 Jul 2025 09:23:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8218F189902;
+	Tue, 22 Jul 2025 09:24:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753176237; cv=none; b=YPUOFVJxhOW54hkpCdSH5EJnzxgBerVxBdaWUh9w/XAURZWIjjlx840GIdVyE0E5UG0rBYlR30kE/w6pSvGujOnn1QK+0eFITfAWs/n4fGAQWv/YNWLsEh95yeVEY4LE+1SVpyt1N/BN6kUkkKCxByXIUTDTYt8Q6RS2lJLWIRM=
+	t=1753176272; cv=none; b=DlUlAhNpldZkz0ooqfPapBxY/KnuOA6TrrMT4w0sE6uE1V/ZuM+iGZC/sEMdeniXDgqhatVUoy1nc+Q0XO/MtZyOk+zNL3htQRzS5nAECnc590d4MdaZ+yrD5dPn/SLP6rt6Sw6FnM7u7UY1lU2VH/ZNOnzuGjgw+1iHWXoGOKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753176237; c=relaxed/simple;
-	bh=a+8E4SAu1ib+nNJy6o6lE6mpCzXJ/lWhWHoAp+XIqMQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qj3rhWKNK+zMr8F9FFDdg7U6nYLTV/eJp4WhhJs4BmI5cpiBLgJiTLFX2y+9RDyoJHMo70rbT0jogZEheS9deMi/wQSEmy4PvJMDRWdKy/UFnWYrwsBK4BtmLJC9+7Jx5RGJ7y5eePshcBlwJHZXoWme9AdXtpp0Tv9E96uLMic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hnpr+OvF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C4B7C4CEEB;
-	Tue, 22 Jul 2025 09:23:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753176237;
-	bh=a+8E4SAu1ib+nNJy6o6lE6mpCzXJ/lWhWHoAp+XIqMQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hnpr+OvFQrLwa9kjrXjGWutJC5Mk7eTwdSFAzB04Y0W/gneYBFZu6N+XiTI1FhnJ9
-	 fasF4G353RSl1Zv7ZsgcE623tPIDs3J7bvNvCSe254Ucr2PWxfr1O0G+PeMRR/VfDv
-	 mgbBc9cvhWwm5LfvExkE1vAKzuP6EiAd0RFZB8iGt5nbVLkS9CovoHGT9Ixr1rCUJ0
-	 xBvvI9fQ57+uvh7g7l6EceitjKj/idoXSHxs2xa8UJ6d4KefJ27L7eTkuwSgroGHfK
-	 yTH2wRCISnEZ02CCi/yfj8N3VREIOTE7u9M5pZ4zvzcUReNHeqqqPlf41r1L+G7Q3u
-	 G6/a/k/3b4t+w==
-Message-ID: <f956664e-24a2-410a-be9b-4d90e08c7c64@kernel.org>
-Date: Tue, 22 Jul 2025 10:23:53 +0100
+	s=arc-20240116; t=1753176272; c=relaxed/simple;
+	bh=Ksr4RcpyiaVxvdAz9Ft+gR94b9IMq2d1CEO85zHMm3o=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ozdi7zxKbUqjVpS7bhPaGPOyba+XSkcY455kr2390EfonGP85biUUp9cXiGLNr9gVbbeTJ+MgwGtO0D32hkHab3nWo1xwF/bGoaBk/cKjpIi85g6kTgFijANpAAaCz9w+glrzCbw2yUhCsIgjDjHfmCUPY2N4E2iLwGsY0Fld2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MjJRYeJZ; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753176271; x=1784712271;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=Ksr4RcpyiaVxvdAz9Ft+gR94b9IMq2d1CEO85zHMm3o=;
+  b=MjJRYeJZpalrlHw+UcPoLhG0hsnDsFWT4Vl198E033SFSD8VB0j88IgK
+   tsdjYlB+nUlOBtv2gmxqzWzz9v+1Vz7qcqmQRLBAvR7KjSNbfuZ3TSzwx
+   6qaTp8+EIIpqjbs7F1OpPp5qYQBh9Dmgn1p5WW0Z46zH98v9JSfFuaIof
+   mP7E3btZygMf7XIArG3cCmTUHgD3AJV5tezE1D566DfnmyOrKeYuvS5xy
+   aEiF4fT4jF51WLsfHPlb0dYBL8C8bnah7e9LuE9zS+DhxKao1yeS5i3uh
+   FKU4YUYIuD8NilU9B5NSz6N2dJHzhdmg7f0JBMvNqHTQ++GDVFQ8Titq4
+   w==;
+X-CSE-ConnectionGUID: dXx7JM3uS8aac5OU3dpXgA==
+X-CSE-MsgGUID: L+02RNx2QLSMDZdllhWsjQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11499"; a="55574717"
+X-IronPort-AV: E=Sophos;i="6.16,331,1744095600"; 
+   d="scan'208";a="55574717"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2025 02:24:30 -0700
+X-CSE-ConnectionGUID: cbehGU95QkWPRtX5+LVZGA==
+X-CSE-MsgGUID: 7OhfXV8JRdOAnLadikdZ1w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,331,1744095600"; 
+   d="scan'208";a="163133052"
+Received: from vpanait-mobl.ger.corp.intel.com (HELO [10.245.244.202]) ([10.245.244.202])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2025 02:24:17 -0700
+Message-ID: <ffd58e1a8b51c98cac9be49e85d367f1a3a24c2d.camel@linux.intel.com>
+Subject: Re: [PATCH v3 3/8] drm/xe: Fix typo "notifer"
+From: Thomas =?ISO-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>
+To: WangYuli <wangyuli@uniontech.com>
+Cc: airlied@gmail.com, akpm@linux-foundation.org,
+ alison.schofield@intel.com, 	andrew+netdev@lunn.ch,
+ andriy.shevchenko@linux.intel.com, 	arend.vanspriel@broadcom.com,
+ bp@alien8.de, brcm80211-dev-list.pdl@broadcom.com, 
+	brcm80211@lists.linux.dev, colin.i.king@gmail.com, cvam0000@gmail.com, 
+	dan.j.williams@intel.com, dave.hansen@linux.intel.com,
+ dave.jiang@intel.com, 	dave@stgolabs.net, davem@davemloft.net,
+ dri-devel@lists.freedesktop.org, 	edumazet@google.com,
+ gregkh@linuxfoundation.org, guanwentao@uniontech.com, 	hpa@zytor.com,
+ ilpo.jarvinen@linux.intel.com, intel-xe@lists.freedesktop.org, 
+	ira.weiny@intel.com, j@jannau.net, jeff.johnson@oss.qualcomm.com,
+ jgross@suse.com, 	jirislaby@kernel.org, johannes.berg@intel.com,
+ jonathan.cameron@huawei.com, 	kuba@kernel.org, kvalo@kernel.org,
+ kvm@vger.kernel.org, linux-cxl@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-serial@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, linux@treblig.org,
+ lucas.demarchi@intel.com, 	marcin.s.wojtas@gmail.com, ming.li@zohomail.com,
+ mingo@kernel.org, 	mingo@redhat.com, netdev@vger.kernel.org,
+ niecheng1@uniontech.com, 	oleksandr_tyshchenko@epam.com, pabeni@redhat.com,
+ pbonzini@redhat.com, 	quic_ramess@quicinc.com, ragazenta@gmail.com,
+ rodrigo.vivi@intel.com, 	seanjc@google.com, shenlichuan@vivo.com,
+ simona@ffwll.ch, sstabellini@kernel.org, 	tglx@linutronix.de,
+ vishal.l.verma@intel.com, wangyuli@deepin.org, x86@kernel.org, 
+	xen-devel@lists.xenproject.org, yujiaoliang@vivo.com, zhanjun@uniontech.com
+Date: Tue, 22 Jul 2025 11:24:15 +0200
+In-Reply-To: <94190C5F54A19F3E+20250722073431.21983-3-wangyuli@uniontech.com>
+References: <576F0D85F6853074+20250722072734.19367-1-wangyuli@uniontech.com>
+	 <94190C5F54A19F3E+20250722073431.21983-3-wangyuli@uniontech.com>
+Organization: Intel Sweden AB, Registration Number: 556189-6027
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next 1/2] bpftool: Add bpf_token show
-To: Tao Chen <chen.dylane@linux.dev>, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
- kuba@kernel.org, hawk@kernel.org
-Cc: linux-kernel@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20250720173310.1334483-1-chen.dylane@linux.dev>
- <6b0669fd-fef6-4f4e-b80d-512769e86938@kernel.org>
- <06387128-8d34-49fd-a409-d35f5d60b094@linux.dev>
-From: Quentin Monnet <qmo@kernel.org>
-Content-Language: en-GB
-In-Reply-To: <06387128-8d34-49fd-a409-d35f5d60b094@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 
-2025-07-22 13:48 UTC+0800 ~ Tao Chen <chen.dylane@linux.dev>
-> 在 2025/7/22 00:23, Quentin Monnet 写道:
->> Thanks a lot for this!
->>
-> 
-> Hi Quenin,
-> 
->>
->> 2025-07-21 01:33 UTC+0800 ~ Tao Chen <chen.dylane@linux.dev>
->>> Add `bpftool token show` command to get token info
->>> from bpf fs in /proc/mounts.
->>>
->>> Example plain output for `token show`:
->>> token_info:
->>>          /sys/fs/bpf/token
->>>
->>> allowed_cmds:
->>>          map_create          prog_load
->>>
->>> allowed_maps:
->>>
->>> allowed_progs:
->>>          kprobe
->>>
->>> allowed_attachs:
->>>          xdp
->>>
->>> Example json output for `token show`:
->>> {
->>>      "token_info": "/sys/fs/bpf/token",
->>>      "allowed_cmds": ["map_create","prog_load"
->>>      ],
->>>      "allowed_maps":
->>
->>
->> This is not valid JSON. You're missing a value for "allowed_maps" (here
->> it should likely be an empty array), and the comma:
->>
->>     "allowed_maps": [],
->>
->>
->>>      "allowed_progs": ["kprobe"
->>>      ],
->>>      "allowed_attachs": ["xdp"
->>>      ]
->>> }
->>>
->>> Signed-off-by: Tao Chen <chen.dylane@linux.dev>
->>> ---
->>>   tools/bpf/bpftool/main.c  |   3 +-
->>>   tools/bpf/bpftool/main.h  |   1 +
->>>   tools/bpf/bpftool/token.c | 229 ++++++++++++++++++++++++++++++++++++++
->>>   3 files changed, 232 insertions(+), 1 deletion(-)
->>>   create mode 100644 tools/bpf/bpftool/token.c
->>>
+On Tue, 2025-07-22 at 15:34 +0800, WangYuli wrote:
+> There is a spelling mistake of 'notifer' in the comment which
+> should be 'notifier'.
+>=20
+> Signed-off-by: WangYuli <wangyuli@uniontech.com>
+Reviewed-by: Thomas Hellstr=C3=B6m <thomas.hellstrom@linux.intel.com>
 
-[...]
+> ---
+> =C2=A0drivers/gpu/drm/xe/xe_vm_types.h | 2 +-
+> =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/gpu/drm/xe/xe_vm_types.h
+> b/drivers/gpu/drm/xe/xe_vm_types.h
+> index 1979e9bdbdf3..0ca27579fd1f 100644
+> --- a/drivers/gpu/drm/xe/xe_vm_types.h
+> +++ b/drivers/gpu/drm/xe/xe_vm_types.h
+> @@ -259,7 +259,7 @@ struct xe_vm {
+> =C2=A0		 * up for revalidation. Protected from access with
+> the
+> =C2=A0		 * @invalidated_lock. Removing items from the list
+> =C2=A0		 * additionally requires @lock in write mode, and
+> adding
+> -		 * items to the list requires either the
+> @userptr.notifer_lock in
+> +		 * items to the list requires either the
+> @userptr.notifier_lock in
+> =C2=A0		 * write mode, OR @lock in write mode.
+> =C2=A0		 */
+> =C2=A0		struct list_head invalidated;
 
->>> diff --git a/tools/bpf/bpftool/token.c b/tools/bpf/bpftool/token.c
->>> new file mode 100644
->>> index 00000000000..2fcaff4f2ba
->>> --- /dev/null
->>> +++ b/tools/bpf/bpftool/token.c
-
-[...]
-
->>> +            if (has_delegate_options(ent->mnt_opts)) {
->>> +                hit = true;
->>> +                break;
->>
->>
->> Apologies, my knowledge of BPF tokens is limited. Can you have only one
->> token exposed through a bpffs at a time? Asking because I know you can
->> have several bpffs on your system, if each can have delegate options
->> then why stop after the first bpffs mount point you find?
->>
-> 
-> Yes it is, only the first bpffs with token info will be showed above.
-> Actually, it will not be limited how many bpffs ceated in kernel, it
-> depends on the user scenarios. In most cases, only one will be created.
-> But, maybe it's better to show all. I will change it in v2.
-
-Yes please. If there are several tokens available, bpftool should "list"
-them all, as the command name implies. The user scenarios don't really
-count here, we should just dump all token info we can see. In the
-future, we could then add the possibility to take an argument (likely a
-path to a bpffs) to show info for a particular mountpoint; a bit like
-you can list all existing programs with "bpftool prog show" but can also
-chose to pick one with "bpftool prog show id ...".
-
-If we print info for several mountpoint, I'd suggest adjusting the
-format for the plain output slightly: I'd remove the blank lines between
-the different sections to get something more compact, maybe play with
-the indent as well, like when we list programs or maps.
-
-Thanks,
-Quentin
 
