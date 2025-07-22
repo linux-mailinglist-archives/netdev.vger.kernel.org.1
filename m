@@ -1,182 +1,185 @@
-Return-Path: <netdev+bounces-208831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CABC4B0D53A
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 11:05:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69410B0D566
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 11:12:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6B057A7293
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 09:03:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D7A51895E48
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 09:12:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8421A2BEC3A;
-	Tue, 22 Jul 2025 09:04:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45BEC2DAFCF;
+	Tue, 22 Jul 2025 09:12:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Tewec8AC"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="emrs40NK"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2080.outbound.protection.outlook.com [40.107.244.80])
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011564CE08;
-	Tue, 22 Jul 2025 09:04:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.80
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753175093; cv=fail; b=AEtFVG+jkXklcny0uys+cZw1zoD8StYOvsCbItvIAMmjLbl8j1YUJyGvT74wu/J9OUqbUVO8pqs4t8P45KE+HBnuQHi5zUI6cbq3J4NWrE+abJ/HVOBG+GY14wT/oIASpUvwEGMJFoLYe7O6Ko7EtsyNH2XaXTtCHja8/DGpnYg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753175093; c=relaxed/simple;
-	bh=JEf2udjvRBx4s2D1iAYtH3ZMsQVveAUZcvcox60T7WM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MltQidvoDCEGczcThn7d92D0mBCZHsZX9bNRCl+L9dh+aJnytGvQ37utozofcoQkHQOovTq/L22nOa9FrKGYYM9OwdS4QyjoYOuMyxzk0vUDzlTTU0qUQUWhObEL4s28Xlid13ru3lINaULJUiuOeQyLFCuyAwHXbI5I0jdidOk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Tewec8AC; arc=fail smtp.client-ip=40.107.244.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dE+JLwPix8ugriT3kz/wGobZPJU3mOhWaJP7GR5NOeA1x1bqLTEqU9dXTQVgawNifU4QZbQwMzenFOnd3J+/p5t46Cr3jJMpE/RPOipkxJeBcvsdoSoYGn4yFrxLtfkJvxMC7p0559oJEimg+KIkpQySm1TGTGCn1BEjlIWjNQOpPnZm3C0dLMR1jN7nl5DyIhrELklDNOVQiHdprvMXDn/SNR0Xm8shOwgGVh+WPf6Z+Gk1Ls65pOPKUFusQmi1js2BqVxVN/FCLJ/kaWMZ1qOJhjPvue3rUUS4BPrb+5WMYMewkiE0SFIcPHBSi9Bz1AumyNwfpPrdSgJdlWDLoA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SIqhe1ozvsIlFysjfhHgQAGOuIHdPwcukiuFCs+WXM4=;
- b=tMVPOOQKZYFFB/lYZ6Cwt2TtZyjGvO1N/3/IbJyDYHnvxT9pC2VgzIwT1QJLY5SemEE+tWU15rNm41IB10OoqKvANrXYOqvZXAu5CczUDYb0+nwYBMKygNFyrQxoFJZIOBYlTFBIW9U0sk0//TvFLocfEzo7CtqwIXvCav3B/LGIPQwSDaZLqLr7z0ui89TxGBppWPt0sxCwFyFJnDSSjo2+VHMNquDhUwN7TlnJH7W/CpfZzmzpejxnZTBL8xLXZczqoKZ0dn+U/qD+p8foCKbGaXisLYYL7TjON0bqH0/ASfRG9xRuqChjVJn4Dc9JFAirLxDErKIen0vR2Cg13Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SIqhe1ozvsIlFysjfhHgQAGOuIHdPwcukiuFCs+WXM4=;
- b=Tewec8ACcFl6gQbMFud0cxLKYWkCxA9IbjrQEiDAh6K+By0L+wEN7wN6N2KtlhQzT0L0LvvV3AH1LE54XnNqsRDdDdSmf7Z5R7sYsOLrc/Oc8T+EMyoS/hrZi7mmW5NmJ3qqN2QfpX5WPny7ey1mYHf8MpkcMu3Z0YiK7et7tiwoDpj4MISixMQCqII5aZUvf3W0LTxo5j4EEd6aip/JVttBkdlcTgWt8MeUqPSrhrTZJzynPIjxKPaufGpj//w9Xl9ZbdQxjN5Sh5oBwcB2RrWAi9IVgXaZIoU4PVv7lLwMjWJLjeEVo5Ux6EZ7EgEchqUdWoSip+dK3V9yOgTEvw==
-Received: from CH2PR15CA0011.namprd15.prod.outlook.com (2603:10b6:610:51::21)
- by DS7PR12MB6142.namprd12.prod.outlook.com (2603:10b6:8:9a::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8943.30; Tue, 22 Jul
- 2025 09:04:49 +0000
-Received: from CH1PEPF0000AD75.namprd04.prod.outlook.com
- (2603:10b6:610:51:cafe::95) by CH2PR15CA0011.outlook.office365.com
- (2603:10b6:610:51::21) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8943.29 via Frontend Transport; Tue,
- 22 Jul 2025 09:04:49 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CH1PEPF0000AD75.mail.protection.outlook.com (10.167.244.54) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8964.20 via Frontend Transport; Tue, 22 Jul 2025 09:04:49 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 22 Jul
- 2025 02:04:32 -0700
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail202.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 22 Jul
- 2025 02:04:32 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.7)
- with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Tue, 22
- Jul 2025 02:04:29 -0700
-From: Tariq Toukan <tariqt@nvidia.com>
-To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>
-CC: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
-	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [pull-request] mlx5-next updates 2025-07-22
-Date: Tue, 22 Jul 2025 12:04:08 +0300
-Message-ID: <1753175048-330044-1-git-send-email-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.8.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387342DAFB8;
+	Tue, 22 Jul 2025 09:12:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753175527; cv=none; b=swKOaJXh+R2PX3CqKJJT0/BSgiJOOOhgFMjqBVmg2Sq5Hza8UclJ+pFt+USP2qGRpkG4s2j4I8stxIGhNPfOdV5zTGk3iFnsGIo6Xd2Adg27J+jgFCInKPUPv81BE+feIhI5cIzbKC2j5Et+pNXMWHxKiBJyJ1r/qD7TEdfYPP8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753175527; c=relaxed/simple;
+	bh=EH6215FFGwk8dFMtWg2oH/Cq3wmZbzjrowwMaoTp/Ic=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=p1k6kwUPyDTVRIgkussjpi8Ruq5FHseuGJw8jp1q7t+1DgaPjWh8ObgXUCDG87wvrgLlo0RPyEaa00qUT9OKaMOokzhpoiEX7LQRx59zA48aY7H579dwrXvvy/fEnuijjJLH1PPjnv0bnuELVbibRZKjOXu89PuGz6ggeDoRtxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=emrs40NK; arc=none smtp.client-ip=91.207.212.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56M96AmW018853;
+	Tue, 22 Jul 2025 11:11:35 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=selector1; bh=
+	eBniFFc5/p1IPtlwHJOG5fqf0eKdncuC7yttR4e44n8=; b=emrs40NKUFiOHe07
+	UKXpZ3p5RlKp6YDSqSzhyJq8BEahW8MgEAUZFFKO0JBr6OUU9WNLPRqdpV5ribCz
+	e/M227uIfWHcPwL8zGvLAaCDDSjZV+SAOVsXipBxfNIOMhEbTWkXRMGosqea4fNC
+	0soau/20fRmFQgfb109Zd3/Ug5TzWJ+SeHC88HNUXET8HxBIQoEPpZDFAVq+qwca
+	Xys6yBDsvbYvyTU1+mAk4A1Zht2XwWrwMRdasdqUdAh9OxNaDZ1ar06YY0l5bGre
+	KwjxxSXsBzxqxrm2SBmJJaB0jPXgqF8O8NOqZmhkQZGJfp1/TDe4XNDjgle/5pRv
+	DGHKaQ==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 48028g4spn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 22 Jul 2025 11:11:35 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 5CEFB40052;
+	Tue, 22 Jul 2025 11:09:54 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 1C95F769739;
+	Tue, 22 Jul 2025 11:08:32 +0200 (CEST)
+Received: from [10.48.87.141] (10.48.87.141) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 22 Jul
+ 2025 11:08:31 +0200
+Message-ID: <383299bb-883c-43bf-a52a-64d7fda71064@foss.st.com>
+Date: Tue, 22 Jul 2025 11:08:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-NV-OnPremToCloud: AnonymousSubmission
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD75:EE_|DS7PR12MB6142:EE_
-X-MS-Office365-Filtering-Correlation-Id: de2d7770-21c4-4ad4-9df4-08ddc8fecfe7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|36860700013|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?bbXvQ9BPfs+TDrlfQMT2mCOL6aeX4cleoj4pQ47vcpczn2mDV2fRFKmYxS4t?=
- =?us-ascii?Q?7gdt9lMx7wYm2X77KrVEMG1lTVhFhiuKEYbEw0im1X5zvYT2nuGQDLIMQSvV?=
- =?us-ascii?Q?eUHBHeAsEW2PuegqpxxqF9fwCsalMKNr49YhvOzDrNeqYAPkAoBJ4KMAgToV?=
- =?us-ascii?Q?cg8XjCMdl4ZWH2RqJCJhPOdU0vB/b2AQ15Wgp0zLt6tULcS95RIUkwZetr6t?=
- =?us-ascii?Q?guw9y9oNt1SjwBerNRYlNveHNoh/QLeP7A6EBicT3FpQ8JLx0VBOppmYR92p?=
- =?us-ascii?Q?wWZJ9EkT5oKw0Krq9rLqTeuX77ygCHKChPdXqQkz5TgPTJIT2/1B869Sb03Q?=
- =?us-ascii?Q?SmvcdfnNbc/8d6Kfq8MTQxD+eUi+aXgjvIaxvG+xQ2Dp4uPp1sXE8jP8L9VA?=
- =?us-ascii?Q?3Xw4QyuCGkERyTdKtKelckkMMJK6fgKnfoEFn0zvmu8Lv5Xy0bFoIQre9tgo?=
- =?us-ascii?Q?jWaPK9xYLQ7AJ78IF5kBoovwjjKvQjohxwayou7pviuXltLGWyQWPSZv8Npf?=
- =?us-ascii?Q?c+iPL1dYZ0nxlmU0W+P+7idvatWjcJaI/P/YEMcrISs4QMOtW4yTVsspCojF?=
- =?us-ascii?Q?9imSq0nQ61+9B+LjEcbe9/HMFMxImJqvmWoG48zPDKBD13XdAXZQFP++MJfJ?=
- =?us-ascii?Q?SSNf1QunSIfHdp4/sH2vmxQTTtAAvv9yeSc6kyrLcPrlmQdm4dwJX+GL+q/P?=
- =?us-ascii?Q?ERligerhHfzw5CioBsRRiE1ELd5vJ+lJOcFCCtWUuZWGWvbviaxELPeLMQBb?=
- =?us-ascii?Q?15ynCkgd7jZTtlSs3vUigwOBeDBChevomglQO7L7pVA6+zqkNR5LF/T6vArX?=
- =?us-ascii?Q?wDkrt0QxxdRnyE+r3RjBqDZfT6otmjWCdXu8NlkkUAMFptFXJBm3j0kuG3Yy?=
- =?us-ascii?Q?BhpWPe36AMFG3X18ty4fGCqVR9r9cnciHfVqYWSGBaROmkofsmUz1IKV1eZN?=
- =?us-ascii?Q?o8brlWTN7mZ6YFdxQAA5sNIuVH1N4yibeZQI00l8dpi0UQ9qqEPJFmslzMrc?=
- =?us-ascii?Q?PhtsxfYQHpyjdVWkfXDLKbbcRbZ/J1/jQMlT6uFNXhSCrvPjJQj7+U0Br0Wu?=
- =?us-ascii?Q?Usj0aWwwyE6O2rzSywEqX0ihnGihhg+ZHDxW99XrFVEf3V4Y2iyV9ocMly3/?=
- =?us-ascii?Q?Lk81d9PO5g4Uo7yE6elvK2/qB1LjNFfTKXaL+hCZGbt0znJsRavJnokvpfJ3?=
- =?us-ascii?Q?MgySfUP6g3zNrvkHNtB5YcpU+yK0y6ZsU1eZwlXvSW8Esv1NqZZJ+HuuCYaV?=
- =?us-ascii?Q?dm87nU9oJnBhejZ/PQemuDLABA/R70K9tAcyUqYGzOB4LAIojuNXHDJ6jZgp?=
- =?us-ascii?Q?hH9EGPIpR6HuZI5YsO4dtFLJu9AiL29/X9JaCInyv3Zj8+XL2dohXSxRU4lU?=
- =?us-ascii?Q?bWhtbJOICV3QCiM3YfSc8fJy6w0FGkSAqsPYGesf5ns63tBJmnoMqxJztsLa?=
- =?us-ascii?Q?b1tcO1lDrJaApj1upjMvPswbvJnW5IssXvGwo1BBAn5GhYTSr/15TCuUlEm+?=
- =?us-ascii?Q?4xHh51IQ8l0rjbJicGDOVymOnQe6/TGXj33i?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700013)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2025 09:04:49.0062
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: de2d7770-21c4-4ad4-9df4-08ddc8fecfe7
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000AD75.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6142
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/4] dt-bindings: net: document st,phy-wol
+ property
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Krzysztof Kozlowski <krzk@kernel.org>,
+        Andrew Lunn
+	<andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Christophe Roullier <christophe.roullier@foss.st.com>,
+        Heiner Kallweit
+	<hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>, Simon Horman
+	<horms@kernel.org>,
+        Tristram Ha <Tristram.Ha@microchip.com>,
+        Florian Fainelli
+	<florian.fainelli@broadcom.com>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+References: <20250721-wol-smsc-phy-v1-0-89d262812dba@foss.st.com>
+ <20250721-wol-smsc-phy-v1-1-89d262812dba@foss.st.com>
+ <faea23d5-9d5d-4fbb-9c6a-a7bc38c04866@kernel.org>
+ <f5c4bb6d-4ff1-4dc1-9d27-3bb1e26437e3@foss.st.com>
+ <e3c99bdb-649a-4652-9f34-19b902ba34c1@lunn.ch>
+ <38278e2a-5a1b-4908-907e-7d45a08ea3b7@foss.st.com>
+ <5b8608cb-1369-4638-9cda-1cf90412fc0f@lunn.ch>
+Content-Language: en-US
+From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+In-Reply-To: <5b8608cb-1369-4638-9cda-1cf90412fc0f@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-22_01,2025-07-21_02,2025-03-28_01
 
-Hi,
 
-The following pull-request contains common mlx5 updates
-for your *net-next* tree.
-Please pull and let me know of any problem.
 
-Regards,
-Tariq
+On 7/21/25 19:07, Andrew Lunn wrote:
+>> Regarding this property, somewhat similar to "mediatek,mac-wol",
+>> I need to position a flag at the mac driver level. I thought I'd go
+>> using the same approach.
+> 
+> Ideally, you don't need such a flag. WoL should be done as low as
+> possible. If the PHY can do the WoL, the PHY should be used. If not,
+> fall back to MAC.
+> 
+> Many MAC drivers don't support this, or they get the implementation
+> wrong. So it could be you need to fix the MAC driver.
+> 
+> MAC get_wol() should ask the PHY what it supports, and then OR in what
+> the MAC supports.
+> 
+> When set_wol() is called, the MAC driver should ask the PHY driver to
+> do it. If it return 0, all is good, and the MAC driver can be
+> suspended when times comes. If the PHY driver returns EOPNOTSUPP, it
+> means it cannot support all the enabled WoL operations, so the MAC
+> driver needs to do some of them. The MAC driver then needs to ensure
+> it is not suspended.
+> 
+> If the PHY driver is missing the interrupt used to wake the system,
+> the get_wol() call should not return any supported WoL modes. The MAC
+> will then do WoL. Your "vendor,mac-wol" property is then pointless.
+> 
 
-----------------------------------------------------------------
-The following changes since commit cd1746cb6555a2238c4aae9f9d60b637a61bf177:
+Seems like a fair and logical approach. It seems reasonable that the
+MAC driver relies on the get_wol() API to know what's supported.
 
-  net/mlx5: IFC updates for disabled host PF (2025-07-13 03:17:30 -0400)
+The tricky thing for the PHY used in this patchset is to get this
+information:
 
-are available in the Git repository at:
+Extract from the documentation of the LAN8742A PHY:
+"The WoL detection can be configured to assert the nINT interrupt pin
+or nPME pin"
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git mlx5-next
+This PHY proposes several pins with alternate configurations so they
+can act as either nINT, nPME or other type of pin. While the nPME
+is dedicated to raise a signal on a WoL event, WoL event can also,
+if configured, raise a signal on a nINT pin. However, the latter
+case expect (extract again):
+"While waiting for a WoL event to occur, it is possible that other
+interrupts may be triggered. To prevent such conditions, all other
+interrupts shall be masked by system software, or the alternative nPME
+pin may be used"
+therefore preventing other types of interrupt from triggering.
 
-for you to fetch changes up to 9a0048e0ae14cb7babfd459ec920234e8a2ab86e:
+Today, the WoL is statically configured so that the nPME pin is
+asserted on such event in lan874x_phy_config_init(). For it to
+be functional, the nPME pin has to be wired to a wake up input of
+a wake up capable interrupt controller.
+On the stm32mp135f-dk board, e.g, that's the case for only one of the
+two ethernet ports.
 
-  net/mlx5: Expose cable_length field in PFCC register (2025-07-20 03:02:14 -0400)
+Overall it's both a combination of what pin is asserted on a WoL
+and what pin is wired to a wake up capable interrupt controller.
+What would be a correct approach to get the information from the PHY
+driver that the WoL is indeed supported considering all of this?
 
-----------------------------------------------------------------
-Jianbo Liu (1):
-      net/mlx5: Add IFC bits to support RSS for IPSec offload
+Tristram, can you tell me if what I'm saying here makes any
+sense?
 
-Oren Sidi (2):
-      net/mlx5: Add IFC bits and enums for buf_ownership
-      net/mlx5: Expose cable_length field in PFCC register
-
- .../mellanox/mlx5/core/steering/hws/definer.c      | 13 +++--
- include/linux/mlx5/mlx5_ifc.h                      | 58 +++++++++++++++++-----
- 2 files changed, 53 insertions(+), 18 deletions(-)
+> Correctly describe the PHY in DT, list the interrupt it uses for
+> waking the system.
+> 
+> 	Andrew
 
