@@ -1,171 +1,167 @@
-Return-Path: <netdev+bounces-209095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDCADB0E47C
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 21:56:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAD62B0E47E
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 21:58:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B12111C2721D
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 19:57:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 99A2C7ABC73
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 19:57:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE81828469A;
-	Tue, 22 Jul 2025 19:56:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2B8128505A;
+	Tue, 22 Jul 2025 19:58:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fB4uUC3C"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AYBsCTrE"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB72244679
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 19:56:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BFD8284674
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 19:58:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753214200; cv=none; b=m2IerhKY66PTW3/Jn39W7E/KNggA9a2wtqU3gWsKlx2SFYXI+lkSwZLjgubGJtKaQ/vOFwom9UtZJq4MNqHSPgx92WWPsAY/mS1/O8+RPO51O/EtpFLdC8XEAO7JBAmCaCpJRwjhDQdpgz0qUqF1mmNkLBXrJb+yf0IT7LDe3eE=
+	t=1753214311; cv=none; b=DiZBSBb8c1JhNHPG3iCXmldw27a7iNCtZDvS+8925/CIlqwUDb836D1CLhDkcKr6/ekJJPqGSQqf6ZcqvEUlZYUy35FjAPN6VuwCjRl4/bj8uo+Bg/RFfSyh1eBr/6JXIwsH3uN0hBW9X5P0N+sl3BRrEAtUVto4vYVW3R4Hx/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753214200; c=relaxed/simple;
-	bh=Wc1U5Vzh9lNoQtPH1Ue5Z8ymhPuP4KoTJS0D6fmZJ+M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NZOByDpeJsCq1Up9mwbqQmXh//5+xxTTr9vT0HRyEO8Z00DMSkUEgQ0D4PtNRPLQ5Pr7qyaB9eNYGtlAacV09fria3izJvS0gg0oqqHkimZhg2FzQiml4E9KZGgsdo2I+d17TKzh0LDBR7ec5+qqqeiKI9wSaif8rJ+ZQov/52Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fB4uUC3C; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 22 Jul 2025 12:56:17 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753214185;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AXWJpOE0ioSzjIOOhzGMWDhyF2zmDNKzi4GlW9Rwppo=;
-	b=fB4uUC3C9EsMYzQAhmDN3jh97gz3KD0V5/k59Mrg+UJ45xI8+h/RkdiTDGu6YOzRovTJwm
-	a1DiSXgOSPK+br4PQa6lD9H3NO2FpLWstorUhwEvlGYINWIUDpTVEwo0u3ICr045l4gbBH
-	0FOePTuhlvWdYxqq2ct/NaVHUefVjIE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Eric Dumazet <edumazet@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	Mat Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
-	Andrew Morton <akpm@linux-foundation.org>, Simon Horman <horms@kernel.org>, 
-	Geliang Tang <geliang@kernel.org>, Muchun Song <muchun.song@linux.dev>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, mptcp@lists.linux.dev, 
-	cgroups@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v1 net-next 13/13] net-memcg: Allow decoupling memcg from
- global protocol memory accounting.
-Message-ID: <xjtbk6g2a3x26sqqrdxbm2vxgxmm3nfaryxlxwipwohsscg7qg@64ueif57zont>
-References: <20250721203624.3807041-1-kuniyu@google.com>
- <20250721203624.3807041-14-kuniyu@google.com>
- <z7kkbenhkndwyghwenwk6c4egq3ky4zl36qh3gfiflfynzzojv@qpcazlpe3l7b>
- <CANn89iLg-VVWqbWvLg__Zz=HqHpQzk++61dbOyuazSah7kWcDg@mail.gmail.com>
- <jc6z5d7d26zunaf6b4qtwegdoljz665jjcigb4glkb6hdy6ap2@2gn6s52s6vfw>
- <CAAVpQUAJCLaOr7DnOH9op8ySFN_9Ky__easoV-6E=scpRaUiJQ@mail.gmail.com>
- <p4fcser5zrjm4ut6lw4ejdr7gn2gejrlhy2u2btmhajiiheoax@ptacajypnvlw>
- <CAAVpQUAk4F__D7xdWpt0SEE4WEM_-6V1P7DUw9TGaV=pxZ+tgw@mail.gmail.com>
+	s=arc-20240116; t=1753214311; c=relaxed/simple;
+	bh=AQ9HUlS3mEFfS+JEN19VPVWTlfsINf6zS8XOENO8xpA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Z9y/YcWS6Z/s3EyO4JEcVPopnF86odeZm0nJJBs1cdLKsDYOyKFHOjMHF2fTOWjtcDBYlZbtW6R326godMgL+/2eqs+npvbMknWepiVw2PkHwfAD6jBWD4Llv0+CfBn+jgZ9zlQKA2Ar0ECOSL+99FRRUQdYpIQOFIE8V1IJm74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AYBsCTrE; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-b3508961d43so5446269a12.3
+        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 12:58:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753214309; x=1753819109; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cCReyCpTjy4nn3Or0iXYbxmyahoyxBHy0fmkPDXu2Qo=;
+        b=AYBsCTrEgYjADPUkLRusw+8RAJITG8f0TCpCbxsYfEJZDw3I1RG07KO1IThfFeBmIB
+         EX4usODtkQdPnPZ5nPeubAk/ujt5Om75u5sAypyOt7iAmBUflx5lNvCE17crFng4fpA8
+         cwfY+lhcTNT+FgVmAPTqPkBIotp0xTnAlnH4FWlcdn+gRBhwvDTCuesnioTC6fhcA1Uq
+         lw+UL485Gp4xz0BaihKD2MjBiIwnYenrJ+4G6DmOx2ofR7lBXU/L8hGCug095xv7PbqY
+         uFMOY3F6jD+aFaCJ+Znrr2TRnTNhLt/qq5qjQFSuD1kglZZxWsK18i3gUVgdh8i+BQoM
+         aKwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753214309; x=1753819109;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cCReyCpTjy4nn3Or0iXYbxmyahoyxBHy0fmkPDXu2Qo=;
+        b=ikkXOC0KDMj5Ln0yKVIWg/pqQHA32sD48B6Zcpb6eut/P38IWhU6h8DGUBwT8Tsomp
+         R9XmLyBaGP7JlLoAfmLfaoqBkJrzEGPxAT9As0dXuoPgxm8o14PGhKO9AjWhkKvi2OFx
+         /BPUJestHzUBD6nx5vevTIm13+hwXDl0J8oRhKsAOawj18NTST1u4LI8JifG+sJx5/Wi
+         5LeFUvVe0VrN/9KL0NgIpJCEaAlTojFikgp2I61fTYvcoXjpAeEzTatmcsnAUQ4Y5XTe
+         kznMgPZdbDNGr9CV3curZsV5KzU+6OJEX1fY+rc8xHz1gbo9PVIabaEMaQGjrR6BBAn5
+         p6Tw==
+X-Forwarded-Encrypted: i=1; AJvYcCW7Jy3oAqdu2PzLuX14gqoOcJpU50docHJTETychiDewIYdBUY311j4ttd0FyMnMkAVEgSj5YA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+WXkpge5yNijdhUac1Wkb0oLKJzaSFjfbPbKJd/eLndx+p6np
+	ygVygh5CBk410naAqu77wSSfj5DrLlwrYmb1q3NpuE6ygUXEA3VX/Np3dhXpYg3UTci2Srk0W7Q
+	DA8rzUF6pngfbphBtweDCglh76uMH1RaC2wbN8rKC
+X-Gm-Gg: ASbGncvh8Q15toqf9faxK1KxG9gsiE30gIRZrV0+7g2Jj0F3em65ayyfkbKigl1HW/H
+	8nu4nVc9zG6zcNFI/jczpK3pULCW2vGZXE47zE//hV783tu4XLGCOfeZAz9GAbaP0d3+HLIfpKj
+	jEzycfEYlrm3JEHeuSfTSsg6ZtznaPwgWShp5Z+jq0+EuN+EurBkG4RtZS76oBCYlwlPjfmXYg/
+	lUwL7lV+E2OcK+5NtRmQ6ikM+jbQTfqOEicqQ==
+X-Google-Smtp-Source: AGHT+IG0SmhWW8QBqcQaG+aqdEHCX9MzB9En/e5DNQG/qjPLBdBSfDDibdJJYPPZ2Dilzt1dahxQKsGb6dQAJYiMO+M=
+X-Received: by 2002:a17:90b:3952:b0:312:e744:5b76 with SMTP id
+ 98e67ed59e1d1-31e507fdbf2mr658997a91.33.1753214309139; Tue, 22 Jul 2025
+ 12:58:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAVpQUAk4F__D7xdWpt0SEE4WEM_-6V1P7DUw9TGaV=pxZ+tgw@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+References: <20250722071146.48616-1-daniel.sedlak@cdn77.com>
+ <ni4axiks6hvap3ixl6i23q7grjbki3akeea2xxzhdlkmrj5hpb@qt3vtmiayvpz>
+ <telhuoj5bj5eskhicysxkblc4vr6qlcq3vx7pgi6p34g4zfwxw@6vm2r2hg3my4>
+ <CAAVpQUBwS3DFs9BENNNgkKFcMtc7tjZBA0PZ-EZ0WY+dCw8hrA@mail.gmail.com> <4g63mbix4aut7ye7b7s4m5q7aewfxq542i2vygniow7l5a3zmd@bvis5wmifscy>
+In-Reply-To: <4g63mbix4aut7ye7b7s4m5q7aewfxq542i2vygniow7l5a3zmd@bvis5wmifscy>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Tue, 22 Jul 2025 12:58:17 -0700
+X-Gm-Features: Ac12FXxXNAuhn4Hv0iRIqcN8oUeZVkIDq7rLj71nMt9uRXTRgjxr4GtJpTqpIu0
+Message-ID: <CAAVpQUCOwFksmo72p_nkr1uJMLRcRo1VAneADon9OxDLoRH0KA@mail.gmail.com>
+Subject: Re: [PATCH v3] memcg: expose socket memory pressure in a cgroup
+To: Shakeel Butt <shakeel.butt@linux.dev>
+Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
+	Daniel Sedlak <daniel.sedlak@cdn77.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Neal Cardwell <ncardwell@google.com>, 
+	David Ahern <dsahern@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org, netdev@vger.kernel.org, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
+	Roman Gushchin <roman.gushchin@linux.dev>, Muchun Song <muchun.song@linux.dev>, 
+	cgroups@vger.kernel.org, Matyas Hurtik <matyas.hurtik@cdn77.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 22, 2025 at 12:03:48PM -0700, Kuniyuki Iwashima wrote:
-> On Tue, Jul 22, 2025 at 11:48 AM Shakeel Butt <shakeel.butt@linux.dev> wrote:
-> >
-> > On Tue, Jul 22, 2025 at 11:18:40AM -0700, Kuniyuki Iwashima wrote:
+On Tue, Jul 22, 2025 at 12:05=E2=80=AFPM Shakeel Butt <shakeel.butt@linux.d=
+ev> wrote:
+>
+> On Tue, Jul 22, 2025 at 11:27:39AM -0700, Kuniyuki Iwashima wrote:
+> > On Tue, Jul 22, 2025 at 10:50=E2=80=AFAM Shakeel Butt <shakeel.butt@lin=
+ux.dev> wrote:
+> > >
+> > > On Tue, Jul 22, 2025 at 10:57:31AM +0200, Michal Koutn=C3=BD wrote:
+> > > > Hello Daniel.
 > > > >
-> > > > I expect this state of jobs with different network accounting config
-> > > > running concurrently is temporary while the migrationg from one to other
-> > > > is happening. Please correct me if I am wrong.
-> > >
-> > > We need to migrate workload gradually and the system-wide config
-> > > does not work at all.  AFAIU, there are already years of effort spent
-> > > on the migration but it's not yet completed at Google.  So, I don't think
-> > > the need is temporary.
-> > >
-> >
-> > From what I remembered shared borg had completely moved to memcg
-> > accounting of network memory (with sys container as an exception) years
-> > ago. Did something change there?
-> 
-> AFAICS, there are some workloads that opted out from memcg and
-> consumed too much tcp memory due to tcp_mem=UINT_MAX, triggering
-> OOM and disrupting other workloads.
-> 
-
-What were the reasons behind opting out? We should fix those
-instead of a permanent opt-out option.
-
-> >
+> > > > On Tue, Jul 22, 2025 at 09:11:46AM +0200, Daniel Sedlak <daniel.sed=
+lak@cdn77.com> wrote:
+> > > > >   /sys/fs/cgroup/**/<cgroup name>/memory.net.socket_pressure
+> > > > >
+> > > > > The output value is an integer matching the internal semantics of=
+ the
+> > > > > struct mem_cgroup for socket_pressure. It is a periodic re-arm cl=
+ock,
+> > > > > representing the end of the said socket memory pressure, and once=
+ the
+> > > > > clock is re-armed it is set to jiffies + HZ.
 > > > >
-> > > > My main concern with the memcg knob is that it is permanent and it
-> > > > requires a hierarchical semantics. No need to add a permanent interface
-> > > > for a temporary need and I don't see a clear hierarchical semantic for
-> > > > this interface.
-> > >
-> > > I don't see merits of having hierarchical semantics for this knob.
-> > > Regardless of this knob, hierarchical semantics is guaranteed
-> > > by other knobs.  I think such semantics for this knob just complicates
-> > > the code with no gain.
-> > >
-> >
-> > Cgroup interfaces are hierarchical and we want to keep it that way.
-> > Putting non-hierarchical interfaces just makes configuration and setup
-> > hard to reason about.
-> 
-> Actually, I tried that way in the initial draft version, but even if the
-> parent's knob is 1 and child one is 0, a harmful scenario didn't come
-> to my mind.
-> 
-
-It is not just about harmful scenario but more about clear semantics.
-Check memory.zswap.writeback semantics.
-
-> 
-> >
-> > >
+> > > > I don't find it ideal to expose this value in its raw form that is
+> > > > rather an implementation detail.
 > > > >
-> > > > I am wondering if alternative approches for per-workload settings are
-> > > > explore starting with BPF.
+> > > > IIUC, the information is possibly valid only during one jiffy inter=
+val.
+> > > > How would be the userspace consuming this?
 > > > >
+> > > > I'd consider exposing this as a cummulative counter in memory.stat =
+for
+> > > > simplicity (or possibly cummulative time spent in the pressure
+> > > > condition).
+> > > >
+> > > > Shakeel, how useful is this vmpressure per-cgroup tracking nowadays=
+? I
+> > > > thought it's kind of legacy.
+> > >
+> > >
+> > > Yes vmpressure is legacy and we should not expose raw underlying numb=
+er
+> > > to the userspace. How about just 0 or 1 and use
+> > > mem_cgroup_under_socket_pressure() underlying? In future if we change
+> > > the underlying implementation, the output of this interface should be
+> > > consistent.
 > >
-> > Any response on the above? Any alternative approaches explored?
-> 
-> Do you mean flagging each socket by BPF at cgroup hook ?
+> > But this is available only for 1 second, and it will not be useful
+> > except for live debugging ?
+>
+> 1 second is the current implementation and it can be more if the memcg
+> remains in memory pressure. Regarding usefullness I think the periodic
+> stat collectors (like cadvisor or Google's internal borglet+rumbo) would
+> be interested in scraping this interface.
 
-Not sure. Will it not be very similar to your current approach? Each
-socket is associated with a memcg and the at the place where you need to
-check which accounting method to use, just check that memcg setting in
-bpf and you can cache the result in socket as well.
+I think the cumulative counter suggested above is better at least.
 
-> 
-> I think it's overkill and we don't need such finer granularity.
-> 
-> Also it sounds way too hacky to use BPF to correct the weird
-> behaviour from day0.
-
-What weird behavior? Two accounting mechanisms. Yes I agree but memcgs
-with different accounting mechanisms concurrently is also weird.
-
-> We should have more generic way to
-> control that.  I know this functionality is helpful for some workloads
-> at Amazon as well.
-
-The reason I am against this permanent opt-out interface is if we add
-this interface then we will never fix the underlying issues blocking the
-full conversion to memcg accounting of network memory. I am ok with some
-temporary measures to allow opt-out impacted workload until the
-underlying issue is fixed.
+If we poll such an interface periodically, the cumulative counter also
+works, we can just calculate the delta.  And even we don't need to
+monitor that if it's not always needed but we can know if there was
+memory pressure.
 
 
 
+> If this is still not useful,
+> what will be better? Some kind of trace which tracks the state of socket
+> pressure state of a memcg (i.e. going into and out of pressure)?
 
