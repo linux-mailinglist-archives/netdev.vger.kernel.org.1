@@ -1,159 +1,176 @@
-Return-Path: <netdev+bounces-209039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50894B0E155
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 18:11:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F211B0E170
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 18:14:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8498B17D167
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 16:11:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EAFC21C85B42
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 16:14:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02B6227A455;
-	Tue, 22 Jul 2025 16:11:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EEC327A900;
+	Tue, 22 Jul 2025 16:14:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XxBLjvhf"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="u7XxY05o"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1341125B1CE
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 16:11:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9471427A462
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 16:14:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753200669; cv=none; b=V5WglCXqPk7W3hT1ZidPh5WEXuEPDRicW8xLBlof44UFeWwVreKFImCx/vcJ3BP6w3Vg1XvNRvR8LEU40ZWR7bh+noVf5qG5TDLj65fDgnpTlhgL7Arz3zhOgqYmUrb8VGgsuQPqPl/Kc+5xre3Lpu5/dN73DI/xLe5m+MfsJwU=
+	t=1753200864; cv=none; b=Oddq8t0uBI65lqEmryl0bmfNBmXo/qdZ5jk+2eCbW8JLCu/OimztVuMpueX0Lyu/Jfwm4HbFDKbmVnfNOs6kdUv9uRWTu08w/SBlzxIYDcKVhKr/whxT8OOY+LeQbl+KixU1JOGyCOEXGepzRU+U+1LZGjMBQbQ8ji6Ary5RHAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753200669; c=relaxed/simple;
-	bh=yzgMOc1JqPvse/2WCjNPKlC8bdQPxErL7KFyqlOB8RM=;
+	s=arc-20240116; t=1753200864; c=relaxed/simple;
+	bh=KTqkyyoOicoJI5BEkfd5qz62KvePx3hlSaBgQWM4Tq4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Suj9FKOS8nUV9ZSBbv0e1yVOqF7zCvn2sofr4No13G2Ap5l4X42WhnCef2T89pT4+klt61wF0g1tj6gZEFGbZK06SiU+QCpp5pAzLHftbf0qB4FBkCHvih6dafQVSVNbPfEY5/181ryL9EMcLLD8eRJH9eRClEtTFj7K2YBu9vg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XxBLjvhf; arc=none smtp.client-ip=91.218.175.172
+	 In-Reply-To:Content-Type; b=YVtKUF2Sy/sx61KPrc0c+SOGmTfOc0+vUlSNoGkC7mfZ8pNBnxI/zyCE+LfT/mUauIoPHk76gs8/EtM5HAiRw4Mk/gmCbGGmeZirLGZPcXAVdLsdd9pM7DcdpmLnIFRTt7xjqSs+eGXt8aT//lCcOQOcsRISv79dHqedSAwFku4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=u7XxY05o; arc=none smtp.client-ip=95.215.58.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <dbc46a1a-9363-4ef7-ae70-d02fca6ecd37@linux.dev>
+Message-ID: <368d27ec-0102-4ccc-909c-7174a096c9fd@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753200666;
+	t=1753200859;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=GQ2Wt/wnzLVk2kOpzHZkebHiwy8smKpH0cZX7371W9M=;
-	b=XxBLjvhfL+sLo0qId3z5iZM8W5TwjKDDKi+M8gxV64bl86GGoEXgbJ10KM4o04Kdm40ph7
-	pnwj4kchOBRBvUVsBJ8ICTdHwvK2hajM00+FyM8pTH3LpgbMmGgqwm+chGikUxIqunTd3/
-	2RL9Hi5Rou6ELHix7LcfEJxvWIUedB0=
-Date: Wed, 23 Jul 2025 00:10:55 +0800
+	bh=rlEPwS6XRbGjrFHOB795Y3ubFb0hkoLP9W6LkkEcoOQ=;
+	b=u7XxY05o+p+ypP1rVpmOiWGf+HJesQEmvpglgsUNu1Qd1wdugqvk8PnRBpY84zbVkEbWoG
+	L+9Nt9HtY+phnbLDivBFXHI1x2CymDQ6ge4cfdaSnOlPtSMuBSo+Rsgd3yGCUEnP96e87w
+	VGxiTRJuTYGB6vNUhSuWk3BscFKx8/4=
+Date: Wed, 23 Jul 2025 00:14:03 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v2 1/3] bpftool: Add bpf_token show
+Subject: Re: [PATCH bpf-next v2 2/3] bpftool: Add bpftool-token manpage
 To: Quentin Monnet <qmo@kernel.org>, ast@kernel.org, daniel@iogearbox.net,
  andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
  yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
  sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
  kuba@kernel.org, hawk@kernel.org
 Cc: linux-kernel@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20250722115815.1390761-1-chen.dylane@linux.dev>
- <4dcd2d25-5955-4364-9b6a-42d66dee0a6b@kernel.org>
+References: <20250722120912.1391604-1-chen.dylane@linux.dev>
+ <20250722120912.1391604-2-chen.dylane@linux.dev>
+ <2e3a00c0-dc18-40d4-af2a-ce8df4e54021@kernel.org>
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Tao Chen <chen.dylane@linux.dev>
-In-Reply-To: <4dcd2d25-5955-4364-9b6a-42d66dee0a6b@kernel.org>
+In-Reply-To: <2e3a00c0-dc18-40d4-af2a-ce8df4e54021@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
 在 2025/7/22 23:01, Quentin Monnet 写道:
-> 2025-07-22 19:58 UTC+0800 ~ Tao Chen <chen.dylane@linux.dev>
->> Add `bpftool token show` command to get token info
->> from bpffs in /proc/mounts.
->>
->> Example plain output for `token show`:
->> token_info  /sys/fs/bpf/token
->> 	allowed_cmds:
->> 	  map_create          prog_load
->> 	allowed_maps:
->> 	allowed_progs:
->> 	  kprobe
->> 	allowed_attachs:
->> 	  xdp
->> token_info  /sys/fs/bpf/token2
->> 	allowed_cmds:
->> 	  map_create          prog_load
->> 	allowed_maps:
->> 	allowed_progs:
->> 	  kprobe
->> 	allowed_attachs:
->> 	  xdp
->>
->> Example json output for `token show`:
->> [{
->> 	"token_info": "/sys/fs/bpf/token",
->> 	"allowed_cmds": ["map_create", "prog_load"],
->> 	"allowed_maps": [],
->> 	"allowed_progs": ["kprobe"],
->> 	"allowed_attachs": ["xdp"]
->> }, {
->> 	"token_info": "/sys/fs/bpf/token2",
->> 	"allowed_cmds": ["map_create", "prog_load"],
->> 	"allowed_maps": [],
->> 	"allowed_progs": ["kprobe"],
->> 	"allowed_attachs": ["xdp"]
->> }]
+> 2025-07-22 20:09 UTC+0800 ~ Tao Chen <chen.dylane@linux.dev>
+>> Add bpftool-token manpage with information and examples of token-related
+>> commands.
 >>
 >> Signed-off-by: Tao Chen <chen.dylane@linux.dev>
 >> ---
-> 
->> diff --git a/tools/bpf/bpftool/token.c b/tools/bpf/bpftool/token.c
+>>   .../bpftool/Documentation/bpftool-token.rst   | 63 +++++++++++++++++++
+>>   1 file changed, 63 insertions(+)
+>>   create mode 100644 tools/bpf/bpftool/Documentation/bpftool-token.rst
+>>
+>> diff --git a/tools/bpf/bpftool/Documentation/bpftool-token.rst b/tools/bpf/bpftool/Documentation/bpftool-token.rst
 >> new file mode 100644
->> index 00000000000..f72a116f9c6
+>> index 00000000000..c5fe9292258
 >> --- /dev/null
->> +++ b/tools/bpf/bpftool/token.c
+>> +++ b/tools/bpf/bpftool/Documentation/bpftool-token.rst
+>> @@ -0,0 +1,63 @@
+>> +.. SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>> +
+>> +================
+>> +bpftool-token
+>> +================
+>> +-------------------------------------------------------------------------------
+>> +tool for inspection and simple manipulation of eBPF tokens
+>> +-------------------------------------------------------------------------------
+>> +
+>> +:Manual section: 8
+>> +
+>> +.. include:: substitutions.rst
+>> +
+>> +SYNOPSIS
+>> +========
+>> +
+>> +**bpftool** [*OPTIONS*] **token** *COMMAND*
+>> +
+>> +*OPTIONS* := { |COMMON_OPTIONS| }
+>> +
+>> +*COMMANDS* := { **show** | **list** | **help** }
+>> +
+>> +TOKEN COMMANDS
+>> +===============
+>> +
+>> +| **bpftool** **token** { **show** | **list** }
+>> +| **bpftool** **token help**
+>> +|
+>> +
+>> +DESCRIPTION
+>> +===========
+>> +bpftool token { show | list }
+>> +    List all the speciafic allowed types for **bpf**\ () system call
 > 
->> +static int show_token_info(void)
->> +{
->> +	FILE *fp;
->> +	struct mntent *ent;
->> +	bool hit = false;
->> +
->> +	fp = setmntent(MOUNTS_FILE, "r");
->> +	if (!fp) {
->> +		p_err("Failed to open: %s", MOUNTS_FILE);
->> +		return -1;
->> +	}
->> +
->> +	if (json_output)
->> +		jsonw_start_array(json_wtr);
->> +
->> +	while ((ent = getmntent(fp)) != NULL) {
->> +		if (strncmp(ent->mnt_type, "bpf", 3) == 0) {
->> +			if (has_delegate_options(ent->mnt_opts)) {
->> +				__show_token_info(ent);
->> +				hit = true;
->> +			}
->> +		}
->> +	}
->> +
->> +	if (json_output)
->> +		jsonw_end_array(json_wtr);
->> +
->> +	if (!hit)
->> +		p_info("Token info not found");
 > 
-> Woops I take this one back. It made sense to have a p_info() message in
-> your v1 because you were only looking at one bpffs mount point, but now
-> we list all the ones we find, we should remove this message and silently
-> ignore mount points without token info (and I think we can remove the
-> "hit" variable entirely). Sorry! :)
+> Typo: "speciafic".
 > 
 
-It‘s okay, i will remove it in v3, thanks anyway.
+will fix it, thanks.
 
-> The rest of this patch looks good to me, thank you
 > 
-> Quentin
+>> +    commands, maps, programs, and attach types, as well as the
+>> +    *bpffs* mount point used to set the token information.
+> 
+> 
+> This sentence needs to be adjusted now that you can print info for
+> several mountpoints.
+> 
+> How about:
+> 
+>      List BPF token information for each *bpffs* mount point containing token
+>      information on the system. Information include mount point path, allowed
+>      **bpf**\ () system call commands, maps, programs, and attach types for the
+>      token.
+> 
+
+This really looks better, thank you for your help.
+
+> 
+>> +
+>> +bpftool prog help
+>> +    Print short help message.
+>> +
+>> +OPTIONS
+>> +========
+>> +.. include:: common_options.rst
+>> +
+>> +EXAMPLES
+>> +========
+>> +|
+>> +| **# mkdir -p /sys/fs/bpf/token**
+>> +| **# mount -t bpf bpffs /sys/fs/bpf/token** \
+>> +|         **-o delegate_cmds=prog_load:map_create** \
+>> +|         **-o delegate_progs=kprobe** \
+>> +|         **-o delegate_attachs=xdp**
+>> +| **# bpftool token list**
+>> +
+>> +::
+>> +
+>> +    token_info  /sys/fs/bpf/token
+>> +            allowed_cmds:
+>> +              map_create          prog_load
+>> +            allowed_maps:
+>> +            allowed_progs:
+>> +              kprobe
+>> +            allowed_attachs:
+>> +              xdp
+> 
 
 
 -- 
