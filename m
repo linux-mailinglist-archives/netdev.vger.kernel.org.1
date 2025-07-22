@@ -1,346 +1,262 @@
-Return-Path: <netdev+bounces-208899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-208900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52BBDB0D7E1
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 13:10:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05896B0D806
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 13:19:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 824831C23E31
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 11:10:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 311463BD1B5
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 11:19:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 753BC22B5A5;
-	Tue, 22 Jul 2025 11:09:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43FC82E0417;
+	Tue, 22 Jul 2025 11:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d0XOO0+r"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A2A28B3FD
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 11:09:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11CDB7080C;
+	Tue, 22 Jul 2025 11:19:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753182594; cv=none; b=anSjCkO4b5rdUEK0qL9MqplfUT4K0Fpx+PehKyg1I3pyVmN1ZUoPoKMvWY0Wqa5WunDV2I1YYSj94o5ZeEj6BlGnT4CTsu9/DAKet65q6Qzp9HNpEKDEq7LIFIMho+FlgoBSGJzGcWdcf59MG9GDbzc7MbNKt7isdGad/9IFiRg=
+	t=1753183177; cv=none; b=t4JmlLa+8qOxa54BGHRiNhsh98Us1CXMLwrRBdjxvRgMXGZ+OJIpxDvvmHXyu7tv2FWuuxaufRBhUP0Hj5XlCZccXoLxtLbxos6UvJ1L7WMao+cmq7/AlITCPGvoF2LEjNrlz9CyELzBeQoeR6D3dnPYR+zv77BQ1NXkcne9LUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753182594; c=relaxed/simple;
-	bh=V01CpwPhoYRMkgTbnuw9OB2Maccg5FkbrxzKPuX1L7g=;
+	s=arc-20240116; t=1753183177; c=relaxed/simple;
+	bh=2miBTodTuvA5czJ/0Egx0TFlpE3uye94c6AudsbNSUo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PKmiJJoUuZkjsO1T4mXzKDdqihzo27e6PDJ4wgeMBQN/44v09F+CxYuTCHto+4m1vWgTueQeIbQpX55HlUolrgjIVW+vzeH27DX+1wUVjx6YJKXYu7waZGrN0tJH5z0tpTsQil7fQz/Xd+a0d1oIUJoIGhed0ZdVQxdr1Btwjew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=18.194.254.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: zesmtpgz3t1753182582t50d83c8d
-X-QQ-Originating-IP: qS7gnAFAEUU6fV4kYj+XcTJ/fX7x++qnIxygmFN6+r4=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 22 Jul 2025 19:09:39 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 10533247899007251616
-Date: Tue, 22 Jul 2025 19:09:39 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 02/15] net: rnpgbe: Add n500/n210 chip support
-Message-ID: <CE56210DD2A0C069+20250722110939.GB125862@nic-Precision-5820-Tower>
-References: <20250721113238.18615-1-dong100@mucse.com>
- <20250721113238.18615-3-dong100@mucse.com>
- <b4233af1-7143-402b-a45c-379c39edf274@linux.dev>
- <911D202AA380FB7F+20250722095159.GA120552@nic-Precision-5820-Tower>
- <fc0d3fa9-67a8-4ac7-a213-283e2971227d@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=L6Kbp1wkkEBT/2skZ75PQ64BUD7MiFwk61y/IICfiaoa6Edi32N2pzGRsXKQbi9GE1L2stagofWJBnBE+oa8Y2CdGd47vvXnNKsYWdnd170nx05UFyO2BihBHJeuK3XqIpn+yqe/HIKhoJ+E1RkD4Z795xMIgTq5fb0la/tr7mY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d0XOO0+r; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB809C4CEEB;
+	Tue, 22 Jul 2025 11:19:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753183176;
+	bh=2miBTodTuvA5czJ/0Egx0TFlpE3uye94c6AudsbNSUo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=d0XOO0+rGGEGiV1JHMYVEKkhnGwyy+40jnkGGVqu+hvsU2Rn6TDKHuul1lkaCgzf2
+	 FFmbSaroynvwk+OmXO7zYNNUaqyxVcaZp2ydO+SWJK+gnCPMilwGAg8C01f0zTckY3
+	 6+F9JAbllIPsNZausRN2zZgxXjA2xDwTFHp5vzDrmTSjsARi9StRmLnA+o6x9zuZ52
+	 JohdYqwMD3IM5oyrzmYfMT8PiQo2vwzSSOSFO1yB4DU5Yl2iGIi4vhqTnxFXU82NdI
+	 bwpL+Ca4sYfzROXXqDY19eA918P3vIQvTZBxGO9ph1lAnXSYyJ5umkLy1s9Q9pJWH4
+	 mNWZsNdKDb2xg==
+Date: Tue, 22 Jul 2025 12:19:29 +0100
+From: Simon Horman <horms@kernel.org>
+To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+Cc: kuba@kernel.org, kys@microsoft.com, haiyangz@microsoft.com,
+	wei.liu@kernel.org, decui@microsoft.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	longli@microsoft.com, kotaranov@microsoft.com, ast@kernel.org,
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+	sdf@fomichev.me, lorenzo@kernel.org, michal.kubiak@intel.com,
+	ernis@linux.microsoft.com, shradhagupta@linux.microsoft.com,
+	shirazsaleem@microsoft.com, rosenp@gmail.com,
+	netdev@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+	ssengar@linux.microsoft.com
+Subject: Re: [PATCH] net: mana: Use page pool fragments for RX buffers
+ instead of full pages to improve memory efficiency and throughput.
+Message-ID: <20250722111929.GE2459@horms.kernel.org>
+References: <20250721101417.GA18873@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <fc0d3fa9-67a8-4ac7-a213-283e2971227d@linux.dev>
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: MheB71eWvOshw4BsUZ4Q1KbbCHXuGGgIFqdDktr09Ss1MqPo1SOuet7J
-	o/coV+4ArHZ/QDBzaEIl5fSTi1lSBXTjW9bBjtRKmbyHIBXou3YCKnnLv6zrTlKym/+X0zl
-	pMAC/79HVZWW1008QZazYbLCKTP7jgHp0syZSoijX8aGp5FmrAUx68tjOP35ujGc8yCbepb
-	MxSMpYvn4JoxSWChRJMYCvWyJOyRbyeF+BQh3+5kHYiKLjnH3fpJkER6PMBL5Pkr31KDTKP
-	0nxZ9wuWUO364icWamp0RPLSDBJT82jBtljNgdx9Up9zYsftTi0ZLZKkAEDohRy5N1/DsaM
-	RU1rpj2qrWYVk29pxBYeN0im6UvxwFRdjQVRhnlpUDsY6i+dSFb04m1Br5MrfGBx5BJozua
-	4Zq2AZInZ2oekt/Lv4NqB1FcVXt/+/dShZGTr+FoXogPU0mDu0V4xR8auVQW1FJbZnRdoIy
-	09C6Ha4eKnw9IIz2i1G005Jz4zQRgiBcVgIwAuvsXbaV8Mv+6ZbITpnW/JuroWG3xiiBvgl
-	8xLK6BfXMZmy4rDRye2nHLIbdzmIy/YHGjQ75siHD7pqncNm81l4YhMSsULAu75iCtMXwih
-	4SXY7+wvjvQXPeTolJsF7El8wX4DEuVYcUkSOk/Ugwh+zGvDiPy7F/7v0LN67hc6Uw+6UYT
-	yOeWW9sKj+fEZQdpFCwBsrLsBC60h9sjDd4t3uqQ+2/F1qn97qhQeOhSzexqMDaa5gQmDSO
-	FpBiKzdRdlnBO7ziNKHm6FWFBLRpMbVBEvZafX5ecy3s4X4ksA3xso1pJ5KRG66weNs2GpP
-	34/K2Or0uDYC6VwpA+xS3rBWi49mV/WaYy/VoW6+16s/af2oCjunZW2cxkLlahFw7f0y3RF
-	fWy7+LQ7yIporP2tIUkTSSG/ccN72nt+2YXMLhXu+b6SNIpmT08iZO1QH8n22i7j700o0EB
-	U9AMIOP4cH+PjCjKGIWHK11sH8K6ZU+ktcGQztJejEWqvHFk9oJW2oSHXzAYQAd2nZJ/djg
-	6UDITdFJpQvi18SAL6dVz77zWHy7SYoqopY04kXwGcincrPbgNFcpBgXsQpoI=
-X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
-X-QQ-RECHKSPAM: 0
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250721101417.GA18873@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 
-On Tue, Jul 22, 2025 at 11:26:44AM +0100, Vadim Fedorenko wrote:
-> On 22/07/2025 10:51, Yibo Dong wrote:
-> > On Mon, Jul 21, 2025 at 03:21:23PM +0100, Vadim Fedorenko wrote:
-> > > On 21/07/2025 12:32, Dong Yibo wrote:
-> > > > Initialize n500/n210 chip bar resource map and
-> > > > dma, eth, mbx ... info for future use.
-> > > > 
-> > > > Signed-off-by: Dong Yibo <dong100@mucse.com>
-> > > > ---
-> > > >    drivers/net/ethernet/mucse/rnpgbe/Makefile    |   4 +-
-> > > >    drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    | 138 ++++++++++++++++++
-> > > >    .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   | 138 ++++++++++++++++++
-> > > >    drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |  27 ++++
-> > > >    .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   |  68 ++++++++-
-> > > >    5 files changed, 370 insertions(+), 5 deletions(-)
-> > > >    create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-> > > >    create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
-> > > > 
+On Mon, Jul 21, 2025 at 03:14:17AM -0700, Dipayaan Roy wrote:
+> This patch enhances RX buffer handling in the mana driver by allocating
+> pages from a page pool and slicing them into MTU-sized fragments, rather
+> than dedicating a full page per packet. This approach is especially
+> beneficial on systems with 64KB page sizes.
 > 
-> [...]
+> Key improvements:
 > 
-> > > > +/**
-> > > > + * rnpgbe_get_invariants_n500 - setup for hw info
-> > > > + * @hw: hw information structure
-> > > > + *
-> > > > + * rnpgbe_get_invariants_n500 initializes all private
-> > > > + * structure, such as dma, eth, mac and mbx base on
-> > > > + * hw->addr for n500
-> > > > + **/
-> > > > +static void rnpgbe_get_invariants_n500(struct mucse_hw *hw)
-> > > > +{
-> > > > +	struct mucse_dma_info *dma = &hw->dma;
-> > > > +	struct mucse_eth_info *eth = &hw->eth;
-> > > > +	struct mucse_mac_info *mac = &hw->mac;
-> > > > +	struct mucse_mbx_info *mbx = &hw->mbx;
-> > > > +
-> > > > +	/* setup msix base */
-> > > > +	hw->ring_msix_base = hw->hw_addr + 0x28700;
-> > > > +	/* setup dma info */
-> > > > +	dma->dma_base_addr = hw->hw_addr;
-> > > > +	dma->dma_ring_addr = hw->hw_addr + RNPGBE_RING_BASE;
-> > > > +	dma->max_tx_queues = RNPGBE_MAX_QUEUES;
-> > > > +	dma->max_rx_queues = RNPGBE_MAX_QUEUES;
-> > > > +	dma->back = hw;
-> > > > +	/* setup eth info */
-> > > > +	eth->eth_base_addr = hw->hw_addr + RNPGBE_ETH_BASE;
-> > > > +	eth->back = hw;
-> > > > +	eth->mc_filter_type = 0;
-> > > > +	eth->mcft_size = RNPGBE_MC_TBL_SIZE;
-> > > > +	eth->vft_size = RNPGBE_VFT_TBL_SIZE;
-> > > > +	eth->num_rar_entries = RNPGBE_RAR_ENTRIES;
-> > > > +	/* setup mac info */
-> > > > +	mac->mac_addr = hw->hw_addr + RNPGBE_MAC_BASE;
-> > > > +	mac->back = hw;
-> > > > +	/* set mac->mii */
-> > > > +	mac->mii.addr = RNPGBE_MII_ADDR;
-> > > > +	mac->mii.data = RNPGBE_MII_DATA;
-> > > > +	mac->mii.addr_shift = 11;
-> > > > +	mac->mii.addr_mask = 0x0000F800;
-> > > > +	mac->mii.reg_shift = 6;
-> > > > +	mac->mii.reg_mask = 0x000007C0;
-> > > > +	mac->mii.clk_csr_shift = 2;
-> > > > +	mac->mii.clk_csr_mask = GENMASK(5, 2);
-> > > > +	mac->clk_csr = 0x02; /* csr 25M */
-> > > > +	/* hw fixed phy_addr */
-> > > > +	mac->phy_addr = 0x11;
-> > > > +
-> > > > +	mbx->mbx_feature |= MBX_FEATURE_NO_ZERO;
-> > > > +	/* mbx offset */
-> > > > +	mbx->vf2pf_mbox_vec_base = 0x28900;
-> > > > +	mbx->fw2pf_mbox_vec = 0x28b00;
-> > > > +	mbx->pf_vf_shm_base = 0x29000;
-> > > > +	mbx->mbx_mem_size = 64;
-> > > > +	mbx->pf2vf_mbox_ctrl_base = 0x2a100;
-> > > > +	mbx->pf_vf_mbox_mask_lo = 0x2a200;
-> > > > +	mbx->pf_vf_mbox_mask_hi = 0;
-> > > > +	mbx->fw_pf_shm_base = 0x2d000;
-> > > > +	mbx->pf2fw_mbox_ctrl = 0x2e000;
-> > > > +	mbx->fw_pf_mbox_mask = 0x2e200;
-> > > > +	mbx->fw_vf_share_ram = 0x2b000;
-> > > > +	mbx->share_size = 512;
-> > > > +
-> > > > +	/* setup net feature here */
-> > > > +	hw->feature_flags |= M_NET_FEATURE_SG |
-> > > > +			     M_NET_FEATURE_TX_CHECKSUM |
-> > > > +			     M_NET_FEATURE_RX_CHECKSUM |
-> > > > +			     M_NET_FEATURE_TSO |
-> > > > +			     M_NET_FEATURE_VLAN_FILTER |
-> > > > +			     M_NET_FEATURE_VLAN_OFFLOAD |
-> > > > +			     M_NET_FEATURE_RX_NTUPLE_FILTER |
-> > > > +			     M_NET_FEATURE_RX_HASH |
-> > > > +			     M_NET_FEATURE_USO |
-> > > > +			     M_NET_FEATURE_RX_FCS |
-> > > > +			     M_NET_FEATURE_STAG_FILTER |
-> > > > +			     M_NET_FEATURE_STAG_OFFLOAD;
-> > > > +	/* start the default ahz, update later */
-> > > > +	hw->usecstocount = 125;
-> > > > +}
-> > > > +
-> > > > +/**
-> > > > + * rnpgbe_get_invariants_n210 - setup for hw info
-> > > > + * @hw: hw information structure
-> > > > + *
-> > > > + * rnpgbe_get_invariants_n210 initializes all private
-> > > > + * structure, such as dma, eth, mac and mbx base on
-> > > > + * hw->addr for n210
-> > > > + **/
-> > > > +static void rnpgbe_get_invariants_n210(struct mucse_hw *hw)
-> > > > +{
-> > > > +	struct mucse_mbx_info *mbx = &hw->mbx;
-> > > > +	/* get invariants based from n500 */
-> > > > +	rnpgbe_get_invariants_n500(hw);
-> > > 
-> > > it's not a good pattern. if you have some configuration that is
-> > > shared amoung devices, it's better to create *base() or *common()
-> > > helper and call it from each specific initializer. BTW, why do you
-> > > name these functions get_invariants*()? They don't get anything, but
-> > > rather init/setup configuration values. It's better to rename it
-> > > according to the function.
-> > > 
-> > 
-> > I try to devide hardware to dma, eth, mac, mbx modules. Different
-> > chips may use the same mbx module with different reg-offset in bar.
-> > So I setup reg-offset in get_invariants for each chip. And common code,
-> > such as mbx achieve functions with the reg-offset.
-> > Ok, I will rename it.
+> - Proper integration of page pool for RX buffer allocations.
+> - MTU-sized buffer slicing to improve memory utilization.
+> - Reduce overall per Rx queue memory footprint.
+> - Automatic fallback to full-page buffers when:
+>    * Jumbo frames are enabled (MTU > PAGE_SIZE / 2).
+>    * The XDP path is active, to avoid complexities with fragment reuse.
+> - Removal of redundant pre-allocated RX buffers used in scenarios like MTU
+>   changes, ensuring consistency in RX buffer allocation.
 > 
-> I fully understand your intention. My point is that calling
-> rnpgbe_get_invariants_n500(hw) in rnpgbe_get_invariants_n210() and
-> then replace almost half of the values is not a good pattern.
-> It's better to have another function to setup values that are the same
-> across models, and keep only specifics in *n500() and *n210().
+> Testing on VMs with 64KB pages shows around 200% throughput improvement.
+> Memory efficiency is significantly improved due to reduced wastage in page
+> allocations. Example: We are now able to fit 35 Rx buffers in a single 64KB
+> page for MTU size of 1500, instead of 1 Rx buffer per page previously.
 > 
+> Tested:
+> 
+> - iperf3, iperf2, and nttcp benchmarks.
+> - Jumbo frames with MTU 9000.
+> - Native XDP programs (XDP_PASS, XDP_DROP, XDP_TX, XDP_REDIRECT) for
+>   testing the driver’s XDP path.
+> - Page leak detection (kmemleak).
+> - Driver load/unload, reboot, and stress scenarios.
+> 
+> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
 
-Got your point, I will improve it.
+Hi,
 
-> > 
-> > > > +
-> > > > +	/* update msix base */
-> > > > +	hw->ring_msix_base = hw->hw_addr + 0x29000;
-> > > > +	/* update mbx offset */
-> > > > +	mbx->vf2pf_mbox_vec_base = 0x29200;
-> > > > +	mbx->fw2pf_mbox_vec = 0x29400;
-> > > > +	mbx->pf_vf_shm_base = 0x29900;
-> > > > +	mbx->mbx_mem_size = 64;
-> > > > +	mbx->pf2vf_mbox_ctrl_base = 0x2aa00;
-> > > > +	mbx->pf_vf_mbox_mask_lo = 0x2ab00;
-> > > > +	mbx->pf_vf_mbox_mask_hi = 0;
-> > > > +	mbx->fw_pf_shm_base = 0x2d900;
-> > > > +	mbx->pf2fw_mbox_ctrl = 0x2e900;
-> > > > +	mbx->fw_pf_mbox_mask = 0x2eb00;
-> > > > +	mbx->fw_vf_share_ram = 0x2b900;
-> > > > +	mbx->share_size = 512;
-> > > > +	/* update hw feature */
-> > > > +	hw->feature_flags |= M_HW_FEATURE_EEE;
-> > > > +	hw->usecstocount = 62;
-> > > > +}
-> 
-> [...]
-> 
-> > > > @@ -58,7 +72,54 @@ static int rnpgbe_add_adapter(struct pci_dev *pdev)
-> > > >    		 rnpgbe_driver_name, mucse->bd_number);
-> > > >    	pci_set_drvdata(pdev, mucse);
-> > > > +	hw = &mucse->hw;
-> > > > +	hw->back = mucse;
-> > > > +	hw->hw_type = ii->hw_type;
-> > > > +
-> > > > +	switch (hw->hw_type) {
-> > > > +	case rnpgbe_hw_n500:
-> > > > +		/* n500 use bar2 */
-> > > > +		hw_addr = devm_ioremap(&pdev->dev,
-> > > > +				       pci_resource_start(pdev, 2),
-> > > > +				       pci_resource_len(pdev, 2));
-> > > > +		if (!hw_addr) {
-> > > > +			dev_err(&pdev->dev, "map bar2 failed!\n");
-> > > > +			return -EIO;
-> > > > +		}
-> > > > +
-> > > > +		/* get dma version */
-> > > > +		dma_version = m_rd_reg(hw_addr);
-> > > > +		break;
-> > > > +	case rnpgbe_hw_n210:
-> > > > +	case rnpgbe_hw_n210L:
-> > > > +		/* check bar0 to load firmware */
-> > > > +		if (pci_resource_len(pdev, 0) == 0x100000)
-> > > > +			return -EIO;
-> > > > +		/* n210 use bar2 */
-> > > > +		hw_addr = devm_ioremap(&pdev->dev,
-> > > > +				       pci_resource_start(pdev, 2),
-> > > > +				       pci_resource_len(pdev, 2));
-> > > > +		if (!hw_addr) {
-> > > > +			dev_err(&pdev->dev, "map bar2 failed!\n");
-> > > > +			return -EIO;
-> > > > +		}
-> > > > +
-> > > > +		/* get dma version */
-> > > > +		dma_version = m_rd_reg(hw_addr);
-> > > > +		break;
-> > > > +	default:
-> > > > +		err = -EIO;
-> > > > +		goto err_free_net;
-> > > > +	}
-> > > > +	hw->hw_addr = hw_addr;
-> > > > +	hw->dma.dma_version = dma_version;
-> > > > +	ii->get_invariants(hw);
-> > > > +
-> > > >    	return 0;
-> > > > +
-> > > > +err_free_net:
-> > > > +	free_netdev(netdev);
-> > > > +	return err;
-> > > >    }
-> > > 
-> > > You have err_free_net label, which is used only in really impossible
-> > > case of unknown device, while other cases can return directly and
-> > > memleak netdev...>>
-> > 
-> > Yes, It is really impossible case of unknown device. But maybe switch
-> > should always has 'default case'? And if in 'default case', nothing To
-> > do but free_netdev and return err.
-> > Other cases return directly with return 0, and netdev will be freed in
-> > rnpgbe_rm_adapter() when rmmod. Sorry, I may not have got the memleak
-> > point?
-> 
-> Both rnpgbe_hw_n500 and rnpgbe_hw_n200 cases have error paths which
-> directly return -EIO. In this case netdev is not freed and
-> rnpgbe_rm_adapter() will not happen as rnpgbe_add_adapter() didn't
-> succeed.
-> 
-> 
+Some minor feedback from my side.
 
-Yes, you are right, memleak may happen here, I will fix it.
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
 
-Thanks for your feedback.
-> > 
-> > > >    /**
-> > > > @@ -74,6 +135,7 @@ static int rnpgbe_add_adapter(struct pci_dev *pdev)
-> > > >     **/
-> > > >    static int rnpgbe_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-> > > >    {
-> > > > +	const struct rnpgbe_info *ii = rnpgbe_info_tbl[id->driver_data];
-> > > >    	int err;
-> > > >    	err = pci_enable_device_mem(pdev);
-> > > > @@ -97,7 +159,7 @@ static int rnpgbe_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-> > > >    	pci_set_master(pdev);
-> > > >    	pci_save_state(pdev);
-> > > > -	err = rnpgbe_add_adapter(pdev);
-> > > > +	err = rnpgbe_add_adapter(pdev, ii);
-> > > >    	if (err)
-> > > >    		goto err_regions;
-> > > 
-> > > 
-> > 
-> > Thanks for your feedback.
-> > 
-> 
-> 
+...
+
+> -int mana_pre_alloc_rxbufs(struct mana_port_context *mpc, int new_mtu, int num_queues)
+> -{
+> -	struct device *dev;
+> -	struct page *page;
+> -	dma_addr_t da;
+> -	int num_rxb;
+> -	void *va;
+> -	int i;
+> -
+> -	mana_get_rxbuf_cfg(new_mtu, &mpc->rxbpre_datasize,
+> -			   &mpc->rxbpre_alloc_size, &mpc->rxbpre_headroom);
+> -
+> -	dev = mpc->ac->gdma_dev->gdma_context->dev;
+> -
+> -	num_rxb = num_queues * mpc->rx_queue_size;
+> -
+> -	WARN(mpc->rxbufs_pre, "mana rxbufs_pre exists\n");
+> -	mpc->rxbufs_pre = kmalloc_array(num_rxb, sizeof(void *), GFP_KERNEL);
+> -	if (!mpc->rxbufs_pre)
+> -		goto error;
+>  
+> -	mpc->das_pre = kmalloc_array(num_rxb, sizeof(dma_addr_t), GFP_KERNEL);
+> -	if (!mpc->das_pre)
+> -		goto error;
+> -
+> -	mpc->rxbpre_total = 0;
+> -
+> -	for (i = 0; i < num_rxb; i++) {
+> -		page = dev_alloc_pages(get_order(mpc->rxbpre_alloc_size));
+> -		if (!page)
+> -			goto error;
+> -
+> -		va = page_to_virt(page);
+> -
+> -		da = dma_map_single(dev, va + mpc->rxbpre_headroom,
+> -				    mpc->rxbpre_datasize, DMA_FROM_DEVICE);
+> -		if (dma_mapping_error(dev, da)) {
+> -			put_page(page);
+> -			goto error;
+> +	/* For xdp and jumbo frames make sure only one packet fits per page */
+> +	if (((mtu + MANA_RXBUF_PAD) > PAGE_SIZE / 2) || rcu_access_pointer(apc->bpf_prog)) {
+
+The line above seems to have unnecessary parentheses.
+And should be line wrapped to be 80 columns wide or less,
+as is still preferred by Networking code.
+The latter condition is flagged by checkpatch.pl --max-line-length=80
+
+	if (mtu + MANA_RXBUF_PAD > PAGE_SIZE / 2 ||
+	    rcu_access_pointer(apc->bpf_prog)) {
+
+(The above is completely untested)
+
+Also, I am a little confused by the use of rcu_access_pointer()
+above and below, as bpf_prog does not seem to be managed by RCU.
+
+Flagged by Sparse.
+
+> +		if (rcu_access_pointer(apc->bpf_prog)) {
+> +			*headroom = XDP_PACKET_HEADROOM;
+> +			*alloc_size = PAGE_SIZE;
+> +		} else {
+> +			*headroom = 0; /* no support for XDP */
+> +			*alloc_size = SKB_DATA_ALIGN(mtu + MANA_RXBUF_PAD + *headroom);
+>  		}
+>  
+> -		mpc->rxbufs_pre[i] = va;
+> -		mpc->das_pre[i] = da;
+> -		mpc->rxbpre_total = i + 1;
+> +		*frag_count = 1;
+> +		return;
+>  	}
+>  
+> -	return 0;
+> +	/* Standard MTU case - optimize for multiple packets per page */
+> +	*headroom = 0;
+>  
+> -error:
+> -	netdev_err(mpc->ndev, "Failed to pre-allocate RX buffers for %d queues\n", num_queues);
+> -	mana_pre_dealloc_rxbufs(mpc);
+> -	return -ENOMEM;
+> +	/* Calculate base buffer size needed */
+> +	u32 len = SKB_DATA_ALIGN(mtu + MANA_RXBUF_PAD + *headroom);
+> +	u32 buf_size = ALIGN(len, MANA_RX_FRAG_ALIGNMENT);
+> +
+> +	/* Calculate how many packets can fit in a page */
+> +	*frag_count = PAGE_SIZE / buf_size;
+> +	*alloc_size = buf_size;
+>  }
+
+...
+
+> -static void *mana_get_rxfrag(struct mana_rxq *rxq, struct device *dev,
+> -			     dma_addr_t *da, bool *from_pool)
+> +static void *mana_get_rxfrag(struct mana_rxq *rxq,
+> +			     struct device *dev, dma_addr_t *da, bool *from_pool)
+>  {
+>  	struct page *page;
+> +	u32 offset;
+>  	void *va;
+> -
+>  	*from_pool = false;
+>  
+> -	/* Reuse XDP dropped page if available */
+> -	if (rxq->xdp_save_va) {
+> -		va = rxq->xdp_save_va;
+> -		rxq->xdp_save_va = NULL;
+> -	} else {
+> -		page = page_pool_dev_alloc_pages(rxq->page_pool);
+> -		if (!page)
+> +	/* Don't use fragments for jumbo frames or XDP (i.e when fragment = 1 per page) */
+> +	if (rxq->frag_count == 1) {
+> +		/* Reuse XDP dropped page if available */
+> +		if (rxq->xdp_save_va) {
+> +			va = rxq->xdp_save_va;
+> +			rxq->xdp_save_va = NULL;
+> +		} else {
+> +			page = page_pool_dev_alloc_pages(rxq->page_pool);
+> +			if (!page)
+> +				return NULL;
+> +
+> +			*from_pool = true;
+> +			va = page_to_virt(page);
+> +		}
+> +
+> +		*da = dma_map_single(dev, va + rxq->headroom, rxq->datasize,
+> +				     DMA_FROM_DEVICE);
+> +		if (dma_mapping_error(dev, *da)) {
+> +			if (*from_pool)
+> +				page_pool_put_full_page(rxq->page_pool, page, false);
+> +			else
+> +				put_page(virt_to_head_page(va));
+
+The put logic above seems to appear in this patch
+more than once. IMHO a helper would be nice.
+
+> +
+>  			return NULL;
+> +		}
+>  
+> -		*from_pool = true;
+> -		va = page_to_virt(page);
+> +		return va;
+>  	}
+
+...
+
+-- 
+pw-bot: changes-requested
 
