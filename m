@@ -1,149 +1,787 @@
-Return-Path: <netdev+bounces-209013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EB06B0DFF5
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 17:07:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C3B9B0DFE7
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 17:06:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2ADFA7B7BF9
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 15:02:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32ED2545E62
+	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 15:03:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B6B92EBBA4;
-	Tue, 22 Jul 2025 15:02:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 087B52ED84C;
+	Tue, 22 Jul 2025 15:02:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="lzMJhF1r"
+	dkim=pass (2048-bit key) header.d=readmodwrite-com.20230601.gappssmtp.com header.i=@readmodwrite-com.20230601.gappssmtp.com header.b="FWhk/PEp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7FC62E1C7A
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 15:01:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E842EACE3
+	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 15:01:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753196520; cv=none; b=ibTWRdg+vDPhpLleNaYSg9FxGCmfb6T+WcbCU/U/wus4ryw3wp+Y5iKisTQ6ZbUU8oQyudoAlYHK108i+AYxCKFIpFr8verp5PEF0pKeAKzMlEVCa4jimvbdgNebq3e36AArDEeaCGpRtyAjf4IdxpRfQBy1AbYMegVitvirML4=
+	t=1753196521; cv=none; b=obafbIVxQcfoL3syc3hLm1e4vnV1VY8FeUkaH+7JKok+dEXxdp8ZrHsydK6v0uUrQVf3B69jzjHEoZ36Rb6O2XURebSV+c8o1KQJ8F82Pipm+26NEl3X1CpGXJKhkahBlcZsEivTdWTD4xLLGGTIcbPbkF7n3rAVaWM5bowe8Y4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753196520; c=relaxed/simple;
-	bh=YmHvIykm13Ip/tOjb7KoHSGXfOvcdQou2fZ6EnWYQTY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Fl3hNct+jp1RV1wiilQmj/JTz7e9q6Xsi893blUsbETWQSvJuYv5WPfkCMn20Gflkccp8BiIGJoshA//FdQb8ri7bZa8+uqUllvUXMforZAuM6ifk9sgWwHY75TUUR7RFyR+lXz1JX+BiESx4rzTFLniIte5JJpUBdqyhPOfVRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=lzMJhF1r; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56M7gQjV011559
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 15:01:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	nQea+0bC6PD6eejJkZGOzWEWHSsdYyQtTKTo+7Hs0x8=; b=lzMJhF1rrwyfBKv4
-	QY1FUQIGo7zdaPMs0+mvmgS6d50hl6NvrGiG8Xj+h0xnai1fCIZBeHDW+URvCzG5
-	213nyitbdgiTo+ItZ6nS0EDKPX2BXtutwA+YowM5xMfh0p4M7FdShhhjs40+Ew7k
-	y38edEMHc0tMqSZzLlayxhVpQqc4+eLJpcQv08khiTp+f8tOXoeAU1f7mZCG62ZJ
-	bTMVKMh+f96wMDjQXvWCYDfxHLGCxX5F79zJXQvL7EtneKg02OyP1yiM94x9uKPj
-	gdUEknpoPV7fHkG8O+gOMNWfiwXcMVpHNgo+CGcjDnXUNpajAcFmd8IUJGa+Ok0T
-	PmJg4A==
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com [209.85.219.69])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 481t6w30ym-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 15:01:56 +0000 (GMT)
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6fabe7822e3so4927836d6.2
-        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 08:01:56 -0700 (PDT)
+	s=arc-20240116; t=1753196521; c=relaxed/simple;
+	bh=NJSuZmY85o4k5E9RkzDYvsZ7fxJKnozQ1DifWO1s+UE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=uVnqvYQuu0J1rxNNGO0ADNkebF0tZv7CTd2EiofGgKsFON35t4I9YZPa/TEWS68oe6KsDNV+4Be0Ym6eNFS7F3XLihpIaAehN0dmk3kG1/h81Fit+3kvTzyM/OA3ZJ2UkzwpEerhm/6YoBLrNAglCGczIXsikMjCXMBe3G41vUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=readmodwrite.com; spf=none smtp.mailfrom=readmodwrite.com; dkim=pass (2048-bit key) header.d=readmodwrite-com.20230601.gappssmtp.com header.i=@readmodwrite-com.20230601.gappssmtp.com header.b=FWhk/PEp; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=readmodwrite.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=readmodwrite.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4563bc166a5so27025205e9.1
+        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 08:01:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=readmodwrite-com.20230601.gappssmtp.com; s=20230601; t=1753196516; x=1753801316; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kaatTu06nqftjCdXA2P3HMgyASdxofw7qYHRjndSGko=;
+        b=FWhk/PEp6yRJlGJoXl0pcmYGd24bsKuiOCmMqnQHAaUMi3oh2Y2/+HddG8/MHYjwms
+         b0jFvPVvzHvRzl9zA7MVyj3G+shhLNnA3tU+ABZ4AwjS7NKm6x/ZYd1N63tyMi+dgGwC
+         FMNWf/0MfLuWQfctW2XBt91zwBKnp0JQErM70cWOmiYEpMENztahCjzPHU9ACfO/dvl3
+         Fs4zBUjsRLLAWFNDXBNijbAx1mSml/kn5d4MJxUnaEIcJcEgPuR1xl0CpCsHZUNUKhkz
+         nV4iy8VHNuylIM7aB8AlyKpJc0/snbvrtSMoXcvPpAQS1CRYTlV4LTdfTLVUVIAJ1dId
+         Z30Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753196515; x=1753801315;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nQea+0bC6PD6eejJkZGOzWEWHSsdYyQtTKTo+7Hs0x8=;
-        b=n0rG0AXSPC5qBUs4faPq/LU8cE0lpk6HZSWm56MEvnjSqv+6pS9fW/4AwR1PA/YY3N
-         Ur1Cx2yYX7olkqkmMYHj8DvEGcVUlWGtrtOWYh4crLr2F3Pzc+bbXPOcGidt2CZ18r4F
-         WH+awZzRKAOHZP64q1N9VEG8c+Pj74d+jHf7+St1AuF+Dss5gbjMtsUUZc3oSWR77C3p
-         tqPL64Q6KBm8c7J6nD+l0yoas2a9TN7RtdKGfvVdNS7DuQIJcdsrRbSzfGCP/nK8I50n
-         UkTY9Qvtp9xmMEg7I2abuXrqD1k9CHtVqSCR0c9PfWjAVfF270f7OGsiWDTxtiKpoMi+
-         ambw==
-X-Forwarded-Encrypted: i=1; AJvYcCXrqp7946uzeRTZaDcsEEqddfisGfgwIwbFfNYNMukGmgudi3TlCsQq16uimndJk4ZaxLuQuCo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFUvVNjtl+24LjCLNr5JdDOtFxHxRIUCgiX4ULgM5P89qvec68
-	tzZXcFLfOXn9asPOeCJv8hD98ECCPZlRXpKhrDXQueHyCOXCWwD/43p+srFCNmQoWNCP74PsWZI
-	95vau+xpMn/sXeVJYn04747vkUZrNlHYIzUDDF5GOO3dyFZOxiWRS5hAcZQ4=
-X-Gm-Gg: ASbGncsQ55tFBKnGXzqmStl/p3AKovw27YZ5fBPsffg7BAMGu10WOwhbrkzQaNvVN/x
-	o12uhXW4+d0PUPZMINRA/vSa48D21QUK8GXmzrszhqQqRysXMgLTnaiM938HirzihiNyTfjVJkE
-	XOXcONPoX+XfkqCvOgC8qW65m8cERlyzcbZeKC9bJw8VsbaxYfDp2JcMKlixWMSHH9Eur6DGhds
-	Pl2fWoEmBN+gFWNc1U7boMaAEPOmKx+skqrKR3aMGILtvWe+4n1b9e6Bf0MnGe+Peh+6cq7a8UC
-	ucL94dImQQvXKhFqTp7ZRgm/kV+Pusz+2x4GTt+tk+l1pbxyhKY+f5TocdrwVmN5fd1fxbbqKA1
-	DQs5u4SyrunusEA+frdIz
-X-Received: by 2002:a05:620a:8089:b0:7e3:3419:8ed with SMTP id af79cd13be357-7e342ab82c0mr1516901085a.6.1753196514607;
-        Tue, 22 Jul 2025 08:01:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE9HTTcR+tQSzuEDJ8+Kt0u51iSbuGAMBmDowZbgYVk1n01G8uxA0VUwMaUyhdWRTPvV72rbA==
-X-Received: by 2002:a05:620a:8089:b0:7e3:3419:8ed with SMTP id af79cd13be357-7e342ab82c0mr1516895185a.6.1753196513449;
-        Tue, 22 Jul 2025 08:01:53 -0700 (PDT)
-Received: from [192.168.143.225] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aec6ca310aasm867940766b.72.2025.07.22.08.01.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Jul 2025 08:01:52 -0700 (PDT)
-Message-ID: <88a22bcf-2c31-48e1-8640-867727c02ea2@oss.qualcomm.com>
-Date: Tue, 22 Jul 2025 17:01:50 +0200
+        d=1e100.net; s=20230601; t=1753196516; x=1753801316;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kaatTu06nqftjCdXA2P3HMgyASdxofw7qYHRjndSGko=;
+        b=R53FqL0GC0bjLbsgKbUnlsWXuRc17F+Tju+AN3T+FV44JI0GeXpYzqdhuG31qvpU05
+         qp8i0iihZH97nGUd8SkCcN2zaSf/Q5e1PGihYHlyNrcbSSV2isVWAbpUHTy1PgRvzE2T
+         DBRzGZksSuykxOce9B82vobwmstJdCszTb0BRUJjSDuqmciEv1mITwCk/N1qFDrmnHbd
+         x1GomhVwpI/99hOK2zXimQar31su3zY6TfF2HrZTOz/cSNdhNPgAGg4Yp6BZZr1d2eI7
+         MICnixiPUdahhUU25HID5+nYxKyxSE5AQrWZ/5lCvuQm3kX3ZOy8ooM2fwEfP+MLhNTM
+         zQRg==
+X-Forwarded-Encrypted: i=1; AJvYcCVosuqQv1CCXXoZDOSFfeNVwztqi1EP5+jWm7C/8zXvyIyc4xT94SLgq0H1L48IQOYf7K8lFEw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXGTbFKSy4ooLrysb0o12BKvhY3GwB3mRbXRgSA8BhYUtzZzYY
+	psQa7z+1dFZzfX5CZaEInT0cnvqdNr+GN0uhoil+MGsSmzITXBRqvdIbUGhXJDWRams=
+X-Gm-Gg: ASbGncsIZKrnRls7EuDx6ZFLZXKrsdBI36V+62kTw50oEDdRvAkOkoQ8/KJAV0RpYAM
+	9+3/dPvXrqgR5HX39wQMMvUEn9fGgxJwMyRnDOzfRamuzOp6yHb0F2vm0B0k/nrl0v+aB2okfb7
+	RZX0PaXaFhS5H3cFc0r43xqH3aUwEMmUrMeAxqxVcf+ewC9S5RQ0+lnO4hYES0w+RJ02y2Wg+kY
+	1lmEa5AFUejvHF4PlwUINF1yRvzPOZMmq9ggqBSg/MUWCdRWllqrqaDlDW4oscdS+4JZqpOFe4D
+	9jUnrzxxUvrPFub8myu/3HUhrNr9rFzrtommuqNqH523Kxyrf0d8PZFlqH0wkTouddjC1pXa+jM
+	sVE9v1N/LoodNbom7xTZ4HJA=
+X-Google-Smtp-Source: AGHT+IHurDda4UzpV9zcPYsaScFoij6h1IVvWbmUM0PfHfuY5bkBJb52+lhjGVFyUHV4dhXCmcmFHg==
+X-Received: by 2002:a05:600c:621a:b0:456:1ab0:d566 with SMTP id 5b1f17b1804b1-45862754b2emr38049545e9.16.1753196515974;
+        Tue, 22 Jul 2025 08:01:55 -0700 (PDT)
+Received: from matt-Precision-5490.. ([2a09:bac1:2880:f0::3d9:46])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4562e886286sm197948995e9.26.2025.07.22.08.01.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Jul 2025 08:01:55 -0700 (PDT)
+From: Matt Fleming <matt@readmodwrite.com>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>
+Cc: Shuah Khan <shuah@kernel.org>,
+	kernel-team@cloudflare.com,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Martin KaFai Lau <martin.lau@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	netdev@vger.kernel.org,
+	Matt Fleming <mfleming@cloudflare.com>
+Subject: [PATCH bpf-next v3] selftests/bpf: Add LPM trie microbenchmarks
+Date: Tue, 22 Jul 2025 16:01:52 +0100
+Message-Id: <20250722150152.1158205-1-matt@readmodwrite.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/7] arm64: dts: qcom: Rename sa8775p SoC to "lemans"
-To: Wasim Nazir <wasim.nazir@oss.qualcomm.com>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
- <conor+dt@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>
-Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        kernel@oss.qualcomm.com
-References: <20250722144926.995064-1-wasim.nazir@oss.qualcomm.com>
- <20250722144926.995064-2-wasim.nazir@oss.qualcomm.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20250722144926.995064-2-wasim.nazir@oss.qualcomm.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Authority-Analysis: v=2.4 cv=SPpCVPvH c=1 sm=1 tr=0 ts=687fa7e5 cx=c_pps
- a=wEM5vcRIz55oU/E2lInRtA==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=EUspDBNiAAAA:8 a=ziRkMoTaCqJTGmMilkgA:9
- a=QEXdDO2ut3YA:10 a=OIgjcC2v60KrkQgK7BGD:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzIyMDEyNCBTYWx0ZWRfX1SpGtwJOqb5y
- 07VWCYSRAtHDLWMpMPHLA4PyTY1ERDAa/Vb3tyWTknYWBUO0xDqK9U/rmv+a1YPP5pPVPz3rQZO
- 79/6lbIeciPU7Wyk61CC6VslxklnAUj5IvlvH3fZXe+rye+ENPGgIsr/7t0pDGK+O0eB1JuWxY1
- 0PnhqqmoQwo3aZUu0BkWptqI6fplh+0673FYkF5RHDujduYR9bryv4Hl1oQg3lK7pBWeGX1BppQ
- 8MyuiRcSEaJp03zCZVEp9xBYofeHND3IVxqEUaim4B89nsHA0/ENhNIuhmupFFOZeNQHjvSwzrH
- GvwKD8EK0jj8br01KY4wFA7dYCBfxQj0RzZabRQc7UX0f1O7YouAwZrFFB5ThRp+togpSbGYGzZ
- 5eNYVn03H7SZLEuYSn2QoHOC2v0jXlDo0LSEnCRTOLxb2sLpJnkr7PwgkZjwc/vKlfrNNerK
-X-Proofpoint-ORIG-GUID: R0LFe2PE_EM5qYy-oVZxSzs3x9lPHqpf
-X-Proofpoint-GUID: R0LFe2PE_EM5qYy-oVZxSzs3x9lPHqpf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-22_02,2025-07-21_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 suspectscore=0 adultscore=0 phishscore=0 malwarescore=0
- mlxscore=0 bulkscore=0 clxscore=1015 priorityscore=1501 impostorscore=0
- lowpriorityscore=0 mlxlogscore=999 classifier=spam authscore=0 authtc=n/a
- authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505280000 definitions=main-2507220124
+Content-Transfer-Encoding: 8bit
 
-On 7/22/25 4:49 PM, Wasim Nazir wrote:
-> SA8775P, QCS9100 and QCS9075 are all variants of the same die,
-> collectively referred to as lemans. Most notably, the last of them
-> has the SAIL (Safety Island) fused off, but remains identical
-> otherwise.
-> 
-> In an effort to streamline the codebase, rename the SoC DTSI, moving
-> away from less meaningful numerical model identifiers.
-> 
-> Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
-> ---
+From: Matt Fleming <mfleming@cloudflare.com>
 
-Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Add benchmarks for the standard set of operations: lookup, update,
+delete. Also, include a benchmark for trie_free() which is known to have
+terrible performance for maps with many entries.
 
-Konrad
+Benchmarks operate on tries without gaps in the key range, i.e. each
+test begins with a trie with valid keys in the range [0, nr_entries).
+This is intended to cause maximum branching when traversing the trie.
+
+All measurements are recorded inside the kernel to remove syscall
+overhead.
+
+Most benchmarks run an XDP program to generate stats but free needs to
+collect latencies using fentry/fexit on map_free_deferred() because it's
+not possible to use fentry directly on lpm_trie.c since commit
+c83508da5620 ("bpf: Avoid deadlock caused by nested kprobe and fentry
+bpf programs") and there's no way to create/destroy a map from within an
+XDP program.
+
+Here is example output from an AMD EPYC 9684X 96-Core machine for each
+of the benchmarks using a trie with 10K entries and a 32-bit prefix
+length, e.g.
+
+  $ ./bench lpm-trie-$op \
+  	--prefix_len=32  \
+	--producers=1     \
+	--nr_entries=10000
+
+  lookup: throughput    7.423 ± 0.023 M ops/s (  7.423M ops/prod), latency  134.710 ns/op
+  update: throughput    2.643 ± 0.015 M ops/s (  2.643M ops/prod), latency  378.310 ns/op
+  delete: throughput    0.712 ± 0.008 M ops/s (  0.712M ops/prod), latency 1405.152 ns/op
+    free: throughput    0.574 ± 0.003 K ops/s (  0.574K ops/prod), latency    1.743 ms/op
+
+Tested-by: Jesper Dangaard Brouer <hawk@kernel.org>
+Reviewed-by: Jesper Dangaard Brouer <hawk@kernel.org>
+Signed-off-by: Matt Fleming <mfleming@cloudflare.com>
+---
+
+Changes in v3:
+
+ - Replace BPF_CORE_READ() with BPF_CORE_READ_STR_INTO() to avoid
+   gcc-bpf CI build failure
+
+Changes in v2:
+
+ - Add Jesper's Tested-by and Revewied-by tags
+ - Remove use of atomic_*() in favour of __sync_add_and_fetch()
+ - Use a file-local 'deleted_entries' in the DELETE op benchmark and add
+   a comment explaining why non-atomic accesses are safe.
+ - Bump 'hits' with the number of bpf_loop() loops actually executed
+
+ tools/testing/selftests/bpf/Makefile          |   2 +
+ tools/testing/selftests/bpf/bench.c           |  10 +
+ tools/testing/selftests/bpf/bench.h           |   1 +
+ .../selftests/bpf/benchs/bench_lpm_trie_map.c | 337 ++++++++++++++++++
+ .../selftests/bpf/progs/lpm_trie_bench.c      | 171 +++++++++
+ .../selftests/bpf/progs/lpm_trie_map.c        |  19 +
+ 6 files changed, 540 insertions(+)
+ create mode 100644 tools/testing/selftests/bpf/benchs/bench_lpm_trie_map.c
+ create mode 100644 tools/testing/selftests/bpf/progs/lpm_trie_bench.c
+ create mode 100644 tools/testing/selftests/bpf/progs/lpm_trie_map.c
+
+diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
+index 910d8d6402ef..10a5f1d0fa41 100644
+--- a/tools/testing/selftests/bpf/Makefile
++++ b/tools/testing/selftests/bpf/Makefile
+@@ -815,6 +815,7 @@ $(OUTPUT)/bench_bpf_hashmap_lookup.o: $(OUTPUT)/bpf_hashmap_lookup.skel.h
+ $(OUTPUT)/bench_htab_mem.o: $(OUTPUT)/htab_mem_bench.skel.h
+ $(OUTPUT)/bench_bpf_crypto.o: $(OUTPUT)/crypto_bench.skel.h
+ $(OUTPUT)/bench_sockmap.o: $(OUTPUT)/bench_sockmap_prog.skel.h
++$(OUTPUT)/bench_lpm_trie_map.o: $(OUTPUT)/lpm_trie_bench.skel.h $(OUTPUT)/lpm_trie_map.skel.h
+ $(OUTPUT)/bench.o: bench.h testing_helpers.h $(BPFOBJ)
+ $(OUTPUT)/bench: LDLIBS += -lm
+ $(OUTPUT)/bench: $(OUTPUT)/bench.o \
+@@ -836,6 +837,7 @@ $(OUTPUT)/bench: $(OUTPUT)/bench.o \
+ 		 $(OUTPUT)/bench_htab_mem.o \
+ 		 $(OUTPUT)/bench_bpf_crypto.o \
+ 		 $(OUTPUT)/bench_sockmap.o \
++		 $(OUTPUT)/bench_lpm_trie_map.o \
+ 		 #
+ 	$(call msg,BINARY,,$@)
+ 	$(Q)$(CC) $(CFLAGS) $(LDFLAGS) $(filter %.a %.o,$^) $(LDLIBS) -o $@
+diff --git a/tools/testing/selftests/bpf/bench.c b/tools/testing/selftests/bpf/bench.c
+index ddd73d06a1eb..fd15f60fd5a8 100644
+--- a/tools/testing/selftests/bpf/bench.c
++++ b/tools/testing/selftests/bpf/bench.c
+@@ -284,6 +284,7 @@ extern struct argp bench_htab_mem_argp;
+ extern struct argp bench_trigger_batch_argp;
+ extern struct argp bench_crypto_argp;
+ extern struct argp bench_sockmap_argp;
++extern struct argp bench_lpm_trie_map_argp;
+ 
+ static const struct argp_child bench_parsers[] = {
+ 	{ &bench_ringbufs_argp, 0, "Ring buffers benchmark", 0 },
+@@ -299,6 +300,7 @@ static const struct argp_child bench_parsers[] = {
+ 	{ &bench_trigger_batch_argp, 0, "BPF triggering benchmark", 0 },
+ 	{ &bench_crypto_argp, 0, "bpf crypto benchmark", 0 },
+ 	{ &bench_sockmap_argp, 0, "bpf sockmap benchmark", 0 },
++	{ &bench_lpm_trie_map_argp, 0, "LPM trie map benchmark", 0 },
+ 	{},
+ };
+ 
+@@ -558,6 +560,10 @@ extern const struct bench bench_htab_mem;
+ extern const struct bench bench_crypto_encrypt;
+ extern const struct bench bench_crypto_decrypt;
+ extern const struct bench bench_sockmap;
++extern const struct bench bench_lpm_trie_lookup;
++extern const struct bench bench_lpm_trie_update;
++extern const struct bench bench_lpm_trie_delete;
++extern const struct bench bench_lpm_trie_free;
+ 
+ static const struct bench *benchs[] = {
+ 	&bench_count_global,
+@@ -625,6 +631,10 @@ static const struct bench *benchs[] = {
+ 	&bench_crypto_encrypt,
+ 	&bench_crypto_decrypt,
+ 	&bench_sockmap,
++	&bench_lpm_trie_lookup,
++	&bench_lpm_trie_update,
++	&bench_lpm_trie_delete,
++	&bench_lpm_trie_free,
+ };
+ 
+ static void find_benchmark(void)
+diff --git a/tools/testing/selftests/bpf/bench.h b/tools/testing/selftests/bpf/bench.h
+index 005c401b3e22..bea323820ffb 100644
+--- a/tools/testing/selftests/bpf/bench.h
++++ b/tools/testing/selftests/bpf/bench.h
+@@ -46,6 +46,7 @@ struct bench_res {
+ 	unsigned long gp_ns;
+ 	unsigned long gp_ct;
+ 	unsigned int stime;
++	unsigned long duration_ns;
+ };
+ 
+ struct bench {
+diff --git a/tools/testing/selftests/bpf/benchs/bench_lpm_trie_map.c b/tools/testing/selftests/bpf/benchs/bench_lpm_trie_map.c
+new file mode 100644
+index 000000000000..435b5c7ceee9
+--- /dev/null
++++ b/tools/testing/selftests/bpf/benchs/bench_lpm_trie_map.c
+@@ -0,0 +1,337 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (c) 2025 Cloudflare */
++
++/*
++ * All of these benchmarks operate on tries with keys in the range
++ * [0, args.nr_entries), i.e. there are no gaps or partially filled
++ * branches of the trie for any key < args.nr_entries.
++ *
++ * This gives an idea of worst-case behaviour.
++ */
++
++#include <argp.h>
++#include <linux/time64.h>
++#include <linux/if_ether.h>
++#include "lpm_trie_bench.skel.h"
++#include "lpm_trie_map.skel.h"
++#include "bench.h"
++#include "testing_helpers.h"
++
++static struct ctx {
++	struct lpm_trie_bench *bench;
++} ctx;
++
++static struct {
++	__u32 nr_entries;
++	__u32 prefixlen;
++} args = {
++	.nr_entries = 10000,
++	.prefixlen = 32,
++};
++
++enum {
++	ARG_NR_ENTRIES = 9000,
++	ARG_PREFIX_LEN,
++};
++
++static const struct argp_option opts[] = {
++	{ "nr_entries", ARG_NR_ENTRIES, "NR_ENTRIES", 0,
++	  "Number of unique entries in the LPM trie" },
++	{ "prefix_len", ARG_PREFIX_LEN, "PREFIX_LEN", 0,
++	  "Number of prefix bits to use in the LPM trie" },
++	{},
++};
++
++static error_t lpm_parse_arg(int key, char *arg, struct argp_state *state)
++{
++	long ret;
++
++	switch (key) {
++	case ARG_NR_ENTRIES:
++		ret = strtol(arg, NULL, 10);
++		if (ret < 1 || ret > UINT_MAX) {
++			fprintf(stderr, "Invalid nr_entries count.");
++			argp_usage(state);
++		}
++		args.nr_entries = ret;
++		break;
++	case ARG_PREFIX_LEN:
++		ret = strtol(arg, NULL, 10);
++		if (ret < 1 || ret > UINT_MAX) {
++			fprintf(stderr, "Invalid prefix_len value.");
++			argp_usage(state);
++		}
++		args.prefixlen = ret;
++		break;
++	default:
++		return ARGP_ERR_UNKNOWN;
++	}
++	return 0;
++}
++
++const struct argp bench_lpm_trie_map_argp = {
++	.options = opts,
++	.parser = lpm_parse_arg,
++};
++
++static void __lpm_validate(void)
++{
++	if (env.consumer_cnt != 0) {
++		fprintf(stderr, "benchmark doesn't support consumer!\n");
++		exit(1);
++	}
++
++	if ((1UL << args.prefixlen) < args.nr_entries) {
++		fprintf(stderr, "prefix_len value too small for nr_entries!\n");
++		exit(1);
++	};
++}
++
++enum { OP_LOOKUP = 1, OP_UPDATE, OP_DELETE, OP_FREE };
++
++static void lpm_delete_validate(void)
++{
++	__lpm_validate();
++
++	if (env.producer_cnt != 1) {
++		fprintf(stderr,
++			"lpm-trie-delete requires a single producer!\n");
++		exit(1);
++	}
++}
++
++static void lpm_free_validate(void)
++{
++	__lpm_validate();
++
++	if (env.producer_cnt != 1) {
++		fprintf(stderr, "lpm-trie-free requires a single producer!\n");
++		exit(1);
++	}
++}
++
++static void fill_map(int map_fd)
++{
++	int i, err;
++
++	for (i = 0; i < args.nr_entries; i++) {
++		struct trie_key {
++			__u32 prefixlen;
++			__u32 data;
++		} key = { args.prefixlen, i };
++		__u32 val = 1;
++
++		err = bpf_map_update_elem(map_fd, &key, &val, BPF_NOEXIST);
++		if (err) {
++			fprintf(stderr, "failed to add key %d to map: %d\n",
++				key.data, -err);
++			exit(1);
++		}
++	}
++}
++
++static void __lpm_setup(void)
++{
++	ctx.bench = lpm_trie_bench__open_and_load();
++	if (!ctx.bench) {
++		fprintf(stderr, "failed to open skeleton\n");
++		exit(1);
++	}
++
++	ctx.bench->bss->nr_entries = args.nr_entries;
++	ctx.bench->bss->prefixlen = args.prefixlen;
++
++	if (lpm_trie_bench__attach(ctx.bench)) {
++		fprintf(stderr, "failed to attach skeleton\n");
++		exit(1);
++	}
++}
++
++static void lpm_setup(void)
++{
++	int fd;
++
++	__lpm_setup();
++
++	fd = bpf_map__fd(ctx.bench->maps.trie_map);
++	fill_map(fd);
++}
++
++static void lpm_lookup_setup(void)
++{
++	lpm_setup();
++
++	ctx.bench->bss->op = OP_LOOKUP;
++}
++
++static void lpm_update_setup(void)
++{
++	lpm_setup();
++
++	ctx.bench->bss->op = OP_UPDATE;
++}
++
++static void lpm_delete_setup(void)
++{
++	lpm_setup();
++
++	ctx.bench->bss->op = OP_DELETE;
++}
++
++static void lpm_free_setup(void)
++{
++	__lpm_setup();
++	ctx.bench->bss->op = OP_FREE;
++}
++
++static void lpm_measure(struct bench_res *res)
++{
++	res->hits = atomic_swap(&ctx.bench->bss->hits, 0);
++	res->duration_ns = atomic_swap(&ctx.bench->bss->duration_ns, 0);
++}
++
++/* For LOOKUP, UPDATE, and DELETE */
++static void *lpm_producer(void *unused __always_unused)
++{
++	int err;
++	char in[ETH_HLEN]; /* unused */
++
++	LIBBPF_OPTS(bpf_test_run_opts, opts, .data_in = in,
++		    .data_size_in = sizeof(in), .repeat = 1, );
++
++	while (true) {
++		int fd = bpf_program__fd(ctx.bench->progs.run_bench);
++		err = bpf_prog_test_run_opts(fd, &opts);
++		if (err) {
++			fprintf(stderr, "failed to run BPF prog: %d\n", err);
++			exit(1);
++		}
++
++		if (opts.retval < 0) {
++			fprintf(stderr, "BPF prog returned error: %d\n",
++				opts.retval);
++			exit(1);
++		}
++
++		if (ctx.bench->bss->op == OP_DELETE && opts.retval == 1) {
++			/* trie_map needs to be refilled */
++			fill_map(bpf_map__fd(ctx.bench->maps.trie_map));
++		}
++	}
++
++	return NULL;
++}
++
++static void *lpm_free_producer(void *unused __always_unused)
++{
++	while (true) {
++		struct lpm_trie_map *skel;
++
++		skel = lpm_trie_map__open_and_load();
++		if (!skel) {
++			fprintf(stderr, "failed to open skeleton\n");
++			exit(1);
++		}
++
++		fill_map(bpf_map__fd(skel->maps.trie_free_map));
++		lpm_trie_map__destroy(skel);
++	}
++
++	return NULL;
++}
++
++static void free_ops_report_progress(int iter, struct bench_res *res,
++				     long delta_ns)
++{
++	double hits_per_sec, hits_per_prod;
++	double rate_divisor = 1000.0;
++	char rate = 'K';
++
++	hits_per_sec = res->hits / (res->duration_ns / (double)NSEC_PER_SEC) /
++		       rate_divisor;
++	hits_per_prod = hits_per_sec / env.producer_cnt;
++
++	printf("Iter %3d (%7.3lfus): ", iter,
++	       (delta_ns - NSEC_PER_SEC) / 1000.0);
++	printf("hits %8.3lf%c/s (%7.3lf%c/prod)\n", hits_per_sec, rate,
++	       hits_per_prod, rate);
++}
++
++static void free_ops_report_final(struct bench_res res[], int res_cnt)
++{
++	double hits_mean = 0.0, hits_stddev = 0.0;
++	double lat_divisor = 1000000.0;
++	double rate_divisor = 1000.0;
++	const char *unit = "ms";
++	double latency = 0.0;
++	char rate = 'K';
++	int i;
++
++	for (i = 0; i < res_cnt; i++) {
++		double val = res[i].hits / rate_divisor /
++			     (res[i].duration_ns / (double)NSEC_PER_SEC);
++		hits_mean += val / (0.0 + res_cnt);
++		latency += res[i].duration_ns / res[i].hits / (0.0 + res_cnt);
++	}
++
++	if (res_cnt > 1) {
++		for (i = 0; i < res_cnt; i++) {
++			double val =
++				res[i].hits / rate_divisor /
++				(res[i].duration_ns / (double)NSEC_PER_SEC);
++			hits_stddev += (hits_mean - val) * (hits_mean - val) /
++				       (res_cnt - 1.0);
++		}
++
++		hits_stddev = sqrt(hits_stddev);
++	}
++	printf("Summary: throughput %8.3lf \u00B1 %5.3lf %c ops/s (%7.3lf%c ops/prod), ",
++	       hits_mean, hits_stddev, rate, hits_mean / env.producer_cnt,
++	       rate);
++	printf("latency %8.3lf %s/op\n",
++	       latency / lat_divisor / env.producer_cnt, unit);
++}
++
++const struct bench bench_lpm_trie_lookup = {
++	.name = "lpm-trie-lookup",
++	.argp = &bench_lpm_trie_map_argp,
++	.validate = __lpm_validate,
++	.setup = lpm_lookup_setup,
++	.producer_thread = lpm_producer,
++	.measure = lpm_measure,
++	.report_progress = ops_report_progress,
++	.report_final = ops_report_final,
++};
++
++const struct bench bench_lpm_trie_update = {
++	.name = "lpm-trie-update",
++	.argp = &bench_lpm_trie_map_argp,
++	.validate = __lpm_validate,
++	.setup = lpm_update_setup,
++	.producer_thread = lpm_producer,
++	.measure = lpm_measure,
++	.report_progress = ops_report_progress,
++	.report_final = ops_report_final,
++};
++
++const struct bench bench_lpm_trie_delete = {
++	.name = "lpm-trie-delete",
++	.argp = &bench_lpm_trie_map_argp,
++	.validate = lpm_delete_validate,
++	.setup = lpm_delete_setup,
++	.producer_thread = lpm_producer,
++	.measure = lpm_measure,
++	.report_progress = ops_report_progress,
++	.report_final = ops_report_final,
++};
++
++const struct bench bench_lpm_trie_free = {
++	.name = "lpm-trie-free",
++	.argp = &bench_lpm_trie_map_argp,
++	.validate = lpm_free_validate,
++	.setup = lpm_free_setup,
++	.producer_thread = lpm_free_producer,
++	.measure = lpm_measure,
++	.report_progress = free_ops_report_progress,
++	.report_final = free_ops_report_final,
++};
+diff --git a/tools/testing/selftests/bpf/progs/lpm_trie_bench.c b/tools/testing/selftests/bpf/progs/lpm_trie_bench.c
+new file mode 100644
+index 000000000000..522e1cbef490
+--- /dev/null
++++ b/tools/testing/selftests/bpf/progs/lpm_trie_bench.c
+@@ -0,0 +1,171 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (c) 2025 Cloudflare */
++
++#include <vmlinux.h>
++#include <bpf/bpf_tracing.h>
++#include <bpf/bpf_helpers.h>
++#include <bpf/bpf_core_read.h>
++#include "bpf_misc.h"
++
++#define BPF_OBJ_NAME_LEN 16U
++#define MAX_ENTRIES 100000000
++#define NR_LOOPS 10000
++
++struct trie_key {
++	__u32 prefixlen;
++	__u32 data;
++};
++
++char _license[] SEC("license") = "GPL";
++
++struct {
++	__uint(type, BPF_MAP_TYPE_HASH);
++	__uint(max_entries, 512);
++	__type(key, struct bpf_map *);
++	__type(value, __u64);
++} latency_free_start SEC(".maps");
++
++/* Filled by userspace. See fill_map() in bench_lpm_trie_map.c */
++struct {
++	__uint(type, BPF_MAP_TYPE_LPM_TRIE);
++	__type(key, struct trie_key);
++	__type(value, __u32);
++	__uint(map_flags, BPF_F_NO_PREALLOC);
++	__uint(max_entries, MAX_ENTRIES);
++} trie_map SEC(".maps");
++
++long hits;
++long duration_ns;
++
++/* Configured from userspace */
++__u32 nr_entries;
++__u32 prefixlen;
++__u8 op;
++
++SEC("fentry/bpf_map_free_deferred")
++int BPF_PROG(trie_free_entry, struct work_struct *work)
++{
++	struct bpf_map *map = container_of(work, struct bpf_map, work);
++	char name[BPF_OBJ_NAME_LEN];
++	u32 map_type;
++	__u64 val;
++
++	map_type = BPF_CORE_READ(map, map_type);
++	if (map_type != BPF_MAP_TYPE_LPM_TRIE)
++		return 0;
++
++	/*
++	 * Ideally we'd have access to the map ID but that's already
++	 * freed before we enter trie_free().
++	 */
++	BPF_CORE_READ_STR_INTO(&name, map, name);
++	if (bpf_strncmp(name, BPF_OBJ_NAME_LEN, "trie_free_map"))
++		return 0;
++
++	val = bpf_ktime_get_ns();
++	bpf_map_update_elem(&latency_free_start, &map, &val, BPF_ANY);
++
++	return 0;
++}
++
++SEC("fexit/bpf_map_free_deferred")
++int BPF_PROG(trie_free_exit, struct work_struct *work)
++{
++	struct bpf_map *map = container_of(work, struct bpf_map, work);
++	__u64 *val;
++
++	val = bpf_map_lookup_elem(&latency_free_start, &map);
++	if (val) {
++		__sync_add_and_fetch(&duration_ns, bpf_ktime_get_ns() - *val);
++		__sync_add_and_fetch(&hits, 1);
++		bpf_map_delete_elem(&latency_free_start, &map);
++	}
++
++	return 0;
++}
++
++static void gen_random_key(struct trie_key *key)
++{
++	key->prefixlen = prefixlen;
++	key->data = bpf_get_prandom_u32() % nr_entries;
++}
++
++static int lookup(__u32 index, __u32 *unused)
++{
++	struct trie_key key;
++
++	gen_random_key(&key);
++	bpf_map_lookup_elem(&trie_map, &key);
++	return 0;
++}
++
++static int update(__u32 index, __u32 *unused)
++{
++	struct trie_key key;
++	u32 val = bpf_get_prandom_u32();
++
++	gen_random_key(&key);
++	bpf_map_update_elem(&trie_map, &key, &val, BPF_EXIST);
++	return 0;
++}
++
++static __u32 deleted_entries;
++
++static int delete (__u32 index, bool *need_refill)
++{
++	struct trie_key key = {
++		.data = deleted_entries,
++		.prefixlen = prefixlen,
++	};
++
++	bpf_map_delete_elem(&trie_map, &key);
++
++	/* Do we need to refill the map? */
++	if (++deleted_entries == nr_entries) {
++		/*
++		 * Atomicity isn't required because DELETE only supports
++		 * one producer running concurrently. What we need is a
++		 * way to track how many entries have been deleted from
++		 * the trie between consecutive invocations of the BPF
++		 * prog because a single bpf_loop() call might not
++		 * delete all entries, e.g. when NR_LOOPS < nr_entries.
++		 */
++		deleted_entries = 0;
++		*need_refill = true;
++		return 1;
++	}
++
++	return 0;
++}
++
++SEC("xdp")
++int BPF_PROG(run_bench)
++{
++	bool need_refill = false;
++	u64 start, delta;
++	int loops;
++
++	start = bpf_ktime_get_ns();
++
++	switch (op) {
++	case 1:
++		loops = bpf_loop(NR_LOOPS, lookup, NULL, 0);
++		break;
++	case 2:
++		loops = bpf_loop(NR_LOOPS, update, NULL, 0);
++		break;
++	case 3:
++		loops = bpf_loop(NR_LOOPS, delete, &need_refill, 0);
++		break;
++	default:
++		bpf_printk("invalid benchmark operation\n");
++		return -1;
++	}
++
++	delta = bpf_ktime_get_ns() - start;
++
++	__sync_add_and_fetch(&duration_ns, delta);
++	__sync_add_and_fetch(&hits, loops);
++
++	return need_refill;
++}
+diff --git a/tools/testing/selftests/bpf/progs/lpm_trie_map.c b/tools/testing/selftests/bpf/progs/lpm_trie_map.c
+new file mode 100644
+index 000000000000..2ab43e2cd6c6
+--- /dev/null
++++ b/tools/testing/selftests/bpf/progs/lpm_trie_map.c
+@@ -0,0 +1,19 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#include <linux/bpf.h>
++#include <bpf/bpf_helpers.h>
++#include <bpf/bpf_tracing.h>
++
++#define MAX_ENTRIES 100000000
++
++struct trie_key {
++	__u32 prefixlen;
++	__u32 data;
++};
++
++struct {
++	__uint(type, BPF_MAP_TYPE_LPM_TRIE);
++	__type(key, struct trie_key);
++	__type(value, __u32);
++	__uint(map_flags, BPF_F_NO_PREALLOC);
++	__uint(max_entries, MAX_ENTRIES);
++} trie_free_map SEC(".maps");
+-- 
+2.34.1
+
 
