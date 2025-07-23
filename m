@@ -1,204 +1,175 @@
-Return-Path: <netdev+bounces-209305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7118B0EFB6
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 12:25:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 467BDB0EFCB
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 12:28:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D754558284E
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:25:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F9939672D7
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:27:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 049D928C035;
-	Wed, 23 Jul 2025 10:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CE5B28C2A8;
+	Wed, 23 Jul 2025 10:27:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jPqO3BtN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.actia.se (mail.actia.se [212.181.117.226])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2A528A73F;
-	Wed, 23 Jul 2025 10:25:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.181.117.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D5428C5DE;
+	Wed, 23 Jul 2025 10:27:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753266341; cv=none; b=uh0peKqauO0cA1jIf2jfq9sp5Jk7VpYTO9e5amfygcZB1UM7PyLbiVJlEXRImXULTPqrk7u90Dby0Qke6ahQ1+ReNMYuRvwOHPy4otDIEXGmzHRhfnTOxvaL5oG3Jk56H/phYYlgYJEUJS78+btAYZGaQyd7I6TwptsHB0ZXVXw=
+	t=1753266473; cv=none; b=iCQzpaG88Wbm9l0aVgUq1cizGAhiF1GnfNI4H46weVr+0uTmPFzyjcS2J3AtlUH/jglEMgX4w/EnNsBYlfArhsH9/+aK4HIk3XpqTWxGeg+Deatn/UtQGEqn+yADAM2Tdsvd8kccQ0cjvjf2MUiliZcsgN69KJUUOttz9q3iIgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753266341; c=relaxed/simple;
-	bh=7WY5QMb3nxJDoy5eYEtR2dYXbPSUspjTvNcDX4R2aQE=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=EwvicOGzvGhX+0DPhJTcNfUDuAk3F8k6Iz1k/PFjvQdsyKHZ6wa4PgFlzL8ywhfH/+/FtZNqBt4mb8kZpM71QmyIiAQlj+ZV6yOtmXwsOe6YMW8CpmmHzTf98RKPrzjUoeGCubE3VXj+sf8/pKw4oDAb5EcCJFlknFk1wr0MtAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=actia.se; spf=pass smtp.mailfrom=actia.se; arc=none smtp.client-ip=212.181.117.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=actia.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=actia.se
-Received: from S036ANL.actianordic.se (10.12.31.117) by S036ANL.actianordic.se
- (10.12.31.117) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.57; Wed, 23 Jul
- 2025 12:25:35 +0200
-Received: from S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69]) by
- S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69%6]) with mapi id
- 15.01.2507.057; Wed, 23 Jul 2025 12:25:35 +0200
-From: John Ernberg <john.ernberg@actia.se>
-To: Oliver Neukum <oneukum@suse.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-usb@vger.kernel.org"
-	<linux-usb@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, John Ernberg <john.ernberg@actia.se>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: [PATCH net v2] net: usbnet: Avoid potential RCU stall on LINK_CHANGE
- event
-Thread-Topic: [PATCH net v2] net: usbnet: Avoid potential RCU stall on
- LINK_CHANGE event
-Thread-Index: AQHb+7wgjhsMeSA3wESW6FUdmfaw8Q==
-Date: Wed, 23 Jul 2025 10:25:35 +0000
-Message-ID: <20250723102526.1305339-1-john.ernberg@actia.se>
-Accept-Language: en-US, sv-SE
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-mailer: git-send-email 2.49.0
-x-esetresult: clean, is OK
-x-esetid: 37303A2955B14450647C65
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1753266473; c=relaxed/simple;
+	bh=DCYNcGOnoipFp5qeRNoTGN+oBlg7O5HSR1iAcWEd6C0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f+P3YTovycsQ8y7pHWiw1iNBYUqRJHfO32PnPclF0IyjV3K25tt9mPdPvFcUuIPcprWwnTLHJBL7q3rSLypioEYI5kQXvzbOjewaIt0B2mlgWNIWijxt4wc1EPelh9L255bZFO8rSpNLAtjG3vIN8ibKruO/D6Ypuc+PXZWVEIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jPqO3BtN; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-236470b2dceso53197775ad.0;
+        Wed, 23 Jul 2025 03:27:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753266471; x=1753871271; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Rm3XRCn+Di3N/rWanYn9EVpo3gmry4TW5aKLBEAX3Jg=;
+        b=jPqO3BtNeygxJZFpHtrsKHnyqjE3PYkW5MXJzL1GGTV3WNMEtpfCN/npBWymjIOedH
+         XggRYXesCcu+sNwIKIqPukHZCEywnZBTeB32AUmb/VdXUxaZvtw5QQ9TBW1+DenlEGNA
+         Nx17+9HO6SHL1jeJ1prGNZ2V4MLNj6uE+mRvq2wTu3K016Q7bDwNGqELo1mpllALp6L+
+         FZvR3X2Ls0dQ69RW+eh2aiD4+SRGIA7kfbfdqqO4SW6MiCtXeO0yizjnHin1R0B84LlC
+         MhZ2BSVlwxozZobIiQOcIcgss2gNiMR+TKWNAycnxuhNbjGQX9hQYKeVan+PEhwcKApx
+         /Vrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753266471; x=1753871271;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Rm3XRCn+Di3N/rWanYn9EVpo3gmry4TW5aKLBEAX3Jg=;
+        b=p6u7CIiiF63u0W4uvwDyCwl6zBm5nfppg+htefwN7NlqfxURJchB4VzjpSHrMfO8wy
+         5YJqn3ZD2IMJ/LwuV5owZdy09zlDUcIW7oI5edSpZjj6faudVHAXgNbPG6yy4+wZbFHD
+         YRA+Oyrs5rgVXbXuYZSv+0AJ4eO/YBCWaIpNsU7NND0qBO77S8bF9l5N67MNxzWTQL+L
+         hgbRD8TZwlDwhwElVbDcUi03EyMBBOeiRHwWeho/Wm03Y7vFy/91+oxnCcTMd7wQsgrz
+         sf3UvlA0IfIrrUbF76OR3jZlVPv3XOBsBBmDllSWvJUU25/wXUxaqWMrfEEoKEhwmTSx
+         YyvA==
+X-Forwarded-Encrypted: i=1; AJvYcCX/qEQRpLlQe2h8HwU09NIderc0czHDL8pW4pXJXzgYeQO6CwhUlOiokZG11pbO6bUaZqJR0yL7Uicxq3U=@vger.kernel.org, AJvYcCXRJOA8nv/k4UpLxRIqdYF5YKtFN93llsva5KSutZc6TdYCLWRrFe5kYbxgH+RYFEEO4JN0sjG6DJHcU8lz5/4s@vger.kernel.org
+X-Gm-Message-State: AOJu0YyT4gM59Okv6hnlChF9pg/tvTqnBPtVqD2q7z6KXuG3El0wJBX1
+	m1wNcDh3Qspoe2uVsfQVDlU4ZYctkOQS/F4G0Bmlm9k0OTdWY2NP93uqBDrxOPaD
+X-Gm-Gg: ASbGncvy38r22JK1xYjsUggquobFbx7DPyrdfkJfwwVjXzLlhRNsqv8MgA2VG24CAFk
+	UvWzAyKY67NKoHAGUXVe+jzbNAa7dFAewZfIyChhroeLt5PuxXfPw0EkyM5K3F1zp7H/06aKVD3
+	JTKG1ebjb5auMPD4ajdWxyEqwJh6dupyLBSQH1rPq96tx+S+OcwLmvhHm1Uug/W2EPfCQQkI3a1
+	S00/2PjARcIGwFU/wqLSaZIAVGBz42x5R7ZVq2wPbeGN3DBDLxdxsLYEmlsQ3qDVCHfe+hHSDL6
+	nIwVB0Tp+d66RZbeQaEs7UJg78GNlFjZGycEOtpaNvmeobg5itispsRLBr6S6r4nGRzH7d3SqtY
+	UZYoNcrbLsZd4fHDqshr/AmIrRvI=
+X-Google-Smtp-Source: AGHT+IG5HdX1lhvkl+xukOzoouzn1VYzVj1xDr6rM5FYHWRSYf6xU0iUA5bPyHyxvghqOr4crhkXxA==
+X-Received: by 2002:a17:902:fc43:b0:236:6f5f:cab4 with SMTP id d9443c01a7336-23f98140225mr34938205ad.5.1753266470585;
+        Wed, 23 Jul 2025 03:27:50 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23e3b6b49ecsm93180095ad.98.2025.07.23.03.27.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Jul 2025 03:27:50 -0700 (PDT)
+Date: Wed, 23 Jul 2025 10:27:42 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jay Vosburgh <jv@jvosburgh.net>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 1/2] bonding: update ntt to true in passive mode
+Message-ID: <aIC5HrE9js_YtSCB@fedora>
+References: <20250709090344.88242-1-liuhangbin@gmail.com>
+ <20250709090344.88242-2-liuhangbin@gmail.com>
+ <765825.1752639589@famine>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <765825.1752639589@famine>
 
-The Gemalto Cinterion PLS83-W modem (cdc_ether) is emitting confusing link
-up and down events when the WWAN interface is activated on the modem-side.
+On Tue, Jul 15, 2025 at 09:19:49PM -0700, Jay Vosburgh wrote:
+> 	Presuming that I'm correct that we're not implementing 6.4.1 d),
+> above, correctly, then I don't think this is a proper fix, as it kind of
+> band-aids over the problem a bit.
+> 
+> 	Looking at the code, I suspect the problem revolves around the
+> "lacp_active" check in ad_periodic_machine():
+> 
+> static void ad_periodic_machine(struct port *port, struct bond_params *bond_params)
+> {
+> 	periodic_states_t last_state;
+> 
+> 	/* keep current state machine state to compare later if it was changed */
+> 	last_state = port->sm_periodic_state;
+> 
+> 	/* check if port was reinitialized */
+> 	if (((port->sm_vars & AD_PORT_BEGIN) || !(port->sm_vars & AD_PORT_LACP_ENABLED) || !port->is_enabled) ||
+> 	    (!(port->actor_oper_port_state & LACP_STATE_LACP_ACTIVITY) && !(port->partner_oper.port_state & LACP_STATE_LACP_ACTIVITY)) ||
+> 	    !bond_params->lacp_active) {
+> 		port->sm_periodic_state = AD_NO_PERIODIC;
+> 	}
+> 
+> 	In the above, because all the tests are chained with ||, the
+> lacp_active test overrides the two correct-looking
+> LACP_STATE_LACP_ACTIVITY tests.
+> 
+> 	It looks like ad_initialize_port() always sets
+> LACP_STATE_LACP_ACTIVITY in the port->actor_oper_port_state, and nothing
+> ever clears it.
+> 
+> 	Thinking out loud, perhaps this could be fixed by
+> 
+> 	a) remove the test of bond_params->lacp_active here, and,
+> 
+> 	b) The lacp_active option setting controls whether LACP_ACTIVITY
+> is set in port->actor_oper_port_state.
+> 
+> 	Thoughts?
 
-Interrupt URBs will in consecutive polls grab:
-* Link Connected
-* Link Disconnected
-* Link Connected
+Hi Jay,
 
-Where the last Connected is then a stable link state.
+I did some investigation and testing. In addition to your previous change,
+we also need to initialize the partner's state to 0 in ad_initialize_port_tmpl().
+Otherwise, the check:
+```
+!(port->partner_oper.port_state & LACP_STATE_LACP_ACTIVITY)
+```
+in ad_periodic_machine() will fail even when the actor is in passive mode.
 
-When the system is under load this may cause the unlink_urbs() work in
-__handle_link_change() to not complete before the next usbnet_link_change()
-call turns the carrier on again, allowing rx_submit() to queue new SKBs.
+Also, the line:
+```
+port->partner_oper.port_state |= LACP_STATE_LACP_ACTIVITY;
+```
+in ad_rx_machine() should be removed, since we can't assume the partner is in
+active mode. [1]
 
-In that event the URB queue is filled faster than it can drain, ending up
-in a RCU stall:
+With these two changes, we can ensure:
+1. In passive mode, the actor will not send LACPDU before receiving any LACPDU from the partner.
+2. Once it receives the partner’s LACPDU, it will start sending periodic LACPDUs as expected.
 
-    rcu: INFO: rcu_sched detected expedited stalls on CPUs/tasks: { 0-.... =
-} 33108 jiffies s: 201 root: 0x1/.
-    rcu: blocking rcu_node structures (internal RCU debug):
-    Sending NMI from CPU 1 to CPUs 0:
-    NMI backtrace for cpu 0
+Do you agree with making these changes? If so, I can post a patch for your review.
 
-    Call trace:
-     arch_local_irq_enable+0x4/0x8
-     local_bh_enable+0x18/0x20
-     __netdev_alloc_skb+0x18c/0x1cc
-     rx_submit+0x68/0x1f8 [usbnet]
-     rx_alloc_submit+0x4c/0x74 [usbnet]
-     usbnet_bh+0x1d8/0x218 [usbnet]
-     usbnet_bh_tasklet+0x10/0x18 [usbnet]
-     tasklet_action_common+0xa8/0x110
-     tasklet_action+0x2c/0x34
-     handle_softirqs+0x2cc/0x3a0
-     __do_softirq+0x10/0x18
-     ____do_softirq+0xc/0x14
-     call_on_irq_stack+0x24/0x34
-     do_softirq_own_stack+0x18/0x20
-     __irq_exit_rcu+0xa8/0xb8
-     irq_exit_rcu+0xc/0x30
-     el1_interrupt+0x34/0x48
-     el1h_64_irq_handler+0x14/0x1c
-     el1h_64_irq+0x68/0x6c
-     _raw_spin_unlock_irqrestore+0x38/0x48
-     xhci_urb_dequeue+0x1ac/0x45c [xhci_hcd]
-     unlink1+0xd4/0xdc [usbcore]
-     usb_hcd_unlink_urb+0x70/0xb0 [usbcore]
-     usb_unlink_urb+0x24/0x44 [usbcore]
-     unlink_urbs.constprop.0.isra.0+0x64/0xa8 [usbnet]
-     __handle_link_change+0x34/0x70 [usbnet]
-     usbnet_deferred_kevent+0x1c0/0x320 [usbnet]
-     process_scheduled_works+0x2d0/0x48c
-     worker_thread+0x150/0x1dc
-     kthread+0xd8/0xe8
-     ret_from_fork+0x10/0x20
+[1] IEEE 8021AX-2020, Figure 6-14—LACP Receive state diagram, the AD_RX_EXPIRED
+statue should be
+```
+Partner_Oper_Port_State.Synchronization = FALSE;
+Partner_Oper_Port_State.Short_Timeout = TRUE;
+Actor_Oper_Port_State.Expired = TRUE;
+LACP_currentWhile = Short_Timeout_Time;
+```
 
-Get around the problem by delaying the carrier on to the scheduled work.
-
-This needs a new flag to keep track of the necessary action.
-
-The carrier ok check cannot be removed as it remains required for the
-LINK_RESET event flow.
-
-Fixes: 4b49f58fff00 ("usbnet: handle link change")
-Cc: stable@vger.kernel.org
-Signed-off-by: John Ernberg <john.ernberg@actia.se>
-
----
-
-I've been testing this quite aggressively over a night, and seems equally
-stable to my first approach. I'm a little bit concerned that the bit stuff
-can now race (although much smaller) in the opposite direction, that a
-carrier off can occur between test_and_clear_bit() and the carrier on
-action in the handler. Leaving the carrier on when it shouldn't be.
-
-v2:
- - target tree in patch description.
- - Drop Ming Lei from address list as their address bounces.
- - Rework solution based on feedback by Jakub (let me know if you want a
-     Suggested-by tag, if we're keeping this direction)
-
-v1: https://lore.kernel.org/netdev/20250710085028.1070922-1-john.ernberg@ac=
-tia.se/
-
-Tested on 6.12.20 and forward ported. Stack trace from 6.12.20.
----
- drivers/net/usb/usbnet.c   | 11 ++++++++---
- include/linux/usb/usbnet.h |  1 +
- 2 files changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-index c04e715a4c2a..bc1d8631ffe0 100644
---- a/drivers/net/usb/usbnet.c
-+++ b/drivers/net/usb/usbnet.c
-@@ -1122,6 +1122,9 @@ static void __handle_link_change(struct usbnet *dev)
- 		 * tx queue is stopped by netcore after link becomes off
- 		 */
- 	} else {
-+		if (test_and_clear_bit(EVENT_LINK_CARRIER_ON, &dev->flags))
-+			netif_carrier_on(dev->net);
-+
- 		/* submitting URBs for reading packets */
- 		tasklet_schedule(&dev->bh);
- 	}
-@@ -2009,10 +2012,12 @@ EXPORT_SYMBOL(usbnet_manage_power);
- void usbnet_link_change(struct usbnet *dev, bool link, bool need_reset)
- {
- 	/* update link after link is reseted */
--	if (link && !need_reset)
--		netif_carrier_on(dev->net);
--	else
-+	if (link && !need_reset) {
-+		set_bit(EVENT_LINK_CARRIER_ON, &dev->flags);
-+	} else {
-+		clear_bit(EVENT_LINK_CARRIER_ON, &dev->flags);
- 		netif_carrier_off(dev->net);
-+	}
-=20
- 	if (need_reset && link)
- 		usbnet_defer_kevent(dev, EVENT_LINK_RESET);
-diff --git a/include/linux/usb/usbnet.h b/include/linux/usb/usbnet.h
-index 0b9f1e598e3a..4bc6bb01a0eb 100644
---- a/include/linux/usb/usbnet.h
-+++ b/include/linux/usb/usbnet.h
-@@ -76,6 +76,7 @@ struct usbnet {
- #		define EVENT_LINK_CHANGE	11
- #		define EVENT_SET_RX_MODE	12
- #		define EVENT_NO_IP_ALIGN	13
-+#		define EVENT_LINK_CARRIER_ON	14
- /* This one is special, as it indicates that the device is going away
-  * there are cyclic dependencies between tasklet, timer and bh
-  * that must be broken
---=20
-2.49.0
+Thanks,
+Hangbin
 
