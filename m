@@ -1,146 +1,98 @@
-Return-Path: <netdev+bounces-209364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95EA1B0F656
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 17:01:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89A6BB0F65F
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 17:02:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD41716DBD7
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 14:58:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6192AA235E
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 15:00:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D0A32FA62C;
-	Wed, 23 Jul 2025 14:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E342FF484;
+	Wed, 23 Jul 2025 14:54:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ZVAcdzUz"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GIXssPHq"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3335B2F8C24;
-	Wed, 23 Jul 2025 14:49:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4A202FEE16;
+	Wed, 23 Jul 2025 14:53:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753282169; cv=none; b=B1pQs/xiGpJRrOrWEQ2NunaWyMT4e8eAzsoUC0K6eCC+SGja1KTpnSp6yZ8ean/WtHkjrC740CZkUnvwjRtEmEIa7l3uVNKGWVvn7Ep7erR9KRsHcsSVMydJCHoo6ros2R/85oH+w22x+5z4MNO5QDTyWbwLAwD3j5boi9oiUoI=
+	t=1753282456; cv=none; b=r0rh9gxsq98SkRWe62kak4XwIFQBb328EENLBGHb7cP61SA27pi2ympuHokdAeL7kUDyhiUxOcDDAVjeCHx7925x4jzhci7RhY2NWXTfBnRCj6PTdBL7qDaz9XpGqRyHGfLlgSW0gBA4QGOFifA7LZ9NVyJcouwl1a6hnmD4SWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753282169; c=relaxed/simple;
-	bh=bVEPW8trOPxREgpEULJ+V2nr0MfDXTvoz1xVhduQmv0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qDU4GCtb4FlAAZu7KIDn4FTB0UV7wkVTQWVbeNn3t5vO9BC+vw/zER1L/MsE4fMrRncxrFNwL5r7nFL/JeIClrpNUbOBaLfIu1ie4N49fqUpMrujXU3JTYGt8hCKe88so77zLTpdmeyDWIG6dZivKQIEpeEsPM4bCtwRnqt0AEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=ZVAcdzUz; arc=none smtp.client-ip=117.135.210.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=cS
-	wtl9rPdjwJyihwf67rWxSNsxvXiR2nFdG7CrLvMi4=; b=ZVAcdzUzn1xis4xrEL
-	WAy/AgxHwmvKVi2Mbrt8e5my/o6WR/I7V136lwvoN6FZyD/eSsodHSxUuBUIR7VW
-	qahZYD/bmTqsEBhwHfGvOMs5ZBhwD9WUtTxzvW+SDoQSRgbT8FnzotsOtdQgU7KY
-	2hsfHntRNI1bkz05uZwu+6tjk=
-Received: from H00576042-PD8FB.china.huawei.com (unknown [])
-	by gzsmtp2 (Coremail) with SMTP id PSgvCgD3uXom9oBoW0PHBg--.55850S2;
-	Wed, 23 Jul 2025 22:48:08 +0800 (CST)
-From: huyizhen2024@163.com
-To: jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	andy@greyhouse.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [Discuss] KASAN: null-ptr-deference in qdisc_tree_reduce_backlog
-Date: Wed, 23 Jul 2025 22:48:27 +0800
-Message-ID: <20250723144828.664-1-huyizhen2024@163.com>
-X-Mailer: git-send-email 2.45.1.windows.1
+	s=arc-20240116; t=1753282456; c=relaxed/simple;
+	bh=BqzWyT6KzHoSXN+hN2edEC1EldzF1+qRFVYHO2Q1FZc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Clduf80lgJWLsK2SKx4KYX48brgcpcgUbgdvIX+cRuDUbbUaFO8pTL51hKY7bsuAldlBiHNlK3ZFvyDAM9nxGyMag72R1NfC6HICg9AZZ3NHOxTGpq4lb0Y+p3pWSjxtzmZxzxKBtRw7lDmMLtIx2052hmAqhUWda5bJ255RE2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GIXssPHq; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=n+4LkLar103CDs6a5yhfU4dJomb3vdlJJeBcr3Q+3gc=; b=GIXssPHqvOOquOggC0SzCdc73f
+	oTD5gPw42GhS/90eBEq/TUG8tR7VsfICR/ODcgDDBOU/4rr/SfBMb/X0daGXwFkQS4+Kp4ijrt0SH
+	x7dyAS9m83IScSzkuCuGyBQVJwvKQOi5ejwYbM3emat/Dh9lR0RkNhY9u+uDV7XoJnfY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ueaqK-002bsu-0e; Wed, 23 Jul 2025 16:53:16 +0200
+Date: Wed, 23 Jul 2025 16:53:16 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tiezhu Yang <yangtiezhu@loongson.cn>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/2] net: stmmac: Return early if invalid in
+ loongson_dwmac_fix_reset()
+Message-ID: <f65deb0d-29d1-4820-95e9-f1dd94967957@lunn.ch>
+References: <20250723100056.6651-1-yangtiezhu@loongson.cn>
+ <20250723100056.6651-2-yangtiezhu@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-CM-TRANSID:PSgvCgD3uXom9oBoW0PHBg--.55850S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxWryUZry3uw18Jr4kAw43KFg_yoWrWw17pr
-	y5Xr9rCr40yr17Ary3Zw15J348Kr43Aa18Xr48Jr1rAF17Gr1Yqr17JrWjkrnagr13J3W7
-	tr1Dtw40qryUGaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07Um1v-UUUUU=
-X-CM-SenderInfo: pkx1x6hkhqjiisu6il2tof0z/1tbiowGTp2iA6RDv8gAAsa
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250723100056.6651-2-yangtiezhu@loongson.cn>
 
-Hello.=0D
-=0D
-KASAN found a null ptr deference in qdisc_tree_reduce_backlog.=0D
-If cops->find cannot find a qdisc, it returns NULL.=0D
-And if cops->qlen_notify doesn't valid arg, it will deference the NULL ptr,=
- resulting in a kernel crash.=0D
-Should we add a check for the argument in cops->qlen_notify?=0D
-=0D
-Looking forward to your reply, thank you!=0D
-=0D
-net\sched\sch_hfsc.c:1237 hfsc_qlen_notify-null-ptr-deref=0D
-=0D
-other info that might help debug this:=0D
-=0D
-crash> bt=0D
-PID: 2297     TASK: ffff8881666aa540  CPU: 0    COMMAND: "syz-executor.1"=0D
-#0 [ffffc9001597f3b0] machine_kexec at ffffffff81206168=0D
-#1 [ffffc9001597f420] __crash_kexec at ffffffff81492da1=0D
-#2 [ffffc9001597f4e8] panic at ffffffff8131dde6=0D
-#3 [ffffc9001597f570] oops_end at ffffffff8119e82b=0D
-#4 [ffffc9001597f598] page_fault_oops at ffffffff8122786c=0D
-#5 [ffffc9001597f630] kernelmode_fixup_or_oops at ffffffff81228125=0D
-#6 [ffffc9001597f658] __bad_area_nosemaphore at ffffffff8122841f=0D
-#7 [ffffc9001597f6a0] exc_page_fault at ffffffff8683eb70=0D
-#8 [ffffc9001597f730] asm_exc_page_fault at ffffffff86a00c12=0D
-    [exception RIP: hfsc_qlen_notify+17]=0D
-    RIP: ffffffff85e29141  RSP: ffffc9001597f7e0  RFLAGS: 00010216=0D
-    RAX: 0000000000001d66  RBX: 0000000000000000  RCX: 0000000000040000=0D
-    RDX: ffffc90006512000  RSI: ffff8881666aa540  RDI: 0000000000000002=0D
-    RBP: 00000000000affe0   R8: 0000000000000001   R9: 0000000000000000=0D
-    R10: 0000000000000000  R11: 0000000000000000  R12: ffffffff87691f60=0D
-    R13: 0000000000000000  R14: 0000000000000000  R15: 0000000000000000=0D
-    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018=0D
-#9 [ffffc9001597f7f8] qdisc_tree_reduce_backlog at ffffffff85dece27=0D
-#10 [ffffc9001597f830] codel_change at ffffffff85e4fe44=0D
-#11 [ffffc9001597f8a0] codel_init at ffffffff85e50223=0D
-#12 [ffffc9001597f8c0] qdisc_create at ffffffff85deb1d8=0D
-#13 [ffffc9001597f930] tc_modify_qdisc at ffffffff85deb9c9=0D
-#14 [ffffc9001597fa38] rtnetlink_rcv_msg at ffffffff85d43739=0D
-#15 [ffffc9001597fac8] netlink_rcv_skb at ffffffff85e913f5=0D
-#16 [ffffc9001597fbb8] netlink_unicast at ffffffff85e907f1=0D
-#17 [ffffc9001597fc00] netlink_sendmsg at ffffffff85e91973=0D
-#18 [ffffc9001597fc80] __sock_sendmsg at ffffffff85cc765e=0D
-#19 [ffffc9001597fca0] ____sys_sendmsg at ffffffff85cc7de2=0D
-#20 [ffffc9001597fd18] ___sys_sendmsg at ffffffff85ccbc0c=0D
-#21 [ffffc9001597fe70] __sys_sendmsg at ffffffff85ccbd47=0D
-#22 [ffffc9001597ff28] do_syscall_64 at ffffffff8683612c=0D
-#23 [ffffc9001597ff50] entry_SYSCALL_64_after_hwframe at ffffffff86a00130=0D
-    RIP: 00007fc942692bdd  RSP: 00007fc9433bebf8  RFLAGS: 00000246=0D
-    RAX: ffffffffffffffda  RBX: 00007fc9427dbf80  RCX: 00007fc942692bdd=0D
-    RDX: 0000000000004000  RSI: 0000000020000280  RDI: 0000000000000003=0D
-    RBP: 00007fc9426f0499   R8: 0000000000000000   R9: 0000000000000000=0D
-    R10: 0000000000000000  R11: 0000000000000246  R12: 0000000000000000=0D
-    R13: 00007ffcb898b86f  R14: 00007ffcb898ba10  R15: 00007fc9433bed80=0D
-ORIG_RAX: 000000000000002e  CS: 0033  SS: 002b=0D
-=0D
-crash> dis -l hfsc_qlen_notify 10=0D
-/data/nq/kernel/net/sched/sch_hfsc.c: 1231=0D
-0xffffffff85e29130 <hfsc_qlen_notify>:  nopl   0x0(%rax,%rax,1) [FTRACE NOP=
-]=0D
-/data/nq/kernel/net/sched/sch_hfsc.c: 1232=0D
-0xffffffff85e29135 <hfsc_qlen_notify+5>:        push   %r12=0D
-0xffffffff85e29137 <hfsc_qlen_notify+7>:        push   %rbp=0D
-0xffffffff85e29138 <hfsc_qlen_notify+8>:        push   %rbx=0D
-/data/nq/kernel/net/sched/sch_hfsc.c: 1231=0D
-0xffffffff85e29139 <hfsc_qlen_notify+9>:        mov    %rsi,%rbx=0D
-/data/nq/kernel/net/sched/sch_hfsc.c: 1232=0D
-0xffffffff85e2913c <hfsc_qlen_notify+12>:       call   0xffffffff814f06a0 <=
-__sanitizer_cov_trace_pc>=0D
-/data/nq/kernel/net/sched/sch_hfsc.c: 1237=0D
-0xffffffff85e29141 <hfsc_qlen_notify+17>:       mov    0x2ec(%rbx),%ebp=0D
-0xffffffff85e29147 <hfsc_qlen_notify+23>:       xor    %edi,%edi=0D
-0xffffffff85e29149 <hfsc_qlen_notify+25>:       mov    %ebp,%esi=0D
-0xffffffff85e2914b <hfsc_qlen_notify+27>:       call   0xffffffff814f08b0 <=
-__sanitizer_cov_trace_const_cmp4>=
+On Wed, Jul 23, 2025 at 06:00:55PM +0800, Tiezhu Yang wrote:
+> If the MAC controller does not connect to any PHY interface, there is a
+> missing clock, then the DMA reset fails.
+> 
+> For this case, the DMA_BUS_MODE_SFT_RESET bit is 1 before software reset,
+> just return -EINVAL immediately to avoid waiting for the timeout when the
+> DMA reset fails in loongson_dwmac_fix_reset().
+> 
+> Signed-off-by: Tiezhu Yang <yangtiezhu@loongson.cn>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> index e1591e6217d4..6d10077666c7 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> @@ -513,6 +513,9 @@ static int loongson_dwmac_fix_reset(void *priv, void __iomem *ioaddr)
+>  {
+>  	u32 value = readl(ioaddr + DMA_BUS_MODE);
+>  
+> +	if (value & DMA_BUS_MODE_SFT_RESET)
+> +		return -EINVAL;
 
+What happens with this return value? Do you get an error message which
+gives a hint the PHY clock is missing? Would a netdev_err() make sense
+here?
+
+	Andrew
 
