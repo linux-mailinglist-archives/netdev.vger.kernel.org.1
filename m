@@ -1,45 +1,47 @@
-Return-Path: <netdev+bounces-209190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DC56B0E91C
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 05:32:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6C76B0E91E
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 05:32:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B6483A3090
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 03:31:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A563D56685B
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 03:32:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C87024676E;
-	Wed, 23 Jul 2025 03:31:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7790246789;
+	Wed, 23 Jul 2025 03:31:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kCZ0kP5c"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tzRkD6qf"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03DC02472A6
-	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 03:31:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C36424678A
+	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 03:31:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753241502; cv=none; b=BuBALemTCkh/bTZsEYuA3jrZoggjfxuh1MxNtEIBB118bNnvmOaX9771xa51cexV8pF/hUeTM8L6TJOsi979TXhV7ni+7pc+zy54H6uYSrPiPTaB417NRDarXqIeffQC0jxsAw5X+f/RwqKcB/70/2ZJ3jM5s6gzVZeBn5b8jEQ=
+	t=1753241513; cv=none; b=c9O04c6qOktAGe/yPctYgbBoeFpMNEHArimOCyunwKuHPs/w6xU7JREyn+2a2ZPkymeSHfbzYVHv8yKXGpu8n4Yr3L8i5Jlh0ynCZMYwqdyaZ8enMXvQCM5w+aQpZAZyFNTXakJoEgRJVi6MvB3MqOuXXPq+UP0Qidu0fUQSrRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753241502; c=relaxed/simple;
-	bh=L9RLkSzGvt+8a/cz8oyUGiNha9y/0DT8CZkSZzbBO04=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=c6dEYVkHO6EpMqORFGb3NMvzHZCIOR4vPyx/hLRmE4Ma9JjFQKbjWNTuxCItu3SrTIq+qItkQClmHjOJqouUrMjtxVEmOqHdbiP7plE0+NYUv0nHtWAZMQyNpLphL2MDa99VNxmkKeXrIa5pmSUmzBQ5fIuVvWGBNX2rBmL2mME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kCZ0kP5c; arc=none smtp.client-ip=91.218.175.186
+	s=arc-20240116; t=1753241513; c=relaxed/simple;
+	bh=gluhea+9Q4zXLUk0JeIwrEY7xnmNHN7GWK8C7nGilAQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=dEoQVM7Bb7m686q/NxgmC7TsRGSH2yqTnyQUl/hU/agw2JlwnpgMaKDvcCoN8wJEE9RsD//Oqdxa83PAvcYWkUMobcDptrvP/YpuXJ5NEMa1xfYHw9zPr+oE08GkDub4B6TH97Jnykv/YfYg0QZ8EMOmgPk0zMG9en8dLTg490M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tzRkD6qf; arc=none smtp.client-ip=95.215.58.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753241488;
+	t=1753241509;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=0Z24TQ45YvSSy0wmD2OTvnM1m6tco29IviVg+O8MlyQ=;
-	b=kCZ0kP5caLrcInkrdAd8jzRSIekn/byb5l7ntgmcZNorrdFPpt+cHdxAJkCo6m2MJERjmR
-	SDc38wSl7bp/p6zFsLZgPi4COQUIMLsgcOOhaVEkgVQLvrnOAAwLMetK5L4NzAKZBmw8CM
-	hj6NypH6/Q2Rj/hEyEh07RqmZWncyX0=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dPzrBOWfFfkNAKrMd58E0JJGQXeyfS1QZoVdfNZC5BY=;
+	b=tzRkD6qfYJcYFZ3JprPuyyeC0H2igHpoBbr1Jc8WUQ+QmobrBScZRd18PanLL+pimrSgct
+	UffF2NKy8HIaXSDma/+8W29AWIt80M4uP2EUQ4t6RivvHyoEirL6D1irpWtY5B7vD0Q+SV
+	8rN/baa2fXg7r6h69lr0nnqHPINhuXc=
 From: Tao Chen <chen.dylane@linux.dev>
 To: qmo@kernel.org,
 	ast@kernel.org,
@@ -61,9 +63,11 @@ Cc: linux-kernel@vger.kernel.org,
 	bpf@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Tao Chen <chen.dylane@linux.dev>
-Subject: [PATCH bpf-next v3 1/3] bpftool: Add bpf_token show
-Date: Wed, 23 Jul 2025 11:31:05 +0800
-Message-ID: <20250723033107.1411154-1-chen.dylane@linux.dev>
+Subject: [PATCH bpf-next v3 2/3] bpftool: Add bpftool-token manpage
+Date: Wed, 23 Jul 2025 11:31:06 +0800
+Message-ID: <20250723033107.1411154-2-chen.dylane@linux.dev>
+In-Reply-To: <20250723033107.1411154-1-chen.dylane@linux.dev>
+References: <20250723033107.1411154-1-chen.dylane@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,343 +77,86 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Add `bpftool token show` command to get token info
-from bpffs in /proc/mounts.
+Add bpftool-token manpage with information and examples of token-related
+commands.
 
-Example plain output for `token show`:
-token_info  /sys/fs/bpf/token
-	allowed_cmds:
-	  map_create          prog_load
-	allowed_maps:
-	allowed_progs:
-	  kprobe
-	allowed_attachs:
-	  xdp
-token_info  /sys/fs/bpf/token2
-	allowed_cmds:
-	  map_create          prog_load
-	allowed_maps:
-	allowed_progs:
-	  kprobe
-	allowed_attachs:
-	  xdp
-
-Example json output for `token show`:
-[{
-	"token_info": "/sys/fs/bpf/token",
-	"allowed_cmds": ["map_create", "prog_load"],
-	"allowed_maps": [],
-	"allowed_progs": ["kprobe"],
-	"allowed_attachs": ["xdp"]
-}, {
-	"token_info": "/sys/fs/bpf/token2",
-	"allowed_cmds": ["map_create", "prog_load"],
-	"allowed_maps": [],
-	"allowed_progs": ["kprobe"],
-	"allowed_attachs": ["xdp"]
-}]
-
+Suggested-by: Quentin Monnet <qmo@kernel.org>
 Signed-off-by: Tao Chen <chen.dylane@linux.dev>
 ---
- tools/bpf/bpftool/main.c  |   3 +-
- tools/bpf/bpftool/main.h  |   1 +
- tools/bpf/bpftool/token.c | 226 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 229 insertions(+), 1 deletion(-)
- create mode 100644 tools/bpf/bpftool/token.c
+ .../bpftool/Documentation/bpftool-token.rst   | 64 +++++++++++++++++++
+ 1 file changed, 64 insertions(+)
+ create mode 100644 tools/bpf/bpftool/Documentation/bpftool-token.rst
 
-Change list:
- v2 -> v3:
-  Quentin suggested:
-  - patch1
-   - remove print when token not found.
-  - patch2
-   - refactor description message.
-  - patch3
-   - update commit message.
- v2: https://lore.kernel.org/bpf/20250722115815.1390761-1-chen.dylane@linux.dev
-     https://lore.kernel.org/bpf/20250722120912.1391604-2-chen.dylane@linux.dev
-  
- v1 -> v2:
-  Quentin suggested:
-  - patch1
-   - remove zclose macro.
-   - rename __json_array_str to split_json_array_str
-   - print empty array when value is null for json format.
-   - show all tokens info and format plain output for readable.
-   - add info when token not found.
-   - add copyright in token.c
-  - patch2
-   - update 'eBPF progs' to 'eBPF tokens'.
-   - update description.
-  - patch3
-   - add bash-completion.
- v1: https://lore.kernel.org/bpf/20250720173310.1334483-1-chen.dylane@linux.dev
-
-diff --git a/tools/bpf/bpftool/main.c b/tools/bpf/bpftool/main.c
-index 2b7f2bd3a7d..0f1183b2ed0 100644
---- a/tools/bpf/bpftool/main.c
-+++ b/tools/bpf/bpftool/main.c
-@@ -61,7 +61,7 @@ static int do_help(int argc, char **argv)
- 		"       %s batch file FILE\n"
- 		"       %s version\n"
- 		"\n"
--		"       OBJECT := { prog | map | link | cgroup | perf | net | feature | btf | gen | struct_ops | iter }\n"
-+		"       OBJECT := { prog | map | link | cgroup | perf | net | feature | btf | gen | struct_ops | iter | token }\n"
- 		"       " HELP_SPEC_OPTIONS " |\n"
- 		"                    {-V|--version} }\n"
- 		"",
-@@ -87,6 +87,7 @@ static const struct cmd commands[] = {
- 	{ "gen",	do_gen },
- 	{ "struct_ops",	do_struct_ops },
- 	{ "iter",	do_iter },
-+	{ "token",	do_token },
- 	{ "version",	do_version },
- 	{ 0 }
- };
-diff --git a/tools/bpf/bpftool/main.h b/tools/bpf/bpftool/main.h
-index 6db704fda5c..a2bb0714b3d 100644
---- a/tools/bpf/bpftool/main.h
-+++ b/tools/bpf/bpftool/main.h
-@@ -166,6 +166,7 @@ int do_tracelog(int argc, char **arg) __weak;
- int do_feature(int argc, char **argv) __weak;
- int do_struct_ops(int argc, char **argv) __weak;
- int do_iter(int argc, char **argv) __weak;
-+int do_token(int argc, char **argv) __weak;
- 
- int parse_u32_arg(int *argc, char ***argv, __u32 *val, const char *what);
- int prog_parse_fd(int *argc, char ***argv);
-diff --git a/tools/bpf/bpftool/token.c b/tools/bpf/bpftool/token.c
+diff --git a/tools/bpf/bpftool/Documentation/bpftool-token.rst b/tools/bpf/bpftool/Documentation/bpftool-token.rst
 new file mode 100644
-index 00000000000..06b56ea40b8
+index 00000000000..d082c499cfe
 --- /dev/null
-+++ b/tools/bpf/bpftool/token.c
-@@ -0,0 +1,226 @@
-+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+/* Copyright (C) 2025 Didi Technology Co., Tao Chen */
++++ b/tools/bpf/bpftool/Documentation/bpftool-token.rst
+@@ -0,0 +1,64 @@
++.. SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 +
-+#ifndef _GNU_SOURCE
-+#define _GNU_SOURCE
-+#endif
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <stdbool.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <unistd.h>
-+#include <mntent.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
++================
++bpftool-token
++================
++-------------------------------------------------------------------------------
++tool for inspection and simple manipulation of eBPF tokens
++-------------------------------------------------------------------------------
 +
-+#include "json_writer.h"
-+#include "main.h"
++:Manual section: 8
 +
-+#define MOUNTS_FILE "/proc/mounts"
++.. include:: substitutions.rst
 +
-+static bool has_delegate_options(const char *mnt_ops)
-+{
-+	return strstr(mnt_ops, "delegate_cmds") != NULL ||
-+	       strstr(mnt_ops, "delegate_maps") != NULL ||
-+	       strstr(mnt_ops, "delegate_progs") != NULL ||
-+	       strstr(mnt_ops, "delegate_attachs") != NULL;
-+}
++SYNOPSIS
++========
 +
-+static char *get_delegate_value(const char *opts, const char *key)
-+{
-+	char *token, *rest, *ret = NULL;
-+	char *opts_copy = strdup(opts);
++**bpftool** [*OPTIONS*] **token** *COMMAND*
 +
-+	if (!opts_copy)
-+		return NULL;
++*OPTIONS* := { |COMMON_OPTIONS| }
 +
-+	for (token = strtok_r(opts_copy, ",", &rest); token != NULL;
-+			token = strtok_r(NULL, ",", &rest)) {
-+		if (strncmp(token, key, strlen(key)) == 0 &&
-+				token[strlen(key)] == '=') {
-+			ret = token + strlen(key) + 1;
-+			break;
-+		}
-+	}
-+	free(opts_copy);
++*COMMANDS* := { **show** | **list** | **help** }
 +
-+	return ret;
-+}
++TOKEN COMMANDS
++===============
 +
-+static void print_items_per_line(const char *input, int items_per_line)
-+{
-+	char *str, *rest, *strs;
-+	int cnt = 0;
++| **bpftool** **token** { **show** | **list** }
++| **bpftool** **token help**
++|
 +
-+	if (!input)
-+		return;
++DESCRIPTION
++===========
++bpftool token { show | list }
++    List BPF token information for each *bpffs* mount point containing token
++    information on the system. Information include mount point path, allowed
++    **bpf**\ () system call commands, maps, programs, and attach types for the
++    token.
 +
-+	strs = strdup(input);
-+	if (!strs)
-+		return;
++bpftool prog help
++    Print short help message.
 +
-+	for (str = strtok_r(strs, ":", &rest); str != NULL;
-+			str = strtok_r(NULL, ":", &rest)) {
-+		if (cnt % items_per_line == 0)
-+			printf("\n\t  ");
++OPTIONS
++========
++.. include:: common_options.rst
 +
-+		printf("%-20s", str);
-+		cnt++;
-+	}
++EXAMPLES
++========
++|
++| **# mkdir -p /sys/fs/bpf/token**
++| **# mount -t bpf bpffs /sys/fs/bpf/token** \
++|         **-o delegate_cmds=prog_load:map_create** \
++|         **-o delegate_progs=kprobe** \
++|         **-o delegate_attachs=xdp**
++| **# bpftool token list**
 +
-+	free(strs);
-+}
++::
 +
-+#define ITEMS_PER_LINE 4
-+static void show_token_info_plain(struct mntent *mntent)
-+{
-+	char *value;
-+
-+	printf("token_info  %s", mntent->mnt_dir);
-+
-+	printf("\n\tallowed_cmds:");
-+	value = get_delegate_value(mntent->mnt_opts, "delegate_cmds");
-+	print_items_per_line(value, ITEMS_PER_LINE);
-+
-+	printf("\n\tallowed_maps:");
-+	value = get_delegate_value(mntent->mnt_opts, "delegate_maps");
-+	print_items_per_line(value, ITEMS_PER_LINE);
-+
-+	printf("\n\tallowed_progs:");
-+	value = get_delegate_value(mntent->mnt_opts, "delegate_progs");
-+	print_items_per_line(value, ITEMS_PER_LINE);
-+
-+	printf("\n\tallowed_attachs:");
-+	value = get_delegate_value(mntent->mnt_opts, "delegate_attachs");
-+	print_items_per_line(value, ITEMS_PER_LINE);
-+	printf("\n");
-+}
-+
-+static void split_json_array_str(const char *input)
-+{
-+	char *str, *rest, *strs;
-+
-+	if (!input) {
-+		jsonw_start_array(json_wtr);
-+		jsonw_end_array(json_wtr);
-+		return;
-+	}
-+
-+	strs = strdup(input);
-+	if (!strs)
-+		return;
-+
-+	jsonw_start_array(json_wtr);
-+	for (str = strtok_r(strs, ":", &rest); str != NULL;
-+			str = strtok_r(NULL, ":", &rest)) {
-+		jsonw_string(json_wtr, str);
-+	}
-+	jsonw_end_array(json_wtr);
-+
-+	free(strs);
-+}
-+
-+static void show_token_info_json(struct mntent *mntent)
-+{
-+	char *value;
-+
-+	jsonw_start_object(json_wtr);
-+
-+	jsonw_string_field(json_wtr, "token_info", mntent->mnt_dir);
-+
-+	jsonw_name(json_wtr, "allowed_cmds");
-+	value = get_delegate_value(mntent->mnt_opts, "delegate_cmds");
-+	split_json_array_str(value);
-+
-+	jsonw_name(json_wtr, "allowed_maps");
-+	value = get_delegate_value(mntent->mnt_opts, "delegate_maps");
-+	split_json_array_str(value);
-+
-+	jsonw_name(json_wtr, "allowed_progs");
-+	value = get_delegate_value(mntent->mnt_opts, "delegate_progs");
-+	split_json_array_str(value);
-+
-+	jsonw_name(json_wtr, "allowed_attachs");
-+	value = get_delegate_value(mntent->mnt_opts, "delegate_attachs");
-+	split_json_array_str(value);
-+
-+	jsonw_end_object(json_wtr);
-+}
-+
-+static int __show_token_info(struct mntent *mntent)
-+{
-+
-+	if (json_output)
-+		show_token_info_json(mntent);
-+	else
-+		show_token_info_plain(mntent);
-+
-+	return 0;
-+}
-+
-+static int show_token_info(void)
-+{
-+	FILE *fp;
-+	struct mntent *ent;
-+
-+	fp = setmntent(MOUNTS_FILE, "r");
-+	if (!fp) {
-+		p_err("Failed to open: %s", MOUNTS_FILE);
-+		return -1;
-+	}
-+
-+	if (json_output)
-+		jsonw_start_array(json_wtr);
-+
-+	while ((ent = getmntent(fp)) != NULL) {
-+		if (strncmp(ent->mnt_type, "bpf", 3) == 0) {
-+			if (has_delegate_options(ent->mnt_opts))
-+				__show_token_info(ent);
-+		}
-+	}
-+
-+	if (json_output)
-+		jsonw_end_array(json_wtr);
-+
-+	endmntent(fp);
-+
-+	return 0;
-+}
-+
-+static int do_show(int argc, char **argv)
-+{
-+	if (argc)
-+		return BAD_ARG();
-+
-+	return show_token_info();
-+}
-+
-+static int do_help(int argc, char **argv)
-+{
-+	if (json_output) {
-+		jsonw_null(json_wtr);
-+		return 0;
-+	}
-+
-+	fprintf(stderr,
-+		"Usage: %1$s %2$s { show | list }\n"
-+		"	%1$s %2$s help\n"
-+		"\n"
-+		"",
-+		bin_name, argv[-2]);
-+	return 0;
-+}
-+
-+static const struct cmd cmds[] = {
-+	{ "show",	do_show },
-+	{ "list",	do_show },
-+	{ "help",	do_help },
-+	{ 0 }
-+};
-+
-+int do_token(int argc, char **argv)
-+{
-+	return cmd_select(cmds, argc, argv, do_help);
-+}
++    token_info  /sys/fs/bpf/token
++            allowed_cmds:
++              map_create          prog_load
++            allowed_maps:
++            allowed_progs:
++              kprobe
++            allowed_attachs:
++              xdp
 -- 
 2.48.1
 
