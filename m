@@ -1,89 +1,89 @@
-Return-Path: <netdev+bounces-209281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7C98B0EE31
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 11:17:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12426B0EE34
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 11:17:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D890568549
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 09:17:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CC813B8AA7
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 09:16:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BC45286881;
-	Wed, 23 Jul 2025 09:16:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BA94286D4C;
+	Wed, 23 Jul 2025 09:16:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KrPjcOkq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ai2CO8Vc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48104285C8C
-	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 09:16:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B926C28640F
+	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 09:16:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753262213; cv=none; b=FFE3vmzGJjNE0iNrDvFiMzoV6M9n2nAysQi5qsB9hqRHnON1qvbA9wEwRbJks4TVcmDB0A1QYzJJg3vvLY/7PAp3ENZmxfjaTJt57vUSi1dQcRkEfmY6ikYi8gqAboRI2m+rYvrq7tU6paC2LycNJKypfTVyogmGYsSM6qqEtL0=
+	t=1753262215; cv=none; b=MkoXLbot7PGG6GIcqY1j+kQp6zZ9VI1+Afj3lSJFlQb8xHkxEX9PhyhoPFuXNUSUwZg/7vO3DEVVW6Td1iiVOuYV1zr1PInpl5D/sZYGU6Pr/5D+hfkfh+9JNdXP1SIgznRYF8Hh3aPrmhBupBnRnEU1PgckmCrhoZHEwvvCP8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753262213; c=relaxed/simple;
-	bh=H2BNf5Y5uuCCMCMObzAj3YltF4GdXLPf3RclMeTe/Zk=;
+	s=arc-20240116; t=1753262215; c=relaxed/simple;
+	bh=WNEdK+X8/H3Jn6TQsrOBAz3zjhUyJZ8L61bmgaGSpKE=;
 	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=C70/zxVOngK0VuMZrTOMFhXmcgn8ObWo/gUcjDnHcJHg7hlhHN9rCZeG2EBtjupH9Bud+IMMTY83urGWXLhNyJ7DC135SHjcYiZumUUVEDReLCWYuyROgXqNex+sUgeMXaPHWyLQDSzw5k2xdHstVF156i0869fuBjRgd5c1uq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KrPjcOkq; arc=none smtp.client-ip=209.85.128.44
+	 MIME-Version:Content-Type; b=DGE5Qx8jjyIq0tR2sFJgkS8+Givor5dCp6g49MNfcSBgdiGhoC9PIjk28c1nudNvxW8rW6gv9cT7AlA9/vlm/YHNo2yjYG5f+731bjS5BSQa59dAcbNh/6+yJU3VTcLChCj0fQIYkm9nQCquuwdPXdb2olteHomnZ3ye9GBA1DA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ai2CO8Vc; arc=none smtp.client-ip=209.85.221.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-451d7b50815so48761285e9.2
-        for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 02:16:51 -0700 (PDT)
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3a4fb9c2436so3652500f8f.1
+        for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 02:16:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753262210; x=1753867010; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1753262212; x=1753867012; darn=vger.kernel.org;
         h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/BBaMS1j5ATUviYrmEB8vJyo66orVWQCLaLlvtMv/PE=;
-        b=KrPjcOkqPp2c3la2moGyfUIIj6nwU7sj1wRVBvSe4aicvgLF3kvuZQPMDKhFJS8VGB
-         DT0fMn+3QuV/ircKBIxd0rjt0v1ACuNhrh5YgBQFhdxQNcdXZOGD9KycfP45ZkZFyzal
-         XXyIz/z56bhyu9ZOVOO/VY/erOGhhVnCYWV9J0JUS1ii+B0/C2L8A6W/9XK6pGsTf8dX
-         jFHbApNU2vHo7+JJfZVlyap03xBVfLoXr3lrnO1ryPyb4/vN6ZxMrfATAI2MSbqsDoil
-         1DhTE8TSf/dFeTXDm4GySkUkirAL9mlHwBjXizZ+VeXKUeUi3oT+9Wp33upWvukyEv50
-         sa4Q==
+        bh=WNEdK+X8/H3Jn6TQsrOBAz3zjhUyJZ8L61bmgaGSpKE=;
+        b=ai2CO8Vcp9DQKDMtqddj7VoE2zPmr4ckwJM3L8/lShI3WfLzut1tPcnDTIK468n2pW
+         Qph5sw4bbLWmpTNe43s4xE4InQfsQm08XU4VVe7vGvrYat/iHkOXCRj35EmDIDgxOoUP
+         CgYDwsYxXhor6fH5pXI6U4iTyQc4Va74vIa4I7T/8L7esJvTWpY12nwwC7566DdQ3ahv
+         4v/NhPU0QZJXmLi/4cHoEpyA6gZRD2z7/PFNXT6DWKDVuRBSlEzwZTqAC9gvG3Tuj83t
+         NC/cTLGsRtniGgXNJgakqnHknYyAZJAvNpzZUEjajdBcaBo/Yk3HHsFOhOyWb7UPOTmC
+         n4Rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753262210; x=1753867010;
+        d=1e100.net; s=20230601; t=1753262212; x=1753867012;
         h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/BBaMS1j5ATUviYrmEB8vJyo66orVWQCLaLlvtMv/PE=;
-        b=TSi1pm9gd+4fP0dsrrUuJGZ3Tjoyzfig+phyAEQp3pTjss1DEoP6xWQkpeonPs8lhb
-         AWfE793XsAEXRpmnZ478gR45WYWsEUXZTbbR1cebDHgM6ARz68hDmv36BM2rRaGbhO+N
-         d8yhhZRA1HjmF8jkKWRFFtmCLmJ9nX8C+fUX0lR3Bh815wlx70XPLf3q1C9A0vC8OGnL
-         DAXO/NgFC7uLvGhWBxGWc7XOejG60QFFsSJQwzL0C6bO28vz8Xb0vCRYo9D1lm/NwBze
-         ESVwG7lGV2W3ugYnBUfwJwd1dSYurfIZa+LjElOrRSbxtQZuu1F6Z+g+BwkLz5UbXO1j
-         b+iw==
-X-Forwarded-Encrypted: i=1; AJvYcCXHW59uNCzRohDA0Sfv5PcH9Bm6lUULtSPpsxlN1DYLAx24V7UXHLnZIv2vfM1YST4nWhTBzaw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqRjtJnAO1B9WJRFX6VPuEc9Ix2cROIV1UE+3g00EHwJMG0UOr
-	IwbdIGxHvY220sPD8Kao6JyT65otdkAZrpdOZ/xRbkXFM3fO3fDcLZcM
-X-Gm-Gg: ASbGncsjQs7fhAEYGFgjol1MpnB0w5fPQUS1ff53V51kb4aNT4JsX5G4uf/LybsqpLi
-	HKSvyTOlTRXAYN/hZu2AgD/nqojf7Ffj4N26BMAFMRijmlBFvFzWgnuWSRBNxkFHF8AIlD9d2+P
-	9708LTq5cve0eaHfIE32iLxRbRQINAYfsSQm6L8ON/Q6WQ6jHCwXm7qFH+9HaL8KjxxlNKPnD5r
-	fmN0vszWTEzsWbp/mhZgFvCJwJUUGjpM682BrSwbiVeiWCusrwtoS1QeoXf4Zf0D9nVwULzEBCF
-	NCpf5fLICG6nEIBzWM8JSVHc8IixZyfhSLo0b5KSgCFFYzb8brZYLx1JtPBa70STtFBOgOSiFQx
-	js8tidq+yPAFl+hR075zN7ZyEMKs+E3XFdYk2SAMxt3pr
-X-Google-Smtp-Source: AGHT+IHgbw+fEb+VtAoYqIxGrVSbC+2a/HD4oq3nmC8izdKmyE4mLfnDCzYCv324Yui+3gHKCGi6lQ==
-X-Received: by 2002:a05:6000:2505:b0:3b5:e2c9:fa05 with SMTP id ffacd0b85a97d-3b768cb1908mr1329691f8f.18.1753262210351;
-        Wed, 23 Jul 2025 02:16:50 -0700 (PDT)
+        bh=WNEdK+X8/H3Jn6TQsrOBAz3zjhUyJZ8L61bmgaGSpKE=;
+        b=xM8nfWvybWQaYtAPa2babqc0Y6Rg5zBmOju882smS8G0FPQs8cd0xuKOusozhvMH5H
+         1aYu7feddxO+bvAjAtlouCrXLnMoYF9S/8fJrhQ180/ns7N1Xnkb1XExDCQopXMDN/YZ
+         3Y7SQtvEIAN381Y60uR38dUCd1s2FTCJyr586pB9UB3/5BNW00tMeJHfXYKmSCdhq371
+         20jRUj31vvcYKbrvmuBLzJzpUIS5RXVKt0aSANU2GAb/SKssfcdSlr7jd8TJ0yfYJtmn
+         SLE0eUEW+guaQwe1E1sLhOtzrjgeguHW+K0fSh/7vVTEGlhAaH7xGrx0qvboaK1PbCOJ
+         9/JQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUOVXG8ksdeejzuYpCpbUi2OuCOxuzmndzkxvxamyhehQyhXKOr/c31nYU9Wf+axnr4IvD622M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmEfteUUY9T8kMF54qvHBpvBSOkxLbdhCr3PYz1NeocuW5I+Wc
+	xm06xgjWWTP1Ztu1YYLX8O7FzFlce1F8w9avbNOx/LR2M9wFzgY8F1zW
+X-Gm-Gg: ASbGncsvcCiPzOttAaqMMRRR/I0894w1hJ/FdtWPhgrh0o5NyIswXOy+IolVf7+8LHL
+	w2UXk/BotN/VdWUa+3GHMJ3B3KsiPomOQ0oP0ATWXr0xHtnDHPPghw9ES6KWMp8pIM/EmgJV4LM
+	VPbnc/gCSPlemaZJDSVov9Lh2sGttrVDcGKwaGxmzU7m64pOFTfWny9w+1yL75JQqAD14uPNRAt
+	bEJzW9Ye+mmo4l9Di1drF051Dcmkwog+bigjAp8ZJE5NyRk7HV0JS512bsEGbmK7e9SUcezwO6K
+	5Cj6UK4YfjcdhqO7drhRpkH6H1zGOJyz9uGJ3dthe51g/gc6HNRP5LVvufR+0rMbHfFKclTbWl8
+	uykoKwQGD/15Tw7ZIzWM8nkl4NK3dlBK9nQ==
+X-Google-Smtp-Source: AGHT+IFaO7ZqlFTQWT3p5Ftv+EtT1W7F2/CzLZlZbN7Ml1L8eu00BAZY1qQMNFqDprK62vVVqiXubQ==
+X-Received: by 2002:a05:6000:26cd:b0:3a5:2208:41d9 with SMTP id ffacd0b85a97d-3b768f23081mr1570838f8f.40.1753262211748;
+        Wed, 23 Jul 2025 02:16:51 -0700 (PDT)
 Received: from imac ([2a02:8010:60a0:0:b8c1:6477:3a30:7fe])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca48719sm15929925f8f.47.2025.07.23.02.16.49
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca4d807sm15943766f8f.73.2025.07.23.02.16.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Jul 2025 02:16:49 -0700 (PDT)
+        Wed, 23 Jul 2025 02:16:51 -0700 (PDT)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
   pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
   almasrymina@google.com,  sdf@fomichev.me
-Subject: Re: [PATCH net-next 4/5] tools: ynl-gen: print setters for
- multi-val attrs
-In-Reply-To: <20250722161927.3489203-5-kuba@kernel.org>
-Date: Wed, 23 Jul 2025 10:15:19 +0100
-Message-ID: <m2h5z39sk8.fsf@gmail.com>
+Subject: Re: [PATCH net-next 5/5] selftests: drv-net: devmem: use new mattr
+ ynl helpers
+In-Reply-To: <20250722161927.3489203-6-kuba@kernel.org>
+Date: Wed, 23 Jul 2025 10:15:58 +0100
+Message-ID: <m2cy9r9sj5.fsf@gmail.com>
 References: <20250722161927.3489203-1-kuba@kernel.org>
-	<20250722161927.3489203-5-kuba@kernel.org>
+	<20250722161927.3489203-6-kuba@kernel.org>
 User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -95,33 +95,8 @@ Content-Type: text/plain
 
 Jakub Kicinski <kuba@kernel.org> writes:
 
-> For basic types we "flatten" setters. If a request "a" has a simple
-> nest "b" with value "val" we print helpers like:
->
->  req_set_a_b(struct a *req, int val)
->  {
->    req->_present.a = 1;
->    req->b._present.val = 1;
->    req->b.val = ...
->  }
->
-> This is not possible for multi-attr because they have to be allocated
-> dynamically by the user. Print "object level" setters so that user
-> preparing the object doesn't have to futz with the presence bits
-> and other YNL internals.
->
-> Add the ability to pass in the variable name to generated setters.
-> Using "req" here doesn't feel right, while the attr is part of a request
-> it's not the request itself, so it seems cleaner to call it "obj".
->
-> Example:
->
->  static inline void
->  netdev_queue_id_set_id(struct netdev_queue_id *obj, __u32 id)
->  {
-> 	obj->_present.id = 1;
-> 	obj->id = id;
->  }
+> Use the just-added YNL helpers instead of manually setting
+> "_present" bits in the queue attrs. Compile tested only.
 >
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
