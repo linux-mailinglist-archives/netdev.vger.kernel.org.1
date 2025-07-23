@@ -1,273 +1,121 @@
-Return-Path: <netdev+bounces-209470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04437B0FA53
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 20:35:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 574AFB0FA59
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 20:36:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 883D87B6FD1
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 18:33:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22148584CF5
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 18:36:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D0FC1F2382;
-	Wed, 23 Jul 2025 18:35:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB232220698;
+	Wed, 23 Jul 2025 18:36:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="GW8cRDYj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vOZiwET9"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B44D272608;
-	Wed, 23 Jul 2025 18:35:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23DEE20F08E
+	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 18:36:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753295719; cv=none; b=onjnI27u+bXJOKQeuz0fp4iLarlRhWFO7vxDZvyVFKLNdxcWy9EKzWq0yCR9o14trJTglol+oovQYYnrjx9UG6kcebm/02lfFS1C/1gSfwFD0/1xFYRf52O9Sk07M9+gecpKb2+fObdwFLCawgljaGRn4kkjSSfj/oKWc7Uvkfc=
+	t=1753295805; cv=none; b=YvKtdGsAu+jfab0sZddLSR9ieRCNjO3kRRAcn2pY49wWOQcnhDUcFkk9UTSjaZcINOhB25zEaVsBkTIAMNuzspsCmop+sMF3dgJ6Wj5KETlHVDmofqyNWuE6ggVIbXo+VMQi9EHfaIqoPenoxErQR5M/+53YxMcqucMKNyGVeNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753295719; c=relaxed/simple;
-	bh=vZV9NnQUdsk7nQrZr0WqwtDxRB8Q9q8blnfuuXLHmgk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hFaxHF47XVpnsr/oE4Ono7EiBxJ4y8azDRQFTCYCH6HjcciVLANggyZLvv1ulwDU1tAKrCuABsJrG/78WLral4OeKFB8fByQzrt5wtZna6VbVROARVq0weq8RjBp6nqpF/SSOvNrRTUm48HZYgXc1ASSyshVFYHoohc+KQEfazk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=GW8cRDYj; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1204)
-	id 2CC61201656A; Wed, 23 Jul 2025 11:35:17 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 2CC61201656A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1753295717;
-	bh=mxx6C4a5tB+QBM3eq0v55PRLt+bJxX+8iqOebyvxPjc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GW8cRDYjLirLbD5VzxIykuO7pmlBInPDZwgZfNGNXwd77W3C+A0qHHVgyL4r0Y3w1
-	 GwhC00RYHuavJjkdvHBDsN6uVkf7yigW5j2ld2usVi64tw5IPpSzmbIQKwbBOxO2/c
-	 x7AmS8Xvs8nNcBAq3CZ4DG1ELjL+0YIEbEJXvQas=
-Date: Wed, 23 Jul 2025 11:35:17 -0700
-From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-To: Simon Horman <horms@kernel.org>
-Cc: kuba@kernel.org, kys@microsoft.com, haiyangz@microsoft.com,
-	wei.liu@kernel.org, decui@microsoft.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com, sdf@fomichev.me, lorenzo@kernel.org,
-	michal.kubiak@intel.com, ernis@linux.microsoft.com,
-	shradhagupta@linux.microsoft.com, shirazsaleem@microsoft.com,
-	rosenp@gmail.com, netdev@vger.kernel.org,
-	linux-hyperv@vger.kernel.org, linux-rdma@vger.kernel.org,
-	bpf@vger.kernel.org, dipayanroy@linux.microsoft.com,
-	ssengar@linux.microsoft.com
-Subject: Re: [PATCH] net: mana: Use page pool fragments for RX buffers
- instead of full pages to improve memory efficiency and throughput.
-Message-ID: <20250723183517.GB25631@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20250721101417.GA18873@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <20250722111929.GE2459@horms.kernel.org>
+	s=arc-20240116; t=1753295805; c=relaxed/simple;
+	bh=5hi4WrE71marHQiRuZkE2QbL/wCvNDBks+dUnwx2Lx8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Uz8q3FYBkDWdeIxJ5/HQb28WHsH+iLQ85F2EO1ANH8s8OQ1qxB497H20O0gLinCSn0cpOyeDnl5XlTZGenXP2SO3Gd2gttHgi4OBYFFjVBjzDzULqGBxelbtBg4uim5BjqiN6aFsSbO0BZe5eVtaTj7gdt82Ag+hxsiq2l7c6VY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vOZiwET9; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4ab8e2c85d7so2974061cf.2
+        for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 11:36:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753295803; x=1753900603; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2895cOJRgjiK1NbActFOWQBd/8gPRhRvycIhI8MYzeg=;
+        b=vOZiwET96MORBsApNWWOpr7w1eVjDMXmm2SGQVCnHMRJEByhzWu4fOxb0vAsvLN4zp
+         Jojnb8gfSrL/9RqpHTMXip2f+EStewCSZOLrRFrbdTAZvxMK7+99RAwNY7+NfYbkfoa8
+         tz6gp/BYjhqeHLubccgRnU6SrV+e1EDHS75C/4J95KnddF/Vk5b9qi2V+b1Bzf5AOqnP
+         p8P9JwHePEqrs0V2DxQz3iBXvClLVFLH0yYrr9GxkM0jKsdY20xCAsTp6IN5JFV6rh0i
+         9V/+c4q0ASlFe7EuHR85csDO8RKrU1CGhiVFauJPIawSuD34WbNlpk4AbkYPB1z/906v
+         7oTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753295803; x=1753900603;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2895cOJRgjiK1NbActFOWQBd/8gPRhRvycIhI8MYzeg=;
+        b=LQ0Zt2ZeuhtKCsqzOFexH5x+NALG6834dbsV/560vn+QaQ/Xqbh0ARBWEoKfcUyrEE
+         E511csZv6gw45clB9JPxx/MoB2ejHcmgp6rlNiWIyJvfNb/aURqT2VvmHe/bO3+shv9h
+         xVrKDleQBWfyKjPohDteNE11ny6SGUH/mmfXS6oSJsm5cfTseaEZkcmyNPBLvf6QrOiw
+         +duy1R7/pgU8Q424OVqMYinEXgmBQ45m59Vt/JxrIx5mVtpjxK3AQgXYPZGoHWSWrXt4
+         prV1CjWmZLCsPf2hwrKtUkl1o0+9Yp6TwWM8L3hH/iW2IVuPLyN5ogXn8qXH5nQ5kDiy
+         4tXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUxhYSIp1ViFTJXWIBz08Vtjt/ZzX/OFl7t/SL93/rWgNTYGV/9nIWMHM2tDZFIgC30bDc5J7U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQXM0KpYoq0m1JJjC6hsAcz7WEd3fAvctOqidrXBHhulgX6ntT
+	QFvC9+3OkOo36D8kPVynoD+zADICoYQJpiSrDYcMZdnahSrlyi7NxxwB8mj2qVEXDHWiV/bxe9H
+	Fp7ossXllMrRRKEScBLRQUaTqa9qdFGjynQwiQHWw
+X-Gm-Gg: ASbGncsPixaOZP0+E7xE+BnrE6EUci4rVrtoGYqf7dycprEHT1AmRlKR1sOqCIGey8N
+	wsGmu2mpWhcB/EjhiNS6+AKbrIjSH79M2l6UQcaBLtfCiOAMrrMB1vxVNHf3kiyHfOBKzHVAd06
+	Twl4WcnfHyZJL+lSla8WGr3uDgaSTP24FbZtXrhWgdw62k64oKOB6CadxUTGhD2UZAoteaigZUI
+	ubo7dE=
+X-Google-Smtp-Source: AGHT+IFt8r1/bn5aE5w+xjp/KZnjhjjB3CgH2KGrcYHKkd+BtH2rkKXI/86jZpijEYB+DXMkCkZr0IIHXXxPnA3Mb6g=
+X-Received: by 2002:a05:622a:189d:b0:4ab:3ff6:f0e9 with SMTP id
+ d75a77b69052e-4ae6de3d55fmr49370301cf.1.1753295802557; Wed, 23 Jul 2025
+ 11:36:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250722111929.GE2459@horms.kernel.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+References: <20250722071508.12497-1-suchitkarunakaran@gmail.com>
+ <CANn89iJgG3yRQv+a04wzUtgqorSOM3DOFvGV2mgFV8QTVFjYxg@mail.gmail.com> <CAO9wTFiGCrAOkZSPr1N6W_8yacyUUcZanvXdQ-FQaphpnWe5DA@mail.gmail.com>
+In-Reply-To: <CAO9wTFiGCrAOkZSPr1N6W_8yacyUUcZanvXdQ-FQaphpnWe5DA@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 23 Jul 2025 11:36:31 -0700
+X-Gm-Features: Ac12FXxlhlhqW8vDJc_oByEs7Tt3_KF9XPplKKOxSHqunQfLKrXinLUbIUzJieg
+Message-ID: <CANn89iKwrp0j1bYQ8yGsbj_B1+eEv8BaWavHAuWpYdQVg-dqsA@mail.gmail.com>
+Subject: Re: [PATCH] net: Revert tx queue length on partial failure in dev_qdisc_change_tx_queue_len()
+To: Suchit K <suchitkarunakaran@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us, sdf@fomichev.me, 
+	kuniyu@google.com, aleksander.lobakin@intel.com, netdev@vger.kernel.org, 
+	skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Simon,
+On Wed, Jul 23, 2025 at 11:17=E2=80=AFAM Suchit K <suchitkarunakaran@gmail.=
+com> wrote:
+>
+> >
+> > WRITE_ONCE() is missing.
+> >
+> > > +               while (i >=3D 0) {
+> > > +                       qdisc_change_tx_queue_len(dev, &dev->_tx[i]);
+> >
+> > What happens if one of these calls fails ?
+> >
+> > I think a fix will be more complicated...
+>
+> Hi Eric,
+> Given that pfifo_fast_change_tx_queue_len is currently the only
+> implementation of change_tx_queue_len, would it be reasonable to
+> handle partial failures solely within pfifo_fast_change_tx_queue_len
+> (which in turn leads to skb_array_resize_multiple_bh)? In other words,
+> is it sufficient to modify only the underlying low level
+> implementation of pfifo_fast_change_tx_queue_len for partial failures,
+> given that it's the sole implementation of change_tx_queue_len?
 
-Thank you for the review, I am sending
-out v2 to address these comments.
+A generic solution will involve two phases...
+Lots of core changes, for a very narrow case.
 
-
-Regards
-Dipayaan Roy
-
-
-On Tue, Jul 22, 2025 at 12:19:29PM +0100, Simon Horman wrote:
-> On Mon, Jul 21, 2025 at 03:14:17AM -0700, Dipayaan Roy wrote:
-> > This patch enhances RX buffer handling in the mana driver by allocating
-> > pages from a page pool and slicing them into MTU-sized fragments, rather
-> > than dedicating a full page per packet. This approach is especially
-> > beneficial on systems with 64KB page sizes.
-> > 
-> > Key improvements:
-> > 
-> > - Proper integration of page pool for RX buffer allocations.
-> > - MTU-sized buffer slicing to improve memory utilization.
-> > - Reduce overall per Rx queue memory footprint.
-> > - Automatic fallback to full-page buffers when:
-> >    * Jumbo frames are enabled (MTU > PAGE_SIZE / 2).
-> >    * The XDP path is active, to avoid complexities with fragment reuse.
-> > - Removal of redundant pre-allocated RX buffers used in scenarios like MTU
-> >   changes, ensuring consistency in RX buffer allocation.
-> > 
-> > Testing on VMs with 64KB pages shows around 200% throughput improvement.
-> > Memory efficiency is significantly improved due to reduced wastage in page
-> > allocations. Example: We are now able to fit 35 Rx buffers in a single 64KB
-> > page for MTU size of 1500, instead of 1 Rx buffer per page previously.
-> > 
-> > Tested:
-> > 
-> > - iperf3, iperf2, and nttcp benchmarks.
-> > - Jumbo frames with MTU 9000.
-> > - Native XDP programs (XDP_PASS, XDP_DROP, XDP_TX, XDP_REDIRECT) for
-> >   testing the driver???s XDP path.
-> > - Page leak detection (kmemleak).
-> > - Driver load/unload, reboot, and stress scenarios.
-> > 
-> > Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-> 
-> Hi,
-> 
-> Some minor feedback from my side.
-> 
-> > diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> 
-> ...
-> 
-> > -int mana_pre_alloc_rxbufs(struct mana_port_context *mpc, int new_mtu, int num_queues)
-> > -{
-> > -	struct device *dev;
-> > -	struct page *page;
-> > -	dma_addr_t da;
-> > -	int num_rxb;
-> > -	void *va;
-> > -	int i;
-> > -
-> > -	mana_get_rxbuf_cfg(new_mtu, &mpc->rxbpre_datasize,
-> > -			   &mpc->rxbpre_alloc_size, &mpc->rxbpre_headroom);
-> > -
-> > -	dev = mpc->ac->gdma_dev->gdma_context->dev;
-> > -
-> > -	num_rxb = num_queues * mpc->rx_queue_size;
-> > -
-> > -	WARN(mpc->rxbufs_pre, "mana rxbufs_pre exists\n");
-> > -	mpc->rxbufs_pre = kmalloc_array(num_rxb, sizeof(void *), GFP_KERNEL);
-> > -	if (!mpc->rxbufs_pre)
-> > -		goto error;
-> >  
-> > -	mpc->das_pre = kmalloc_array(num_rxb, sizeof(dma_addr_t), GFP_KERNEL);
-> > -	if (!mpc->das_pre)
-> > -		goto error;
-> > -
-> > -	mpc->rxbpre_total = 0;
-> > -
-> > -	for (i = 0; i < num_rxb; i++) {
-> > -		page = dev_alloc_pages(get_order(mpc->rxbpre_alloc_size));
-> > -		if (!page)
-> > -			goto error;
-> > -
-> > -		va = page_to_virt(page);
-> > -
-> > -		da = dma_map_single(dev, va + mpc->rxbpre_headroom,
-> > -				    mpc->rxbpre_datasize, DMA_FROM_DEVICE);
-> > -		if (dma_mapping_error(dev, da)) {
-> > -			put_page(page);
-> > -			goto error;
-> > +	/* For xdp and jumbo frames make sure only one packet fits per page */
-> > +	if (((mtu + MANA_RXBUF_PAD) > PAGE_SIZE / 2) || rcu_access_pointer(apc->bpf_prog)) {
-> 
-> The line above seems to have unnecessary parentheses.
-> And should be line wrapped to be 80 columns wide or less,
-> as is still preferred by Networking code.
-> The latter condition is flagged by checkpatch.pl --max-line-length=80
-> 
-> 	if (mtu + MANA_RXBUF_PAD > PAGE_SIZE / 2 ||
-> 	    rcu_access_pointer(apc->bpf_prog)) {
-> 
-> (The above is completely untested)
-> 
-> Also, I am a little confused by the use of rcu_access_pointer()
-> above and below, as bpf_prog does not seem to be managed by RCU.
-> 
-> Flagged by Sparse.
-> 
-> > +		if (rcu_access_pointer(apc->bpf_prog)) {
-> > +			*headroom = XDP_PACKET_HEADROOM;
-> > +			*alloc_size = PAGE_SIZE;
-> > +		} else {
-> > +			*headroom = 0; /* no support for XDP */
-> > +			*alloc_size = SKB_DATA_ALIGN(mtu + MANA_RXBUF_PAD + *headroom);
-> >  		}
-> >  
-> > -		mpc->rxbufs_pre[i] = va;
-> > -		mpc->das_pre[i] = da;
-> > -		mpc->rxbpre_total = i + 1;
-> > +		*frag_count = 1;
-> > +		return;
-> >  	}
-> >  
-> > -	return 0;
-> > +	/* Standard MTU case - optimize for multiple packets per page */
-> > +	*headroom = 0;
-> >  
-> > -error:
-> > -	netdev_err(mpc->ndev, "Failed to pre-allocate RX buffers for %d queues\n", num_queues);
-> > -	mana_pre_dealloc_rxbufs(mpc);
-> > -	return -ENOMEM;
-> > +	/* Calculate base buffer size needed */
-> > +	u32 len = SKB_DATA_ALIGN(mtu + MANA_RXBUF_PAD + *headroom);
-> > +	u32 buf_size = ALIGN(len, MANA_RX_FRAG_ALIGNMENT);
-> > +
-> > +	/* Calculate how many packets can fit in a page */
-> > +	*frag_count = PAGE_SIZE / buf_size;
-> > +	*alloc_size = buf_size;
-> >  }
-> 
-> ...
-> 
-> > -static void *mana_get_rxfrag(struct mana_rxq *rxq, struct device *dev,
-> > -			     dma_addr_t *da, bool *from_pool)
-> > +static void *mana_get_rxfrag(struct mana_rxq *rxq,
-> > +			     struct device *dev, dma_addr_t *da, bool *from_pool)
-> >  {
-> >  	struct page *page;
-> > +	u32 offset;
-> >  	void *va;
-> > -
-> >  	*from_pool = false;
-> >  
-> > -	/* Reuse XDP dropped page if available */
-> > -	if (rxq->xdp_save_va) {
-> > -		va = rxq->xdp_save_va;
-> > -		rxq->xdp_save_va = NULL;
-> > -	} else {
-> > -		page = page_pool_dev_alloc_pages(rxq->page_pool);
-> > -		if (!page)
-> > +	/* Don't use fragments for jumbo frames or XDP (i.e when fragment = 1 per page) */
-> > +	if (rxq->frag_count == 1) {
-> > +		/* Reuse XDP dropped page if available */
-> > +		if (rxq->xdp_save_va) {
-> > +			va = rxq->xdp_save_va;
-> > +			rxq->xdp_save_va = NULL;
-> > +		} else {
-> > +			page = page_pool_dev_alloc_pages(rxq->page_pool);
-> > +			if (!page)
-> > +				return NULL;
-> > +
-> > +			*from_pool = true;
-> > +			va = page_to_virt(page);
-> > +		}
-> > +
-> > +		*da = dma_map_single(dev, va + rxq->headroom, rxq->datasize,
-> > +				     DMA_FROM_DEVICE);
-> > +		if (dma_mapping_error(dev, *da)) {
-> > +			if (*from_pool)
-> > +				page_pool_put_full_page(rxq->page_pool, page, false);
-> > +			else
-> > +				put_page(virt_to_head_page(va));
-> 
-> The put logic above seems to appear in this patch
-> more than once. IMHO a helper would be nice.
-> 
-> > +
-> >  			return NULL;
-> > +		}
-> >  
-> > -		*from_pool = true;
-> > -		va = page_to_virt(page);
-> > +		return va;
-> >  	}
-> 
-> ...
-> 
-> -- 
-> pw-bot: changes-requested
+Most of us do not use pfifo_fast anyway.
 
