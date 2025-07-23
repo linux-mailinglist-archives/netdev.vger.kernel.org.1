@@ -1,212 +1,183 @@
-Return-Path: <netdev+bounces-209308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F15AB0EFD8
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 12:29:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86752B0EFDF
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 12:30:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27B347B5C6E
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:28:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 912853A871D
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:30:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B80329E0F8;
-	Wed, 23 Jul 2025 10:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECF46284671;
+	Wed, 23 Jul 2025 10:30:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="ld/t2gte"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WZFeCun8"
 X-Original-To: netdev@vger.kernel.org
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013016.outbound.protection.outlook.com [40.107.159.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C5523C50F;
-	Wed, 23 Jul 2025 10:29:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753266555; cv=fail; b=HtX/c8E0gzhm5tPPJapRu8zfToxr9nc/Wst8UjFY9LOFBhWyX2U9yJPxRz2kvkHJlA2SVC//91ZUhJjXzgX9LTqfuaDRbgrWXc0UCWkpJme26vSL4lkFd9LH4SHIFQuaSYyyBKUmE7/I7LUo7jqQg/GRkA3t5vNP87sbRjZSmhc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753266555; c=relaxed/simple;
-	bh=yQa10byD2mcIn7urxrxFgJ+MWRnG6LXvZdYhGCzCExY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=U65EKoXMgwR1ySiI0n4loGTvpeBvhxqRsHmHmfj6rvE7wkhwC7DmOvyFWYgxC+ui5unnYXGT44plY0xDFRBG2oO+jDzz2rgWkZIiywmdVE72kmq0rUDSS74Magks+1Kc4JlRYt3CVl0SslLiyvbZ1l+VpoV8MvYydfLyD0Lw6uo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=ld/t2gte; arc=fail smtp.client-ip=40.107.159.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HGhkjOkuMd+ZtfZA8m6XOxLn4fB3eDWGLHeA8JJ6uLO7dRlDk5T897QXeFfcxV8zZi/9AOXXxaBvfLgq/8/TLGuF8IknNKwbnfFKEfJyYV84or/QafV7TpAIMiVEoWHK8f2Uktr2dTxNgpXIy1qHoPeBAngi7gf8FS7S37Ex/RhtFMxO6ReDgVZUr7Ia34me24mqjxaeIX71eEiHXAZrbh0pzn3+c7c0qyJJTLNhzLhq0xCrFtv4uGycy3PiJyIiGAdLJVPvXFbnJx/GAl3G5JBMkNwtAT8+Wzy+YvqkjdAHOzt9sq2IEUKrUi0UV1HYR1exW95bgU2Aw2HrHLKPhg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yQa10byD2mcIn7urxrxFgJ+MWRnG6LXvZdYhGCzCExY=;
- b=Pm4NzKVMokVOOlUmPKTgHDj5U0LkrTwIPhiBOW+zrsnSksGmY9Bq4DRs7njy/HVq0jxPthot7BV0yFelPb1W1saOpIRx3WjYtwrPU5dcU5k0cObKykeolv0Y/WMe+5GZ7L+2aJBgRmsQD/Ez3gA4v9OAwmAEq8ZA6c1YN0hioZMzhctTAFRARqVY2bssWEM6I1mbfZBuDrDKCr19NFKZVT3Lwu9r8JhMt3QhzuPhWbt2ybI+oKFqS83GmdALR9b7e1J9HRyoplgsqCvL8TXGtdaLMzYEY5BmOGY68vucasXnkgQ+C8aeoU/lJaj/Nub+l6vckrz/tzl1QL17Oh0U4w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yQa10byD2mcIn7urxrxFgJ+MWRnG6LXvZdYhGCzCExY=;
- b=ld/t2gteAx85G09bIBQXq8gYMT2Kp9kAlQq/+xXJbFxZ5vARWGxCAIu9gQ+QAtyBxdi09bB+b37GFQ+4qlOt2r0VlzdTxeRewK16ryEEiCAeestkY2GkgNQqHNfZEt+3mQrSL5d0p2jBmLsXOQ/FJ4MUtYxV3Bn/uZ9Zb2SpeXjcXC3pdYGifrNMDXNy2MzwLUxiwcjfI1ycZflX+2zxMMcEh4l1c/9E90lo/usX4Lkvum2umeXW5DzN1Y9UIwZ7jRN9sTLcTbSsM2+R/d/d/3eqSvVYkjtWrfwqVDWyUjX241JJRmFJlbCWfa1Ok3b2buow+sbtEr41ar0mrjOqHA==
-Received: from DB9PR04MB9259.eurprd04.prod.outlook.com (2603:10a6:10:371::5)
- by PAXPR04MB8928.eurprd04.prod.outlook.com (2603:10a6:102:20f::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8943.30; Wed, 23 Jul
- 2025 10:29:09 +0000
-Received: from DB9PR04MB9259.eurprd04.prod.outlook.com
- ([fe80::dd45:32bc:a31f:33a4]) by DB9PR04MB9259.eurprd04.prod.outlook.com
- ([fe80::dd45:32bc:a31f:33a4%5]) with mapi id 15.20.8943.029; Wed, 23 Jul 2025
- 10:29:09 +0000
-From: Xiaoliang Yang <xiaoliang.yang_1@nxp.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-CC: "davem@davemloft.net" <davem@davemloft.net>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "kuba@kernel.org" <kuba@kernel.org>,
-	"n.zhandarovich@fintech.ru" <n.zhandarovich@fintech.ru>,
-	"edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, "wojciech.drewek@intel.com" <wojciech.drewek@intel.com>,
-	"Arvid.Brodin@xdin.com" <Arvid.Brodin@xdin.com>, "horms@kernel.org"
-	<horms@kernel.org>, "lukma@denx.de" <lukma@denx.de>, "m-karicheri2@ti.com"
-	<m-karicheri2@ti.com>
-Subject: RE: [PATCH net-next] net: hsr: create an API to get hsr port type
-Thread-Topic: [PATCH net-next] net: hsr: create an API to get hsr port type
-Thread-Index: AQHb+7fosV4yMl9lt0ysQiXA0LqHJrQ/e2EAgAABbDA=
-Date: Wed, 23 Jul 2025 10:29:09 +0000
-Message-ID:
- <DB9PR04MB9259A60ECD5FFAA71A0509A2F05FA@DB9PR04MB9259.eurprd04.prod.outlook.com>
-References: <20250723100605.23860-1-xiaoliang.yang_1@nxp.com>
- <20250723100608.apixcv3ix5rn7ydz@skbuf>
-In-Reply-To: <20250723100608.apixcv3ix5rn7ydz@skbuf>
-Accept-Language: en-US, zh-CN
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DB9PR04MB9259:EE_|PAXPR04MB8928:EE_
-x-ms-office365-filtering-correlation-id: 7a8cfc2e-f107-41ae-10b3-08ddc9d3c29a
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|376014|7416014|366016|19092799006|7053199007|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?skmsSLbVquQsVkqV5hgnCKNpigSEz9tnHOAXtGDwfjTxs77CtvhhlFrNHUx/?=
- =?us-ascii?Q?D1KSTkxx2yyX9jFRFlMikRqq4YrEyHkJL7ZKUcvl+16poCtKgpG7Go2xjAlV?=
- =?us-ascii?Q?UXsWzqfBF5oyBWtIM49Y7QnrsB3T+mqo9nOS1pFFyj4Rp47wKtjaCuksGe+w?=
- =?us-ascii?Q?vmOod2B9/w6EEs+tzxUrAGwBH5G0Ki4nnjyet79r9oYnbV88qD/IBOXjOr+0?=
- =?us-ascii?Q?PdWDlRYDnYMJ8k4Zs6x8usF3zOaZoEcjs/NxiC2gdI/eCn3hMjY/314W65KP?=
- =?us-ascii?Q?s6HLZmLqWZRVrhbj/ZjxceHAf4RQ5Bz5yDvI+det4bqRB+PNPgqGNmq2m650?=
- =?us-ascii?Q?Nf5CbrEpMpJUrMg1T4zV7yBMJ4NYIuny7h1waPPdcDJ+0rytelIKhhByz/Zk?=
- =?us-ascii?Q?EybWEos+ljVneoSKhH8U6VKgNK4RdREPabIZnDDVh60fz70RTrtOKD/eO1R7?=
- =?us-ascii?Q?FWgl+3+sx06guCykUWilnRKqQW2QIkoTib2Zv1y1Hu7TOH1MGRGNPWJxjrag?=
- =?us-ascii?Q?8UL+JsXsdWK1u3xHUb/QYxjdJBYMEWATtSVtx0hthp6LYPo2ZcbGn4JyyEyK?=
- =?us-ascii?Q?M+4qw6PrVZTxQ4/dAIMxTr8E8bHSI+aP9XMrhnkhT43ykydXTQ+V2dv2aTgD?=
- =?us-ascii?Q?NNBnmyN7Po+A53CCosp/+cZ4MNM19r5h4/UvLJgWr/a81DreZgdxBrwe7xRk?=
- =?us-ascii?Q?mpSVcC1eYphKHXYK5A93lSGNjxKN055foH6ljKnnnkBbx2PlVhHXRQJ33iib?=
- =?us-ascii?Q?XUIqAjpoRNzAcrxvpUtSPXBXq8uQJkWERMF4ik3CIGXy3wbq+jZ4B0HTD1PI?=
- =?us-ascii?Q?OBwzK2ANxP6ynp/mbyntBJ2+lAmX+piJmUpiIjK6xLF3xg8oCfa7eTTW5uBk?=
- =?us-ascii?Q?fp4+Ww05jFdbEAgeCqaror8yN+WfTHlwIWbXQgFFPo1ooQeg/ncE8eViRDXv?=
- =?us-ascii?Q?PNsLoslAMlNJWcR+M6sku1rZwIFLFqOKhhh/mSc9hcwuAx4RbQdtED3on1hn?=
- =?us-ascii?Q?HpCovNpJKuTddzKJp/+l6gbCmJY/wwio9nV0L8UqMrOsd84iN25ydLI2368t?=
- =?us-ascii?Q?1iotTXWwYMj/BBfvYpOdYErfg3WZOgrOu8n9DgW4yXDCsIaorScnFJt5A/UG?=
- =?us-ascii?Q?/OiPPTc4tXh8zaaOoo0lz9KkH2MO/yjE0KIoH5TGfdgCDkuKRc4iyzrv2o2X?=
- =?us-ascii?Q?lvg4sN9Wn/OpD2WQr9qWJR5RrOlIpCxHxNdvAzI+coM5jUYeviGsOnWj8A2k?=
- =?us-ascii?Q?3lkk50YcY1QWZemAhWlXQGXDw50WTO2v5xt8+WMpDsdYm574R2z7Z8vCH0zV?=
- =?us-ascii?Q?oSJniVHVoFx5lGbR4uIdlhf4UemVh555gS3CAAZ9iKr3lkhwwmQ83Y4hIrpn?=
- =?us-ascii?Q?lrhTDfjB68LKW/EqInkbFWeb9drIc+DkUF8fU/1E3wupEnHJ/5vgCZy08w7A?=
- =?us-ascii?Q?lVI6lYMErkY6XWO6j/ZIARFE386cS+KTMkK09dkOCP6wnzkmDMpeRA=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR04MB9259.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(19092799006)(7053199007)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?wZF220+xDVxOg2zd8HjdcoVQvsuaRka/AqN5c12Xxqfxcri5kpV8D1d8R9wH?=
- =?us-ascii?Q?23LxtSPQRDanfEvnCfnY9+fMYNbRlf/2cElHrdxMwh6+DAubok1m/W/8MNqw?=
- =?us-ascii?Q?7ejaQsp8kh9nUZ8iQ88gUow5z9PARRv2F85fTc2KhMNEPzrvTQ83vvwvkOok?=
- =?us-ascii?Q?NR4nT90EzYHxuiAdgC5V9G4YQ3hCOxlYM9D8MrMY3wDqaZgugwrW24gBdPBb?=
- =?us-ascii?Q?S0RDt1NlI84wjDq09auz/aA3o3OROewSVPLBkrUhTVBQmkhVlnYGIGoqbdzN?=
- =?us-ascii?Q?kXdDbgxygKMRH2ZfHl27iNuCNHkLtvK4q2MS707PUmyY0tE7oiiAHBWw8VgA?=
- =?us-ascii?Q?Fe54CiJnLzYSfb9n3j6pgFAYBWH2ykTCbC4AXW0Dnj36UKRYzOadwn9HE2ed?=
- =?us-ascii?Q?NwAwI5RXUX4VM7JO0Hqu2eugJGGI/XoPgcBM9YBpJLep98RXxLcTr8EadnEW?=
- =?us-ascii?Q?glK6vyH99RBgRk+6keW8n9ost3QzkeR3c/cbRRgt08P2Og3e/Jk6+Ae2lczr?=
- =?us-ascii?Q?hK5yw5nCM/S5iaKXUBXyZdBNP1ALbi0hy0iK/Uua5leuBjXT8FCUGrAKfTEy?=
- =?us-ascii?Q?qXwkveZf7nmo1pyYPT+Ht332gm6awP9bEEa9t27gHYNToYQ1ZOxIKATQjEkj?=
- =?us-ascii?Q?aqxKr7roavZgR9EZt1dJ7vkZkzThQBrbKz0Pbo8vg6eIGVe8HFfELPjzmHW+?=
- =?us-ascii?Q?1UVWJ+bU4JSrj7DC53Kg3f3H1jgMO/JTRlEIspYhLO9ivc4zHCiDFe81EF3A?=
- =?us-ascii?Q?kW1xcbtTuYYsPXJj29gfuFvfTr3XbsWKTWH2K2FfHm/VCTAWidioP343yAPf?=
- =?us-ascii?Q?Cdy8t2ftBgN0BXuppuk+dKnUffBsfHycrDBv72DZRrdAJjh2d6i3ZqzPBCmm?=
- =?us-ascii?Q?3TwJ0u+aTOf7Z48uMO6PIHWjtxci9+Ibm62lL+SG1znC7NLNvf5bM8ZMmNSi?=
- =?us-ascii?Q?mYAZ/RchSZu3Asz2GASttyR8Hd3wJrbuNKMntqUd81q25f4FuAyBJvCdFsaK?=
- =?us-ascii?Q?ZsZq8xWgOZvhxpTUTyqRN5mAYg69cVKmm6VwzthR0mH8mdRzL+l2Nmwk85Qd?=
- =?us-ascii?Q?r0Izmzaqr1PrgoqIXHSzjfc5Wy9OtvWs2KTkr26dSdtxQoXP3zehHNFWHZMT?=
- =?us-ascii?Q?ZSuZ8tUAvXnbdgJLQ80/2mjaPj9Lx7Gys2eNOpwdwgCtUsuZFe+aVeh36bGH?=
- =?us-ascii?Q?1lhpy/MnUc/m+uETpa3PE7pEjocspaxW80teQhiGfgBuU7ViIBaIiXG+EHOY?=
- =?us-ascii?Q?czS8Oh5JcEZWu86hy3Z7azK7k6OlleX2ygONgiCtCgkV6KrX8nq4UV8+i02b?=
- =?us-ascii?Q?El9zMk0Bi3DJ3eZEx2QpVoaef/sxy5zafVBeJ1J+hntnjw6EiQ18d07t3z9+?=
- =?us-ascii?Q?LNNr16v/7NTVdPTuGyToYXpnnXg9eqOrZonetp6joAt3k17+mwKMSpK5VhQS?=
- =?us-ascii?Q?nxfATwiegsO5hNL9JjntCU5AmmQtlV7wzCR1USIfrMDfaGO081Z1ces/74I6?=
- =?us-ascii?Q?eJ+1a2vfQf/9JonhnTpJ7seieFypx6xBE53oYIu1w5TuIgrB1KRL3I8MlQdp?=
- =?us-ascii?Q?gxTt/mIt+cXvV4xNOIKtQljVTjxF5lwg5HbmUtxS?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487484204E;
+	Wed, 23 Jul 2025 10:30:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753266647; cv=none; b=D5u6v+MVpzefxtV3X7LfU/cdOijGspIiDHI0ZpxUtC8YjVAFYwAP0+bDmCjhwpaZ6ADMhGu2TwgUYZCzvPa/MWFmWxmrEYKvWkGwOeJuHoe4YfCwHz2N1wEbeaHHgpQcaDeE/MZfvGXWUer+T06/vy19jIKBRgfIwZCLk7tq1xo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753266647; c=relaxed/simple;
+	bh=ZrYyFE1RNxcg54HRe+wiJ/9APC6lKR7QItphur8ntNI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lv1p0j4wKtkY+J5y1jWBLzUIhPdmaOdPIwPPGRnRGZwBIRv0YR8Z3dCvR56gscDMwr0hJ9Br1vatFm8EKus2jq9MPMV0aX+V/AYJyUefVCuGYl9dasvBYtY5m42PaU7jOdkNqB+EUXr6WyaL3k0AaoQ/4NVO5WxZjLH6dZJCiag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WZFeCun8; arc=none smtp.client-ip=209.85.219.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e8d7122c3a5so5597088276.1;
+        Wed, 23 Jul 2025 03:30:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753266645; x=1753871445; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LA7ngCL+inJRE+v5ucYQaFMllQEH7zLcZ73D/ihvwEw=;
+        b=WZFeCun8NPSONBks4RkXsVinb6Gvj3d06WyIg5lTbgxWb5YuMpP6rv1NMJUdAdRmGy
+         ZBfyD1p0rfvBBmyDiFbPlNSnf1hIFP2e/5ZpJ0XfV9nRiE53Vlv95FguZU7OTH1vXMdA
+         PV8tyzHABJ+0TMJ/N79n9Tshs6+fIY2GXfET3tqq4j+D0V+3HbN/5GaLcz5D1Vufu2Oz
+         yJWTsCT1y1K/tg0BHfAL7SqTs85VtGVj1rxFep/pb3jyzgdcEkRkpBw+kzS3B3wcy5Ho
+         3n2QVde4L/k6LucSx3eVngZHGw9LokbcYPPG4Th8W4xOtWZ3dDuevxvBEpJyooUW7HVK
+         lJhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753266645; x=1753871445;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LA7ngCL+inJRE+v5ucYQaFMllQEH7zLcZ73D/ihvwEw=;
+        b=NZAMeMp7tp8Coi/GAxaISf0jf9v1lk2Nu6AkR4CVpG6nOD550y76OX3EMnHhleej3R
+         cSkpBI//gHEgyjVsCbEY+bLaeUKjfAf0gNd5U2CMlr1f8bbXHNEvOwzelFHKjSz8furv
+         i6zlxi+IORwTHYV0Re8dTDCzGhrejArrtkXyuoKUFs/OeWFMx7DLylz7QE0Cb1iWLL1D
+         eL0a0o4sPju+epAVf3SCKhp45wmmY7SKnR52i5sV/rXCqpyim4G8D80vlxxtIC93E4qo
+         6xc+BcBiwSAA+saSthprmPelmTxUs6Jhe08+Ma2hRYGSLDoQaPjjT5JTuC/zC6FoRdge
+         5ZdA==
+X-Forwarded-Encrypted: i=1; AJvYcCUKdooei4MfnQCzJW0gNWlBGddQZ+OtWKr09kMgVYS9nU73+Kd7fmb9mfYT1Gsb135REZowWy9baDHQ@vger.kernel.org, AJvYcCUMdkf9n97zhH3R28WeVDul5pJ2Yf/M/vo3S76JmzUxs6y6XdErqy+zZNB5DI1xnGjuWPt6CCYq@vger.kernel.org, AJvYcCUe5iM/Sa9/YOXteew7nImwPt2XTnDr48tsxMEZ+xwbpmHgyhhHWZ2hzNI8qJZxxrvQi4od0P0P/dq19a+8@vger.kernel.org, AJvYcCVeZ+GAFTPcOk7o2avic4Y0XxdGryxovEXVVq3ddQ4/nT7zjjbYj5nZDZyctRKi6JzUsEwhcO5khjz+@vger.kernel.org, AJvYcCVmKpfkAIjrTohp3q4eemxMKLkU1YTFGK1g59CWUYXeZl2UTwh4TU15ip8iBZG3ZsQLMd65rczHVlHeNnbHVXk=@vger.kernel.org, AJvYcCWYKH5v5Dzcr/3B5Xny8eOeEGuL0pEbvgv14o37z1Vb8uZTyZmmM0RSe2mHtgjazPYxZzekb2Iknqs3I8Y=@vger.kernel.org, AJvYcCWpNtQOJuhqfj+dYcfO6mX+KRKj6NjjH1oPydtU+gd+wjYauZurERQcY21jSDQWYbznZepvPvSzDfefeA==@vger.kernel.org, AJvYcCX6HbW13g0gXtMcuNgDrwvONDIBRY9L1c5Uq7m15pgri3HdqWMlHFEhJZeZQv2hqTzY6f/AwSyADNUY@vger.kernel.org, AJvYcCXYlf1ZzCw1IlVvvF0lN82iIczJRu6NMxu3TYYg3jYHHgi4Bs/YUVeYGj2uUKFX4uHk4aMlJj0m/tA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQPVJGoBRNfTnekNmnf+sRy/Udr+qlmpBfDFXKGRf+M52XwbEV
+	hfQLJMifsWd/TdHoniOb8hy3NDOeNm5fMk3Y8vZs1Z4+E3fWZd0Nz7l0p4P2xHeAcA9/ULbdHZJ
+	Zb7ML1p5MW1T0Xsm0LB5KFnHFdVAHjvg=
+X-Gm-Gg: ASbGncuHaxxnMVIRoPg8HHpt8m3SMxbSq6uZYCKhZq9VS1S6caLF/Twz3r7t6jqQMo5
+	FzYNjObAbpEPtbQawEiKGrb2Hsng1ZrcaB87flR0vCpQgdofg3Z8XyViGzm8SxHBuj8z1UelNEy
+	olZdkFhpuk+8PvbFUV2vk7IN30DRJPyWNPidbtm/FQ1ceT8e3jMKBNBLz7TW4em/L1sQld3i4k5
+	BbuSLBk2IbaJEAvoQW4fh8frrefdRoMY4Ol40Y7qA==
+X-Google-Smtp-Source: AGHT+IGtjUwHyzHtKQ4mrqvi8yeQhMpiGpkgpDBx25yEpA8Cdc5zRk5eSD0faXJ+bObKq5lWLxM0HxvU9SBSEJ+05TM=
+X-Received: by 2002:a05:690c:3601:b0:718:4095:89bc with SMTP id
+ 00721157ae682-719b4227127mr32013927b3.22.1753266644983; Wed, 23 Jul 2025
+ 03:30:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DB9PR04MB9259.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7a8cfc2e-f107-41ae-10b3-08ddc9d3c29a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jul 2025 10:29:09.6203
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: LzmpNsIPumsTosj9q+8BMoGQdXhkzg8HeurCBt/7lL5eLSca1/liVoK2ueQdySIAu/mwQny3BY0AMGYCRqwanSKC7NX1iUMrO3msQVZpPw8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8928
+References: <20250715025626.968466-1-a0282524688@gmail.com> <20250723095856.GT11056@google.com>
+In-Reply-To: <20250723095856.GT11056@google.com>
+From: Ming Yu <a0282524688@gmail.com>
+Date: Wed, 23 Jul 2025 18:30:33 +0800
+X-Gm-Features: Ac12FXxeadozV19JFZpQNzkVZb_LJVxV9KJ9zIVS_BiMIAH5J9MrfqpSvwxvedo
+Message-ID: <CAOoeyxUBHDu8=wKkV7TdUGTqc-At-WD6TMY-qKG1dTu-w83DmA@mail.gmail.com>
+Subject: Re: [PATCH v14 0/7] Add Nuvoton NCT6694 MFD drivers
+To: Lee Jones <lee@kernel.org>
+Cc: tmyu0@nuvoton.com, linus.walleij@linaro.org, brgl@bgdev.pl, 
+	andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, 
+	linux@roeck-us.net, jdelvare@suse.com, alexandre.belloni@bootlin.com, 
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Dear Lee,
+
+Thanks a lot for all the help so far!
+Appreciate your support -- looking forward to seeing it merged.
 
 
+Best regards,
+Ming
 
-> -----Original Message-----
-> From: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Sent: Wednesday, July 23, 2025 6:06 PM
-> To: Xiaoliang Yang <xiaoliang.yang_1@nxp.com>
-> Cc: davem@davemloft.net; netdev@vger.kernel.org; linux-
-> kernel@vger.kernel.org; kuba@kernel.org; n.zhandarovich@fintech.ru;
-> edumazet@google.com; pabeni@redhat.com; wojciech.drewek@intel.com;
-> Arvid.Brodin@xdin.com; horms@kernel.org; lukma@denx.de; m-
-> karicheri2@ti.com
-> Subject: Re: [PATCH net-next] net: hsr: create an API to get hsr port typ=
-e
->=20
-> Hi Xiaoliang,
->=20
-> On Wed, Jul 23, 2025 at 06:06:05PM +0800, Xiaoliang Yang wrote:
-> > If a switch device has HSR hardware ability and HSR configuration
-> > offload to hardware. The device driver needs to get the HSR port type
-> > when joining the port to HSR. Different port types require different
-> > settings for the hardware, like HSR_PT_SLAVE_A, HSR_PT_SLAVE_B, and
-> > HSR_PT_INTERLINK. Create the API hsr_get_port_type() and export it.
+Lee Jones <lee@kernel.org> =E6=96=BC 2025=E5=B9=B47=E6=9C=8823=E6=97=A5 =E9=
+=80=B1=E4=B8=89 =E4=B8=8B=E5=8D=885:59=E5=AF=AB=E9=81=93=EF=BC=9A
+>
+> On Tue, 15 Jul 2025, a0282524688@gmail.com wrote:
+>
+> > From: Ming Yu <a0282524688@gmail.com>
 > >
-> > When the hsr_get_port_type() is called in the device driver, if the
-> > port can be found in the HSR port list, the HSR port type can be obtain=
-ed.
-> > Therefore, before calling the device driver, we need to first add the
-> > hsr_port to the HSR port list.
+> > This patch series introduces support for Nuvoton NCT6694, a peripheral
+> > expander based on USB interface. It models the chip as an MFD driver
+> > (1/7), GPIO driver(2/7), I2C Adapter driver(3/7), CANfd driver(4/7),
+> > WDT driver(5/7), HWMON driver(6/7), and RTC driver(7/7).
 > >
-> > Signed-off-by: Xiaoliang Yang <xiaoliang.yang_1@nxp.com>
-> > ---
->=20
-> An API with no callers will never be accepted. You need to post the user =
-together
-> with this change, for the maintainers to have the full picture and see wh=
-ether it is
-> the best way to solve the problem.
-Thanks Vladimir, I want to use the API in dsa netc driver. The driver has n=
-ot been upstream now. I see the HSR implemented on some devices only act as=
- DANH. If the device act as RedBox, we don't know which port is interlink, =
-which is slave_A or slave_B. I will re-send it as RFC patch, anyone can dis=
-cuss how to handle this issue.
-
-Regards,
-Xiaoliang
+> > The MFD driver implements USB device functionality to issue
+> > custom-define USB bulk pipe packets for NCT6694. Each child device can
+> > use the USB functions nct6694_read_msg() and nct6694_write_msg() to iss=
+ue
+> > a command. They can also request interrupt that will be called when the
+> > USB device receives its interrupt pipe.
+> >
+> > The following introduces the custom-define USB transactions:
+> >       nct6694_read_msg - Send bulk-out pipe to write request packet
+> >                          Receive bulk-in pipe to read response packet
+> >                          Receive bulk-in pipe to read data packet
+> >
+> >       nct6694_write_msg - Send bulk-out pipe to write request packet
+> >                           Send bulk-out pipe to write data packet
+> >                           Receive bulk-in pipe to read response packet
+>
+> [...]
+>
+> > Ming Yu (7):
+> >   mfd: Add core driver for Nuvoton NCT6694
+> >   gpio: Add Nuvoton NCT6694 GPIO support
+> >   i2c: Add Nuvoton NCT6694 I2C support
+> >   can: Add Nuvoton NCT6694 CANFD support
+> >   watchdog: Add Nuvoton NCT6694 WDT support
+> >   hwmon: Add Nuvoton NCT6694 HWMON support
+> >   rtc: Add Nuvoton NCT6694 RTC support
+> >
+> >  MAINTAINERS                         |  12 +
+> >  drivers/gpio/Kconfig                |  12 +
+> >  drivers/gpio/Makefile               |   1 +
+> >  drivers/gpio/gpio-nct6694.c         | 499 +++++++++++++++
+> >  drivers/hwmon/Kconfig               |  10 +
+> >  drivers/hwmon/Makefile              |   1 +
+> >  drivers/hwmon/nct6694-hwmon.c       | 949 ++++++++++++++++++++++++++++
+> >  drivers/i2c/busses/Kconfig          |  10 +
+> >  drivers/i2c/busses/Makefile         |   1 +
+> >  drivers/i2c/busses/i2c-nct6694.c    | 196 ++++++
+> >  drivers/mfd/Kconfig                 |  15 +
+> >  drivers/mfd/Makefile                |   2 +
+> >  drivers/mfd/nct6694.c               | 388 ++++++++++++
+> >  drivers/net/can/usb/Kconfig         |  11 +
+> >  drivers/net/can/usb/Makefile        |   1 +
+> >  drivers/net/can/usb/nct6694_canfd.c | 832 ++++++++++++++++++++++++
+> >  drivers/rtc/Kconfig                 |  10 +
+> >  drivers/rtc/Makefile                |   1 +
+> >  drivers/rtc/rtc-nct6694.c           | 297 +++++++++
+> >  drivers/watchdog/Kconfig            |  11 +
+> >  drivers/watchdog/Makefile           |   1 +
+> >  drivers/watchdog/nct6694_wdt.c      | 307 +++++++++
+> >  include/linux/mfd/nct6694.h         | 102 +++
+> >  23 files changed, 3669 insertions(+)
+> >  create mode 100644 drivers/gpio/gpio-nct6694.c
+> >  create mode 100644 drivers/hwmon/nct6694-hwmon.c
+> >  create mode 100644 drivers/i2c/busses/i2c-nct6694.c
+> >  create mode 100644 drivers/mfd/nct6694.c
+> >  create mode 100644 drivers/net/can/usb/nct6694_canfd.c
+> >  create mode 100644 drivers/rtc/rtc-nct6694.c
+> >  create mode 100644 drivers/watchdog/nct6694_wdt.c
+> >  create mode 100644 include/linux/mfd/nct6694.h
+>
+> I will apply this the other side of the pending merge-window.
+>
+> --
+> Lee Jones [=E6=9D=8E=E7=90=BC=E6=96=AF]
 
