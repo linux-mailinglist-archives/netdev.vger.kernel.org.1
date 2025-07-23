@@ -1,153 +1,142 @@
-Return-Path: <netdev+bounces-209322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81C2FB0F074
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 12:55:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDF49B0F0B3
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 13:03:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1BEA566A5D
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:55:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D8E01C8582F
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 11:03:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F021729B8DB;
-	Wed, 23 Jul 2025 10:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D77E289364;
+	Wed, 23 Jul 2025 11:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="S4Ucak01"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="qfN29ILP"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16EC4285C89
-	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 10:55:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D985D230268;
+	Wed, 23 Jul 2025 11:03:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753268150; cv=none; b=Tt1tknSBx7MNT8SCwm1h3f83qiFzf2XQXKjS6oDnObcRcNaIUozTboUGwKzv31M/9B0Odch1b2/S15GXgd/otuw33jOmnoOWQyRioTpMxXoN1ZcsUru9nEddoVEFGyN2vcPvXSy2oYUhIoYbIUk6rF1nc3/QpmERQj0QwbgzOn4=
+	t=1753268602; cv=none; b=J+tuo8EXEzP7zlgn05QnD5KafSlRdhEAaov9muHmnN6pmvbt/xjyoNeQo7B2dW5MrU/GCtk1/WxmZGHRA5jsY3dJedxFS+6Rbs/v8quNFT4eG1voUNliAsssIvMCZ6WIW3R6Ae/xoh7Qb3eIkjt5bUJcE0NP15EPwV4mhdCjkrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753268150; c=relaxed/simple;
-	bh=m43EYY6q+XvOfeXV3GPp4XFcqABOWCC0aWg0XAAXamM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pupzaOLAmcsazW7oGoNSb9V84F+f3/ZqH2KO+vKwlJ3RSYo1mwzQ2gFpO3cVACKMKgQVf/nU5LTL0yOecNyMwAr4okTwybqdsb2mffnxANdZOUXEdJ97D0MKtW6QfgydUi5/3cTmtsg+2naJ7sZKSywT9GUOJpcFz3+r0/9IGM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=S4Ucak01; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <393b7e0e-2240-49c5-9ff7-8efa07a11d3b@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753268136;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CYI4IOaiJ64Vf6dp+PDO/cqw+3AhfpJbd/gGnQR4Krs=;
-	b=S4Ucak01dKys0gBZgwAJY0O/HeDXEdpglcJx9M10oPvLNUmZwQxFY9YeCJ21xWHJ9esC7k
-	ZgWO0NhpOTWh7nOCsapziZDvN1pYsjnKm6a/2MHCihuxR07Y9uiMAjgSejnLMbu+fnCiP2
-	WBQjgB5I5O1icPeJG4STrEioJ44ax3c=
-Date: Wed, 23 Jul 2025 18:55:07 +0800
+	s=arc-20240116; t=1753268602; c=relaxed/simple;
+	bh=QPxiXguHsz3/IgGxbGoTb29vEn8S9ZjWyH1BjKYamuY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=c80nitdT1D4YovG30LQsM42D2nTzVO/gGpgNfc2WiEt5AZwBZ/yOsiBKpp19kl4HiZ3UP89h9UIhiEGiueHluvmbpZZGgYn3lGQSosOyHeWQRp9VLzwa3n5RQcn4pGWNfuyxSxDl9YzhW/MZWERAEbG151Qq3qfrklK7CR0EMJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=qfN29ILP; arc=none smtp.client-ip=162.240.164.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
+	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=tpUwu4il1VAiTMh13wOHJHOYU4uf2KEQd4xPzFOpTMk=; b=qfN29ILP5BDZQoV1YozWjQ2m92
+	ZlM0uuWGKU/sFaEY7+M0Upxd9Io6/DdLXOh/yhGIu9gvfBKELJgamULl8hSnqVSmdzk/JAf/uvW/S
+	kNsNOGwEbXYVdPHnKPXTLdyV2pDeMCFM+TOyt7qVKzVxtqxJZhPI3HyEooSuPSHHzqpw0mNIeLRbj
+	v0BRvORh1FxxPy1BmtUMToWTOFdCzsKIC3IcP7OCAYk9i6X/gVKFXglJZ4o16Lfz6pWuNHw8UFq6I
+	hRcivPL1CmMq7s4QIfwY7v9Q/wPYRAs77MOqmTo79Yi2ezt/4Z9QvxQV1pjeYU5eEEr3JoxzRMJqA
+	wt34HXPA==;
+Received: from [122.175.9.182] (port=24906 helo=zimbra.couthit.local)
+	by server.couthit.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <parvathi@couthit.com>)
+	id 1ueXFg-00000006TmQ-1gKW;
+	Wed, 23 Jul 2025 07:03:12 -0400
+Received: from zimbra.couthit.local (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTPS id 231911782036;
+	Wed, 23 Jul 2025 16:33:03 +0530 (IST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id F36BA17823D4;
+	Wed, 23 Jul 2025 16:33:02 +0530 (IST)
+Received: from zimbra.couthit.local ([127.0.0.1])
+	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id kVxGdNqyNizW; Wed, 23 Jul 2025 16:33:02 +0530 (IST)
+Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
+	by zimbra.couthit.local (Postfix) with ESMTP id 948C61782036;
+	Wed, 23 Jul 2025 16:33:02 +0530 (IST)
+Date: Wed, 23 Jul 2025 16:33:02 +0530 (IST)
+From: Parvathi Pudi <parvathi@couthit.com>
+To: kuba <kuba@kernel.org>
+Cc: parvathi <parvathi@couthit.com>, danishanwar <danishanwar@ti.com>, 
+	rogerq <rogerq@kernel.org>, andrew+netdev <andrew+netdev@lunn.ch>, 
+	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
+	pabeni <pabeni@redhat.com>, robh <robh@kernel.org>, 
+	krzk+dt <krzk+dt@kernel.org>, conor+dt <conor+dt@kernel.org>, 
+	ssantosh <ssantosh@kernel.org>, 
+	richardcochran <richardcochran@gmail.com>, 
+	s hauer <s.hauer@pengutronix.de>, m-karicheri2 <m-karicheri2@ti.com>, 
+	glaroque <glaroque@baylibre.com>, afd <afd@ti.com>, 
+	saikrishnag <saikrishnag@marvell.com>, m-malladi <m-malladi@ti.com>, 
+	jacob e keller <jacob.e.keller@intel.com>, 
+	kory maincent <kory.maincent@bootlin.com>, 
+	diogo ivo <diogo.ivo@siemens.com>, 
+	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
+	horms <horms@kernel.org>, s-anna <s-anna@ti.com>, 
+	basharath <basharath@couthit.com>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
+	netdev <netdev@vger.kernel.org>, 
+	devicetree <devicetree@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	pratheesh <pratheesh@ti.com>, Prajith Jayarajan <prajith@ti.com>, 
+	Vignesh Raghavendra <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
+	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
+	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
+	mohan <mohan@couthit.com>
+Message-ID: <1390395318.23287.1753268582122.JavaMail.zimbra@couthit.local>
+In-Reply-To: <20250722184749.0c04d669@kernel.org>
+References: <20250722132700.2655208-1-parvathi@couthit.com> <20250722132700.2655208-3-parvathi@couthit.com> <20250722184749.0c04d669@kernel.org>
+Subject: Re: [PATCH net-next v11 2/5] net: ti: prueth: Adds ICSSM Ethernet
+ driver
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v3 1/3] bpftool: Add bpf_token show
-To: Quentin Monnet <qmo@kernel.org>, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
- kuba@kernel.org, hawk@kernel.org
-Cc: linux-kernel@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20250723033107.1411154-1-chen.dylane@linux.dev>
- <1dd1a433-ecdf-437d-bc71-6d1b65b74cc8@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Tao Chen <chen.dylane@linux.dev>
-In-Reply-To: <1dd1a433-ecdf-437d-bc71-6d1b65b74cc8@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - GC138 (Linux)/8.8.15_GA_3968)
+Thread-Topic: prueth: Adds ICSSM Ethernet driver
+Thread-Index: CS6Pxk1Q6vpt0yapW6BMmVo7ZPHfVw==
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
+X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-在 2025/7/23 18:40, Quentin Monnet 写道:
-> 2025-07-23 11:31 UTC+0800 ~ Tao Chen <chen.dylane@linux.dev>
->> Add `bpftool token show` command to get token info
->> from bpffs in /proc/mounts.
->>
->> Example plain output for `token show`:
->> token_info  /sys/fs/bpf/token
->> 	allowed_cmds:
->> 	  map_create          prog_load
->> 	allowed_maps:
->> 	allowed_progs:
->> 	  kprobe
->> 	allowed_attachs:
->> 	  xdp
->> token_info  /sys/fs/bpf/token2
->> 	allowed_cmds:
->> 	  map_create          prog_load
->> 	allowed_maps:
->> 	allowed_progs:
->> 	  kprobe
->> 	allowed_attachs:
->> 	  xdp
->>
->> Example json output for `token show`:
->> [{
->> 	"token_info": "/sys/fs/bpf/token",
->> 	"allowed_cmds": ["map_create", "prog_load"],
->> 	"allowed_maps": [],
->> 	"allowed_progs": ["kprobe"],
->> 	"allowed_attachs": ["xdp"]
->> }, {
->> 	"token_info": "/sys/fs/bpf/token2",
->> 	"allowed_cmds": ["map_create", "prog_load"],
->> 	"allowed_maps": [],
->> 	"allowed_progs": ["kprobe"],
->> 	"allowed_attachs": ["xdp"]
->> }]
->>
->> Signed-off-by: Tao Chen <chen.dylane@linux.dev>
->> ---
-> 
-> [...]
-> 
->> diff --git a/tools/bpf/bpftool/token.c b/tools/bpf/bpftool/token.c
->> new file mode 100644
->> index 00000000000..06b56ea40b8
->> --- /dev/null
->> +++ b/tools/bpf/bpftool/token.c
-> 
-> [...]
-> 
->> +static int do_help(int argc, char **argv)
->> +{
->> +	if (json_output) {
->> +		jsonw_null(json_wtr);
->> +		return 0;
->> +	}
+Hi,
+
+> On Tue, 22 Jul 2025 18:55:02 +0530 Parvathi Pudi wrote:
+>> +	for_each_child_of_node(eth_ports_node, eth_node) {
+>> +		u32 reg;
 >> +
->> +	fprintf(stderr,
->> +		"Usage: %1$s %2$s { show | list }\n"
->> +		"	%1$s %2$s help\n"
+>> +		if (strcmp(eth_node->name, "ethernet-port"))
+>> +			continue;
+>> +		ret = of_property_read_u32(eth_node, "reg", &reg);
+>> +		if (ret < 0) {
+>> +			dev_err(dev, "%pOF error reading port_id %d\n",
+>> +				eth_node, ret);
+>> +			return ret;
 > 
-> 
-> One more nit: applying and testing the help message locally, I noticed
-> that the alignement is not correct:
-> 
->      $ ./bpftool token help
->      Usage: bpftool token { show | list }
->              bpftool token help
-> 
-> The two "bpftool" should be aligned. This is because you use a tab for
-> indent on the "help" line. Can you please replace it with spaces to fix
-> indentation, and remain consistent with what other files do?
+> missing put for eth_node
 > 
 
-Thanks for your testing, i will fix it, thanks again.
-
-> After that change, you can add:
-> 
->      Reviewed-by: Quentin Monnet <qmo@kernel.org>
+Yes, We will address this and post the next version shortly.
 
 
--- 
-Best Regards
-Tao Chen
+Thanks and Regards,
+Parvathi.
 
