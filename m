@@ -1,235 +1,187 @@
-Return-Path: <netdev+bounces-209214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A87FB0EA79
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 08:18:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4EF3B0EA8E
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 08:25:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 326261C25F3D
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 06:18:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1F0B169D5B
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 06:25:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36AAA26B09F;
-	Wed, 23 Jul 2025 06:17:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F55426B2D7;
+	Wed, 23 Jul 2025 06:25:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="loEaKWAj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YVH+SHzz"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2067.outbound.protection.outlook.com [40.107.244.67])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 557C378F51;
-	Wed, 23 Jul 2025 06:17:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753251478; cv=fail; b=AwP2QY4N7bh/+2wOi2ULEHi7uCGv1oMy6ABXYm8avQwYmCd31aTH4p5hb37tZeMvSM0E+DbQFt68meQ0raVc7pXbbSi6SNC2W8Am1UWQQMn/zhqVX0ZkxFQ/FxUkGMvP41+fPPh40Cjx7tunLjIjHFVq9jto7dLrJ8E2jbUR4ZA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753251478; c=relaxed/simple;
-	bh=khwYtrY1MQIXmW8psiH3nFUsvKpWZRbrVKqnUwRvW/0=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=sE8GNTQbPQJwe0Do/y2qCdmdN8N3j2yu0KMCV9wp/rHj0pAWrgSCwNR++K80xrIbrTp4Mr8w4fSCLJrxrntTbNPVZxKFFzl2eoLl2VO2qlneePgA3fT5ntbgIHNDudglKEyzGK0i1amkFj+eTKUt/xd/qU8ium55JfT2kpzhdzU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=loEaKWAj; arc=fail smtp.client-ip=40.107.244.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FiGpJCwemK/wx5D5+MVALhdpFscy4RRZuzNYyDwuIrF76DD62purZOJ8sgKwpxdjn8M5LBhBzcV5FGcTARvq723CJhIuY0MMOmmjxYQxD32XQ+xeauttKIw/K/LFParwXLwHnJ9zIBTf+gagAMr6cESNvcf6TCXfU/VsYHKsDq/u5i5OPoDPLLqtYDOS4aZQxTF0O3TKyVU56RWR9PpxL/srZQCWjGRqjvQv4YD4ULABMONIN1l+zSBLORMBObw4EPttUf+eWHtIVODpoQ7M8AsKL96LfIgd9ttajUuqp8qBo5XxMOBCC90qlpPimXhUwVEeKC0hommlCWhi32TQeA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wVkPWV42KZd8m/vH8t5uhFjB7T/lUD2yHfdnJZdWuhY=;
- b=HdhJeyILKr1RsFtXU3opW+DAyqvUpjGfy3gVAzmWMxclPPpRCAHG6Rwl+c4Q/tluybYxVUfBnwGaqaef/vFsOPlqNu3lde1okfr0vXrunK8PhtBVKgHh9xS2GoJaFx7Z5FEgUkzNLGV4ImtRebU6DvHT2Ui7QGBun9tX24nbQfwU8oExwJC6TdpX8WKRt5YWqa7BRQH6yPIUBDQdHL81Q+yTdj5upw6RAApbu28fKbrZLsq5GsskMtpxpF2y/v0/huUzr2F3eHQivpXgV3GcwFQfUBPl+c6IKBTS9dvUCQZhqNiM3WqkWkQhTUNWZDKSqvR4+WTkheRYnuPK7039dQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wVkPWV42KZd8m/vH8t5uhFjB7T/lUD2yHfdnJZdWuhY=;
- b=loEaKWAjpPEdyhfC0G6g0FA4OeuqfAZi+VHpLLpyT9US4Hj+XpVpv9e2bcvN7IN8Gh93KJG9Cx/amx32iUDgTP5URKz1M42GIGIakKJzdksE+ui3ArDchhzso3c97Q3a1M7VjcnI8FLk/t2Zpt8AYX/CfqvSGg5bxYpehmOC+8hC+m5XxWxnIsnwNDW80HxPQ1t7Jm7WPQnpiQIOHqt66tWVY9WeC6+6Z170PXX7BC9264bVGhFcJKaQS6ZPEBsZq7VRCwfbDN+OopZ2tAVYGSj+Mv3Y1hiTTyb3IXVUgrXfyZ4biqZb/s5WpVfrvEqcPqNQAdPiHs+5rsvbyLQGxQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB7500.namprd12.prod.outlook.com (2603:10b6:610:148::17)
- by CY5PR12MB6130.namprd12.prod.outlook.com (2603:10b6:930:26::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.39; Wed, 23 Jul
- 2025 06:17:53 +0000
-Received: from CH3PR12MB7500.namprd12.prod.outlook.com
- ([fe80::7470:5626:d269:2bf2]) by CH3PR12MB7500.namprd12.prod.outlook.com
- ([fe80::7470:5626:d269:2bf2%6]) with mapi id 15.20.8964.019; Wed, 23 Jul 2025
- 06:17:53 +0000
-Message-ID: <4f350869-acd9-4e2b-a3e0-b3f29a7fbbfb@nvidia.com>
-Date: Wed, 23 Jul 2025 09:17:44 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next V6 2/5] selftests: drv-net: Test XDP_PASS/DROP
- support
-To: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Nimrod Oren <noren@nvidia.com>
-Cc: Mohsin Bashir <mohsin.bashr@gmail.com>, netdev@vger.kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- shuah@kernel.org, horms@kernel.org, cratiu@nvidia.com, cjubran@nvidia.com,
- mbloch@nvidia.com, jdamato@fastly.com, sdf@fomichev.me, ast@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
- nathan@kernel.org, nick.desaulniers+lkml@gmail.com, morbo@google.com,
- justinstitt@google.com, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, llvm@lists.linux.dev, tariqt@nvidia.com,
- thoiland@redhat.com
-References: <20250719083059.3209169-1-mohsin.bashr@gmail.com>
- <20250719083059.3209169-3-mohsin.bashr@gmail.com>
- <ab65545f-c79c-492b-a699-39f7afa984ea@nvidia.com>
- <20250721084046.5659971c@kernel.org>
- <eaca90db-897c-45a0-8eed-92c36dbec825@nvidia.com>
- <eea3a104-1cb9-4606-9664-a8beda93e018@redhat.com>
-From: Gal Pressman <gal@nvidia.com>
-Content-Language: en-US
-In-Reply-To: <eea3a104-1cb9-4606-9664-a8beda93e018@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TLZP290CA0001.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:9::14) To CH3PR12MB7500.namprd12.prod.outlook.com
- (2603:10b6:610:148::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BFC4151991;
+	Wed, 23 Jul 2025 06:25:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753251930; cv=none; b=szKLwpcXH+oYL8nwAWpWJG8OlIHCx9tHWl1iVIUOFqCM1ZRwT6a+sZ7BMuGYxUYg9b4viIOimxFqGfAptjLwRdjRIjeL/OWij3153ggH4IZTnNNwvLIMWwa1BjvxnhdF74Y0r+gxNGwg2/LIXwMCS4PyOxW9cxxyJJ7CbWkpkE4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753251930; c=relaxed/simple;
+	bh=5As5b9hDZCf2zDsqZ/ytZOfi5BQC+vAXvNGPONFtPF0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kON3TKvg+8xarTUFuzFaw7cUkUHWUqw6lEhrETIEBVWrWzjRk/IK+Wsdt/l1rIys5oFvT4UElVrtzINz5+n4MeDa75T03NJvIBJeAG49Usb5de9MvDo86aR2CDb3L+NmPnD0fPvzlud45mmWZhSU5HJrkZyp6N+6Db/P9ftBvdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YVH+SHzz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76A46C4CEE7;
+	Wed, 23 Jul 2025 06:25:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753251929;
+	bh=5As5b9hDZCf2zDsqZ/ytZOfi5BQC+vAXvNGPONFtPF0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=YVH+SHzzsT4EFqy6VtGrkUcwwcgbP9/KwOm/A/GBKrZvytCsA+G829kBI1CGWmWQn
+	 5cxoDQkYfmFDuN/ooh9yzVHEqi62jUYeKSoecogCazaHd1OCvHlwO6Ye0OGIs7K2K2
+	 7SAe1obrfgoRBASOrb56kUXvwiHu9YDKNHIan3NjGoUhcNkezMIDOaAhCWyBU0/eJG
+	 Tl25PNDHXjhuMW5FzPnSNEl185kAbuDEhhtAN4FHeXrxJUkOdKAfeIXkMZ7RP7vtu8
+	 oGBHSKwPx2N9OS8tr5YQYlvX9G8NhV8Bwf8vYBbgzPZXohI7kuW2LcMzFtgIzCEWRs
+	 NxnHYYZw7pRTA==
+Message-ID: <9220f776-8c82-474b-93fc-ad6b84faf5cc@kernel.org>
+Date: Wed, 23 Jul 2025 08:25:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB7500:EE_|CY5PR12MB6130:EE_
-X-MS-Office365-Filtering-Correlation-Id: d71292ae-d6a7-4deb-6c87-08ddc9b0a86d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?elBVUEM1blh4MGtNUGRaRHR5ZjlNMjZaZ0U4Z205cTI1UjMzbW83cmhIbmFj?=
- =?utf-8?B?ckFScjBBK3QvVmp5T0ErNnJEUm9VVVlwNTFyTmJVbjRUQjdKcWhLYlRUVFJ6?=
- =?utf-8?B?L2szZnFEb2hqb3VXY2N0YkNneEZpMnVib1YxSVN3NWkxOExubEpnUW9hN0o5?=
- =?utf-8?B?QWpURmsxcHMxUnJEdGtGRERaanhqYzhlL29NaWtIQStFMUxOL1Fha01iOWMw?=
- =?utf-8?B?alFlaTJ3NWVlVkZCdVBPRnVQMThxTzZmY3NtbE9DbGc5cUhteVREVFpGWFdn?=
- =?utf-8?B?MURtVXp2dTdUYmN6WDlWRDRpWXFCbmREbURxU2kvWUMyV0RFZjBMY0YyQ3lw?=
- =?utf-8?B?dm9xa1ZlUStWYTlGb241cTIzSU9mb2doMWlvdXNpd3JPYWhFYVVFTG8zOHpD?=
- =?utf-8?B?cmErdktCQ0xCK2xpczFkelp5ZjY5QWJOUm93bkQ3OXN5Y0VqS1R5b2N3Q0sy?=
- =?utf-8?B?YmF1am9pSTlKVFMxNmlHZTlsR3VnZENXUW1zZ3g5REljN3g5Y3NHWGd5dlBY?=
- =?utf-8?B?T0NqZE5HbS9vUG1yUzYvdlNCcFgvVXZjclRmN2RiY3FqWUp6NzZ6dHplN3cz?=
- =?utf-8?B?dlJTc1dqdkxHNkRhckZoVXQ3VWpON09DT1l3NGZIcEZLclR6OWNNV3JvQUE0?=
- =?utf-8?B?clFvL1E1dWpJNFdxRlpOTlA2TW1BMjBXYXFDcnV6WGRyNmxXdFlSR0Q2NXFJ?=
- =?utf-8?B?UTNRcUNNNG5PZHRsRE02OE0ydmZDSUdpa2JVS0JEZkV4bkhKNjBLSzFKNSt3?=
- =?utf-8?B?Zm8xUlpwZkZEU0FWUzV3NkNxSUlJS0VTYnNIZFM2bGd1V09uUW4xQUNTNC9o?=
- =?utf-8?B?Zi9PYnZiZVdSSVFLYkN2R2JPVlU4TUNrMUNNK25lSGRNckE2N0xIV0EzaHFO?=
- =?utf-8?B?R3MvRjZWeTUxbVJlQ0ViZTFpS09sTEZ2aktxTTh5aEdYTUxZNEliOEJMS3NO?=
- =?utf-8?B?dlZveTFLbHpIUmgwUzludUtHTlJJM3FNUjJQZm9Qb1JrZkFZNnhaclZ6Rmg0?=
- =?utf-8?B?OGR3OFBDdTF6eEIxSFIyWitFZWZCTThURUtFNlFrb0dyMFNub2w4aFRRMjM5?=
- =?utf-8?B?M3NwcGZ6NWVFb0hoTEdqSEpVaFA4U3BXUU9RR0lOTGp3V0ZqeVFYV3RaUGJj?=
- =?utf-8?B?TjU5VTE4Mnd2ZHhHVG5ZckZZYzFKRXlJSmdsWkJ1V0E2em9NV2UwNk00U0Fy?=
- =?utf-8?B?T3BmdjlhWmVncTNWN1IxMkNJbnB3U3gxNGNNeDNJNy9rSTF0My80VU5oQjNV?=
- =?utf-8?B?NVpLUTZkVFp3NmQrOVRlS1M3MDFTSzA3ZXRaMmpOTzhrSFIxazRudWQ2Mi9O?=
- =?utf-8?B?QTY4ZnBUOHRUV3E0Z0lPcjdsVDFSWmZmbHVtRnR1ditMZ1V5b1hMVmpvR3J5?=
- =?utf-8?B?ODcrMERGYTlDK3dlUUszQ0Q5aXkrRUJ0ekY0MWVlQnZtS0JuUXIvcm1DUDdT?=
- =?utf-8?B?T3llQWZrMWFZN25nakFZQ3BMQXMrY01Qbk9TcVB4REZuNTJZUWxwNEphd21n?=
- =?utf-8?B?SFNla3o2L29XTmJnT3RZTW52MmVteE9uVEo0bGxJS2VpbHZzV0VvL0NOQzBG?=
- =?utf-8?B?N1h2QmVvanpsZ3RQTGUvSk1wNnd5WHBIS1p6N1VCT0s2U2xMYTZCQysxeUFY?=
- =?utf-8?B?eEZBdWNBb2pmNkN2ZmFwT0pOYVFLbjdZU3lSOENIS0o3SEQwd3NNcWVhUm43?=
- =?utf-8?B?bzc1U05Gems2YXNCVEs0TE9mRzdxMlNzNG5VQ21HUU5mNWRTbkJHNVZCWXlC?=
- =?utf-8?B?VnFqclBpOUl0OFp1Q0xjWFhza29FdXd1T3NPWXZoblY1MTdrMjk1RnlKNzlv?=
- =?utf-8?B?UzJUdE1uRlJVNXhUMGVGbGZCY1FrQjlqY1VxaEhPekdaUW42TmtoVmZObGpv?=
- =?utf-8?B?OU8rQXljVWxucVJRUFpZR2p2WER1ZlIzNGlvaW9xWE5qdUlrNXYzNlViMDRx?=
- =?utf-8?Q?9z1MYfnWBfI=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7500.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RXdlWnJWU1VBNWZFRVNIem91WUVjSVdrTHZXUUNzeEJrbmpZQW1qd2VhbUtT?=
- =?utf-8?B?VVpLR050cEg0NGplcjBLdTRadm1acHF0NjdVUFdEc3VaS3JoSXNkWWc4dzRx?=
- =?utf-8?B?dEtURHE1NnJDNC8rUUdBeDVIUk1iMFltbmtuRGcwZkFJQTIxaDRDTEVWTGdT?=
- =?utf-8?B?bi9oNkt0RkJYRGphNmIwNm5YWHJpR0g2TUIyaElFalJwdURrMTFVNGhwbUlm?=
- =?utf-8?B?b2cySDdmQjBEcnFkdVoxeEorQVRkWGJkWkdoa2RqMTZlUXRCY28vaUhyeWtW?=
- =?utf-8?B?ODJBa3grYnhYazlaVzNEQWZ1T0ZqNUZua0tYMFU4YlRiZVVMdFE0K2VLY3Yv?=
- =?utf-8?B?SUhka3VSM2w3cXBFRDJZN1cxdkF3eU43ajZqVWNSbVdqZnh4Z3hkd3hpbFMv?=
- =?utf-8?B?Z21CN3NsQm5MOW4xZGxIek9QMXI5aGlMQWMzQ1VnaTdsTXluL2RidWFsZEFm?=
- =?utf-8?B?R2YwUFlQU092NmJvYnpaRWlpdUV5RmxtUTJQbjcrNGltcC92djNnM0hMa0lo?=
- =?utf-8?B?aDczNjZHd0k1UGUva05xNGhhMUdSMm1NNXMwYlZLZi93NUNmenJWdEg5SVJk?=
- =?utf-8?B?dmJGUkROSzY3OTB6cGdKVUtIREU5bnNYUWpqQWRVMWx4ZllhVld4c0F1a0xE?=
- =?utf-8?B?MUJEcEdoTWtxUFVxSzgwZHQ5QTVWc0NkU0ZFajNDYXdaQWhMYXVGM2Y4Wndw?=
- =?utf-8?B?U1pDelVoOWtCUW5iTTlqOG44UUpLa3dGd3dIdjZBL3NDNEF1Wmp3V2pzejZk?=
- =?utf-8?B?bmxGM3VHaTJrVSt4NjdXMlNUTTJvZXZGV2gyUStUclJiMG9sRFhJR1cvV2FI?=
- =?utf-8?B?MnRTQ3M1UFlBM2x4ZFIremFOQ0N5K1RPSzRNSzN2ZGJEUmV2cjNaOW9FOUhF?=
- =?utf-8?B?R2V6Z20wR0ZrSmVQUWlRMmJYV0dnZ3FtMnlqVzZtWDJ6K01RNnpSMnNsd2Qw?=
- =?utf-8?B?RjE5Q2JUYUlwRUYzLzdLbHlJVnJSb2ZTeTBKSVFWUGx2UVFVZ0tSZkxRZTlU?=
- =?utf-8?B?RnF2MVVPQlg3UGdFNDlaSWRzZGZJdW4vU0U2N2VtckdGYkIrRjF3K2h2dzc0?=
- =?utf-8?B?U08xMWZDNFB2VXFCWVRWbG9TM1VEQkNBOXBoeG5oSiszWGw0VEd2bk85b1RH?=
- =?utf-8?B?bngzUEpQbXE5N3dSbzdTMjZuOFowNzNkcmxUUEw0ZmtJR2lFWkdkeS9MTnFi?=
- =?utf-8?B?MHAySzNtNnJqV0FiLzVWaU83OU5LUzFnb3RJNVR0WjR6SnVGZVVGaVE1UGNS?=
- =?utf-8?B?dE5TRzdoTDhvWDBCN2EwSVNwNThKRnpjVFdpaFl4TWJqQURnZXZ6VXFrM2s0?=
- =?utf-8?B?MEVnSXpmVnRlNUVYdXVNdVJ1VmsycERRaHRic3dGeVFDN2kreHRqSURIRms4?=
- =?utf-8?B?R2JXOEpoa3R4SmpKb3Q1S2k3UEN6VDI0QmVsdThVNnB2R0k4c0pZalN4Tlpt?=
- =?utf-8?B?RFg4RGxodXQ3UnZCMUJZQnFydUUvaE1DTXRxNzJ2dzlIeDVUNlY5SVcrdWZL?=
- =?utf-8?B?WlBLTzNKV3ZQNDBCUTBlTlBrSjQ4TWxqYWpoeGZibUxDZjJiRlVkbnNyMGF5?=
- =?utf-8?B?ZWI3MU1Oa2dtcjlLT2l4ZVdvS3RUSG4xRjk4ZUh3RGNhMWFlcFVjZ1VYMk5t?=
- =?utf-8?B?UnlTTWxYWmtUa0NZR1h6Z2t2Y1Z5RXN1eWZ0bnlTTkNEaUtWOWRiVmlIUTNX?=
- =?utf-8?B?eFVvdTRGLzVjeEdyaGpQVUNzbkhlUTlRNndObkdSbzNVWFkwcVZkT2IzQUhB?=
- =?utf-8?B?ZUtkTEFQSWljVWh6OWMyZmo3M0dMZittYm8xeFVTRmJ3aGRvZE9HQzNRbi9Q?=
- =?utf-8?B?VmtLaTJLY1NvU3NCT0ZpQm51M3JsNlAycEJFQUoycjBxL0RYcHNhRFJMYTcv?=
- =?utf-8?B?Vi9Eem1XY2RHdkhIRG53aitjNmF2aHhmaFVZaXhleXRaVkN4MHR4T1dlcjVG?=
- =?utf-8?B?NmNuZEQvSlRnVmxQZUlFYklBcnY0Z0FjdWREVFJFaG1Bb25JV3o0VlNBbEx2?=
- =?utf-8?B?WElsSjJsRkJTVVZjZnROU29xMW9tekozTTlHZTNhR1FzVW1sSHhxQjVNT2hI?=
- =?utf-8?B?U0xvd080VzZmR0U4NHZ3VDdEOEtMVmtSUEZqejI1c1ZKdW5PdGhOUW5VbC96?=
- =?utf-8?Q?/vESCiPoTj+lhd+bEQ/VsJiN9?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d71292ae-d6a7-4deb-6c87-08ddc9b0a86d
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7500.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2025 06:17:53.7092
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: sau+h1OKBN+HFYpmlMi5aWOJwRccDQ6L/lxVc7KZCTjNs1kT3FK9sEttgudl8e+F
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6130
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] dt-bindings: dpll: Add clock ID property
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>
+References: <20250717171100.2245998-1-ivecera@redhat.com>
+ <20250717171100.2245998-2-ivecera@redhat.com>
+ <5ff2bb3e-789e-4543-a951-e7f2c0cde80d@kernel.org>
+ <6937b833-4f3b-46cc-84a6-d259c5dc842a@redhat.com>
+ <20250721-lean-strong-sponge-7ab0be@kuoka>
+ <804b4a5f-06bc-4943-8801-2582463c28ef@redhat.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <804b4a5f-06bc-4943-8801-2582463c28ef@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 22/07/2025 18:03, Paolo Abeni wrote:
-> On 7/21/25 8:34 PM, Gal Pressman wrote:
->> On 21/07/2025 18:40, Jakub Kicinski wrote:
->>> On Mon, 21 Jul 2025 14:43:15 +0300 Nimrod Oren wrote:
->>>>> +static struct udphdr *filter_udphdr(struct xdp_md *ctx, __u16 port)
->>>>> +{
->>>>> +	void *data_end = (void *)(long)ctx->data_end;
->>>>> +	void *data = (void *)(long)ctx->data;
->>>>> +	struct udphdr *udph = NULL;
->>>>> +	struct ethhdr *eth = data;
->>>>> +
->>>>> +	if (data + sizeof(*eth) > data_end)
->>>>> +		return NULL;
->>>>> +  
->>>>
->>>> This check assumes that the packet headers reside in the linear part of
->>>> the xdp_buff. However, this assumption does not hold across all drivers.
->>>> For example, in mlx5, the linear part is empty when using multi-buffer
->>>> mode with striding rq configuration. This causes all multi-buffer test
->>>> cases to fail over mlx5.
->>>>
->>>> To ensure correctness across all drivers, all direct accesses to packet
->>>> data should use these safer helper functions instead:
->>>> bpf_xdp_load_bytes() and bpf_xdp_store_bytes().
->>>>
->>>> Related discussion and context can be found here:
->>>> https://github.com/xdp-project/xdp-tools/pull/409
+On 21/07/2025 14:54, Ivan Vecera wrote:
+> On 21. 07. 25 11:23 dop., Krzysztof Kozlowski wrote:
+>> On Fri, Jul 18, 2025 at 02:16:41PM +0200, Ivan Vecera wrote:
+>>> Hi Krzysztof,
 >>>
->>> That's a reasonable way to modify the test. But I'm not sure it's
->>> something that should be blocking merging the patches.
->>> Or for that matter whether it's Mohsin's responsibility to make the
->>> test cater to quirks of mlx5, 
+>>> ...
+>>>
+>>> The clock-id property name may have been poorly chosen. This ID is used by
+>>> the DPLL subsystem during the registration of a DPLL channel, along with its
+>>> channel ID. A driver that provides DPLL functionality can compute this
+>>> clock-id from any unique chip information, such as a serial number.
+>>>
+>>> Currently, other drivers that implement DPLL functionality are network
+>>> drivers, and they generate the clock-id from one of their MAC addresses by
+>>> extending it to an EUI-64.
+>>>
+>>> A standalone DPLL device, like the zl3073x, could use a unique property such
+>>> as its serial number, but the zl3073x does not have one. This patch-set is
+>>> motivated by the need to support such devices by allowing the DPLL device ID
+>>> to be passed via the Device Tree (DT), which is similar to how NICs without
+>>> an assigned MAC address are handled.
 >>
->> Definitely not a quirk, you cannot assume the headers are in the linear
->> part, especially if you're going to put this program as reference in the
->> kernel tree.
->>
->> This issue has nothing to do with mlx5, but a buggy XDP program.
+>> You use words like "unique" and MAC, thus I fail to see how one fixed
+>> string for all boards matches this. MACs are unique. Property value set
+>> in DTS for all devices is not.
+>>> You also need to explain who assigns this value (MACs are assigned) or
+>> if no one, then why you cannot use random? I also do not see how this
+>> property solves this...  One person would set it to value "1", other to
+>> "2" but third decide to reuse "1"? How do you solve it for all projects
+>> in the upstream?
 > 
-> Note that with the self-tests we have a slightly different premise WRT
-> the actual kernel code. We prefer on-boarding tests cases that work for
-> some/most of the possible setup vs perfect ones, and eventually improve
-> incrementally as needed: the goal is to increase the code coverage _and_
-> encourage people to contribute new tests upstream.
+> Some background: Any DPLL driver has to use a unique number during the
+> DPLL device/channel registration. The number must be unique for the
+> device across a clock domain (e.g., a single PTP network).
+> 
+> NIC drivers that expose DPLL functionality usually use their MAC address
+> to generate such a unique ID. A standalone DPLL driver does not have
+> this option, as there are no NIC ports and therefore no MAC addresses.
+> Such a driver can use any other source for the ID (e.g., the chip's
+> serial number). Unfortunately, this is not the case for zl3073x-based
+> hardware, as its current firmware revisions do not expose information
+> that could be used to generate the clock ID (this may change in the
+> future).
+> 
+> There is no authority that assigns clock ID value ranges similarly to
+> MAC addresses (OUIs, etc.), but as mentioned above, uniqueness is
+> required across a single PTP network so duplicates outside this
+> single network are not a problem.
 
-The changes required to fix the test are trivial, and Nimrod provided a
-reference for the conversion.
+You did not address main concern. You will configure the same value for
+all boards, so how do you solve uniqueness within PTP network?
+
+> 
+> A randomly generated clock ID works, but the problem is that the value
+> is different after each reboot. Yes, there is an option to override the
+> clock ID using the devlink interface, but this also has to be done after
+> every reboot or power-up.
+> 
+>> All this must be clearly explained when you add new, generic property.
+> 
+> Would it be acceptable to define a hardware-specific property, since
+> only this hardware has this particular problem (the absence of a chip
+> unique attribute)? I'm referring to a property like 'microchip,id' or
+> 'microchip,dpll-id' defined in microchip,zl30731.yaml.
+
+It does not change anything, no problems solved.
+
+
+Best regards,
+Krzysztof
 
