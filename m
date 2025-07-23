@@ -1,132 +1,145 @@
-Return-Path: <netdev+bounces-209185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE956B0E8F2
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 05:04:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 858D8B0E8F7
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 05:08:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D95CF3BE8EB
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 03:04:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6ED71689DF
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 03:08:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7F721DE3CA;
-	Wed, 23 Jul 2025 03:04:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="cFgZdow/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04BB81F3FDC;
+	Wed, 23 Jul 2025 03:08:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26A8D19C55E;
-	Wed, 23 Jul 2025 03:04:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4201F2382;
+	Wed, 23 Jul 2025 03:08:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753239883; cv=none; b=OmZcBpKcCDOmCNXrYpRU0GpsM7/WX2GZ2+sMTEsrfP+loNE7ZkQ2k1MuxzzwjcsAQRA0cKyF5/N1aTCTeuQLq06j4nw2p971fwHHEXh1A6Qk9k9iCDB5FV+18lJknY5bxD+ZW8b5ql6n73ZmqQwGeFphzUWovKuD8X9BbP3O3zo=
+	t=1753240123; cv=none; b=dP6+r+6mDJUSBVHfb+YeuU9AniCwfakdDklUsFAAS++ACJlkp/M3KsZVTYPKKgNTG0JGuQkwdsyBs8DlMwMERlflH29HLHStuKEk9MhnRwTI9fo0kspetZBjmf0V3wSMviKfI34n2u3Fvx2eIsblwNlxMSZPChCcZfZaAja9a7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753239883; c=relaxed/simple;
-	bh=5Nl9JET6mcAfxTbOUjqQ3aF5keMnpA8MjbKqQN9pySs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nwQxQkIBRNoC8rEVmG6luZSFYvkpdcY6PT+5KbG30TNN/IG9z0BmOD9/d2Vg4Uj0FEORE4k58ahR8kTiSLTwhbVVdvk1wu6qux6hS4xLHvCWaHGtTxa7Pkfh8eMwXCxjSLCTTTu5vMPV3UGbGAxUqKv0Ou9H3Vidl+tScTmFJaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=cFgZdow/; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1753239882; x=1784775882;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=5Nl9JET6mcAfxTbOUjqQ3aF5keMnpA8MjbKqQN9pySs=;
-  b=cFgZdow/CXy96FAXjzRyKrHl5Uho2a6u00cjJsWcglborD0a+7W/RXYw
-   PsCF3fl7LwW5gFxdNS+6paTKs2Bvy/uigm3NHCzGK/0oonA6sj6LWDW/g
-   x3PwwVlrYiBW5jGVdFFUOKccgYClFRaaV+gpoet4jRLA1vly3HsGL3sYy
-   XzQL8KyZnXxL+qhkTFDVURYji51HHIvTYulLDUIW7wfW01XfrLFpj3CJ9
-   t/WhkihoxS4krsHD0Rwdi68Kx3IsE1j9lsuaxPfv3P2KziH/ta+3+dZUc
-   Mv+ex4UDkpWpTX8EsoTz54DkI5FKRJY2V816rrYVBNcKYlP+t+5fS/ISw
-   Q==;
-X-CSE-ConnectionGUID: xSVfhEo0TXyd97+4CNr+4g==
-X-CSE-MsgGUID: d7oyaCNFS9GZ22ZTmNzXvg==
-X-IronPort-AV: E=Sophos;i="6.16,333,1744095600"; 
-   d="scan'208";a="43781679"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 22 Jul 2025 20:04:34 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Tue, 22 Jul 2025 20:04:04 -0700
-Received: from pop-os.microchip.com (10.10.85.11) by chn-vm-ex02.mchp-main.com
- (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
- Transport; Tue, 22 Jul 2025 20:04:04 -0700
-From: <Tristram.Ha@microchip.com>
-To: Oleksij Rempel <linux@rempel-privat.de>, Michael Grzeschik
-	<m.grzeschik@pengutronix.de>, Woojung Huh <woojung.huh@microchip.com>,
-	"Andrew Lunn" <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>
-CC: Maxime Chevallier <maxime.chevallier@bootlin.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<UNGLinuxDriver@microchip.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Tristram Ha <tristram.ha@microchip.com>
-Subject: [PATCH net] net: dsa: microchip: Fix wrong rx drop MIB counter for KSZ8863
-Date: Tue, 22 Jul 2025 20:04:03 -0700
-Message-ID: <20250723030403.56878-1-Tristram.Ha@microchip.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1753240123; c=relaxed/simple;
+	bh=2yg9SG0vvIlVvlZR8JpUpVQxNLZGjH6tRGJV9TpFhS0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SmfbenEgT9djIEuUfWjy//LIzYzxu9SalOH3uTLIS06REvhf655Kiy4VFvSy3CdI9nWBKENJROpBtfaA8V85GKBfqutlIziUFhXcu4G77kUyZGPO0fXYi7aAK/YSMiengk25XGV2pNJGR+Zao2t8pEq0KknXAY8LcRtWxxXp6po=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=18.169.211.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: zesmtpsz5t1753240028t6b29edfa
+X-QQ-Originating-IP: NT9ZibIvYk5fNjjauD+gBPoL+YaRUZQrmD9vxnv86+c=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 23 Jul 2025 11:07:06 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 1109793005909151533
+Date: Wed, 23 Jul 2025 11:07:05 +0800
+From: Yibo Dong <dong100@mucse.com>
+To: Simon Horman <horms@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
+	gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au,
+	danishanwar@ti.com, lee@trager.us, gongfan1@huawei.com,
+	lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, richardcochran@gmail.com,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 03/15] net: rnpgbe: Add basic mbx ops support
+Message-ID: <78BE2D403125AFDD+20250723030705.GB169181@nic-Precision-5820-Tower>
+References: <20250721113238.18615-1-dong100@mucse.com>
+ <20250721113238.18615-4-dong100@mucse.com>
+ <20250722113542.GG2459@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250722113542.GG2459@horms.kernel.org>
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: NfRA73Gayti6CGR3D1JlkQ2+KrsmWAYUkl9H1DK2aWmQSQG72lYm2EAN
+	c74TwYi0o7kfSFslwYgeoZ1xr59cgDC6dPMbyFHs6TRLmCwdQL92FKAV86JFgzXpOEGQPG3
+	hYORMAZoQ5i1Ry7crHDGuJ+7hMyK695lpI3EERR6k8SEahkTO7/SvyWj6nk0mayMYnPnRnB
+	kXod5ud4dV/EHkHz4prcgLPsVrSl29qjZiWj+vt57o2Q1O/PCbPw6c5KOufwWbvDbEjeJjb
+	JAiky/PNwJDTJmhnltdFwuUsVYukv2p009jT/jFobZzu62wg7c2KwNJ2jX5fFafGPpqa0KU
+	EDgpwHv+7cVtExEh4OWe72jTVP6pUatXNyfEX5DFDqQYBjveDo7oDRGEokrucC+p3/VvtZD
+	ap+us0yG9zjn82ojSkpCX8PrSWOM1+Tj/hy1YnwvQ9mhd1U6iiFGVUfrB6GTk4xGLZ6B1wn
+	HM+HzoKXKJtsy7SRCHy4yi3Nwbln1cw4668c2y4lI0CsdmHVQmyrQDxnBV2/2kigLO6BKUk
+	07RA93rerTcZ0GaxzOdX9lxZorS6uuI7JGL2sI5sTKhuQkMGdkPVebDXN5lqaHDrWIIrolq
+	suUv0E1e7D+ViTpYbanopYYzanDGxkech3MEDVJdePoEL9mFTYby9Z3oidcrfhTovzR+uRX
+	q/Q119vfIQpzB8LSw60w9XrZj5zDYUp38RjPwxe4teSR85Ry+vB+kwOPoFSlVwvySfCe5XG
+	alQd+eS10ESGwtAKgWKTHR8Q6235E0Yty7DgP2rJknKhEudDq59BfJ0mp9RNnDFmCf2r1/4
+	UHbc/PGv+tGACOFqWMvZpjdCLZDut/O7Z5YmZnSc4b+pPS+86zcc3VjDpeMJXC3TywpGsP1
+	EsUlROYSyTsKwOk2JJ2QQSCjy6oBbRd/GBvZ/W0CmgZ6TNSrd1DbMnXByxeudFkCL0/JNXq
+	Z1S2NLLmnAKt/8w9perumQmHPghxw0rOqnqREbhCRyu/FnbvYdno7QdaPJ0txR3X6CvJxtE
+	VyIKhk8Q==
+X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
+X-QQ-RECHKSPAM: 0
 
-From: Tristram Ha <tristram.ha@microchip.com>
+On Tue, Jul 22, 2025 at 12:35:42PM +0100, Simon Horman wrote:
+> On Mon, Jul 21, 2025 at 07:32:26PM +0800, Dong Yibo wrote:
+> > Initialize basic mbx function.
+> > 
+> > Signed-off-by: Dong Yibo <dong100@mucse.com>
+> 
+> ...
+> 
+> > diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
+> 
+> ...
+> 
+> > +/**
+> > + * mucse_obtain_mbx_lock_pf - obtain mailbox lock
+> > + * @hw: pointer to the HW structure
+> > + * @mbx_id: Id of vf/fw to obtain
+> > + *
+> > + * This function maybe used in an irq handler.
+> > + *
+> > + * @return: 0 if we obtained the mailbox lock
+> > + **/
+> > +static int mucse_obtain_mbx_lock_pf(struct mucse_hw *hw, enum MBX_ID mbx_id)
+> > +{
+> > +	struct mucse_mbx_info *mbx = &hw->mbx;
+> > +	int try_cnt = 5000, ret;
+> > +	u32 reg;
+> > +
+> > +	reg = (mbx_id == MBX_FW) ? PF2FW_MBOX_CTRL(mbx) :
+> > +				   PF2VF_MBOX_CTRL(mbx, mbx_id);
+> > +	while (try_cnt-- > 0) {
+> > +		/* Take ownership of the buffer */
+> > +		mbx_wr32(hw, reg, MBOX_PF_HOLD);
+> > +		/* force write back before check */
+> > +		wmb();
+> > +		if (mbx_rd32(hw, reg) & MBOX_PF_HOLD)
+> > +			return 0;
+> > +		udelay(100);
+> > +	}
+> > +	return ret;
+> 
+> ret is declared, and returned here.
+> But it is never initialised.
+> 
+> Perhaps it is appropriate to return an error value here,
+> and update the kernel doc for this function accordingly.
+> 
+> Flagged by W=1 builds with Clang 20.1.8, and Smatch.
+> 
+> > +}
+> 
+> ...
+> 
 
-When KSZ8863 support was first added to KSZ driver the RX drop MIB
-counter was somehow defined as 0x105.  The TX drop MIB counter
-starts at 0x100 for port 1, 0x101 for port 2, and 0x102 for port 3, so
-the RX drop MIB counter should start at 0x103 for port 1, 0x104 for
-port 2, and 0x105 for port 3.
-
-There are 5 ports for KSZ8895, so its RX drop MIB counter starts at
-0x105.
-
-Fixes: 4b20a07e103f ("net: dsa: microchip: ksz8795: add support for ksz88xx chips")
-Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
----
- drivers/net/dsa/microchip/ksz8.c     | 3 +++
- drivers/net/dsa/microchip/ksz8_reg.h | 4 +++-
- 2 files changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/dsa/microchip/ksz8.c b/drivers/net/dsa/microchip/ksz8.c
-index be433b4e2b1c..8f55be89f8bf 100644
---- a/drivers/net/dsa/microchip/ksz8.c
-+++ b/drivers/net/dsa/microchip/ksz8.c
-@@ -371,6 +371,9 @@ static void ksz8863_r_mib_pkt(struct ksz_device *dev, int port, u16 addr,
- 	addr -= dev->info->reg_mib_cnt;
- 	ctrl_addr = addr ? KSZ8863_MIB_PACKET_DROPPED_TX_0 :
- 			   KSZ8863_MIB_PACKET_DROPPED_RX_0;
-+	if (ksz_is_8895_family(dev) &&
-+	    ctrl_addr == KSZ8863_MIB_PACKET_DROPPED_RX_0)
-+		ctrl_addr = KSZ8895_MIB_PACKET_DROPPED_RX_0;
- 	ctrl_addr += port;
- 	ctrl_addr |= IND_ACC_TABLE(TABLE_MIB | TABLE_READ);
- 
-diff --git a/drivers/net/dsa/microchip/ksz8_reg.h b/drivers/net/dsa/microchip/ksz8_reg.h
-index 329688603a58..da80e659c648 100644
---- a/drivers/net/dsa/microchip/ksz8_reg.h
-+++ b/drivers/net/dsa/microchip/ksz8_reg.h
-@@ -784,7 +784,9 @@
- #define KSZ8795_MIB_TOTAL_TX_1		0x105
- 
- #define KSZ8863_MIB_PACKET_DROPPED_TX_0 0x100
--#define KSZ8863_MIB_PACKET_DROPPED_RX_0 0x105
-+#define KSZ8863_MIB_PACKET_DROPPED_RX_0 0x103
-+
-+#define KSZ8895_MIB_PACKET_DROPPED_RX_0 0x105
- 
- #define MIB_PACKET_DROPPED		0x0000FFFF
- 
--- 
-2.34.1
+Got it, I will fix this.
+Maybe my clang (10.0.0) is too old, I will update it and 
+try W=1 again.
+Thanks for your feedback.
 
 
