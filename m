@@ -1,117 +1,212 @@
-Return-Path: <netdev+bounces-209417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3259CB0F8C7
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 19:16:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9835B0F8D2
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 19:19:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A2593A57F3
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 17:15:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D095A566919
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 17:19:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0291919C54E;
-	Wed, 23 Jul 2025 17:16:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vlHLPvdm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E006204C07;
+	Wed, 23 Jul 2025 17:19:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A06B2E371B;
-	Wed, 23 Jul 2025 17:16:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4294C1DDC1B
+	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 17:19:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753290971; cv=none; b=TlajRNPn0Zde+WaL4/9arve3gzQuFFlLhYPSdSZvDQ4Jr1yvN7Oa7xKnfupjhkWU5PE7vFudcEISRpUxI8gaH9KuViMt4bBtXUtjoETZhH3jjsRnKkqcKkPVTHI4ocWuDdExWLyBURBb3I/HgT+zo3OYnSb7gzkUV2vW92nMs5U=
+	t=1753291170; cv=none; b=T3CEojmpJyHtShEMNYTsPNzStw4V2bNVMaUDCKwwytTU8bJ3Ke1Fx2/XgQqLs/59BB1SCH4a1oMTKBilAU3yPihw2OnoE+IYc9C5P4S0fz1eg75hIE4q2t4Kvmgh5ZKP+2k0ES/iVAAkyRfolehumgkF16UBJRRvxfcqn0rhDoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753290971; c=relaxed/simple;
-	bh=iVTDmofGQTAzngV/8kkO8hEyfpfo8lk01PQhA0Hog3E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UQc48qCEe7xqtc1IBe3l/VzUcyzAhI1X687aEqyv1hIDfX9AuVvaugOP6AgRk68I2IqOUtv5Czh8qrKXyxxeZCu0Ckbc0efB+5k+U2qcRYk26TfgHXDyKM4rC1b2SFxmwQPud0QDgvs6RlzlAYvJEm3+1aIUEhtpUFJhpjqFdlg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vlHLPvdm; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=TUmK6VJp0+E0SJQueeIqF9DxsO4dtccjN/iCA5xVXSQ=; b=vlHLPvdmdD+XmzDdgEpCoJ37fR
-	4kA3gtamKP6pl7RUUKO7ce0QIfkO69/BZ/B8cVEnuum/5vFgJ/9z9LEreyN4BY0egcqVBEUlz4hoG
-	+oAv6TzUYbem5YxCixTJvUMOQfg1CBZLX7BcrP6MF8x+QqEcf+CfpK10/m6eDUp5axqo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ued4T-002fhc-Qy; Wed, 23 Jul 2025 19:16:01 +0200
-Date: Wed, 23 Jul 2025 19:16:01 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Tristram.Ha@microchip.com
-Cc: Woojung Huh <woojung.huh@microchip.com>,
-	Vladimir Oltean <olteanv@gmail.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Simon Horman <horms@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Marek Vasut <marex@denx.de>, UNGLinuxDriver@microchip.com,
-	devicetree@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 2/6] net: dsa: microchip: Add KSZ8463 switch
- support to KSZ DSA driver
-Message-ID: <857db988-fd4d-4cac-9774-43161f1f592a@lunn.ch>
-References: <20250723022612.38535-1-Tristram.Ha@microchip.com>
- <20250723022612.38535-3-Tristram.Ha@microchip.com>
+	s=arc-20240116; t=1753291170; c=relaxed/simple;
+	bh=KBC/rTGDvGK+TPIpMxOkhR4RjlAUAVRHpnVIEHGjI/Y=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=KPtSsM8wV0QJm+VcY69jFK/b0L4/mPM8M9jgP974dbFmaCObozJHss+gM2VgyKjX/p0xXSB028b0eF6Nc/Goh4JI7fUBhAhvz+hpKgENmwtKVFB5K7IC7ZKmVfZT7Wdz2gz5BNwv0n/yu52be/LWM2XiwxXTJhpz6Z5ZV1BLgv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-8649be94fa1so14563139f.0
+        for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 10:19:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753291168; x=1753895968;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LETkx7CVH83zD4M4cUDXo3lvqXJWw4t3iCSMVC8drac=;
+        b=L6MEXAKIUFzH6Gg1bCQnN36hcxb/JfbM+YGJ+Z7gGS1tbPxRpAJz13PJ327HmSIula
+         7OvwM5/af6XMDHd7V0DGznC9qZpyEl+K1Lw6cLFSmFv3sqBkOYZ442Hk83DvnvY1rtrS
+         fezIqhiTFhSDqJWF3I5pqmMIcNBdwWvtb+2E2tw8InZCLarNuthRuiKjLeSZ6tzkkeq2
+         I1s7WLCkhB3NHBV9P2ZQClm6MCKSoZpbk/L+MDo+nCyeYi4MCPyUinmgqEs+EMWZtAem
+         NXt0EsXoYA3GCX0wnncRmF1zazs5sFz5aSFS903m8Ekcn+i+93uJ10lJEOp9SQyV6WBq
+         /rIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVAcXrXJuwbnQf0UMWzI+5H7SUixrKb4fnCDxypRMZXjxgLNYW6ypql3cYgxaYMIh7syIQ0Gao=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0A/5kk8+haoDMoTEhNc2NHY7xwsRVGjI8sh86jBkRKzeHlOQC
+	oaR/skvT8BpNkhm3N6rfXc4FTQCAmEiE4DINLEXcSiUwt4MeNnaOdWeVVXou2P12JPEFgb6/Pjk
+	pyKO2CbFDpBKHqOT6MXY3qiqIkDps3DH9Szl58FK/qvFndCOAyR8t/6fZWkc=
+X-Google-Smtp-Source: AGHT+IF8gAJsK0U1ptptS6UBVaRziAt7UZcVX/lLpudEgilcLQ6Zr5ZDcBYL39GaXR5IdHc2wFknCXfxuWMWvD8gVRmO5tWqquWD
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250723022612.38535-3-Tristram.Ha@microchip.com>
+X-Received: by 2002:a05:6602:3421:b0:87c:4496:329d with SMTP id
+ ca18e2360f4ac-87c64f64aafmr689931339f.5.1753291168476; Wed, 23 Jul 2025
+ 10:19:28 -0700 (PDT)
+Date: Wed, 23 Jul 2025 10:19:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <688119a0.050a0220.248954.0007.GAE@google.com>
+Subject: [syzbot] [fs?] [wireless?] general protection fault in
+ simple_recursive_removal (5)
+From: syzbot <syzbot+d6ccd49ae046542a0641@syzkaller.appspotmail.com>
+To: dakr@kernel.org, gregkh@linuxfoundation.org, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, rafael@kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-> KSZ8463 switch is a 3-port switch based from KSZ8863.  Its major
-> difference from other KSZ SPI switches is its register access is not a
-> simple continual 8-bit transfer with automatic address increase but uses
-> a byte-enable mechanism specifying 8-bit, 16-bit, or 32-bit access.  Its
-> registers are also defined in 16-bit format because it shares a design
-> with a MAC controller using 16-bit access.  As a result some common
-> register accesses need to be re-arranged.  The 64-bit access used by
-> other switches needs to be broken into 2 32-bit accesses.
+Hello,
 
-> +	if (ksz_is_ksz8463(dev)) {
-> +		int i;
-> +
-> +		for (i = 0; i < 2; i++)
-> +			ret = regmap_read(ksz_regmap_32(dev), reg + i * 4,
-> +					  &value[i]);
-> +		*val = (u64)value[0] << 32 | value[1];
-> +		return ret;
-> +	}
->  	ret = regmap_bulk_read(ksz_regmap_32(dev), reg, value, 2);
+syzbot found the following issue on:
 
-This needs a bit more explanation. When i look at
+HEAD commit:    89be9a83ccf1 Linux 6.16-rc7
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11b42fd4580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8adfe52da0de2761
+dashboard link: https://syzkaller.appspot.com/bug?extid=d6ccd49ae046542a0641
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=134baf22580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16d5a4f0580000
 
-https://elixir.bootlin.com/linux/v6.15.7/source/drivers/base/regmap/regmap.c#L3117
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-89be9a83.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/a3f5f507f252/vmlinux-89be9a83.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/a8f9b92c57a6/bzImage-89be9a83.xz
 
-It appears to do something similar, looping over count doing
-_regmap_read().
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d6ccd49ae046542a0641@syzkaller.appspotmail.com
 
-There is also:
+wlan1: send auth to aa:09:b7:99:c0:d7 (try 2/3)
+wlan1: send auth to aa:09:b7:99:c0:d7 (try 3/3)
+wlan1: authentication with aa:09:b7:99:c0:d7 timed out
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000029: 0000 [#1] SMP KASAN NOPTI
+KASAN: null-ptr-deref in range [0x0000000000000148-0x000000000000014f]
+CPU: 0 UID: 0 PID: 171 Comm: kworker/u4:4 Not tainted 6.16.0-rc7-syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Workqueue: events_unbound cfg80211_wiphy_work
+RIP: 0010:kasan_byte_accessible+0x12/0x30 mm/kasan/generic.c:199
+Code: 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 66 0f 1f 00 48 c1 ef 03 48 b8 00 00 00 00 00 fc ff df <0f> b6 04 07 3c 08 0f 92 c0 c3 cc cc cc cc cc 66 66 66 66 66 66 2e
+RSP: 0018:ffffc90001977400 EFLAGS: 00010202
+RAX: dffffc0000000000 RBX: ffffffff8b713286 RCX: ca5c1933e35f3700
+RDX: 0000000000000000 RSI: ffffffff8b713286 RDI: 0000000000000029
+RBP: ffffffff824067f0 R08: 0000000000000001 R09: 0000000000000000
+R10: dffffc0000000000 R11: ffffed10085cf24c R12: 0000000000000000
+R13: 0000000000000148 R14: 0000000000000148 R15: 0000000000000001
+FS:  0000000000000000(0000) GS:ffff88808d218000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b2f55ffff CR3: 000000005030a000 CR4: 0000000000352ef0
+Call Trace:
+ <TASK>
+ __kasan_check_byte+0x12/0x40 mm/kasan/common.c:556
+ kasan_check_byte include/linux/kasan.h:399 [inline]
+ lock_acquire+0x8d/0x360 kernel/locking/lockdep.c:5845
+ down_write+0x96/0x1f0 kernel/locking/rwsem.c:1577
+ inode_lock include/linux/fs.h:869 [inline]
+ simple_recursive_removal+0x90/0x690 fs/libfs.c:616
+ debugfs_remove+0x5b/0x70 fs/debugfs/inode.c:805
+ ieee80211_sta_debugfs_remove+0x40/0x70 net/mac80211/debugfs_sta.c:1279
+ __sta_info_destroy_part2+0x352/0x450 net/mac80211/sta_info.c:1501
+ __sta_info_destroy net/mac80211/sta_info.c:1517 [inline]
+ sta_info_destroy_addr+0xf5/0x140 net/mac80211/sta_info.c:1529
+ ieee80211_destroy_auth_data+0x12d/0x260 net/mac80211/mlme.c:4597
+ ieee80211_sta_work+0x11cf/0x3600 net/mac80211/mlme.c:8310
+ cfg80211_wiphy_work+0x2df/0x460 net/wireless/core.c:435
+ process_one_work kernel/workqueue.c:3238 [inline]
+ process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3321
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3402
+ kthread+0x70e/0x8a0 kernel/kthread.c:464
+ ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:kasan_byte_accessible+0x12/0x30 mm/kasan/generic.c:199
+Code: 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 66 0f 1f 00 48 c1 ef 03 48 b8 00 00 00 00 00 fc ff df <0f> b6 04 07 3c 08 0f 92 c0 c3 cc cc cc cc cc 66 66 66 66 66 66 2e
+RSP: 0018:ffffc90001977400 EFLAGS: 00010202
+RAX: dffffc0000000000 RBX: ffffffff8b713286 RCX: ca5c1933e35f3700
+RDX: 0000000000000000 RSI: ffffffff8b713286 RDI: 0000000000000029
+RBP: ffffffff824067f0 R08: 0000000000000001 R09: 0000000000000000
+R10: dffffc0000000000 R11: ffffed10085cf24c R12: 0000000000000000
+R13: 0000000000000148 R14: 0000000000000148 R15: 0000000000000001
+FS:  0000000000000000(0000) GS:ffff88808d218000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b2f55ffff CR3: 0000000011601000 CR4: 0000000000352ef0
+----------------
+Code disassembly (best guess):
+   0:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+   7:	00
+   8:	90                   	nop
+   9:	90                   	nop
+   a:	90                   	nop
+   b:	90                   	nop
+   c:	90                   	nop
+   d:	90                   	nop
+   e:	90                   	nop
+   f:	90                   	nop
+  10:	90                   	nop
+  11:	90                   	nop
+  12:	90                   	nop
+  13:	90                   	nop
+  14:	90                   	nop
+  15:	90                   	nop
+  16:	90                   	nop
+  17:	90                   	nop
+  18:	66 0f 1f 00          	nopw   (%rax)
+  1c:	48 c1 ef 03          	shr    $0x3,%rdi
+  20:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  27:	fc ff df
+* 2a:	0f b6 04 07          	movzbl (%rdi,%rax,1),%eax <-- trapping instruction
+  2e:	3c 08                	cmp    $0x8,%al
+  30:	0f 92 c0             	setb   %al
+  33:	c3                   	ret
+  34:	cc                   	int3
+  35:	cc                   	int3
+  36:	cc                   	int3
+  37:	cc                   	int3
+  38:	cc                   	int3
+  39:	66                   	data16
+  3a:	66                   	data16
+  3b:	66                   	data16
+  3c:	66                   	data16
+  3d:	66                   	data16
+  3e:	66                   	data16
+  3f:	2e                   	cs
 
-https://elixir.bootlin.com/linux/v6.15.7/source/include/linux/regmap.h#L370
 
- * @use_single_read: If set, converts the bulk read operation into a series of
- *                   single read operations. This is useful for a device that
- *                   does not support  bulk read.
- * @use_single_write: If set, converts the bulk write operation into a series of
- *                    single write operations. This is useful for a device that
- *                    does not support bulk write.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-It would be better if regmap_bulk_read() could be made to work, and
-hide away the differences, which is what regmap is all about.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-	Andrew
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
