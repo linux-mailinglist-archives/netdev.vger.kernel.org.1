@@ -1,152 +1,220 @@
-Return-Path: <netdev+bounces-209146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D764B0E790
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 02:21:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 04AFCB0E798
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 02:29:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A902D3A4D45
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 00:21:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F10323AC4F6
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 00:29:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F44E156CA;
-	Wed, 23 Jul 2025 00:21:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CB542E40B;
+	Wed, 23 Jul 2025 00:29:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0elZRU6b"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="B4vsgDXv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5DFA2E36FA
-	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 00:21:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F23A3E555;
+	Wed, 23 Jul 2025 00:29:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753230105; cv=none; b=XO9NF8Yw3+do/0Obnc37Ns8zasTnUu3WtN6ljA9Q3udRtqMSLXsSF2c/bkP5+DYuijSXDD+W7vZV7qFFd2xCXoJXqTFaon9AUQ1q8HX50vj9x9LJyaBtsc+MMJHmuHzxCVXBfL/dr7uC2JM1oKgdYcQWZkxX906t5Y9VoAZvuB4=
+	t=1753230569; cv=none; b=vBnnWYppNBrk8ukmrQt6KoDV0HXcfEsEFiewjVb7Ya7D0+jDPlyGqAKYDAgXvC/NcyHVoK/3/ha8PqgS1aLuoGPmhME837C1Wiab6ud9+FQNINjbQTltah7wWO5D8eLBV0PIDkLzMs4Cz7FD28Jlzq+O/cf2GKs18fkQtZXV4yE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753230105; c=relaxed/simple;
-	bh=3B8oGYKqxq6bN7oLyibAlFmYoaYKpNAqyo5dpnbQaMA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V3SMIlcIeEckMay6JptyWgxjaPEEnh1zg9pl8jYSVVJEXYAglowlm8n51+1BCOi0YhvsECqdBrS3BnFx54JVAKNEbrlbMcrPxI57j7cJsW7cD6KFZDrnB/PpVOAdHHlHTAzg04pvx9L/8AGqifsBthhy+twhLPOsAv6bJD1pRHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0elZRU6b; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-237f18108d2so85045ad.0
-        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 17:21:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753230103; x=1753834903; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kKou5T6jjhYJRS+fJK+c9beYVAJB+czjecP03lKrYoI=;
-        b=0elZRU6b2C/kT5531PK55w/2+uFUu/odm7SY4j7OZiQdID5bqOQuW3O1ZmnTgzVprW
-         +P/UgDkvDExaCyEEdonTRFvoHX8Y7Mc5jWX7yy89SG8aGNvZ+LF6jHiPTQoStUvZ7vfd
-         p9nAoS/t/L6QS77K8KIaf7WU24U4C43Xzj8CaQ2alN4vfV14A2Em231CWhVsO0DOIY/C
-         uA+OmYSLBKmKHPS9NX/MXzHOTraqVTvK7KmI+gBkSTQ1FQi/6RB0yQ9uVymeBU4vbFad
-         Mr4Y6DsyrCjeXoEMwTLBdj/lmlFaVf155U359uWdaK8agdcdmwx8RSUUhGL3qhSU/YJU
-         Wz2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753230103; x=1753834903;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kKou5T6jjhYJRS+fJK+c9beYVAJB+czjecP03lKrYoI=;
-        b=FurueGhWLqU8qxoI0WOQUwqi5cyuPbtlTOklgvcV6ky6QkUK+QayiIvF+Yg0Q+IugC
-         pGgXDYi3PCWyoo3vt4dyaxxntiKBa3FVttOQgkHUVnymsS8mjmex/bQ9IseQbSbncgkK
-         UEPZmLyu0EY1q8XgkD04tJpjXG9sJVzSxgth2QABAJLeYTrq6IyzAHlWud/bHLKjYH9E
-         nTgnBl4GSH29U3hVyoZLcK02BgJgd6QHyrGcNOR+qJiiS7tz3R+Pm8dWy2ro3nVDI38W
-         0bF5XIff1r1DjJ/BSawPGUT81lX1jxIeU/jUNNSKRGtHhQLKIVegVf/HNdkhSp820caL
-         ZCxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXxSB3/ngec9HtNHYnRXDvEmKGbA4uXJOM78aYJs8M5B+zM75cwmVbQOS0huxGOqWPVL9LbBKg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuBR546f8G73qXwiR2rHWdSQWuOFXa8mwqRpyz4iGwcRFN+HgJ
-	XXD/cg+53OSqq2l/nE4gqZG89/lzmrxTrXX1Y5VeOScM8VvGxGuXVEJu0k+2o4rY+zS5ZfdJNNS
-	TnE/srmH89Ml/o2irNWmuMHhcS7xb1BpoZ+qVdkNa
-X-Gm-Gg: ASbGncsMSq4bxPWsuU5bgarkfnQ/HKmw+qN87C65kUklwErFOoVw7n00fqRWkVTPHWG
-	6WnBUbB78dk1WVlyLrjR6f5cc3x2KrBgx8nbNZAG12Ct2PRMXQ7aypWsQaEjedzYZlsAv2zv4J3
-	NZpA1wGmQnYiYj5BxHN21odo9uFKw+EtiGNNkMxtC5AI27/fzLpNijrhmn/3a/uSauEndlPG1gc
-	bn8+iX7J4dAwD2/sXfkKZSCNvPKiClGbtxsHw==
-X-Google-Smtp-Source: AGHT+IEQeZCIdHi0V+DxkoGGF7AcjDGNzwBvFMVANikWrcAQmVDZA5TsZEnDj8p6ca3Zasw3IP1ScDSpHmGAdnw62vM=
-X-Received: by 2002:a17:903:2304:b0:234:a44e:fee8 with SMTP id
- d9443c01a7336-23f98dde4f0mr803645ad.27.1753230102498; Tue, 22 Jul 2025
- 17:21:42 -0700 (PDT)
+	s=arc-20240116; t=1753230569; c=relaxed/simple;
+	bh=8t4qc+1oVPIes96V6mDCFXqe004QTXFHw8Dcn/BmaOk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YmWZ1RVEJovzOvOCz+lsxFdEulKMIdK60khNSNeEDRbfqIYJzSl5hJf51v8W5mRTJQGlWx+JP+25eV86X8LfgLWaIPzgyAzYoUY32JSMAtn0X/uhGkEuAnLTcyyUbxy6/ORrx0yGPj008fGXlpYi2DR0+8psn8GZJsqEI+n51Zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=B4vsgDXv; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 22 Jul 2025 17:29:06 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753230552;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ya/iMqP+L9J9OUdonPqQ6BajrGRFzQbsY8dxwMUGMDQ=;
+	b=B4vsgDXvvTZuPekKEvlBPO/rcadIYkXZRtK1VWBTBeIq8ySKpTBHPE5nbhUJ8NveiKFnoB
+	AT/Lq/U7xhSK5nAGAUh2GnfvB0/T+yUWCoT3N5eROHXYeL7yJd7UpQh2K5LOZIdKEiz7tH
+	TA5ZtxEMHLFsdhPw43GKQSyLFlJfFfM=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Eric Dumazet <edumazet@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	Mat Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
+	Andrew Morton <akpm@linux-foundation.org>, Simon Horman <horms@kernel.org>, 
+	Geliang Tang <geliang@kernel.org>, Muchun Song <muchun.song@linux.dev>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+	cgroups@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v1 net-next 13/13] net-memcg: Allow decoupling memcg from
+ global protocol memory accounting.
+Message-ID: <jmbszz4m7xkw7fzolpusjesbreaczmr4i64kynbs3zcoehrkpj@lwso5soc4dh3>
+References: <20250721203624.3807041-1-kuniyu@google.com>
+ <20250721203624.3807041-14-kuniyu@google.com>
+ <z7kkbenhkndwyghwenwk6c4egq3ky4zl36qh3gfiflfynzzojv@qpcazlpe3l7b>
+ <CANn89iLg-VVWqbWvLg__Zz=HqHpQzk++61dbOyuazSah7kWcDg@mail.gmail.com>
+ <jc6z5d7d26zunaf6b4qtwegdoljz665jjcigb4glkb6hdy6ap2@2gn6s52s6vfw>
+ <CAAVpQUAJCLaOr7DnOH9op8ySFN_9Ky__easoV-6E=scpRaUiJQ@mail.gmail.com>
+ <p4fcser5zrjm4ut6lw4ejdr7gn2gejrlhy2u2btmhajiiheoax@ptacajypnvlw>
+ <CAAVpQUAk4F__D7xdWpt0SEE4WEM_-6V1P7DUw9TGaV=pxZ+tgw@mail.gmail.com>
+ <xjtbk6g2a3x26sqqrdxbm2vxgxmm3nfaryxlxwipwohsscg7qg@64ueif57zont>
+ <CAAVpQUAL09OGKZmf3HkjqqkknaytQ59EXozAVqJuwOZZucLR0Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250722030727.1033487-1-skhawaja@google.com> <20250722030727.1033487-2-skhawaja@google.com>
- <CANn89i++XK3BFzk4t4bvKeZtqXT-FUCaY_5SkSTOeV0AGNDdZg@mail.gmail.com> <20250722154127.2880a12e@kernel.org>
-In-Reply-To: <20250722154127.2880a12e@kernel.org>
-From: Samiullah Khawaja <skhawaja@google.com>
-Date: Tue, 22 Jul 2025 17:21:30 -0700
-X-Gm-Features: Ac12FXzE3uP6ATwWT5gYj_NDqhtm3-2ZD50GXEXbyjXOBHc2HRRab6luXwealg8
-Message-ID: <CAAywjhTgBCrSQ9EhaNgoXYaKtqWn0Ks+8=nXo_-rnCU_hV4irw@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 2/3] net: Use netif_set_threaded_hint instead
- of netif_set_threaded in drivers
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, willemb@google.com, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAAVpQUAL09OGKZmf3HkjqqkknaytQ59EXozAVqJuwOZZucLR0Q@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jul 22, 2025 at 3:41=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 22 Jul 2025 01:21:58 -0700 Eric Dumazet wrote:
-> > > diff --git a/drivers/net/ethernet/atheros/atl1c/atl1c_main.c b/driver=
-s/net/ethernet/atheros/atl1c/atl1c_main.c
-> > > index 3a9ad4a9c1cb..ee7d07c86dcf 100644
-> > > --- a/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
-> > > +++ b/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
-> > > @@ -2688,7 +2688,7 @@ static int atl1c_probe(struct pci_dev *pdev, co=
-nst struct pci_device_id *ent)
-> > >         adapter->mii.mdio_write =3D atl1c_mdio_write;
-> > >         adapter->mii.phy_id_mask =3D 0x1f;
-> > >         adapter->mii.reg_num_mask =3D MDIO_CTRL_REG_MASK;
-> > > -       netif_set_threaded(netdev, true);
-> > > +       netif_set_threaded_hint(netdev);
+On Tue, Jul 22, 2025 at 02:59:33PM -0700, Kuniyuki Iwashima wrote:
+> On Tue, Jul 22, 2025 at 12:56 PM Shakeel Butt <shakeel.butt@linux.dev> wrote:
 > >
-> > I have not seen a cover letter for this series ?
+> > On Tue, Jul 22, 2025 at 12:03:48PM -0700, Kuniyuki Iwashima wrote:
+> > > On Tue, Jul 22, 2025 at 11:48 AM Shakeel Butt <shakeel.butt@linux.dev> wrote:
+> > > >
+> > > > On Tue, Jul 22, 2025 at 11:18:40AM -0700, Kuniyuki Iwashima wrote:
+> > > > > >
+> > > > > > I expect this state of jobs with different network accounting config
+> > > > > > running concurrently is temporary while the migrationg from one to other
+> > > > > > is happening. Please correct me if I am wrong.
+> > > > >
+> > > > > We need to migrate workload gradually and the system-wide config
+> > > > > does not work at all.  AFAIU, there are already years of effort spent
+> > > > > on the migration but it's not yet completed at Google.  So, I don't think
+> > > > > the need is temporary.
+> > > > >
+> > > >
+> > > > From what I remembered shared borg had completely moved to memcg
+> > > > accounting of network memory (with sys container as an exception) years
+> > > > ago. Did something change there?
+> > >
+> > > AFAICS, there are some workloads that opted out from memcg and
+> > > consumed too much tcp memory due to tcp_mem=UINT_MAX, triggering
+> > > OOM and disrupting other workloads.
+> > >
 > >
-> > netif_set_threaded_hint() name seems a bit strange, it seems drivers
-> > intent is to enable threaded mode ?
+> > What were the reasons behind opting out? We should fix those
+> > instead of a permanent opt-out option.
 > >
-> > netif_threaded_enable() might be a better name.
-+1
->
-> Cover letter or at least a link to where this was suggested would indeed
-> be useful. I may have suggested the name, and if so the thinking was
-> that the API is for the driver to "recommend" that we default to
-> threaded NAPI, likely because the device is IRQ-challenged.
-> But no strong feelings if you prefer netif_set_threaded_enabled().
-Yes. You suggested it, but I am changing it to netif_threaded_enable
-as it maybe is more clear.
->
-> Since this is a driver-facing API a kdoc may be useful:
->
-> /**
->  * netif_set_threaded_hint() - default to using threaded NAPIs
->  * @dev: net_device instance
->  *
->  * Default NAPI instances of the device to run in threaded mode.
->  * This may be useful for devices where multiple NAPI instances
->  * get scheduled by a single interrupt. Threaded NAPI allows moving
->  * the NAPI processing to cores other than the core where IRQ is mapped.
->  *
->  * This function should be called before @dev is registered.
->  */
-+1
->
-> Since this is just a hint the function should be void. No caller cares
-> about the return value anyway.
-+1
->
-> BTW I think we should delete the debugfs file for threaded config
-> from mt76. debugfs is not uAPI, presumably.
-+1
 
-Do you think I should send a patch for that with this series? I was
-planning to remove that separately.
+Any response to the above?
+
+> > > >
+> > > > > >
+> > > > > > My main concern with the memcg knob is that it is permanent and it
+> > > > > > requires a hierarchical semantics. No need to add a permanent interface
+> > > > > > for a temporary need and I don't see a clear hierarchical semantic for
+> > > > > > this interface.
+> > > > >
+> > > > > I don't see merits of having hierarchical semantics for this knob.
+> > > > > Regardless of this knob, hierarchical semantics is guaranteed
+> > > > > by other knobs.  I think such semantics for this knob just complicates
+> > > > > the code with no gain.
+> > > > >
+> > > >
+> > > > Cgroup interfaces are hierarchical and we want to keep it that way.
+> > > > Putting non-hierarchical interfaces just makes configuration and setup
+> > > > hard to reason about.
+> > >
+> > > Actually, I tried that way in the initial draft version, but even if the
+> > > parent's knob is 1 and child one is 0, a harmful scenario didn't come
+> > > to my mind.
+> > >
+> >
+> > It is not just about harmful scenario but more about clear semantics.
+> > Check memory.zswap.writeback semantics.
+> 
+> zswap checks all parent cgroups when evaluating the knob, but
+> this is not an option for the networking fast path as we cannot
+> check them for every skb, which will degrade the performance.
+
+That's an implementation detail and you can definitely optimize it. One
+possible way might be caching the state in socket at creation time which
+puts some restrictions like to change the config, workload needs to be
+restarted.
+
+> 
+> Also, we don't track which sockets were created with the knob
+> enabled and how many such sockets are still left under the cgroup,
+> there is no way to keep options consistent throughout the hierarchy
+> and no need to try hard to make the option pretend to be consistent
+> if there's no real issue.
+> 
+> 
+> >
+> > >
+> > > >
+> > > > >
+> > > > > >
+> > > > > > I am wondering if alternative approches for per-workload settings are
+> > > > > > explore starting with BPF.
+> > > > > >
+> > > >
+> > > > Any response on the above? Any alternative approaches explored?
+> > >
+> > > Do you mean flagging each socket by BPF at cgroup hook ?
+> >
+> > Not sure. Will it not be very similar to your current approach? Each
+> > socket is associated with a memcg and the at the place where you need to
+> > check which accounting method to use, just check that memcg setting in
+> > bpf and you can cache the result in socket as well.
+> 
+> The socket pointer is not writable by default, thus we need to add
+> a bpf helper or kfunc just for flipping a single bit.  As said, this is
+> overkill, and per-memcg knob is much simpler.
+> 
+
+Your simple solution is exposing a stable permanent user facing API
+which I suspect is temporary situation. Let's discuss it at the end.
+
+> 
+> >
+> > >
+> > > I think it's overkill and we don't need such finer granularity.
+> > >
+> > > Also it sounds way too hacky to use BPF to correct the weird
+> > > behaviour from day0.
+> >
+> > What weird behavior? Two accounting mechanisms. Yes I agree but memcgs
+> > with different accounting mechanisms concurrently is also weird.
+> 
+> Not that weird given the root cgroup does not allocate sk->sk_memcg
+> and are subject to the global tcp memory accounting.  We already have
+> a mixed set of memcgs.
+
+Running workloads in root cgroup is not normal and comes with a warning
+of no isolation provided.
+
+I looked at the patch again to understand the modes you are introducing.
+Initially, I thought the series introduced multiple modes, including an
+option to exclude network memory from memcg accounting. However, if I
+understand correctly, that is not the case—the opt-out applies only to
+the global TCP/UDP accounting. That’s a relief, and I apologize for the
+misunderstanding.
+
+If I’m correct, you need a way to exclude a workload from the global
+TCP/UDP accounting, and currently, memcg serves as a convenient
+abstraction for the workload. Please let me know if I misunderstood.
+
+Now memcg is one way to represent the workload. Another more natural, at
+least to me, is the core cgroup. Basically cgroup.something interface.
+BPF is yet another option.
+
+To me cgroup seems preferrable but let's see what other memcg & cgroup
+folks think. Also note that for cgroup and memcg the interface will need
+to be hierarchical.
 
