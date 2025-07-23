@@ -1,165 +1,203 @@
-Return-Path: <netdev+bounces-209534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DEE0B0FBB5
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 22:40:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 88350B0FBDF
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 22:49:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AF8A1CC3C60
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 20:40:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49DE81C816A6
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 20:50:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF031248F59;
-	Wed, 23 Jul 2025 20:35:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6F67223323;
+	Wed, 23 Jul 2025 20:49:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IkiFu6MP"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="cytUNWG7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SJ2PR03CU002.outbound.protection.outlook.com (mail-westusazon11023101.outbound.protection.outlook.com [52.101.44.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CE8F248861
-	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 20:35:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753302945; cv=none; b=Y6t1GD88WKKYSFM8hqEZ4rbRC5rDhXB4mwAcqt8agBd7v73Xflbj59Dspk7XqRc6hmsZFRtOJke6dZkbqZpCNzvF7drQwyuQaDn5HDvIYSKYzWb+mWDRifiZyypnpDcQ2yzsZtHK/IScNU75sPvzgiBdyaAPKf5RpNb1y4sjiyY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753302945; c=relaxed/simple;
-	bh=spoGdToWQ7Qrm4bToQXLFz/9ptP2rN3jOZ+nPouxc+w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lvySMjnzXZ2rAmg++FnX2yuHTjdx2bVN0BC2qP4Bru8nmQuNUghJE5wSy8UkS1xwb0/R0WeBm+57i+tayhjzWeGmPs7Xtx+SoYFO5kptvO/H4ezEvfHbDlJ96RHwRexKf2/K3OfxUREe+FSqbU5l3lBiwMYOZdMJidEo82VTy5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IkiFu6MP; arc=none smtp.client-ip=209.85.219.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-e8bc571ce7aso197552276.0
-        for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 13:35:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753302943; x=1753907743; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vkOu+beI+6o/oWvo1KmSXmhEqOhds8ciBXnxJyc2DQ8=;
-        b=IkiFu6MPAkrJ0JSYtVb5xYCqqcO1cmV7WIpvM5URenB7ez+/YsIGV2pxRAMjcGLBXD
-         zb4rGInA3KJ+XC6hSPozk/8UgcTDwlsWwnJ6gC2BpjWdDwIdlicEISXuK7kLw83WxO84
-         nEYgnaimPVYIq/O+baWNgqbmokDOx5to5eVyb24CGeV1dHjcQO2CjfcXSsPGsAueTX0R
-         DuHymhVb35SVCwOMSjm9J8SicOMizq5NTFGKPDPssxmnofFoXPKjyXJmoQkVSQmiWVNU
-         pIl9M5F9fRLVg4He0hDqkcNAEixZei3xjYel/JziCX6NYnvRxCSn1JBI5w6i8aM6lwPo
-         vl5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753302943; x=1753907743;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vkOu+beI+6o/oWvo1KmSXmhEqOhds8ciBXnxJyc2DQ8=;
-        b=kzC2FPVHkQRtgSxqbHe80W2qgVlYwl/cbl0pzIZd9NcvvOmV7YMxcbcKZ0PiLKFUku
-         qapQCirOVrY4HlAoSH+MYT4WxK/eDwy8+UiWrGKyMjHr1B+PBJgsC6hFwImuiQ7HSeQl
-         fVTMhPK3DvEXCt+2togrD9vAxabHks5Jcl5gBkjdXSnuySAqfE3gmbXKsl/of409MzQ2
-         c8KPydtWA4BY+chzETxHbXI3C3S29BaZKmYzCanerhAwaFx6lQDgvp5z6lOPs4paiLJI
-         bqq065jOAJagzuoG8rHqXGUTIBBxDt12bzBfD6/pCkyMpgS6ua6IpHEfnCllc14or5ar
-         hpXA==
-X-Forwarded-Encrypted: i=1; AJvYcCWqglb41X9DQ69x3RgwkYEMOz1gP9QCb4Xb5QQi/6yRxd3UCFJwIdFB9Yk0vxAq1lyUzFOK67s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+69U7UyQoJv6wpQ5wZBARymq8CoxMnmbszA3DGkaz6h3I4Hqt
-	bYcXtkegOrtFfDQzZLeWvOG3ajtRERIgu03IoVGRbGYLcYk4EB+zWvuh
-X-Gm-Gg: ASbGncuKhRqQtN+YpYtTkOVuyBraCx96qmofCqBrUvbbmJotkGLmIGfC8R2b8Ne5cW7
-	uReOoFxSsM1ETYCHAF9TUWNnJQ3WOaXqFmlkbTEoGbsYBJdBS5sQ6ea5c0GKSwENR3quhZ6Mnp3
-	iRCAtqpzq5tbg6WrFGO4UtSeudK/3NtrO4CjkTLGq+9+7dEsLtdPAUiSADkfD+MW1ElzEi7NHYl
-	kD0ESWdyNcEAeV+HnOaykEJZvIL7XCoX1hXHzeD8d+yhr5tuGiMyynrC/JTRS9RJNqaTG/PgrIw
-	2zTw7S0Xvu3NlFAirjbL5Yku54CKPIam/M11vUstaoaOKtYpUi7dF1YTCu67Ao42WLRghwKL0xh
-	9eo8xBmPDrzjnmYNISqY=
-X-Google-Smtp-Source: AGHT+IEPm+tBWG7ic+91WxehYgT5LpmlYDSyEqBiSAcu2DWnW5GR46MwMwmjXDHzdlq756zkJVh1wA==
-X-Received: by 2002:a05:6902:a90:b0:e8d:7599:15cd with SMTP id 3f1490d57ef6-e8dc58211eamr5820102276.5.1753302943269;
-        Wed, 23 Jul 2025 13:35:43 -0700 (PDT)
-Received: from localhost ([2a03:2880:25ff:b::])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e8d7cc0eb6dsm4227798276.6.2025.07.23.13.35.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Jul 2025 13:35:42 -0700 (PDT)
-From: Daniel Zahka <daniel.zahka@gmail.com>
-To: Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Boris Pismenny <borisp@nvidia.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Neal Cardwell <ncardwell@google.com>,
-	Patrisious Haddad <phaddad@nvidia.com>,
-	Raed Salem <raeds@nvidia.com>,
-	Jianbo Liu <jianbol@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v5.0 19/19] net/mlx5e: Implement PSP key_rotate operation
-Date: Wed, 23 Jul 2025 13:34:50 -0700
-Message-ID: <20250723203454.519540-40-daniel.zahka@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250723203454.519540-1-daniel.zahka@gmail.com>
-References: <20250723203454.519540-1-daniel.zahka@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66EF52E3719;
+	Wed, 23 Jul 2025 20:49:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.44.101
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753303777; cv=fail; b=EXYwxmAdAwT7vGiybYIBJtfg4f0hL87U3pqtg6a6iICnRocJ4AGzA85pbwompvbh4mBvLS1eyxZUqGVUroUYQa41JtfQ3sozunH28Kp4yBIz0YLd9UoV4vxMaJ57zwmmSGWJC8kKXpxq/1pqol3McUjomt8gwKnSdvbq+LqgSCw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753303777; c=relaxed/simple;
+	bh=enyL0jPl6JnJvYDLjMMZR4jgzhTgIUepLNyl4fNhL/w=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=qqc/mmESHUDnxZ1jRyT2O+tGsD+mJ2MnKyinWnZCCoRNJMfmZ63d61QajdSRuE4iSVttpVecsvuDEklaBME7NZHIJ8GnBWhutkyiEyWwKwgZQ5MWJ6W4d0eNJWlRhm9EUtybLn4amyBz9/awWuUGszO7L8Cj3TXKY6M/4I56Tf8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=cytUNWG7; arc=fail smtp.client-ip=52.101.44.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=W1hsZENjYh9IaZlMOMnEFmoFxBsRpynw4D3wXYLXFIU6NKnpaBfKiCY7KiHxmr8wNYK5IuU5o5VvCP2QhC1wQwCj9ZyhCyaSV42dQetGrPZ3n98G7eH90NbProg4Shk8MjyV21wkmDSS7N8fK4T8bVBFM+XNqbXJh971furzwOp4vnFR9puvxMRFdNgFoCoqHzGDTwmV+2PgBlJ2OtvWR4LSljKUwBeV6ajNgU+exxOyE7y7S/rk+7I87dczEBgb1GC+1zMGd2i8m/4aYRLZbgoiq5Rqzy7RxdwAkgT3EXiM6dhJLkjBTwLrtjCfVBVbRfmKt/ye3IHk/wq3zusrEQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=enyL0jPl6JnJvYDLjMMZR4jgzhTgIUepLNyl4fNhL/w=;
+ b=TVV6i8MN32gQ8ol9CCKQm+LKy/+oTtP/1t35gMqcueu1GUHF9zl2FAcK382r5796V5KnLOf/23g7ZV4zx7yfXOlB7Dzw3DPI/wz0zJS/vVQvk4X+ON+IKdfANWVkjnscKJso0RfuKP+FxvSHvVwTYqaQCdBEBe1xSJB/kliehKhFNdASNaj7Bx6neUiv+4sob9weOYbLumt17lqcFGf1MaClbmCn0OiS14TC1N3nI2fQRJOma0Q8Yz1muLnU3PnJSAaSGocRJhxtXVo45ouvjLb0FvhhjLXVKxVdNbNR86yJnzjF+rbPKka5G1wo1sNXnr6HoRYDbNEVPdEmqAyQEg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=enyL0jPl6JnJvYDLjMMZR4jgzhTgIUepLNyl4fNhL/w=;
+ b=cytUNWG7fmrLlziOiyV6H5+KL88LhTiJAsKZBm1JyE7bBNLP2IzQjoaaIiT4KnUyGIfS+HK6hRtcyi9CA/0TqhnpjTyYIbv/Jkv9QmDWBGpeIRiifjHSYZ7wbNFVEKbpHPYLcp88lv8gdZWUCqmpVKcTsTcf+1Gv9ndb67vPla4=
+Received: from SJ2PR21MB4013.namprd21.prod.outlook.com (2603:10b6:a03:546::14)
+ by SJ1PR21MB3529.namprd21.prod.outlook.com (2603:10b6:a03:453::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.20; Wed, 23 Jul
+ 2025 20:49:31 +0000
+Received: from SJ2PR21MB4013.namprd21.prod.outlook.com
+ ([fe80::3c6d:58dc:1516:f18]) by SJ2PR21MB4013.namprd21.prod.outlook.com
+ ([fe80::3c6d:58dc:1516:f18%4]) with mapi id 15.20.8964.004; Wed, 23 Jul 2025
+ 20:49:31 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>, Haiyang Zhang
+	<haiyangz@linux.microsoft.com>
+CC: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, KY Srinivasan
+	<kys@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui
+	<decui@microsoft.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"sd@queasysnail.net" <sd@queasysnail.net>, "viro@zeniv.linux.org.uk"
+	<viro@zeniv.linux.org.uk>, "chuck.lever@oracle.com" <chuck.lever@oracle.com>,
+	"neil@brown.name" <neil@brown.name>, "edumazet@google.com"
+	<edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"horms@kernel.org" <horms@kernel.org>, "davem@davemloft.net"
+	<davem@davemloft.net>, "kuniyu@google.com" <kuniyu@google.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [EXTERNAL] Re: [PATCH net, 0/2] net: Add llist_node init and fix
+ hv_netvsc namespace error
+Thread-Topic: [EXTERNAL] Re: [PATCH net, 0/2] net: Add llist_node init and fix
+ hv_netvsc namespace error
+Thread-Index: AQHb+3NcGZK42ouXrEuRDoOAFVev+rRAKzjQ
+Date: Wed, 23 Jul 2025 20:49:31 +0000
+Message-ID:
+ <SJ2PR21MB40137E181C23C6550604334BCA5FA@SJ2PR21MB4013.namprd21.prod.outlook.com>
+References: <1753228248-20865-1-git-send-email-haiyangz@linux.microsoft.com>
+ <20250722184433.2b951171@kernel.org>
+In-Reply-To: <20250722184433.2b951171@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=1f1371c2-3506-440d-b221-7bd9eb2dd8b6;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-07-23T20:33:34Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
+ 3, 0, 1;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ2PR21MB4013:EE_|SJ1PR21MB3529:EE_
+x-ms-office365-filtering-correlation-id: bf1b75b9-356e-4aa1-f197-08ddca2a6c4e
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|7416014|376014|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?nzhmyMgcsaFExwZMjOFeakNACe6bNMmWtEgV5tt5ZT2OGM85DkxZ62a635sp?=
+ =?us-ascii?Q?rHIjbjElScx1gz1MNbnoHqz6GFbC/3rHp1/as9QtEHugGGjzaCLijuO7y5x+?=
+ =?us-ascii?Q?2koBGznz6InvhYtBfcyJT/TLE2D8G1BYb4Sje9NSRC9VmT4pTexddvVuGbBL?=
+ =?us-ascii?Q?h7bL4QTo380rOHRFfllLd/pILselwnOr0HTe2TgDG6EP6/XykEvwslEFeLR8?=
+ =?us-ascii?Q?thwvye51DVgEpRzxwm/PaXw6hf7ItBKAh9k1tBth524NawUOAobOs5lrXIZh?=
+ =?us-ascii?Q?hy4RxYvQNNQn/TGVWCZPbQt7+OtHn1K3TlAYGWLMfodK7b/DaGwvp8eSNVHD?=
+ =?us-ascii?Q?k4pQOwe/RqnSHyJTx2ZqGbAk34+RpOURXLZSN43ONMT9TzqOONNmy5KnAlZN?=
+ =?us-ascii?Q?PhUSA3ujMUR/bzPN5kdrai1HGEDlw/nCmQSHhmUUUIWSN1Rnl0CTokIutLCO?=
+ =?us-ascii?Q?NLnDAH3uLAqWLaMrPDRjtVFXlVo0NiuNO4b0FK/MmWCMJSypLilxCb5oKTa6?=
+ =?us-ascii?Q?huGHY8Om+QaIyMdmsgwz2KNNe8qaq0I+e2iOA+5NLAjCkh97e0ppxpZDI2yp?=
+ =?us-ascii?Q?E4A4c15CbeCreCoAY0SZUPIlUVq/HAKtmqhIWHXxXBvGEllDUOPmsjIWalfa?=
+ =?us-ascii?Q?19qYeaCpLX7rZLf6edmC2A80MIsYeBF9vtVO0KGUx+1sn5j4llWPOkfMYsrr?=
+ =?us-ascii?Q?OJGm/EMz4HNlCbRKlm0gXegCuc9fGo7TBoZl9so9rpo9Feuy8icmdNgFCKBm?=
+ =?us-ascii?Q?iOC2P1EwyRI2bVb3ue84g+Ug8fKmxayQkH1gVEId+v+UW2b8WUJmQ8p73pSt?=
+ =?us-ascii?Q?qrKsb0C7Es6aoeotsOb66h0UONXhwdkjilYmXVS0awi/v9Fky+HrBrUFRWIa?=
+ =?us-ascii?Q?JQl8UGmcMRCV11/KG6BxAe1mKdfOQJTU9dl/t6P0GG3CG8hMfCxcLT1xzswM?=
+ =?us-ascii?Q?SeIQZws9/w+X+eojCcT2T/faXJ7p3GvM8+MGR3ILgDVipA6Bb4QpGQ/zUXAM?=
+ =?us-ascii?Q?QJnWURoX8br3lfVicXilzoMQfmz5y0exuROwV8OgAMcoMTXg7LiamiGz5eU8?=
+ =?us-ascii?Q?e2xf0WO/SYIpMAhTD1UftqY0fYGPHEDB0IDJH/PfH4EYejJGkS+wVH+r7Z1L?=
+ =?us-ascii?Q?lUJPVXC8WFdkD3hnvTnsqfHWvW3vgO6k+Ez0RZ24pBsIE75eyHTx62pc31u3?=
+ =?us-ascii?Q?YK48eVqKa7s3CNNuFJzqpML9XFxxA0B5J4E22+IPruGXjGhvVOocajjQJfhv?=
+ =?us-ascii?Q?WSZRBoxva1lTfn/N4nZyH4Bp1KkNiKmjjuD/jbZwJx3mcS/irPIL/AAcrYJv?=
+ =?us-ascii?Q?nLyCtdgFcN0eG/7YVHJFEF5e6FGKbYLUXgbxDxc9k3E8sxAGt5v1VyYQ4Ktz?=
+ =?us-ascii?Q?cU0u8BcxfyHcCHmEb/Bk1l2RTrnLsINrGpJrImpLUATwU/hbVLJFR7cBp1OF?=
+ =?us-ascii?Q?wgCJNUrXbSfwzVaNlcJSp4Iu9UKEN79mXDLbRH7ZPHaTLLLpiM2ylA=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR21MB4013.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?hSlO9xYd1QDRylDgiSzaCB4cDuipERPVHnQ2qebPA1EZZJ1mEhl6xzpmF41j?=
+ =?us-ascii?Q?w4UWWqSoUQqwOP6c2Y7Ze/XurMm+gMDgXt89yGCCW4RhQvj5KOgnJ1DvdYfw?=
+ =?us-ascii?Q?8byPYRFPfiACzoKgZXu+FnCAa9fT2kuXGrbG33C87DqMMndOao+u0nrYjwpW?=
+ =?us-ascii?Q?WZXmLyU47sjKqDPJkJoLJdN4hebay8Nf/Nk14rc+CKs1LFkDdWv7a0haDMHZ?=
+ =?us-ascii?Q?XFBJ8t/FXSSO8AoWZ4pVdbKNz5yXxQs+4pIQV9zNhR1wpQOnSejfaEzD0rFH?=
+ =?us-ascii?Q?D52FbmRerfjkVzpSz1hLXMx0AQ+VVHGYWljN6sx251i4xm8FZ+f94W9cuHrI?=
+ =?us-ascii?Q?rIv7iTMEn4nqomzjtXt+F+9jKs9wNP0BpYZFKjxWQIJC4xliciboQF9MXKAu?=
+ =?us-ascii?Q?TY4GdAffPzlLUOgHcthFM9yyaN721o3ncA84Bud6a/zNRFJeYapHmOpMOdoi?=
+ =?us-ascii?Q?BbHFz7qw/ycIDhfpjC2qxwnsVD6pv+z0Nys69WyAEmFe/6M6VhaAWl9DeUec?=
+ =?us-ascii?Q?IRMIw6lj3HYnmF4ywk5VWtZBp/aWjpS+sJ2iI10CMkWU+8IggtiLsUWHK2iD?=
+ =?us-ascii?Q?LN/fJA0sVME+qQ+/5CKvH+TP3DydThTciMbgKtXH+4FfrnsE134PvdqJA526?=
+ =?us-ascii?Q?ffdblCNDwYrPTbHVqHtcb8vVyHTsiIf/24mk5tHwUrq37n/erXs5ec7Umbnf?=
+ =?us-ascii?Q?fBWijY1yLksyfmKbCTtrqc+oSEGIIzd7hlveIqwnv4K10a1+nEtd529srM7r?=
+ =?us-ascii?Q?PxI8isVsNhEXsbO3vBlz4giu9815qXdBNDYXnP8h9UIK42dz793Mr/kInBzy?=
+ =?us-ascii?Q?3jJ+O24awcnLA1H8T5oMZP9qB00n0r//8eRNYuwFfKR35wvnBLUgX7pVhWtP?=
+ =?us-ascii?Q?Y7N/6eEwBwxKFy6HX4e4wfCm9N6T3HbxRRZX3SqOdCXdYUA4oXSCyNzBhhi2?=
+ =?us-ascii?Q?EWp3xyFKVBCsfi02c/BbbKcOgTJ6vJoPRSdPccY/Km/Qb2fccR06bS+tqxbw?=
+ =?us-ascii?Q?loDXCzw3MEwU3S/cUfHq7gmtk6Ej/OsUsPIc7XbPrZiyzAGsA+ERY5XU2RYH?=
+ =?us-ascii?Q?Cbff3Gt4k9yrkVmay+mo3QYKyMfFsrfeB6bH5NCBPYMqL7Kh9cTfto+zbzce?=
+ =?us-ascii?Q?0ztQjpOXRZR7BUW037Nd/MbyBs4qO2zvo8m2kAi4R6+Hx3Scch8QeJMDRxiT?=
+ =?us-ascii?Q?22YgUZ5MxwOiiQV2U2nFweG8LRh/69+6sqFENJYFGXQXfpk5eyCpLQOgjvnI?=
+ =?us-ascii?Q?ickYiDc0xHMX8b+/RjUyZ5aDcD2NJszPvzwH7WNZACZJgnNrohNi0zeV2mMd?=
+ =?us-ascii?Q?uZPnbWd7XnnUQFy4HYBekk+e8i3BH9wTURq0Z+wcp1vicU57gZiSaLyulYXf?=
+ =?us-ascii?Q?FEJJRUW/BGVQGlW8/BJulnRIgSfvZAy2lUR9xc9Rm7aZoM8jlohiooPwDgY2?=
+ =?us-ascii?Q?HRSDFeEBWSwyyX5vJiiFXMSb19PZbjI6kTgnMmpLD/ny63wWaZswgapjF8Sx?=
+ =?us-ascii?Q?VBHHydbhGSY+vpMbBUc93UVfE22WcqxVRjbJ38SO02xNoZgxxs9AnJbvdmAv?=
+ =?us-ascii?Q?9aE/lJrNsuwB9G+MkOBlYVkhYH7BVwm5njKS8/gK?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR21MB4013.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bf1b75b9-356e-4aa1-f197-08ddca2a6c4e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jul 2025 20:49:31.0712
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: fBB41h8YIiNw3CA6VnKqE6aYAPpQezU5Z+MrKLYXK3liIsyleBdeArYxSOnuady9mHUsZ1x1iSqAvhOGF2KKDg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR21MB3529
 
-From: Raed Salem <raeds@nvidia.com>
 
-Implement .key_rotate operation where when invoked will cause the HW to use
-a new master key to derive PSP spi/key pairs with complience with PSP spec.
 
-Signed-off-by: Raed Salem <raeds@nvidia.com>
-Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
-Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
----
+> -----Original Message-----
+> From: Jakub Kicinski <kuba@kernel.org>
+> Sent: Tuesday, July 22, 2025 9:45 PM
+> To: Haiyang Zhang <haiyangz@linux.microsoft.com>
+> Cc: linux-hyperv@vger.kernel.org; netdev@vger.kernel.org; Haiyang Zhang
+> <haiyangz@microsoft.com>; KY Srinivasan <kys@microsoft.com>;
+> wei.liu@kernel.org; Dexuan Cui <decui@microsoft.com>;
+> andrew+netdev@lunn.ch; sd@queasysnail.net; viro@zeniv.linux.org.uk;
+> chuck.lever@oracle.com; neil@brown.name; edumazet@google.com;
+> pabeni@redhat.com; horms@kernel.org; davem@davemloft.net;
+> kuniyu@google.com; linux-kernel@vger.kernel.org
+> Subject: [EXTERNAL] Re: [PATCH net, 0/2] net: Add llist_node init and fix
+> hv_netvsc namespace error
+>=20
+> On Tue, 22 Jul 2025 16:50:46 -0700 Haiyang Zhang wrote:
+> > Add llist_node init to setup_net(), so we can check if the node is on
+> list.
+> > Then, fix the namespace callback function in hv_netvsc.
+>=20
+> Can you not do the moving from a workqueue? Schedule a work, let the
+> stack finish what it's doing, take rtnl_lock, do you your own moving?
 
-Notes:
-    v1:
-    - https://lore.kernel.org/netdev/20240510030435.120935-16-kuba@kernel.org/
+Thanks for the suggestion! I will implement and test it.
 
- .../net/ethernet/mellanox/mlx5/core/en_accel/psp.c    | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.c
-index 56f39f452bc8..406fe351cd28 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.c
-@@ -82,11 +82,22 @@ static void mlx5e_psp_assoc_del(struct psp_dev *psd, struct psp_assoc *pas)
- 	atomic_dec(&psp->tx_key_cnt);
- }
- 
-+static int mlx5e_psp_key_rotate(struct psp_dev *psd, struct netlink_ext_ack *exack)
-+{
-+	struct mlx5e_priv *priv = netdev_priv(psd->main_netdev);
-+
-+	/* no support for protecting against external rotations */
-+	psd->generation = 0;
-+
-+	return mlx5e_psp_rotate_key(priv->mdev);
-+}
-+
- static struct psp_dev_ops mlx5_psp_ops = {
- 	.set_config   = mlx5e_psp_set_config,
- 	.rx_spi_alloc = mlx5e_psp_rx_spi_alloc,
- 	.tx_key_add   = mlx5e_psp_assoc_add,
- 	.tx_key_del   = mlx5e_psp_assoc_del,
-+	.key_rotate   = mlx5e_psp_key_rotate,
- };
- 
- void mlx5e_psp_unregister(struct mlx5e_priv *priv)
--- 
-2.47.1
-
+ - Haiyang
 
