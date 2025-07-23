@@ -1,183 +1,146 @@
-Return-Path: <netdev+bounces-209309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86752B0EFDF
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 12:30:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35A12B0EFEE
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 12:36:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 912853A871D
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:30:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C64A1AA38B7
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:36:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECF46284671;
-	Wed, 23 Jul 2025 10:30:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83B2028466F;
+	Wed, 23 Jul 2025 10:35:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WZFeCun8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FY6pKQq8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487484204E;
-	Wed, 23 Jul 2025 10:30:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 545F027FB16;
+	Wed, 23 Jul 2025 10:35:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753266647; cv=none; b=D5u6v+MVpzefxtV3X7LfU/cdOijGspIiDHI0ZpxUtC8YjVAFYwAP0+bDmCjhwpaZ6ADMhGu2TwgUYZCzvPa/MWFmWxmrEYKvWkGwOeJuHoe4YfCwHz2N1wEbeaHHgpQcaDeE/MZfvGXWUer+T06/vy19jIKBRgfIwZCLk7tq1xo=
+	t=1753266957; cv=none; b=QAm3yowDBL78q8Ps3xCf+4UcpLo6Y23wJ4QYgO5a6rnaKrtnYnNHM4aoPgg0O4jRmNNAMcgh2rXoM1TuKTQFkLc+xqoC7HgwCOJunlKRXPnH8JWPyGrXlaePnU76IZu5plWvslk3ob4CVQm4VZbzoYjToIBfKqOlz3w6joL0pRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753266647; c=relaxed/simple;
-	bh=ZrYyFE1RNxcg54HRe+wiJ/9APC6lKR7QItphur8ntNI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lv1p0j4wKtkY+J5y1jWBLzUIhPdmaOdPIwPPGRnRGZwBIRv0YR8Z3dCvR56gscDMwr0hJ9Br1vatFm8EKus2jq9MPMV0aX+V/AYJyUefVCuGYl9dasvBYtY5m42PaU7jOdkNqB+EUXr6WyaL3k0AaoQ/4NVO5WxZjLH6dZJCiag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WZFeCun8; arc=none smtp.client-ip=209.85.219.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e8d7122c3a5so5597088276.1;
-        Wed, 23 Jul 2025 03:30:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753266645; x=1753871445; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LA7ngCL+inJRE+v5ucYQaFMllQEH7zLcZ73D/ihvwEw=;
-        b=WZFeCun8NPSONBks4RkXsVinb6Gvj3d06WyIg5lTbgxWb5YuMpP6rv1NMJUdAdRmGy
-         ZBfyD1p0rfvBBmyDiFbPlNSnf1hIFP2e/5ZpJ0XfV9nRiE53Vlv95FguZU7OTH1vXMdA
-         PV8tyzHABJ+0TMJ/N79n9Tshs6+fIY2GXfET3tqq4j+D0V+3HbN/5GaLcz5D1Vufu2Oz
-         yJWTsCT1y1K/tg0BHfAL7SqTs85VtGVj1rxFep/pb3jyzgdcEkRkpBw+kzS3B3wcy5Ho
-         3n2QVde4L/k6LucSx3eVngZHGw9LokbcYPPG4Th8W4xOtWZ3dDuevxvBEpJyooUW7HVK
-         lJhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753266645; x=1753871445;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LA7ngCL+inJRE+v5ucYQaFMllQEH7zLcZ73D/ihvwEw=;
-        b=NZAMeMp7tp8Coi/GAxaISf0jf9v1lk2Nu6AkR4CVpG6nOD550y76OX3EMnHhleej3R
-         cSkpBI//gHEgyjVsCbEY+bLaeUKjfAf0gNd5U2CMlr1f8bbXHNEvOwzelFHKjSz8furv
-         i6zlxi+IORwTHYV0Re8dTDCzGhrejArrtkXyuoKUFs/OeWFMx7DLylz7QE0Cb1iWLL1D
-         eL0a0o4sPju+epAVf3SCKhp45wmmY7SKnR52i5sV/rXCqpyim4G8D80vlxxtIC93E4qo
-         6xc+BcBiwSAA+saSthprmPelmTxUs6Jhe08+Ma2hRYGSLDoQaPjjT5JTuC/zC6FoRdge
-         5ZdA==
-X-Forwarded-Encrypted: i=1; AJvYcCUKdooei4MfnQCzJW0gNWlBGddQZ+OtWKr09kMgVYS9nU73+Kd7fmb9mfYT1Gsb135REZowWy9baDHQ@vger.kernel.org, AJvYcCUMdkf9n97zhH3R28WeVDul5pJ2Yf/M/vo3S76JmzUxs6y6XdErqy+zZNB5DI1xnGjuWPt6CCYq@vger.kernel.org, AJvYcCUe5iM/Sa9/YOXteew7nImwPt2XTnDr48tsxMEZ+xwbpmHgyhhHWZ2hzNI8qJZxxrvQi4od0P0P/dq19a+8@vger.kernel.org, AJvYcCVeZ+GAFTPcOk7o2avic4Y0XxdGryxovEXVVq3ddQ4/nT7zjjbYj5nZDZyctRKi6JzUsEwhcO5khjz+@vger.kernel.org, AJvYcCVmKpfkAIjrTohp3q4eemxMKLkU1YTFGK1g59CWUYXeZl2UTwh4TU15ip8iBZG3ZsQLMd65rczHVlHeNnbHVXk=@vger.kernel.org, AJvYcCWYKH5v5Dzcr/3B5Xny8eOeEGuL0pEbvgv14o37z1Vb8uZTyZmmM0RSe2mHtgjazPYxZzekb2Iknqs3I8Y=@vger.kernel.org, AJvYcCWpNtQOJuhqfj+dYcfO6mX+KRKj6NjjH1oPydtU+gd+wjYauZurERQcY21jSDQWYbznZepvPvSzDfefeA==@vger.kernel.org, AJvYcCX6HbW13g0gXtMcuNgDrwvONDIBRY9L1c5Uq7m15pgri3HdqWMlHFEhJZeZQv2hqTzY6f/AwSyADNUY@vger.kernel.org, AJvYcCXYlf1ZzCw1IlVvvF0lN82iIczJRu6NMxu3TYYg3jYHHgi4Bs/YUVeYGj2uUKFX4uHk4aMlJj0m/tA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQPVJGoBRNfTnekNmnf+sRy/Udr+qlmpBfDFXKGRf+M52XwbEV
-	hfQLJMifsWd/TdHoniOb8hy3NDOeNm5fMk3Y8vZs1Z4+E3fWZd0Nz7l0p4P2xHeAcA9/ULbdHZJ
-	Zb7ML1p5MW1T0Xsm0LB5KFnHFdVAHjvg=
-X-Gm-Gg: ASbGncuHaxxnMVIRoPg8HHpt8m3SMxbSq6uZYCKhZq9VS1S6caLF/Twz3r7t6jqQMo5
-	FzYNjObAbpEPtbQawEiKGrb2Hsng1ZrcaB87flR0vCpQgdofg3Z8XyViGzm8SxHBuj8z1UelNEy
-	olZdkFhpuk+8PvbFUV2vk7IN30DRJPyWNPidbtm/FQ1ceT8e3jMKBNBLz7TW4em/L1sQld3i4k5
-	BbuSLBk2IbaJEAvoQW4fh8frrefdRoMY4Ol40Y7qA==
-X-Google-Smtp-Source: AGHT+IGtjUwHyzHtKQ4mrqvi8yeQhMpiGpkgpDBx25yEpA8Cdc5zRk5eSD0faXJ+bObKq5lWLxM0HxvU9SBSEJ+05TM=
-X-Received: by 2002:a05:690c:3601:b0:718:4095:89bc with SMTP id
- 00721157ae682-719b4227127mr32013927b3.22.1753266644983; Wed, 23 Jul 2025
- 03:30:44 -0700 (PDT)
+	s=arc-20240116; t=1753266957; c=relaxed/simple;
+	bh=cJeftLriWrLbVNEaXDZWfCkVPaVSCfDT05EzFNVqUKc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dwtLits7vhdLeL14YekiHyxsG8udqwBYky1oBPDb+nwil3qs3+jp8YLDl3Vd9ZfwYG0P5Aw41McgEVBEakcH2te5CqjxtA7pYeerj11n+DmrbPnFcgbO4cwodSvVjGcFdzn7H4VgIW2EA6wajIxyqIHdh7+ilGkdLlAg78/r/1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FY6pKQq8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FEC9C4CEE7;
+	Wed, 23 Jul 2025 10:35:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753266956;
+	bh=cJeftLriWrLbVNEaXDZWfCkVPaVSCfDT05EzFNVqUKc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FY6pKQq8oN0l6sVsEmuTeRmNQqpswc2aywTudkIVIcFBcHQsaqjbvfDVAQ33Ubw/F
+	 gMS0SmR81MtFn+ZCiA7XhMVUpXrY+fAVytHk4k9qj0f8EPkZ3kdeoa6we3p/vQz4G6
+	 7RaaYqStg+1PL2lS9SJJ6touGJUAWuZNSWbJNnxQc0LnaRGIkjEiti0yRo7V21uxjJ
+	 F/qm6OahJ6xeIjZqp4tz7jjuUKAo2H6vOjlIB/OmNKBnKjEBYVeOxE+kxxIuw7u0Du
+	 L3/uuquHeN0BsL3YIaSun2Iq22dedSMvg3yyg8ntgYadL29gsNFJ0jrkPjcWKgsTXu
+	 SlgcpfPtfiPYg==
+Date: Wed, 23 Jul 2025 11:35:49 +0100
+From: Simon Horman <horms@kernel.org>
+To: Fan Gong <gongfan1@huawei.com>
+Cc: Zhu Yikai <zhuyikai1@h-partners.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, linux-doc@vger.kernel.org,
+	Jonathan Corbet <corbet@lwn.net>,
+	Bjorn Helgaas <helgaas@kernel.org>, luosifu <luosifu@huawei.com>,
+	Xin Guo <guoxin09@huawei.com>,
+	Shen Chenyang <shenchenyang1@hisilicon.com>,
+	Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
+	Shi Jing <shijing34@huawei.com>,
+	Fu Guiming <fuguiming@h-partners.com>,
+	Meny Yossefi <meny.yossefi@huawei.com>,
+	Gur Stavi <gur.stavi@huawei.com>, Lee Trager <lee@trager.us>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Suman Ghosh <sumang@marvell.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Joe Damato <jdamato@fastly.com>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: Re: [PATCH net-next v10 6/8] hinic3: Mailbox framework
+Message-ID: <20250723103549.GY2459@horms.kernel.org>
+References: <cover.1753152592.git.zhuyikai1@h-partners.com>
+ <6233841053851b93390df642f65b2bc4c4646abe.1753152592.git.zhuyikai1@h-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250715025626.968466-1-a0282524688@gmail.com> <20250723095856.GT11056@google.com>
-In-Reply-To: <20250723095856.GT11056@google.com>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Wed, 23 Jul 2025 18:30:33 +0800
-X-Gm-Features: Ac12FXxeadozV19JFZpQNzkVZb_LJVxV9KJ9zIVS_BiMIAH5J9MrfqpSvwxvedo
-Message-ID: <CAOoeyxUBHDu8=wKkV7TdUGTqc-At-WD6TMY-qKG1dTu-w83DmA@mail.gmail.com>
-Subject: Re: [PATCH v14 0/7] Add Nuvoton NCT6694 MFD drivers
-To: Lee Jones <lee@kernel.org>
-Cc: tmyu0@nuvoton.com, linus.walleij@linaro.org, brgl@bgdev.pl, 
-	andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, 
-	linux@roeck-us.net, jdelvare@suse.com, alexandre.belloni@bootlin.com, 
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6233841053851b93390df642f65b2bc4c4646abe.1753152592.git.zhuyikai1@h-partners.com>
 
-Dear Lee,
+On Tue, Jul 22, 2025 at 03:18:45PM +0800, Fan Gong wrote:
 
-Thanks a lot for all the help so far!
-Appreciate your support -- looking forward to seeing it merged.
+...
 
+> +static void recv_mbox_handler(struct hinic3_mbox *mbox,
+> +			      u64 *header, struct hinic3_msg_desc *msg_desc)
+> +{
+> +	void *mbox_body = MBOX_BODY_FROM_HDR(((void *)header));
+> +	u64 mbox_header = *header;
+> +	u8 seq_id, seg_len;
+> +	int pos;
+> +
+> +	if (!mbox_segment_valid(mbox, msg_desc, mbox_header)) {
+> +		msg_desc->seq_id = MBOX_SEQ_ID_MAX_VAL;
+> +		return;
+> +	}
+> +
+> +	seq_id = MBOX_MSG_HEADER_GET(mbox_header, SEQID);
+> +	seg_len = MBOX_MSG_HEADER_GET(mbox_header, SEG_LEN);
+> +
+> +	pos = seq_id * MBOX_SEG_LEN;
+> +	memcpy((u8 *)msg_desc->msg + pos, mbox_body, seg_len);
 
-Best regards,
-Ming
+It would be nice if msg_desc->msg and mbox_body had more meaningful types
+than void *. If they are being treated as an array of bytes, then
+maybe u8 *?
 
-Lee Jones <lee@kernel.org> =E6=96=BC 2025=E5=B9=B47=E6=9C=8823=E6=97=A5 =E9=
-=80=B1=E4=B8=89 =E4=B8=8B=E5=8D=885:59=E5=AF=AB=E9=81=93=EF=BC=9A
->
-> On Tue, 15 Jul 2025, a0282524688@gmail.com wrote:
->
-> > From: Ming Yu <a0282524688@gmail.com>
-> >
-> > This patch series introduces support for Nuvoton NCT6694, a peripheral
-> > expander based on USB interface. It models the chip as an MFD driver
-> > (1/7), GPIO driver(2/7), I2C Adapter driver(3/7), CANfd driver(4/7),
-> > WDT driver(5/7), HWMON driver(6/7), and RTC driver(7/7).
-> >
-> > The MFD driver implements USB device functionality to issue
-> > custom-define USB bulk pipe packets for NCT6694. Each child device can
-> > use the USB functions nct6694_read_msg() and nct6694_write_msg() to iss=
-ue
-> > a command. They can also request interrupt that will be called when the
-> > USB device receives its interrupt pipe.
-> >
-> > The following introduces the custom-define USB transactions:
-> >       nct6694_read_msg - Send bulk-out pipe to write request packet
-> >                          Receive bulk-in pipe to read response packet
-> >                          Receive bulk-in pipe to read data packet
-> >
-> >       nct6694_write_msg - Send bulk-out pipe to write request packet
-> >                           Send bulk-out pipe to write data packet
-> >                           Receive bulk-in pipe to read response packet
->
-> [...]
->
-> > Ming Yu (7):
-> >   mfd: Add core driver for Nuvoton NCT6694
-> >   gpio: Add Nuvoton NCT6694 GPIO support
-> >   i2c: Add Nuvoton NCT6694 I2C support
-> >   can: Add Nuvoton NCT6694 CANFD support
-> >   watchdog: Add Nuvoton NCT6694 WDT support
-> >   hwmon: Add Nuvoton NCT6694 HWMON support
-> >   rtc: Add Nuvoton NCT6694 RTC support
-> >
-> >  MAINTAINERS                         |  12 +
-> >  drivers/gpio/Kconfig                |  12 +
-> >  drivers/gpio/Makefile               |   1 +
-> >  drivers/gpio/gpio-nct6694.c         | 499 +++++++++++++++
-> >  drivers/hwmon/Kconfig               |  10 +
-> >  drivers/hwmon/Makefile              |   1 +
-> >  drivers/hwmon/nct6694-hwmon.c       | 949 ++++++++++++++++++++++++++++
-> >  drivers/i2c/busses/Kconfig          |  10 +
-> >  drivers/i2c/busses/Makefile         |   1 +
-> >  drivers/i2c/busses/i2c-nct6694.c    | 196 ++++++
-> >  drivers/mfd/Kconfig                 |  15 +
-> >  drivers/mfd/Makefile                |   2 +
-> >  drivers/mfd/nct6694.c               | 388 ++++++++++++
-> >  drivers/net/can/usb/Kconfig         |  11 +
-> >  drivers/net/can/usb/Makefile        |   1 +
-> >  drivers/net/can/usb/nct6694_canfd.c | 832 ++++++++++++++++++++++++
-> >  drivers/rtc/Kconfig                 |  10 +
-> >  drivers/rtc/Makefile                |   1 +
-> >  drivers/rtc/rtc-nct6694.c           | 297 +++++++++
-> >  drivers/watchdog/Kconfig            |  11 +
-> >  drivers/watchdog/Makefile           |   1 +
-> >  drivers/watchdog/nct6694_wdt.c      | 307 +++++++++
-> >  include/linux/mfd/nct6694.h         | 102 +++
-> >  23 files changed, 3669 insertions(+)
-> >  create mode 100644 drivers/gpio/gpio-nct6694.c
-> >  create mode 100644 drivers/hwmon/nct6694-hwmon.c
-> >  create mode 100644 drivers/i2c/busses/i2c-nct6694.c
-> >  create mode 100644 drivers/mfd/nct6694.c
-> >  create mode 100644 drivers/net/can/usb/nct6694_canfd.c
-> >  create mode 100644 drivers/rtc/rtc-nct6694.c
-> >  create mode 100644 drivers/watchdog/nct6694_wdt.c
-> >  create mode 100644 include/linux/mfd/nct6694.h
->
-> I will apply this the other side of the pending merge-window.
->
-> --
-> Lee Jones [=E6=9D=8E=E7=90=BC=E6=96=AF]
+> +
+> +	if (!MBOX_MSG_HEADER_GET(mbox_header, LAST))
+> +		return;
+> +
+> +	msg_desc->msg_len = MBOX_MSG_HEADER_GET(mbox_header, MSG_LEN);
+> +	msg_desc->msg_info.status = MBOX_MSG_HEADER_GET(mbox_header, STATUS);
+> +
+> +	if (MBOX_MSG_HEADER_GET(mbox_header, DIRECTION) == MBOX_MSG_RESP)
+> +		resp_mbox_handler(mbox, msg_desc);
+> +}
+> +
+> +void hinic3_mbox_func_aeqe_handler(struct hinic3_hwdev *hwdev, u8 *header,
+> +				   u8 size)
+> +{
+> +	u64 mbox_header = *((u64 *)header);
+> +	enum mbox_msg_direction_type dir;
+> +	struct hinic3_msg_desc *msg_desc;
+> +	struct hinic3_mbox *mbox;
+> +	u16 src_func_id;
+> +
+> +	mbox = hwdev->mbox;
+> +	dir = MBOX_MSG_HEADER_GET(mbox_header, DIRECTION);
+> +	src_func_id = MBOX_MSG_HEADER_GET(mbox_header, SRC_GLB_FUNC_IDX);
+> +	msg_desc = get_mbox_msg_desc(mbox, dir, src_func_id);
+> +	recv_mbox_handler(mbox, (u64 *)header, msg_desc);
+
+I would suggest dropping the cast and changing recv_mbox_handler()
+to expect header to be a u8 *. I think you can then drop the cast above,
+the one at of the argument passed to MBOX_BODY_FROM_HDR()
+and the one inside MBOX_BODY_FROM_HDR().
+
+I'd also suggest that MBOX_BODY_FROM_HDR be changed to a
+static function so there is some type checking of the argument.
+
+> +}
+
+...
 
