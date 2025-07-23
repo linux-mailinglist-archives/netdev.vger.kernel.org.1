@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-209549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDEA1B0FD3A
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 01:19:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5DB9B0FD3B
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 01:19:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D91635435A8
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 23:19:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0B76968132
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 23:19:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A23D22D786;
-	Wed, 23 Jul 2025 23:19:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C04926C3BE;
+	Wed, 23 Jul 2025 23:19:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qkArfUW7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UjpFl0l4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72898A95C
-	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 23:19:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47B08A95C
+	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 23:19:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753312762; cv=none; b=KExcfYwVWka1yUY2dEkjmooZGwIUDhRTd3FtTxNdH6v1w05om2NLxv0s0d58OgZQANASZ+QPvQnaqVIc0tQu2eCaUIBWE75gnW8WZ+sPEoW4peSLeZA57lE4i4ju2nZbIVPKWBGegvWssMb4LuYJnW5fYqE8TpcpBUlpjlgHVhA=
+	t=1753312766; cv=none; b=Vk1G/E3Hd1RhtXmIKJ3MSY74JJSOQad0WdDbSTMu5hX2ZFRQFJg4+lK8F1dJS/jGY12aRKzevzoNrWDRaHFFlQX9SosH/TxLVejBcCziAxDVLYV22XorX8zfbJEkvkdyfeVzAFdgE9y1AhmpJ0bNSwKxHn2OVixQCWX9ypXuzoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753312762; c=relaxed/simple;
-	bh=xMRkc3hMEooERsYGMs3Q39oDE/IWErsDq+4OWl6ggGc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=K4txtZsKf7cp+2Q25NPSF98yPOS63dcSnT505/LokOzrPo2fFDXLHIhmbc/Qqu4p1acIbY76LCj4HInAo0oy/p3b+hKYrDPeiNSZ5tgCG2EFFrNwXorZfOoJfC6bw+EyOJLPxEfNZp+Fb9l7JFgdhHO3YoS/6ztPIXfIvLQAt0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qkArfUW7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D65FFC4CEE7;
-	Wed, 23 Jul 2025 23:19:21 +0000 (UTC)
+	s=arc-20240116; t=1753312766; c=relaxed/simple;
+	bh=ZyzirJh2YHdHfr8ZO3cTwhmuIpqiNW/lQtb1WaKD29o=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=aqG7RL5T3POnGnIayJH9RmhbrxeMlP+2OHpTDIsO+2jB2Bup8DZQTEYGplqyutkcH94aswWfScDFoCnPS1DM8D+b9MgZXcy88CzuST+7F1/av4OaeU7qQ5t2TPK3neVo9N0KP7HcAkaHUi+sp+tR39N6LZVwHXkQ9VZl9OusVq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UjpFl0l4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6B2AC4CEE7;
+	Wed, 23 Jul 2025 23:19:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753312761;
-	bh=xMRkc3hMEooERsYGMs3Q39oDE/IWErsDq+4OWl6ggGc=;
-	h=From:To:Cc:Subject:Date:From;
-	b=qkArfUW7XalkEj7xkXsUraWJzbER2zC4yd1lBYWdMy9TolT1OL/sKjTb6EDyrL/+b
-	 91JrqBbKrj5vANMC20WJ97aJVTixJ7iaVkZSLNkUFOtDQUYgT0i4JsmvYEKtyrYSh4
-	 v/1WC4WsKNygCstq4cY0a8ZPojNZ7M9512SeURhUxnI/t8pZ0g+XWykesVEsiBW+UU
-	 dXt6EGrtB/2q/yxwdNOTAOIH0Io5APyKWHJYjAem1pvrs+UMny2cRh4zQGjuoCUl0h
-	 xPHSin04PwYZZbm6380pWffZ9g3tBrpQuZg8mN9kbExMXWengasKm12Um8Cv43yZud
-	 yO4ckshxr5wVg==
+	s=k20201202; t=1753312765;
+	bh=ZyzirJh2YHdHfr8ZO3cTwhmuIpqiNW/lQtb1WaKD29o=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=UjpFl0l4xj+ShGwFBOwmnuvr0T55x0ABathnJI5cgjHIpsNmpC1KoB8vNBm2soITx
+	 BcQ6Mqudn2Hyd/0XO6eWPWV1MJN72RAuqtQUKu7n0QDuf9fGpn+zkvRUEqUQ6gqtcD
+	 jZrO1FcHHd6txvMdbi6PNIE7SLafS0hGmoIF9OVaIEOvpZjsY7Tp1GWhpLsgDPu+xm
+	 B13C8rZv8KD5DNSZaK8L5Lt27uVW4wexUvNA0qPaYcpaaHalYnOHKXBDpWi5Q80d0B
+	 C2NvgG6QtHh/a0fyVE1qLUqrt/SynAWFpXJxXm4I6E7B4CtpFzuqK+rzyeRLElik0+
+	 90XcHpNkCoh7w==
 From: Kees Cook <kees@kernel.org>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: Kees Cook <kees@kernel.org>,
@@ -50,168 +51,82 @@ Cc: Kees Cook <kees@kernel.org>,
 	Kuniyuki Iwashima <kuniyu@google.com>,
 	Willem de Bruijn <willemb@google.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH 0/6 net-next] net: Introduce struct sockaddr_unspec
-Date: Wed, 23 Jul 2025 16:19:07 -0700
-Message-Id: <20250723230354.work.571-kees@kernel.org>
+Subject: [PATCH 1/6 net-next] net: uapi: Add __kernel_sockaddr_unspec for sockaddr of unknown length
+Date: Wed, 23 Jul 2025 16:19:08 -0700
+Message-Id: <20250723231921.2293685-1-kees@kernel.org>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250723230354.work.571-kees@kernel.org>
+References: <20250723230354.work.571-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7563; i=kees@kernel.org; h=from:subject:message-id; bh=xMRkc3hMEooERsYGMs3Q39oDE/IWErsDq+4OWl6ggGc=; b=owGbwMvMwCVmps19z/KJym7G02pJDBmNue9yFWf8eNRg27j+ztO0y9ticn9I5R0SSt1/kfugl JzyxUu1HaUsDGJcDLJiiixBdu5xLh5v28Pd5yrCzGFlAhnCwMUpABO53sjIsKPT0yJYcsLXZaHz JZnN7yeGdHF5J6ZptB/zD9g/J6+2jeGfuodrqbb01YUO0fxJh/rLlq1e9polfv1FhfsRXOZ32A5 zAgA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2006; i=kees@kernel.org; h=from:subject; bh=ZyzirJh2YHdHfr8ZO3cTwhmuIpqiNW/lQtb1WaKD29o=; b=owGbwMvMwCVmps19z/KJym7G02pJDBmNue9lo9N6Lx/KXD/Zl+nIuRuPpsWs6Oa8I6H5O3uJb Z5xOUdxRykLgxgXg6yYIkuQnXuci8fb9nD3uYowc1iZQIYwcHEKwESEIhgZPi2frXP8pMr/rki9 S8VmUcutGD/eMWh5y5xqOyO+9d+V64wMr5MWHXd/Z+GYmBWXc1Fk/0xnoc2mdgs+Nq0tKXvO3iT ADQA=
 X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 
-Hi,
+Add flexible sockaddr structure to support addresses longer than the
+traditional 14-byte struct sockaddr::sa_data limitation. This allows the
+network APIs to pass around a pointer to an object that isn't lying to
+the compiler about how big it is.
 
-The historically fixed-size struct sockaddr is part of UAPI and embedded
-in many existing structures. The kernel uses struct sockaddr extensively
-within the kernel to represent arbitrarily sized sockaddr structures,
-which caused problems with the compiler's ability to determine object
-sizes correctly. The "temporary" solution was to make sockaddr explicitly
-use a flexible array, but this causes problems for embedding struct
-sockaddr in structures, where once again the compiler has to guess about
-the size of such objects.
+I added this to UAPI in the hopes that it could also be used for any
+future "arbitrarily sized" sockaddr needs. But it may be better to
+use a different UAPI with an explicit size member:
 
-Switching to sockaddr_storage internally everywhere wastes a lot of memory,
-so we are left with needing two changes:
-- introduction of an explicitly arbitrarily sized sockaddr struct
-- switch struct sockaddr back to being fixed size
+struct sockaddr_unspec {
+	u16 sa_data_len;
+	u16 sa_family;
+	u8  sa_data[] __counted_by(sa_data_len);
+};
 
-Doing the latter step requires all "arbitrarily sized" uses of struct
-sockaddr to be replaced with the new struct from the first step.
+Signed-off-by: Kees Cook <kees@kernel.org>
+---
+ include/linux/net.h         |  2 ++
+ include/uapi/linux/socket.h | 15 +++++++++++++++
+ 2 files changed, 17 insertions(+)
 
-So, introduce the new struct and start the conversions.
-
-Thanks!
-
--Kees
-
-
-Kees Cook (6):
-  net: uapi: Add __kernel_sockaddr_unspec for sockaddr of unknown length
-  net/l2tp: Add missing sa_family validation in
-    pppol2tp_sockaddr_get_info
-  net: Convert proto_ops bind() callbacks to use sockaddr_unspec
-  net: Convert proto_ops connect() callbacks to use sockaddr_unspec
-  net: Remove struct sockaddr from net.h
-  net: Convert proto callbacks from sockaddr to sockaddr_unspec
-
- include/linux/bpf-cgroup.h                |  6 +++---
- include/linux/net.h                       | 11 ++++++-----
- include/net/inet_common.h                 | 13 ++++++-------
- include/net/ip.h                          |  4 ++--
- include/net/ipv6.h                        | 10 +++++-----
- include/net/ipv6_stubs.h                  |  2 +-
- include/net/ping.h                        |  2 +-
- include/net/sctp/sctp.h                   |  2 +-
- include/net/sock.h                        | 14 +++++++-------
- include/net/tcp.h                         |  2 +-
- include/net/udp.h                         |  2 +-
- include/net/vsock_addr.h                  |  2 +-
- include/uapi/linux/socket.h               | 15 +++++++++++++++
- net/rds/rds.h                             |  2 +-
- net/smc/smc.h                             |  4 ++--
- crypto/af_alg.c                           |  2 +-
- drivers/block/drbd/drbd_receiver.c        |  6 +++---
- drivers/infiniband/hw/erdma/erdma_cm.c    |  6 +++---
- drivers/infiniband/sw/siw/siw_cm.c        |  8 ++++----
- drivers/isdn/mISDN/l1oip_core.c           |  2 +-
- drivers/isdn/mISDN/socket.c               |  4 ++--
- drivers/net/ppp/pppoe.c                   |  2 +-
- drivers/net/ppp/pptp.c                    |  4 ++--
- drivers/net/wireless/ath/ath10k/qmi.c     |  2 +-
- drivers/net/wireless/ath/ath11k/qmi.c     |  2 +-
- drivers/net/wireless/ath/ath12k/qmi.c     |  2 +-
- drivers/nvme/host/tcp.c                   |  4 ++--
- drivers/nvme/target/tcp.c                 |  2 +-
- drivers/slimbus/qcom-ngd-ctrl.c           |  2 +-
- drivers/target/iscsi/iscsi_target_login.c |  2 +-
- drivers/xen/pvcalls-back.c                |  4 ++--
- fs/afs/rxrpc.c                            |  6 +++---
- fs/coredump.c                             |  2 +-
- fs/dlm/lowcomms.c                         |  8 ++++----
- fs/ocfs2/cluster/tcp.c                    |  6 +++---
- fs/smb/client/connect.c                   |  4 ++--
- fs/smb/server/transport_tcp.c             |  4 ++--
- net/9p/trans_fd.c                         |  6 +++---
- net/appletalk/ddp.c                       |  4 ++--
- net/atm/pvc.c                             |  4 ++--
- net/atm/svc.c                             |  4 ++--
- net/ax25/af_ax25.c                        |  4 ++--
- net/bluetooth/hci_sock.c                  |  2 +-
- net/bluetooth/iso.c                       |  6 +++---
- net/bluetooth/l2cap_sock.c                |  4 ++--
- net/bluetooth/rfcomm/core.c               |  6 +++---
- net/bluetooth/rfcomm/sock.c               |  4 ++--
- net/bluetooth/sco.c                       |  4 ++--
- net/caif/caif_socket.c                    |  2 +-
- net/can/bcm.c                             |  2 +-
- net/can/isotp.c                           |  2 +-
- net/can/j1939/socket.c                    |  4 ++--
- net/can/raw.c                             |  2 +-
- net/ceph/messenger.c                      |  2 +-
- net/core/filter.c                         |  4 ++--
- net/core/sock.c                           |  6 +++---
- net/ieee802154/socket.c                   | 12 ++++++------
- net/ipv4/af_inet.c                        | 12 ++++++------
- net/ipv4/datagram.c                       |  4 ++--
- net/ipv4/ping.c                           |  8 ++++----
- net/ipv4/raw.c                            |  3 ++-
- net/ipv4/tcp.c                            |  2 +-
- net/ipv4/tcp_ipv4.c                       |  4 ++--
- net/ipv4/udp.c                            |  6 ++++--
- net/ipv4/udp_tunnel_core.c                |  4 ++--
- net/ipv6/af_inet6.c                       |  6 +++---
- net/ipv6/datagram.c                       |  8 ++++----
- net/ipv6/ip6_udp_tunnel.c                 |  4 ++--
- net/ipv6/ping.c                           |  2 +-
- net/ipv6/raw.c                            |  3 ++-
- net/ipv6/tcp_ipv6.c                       |  6 +++---
- net/ipv6/udp.c                            |  5 +++--
- net/l2tp/l2tp_core.c                      |  8 ++++----
- net/l2tp/l2tp_ip.c                        |  6 ++++--
- net/l2tp/l2tp_ip6.c                       |  5 +++--
- net/l2tp/l2tp_ppp.c                       |  9 ++++++++-
- net/llc/af_llc.c                          |  4 ++--
- net/mctp/af_mctp.c                        |  2 +-
- net/mctp/test/route-test.c                |  2 +-
- net/mptcp/pm_kernel.c                     |  4 ++--
- net/mptcp/protocol.c                      |  5 +++--
- net/mptcp/subflow.c                       |  4 ++--
- net/netfilter/ipvs/ip_vs_sync.c           |  6 +++---
- net/netlink/af_netlink.c                  |  4 ++--
- net/netrom/af_netrom.c                    |  4 ++--
- net/nfc/llcp_sock.c                       |  6 +++---
- net/nfc/rawsock.c                         |  2 +-
- net/packet/af_packet.c                    |  4 ++--
- net/phonet/pep.c                          |  3 ++-
- net/phonet/socket.c                       |  6 +++---
- net/qrtr/af_qrtr.c                        |  4 ++--
- net/qrtr/ns.c                             |  2 +-
- net/rds/af_rds.c                          |  2 +-
- net/rds/bind.c                            |  2 +-
- net/rds/tcp_connect.c                     |  4 ++--
- net/rds/tcp_listen.c                      |  2 +-
- net/rose/af_rose.c                        |  4 ++--
- net/rxrpc/af_rxrpc.c                      |  4 ++--
- net/rxrpc/rxperf.c                        |  2 +-
- net/sctp/socket.c                         | 13 +++++++------
- net/smc/af_smc.c                          |  6 +++---
- net/socket.c                              | 12 ++++++------
- net/sunrpc/clnt.c                         |  6 +++---
- net/sunrpc/svcsock.c                      |  2 +-
- net/sunrpc/xprtsock.c                     |  6 +++---
- net/tipc/socket.c                         |  6 +++---
- net/unix/af_unix.c                        | 12 ++++++------
- net/vmw_vsock/af_vsock.c                  |  6 +++---
- net/vmw_vsock/vsock_addr.c                |  2 +-
- net/x25/af_x25.c                          |  4 ++--
- net/xdp/xsk.c                             |  2 +-
- 111 files changed, 278 insertions(+), 245 deletions(-)
-
+diff --git a/include/linux/net.h b/include/linux/net.h
+index ec09620f40f7..77de581bdd56 100644
+--- a/include/linux/net.h
++++ b/include/linux/net.h
+@@ -26,6 +26,8 @@
+ 
+ #include <uapi/linux/net.h>
+ 
++#define sockaddr_unspec __kernel_sockaddr_unspec
++
+ struct poll_table_struct;
+ struct pipe_inode_info;
+ struct inode;
+diff --git a/include/uapi/linux/socket.h b/include/uapi/linux/socket.h
+index d3fcd3b5ec53..2667dd64fd0f 100644
+--- a/include/uapi/linux/socket.h
++++ b/include/uapi/linux/socket.h
+@@ -26,6 +26,21 @@ struct __kernel_sockaddr_storage {
+ 	};
+ };
+ 
++/**
++ * struct __kernel_sockaddr_unspec - Unspecified size sockaddr for callbacks
++ * @sa_family: Address family (AF_UNIX, AF_INET, AF_INET6, etc.)
++ * @sa_data: Flexible array for address data
++ *
++ * This structure is designed for callback interfaces where the
++ * total size is known via the sockaddr_len parameter. Unlike struct
++ * sockaddr which has a fixed 14-byte sa_data limit, this structure
++ * can accommodate addresses of any size.
++ */
++struct __kernel_sockaddr_unspec {
++	__kernel_sa_family_t	sa_family;	/* address family, AF_xxx */
++	char			sa_data[];	/* flexible address data */
++};
++
+ #define SOCK_SNDBUF_LOCK	1
+ #define SOCK_RCVBUF_LOCK	2
+ 
 -- 
 2.34.1
 
