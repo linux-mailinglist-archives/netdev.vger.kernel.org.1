@@ -1,75 +1,77 @@
-Return-Path: <netdev+bounces-209199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9D61B0E9CB
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 06:48:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5212B0E9D4
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 06:50:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12D5F3A40A3
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 04:48:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FF4D9607B1
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 04:49:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D84F51C84C7;
-	Wed, 23 Jul 2025 04:48:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1D1721ADA2;
+	Wed, 23 Jul 2025 04:49:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FEBi6hqY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XDwsdq71"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D3D3151991
-	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 04:48:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F25F21B9C9
+	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 04:49:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753246119; cv=none; b=CygvpV0BP2c9s4YBcT67WgIlGBEG59IEsIflK7z7mpUww9ylbxmH7YXNgk0RxDi3BU14+NtFW3fmecxZAiTNjoI/lNhPwEL91WOx6ktMQ+0GAAMhU/irEHNOKuyL3RcHgUOWdLK1/dV2nsyyRqSBKJrU1SegNo+kyF0gWQa4r/c=
+	t=1753246199; cv=none; b=TVH4Oz8kombsDQlZn9FaK4w6h3RbEoT05QkMDrnVmVm9W1T3f8TQULi6DSAQoXCGnf2zirQ1bFy6IhZdu08l834CZvq2tv+d95EqpGnqfjcVDjcj/JcaPkmvgQplMssHbf+ACRO3nm8c1m4mU4niCmKCAAPdlqY0EwxNcNa8Z7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753246119; c=relaxed/simple;
-	bh=qNjmRPPIJN5Zjpha05dmWoSkyDjdBWOVgWeDdaqiQpY=;
+	s=arc-20240116; t=1753246199; c=relaxed/simple;
+	bh=1+i5fwHsssFH8fer9hR+N6BmV3M+1an/8DwXt1LUWZ4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hy3NRRpo8UaLojTGHgRnFjW2MNXtwTOXxIdfOMAVoYZEPZbvggC8omTbGwbqILRA1oy3A5VhRwYPo4tKI+xiQbzVSjQCys6SyKYRu74Wn0qL4ZHYra+CsEz0qXMsTaoF3hRIzuALQwre7Evw382xHbCdH9iPvVgX5rf4xzruLKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FEBi6hqY; arc=none smtp.client-ip=192.198.163.19
+	 Content-Type:Content-Disposition:In-Reply-To; b=ooG2N1EjPkyA6CZCx5vNu1nW5imTdz0Ojtr5FIzkR+p4lrwEPe1bEkM4wqyv/jsW29/Yx1IGMT/OiTer6cogu42nUBmZ6JYB2rfHGB6qhI22oIJh2Shppuk9Ravd/NVnbR2ZmzJOxtxWXO7pFqbrU6zGu6MsY7nSmlVCM26zqu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XDwsdq71; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753246118; x=1784782118;
+  t=1753246198; x=1784782198;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=qNjmRPPIJN5Zjpha05dmWoSkyDjdBWOVgWeDdaqiQpY=;
-  b=FEBi6hqYqDU/qSwL4N+31umbaH3++EJOWNhxlkh/GwSr1WHncy7bgkRB
-   RdxjC/+LX/WQzJSSjAp2tQnvhOAkvU60JHXcsblZ06IPaAjuH6sl+qthR
-   aCWJq7TlQSCVxkEqfTP4UKSqhty0CZPV7Gt78sLlOttLhG2IWVMoqZlo7
-   Ks23Pqmy/MDEfDujTFee1olI+DC9qN3EwsQTNZrwlGbgKjpaNLeGiSOqP
-   SXusNNAsADVhIuTjp8mfiGXKRV91pQAJbfHCH+s2lc9idZR46yxqlxYyu
-   osbc/sWhxL1cBwrLikzB35Nm8h3c+H+2aywzBhaiDviFywS1mLKjDiFS/
-   g==;
-X-CSE-ConnectionGUID: Alc+jd6DTPGEXXyhOAOrFg==
-X-CSE-MsgGUID: oSrNSBepQlersAZnSK1L/g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11500"; a="54613674"
+  bh=1+i5fwHsssFH8fer9hR+N6BmV3M+1an/8DwXt1LUWZ4=;
+  b=XDwsdq71cLlO2GSU6i6iqbGZZyuyed7zuNaLK6z7hju+zFE93FaguKRK
+   XiFRNXS2OQAcD3oBbYmJrBL5QAcLKNfz45vrgoAUtbafRtEWdFQkNbwJw
+   qSUh5oYUrXEgoUiJF+IBD0ivcHRJI964RmBfTVu8L7251lL6bpt8OEHkR
+   dRivxCnEPka3zkeffzXfUHlvK8+WPDe0V+hWVH2AAaC02uC6UDuDDBQve
+   LmpZD6XNR5sVI6jHAghxEGuaaov7Y2hwjXHwxmksHxbBnqa/ObB0X7ud9
+   PdhSLIiyg18VuZXwuBzSL1t7vBcpppIiB5Z1yZGg1yalTcbEW22gr4A9X
+   w==;
+X-CSE-ConnectionGUID: /QJJ/5W8RWuQhwmD2gNZLg==
+X-CSE-MsgGUID: Cq7ez+MBSr+v3X/Lm4gHqQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11500"; a="55455935"
 X-IronPort-AV: E=Sophos;i="6.16,333,1744095600"; 
-   d="scan'208";a="54613674"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2025 21:48:36 -0700
-X-CSE-ConnectionGUID: sNJc5pEmTV238Zug66iE+w==
-X-CSE-MsgGUID: 5xsNh3H2RwSNGd3ttfay0g==
+   d="scan'208";a="55455935"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2025 21:49:57 -0700
+X-CSE-ConnectionGUID: HYkRLkIRT0ObbXeX4vJvig==
+X-CSE-MsgGUID: XUU0kdGGQd2s737DBzYrvg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,333,1744095600"; 
-   d="scan'208";a="164973226"
+   d="scan'208";a="163561384"
 Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2025 21:48:34 -0700
-Date: Wed, 23 Jul 2025 06:47:25 +0200
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2025 21:49:56 -0700
+Date: Wed, 23 Jul 2025 06:48:51 +0200
 From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Simon Horman <horms@kernel.org>
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
 Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	przemyslaw.kitszel@intel.com, dawid.osuchowski@linux.intel.com
-Subject: Re: [PATCH iwl-next v1 09/15] ice: drop driver specific structure
- from fwlog code
-Message-ID: <aIBpMBCIab9WMUvp@mev-dev.igk.intel.com>
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"dawid.osuchowski@linux.intel.com" <dawid.osuchowski@linux.intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1 02/15] ice: move
+ get_fwlog_data() to fwlog file
+Message-ID: <aIBps1pWsmrZhoDu@mev-dev.igk.intel.com>
 References: <20250722104600.10141-1-michal.swiatkowski@linux.intel.com>
- <20250722104600.10141-10-michal.swiatkowski@linux.intel.com>
- <20250722145428.GM2459@horms.kernel.org>
+ <20250722104600.10141-3-michal.swiatkowski@linux.intel.com>
+ <IA3PR11MB8986DF9CBA9DD7D092D11D14E55CA@IA3PR11MB8986.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,60 +80,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250722145428.GM2459@horms.kernel.org>
+In-Reply-To: <IA3PR11MB8986DF9CBA9DD7D092D11D14E55CA@IA3PR11MB8986.namprd11.prod.outlook.com>
 
-On Tue, Jul 22, 2025 at 03:54:28PM +0100, Simon Horman wrote:
-> On Tue, Jul 22, 2025 at 12:45:54PM +0200, Michal Swiatkowski wrote:
-> > In debugfs pass ice_fwlog structure instead of ice_pf.
+On Tue, Jul 22, 2025 at 12:02:52PM +0000, Loktionov, Aleksandr wrote:
+> 
+> 
+> > -----Original Message-----
+> > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> > Of Michal Swiatkowski
+> > Sent: Tuesday, July 22, 2025 12:46 PM
+> > To: intel-wired-lan@lists.osuosl.org
+> > Cc: netdev@vger.kernel.org; Kitszel, Przemyslaw
+> > <przemyslaw.kitszel@intel.com>; dawid.osuchowski@linux.intel.com;
+> > Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> > Subject: [Intel-wired-lan] [PATCH iwl-next v1 02/15] ice: move
+> > get_fwlog_data() to fwlog file
 > > 
-> > The debgufs dirs specific for fwlog can be stored in fwlog structure.
+> > Change the function prototype to receive hw structure instead of pf to
+> > simplify the call. Instead of passing whole event pass only msg_buf
+> > pointer and length.
 > > 
-> > Add debugfs entry point to fwlog api.
+> > Make ice_fwlog_ring_full() static as it isn't  called from any other
+> > context.
 > > 
 > > Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 > > Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> 
-> ...
-> 
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_debugfs.c b/drivers/net/ethernet/intel/ice/ice_debugfs.c
-> 
-> ...
-> 
-> > @@ -580,9 +569,10 @@ static const struct file_operations ice_debugfs_data_fops = {
-> >  
-> >  /**
-> >   * ice_debugfs_fwlog_init - setup the debugfs directory
-> > - * @pf: the ice that is starting up
-> > + * @fwlog: pointer to the fwlog structure
-> > + * @root: debugfs root entry on which fwlog director will be registered
-> >   */
-> > -void ice_debugfs_fwlog_init(struct ice_pf *pf)
-> > +void ice_debugfs_fwlog_init(struct ice_fwlog *fwlog, struct dentry *root)
+> > ---
+> >  drivers/net/ethernet/intel/ice/ice_fwlog.c | 27 +++++++++++++++++++-
+> > drivers/net/ethernet/intel/ice/ice_fwlog.h |  2 +-
+> > drivers/net/ethernet/intel/ice/ice_main.c  | 29 ++--------------------
+> >  3 files changed, 29 insertions(+), 29 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/intel/ice/ice_fwlog.c
+> > b/drivers/net/ethernet/intel/ice/ice_fwlog.c
+> > index e48856206648..ea5d6d2d3f30 100644
+> > --- a/drivers/net/ethernet/intel/ice/ice_fwlog.c
+> > +++ b/drivers/net/ethernet/intel/ice/ice_fwlog.c
+> > @@ -6,7 +6,7 @@
+> >  #include "ice_common.h"
+> >  #include "ice_fwlog.h"
+> > 
+> > -bool ice_fwlog_ring_full(struct ice_fwlog_ring *rings)
+> > +static bool ice_fwlog_ring_full(struct ice_fwlog_ring *rings)
 > >  {
-> >  	struct dentry *fw_modules_dir;
-> >  	struct dentry **fw_modules;
-> > @@ -598,41 +588,39 @@ void ice_debugfs_fwlog_init(struct ice_pf *pf)
-> >  
-> >  	pf->ice_debugfs_pf_fwlog = debugfs_create_dir("fwlog",
-> >  						      pf->ice_debugfs_pf);
-> 
-> pf no longer exists in this context.
+> >  	u16 head, tail;
+> > 
+> Can you consider adding kernel-doc for ice_fwlog_ring_full()?
 > 
 
-Right, sorry, I missed that. I will build check each commit before
-sending v2.
-
-Thanks
-
-> > -	if (IS_ERR(pf->ice_debugfs_pf_fwlog))
-> > +	if (IS_ERR(fwlog->debugfs))
-> >  		goto err_create_module_files;
-> >  
-> > -	fw_modules_dir = debugfs_create_dir("modules",
-> > -					    pf->ice_debugfs_pf_fwlog);
-> > +	fw_modules_dir = debugfs_create_dir("modules", fwlog->debugfs);
-> >  	if (IS_ERR(fw_modules_dir))
-> >  		goto err_create_module_files;
-> 
-> ...
+I will add it.
 
