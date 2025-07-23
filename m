@@ -1,121 +1,148 @@
-Return-Path: <netdev+bounces-209276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 453CFB0EE15
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 11:09:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4818EB0EE17
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 11:10:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 754D6566E18
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 09:09:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB127188531D
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 09:09:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36128283C8C;
-	Wed, 23 Jul 2025 09:09:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Dobyz5Ug"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5AA72820DC;
+	Wed, 23 Jul 2025 09:09:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EEEB283137
-	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 09:09:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35BA9283137
+	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 09:09:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753261770; cv=none; b=Xehq9VsrL2EMfS/o6XEGSchvjSZghMbe3ZaL2Th/knE3iqwTWCAUjA4Xw5jzZmyJfkAfNweBh49oYRNwe1BiMXd+bqX/IKxR27IKHS1yEo8PMFuqyZpOUAdXw3joQ0FKDML4N2GhW0nMPFAI8ZzPd89X8HHboTUVW6VkP660CIA=
+	t=1753261777; cv=none; b=qLo5BWQIoTCneEf8oCGYJJo0jHwo4KwVIKW45Y4AFj5lXxJuL4Wt9VuVQllJG8aFMDq5C1f0OKy9JvrvDL7JTc5PnXF9VdNKvBDbM8potIF/6UxL3o1fgNBH2fGUAIfEc4nYaQey5xN1CuPK+u/pHdNHeAF/7tV5D0Eiff+H8OQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753261770; c=relaxed/simple;
-	bh=+ytYnD3luDBYq9P4nCMvymvEEpfDPNQbSLnTtC4hmEw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=OTSDyb2o43wWmR7rliWCBfav++QI3jo8lEFLyqfCqHst8KgqcpdAjZGKXiXykgpKp5dT6R42rXgdUGOJmXcdR7Nwl5DR8CixLUQvDlSH5D6e+sVLyl6Ntlhy44wrPbfU6G/c4iEnxc4L/ek4Kr5azFccu4fHBimqZQHj2pHtMSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=Dobyz5Ug; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ae0d7b32322so1013271566b.2
-        for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 02:09:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1753261767; x=1753866567; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2zcV36T8m2bDfLjZ71K3Nn6DOnILgi1eLJ8ygProCpU=;
-        b=Dobyz5UghswWZ3YrUZhnvIqA0N0jisQ50PXWi4Jd5OHY9bQpcxAeCgs7Les7ttqH05
-         0TkhQKY0fO7fVcMVN98sEvrT+cFUunfm7sVcJD8YeulARXmsl3aaJ9YPl02FoMFAmOH2
-         T3xChhKW7rDypPUM33jhMN7oekKNlIaN0N3OpADSerXdlkTslYt4a53uAi4CewWUNSsJ
-         pwVIgiSJP94FI6TU9Ag4LOHfxCcx5n7k6inxbxZgHF1pA/Nm3nICpL+5rgwRSUq7eqXY
-         NqYSQpXm40SqgWbYP1cejOaAbr9nldxqO0uomtDV/bkM/52xyxFx9aVJjnJdZd9BHMo2
-         sSnA==
+	s=arc-20240116; t=1753261777; c=relaxed/simple;
+	bh=/yGUGKAhGBPBrwTTEOjI9B+HkXKztIO+0eBa5uesc3s=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=E2KFoxTxD/CNfwMq3sSSGBvtVLhTQUlU9ivYOWJDc3IubWECfjQmHAbZD13vvHG110F3SjL5FIZ5iFohuFj9IJ6SYTKXassWpoNFLcs5b+M8OcAO6/nX6CgqxNTa4BZeNU8LksqcCKdTHQ8A3JP9oq9HhRVwiZy501ygUeJp4hM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-87c1d1356f3so429342539f.0
+        for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 02:09:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753261767; x=1753866567;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2zcV36T8m2bDfLjZ71K3Nn6DOnILgi1eLJ8ygProCpU=;
-        b=SvLvgXI6KWuUGtXWZH6BTlafaCS7MDtT42Zjzw8sv8hRbvb7k+oO7GxlI49nXlNaVg
-         zh9F3omkvq96YeDLavl2tQGe3JDfKQ1MRsvIzKJJ7cNybEtDQJ88/3/kTGMzWYK+f5hN
-         bPqaYmZLRxkqeQzLJfLTJG0CbvSKaob7vpusBZZcqIMBtluype029kq+GKLHTPxxLE4S
-         PaF7CrAf3IZUUBEQtO36VtXaTVSU3NmT4XUrM8Rj/EvwXSUJkAIxAecKLSiAm26Ty+Bc
-         AiN3DFLkQ+sWgfV7c/b9JJvRSbN5IbHm2TEzVGlepUoSn7cycsHH/erBUuvpsWJTiGt+
-         cQ6g==
-X-Forwarded-Encrypted: i=1; AJvYcCWOc0p9dNKYbsHW4rv2Xkg/VVZbNczHGghS+4ffLykKfr1PQX5kmNaS3wlKVrogXEBhVdqJt0I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxx5CiHQqJZLAZwnvDdUckEUYGbejzBPJjox53eKJR8nS38PWdy
-	P+Ti60YgSqlmZLaMmmjR9TGd1Do9gXlkiXuf2s4zi0fdUP3fP2D0/QwmEa76881cBnM=
-X-Gm-Gg: ASbGncsnkQjAY7h/lMKoWMy9yw3Lj0QRMQ5HcIbawqPmQh/kQJQbGibFnAm5CWIlFlL
-	d7JWYSypGiCyKOCkZoE1r4Wwti481zqyNJju0TSuicN6awoKLpCs1lgjj7x57HhTbwIWqb5kiOK
-	kNOiJyr+fx7OPCvHACqPVg2ccP1IIeKfTju94+w89Ou9iVmyKIeY8wlMsOINX39KYHL1e3CFGQ6
-	XGnMNrYevm1Thyocrw//47EIkFZfIlwcRhutgfwcnmmLD3XLjQW8XZIfuTI8dT8WtGa73/ofGYU
-	GgM/rdfxivLE+BiX94VL+QjARn8I9w5XQNg500tLAmCOFyykSkO1j73iieu8oR5DSLE8wSWgL/h
-	1JYHDJ1ytMHmgu2Q=
-X-Google-Smtp-Source: AGHT+IFppVFkyEpOyB0CPplf4xKmqV75wZQ/fIWHvCo3wyJNQ+QDWQbCFvBJ3QOnmHHOIlenUkvO2w==
-X-Received: by 2002:a17:907:1ca9:b0:ae0:cadc:e745 with SMTP id a640c23a62f3a-af2f8e51179mr201694266b.40.1753261766446;
-        Wed, 23 Jul 2025 02:09:26 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:54])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aec6c7d5255sm1008043966b.40.2025.07.23.02.09.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Jul 2025 02:09:25 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Eduard Zingerman <eddyz87@gmail.com>
-Cc: bpf@vger.kernel.org,  Alexei Starovoitov <ast@kernel.org>,  Andrii
- Nakryiko <andrii@kernel.org>,  Arthur Fabre <arthur@arthurfabre.com>,
-  Daniel Borkmann <daniel@iogearbox.net>,  Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Jesper Dangaard
- Brouer <hawk@kernel.org>,  Jesse Brandeburg <jbrandeburg@cloudflare.com>,
-  Joanne Koong <joannelkoong@gmail.com>,  Lorenzo Bianconi
- <lorenzo@kernel.org>,  Martin KaFai Lau <martin.lau@linux.dev>,  Toke
- =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <thoiland@redhat.com>,  Yan Zhai
- <yan@cloudflare.com>,
-  kernel-team@cloudflare.com,  netdev@vger.kernel.org,  Stanislav Fomichev
- <sdf@fomichev.me>
-Subject: Re: [PATCH bpf-next v3 10/10] selftests/bpf: Cover read/write to
- skb metadata at an offset
-In-Reply-To: <addca8ce8c3c51bbd147175406e9da84fbc9c1e7.camel@gmail.com>
-	(Eduard Zingerman's message of "Tue, 22 Jul 2025 13:30:05 -0700")
-References: <20250721-skb-metadata-thru-dynptr-v3-0-e92be5534174@cloudflare.com>
-	<20250721-skb-metadata-thru-dynptr-v3-10-e92be5534174@cloudflare.com>
-	<addca8ce8c3c51bbd147175406e9da84fbc9c1e7.camel@gmail.com>
-Date: Wed, 23 Jul 2025 11:09:24 +0200
-Message-ID: <87a54vxohn.fsf@cloudflare.com>
+        d=1e100.net; s=20230601; t=1753261775; x=1753866575;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TvFG3sQTKMwo29OtOJz9i/cr+68WnmlBBDZAn9btd1A=;
+        b=wBnrLw1qNfg2vTmZi569hffM15pIg7G1oiyMu9IY0a/l0jMiY4wcdhEPrxpRVuammZ
+         xiaCk1XS3rS2sLmPqc5sySs+oMVCXjibM9YIUyPSJ/7fVAC6NVYpdbEy292Dt4jhV8su
+         z305o+voxBaWupQxwGjbZ/JhaYIL0v98wn6Qd9DOkYuwc7RO3LbXBLND+bSjIviHYeuN
+         RM9bdiy4325yZfnO3RGwSWdlkVnnMlKxVtGm9rc64NeYEwAqsOsYeeK+cwvVkSy4ALHt
+         5SDKskssZq7moxrEWv+lJAksqUD+1kk9DuzywRhV6X2Hlu+qou8WoUENub0uRe1dWQLV
+         +l8w==
+X-Forwarded-Encrypted: i=1; AJvYcCX7HZaZ4+73YI+t3YMUrEDQesIgFhfRQql3jTvuWyJwRrzq2K885DYY1oMtA7tiDEHq5MiLj6o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1pXHk1gG7VVFTYtbpIrMqiR22WnWx/gWnbu3hu2aJ2TgYu0my
+	A+xXY3fhQeSJqqXaLjWI0oXLmwH2h8E0XvPo4b5Cn/Il75dJgbXjbhvq0NHZkA+DWuJZtNlU45r
+	H8v/3dmVMTbVYU5FhT7NBH6i2Zn9PzxEGKcoaLA3DvmpWAzYGnzYp2FilQRo=
+X-Google-Smtp-Source: AGHT+IFAeZxnWZN6oyV6j+V0s/nOmFK6pRexyplCpc2+fX0UQLepZSpXUWTIKp0c4WkSDYL6cj51kYBhiyyzzpLl/WkoydOWc6oG
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-Received: by 2002:a05:6602:3a0d:b0:875:ba1e:4d7e with SMTP id
+ ca18e2360f4ac-87c64fbb367mr491673439f.6.1753261775276; Wed, 23 Jul 2025
+ 02:09:35 -0700 (PDT)
+Date: Wed, 23 Jul 2025 02:09:35 -0700
+In-Reply-To: <20250722210256.143208-1-sdf@fomichev.me>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6880a6cf.050a0220.40ccf.0000.GAE@google.com>
+Subject: [syzbot ci] Re: vrf: Drop existing dst reference in vrf_ip6_input_dst
+From: syzbot ci <syzbot+ci7bed65dd2de1adbd@syzkaller.appspotmail.com>
+To: andrew@lunn.ch, davem@davemloft.net, dsahern@kernel.org, 
+	edumazet@google.com, horms@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	sdf@fomichev.me
+Cc: syzbot@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Jul 22, 2025 at 01:30 PM -07, Eduard Zingerman wrote:
-> On Mon, 2025-07-21 at 12:52 +0200, Jakub Sitnicki wrote:
->> Exercise r/w access to skb metadata through an offset-adjusted dynptr,
->> read/write helper with an offset argument, and a slice starting at an
->> offset.
->> 
->> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
->> ---
->
-> Maybe also add a test case checking error conditions for out of bounds
-> metadata access?
+syzbot ci has tested the following series
 
-Crossed my mind. I was on the fence here, asking myself:
+[v1] vrf: Drop existing dst reference in vrf_ip6_input_dst
+https://lore.kernel.org/all/<20250722210256.143208-1-sdf@fomichev.me>
+* [PATCH net 1/2] vrf: Drop existing dst reference in vrf_ip6_input_dst
+* [PATCH net 2/2] net: Warn when overriding referenced dst entry
 
-do we need a test for dynptr OOB checks for each dynptr kind?
+and found the following issue:
+WARNING in nf_reject_fill_skb_dst
 
-I decided at that time that we don't, but happy to add it. Doesn't hurt.
+Full report is available here:
+https://ci.syzbot.org/series/c92e1af5-3b8b-4c26-8104-acca93ad8939
+
+***
+
+WARNING in nf_reject_fill_skb_dst
+
+tree:      net
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
+base:      cf074eca0065bc5142e6004ae236bb35a2687fdf
+arch:      amd64
+compiler:  Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+config:    https://ci.syzbot.org/builds/235c4af3-77ea-4670-9c9e-9de1ef0a5aa6/config
+syz repro: https://ci.syzbot.org/findings/1038832f-72d8-4491-9ac9-28339d31f0f7/syz_repro
+
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 12 at ./include/linux/skbuff.h:1165 nf_reject_fill_skb_dst+0x313/0x3b0
+Modules linked in:
+CPU: 1 UID: 0 PID: 12 Comm: kworker/u8:0 Not tainted 6.16.0-rc6-syzkaller-00135-gcf074eca0065-dirty #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Workqueue: ipv6_addrconf addrconf_dad_work
+RIP: 0010:nf_reject_fill_skb_dst+0x313/0x3b0
+Code: 8b 0d f1 35 98 08 48 3b 8c 24 e0 00 00 00 75 6b 48 8d 65 d8 5b 41 5c 41 5d 41 5e 41 5f 5d e9 54 19 69 01 cc e8 9e 7e b8 f7 90 <0f> 0b 90 e9 43 ff ff ff e8 90 7e b8 f7 90 0f 0b 90 e9 e3 fe ff ff
+RSP: 0018:ffffc900001e0360 EFLAGS: 00010246
+RAX: ffffffff8a07aa52 RBX: ffff888110f75500 RCX: ffff88801c2f5640
+RDX: 0000000000000100 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffffc900001e0490 R08: ffffffff8fa1d6f7 R09: 1ffffffff1f43ade
+R10: dffffc0000000000 R11: fffffbfff1f43adf R12: ffff888110f75501
+R13: dffffc0000000001 R14: 1ffff9200003c070 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff8881a3c22000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00002000000000c0 CR3: 000000001ff6e000 CR4: 00000000000006f0
+Call Trace:
+ <IRQ>
+ nf_send_unreach+0x17b/0x700
+ nft_reject_inet_eval+0x4bc/0x690
+ nft_do_chain+0x40c/0x1920
+ nft_do_chain_inet+0x25d/0x340
+ nf_hook_slow+0xc5/0x220
+ NF_HOOK+0x206/0x3a0
+ __netif_receive_skb+0x143/0x380
+ process_backlog+0x60e/0x14f0
+ __napi_poll+0xc7/0x480
+ net_rx_action+0x707/0xe30
+ handle_softirqs+0x286/0x870
+ do_softirq+0xec/0x180
+ </IRQ>
+ <TASK>
+ __local_bh_enable_ip+0x17d/0x1c0
+ __dev_queue_xmit+0x1cd7/0x3a70
+ ip6_finish_output2+0x11fe/0x16a0
+ ndisc_send_skb+0xc77/0x1500
+ ndisc_send_ns+0xcb/0x150
+ addrconf_dad_work+0xaae/0x14b0
+ process_scheduled_works+0xae1/0x17b0
+ worker_thread+0x8a0/0xda0
+ kthread+0x711/0x8a0
+ ret_from_fork+0x3fc/0x770
+ ret_from_fork_asm+0x1a/0x30
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
