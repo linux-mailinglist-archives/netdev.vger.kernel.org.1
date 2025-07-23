@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-209258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90A4BB0ED34
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:29:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFC4DB0ED3D
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:31:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8ECE3A64C8
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 08:28:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2149E1761B3
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 08:31:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EA3227A455;
-	Wed, 23 Jul 2025 08:29:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3369A2701CE;
+	Wed, 23 Jul 2025 08:31:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V3XTApcN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bYn6ZMBY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68EA227990C;
-	Wed, 23 Jul 2025 08:29:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 044151E2834;
+	Wed, 23 Jul 2025 08:31:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753259354; cv=none; b=bSMva54aK14znflxh9/nEbj0V4iKUeW25asli9McIkceSBHcJ+cZcisHwtozbaWTFNwwD333E7M8uDWAGuaLX3Ov0B577B/m5GW2Xz6pSwMgQbJnSXeeMbcFjypU06njC65jft4ju/GNmqU3TIOHQISk/8rD9+5iLfF8M7oEqXc=
+	t=1753259482; cv=none; b=rb5OebLeDFhL42nveRS3RpvbfcJhoFEDAD1o+bsgvFLTUMQUtjKbNJcm6K6WsDWeG5iLR+LNK+81IZ+dkhGp8X7YfIN7srMWR0Aohrtr5j/Aapd7jQ8QQiWxcOWJiMXV32LDZDUdIGWjIQqnzu4jN5/+UHfB4P5APgdLcuty+Ho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753259354; c=relaxed/simple;
-	bh=SJ8fc2NpnCO+no1eSN/RzEnPIgifibyaw8VNSVwphgY=;
+	s=arc-20240116; t=1753259482; c=relaxed/simple;
+	bh=Yv2j22Qo5jPgR1rVLrYGgJrexiV+ALN2HPlv6/TwoRo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PE9VGJ3Iyslzo5soG4hMoUvpG3N4iF0yROYzzbm0z5lUzI2QKwUU3oJfy6jjz7boZEAdhNtcvVl/Sj2o1hkA+ljlW5pRMlpChxv3a7t/tTWCsKsUxlAHMgrhIGCcPEq03YhPPqzxpeL0sI/ZTbgn2KPiV2ph4vNWOTucw9xBdks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V3XTApcN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EFFAC4CEE7;
-	Wed, 23 Jul 2025 08:29:13 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=RW0vq+o9Zfros6Do7UObg/d/sCQaqvHBbmadJgPBMomMVYhhS6Ob33Eu4EefSI+AWMpvH6jqg82ik97LMx5RgUmSQIL7i1NzA6R+wRHN3/MPVI2/wrqN3xgP+vP6ERcGi4alg8QXhF+B6sL0O+32Yqml22WYGlrt9RmGBRTCRBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bYn6ZMBY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3EAAC4CEE7;
+	Wed, 23 Jul 2025 08:31:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753259354;
-	bh=SJ8fc2NpnCO+no1eSN/RzEnPIgifibyaw8VNSVwphgY=;
+	s=k20201202; t=1753259481;
+	bh=Yv2j22Qo5jPgR1rVLrYGgJrexiV+ALN2HPlv6/TwoRo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=V3XTApcNWd1pc3mPG8K5ztgs6uCHnGz1/oExjWITCGHivkYc0nk5s7d0YtkUSrGZC
-	 cQIbzh/vP89MG37vfY1FOUHkT5kcLyMWTT2+mjcJUmpCCEIfXrQHuk0HgIWVh5RD8i
-	 4oVcAPPOlrz2ANTg3qY0jAAlcvYrQYpQOwlE31mwXAGc80jfP54N528mjU5n1hpQNa
-	 2bdybs6fVpaIwkjii1nDaYd1W/42J7niU+rgk5omiNgktxnTNV+Yjy22SpaU9L4W2q
-	 PkkLjGfX3uKBw2L0wMHN1UOibsBNFLyfGoTVgtQg73IBQRMJ9iKKWHopvGVcVk0OQB
-	 CGPiKOyD+eucA==
-Date: Wed, 23 Jul 2025 10:29:11 +0200
+	b=bYn6ZMBYnETAyWdsGNd5VHMeDCzHx5hb/UT8nY0S5DdTR0NWuETC4odeUF0ZY+yP0
+	 SKFEbtsfxhbKndsI7zZqmISv3uqbmDPbqDNcu/d9Fwf+9kMQZCyCVXaZykixwRncuY
+	 mb/TQ6aM2AUPX4hNcIR2dlm4Z1pMCblZzxTBQuMED5aLdjLiTqX11Ahn4MG8oaaskz
+	 obkmecWufQEasLaB84FGIMaP+pc2ssl5BNGg93zOJGmBDJpGAQXoCrp3YBU0JMKiHp
+	 77jFeyklpiWQ/142OvytoE8AS//hRp15RAoRGNFbuEvI2fM77FbnyHK4A5zWV5jIu4
+	 raNBgBfYDxiJQ==
+Date: Wed, 23 Jul 2025 10:31:18 +0200
 From: Krzysztof Kozlowski <krzk@kernel.org>
 To: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
 Cc: Bjorn Andersson <andersson@kernel.org>, 
@@ -49,10 +49,11 @@ Cc: Bjorn Andersson <andersson@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
 	Richard Cochran <richardcochran@gmail.com>, linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kernel@oss.qualcomm.com
-Subject: Re: [PATCH 1/7] arm64: dts: qcom: Rename sa8775p SoC to "lemans"
-Message-ID: <20250723-swinging-chirpy-hornet-eed2f2@kuoka>
+Subject: Re: [PATCH 5/7] arm64: dts: qcom: lemans: Rename boards and clean up
+ unsupported platforms
+Message-ID: <20250723-foamy-stallion-of-competence-e8d900@kuoka>
 References: <20250722144926.995064-1-wasim.nazir@oss.qualcomm.com>
- <20250722144926.995064-2-wasim.nazir@oss.qualcomm.com>
+ <20250722144926.995064-6-wasim.nazir@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,27 +62,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250722144926.995064-2-wasim.nazir@oss.qualcomm.com>
+In-Reply-To: <20250722144926.995064-6-wasim.nazir@oss.qualcomm.com>
 
-On Tue, Jul 22, 2025 at 08:19:20PM +0530, Wasim Nazir wrote:
-> SA8775P, QCS9100 and QCS9075 are all variants of the same die,
-> collectively referred to as lemans. Most notably, the last of them
-> has the SAIL (Safety Island) fused off, but remains identical
-> otherwise.
+On Tue, Jul 22, 2025 at 08:19:24PM +0530, Wasim Nazir wrote:
+> Rename qcs9100 based ride-r3 board to lemans ride-r3 and use it for all
+> the IoT ride-r3 boards.
+> Rename sa8775p based ride/ride-r3 boards to lemans-auto ride/ride-r3,
+> to allow users to run with old automotive memory-map.
 > 
-> In an effort to streamline the codebase, rename the SoC DTSI, moving
-> away from less meaningful numerical model identifiers.
+> Remove support for qcs9100-ride, as no platform currently uses it.
 > 
 > Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
 > ---
->  arch/arm64/boot/dts/qcom/{sa8775p.dtsi => lemans.dtsi} | 0
->  arch/arm64/boot/dts/qcom/sa8775p-ride.dtsi             | 2 +-
+>  arch/arm64/boot/dts/qcom/Makefile                    |  7 +++----
+>  .../{sa8775p-ride-r3.dts => lemans-auto-ride-r3.dts} |  6 +++---
+>  .../qcom/{sa8775p-ride.dts => lemans-auto-ride.dts}  |  6 +++---
+>  .../qcom/{sa8775p-pmics.dtsi => lemans-pmics.dtsi}   |  0
+>  .../qcom/{qcs9100-ride-r3.dts => lemans-ride-r3.dts} | 12 +++++++++---
 
-No, stop with this rename.
+I cannot stress more how HUGE MESS you made over the time.
 
-There is no policy of renaming existing files. It's ridicilous. Just
-because you introduced a new naming model for NEW SOC, does not mean you
-now going to rename all boards which you already upstreamed.
+All the discussions one and two years ago about SA8775p mess.... and now
+you just call everything lemans.
+
+Srsly, this is just irresponsibler. It's like random moves from
+Qualcomm. Whatever you decided, stay with it. Take ownership and
+responsibility, not change minds just because manager asked you to do
+something. Say no to the manager.
+
+NAK.
 
 Best regards,
 Krzysztof
