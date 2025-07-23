@@ -1,268 +1,248 @@
-Return-Path: <netdev+bounces-209486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF50DB0FB2D
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 21:55:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0C20B0FB2F
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 21:55:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC98B963405
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 19:54:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D1921CC1CF9
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 19:56:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D33832153F1;
-	Wed, 23 Jul 2025 19:55:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A6FA230BCC;
+	Wed, 23 Jul 2025 19:55:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wygj/4lL"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="JWRW5M7t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SJ2PR03CU002.outbound.protection.outlook.com (mail-westusazon11023101.outbound.protection.outlook.com [52.101.44.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3671A1A23A0
-	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 19:54:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753300501; cv=none; b=ri323S5QZOiwW/cgEJVU6vGMm+q52Pk7hgWsx1z68gGTn4+51Qq08hTXIiFQne9mezaYxFi4F1dNQEs8JicoiNediFrQKsfIeCAoRySjlpVFo0r+AfeXWgPVkhZLdx14PFKFA+qgxT4FOMJfV4R4qjHpOQaJRY5WsBU0PlzF8K4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753300501; c=relaxed/simple;
-	bh=zp7K8TDhHz7f0oQCCCHnOFm3TZmOBIzAV0Jm+84Bag4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=PdI5dy/k4vYqxFeJSQ6XGyjrkj89m3/MyOjDEuMT+t9KrfluucC38Gl/7mS3NtOkvsuwZXmIR5sRiGga8LGMPuvyKaDT5RLD7pDiZv1i9NfrpaM1xVrUeQvVIuazaLNfoJgoflHZbb8p0CZ1eyfXR6Zdfgg88w7G5qrWnF7Ssuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wygj/4lL; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-748f13ef248so230593b3a.3
-        for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 12:54:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753300499; x=1753905299; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=X/o96rHaBqkn4juUorQ0ZXUvs2xTloSPhlRAGJTQ7+w=;
-        b=wygj/4lL+74wVOykCXT5aLT8OyHpusBvs8uH8udCSoctCl1Dx6S7p5NuQkRr5e90Bj
-         UmDcaNwO3xEOY3e1lI9SUUZ67AsMtfk/bOf7bCLTkhb8ZakMCJ4liRm6ZDWIL9N3RgXI
-         VQ2fpgsL8hLUaqs8x06d+T9QqNf6qXg7r1nlt51dpox4RKmL9+jNc/boOtBVHj/6gM9N
-         LaDgaAbvMlzLqiKM8PpHxvccRzUX0YOO+6Zzy5QjLY21kluNKBTXy/Fh8yVvieIxaVCw
-         RFx2aO1tsyM9k6aLWPnzhfuU0vi6KJ4bxYySl1Ji1767c+Pr8LWGDfqssq+tDGMlbfo/
-         3SCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753300499; x=1753905299;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=X/o96rHaBqkn4juUorQ0ZXUvs2xTloSPhlRAGJTQ7+w=;
-        b=ZxmBY7MYApK2qVQzVsd39LpkzVx2ZmksAtOe75wy1+x8BMlri6LapB1GY11a+2z5uO
-         ja6aJLc+bTP1DitMHlHHoYoK5TiySfVdgEIbQXwAB5UbjIkQLLfU31iuHplg2qGGSB68
-         4e1q9JJyrxHhGqM71ZBDKBvhdhc1fr/3nPfcWRDI4FiBVTs2foLlsZcWRssxJrGbnmZQ
-         yXQpoJAgnWR2Xq7ZDS0N37+0Uu1Hvk5JRK74hLA1jWR4dRuc0De5HVky4+L1kGsE/G1H
-         oN20oPAbsQTMhJ+2RlGaGkzqRt2RiGYz6FqR2CDgizDQkQJe49O7iMphHUA8MbVspnZV
-         qVwg==
-X-Forwarded-Encrypted: i=1; AJvYcCVxu0tyA9VBa11fqAPKt0kBpsq++A23dFqtTWs6NAeGPrRcGJ0ODVXDMWoOKD8+UM1XC4/R4VY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeZ4kJdBhHpf8CI4bqnPE2l/R/oHmxVY5iRm6zUCN8SUzEpsU7
-	SXCxBL19cKOrIdOXTokC7CuvI/pyUsVTDHjySAG3Ji0sUcmT/fDH1Tj3aG4J46hyt6ubhKebKHP
-	DTGxJ6A==
-X-Google-Smtp-Source: AGHT+IHHnfpirAXwpp5xgzIppj+43AHqV4CfEjzvj2SYLLVEDbu0VS/xlWKLZxStVHP0LD34bfF1vNiiX/k=
-X-Received: from pfbhr20-n2.prod.google.com ([2002:a05:6a00:6b94:20b0:747:abae:78e8])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1acf:b0:748:2cbb:be45
- with SMTP id d2e1a72fcca58-76034de13b5mr5231490b3a.15.1753300499429; Wed, 23
- Jul 2025 12:54:59 -0700 (PDT)
-Date: Wed, 23 Jul 2025 19:53:59 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79FA9200BAE;
+	Wed, 23 Jul 2025 19:55:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.44.101
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753300554; cv=fail; b=Jj8DC6YFZsfCq6Ci/EdbJs+VDa69P71tTX3pbjj8UB5d9tvSeSDVEAZ+ui1E3eKzUwDzBQ0GYXQoYT75xXrbg9sfPzraKeSASYsc5GlE/FpVBiH1lon7eQ4imwj9M0Pg8K4skFocpqjJ8q4qyOWc8uuxvoTBtVuV7wWzUFxf/Jo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753300554; c=relaxed/simple;
+	bh=NbRkuUrANDq5CHoZZRvLOgV6pZsPYSWNURLiv1D8L6E=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=tJKjoOcoS8LaMxUKIleNY+n3otvCObIrRBy8j2tVF7QXC/MFadsVRlDYQT57FSWdvXuVSYzrM6sgel5Oij3qpOFieYVwyTwXSKxeS9EwLsD9U551Phig/CMHG4t8xZ8+Ku6COPdovmtAhIUtnqZqI6KA7LsRT6UtM/TxtZXdZOs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=JWRW5M7t; arc=fail smtp.client-ip=52.101.44.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=v2nMV2kb/wFRobBj4dBWzMFTfL8NPlxb3MRDQfQGldkyuZ7k2U2lO5ufPa5BAW2T3tbQXbcWAx5BV+r4CbWBJqfqO15yzlp3/pNW8akVC6zQbcGyJOQmfrsi/MtwIDYu7fx81unVJzW1b2hau2DTi5MYKtsWYEBzoV9XS3CbGmeX1jf8tKUCo163kDDox9dhFAouqoPIqC78dxcuyrfsVxnc39c11+dKrFaWq2PwOyGsRScvd1xPVR94JSpn0H6SQuSUtxTllNk1zoFk71pmnCSV5rSa95n0P9dqbl8slJ1wrcTQBKYy8FLvqg5sJwDzrNs7BZMwZXixRIgY0Xnpww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AhUN9bYyya9HcQTKRb2Tr9lYZtPkq3KIWG5QNp1HDcE=;
+ b=fgFYYztJkXF20hxFurq0pCqGt0f6xyX/ljKaYIeHfw5Evjxd2wG/rn/pYAw4GOVpx+CR+BkZVDHeICC7CuqekHjo4TkltB3oVn9Gol68Vp8oRTES1ARAD6D+5QvMl4RkDZI4weVDeZ8myQXfK9NVgLZ83JS806nGRzeJVnpSv8oJNrvcKXGhRpqlZgeYhRteXt0RYAW7HPkVR1UEraqqHf2vPp4LI2h/9RHxaQcvSv3K5S5Lg4qBKqrnTvPB/ckSNk4GHI5FqUwUPaRDZhmYW1EdKbD7s3nVa/6nVQhoqFMuN6Q+M2FiuB92N1EKw7tXEband1/T81QokykdFldDog==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AhUN9bYyya9HcQTKRb2Tr9lYZtPkq3KIWG5QNp1HDcE=;
+ b=JWRW5M7tNmkZaHm/DnJq8nfHI7nWFTlls34f5K8feDL9dy4RAcjiUcXuf6RN6uEepe6suownZclwqOXzGfEfH7V4O7zTu5da9EiqU3HyrpWQe78nGCwDYoZIFeNaGzJEC/zI9hY6XCPx5OjGPOoeTR8hx8Ie7i/wWyxr4d21Qyk=
+Received: from SJ2PR21MB4013.namprd21.prod.outlook.com (2603:10b6:a03:546::14)
+ by SJ0PR21MB2016.namprd21.prod.outlook.com (2603:10b6:a03:2aa::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.5; Wed, 23 Jul
+ 2025 19:55:49 +0000
+Received: from SJ2PR21MB4013.namprd21.prod.outlook.com
+ ([fe80::3c6d:58dc:1516:f18]) by SJ2PR21MB4013.namprd21.prod.outlook.com
+ ([fe80::3c6d:58dc:1516:f18%4]) with mapi id 15.20.8964.004; Wed, 23 Jul 2025
+ 19:55:49 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: Dipayaan Roy <dipayanroy@linux.microsoft.com>, "horms@kernel.org"
+	<horms@kernel.org>, "kuba@kernel.org" <kuba@kernel.org>, KY Srinivasan
+	<kys@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui
+	<decui@microsoft.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>, Long Li
+	<longli@microsoft.com>, Konstantin Taranov <kotaranov@microsoft.com>,
+	"ast@kernel.org" <ast@kernel.org>, "daniel@iogearbox.net"
+	<daniel@iogearbox.net>, "hawk@kernel.org" <hawk@kernel.org>,
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "sdf@fomichev.me"
+	<sdf@fomichev.me>, "lorenzo@kernel.org" <lorenzo@kernel.org>,
+	"michal.kubiak@intel.com" <michal.kubiak@intel.com>,
+	"ernis@linux.microsoft.com" <ernis@linux.microsoft.com>,
+	"shradhagupta@linux.microsoft.com" <shradhagupta@linux.microsoft.com>, Shiraz
+ Saleem <shirazsaleem@microsoft.com>, "rosenp@gmail.com" <rosenp@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "ssengar@linux.microsoft.com"
+	<ssengar@linux.microsoft.com>, Dipayaan Roy <dipayanroy@microsoft.com>
+Subject: RE: [PATCH v2] net: mana: Use page pool fragments for RX buffers
+ instead of full pages to improve memory efficiency.
+Thread-Topic: [PATCH v2] net: mana: Use page pool fragments for RX buffers
+ instead of full pages to improve memory efficiency.
+Thread-Index: AQHb/AUBeOoDCPVUaUazwNHsW9rYXbRAHwZw
+Date: Wed, 23 Jul 2025 19:55:49 +0000
+Message-ID:
+ <SJ2PR21MB4013DD021CE6EE505366E83DCA5FA@SJ2PR21MB4013.namprd21.prod.outlook.com>
+References:
+ <20250723190706.GA5291@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+In-Reply-To:
+ <20250723190706.GA5291@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=15485fe5-d475-47f0-9408-2df30c684c9e;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-07-23T19:53:59Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
+ 3, 0, 1;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ2PR21MB4013:EE_|SJ0PR21MB2016:EE_
+x-ms-office365-filtering-correlation-id: cf8ce484-87d7-4757-1bae-08ddca22ebe8
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|376014|7416014|1800799024|921020|7053199007|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?5CXy0LpNuwICJ0h0F9L38DpWvO1XtInpWpZUNDxLSzawrnaBIuQVhRuz9T9p?=
+ =?us-ascii?Q?Q/lpBnl//La2N0rAFeml93Hz5VYRt1HHF5g2VkEp5Ir34OzpMKfBDTAFXGBo?=
+ =?us-ascii?Q?QbszOmyyqgLQRnPpyfYLAJQM7lqJENyEl4j7M3JQi0o7UR6NRQf9jOP/SyzQ?=
+ =?us-ascii?Q?3gcHl0Cmek4Z8pxJTkpG8/cFFqsozM8jZiKApvsPrLJBX913SnaQVRvx2swn?=
+ =?us-ascii?Q?v+v8nIep8FU3AT+4s/ACRObHUZIoXbaKtFD9N5K48L171XUy4idh4mP+GvCz?=
+ =?us-ascii?Q?rHCPrQe9X58cTis8kaIz9125VP7iifyF1I0lZPbSCdtYFgeTuzPDopW9SPUG?=
+ =?us-ascii?Q?SLz+Pp+E8rhktNT75zoUFTecY+lU2vNGQCvMejn+qmo5gmm4cvKSwLzjOCdl?=
+ =?us-ascii?Q?YOyBI0tj+8YWcJNBWEaL9sRzN09tITlYV6GfUNSWcMssRgUoa1Gx62Bcexyh?=
+ =?us-ascii?Q?ivzRUoo2RmQER8PznBt4tw5u2D6lDuCe5aLbHEw1Ox1jDiQVbj3oDST1a6tR?=
+ =?us-ascii?Q?YIC2tQ5oX1dImSoK7xQZs+h9QubtoGYA44Uuzc9w9nIm4TSBovdZqjOU9EDz?=
+ =?us-ascii?Q?C/Zn06KBH500NeF9MOcj0pDqMPqaTpyZ8RlTds7vrWuAOJ8xOOCiiwDO6SzB?=
+ =?us-ascii?Q?0dnFMeuiXux9F3Xg73KOOk9puIpgD19U++y7OQfPOsC9OkR1lQH8h4Yb/laT?=
+ =?us-ascii?Q?MmV0dkZpM3dHGOu8gsIzN5q6RHZXfMcpkI61UzngzHelSgeKnh/0+70sEvaF?=
+ =?us-ascii?Q?gNpDAFrnHDZWnlXR+Ij/hM9J23C0KjWgv5jxS9y8M7Orr30D4UJAqlxx1RJ1?=
+ =?us-ascii?Q?bjC5gfUyWUh50N+uG3Gz3KEV2JLB6oIxdTg58jCde3vHP8XBOXn7lCkVq4eW?=
+ =?us-ascii?Q?QnQUjnBN6gd6dqeO5lvY22+Vggydw1+7tRFY3P7pcbhOFVswSyHmyuV74Jtj?=
+ =?us-ascii?Q?L+xynXTiMwv1uS8UD4/Buf26IiWMPzJtyNFpFV9kbrmD5GSldAjxgiY+mHty?=
+ =?us-ascii?Q?jWi3r3vZ+/u5HNPBnLRhIWks58wM4OnUvOgC01o5NxVU3qwJhMEYYtetJDYe?=
+ =?us-ascii?Q?/RcHj2qqn+nyNL9EeJBv0/dSCFuqhKbRcK0juNz6NUndVKR+grDsj4ERgyM+?=
+ =?us-ascii?Q?pAk8ADgB39iT5hq2CoWIuZtKexpaZUOame0r6LbF2JMgMdrH73fd8gQHiJyu?=
+ =?us-ascii?Q?x8p0bI40nCPtGdYoK5iHxIn47VjbQXLfT0Y4RmyAUtz3xgS+EeANJ+9ObTT3?=
+ =?us-ascii?Q?E7pileE7fVXy44/Zo0ooMxFJbyIa02y25Vgg0q2VYxF4cGHWRLMRS1mq5RyD?=
+ =?us-ascii?Q?WKvKbFd5TewMojNxwxljjR/ItEOeJfL3/TzNqljq39V89uQb1b5xhXbtt+bW?=
+ =?us-ascii?Q?p6x+0zMOhMhkPOyaxONxaSxOF4OKPJwG1SI8Zm7PVyET10UtccFNed4+ZoQN?=
+ =?us-ascii?Q?UlPoa+d+SnsZM647FV/uZnjCRF8NL8oZkFvKazMKNWOWU9RAoKAJvN3lvpI7?=
+ =?us-ascii?Q?BX7JNBxpjyHS4Kw=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR21MB4013.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(921020)(7053199007)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?NffS8qZjEMhgOOEuE3IDCurlhrfo0tyFPOnyVgCoCUoFVYGaVlhRCFOMil1K?=
+ =?us-ascii?Q?K0ywfwUEEIbIdD62SvrzFbwIn+sliUfJCrZZ0E4q7QFn9bJ0E/c+6GJ7UOhF?=
+ =?us-ascii?Q?CAAfCO3e79RJLtOw2fOZXemECvGvmU+WaACqdYReowYO9sO4S3I+04bxvsgo?=
+ =?us-ascii?Q?GRZ/sQyZ8Z4N/77zSrvXKt4gNtwNHPfpeTQSwYE/3gE1QetxwZyFUHeLGDWb?=
+ =?us-ascii?Q?GlX3hgekO22CS7WFFnReYrczAMG7PjCi5hMcb9XxCDNs9t7hcVY+C0LiLXRr?=
+ =?us-ascii?Q?V5g8CZG10PqI3ZgTHsYNzY1xX73xiiW6zR+ezaZcAVJj3sMDbF9dyYYNvARX?=
+ =?us-ascii?Q?wng7dzYENaxluiKfH/o4ebOZ/ffqVEPc7SuulIWXwIrf7N/MfiYI1/9yGKfg?=
+ =?us-ascii?Q?55n56u4dPjqxdBw581r9bFZID9jl5fJ3+XVVzbvzSBNAKQKWuwo9NtFBdraQ?=
+ =?us-ascii?Q?3B5w0wVYnPt2xdHjg6KCWVnq7rDgOtZtM46tw0Ro+sH2KL/enrJTSS6shbmJ?=
+ =?us-ascii?Q?nBu86DbSg6rW2VLjZmFWwPyEBPvzjPoatsxSr2OcfyvU2ajDGg9VXmcuQpHd?=
+ =?us-ascii?Q?yuRF4pC/di8Iup/P+uXq0iECG4buZ4T/NmSEix9D7Cj9hpxxN17SUH9GAJDx?=
+ =?us-ascii?Q?wHg0GPyvr8RKYiB1N+j1F+UPljchqBpQkzGq6UxZOHZLBKqyPb9zZU/IW1QH?=
+ =?us-ascii?Q?KePL2ChTTgW/y7sk2tcZsIGO82kgRRWSY8UHbkvVoDPnWlFhNN9ti+MrXNMs?=
+ =?us-ascii?Q?fKl7oAv7AKVjz1s9L+5O4GSw4lsW35DO5NCty1awJG1RpILLL90LYE7yiTpa?=
+ =?us-ascii?Q?x94KKBrXQa06Zo2zxA3afDCnkraafalg0Z/1OwQb9D0vQy43vGBTSm25OV2g?=
+ =?us-ascii?Q?tg7YMPfv9m8mw8qh9T6MU3D11taZNO/RfTLJLuTQRQW0GgPjFko4abqT/zMt?=
+ =?us-ascii?Q?cUgcQyjrO9WmaGT/XqDOMsroF38KUVqn9W3pCVxYXjbwizpdsiVung/dehHR?=
+ =?us-ascii?Q?lAmNAIUrvpbE3iXzzTl/AWeFSr8VVILjxr6te9c1BXdRV/otHyvqFcN8kAzR?=
+ =?us-ascii?Q?FVLPK7PEfZ72imWJwfPjZNOQdxMYvnfVSb/2sNRuxHXEjegNCGmpr7lpTy1d?=
+ =?us-ascii?Q?4IERP/L+izg022/uUy7ufFF0NVbn2vfn0si94DsAKHy4JyzSkOg6Sj3f3COn?=
+ =?us-ascii?Q?5IRAvvSkICVCyq3jB5ufKj4st0IIrq7n+w90mWPhnlNbAZ79whQkN1ANDqm0?=
+ =?us-ascii?Q?YJLIdmr/4bMZovo+quEe5xHi9T2SAwfzp0isjud2WzgO03NZlIXtTNuSa4GU?=
+ =?us-ascii?Q?w8br/MFTlV5XiOl/4dadrh6KzuJSBPp5CiUow8u5lXHOMjAiw0skXXT2P9+K?=
+ =?us-ascii?Q?pu2IXWtuVJA9NNRkatLa7FrdyXLlOhV50gS6aJ3iLtIU/mPbQ0P7S2fC5/oz?=
+ =?us-ascii?Q?wEpaNvmsf1Sxyt6aFCALmNZi+Q+WQ2yuy+Bxv5EjA4mdtRcXym3u2H82VtNI?=
+ =?us-ascii?Q?vWpt28nK/mBfxOmGiOQuiqUc4I4gKqWGnj+A5B1pp0Bklz+r0U2wODMaTH1M?=
+ =?us-ascii?Q?SebpqaRMnjlPDpSrhU1TfTd38mnaw4mIwOmKXiCG?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.1.470.g6ba607880d-goog
-Message-ID: <20250723195443.448163-1-kuniyu@google.com>
-Subject: [PATCH v1 net] neighbour: Fix null-ptr-deref in neigh_flush_dev().
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Gilad Naaman <gnaaman@drivenets.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	kernel test robot <oliver.sang@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR21MB4013.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cf8ce484-87d7-4757-1bae-08ddca22ebe8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jul 2025 19:55:49.1957
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: yCOwcEWpFUrW17k1BTC2koCT0jmzp3hUDTbC7J46FTZP5sAY0K8xk0awQHlCKSPZwuh7kXx+q+qhgZ90abwBtw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR21MB2016
 
-kernel test robot reported null-ptr-deref in neigh_flush_dev(). [0]
 
-The cited commit introduced per-netdev neighbour list and converted
-neigh_flush_dev() to use it instead of the global hash table.
 
-One thing we missed is that neigh_table_clear() calls neigh_ifdown()
-with NULL dev.
+> -----Original Message-----
+> From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+> Sent: Wednesday, July 23, 2025 3:07 PM
+> To: horms@kernel.org; kuba@kernel.org; KY Srinivasan <kys@microsoft.com>;
+> Haiyang Zhang <haiyangz@microsoft.com>; wei.liu@kernel.org; Dexuan Cui
+> <decui@microsoft.com>; andrew+netdev@lunn.ch; davem@davemloft.net;
+> edumazet@google.com; pabeni@redhat.com; Long Li <longli@microsoft.com>;
+> Konstantin Taranov <kotaranov@microsoft.com>; ast@kernel.org;
+> daniel@iogearbox.net; hawk@kernel.org; john.fastabend@gmail.com;
+> sdf@fomichev.me; lorenzo@kernel.org; michal.kubiak@intel.com;
+> ernis@linux.microsoft.com; shradhagupta@linux.microsoft.com; Shiraz Salee=
+m
+> <shirazsaleem@microsoft.com>; rosenp@gmail.com; netdev@vger.kernel.org;
+> linux-hyperv@vger.kernel.org; linux-rdma@vger.kernel.org;
+> bpf@vger.kernel.org; linux-kernel@vger.kernel.org;
+> ssengar@linux.microsoft.com; Dipayaan Roy <dipayanroy@microsoft.com>
+> Subject: [PATCH v2] net: mana: Use page pool fragments for RX buffers
+> instead of full pages to improve memory efficiency.
+>=20
+> This patch enhances RX buffer handling in the mana driver by allocating
+> pages from a page pool and slicing them into MTU-sized fragments, rather
+> than dedicating a full page per packet. This approach is especially
+> beneficial on systems with large page sizes like 64KB.
+>=20
+> Key improvements:
+>=20
+> - Proper integration of page pool for RX buffer allocations.
+> - MTU-sized buffer slicing to improve memory utilization.
+> - Reduce overall per Rx queue memory footprint.
+> - Automatic fallback to full-page buffers when:
+>    * Jumbo frames are enabled (MTU > PAGE_SIZE / 2).
+>    * The XDP path is active, to avoid complexities with fragment reuse.
+> - Removal of redundant pre-allocated RX buffers used in scenarios like MT=
+U
+>   changes, ensuring consistency in RX buffer allocation.
+>=20
+> Testing on VMs with 64KB pages shows around 200% throughput improvement.
+> Memory efficiency is significantly improved due to reduced wastage in pag=
+e
+> allocations. Example: We are now able to fit 35 rx buffers in a single
+> 64kb
+> page for MTU size of 1500, instead of 1 rx buffer per page previously.
+>=20
+> Tested:
+>=20
+> - iperf3, iperf2, and nttcp benchmarks.
+> - Jumbo frames with MTU 9000.
+> - Native XDP programs (XDP_PASS, XDP_DROP, XDP_TX, XDP_REDIRECT) for
+>   testing the XDP path in driver.
+> - Page leak detection (kmemleak).
+> - Driver load/unload, reboot, and stress scenarios.
+>=20
+> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+>=20
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> Reviewed-by: Saurabh Sengar <ssengar@linux.microsoft.com>
 
-Let's restore the hash table iteration.
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
 
-Note that IPv6 module is no longer unloadable, so neigh_table_clear()
-is called only when IPv6 fails to initialise, which is unlikely to
-happen.
-
-[0]:
-IPv6: Attempt to unregister permanent protocol 136
-IPv6: Attempt to unregister permanent protocol 17
-Oops: general protection fault, probably for non-canonical address 0xdffffc00000001a0: 0000 [#1] SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000d00-0x0000000000000d07]
-CPU: 1 UID: 0 PID: 1 Comm: systemd Tainted: G                T  6.12.0-rc6-01246-gf7f52738637f #1
-Tainted: [T]=RANDSTRUCT
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:neigh_flush_dev.llvm.6395807810224103582+0x52/0x570
-Code: c1 e8 03 42 8a 04 38 84 c0 0f 85 15 05 00 00 31 c0 41 83 3e 0a 0f 94 c0 48 8d 1c c3 48 81 c3 f8 0c 00 00 48 89 d8 48 c1 e8 03 <42> 80 3c 38 00 74 08 48 89 df e8 f7 49 93 fe 4c 8b 3b 4d 85 ff 0f
-RSP: 0000:ffff88810026f408 EFLAGS: 00010206
-RAX: 00000000000001a0 RBX: 0000000000000d00 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffffc0631640
-RBP: ffff88810026f470 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-R13: ffffffffc0625250 R14: ffffffffc0631640 R15: dffffc0000000000
-FS:  00007f575cb83940(0000) GS:ffff8883aee00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f575db40008 CR3: 00000002bf936000 CR4: 00000000000406f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- __neigh_ifdown.llvm.6395807810224103582+0x44/0x390
- neigh_table_clear+0xb1/0x268
- ndisc_cleanup+0x21/0x38 [ipv6]
- init_module+0x2f5/0x468 [ipv6]
- do_one_initcall+0x1ba/0x628
- do_init_module+0x21a/0x530
- load_module+0x2550/0x2ea0
- __se_sys_finit_module+0x3d2/0x620
- __x64_sys_finit_module+0x76/0x88
- x64_sys_call+0x7ff/0xde8
- do_syscall_64+0xfb/0x1e8
- entry_SYSCALL_64_after_hwframe+0x67/0x6f
-RIP: 0033:0x7f575d6f2719
-Code: 08 89 e8 5b 5d c3 66 2e 0f 1f 84 00 00 00 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d b7 06 0d 00 f7 d8 64 89 01 48
-RSP: 002b:00007fff82a2a268 EFLAGS: 00000246 ORIG_RAX: 0000000000000139
-RAX: ffffffffffffffda RBX: 0000557827b45310 RCX: 00007f575d6f2719
-RDX: 0000000000000000 RSI: 00007f575d584efd RDI: 0000000000000004
-RBP: 00007f575d584efd R08: 0000000000000000 R09: 0000557827b47b00
-R10: 0000000000000004 R11: 0000000000000246 R12: 0000000000020000
-R13: 0000000000000000 R14: 0000557827b470e0 R15: 00007f575dbb4270
- </TASK>
-Modules linked in: ipv6(+)
-
-Fixes: f7f52738637f4 ("neighbour: Create netdev->neighbour association")
-Reported-by: kernel test robot <oliver.sang@intel.com>
-Closes: https://lore.kernel.org/oe-lkp/202507200931.7a89ecd8-lkp@intel.com
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- net/core/neighbour.c | 88 ++++++++++++++++++++++++++++++--------------
- 1 file changed, 61 insertions(+), 27 deletions(-)
-
-diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index 49dce9a82295b..a8dc72eda2027 100644
---- a/net/core/neighbour.c
-+++ b/net/core/neighbour.c
-@@ -368,6 +368,43 @@ static void pneigh_queue_purge(struct sk_buff_head *list, struct net *net,
- 	}
- }
- 
-+static void neigh_flush_one(struct neighbour *n)
-+{
-+	hlist_del_rcu(&n->hash);
-+	hlist_del_rcu(&n->dev_list);
-+
-+	write_lock(&n->lock);
-+
-+	neigh_del_timer(n);
-+	neigh_mark_dead(n);
-+
-+	if (refcount_read(&n->refcnt) != 1) {
-+		/* The most unpleasant situation.
-+		 * We must destroy neighbour entry,
-+		 * but someone still uses it.
-+		 *
-+		 * The destroy will be delayed until
-+		 * the last user releases us, but
-+		 * we must kill timers etc. and move
-+		 * it to safe state.
-+		 */
-+		__skb_queue_purge(&n->arp_queue);
-+		n->arp_queue_len_bytes = 0;
-+		WRITE_ONCE(n->output, neigh_blackhole);
-+
-+		if (n->nud_state & NUD_VALID)
-+			n->nud_state = NUD_NOARP;
-+		else
-+			n->nud_state = NUD_NONE;
-+
-+		neigh_dbg(2, "neigh %p is stray\n", n);
-+	}
-+
-+	write_unlock(&n->lock);
-+
-+	neigh_cleanup_and_release(n);
-+}
-+
- static void neigh_flush_dev(struct neigh_table *tbl, struct net_device *dev,
- 			    bool skip_perm)
- {
-@@ -381,32 +418,24 @@ static void neigh_flush_dev(struct neigh_table *tbl, struct net_device *dev,
- 		if (skip_perm && n->nud_state & NUD_PERMANENT)
- 			continue;
- 
--		hlist_del_rcu(&n->hash);
--		hlist_del_rcu(&n->dev_list);
--		write_lock(&n->lock);
--		neigh_del_timer(n);
--		neigh_mark_dead(n);
--		if (refcount_read(&n->refcnt) != 1) {
--			/* The most unpleasant situation.
--			 * We must destroy neighbour entry,
--			 * but someone still uses it.
--			 *
--			 * The destroy will be delayed until
--			 * the last user releases us, but
--			 * we must kill timers etc. and move
--			 * it to safe state.
--			 */
--			__skb_queue_purge(&n->arp_queue);
--			n->arp_queue_len_bytes = 0;
--			WRITE_ONCE(n->output, neigh_blackhole);
--			if (n->nud_state & NUD_VALID)
--				n->nud_state = NUD_NOARP;
--			else
--				n->nud_state = NUD_NONE;
--			neigh_dbg(2, "neigh %p is stray\n", n);
--		}
--		write_unlock(&n->lock);
--		neigh_cleanup_and_release(n);
-+		neigh_flush_one(n);
-+	}
-+}
-+
-+static void neigh_flush_table(struct neigh_table *tbl)
-+{
-+	struct neigh_hash_table *nht;
-+	int i;
-+
-+	nht = rcu_dereference_protected(tbl->nht,
-+					lockdep_is_held(&tbl->lock));
-+
-+	for (i = 0; i < (1 << nht->hash_shift); i++) {
-+		struct hlist_node *tmp;
-+		struct neighbour *n;
-+
-+		neigh_for_each_in_bucket_safe(n, tmp, &nht->hash_heads[i])
-+			neigh_flush_one(n);
- 	}
- }
- 
-@@ -422,7 +451,12 @@ static int __neigh_ifdown(struct neigh_table *tbl, struct net_device *dev,
- 			  bool skip_perm)
- {
- 	write_lock_bh(&tbl->lock);
--	neigh_flush_dev(tbl, dev, skip_perm);
-+	if (likely(dev)) {
-+		neigh_flush_dev(tbl, dev, skip_perm);
-+	} else {
-+		DEBUG_NET_WARN_ON_ONCE(skip_perm);
-+		neigh_flush_table(tbl);
-+	}
- 	pneigh_ifdown_and_unlock(tbl, dev);
- 	pneigh_queue_purge(&tbl->proxy_queue, dev ? dev_net(dev) : NULL,
- 			   tbl->family);
--- 
-2.50.1.470.g6ba607880d-goog
 
 
