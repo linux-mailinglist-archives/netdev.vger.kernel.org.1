@@ -1,104 +1,175 @@
-Return-Path: <netdev+bounces-209296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D697EB0EF32
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 12:05:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 79E1CB0EEED
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 11:56:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B104218915C6
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:04:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FC0F1C83E1A
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 09:57:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A0B7288524;
-	Wed, 23 Jul 2025 10:04:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lunBdKsg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0E50288C24;
+	Wed, 23 Jul 2025 09:55:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from inva020.nxp.com (inva020.nxp.com [92.121.34.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CBE4283FF7;
-	Wed, 23 Jul 2025 10:03:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA69A281351;
+	Wed, 23 Jul 2025 09:55:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753265040; cv=none; b=BUWw/6GCE1Y6Zg391U7BPjt34uQUnnDiTknLFd8e1LpabZWVdKJ3xoBwMwEdPnXnGttp6zhmICsUF0AKrt8dPt3eWJCdxtJu/RSEKfGZYtZK5wBg6rjjegFxmoJecaRE9Galp1zV1OeVPM+wEJ9eU5Mc48mO/H+tiPXQjfFOfH8=
+	t=1753264531; cv=none; b=KuNjCrx4AlB4IbyvwnCLwEd709mVPcnPRqREwnClHIzsKrpkg9VNjKTfOWb+Wzb7XsdZtdE1rGw4IpEi3HIThrZdNJdW9Kf4P4X3WWTjDvo5nTWtm1baAhJm88iwJPNKmdit7k0OYumrwKmEuVj8L94Qj9kTPVJ4FoVoOSQL+Dw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753265040; c=relaxed/simple;
-	bh=1gm5UbqhAXgE7lNc69Zqc7sMDOmm6TonOtX7iaf8rUo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q156tCTAKncQtQdkoba4PfCrpsVf8PSm0GNigfYbkLdSSYFjvwndhmC+i5HkoM/NSSvWlnqcwV3ajWrNUDqF4s55Sqae54E4megnJOIQEt1tDalhZuaDQ/ILq4q3kYjxfaY9rMLIUdYELxqWbJVESolr4WVn2+0zZ2HF2TxiQ50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lunBdKsg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD30CC4CEE7;
-	Wed, 23 Jul 2025 10:03:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753265039;
-	bh=1gm5UbqhAXgE7lNc69Zqc7sMDOmm6TonOtX7iaf8rUo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lunBdKsg25fUuAQ27teQp3vNC6VfZYH2qNGWMGsO8SeohsylvRim73lrFr6Lhl2dj
-	 v5cQgz6labiJy3Xucqr/jPmCNhoPuN9ki5LELFuGERCzBK4g05tlxxFbybwdAS1GDF
-	 w5PDQ+zkCR4RaYTmxY3y6R6v+JvwTzIgVzCIXGD6j3j6O9ha4a0j03ef9K/7/sWmO9
-	 /Ae/fld+ebZFBP6Uj0jiEs822qrt3V8GCfuWEqD8herQOQ24izWeuY5PlngX1bipFY
-	 4AKDOSc+b2E6XNF3sL53CWTkYs1B7hthabIkCh4pGeYHqH7hsLUf+kJvvyXvMATgMx
-	 aCRRi167l2MYA==
-Date: Wed, 23 Jul 2025 11:03:52 +0100
-From: Simon Horman <horms@kernel.org>
-To: Fan Gong <gongfan1@huawei.com>
-Cc: Zhu Yikai <zhuyikai1@h-partners.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, linux-doc@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	Bjorn Helgaas <helgaas@kernel.org>, luosifu <luosifu@huawei.com>,
-	Xin Guo <guoxin09@huawei.com>,
-	Shen Chenyang <shenchenyang1@hisilicon.com>,
-	Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
-	Shi Jing <shijing34@huawei.com>,
-	Fu Guiming <fuguiming@h-partners.com>,
-	Meny Yossefi <meny.yossefi@huawei.com>,
-	Gur Stavi <gur.stavi@huawei.com>, Lee Trager <lee@trager.us>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Suman Ghosh <sumang@marvell.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Joe Damato <jdamato@fastly.com>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: Re: [PATCH net-next v10 2/8] hinic3: Complete Event Queue interfaces
-Message-ID: <20250723100352.GX2459@horms.kernel.org>
-References: <cover.1753152592.git.zhuyikai1@h-partners.com>
- <5dc43637cc54d5f3edfa323ef9021cfe095588c7.1753152592.git.zhuyikai1@h-partners.com>
+	s=arc-20240116; t=1753264531; c=relaxed/simple;
+	bh=uMba/ezhAC8r5pyu8vjGDcLH/UWyJZSzahC5FZcfZPY=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=inEgSNQYBUWXnLfOnEVi6EPIqnBpWV2gm+iLcG+xlDJUwHKZO1VS7TkM9Js2PrvMwW3Aq0bO7rTdr055c/jbX1KD+IQVSdMUHVFigy9PFdFgi/Q+Kc6Y1dVXQbeKWiRBA8ElN74rkgYzfHjWTmyBAmSO27dz2U9CrJYFezKSzjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; arc=none smtp.client-ip=92.121.34.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 749D91A1640;
+	Wed, 23 Jul 2025 11:55:22 +0200 (CEST)
+Received: from aprdc01srsp001v.ap-rdc01.nxp.com (aprdc01srsp001v.ap-rdc01.nxp.com [165.114.16.16])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 37DB61A05FA;
+	Wed, 23 Jul 2025 11:55:22 +0200 (CEST)
+Received: from mega.am.freescale.net (mega.ap.freescale.net [10.192.208.232])
+	by aprdc01srsp001v.ap-rdc01.nxp.com (Postfix) with ESMTP id 1B9AD1800079;
+	Wed, 23 Jul 2025 17:55:20 +0800 (+08)
+From: Xiaoliang Yang <xiaoliang.yang_1@nxp.com>
+To: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: kuba@kernel.org,
+	n.zhandarovich@fintech.ru,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	wojciech.drewek@intel.com,
+	Arvid.Brodin@xdin.com,
+	horms@kernel.org,
+	lukma@denx.de,
+	m-karicheri2@ti.com,
+	xiaoliang.yang_1@nxp.com,
+	vladimir.oltean@nxp.com
+Subject: [PATCH net-next] net: hsr: create an API to get hsr port type
+Date: Wed, 23 Jul 2025 18:06:05 +0800
+Message-Id: <20250723100605.23860-1-xiaoliang.yang_1@nxp.com>
+X-Mailer: git-send-email 2.17.1
+X-Virus-Scanned: ClamAV using ClamSMTP
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5dc43637cc54d5f3edfa323ef9021cfe095588c7.1753152592.git.zhuyikai1@h-partners.com>
 
-On Tue, Jul 22, 2025 at 03:18:41PM +0800, Fan Gong wrote:
+If a switch device has HSR hardware ability and HSR configuration
+offload to hardware. The device driver needs to get the HSR port type
+when joining the port to HSR. Different port types require different
+settings for the hardware, like HSR_PT_SLAVE_A, HSR_PT_SLAVE_B, and
+HSR_PT_INTERLINK. Create the API hsr_get_port_type() and export it.
 
-...
+When the hsr_get_port_type() is called in the device driver, if the port
+can be found in the HSR port list, the HSR port type can be obtained.
+Therefore, before calling the device driver, we need to first add the
+hsr_port to the HSR port list.
 
-> +void hinic3_free_db_addr(struct hinic3_hwdev *hwdev, const u8 __iomem *db_base)
-> +{
-> +	struct hinic3_hwif *hwif;
-> +	uintptr_t distance;
-> +	u32 idx;
-> +
-> +	hwif = hwdev->hwif;
-> +	distance = (const char __iomem *)db_base -
-> +		   (const char __iomem *)hwif->db_base;
+Signed-off-by: Xiaoliang Yang <xiaoliang.yang_1@nxp.com>
+---
+ include/linux/if_hsr.h |  8 ++++++++
+ net/hsr/hsr_device.c   | 20 ++++++++++++++++++++
+ net/hsr/hsr_slave.c    |  7 ++++---
+ 3 files changed, 32 insertions(+), 3 deletions(-)
 
-nit: These casts seem unnecessary.
+diff --git a/include/linux/if_hsr.h b/include/linux/if_hsr.h
+index d7941fd88032..4d6452ca2ac8 100644
+--- a/include/linux/if_hsr.h
++++ b/include/linux/if_hsr.h
+@@ -43,6 +43,8 @@ extern bool is_hsr_master(struct net_device *dev);
+ extern int hsr_get_version(struct net_device *dev, enum hsr_version *ver);
+ struct net_device *hsr_get_port_ndev(struct net_device *ndev,
+ 				     enum hsr_port_type pt);
++extern int hsr_get_port_type(struct net_device *hsr_dev, struct net_device *dev,
++			     enum hsr_port_type *type);
+ #else
+ static inline bool is_hsr_master(struct net_device *dev)
+ {
+@@ -59,6 +61,12 @@ static inline struct net_device *hsr_get_port_ndev(struct net_device *ndev,
+ {
+ 	return ERR_PTR(-EINVAL);
+ }
++
++static inline int hsr_get_port_type(struct net_device *hsr_dev, struct net_device *dev,
++				    enum hsr_port_type *type)
++{
++	return -EINVAL;
++}
+ #endif /* CONFIG_HSR */
+ 
+ #endif /*_LINUX_IF_HSR_H_*/
+diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
+index 88657255fec1..d4bea847527c 100644
+--- a/net/hsr/hsr_device.c
++++ b/net/hsr/hsr_device.c
+@@ -679,6 +679,26 @@ struct net_device *hsr_get_port_ndev(struct net_device *ndev,
+ }
+ EXPORT_SYMBOL(hsr_get_port_ndev);
+ 
++/* Get hsr port type, return -EINVAL if not get.
++ */
++int hsr_get_port_type(struct net_device *hsr_dev, struct net_device *dev, enum hsr_port_type *type)
++{
++	struct hsr_priv *hsr;
++	struct hsr_port *port;
++
++	hsr = netdev_priv(hsr_dev);
++
++	hsr_for_each_port(hsr, port) {
++		if (port->dev == dev) {
++			*type = port->type;
++			return 0;
++		}
++	}
++
++	return -EINVAL;
++}
++EXPORT_SYMBOL(hsr_get_port_type);
++
+ /* Default multicast address for HSR Supervision frames */
+ static const unsigned char def_multicast_addr[ETH_ALEN] __aligned(2) = {
+ 	0x01, 0x15, 0x4e, 0x00, 0x01, 0x00
+diff --git a/net/hsr/hsr_slave.c b/net/hsr/hsr_slave.c
+index b87b6a6fe070..e11ab1ed3320 100644
+--- a/net/hsr/hsr_slave.c
++++ b/net/hsr/hsr_slave.c
+@@ -198,14 +198,14 @@ int hsr_add_port(struct hsr_priv *hsr, struct net_device *dev,
+ 	port->type = type;
+ 	ether_addr_copy(port->original_macaddress, dev->dev_addr);
+ 
++	list_add_tail_rcu(&port->port_list, &hsr->ports);
++
+ 	if (type != HSR_PT_MASTER) {
+ 		res = hsr_portdev_setup(hsr, dev, port, extack);
+ 		if (res)
+ 			goto fail_dev_setup;
+ 	}
+ 
+-	list_add_tail_rcu(&port->port_list, &hsr->ports);
+-
+ 	master = hsr_port_get_hsr(hsr, HSR_PT_MASTER);
+ 	netdev_update_features(master->dev);
+ 	dev_set_mtu(master->dev, hsr_get_max_mtu(hsr));
+@@ -213,7 +213,8 @@ int hsr_add_port(struct hsr_priv *hsr, struct net_device *dev,
+ 	return 0;
+ 
+ fail_dev_setup:
+-	kfree(port);
++	list_del_rcu(&port->port_list);
++	kfree_rcu(port, rcu);
+ 	return res;
+ }
+ 
+-- 
+2.17.1
 
-> +	idx = distance / HINIC3_DB_PAGE_SIZE;
-> +
-> +	free_db_idx(hwif, idx);
-> +}
-
-...
 
