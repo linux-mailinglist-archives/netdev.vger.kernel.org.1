@@ -1,75 +1,80 @@
-Return-Path: <netdev+bounces-209545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35292B0FD13
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 00:46:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3539DB0FD16
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 00:47:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 191993B8567
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 22:46:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B11D3AF2F8
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 22:46:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70695221F03;
-	Wed, 23 Jul 2025 22:46:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98F37237707;
+	Wed, 23 Jul 2025 22:47:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8193E1ADC93;
-	Wed, 23 Jul 2025 22:46:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F1D86340;
+	Wed, 23 Jul 2025 22:47:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753310789; cv=none; b=Oerh7HchkETIDDA/n7aVPbi4GJbXhg/gZbIcs9VxvGsREQaNJVaUSg+JmtpB1Kv/p7Kdi9KtZ7D3fgbErZGOC+bFhozCADa6/kgid0OZ7EvmS0HFXDLXJhP/8JsqbbGFE536IG+VPj8qWyXdROXjuTm4pz14BaObQqFbeYYRhoA=
+	t=1753310838; cv=none; b=Fp+AQG8w5n/r9EKYFWJCGPN0XZ3GOr86225Hb0diegoTqyMdaPxjPVExNgZJxJIPhcTxSECNZIeILJbM26Q2VK6UNuGenZwzEKnYFCfzdtIF3jlkuGve5419Z0aMELqYAMaa+yTeZnrLFTQan+NHRjRJtm12puCTuFdauyolmgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753310789; c=relaxed/simple;
-	bh=2jcrmsUMhIjnStACZd80+gw+3X1rP7B4ZqR92ZrO0Ow=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pEV5+7bVsgPdLvWSS7L+zFXexpW2Uyy2GOGWR0qaI+IHNfNYtKhjoTVwhalbtI+/knL1D4fw/yyt/UzrwcmuM6zNbekLFBjgeGh7rxF/RqfjqOTYRrLovrXgxnWs4sx49i/fIAAZ+8NLI716nuREcQFXBr72ZdSlTfYxqLQxbpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.51
+	s=arc-20240116; t=1753310838; c=relaxed/simple;
+	bh=qxud6TWTuT/i2xJTCPl+cb5qpmtrDGSXXC3RSF4ppNg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ceevHpEupacjFGE05c+ZvjyGW5WUjUmK6VXkGaCvWv7iUKHpcgsOg9ECIT/yNT0E4PRw3scw1TgBRGhT78FqS+zuV2h/P58jFirnHmg4z/MaPuyiDnahaf6uckMf++raDBVxVpdgV2KmtLeBPzz2RCIc3PN4VOB3RFG+bVjVkf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-311bd8ce7e4so289553a91.3;
-        Wed, 23 Jul 2025 15:46:27 -0700 (PDT)
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-b34a6d0c9a3so521487a12.3;
+        Wed, 23 Jul 2025 15:47:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753310787; x=1753915587;
+        d=1e100.net; s=20230601; t=1753310836; x=1753915636;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Doz7Qgy4SbD2PQgFZBfn1elNOBFUCyhJJzrXMqMsArI=;
-        b=gNTKfZl8+IPaCXULK8R1YBYO6PjV21UE+BTigvGh1JhjMYOepZc98NxsZ4qgyQ8CAn
-         g+T7BmOI9gQAmkkix6bl1aLwZonJbBwQcALXebz5qoSZmXvPsiTt1KJTe4y9kqyVPQDs
-         sAcnerYZBd6/DD23/eVYLMxp+ngflesljFynAHeRj2qPcJqx3+OKSPYPto/THYdSyTma
-         eIuzqg3GRWWZhMCDPYAgZ1GwMIBNFV3gUyO6W3pQFeZgM+8bwuO0zJXvOu75jscE1aOe
-         NPPgfmR2UprJcMG5oGW6rFy+ZLHUHTH9tmBjvG0HP7Gas8qORcwMQr7m7RtDWnvbctIr
-         O8fg==
-X-Forwarded-Encrypted: i=1; AJvYcCXtrHhLV7OUeNMlbu7tkEyZe4x1ZwN+0R9ouOiNe/BFwKhIk/Uydsl9wRaYukVTjT9sdOpVdwckMw53Png=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMUmQsSNwzEdMwstHWMDg97EFn2uju2kJsLh32JRlqkxxdy029
-	Ezn9BOJ6c47zMpickdE4sW+dsUcupKZPfcSlTXtauJTNjnRJ32EIig1/Yo8L
-X-Gm-Gg: ASbGncuNVz48Z7oS4cvusoCF5Ndtf5Jb4KsWwQT48JPJtXv+7oJYsuUo7O0o9+1bHt8
-	CLWzA8/786FPuQcgA8rsvV30GBdUkhj6WGjzAz0PDyhI5YZSiNaCi/6p6wBpHUZTsTGQphIJrcx
-	QpwM2b9/JtbmyYuTlJJKwQGyG5MbXvbk4HriaKg+lVjW3QfuE3WHkSg6CIlQ94vnlb9suQnnO06
-	rBC1Ifm0AbwN1fXoyBc212eLfJqOvSdbQQSNSe9B7SaDsNPlv5z2odcl69hUIfVAI1SC+p9KQlS
-	I5vxR/+uJdFziJCChHP/Y27RPQs7zTQz/2i98tVbgHiy/vklv7hrLuYF7MzYiV9uU5vZZ3v2FUQ
-	JOe8jxnEH17TyNsRO07gznsbvkJSoidvfGUh1F+H7PRWch4azpWtUDDP2MXI=
-X-Google-Smtp-Source: AGHT+IGo1KRNJBNeJX90xQJQCmbmpdOhCxtmsnLyJTQqjWshKf9eRJAmiaIVnoXFX22QLyIm1ssupQ==
-X-Received: by 2002:a17:90b:5448:b0:312:25dd:1c86 with SMTP id 98e67ed59e1d1-31e507c38f0mr7244156a91.18.1753310786506;
-        Wed, 23 Jul 2025 15:46:26 -0700 (PDT)
+        bh=LZfbKihTA0SiaLa7tBR1egf/LlbjjRZjDe/A603Gvgk=;
+        b=wvlOmKOPq7x2itPrVDH+OkRcrmDA1r+N5Ah4Fg5Kx12NNnklubTsCBpDqFyAQqlb4a
+         8l5rCND4QnmncpcGWRQCsDK9JDtyCRC0aBfGX5OZr+WlbrO0hwJBMR/jl/Agq/97Rtsa
+         dHuD9UqTeSxzxLcsOQkFH3pQRuJpLWfN0VP1q3dFPUDhC3LQj1DeDa4WDhN1blvtrc57
+         UJWcWvc528zfnXtk/6WnjpG2F2ipT7C1h6hKm+oqS0qci8w4SrpWTwR5L8ULCS4LTgyh
+         WR+klp8wnrGGTpZnPySELfn8AMNIql6fAYWgL7ZDNNl+thE3H9vSbrksLmOo4JzH2ao0
+         bNMA==
+X-Forwarded-Encrypted: i=1; AJvYcCVNqqrLHgC/SanYtbAICO6ofzfkVH/7bmHoRfaljy3lpthkXMuG05PibjDyqO2+fFNZskMdy+mA+xjsXD1ZxTqH@vger.kernel.org, AJvYcCVfEUKuALidpToVmo/zro+jyQxW0EGz8/gTGw8zmERa58aQY+UK9AcjfnLdwjqIBd4d5Ws8NSYZ0LYT6MA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAmbh/ilUcvf4xl0oDby+oiz7TyJsjeEs1X63zJ+89TC/akaIC
+	mLjL+0CsnI85be+UPro6OnaZ36bIkrBo+WrUcJnp+InaYxYdfMCfoDk8A3nB
+X-Gm-Gg: ASbGncvLEuIMMdJtoD/9KL/af8tdTMBrSF+sjd0amLqLOEyzNSeHPRS2+fs8sFm2xJN
+	P3cq3ha9cit6EKKmtcuJzAk4w1zJ+IM9SiNqRBNxTIHYPAPDpOw2baKwYHkBP7rMCTIWtXOhU8p
+	6a1u3zU7Pxy9WuObE2xwrpW4rnsBoPOjUck6Psn4d9cyzQR1hqaw7vNZ235tJpuZbjKQ4S6wgDT
+	p0VA8Gb+inS1R8MVqno1J/Mypi4P6pMKZ/I11p7sm0vhbPfbBi7bgY7Hwvm5a9/bDjoRwbcpjdA
+	3HWypIcAQVVMeeuqD/B7x7tmkX14SZCb73lqvBXCYZWdUnW2/+UN15YYOTOCvgraMpVTmbNY0/x
+	F0pSzcnCN7u0oTkCQFkFWQ7cjbWVEKftNMv9W3shTTHo+MhGOySBx3jC7h98=
+X-Google-Smtp-Source: AGHT+IG7wfbNYJEtHjTmClp6E4Cek1JDdZAHYrC1evfdW/3PsdkbT0HMCkBigx05bAeFOdf5kQgaYg==
+X-Received: by 2002:a05:6a21:6f13:b0:220:a3de:a083 with SMTP id adf61e73a8af0-23d4903f5aemr6883847637.10.1753310835862;
+        Wed, 23 Jul 2025 15:47:15 -0700 (PDT)
 Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-31e51b9329csm2464562a91.32.2025.07.23.15.46.25
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-761ae158001sm184593b3a.31.2025.07.23.15.47.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Jul 2025 15:46:25 -0700 (PDT)
+        Wed, 23 Jul 2025 15:47:15 -0700 (PDT)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	dsahern@kernel.org,
+	sd@queasysnail.net,
 	andrew+netdev@lunn.ch,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] vrf: Drop existing dst reference in vrf_ip6_input_dst
-Date: Wed, 23 Jul 2025 15:46:25 -0700
-Message-ID: <20250723224625.1340224-1-sdf@fomichev.me>
+	horms@kernel.org,
+	shuah@kernel.org,
+	sdf@fomichev.me,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Cosmin Ratiu <cratiu@nvidia.com>
+Subject: [PATCH net v2 1/2] macsec: set IFF_UNICAST_FLT priv flag
+Date: Wed, 23 Jul 2025 15:47:14 -0700
+Message-ID: <20250723224715.1341121-1-sdf@fomichev.me>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -79,55 +84,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Commit 8fba0fc7b3de ("selftests: tc: Add generic erspan_opts matching support
-for tc-flower") started triggering the following kmemleak warning:
+Cosmin reports the following locking issue:
 
-unreferenced object 0xffff888015fb0e00 (size 512):
-  comm "softirq", pid 0, jiffies 4294679065
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 40 d2 85 9e ff ff ff ff  ........@.......
-    41 69 59 9d ff ff ff ff 00 00 00 00 00 00 00 00  AiY.............
-  backtrace (crc 30b71e8b):
-    __kmalloc_noprof+0x359/0x460
-    metadata_dst_alloc+0x28/0x490
-    erspan_rcv+0x4f1/0x1160 [ip_gre]
-    gre_rcv+0x217/0x240 [ip_gre]
-    gre_rcv+0x1b8/0x400 [gre]
-    ip_protocol_deliver_rcu+0x31d/0x3a0
-    ip_local_deliver_finish+0x37d/0x620
-    ip_local_deliver+0x174/0x460
-    ip_rcv+0x52b/0x6b0
-    __netif_receive_skb_one_core+0x149/0x1a0
-    process_backlog+0x3c8/0x1390
-    __napi_poll.constprop.0+0xa1/0x390
-    net_rx_action+0x59b/0xe00
-    handle_softirqs+0x22b/0x630
-    do_softirq+0xb1/0xf0
-    __local_bh_enable_ip+0x115/0x150
+  # BUG: sleeping function called from invalid context at
+  kernel/locking/mutex.c:275
+  #   dump_stack_lvl+0x4f/0x60
+  #   __might_resched+0xeb/0x140
+  #   mutex_lock+0x1a/0x40
+  #   dev_set_promiscuity+0x26/0x90
+  #   __dev_set_promiscuity+0x85/0x170
+  #   __dev_set_rx_mode+0x69/0xa0
+  #   dev_uc_add+0x6d/0x80
+  #   vlan_dev_open+0x5f/0x120 [8021q]
+  #  __dev_open+0x10c/0x2a0
+  #  __dev_change_flags+0x1a4/0x210
+  #  netif_change_flags+0x22/0x60
+  #  do_setlink.isra.0+0xdb0/0x10f0
+  #  rtnl_newlink+0x797/0xb00
+  #  rtnetlink_rcv_msg+0x1cb/0x3f0
+  #  netlink_rcv_skb+0x53/0x100
+  #  netlink_unicast+0x273/0x3b0
+  #  netlink_sendmsg+0x1f2/0x430
 
-vrf_ip6_input_dst unconditionally sets skb dst entry, add a call to
-skb_dst_drop to drop any existing entry.
+Which is similar to recent syzkaller reports in [0] and [1] and triggers
+because macsec does not advertise IFF_UNICAST_FLT although it has proper
+ndo_set_rx_mode callback that takes care of pushing uc/mc addresses
+down to the real device.
 
-Cc: David Ahern <dsahern@kernel.org>
-Fixes: 9ff74384600a ("net: vrf: Handle ipv6 multicast and link-local addresses")
+In general, dev_uc_add call path is problematic for stacking
+non-IFF_UNICAST_FLT because we might grab netdev instance lock under
+addr_list_lock spinlock, so this is not a systemic fix.
+
+0: https://lore.kernel.org/netdev/686d55b4.050a0220.1ffab7.0014.GAE@google.com
+1: https://lore.kernel.org/netdev/68712acf.a00a0220.26a83e.0051.GAE@google.com/
+Reviewed-by: Simon Horman <horms@kernel.org>
+Tested-by: Simon Horman <horms@kernel.org>
+Link: https://lore.kernel.org/netdev/2aff4342b0f5b1539c02ffd8df4c7e58dd9746e7.camel@nvidia.com
+Fixes: 7e4d784f5810 ("net: hold netdev instance lock during rtnetlink operations")
+Reported-by: Cosmin Ratiu <cratiu@nvidia.com>
+Tested-by: Cosmin Ratiu <cratiu@nvidia.com>
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- drivers/net/vrf.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/net/macsec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
-index 9a4beea6ee0c..3ccd649913b5 100644
---- a/drivers/net/vrf.c
-+++ b/drivers/net/vrf.c
-@@ -1302,6 +1302,8 @@ static void vrf_ip6_input_dst(struct sk_buff *skb, struct net_device *vrf_dev,
- 	struct net *net = dev_net(vrf_dev);
- 	struct rt6_info *rt6;
- 
-+	skb_dst_drop(skb);
-+
- 	rt6 = vrf_ip6_route_lookup(net, vrf_dev, &fl6, ifindex, skb,
- 				   RT6_LOOKUP_F_HAS_SADDR | RT6_LOOKUP_F_IFACE);
- 	if (unlikely(!rt6))
+diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
+index 7edbe76b5455..4c75d1fea552 100644
+--- a/drivers/net/macsec.c
++++ b/drivers/net/macsec.c
+@@ -3868,7 +3868,7 @@ static void macsec_setup(struct net_device *dev)
+ 	ether_setup(dev);
+ 	dev->min_mtu = 0;
+ 	dev->max_mtu = ETH_MAX_MTU;
+-	dev->priv_flags |= IFF_NO_QUEUE;
++	dev->priv_flags |= IFF_NO_QUEUE | IFF_UNICAST_FLT;
+ 	dev->netdev_ops = &macsec_netdev_ops;
+ 	dev->needs_free_netdev = true;
+ 	dev->priv_destructor = macsec_free_netdev;
 -- 
 2.50.1
 
