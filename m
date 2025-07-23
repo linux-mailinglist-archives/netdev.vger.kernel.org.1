@@ -1,37 +1,38 @@
-Return-Path: <netdev+bounces-209292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60855B0EF13
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 12:01:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 521A2B0EF11
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 12:01:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F32B31C816E5
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:01:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4892B1889FC5
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:01:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F82F28C5DC;
-	Wed, 23 Jul 2025 10:01:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CDB628C031;
+	Wed, 23 Jul 2025 10:01:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B4F428C029;
-	Wed, 23 Jul 2025 10:01:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3660C28C032;
+	Wed, 23 Jul 2025 10:01:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753264867; cv=none; b=OFjZw+AZa8Qp6TxSMeYOoArr0/TP+Krau+qHNHnZczqm4BtAbE2dXuOVD4prHyZ0Fo4lm3sVNN8d8fXaVIeQS/r5aBToRVQjtI723eQrvqPIZ8pIvijVzSdF7br3w7v0I0m0IHUMlDRss6bykMHeZ3Ulh0vIbzIh23JToZGFvJ0=
+	t=1753264866; cv=none; b=gDuuQBONsHYWV/5Vofk3YWUIj+zX4fcnppA73UZfJ55pRNdOK7VBPc/VLPPGdggvYxAxiEA20XGcsib99Ka4bhk6AtwVZVJep41WeV86AEeLmTBsxaD0MstQVcXy751uMwY/EKno5ZGEcpXWnHthhsmJ2MNrC6FL2P93DNm9MWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753264867; c=relaxed/simple;
-	bh=rRc7eKvHbFGcza3WOstM5gEoFED6LfK2Xd83nvCt4Js=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eArentE4trcg3vXED7nodt6h5o82wbn4SVgQsvB5s+k4ZAfp5sS+hAnplvGaDoYix4NkdPsSCZPPAmL0MFX4OHnLReILg1qst4uRbWx8VO9B8EKkHWgBkJr/uJ6+yNt1auVGJ6yNaUfSji5fsScGtrQR8TjqsF5MuT+KJmGN+CE=
+	s=arc-20240116; t=1753264866; c=relaxed/simple;
+	bh=1uPdLiyr/1tZ6U7FvmjwMa/NOrzX1/JOGuP56VkwTiI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=AcVztXoFhXSLYTlUcKZma+Yfl7dM48Lw/cfuEvB33TtnkFwNg1tbqaBc3JHKP3xvF+LgL7ggCJt4+rs0zVzhpN+t7TIz7CzbRF3hibRt6JhChxpMj8D980CTy/n0mTd8XKDNsBBq8SvMWxYKvfGW/CRrcPpGQGcMU0KtN03IT80=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
 Received: from loongson.cn (unknown [113.200.148.30])
-	by gateway (Coremail) with SMTP id _____8AxSWrcsoBoLzkwAQ--.62641S3;
-	Wed, 23 Jul 2025 18:01:00 +0800 (CST)
+	by gateway (Coremail) with SMTP id _____8DxDePbsoBoJzkwAQ--.62284S3;
+	Wed, 23 Jul 2025 18:00:59 +0800 (CST)
 Received: from linux.localdomain (unknown [113.200.148.30])
-	by front1 (Coremail) with SMTP id qMiowJBxzsHYsoBo1AUjAA--.24129S2;
-	Wed, 23 Jul 2025 18:00:57 +0800 (CST)
+	by front1 (Coremail) with SMTP id qMiowJBxzsHYsoBo1AUjAA--.24129S3;
+	Wed, 23 Jul 2025 18:00:58 +0800 (CST)
 From: Tiezhu Yang <yangtiezhu@loongson.cn>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S . Miller" <davem@davemloft.net>,
@@ -41,10 +42,12 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
 Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 0/2] Refine stmmac code
-Date: Wed, 23 Jul 2025 18:00:54 +0800
-Message-ID: <20250723100056.6651-1-yangtiezhu@loongson.cn>
+Subject: [PATCH net-next v2 1/2] net: stmmac: Return early if invalid in loongson_dwmac_fix_reset()
+Date: Wed, 23 Jul 2025 18:00:55 +0800
+Message-ID: <20250723100056.6651-2-yangtiezhu@loongson.cn>
 X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20250723100056.6651-1-yangtiezhu@loongson.cn>
+References: <20250723100056.6651-1-yangtiezhu@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,39 +55,52 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJBxzsHYsoBo1AUjAA--.24129S2
+X-CM-TRANSID:qMiowJBxzsHYsoBo1AUjAA--.24129S3
 X-CM-SenderInfo: p1dqw3xlh2x3gn0dqz5rrqw2lrqou0/
-X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
-	ZEXasCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29K
-	BjDU0xBIdaVrnRJUUUBEb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26c
-	xKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1a6r1DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vE
-	j48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxV
-	AFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E
-	14v26F4UJVW0owAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI
-	0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUtVWrXwAv7VC2z280
-	aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxAIw28Icx
-	kI7VAKI48JMxAqzxv262kKe7AKxVWUAVWUtwCF54CYxVCY1x0262kKe7AKxVWUAVWUtwCF
-	x2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r
-	1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij
-	64vIr41lIxAIcVC0I7IYx2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr
-	0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF
-	0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07Ul4E_UUUUU=
+X-Coremail-Antispam: 1Uk129KBj9xXoWrZrWDWF18Ww4ktF4UZrWUGFX_yoWkJwb_WF
+	yavFnYq3Z8Xr4Ut342qw13ZrySvFykWa1ruanrtrWS9ayjvwn8JF9Y9ws5CF17CrWDZF98
+	Wr4xtr4Svw1kKosvyTuYvTs0mTUanT9S1TB71UUUUjDqnTZGkaVYY2UrUUUUj1kv1TuYvT
+	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+	cSsGvfJTRUUUbfAYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	vaj40_Wr0E3s1l1IIY67AEw4v_JF0_JFyl8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	W8JVWxJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Cr1j6rxdM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUtVWr
+	XwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
+	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r4j6ryUMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4
+	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AK
+	xVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8Gii3UUUUU==
 
-Here are two small patches to refine stmmac code when debugging and
-testing the problem "Failed to reset the dma".
+If the MAC controller does not connect to any PHY interface, there is a
+missing clock, then the DMA reset fails.
 
-v2:
-  -- Update the commit message of patch #1 to explain the background.
-  -- Add Reviewed-by tag for patch #2, no code changes.
+For this case, the DMA_BUS_MODE_SFT_RESET bit is 1 before software reset,
+just return -EINVAL immediately to avoid waiting for the timeout when the
+DMA reset fails in loongson_dwmac_fix_reset().
 
-Tiezhu Yang (2):
-  net: stmmac: Return early if invalid in loongson_dwmac_fix_reset()
-  net: stmmac: Check stmmac_hw_setup() in stmmac_resume()
-
+Signed-off-by: Tiezhu Yang <yangtiezhu@loongson.cn>
+---
  drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 3 +++
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c    | 9 ++++++++-
- 2 files changed, 11 insertions(+), 1 deletion(-)
+ 1 file changed, 3 insertions(+)
 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+index e1591e6217d4..6d10077666c7 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+@@ -513,6 +513,9 @@ static int loongson_dwmac_fix_reset(void *priv, void __iomem *ioaddr)
+ {
+ 	u32 value = readl(ioaddr + DMA_BUS_MODE);
+ 
++	if (value & DMA_BUS_MODE_SFT_RESET)
++		return -EINVAL;
++
+ 	value |= DMA_BUS_MODE_SFT_RESET;
+ 	writel(value, ioaddr + DMA_BUS_MODE);
+ 
 -- 
 2.42.0
 
