@@ -1,145 +1,233 @@
-Return-Path: <netdev+bounces-209209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23070B0EA46
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 08:01:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51B1FB0EA69
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 08:14:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C67B3A333C
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 06:00:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78C1D16731D
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 06:14:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A62E11F0991;
-	Wed, 23 Jul 2025 06:01:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NZ43+Gzf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1644F248F4A;
+	Wed, 23 Jul 2025 06:14:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB47D4685
-	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 06:01:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADB21A0BFD;
+	Wed, 23 Jul 2025 06:14:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753250465; cv=none; b=pQypUwNsjtZDfOT/cPfAggUhjXkK4kVphZOrZg9wPtPLkZJk1iDiegWDjU1Tlbxoc0v3GB3bGXLlZepKeYzh/otwCOKW/vUVysp3Q1lXVZUHd/jsA63etefhJxsHTCPFBaq+pMCG4s59mtnWYFadYwVrjJYFqi6QB3PvWxL0R8g=
+	t=1753251267; cv=none; b=eNPx5sYnMsBxT1QWpM930RHkJincVL/YuSqc/WpBlZroNEe9W/Lt0/OvA1GD6A9NfmPZaOTwht2kPBOiaPqqzqVpkY+KkPJllulfYs9dAKD5D5dVLXMZZZrZMIjVIaiy1aztaDgKOVcBc4NRu+x4/hTCLCGjxatKHGm8HzBnjdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753250465; c=relaxed/simple;
-	bh=W3OEZPSUScGaKIkoKNcKNemh+3UB9G5qvWLv5ZR7u3g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NlAw7mtt2UsG+PLd7Pc+8+o2kiwGgMJo03rNRDHmfmbHcIujPCuCiQJiKXgBabKRISj5EpCHLzOPayTslPGlYMKjUvdWRsTRRsDPHh+Uae2FqUANQWZxJ0JhTv4i86Irm1/2e9Wnps3PKzXcRL2AD+m4G6dQ2kMhy4HHypXZqi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NZ43+Gzf; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1753250462;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=W3OEZPSUScGaKIkoKNcKNemh+3UB9G5qvWLv5ZR7u3g=;
-	b=NZ43+Gzffc6HWvzBF1z1tPjVn6iX4fjcqfxHjitMEtcyS9qd7DO2NFdrufq98KcKPmxSp2
-	C4CqS5yUykAbHvyXKGwikciBlsBl0D0PJwqU5mL2tu5bN16+x0TgQPv5FKys5v7DprUgtK
-	kbqVDGRdP4BYnCfgWTpqgNgetcij7sA=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-638-AweV28KDMz2c2s4RxaVOmg-1; Wed, 23 Jul 2025 02:01:00 -0400
-X-MC-Unique: AweV28KDMz2c2s4RxaVOmg-1
-X-Mimecast-MFC-AGG-ID: AweV28KDMz2c2s4RxaVOmg_1753250459
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-31cb5c75e00so576315a91.0
-        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 23:01:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753250459; x=1753855259;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=W3OEZPSUScGaKIkoKNcKNemh+3UB9G5qvWLv5ZR7u3g=;
-        b=lj5bWvB0aYu7lozuTnDTO5c9rZiIW3vC7cJq4g4TYy+eFgu9j488nopPIQKcrGnpqE
-         +ejDYeDyn6qXAQUL1EUiic5dQ7I7cIggmZk6/4QQ219LIJji6wonzKgLXOGNW6ys/VxN
-         gfJNza/plCrnFGRcLGVZyiNHnmiB86BV+iIxwHgFS0h87pNMykNp2LovXcK+asl+g9pK
-         7q9t1aAarFEjo65E/EvEj5MqwqPlMagO63N5bz5A1DwkSFdwW1hSh10aMzCl1Lrpn6fg
-         qcocCPSSp0V8WeH2SKQfn3hfdyCNo8zzjk8SFrcNR7yhC9f04DdJEfUJcYOkOZl1+TvD
-         r1EA==
-X-Forwarded-Encrypted: i=1; AJvYcCULNXw6baEF1AT7yYYlIFnzFM+vJKeU2z4H0U85BxaVDW/APotgNiShwlwCe/4yRRy7JmdQqno=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGRBKmqb9f/rqrCND0gspdckUcsbOcG1b324me4XDI6gXmyvbx
-	51m1i+OYifuvoryI+rjaliQuAdUTTTwuAc/zOyhDSUWRHneuAj3NAMo1dnKdBApHqMD8DEXJJ4s
-	ixbzzOO3Q/as8MYrOcB+Dq6jHRM8tFWiW3snML3oCX7cGZEQFqwbFBLYtaLAJIPj9SOddhLaExR
-	4/I6dDpxQ0qC1nlNQmVPWZ90NjTdC95MMD
-X-Gm-Gg: ASbGncsdAsxWBBrdfTXt42BKsKa4UFmomRkbpRp1V1em1syFgt1rbP54K3z+eWELAMf
-	J9zO6no8I1QvqUDtroY5dzP+VZxrUQOjC7sZEd/2e0arGAkn0cn+KhBlPr3yxfDyhX9yOzLchVh
-	T7V2AHWEqJqLSm9Tav284=
-X-Received: by 2002:a17:90b:1c8d:b0:31a:8dc4:b5bf with SMTP id 98e67ed59e1d1-31e3e218aaemr8741149a91.17.1753250458804;
-        Tue, 22 Jul 2025 23:00:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEfliq5NGtPU/ziGbtu8YM4b/iq3mmjjPMpvlbkNtkuESyW0l9icnltubphyWJS/Lk+K+taORz5U6WVf0EI7c4=
-X-Received: by 2002:a17:90b:1c8d:b0:31a:8dc4:b5bf with SMTP id
- 98e67ed59e1d1-31e3e218aaemr8741094a91.17.1753250458228; Tue, 22 Jul 2025
- 23:00:58 -0700 (PDT)
+	s=arc-20240116; t=1753251267; c=relaxed/simple;
+	bh=eOp8B5FEQjPYgaY8oyZNnVe9OVIKUc0sH+uAJU1qXyY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ME31lEdUefrBHgsOSViMJ03/9733kOLa3w2i3FhXf/F22swaBqLQbzkfl+r9uUfhf/fqKlscq+ZcjkaZqtrD5LHfBXov8CTNMT0Ed3QiAS7Ra5IdOmlgg85J6gP9vB5vsTLfH3duMLaRGFYredHDI6cpKjO8tNPDPUpvZjM6Kuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=15.184.224.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: zesmtpsz3t1753251185t633970d9
+X-QQ-Originating-IP: 7fAbvXkimtFsEETOli6idrq+iTqKCtYaOTIC1dZ/jwM=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 23 Jul 2025 14:13:03 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 7362397933906693450
+Date: Wed, 23 Jul 2025 14:13:03 +0800
+From: Yibo Dong <dong100@mucse.com>
+To: Simon Horman <horms@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
+	gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au,
+	danishanwar@ti.com, lee@trager.us, gongfan1@huawei.com,
+	lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, richardcochran@gmail.com,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 10/15] net: rnpgbe: Add netdev irq in open
+Message-ID: <2C80B81E5B7F54CD+20250723061303.GE169181@nic-Precision-5820-Tower>
+References: <20250721113238.18615-1-dong100@mucse.com>
+ <20250721113238.18615-11-dong100@mucse.com>
+ <20250722140326.GJ2459@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250718061812.238412-1-lulu@redhat.com> <20250721162834.484d352a@kernel.org>
- <CACGkMEtqhjTjdxPc=eqMxPNKFsKKA+5YP+uqWtonm=onm0gCrg@mail.gmail.com> <20250721181807.752af6a4@kernel.org>
-In-Reply-To: <20250721181807.752af6a4@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 23 Jul 2025 14:00:47 +0800
-X-Gm-Features: Ac12FXwsu5AMgm40YID7nIeVAKGIxY3SiYvCb26wbwKJM0nbVKa8OQafZHUHruE
-Message-ID: <CACGkMEtEvkSaYP1s+jq-3RPrX_GAr1gQ+b=b4oytw9_dGnSc_w@mail.gmail.com>
-Subject: Re: [PATCH RESEND] netvsc: transfer lower device max tso size
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Cindy Lu <lulu@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Michael Kelley <mhklinux@outlook.com>, Shradha Gupta <shradhagupta@linux.microsoft.com>, 
-	Kees Cook <kees@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Guillaume Nault <gnault@redhat.com>, 
-	Joe Damato <jdamato@fastly.com>, Ahmed Zaki <ahmed.zaki@intel.com>, 
-	"open list:Hyper-V/Azure CORE AND DRIVERS" <linux-hyperv@vger.kernel.org>, 
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250722140326.GJ2459@horms.kernel.org>
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: NZcrde3zhHkVc4vD6pFJ0MsmdlniyAZ1/GnUJawXfuNgJNYvhe66+B2Q
+	hAjz+caQByEVUdAJLe+AOq7TSO39J5A9v9jhjUCmgLhNvERxR+5rylo6XiQayJZhFPHk+f5
+	kwzMSTFoiZ0OeJPGwOoW6yRA5LN7r9tyuu3fj/OpaPYgTLxlo3JslmpZ6Us30vF6cRNRbrn
+	w4QLBpsvkOz1p4zlbw8BwEVpqy5U1bhqbLdVqeLT+Q+h+yMP8pfDyNk665NP4EmiHtIjklL
+	a7YUJUPyIQkaC3xjjHG5t9U2OBExkmzb3YHZ4ojQzKDg/PEqo8J8I4l64dVcrojO6CMzAN0
+	dmDkub3G303j4Yc0VyMm6Lfwgm2lltrVpbbnlYYfGsgrJyCAUvTMd7XHx+YrkKDvR03Xs/0
+	hwpvFBfg2oWmrMZpr721wogaAX/3pxtzfnDyEMRsSBN7hfJxl921t1lz21LTTPeLDhXfwzh
+	HUYi+SVrkfturNKML1Fa2OWTpvh0KgSGfTKaxiozFWsHzylhm1BPMzXqvUBpf+8A52Nfl8e
+	bTe8uaDy8eW0AJAgKz7GoVl8V6YnnMneCUPQYzBMJLJBkW3lt2sPAQHwlZ4Bjgkekf500u8
+	aX36pok1PF7fimdAptFALf5geA5OOpeCBk+/4dndYX8k1NbcxD/Rh6thqEvSUVmb+3vOqm2
+	xMqslxbC+NHFbJOd5HAoo8VDOSl63U8bGLuJg8PvMEhcDjJ/9sbQQ3+6DPDqx7T+FjfHWk7
+	DfqhFxLgNRz/B6mdubc4jnm6vNq1k86n4oEkvUcNi4OBqTimIngGyQVzxFPxbArbGqD6RM9
+	wGGcsPzVoLuk0SiYvvRGPckweZ9k1uOl3ykNV34iFT5fSP6I0VJ4uxRplk9BG9D2G/gm7Hu
+	B5DCPCnzPlAa3Ce7gDdaOgT0zSPeYD+x/NqFabWfhuozBAo5dj5Du4euZM7Osyu2Fo7F8ju
+	ZCHVBRkSbTTnCYVfiQKTS+AUs39Z6i3Sh2qfayo+2CBYmahfmczrZaCLy
+X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
+X-QQ-RECHKSPAM: 0
 
-On Tue, Jul 22, 2025 at 9:18=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 22 Jul 2025 09:04:20 +0800 Jason Wang wrote:
-> > On Tue, Jul 22, 2025 at 7:28=E2=80=AFAM Jakub Kicinski <kuba@kernel.org=
-> wrote:
-> > > On Fri, 18 Jul 2025 14:17:55 +0800 Cindy Lu wrote:
-> > > > Subject: [PATCH RESEND] netvsc: transfer lower device max tso size
-> > >
-> > > You say RESEND but I don't see a link to previous posting anywhere.
->
-> Someone should respond to this part, please.
->
-> > > I'd rather we didn't extend the magic behavior of hyperv/netvsc any
-> > > further.
-> >
-> > Are you referring to the netdev coupling model of the VF acceleration?
->
-> Yes, it tries to apply whole bunch of policy automatically in
-> the kernel.
->
-> > > We have enough problems with it.
-> >
-> > But this fixes a real problem, otherwise nested VM performance will be
-> > broken due to the GSO software segmentation.
->
-> Perhaps, possibly, a migration plan can be devised, away from the
-> netvsc model, so we don't have to deal with nuggets of joy like:
-> https://lore.kernel.org/all/1752870014-28909-1-git-send-email-haiyangz@li=
-nux.microsoft.com/
+On Tue, Jul 22, 2025 at 03:03:26PM +0100, Simon Horman wrote:
+> On Mon, Jul 21, 2025 at 07:32:33PM +0800, Dong Yibo wrote:
+> > Initialize irq for tx/rx in open func.
+> > 
+> > Signed-off-by: Dong Yibo <dong100@mucse.com>
+> 
+> ...
+> 
+> > diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
+> 
+> ...
+> 
+> > +/**
+> > + * rnpgbe_set_mac_hw_ops_n500 - Setup mac address to hw
+> > + * @hw: pointer to hw structure
+> > + * @mac: pointer to mac addr
+> > + *
+> > + * Setup a mac address to hw.
+> > + **/
+> > +static void rnpgbe_set_mac_hw_ops_n500(struct mucse_hw *hw, u8 *mac)
+> > +{
+> > +	struct mucse_eth_info *eth = &hw->eth;
+> > +	struct mucse_mac_info *mac_info = &hw->mac;
+> 
+> Reverse xmas tree here please.
+> 
 
-Btw, if I understand this correctly. This is for future development so
-it's not a blocker for this patch?
+Got it, I'll fix it.
 
-Thanks
+> > +
+> > +	/* use idx 0 */
+> > +	eth->ops.set_rar(eth, 0, mac);
+> > +	mac_info->ops.set_mac(mac_info, mac, 0);
+> > +}
+> 
+> ...
+> 
+> > diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c
+> 
+> ...
+> 
+> > +/**
+> > + * rnpgbe_msix_clean_rings - msix irq handler for ring irq
+> > + * @irq: irq num
+> > + * @data: private data
+> > + *
+> > + * rnpgbe_msix_clean_rings handle irq from ring, start napi
+> 
+> Please also document the return value of this function.
+> Likewise for rnpgbe_request_msix_irqs(), rnpgbe_intr() and
+> rnpgbe_request_irq().
+> 
 
->
+Got it, I'll fix it.
+
+> > + **/
+> > +static irqreturn_t rnpgbe_msix_clean_rings(int irq, void *data)
+> > +{
+> > +	return IRQ_HANDLED;
+> > +}
+> 
+> ...
+> 
+> > +/**
+> > + * rnpgbe_request_msix_irqs - Initialize MSI-X interrupts
+> > + * @mucse: pointer to private structure
+> > + *
+> > + * rnpgbe_request_msix_irqs allocates MSI-X vectors and requests
+> > + * interrupts from the kernel.
+> > + **/
+> > +static int rnpgbe_request_msix_irqs(struct mucse *mucse)
+> > +{
+> > +	struct net_device *netdev = mucse->netdev;
+> > +	int q_off = mucse->q_vector_off;
+> > +	struct msix_entry *entry;
+> > +	int i = 0;
+> > +	int err;
+> > +
+> > +	for (i = 0; i < mucse->num_q_vectors; i++) {
+> > +		struct mucse_q_vector *q_vector = mucse->q_vector[i];
+> > +
+> > +		entry = &mucse->msix_entries[i + q_off];
+> > +		if (q_vector->tx.ring && q_vector->rx.ring) {
+> > +			snprintf(q_vector->name, sizeof(q_vector->name) - 1,
+> > +				 "%s-%s-%d", netdev->name, "TxRx", i);
+> 
+> Probably the full range of i is not used, in particular I assume
+> it is never negative, and thus i and mucse->num_q_vectors
+> could be unsigned int rather than int.
+> 
+> But as it stands q_vector->name is once character too short to
+> fit the maximum possible string formatted by snprintf().
+> 
+> I was able to address the warning flagged by GCC 15.0.0 about this by
+> increasing the size of q_vector->name by one byte.
+> 
+>   .../rnpgbe_lib.c: In function 'rnpgbe_request_irq':
+>   .../rnpgbe_lib.c:1015:43: warning: 'snprintf' output may be truncated before the last format character [-Wformat-truncation=]
+>    1015 |                                  "%s-%s-%d", netdev->name, "TxRx", i);
+>         |                                           ^
+>   In function 'rnpgbe_request_msix_irqs',
+>       inlined from 'rnpgbe_request_irq' at drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c:1069:9:
+>   .../rnpgbe_lib.c:1014:25: note: 'snprintf' output between 8 and 33 bytes into a destination of size 32
+>    1014 |                         snprintf(q_vector->name, sizeof(q_vector->name) - 1,
+>         |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>    1015 |                                  "%s-%s-%d", netdev->name, "TxRx", i);
+>         |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> 
+> 
+
+Yes, q_vector->name is too short, I'll fix it.
+
+> > +		} else {
+> > +			/* skip this unused q_vector */
+> > +			continue;
+> > +		}
+> > +		err = request_irq(entry->vector, &rnpgbe_msix_clean_rings, 0,
+> > +				  q_vector->name, q_vector);
+> > +		if (err)
+> > +			goto free_queue_irqs;
+> > +		/* register for affinity change notifications */
+> > +		q_vector->affinity_notify.notify = rnpgbe_irq_affinity_notify;
+> > +		q_vector->affinity_notify.release = rnpgbe_irq_affinity_release;
+> > +		irq_set_affinity_notifier(entry->vector,
+> > +					  &q_vector->affinity_notify);
+> > +		irq_set_affinity_hint(entry->vector, &q_vector->affinity_mask);
+> > +	}
+> > +
+> > +	return 0;
+> > +
+> > +free_queue_irqs:
+> > +	while (i) {
+> > +		i--;
+> > +		entry = &mucse->msix_entries[i + q_off];
+> > +		irq_set_affinity_hint(entry->vector, NULL);
+> > +		free_irq(entry->vector, mucse->q_vector[i]);
+> > +		irq_set_affinity_notifier(entry->vector, NULL);
+> > +		irq_set_affinity_hint(entry->vector, NULL);
+> > +	}
+> > +	return err;
+> > +}
+> 
+> ...
+> 
+
+Thanks for your feedback.
 
 
