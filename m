@@ -1,128 +1,102 @@
-Return-Path: <netdev+bounces-209286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBB76B0EE6C
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 11:29:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19F77B0EE95
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 11:38:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA2143A4866
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 09:28:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 765831AA4DB2
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 09:38:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 058D828640B;
-	Wed, 23 Jul 2025 09:29:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B9A7285C8C;
+	Wed, 23 Jul 2025 09:37:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dFRM+tpN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.actia.se (mail.actia.se [212.181.117.226])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3B9A3FB1B;
-	Wed, 23 Jul 2025 09:29:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.181.117.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C824284694
+	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 09:37:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753262956; cv=none; b=OWPSaBp7Inz8NBAflzU/k8fy7gXdQi2Y65xSF21AiJnTYf1QKZnjq5wzDDexPw4sCOJwWMB3tnf9Wa8PCX8FUTr5Uc4yJZmg0GPggwri1LVPTdE9IwvaUJqAzKY4WZsjmSrpN8O8/PUpc45DRgXQ/xO6s2cKqu3HZMUMdHt+eJ4=
+	t=1753263467; cv=none; b=KbTOVus+Ccf3JuPwmYi6yLS5bX1Z4ZKsDckgq/W+0s9j0tvNsIOvzJXRZ0vwpMqnGxmAbUtsU2vO4GBZ7NWIsdKDUHpXJPidBr0N2gQGuuC+NFMRj+5FoSWvQAA8OF2KpG+KyB+RaVwJD8H+5goWzxVmKAGuY5FhrWBHFFDQ1S4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753262956; c=relaxed/simple;
-	bh=grOY7rG/X+b9Vqa7udJpstXqVwojxMiy+5DRZZXGdFA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=jQyUq/xu6XTNTOyt5cQ2L7HdoC+ip9Vwd6bSJHwHyx7z4/w0oTqMgcU6qljswCzCB4QCtI6mhims2nF9ZH7eKST4zYOgtnicVFBqKd30NOdXojlny4CPqbXXIIyA8UKqg7qxM/XibKHb4WLSfVtibNsw+92WfcE+30hpHPhkQAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=actia.se; spf=pass smtp.mailfrom=actia.se; arc=none smtp.client-ip=212.181.117.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=actia.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=actia.se
-Received: from S036ANL.actianordic.se (10.12.31.117) by S036ANL.actianordic.se
- (10.12.31.117) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.57; Wed, 23 Jul
- 2025 11:29:03 +0200
-Received: from S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69]) by
- S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69%6]) with mapi id
- 15.01.2507.057; Wed, 23 Jul 2025 11:29:03 +0200
-From: John Ernberg <john.ernberg@actia.se>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Oliver Neukum <oneukum@suse.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Ming Lei <ming.lei@canonical.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [PATCH] net: usbnet: Avoid potential RCU stall on LINK_CHANGE
- event
-Thread-Topic: [PATCH] net: usbnet: Avoid potential RCU stall on LINK_CHANGE
- event
-Thread-Index: AQHb8Xe2qza52xx55UmGbnkg6Pc/lg==
-Date: Wed, 23 Jul 2025 09:29:03 +0000
-Message-ID: <aICrWl2TTTInbfT8@w447anl.localdomain>
-References: <20250710085028.1070922-1-john.ernberg@actia.se>
- <20250714163505.44876e62@kernel.org>
- <74a87648-bc02-4edb-9e6a-102cb6621547@actia.se>
- <20250715065403.641e4bd7@kernel.org>
- <fbd03180-cca0-4a0f-8fd9-4daf5ff28ff5@actia.se>
- <20250716143959.683df283@kernel.org>
- <55147f36-822b-4026-a091-33b909d1eea8@actia.se>
- <20250718161825.65912e37@kernel.org>
-In-Reply-To: <20250718161825.65912e37@kernel.org>
-Accept-Language: en-US, sv-SE
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-esetresult: clean, is OK
-x-esetid: 37303A2955B14450647C67
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <95DD33E56AD5674EBC1A132FFD9750A6@actia.se>
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1753263467; c=relaxed/simple;
+	bh=Q66xsA1c5vWlizutLgsD2be+4pQ8rZeycqCEKNYGQIc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Iz2cJBRKMMl0HmECFcIVBgnlOpq1Dxd4zbJb9axYFOk1xbpczqjJmP5KQ3QgmmQw1w/OJA8A6kilT4zp1wnukFLdHabeKCPnavea0lyvlFlL8MojSCR01vSPxwohXZ819Ao7OkELR/AcrS6H4YWpUVQQFAVXWF1xzsdaj38k5XM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dFRM+tpN; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <b33f5cee-d3de-4cbd-8eeb-214ba6b42cb7@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753263453;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BmHpTBjJA4deSSRvm8BefbJLyr67VvXXsw2bU3lFe7g=;
+	b=dFRM+tpNPT7p9UgKAuDbizJDaaH7rRV5TdcekszlC1wNKSxpudvxz2O8QJjjxFzAJ8pUph
+	+oMTfP+kdVMDtA8N4roTeDqLrTRrH/XHJNG/yjF0Qm9cFxyOrzhb768pZm0C5864VeuWdL
+	qYoHBAYxPwRzcSHhwZvYtt/gOhSRZsc=
+Date: Wed, 23 Jul 2025 10:37:27 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH] pch_gbe: Add NULL check for ptp_pdev in pch_gbe_probe()
+To: Chenyuan Yang <chenyuan0y@gmail.com>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, richardcochran@gmail.com, mingo@kernel.org,
+ tglx@linutronix.de
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250723034105.2939635-1-chenyuan0y@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250723034105.2939635-1-chenyuan0y@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Jakub,
+On 23/07/2025 04:41, Chenyuan Yang wrote:
+> Since pci_get_domain_bus_and_slot() can return NULL for PCI_DEVFN(12, 4),
+> add NULL check for adapter->ptp_pdev in pch_gbe_probe().
+> 
+> This change is similar to the fix implemented in commit 9af152dcf1a0
+> ("drm/gma500: Add NULL check for pci_gfx_root in mid_get_vbt_data()").
+> 
+> Signed-off-by: Chenyuan Yang <chenyuan0y@gmail.com>
+> ---
+>   drivers/net/ethernet/oki-semi/pch_gbe/pch_gbe_main.c | 5 +++++
+>   1 file changed, 5 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/oki-semi/pch_gbe/pch_gbe_main.c b/drivers/net/ethernet/oki-semi/pch_gbe/pch_gbe_main.c
+> index e5a6f59af0b6..10b8f1fea1a2 100644
+> --- a/drivers/net/ethernet/oki-semi/pch_gbe/pch_gbe_main.c
+> +++ b/drivers/net/ethernet/oki-semi/pch_gbe/pch_gbe_main.c
+> @@ -2515,6 +2515,11 @@ static int pch_gbe_probe(struct pci_dev *pdev,
+>   		pci_get_domain_bus_and_slot(pci_domain_nr(adapter->pdev->bus),
+>   					    adapter->pdev->bus->number,
+>   					    PCI_DEVFN(12, 4));
+> +	if (!adapter->ptp_pdev) {
+> +		dev_err(&pdev->dev, "PTP device not found\n");
+> +		ret = -ENODEV;
+> +		goto err_free_netdev;
+> +	}
 
-On Fri, Jul 18, 2025 at 04:18:25PM -0700, Jakub Kicinski wrote:
-> On Fri, 18 Jul 2025 09:07:26 +0000 John Ernberg wrote:
-> > > Thanks for the analysis, I think I may have misread the code.
-> > > What I was saying is that we are restoring the carrier while
-> > > we are still processing the previous carrier off event in
-> > > the workqueue. My thinking was that if we deferred the
-> > > netif_carrier_on() to the workqueue this race couldn't happen.
-> > >=20
-> > > usbnet_bh() already checks netif_carrier_ok() - we're kinda duplicati=
-ng
-> > > the carrier state with this RX_PAUSED workaround.
-> > >=20
-> > > I don't feel strongly about this, but deferring the carrier_on()
-> > > the the workqueue would be a cleaner solution IMO.
-> > >  =20
-> >=20
-> > I've been thinking about this idea, but I'm concerned for the opposite=
-=20
-> > direction. I cannot think of a way to fully guarantee that the carrier=
-=20
-> > isn't turned on again incorrectly if an off gets queued.
-> >=20
-> > The most I came up with was adding an extra flag bit to set carrier on,=
-=20
-> > and then test_and_clear_bit() it in the __handle_link_change() function=
-.
-> > And also clear_bit() in the usbnet_link_change() function if an off=20
-> > arrives. I cannot convince myself that there isn't a way for that to go=
-=20
-> > sideways. But perhaps that would be robust enough?
->=20
-> I think it should be robust enough.. Unless my grep skills are failing
-> me - no drivers which call usbnet_link_change() twiddle the link state
-> directly.
->=20
-> Give it a go, if you think your initial patch is cleaner -- it's fine.
->=20
+Why is this error fatal? I believe the device still can transmit and
+receive packets without PTP device. If this situation is really possible
+I would suggest you to add checks to ioctl function to remove
+timestamping support if there is no PTP device found
 
-Apologies for the delay, I was stuck in a higher priority issue.
+>   
+>   	netdev->netdev_ops = &pch_gbe_netdev_ops;
+>   	netdev->watchdog_timeo = PCH_GBE_WATCHDOG_PERIOD;
 
-I've tested this approach and it looks promising. Will send this approach
-as a v2 later today.
-
-Thank you for the guidance, very much appreciated.
-
-Best regards // John Ernberg=
 
