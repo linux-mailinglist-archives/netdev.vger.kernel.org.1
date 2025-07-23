@@ -1,113 +1,189 @@
-Return-Path: <netdev+bounces-209238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07787B0EC7F
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 09:57:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 23EE8B0ECA4
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:04:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 262AB3B740C
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 07:56:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 296B83B8892
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 08:04:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0C75278173;
-	Wed, 23 Jul 2025 07:57:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0298227A90A;
+	Wed, 23 Jul 2025 08:04:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="We7v/14B"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Dc0yvBqD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B6E27815E;
-	Wed, 23 Jul 2025 07:57:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C55127A131;
+	Wed, 23 Jul 2025 08:04:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753257439; cv=none; b=FGjHHaGDVctg79e3Hmzw8fMFI5Epe6xDs1cAJQlSr9VovQhWFIqVI7oq7XSaZ7lOv9oYPPFMY4X/+Z1sGSfolNvPwOEZcP20GABz4k5PaRupfAfmFYce6fcaZCLPHNjI6+AB0+/dFaFVIuk3XVsFRK9KDEx5X+JabjZsQf0SvRo=
+	t=1753257855; cv=none; b=U/ToqfpqG8FKGMRkz/0Z45mRkBsqhaG0mnHFLOQZHjItqa+QkURWfO8djGOxl2SwmPK4xmWoeU9iWSv4z46G7vP9CqdZhIu9GV3KGYQM6elIBzN7zWHYlvekBUi80EWdhvSTx1UNmFSOeQx1nw9vYv4Jm832WbxNtiRA4Q0WOsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753257439; c=relaxed/simple;
-	bh=tdAL6jB4Ko7Lztc4ajkspFeVq6iUKILRJD4GvTuV/9g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oK4QpDWArluTbbU6O8vp9T1dtiZE3uUT24GNfywW+dcLPE/rA914zui/v8w+oPE0TAoGC9pex4y7jg81W9Z9WRyemgCZVuLdpvzOVB/00UTOdVqIetvmqgzrUleuNCjH0vOsGdtLWF2Pt99DMEboyHiYR3E5tzIqKpUp8MXrAUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=We7v/14B; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 386F3C4CEF5;
-	Wed, 23 Jul 2025 07:57:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753257439;
-	bh=tdAL6jB4Ko7Lztc4ajkspFeVq6iUKILRJD4GvTuV/9g=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=We7v/14BqDrhc9FrahJg4aqfjxDxm23gqFn/2D1/W1r+LRTJ01euREJaJoI5DMiN6
-	 iC6P33QYbZgUY/GaJFmLvrpDQrtyfPK8xZyz5tVdMzGE3ZXhQLuw42vhCeNbODwKia
-	 6w2r8fkHhyObHbIH9uK+3tjMchi+eaaMkVd7/Nmi9JwI28U6t5md2GcqFVBHd+21W8
-	 yGdZIOosQqN5dP59ta0IFNBLoDH/S0bj0q6+QFeTEm3mwVo5fNyFb6Oqy6BX2VKTxe
-	 cSz8e0Qncy40/5bmK43Pt5qbj89NlrE4oGpxuAwrZ9hH0mewFJmkwvaK1a6IdtkZ1e
-	 8+a+ZcKS99mzw==
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-60bf5a08729so12238901a12.0;
-        Wed, 23 Jul 2025 00:57:19 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWsSUKT9pMTFutJGRNORN0zvq8I64y+LoLo4Pe6VffRlOMJ4g5a2fqkGNxgkuMKXCtKUqURTfNa@vger.kernel.org, AJvYcCX2CPaaA2qnpBpro/+ibV3zSzG7CL1kDgzkINJsL5iBxuiEU7ScojKzIFzi1dbuDhbwxuk5H0wFL9hmtXo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaL7ZM+1u8Onh3nDdJVyngb8aGiyaWcvN8xg41tpwv+DOoOQPy
-	ni8FNcU+rYbZRMZPpAZibce6jUbE5z/jRIL3HW4zoTHkPUF8jAW29QKxYJ0uawO6tvjNd66/XUm
-	apcIi+YRehIMxX0K+JrLhCWcQ6X2sXDQ=
-X-Google-Smtp-Source: AGHT+IGIF7AVBA9b0CBAQLpikyzPtrMgp6p7LCmQn3Tsnr/SlGGly8L96wf3Glz5EOjEESdHNbzxzbVV6HAoeupH2hc=
-X-Received: by 2002:a05:6402:42ce:b0:609:aa85:8d78 with SMTP id
- 4fb4d7f45d1cf-6149b427070mr1740625a12.8.1753257437717; Wed, 23 Jul 2025
- 00:57:17 -0700 (PDT)
+	s=arc-20240116; t=1753257855; c=relaxed/simple;
+	bh=in6aCh8OG+DIgT70sSqbf6rBRdXsO3IskACYFmdI6aY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OgNxXIjGr+BDnkJZeUYqYuV7A5jCkerRsyaRJd2vrPqS1xZGA+kBZKR6qvijlfvbYZTOksDlzaVQGLpbU4s6VGu19SOXr+n6BMXtNQbCOCT+xsfsjtwCpilkFV8cqHXsm7E/1gzuRLVoKKu4VdMsWD1FsULe2oZRAMB/4M5KnlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Dc0yvBqD; arc=none smtp.client-ip=198.47.19.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllvem-sh03.itg.ti.com ([10.64.41.86])
+	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTP id 56N83Sn51223384;
+	Wed, 23 Jul 2025 03:03:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1753257808;
+	bh=0Ybm8y+09b48ASpOGQxtkH7SHUZzEVtplNLuU/J9K3k=;
+	h=From:To:CC:Subject:Date;
+	b=Dc0yvBqDZax9AHS3O15+YBkPMxBeHwqkydQ/ggHCw9a3LYpontOSGFl8Uew1Ginp8
+	 gCBx8uqiYla5rC05/mHXMuzACXeS7JkO+kAHojBShYC9CNiQWNiTnm2wkll2pUExeX
+	 YoWFMvoslaIneEqjAOTB08BF68DTUNSursF0j60o=
+Received: from DFLE104.ent.ti.com (dfle104.ent.ti.com [10.64.6.25])
+	by fllvem-sh03.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 56N83SlJ1619052
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
+	Wed, 23 Jul 2025 03:03:28 -0500
+Received: from DFLE102.ent.ti.com (10.64.6.23) by DFLE104.ent.ti.com
+ (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Wed, 23
+ Jul 2025 03:03:27 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
+ Frontend Transport; Wed, 23 Jul 2025 03:03:27 -0500
+Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 56N83RlH2365773;
+	Wed, 23 Jul 2025 03:03:27 -0500
+Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 56N83QkL015933;
+	Wed, 23 Jul 2025 03:03:26 -0500
+From: MD Danish Anwar <danishanwar@ti.com>
+To: "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Jonathan Corbet
+	<corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        Mengyuan Lou
+	<mengyuanlou@net-swift.com>,
+        MD Danish Anwar <danishanwar@ti.com>,
+        Michael
+ Ellerman <mpe@ellerman.id.au>,
+        Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Fan
+ Gong <gongfan1@huawei.com>, Lee Trager <lee@trager.us>,
+        Lorenzo Bianconi
+	<lorenzo@kernel.org>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Lukas
+ Bulwahn <lukas.bulwahn@redhat.com>,
+        Parthiban Veerasooran
+	<Parthiban.Veerasooran@microchip.com>
+CC: <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next 0/5] Add RPMSG Ethernet Driver
+Date: Wed, 23 Jul 2025 13:33:17 +0530
+Message-ID: <20250723080322.3047826-1-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250722062716.29590-1-yangtiezhu@loongson.cn> <20250722062716.29590-3-yangtiezhu@loongson.cn>
-In-Reply-To: <20250722062716.29590-3-yangtiezhu@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Wed, 23 Jul 2025 15:57:05 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H6seOazKUDwpqEwokv2-dYJX8sa03p=2ye8C-d=Bj8-wA@mail.gmail.com>
-X-Gm-Features: Ac12FXxUAg2s71SmfpE9ISn67doyybcYHPiL-kDLYehl6ymK9jmGn6iRkOyyaVY
-Message-ID: <CAAhV-H6seOazKUDwpqEwokv2-dYJX8sa03p=2ye8C-d=Bj8-wA@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/2] net: stmmac: Check stmmac_hw_setup() in stmmac_resume()
-To: Tiezhu Yang <yangtiezhu@loongson.cn>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Tue, Jul 22, 2025 at 2:27=E2=80=AFPM Tiezhu Yang <yangtiezhu@loongson.cn=
-> wrote:
->
-> stmmac_hw_setup() may return 0 on success and an appropriate negative
-> integer as defined in errno.h file on failure, just check it and then
-> return early if failed in stmmac_resume().
->
-> Signed-off-by: Tiezhu Yang <yangtiezhu@loongson.cn>
-Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/=
-net/ethernet/stmicro/stmmac/stmmac_main.c
-> index b948df1bff9a..2bfacab71ab9 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -7975,7 +7975,14 @@ int stmmac_resume(struct device *dev)
->         stmmac_free_tx_skbufs(priv);
->         stmmac_clear_descriptors(priv, &priv->dma_conf);
->
-> -       stmmac_hw_setup(ndev, false);
-> +       ret =3D stmmac_hw_setup(ndev, false);
-> +       if (ret < 0) {
-> +               netdev_err(priv->dev, "%s: Hw setup failed\n", __func__);
-> +               mutex_unlock(&priv->lock);
-> +               rtnl_unlock();
-> +               return ret;
-> +       }
-> +
->         stmmac_init_coalesce(priv);
->         phylink_rx_clk_stop_block(priv->phylink);
->         stmmac_set_rx_mode(ndev);
-> --
-> 2.42.0
->
->
+This patch series introduces the RPMSG Ethernet driver, which provides a
+virtual Ethernet interface for communication between a host processor and
+a remote processor using the RPMSG framework. The driver enables
+Ethernet-like packet transmission and reception over shared memory,
+facilitating inter-core communication in systems with heterogeneous
+processors.
+
+This series is a rework of [1]. There was comment from Andrew Lunn
+<andrew@lunn.ch> to modify this driver and make it generic so that other
+vendors can also use it.
+
+I have tried to generalize the driver. Since there has been lots of changes
+since [1], I am posting this as a new series.
+
+The series includes the following patches:
+
+1. Documentation:
+  - Adds comprehensive documentation for the RPMSG Ethernet driver.
+  - Details the shared memory layout, communication protocol, and usage
+    instructions.
+  - Provides a guide for vendors to develop compatible firmware.
+
+2. Basic RPMSG Skeleton:
+  - Introduces the basic RPMSG Ethernet driver skeleton.
+  - Implements probe, remove, and callback functions.
+  - Sets up the foundation for RPMSG communication.
+
+3. Netdev Registration:
+  - Registers the RPMSG Ethernet device as a netdev.
+  - Enhances the RPMSG callback to handle shared memory for TX and RX
+    buffers.
+  - Introduces shared memory structures and initializes the netdev.
+
+4. Netdev Operations:
+  - Implements netdev operations such as `ndo_open`, `ndo_stop`,
+    `ndo_start_xmit`, and `ndo_set_mac_address`.
+  - Adds support for NAPI-based RX processing and a timer-based RX
+    polling mechanism.
+  - Introduces a state machine to manage the driver's state transitions.
+
+5. Multicast Filtering:
+  - Adds support for multicast address filtering.
+  - Implements the `ndo_set_rx_mode` callback to manage multicast
+    addresses.
+  - Introduces a workqueue-based mechanism for asynchronous RX mode
+    updates.
+
+Key Features:
+- Virtual Ethernet interface using RPMSG.
+- Shared memory-based packet transmission and reception.
+- Support for multicast address management.
+- Dynamic MAC address assignment.
+- Efficient packet processing using NAPI.
+- State machine for managing interface states.
+
+This driver is designed to be generic and vendor-agnostic. Vendors can
+develop firmware for the remote processor to make it compatible with this
+driver by adhering to the shared memory layout and communication protocol
+described in the documentation.
+
+This patch series has been tested on a TI AM64xx platform with a compatible
+remote processor firmware. Feedback and suggestions for improvement are
+welcome.
+
+[1] https://lore.kernel.org/all/20240531064006.1223417-1-y-mallik@ti.com/
+
+MD Danish Anwar (5):
+  net: rpmsg-eth: Add Documentation for RPMSG-ETH Driver
+  net: rpmsg-eth: Add basic rpmsg skeleton
+  net: rpmsg-eth: Register device as netdev
+  net: rpmsg-eth: Add netdev ops
+  net: rpmsg-eth: Add support for multicast filtering
+
+ .../device_drivers/ethernet/index.rst         |   1 +
+ .../device_drivers/ethernet/rpmsg_eth.rst     | 339 ++++++++
+ drivers/net/ethernet/Kconfig                  |  10 +
+ drivers/net/ethernet/Makefile                 |   1 +
+ drivers/net/ethernet/rpmsg_eth.c              | 743 ++++++++++++++++++
+ drivers/net/ethernet/rpmsg_eth.h              | 305 +++++++
+ 6 files changed, 1399 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/rpmsg_eth.rst
+ create mode 100644 drivers/net/ethernet/rpmsg_eth.c
+ create mode 100644 drivers/net/ethernet/rpmsg_eth.h
+
+
+base-commit: 56613001dfc9b2e35e2d6ba857cbc2eb0bac4272
+-- 
+2.34.1
+
 
