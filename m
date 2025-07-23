@@ -1,101 +1,106 @@
-Return-Path: <netdev+bounces-209540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AAA9B0FC94
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 00:16:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D839BB0FCEF
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 00:33:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E36E1CC0685
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 22:16:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B0D2A7B8EB7
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 22:32:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C26C22257E;
-	Wed, 23 Jul 2025 22:16:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C07E273817;
+	Wed, 23 Jul 2025 22:32:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ja846Zfs"
+	dkim=pass (1024-bit key) header.d=n621.de header.i=@n621.de header.b="oWz675rP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from nyx.n621.de (v4gw.hekate.n621.de [136.243.2.102])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9641C84D0;
-	Wed, 23 Jul 2025 22:16:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76237273D60;
+	Wed, 23 Jul 2025 22:32:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=136.243.2.102
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753308984; cv=none; b=R7ydsmyEail1pd2aTr2BJftsqD49dDusl5eK0yHEi9wFIitBJu5Cs7hZsyKN/46TvzQjzMgHyNDjmmqfPaPcSGnHm06efAUiRsJ5uFs4wwzX5yPJ+cl23ru2UG9DE3sRC0NJWtgFIJ+80vIWhL3qL8Yo71uEbzzBMf3L0xLaV8g=
+	t=1753309949; cv=none; b=Tt+ql2BaAM8XGVP7n7O2s9TheXOyaJWD4kvWdZWpU3tFOcwxRTfSXPkmhO3cuig2ZANRozRaG6sUCTLeZEioUlXcaXt9LC9CsHfuQ5uO72ClfbwkfOIleadeCiXf4H7j4/Okc8p54SC7Y3gG5RrLmhuaVWBTSw7vH3YztGNiIMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753308984; c=relaxed/simple;
-	bh=CXlQbWCod255PhLjLd1pnNzqKBTQAnCUYfPIJDFXxt0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Kvhq3zNhisEVqOqIZEBZmAAY8+l3qIpaqR0gTBFr3OIjCHityjkZXBZaPVyyV/3GQBk0OML+U9EI4ohX4n/bWwq9/x3vuvGDqApDIHL6v1A7jTAeQSfpgmR8sGLoQZY1p49LP3yAVaSJwKW7lMT9LpzmR2Oqgeb8G4S53pimYkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ja846Zfs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22114C4CEE7;
-	Wed, 23 Jul 2025 22:16:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753308983;
-	bh=CXlQbWCod255PhLjLd1pnNzqKBTQAnCUYfPIJDFXxt0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ja846ZfsobSHMLatLtSKRrWuSKOfxaPHfEzAJ34f28njgLINmFZpWB/AjV/gmY35L
-	 05R9wcQt0M0eaz4Ej+W1Nulw2AcV/ZCmlAG+au9iJF42KHCqSzuXNX1ABrJQu1pTEW
-	 gOYTD2urcBwM9xxiKbhmfzXNxkIUMaxv7K+IW9vSouCKr7iMhl98zcI+CbGigWt6gP
-	 A00BFuSB789iM+Xisadpw40OzfJVgO96vKeXmcNvXSsSmIEaY/wIU8kC7suxC2EKcX
-	 QiP/oE5cbZz+zWTTTfxfq8Bcqb/e3lXDGGJH7QlyhsM57ijbT7IeqvDPBgT6edEzQ1
-	 YiM9AbxQQUZaw==
-Date: Wed, 23 Jul 2025 15:16:22 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: Jason Wang <jasowang@redhat.com>, Stephen Hemminger
- <stephen@networkplumber.org>, Cindy Lu <lulu@redhat.com>, KY Srinivasan
- <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
- <decui@microsoft.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Michael Kelley
- <mhklinux@outlook.com>, Shradha Gupta <shradhagupta@linux.microsoft.com>,
- Kees Cook <kees@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Kuniyuki
- Iwashima <kuniyu@google.com>, Alexander Lobakin
- <aleksander.lobakin@intel.com>, Guillaume Nault <gnault@redhat.com>, Joe
- Damato <jdamato@fastly.com>, Ahmed Zaki <ahmed.zaki@intel.com>, "open
- list:Hyper-V/Azure CORE AND DRIVERS" <linux-hyperv@vger.kernel.org>, "open
- list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, open list
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH RESEND] netvsc: transfer lower device max tso size
-Message-ID: <20250723151622.0606cc99@kernel.org>
-In-Reply-To: <SJ2PR21MB40138F71138A809C3A2D903BCA5FA@SJ2PR21MB4013.namprd21.prod.outlook.com>
-References: <20250718061812.238412-1-lulu@redhat.com>
-	<20250721162834.484d352a@kernel.org>
-	<CACGkMEtqhjTjdxPc=eqMxPNKFsKKA+5YP+uqWtonm=onm0gCrg@mail.gmail.com>
-	<20250721181807.752af6a4@kernel.org>
-	<CACGkMEtEvkSaYP1s+jq-3RPrX_GAr1gQ+b=b4oytw9_dGnSc_w@mail.gmail.com>
-	<20250723080532.53ecc4f1@kernel.org>
-	<SJ2PR21MB40138F71138A809C3A2D903BCA5FA@SJ2PR21MB4013.namprd21.prod.outlook.com>
+	s=arc-20240116; t=1753309949; c=relaxed/simple;
+	bh=H5dLFQLR80zyzGXaWyzLG3KAZqe+SuFTxe0PJa5w1d8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GKugATd6iYbpaOd1f/olkF2Hz57o9g/7Rr7ojL8o9g2WqcS/yLy4mVG/0+OYUendugh9ZIKzEr7MntudYPu8TeBWsaWp1mVrYBxuAq68RDnLsKcgGyaV8aUGVQbsq3Hsuvl4Ejl7KiApsRVrnTPCXsrBDjPpB4bR7tQX9WY604U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=n621.de; spf=pass smtp.mailfrom=n621.de; dkim=pass (1024-bit key) header.d=n621.de header.i=@n621.de header.b=oWz675rP; arc=none smtp.client-ip=136.243.2.102
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=n621.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=n621.de
+Received: from eos.home.n621.de (localhost [127.0.0.1])
+	by nyx.n621.de (Postfix) with ESMTP id C3180E002AF;
+	Thu, 24 Jul 2025 00:23:07 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=n621.de; s=dkim;
+	t=1753309388;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=FHC/FhBnpS0kU/U/rZh5/dUh3Fl0ZDAJeeBOGbTp50w=;
+	b=oWz675rPKlbZ8OpIlElDVCiM0hlKbtAlMQXiZgApQrxC60YFH1+4XN+WBCeiRI/tgBvpqx
+	dwKUOxDqmcDxisZNyDbkU5VfumbdCGVasDhAWVbEoBKJoGpTQQswaMppEeyCicAHZ8N+M6
+	F9F/zPRieeit9ayyuNE9vFwu73MBnps=
+From: Florian Larysch <fl@n621.de>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	Divya.Koppera@microchip.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Florian Larysch <fl@n621.de>,
+	stable@vger.kernel.org
+Subject: [PATCH net] net: phy: micrel: fix KSZ8081/KSZ8091 cable test
+Date: Thu, 24 Jul 2025 00:20:42 +0200
+Message-ID: <20250723222250.13960-1-fl@n621.de>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Wed, 23 Jul 2025 20:18:03 +0000 Haiyang Zhang wrote:
-> > > Btw, if I understand this correctly. This is for future development so
-> > > it's not a blocker for this patch?  
-> >
-> > Not a blocker, I'm just giving an example of the netvsc auto-weirdness
-> > being a source of tech debt and bugs. Commit d7501e076d859d is another
-> > recent one off the top of my head. IIUC systemd-networkd is broadly
-> > deployed now. It'd be great if there was some migration plan for moving
-> > this sort of VM auto-bonding to user space (with the use of the common
-> > bonding driver, not each hypervisor rolling its own).  
-> 
-> Actually, we had used the common bonding driver 9 years ago. But it's
-> replaced by this kernel/netvsc based "transparent" bonding mode. See
-> the patches listed below.
-> 
-> The user mode bonding scripts were unstable, and difficult to deliver
-> & update for various distros. So Stephen developed the new "transparent"
-> bonding mode, which greatly improves the situation.
+Commit 21b688dabecb ("net: phy: micrel: Cable Diag feature for lan8814
+phy") introduced cable_test support for the LAN8814 that reuses parts of
+the KSZ886x logic and introduced the cable_diag_reg and pair_mask
+parameters to account for differences between those chips.
 
-I specifically highlighted systemd-networkd as the change in the user
-space landscape.
+However, it did not update the ksz8081_type struct, so those members are
+now 0, causing no pairs to be tested in ksz886x_cable_test_get_status
+and ksz886x_cable_test_wait_for_completion to poll the wrong register
+for the affected PHYs (Basic Control/Reset, which is 0 in normal
+operation) and exit immediately.
+
+Fix this by setting both struct members accordingly.
+
+Fixes: 21b688dabecb ("net: phy: micrel: Cable Diag feature for lan8814 phy")
+Cc: stable@vger.kernel.org
+Signed-off-by: Florian Larysch <fl@n621.de>
+---
+ drivers/net/phy/micrel.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+index 64aa03aed770..50c6a4e8cfa1 100644
+--- a/drivers/net/phy/micrel.c
++++ b/drivers/net/phy/micrel.c
+@@ -472,6 +472,8 @@ static const struct kszphy_type ksz8051_type = {
+ 
+ static const struct kszphy_type ksz8081_type = {
+ 	.led_mode_reg		= MII_KSZPHY_CTRL_2,
++	.cable_diag_reg		= KSZ8081_LMD,
++	.pair_mask		= KSZPHY_WIRE_PAIR_MASK,
+ 	.has_broadcast_disable	= true,
+ 	.has_nand_tree_disable	= true,
+ 	.has_rmii_ref_clk_sel	= true,
+-- 
+2.50.1
+
 
