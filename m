@@ -1,157 +1,118 @@
-Return-Path: <netdev+bounces-209324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06708B0F14A
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 13:35:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B6B7B0F176
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 13:40:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A4537B2D12
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 11:34:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8298918987AC
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 11:41:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED06A2E543A;
-	Wed, 23 Jul 2025 11:35:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58BE22E425F;
+	Wed, 23 Jul 2025 11:40:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Kjcah5zH"
+	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="kC2WPWDa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from mail.zeus03.de (zeus03.de [194.117.254.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BF422E49BE;
-	Wed, 23 Jul 2025 11:35:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4C702E427C
+	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 11:40:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753270510; cv=none; b=e2MQacE0WnrqsOoydjKkREqgWxcJKAthPb55OhkQJ1t8CTYK2FybYd0TCJoXIMwIVGMpbAOkRrLyCxLuMs/vC9CB4Rk446GO0v3G6Y3MMV5ebNuo+dKemcAjpHSiH/EsCbZX7nAig+t3xx6W5tDiJ1YNzQxL5lddjp2S6zhM96s=
+	t=1753270846; cv=none; b=b17L/yN2VJhgXnq+okMWnOITb8Vq5m4pJmsRKswj4Ya6sYZ9Ut3FYrcPTZvygOI2z8JGSnipzqnJ2bVKEZBONXl1JonNbqsN4QTeCRcwNhZhhfptqgetYqgWETWr+0oy7hi4cByvdMjDlCqqiiF8rx4iKXf3qr7NyYabKshDpZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753270510; c=relaxed/simple;
-	bh=NaqnBjwkXIQgRY6bvzvyQHA4TyoMVW07CLlzipyiNSc=;
+	s=arc-20240116; t=1753270846; c=relaxed/simple;
+	bh=vBLeINt+biwJoMtPoVVFU+AyFpkgcapAO9E+5gGvdxs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u3RLFY5zMqv4qy2a57/h70YpJ+FGsV7m7KYa360rKT1EEBD+qFb9Q1GHSVU2Gv12oOyHNCI5IEOYSryCivz7KrD54axmabJaIUqlU451yHOutEKqyxyBVG58Uvw6aeuEOIeTS9G9dGASB4H85wYrWK7MmKG+n4RKbaW5gMSHZu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Kjcah5zH; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753270510; x=1784806510;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=NaqnBjwkXIQgRY6bvzvyQHA4TyoMVW07CLlzipyiNSc=;
-  b=Kjcah5zHwh6bN0B6C76Q32zBPhG8lGgwHihSm0NyBRZncs0mk1oX9Tbt
-   Ge2Xv20ykJYMR706t/9g00Ak6PxSvncOxLv/tGyj1Gf4jroSBAsPogOpQ
-   6FX51/cfY6kJT2R1TXiIO/1Y2EA/AQHvmChmLxrjWruIRLf5i9h1F7A6b
-   +DrrHkJSN0bDBJJS+OMmFGv+Hq9/Pe74wdorUhyalZEHuAhlfzg4W8sIs
-   k4bHuz30ucRHbBwyqBIgIP6f6ebJuKwJxxgtnNmxJ2aaJlBt0zJX6HouH
-   VwGKuaXP+4rstH/hQ2pCQC9PD7PXEUmKqzGV8sThaWp0xoPUaY/5d2RDe
-   w==;
-X-CSE-ConnectionGUID: 2IA6dQgcQPSsGx1rGoHlZw==
-X-CSE-MsgGUID: O3Psr69OQc+rJ9x6diaTeA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11500"; a="55505001"
-X-IronPort-AV: E=Sophos;i="6.16,333,1744095600"; 
-   d="scan'208";a="55505001"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2025 04:35:09 -0700
-X-CSE-ConnectionGUID: TR6FWWC9SVmfojcgdHvLRg==
-X-CSE-MsgGUID: AsjbwzVhTyeUC7pzLlASzg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,333,1744095600"; 
-   d="scan'208";a="164892580"
-Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 23 Jul 2025 04:35:02 -0700
-Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1ueXkS-000JJx-17;
-	Wed, 23 Jul 2025 11:35:00 +0000
-Date: Wed, 23 Jul 2025 19:34:58 +0800
-From: kernel test robot <lkp@intel.com>
-To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, linux-doc@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	Bjorn Helgaas <helgaas@kernel.org>, luosifu <luosifu@huawei.com>,
-	Xin Guo <guoxin09@huawei.com>,
-	Shen Chenyang <shenchenyang1@hisilicon.com>,
-	Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
-	Shi Jing <shijing34@huawei.com>,
-	Fu Guiming <fuguiming@h-partners.com>,
-	Meny Yossefi <meny.yossefi@huawei.com>,
-	Gur Stavi <gur.stavi@huawei.com>, Lee Trager <lee@trager.us>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Suman Ghosh <sumang@marvell.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Joe Damato <jdamato@fastly.com>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: Re: [PATCH net-next v10 1/8] hinic3: Async Event Queue interfaces
-Message-ID: <202507231813.7ti3bdJj-lkp@intel.com>
-References: <bea50c6c329c5ffb77cfe059e07eeed187619346.1753152592.git.zhuyikai1@h-partners.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=D9bBz3sper4+Ny7AAHuvZ0LsjrF/rJxMRUuo92op6M2hwvSksnqTtAIJDpN4R0pwYk8IKJTQMfz0mIrB6jjAXUckB46P4A4XbhftktxkupQeZyVdcF3WHvuznqi4t/3XbONerBdqndoHr36ymQr1Vv+f41rKNbTMPdq6kMHO5T0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=kC2WPWDa; arc=none smtp.client-ip=194.117.254.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	sang-engineering.com; h=date:from:to:cc:subject:message-id
+	:references:mime-version:content-type:in-reply-to; s=k1; bh=vBLe
+	INt+biwJoMtPoVVFU+AyFpkgcapAO9E+5gGvdxs=; b=kC2WPWDaokTQoHdXhIqT
+	+4nvQmuF7Q6kQWiGDR97P/l4ZZbVpwRg+0wN6fs/NdCJ75oAC/LWN4hvQWFAahTk
+	kCis8IkWJgij5/2XKql6tjdb4MNCrPlvaX5UZpn5ZAEm+1eZiNS1AfJ4ljCbKqNL
+	zeYFhgmN1vmr/5RjZNhTaBuDDlMUN6JTK1flvRnlVlaC3880HKxMjsZpolFIaZcb
+	8cEX3vDBmv43xJiw4bkHyFbabsUW35++L1rIx8TtDOECt4N1EcHdK2o4VQ7dqLIA
+	KYhmY+PxaV4ok7JfIYGrnzIwgJmF0ODVcGOwnmepXLEp/HL24kp2jjurDETPCYsB
+	QQ==
+Received: (qmail 1683768 invoked from network); 23 Jul 2025 13:40:38 +0200
+Received: by mail.zeus03.de with UTF8SMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 23 Jul 2025 13:40:38 +0200
+X-UD-Smtp-Session: l3s3148p1@LMKHLZc6ltAujnvr
+Date: Wed, 23 Jul 2025 13:40:38 +0200
+From: Wolfram Sang <wsa+renesas@sang-engineering.com>
+To: a0282524688@gmail.com
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org,
+	brgl@bgdev.pl, andi.shyti@kernel.org, mkl@pengutronix.de,
+	mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net,
+	jdelvare@suse.com, alexandre.belloni@bootlin.com,
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
+	linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH v14 3/7] i2c: Add Nuvoton NCT6694 I2C support
+Message-ID: <aIDKNieKis55kyZN@shikoro>
+References: <20250715025626.968466-1-a0282524688@gmail.com>
+ <20250715025626.968466-4-a0282524688@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Iem7TgVIXcEduHhw"
+Content-Disposition: inline
+In-Reply-To: <20250715025626.968466-4-a0282524688@gmail.com>
+
+
+--Iem7TgVIXcEduHhw
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bea50c6c329c5ffb77cfe059e07eeed187619346.1753152592.git.zhuyikai1@h-partners.com>
+Content-Transfer-Encoding: quoted-printable
 
-Hi Fan,
+On Tue, Jul 15, 2025 at 10:56:22AM +0800, a0282524688@gmail.com wrote:
+> From: Ming Yu <a0282524688@gmail.com>
+>=20
+> This driver supports I2C adapter functionality for NCT6694 MFD
+> device based on USB interface.
+>=20
+> Each I2C controller uses the default baudrate of 100kHz, which
+> can be overridden via module parameters.
+>=20
+> Acked-by: Andi Shyti <andi.shyti@kernel.org>
+> Signed-off-by: Ming Yu <a0282524688@gmail.com>
 
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on 5e95c0a3a55aea490420bd6994805edb050cc86b]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Fan-Gong/hinic3-Async-Event-Queue-interfaces/20250722-152434
-base:   5e95c0a3a55aea490420bd6994805edb050cc86b
-patch link:    https://lore.kernel.org/r/bea50c6c329c5ffb77cfe059e07eeed187619346.1753152592.git.zhuyikai1%40h-partners.com
-patch subject: [PATCH net-next v10 1/8] hinic3: Async Event Queue interfaces
-config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20250723/202507231813.7ti3bdJj-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250723/202507231813.7ti3bdJj-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507231813.7ti3bdJj-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/huawei/hinic3/hinic3_eqs.c:77:17: warning: variable 'cb_state' set but not used [-Wunused-but-set-variable]
-      77 |         unsigned long *cb_state;
-         |                        ^
-   drivers/net/ethernet/huawei/hinic3/hinic3_eqs.c:91:17: warning: variable 'cb_state' set but not used [-Wunused-but-set-variable]
-      91 |         unsigned long *cb_state;
-         |                        ^
-   drivers/net/ethernet/huawei/hinic3/hinic3_eqs.c:127:17: warning: variable 'cb_state' set but not used [-Wunused-but-set-variable]
-     127 |         unsigned long *cb_state;
-         |                        ^
-   3 warnings generated.
+Reviewed-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
 
 
-vim +/cb_state +77 drivers/net/ethernet/huawei/hinic3/hinic3_eqs.c
+--Iem7TgVIXcEduHhw
+Content-Type: application/pgp-signature; name="signature.asc"
 
-    71	
-    72	int hinic3_aeq_register_cb(struct hinic3_hwdev *hwdev,
-    73				   enum hinic3_aeq_type event,
-    74				   hinic3_aeq_event_cb hwe_cb)
-    75	{
-    76		struct hinic3_aeqs *aeqs;
-  > 77		unsigned long *cb_state;
-    78	
-    79		aeqs = hwdev->aeqs;
-    80		cb_state = &aeqs->aeq_cb_state[event];
-    81		aeqs->aeq_cb[event] = hwe_cb;
-    82		spin_lock_init(&aeqs->aeq_lock);
-    83	
-    84		return 0;
-    85	}
-    86	
+-----BEGIN PGP SIGNATURE-----
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmiAyjIACgkQFA3kzBSg
+KbZiTA//QkvcMLKXy7oEhoPaRSSzTZUtGps1YigTeY52v1SgTJ/ySNv1fAEE54ei
+gr1ochYm/mhCI4ahDZFZZ2j2ulA34KchA8SQ0Tj20RPyQz9jbgHiNPP6Wsgl4kk4
+z943QFzVoxDlxWoWhnkJbwMMCO683Oq/JPRP3DSgVbLRbVBVXdNgp7mit9zgmZev
+2koMgmj6AePIWn35T2/U7pIS4vVzYVzHqycllQdt+XmA5U/V8b3ozjswOKHNDDZf
+64brf3wbZLM5xDg8gXI6qmceEWYTAfY4i7epDpqZtFclVRcnHl2+guWppdu7TO2F
+OGpaqLudduYZG//U2VX3WycczzhsboQoEiLJb/lfAw+xfI/pjbN7FRlQhtd4e/0t
+0rRJMjckmrmFA4G9Yu+Hd3AA2OcLt0FcW/z3+HXUFLd8HvORVgozd/nF1fyYMlKD
+ySy+iBx9eYxgGGxAw8xiWGFIMIJ8Xc40D2SZ1Rh7ZAZTJvDklJpvB2iHSsU86yMD
+1XRWJO14df/RrKqsfecRa49LXmpbNU5pbHshW4p7IJaeWhjliAa5j9kA77Y/iWDq
+fShNWwC5++edujKlXVdHX+46+fikhZTo374+SrY3mx49zcZcL1UQ/MTgX3vmMfkk
+SyTxZuVMK+Vr5jA7+vjMkCm7G/9thcIsx/sRYG5LXfIKnd/NZMQ=
+=KBkq
+-----END PGP SIGNATURE-----
+
+--Iem7TgVIXcEduHhw--
 
