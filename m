@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-209156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8AEAB0E813
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 03:30:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7847B0E815
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 03:30:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0CFA516A3A5
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 01:30:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A6C01C88589
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 01:30:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7621219D88F;
-	Wed, 23 Jul 2025 01:29:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD6D19CC29;
+	Wed, 23 Jul 2025 01:29:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DNpG3Yrv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hyDU0mZf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D08719CC29;
-	Wed, 23 Jul 2025 01:29:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A911A5BAE
+	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 01:29:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753234194; cv=none; b=o7HJJ63RpLlOLjvMeYttPZktWzyhQErpvkaKvklAc97jJIC5F9OzlMrGXWuAp4JlMTk7rpaeN02VzaZU2YbMcr1RB1Qn7aaO9vdX0QT5p2rOHLsUoKigcIUhGOEay32Ysk0l8I+ZSiDY1Wj/W643iAFtBHjSZ8tOX45k5gwh2yY=
+	t=1753234195; cv=none; b=DfTRR3mYHxcVNYzOgWs3VmLGeB5xYI0ZHBSJKc4fy9keK5DBSzbOxIaAn179l+qQBmE1GD9jjijMebLmW0FuyaHXln7hbLMbZwqx0vXhkD6rQWbF7cm+2dp2j5cwKi9X+hQATtRBfhdNmwpmtp16eA+XhVyr7+XlAZ0fKItz9qM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753234194; c=relaxed/simple;
-	bh=VWKJc7ylCoJ9UM9J8dblvzszsYB29Cn5NRgB99tmpuo=;
+	s=arc-20240116; t=1753234195; c=relaxed/simple;
+	bh=ZJ4o4zOvgVH+xjq304mGOhhr+zGRmm4CPF3hEi+ykYA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=J8h6Ec01Kmtu1Yb1RSxxKMXwMEEoeuO72KPkRHpHOfzbcMhOwvZxqWdpG//0IxzZLRkroG2YRe9X6TXKnFXQjmW0xvZensYGTHKjoFGDDtZ4KvTNDqfrpGeQuZcwVktuqpqeLgzVPZbiNTdYdbHIJCLzV8rXRhmRUFkEXCmyZ0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DNpG3Yrv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFDF6C4CEF7;
-	Wed, 23 Jul 2025 01:29:53 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=NRGJaDFMWupD1LOX8+N/0i7t7tczdRsG8vjbFatnhCQ7BDXpbPVEDm5mKPHRakKQCZ1WL+RPPmOZ4wG4MjHCc+4mhzq6bWHUBLlq7wYV3CnJ3l8EOhLTCe2fbgVtijtJwgpLhpWWuHMIYmxpVNJcMDNTDUxxPmSkUD2vS57+3Os=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hyDU0mZf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 185B6C4CEF1;
+	Wed, 23 Jul 2025 01:29:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753234193;
-	bh=VWKJc7ylCoJ9UM9J8dblvzszsYB29Cn5NRgB99tmpuo=;
+	s=k20201202; t=1753234195;
+	bh=ZJ4o4zOvgVH+xjq304mGOhhr+zGRmm4CPF3hEi+ykYA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DNpG3YrvH6PQnbfQuZfuNk398wd4esBgabN2wB4vq1Z8jw17v7aJeOypc53noI2RY
-	 6860JxTwrGAnuKoqH5FlGgJbjAKDtZzxAGMvsdB81xN4BvOBa44+qFsA+mKBy9Yel9
-	 g+T9tYdBT0cEoIiqxxU8uEcDLUaXEo/YNgMHdkgtA4I/WhquZTV8eg5q99orvgB8H7
-	 +ZZDOfqcvk0Ubo1eRn+oWfOx4N5NUwkmZWczU1wV/Ae/l+/nK/CLTYSQm4qU0xsx4j
-	 ET9oxuNLacW2clXwtuVxisR9vFPvyfCfKGrhqYgw//AhFsW4Ars31TxD+3lcfIpRr/
-	 KlF14jcDRTSmQ==
+	b=hyDU0mZfGs+vR8uVhENQswlVfmiMguryPC0I5jY5q3tCzDG8Geu3DauhqecEv2sms
+	 TUavdgB9ayNRlDpnVoSfGuvJI0dyIZaoO6wrt5/MHmFIaXYb47PD4cccBuhHb78WPe
+	 r+7/itRMnmi5bNwrkVBJOq1ONCuhR9H5SmFc2XBMJwsmjioKpqUesyCDDAPXS1OHy9
+	 bRCNkzK8L3wObfd/2630I74AN9/d5Hbdte4Y125hVyiX7MVoxmCGoajy0kMfKCjqpc
+	 WH6woy6ezxso04TxpptTO8Bu9OAydeenKS2j499JAeXKAyO1gvQ+THnuci2y7hsMF+
+	 /P4lEfwOaqUuw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C10383BF5D;
-	Wed, 23 Jul 2025 01:30:13 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC17383BF5D;
+	Wed, 23 Jul 2025 01:30:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net] selftests: netfilter: tone-down conntrack clash
- test
+Subject: Re: [PATCH net 0/5][pull request] Intel Wired LAN Driver Updates
+ 2025-07-21 (i40e, ice, e1000e)
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175323421226.1016544.13216461197162224409.git-patchwork-notify@kernel.org>
-Date: Wed, 23 Jul 2025 01:30:12 +0000
-References: <20250721223652.6956-1-fw@strlen.de>
-In-Reply-To: <20250721223652.6956-1-fw@strlen.de>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, kuba@kernel.org,
- pabeni@redhat.com, davem@davemloft.net, edumazet@google.com
+ <175323421349.1016544.2573519707976944136.git-patchwork-notify@kernel.org>
+Date: Wed, 23 Jul 2025 01:30:13 +0000
+References: <20250721173733.2248057-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20250721173733.2248057-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series was applied to netdev/net.git (main)
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
 
-On Tue, 22 Jul 2025 00:36:49 +0200 you wrote:
-> The test is supposed to observe that the 'clash_resolve' stat counter
-> incremented (i.e., the code path was covered).
-> This check was incorrect, 'conntrack -S' needs to be called in the
-> revevant namespace, not the initial netns.
+On Mon, 21 Jul 2025 10:37:21 -0700 you wrote:
+> For i40e:
+> Dennis Chen adjusts reporting of VF Tx dropped to a more appropriate
+> field.
 > 
-> The clash resolution logic in conntrack is only exercised when multiple
-> packets with the same udp quadruple race. Depending on kernel config,
-> number of CPUs, scheduling policy etc.  this might not trigger even
-> after several retries.  Thus the script eventually returns SKIP if the
-> retry count is exceeded.
+> Jamie Bainbridge fixes a check which can cause a PF set VF MAC address
+> to be lost.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,net] selftests: netfilter: tone-down conntrack clash test
-    https://git.kernel.org/netdev/net/c/dca56cc8b5c3
+  - [net,1/5] i40e: report VF tx_dropped with tx_errors instead of tx_discards
+    https://git.kernel.org/netdev/net/c/50b2af451597
+  - [net,2/5] i40e: When removing VF MAC filters, only check PF-set MAC
+    https://git.kernel.org/netdev/net/c/5a0df02999db
+  - [net,3/5] ice: Fix a null pointer dereference in ice_copy_and_init_pkg()
+    https://git.kernel.org/netdev/net/c/4ff12d82dac1
+  - [net,4/5] e1000e: disregard NVM checksum on tgp when valid checksum bit is not set
+    https://git.kernel.org/netdev/net/c/536fd741c7ac
+  - [net,5/5] e1000e: ignore uninitialized checksum word on tgp
+    https://git.kernel.org/netdev/net/c/61114910a5f6
 
 You are awesome, thank you!
 -- 
