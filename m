@@ -1,54 +1,63 @@
-Return-Path: <netdev+bounces-209478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 617F0B0FA82
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 20:50:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D204DB0FA87
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 20:57:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65B334E169A
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 18:50:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 043A958103A
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 18:57:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98822221280;
-	Wed, 23 Jul 2025 18:50:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34D60221F2F;
+	Wed, 23 Jul 2025 18:57:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QHGo/i99"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="ggWql5De"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70D2221D3F5;
-	Wed, 23 Jul 2025 18:50:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C7301DE2DE;
+	Wed, 23 Jul 2025 18:57:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753296651; cv=none; b=jRjPd+5Hqw//qMoollIw/TH2MNq1zvBeolc72r5mNqv9xgsmb9ERtQWkdqJAj7V2rU2Xf3SKrkMJGL/rl+kxsudut5UFtcv6FCh09mAfYPPsimj+VIqu/zNhw/cTaiIYSZoPd0XC1YUk03+I68xTjWOmUGTArbW65rXEl9tzae8=
+	t=1753297029; cv=none; b=l4hdQBp7J9OzJUjWqe13MdCmGl1GHWPYk5pe2tfUi907jSYxkmUOfjOaIJgzXwzCJxbUGSk0ty0fODzY+n4mBzONqc9GgmrCN5bZ7I0It31wPv7+mpbOwm70qsyETfemTmRLHMi2UCLeLTtiM/C2bznwKkcEISjq+MctInJW0p8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753296651; c=relaxed/simple;
-	bh=RXOYLDNicKQoltUaW0luwByl2WWWYpgXXuteOXBrbxc=;
+	s=arc-20240116; t=1753297029; c=relaxed/simple;
+	bh=1pdO3xQX9ZiWPr/mrU+7/w8/Rw4NA64MEUh5HJsxIBQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NyQ0+9J7+f8RtU8C+DFRhei+U+QShWjzwZFgcw6R3rUKCzF8CRR19Zb94v1D6jc7U432WXXvYCNLYcpNNhqbffeaWk4Uj6KhDqANBjgNBQb+zzsNOUkq1nynmkiqfDrjR4Tpv7p10nDuop8hEedMOWsPJykkiOSgZepX4es61PU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QHGo/i99; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08B52C4CEE7;
-	Wed, 23 Jul 2025 18:50:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753296651;
-	bh=RXOYLDNicKQoltUaW0luwByl2WWWYpgXXuteOXBrbxc=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ny5FwdHgblPNQbfih3pxnBdx7SnY/9UFFvXd4SyspJkS7v3lWji04KQuT7PVLV5BCKZzn3nqTtW0sioSi95i1SeQQNSSpEXG8zTlRMxIM4Wopa/QuXOdk8ucV+fDqbiIzF3hFQlHEX32I1yqNn6LxITVrspXlgOhLKeJgMT71Vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=ggWql5De; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id 918A5201657D; Wed, 23 Jul 2025 11:57:06 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 918A5201657D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1753297026;
+	bh=fdUlepUEgkZhZD2V9VB8bb3OKlCd2kCf6lff3ztogl8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QHGo/i99c8nDxKsS+28Ul2un62l327D3BZFDCqACRDanXNKXSoP1RAFf2PaBbDATz
-	 +Zzm57NggmXt0WL2J0I4qVCmG1DHn/PdfystzcJbMeejvO0IygIV6qPSi9gsEV5GHd
-	 Gb5pLUTWOAFUTExSwXIvUEx0qDykYsThVMef/6JxdNjvo0MdPdLgW7vbB7oI+hJNSk
-	 hXNOM+V4U+9wuYsWe9nX5uXy4LU2fj5R1AsEjZeGaiK/tltG17tCYloZuD1kPre410
-	 Qj7xm/b2TFmGuy5TE21YD/pLlJ3T/MeE6BZgFe/5wS8JeQOc2Q4XCDzWoZzh7BrqUH
-	 KAYrcujitfG3A==
-Date: Wed, 23 Jul 2025 19:50:47 +0100
-From: Simon Horman <horms@kernel.org>
-To: Ali Ghaffarian <alighaffarian9@gmail.com>
-Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] Net: ipv4: fixed a coding style issue
-Message-ID: <20250723185047.GL1036606@horms.kernel.org>
-References: <20250723084736.521507-1-alighaffarian9@gmail.com>
+	b=ggWql5DeForUtDzNIudbHl7Ej2o5uqXZBHIxrPv9IaevtdIjKGnJo7fj/NXvI4a6i
+	 ynYpzpdeC63dJ+9xzEF94LVR0ewKSRrOg3wCeJwXdBmeHYc+IUKQettO6WxgLNAf6V
+	 IXqeRoeNf2i867JBE9IhIg1uSQgGeZxZbaIx47EM=
+Date: Wed, 23 Jul 2025 11:57:06 -0700
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: Saurabh Singh Sengar <ssengar@linux.microsoft.com>
+Cc: kuba@kernel.org, kys@microsoft.com, haiyangz@microsoft.com,
+	wei.liu@kernel.org, decui@microsoft.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+	john.fastabend@gmail.com, sdf@fomichev.me, lorenzo@kernel.org,
+	michal.kubiak@intel.com, ernis@linux.microsoft.com,
+	shradhagupta@linux.microsoft.com, shirazsaleem@microsoft.com,
+	rosenp@gmail.com, netdev@vger.kernel.org,
+	linux-hyperv@vger.kernel.org, linux-rdma@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH] net: mana: Use page pool fragments for RX buffers
+ instead of full pages to improve memory efficiency and throughput.
+Message-ID: <20250723185706.GA31952@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20250721101417.GA18873@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <20250723073804.GA19640@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,36 +66,593 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250723084736.521507-1-alighaffarian9@gmail.com>
+In-Reply-To: <20250723073804.GA19640@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Wed, Jul 23, 2025 at 12:17:36PM +0330, Ali Ghaffarian wrote:
-> Fixed a coding style issue.
+Thanks Saurabh,
+I am sending a v2.
+
+Regards
+Dipayaan Roy
+
+On Wed, Jul 23, 2025 at 12:38:04AM -0700, Saurabh Singh Sengar wrote:
+> On Mon, Jul 21, 2025 at 03:14:17AM -0700, Dipayaan Roy wrote:
+> > This patch enhances RX buffer handling in the mana driver by allocating
+> > pages from a page pool and slicing them into MTU-sized fragments, rather
+> > than dedicating a full page per packet. This approach is especially
+> > beneficial on systems with 64KB page sizes.
+> > 
+> > Key improvements:
+> > 
+> > - Proper integration of page pool for RX buffer allocations.
+> > - MTU-sized buffer slicing to improve memory utilization.
+> > - Reduce overall per Rx queue memory footprint.
+> > - Automatic fallback to full-page buffers when:
+> >    * Jumbo frames are enabled (MTU > PAGE_SIZE / 2).
+> >    * The XDP path is active, to avoid complexities with fragment reuse.
+> > - Removal of redundant pre-allocated RX buffers used in scenarios like MTU
+> >   changes, ensuring consistency in RX buffer allocation.
+> > 
+> > Testing on VMs with 64KB pages shows around 200% throughput improvement.
+> > Memory efficiency is significantly improved due to reduced wastage in page
+> > allocations. Example: We are now able to fit 35 Rx buffers in a single 64KB
+> > page for MTU size of 1500, instead of 1 Rx buffer per page previously.
+> > 
+> > Tested:
+> > 
+> > - iperf3, iperf2, and nttcp benchmarks.
+> > - Jumbo frames with MTU 9000.
+> > - Native XDP programs (XDP_PASS, XDP_DROP, XDP_TX, XDP_REDIRECT) for
+> >   testing the driver???s XDP path.
+> > - Page leak detection (kmemleak).
+> > - Driver load/unload, reboot, and stress scenarios.
+> > 
+> > Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+> > ---
+> >  .../net/ethernet/microsoft/mana/mana_bpf.c    |  22 +-
+> >  drivers/net/ethernet/microsoft/mana/mana_en.c | 284 ++++++------------
+> >  .../ethernet/microsoft/mana/mana_ethtool.c    |  13 -
+> >  include/net/mana/mana.h                       |  13 +-
+> >  4 files changed, 115 insertions(+), 217 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/microsoft/mana/mana_bpf.c b/drivers/net/ethernet/microsoft/mana/mana_bpf.c
+> > index d30721d4516f..96813b6c184f 100644
+> > --- a/drivers/net/ethernet/microsoft/mana/mana_bpf.c
+> > +++ b/drivers/net/ethernet/microsoft/mana/mana_bpf.c
+> > @@ -174,6 +174,7 @@ static int mana_xdp_set(struct net_device *ndev, struct bpf_prog *prog,
+> >  	struct mana_port_context *apc = netdev_priv(ndev);
+> >  	struct bpf_prog *old_prog;
+> >  	struct gdma_context *gc;
+> > +	int err;
+> >  
+> >  	gc = apc->ac->gdma_dev->gdma_context;
+> >  
+> > @@ -198,14 +199,33 @@ static int mana_xdp_set(struct net_device *ndev, struct bpf_prog *prog,
+> >  	if (old_prog)
+> >  		bpf_prog_put(old_prog);
+> >  
+> > -	if (apc->port_is_up)
+> > +	if (apc->port_is_up) {
+> > +		/* Re-create rxq's after xdp prog was loaded or unloaded.
+> > +		 * Ex: re create rxq's to switch from full pages to smaller
+> > +		 * size page fragments when xdp prog is unloaded and vice-versa.
+> > +		 */
+> > +
+> > +		err = mana_detach(ndev, false);
+> > +		if (err) {
+> > +			netdev_err(ndev, "mana_detach failed at xdp set: %d\n", err);
+> > +			goto out;
 > 
-> Signed-off-by: Ali Ghaffarian <alighaffarian9@gmail.com>
-
-Hi Ali,
-
-Unfortunately we don't accept clean-up patches of this nature
-for Networking code unless they are part of a broader set of changes.
-
-Quoting documentation:
-
-  Clean-up patches
-  ~~~~~~~~~~~~~~~~
-
-  Netdev discourages patches which perform simple clean-ups, which are not in
-  the context of other work. For example:
-
-  * Addressing ``checkpatch.pl`` warnings
-  * Addressing :ref:`Local variable ordering<rcs>` issues
-  * Conversions to device-managed APIs (``devm_`` helpers)
-
-  This is because it is felt that the churn that such changes produce comes
-  at a greater cost than the value of such clean-ups.
-
-  Conversely, spelling and grammar fixes are not discouraged.
-
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#clean-up-patches
---
-pw-bot: cr
+> You should return err. At out we are always returning 0 which is wrong.
+> 
+> > +		}
+> > +
+> > +		err = mana_attach(ndev);
+> > +		if (err) {
+> > +			netdev_err(ndev, "mana_attach failed at xdp set: %d\n", err);
+> > +			goto out;
+> 
+> same here.
+> 
+> > +		}
+> > +
+> >  		mana_chn_setxdp(apc, prog);
+> > +	}
+> >  
+> >  	if (prog)
+> >  		ndev->max_mtu = MANA_XDP_MTU_MAX;
+> >  	else
+> >  		ndev->max_mtu = gc->adapter_mtu - ETH_HLEN;
+> >  
+> > +out:
+> >  	return 0;
+> >  }
+> >  
+> > diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > index a7973651ae51..a474c59c907c 100644
+> > --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > @@ -548,171 +548,45 @@ static u16 mana_select_queue(struct net_device *ndev, struct sk_buff *skb,
+> >  	return txq;
+> >  }
+> >  
+> > -/* Release pre-allocated RX buffers */
+> > -void mana_pre_dealloc_rxbufs(struct mana_port_context *mpc)
+> > -{
+> > -	struct device *dev;
+> > -	int i;
+> > -
+> > -	dev = mpc->ac->gdma_dev->gdma_context->dev;
+> > -
+> > -	if (!mpc->rxbufs_pre)
+> > -		goto out1;
+> > -
+> > -	if (!mpc->das_pre)
+> > -		goto out2;
+> > -
+> > -	while (mpc->rxbpre_total) {
+> > -		i = --mpc->rxbpre_total;
+> > -		dma_unmap_single(dev, mpc->das_pre[i], mpc->rxbpre_datasize,
+> > -				 DMA_FROM_DEVICE);
+> > -		put_page(virt_to_head_page(mpc->rxbufs_pre[i]));
+> > -	}
+> > -
+> > -	kfree(mpc->das_pre);
+> > -	mpc->das_pre = NULL;
+> > -
+> > -out2:
+> > -	kfree(mpc->rxbufs_pre);
+> > -	mpc->rxbufs_pre = NULL;
+> > -
+> > -out1:
+> > -	mpc->rxbpre_datasize = 0;
+> > -	mpc->rxbpre_alloc_size = 0;
+> > -	mpc->rxbpre_headroom = 0;
+> > -}
+> > -
+> > -/* Get a buffer from the pre-allocated RX buffers */
+> > -static void *mana_get_rxbuf_pre(struct mana_rxq *rxq, dma_addr_t *da)
+> > -{
+> > -	struct net_device *ndev = rxq->ndev;
+> > -	struct mana_port_context *mpc;
+> > -	void *va;
+> > -
+> > -	mpc = netdev_priv(ndev);
+> > -
+> > -	if (!mpc->rxbufs_pre || !mpc->das_pre || !mpc->rxbpre_total) {
+> > -		netdev_err(ndev, "No RX pre-allocated bufs\n");
+> > -		return NULL;
+> > -	}
+> > -
+> > -	/* Check sizes to catch unexpected coding error */
+> > -	if (mpc->rxbpre_datasize != rxq->datasize) {
+> > -		netdev_err(ndev, "rxbpre_datasize mismatch: %u: %u\n",
+> > -			   mpc->rxbpre_datasize, rxq->datasize);
+> > -		return NULL;
+> > -	}
+> > -
+> > -	if (mpc->rxbpre_alloc_size != rxq->alloc_size) {
+> > -		netdev_err(ndev, "rxbpre_alloc_size mismatch: %u: %u\n",
+> > -			   mpc->rxbpre_alloc_size, rxq->alloc_size);
+> > -		return NULL;
+> > -	}
+> > -
+> > -	if (mpc->rxbpre_headroom != rxq->headroom) {
+> > -		netdev_err(ndev, "rxbpre_headroom mismatch: %u: %u\n",
+> > -			   mpc->rxbpre_headroom, rxq->headroom);
+> > -		return NULL;
+> > -	}
+> > -
+> > -	mpc->rxbpre_total--;
+> > -
+> > -	*da = mpc->das_pre[mpc->rxbpre_total];
+> > -	va = mpc->rxbufs_pre[mpc->rxbpre_total];
+> > -	mpc->rxbufs_pre[mpc->rxbpre_total] = NULL;
+> > -
+> > -	/* Deallocate the array after all buffers are gone */
+> > -	if (!mpc->rxbpre_total)
+> > -		mana_pre_dealloc_rxbufs(mpc);
+> > -
+> > -	return va;
+> > -}
+> > -
+> >  /* Get RX buffer's data size, alloc size, XDP headroom based on MTU */
+> > -static void mana_get_rxbuf_cfg(int mtu, u32 *datasize, u32 *alloc_size,
+> > -			       u32 *headroom)
+> > +static void mana_get_rxbuf_cfg(struct mana_port_context *apc,
+> > +			       int mtu, u32 *datasize, u32 *alloc_size,
+> > +			       u32 *headroom, u32 *frag_count)
+> >  {
+> > -	if (mtu > MANA_XDP_MTU_MAX)
+> > -		*headroom = 0; /* no support for XDP */
+> > -	else
+> > -		*headroom = XDP_PACKET_HEADROOM;
+> > -
+> > -	*alloc_size = SKB_DATA_ALIGN(mtu + MANA_RXBUF_PAD + *headroom);
+> > -
+> > -	/* Using page pool in this case, so alloc_size is PAGE_SIZE */
+> > -	if (*alloc_size < PAGE_SIZE)
+> > -		*alloc_size = PAGE_SIZE;
+> > -
+> > +	/* Calculate datasize first (consistent across all cases) */
+> >  	*datasize = mtu + ETH_HLEN;
+> > -}
+> > -
+> > -int mana_pre_alloc_rxbufs(struct mana_port_context *mpc, int new_mtu, int num_queues)
+> > -{
+> > -	struct device *dev;
+> > -	struct page *page;
+> > -	dma_addr_t da;
+> > -	int num_rxb;
+> > -	void *va;
+> > -	int i;
+> > -
+> > -	mana_get_rxbuf_cfg(new_mtu, &mpc->rxbpre_datasize,
+> > -			   &mpc->rxbpre_alloc_size, &mpc->rxbpre_headroom);
+> > -
+> > -	dev = mpc->ac->gdma_dev->gdma_context->dev;
+> > -
+> > -	num_rxb = num_queues * mpc->rx_queue_size;
+> > -
+> > -	WARN(mpc->rxbufs_pre, "mana rxbufs_pre exists\n");
+> > -	mpc->rxbufs_pre = kmalloc_array(num_rxb, sizeof(void *), GFP_KERNEL);
+> > -	if (!mpc->rxbufs_pre)
+> > -		goto error;
+> >  
+> > -	mpc->das_pre = kmalloc_array(num_rxb, sizeof(dma_addr_t), GFP_KERNEL);
+> > -	if (!mpc->das_pre)
+> > -		goto error;
+> > -
+> > -	mpc->rxbpre_total = 0;
+> > -
+> > -	for (i = 0; i < num_rxb; i++) {
+> > -		page = dev_alloc_pages(get_order(mpc->rxbpre_alloc_size));
+> > -		if (!page)
+> > -			goto error;
+> > -
+> > -		va = page_to_virt(page);
+> > -
+> > -		da = dma_map_single(dev, va + mpc->rxbpre_headroom,
+> > -				    mpc->rxbpre_datasize, DMA_FROM_DEVICE);
+> > -		if (dma_mapping_error(dev, da)) {
+> > -			put_page(page);
+> > -			goto error;
+> > +	/* For xdp and jumbo frames make sure only one packet fits per page */
+> > +	if (((mtu + MANA_RXBUF_PAD) > PAGE_SIZE / 2) || rcu_access_pointer(apc->bpf_prog)) {
+> > +		if (rcu_access_pointer(apc->bpf_prog)) {
+> > +			*headroom = XDP_PACKET_HEADROOM;
+> > +			*alloc_size = PAGE_SIZE;
+> > +		} else {
+> > +			*headroom = 0; /* no support for XDP */
+> > +			*alloc_size = SKB_DATA_ALIGN(mtu + MANA_RXBUF_PAD + *headroom);
+> >  		}
+> >  
+> > -		mpc->rxbufs_pre[i] = va;
+> > -		mpc->das_pre[i] = da;
+> > -		mpc->rxbpre_total = i + 1;
+> > +		*frag_count = 1;
+> > +		return;
+> >  	}
+> >  
+> > -	return 0;
+> > +	/* Standard MTU case - optimize for multiple packets per page */
+> > +	*headroom = 0;
+> >  
+> > -error:
+> > -	netdev_err(mpc->ndev, "Failed to pre-allocate RX buffers for %d queues\n", num_queues);
+> > -	mana_pre_dealloc_rxbufs(mpc);
+> > -	return -ENOMEM;
+> > +	/* Calculate base buffer size needed */
+> > +	u32 len = SKB_DATA_ALIGN(mtu + MANA_RXBUF_PAD + *headroom);
+> > +	u32 buf_size = ALIGN(len, MANA_RX_FRAG_ALIGNMENT);
+> 
+> its good to have all the declaration at start of function.
+> 
+> > +
+> > +	/* Calculate how many packets can fit in a page */
+> > +	*frag_count = PAGE_SIZE / buf_size;
+> > +	*alloc_size = buf_size;
+> >  }
+> >  
+> >  static int mana_change_mtu(struct net_device *ndev, int new_mtu)
+> >  {
+> > -	struct mana_port_context *mpc = netdev_priv(ndev);
+> >  	unsigned int old_mtu = ndev->mtu;
+> >  	int err;
+> >  
+> > -	/* Pre-allocate buffers to prevent failure in mana_attach later */
+> > -	err = mana_pre_alloc_rxbufs(mpc, new_mtu, mpc->num_queues);
+> > -	if (err) {
+> > -		netdev_err(ndev, "Insufficient memory for new MTU\n");
+> > -		return err;
+> > -	}
+> > -
+> >  	err = mana_detach(ndev, false);
+> >  	if (err) {
+> >  		netdev_err(ndev, "mana_detach failed: %d\n", err);
+> > @@ -728,7 +602,6 @@ static int mana_change_mtu(struct net_device *ndev, int new_mtu)
+> >  	}
+> >  
+> >  out:
+> > -	mana_pre_dealloc_rxbufs(mpc);
+> >  	return err;
+> >  }
+> >  
+> > @@ -1841,8 +1714,11 @@ static void mana_rx_skb(void *buf_va, bool from_pool,
+> >  
+> >  drop:
+> >  	if (from_pool) {
+> > -		page_pool_recycle_direct(rxq->page_pool,
+> > -					 virt_to_head_page(buf_va));
+> > +		if (rxq->frag_count == 1)
+> > +			page_pool_recycle_direct(rxq->page_pool,
+> > +						 virt_to_head_page(buf_va));
+> > +		else
+> > +			page_pool_free_va(rxq->page_pool, buf_va, true);
+> >  	} else {
+> >  		WARN_ON_ONCE(rxq->xdp_save_va);
+> >  		/* Save for reuse */
+> > @@ -1854,37 +1730,50 @@ static void mana_rx_skb(void *buf_va, bool from_pool,
+> >  	return;
+> >  }
+> >  
+> > -static void *mana_get_rxfrag(struct mana_rxq *rxq, struct device *dev,
+> > -			     dma_addr_t *da, bool *from_pool)
+> > +static void *mana_get_rxfrag(struct mana_rxq *rxq,
+> > +			     struct device *dev, dma_addr_t *da, bool *from_pool)
+> >  {
+> >  	struct page *page;
+> > +	u32 offset;
+> >  	void *va;
+> > -
+> >  	*from_pool = false;
+> >  
+> > -	/* Reuse XDP dropped page if available */
+> > -	if (rxq->xdp_save_va) {
+> > -		va = rxq->xdp_save_va;
+> > -		rxq->xdp_save_va = NULL;
+> > -	} else {
+> > -		page = page_pool_dev_alloc_pages(rxq->page_pool);
+> > -		if (!page)
+> > +	/* Don't use fragments for jumbo frames or XDP (i.e when fragment = 1 per page) */
+> > +	if (rxq->frag_count == 1) {
+> > +		/* Reuse XDP dropped page if available */
+> > +		if (rxq->xdp_save_va) {
+> > +			va = rxq->xdp_save_va;
+> > +			rxq->xdp_save_va = NULL;
+> > +		} else {
+> > +			page = page_pool_dev_alloc_pages(rxq->page_pool);
+> > +			if (!page)
+> > +				return NULL;
+> > +
+> > +			*from_pool = true;
+> > +			va = page_to_virt(page);
+> > +		}
+> > +
+> > +		*da = dma_map_single(dev, va + rxq->headroom, rxq->datasize,
+> > +				     DMA_FROM_DEVICE);
+> > +		if (dma_mapping_error(dev, *da)) {
+> > +			if (*from_pool)
+> > +				page_pool_put_full_page(rxq->page_pool, page, false);
+> > +			else
+> > +				put_page(virt_to_head_page(va));
+> > +
+> >  			return NULL;
+> > +		}
+> >  
+> > -		*from_pool = true;
+> > -		va = page_to_virt(page);
+> > +		return va;
+> >  	}
+> >  
+> > -	*da = dma_map_single(dev, va + rxq->headroom, rxq->datasize,
+> > -			     DMA_FROM_DEVICE);
+> > -	if (dma_mapping_error(dev, *da)) {
+> > -		if (*from_pool)
+> > -			page_pool_put_full_page(rxq->page_pool, page, false);
+> > -		else
+> > -			put_page(virt_to_head_page(va));
+> > -
+> > +	page =  page_pool_dev_alloc_frag(rxq->page_pool, &offset, rxq->alloc_size);
+> > +	if (!page)
+> >  		return NULL;
+> > -	}
+> > +
+> > +	va  = page_to_virt(page) + offset;
+> > +	*da = page_pool_get_dma_addr(page) + offset + rxq->headroom;
+> > +	*from_pool = true;
+> >  
+> >  	return va;
+> >  }
+> > @@ -1901,9 +1790,9 @@ static void mana_refill_rx_oob(struct device *dev, struct mana_rxq *rxq,
+> >  	va = mana_get_rxfrag(rxq, dev, &da, &from_pool);
+> >  	if (!va)
+> >  		return;
+> > -
+> > -	dma_unmap_single(dev, rxoob->sgl[0].address, rxq->datasize,
+> > -			 DMA_FROM_DEVICE);
+> > +	if (!rxoob->from_pool || rxq->frag_count == 1)
+> > +		dma_unmap_single(dev, rxoob->sgl[0].address, rxq->datasize,
+> > +				 DMA_FROM_DEVICE);
+> >  	*old_buf = rxoob->buf_va;
+> >  	*old_fp = rxoob->from_pool;
+> >  
+> > @@ -2314,15 +2203,19 @@ static void mana_destroy_rxq(struct mana_port_context *apc,
+> >  		if (!rx_oob->buf_va)
+> >  			continue;
+> >  
+> > -		dma_unmap_single(dev, rx_oob->sgl[0].address,
+> > -				 rx_oob->sgl[0].size, DMA_FROM_DEVICE);
+> > -
+> >  		page = virt_to_head_page(rx_oob->buf_va);
+> >  
+> > -		if (rx_oob->from_pool)
+> > -			page_pool_put_full_page(rxq->page_pool, page, false);
+> > -		else
+> > -			put_page(page);
+> > +		if (rxq->frag_count == 1) {
+> > +			dma_unmap_single(dev, rx_oob->sgl[0].address, rx_oob->sgl[0].size,
+> > +					 DMA_FROM_DEVICE);
+> > +
+> > +			if (rx_oob->from_pool)
+> > +				page_pool_put_full_page(rxq->page_pool, page, false);
+> > +			else
+> > +				put_page(page);
+> > +		} else {
+> > +			page_pool_free_va(rxq->page_pool, rx_oob->buf_va, true);
+> > +		}
+> >  
+> >  		rx_oob->buf_va = NULL;
+> >  	}
+> > @@ -2338,16 +2231,11 @@ static void mana_destroy_rxq(struct mana_port_context *apc,
+> >  static int mana_fill_rx_oob(struct mana_recv_buf_oob *rx_oob, u32 mem_key,
+> >  			    struct mana_rxq *rxq, struct device *dev)
+> >  {
+> > -	struct mana_port_context *mpc = netdev_priv(rxq->ndev);
+> >  	bool from_pool = false;
+> >  	dma_addr_t da;
+> >  	void *va;
+> >  
+> > -	if (mpc->rxbufs_pre)
+> > -		va = mana_get_rxbuf_pre(rxq, &da);
+> > -	else
+> > -		va = mana_get_rxfrag(rxq, dev, &da, &from_pool);
+> > -
+> > +	va = mana_get_rxfrag(rxq, dev, &da, &from_pool);
+> >  	if (!va)
+> >  		return -ENOMEM;
+> >  
+> > @@ -2428,11 +2316,22 @@ static int mana_create_page_pool(struct mana_rxq *rxq, struct gdma_context *gc)
+> >  	struct page_pool_params pprm = {};
+> >  	int ret;
+> >  
+> > -	pprm.pool_size = mpc->rx_queue_size;
+> > +	pprm.pool_size = mpc->rx_queue_size / rxq->frag_count + 1;
+> >  	pprm.nid = gc->numa_node;
+> >  	pprm.napi = &rxq->rx_cq.napi;
+> >  	pprm.netdev = rxq->ndev;
+> >  	pprm.order = get_order(rxq->alloc_size);
+> > +	pprm.queue_idx = rxq->rxq_idx;
+> > +	pprm.dev = gc->dev;
+> > +
+> > +	/* Let the page pool do the dma map when page sharing with multiple fragments
+> > +	 * enabled for rx buffers.
+> > +	 */
+> > +	if (rxq->frag_count > 1) {
+> > +		pprm.flags =  PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
+> > +		pprm.max_len = PAGE_SIZE;
+> > +		pprm.dma_dir = DMA_FROM_DEVICE;
+> > +	}
+> >  
+> >  	rxq->page_pool = page_pool_create(&pprm);
+> >  
+> > @@ -2471,9 +2370,8 @@ static struct mana_rxq *mana_create_rxq(struct mana_port_context *apc,
+> >  	rxq->rxq_idx = rxq_idx;
+> >  	rxq->rxobj = INVALID_MANA_HANDLE;
+> >  
+> > -	mana_get_rxbuf_cfg(ndev->mtu, &rxq->datasize, &rxq->alloc_size,
+> > -			   &rxq->headroom);
+> > -
+> > +	mana_get_rxbuf_cfg(apc, ndev->mtu, &rxq->datasize, &rxq->alloc_size,
+> > +			   &rxq->headroom, &rxq->frag_count);
+> >  	/* Create page pool for RX queue */
+> >  	err = mana_create_page_pool(rxq, gc);
+> >  	if (err) {
+> > diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> > index a1afa75a9463..7ede03c74fb9 100644
+> > --- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> > +++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> > @@ -396,12 +396,6 @@ static int mana_set_channels(struct net_device *ndev,
+> >  	unsigned int old_count = apc->num_queues;
+> >  	int err;
+> >  
+> > -	err = mana_pre_alloc_rxbufs(apc, ndev->mtu, new_count);
+> > -	if (err) {
+> > -		netdev_err(ndev, "Insufficient memory for new allocations");
+> > -		return err;
+> > -	}
+> > -
+> >  	err = mana_detach(ndev, false);
+> >  	if (err) {
+> >  		netdev_err(ndev, "mana_detach failed: %d\n", err);
+> > @@ -416,7 +410,6 @@ static int mana_set_channels(struct net_device *ndev,
+> >  	}
+> >  
+> >  out:
+> > -	mana_pre_dealloc_rxbufs(apc);
+> >  	return err;
+> >  }
+> >  
+> > @@ -465,12 +458,7 @@ static int mana_set_ringparam(struct net_device *ndev,
+> >  
+> >  	/* pre-allocating new buffers to prevent failures in mana_attach() later */
+> >  	apc->rx_queue_size = new_rx;
+> > -	err = mana_pre_alloc_rxbufs(apc, ndev->mtu, apc->num_queues);
+> >  	apc->rx_queue_size = old_rx;
+> > -	if (err) {
+> > -		netdev_err(ndev, "Insufficient memory for new allocations\n");
+> > -		return err;
+> > -	}
+> >  
+> >  	err = mana_detach(ndev, false);
+> >  	if (err) {
+> > @@ -488,7 +476,6 @@ static int mana_set_ringparam(struct net_device *ndev,
+> >  		apc->rx_queue_size = old_rx;
+> >  	}
+> >  out:
+> > -	mana_pre_dealloc_rxbufs(apc);
+> >  	return err;
+> >  }
+> >  
+> > diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+> > index e1030a7d2daa..99a3847b0f9d 100644
+> > --- a/include/net/mana/mana.h
+> > +++ b/include/net/mana/mana.h
+> > @@ -65,6 +65,8 @@ enum TRI_STATE {
+> >  #define MANA_STATS_RX_COUNT 5
+> >  #define MANA_STATS_TX_COUNT 11
+> >  
+> > +#define MANA_RX_FRAG_ALIGNMENT 64
+> > +
+> >  struct mana_stats_rx {
+> >  	u64 packets;
+> >  	u64 bytes;
+> > @@ -328,6 +330,7 @@ struct mana_rxq {
+> >  	u32 datasize;
+> >  	u32 alloc_size;
+> >  	u32 headroom;
+> > +	u32 frag_count;
+> >  
+> >  	mana_handle_t rxobj;
+> >  
+> > @@ -503,14 +506,6 @@ struct mana_port_context {
+> >  	/* This points to an array of num_queues of RQ pointers. */
+> >  	struct mana_rxq **rxqs;
+> >  
+> > -	/* pre-allocated rx buffer array */
+> > -	void **rxbufs_pre;
+> > -	dma_addr_t *das_pre;
+> > -	int rxbpre_total;
+> > -	u32 rxbpre_datasize;
+> > -	u32 rxbpre_alloc_size;
+> > -	u32 rxbpre_headroom;
+> > -
+> >  	struct bpf_prog *bpf_prog;
+> >  
+> >  	/* Create num_queues EQs, SQs, SQ-CQs, RQs and RQ-CQs, respectively. */
+> > @@ -574,8 +569,6 @@ int mana_query_link_cfg(struct mana_port_context *apc);
+> >  int mana_set_bw_clamp(struct mana_port_context *apc, u32 speed,
+> >  		      int enable_clamping);
+> >  void mana_query_phy_stats(struct mana_port_context *apc);
+> > -int mana_pre_alloc_rxbufs(struct mana_port_context *apc, int mtu, int num_queues);
+> > -void mana_pre_dealloc_rxbufs(struct mana_port_context *apc);
+> >  
+> >  extern const struct ethtool_ops mana_ethtool_ops;
+> >  extern struct dentry *mana_debugfs_root;
+> > -- 
+> > 2.43.0
+> 
+> 
+> Rest looks good. After fixing above,
+> Reviewed-by: Saurabh Sengar <ssengar@linux.microsoft.com>
 
