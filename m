@@ -1,157 +1,149 @@
-Return-Path: <netdev+bounces-209183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0D0EB0E8B6
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 04:36:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 140EAB0E8EE
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 05:02:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 170703A543B
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 02:36:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0806D7B322C
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 03:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1676F1C2334;
-	Wed, 23 Jul 2025 02:36:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2sQ0t69t"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A937418A6A7;
+	Wed, 23 Jul 2025 03:02:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928A719C54E
-	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 02:36:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AB1D1DE3CA;
+	Wed, 23 Jul 2025 03:02:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753238206; cv=none; b=Conp4s9M1A9tm5RR1K/beU3kl1feO1NhL+eMMCbRy/T8ubVgeQQn4uaCSoznXUwipoW4WIWL3amT/GeNZCWMi49+m+Gp0woBtkXA/GoNp0R/b7ssFvWEt/d1/KkJc98sOMeJqj+WN8jVoQj3xxhX1BznZOipbKNHti6IJhMWY5Q=
+	t=1753239749; cv=none; b=u6w774CCcFE9pykblIMzs1/kh8hfQSWTnGXMXQPmxqEFHi1f1pTwm1MpVoLFEPZJ50izSYGUx3ajbf5BJksIWsLleq+UC/0EIr+pnH+36bPP1KznPRxPeSyMdIy2n5T8mwx+sOqlj9d8+SaLKi6W1ZBinM2Iv+N531iY/+Q+IaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753238206; c=relaxed/simple;
-	bh=9F/qrer0YHOOzf34SvLjL1tmn8PFnQdDB52YTfxHz6w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QAQ7zQC5wRxXMsseDR0TBCEqzuPp6+KPfWHmEFZfdTRCRdQPZ1OBAY1ADMpDTsUQkyJwKydZaHAh76qo/tR9dCRybwNaLEfF6Syy7axEcG0jR5DGMav0bNpZFICn8YPxLdhslLpIk4PcBtBgyeYsJ8qL/glN1rFroQVkq6rQrWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2sQ0t69t; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-235e389599fso121975ad.0
-        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 19:36:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753238204; x=1753843004; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lkcawzErsKetlruUZ8nxtm75KFIUDxv5f5CiaoAi4JI=;
-        b=2sQ0t69ts2q7iiJh5ymCTGITFQCmM1Gk3L9Y2gwRR9ARX+J7MYMG4efmivGX1xeWak
-         SVDNwtGrViSg/Aa4DDPEsgsEaM+M6Xkv0BrZYkp1TL2wRRYmixk93OP3+DIjb9/K812U
-         S/zs5BFwmdjUFq4ok28ZKaP7Twcjhx5THeaZ++yUXisSfpY1p1NH2KPL5Uv7WMgKpJkk
-         vsiSfXw3UkXm6d3PPxEBNhQricO2dmozNIzWtVsMzmGPnA+gmn+fFgsiApWXpp+pfBQF
-         HZbDFDRNnhfAmkRsFM22c17KbyBB7JsUZ5UKUH2j3w8g4QsjP/7tHUrkcalbJlPaYPCv
-         XDjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753238204; x=1753843004;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lkcawzErsKetlruUZ8nxtm75KFIUDxv5f5CiaoAi4JI=;
-        b=vGi0RaUe1Ia5wL7ZW/pWMUlKnVjxxib+Cimx/V3eBgG0Gdk1OASh/7rL8e1IDaNiGo
-         f1a1vhXEB24rdtIyOQuYsXbGB2UbqW+J5NhnI/cIrue04QeqfV5jgmRwCXa/2bDaPRfc
-         tonLs4566fyT2g3z+Ki4WDvz7GorS6X2ubvamTq8pQHFxAF2htWuTLtoi1/ouhXw31CC
-         PBslkC/Gk7XKB6PkV63ClzodaX9EiCQ7xg8j6J5vjySf2rd03JVl8WIG4GzMjgd2sZ7B
-         qV6494laQ4qsndW7MH+N7z4qNdOgbl1AktxIuZSMJ3aN8vhg9R0YfaRNV4FGsiHISlHX
-         poMw==
-X-Forwarded-Encrypted: i=1; AJvYcCUm3qri3cQxxu4GHIap4DTTjgx2qzKOYhfJMykC06mT/ajs09rxEa+r9rWV9cQdnNj46BC7fvU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfCbFBOFs303ra23OVBp486JJxvBmIM1Zf5HOvfRJDzA+FEQFL
-	m1F/3YXUSYAPQO6gCWo2fmf+100YfeLHDWMjOKHdP/ABMdoxW+7byXw9W1yz5nZWbi34PLoDnYN
-	0zqaTQUm6UoePGSYUrZZ2JCHd1bRwbBJxsxjE4Rnr
-X-Gm-Gg: ASbGncuTcyoLFEF2DBVTm8CVj+NH+R9cp14t9gF29v1hCQzxJxEYTshA3nwlXkPfz5O
-	d/t4nvx0McJCfbwqnEnQKHd0t2/PSagixLC7hKAVYy8mTOe6NXBHdyKrO8M5EBIp+tBDP7OgYOO
-	qclTkFq+498ab3ufojiNpUWoxvj4OM6h20zfeIiWrGGdm9KXwxYnjJ456J6UZJhO1wO/NEiEssw
-	v5z+7UWrc9D1CFNGTy6HuXmS7EXmNcjGfUg9Q==
-X-Google-Smtp-Source: AGHT+IE/f5gMKJQecCvU4mwpZfVLxyBC1LLMi24CZwRjawgIkPvTTYzKJPAAZ/WiT4xQybYn47Hhesu7cmfqaRxP9oQ=
-X-Received: by 2002:a17:903:e8b:b0:234:b2bf:e67e with SMTP id
- d9443c01a7336-23f98dc9378mr689295ad.13.1753238203211; Tue, 22 Jul 2025
- 19:36:43 -0700 (PDT)
+	s=arc-20240116; t=1753239749; c=relaxed/simple;
+	bh=M/evPR0svUbE7leAMZM+BaBttls2euCF4BVwatvjvI0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TcUrI7JyZ8dGQespaLrZnxEByeR1MVazoW0XCkIMiy8SWTIULYVnhViqF/vZwUMVSqsW/k2z7oe9nbe8P0VJq57T7pj31s91MWlXGLWOdrTFQQHBOPFOF3mitZxcFmjjVhsp1jY8Q+PJRrzgFMNoDJukikloB88OIi7pKJkliiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.207.22.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: esmtpsz19t1753239673t6fcb271e
+X-QQ-Originating-IP: h6+YcNk6wtGkCE8eMFp3AqG3T77X+yNwoyDRkGfMTO8=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 23 Jul 2025 11:01:11 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 12358391869417309562
+Date: Wed, 23 Jul 2025 11:01:11 +0800
+From: Yibo Dong <dong100@mucse.com>
+To: Simon Horman <horms@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
+	gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au,
+	danishanwar@ti.com, lee@trager.us, gongfan1@huawei.com,
+	lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, richardcochran@gmail.com,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 01/15] net: rnpgbe: Add build support for rnpgbe
+Message-ID: <0E9C9DD4FB65EC52+20250723030111.GA169181@nic-Precision-5820-Tower>
+References: <20250721113238.18615-1-dong100@mucse.com>
+ <20250721113238.18615-2-dong100@mucse.com>
+ <20250722112909.GF2459@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250721233608.111860-1-skhawaja@google.com> <20250722183647.1fd15767@kernel.org>
-In-Reply-To: <20250722183647.1fd15767@kernel.org>
-From: Samiullah Khawaja <skhawaja@google.com>
-Date: Tue, 22 Jul 2025 19:36:31 -0700
-X-Gm-Features: Ac12FXxFUdV4X9GigSCMTo9FSOpAt5CY4_7t0vjHnnZXCDiEjiwsp_8EEjx-bBA
-Message-ID: <CAAywjhQN4Re3+64=qiukq1Q2wtLBj2pesaDSsvojK4tDAGHegw@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: Restore napi threaded state only when it is enabled
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, willemb@google.com, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250722112909.GF2459@horms.kernel.org>
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: MvyKdZyVtFx3iDqIOOqiI+R6sLCE+t2jMOk4OK539kaJ9/u1j6/h2grf
+	Rgy2tNSMffv4T/gAAzgDq+EYY/P2yiHpa+ldqcvDiUe09M60SYtTATEYMPKNZU3PMIDvkZH
+	6qJcuARg4Xzau/nH7DJiP4ySkEdza6WYuDkTaT40FrT+aQ6mrJqesP+RCcnBrZMHBb2kt5F
+	XuSYG95Iinpq2h9cniaMQbuMClyhs6DXaApc14kAEe2SVp9vwc5nmg24Zlf+sGVJ/YgNV/M
+	n8oV71faRgN9YE+PdW+lrZ2/bkfpLv2kWwt9xRasuuhPEMPPo8dHP0XDE7iiRyWkrZqwzOK
+	KCXCsL+ROaF9i1W8yhz6JHemCkyPMdUt/nTf+4kGb2YGWH6Vr4XQsYrDeT83Xwd9n3yGcbY
+	DSsi7pmCAsR9L4bHuecKj2mX7/IaLXB2jPfkigBu0hzz++pXf5AxrC+q0j+cxWwiPQO9E/m
+	f/APh/Y8Oa+h/KpXmsAjn4Pdu7cBADCAWMsZZx8eGq886yMLbKA4A+WnLrxesc6QsRQmvlZ
+	afgFNei527OUjBGnM4QZbXdTmv7kvPwePL1Jwo/h0gK3lU7zFIgj7CKmSR7sS10le+eGl5X
+	IzqFq4MKwNSz1ae68lUF077mJjUyrsM/9uiA9D+C08XD39TQxjtXt0ra2BEjSQBiB/41SZF
+	JhABcX885n2JElZ4lJvwPjX9LrmeSqt/w1dy+7qEmv7pagGJizYyUQCu0qOOEWbJkcCwBdh
+	IFmi0uIw6A02t42LB0JqQWrbwYtJUqJWymFAl3PvkrJbzNFbghclRSvQEktTND8432Wi7Ai
+	EDFuThRqqAsu3XJLRlQHB1B4g/Jxl8+bEdoP4KaQf8Et5xmn09MZ1Umd6iQgIekaolCOZ/m
+	+m6Xmq+gMc16cnzZXm0Eph8U9y7r0RtXvXU3oXcRPn2Mzdc4SbIrOO//yvURoXJ64nPq8wx
+	IP4FSJX3cCvGPmh2jV5cXkWMqN2LzUfMOa4xuGEZN8qOU1bUZPX7Q/WWdxv2pwVkhRaZlvk
+	9xFPjF3Q==
+X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
+X-QQ-RECHKSPAM: 0
 
-On Tue, Jul 22, 2025 at 6:36=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Mon, 21 Jul 2025 23:36:08 +0000 Samiullah Khawaja wrote:
-> > Commit 2677010e7793 ("Add support to set NAPI threaded for individual
-> > NAPI") added support to enable/disable threaded napi using netlink. Thi=
-s
-> > also extended the napi config save/restore functionality to set the nap=
-i
-> > threaded state. This breaks the netdev reset when threaded napi is
->
-> "This breaks the netdev reset" is very vague.
-Basically on netdev reset inside napi_enable when it calls
-napi_restore_config it tries to stop the NAPI kthread. Since during
-napi_enable, the NAPI has STATE_SCHED set on it, the stop_kthread gets
-stuck waiting for the STATE_SCHED to be unset. It should not be
-destroying the kthread since threaded is enabled at device level. But
-I think your point below is valid, we should probably set
-napi->config->threaded in netif_set_threaded.
+On Tue, Jul 22, 2025 at 12:29:09PM +0100, Simon Horman wrote:
+> On Mon, Jul 21, 2025 at 07:32:24PM +0800, Dong Yibo wrote:
+> > Add build options and doc for mucse.
+> > Initialize pci device access for MUCSE devices.
+> > 
+> > Signed-off-by: Dong Yibo <dong100@mucse.com>
+> 
+> ...
+> 
+> > diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
+> > new file mode 100644
+> > index 000000000000..13b49875006b
+> > --- /dev/null
+> > +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
+> > @@ -0,0 +1,226 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/* Copyright(c) 2020 - 2025 Mucse Corporation. */
+> > +
+> > +#include <linux/types.h>
+> > +#include <linux/module.h>
+> > +#include <linux/pci.h>
+> > +#include <linux/netdevice.h>
+> > +#include <linux/string.h>
+> > +#include <linux/etherdevice.h>
+> > +
+> > +#include "rnpgbe.h"
+> > +
+> > +char rnpgbe_driver_name[] = "rnpgbe";
+> 
+> At least with (only) this patch applied, rnpgbe_driver_name
+> appears to only be used in this file. So it should be static.
+> 
+> Flagged by Sparse.
+> 
+> Please make sure that when each patch in the series is applied in turn,
+> no new Sparse warnings are introduced. Likewise for build errors.
+> And ideally warnings for W=1 builds.
+> 
+> ...
+> 
 
-I should add this to the commit message.
->
-> > enabled at device level as the napi_restore_config tries to stop the
-> > kthreads as napi->config->thread is false when threaded is enabled at
-> > device level.
->
-> My reading of the commit message is that the WARN triggers, but
-> looking at the code I think you mean that we fail to update the
-> config when we set at the device level?
->
-> > The napi_restore_config should only restore the napi threaded state whe=
-n
-> > threaded is enabled at NAPI level.
-> >
-> > The issue can be reproduced on virtio-net device using qemu. To
-> > reproduce the issue run following,
-> >
-> >   echo 1 > /sys/class/net/threaded
-> >   ethtool -L eth0 combined 1
->
-> Maybe we should add that as a test under tools/testing/drivers/net -
-> it will run against netdevsim but also all drivers we test which
-> currently means virtio and fbnic, but hopefully soon more. Up to you.
-+1
+Got it, I will fix this.
+But I can't get this warning follow steps in my local:
+---
+- make x86_64_defconfig
+- make menuconfig  (select my driver rnpgbe to *)
+- make W=1 -j 20
+---
+if I compile it with 'make W=1 C=1 -j 20', some errors like this:
+---
+./include/linux/skbuff.h:978:1: error: directive in macro's argument list
+./include/linux/skbuff.h:981:1: error: directive in macro's argument list
+........
+Segmentation fault
+---
+I also tried to use nipa/tests/patch/build_allmodconfig_warn
+/build_allmodconfig.sh (not run the bot, just copy this sh to source
+code). It seems the same with 'make W=1 C=1 -j 20'.
+Is there something wrong for me? I want to get the warnings locally,
+then I can check it before sending patches. Any suggestions to me, please?
+Thanks for your feedback.
 
-I do want to add a test for it. I was thinking of extending
-nl_netdev.py but that doesn't seem suitable as it only looks at the
-state. I will look at the driver directory. Should I send a test with
-this fix or should I send that later after the next reopen?
->
-> I'm not sure I agree with the semantics, tho. IIUC you're basically
-> making the code prefer threaded option. If user enables threading
-> for the device, then disables it for a NAPI - reconfiguration will
-> lose the fact that specific NAPI instance was supposed to have threading
-> disabled. Why not update napi->config in netif_set_threaded() instead?
-I think this discrepancy is orthogonal to the stopping of threads in
-restore. This is because the napi_enable is calling restore_config and
-then setting the STATE_THREADED bit on napis based on dev->threaded.
-Even if restore unsets the THREADED bit (which would have already been
-unset during napi_disable), it will be set again based on
-dev->threaded.
-
-I think napi_restore_config should be called after setting up STATE bits?
-> --
-> pw-bot: cr
 
