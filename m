@@ -1,246 +1,110 @@
-Return-Path: <netdev+bounces-209466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D841B0FA0F
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 20:14:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80CE0B0FA1B
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 20:17:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30EAE1C80843
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 18:14:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD81516B12E
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 18:17:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEE292264D4;
-	Wed, 23 Jul 2025 18:13:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB81021421D;
+	Wed, 23 Jul 2025 18:17:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=earthlink.net header.i=@earthlink.net header.b="jnsO6VBB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XFlaIKkB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-201a.earthlink-vadesecure.net (mta-201a.earthlink-vadesecure.net [51.81.229.180])
+Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B20E4223323;
-	Wed, 23 Jul 2025 18:13:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.81.229.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365D94EB38;
+	Wed, 23 Jul 2025 18:17:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753294430; cv=none; b=mUWngVo/hm0lmGRuPdm8S9Kcxr5QYU0dCwEylLEjNxWXP+OpywzWPay/8vi7WI+xuNRjjEfXzUTXJEdGYeV+TPpUyr9mOuN0+A0yOzzvJBkaEx3zgFq5fHtAZB7V5bewpFHxrPUPjEVQFuLwcMVdzP+pOjwX1/YrmSfy35B1Zfo=
+	t=1753294642; cv=none; b=nu47yStHVmUCsYwvVAhGNJYBMFOqMwOiGUMJPFEUJY9RhqyTv+II8SU8JoN4ELtHS5Y81G26GvHHqc3h9R/rxPUocBp0Cnecz1Ae+iM/5tPeITBQNPE7TF0eRIxHswGM6fjrts3i8yZ0FMsNAHWUFc3zCjzO9ReI9k8LrkfEBp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753294430; c=relaxed/simple;
-	bh=tnjpzqd1Mggmvw8Wggg8wzHg0F7ogxOpOkKC+zxbTJQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Dqcwao1iLrrtmxYsNwoo/vr6nQVbrXLWKaPSfzpAXfnjSaF66D7pD37DJdmO5wllO/zQNqMQNbaQQhv5TZbKv3eUTryrTFlargZqRJfFVkuNlBIfPSA+ESUVuIMXRhM9rlo5VZsyZszNj2UfiVZlnk/6pcRhcOSpUX4qHJYh53w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=onemain.com; spf=pass smtp.mailfrom=onemain.com; dkim=pass (2048-bit key) header.d=earthlink.net header.i=@earthlink.net header.b=jnsO6VBB; arc=none smtp.client-ip=51.81.229.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=onemain.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=onemain.com
-Authentication-Results: earthlink-vadesecure.net;
- auth=pass smtp.auth=svnelson@teleport.com smtp.mailfrom=sln@onemain.com;
-DKIM-Signature: v=1; a=rsa-sha256; bh=TopWGv7yYEm89cmEi+jB4nxn++rXyLPZlZQ0Hz
- pYEDk=; c=relaxed/relaxed; d=earthlink.net; h=from:reply-to:subject:
- date:to:cc:resent-date:resent-from:resent-to:resent-cc:in-reply-to:
- references:list-id:list-help:list-unsubscribe:list-unsubscribe-post:
- list-subscribe:list-post:list-owner:list-archive; q=dns/txt;
- s=dk12062016; t=1753294419; x=1753899219; b=jnsO6VBBkNdZLB/t1bpISWlnOU/
- LVjFlWvHzwuo6RH9EWc3AkvhAhHbykqf9cxMulgGygCsFTRRoj7e961oJHIvRFXRwldeOZc
- A9nav7otEHwNwV+AGaO26d9/Ol4gRPOztsen3v4MOMgKEMH4J7qhRbPlYJJ/a5AhYIbpWId
- oh/phJjBszMhxdHnA3/MsKF7KulF60fvogiKUO7yqS26bfj4xGWl8c6hj5L29zosONGOX1X
- WhCmFoU0tWPk8j1nscL3Mequ2WvHODaR3SXOW/KI4VDNa/S4fvDbcAc6+gyl5XGl4TrWB9v
- KgRe94c9ELmnsmK/AqigTQfEy3Ozqzg==
-Received: from [192.168.0.23] ([50.47.159.51])
- by vsel2nmtao01p.internal.vadesecure.com with ngmta
- id 1f341533-1854f3fbedb751fd; Wed, 23 Jul 2025 18:13:39 +0000
-Message-ID: <086f34bd-12d9-40a4-919d-9c36a4089e8b@onemain.com>
-Date: Wed, 23 Jul 2025 11:13:37 -0700
+	s=arc-20240116; t=1753294642; c=relaxed/simple;
+	bh=Mxapj/W6ghkGZsbzY4w3vXEDzVHjWtirUwe3EqUITS4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ao+FhFr/TdZpY0Ae9JlcSzwU7yFgPwKL2VsCvWuXGZ4xg5cC7SOwG8dTD7YWLA3BX5wPXxQa/1YYzvnZ4jG80OZEvN1JSmO2FxNyRivT0KI80lXrmjaLwcQND2Zr0kxlXb/5itwMyVC3r6GViiRCe6nsWFAosETp4hlEzX/63tk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XFlaIKkB; arc=none smtp.client-ip=209.85.161.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-60d666804ebso562415eaf.1;
+        Wed, 23 Jul 2025 11:17:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753294640; x=1753899440; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=RisToY55DvY0MLXrsGRlCU6n7jXckJ5IoAhRIn7EY5A=;
+        b=XFlaIKkBjnikFw7vAIJSB2t7ICMoHSgNpNSoSX8PLOfBk2MjQduRdBjXoKr4DvyCUF
+         byfqVADKxK6/4UNhhgnN8f3w7JT9p2Kq5cMNi/Gjuq17Q9i4NqMJhSsXL64GI7YEwlhz
+         wEL/WRr2fz9JN2klqXSYx1o2yjY8CQydQkLVwLarewDN03jWb5ldx+JtxEESdTR9y5CV
+         htbp1+AGR6mbrfa+VxOgk4QzrBOY1yaRlTJJtls1b2lr5frdgNx5cJWxnZde1tKNDPK7
+         VJN23QRVHZQj9dkbdwBRy5sLF47OCuTqGaRW8aXRyJRALHIfYhnzZwh0ZgTv/JkwS7bq
+         CQbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753294640; x=1753899440;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RisToY55DvY0MLXrsGRlCU6n7jXckJ5IoAhRIn7EY5A=;
+        b=ICmhTOuLVGdvi8hR2404fNBhNlqOgWtgq6daEIiwmP/b3R1my2EViyjV2LrV3mImMR
+         edOynhn8+4wDTTEWy6a3Q/33M/Ola2LtNZd82Nd0K/yjo1cz+x4nBV5HpghKNaCOuej4
+         6QqYl9esiIWJKtbX8RZ/n9wgt9I99SB6JPpwwCgQgtkMnafaiQ6PMJP1FUMqXs2S63SY
+         zTFctkW6QIjkpZVkrRYglBvLvFC8n/T6/87PGA5mqxmrirENiGaKW0WIUAByZyfq1Bpz
+         jH5nzmCFeWQCRqMsKXPsUpenppcKg3upC5hrU+vSeC38mqOZ7dtV8EdOYu/8PC0pLoCc
+         IVMw==
+X-Forwarded-Encrypted: i=1; AJvYcCWJeQic8GaW6Ix14mfdLOh/ETM8jlUEwIATOAVeesIQrN7A8r/QjEuHsJFaLmQl6rbAyVKiZ2BG@vger.kernel.org, AJvYcCXhRhDoyGIxtiAXi3VM/9hJBAhQTps0wdT1gtAwIcr7U1ajbW+K/axXUdrk39/yAD8HkZAcDAjx6GNMmKU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7osVxD2FSVCvwFJfHfcoxm2ZiLi+S3JITdVsQ7C7HRmZKhEQh
+	36zoLO/0d6QOGU9GYn5epcqOO19WxYKgos91KlFbM+jpElq01/N5iC4Ep2zQSZ+QFEWJI53Mzho
+	uywSGQ0byHSZHTUvkk3b7enDpWtCSyEE=
+X-Gm-Gg: ASbGncs5TjVjqnKN2iRjN4ZWQeyzJtSowGLA7ib79cOjOg8zblP9pyzY8gNvm2ZPZxm
+	LrRbGEscBGmQ07C2kRi0h1UiDCNu4XO50Wmc7vI+CfhnxMfl8Xalmwkh5XMgenYvwcQrr54hRPV
+	NkvC0IRwj8uIbcQMx60vpUqoRLJGyd9wSN7jKUd787/r+svCCI52XkB4KOc8plLOQpzulZPosiV
+	+ohTxUw
+X-Google-Smtp-Source: AGHT+IH0b5gniHC2oV6Q2cydxzDkfKC9O8de+o7IucN+Mu/rb3bzyZeGVWY4j+4HT2s4MTG/OFFbhDXhysYI9OzTKZs=
+X-Received: by 2002:a05:6871:4681:b0:2ef:ad56:aaba with SMTP id
+ 586e51a60fabf-306a79e6abamr5612128fac.3.1753294640104; Wed, 23 Jul 2025
+ 11:17:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 14/14] RDMA/ionic: Add Makefile/Kconfig to kernel build
- environment
-To: Abhijit Gangurde <abhijit.gangurde@amd.com>, shannon.nelson@amd.com,
- brett.creeley@amd.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net, jgg@ziepe.ca,
- leon@kernel.org, andrew+netdev@lunn.ch
-Cc: allen.hubbe@amd.com, nikhil.agarwal@amd.com, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250723173149.2568776-1-abhijit.gangurde@amd.com>
- <20250723173149.2568776-15-abhijit.gangurde@amd.com>
-Content-Language: en-US
-From: Shannon Nelson <sln@onemain.com>
-In-Reply-To: <20250723173149.2568776-15-abhijit.gangurde@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250722071508.12497-1-suchitkarunakaran@gmail.com> <CANn89iJgG3yRQv+a04wzUtgqorSOM3DOFvGV2mgFV8QTVFjYxg@mail.gmail.com>
+In-Reply-To: <CANn89iJgG3yRQv+a04wzUtgqorSOM3DOFvGV2mgFV8QTVFjYxg@mail.gmail.com>
+From: Suchit K <suchitkarunakaran@gmail.com>
+Date: Wed, 23 Jul 2025 23:47:09 +0530
+X-Gm-Features: Ac12FXwzJdHhCWw-QUoBRjGVUQrpiSZCrI9ATw4JQ1XXd6D6Ht2zQKkMXPXNQEM
+Message-ID: <CAO9wTFiGCrAOkZSPr1N6W_8yacyUUcZanvXdQ-FQaphpnWe5DA@mail.gmail.com>
+Subject: Re: [PATCH] net: Revert tx queue length on partial failure in dev_qdisc_change_tx_queue_len()
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us, sdf@fomichev.me, 
+	kuniyu@google.com, aleksander.lobakin@intel.com, netdev@vger.kernel.org, 
+	skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 7/23/25 10:31 AM, Abhijit Gangurde wrote:
-> Add ionic to the kernel build environment.
 >
-> Co-developed-by: Allen Hubbe <allen.hubbe@amd.com>
-> Signed-off-by: Allen Hubbe <allen.hubbe@amd.com>
-> Signed-off-by: Abhijit Gangurde <abhijit.gangurde@amd.com>
-> ---
-> v2->v3
->    - Removed select of ethernet driver
->    - Fixed make htmldocs error
+> WRITE_ONCE() is missing.
 >
->   .../device_drivers/ethernet/index.rst         |  1 +
->   .../ethernet/pensando/ionic_rdma.rst          | 43 +++++++++++++++++++
->   MAINTAINERS                                   |  9 ++++
->   drivers/infiniband/Kconfig                    |  1 +
->   drivers/infiniband/hw/Makefile                |  1 +
->   drivers/infiniband/hw/ionic/Kconfig           | 15 +++++++
->   drivers/infiniband/hw/ionic/Makefile          |  9 ++++
->   7 files changed, 79 insertions(+)
->   create mode 100644 Documentation/networking/device_drivers/ethernet/pensando/ionic_rdma.rst
->   create mode 100644 drivers/infiniband/hw/ionic/Kconfig
->   create mode 100644 drivers/infiniband/hw/ionic/Makefile
+> > +               while (i >= 0) {
+> > +                       qdisc_change_tx_queue_len(dev, &dev->_tx[i]);
 >
-> diff --git a/Documentation/networking/device_drivers/ethernet/index.rst b/Documentation/networking/device_drivers/ethernet/index.rst
-> index 139b4c75a191..4b16ecd289da 100644
-> --- a/Documentation/networking/device_drivers/ethernet/index.rst
-> +++ b/Documentation/networking/device_drivers/ethernet/index.rst
-> @@ -50,6 +50,7 @@ Contents:
->      neterion/s2io
->      netronome/nfp
->      pensando/ionic
-> +   pensando/ionic_rdma
->      smsc/smc9
->      stmicro/stmmac
->      ti/cpsw
-> diff --git a/Documentation/networking/device_drivers/ethernet/pensando/ionic_rdma.rst b/Documentation/networking/device_drivers/ethernet/pensando/ionic_rdma.rst
-> new file mode 100644
-> index 000000000000..80c4d9876d3e
-> --- /dev/null
-> +++ b/Documentation/networking/device_drivers/ethernet/pensando/ionic_rdma.rst
-> @@ -0,0 +1,43 @@
-> +.. SPDX-License-Identifier: GPL-2.0+
-> +
-> +============================================================
-> +Linux Driver for the AMD Pensando(R) Ethernet adapter family
-> +============================================================
-> +
-> +AMD Pensando RDMA driver.
-> +Copyright (C) 2018-2025, Advanced Micro Devices, Inc.
-> +
-> +Contents
-> +========
-> +
-> +- Identifying the Adapter
-> +- Enabling the driver
-> +- Support
-> +
-> +Identifying the Adapter
-> +=======================
-> +
-> +See Documentation/networking/device_drivers/ethernet/pensando/ionic.rst
-> +for more information on identifying the adapter.
-> +
-> +Enabling the driver
-> +===================
-> +
-> +The driver is enabled via the standard kernel configuration system,
-> +using the make command::
-> +
-> +  make oldconfig/menuconfig/etc.
-> +
-> +The driver is located in the menu structure at:
-> +
-> +  -> Device Drivers
-> +    -> InfiniBand support
-> +      -> AMD Pensando DSC RDMA/RoCE Support
+> What happens if one of these calls fails ?
+>
+> I think a fix will be more complicated...
 
-Please add some verbage about this being an auxiliary_device dependent 
-on the ionic driver, and that it can be disabled/enab led with a devlink 
-command.
-
-sln
-
-
-> +
-> +Support
-> +=======
-> +
-> +For general Linux rdma support, please use the rdma mailing
-> +list, which is monitored by AMD Pensando personnel::
-> +
-> +  linux-rdma@vger.kernel.org
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index b4f3fa14ddca..f52409bde673 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1165,6 +1165,15 @@ F:	Documentation/networking/device_drivers/ethernet/amd/pds_core.rst
->   F:	drivers/net/ethernet/amd/pds_core/
->   F:	include/linux/pds/
->   
-> +AMD PENSANDO RDMA DRIVER
-> +M:	Abhijit Gangurde <abhijit.gangurde@amd.com>
-> +M:	Allen Hubbe <allen.hubbe@amd.com>
-> +L:	linux-rdma@vger.kernel.org
-> +S:	Maintained
-> +F:	Documentation/networking/device_drivers/ethernet/pensando/ionic_rdma.rst
-> +F:	drivers/infiniband/hw/ionic/
-> +F:	include/uapi/rdma/ionic-abi.h
-> +
->   AMD PMC DRIVER
->   M:	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
->   L:	platform-driver-x86@vger.kernel.org
-> diff --git a/drivers/infiniband/Kconfig b/drivers/infiniband/Kconfig
-> index 3a394cd772f6..f0323f1d6f01 100644
-> --- a/drivers/infiniband/Kconfig
-> +++ b/drivers/infiniband/Kconfig
-> @@ -85,6 +85,7 @@ source "drivers/infiniband/hw/efa/Kconfig"
->   source "drivers/infiniband/hw/erdma/Kconfig"
->   source "drivers/infiniband/hw/hfi1/Kconfig"
->   source "drivers/infiniband/hw/hns/Kconfig"
-> +source "drivers/infiniband/hw/ionic/Kconfig"
->   source "drivers/infiniband/hw/irdma/Kconfig"
->   source "drivers/infiniband/hw/mana/Kconfig"
->   source "drivers/infiniband/hw/mlx4/Kconfig"
-> diff --git a/drivers/infiniband/hw/Makefile b/drivers/infiniband/hw/Makefile
-> index df61b2299ec0..b706dc0d0263 100644
-> --- a/drivers/infiniband/hw/Makefile
-> +++ b/drivers/infiniband/hw/Makefile
-> @@ -14,3 +14,4 @@ obj-$(CONFIG_INFINIBAND_HNS_HIP08)	+= hns/
->   obj-$(CONFIG_INFINIBAND_QEDR)		+= qedr/
->   obj-$(CONFIG_INFINIBAND_BNXT_RE)	+= bnxt_re/
->   obj-$(CONFIG_INFINIBAND_ERDMA)		+= erdma/
-> +obj-$(CONFIG_INFINIBAND_IONIC)		+= ionic/
-> diff --git a/drivers/infiniband/hw/ionic/Kconfig b/drivers/infiniband/hw/ionic/Kconfig
-> new file mode 100644
-> index 000000000000..de6f10e9b6e9
-> --- /dev/null
-> +++ b/drivers/infiniband/hw/ionic/Kconfig
-> @@ -0,0 +1,15 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +# Copyright (C) 2018-2025, Advanced Micro Devices, Inc.
-> +
-> +config INFINIBAND_IONIC
-> +	tristate "AMD Pensando DSC RDMA/RoCE Support"
-> +	depends on NETDEVICES && ETHERNET && PCI && INET && IONIC
-> +	help
-> +	  This enables RDMA/RoCE support for the AMD Pensando family of
-> +	  Distributed Services Cards (DSCs).
-> +
-> +	  To learn more, visit our website at
-> +	  <https://www.amd.com/en/products/accelerators/pensando.html>.
-> +
-> +	  To compile this driver as a module, choose M here. The module
-> +	  will be called ionic_rdma.
-> diff --git a/drivers/infiniband/hw/ionic/Makefile b/drivers/infiniband/hw/ionic/Makefile
-> new file mode 100644
-> index 000000000000..957973742820
-> --- /dev/null
-> +++ b/drivers/infiniband/hw/ionic/Makefile
-> @@ -0,0 +1,9 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +ccflags-y :=  -I $(srctree)/drivers/net/ethernet/pensando/ionic
-> +
-> +obj-$(CONFIG_INFINIBAND_IONIC)	+= ionic_rdma.o
-> +
-> +ionic_rdma-y :=	\
-> +	ionic_ibdev.o ionic_lif_cfg.o ionic_queue.o ionic_pgtbl.o ionic_admin.o \
-> +	ionic_controlpath.o ionic_datapath.o ionic_hw_stats.o
-
+Hi Eric,
+Given that pfifo_fast_change_tx_queue_len is currently the only
+implementation of change_tx_queue_len, would it be reasonable to
+handle partial failures solely within pfifo_fast_change_tx_queue_len
+(which in turn leads to skb_array_resize_multiple_bh)? In other words,
+is it sufficient to modify only the underlying low level
+implementation of pfifo_fast_change_tx_queue_len for partial failures,
+given that it's the sole implementation of change_tx_queue_len?
 
