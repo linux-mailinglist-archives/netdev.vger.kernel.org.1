@@ -1,1016 +1,1787 @@
-Return-Path: <netdev+bounces-209490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5181B0FB4D
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 22:15:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78B40B0FB58
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 22:18:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50C8D1C239B5
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 20:15:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F9684E62A0
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 20:17:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77D2720F087;
-	Wed, 23 Jul 2025 20:15:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B80AB233739;
+	Wed, 23 Jul 2025 20:17:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PkelfJ76"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W+GvO1yg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA361E7C1C;
-	Wed, 23 Jul 2025 20:15:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753301736; cv=none; b=gUupcVJoh0QgMpEJ543Ziq+h0PFxBh/k5IyfBWqVleRViAatbktNW4vXh3Brmz7CSJJMw8fgN4LsG52K83VWzKUZrL4kaZZfbt/lMh77oqk1eyDPm/nbRuGZTgtgbvquBHXIFiCnqtbbhhLgaRF/rfQmb+Ge1N8Gipu8sx6R9wU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753301736; c=relaxed/simple;
-	bh=X/H6wobxFfjzr1wQCvTMxxrRUkk7PQxBiI41a4mTZ88=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hD8kggqrtM6cNWPc6FK+AN2qTs092kesooa5sGmLbFtLw5nbUtStSrTexR6DoApEPk6cNoqGsj+iaZH2euj14pTl5A14NrEwFYGaiKkOVUeJmbFw2NtjI8TenJ90TK4DsJNpkxsqLFxXDmA4ck6LZpJ9u43/HTuQzJAKyIcgAXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PkelfJ76; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77672C4CEE7;
-	Wed, 23 Jul 2025 20:15:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753301735;
-	bh=X/H6wobxFfjzr1wQCvTMxxrRUkk7PQxBiI41a4mTZ88=;
-	h=From:To:Cc:Subject:Date:From;
-	b=PkelfJ76oQNFVwsQNzmEITA9C+qoM1bqaV9iZ7jlQTFx44Gse8ig3cWSZq6diRc9/
-	 ByK0XyuK0bnlpADsyxYG5HWvHOMdUEkDElfBM42l726zVabthvt88QEaBq0K3x1TmT
-	 LSiFiYJdSpG+/kaRufuNSdVlRt5gP9cvGeyVDuMVyQnSYcNUByCCVN6d4bodk4HJBM
-	 mlPsFeMVpIxoe64Rr2C4bQ0ElGZE7KCMH0rwh7BB4GFX2TWyb/u1u6eem4k7Hz8G4d
-	 h7gEKm3+p5wdnTaVV5LwB5sdm15aypSID6HDXLrC8Ky/grfJcZVYAK8wWeUw4fbjgd
-	 EKMFPvpB7r0RQ==
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bjorn Helgaas <bhelgaas@google.com>
-Subject: [PATCH] net: Fix typos
-Date: Wed, 23 Jul 2025 15:15:05 -0500
-Message-ID: <20250723201528.2908218-1-helgaas@kernel.org>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2675B17C91
+	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 20:17:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753301876; cv=fail; b=kclLWWrEq6gNCP1rc09VoMCM5ihmL5K8mSkSq3RcF7Jej8pWxoDqUCJdDjGvpmGqK2Ah9sfmW17qgHj2itpRY0ht+MQYCf+IJfBSM3B7oLrwz804j/U9a/KABHKhZzrev91Zrth/fIYBfCt3lFRCAAU0kxGic2ky3Re+4WueaJc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753301876; c=relaxed/simple;
+	bh=mPtGANex+Qjx2w5tw4eGleAfmkY+X/vd5EQanLB42Y8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=d4aVnkU0CvgAfldP7qeKsixFb31youP1IL6lD9g6GNkiLkE9R95K47DVN8ETutnLj8GiF4mLA5xeRDrlRfq7MDQ0U53lOAYlLlYTQ+6p2VTBNR56k/z1ToQdqzFB4uKSicN4hdrouiZ+a/DQwkNvS+cnORUkUPl2ib1NAWTIyG4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W+GvO1yg; arc=fail smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753301873; x=1784837873;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=mPtGANex+Qjx2w5tw4eGleAfmkY+X/vd5EQanLB42Y8=;
+  b=W+GvO1ygVgyydGJmgh0hr0onEsOhamb9aWmrLdJCFEYEP9Lgjl5gpjfI
+   PHq0kGQYrdJCB60Op+FRmx2mUhX0z4Al5ZU+mc5gzJbYDpo4B1Hf8Cp0w
+   YkO2FKzkTJhFPzM+ZQLmdiPc+oUrAWYHtA4ESUCFykJdS5D1rWW0H2NXv
+   oGOoUXi0PFIN5585STW8pisxQGhAy6vHQIJ4Cq1MSjfPpXX1pKV0MMvWy
+   Bp+NWC0uK88ftpcv5sgPI8XgBotnzXxNLbNkMXkqPNPOtgwfTGiEf2chb
+   lFvS3bN4caOpiAjWKNQOySpINIC9Q22p/dYZsF/6y6LQwq+ej9JOzgkoi
+   g==;
+X-CSE-ConnectionGUID: vDWuombvSk6kE6nGzdmjZA==
+X-CSE-MsgGUID: f5sB4ApyREa1WBRkxn9cZA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11501"; a="55557935"
+X-IronPort-AV: E=Sophos;i="6.16,335,1744095600"; 
+   d="scan'208";a="55557935"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2025 13:17:49 -0700
+X-CSE-ConnectionGUID: nYaQzxvdTWudJtfQa4erMQ==
+X-CSE-MsgGUID: Uwkesp9BRvKbTnpJStv5Nw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,335,1744095600"; 
+   d="scan'208";a="190693218"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2025 13:17:49 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Wed, 23 Jul 2025 13:17:48 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26 via Frontend Transport; Wed, 23 Jul 2025 13:17:48 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (40.107.243.85)
+ by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Wed, 23 Jul 2025 13:17:47 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=aQWlVIDAeGfDKbi00ii8L2ZoiPXpyV41BlbFxC4/WZUrNgxyqem9buaiylqEQ+4UcRUFnbKhd1PietrmJBjmZQTpiVL9UOPo6l5+RIrzT3WDLXv2T0tvtroL+b18sEr1Q5mv+tk/CQFZQa2kMaFAkouXaTgCQCHHzZ4yKQKZEmSjYn0IHS0NNHBJlozMP9Jj+hok9LHyPq1pOhWD7pDjXiMAexHAJmc4irXlaXvMYBovpT1ZRxNIRJOqNk8JRs+WwtZb+DedoQPBc2xklgbxWeu4g7L6FaXT7yF+wxoG2C3FEfpHaUsjKKXLvkw5CPMSbiE9ERFm3phYeAuXStqEZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=v2ArQRlpmCrhkeRPJKSGayLSucT8X88p+p2WddyMrCc=;
+ b=U0343PBCu2PoBs+dG1FZ6+3npfwZbjdGP3U7z3zobg/GAt8S+aT1BscGF2xGml1DSe5cSAGBanO0DNI+4NJKrCaPGhH3sL8qypGhT5M9Uk06pNoHa+7iLMdwG2gmIEwvYgiIJsg47EhclQGh+s6dXesgWOOXALR4lzgC8ljCxao8V5Udmcwg0/Il5/uvnOBLWDRKMjGgJsJAKgW20VDpNlD2P+bSVez8m4gNmJc+WeFcS8G+JQ4H8itI1r65Y2xQIIUOOQ9VScDWnFLfR6po0TumsTeklaUkSF7D0VdmMRzNdhg1YlhcCiKfPlNYrUpSkBy6UH2f2iKYE3YSkWz0Ng==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SJ2PR11MB8452.namprd11.prod.outlook.com (2603:10b6:a03:574::22)
+ by PH7PR11MB7073.namprd11.prod.outlook.com (2603:10b6:510:20c::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8943.30; Wed, 23 Jul
+ 2025 20:17:04 +0000
+Received: from SJ2PR11MB8452.namprd11.prod.outlook.com
+ ([fe80::d200:bfac:918a:1a38]) by SJ2PR11MB8452.namprd11.prod.outlook.com
+ ([fe80::d200:bfac:918a:1a38%3]) with mapi id 15.20.8943.029; Wed, 23 Jul 2025
+ 20:17:04 +0000
+From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+To: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Korba, Przemyslaw"
+	<przemyslaw.korba@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "Olech, Milena" <milena.olech@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH v7 iwl-next] ice: add recovery clock and
+ clock 1588 control for E825c
+Thread-Topic: [Intel-wired-lan] [PATCH v7 iwl-next] ice: add recovery clock
+ and clock 1588 control for E825c
+Thread-Index: AQHb+1e1RMYXpAYNsEqvYVk9ngiVbLRAFPYg
+Date: Wed, 23 Jul 2025 20:17:04 +0000
+Message-ID: <SJ2PR11MB845248E1F2A83B0860EEBFAB9B5FA@SJ2PR11MB8452.namprd11.prod.outlook.com>
+References: <20250722222509.2178387-1-grzegorz.nitka@intel.com>
+In-Reply-To: <20250722222509.2178387-1-grzegorz.nitka@intel.com>
+Accept-Language: pl-PL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ2PR11MB8452:EE_|PH7PR11MB7073:EE_
+x-ms-office365-filtering-correlation-id: 46d51511-34c6-48e1-049b-08ddca25e405
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?3QwKBYObpAS6I/kY3j7nzpEUbJMoQzkRFBHXYxpKroq4t+Z5U5KF687ER89M?=
+ =?us-ascii?Q?K/pfN9I0AxSoPd+Td8pV0Oog7NHlIfdS07Wfxv2SiAdiYCSO61HWq7jOccQa?=
+ =?us-ascii?Q?KWu7gePnDKutB5Hp76l3slKUX3XmZbJAzUpD5SqNvgLfecuOyPx5v26AiIAi?=
+ =?us-ascii?Q?jnbSAEob5i18fLR4Fzq3F/BLn4HzVAfp6SLMYxUIwluqv7Aasr3Tqr0GAG7l?=
+ =?us-ascii?Q?Q0VSRAdk2+/eE6H3VviZw8FPEythgOXkFEioYSevILuQKNojEtJ7PdIDKo1b?=
+ =?us-ascii?Q?dyZLVnQP8Hah49vgmifologVQS6bArNYgNV7romASauNurhGmwOkfovroLAK?=
+ =?us-ascii?Q?FkYcqi1TN4XAWArthYYNPBrn694D9cj84Y4OswrdvOuVow1e0kfvJBTpGls2?=
+ =?us-ascii?Q?CC/gcOOfOgY355iybGWPwPWCrJU9l3oxjmQy9PBXE4MOg2h56A7hnpMDFswr?=
+ =?us-ascii?Q?MzZNtMYZYKw+Ehw+5TNlpRW2J/hv+m7LP562y7loDaEI+Qm/szOJGH7Q8aDZ?=
+ =?us-ascii?Q?KLIAUgRuliPzhijxO2ftAlHendzq8hKaElOIXT79nSygwZbdqkaujWwNvmVi?=
+ =?us-ascii?Q?+O0NNusFFffx/RLGAO/Vf+zprC5x4FFxAZYuEleFBBt7ith0fZBtc1H0SSf1?=
+ =?us-ascii?Q?TOowC0t2a9Q/qXZUtCOlk8fyG3Xh5wPVoIs/a1mohdBR5/cbtE28oCYvpblf?=
+ =?us-ascii?Q?Kq4+vuTm3MOJPaWk8PHncLZAz7PdE6JyhfzY2bbdON2/ewcvWu1Kl5v7JZrh?=
+ =?us-ascii?Q?GcU30DrcfUYzH3+9JWIPwoKN3G15Vk2bwQumgX0VrCjARf4+aDH6igxdh6ez?=
+ =?us-ascii?Q?JfIZfJ0bocN8cLPHjZuE86/ZfzDDVyli84VcVmbWx7j75uo7qjPysqz7Vz8D?=
+ =?us-ascii?Q?KGiqOfE7IRWjYXRtgsZE+cZ78/Xsl83jv//M0hqN0qk+Rtd/GohksUOQMzyR?=
+ =?us-ascii?Q?jLMkWNYAWUNWAzwVHLG58F/3lR6zi88TVLNhXcYSUdu8IeTZLxbTqnTqxzmc?=
+ =?us-ascii?Q?15Tk9O7OCHTv7KYQZuycrokvszdAL45TcErcOkndN5vYgg+l1zKpQbGEZ/zu?=
+ =?us-ascii?Q?AaEC8AJiD3cDrMVEkOTVszGeQ1u85Lrvr9aOe+voFNb7WaR4abdpxPDtrGk8?=
+ =?us-ascii?Q?/UZszOXEL0IxjXneP6XVnTv9sm6wbSCnSdds9wCjWeAXlAeC/h4sbxiNFTZm?=
+ =?us-ascii?Q?OloxNHcc4eeEUoxgaBhhbkYCmRtW17s/PqLssjDWV+JRrs8XbLx0sqMntryo?=
+ =?us-ascii?Q?457QBEugiRfofKbjhkUMLorQCd6GuPeJImnhl4gy9BuUTTsTHRtxdNWnwKRW?=
+ =?us-ascii?Q?jT6YKhG2Kukv2HwyhtX63sMed/WFFpxzIEeV4NeAaPjOO1+W5+2/lFKLpuKL?=
+ =?us-ascii?Q?l3+CByaAP8+/AbVK70+wbBH7rOvVOniXLSbMghhF2akLSSDjqxYE4vxuogP+?=
+ =?us-ascii?Q?nowdZ8nu5Jq35xeuUVBMZ+6wSID0xng+rD/oDBKtyH+QDqOD6Xp2mg=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR11MB8452.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?GY01mmnnGBLW4VYmBqwBOy+aB/CAlMBW412TRorL513e4V6AVH+zGmeHkj9p?=
+ =?us-ascii?Q?CBopoclCnVZisnpzV7BpZC/e4vRPX8hrATF9FU+3875k2Uaw5364l/mpixhI?=
+ =?us-ascii?Q?0nZJcehIhbRTQdMoaxaoAXsYFEjptUhp+qRansd1XqY+lhgsDjuHjjuca+yq?=
+ =?us-ascii?Q?aTdZtjWUS+mIQhPAGDwJBcFQlNR0uy80KqAu30ugeuG6ZKRMo0kQfCp5xwEp?=
+ =?us-ascii?Q?OiCnytIo8kVvp1/p3g5fKAVXPzYG49jXVobrVlKkAyrUrox/zYyrUwmclUQ7?=
+ =?us-ascii?Q?D1efqaFGzRzugbZedum9kO/JZSKpTuTcqIVMx2+xBECN5cfhYFvnFtHZoD8z?=
+ =?us-ascii?Q?jM4iqFRT0I1+OiIxb/HYwlEbX31RiFopkFUFS2cyz4OaP5qfpHvyAONaD48n?=
+ =?us-ascii?Q?Z/V6r7H0veMS4KGJbVW7ZEnRlExgvOrovj70zLo/lnag0vy26qAqfSd9gRXY?=
+ =?us-ascii?Q?5tmVa/sUrIK/xhaEnjmqIgLhcbUi1eq09jz5fF5NKEInXXvuNK52ofLQVhcD?=
+ =?us-ascii?Q?BiWwHeTfDSZ24xqgR3wVq+bQGKqN1y/9qi7pG4YnWYT2fX4FAZPrp2qUrPo5?=
+ =?us-ascii?Q?T2Gy9XFWNmy+mO7gYyky79vm+cEluqIUCO9vHp3H52Zuv7BtCfwz+9zr6Ay0?=
+ =?us-ascii?Q?iABbJbXmtTrscU1u4eMrh5+zS1J2hzjC7he0xz4iZNS0QfLUP0USShhkjNs2?=
+ =?us-ascii?Q?gQ6kbfl6JLxVwlPDGpoZftHI4WBCpSX99eSykFOqQxTXwxBoAitjxG1IJvmj?=
+ =?us-ascii?Q?4E8t9PywK/OFG1QxqtjLKstaE1bMgH0GrX9yogLHqIhnfxrS2mdhmnqdZSjZ?=
+ =?us-ascii?Q?qfQQSOjmQO8hdpp3lI7+Qnl1ArKcE1Jq6c93Aa98rtcsw0fbW4ppIaIXayV9?=
+ =?us-ascii?Q?V3T988pWqni05eGG9njQ2MP8FbwZTCLD6CUjaXjmaACUQxEHCTDmwlqRPS6F?=
+ =?us-ascii?Q?N6mIW7VWmDbZWUUhhICxARNXXKc7gcemYg6IXyEsBWoaX0YrhBKqICV8bTgp?=
+ =?us-ascii?Q?qY9XPxYZeYOIHab0r0dQbM9mBIGfDI++dBLMBAmZuXEY28la7+BXTBnniEvQ?=
+ =?us-ascii?Q?SO2ElRIEx5lqGIN1/UZ79xNo62MNtTEIVXOmBCR9EDqjc2FaVXp4LMFQeRrw?=
+ =?us-ascii?Q?hb+FtyPbi8R8ME6GxlRKM801lRi/7bweXfXvK+UwVzmThGX9UaN4GV2d80gy?=
+ =?us-ascii?Q?HPVmsMGk+qmCnWKUlwycvKHAGrZR3GjnIOZpC26lC3XmjFN4N82Av8epwP70?=
+ =?us-ascii?Q?CeHa+PytY7pseXhSJhk/9Eo/NlWnheUd7cnmQqpWlFNArE6hTZ6AdpJkzAfk?=
+ =?us-ascii?Q?8I6v8XrfRTIsYvwMEeycvoC0nwmtDi58xQvvSkEJS52O2spYBCob+G+Y/z/G?=
+ =?us-ascii?Q?eGyMPE46QU5qtN48/GZ8To3QVOpG4gci0pNWDKXWLEJa182WBhhN//Lo44da?=
+ =?us-ascii?Q?2Mk3W6sdFhHK1G21EKWqr37Gqq5dFirEQmJTGtt/v1vy4QXUibLVcAY9hZnd?=
+ =?us-ascii?Q?amujbff58gmi6mysXrAbJhZjSeEWzaQCiuza/Hlu1e40ciAH5F+jtl/ci5FM?=
+ =?us-ascii?Q?EDGNFGUiW5ennmiD+Rp+BMTFjve+UwC+yZC+mrrrcKpd5c1kB5dKJoC9JLvg?=
+ =?us-ascii?Q?+g=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR11MB8452.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 46d51511-34c6-48e1-049b-08ddca25e405
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jul 2025 20:17:04.4392
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: fh5HdhNS1pXfJj9MrLb1GfglCJLAHVfmEx1ENdKeJzdSOk9PIuYqqxjjgz1HP+m5nhEHC6zPaU1vyJqpj9wkZc17a4QkoG68x8YDGpj1ums=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7073
+X-OriginatorOrg: intel.com
 
-From: Bjorn Helgaas <bhelgaas@google.com>
+>From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+>Grzegorz Nitka
+>Sent: Wednesday, July 23, 2025 12:25 AM
+>
+>From: Przemyslaw Korba <przemyslaw.korba@intel.com>
+>
+>Add control for E825 input pins: phy clock recovery and clock 1588.
+>E825 does not provide control over platform level DPLL but it
+>provides control over PHY clock recovery, and PTP/timestamp driven
+>inputs for platform level DPLL.
+>
+>Introduce a software controlled layer of abstraction to:
+>- create a DPLL of type EEC for E825c,
+>- create recovered clock pin for each PF, and control them through
+>writing to registers,
+>- create pin to control clock 1588 for PF0, and control it through
+>writing to registers.
+>
+>Usage example:
+>- to get EEC PLL info
+>$ ynl --family dpll --dump device-get
+>[{'clock-id': 0,
+>  'id': 6,
+>  'lock-status': 'locked',
+>  'mode': 'manual',
+>  'mode-supported': ['manual'],
+>  'module-name': 'ice',
+>  'type': 'eec'},
+>...]
 
-Fix typos in comments and error messages.
+I would put new line between ... and ]
 
-Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
----
- drivers/net/ethernet/amazon/ena/ena_admin_defs.h     |  2 +-
- drivers/net/ethernet/broadcom/b44.c                  |  2 +-
- drivers/net/ethernet/broadcom/bnx2x/bnx2x_dcb.c      |  2 +-
- drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c  |  4 ++--
- drivers/net/ethernet/broadcom/bnx2x/bnx2x_fw_defs.h  |  2 +-
- drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c     |  2 +-
- drivers/net/ethernet/broadcom/bnx2x/bnx2x_sp.h       |  2 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c            |  2 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c      |  2 +-
- drivers/net/ethernet/broadcom/tg3.c                  |  2 +-
- drivers/net/ethernet/cavium/liquidio/octeon_main.h   |  2 +-
- drivers/net/ethernet/cavium/liquidio/octeon_nic.h    |  4 ++--
- drivers/net/ethernet/chelsio/cxgb/pm3393.c           |  8 ++++----
- drivers/net/ethernet/chelsio/cxgb4/cxgb4.h           |  2 +-
- drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c      |  4 ++--
- drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_u32.c    |  4 ++--
- drivers/net/ethernet/chelsio/cxgb4/sge.c             |  2 +-
- drivers/net/ethernet/chelsio/cxgb4/t4_hw.c           |  2 +-
- drivers/net/ethernet/chelsio/cxgb4vf/sge.c           |  2 +-
- drivers/net/ethernet/chelsio/cxgb4vf/t4vf_hw.c       |  2 +-
- drivers/net/ethernet/dec/tulip/tulip_core.c          |  2 +-
- drivers/net/ethernet/faraday/ftgmac100.c             |  2 +-
- drivers/net/ethernet/hisilicon/hns3/hns3_enet.c      |  4 ++--
- .../net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c  |  2 +-
- drivers/net/ethernet/huawei/hinic/hinic_hw_eqs.c     |  2 +-
- drivers/net/ethernet/huawei/hinic/hinic_hw_mbox.c    |  2 +-
- drivers/net/ethernet/intel/i40e/i40e_ptp.c           |  2 +-
- drivers/net/ethernet/intel/ice/devlink/port.h        |  2 +-
- drivers/net/ethernet/intel/ice/ice_base.c            |  2 +-
- drivers/net/ethernet/intel/ice/ice_lib.c             |  2 +-
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c          |  2 +-
- drivers/net/ethernet/intel/igc/igc_mac.c             |  2 +-
- drivers/net/ethernet/intel/ixgbevf/vf.c              |  2 +-
- drivers/net/ethernet/marvell/mvneta_bm.h             |  2 +-
- .../net/ethernet/marvell/octeontx2/af/rvu_cn10k.c    |  2 +-
- drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c  |  2 +-
- drivers/net/ethernet/marvell/pxa168_eth.c            |  6 +++---
- drivers/net/ethernet/mellanox/mlx5/core/en.h         |  2 +-
- drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c      |  2 +-
- drivers/net/ethernet/micrel/ks8842.c                 |  2 +-
- drivers/net/ethernet/neterion/s2io.c                 |  4 ++--
- drivers/net/ethernet/pensando/ionic/ionic_if.h       |  2 +-
- drivers/net/ethernet/qlogic/qed/qed_dev.c            |  2 +-
- drivers/net/ethernet/qlogic/qed/qed_ptp.c            |  2 +-
- drivers/net/ethernet/qlogic/qla3xxx.c                |  2 +-
- .../net/ethernet/qlogic/qlcnic/qlcnic_83xx_init.c    |  2 +-
- drivers/net/ethernet/qualcomm/emac/emac-sgmii.c      |  2 +-
- drivers/net/ethernet/sfc/mcdi_pcol.h                 |  6 +++---
- drivers/net/ethernet/sfc/siena/farch.c               |  2 +-
- drivers/net/ethernet/sfc/siena/mcdi_pcol.h           | 12 ++++++------
- drivers/net/ethernet/sfc/tc_encap_actions.c          |  2 +-
- drivers/net/ethernet/smsc/smsc911x.c                 |  2 +-
- .../net/ethernet/stmicro/stmmac/stmmac_platform.c    |  2 +-
- drivers/net/ethernet/sun/niu.c                       |  2 +-
- drivers/net/ethernet/sun/niu.h                       |  4 ++--
- drivers/net/ethernet/sun/sunhme.c                    |  2 +-
- drivers/net/ethernet/sun/sunqe.h                     |  2 +-
- drivers/net/ethernet/tehuti/tehuti.c                 |  2 +-
- 58 files changed, 77 insertions(+), 77 deletions(-)
+>
+>- to get 1588 and rclk pins info
+>(note: in the output below, pin id=3D31 is a representor for 1588 input,
+>while pins 32..35 corresponds to PHY clock inputs to SyncE  module)
+>$ ynl --family dpll --dump pin-get
+>[{'board-label': 'CLK_IN_0',
+>  'capabilities': set(),
+>  'clock-id': 0,
+>  'id': 27,
+>  'module-name': 'ice',
+>  'parent-device': [{'direction': 'input',
+>                     'parent-id': 6,
+>                     'state': 'connected'}],
+>  'phase-adjust-max': 0,
+>  'phase-adjust-min': 0,
+>  'type': 'mux'},
+> {'board-label': 'CLK_IN_1',
+>  'capabilities': set(),
+>  'clock-id': 0,
+>  'id': 28,
+>  'module-name': 'ice',
+>  'parent-device': [{'direction': 'input',
+>                     'parent-id': 6,
+>                     'state': 'connected'}],
+>  'phase-adjust-max': 0,
+>  'phase-adjust-min': 0,
+>  'type': 'mux'},
+> {'board-label': 'pin_1588',
+>  'capabilities': {'state-can-change'},
+>  'clock-id': 0,
+>  'id': 31,
+>  'module-name': 'ice',
+>  'parent-pin': [{'parent-id': 27, 'state': 'disconnected'},
+>                 {'parent-id': 28, 'state': 'disconnected'}],
+>  'phase-adjust-max': 0,
+>  'phase-adjust-min': 0,
+>  'type': 'synce-eth-port'},
 
-diff --git a/drivers/net/ethernet/amazon/ena/ena_admin_defs.h b/drivers/net/ethernet/amazon/ena/ena_admin_defs.h
-index 562869a0fdba..898ecd96b96a 100644
---- a/drivers/net/ethernet/amazon/ena/ena_admin_defs.h
-+++ b/drivers/net/ethernet/amazon/ena/ena_admin_defs.h
-@@ -986,7 +986,7 @@ struct ena_admin_feature_rss_ind_table {
- 	struct ena_admin_rss_ind_table_entry inline_entry;
- };
- 
--/* When hint value is 0, driver should use it's own predefined value */
-+/* When hint value is 0, driver should use its own predefined value */
- struct ena_admin_ena_hw_hints {
- 	/* value in ms */
- 	u16 mmio_read_timeout;
-diff --git a/drivers/net/ethernet/broadcom/b44.c b/drivers/net/ethernet/broadcom/b44.c
-index 8267417b3750..0353359c3fe9 100644
---- a/drivers/net/ethernet/broadcom/b44.c
-+++ b/drivers/net/ethernet/broadcom/b44.c
-@@ -2570,7 +2570,7 @@ static int __init b44_init(void)
- 	unsigned int dma_desc_align_size = dma_get_cache_alignment();
- 	int err;
- 
--	/* Setup paramaters for syncing RX/TX DMA descriptors */
-+	/* Setup parameters for syncing RX/TX DMA descriptors */
- 	dma_desc_sync_size = max_t(unsigned int, dma_desc_align_size, sizeof(struct dma_desc));
- 
- 	err = b44_pci_init();
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_dcb.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_dcb.c
-index 17ae6df90723..9af81630c8a4 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_dcb.c
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_dcb.c
-@@ -344,7 +344,7 @@ static void  bnx2x_dcbx_get_pfc_feature(struct bnx2x *bp,
- 	}
- }
- 
--/* maps unmapped priorities to to the same COS as L2 */
-+/* maps unmapped priorities to the same COS as L2 */
- static void bnx2x_dcbx_map_nw(struct bnx2x *bp)
- {
- 	int i;
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
-index 528ce9ca4f54..fc8dec37a9e4 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
-@@ -1243,9 +1243,9 @@ static int bnx2x_get_eeprom_len(struct net_device *dev)
-  * pf B succeeds in taking the same lock since they are from the same port.
-  * pf A takes the per pf misc lock. Performs eeprom access.
-  * pf A finishes. Unlocks the per pf misc lock.
-- * Pf B takes the lock and proceeds to perform it's own access.
-+ * Pf B takes the lock and proceeds to perform its own access.
-  * pf A unlocks the per port lock, while pf B is still working (!).
-- * mcp takes the per port lock and corrupts pf B's access (and/or has it's own
-+ * mcp takes the per port lock and corrupts pf B's access (and/or has its own
-  * access corrupted by pf B)
-  */
- static int bnx2x_acquire_nvram_lock(struct bnx2x *bp)
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_fw_defs.h b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_fw_defs.h
-index a84d015da5df..9221942290a8 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_fw_defs.h
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_fw_defs.h
-@@ -332,7 +332,7 @@
- #define TOE_STATE (TOE_CONNECTION_TYPE << PROTOCOL_STATE_BIT_OFFSET)
- #define RDMA_STATE (RDMA_CONNECTION_TYPE << PROTOCOL_STATE_BIT_OFFSET)
- 
--/* microcode fixed page page size 4K (chains and ring segments) */
-+/* microcode fixed page size 4K (chains and ring segments) */
- #define MC_PAGE_SIZE 4096
- 
- /* Number of indices per slow-path SB */
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-index 3ee4b848ef53..9d9f9a987bc0 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-@@ -1768,7 +1768,7 @@ static bool bnx2x_trylock_hw_lock(struct bnx2x *bp, u32 resource)
-  * @bp:	driver handle
-  *
-  * Returns the recovery leader resource id according to the engine this function
-- * belongs to. Currently only only 2 engines is supported.
-+ * belongs to. Currently only 2 engines is supported.
-  */
- static int bnx2x_get_leader_lock_resource(struct bnx2x *bp)
- {
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_sp.h b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_sp.h
-index bacc8552bce1..00ca861c80dd 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_sp.h
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_sp.h
-@@ -379,7 +379,7 @@ struct bnx2x_vlan_mac_obj {
- 	/**
- 	*  Delete all configured elements having the given
- 	*  vlan_mac_flags specification. Assumes no pending for
--	*  execution commands. Will schedule all all currently
-+	*  execution commands. Will schedule all currently
- 	*  configured MACs/VLANs/VLAN-MACs matching the vlan_mac_flags
- 	*  specification for deletion and will use the given
- 	*  ramrod_flags for the last DEL operation.
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index de8080df69a8..5578ddcb465d 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -16974,7 +16974,7 @@ static pci_ers_result_t bnxt_io_error_detected(struct pci_dev *pdev,
- 	bnxt_free_ctx_mem(bp, false);
- 	netdev_unlock(netdev);
- 
--	/* Request a slot slot reset. */
-+	/* Request a slot reset. */
- 	return PCI_ERS_RESULT_NEED_RESET;
- }
- 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
-index ec14b51ba38e..480e18a32caa 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
-@@ -1125,7 +1125,7 @@ static int bnxt_vf_validate_set_mac(struct bnxt *bp, struct bnxt_vf_info *vf)
- 		/* There are two cases:
- 		 * 1.If firmware spec < 0x10202,VF MAC address is not forwarded
- 		 *   to the PF and so it doesn't have to match
--		 * 2.Allow VF to modify it's own MAC when PF has not assigned a
-+		 * 2.Allow VF to modify its own MAC when PF has not assigned a
- 		 *   valid MAC address and firmware spec >= 0x10202
- 		 */
- 		mac_ok = true;
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index c00b05b2e945..b4dc93a48718 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -16610,7 +16610,7 @@ static int tg3_get_invariants(struct tg3 *tp, const struct pci_device_id *ent)
- 
- 			tg3_flag_set(tp, PCIX_TARGET_HWBUG);
- 
--			/* The chip can have it's power management PCI config
-+			/* The chip can have its power management PCI config
- 			 * space registers clobbered due to this bug.
- 			 * So explicitly force the chip into D0 here.
- 			 */
-diff --git a/drivers/net/ethernet/cavium/liquidio/octeon_main.h b/drivers/net/ethernet/cavium/liquidio/octeon_main.h
-index 5b4cb725f60f..953edf0c7096 100644
---- a/drivers/net/ethernet/cavium/liquidio/octeon_main.h
-+++ b/drivers/net/ethernet/cavium/liquidio/octeon_main.h
-@@ -157,7 +157,7 @@ static inline int octeon_map_pci_barx(struct octeon_device *oct,
- 	    response of the request.
-  *          0: the request will wait until its response gets back
-  *	       from the firmware within LIO_SC_MAX_TMO_MS milli sec.
-- *	       It the response does not return within
-+ *	       If the response does not return within
-  *	       LIO_SC_MAX_TMO_MS milli sec, lio_process_ordered_list()
-  *	       will move the request to zombie response list.
-  *
-diff --git a/drivers/net/ethernet/cavium/liquidio/octeon_nic.h b/drivers/net/ethernet/cavium/liquidio/octeon_nic.h
-index 87dd6f89ce51..c139fc423764 100644
---- a/drivers/net/ethernet/cavium/liquidio/octeon_nic.h
-+++ b/drivers/net/ethernet/cavium/liquidio/octeon_nic.h
-@@ -268,7 +268,7 @@ octeon_alloc_soft_command_resp(struct octeon_device    *oct,
-  * @param oct - octeon device pointer
-  * @param ndata - control structure with queueing, and buffer information
-  *
-- * @returns IQ_FAILED if it failed to add to the input queue. IQ_STOP if it the
-+ * @returns IQ_FAILED if it failed to add to the input queue. IQ_STOP if the
-  * queue should be stopped, and IQ_SEND_OK if it sent okay.
-  */
- int octnet_send_nic_data_pkt(struct octeon_device *oct,
-@@ -278,7 +278,7 @@ int octnet_send_nic_data_pkt(struct octeon_device *oct,
- /** Send a NIC control packet to the device
-  * @param oct - octeon device pointer
-  * @param nctrl - control structure with command, timout, and callback info
-- * @returns IQ_FAILED if it failed to add to the input queue. IQ_STOP if it the
-+ * @returns IQ_FAILED if it failed to add to the input queue. IQ_STOP if the
-  * queue should be stopped, and IQ_SEND_OK if it sent okay.
-  */
- int
-diff --git a/drivers/net/ethernet/chelsio/cxgb/pm3393.c b/drivers/net/ethernet/chelsio/cxgb/pm3393.c
-index cbfa03d5663a..f3ada6e7cdc5 100644
---- a/drivers/net/ethernet/chelsio/cxgb/pm3393.c
-+++ b/drivers/net/ethernet/chelsio/cxgb/pm3393.c
-@@ -141,7 +141,7 @@ static int pm3393_interrupt_enable(struct cmac *cmac)
- 	pmwrite(cmac, SUNI1x10GEXP_REG_GLOBAL_INTERRUPT_ENABLE,
- 		0 /*SUNI1x10GEXP_BITMSK_TOP_INTE */ );
- 
--	/* TERMINATOR - PL_INTERUPTS_EXT */
-+	/* TERMINATOR - PL_INTERRUPTS_EXT */
- 	pl_intr = readl(cmac->adapter->regs + A_PL_ENABLE);
- 	pl_intr |= F_PL_INTR_EXT;
- 	writel(pl_intr, cmac->adapter->regs + A_PL_ENABLE);
-@@ -179,7 +179,7 @@ static int pm3393_interrupt_disable(struct cmac *cmac)
- 	elmer &= ~ELMER0_GP_BIT1;
- 	t1_tpi_write(cmac->adapter, A_ELMER0_INT_ENABLE, elmer);
- 
--	/* TERMINATOR - PL_INTERUPTS_EXT */
-+	/* TERMINATOR - PL_INTERRUPTS_EXT */
- 	/* DO NOT DISABLE TERMINATOR's EXTERNAL INTERRUPTS. ANOTHER CHIP
- 	 * COULD WANT THEM ENABLED. We disable PM3393 at the ELMER level.
- 	 */
-@@ -222,7 +222,7 @@ static int pm3393_interrupt_clear(struct cmac *cmac)
- 	elmer |= ELMER0_GP_BIT1;
- 	t1_tpi_write(cmac->adapter, A_ELMER0_INT_CAUSE, elmer);
- 
--	/* TERMINATOR - PL_INTERUPTS_EXT
-+	/* TERMINATOR - PL_INTERRUPTS_EXT
- 	 */
- 	pl_intr = readl(cmac->adapter->regs + A_PL_CAUSE);
- 	pl_intr |= F_PL_INTR_EXT;
-@@ -756,7 +756,7 @@ static int pm3393_mac_reset(adapter_t * adapter)
- 
- 		/* ??? If this fails, might be able to software reset the XAUI part
- 		 *     and try to recover... thus saving us from doing another HW reset */
--		/* Has the XAUI MABC PLL circuitry stablized? */
-+		/* Has the XAUI MABC PLL circuitry stabilized? */
- 		is_xaui_mabc_pll_locked =
- 		    (val & SUNI1x10GEXP_BITMSK_TOP_SXRA_EXPIRED);
- 
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h b/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
-index 95e6f015a6af..0d85198fb03d 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
-+++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
-@@ -1316,7 +1316,7 @@ struct ch_sched_flowc {
-  * (value, mask) tuples.  The associated ingress packet field matches the
-  * tuple when ((field & mask) == value).  (Thus a wildcard "don't care" field
-  * rule can be constructed by specifying a tuple of (0, 0).)  A filter rule
-- * matches an ingress packet when all of the individual individual field
-+ * matches an ingress packet when all of the individual field
-  * matching rules are true.
-  *
-  * Partial field masks are always valid, however, while it may be easy to
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-index 51395c96b2e9..392723ef14e5 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-@@ -3297,7 +3297,7 @@ static int cxgb4_mgmt_set_vf_rate(struct net_device *dev, int vf,
- 	}
- 
- 	if (max_tx_rate == 0) {
--		/* unbind VF to to any Traffic Class */
-+		/* unbind VF to any Traffic Class */
- 		fw_pfvf =
- 		    (FW_PARAMS_MNEM_V(FW_PARAMS_MNEM_PFVF) |
- 		     FW_PARAMS_PARAM_X_V(FW_PARAMS_PARAM_PFVF_SCHEDCLASS_ETH));
-@@ -4816,7 +4816,7 @@ static int adap_init0(struct adapter *adap, int vpd_skip)
- 			goto bye;
- 		}
- 
--		/* Get FW from from /lib/firmware/ */
-+		/* Get FW from /lib/firmware/ */
- 		ret = request_firmware(&fw, fw_info->fw_mod_name,
- 				       adap->pdev_dev);
- 		if (ret < 0) {
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_u32.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_u32.c
-index a5d2f84dcdd5..8524246fd67e 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_u32.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_u32.c
-@@ -186,7 +186,7 @@ int cxgb4_config_knode(struct net_device *dev, struct tc_cls_u32_offload *cls)
- 	link_uhtid = TC_U32_USERHTID(cls->knode.link_handle);
- 
- 	/* Ensure that uhtid is either root u32 (i.e. 0x800)
--	 * or a a valid linked bucket.
-+	 * or a valid linked bucket.
- 	 */
- 	if (uhtid != 0x800 && uhtid >= t->size)
- 		return -EINVAL;
-@@ -422,7 +422,7 @@ int cxgb4_delete_knode(struct net_device *dev, struct tc_cls_u32_offload *cls)
- 	uhtid = TC_U32_USERHTID(cls->knode.handle);
- 
- 	/* Ensure that uhtid is either root u32 (i.e. 0x800)
--	 * or a a valid linked bucket.
-+	 * or a valid linked bucket.
- 	 */
- 	if (uhtid != 0x800 && uhtid >= t->size)
- 		return -EINVAL;
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/sge.c b/drivers/net/ethernet/chelsio/cxgb4/sge.c
-index 64402e3646b3..9fccb8ea9bcd 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/sge.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/sge.c
-@@ -163,7 +163,7 @@ static inline unsigned int fl_mtu_bufsize(struct adapter *adapter,
-  * for DMA, but this is of course never sent to the hardware and is only used
-  * to prevent double unmappings.  All of the above requires that the Free List
-  * Buffers which we allocate have the bottom 5 bits free (0) -- i.e. are
-- * 32-byte or or a power of 2 greater in alignment.  Since the SGE's minimal
-+ * 32-byte or a power of 2 greater in alignment.  Since the SGE's minimal
-  * Free List Buffer alignment is 32 bytes, this works out for us ...
-  */
- enum {
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/t4_hw.c b/drivers/net/ethernet/chelsio/cxgb4/t4_hw.c
-index 175bf9b13058..171750fad44f 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/t4_hw.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/t4_hw.c
-@@ -9348,7 +9348,7 @@ int t4_init_devlog_params(struct adapter *adap)
- 		return 0;
- 	}
- 
--	/* Otherwise, ask the firmware for it's Device Log Parameters.
-+	/* Otherwise, ask the firmware for its Device Log Parameters.
- 	 */
- 	memset(&devlog_cmd, 0, sizeof(devlog_cmd));
- 	devlog_cmd.op_to_write = cpu_to_be32(FW_CMD_OP_V(FW_DEVLOG_CMD) |
-diff --git a/drivers/net/ethernet/chelsio/cxgb4vf/sge.c b/drivers/net/ethernet/chelsio/cxgb4vf/sge.c
-index 4e6ecb9c8dcc..31fab2415743 100644
---- a/drivers/net/ethernet/chelsio/cxgb4vf/sge.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4vf/sge.c
-@@ -2191,7 +2191,7 @@ static void __iomem *bar2_address(struct adapter *adapter,
- /**
-  *	t4vf_sge_alloc_rxq - allocate an SGE RX Queue
-  *	@adapter: the adapter
-- *	@rspq: pointer to to the new rxq's Response Queue to be filled in
-+ *	@rspq: pointer to the new rxq's Response Queue to be filled in
-  *	@iqasynch: if 0, a normal rspq; if 1, an asynchronous event queue
-  *	@dev: the network device associated with the new rspq
-  *	@intr_dest: MSI-X vector index (overriden in MSI mode)
-diff --git a/drivers/net/ethernet/chelsio/cxgb4vf/t4vf_hw.c b/drivers/net/ethernet/chelsio/cxgb4vf/t4vf_hw.c
-index 1c52592d3b65..56fcc531af2e 100644
---- a/drivers/net/ethernet/chelsio/cxgb4vf/t4vf_hw.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4vf/t4vf_hw.c
-@@ -706,7 +706,7 @@ int t4vf_fl_pkt_align(struct adapter *adapter)
- 	 * separately.  The actual Ingress Packet Data alignment boundary
- 	 * within Packed Buffer Mode is the maximum of these two
- 	 * specifications.  (Note that it makes no real practical sense to
--	 * have the Pading Boudary be larger than the Packing Boundary but you
-+	 * have the Padding Boundary be larger than the Packing Boundary but you
- 	 * could set the chip up that way and, in fact, legacy T4 code would
- 	 * end doing this because it would initialize the Padding Boundary and
- 	 * leave the Packing Boundary initialized to 0 (16 bytes).)
-diff --git a/drivers/net/ethernet/dec/tulip/tulip_core.c b/drivers/net/ethernet/dec/tulip/tulip_core.c
-index 5b7e6eb080f3..b608585f1954 100644
---- a/drivers/net/ethernet/dec/tulip/tulip_core.c
-+++ b/drivers/net/ethernet/dec/tulip/tulip_core.c
-@@ -1550,7 +1550,7 @@ static int tulip_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
-                     (PCI_SLOT(pdev->devfn) == 12))) {
-                        /* Cobalt MAC address in first EEPROM locations. */
-                        sa_offset = 0;
--		       /* Ensure our media table fixup get's applied */
-+		       /* Ensure our media table fixup gets applied */
- 		       memcpy(ee_data + 16, ee_data, 8);
-                }
- #endif
-diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
-index 05b8e3743a79..5d0c0906878d 100644
---- a/drivers/net/ethernet/faraday/ftgmac100.c
-+++ b/drivers/net/ethernet/faraday/ftgmac100.c
-@@ -1448,7 +1448,7 @@ static void ftgmac100_adjust_link(struct net_device *netdev)
- 	/* Disable all interrupts */
- 	iowrite32(0, priv->base + FTGMAC100_OFFSET_IER);
- 
--	/* Release phy lock to allow ftgmac100_reset to aquire it, keeping lock
-+	/* Release phy lock to allow ftgmac100_reset to acquire it, keeping lock
- 	 * order consistent to prevent dead lock.
- 	 */
- 	if (netdev->phydev)
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-index 52f42fe1d56f..011f710d933a 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-@@ -2106,7 +2106,7 @@ static void hns3_tx_doorbell(struct hns3_enet_ring *ring, int num,
- 	 */
- 	if (test_bit(HNS3_NIC_STATE_TX_PUSH_ENABLE, &priv->state) && num &&
- 	    !ring->pending_buf && num <= HNS3_MAX_PUSH_BD_NUM && doorbell) {
--		/* This smp_store_release() pairs with smp_load_aquire() in
-+		/* This smp_store_release() pairs with smp_load_acquire() in
- 		 * hns3_nic_reclaim_desc(). Ensure that the BD valid bit
- 		 * is updated.
- 		 */
-@@ -2122,7 +2122,7 @@ static void hns3_tx_doorbell(struct hns3_enet_ring *ring, int num,
- 		return;
- 	}
- 
--	/* This smp_store_release() pairs with smp_load_aquire() in
-+	/* This smp_store_release() pairs with smp_load_acquire() in
- 	 * hns3_nic_reclaim_desc(). Ensure that the BD valid bit is updated.
- 	 */
- 	smp_store_release(&ring->last_to_use, ring->next_to_use);
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index d3c71bc1855d..ef17de71b9d4 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -490,7 +490,7 @@ static int hclge_mac_update_stats_complete(struct hclge_dev *hdev)
- 	desc_num = reg_num / HCLGE_REG_NUM_PER_DESC + 1;
- 
- 	/* This may be called inside atomic sections,
--	 * so GFP_ATOMIC is more suitalbe here
-+	 * so GFP_ATOMIC is more suitable here
- 	 */
- 	desc = kcalloc(desc_num, sizeof(struct hclge_desc), GFP_ATOMIC);
- 	if (!desc)
-diff --git a/drivers/net/ethernet/huawei/hinic/hinic_hw_eqs.c b/drivers/net/ethernet/huawei/hinic/hinic_hw_eqs.c
-index 045c47786a04..28114a59347e 100644
---- a/drivers/net/ethernet/huawei/hinic/hinic_hw_eqs.c
-+++ b/drivers/net/ethernet/huawei/hinic/hinic_hw_eqs.c
-@@ -605,7 +605,7 @@ static void aeq_elements_init(struct hinic_eq *eq, u32 init_val)
- /**
-  * ceq_elements_init - Initialize all the elements in the ceq
-  * @eq: the event queue
-- * @init_val: value to init with it the elements
-+ * @init_val: value to init the elements with
-  **/
- static void ceq_elements_init(struct hinic_eq *eq, u32 init_val)
- {
-diff --git a/drivers/net/ethernet/huawei/hinic/hinic_hw_mbox.c b/drivers/net/ethernet/huawei/hinic/hinic_hw_mbox.c
-index 3f9c31d29215..97c1584dc05b 100644
---- a/drivers/net/ethernet/huawei/hinic/hinic_hw_mbox.c
-+++ b/drivers/net/ethernet/huawei/hinic/hinic_hw_mbox.c
-@@ -861,7 +861,7 @@ static int send_mbox_to_func(struct hinic_mbox_func_to_func *func_to_func,
- 		 HINIC_MBOX_HEADER_SET(NOT_LAST_SEG, LAST) |
- 		 HINIC_MBOX_HEADER_SET(direction, DIRECTION) |
- 		 HINIC_MBOX_HEADER_SET(cmd, CMD) |
--		 /* The vf's offset to it's associated pf */
-+		 /* The vf's offset to its associated pf */
- 		 HINIC_MBOX_HEADER_SET(msg_info->msg_id, MSG_ID) |
- 		 HINIC_MBOX_HEADER_SET(msg_info->status, STATUS) |
- 		 HINIC_MBOX_HEADER_SET(hinic_global_func_id_hw(hwdev->hwif),
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ptp.c b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-index 1d04ea7df552..33535418178b 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-@@ -550,7 +550,7 @@ static int i40e_ptp_enable_pin(struct i40e_pf *pf, unsigned int chan,
- 	pins.gpio_4 = pf->ptp_pins->gpio_4;
- 
- 	/* To turn on the pin - find the corresponding one based on
--	 * the given index. To to turn the function off - find
-+	 * the given index. To turn the function off - find
- 	 * which pin had it assigned. Don't use ptp_find_pin here
- 	 * because it tries to lock the pincfg_mux which is locked by
- 	 * ptp_pin_store() that calls here.
-diff --git a/drivers/net/ethernet/intel/ice/devlink/port.h b/drivers/net/ethernet/intel/ice/devlink/port.h
-index d60efc340945..e89ddd60eeac 100644
---- a/drivers/net/ethernet/intel/ice/devlink/port.h
-+++ b/drivers/net/ethernet/intel/ice/devlink/port.h
-@@ -11,7 +11,7 @@
-  * struct ice_dynamic_port - Track dynamically added devlink port instance
-  * @hw_addr: the HW address for this port
-  * @active: true if the port has been activated
-- * @attached: true it the prot is attached
-+ * @attached: true if the prot is attached
-  * @devlink_port: the associated devlink port structure
-  * @pf: pointer to the PF private structure
-  * @vsi: the VSI associated with this port
-diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
-index 270f936ce807..c5da8e9cc0a0 100644
---- a/drivers/net/ethernet/intel/ice/ice_base.c
-+++ b/drivers/net/ethernet/intel/ice/ice_base.c
-@@ -250,7 +250,7 @@ static u16 ice_calc_txq_handle(struct ice_vsi *vsi, struct ice_tx_ring *ring, u8
- 		return ring->q_index - ring->ch->base_q;
- 
- 	/* Idea here for calculation is that we subtract the number of queue
--	 * count from TC that ring belongs to from it's absolute queue index
-+	 * count from TC that ring belongs to from its absolute queue index
- 	 * and as a result we get the queue's index within TC.
- 	 */
- 	return ring->q_index - vsi->tc_cfg.tc_info[tc].qoffset;
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index 1be1e429a7c8..b1965357fda2 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -3199,7 +3199,7 @@ void ice_vsi_cfg_netdev_tc(struct ice_vsi *vsi, u8 ena_tc)
- 	if (!netdev)
- 		return;
- 
--	/* CHNL VSI doesn't have it's own netdev, hence, no netdev_tc */
-+	/* CHNL VSI doesn't have its own netdev, hence, no netdev_tc */
- 	if (vsi->type == ICE_VSI_CHNL)
- 		return;
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index e8e439fd64a4..70365196bb5c 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -149,7 +149,7 @@ static const struct ice_cgu_pin_desc ice_e823_zl_cgu_outputs[] = {
-  *                    |    8 bit s    | |    32 bits    |
-  *                    +---------------+ +---------------+
-  *
-- * The increment value is added to the GLSTYN_TIME_R and GLSTYN_TIME_L
-+ * The increment value is added to the GLTSYN_TIME_R and GLTSYN_TIME_L
-  * registers every clock source tick. Depending on the specific device
-  * configuration, the clock source frequency could be one of a number of
-  * values.
-diff --git a/drivers/net/ethernet/intel/igc/igc_mac.c b/drivers/net/ethernet/intel/igc/igc_mac.c
-index d344e0a1cd5e..7ac6637f8db7 100644
---- a/drivers/net/ethernet/intel/igc/igc_mac.c
-+++ b/drivers/net/ethernet/intel/igc/igc_mac.c
-@@ -127,7 +127,7 @@ s32 igc_setup_link(struct igc_hw *hw)
- 		goto out;
- 
- 	/* If requested flow control is set to default, set flow control
--	 * to the both 'rx' and 'tx' pause frames.
-+	 * to both 'rx' and 'tx' pause frames.
- 	 */
- 	if (hw->fc.requested_mode == igc_fc_default)
- 		hw->fc.requested_mode = igc_fc_full;
-diff --git a/drivers/net/ethernet/intel/ixgbevf/vf.c b/drivers/net/ethernet/intel/ixgbevf/vf.c
-index da7a72ecce7a..dcaef34b88b6 100644
---- a/drivers/net/ethernet/intel/ixgbevf/vf.c
-+++ b/drivers/net/ethernet/intel/ixgbevf/vf.c
-@@ -255,7 +255,7 @@ static s32 ixgbevf_set_uc_addr_vf(struct ixgbe_hw *hw, u32 index, u8 *addr)
- 
- 	memset(msgbuf, 0, sizeof(msgbuf));
- 	/* If index is one then this is the start of a new list and needs
--	 * indication to the PF so it can do it's own list management.
-+	 * indication to the PF so it can do its own list management.
- 	 * If it is zero then that tells the PF to just clear all of
- 	 * this VF's macvlans and there is no new list.
- 	 */
-diff --git a/drivers/net/ethernet/marvell/mvneta_bm.h b/drivers/net/ethernet/marvell/mvneta_bm.h
-index e47783ce77e0..57ac039df6f7 100644
---- a/drivers/net/ethernet/marvell/mvneta_bm.h
-+++ b/drivers/net/ethernet/marvell/mvneta_bm.h
-@@ -115,7 +115,7 @@ struct mvneta_bm_pool {
- 
- 	/* Packet size */
- 	int pkt_size;
--	/* Size of the buffer acces through DMA*/
-+	/* Size of the buffer access through DMA */
- 	u32 buf_size;
- 
- 	/* BPPE virtual base address */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
-index 05adc54535eb..d2163da28d18 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
-@@ -155,7 +155,7 @@ int rvu_mbox_handler_lmtst_tbl_setup(struct rvu *rvu,
- 	int err = 0;
- 	u64 val;
- 
--	/* Check if PF_FUNC wants to use it's own local memory as LMTLINE
-+	/* Check if PF_FUNC wants to use its own local memory as LMTLINE
- 	 * region, if so, convert that IOVA to physical address and
- 	 * populate LMT table with that address
- 	 */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-index bdf4d852c15d..60db1f616cc8 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-@@ -5050,7 +5050,7 @@ static int rvu_nix_block_init(struct rvu *rvu, struct nix_hw *nix_hw)
- 				    (ltdefs->rx_apad1.ltype_match << 4) |
- 				    ltdefs->rx_apad1.ltype_mask);
- 
--			/* Receive ethertype defination register defines layer
-+			/* Receive ethertype definition register defines layer
- 			 * information in NPC_RESULT_S to identify the Ethertype
- 			 * location in L2 header. Used for Ethertype overwriting
- 			 * in inline IPsec flow.
-diff --git a/drivers/net/ethernet/marvell/pxa168_eth.c b/drivers/net/ethernet/marvell/pxa168_eth.c
-index e4cfdc8bc055..68f8a1e36aa6 100644
---- a/drivers/net/ethernet/marvell/pxa168_eth.c
-+++ b/drivers/net/ethernet/marvell/pxa168_eth.c
-@@ -1229,9 +1229,9 @@ static int pxa168_rx_poll(struct napi_struct *napi, int budget)
- 	int work_done = 0;
- 
- 	/*
--	 * We call txq_reclaim every time since in NAPI interupts are disabled
--	 * and due to this we miss the TX_DONE interrupt,which is not updated in
--	 * interrupt status register.
-+	 * We call txq_reclaim every time since in NAPI interrupts are disabled
-+	 * and due to this we miss the TX_DONE interrupt, which is not updated
-+	 * in interrupt status register.
- 	 */
- 	txq_reclaim(dev, 0);
- 	if (netif_queue_stopped(dev)
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-index 99295eaf2f02..60d24d8a2242 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-@@ -375,7 +375,7 @@ struct mlx5e_sq_dma {
- 	enum mlx5e_dma_map_type type;
- };
- 
--/* Keep this enum consistent with with the corresponding strings array
-+/* Keep this enum consistent with the corresponding strings array
-  * declared in en/reporter_tx.c
-  */
- enum {
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-index 588da02d6e22..dc7ba8d5fc43 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-@@ -1445,7 +1445,7 @@ static int fbnic_set_channels(struct net_device *netdev,
- 	standalone = ch->rx_count + ch->tx_count;
- 
- 	/* Limits for standalone queues:
--	 *  - each queue has it's own NAPI (num_napi >= rx + tx + combined)
-+	 *  - each queue has its own NAPI (num_napi >= rx + tx + combined)
- 	 *  - combining queues (combined not 0, rx or tx must be 0)
- 	 */
- 	if ((ch->rx_count && ch->tx_count && ch->combined_count) ||
-diff --git a/drivers/net/ethernet/micrel/ks8842.c b/drivers/net/ethernet/micrel/ks8842.c
-index c7b0b09c2b09..541c41a9077a 100644
---- a/drivers/net/ethernet/micrel/ks8842.c
-+++ b/drivers/net/ethernet/micrel/ks8842.c
-@@ -335,7 +335,7 @@ static void ks8842_reset_hw(struct ks8842_adapter *adapter)
- 		/* When running in DMA Mode the RX interrupt is not enabled in
- 		   timberdale because RX data is received by DMA callbacks
- 		   it must still be enabled in the KS8842 because it indicates
--		   to timberdale when there is RX data for it's DMA FIFOs */
-+		   to timberdale when there is RX data for its DMA FIFOs */
- 		iowrite16(ENABLED_IRQS_DMA_IP, adapter->hw_addr + REG_TIMB_IER);
- 		ks8842_write16(adapter, 18, ENABLED_IRQS_DMA, REG_IER);
- 	} else {
-diff --git a/drivers/net/ethernet/neterion/s2io.c b/drivers/net/ethernet/neterion/s2io.c
-index 27443e346f9f..5026b0263d43 100644
---- a/drivers/net/ethernet/neterion/s2io.c
-+++ b/drivers/net/ethernet/neterion/s2io.c
-@@ -4707,7 +4707,7 @@ static irqreturn_t s2io_isr(int irq, void *dev_id)
- 			/*
- 			 * rx_traffic_int reg is an R1 register, writing all 1's
- 			 * will ensure that the actual interrupt causing bit
--			 * get's cleared and hence a read can be avoided.
-+			 * gets cleared and hence a read can be avoided.
- 			 */
- 			if (reason & GEN_INTR_RXTRAFFIC)
- 				writeq(S2IO_MINUS_ONE, &bar0->rx_traffic_int);
-@@ -4721,7 +4721,7 @@ static irqreturn_t s2io_isr(int irq, void *dev_id)
- 
- 		/*
- 		 * tx_traffic_int reg is an R1 register, writing all 1's
--		 * will ensure that the actual interrupt causing bit get's
-+		 * will ensure that the actual interrupt causing bit gets
- 		 * cleared and hence a read can be avoided.
- 		 */
- 		if (reason & GEN_INTR_TXTRAFFIC)
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_if.h b/drivers/net/ethernet/pensando/ionic/ionic_if.h
-index f1ddbe9994a3..9886cd66ce68 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_if.h
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_if.h
-@@ -1074,7 +1074,7 @@ struct ionic_rxq_sg_desc {
-  *                    first IPv4 header.  If the receive packet
-  *                    contains both a tunnel IPv4 header and a
-  *                    transport IPv4 header, the device validates the
-- *                    checksum for the both IPv4 headers.
-+ *                    checksum for both IPv4 headers.
-  *
-  *                  IONIC_RXQ_COMP_CSUM_F_IP_BAD:
-  *                    The IPv4 checksum calculated by the device did
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_dev.c b/drivers/net/ethernet/qlogic/qed/qed_dev.c
-index 9659ce5b0712..f3d2b2b3bad5 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_dev.c
-+++ b/drivers/net/ethernet/qlogic/qed/qed_dev.c
-@@ -2216,7 +2216,7 @@ int qed_resc_alloc(struct qed_dev *cdev)
- 		}
- 
- 		/* CID map / ILT shadow table / T2
--		 * The talbes sizes are determined by the computations above
-+		 * The table sizes are determined by the computations above
- 		 */
- 		rc = qed_cxt_tables_alloc(p_hwfn);
- 		if (rc)
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_ptp.c b/drivers/net/ethernet/qlogic/qed/qed_ptp.c
-index 295ce435a1a4..4df8a97b717e 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_ptp.c
-+++ b/drivers/net/ethernet/qlogic/qed/qed_ptp.c
-@@ -307,7 +307,7 @@ static int qed_ptp_hw_adjfreq(struct qed_dev *cdev, s32 ppb)
- 	} else if (ppb == 1) {
- 		/* This is a special case as its the only value which wouldn't
- 		 * fit in a s64 variable. In order to prevent castings simple
--		 * handle it seperately.
-+		 * handle it separately.
- 		 */
- 		best_val = 4;
- 		best_period = 0xee6b27f;
-diff --git a/drivers/net/ethernet/qlogic/qla3xxx.c b/drivers/net/ethernet/qlogic/qla3xxx.c
-index aee4e63b4b82..fca94a69c777 100644
---- a/drivers/net/ethernet/qlogic/qla3xxx.c
-+++ b/drivers/net/ethernet/qlogic/qla3xxx.c
-@@ -1501,7 +1501,7 @@ static int ql_finish_auto_neg(struct ql3_adapter *qdev)
- 				     "Remote error detected. Calling ql_port_start()\n");
- 			/*
- 			 * ql_port_start() is shared code and needs
--			 * to lock the PHY on it's own.
-+			 * to lock the PHY on its own.
- 			 */
- 			ql_sem_unlock(qdev, QL_PHY_GIO_SEM_MASK);
- 			if (ql_port_start(qdev))	/* Restart port */
-diff --git a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_init.c b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_init.c
-index b733374b4dc5..6145252d8ff8 100644
---- a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_init.c
-+++ b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_init.c
-@@ -2051,7 +2051,7 @@ static void qlcnic_83xx_init_hw(struct qlcnic_adapter *p_dev)
- 		dev_err(&p_dev->pdev->dev, "%s: failed\n", __func__);
- }
- 
--/* POST FW related definations*/
-+/* POST FW related definitions*/
- #define QLC_83XX_POST_SIGNATURE_REG	0x41602014
- #define QLC_83XX_POST_MODE_REG		0x41602018
- #define QLC_83XX_POST_FAST_MODE		0
-diff --git a/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c b/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c
-index a508ebc4b206..28b3a7071e58 100644
---- a/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c
-+++ b/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c
-@@ -419,7 +419,7 @@ int emac_sgmii_config(struct platform_device *pdev, struct emac_adapter *adpt)
- 		goto error_put_device;
- 	}
- 
--	/* v2 SGMII has a per-lane digital digital, so parse it if it exists */
-+	/* v2 SGMII has a per-lane digital, so parse it if it exists */
- 	res = platform_get_resource(sgmii_pdev, IORESOURCE_MEM, 1);
- 	if (res) {
- 		phy->digital = ioremap(res->start, resource_size(res));
-diff --git a/drivers/net/ethernet/sfc/mcdi_pcol.h b/drivers/net/ethernet/sfc/mcdi_pcol.h
-index 9cb339c461fb..b9866e389e6d 100644
---- a/drivers/net/ethernet/sfc/mcdi_pcol.h
-+++ b/drivers/net/ethernet/sfc/mcdi_pcol.h
-@@ -9190,7 +9190,7 @@
- /* MC_CMD_DYNAMIC_SENSORS_GET_DESCRIPTIONS
-  * Get descriptions for a set of sensors, specified as an array of sensor
-  * handles as returned by MC_CMD_DYNAMIC_SENSORS_LIST. Any handles which do not
-- * correspond to a sensor currently managed by the MC will be dropped from from
-+ * correspond to a sensor currently managed by the MC will be dropped from
-  * the response. This may happen when a sensor table update is in progress, and
-  * effectively means the set of usable sensors is the intersection between the
-  * sets of sensors known to the driver and the MC. On Riverhead this command is
-@@ -9236,7 +9236,7 @@
-  * broken sensor, then the state of the response's MC_CMD_DYNAMIC_SENSORS_VALUE
-  * entry will be set to BROKEN, and any value provided should be treated as
-  * erroneous. Any handles which do not correspond to a sensor currently managed
-- * by the MC will be dropped from from the response. This may happen when a
-+ * by the MC will be dropped from the response. This may happen when a
-  * sensor table update is in progress, and effectively means the set of usable
-  * sensors is the intersection between the sets of sensors known to the driver
-  * and the MC. On Riverhead this command is implemented as a wrapper for
-@@ -22487,7 +22487,7 @@
-  * the named interface itself - INTF=..., PF=..., VF=VF_NULL to refer to a PF
-  * on a named interface - INTF=..., PF=..., VF=... to refer to a VF on a named
-  * interface where ... refers to a small integer for the VF/PF fields, and to
-- * values from the PCIE_INTERFACE enum for for the INTF field. It's only
-+ * values from the PCIE_INTERFACE enum for the INTF field. It's only
-  * meaningful to use INTF=CALLER within a structure that's an argument to
-  * MC_CMD_DEVEL_GET_CLIENT_HANDLE.
-  */
-diff --git a/drivers/net/ethernet/sfc/siena/farch.c b/drivers/net/ethernet/sfc/siena/farch.c
-index 89ccd65c978b..562a038e38a7 100644
---- a/drivers/net/ethernet/sfc/siena/farch.c
-+++ b/drivers/net/ethernet/sfc/siena/farch.c
-@@ -1708,7 +1708,7 @@ void efx_farch_dimension_resources(struct efx_nic *efx, unsigned sram_lim_qw)
- 
- 			if (efx->vf_count > vf_limit) {
- 				netif_err(efx, probe, efx->net_dev,
--					  "Reducing VF count from from %d to %d\n",
-+					  "Reducing VF count from %d to %d\n",
- 					  efx->vf_count, vf_limit);
- 				efx->vf_count = vf_limit;
- 			}
-diff --git a/drivers/net/ethernet/sfc/siena/mcdi_pcol.h b/drivers/net/ethernet/sfc/siena/mcdi_pcol.h
-index a3cc8b7ec732..b81b0aa460d2 100644
---- a/drivers/net/ethernet/sfc/siena/mcdi_pcol.h
-+++ b/drivers/net/ethernet/sfc/siena/mcdi_pcol.h
-@@ -6704,16 +6704,16 @@
- #define       MC_CMD_SENSOR_SET_LIMS_IN_SENSOR_LEN 4
- /*            Enum values, see field(s): */
- /*               MC_CMD_SENSOR_INFO/MC_CMD_SENSOR_INFO_OUT/MASK */
--/* interpretation is is sensor-specific. */
-+/* interpretation is sensor-specific. */
- #define       MC_CMD_SENSOR_SET_LIMS_IN_LOW0_OFST 4
- #define       MC_CMD_SENSOR_SET_LIMS_IN_LOW0_LEN 4
--/* interpretation is is sensor-specific. */
-+/* interpretation is sensor-specific. */
- #define       MC_CMD_SENSOR_SET_LIMS_IN_HI0_OFST 8
- #define       MC_CMD_SENSOR_SET_LIMS_IN_HI0_LEN 4
--/* interpretation is is sensor-specific. */
-+/* interpretation is sensor-specific. */
- #define       MC_CMD_SENSOR_SET_LIMS_IN_LOW1_OFST 12
- #define       MC_CMD_SENSOR_SET_LIMS_IN_LOW1_LEN 4
--/* interpretation is is sensor-specific. */
-+/* interpretation is sensor-specific. */
- #define       MC_CMD_SENSOR_SET_LIMS_IN_HI1_OFST 16
- #define       MC_CMD_SENSOR_SET_LIMS_IN_HI1_LEN 4
- 
-@@ -7823,7 +7823,7 @@
-  * handles as returned by MC_CMD_DYNAMIC_SENSORS_LIST
-  *
-  * Any handles which do not correspond to a sensor currently managed by the MC
-- * will be dropped from from the response. This may happen when a sensor table
-+ * will be dropped from the response. This may happen when a sensor table
-  * update is in progress, and effectively means the set of usable sensors is
-  * the intersection between the sets of sensors known to the driver and the MC.
-  *
-@@ -7872,7 +7872,7 @@
-  * provided should be treated as erroneous.
-  *
-  * Any handles which do not correspond to a sensor currently managed by the MC
-- * will be dropped from from the response. This may happen when a sensor table
-+ * will be dropped from the response. This may happen when a sensor table
-  * update is in progress, and effectively means the set of usable sensors is
-  * the intersection between the sets of sensors known to the driver and the MC.
-  *
-diff --git a/drivers/net/ethernet/sfc/tc_encap_actions.c b/drivers/net/ethernet/sfc/tc_encap_actions.c
-index 87443f9dfd22..2258f854e5be 100644
---- a/drivers/net/ethernet/sfc/tc_encap_actions.c
-+++ b/drivers/net/ethernet/sfc/tc_encap_actions.c
-@@ -442,7 +442,7 @@ static void efx_tc_update_encap(struct efx_nic *efx,
- 			rule = container_of(acts, struct efx_tc_flow_rule, acts);
- 			if (rule->fallback)
- 				fallback = rule->fallback;
--			else /* fallback fallback: deliver to PF */
-+			else /* fallback: deliver to PF */
- 				fallback = &efx->tc->facts.pf;
- 			rc = efx_mae_update_rule(efx, fallback->fw_id,
- 						 rule->fw_id);
-diff --git a/drivers/net/ethernet/smsc/smsc911x.c b/drivers/net/ethernet/smsc/smsc911x.c
-index 2e1106097965..6ca290f7c0df 100644
---- a/drivers/net/ethernet/smsc/smsc911x.c
-+++ b/drivers/net/ethernet/smsc/smsc911x.c
-@@ -2350,7 +2350,7 @@ static void smsc911x_drv_remove(struct platform_device *pdev)
- 	pm_runtime_disable(&pdev->dev);
- }
- 
--/* standard register acces */
-+/* standard register access */
- static const struct smsc911x_ops standard_smsc911x_ops = {
- 	.reg_read = __smsc911x_reg_read,
- 	.reg_write = __smsc911x_reg_write,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index 38b1c04c92a2..030fcf1b5993 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -60,7 +60,7 @@ static int dwmac1000_validate_mcast_bins(struct device *dev, int mcast_bins)
-  * Description:
-  * This function validates the number of Unicast address entries supported
-  * by a particular Synopsys 10/100/1000 controller. The Synopsys controller
-- * supports 1..32, 64, or 128 Unicast filter entries for it's Unicast filter
-+ * supports 1..32, 64, or 128 Unicast filter entries for its Unicast filter
-  * logic. This function validates a valid, supported configuration is
-  * selected, and defaults to 1 Unicast address if an unsupported
-  * configuration is selected.
-diff --git a/drivers/net/ethernet/sun/niu.c b/drivers/net/ethernet/sun/niu.c
-index 67625fb12101..893216b0e08d 100644
---- a/drivers/net/ethernet/sun/niu.c
-+++ b/drivers/net/ethernet/sun/niu.c
-@@ -5825,7 +5825,7 @@ static int niu_init_mac(struct niu *np)
- 	/* This looks hookey but the RX MAC reset we just did will
- 	 * undo some of the state we setup in niu_init_tx_mac() so we
- 	 * have to call it again.  In particular, the RX MAC reset will
--	 * set the XMAC_MAX register back to it's default value.
-+	 * set the XMAC_MAX register back to its default value.
- 	 */
- 	niu_init_tx_mac(np);
- 	niu_enable_tx_mac(np, 1);
-diff --git a/drivers/net/ethernet/sun/niu.h b/drivers/net/ethernet/sun/niu.h
-index 0b169c08b0f2..d8368043fc3b 100644
---- a/drivers/net/ethernet/sun/niu.h
-+++ b/drivers/net/ethernet/sun/niu.h
-@@ -3250,8 +3250,8 @@ struct niu {
- 	struct niu_parent		*parent;
- 
- 	u32				flags;
--#define NIU_FLAGS_HOTPLUG_PHY_PRESENT	0x02000000 /* Removeable PHY detected*/
--#define NIU_FLAGS_HOTPLUG_PHY		0x01000000 /* Removeable PHY */
-+#define NIU_FLAGS_HOTPLUG_PHY_PRESENT	0x02000000 /* Removable PHY detected*/
-+#define NIU_FLAGS_HOTPLUG_PHY		0x01000000 /* Removable PHY */
- #define NIU_FLAGS_VPD_VALID		0x00800000 /* VPD has valid version */
- #define NIU_FLAGS_MSIX			0x00400000 /* MSI-X in use */
- #define NIU_FLAGS_MCAST			0x00200000 /* multicast filter enabled */
-diff --git a/drivers/net/ethernet/sun/sunhme.c b/drivers/net/ethernet/sun/sunhme.c
-index 4bc0e114d5ee..48f0a96c0e9e 100644
---- a/drivers/net/ethernet/sun/sunhme.c
-+++ b/drivers/net/ethernet/sun/sunhme.c
-@@ -451,7 +451,7 @@ static void happy_meal_tcvr_write(struct happy_meal *hp,
- /* Auto negotiation.  The scheme is very simple.  We have a timer routine
-  * that keeps watching the auto negotiation process as it progresses.
-  * The DP83840 is first told to start doing it's thing, we set up the time
-- * and place the timer state machine in it's initial state.
-+ * and place the timer state machine in its initial state.
-  *
-  * Here the timer peeks at the DP83840 status registers at each click to see
-  * if the auto negotiation has completed, we assume here that the DP83840 PHY
-diff --git a/drivers/net/ethernet/sun/sunqe.h b/drivers/net/ethernet/sun/sunqe.h
-index 0daed05b7c83..300631e8ac0d 100644
---- a/drivers/net/ethernet/sun/sunqe.h
-+++ b/drivers/net/ethernet/sun/sunqe.h
-@@ -36,7 +36,7 @@
- #define GLOB_PSIZE_6144       0x10       /* 6k packet size           */
- #define GLOB_PSIZE_8192       0x11       /* 8k packet size           */
- 
--/* In MACE mode, there are four qe channels.  Each channel has it's own
-+/* In MACE mode, there are four qe channels.  Each channel has its own
-  * status bits in the QEC status register.  This macro picks out the
-  * ones you want.
-  */
-diff --git a/drivers/net/ethernet/tehuti/tehuti.c b/drivers/net/ethernet/tehuti/tehuti.c
-index fc77f424f90b..2cee1f05ac47 100644
---- a/drivers/net/ethernet/tehuti/tehuti.c
-+++ b/drivers/net/ethernet/tehuti/tehuti.c
-@@ -276,7 +276,7 @@ static irqreturn_t bdx_isr_napi(int irq, void *dev)
- 			 * currently intrs are disabled (since we read ISR),
- 			 * and we have failed to register next poll.
- 			 * so we read the regs to trigger chip
--			 * and allow further interupts. */
-+			 * and allow further interrupts. */
- 			READ_REG(priv, regTXF_WPTR_0);
- 			READ_REG(priv, regRXD_WPTR_0);
- 		}
--- 
-2.43.0
+This pin type seems not correct? If the pin is related to somehow
+externally obtained PHC generated clock ticks I would go with
+DPLL_PIN_TYPE_EXT.
+
+> {'capabilities': {'state-can-change'},
+>  'clock-id': 0,
+>  'id': 32,
+>  'module-name': 'ice',
+>  'parent-pin': [{'parent-id': 27, 'state': 'disconnected'},
+>                 {'parent-id': 28, 'state': 'disconnected'}],
+>  'phase-adjust-max': 0,
+>  'phase-adjust-min': 0,
+>  'type': 'synce-eth-port'},
+> {'capabilities': {'state-can-change'},
+>  'clock-id': 0,
+>  'id': 33,
+>  'module-name': 'ice',
+>  'parent-pin': [{'parent-id': 27, 'state': 'disconnected'},
+>                 {'parent-id': 28, 'state': 'disconnected'}],
+>  'phase-adjust-max': 0,
+>  'phase-adjust-min': 0,
+>  'type': 'synce-eth-port'},
+> {'capabilities': {'state-can-change'},
+>  'clock-id': 0,
+>  'id': 34,
+>  'module-name': 'ice',
+>  'parent-pin': [{'parent-id': 27, 'state': 'disconnected'},
+>                 {'parent-id': 28, 'state': 'disconnected'}],
+>  'phase-adjust-max': 0,
+>  'phase-adjust-min': 0,
+>  'type': 'synce-eth-port'},
+> {'capabilities': {'state-can-change'},
+>  'clock-id': 0,
+>  'id': 35,
+>  'module-name': 'ice',
+>  'parent-pin': [{'parent-id': 27, 'state': 'disconnected'},
+>                 {'parent-id': 28, 'state': 'disconnected'}],
+>  'phase-adjust-max': 0,
+>  'phase-adjust-min': 0,
+>  'type': 'synce-eth-port'}]
+>
+>- to set PHY0 clock as SyncE module input
+>$ ynl --family dpll --do pin-set --json '{"id":32,"parent-pin":\
+>    {"parent-id":27, "state":"connected"}}'
+>
+>- to set 1588 Main Timer as source into SyncE module
+>$ ynl --family dpll --do pin-set --json '{"id":31,"parent-pin":\
+>    {"parent-id":27, "state":"connected"}}'
+>
+>Reviewed-by: Milena Olech <milena.olech@intel.com>
+>Co-developed-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+>Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+>Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
+>---
+>v7:
+>- fix lkp error about wrong label name
+>v6:
+>- extended commit message with usage examples
+>- updated int ice_dpll_init_pins (removed E825 checker from
+>  if-condition, use ICE_DPLL_PIN_1588_NUM instead of
+>  ICE_DPLL_RCLK_NUM_PER_PF)
+>v5:
+>- fix lkp warning about ice_e825c_inputs definition
+>v4:
+>- rebased
+>- fix docstring for ice_dpll_cfg_synce_ethdiv_e825c (removed 'divider'
+>  argument)
+>v3:
+>- rebased
+>- removed netdev reference in 1588 pin initialization
+>- improved error path in ice_dpll_init_pins
+>v2:
+>- rebased, addressed comments from v1 (kdoc updated, removed unrelated
+>  code changes, fixed undefined 'ret' code in error patchs, use feature
+>  flag instead of MAC type chacking)
+>- use ptp.ptp_port to create pins indexes instead of PF ID
+>- removed CLK_OUT/output pins definitions as unused
+>- removed redundant dpll_netdev_pin_set call on 1588 pin
+>- removed checkpatch warning about SET_PIN_STATE macro (parenthesis
+>  added)
+
+Don't think we need to keep full history, last version diff would be
+just fine.
+
+>---
+> drivers/net/ethernet/intel/ice/ice_dpll.c   | 855 ++++++++++++++++++--
+> drivers/net/ethernet/intel/ice/ice_dpll.h   |  26 +-
+> drivers/net/ethernet/intel/ice/ice_lib.c    |   3 +
+> drivers/net/ethernet/intel/ice/ice_ptp_hw.c |  35 +-
+> drivers/net/ethernet/intel/ice/ice_ptp_hw.h |   2 +
+> drivers/net/ethernet/intel/ice/ice_tspll.h  |   7 +
+> drivers/net/ethernet/intel/ice/ice_type.h   |   6 +
+> 7 files changed, 873 insertions(+), 61 deletions(-)
+>
+>diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c
+>b/drivers/net/ethernet/intel/ice/ice_dpll.c
+>index 53b54e395a2e..5ab2594cee68 100644
+>--- a/drivers/net/ethernet/intel/ice/ice_dpll.c
+>+++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
+>@@ -9,6 +9,7 @@
+> #define ICE_CGU_STATE_ACQ_ERR_THRESHOLD		50
+> #define ICE_DPLL_PIN_IDX_INVALID		0xff
+> #define ICE_DPLL_RCLK_NUM_PER_PF		1
+>+#define ICE_DPLL_PIN_1588_NUM			1
+> #define ICE_DPLL_PIN_ESYNC_PULSE_HIGH_PERCENT	25
+> #define ICE_DPLL_PIN_GEN_RCLK_FREQ		1953125
+> #define ICE_DPLL_PIN_PRIO_OUTPUT		0xff
+>@@ -74,6 +75,7 @@ static const char * const pin_type_name[] =3D {
+>
+> static const char * const ice_dpll_sw_pin_sma[] =3D { "SMA1", "SMA2" };
+> static const char * const ice_dpll_sw_pin_ufl[] =3D { "U.FL1", "U.FL2" };
+>+static const char ice_dpll_pin_1588[] =3D "pin_1588";
+>
+> static const struct dpll_pin_frequency ice_esync_range[] =3D {
+> 	DPLL_PIN_FREQUENCY_RANGE(0, DPLL_PIN_FREQUENCY_1_HZ),
+>@@ -528,6 +530,117 @@ ice_dpll_pin_disable(struct ice_hw *hw, struct
+>ice_dpll_pin *pin,
+> 	return ret;
+> }
+>
+>+/**
+>+ * ice_dpll_rclk_update_e825c - updates the state of rclk pin on e825c
+>device
+>+ * @pf: private board struct
+>+ * @pin: pointer to a pin
+>+ *
+>+ * Update struct holding pin states info, states are separate for each
+>parent
+>+ *
+>+ * Context: Called under pf->dplls.lock
+>+ * Return:
+>+ * * 0 - OK
+>+ * * negative - error
+>+ */
+>+static int ice_dpll_rclk_update_e825c(struct ice_pf *pf,
+>+				      struct ice_dpll_pin *pin)
+>+{
+>+	u8 rclk_bits;
+>+	int err;
+>+	u32 reg;
+>+
+>+	if (pf->dplls.rclk.num_parents > ICE_SYNCE_CLK_NUM)
+>+		return -EINVAL;
+>+
+>+	err =3D ice_read_cgu_reg(&pf->hw, ICE_CGU_R10, &reg);
+>+	if (err)
+>+		return err;
+>+	rclk_bits =3D FIELD_GET(ICE_CGU_R10_SYNCE_S_REF_CLK, reg);
+>+	SET_PIN_STATE(pin, ICE_SYNCE_CLK0, rclk_bits =3D=3D
+>+		     (pf->ptp.port.port_num + ICE_CGU_BYPASS_MUX_OFFSET_E825C));
+>+
+>+	err =3D ice_read_cgu_reg(&pf->hw, ICE_CGU_R11, &reg);
+>+	if (err)
+>+		return err;
+>+	rclk_bits =3D FIELD_GET(ICE_CGU_R11_SYNCE_S_BYP_CLK, reg);
+>+	SET_PIN_STATE(pin, ICE_SYNCE_CLK1, rclk_bits =3D=3D
+>+		     (pf->ptp.port.port_num + ICE_CGU_BYPASS_MUX_OFFSET_E825C));
+>+	return 0;
+>+}
+>+
+>+/**
+>+ * ice_dpll_rclk_update - updates the state of rclk pin on a device
+>+ * @pf: private board struct
+>+ * @pin: pointer to a pin
+>+ * @port_num: port number
+>+ *
+>+ * Update struct holding pin states info, states are separate for each
+>parent
+>+ *
+>+ * Context: Called under pf->dplls.lock
+>+ * Return:
+>+ * * 0 - OK
+>+ * * negative - error
+>+ */
+>+static int ice_dpll_rclk_update(struct ice_pf *pf, struct ice_dpll_pin
+>*pin,
+>+				u8 port_num)
+>+{
+>+	int ret;
+>+
+>+	for (u8 parent =3D 0; parent < pf->dplls.rclk.num_parents; parent++) {
+>+		ret =3D ice_aq_get_phy_rec_clk_out(&pf->hw, &parent, &port_num,
+>+						 &pin->flags[parent], NULL);
+>+		if (ret)
+>+			return ret;
+>+		SET_PIN_STATE(pin, parent,
+>+			      ICE_AQC_GET_PHY_REC_CLK_OUT_OUT_EN &
+>+			      pin->flags[parent]);
+>+	}
+>+
+>+	return 0;
+>+}
+>+
+>+/**
+>+ * ice_dpll_update_pin_1588_e825c - updates the state of clock 1588 pin
+>+ * @hw: board private hw structure
+>+ * @pin: pointer to a pin
+>+ * @parent: clock source identifier
+>+ *
+>+ * Update struct holding pin states info, states are separate for each
+>parent
+>+ *
+>+ * Context: Called under pf->dplls.lock
+>+ * Return:
+>+ * * 0 - OK
+>+ * * negative - error
+>+ */
+>+static int ice_dpll_update_pin_1588_e825c(struct ice_hw *hw,
+>+					  struct ice_dpll_pin *pin,
+>+					  enum ice_synce_clk parent)
+>+{
+>+	u8 bits_clk;
+>+	int err;
+>+	u32 reg;
+>+
+>+	switch (parent) {
+>+	case ICE_SYNCE_CLK0:
+>+		err =3D ice_read_cgu_reg(hw, ICE_CGU_R10, &reg);
+>+		if (err)
+>+			return err;
+>+		bits_clk =3D FIELD_GET(ICE_CGU_R10_SYNCE_S_REF_CLK, reg);
+>+		break;
+>+	case ICE_SYNCE_CLK1:
+>+		err =3D ice_read_cgu_reg(hw, ICE_CGU_R11, &reg);
+>+		if (err)
+>+			return err;
+>+		bits_clk =3D FIELD_GET(ICE_CGU_R11_SYNCE_S_BYP_CLK, reg);
+>+		break;
+>+	default:
+>+		return -EINVAL;
+>+	}
+>+	SET_PIN_STATE(pin, parent, bits_clk =3D=3D ICE_CGU_NCOCLK);
+>+
+>+	return 0;
+>+}
+>+
+> /**
+>  * ice_dpll_sw_pins_update - update status of all SW pins
+>  * @pf: private board struct
+>@@ -668,22 +781,14 @@ ice_dpll_pin_state_update(struct ice_pf *pf, struct
+>ice_dpll_pin *pin,
+> 		}
+> 		break;
+> 	case ICE_DPLL_PIN_TYPE_RCLK_INPUT:
+>-		for (parent =3D 0; parent < pf->dplls.rclk.num_parents;
+>-		     parent++) {
+>-			u8 p =3D parent;
+>-
+>-			ret =3D ice_aq_get_phy_rec_clk_out(&pf->hw, &p,
+>-							 &port_num,
+>-							 &pin->flags[parent],
+>-							 NULL);
+>+		if (pf->hw.mac_type =3D=3D ICE_MAC_GENERIC_3K_E825) {
+>+			ret =3D ice_dpll_rclk_update_e825c(pf, pin);
+>+			if (ret)
+>+				goto err;
+>+		} else {
+>+			ret =3D ice_dpll_rclk_update(pf, pin, port_num);
+> 			if (ret)
+> 				goto err;
+>-			if (ICE_AQC_GET_PHY_REC_CLK_OUT_OUT_EN &
+>-			    pin->flags[parent])
+>-				pin->state[parent] =3D DPLL_PIN_STATE_CONNECTED;
+>-			else
+>-				pin->state[parent] =3D
+>-					DPLL_PIN_STATE_DISCONNECTED;
+> 		}
+> 		break;
+> 	case ICE_DPLL_PIN_TYPE_SOFTWARE:
+>@@ -1021,6 +1126,33 @@ ice_dpll_pin_state_get(const struct dpll_pin *pin,
+>void *pin_priv,
+> 	return ret;
+> }
+>
+>+/**
+>+ * ice_dpll_pin_state_get_e825c - update e825c device pin's state on dpll
+>+ * @pin: pointer to a pin
+>+ * @pin_priv: private data pointer passed on pin registration
+>+ * @dpll: registered dpll pointer
+>+ * @dpll_priv: private data pointer passed on dpll registration
+>+ * @state: on success holds state of the pin
+>+ * @extack: error reporting
+>+ *
+>+ * Set pin state of e825c device to connected.
+>+ *
+>+ * Context: Called under pf->dplls.lock
+>+ * Return:
+>+ * * 0 - success
+>+ */
+>+static int ice_dpll_pin_state_get_e825c(const struct dpll_pin *pin,
+>+					void *pin_priv,
+>+					const struct dpll_device *dpll,
+>+					void *dpll_priv,
+>+					enum dpll_pin_state *state,
+>+					struct netlink_ext_ack *extack)
+>+{
+>+	*state =3D DPLL_PIN_STATE_CONNECTED;
+>+
+>+	return 0;
+>+}
+>+
+> /**
+>  * ice_dpll_output_state_get - get output pin state on dpll device
+>  * @pin: pointer to a pin
+>@@ -1842,6 +1974,228 @@ ice_dpll_phase_offset_get(const struct dpll_pin
+>*pin, void *pin_priv,
+> 	return 0;
+> }
+>
+>+/**
+>+ * ice_dpll_cfg_bypass_mux_e825c - check if the given port recovered cloc=
+k
+>+ * or clock 1588 is set active
+>+ * @hw: Pointer to the HW struct
+>+ * @ena: true to enable the reference, false if disable
+>+ * @port_num: Number of the port
+>+ * @output: Output pin, we have two in E825C
+>+ * @clock_1588: true to enable 1588 reference, false to recover from port
+>+ *
+>+ * Dpll subsystem callback. Handler for setting the correct registers to
+>+ * enable a functionality on e825c device.
+>+ *
+>+ * Context: Called under pf->dplls.lock
+>+ * Return:
+>+ * * 0 - success
+>+ * * negative - error
+>+ */
+>+static int
+>+ice_dpll_cfg_bypass_mux_e825c(struct ice_hw *hw, bool ena,
+>+			      u32 port_num, enum ice_synce_clk output,
+>+			      bool clock_1588)
+>+{
+>+	u8 first_mux;
+>+	int err;
+>+	u32 r10;
+>+
+>+	err =3D ice_read_cgu_reg(hw, ICE_CGU_R10, &r10);
+>+	if (err)
+>+		return err;
+>+
+>+	if (!ena)
+>+		first_mux =3D ICE_CGU_NET_REF_CLK0;
+>+	else if (clock_1588)
+>+		first_mux =3D ICE_CGU_NCOCLK;
+>+	else
+>+		first_mux =3D port_num + ICE_CGU_BYPASS_MUX_OFFSET_E825C;
+>+
+>+	r10 &=3D ~(ICE_CGU_R10_SYNCE_DCK_RST | ICE_CGU_R10_SYNCE_DCK2_RST);
+>+
+>+	switch (output) {
+>+	case ICE_SYNCE_CLK0:
+>+		r10 &=3D ~(ICE_CGU_R10_SYNCE_ETHCLKO_SEL |
+>+			 ICE_CGU_R10_SYNCE_ETHDIV_LOAD |
+>+			 ICE_CGU_R10_SYNCE_S_REF_CLK);
+>+		r10 |=3D FIELD_PREP(ICE_CGU_R10_SYNCE_S_REF_CLK, first_mux);
+>+		if (clock_1588)
+>+			r10 |=3D FIELD_PREP(ICE_CGU_R10_SYNCE_ETHCLKO_SEL,
+>+					  ICE_CGU_REF_CLK_BYP0);
+>+		else
+>+			r10 |=3D FIELD_PREP(ICE_CGU_R10_SYNCE_ETHCLKO_SEL,
+>+					  ICE_CGU_REF_CLK_BYP0_DIV);
+>+		break;
+>+	case ICE_SYNCE_CLK1:
+>+	{
+>+		u32 val;
+>+
+>+		err =3D ice_read_cgu_reg(hw, ICE_CGU_R11, &val);
+>+		if (err)
+>+			return err;
+>+		val &=3D ~ICE_CGU_R11_SYNCE_S_BYP_CLK;
+>+		val |=3D FIELD_PREP(ICE_CGU_R11_SYNCE_S_BYP_CLK, first_mux);
+>+		err =3D ice_write_cgu_reg(hw, ICE_CGU_R11, val);
+>+		if (err)
+>+			return err;
+>+		r10 &=3D ~(ICE_CGU_R10_SYNCE_CLKODIV_LOAD |
+>+			 ICE_CGU_R10_SYNCE_CLKO_SEL);
+>+		if (clock_1588)
+>+			r10 |=3D FIELD_PREP(ICE_CGU_R10_SYNCE_CLKO_SEL,
+>+					  ICE_CGU_REF_CLK_BYP1);
+>+		else
+>+			r10 |=3D FIELD_PREP(ICE_CGU_R10_SYNCE_CLKO_SEL,
+>+					  ICE_CGU_REF_CLK_BYP1_DIV);
+>+		break;
+>+	}
+>+	default:
+>+		return -EINVAL;
+>+	}
+>+
+>+	err =3D ice_write_cgu_reg(hw, ICE_CGU_R10, r10);
+>+	if (err)
+>+		return err;
+>+
+>+	return 0;
+>+}
+>+
+>+/**
+>+ * ice_dpll_get_div_e825c - get the divider for the given speed
+>+ * @link_speed: link speed of the port
+>+ * @divider: output value, calculated divider
+>+ *
+>+ * Dpll subsystem callback. Handler for setting the divider on e825c
+>device.
+>+ *
+>+ * Context: Called under pf->dplls.lock
+>+ * Return:
+>+ * * 0 - success
+>+ * * negative - error
+>+ */
+>+static int ice_dpll_get_div_e825c(u16 link_speed, u8 *divider)
+>+{
+>+	switch (link_speed) {
+>+	case ICE_AQ_LINK_SPEED_100GB:
+>+	case ICE_AQ_LINK_SPEED_50GB:
+>+	case ICE_AQ_LINK_SPEED_25GB:
+>+		*divider =3D 10;
+>+		break;
+>+	case ICE_AQ_LINK_SPEED_40GB:
+>+	case ICE_AQ_LINK_SPEED_10GB:
+>+		*divider =3D 4;
+>+		break;
+>+	case ICE_AQ_LINK_SPEED_5GB:
+>+	case ICE_AQ_LINK_SPEED_2500MB:
+>+	case ICE_AQ_LINK_SPEED_1000MB:
+>+		*divider =3D 2;
+>+		break;
+>+	case ICE_AQ_LINK_SPEED_100MB:
+>+		*divider =3D 1;
+>+		break;
+>+	default:
+>+		return -EOPNOTSUPP;
+>+	}
+>+
+>+	return 0;
+>+}
+>+
+>+/**
+>+ * ice_dpll_cfg_synce_ethdiv_e825c - set the divider on the mux
+>+ * @hw: Pointer to the HW struct
+>+ * @output: Output pin, we have two in E825C
+>+ *
+>+ * Dpll subsystem callback. Set the correct divider for RCLKA or RCLKB.
+>+ *
+>+ * Context: Called under pf->dplls.lock
+>+ * Return:
+>+ * * 0 - success
+>+ * * negative - error
+>+ */
+>+static int ice_dpll_cfg_synce_ethdiv_e825c(struct ice_hw *hw,
+>+					   enum ice_synce_clk output)
+>+{
+>+	u16 link_speed;
+>+	u8 divider;
+>+	u32 val;
+>+	int err;
+>+
+>+	link_speed =3D hw->port_info->phy.link_info.link_speed;
+>+	if (!link_speed)
+>+		return 0;
+>+
+>+	err =3D ice_dpll_get_div_e825c(link_speed, &divider);
+>+	if (err)
+>+		return err;
+>+
+>+	err =3D ice_read_cgu_reg(hw, ICE_CGU_R10, &val);
+>+	if (err)
+>+		return err;
+>+
+>+	/* programmable divider value (from 2 to 16) minus 1 for ETHCLKOUT */
+>+	switch (output) {
+>+	case ICE_SYNCE_CLK0:
+>+		val &=3D ~(ICE_CGU_R10_SYNCE_ETHDIV_M1 |
+>+			 ICE_CGU_R10_SYNCE_ETHDIV_LOAD);
+>+		val |=3D FIELD_PREP(ICE_CGU_R10_SYNCE_ETHDIV_M1, divider - 1);
+>+		err =3D ice_write_cgu_reg(hw, ICE_CGU_R10, val);
+>+		if (err)
+>+			return err;
+>+		val |=3D ICE_CGU_R10_SYNCE_ETHDIV_LOAD;
+>+		break;
+>+	case ICE_SYNCE_CLK1:
+>+		val &=3D ~(ICE_CGU_R10_SYNCE_CLKODIV_M1 |
+>+			 ICE_CGU_R10_SYNCE_CLKODIV_LOAD);
+>+		val |=3D FIELD_PREP(ICE_CGU_R10_SYNCE_CLKODIV_M1, divider - 1);
+>+		err =3D ice_write_cgu_reg(hw, ICE_CGU_R10, val);
+>+		if (err)
+>+			return err;
+>+		val |=3D ICE_CGU_R10_SYNCE_CLKODIV_LOAD;
+>+		break;
+>+	default:
+>+		return -EINVAL;
+>+	}
+>+
+>+	err =3D ice_write_cgu_reg(hw, ICE_CGU_R10, val);
+>+	if (err)
+>+		return err;
+>+
+>+	return 0;
+>+}
+>+
+>+/**
+>+ * ice_dpll_synce_update_e825c - setting PHY recovered clock pins on e825=
+c
+>+ * @hw: Pointer to the HW struct
+>+ * @ena: true if enable, false in disable
+>+ * @port_num: port number
+>+ * @output: output pin, we have two in E825C
+>+ *
+>+ * Dpll subsystem callback. Set proper signals to recover clock from port=
+.
+>+ *
+>+ * Context: Called under pf->dplls.lock
+>+ * Return:
+>+ * * 0 - success
+>+ * * negative - error
+>+ */
+>+static int ice_dpll_synce_update_e825c(struct ice_hw *hw, bool ena,
+>+				       u32 port_num, enum ice_synce_clk output)
+>+{
+>+	int err;
+>+
+>+	/* configure the mux to deliver proper signal to DPLL from the MUX */
+>+	err =3D ice_dpll_cfg_bypass_mux_e825c(hw, ena, port_num, output,
+>+					    false);
+>+	if (err)
+>+		return err;
+>+
+>+	err =3D ice_dpll_cfg_synce_ethdiv_e825c(hw, output);
+>+	if (err)
+>+		return err;
+>+
+>+	dev_dbg(ice_hw_to_dev(hw), "CLK_SYNCE%u recovered clock: pin %s\n",
+>+		output, str_enabled_disabled(ena));
+>+
+>+	return 0;
+>+}
+>+
+> /**
+>  * ice_dpll_output_esync_set - callback for setting embedded sync
+>  * @pin: pointer to a pin
+>@@ -2289,9 +2643,12 @@ ice_dpll_rclk_state_on_pin_set(const struct dpll_pi=
+n
+>*pin, void *pin_priv,
+> 	struct ice_dpll_pin *p =3D pin_priv, *parent =3D parent_pin_priv;
+> 	bool enable =3D state =3D=3D DPLL_PIN_STATE_CONNECTED;
+> 	struct ice_pf *pf =3D p->pf;
+>+	struct ice_hw *hw;
+> 	int ret =3D -EINVAL;
+> 	u32 hw_idx;
+>
+>+	hw =3D &pf->hw;
+>+
+
+Assign this within variable definition above?
+
+> 	if (ice_dpll_is_reset(pf, extack))
+> 		return -EBUSY;
+>
+>@@ -2307,13 +2664,19 @@ ice_dpll_rclk_state_on_pin_set(const struct
+>dpll_pin *pin, void *pin_priv,
+> 				   p->idx, state, parent->idx);
+> 		goto unlock;
+> 	}
+>-	ret =3D ice_aq_set_phy_rec_clk_out(&pf->hw, hw_idx, enable,
+>-					 &p->freq);
+>+
+>+	if (hw->mac_type =3D=3D ICE_MAC_GENERIC_3K_E825)
+>+		ret =3D ice_dpll_synce_update_e825c(hw, enable,
+>+						  pf->ptp.port.port_num,
+>+						  (enum ice_synce_clk)hw_idx);
+>+	else
+>+		ret =3D ice_aq_set_phy_rec_clk_out(hw, hw_idx, enable,
+>+						 &p->freq);
+> 	if (ret)
+> 		NL_SET_ERR_MSG_FMT(extack,
+> 				   "err:%d %s failed to set pin state:%u for pin:%u
+>on parent:%u",
+> 				   ret,
+>-				   libie_aq_str(pf->hw.adminq.sq_last_status),
+>+				   libie_aq_str(hw->adminq.sq_last_status),
+> 				   state, p->idx, parent->idx);
+> unlock:
+> 	mutex_unlock(&pf->dplls.lock);
+>@@ -2321,6 +2684,59 @@ ice_dpll_rclk_state_on_pin_set(const struct dpll_pi=
+n
+>*pin, void *pin_priv,
+> 	return ret;
+> }
+>
+>+/**
+>+ * ice_dpll_pin_1588_state_on_pin_set - set a state on a clock 1588 pin
+>+ * @pin: pointer to a pin
+>+ * @pin_priv: private data pointer passed on pin registration
+>+ * @parent_pin: pin parent pointer
+>+ * @parent_pin_priv: parent private data pointer passed on pin
+>registration
+>+ * @state: state to be set on pin
+>+ * @extack: error reporting
+>+ *
+>+ * Dpll subsystem callback. Set a state of a clock 1588 pin on a parent
+>pin
+>+ *
+>+ * Context: Acquires pf->dplls.lock
+>+ * Return:
+>+ * * 0 - success
+>+ * * negative - failure
+>+ */
+>+static int ice_dpll_pin_1588_state_on_pin_set(const struct dpll_pin *pin,
+>+					      void *pin_priv,
+>+					      const struct dpll_pin *parent_pin,
+>+					      void *parent_pin_priv,
+>+					      enum dpll_pin_state state,
+>+					      struct netlink_ext_ack *extack)
+>+{
+>+	const struct ice_dpll_pin *parent =3D parent_pin_priv;
+>+	bool ena =3D state =3D=3D DPLL_PIN_STATE_CONNECTED;
+>+	struct ice_dpll_pin *p =3D pin_priv;
+>+	struct ice_pf *pf =3D p->pf;
+>+	int ret =3D -EINVAL;
+>+	u32 hw_idx;
+>+
+>+	if (ice_dpll_is_reset(pf, extack))
+>+		return -EBUSY;
+>+
+>+	mutex_lock(&pf->dplls.lock);
+>+	hw_idx =3D parent->idx - pf->dplls.base_rclk_idx;
+>+	if (hw_idx >=3D pf->dplls.num_inputs)
+>+		goto unlock;
+>+
+>+	if ((ena && p->state[hw_idx] =3D=3D DPLL_PIN_STATE_CONNECTED) ||
+>+	    (!ena && p->state[hw_idx] =3D=3D DPLL_PIN_STATE_DISCONNECTED)) {
+>+		NL_SET_ERR_MSG(extack,
+>+			       "Pin state on parent is already set");
+>+		goto unlock;
+>+	}
+>+	ret =3D ice_dpll_cfg_bypass_mux_e825c(&pf->hw, ena,
+>+					    pf->ptp.port.port_num,
+>+					    hw_idx, true);
+>+unlock:
+>+	mutex_unlock(&pf->dplls.lock);
+>+
+>+	return ret;
+>+}
+>+
+> /**
+>  * ice_dpll_rclk_state_on_pin_get - get a state of rclk pin
+>  * @pin: pointer to a pin
+>@@ -2370,12 +2786,71 @@ ice_dpll_rclk_state_on_pin_get(const struct
+>dpll_pin *pin, void *pin_priv,
+> 	return ret;
+> }
+>
+>+/**
+>+ * ice_dpll_pin_1588_state_on_pin_get - get a state of a 1588 clock pin
+>+ * @pin: pointer to a pin
+>+ * @pin_priv: private data pointer passed on pin registration
+>+ * @parent_pin: pin parent pointer
+>+ * @parent_pin_priv: pin parent priv data pointer passed on pin
+>registration
+>+ * @state: on success holds pin state on parent pin
+>+ * @extack: error reporting
+>+ *
+>+ * dpll subsystem callback, get a state of a 1588 clock pin.
+>+ *
+>+ * Context: Acquires pf->dplls.lock
+>+ * Return:
+>+ * * 0 - success
+>+ * * negative - failure
+>+ */
+>+static int
+>+ice_dpll_pin_1588_state_on_pin_get(const struct dpll_pin *pin, void
+>*pin_priv,
+>+				   const struct dpll_pin *parent_pin,
+>+				   void *parent_pin_priv,
+>+				   enum dpll_pin_state *state,
+>+				   struct netlink_ext_ack *extack)
+>+{
+>+	const struct ice_dpll_pin *parent =3D parent_pin_priv;
+>+	struct ice_dpll_pin *p =3D pin_priv;
+>+	struct ice_pf *pf =3D p->pf;
+>+	int ret =3D -EINVAL;
+>+	u32 hw_idx;
+>+
+>+	if (ice_dpll_is_reset(pf, extack))
+>+		return -EBUSY;
+>+
+>+	mutex_lock(&pf->dplls.lock);
+>+	hw_idx =3D parent->idx - pf->dplls.base_1588_idx;
+>+	if (hw_idx >=3D pf->dplls.num_inputs)
+>+		goto unlock;
+>+
+>+	ret =3D ice_dpll_update_pin_1588_e825c(&pf->hw, p,
+>+					     (enum ice_synce_clk)hw_idx);
+>+	if (ret)
+>+		goto unlock;
+>+	*state =3D p->state[hw_idx];
+>+unlock:
+>+	mutex_unlock(&pf->dplls.lock);
+>+
+>+	return ret;
+>+}
+>+
+> static const struct dpll_pin_ops ice_dpll_rclk_ops =3D {
+> 	.state_on_pin_set =3D ice_dpll_rclk_state_on_pin_set,
+> 	.state_on_pin_get =3D ice_dpll_rclk_state_on_pin_get,
+> 	.direction_get =3D ice_dpll_input_direction,
+> };
+>
+>+static const struct dpll_pin_ops ice_dpll_pin_1588_ops =3D {
+>+	.direction_get =3D ice_dpll_input_direction,
+>+	.state_on_pin_get =3D ice_dpll_pin_1588_state_on_pin_get,
+>+	.state_on_pin_set =3D ice_dpll_pin_1588_state_on_pin_set,
+>+};
+>+
+>+static const struct dpll_pin_ops ice_dpll_input_ops_e825c =3D {
+>+	.direction_get =3D ice_dpll_input_direction,
+>+	.state_on_dpll_get =3D ice_dpll_pin_state_get_e825c,
+>+};
+>+
+> static const struct dpll_pin_ops ice_dpll_pin_sma_ops =3D {
+> 	.state_on_dpll_set =3D ice_dpll_sma_pin_state_set,
+> 	.state_on_dpll_get =3D ice_dpll_sw_pin_state_get,
+>@@ -2944,6 +3419,7 @@ ice_dpll_register_pins(struct dpll_device *dpll,
+>struct ice_dpll_pin *pins,
+>
+> /**
+>  * ice_dpll_deinit_direct_pins - deinitialize direct pins
+>+ * @pf: board private structure
+>  * @cgu: if cgu is present and controlled by this NIC
+>  * @pins: pointer to pins array
+>  * @count: number of pins
+>@@ -2955,7 +3431,8 @@ ice_dpll_register_pins(struct dpll_device *dpll,
+>struct ice_dpll_pin *pins,
+>  * Release pins resources to the dpll subsystem.
+>  */
+> static void
+>-ice_dpll_deinit_direct_pins(bool cgu, struct ice_dpll_pin *pins, int
+>count,
+>+ice_dpll_deinit_direct_pins(struct ice_pf *pf, bool cgu,
+>+			    struct ice_dpll_pin *pins, int count,
+> 			    const struct dpll_pin_ops *ops,
+> 			    struct dpll_device *first,
+> 			    struct dpll_device *second)
+>@@ -3004,7 +3481,11 @@ ice_dpll_init_direct_pins(struct ice_pf *pf, bool
+>cgu,
+> 		if (ret)
+> 			goto unregister_first;
+> 	}
+>-
+>+	if (pf->hw.mac_type =3D=3D ICE_MAC_GENERIC_3K_E825) {
+>+		ret =3D ice_dpll_register_pins(first, pins, ops, count);
+>+		if (ret)
+>+			goto release_pins;
+>+	}
+> 	return 0;
+>
+> unregister_first:
+>@@ -3014,6 +3495,31 @@ ice_dpll_init_direct_pins(struct ice_pf *pf, bool
+>cgu,
+> 	return ret;
+> }
+>
+>+/**
+>+ * ice_dpll_deinit_pin_1588 - release 1588 pin resources
+>+ * @pf: board private structure
+>+ *
+>+ * Deregister 1588 pin from parent pins and release resources in dpll
+>+ * subsystem.
+>+ */
+>+static void ice_dpll_deinit_pin_1588(struct ice_pf *pf)
+>+{
+>+	struct ice_dpll_pin *pin_1588 =3D &pf->dplls.pin_1588;
+>+	struct dpll_pin *parent;
+>+	int i;
+>+
+>+	for (i =3D 0; i < pin_1588->num_parents; i++) {
+>+		parent =3D pf->dplls.inputs[pin_1588->parent_idx[i]].pin;
+>+
+>+		if (!parent)
+>+			continue;
+>+		dpll_pin_on_pin_unregister(parent, pin_1588->pin,
+>+					   &ice_dpll_pin_1588_ops,
+>+					   pin_1588);
+>+	}
+>+
+>+	dpll_pin_put(pin_1588->pin);
+>+}
+> /**
+>  * ice_dpll_deinit_rclk_pin - release rclk pin resources
+>  * @pf: board private structure
+>@@ -3025,7 +3531,11 @@ static void ice_dpll_deinit_rclk_pin(struct ice_pf
+>*pf)
+> 	struct ice_dpll_pin *rclk =3D &pf->dplls.rclk;
+> 	struct ice_vsi *vsi =3D ice_get_main_vsi(pf);
+> 	struct dpll_pin *parent;
+>-	int i;
+>+	u8 i;
+>+
+>+	if (pf->hw.mac_type =3D=3D ICE_MAC_GENERIC_3K_E825 &&
+>+	    ice_pf_src_tmr_owned(pf))
+>+		ice_dpll_deinit_pin_1588(pf);
+>
+> 	for (i =3D 0; i < rclk->num_parents; i++) {
+> 		parent =3D pf->dplls.inputs[rclk->parent_idx[i]].pin;
+>@@ -3094,6 +3604,59 @@ ice_dpll_init_rclk_pins(struct ice_pf *pf, struct
+>ice_dpll_pin *pin,
+> 	return ret;
+> }
+>
+>+/**
+>+ * ice_dpll_init_pin_1588 - initialize pin to control clock 1588
+>+ * @pf: board private structure
+>+ * @pin: pin to register
+>+ * @start_idx: on which index shall allocation start in dpll subsystem
+>+ * @ops: callback ops registered with the pins
+>+ *
+>+ * Allocate resource for clock 1588 pin in dpll subsystem. Register the
+>+ * pin with the parents it has in the info. Register pin with the pf's
+>main vsi
+>+ * netdev.
+>+ *
+>+ * Return:
+>+ * * 0 - success
+>+ * * negative - registration failure reason
+>+ */
+>+static int
+>+ice_dpll_init_pin_1588(struct ice_pf *pf, struct ice_dpll_pin *pin,
+>+		       int start_idx, const struct dpll_pin_ops *ops)
+>+{
+>+	struct dpll_pin *parent;
+>+	int ret;
+>+	u8 i;
+>+
+>+	ret =3D ice_dpll_get_pins(pf, pin, start_idx, ICE_DPLL_PIN_1588_NUM,
+>+				pf->dplls.clock_id);
+>+	if (ret)
+>+		return ret;
+>+	for (i =3D 0; i < pf->dplls.pin_1588.num_parents; i++) {
+>+		parent =3D pf->dplls.inputs[pf-
+>>dplls.pin_1588.parent_idx[i]].pin;
+>+		if (!parent) {
+>+			ret =3D -ENODEV;
+>+			goto unregister_pins;
+>+		}
+>+		ret =3D dpll_pin_on_pin_register(parent, pf->dplls.pin_1588.pin,
+>+					       ops, &pf->dplls.pin_1588);
+>+		if (ret)
+>+			goto unregister_pins;
+>+	}
+>+
+>+	return 0;
+>+
+>+unregister_pins:
+>+	while (i) {
+>+		parent =3D pf->dplls.inputs[pf->dplls.pin_1588.parent_idx[--
+>i]].pin;
+>+		dpll_pin_on_pin_unregister(parent, pf->dplls.pin_1588.pin,
+>+					   &ice_dpll_pin_1588_ops,
+>+					   &pf->dplls.pin_1588);
+>+	}
+>+	ice_dpll_release_pins(pin, ICE_DPLL_RCLK_NUM_PER_PF);
+>+
+>+	return ret;
+>+}
+>+
+> /**
+>  * ice_dpll_deinit_pins - deinitialize direct pins
+>  * @pf: board private structure
+>@@ -3119,6 +3682,9 @@ static void ice_dpll_deinit_pins(struct ice_pf *pf,
+>bool cgu)
+> 		ice_dpll_unregister_pins(de->dpll, inputs, &ice_dpll_input_ops,
+> 					 num_inputs);
+> 	}
+>+	if (pf->hw.mac_type =3D=3D ICE_MAC_GENERIC_3K_E825)
+>+		ice_dpll_unregister_pins(de->dpll, inputs,
+>+					 &ice_dpll_input_ops_e825c, num_inputs);
+> 	ice_dpll_release_pins(inputs, num_inputs);
+> 	if (cgu) {
+> 		ice_dpll_unregister_pins(dp->dpll, outputs,
+>@@ -3127,12 +3693,12 @@ static void ice_dpll_deinit_pins(struct ice_pf *pf=
+,
+>bool cgu)
+> 					 &ice_dpll_output_ops, num_outputs);
+> 		ice_dpll_release_pins(outputs, num_outputs);
+> 		if (!pf->dplls.generic) {
+>-			ice_dpll_deinit_direct_pins(cgu, pf->dplls.ufl,
+>+			ice_dpll_deinit_direct_pins(pf, cgu, pf->dplls.ufl,
+> 						    ICE_DPLL_PIN_SW_NUM,
+> 						    &ice_dpll_pin_ufl_ops,
+> 						    pf->dplls.pps.dpll,
+> 						    pf->dplls.eec.dpll);
+>-			ice_dpll_deinit_direct_pins(cgu, pf->dplls.sma,
+>+			ice_dpll_deinit_direct_pins(pf, cgu, pf->dplls.sma,
+> 						    ICE_DPLL_PIN_SW_NUM,
+> 						    &ice_dpll_pin_sma_ops,
+> 						    pf->dplls.pps.dpll,
+>@@ -3155,21 +3721,32 @@ static void ice_dpll_deinit_pins(struct ice_pf *pf=
+,
+>bool cgu)
+>  */
+> static int ice_dpll_init_pins(struct ice_pf *pf, bool cgu)
+> {
+>+	const struct dpll_pin_ops *output_ops;
+>+	const struct dpll_pin_ops *input_ops;
+> 	int ret, count;
+>
+>+	switch (pf->hw.mac_type) {
+>+	case ICE_MAC_GENERIC_3K_E825:
+>+		input_ops =3D &ice_dpll_input_ops_e825c;
+>+		output_ops =3D NULL;
+>+		break;
+>+	default:
+>+		input_ops =3D &ice_dpll_input_ops;
+>+		output_ops =3D &ice_dpll_output_ops;
+>+		break;
+>+	}
+> 	ret =3D ice_dpll_init_direct_pins(pf, cgu, pf->dplls.inputs, 0,
+>-					pf->dplls.num_inputs,
+>-					&ice_dpll_input_ops,
+>+					pf->dplls.num_inputs, input_ops,
+> 					pf->dplls.eec.dpll, pf->dplls.pps.dpll);
+> 	if (ret)
+> 		return ret;
+>+
+> 	count =3D pf->dplls.num_inputs;
+>+
+> 	if (cgu) {
+> 		ret =3D ice_dpll_init_direct_pins(pf, cgu, pf->dplls.outputs,
+>-						count,
+>-						pf->dplls.num_outputs,
+>-						&ice_dpll_output_ops,
+>-						pf->dplls.eec.dpll,
+>+						count, pf->dplls.num_outputs,
+>+						output_ops, pf->dplls.eec.dpll,
+> 						pf->dplls.pps.dpll);
+> 		if (ret)
+> 			goto deinit_inputs;
+>@@ -3205,30 +3782,45 @@ static int ice_dpll_init_pins(struct ice_pf *pf,
+>bool cgu)
+> 	} else {
+> 		count +=3D pf->dplls.num_outputs + 2 * ICE_DPLL_PIN_SW_NUM;
+> 	}
+>-	ret =3D ice_dpll_init_rclk_pins(pf, &pf->dplls.rclk, count + pf-
+>>hw.pf_id,
+>+	if (pf->hw.mac_type =3D=3D ICE_MAC_GENERIC_3K_E825) {
+>+		if (ice_pf_src_tmr_owned(pf)) {
+>+			ret =3D ice_dpll_init_pin_1588(pf, &pf->dplls.pin_1588,
+>+						     count,
+>+						     &ice_dpll_pin_1588_ops);
+>+			if (ret)
+>+				goto deinit_inputs;
+>+		}
+>+		count +=3D ICE_DPLL_PIN_1588_NUM;
+>+	}
+>+
+>+	ret =3D ice_dpll_init_rclk_pins(pf, &pf->dplls.rclk,
+>+				      count + pf->ptp.port.port_num,
+> 				      &ice_dpll_rclk_ops);
+> 	if (ret)
+> 		goto deinit_ufl;
+>
+> 	return 0;
+>+
+> deinit_ufl:
+>-	ice_dpll_deinit_direct_pins(cgu, pf->dplls.ufl,
+>-				    ICE_DPLL_PIN_SW_NUM,
+>-				    &ice_dpll_pin_ufl_ops,
+>-				    pf->dplls.pps.dpll, pf->dplls.eec.dpll);
+>+	ice_dpll_deinit_direct_pins(pf, cgu, pf->dplls.ufl,
+>ICE_DPLL_PIN_SW_NUM,
+>+				    &ice_dpll_pin_ufl_ops, pf->dplls.pps.dpll,
+>+				    pf->dplls.eec.dpll);
+>+	if (pf->hw.mac_type =3D=3D ICE_MAC_GENERIC_3K_E825 &&
+>+	    ice_pf_src_tmr_owned(pf))
+>+		ice_dpll_deinit_pin_1588(pf);
+> deinit_sma:
+>-	ice_dpll_deinit_direct_pins(cgu, pf->dplls.sma,
+>-				    ICE_DPLL_PIN_SW_NUM,
+>-				    &ice_dpll_pin_sma_ops,
+>-				    pf->dplls.pps.dpll, pf->dplls.eec.dpll);
+>+	ice_dpll_deinit_direct_pins(pf, cgu, pf->dplls.sma,
+>ICE_DPLL_PIN_SW_NUM,
+>+				    &ice_dpll_pin_sma_ops, pf->dplls.pps.dpll,
+>+				    pf->dplls.eec.dpll);
+> deinit_outputs:
+>-	ice_dpll_deinit_direct_pins(cgu, pf->dplls.outputs,
+>+	ice_dpll_deinit_direct_pins(pf, cgu, pf->dplls.outputs,
+> 				    pf->dplls.num_outputs,
+>-				    &ice_dpll_output_ops, pf->dplls.pps.dpll,
+>+				    output_ops, pf->dplls.pps.dpll,
+> 				    pf->dplls.eec.dpll);
+> deinit_inputs:
+>-	ice_dpll_deinit_direct_pins(cgu, pf->dplls.inputs, pf-
+>>dplls.num_inputs,
+>-				    &ice_dpll_input_ops, pf->dplls.pps.dpll,
+>+	ice_dpll_deinit_direct_pins(pf, cgu, pf->dplls.inputs,
+>+				    pf->dplls.num_inputs,
+>+				    input_ops, pf->dplls.pps.dpll,
+> 				    pf->dplls.eec.dpll);
+> 	return ret;
+> }
+>@@ -3239,14 +3831,15 @@ static int ice_dpll_init_pins(struct ice_pf *pf,
+>bool cgu)
+>  * @d: pointer to ice_dpll
+>  * @cgu: if cgu is present and controlled by this NIC
+>  *
+>- * If cgu is owned unregister the dpll from dpll subsystem.
+>+ * If cgu is owned or device is e825c, unregister the dpll from dpll
+>subsystem.
+>  * Release resources of dpll device from dpll subsystem.
+>  */
+> static void
+> ice_dpll_deinit_dpll(struct ice_pf *pf, struct ice_dpll *d, bool cgu)
+> {
+>-	if (cgu)
+>-		dpll_device_unregister(d->dpll, d->ops, d);
+>+	if (cgu || (pf->hw.mac_type =3D=3D ICE_MAC_GENERIC_3K_E825 &&
+>+		    ice_pf_src_tmr_owned(pf)))
+>+		dpll_device_unregister(d->dpll, &ice_dpll_ops, d);
+> 	dpll_device_put(d->dpll);
+> }
+>
+>@@ -3279,12 +3872,15 @@ ice_dpll_init_dpll(struct ice_pf *pf, struct
+>ice_dpll *d, bool cgu,
+> 		return ret;
+> 	}
+> 	d->pf =3D pf;
+>-	if (cgu) {
+>+
+>+	if (cgu || (pf->hw.mac_type =3D=3D ICE_MAC_GENERIC_3K_E825 &&
+>+		    ice_pf_src_tmr_owned(pf))) {
+> 		const struct dpll_device_ops *ops =3D &ice_dpll_ops;
+>
+> 		if (type =3D=3D DPLL_TYPE_PPS && ice_dpll_is_pps_phase_monitor(pf))
+> 			ops =3D  &ice_dpll_pom_ops;
+>-		ice_dpll_update_state(pf, d, true);
+>+		if (cgu)
+>+			ice_dpll_update_state(pf, d, true);
+> 		ret =3D dpll_device_register(d->dpll, type, ops, d);
+> 		if (ret) {
+> 			dpll_device_put(d->dpll);
+>@@ -3417,6 +4013,52 @@ static int ice_dpll_init_info_pins_generic(struct
+>ice_pf *pf, bool input)
+> 	return ret;
+> }
+>
+>+/**
+>+ * ice_dpll_init_info_direct_pins_e825c - initializes direct pins info
+>+ * @pf: board private structure
+>+ * @pin_type: type of pins being initialized
+>+ *
+>+ * Init information for directly connected pins, cache them in pf's pins
+>+ * structures.
+>+ *
+>+ * Return:
+>+ * * 0 - success
+>+ * * negative - init failure reason
+>+ */
+>+static int ice_dpll_init_info_direct_pins_e825c(struct ice_pf *pf,
+>+						enum ice_dpll_pin_type pin_type)
+>+{
+>+	struct ice_hw *hw =3D &pf->hw;
+>+	struct ice_dpll_pin *pins;
+>+	unsigned long caps =3D 0;
+>+	int num_pins, i;
+>+	bool input;
+>+
+>+	switch (pin_type) {
+>+	case ICE_DPLL_PIN_TYPE_INPUT:
+>+		pins =3D pf->dplls.inputs;
+>+		num_pins =3D pf->dplls.num_inputs;
+>+		input =3D true;
+>+		break;
+>+	case ICE_DPLL_PIN_TYPE_OUTPUT:
+>+		pins =3D pf->dplls.outputs;
+>+		num_pins =3D pf->dplls.num_outputs;
+>+		input =3D false;
+>+		break;
+>+	default:
+>+		return -EINVAL;
+>+	}
+>+
+>+	for (i =3D 0; i < num_pins; i++) {
+>+		pins[i].idx =3D i;
+>+		pins[i].prop.board_label =3D ice_cgu_get_pin_name(hw, i, input);
+>+		pins[i].prop.type =3D ice_cgu_get_pin_type(hw, i, input);
+>+		pins[i].prop.capabilities =3D caps;
+>+		pins[i].pf =3D pf;
+>+	}
+>+	return 0;
+>+}
+>+
+> /**
+>  * ice_dpll_init_info_direct_pins - initializes direct pins info
+>  * @pf: board private structure
+>@@ -3505,6 +4147,32 @@ ice_dpll_init_info_direct_pins(struct ice_pf *pf,
+> 	return ret;
+> }
+>
+>+/**
+>+ * ice_dpll_init_info_pin_on_pin_e825c - initializes rclk pin information
+>+ * @pf: board private structure
+>+ *
+>+ * Init information for rclk pin, cache them in pf->dplls.rclk and
+>+ * pf->dplls.pin_1588.
+>+ *
+>+ * Return:
+>+ * * 0 - success
+>+ */
+>+static int ice_dpll_init_info_pin_on_pin_e825c(struct ice_pf *pf)
+>+{
+>+	struct ice_dpll_pin *pin_1588 =3D &pf->dplls.pin_1588;
+>+	struct ice_dpll_pin *rclk_pin =3D &pf->dplls.rclk;
+>+
+>+	rclk_pin->prop.type =3D DPLL_PIN_TYPE_SYNCE_ETH_PORT;
+>+	rclk_pin->prop.capabilities |=3D
+>DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE;
+>+	rclk_pin->pf =3D pf;
+>+	pin_1588->prop.type =3D DPLL_PIN_TYPE_SYNCE_ETH_PORT;
+>+	pin_1588->prop.capabilities |=3D
+>DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE;
+>+	pin_1588->prop.board_label =3D ice_dpll_pin_1588;
+>+	pin_1588->pf =3D pf;
+>+
+>+	return 0;
+>+}
+>+
+> /**
+>  * ice_dpll_init_info_rclk_pin - initializes rclk pin information
+>  * @pf: board private structure
+>@@ -3629,9 +4297,15 @@ ice_dpll_init_pins_info(struct ice_pf *pf, enum
+>ice_dpll_pin_type pin_type)
+> 	switch (pin_type) {
+> 	case ICE_DPLL_PIN_TYPE_INPUT:
+> 	case ICE_DPLL_PIN_TYPE_OUTPUT:
+>-		return ice_dpll_init_info_direct_pins(pf, pin_type);
+>+		if (pf->hw.mac_type =3D=3D ICE_MAC_GENERIC_3K_E825)
+>+			return ice_dpll_init_info_direct_pins_e825c(pf,
+>pin_type);
+>+		else
+>+			return ice_dpll_init_info_direct_pins(pf, pin_type);
+> 	case ICE_DPLL_PIN_TYPE_RCLK_INPUT:
+>-		return ice_dpll_init_info_rclk_pin(pf);
+>+		if (pf->hw.mac_type =3D=3D ICE_MAC_GENERIC_3K_E825)
+>+			return ice_dpll_init_info_pin_on_pin_e825c(pf);
+>+		else
+>+			return ice_dpll_init_info_rclk_pin(pf);
+> 	case ICE_DPLL_PIN_TYPE_SOFTWARE:
+> 		return ice_dpll_init_info_sw_pins(pf);
+> 	default:
+>@@ -3653,6 +4327,68 @@ static void ice_dpll_deinit_info(struct ice_pf *pf)
+> 	kfree(pf->dplls.pps.input_prio);
+> }
+>
+>+/**
+>+ * ice_dpll_init_info_e825c - prepare pf's dpll information structure for
+>e825c
+>+ * device
+>+ * @pf: board private structure
+>+ *
+>+ * Acquire (from HW) and set basic dpll information (on pf->dplls struct)=
+.
+>+ *
+>+ * Return:
+>+ * * 0 - success
+>+ * * negative - init failure reason
+>+ */
+>+static int ice_dpll_init_info_e825c(struct ice_pf *pf)
+>+{
+>+	struct ice_dplls *d =3D &pf->dplls;
+>+	struct ice_dpll *de =3D &d->eec;
+>+	int ret =3D 0;
+>+	int i;
+>+
+>+	d->clock_id =3D ice_generate_clock_id(pf);
+>+	d->num_inputs =3D ICE_DPLL_PARENT_PIN_NUM_E825;
+>+	de->dpll_state =3D DPLL_LOCK_STATUS_LOCKED;
+>+
+>+	d->inputs =3D kcalloc(d->num_inputs, sizeof(*d->inputs), GFP_KERNEL);
+>+	if (!d->inputs)
+>+		return -ENOMEM;
+>+
+>+	ret =3D ice_dpll_init_pins_info(pf, ICE_DPLL_PIN_TYPE_INPUT);
+>+	if (ret)
+>+		goto deinit_info;
+>+
+>+	ret =3D ice_get_cgu_rclk_pin_info(&pf->hw, &d->base_rclk_idx,
+>+					&pf->dplls.rclk.num_parents);
+>+	if (ret)
+>+		return ret;
+>+
+>+	for (i =3D 0; i < pf->dplls.rclk.num_parents; i++)
+>+		pf->dplls.rclk.parent_idx[i] =3D d->base_rclk_idx + i;
+>+
+>+	d->base_1588_idx =3D ICE_E825_1588_BASE_IDX;
+>+	pf->dplls.pin_1588.num_parents =3D ICE_DPLL_PARENT_PIN_NUM_E825;
+>+
+>+	if (ice_pf_src_tmr_owned(pf)) {
+>+		for (i =3D 0; i < pf->dplls.pin_1588.num_parents; i++)
+>+			pf->dplls.pin_1588.parent_idx[i] =3D d->base_1588_idx + i;
+>+	}
+>+	ret =3D ice_dpll_init_pins_info(pf, ICE_DPLL_PIN_TYPE_RCLK_INPUT);
+>+	if (ret)
+>+		return ret;
+>+	de->mode =3D DPLL_MODE_MANUAL;
+>+	dev_dbg(ice_pf_to_dev(pf),
+>+		"%s - success, inputs:%u, outputs:%u, rclk-parents:%u,
+>pin_1588-parents:%u\n",
+>+		 __func__, d->num_inputs, d->num_outputs, d->rclk.num_parents,
+>+		 d->pin_1588.num_parents);
+>+	return 0;
+>+deinit_info:
+>+	dev_err(ice_pf_to_dev(pf),
+>+		"%s - fail: d->inputs:%p, d->outputs:%p\n",
+>+		__func__, d->inputs, d->outputs);
+>+	ice_dpll_deinit_info(pf);
+>+	return ret;
+>+}
+>+
+> /**
+>  * ice_dpll_init_info - prepare pf's dpll information structure
+>  * @pf: board private structure
+>@@ -3772,7 +4508,8 @@ void ice_dpll_deinit(struct ice_pf *pf)
+> 		ice_dpll_deinit_worker(pf);
+>
+> 	ice_dpll_deinit_pins(pf, cgu);
+>-	ice_dpll_deinit_dpll(pf, &pf->dplls.pps, cgu);
+>+	if (pf->hw.mac_type !=3D ICE_MAC_GENERIC_3K_E825)
+>+		ice_dpll_deinit_dpll(pf, &pf->dplls.pps, cgu);
+> 	ice_dpll_deinit_dpll(pf, &pf->dplls.eec, cgu);
+> 	ice_dpll_deinit_info(pf);
+> 	mutex_destroy(&pf->dplls.lock);
+>@@ -3795,25 +4532,33 @@ void ice_dpll_init(struct ice_pf *pf)
+> 	int err =3D 0;
+>
+> 	mutex_init(&d->lock);
+>-	err =3D ice_dpll_init_info(pf, cgu);
+>+
+>+	if (pf->hw.mac_type =3D=3D ICE_MAC_GENERIC_3K_E825)
+>+		err =3D ice_dpll_init_info_e825c(pf);
+>+	else
+>+		err =3D ice_dpll_init_info(pf, cgu);
+>+
+> 	if (err)
+> 		goto err_exit;
+>+
+> 	err =3D ice_dpll_init_dpll(pf, &pf->dplls.eec, cgu, DPLL_TYPE_EEC);
+> 	if (err)
+> 		goto deinit_info;
+>-	err =3D ice_dpll_init_dpll(pf, &pf->dplls.pps, cgu, DPLL_TYPE_PPS);
+>-	if (err)
+>-		goto deinit_eec;
+>+	if (pf->hw.mac_type !=3D ICE_MAC_GENERIC_3K_E825) {
+>+		err =3D ice_dpll_init_dpll(pf, &pf->dplls.pps, cgu,
+>+					 DPLL_TYPE_PPS);
+>+		if (err)
+>+			goto deinit_eec;
+>+	}
+> 	err =3D ice_dpll_init_pins(pf, cgu);
+> 	if (err)
+> 		goto deinit_pps;
+>-	if (cgu) {
+>+	if (cgu && pf->hw.mac_type !=3D ICE_MAC_GENERIC_3K_E825) {
+> 		err =3D ice_dpll_init_worker(pf);
+> 		if (err)
+> 			goto deinit_pins;
+> 	}
+> 	set_bit(ICE_FLAG_DPLL, pf->flags);
+>-
+
+Not related to the change :)
+
+> 	return;
+>
+> deinit_pins:
+>diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.h
+>b/drivers/net/ethernet/intel/ice/ice_dpll.h
+>index c0da03384ce9..90e624b1cb4e 100644
+>--- a/drivers/net/ethernet/intel/ice/ice_dpll.h
+>+++ b/drivers/net/ethernet/intel/ice/ice_dpll.h
+>@@ -24,7 +24,7 @@ enum ice_dpll_pin_sw {
+>  * @pin: dpll pin structure
+>  * @pf: pointer to pf, which has registered the dpll_pin
+>  * @idx: ice pin private idx
+>- * @num_parents: hols number of parent pins
+>+ * @num_parents: hold number of parent pins
+
+Not related :)
+
+>  * @parent_idx: hold indexes of parent pins
+>  * @flags: pin flags returned from HW
+>  * @state: state of a pin
+>@@ -101,11 +101,13 @@ struct ice_dpll {
+>  * @pps: pointer to PPS dpll dev
+>  * @inputs: input pins pointer
+>  * @outputs: output pins pointer
+>+ * @pin_1588: pin controlling clock 1588 pointer
+>  * @rclk: recovered pins pointer
+>  * @num_inputs: number of input pins available on dpll
+>  * @num_outputs: number of output pins available on dpll
+>  * @cgu_state_acq_err_num: number of errors returned during periodic work
+>  * @base_rclk_idx: idx of first pin used for clock revocery pins
+>+ * @base_1588_idx: idx of first pin used for 1588 clock control pin
+>  * @clock_id: clock_id of dplls
+>  * @input_phase_adj_max: max phase adjust value for an input pins
+>  * @output_phase_adj_max: max phase adjust value for an output pins
+>@@ -119,6 +121,7 @@ struct ice_dplls {
+> 	struct ice_dpll pps;
+> 	struct ice_dpll_pin *inputs;
+> 	struct ice_dpll_pin *outputs;
+>+	struct ice_dpll_pin pin_1588;
+> 	struct ice_dpll_pin sma[ICE_DPLL_PIN_SW_NUM];
+> 	struct ice_dpll_pin ufl[ICE_DPLL_PIN_SW_NUM];
+> 	struct ice_dpll_pin rclk;
+>@@ -126,6 +129,7 @@ struct ice_dplls {
+> 	u8 num_outputs;
+> 	u8 sma_data;
+> 	u8 base_rclk_idx;
+>+	u8 base_1588_idx;
+> 	int cgu_state_acq_err_num;
+> 	u64 clock_id;
+> 	s32 input_phase_adj_max;
+>@@ -143,3 +147,23 @@ static inline void ice_dpll_deinit(struct ice_pf *pf)
+>{ }
+> #endif
+>
+> #endif
+>+
+>+#define ICE_CGU_R10				0x28
+>+#define ICE_CGU_R10_SYNCE_CLKO_SEL		GENMASK(8, 5)
+>+#define ICE_CGU_R10_SYNCE_CLKODIV_M1		GENMASK(13, 9)
+>+#define ICE_CGU_R10_SYNCE_CLKODIV_LOAD		BIT(14)
+>+#define ICE_CGU_R10_SYNCE_DCK_RST		BIT(15)
+>+#define ICE_CGU_R10_SYNCE_ETHCLKO_SEL		GENMASK(18, 16)
+>+#define ICE_CGU_R10_SYNCE_ETHDIV_M1		GENMASK(23, 19)
+>+#define ICE_CGU_R10_SYNCE_ETHDIV_LOAD		BIT(24)
+>+#define ICE_CGU_R10_SYNCE_DCK2_RST		BIT(25)
+>+#define ICE_CGU_R10_SYNCE_S_REF_CLK		GENMASK(31, 27)
+>+
+>+#define ICE_CGU_R11				0x2C
+>+#define ICE_CGU_R11_SYNCE_S_BYP_CLK		GENMASK(6, 1)
+>+
+>+#define ICE_CGU_BYPASS_MUX_OFFSET_E825C		3
+>+
+>+#define SET_PIN_STATE(_pin, _id, _condition) \
+>+	((_pin)->state[_id] =3D (_condition) ? DPLL_PIN_STATE_CONNECTED : \
+>+			       DPLL_PIN_STATE_DISCONNECTED)
+>diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c
+>b/drivers/net/ethernet/intel/ice/ice_lib.c
+>index d75836700889..0fa483f3d8d0 100644
+>--- a/drivers/net/ethernet/intel/ice/ice_lib.c
+>+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+>@@ -3947,6 +3947,9 @@ void ice_init_feature_support(struct ice_pf *pf)
+> 		break;
+> 	}
+>
+>+	if (pf->hw.mac_type =3D=3D ICE_MAC_GENERIC_3K_E825)
+>+		ice_set_feature_support(pf, ICE_F_PHY_RCLK);
+>+
+> 	if (pf->hw.mac_type =3D=3D ICE_MAC_E830) {
+> 		ice_set_feature_support(pf, ICE_F_MBX_LIMIT);
+> 		ice_set_feature_support(pf, ICE_F_GCS);
+>diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+>b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+>index 523f95271f35..9b7c892ca1d8 100644
+>--- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+>+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+>@@ -131,6 +131,11 @@ static const struct ice_cgu_pin_desc
+>ice_e823_zl_cgu_outputs[] =3D {
+> 	{ "NONE",	   ZL_OUT5, 0, 0 },
+> };
+>
+>+static const struct ice_cgu_pin_desc ice_e825c_inputs[] =3D {
+>+	{ "CLK_IN_0",	 0, DPLL_PIN_TYPE_MUX, 0 },
+>+	{ "CLK_IN_1",	 0, DPLL_PIN_TYPE_MUX, 0 },
+>+};
+>+
+> /* Low level functions for interacting with and managing the device clock
+>used
+>  * for the Precision Time Protocol.
+>  *
+>@@ -5602,7 +5607,7 @@ int ice_get_phy_tx_tstamp_ready(struct ice_hw *hw, u=
+8
+>block, u64 *tstamp_ready)
+> }
+>
+> /**
+>- * ice_cgu_get_pin_desc_e823 - get pin description array
+>+ * ice_get_pin_desc_e82x - get pin description array
+>  * @hw: pointer to the hw struct
+>  * @input: if request is done against input or output pin
+>  * @size: number of inputs/outputs
+>@@ -5610,9 +5615,19 @@ int ice_get_phy_tx_tstamp_ready(struct ice_hw *hw,
+>u8 block, u64 *tstamp_ready)
+>  * Return: pointer to pin description array associated to given hw.
+>  */
+> static const struct ice_cgu_pin_desc *
+>-ice_cgu_get_pin_desc_e823(struct ice_hw *hw, bool input, int *size)
+>+ice_get_pin_desc_e82x(struct ice_hw *hw, bool input, int *size)
+> {
+> 	static const struct ice_cgu_pin_desc *t;
+>+	if (hw->mac_type =3D=3D ICE_MAC_GENERIC_3K_E825) {
+>+		if (input) {
+>+			t =3D ice_e825c_inputs;
+>+			*size =3D ARRAY_SIZE(ice_e825c_inputs);
+>+			return t;
+>+		}
+>+		t =3D NULL;
+>+		*size =3D 0;
+>+		return t;
+>+	}
+>
+> 	if (hw->cgu_part_number =3D=3D
+> 	    ICE_AQC_GET_LINK_TOPO_NODE_NR_ZL30632_80032) {
+>@@ -5682,7 +5697,11 @@ ice_cgu_get_pin_desc(struct ice_hw *hw, bool input,
+>int *size)
+> 	case ICE_DEV_ID_E823C_QSFP:
+> 	case ICE_DEV_ID_E823C_SFP:
+> 	case ICE_DEV_ID_E823C_SGMII:
+>-		t =3D ice_cgu_get_pin_desc_e823(hw, input, size);
+>+	case ICE_DEV_ID_E825C_BACKPLANE:
+>+	case ICE_DEV_ID_E825C_QSFP:
+>+	case ICE_DEV_ID_E825C_SFP:
+>+	case ICE_DEV_ID_E825C_SGMII:
+>+		t =3D ice_get_pin_desc_e82x(hw, input, size);
+> 		break;
+> 	default:
+> 		break;
+>@@ -5730,7 +5749,6 @@ enum dpll_pin_type ice_cgu_get_pin_type(struct ice_h=
+w
+>*hw, u8 pin, bool input)
+>
+> 	if (pin >=3D t_size)
+> 		return 0;
+>-
+
+Not related :)
+
+> 	return t[pin].type;
+> }
+>
+>@@ -5903,7 +5921,14 @@ int ice_get_cgu_rclk_pin_info(struct ice_hw *hw, u8
+>*base_idx, u8 *pin_num)
+> 			*base_idx =3D SI_REF1P;
+> 		else
+> 			ret =3D -ENODEV;
+>-
+>+		break;
+>+	case ICE_DEV_ID_E825C_BACKPLANE:
+>+	case ICE_DEV_ID_E825C_QSFP:
+>+	case ICE_DEV_ID_E825C_SFP:
+>+	case ICE_DEV_ID_E825C_SGMII:
+>+		*pin_num =3D 2;
+
+Below is ICE_SYNCE_CLK_NUM, also 2, imho both are the same value :)
+
+>+		*base_idx =3D 0;
+
+>+		ret =3D 0;
+> 		break;
+> 	default:
+> 		ret =3D -ENODEV;
+>diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+>b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+>index 5896b346e579..a2ef4034d42f 100644
+>--- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+>+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+>@@ -210,6 +210,8 @@ enum ice_phy_rclk_pins {
+> #define ICE_E82X_RCLK_PINS_NUM		(ICE_RCLKA_PIN + 1)
+> #define E810T_CGU_INPUT_C827(_phy, _pin) ((_phy) * ICE_E810_RCLK_PINS_NUM
+>+ \
+> 					  (_pin) + ZL_REF1P)
+>+#define ICE_E825_1588_BASE_IDX		0
+>+#define ICE_DPLL_PARENT_PIN_NUM_E825	2
+
+Below is ICE_SYNCE_CLK_NUM, also 2, imho both are the same value :)
+Thank you!
+Arkadiusz
+
+>
+> enum ice_zl_cgu_in_pins {
+> 	ZL_REF0P =3D 0,
+>diff --git a/drivers/net/ethernet/intel/ice/ice_tspll.h
+>b/drivers/net/ethernet/intel/ice/ice_tspll.h
+>index c0b1232cc07c..dec0b0105a5d 100644
+>--- a/drivers/net/ethernet/intel/ice/ice_tspll.h
+>+++ b/drivers/net/ethernet/intel/ice/ice_tspll.h
+>@@ -21,6 +21,13 @@ struct ice_tspll_params_e82x {
+> 	u32 frac_n_div;
+> };
+>
+>+#define ICE_CGU_NET_REF_CLK0		0x0
+>+#define ICE_CGU_NCOCLK			0x2
+>+#define ICE_CGU_REF_CLK_BYP0		0x5
+>+#define ICE_CGU_REF_CLK_BYP0_DIV	0x0
+>+#define ICE_CGU_REF_CLK_BYP1		0x4
+>+#define ICE_CGU_REF_CLK_BYP1_DIV	0x1
+>+
+> #define ICE_TSPLL_CK_REFCLKFREQ_E825		0x1F
+> #define ICE_TSPLL_NDIVRATIO_E825		5
+> #define ICE_TSPLL_FBDIV_INTGR_E825		256
+>diff --git a/drivers/net/ethernet/intel/ice/ice_type.h
+>b/drivers/net/ethernet/intel/ice/ice_type.h
+>index 8d19efc1df72..c606cd75844d 100644
+>--- a/drivers/net/ethernet/intel/ice/ice_type.h
+>+++ b/drivers/net/ethernet/intel/ice/ice_type.h
+>@@ -349,6 +349,12 @@ enum ice_clk_src {
+> 	NUM_ICE_CLK_SRC
+> };
+>
+>+enum ice_synce_clk {
+>+	ICE_SYNCE_CLK0,
+>+	ICE_SYNCE_CLK1,
+>+	ICE_SYNCE_CLK_NUM
+>+};
+>+
+> struct ice_ts_func_info {
+> 	/* Function specific info */
+> 	enum ice_tspll_freq time_ref;
+>
+>base-commit: 10c6d502429ad0de7df1e23d372d0afa70f30400
+>--
+>2.39.3
 
 
