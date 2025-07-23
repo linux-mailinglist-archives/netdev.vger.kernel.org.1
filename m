@@ -1,160 +1,78 @@
-Return-Path: <netdev+bounces-209331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F9B7B0F2A2
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 14:55:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A578AB0F33A
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 15:09:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40F92AA4C3B
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 12:55:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF91C3A7FDA
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 13:06:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEEBD2E6D1C;
-	Wed, 23 Jul 2025 12:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32FAB2E8DF8;
+	Wed, 23 Jul 2025 13:04:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tx7SheHY"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="V/X/j+P9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86A55D2FF;
-	Wed, 23 Jul 2025 12:55:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3272E8DE4;
+	Wed, 23 Jul 2025 13:04:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753275325; cv=none; b=iknyeT24W08gJ1WmWX+832p/zbZkgQGIKNkrfuGT4wEURaqbHzmIOyjhhFlw6+lGJupaamQTlnaV6BDAGPI3rLCqwCoC6AGr+uT7wNjNx6Nt/qHfKE5T0IeDIgPeLJ2NQ0/RY6/BDZ2EVr9dwSyTqDOSGCZ0869mfGD4qsSxaz4=
+	t=1753275859; cv=none; b=iZ3GHACg/ookqjmqUuW6N0I6d5AvVlTLOT94w/4HLPTiauKm+/fY5N174rNkj9H3UIWOAMahpO/qw12ImI1r6ou1Adrf/gB5W4gkTpSJpIXY/O4nPGe5pjV0/mCNEUZseidus9pcJlPuOUs0HCwUBejoP8U/3NljMAKUNgkFYbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753275325; c=relaxed/simple;
-	bh=q6UaTmh3DUzTqX540vpF9A2/WnSH1xQl+bmrZyzGJWc=;
+	s=arc-20240116; t=1753275859; c=relaxed/simple;
+	bh=w/9OtaMeEiVS2xNmC0iski2P65RG5/IVinW9MNewWrI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UOEZ6v1dcH7HzrbuPR+g1aLFOnT52ou3tbkVQv0i04Xos7NLumnKSI3DFLZxDTtW1Yo8jaQWvGN2XqRpvovSMA0LGDpKoQgQs298FTZPls+liwGYfSM7MkrTyQiOEdk0bXD8Uy202YvZlQ04GNdPD9Poi5A6zCLlJN0OvxFdn+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tx7SheHY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E4F2C4CEE7;
-	Wed, 23 Jul 2025 12:55:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753275325;
-	bh=q6UaTmh3DUzTqX540vpF9A2/WnSH1xQl+bmrZyzGJWc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tx7SheHYFhejshYY11lOeIM2jstrFeP/NycPJe3aYBOWngvzkDZNZ0WzlXfZfzMlM
-	 huSVlGkH+7jz0dKXHFK6U8UTm69rIU/V6qpTMtd/wPweOig6wkSboPdPkHmuv51Rxp
-	 Il2Dm+5ZTN8Ax8aymSfWFiGroRlPv/bnyXRM2jU0WVao5REn5SJGvfaYiYTJKyPmiG
-	 6uXr+ULn0VP4ukPTgJZVtEkStDk1sWegvKgoHi98HlKcLsBG+Dy2CiiY9qWZ6S4JgE
-	 SgborqPkp3A+QCsukP0yW92UE3GoJ/rzIzJyFXVQVLxrDvOL3N931v0KlUtb71WLWB
-	 qn+5goUiUZwCQ==
-Date: Wed, 23 Jul 2025 13:55:21 +0100
-From: Simon Horman <horms@kernel.org>
-To: Maher Azzouzi <maherazz04@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	Ferenc Fejes <fejes@inf.elte.hu>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>
-Subject: Re: [PATCH net] net/sched: mqprio: fix stack out-of-bounds write in
- tc entry parsing
-Message-ID: <20250723125521.GA2459@horms.kernel.org>
-References: <20250722155121.440969-1-maherazz04@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=D4yV+xCaEO4hQTFFmIckpiLZOG6rnbaUKSeRNRCvmk1oexSVpus28MLq/wP8kja4nM2umJXkeXjzjnlpwCuJ7aVfuvT6+t2JyInCJgwTTePVHaBKSJ6Jcyq2VsGXpm+kSGPGlJEAwccJTrE3sx4NvxVxI85jQFaroaluYqKabXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=V/X/j+P9; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=6fi28c4WdnvJ8Srjsg0gsNHyyk9cO4yVoUg2Y0UaAns=; b=V/X/j+P9X02TRH4IEf/+2IfgXy
+	Jpy1YqhdK6AOxxdL6+5jS02Ravx00MN1gUzV+B9b/gpUdGylYZAAMmje3Wo3FMbtgcU7ji2ocYedo
+	NB6gI4sL52wG7/67AhuO0o31IkX76xNVGa1qxyPnU4EyBWu3ZPdmq6kJOC39mUJSLafs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ueZ8c-002Zdx-VU; Wed, 23 Jul 2025 15:04:02 +0200
+Date: Wed, 23 Jul 2025 15:04:02 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: yicongsrfy@163.com
+Cc: oneukum@suse.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	yicong@kylinos.cn
+Subject: Re: [PATCH] usbnet: Set duplex status to unknown in the absence of
+ MII
+Message-ID: <7d2d0313-4e20-4c3d-bd2a-5160465d4fa2@lunn.ch>
+References: <6373678e-d827-4cf7-a98f-e66bda238315@suse.com>
+ <20250723084456.1507563-1-yicongsrfy@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250722155121.440969-1-maherazz04@gmail.com>
+In-Reply-To: <20250723084456.1507563-1-yicongsrfy@163.com>
 
-+ Ferenc and Vladimir
+> Coming back to the issue described in this patch,
+> usbnet_get_link_ksettings_internal is currently only used in
+> cdc_ether.c and cdc_ncm.c as a callback for ethtool.
+> Can we assume that this part only concerns Ethernet devices
+> (and that, at least for now, none of the existing devices can
+> retrieve the duplex status through this interface)?
 
-On Tue, Jul 22, 2025 at 04:51:21PM +0100, Maher Azzouzi wrote:
-> From: MaherAzzouzi <maherazz04@gmail.com>
+"ethtool" can be used with any sort of interface, if the driver
+implements the op. So you should not assume it is only used for
+Ethernet.
 
-nit: space between your names please
-
-> 
-> TCA_MQPRIO_TC_ENTRY_INDEX is validated using
-> NLA_POLICY_MAX(NLA_U32, TC_QOPT_MAX_QUEUE), which allows the value
-> TC_QOPT_MAX_QUEUE (16). This leads to a 4-byte out-of-bounds stack write in
-> the fp[] array, which only has room for 16 elements (0–15).
-> 
-> Fix this by changing the policy to allow only up to TC_QOPT_MAX_QUEUE - 1.
-> 
-> Fixes: f62af20bed2d ("net/sched: mqprio: allow per-TC user input of FP adminStatus")
-> Reported-by: Maher Azzouzi <maherazz04@gmail.com>
-
-I don't think there is any need to include a Reported-by tag if
-you are also the patch author.
-
-> Signed-off-by: Maher Azzouzi <maherazz04@gmail.com>
-
-I agree with your analysis and that this is a good fix.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
-
-I do think it is misleading to name this #define MAX,
-but it's part of the UAPI so that ship has sailed.
-
-It seems that taprio has a similar problem, but that it is
-not a bug due to an additional check. I wonder if something
-like this for net-next is appropriate to align it's implementation
-wit that of maprio.
-
-diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-index 2b14c81a87e5..e759e43ad27e 100644
---- a/net/sched/sch_taprio.c
-+++ b/net/sched/sch_taprio.c
-@@ -998,7 +998,7 @@ static const struct nla_policy entry_policy[TCA_TAPRIO_SCHED_ENTRY_MAX + 1] = {
- 
- static const struct nla_policy taprio_tc_policy[TCA_TAPRIO_TC_ENTRY_MAX + 1] = {
- 	[TCA_TAPRIO_TC_ENTRY_INDEX]	   = NLA_POLICY_MAX(NLA_U32,
--							    TC_QOPT_MAX_QUEUE),
-+							    TC_QOPT_MAX_QUEUE - 1),
- 	[TCA_TAPRIO_TC_ENTRY_MAX_SDU]	   = { .type = NLA_U32 },
- 	[TCA_TAPRIO_TC_ENTRY_FP]	   = NLA_POLICY_RANGE(NLA_U32,
- 							      TC_FP_EXPRESS,
-@@ -1698,19 +1698,15 @@ static int taprio_parse_tc_entry(struct Qdisc *sch,
- 	if (err < 0)
- 		return err;
- 
--	if (!tb[TCA_TAPRIO_TC_ENTRY_INDEX]) {
-+	if (NL_REQ_ATTR_CHECK(extack, opt, tb, TCA_TAPRIO_TC_ENTRY_INDEX)) {
- 		NL_SET_ERR_MSG_MOD(extack, "TC entry index missing");
- 		return -EINVAL;
- 	}
- 
- 	tc = nla_get_u32(tb[TCA_TAPRIO_TC_ENTRY_INDEX]);
--	if (tc >= TC_QOPT_MAX_QUEUE) {
--		NL_SET_ERR_MSG_MOD(extack, "TC entry index out of range");
--		return -ERANGE;
--	}
--
- 	if (*seen_tcs & BIT(tc)) {
--		NL_SET_ERR_MSG_MOD(extack, "Duplicate TC entry");
-+		NL_SET_ERR_MSG_ATTR(extack, tb[TCA_TAPRIO_TC_ENTRY_INDEX],
-+				    "Duplicate tc entry");
- 		return -EINVAL;
- 	}
- 
-
-> ---
->  net/sched/sch_mqprio.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/sched/sch_mqprio.c b/net/sched/sch_mqprio.c
-> index 51d4013b6121..f3e5ef9a9592 100644
-> --- a/net/sched/sch_mqprio.c
-> +++ b/net/sched/sch_mqprio.c
-> @@ -152,7 +152,7 @@ static int mqprio_parse_opt(struct net_device *dev, struct tc_mqprio_qopt *qopt,
->  static const struct
->  nla_policy mqprio_tc_entry_policy[TCA_MQPRIO_TC_ENTRY_MAX + 1] = {
->       [TCA_MQPRIO_TC_ENTRY_INDEX]     = NLA_POLICY_MAX(NLA_U32,
-> -                                                      TC_QOPT_MAX_QUEUE),
-> +                                                      TC_QOPT_MAX_QUEUE - 1),
->       [TCA_MQPRIO_TC_ENTRY_FP]        = NLA_POLICY_RANGE(NLA_U32,
->                                                          TC_FP_EXPRESS,
->                                                          TC_FP_PREEMPTIBLE),
-> --
-> 2.34.1
->
-
+	Andrew
 
