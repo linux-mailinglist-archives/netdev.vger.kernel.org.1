@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-209170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DE24B0E84B
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 03:49:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6094B0E84D
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 03:50:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83819172493
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 01:49:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79DB51C2550A
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 01:50:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4261FB3;
-	Wed, 23 Jul 2025 01:49:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB14419AD90;
+	Wed, 23 Jul 2025 01:49:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dsZ7F1Yf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cHPkuMq+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9A12360;
-	Wed, 23 Jul 2025 01:49:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D7041FB3;
+	Wed, 23 Jul 2025 01:49:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753235388; cv=none; b=A/D3pV4MCwaWykzTgxQZrLUapHggor5fmbyI84N4dE+f/NE+Z4J/qxpcdUsIefz6EX5ePA+CX1eUnrIYrTnufI/M0tcCRKSmQSz74sPt+OfWrj7s/YUdoyezhjhFoyEWsrvy/M0m9M6JYVAHoeU0Y0TV0fFJqZIGHb7EUafJUp8=
+	t=1753235395; cv=none; b=FDPhNVB/13pAOq7FL1qHCxhBNFN4gksYCxEJfsIUB20V8cAfvdzGPDeiKmYYWFiLb4S/OU18e52/B+TGKMX/u1orH/VTfHe5A0fgko3iGWdS1OcIv6vKZPuzn3gp5K1eCaqTf/sedQkv2rkXZ4d21rU9aHTT1xJrEsW9tNNEq20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753235388; c=relaxed/simple;
-	bh=S46aXaZJUwkqewFsT8fYXJDPXML7kNl5HkXjA6XHDy8=;
+	s=arc-20240116; t=1753235395; c=relaxed/simple;
+	bh=TWWP5UC0hl2kMWCVnIXPI8WlY1NR78JudHF5e6wlwdM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ujr9LCWkZ/W86gRufvVpw+Bx7jiDMVLtMAFylUUjZ0ueR/vKh8PnXuA1+RsYsF8VRzcC/9NokF97CmKasF1EflGCiYhLchzI6+/bnpzW0AJEi6WNwWqQu1wW274McWi68Yl+5wALLVJZ46mlyQY4Cigem9L3BJKxZX5/jx990tk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dsZ7F1Yf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 618E4C4CEEB;
-	Wed, 23 Jul 2025 01:49:48 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=MXlK/mCxHwZ53G6e7SFBMVE196cOY5dApK/GiJCELifig6F0qiPetEGd6ZmcPn7nrHZu/KSIM9mI4we2OSBJ0BIOqB4o6oxoJTbOAjgAgk5a00nKtNnXuY06PvYNow28cCl6tkx7kbk4OtIndxACZluZBgrWcUGyWxAfrttPcj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cHPkuMq+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 222D9C4CEEB;
+	Wed, 23 Jul 2025 01:49:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753235388;
-	bh=S46aXaZJUwkqewFsT8fYXJDPXML7kNl5HkXjA6XHDy8=;
+	s=k20201202; t=1753235395;
+	bh=TWWP5UC0hl2kMWCVnIXPI8WlY1NR78JudHF5e6wlwdM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dsZ7F1Yf/Lm7uoJWyXtpTzM50Dd/yHwn9VM/OXWb3NLDkElroRYZi/QgDKVpbPmtK
-	 uQLV8ofPt/wO2hD0gAep3/EKHENTppQLM4R+hLh1w/0G8/blaA5kGbVV1FOIhUhcxm
-	 +b7aIAcGXOftxffcsmDYFK7ykSepqcMoreUGxwXzkHo69Ad1u7ePAQJ+VfQklj/J4z
-	 k5yZwLYy1z43RUNgQDZnNuBcHoYZP8u2IKWIz5sXjAZn8M0BvnIhn3PkPC57Jscf/l
-	 RByW9stS4NsbWiYeAXVcsZip9jfLg3IrbTY5vqI5NQnp0hi9KwlesvVKk3k0yxG4r/
-	 CAn4CYZBh+CKg==
+	b=cHPkuMq+uDnLJgjjdEi10acprytyO7c2jBESQjdNfA3uEbAoymSOeFYDwtxlbBpXm
+	 K8JvB1GDJlYlXIzz16wE2HwG3rg4+Z9o/aQIPOPVtFLUZu6rh+HD8rr7pMrDMG78Ci
+	 l0FptGsMmqrhMhQRdxxVBtnYZ308pugQ6N3yVIpzpgWBsnDHg9fpce4FG1oA0YUSTH
+	 1N6F6IFOuMtvUPTwJmjz40f8g8Z7JECRIpIH46pv++PjmHp6wTePCeVg0VexuIOsHh
+	 aXUXDxD5gvQ/eei/ysWYTzTdr/BzhIwnO0YuL0ogqsBHljkYxLfqxX+G1AC2cKk+zL
+	 XOr9azYckNvdA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD93383BF5D;
-	Wed, 23 Jul 2025 01:50:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCA9383BF5D;
+	Wed, 23 Jul 2025 01:50:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] can: netlink: can_changelink(): fix NULL pointer
- deref of
- struct can_priv::do_set_mode
+Subject: Re: [pull-request] mlx5-next updates 2025-07-22
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175323540664.1021632.5111013951274010808.git-patchwork-notify@kernel.org>
-Date: Wed, 23 Jul 2025 01:50:06 +0000
-References: <20250722110059.3664104-2-mkl@pengutronix.de>
-In-Reply-To: <20250722110059.3664104-2-mkl@pengutronix.de>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- linux-can@vger.kernel.org, kernel@pengutronix.de, andrey.lalaev@gmail.com
+ <175323541324.1021632.17931149096787900898.git-patchwork-notify@kernel.org>
+Date: Wed, 23 Jul 2025 01:50:13 +0000
+References: <1753175048-330044-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1753175048-330044-1-git-send-email-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
+ leon@kernel.org, mbloch@nvidia.com, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
-by Marc Kleine-Budde <mkl@pengutronix.de>:
+This pull request was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 22 Jul 2025 12:58:32 +0200 you wrote:
-> Andrei Lalaev reported a NULL pointer deref when a CAN device is
-> restarted from Bus Off and the driver does not implement the struct
-> can_priv::do_set_mode callback.
+On Tue, 22 Jul 2025 12:04:08 +0300 you wrote:
+> Hi,
 > 
-> There are 2 code path that call struct can_priv::do_set_mode:
-> - directly by a manual restart from the user space, via
->   can_changelink()
-> - delayed automatic restart after bus off (deactivated by default)
+> The following pull-request contains common mlx5 updates
+> for your *net-next* tree.
+> Please pull and let me know of any problem.
+> 
+> Regards,
+> Tariq
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] can: netlink: can_changelink(): fix NULL pointer deref of struct can_priv::do_set_mode
-    https://git.kernel.org/netdev/net/c/c1f3f9797c1f
+  - [pull-request] mlx5-next updates 2025-07-22
+    https://git.kernel.org/netdev/net-next/c/56613001dfc9
 
 You are awesome, thank you!
 -- 
