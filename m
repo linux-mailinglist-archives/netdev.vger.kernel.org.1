@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-209159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CA36B0E81A
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 03:30:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07331B0E81C
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 03:30:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F5701C8860C
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 01:30:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B5791713E9
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 01:30:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 632881B87E9;
-	Wed, 23 Jul 2025 01:30:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E8E41DC985;
+	Wed, 23 Jul 2025 01:30:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nMFmQA/i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JcqjIfoa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 356A51A4F3C;
-	Wed, 23 Jul 2025 01:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00271D6DB6;
+	Wed, 23 Jul 2025 01:30:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753234219; cv=none; b=Hrib2EJt+MhhcCpD9hN/TchtVCjwKHdmh0AoPX0jx7PIi8QTlIpNpCRGlSnQvq1mx/lveNR0AMDr1ccx9I7CZq6KyjdklZ+uYBGfMtvENOyU0y1GIDHwnChL+tck/+PdzLegL6+tqKXsLjJyOlCQ06SsPQennMGNJ+phxsihEZs=
+	t=1753234221; cv=none; b=iMBRxP7SlLj7W9wkJbp+JIe3QJwhQuirtWFL8pF8uvlQ6mB5w3uv4BKutTdF8JRI3eY7rnIjXTa8RzlyyYqHY7YA0vHvf2A+ifTFoIvex4pjzJhZfi6dayPRqhowDEHHs/etRRUKuiLwExk5R9A3C7InZ0KZen85pwoPQqIAyQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753234219; c=relaxed/simple;
-	bh=IZ4nWfDXHA9JxsyQg6ERpoS0dG2FhhBiten7oPTuzXc=;
+	s=arc-20240116; t=1753234221; c=relaxed/simple;
+	bh=3E1gRrFaeCrEyCBmb1gLjo97LjP+ccCXOTC9zsWGrFY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=InuRV53p/rv7FW2DCVZQQD0TAqZBChVWRVFC/WTnfAkCwIrtl8ZPS7ClYQr8hnHMBfqIyQQaJIg055GgmAkqFELeFf1o+iR2h8vveVgAvUHOlq0i/Bb19LcGi1jHnGlpdriNaGGgm4UWgRFEox5U4JX7f1Jkdqoy5PtsVs51IaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nMFmQA/i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA8DFC4CEEB;
-	Wed, 23 Jul 2025 01:30:18 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=qiuJh8xpEms8WG0JJUh/65iKR64wTE06zHDLB7Kl+PE66d+FQblYzC1QKL5wS3l0RfEkVl57N+A+CF/MdxydTlkmlW+i6P091b/zpgJh3YWEScdn+9w/lQmZU/zKOaLnkxaR+JOJUg9KsAyWxkdEPL27KHZUcz/VWCVPVyKUpGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JcqjIfoa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AA36C4CEEB;
+	Wed, 23 Jul 2025 01:30:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753234218;
-	bh=IZ4nWfDXHA9JxsyQg6ERpoS0dG2FhhBiten7oPTuzXc=;
+	s=k20201202; t=1753234220;
+	bh=3E1gRrFaeCrEyCBmb1gLjo97LjP+ccCXOTC9zsWGrFY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nMFmQA/iR3+kxLvvea4ldB9z1M+lgINnmQos4GR2GQG/48GopTiCkWdr01gJXQnFo
-	 BrsQWRxWoTddlFpQUduYWp0Cv+tEF7Px9XjodYRFrqQ8F1wZm26sXswhdWRKY9b5+J
-	 KfpDy8dL971UNnqZjbzOubCH4c6KoXVW1ZD9wzrZsYB3l1Jfu9A1j1Yf1hNis9jSwk
-	 zEcEWjL9wCQzF6MpHPpef3jKIg+Cyksp9j1SDm6ehBY5sw5w9g+RB+hC6kREYDmcyp
-	 NKHwdvsyw3X0aHEfZxIdAPUB3yV3hh4BnV2IWv4Id7QAuZN+E26aWsoAU3moiTQe+t
-	 O5gM0QNkui8Yg==
+	b=JcqjIfoa7UagvsAZzk0ZhGUiFcnAufyTjUhy2sciWBBPAgn/aBTwDhSYZsJcT+5Ab
+	 dXIXtAamC5gMME/AVw1OVe4LdTMNZkLhlQ8CxYTkSdYr5KhNbp5LQvQ8+wTauGU7vk
+	 fXqEkvlzmxwEd6UNjpuHmUuhNNNRMcplsDZ4WAu87w09Vl4RUGTc+2xbniSXzF5rcm
+	 6dS6AUDW9yHMjKElP/mnAMxm4yIsVNOXjDVz8d69CYvbs+MAqbOkBcHfddV1GO3gg0
+	 PRiYe37omdJN7bwskIl1bbyeFixo5uuPEF6x+bx6NgHS5bglBBudoKmP48r40OI4+T
+	 s82HwINcv0cog==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CA5383BF5D;
-	Wed, 23 Jul 2025 01:30:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD7C383BF5D;
+	Wed, 23 Jul 2025 01:30:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,53 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re:
- =?utf-8?q?=5BPATCH_net-next_v7_RESEND=5D_tcp=3A_trace_retransmit_fa?=
-	=?utf-8?q?ilures_in_tcp=5Fretransmit=5Fskb?=
+Subject: Re: [PATCH net-next V6 0/5] selftests: drv-net: Test XDP native
+ support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175323423699.1016544.6003435130769991135.git-patchwork-notify@kernel.org>
-Date: Wed, 23 Jul 2025 01:30:36 +0000
-References: <20250721111607626_BDnIJB0ywk6FghN63bor@zte.com.cn>
-In-Reply-To: <20250721111607626_BDnIJB0ywk6FghN63bor@zte.com.cn>
-To:  <fan.yu9@zte.com.cn>
-Cc: kuba@kernel.org, edumazet@google.com, ncardwell@google.com,
- davem@davemloft.net, dsahern@kernel.org, pabeni@redhat.com, horms@kernel.org,
- kuniyu@google.com, rostedt@goodmis.org, mhiramat@kernel.org,
- mathieu.desnoyers@efficios.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- yang.yang29@zte.com.cn, xu.xin16@zte.com.cn, tu.qiang35@zte.com.cn,
- jiang.kun2@zte.com.cn, qiu.yutan@zte.com.cn, wang.yaxin@zte.com.cn,
- he.peilin@zte.com.cn
+ <175323423849.1016544.9128937268934260157.git-patchwork-notify@kernel.org>
+Date: Wed, 23 Jul 2025 01:30:38 +0000
+References: <20250719083059.3209169-1-mohsin.bashr@gmail.com>
+In-Reply-To: <20250719083059.3209169-1-mohsin.bashr@gmail.com>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ shuah@kernel.org, horms@kernel.org, cratiu@nvidia.com, noren@nvidia.com,
+ cjubran@nvidia.com, mbloch@nvidia.com, jdamato@fastly.com, gal@nvidia.com,
+ sdf@fomichev.me, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, nathan@kernel.org, nick.desaulniers+lkml@gmail.com,
+ morbo@google.com, justinstitt@google.com, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, llvm@lists.linux.dev
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 21 Jul 2025 11:16:07 +0800 (CST) you wrote:
-> From: Fan Yu <fan.yu9@zte.com.cn>
+On Sat, 19 Jul 2025 01:30:54 -0700 you wrote:
+> This patch series add tests to validate XDP native support for PASS,
+> DROP, ABORT, and TX actions, as well as headroom and tailroom adjustment.
+> For adjustment tests, validate support for both the extension and
+> shrinking cases across various packet sizes and offset values.
 > 
-> Background
-> ==========
-> When TCP retransmits a packet due to missing ACKs, the
-> retransmission may fail for various reasons (e.g., packets
-> stuck in driver queues, receiver zero windows, or routing issues).
+> The pass criteria for head/tail adjustment tests require that at-least
+> one adjustment value works for at-least one packet size. This ensure
+> that the variability in maximum supported head/tail adjustment offset
+> across different drivers is being incorporated.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v7,RESEND] tcp: trace retransmit failures in tcp_retransmit_skb
-    https://git.kernel.org/netdev/net-next/c/ad892e912b84
+  - [net-next,V6,1/5] net: netdevsim: hook in XDP handling
+    https://git.kernel.org/netdev/net-next/c/be09f0d1acce
+  - [net-next,V6,2/5] selftests: drv-net: Test XDP_PASS/DROP support
+    https://git.kernel.org/netdev/net-next/c/1cbcb1b28b26
+  - [net-next,V6,3/5] selftests: drv-net: Test XDP_TX support
+    https://git.kernel.org/netdev/net-next/c/6713945726ce
+  - [net-next,V6,4/5] selftests: drv-net: Test tail-adjustment support
+    https://git.kernel.org/netdev/net-next/c/0b65cfcef9c5
+  - [net-next,V6,5/5] selftests: drv-net: Test head-adjustment support
+    https://git.kernel.org/netdev/net-next/c/d6444ebc97dc
 
 You are awesome, thank you!
 -- 
