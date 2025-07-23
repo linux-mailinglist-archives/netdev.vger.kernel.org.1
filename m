@@ -1,287 +1,99 @@
-Return-Path: <netdev+bounces-209401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48990B0F806
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 18:25:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 372B1B0F80D
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 18:26:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76F80547977
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 16:25:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E70E1CC2F51
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 16:26:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9584D1F0994;
-	Wed, 23 Jul 2025 16:25:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC1331EB5DD;
+	Wed, 23 Jul 2025 16:25:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="liLifVWL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HOTbVh+k"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E8F01C1AAA;
-	Wed, 23 Jul 2025 16:24:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE14157E99
+	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 16:25:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753287901; cv=none; b=QW1UeUG3XbllswzGyEcRQlgBfzn/lRCsKI4gATDcutUxFNrNXt7BEhii3AQ4hkXXV+1phvm244c/xZTrW/tMYEOOO3ULoTH/LfeEeFt3/4FbDJL2e0m7p3+vrF8hosokIxjNi9THnQIaLdd84Wo2esVt5yowWH158S49Pt7rBAE=
+	t=1753287953; cv=none; b=kFrPZDCFu5uvuhEjN+daRwG5d9BKDlkWXueSNytpJ0FRsBWX07OB9KrjGfxZC30Q2T1WI8GatfK3pbpxkqAxHOXWsqcYgJdBihoXhjsSrWj8Sr5pNT4msOB9Rc1qmS+P6O15bXjjdkEi3hZ/FBJ/7ieOZ241WBv8IfOAqqANAgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753287901; c=relaxed/simple;
-	bh=+yH5sdRuy5JtUTts9MfUfZZCJprgFstIzCLKlBAEnhc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IxVHUOt3JNRpi4vCSA6MN4l9SNHqaEQsjZV3TKxsUeCWNL7beIebS2C9DWEl17foFps0dBM9vZL97mLRtttD2d/3BDww0Ekb2w0trfuE6EHpEDL3OBbSYggbaDxnbk7esRlWh7dtV2WuqDgLlbdWhMlENgGts8l7Gzd0g5YPGyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=liLifVWL; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=zZNfuBfgB8dRySkDcZcabnnOZgPd4ahYjtj3I0BOkM4=; b=liLifVWLrTxGNp03U4ezUOaAcM
-	kl7wHLDNErluVHrsCzFpLad3A/KqCtnUpyr3eFfWTFeV57VEatuR6kyvyxrGBZ6isu2L2UwzHYOaR
-	Vj24hXdbxfa2gaUtS3K/HWa+DrZ/czeRVIrpr5mNRBnd08VndPL8P6CUVzNAjM3crXcs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uecGS-002fSW-KG; Wed, 23 Jul 2025 18:24:20 +0200
-Date: Wed, 23 Jul 2025 18:24:20 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Fan Gong <gongfan1@huawei.com>, Lee Trager <lee@trager.us>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
-	Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/5] net: rpmsg-eth: Add Documentation for
- RPMSG-ETH Driver
-Message-ID: <81273487-a450-4b28-abcc-c97273ca7b32@lunn.ch>
-References: <20250723080322.3047826-1-danishanwar@ti.com>
- <20250723080322.3047826-2-danishanwar@ti.com>
+	s=arc-20240116; t=1753287953; c=relaxed/simple;
+	bh=crGSmEZZzBdX5XwVo1TjX4JZzyiOlGt+tkX5ORlR/dM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=eBOiVWAH0BzsSl+LLXYrPjmsSqN49Pio/IClDdOT7HEHrTs8E5YdfxZff8xrJDfLxiaSSDrjy7Snna1UDn0kXsSpEyLWR4H6iASxxDSRfZrp9y3fQ7NQRD4/KvHhfHNK1i2AJvWL+lUlPUYBhTVHVKM/uYuUFblSqioQikuE+wk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--nogikh.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HOTbVh+k; arc=none smtp.client-ip=209.85.221.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--nogikh.bounces.google.com
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3af3c860ed7so14946f8f.1
+        for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 09:25:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753287950; x=1753892750; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=C7nlf4Cqx5uEEwMr05M8xGLym6bdF69iKrcAxYvQRwA=;
+        b=HOTbVh+kaMfLmxlJdO7VY6gY0F/XY8jp0OO1Hiy7br9DFCyf/HRdohTzqlfomENCnN
+         qv2Zp6yzfMkVIzjkhsUk/oI150/x6qaXhz4/yECOYjdrVsupRGn2NJuBR8GO4Z07C7tJ
+         RUa/CHIOmagVTfBzxtDmsjNJ+NhnDcXk/yLb8pGg0ZEEAKTERkGLA7utNaRRVDMhSE4q
+         /QhQL48UCYCGlCaQYvW1eixLGiQerdnsVlHxSwNCeCwS9JLQ3i4XtUUkSa2dccsn44kJ
+         gAgB3gRMOM1Vo+QlEdYDzbkTwSK/2NnDvmt12wGekd4WKeRw2oLlPywL5GC2fY1yYBMV
+         TOzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753287950; x=1753892750;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=C7nlf4Cqx5uEEwMr05M8xGLym6bdF69iKrcAxYvQRwA=;
+        b=Pb7DGM0SL2ALMpWHMbYZWvVA4XnTLVCOpd0g5JWbdLWwftJb8AkKkvCdoDhHeVHJMR
+         I52h/5fYuwrFdGJbMw2YaAmcRVcIGuckUO5LL0EpEamijLItjTn/jJj2OJ7jlSCAoOPH
+         ZaH0IklKSwZs/CqQlRJBpd2xuy27qKQ3VPfe+d9n17jzgx0qZwVTmQVhtfdD8ZsKwmKD
+         d9hii8KTSlRzLDkfgBZ2H3IU1ZzIDuPyJ7hsZkz1XhCLlyGwonYVVAZzn98VfWOicQHe
+         +IorqVcrzGxGuXz66eW0xM+NiGWP1RhXbzCEBtTAxGj/ahMx1wOktiKw0QPSh+fw0fJJ
+         YPqA==
+X-Forwarded-Encrypted: i=1; AJvYcCUPLhoAXKqoy7VycZsR0O32r2kY9ikrI4j5TaLUfAplfLM6YN4nTOg3YMDV2501xzt9VglSvgU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxH6Gj6UEVblghAtzZbqqyYluz8ftO2Nw0/B+PDMiGLxm7Xugfw
+	hf9XjePvTMJ6aaFbnHNRi4A0fNfsBCggcQnoaqG+uNxJqX00c0BrBAQbeXX3kfMBw4CsjsQSbx8
+	7pAxP2w==
+X-Google-Smtp-Source: AGHT+IF1gZj7uYUs8D8ao+ag5oMJ8erDSIHrlj2XvlP24E0UVjCruiGOe8gDPJKfTVGemA9iyDmfCNj918Y=
+X-Received: from wrnt1.prod.google.com ([2002:adf:eb81:0:b0:3b6:1610:fc9f])
+ (user=nogikh job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:2c03:b0:3a4:f975:30f7
+ with SMTP id ffacd0b85a97d-3b768f12e09mr3084562f8f.56.1753287950449; Wed, 23
+ Jul 2025 09:25:50 -0700 (PDT)
+Date: Wed, 23 Jul 2025 18:25:47 +0200
+In-Reply-To: <20250722100743.38914e9a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250723080322.3047826-2-danishanwar@ti.com>
+Mime-Version: 1.0
+References: <20250722100743.38914e9a@kernel.org>
+X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
+Message-ID: <20250723162547.1395048-1-nogikh@google.com>
+Subject: Re: Re: [syzbot ci] Re: net: Revert tx queue length on partial
+ failure in dev_qdisc_change_tx_queue_len()
+From: Aleksandr Nogikh <nogikh@google.com>
+To: kuba@kernel.org
+Cc: dvyukov@google.com, edumazet@google.com, 
+	linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, syzbot@lists.linux.dev, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-> --- a/Documentation/networking/device_drivers/ethernet/index.rst
-> +++ b/Documentation/networking/device_drivers/ethernet/index.rst
-> @@ -61,6 +61,7 @@ Contents:
->     wangxun/txgbevf
->     wangxun/ngbe
->     wangxun/ngbevf
-> +   rpmsg_eth
+Hi Jakub,
 
-This list is sorted. Please insert at the right location. I made the
-same comment to somebody else this week as well....
+On Tue, 22 Jul 2025 Jakub Kicinski wrote:
+> I think this email is missing a References: header ?
+> It doesn't get threaded properly.
 
-> +This driver is generic and can be used by any vendor. Vendors can develop their
-> +own firmware for the remote processor to make it compatible with this driver.
-> +The firmware must adhere to the shared memory layout, RPMSG communication
-> +protocol, and data exchange requirements described in this documentation.
+Yes, that was indeed a bug that has now been fixed, thanks for
+reaching out!
 
-Could you add a link to TIs firmware? It would be a good reference
-implementation. But i guess that needs to wait until the driver is
-merged and the ABI is stable.
-
-> +Implementation Details
-> +----------------------
-> +
-> +- The magic number is defined as a macro in the driver source (e.g.,
-> +  ``#define RPMSG_ETH_SHM_MAGIC_NUM 0xABCDABCD``).
-> +- The firmware must write this value to the ``magic_num`` field of the head and
-> +  tail structures in the shared memory region.
-> +- During the handshake, the Linux driver reads these fields and compares them to
-> +  the expected value. If any mismatch is detected, the driver will log an error
-> +  and refuse to proceed.
-
-So the firmware always takes the role of "primary" and Linux is
-"secondary"? With the current implementation, you cannot have Linux on
-both ends?
-
-I don't see this as a problem, but maybe it is worth stating as a
-current limitation.
-
-> +Shared Memory Layout
-> +====================
-> +
-> +The RPMSG Based Virtual Ethernet Driver uses a shared memory region to exchange
-> +data between the host and the remote processor. The shared memory is divided
-> +into transmit and receive regions, each with its own `head` and `tail` pointers
-> +to track the buffer state.
-> +
-> +Shared Memory Parameters
-> +------------------------
-> +
-> +The following parameters are exchanged between the host and the firmware to
-> +configure the shared memory layout:
-
-So the host tells the firmware this? Maybe this is explained later,
-but is the flow something like:
-
-Linux makes an RPC call to the firmware with the parameters you list
-below. Upon receiving that RPC, the firmware puts the magic numbers in
-place. It then ACKs the RPC call? Linux then checks the magic numbers?
-
-> +1. **num_pkt_bufs**:
-> +
-> +   - The total number of packet buffers available in the shared memory.
-> +   - This determines the maximum number of packets that can be stored in the
-> +     shared memory at any given time.
-> +
-> +2. **buff_slot_size**:
-> +
-> +   - The size of each buffer slot in the shared memory.
-> +   - This includes space for the packet length, metadata, and the actual packet
-> +     data.
-> +
-> +3. **base_addr**:
-> +
-> +   - The base address of the shared memory region.
-> +   - This is the starting point for accessing the shared memory.
-
-So this is the base address in the Linux address space? How should the
-firmware convert this into a base address in its address space?
-
-> +4. **tx_offset**:
-> +
-> +   - The offset from the `base_addr` where the transmit buffers begin.
-> +   - This is used by the host to write packets for transmission.
-> +
-> +5. **rx_offset**:
-> +
-> +   - The offset from the `base_addr` where the receive buffers begin.
-> +   - This is used by the host to read packets received from the remote
-> +     processor.
-
-Maybe change 'host' to 'Linux'? Or some other name, 'primary' and
-'secondary'. The naming should be consistent throughout the
-documentation and driver.
-
-Part of the issue here is that you pass this information from Linux to
-the firmware. When the firmware receives it, it has the complete
-opposite meaning. It uses "tx_offset" to receive packets, and
-"rx_offset" to send packets. This can quickly get confusing. If you
-used names like "linux_tx_offset", the added context with avoid
-confusion.
-
-> +Shared Memory Structure
-> +-----------------------
-> +
-> +The shared memory layout is as follows:
-> +
-> +.. code-block:: text
-> +
-> +      Shared Memory Layout:
-> +      ---------------------------
-> +      |        MAGIC_NUM        |   rpmsg_eth_shm_head
-> +      |          HEAD           |
-> +      ---------------------------
-> +      |        MAGIC_NUM        |
-> +      |        PKT_1_LEN        |
-> +      |          PKT_1          |
-> +      ---------------------------
-> +      |           ...           |
-> +      ---------------------------
-> +      |        MAGIC_NUM        |
-> +      |          TAIL           |   rpmsg_eth_shm_tail
-> +      ---------------------------
-> +
-> +1. **MAGIC_NUM**:
-> +
-> +   - A unique identifier used to validate the shared memory region.
-> +   - Ensures that the memory region is correctly initialized and accessible.
-> +
-> +2. **HEAD Pointer**:
-> +
-> +   - Tracks the start of the buffer for packet transmission or reception.
-> +   - Updated by the producer (host or remote processor) after writing a packet.
-
-Is this a pointer, or an offset from the base address? Pointers get
-messy when you have multiple address spaces involved. An offset is
-simpler to work with. Given that the buffers are fixed size, it could
-even be an index.
-
-> +Information Exchanged Between RPMSG Channels
-> +--------------------------------------------
-> +
-> +1. **Requests from Host to Remote Processor**:
-
-Another place where consistent naming would be good. Here it is the
-remote processor, not firmware used earlier.
-
-> +
-> +   - `RPMSG_ETH_REQ_SHM_INFO`: Request shared memory information, such as
-> +     ``num_pkt_bufs``, ``buff_slot_size``, ``base_addr``, ``tx_offset``, and
-> +     ``rx_offset``.
-
-Is this requested, or telling? I suppose the text above uses "between"
-which is ambiguous.
-
-> +3. **Notifications from Remote Processor to Host**:
-> +
-> +   - `RPMSG_ETH_NOTIFY_PORT_UP`: Notify that the Ethernet port is up and ready
-> +     for communication.
-> +   - `RPMSG_ETH_NOTIFY_PORT_DOWN`: Notify that the Ethernet port is down.
-> +   - `RPMSG_ETH_NOTIFY_PORT_READY`: Notify that the Ethernet port is ready for
-> +     configuration.
-
-That needs more explanation. Why would it not be ready? 
-
-> +   - `RPMSG_ETH_NOTIFY_REMOTE_READY`: Notify that the remote processor is ready
-> +     for communication.
-
-How does this differ from PORT_READY?
-
-> +How-To Guide for Vendors
-> +========================
-> +
-> +This section provides a guide for vendors to develop firmware for the remote
-> +processor that is compatible with the RPMSG Based Virtual Ethernet Driver.
-> +
-> +1. **Implement Shared Memory Layout**:
-> +
-> +   - Allocate a shared memory region for packet transmission and reception.
-> +   - Initialize the `MAGIC_NUM`, `num_pkt_bufs`, `buff_slot_size`, `base_addr`,
-> +     `tx_offset`, and `rx_offset`.
-> +
-> +2. **Magic Number Requirements**
-> +
-> +   - The firmware must write a unique magic number (for example, ``0xABCDABCD``)
-
-Why "for example"? Do you have a use case where some other value
-should be used? Or can we just make this magic value part of the
-specification?
-
-> +- The driver assumes a specific shared memory layout and may not work with other
-> +  configurations.
-> +- Multicast address filtering is limited to the capabilities of the underlying
-> +  RPMSG framework.
-
-I don't think there is anything special here. The network stack always
-does perfect address filtering. The driver can help out, by also doing
-perfect address filtering, or imperfect address filtering, and letting
-more through than actually wanted. Or it can go into promiscuous mode.
-
-> +- The driver currently supports only one transmit and one receive queue.
-> +
-> +References
-> +==========
-> +
-> +- RPMSG Framework Documentation: https://www.kernel.org/doc/html/latest/rpmsg.html
-
-This results in 404 Not Found.
-
-     Andrew
+-- 
+Aleksandr
 
