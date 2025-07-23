@@ -1,106 +1,85 @@
-Return-Path: <netdev+bounces-209543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D839BB0FCEF
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 00:33:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDB87B0FCA1
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 00:21:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B0D2A7B8EB7
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 22:32:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E864C586ACE
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 22:21:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C07E273817;
-	Wed, 23 Jul 2025 22:32:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 842F0270559;
+	Wed, 23 Jul 2025 22:21:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=n621.de header.i=@n621.de header.b="oWz675rP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IZIvS/82"
 X-Original-To: netdev@vger.kernel.org
-Received: from nyx.n621.de (v4gw.hekate.n621.de [136.243.2.102])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76237273D60;
-	Wed, 23 Jul 2025 22:32:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=136.243.2.102
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5880F215F4B;
+	Wed, 23 Jul 2025 22:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753309949; cv=none; b=Tt+ql2BaAM8XGVP7n7O2s9TheXOyaJWD4kvWdZWpU3tFOcwxRTfSXPkmhO3cuig2ZANRozRaG6sUCTLeZEioUlXcaXt9LC9CsHfuQ5uO72ClfbwkfOIleadeCiXf4H7j4/Okc8p54SC7Y3gG5RrLmhuaVWBTSw7vH3YztGNiIMQ=
+	t=1753309313; cv=none; b=BIbAz6vQbVzGi7ch1yrwJFvGM/2OND4UJeVvErXF86bNThksrm3Y7jKMW2UrDLMS/qUdRaIpa3HZrfEmrVYK2gJanj0SUfFbq2fUHdWTSDTG/bCyABIAxQ272oWE1jMq5T73FzM8JWqSEJG2p9ULLaugmkkfjSlBtzKI6p5N6RY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753309949; c=relaxed/simple;
-	bh=H5dLFQLR80zyzGXaWyzLG3KAZqe+SuFTxe0PJa5w1d8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GKugATd6iYbpaOd1f/olkF2Hz57o9g/7Rr7ojL8o9g2WqcS/yLy4mVG/0+OYUendugh9ZIKzEr7MntudYPu8TeBWsaWp1mVrYBxuAq68RDnLsKcgGyaV8aUGVQbsq3Hsuvl4Ejl7KiApsRVrnTPCXsrBDjPpB4bR7tQX9WY604U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=n621.de; spf=pass smtp.mailfrom=n621.de; dkim=pass (1024-bit key) header.d=n621.de header.i=@n621.de header.b=oWz675rP; arc=none smtp.client-ip=136.243.2.102
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=n621.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=n621.de
-Received: from eos.home.n621.de (localhost [127.0.0.1])
-	by nyx.n621.de (Postfix) with ESMTP id C3180E002AF;
-	Thu, 24 Jul 2025 00:23:07 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=n621.de; s=dkim;
-	t=1753309388;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=FHC/FhBnpS0kU/U/rZh5/dUh3Fl0ZDAJeeBOGbTp50w=;
-	b=oWz675rPKlbZ8OpIlElDVCiM0hlKbtAlMQXiZgApQrxC60YFH1+4XN+WBCeiRI/tgBvpqx
-	dwKUOxDqmcDxisZNyDbkU5VfumbdCGVasDhAWVbEoBKJoGpTQQswaMppEeyCicAHZ8N+M6
-	F9F/zPRieeit9ayyuNE9vFwu73MBnps=
-From: Florian Larysch <fl@n621.de>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Divya.Koppera@microchip.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Florian Larysch <fl@n621.de>,
-	stable@vger.kernel.org
-Subject: [PATCH net] net: phy: micrel: fix KSZ8081/KSZ8091 cable test
-Date: Thu, 24 Jul 2025 00:20:42 +0200
-Message-ID: <20250723222250.13960-1-fl@n621.de>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1753309313; c=relaxed/simple;
+	bh=8PVTetr6krJCl5NHxCBpcVdg4mQmrN6W/cxBYHIjJ4I=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=q2kLen3IUl5FBnAbmzKhZnu7UR0MbicrmgiTP9mrSj2MQsj1OBiTlcBETBWYlZyP5asSYFn58GsekALkVDek89u3CpGRZSZxgluphzenbAZwvdCztmnIVkLbB2sdViqwWYI5ME8PXflBH2rUdflWj0JS3DechZysJWvyLWIjt1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IZIvS/82; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FDC9C4CEE7;
+	Wed, 23 Jul 2025 22:21:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753309312;
+	bh=8PVTetr6krJCl5NHxCBpcVdg4mQmrN6W/cxBYHIjJ4I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IZIvS/82VzPmU6FCNpG9SyyBLyy6kdbb+itSmVciLY6C2X6rVe/E3E0wJ8JMx06R4
+	 ggQBvsmkb0+ST8NcyCST6kG73J5MdLUg230qEwQRWdmtKNx7DlgUGa89HpDCN4Jblc
+	 rqmvYyR2LmgKHS2WMqeaCEo4xH5Faa+koafuAUAT5JUneqczexdvmbgSRkkuyGMGre
+	 6susTZcUBSBTjqhQOPaDM4lUn3W4vCQbVgsTXTe/Ur9b3+XMBxraHKHVPYF+zJIosh
+	 zSWxM1NlZTYnMgKNkJ/jrlcSgBDxoFuYQKOp2PrfSUcqFr1gNg3mx96gQD+88KDarq
+	 reo57r7VpTjaw==
+Date: Wed, 23 Jul 2025 15:21:51 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: yicongsrfy@163.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ linux-usb@vger.kernel.org, netdev@vger.kernel.org, oneukum@suse.com,
+ yicong@kylinos.cn
+Subject: Re: [PATCH] usbnet: Set duplex status to unknown in the absence of
+ MII
+Message-ID: <20250723152151.70a8034b@kernel.org>
+In-Reply-To: <d8852211-e3ba-4c9e-a9ab-798e1b8d802e@lunn.ch>
+References: <1c65c240-514d-461f-b81e-6a799f6ea56f@lunn.ch>
+	<20250723012926.1421513-1-yicongsrfy@163.com>
+	<d8852211-e3ba-4c9e-a9ab-798e1b8d802e@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Commit 21b688dabecb ("net: phy: micrel: Cable Diag feature for lan8814
-phy") introduced cable_test support for the LAN8814 that reuses parts of
-the KSZ886x logic and introduced the cable_diag_reg and pair_mask
-parameters to account for differences between those chips.
+On Wed, 23 Jul 2025 15:05:27 +0200 Andrew Lunn wrote:
+> > > Thanks for checking this.
+> > >
+> > > Just one more question. This is kind of flipping the question on its
+> > > head. Does the standard say devices are actually allowed to support
+> > > 1/2 duplex? Does it say they are not allowed to support 1/2 duplex?
+> > >
+> > > If duplex is not reported, maybe it is because 1/2 duplex is simply
+> > > not allowed, so there is no need to report it.
+> > >  
+> > 
+> > No, the standard does not mention anything about duplex at all.  
+> 
+> O.K. So please set duplex to unknown.
 
-However, it did not update the ksz8081_type struct, so those members are
-now 0, causing no pairs to be tested in ksz886x_cable_test_get_status
-and ksz886x_cable_test_wait_for_completion to poll the wrong register
-for the affected PHYs (Basic Control/Reset, which is 0 in normal
-operation) and exit immediately.
-
-Fix this by setting both struct members accordingly.
-
-Fixes: 21b688dabecb ("net: phy: micrel: Cable Diag feature for lan8814 phy")
-Cc: stable@vger.kernel.org
-Signed-off-by: Florian Larysch <fl@n621.de>
----
- drivers/net/phy/micrel.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 64aa03aed770..50c6a4e8cfa1 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -472,6 +472,8 @@ static const struct kszphy_type ksz8051_type = {
- 
- static const struct kszphy_type ksz8081_type = {
- 	.led_mode_reg		= MII_KSZPHY_CTRL_2,
-+	.cable_diag_reg		= KSZ8081_LMD,
-+	.pair_mask		= KSZPHY_WIRE_PAIR_MASK,
- 	.has_broadcast_disable	= true,
- 	.has_nand_tree_disable	= true,
- 	.has_rmii_ref_clk_sel	= true,
+.. and update the commit message and the code comment to reflect 
+the outcome of the discussion better.
 -- 
-2.50.1
-
+pw-bot: cr
 
