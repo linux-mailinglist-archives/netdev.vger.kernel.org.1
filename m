@@ -1,148 +1,129 @@
-Return-Path: <netdev+bounces-209277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4818EB0EE17
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 11:10:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7C98B0EE31
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 11:17:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB127188531D
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 09:09:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D890568549
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 09:17:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5AA72820DC;
-	Wed, 23 Jul 2025 09:09:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BC45286881;
+	Wed, 23 Jul 2025 09:16:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KrPjcOkq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35BA9283137
-	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 09:09:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48104285C8C
+	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 09:16:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753261777; cv=none; b=qLo5BWQIoTCneEf8oCGYJJo0jHwo4KwVIKW45Y4AFj5lXxJuL4Wt9VuVQllJG8aFMDq5C1f0OKy9JvrvDL7JTc5PnXF9VdNKvBDbM8potIF/6UxL3o1fgNBH2fGUAIfEc4nYaQey5xN1CuPK+u/pHdNHeAF/7tV5D0Eiff+H8OQ=
+	t=1753262213; cv=none; b=FFE3vmzGJjNE0iNrDvFiMzoV6M9n2nAysQi5qsB9hqRHnON1qvbA9wEwRbJks4TVcmDB0A1QYzJJg3vvLY/7PAp3ENZmxfjaTJt57vUSi1dQcRkEfmY6ikYi8gqAboRI2m+rYvrq7tU6paC2LycNJKypfTVyogmGYsSM6qqEtL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753261777; c=relaxed/simple;
-	bh=/yGUGKAhGBPBrwTTEOjI9B+HkXKztIO+0eBa5uesc3s=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=E2KFoxTxD/CNfwMq3sSSGBvtVLhTQUlU9ivYOWJDc3IubWECfjQmHAbZD13vvHG110F3SjL5FIZ5iFohuFj9IJ6SYTKXassWpoNFLcs5b+M8OcAO6/nX6CgqxNTa4BZeNU8LksqcCKdTHQ8A3JP9oq9HhRVwiZy501ygUeJp4hM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-87c1d1356f3so429342539f.0
-        for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 02:09:35 -0700 (PDT)
+	s=arc-20240116; t=1753262213; c=relaxed/simple;
+	bh=H2BNf5Y5uuCCMCMObzAj3YltF4GdXLPf3RclMeTe/Zk=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=C70/zxVOngK0VuMZrTOMFhXmcgn8ObWo/gUcjDnHcJHg7hlhHN9rCZeG2EBtjupH9Bud+IMMTY83urGWXLhNyJ7DC135SHjcYiZumUUVEDReLCWYuyROgXqNex+sUgeMXaPHWyLQDSzw5k2xdHstVF156i0869fuBjRgd5c1uq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KrPjcOkq; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-451d7b50815so48761285e9.2
+        for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 02:16:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753262210; x=1753867010; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/BBaMS1j5ATUviYrmEB8vJyo66orVWQCLaLlvtMv/PE=;
+        b=KrPjcOkqPp2c3la2moGyfUIIj6nwU7sj1wRVBvSe4aicvgLF3kvuZQPMDKhFJS8VGB
+         DT0fMn+3QuV/ircKBIxd0rjt0v1ACuNhrh5YgBQFhdxQNcdXZOGD9KycfP45ZkZFyzal
+         XXyIz/z56bhyu9ZOVOO/VY/erOGhhVnCYWV9J0JUS1ii+B0/C2L8A6W/9XK6pGsTf8dX
+         jFHbApNU2vHo7+JJfZVlyap03xBVfLoXr3lrnO1ryPyb4/vN6ZxMrfATAI2MSbqsDoil
+         1DhTE8TSf/dFeTXDm4GySkUkirAL9mlHwBjXizZ+VeXKUeUi3oT+9Wp33upWvukyEv50
+         sa4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753261775; x=1753866575;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TvFG3sQTKMwo29OtOJz9i/cr+68WnmlBBDZAn9btd1A=;
-        b=wBnrLw1qNfg2vTmZi569hffM15pIg7G1oiyMu9IY0a/l0jMiY4wcdhEPrxpRVuammZ
-         xiaCk1XS3rS2sLmPqc5sySs+oMVCXjibM9YIUyPSJ/7fVAC6NVYpdbEy292Dt4jhV8su
-         z305o+voxBaWupQxwGjbZ/JhaYIL0v98wn6Qd9DOkYuwc7RO3LbXBLND+bSjIviHYeuN
-         RM9bdiy4325yZfnO3RGwSWdlkVnnMlKxVtGm9rc64NeYEwAqsOsYeeK+cwvVkSy4ALHt
-         5SDKskssZq7moxrEWv+lJAksqUD+1kk9DuzywRhV6X2Hlu+qou8WoUENub0uRe1dWQLV
-         +l8w==
-X-Forwarded-Encrypted: i=1; AJvYcCX7HZaZ4+73YI+t3YMUrEDQesIgFhfRQql3jTvuWyJwRrzq2K885DYY1oMtA7tiDEHq5MiLj6o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1pXHk1gG7VVFTYtbpIrMqiR22WnWx/gWnbu3hu2aJ2TgYu0my
-	A+xXY3fhQeSJqqXaLjWI0oXLmwH2h8E0XvPo4b5Cn/Il75dJgbXjbhvq0NHZkA+DWuJZtNlU45r
-	H8v/3dmVMTbVYU5FhT7NBH6i2Zn9PzxEGKcoaLA3DvmpWAzYGnzYp2FilQRo=
-X-Google-Smtp-Source: AGHT+IFAeZxnWZN6oyV6j+V0s/nOmFK6pRexyplCpc2+fX0UQLepZSpXUWTIKp0c4WkSDYL6cj51kYBhiyyzzpLl/WkoydOWc6oG
+        d=1e100.net; s=20230601; t=1753262210; x=1753867010;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/BBaMS1j5ATUviYrmEB8vJyo66orVWQCLaLlvtMv/PE=;
+        b=TSi1pm9gd+4fP0dsrrUuJGZ3Tjoyzfig+phyAEQp3pTjss1DEoP6xWQkpeonPs8lhb
+         AWfE793XsAEXRpmnZ478gR45WYWsEUXZTbbR1cebDHgM6ARz68hDmv36BM2rRaGbhO+N
+         d8yhhZRA1HjmF8jkKWRFFtmCLmJ9nX8C+fUX0lR3Bh815wlx70XPLf3q1C9A0vC8OGnL
+         DAXO/NgFC7uLvGhWBxGWc7XOejG60QFFsSJQwzL0C6bO28vz8Xb0vCRYo9D1lm/NwBze
+         ESVwG7lGV2W3ugYnBUfwJwd1dSYurfIZa+LjElOrRSbxtQZuu1F6Z+g+BwkLz5UbXO1j
+         b+iw==
+X-Forwarded-Encrypted: i=1; AJvYcCXHW59uNCzRohDA0Sfv5PcH9Bm6lUULtSPpsxlN1DYLAx24V7UXHLnZIv2vfM1YST4nWhTBzaw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqRjtJnAO1B9WJRFX6VPuEc9Ix2cROIV1UE+3g00EHwJMG0UOr
+	IwbdIGxHvY220sPD8Kao6JyT65otdkAZrpdOZ/xRbkXFM3fO3fDcLZcM
+X-Gm-Gg: ASbGncsjQs7fhAEYGFgjol1MpnB0w5fPQUS1ff53V51kb4aNT4JsX5G4uf/LybsqpLi
+	HKSvyTOlTRXAYN/hZu2AgD/nqojf7Ffj4N26BMAFMRijmlBFvFzWgnuWSRBNxkFHF8AIlD9d2+P
+	9708LTq5cve0eaHfIE32iLxRbRQINAYfsSQm6L8ON/Q6WQ6jHCwXm7qFH+9HaL8KjxxlNKPnD5r
+	fmN0vszWTEzsWbp/mhZgFvCJwJUUGjpM682BrSwbiVeiWCusrwtoS1QeoXf4Zf0D9nVwULzEBCF
+	NCpf5fLICG6nEIBzWM8JSVHc8IixZyfhSLo0b5KSgCFFYzb8brZYLx1JtPBa70STtFBOgOSiFQx
+	js8tidq+yPAFl+hR075zN7ZyEMKs+E3XFdYk2SAMxt3pr
+X-Google-Smtp-Source: AGHT+IHgbw+fEb+VtAoYqIxGrVSbC+2a/HD4oq3nmC8izdKmyE4mLfnDCzYCv324Yui+3gHKCGi6lQ==
+X-Received: by 2002:a05:6000:2505:b0:3b5:e2c9:fa05 with SMTP id ffacd0b85a97d-3b768cb1908mr1329691f8f.18.1753262210351;
+        Wed, 23 Jul 2025 02:16:50 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:b8c1:6477:3a30:7fe])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca48719sm15929925f8f.47.2025.07.23.02.16.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Jul 2025 02:16:49 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
+  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
+  almasrymina@google.com,  sdf@fomichev.me
+Subject: Re: [PATCH net-next 4/5] tools: ynl-gen: print setters for
+ multi-val attrs
+In-Reply-To: <20250722161927.3489203-5-kuba@kernel.org>
+Date: Wed, 23 Jul 2025 10:15:19 +0100
+Message-ID: <m2h5z39sk8.fsf@gmail.com>
+References: <20250722161927.3489203-1-kuba@kernel.org>
+	<20250722161927.3489203-5-kuba@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:3a0d:b0:875:ba1e:4d7e with SMTP id
- ca18e2360f4ac-87c64fbb367mr491673439f.6.1753261775276; Wed, 23 Jul 2025
- 02:09:35 -0700 (PDT)
-Date: Wed, 23 Jul 2025 02:09:35 -0700
-In-Reply-To: <20250722210256.143208-1-sdf@fomichev.me>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6880a6cf.050a0220.40ccf.0000.GAE@google.com>
-Subject: [syzbot ci] Re: vrf: Drop existing dst reference in vrf_ip6_input_dst
-From: syzbot ci <syzbot+ci7bed65dd2de1adbd@syzkaller.appspotmail.com>
-To: andrew@lunn.ch, davem@davemloft.net, dsahern@kernel.org, 
-	edumazet@google.com, horms@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	sdf@fomichev.me
-Cc: syzbot@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-syzbot ci has tested the following series
+Jakub Kicinski <kuba@kernel.org> writes:
 
-[v1] vrf: Drop existing dst reference in vrf_ip6_input_dst
-https://lore.kernel.org/all/<20250722210256.143208-1-sdf@fomichev.me>
-* [PATCH net 1/2] vrf: Drop existing dst reference in vrf_ip6_input_dst
-* [PATCH net 2/2] net: Warn when overriding referenced dst entry
+> For basic types we "flatten" setters. If a request "a" has a simple
+> nest "b" with value "val" we print helpers like:
+>
+>  req_set_a_b(struct a *req, int val)
+>  {
+>    req->_present.a = 1;
+>    req->b._present.val = 1;
+>    req->b.val = ...
+>  }
+>
+> This is not possible for multi-attr because they have to be allocated
+> dynamically by the user. Print "object level" setters so that user
+> preparing the object doesn't have to futz with the presence bits
+> and other YNL internals.
+>
+> Add the ability to pass in the variable name to generated setters.
+> Using "req" here doesn't feel right, while the attr is part of a request
+> it's not the request itself, so it seems cleaner to call it "obj".
+>
+> Example:
+>
+>  static inline void
+>  netdev_queue_id_set_id(struct netdev_queue_id *obj, __u32 id)
+>  {
+> 	obj->_present.id = 1;
+> 	obj->id = id;
+>  }
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-and found the following issue:
-WARNING in nf_reject_fill_skb_dst
-
-Full report is available here:
-https://ci.syzbot.org/series/c92e1af5-3b8b-4c26-8104-acca93ad8939
-
-***
-
-WARNING in nf_reject_fill_skb_dst
-
-tree:      net
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
-base:      cf074eca0065bc5142e6004ae236bb35a2687fdf
-arch:      amd64
-compiler:  Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-config:    https://ci.syzbot.org/builds/235c4af3-77ea-4670-9c9e-9de1ef0a5aa6/config
-syz repro: https://ci.syzbot.org/findings/1038832f-72d8-4491-9ac9-28339d31f0f7/syz_repro
-
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 12 at ./include/linux/skbuff.h:1165 nf_reject_fill_skb_dst+0x313/0x3b0
-Modules linked in:
-CPU: 1 UID: 0 PID: 12 Comm: kworker/u8:0 Not tainted 6.16.0-rc6-syzkaller-00135-gcf074eca0065-dirty #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Workqueue: ipv6_addrconf addrconf_dad_work
-RIP: 0010:nf_reject_fill_skb_dst+0x313/0x3b0
-Code: 8b 0d f1 35 98 08 48 3b 8c 24 e0 00 00 00 75 6b 48 8d 65 d8 5b 41 5c 41 5d 41 5e 41 5f 5d e9 54 19 69 01 cc e8 9e 7e b8 f7 90 <0f> 0b 90 e9 43 ff ff ff e8 90 7e b8 f7 90 0f 0b 90 e9 e3 fe ff ff
-RSP: 0018:ffffc900001e0360 EFLAGS: 00010246
-RAX: ffffffff8a07aa52 RBX: ffff888110f75500 RCX: ffff88801c2f5640
-RDX: 0000000000000100 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: ffffc900001e0490 R08: ffffffff8fa1d6f7 R09: 1ffffffff1f43ade
-R10: dffffc0000000000 R11: fffffbfff1f43adf R12: ffff888110f75501
-R13: dffffc0000000001 R14: 1ffff9200003c070 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8881a3c22000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00002000000000c0 CR3: 000000001ff6e000 CR4: 00000000000006f0
-Call Trace:
- <IRQ>
- nf_send_unreach+0x17b/0x700
- nft_reject_inet_eval+0x4bc/0x690
- nft_do_chain+0x40c/0x1920
- nft_do_chain_inet+0x25d/0x340
- nf_hook_slow+0xc5/0x220
- NF_HOOK+0x206/0x3a0
- __netif_receive_skb+0x143/0x380
- process_backlog+0x60e/0x14f0
- __napi_poll+0xc7/0x480
- net_rx_action+0x707/0xe30
- handle_softirqs+0x286/0x870
- do_softirq+0xec/0x180
- </IRQ>
- <TASK>
- __local_bh_enable_ip+0x17d/0x1c0
- __dev_queue_xmit+0x1cd7/0x3a70
- ip6_finish_output2+0x11fe/0x16a0
- ndisc_send_skb+0xc77/0x1500
- ndisc_send_ns+0xcb/0x150
- addrconf_dad_work+0xaae/0x14b0
- process_scheduled_works+0xae1/0x17b0
- worker_thread+0x8a0/0xda0
- kthread+0x711/0x8a0
- ret_from_fork+0x3fc/0x770
- ret_from_fork_asm+0x1a/0x30
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
