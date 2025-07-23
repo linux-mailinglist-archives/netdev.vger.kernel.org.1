@@ -1,123 +1,133 @@
-Return-Path: <netdev+bounces-209141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50D44B0E763
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 01:57:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DFB49B0E76C
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 02:01:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 433091C878F7
-	for <lists+netdev@lfdr.de>; Tue, 22 Jul 2025 23:57:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB8CD1CC016A
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 00:02:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E9DF28A40A;
-	Tue, 22 Jul 2025 23:57:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7DCB2E36F8;
+	Wed, 23 Jul 2025 00:01:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="U4wl79tR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yqNvtvzE"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE970289E32;
-	Tue, 22 Jul 2025 23:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B3719A
+	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 00:01:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753228632; cv=none; b=YUIOo/Ppq0C3siAwwc/SKm+4kpaMB58roRQVdStiJlOCDDwDLQkVuJh5x1LdW9maX/hqBKHJ5M7J8j22/jRKXExyiGyepr224GjaRvz3qM2EKVgBnkT/vDOWRwLUptMekVmOf6yHpujQGwSqbIZfRL3EW7EjFz0+l5CdXsflXE4=
+	t=1753228915; cv=none; b=aHIUlgD45pyA8TGix5Jx9l29ROQ0++auIC6GcU4shfTIRJzoZBX/TIwlnrpNkya2CYsK+JQdokltlEyoDPSVNCmm8owj3zz1PTjmgI42ok6YZj91TaVlnLUt/tDNcQSuI82vG6/RV1S+LV37JJPI7TlSlIPnpk/eq7jiwZS/RMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753228632; c=relaxed/simple;
-	bh=pktmUuwdhUsTi4dawxHmKwqOBRmLySGnvk1UL1YTlnk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HEmH9OO8Kv/HzV5E6yc9PzVlSo9wFA566cv3GhNcVePK/ZHzAt+9ujZNGL2xn4BnuTtZ3wx5e/tH+b/Ylh4Or0bgSJ3t4fZBWswd/UVMmmPMYP/Kd4egwxnXb0avYS13sHU42Q6RM3XeSKKxG19foFWjsDdb3CUt91lynBXJcCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=U4wl79tR; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=LzTw3TQy4x8voOBDTwRwDXWNoCL87C9cZ53++EGX5IU=; b=U4wl79tRK/N0V6pW+qleOdhIu2
-	hY3vYKifGwTaXTm2jXYhYxPNyrtx0BYLyPmFIuaB940kfDG9H1RcpVaw4jBfd6U4PB0CsFZAtJaHo
-	8zwq8zx+qbOL+CGbCvPJ8Lmzmbsp3o42n9bqQ81XPGHOpIG5MNl73UgEakLK7y9pBHhaXmYyRcqZ3
-	V5Ygy71KLeLv1//YYAFMh0ZL2lR4q141PLMJd9owpCHfrl6jgrM4Zgzggb7FMPhStoC4b9K3KqJHu
-	tcH0X7o+gapKWcSZWPCyrjRpO6+PzZC/CgV55abKOF1vA6kieaxS2Wy46NGwvWl6Tysn+6lL1FJLw
-	Z7gFZdZg==;
-Received: from [50.53.25.54] (helo=[192.168.254.17])
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1ueMr7-00000003hW3-3OBq;
-	Tue, 22 Jul 2025 23:57:09 +0000
-Message-ID: <d44b9541-b912-4d3e-8c41-ea2f460ddd17@infradead.org>
-Date: Tue, 22 Jul 2025 16:57:09 -0700
+	s=arc-20240116; t=1753228915; c=relaxed/simple;
+	bh=gPi51dK3oE0zdSbMxyoTJ2j+Kp9ZEpvTgPvxtE9gInE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UqU965OVgbLEU39zf8S5x0Y35KuXLV2e8cOb3VBaZpcV1W2CdrW66+AYW46raPYFwxTPuMkrBQXBAJe/ScqYHZ5kOFS9GdVxKahNWrry5gmoQRHw4WX1neZOdHzEidD9wiwRV8/Data3JqCiAf+g+06xZlw/k+2Hde9rDi80iy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yqNvtvzE; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-23694cec0feso58503695ad.2
+        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 17:01:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753228914; x=1753833714; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RmW+kJOfooutx6wMAE2aHCnhV2kwpGozAvb4QhsmOeU=;
+        b=yqNvtvzEJx8CAJWDXglxqzSCndkfMHaCHTnO1mhIRzNhGVNhGyjm9U1u1zEpjsPPMU
+         K+NJYKgJn3xFkMGFInFnoAJ6sQfh4fgTcXwPe9uFHKFPu0nnXjE+jm5yuvEKREN8wtGW
+         0IK0os0g+5Re7qHOlQC/t/zwH2h7/TsPy9BPBsT1lkU7/TMBvCquYS491QMByqHB9BSI
+         D9NwWUccJzqu03TdFBGS3qdVzajQpDq5gzxiYIGr+swRK9X1XPGdV8o4VnZK7BMwkAH/
+         f8TNHv9WGs/RI7GZ3He2sHTtaZnpbjBcCk0b02nu05knS8IIeJFFNQfQNh3j2VYd+Bvm
+         BCyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753228914; x=1753833714;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RmW+kJOfooutx6wMAE2aHCnhV2kwpGozAvb4QhsmOeU=;
+        b=jLDgljVZhPGMmLW+NB0gcFb+PM2SkVnGVGVH5gPkuTZj3EBWE45TLQgxlXdL7qAri2
+         QV1MisavI6VaPxqBwHz5Lvllnuo3T7bJVcvHQuP9wQS3yyqDqw5uP9KMK55T59YcoM2b
+         j11GZUwips/wwcP+NzMA+ICvSW8B5B1E75c0sbCJB4lKahXzNh/VpfTdmPK8bXC63qjv
+         T0iB1mVUqwWG4sRp1/dyqNurqusHSig2qQt8rHyRGoCJE0/7/ep2B584rigOrhotpfnj
+         pJIUx0GVErpn8K0MwV2F5cUjrLE/7RLejBMgrApRkERWQaHCZ3P+QPPgY/yC4RiUEfjd
+         +tEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVQpe34FED1vL1cY6CB7Y+GOxzJm0BNtldzUMgM76wGZj4pGf0j/T+L45vPpdsGH54FKjePBWQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyD9FuS4Tzh2gYR+Sha3WkqRhEIvZMfJboxNdqpBQTvQ8nOsvRs
+	QkHVxbRHci/Jaok/p4YdIJGSBEsMlxu67RLqnxrGU+mu/JeWzI/OhQw1bYrNP67q6iSU0N2gExX
+	lu0m6SB/5OekCxJkY6mha/lmssZidkQZfrsCBYlNE
+X-Gm-Gg: ASbGncu99ctWcPlsGuRLNJiUSG/uu1lEQbv8uLWmG9gIM5m+jYRoDZHxMQMeMCJOtQJ
+	PoyBxNZuSgturCK2py+XPdEtie73ILL7KCL+hQC1KyCr/+7BsD+I80ddmGdJcUwk/qzpNwrfleY
+	awd7otmJ93rDMq3UGntbS2gKzWzeoRDYopzWRtTW/60/4hdJoVobmRJ6Sb0DlAJqnuNDKUCgeF5
+	JDziES4qu3bIItSY6Ds6b9Ccis8bMTq+9UOtA==
+X-Google-Smtp-Source: AGHT+IEqqHZkTue9jUT8aBgzW9HXFM4b9QYOnzU5SiGbcOMqJT4zItAuhvKX5pr1J1z8bXy8wQZzWEwQMYnEb1hq4s4=
+X-Received: by 2002:a17:902:c946:b0:235:779:ede5 with SMTP id
+ d9443c01a7336-23f981df84emr10431745ad.40.1753228913257; Tue, 22 Jul 2025
+ 17:01:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] can: tscan1: CAN_TSCAN1 can depend on PC104
-To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
- Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: netdev@vger.kernel.org, "Andre B. Oliveira" <anbadeol@gmail.com>,
- linux-can@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-References: <20250721002823.3548945-1-rdunlap@infradead.org>
- <20250722-delectable-porcelain-partridge-a87134-mkl@pengutronix.de>
- <20250722-godlike-discerning-weasel-fbec72-mkl@pengutronix.de>
- <266ff6cc-82f6-4e5f-84c5-39a1ff0aa8a2@wanadoo.fr>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <266ff6cc-82f6-4e5f-84c5-39a1ff0aa8a2@wanadoo.fr>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <1753228248-20865-1-git-send-email-haiyangz@linux.microsoft.com> <1753228248-20865-2-git-send-email-haiyangz@linux.microsoft.com>
+In-Reply-To: <1753228248-20865-2-git-send-email-haiyangz@linux.microsoft.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Tue, 22 Jul 2025 17:01:41 -0700
+X-Gm-Features: Ac12FXwOFltqpWqcJyOPdTDnWUTF9s30pio1HgtXH8zT888WCdTjkN8V30YF4KI
+Message-ID: <CAAVpQUBuyfnv4BBxnOvheEb7JVnokTEiea5Yp4UZdX=5CuWVHg@mail.gmail.com>
+Subject: Re: [PATCH net, 1/2] net: core: Fix missing init of llist_node in setup_net()
+To: Haiyang Zhang <haiyangz@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org, 
+	haiyangz@microsoft.com, kys@microsoft.com, wei.liu@kernel.org, 
+	decui@microsoft.com, andrew+netdev@lunn.ch, sd@queasysnail.net, 
+	viro@zeniv.linux.org.uk, chuck.lever@oracle.com, neil@brown.name, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	davem@davemloft.net, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Jul 22, 2025 at 4:51=E2=80=AFPM Haiyang Zhang
+<haiyangz@linux.microsoft.com> wrote:
+>
+> From: Haiyang Zhang <haiyangz@microsoft.com>
+>
+> Add init_llist_node for lock-less list nodes in struct net in
+> setup_net(), so we can test if a node is on a list or not.
+>
+> Cc: stable@vger.kernel.org
+> Fixes: d6b3358a2813 ("llist: add interface to check if a node is on a lis=
+t.")
+
+No Fixes tag is needed because we didn't have a need to
+test if net is queued for destruction.
 
 
-
-On 7/22/25 5:12 AM, Vincent Mailhol wrote:
-> On 22/07/2025 at 19:52, Marc Kleine-Budde a écrit :
->> On 22.07.2025 12:48:41, Marc Kleine-Budde wrote:
->>> On 20.07.2025 17:28:23, Randy Dunlap wrote:
->>>> Add a dependency on PC104 to limit (restrict) this driver kconfig
->>>> prompt to kernel configs that have PC104 set.
->>>>
->>>> Add COMPILE_TEST as a possibility for more complete build coverage.
->>>> I tested this build config on x86_64 5 times without problems.
->>>
->>> I've already Vincent's patch [1] on my tree.
->>>
->>> [1] https://lore.kernel.org/all/20250715-can-compile-test-v2-3-f7fd566db86f@wanadoo.fr/
-> 
-> Don't know how I did not realize the conflict when reviewing :D
-> 
->>> So this doesn't apply any more. Fixing the merge conflicts result in:
->>>
->>> index ba16d7bc09ef..e061e35769bf 100644
->>> --- a/drivers/net/can/sja1000/Kconfig
->>> +++ b/drivers/net/can/sja1000/Kconfig
->>> @@ -105,7 +105,7 @@ config CAN_SJA1000_PLATFORM
->>>  
->>>  config CAN_TSCAN1
->>>          tristate "TS-CAN1 PC104 boards"
->>> -        depends on ISA || (COMPILE_TEST && HAS_IOPORT)
->>> +        depends on (ISA && PC104) || (COMPILE_TEST && HAS_IOPORT)
->>>          help
->>>            This driver is for Technologic Systems' TSCAN-1 PC104 boards.
->>>            https://www.embeddedts.com/products/TS-CAN1
->>>
->>> Should be ok?
-
-Looks good. Thanks.
-
->> If no-one complains I'll add this to my can-next tree and remove the
->> Fixes tag. Otherwise stable will pick this up, but it won't apply
->> without Vincent's patch.
-> 
-> I do not really mind if those are not backported. No issue for me to drop the
-> fix tag.
-
-Agreed. Not needed.
-
--- 
-~Randy
-
+> Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
+> ---
+>  net/core/net_namespace.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+> index ae54f26709ca..2a821849558f 100644
+> --- a/net/core/net_namespace.c
+> +++ b/net/core/net_namespace.c
+> @@ -434,6 +434,9 @@ static __net_init int setup_net(struct net *net)
+>         LIST_HEAD(net_exit_list);
+>         int error =3D 0;
+>
+> +       init_llist_node(&net->defer_free_list);
+> +       init_llist_node(&net->cleanup_list);
+> +
+>         preempt_disable();
+>         net->net_cookie =3D gen_cookie_next(&net_cookie);
+>         preempt_enable();
+> --
+> 2.34.1
+>
 
