@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-209372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAC83B0F685
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 17:08:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 960E3B0F69E
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 17:11:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B98E5178CC5
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 15:04:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 113271C20356
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 15:05:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D9BF2FD5AA;
-	Wed, 23 Jul 2025 15:00:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4A42EF2AD;
+	Wed, 23 Jul 2025 15:01:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K5OIn9ex"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LIhZnDCP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00DF02F6F99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55E712FD89C
 	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 15:00:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753282840; cv=none; b=Vvv2zdN1hUDPsZusSJd3HFdmeel8ijtlD5xSHtMbWzJy0EdXUoKkAjhdxqRgz8+isyonfk/Kbm6dcN/qf0tJd/L388eeMa6dGW1Hu8Ty2mSNJvn5VQ/Lr2JbLtp9dhUbINcEnRWppphWoLivu55tLXAv97yU/sCE9UajakvrbQ0=
+	t=1753282864; cv=none; b=pGCzHZoIEGYaEqhxgzCeYCRcbtmaFul1QgIMItknXkKrR5XWrhYFvlCKJjhSUWsSCBZLQby8BRLuIej99JoOd4M9Wv7w9s6FrHimX6xsDJG+9XKVyENBubbYRlU8MWmv0tJZWQzcPEU8EiABEQ53sxKJfNDaZRo5jwTVLuIf27k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753282840; c=relaxed/simple;
-	bh=0k0791S51sKw6HHriyPNDJ7fpdSMyLS8SMOoFFDC9uc=;
+	s=arc-20240116; t=1753282864; c=relaxed/simple;
+	bh=qFrNRftYYRFSsbjJxx0Z1DarwhlBLVjErZMJy4Vaqpg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pVR2A12TBz6uK5KdOcDQEuwStF7gDPV9kqK07/yq9PbzwSgIx8CdLZhZsWq0MBQBouD2sahS6HaD3pyXt57PM2+H9os4iNl4jpMi+FKiliGHKla4u3rdttRzQJRWPKktRVWqP2JlZ+iJBQYfZACoweEp3bTBC/wocmwbYtGwGAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K5OIn9ex; arc=none smtp.client-ip=209.85.221.52
+	 MIME-Version; b=qjSYgM3ylFgkmZQgicxNzuIGTOEztURCLTKHABKjauMcPzutccUejAfA8ItdY0YbOM/mrQeNdl6W+bOchGfGfVtexO/t7mrwC4NT4MMKj+E2N8EGbUTTraOeIaxNc1VU4zEnHq5GPO+Yuoo5jfsp2bK3QCC/5U7kzmqygeejx7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LIhZnDCP; arc=none smtp.client-ip=209.85.221.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3a548a73ff2so6188263f8f.0
-        for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 08:00:16 -0700 (PDT)
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3b45edf2303so6103661f8f.2
+        for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 08:00:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753282804; x=1753887604; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1753282806; x=1753887606; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uV58jU3iDRMSvFKeRVjmD80ktBZ8qchI2hSY+q9ToFM=;
-        b=K5OIn9ex8ffjqehWovo2WylCqgj7zkgDX3s8ywTvaDnhE+ySn3lcEDegqCt+Xur76V
-         DPL/HeX4aDLsLt+qQixcFVHBHcAT+Ll+QrOs5qPuuUzKXfwIAofQ27MaszJ8inINNePz
-         Bzfaqj4arZH8zZXAZ2gM9doV2j2Nqlti14Irfp1ez5DMeMNG1/P/8eK4y/zFl9c3ih/R
-         rsNojx/JK4U8LOd9LvTT12gbpZ1DP93rKxviyUNsMBZajg26tUpQuOrnPR07R1caOOp0
-         RfXM2R8imIBvg6kS05XDBj4uXy8y455bZ1sYvE2ApFTPMjHpTe9QiF9X8OcLkLUW+Yso
-         q+Dg==
+        bh=Ym8OS0V8bBUvcl2Zh7CpV4Rstv20WrbCPt8/82MXEpU=;
+        b=LIhZnDCPlj+KSLQPQ/PKg6EVDGWrHxADeqw6oUQ/tt17UIwRcsB6s5VOzRmLKdcrLN
+         cPLmcv7/72WPftLezZ7b7pp25xglqjsU/Uh0AeCHrAKIQlEYHmIOTcwKTMeWsAUL1Kj6
+         Ut6o0TrWi51L2QYX+9dL3ggptUO2kXA/T4fWR+sMAyTatvPiZF1JiybLX9Jix3jFgyBz
+         9tasbpVKp/172c9pKQzJGo9c8tzf0786qYCs237SzF08blEYYFAJl++rt8+vLXwS4kAU
+         i7U4ibzJ9RO5YnY1WuwdTAIyYOL6jnvhYqewd+Z1YFOBXRNC5sBMs/NbEfJ2QT6U5l9L
+         XBxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753282804; x=1753887604;
+        d=1e100.net; s=20230601; t=1753282806; x=1753887606;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uV58jU3iDRMSvFKeRVjmD80ktBZ8qchI2hSY+q9ToFM=;
-        b=GYRSkJ8rilMpPEOLpgnZyU+8dBQ6SUB0aFP7FWDiWYsqDDya7zsM6r5tOxtG5EdRtu
-         HNWUqLVev+lInvNe7VXexVwRWHXL+OKrD5u0chIItIogzV97OaNoNCS1DU83C9XPm7Nm
-         R/Uf4liyKmOzJtn7tUExFtgqg7MqUnn8AQUE7vvrZp20nLRyN8FRM6CRDt2nU89w9LCu
-         LWHLoVuRORWDEHhSkAoLVX8wGVsE9ZYR3m99Vn6Tc0236FM2sYLhsovhDEqqCMM4bq9l
-         yRAOGKJaO/sdljWbKwwdFWzMys3ShSVumiFYLRdpTcGy+upgY2GDIzUVPSrWMtth9RvO
-         E2Ag==
-X-Gm-Message-State: AOJu0YyMrzkewgrBHESLawjwnNl7ZYrUkhcOwZ2PTAuR5L4KTZ9IIpil
-	jBOMx6WOV83zPy2Q3MnI2THIE2wUXhuesU+/PTrIQivwk16YJvB874xggXwjac/s
-X-Gm-Gg: ASbGncvhCuvVq5Lk0kxrhHttsEGbNq1jFMAUADmsZBmEPrlWnVZlr602VXjNTilPtt2
-	HQaTUPuCfZ4J5s4PPyhbhm9fnAGptJnCapgQqg7lWFWLfddEknFE+5H03i3mwUTMZFIDRsIsbND
-	W4JIJC2o2K8t88Rkl/cOFiE4kWGJTv4YENd7qGr3SFYVMoXDwzEFIxglJysQmSNQG2DFCOVCGFh
-	gWiKuJ5DPHmzLZVD4OFunQX2IAvyC647ByOTDRxYfvfSIPTasGDssDLi0qx6NzHWTAFb8HMDys1
-	dN4N/mE1janOobi/2qIDMO0KQVkBcO/xtxjTzWiBf2MabQprKx2ZLBSmTylbj8x9McwiY1WRq9R
-	19SuSw2JGNRlyz7qsllNc
-X-Google-Smtp-Source: AGHT+IHqH2SmWxbVt1vPVeH9N23lbjrWYokVIpJHSf76x6+O0FSs7rjb/+S5SbczVag00raqHgnbSw==
-X-Received: by 2002:a5d:5d07:0:b0:3a5:2fae:1348 with SMTP id ffacd0b85a97d-3b768f13852mr2774979f8f.51.1753282804147;
-        Wed, 23 Jul 2025 08:00:04 -0700 (PDT)
-Received: from localhost ([2a03:2880:31ff:4a::])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca253f9sm16812352f8f.6.2025.07.23.08.00.03
+        bh=Ym8OS0V8bBUvcl2Zh7CpV4Rstv20WrbCPt8/82MXEpU=;
+        b=MYqTDbxfTPji1OapdMOEH11DkTcKr6pa08kfkMfQRGBnbwUw3mLhn/bMn7tWu/OxrA
+         nVS0yZxxRuLR//SJ68jOWsdQpm/zkK3I+G/LKcm3e3Ltogtb/kYNWEMnEpnoJkfFxyHd
+         hsbTwsxbMlWoCaF9elJ5ZuvWsssbuz6OIFlYcPkFmJPdpQLc+S39Q6pwxYTZxj69hdf1
+         G+Jf0TP0FKhCicuWQdd1GY8xj1jaRwOKMfoCtPs44fMuia3DA+5QZy7tEYEZmavHBdG6
+         8AKLciLTEuM2Q2GekGwgifdF1wcS1a34v4vP+NR+7JmmlWjHulLlWon3q9XQDHJLL6Zs
+         Q5jg==
+X-Gm-Message-State: AOJu0YyDyaif/Bz7LaszC+97vceeAciTM7HS1yMdZgYxy1jIojEYvzEW
+	8W8PgJ8fLzK48NwZNJ/ugZXWNtVc0WP17/+skEuNka2fBSVuWc3HkGTW1BAQQGQJ
+X-Gm-Gg: ASbGncts2liPBsGdfzooES+NuHxv8Wof7iWjuCW2A76uvnq0SeCm5Y3hCo4Gt2kYRov
+	3MFjEF1QlEhDpkZKhKUNuHfO9xiDz3Y6cFSTcYkMHWNjbyKYqWpUWtt4xyIeJaPKzWVigd9I534
+	suxOIzWfiKFQXnRJWZIMzXBgWMn7xz0k58T+ZxnfFUyBt/OVHx2LtXrfJvvxij2CklQTWpM0XAI
+	/jaUQxLYEF7UJn9beu3NDYjYWvAIx0Q/YK6MJnGhBr8x4sb4tExpBBDiokNy+oglDprTUtv6FQ/
+	wVydGjGFhxvts6yqwVpynlloIU+/W/5wcVqa5B319An3edmwPE0b/vnioo1kLRgizccHYTHanJj
+	kUgipxG2ASLtGH2ZHiqc=
+X-Google-Smtp-Source: AGHT+IEH7urWoow9a3Zaa08PimrBgn+ceQYEmTS7zV3/bqvOGoNVtzkobka9B9fDgdSjW4Fow43qfw==
+X-Received: by 2002:a05:6000:2088:b0:3b6:10af:88e6 with SMTP id ffacd0b85a97d-3b768f05626mr2655739f8f.43.1753282806370;
+        Wed, 23 Jul 2025 08:00:06 -0700 (PDT)
+Received: from localhost ([2a03:2880:31ff:6::])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca487fdsm16555037f8f.48.2025.07.23.08.00.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Jul 2025 08:00:03 -0700 (PDT)
+        Wed, 23 Jul 2025 08:00:05 -0700 (PDT)
 From: Mohsin Bashir <mohsin.bashr@gmail.com>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -90,9 +90,9 @@ Cc: kuba@kernel.org,
 	daniel@iogearbox.net,
 	hawk@kernel.org,
 	john.fastabend@gmail.com
-Subject: [PATCH net-next 2/9] eth: fbnic: Update Headroom
-Date: Wed, 23 Jul 2025 07:59:19 -0700
-Message-ID: <20250723145926.4120434-3-mohsin.bashr@gmail.com>
+Subject: [PATCH net-next 3/9] eth: fbnic: Use shinfo to track frags state on Rx
+Date: Wed, 23 Jul 2025 07:59:20 -0700
+Message-ID: <20250723145926.4120434-4-mohsin.bashr@gmail.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250723145926.4120434-1-mohsin.bashr@gmail.com>
 References: <20250723145926.4120434-1-mohsin.bashr@gmail.com>
@@ -104,36 +104,169 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fbnic currently reserves a minimum of 64B headroom, but this is
-insufficient for inserting additional headers (e.g., IPV6) via XDP, as
-only 24 bytes are available for adjustment. To address this limitation,
-increase the headroom to a larger value while ensuring better page use.
-Although the resulting headroom (192B) is smaller than the recommended
-value (256B), forcing the headroom to 256B would require aligning to
-256B (as opposed to the current 128B), which can push the max headroom
-to 511B.
+Remove local fields that track frags state and instead store this
+information directly in the shinfo struct. This change is necessary
+because the current implementation can lead to inaccuracies in certain
+scenarios, such as when using XDP multi-buff support. Specifically, the
+XDP program may update nr_frags without updating the local variables,
+resulting in an inconsistent state.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
 ---
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.c | 79 ++++++--------------
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.h |  4 +-
+ 2 files changed, 25 insertions(+), 58 deletions(-)
 
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+index 1fc7bd19e7a1..f5725c0972a5 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+@@ -892,9 +892,7 @@ static void fbnic_pkt_prepare(struct fbnic_napi_vector *nv, u64 rcd,
+ 	xdp_prepare_buff(&pkt->buff, hdr_start, headroom,
+ 			 len - FBNIC_RX_PAD, true);
+ 
+-	pkt->data_truesize = 0;
+-	pkt->data_len = 0;
+-	pkt->nr_frags = 0;
++	pkt->add_frag_failed = false;
+ }
+ 
+ static void fbnic_add_rx_frag(struct fbnic_napi_vector *nv, u64 rcd,
+@@ -905,8 +903,8 @@ static void fbnic_add_rx_frag(struct fbnic_napi_vector *nv, u64 rcd,
+ 	unsigned int pg_off = FIELD_GET(FBNIC_RCD_AL_BUFF_OFF_MASK, rcd);
+ 	unsigned int len = FIELD_GET(FBNIC_RCD_AL_BUFF_LEN_MASK, rcd);
+ 	struct page *page = fbnic_page_pool_get(&qt->sub1, pg_idx);
+-	struct skb_shared_info *shinfo;
+ 	unsigned int truesize;
++	bool added;
+ 
+ 	truesize = FIELD_GET(FBNIC_RCD_AL_PAGE_FIN, rcd) ?
+ 		   FBNIC_BD_FRAG_SIZE - pg_off : ALIGN(len, 128);
+@@ -918,34 +916,34 @@ static void fbnic_add_rx_frag(struct fbnic_napi_vector *nv, u64 rcd,
+ 	dma_sync_single_range_for_cpu(nv->dev, page_pool_get_dma_addr(page),
+ 				      pg_off, truesize, DMA_BIDIRECTIONAL);
+ 
+-	/* Add page to xdp shared info */
+-	shinfo = xdp_get_shared_info_from_buff(&pkt->buff);
+-
+-	/* We use gso_segs to store truesize */
+-	pkt->data_truesize += truesize;
+-
+-	__skb_fill_page_desc_noacc(shinfo, pkt->nr_frags++, page, pg_off, len);
+-
+-	/* Store data_len in gso_size */
+-	pkt->data_len += len;
++	added = xdp_buff_add_frag(&pkt->buff, page_to_netmem(page), pg_off, len,
++				  truesize);
++	if (unlikely(!added)) {
++		pkt->add_frag_failed = true;
++		netdev_err_once(nv->napi.dev,
++				"Failed to add fragment to xdp_buff\n");
++	}
+ }
+ 
+ static void fbnic_put_pkt_buff(struct fbnic_napi_vector *nv,
+ 			       struct fbnic_pkt_buff *pkt, int budget)
+ {
+-	struct skb_shared_info *shinfo;
+ 	struct page *page;
+-	int nr_frags;
+ 
+ 	if (!pkt->buff.data_hard_start)
+ 		return;
+ 
+-	shinfo = xdp_get_shared_info_from_buff(&pkt->buff);
+-	nr_frags = pkt->nr_frags;
++	if (xdp_buff_has_frags(&pkt->buff)) {
++		struct skb_shared_info *shinfo;
++		int nr_frags;
+ 
+-	while (nr_frags--) {
+-		page = skb_frag_page(&shinfo->frags[nr_frags]);
+-		page_pool_put_full_page(nv->page_pool, page, !!budget);
++		shinfo = xdp_get_shared_info_from_buff(&pkt->buff);
++		nr_frags = shinfo->nr_frags;
++
++		while (nr_frags--) {
++			page = skb_frag_page(&shinfo->frags[nr_frags]);
++			page_pool_put_full_page(nv->page_pool, page, !!budget);
++		}
+ 	}
+ 
+ 	page = virt_to_page(pkt->buff.data_hard_start);
+@@ -955,43 +953,12 @@ static void fbnic_put_pkt_buff(struct fbnic_napi_vector *nv,
+ static struct sk_buff *fbnic_build_skb(struct fbnic_napi_vector *nv,
+ 				       struct fbnic_pkt_buff *pkt)
+ {
+-	unsigned int nr_frags = pkt->nr_frags;
+-	struct skb_shared_info *shinfo;
+-	unsigned int truesize;
+ 	struct sk_buff *skb;
+ 
+-	truesize = xdp_data_hard_end(&pkt->buff) + FBNIC_RX_TROOM -
+-		   pkt->buff.data_hard_start;
+-
+-	/* Build frame around buffer */
+-	skb = napi_build_skb(pkt->buff.data_hard_start, truesize);
+-	if (unlikely(!skb))
++	skb = xdp_build_skb_from_buff(&pkt->buff);
++	if (!skb)
+ 		return NULL;
+ 
+-	/* Push data pointer to start of data, put tail to end of data */
+-	skb_reserve(skb, pkt->buff.data - pkt->buff.data_hard_start);
+-	__skb_put(skb, pkt->buff.data_end - pkt->buff.data);
+-
+-	/* Add tracking for metadata at the start of the frame */
+-	skb_metadata_set(skb, pkt->buff.data - pkt->buff.data_meta);
+-
+-	/* Add Rx frags */
+-	if (nr_frags) {
+-		/* Verify that shared info didn't move */
+-		shinfo = xdp_get_shared_info_from_buff(&pkt->buff);
+-		WARN_ON(skb_shinfo(skb) != shinfo);
+-
+-		skb->truesize += pkt->data_truesize;
+-		skb->data_len += pkt->data_len;
+-		shinfo->nr_frags = nr_frags;
+-		skb->len += pkt->data_len;
+-	}
+-
+-	skb_mark_for_recycle(skb);
+-
+-	/* Set MAC header specific fields */
+-	skb->protocol = eth_type_trans(skb, nv->napi.dev);
+-
+ 	/* Add timestamp if present */
+ 	if (pkt->hwtstamp)
+ 		skb_hwtstamps(skb)->hwtstamp = pkt->hwtstamp;
+@@ -1094,7 +1061,9 @@ static int fbnic_clean_rcq(struct fbnic_napi_vector *nv,
+ 			/* We currently ignore the action table index */
+ 			break;
+ 		case FBNIC_RCD_TYPE_META:
+-			if (likely(!fbnic_rcd_metadata_err(rcd)))
++			if (unlikely(pkt->add_frag_failed))
++				skb = NULL;
++			else if (likely(!fbnic_rcd_metadata_err(rcd)))
+ 				skb = fbnic_build_skb(nv, pkt);
+ 
+ 			/* Populate skb and invalidate XDP */
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-index 4d248f94ec9b..398310be592e 100644
+index 398310be592e..be34962c465e 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-@@ -50,8 +50,9 @@ struct fbnic_net;
+@@ -69,9 +69,7 @@ struct fbnic_net;
+ struct fbnic_pkt_buff {
+ 	struct xdp_buff buff;
+ 	ktime_t hwtstamp;
+-	u32 data_truesize;
+-	u16 data_len;
+-	u16 nr_frags;
++	bool add_frag_failed;
+ };
  
- #define FBNIC_RX_TROOM \
- 	SKB_DATA_ALIGN(sizeof(struct skb_shared_info))
-+#define FBNIC_RX_HROOM_PAD		128
- #define FBNIC_RX_HROOM \
--	(ALIGN(FBNIC_RX_TROOM + NET_SKB_PAD, 128) - FBNIC_RX_TROOM)
-+	(ALIGN(FBNIC_RX_TROOM + FBNIC_RX_HROOM_PAD, 128) - FBNIC_RX_TROOM)
- #define FBNIC_RX_PAD			0
- #define FBNIC_RX_PAYLD_OFFSET		0
- #define FBNIC_RX_PAYLD_PG_CL		0
+ struct fbnic_queue_stats {
 -- 
 2.47.1
 
