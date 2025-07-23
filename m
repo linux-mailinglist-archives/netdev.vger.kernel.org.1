@@ -1,104 +1,116 @@
-Return-Path: <netdev+bounces-209263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5B3CB0ED8D
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:45:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75E39B0ED9B
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:48:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE01E3B72FA
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 08:44:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 607F7188FA91
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 08:48:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AB7F277CA2;
-	Wed, 23 Jul 2025 08:45:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7E5C277C8B;
+	Wed, 23 Jul 2025 08:48:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="P2N0KK0k"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DzH9K+OC"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7931027990C;
-	Wed, 23 Jul 2025 08:45:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18C97244679;
+	Wed, 23 Jul 2025 08:48:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753260316; cv=none; b=sTei9Ku1e/REBpuLRgUY48WVnkBsowu0S6DRWY3zmxRgn/o2zYhcs4YhaMBGt9MCui+JQMAv22uB11nn6RlhKr1XzeMyBHFtfAAfP00D6j0n32EyGqXFF8fjeIKtNW30MGIn3565qoXOY9DZKQJvC+Enymt3tbxxtQ2WiJI80rY=
+	t=1753260509; cv=none; b=EQOmnGjhwIfjfRQA85AhhSwxuF2qxKh75MaYISDgiqZQ1RKh/KrUllo6tqrBAC1l0sWSGM4XTSJ7hH+kyhtX6ca4eROjQKctzUzs2rmbjWQPG7OU886dzFuoB+lBngPJ5VI1Z46+8mTb96FBjr2Kok/8pq7VIJtLicrFo4N0B/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753260316; c=relaxed/simple;
-	bh=juf9ggKeJ2S2DwzYU3ii5rklPp81WUO8OyahSzXouI0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Pxilhc1gffzxuq2vxNKDY+5c+sxWRQiWUEeutY8ah/iXRKcBKqH7IoScoTysLOVBYVrPysj/sI/xtY07ubj8Ws473q8eeh5e3ou27JrLZyWzFoLiijSlyeeI01BtjWuH9Wn0VPm1YLZaOrDVgxYIxKr1/H7A0MK97yra5ddy2eE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=P2N0KK0k; arc=none smtp.client-ip=117.135.210.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version:
-	Content-Type; bh=Kh7Twf/JLXX4QIJ0YUBvAzwYRNxCP5KMdOZH9O0+eaE=;
-	b=P2N0KK0kD5hNE+SeqIdEGVe+vH1facgRuAGOOLRwo3b9i4eGRnZ6xyhW8JT22d
-	CxARBh7V13P02rGoBoZ9rJwPWCCNwXCzYvisDFL/lqOPiRRH0K7cYKEe7VMF3EKV
-	ToubNpvVG4NPTSdUrG6gmmZFb2nohMTLKtcir/ixPYKr8=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-2 (Coremail) with SMTP id _____wD3MS8IoYBoqoVeGw--.4006S2;
-	Wed, 23 Jul 2025 16:44:56 +0800 (CST)
-From: yicongsrfy@163.com
-To: oneukum@suse.com
-Cc: andrew+netdev@lunn.ch,
-	andrew@lunn.ch,
-	davem@davemloft.net,
-	linux-usb@vger.kernel.org,
+	s=arc-20240116; t=1753260509; c=relaxed/simple;
+	bh=jWXaYGxYYLYiCDGN7xik4lrIyUUKLSRMDJE0kXyPZyI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T/cSLa5euicFYrvfk9NQwMg34hV5sXTA8zELJdjDWgHyNgVMAx3tmHeUu31cQrZH+RAU8yB+2eEgSji8KQe5EXsgzExkh2GglAd2C2Rhm6Kiy4A4y/wsGJTRUFyUoyRa4BmGVeUTm99bcddMpCmsDyAN2pVMSSUKi/wPLr2Y0xw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DzH9K+OC; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-ae3ec622d2fso1073862166b.1;
+        Wed, 23 Jul 2025 01:48:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753260506; x=1753865306; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tQowkAFRLXXjw5lYLGQoSknnad2/JoJTmbOjV7xvS8w=;
+        b=DzH9K+OCRt68XoiOoxnWWfxbw9RDE7bNGCMOo0Pg72043CgWdrXjZ7cmC/DC799mRS
+         /JrmDW9aBiFWoRnR0YVe4Bo2hMlhQJoHIjt0bCeWhtxs+OUeGb7r9L2vQoNNxsxlPRQS
+         iTWvTK4QCBH08it8+KopfDsbYiGVSi0wT4LAW8urvYCYSuI4OHpZ9R//kg2he4lDFraA
+         WTCy4suP4SbHBWIlt44D5/KREoMoZ4ZwX66RqdLUrTyLCjBdwDY153IRmPr6aiMNeoAE
+         qbL9Gz3GJuv0DUfZAi6voVVzwSzFY2i/nN9Pl2kzDAcnI1YEQ7cGqhS4Q+VKiuw9C+AN
+         327A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753260506; x=1753865306;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tQowkAFRLXXjw5lYLGQoSknnad2/JoJTmbOjV7xvS8w=;
+        b=r0Q8DKtyh6LaWBdilFcLP67s1EBST1XN7XJwyHrB519qjDujUGz5Pm2pKI4M6qvL7X
+         N+p2gk+SqgJ/MP4dUUI8yPHBmpHtF7evCvNTylKxLf+7UEh2Gn2CQJ+EQA+ev4bhNDPz
+         kh/V4WzyWOCN+4lF6kIX3GTvn40FZ0QprmS4PpZJ3oXJbA6TMzcs8U2TwYDLM8diCBij
+         9FQ4QZvjFXS+AYnyxf+TnIQAKjrBxDlCqVb4l9f1nxPzh0SCCmnr8QLiWXCdCdrPmZXb
+         yOT+9awS5pzEgctl0HKCDcDGp8dzw63jFilpMtxRb+hzY4z4+5fGUzdI+nOCZ8HZIVaw
+         efAg==
+X-Forwarded-Encrypted: i=1; AJvYcCX+wPB6OK03xxrwx4IIlnPE/dOBTINNAMAuLmq1vGb8Wj+eSyw4iqCoebsuWas18A8j3LlLth8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyELUCDSLrudbSw+5fA5R7WyxUXjLEA9erolV2xyJXsAFDeEcw7
+	hEijqjjdAeuNLcuj2VwDo83RclYgZ06qFP69xgAup9mGkikAIbf7Tqh9
+X-Gm-Gg: ASbGncvhx3TVnsGEpIgBJZJYgGv5DxflSqpmtENXhTZeicUa8UHGtFkNIQCCdcO1g8+
+	N8gTArxthZHnCxNOUOXfvYv6Qi5Z3N1fGJ+7pfaLLjgucqg3KOHneo8sTRUIKQYvqEn8TB7UHI+
+	qUYHR/l5HaPr0LaCTaQC7EU0dQ+QKnWfBnXHJyxleTYCKoKSij3EngFR0QUenggjeTyR1AYPl0b
+	/kpsOc9CixUVM+Ay5yrI4Gpw3H5hGDb5T6DvyPSgbnSuv4NVO0NccH9vBMe/Jzzi0QqIjyNRcvA
+	973BosTL+CLOJrjmPKRrZyP8ZVjWL1alvpjzt0j+Pvxagp5k7OXarpjvxKiqbK2HW95X67u0wbL
+	iXjVk0i1A3PI7HYQFhPrFrlU/Nao=
+X-Google-Smtp-Source: AGHT+IHBaoZiRrpOQwd8Zc4/QeSjA7UMm8Njh+vBlpKk7GLwIJiObQl2/SIgTheXyVV5ksVEA3zZtw==
+X-Received: by 2002:a17:907:78b:b0:ae0:b49d:9cd with SMTP id a640c23a62f3a-af2f9872929mr186405666b.58.1753260506055;
+        Wed, 23 Jul 2025 01:48:26 -0700 (PDT)
+Received: from Thishost ([2a01:5ec0:9813:28d9:ba3b:baec:155c:3318])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aec6c7d7b9csm1005778866b.61.2025.07.23.01.48.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Jul 2025 01:48:25 -0700 (PDT)
+From: Ali Ghaffarian <alighaffarian9@gmail.com>
+To: davem@davemloft.net
+Cc: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
-	yicong@kylinos.cn
-Subject: Re: [PATCH] usbnet: Set duplex status to unknown in the absence of MII
-Date: Wed, 23 Jul 2025 16:44:56 +0800
-Message-Id: <20250723084456.1507563-1-yicongsrfy@163.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <6373678e-d827-4cf7-a98f-e66bda238315@suse.com>
-References: <6373678e-d827-4cf7-a98f-e66bda238315@suse.com>
+	Ali Ghaffarian <alighaffarian9@gmail.com>
+Subject: [PATCH] Net: ipv4: fixed a coding style issue
+Date: Wed, 23 Jul 2025 12:17:36 +0330
+Message-ID: <20250723084736.521507-1-alighaffarian9@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3MS8IoYBoqoVeGw--.4006S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7tw18uw1fAr1xWF48CFWfZrb_yoW8GF18pF
-	WFgFWUK3Wqqr4xJr4kZw4UWFyFvw1xXrW8GF1rCryUCF4akF9xWr18KFW5CFy0grZ5Cw4a
-	qF4UX3Z5Cayqv3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jyYLkUUUUU=
-X-CM-SenderInfo: p1lf00xjvuw5i6rwjhhfrp/xtbBzReT22iAiItzUQABsa
 
-On Wed, 23 Jul 2025 09:17:02 +0200 Oliver <oneukum@suse.com> wrote:
->
-> On 23.07.25 03:29, yicongsrfy@163.com wrote:
->
-> >  From these two tests, we can conclude that both full-duplex
-> > and half-duplex modes are supported — the problem is simply
-> > that the duplex status cannot be retrieved in the absence of
-> > MII support.
->
-> Sort of. You are asking a generic driver to apply a concept
-> from ethernet. It cannot. Ethernet even if it is half-duplex
-> is very much symmetrical in speed. Cable modems do not, just
-> to give an example.
->
-> I think we need to centralize the reaction to stuff that is not ethernet.
+Fixed a coding style issue.
 
-Thanks!
+Signed-off-by: Ali Ghaffarian <alighaffarian9@gmail.com>
+---
+ net/ipv4/af_inet.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-I think I understand what you mean now.
-You're suggesting to create a unified interface or
-framework to retrieve the duplex status of all CDC
-protocol-supported devices?
-This seems like a rather big undertaking, and one of the key
-reasons is that the CDC protocol itself does not define anything
-related to duplex status — unlike the 802.3 standard, which
-clearly defines how to obtain this information via MDIO.
-
-Coming back to the issue described in this patch,
-usbnet_get_link_ksettings_internal is currently only used in
-cdc_ether.c and cdc_ncm.c as a callback for ethtool.
-Can we assume that this part only concerns Ethernet devices
-(and that, at least for now, none of the existing devices can
-retrieve the duplex status through this interface)?
+diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+index 76e38092c..e38a977c9 100644
+--- a/net/ipv4/af_inet.c
++++ b/net/ipv4/af_inet.c
+@@ -445,9 +445,8 @@ int inet_bind_sk(struct sock *sk, struct sockaddr *uaddr, int addr_len)
+ 	int err;
+ 
+ 	/* If the socket has its own bind function then use it. (RAW) */
+-	if (sk->sk_prot->bind) {
++	if (sk->sk_prot->bind)
+ 		return sk->sk_prot->bind(sk, uaddr, addr_len);
+-	}
+ 	if (addr_len < sizeof(struct sockaddr_in))
+ 		return -EINVAL;
+ 
+-- 
+2.50.1
 
 
