@@ -1,264 +1,164 @@
-Return-Path: <netdev+bounces-209463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 893A3B0F9FC
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 20:06:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63720B0FA02
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 20:10:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA2F15823CD
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 18:06:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C1F01AA78A1
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 18:11:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE6942206BB;
-	Wed, 23 Jul 2025 18:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 610672236F7;
+	Wed, 23 Jul 2025 18:10:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gZr9hy+p"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="O7SH2ghI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 211241F4CBB
-	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 18:06:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8134D2E36F0;
+	Wed, 23 Jul 2025 18:10:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753293988; cv=none; b=FDn9cVExbfvlqPiCPrXIhwpjo3KXlOk0PuuYl8yeH6hZ/k/yhXlMdDYw2mvaJ9UBYEiwmMbF7OpjKrrOCbqSGfejYq5rK6QGYj12aMU604gwYsO7tVb9BKlifGZrIgMkAUMIH9lXrg8FL2zdQ4B5SrtfUoGVs7PVyfZtJ4ywiyY=
+	t=1753294251; cv=none; b=V+l7k9nj+zF5iNZXe405hrO4HeRdzrAJSGeV3l08fW5I8hfYKDc36xBHuBzLTyAlCFP5TCj9aj+RjHzTM2G1RCGknHSOlgmG6JLW7ss3rmOpwP41lwWBXV0Pie5VxF980LIWE5iXfd/c6xPxDl/ntf/Uy2yZFcwQ+1DuSj1vo00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753293988; c=relaxed/simple;
-	bh=AtQqA6F/45yFU5BVQolqTbs8/m2tj/q1zoYsWyGZ/7s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XwwK2/QQYBFI9iGdPwv2w1TL80iWCeBB4eBfc/SBApIzcxcP2i5xahTypZaEA5ntcFnLCqSnjHXzQuaxR/nVAdxstwW+A76aDGo+KJ3Oui4ijWW6XxfrESedZKojDkkqzugsqKsxa54nptSXmzu0ll+5Wu8EVDTYLY+bDQA1HGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gZr9hy+p; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-235ea292956so919165ad.1
-        for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 11:06:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753293986; x=1753898786; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nRVhbn5cd2Y+Qqs2piA5lEzyVD0l4Fs2Eu31USQDCPI=;
-        b=gZr9hy+pefoY6zonqwViEnJn3y8H0Gtcy4XxC3m9C6hJTUrZ10U7jyaJStGiDKLjOE
-         RCQP/DKZve7fpz0xIpMLcvG7o+0xDYMbMkMU3ipx+BcM3TrjPUFax/qPh+3yN7gG17L0
-         y5//P2QNqGBTc+1xM51Pi0l/yr71q0ifC5FxHAt+2S3iuCPR2MF02dCclUL3zakT8UrN
-         2s2Mb2umcUeegY626O/VHp+mUogzp7/T5yx6duQJ35a0hH2wImiKSCcRIKaUoOiloH8A
-         Gam5UXQI0edLK1IWm8E0oF57/p9fPsn5SkBJ1t0taFZ5ZH+2YcS1Hm0YtYPkMPGYeYSS
-         1hSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753293986; x=1753898786;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nRVhbn5cd2Y+Qqs2piA5lEzyVD0l4Fs2Eu31USQDCPI=;
-        b=hxRSVdSpFKzEnB+47qm9GdmGpcTDY4NRDiwrU6J0vMxDlD5b4WB7vfADTOEWSA4Slj
-         Zx2bs6KJCCKFyn2pq8ljQufO5MgngP8HfzTnBY/nGHYZLX4b3zQ73YbV+bVW0EmQWhAp
-         ZvamcCpaTR+FM+oxyjBSB8w9oRm5XwFTwOpucL5WYAwfq0FZY7kyZatRzOgy0Qv3KbxY
-         8q24SnH+LFboDGoLxyCiOseY0MTJNZqo/ENOf3LJnOJllMeAeRzddTpNF9ZivWP97wTV
-         y+cOJVWfpAgY1nJLJ9R2GWC5+EYkCsPLUMrv+UNo6CprraPU0q84c76nwqtzhpRtMmpd
-         XkNw==
-X-Forwarded-Encrypted: i=1; AJvYcCX62tja/A2RN8xCjJv2Ts10nYjj29+3HJrR/Kjd+YJOJngnOi/90Ccqgg2f8XLUnckaQncBKfY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7QpCSjIWmDCJYVLoFw3oTymwKExE+yQK2orw3rV7tZQaJBL2Y
-	emwCaAVO91EAfZbr092RhfnEFo/jFgCbjdBjd1sujSs4WWwOfiqpdfmrKBv2Sy/Eipn5jP+lUcC
-	ZQ4SEcQJZolpEvemsRgcHgo3jIfKV1gh8o4UAneIx
-X-Gm-Gg: ASbGnct/egLygzll1tX7vnMaU2rKI0KqPoZd4mk6Oln5DejWgWQQQwrYGqD3GGVoLWd
-	yUE94YM8p5pIA9CUNXFVYgKvY5YM21ZGFgvQVLyj9DnDUsDdW04NrYfxBpncUB/D7809x7OlWYW
-	jZf83Fg4y2O+ZWwXeSYI2b0saHx2FVwILr7qeRYE1YHLla6IBKkkJQdVTmbjEsQVEOC6nHl1R2u
-	cQsaoWtXT4W63ykUjLgC11YjpnErg7qpWvhjA==
-X-Google-Smtp-Source: AGHT+IGAS9GFi3JlMJlvgpwfxagLVOLIDfr/dpIzxSNzxoDY3Xq3bIbZBTFy9IfSvS1aU0XN3So/jgdBQSoP4rQIooc=
-X-Received: by 2002:a17:903:fab:b0:23c:7b65:9b08 with SMTP id
- d9443c01a7336-23f9813aa74mr61580225ad.1.1753293986127; Wed, 23 Jul 2025
- 11:06:26 -0700 (PDT)
+	s=arc-20240116; t=1753294251; c=relaxed/simple;
+	bh=tKNJjaAqhMlo0SUQGs+ceDgPqde7WpwhfupbI7Mb4wg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WjA8RJXrUS2rBffobb/scxBI2BWfl3QcfxYFHuuxamif/W011tWLHNJKhXzlMFO/rr5RYQkgby13YztErvuUsk+vgA8cp1Qnjyxb7oIFnfm195yUy1Ab+JA7pDFiMVY/7RVMbiSG6HYP1Soclx+S9//1D0GphJ4qjf0rGQfa42o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=O7SH2ghI; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=e7yAQVKufsGUq0RlWkmXXT76VJ5Jz8/4Modn4AF3l8Y=; b=O7SH2ghIeyJ4J07Wq82Am6kIXg
+	mCZtwEIIPos7eogVB5F4K5ZUsUNFNft08J0nNKY92wMJ5T8msMb5f+Fxyb2zR9WiWXNg93VFKhzF1
+	U1F3SUG0OSdJ5eVblMhR6L910dsJzBHA4SPi3xnoWQDBSzG6FhFKHkB8nLZ3AUtAYtmBD5cyGnZ/T
+	Lhl3eBBKAym8Hd1B+gO7bH9EZwbxDPR0zp0Bhv/NNjlmVRNqdA973OVYO2o9x4vor9H+2JPKuq8Ap
+	l7D+ZM1w9f4ehGy7/X/qD/bzfmN5YUZ3nirX5+kIm25iSEDX9Q0DcYTwrjXi92na9Jm1d8l/0Rrbt
+	PGOtSY3g==;
+Received: from [50.53.25.54] (helo=[192.168.254.17])
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uedvQ-00000005ifW-2wT6;
+	Wed, 23 Jul 2025 18:10:44 +0000
+Message-ID: <62345993-46bb-48d9-853b-09a82b03edaf@infradead.org>
+Date: Wed, 23 Jul 2025 11:10:43 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <z7kkbenhkndwyghwenwk6c4egq3ky4zl36qh3gfiflfynzzojv@qpcazlpe3l7b>
- <CANn89iLg-VVWqbWvLg__Zz=HqHpQzk++61dbOyuazSah7kWcDg@mail.gmail.com>
- <jc6z5d7d26zunaf6b4qtwegdoljz665jjcigb4glkb6hdy6ap2@2gn6s52s6vfw>
- <CAAVpQUAJCLaOr7DnOH9op8ySFN_9Ky__easoV-6E=scpRaUiJQ@mail.gmail.com>
- <p4fcser5zrjm4ut6lw4ejdr7gn2gejrlhy2u2btmhajiiheoax@ptacajypnvlw>
- <CAAVpQUAk4F__D7xdWpt0SEE4WEM_-6V1P7DUw9TGaV=pxZ+tgw@mail.gmail.com>
- <xjtbk6g2a3x26sqqrdxbm2vxgxmm3nfaryxlxwipwohsscg7qg@64ueif57zont>
- <CAAVpQUAL09OGKZmf3HkjqqkknaytQ59EXozAVqJuwOZZucLR0Q@mail.gmail.com>
- <jmbszz4m7xkw7fzolpusjesbreaczmr4i64kynbs3zcoehrkpj@lwso5soc4dh3>
- <CAAVpQUCv+CpKkX9Ryxa5ATG3CC0TGGE4EFeGt4Xnu+0kV7TMZg@mail.gmail.com> <e6qunyonbd4yxgf3g7gyc4435ueez6ledshde6lfdq7j5nslsh@xl7mcmaczfmk>
-In-Reply-To: <e6qunyonbd4yxgf3g7gyc4435ueez6ledshde6lfdq7j5nslsh@xl7mcmaczfmk>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 23 Jul 2025 11:06:14 -0700
-X-Gm-Features: Ac12FXw7kOY6uM_dMo2JVrN3O4hsJfpqzeP9Oi1ZMcHl-QMNLbwpvpTS0-tYcwk
-Message-ID: <CAAVpQUDMj_1p6sVeo=bZ_u34HSX7V3WM6hYG3wHyyCACKrTKmQ@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 13/13] net-memcg: Allow decoupling memcg from
- global protocol memory accounting.
-To: Shakeel Butt <shakeel.butt@linux.dev>
-Cc: Eric Dumazet <edumazet@google.com>, =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Tejun Heo <tj@kernel.org>, "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	Mat Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
-	Andrew Morton <akpm@linux-foundation.org>, Simon Horman <horms@kernel.org>, 
-	Geliang Tang <geliang@kernel.org>, Muchun Song <muchun.song@linux.dev>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, mptcp@lists.linux.dev, 
-	cgroups@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Jul 23, 2025 at 10:28=E2=80=AFAM Shakeel Butt <shakeel.butt@linux.d=
-ev> wrote:
->
-> Cc Tejun & Michal to get their opinion on memcg vs cgroup vs BPF
-> options.
->
-> On Tue, Jul 22, 2025 at 07:35:52PM -0700, Kuniyuki Iwashima wrote:
-> [...]
-> > >
-> > > Running workloads in root cgroup is not normal and comes with a warni=
-ng
-> > > of no isolation provided.
-> > >
-> > > I looked at the patch again to understand the modes you are introduci=
-ng.
-> > > Initially, I thought the series introduced multiple modes, including =
-an
-> > > option to exclude network memory from memcg accounting. However, if I
-> > > understand correctly, that is not the case=E2=80=94the opt-out applie=
-s only to
-> > > the global TCP/UDP accounting. That=E2=80=99s a relief, and I apologi=
-ze for the
-> > > misunderstanding.
-> > >
-> > > If I=E2=80=99m correct, you need a way to exclude a workload from the=
- global
-> > > TCP/UDP accounting, and currently, memcg serves as a convenient
-> > > abstraction for the workload. Please let me know if I misunderstood.
-> >
-> > Correct.
-> >
-> > Currently, memcg by itself cannot guarantee that memory allocation for
-> > socket buffer does not fail even when memory.current < memory.max
-> > due to the global protocol limits.
-> >
-> > It means we need to increase the global limits to
-> >
-> > (bytes of TCP socket buffer in each cgroup) * (number of cgroup)
-> >
-> > , which is hard to predict, and I guess that's the reason why you
-> > or Wei set tcp_mem[] to UINT_MAX so that we can ignore the global
-> > limit.
->
-> No that was not the reason. The main reason behind max tcp_mem global
-> limit was it was not needed
-
-but the global limit did take place thus you had to set tcp_mem
-to unlimited.
-
-> as memcg should account and limit the
-> network memory.
-> I think the reason you don't want tcp_mem global limit
-> unlimited now is
-
-memcg has been subject to the global limit from day 0.
-
-And note that not every process is under memcg with memory.max
-configured.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 14/14] RDMA/ionic: Add Makefile/Kconfig to kernel build
+ environment
+To: Abhijit Gangurde <abhijit.gangurde@amd.com>, shannon.nelson@amd.com,
+ brett.creeley@amd.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net, jgg@ziepe.ca,
+ leon@kernel.org, andrew+netdev@lunn.ch
+Cc: allen.hubbe@amd.com, nikhil.agarwal@amd.com, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250723173149.2568776-1-abhijit.gangurde@amd.com>
+ <20250723173149.2568776-15-abhijit.gangurde@amd.com>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20250723173149.2568776-15-abhijit.gangurde@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
 
-> you have internal feature to let workloads opt out of
-> the memcg accounting of network memory which is causing isolation
-> issues.
->
-> >
-> > But we should keep tcp_mem[] within a sane range in the first place.
-> >
-> > This series allows us to configure memcg limits only and let memcg
-> > guarantee no failure until it fully consumes memory.max.
-> >
-> > The point is that memcg should not be affected by the global limits,
-> > and this is orthogonal with the assumption that every workload should
-> > be running under memcg.
-> >
-> >
-> > >
-> > > Now memcg is one way to represent the workload. Another more natural,=
- at
-> > > least to me, is the core cgroup. Basically cgroup.something interface=
-.
-> > > BPF is yet another option.
-> > >
-> > > To me cgroup seems preferrable but let's see what other memcg & cgrou=
-p
-> > > folks think. Also note that for cgroup and memcg the interface will n=
-eed
-> > > to be hierarchical.
-> >
-> > As the root cgroup doesn't have the knob, these combinations are
-> > considered hierarchical:
-> >
-> > (parent, child) =3D (0, 0), (0, 1), (1, 1)
-> >
-> > and only the pattern below is not considered hierarchical
-> >
-> > (parent, child) =3D (1, 0)
-> >
-> > Let's say we lock the knob at the first socket creation like your
-> > idea above.
-> >
-> > If a parent and its child' knobs are (0, 0) and the child creates a
-> > socket, the child memcg is locked as 0.  When the parent enables
-> > the knob, we must check all child cgroups as well.  Or, we lock
-> > the all parents' knobs when a socket is created in a child cgroup
-> > with knob=3D0 ?  In any cases we need a global lock.
-> >
-> > Well, I understand that the hierarchical semantics is preferable
-> > for cgroup but I think it does not resolve any real issue and rather
-> > churns the code unnecessarily.
->
-> All this is implementation detail and I am asking about semantics. More
-> specifically:
->
-> 1. Will the root be non-isolated always?
 
-Yes, because the root cgroup doesn't have memcg.
-Also, the knob has CFTYPE_NOT_ON_ROOT.
+On 7/23/25 10:31 AM, Abhijit Gangurde wrote:
+> Add ionic to the kernel build environment.
+> 
+> Co-developed-by: Allen Hubbe <allen.hubbe@amd.com>
+> Signed-off-by: Allen Hubbe <allen.hubbe@amd.com>
+> Signed-off-by: Abhijit Gangurde <abhijit.gangurde@amd.com>
+> ---
+> v2->v3
+>   - Removed select of ethernet driver
+>   - Fixed make htmldocs error
+> 
+>  .../device_drivers/ethernet/index.rst         |  1 +
+>  .../ethernet/pensando/ionic_rdma.rst          | 43 +++++++++++++++++++
+>  MAINTAINERS                                   |  9 ++++
+>  drivers/infiniband/Kconfig                    |  1 +
+>  drivers/infiniband/hw/Makefile                |  1 +
+>  drivers/infiniband/hw/ionic/Kconfig           | 15 +++++++
+>  drivers/infiniband/hw/ionic/Makefile          |  9 ++++
+>  7 files changed, 79 insertions(+)
+>  create mode 100644 Documentation/networking/device_drivers/ethernet/pensando/ionic_rdma.rst
+>  create mode 100644 drivers/infiniband/hw/ionic/Kconfig
+>  create mode 100644 drivers/infiniband/hw/ionic/Makefile
+> 
 
+> diff --git a/Documentation/networking/device_drivers/ethernet/pensando/ionic_rdma.rst b/Documentation/networking/device_drivers/ethernet/pensando/ionic_rdma.rst
+> new file mode 100644
+> index 000000000000..80c4d9876d3e
+> --- /dev/null
+> +++ b/Documentation/networking/device_drivers/ethernet/pensando/ionic_rdma.rst
+> @@ -0,0 +1,43 @@
+> +.. SPDX-License-Identifier: GPL-2.0+
+> +
+> +============================================================
+> +Linux Driver for the AMD Pensando(R) Ethernet adapter family
+> +============================================================
 
-> 2. If a cgroup is isolated, does it mean all its desendants are
->    isolated?
+Please try to differentiate the title of this driver from that of
+the Pensando ethernet driver:
 
-No, but this is because we MUST think about how we handle
-the scenario above that (parent, child) =3D (0,0) becomes (1, 0).
+========================================================
+Linux Driver for the Pensando(R) Ethernet adapter family
+========================================================
 
-We cannot think about the semantics without implementation
-detail.  And if we allow such scenario, the hierarchical semantics
-is fake and has no meaning.
+Thanks.
 
-
-> 3. Will there ever be a reasonable use-case where there is non-isolated
->    sub-tree under an isolated ancestor?
-
-I think no, but again, we need to think about the scenario above,
-otherwise, your ideal semantics is just broken.
-
-Also, "no reasonable scenario" does not always mean "we must
-prevent the scenario".
-
-If there's nothing harmful, we can just let it be, especially if such
-restriction gives nothing andrather hurts performance with no
-good reason.
-
-
->
-> Please give some thought to the above (and related) questions.
-
-Please think about the implementation detail and if its trade-off
-(just keeping semantics vs code churn & perf regression) makes
-really sense.
+> +
+> +AMD Pensando RDMA driver.
+> +Copyright (C) 2018-2025, Advanced Micro Devices, Inc.
+> +
+> +Contents
+> +========
+> +
+> +- Identifying the Adapter
+> +- Enabling the driver
+> +- Support
+> +
+> +Identifying the Adapter
+> +=======================
+> +
+> +See Documentation/networking/device_drivers/ethernet/pensando/ionic.rst
+> +for more information on identifying the adapter.
+> +
+> +Enabling the driver
+> +===================
+> +
+> +The driver is enabled via the standard kernel configuration system,
+> +using the make command::
+> +
+> +  make oldconfig/menuconfig/etc.
+> +
+> +The driver is located in the menu structure at:
+> +
+> +  -> Device Drivers
+> +    -> InfiniBand support
+> +      -> AMD Pensando DSC RDMA/RoCE Support
+> +
+> +Support
+> +=======
+> +
+> +For general Linux rdma support, please use the rdma mailing
+> +list, which is monitored by AMD Pensando personnel::
+> +
+> +  linux-rdma@vger.kernel.org
 
 
->
-> I am still not convinced that memcg is the right home for this opt-out
-> feature. I have CCed cgroup folks to get their opinion as well.
+-- 
+~Randy
+
 
