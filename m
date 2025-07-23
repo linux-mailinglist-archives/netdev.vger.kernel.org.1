@@ -1,156 +1,218 @@
-Return-Path: <netdev+bounces-209547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAC2CB0FD18
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 00:47:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDEA1B0FD3A
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 01:19:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D99227B96E4
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 22:46:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D91635435A8
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 23:19:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70770272E4C;
-	Wed, 23 Jul 2025 22:47:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A23D22D786;
+	Wed, 23 Jul 2025 23:19:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qkArfUW7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D2D1ADC93;
-	Wed, 23 Jul 2025 22:47:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72898A95C
+	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 23:19:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753310839; cv=none; b=BtClGQ8mfUkVG4ouIHASIGzNBV8ANfKJgGZmsbzfYmeZbnE9sBieqprKvD1TtYF7wnLFhQRMtUdzyRqViM8Tr/SEkcXZO+QgZndK01MDMN8yEchRuYrIGRQgxCjxHM8bHmQy57cHowMkfNHsaQL3WRfV8Dj11z04NHr477iZ/tA=
+	t=1753312762; cv=none; b=KExcfYwVWka1yUY2dEkjmooZGwIUDhRTd3FtTxNdH6v1w05om2NLxv0s0d58OgZQANASZ+QPvQnaqVIc0tQu2eCaUIBWE75gnW8WZ+sPEoW4peSLeZA57lE4i4ju2nZbIVPKWBGegvWssMb4LuYJnW5fYqE8TpcpBUlpjlgHVhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753310839; c=relaxed/simple;
-	bh=gIZ3Gg4GHsNCeHTDxIT3z/WY+ARBDqVZGC0oXyvX9Zc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hFVW1q9yNYkZmTn379N9IJi4EC/xaYdEqje866RoVMTm2NOEqZpmLFM2MyGlSmDnu/OQTdSGIAf5isypaUd03zr3tWFx4T44ao9VhRCiHTDNc45HD+vk4jTXJtB9mQOVaWj0CbWHpUjcvIlJpP6hXLLmlKRuOGBiRdJuyQQMbY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-236377f00a1so2733055ad.3;
-        Wed, 23 Jul 2025 15:47:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753310837; x=1753915637;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lIv0ABc2hZ3qEcGwVWoX24Ijm7AbP0wuivuZzCaSDck=;
-        b=hkiQ/Ffg+igedPR2KHV/0InzJgGsj4q1KEMlFVcOyDhLHteMyUsbDueVyf/d9WJbPw
-         x1BHMmutgBP/j4ykRk+XXwCU1ZJxgpXmHuLVpBcxB0T1igKY9lrzcd8KQjMCDJJNdFOr
-         TkXNqga80YE/7LNj//SuT+X0TuUVaXAg80ZG+VFcj8QuISMJ3CeqdMM5e5tM1s2atw4E
-         YawLCrSI/IMptsyLna9gM1+Ll247Rc37pgkKX+ZPnJo8y/2Ml8bu6Ofj3fhWqPTrlbCr
-         6TlrkdLD4lA/Tsa3H3ysT3P4YobJGUaqecAwRELznxlutmig35kypcRtpUHPkVfCLKBO
-         wR6w==
-X-Forwarded-Encrypted: i=1; AJvYcCXA3jIncQS6jYo4BHBbjvs1+ovKKOQbY6T5sXHzjK8/pInVfOPEA+U/wqurSamRqS8B+3zJEid1oXiAlmGs7Oiw@vger.kernel.org, AJvYcCXEeaneqAp6t6H+ocqX2u92HgXwESc6jiah8xN5aBOfdOILJT3DgLRo26wvnrj39u6Iv93z08FRSBctzgs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/QbXMkYsEMehutzOC7lSt8lWC5Dp+zYZnWTriCFQcGilaPEk8
-	85zyjnKZSD6RTWsB1EnTa9Culd0ff/HqBNSgRSx3SGmZkHCwwKdSNpZfiL8n
-X-Gm-Gg: ASbGncsW/DL8uUyWtlQJam2sR7bTYRhFo18RKau7jOm9VbBIfvtlykF8jD68m4f1Oin
-	qHvG8mgq8CCkhtXKdlOn4/P/0FIpivhln5MT4qg6C+FdUaOUvhtISQomlrI7OkbLARe41C1eKLZ
-	mRDk85tuTo01p5I0NyP9MfXpwoLJ/+nSR0ftAIeLuWkN1mSM719ciBEogcIBgau2PTUdWSsgPEQ
-	RVDI1HH+AWOMZC3QlkEQ3qJ2T/MXtLie0/s+xb+cakDFMfGBeyC7mfR2EKYlvoKDfoXlzKmEj6/
-	E295smbT8uHS6JSbydmYhkit5Dtma3S54WHQpUs2MLfAJRGJtL/qh3bBtglx4WM+WPF7jzUsAwP
-	GAP5ckSAiGwKZGxn8Dp7fE3McP9B2FcbxQkjBUhZxLhu37Fw9WMTeifNDofTBnznLDQl2VA==
-X-Google-Smtp-Source: AGHT+IG9CGSEp3Qw45UQnHd6uj+P20AwcVqjHQKhcpdUnznQ9Sg0rN1CwtHG/GLgdDSbf6t/F3/BtQ==
-X-Received: by 2002:a17:902:e546:b0:234:ed31:fc94 with SMTP id d9443c01a7336-23f981ba3d4mr58873915ad.26.1753310836823;
-        Wed, 23 Jul 2025 15:47:16 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-23fa476c131sm995695ad.45.2025.07.23.15.47.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Jul 2025 15:47:16 -0700 (PDT)
-From: Stanislav Fomichev <sdf@fomichev.me>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	sd@queasysnail.net,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	shuah@kernel.org,
-	sdf@fomichev.me,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net v2 2/2] selftests: rtnetlink: add macsec and vlan nesting test
-Date: Wed, 23 Jul 2025 15:47:15 -0700
-Message-ID: <20250723224715.1341121-2-sdf@fomichev.me>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250723224715.1341121-1-sdf@fomichev.me>
-References: <20250723224715.1341121-1-sdf@fomichev.me>
+	s=arc-20240116; t=1753312762; c=relaxed/simple;
+	bh=xMRkc3hMEooERsYGMs3Q39oDE/IWErsDq+4OWl6ggGc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=K4txtZsKf7cp+2Q25NPSF98yPOS63dcSnT505/LokOzrPo2fFDXLHIhmbc/Qqu4p1acIbY76LCj4HInAo0oy/p3b+hKYrDPeiNSZ5tgCG2EFFrNwXorZfOoJfC6bw+EyOJLPxEfNZp+Fb9l7JFgdhHO3YoS/6ztPIXfIvLQAt0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qkArfUW7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D65FFC4CEE7;
+	Wed, 23 Jul 2025 23:19:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753312761;
+	bh=xMRkc3hMEooERsYGMs3Q39oDE/IWErsDq+4OWl6ggGc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=qkArfUW7XalkEj7xkXsUraWJzbER2zC4yd1lBYWdMy9TolT1OL/sKjTb6EDyrL/+b
+	 91JrqBbKrj5vANMC20WJ97aJVTixJ7iaVkZSLNkUFOtDQUYgT0i4JsmvYEKtyrYSh4
+	 v/1WC4WsKNygCstq4cY0a8ZPojNZ7M9512SeURhUxnI/t8pZ0g+XWykesVEsiBW+UU
+	 dXt6EGrtB/2q/yxwdNOTAOIH0Io5APyKWHJYjAem1pvrs+UMny2cRh4zQGjuoCUl0h
+	 xPHSin04PwYZZbm6380pWffZ9g3tBrpQuZg8mN9kbExMXWengasKm12Um8Cv43yZud
+	 yO4ckshxr5wVg==
+From: Kees Cook <kees@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Kees Cook <kees@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH 0/6 net-next] net: Introduce struct sockaddr_unspec
+Date: Wed, 23 Jul 2025 16:19:07 -0700
+Message-Id: <20250723230354.work.571-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=7563; i=kees@kernel.org; h=from:subject:message-id; bh=xMRkc3hMEooERsYGMs3Q39oDE/IWErsDq+4OWl6ggGc=; b=owGbwMvMwCVmps19z/KJym7G02pJDBmNue9yFWf8eNRg27j+ztO0y9ticn9I5R0SSt1/kfugl JzyxUu1HaUsDGJcDLJiiixBdu5xLh5v28Pd5yrCzGFlAhnCwMUpABO53sjIsKPT0yJYcsLXZaHz JZnN7yeGdHF5J6ZptB/zD9g/J6+2jeGfuodrqbb01YUO0fxJh/rLlq1e9polfv1FhfsRXOZ32A5 zAgA=
+X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 
-Add reproducer for [0] with a dummy device.
+Hi,
 
-0: https://lore.kernel.org/netdev/2aff4342b0f5b1539c02ffd8df4c7e58dd9746e7.camel@nvidia.com/
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
----
- tools/testing/selftests/net/rtnetlink.sh | 36 ++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+The historically fixed-size struct sockaddr is part of UAPI and embedded
+in many existing structures. The kernel uses struct sockaddr extensively
+within the kernel to represent arbitrarily sized sockaddr structures,
+which caused problems with the compiler's ability to determine object
+sizes correctly. The "temporary" solution was to make sockaddr explicitly
+use a flexible array, but this causes problems for embedding struct
+sockaddr in structures, where once again the compiler has to guess about
+the size of such objects.
 
-diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
-index 2e8243a65b50..d786aa07829b 100755
---- a/tools/testing/selftests/net/rtnetlink.sh
-+++ b/tools/testing/selftests/net/rtnetlink.sh
-@@ -21,6 +21,7 @@ ALL_TESTS="
- 	kci_test_vrf
- 	kci_test_encap
- 	kci_test_macsec
-+	kci_test_macsec_vlan
- 	kci_test_ipsec
- 	kci_test_ipsec_offload
- 	kci_test_fdb_get
-@@ -561,6 +562,41 @@ kci_test_macsec()
- 	end_test "PASS: macsec"
- }
- 
-+# Test __dev_set_rx_mode call from dev_uc_add under addr_list_lock spinlock.
-+# Make sure __dev_set_promiscuity is not grabbing (sleeping) netdev instance
-+# lock.
-+# https://lore.kernel.org/netdev/2aff4342b0f5b1539c02ffd8df4c7e58dd9746e7.camel@nvidia.com/
-+kci_test_macsec_vlan()
-+{
-+	msname="test_macsec1"
-+	vlanname="test_vlan1"
-+	local ret=0
-+	run_cmd_grep "^Usage: ip macsec" ip macsec help
-+	if [ $? -ne 0 ]; then
-+		end_test "SKIP: macsec: iproute2 too old"
-+		return $ksft_skip
-+	fi
-+	run_cmd ip link add link "$devdummy" "$msname" type macsec port 42 encrypt on
-+	if [ $ret -ne 0 ];then
-+		end_test "FAIL: can't add macsec interface, skipping test"
-+		return 1
-+	fi
-+
-+	run_cmd ip link set dev "$msname" up
-+	ip link add link "$msname" name "$vlanname" type vlan id 1
-+	ip link set dev "$vlanname" address 00:11:22:33:44:88
-+	ip link set dev "$vlanname" up
-+	run_cmd ip link del dev "$vlanname"
-+	run_cmd ip link del dev "$msname"
-+
-+	if [ $ret -ne 0 ];then
-+		end_test "FAIL: macsec_vlan"
-+		return 1
-+	fi
-+
-+	end_test "PASS: macsec_vlan"
-+}
-+
- #-------------------------------------------------------------------
- # Example commands
- #   ip x s add proto esp src 14.0.0.52 dst 14.0.0.70 \
+Switching to sockaddr_storage internally everywhere wastes a lot of memory,
+so we are left with needing two changes:
+- introduction of an explicitly arbitrarily sized sockaddr struct
+- switch struct sockaddr back to being fixed size
+
+Doing the latter step requires all "arbitrarily sized" uses of struct
+sockaddr to be replaced with the new struct from the first step.
+
+So, introduce the new struct and start the conversions.
+
+Thanks!
+
+-Kees
+
+
+Kees Cook (6):
+  net: uapi: Add __kernel_sockaddr_unspec for sockaddr of unknown length
+  net/l2tp: Add missing sa_family validation in
+    pppol2tp_sockaddr_get_info
+  net: Convert proto_ops bind() callbacks to use sockaddr_unspec
+  net: Convert proto_ops connect() callbacks to use sockaddr_unspec
+  net: Remove struct sockaddr from net.h
+  net: Convert proto callbacks from sockaddr to sockaddr_unspec
+
+ include/linux/bpf-cgroup.h                |  6 +++---
+ include/linux/net.h                       | 11 ++++++-----
+ include/net/inet_common.h                 | 13 ++++++-------
+ include/net/ip.h                          |  4 ++--
+ include/net/ipv6.h                        | 10 +++++-----
+ include/net/ipv6_stubs.h                  |  2 +-
+ include/net/ping.h                        |  2 +-
+ include/net/sctp/sctp.h                   |  2 +-
+ include/net/sock.h                        | 14 +++++++-------
+ include/net/tcp.h                         |  2 +-
+ include/net/udp.h                         |  2 +-
+ include/net/vsock_addr.h                  |  2 +-
+ include/uapi/linux/socket.h               | 15 +++++++++++++++
+ net/rds/rds.h                             |  2 +-
+ net/smc/smc.h                             |  4 ++--
+ crypto/af_alg.c                           |  2 +-
+ drivers/block/drbd/drbd_receiver.c        |  6 +++---
+ drivers/infiniband/hw/erdma/erdma_cm.c    |  6 +++---
+ drivers/infiniband/sw/siw/siw_cm.c        |  8 ++++----
+ drivers/isdn/mISDN/l1oip_core.c           |  2 +-
+ drivers/isdn/mISDN/socket.c               |  4 ++--
+ drivers/net/ppp/pppoe.c                   |  2 +-
+ drivers/net/ppp/pptp.c                    |  4 ++--
+ drivers/net/wireless/ath/ath10k/qmi.c     |  2 +-
+ drivers/net/wireless/ath/ath11k/qmi.c     |  2 +-
+ drivers/net/wireless/ath/ath12k/qmi.c     |  2 +-
+ drivers/nvme/host/tcp.c                   |  4 ++--
+ drivers/nvme/target/tcp.c                 |  2 +-
+ drivers/slimbus/qcom-ngd-ctrl.c           |  2 +-
+ drivers/target/iscsi/iscsi_target_login.c |  2 +-
+ drivers/xen/pvcalls-back.c                |  4 ++--
+ fs/afs/rxrpc.c                            |  6 +++---
+ fs/coredump.c                             |  2 +-
+ fs/dlm/lowcomms.c                         |  8 ++++----
+ fs/ocfs2/cluster/tcp.c                    |  6 +++---
+ fs/smb/client/connect.c                   |  4 ++--
+ fs/smb/server/transport_tcp.c             |  4 ++--
+ net/9p/trans_fd.c                         |  6 +++---
+ net/appletalk/ddp.c                       |  4 ++--
+ net/atm/pvc.c                             |  4 ++--
+ net/atm/svc.c                             |  4 ++--
+ net/ax25/af_ax25.c                        |  4 ++--
+ net/bluetooth/hci_sock.c                  |  2 +-
+ net/bluetooth/iso.c                       |  6 +++---
+ net/bluetooth/l2cap_sock.c                |  4 ++--
+ net/bluetooth/rfcomm/core.c               |  6 +++---
+ net/bluetooth/rfcomm/sock.c               |  4 ++--
+ net/bluetooth/sco.c                       |  4 ++--
+ net/caif/caif_socket.c                    |  2 +-
+ net/can/bcm.c                             |  2 +-
+ net/can/isotp.c                           |  2 +-
+ net/can/j1939/socket.c                    |  4 ++--
+ net/can/raw.c                             |  2 +-
+ net/ceph/messenger.c                      |  2 +-
+ net/core/filter.c                         |  4 ++--
+ net/core/sock.c                           |  6 +++---
+ net/ieee802154/socket.c                   | 12 ++++++------
+ net/ipv4/af_inet.c                        | 12 ++++++------
+ net/ipv4/datagram.c                       |  4 ++--
+ net/ipv4/ping.c                           |  8 ++++----
+ net/ipv4/raw.c                            |  3 ++-
+ net/ipv4/tcp.c                            |  2 +-
+ net/ipv4/tcp_ipv4.c                       |  4 ++--
+ net/ipv4/udp.c                            |  6 ++++--
+ net/ipv4/udp_tunnel_core.c                |  4 ++--
+ net/ipv6/af_inet6.c                       |  6 +++---
+ net/ipv6/datagram.c                       |  8 ++++----
+ net/ipv6/ip6_udp_tunnel.c                 |  4 ++--
+ net/ipv6/ping.c                           |  2 +-
+ net/ipv6/raw.c                            |  3 ++-
+ net/ipv6/tcp_ipv6.c                       |  6 +++---
+ net/ipv6/udp.c                            |  5 +++--
+ net/l2tp/l2tp_core.c                      |  8 ++++----
+ net/l2tp/l2tp_ip.c                        |  6 ++++--
+ net/l2tp/l2tp_ip6.c                       |  5 +++--
+ net/l2tp/l2tp_ppp.c                       |  9 ++++++++-
+ net/llc/af_llc.c                          |  4 ++--
+ net/mctp/af_mctp.c                        |  2 +-
+ net/mctp/test/route-test.c                |  2 +-
+ net/mptcp/pm_kernel.c                     |  4 ++--
+ net/mptcp/protocol.c                      |  5 +++--
+ net/mptcp/subflow.c                       |  4 ++--
+ net/netfilter/ipvs/ip_vs_sync.c           |  6 +++---
+ net/netlink/af_netlink.c                  |  4 ++--
+ net/netrom/af_netrom.c                    |  4 ++--
+ net/nfc/llcp_sock.c                       |  6 +++---
+ net/nfc/rawsock.c                         |  2 +-
+ net/packet/af_packet.c                    |  4 ++--
+ net/phonet/pep.c                          |  3 ++-
+ net/phonet/socket.c                       |  6 +++---
+ net/qrtr/af_qrtr.c                        |  4 ++--
+ net/qrtr/ns.c                             |  2 +-
+ net/rds/af_rds.c                          |  2 +-
+ net/rds/bind.c                            |  2 +-
+ net/rds/tcp_connect.c                     |  4 ++--
+ net/rds/tcp_listen.c                      |  2 +-
+ net/rose/af_rose.c                        |  4 ++--
+ net/rxrpc/af_rxrpc.c                      |  4 ++--
+ net/rxrpc/rxperf.c                        |  2 +-
+ net/sctp/socket.c                         | 13 +++++++------
+ net/smc/af_smc.c                          |  6 +++---
+ net/socket.c                              | 12 ++++++------
+ net/sunrpc/clnt.c                         |  6 +++---
+ net/sunrpc/svcsock.c                      |  2 +-
+ net/sunrpc/xprtsock.c                     |  6 +++---
+ net/tipc/socket.c                         |  6 +++---
+ net/unix/af_unix.c                        | 12 ++++++------
+ net/vmw_vsock/af_vsock.c                  |  6 +++---
+ net/vmw_vsock/vsock_addr.c                |  2 +-
+ net/x25/af_x25.c                          |  4 ++--
+ net/xdp/xsk.c                             |  2 +-
+ 111 files changed, 278 insertions(+), 245 deletions(-)
+
 -- 
-2.50.1
+2.34.1
 
 
