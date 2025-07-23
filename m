@@ -1,491 +1,222 @@
-Return-Path: <netdev+bounces-209311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85499B0EFF3
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 12:36:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F126B0F009
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 12:38:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1B807A3593
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:35:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F64B1662EC
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:38:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0CE6283FFB;
-	Wed, 23 Jul 2025 10:36:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61D162BE637;
+	Wed, 23 Jul 2025 10:37:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d2S8gpUO"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="CQ8argJw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011035.outbound.protection.outlook.com [52.101.70.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C522021FF44
-	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 10:36:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46FF528A73C;
+	Wed, 23 Jul 2025 10:37:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.35
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753267001; cv=fail; b=AYZiWx7GLt02IArWez/90F98bfsfTE8V0MbhVOa5AIIgxAAGjvvxKl5WiCxFbShyNoIFRfCpnvG/3mh3Kp+e3j/kxgh3WrVhoTVI82usoIwNu3v2yVAltkmx4lwkYqj2u9oOMMU0f5YpQpNlFt1SqqGCKVWXKfkW3cj6gJgBbDg=
+	t=1753267063; cv=fail; b=GPM2knuwllan1KtDf3MpDiM5vX0MvIv8gmf9Yl+BwkXb8nIT+IdfYwVNZUxAw9/3B/+ieKxg0KQhL9iO7F1i1JcJGDuoC9Egg/HQj3eRMZ3AKDeQxIYoW0Wp99FVqEm0rpIVSKakjpHS8s0JBV11D+gwLRboYxdRSSqcDdxBGTw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753267001; c=relaxed/simple;
-	bh=B/KkGFHwnbsugqKzBVWOTbF0mDdKMDYWLgYU/sbO1WE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=NdCBQBM7cLfpR6PPcL50+6OpMc+Sc6m+ORechxWaS5hjGfKEIIyfHPenRsWHt06/XTjRwoaafwefEvF2r4/fuNkFef4rtdq4nBIB+bowKXfNB8BocwoRCXxSqzlRjYd6QuOfvt35NzkQfn+4tU/f0ASiP6q7v1HxktUe6LBYgNM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d2S8gpUO; arc=fail smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753267000; x=1784803000;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=B/KkGFHwnbsugqKzBVWOTbF0mDdKMDYWLgYU/sbO1WE=;
-  b=d2S8gpUOBjKz//q2QhfffpjZ9InEunKQo7kmbeQpOAxqoO/DJA+bDt2I
-   sVjchYjSXkGNUHi7gvw/X6CBRmowoXnfXJnb3b7/0NwHXxtpGxhiaWiFJ
-   5wcGWbRWEZ+SyE63kxzODhyiFLkvYfGFm85h9n9fSmlGZnSqRta77kGvt
-   mqLVmamRcEg2Y+GIMHAI3oEpterVPxX4JHU10WAQ9c4iB9UuTWRwT9xt1
-   kcIOWoSvwwvT/7WHydEkGvuf1ViI961SbauC8PrscYBweC/LUnp2tNT1T
-   Rwnj1Tk6cVqRhnlL43m5US146hPDZ8mXV14K4xX9H4jqvUtynK/lLVniC
-   A==;
-X-CSE-ConnectionGUID: n1LiUu6zQPGkAzRG6jm1Uw==
-X-CSE-MsgGUID: FVgqF9LtQFeJdITU/AsTgw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11500"; a="43164566"
-X-IronPort-AV: E=Sophos;i="6.16,333,1744095600"; 
-   d="scan'208";a="43164566"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2025 03:36:31 -0700
-X-CSE-ConnectionGUID: 2pX1d7BYSrKyw5sdmJj/aA==
-X-CSE-MsgGUID: 4I1wQ6lrSZm+xFeiFBhW8A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,333,1744095600"; 
-   d="scan'208";a="159167771"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2025 03:36:30 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Wed, 23 Jul 2025 03:36:30 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26 via Frontend Transport; Wed, 23 Jul 2025 03:36:29 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (40.107.237.64)
- by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Wed, 23 Jul 2025 03:36:29 -0700
+	s=arc-20240116; t=1753267063; c=relaxed/simple;
+	bh=uvk5gIrsEANieVGXDF7OzO4ByBJM+UKPZd6kr9oWOY4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=D/jmcDdtQDfxE4XOCymPYWvdv8Fa7C2H3DuR1vHMW4Y58u82sxkb1FdRTr8t/6ypxuQZNkSszZYy9lZNyRJKiXjKScjawnOc7NJyq262ltCP7fZtbjR6AKaSC+FI3ZENY4xOpjP3QctoTYSxK7UYfm+AcHSbAbJjOMJoc5Ae6lM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=CQ8argJw; arc=fail smtp.client-ip=52.101.70.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=PFkztPMKqsk0ZPLFTA6ebLspOR8nS5UQNroNXxbGKCnrbdfRx35hXgEYWlknMZK6hY9EGC6GYJHJfAUciqRmZB5OdsZDZjNQ+jNdBgWY87mNNB73aueX+iPstzR+70CdY2oxHH2yEiJJHP6awCnqIMN2V0kT/O3/S8/kZuIv3ebJabWZGH/zyG4iefUrRPhq5bJkGpBpkE7yXtiD9USb/IfCS9dobafshiYSVKpHstnX5tG7cJXP8zWAkf0k4TL58b7p3DQE1pz9tTU7RR4qJzk0t1KL8SvaHYyHxUaHdoQPdoPINB/xwOujoP8m7X5uf3kqaHx92NMbysrk8ERrqQ==
+ b=i72pGqk/7PGyRD8DVm5ef8++zTjL1Nw50kynhMHkirMUCx76Tm/Y79w4Jfbh3aFY6nCMEzQsDcV9MeHMVR40uxumD+sjIs3A3N6QE7sR8WJZTLn35VUNf66thqa58viMWhweDHk7bzEANr8wnqzLvMUv1Z9rlAIKgJNmxxbTI04aEzIhqPkcU+KCNLLYMG/MQIneaiTqckEofonImNMBO5PqzJFU31UGBb5iThNqunbiMXReDLXpSVnVREMS50MFCHea85zBQsWhlfHr8w6NyJHHt0dMiPvTuFdEvpn1NOXh0wQ+UoNZFr8tTSqrOpmJuvddamUDzeLRoy+PsSkNZw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DwNVXXRJ/krHno529j0zwxU+EG4euEa0oeczIJEUNqI=;
- b=GRbQwL8C2X3Ctzv6bss5n92uDe/tFlMhZ/fGi1ZcUpO8xipG9YwusjBvryWLRAWMIUoAC7McHSuVdHefhMU2qeNeIQ4WugXrt5w34Du0KB2SNulnl1YggnkbrWXFX/Emyc9IguQEBcXh0LgwXEFtNLicUHyOzQXqdrZOtBdW5I/2fAxb2BFx4ev72c9t2V8hTVddxO9uEvD62A+6xC8DE6OkILfz37ROmlD+tsKDbNDglFZbEP2XFrztN9cyy25mJ0xrWHl626+iTD3iZMsssAZl2dB5te3YadQxoUugC5aIvhD37cu+Oci9SyhMhpMsUgF6mhHA+pQcsbSoYN9rjA==
+ bh=YFiIoCYv50h6c9Z86tjX1BJjXv+bGXRNIYA8gaP+yOo=;
+ b=E7apMIoCGvr7PgWnwM3bpk+YaoQjx0DJtOBBpLVQQUteHqamu/3Xe2CwlgMLNJcp5Kdc67dSG4Wd0MWKCg2TZV6JGZ2D1AcxlXcZf57tZ5v61gb6p0fOUCH3Pfg8uHY788xmsmE9VHsShRevF3CkyA0CSQ/VZQXswaeoSqTZcSgX9fqfNdUD1ZfcrmTfR+fUv7c4j398iRp+kseWfM54wIYijXtdZvvbz3OGjmEg1uyECaiy8lH8W23p6vW7xyAD9Wd9OizYo5Qpd6iIPw0ieBZh4Ige3cx1ay4LOrAh9JXz3EmXVcyfIAXYylpp84FpEWuOhkH1UdPGOKF3HHGtug==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by IA3PR11MB9276.namprd11.prod.outlook.com (2603:10b6:208:572::19) with
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YFiIoCYv50h6c9Z86tjX1BJjXv+bGXRNIYA8gaP+yOo=;
+ b=CQ8argJwU4z2mAFDDJJNdCxdRFdzfPEEf99psc5iMYzwxfkqGABa3a0j8K04xf+rM1Fe/yh/NWM6fX1PMfy5xw6D5XutcO3nhKhw3xOe4/hqJy9Ww+//KoJ38q2MEshnp9MxefrWf+3x4o6AerP6tiBxLGGlASURu5a9kqyJ518vTps2Y3hQQ55Lbbb7sa3Djx9W7RQaUrcCcMJ/BACQ0rE9L7rgOADzFKwvrsl6RN8QbVcBgiTobHmYuHXy1+laMTyXfulUacr7ggCkkCHNWMjPksFnKe1UjVTdF/ZYL5sB1JlyAWRJ6RReFMQO9Qz/s4ZERKIqeUPAKE/ZRl9eng==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
+ by AM9PR04MB8453.eurprd04.prod.outlook.com (2603:10a6:20b:410::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8943.25; Wed, 23 Jul
- 2025 10:36:27 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::395e:7a7f:e74c:5408%4]) with mapi id 15.20.8922.037; Wed, 23 Jul 2025
- 10:36:27 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "dawid.osuchowski@linux.intel.com"
-	<dawid.osuchowski@linux.intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v1 05/15] ice: add pdev into
- fwlog structure and use it for logging
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v1 05/15] ice: add pdev into
- fwlog structure and use it for logging
-Thread-Index: AQHb+vjSJq82MJccXk2rlRKhyzGL5bQ/hT0w
-Date: Wed, 23 Jul 2025 10:36:27 +0000
-Message-ID: <IA3PR11MB89866C84FFEC1183637926B9E55FA@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <20250722104600.10141-1-michal.swiatkowski@linux.intel.com>
- <20250722104600.10141-6-michal.swiatkowski@linux.intel.com>
-In-Reply-To: <20250722104600.10141-6-michal.swiatkowski@linux.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|IA3PR11MB9276:EE_
-x-ms-office365-filtering-correlation-id: 21c90e36-16f6-45ae-cb77-08ddc9d4c78a
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?yxlpF3Cn3ymtRGMfksDkS8ReKh+YKyWDrtDRVaD2glriVaDCxWPzl8AE64G0?=
- =?us-ascii?Q?seEwRXb1OSIHGaD9+wdC1fjYrODpkWTvSh6rogoYwVDBl7lPVmrkmFV2qjTZ?=
- =?us-ascii?Q?4ASMhG75tXHBUKSw5pLLt3GNMeKEmbvooJa4ZNHOBsyABbbKw8qM1AQKYTci?=
- =?us-ascii?Q?YWrGI5VXwoyQ5+F2KlVwchKDDTAlwFL7kn80O63hMjK3kxI6TPLDkYTjgmjb?=
- =?us-ascii?Q?bz2flBlYktPOaP4FmyOUHO+NQv+SZwdVRGmSNer+Oll0VFd1YE33MEmG+5BS?=
- =?us-ascii?Q?ILWBOxMnMCGftDEwdEPlbne3sPgwxD1xlI8X3S2VWJyVWNxuNOgxtDenrG2x?=
- =?us-ascii?Q?kmM/PCgyaAOdA8nXJiPDrtXcE6UlbhiARuHHNyhWajkcJzyXA6sJKHFqFLre?=
- =?us-ascii?Q?eqgOoF/9pmp3W+qellKE1qRGRuZGHqPUqty4HoQ+cv5N45VvXRk5vFwnA0f0?=
- =?us-ascii?Q?0F+h6H+NKPYhDy897m9xwnWSvsk5BPbyTLQJaw7R8XRjuHp62WoeQC4abVg8?=
- =?us-ascii?Q?W8Gx8qRy8VzhLsc1mwKzeJPPz+Sgn8H1aqj53gxCz4WaK+eA5YVXETq9rZCV?=
- =?us-ascii?Q?XStrxYHJhGrxuNoNOy3HnrolPIAY7K7l1ylZ4+oL9T6or4fL0XqKIfgW7g4B?=
- =?us-ascii?Q?0hB9edMnvVEPJsTwzGHKs6IYMAHtcIqws+s93dBoyzfFZjJuEq5uZBwp4OpE?=
- =?us-ascii?Q?l7RijevvOizllyRB+NzOyfu7/sSyP7SILt2eGIg8HdKKRtDlBEJMOwgiw4tr?=
- =?us-ascii?Q?tMk4jw6VpmtEd+Ridk73Zymdvurn0WoMS8+iLCi/VlBfxEQbqZ+jbBcMik4Z?=
- =?us-ascii?Q?XirFUhdvmM8tRn/mhoWDVbCzeaPOFS4QTKC3qkEnl5SFXwiFO99nkmWGe7fn?=
- =?us-ascii?Q?JyGlOsSFEh7Q06a4+hCyzJtjzJ06ua8kiEpQ4z4r5nRuqcnFFBBG+JDnasBl?=
- =?us-ascii?Q?Mc3hZBqP0kSgvkW3s5+soFKbMJzuBd0xjtxhYS0QNeOBecAHZsmAHI1MCqWv?=
- =?us-ascii?Q?P6Mau0mK0D0vQ7vl25zEAkz5aENk+/Ac0kUtjxbJk73rkiH3rp4I+pFdMZ84?=
- =?us-ascii?Q?B/aItVshkFj1tP/x15h9SHzyDXfYNt6RFuGgQYqb5DJzg1RdwybThuGzqoN4?=
- =?us-ascii?Q?O8hTpyKuRd9v5lUwuOBBKuXfWukHNQkX7nYeBBCQGGVVb2XPCCA+xJdZDhfY?=
- =?us-ascii?Q?O2XzewKMjItcHl1NxArtNhlgywaBWxLTpGgdqeERkFgL1lLw+qI5AQOnnGnq?=
- =?us-ascii?Q?XFtjU0GYF4cpUwrwcbrs3B5aJSH0Ti0O/MJg0QdaqXOGA60Lbx34zjk4meAs?=
- =?us-ascii?Q?ITia6cafV/o0t+NKlPPych0XZFYOfrhZHU/LSHxn3aWWxjXHOJekoLCOYm9r?=
- =?us-ascii?Q?JpxbPNrBdCESCZN4p4xvfi/7SdCJoU8cFCf6PphkE0iD4fSV5e2S6K8VN3Gy?=
- =?us-ascii?Q?k/KjrID2m6SWMcayis+fmolUwP8Ou8VZgYHaUZ8sjB3LOoMfOmWeHYgeC8Qu?=
- =?us-ascii?Q?BEe5LmEz0OoER0I=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?lfGWEmC8AgxwJAX8EgxSnZtm7mJEd9UmqveKysBRoUObudBqLh7r1lmRdxh/?=
- =?us-ascii?Q?1GZxY8gxZalqUz5Hoc700cHN/yoMitIOSxW6Tp+PiSfL+IVOgeUueFJfXhs1?=
- =?us-ascii?Q?lJeMhrF3NpuwO54CSB1prD0SA1K9Sqg+JYIz1NsgoT083DSHMb9jEh6bG/Wy?=
- =?us-ascii?Q?hTB60CPSrMY9HzmGvc+btqzsmeDG2JnkhnenNSMiY2KRTBFL5xguEFzbSKRz?=
- =?us-ascii?Q?iQ+2HHZFVUZp8DLTYepgVxunFejz6KOoIVp54m2T447YwOxU4qnF+ya5e0vQ?=
- =?us-ascii?Q?CSTaSPh3u56HuXFPafjI/5n5XtaaXZc5g6YdyTzSbOwSdrlFevMtA2keqS0L?=
- =?us-ascii?Q?pEOp6I9Ix3c3ozq+8H12G9gYMowAYXV0lZ2R2KOCF3bh/pfm17fnXxd0TVFK?=
- =?us-ascii?Q?6A06+7St1I/X+/8VfzvAJA8t+jP+GmxHqGyb6T7SGVGI+Pe7g6Q3ikN8tp7a?=
- =?us-ascii?Q?PU2zIYz5vACWLphCx8GCTm0JPClrEapuZO2t/PFsAqIEI2Q7bU5ktpNTNhag?=
- =?us-ascii?Q?cU+bVRjW7Fzdlnpi9BS5YXm9EkRjsGlXgYhiI3r+T5ZJKzJ0ve+kMBX26CxO?=
- =?us-ascii?Q?joY/YVzEs8G7wPW7vNxaHB6IgqK0HpQDcI/fTC1D8r98HuTC86uppBtM+RFA?=
- =?us-ascii?Q?QLmsFJBPZF4DeNOPAFRDJKSwDYtPQBsT/O/rXN6D0ffCQX537BAHwVX8GChb?=
- =?us-ascii?Q?9s231nY6OYJyKGDug6SQJqF6MXVJUjG1P4ZZdgV9BCFqHqa8AeX3ncbnkMia?=
- =?us-ascii?Q?Nhl2gO5waVin1hhX7O0R//AXRrmhzMJuvmfHixOBOOiM/Al37bawx7mfQntE?=
- =?us-ascii?Q?Y8gx1tuAz50iAtzQR3NpOrt2xtbgQ4y1t/6pfjweE+yCMSBjh+hyqPdZI2U5?=
- =?us-ascii?Q?/w1IJ5iQYJKGVUYqJR5lU27kTK9MIdlr93v9enqDgoDOU+b3/wT0yham8GzF?=
- =?us-ascii?Q?r7wH+fitQ+olfb7RKQNLGO/hZaY23QIIU4CDachL7TfxDVnOkTMTK369nWKo?=
- =?us-ascii?Q?pZcILkGQslWeC5fIn875RimoLmgjcWPhbNUJxdqN7zHWAmM0bnu56Cnl29gR?=
- =?us-ascii?Q?rZHwJ+FdM2D3YNC7/gDhUe3aMd9OgUe5NaeqmsIr2rtA720/UFcvHdn8W1+Y?=
- =?us-ascii?Q?7MmEH3otXgv5qzyd5MmJWruo59htHRYLaR9kKBU9xGMCpEedLLvxuRHE/j4t?=
- =?us-ascii?Q?xReVDRZwK8nsUGFbhfdDA2DPLUtLO9WFDujiyHhMyTkM7qQb3tIS9wIyCAk2?=
- =?us-ascii?Q?OtF8CPaScLn8KZGQJkSBLCTwA9o+6NVxMpLwnJMphwFjwp+F+/Eh7KkhPeLX?=
- =?us-ascii?Q?rbbIt56NoEr5lf7SgorRVJoW/8tjFbni9BLDJYG49PM0JvMlCiYzgzeYYuWa?=
- =?us-ascii?Q?UnYY+k2wuAVsbc4iflmRioW8TS9V9IxUzNb+d2fyxjJsAqPk9gwINkFZcjpe?=
- =?us-ascii?Q?VtTdFyMmsLsFWDKu+sdJ7YaJltcrJQsjUbMrNujQBGj/qJ2+gp8Xxnp9Xu1g?=
- =?us-ascii?Q?pabtgNg6ZLqDoIrojEXynDiZRT4FwK0R+VEQ2rwogqphOzudA6PA99oGgX7G?=
- =?us-ascii?Q?/M4K1eAhjexVWx9roYJVdUUta3fK7urEVj213xZA79Z30pL0Mqhm1oYL/krb?=
- =?us-ascii?Q?sg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.21; Wed, 23 Jul
+ 2025 10:37:38 +0000
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2%7]) with mapi id 15.20.8964.019; Wed, 23 Jul 2025
+ 10:37:38 +0000
+Date: Wed, 23 Jul 2025 13:37:34 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Xiaoliang Yang <xiaoliang.yang_1@nxp.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"n.zhandarovich@fintech.ru" <n.zhandarovich@fintech.ru>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"wojciech.drewek@intel.com" <wojciech.drewek@intel.com>,
+	"Arvid.Brodin@xdin.com" <Arvid.Brodin@xdin.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"lukma@denx.de" <lukma@denx.de>,
+	"m-karicheri2@ti.com" <m-karicheri2@ti.com>
+Subject: Re: [PATCH net-next] net: hsr: create an API to get hsr port type
+Message-ID: <20250723103734.64ydzav3fsw3lgxc@skbuf>
+References: <20250723100605.23860-1-xiaoliang.yang_1@nxp.com>
+ <20250723100608.apixcv3ix5rn7ydz@skbuf>
+ <DB9PR04MB9259A60ECD5FFAA71A0509A2F05FA@DB9PR04MB9259.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DB9PR04MB9259A60ECD5FFAA71A0509A2F05FA@DB9PR04MB9259.eurprd04.prod.outlook.com>
+X-ClientProxiedBy: VI1PR07CA0306.eurprd07.prod.outlook.com
+ (2603:10a6:800:130::34) To AM8PR04MB7779.eurprd04.prod.outlook.com
+ (2603:10a6:20b:24b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|AM9PR04MB8453:EE_
+X-MS-Office365-Filtering-Correlation-Id: 315bc0af-28eb-408e-7d5d-08ddc9d4f186
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|7416014|366016|10070799003|19092799006|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?QkD+hAYDaymRxtTXpucLQJ/q04rjkoeJx64RiQz5q6cTrlDwi5lBhItoDUvX?=
+ =?us-ascii?Q?ALaLuNU6n+MmXa/S+yNfnO7krc7k/iH5tXxue35lBz5Y3pFwsJRX0ksQffpI?=
+ =?us-ascii?Q?itqD+F7YzL2kyCGe79MjHdT+C1Omm5CyHI7Bfdx8IMID4KzGQTGSr/x1YbJk?=
+ =?us-ascii?Q?0k5a4GwVkNGVdsuVDdNzCQfYU/N6qVhXf2jr1l8ctsR0B3WIaxJfkSbcXHtE?=
+ =?us-ascii?Q?tX2bCVXeZmOZh1yurR+ALiLasLPe3NnzMs5TR6/itRRdOiz6t5EL7LbwVSLC?=
+ =?us-ascii?Q?tHZnmTvmy4PHRgkvknVwXmI3/izvjKkDCTjC8kknBzgYXCNazQUO7//oxjXE?=
+ =?us-ascii?Q?2ppmIKwh71N0zRGiY22W6/i0w5EIdiTfZWxHdwAKFFNLcGhUnV5ae3Unu0RL?=
+ =?us-ascii?Q?QypkJ7c7LxJuBsJxZ6Pb5NQxTc2Lm9MuDdSUyxKmBYaZT3u4O6ipG6GzAlec?=
+ =?us-ascii?Q?a6TKOAly10mS+PRghBvyH7jP+ruEZ7DSPx5RKUcPhcYYHmDJJR1+T41i5EJk?=
+ =?us-ascii?Q?hTpLha3LfJLK3IgvuAZGpDFCaW9iee9QIdYciGjDWEFn4gHBkxSUoGqIgAaR?=
+ =?us-ascii?Q?rIudUgirgSGUkPElUHC/WIPgw1I6O6wokjVACys9oG7FQnB/kOPpb9Dok+kK?=
+ =?us-ascii?Q?vX5txnDk5EjW+Lpfr5tt84/UAVed0HML816ip4k4HhXi8cYrQpB7oKE2LHWy?=
+ =?us-ascii?Q?bXz9if5Fu2UHBKOmSBeJsg3TUJHSJ0cqBVrt7zkcjrW+LrPgYD4H2wJl0H81?=
+ =?us-ascii?Q?iPPdxmnr1OFdNuequkUIpK6U7M3avcz3hMjJvkn76VLumHGJ84HWLE6jbX5W?=
+ =?us-ascii?Q?Ln1SW6ktKZavfBPaLnDpTZ8u7XDEGfgRelNLPN21MP5sVtMknoPl/0rCkCdS?=
+ =?us-ascii?Q?cNJNtoVzGZi+XdArqy09R1L/CoxTFG97UwxKbwNlV5aOjHIBHrfybaZs+EJO?=
+ =?us-ascii?Q?7I1FXnfK8lRQsZ6PulL7C/DZBtG8+dsCAHFlLy1nH0F2revMKgpdeShi1MDE?=
+ =?us-ascii?Q?xjEe+1GqIaMcUOIFnh5py4P66O+nIF5/GszFkVh5I0pFa4GWwOgJI8mOD+tv?=
+ =?us-ascii?Q?3GEBxjllcAPSK9/FMh2XnMf9WHWIW7rWov4FDCbA8E+dbHFYKEF8dIWE8eAX?=
+ =?us-ascii?Q?OPkabmxHcrcNeW5gQi3TbiHOgxaQz2L/zDXjYL+j5E3GzNc375HSwwABweeF?=
+ =?us-ascii?Q?bpRYaqb2e2GldeF46So1nAEUV8LK5SA2anxj4Rvg0Qh6c7pKIJpVXqvUjvZC?=
+ =?us-ascii?Q?dllCYQOTN/f96HPSYZZySsJSU6zYD9JxJtk7CeLizRQYDVyRjpPNfMahxQCp?=
+ =?us-ascii?Q?nkrgwT0A39y1LxZ4r/sndAVc86ajckkjSpWa3nhIMXyTJLhSN9NSQH7bhgeQ?=
+ =?us-ascii?Q?9aSGLkfppxfh8g7b5QxNG7uvVCcsCalbh76mUmmTuKV67BDn8BKjx/JHk9EF?=
+ =?us-ascii?Q?f40aZLaK7j0=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016)(10070799003)(19092799006)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?rm6rFFwPkAWr9FbFgPirDG5xqTOIX+Ky63ezugH76BQDE03cv1s2Iox8uGWM?=
+ =?us-ascii?Q?f9U8GoiQitt3v9qNMzS5aRtioeHsQm6oaxl0nm6bwQw6MGD8x9c0jY+2OllM?=
+ =?us-ascii?Q?BLYPx/o5YYA6ONL8fbnFpIpZrEvVN8GnDLg29CAMEf7Rqk7XO7M3ZiaE1RK7?=
+ =?us-ascii?Q?uCxU7jtc7mYBoMZ7Zv8tDTvy9C/aX0LY+TKwURofCvM5IUZEYgGSXPeifngF?=
+ =?us-ascii?Q?DDkuG6155H5clmRk4lgIJ5A1qQNeqr5Vvq5sdSTMdzLMO8fL/ioQ5JYrIQz4?=
+ =?us-ascii?Q?uBacuCrS1n09yQCF8utGkcgjlnWEA3WpHSB040DDwKyH1Z9DWR8cLQ5jJ5L4?=
+ =?us-ascii?Q?PRKIQtZwcpzmyLfTSHSFegqZusoFmTQ/PI2KnX6czXGs2/hsL41hLsThWrJy?=
+ =?us-ascii?Q?HgrH2KDdqiKimTYfKZGffL2KH5JUE7I5ElzDAtNohifa60QCEmU9K2sibj5g?=
+ =?us-ascii?Q?XqSyDhB+8IfH409/k9vzjToGQx2G48B0kWcPTjRbG/NPdLAa1HvtX2NBD22F?=
+ =?us-ascii?Q?6eneK8Pql1miKDjOHX1v6em6zr8qQTc//xHFFlTj9buE489UMMgFKDwONV2Q?=
+ =?us-ascii?Q?Tf2LDBXf1PJDTNOPgUSZkfTSvq5k4MeYcf2ZGWoywSd62X/Qxyh4QRL3cId8?=
+ =?us-ascii?Q?76oN98u+aMyR2wytSn0wMf102COIJuNMseQPIXYNVCv6W/ftYljAAR1NmT1P?=
+ =?us-ascii?Q?EYyvPgOmY4edhkarctQydufiTWZRRC4lHsDgn6CSwQXW0Qsl8xi1dInAMcvC?=
+ =?us-ascii?Q?byVkocjSSC+mF+92oR668GBuwz1RkZweyzhhVpSl/UwDhERAdrUjQNEttb04?=
+ =?us-ascii?Q?Mwsi+AtHG0ztY14jWEcdxFEPU+vbaeOYMJlgSVxkLhLjP8wlv70AJP67PphF?=
+ =?us-ascii?Q?WfwaU3xQFf6CiKG1dR15dHa4x/KfBEXEP/vOvEwSiTZo3eXo0IgEKo/VwTSI?=
+ =?us-ascii?Q?sYdm6EmhrsFJkhDV+4+PmwXZHMyMr6c22Tik9qtj5GI6VRjrbqLjugUAMTnx?=
+ =?us-ascii?Q?TSNf4T+1W3YJtFGmmcDMSGbGCRwHOQ6VN6bVCWJkFaWYfnuSXWpDHgRusscx?=
+ =?us-ascii?Q?mYZ6dU/008zJqUcXv4MRQ0LZVtyNLosIjs8Kg5RBsVeawvo9N4yeO6GOwHIH?=
+ =?us-ascii?Q?kaz9I1fUaMMxbgAghU4MgTthbbDHQkCT6cJp7Nr7jFlqHjpFDYzDH6KKJ1pG?=
+ =?us-ascii?Q?Ph0p/xdrZKOi3BdIKCLxzZ41yH0yuTZS9HDvdux5/jmPlVqoLuV1Iout6V06?=
+ =?us-ascii?Q?7NU2NqApdtLzLi7BcNaAQ9WVQX1VklBszKC7+VnJCyhpLxoTSKnAOv1psVVp?=
+ =?us-ascii?Q?nDCZVql85FTAB9r4/CTDOJsKz4wL4T0MwxmoBpqgxYiiY4yLn6ElnK13beTU?=
+ =?us-ascii?Q?I+V8227aJl3WxQmXgKPSaaO3KI1dHMljNVbUzMgzXEFQ/Ht+N6GpOIgVGJt7?=
+ =?us-ascii?Q?m7ho8HjKKZpnJLzMI544TG5zIGAQW5fT+ix+R96Rpc34ScS3FISOm22lIQio?=
+ =?us-ascii?Q?gkefQPdGwC7cCjd9KaUz0+axtjh1iEve4heFUHv+SmbmWAUJFZKaci1hJpKS?=
+ =?us-ascii?Q?+8EkeqKjThdRQa5W1IfsoP3yxMFksmigYLAKxT9ygJY65H3tPtNs+0XVtzWi?=
+ =?us-ascii?Q?BI5AT+5JugTSBbnbcyXoHKJClbxKzV6IllwL0SRJiOoOed20kxdc9yr8GoK8?=
+ =?us-ascii?Q?rToWgg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 315bc0af-28eb-408e-7d5d-08ddc9d4f186
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 21c90e36-16f6-45ae-cb77-08ddc9d4c78a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jul 2025 10:36:27.4016
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2025 10:37:38.0686
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: xcaikApQ7eRHwsaw92zLVMKmLk/p0DsEY0WJYh5oK6OrS0sAKI/d9R5HXwBplBXLX7n8+yO+6GEn+SI94VmJIiRhkrk0Hdkzxdgcg2/dhjA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR11MB9276
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +dGbRsBPilhtIteTB0s4Pfun78QH7re2YqtFtdazX1M8WSow6M33/9DKCG8bVZ9j6kJk4jG0UlXzfP1Rbj3npQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8453
 
+On Wed, Jul 23, 2025 at 01:29:09PM +0300, Xiaoliang Yang wrote:
+> 
+> 
+> > -----Original Message-----
+> > From: Vladimir Oltean <vladimir.oltean@nxp.com>
+> > Sent: Wednesday, July 23, 2025 6:06 PM
+> > To: Xiaoliang Yang <xiaoliang.yang_1@nxp.com>
+> > Cc: davem@davemloft.net; netdev@vger.kernel.org; linux-
+> > kernel@vger.kernel.org; kuba@kernel.org; n.zhandarovich@fintech.ru;
+> > edumazet@google.com; pabeni@redhat.com; wojciech.drewek@intel.com;
+> > Arvid.Brodin@xdin.com; horms@kernel.org; lukma@denx.de; m-
+> > karicheri2@ti.com
+> > Subject: Re: [PATCH net-next] net: hsr: create an API to get hsr port type
+> > 
+> > Hi Xiaoliang,
+> > 
+> > On Wed, Jul 23, 2025 at 06:06:05PM +0800, Xiaoliang Yang wrote:
+> > > If a switch device has HSR hardware ability and HSR configuration
+> > > offload to hardware. The device driver needs to get the HSR port type
+> > > when joining the port to HSR. Different port types require different
+> > > settings for the hardware, like HSR_PT_SLAVE_A, HSR_PT_SLAVE_B, and
+> > > HSR_PT_INTERLINK. Create the API hsr_get_port_type() and export it.
+> > >
+> > > When the hsr_get_port_type() is called in the device driver, if the
+> > > port can be found in the HSR port list, the HSR port type can be obtained.
+> > > Therefore, before calling the device driver, we need to first add the
+> > > hsr_port to the HSR port list.
+> > >
+> > > Signed-off-by: Xiaoliang Yang <xiaoliang.yang_1@nxp.com>
+> > > ---
+> > 
+> > An API with no callers will never be accepted. You need to post the user together
+> > with this change, for the maintainers to have the full picture and see whether it is
+> > the best way to solve the problem.
+> 
+> Thanks Vladimir, I want to use the API in dsa netc driver. The driver
+> has not been upstream now. I see the HSR implemented on some devices
+> only act as DANH. If the device act as RedBox, we don't know which
+> port is interlink, which is slave_A or slave_B. I will re-send it as
+> RFC patch, anyone can discuss how to handle this issue.
+> 
+> Regards,
+> Xiaoliang
 
+It's not of much use if you still repost an API with no users with an
+RFC tag.
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> Of Michal Swiatkowski
-> Sent: Tuesday, July 22, 2025 12:46 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: netdev@vger.kernel.org; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; dawid.osuchowski@linux.intel.com;
-> Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-next v1 05/15] ice: add pdev
-> into fwlog structure and use it for logging
->=20
-> Prepare the code to be moved to the library. ice_debug() won't be
-> there so switch to dev_dbg().
->=20
-> Add struct pdev pointer in fwlog to track on which pdev the fwlog was
-> created.
->=20
-> Switch the dev passed in dev_warn() to the one stored in fwlog.
->=20
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_common.c  |  3 +-
-> drivers/net/ethernet/intel/ice/ice_debugfs.c |  2 +-
->  drivers/net/ethernet/intel/ice/ice_fwlog.c   | 37 ++++++++++---------
-> -
->  drivers/net/ethernet/intel/ice/ice_fwlog.h   |  7 ++--
->  4 files changed, 26 insertions(+), 23 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c
-> b/drivers/net/ethernet/intel/ice/ice_common.c
-> index 5d7f348aa596..7f293c791775 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_common.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
-> @@ -992,6 +992,7 @@ int ice_init_hw(struct ice_hw *hw)  {
->  	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree) =3D NULL;
->  	void *mac_buf __free(kfree) =3D NULL;
-> +	struct ice_pf *pf =3D hw->back;
->  	u16 mac_buf_len;
->  	int status;
->=20
-> @@ -1012,7 +1013,7 @@ int ice_init_hw(struct ice_hw *hw)
->  	if (status)
->  		goto err_unroll_cqinit;
->=20
-> -	status =3D ice_fwlog_init(hw, &hw->fwlog);
-> +	status =3D ice_fwlog_init(hw, &hw->fwlog, pf->pdev);
->  	if (status)
->  		ice_debug(hw, ICE_DBG_FW_LOG, "Error initializing FW
-> logging: %d\n",
->  			  status);
-> diff --git a/drivers/net/ethernet/intel/ice/ice_debugfs.c
-> b/drivers/net/ethernet/intel/ice/ice_debugfs.c
-> index dbcc0cb438aa..1e036bc128c5 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_debugfs.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_debugfs.c
-> @@ -450,7 +450,7 @@ ice_debugfs_log_size_write(struct file *filp,
-> const char __user *buf,
->  	}
->=20
->  	/* free all the buffers and the tracking info and resize */
-> -	ice_fwlog_realloc_rings(hw, &hw->fwlog, index);
-> +	ice_fwlog_realloc_rings(&hw->fwlog, index);
->=20
->  	/* if we get here, nothing went wrong; return count since we
-> didn't
->  	 * really write anything
-> diff --git a/drivers/net/ethernet/intel/ice/ice_fwlog.c
-> b/drivers/net/ethernet/intel/ice/ice_fwlog.c
-> index a010f655ffb7..b1c1359d5ab5 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_fwlog.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_fwlog.c
-> @@ -73,13 +73,11 @@ static void ice_fwlog_free_ring_buffs(struct
-> ice_fwlog_ring *rings)  #define ICE_FWLOG_INDEX_TO_BYTES(n) ((128 *
-> 1024) << (n))
->  /**
->   * ice_fwlog_realloc_rings - reallocate the FW log rings
-> - * @hw: pointer to the HW structure
->   * @fwlog: pointer to the fwlog structure
->   * @index: the new index to use to allocate memory for the log data
->   *
->   */
-> -void ice_fwlog_realloc_rings(struct ice_hw *hw, struct ice_fwlog
-> *fwlog,
-> -			     int index)
-> +void ice_fwlog_realloc_rings(struct ice_fwlog *fwlog, int index)
->  {
->  	struct ice_fwlog_ring ring;
->  	int status, ring_size;
-> @@ -109,7 +107,7 @@ void ice_fwlog_realloc_rings(struct ice_hw *hw,
-> struct ice_fwlog *fwlog,
->=20
->  	status =3D ice_fwlog_alloc_ring_buffs(&ring);
->  	if (status) {
-> -		dev_warn(ice_hw_to_dev(hw), "Unable to allocate memory
-> for FW log ring data buffers\n");
-> +		dev_warn(&fwlog->pdev->dev, "Unable to allocate memory
-> for FW log
-> +ring data buffers\n");
->  		ice_fwlog_free_ring_buffs(&ring);
->  		kfree(ring.rings);
->  		return;
-> @@ -165,16 +163,16 @@ static int ice_aq_fwlog_get(struct ice_hw *hw,
-> struct ice_fwlog_cfg *cfg)
->=20
->  	status =3D ice_aq_send_cmd(hw, &desc, buf, ICE_AQ_MAX_BUF_LEN,
-> NULL);
->  	if (status) {
-> -		ice_debug(hw, ICE_DBG_FW_LOG, "Failed to get FW log
-> configuration\n");
-> +		dev_dbg(&hw->fwlog.pdev->dev, "Failed to get FW log
-> +configuration\n");
->  		goto status_out;
->  	}
->=20
->  	module_id_cnt =3D le16_to_cpu(cmd->ops.cfg.mdl_cnt);
->  	if (module_id_cnt < ICE_AQC_FW_LOG_ID_MAX) {
-> -		ice_debug(hw, ICE_DBG_FW_LOG, "FW returned less than the
-> expected number of FW log module IDs\n");
-> +		dev_dbg(&hw->fwlog.pdev->dev, "FW returned less than the
-> expected
-> +number of FW log module IDs\n");
->  	} else if (module_id_cnt > ICE_AQC_FW_LOG_ID_MAX) {
-> -		ice_debug(hw, ICE_DBG_FW_LOG, "FW returned more than
-> expected number of FW log module IDs, setting module_id_cnt to
-> software expected max %u\n",
-> -			  ICE_AQC_FW_LOG_ID_MAX);
-> +		dev_dbg(&hw->fwlog.pdev->dev, "FW returned more than
-> expected number of FW log module IDs, setting module_id_cnt to
-> software expected max %u\n",
-> +			ICE_AQC_FW_LOG_ID_MAX);
->  		module_id_cnt =3D ICE_AQC_FW_LOG_ID_MAX;
->  	}
->=20
-> @@ -225,8 +223,8 @@ static void ice_fwlog_set_supported(struct ice_hw
-> *hw, struct ice_fwlog *fwlog)
->=20
->  	status =3D ice_aq_fwlog_get(hw, cfg);
->  	if (status)
-> -		ice_debug(hw, ICE_DBG_FW_LOG, "ice_aq_fwlog_get failed,
-> FW logging is not supported on this version of FW, status %d\n",
-> -			  status);
-> +		dev_dbg(&fwlog->pdev->dev, "ice_aq_fwlog_get failed, FW
-> logging is not supported on this version of FW, status %d\n",
-> +			status);
->  	else
->  		fwlog->supported =3D true;
->=20
-> @@ -237,17 +235,20 @@ static void ice_fwlog_set_supported(struct
-> ice_hw *hw, struct ice_fwlog *fwlog)
->   * ice_fwlog_init - Initialize FW logging configuration
->   * @hw: pointer to the HW structure
->   * @fwlog: pointer to the fwlog structure
-> + * @pdev: pointer to the pci dev used in dev_warn()
->   *
->   * This function should be called on driver initialization during
->   * ice_init_hw().
->   */
-> -int ice_fwlog_init(struct ice_hw *hw, struct ice_fwlog *fwlog)
-> +int ice_fwlog_init(struct ice_hw *hw, struct ice_fwlog *fwlog,
-> +		   struct pci_dev *pdev)
->  {
->  	/* only support fw log commands on PF 0 */
->  	if (hw->bus.func)
->  		return -EINVAL;
->=20
->  	ice_fwlog_set_supported(hw, fwlog);
-> +	fwlog->pdev =3D pdev;
->=20
->  	if (ice_fwlog_supported(fwlog)) {
->  		int status;
-> @@ -261,7 +262,7 @@ int ice_fwlog_init(struct ice_hw *hw, struct
-> ice_fwlog *fwlog)
->  					    sizeof(*fwlog->ring.rings),
->  					    GFP_KERNEL);
->  		if (!fwlog->ring.rings) {
-> -			dev_warn(ice_hw_to_dev(hw), "Unable to allocate
-> memory for FW log rings\n");
-> +			dev_warn(&fwlog->pdev->dev, "Unable to allocate
-> memory for FW log
-> +rings\n");
->  			return -ENOMEM;
->  		}
->=20
-> @@ -270,7 +271,7 @@ int ice_fwlog_init(struct ice_hw *hw, struct
-> ice_fwlog *fwlog)
->=20
->  		status =3D ice_fwlog_alloc_ring_buffs(&fwlog->ring);
->  		if (status) {
-> -			dev_warn(ice_hw_to_dev(hw), "Unable to allocate
-> memory for FW log ring data buffers\n");
-> +			dev_warn(&fwlog->pdev->dev, "Unable to allocate
-> memory for FW log
-> +ring data buffers\n");
->  			ice_fwlog_free_ring_buffs(&fwlog->ring);
->  			kfree(fwlog->ring.rings);
->  			return status;
-> @@ -278,7 +279,7 @@ int ice_fwlog_init(struct ice_hw *hw, struct
-> ice_fwlog *fwlog)
->=20
->  		ice_debugfs_fwlog_init(hw->back);
->  	} else {
-> -		dev_warn(ice_hw_to_dev(hw), "FW logging is not supported
-> in this NVM image. Please update the NVM to get FW log support\n");
-> +		dev_warn(&fwlog->pdev->dev, "FW logging is not supported
-> in this NVM
-> +image. Please update the NVM to get FW log support\n");
->  	}
->=20
->  	return 0;
-> @@ -308,7 +309,7 @@ void ice_fwlog_deinit(struct ice_hw *hw, struct
-> ice_fwlog *fwlog)
->  	fwlog->cfg.options &=3D ~ICE_FWLOG_OPTION_ARQ_ENA;
->  	status =3D ice_fwlog_set(hw, &fwlog->cfg);
->  	if (status)
-> -		dev_warn(ice_hw_to_dev(hw), "Unable to turn off FW
-> logging, status: %d\n",
-> +		dev_warn(&fwlog->pdev->dev, "Unable to turn off FW
-> logging, status:
-> +%d\n",
->  			 status);
->=20
->  	kfree(pf->ice_debugfs_pf_fwlog_modules);
-> @@ -317,7 +318,7 @@ void ice_fwlog_deinit(struct ice_hw *hw, struct
-> ice_fwlog *fwlog)
->=20
->  	status =3D ice_fwlog_unregister(hw, fwlog);
->  	if (status)
-> -		dev_warn(ice_hw_to_dev(hw), "Unable to unregister FW
-> logging, status: %d\n",
-> +		dev_warn(&fwlog->pdev->dev, "Unable to unregister FW
-> logging, status:
-> +%d\n",
->  			 status);
->=20
->  	if (fwlog->ring.rings) {
-> @@ -436,7 +437,7 @@ int ice_fwlog_register(struct ice_hw *hw, struct
-> ice_fwlog *fwlog)
->=20
->  	status =3D ice_aq_fwlog_register(hw, true);
->  	if (status)
-> -		ice_debug(hw, ICE_DBG_FW_LOG, "Failed to register for
-> firmware logging events over ARQ\n");
-> +		dev_dbg(&fwlog->pdev->dev, "Failed to register for
-> firmware logging
-> +events over ARQ\n");
->  	else
->  		fwlog->cfg.options |=3D ICE_FWLOG_OPTION_IS_REGISTERED;
->=20
-> @@ -457,7 +458,7 @@ int ice_fwlog_unregister(struct ice_hw *hw, struct
-> ice_fwlog *fwlog)
->=20
->  	status =3D ice_aq_fwlog_register(hw, false);
->  	if (status)
-> -		ice_debug(hw, ICE_DBG_FW_LOG, "Failed to unregister from
-> firmware logging events over ARQ\n");
-> +		dev_dbg(&fwlog->pdev->dev, "Failed to unregister from
-> firmware
-> +logging events over ARQ\n");
->  	else
->  		fwlog->cfg.options &=3D ~ICE_FWLOG_OPTION_IS_REGISTERED;
->=20
-> diff --git a/drivers/net/ethernet/intel/ice/ice_fwlog.h
-> b/drivers/net/ethernet/intel/ice/ice_fwlog.h
-> index 334a125eac80..9c56ca6cbef0 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_fwlog.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_fwlog.h
-> @@ -68,16 +68,17 @@ struct ice_fwlog {
->  	struct ice_fwlog_cfg cfg;
->  	bool supported; /* does hardware support FW logging? */
->  	struct ice_fwlog_ring ring;
-> +	struct pci_dev *pdev;
->  };
->=20
->  bool ice_fwlog_ring_empty(struct ice_fwlog_ring *rings);  void
-> ice_fwlog_ring_increment(u16 *item, u16 size); -int
-> ice_fwlog_init(struct ice_hw *hw, struct ice_fwlog *fwlog);
-> +int ice_fwlog_init(struct ice_hw *hw, struct ice_fwlog *fwlog,
-> +		   struct pci_dev *pdev);
->  void ice_fwlog_deinit(struct ice_hw *hw, struct ice_fwlog *fwlog);
-> int ice_fwlog_set(struct ice_hw *hw, struct ice_fwlog_cfg *cfg);  int
-> ice_fwlog_register(struct ice_hw *hw, struct ice_fwlog *fwlog);  int
-> ice_fwlog_unregister(struct ice_hw *hw, struct ice_fwlog *fwlog); -
-> void ice_fwlog_realloc_rings(struct ice_hw *hw, struct ice_fwlog
-> *fwlog,
-> -			     int index);
-> +void ice_fwlog_realloc_rings(struct ice_fwlog *fwlog, int index);
->  void ice_get_fwlog_data(struct ice_fwlog *fwlog, u8 *buf, u16 len);
-> #endif /* _ICE_FWLOG_H_ */
-> --
-> 2.49.0
+I could equally propose populating struct netdev_notifier_changeupper_info :: upper_info
+with the information you need (port type). Currently HSR calls netdev_upper_dev_link(),
+which sets this argument to NULL.
 
+But without seeing actual code which makes use of this, it is impossible
+to know which one is preferable. So please don't send an empty RFC.
 
