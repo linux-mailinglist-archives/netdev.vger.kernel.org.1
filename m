@@ -1,86 +1,152 @@
-Return-Path: <netdev+bounces-209260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59560B0ED43
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:32:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E043B0ED64
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:38:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66B9C6C74B8
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 08:32:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1148F3B64B3
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 08:37:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68EA8279DB6;
-	Wed, 23 Jul 2025 08:32:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F4BB27F75F;
+	Wed, 23 Jul 2025 08:38:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jHRrgiIi"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Rgo481jY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39769278E5A;
-	Wed, 23 Jul 2025 08:32:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 984BF279DDB
+	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 08:38:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753259567; cv=none; b=HUSZO74ZoJik9Y+yNbdnWJClyeULvkTbg4WpGqakXqYO410aG83Mn8ifJjCq3ew4w52ihOKUqocrhYBAMZUirrKEaZNXuQmNY6rcug17h01EJJwzy3wruixOEU5TQ7ztg6RWrzJk11QHtDF+GcHbJDURqL6hYo77KGHNiw/HOPI=
+	t=1753259887; cv=none; b=flFD/fLQgF8K89ukuBpy52C60DBSyyTkC8BWFxYvT9mPGN6HUUw8If0xWBh/Go9wmiu2Tbe6MIN11Bc2eyhKNIY7NXLmNWLiwi24zCPSCmFb8yRfBZBreArlfVVoupL44VxmhwyzccM1py/eI6QZ8cgTc8mH/IfLyYlMI7dMSGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753259567; c=relaxed/simple;
-	bh=hz//+fyPn6iEdrpgvveWfsPwwbaPjDkwCuRuVl9i7wU=;
+	s=arc-20240116; t=1753259887; c=relaxed/simple;
+	bh=n3P2VApwyqZcQGgH2xsyRWVJMZr2KQKxV6y9K6HQS9w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tb5PXhJ6nbkflO1soeQMQyw1A4YJC8g0hlU6P8iWZjp3OisG7fi1P5B+2+bRbRtx2RBKo33phZhAZsMt5xg4QTpCl60MdoUvj413nBOkxtIq4snnOmYosvqi1M60dFEDEhh/OpVPllQ0nBitsvNtbVWwYUeOeAxKOGgX/djy8BM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jHRrgiIi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15DB8C4CEE7;
-	Wed, 23 Jul 2025 08:32:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753259566;
-	bh=hz//+fyPn6iEdrpgvveWfsPwwbaPjDkwCuRuVl9i7wU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jHRrgiIiqaaPFpTpzPhxESsJ+npF1R9e1GbGn1WNut2kVW3+nyOidVF+f4Sk+62sO
-	 IEr//dTLLUUTkh0gjetgMyB7nlw2pqrBJd7kX9j6m6RpAhym/J9hRo4Lxf2bQ2t/gI
-	 7WGyLz/22NjFiJfH7falnvZ1JuGbqsbxPmgLvfO/ZF/T7k/92L7xUMW4svo0lwiNO9
-	 xUKw3+EgX3jSMeon3Rk7Kv6tTootRL9ESluMPvH949/lxvdCltUVUIlXRU+aoMfUe+
-	 IfOcrwPygDKk9oD5BXQo+8wb15Jzi1/ooOT0W1BTyWhRcYpZ4K9L+5WDePifFynNJw
-	 BQADnJ2lQZJnw==
-Date: Wed, 23 Jul 2025 10:32:43 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
-Cc: Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Richard Cochran <richardcochran@gmail.com>, linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kernel@oss.qualcomm.com
-Subject: Re: [PATCH 0/7] Refactor sa8775p/qcs9100 to common names
- lemans-auto/lemans
-Message-ID: <20250723-angelic-aboriginal-waxbill-cd2e4c@kuoka>
-References: <20250722144926.995064-1-wasim.nazir@oss.qualcomm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Iwu5H08gBEMYp3qvWBWqXIFqwA4fuwn4g90wMT+lVdMyQCe6D/usu8nERBvfwsM9j3YCTpzQKaq/P+8u5JrqRwAtMnAZiCWCo/nSSdCPMAeZvRpaahZBSd7dIQtgWNKIUpriXXkGxzEyYRtjYh9pfGdK5ICe+ooU13fkJH6PFHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Rgo481jY; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-ae0d7b32322so1007938266b.2
+        for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 01:38:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1753259884; x=1753864684; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=n3P2VApwyqZcQGgH2xsyRWVJMZr2KQKxV6y9K6HQS9w=;
+        b=Rgo481jYofKw+/JWzltpDuIvRwCX1WfxnfcOQk5WzmZ7ZBm4ckMo6FBIf1eB5vB02Z
+         fgcVh4cWZwVf27U7yr84fa5OthqEAWFmDaG29rxS9WdM8qJ8JY07ZC+h0yAgyfvQC+Vz
+         FpcDdcdNTl4jEggR0gdofkXdKW3p9lABacqbcEa8EZLO5T+MmT4XUCyRivEqUFeH6VDn
+         jTAtCX0mqIuYUM71BrZF2V0imJGTD3ZrzWANbMXfiNIb0pFso7SAurv+rDYNFUnaIIGd
+         zgs35lFEpsPFDT9iSAAgsCg3UT93GPmHtJo4TF+bBl6QKbKKlWyEBs19znTkKyxzdlYN
+         YsvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753259884; x=1753864684;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=n3P2VApwyqZcQGgH2xsyRWVJMZr2KQKxV6y9K6HQS9w=;
+        b=SmFYStCtsZn8tCQ5zEDUfhpXV7taqn0oLWa3/FsQCLlL7hVzlg6SL74XDbjo5f4EAE
+         rOxfu7hFgD7OMcrrfvwoWqVRyjeiKRTkBcwq3g6rJrkoIgI2jeUH3ufNQ2iyT6AR8wmG
+         nyI35jgIcgzOicYgvYqOg19FVCQJYVYk0SvuP1qsInWtfdqVkWG8ZRb6AIwVE/L/2PvP
+         x2mHT7pDkmUvbF+5Q7W31iGRKJTrwFcC5VrtD0DzjpYM3e/5m0xl1H6u71C8DLYk6BHD
+         4wCCq6mdG95pMVT+54mF2Y6RzRnXUdx7pM9Y8ffjSRKVW/9ycL96mmX5fooJPLoYH3aZ
+         A7zA==
+X-Forwarded-Encrypted: i=1; AJvYcCXac/hnpQS6qn4B2ac6TUA+C9cLz3dqM2eGbZQRDYoK0cdFttEod85ue0hfzdJhcO+BPTqWw4c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDJC3Gmg1bTsHyEXWVn9qfY/WExrAgJ8CLcehR1ydOLXZqFxv2
+	GNa2GZK6IrMYbq3v7XzoVZslP+l7wltFiwYZTIyJdQnoEXt61BPThuK5CQAFBmYLnwk=
+X-Gm-Gg: ASbGncuyqG1CVPlujJsyPU4bupTJDF0xODRnx9xy377nsMnjWK2SjyfPJEikcOv0FLS
+	CEOHO2gOdpsir5Bhwe8BkuuEBd8qxk7+W+NrzGzkgdyKbjNlzSAp7GDxwEjBhjk/t4Ke53RA9qf
+	x6a1Wt7mFlCnzN/hBO68+iEu4ozQpJxexJaehNMVAwFb7s91tcFPHJZtwsDPZLgeoVIGcNRIExG
+	PP7pcng8rDB6ZkLA4wTff6/75YBIkjd+KUrkq45A1QF3Dtk6Y7nA+ZcP9a5baoemZIzYBuSlcNP
+	tmhiLulKINsm0/22bUp0TH1FdoeaxQ0ZRu9YdoyFbTd9tsA+5zoTOlsCXPpxr/QpIztpYNoBtb+
+	qwv0vJMQWc6zP
+X-Google-Smtp-Source: AGHT+IGfKxkKSgjfuBbrA9aMKGgq6w9CMUJszw4YPTrPg/PbU2Z6gWyowOy29hJBo56zgCZxcn3x3g==
+X-Received: by 2002:a17:907:3d0f:b0:ae3:696c:60a with SMTP id a640c23a62f3a-af2f66c5e04mr165593266b.8.1753259883713;
+        Wed, 23 Jul 2025 01:38:03 -0700 (PDT)
+Received: from blackbook2 ([84.19.86.74])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aec6cab5f53sm1014137866b.136.2025.07.23.01.38.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Jul 2025 01:38:03 -0700 (PDT)
+Date: Wed, 23 Jul 2025 10:38:00 +0200
+From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To: Shakeel Butt <shakeel.butt@linux.dev>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>, 
+	Daniel Sedlak <daniel.sedlak@cdn77.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Neal Cardwell <ncardwell@google.com>, 
+	David Ahern <dsahern@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org, netdev@vger.kernel.org, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
+	Roman Gushchin <roman.gushchin@linux.dev>, Muchun Song <muchun.song@linux.dev>, cgroups@vger.kernel.org, 
+	Matyas Hurtik <matyas.hurtik@cdn77.com>
+Subject: Re: [PATCH v3] memcg: expose socket memory pressure in a cgroup
+Message-ID: <yruvlyxyy6gsrf2hhtyja5hqnxi2fmdqr63twzxpjrxgffov32@l7gqvdxijs5c>
+References: <20250722071146.48616-1-daniel.sedlak@cdn77.com>
+ <ni4axiks6hvap3ixl6i23q7grjbki3akeea2xxzhdlkmrj5hpb@qt3vtmiayvpz>
+ <telhuoj5bj5eskhicysxkblc4vr6qlcq3vx7pgi6p34g4zfwxw@6vm2r2hg3my4>
+ <CAAVpQUBwS3DFs9BENNNgkKFcMtc7tjZBA0PZ-EZ0WY+dCw8hrA@mail.gmail.com>
+ <4g63mbix4aut7ye7b7s4m5q7aewfxq542i2vygniow7l5a3zmd@bvis5wmifscy>
+ <CAAVpQUCOwFksmo72p_nkr1uJMLRcRo1VAneADon9OxDLoRH0KA@mail.gmail.com>
+ <jj5w7cpjjyzxasuweiz64jqqxcz23tm75ca22h3wvfj3u4aums@gnjarnf5gpgq>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="i2zmhp2yhqwmj7st"
 Content-Disposition: inline
-In-Reply-To: <20250722144926.995064-1-wasim.nazir@oss.qualcomm.com>
+In-Reply-To: <jj5w7cpjjyzxasuweiz64jqqxcz23tm75ca22h3wvfj3u4aums@gnjarnf5gpgq>
 
-On Tue, Jul 22, 2025 at 08:19:19PM +0530, Wasim Nazir wrote:
-> This patch series refactors the sa8775p and qcs9100 platforms and introduces
-> a unified naming convention for current and future platforms (qcs9075).
-> 
-> The motivation behind this change is to group similar platforms under a
-> consistent naming scheme and to avoid using numeric identifiers.
-> For example, qcs9100 and qcs9075 differ only in safety features provided by
-> the Safety-Island (SAIL) subsystem but safety features are currently
-> unsupported, so both can be categorized as the same chip today.
->
 
-I expressed strong disagreement with this patchset in individual
-patches. I expect NO NEW versions of it, but by any chance you send it,
-then please always carry my:
+--i2zmhp2yhqwmj7st
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v3] memcg: expose socket memory pressure in a cgroup
+MIME-Version: 1.0
 
-Nacked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+On Tue, Jul 22, 2025 at 01:11:05PM -0700, Shakeel Butt <shakeel.butt@linux.=
+dev> wrote:
+> > > 1 second is the current implementation and it can be more if the memcg
+> > > remains in memory pressure. Regarding usefullness I think the periodic
+> > > stat collectors (like cadvisor or Google's internal borglet+rumbo) wo=
+uld
+> > > be interested in scraping this interface.
+> >=20
+> > I think the cumulative counter suggested above is better at least.
+>=20
+> It is tied to the underlying implementation. If we decide to use, for
+> example, PSI in future, what should this interface show?
 
-Best regards,
-Krzysztof
+Actually, if it was exposed as cummulative time under pressure (not
+cummulative events), that's quite similar to PSI.
 
+My curiosity is whether this can be useful to some responsive actions
+(hence it's worth watching with high frequency or even create
+notification events) or rather like post-hoc examination or low
+frequency adjustments (reason for cummulative). I.e. what can this
+signal to the userspace?
+
+Michal
+
+--i2zmhp2yhqwmj7st
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQRCE24Fn/AcRjnLivR+PQLnlNv4CAUCaICfVQAKCRB+PQLnlNv4
+CE5mAQDDOte4EPAzuuoOKqbLKO5Ygkc70z9WHcXnUbPwPcq4swEA8kCX/rxqTORQ
+i9MXibIkSfPBUZjxLcl7kwUmqFoxXQw=
+=1mgK
+-----END PGP SIGNATURE-----
+
+--i2zmhp2yhqwmj7st--
 
