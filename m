@@ -1,233 +1,140 @@
-Return-Path: <netdev+bounces-209210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51B1FB0EA69
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 08:14:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D125B0EA74
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 08:16:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78C1D16731D
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 06:14:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 785D87B5D52
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 06:14:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1644F248F4A;
-	Wed, 23 Jul 2025 06:14:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C84726B748;
+	Wed, 23 Jul 2025 06:16:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZjgMPxV6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADB21A0BFD;
-	Wed, 23 Jul 2025 06:14:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C8425CC63
+	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 06:16:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753251267; cv=none; b=eNPx5sYnMsBxT1QWpM930RHkJincVL/YuSqc/WpBlZroNEe9W/Lt0/OvA1GD6A9NfmPZaOTwht2kPBOiaPqqzqVpkY+KkPJllulfYs9dAKD5D5dVLXMZZZrZMIjVIaiy1aztaDgKOVcBc4NRu+x4/hTCLCGjxatKHGm8HzBnjdg=
+	t=1753251376; cv=none; b=MJWiqb92+TXg5R7GymSXjAkxDJIBBT+DKIeNyhS+ioF5xJsW17emHg4sVPX0cf80ORCLP76fw2lZeGDeveqvUyXcpCHqWPyDv+OpmpvKrEPf1sAvc7FepHeNINU0vlkukCzpJ7o0gWtSKuBCSQZbRNW2V+P77WRRyGgrw9pMQTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753251267; c=relaxed/simple;
-	bh=eOp8B5FEQjPYgaY8oyZNnVe9OVIKUc0sH+uAJU1qXyY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ME31lEdUefrBHgsOSViMJ03/9733kOLa3w2i3FhXf/F22swaBqLQbzkfl+r9uUfhf/fqKlscq+ZcjkaZqtrD5LHfBXov8CTNMT0Ed3QiAS7Ra5IdOmlgg85J6gP9vB5vsTLfH3duMLaRGFYredHDI6cpKjO8tNPDPUpvZjM6Kuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=15.184.224.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: zesmtpsz3t1753251185t633970d9
-X-QQ-Originating-IP: 7fAbvXkimtFsEETOli6idrq+iTqKCtYaOTIC1dZ/jwM=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 23 Jul 2025 14:13:03 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 7362397933906693450
-Date: Wed, 23 Jul 2025 14:13:03 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: Simon Horman <horms@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
-	gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au,
-	danishanwar@ti.com, lee@trager.us, gongfan1@huawei.com,
-	lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 10/15] net: rnpgbe: Add netdev irq in open
-Message-ID: <2C80B81E5B7F54CD+20250723061303.GE169181@nic-Precision-5820-Tower>
-References: <20250721113238.18615-1-dong100@mucse.com>
- <20250721113238.18615-11-dong100@mucse.com>
- <20250722140326.GJ2459@horms.kernel.org>
+	s=arc-20240116; t=1753251376; c=relaxed/simple;
+	bh=nyQ60akwTO7CwWbX0gdO/UaxQKyumyv74IWbBFYbpuw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IdNY7P2G//lN5hUHLL3+7QKgqVyJ4u9wkn+RljAhnU3U5Hk2EIjNN/fC1patoRb5OKvjNEg8goZJjfCFQGzwAtaKXsAxbr7BTlIqdvU2rPp+4CppqXesEpiW/CyOiIRPj950xc/AbpJaGH+CMF0yZfI8gVbyPJCeVjHQqcXgLEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZjgMPxV6; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-234b440afa7so58634495ad.0
+        for <netdev@vger.kernel.org>; Tue, 22 Jul 2025 23:16:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753251374; x=1753856174; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PDKg7ePUHJDoQ1oMJwhR4V9KfKAK4XHoKDAA8OdhErI=;
+        b=ZjgMPxV6/AHuS47+RApM18Ac/FrEjlnh2m8E6DmkgJBw10uXv6YWtHXnp3fpcdBrjd
+         IMbSImE6sx8xftOddxcbaKddQhAmFBhK4vAJvi410Qh4Iv85nzb1EIaCBjkEqiR2y0K9
+         23FLxl5xkgrMLtx2rxu1ADzx3h0TXHnD8W9Ek94JctHbG7+x7zkdEBaTMD9xV2sdWJgm
+         I+uUmQwFnLrXBrJsWllc6k0K/q69GMjl6e+03bQptoMUWIQo2KG7r4POSXCV/W/A2ds/
+         DD5NXDyP+KNwKYYs6xG0DTiiD+1xnP4d5K8A6mKKJb4Cl93Z0EN7RDPkFU9T/jz5pEf6
+         wMHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753251374; x=1753856174;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PDKg7ePUHJDoQ1oMJwhR4V9KfKAK4XHoKDAA8OdhErI=;
+        b=lsTCJiQ4LdPmHDV68rSgwXRi0tRKyG0Xn6K5ZgFazMIRYpndADtlWxOxk0oGvcgvEL
+         iyR6b+XP5uHF1dAkSdUrsyxhwl/j/haxW1n3J2faP9u2i5voJAnz6ahn0FXpHHQQ8rws
+         XXJ90U5guPYPNMbMVvSIk3ZFGnw9wwN7EUcNR7ytCDRge/n8IvDsBM4C1ZZmE2lFsUbR
+         WFdkGMnI5JozpQ0pH2wGRUHcUFXKql6U5KUtnLaInOubvlQNd2kl47fkMAXa/OvWj0ZL
+         ednZb3Lqt3Osn2iV/uFrieTG8KHqGDsGMm4iW98rdv2EnHEFQjr8pAQnOjiEUALTxYRl
+         na3g==
+X-Gm-Message-State: AOJu0Yzvy1ohzWsXttbIZwWzoOaOb6M2bVWHvhvsJ8690XbBv1eAdwAm
+	h7nBNZIqyc4gYA8bWCq0A7bkk8m75frFKFJ00ng4K5EBfOiRXx4G4YbWdhvh5IvY
+X-Gm-Gg: ASbGnct9Bi5ek1ElUq6E42VFOZc0BViGxhSqy60nZBOV15niOFsbBt4JhDklFxuxQrB
+	WL3q6saP99cqphDldQQAfTiZImhEPHtsQYLZESoDF9okBbc4vXVWufnKneSTq+ltvh5/a0xze6x
+	dtCdbfVU8W+OjJmHY9FjnZi2NSgnOGJrEx7keh2+uXViv/FmSwdjwb07B4JOUrJRU7rKAPm5Gh0
+	t1pcSOBEXBQ4gSBnsa9zKhc/ddeolb+IE0WzCOHHJUds3bUM9ODptIb4XZVio4hjEDKUmdpnrw3
+	AfWjBQE9P3K+snb/WF4B5EU1leK6jyM2/bIQsbYhx8IASez0fgzXNiw7Tl2Snq/nMnioYsvDoBN
+	RHENb6jH5/VPMY/hkeG7fpRolNs2WY3iq4dk=
+X-Google-Smtp-Source: AGHT+IHtcfAwE6MRlwmdk0CgZotD6OwJZQVYPLudPrB3Vw1n6+JYrP8FxNP9ShtXyyeqJOG9iGgSXw==
+X-Received: by 2002:a17:902:d483:b0:234:d292:be7a with SMTP id d9443c01a7336-23f9812b545mr25236505ad.1.1753251373643;
+        Tue, 22 Jul 2025 23:16:13 -0700 (PDT)
+Received: from krishna-laptop.localdomain ([134.238.252.35])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31e51b9329csm798044a91.32.2025.07.22.23.16.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Jul 2025 23:16:12 -0700 (PDT)
+From: Krishna Kumar <krikku@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	tom@herbertland.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	sdf@fomichev.me,
+	kuniyu@google.com,
+	ahmed.zaki@intel.com,
+	aleksander.lobakin@intel.com,
+	atenart@kernel.org,
+	krishna.ku@flipkart.com,
+	krikku@gmail.com
+Subject: [PATCH v6 net-next 0/2] net: RPS table overwrite prevention and flow_id caching
+Date: Wed, 23 Jul 2025 11:46:02 +0530
+Message-ID: <20250723061604.526972-1-krikku@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250722140326.GJ2459@horms.kernel.org>
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: NZcrde3zhHkVc4vD6pFJ0MsmdlniyAZ1/GnUJawXfuNgJNYvhe66+B2Q
-	hAjz+caQByEVUdAJLe+AOq7TSO39J5A9v9jhjUCmgLhNvERxR+5rylo6XiQayJZhFPHk+f5
-	kwzMSTFoiZ0OeJPGwOoW6yRA5LN7r9tyuu3fj/OpaPYgTLxlo3JslmpZ6Us30vF6cRNRbrn
-	w4QLBpsvkOz1p4zlbw8BwEVpqy5U1bhqbLdVqeLT+Q+h+yMP8pfDyNk665NP4EmiHtIjklL
-	a7YUJUPyIQkaC3xjjHG5t9U2OBExkmzb3YHZ4ojQzKDg/PEqo8J8I4l64dVcrojO6CMzAN0
-	dmDkub3G303j4Yc0VyMm6Lfwgm2lltrVpbbnlYYfGsgrJyCAUvTMd7XHx+YrkKDvR03Xs/0
-	hwpvFBfg2oWmrMZpr721wogaAX/3pxtzfnDyEMRsSBN7hfJxl921t1lz21LTTPeLDhXfwzh
-	HUYi+SVrkfturNKML1Fa2OWTpvh0KgSGfTKaxiozFWsHzylhm1BPMzXqvUBpf+8A52Nfl8e
-	bTe8uaDy8eW0AJAgKz7GoVl8V6YnnMneCUPQYzBMJLJBkW3lt2sPAQHwlZ4Bjgkekf500u8
-	aX36pok1PF7fimdAptFALf5geA5OOpeCBk+/4dndYX8k1NbcxD/Rh6thqEvSUVmb+3vOqm2
-	xMqslxbC+NHFbJOd5HAoo8VDOSl63U8bGLuJg8PvMEhcDjJ/9sbQQ3+6DPDqx7T+FjfHWk7
-	DfqhFxLgNRz/B6mdubc4jnm6vNq1k86n4oEkvUcNi4OBqTimIngGyQVzxFPxbArbGqD6RM9
-	wGGcsPzVoLuk0SiYvvRGPckweZ9k1uOl3ykNV34iFT5fSP6I0VJ4uxRplk9BG9D2G/gm7Hu
-	B5DCPCnzPlAa3Ce7gDdaOgT0zSPeYD+x/NqFabWfhuozBAo5dj5Du4euZM7Osyu2Fo7F8ju
-	ZCHVBRkSbTTnCYVfiQKTS+AUs39Z6i3Sh2qfayo+2CBYmahfmczrZaCLy
-X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
-X-QQ-RECHKSPAM: 0
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 22, 2025 at 03:03:26PM +0100, Simon Horman wrote:
-> On Mon, Jul 21, 2025 at 07:32:33PM +0800, Dong Yibo wrote:
-> > Initialize irq for tx/rx in open func.
-> > 
-> > Signed-off-by: Dong Yibo <dong100@mucse.com>
-> 
-> ...
-> 
-> > diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-> 
-> ...
-> 
-> > +/**
-> > + * rnpgbe_set_mac_hw_ops_n500 - Setup mac address to hw
-> > + * @hw: pointer to hw structure
-> > + * @mac: pointer to mac addr
-> > + *
-> > + * Setup a mac address to hw.
-> > + **/
-> > +static void rnpgbe_set_mac_hw_ops_n500(struct mucse_hw *hw, u8 *mac)
-> > +{
-> > +	struct mucse_eth_info *eth = &hw->eth;
-> > +	struct mucse_mac_info *mac_info = &hw->mac;
-> 
-> Reverse xmas tree here please.
-> 
+This series splits the previous RPS patch [1] into two patches for
+net-next following reviewer feedback. It also addresses a kernel test
+robot warning by ensuring rps_flow_is_active() is defined only when
+aRFS is enabled. I tested v3 with four builds and reboots: two for
+[PATCH 1/2] with aRFS enabled/disabled, and two for [PATCH 2/2].
+There are no code changes in v4 and v5, only documentation. Patch
+v6 has one line change to keep 'hash' field under #ifdef, and was
+test built with aRFS=on and aRFS=off.
 
-Got it, I'll fix it.
+The first patch prevents RPS table overwrite for active flows thereby
+improving aRFS stability.
 
-> > +
-> > +	/* use idx 0 */
-> > +	eth->ops.set_rar(eth, 0, mac);
-> > +	mac_info->ops.set_mac(mac_info, mac, 0);
-> > +}
-> 
-> ...
-> 
-> > diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c
-> 
-> ...
-> 
-> > +/**
-> > + * rnpgbe_msix_clean_rings - msix irq handler for ring irq
-> > + * @irq: irq num
-> > + * @data: private data
-> > + *
-> > + * rnpgbe_msix_clean_rings handle irq from ring, start napi
-> 
-> Please also document the return value of this function.
-> Likewise for rnpgbe_request_msix_irqs(), rnpgbe_intr() and
-> rnpgbe_request_irq().
-> 
+The second patch caches hash & flow_id in get_rps_cpu() to avoid
+recalculating it in set_rps_cpu() (this patch depends on the first).
 
-Got it, I'll fix it.
+[1] https://lore.kernel.org/netdev/20250708081516.53048-1-krikku@gmail.com/
+[2] https://lore.kernel.org/netdev/20250717064554.3e4d9993@kernel.org/
 
-> > + **/
-> > +static irqreturn_t rnpgbe_msix_clean_rings(int irq, void *data)
-> > +{
-> > +	return IRQ_HANDLED;
-> > +}
-> 
-> ...
-> 
-> > +/**
-> > + * rnpgbe_request_msix_irqs - Initialize MSI-X interrupts
-> > + * @mucse: pointer to private structure
-> > + *
-> > + * rnpgbe_request_msix_irqs allocates MSI-X vectors and requests
-> > + * interrupts from the kernel.
-> > + **/
-> > +static int rnpgbe_request_msix_irqs(struct mucse *mucse)
-> > +{
-> > +	struct net_device *netdev = mucse->netdev;
-> > +	int q_off = mucse->q_vector_off;
-> > +	struct msix_entry *entry;
-> > +	int i = 0;
-> > +	int err;
-> > +
-> > +	for (i = 0; i < mucse->num_q_vectors; i++) {
-> > +		struct mucse_q_vector *q_vector = mucse->q_vector[i];
-> > +
-> > +		entry = &mucse->msix_entries[i + q_off];
-> > +		if (q_vector->tx.ring && q_vector->rx.ring) {
-> > +			snprintf(q_vector->name, sizeof(q_vector->name) - 1,
-> > +				 "%s-%s-%d", netdev->name, "TxRx", i);
-> 
-> Probably the full range of i is not used, in particular I assume
-> it is never negative, and thus i and mucse->num_q_vectors
-> could be unsigned int rather than int.
-> 
-> But as it stands q_vector->name is once character too short to
-> fit the maximum possible string formatted by snprintf().
-> 
-> I was able to address the warning flagged by GCC 15.0.0 about this by
-> increasing the size of q_vector->name by one byte.
-> 
->   .../rnpgbe_lib.c: In function 'rnpgbe_request_irq':
->   .../rnpgbe_lib.c:1015:43: warning: 'snprintf' output may be truncated before the last format character [-Wformat-truncation=]
->    1015 |                                  "%s-%s-%d", netdev->name, "TxRx", i);
->         |                                           ^
->   In function 'rnpgbe_request_msix_irqs',
->       inlined from 'rnpgbe_request_irq' at drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c:1069:9:
->   .../rnpgbe_lib.c:1014:25: note: 'snprintf' output between 8 and 33 bytes into a destination of size 32
->    1014 |                         snprintf(q_vector->name, sizeof(q_vector->name) - 1,
->         |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->    1015 |                                  "%s-%s-%d", netdev->name, "TxRx", i);
->         |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> 
+Signed-off-by: Krishna Kumar <krikku@gmail.com>
+---
+v6: Keep 'hash' in 'rps_dev_flow' under aRFS config.
+v5: Same v4 patch sent with a change in documentation style for "return".
+v4: Same v3 patch sent as a new thread instead of a continuation.
+v3: Wrapped rps_flow_is_active() in #ifdef CONFIG_RFS_ACCEL to fix
+    unused function warning reported by kernel test robot.
+v2: Split original patch into two: RPS table overwrite prevention and hash/
+    flow_id caching.
 
-Yes, q_vector->name is too short, I'll fix it.
+Krishna Kumar (2):
+  net: Prevent RPS table overwrite for active flows
+  net: Cache hash and flow_id to avoid recalculation
 
-> > +		} else {
-> > +			/* skip this unused q_vector */
-> > +			continue;
-> > +		}
-> > +		err = request_irq(entry->vector, &rnpgbe_msix_clean_rings, 0,
-> > +				  q_vector->name, q_vector);
-> > +		if (err)
-> > +			goto free_queue_irqs;
-> > +		/* register for affinity change notifications */
-> > +		q_vector->affinity_notify.notify = rnpgbe_irq_affinity_notify;
-> > +		q_vector->affinity_notify.release = rnpgbe_irq_affinity_release;
-> > +		irq_set_affinity_notifier(entry->vector,
-> > +					  &q_vector->affinity_notify);
-> > +		irq_set_affinity_hint(entry->vector, &q_vector->affinity_mask);
-> > +	}
-> > +
-> > +	return 0;
-> > +
-> > +free_queue_irqs:
-> > +	while (i) {
-> > +		i--;
-> > +		entry = &mucse->msix_entries[i + q_off];
-> > +		irq_set_affinity_hint(entry->vector, NULL);
-> > +		free_irq(entry->vector, mucse->q_vector[i]);
-> > +		irq_set_affinity_notifier(entry->vector, NULL);
-> > +		irq_set_affinity_hint(entry->vector, NULL);
-> > +	}
-> > +	return err;
-> > +}
-> 
-> ...
-> 
+ include/net/rps.h    |  7 +++-
+ net/core/dev.c       | 89 ++++++++++++++++++++++++++++++++++++++------
+ net/core/net-sysfs.c |  4 +-
+ 3 files changed, 86 insertions(+), 14 deletions(-)
 
-Thanks for your feedback.
+-- 
+2.39.5
 
 
