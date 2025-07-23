@@ -1,59 +1,82 @@
-Return-Path: <netdev+bounces-209218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 183AEB0EAF7
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 08:51:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42477B0EB04
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 08:53:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 022501AA4F7F
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 06:51:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1175A7B34A3
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 06:52:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EDAF26F463;
-	Wed, 23 Jul 2025 06:50:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 523DF23C51B;
+	Wed, 23 Jul 2025 06:53:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OmbkbPrR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B43226FA60;
-	Wed, 23 Jul 2025 06:50:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 988B41DF725;
+	Wed, 23 Jul 2025 06:53:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753253459; cv=none; b=SJBbs/QJ+H9IKGwAUUnpiuxS16Rg5Dg0v4MDZsQnGDMuBpgGFipXnQ68u1yb15LZB0tZetDGGyo/F7W4OrZuHVOoXZcsrjEKzIDS0gyJgm7pzE9kjlwJCVSs0b7sysQvJbEFM3NXeK7eT5q46734WDub/iLCMgpPb0nqQbSgdcs=
+	t=1753253604; cv=none; b=FnmS7Ig0OZ+qeS+wMXuJPu3MMlB9AT4des9TjTCmqBwJHd1EUEC6AT4D+/zKckT8ieRUx9DhAJTGjmGg2VWyeRSWmL4VT29zpQUnSkRhSBxvUN+/yI0pwQbFXE2bToN8ipuin3YhglQVO0zgBVxyEwN8yIxxtee1n4TImS7+dWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753253459; c=relaxed/simple;
-	bh=G58YKvUujIBWrJkI0NYR1sVGNRm9J8ICp7P9MOotfgo=;
+	s=arc-20240116; t=1753253604; c=relaxed/simple;
+	bh=vz2E0FW4xCQTolD++PHtUgPfw65t6dNIfiDrgAyBAxo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AhvVgPjs1Ln8bqP2JWHvyuWOum6p6iYEKCwgM2k3bNwZLRp4qQH6Sv3YghE5Kys4PgG4TExuliboOECJjwdO9dXBuwK1pn3SZ68iXwk++IVfJnceFsyyE7MyTpFmrZcrZF565VBbuuwVdLQbaTMrWFLCnmayeDpCaVfWUH2sZ1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.207.22.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: esmtpsz16t1753253380t0ab00ecb
-X-QQ-Originating-IP: lRLKBcb1n0wzw/+enrJkpgcKfTXRxD93bs4sAWYliJs=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 23 Jul 2025 14:49:38 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 11276420674999546687
-Date: Wed, 23 Jul 2025 14:49:38 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: Simon Horman <horms@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
-	gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au,
-	danishanwar@ti.com, lee@trager.us, gongfan1@huawei.com,
-	lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 14/15] net: rnpgbe: Add base rx function
-Message-ID: <92D9F4A7FDB27183+20250723064938.GF169181@nic-Precision-5820-Tower>
-References: <20250721113238.18615-1-dong100@mucse.com>
- <20250721113238.18615-15-dong100@mucse.com>
- <20250722141426.GK2459@horms.kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=BBORWolHicQXBRm55rIi0a2oi5kOTbWwqbGg3JPu62XzP/Lj0qs+KDD8xodIDdHBQpW7hIMPlDOUhxC354Oq21G+ZQe10HEByWd06IKTX4Vmzn1uymaV3BdcYLX8xkVRy3L9NoX3rBMRLQXW+R5sFZJ76qfyO6zkTJpjyoMCgp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OmbkbPrR; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753253602; x=1784789602;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=vz2E0FW4xCQTolD++PHtUgPfw65t6dNIfiDrgAyBAxo=;
+  b=OmbkbPrR7ckTvu+smN9QnnmJM2hnzvPn78FcfFfJ1P/UYl7LeOyf5qgF
+   Bpaaeyw/N9FlTj6rsNu9exwV67DDE2U5SpZ6w5u9oiZEjHyhDhsbza45k
+   y79l0hmmwSJHuN0edB6FY/9j8rrCpwCWvGchdTJ0d0tvFNzih9l5Is8Tl
+   ktMJQotbk6AnEyY4F84osV+DT8J+yFeys4oC8C6AaZkDTppAs4zeW12Wd
+   N3Xh16NzVTKWs6DCwkqCJnkNGF2bzTUDbVoYs3mINmGF678fD2MkrcZUP
+   QhrBYjtLdaxw8Sw8mz5ZJt/Hq91HBV4F+O2MI48WRo/ornNnbmxBl4Lng
+   A==;
+X-CSE-ConnectionGUID: wyJJ1DBbRnifsn5aPgKy1g==
+X-CSE-MsgGUID: AyXEwjdtS1KFjkz17qhbIg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11500"; a="54743418"
+X-IronPort-AV: E=Sophos;i="6.16,333,1744095600"; 
+   d="scan'208";a="54743418"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2025 23:53:21 -0700
+X-CSE-ConnectionGUID: H6/jiKkESpi07lLwQV0Bsw==
+X-CSE-MsgGUID: z6kjFawRQXCD54aSDerS8A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,333,1744095600"; 
+   d="scan'208";a="196439786"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2025 23:53:18 -0700
+Date: Wed, 23 Jul 2025 08:52:09 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Saeed Mahameed <saeed@kernel.org>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Alexandre Cassen <acassen@corp.free.fr>,
+	Leon Romanovsky <leonro@nvidia.com>
+Subject: Re: [PATCH net-next V2 1/2] net/mlx5e: Support routed networks
+ during IPsec MACs initialization
+Message-ID: <aICGmVC06H+WTy6s@mev-dev.igk.intel.com>
+References: <1753194228-333722-1-git-send-email-tariqt@nvidia.com>
+ <1753194228-333722-2-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,99 +85,158 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250722141426.GK2459@horms.kernel.org>
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: MAN6sKHDZ5xSaGWXfe+7Bn96Kxr/zIytK58NzLYVZD5K0bPm9SWLPbmp
-	ZgP5VO8dAJUVM+dyW4qci2FTMyNsyaDopEOFvcFylknYFjPI2icsAIuQ7htzKqySkeYbB4v
-	80X2dVzQf9cDDwyf4as/thLg7Y9hetmU+egvMiQ9lX04fUutKQafB24sesfDbaaS0C0iwTv
-	c26tEwOelqqDPi60HO3xcHZe33cL36M7aamUekb8HtIMC1IBE7y5inGAqKH2R6lXsPr0PjL
-	hyC3B+C9nsmfFAAHbfo8/9KJ/WRkADl+e8yH12MYIClv/HfQ0kfA7e7ovpaVzoliNxaqqfg
-	8nSX7XgXsWZu1eFJKCnEEeA/9VXt/TYLIw3Uw5BJx5C7bgGvc4srixU/OI2Pt5X6mmZpV4K
-	JQVlxad565UWGVbF8ijYiwkqIEcZl+W8DYJlYWkEbD168Cf56fnCgLPawwBwCx0mXJ4xMiw
-	MFAh1PgFvSGx0ohVWawEL3TYm9WE7HioReNbwkDQlRVdBDNJRD+x/ztW7MPPeKY4xjtHL0y
-	/NCjWADs5k5cDJRrylRy7j9PqlZ7ZndzzmCRJF1uxYiaGRMxQIiYfDqJ79vpsPD9dFp6y6X
-	CjUf9Kqv74/ZSjSMu7knuGrgYrEUNjIIIFPlGiep+tXGQkx7pbdISekLHwArJzl59Lf2d/k
-	eFBU/yAWmsW+0+0ZnZ+RMHAg/rprf39gpGL5nqtEdUiMXZu8cuFGXnJUODc+A89fUO2Izyb
-	ENCHJmbFCKhrIdOoaSkRRE4aodwG1ZUnoPo7Ye4dkcahV5a8F36JyRHuXDVvDrp9Xxswk7f
-	DywhhTiLgzw3PjxRzGbUcx77wIVLrZ8lNAS7XDwBfxSj2GhhhqXZQEkAhah6A9cm41xl5i3
-	Lm3mMdDOelrR8Xi0qMYI6dAbWy+0JjZMuBX9OeaDOtHI6FcCRaMUyOfkg4MgCroV1gmjDSZ
-	O+E2hGym61TNSdeTSnaBSDRAoDgKhGbKEr3a5OJJXidy6qcxQenyFmZVcpskSvhRS080=
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-X-QQ-RECHKSPAM: 0
+In-Reply-To: <1753194228-333722-2-git-send-email-tariqt@nvidia.com>
 
-On Tue, Jul 22, 2025 at 03:14:26PM +0100, Simon Horman wrote:
-> On Mon, Jul 21, 2025 at 07:32:37PM +0800, Dong Yibo wrote:
-> > Initialize rx clean function.
-> > 
-> > Signed-off-by: Dong Yibo <dong100@mucse.com>
+On Tue, Jul 22, 2025 at 05:23:47PM +0300, Tariq Toukan wrote:
+> From: Alexandre Cassen <acassen@corp.free.fr>
 > 
-> ...
+> Remote IPsec tunnel endpoint may refer to a network segment that is
+> not directly connected to the host. In such a case, IPsec tunnel
+> endpoints are connected to a router and reachable via a routing path.
+> In IPsec packet offload mode, HW is initialized with the MAC address
+> of both IPsec tunnel endpoints.
 > 
-> > diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c
+> Extend the current IPsec init MACs procedure to resolve nexthop for
+> routed networks. Direct neighbour lookup and probe is still used
+> for directly connected networks and as a fallback mechanism if fib
+> lookup fails.
 > 
-> ...
+> Signed-off-by: Alexandre Cassen <acassen@corp.free.fr>
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> ---
+>  .../mellanox/mlx5/core/en_accel/ipsec.c       | 82 ++++++++++++++++++-
+>  1 file changed, 80 insertions(+), 2 deletions(-)
 > 
-> > @@ -299,12 +707,27 @@ static int rnpgbe_poll(struct napi_struct *napi, int budget)
-> >  	struct mucse_q_vector *q_vector =
-> >  		container_of(napi, struct mucse_q_vector, napi);
-> >  	struct mucse *mucse = q_vector->mucse;
-> > +	int per_ring_budget, work_done = 0;
-> >  	bool clean_complete = true;
-> >  	struct mucse_ring *ring;
-> > -	int work_done = 0;
-> > +	int cleaned_total = 0;
-> 
-> cleaned_total is set but otherwise unused in this function.
-> 
-> Flagged by Clang 20.1.8 builds with KCFLAGS=-Wunused-but-set-variable.
-> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+> index 77f61cd28a79..00e77c71e201 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+> @@ -36,6 +36,7 @@
+>  #include <linux/inetdevice.h>
+>  #include <linux/netdevice.h>
+>  #include <net/netevent.h>
+> +#include <net/ipv6_stubs.h>
+>  
+>  #include "en.h"
+>  #include "eswitch.h"
+> @@ -259,9 +260,15 @@ static void mlx5e_ipsec_init_macs(struct mlx5e_ipsec_sa_entry *sa_entry,
+>  				  struct mlx5_accel_esp_xfrm_attrs *attrs)
+>  {
+>  	struct mlx5_core_dev *mdev = mlx5e_ipsec_sa2dev(sa_entry);
+> +	struct mlx5e_ipsec_addr *addrs = &attrs->addrs;
+>  	struct net_device *netdev = sa_entry->dev;
+> +	struct xfrm_state *x = sa_entry->x;
+> +	struct dst_entry *rt_dst_entry;
+> +	struct flowi4 fl4 = {};
+> +	struct flowi6 fl6 = {};
+>  	struct neighbour *n;
+>  	u8 addr[ETH_ALEN];
+> +	struct rtable *rt;
+>  	const void *pkey;
+>  	u8 *dst, *src;
+>  
+> @@ -274,18 +281,89 @@ static void mlx5e_ipsec_init_macs(struct mlx5e_ipsec_sa_entry *sa_entry,
+>  	case XFRM_DEV_OFFLOAD_IN:
+>  		src = attrs->dmac;
+>  		dst = attrs->smac;
+> -		pkey = &attrs->addrs.saddr.a4;
+> +
+> +		switch (addrs->family) {
+> +		case AF_INET:
+> +			fl4.flowi4_proto = x->sel.proto;
+> +			fl4.daddr = addrs->saddr.a4;
+> +			fl4.saddr = addrs->daddr.a4;
+> +			pkey = &addrs->saddr.a4;
+> +			break;
+> +		case AF_INET6:
+> +			fl6.flowi6_proto = x->sel.proto;
+> +			memcpy(fl6.daddr.s6_addr32, addrs->saddr.a6, 16);
+> +			memcpy(fl6.saddr.s6_addr32, addrs->daddr.a6, 16);
+> +			pkey = &addrs->saddr.a6;
+> +			break;
+> +		default:
+> +			return;
+> +		}
+>  		break;
+>  	case XFRM_DEV_OFFLOAD_OUT:
+>  		src = attrs->smac;
+>  		dst = attrs->dmac;
+> -		pkey = &attrs->addrs.daddr.a4;
 
-Got it, I can get this warning with KCFLAGS=-Wunused-but-set-variable
-locally, I'll fix it.
+Isn't it worth to move getting pkey to separate function? The switch is
+the same with OFFLOAD_IN and OFFLOAD_OUT.
 
-> >  
-> >  	mucse_for_each_ring(ring, q_vector->tx)
-> >  		clean_complete = rnpgbe_clean_tx_irq(q_vector, ring, budget);
-> > +	if (q_vector->rx.count > 1)
-> > +		per_ring_budget = max(budget / q_vector->rx.count, 1);
-> > +	else
-> > +		per_ring_budget = budget;
-> > +
-> > +	mucse_for_each_ring(ring, q_vector->rx) {
-> > +		int cleaned = 0;
-> > +
-> > +		cleaned = rnpgbe_clean_rx_irq(q_vector, ring, per_ring_budget);
-> > +		work_done += cleaned;
-> > +		cleaned_total += cleaned;
-> > +		if (cleaned >= per_ring_budget)
-> > +			clean_complete = false;
-> > +	}
-> >  
-> >  	if (!netif_running(mucse->netdev))
-> >  		clean_complete = true;
-> 
-> ...
-> 
-> > @@ -871,6 +1323,8 @@ static int rnpgbe_setup_rx_resources(struct mucse_ring *rx_ring,
-> >  	memset(rx_ring->desc, 0, rx_ring->size);
-> >  	rx_ring->next_to_clean = 0;
-> >  	rx_ring->next_to_use = 0;
-> > +	if (mucse_alloc_page_pool(rx_ring)
-> 
-> There is a trailing ')' missing from the line above.
-> 
+> +		switch (addrs->family) {
+> +		case AF_INET:
+> +			fl4.flowi4_proto = x->sel.proto;
+> +			fl4.daddr = addrs->daddr.a4;
+> +			fl4.saddr = addrs->saddr.a4;
+> +			pkey = &addrs->daddr.a4;
+> +			break;
+> +		case AF_INET6:
+> +			fl6.flowi6_proto = x->sel.proto;
+> +			memcpy(fl6.daddr.s6_addr32, addrs->daddr.a6, 16);
+> +			memcpy(fl6.saddr.s6_addr32, addrs->saddr.a6, 16);
+> +			pkey = &addrs->daddr.a6;
+> +			break;
+> +		default:
+> +			return;
+> +		}
+>  		break;
+>  	default:
+>  		return;
+>  	}
+>  
+>  	ether_addr_copy(src, addr);
+> +
+> +	/* Destination can refer to a routed network, so perform FIB lookup
+> +	 * to resolve nexthop and get its MAC. Neighbour resolution is used as
+> +	 * fallback.
+> +	 */
+> +	switch (addrs->family) {
+> +	case AF_INET:
+> +		rt = ip_route_output_key(dev_net(netdev), &fl4);
+> +		if (IS_ERR(rt))
+> +			goto neigh;
+> +
+> +		if (rt->rt_type != RTN_UNICAST) {
+> +			ip_rt_put(rt);
+> +			goto neigh;
+> +		}
+> +		rt_dst_entry = &rt->dst;
+> +		break;
+> +	case AF_INET6:
+> +		rt_dst_entry = ipv6_stub->ipv6_dst_lookup_flow(
+> +			dev_net(netdev), NULL, &fl6, NULL);
+> +		if (IS_ERR(rt_dst_entry))
+> +			goto neigh;
+> +		break;
+> +	default:
+> +		return;
+> +	}
+> +
+> +	n = dst_neigh_lookup(rt_dst_entry, pkey);
+> +	if (!n) {
+> +		dst_release(rt_dst_entry);
+> +		goto neigh;
+> +	}
+> +
+> +	neigh_ha_snapshot(addr, n, netdev);
+> +	ether_addr_copy(dst, addr);
+> +	dst_release(rt_dst_entry);
+> +	neigh_release(n);
+> +	return;
+> +
+> +neigh:
+>  	n = neigh_lookup(&arp_tbl, pkey, netdev);
+>  	if (!n) {
+>  		n = neigh_create(&arp_tbl, pkey, netdev);
 
-Yes, compile error here. I'll fix it.
+Code looks fine,
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-> > +		goto err;
-> >  
-> >  	return 0;
-> >  err:
-> 
-> ...
-> 
-
-Thanks for your feedback.
-
+> -- 
+> 2.31.1
 
