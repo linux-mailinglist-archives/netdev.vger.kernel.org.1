@@ -1,167 +1,146 @@
-Return-Path: <netdev+bounces-209361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AD9AB0F5B2
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 16:46:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95EA1B0F656
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 17:01:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F09A1176D07
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 14:45:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD41716DBD7
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 14:58:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAE052F2C5E;
-	Wed, 23 Jul 2025 14:45:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D0A32FA62C;
+	Wed, 23 Jul 2025 14:49:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ZVAcdzUz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D51C2EAD06
-	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 14:45:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3335B2F8C24;
+	Wed, 23 Jul 2025 14:49:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753281938; cv=none; b=e1lqEF9VgA17uS5xZPNwPA9yZh6ZFjqyIYadcpGwox98h1PBJ+fafymnjprMx9EpmYFngosifscYIqNNJW13PrHanO85y8JgTnqwITTIQ3njEFqVCG3Cygo+wH7Sw4npJQ9wQeZPjHjYO7jqPOwmv+bZmuhXte7bGp0Ju1KHnpY=
+	t=1753282169; cv=none; b=B1pQs/xiGpJRrOrWEQ2NunaWyMT4e8eAzsoUC0K6eCC+SGja1KTpnSp6yZ8ean/WtHkjrC740CZkUnvwjRtEmEIa7l3uVNKGWVvn7Ep7erR9KRsHcsSVMydJCHoo6ros2R/85oH+w22x+5z4MNO5QDTyWbwLAwD3j5boi9oiUoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753281938; c=relaxed/simple;
-	bh=ytx5Wx3EuwngFK3Jxlb30QKnQtjx/IQhzvwLdRiJ5ZI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Fbsi75m8cxCK1+i0cDFCHQ3abhHD/g3icBY5q+OHbN/q+ZdEc2FVOQ0A54iwEqmjxleI1an0rzfxfM0LuNwq8OR1y2l57VUFa5AP4AgmYhR27DnGrV6b8EnYUDhrmBkAzEcK1gp4FEMZ5FjO7lh74xhnNtFfrUOZvlQ7KAaJ9JQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-87c30329a56so777448939f.1
-        for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 07:45:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753281935; x=1753886735;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6J0xr1uO+ygDWs1lqz1tpCMN0HmdwzS8B6enhcpsCHw=;
-        b=Dg0ntWkZpB6nn8GYqlctT9bE9cULJKVKPt0hnAA8t3MaA0F86FdBviFXvcWo4iBhtR
-         ENWRZYKzBz3peA3hK7C0RobwRi2mY0fd9GJyPl+ILGx0lEGOxuhD/44rog5zzGv4aoUY
-         V6ttFwGTsHhoCk0QsIUqjq/ws1k1ik0R5CVdnoOAK7sBv91IrdYxyDKr1xjwpf1S4gPH
-         hnEKTip7r5WvvJ2eKtwwxXSabNZ5nledmQfFJcZ/bIP+IGiZs2Yn4j8wb6fW7mqkPxvJ
-         /skfof6m9SKMWSBYF+AF4DGsqkqVgV2Enio2dLyKf/7eajBTJjisVsP8fUy1ZbcIciQQ
-         Kedg==
-X-Forwarded-Encrypted: i=1; AJvYcCU2gRgRaWy9pZG0UJyz8CMIAmcNX9xlLTlvioDDCndzoC0h0Mo/rQvep25tUP79JduTiGvpu38=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxN6iThi8+6Kg1eSyAQ/9L7SzHEufABGrEgwmvNw+7RyVbki7W
-	Mgbp0WLCcnbku5o/iH0iE9BXVveqgdE5OzVKoF1KTqjKh4wYctqhK28e7MpBRCsmK4zmDpDFH4u
-	pZX5JRhsKRSGbKyBOTsOr9OsI9VWKPDJtYIRXgr0SobIXCNQDjkoqO6cpLI4=
-X-Google-Smtp-Source: AGHT+IHEO6vxWGYXkHxVFE0xnGLbD9LNiGLAjgXFVnLZRGGBzHfujx3JuOmvoNgTIWxWpn48UMjMmbRlei4fFNbsiiQlSbgVau1H
+	s=arc-20240116; t=1753282169; c=relaxed/simple;
+	bh=bVEPW8trOPxREgpEULJ+V2nr0MfDXTvoz1xVhduQmv0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qDU4GCtb4FlAAZu7KIDn4FTB0UV7wkVTQWVbeNn3t5vO9BC+vw/zER1L/MsE4fMrRncxrFNwL5r7nFL/JeIClrpNUbOBaLfIu1ie4N49fqUpMrujXU3JTYGt8hCKe88so77zLTpdmeyDWIG6dZivKQIEpeEsPM4bCtwRnqt0AEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=ZVAcdzUz; arc=none smtp.client-ip=117.135.210.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=cS
+	wtl9rPdjwJyihwf67rWxSNsxvXiR2nFdG7CrLvMi4=; b=ZVAcdzUzn1xis4xrEL
+	WAy/AgxHwmvKVi2Mbrt8e5my/o6WR/I7V136lwvoN6FZyD/eSsodHSxUuBUIR7VW
+	qahZYD/bmTqsEBhwHfGvOMs5ZBhwD9WUtTxzvW+SDoQSRgbT8FnzotsOtdQgU7KY
+	2hsfHntRNI1bkz05uZwu+6tjk=
+Received: from H00576042-PD8FB.china.huawei.com (unknown [])
+	by gzsmtp2 (Coremail) with SMTP id PSgvCgD3uXom9oBoW0PHBg--.55850S2;
+	Wed, 23 Jul 2025 22:48:08 +0800 (CST)
+From: huyizhen2024@163.com
+To: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	andy@greyhouse.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [Discuss] KASAN: null-ptr-deference in qdisc_tree_reduce_backlog
+Date: Wed, 23 Jul 2025 22:48:27 +0800
+Message-ID: <20250723144828.664-1-huyizhen2024@163.com>
+X-Mailer: git-send-email 2.45.1.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:e55:b0:879:c608:d1d5 with SMTP id
- ca18e2360f4ac-87c6506e00bmr541701939f.14.1753281935005; Wed, 23 Jul 2025
- 07:45:35 -0700 (PDT)
-Date: Wed, 23 Jul 2025 07:45:34 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6880f58e.050a0220.248954.0001.GAE@google.com>
-Subject: [syzbot] [tipc?] KMSAN: uninit-value in tipc_rcv (2)
-From: syzbot <syzbot+9a4fbb77c9d4aacd3388@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	jmaloy@redhat.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	tipc-discussion@lists.sourceforge.net
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-CM-TRANSID:PSgvCgD3uXom9oBoW0PHBg--.55850S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxWryUZry3uw18Jr4kAw43KFg_yoWrWw17pr
+	y5Xr9rCr40yr17Ary3Zw15J348Kr43Aa18Xr48Jr1rAF17Gr1Yqr17JrWjkrnagr13J3W7
+	tr1Dtw40qryUGaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07Um1v-UUUUU=
+X-CM-SenderInfo: pkx1x6hkhqjiisu6il2tof0z/1tbiowGTp2iA6RDv8gAAsa
 
-Hello,
+Hello.=0D
+=0D
+KASAN found a null ptr deference in qdisc_tree_reduce_backlog.=0D
+If cops->find cannot find a qdisc, it returns NULL.=0D
+And if cops->qlen_notify doesn't valid arg, it will deference the NULL ptr,=
+ resulting in a kernel crash.=0D
+Should we add a check for the argument in cops->qlen_notify?=0D
+=0D
+Looking forward to your reply, thank you!=0D
+=0D
+net\sched\sch_hfsc.c:1237 hfsc_qlen_notify-null-ptr-deref=0D
+=0D
+other info that might help debug this:=0D
+=0D
+crash> bt=0D
+PID: 2297     TASK: ffff8881666aa540  CPU: 0    COMMAND: "syz-executor.1"=0D
+#0 [ffffc9001597f3b0] machine_kexec at ffffffff81206168=0D
+#1 [ffffc9001597f420] __crash_kexec at ffffffff81492da1=0D
+#2 [ffffc9001597f4e8] panic at ffffffff8131dde6=0D
+#3 [ffffc9001597f570] oops_end at ffffffff8119e82b=0D
+#4 [ffffc9001597f598] page_fault_oops at ffffffff8122786c=0D
+#5 [ffffc9001597f630] kernelmode_fixup_or_oops at ffffffff81228125=0D
+#6 [ffffc9001597f658] __bad_area_nosemaphore at ffffffff8122841f=0D
+#7 [ffffc9001597f6a0] exc_page_fault at ffffffff8683eb70=0D
+#8 [ffffc9001597f730] asm_exc_page_fault at ffffffff86a00c12=0D
+    [exception RIP: hfsc_qlen_notify+17]=0D
+    RIP: ffffffff85e29141  RSP: ffffc9001597f7e0  RFLAGS: 00010216=0D
+    RAX: 0000000000001d66  RBX: 0000000000000000  RCX: 0000000000040000=0D
+    RDX: ffffc90006512000  RSI: ffff8881666aa540  RDI: 0000000000000002=0D
+    RBP: 00000000000affe0   R8: 0000000000000001   R9: 0000000000000000=0D
+    R10: 0000000000000000  R11: 0000000000000000  R12: ffffffff87691f60=0D
+    R13: 0000000000000000  R14: 0000000000000000  R15: 0000000000000000=0D
+    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018=0D
+#9 [ffffc9001597f7f8] qdisc_tree_reduce_backlog at ffffffff85dece27=0D
+#10 [ffffc9001597f830] codel_change at ffffffff85e4fe44=0D
+#11 [ffffc9001597f8a0] codel_init at ffffffff85e50223=0D
+#12 [ffffc9001597f8c0] qdisc_create at ffffffff85deb1d8=0D
+#13 [ffffc9001597f930] tc_modify_qdisc at ffffffff85deb9c9=0D
+#14 [ffffc9001597fa38] rtnetlink_rcv_msg at ffffffff85d43739=0D
+#15 [ffffc9001597fac8] netlink_rcv_skb at ffffffff85e913f5=0D
+#16 [ffffc9001597fbb8] netlink_unicast at ffffffff85e907f1=0D
+#17 [ffffc9001597fc00] netlink_sendmsg at ffffffff85e91973=0D
+#18 [ffffc9001597fc80] __sock_sendmsg at ffffffff85cc765e=0D
+#19 [ffffc9001597fca0] ____sys_sendmsg at ffffffff85cc7de2=0D
+#20 [ffffc9001597fd18] ___sys_sendmsg at ffffffff85ccbc0c=0D
+#21 [ffffc9001597fe70] __sys_sendmsg at ffffffff85ccbd47=0D
+#22 [ffffc9001597ff28] do_syscall_64 at ffffffff8683612c=0D
+#23 [ffffc9001597ff50] entry_SYSCALL_64_after_hwframe at ffffffff86a00130=0D
+    RIP: 00007fc942692bdd  RSP: 00007fc9433bebf8  RFLAGS: 00000246=0D
+    RAX: ffffffffffffffda  RBX: 00007fc9427dbf80  RCX: 00007fc942692bdd=0D
+    RDX: 0000000000004000  RSI: 0000000020000280  RDI: 0000000000000003=0D
+    RBP: 00007fc9426f0499   R8: 0000000000000000   R9: 0000000000000000=0D
+    R10: 0000000000000000  R11: 0000000000000246  R12: 0000000000000000=0D
+    R13: 00007ffcb898b86f  R14: 00007ffcb898ba10  R15: 00007fc9433bed80=0D
+ORIG_RAX: 000000000000002e  CS: 0033  SS: 002b=0D
+=0D
+crash> dis -l hfsc_qlen_notify 10=0D
+/data/nq/kernel/net/sched/sch_hfsc.c: 1231=0D
+0xffffffff85e29130 <hfsc_qlen_notify>:  nopl   0x0(%rax,%rax,1) [FTRACE NOP=
+]=0D
+/data/nq/kernel/net/sched/sch_hfsc.c: 1232=0D
+0xffffffff85e29135 <hfsc_qlen_notify+5>:        push   %r12=0D
+0xffffffff85e29137 <hfsc_qlen_notify+7>:        push   %rbp=0D
+0xffffffff85e29138 <hfsc_qlen_notify+8>:        push   %rbx=0D
+/data/nq/kernel/net/sched/sch_hfsc.c: 1231=0D
+0xffffffff85e29139 <hfsc_qlen_notify+9>:        mov    %rsi,%rbx=0D
+/data/nq/kernel/net/sched/sch_hfsc.c: 1232=0D
+0xffffffff85e2913c <hfsc_qlen_notify+12>:       call   0xffffffff814f06a0 <=
+__sanitizer_cov_trace_pc>=0D
+/data/nq/kernel/net/sched/sch_hfsc.c: 1237=0D
+0xffffffff85e29141 <hfsc_qlen_notify+17>:       mov    0x2ec(%rbx),%ebp=0D
+0xffffffff85e29147 <hfsc_qlen_notify+23>:       xor    %edi,%edi=0D
+0xffffffff85e29149 <hfsc_qlen_notify+25>:       mov    %ebp,%esi=0D
+0xffffffff85e2914b <hfsc_qlen_notify+27>:       call   0xffffffff814f08b0 <=
+__sanitizer_cov_trace_const_cmp4>=
 
-syzbot found the following issue on:
-
-HEAD commit:    4871b7cb27f4 Merge tag 'v6.16-rc6-smb3-client-fixes' of gi..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15bbe38c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=5227c65742122bdd
-dashboard link: https://syzkaller.appspot.com/bug?extid=9a4fbb77c9d4aacd3388
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-userspace arch: i386
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/e2e34a7999ba/disk-4871b7cb.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/834fdc8dbc07/vmlinux-4871b7cb.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/617fadfb9a8e/bzImage-4871b7cb.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+9a4fbb77c9d4aacd3388@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in tipc_rcv+0x17fa/0x1ea0 net/tipc/node.c:2132
- tipc_rcv+0x17fa/0x1ea0 net/tipc/node.c:2132
- tipc_l2_rcv_msg+0x213/0x320 net/tipc/bearer.c:668
- __netif_receive_skb_list_ptype net/core/dev.c:6025 [inline]
- __netif_receive_skb_list_core+0x133b/0x16b0 net/core/dev.c:6067
- __netif_receive_skb_list net/core/dev.c:6119 [inline]
- netif_receive_skb_list_internal+0xee7/0x1530 net/core/dev.c:6210
- gro_normal_list include/net/gro.h:532 [inline]
- napi_complete_done+0x3fb/0x7d0 net/core/dev.c:6580
- napi_complete include/linux/netdevice.h:588 [inline]
- tun_get_user+0x4ac4/0x6b40 drivers/net/tun.c:1909
- tun_chr_write_iter+0x3e9/0x5c0 drivers/net/tun.c:1984
- do_iter_readv_writev+0x94a/0xba0 fs/read_write.c:-1
- vfs_writev+0x52a/0x1500 fs/read_write.c:1057
- do_writev+0x1b5/0x580 fs/read_write.c:1103
- __do_sys_writev fs/read_write.c:1171 [inline]
- __se_sys_writev fs/read_write.c:1168 [inline]
- __ia32_sys_writev+0x9c/0xf0 fs/read_write.c:1168
- ia32_sys_call+0x3f2a/0x42c0 arch/x86/include/generated/asm/syscalls_32.h:147
- do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
- __do_fast_syscall_32+0xb0/0x150 arch/x86/entry/syscall_32.c:306
- do_fast_syscall_32+0x38/0x80 arch/x86/entry/syscall_32.c:331
- do_SYSENTER_32+0x1f/0x30 arch/x86/entry/syscall_32.c:369
- entry_SYSENTER_compat_after_hwframe+0x84/0x8e
-
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:4154 [inline]
- slab_alloc_node mm/slub.c:4197 [inline]
- kmem_cache_alloc_node_noprof+0x818/0xf00 mm/slub.c:4249
- kmalloc_reserve+0x13c/0x4b0 net/core/skbuff.c:579
- __alloc_skb+0x347/0x7d0 net/core/skbuff.c:670
- napi_alloc_skb+0xc1/0x740 net/core/skbuff.c:812
- napi_get_frags+0xab/0x250 net/core/gro.c:673
- tun_napi_alloc_frags drivers/net/tun.c:1404 [inline]
- tun_get_user+0x1246/0x6b40 drivers/net/tun.c:1772
- tun_chr_write_iter+0x3e9/0x5c0 drivers/net/tun.c:1984
- do_iter_readv_writev+0x94a/0xba0 fs/read_write.c:-1
- vfs_writev+0x52a/0x1500 fs/read_write.c:1057
- do_writev+0x1b5/0x580 fs/read_write.c:1103
- __do_sys_writev fs/read_write.c:1171 [inline]
- __se_sys_writev fs/read_write.c:1168 [inline]
- __ia32_sys_writev+0x9c/0xf0 fs/read_write.c:1168
- ia32_sys_call+0x3f2a/0x42c0 arch/x86/include/generated/asm/syscalls_32.h:147
- do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
- __do_fast_syscall_32+0xb0/0x150 arch/x86/entry/syscall_32.c:306
- do_fast_syscall_32+0x38/0x80 arch/x86/entry/syscall_32.c:331
- do_SYSENTER_32+0x1f/0x30 arch/x86/entry/syscall_32.c:369
- entry_SYSENTER_compat_after_hwframe+0x84/0x8e
-
-CPU: 0 UID: 0 PID: 15202 Comm: syz.3.3410 Not tainted 6.16.0-rc6-syzkaller-00253-g4871b7cb27f4 #0 PREEMPT(none) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-=====================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
