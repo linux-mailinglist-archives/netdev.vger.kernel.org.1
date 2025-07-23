@@ -1,99 +1,105 @@
-Return-Path: <netdev+bounces-209402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 372B1B0F80D
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 18:26:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7889B0F813
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 18:26:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E70E1CC2F51
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 16:26:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE5A43A39AA
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 16:26:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC1331EB5DD;
-	Wed, 23 Jul 2025 16:25:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D42C1EB5DD;
+	Wed, 23 Jul 2025 16:26:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HOTbVh+k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N9kJJIZb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE14157E99
-	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 16:25:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DFFC45009;
+	Wed, 23 Jul 2025 16:26:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753287953; cv=none; b=kFrPZDCFu5uvuhEjN+daRwG5d9BKDlkWXueSNytpJ0FRsBWX07OB9KrjGfxZC30Q2T1WI8GatfK3pbpxkqAxHOXWsqcYgJdBihoXhjsSrWj8Sr5pNT4msOB9Rc1qmS+P6O15bXjjdkEi3hZ/FBJ/7ieOZ241WBv8IfOAqqANAgE=
+	t=1753288013; cv=none; b=ffi/2GPuCKSFoKnp3nF0OolxReZWEAfJlUsv+fFepfGsvUYsrEF4DP8Nqu7HxYSr/nddHdrArWay/qhqco3I3ibPkteH3aPFzkf4ezQdWqXT6IvtBhF2KT2nut14Fbsjk7SODGTafDGRsCYdMzmY4xAXppLlzcZrRZIRD8FNAXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753287953; c=relaxed/simple;
-	bh=crGSmEZZzBdX5XwVo1TjX4JZzyiOlGt+tkX5ORlR/dM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=eBOiVWAH0BzsSl+LLXYrPjmsSqN49Pio/IClDdOT7HEHrTs8E5YdfxZff8xrJDfLxiaSSDrjy7Snna1UDn0kXsSpEyLWR4H6iASxxDSRfZrp9y3fQ7NQRD4/KvHhfHNK1i2AJvWL+lUlPUYBhTVHVKM/uYuUFblSqioQikuE+wk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--nogikh.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HOTbVh+k; arc=none smtp.client-ip=209.85.221.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--nogikh.bounces.google.com
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3af3c860ed7so14946f8f.1
-        for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 09:25:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753287950; x=1753892750; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=C7nlf4Cqx5uEEwMr05M8xGLym6bdF69iKrcAxYvQRwA=;
-        b=HOTbVh+kaMfLmxlJdO7VY6gY0F/XY8jp0OO1Hiy7br9DFCyf/HRdohTzqlfomENCnN
-         qv2Zp6yzfMkVIzjkhsUk/oI150/x6qaXhz4/yECOYjdrVsupRGn2NJuBR8GO4Z07C7tJ
-         RUa/CHIOmagVTfBzxtDmsjNJ+NhnDcXk/yLb8pGg0ZEEAKTERkGLA7utNaRRVDMhSE4q
-         /QhQL48UCYCGlCaQYvW1eixLGiQerdnsVlHxSwNCeCwS9JLQ3i4XtUUkSa2dccsn44kJ
-         gAgB3gRMOM1Vo+QlEdYDzbkTwSK/2NnDvmt12wGekd4WKeRw2oLlPywL5GC2fY1yYBMV
-         TOzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753287950; x=1753892750;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C7nlf4Cqx5uEEwMr05M8xGLym6bdF69iKrcAxYvQRwA=;
-        b=Pb7DGM0SL2ALMpWHMbYZWvVA4XnTLVCOpd0g5JWbdLWwftJb8AkKkvCdoDhHeVHJMR
-         I52h/5fYuwrFdGJbMw2YaAmcRVcIGuckUO5LL0EpEamijLItjTn/jJj2OJ7jlSCAoOPH
-         ZaH0IklKSwZs/CqQlRJBpd2xuy27qKQ3VPfe+d9n17jzgx0qZwVTmQVhtfdD8ZsKwmKD
-         d9hii8KTSlRzLDkfgBZ2H3IU1ZzIDuPyJ7hsZkz1XhCLlyGwonYVVAZzn98VfWOicQHe
-         +IorqVcrzGxGuXz66eW0xM+NiGWP1RhXbzCEBtTAxGj/ahMx1wOktiKw0QPSh+fw0fJJ
-         YPqA==
-X-Forwarded-Encrypted: i=1; AJvYcCUPLhoAXKqoy7VycZsR0O32r2kY9ikrI4j5TaLUfAplfLM6YN4nTOg3YMDV2501xzt9VglSvgU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxH6Gj6UEVblghAtzZbqqyYluz8ftO2Nw0/B+PDMiGLxm7Xugfw
-	hf9XjePvTMJ6aaFbnHNRi4A0fNfsBCggcQnoaqG+uNxJqX00c0BrBAQbeXX3kfMBw4CsjsQSbx8
-	7pAxP2w==
-X-Google-Smtp-Source: AGHT+IF1gZj7uYUs8D8ao+ag5oMJ8erDSIHrlj2XvlP24E0UVjCruiGOe8gDPJKfTVGemA9iyDmfCNj918Y=
-X-Received: from wrnt1.prod.google.com ([2002:adf:eb81:0:b0:3b6:1610:fc9f])
- (user=nogikh job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:2c03:b0:3a4:f975:30f7
- with SMTP id ffacd0b85a97d-3b768f12e09mr3084562f8f.56.1753287950449; Wed, 23
- Jul 2025 09:25:50 -0700 (PDT)
-Date: Wed, 23 Jul 2025 18:25:47 +0200
-In-Reply-To: <20250722100743.38914e9a@kernel.org>
+	s=arc-20240116; t=1753288013; c=relaxed/simple;
+	bh=n3qXmtc19QU3ZmV4nZYz1SVUQ1cC1I+DIwzc4nirjyg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mrPrDe+I21VOYQHjJLjRqiPHmU32wMxFtcVS3M3ivaVF4fee2Cma5TxyHYUjA0sGri9Xj4X6p9cZWc2rJ16ywbw7HJCAPVfGfqVkXqvxrFSDoeKCFaYydHLgJsODUGzUx1Nv8Y0QLv+DL5pDyj8d7WY8PmV2EF8RrWKKVc8C06U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N9kJJIZb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01150C4CEF1;
+	Wed, 23 Jul 2025 16:26:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753288013;
+	bh=n3qXmtc19QU3ZmV4nZYz1SVUQ1cC1I+DIwzc4nirjyg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=N9kJJIZbQJf6P9svGPJUD275iN2bEHWtom3WIIIQ7r4NHUvucLRzaFmcwM6DYXy/w
+	 eP8JMAD3toXG9dTz2WF6xlKU3KMM+rLmwOOw0NBmvEpBRJd6FZA5gXCq7mqYy+yd+V
+	 Z4x2uIW8DtG81v6WT9T8Uq85ff17hwtnI8CEtXn08YNtbV+NKarkzKOKjmTSYwCJQG
+	 Y183CBkHkZJmYJs72lK2Z/+DPX5LYt80yXPnETvNvaUNcjGjU2hAxbnvUbZcAphNI2
+	 k54Flizmov93mPe9r05TdbaIT9tVHzoplWF46nbNuOY89i4QqAzqq12nbkkUUZhPsA
+	 jJ4LgoDcEcSCg==
+Date: Wed, 23 Jul 2025 17:26:47 +0100
+From: Simon Horman <horms@kernel.org>
+To: Tristram.Ha@microchip.com
+Cc: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Marek Vasut <marex@denx.de>, UNGLinuxDriver@microchip.com,
+	devicetree@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 3/6] net: dsa: microchip: Use different
+ registers for KSZ8463
+Message-ID: <20250723162647.GK1036606@horms.kernel.org>
+References: <20250723022612.38535-1-Tristram.Ha@microchip.com>
+ <20250723022612.38535-4-Tristram.Ha@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250722100743.38914e9a@kernel.org>
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250723162547.1395048-1-nogikh@google.com>
-Subject: Re: Re: [syzbot ci] Re: net: Revert tx queue length on partial
- failure in dev_qdisc_change_tx_queue_len()
-From: Aleksandr Nogikh <nogikh@google.com>
-To: kuba@kernel.org
-Cc: dvyukov@google.com, edumazet@google.com, 
-	linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzbot@lists.linux.dev, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250723022612.38535-4-Tristram.Ha@microchip.com>
 
-Hi Jakub,
+On Tue, Jul 22, 2025 at 07:26:09PM -0700, Tristram.Ha@microchip.com wrote:
+> From: Tristram Ha <tristram.ha@microchip.com>
+> 
+> KSZ8463 does not use same set of registers as KSZ8863 so it is necessary
+> to change some registers when using KSZ8463.
+> 
+> Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
 
-On Tue, 22 Jul 2025 Jakub Kicinski wrote:
-> I think this email is missing a References: header ?
-> It doesn't get threaded properly.
+...
 
-Yes, that was indeed a bug that has now been fixed, thanks for
-reaching out!
+> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
 
--- 
-Aleksandr
+...
+
+> @@ -2980,10 +2981,14 @@ static int ksz_setup(struct dsa_switch *ds)
+>  	}
+>  
+>  	/* set broadcast storm protection 10% rate */
+> +	storm_mask = BROADCAST_STORM_RATE;
+> +	storm_rate = (BROADCAST_STORM_VALUE * BROADCAST_STORM_PROT_RATE) / 100;
+> +	if (ksz_is_ksz8463(dev)) {
+> +		storm_mask = swab16(storm_mask);
+> +		storm_rate = swab16(storm_rate);
+> +	}
+
+I'm sorry to be difficult, but I think the topic of using
+swab16(), which I raised in reviewing the previous version of this
+patchset, is still open.
+
+https://lore.kernel.org/netdev/20250723162158.GJ1036606@horms.kernel.org/
+
+...
 
