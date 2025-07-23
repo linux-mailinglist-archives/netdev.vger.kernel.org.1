@@ -1,64 +1,70 @@
-Return-Path: <netdev+bounces-209400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 001E2B0F7FE
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 18:22:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48990B0F806
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 18:25:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F336596618B
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 16:21:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76F80547977
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 16:25:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 861F5149C41;
-	Wed, 23 Jul 2025 16:22:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9584D1F0994;
+	Wed, 23 Jul 2025 16:25:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aOdbMFOA"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="liLifVWL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B1632E36F0;
-	Wed, 23 Jul 2025 16:22:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E8F01C1AAA;
+	Wed, 23 Jul 2025 16:24:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753287723; cv=none; b=XNPuoHYV3eGJxL0ZI3l0D7zWUvamhqhlkJ2uJ/Y6Tt+6wgrZolAwweno+t/BKgRSgcQ/pkau2BsS757n6N8H9W0NkDkDfyRvw6vjG3u0QUu0X9h0TxcjncFUkXeL9kmrrEpiXq6aQbgR3s6rMxg90UD1gVqyItjslkfh8TG/hz8=
+	t=1753287901; cv=none; b=QW1UeUG3XbllswzGyEcRQlgBfzn/lRCsKI4gATDcutUxFNrNXt7BEhii3AQ4hkXXV+1phvm244c/xZTrW/tMYEOOO3ULoTH/LfeEeFt3/4FbDJL2e0m7p3+vrF8hosokIxjNi9THnQIaLdd84Wo2esVt5yowWH158S49Pt7rBAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753287723; c=relaxed/simple;
-	bh=bfdY0aVwf47XiE8ZVRejqu5I4YU16Lsl9rpzoYPP11c=;
+	s=arc-20240116; t=1753287901; c=relaxed/simple;
+	bh=+yH5sdRuy5JtUTts9MfUfZZCJprgFstIzCLKlBAEnhc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K+YXnYYGnQ4/gK8VZW8s2L0XO3YIrWTrdotlyouMFNgHYdwh9o4XLMy54gOsP8+cK3eac9UuKbZiw0qfaEHiW4j9rbtA14u7Sh5Z3r54FpLA9tJ0JkAgxRTmmvL4zOLbjHRCTllTskr8GUHxn0nua9FOnx+ds21NQ3wKH1+bz3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aOdbMFOA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 275CFC4CEE7;
-	Wed, 23 Jul 2025 16:21:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753287723;
-	bh=bfdY0aVwf47XiE8ZVRejqu5I4YU16Lsl9rpzoYPP11c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aOdbMFOAjPrHkyem2K8fAg4ZfGJz3RKc/Z0QsmW/z4vMpJR7kLa+Sjp9YkYnQ1TyL
-	 SYta3l8yt27PDDMo+q4zdNtj9hznvhgftwL3aRclTUlvEgBLA/FE+Vn0Wpw/S9lYpn
-	 MjUtb67pSB/tKwjdYknGLY3A2FkllPFKhbbgsnbI7BvHQoFKOKFq/eMosuRXRIxpRS
-	 hrta77jYY+pWUZb/ov6u4nXI8w0yJGjZggBMCSgiSQJYvUp34ZaYVgjgFDhC5Qz9MW
-	 etKJrZNC5Cd3g94Joam/OU9eewkUnfrimPINAx6ftuV/XPESxCw66L5tyKoUJqfJR5
-	 R9ar/yGtFlFCw==
-Date: Wed, 23 Jul 2025 17:21:58 +0100
-From: Simon Horman <horms@kernel.org>
-To: Tristram.Ha@microchip.com
-Cc: Woojung.Huh@microchip.com, andrew@lunn.ch, olteanv@gmail.com,
-	kuba@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, maxime.chevallier@bootlin.com,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	marex@denx.de, UNGLinuxDriver@microchip.com,
-	devicetree@vger.kernel.org, netdev@vger.kernel.org,
+	 Content-Type:Content-Disposition:In-Reply-To; b=IxVHUOt3JNRpi4vCSA6MN4l9SNHqaEQsjZV3TKxsUeCWNL7beIebS2C9DWEl17foFps0dBM9vZL97mLRtttD2d/3BDww0Ekb2w0trfuE6EHpEDL3OBbSYggbaDxnbk7esRlWh7dtV2WuqDgLlbdWhMlENgGts8l7Gzd0g5YPGyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=liLifVWL; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=zZNfuBfgB8dRySkDcZcabnnOZgPd4ahYjtj3I0BOkM4=; b=liLifVWLrTxGNp03U4ezUOaAcM
+	kl7wHLDNErluVHrsCzFpLad3A/KqCtnUpyr3eFfWTFeV57VEatuR6kyvyxrGBZ6isu2L2UwzHYOaR
+	Vj24hXdbxfa2gaUtS3K/HWa+DrZ/czeRVIrpr5mNRBnd08VndPL8P6CUVzNAjM3crXcs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uecGS-002fSW-KG; Wed, 23 Jul 2025 18:24:20 +0200
+Date: Wed, 23 Jul 2025 18:24:20 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: MD Danish Anwar <danishanwar@ti.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Fan Gong <gongfan1@huawei.com>, Lee Trager <lee@trager.us>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
+	Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4 4/7] net: dsa: microchip: Use different
- registers for KSZ8463
-Message-ID: <20250723162158.GJ1036606@horms.kernel.org>
-References: <20250719012106.257968-1-Tristram.Ha@microchip.com>
- <20250719012106.257968-5-Tristram.Ha@microchip.com>
- <20250720101703.GQ2459@horms.kernel.org>
- <20250720102224.GR2459@horms.kernel.org>
- <DM3PR11MB873641FBBF2A79E787F13877EC5FA@DM3PR11MB8736.namprd11.prod.outlook.com>
+Subject: Re: [PATCH net-next 1/5] net: rpmsg-eth: Add Documentation for
+ RPMSG-ETH Driver
+Message-ID: <81273487-a450-4b28-abcc-c97273ca7b32@lunn.ch>
+References: <20250723080322.3047826-1-danishanwar@ti.com>
+ <20250723080322.3047826-2-danishanwar@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,117 +73,215 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <DM3PR11MB873641FBBF2A79E787F13877EC5FA@DM3PR11MB8736.namprd11.prod.outlook.com>
+In-Reply-To: <20250723080322.3047826-2-danishanwar@ti.com>
 
-On Wed, Jul 23, 2025 at 02:25:27AM +0000, Tristram.Ha@microchip.com wrote:
-> > On Sun, Jul 20, 2025 at 11:17:03AM +0100, Simon Horman wrote:
-> > > On Fri, Jul 18, 2025 at 06:21:03PM -0700, Tristram.Ha@microchip.com wrote:
-> > > > From: Tristram Ha <tristram.ha@microchip.com>
-> > > >
-> > > > KSZ8463 does not use same set of registers as KSZ8863 so it is necessary
-> > > > to change some registers when using KSZ8463.
-> > > >
-> > > > Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
-> > > > ---
-> > > > v3
-> > > > - Replace cpu_to_be16() with swab16() to avoid compiler warning
-> > >
-> > > ...
-> > >
-> > > > diff --git a/drivers/net/dsa/microchip/ksz_common.c
-> > b/drivers/net/dsa/microchip/ksz_common.c
-> > >
-> > > ...
-> > >
-> > > > @@ -2980,10 +2981,15 @@ static int ksz_setup(struct dsa_switch *ds)
-> > > >     }
-> > > >
-> > > >     /* set broadcast storm protection 10% rate */
-> > > > -   regmap_update_bits(ksz_regmap_16(dev), regs[S_BROADCAST_CTRL],
-> > > > -                      BROADCAST_STORM_RATE,
-> > > > -                      (BROADCAST_STORM_VALUE *
-> > > > -                      BROADCAST_STORM_PROT_RATE) / 100);
-> > > > +   storm_mask = BROADCAST_STORM_RATE;
-> > > > +   storm_rate = (BROADCAST_STORM_VALUE *
-> > BROADCAST_STORM_PROT_RATE) / 100;
-> > > > +   if (ksz_is_ksz8463(dev)) {
-> > > > +           storm_mask = swab16(storm_mask);
-> > > > +           storm_rate = swab16(storm_rate);
-> > > > +   }
-> > > > +   regmap_update_bits(ksz_regmap_16(dev),
-> > > > +                      reg16(dev, regs[S_BROADCAST_CTRL]),
-> > > > +                      storm_mask, storm_rate);
-> > >
-> > > Hi Tristram,
-> > >
-> > > I am confused by the use of swab16() here.
-> > >
-> > > Let us say that we are running on a little endian host (likely).
-> > > Then the effect of this is to pass big endian values to regmap_update_bits().
-> > >
-> > > But if we are running on a big endian host, the opposite will be true:
-> > > little endian values will be passed to regmap_update_bits().
-> > >
-> > >
-> > > Looking at KSZ_REGMAP_ENTRY() I see:
-> > >
-> > > #define KSZ_REGMAP_ENTRY(width, swp, regbits, regpad, regalign)         \
-> > >         {                                                               \
-> > >               ...
-> > >                 .reg_format_endian = REGMAP_ENDIAN_BIG,                 \
-> > >                 .val_format_endian = REGMAP_ENDIAN_BIG                  \
-> > >         }
-> > 
-> > Update; I now see this in another patch of the series:
-> > 
-> > +#define KSZ8463_REGMAP_ENTRY(width, swp, regbits, regpad, regalign)    \
-> > +       {                                                               \
-> >                 ...
-> > +               .reg_format_endian = REGMAP_ENDIAN_BIG,                 \
-> > +               .val_format_endian = REGMAP_ENDIAN_LITTLE               \
-> > +       }
-> > 
-> > Which I understand to mean that the hardware is expecting little endian
-> > values. But still, my concerns raised in my previous email of this
-> > thread remain.
-> > 
-> > And I have a question: does this chip use little endian register values
-> > whereas other chips used big endian register values?
-> > 
-> > >
-> > > Which based on a skimming the regmap code implies to me that
-> > > regmap_update_bits() should be passed host byte order values
-> > > which regmap will convert to big endian when writing out
-> > > these values.
-> > >
-> > > It is unclear to me why changing the byte order of storm_mask
-> > > and storm_rate is needed here. But it does seem clear that
-> > > it will lead to inconsistent results on big endian and little
-> > > endian hosts.
-> 
-> The broadcast storm value 0x7ff is stored in registers 6 and 7 in KSZ8863
-> where register 6 holds the 0x7 part while register 7 holds the 0xff part.
-> In KSZ8463 register 6 is defined as 16-bit where the 0x7 part is held in
-> lower byte and the 0xff part is held in higher byte.  It is necessary to
-> swap the bytes when the value is passed to the 16-bit write function.
+> --- a/Documentation/networking/device_drivers/ethernet/index.rst
+> +++ b/Documentation/networking/device_drivers/ethernet/index.rst
+> @@ -61,6 +61,7 @@ Contents:
+>     wangxun/txgbevf
+>     wangxun/ngbe
+>     wangxun/ngbevf
+> +   rpmsg_eth
 
-Perhaps naively, I would have expected
+This list is sorted. Please insert at the right location. I made the
+same comment to somebody else this week as well....
 
-	.val_format_endian = REGMAP_ENDIAN_LITTLE
+> +This driver is generic and can be used by any vendor. Vendors can develop their
+> +own firmware for the remote processor to make it compatible with this driver.
+> +The firmware must adhere to the shared memory layout, RPMSG communication
+> +protocol, and data exchange requirements described in this documentation.
 
-to handle writing the 16-bit value 0x7ff such that 0x7 is in
-the lower byte, while 0xff is in the upper byte. Is that not the case?
+Could you add a link to TIs firmware? It would be a good reference
+implementation. But i guess that needs to wait until the driver is
+merged and the ABI is stable.
 
-If not, do you get the desired result by removing the swab16() calls
-and using
+> +Implementation Details
+> +----------------------
+> +
+> +- The magic number is defined as a macro in the driver source (e.g.,
+> +  ``#define RPMSG_ETH_SHM_MAGIC_NUM 0xABCDABCD``).
+> +- The firmware must write this value to the ``magic_num`` field of the head and
+> +  tail structures in the shared memory region.
+> +- During the handshake, the Linux driver reads these fields and compares them to
+> +  the expected value. If any mismatch is detected, the driver will log an error
+> +  and refuse to proceed.
 
-	.val_format_endian = REGMAP_ENDIAN_BIG
+So the firmware always takes the role of "primary" and Linux is
+"secondary"? With the current implementation, you cannot have Linux on
+both ends?
 
-But perhaps I misunderstand how .val_format_endian works.
+I don't see this as a problem, but maybe it is worth stating as a
+current limitation.
 
-> 
-> All other KSZ switches use 8-bit access with automatic address increase
-> so a write to register 0 with value 0x12345678 means 0=0x12, 1=0x34,
-> 2=0x56, and 3=0x78.
-> 
+> +Shared Memory Layout
+> +====================
+> +
+> +The RPMSG Based Virtual Ethernet Driver uses a shared memory region to exchange
+> +data between the host and the remote processor. The shared memory is divided
+> +into transmit and receive regions, each with its own `head` and `tail` pointers
+> +to track the buffer state.
+> +
+> +Shared Memory Parameters
+> +------------------------
+> +
+> +The following parameters are exchanged between the host and the firmware to
+> +configure the shared memory layout:
+
+So the host tells the firmware this? Maybe this is explained later,
+but is the flow something like:
+
+Linux makes an RPC call to the firmware with the parameters you list
+below. Upon receiving that RPC, the firmware puts the magic numbers in
+place. It then ACKs the RPC call? Linux then checks the magic numbers?
+
+> +1. **num_pkt_bufs**:
+> +
+> +   - The total number of packet buffers available in the shared memory.
+> +   - This determines the maximum number of packets that can be stored in the
+> +     shared memory at any given time.
+> +
+> +2. **buff_slot_size**:
+> +
+> +   - The size of each buffer slot in the shared memory.
+> +   - This includes space for the packet length, metadata, and the actual packet
+> +     data.
+> +
+> +3. **base_addr**:
+> +
+> +   - The base address of the shared memory region.
+> +   - This is the starting point for accessing the shared memory.
+
+So this is the base address in the Linux address space? How should the
+firmware convert this into a base address in its address space?
+
+> +4. **tx_offset**:
+> +
+> +   - The offset from the `base_addr` where the transmit buffers begin.
+> +   - This is used by the host to write packets for transmission.
+> +
+> +5. **rx_offset**:
+> +
+> +   - The offset from the `base_addr` where the receive buffers begin.
+> +   - This is used by the host to read packets received from the remote
+> +     processor.
+
+Maybe change 'host' to 'Linux'? Or some other name, 'primary' and
+'secondary'. The naming should be consistent throughout the
+documentation and driver.
+
+Part of the issue here is that you pass this information from Linux to
+the firmware. When the firmware receives it, it has the complete
+opposite meaning. It uses "tx_offset" to receive packets, and
+"rx_offset" to send packets. This can quickly get confusing. If you
+used names like "linux_tx_offset", the added context with avoid
+confusion.
+
+> +Shared Memory Structure
+> +-----------------------
+> +
+> +The shared memory layout is as follows:
+> +
+> +.. code-block:: text
+> +
+> +      Shared Memory Layout:
+> +      ---------------------------
+> +      |        MAGIC_NUM        |   rpmsg_eth_shm_head
+> +      |          HEAD           |
+> +      ---------------------------
+> +      |        MAGIC_NUM        |
+> +      |        PKT_1_LEN        |
+> +      |          PKT_1          |
+> +      ---------------------------
+> +      |           ...           |
+> +      ---------------------------
+> +      |        MAGIC_NUM        |
+> +      |          TAIL           |   rpmsg_eth_shm_tail
+> +      ---------------------------
+> +
+> +1. **MAGIC_NUM**:
+> +
+> +   - A unique identifier used to validate the shared memory region.
+> +   - Ensures that the memory region is correctly initialized and accessible.
+> +
+> +2. **HEAD Pointer**:
+> +
+> +   - Tracks the start of the buffer for packet transmission or reception.
+> +   - Updated by the producer (host or remote processor) after writing a packet.
+
+Is this a pointer, or an offset from the base address? Pointers get
+messy when you have multiple address spaces involved. An offset is
+simpler to work with. Given that the buffers are fixed size, it could
+even be an index.
+
+> +Information Exchanged Between RPMSG Channels
+> +--------------------------------------------
+> +
+> +1. **Requests from Host to Remote Processor**:
+
+Another place where consistent naming would be good. Here it is the
+remote processor, not firmware used earlier.
+
+> +
+> +   - `RPMSG_ETH_REQ_SHM_INFO`: Request shared memory information, such as
+> +     ``num_pkt_bufs``, ``buff_slot_size``, ``base_addr``, ``tx_offset``, and
+> +     ``rx_offset``.
+
+Is this requested, or telling? I suppose the text above uses "between"
+which is ambiguous.
+
+> +3. **Notifications from Remote Processor to Host**:
+> +
+> +   - `RPMSG_ETH_NOTIFY_PORT_UP`: Notify that the Ethernet port is up and ready
+> +     for communication.
+> +   - `RPMSG_ETH_NOTIFY_PORT_DOWN`: Notify that the Ethernet port is down.
+> +   - `RPMSG_ETH_NOTIFY_PORT_READY`: Notify that the Ethernet port is ready for
+> +     configuration.
+
+That needs more explanation. Why would it not be ready? 
+
+> +   - `RPMSG_ETH_NOTIFY_REMOTE_READY`: Notify that the remote processor is ready
+> +     for communication.
+
+How does this differ from PORT_READY?
+
+> +How-To Guide for Vendors
+> +========================
+> +
+> +This section provides a guide for vendors to develop firmware for the remote
+> +processor that is compatible with the RPMSG Based Virtual Ethernet Driver.
+> +
+> +1. **Implement Shared Memory Layout**:
+> +
+> +   - Allocate a shared memory region for packet transmission and reception.
+> +   - Initialize the `MAGIC_NUM`, `num_pkt_bufs`, `buff_slot_size`, `base_addr`,
+> +     `tx_offset`, and `rx_offset`.
+> +
+> +2. **Magic Number Requirements**
+> +
+> +   - The firmware must write a unique magic number (for example, ``0xABCDABCD``)
+
+Why "for example"? Do you have a use case where some other value
+should be used? Or can we just make this magic value part of the
+specification?
+
+> +- The driver assumes a specific shared memory layout and may not work with other
+> +  configurations.
+> +- Multicast address filtering is limited to the capabilities of the underlying
+> +  RPMSG framework.
+
+I don't think there is anything special here. The network stack always
+does perfect address filtering. The driver can help out, by also doing
+perfect address filtering, or imperfect address filtering, and letting
+more through than actually wanted. Or it can go into promiscuous mode.
+
+> +- The driver currently supports only one transmit and one receive queue.
+> +
+> +References
+> +==========
+> +
+> +- RPMSG Framework Documentation: https://www.kernel.org/doc/html/latest/rpmsg.html
+
+This results in 404 Not Found.
+
+     Andrew
 
