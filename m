@@ -1,248 +1,415 @@
-Return-Path: <netdev+bounces-209487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0C20B0FB2F
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 21:55:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6F7AB0FB41
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 22:05:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D1921CC1CF9
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 19:56:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62F151AA3826
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 20:05:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A6FA230BCC;
-	Wed, 23 Jul 2025 19:55:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E5522222B4;
+	Wed, 23 Jul 2025 20:05:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="JWRW5M7t"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="SyBtKbQt"
 X-Original-To: netdev@vger.kernel.org
-Received: from SJ2PR03CU002.outbound.protection.outlook.com (mail-westusazon11023101.outbound.protection.outlook.com [52.101.44.101])
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79FA9200BAE;
-	Wed, 23 Jul 2025 19:55:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.44.101
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753300554; cv=fail; b=Jj8DC6YFZsfCq6Ci/EdbJs+VDa69P71tTX3pbjj8UB5d9tvSeSDVEAZ+ui1E3eKzUwDzBQ0GYXQoYT75xXrbg9sfPzraKeSASYsc5GlE/FpVBiH1lon7eQ4imwj9M0Pg8K4skFocpqjJ8q4qyOWc8uuxvoTBtVuV7wWzUFxf/Jo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753300554; c=relaxed/simple;
-	bh=NbRkuUrANDq5CHoZZRvLOgV6pZsPYSWNURLiv1D8L6E=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=tJKjoOcoS8LaMxUKIleNY+n3otvCObIrRBy8j2tVF7QXC/MFadsVRlDYQT57FSWdvXuVSYzrM6sgel5Oij3qpOFieYVwyTwXSKxeS9EwLsD9U551Phig/CMHG4t8xZ8+Ku6COPdovmtAhIUtnqZqI6KA7LsRT6UtM/TxtZXdZOs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=JWRW5M7t; arc=fail smtp.client-ip=52.101.44.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=v2nMV2kb/wFRobBj4dBWzMFTfL8NPlxb3MRDQfQGldkyuZ7k2U2lO5ufPa5BAW2T3tbQXbcWAx5BV+r4CbWBJqfqO15yzlp3/pNW8akVC6zQbcGyJOQmfrsi/MtwIDYu7fx81unVJzW1b2hau2DTi5MYKtsWYEBzoV9XS3CbGmeX1jf8tKUCo163kDDox9dhFAouqoPIqC78dxcuyrfsVxnc39c11+dKrFaWq2PwOyGsRScvd1xPVR94JSpn0H6SQuSUtxTllNk1zoFk71pmnCSV5rSa95n0P9dqbl8slJ1wrcTQBKYy8FLvqg5sJwDzrNs7BZMwZXixRIgY0Xnpww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AhUN9bYyya9HcQTKRb2Tr9lYZtPkq3KIWG5QNp1HDcE=;
- b=fgFYYztJkXF20hxFurq0pCqGt0f6xyX/ljKaYIeHfw5Evjxd2wG/rn/pYAw4GOVpx+CR+BkZVDHeICC7CuqekHjo4TkltB3oVn9Gol68Vp8oRTES1ARAD6D+5QvMl4RkDZI4weVDeZ8myQXfK9NVgLZ83JS806nGRzeJVnpSv8oJNrvcKXGhRpqlZgeYhRteXt0RYAW7HPkVR1UEraqqHf2vPp4LI2h/9RHxaQcvSv3K5S5Lg4qBKqrnTvPB/ckSNk4GHI5FqUwUPaRDZhmYW1EdKbD7s3nVa/6nVQhoqFMuN6Q+M2FiuB92N1EKw7tXEband1/T81QokykdFldDog==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AhUN9bYyya9HcQTKRb2Tr9lYZtPkq3KIWG5QNp1HDcE=;
- b=JWRW5M7tNmkZaHm/DnJq8nfHI7nWFTlls34f5K8feDL9dy4RAcjiUcXuf6RN6uEepe6suownZclwqOXzGfEfH7V4O7zTu5da9EiqU3HyrpWQe78nGCwDYoZIFeNaGzJEC/zI9hY6XCPx5OjGPOoeTR8hx8Ie7i/wWyxr4d21Qyk=
-Received: from SJ2PR21MB4013.namprd21.prod.outlook.com (2603:10b6:a03:546::14)
- by SJ0PR21MB2016.namprd21.prod.outlook.com (2603:10b6:a03:2aa::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.5; Wed, 23 Jul
- 2025 19:55:49 +0000
-Received: from SJ2PR21MB4013.namprd21.prod.outlook.com
- ([fe80::3c6d:58dc:1516:f18]) by SJ2PR21MB4013.namprd21.prod.outlook.com
- ([fe80::3c6d:58dc:1516:f18%4]) with mapi id 15.20.8964.004; Wed, 23 Jul 2025
- 19:55:49 +0000
-From: Haiyang Zhang <haiyangz@microsoft.com>
-To: Dipayaan Roy <dipayanroy@linux.microsoft.com>, "horms@kernel.org"
-	<horms@kernel.org>, "kuba@kernel.org" <kuba@kernel.org>, KY Srinivasan
-	<kys@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui
-	<decui@microsoft.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>, Long Li
-	<longli@microsoft.com>, Konstantin Taranov <kotaranov@microsoft.com>,
-	"ast@kernel.org" <ast@kernel.org>, "daniel@iogearbox.net"
-	<daniel@iogearbox.net>, "hawk@kernel.org" <hawk@kernel.org>,
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "sdf@fomichev.me"
-	<sdf@fomichev.me>, "lorenzo@kernel.org" <lorenzo@kernel.org>,
-	"michal.kubiak@intel.com" <michal.kubiak@intel.com>,
-	"ernis@linux.microsoft.com" <ernis@linux.microsoft.com>,
-	"shradhagupta@linux.microsoft.com" <shradhagupta@linux.microsoft.com>, Shiraz
- Saleem <shirazsaleem@microsoft.com>, "rosenp@gmail.com" <rosenp@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "ssengar@linux.microsoft.com"
-	<ssengar@linux.microsoft.com>, Dipayaan Roy <dipayanroy@microsoft.com>
-Subject: RE: [PATCH v2] net: mana: Use page pool fragments for RX buffers
- instead of full pages to improve memory efficiency.
-Thread-Topic: [PATCH v2] net: mana: Use page pool fragments for RX buffers
- instead of full pages to improve memory efficiency.
-Thread-Index: AQHb/AUBeOoDCPVUaUazwNHsW9rYXbRAHwZw
-Date: Wed, 23 Jul 2025 19:55:49 +0000
-Message-ID:
- <SJ2PR21MB4013DD021CE6EE505366E83DCA5FA@SJ2PR21MB4013.namprd21.prod.outlook.com>
-References:
- <20250723190706.GA5291@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-In-Reply-To:
- <20250723190706.GA5291@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=15485fe5-d475-47f0-9408-2df30c684c9e;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-07-23T19:53:59Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
- 3, 0, 1;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ2PR21MB4013:EE_|SJ0PR21MB2016:EE_
-x-ms-office365-filtering-correlation-id: cf8ce484-87d7-4757-1bae-08ddca22ebe8
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|376014|7416014|1800799024|921020|7053199007|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?5CXy0LpNuwICJ0h0F9L38DpWvO1XtInpWpZUNDxLSzawrnaBIuQVhRuz9T9p?=
- =?us-ascii?Q?Q/lpBnl//La2N0rAFeml93Hz5VYRt1HHF5g2VkEp5Ir34OzpMKfBDTAFXGBo?=
- =?us-ascii?Q?QbszOmyyqgLQRnPpyfYLAJQM7lqJENyEl4j7M3JQi0o7UR6NRQf9jOP/SyzQ?=
- =?us-ascii?Q?3gcHl0Cmek4Z8pxJTkpG8/cFFqsozM8jZiKApvsPrLJBX913SnaQVRvx2swn?=
- =?us-ascii?Q?v+v8nIep8FU3AT+4s/ACRObHUZIoXbaKtFD9N5K48L171XUy4idh4mP+GvCz?=
- =?us-ascii?Q?rHCPrQe9X58cTis8kaIz9125VP7iifyF1I0lZPbSCdtYFgeTuzPDopW9SPUG?=
- =?us-ascii?Q?SLz+Pp+E8rhktNT75zoUFTecY+lU2vNGQCvMejn+qmo5gmm4cvKSwLzjOCdl?=
- =?us-ascii?Q?YOyBI0tj+8YWcJNBWEaL9sRzN09tITlYV6GfUNSWcMssRgUoa1Gx62Bcexyh?=
- =?us-ascii?Q?ivzRUoo2RmQER8PznBt4tw5u2D6lDuCe5aLbHEw1Ox1jDiQVbj3oDST1a6tR?=
- =?us-ascii?Q?YIC2tQ5oX1dImSoK7xQZs+h9QubtoGYA44Uuzc9w9nIm4TSBovdZqjOU9EDz?=
- =?us-ascii?Q?C/Zn06KBH500NeF9MOcj0pDqMPqaTpyZ8RlTds7vrWuAOJ8xOOCiiwDO6SzB?=
- =?us-ascii?Q?0dnFMeuiXux9F3Xg73KOOk9puIpgD19U++y7OQfPOsC9OkR1lQH8h4Yb/laT?=
- =?us-ascii?Q?MmV0dkZpM3dHGOu8gsIzN5q6RHZXfMcpkI61UzngzHelSgeKnh/0+70sEvaF?=
- =?us-ascii?Q?gNpDAFrnHDZWnlXR+Ij/hM9J23C0KjWgv5jxS9y8M7Orr30D4UJAqlxx1RJ1?=
- =?us-ascii?Q?bjC5gfUyWUh50N+uG3Gz3KEV2JLB6oIxdTg58jCde3vHP8XBOXn7lCkVq4eW?=
- =?us-ascii?Q?QnQUjnBN6gd6dqeO5lvY22+Vggydw1+7tRFY3P7pcbhOFVswSyHmyuV74Jtj?=
- =?us-ascii?Q?L+xynXTiMwv1uS8UD4/Buf26IiWMPzJtyNFpFV9kbrmD5GSldAjxgiY+mHty?=
- =?us-ascii?Q?jWi3r3vZ+/u5HNPBnLRhIWks58wM4OnUvOgC01o5NxVU3qwJhMEYYtetJDYe?=
- =?us-ascii?Q?/RcHj2qqn+nyNL9EeJBv0/dSCFuqhKbRcK0juNz6NUndVKR+grDsj4ERgyM+?=
- =?us-ascii?Q?pAk8ADgB39iT5hq2CoWIuZtKexpaZUOame0r6LbF2JMgMdrH73fd8gQHiJyu?=
- =?us-ascii?Q?x8p0bI40nCPtGdYoK5iHxIn47VjbQXLfT0Y4RmyAUtz3xgS+EeANJ+9ObTT3?=
- =?us-ascii?Q?E7pileE7fVXy44/Zo0ooMxFJbyIa02y25Vgg0q2VYxF4cGHWRLMRS1mq5RyD?=
- =?us-ascii?Q?WKvKbFd5TewMojNxwxljjR/ItEOeJfL3/TzNqljq39V89uQb1b5xhXbtt+bW?=
- =?us-ascii?Q?p6x+0zMOhMhkPOyaxONxaSxOF4OKPJwG1SI8Zm7PVyET10UtccFNed4+ZoQN?=
- =?us-ascii?Q?UlPoa+d+SnsZM647FV/uZnjCRF8NL8oZkFvKazMKNWOWU9RAoKAJvN3lvpI7?=
- =?us-ascii?Q?BX7JNBxpjyHS4Kw=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR21MB4013.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(921020)(7053199007)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?NffS8qZjEMhgOOEuE3IDCurlhrfo0tyFPOnyVgCoCUoFVYGaVlhRCFOMil1K?=
- =?us-ascii?Q?K0ywfwUEEIbIdD62SvrzFbwIn+sliUfJCrZZ0E4q7QFn9bJ0E/c+6GJ7UOhF?=
- =?us-ascii?Q?CAAfCO3e79RJLtOw2fOZXemECvGvmU+WaACqdYReowYO9sO4S3I+04bxvsgo?=
- =?us-ascii?Q?GRZ/sQyZ8Z4N/77zSrvXKt4gNtwNHPfpeTQSwYE/3gE1QetxwZyFUHeLGDWb?=
- =?us-ascii?Q?GlX3hgekO22CS7WFFnReYrczAMG7PjCi5hMcb9XxCDNs9t7hcVY+C0LiLXRr?=
- =?us-ascii?Q?V5g8CZG10PqI3ZgTHsYNzY1xX73xiiW6zR+ezaZcAVJj3sMDbF9dyYYNvARX?=
- =?us-ascii?Q?wng7dzYENaxluiKfH/o4ebOZ/ffqVEPc7SuulIWXwIrf7N/MfiYI1/9yGKfg?=
- =?us-ascii?Q?55n56u4dPjqxdBw581r9bFZID9jl5fJ3+XVVzbvzSBNAKQKWuwo9NtFBdraQ?=
- =?us-ascii?Q?3B5w0wVYnPt2xdHjg6KCWVnq7rDgOtZtM46tw0Ro+sH2KL/enrJTSS6shbmJ?=
- =?us-ascii?Q?nBu86DbSg6rW2VLjZmFWwPyEBPvzjPoatsxSr2OcfyvU2ajDGg9VXmcuQpHd?=
- =?us-ascii?Q?yuRF4pC/di8Iup/P+uXq0iECG4buZ4T/NmSEix9D7Cj9hpxxN17SUH9GAJDx?=
- =?us-ascii?Q?wHg0GPyvr8RKYiB1N+j1F+UPljchqBpQkzGq6UxZOHZLBKqyPb9zZU/IW1QH?=
- =?us-ascii?Q?KePL2ChTTgW/y7sk2tcZsIGO82kgRRWSY8UHbkvVoDPnWlFhNN9ti+MrXNMs?=
- =?us-ascii?Q?fKl7oAv7AKVjz1s9L+5O4GSw4lsW35DO5NCty1awJG1RpILLL90LYE7yiTpa?=
- =?us-ascii?Q?x94KKBrXQa06Zo2zxA3afDCnkraafalg0Z/1OwQb9D0vQy43vGBTSm25OV2g?=
- =?us-ascii?Q?tg7YMPfv9m8mw8qh9T6MU3D11taZNO/RfTLJLuTQRQW0GgPjFko4abqT/zMt?=
- =?us-ascii?Q?cUgcQyjrO9WmaGT/XqDOMsroF38KUVqn9W3pCVxYXjbwizpdsiVung/dehHR?=
- =?us-ascii?Q?lAmNAIUrvpbE3iXzzTl/AWeFSr8VVILjxr6te9c1BXdRV/otHyvqFcN8kAzR?=
- =?us-ascii?Q?FVLPK7PEfZ72imWJwfPjZNOQdxMYvnfVSb/2sNRuxHXEjegNCGmpr7lpTy1d?=
- =?us-ascii?Q?4IERP/L+izg022/uUy7ufFF0NVbn2vfn0si94DsAKHy4JyzSkOg6Sj3f3COn?=
- =?us-ascii?Q?5IRAvvSkICVCyq3jB5ufKj4st0IIrq7n+w90mWPhnlNbAZ79whQkN1ANDqm0?=
- =?us-ascii?Q?YJLIdmr/4bMZovo+quEe5xHi9T2SAwfzp0isjud2WzgO03NZlIXtTNuSa4GU?=
- =?us-ascii?Q?w8br/MFTlV5XiOl/4dadrh6KzuJSBPp5CiUow8u5lXHOMjAiw0skXXT2P9+K?=
- =?us-ascii?Q?pu2IXWtuVJA9NNRkatLa7FrdyXLlOhV50gS6aJ3iLtIU/mPbQ0P7S2fC5/oz?=
- =?us-ascii?Q?wEpaNvmsf1Sxyt6aFCALmNZi+Q+WQ2yuy+Bxv5EjA4mdtRcXym3u2H82VtNI?=
- =?us-ascii?Q?vWpt28nK/mBfxOmGiOQuiqUc4I4gKqWGnj+A5B1pp0Bklz+r0U2wODMaTH1M?=
- =?us-ascii?Q?SebpqaRMnjlPDpSrhU1TfTd38mnaw4mIwOmKXiCG?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E1C11EE7B7;
+	Wed, 23 Jul 2025 20:05:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753301127; cv=none; b=roAerfgwNBBuyVJxehbod07NEYRGD/fCKgchEO7Zk5T10KVYMIZhRI6qn/JpfF4qqWLvPi1GOetIqyNcrRKPd9y2/aZ/WNV2NK5RD1bHDhBrGixGGM7fnDpeVHlbqfAnhcC42WRO4iPShSilVrVoy0LdXqa4IeoRHJzPhbMavfs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753301127; c=relaxed/simple;
+	bh=H7nBYB1X2440pJpSoN1Wn0N9DqqtQ4gh2JSuvy/9Oa8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=grbexL086FGFSchJH353MqPeKuA+2fD2jPuBG3B53ouQKQ2g4p+e+gOaE1pfCBf88UAQ3Mn3/Aw3PoZp5oSJH9sSRf8ECad6+Jfm3nbqULnzYYsjGgnwtGhlUvqghE5IVpudPAGUhvbThopTSF6/glcMUCJ/75Z7a4PnmTf0M9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=SyBtKbQt; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 6DE3810272359;
+	Wed, 23 Jul 2025 22:05:18 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1753301122; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=JRu1eEhqQTWRrM+V9siD8r1BXrfWDxNfwR7uGPU++GM=;
+	b=SyBtKbQtFJsJr8BbMMF4N8L0uuZ0w/k99K9Lgwo26BBDMWchLQ3FZDnWWOq3pb6F2H+WtB
+	IH+nJS/DzMJAuwGcepsegNzfGd+UQw22MHZhJhknKZ/tRgAoe1M/xgOHeRLGFKRwdYXD2r
+	95E75LHIK/XQR7g4vKwLJC+4XmCd5557t59okh64ES41tuBaHxSMNEiUjOH17vuxdAoBRs
+	/dO5I6YGCmlA9RA2dm6eFwf1/wYrat3uHsPR4y4rH7sW2HHPWRh/llRKP00X3Mc/lRYll3
+	XfBrBSFn3P805Vkju6oKOWmp5MwvuyFOmTq+xOE8v2pQOekag46+iKswvcWOIA==
+Date: Wed, 23 Jul 2025 22:05:17 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
+ <edumazet@google.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Shawn Guo
+ <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix
+ Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
+ <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>
+Subject: Re: [net-next v15 06/12] net: mtip: Add net_device_ops functions to
+ the L2 switch driver
+Message-ID: <20250723220517.063c204b@wsk>
+In-Reply-To: <20250722111639.3a53b450@wsk>
+References: <20250716214731.3384273-1-lukma@denx.de>
+	<20250716214731.3384273-7-lukma@denx.de>
+	<20250718182840.7ab7e202@kernel.org>
+	<20250722111639.3a53b450@wsk>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ2PR21MB4013.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cf8ce484-87d7-4757-1bae-08ddca22ebe8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jul 2025 19:55:49.1957
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: yCOwcEWpFUrW17k1BTC2koCT0jmzp3hUDTbC7J46FTZP5sAY0K8xk0awQHlCKSPZwuh7kXx+q+qhgZ90abwBtw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR21MB2016
+Content-Type: multipart/signed; boundary="Sig_/TD4of5q5UnstYcIEUgvkE=c";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Last-TLS-Session-Version: TLSv1.3
+
+--Sig_/TD4of5q5UnstYcIEUgvkE=c
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+Hi Jakub, Paolo,
+
+Do you have more comments and questions regarding this driver after my
+explanation?
+
+Shall I do something more?
+
+Thanks in advance for you feedback.
+
+> Hi Jakub,
+>=20
+> > On Wed, 16 Jul 2025 23:47:25 +0200 Lukasz Majewski wrote: =20
+> > > +static netdev_tx_t mtip_start_xmit_port(struct sk_buff *skb,
+> > > +					struct net_device *dev,
+> > > int port) +{
+> > > +	struct mtip_ndev_priv *priv =3D netdev_priv(dev);
+> > > +	struct switch_enet_private *fep =3D priv->fep;
+> > > +	unsigned short status;
+> > > +	struct cbd_t *bdp;
+> > > +	void *bufaddr;
+> > > +
+> > > +	spin_lock(&fep->hw_lock);   =20
+> >=20
+> > I see some inconsistencies in how you take this lock.
+> > Bunch of bare spin_lock() calls from BH context, but there's also
+> > a _irqsave() call in mtip_adjust_link(). =20
+>=20
+> In the legacy NXP (Freescale) code for this IP block (i.e. MTIP
+> switch) the recommended way to re-setup it, when link or duplex
+> changes, is to reset and reconfigure it.
+>=20
+> It requires setting up interrupts as well... In that situation, IMHO
+> disabling system interrupts is required to avoid some undefined
+> behaviour.
+>=20
+> > Please align to the strictest
+> > context (not sure if the irqsave is actually needed, at a glance,
+> > IOW whether the lock is taken from an IRQ) =20
+>=20
+> The spin_lock() for xmit port is similar to what is done for
+> fec_main.c. As this switch uses single uDMA for both ports as well as
+> there is no support (and need) for multiple queues it can be omitted.
+>=20
+> >  =20
+> > > +	if (!fep->link[0] && !fep->link[1]) {
+> > > +		/* Link is down or autonegotiation is in
+> > > progress. */
+> > > +		netif_stop_queue(dev);
+> > > +		spin_unlock(&fep->hw_lock);
+> > > +		return NETDEV_TX_BUSY;
+> > > +	}
+> > > +
+> > > +	/* Fill in a Tx ring entry */
+> > > +	bdp =3D fep->cur_tx;
+> > > +
+> > > +	/* Force read memory barier on the current transmit
+> > > description */   =20
+> >=20
+> > Barrier are between things. What is this barrier separating, and
+> > what write barrier does it pair with? As far as I can tell cur_tx
+> > is just a value in memory, and accesses are under ->hw_lock, so
+> > there should be no ordering concerns. =20
+>=20
+> The bdp is the uDMA descritptor (memory allocated in the coherent dma
+> area). It is used by the uDMA when data is transferred to MTIP switch
+> internal buffer.
+>=20
+> The bdp->cbd_sc is a half word, which is modified by uDMA engine, to
+> indicate if there are errors or transfer has ended.
+>=20
+> The rmb() shall improve robustness - it assures that the status
+> corresponds to what was set by uDMA. On the other hand dma coherent
+> allocation shall do this as well.
+>=20
+> The fec_main.c places the rmb() in similar places, so I followed their
+> approach.
+>=20
+> >  =20
+> > > +	rmb();
+> > > +	status =3D bdp->cbd_sc;
+> > > +
+> > > +	if (status & BD_ENET_TX_READY) {
+> > > +		/* All transmit buffers are full. Bail out.
+> > > +		 * This should not happen, since dev->tbusy
+> > > should be set.
+> > > +		 */
+> > > +		netif_stop_queue(dev);
+> > > +		dev_err(&fep->pdev->dev, "%s: tx queue full!.\n",
+> > > dev->name);   =20
+> >=20
+> > This needs to be rate limited, we don't want to flood the logs in
+> > case there's a bug. =20
+>=20
+> +1
+>=20
+> >=20
+> > Also at a glance it seems like you have one fep for multiple
+> > netdevs. =20
+>=20
+> Yes.
+>=20
+> > So stopping one netdev's Tx queue when fep fills up will not stop
+> > the other ports from pushing frames, right? =20
+>=20
+> This is a bit more complicated...
+>=20
+> Other solutions - like cpsw_new - are conceptually simple; there are
+> two DMAs to two separate eth IP blocks.
+> During startup two separate devices are created. When one wants to
+> enable bridge (i.e. start in-hw offloading) - just single bit is setup
+> and ... that's it.
+>=20
+> With vf610 / imx287 and MTIP it is a bit different (imx287 is even
+> worse as second ETH interface has incomplete functionality by design).
+>=20
+> When switch is not active - you have two uDMA ports to two ENET IP
+> blocks. Full separation. That is what is done with fec_main.c driver.
+>=20
+> When you enable MTIP switch - then you have just a single uDMA0 active
+> for "both" ports. In fact you "bridge" two ports into a single one -
+> that is why Freescale/NXP driver (for 2.6.y) just had eth0 to "model"
+> bridged interfaces. That was "simpler" (PHY management was done in the
+> driver as well).
+>=20
+> Now, in this driver, we do have two network devices, which are
+> "bridged" (so there is br0). And of course there must be separation
+> between lan0/1 when this driver is used, but bridge is not (yet)
+> created. This works :-)
+>=20
+>=20
+> So I do have - 2x netdevs (handled by single uDMA0) + 2PHYS + br0 +
+> NAPI + switchdev (to avoid broadcast frame storms + {R}STP + FDB -
+> WIP).
+>=20
+>=20
+> Just pure fun :-) to model it all ... and make happy all maintainers
+> :-)
+>=20
+> >  =20
+> > > +		spin_unlock(&fep->hw_lock);
+> > > +		return NETDEV_TX_BUSY;
+> > > +	}
+> > > +
+> > > +	/* Clear all of the status flags */
+> > > +	status &=3D ~BD_ENET_TX_STATS;
+> > > +
+> > > +	/* Set buffer length and buffer pointer */
+> > > +	bufaddr =3D skb->data;
+> > > +	bdp->cbd_datlen =3D skb->len;
+> > > +
+> > > +	/* On some FEC implementations data must be aligned on
+> > > +	 * 4-byte boundaries. Use bounce buffers to copy data
+> > > +	 * and get it aligned.spin
+> > > +	 */
+> > > +	if ((unsigned long)bufaddr & MTIP_ALIGNMENT) {   =20
+> >=20
+> > I think you should add=20
+> >=20
+> > 	if ... ||
+> >            fep->quirks & FEC_QUIRK_SWAP_FRAME)
+> >=20
+> > here. You can't modify skb->data without calling skb_cow_data()
+> > but you already have buffers allocated so can as well use them. =20
+>=20
+> The vf610 doesn't need the frame to be swapped, but has requirements
+> for alignment as well.
+>=20
+> I would keep things as they are now - as they just improve
+> readability.
+>=20
+> Please keep in mind that this version only supports imx287, but the
+> plan is to add vf610 as well (to be more specific - this driver also
+> works on vf610, but I plan to add those patches after this one is
+> accepted and pulled).=20
+>=20
+> >  =20
+> > > +		unsigned int index;
+> > > +
+> > > +		index =3D bdp - fep->tx_bd_base;
+> > > +		memcpy(fep->tx_bounce[index],
+> > > +		       (void *)skb->data, skb->len);   =20
+> >=20
+> > this fits on one 80 char line BTW, quite easily:
+> >=20
+> > 		memcpy(fep->tx_bounce[index], (void *)skb->data,
+> > skb->len);
+> >=20
+> > Also the cast to void * is not necessary in C. =20
+>=20
+> +1
+>=20
+> >  =20
+> > > +		bufaddr =3D fep->tx_bounce[index];
+> > > +	}
+> > > +
+> > > +	if (fep->quirks & FEC_QUIRK_SWAP_FRAME)
+> > > +		swap_buffer(bufaddr, skb->len);
+> > > +
+> > > +	/* Save skb pointer. */
+> > > +	fep->tx_skbuff[fep->skb_cur] =3D skb;
+> > > +
+> > > +	fep->skb_cur =3D (fep->skb_cur + 1) & TX_RING_MOD_MASK;   =20
+> >=20
+> > Not sure if this is buggy, but maybe delay updating things until the
+> > mapping succeeds? Fewer things to unwind. =20
+>=20
+> Yes, the skb storage as well as ring buffer modification can be done
+> after dma mapping code.
+>=20
+> >  =20
+> > > +	/* Push the data cache so the CPM does not get stale
+> > > memory
+> > > +	 * data.
+> > > +	 */
+> > > +	bdp->cbd_bufaddr =3D dma_map_single(&fep->pdev->dev,
+> > > bufaddr,
+> > > +					  MTIP_SWITCH_TX_FRSIZE,
+> > > +					  DMA_TO_DEVICE);
+> > > +	if (unlikely(dma_mapping_error(&fep->pdev->dev,
+> > > bdp->cbd_bufaddr))) {
+> > > +		dev_err(&fep->pdev->dev,
+> > > +			"Failed to map descriptor tx buffer\n");
+> > > +		dev->stats.tx_errors++;
+> > > +		dev->stats.tx_dropped++;   =20
+> >=20
+> > dropped and errors are two different counters
+> > I'd stick to dropped =20
+>=20
+> Ok.
+>=20
+> >  =20
+> > > +		dev_kfree_skb_any(skb);
+> > > +		goto err;
+> > > +	}
+> > > +
+> > > +	/* Send it on its way.  Tell FEC it's ready, interrupt
+> > > when done,
+> > > +	 * it's the last BD of the frame, and to put the CRC on
+> > > the end.
+> > > +	 */
+> > > +
+> > > +	status |=3D (BD_ENET_TX_READY | BD_ENET_TX_INTR
+> > > +			| BD_ENET_TX_LAST | BD_ENET_TX_TC);   =20
+> >=20
+> > The | goes at the end of the previous line, start of new line
+> > adjusts to the opening brackets..
+> >  =20
+>=20
+> I've refactored it.
+>=20
+> > > +
+> > > +	/* Synchronize all descriptor writes */
+> > > +	wmb();
+> > > +	bdp->cbd_sc =3D status;
+> > > +
+> > > +	netif_trans_update(dev);   =20
+> >=20
+> > Is this call necessary? =20
+>=20
+> I've added it when I was forward porting the old driver. It can be
+> removed.
+>=20
+> >  =20
+> > > +	skb_tx_timestamp(skb);
+> > > +
+> > > +	/* Trigger transmission start */
+> > > +	writel(MCF_ESW_TDAR_X_DES_ACTIVE, fep->hwp + ESW_TDAR);
+> > > +
+> > > +	dev->stats.tx_bytes +=3D skb->len;
+> > > +	/* If this was the last BD in the ring,
+> > > +	 * start at the beginning again.
+> > > +	 */
+> > > +	if (status & BD_ENET_TX_WRAP)
+> > > +		bdp =3D fep->tx_bd_base;
+> > > +	else
+> > > +		bdp++;
+> > > +
+> > > +	if (bdp =3D=3D fep->dirty_tx) {
+> > > +		fep->tx_full =3D 1;
+> > > +		netif_stop_queue(dev);
+> > > +	}
+> > > +
+> > > +	fep->cur_tx =3D bdp;
+> > > + err:
+> > > +	spin_unlock(&fep->hw_lock);
+> > > +
+> > > +	return NETDEV_TX_OK;
+> > > +}   =20
+>=20
+>=20
+> Thanks for the feedback.
+>=20
+> Best regards,
+>=20
+> Lukasz Majewski
+>=20
+> --
+>=20
+> DENX Software Engineering GmbH, Managing Director: Johanna Denk,
+> Tabea Lutz HRB 165235 Munich, Office: Kirchenstr.5, D-82194
+> Groebenzell, Germany
+> Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email:
+> lukma@denx.de
 
 
 
-> -----Original Message-----
-> From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-> Sent: Wednesday, July 23, 2025 3:07 PM
-> To: horms@kernel.org; kuba@kernel.org; KY Srinivasan <kys@microsoft.com>;
-> Haiyang Zhang <haiyangz@microsoft.com>; wei.liu@kernel.org; Dexuan Cui
-> <decui@microsoft.com>; andrew+netdev@lunn.ch; davem@davemloft.net;
-> edumazet@google.com; pabeni@redhat.com; Long Li <longli@microsoft.com>;
-> Konstantin Taranov <kotaranov@microsoft.com>; ast@kernel.org;
-> daniel@iogearbox.net; hawk@kernel.org; john.fastabend@gmail.com;
-> sdf@fomichev.me; lorenzo@kernel.org; michal.kubiak@intel.com;
-> ernis@linux.microsoft.com; shradhagupta@linux.microsoft.com; Shiraz Salee=
-m
-> <shirazsaleem@microsoft.com>; rosenp@gmail.com; netdev@vger.kernel.org;
-> linux-hyperv@vger.kernel.org; linux-rdma@vger.kernel.org;
-> bpf@vger.kernel.org; linux-kernel@vger.kernel.org;
-> ssengar@linux.microsoft.com; Dipayaan Roy <dipayanroy@microsoft.com>
-> Subject: [PATCH v2] net: mana: Use page pool fragments for RX buffers
-> instead of full pages to improve memory efficiency.
->=20
-> This patch enhances RX buffer handling in the mana driver by allocating
-> pages from a page pool and slicing them into MTU-sized fragments, rather
-> than dedicating a full page per packet. This approach is especially
-> beneficial on systems with large page sizes like 64KB.
->=20
-> Key improvements:
->=20
-> - Proper integration of page pool for RX buffer allocations.
-> - MTU-sized buffer slicing to improve memory utilization.
-> - Reduce overall per Rx queue memory footprint.
-> - Automatic fallback to full-page buffers when:
->    * Jumbo frames are enabled (MTU > PAGE_SIZE / 2).
->    * The XDP path is active, to avoid complexities with fragment reuse.
-> - Removal of redundant pre-allocated RX buffers used in scenarios like MT=
-U
->   changes, ensuring consistency in RX buffer allocation.
->=20
-> Testing on VMs with 64KB pages shows around 200% throughput improvement.
-> Memory efficiency is significantly improved due to reduced wastage in pag=
-e
-> allocations. Example: We are now able to fit 35 rx buffers in a single
-> 64kb
-> page for MTU size of 1500, instead of 1 rx buffer per page previously.
->=20
-> Tested:
->=20
-> - iperf3, iperf2, and nttcp benchmarks.
-> - Jumbo frames with MTU 9000.
-> - Native XDP programs (XDP_PASS, XDP_DROP, XDP_TX, XDP_REDIRECT) for
->   testing the XDP path in driver.
-> - Page leak detection (kmemleak).
-> - Driver load/unload, reboot, and stress scenarios.
->=20
-> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
->=20
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> Reviewed-by: Saurabh Sengar <ssengar@linux.microsoft.com>
 
-Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+Best regards,
 
+Lukasz Majewski
 
+--
+
+DENX Software Engineering GmbH, Managing Director: Johanna Denk,
+Tabea Lutz HRB 165235 Munich, Office: Kirchenstr.5, D-82194
+Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/TD4of5q5UnstYcIEUgvkE=c
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmiBQH0ACgkQAR8vZIA0
+zr1Utgf6Ard+NJXd0ZSwPbQGeReeiTVtyyTnWcReC90yLPoHeAp0XlMJjBDXKjd4
+UB7FYVTELP+NVWQFhAutUrWMlMaiAetWXTwiYgxmCa5O05HuHATTkaN7dRZ3iVQc
+lvPpoTZfRXf2QPEJ7PaoPsvqoVew1GINeqqKmqodBbDvOz7ykY7ixvjbrw/CLFXM
+q/3gN2TzXmKS1sTiM0y05r/V7XunIzrV4eZVcEJAy1p7WuE56VqHssJVf33FOCU8
+WJHa9x6eli6qVbdsU6EbtX5yI3cJpTJtqi55COBtFAd1h7EahG44/wtJ6Hjfzh7+
+zH/lEkH06w5PbB/+xFJag5+KwzvlcQ==
+=EEYc
+-----END PGP SIGNATURE-----
+
+--Sig_/TD4of5q5UnstYcIEUgvkE=c--
 
