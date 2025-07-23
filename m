@@ -1,119 +1,95 @@
-Return-Path: <netdev+bounces-209346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7C68B0F4F3
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 16:11:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 569F0B0F4F9
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 16:13:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C304E16F755
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 14:11:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86DDB1683B6
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 14:13:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EBED2E7165;
-	Wed, 23 Jul 2025 14:10:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7299C2D948B;
+	Wed, 23 Jul 2025 14:12:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KzjUwdy7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="STy9M1Ev"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44D892E9EB0;
-	Wed, 23 Jul 2025 14:10:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FE2422F755;
+	Wed, 23 Jul 2025 14:12:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753279818; cv=none; b=momixngSZEFp/2SVjZWZcqRcshcTW8cRNxpk5j9RofqaDwO+E5EQR5k6i7AGbq+Tjtu32h2kXiW41trfjZDhTrEE2dLWV4u6TqtpxZishyg0TlF+eBpILR9/uLBddBftCvFfCuCXa8KGzHSYoNhu8CQU+npsYpKGcIAAzA60w3U=
+	t=1753279976; cv=none; b=HZBhNv9rvUdKoNkb/Lp3sEAgq9U5QCndtdA1iPTLbXjZn2Ew1hTSbgZe51dnyvTffYp/bh6xvRsM30mPZVgr9vgF3QkO3FIUFKvgud/SLE14tNdrDgeh3wtYLzZg80iixYiu08BaEcVCrGumdvnLsJTX2sMun4YDc/WZ5V5troY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753279818; c=relaxed/simple;
-	bh=OPmCOUzLa0r7HyBI3CEMPKIRnUQyt+8lt651VJBZ6pc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EFzLF2cKFVto0g+aoI19VaNDn83/Xmwpb8yryZvtMiv/2T786iCkEUDP28Qq+vaF4zgd49V7ca6LxSHo8/sh9q9V/6UlDHrPYbjsh1bSMqSfofH538nq9wbMbOC8QmXTh4FZXKZDba2fFAbUicy/l26j318xRoknnweuA5D9p/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KzjUwdy7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B49F9C4CEE7;
-	Wed, 23 Jul 2025 14:10:13 +0000 (UTC)
+	s=arc-20240116; t=1753279976; c=relaxed/simple;
+	bh=dcKCD/aF7xJwbKKl79LFdtsYfWfciBaVw1Uci7MOVO8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=b+p+kIYH8nsxxYBkQRpvjLMjNF+jMLXQgTnLgSOr3otlajL/TXToHUOCmO4rNxNqsPjfvHNIR7EXa0abkYfCpCGWG0qmGzG8M/3kSui6ngtRdGXWJjyvmSghp3xKQA34m+YsmfxgPt2ye+K6JiS5IToXuvfaev5sMJOjzHXzcUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=STy9M1Ev; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6D4DC4CEEF;
+	Wed, 23 Jul 2025 14:12:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753279816;
-	bh=OPmCOUzLa0r7HyBI3CEMPKIRnUQyt+8lt651VJBZ6pc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KzjUwdy7IW7z1YdpnwQQlIGqt1XwBvhrF6D3enBtAhXZAtUITGLps8I4WDkamoRTy
-	 b/COlduTYWT0ZW5kP8b8u1myxkzomIYmFcBbhrrcQAjGef11ktjQK8P3qujDC2PZxo
-	 W8ehL1nTgTBQsE5MibYqkWFPVwFaMrIBWVk3Did2KJ2Uw1zxZELnUkRU6Ns6aHgU8W
-	 mVSYqWT20blUxjDwczuwaVtLk5oSa9n6Q78/Y3duV5uGYV4XS5eQoDIJu/bQcYLpcz
-	 C/s9aYdhF2qOW71E24hRQwOBacXV6n22VtdkmbnfZzkXpHUleUIqm6F6v8NslVo8Sy
-	 8bQe0Kpdt8MvQ==
-Date: Wed, 23 Jul 2025 15:10:11 +0100
-From: Simon Horman <horms@kernel.org>
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thorsten Winkler <twinkler@linux.ibm.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Aliaksei Makarau <Aliaksei.Makarau@ibm.com>,
-	Mahanta Jambigi <mjambigi@linux.ibm.com>
-Subject: Re: [PATCH net v2] s390/ism: fix concurrency management in ism_cmd()
-Message-ID: <20250723141011.GB2459@horms.kernel.org>
-References: <20250722161817.1298473-1-wintera@linux.ibm.com>
+	s=k20201202; t=1753279975;
+	bh=dcKCD/aF7xJwbKKl79LFdtsYfWfciBaVw1Uci7MOVO8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=STy9M1EvNUe1+oGFgEUF9aZiKVHmPLZGiOOr/g2KMSC9iu+MX7aLfYDBAgaqg1IvE
+	 flypRPN/g5sFxt8ErJiLMvVxYc2z47IeC/iwXkn9ndjQtV8NNmP841hSx7ZyPCbuBC
+	 oIK0a2q1QIeIyXqNSYKkTZgOMXUS3tVV+2Duv+QFhW/aCwZq0r18giRlQuya2yZtr6
+	 uovy+UfNesOJK3RSdErTNxan3v+bxx04+P//0XfWlzV/D2G0CLFAt9xxHG7Woau5EC
+	 5l1crr3fM14jKNi3mMXmRgMBodJUsAeuQfIEbEQ1cBEoJD39AaubIE5x3+vwxURfpZ
+	 TApGW2ISFrCXA==
+Date: Wed, 23 Jul 2025 07:12:53 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Gal Pressman <gal@nvidia.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
+ horms@kernel.org, cratiu@nvidia.com, noren@nvidia.com, cjubran@nvidia.com,
+ mbloch@nvidia.com, jdamato@fastly.com, sdf@fomichev.me, ast@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+ nathan@kernel.org, nick.desaulniers+lkml@gmail.com, morbo@google.com,
+ justinstitt@google.com, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, llvm@lists.linux.dev, Mohsin Bashir
+ <mohsin.bashr@gmail.com>, patchwork-bot+netdevbpf@kernel.org
+Subject: Re: [PATCH net-next V6 0/5] selftests: drv-net: Test XDP native
+ support
+Message-ID: <20250723071253.54a97c65@kernel.org>
+In-Reply-To: <48bb190e-073c-4ad8-841b-f6d0572cb0fd@nvidia.com>
+References: <20250719083059.3209169-1-mohsin.bashr@gmail.com>
+	<175323423849.1016544.9128937268934260157.git-patchwork-notify@kernel.org>
+	<48bb190e-073c-4ad8-841b-f6d0572cb0fd@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250722161817.1298473-1-wintera@linux.ibm.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 22, 2025 at 06:18:17PM +0200, Alexandra Winter wrote:
-> From: Halil Pasic <pasic@linux.ibm.com>
+On Wed, 23 Jul 2025 10:11:57 +0300 Gal Pressman wrote:
+> On 23/07/2025 4:30, patchwork-bot+netdevbpf@kernel.org wrote:
+> > Hello:
+> > 
+> > This series was applied to netdev/net-next.git (main)
+> > by Jakub Kicinski <kuba@kernel.org>:  
 > 
-> The s390x ISM device data sheet clearly states that only one
-> request-response sequence is allowable per ISM function at any point in
-> time.  Unfortunately as of today the s390/ism driver in Linux does not
-> honor that requirement. This patch aims to rectify that.
+> Jakub, the test was still under active discussion, and you knowingly
+> merged it with buggy code, ignoring our comments.
 > 
-> This problem was discovered based on Aliaksei's bug report which states
-> that for certain workloads the ISM functions end up entering error state
-> (with PEC 2 as seen from the logs) after a while and as a consequence
-> connections handled by the respective function break, and for future
-> connection requests the ISM device is not considered -- given it is in a
-> dysfunctional state. During further debugging PEC 3A was observed as
-> well.
+> This is *extremely disrespectful* towards people that spent time
+> reviewing, replying and participating in the netdev mailing list.
 > 
-> A kernel message like
-> [ 1211.244319] zpci: 061a:00:00.0: Event 0x2 reports an error for PCI function 0x61a
-> is a reliable indicator of the stated function entering error state
-> with PEC 2. Let me also point out that a kernel message like
-> [ 1211.244325] zpci: 061a:00:00.0: The ism driver bound to the device does not support error recovery
-> is a reliable indicator that the ISM function won't be auto-recovered
-> because the ISM driver currently lacks support for it.
-> 
-> On a technical level, without this synchronization, commands (inputs to
-> the FW) may be partially or fully overwritten (corrupted) by another CPU
-> trying to issue commands on the same function. There is hard evidence that
-> this can lead to DMB token values being used as DMB IOVAs, leading to
-> PEC 2 PCI events indicating invalid DMA. But this is only one of the
-> failure modes imaginable. In theory even completely losing one command
-> and executing another one twice and then trying to interpret the outputs
-> as if the command we intended to execute was actually executed and not
-> the other one is also possible.  Frankly, I don't feel confident about
-> providing an exhaustive list of possible consequences.
-> 
-> Fixes: 684b89bc39ce ("s390/ism: add device driver for internal shared memory")
-> Reported-by: Aliaksei Makarau <Aliaksei.Makarau@ibm.com>
-> Tested-by: Mahanta Jambigi <mjambigi@linux.ibm.com>
-> Tested-by: Aliaksei Makarau <Aliaksei.Makarau@ibm.com>
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
-> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
+> I expect better from you, and other netdev maintainers which allow this
+> to happen. Please uphold your responsibilities as maintainers towards
+> the community, this is unacceptable behavior.
 
-Thanks for the update.
+Man, I just want tests upstream. How hard is this to understand.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+These tests even work on mlx5, AFAIU, just not if LRO is enabled.
 
+Please at least try to think about what's good for this community.
+At least try.
 
