@@ -1,212 +1,126 @@
-Return-Path: <netdev+bounces-209418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9835B0F8D2
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 19:19:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDCD8B0F8D7
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 19:20:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D095A566919
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 17:19:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DC7C566D1C
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 17:20:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E006204C07;
-	Wed, 23 Jul 2025 17:19:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82DC51FE44A;
+	Wed, 23 Jul 2025 17:20:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m6IixJ8I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4294C1DDC1B
-	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 17:19:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5784019C54E;
+	Wed, 23 Jul 2025 17:20:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753291170; cv=none; b=T3CEojmpJyHtShEMNYTsPNzStw4V2bNVMaUDCKwwytTU8bJ3Ke1Fx2/XgQqLs/59BB1SCH4a1oMTKBilAU3yPihw2OnoE+IYc9C5P4S0fz1eg75hIE4q2t4Kvmgh5ZKP+2k0ES/iVAAkyRfolehumgkF16UBJRRvxfcqn0rhDoI=
+	t=1753291205; cv=none; b=jnGIFjK0Jq51ABZE8xOXFzeuspsj8qPfT75kmIJx7X69jDZgmkbr/LwEsxtBglCLCBjPP0Eo1Ku1RBfGQtAU7Nqfs0+x1OAdozt2hctMH9LNTnVIAyChPp/NPbYVqFWzH+Hvqoyn79PSB7/He9/TB/x6EDj7UA04gUKPq9Pnn60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753291170; c=relaxed/simple;
-	bh=KBC/rTGDvGK+TPIpMxOkhR4RjlAUAVRHpnVIEHGjI/Y=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=KPtSsM8wV0QJm+VcY69jFK/b0L4/mPM8M9jgP974dbFmaCObozJHss+gM2VgyKjX/p0xXSB028b0eF6Nc/Goh4JI7fUBhAhvz+hpKgENmwtKVFB5K7IC7ZKmVfZT7Wdz2gz5BNwv0n/yu52be/LWM2XiwxXTJhpz6Z5ZV1BLgv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-8649be94fa1so14563139f.0
-        for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 10:19:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753291168; x=1753895968;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LETkx7CVH83zD4M4cUDXo3lvqXJWw4t3iCSMVC8drac=;
-        b=L6MEXAKIUFzH6Gg1bCQnN36hcxb/JfbM+YGJ+Z7gGS1tbPxRpAJz13PJ327HmSIula
-         7OvwM5/af6XMDHd7V0DGznC9qZpyEl+K1Lw6cLFSmFv3sqBkOYZ442Hk83DvnvY1rtrS
-         fezIqhiTFhSDqJWF3I5pqmMIcNBdwWvtb+2E2tw8InZCLarNuthRuiKjLeSZ6tzkkeq2
-         I1s7WLCkhB3NHBV9P2ZQClm6MCKSoZpbk/L+MDo+nCyeYi4MCPyUinmgqEs+EMWZtAem
-         NXt0EsXoYA3GCX0wnncRmF1zazs5sFz5aSFS903m8Ekcn+i+93uJ10lJEOp9SQyV6WBq
-         /rIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVAcXrXJuwbnQf0UMWzI+5H7SUixrKb4fnCDxypRMZXjxgLNYW6ypql3cYgxaYMIh7syIQ0Gao=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0A/5kk8+haoDMoTEhNc2NHY7xwsRVGjI8sh86jBkRKzeHlOQC
-	oaR/skvT8BpNkhm3N6rfXc4FTQCAmEiE4DINLEXcSiUwt4MeNnaOdWeVVXou2P12JPEFgb6/Pjk
-	pyKO2CbFDpBKHqOT6MXY3qiqIkDps3DH9Szl58FK/qvFndCOAyR8t/6fZWkc=
-X-Google-Smtp-Source: AGHT+IF8gAJsK0U1ptptS6UBVaRziAt7UZcVX/lLpudEgilcLQ6Zr5ZDcBYL39GaXR5IdHc2wFknCXfxuWMWvD8gVRmO5tWqquWD
+	s=arc-20240116; t=1753291205; c=relaxed/simple;
+	bh=zp+jX/kXfpkO7Tu8Jj84eW8FHZ9VneOw13Yz+OEtiW8=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=uF3ufP2AjV/VH4CblEPvadDzE8szv3AJmnDnFpIZEcD+bi1j4vb5yOBbjd3hcxDOOrxoENVxLqEa+t+CGIogtpKD0rsMW+WAvge3YYtTlTTqqslIOVRpYuFlXWkdtUbFK3QmxtzWwJlNjaZsoEZxxCpCU2AYV8EhlciNeo8oWpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m6IixJ8I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85E0AC4CEE7;
+	Wed, 23 Jul 2025 17:20:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753291204;
+	bh=zp+jX/kXfpkO7Tu8Jj84eW8FHZ9VneOw13Yz+OEtiW8=;
+	h=From:Subject:Date:To:Cc:From;
+	b=m6IixJ8I44Vn0PM8TJaI1DRBt9HlAW+TtStOnYhvTFtnhT6eLX2Z9CNXrzXLQFHvp
+	 HsmBn4TiFUVaSNXURh8Gg7dA9z6kjNRFWIGcSWL1E8rWzNGcZ4A4unK5jhIK9Rh+RM
+	 rFH7ldtrYelnpaHAzZ9DtK1iA9H6/cmdRU5iJoTMpR6fvvFMfmsxjy4TMl2QPqTRpY
+	 mtS2ZelfScivkcZS095Xwr+CK6MpLal3ny+ceNw9t0YKsZ3W0jfbqM5cQSb4aIfPHW
+	 wDKKpBzIIGfqjnj324O9sueI1hT1qL0WVS1rSQzcGWviQbblFjz7k45ZHv0qXMZw4f
+	 5YSFUnJoPEBZw==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Subject: [PATCH net-next v5 0/7] net: airoha: Introduce NPU callbacks for
+ wlan offloading
+Date: Wed, 23 Jul 2025 19:19:49 +0200
+Message-Id: <20250723-airoha-en7581-wlan-offlaod-v5-0-da92e0f8c497@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:3421:b0:87c:4496:329d with SMTP id
- ca18e2360f4ac-87c64f64aafmr689931339f.5.1753291168476; Wed, 23 Jul 2025
- 10:19:28 -0700 (PDT)
-Date: Wed, 23 Jul 2025 10:19:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <688119a0.050a0220.248954.0007.GAE@google.com>
-Subject: [syzbot] [fs?] [wireless?] general protection fault in
- simple_recursive_removal (5)
-From: syzbot <syzbot+d6ccd49ae046542a0641@syzkaller.appspotmail.com>
-To: dakr@kernel.org, gregkh@linuxfoundation.org, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, rafael@kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALYZgWgC/33OwYrDIBDG8Vcpnteijkazp32PZQ+TODayQYtZ0
+ i4l714bKKQUcvzP4ffNjU1UIk3s83BjheY4xZxqmI8D6wdMJ+LR12ZKKCOskBxjyQNyStY4yS8
+ jJp5DGDF73ti+9RiC0xZYBc6FQryu+PdP7SFOf7n8r1uzfFyfrNpjZ8kFdwKEaK0QHbivXyqJx
+ mMuJ/ZwZ7W1zK6lqgV9AGWdIXDyzYKNJfWuBetf2IUGkVrSb5beWnbX0tVqfCetg1aSVy/Wsix
+ 32QBQPKkBAAA=
+X-Change-ID: 20250701-airoha-en7581-wlan-offlaod-67c9daff8473
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, Felix Fietkau <nbd@nbd.name>, 
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+ netdev@vger.kernel.org, devicetree@vger.kernel.org
+X-Mailer: b4 0.14.2
 
-Hello,
+Similar to wired traffic, EN7581 SoC allows to offload traffic to/from
+the MT76 wireless NIC configuring the NPU module via the Netfilter
+flowtable. This series introduces the necessary NPU callback used by
+the MT7996 driver in order to enable the offloading.
+MT76 support has been posted as RFC in [0] in order to show how the
+APIs are consumed.
 
-syzbot found the following issue on:
-
-HEAD commit:    89be9a83ccf1 Linux 6.16-rc7
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11b42fd4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8adfe52da0de2761
-dashboard link: https://syzkaller.appspot.com/bug?extid=d6ccd49ae046542a0641
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=134baf22580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16d5a4f0580000
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-89be9a83.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/a3f5f507f252/vmlinux-89be9a83.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a8f9b92c57a6/bzImage-89be9a83.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+d6ccd49ae046542a0641@syzkaller.appspotmail.com
-
-wlan1: send auth to aa:09:b7:99:c0:d7 (try 2/3)
-wlan1: send auth to aa:09:b7:99:c0:d7 (try 3/3)
-wlan1: authentication with aa:09:b7:99:c0:d7 timed out
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000029: 0000 [#1] SMP KASAN NOPTI
-KASAN: null-ptr-deref in range [0x0000000000000148-0x000000000000014f]
-CPU: 0 UID: 0 PID: 171 Comm: kworker/u4:4 Not tainted 6.16.0-rc7-syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Workqueue: events_unbound cfg80211_wiphy_work
-RIP: 0010:kasan_byte_accessible+0x12/0x30 mm/kasan/generic.c:199
-Code: 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 66 0f 1f 00 48 c1 ef 03 48 b8 00 00 00 00 00 fc ff df <0f> b6 04 07 3c 08 0f 92 c0 c3 cc cc cc cc cc 66 66 66 66 66 66 2e
-RSP: 0018:ffffc90001977400 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: ffffffff8b713286 RCX: ca5c1933e35f3700
-RDX: 0000000000000000 RSI: ffffffff8b713286 RDI: 0000000000000029
-RBP: ffffffff824067f0 R08: 0000000000000001 R09: 0000000000000000
-R10: dffffc0000000000 R11: ffffed10085cf24c R12: 0000000000000000
-R13: 0000000000000148 R14: 0000000000000148 R15: 0000000000000001
-FS:  0000000000000000(0000) GS:ffff88808d218000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b2f55ffff CR3: 000000005030a000 CR4: 0000000000352ef0
-Call Trace:
- <TASK>
- __kasan_check_byte+0x12/0x40 mm/kasan/common.c:556
- kasan_check_byte include/linux/kasan.h:399 [inline]
- lock_acquire+0x8d/0x360 kernel/locking/lockdep.c:5845
- down_write+0x96/0x1f0 kernel/locking/rwsem.c:1577
- inode_lock include/linux/fs.h:869 [inline]
- simple_recursive_removal+0x90/0x690 fs/libfs.c:616
- debugfs_remove+0x5b/0x70 fs/debugfs/inode.c:805
- ieee80211_sta_debugfs_remove+0x40/0x70 net/mac80211/debugfs_sta.c:1279
- __sta_info_destroy_part2+0x352/0x450 net/mac80211/sta_info.c:1501
- __sta_info_destroy net/mac80211/sta_info.c:1517 [inline]
- sta_info_destroy_addr+0xf5/0x140 net/mac80211/sta_info.c:1529
- ieee80211_destroy_auth_data+0x12d/0x260 net/mac80211/mlme.c:4597
- ieee80211_sta_work+0x11cf/0x3600 net/mac80211/mlme.c:8310
- cfg80211_wiphy_work+0x2df/0x460 net/wireless/core.c:435
- process_one_work kernel/workqueue.c:3238 [inline]
- process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3321
- worker_thread+0x8a0/0xda0 kernel/workqueue.c:3402
- kthread+0x70e/0x8a0 kernel/kthread.c:464
- ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:kasan_byte_accessible+0x12/0x30 mm/kasan/generic.c:199
-Code: 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 66 0f 1f 00 48 c1 ef 03 48 b8 00 00 00 00 00 fc ff df <0f> b6 04 07 3c 08 0f 92 c0 c3 cc cc cc cc cc 66 66 66 66 66 66 2e
-RSP: 0018:ffffc90001977400 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: ffffffff8b713286 RCX: ca5c1933e35f3700
-RDX: 0000000000000000 RSI: ffffffff8b713286 RDI: 0000000000000029
-RBP: ffffffff824067f0 R08: 0000000000000001 R09: 0000000000000000
-R10: dffffc0000000000 R11: ffffed10085cf24c R12: 0000000000000000
-R13: 0000000000000148 R14: 0000000000000148 R15: 0000000000000001
-FS:  0000000000000000(0000) GS:ffff88808d218000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b2f55ffff CR3: 0000000011601000 CR4: 0000000000352ef0
-----------------
-Code disassembly (best guess):
-   0:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
-   7:	00
-   8:	90                   	nop
-   9:	90                   	nop
-   a:	90                   	nop
-   b:	90                   	nop
-   c:	90                   	nop
-   d:	90                   	nop
-   e:	90                   	nop
-   f:	90                   	nop
-  10:	90                   	nop
-  11:	90                   	nop
-  12:	90                   	nop
-  13:	90                   	nop
-  14:	90                   	nop
-  15:	90                   	nop
-  16:	90                   	nop
-  17:	90                   	nop
-  18:	66 0f 1f 00          	nopw   (%rax)
-  1c:	48 c1 ef 03          	shr    $0x3,%rdi
-  20:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  27:	fc ff df
-* 2a:	0f b6 04 07          	movzbl (%rdi,%rax,1),%eax <-- trapping instruction
-  2e:	3c 08                	cmp    $0x8,%al
-  30:	0f 92 c0             	setb   %al
-  33:	c3                   	ret
-  34:	cc                   	int3
-  35:	cc                   	int3
-  36:	cc                   	int3
-  37:	cc                   	int3
-  38:	cc                   	int3
-  39:	66                   	data16
-  3a:	66                   	data16
-  3b:	66                   	data16
-  3c:	66                   	data16
-  3d:	66                   	data16
-  3e:	66                   	data16
-  3f:	2e                   	cs
-
+[0] https://lore.kernel.org/linux-wireless/cover.1753173330.git.lorenzo@kernel.org/
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Changes in v5:
+- Rebase on top of net-next main branch
+- Link to v4: https://lore.kernel.org/r/20250717-airoha-en7581-wlan-offlaod-v4-0-6db178391ed2@kernel.org
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Changes in v4:
+- Improve commit messages
+- Link to v3: https://lore.kernel.org/r/20250714-airoha-en7581-wlan-offlaod-v3-0-80abf6aae9e4@kernel.org
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Changes in v3:
+- Rename 'binary' memory region in 'firmware'
+- Do not make memory-region-names property required
+- Link to v2: https://lore.kernel.org/r/20250705-airoha-en7581-wlan-offlaod-v2-0-3cf32785e381@kernel.org
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Changes in v2:
+- Introduce binding for memory regions used for wlan offload
+- Rely on of_reserved_mem_region_to_resource_byname
+- Export just wlan_{send,get}_msg NPU callback for MT76
+- Improve commit messages
+- Link to v1: https://lore.kernel.org/r/20250702-airoha-en7581-wlan-offlaod-v1-0-803009700b38@kernel.org
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+---
+Lorenzo Bianconi (7):
+      dt-bindings: net: airoha: npu: Add memory regions used for wlan offload
+      net: airoha: npu: Add NPU wlan memory initialization commands
+      net: airoha: npu: Add wlan_{send,get}_msg NPU callbacks
+      net: airoha: npu: Add wlan irq management callbacks
+      net: airoha: npu: Read NPU wlan interrupt lines from the DTS
+      net: airoha: npu: Enable core 3 for WiFi offloading
+      net: airoha: Add airoha_offload.h header
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+ .../devicetree/bindings/net/airoha,en7581-npu.yaml |  19 +-
+ drivers/net/ethernet/airoha/airoha_npu.c           | 180 +++++++++++++-
+ drivers/net/ethernet/airoha/airoha_npu.h           |  36 ---
+ drivers/net/ethernet/airoha/airoha_ppe.c           |   2 +-
+ include/linux/soc/airoha/airoha_offload.h          | 259 +++++++++++++++++++++
+ 5 files changed, 452 insertions(+), 44 deletions(-)
+---
+base-commit: 56613001dfc9b2e35e2d6ba857cbc2eb0bac4272
+change-id: 20250701-airoha-en7581-wlan-offlaod-67c9daff8473
 
-If you want to undo deduplication, reply with:
-#syz undup
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
