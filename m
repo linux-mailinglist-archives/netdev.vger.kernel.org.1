@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-209250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3B5BB0ECA9
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:05:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5452EB0ECA7
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:04:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71E2F16D6E9
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 08:05:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6703C3B93D1
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 08:04:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D487C27CCEE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5504F27AC3A;
 	Wed, 23 Jul 2025 08:04:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="jNmNN4aJ"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="vTzo1LiX"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
+Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A55727A135;
-	Wed, 23 Jul 2025 08:04:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C4E927A12C;
+	Wed, 23 Jul 2025 08:04:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753257856; cv=none; b=OnE/1zJS7vY30Nu/kLK0CQflFz1TpJS4fZXUB7uuuAU8oiehDF6znUpDpZzDbTj00C1/RNOItCs8BjrcGefcfdyrupdwVFUUPfA0PmXK6g0GaCtfgYGhY+FZVhyLx4UDbHDkTVeotd0M7ZAR3DJwvYVVtBL/JEql64+hBY/FIYk=
+	t=1753257856; cv=none; b=Ho8WUZPIlyk2QQtFo9WoWVemRK5bQ+SphJszijtFdX6szLS5WY4Zoj8mi/22qjya1jMcJAYe87Z4ksawaiM0uaDKxsDFALSwjf5bh0UHcOD6cXWhjQoaNClLTVEw4ZDXK5J5ng/MqrvAMP78Av5Rgjyysoh+E1Lr4hwb2xm0Th0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1753257856; c=relaxed/simple;
-	bh=mu9vJrbVW6pLW0y6TlYod3MetdqgGWeuGGWBxEjrAzs=;
+	bh=Byab61WjMDYnAwBBhTk8h7ZIULStJN65B+0eQwvduFA=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hhcG7noYZcSX8xLTueACyHdk8udTVOAX4rz2jZKYwHzVSyShkMH47PglgwNDWgtVePWxB4KVOovKN4etkqkvaODrchf+m7E3E7yDQX6S4mT/StiIqbJVOB1I7i4zufH8PFMODlIg4uS/ZINIb1LNeJ8ZZ1xCeH1WucmI2rKU86M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=jNmNN4aJ; arc=none smtp.client-ip=198.47.19.246
+	 MIME-Version:Content-Type; b=NupgAFVwiejGiYDSLFYMMcvokhYh8w8r+LEvk4SXzji2wLYq2+1hyBBNxX15kCVEhaOqp1r9DwIWDvO8QEaz6sVg5WgX2ZgCNRdcjons5pc3EUrAf3oWotfhVmifLiccIus1Y5jBzKMc5eKSmLRzfr51jCSCBe2Gts1EB/55RuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=vTzo1LiX; arc=none smtp.client-ip=198.47.19.245
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllvem-sh03.itg.ti.com ([10.64.41.86])
-	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTP id 56N83Znu1676451;
-	Wed, 23 Jul 2025 03:03:35 -0500
+Received: from lelvem-sh01.itg.ti.com ([10.180.77.71])
+	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTP id 56N83b4f1223412;
+	Wed, 23 Jul 2025 03:03:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1753257815;
-	bh=J7Pw2c7pQUrc6QTEN0gXmSfzT3FzaWnjufqPB8NQJlA=;
+	s=ti-com-17Q1; t=1753257817;
+	bh=NanDPG3eGNw9XC4l/hPEFH2QVadmc7khxeTagmYKGvg=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=jNmNN4aJQ297TJ5n3CaM2RGk0QEpBzKCmfkES3RxJ8tUO1xpoMwcDABsDwEIx9Iv2
-	 zsos9QA0bo63VM4c05sohC7rSeZIXuUAf01ewZmZ21uaUhZZZlmo2ZY8hQ30eZhDrr
-	 +fhWUu2BikAXcffj5BARhvrcNedYOATjcEQAAB8U=
-Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
-	by fllvem-sh03.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 56N83ZTn1619141
+	b=vTzo1LiX04NauhzWdJVl8cWqeDByuGbQxw5DuELtvToKTW5UhbZlLow7/5f6pjU6b
+	 ZaiNS5DUhG2tiCMtJWjtZUR+iVk47z6Rr2+2u9EKPvtz1lKNMqOqcKPlN0bIvnKkks
+	 ueDzwGGHrlzQ2t41toock1ex14RjB//QSswcw5eA=
+Received: from DFLE105.ent.ti.com (dfle105.ent.ti.com [10.64.6.26])
+	by lelvem-sh01.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 56N83bws553849
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Wed, 23 Jul 2025 03:03:35 -0500
-Received: from DFLE114.ent.ti.com (10.64.6.35) by DFLE102.ent.ti.com
- (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+	Wed, 23 Jul 2025 03:03:37 -0500
+Received: from DFLE114.ent.ti.com (10.64.6.35) by DFLE105.ent.ti.com
+ (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Wed, 23
- Jul 2025 03:03:34 -0500
+ Jul 2025 03:03:36 -0500
 Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE114.ent.ti.com
  (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Wed, 23 Jul 2025 03:03:34 -0500
+ Frontend Transport; Wed, 23 Jul 2025 03:03:37 -0500
 Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 56N83YPv2365941;
-	Wed, 23 Jul 2025 03:03:34 -0500
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 56N83bVd2366006;
+	Wed, 23 Jul 2025 03:03:37 -0500
 Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 56N83XNa015985;
-	Wed, 23 Jul 2025 03:03:34 -0500
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 56N83ZRo015995;
+	Wed, 23 Jul 2025 03:03:36 -0500
 From: MD Danish Anwar <danishanwar@ti.com>
 To: "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet
@@ -84,9 +84,9 @@ To: "David S. Miller" <davem@davemloft.net>,
 	<Parthiban.Veerasooran@microchip.com>
 CC: <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next 3/5] net: rpmsg-eth: Register device as netdev
-Date: Wed, 23 Jul 2025 13:33:20 +0530
-Message-ID: <20250723080322.3047826-4-danishanwar@ti.com>
+Subject: [PATCH net-next 4/5] net: rpmsg-eth: Add netdev ops
+Date: Wed, 23 Jul 2025 13:33:21 +0530
+Message-ID: <20250723080322.3047826-5-danishanwar@ti.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250723080322.3047826-1-danishanwar@ti.com>
 References: <20250723080322.3047826-1-danishanwar@ti.com>
@@ -100,580 +100,451 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Register the rpmsg-eth device as a netdev and enhance the rpmsg callback
-function to handle shared memory for tx and rx buffers. Introduce
-structures for shared memory layout, including head, buffer, and tail
-indices. Add initialization for the netdev, including setting up MAC
-address, MTU, and netdev operations. Allocate memory for tx and rx
-buffers and map shared memory regions. Update the probe function to
-initialize the netdev and set the device state. Add necessary headers,
-constants, and enums for shared memory and state management. Define
-shared memory layout and buffer structures for efficient data handling.
-Implement helper macros for accessing private data and shared memory
-buffers. Ensure proper error handling during memory allocation and
-device registration.
+Add netdev ops for rpmsg-eth driver. This patch introduces the netdev
+operations for the rpmsg-eth driver, enabling the driver to interact
+with the Linux networking stack. The following functionalities are
+implemented:
+
+1. `ndo_open` and `ndo_stop`:
+	- Handles the initialization and cleanup of the network device
+	  during open and stop operations.
+	- Manages the state transitions of the rpmsg-eth driver.
+
+2. `ndo_start_xmit`:
+	- Implements the transmit functionality by copying data from the
+	  skb to the shared memory buffer and updating the head index.
+
+3. `ndo_set_mac_address`:
+	- Allows setting the MAC address of the network device and sends
+	  the updated MAC address to the remote processor.
+
+4. RX Path:
+	- Adds a timer-based mechanism to poll for received packets in
+	  shared memory.
+	- Implements NAPI-based packet processing to handle received
+	  packets efficiently.
+
+5. State Machine:
+	- Introduces a state machine to manage the driver's state
+	  transitions, such as PROBE, OPEN, READY, and RUNNING.
+
+6. Initialization:
+	- Adds necessary initialization for locks, timers, and work
+	  structures.
+	- Registers the network device and sets up NAPI and RX timer.
+
+7. Cleanup:
+	- Ensures proper cleanup of resources during driver removal,
+	  including NAPI and timers.
+
+This patch enhances the rpmsg-eth driver to function as a fully
+operational network device in the Linux kernel.
 
 Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
 ---
- drivers/net/ethernet/rpmsg_eth.c | 239 ++++++++++++++++++++++++++++++-
- drivers/net/ethernet/rpmsg_eth.h | 216 ++++++++++++++++++++++++++++
- 2 files changed, 452 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/rpmsg_eth.c | 319 +++++++++++++++++++++++++++++++
+ drivers/net/ethernet/rpmsg_eth.h |   2 +
+ 2 files changed, 321 insertions(+)
 
 diff --git a/drivers/net/ethernet/rpmsg_eth.c b/drivers/net/ethernet/rpmsg_eth.c
-index 9a51619f9313..26f9eee6aeec 100644
+index 26f9eee6aeec..4efa9b634f8b 100644
 --- a/drivers/net/ethernet/rpmsg_eth.c
 +++ b/drivers/net/ethernet/rpmsg_eth.c
-@@ -7,20 +7,173 @@
- #include <linux/of.h>
- #include "rpmsg_eth.h"
+@@ -130,6 +130,109 @@ static void rpmsg_eth_unmap_buffers(struct rpmsg_eth_port *port)
+ 	}
+ }
  
-+/**
-+ * rpmsg_eth_validate_handshake - Validate handshake parameters from remote
-+ * @port: Pointer to rpmsg_eth_port structure
-+ * @shm_info: Pointer to shared memory info received from remote
-+ *
-+ * Checks the magic numbers, base address, and TX/RX offsets in the handshake
-+ * response to ensure they match expected values and are within valid ranges.
-+ *
-+ * Return: 0 on success, -EINVAL on validation failure.
-+ */
-+static int rpmsg_eth_validate_handshake(struct rpmsg_eth_port *port,
-+					struct rpmsg_eth_shm *shm_info)
++static int create_request(struct rpmsg_eth_common *common,
++			  enum rpmsg_eth_rpmsg_type rpmsg_type)
 +{
-+	if (port->tx_buffer->head->magic_num != RPMSG_ETH_SHM_MAGIC_NUM ||
-+	    port->tx_buffer->tail->magic_num != RPMSG_ETH_SHM_MAGIC_NUM ||
-+	    port->rx_buffer->head->magic_num != RPMSG_ETH_SHM_MAGIC_NUM ||
-+	    port->rx_buffer->tail->magic_num != RPMSG_ETH_SHM_MAGIC_NUM) {
-+		dev_err(port->common->dev, "Magic number mismatch in handshake: tx_head=0x%x, tx_tail=0x%x, rx_head=0x%x, rx_tail=0x%x\n",
-+			port->tx_buffer->head->magic_num,
-+			port->tx_buffer->tail->magic_num,
-+			port->rx_buffer->head->magic_num,
-+			port->rx_buffer->tail->magic_num);
-+		return -EINVAL;
-+	}
++	struct message *msg = &common->send_msg;
++	int ret = 0;
 +
-+	if (shm_info->base_addr != port->buf_start_addr) {
-+		dev_err(port->common->dev, "Base address mismatch in handshake: expected=0x%x, received=0x%x\n",
-+			port->buf_start_addr,
-+			shm_info->base_addr);
-+		return -EINVAL;
-+	}
++	msg->msg_hdr.src_id = common->port->port_id;
++	msg->req_msg.type = rpmsg_type;
 +
-+	if (shm_info->tx_offset >= port->buf_size ||
-+	    shm_info->rx_offset >= port->buf_size) {
-+		dev_err(port->common->dev, "TX/RX offset out of range in handshake: tx_offset=0x%x, rx_offset=0x%x, size=0x%x\n",
-+			shm_info->tx_offset,
-+			shm_info->rx_offset,
-+			port->buf_size);
-+		return -EINVAL;
++	switch (rpmsg_type) {
++	case RPMSG_ETH_REQ_SHM_INFO:
++		msg->msg_hdr.msg_type = RPMSG_ETH_REQUEST_MSG;
++		break;
++	case RPMSG_ETH_REQ_SET_MAC_ADDR:
++		msg->msg_hdr.msg_type = RPMSG_ETH_REQUEST_MSG;
++		ether_addr_copy(msg->req_msg.mac_addr.addr,
++				common->port->ndev->dev_addr);
++		break;
++	case RPMSG_ETH_NOTIFY_PORT_UP:
++	case RPMSG_ETH_NOTIFY_PORT_DOWN:
++		msg->msg_hdr.msg_type = RPMSG_ETH_NOTIFY_MSG;
++		break;
++	default:
++		ret = -EINVAL;
++		dev_err(common->dev, "Invalid RPMSG request\n");
 +	}
-+
-+	return 0;
++	return ret;
 +}
 +
-+static void rpmsg_eth_map_buffers(struct rpmsg_eth_port *port,
-+				  struct message *msg)
++static int rpmsg_eth_create_send_request(struct rpmsg_eth_common *common,
++					 enum rpmsg_eth_rpmsg_type rpmsg_type,
++					 bool wait)
 +{
-+	port->tx_buffer->head =
-+		(struct rpmsg_eth_shm_index __force *)
-+		 (ioremap(msg->resp_msg.shm_info.base_addr +
-+			  msg->resp_msg.shm_info.tx_offset,
-+			  sizeof(*port->tx_buffer->head)));
++	unsigned long flags;
++	int ret = 0;
 +
-+	port->tx_buffer->buf->base_addr =
-+		ioremap((msg->resp_msg.shm_info.base_addr +
-+			 msg->resp_msg.shm_info.tx_offset +
-+			 sizeof(*port->tx_buffer->head)),
-+			 (msg->resp_msg.shm_info.num_pkt_bufs *
-+			  msg->resp_msg.shm_info.buff_slot_size));
++	if (wait)
++		reinit_completion(&common->sync_msg);
 +
-+	port->tx_buffer->tail =
-+		(struct rpmsg_eth_shm_index __force *)
-+		 (ioremap(msg->resp_msg.shm_info.base_addr +
-+			  msg->resp_msg.shm_info.tx_offset +
-+			  sizeof(*port->tx_buffer->head) +
-+			  (msg->resp_msg.shm_info.num_pkt_bufs *
-+			   msg->resp_msg.shm_info.buff_slot_size),
-+			  sizeof(*port->tx_buffer->tail)));
++	spin_lock_irqsave(&common->send_msg_lock, flags);
++	ret = create_request(common, rpmsg_type);
++	if (ret)
++		goto release_lock;
 +
-+	port->rx_buffer->head =
-+		(struct rpmsg_eth_shm_index __force *)
-+		 (ioremap(msg->resp_msg.shm_info.base_addr +
-+			  msg->resp_msg.shm_info.rx_offset,
-+			  sizeof(*port->rx_buffer->head)));
++	ret = rpmsg_send(common->rpdev->ept, (void *)(&common->send_msg),
++			 sizeof(common->send_msg));
++	if (ret) {
++		dev_err(common->dev, "Failed to send RPMSG message\n");
++		goto release_lock;
++	}
 +
-+	port->rx_buffer->buf->base_addr =
-+		ioremap(msg->resp_msg.shm_info.base_addr +
-+			msg->resp_msg.shm_info.rx_offset +
-+			sizeof(*port->rx_buffer->head),
-+			(msg->resp_msg.shm_info.num_pkt_bufs *
-+			 msg->resp_msg.shm_info.buff_slot_size));
++	spin_unlock_irqrestore(&common->send_msg_lock, flags);
++	if (wait) {
++		ret = wait_for_completion_timeout(&common->sync_msg,
++						  RPMSG_ETH_REQ_TIMEOUT_JIFFIES);
 +
-+	port->rx_buffer->tail =
-+		(struct rpmsg_eth_shm_index __force *)
-+		 (ioremap(msg->resp_msg.shm_info.base_addr +
-+			  msg->resp_msg.shm_info.rx_offset +
-+			  sizeof(*port->rx_buffer->head) +
-+			  (msg->resp_msg.shm_info.num_pkt_bufs *
-+			   msg->resp_msg.shm_info.buff_slot_size),
-+			  sizeof(*port->rx_buffer->tail)));
++		if (!ret) {
++			dev_err(common->dev, "Failed to receive response within %ld jiffies\n",
++				RPMSG_ETH_REQ_TIMEOUT_JIFFIES);
++			return -ETIMEDOUT;
++		}
++		ret = 0;
++	}
++	return ret;
++release_lock:
++	spin_unlock_irqrestore(&common->send_msg_lock, flags);
++	return ret;
 +}
 +
-+static void rpmsg_eth_unmap_buffers(struct rpmsg_eth_port *port)
++static void rpmsg_eth_state_machine(struct work_struct *work)
 +{
-+	if (port->tx_buffer && port->tx_buffer->head) {
-+		iounmap((void __iomem *)port->tx_buffer->head);
-+		port->tx_buffer->head = NULL;
-+	}
-+	if (port->tx_buffer && port->tx_buffer->buf &&
-+	    port->tx_buffer->buf->base_addr) {
-+		iounmap((void __iomem *)port->tx_buffer->buf->base_addr);
-+		port->tx_buffer->buf->base_addr = NULL;
-+	}
-+	if (port->tx_buffer && port->tx_buffer->tail) {
-+		iounmap((void __iomem *)port->tx_buffer->tail);
-+		port->tx_buffer->tail = NULL;
-+	}
++	struct delayed_work *dwork = to_delayed_work(work);
++	struct rpmsg_eth_common *common;
++	struct rpmsg_eth_port *port;
++	int ret;
 +
-+	if (port->rx_buffer && port->rx_buffer->head) {
-+		iounmap((void __iomem *)port->rx_buffer->head);
-+		port->rx_buffer->head = NULL;
++	common = container_of(dwork, struct rpmsg_eth_common, state_work);
++	port = common->port;
++
++	mutex_lock(&common->state_lock);
++
++	switch (common->state) {
++	case RPMSG_ETH_STATE_PROBE:
++		break;
++	case RPMSG_ETH_STATE_OPEN:
++		rpmsg_eth_create_send_request(common, RPMSG_ETH_REQ_SHM_INFO, false);
++		break;
++	case RPMSG_ETH_STATE_CLOSE:
++		break;
++	case RPMSG_ETH_STATE_READY:
++		ret = rpmsg_eth_create_send_request(common, RPMSG_ETH_REQ_SET_MAC_ADDR, false);
++		if (!ret) {
++			napi_enable(&port->rx_napi);
++			netif_carrier_on(port->ndev);
++			mod_timer(&port->rx_timer, RX_POLL_TIMEOUT_JIFFIES);
++		}
++		break;
++	case RPMSG_ETH_STATE_RUNNING:
++		break;
 +	}
-+	if (port->rx_buffer && port->rx_buffer->buf &&
-+	    port->rx_buffer->buf->base_addr) {
-+		iounmap((void __iomem *)port->rx_buffer->buf->base_addr);
-+		port->rx_buffer->buf->base_addr = NULL;
-+	}
-+	if (port->rx_buffer && port->rx_buffer->tail) {
-+		iounmap((void __iomem *)port->rx_buffer->tail);
-+		port->rx_buffer->tail = NULL;
-+	}
++	mutex_unlock(&common->state_lock);
 +}
 +
  static int rpmsg_eth_rpmsg_cb(struct rpmsg_device *rpdev, void *data, int len,
  			      void *priv, u32 src)
  {
- 	struct rpmsg_eth_common *common = dev_get_drvdata(&rpdev->dev);
- 	struct message *msg = (struct message *)data;
-+	struct rpmsg_eth_port *port = common->port;
- 	u32 msg_type = msg->msg_hdr.msg_type;
-+	u32 rpmsg_type;
- 	int ret = 0;
- 
- 	switch (msg_type) {
- 	case RPMSG_ETH_REQUEST_MSG:
-+		rpmsg_type = msg->req_msg.type;
-+		dev_dbg(common->dev, "Msg type = %d, RPMsg type = %d, Src Id = %d, Msg Id = %d\n",
-+			msg_type, rpmsg_type, msg->msg_hdr.src_id, msg->req_msg.id);
-+		break;
- 	case RPMSG_ETH_RESPONSE_MSG:
-+		rpmsg_type = msg->resp_msg.type;
-+		dev_dbg(common->dev, "Msg type = %d, RPMsg type = %d, Src Id = %d, Msg Id = %d\n",
-+			msg_type, rpmsg_type, msg->msg_hdr.src_id, msg->resp_msg.id);
+@@ -167,6 +270,17 @@ static int rpmsg_eth_rpmsg_cb(struct rpmsg_device *rpdev, void *data, int len,
+ 				rpmsg_eth_unmap_buffers(port);
+ 				return ret;
+ 			}
++
++			mutex_lock(&common->state_lock);
++			common->state = RPMSG_ETH_STATE_READY;
++			mutex_unlock(&common->state_lock);
++
++			mod_delayed_work(system_wq,
++					 &common->state_work,
++					 STATE_MACHINE_TIME_JIFFIES);
++
++			break;
++		case RPMSG_ETH_RESP_SET_MAC_ADDR:
+ 			break;
+ 		}
+ 		break;
+@@ -174,6 +288,20 @@ static int rpmsg_eth_rpmsg_cb(struct rpmsg_device *rpdev, void *data, int len,
+ 		rpmsg_type = msg->notify_msg.type;
+ 		dev_dbg(common->dev, "Msg type = %d, RPMsg type = %d, Src Id = %d, Msg Id = %d\n",
+ 			msg_type, rpmsg_type, msg->msg_hdr.src_id, msg->notify_msg.id);
 +		switch (rpmsg_type) {
-+		case RPMSG_ETH_RESP_SHM_INFO:
-+			/* Retrieve Tx and Rx shared memory info from msg */
-+			rpmsg_eth_map_buffers(port, msg);
++		case RPMSG_ETH_NOTIFY_REMOTE_READY:
++			mutex_lock(&common->state_lock);
++			common->state = RPMSG_ETH_STATE_RUNNING;
++			mutex_unlock(&common->state_lock);
 +
-+			port->rpmsg_eth_tx_max_buffers =
-+				msg->resp_msg.shm_info.num_pkt_bufs;
-+			port->rpmsg_eth_rx_max_buffers =
-+				msg->resp_msg.shm_info.num_pkt_bufs;
-+
-+			/* Handshake validation */
-+			ret = rpmsg_eth_validate_handshake(port, &msg->resp_msg.shm_info);
-+			if (ret) {
-+				dev_err(common->dev, "RPMSG handshake failed %d\n", ret);
-+				rpmsg_eth_unmap_buffers(port);
-+				return ret;
-+			}
++			mod_delayed_work(system_wq,
++					 &common->state_work,
++					 STATE_MACHINE_TIME_JIFFIES);
++			break;
++		case RPMSG_ETH_NOTIFY_PORT_UP:
++		case RPMSG_ETH_NOTIFY_PORT_DOWN:
 +			break;
 +		}
-+		break;
- 	case RPMSG_ETH_NOTIFY_MSG:
--		dev_dbg(common->dev, "Msg type = %d, Src Id = %d\n",
--			msg_type, msg->msg_hdr.src_id);
-+		rpmsg_type = msg->notify_msg.type;
-+		dev_dbg(common->dev, "Msg type = %d, RPMsg type = %d, Src Id = %d, Msg Id = %d\n",
-+			msg_type, rpmsg_type, msg->msg_hdr.src_id, msg->notify_msg.id);
  		break;
  	default:
  		dev_err(common->dev, "Invalid msg type\n");
-@@ -80,6 +233,76 @@ static int rpmsg_eth_get_shm_info(struct rpmsg_eth_common *common)
+@@ -233,6 +361,185 @@ static int rpmsg_eth_get_shm_info(struct rpmsg_eth_common *common)
  	return 0;
  }
  
-+static int rpmsg_eth_init_ndev(struct rpmsg_eth_common *common)
++static void rpmsg_eth_rx_timer(struct timer_list *timer)
 +{
-+	struct device *dev = &common->rpdev->dev;
-+	struct rpmsg_eth_ndev_priv *ndev_priv;
-+	struct rpmsg_eth_port *port;
-+	static u32 port_id;
-+	int err;
++	struct rpmsg_eth_port *port = timer_container_of(port, timer, rx_timer);
++	struct napi_struct *napi;
++	int num_pkts = 0;
++	u32 head, tail;
 +
-+	port = common->port;
-+	port->common = common;
-+	port->port_id = port_id++;
++	head = port->rx_buffer->head->index;
++	tail = port->rx_buffer->tail->index;
 +
-+	port->ndev = devm_alloc_etherdev_mqs(common->dev, sizeof(*ndev_priv),
-+					     RPMSG_ETH_MAX_TX_QUEUES,
-+					     RPMSG_ETH_MAX_RX_QUEUES);
++	num_pkts = tail - head;
++	num_pkts = num_pkts >= 0 ? num_pkts :
++				   (num_pkts + port->rpmsg_eth_rx_max_buffers);
 +
-+	if (!port->ndev) {
-+		dev_err(dev, "error allocating net_device\n");
-+		return -ENOMEM;
++	napi = &port->rx_napi;
++	if (num_pkts && likely(napi_schedule_prep(napi)))
++		__napi_schedule(napi);
++	else
++		mod_timer(&port->rx_timer, RX_POLL_JIFFIES);
++}
++
++static int rpmsg_eth_rx_packets(struct napi_struct *napi, int budget)
++{
++	struct rpmsg_eth_port *port = container_of(napi, struct rpmsg_eth_port, rx_napi);
++	u32 count, process_pkts;
++	struct sk_buff *skb;
++	u32 head, tail;
++	int num_pkts;
++	u32 pkt_len;
++
++	head = port->rx_buffer->head->index;
++	tail = port->rx_buffer->tail->index;
++
++	num_pkts = head - tail;
++
++	num_pkts = num_pkts >= 0 ? num_pkts :
++				   (num_pkts + port->rpmsg_eth_rx_max_buffers);
++	process_pkts = min(num_pkts, budget);
++	count = 0;
++	while (count < process_pkts) {
++		memcpy_fromio((void *)&pkt_len,
++			      (void __iomem *)(port->rx_buffer->buf->base_addr +
++			      MAGIC_NUM_SIZE_TYPE +
++			      (((tail + count) % port->rpmsg_eth_rx_max_buffers) *
++			      RPMSG_ETH_BUFFER_SIZE)),
++			      PKT_LEN_SIZE_TYPE);
++		/* Start building the skb */
++		skb = napi_alloc_skb(napi, pkt_len);
++		if (!skb) {
++			port->ndev->stats.rx_dropped++;
++			goto rx_dropped;
++		}
++
++		skb->dev = port->ndev;
++		skb_put(skb, pkt_len);
++		memcpy_fromio((void *)skb->data,
++			      (void __iomem *)(port->rx_buffer->buf->base_addr +
++			      PKT_LEN_SIZE_TYPE + MAGIC_NUM_SIZE_TYPE +
++			      (((tail + count) % port->rpmsg_eth_rx_max_buffers) *
++			      RPMSG_ETH_BUFFER_SIZE)),
++			      pkt_len);
++
++		skb->protocol = eth_type_trans(skb, port->ndev);
++
++		/* Push skb into network stack */
++		napi_gro_receive(napi, skb);
++
++		count++;
++		port->ndev->stats.rx_packets++;
++		port->ndev->stats.rx_bytes += skb->len;
 +	}
 +
-+	ndev_priv = netdev_priv(port->ndev);
-+	ndev_priv->port = port;
-+	SET_NETDEV_DEV(port->ndev, dev);
++rx_dropped:
 +
-+	port->ndev->min_mtu = RPMSG_ETH_MIN_PACKET_SIZE;
-+	port->ndev->max_mtu = MAX_MTU;
++	if (num_pkts) {
++		port->rx_buffer->tail->index =
++			(port->rx_buffer->tail->index + count) %
++			port->rpmsg_eth_rx_max_buffers;
 +
-+	if (!is_valid_ether_addr(port->ndev->dev_addr)) {
-+		eth_hw_addr_random(port->ndev);
-+		dev_dbg(dev, "Using random MAC address %pM\n", port->ndev->dev_addr);
++		if (num_pkts < budget && napi_complete_done(napi, count))
++			mod_timer(&port->rx_timer, RX_POLL_TIMEOUT_JIFFIES);
 +	}
 +
-+	/* Allocate memory to test without actual RPMsg handshaking */
-+	port->tx_buffer =
-+		devm_kzalloc(dev, sizeof(*port->tx_buffer), GFP_KERNEL);
-+	if (!port->tx_buffer) {
-+		dev_err(dev, "Memory not available\n");
-+		return -ENOMEM;
-+	}
++	return count;
++}
 +
-+	port->tx_buffer->buf =
-+		devm_kzalloc(dev, sizeof(*port->tx_buffer->buf), GFP_KERNEL);
-+	if (!port->tx_buffer->buf) {
-+		dev_err(dev, "Memory not available\n");
-+		return -ENOMEM;
-+	}
++static int rpmsg_eth_ndo_open(struct net_device *ndev)
++{
++	struct rpmsg_eth_common *common = rpmsg_eth_ndev_to_common(ndev);
 +
-+	port->rx_buffer =
-+		devm_kzalloc(dev, sizeof(*port->rx_buffer), GFP_KERNEL);
-+	if (!port->rx_buffer) {
-+		dev_err(dev, "Memory not available\n");
-+		return -ENOMEM;
-+	}
++	mutex_lock(&common->state_lock);
++	common->state = RPMSG_ETH_STATE_OPEN;
++	mutex_unlock(&common->state_lock);
++	mod_delayed_work(system_wq, &common->state_work, msecs_to_jiffies(100));
 +
-+	port->rx_buffer->buf =
-+		devm_kzalloc(dev, sizeof(*port->rx_buffer->buf), GFP_KERNEL);
-+	if (!port->rx_buffer->buf) {
-+		dev_err(dev, "Memory not available\n");
-+		return -ENOMEM;
-+	}
-+	netif_carrier_off(port->ndev);
-+
-+	err = register_netdev(port->ndev);
-+
-+	if (err)
-+		dev_err(dev, "error registering rpmsg_eth net device %d\n", err);
 +	return 0;
 +}
 +
- static int rpmsg_eth_probe(struct rpmsg_device *rpdev)
++static int rpmsg_eth_ndo_stop(struct net_device *ndev)
++{
++	struct rpmsg_eth_common *common = rpmsg_eth_ndev_to_common(ndev);
++	struct rpmsg_eth_port *port = rpmsg_eth_ndev_to_port(ndev);
++
++	mutex_lock(&common->state_lock);
++	common->state = RPMSG_ETH_STATE_CLOSE;
++	mutex_unlock(&common->state_lock);
++
++	netif_carrier_off(port->ndev);
++
++	cancel_delayed_work_sync(&common->state_work);
++	timer_delete_sync(&port->rx_timer);
++	napi_disable(&port->rx_napi);
++
++	return 0;
++}
++
++static netdev_tx_t rpmsg_eth_start_xmit(struct sk_buff *skb, struct net_device *ndev)
++{
++	struct rpmsg_eth_port *port = rpmsg_eth_ndev_to_port(ndev);
++	u32 head, tail;
++	int num_pkts;
++	u32 len;
++
++	len = skb_headlen(skb);
++	head = port->tx_buffer->head->index;
++	tail = port->tx_buffer->tail->index;
++
++	/* If the buffer queue is full, then drop packet */
++	num_pkts = head - tail;
++	num_pkts = num_pkts >= 0 ? num_pkts :
++				   (num_pkts + port->rpmsg_eth_tx_max_buffers);
++
++	if ((num_pkts + 1) == port->rpmsg_eth_tx_max_buffers) {
++		netdev_warn(ndev, "Tx buffer full %d\n", num_pkts);
++		goto ring_full;
++	}
++	/* Copy length */
++	memcpy_toio((void __iomem *)port->tx_buffer->buf->base_addr +
++			    MAGIC_NUM_SIZE_TYPE +
++			    (port->tx_buffer->head->index * RPMSG_ETH_BUFFER_SIZE),
++		    (void *)&len, PKT_LEN_SIZE_TYPE);
++	/* Copy data to shared mem */
++	memcpy_toio((void __iomem *)(port->tx_buffer->buf->base_addr +
++			     MAGIC_NUM_SIZE_TYPE + PKT_LEN_SIZE_TYPE +
++			     (port->tx_buffer->head->index * RPMSG_ETH_BUFFER_SIZE)),
++		    (void *)skb->data, len);
++	port->tx_buffer->head->index =
++		(port->tx_buffer->head->index + 1) % port->rpmsg_eth_tx_max_buffers;
++
++	ndev->stats.tx_packets++;
++	ndev->stats.tx_bytes += skb->len;
++
++	dev_consume_skb_any(skb);
++	return NETDEV_TX_OK;
++
++ring_full:
++	return NETDEV_TX_BUSY;
++}
++
++static int rpmsg_eth_set_mac_address(struct net_device *ndev, void *addr)
++{
++	struct rpmsg_eth_common *common = rpmsg_eth_ndev_to_common(ndev);
++	int ret;
++
++	ret = eth_mac_addr(ndev, addr);
++
++	if (ret < 0)
++		return ret;
++	ret = rpmsg_eth_create_send_request(common, RPMSG_ETH_REQ_SET_MAC_ADDR, false);
++	return ret;
++}
++
++static const struct net_device_ops rpmsg_eth_netdev_ops = {
++	.ndo_open = rpmsg_eth_ndo_open,
++	.ndo_stop = rpmsg_eth_ndo_stop,
++	.ndo_start_xmit = rpmsg_eth_start_xmit,
++	.ndo_set_mac_address = rpmsg_eth_set_mac_address,
++};
++
+ static int rpmsg_eth_init_ndev(struct rpmsg_eth_common *common)
  {
- 	struct device *dev = &rpdev->dev;
-@@ -95,17 +318,27 @@ static int rpmsg_eth_probe(struct rpmsg_device *rpdev)
- 	common->port = devm_kzalloc(dev, sizeof(*common->port), GFP_KERNEL);
- 	common->dev = dev;
- 	common->rpdev = rpdev;
-+	common->state = RPMSG_ETH_STATE_PROBE;
+ 	struct device *dev = &common->rpdev->dev;
+@@ -256,6 +563,7 @@ static int rpmsg_eth_init_ndev(struct rpmsg_eth_common *common)
  
- 	ret = rpmsg_eth_get_shm_info(common);
+ 	ndev_priv = netdev_priv(port->ndev);
+ 	ndev_priv->port = port;
++	port->ndev->netdev_ops = &rpmsg_eth_netdev_ops;
+ 	SET_NETDEV_DEV(port->ndev, dev);
+ 
+ 	port->ndev->min_mtu = RPMSG_ETH_MIN_PACKET_SIZE;
+@@ -296,6 +604,8 @@ static int rpmsg_eth_init_ndev(struct rpmsg_eth_common *common)
+ 	}
+ 	netif_carrier_off(port->ndev);
+ 
++	netif_napi_add(port->ndev, &port->rx_napi, rpmsg_eth_rx_packets);
++	timer_setup(&port->rx_timer, rpmsg_eth_rx_timer, 0);
+ 	err = register_netdev(port->ndev);
+ 
+ 	if (err)
+@@ -324,6 +634,12 @@ static int rpmsg_eth_probe(struct rpmsg_device *rpdev)
  	if (ret)
  		return ret;
  
-+	/* Register the network device */
-+	ret = rpmsg_eth_init_ndev(common);
-+	if (ret)
-+		return ret;
++	spin_lock_init(&common->send_msg_lock);
++	spin_lock_init(&common->recv_msg_lock);
++	mutex_init(&common->state_lock);
++	INIT_DELAYED_WORK(&common->state_work, rpmsg_eth_state_machine);
++	init_completion(&common->sync_msg);
 +
- 	return 0;
- }
+ 	/* Register the network device */
+ 	ret = rpmsg_eth_init_ndev(common);
+ 	if (ret)
+@@ -339,6 +655,9 @@ static void rpmsg_eth_rpmsg_remove(struct rpmsg_device *rpdev)
  
- static void rpmsg_eth_rpmsg_remove(struct rpmsg_device *rpdev)
- {
--	dev_dbg(&rpdev->dev, "rpmsg-eth client driver is removed\n");
-+	struct rpmsg_eth_common *common = dev_get_drvdata(&rpdev->dev);
-+	struct rpmsg_eth_port *port = common->port;
+ 	/* Unmap ioremap'd regions */
+ 	rpmsg_eth_unmap_buffers(port);
 +
-+	/* Unmap ioremap'd regions */
-+	rpmsg_eth_unmap_buffers(port);
++	netif_napi_del(&port->rx_napi);
++	timer_delete_sync(&port->rx_timer);
  }
  
  static struct rpmsg_device_id rpmsg_eth_rpmsg_id_table[] = {
 diff --git a/drivers/net/ethernet/rpmsg_eth.h b/drivers/net/ethernet/rpmsg_eth.h
-index 56dabd139643..aa43030f3d72 100644
+index aa43030f3d72..d7e4d53c8de4 100644
 --- a/drivers/net/ethernet/rpmsg_eth.h
 +++ b/drivers/net/ethernet/rpmsg_eth.h
-@@ -18,6 +18,27 @@
- #include <linux/rpmsg.h>
- 
- #define RPMSG_ETH_SHM_MAGIC_NUM 0xABCDABCD
-+#define RPMSG_ETH_MIN_PACKET_SIZE ETH_ZLEN
-+#define RPMSG_ETH_PACKET_BUFFER_SIZE   1540
-+#define MAX_MTU   (RPMSG_ETH_PACKET_BUFFER_SIZE - (ETH_HLEN + ETH_FCS_LEN + VLAN_HLEN))
-+
-+#define RPMSG_ETH_MAX_TX_QUEUES 1
-+#define RPMSG_ETH_MAX_RX_QUEUES 1
-+#define PKT_LEN_SIZE_TYPE sizeof(u32)
-+#define MAGIC_NUM_SIZE_TYPE sizeof(u32)
-+
-+/* 4 bytes to hold packet length and RPMSG_ETH_PACKET_BUFFER_SIZE to hold packet */
-+#define RPMSG_ETH_BUFFER_SIZE \
-+	(RPMSG_ETH_PACKET_BUFFER_SIZE + PKT_LEN_SIZE_TYPE + MAGIC_NUM_SIZE_TYPE)
-+
-+#define RX_POLL_TIMEOUT_JIFFIES usecs_to_jiffies(1000)
-+#define RX_POLL_JIFFIES (jiffies + RX_POLL_TIMEOUT_JIFFIES)
-+#define STATE_MACHINE_TIME_JIFFIES msecs_to_jiffies(100)
-+#define RPMSG_ETH_REQ_TIMEOUT_JIFFIES msecs_to_jiffies(100)
-+
-+#define rpmsg_eth_ndev_to_priv(ndev) ((struct rpmsg_eth_ndev_priv *)netdev_priv(ndev))
-+#define rpmsg_eth_ndev_to_port(ndev) (rpmsg_eth_ndev_to_priv(ndev)->port)
-+#define rpmsg_eth_ndev_to_common(ndev) (rpmsg_eth_ndev_to_port(ndev)->common)
- 
- enum rpmsg_eth_msg_type {
- 	RPMSG_ETH_REQUEST_MSG = 0,
-@@ -25,6 +46,89 @@ enum rpmsg_eth_msg_type {
- 	RPMSG_ETH_NOTIFY_MSG,
- };
- 
-+enum rpmsg_eth_rpmsg_type {
-+	/* Request types */
-+	RPMSG_ETH_REQ_SHM_INFO = 0,
-+	RPMSG_ETH_REQ_SET_MAC_ADDR,
-+
-+	/* Response types */
-+	RPMSG_ETH_RESP_SHM_INFO,
-+	RPMSG_ETH_RESP_SET_MAC_ADDR,
-+
-+	/* Notification types */
-+	RPMSG_ETH_NOTIFY_PORT_UP,
-+	RPMSG_ETH_NOTIFY_PORT_DOWN,
-+	RPMSG_ETH_NOTIFY_PORT_READY,
-+	RPMSG_ETH_NOTIFY_REMOTE_READY,
-+};
-+
-+/**
-+ * struct rpmsg_eth_shm - Shared memory layout for RPMsg Ethernet
-+ * @num_pkt_bufs: Number of packet buffers available in the shared memory
-+ * @buff_slot_size: Size of each buffer slot in bytes
-+ * @base_addr: Base address of the shared memory region
-+ * @tx_offset: Offset for the transmit buffer region within the shared memory
-+ * @rx_offset: Offset for the receive buffer region within the shared memory
-+ *
-+ * This structure defines the layout of the shared memory used for
-+ * communication between the host and the remote processor in an RPMsg
-+ * Ethernet driver. It specifies the configuration and memory offsets
-+ * required for transmitting and receiving Ethernet packets.
-+ */
-+struct rpmsg_eth_shm {
-+	u32 num_pkt_bufs;
-+	u32 buff_slot_size;
-+	u32 base_addr;
-+	u32 tx_offset;
-+	u32 rx_offset;
-+} __packed;
-+
-+/**
-+ * struct rpmsg_eth_mac_addr - MAC address information for RPMSG Ethernet
-+ * @addr: MAC address
-+ */
-+struct rpmsg_eth_mac_addr {
-+	char addr[ETH_ALEN];
-+} __packed;
-+
-+/**
-+ * struct request_message - request message structure for RPMSG Ethernet
-+ * @type: Request Type
-+ * @id: Request ID
-+ * @mac_addr: MAC address (if request type is MAC address related)
-+ */
-+struct request_message {
-+	u32 type;
-+	u32 id;
-+	union {
-+		struct rpmsg_eth_mac_addr mac_addr;
-+	};
-+} __packed;
-+
-+/**
-+ * struct response_message - response message structure for RPMSG Ethernet
-+ * @type: Response Type
-+ * @id: Response ID
-+ * @shm_info: rpmsg shared memory info
-+ */
-+struct response_message {
-+	u32 type;
-+	u32 id;
-+	union {
-+		struct rpmsg_eth_shm shm_info;
-+	};
-+} __packed;
-+
-+/**
-+ * struct notify_message - notification message structure for RPMSG Ethernet
-+ * @type: Notify Type
-+ * @id: Notify ID
-+ */
-+struct notify_message {
-+	u32 type;
-+	u32 id;
-+} __packed;
-+
- /**
-  * struct message_header - message header structure for RPMSG Ethernet
-  * @src_id: Source endpoint ID
-@@ -40,22 +144,116 @@ struct message_header {
-  *
-  * @msg_hdr: Message header contains source and destination endpoint and
-  *          the type of message
-+ * @req_msg: Request message structure contains the request type and ID
-+ * @resp_msg: Response message structure contains the response type and ID
-+ * @notify_msg: Notification message structure contains the notify type and ID
-  *
-  * This structure is used to send and receive messages between the RPMSG
-  * Ethernet ports.
-  */
- struct message {
- 	struct message_header msg_hdr;
-+	union {
-+		struct request_message req_msg;
-+		struct response_message resp_msg;
-+		struct notify_message notify_msg;
-+	};
-+} __packed;
-+
-+/*      Shared Memory Layout
-+ *
-+ *	---------------------------	*****************
-+ *	|        MAGIC_NUM        |	 rpmsg_eth_shm_head
-+ *	|          HEAD           |
-+ *	---------------------------	*****************
-+ *	|        MAGIC_NUM        |
-+ *	|        PKT_1_LEN        |
-+ *	|          PKT_1          |
-+ *	---------------------------
-+ *	|        MAGIC_NUM        |
-+ *	|        PKT_2_LEN        |	 rpmsg_eth_shm_buf
-+ *	|          PKT_2          |
-+ *	---------------------------
-+ *	|           .             |
-+ *	|           .             |
-+ *	---------------------------
-+ *	|        MAGIC_NUM        |
-+ *	|        PKT_N_LEN        |
-+ *	|          PKT_N          |
-+ *	---------------------------	****************
-+ *	|        MAGIC_NUM        |      rpmsg_eth_shm_tail
-+ *	|          TAIL           |
-+ *	---------------------------	****************
-+ */
-+
-+struct rpmsg_eth_shm_index {
-+	u32 magic_num;
-+	u32 index;
-+}  __packed;
-+
-+/**
-+ * struct rpmsg_eth_shm_buf - shared memory buffer structure for RPMSG Ethernet
-+ * @base_addr: Base address of the buffer
-+ * @magic_num: Magic number for buffer validation
-+ */
-+struct rpmsg_eth_shm_buf {
-+	void __iomem *base_addr;
-+	u32 magic_num;
-+} __packed;
-+
-+/**
-+ * struct rpmsg_eth_shared_mem - shared memory structure for RPMSG Ethernet
-+ * @head: Head of the shared memory
-+ * @buf: Buffer of the shared memory
-+ * @tail: Tail of the shared memory
-+ */
-+struct rpmsg_eth_shared_mem {
-+	struct rpmsg_eth_shm_index *head;
-+	struct rpmsg_eth_shm_buf *buf;
-+	struct rpmsg_eth_shm_index *tail;
- } __packed;
- 
-+enum rpmsg_eth_state {
-+	RPMSG_ETH_STATE_PROBE,
-+	RPMSG_ETH_STATE_OPEN,
-+	RPMSG_ETH_STATE_CLOSE,
-+	RPMSG_ETH_STATE_READY,
-+	RPMSG_ETH_STATE_RUNNING,
-+
-+};
-+
- /**
-  * struct rpmsg_eth_common - common structure for RPMSG Ethernet
-  * @rpdev: RPMSG device
-+ * @send_msg: Send message
-+ * @recv_msg: Receive message
-  * @port: Ethernet port
+@@ -231,6 +231,7 @@ enum rpmsg_eth_state {
   * @dev: Device
-+ * @state: Interface state
-+ * @state_work: Delayed work for state machine
+  * @state: Interface state
+  * @state_work: Delayed work for state machine
++ * @sync_msg: Completion for synchronous message
   */
  struct rpmsg_eth_common {
  	struct rpmsg_device *rpdev;
-+	/** @send_msg_lock: Lock for sending RPMSG */
-+	spinlock_t send_msg_lock;
-+	/** @recv_msg_lock: Lock for receiving RPMSG */
-+	spinlock_t recv_msg_lock;
-+	struct message send_msg;
-+	struct message recv_msg;
-+	struct rpmsg_eth_port *port;
-+	struct device *dev;
-+	enum rpmsg_eth_state state;
-+	/** @state_lock: Lock for changing interface state */
-+	struct mutex state_lock;
-+	struct delayed_work state_work;
-+};
-+
-+/**
-+ * struct rpmsg_eth_ndev_priv - private structure for RPMSG Ethernet net device
-+ * @port: Ethernet port
-+ * @dev: Device
-+ */
-+struct rpmsg_eth_ndev_priv {
- 	struct rpmsg_eth_port *port;
- 	struct device *dev;
- };
-@@ -65,11 +263,29 @@ struct rpmsg_eth_common {
-  * @common: Pointer to the common RPMSG Ethernet structure
-  * @buf_start_addr: Start address of the shared memory buffer for this port
-  * @buf_size: Size (in bytes) of the shared memory buffer for this port
-+ * @tx_buffer: Write buffer for data to be consumed by remote side
-+ * @rx_buffer: Read buffer for data to be consumed by this driver
-+ * @rx_timer: Timer for rx polling
-+ * @rx_napi: NAPI structure for rx polling
-+ * @local_mac_addr: Local MAC address
-+ * @ndev: Network device
-+ * @rpmsg_eth_tx_max_buffers: Maximum number of tx buffers
-+ * @rpmsg_eth_rx_max_buffers: Maximum number of rx buffers
-+ * @port_id: Port ID
-  */
- struct rpmsg_eth_port {
- 	struct rpmsg_eth_common *common;
- 	u32 buf_start_addr;
- 	u32 buf_size;
-+	struct rpmsg_eth_shared_mem *tx_buffer;
-+	struct rpmsg_eth_shared_mem *rx_buffer;
-+	struct timer_list rx_timer;
-+	struct napi_struct rx_napi;
-+	u8 local_mac_addr[ETH_ALEN];
-+	struct net_device *ndev;
-+	u32 rpmsg_eth_tx_max_buffers;
-+	u32 rpmsg_eth_rx_max_buffers;
-+	u32 port_id;
+@@ -246,6 +247,7 @@ struct rpmsg_eth_common {
+ 	/** @state_lock: Lock for changing interface state */
+ 	struct mutex state_lock;
+ 	struct delayed_work state_work;
++	struct completion sync_msg;
  };
  
- #endif /* __RPMSG_ETH_H__ */
+ /**
 -- 
 2.34.1
 
