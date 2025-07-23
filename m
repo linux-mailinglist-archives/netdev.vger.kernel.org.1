@@ -1,110 +1,119 @@
-Return-Path: <netdev+bounces-209467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80CE0B0FA1B
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 20:17:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 045C0B0FA30
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 20:22:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD81516B12E
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 18:17:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8916996388D
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 18:22:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB81021421D;
-	Wed, 23 Jul 2025 18:17:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEB7022B8B6;
+	Wed, 23 Jul 2025 18:22:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XFlaIKkB"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="SqOc9gRz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365D94EB38;
-	Wed, 23 Jul 2025 18:17:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45EE0224B07;
+	Wed, 23 Jul 2025 18:22:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753294642; cv=none; b=nu47yStHVmUCsYwvVAhGNJYBMFOqMwOiGUMJPFEUJY9RhqyTv+II8SU8JoN4ELtHS5Y81G26GvHHqc3h9R/rxPUocBp0Cnecz1Ae+iM/5tPeITBQNPE7TF0eRIxHswGM6fjrts3i8yZ0FMsNAHWUFc3zCjzO9ReI9k8LrkfEBp0=
+	t=1753294951; cv=none; b=HhMmaXVDJzo2RePPV5SH1vQv8/Vc4kFgwL2TCzlyY2oHUDSwmc2IgXrdxVOXc3V0xqGQFAbdwLOWonfpGasYFXKOdxv08UXsJvKMM8jVcB3BKIh1jextZ8V20mTb8BwW+Fsi/zGwckX3nh8ercpgT83hmxn4oVZAXD37Jwg/HUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753294642; c=relaxed/simple;
-	bh=Mxapj/W6ghkGZsbzY4w3vXEDzVHjWtirUwe3EqUITS4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ao+FhFr/TdZpY0Ae9JlcSzwU7yFgPwKL2VsCvWuXGZ4xg5cC7SOwG8dTD7YWLA3BX5wPXxQa/1YYzvnZ4jG80OZEvN1JSmO2FxNyRivT0KI80lXrmjaLwcQND2Zr0kxlXb/5itwMyVC3r6GViiRCe6nsWFAosETp4hlEzX/63tk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XFlaIKkB; arc=none smtp.client-ip=209.85.161.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-60d666804ebso562415eaf.1;
-        Wed, 23 Jul 2025 11:17:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753294640; x=1753899440; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=RisToY55DvY0MLXrsGRlCU6n7jXckJ5IoAhRIn7EY5A=;
-        b=XFlaIKkBjnikFw7vAIJSB2t7ICMoHSgNpNSoSX8PLOfBk2MjQduRdBjXoKr4DvyCUF
-         byfqVADKxK6/4UNhhgnN8f3w7JT9p2Kq5cMNi/Gjuq17Q9i4NqMJhSsXL64GI7YEwlhz
-         wEL/WRr2fz9JN2klqXSYx1o2yjY8CQydQkLVwLarewDN03jWb5ldx+JtxEESdTR9y5CV
-         htbp1+AGR6mbrfa+VxOgk4QzrBOY1yaRlTJJtls1b2lr5frdgNx5cJWxnZde1tKNDPK7
-         VJN23QRVHZQj9dkbdwBRy5sLF47OCuTqGaRW8aXRyJRALHIfYhnzZwh0ZgTv/JkwS7bq
-         CQbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753294640; x=1753899440;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RisToY55DvY0MLXrsGRlCU6n7jXckJ5IoAhRIn7EY5A=;
-        b=ICmhTOuLVGdvi8hR2404fNBhNlqOgWtgq6daEIiwmP/b3R1my2EViyjV2LrV3mImMR
-         edOynhn8+4wDTTEWy6a3Q/33M/Ola2LtNZd82Nd0K/yjo1cz+x4nBV5HpghKNaCOuej4
-         6QqYl9esiIWJKtbX8RZ/n9wgt9I99SB6JPpwwCgQgtkMnafaiQ6PMJP1FUMqXs2S63SY
-         zTFctkW6QIjkpZVkrRYglBvLvFC8n/T6/87PGA5mqxmrirENiGaKW0WIUAByZyfq1Bpz
-         jH5nzmCFeWQCRqMsKXPsUpenppcKg3upC5hrU+vSeC38mqOZ7dtV8EdOYu/8PC0pLoCc
-         IVMw==
-X-Forwarded-Encrypted: i=1; AJvYcCWJeQic8GaW6Ix14mfdLOh/ETM8jlUEwIATOAVeesIQrN7A8r/QjEuHsJFaLmQl6rbAyVKiZ2BG@vger.kernel.org, AJvYcCXhRhDoyGIxtiAXi3VM/9hJBAhQTps0wdT1gtAwIcr7U1ajbW+K/axXUdrk39/yAD8HkZAcDAjx6GNMmKU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7osVxD2FSVCvwFJfHfcoxm2ZiLi+S3JITdVsQ7C7HRmZKhEQh
-	36zoLO/0d6QOGU9GYn5epcqOO19WxYKgos91KlFbM+jpElq01/N5iC4Ep2zQSZ+QFEWJI53Mzho
-	uywSGQ0byHSZHTUvkk3b7enDpWtCSyEE=
-X-Gm-Gg: ASbGncs5TjVjqnKN2iRjN4ZWQeyzJtSowGLA7ib79cOjOg8zblP9pyzY8gNvm2ZPZxm
-	LrRbGEscBGmQ07C2kRi0h1UiDCNu4XO50Wmc7vI+CfhnxMfl8Xalmwkh5XMgenYvwcQrr54hRPV
-	NkvC0IRwj8uIbcQMx60vpUqoRLJGyd9wSN7jKUd787/r+svCCI52XkB4KOc8plLOQpzulZPosiV
-	+ohTxUw
-X-Google-Smtp-Source: AGHT+IH0b5gniHC2oV6Q2cydxzDkfKC9O8de+o7IucN+Mu/rb3bzyZeGVWY4j+4HT2s4MTG/OFFbhDXhysYI9OzTKZs=
-X-Received: by 2002:a05:6871:4681:b0:2ef:ad56:aaba with SMTP id
- 586e51a60fabf-306a79e6abamr5612128fac.3.1753294640104; Wed, 23 Jul 2025
- 11:17:20 -0700 (PDT)
+	s=arc-20240116; t=1753294951; c=relaxed/simple;
+	bh=rxt64hmEfXGDpk+90Gt/zaDz2ey8jjpQyAtFOj/qsD0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bS5hXj5yxZZ2XLJrv0ZjfyGZj4AwaxpXccL9aBOQVM3OBghiYghZSNb/IGeF1+3UdwATHq8tzHLD7uKfQzqvYTV6b3fEmU2maXojHc4HftBMm9UZumH18MgH37AJY6QDTAaPKZpvA4YKcLsS7C7MJi1vTlDjq3hgCFtpfVa2r04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=SqOc9gRz; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id 528AF202186F; Wed, 23 Jul 2025 11:22:24 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 528AF202186F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1753294944;
+	bh=97R2aoDUcHgnNx84Rvmur00qbaItR6hrznKaMPHKy9Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SqOc9gRz4MLyhDiCdEu+cqoXt1Dbn/5Mglo1Yvj12hpgclQBcSwtgcNjJk6dAGqUz
+	 Ml2J+2araiRX7EiA1lYQnVb2Ut5nU1LgFw/Bcl2xxh27KnRWos2KcZw5cf6GEB+gih
+	 l5Gf6uG6QOgcKq7KD9DwcjH57h619rrWv3jpEc5I=
+Date: Wed, 23 Jul 2025 11:22:24 -0700
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: kuba@kernel.org, kys@microsoft.com, haiyangz@microsoft.com,
+	wei.liu@kernel.org, decui@microsoft.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+	john.fastabend@gmail.com, sdf@fomichev.me, lorenzo@kernel.org,
+	michal.kubiak@intel.com, ernis@linux.microsoft.com,
+	shradhagupta@linux.microsoft.com, shirazsaleem@microsoft.com,
+	rosenp@gmail.com, netdev@vger.kernel.org,
+	linux-hyperv@vger.kernel.org, linux-rdma@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH] net: mana: Use page pool fragments for RX buffers
+ instead of full pages to improve memory efficiency and throughput.
+Message-ID: <20250723182224.GA25631@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20250721101417.GA18873@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <1d18f7dc-eca5-4daa-98fb-5c8d20ef6ac4@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250722071508.12497-1-suchitkarunakaran@gmail.com> <CANn89iJgG3yRQv+a04wzUtgqorSOM3DOFvGV2mgFV8QTVFjYxg@mail.gmail.com>
-In-Reply-To: <CANn89iJgG3yRQv+a04wzUtgqorSOM3DOFvGV2mgFV8QTVFjYxg@mail.gmail.com>
-From: Suchit K <suchitkarunakaran@gmail.com>
-Date: Wed, 23 Jul 2025 23:47:09 +0530
-X-Gm-Features: Ac12FXwzJdHhCWw-QUoBRjGVUQrpiSZCrI9ATw4JQ1XXd6D6Ht2zQKkMXPXNQEM
-Message-ID: <CAO9wTFiGCrAOkZSPr1N6W_8yacyUUcZanvXdQ-FQaphpnWe5DA@mail.gmail.com>
-Subject: Re: [PATCH] net: Revert tx queue length on partial failure in dev_qdisc_change_tx_queue_len()
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us, sdf@fomichev.me, 
-	kuniyu@google.com, aleksander.lobakin@intel.com, netdev@vger.kernel.org, 
-	skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1d18f7dc-eca5-4daa-98fb-5c8d20ef6ac4@intel.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
->
-> WRITE_ONCE() is missing.
->
-> > +               while (i >= 0) {
-> > +                       qdisc_change_tx_queue_len(dev, &dev->_tx[i]);
->
-> What happens if one of these calls fails ?
->
-> I think a fix will be more complicated...
+Hi Jacob,
 
-Hi Eric,
-Given that pfifo_fast_change_tx_queue_len is currently the only
-implementation of change_tx_queue_len, would it be reasonable to
-handle partial failures solely within pfifo_fast_change_tx_queue_len
-(which in turn leads to skb_array_resize_multiple_bh)? In other words,
-is it sufficient to modify only the underlying low level
-implementation of pfifo_fast_change_tx_queue_len for partial failures,
-given that it's the sole implementation of change_tx_queue_len?
+Thanks for the review, I tested this patch previously
+for 4kb page size systems. The throughput improvement is around
+10 to 15%. Also sligthly better memory utilization as for
+typical 1500 MTU size we are able to fit 2 Rx buffer in
+a single 4kb page as compared to 1 per page previously.
+
+Thanks
+Dipayaan Roy 
+
+On Mon, Jul 21, 2025 at 04:51:10PM -0700, Jacob Keller wrote:
+> 
+> 
+> On 7/21/2025 3:14 AM, Dipayaan Roy wrote:
+> > This patch enhances RX buffer handling in the mana driver by allocating
+> > pages from a page pool and slicing them into MTU-sized fragments, rather
+> > than dedicating a full page per packet. This approach is especially
+> > beneficial on systems with 64KB page sizes.
+> > 
+> > Key improvements:
+> > 
+> > - Proper integration of page pool for RX buffer allocations.
+> > - MTU-sized buffer slicing to improve memory utilization.
+> > - Reduce overall per Rx queue memory footprint.
+> > - Automatic fallback to full-page buffers when:
+> >    * Jumbo frames are enabled (MTU > PAGE_SIZE / 2).
+> >    * The XDP path is active, to avoid complexities with fragment reuse.
+> > - Removal of redundant pre-allocated RX buffers used in scenarios like MTU
+> >   changes, ensuring consistency in RX buffer allocation.
+> > 
+> > Testing on VMs with 64KB pages shows around 200% throughput improvement.
+> > Memory efficiency is significantly improved due to reduced wastage in page
+> > allocations. Example: We are now able to fit 35 Rx buffers in a single 64KB
+> > page for MTU size of 1500, instead of 1 Rx buffer per page previously.
+> > 
+> Nice to see such improvements while also reducing the overall driver
+> code footprint!
+> 
+> Do you happen to have numbers on some of the smaller page sizes? I'm not
+> sure how common 64KB is, but it seems like this would still be quite
+> beneficial even if you had 4K or 8K pages when operating at 1500 MTU.
+> 
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+
+
+
 
