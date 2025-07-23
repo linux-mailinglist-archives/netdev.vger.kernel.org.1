@@ -1,72 +1,74 @@
-Return-Path: <netdev+bounces-209254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8375B0ECE7
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:14:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 640B4B0ED04
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:19:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AE3C1886315
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 08:14:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61FA83B16A8
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 08:18:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA59F2797AD;
-	Wed, 23 Jul 2025 08:14:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E95E727991C;
+	Wed, 23 Jul 2025 08:19:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HYilHJs3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YgB17DSE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A29A3182D3;
-	Wed, 23 Jul 2025 08:14:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE402797A4;
+	Wed, 23 Jul 2025 08:19:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753258442; cv=none; b=H2SCwocyhEKXKJD5wEVARJsdU5ibYQpjYXTbjVkmJTsfrVT+DBCYJcOFpjhzj66BGEXSSdIzr81tFBmdIIfFICwkvvjw2dlntW3hGhNuunLohn9xeRPIzLDA9QPb9OPFLITnQIN54BrJ8BTJa0DPWOcCgT8h0QXDlWG8dDfTmpw=
+	t=1753258755; cv=none; b=Dn2BLRjNknkXNk3EXowJr7hPJEDv46IrCnEam44lJwFh+pXmvxqdpF7UEd3d694TvegmjvO+e042zoWeYT+V6avA4pCZUFqPVzfPo7NZ77nKRwosuwByrTJitU814ibjdC96fCXFoqxWQAJk08P932uFt3b0adXoT4JiJecgqxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753258442; c=relaxed/simple;
-	bh=qeKqZqAhMV1fB+a75jUMSKcJMpZvyxlRjnCdZh1vOuI=;
+	s=arc-20240116; t=1753258755; c=relaxed/simple;
+	bh=zt9Qo87c6GQ+qZFQ/rW4OVrNszsm3KfmfrOniuhUpHs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gk+hUyoJTLjd15WY38gnYVw+QCI/JFYPbpSsumEea4nGYpEMxCt0EmVgdkOaNLQdzfXf1zDqo/ROvhnP0VOI0qzBq6ckSYRvdYRv9jcIb5ZXXAamI74zh2zRGTC3A2OueGQxlryHNIL2ExVHgyTMyhIT9CfkPLIL4iFDj5feyTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HYilHJs3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5FFFC4CEE7;
-	Wed, 23 Jul 2025 08:14:00 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=AxO7yjLU9lmvXx/qKXnY7qXQz1CDT4PV2P8iNbCXH/uBd9O/6JEGF1b8kBPiAg91MRUig+AHggFt0fD1xa12mU6VbNh6I+af5PRwcUp5/V3ntiglgeyNomei6jKKLVJVYP5bVMmDj0E7gRUR/RD2Uk5lPFuzn+UO7pkw/ey4298=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YgB17DSE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC7ADC4CEE7;
+	Wed, 23 Jul 2025 08:19:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753258441;
-	bh=qeKqZqAhMV1fB+a75jUMSKcJMpZvyxlRjnCdZh1vOuI=;
+	s=k20201202; t=1753258755;
+	bh=zt9Qo87c6GQ+qZFQ/rW4OVrNszsm3KfmfrOniuhUpHs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HYilHJs3hXC/SulBh6ytsuj620LusH3SCvPIZqWdTUzNUppiytZyTyQUWLZT/H0ma
-	 bGcQvgsrUVrRlPtyBdb+Xv16p+S0KaupUr8GuTBNhkKuR3Wfe7/Z8lcqhVuwhq2mtE
-	 s9RXvHI3210SU0aN8kmBpqYBDUkOaPNg40V/7HWlT8wla9PsxZzT46fdWaeuJ8dHlv
-	 VR4hsfO5yetBNuyWVSjVGvOf5Ah4IfvC6GLyMQhIt7GQocAQGMasXfJXJWDaC0BitP
-	 eRN7JOPssACXeV4q0Vd7pQy7wTuHxiNZUyZit8S0ViXvTWkcVqYDJ6XQBH867ndzFq
-	 G0JYH7soBw0tA==
-Date: Wed, 23 Jul 2025 11:13:56 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
+	b=YgB17DSEvogPZOReGL8TNRDU1xw6PrnH9uHRmRPImf7NSbpfgJXJW/Vj8yoEwjVfJ
+	 fm/JF+XfTuVcZOBi5aS1irPJPaNkD3XuliFF6qK7SYv/ZtezZwx0m0fbs7HDYCc5a7
+	 kHxY1CtI+oWdGQ7WwjYHG3abjssoLgUrPkkt6bHQvb2FavcTuu2VTnfEcqQDUpyDDA
+	 IYI9lY0ZXmSVRRdrLYb5BUCZfrtsHBhsnzMH5grDhMRyhS/N/u3fWdPaAeGnChwFid
+	 hCLV5J1WKW6O5Zg8aW98ZXk0Wds5MZx+mRiRzppDkAheTwG33vYhff8j29cARYdJzf
+	 cif31QqbIK1Kw==
+Date: Wed, 23 Jul 2025 09:19:08 +0100
+From: Simon Horman <horms@kernel.org>
+To: Fan Gong <gongfan1@huawei.com>
+Cc: Zhu Yikai <zhuyikai1@h-partners.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Dave Ertman <david.m.ertman@intel.com>,
-	Saravana Kannan <saravanak@google.com>,
-	linux-kernel@vger.kernel.org, Michal Simek <michal.simek@amd.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Ira Weiny <ira.weiny@intel.com>
-Subject: Re: [PATCH net v2 1/4] auxiliary: Support hexadecimal ids
-Message-ID: <20250723081356.GM402218@unreal>
-References: <2025071637-doubling-subject-25de@gregkh>
- <719ff2ee-67e3-4df1-9cec-2d9587c681be@linux.dev>
- <2025071747-icing-issuing-b62a@gregkh>
- <5d8205e1-b384-446b-822a-b5737ea7bd6c@linux.dev>
- <2025071736-viscous-entertain-ff6c@gregkh>
- <03e04d98-e5eb-41c0-8407-23cccd578dbe@linux.dev>
- <2025071726-ramp-friend-a3e5@gregkh>
- <5ee4bac4-957b-481a-8608-15886da458c2@linux.dev>
- <20250720081705.GE402218@unreal>
- <e4b5e4fa-45c4-4b67-b8f1-7d9ff9f8654f@linux.dev>
+	Andrew Lunn <andrew+netdev@lunn.ch>, linux-doc@vger.kernel.org,
+	Jonathan Corbet <corbet@lwn.net>,
+	Bjorn Helgaas <helgaas@kernel.org>, luosifu <luosifu@huawei.com>,
+	Xin Guo <guoxin09@huawei.com>,
+	Shen Chenyang <shenchenyang1@hisilicon.com>,
+	Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
+	Shi Jing <shijing34@huawei.com>,
+	Fu Guiming <fuguiming@h-partners.com>,
+	Meny Yossefi <meny.yossefi@huawei.com>,
+	Gur Stavi <gur.stavi@huawei.com>, Lee Trager <lee@trager.us>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Suman Ghosh <sumang@marvell.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Joe Damato <jdamato@fastly.com>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: Re: [PATCH net-next v10 1/8] hinic3: Async Event Queue interfaces
+Message-ID: <20250723081908.GW2459@horms.kernel.org>
+References: <cover.1753152592.git.zhuyikai1@h-partners.com>
+ <bea50c6c329c5ffb77cfe059e07eeed187619346.1753152592.git.zhuyikai1@h-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,54 +77,68 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e4b5e4fa-45c4-4b67-b8f1-7d9ff9f8654f@linux.dev>
+In-Reply-To: <bea50c6c329c5ffb77cfe059e07eeed187619346.1753152592.git.zhuyikai1@h-partners.com>
 
-On Mon, Jul 21, 2025 at 10:29:32AM -0400, Sean Anderson wrote:
-> On 7/20/25 04:17, Leon Romanovsky wrote:
-> > On Thu, Jul 17, 2025 at 01:12:08PM -0400, Sean Anderson wrote:
-> >> On 7/17/25 12:33, Greg Kroah-Hartman wrote:
-> > 
-> > <...>
-> > 
-> >> Anyway, if you really think ids should be random or whatever, why not
-> >> just ida_alloc one in axiliary_device_init and ignore whatever's
-> >> provided? I'd say around half the auxiliary drivers just use 0 (or some
-> >> other constant), which is just as deterministic as using the device
-> >> address.
-> > 
-> > I would say that auxiliary bus is not right fit for such devices. This
-> > bus was introduced for more complex devices, like the one who has their
-> > own ida_alloc logic.
+On Tue, Jul 22, 2025 at 03:18:40PM +0800, Fan Gong wrote:
+> Add async event queue interfaces initialization.
+> It allows driver to handle async events reported by HW.
 > 
-> I'd say that around 2/3 of the auxiliary drivers that have non-constant
-> ids use ida_alloc solely for the auxiliary bus and for no other purpose.
-> I don't think that's the kind of complexity you're referring to.
-> 
-> >> Another third use ida_alloc (or xa_alloc) so all that could be
-> >> removed.
-> > 
-> > These ID numbers need to be per-device.
-> 
-> Why? They are arbitrary with no semantic meaning, right?
+> Co-developed-by: Xin Guo <guoxin09@huawei.com>
+> Signed-off-by: Xin Guo <guoxin09@huawei.com>
+> Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
+> Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
+> Signed-off-by: Fan Gong <gongfan1@huawei.com>
 
-Yes, officially there is no meaning, and this is how we would like to
-keep it.
-
-Right now, they are very correlated with with their respective PCI function number.
-Is it important? No, however it doesn't mean that we should proactively harm user
-experience just because we can do it.
-
-[leonro@c ~]$ l /sys/bus/auxiliary/devices/
-,,,
-rwxrwxrwx 1 root root 0 Jul 21 15:25 mlx5_core.rdma.0 -> ../../../devices/pci0000:00/0000:00:02.7/0000:0
-8:00.0/mlx5_core.rdma.0
-lrwxrwxrwx 1 root root 0 Jul 21 15:25 mlx5_core.rdma.1 -> ../../../devices/pci0000:00/0000:00:02.7/0000:0
-8:00.1/mlx5_core.rdma
 ...
 
-Thanks
+> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_common.c b/drivers/net/ethernet/huawei/hinic3/hinic3_common.c
+> index 0aa42068728c..a5aaf6febba9 100644
+> --- a/drivers/net/ethernet/huawei/hinic3/hinic3_common.c
+> +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_common.c
+> @@ -51,3 +51,16 @@ void hinic3_dma_free_coherent_align(struct device *dev,
+>  	dma_free_coherent(dev, mem_align->real_size,
+>  			  mem_align->ori_vaddr, mem_align->ori_paddr);
+>  }
+> +
+> +/* Data provided to/by cmdq is arranged in structs with little endian fields but
+> + * every dword (32bits) should be swapped since HW swaps it again when it
+> + * copies it from/to host memory.
+> + */
 
-> 
-> --Sean
-> 
+This scheme may work on little endian hosts.
+But if so it seems unlikely to work on big endian hosts.
+
+I expect you want be32_to_cpu_array() for data coming from hw,
+with a source buffer as an array of __be32 while
+the destination buffer is an array of u32.
+
+And cpu_to_be32_array() for data going to the hw,
+with the types of the source and destination buffers reversed.
+
+If those types don't match your data, then we have
+a framework to have that discussion.
+
+
+That said, it is more usual for drivers to keep structures in the byte
+order they are received. Stored in structures with members with types, in
+this case it seems that would be __be32, and accessed using a combination
+of BIT/GENMASK, FIELD_PREP/FIELD_GET, and cpu_to_be*/be*_to_cpu (in this
+case cpu_to_be32/be32_to_cpu).
+
+An advantage of this approach is that the byte order of
+data is only changed when needed. Another is that it is clear
+what the byte order of data is.
+
+> +void hinic3_cmdq_buf_swab32(void *data, int len)
+> +{
+> +	u32 *mem = data;
+> +	u32 i;
+> +
+> +	for (i = 0; i < len / sizeof(u32); i++)
+> +		mem[i] = swab32(mem[i]);
+> +}
+
+This seems to open code swab32_array().
+
+...
 
