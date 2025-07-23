@@ -1,175 +1,161 @@
-Return-Path: <netdev+bounces-209312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D138B0F002
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 12:38:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB483B0F05F
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 12:50:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31A571AA7EAD
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:38:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E10751706B8
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:50:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 865712D8383;
-	Wed, 23 Jul 2025 10:37:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 035F527FB2E;
+	Wed, 23 Jul 2025 10:48:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from inva020.nxp.com (inva020.nxp.com [92.121.34.13])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85C1F28C016;
-	Wed, 23 Jul 2025 10:37:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AB87277815
+	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 10:48:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753267034; cv=none; b=EDP03KKq/O6Q/1MktWgI9htG6x3obuYJv8JLivsw5vbjUF7wISsHrg1S7fR6CHGI2FLO+gWX9OyxaAhQstmq4BX0lQ0vrAFhFssr4C+mwiVQZaH0e5Ki/9QBSWUQ5xHOBgiBFjFABC6EEVNP98Bxq2nCfJN6qbtCsfud/fzFHpE=
+	t=1753267703; cv=none; b=dNFGkDlN1ahHFkCYhUO2O41es3Tha+d9QFTYbS3XoEqcqXyXcBBBxNYEME3bsn971EkwFID8MJ7meYo8h1Rg9kDNEhL9Hh5yqMXRatCE+hGprLiLSAvA08DmMmv3r/2dAUjLMAaP9Yv8YG5YKZUIh2ktT8LHK29hVR7W/di9Nvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753267034; c=relaxed/simple;
-	bh=uMba/ezhAC8r5pyu8vjGDcLH/UWyJZSzahC5FZcfZPY=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=qh8b6HXrH9iFNJLcYEgSN538zNKBU5Bpbqv4rc6V8H5cfPm3+Lci7e0DHxuysD8OLK6PtUFcLoR539d4XpNqJRChIWjTHiXkyrrLRu3434LRXVGwY54+WT1auzqcAhQkzfA9L0cHKaDx+K8diiyrmDMoPb4qYkvaR6n6F91f3sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; arc=none smtp.client-ip=92.121.34.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id E96C41A167A;
-	Wed, 23 Jul 2025 12:37:10 +0200 (CEST)
-Received: from aprdc01srsp001v.ap-rdc01.nxp.com (aprdc01srsp001v.ap-rdc01.nxp.com [165.114.16.16])
-	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id AC5F11A167C;
-	Wed, 23 Jul 2025 12:37:10 +0200 (CEST)
-Received: from mega.am.freescale.net (mega.ap.freescale.net [10.192.208.232])
-	by aprdc01srsp001v.ap-rdc01.nxp.com (Postfix) with ESMTP id 8BEEC1800079;
-	Wed, 23 Jul 2025 18:37:08 +0800 (+08)
-From: Xiaoliang Yang <xiaoliang.yang_1@nxp.com>
-To: davem@davemloft.net,
-	netdev@vger.kernel.org,
+	s=arc-20240116; t=1753267703; c=relaxed/simple;
+	bh=TAHWis23G46fXp6LQc4qsXNReDqQ232ezrQAuXft++c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XVHY+FdaPZFpaR/ZDwIilGqrixnheKfEH652EKC2oPgV1+TXtQJ+udssgi8OhDjty9mprqZy9X28zoiG688lNnhA7/e77qrEAECDTdiCEO6uqBVIJkuD7NaUmaNfv0viIKDEySjSKNzR8mDZxBsffvbICC6gkh/j3/ljISg+Haw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1ueX13-0002Bo-H8; Wed, 23 Jul 2025 12:48:05 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1ueX11-009sDo-2v;
+	Wed, 23 Jul 2025 12:48:03 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1ueX11-0014eb-2b;
+	Wed, 23 Jul 2025 12:48:03 +0200
+Date: Wed, 23 Jul 2025 12:48:03 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Cc: kuba@kernel.org,
-	n.zhandarovich@fintech.ru,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	wojciech.drewek@intel.com,
-	Arvid.Brodin@xdin.com,
-	horms@kernel.org,
-	lukma@denx.de,
-	m-karicheri2@ti.com,
-	xiaoliang.yang_1@nxp.com,
-	vladimir.oltean@nxp.com
-Subject: [RFC PATCH net-next] net: hsr: create an API to get hsr port type
-Date: Wed, 23 Jul 2025 18:47:54 +0800
-Message-Id: <20250723104754.29926-1-xiaoliang.yang_1@nxp.com>
-X-Mailer: git-send-email 2.17.1
-X-Virus-Scanned: ClamAV using ClamSMTP
+Subject: Re: [PATCH net-next] net: phy: micrel: Add support for lan8842
+Message-ID: <aIC944gcYkfFsIRD@pengutronix.de>
+References: <20250721071405.1859491-1-horatiu.vultur@microchip.com>
+ <aIB0VYLqcBKVtAmU@pengutronix.de>
+ <20250723090145.o2kq4vxcjrih54rt@DEN-DL-M31836.microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250723090145.o2kq4vxcjrih54rt@DEN-DL-M31836.microchip.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-If a switch device has HSR hardware ability and HSR configuration
-offload to hardware. The device driver needs to get the HSR port type
-when joining the port to HSR. Different port types require different
-settings for the hardware, like HSR_PT_SLAVE_A, HSR_PT_SLAVE_B, and
-HSR_PT_INTERLINK. Create the API hsr_get_port_type() and export it.
+On Wed, Jul 23, 2025 at 11:01:45AM +0200, Horatiu Vultur wrote:
+> The 07/23/2025 07:34, Oleksij Rempel wrote:
+> > 
+> > Hi Horatiu,
+> 
+> Hi Olekij,
+> 
+> > 
+> > On Mon, Jul 21, 2025 at 09:14:05AM +0200, Horatiu Vultur wrote:
+> > 
+> > > +static int lan8842_config_init(struct phy_device *phydev)
+> > > +{
+> > > +     int val;
+> > > +     int ret;
+> > > +
+> > > +     /* Reset the PHY */
+> > > +     val = lanphy_read_page_reg(phydev, 4, LAN8814_QSGMII_SOFT_RESET);
+> > 
+> > It would be good to use defines for MMD pages.
+> 
+> Those are extended pages and not MMD pages. Currently in the entire
+> source code I can see we used hardcoded values, also in the register
+> description it looks like all these extended pages do not have really
+> meaningfull names: Extended Page 0, Extended Page 4, Extended Page 5...
 
-When the hsr_get_port_type() is called in the device driver, if the port
-can be found in the HSR port list, the HSR port type can be obtained.
-Therefore, before calling the device driver, we need to first add the
-hsr_port to the HSR port list.
+I'll be happy with xxxx_EXT_PAGE_0, etc 
 
-Signed-off-by: Xiaoliang Yang <xiaoliang.yang_1@nxp.com>
----
- include/linux/if_hsr.h |  8 ++++++++
- net/hsr/hsr_device.c   | 20 ++++++++++++++++++++
- net/hsr/hsr_slave.c    |  7 ++++---
- 3 files changed, 32 insertions(+), 3 deletions(-)
+> > > +     val = lanphy_read_page_reg(phydev, 0, LAN8842_FLF);
+> > > +     if (val < 0)
+> > > +             return val;
+> > > +     val |= LAN8842_FLF_ENA | LAN8842_FLF_ENA_LINK_DOWN;
+> > 
+> > If I see it correctly, FLF support will make link fail after ~1ms, while
+> > IEEE 802.3 recommends 750ms. Since a link recovery of a PHY with autoneg
+> > support usually takes multiple seconds, I see the benefit for FLF
+> > support only mostly for SyncE environment at same time it seems to be
+> > a disadvantage for other environments.
+> 
+> Why would be a disadvantage?
 
-diff --git a/include/linux/if_hsr.h b/include/linux/if_hsr.h
-index d7941fd88032..4d6452ca2ac8 100644
---- a/include/linux/if_hsr.h
-+++ b/include/linux/if_hsr.h
-@@ -43,6 +43,8 @@ extern bool is_hsr_master(struct net_device *dev);
- extern int hsr_get_version(struct net_device *dev, enum hsr_version *ver);
- struct net_device *hsr_get_port_ndev(struct net_device *ndev,
- 				     enum hsr_port_type pt);
-+extern int hsr_get_port_type(struct net_device *hsr_dev, struct net_device *dev,
-+			     enum hsr_port_type *type);
- #else
- static inline bool is_hsr_master(struct net_device *dev)
- {
-@@ -59,6 +61,12 @@ static inline struct net_device *hsr_get_port_ndev(struct net_device *ndev,
- {
- 	return ERR_PTR(-EINVAL);
- }
-+
-+static inline int hsr_get_port_type(struct net_device *hsr_dev, struct net_device *dev,
-+				    enum hsr_port_type *type)
-+{
-+	return -EINVAL;
-+}
- #endif /* CONFIG_HSR */
- 
- #endif /*_LINUX_IF_HSR_H_*/
-diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
-index 88657255fec1..d4bea847527c 100644
---- a/net/hsr/hsr_device.c
-+++ b/net/hsr/hsr_device.c
-@@ -679,6 +679,26 @@ struct net_device *hsr_get_port_ndev(struct net_device *ndev,
- }
- EXPORT_SYMBOL(hsr_get_port_ndev);
- 
-+/* Get hsr port type, return -EINVAL if not get.
-+ */
-+int hsr_get_port_type(struct net_device *hsr_dev, struct net_device *dev, enum hsr_port_type *type)
-+{
-+	struct hsr_priv *hsr;
-+	struct hsr_port *port;
-+
-+	hsr = netdev_priv(hsr_dev);
-+
-+	hsr_for_each_port(hsr, port) {
-+		if (port->dev == dev) {
-+			*type = port->type;
-+			return 0;
-+		}
-+	}
-+
-+	return -EINVAL;
-+}
-+EXPORT_SYMBOL(hsr_get_port_type);
-+
- /* Default multicast address for HSR Supervision frames */
- static const unsigned char def_multicast_addr[ETH_ALEN] __aligned(2) = {
- 	0x01, 0x15, 0x4e, 0x00, 0x01, 0x00
-diff --git a/net/hsr/hsr_slave.c b/net/hsr/hsr_slave.c
-index b87b6a6fe070..e11ab1ed3320 100644
---- a/net/hsr/hsr_slave.c
-+++ b/net/hsr/hsr_slave.c
-@@ -198,14 +198,14 @@ int hsr_add_port(struct hsr_priv *hsr, struct net_device *dev,
- 	port->type = type;
- 	ether_addr_copy(port->original_macaddress, dev->dev_addr);
- 
-+	list_add_tail_rcu(&port->port_list, &hsr->ports);
-+
- 	if (type != HSR_PT_MASTER) {
- 		res = hsr_portdev_setup(hsr, dev, port, extack);
- 		if (res)
- 			goto fail_dev_setup;
- 	}
- 
--	list_add_tail_rcu(&port->port_list, &hsr->ports);
--
- 	master = hsr_port_get_hsr(hsr, HSR_PT_MASTER);
- 	netdev_update_features(master->dev);
- 	dev_set_mtu(master->dev, hsr_get_max_mtu(hsr));
-@@ -213,7 +213,8 @@ int hsr_add_port(struct hsr_priv *hsr, struct net_device *dev,
- 	return 0;
- 
- fail_dev_setup:
--	kfree(port);
-+	list_del_rcu(&port->port_list);
-+	kfree_rcu(port, rcu);
- 	return res;
- }
- 
+The disadvantage in a standard network without a backup link (like one
+using RSTP) comes from how the system handles recoverable, temporary
+errors like a short burst of noise.
+
+# Standard PHY Behavior (Grace Period)
+When a standard 1000BASE-T link becomes unstable, the IEEE 802.3
+standard requires the PHY to attempt to retrain and recover the
+connection on its own. It has a timeout window of up to 750 ms to do
+this, which acts as a grace period.
+
+If the link issue was temporary and the PHY recovers within this window,
+the operating system never sees a "link down" event. Applications only
+experience a brief moment of packet loss, which is often handled
+gracefully by protocols like TCP.
+
+# FLF Behavior (Immediate Failure)
+An FLF-enabled PHY is designed to report link instability almost
+immediately (~1 ms). Instead of trying to recover silently, it
+immediately reports a hard link failure to the operating system.
+
+# The Disadvantage in a Single-Link System
+
+For a system with only one link, this "fail-fast" approach can be a
+disadvantage. Consider a short, recoverable noise burst:
+
+- Without FLF: The PHY uses its 750 ms grace period to recover. The
+link stays up, and the service interruption is limited to brief packet
+loss.
+
+- With FLF: The PHY reports "link down" after ~1 ms. The operating
+system tears down the network interface. Even if the hardware recovers
+quickly, the OS has to bring the interface back up, re-run DHCP, and
+re-establish all application connections. This system-level recovery
+often takes much longer than the original glitch.
+
+In short, FLF can turn a minor, recoverable physical-layer glitch into a
+more disruptive, longer-lasting outage at the application level when
+there is no backup link to switch to.
+
 -- 
-2.17.1
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
