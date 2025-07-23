@@ -1,129 +1,117 @@
-Return-Path: <netdev+bounces-209416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7365B0F8C1
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 19:14:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3259CB0F8C7
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 19:16:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D90AE1CC0284
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 17:15:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A2593A57F3
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 17:15:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EBAD20E717;
-	Wed, 23 Jul 2025 17:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0291919C54E;
+	Wed, 23 Jul 2025 17:16:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="FRSyI64/"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vlHLPvdm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F72210F59;
-	Wed, 23 Jul 2025 17:14:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A06B2E371B;
+	Wed, 23 Jul 2025 17:16:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753290895; cv=none; b=EQF8BIp3K8y65GV/4t54kZAHS+tehZtqHDa6vpmzA45sQtnrw+YNu8JOsDjVjlfPQATlOVmFjE1Jy2qaJ/28Hcv9KpkxS/mempiLUpHQTCkTyfYP3yo2nGuWpAARuJsH/75hnCRPhLFI8KzM5GNKEOX77NHmC2Th57iFrqcAxkQ=
+	t=1753290971; cv=none; b=TlajRNPn0Zde+WaL4/9arve3gzQuFFlLhYPSdSZvDQ4Jr1yvN7Oa7xKnfupjhkWU5PE7vFudcEISRpUxI8gaH9KuViMt4bBtXUtjoETZhH3jjsRnKkqcKkPVTHI4ocWuDdExWLyBURBb3I/HgT+zo3OYnSb7gzkUV2vW92nMs5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753290895; c=relaxed/simple;
-	bh=376GIzdk3UK3ULXlhu8XycOTMZW+JFFzHA6EjVpQvw8=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PsEGI1YTgTQ0sVc9iPQI2lV3r92BixVm1hL4ryAP225ncfIo25eq/U/iCbi/sE0az9SRBUCEQS3sAkkyYUyPuHyFt3Fo3goYSp6ODJuuQR53H/AAi2mMaasi496XVQrJzYDuhmtt6uUBKvfDe5Bjzym/bDEbt+ByN1/Ylrm32l8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=FRSyI64/; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56NFBbL3024070;
-	Wed, 23 Jul 2025 10:14:42 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=Gl1TWmaJUfAG+7Fw2CmtDcyTN
-	4evgDZ3kNkyr2icgUg=; b=FRSyI64/ROiMobw+Y553Of0ur/Ybcv7khMgmXKRI7
-	alfFUBFrW5ELE574BaDZaUVFYMsSc/8HXtSjVdIVVS9aD39cPpb16MVBfG4PVoDj
-	qG1+cNekc2wQoMs4EnnUQprRlkjct5ZHtu/3H9D7HKc2Zf3gsgutE8djMh70J4JH
-	ub2TDwwTYIJXs5y6IKQlgtp2MA6gv9ZbqNhAwRIrhh/H9gUZeoKkgyYQcZwOMUmH
-	sRnmBFRqKVz5VJRWbieypjr/BHFZhvo8QDIJVeq7DrF4scMpT/Urg6vB3RpTC+Ae
-	9dsFS81DKX8CDs+N9Lv/UhV0drQb9VNExa+awef7pdMPg==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 482vpwh31b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 23 Jul 2025 10:14:42 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Wed, 23 Jul 2025 10:14:41 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Wed, 23 Jul 2025 10:14:41 -0700
-Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
-	by maili.marvell.com (Postfix) with SMTP id 93ED23F70A1;
-	Wed, 23 Jul 2025 10:14:36 -0700 (PDT)
-Date: Wed, 23 Jul 2025 22:44:35 +0530
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Sunil Goutham
-	<sgoutham@marvell.com>,
-        Geetha sowjanya <gakula@marvell.com>,
-        "Subbaraya
- Sundeep" <sbhatta@marvell.com>,
-        Bharat Bhushan <bbhushan2@marvell.com>,
-        "Andrew Lunn" <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        "Eric Dumazet" <edumazet@google.com>,
-        Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Tomasz Duszynski
-	<tduszynski@marvell.com>,
-        Simon Horman <horms@kernel.org>
-Subject: Re: [net PatchV3] Octeontx2-vf: Fix max packet length errors
-Message-ID: <aIEYe/lXNAsvv24l@test-OptiPlex-Tower-Plus-7010>
-References: <20250721085815.1720485-1-hkelam@marvell.com>
- <316e5fb7-7f45-4564-9354-e50305f6f3fd@lunn.ch>
+	s=arc-20240116; t=1753290971; c=relaxed/simple;
+	bh=iVTDmofGQTAzngV/8kkO8hEyfpfo8lk01PQhA0Hog3E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UQc48qCEe7xqtc1IBe3l/VzUcyzAhI1X687aEqyv1hIDfX9AuVvaugOP6AgRk68I2IqOUtv5Czh8qrKXyxxeZCu0Ckbc0efB+5k+U2qcRYk26TfgHXDyKM4rC1b2SFxmwQPud0QDgvs6RlzlAYvJEm3+1aIUEhtpUFJhpjqFdlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vlHLPvdm; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=TUmK6VJp0+E0SJQueeIqF9DxsO4dtccjN/iCA5xVXSQ=; b=vlHLPvdmdD+XmzDdgEpCoJ37fR
+	4kA3gtamKP6pl7RUUKO7ce0QIfkO69/BZ/B8cVEnuum/5vFgJ/9z9LEreyN4BY0egcqVBEUlz4hoG
+	+oAv6TzUYbem5YxCixTJvUMOQfg1CBZLX7BcrP6MF8x+QqEcf+CfpK10/m6eDUp5axqo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ued4T-002fhc-Qy; Wed, 23 Jul 2025 19:16:01 +0200
+Date: Wed, 23 Jul 2025 19:16:01 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tristram.Ha@microchip.com
+Cc: Woojung Huh <woojung.huh@microchip.com>,
+	Vladimir Oltean <olteanv@gmail.com>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Simon Horman <horms@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Marek Vasut <marex@denx.de>, UNGLinuxDriver@microchip.com,
+	devicetree@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 2/6] net: dsa: microchip: Add KSZ8463 switch
+ support to KSZ DSA driver
+Message-ID: <857db988-fd4d-4cac-9774-43161f1f592a@lunn.ch>
+References: <20250723022612.38535-1-Tristram.Ha@microchip.com>
+ <20250723022612.38535-3-Tristram.Ha@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <316e5fb7-7f45-4564-9354-e50305f6f3fd@lunn.ch>
-X-Proofpoint-GUID: MM7CKpi23qhCnyf_IyNa9LI0yrfgSPEL
-X-Authority-Analysis: v=2.4 cv=DstW+H/+ c=1 sm=1 tr=0 ts=68811882 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=kj9zAlcOel0A:10 a=Wb1JkmetP80A:10 a=RiCNH3QyFshw-4LhWYEA:9 a=CjuIK1q_8ugA:10 a=quENcT-jsP8hFS3YNsuE:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzIzMDE0OSBTYWx0ZWRfX/OyVmweVQczU oSEHC2jYm4u8UkbV2rUobiwZsEGmQJ/ZOgGf5w1kI0s8BybEFqytH7kJJyFRkoxDx/muZr05Bqv D7j+kmTwPa74rnksfmVRvVSmewLCe4dpiSauyKasw2M3wgQ5IMbVVBXGGLGmUCTAq89NBvcDRTr
- OE6TpV8Bs7Nmzm9SsFqutA6NIwsS+0JW39gOr9vQNQPJtqyVRkxX+ieRQZgRl42xyObthrOX7id u/3RnnM7kQQghmsVpwgcrzjUZMgwh6HCNHITOntgehDywxMSsa+tijy3uyvhhSwLpUvbLYRtVal +qIqXPfZ5r0euWAm+l+pINvc5X/2mfTEOpR7F71INE28FymQtvM4HwsHOYKQQNe5vRIx7chV/rS
- lVmFsJgMUl21RJtWDAcjelP/p1KgRs4s/9kA0QOXffITrnS2FKYgZkCw7DL5VX5WKNYAkPfZ
-X-Proofpoint-ORIG-GUID: MM7CKpi23qhCnyf_IyNa9LI0yrfgSPEL
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-23_03,2025-07-23_01,2025-03-28_01
+In-Reply-To: <20250723022612.38535-3-Tristram.Ha@microchip.com>
 
-On 2025-07-21 at 19:28:05, Andrew Lunn (andrew@lunn.ch) wrote:
-> On Mon, Jul 21, 2025 at 02:28:15PM +0530, Hariprasad Kelam wrote:
-> > Implement packet length validation before submitting packets to
-> > the hardware to prevent MAXLEN_ERR. Increment tx_dropped counter
-> > on failure.
-> 
-> Sorry, i did not look at previous versions of this patch, so i might
-> be asking a question some other Reviewer already asked.
-> 
-> How expensive is MAXLEN_ERR? What do you need to do when it happens?
->
-  On error case, hardware raises the queue interrupts about max lenth errors 
-  goes to hang state. Driver needs to execute reset to come out of the state.
+> KSZ8463 switch is a 3-port switch based from KSZ8863.  Its major
+> difference from other KSZ SPI switches is its register access is not a
+> simple continual 8-bit transfer with automatic address increase but uses
+> a byte-enable mechanism specifying 8-bit, 16-bit, or 32-bit access.  Its
+> registers are also defined in 16-bit format because it shares a design
+> with a MAC controller using 16-bit access.  As a result some common
+> register accesses need to be re-arranged.  The 64-bit access used by
+> other switches needs to be broken into 2 32-bit accesses.
 
- 
-> I would _guess_ that if ndev->mtu is set correctly, and any change to
-> it validated, you are going to get very few packets which are too big.
-> 
-> Is it better to introduce this test on the hot path which effects
-> every single packet, or just deal with MAXLEN_ERR if it ever actually
-> happens, so leaving the hot path optimised for the common case?
-> 
-> Maybe you could include something about this in the commit message?
->
- ACK will update the commit description. 
-> 	Andrew
-> 
+> +	if (ksz_is_ksz8463(dev)) {
+> +		int i;
+> +
+> +		for (i = 0; i < 2; i++)
+> +			ret = regmap_read(ksz_regmap_32(dev), reg + i * 4,
+> +					  &value[i]);
+> +		*val = (u64)value[0] << 32 | value[1];
+> +		return ret;
+> +	}
+>  	ret = regmap_bulk_read(ksz_regmap_32(dev), reg, value, 2);
+
+This needs a bit more explanation. When i look at
+
+https://elixir.bootlin.com/linux/v6.15.7/source/drivers/base/regmap/regmap.c#L3117
+
+It appears to do something similar, looping over count doing
+_regmap_read().
+
+There is also:
+
+https://elixir.bootlin.com/linux/v6.15.7/source/include/linux/regmap.h#L370
+
+ * @use_single_read: If set, converts the bulk read operation into a series of
+ *                   single read operations. This is useful for a device that
+ *                   does not support  bulk read.
+ * @use_single_write: If set, converts the bulk write operation into a series of
+ *                    single write operations. This is useful for a device that
+ *                    does not support bulk write.
+
+It would be better if regmap_bulk_read() could be made to work, and
+hide away the differences, which is what regmap is all about.
+
+	Andrew
 
