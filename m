@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-209239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB4F4B0EC93
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 872A0B0EC92
 	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:01:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84D207A49E3
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 07:59:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 154973AAD78
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 08:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9701B27932B;
-	Wed, 23 Jul 2025 08:00:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFB232798FF;
+	Wed, 23 Jul 2025 08:00:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="Kiz27qWS"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="VI2lVMau"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E7A727702B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8212278E6A
 	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 08:00:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753257645; cv=none; b=j3FdvvlhtAvIFa7FcIcJtAS5jRuuFzFUt1zZtOkr1KEy16pIrMAzNDY19HiH2P5DIXZRlloRBJktoGyuPe+h+z0Zk3leKf0NvQUDrgly2Fn7kUbOlxOD9bpXDTRANGPznFl++shNEH+GyPvVmyuYYaldbFthNKor9Nmjc4OOAQg=
+	t=1753257646; cv=none; b=FTHd2sPEsFugT73OFQpXBkD3B7Hcgp3Ih9Y9NLWJ39CrA8AU7QMQHstxKPUSew7sCydgHa7hnMdlQ7+m6clWcdB+22MxFQUyjaaUkuhBSClJteccHcCfmhP67AURuA/+7z4oBu/s2ze/nAhU2zWCr1l7vhz7utv8UpfzEW6PjdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753257645; c=relaxed/simple;
-	bh=SsM0Tmc5D3YyHScnpTcxwIKzuA/LkgwYvJ3XmOUbD00=;
+	s=arc-20240116; t=1753257646; c=relaxed/simple;
+	bh=cuk5/DR0diivOqm+dcyCNXdTAwQON0dxc3vcPudM2/M=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CdazCzMAi/+bSs99/9ZsNgoo4zgh2QPPGb4/WaRXDuQbpEHJgH/CbvFFmjuQb83cjVF29e60JXUTNnhxs1MJazmMH5m64GcxmVKIedcbn5Ojq8pcrR47D2QokiEWwTXAZH0KxKc7BX1vn0iiVYItUmDek8TGLCcpApKoCkhDYYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=Kiz27qWS; arc=none smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=ZYbi4uqnf5UoMzsLNqOGrMxN1wvA4gpoTUg+dqocR22slJyBGSIqb/iPQMAWzNpsxmodghi3QvD4hnoxtd0R/VNRl7yMsM5AcgClLUIkkF/+ULMFIMK4JF/Qg7ou5+DdTvyAILvFb/5WRt+fmQWGZPDVi2Gf2vJjaEwZxb9cUls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=VI2lVMau; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 299542088A;
-	Wed, 23 Jul 2025 09:54:22 +0200 (CEST)
+	by mx1.secunet.com (Postfix) with ESMTP id 36C3420891;
+	Wed, 23 Jul 2025 09:54:21 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from mx1.secunet.com ([127.0.0.1])
  by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VXvsNQr2gWUg; Wed, 23 Jul 2025 09:54:21 +0200 (CEST)
+ with ESMTP id vBiIYheNKo09; Wed, 23 Jul 2025 09:54:20 +0200 (CEST)
 Received: from EXCH-01.secunet.de (unknown [10.32.0.231])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id AFFDF20892;
+	by mx1.secunet.com (Postfix) with ESMTPS id 4727B201A1;
 	Wed, 23 Jul 2025 09:54:20 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com AFFDF20892
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 4727B201A1
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
 	s=202301; t=1753257260;
-	bh=tpmchTW64S8TMwG019sobKSCAtLKi303KwyrjUdV5aM=;
+	bh=kEB9ZtWF3MsS7SU8p0+6NrTgwhEXWOQGx2EvSh1aTBk=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=Kiz27qWSeyo4SeuVatIuYcNmanc5VeUry9iMdetexPQl78KQVPrDk/pzut4TDVfD0
-	 aEpdGAq5j8Aq5uE6M/mN1v2M2R2vVuXvz6LLnplFPXrrqgEw5dwEcu6B7o9eUpJfFI
-	 5u9Dx6kNAcR2SNPSbc/aJoevFEcslp4zpD852Dr0Za59U6kWmxCZ1GHZqQgebfq20A
-	 jrP3AMoYDfnI66IuGQQ0n+sYDV3+m/Hg+2vHOAt0Kx78S6sgVZjTwy96k7ICpbVY/n
-	 t0UtVAXfOxnK7UqfL8ZyFWZTh/WfBGOP8CaJl9gU48SJU2zC3S2E98kYc/Sr5ezEO9
-	 vcEu4yzTFyBng==
+	b=VI2lVMaukiR9L9hi3Ca1YljgSLxIS8kdY/vxJsEaHYzOePe0NChvl6XqS87tMPCeb
+	 qmsrCwqYcYVoOSUK2iz2/zC0DWXiaQRg9TkR8Hm+ri1356S6E7Tf3CtrCio3DxoKZq
+	 VW+S/8B7EloYx6kZXSL+kDZ+/EgnZ99/TU3ZdPXZSrnFInVO/5T2zKa4wKrwVt0C6N
+	 i2zz2jxMZ5yXuynes4T146N7gGfCtsxi9JNs88tvg31pDWb5cSZgZmNeRyQ/ATRW5V
+	 T5+naJKDoCCW6hbbDW9aphbXvW29N2vToagDSesz1a9SEtLVLjLR1lcFC6ZzCcPALG
+	 dH17+gfrSkGag==
 Received: from gauss2.secunet.de (10.182.7.193) by EXCH-01.secunet.de
  (10.32.0.171) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.10; Wed, 23 Jul
- 2025 09:54:19 +0200
+ 2025 09:54:20 +0200
 Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 9B860318410C; Wed, 23 Jul 2025 09:54:19 +0200 (CEST)
+	id 9E3423184127; Wed, 23 Jul 2025 09:54:19 +0200 (CEST)
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 2/8] xfrm: state: use a consistent pcpu_id in xfrm_state_find
-Date: Wed, 23 Jul 2025 09:53:54 +0200
-Message-ID: <20250723075417.3432644-3-steffen.klassert@secunet.com>
+Subject: [PATCH 3/8] xfrm: always initialize offload path
+Date: Wed, 23 Jul 2025 09:53:55 +0200
+Message-ID: <20250723075417.3432644-4-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250723075417.3432644-1-steffen.klassert@secunet.com>
 References: <20250723075417.3432644-1-steffen.klassert@secunet.com>
@@ -81,108 +81,94 @@ Content-Type: text/plain
 X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
  EXCH-01.secunet.de (10.32.0.171)
 
-From: Sabrina Dubroca <sd@queasysnail.net>
+From: Leon Romanovsky <leonro@nvidia.com>
 
-If we get preempted during xfrm_state_find, we could run
-xfrm_state_look_at using a different pcpu_id than the one
-xfrm_state_find saw. This could lead to ignoring states that should
-have matched, and triggering acquires on a CPU that already has a pcpu
-state.
+Offload path is used for GRO with SW IPsec, and not just for HW
+offload. So initialize it anyway.
 
-    xfrm_state_find starts on CPU1
-    pcpu_id = 1
-    lookup starts
-    <preemption, we're now on CPU2>
-    xfrm_state_look_at pcpu_id = 2
-       finds a state
-found:
-    best->pcpu_num != pcpu_id (2 != 1)
-    if (!x && !error && !acquire_in_progress) {
-        ...
-        xfrm_state_alloc
-        xfrm_init_tempstate
-        ...
-
-This can be avoided by passing the original pcpu_id down to all
-xfrm_state_look_at() calls.
-
-Also switch to raw_smp_processor_id, disabling preempting just to
-re-enable it immediately doesn't really make sense.
-
-Fixes: 1ddf9916ac09 ("xfrm: Add support for per cpu xfrm state handling.")
-Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
-Reviewed-by: Florian Westphal <fw@strlen.de>
+Fixes: 585b64f5a620 ("xfrm: delay initialization of offload path till its actually requested")
+Reported-by: Sabrina Dubroca <sd@queasysnail.net>
+Closes: https://lore.kernel.org/all/aEGW_5HfPqU1rFjl@krikkit
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- net/xfrm/xfrm_state.c | 19 ++++++-------------
- 1 file changed, 6 insertions(+), 13 deletions(-)
+ include/net/xfrm.h     | 2 +-
+ net/xfrm/xfrm_device.c | 1 -
+ net/xfrm/xfrm_state.c  | 6 ++----
+ net/xfrm/xfrm_user.c   | 1 +
+ 4 files changed, 4 insertions(+), 6 deletions(-)
 
+diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+index a21e276dbe44..e45a275fca26 100644
+--- a/include/net/xfrm.h
++++ b/include/net/xfrm.h
+@@ -474,7 +474,7 @@ struct xfrm_type_offload {
+ 
+ int xfrm_register_type_offload(const struct xfrm_type_offload *type, unsigned short family);
+ void xfrm_unregister_type_offload(const struct xfrm_type_offload *type, unsigned short family);
+-void xfrm_set_type_offload(struct xfrm_state *x);
++void xfrm_set_type_offload(struct xfrm_state *x, bool try_load);
+ static inline void xfrm_unset_type_offload(struct xfrm_state *x)
+ {
+ 	if (!x->type_offload)
+diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
+index 81fd486b5e56..d2819baea414 100644
+--- a/net/xfrm/xfrm_device.c
++++ b/net/xfrm/xfrm_device.c
+@@ -305,7 +305,6 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
+ 		return -EINVAL;
+ 	}
+ 
+-	xfrm_set_type_offload(x);
+ 	if (!x->type_offload) {
+ 		NL_SET_ERR_MSG(extack, "Type doesn't support offload");
+ 		dev_put(dev);
 diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 2e2e95d2a06f..7e34fc94f668 100644
+index 7e34fc94f668..c7e6472c623d 100644
 --- a/net/xfrm/xfrm_state.c
 +++ b/net/xfrm/xfrm_state.c
-@@ -1307,14 +1307,8 @@ static void xfrm_hash_grow_check(struct net *net, int have_hash_collision)
- static void xfrm_state_look_at(struct xfrm_policy *pol, struct xfrm_state *x,
- 			       const struct flowi *fl, unsigned short family,
- 			       struct xfrm_state **best, int *acq_in_progress,
--			       int *error)
-+			       int *error, unsigned int pcpu_id)
+@@ -424,11 +424,10 @@ void xfrm_unregister_type_offload(const struct xfrm_type_offload *type,
+ }
+ EXPORT_SYMBOL(xfrm_unregister_type_offload);
+ 
+-void xfrm_set_type_offload(struct xfrm_state *x)
++void xfrm_set_type_offload(struct xfrm_state *x, bool try_load)
  {
--	/* We need the cpu id just as a lookup key,
--	 * we don't require it to be stable.
--	 */
--	unsigned int pcpu_id = get_cpu();
--	put_cpu();
+ 	const struct xfrm_type_offload *type = NULL;
+ 	struct xfrm_state_afinfo *afinfo;
+-	bool try_load = true;
+ 
+ retry:
+ 	afinfo = xfrm_state_get_afinfo(x->props.family);
+@@ -607,6 +606,7 @@ static void ___xfrm_state_destroy(struct xfrm_state *x)
+ 	kfree(x->coaddr);
+ 	kfree(x->replay_esn);
+ 	kfree(x->preplay_esn);
++	xfrm_unset_type_offload(x);
+ 	if (x->type) {
+ 		x->type->destructor(x);
+ 		xfrm_put_type(x->type);
+@@ -780,8 +780,6 @@ void xfrm_dev_state_free(struct xfrm_state *x)
+ 	struct xfrm_dev_offload *xso = &x->xso;
+ 	struct net_device *dev = READ_ONCE(xso->dev);
+ 
+-	xfrm_unset_type_offload(x);
 -
- 	/* Resolution logic:
- 	 * 1. There is a valid state with matching selector. Done.
- 	 * 2. Valid state with inappropriate selector. Skip.
-@@ -1381,8 +1375,7 @@ xfrm_state_find(const xfrm_address_t *daddr, const xfrm_address_t *saddr,
- 	/* We need the cpu id just as a lookup key,
- 	 * we don't require it to be stable.
- 	 */
--	pcpu_id = get_cpu();
--	put_cpu();
-+	pcpu_id = raw_smp_processor_id();
+ 	if (dev && dev->xfrmdev_ops) {
+ 		spin_lock_bh(&xfrm_state_dev_gc_lock);
+ 		if (!hlist_unhashed(&x->dev_gclist))
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index 59f258daf830..1db18f470f42 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -977,6 +977,7 @@ static struct xfrm_state *xfrm_state_construct(struct net *net,
+ 	/* override default values from above */
+ 	xfrm_update_ae_params(x, attrs, 0);
  
- 	to_put = NULL;
- 
-@@ -1402,7 +1395,7 @@ xfrm_state_find(const xfrm_address_t *daddr, const xfrm_address_t *saddr,
- 		    tmpl->id.proto == x->id.proto &&
- 		    (tmpl->id.spi == x->id.spi || !tmpl->id.spi))
- 			xfrm_state_look_at(pol, x, fl, encap_family,
--					   &best, &acquire_in_progress, &error);
-+					   &best, &acquire_in_progress, &error, pcpu_id);
- 	}
- 
- 	if (best)
-@@ -1419,7 +1412,7 @@ xfrm_state_find(const xfrm_address_t *daddr, const xfrm_address_t *saddr,
- 		    tmpl->id.proto == x->id.proto &&
- 		    (tmpl->id.spi == x->id.spi || !tmpl->id.spi))
- 			xfrm_state_look_at(pol, x, fl, family,
--					   &best, &acquire_in_progress, &error);
-+					   &best, &acquire_in_progress, &error, pcpu_id);
- 	}
- 
- cached:
-@@ -1460,7 +1453,7 @@ xfrm_state_find(const xfrm_address_t *daddr, const xfrm_address_t *saddr,
- 		    tmpl->id.proto == x->id.proto &&
- 		    (tmpl->id.spi == x->id.spi || !tmpl->id.spi))
- 			xfrm_state_look_at(pol, x, fl, family,
--					   &best, &acquire_in_progress, &error);
-+					   &best, &acquire_in_progress, &error, pcpu_id);
- 	}
- 	if (best || acquire_in_progress)
- 		goto found;
-@@ -1495,7 +1488,7 @@ xfrm_state_find(const xfrm_address_t *daddr, const xfrm_address_t *saddr,
- 		    tmpl->id.proto == x->id.proto &&
- 		    (tmpl->id.spi == x->id.spi || !tmpl->id.spi))
- 			xfrm_state_look_at(pol, x, fl, family,
--					   &best, &acquire_in_progress, &error);
-+					   &best, &acquire_in_progress, &error, pcpu_id);
- 	}
- 
- found:
++	xfrm_set_type_offload(x, attrs[XFRMA_OFFLOAD_DEV]);
+ 	/* configure the hardware if offload is requested */
+ 	if (attrs[XFRMA_OFFLOAD_DEV]) {
+ 		err = xfrm_dev_state_add(net, x,
 -- 
 2.43.0
 
