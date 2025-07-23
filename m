@@ -1,161 +1,158 @@
-Return-Path: <netdev+bounces-209319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB483B0F05F
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 12:50:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C9BAB0F063
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 12:51:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E10751706B8
-	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:50:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52D1C17E622
+	for <lists+netdev@lfdr.de>; Wed, 23 Jul 2025 10:51:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 035F527FB2E;
-	Wed, 23 Jul 2025 10:48:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C7C929A300;
+	Wed, 23 Jul 2025 10:50:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="beB2H1SN"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AB87277815
-	for <netdev@vger.kernel.org>; Wed, 23 Jul 2025 10:48:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63748279327;
+	Wed, 23 Jul 2025 10:50:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753267703; cv=none; b=dNFGkDlN1ahHFkCYhUO2O41es3Tha+d9QFTYbS3XoEqcqXyXcBBBxNYEME3bsn971EkwFID8MJ7meYo8h1Rg9kDNEhL9Hh5yqMXRatCE+hGprLiLSAvA08DmMmv3r/2dAUjLMAaP9Yv8YG5YKZUIh2ktT8LHK29hVR7W/di9Nvo=
+	t=1753267837; cv=none; b=iatd3knwYO6n5R8iymnKas6A1fr+ZZZHk+eBYr/Ci7yU143zGpvAXIp6zolT3+eHfp3/vDgzWBEyJfhAPA68TP2GNg1LWRfiJ2AqJnIJAqQ94/iWmRN7QPb+P40Pu0dkqdrtAXp+4r+3bByDJxWLoT1Hr3yz1G6S/DGLvb5VGcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753267703; c=relaxed/simple;
-	bh=TAHWis23G46fXp6LQc4qsXNReDqQ232ezrQAuXft++c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XVHY+FdaPZFpaR/ZDwIilGqrixnheKfEH652EKC2oPgV1+TXtQJ+udssgi8OhDjty9mprqZy9X28zoiG688lNnhA7/e77qrEAECDTdiCEO6uqBVIJkuD7NaUmaNfv0viIKDEySjSKNzR8mDZxBsffvbICC6gkh/j3/ljISg+Haw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ueX13-0002Bo-H8; Wed, 23 Jul 2025 12:48:05 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ueX11-009sDo-2v;
-	Wed, 23 Jul 2025 12:48:03 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ueX11-0014eb-2b;
-	Wed, 23 Jul 2025 12:48:03 +0200
-Date: Wed, 23 Jul 2025 12:48:03 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Horatiu Vultur <horatiu.vultur@microchip.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy: micrel: Add support for lan8842
-Message-ID: <aIC944gcYkfFsIRD@pengutronix.de>
-References: <20250721071405.1859491-1-horatiu.vultur@microchip.com>
- <aIB0VYLqcBKVtAmU@pengutronix.de>
- <20250723090145.o2kq4vxcjrih54rt@DEN-DL-M31836.microchip.com>
+	s=arc-20240116; t=1753267837; c=relaxed/simple;
+	bh=+7U/XbRB5FPTa99oy/KCh6Z6mrxWRz6MpFm/ujghB0o=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=o29za3lhMxVPESTbzzosIf3Py6Ayplk6xyqhZF2D0Zi/pEHeUeJTjI7tpcWiIkDX5v8+F6kyhTkXbsU1rMbCaP5YQSEymO7K0LP6OlExOy//FW7xzEUN+yGnT1bZTmNr9E9LYL/Mzpw7L9BP+XVXI1Fj7fMBtjgzJarLgFezqjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=beB2H1SN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D89A9C4CEF5;
+	Wed, 23 Jul 2025 10:50:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753267835;
+	bh=+7U/XbRB5FPTa99oy/KCh6Z6mrxWRz6MpFm/ujghB0o=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=beB2H1SNmOswraWKSFQFSqG3iC61n05JQXqJUx6h4P+3ZX2f6imU0iiO7nQIWEOh0
+	 4ztEEvEF0NHBjhEDgijPiNEoU9sPUdaHaMUcJ+3iN7GpXp3Pd5Ce4AjiJGGT7fESyq
+	 zRi73t5j4ai7Y6l0fMVsT56UMctrqkqO2jMVH5OYGLkkTWtjs9A85T9F80gRlntSs7
+	 09ULcA9r3c3B/I6cbRQyh1nuWX3pfrrzvQ1Wl6Rew2v7b+IJ+CAIZKZwiYQ+3Iuk5m
+	 /k59eEKr3S2dJBq11DAZ+zfc4biVckpXR+V7x7eTWCAJz72fCPSdZ1oI9El3kTkK+0
+	 61HejS9Jl9kUQ==
+Message-ID: <bf0c416f-5384-4c22-99de-bfef9ba3da03@kernel.org>
+Date: Wed, 23 Jul 2025 11:50:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250723090145.o2kq4vxcjrih54rt@DEN-DL-M31836.microchip.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v3 1/3] bpftool: Add bpf_token show
+From: Quentin Monnet <qmo@kernel.org>
+To: Tao Chen <chen.dylane@linux.dev>, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
+ kuba@kernel.org, hawk@kernel.org
+Cc: linux-kernel@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20250723033107.1411154-1-chen.dylane@linux.dev>
+ <1dd1a433-ecdf-437d-bc71-6d1b65b74cc8@kernel.org>
+Content-Language: en-GB
+In-Reply-To: <1dd1a433-ecdf-437d-bc71-6d1b65b74cc8@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 23, 2025 at 11:01:45AM +0200, Horatiu Vultur wrote:
-> The 07/23/2025 07:34, Oleksij Rempel wrote:
-> > 
-> > Hi Horatiu,
+2025-07-23 11:40 UTC+0100 ~ Quentin Monnet <qmo@kernel.org>
+> 2025-07-23 11:31 UTC+0800 ~ Tao Chen <chen.dylane@linux.dev>
+>> Add `bpftool token show` command to get token info
+>> from bpffs in /proc/mounts.
+>>
+>> Example plain output for `token show`:
+>> token_info  /sys/fs/bpf/token
+>> 	allowed_cmds:
+>> 	  map_create          prog_load
+>> 	allowed_maps:
+>> 	allowed_progs:
+>> 	  kprobe
+>> 	allowed_attachs:
+>> 	  xdp
+>> token_info  /sys/fs/bpf/token2
+>> 	allowed_cmds:
+>> 	  map_create          prog_load
+>> 	allowed_maps:
+>> 	allowed_progs:
+>> 	  kprobe
+>> 	allowed_attachs:
+>> 	  xdp
+>>
+>> Example json output for `token show`:
+>> [{
+>> 	"token_info": "/sys/fs/bpf/token",
+>> 	"allowed_cmds": ["map_create", "prog_load"],
+>> 	"allowed_maps": [],
+>> 	"allowed_progs": ["kprobe"],
+>> 	"allowed_attachs": ["xdp"]
+>> }, {
+>> 	"token_info": "/sys/fs/bpf/token2",
+>> 	"allowed_cmds": ["map_create", "prog_load"],
+>> 	"allowed_maps": [],
+>> 	"allowed_progs": ["kprobe"],
+>> 	"allowed_attachs": ["xdp"]
+>> }]
+>>
+>> Signed-off-by: Tao Chen <chen.dylane@linux.dev>
+>> ---
 > 
-> Hi Olekij,
+> [...]
 > 
-> > 
-> > On Mon, Jul 21, 2025 at 09:14:05AM +0200, Horatiu Vultur wrote:
-> > 
-> > > +static int lan8842_config_init(struct phy_device *phydev)
-> > > +{
-> > > +     int val;
-> > > +     int ret;
-> > > +
-> > > +     /* Reset the PHY */
-> > > +     val = lanphy_read_page_reg(phydev, 4, LAN8814_QSGMII_SOFT_RESET);
-> > 
-> > It would be good to use defines for MMD pages.
+>> diff --git a/tools/bpf/bpftool/token.c b/tools/bpf/bpftool/token.c
+>> new file mode 100644
+>> index 00000000000..06b56ea40b8
+>> --- /dev/null
+>> +++ b/tools/bpf/bpftool/token.c
 > 
-> Those are extended pages and not MMD pages. Currently in the entire
-> source code I can see we used hardcoded values, also in the register
-> description it looks like all these extended pages do not have really
-> meaningfull names: Extended Page 0, Extended Page 4, Extended Page 5...
-
-I'll be happy with xxxx_EXT_PAGE_0, etc 
-
-> > > +     val = lanphy_read_page_reg(phydev, 0, LAN8842_FLF);
-> > > +     if (val < 0)
-> > > +             return val;
-> > > +     val |= LAN8842_FLF_ENA | LAN8842_FLF_ENA_LINK_DOWN;
-> > 
-> > If I see it correctly, FLF support will make link fail after ~1ms, while
-> > IEEE 802.3 recommends 750ms. Since a link recovery of a PHY with autoneg
-> > support usually takes multiple seconds, I see the benefit for FLF
-> > support only mostly for SyncE environment at same time it seems to be
-> > a disadvantage for other environments.
+> [...]
 > 
-> Why would be a disadvantage?
+>> +static int do_help(int argc, char **argv)
+>> +{
+>> +	if (json_output) {
+>> +		jsonw_null(json_wtr);
+>> +		return 0;
+>> +	}
+>> +
+>> +	fprintf(stderr,
+>> +		"Usage: %1$s %2$s { show | list }\n"
+>> +		"	%1$s %2$s help\n"
+> 
+> 
+> One more nit: applying and testing the help message locally, I noticed
+> that the alignement is not correct:
+> 
+>     $ ./bpftool token help
+>     Usage: bpftool token { show | list }
+>             bpftool token help
+> 
+> The two "bpftool" should be aligned. This is because you use a tab for
+> indent on the "help" line. Can you please replace it with spaces to fix
+> indentation, and remain consistent with what other files do?
+> 
+> After that change, you can add:
+> 
+>     Reviewed-by: Quentin Monnet <qmo@kernel.org>
+> 
 
-The disadvantage in a standard network without a backup link (like one
-using RSTP) comes from how the system handles recoverable, temporary
-errors like a short burst of noise.
 
-# Standard PHY Behavior (Grace Period)
-When a standard 1000BASE-T link becomes unstable, the IEEE 802.3
-standard requires the PHY to attempt to retrain and recover the
-connection on its own. It has a timeout window of up to 750 ms to do
-this, which acts as a grace period.
+Please also take a look at the "CHECK" reports from checkpatch, some of
+them are worth addressing:
 
-If the link issue was temporary and the PHY recovers within this window,
-the operating system never sees a "link down" event. Applications only
-experience a brief moment of packet loss, which is often handled
-gracefully by protocols like TCP.
+https://netdev.bots.linux.dev/static/nipa/984952/14165722/checkpatch/stdout
 
-# FLF Behavior (Immediate Failure)
-An FLF-enabled PHY is designed to report link instability almost
-immediately (~1 ms). Instead of trying to recover silently, it
-immediately reports a hard link failure to the operating system.
+(accessed via
+https://patchwork.kernel.org/project/netdevbpf/patch/20250723033107.1411154-1-chen.dylane@linux.dev/)
 
-# The Disadvantage in a Single-Link System
-
-For a system with only one link, this "fail-fast" approach can be a
-disadvantage. Consider a short, recoverable noise burst:
-
-- Without FLF: The PHY uses its 750 ms grace period to recover. The
-link stays up, and the service interruption is limited to brief packet
-loss.
-
-- With FLF: The PHY reports "link down" after ~1 ms. The operating
-system tears down the network interface. Even if the hardware recovers
-quickly, the OS has to bring the interface back up, re-run DHCP, and
-re-establish all application connections. This system-level recovery
-often takes much longer than the original glitch.
-
-In short, FLF can turn a minor, recoverable physical-layer glitch into a
-more disruptive, longer-lasting outage at the application level when
-there is no backup link to switch to.
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Thanks,
+Quentin
 
