@@ -1,209 +1,240 @@
-Return-Path: <netdev+bounces-209710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CE45B10805
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 12:46:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4ECA0B10809
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 12:47:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8539CAE3FA2
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 10:46:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71BC25A2760
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 10:47:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6A2826A1A4;
-	Thu, 24 Jul 2025 10:46:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7020326056C;
+	Thu, 24 Jul 2025 10:47:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eIYbS6ke"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kd4YlGG9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA86E26A08A;
-	Thu, 24 Jul 2025 10:46:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753353975; cv=none; b=B3xHZJGgH7sSL7x4FyGGYPuiQASBsP7frydoKN+DEeuCc+Yj1nKUb5CNfuZT4iGwGZL5PgwBYyNsQIWJXz2LZhau34R40AmHRflWBurRQLMbcVUJ6HprzpBrRtTRmdrJO7G8OpdnJV1kDv5O8WghahlIs5xkKJixuFzUrzquFqw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753353975; c=relaxed/simple;
-	bh=xmBaVTQvnV6kaGGqhu7GbZCc1bl8sDliNYMy72sS7/Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PzoCXIuLiVzUfiQU+90MT5oFFmLDXd6fChjJEMbjDPytwuE7Rx0YhjMBErD28kz7EYZ0ectTRFcGwy85cINFl8dO2Ct+jhhiny2TYM+/DSR0PIs22hKSKHR94IkTMSOn0sZoz4bPMTCM9BzH19oOMdbNSQrIuCFnGirN/xzYaSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eIYbS6ke; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4560add6cd2so7145365e9.0;
-        Thu, 24 Jul 2025 03:46:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753353972; x=1753958772; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YEUPeEfAoqVDN5AzS+Zi6ECP6+DLN/BEyFRoJmYLtxk=;
-        b=eIYbS6ke9+Ne07xsRwGNXSjwnmxvlbS4Dvu6GQeICRGSNdY326fKODTho5Qm+PlJVV
-         sn6hXXl0qRfhD1/on4/0AvoVO0MCVpRgy2fXO92BQ10ZVBe9umhDoTfzVe8PEIqNazy7
-         Anid5U4Qvok2cA3bLVcksmotnwqg7q2LkORETH1sTMNeZfj+yLtc98brNTFZvvlK9mbQ
-         TIU7Kboh67iWlegoqHnJYIvwoRF9QdxcyRoKR1O87voZf7qJGHv821WFT2cIQ1djanDr
-         9dZ8rEk7mwZO6+L6T7YzJ3j3NjGlhW+v/uJFpWoTk9ZCQojYy5LJDzDx4solviOMnEWe
-         Oytg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753353972; x=1753958772;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YEUPeEfAoqVDN5AzS+Zi6ECP6+DLN/BEyFRoJmYLtxk=;
-        b=Vl7BRqCKwyE8/pX2v1HLmOtF3HjY42H7rtCSLdKYeGQv1fphk+Qm2ofFZ51BrpjHY6
-         xbq9CNiWppIkIaGPU+7/wh0pjryWBbTF9xUVMDPFWGc0ZZExOeRtFn5hCBcwhH5dGoaM
-         4wQ6MkTMmIhJiccIRtZxdVOjkFMPyU7izY1XmYFjzQlFiLU/pcmCk9lYxlzAuuBxPGFi
-         U4mKOPIt7DapyJGihG5W0BdGEaV/eJ665XrndTY4VDIC93Jt7HbOEMAieT1aHNdG3PAW
-         ke5lZH0jxGGBXNXCzlduijkkdNdozwlQXGx0sE5KH+HeiNsdVdDLMpAJo//Wj1OTcJ7A
-         usWA==
-X-Forwarded-Encrypted: i=1; AJvYcCU8PBMBg62KCw1OBJQRswVrar+q45o1x5FL3MD+2IRpJ6GKZq3+3rqOLSZ5/Y7EQYS+7YPQkM2g6ck=@vger.kernel.org, AJvYcCX0F454YosScXQUOKJJc2RWmPhkkWlgjr1MS3hAn1bUBUtr/q1hiRCUppC7N32F2LjSclKdiQZz@vger.kernel.org, AJvYcCX4sVpOADnmhJZwNxJAkcpeLFH/CuesLmKDjwljudoqBUsaZxFCmcp4HeVctolgmH/Y7YCNIAIlyWBURlb3@vger.kernel.org, AJvYcCXhbHtUQDniIa3tuYxGtqkt1NxyO/wEVLdKiaUxryHA2dG4jAhZjYzDUbGGhQ9LkcPV1TPsVTwIRs2khg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeQp6dbZ7RlOETJoIMm3L3+3Vxd6aH43sbiPGopdiYOutnAtJB
-	GxcKxMHPb7GoBsFb105DNaRr4eWK3Vkt0Nkayc19XgLCkEsn521iKMkw
-X-Gm-Gg: ASbGncs5ceVeLePsXEjC5D0Ri8JKGpsQ5QfkwfrG7LeJi0bEq5qVrLBicFJbM8G1vev
-	tTPZRT63FO/fosS38Y+gbRCIegnw0WvbCWVw4euL8nQdoOT/L28yBtPDPHYFBgUP9zlHQ+TkM+f
-	INS+L+HVC47VEcPh76P3AdQvcz89rOP2wkjzhm/iMbMU0928LWWV/thWv2EKIbBc0R/NJoDeUJg
-	WbPSwMqJuRKlwvGrkB/CBjBOSzNV1sEOrAYRK22iTKw9FwZ+OOwdsoUsi6W4SV5jtY++StOKTiB
-	zIhYQSo4TEjcTYZU/HSEySk+xonRrpvNpDuPkFXDQka7MXXr2Lg30cKE7AB6nDF0JUXdxJJyYwg
-	Ztz+pYlI1tVol8L7kmSqWh4XBl/W703DtUNkfmHLld95ap/w=
-X-Google-Smtp-Source: AGHT+IGtbri2LyVwVV5y2rXjxBpJkNTC31WMYq6VcMg7L3LFbeb1UNBKa0ttb0d56fjHKoQjRi9rpw==
-X-Received: by 2002:a05:600c:4f06:b0:450:c9e3:91fe with SMTP id 5b1f17b1804b1-45870973ccbmr11393355e9.0.1753353971581;
-        Thu, 24 Jul 2025 03:46:11 -0700 (PDT)
-Received: from [10.221.199.138] ([165.85.126.46])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b76fcb8205sm1773660f8f.55.2025.07.24.03.46.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Jul 2025 03:46:11 -0700 (PDT)
-Message-ID: <6892bb46-e2eb-4373-9ac0-6c43eca78b8e@gmail.com>
-Date: Thu, 24 Jul 2025 13:46:08 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F3A7F9
+	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 10:47:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753354071; cv=fail; b=OiltIeH++qZxjMdecL90ko4WwvZpwkzguoZUFwCYc9i89u7QH6+GkYnDtEVSMH7OBl1BrExC6muMdzptgv1YaE3JtgQU04GPHTi6paOo4t0fRHmTxKLK2Wuwfo61QCepOmkfscAKUT3x7PUjb8YKPE9amqPDm5ssUJlhZFuNbF0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753354071; c=relaxed/simple;
+	bh=X5ihEhE2hwVde2hAqNwvk2xEdIk87JkRdH4iGOd/tDI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=m2icnIzni7AcA+lUs7vPi4NCoFTHVbRJZ7Lv7eJKMYRKi7kdrMkhso630MUoz8Dg5CnNa8ALwj/jthpcI50vGdm9gAvtyJwvYVXSOiPlBJxyBF6HcQt8JZOgPap0m+JcR5YGM2FnhpWLl+axFz6rLq6eUe6ytE4RKD9izOlIHBg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kd4YlGG9; arc=fail smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753354070; x=1784890070;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=X5ihEhE2hwVde2hAqNwvk2xEdIk87JkRdH4iGOd/tDI=;
+  b=kd4YlGG9Mf6VKSeKn7MXpKi6LWMyFhxG5klikmFAk4N8PWnnSMY1I7nd
+   yczQ4oTGvKqNJZFkzn5PNZdovbDri/GAS0zkD/YUIY45A5jSbFb7Ynih4
+   VU4ZNWFNZlGMzYkJKbQN6YQ+a/EH4eN8n8ngDNuZVZu6siJES5Cen/cAM
+   0SJ5sjLpT46Q2pPNw/RSVxnfTa4xCRmppdvnzvRY//0QO9nPx5zOeWDtc
+   QuB+DIeft4aQrcM0neHiDqOZKWlctc6Jv2LCfQU+upx2v54BWKhaStcAa
+   R7dovis+7wenXtT46wL2PfsKZLKlZw4AkyPUbLp/a5CaJ+entSIJXTvnk
+   Q==;
+X-CSE-ConnectionGUID: Q7v8MvgKRcOc8ED88xtx8w==
+X-CSE-MsgGUID: CSeEyViITSO877XGVSup1g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11501"; a="55511952"
+X-IronPort-AV: E=Sophos;i="6.16,336,1744095600"; 
+   d="scan'208";a="55511952"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2025 03:47:50 -0700
+X-CSE-ConnectionGUID: yAWYiqpMTN+h+3Rqy4/mHQ==
+X-CSE-MsgGUID: tuCM+rmdQK6sIIKwkv896A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,336,1744095600"; 
+   d="scan'208";a="191074530"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2025 03:47:49 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Thu, 24 Jul 2025 03:47:48 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26 via Frontend Transport; Thu, 24 Jul 2025 03:47:48 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (40.107.244.75)
+ by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Thu, 24 Jul 2025 03:47:48 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=fId9YeFMk3LAsVPMvesoXbJ7HYYija+fzNwgFwQQnKuLl6B/WWDeeVDDFo5qFxW7hljQ2p3uV+rE5yhFyUcZHRZNM1E/NkP3Myep4Xc5O/ek/8ptiaeRYEGZLZE9nKkn6PNiqikM027OkiRbEqTsMKEVF8YqMZcugIqHaboqkmpI8U8aab/UW3AS1hqBmINQek0L3Hghx4Fi8MHca5yftmZ//4cuwiw093vwgFRSFquFDmtYp4wOZFs86wDXt2CAzbm1VK8/RDw84yS5EIB69ohnobH2gwvQQAaR/wVNe3SoUYw102AVZE2e3xsDOhtF/YErppXhEvEW1OUZEdzsnA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lsP3P01v8DMJWAArOlY9ylE5OpsUXKc40Abt05W0lSM=;
+ b=iUE825YSKdXqPpI5bMs0SipSjEatdt3dKCcI24a2sDx+ufkouSK0amhx61SVacXPe9MbhSHY222GXFktvgfyFmFstlvZVHFo8Pi/qE4UoiiBP1F/lQTppMVgzxsHd4z5Uno5VvoBZrsg51vEcTVp6xgKEOwqCYldziwt63nBBTUOTDgB7hqpEd+/KoOFrQ/cveTyZEMW5mrIYzh+Iw3PkOJu0f3HbleJi4RQHvIdaf+VToGbP4TtvqZuGVro2Y0NpLq6X/NFu1gOIXoILqFNW1xFH0wdanyEHMThNelxN2Uye+0jUFSdYG1OznbvYoj93UWpiNzqPTWN/7SXUNvtZw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by MN0PR11MB6207.namprd11.prod.outlook.com (2603:10b6:208:3c5::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8943.29; Thu, 24 Jul
+ 2025 10:47:45 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408%4]) with mapi id 15.20.8922.037; Thu, 24 Jul 2025
+ 10:47:45 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: "Rinitha, SX" <sx.rinitha@intel.com>, "Kwapulinski, Piotr"
+	<piotr.kwapulinski@intel.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "andrew@lunn.ch"
+	<andrew@lunn.ch>, "pmenzel@molgen.mpg.de" <pmenzel@molgen.mpg.de>,
+	"Kwapulinski, Piotr" <piotr.kwapulinski@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>
+Subject: RE: [Intel-wired-lan] [iwl-next v2] ixgbe: add the 2.5G and 5G speeds
+ in auto-negotiation for E610
+Thread-Topic: [Intel-wired-lan] [iwl-next v2] ixgbe: add the 2.5G and 5G
+ speeds in auto-negotiation for E610
+Thread-Index: AQHb7OKCOvwkH5j2nEOH+xTzjK5FpbRBNfcAgAAA3nA=
+Date: Thu, 24 Jul 2025 10:47:45 +0000
+Message-ID: <IA3PR11MB8986C68BE894198CB16F6C21E55EA@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20250704130624.372651-1-piotr.kwapulinski@intel.com>
+ <IA1PR11MB6241A1940E8E31B1F78BA87C8B5EA@IA1PR11MB6241.namprd11.prod.outlook.com>
+In-Reply-To: <IA1PR11MB6241A1940E8E31B1F78BA87C8B5EA@IA1PR11MB6241.namprd11.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|MN0PR11MB6207:EE_
+x-ms-office365-filtering-correlation-id: b043fdc3-6ca5-4560-6d22-08ddca9f85f4
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7053199007|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?Pll8H1GXSLYGewOY+FvOhnt9CR5kuMBO95krYOn3FkFuUeuQw1HvBCRdjx6V?=
+ =?us-ascii?Q?MYMf07P7iKxBIl6QsCIV3Emi94oOoNNiSLLD7vGxk/za/LtUoCha/9po3HLc?=
+ =?us-ascii?Q?bvMH5PAO574k+9ikvuZp5x7vzVYHiKFyt2l0gyzk/wY1Pp8yq1v9N9sdk3HX?=
+ =?us-ascii?Q?JkNzpPH2VcMY+WaKOBLKnRCCmAYrU8mIzeq0j+vCewGzUlH/pZMktRtdDc/y?=
+ =?us-ascii?Q?1K5kcHM1LrE9wZqCbq0gMnpzuzpWezUUeUTXEzrR38dB6WRZX+b8sfbTw7od?=
+ =?us-ascii?Q?gPbiaAQzh+Hg5fNOyRfW3NvP3b1DmcIdX+GJgLoKjLkg4aL2w7BG7mH4P5sY?=
+ =?us-ascii?Q?f3jSoEOTZmzJnfur2h8wPZjxTn49JkN15ZCbeGEbPMDM5XmaRzSXwRrHmFUL?=
+ =?us-ascii?Q?QXNSj9powxs3D492phJXFfRYM5cdNno1Nl2FzlG7qw9KQEP7tDuvcZ4pGCS6?=
+ =?us-ascii?Q?LWEgHdHA6QtrE6a/m/jo/QVxw4T4GUg2ygyUlYudq+ivFaayT857bhiGch/J?=
+ =?us-ascii?Q?e07AuKcQB+wUkyRtvj8kMAPedWBw7kEo53debC5Ffrz+IiReg3TjzoP/6tsM?=
+ =?us-ascii?Q?6e//h1C3LSJH0ZrjLcZvNY+xRdoY66DgI40TKsDDaAgPOZ20rGv+XS9HuXEf?=
+ =?us-ascii?Q?VFe5Y7PSRz6NznvAjtJ4AerQwYNsMtp0L0a3LFw5RM6XolwCU3F3ZFi4w7Io?=
+ =?us-ascii?Q?CAB2LLH8Lz0P+piCexL5Q5xRMsoWw4KM3rETlur5mZUXfz+dIje7Str4lQSJ?=
+ =?us-ascii?Q?63HFR4oAtz9WUFKQUlej6SNlXR2ohbeURle50jCLeP9dJHq19caJXkHV7wVU?=
+ =?us-ascii?Q?bSYI+QaZBoDuLIA9YvGVYNbrEOQ8QIjoQ+MMzFn6YQWApb4T/wheyut0uGzJ?=
+ =?us-ascii?Q?d5+jp0mgN3r0AmeOFGn2+nAclp0vAV01jQgnZ7/tF65ccvLuUKH9YE5jmuhy?=
+ =?us-ascii?Q?Hnaip3lMFq0CZeYtgLh69cj7ZF8Gxk1RDfF659lSWuADBmDu1OCZNozFfZ0t?=
+ =?us-ascii?Q?ImFgvk46YjZtsqy5+I2NBSefFvmLRFCgrG/RmF0wnKd5zLSrRIHiXD4PuPs1?=
+ =?us-ascii?Q?gWQGv7QJmOP8JXbrvvF9sk2ITeCXSvrDxYBmm+ihMNW4Qxyr6HseXAsYEWA8?=
+ =?us-ascii?Q?UHGSemI6i418zODGu/chz42NMeAyhqZi54VsSRwAnph0hPkuciLuyxLqDohb?=
+ =?us-ascii?Q?eQVfldZ25OKbz9J1Qf1u6oa9t9Iw/eZvGLdYFLExBuO6/khyxyNjPt7h46Wb?=
+ =?us-ascii?Q?SAEm4/Tc+jNftt2XbE/opWfea9N9enaWoLoiLxUqO8ynK8sl9Z67di2VXa6i?=
+ =?us-ascii?Q?FweM+Mk4eXRypUBXkRsEPEYmXUdQ1MXCCppx+AYEirmOxUiZZcWqJJXrcc0c?=
+ =?us-ascii?Q?z4qRXZiLE+h5Ho5BITRI4unAY/JgSN9TKcKahbO3lk0BAo0Fx6oqw2iUJ4oV?=
+ =?us-ascii?Q?eKMkGatZ9OtEAvkdj1EgQhOe52mzOGiLB1JKvhb+21KNs8dqnIEcuw=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7053199007)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?s+hA9b2HAH2BLgTwBWa7rn76jB8ax+MRsceE6gaItwVSnfSulgAWCVaEzJch?=
+ =?us-ascii?Q?RcpWB/A84A44eQY9ZtX73tJKS/dJoqWzwT9g7Ncam9pL0EbtHmWRzl58f8CR?=
+ =?us-ascii?Q?zt6CTMpaWFKqHduDM7I85vtZh0DnBYEusqscI2MQBJvajfBZfhgy40PKKd1k?=
+ =?us-ascii?Q?YXuJREsinnjFpQ+l+k/w8pcBCq08B2APd9/bWSvQfLW5ffif4hXqmwzMGahF?=
+ =?us-ascii?Q?hqxJcb2iigkv6Lpp6kGU5l1cf2jyQbWCQ1Q1bgsf7X7d67U7BrCumqCBWvPD?=
+ =?us-ascii?Q?7M0bLGJv6D9mPF247MdUi/IlYXIiJ1bs4YO/YgKvnLYqE3fxLc8bENgbLsBN?=
+ =?us-ascii?Q?F1GoHigqzYbZlvQ1SQ/dub/OcfyXrriEnLBkhyBRUX086tVZj4f/SrHg1uLo?=
+ =?us-ascii?Q?eTe9b5jijGAUXvYtPSuAh0O8GKt2kAdYAyyJ+M7nIzctUBDp0C2tjV8vL1qD?=
+ =?us-ascii?Q?miRbxSlaHW4kC+iawYkZaNT5AHNr4UcsyO+fMdaeO1Gy8GbQnEUFOpOPt0LG?=
+ =?us-ascii?Q?cUnoVP0Nf4RDbnsxu57PhlhGRFBxok9ZLgLQpRgNlbwDbmVrHi5ONZh6kzSl?=
+ =?us-ascii?Q?h7rcpdPfS7DGPnG1Jrwb3L0A+BYYDwJTYSi+H0X0t0UH11GUrHRDzYrMoC8i?=
+ =?us-ascii?Q?bFE66Zn4qAVs7AuiR8le410FNNV5+CMLpOB4BD1h1w6EHzBl1Gr2GO9fNQ5S?=
+ =?us-ascii?Q?wZAYHCSVJXM7Ng+juHlm3a5LgY7TZ/ryFovUdtCDqeKQeuK/CdG5kGulO6Gb?=
+ =?us-ascii?Q?9IU7XfoUhJLwIJkIDhToVtnYc3MD7y+P5xX9HATp/P0nwcnaB+lVYIEnu7iI?=
+ =?us-ascii?Q?GXW4CSJLnPab9mj5UVUyyQ7wUKbg1RMN8VxsK1P6a8jXfKuggl1xKot/QeLB?=
+ =?us-ascii?Q?uOH/Bsfo6TLtMNrJ9bhTNp8+vh7fMbTfsQPi0uCBYd47Y8B3ANgXbdPgd6bU?=
+ =?us-ascii?Q?TPjavoqAlOx7vJPEUt9b1080fnPiaG3lRtD4zE74lMUcDdqiUPWmTXi9C003?=
+ =?us-ascii?Q?+MNJjF1UHg1gtdloPJfH3v2X+PogfFXBCjjJiGZ4ZcnZ3KqPZFYqPBDKfVk6?=
+ =?us-ascii?Q?rWK34e31K92B9XqMI6APGTWP5V6sfPKiE6fFlpFEH2cSV1Z2IZM12WtbAHIq?=
+ =?us-ascii?Q?e6elMB3v1U4HANcKQyhmEGSWaKFV/LddGusZDwG+/Jni2ddyDuu84oOu89q1?=
+ =?us-ascii?Q?OYvJTprmIYLIfJkq2Fl5eLFAtQ8Iy9UbSnEbrvg+FENKU3uvwJzzT4UiLASY?=
+ =?us-ascii?Q?b4dRpvNzBa66LWA+kGHa1CHdF5vitZlZJSNrQ80yCF4Mf6moLDwKdcccq9MD?=
+ =?us-ascii?Q?Jl6UVnMoQH1wd3wi+9DAImdkhKZAahzQM7pg+A0RYtwXNvgwhdTp6mPDT2b6?=
+ =?us-ascii?Q?uwB22iyKFG3W4vGyz+ziaLuOPRhZph4OMdpHsB5aRpZGYtr1JBxVijYAQQlJ?=
+ =?us-ascii?Q?K6FFneoaiNhvbTyiGL58jsURA3q41MH3AcY3iz/c3rzw1gGatiKc0Qhq0f23?=
+ =?us-ascii?Q?yMZuVEmZPsvbl9YbCH3w2YDRFlhYH/BBVabBH41cBIXoVnsTon6DZFamz4LG?=
+ =?us-ascii?Q?IMPQCZUKbJ4nH8+PgsqSieU2Y0d6XSTb9ey1SGfPcONUXyrixrPeIVvEaQDr?=
+ =?us-ascii?Q?tQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/5] Expose grace period delay for devlink health
- reporter
-To: Jakub Kicinski <kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Jiri Pirko <jiri@resnulli.us>,
- Jiri Pirko <jiri@nvidia.com>, Saeed Mahameed <saeed@kernel.org>,
- Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Shahar Shitrit <shshitrit@nvidia.com>,
- Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
- Brett Creeley <brett.creeley@amd.com>,
- Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>, Cai Huoqing
- <cai.huoqing@linux.dev>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Sunil Goutham <sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>,
- Geetha sowjanya <gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>,
- hariprasad <hkelam@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>,
- Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
- Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
- Manish Chopra <manishc@marvell.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org
-References: <1752768442-264413-1-git-send-email-tariqt@nvidia.com>
- <20250718174737.1d1177cd@kernel.org>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20250718174737.1d1177cd@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b043fdc3-6ca5-4560-6d22-08ddca9f85f4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Jul 2025 10:47:45.2071
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 73Bsf/Zea9C42DXhQsblIPeGDT7gwTiXPeswX4lWg8oWMOdcAL/TE5bF/SP61TSckM1U7elykZ+mao8bZw7t4qyWhGgYP4OuL0BplIkrF7s=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB6207
+X-OriginatorOrg: intel.com
 
 
 
-On 19/07/2025 3:47, Jakub Kicinski wrote:
-> On Thu, 17 Jul 2025 19:07:17 +0300 Tariq Toukan wrote:
->> Currently, the devlink health reporter initiates the grace period
->> immediately after recovering an error, which blocks further recovery
->> attempts until the grace period concludes. Since additional errors
->> are not generally expected during this short interval, any new error
->> reported during the grace period is not only rejected but also causes
->> the reporter to enter an error state that requires manual intervention.
->>
->> This approach poses a problem in scenarios where a single root cause
->> triggers multiple related errors in quick succession - for example,
->> a PCI issue affecting multiple hardware queues. Because these errors
->> are closely related and occur rapidly, it is more effective to handle
->> them together rather than handling only the first one reported and
->> blocking any subsequent recovery attempts. Furthermore, setting the
->> reporter to an error state in this context can be misleading, as these
->> multiple errors are manifestations of a single underlying issue, making
->> it unlike the general case where additional errors are not expected
->> during the grace period.
->>
->> To resolve this, introduce a configurable grace period delay attribute
->> to the devlink health reporter. This delay starts when the first error
->> is recovered and lasts for a user-defined duration. Once this grace
->> period delay expires, the actual grace period begins. After the grace
->> period ends, a new reported error will start the same flow again.
->>
->> Timeline summary:
->>
->> ----|--------|------------------------------/----------------------/--
->> error is  error is    grace period delay          grace period
->> reported  recovered  (recoveries allowed)     (recoveries blocked)
->>
->> With grace period delay, create a time window during which recovery
->> attempts are permitted, allowing all reported errors to be handled
->> sequentially before the grace period starts. Once the grace period
->> begins, it prevents any further error recoveries until it ends.
-> 
-> We are rate limiting recoveries, the "networking solution" to the
-> problem you're describing would be to introduce a burst size.
-> Some kind of poor man's token bucket filter.
-> 
-> Could you say more about what designs were considered and why this
-> one was chosen?
-> 
-
-Please see below.
-If no more comments, I'll add the below to the cover letter and re-spin.
-
-Regards,
-Tariq
-
-Design alternatives considered:
-
-1. Recover all queues upon any error:
-    A brute-force approach that recovers all queues on any error.
-    While simple, it is overly aggressive and disrupts unaffected queues
-    unnecessarily. Also, because this is handled entirely within the
-    driver, it leads to a driver-specific implementation rather than a
-    generic one.
-
-2. Per-queue reporter:
-    This design would isolate recovery handling per SQ or RQ, effectively
-    removing interdependencies between queues. While conceptually clean,
-    it introduces significant scalability challenges as the number of
-    queues grows, as well as synchronization challenges across multiple
-    reporters.
-
-3. Error aggregation with delayed handling:
-    Errors arriving during the grace period are saved and processed after
-    it ends. While addressing the issue of related errors whose recovery
-    is aborted as grace period started, this adds complexity due to
-    synchronization needs and contradicts the assumption that no errors
-    should occur during a healthy system’s grace period. Also, this
-    breaks the important role of grace period in preventing an infinite
-    loop of immediate error detection following recovery. In such cases
-    we want to stop.
-
-4. Allowing a fixed burst of errors before starting grace period:
-    Allows a set number of recoveries before the grace period begins.
-    However, it also requires limiting the error reporting window.
-    To keep the design simple, the burst threshold becomes redundant.
-
-The grace period delay design was chosen for its simplicity and
-precision in addressing the problem at hand. It effectively captures
-the temporal correlation of related errors and aligns with the original
-intent of the grace period as a stabilization window where further
-errors are unexpected, and if they do occur, they indicate an abnormal
-system state.
-
-
-
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> Of Rinitha, SX
+> Sent: Thursday, July 24, 2025 12:44 PM
+> To: Kwapulinski, Piotr <piotr.kwapulinski@intel.com>; intel-wired-
+> lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; andrew@lunn.ch; pmenzel@molgen.mpg.de;
+> Kwapulinski, Piotr <piotr.kwapulinski@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>
+> Subject: Re: [Intel-wired-lan] [iwl-next v2] ixgbe: add the 2.5G and
+> 5G speeds in auto-negotiation for E610
+>=20
+> > -----Original Message-----
+> > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> Of Piotr Kwapulinski
+> > Sent: 04 July 2025 18:36
+> > To: intel-wired-lan@lists.osuosl.org
+> > Cc: netdev@vger.kernel.org; andrew@lunn.ch; pmenzel@molgen.mpg.de;
+> Kwapulinski, Piotr <piotr.kwapulinski@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>
+> > Subject: [Intel-wired-lan] [iwl-next v2] ixgbe: add the 2.5G and 5G
+> speeds in auto-negotiation for E610
+> >
+> > The auto-negotiation limitation for 2.5G and 5G speeds is no longer
+> true for X550 successors like E610 adapter. Enable the 2.5G and 5G
+> speeds in auto-negotiation for E610 at driver load.
+> >
+> > Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> > Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+> > ---
+> > v1 -> v2
+> >  More details in commit message
+> > ---
+> > drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 35 +++++++----------
+> --
+> > 1 file changed, 12 insertions(+), 23 deletions(-)
+> >
+>=20
+> Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at
+> Intel)
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
