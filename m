@@ -1,61 +1,90 @@
-Return-Path: <netdev+bounces-209609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9D4FB10068
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 08:12:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D49B2B1006A
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 08:15:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6F794E68E0
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 06:12:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 002F656729F
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 06:15:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191DF205E02;
-	Thu, 24 Jul 2025 06:12:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7097F19882B;
+	Thu, 24 Jul 2025 06:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ArEv+4le"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A78B148830;
-	Thu, 24 Jul 2025 06:12:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0191F1863E;
+	Thu, 24 Jul 2025 06:15:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753337566; cv=none; b=m/uEbw0gJcJHtmcdDwasM9zoFeBBN/azHbADjfw3rIhmQBlKy4MqslRJi/J+yqvugdv819D+VZ2c/oc+unu1r+Apmi/U4OoTMe9/fee5gyvMtcYIkwyVfn7zqQWle1JTLer0OzgLnRbxj2sbKkjouN4S7eQCspwETkbQ+Kio4eE=
+	t=1753337741; cv=none; b=CnR5NzZQFmqKx7pGHv4A3ckNbLYclJCLG/BS8s/4BVFlK+8RC/xDPj0euHNbM3MBYqL6q2xwSI19ONxrl/pH63j6cwHmD6RHlMvYVnpg0FsF7vTc4LaxYv4JNxVyICAq3N/lYijyTdmq/wkqShi9ihFIABR9LNTbB93cebRePYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753337566; c=relaxed/simple;
-	bh=CByW3Y3+zXKsW1KVgHar09KXfov0Pnop6z7uMFXJ9wI=;
+	s=arc-20240116; t=1753337741; c=relaxed/simple;
+	bh=NTW+Rgkxx6wfBOpLL+89g4QkZGnznyXnNU309V9VZmc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TQCHiDRcdWOrYOYtNYbwVL+Gw6/uMuXIRiOfyHV1dRWw0hEDje9lVo+MFnJvVav2B0lOeQ/ZVfBvXAE+hBnrZw8tqvKBIQRavjn6DKSzOWM0uhmK7BzWQTghMBG8wHnJj29Urqppni5nzRvxXyE6PP10DnIhecRy9KvSFB/ij8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.204.34.129
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: esmtpgz10t1753337450t4ba43d06
-X-QQ-Originating-IP: IbpEF2adBK0K3OR0Dr975OKXmkffwF0i3hlqe5FSep0=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 24 Jul 2025 14:10:48 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 12413902011030237247
-Date: Thu, 24 Jul 2025 14:10:47 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: Simon Horman <horms@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
-	gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au,
-	danishanwar@ti.com, lee@trager.us, gongfan1@huawei.com,
-	lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 01/15] net: rnpgbe: Add build support for rnpgbe
-Message-ID: <173AE84ACE4EE2AE+20250724061047.GA153004@nic-Precision-5820-Tower>
-References: <20250721113238.18615-1-dong100@mucse.com>
- <20250721113238.18615-2-dong100@mucse.com>
- <20250722112909.GF2459@horms.kernel.org>
- <0E9C9DD4FB65EC52+20250723030111.GA169181@nic-Precision-5820-Tower>
- <20250723200934.GO1036606@horms.kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=AAALg2tKg8mL2khowIgOusJRJvA32sAkCX2TQ22aJINhlxNtHHHtX+3i23diNEEwRrmca5CC0mE6pSWG/s/zTzAsOU9+sfVJCPifpXr1ZLmunF/j+VLmMOmKGR4YQOO9xl0PZ/V0bRTtZNxUkHsCgN6jyO+jzRixPxrmoyFFJXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ArEv+4le; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-23c8f179e1bso6532465ad.1;
+        Wed, 23 Jul 2025 23:15:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753337739; x=1753942539; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=V59asKqFpce7gBskLYl882QJNmx1VE/lKK51NriEFh0=;
+        b=ArEv+4leEDbELfX13mEioQchoujptsvbs9iErdyhbQBCgwV/WQpHZ6Hr5qIkY73GDL
+         dl6RHmBdHc4rF/fFY0ef0rbaQla2Da9BaFrTgpyhZhVTXGbzg9xO753/iq9uVM7dCXAp
+         hqSARWEa4NntkIdZcntaPHlfslmzzWnc/4T7ChVh+aU25fpurIGZkxzyxjzN7BYdeXph
+         WU8QsJRynQSRBC9Al4ataICESiE5Tm9OZqZXo2aKH8dP7E0ihUiZJKBgDRt2dvow0cVt
+         W6WZBhvKcqhMg4GLRx0ICUwQAqy25ANOhYCJi19qMJKQ5CCMB0RgDocuwL5ZUPi9CLVS
+         VYdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753337739; x=1753942539;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V59asKqFpce7gBskLYl882QJNmx1VE/lKK51NriEFh0=;
+        b=LUostw0fEV6BNv9s38kiLch4s1fCqJzhuJ5OntF51Lc1FGrljyVjafvBSpPtUVZgOs
+         J7Gc+4mmBvMDYVNfkFc/v5xBN85Tnb1ibAtk9PsOARsMvBemC9Bb0gQHkOdHAG86ZWPk
+         j1Vx6itPu7hlkUSpQqzBeNLgZwVUXXzWU8g7+axXXAcLqFYfHRjoEj4UjeXo3UcIaMcB
+         aBKn48hUeGPVDAEHYWtJc7LWywbucrVFzuyeI5j4T3VoeBMx3WkWd2kMOjsy8ntVb/5s
+         tkhWWg3HOJ1VFykzhhHNxZdprBxdMTnkr9avbGhzyFpALFP0eT8j9bSCwJkidcRFXGmM
+         ke6w==
+X-Forwarded-Encrypted: i=1; AJvYcCVKR5VSKQw5Pnfcs8fBNetnRJKxzuamhh6H3Owu6bLgb2RjQBiMaKQxKsl0+y/eHI6TIL+j+hm4w9CP7bVh65nq@vger.kernel.org, AJvYcCX7s7sZnanE/2QQec2y0bJSecb0CPCqI2w890gzHGO1tNzk5EWYTdIktq5NJ4JNmh//8TpI1sah0r/GPiuaThoO@vger.kernel.org, AJvYcCXBX4j2STCLc1LCSrnYJmaJN273bQhRp++6MPzlzhUWm68OMfXzHbcA4Y3pK+No2RuCGKc0rY22gSrrLDk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyrc61xu96xrvxAVqcZWOHKx+zKN8DPetBYrNo/CjadMZ2ULuLv
+	MI3k+fVd5Oef/KChhI8oGVjiNjt+R+3LMXZteBRwqzGuax4zHDKEAGmp
+X-Gm-Gg: ASbGncs7Qb0BfPBwU/zCeta9E4DShDOVU4+f2s0k0jLxcCMwIOJdr09YeLCEJ+8IlwI
+	MtUS0/J/KQ3rzh1W2U0AfkJdo4jvU59t4Pc3qSaDcGd1uYdnTSHNcfUl/ywyjwVAoftb/PgiTyA
+	GwWmRR2zghXda1B8Or+Q6OBnEaWkDfl5XgvWQ1U6olnBAw4J480pOc5DnUJWL4n2lXYtwIYUzP3
+	yN+DRx9IG+YWnwTPyO9o+uPYeDRuCHrfEcDG1b/az5ZKAGJF518ZKNAOmeTtFNVuDYyWASK3m74
+	xRZkK744cURSzfRtZ5y5cRa6sgbgJeLD0z6B3EHwFYbHtPR3kKY0glE3VsWm744qA25drpH80k+
+	ie67/wOJh6zxZc7fcdwQyHnTv0Qs=
+X-Google-Smtp-Source: AGHT+IEL3uRCh7ghRklP4SkRDgUxiCWuc+kUhergl0tzV70xbLwF4W/W5h5ye9VIUfcFjTZmoHrgxw==
+X-Received: by 2002:a17:902:e54e:b0:235:ea29:28e9 with SMTP id d9443c01a7336-23f981b0a15mr93791575ad.38.1753337739253;
+        Wed, 23 Jul 2025 23:15:39 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23fa475f82esm7185855ad.15.2025.07.23.23.15.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Jul 2025 23:15:38 -0700 (PDT)
+Date: Thu, 24 Jul 2025 06:15:30 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Yi Chen <yiche@redhat.com>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	pablo@netfilter.org, kadlec@netfilter.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	shuah@kernel.org, horms@kernel.org, coreteam@netfilter.org,
+	fw@strlen.de
+Subject: Re: [PATCH] selftests: netfilter: ipvs.sh: Explicity disable
+ rp_filter on interface tunl0
+Message-ID: <aIHPggRqH461rzSL@fedora>
+References: <20250724024339.11799-1-yiche@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,76 +93,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250723200934.GO1036606@horms.kernel.org>
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: Ndw/mc8X39ObfM92LSarzqTQNNyDZ5M4hnRkSi+toTBH0w6nDlyd00An
-	6YZpGvoM9enhMoZwUbhQ2RW1f8mzuWwcpnZa+hOQKbzA6+Y5awep0hyV1dUa7fB50yc0P74
-	wdsPRneR2DITPfSXDo1oKWb7fqtvRunUGh1euW0oCoJydB6HTEmDglXN1F0TQPU0pAGxUnF
-	dFvbe9ZNS3kIZNd8jacCgAxuz/E9Jhif1wrCfxA31TTKcT+ZixWSuAwnHGZKXujM7qEwHvT
-	/okngwUuDZf30Om6/p0O/ojgvLLzfmJxIcTI/i9a5edyczIkrzgiQRCoGjJcmXFU/7+cX1y
-	CDTaqqtlOKEpD/mG97hN+bAeYcwX6Y3VshCdKnmnAdGxJTp5X2b1k0MXCdNSS93uHm85Jty
-	N4iSxJveSGIouOECoygHbagOknTn9R268bBLyYIqJYmWdlu0yxafCR52yTdMOWvu35jUJ/Q
-	xBmDGl9BYgf0lLHk7Og6MSg2zhXzT3JkJnRcxvTNdhNwWVAwy0njRvXJUP/Wcb4c46fmSas
-	ZOfa/7hQCWvajRyTaO9oXMbMUuzb50eGGTZlilGEK6MwgwX+gUefaNlIdGVHXtOosYLvAB6
-	DMXbiafg0GbHEGNRNourZC1sbbc8iuFu5/ebCvF/O9N9KX3HDxRW3ME2Ks14toImO+2xhV9
-	nUydx+U4wn3IGkTB5CLw1d+PLtjCxIndJiZlI2JHYFSYdtHK+vXhQy9oXaXnbqUnQ6rB6HN
-	WHjjKpTfSMa2AbJtIXOpSCRdXE1pHKSeZWiwYoUJFx1j1Uq2exj7TQ/9MtcjdVJFt4SuCoU
-	/Hazyx09CEdnas/rv/lD0ujHoF0UvW7QShtNVzoyDSl6biXax6tvXGvtPFznHytK2LTbPN2
-	SQzW8yOYLMB1m6sMWYtuv86VwS6uSuHYZSo2K0nz0ipr7byg0EozWXQM/i374zfyuULNTTJ
-	tm4V9GEnrGTM1t5AsM8vAn+FmcEeEKV/qckkdE6NLj9y7w4QkZjM8LBV8BUmA7isCwPw=
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-X-QQ-RECHKSPAM: 0
+In-Reply-To: <20250724024339.11799-1-yiche@redhat.com>
 
-On Wed, Jul 23, 2025 at 09:09:34PM +0100, Simon Horman wrote:
-> On Wed, Jul 23, 2025 at 11:01:11AM +0800, Yibo Dong wrote:
-> > On Tue, Jul 22, 2025 at 12:29:09PM +0100, Simon Horman wrote:
-> > > On Mon, Jul 21, 2025 at 07:32:24PM +0800, Dong Yibo wrote:
-> 
-> ...
-> 
-> > But I can't get this warning follow steps in my local:
-> > ---
-> > - make x86_64_defconfig
-> > - make menuconfig  (select my driver rnpgbe to *)
-> > - make W=1 -j 20
-> > ---
-> > if I compile it with 'make W=1 C=1 -j 20', some errors like this:
-> > ---
-> > ./include/linux/skbuff.h:978:1: error: directive in macro's argument list
-> > ./include/linux/skbuff.h:981:1: error: directive in macro's argument list
-> > ........
-> > Segmentation fault
-> > ---
-> > I also tried to use nipa/tests/patch/build_allmodconfig_warn
-> > /build_allmodconfig.sh (not run the bot, just copy this sh to source
-> > code). It seems the same with 'make W=1 C=1 -j 20'.
-> > Is there something wrong for me? I want to get the warnings locally,
-> > then I can check it before sending patches. Any suggestions to me, please?
-> > Thanks for your feedback.
-> 
-> I would expect what you are trying to work.
+Hi Chen Yi,
 
-I want to reproduce the warning locally, like this: 
-'warning: symbol 'rnpgbe_driver_name' was not declared. Should it be static'
-Then, I can check codes before sending patches.
+For the subject, please specify the target repo. e.g.
+[PATCH net] or [PATCH netfilter]
 
-> And I certainly would not expect a segmentation fault.
+On Thu, Jul 24, 2025 at 10:43:39AM +0800, Yi Chen wrote:
+> Although setup_ns() set net.ipv4.conf.default.rp_filter=0,
+> loading certain module such as ipip will automatically create a tunl0 interface
+> in all netns including new created ones, this in script is before than
+> default.rp_filter=0 applied, as a result tunl0.rp_filter remains set to 1
+> which causes the test report FAIL when ipip module is preloaded.
 > 
-> I suspect that the version of Sparse you have is causing this problem
-> (although it is just a wild guess). I would suggest installing
-> from git. http://git.kernel.org/pub/scm/devel/sparse/sparse.git
+> Before fix:
+> Testing DR mode...
+> Testing NAT mode...
+> Testing Tunnel mode...
+> ipvs.sh: FAIL
 > 
-> The current HEAD is commit 0196afe16a50 ("Merge branch 'riscv'").
-> I have exercised it quite a lot.
+> After fix:
+> Testing DR mode...
+> Testing NAT mode...
+> Testing Tunnel mode...
+> ipvs.sh: PASS
 > 
+> Fixes: ("7c8b89ec5 selftests: netfilter: remove rp_filter configuration")
 
-nice, after installation, it works. I reproduced the warning, thanks.
+Should be
 
-> For reference, I also use:
-> GCC 15.1.0 from here: https://mirrors.edge.kernel.org/pub/tools/crosstool/
-> Clang 20.1.8 from here: https://mirrors.edge.kernel.org/pub/tools/llvm/
-> (Because they are the latest non -rc compilers available there)
-> 
-> 
+Fixes: 7c8b89ec506e ("selftests: netfilter: remove rp_filter configuration")
+
+Thanks
+Hangbin
 
