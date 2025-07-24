@@ -1,358 +1,383 @@
-Return-Path: <netdev+bounces-209886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44875B112E2
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 23:14:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F860B11308
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 23:23:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66227562917
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 21:14:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DE4DAE3980
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 21:23:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95ACB253F35;
-	Thu, 24 Jul 2025 21:14:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5AD52EE60D;
+	Thu, 24 Jul 2025 21:23:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j3iTBdDG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jZ5Qi4LG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0D5D1494C3
-	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 21:14:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF7452ED848
+	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 21:23:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753391656; cv=none; b=rOmZ7P7xKw0HhqDRwE2otaemwcys5Wi6yA5zpwaWlcakOUQnanWxO1rDidwNxst4Zc6po9rr8K+y6WnNgHlSxISsWJTVi/1aVUYOMilcMLVAY8sWWly4rz8Ns+RRLHhUVaAFUo3FfSZYaF4u1VUhJ3mr+1bBewBj7ODYumTHW38=
+	t=1753392202; cv=none; b=lHa8TC/Ss5BqYmN1nJwOMpggVpDINMPtdaovB+G36aTdkh9CI9Gm7mXSdRLO6WJi7s0ZS0WxfU+92btkZUX/BhwSzAPdc+WHFfjHwrL6hT/oxCYtOm0t9z43lcfs5x3nIT/IAuCzstKJ6PgchUI4mMn5wDESDAEFFM4sMcCurrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753391656; c=relaxed/simple;
-	bh=FoeQUP6R2dV4hT56mf7saYeP0ufIFSHMmIlwGaa8a0o=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=eWsUS3EbUnndi5mKxM6c9QOVhB2vwfAuDULdTIiTfVvjziZl8PkxA3q3n0Ix2b+OrUwPcoRCUOTr/Z6C3SLXqOIHHtmnBv1j870SeKa7jDPjvQW4lvJZFi083tKnEQaw+ruijFeCoCHOvuzi5zAxbAoyohTfR1R1h61SMP0O5Ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j3iTBdDG; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-748e81d37a7so1056302b3a.1
-        for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 14:14:14 -0700 (PDT)
+	s=arc-20240116; t=1753392202; c=relaxed/simple;
+	bh=AWa3QljlTQI2w6CzFs/GJMnKM1od+dLR+KMOmwq2NRg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WwZRaiMvTy8uHras0H8lP8me77PHAZWAgSEFYPgoLM1PutqU3uRBxVpBuRAObP2oiWKOXZstaFrcdjSgjg78oojE7ITNopj5BwvhQVUkDbyAuKn8fD/DL2gBc0kDA2fArZH+FkT8zTG7XYcFEgIkPaQlBIyn+MAjZcTDyD1p6vU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jZ5Qi4LG; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-237f18108d2so65285ad.0
+        for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 14:23:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753391654; x=1753996454; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=DanjK+ayaBqr/ziqIDwxf4KxKx2IqkL+inWPjL3pAGk=;
-        b=j3iTBdDGLnD0e+6CBUFnq9oJVDXlRn7oFLk8sI5j4HAFlxLxf7fqbsdnX+I0ymf2H3
-         BzvQeZepMjsfBRhHrtY0ItH//IYrmbkom1d1MEs6i58iXaADIiRw+EWw3X3kiq+OplEM
-         rJ5Bo6hej043rszQluewuElSB2TJB7XRwkeeCLHCfIykZZG9jxVWvvp/ryK72PRbpcS3
-         56IKFLLyUJ389sBkzZ+B8xCNsALfOXNTMEnoPeJXWUZ3vaSvuTVOEdC8HpEqV7Gr7G0C
-         5zLlAD83muewOLVbsd3qxdzqGBA4reFPSVpjcFzZetWz9wQnw0cPL8J4UR9w5Z9dUo3o
-         x6ww==
+        d=google.com; s=20230601; t=1753392199; x=1753996999; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TNnTJ5darf1pQDB2vsYeV7FJpreNa9uOT82oPg1Gxp8=;
+        b=jZ5Qi4LG9byWLV2CFlBI6eNDIxXIsnTNhRI/EvwTF56DPpWAT5cLUQooVsFfJG+NjX
+         AU31WoPK2QdXqz/QcjdAU6WFnzSLCs2yzmzxvNEEgu9Ug4MigGnJVpQ/lqPNehQnmQ6a
+         XCvRJ+M33c4fpO9p6CwJ0lLP83gQd26UtGNCBFzSzrT5G2Dkn5iE+5WB8ae/iOjFdSBS
+         jL4aEjekadOsZSumx9HbPlePhuPt9AbAVqZyIbl6RjNZmPgAwyatykA/lRWwyAkAcm/M
+         NvWtElxtpZ2p164pQFy36ym7oj1/yGG0owJRf0v+nml2HAopav+vJjUkNzzGq0iUriLI
+         /BsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753391654; x=1753996454;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DanjK+ayaBqr/ziqIDwxf4KxKx2IqkL+inWPjL3pAGk=;
-        b=sl8zV05FfXDTHdlop4S5SNaZXBCiKzI3FbVBVVUbgVp/8bIuq4Yu1PSoIxURblD4mN
-         2MwEK3kviEZvitG0J9HRj1cqiYQf55zO2ISp5UG8ySoQE7n7zjT+nvqYSqfpqYtNra3H
-         GtY2F0nNRsQkQC5tMIQPoBN/wE5zD2icYqjmcgBrz+5Dp51qerc6voGCBsyqVxmwkdRm
-         JuAzDECG5u2mroOcWei7LcFUxWu8UQvQr9ooT13C9Fi9MBz/iKzAOHuB3+rhLrJKjpTf
-         cueR5kq5Ogh38Enstxn24Ca7134dqRK01g7Ud+4Olk5tsEWBAxTHAnFWapiTYFReD1p8
-         HAYg==
-X-Gm-Message-State: AOJu0Yxs8jN5tU94eKU6kzxAWxVyKHepXxtfsOUSlJd5o08FKXbsliOk
-	pBHNYaZ1AnTHZR+ydLC4Qq6QeeH4h/mrbA3N8zK/N3VoMGqsHnRPFNip
-X-Gm-Gg: ASbGncstcShcnjwZEVlUzHFP80xUdc/QogdrFPqb5Klav0fYfGeyi7WiHmCGumIwsLK
-	KXpNstOtnXGJryeYrkSbASlcVqSyrlq1Z7lomFcIGtwffJriGETcOPs4sZj/yXtJabMufIJSNKg
-	7axB10q6Horiypes1VLwEQ61M+AqUrvsEWptaZ7KAT7tROcq9HkHLUG4lWPSjjIrVPwzDvu/MNJ
-	I0MnpkuHtUhwcAe9Bk4orsYyg6vTDFrCDpcs6N9fLzFgj5PuhV3ckWze9ZU/qlPD/V6ccXS34zT
-	4grfZ45aMr8ba+v6SGuy82vJZBFb/pOQ3arURboNmgEzCM+7Oa7pQeEmsZKfqwkPHGHhYw8Wsw5
-	5vnteHjM+GpkhvGJ8KCTIFpUucsiN5zeFgj1w4OUiWUJ37drKSuMAWTPSLsXYtaDpayBo8pOzG5
-	xzhw==
-X-Google-Smtp-Source: AGHT+IGrsFAZrDDdZpr8TpLjR1F6finp5kcpRhIqd1S4HINMtBCCNDixBbsAWAMUYwKcVgWJK+WFwA==
-X-Received: by 2002:a05:6a00:228a:b0:748:323f:ba21 with SMTP id d2e1a72fcca58-76034c00474mr11415875b3a.1.1753391653816;
-        Thu, 24 Jul 2025 14:14:13 -0700 (PDT)
-Received: from ?IPv6:2605:59c8:829:4c00:82ee:73ff:fe41:9a02? ([2605:59c8:829:4c00:82ee:73ff:fe41:9a02])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-7622833c9e2sm1763603b3a.21.2025.07.24.14.14.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Jul 2025 14:14:13 -0700 (PDT)
-Message-ID: <d47b541e48002d8edfc8331183c4617fb3d74f8a.camel@gmail.com>
-Subject: Re: [PATCH net-next 5/9] eth: fbnic: Add XDP pass, drop, abort
- support
-From: Alexander H Duyck <alexander.duyck@gmail.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Mohsin Bashir
-	 <mohsin.bashr@gmail.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, alexanderduyck@fb.com, 
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com,  horms@kernel.org, vadim.fedorenko@linux.dev,
- jdamato@fastly.com, sdf@fomichev.me,  aleksander.lobakin@intel.com,
- ast@kernel.org, daniel@iogearbox.net,  hawk@kernel.org,
- john.fastabend@gmail.com
-Date: Thu, 24 Jul 2025 14:14:11 -0700
-In-Reply-To: <aIEdS6fnblUEuYf5@boxer>
-References: <20250723145926.4120434-1-mohsin.bashr@gmail.com>
-	 <20250723145926.4120434-6-mohsin.bashr@gmail.com> <aIEdS6fnblUEuYf5@boxer>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
+        d=1e100.net; s=20230601; t=1753392199; x=1753996999;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TNnTJ5darf1pQDB2vsYeV7FJpreNa9uOT82oPg1Gxp8=;
+        b=X4gPDUSWhdOrYENnLZQZCqR3fxQt30a/5rJT/L+XzbUXfasCh0p61VJKGuJn/S5J8h
+         mfrX5N/cYmqYMj8X55BC/uJqT2JpiTXSyRHTVFfv872IqPq9yQiF+RYDjwB7sQzkI5bM
+         +6oo9KMoDlRQa18laeIb3XJiZLWy1M6qeGY9IB+LlvhISqJUaCQNXdaLm2CuBResUlXn
+         ERx9QUiBEgVsnngwXDgD3ht4ZbrGHIfmz5wkptwU4985g8+J7rzmawX7DhC6yQUjn9OM
+         09K9OJI8nWFlslL1Q2iLaJV7k2fNNPWHuJz/DA+ScmBsnHHejKw7/xyiU3fJpsOiW0+y
+         qCoA==
+X-Forwarded-Encrypted: i=1; AJvYcCUXAZwK+SxGsQ++TQNA9QjN8mmTvlqjWE8PgkIFjuTCMBxLI5VSsJ6W5Tjbs+vmr6OkQbxT1FA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVfhXxzISgg0sAXJz08MxKcP7o9Cgg20um/Ra+E2tFsuAMV/Tj
+	P9r3zj4pWsF/okTZU444vPcrd8uheCu+3rbbqiDM2LPhRqXAmc4wHoUnL6ah/7zLgs+DF+vCd2c
+	IBCj3qcq7NM55SWNf3tbqfmkxsTL3Q6isE58OxWD7
+X-Gm-Gg: ASbGnctDOzcZPtCMs1vU4YLBxj1QLYVzk3TSI5vRZ3iSfFxHKCekyAlhxvAdB74ETcU
+	iEZt/0YFU1+RTHV3XpE2KRPVZIfZWA+BDbTZAr48d3x89PW6kdu1fJQKH+F1h0PTcGwP7PCp7U9
+	7vsOfnNnEMIgxUac7uDKuQQnpODlxt/R3QeD/c4515YJcKUs3b0/Rs5UrEmS3UFh3LojW9a88a+
+	nTpcSTPLeNvMpgQk/ZCpLn69o+7wBcd+FmgG4fLhxTrJuzz
+X-Google-Smtp-Source: AGHT+IHP4CcY56s6tdK30PaY3+VQezaoZk4lvk+rDg73ia56t/qWWvkH19hG/XzNRK1ErwjJSSAFdSL4fYDkuZlCRh0=
+X-Received: by 2002:a17:903:32ce:b0:231:f6bc:5c84 with SMTP id
+ d9443c01a7336-23fada5b364mr924205ad.8.1753392198670; Thu, 24 Jul 2025
+ 14:23:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250721054903.39833-1-byungchul@sk.com> <CAHS8izM11fxu6jHZw5VJsHXeZ+Tk+6ZBGDk0vHiOoHyXZoOvOg@mail.gmail.com>
+ <20250723044610.GA80428@system.software.com>
+In-Reply-To: <20250723044610.GA80428@system.software.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 24 Jul 2025 14:23:05 -0700
+X-Gm-Features: Ac12FXz-gExQLTDVuATyXHwkSGv0B-njaHRD7KrjKadlfvJJk-4Hay1UO-wB7MU
+Message-ID: <CAHS8izMO0LO1uKu0peSAC8Sixes06KLfKJvyQnAOiLfDqZd5+Q@mail.gmail.com>
+Subject: Re: [PATCH] mm, page_pool: introduce a new page type for page pool in
+ page type
+To: Byungchul Park <byungchul@sk.com>
+Cc: linux-mm@kvack.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kernel_team@skhynix.com, harry.yoo@oracle.com, ast@kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org, hawk@kernel.org, 
+	john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com, leon@kernel.org, 
+	tariqt@nvidia.com, mbloch@nvidia.com, andrew+netdev@lunn.ch, 
+	edumazet@google.com, pabeni@redhat.com, akpm@linux-foundation.org, 
+	david@redhat.com, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, 
+	vbabka@suse.cz, rppt@kernel.org, surenb@google.com, mhocko@suse.com, 
+	horms@kernel.org, jackmanb@google.com, hannes@cmpxchg.org, ziy@nvidia.com, 
+	ilias.apalodimas@linaro.org, willy@infradead.org, brauner@kernel.org, 
+	kas@kernel.org, yuzhao@google.com, usamaarif642@gmail.com, 
+	baolin.wang@linux.alibaba.com, toke@redhat.com, asml.silence@gmail.com, 
+	bpf@vger.kernel.org, linux-rdma@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2025-07-23 at 19:35 +0200, Maciej Fijalkowski wrote:
-> On Wed, Jul 23, 2025 at 07:59:22AM -0700, Mohsin Bashir wrote:
-> > Add basic support for attaching an XDP program to the device and suppor=
+On Tue, Jul 22, 2025 at 9:46=E2=80=AFPM Byungchul Park <byungchul@sk.com> w=
+rote:
+>
+> On Tue, Jul 22, 2025 at 03:17:15PM -0700, Mina Almasry wrote:
+> > On Sun, Jul 20, 2025 at 10:49=E2=80=AFPM Byungchul Park <byungchul@sk.c=
+om> wrote:
+> > >
+> > > Hi,
+> > >
+> > > I focused on converting the existing APIs accessing ->pp_magic field =
+to
+> > > page type APIs.  However, yes.  Additional works would better be
+> > > considered on top like:
+> > >
+> > >    1. Adjust how to store and retrieve dma index.  Maybe network guys
+> > >       can work better on top.
+> > >
+> > >    2. Move the sanity check for page pool in mm/page_alloc.c to on fr=
+ee.
+> > >
+> > >    Byungchul
+> > >
+> > > ---8<---
+> > > From 7d207a1b3e9f4ff2a72f5b54b09e3ed0c4aaaca3 Mon Sep 17 00:00:00 200=
+1
+> > > From: Byungchul Park <byungchul@sk.com>
+> > > Date: Mon, 21 Jul 2025 14:05:20 +0900
+> > > Subject: [PATCH] mm, page_pool: introduce a new page type for page po=
+ol in page type
+> > >
+> > > ->pp_magic field in struct page is current used to identify if a page
+> > > belongs to a page pool.  However, page type e.i. PGTY_netpp can be us=
+ed
+> > > for that purpose.
+> > >
+> > > Use the page type APIs e.g. PageNetpp(), __SetPageNetpp(), and
+> > > __ClearPageNetpp() instead, and remove the existing APIs accessing
+> > > ->pp_magic e.g. page_pool_page_is_pp(), netmem_or_pp_magic(), and
+> > > netmem_clear_pp_magic() since they are totally replaced.
+> > >
+> > > This work was inspired by the following link by Pavel:
+> > >
+> > > [1] https://lore.kernel.org/all/582f41c0-2742-4400-9c81-0d46bf4e8314@=
+gmail.com/
+> > >
+> > > Suggested-by: Pavel Begunkov <asml.silence@gmail.com>
+> > > Signed-off-by: Byungchul Park <byungchul@sk.com>
+> > > ---
+> > >  .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |  2 +-
+> > >  include/linux/mm.h                            | 28 ++---------------=
+--
+> > >  include/linux/page-flags.h                    |  6 ++++
+> > >  include/net/netmem.h                          |  2 +-
+> > >  mm/page_alloc.c                               |  4 +--
+> > >  net/core/netmem_priv.h                        | 16 ++---------
+> > >  net/core/page_pool.c                          | 10 +++++--
+> > >  7 files changed, 24 insertions(+), 44 deletions(-)
+> > >
+> > > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/drive=
+rs/net/ethernet/mellanox/mlx5/core/en/xdp.c
+> > > index 5d51600935a6..def274f5c1ca 100644
+> > > --- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+> > > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+> > > @@ -707,7 +707,7 @@ static void mlx5e_free_xdpsq_desc(struct mlx5e_xd=
+psq *sq,
+> > >                                 xdpi =3D mlx5e_xdpi_fifo_pop(xdpi_fif=
+o);
+> > >                                 page =3D xdpi.page.page;
+> > >
+> > > -                               /* No need to check page_pool_page_is=
+_pp() as we
+> > > +                               /* No need to check PageNetpp() as we
+> > >                                  * know this is a page_pool page.
+> > >                                  */
+> > >                                 page_pool_recycle_direct(pp_page_to_n=
+mdesc(page)->pp,
+> > > diff --git a/include/linux/mm.h b/include/linux/mm.h
+> > > index ae50c1641bed..736061749535 100644
+> > > --- a/include/linux/mm.h
+> > > +++ b/include/linux/mm.h
+> > > @@ -4135,10 +4135,9 @@ int arch_lock_shadow_stack_status(struct task_=
+struct *t, unsigned long status);
+> > >   * DMA mapping IDs for page_pool
+> > >   *
+> > >   * When DMA-mapping a page, page_pool allocates an ID (from an xarra=
+y) and
+> > > - * stashes it in the upper bits of page->pp_magic. We always want to=
+ be able to
+> > > - * unambiguously identify page pool pages (using page_pool_page_is_p=
+p()). Non-PP
+> > > - * pages can have arbitrary kernel pointers stored in the same field=
+ as pp_magic
+> > > - * (since it overlaps with page->lru.next), so we must ensure that w=
+e cannot
+> > > + * stashes it in the upper bits of page->pp_magic. Non-PP pages can =
+have
+> > > + * arbitrary kernel pointers stored in the same field as pp_magic (s=
+ince
+> > > + * it overlaps with page->lru.next), so we must ensure that we canno=
 t
-> > for PASS/DROP/ABORT actions.
-> > In fbnic, buffers are always mapped as DMA_BIDIRECTIONAL.
-> >=20
-> > Testing:
-> >=20
-> > Hook a simple XDP program that passes all the packets destined for a
-> > specific port
-> >=20
-> > iperf3 -c 192.168.1.10 -P 5 -p 12345
-> > Connecting to host 192.168.1.10, port 12345
-> > [  5] local 192.168.1.9 port 46702 connected to 192.168.1.10 port 12345
-> > [ ID] Interval           Transfer     Bitrate         Retr  Cwnd
-> > - - - - - - - - - - - - - - - - - - - - - - - - -
-> > [SUM]   1.00-2.00   sec  3.86 GBytes  33.2 Gbits/sec    0
-> >=20
-> > XDP_DROP:
-> > Hook an XDP program that drops packets destined for a specific port
-> >=20
-> >  iperf3 -c 192.168.1.10 -P 5 -p 12345
-> > ^C- - - - - - - - - - - - - - - - - - - - - - - - -
-> > [ ID] Interval           Transfer     Bitrate         Retr
-> > [SUM]   0.00-0.00   sec  0.00 Bytes  0.00 bits/sec    0       sender
-> > [SUM]   0.00-0.00   sec  0.00 Bytes  0.00 bits/sec            receiver
-> > iperf3: interrupt - the client has terminated
-> >=20
-> > XDP with HDS:
-> >=20
-> > - Validate XDP attachment failure when HDS is low
-> >    ~] ethtool -G eth0 hds-thresh 512
-> >    ~] sudo ip link set eth0 xdpdrv obj xdp_pass_12345.o sec xdp
-> >    ~] Error: fbnic: MTU too high, or HDS threshold is too low for singl=
-e
-> >       buffer XDP.
-> >=20
-> > - Validate successful XDP attachment when HDS threshold is appropriate
-> >   ~] ethtool -G eth0 hds-thresh 1536
-> >   ~] sudo ip link set eth0 xdpdrv obj xdp_pass_12345.o sec xdp
-> >=20
-> > - Validate when the XDP program is attached, changing HDS thresh to a
-> >   lower value fails
-> >   ~] ethtool -G eth0 hds-thresh 512
-> >   ~] netlink error: fbnic: Use higher HDS threshold or multi-buf capabl=
-e
-> >      program
-> >=20
-> > - Validate HDS thresh does not matter when xdp frags support is
-> >   available
-> >   ~] ethtool -G eth0 hds-thresh 512
-> >   ~] sudo ip link set eth0 xdpdrv obj xdp_pass_mb_12345.o sec xdp.frags
-> >=20
-> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> > Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
-> > ---
-> >  .../net/ethernet/meta/fbnic/fbnic_ethtool.c   | 11 +++
-> >  .../net/ethernet/meta/fbnic/fbnic_netdev.c    | 35 +++++++
-> >  .../net/ethernet/meta/fbnic/fbnic_netdev.h    |  5 +
-> >  drivers/net/ethernet/meta/fbnic/fbnic_txrx.c  | 95 +++++++++++++++++--
-> >  drivers/net/ethernet/meta/fbnic/fbnic_txrx.h  |  1 +
-> >  5 files changed, 140 insertions(+), 7 deletions(-)
-> >=20
-> > diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/=
-net/ethernet/meta/fbnic/fbnic_ethtool.c
-> > index 84a0db9f1be0..d7b9eb267ead 100644
-> > --- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-> > +++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-> > @@ -329,6 +329,17 @@ fbnic_set_ringparam(struct net_device *netdev, str=
-uct ethtool_ringparam *ring,
-> >  		return -EINVAL;
-> >  	}
-> > =20
-> > +	/* If an XDP program is attached, we should check for potential frame
-> > +	 * splitting. If the new HDS threshold can cause splitting, we should
-> > +	 * only allow if the attached XDP program can handle frags.
-> > +	 */
-> > +	if (fbnic_check_split_frames(fbn->xdp_prog, netdev->mtu,
-> > +				     kernel_ring->hds_thresh)) {
-> > +		NL_SET_ERR_MSG_MOD(extack,
-> > +				   "Use higher HDS threshold or multi-buf capable program");
-> > +		return -EINVAL;
-> > +	}
-> > +
-> >  	if (!netif_running(netdev)) {
-> >  		fbnic_set_rings(fbn, ring, kernel_ring);
-> >  		return 0;
-> > diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/n=
-et/ethernet/meta/fbnic/fbnic_netdev.c
-> > index d039e1c7a0d5..0621b89cbf3d 100644
-> > --- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-> > +++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-> > @@ -504,6 +504,40 @@ static void fbnic_get_stats64(struct net_device *d=
-ev,
-> >  	}
-> >  }
-> > =20
-> > +bool fbnic_check_split_frames(struct bpf_prog *prog, unsigned int mtu,
-> > +			      u32 hds_thresh)
-> > +{
-> > +	if (!prog)
-> > +		return false;
-> > +
-> > +	if (prog->aux->xdp_has_frags)
-> > +		return false;
-> > +
-> > +	return mtu + ETH_HLEN > hds_thresh;
-> > +}
-> > +
-> > +static int fbnic_bpf(struct net_device *netdev, struct netdev_bpf *bpf=
-)
-> > +{
-> > +	struct bpf_prog *prog =3D bpf->prog, *prev_prog;
-> > +	struct fbnic_net *fbn =3D netdev_priv(netdev);
-> > +
-> > +	if (bpf->command !=3D XDP_SETUP_PROG)
-> > +		return -EINVAL;
-> > +
-> > +	if (fbnic_check_split_frames(prog, netdev->mtu,
-> > +				     fbn->hds_thresh)) {
-> > +		NL_SET_ERR_MSG_MOD(bpf->extack,
-> > +				   "MTU too high, or HDS threshold is too low for single buffer XD=
-P");
-> > +		return -EOPNOTSUPP;
-> > +	}
-> > +
-> > +	prev_prog =3D xchg(&fbn->xdp_prog, prog);
-> > +	if (prev_prog)
-> > +		bpf_prog_put(prev_prog);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >  static const struct net_device_ops fbnic_netdev_ops =3D {
-> >  	.ndo_open		=3D fbnic_open,
-> >  	.ndo_stop		=3D fbnic_stop,
-> > @@ -513,6 +547,7 @@ static const struct net_device_ops fbnic_netdev_ops=
- =3D {
-> >  	.ndo_set_mac_address	=3D fbnic_set_mac,
-> >  	.ndo_set_rx_mode	=3D fbnic_set_rx_mode,
-> >  	.ndo_get_stats64	=3D fbnic_get_stats64,
-> > +	.ndo_bpf		=3D fbnic_bpf,
-> >  	.ndo_hwtstamp_get	=3D fbnic_hwtstamp_get,
-> >  	.ndo_hwtstamp_set	=3D fbnic_hwtstamp_set,
-> >  };
-> > diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h b/drivers/n=
-et/ethernet/meta/fbnic/fbnic_netdev.h
-> > index 04c5c7ed6c3a..bfa79ea910d8 100644
-> > --- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-> > +++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-> > @@ -18,6 +18,8 @@
-> >  #define FBNIC_TUN_GSO_FEATURES		NETIF_F_GSO_IPXIP6
-> > =20
-> >  struct fbnic_net {
-> > +	struct bpf_prog *xdp_prog;
-> > +
-> >  	struct fbnic_ring *tx[FBNIC_MAX_TXQS];
-> >  	struct fbnic_ring *rx[FBNIC_MAX_RXQS];
-> > =20
-> > @@ -104,4 +106,7 @@ int fbnic_phylink_ethtool_ksettings_get(struct net_=
-device *netdev,
-> >  int fbnic_phylink_get_fecparam(struct net_device *netdev,
-> >  			       struct ethtool_fecparam *fecparam);
-> >  int fbnic_phylink_init(struct net_device *netdev);
-> > +
-> > +bool fbnic_check_split_frames(struct bpf_prog *prog,
-> > +			      unsigned int mtu, u32 hds_threshold);
-> >  #endif /* _FBNIC_NETDEV_H_ */
-> > diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net=
-/ethernet/meta/fbnic/fbnic_txrx.c
-> > index 71af7b9d5bcd..486c14e83ad5 100644
-> > --- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-> > +++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-> > @@ -2,17 +2,26 @@
-> >  /* Copyright (c) Meta Platforms, Inc. and affiliates. */
-> > =20
-> >  #include <linux/bitfield.h>
-> > +#include <linux/bpf.h>
-> > +#include <linux/bpf_trace.h>
-> >  #include <linux/iopoll.h>
-> >  #include <linux/pci.h>
-> >  #include <net/netdev_queues.h>
-> >  #include <net/page_pool/helpers.h>
-> >  #include <net/tcp.h>
-> > +#include <net/xdp.h>
-> > =20
-> >  #include "fbnic.h"
-> >  #include "fbnic_csr.h"
-> >  #include "fbnic_netdev.h"
-> >  #include "fbnic_txrx.h"
-> > =20
-> > +enum {
-> > +	FBNIC_XDP_PASS =3D 0,
-> > +	FBNIC_XDP_CONSUME,
-> > +	FBNIC_XDP_LEN_ERR,
-> > +};
-> > +
-> >  enum {
-> >  	FBNIC_XMIT_CB_TS	=3D 0x01,
-> >  };
-> > @@ -877,7 +886,7 @@ static void fbnic_pkt_prepare(struct fbnic_napi_vec=
-tor *nv, u64 rcd,
-> > =20
-> >  	headroom =3D hdr_pg_off - hdr_pg_start + FBNIC_RX_PAD;
-> >  	frame_sz =3D hdr_pg_end - hdr_pg_start;
-> > -	xdp_init_buff(&pkt->buff, frame_sz, NULL);
-> > +	xdp_init_buff(&pkt->buff, frame_sz, &qt->xdp_rxq);
-> >  	hdr_pg_start +=3D (FBNIC_RCD_AL_BUFF_FRAG_MASK & rcd) *
-> >  			FBNIC_BD_FRAG_SIZE;
-> > =20
-> > @@ -966,6 +975,38 @@ static struct sk_buff *fbnic_build_skb(struct fbni=
-c_napi_vector *nv,
-> >  	return skb;
-> >  }
-> > =20
-> > +static struct sk_buff *fbnic_run_xdp(struct fbnic_napi_vector *nv,
-> > +				     struct fbnic_pkt_buff *pkt)
-> > +{
-> > +	struct fbnic_net *fbn =3D netdev_priv(nv->napi.dev);
-> > +	struct bpf_prog *xdp_prog;
-> > +	int act;
-> > +
-> > +	xdp_prog =3D READ_ONCE(fbn->xdp_prog);
-> > +	if (!xdp_prog)
-> > +		goto xdp_pass;
->=20
-> Hi Mohsin,
->=20
-> I thought we were past the times when we read prog pointer per each
-> processed packet and agreed on reading the pointer once per napi loop?
+> > >   * mistake a valid kernel pointer with any of the values we write in=
+to this
+> > >   * field.
+> > >   *
+> > > @@ -4168,25 +4167,4 @@ int arch_lock_shadow_stack_status(struct task_=
+struct *t, unsigned long status);
+> > >
+> > >  #define PP_DMA_INDEX_MASK GENMASK(PP_DMA_INDEX_BITS + PP_DMA_INDEX_S=
+HIFT - 1, \
+> > >                                   PP_DMA_INDEX_SHIFT)
+> > > -
+> > > -/* Mask used for checking in page_pool_page_is_pp() below. page->pp_=
+magic is
+> > > - * OR'ed with PP_SIGNATURE after the allocation in order to preserve=
+ bit 0 for
+> > > - * the head page of compound page and bit 1 for pfmemalloc page, as =
+well as the
+> > > - * bits used for the DMA index. page_is_pfmemalloc() is checked in
+> > > - * __page_pool_put_page() to avoid recycling the pfmemalloc page.
+> > > - */
+> > > -#define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
+> > > -
+> > > -#ifdef CONFIG_PAGE_POOL
+> > > -static inline bool page_pool_page_is_pp(const struct page *page)
+> > > -{
+> > > -       return (page->pp_magic & PP_MAGIC_MASK) =3D=3D PP_SIGNATURE;
+> > > -}
+> > > -#else
+> > > -static inline bool page_pool_page_is_pp(const struct page *page)
+> > > -{
+> > > -       return false;
+> > > -}
+> > > -#endif
+> > > -
+> > >  #endif /* _LINUX_MM_H */
+> > > diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+> > > index 4fe5ee67535b..906ba7c9e372 100644
+> > > --- a/include/linux/page-flags.h
+> > > +++ b/include/linux/page-flags.h
+> > > @@ -957,6 +957,7 @@ enum pagetype {
+> > >         PGTY_zsmalloc           =3D 0xf6,
+> > >         PGTY_unaccepted         =3D 0xf7,
+> > >         PGTY_large_kmalloc      =3D 0xf8,
+> > > +       PGTY_netpp              =3D 0xf9,
+> > >
+> > >         PGTY_mapcount_underflow =3D 0xff
+> > >  };
+> > > @@ -1101,6 +1102,11 @@ PAGE_TYPE_OPS(Zsmalloc, zsmalloc, zsmalloc)
+> > >  PAGE_TYPE_OPS(Unaccepted, unaccepted, unaccepted)
+> > >  FOLIO_TYPE_OPS(large_kmalloc, large_kmalloc)
+> > >
+> > > +/*
+> > > + * Marks page_pool allocated pages.
+> > > + */
+> > > +PAGE_TYPE_OPS(Netpp, netpp, netpp)
+> > > +
+> > >  /**
+> > >   * PageHuge - Determine if the page belongs to hugetlbfs
+> > >   * @page: The page to test.
+> > > diff --git a/include/net/netmem.h b/include/net/netmem.h
+> > > index f7dacc9e75fd..3667334e16e7 100644
+> > > --- a/include/net/netmem.h
+> > > +++ b/include/net/netmem.h
+> > > @@ -298,7 +298,7 @@ static inline struct net_iov *__netmem_clear_lsb(=
+netmem_ref netmem)
+> > >   */
+> > >  #define pp_page_to_nmdesc(p)                                        =
+   \
+> > >  ({                                                                  =
+   \
+> > > -       DEBUG_NET_WARN_ON_ONCE(!page_pool_page_is_pp(p));            =
+   \
+> > > +       DEBUG_NET_WARN_ON_ONCE(!PageNetpp(p));                       =
+   \
+> > >         __pp_page_to_nmdesc(p);                                      =
+   \
+> > >  })
+> > >
+> > > diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+> > > index 2ef3c07266b3..71c7666e48a9 100644
+> > > --- a/mm/page_alloc.c
+> > > +++ b/mm/page_alloc.c
+> > > @@ -898,7 +898,7 @@ static inline bool page_expected_state(struct pag=
+e *page,
+> > >  #ifdef CONFIG_MEMCG
+> > >                         page->memcg_data |
+> > >  #endif
+> > > -                       page_pool_page_is_pp(page) |
+> > > +                       PageNetpp(page) |
+> > >                         (page->flags & check_flags)))
+> > >                 return false;
+> > >
+> > > @@ -925,7 +925,7 @@ static const char *page_bad_reason(struct page *p=
+age, unsigned long flags)
+> > >         if (unlikely(page->memcg_data))
+> > >                 bad_reason =3D "page still charged to cgroup";
+> > >  #endif
+> > > -       if (unlikely(page_pool_page_is_pp(page)))
+> > > +       if (unlikely(PageNetpp(page)))
+> > >                 bad_reason =3D "page_pool leak";
+> > >         return bad_reason;
+> > >  }
+> > > diff --git a/net/core/netmem_priv.h b/net/core/netmem_priv.h
+> > > index cd95394399b4..39a97703d9ed 100644
+> > > --- a/net/core/netmem_priv.h
+> > > +++ b/net/core/netmem_priv.h
+> > > @@ -8,21 +8,11 @@ static inline unsigned long netmem_get_pp_magic(net=
+mem_ref netmem)
+> > >         return __netmem_clear_lsb(netmem)->pp_magic & ~PP_DMA_INDEX_M=
+ASK;
+> > >  }
+> > >
+> > > -static inline void netmem_or_pp_magic(netmem_ref netmem, unsigned lo=
+ng pp_magic)
+> > > -{
+> > > -       __netmem_clear_lsb(netmem)->pp_magic |=3D pp_magic;
+> > > -}
+> > > -
+> > > -static inline void netmem_clear_pp_magic(netmem_ref netmem)
+> > > -{
+> > > -       WARN_ON_ONCE(__netmem_clear_lsb(netmem)->pp_magic & PP_DMA_IN=
+DEX_MASK);
+> > > -
+> > > -       __netmem_clear_lsb(netmem)->pp_magic =3D 0;
+> > > -}
+> > > -
+> > >  static inline bool netmem_is_pp(netmem_ref netmem)
+> > >  {
+> > > -       return (netmem_get_pp_magic(netmem) & PP_MAGIC_MASK) =3D=3D P=
+P_SIGNATURE;
+> > > +       if (netmem_is_net_iov(netmem))
+> > > +               return true;
+> >
+> > As Pavel alludes, this is dubious, and at least it's difficult to
+> > reason about it.
+> >
+> > There could be net_iovs that are not attached to pp, and should not be
+> > treated as pp memory. These are in the devmem (and future net_iov) tx
+> > paths.
+> >
+> > We need a way to tell if a net_iov is pp or not. A couple of options:
+> >
+> > 1. We could have it such that if net_iov->pp is set, then the
+> > netmem_is_pp =3D=3D true, otherwise false.
+> > 2. We could implement a page-flags equivalent for net_iov.
+> >
+> > Option #1 is simpler and is my preferred. To do that properly, you need=
+ to:
+> >
+> > 1. Make sure everywhere net_iovs are allocated that pp=3DNULL in the
+> > non-pp case and pp=3Dnon NULL in the pp case. those callsites are
+> > net_devmem_bind_dmabuf (devmem rx & tx path), io_zcrx_create_area
+> > (io_uring rx path).
+> >
+> > 2. Change netmem_is_pp to check net_iov->pp in the net_iov case.
+>
+> Good idea, but I'm not sure if I could work on it without consuming your
+> additional review efforts.  Can anyone add net_iov_is_pp() helper?
+>
 
-This is reading the cached pointer from the netdev. Are you saying you
-would rather have this as a stack pointer instead? I don't really see
-the advantage to making this a once per napi poll session versus just
-reading it once per packet.
+Things did indeed get busy for me with work work the past week and I
+still need to look at your merged netmem desc series, but I'm happy to
+review whenever I can.
 
->=20
-> > +
-> > +	if (xdp_buff_has_frags(&pkt->buff) && !xdp_prog->aux->xdp_has_frags)
-> > +		return ERR_PTR(-FBNIC_XDP_LEN_ERR);
->=20
-> when can this happen and couldn't you catch this within ndo_bpf? i suppos=
-e
-> it's related to hds setup.
+> Or use the page type, Netpp, as an additional way to identify if it's a
+> pp page for system memory, keeping the current way using ->pp_magic.
+> So the page type, Netpp, is used for system memory, and ->pp_magic is
+> used for net_iov.  The clean up for ->pp_magic can be done if needed.
+>
 
-I was looking over the code and really the MTU is just a suggestion for
-what size packets we can expect to receive. The MTU doesn't guarantee
-the receive size, it is just the maximum transmission unit and
-represents the minimum frame size we should support.
+IMO I would like to avoid deviations like this, especially since
+->pp_magic is in the netmem_desc struct that is now shared between
+page and net_iov. I'd rather both use pp_magic or both not, but that
+may just be me.
 
-Much like what I did on the Intel NICs back in the day we can receive
-up to the maximum frame size in almost all cases regardless of MTU
-setting. Otherwise we would have to shut down the NIC and change the
-buffer allocations much like we used to do on the old drivers every
-time you changed the MTU.
+
+--=20
+Thanks,
+Mina
 
