@@ -1,158 +1,150 @@
-Return-Path: <netdev+bounces-209658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBB1CB102F1
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 10:10:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A1A8B104EC
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 10:55:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4B2B16F17B
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 08:09:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53EA03A76FD
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 08:52:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1C2E27464A;
-	Thu, 24 Jul 2025 08:08:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96F6E275B1D;
+	Thu, 24 Jul 2025 08:43:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VKHtRMei"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E7C274642;
-	Thu, 24 Jul 2025 08:08:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF694275851
+	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 08:43:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753344521; cv=none; b=KAbJShkDUUhh9s+53DaQGp601+4gfbZxWp1cFo1CO/Kt2h8j9+ffa2v/I8iZ/4f2gao2TqAeG+7Nq/YFpBcG4fOG0u8dLSxorKDd0Ds25J702gp3SrPCksiMXWHmuw7gsj+sN22YwKTdQU8jHpHU+7NIbm+WZAtar+ctal6x8Pg=
+	t=1753346599; cv=none; b=sD0gqzANlnV+gs37iH8lIxR98yRkRam+68HbemesCjt0pRAuXAHuxqa0Q3s5ggssLZ3EIOt4BnjL2j1eTXWWz1/8BdFkd7rPxGdletKOWBiXTBdLWP6w5UeSC61r7LAbfg9ToRxua5kTfz8e0MmlsZZYwFWWi5+TwDcrtfUMPjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753344521; c=relaxed/simple;
-	bh=32eMAaAFZX0xgC3CVuE+Q+yYsKnapcRGesxxo78CraY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=teA3rPVZPZNp2kJrxB6lVeVViT9j52Lcg8+yamzn+GQK/ACEUUGWKKfjiWynolzXMNS0yYjgzpuGDZYfEjkme4PEOuMpDpIsjnMrS4HyLmHqK4LAeywiX2xZkJ/SGmvFymiZsekrAzReNZ/Te2q/HExVeC/uIeM9CT0oMzAi1Nw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4bnk6w5rDkzGq1k;
-	Thu, 24 Jul 2025 16:04:24 +0800 (CST)
-Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9F672180B63;
-	Thu, 24 Jul 2025 16:08:35 +0800 (CST)
-Received: from huawei.com (10.175.124.27) by dggpemf500016.china.huawei.com
- (7.185.36.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 24 Jul
- 2025 16:08:34 +0800
-From: Wang Liang <wangliang74@huawei.com>
-To: <mst@redhat.com>, <jasowang@redhat.com>, <xuanzhuo@linux.alibaba.com>,
-	<eperezma@redhat.com>, <pabeni@redhat.com>, <davem@davemloft.net>,
-	<willemb@google.com>, <atenart@kernel.org>
-CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
-	<wangliang74@huawei.com>, <netdev@vger.kernel.org>,
-	<virtualization@lists.linux.dev>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH net] net: check the minimum value of gso size in virtio_net_hdr_to_skb()
-Date: Thu, 24 Jul 2025 16:30:05 +0800
-Message-ID: <20250724083005.3918375-1-wangliang74@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1753346599; c=relaxed/simple;
+	bh=9zN1dEpSPCgnoKMhnC9SNhHXxUcvr2JCUuRwjjhjxwA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XUuiQwyt2zu48U4MVO2Mip9dCT8gHHuPNkQ4S1MbO/aN876+qTw0qBHo/yTQa+ELvA+4vGbVhQ4D3u5MYJ99arEwtP9HzeL7YWBqHnGdv+IBcxwV9Oi7+jLWNvaRoBnfbKK/1cRZKPVuHwwKvcrRfPPd9CkgXchNyAOHkymjUVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VKHtRMei; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753346594;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=131oVeJbbxdBC3wo7pqtqaJG7n7zzMzTYT4OnzIeYJg=;
+	b=VKHtRMei/ir5d+wLmwO8e+6U9Tkplg8zWKGyVxlvaRUxcRQAEZdEvVB//6+fLjT4oCpwqU
+	SVDb3nZv8odLEh0JOKlM9QztR0uu0KivcZPh/gHd7+zTBkcylUpImuLDbqbilWRv7M3I4z
+	KxBAXjv2YSUUcwsunIgDQHtmDKzxLhg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-665-u6705_gsNZSKJazdlUE58g-1; Thu, 24 Jul 2025 04:43:12 -0400
+X-MC-Unique: u6705_gsNZSKJazdlUE58g-1
+X-Mimecast-MFC-AGG-ID: u6705_gsNZSKJazdlUE58g_1753346591
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3a523ce0bb2so390596f8f.0
+        for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 01:43:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753346591; x=1753951391;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=131oVeJbbxdBC3wo7pqtqaJG7n7zzMzTYT4OnzIeYJg=;
+        b=n3efvlxK9eoKuebIPmltuxfD48DAtK2iOTbN/ziJK0+rgZx34956bp7FupQNCDMqBf
+         ZXoH+ho8JbPrafsVuLAe2U5V+pAnCRCwXdQFIk36xhCXmVFHvXZykaHRa2udh0XPHu4q
+         TnuoEZaAKIQrqN1Imli0Tr08ta7N1URAy2PHUH9daBY/C1HUATz1hhZBmZt8nppfzdl0
+         SHgJANP543lcIAn2evrvvcdKICVR79Zg4WQqRz0IswNEInP0qEAi6lvCzW+IMZeXsboA
+         3Hu/bXMWqUPyPwhE9FHCozFgRLSX6r4AADPYsj/0+d7B8GsJBN+GMpeSNN2gxNl9cx7+
+         5xDA==
+X-Forwarded-Encrypted: i=1; AJvYcCVo2qZjD2DI+yXG4RYvetmo1Q6LRKxdH/ppTonRu/SKpyts6hnLx0H/KwWF3kA/6w0RmFFKr8U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5c9R+5mcoq4Ijl2O0uOpAHXv5MAkk7QXG3iAGFpvc8jAtF46p
+	J0AmGFFMwdkDvTLYnLI9AriadOp7nB+dDfe/iN0VKbc41q6MEYjVgPsLWBdw7PGu43svmQRJHJn
+	8PRXpbsWxIgKqfd0J7Q1VrYT0yhmns1aeBHjaZacqQGsX04M8aLrqXrz0aQ==
+X-Gm-Gg: ASbGncveaDtSmkZqel8nS3nDlcMKTj0mfx1YxCp0lkDlHWaqx7aqBUzgmyvIs/21ML5
+	ij+LLr9a0iNInjsSodzBnuJLSVdjzn89mgr36G4kVjcGapscB53sx+e2mqKD+5YPhmKdtCzUSkD
+	9m/oKHdbi1eGG8tH9gyS14mkHohira8SFpzBLKNcSegyQi0YuXBpfhqoCDd7cUOfPSPCWEwZa0B
+	x0EDZkP+Ada+liOonXr+XojU/9yhuFkUHNqNIi5m86fN1hWUnaIoj7E9Io0G23aFAcK1UYO60Xl
+	El5TFrHPrdi5hIdbh/y7Zu93nAJwLX9GAS31KPK5Ul/Nt3R94iNroAZzuGB8uZtvwXbQOBJ/ZRf
+	VDJkN4tAbkb0=
+X-Received: by 2002:a05:6000:25c5:b0:3a4:f744:e01b with SMTP id ffacd0b85a97d-3b768efff24mr5893571f8f.39.1753346590780;
+        Thu, 24 Jul 2025 01:43:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHw2ZCsLSC8U30AYmY/u4VF/S1+ls/wQ2DtYhThaRcAJMKg+XGgueYBxIEB3uBg9YGMehdIgQ==
+X-Received: by 2002:a05:6000:25c5:b0:3a4:f744:e01b with SMTP id ffacd0b85a97d-3b768efff24mr5893538f8f.39.1753346590308;
+        Thu, 24 Jul 2025 01:43:10 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b76fcb888csm1456929f8f.59.2025.07.24.01.43.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Jul 2025 01:43:09 -0700 (PDT)
+Message-ID: <83470afc-31f1-4696-91f3-2587317cb3a1@redhat.com>
+Date: Thu, 24 Jul 2025 10:43:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: virtio_close() stuck on napi_disable_locked()
+To: Jason Wang <jasowang@redhat.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Zigit Zo <zuozhijie@bytedance.com>, "Michael S. Tsirkin"
+ <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <c5a93ed1-9abe-4880-a3bb-8d1678018b1d@redhat.com>
+ <20250722145524.7ae61342@kernel.org>
+ <CACGkMEsnKwYqRi_=s4Uy8x5b2M8WXXzmPV3tOf1Qh-7MG-KNDQ@mail.gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CACGkMEsnKwYqRi_=s4Uy8x5b2M8WXXzmPV3tOf1Qh-7MG-KNDQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- dggpemf500016.china.huawei.com (7.185.36.197)
 
-When sending a packet with virtio_net_hdr to tun device, if the gso_type
-in virtio_net_hdr is SKB_GSO_UDP and the gso_size is less than udphdr
-size, below crash may happen.
+On 7/23/25 7:14 AM, Jason Wang wrote:
+> On Wed, Jul 23, 2025 at 5:55 AM Jakub Kicinski <kuba@kernel.org> wrote:
+>> On Tue, 22 Jul 2025 13:00:14 +0200 Paolo Abeni wrote:
+>>> The NIPA CI is reporting some hung-up in the stats.py test caused by the
+>>> virtio_net driver stuck at close time.
+>>>
+>>> A sample splat is available here:
+>>>
+>>> https://netdev-3.bots.linux.dev/vmksft-drv-hw-dbg/results/209441/4-stats-py/stderr
+>>>
+>>> AFAICS the issue happens only on debug builds.
+>>>
+>>> I'm wild guessing to something similar to the the issue addressed by
+>>> commit 4bc12818b363bd30f0f7348dd9ab077290a637ae, possibly for tx_napi,
+>>> but I could not spot anything obvious.
+>>>
+>>> Could you please have a look?
+>>
+>> It only hits in around 1 in 5 runs.
+> 
+> I tried to reproduce this locally but failed. Where can I see the qemu
+> command line for the VM?
+> 
+>> Likely some pre-existing race, but
+>> it started popping up for us when be5dcaed694e ("virtio-net: fix
+>> recursived rtnl_lock() during probe()") was merged.
+> 
+> Probably but I didn't see a direct connection with that commit. It
+> looks like the root cause is the deadloop of napi_disable() for some
+> reason as Paolo said.
+> 
+>> It never hit before.
+>> If we can't find a quick fix I think we should revert be5dcaed694e for
+>> now, so that it doesn't end up regressing 6.16 final.
 
-  ------------[ cut here ]------------
-  kernel BUG at net/core/skbuff.c:4572!
-  Oops: invalid opcode: 0000 [#1] SMP NOPTI
-  CPU: 0 UID: 0 PID: 62 Comm: mytest Not tainted 6.16.0-rc7 #203 PREEMPT(voluntary)
-  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-  RIP: 0010:skb_pull_rcsum+0x8e/0xa0
-  Code: 00 00 5b c3 cc cc cc cc 8b 93 88 00 00 00 f7 da e8 37 44 38 00 f7 d8 89 83 88 00 00 00 48 8b 83 c8 00 00 00 5b c3 cc cc cc cc <0f> 0b 0f 0b 66 66 2e 0f 1f 84 00 000
-  RSP: 0018:ffffc900001fba38 EFLAGS: 00000297
-  RAX: 0000000000000004 RBX: ffff8880040c1000 RCX: ffffc900001fb948
-  RDX: ffff888003e6d700 RSI: 0000000000000008 RDI: ffff88800411a062
-  RBP: ffff8880040c1000 R08: 0000000000000000 R09: 0000000000000001
-  R10: ffff888003606c00 R11: 0000000000000001 R12: 0000000000000000
-  R13: ffff888004060900 R14: ffff888004050000 R15: ffff888004060900
-  FS:  000000002406d3c0(0000) GS:ffff888084a19000(0000) knlGS:0000000000000000
-  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  CR2: 0000000020000040 CR3: 0000000004007000 CR4: 00000000000006f0
-  Call Trace:
-   <TASK>
-   udp_queue_rcv_one_skb+0x176/0x4b0 net/ipv4/udp.c:2445
-   udp_queue_rcv_skb+0x155/0x1f0 net/ipv4/udp.c:2475
-   udp_unicast_rcv_skb+0x71/0x90 net/ipv4/udp.c:2626
-   __udp4_lib_rcv+0x433/0xb00 net/ipv4/udp.c:2690
-   ip_protocol_deliver_rcu+0xa6/0x160 net/ipv4/ip_input.c:205
-   ip_local_deliver_finish+0x72/0x90 net/ipv4/ip_input.c:233
-   ip_sublist_rcv_finish+0x5f/0x70 net/ipv4/ip_input.c:579
-   ip_sublist_rcv+0x122/0x1b0 net/ipv4/ip_input.c:636
-   ip_list_rcv+0xf7/0x130 net/ipv4/ip_input.c:670
-   __netif_receive_skb_list_core+0x21d/0x240 net/core/dev.c:6067
-   netif_receive_skb_list_internal+0x186/0x2b0 net/core/dev.c:6210
-   napi_complete_done+0x78/0x180 net/core/dev.c:6580
-   tun_get_user+0xa63/0x1120 drivers/net/tun.c:1909
-   tun_chr_write_iter+0x65/0xb0 drivers/net/tun.c:1984
-   vfs_write+0x300/0x420 fs/read_write.c:593
-   ksys_write+0x60/0xd0 fs/read_write.c:686
-   do_syscall_64+0x50/0x1c0 arch/x86/entry/syscall_64.c:63
-   </TASK>
+I tried hard to reproduce the issue locally - to validate an eventual
+revert before pushing it. But so far I failed quite miserably.
 
-To trigger gso segment in udp_queue_rcv_skb(), we should also set option
-UDP_ENCAP_ESPINUDP to enable udp_sk(sk)->encap_rcv. When the encap_rcv
-hook return 1 in udp_queue_rcv_one_skb(), udp_csum_pull_header() will try
-to pull udphdr, but the skb size has been segmented to gso size, which
-leads to this crash.
+Given the above, I would avoid the revert and just mention the known
+issue in the net PR to Linus.
 
-Only udp has this probloem. Add check for the minimum value of gso size in
-virtio_net_hdr_to_skb().
-
-Fixes: cf329aa42b66 ("udp: cope with UDP GRO packet misdirection")
-Fixes: 3d010c8031e3 ("udp: do not accept non-tunnel GSO skbs landing in a tunnel")
-Signed-off-by: Wang Liang <wangliang74@huawei.com>
----
- include/linux/virtio_net.h | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-index 02a9f4dc594d..0533101642bd 100644
---- a/include/linux/virtio_net.h
-+++ b/include/linux/virtio_net.h
-@@ -157,11 +157,13 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
- 		u16 gso_size = __virtio16_to_cpu(little_endian, hdr->gso_size);
- 		unsigned int nh_off = p_off;
- 		struct skb_shared_info *shinfo = skb_shinfo(skb);
-+		u16 min_gso_size = 0;
- 
- 		switch (gso_type & ~SKB_GSO_TCP_ECN) {
- 		case SKB_GSO_UDP:
- 			/* UFO may not include transport header in gso_size. */
- 			nh_off -= thlen;
-+			min_gso_size = sizeof(struct udphdr) + 1;
- 			break;
- 		case SKB_GSO_UDP_L4:
- 			if (!(hdr->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM))
-@@ -172,6 +174,7 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
- 				return -EINVAL;
- 			if (gso_type != SKB_GSO_UDP_L4)
- 				return -EINVAL;
-+			min_gso_size = sizeof(struct udphdr) + 1;
- 			break;
- 		case SKB_GSO_TCPV4:
- 		case SKB_GSO_TCPV6:
-@@ -182,7 +185,7 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
- 		}
- 
- 		/* Kernel has a special handling for GSO_BY_FRAGS. */
--		if (gso_size == GSO_BY_FRAGS)
-+		if ((gso_size == GSO_BY_FRAGS) || (gso_size < min_gso_size))
- 			return -EINVAL;
- 
- 		/* Too small packets are not really GSO ones. */
--- 
-2.34.1
+/P
 
 
