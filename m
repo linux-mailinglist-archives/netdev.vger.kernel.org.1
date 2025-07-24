@@ -1,123 +1,158 @@
-Return-Path: <netdev+bounces-209669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 920C4B10384
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 10:29:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBB1CB102F1
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 10:10:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5586A3A406C
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 08:29:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4B2B16F17B
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 08:09:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ACE5272E4F;
-	Thu, 24 Jul 2025 08:29:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="he4a7OHM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1C2E27464A;
+	Thu, 24 Jul 2025 08:08:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6B021E32B7;
-	Thu, 24 Jul 2025 08:29:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E7C274642;
+	Thu, 24 Jul 2025 08:08:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753345772; cv=none; b=ty3Oheccx56NyXGzcwX8KdFCoCqTLPZzkB2vYzNzS790oU/7L/AvvL/Tw0f1sQMqLy5zV3pxGGgA/j40p/ZA0GAHa3ls56j98763yXiJGvXuI63RAPIhYYkTOPuVgNVRnniwD+ZKMjXVspI0vL9ewYoVblQLLJ+9I6KYJlryBm4=
+	t=1753344521; cv=none; b=KAbJShkDUUhh9s+53DaQGp601+4gfbZxWp1cFo1CO/Kt2h8j9+ffa2v/I8iZ/4f2gao2TqAeG+7Nq/YFpBcG4fOG0u8dLSxorKDd0Ds25J702gp3SrPCksiMXWHmuw7gsj+sN22YwKTdQU8jHpHU+7NIbm+WZAtar+ctal6x8Pg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753345772; c=relaxed/simple;
-	bh=tlzwZGCuIfcEqftp3h7uHc2ycvorKqwQFGrRHHg/6m4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=auY/9RIgVV04/bCDlJoSh/4Jt9fLod+m+Sa4ChaktfXtQ68AKhzALXptaH91MG52R922j4k9Fj5S+v6kl7QroF02u4tpdqO+IYAPHaLJVSEbByQU3C1Zeopyv1Hhvfxy+KNYqlt8cNM137P2RhStcho/y3EsR6hlyWOgw/HFNRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=he4a7OHM; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <487ba043-ba5b-4071-ad84-2cdc8ef2eaf1@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753345767;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ODlto4/Gmeh1aGgrIs5jPYnBSPBuOWPalhw5GtoU864=;
-	b=he4a7OHMN1IFpuoLBP732FEEPEQeNLynxheTL5kIeK896tGmTQ5qZqyIvCeTzvuo8Pne4Z
-	v4NNSyFzPRhgkFeO42lpQU1OZrHE3xNot424krFz4QkOqpGeNH/J29yxRW5al2vDkUFKMq
-	hWttLLIw10wivgtlDGqypsIod1WVEM4=
-Date: Thu, 24 Jul 2025 09:28:54 +0100
+	s=arc-20240116; t=1753344521; c=relaxed/simple;
+	bh=32eMAaAFZX0xgC3CVuE+Q+yYsKnapcRGesxxo78CraY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=teA3rPVZPZNp2kJrxB6lVeVViT9j52Lcg8+yamzn+GQK/ACEUUGWKKfjiWynolzXMNS0yYjgzpuGDZYfEjkme4PEOuMpDpIsjnMrS4HyLmHqK4LAeywiX2xZkJ/SGmvFymiZsekrAzReNZ/Te2q/HExVeC/uIeM9CT0oMzAi1Nw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4bnk6w5rDkzGq1k;
+	Thu, 24 Jul 2025 16:04:24 +0800 (CST)
+Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9F672180B63;
+	Thu, 24 Jul 2025 16:08:35 +0800 (CST)
+Received: from huawei.com (10.175.124.27) by dggpemf500016.china.huawei.com
+ (7.185.36.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 24 Jul
+ 2025 16:08:34 +0800
+From: Wang Liang <wangliang74@huawei.com>
+To: <mst@redhat.com>, <jasowang@redhat.com>, <xuanzhuo@linux.alibaba.com>,
+	<eperezma@redhat.com>, <pabeni@redhat.com>, <davem@davemloft.net>,
+	<willemb@google.com>, <atenart@kernel.org>
+CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
+	<wangliang74@huawei.com>, <netdev@vger.kernel.org>,
+	<virtualization@lists.linux.dev>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH net] net: check the minimum value of gso size in virtio_net_hdr_to_skb()
+Date: Thu, 24 Jul 2025 16:30:05 +0800
+Message-ID: <20250724083005.3918375-1-wangliang74@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] pch_gbe: Add NULL check for ptp_pdev in pch_gbe_probe()
-To: Chenyuan Yang <chenyuan0y@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
- mingo@kernel.org, tglx@linutronix.de, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250723034105.2939635-1-chenyuan0y@gmail.com>
- <b33f5cee-d3de-4cbd-8eeb-214ba6b42cb7@linux.dev>
- <CALGdzuq1BndVib-==ZEHapGsiKuReMxm-f8DB+xFK9qbSpWruQ@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <CALGdzuq1BndVib-==ZEHapGsiKuReMxm-f8DB+xFK9qbSpWruQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ dggpemf500016.china.huawei.com (7.185.36.197)
 
-On 23/07/2025 17:29, Chenyuan Yang wrote:
-> On Wed, Jul 23, 2025 at 2:37 AM Vadim Fedorenko
-> <vadim.fedorenko@linux.dev> wrote:
->>
->> On 23/07/2025 04:41, Chenyuan Yang wrote:
->>> Since pci_get_domain_bus_and_slot() can return NULL for PCI_DEVFN(12, 4),
->>> add NULL check for adapter->ptp_pdev in pch_gbe_probe().
->>>
->>> This change is similar to the fix implemented in commit 9af152dcf1a0
->>> ("drm/gma500: Add NULL check for pci_gfx_root in mid_get_vbt_data()").
->>>
->>> Signed-off-by: Chenyuan Yang <chenyuan0y@gmail.com>
->>> ---
->>>    drivers/net/ethernet/oki-semi/pch_gbe/pch_gbe_main.c | 5 +++++
->>>    1 file changed, 5 insertions(+)
->>>
->>> diff --git a/drivers/net/ethernet/oki-semi/pch_gbe/pch_gbe_main.c b/drivers/net/ethernet/oki-semi/pch_gbe/pch_gbe_main.c
->>> index e5a6f59af0b6..10b8f1fea1a2 100644
->>> --- a/drivers/net/ethernet/oki-semi/pch_gbe/pch_gbe_main.c
->>> +++ b/drivers/net/ethernet/oki-semi/pch_gbe/pch_gbe_main.c
->>> @@ -2515,6 +2515,11 @@ static int pch_gbe_probe(struct pci_dev *pdev,
->>>                pci_get_domain_bus_and_slot(pci_domain_nr(adapter->pdev->bus),
->>>                                            adapter->pdev->bus->number,
->>>                                            PCI_DEVFN(12, 4));
->>> +     if (!adapter->ptp_pdev) {
->>> +             dev_err(&pdev->dev, "PTP device not found\n");
->>> +             ret = -ENODEV;
->>> +             goto err_free_netdev;
->>> +     }
->>
->> Why is this error fatal? I believe the device still can transmit and
->> receive packets without PTP device. If this situation is really possible
->> I would suggest you to add checks to ioctl function to remove
->> timestamping support if there is no PTP device found
-> 
-> Thanks for the prompt reply!
-> Our static analysis tool found this issue and we made the initial
-> patch based on the existings checks for pci_get_domain_bus_and_slot()
-> 
-> I've drafted a new version based on your suggestion. It removes the
-> check from the probe function and instead adds the necessary NULL
-> checks directly to the timestamping and ioctl functions.
-> 
-> Does the implementation below look correct to you? If so, I will
-> prepare and send a formal v2 patch.
-> 
+When sending a packet with virtio_net_hdr to tun device, if the gso_type
+in virtio_net_hdr is SKB_GSO_UDP and the gso_size is less than udphdr
+size, below crash may happen.
 
-I would say this patch looks way too defensive. It's enough to deny
-enabling HW timestamping when there is no PTP device, then all other
-checks will never happen. And I would keep the error message just to
-inform users that PTP feature is not available on the particular
-device/system.
+  ------------[ cut here ]------------
+  kernel BUG at net/core/skbuff.c:4572!
+  Oops: invalid opcode: 0000 [#1] SMP NOPTI
+  CPU: 0 UID: 0 PID: 62 Comm: mytest Not tainted 6.16.0-rc7 #203 PREEMPT(voluntary)
+  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+  RIP: 0010:skb_pull_rcsum+0x8e/0xa0
+  Code: 00 00 5b c3 cc cc cc cc 8b 93 88 00 00 00 f7 da e8 37 44 38 00 f7 d8 89 83 88 00 00 00 48 8b 83 c8 00 00 00 5b c3 cc cc cc cc <0f> 0b 0f 0b 66 66 2e 0f 1f 84 00 000
+  RSP: 0018:ffffc900001fba38 EFLAGS: 00000297
+  RAX: 0000000000000004 RBX: ffff8880040c1000 RCX: ffffc900001fb948
+  RDX: ffff888003e6d700 RSI: 0000000000000008 RDI: ffff88800411a062
+  RBP: ffff8880040c1000 R08: 0000000000000000 R09: 0000000000000001
+  R10: ffff888003606c00 R11: 0000000000000001 R12: 0000000000000000
+  R13: ffff888004060900 R14: ffff888004050000 R15: ffff888004060900
+  FS:  000000002406d3c0(0000) GS:ffff888084a19000(0000) knlGS:0000000000000000
+  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+  CR2: 0000000020000040 CR3: 0000000004007000 CR4: 00000000000006f0
+  Call Trace:
+   <TASK>
+   udp_queue_rcv_one_skb+0x176/0x4b0 net/ipv4/udp.c:2445
+   udp_queue_rcv_skb+0x155/0x1f0 net/ipv4/udp.c:2475
+   udp_unicast_rcv_skb+0x71/0x90 net/ipv4/udp.c:2626
+   __udp4_lib_rcv+0x433/0xb00 net/ipv4/udp.c:2690
+   ip_protocol_deliver_rcu+0xa6/0x160 net/ipv4/ip_input.c:205
+   ip_local_deliver_finish+0x72/0x90 net/ipv4/ip_input.c:233
+   ip_sublist_rcv_finish+0x5f/0x70 net/ipv4/ip_input.c:579
+   ip_sublist_rcv+0x122/0x1b0 net/ipv4/ip_input.c:636
+   ip_list_rcv+0xf7/0x130 net/ipv4/ip_input.c:670
+   __netif_receive_skb_list_core+0x21d/0x240 net/core/dev.c:6067
+   netif_receive_skb_list_internal+0x186/0x2b0 net/core/dev.c:6210
+   napi_complete_done+0x78/0x180 net/core/dev.c:6580
+   tun_get_user+0xa63/0x1120 drivers/net/tun.c:1909
+   tun_chr_write_iter+0x65/0xb0 drivers/net/tun.c:1984
+   vfs_write+0x300/0x420 fs/read_write.c:593
+   ksys_write+0x60/0xd0 fs/read_write.c:686
+   do_syscall_64+0x50/0x1c0 arch/x86/entry/syscall_64.c:63
+   </TASK>
 
-Do you have HW to test your patch?
+To trigger gso segment in udp_queue_rcv_skb(), we should also set option
+UDP_ENCAP_ESPINUDP to enable udp_sk(sk)->encap_rcv. When the encap_rcv
+hook return 1 in udp_queue_rcv_one_skb(), udp_csum_pull_header() will try
+to pull udphdr, but the skb size has been segmented to gso size, which
+leads to this crash.
+
+Only udp has this probloem. Add check for the minimum value of gso size in
+virtio_net_hdr_to_skb().
+
+Fixes: cf329aa42b66 ("udp: cope with UDP GRO packet misdirection")
+Fixes: 3d010c8031e3 ("udp: do not accept non-tunnel GSO skbs landing in a tunnel")
+Signed-off-by: Wang Liang <wangliang74@huawei.com>
+---
+ include/linux/virtio_net.h | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+index 02a9f4dc594d..0533101642bd 100644
+--- a/include/linux/virtio_net.h
++++ b/include/linux/virtio_net.h
+@@ -157,11 +157,13 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
+ 		u16 gso_size = __virtio16_to_cpu(little_endian, hdr->gso_size);
+ 		unsigned int nh_off = p_off;
+ 		struct skb_shared_info *shinfo = skb_shinfo(skb);
++		u16 min_gso_size = 0;
+ 
+ 		switch (gso_type & ~SKB_GSO_TCP_ECN) {
+ 		case SKB_GSO_UDP:
+ 			/* UFO may not include transport header in gso_size. */
+ 			nh_off -= thlen;
++			min_gso_size = sizeof(struct udphdr) + 1;
+ 			break;
+ 		case SKB_GSO_UDP_L4:
+ 			if (!(hdr->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM))
+@@ -172,6 +174,7 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
+ 				return -EINVAL;
+ 			if (gso_type != SKB_GSO_UDP_L4)
+ 				return -EINVAL;
++			min_gso_size = sizeof(struct udphdr) + 1;
+ 			break;
+ 		case SKB_GSO_TCPV4:
+ 		case SKB_GSO_TCPV6:
+@@ -182,7 +185,7 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
+ 		}
+ 
+ 		/* Kernel has a special handling for GSO_BY_FRAGS. */
+-		if (gso_size == GSO_BY_FRAGS)
++		if ((gso_size == GSO_BY_FRAGS) || (gso_size < min_gso_size))
+ 			return -EINVAL;
+ 
+ 		/* Too small packets are not really GSO ones. */
+-- 
+2.34.1
+
 
