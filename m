@@ -1,45 +1,47 @@
-Return-Path: <netdev+bounces-209896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AB06B11403
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 00:34:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5985BB1140C
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 00:35:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D21116A12D
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 22:34:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4648AE5BA1
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 22:34:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FDC5241C8C;
-	Thu, 24 Jul 2025 22:33:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4379C242D87;
+	Thu, 24 Jul 2025 22:33:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="SvLnwKim"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="IkiWzoyh"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EA4323BCE4;
-	Thu, 24 Jul 2025 22:33:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3438B2417E0;
+	Thu, 24 Jul 2025 22:33:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753396435; cv=none; b=V1Vd3A3iLPX047PvfREHwIESWy0FYLNemvNScxw4gHFa0/OlNG9840Rb+OepXlmg2wagrwo4opPRwWi8AUohNz5TH8CRc8wTfYQ/LugWw2SwwNZGGHa15212Kn94mX4A9bPbOios3Jih+83JzLHQfv3v9o4YuMBPEfon8Xxxh94=
+	t=1753396437; cv=none; b=D6g3AxytQsjquadTgXhzLM67TzWoJlS8MlWy9KjCg2wNzbKRUWn5aWhB9JPJaPaudX7ihJ6K5ne3kTwlqO15VQ5yYry2dbsFtZSGGl26kO7sPN784hjvtjWcJS3acolFBwgyo5ySKuox7peXRwzZBSH36EOfLtUKuYRIyEGrZGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753396435; c=relaxed/simple;
-	bh=ZU7QPNVicHahHGP/x1GNBLKUwIzvGJeMk8fuXUXOr/g=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tLROW2tW1E/Xj2uceACFv32uaw9pjPtLAOf+/7U2mVerhGmg0kN3pkeXFFunrn2gD8yZJJwVwaMWuCSdsXnIRvik5aoS5dLVmklX1+t1JwCHytEJH/XcVUcsPtSjJNVd1tg0/Vr2IUGbnnvok3GyoDbONj1wRwEPt9G3Snyvshw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=SvLnwKim; arc=none smtp.client-ip=89.58.32.78
+	s=arc-20240116; t=1753396437; c=relaxed/simple;
+	bh=J+W5RHk2k/qg33KNTje4jrbvZgNrUHbcd4OcNRTq2hg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=YioMGMVpQ8WgUFBRnd5Gf171Vteeet3k5eKQ7XMKbeg0fQ3PUkMACfSB/jhQBmaY+wena0LOG6f8wc425KayoTr5S8h56vuAOPq53IBlvYuSEzx3oOZmPsoKLc7s15gSquggRkdJS+RRvM1sb2zbgUSaLgPa/c9jkvSVncIzHNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=IkiWzoyh; arc=none smtp.client-ip=89.58.32.78
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 1979F10391E80;
-	Fri, 25 Jul 2025 00:33:39 +0200 (CEST)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3832310391E81;
+	Fri, 25 Jul 2025 00:33:45 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1753396424; h=from:subject:date:message-id:to:cc:mime-version:
-	 content-transfer-encoding; bh=saNao2TEFsS6+fbp/fnBqwGoKqCJ4jz58yV/lw4xvXk=;
-	b=SvLnwKimY2Sxa1GWeZaRqlyc+eQ+h8ljACW/kjPUzJOphgQQZdbRFsGHAsjpa3I4XPrJbR
-	8g1zufVcyriv/KCDY/uyt5r714ej6k5laGQ10aeEQzVf5V+FbeDBYNGGzfUjDAhFIWpZlg
-	tWGIvNg5QKbR/aUfZs34jCXcR8jFWPZ/BqTJbVi61ROea33UhhYXsU0o7gt6Xo+BP2X8c6
-	2RpHUBbpPu5x815mkV9NVTfbKu3ewLCb0gpKyNgVq+SXVildi3Zllsd4TFeWuZWH2o25bU
-	0LSkqmXr0ciaJpGCXclfXgmTKBOKtQwq0fTacVLpwvbd2mOwFEg4jLnjNj/jHg==
+	t=1753396427; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=NuK3TOk1yoMOtldYL3UKEOg7C0x35B36DKUy8/ECc3Y=;
+	b=IkiWzoyh++bGA8V27PhBNuPe2eOyvNMEBr4Ws3rtLPKZv20vZeD+k1dfAbvQgTCMzB4aI/
+	V4w9TwkIHBkYoSAlhJUFGhrzTjiC02tRJ3jlarcrosit9AKdCdFsqawXhVsJ1lEu0EG0o2
+	fEHL8lYFJHDjX62+kF2CgvapQx0Fv02F+yVAlkDE1lBJzy/sFSCzC8gwMNhKdDRd/+zq6h
+	pIC/TzDyMjYjyHdqK0/CtRxmPyoJ1uDByVvXFK6ParTRKFJLmHKnrTa9GSzlOYAxHqn9Dd
+	wWXQoTkMui1uvbhfMkheCIaXEnWwM4lJwMN1LK/Z8v7cuqEM58pQueg4kOWGCQ==
 From: Lukasz Majewski <lukma@denx.de>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	davem@davemloft.net,
@@ -61,11 +63,13 @@ Cc: Sascha Hauer <s.hauer@pengutronix.de>,
 	linux-arm-kernel@lists.infradead.org,
 	Stefan Wahren <wahrenst@gmx.net>,
 	Simon Horman <horms@kernel.org>,
-	Lukasz Majewski <lukasz.majewski@mailbox.org>
-Subject: [net-next v16 00/12] net: mtip: Add support for MTIP imx287 L2 switch driver
-Date: Fri, 25 Jul 2025 00:33:06 +0200
-Message-Id: <20250724223318.3068984-1-lukma@denx.de>
+	Lukasz Majewski <lukma@denx.de>
+Subject: [net-next v16 01/12] dt-bindings: net: Add MTIP L2 switch description
+Date: Fri, 25 Jul 2025 00:33:07 +0200
+Message-Id: <20250724223318.3068984-2-lukma@denx.de>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250724223318.3068984-1-lukma@denx.de>
+References: <20250724223318.3068984-1-lukma@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,127 +79,227 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Last-TLS-Session-Version: TLSv1.3
 
-From: Lukasz Majewski <lukasz.majewski@mailbox.org>
+This patch provides description of the MTIP L2 switch available in some
+NXP's SOCs - e.g. imx287.
 
-This patch series adds support for More Than IP's L2 switch driver embedded
-in some NXP's SoCs. This one has been tested on imx287, but is also available
-in the vf610.
+Signed-off-by: Lukasz Majewski <lukma@denx.de>
+Reviewed-by: Stefan Wahren <wahrenst@gmx.net>
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
-In the past there has been performed some attempts to upstream this driver:
+---
+Changes for v2:
+- Rename the file to match exactly the compatible
+  (nxp,imx287-mtip-switch)
 
-1. The 4.19-cip based one [1]
-2. DSA based one for 5.12 [2] - i.e. the switch itself was treat as a DSA switch
-   with NO tag appended.
-3. The extension for FEC driver for 5.12 [3] - the trick here was to fully reuse
-   FEC when the in-HW switching is disabled. When bridge offloading is enabled,
-   the driver uses already configured MAC and PHY to also configure PHY.
+Changes for v3:
+- Remove '-' from const:'nxp,imx287-mtip-switch'
+- Use '^port@[12]+$' for port patternProperties
+- Drop status = "okay";
+- Provide proper indentation for 'example' binding (replace 8
+  spaces with 4 spaces)
+- Remove smsc,disable-energy-detect; property
+- Remove interrupt-parent and interrupts properties as not required
+- Remove #address-cells and #size-cells from required properties check
+- remove description from reg:
+- Add $ref: ethernet-switch.yaml#
 
-All three approaches were not accepted as eligible for upstreaming.
+Changes for v4:
+- Use $ref: ethernet-switch.yaml#/$defs/ethernet-ports and remove already
+  referenced properties
+- Rename file to nxp,imx28-mtip-switch.yaml
 
-The driver from this series has floowing features:
+Changes for v5:
+- Provide proper description for 'ethernet-port' node
 
-1. It is fully separated from fec_main - i.e. can be used interchangeable
-   with it. To be more specific - one can build them as modules and
-   if required switch between them when e.g. bridge offloading is required.
+Changes for v6:
+- Proper usage of
+  $ref: ethernet-switch.yaml#/$defs/ethernet-ports/patternProperties
+  when specifying the 'ethernet-ports' property
+- Add description and check for interrupt-names property
 
-   To be more specific:
-        - Use FEC_MAIN: When one needs support for two ETH ports with separate
-          uDMAs used for both and bridging can be realized in SW.
+Changes for v7:
+- Change switch interrupt name from 'mtipl2sw' to 'enet_switch'
 
-        - Use MTIPL2SW: When it is enough to support two ports with only uDMA0
-          attached to switch and bridging shall be offloaded to HW. 
+Changes for v8:
+- None
 
-2. This driver uses MTIP's L2 switch internal VLAN feature to provide port
-   separation at boot time. Port separation is disabled when bridging is
-   required.
+Changes for v9:
+- Add GPIO_ACTIVE_LOW to reset-gpios mdio phandle
 
-3. Example usage:
-        Configuration:
-        ip link set lan0 up; sleep 1;
-        ip link set lan1 up; sleep 1;
-        ip link add name br0 type bridge;
-        ip link set br0 up; sleep 1;
-        ip link set lan0 master br0;
-        ip link set lan1 master br0;
-        bridge link;
-        ip addr add 192.168.2.17/24 dev br0;
-        ping -c 5 192.168.2.222
+Changes for v10:
+- None
 
-        Removal:
-        ip link set br0 down;
-        ip link delete br0 type bridge;
-        ip link set dev lan1 down
-        ip link set dev lan0 down
+Changes for v11:
+- None
 
-4. Limitations:
-        - Driver enables and disables switch operation with learning and ageing.
-        - Missing is the advanced configuration (e.g. adding entries to FBD). This is
-          on purpose, as up till now we didn't had consensus about how the driver
-          shall be added to Linux.
+Changes for v12:
+- Remove 'label' from required properties
+- Move the reference to $ref: ethernet-switch.yaml#/$defs/ethernet-ports
+  the proper place (under 'allOf:')
 
-5. Clang build:
-	make LLVM_SUFFIX=-19 LLVM=1 mrproper
-	cp ./arch/arm/configs/mxs_defconfig .config
-	make ARCH=arm LLVM_SUFFIX=-19 LLVM=1 W=1 menuconfig
-	make ARCH=arm LLVM_SUFFIX=-19 LLVM=1 W=1 -j8 LOADADDR=0x40008000 uImage dtbs
-
-        make LLVM_SUFFIX=-19 LLVM=1 mrproper
-        make LLVM_SUFFIX=-19 LLVM=1 allmodconfig
-        make LLVM_SUFFIX=-19 LLVM=1 W=1 drivers/net/ethernet/freescale/mtipsw/ | tee llvm_build.log
-        make LLVM_SUFFIX=-19 LLVM=1 W=1 -j8 | tee llvm_build.log
-
-6. Kernel compliance checks:
-	make coccicheck MODE=report J=4 M=drivers/net/ethernet/freescale/mtipsw/
-	~/work/src/smatch/smatch_scripts/kchecker drivers/net/ethernet/freescale/mtipsw/
-
-7. GCC
-        make mrproper
-        make allmodconfig
-        make W=1 drivers/net/ethernet/freescale/mtipsw/
-
-Links:
-[1] - https://github.com/lmajewski/linux-imx28-l2switch/commits/master
-[2] - https://github.com/lmajewski/linux-imx28-l2switch/tree/imx28-v5.12-L2-upstream-RFC_v1
-[3] - https://source.denx.de/linux/linux-imx28-l2switch/-/tree/imx28-v5.12-L2-upstream-switchdev-RFC_v1?ref_type=heads
-
-Lukasz Majewski (12):
-  dt-bindings: net: Add MTIP L2 switch description
-  ARM: dts: nxp: mxs: Adjust the imx28.dtsi L2 switch description
-  ARM: dts: nxp: mxs: Adjust XEA board's DTS to support L2 switch
-  net: mtip: The L2 switch driver for imx287
-  net: mtip: Add buffers management functions to the L2 switch driver
-  net: mtip: Add net_device_ops functions to the L2 switch driver
-  net: mtip: Add mtip_switch_{rx|tx} functions to the L2 switch driver
-  net: mtip: Extend the L2 switch driver with management operations
-  net: mtip: Extend the L2 switch driver for imx287 with bridge
-    operations
-  ARM: mxs_defconfig: Enable CONFIG_NFS_FSCACHE
-  ARM: mxs_defconfig: Update mxs_defconfig to 6.16-rc5
-  ARM: mxs_defconfig: Enable CONFIG_FEC_MTIP_L2SW to support MTIP L2
-    switch
-
- .../bindings/net/nxp,imx28-mtip-switch.yaml   |  150 ++
- MAINTAINERS                                   |    7 +
- arch/arm/boot/dts/nxp/mxs/imx28-xea.dts       |   56 +
- arch/arm/boot/dts/nxp/mxs/imx28.dtsi          |    9 +-
- arch/arm/configs/mxs_defconfig                |   13 +-
- drivers/net/ethernet/freescale/Kconfig        |    1 +
- drivers/net/ethernet/freescale/Makefile       |    1 +
- drivers/net/ethernet/freescale/mtipsw/Kconfig |   13 +
- .../net/ethernet/freescale/mtipsw/Makefile    |    4 +
- .../net/ethernet/freescale/mtipsw/mtipl2sw.c  | 1957 +++++++++++++++++
- .../net/ethernet/freescale/mtipsw/mtipl2sw.h  |  651 ++++++
- .../ethernet/freescale/mtipsw/mtipl2sw_br.c   |  132 ++
- .../ethernet/freescale/mtipsw/mtipl2sw_mgnt.c |  443 ++++
- 13 files changed, 3426 insertions(+), 11 deletions(-)
+Changes for v13 - v16:
+- None
+---
+ .../bindings/net/nxp,imx28-mtip-switch.yaml   | 150 ++++++++++++++++++
+ 1 file changed, 150 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/net/nxp,imx28-mtip-switch.yaml
- create mode 100644 drivers/net/ethernet/freescale/mtipsw/Kconfig
- create mode 100644 drivers/net/ethernet/freescale/mtipsw/Makefile
- create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
- create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw.h
- create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw_br.c
- create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw_mgnt.c
 
+diff --git a/Documentation/devicetree/bindings/net/nxp,imx28-mtip-switch.yaml b/Documentation/devicetree/bindings/net/nxp,imx28-mtip-switch.yaml
+new file mode 100644
+index 000000000000..6a07dcd119ea
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/nxp,imx28-mtip-switch.yaml
+@@ -0,0 +1,150 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/nxp,imx28-mtip-switch.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: NXP SoC Ethernet Switch Controller (L2 MoreThanIP switch)
++
++maintainers:
++  - Lukasz Majewski <lukma@denx.de>
++
++description:
++  The 2-port switch ethernet subsystem provides ethernet packet (L2)
++  communication and can be configured as an ethernet switch. It provides the
++  reduced media independent interface (RMII), the management data input
++  output (MDIO) for physical layer device (PHY) management.
++
++allOf:
++  - $ref: ethernet-switch.yaml#/$defs/ethernet-ports
++
++properties:
++  compatible:
++    const: nxp,imx28-mtip-switch
++
++  reg:
++    maxItems: 1
++
++  phy-supply:
++    description:
++      Regulator that powers Ethernet PHYs.
++
++  clocks:
++    items:
++      - description: Register accessing clock
++      - description: Bus access clock
++      - description: Output clock for external device - e.g. PHY source clock
++      - description: IEEE1588 timer clock
++
++  clock-names:
++    items:
++      - const: ipg
++      - const: ahb
++      - const: enet_out
++      - const: ptp
++
++  interrupts:
++    items:
++      - description: Switch interrupt
++      - description: ENET0 interrupt
++      - description: ENET1 interrupt
++
++  interrupt-names:
++    items:
++      - const: enet_switch
++      - const: enet0
++      - const: enet1
++
++  pinctrl-names: true
++
++  ethernet-ports:
++    type: object
++    additionalProperties: true
++
++    patternProperties:
++      '^ethernet-port@[12]$':
++        type: object
++        additionalProperties: true
++        properties:
++          reg:
++            items:
++              - enum: [1, 2]
++            description: MTIP L2 switch port number
++
++        required:
++          - reg
++          - phy-mode
++          - phy-handle
++
++  mdio:
++    type: object
++    $ref: mdio.yaml#
++    unevaluatedProperties: false
++    description:
++      Specifies the mdio bus in the switch, used as a container for phy nodes.
++
++required:
++  - compatible
++  - reg
++  - clocks
++  - clock-names
++  - interrupts
++  - interrupt-names
++  - mdio
++  - ethernet-ports
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    #include<dt-bindings/interrupt-controller/irq.h>
++    #include<dt-bindings/gpio/gpio.h>
++    switch@800f0000 {
++        compatible = "nxp,imx28-mtip-switch";
++        reg = <0x800f0000 0x20000>;
++        pinctrl-names = "default";
++        pinctrl-0 = <&mac0_pins_a>, <&mac1_pins_a>;
++        phy-supply = <&reg_fec_3v3>;
++        interrupts = <100>, <101>, <102>;
++        interrupt-names = "enet_switch", "enet0", "enet1";
++        clocks = <&clks 57>, <&clks 57>, <&clks 64>, <&clks 35>;
++        clock-names = "ipg", "ahb", "enet_out", "ptp";
++
++        ethernet-ports {
++            #address-cells = <1>;
++            #size-cells = <0>;
++
++            mtip_port1: ethernet-port@1 {
++                reg = <1>;
++                label = "lan0";
++                local-mac-address = [ 00 00 00 00 00 00 ];
++                phy-mode = "rmii";
++                phy-handle = <&ethphy0>;
++            };
++
++            mtip_port2: ethernet-port@2 {
++                reg = <2>;
++                label = "lan1";
++                local-mac-address = [ 00 00 00 00 00 00 ];
++                phy-mode = "rmii";
++                phy-handle = <&ethphy1>;
++            };
++        };
++
++        mdio_sw: mdio {
++            #address-cells = <1>;
++            #size-cells = <0>;
++
++            reset-gpios = <&gpio2 13 GPIO_ACTIVE_LOW>;
++            reset-delay-us = <25000>;
++            reset-post-delay-us = <10000>;
++
++            ethphy0: ethernet-phy@0 {
++                reg = <0>;
++            };
++
++            ethphy1: ethernet-phy@1 {
++                reg = <1>;
++            };
++        };
++    };
 -- 
 2.39.5
 
