@@ -1,288 +1,166 @@
-Return-Path: <netdev+bounces-209741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA1A1B10AC4
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 14:59:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05A7CB10ADB
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 15:03:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6D215655B3
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 12:59:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27968168184
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 13:03:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C19D2D46C4;
-	Thu, 24 Jul 2025 12:59:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 853EF248864;
+	Thu, 24 Jul 2025 13:03:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PkW0LwhM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bWV9ECM9"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1FA740856
-	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 12:59:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21DEA24113C
+	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 13:03:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753361960; cv=none; b=H/ApvFmpxtwL06xpnPGF6VxY3uXnn5emp4AQmue0MPGYHeLj+9D+EA6OJKlFG+tvC4EOql4so11nSDke2aHzyHl0cFwK8zfCL7UU3O03gpSXQz6AVen6LwFc0mmAhxiG33pcpyaO/ves6WSw3DAPdIl8NTZz3p6r/DtUfMJ7MPs=
+	t=1753362209; cv=none; b=a0AxS7su4QG922S7sD4AO+W+ZmlkgFiV6Lgx3Fudd5XYwBRF42LfHqOLCjHck/IAzmuUKreJw85FbidUbPhv4i3qDBrDyRRYOdBYmvyoH2hdlFNecXfWlXLWPqH7Sq1dGVZnz04FTKVuY24FxOayCdMoEPXObjJeDVmcntzyZZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753361960; c=relaxed/simple;
-	bh=o+/xP/nRACgq6sYyyyENl6/+gxkfYdsCrg7JoE5NC9o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FV1ecjKF5KeTJhdKDyfRtL2jZtFS6RmnR4lGK8ryvigVsLbmeb7t+vaKKt90TBB4iLk9+4JQj2AP9kcKkt5vF6bC2ScZFsT6gUyCA9fYCkMgr/2lBIRNKmMZGraC1UgHwynZ6gAQiXyp6WqxB/++x+uEnt+kaMAqIsWocrsQd34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PkW0LwhM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1753361956;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=hZiwGdR7LRfu5HGHtwgbMQ2Giw34fi/j2EFOpcB/EYM=;
-	b=PkW0LwhMqlXvJKDNQefH0QDmbZ98uzDpPOt2MDw4fF+BnL+w7zKq1+LJc3lypws7xpV0EP
-	4vPMGqYq1H/V9dlDKNXJv4b0pi49TgPusvfTCo11Tt/GMY8VG/+L2tPENrFNejvE86fZXk
-	EbkwU/eI+Hd0pYfuETFr1FLfmea1AF4=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-133-q7td4VieOdeRbZQwU_ug0A-1; Thu,
- 24 Jul 2025 08:59:13 -0400
-X-MC-Unique: q7td4VieOdeRbZQwU_ug0A-1
-X-Mimecast-MFC-AGG-ID: q7td4VieOdeRbZQwU_ug0A_1753361952
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9549419560B6;
-	Thu, 24 Jul 2025 12:59:11 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.32.113])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4DCF119560AA;
-	Thu, 24 Jul 2025 12:59:08 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [GIT PULL] Networking for v6.16-rc8
-Date: Thu, 24 Jul 2025 14:58:59 +0200
-Message-ID: <20250724125859.371031-1-pabeni@redhat.com>
+	s=arc-20240116; t=1753362209; c=relaxed/simple;
+	bh=Z9yx0Znel3PZgr0veP+u6wAz+0Rq+E1+JLEXc+hdjsc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kbNSWQKPdycdQAR8BiDGMEGSdXF66hzHOYL3Fs8sb2apZphTATSqzreZL1/po1bIyabuwsBr+98liYAvEkKpNUq2tP8z/QeL94aIKrSXs+NV1wkJGQmRg75ojM5Dv70AWq35O4V8tjd2ovfDVXPJEk9653vKc8SgsDZF5bTwNLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bWV9ECM9; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753362207; x=1784898207;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Z9yx0Znel3PZgr0veP+u6wAz+0Rq+E1+JLEXc+hdjsc=;
+  b=bWV9ECM9Ur5xB89dQzRFEwJ/PacL+ilxmHNnik/gCgzTeMbZL6WGUeBp
+   q6PFNI5N7bivNBMGPKX7cV0DG7nOIKDAIvbRBpJExTVKlf14Kptye0Qzp
+   2Ee/abuGzFxmEDkd40dLab2zxPbNlASqcpQ9FUoT3pBQuU5i2T88OOpiN
+   Xl4xxJsYmzbaf1VbLhPhZm1S+rzcV1bJEy8AXyLPLgTjvWGQb5at03r3y
+   uZOORBtn3RP3BHjGY6pPCGkhKY00gRWhjWLvHB4gxFdPSQdCzKolawpQh
+   kx+7oKV3+Nakwyx+coaZt9jgCorWufXt5zTm7gADRTXBkGaSdhN3XcMG3
+   Q==;
+X-CSE-ConnectionGUID: FgWUIOz+S1OyoIp3p8/yqw==
+X-CSE-MsgGUID: 5jvRY66CROGHVZurRC5nHg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11501"; a="55524712"
+X-IronPort-AV: E=Sophos;i="6.16,337,1744095600"; 
+   d="scan'208";a="55524712"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2025 06:03:26 -0700
+X-CSE-ConnectionGUID: qpFF78SRRAqtYYzAokPyjA==
+X-CSE-MsgGUID: ARtbnSpRRXOw8IE+ng+FtQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,337,1744095600"; 
+   d="scan'208";a="160515373"
+Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
+  by fmviesa009.fm.intel.com with ESMTP; 24 Jul 2025 06:03:24 -0700
+Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uevbW-000KS7-08;
+	Thu, 24 Jul 2025 13:03:22 +0000
+Date: Thu, 24 Jul 2025 21:02:39 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kees Cook <kees@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, Kees Cook <kees@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH 3/6 net-next] net: Convert proto_ops bind() callbacks to
+ use sockaddr_unspec
+Message-ID: <202507242032.e0sbPWI4-lkp@intel.com>
+References: <20250723231921.2293685-3-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250723231921.2293685-3-kees@kernel.org>
 
-Hi Linus!
+Hi Kees,
 
-The following changes since commit 6832a9317eee280117cd695fa885b2b7a7a38daf:
+kernel test robot noticed the following build errors:
 
-  Merge tag 'net-6.16-rc7' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-07-17 10:04:04 -0700)
+[auto build test ERROR on next-20250723]
+[also build test ERROR on v6.16-rc7]
+[cannot apply to net-next/main bluetooth-next/master bluetooth/master brauner-vfs/vfs.all mkl-can-next/testing mptcp/export mptcp/export-net trondmy-nfs/linux-next linus/master v6.16-rc7 v6.16-rc6 v6.16-rc5]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-are available in the Git repository at:
+url:    https://github.com/intel-lab-lkp/linux/commits/Kees-Cook/net-uapi-Add-__kernel_sockaddr_unspec-for-sockaddr-of-unknown-length/20250724-072218
+base:   next-20250723
+patch link:    https://lore.kernel.org/r/20250723231921.2293685-3-kees%40kernel.org
+patch subject: [PATCH 3/6 net-next] net: Convert proto_ops bind() callbacks to use sockaddr_unspec
+config: x86_64-buildonly-randconfig-003-20250724 (https://download.01.org/0day-ci/archive/20250724/202507242032.e0sbPWI4-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250724/202507242032.e0sbPWI4-lkp@intel.com/reproduce)
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.16-rc8
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202507242032.e0sbPWI4-lkp@intel.com/
 
-for you to fetch changes up to 291d5dc80eca1fc67a0fa4c861d13c101345501a:
+All errors (new ones prefixed by >>):
 
-  Merge tag 'ipsec-2025-07-23' of git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec (2025-07-24 12:30:40 +0200)
+   net/packet/af_packet.c: In function 'packet_bind_spkt':
+>> net/packet/af_packet.c:3340:33: error: 'struct __kernel_sockaddr_unspec' has no member named 'sa_data_min'; did you mean 'sa_data'?
+    3340 |         char name[sizeof(uaddr->sa_data_min) + 1];
+         |                                 ^~~~~~~~~~~
+         |                                 sa_data
+   net/packet/af_packet.c:3351:52: error: 'struct __kernel_sockaddr_unspec' has no member named 'sa_data_min'; did you mean 'sa_data'?
+    3351 |         memcpy(name, uaddr->sa_data, sizeof(uaddr->sa_data_min));
+         |                                                    ^~~~~~~~~~~
+         |                                                    sa_data
+   net/packet/af_packet.c:3352:28: error: 'struct __kernel_sockaddr_unspec' has no member named 'sa_data_min'; did you mean 'sa_data'?
+    3352 |         name[sizeof(uaddr->sa_data_min)] = 0;
+         |                            ^~~~~~~~~~~
+         |                            sa_data
+   net/packet/af_packet.c:3340:14: warning: unused variable 'name' [-Wunused-variable]
+    3340 |         char name[sizeof(uaddr->sa_data_min) + 1];
+         |              ^~~~
+   net/packet/af_packet.c:3355:1: warning: control reaches end of non-void function [-Wreturn-type]
+    3355 | }
+         | ^
 
-----------------------------------------------------------------
-Including fixes from can and xfrm.
 
-The TI regression notified last week is actually on our net-next tree,
-it does not affect 6.16.
-We are investigating a virtio regression which is quite hard to
-reproduce - currently only our CI sporadically hits it. Hopefully it
-should not be critical, and I'm not sure that an additional week would
-be enough to solve it.
+vim +3340 net/packet/af_packet.c
 
-Current release - fix to a fix:
+^1da177e4c3f41 Linus Torvalds      2005-04-16  3331  
+^1da177e4c3f41 Linus Torvalds      2005-04-16  3332  /*
+^1da177e4c3f41 Linus Torvalds      2005-04-16  3333   *	Bind a packet socket to a device
+^1da177e4c3f41 Linus Torvalds      2005-04-16  3334   */
+^1da177e4c3f41 Linus Torvalds      2005-04-16  3335  
+40570133fbb3ba Kees Cook           2025-07-23  3336  static int packet_bind_spkt(struct socket *sock, struct sockaddr_unspec *uaddr,
+40d4e3dfc2f56a Eric Dumazet        2009-07-21  3337  			    int addr_len)
+^1da177e4c3f41 Linus Torvalds      2005-04-16  3338  {
+^1da177e4c3f41 Linus Torvalds      2005-04-16  3339  	struct sock *sk = sock->sk;
+b5f0de6df6dce8 Kees Cook           2022-10-18 @3340  	char name[sizeof(uaddr->sa_data_min) + 1];
+^1da177e4c3f41 Linus Torvalds      2005-04-16  3341  
+^1da177e4c3f41 Linus Torvalds      2005-04-16  3342  	/*
+^1da177e4c3f41 Linus Torvalds      2005-04-16  3343  	 *	Check legality
+^1da177e4c3f41 Linus Torvalds      2005-04-16  3344  	 */
+^1da177e4c3f41 Linus Torvalds      2005-04-16  3345  
+^1da177e4c3f41 Linus Torvalds      2005-04-16  3346  	if (addr_len != sizeof(struct sockaddr))
+^1da177e4c3f41 Linus Torvalds      2005-04-16  3347  		return -EINVAL;
+540e2894f79055 Alexander Potapenko 2017-03-01  3348  	/* uaddr->sa_data comes from the userspace, it's not guaranteed to be
+540e2894f79055 Alexander Potapenko 2017-03-01  3349  	 * zero-terminated.
+540e2894f79055 Alexander Potapenko 2017-03-01  3350  	 */
+b5f0de6df6dce8 Kees Cook           2022-10-18  3351  	memcpy(name, uaddr->sa_data, sizeof(uaddr->sa_data_min));
+b5f0de6df6dce8 Kees Cook           2022-10-18  3352  	name[sizeof(uaddr->sa_data_min)] = 0;
+^1da177e4c3f41 Linus Torvalds      2005-04-16  3353  
+6ffc57ea004234 Eric Dumazet        2023-05-26  3354  	return packet_do_bind(sk, name, 0, 0);
+^1da177e4c3f41 Linus Torvalds      2005-04-16  3355  }
+^1da177e4c3f41 Linus Torvalds      2005-04-16  3356  
 
-  - sched: sch_qfq: avoid sleeping in atomic context in qfq_delete_class
-
-Previous releases - regressions:
-
-  - xfrm:
-    - set transport header to fix UDP GRO handling
-    - delete x->tunnel as we delete x
-
-  - eth: mlx5: fix memory leak in cmd_exec()
-
-  - eth: i40e: when removing VF MAC filters, avoid losing PF-set MAC
-
-  - eth: gve: fix stuck TX queue for DQ queue format
-
-Previous releases - always broken:
-
-  - can: fix NULL pointer deref of struct can_priv::do_set_mode
-
-  - eth: ice: fix a null pointer dereference in ice_copy_and_init_pkg()
-
-  - eth: ism: fix concurrency management in ism_cmd()
-
-  - eth: dpaa2: fix device reference count leak in MAC endpoint handling
-
-  - eth: icssg-prueth: fix buffer allocation for ICSSG
-
-Misc:
-
-  - selftests: mptcp: increase code coverage
-
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-
-----------------------------------------------------------------
-Chiara Meiohas (1):
-      net/mlx5: Fix memory leak in cmd_exec()
-
-Dennis Chen (1):
-      i40e: report VF tx_dropped with tx_errors instead of tx_discards
-
-Eyal Birger (1):
-      xfrm: interface: fix use-after-free after changing collect_md xfrm interface
-
-Fernando Fernandez Mancera (1):
-      xfrm: ipcomp: adjust transport header after decompressing
-
-Florian Fainelli (1):
-      net: bcmasp: Restore programming of TX map vector register
-
-Florian Westphal (1):
-      selftests: netfilter: tone-down conntrack clash test
-
-Halil Pasic (1):
-      s390/ism: fix concurrency management in ism_cmd()
-
-Haoxiang Li (1):
-      ice: Fix a null pointer dereference in ice_copy_and_init_pkg()
-
-Himanshu Mittal (1):
-      net: ti: icssg-prueth: Fix buffer allocation for ICSSG
-
-Jacek Kowalski (2):
-      e1000e: disregard NVM checksum on tgp when valid checksum bit is not set
-      e1000e: ignore uninitialized checksum word on tgp
-
-Jakub Kicinski (4):
-      Merge branch 'mlx5-misc-fixes-2025-07-17'
-      Merge branch 'selftests-mptcp-connect-cover-alt-modes'
-      Merge branch '40GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
-      Merge tag 'linux-can-fixes-for-6.16-20250722' of git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can
-
-Jamie Bainbridge (1):
-      i40e: When removing VF MAC filters, only check PF-set MAC
-
-Jian Shen (2):
-      net: hns3: fix concurrent setting vlan filter issue
-      net: hns3: fixed vf get max channels bug
-
-Jijie Shao (1):
-      net: hns3: default enable tx bounce buffer when smmu enabled
-
-Kees Cook (1):
-      MAINTAINERS: Add in6.h to MAINTAINERS
-
-Kito Xu (veritas501) (1):
-      net: appletalk: Fix use-after-free in AARP proxy probe
-
-Leon Romanovsky (1):
-      xfrm: always initialize offload path
-
-Ma Ke (3):
-      bus: fsl-mc: Fix potential double device reference in fsl_mc_get_endpoint()
-      dpaa2-eth: Fix device reference count leak in MAC endpoint handling
-      dpaa2-switch: Fix device reference count leak in MAC endpoint handling
-
-Marc Kleine-Budde (1):
-      can: netlink: can_changelink(): fix NULL pointer deref of struct can_priv::do_set_mode
-
-Matthieu Baerts (NGI0) (2):
-      selftests: mptcp: connect: also cover alt modes
-      selftests: mptcp: connect: also cover checksum
-
-Nimrod Oren (1):
-      selftests: drv-net: wait for iperf client to stop sending
-
-Paolo Abeni (2):
-      Merge branch 'there-are-some-bugfix-for-the-hns3-ethernet-driver'
-      Merge tag 'ipsec-2025-07-23' of git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec
-
-Praveen Kaligineedi (1):
-      gve: Fix stuck TX queue for DQ queue format
-
-Sabrina Dubroca (4):
-      xfrm: state: initialize state_ptrs earlier in xfrm_state_find
-      xfrm: state: use a consistent pcpu_id in xfrm_state_find
-      xfrm: delete x->tunnel as we delete x
-      Revert "xfrm: destroy xfrm_state synchronously on net exit path"
-
-Shahar Shitrit (1):
-      net/mlx5: E-Switch, Fix peer miss rules to use peer eswitch
-
-Steffen Klassert (2):
-      Merge branch 'xfrm: fixes for xfrm_state_find under preemption'
-      Merge branch 'ipsec: fix splat due to ipcomp fallback tunnel'
-
-Tobias Brunner (1):
-      xfrm: Set transport header to fix UDP GRO handling
-
-Xiang Mei (1):
-      net/sched: sch_qfq: Avoid triggering might_sleep in atomic context in qfq_delete_class
-
-Yonglong Liu (1):
-      net: hns3: disable interrupt when ptp init failed
-
- MAINTAINERS                                        |   1 +
- drivers/bus/fsl-mc/fsl-mc-bus.c                    |  19 ++-
- drivers/net/can/dev/dev.c                          |  12 +-
- drivers/net/can/dev/netlink.c                      |  12 ++
- drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c   |   3 +
- drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c   |  15 +-
- .../net/ethernet/freescale/dpaa2/dpaa2-switch.c    |  15 +-
- drivers/net/ethernet/google/gve/gve_main.c         |  67 +++++----
- drivers/net/ethernet/hisilicon/hns3/hns3_enet.c    |  31 ++++
- drivers/net/ethernet/hisilicon/hns3/hns3_enet.h    |   2 +
- .../ethernet/hisilicon/hns3/hns3pf/hclge_main.c    |  36 +++--
- .../net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c |   9 +-
- .../ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c  |   6 +-
- drivers/net/ethernet/intel/e1000e/defines.h        |   3 +
- drivers/net/ethernet/intel/e1000e/ich8lan.c        |   2 +
- drivers/net/ethernet/intel/e1000e/nvm.c            |   6 +
- drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c |   6 +-
- drivers/net/ethernet/intel/ice/ice_ddp.c           |   2 +
- drivers/net/ethernet/mellanox/mlx5/core/cmd.c      |   4 +-
- .../ethernet/mellanox/mlx5/core/eswitch_offloads.c | 108 +++++++-------
- drivers/net/ethernet/ti/icssg/icssg_config.c       | 158 ++++++++++++++-------
- drivers/net/ethernet/ti/icssg/icssg_config.h       |  80 +++++++++--
- drivers/net/ethernet/ti/icssg/icssg_prueth.c       |  20 ++-
- drivers/net/ethernet/ti/icssg/icssg_prueth.h       |   2 +
- drivers/net/ethernet/ti/icssg/icssg_switch_map.h   |   3 +
- drivers/s390/net/ism_drv.c                         |   3 +
- include/linux/ism.h                                |   1 +
- include/net/xfrm.h                                 |  15 +-
- net/appletalk/aarp.c                               |  24 +++-
- net/ipv4/ipcomp.c                                  |   2 +
- net/ipv4/xfrm4_input.c                             |   3 +
- net/ipv6/ipcomp6.c                                 |   2 +
- net/ipv6/xfrm6_input.c                             |   3 +
- net/ipv6/xfrm6_tunnel.c                            |   2 +-
- net/key/af_key.c                                   |   2 +-
- net/sched/sch_qfq.c                                |   7 +-
- net/xfrm/xfrm_device.c                             |   1 -
- net/xfrm/xfrm_interface_core.c                     |   7 +-
- net/xfrm/xfrm_ipcomp.c                             |   3 +-
- net/xfrm/xfrm_state.c                              |  69 ++++-----
- net/xfrm/xfrm_user.c                               |   3 +-
- tools/testing/selftests/drivers/net/lib/py/load.py |  23 ++-
- tools/testing/selftests/net/mptcp/Makefile         |   3 +-
- .../selftests/net/mptcp/mptcp_connect_checksum.sh  |   5 +
- .../selftests/net/mptcp/mptcp_connect_mmap.sh      |   5 +
- .../selftests/net/mptcp/mptcp_connect_sendfile.sh  |   5 +
- .../selftests/net/netfilter/conntrack_clash.sh     |  45 +++---
- 47 files changed, 549 insertions(+), 306 deletions(-)
- create mode 100755 tools/testing/selftests/net/mptcp/mptcp_connect_checksum.sh
- create mode 100755 tools/testing/selftests/net/mptcp/mptcp_connect_mmap.sh
- create mode 100755 tools/testing/selftests/net/mptcp/mptcp_connect_sendfile.sh
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
