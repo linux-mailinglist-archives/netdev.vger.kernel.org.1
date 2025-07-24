@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-209873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D944DB11209
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 22:13:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A3E7B11203
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 22:12:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E7395A7D95
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 20:13:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B195AC00DB
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 20:11:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B166F24DCE5;
-	Thu, 24 Jul 2025 20:12:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 235D424DCE2;
+	Thu, 24 Jul 2025 20:12:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="qKNyUqd8"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="QVey1vBX"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBBF224888C;
-	Thu, 24 Jul 2025 20:12:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F4B022D4DE;
+	Thu, 24 Jul 2025 20:12:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753387963; cv=none; b=VQthbrs1gDfro9OApmuyXWdBS/n+LRpdHrgDE5qHodUnj25f12wu7l7sel5IOsrMuX+oNHgTeAZ0/DhYI2d6iE9HTvAYPV2Uy/XRT1YQvuVT64wTGKJhxqKZ1kn1O0PIpjE3zPlj0ljpxC6v4WYZjfnWFrvo7xPDEMUpIbp462I=
+	t=1753387932; cv=none; b=NMD7z285xM2Yvudqw80fFsbfEQuxw1pjdqinxCNrb7smDazxcT/LEG93sCthoiL/F5xy8pw8KhTcht60883K4dBzv+t/7zAhtDjrzJBLbmK+8Gv6QrbhCJIOYliyw4dBYjD2mkAb8Y5lfn7UwHG/slo4J5XDgi+2vGn5vLME8eA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753387963; c=relaxed/simple;
-	bh=SVmFzM9HX1G4W1SR5ohas/J7SBbMjYe1/YYfaD8egpM=;
+	s=arc-20240116; t=1753387932; c=relaxed/simple;
+	bh=nmARrY53udeSjJWuHveIype0UPUfLDn4BfiYQiZXyhI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PVA7BljVSmIgHmlIvpqwUx7rXRGPMA/boy438xrkm8ncLlGtlFczAQXA9mieO2j3izTLsOsQdhnvBxO8kxz+ddcpi+zpeH1zXiTDgQ9yxUQ7M5nXrsXhMm9k43FlZcvOwkJRst3460t/Z6VNMtJnGkUZZ+vNsL7unVeTqmACzNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=qKNyUqd8; arc=none smtp.client-ip=68.232.154.123
+	 MIME-Version:Content-Type; b=YyC6LoPPoNVVao/0z15IBeCirNMwQlblIcX4kbpZy3rGAzl5b4fXxzjAfAPTTRDfZLX6ju5SNFkEVTjjsMenKa2l2QKmAh0m0FYZF2PXtavqttWHKt7VnvJ37mLz0UyqQ55BnNMuqXVO3a/cjxz45Ec/944N48jYh7chpRmi59E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=QVey1vBX; arc=none smtp.client-ip=68.232.153.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1753387961; x=1784923961;
+  t=1753387931; x=1784923931;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=SVmFzM9HX1G4W1SR5ohas/J7SBbMjYe1/YYfaD8egpM=;
-  b=qKNyUqd8UiVdzIUeMk9PPaTeAnDAzjEih6VqPhpaIdo6WR2iMPPzGgag
-   3NLBPEQt9pp/V/Vdw93ymBVvGQKQLc6DmwqTNG0BzCQZNkLggCrifKEnD
-   3GY/a0AV2epy2YA17n/a1bid/36nKU5r0Mf5wfy2W8lDohYQv+I7e9K3p
-   VqXKK69SmfkEP5XeQSRiw0MF+VHJwdGGViVgPQ8GICYOq2OstEMDBtUYl
-   2Nvw4KETA3cmoev0AGswM89Enr6U9ctj4uHW6Q8KOX9tWVU5jpxSmJS8M
-   HT9F+eaX2wr9teCcfcF5OtEhUc0YZiK4Xnbrq2/N2Ow+F2fBATBy4/qHO
+  bh=nmARrY53udeSjJWuHveIype0UPUfLDn4BfiYQiZXyhI=;
+  b=QVey1vBXcESV8lZHmMOEpjq+rE2jiMOMHPBsRyCMLcvgN0hueagq0IJp
+   s02c890favrYu9TCEmvZ0dyhpClwAEV4fvgB7GNjAc4GejhN18F6wJNnv
+   UBxcdHor6WfW1XuYV/ViNq7leBRYW5ZPklTZiyPLHIlGj4XknnX8NZi7A
+   w3dX218Ec3tA/ptMpCA8Rk0IygsJiewSxSe6amwakvBWIwtvRbXcb9wW2
+   IIRpS/AuM/RDPI61BMOAwskUyb6voJkD/b8CMIb0TYA0yoTyhw/ToCz+B
+   bwijwSudMB4FUbGBhbRZoNryXSeXj0NN9PIp9/RMvMekKdakoLY+QhP/N
    Q==;
-X-CSE-ConnectionGUID: Vloo96aWRWWEYpPX1eCS2Q==
-X-CSE-MsgGUID: dw1dE8HlQKK+Caexc1LEXQ==
+X-CSE-ConnectionGUID: dPxjunYJTo2XkJR5vJWM1w==
+X-CSE-MsgGUID: PafZ9Xd6So6cqHGNOwe6yQ==
 X-IronPort-AV: E=Sophos;i="6.16,337,1744095600"; 
-   d="scan'208";a="211826703"
+   d="scan'208";a="44383321"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Jul 2025 13:12:34 -0700
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Jul 2025 13:12:09 -0700
 Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
  chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Thu, 24 Jul 2025 13:11:30 -0700
+ 15.1.2507.44; Thu, 24 Jul 2025 13:11:32 -0700
 Received: from DEN-DL-M31836.microchip.com (10.10.85.11) by
  chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.44 via Frontend Transport; Thu, 24 Jul 2025 13:11:28 -0700
+ 15.1.2507.44 via Frontend Transport; Thu, 24 Jul 2025 13:11:30 -0700
 From: Horatiu Vultur <horatiu.vultur@microchip.com>
 To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
 	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <richardcochran@gmail.com>, <o.rempel@pengutronix.de>
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
 	<horatiu.vultur@microchip.com>
-Subject: [PATCH net-next v2 1/4] net: phy: micrel: Start using PHY_ID_MATCH_MODEL
-Date: Thu, 24 Jul 2025 22:08:23 +0200
-Message-ID: <20250724200826.2662658-2-horatiu.vultur@microchip.com>
+Subject: [PATCH net-next v2 2/4] net: phy: micrel: Introduce lanphy_modify_page_reg
+Date: Thu, 24 Jul 2025 22:08:24 +0200
+Message-ID: <20250724200826.2662658-3-horatiu.vultur@microchip.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250724200826.2662658-1-horatiu.vultur@microchip.com>
 References: <20250724200826.2662658-1-horatiu.vultur@microchip.com>
@@ -79,187 +79,400 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-Start using PHY_ID_MATCH_MODEL for all the drivers.
-While at this add also PHY_ID_KSZ8041RNLI to micrel_tbl.
+As the name suggests this function modifies the register in an
+extended page. It has the same parameters as phy_modify_mmd.
+This function was introduce because there are many places in the
+code where the registers was read then the value was modified and
+written back. So replace all this code with this function to make
+it clear.
 
 Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
 ---
- drivers/net/phy/micrel.c | 66 ++++++++++++++++------------------------
- 1 file changed, 27 insertions(+), 39 deletions(-)
+ drivers/net/phy/micrel.c | 228 +++++++++++++++++++--------------------
+ 1 file changed, 113 insertions(+), 115 deletions(-)
 
 diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index f678c1bdacdf0..c6aacf7feb7b0 100644
+index c6aacf7feb7b0..b04c471c11a4a 100644
 --- a/drivers/net/phy/micrel.c
 +++ b/drivers/net/phy/micrel.c
-@@ -5643,8 +5643,7 @@ static int ksz9131_resume(struct phy_device *phydev)
+@@ -2838,6 +2838,24 @@ static int lanphy_write_page_reg(struct phy_device *phydev, int page, u16 addr,
+ 	return val;
+ }
  
- static struct phy_driver ksphy_driver[] = {
++static int lanphy_modify_page_reg(struct phy_device *phydev, int page, u16 addr,
++				  u16 mask, u16 set)
++{
++	int new, ret;
++
++	ret = lanphy_read_page_reg(phydev, page, addr);
++	if (ret < 0)
++		return ret;
++
++	new = (ret & ~mask) | set;
++	if (new == ret)
++		return 0;
++
++	ret = lanphy_write_page_reg(phydev, page, addr, new);
++
++	return ret < 0 ? ret : 1;
++}
++
+ static int lan8814_config_ts_intr(struct phy_device *phydev, bool enable)
  {
--	.phy_id		= PHY_ID_KS8737,
--	.phy_id_mask	= MICREL_PHY_ID_MASK,
-+	PHY_ID_MATCH_MODEL(PHY_ID_KS8737),
- 	.name		= "Micrel KS8737",
- 	/* PHY_BASIC_FEATURES */
- 	.driver_data	= &ks8737_type,
-@@ -5685,8 +5684,7 @@ static struct phy_driver ksphy_driver[] = {
- 	.suspend	= kszphy_suspend,
- 	.resume		= kszphy_resume,
- }, {
--	.phy_id		= PHY_ID_KSZ8041,
--	.phy_id_mask	= MICREL_PHY_ID_MASK,
-+	PHY_ID_MATCH_MODEL(PHY_ID_KSZ8041),
- 	.name		= "Micrel KSZ8041",
- 	/* PHY_BASIC_FEATURES */
- 	.driver_data	= &ksz8041_type,
-@@ -5701,8 +5699,7 @@ static struct phy_driver ksphy_driver[] = {
- 	.suspend	= ksz8041_suspend,
- 	.resume		= ksz8041_resume,
- }, {
--	.phy_id		= PHY_ID_KSZ8041RNLI,
--	.phy_id_mask	= MICREL_PHY_ID_MASK,
-+	PHY_ID_MATCH_MODEL(PHY_ID_KSZ8041RNLI),
- 	.name		= "Micrel KSZ8041RNLI",
- 	/* PHY_BASIC_FEATURES */
- 	.driver_data	= &ksz8041_type,
-@@ -5745,9 +5742,8 @@ static struct phy_driver ksphy_driver[] = {
- 	.suspend	= kszphy_suspend,
- 	.resume		= kszphy_resume,
- }, {
--	.phy_id		= PHY_ID_KSZ8081,
-+	PHY_ID_MATCH_MODEL(PHY_ID_KSZ8081),
- 	.name		= "Micrel KSZ8081 or KSZ8091",
--	.phy_id_mask	= MICREL_PHY_ID_MASK,
- 	.flags		= PHY_POLL_CABLE_TEST,
- 	/* PHY_BASIC_FEATURES */
- 	.driver_data	= &ksz8081_type,
-@@ -5766,9 +5762,8 @@ static struct phy_driver ksphy_driver[] = {
- 	.cable_test_start	= ksz886x_cable_test_start,
- 	.cable_test_get_status	= ksz886x_cable_test_get_status,
- }, {
--	.phy_id		= PHY_ID_KSZ8061,
-+	PHY_ID_MATCH_MODEL(PHY_ID_KSZ8061),
- 	.name		= "Micrel KSZ8061",
--	.phy_id_mask	= MICREL_PHY_ID_MASK,
- 	/* PHY_BASIC_FEATURES */
- 	.probe		= kszphy_probe,
- 	.config_init	= ksz8061_config_init,
-@@ -5796,8 +5791,7 @@ static struct phy_driver ksphy_driver[] = {
- 	.read_mmd	= genphy_read_mmd_unsupported,
- 	.write_mmd	= genphy_write_mmd_unsupported,
- }, {
--	.phy_id		= PHY_ID_KSZ9031,
--	.phy_id_mask	= MICREL_PHY_ID_MASK,
-+	PHY_ID_MATCH_MODEL(PHY_ID_KSZ9031),
- 	.name		= "Micrel KSZ9031 Gigabit PHY",
- 	.flags		= PHY_POLL_CABLE_TEST,
- 	.driver_data	= &ksz9021_type,
-@@ -5817,8 +5811,7 @@ static struct phy_driver ksphy_driver[] = {
- 	.cable_test_get_status	= ksz9x31_cable_test_get_status,
- 	.set_loopback	= ksz9031_set_loopback,
- }, {
--	.phy_id		= PHY_ID_LAN8814,
--	.phy_id_mask	= MICREL_PHY_ID_MASK,
-+	PHY_ID_MATCH_MODEL(PHY_ID_LAN8814),
- 	.name		= "Microchip INDY Gigabit Quad PHY",
- 	.flags          = PHY_POLL_CABLE_TEST,
- 	.config_init	= lan8814_config_init,
-@@ -5836,8 +5829,7 @@ static struct phy_driver ksphy_driver[] = {
- 	.cable_test_start	= lan8814_cable_test_start,
- 	.cable_test_get_status	= ksz886x_cable_test_get_status,
- }, {
--	.phy_id		= PHY_ID_LAN8804,
--	.phy_id_mask	= MICREL_PHY_ID_MASK,
-+	PHY_ID_MATCH_MODEL(PHY_ID_LAN8804),
- 	.name		= "Microchip LAN966X Gigabit PHY",
- 	.config_init	= lan8804_config_init,
- 	.driver_data	= &ksz9021_type,
-@@ -5852,8 +5844,7 @@ static struct phy_driver ksphy_driver[] = {
- 	.config_intr	= lan8804_config_intr,
- 	.handle_interrupt = lan8804_handle_interrupt,
- }, {
--	.phy_id		= PHY_ID_LAN8841,
--	.phy_id_mask	= MICREL_PHY_ID_MASK,
-+	PHY_ID_MATCH_MODEL(PHY_ID_LAN8841),
- 	.name		= "Microchip LAN8841 Gigabit PHY",
- 	.flags		= PHY_POLL_CABLE_TEST,
- 	.driver_data	= &lan8841_type,
-@@ -5870,8 +5861,7 @@ static struct phy_driver ksphy_driver[] = {
- 	.cable_test_start	= lan8814_cable_test_start,
- 	.cable_test_get_status	= ksz886x_cable_test_get_status,
- }, {
--	.phy_id		= PHY_ID_KSZ9131,
--	.phy_id_mask	= MICREL_PHY_ID_MASK,
-+	PHY_ID_MATCH_MODEL(PHY_ID_KSZ9131),
- 	.name		= "Microchip KSZ9131 Gigabit PHY",
- 	/* PHY_GBIT_FEATURES */
- 	.flags		= PHY_POLL_CABLE_TEST,
-@@ -5892,8 +5882,7 @@ static struct phy_driver ksphy_driver[] = {
- 	.cable_test_get_status	= ksz9x31_cable_test_get_status,
- 	.get_features	= ksz9477_get_features,
- }, {
--	.phy_id		= PHY_ID_KSZ8873MLL,
--	.phy_id_mask	= MICREL_PHY_ID_MASK,
-+	PHY_ID_MATCH_MODEL(PHY_ID_KSZ8873MLL),
- 	.name		= "Micrel KSZ8873MLL Switch",
- 	/* PHY_BASIC_FEATURES */
- 	.config_init	= kszphy_config_init,
-@@ -5902,8 +5891,7 @@ static struct phy_driver ksphy_driver[] = {
- 	.suspend	= genphy_suspend,
- 	.resume		= genphy_resume,
- }, {
--	.phy_id		= PHY_ID_KSZ886X,
--	.phy_id_mask	= MICREL_PHY_ID_MASK,
-+	PHY_ID_MATCH_MODEL(PHY_ID_KSZ886X),
- 	.name		= "Micrel KSZ8851 Ethernet MAC or KSZ886X Switch",
- 	.driver_data	= &ksz886x_type,
- 	/* PHY_BASIC_FEATURES */
-@@ -5923,8 +5911,7 @@ static struct phy_driver ksphy_driver[] = {
- 	.suspend	= genphy_suspend,
- 	.resume		= genphy_resume,
- }, {
--	.phy_id		= PHY_ID_KSZ9477,
--	.phy_id_mask	= MICREL_PHY_ID_MASK,
-+	PHY_ID_MATCH_MODEL(PHY_ID_KSZ9477),
- 	.name		= "Microchip KSZ9477",
- 	.probe		= kszphy_probe,
- 	/* PHY_GBIT_FEATURES */
-@@ -5951,22 +5938,23 @@ MODULE_LICENSE("GPL");
+ 	u16 val = 0;
+@@ -2926,7 +2944,6 @@ static int lan8814_hwtstamp(struct mii_timestamper *mii_ts,
+ 	struct lan8814_ptp_rx_ts *rx_ts, *tmp;
+ 	int txcfg = 0, rxcfg = 0;
+ 	int pkt_ts_enable;
+-	int tx_mod;
  
- static const struct mdio_device_id __maybe_unused micrel_tbl[] = {
- 	{ PHY_ID_KSZ9021, 0x000ffffe },
--	{ PHY_ID_KSZ9031, MICREL_PHY_ID_MASK },
--	{ PHY_ID_KSZ9131, MICREL_PHY_ID_MASK },
-+	{ PHY_ID_MATCH_MODEL(PHY_ID_KSZ9031) },
-+	{ PHY_ID_MATCH_MODEL(PHY_ID_KSZ9131) },
- 	{ PHY_ID_KSZ8001, 0x00fffffc },
--	{ PHY_ID_KS8737, MICREL_PHY_ID_MASK },
-+	{ PHY_ID_MATCH_MODEL(PHY_ID_KS8737) },
- 	{ PHY_ID_KSZ8021, 0x00ffffff },
- 	{ PHY_ID_KSZ8031, 0x00ffffff },
--	{ PHY_ID_KSZ8041, MICREL_PHY_ID_MASK },
--	{ PHY_ID_KSZ8051, MICREL_PHY_ID_MASK },
--	{ PHY_ID_KSZ8061, MICREL_PHY_ID_MASK },
--	{ PHY_ID_KSZ8081, MICREL_PHY_ID_MASK },
--	{ PHY_ID_KSZ8873MLL, MICREL_PHY_ID_MASK },
--	{ PHY_ID_KSZ886X, MICREL_PHY_ID_MASK },
--	{ PHY_ID_KSZ9477, MICREL_PHY_ID_MASK },
--	{ PHY_ID_LAN8814, MICREL_PHY_ID_MASK },
--	{ PHY_ID_LAN8804, MICREL_PHY_ID_MASK },
--	{ PHY_ID_LAN8841, MICREL_PHY_ID_MASK },
-+	{ PHY_ID_MATCH_MODEL(PHY_ID_KSZ8041) },
-+	{ PHY_ID_MATCH_MODEL(PHY_ID_KSZ8041RNLI) },
-+	{ PHY_ID_MATCH_MODEL(PHY_ID_KSZ8051) },
-+	{ PHY_ID_MATCH_MODEL(PHY_ID_KSZ8061) },
-+	{ PHY_ID_MATCH_MODEL(PHY_ID_KSZ8081) },
-+	{ PHY_ID_MATCH_MODEL(PHY_ID_KSZ8873MLL) },
-+	{ PHY_ID_MATCH_MODEL(PHY_ID_KSZ886X) },
-+	{ PHY_ID_MATCH_MODEL(PHY_ID_KSZ9477) },
-+	{ PHY_ID_MATCH_MODEL(PHY_ID_LAN8814) },
-+	{ PHY_ID_MATCH_MODEL(PHY_ID_LAN8804) },
-+	{ PHY_ID_MATCH_MODEL(PHY_ID_LAN8841) },
- 	{ }
- };
+ 	ptp_priv->hwts_tx_type = config->tx_type;
+ 	ptp_priv->rx_filter = config->rx_filter;
+@@ -2973,13 +2990,14 @@ static int lan8814_hwtstamp(struct mii_timestamper *mii_ts,
+ 	lanphy_write_page_reg(ptp_priv->phydev, 5, PTP_RX_TIMESTAMP_EN, pkt_ts_enable);
+ 	lanphy_write_page_reg(ptp_priv->phydev, 5, PTP_TX_TIMESTAMP_EN, pkt_ts_enable);
  
+-	tx_mod = lanphy_read_page_reg(ptp_priv->phydev, 5, PTP_TX_MOD);
+ 	if (ptp_priv->hwts_tx_type == HWTSTAMP_TX_ONESTEP_SYNC) {
+-		lanphy_write_page_reg(ptp_priv->phydev, 5, PTP_TX_MOD,
+-				      tx_mod | PTP_TX_MOD_TX_PTP_SYNC_TS_INSERT_);
++		lanphy_modify_page_reg(ptp_priv->phydev, 5, PTP_TX_MOD,
++				       PTP_TX_MOD_TX_PTP_SYNC_TS_INSERT_,
++				       PTP_TX_MOD_TX_PTP_SYNC_TS_INSERT_);
+ 	} else if (ptp_priv->hwts_tx_type == HWTSTAMP_TX_ON) {
+-		lanphy_write_page_reg(ptp_priv->phydev, 5, PTP_TX_MOD,
+-				      tx_mod & ~PTP_TX_MOD_TX_PTP_SYNC_TS_INSERT_);
++		lanphy_modify_page_reg(ptp_priv->phydev, 5, PTP_TX_MOD,
++				       PTP_TX_MOD_TX_PTP_SYNC_TS_INSERT_,
++				       0);
+ 	}
+ 
+ 	if (config->rx_filter != HWTSTAMP_FILTER_NONE)
+@@ -3382,73 +3400,66 @@ static void lan8814_ptp_set_reload(struct phy_device *phydev, int event,
+ static void lan8814_ptp_enable_event(struct phy_device *phydev, int event,
+ 				     int pulse_width)
+ {
+-	u16 val;
+-
+-	val = lanphy_read_page_reg(phydev, 4, LAN8814_PTP_GENERAL_CONFIG);
+-	/* Set the pulse width of the event */
+-	val &= ~(LAN8814_PTP_GENERAL_CONFIG_LTC_EVENT_MASK(event));
+-	/* Make sure that the target clock will be incremented each time when
++	/* Set the pulse width of the event,
++	 * Make sure that the target clock will be incremented each time when
+ 	 * local time reaches or pass it
++	 * Set the polarity high
+ 	 */
+-	val |= LAN8814_PTP_GENERAL_CONFIG_LTC_EVENT_SET(event, pulse_width);
+-	val &= ~(LAN8814_PTP_GENERAL_CONFIG_RELOAD_ADD_X(event));
+-	/* Set the polarity high */
+-	val |= LAN8814_PTP_GENERAL_CONFIG_POLARITY_X(event);
+-	lanphy_write_page_reg(phydev, 4, LAN8814_PTP_GENERAL_CONFIG, val);
++	lanphy_modify_page_reg(phydev, 4, LAN8814_PTP_GENERAL_CONFIG,
++			       LAN8814_PTP_GENERAL_CONFIG_LTC_EVENT_MASK(event) |
++			       LAN8814_PTP_GENERAL_CONFIG_LTC_EVENT_SET(event, pulse_width) |
++			       LAN8814_PTP_GENERAL_CONFIG_RELOAD_ADD_X(event) |
++			       LAN8814_PTP_GENERAL_CONFIG_POLARITY_X(event),
++			       LAN8814_PTP_GENERAL_CONFIG_LTC_EVENT_SET(event, pulse_width) |
++			       LAN8814_PTP_GENERAL_CONFIG_POLARITY_X(event));
+ }
+ 
+ static void lan8814_ptp_disable_event(struct phy_device *phydev, int event)
+ {
+-	u16 val;
+-
+ 	/* Set target to too far in the future, effectively disabling it */
+ 	lan8814_ptp_set_target(phydev, event, 0xFFFFFFFF, 0);
+ 
+ 	/* And then reload once it recheas the target */
+-	val = lanphy_read_page_reg(phydev, 4, LAN8814_PTP_GENERAL_CONFIG);
+-	val |= LAN8814_PTP_GENERAL_CONFIG_RELOAD_ADD_X(event);
+-	lanphy_write_page_reg(phydev, 4, LAN8814_PTP_GENERAL_CONFIG, val);
++	lanphy_modify_page_reg(phydev, 4, LAN8814_PTP_GENERAL_CONFIG,
++			       LAN8814_PTP_GENERAL_CONFIG_RELOAD_ADD_X(event),
++			       LAN8814_PTP_GENERAL_CONFIG_RELOAD_ADD_X(event));
+ }
+ 
+ static void lan8814_ptp_perout_off(struct phy_device *phydev, int pin)
+ {
+-	u16 val;
+-
+ 	/* Disable gpio alternate function,
+ 	 * 1: select as gpio,
+ 	 * 0: select alt func
+ 	 */
+-	val = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin));
+-	val |= LAN8814_GPIO_EN_BIT(pin);
+-	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin), val);
++	lanphy_modify_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin),
++			       LAN8814_GPIO_EN_BIT(pin),
++			       LAN8814_GPIO_EN_BIT(pin));
+ 
+-	val = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin));
+-	val &= ~LAN8814_GPIO_DIR_BIT(pin);
+-	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin), val);
++	lanphy_modify_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin),
++			       LAN8814_GPIO_DIR_BIT(pin),
++			       0);
+ 
+-	val = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_BUF_ADDR(pin));
+-	val &= ~LAN8814_GPIO_BUF_BIT(pin);
+-	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_BUF_ADDR(pin), val);
++	lanphy_modify_page_reg(phydev, 4, LAN8814_GPIO_BUF_ADDR(pin),
++			       LAN8814_GPIO_BUF_BIT(pin),
++			       0);
+ }
+ 
+ static void lan8814_ptp_perout_on(struct phy_device *phydev, int pin)
+ {
+-	int val;
+-
+ 	/* Set as gpio output */
+-	val = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin));
+-	val |= LAN8814_GPIO_DIR_BIT(pin);
+-	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin), val);
++	lanphy_modify_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin),
++			       LAN8814_GPIO_DIR_BIT(pin),
++			       LAN8814_GPIO_DIR_BIT(pin));
+ 
+ 	/* Enable gpio 0:for alternate function, 1:gpio */
+-	val = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin));
+-	val &= ~LAN8814_GPIO_EN_BIT(pin);
+-	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin), val);
++	lanphy_modify_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin),
++			       LAN8814_GPIO_EN_BIT(pin),
++			       0);
+ 
+ 	/* Set buffer type to push pull */
+-	val = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_BUF_ADDR(pin));
+-	val |= LAN8814_GPIO_BUF_BIT(pin);
+-	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_BUF_ADDR(pin), val);
++	lanphy_modify_page_reg(phydev, 4, LAN8814_GPIO_BUF_ADDR(pin),
++			       LAN8814_GPIO_BUF_BIT(pin),
++			       LAN8814_GPIO_BUF_BIT(pin));
+ }
+ 
+ static int lan8814_ptp_perout(struct ptp_clock_info *ptpci,
+@@ -3563,61 +3574,59 @@ static int lan8814_ptp_perout(struct ptp_clock_info *ptpci,
+ 
+ static void lan8814_ptp_extts_on(struct phy_device *phydev, int pin, u32 flags)
+ {
+-	u16 tmp;
+-
+ 	/* Set as gpio input */
+-	tmp = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin));
+-	tmp &= ~LAN8814_GPIO_DIR_BIT(pin);
+-	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin), tmp);
++	lanphy_modify_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin),
++			       LAN8814_GPIO_DIR_BIT(pin),
++			       0);
+ 
+ 	/* Map the pin to ltc pin 0 of the capture map registers */
+-	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_MAP_LO);
+-	tmp |= pin;
+-	lanphy_write_page_reg(phydev, 4, PTP_GPIO_CAP_MAP_LO, tmp);
++	lanphy_modify_page_reg(phydev, 4, PTP_GPIO_CAP_MAP_LO,
++			       pin,
++			       pin);
+ 
+ 	/* Enable capture on the edges of the ltc pin */
+-	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_EN);
+ 	if (flags & PTP_RISING_EDGE)
+-		tmp |= PTP_GPIO_CAP_EN_GPIO_RE_CAPTURE_ENABLE(0);
++		lanphy_modify_page_reg(phydev, 4, PTP_GPIO_CAP_EN,
++				       PTP_GPIO_CAP_EN_GPIO_RE_CAPTURE_ENABLE(0),
++				       PTP_GPIO_CAP_EN_GPIO_RE_CAPTURE_ENABLE(0));
+ 	if (flags & PTP_FALLING_EDGE)
+-		tmp |= PTP_GPIO_CAP_EN_GPIO_FE_CAPTURE_ENABLE(0);
+-	lanphy_write_page_reg(phydev, 4, PTP_GPIO_CAP_EN, tmp);
++		lanphy_modify_page_reg(phydev, 4, PTP_GPIO_CAP_EN,
++				       PTP_GPIO_CAP_EN_GPIO_FE_CAPTURE_ENABLE(0),
++				       PTP_GPIO_CAP_EN_GPIO_FE_CAPTURE_ENABLE(0));
+ 
+ 	/* Enable interrupt top interrupt */
+-	tmp = lanphy_read_page_reg(phydev, 4, PTP_COMMON_INT_ENA);
+-	tmp |= PTP_COMMON_INT_ENA_GPIO_CAP_EN;
+-	lanphy_write_page_reg(phydev, 4, PTP_COMMON_INT_ENA, tmp);
++	lanphy_modify_page_reg(phydev, 4, PTP_COMMON_INT_ENA,
++			       PTP_COMMON_INT_ENA_GPIO_CAP_EN,
++			       PTP_COMMON_INT_ENA_GPIO_CAP_EN);
+ }
+ 
+ static void lan8814_ptp_extts_off(struct phy_device *phydev, int pin)
+ {
+-	u16 tmp;
+-
+ 	/* Set as gpio out */
+-	tmp = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin));
+-	tmp |= LAN8814_GPIO_DIR_BIT(pin);
+-	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin), tmp);
++	lanphy_modify_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin),
++			       LAN8814_GPIO_DIR_BIT(pin),
++			       LAN8814_GPIO_DIR_BIT(pin));
+ 
+ 	/* Enable alternate, 0:for alternate function, 1:gpio */
+-	tmp = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin));
+-	tmp &= ~LAN8814_GPIO_EN_BIT(pin);
+-	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin), tmp);
++	lanphy_modify_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin),
++			       LAN8814_GPIO_EN_BIT(pin),
++			       0);
+ 
+ 	/* Clear the mapping of pin to registers 0 of the capture registers */
+-	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_MAP_LO);
+-	tmp &= ~GENMASK(3, 0);
+-	lanphy_write_page_reg(phydev, 4, PTP_GPIO_CAP_MAP_LO, tmp);
++	lanphy_modify_page_reg(phydev, 4, PTP_GPIO_CAP_MAP_LO,
++			       GENMASK(3, 0),
++			       0);
+ 
+ 	/* Disable capture on both of the edges */
+-	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_EN);
+-	tmp &= ~PTP_GPIO_CAP_EN_GPIO_RE_CAPTURE_ENABLE(pin);
+-	tmp &= ~PTP_GPIO_CAP_EN_GPIO_FE_CAPTURE_ENABLE(pin);
+-	lanphy_write_page_reg(phydev, 4, PTP_GPIO_CAP_EN, tmp);
++	lanphy_modify_page_reg(phydev, 4, PTP_GPIO_CAP_EN,
++			       PTP_GPIO_CAP_EN_GPIO_RE_CAPTURE_ENABLE(pin) |
++			       PTP_GPIO_CAP_EN_GPIO_FE_CAPTURE_ENABLE(pin),
++			       0);
+ 
+ 	/* Disable interrupt top interrupt */
+-	tmp = lanphy_read_page_reg(phydev, 4, PTP_COMMON_INT_ENA);
+-	tmp &= ~PTP_COMMON_INT_ENA_GPIO_CAP_EN;
+-	lanphy_write_page_reg(phydev, 4, PTP_COMMON_INT_ENA, tmp);
++	lanphy_modify_page_reg(phydev, 4, PTP_COMMON_INT_ENA,
++			       PTP_COMMON_INT_ENA_GPIO_CAP_EN,
++			       0);
+ }
+ 
+ static int lan8814_ptp_extts(struct ptp_clock_info *ptpci,
+@@ -3857,9 +3866,9 @@ static int lan8814_gpio_process_cap(struct lan8814_shared_priv *shared)
+ 	/* This is 0 because whatever was the input pin it was mapped it to
+ 	 * ltc gpio pin 0
+ 	 */
+-	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_SEL);
+-	tmp |= PTP_GPIO_SEL_GPIO_SEL(0);
+-	lanphy_write_page_reg(phydev, 4, PTP_GPIO_SEL, tmp);
++	lanphy_modify_page_reg(phydev, 4, PTP_GPIO_SEL,
++			       PTP_GPIO_SEL_GPIO_SEL(0),
++			       PTP_GPIO_SEL_GPIO_SEL(0));
+ 
+ 	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_STS);
+ 	if (!(tmp & PTP_GPIO_CAP_STS_PTP_GPIO_RE_STS(0)) &&
+@@ -3906,13 +3915,10 @@ static int lan8814_handle_gpio_interrupt(struct phy_device *phydev, u16 status)
+ 
+ static int lan8804_config_init(struct phy_device *phydev)
+ {
+-	int val;
+-
+ 	/* MDI-X setting for swap A,B transmit */
+-	val = lanphy_read_page_reg(phydev, 2, LAN8804_ALIGN_SWAP);
+-	val &= ~LAN8804_ALIGN_TX_A_B_SWAP_MASK;
+-	val |= LAN8804_ALIGN_TX_A_B_SWAP;
+-	lanphy_write_page_reg(phydev, 2, LAN8804_ALIGN_SWAP, val);
++	lanphy_modify_page_reg(phydev, 2, LAN8804_ALIGN_SWAP,
++			       LAN8804_ALIGN_TX_A_B_SWAP_MASK,
++			       LAN8804_ALIGN_TX_A_B_SWAP);
+ 
+ 	/* Make sure that the PHY will not stop generating the clock when the
+ 	 * link partner goes down
+@@ -4054,7 +4060,6 @@ static void lan8814_ptp_init(struct phy_device *phydev)
+ {
+ 	struct kszphy_priv *priv = phydev->priv;
+ 	struct kszphy_ptp_priv *ptp_priv = &priv->ptp_priv;
+-	u32 temp;
+ 
+ 	if (!IS_ENABLED(CONFIG_PTP_1588_CLOCK) ||
+ 	    !IS_ENABLED(CONFIG_NETWORK_PHY_TIMESTAMPING))
+@@ -4062,13 +4067,13 @@ static void lan8814_ptp_init(struct phy_device *phydev)
+ 
+ 	lanphy_write_page_reg(phydev, 5, TSU_HARD_RESET, TSU_HARD_RESET_);
+ 
+-	temp = lanphy_read_page_reg(phydev, 5, PTP_TX_MOD);
+-	temp |= PTP_TX_MOD_BAD_UDPV4_CHKSUM_FORCE_FCS_DIS_;
+-	lanphy_write_page_reg(phydev, 5, PTP_TX_MOD, temp);
++	lanphy_modify_page_reg(phydev, 5, PTP_TX_MOD,
++			       PTP_TX_MOD_BAD_UDPV4_CHKSUM_FORCE_FCS_DIS_,
++			       PTP_TX_MOD_BAD_UDPV4_CHKSUM_FORCE_FCS_DIS_);
+ 
+-	temp = lanphy_read_page_reg(phydev, 5, PTP_RX_MOD);
+-	temp |= PTP_RX_MOD_BAD_UDPV4_CHKSUM_FORCE_FCS_DIS_;
+-	lanphy_write_page_reg(phydev, 5, PTP_RX_MOD, temp);
++	lanphy_modify_page_reg(phydev, 5, PTP_RX_MOD,
++			       PTP_RX_MOD_BAD_UDPV4_CHKSUM_FORCE_FCS_DIS_,
++			       PTP_RX_MOD_BAD_UDPV4_CHKSUM_FORCE_FCS_DIS_);
+ 
+ 	lanphy_write_page_reg(phydev, 5, PTP_RX_PARSE_CONFIG, 0);
+ 	lanphy_write_page_reg(phydev, 5, PTP_TX_PARSE_CONFIG, 0);
+@@ -4194,23 +4199,21 @@ static void lan8814_setup_led(struct phy_device *phydev, int val)
+ static int lan8814_config_init(struct phy_device *phydev)
+ {
+ 	struct kszphy_priv *lan8814 = phydev->priv;
+-	int val;
+ 
+ 	/* Reset the PHY */
+-	val = lanphy_read_page_reg(phydev, 4, LAN8814_QSGMII_SOFT_RESET);
+-	val |= LAN8814_QSGMII_SOFT_RESET_BIT;
+-	lanphy_write_page_reg(phydev, 4, LAN8814_QSGMII_SOFT_RESET, val);
++	lanphy_modify_page_reg(phydev, 4, LAN8814_QSGMII_SOFT_RESET,
++			       LAN8814_QSGMII_SOFT_RESET_BIT,
++			       LAN8814_QSGMII_SOFT_RESET_BIT);
+ 
+ 	/* Disable ANEG with QSGMII PCS Host side */
+-	val = lanphy_read_page_reg(phydev, 5, LAN8814_QSGMII_PCS1G_ANEG_CONFIG);
+-	val &= ~LAN8814_QSGMII_PCS1G_ANEG_CONFIG_ANEG_ENA;
+-	lanphy_write_page_reg(phydev, 5, LAN8814_QSGMII_PCS1G_ANEG_CONFIG, val);
++	lanphy_modify_page_reg(phydev, 4, LAN8814_QSGMII_PCS1G_ANEG_CONFIG,
++			       LAN8814_QSGMII_PCS1G_ANEG_CONFIG_ANEG_ENA,
++			       0);
+ 
+ 	/* MDI-X setting for swap A,B transmit */
+-	val = lanphy_read_page_reg(phydev, 2, LAN8814_ALIGN_SWAP);
+-	val &= ~LAN8814_ALIGN_TX_A_B_SWAP_MASK;
+-	val |= LAN8814_ALIGN_TX_A_B_SWAP;
+-	lanphy_write_page_reg(phydev, 2, LAN8814_ALIGN_SWAP, val);
++	lanphy_modify_page_reg(phydev, 2, LAN8814_ALIGN_SWAP,
++			       LAN8814_ALIGN_TX_A_B_SWAP_MASK,
++			       LAN8814_ALIGN_TX_A_B_SWAP);
+ 
+ 	if (lan8814->led_mode >= 0)
+ 		lan8814_setup_led(phydev, lan8814->led_mode);
+@@ -4241,29 +4244,24 @@ static int lan8814_release_coma_mode(struct phy_device *phydev)
+ 
+ static void lan8814_clear_2psp_bit(struct phy_device *phydev)
+ {
+-	u16 val;
+-
+ 	/* It was noticed that when traffic is passing through the PHY and the
+ 	 * cable is removed then the LED was still one even though there is no
+ 	 * link
+ 	 */
+-	val = lanphy_read_page_reg(phydev, 2, LAN8814_EEE_STATE);
+-	val &= ~LAN8814_EEE_STATE_MASK2P5P;
+-	lanphy_write_page_reg(phydev, 2, LAN8814_EEE_STATE, val);
++	lanphy_modify_page_reg(phydev, 2, LAN8814_EEE_STATE,
++			       LAN8814_EEE_STATE_MASK2P5P,
++			       0);
+ }
+ 
+ static void lan8814_update_meas_time(struct phy_device *phydev)
+ {
+-	u16 val;
+-
+ 	/* By setting the measure time to a value of 0xb this will allow cables
+ 	 * longer than 100m to be used. This configuration can be used
+ 	 * regardless of the mode of operation of the PHY
+ 	 */
+-	val = lanphy_read_page_reg(phydev, 1, LAN8814_PD_CONTROLS);
+-	val &= ~LAN8814_PD_CONTROLS_PD_MEAS_TIME_MASK;
+-	val |= LAN8814_PD_CONTROLS_PD_MEAS_TIME_VAL;
+-	lanphy_write_page_reg(phydev, 1, LAN8814_PD_CONTROLS, val);
++	lanphy_modify_page_reg(phydev, 1, LAN8814_PD_CONTROLS,
++			       LAN8814_PD_CONTROLS_PD_MEAS_TIME_MASK,
++			       LAN8814_PD_CONTROLS_PD_MEAS_TIME_VAL);
+ }
+ 
+ static int lan8814_probe(struct phy_device *phydev)
 -- 
 2.34.1
 
