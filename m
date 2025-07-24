@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-209905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67CD9B11429
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 00:37:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 485ABB1142C
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 00:38:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 455DA3A6745
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 22:36:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE3E0AC6DBC
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 22:36:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73916253B73;
-	Thu, 24 Jul 2025 22:34:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD99255E4E;
+	Thu, 24 Jul 2025 22:34:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="ehN5ZoMx"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="HOtlew61"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEAE52512D7;
-	Thu, 24 Jul 2025 22:34:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818DE253F03;
+	Thu, 24 Jul 2025 22:34:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753396451; cv=none; b=SHLZ2NR9yxLg2s+jGp6OgQX3wVib7ICcIG3HCCQaH7Do1K311K8MTxXXdlgSXwf7aUdb++za5YZB3IelnhUJKbDC1Lk45lRpBEclk+/diLfwaZdJeHSVl2VAodR2e+bJk9YrMAAmaOpwUkAQOtouF/MYCu8U2d9BQLmrcRhWaLc=
+	t=1753396453; cv=none; b=IZuHDBOiVRdk2Ju4tdNZngEMRrpN4B8rybBRyZ7gKd4O477Iad6Qx7SNBGwhhrVqhFEStNWA5277BXOEvcYfSWzjjuPsTznhNes2X1icq/vh2+lMsBk0cDcB6E2GKKxvW8F1iE3lCVuE9CZXZ42vbh90rKsdyDPYRLJGxKq67GY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753396451; c=relaxed/simple;
-	bh=RsNa6dY7Ggx79BBDezqD2LIxCrlLT9hrdaX0sUwxeUQ=;
+	s=arc-20240116; t=1753396453; c=relaxed/simple;
+	bh=PtIDZiEM1/+QVnqWE3yQqYoU966UQzTxFHIuPV/1zkM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qkEw7oJwJ/q4x9wr+jTdakddYB+I2pxW7FBGbjBU7OWxbmTskVpdYIAjpb1qwIn6YB+U2yj+ORpKz5uzew8QuQiItuX70v0N02veUIs0ZXUVQvOHDvElGnjIBLvqCPBtmu+Y4TOzogjiNTqjoxZrDM3gXHYkuyM0XvkIBgfIOdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=ehN5ZoMx; arc=none smtp.client-ip=89.58.32.78
+	 MIME-Version; b=pxN0L4QEceV+LRo6SEWXZ3dTUTnYi9aeVIdqIgBJcHPUUx520i40tUIDXWmhVkWFoFuWLSWiCrFNh9hn6s5N3al5vs2j71lm9wVwCnJxuwEa02c0BDbuioSk6AQySiRq95uJr4SggcjazJbq7qKziiRcXQ9h4u/7Utc/zj+KEbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=HOtlew61; arc=none smtp.client-ip=89.58.32.78
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 23DC010391E85;
-	Fri, 25 Jul 2025 00:34:05 +0200 (CEST)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 6E5D610391E84;
+	Fri, 25 Jul 2025 00:34:07 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1753396447; h=from:subject:date:message-id:to:cc:mime-version:
+	t=1753396449; h=from:subject:date:message-id:to:cc:mime-version:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=Um6fsWMXXdwOsborhlhL6uEmELmgkvz5EFE7jyDkCvQ=;
-	b=ehN5ZoMx6Y/+gUglQnQRUxbs7tfSAaDbI10FlWeHThbHmIVnnfHgPWG0zpgibg0DK1l772
-	SnKrlZJsXApRk38YoyX/yFttxbqO03tMZnazjxfDGsyHvorDyS1nz3WhtadHSOsAyMY/qt
-	D4bKG1oUKaSTEKu25JHCiLVGwk359I05YkS26/ICM6YCigluuMseJPpa84bDpi+qIwIjtC
-	xYjut9ridiIqoxCaIw+W6ZrqyDxsCSy4MZjXyzQpT2iDRm+VopjRjKqjGz/5mM0uSSvVA7
-	C8MRLsoB9oRv/WIB2FQ0iWBXX1nJpEvWWpBvDshBjwL3MpdCnd2vKl5A7G+Hyg==
+	bh=O8YK2gujWnxBiiFJKNzidOYlk08NSwx6YEHjmvn158s=;
+	b=HOtlew61/29aE4tVP5IBTCkr0W8CCyzx64byT3GJLAbCZ/TzDVi4vcVNyDhINNd2gNyl0j
+	6OMmclcuWeZbWT2v+wwOIixkOwtD2HdfuY6P2q68LYfetL1sUXcoEgyP5GsO3ZIVxMpqaT
+	9EFFdpBDuQQMSmgqIuNgr4v8SzGJ4pje9dR0/ABRl6w0a9MHOLJGpH2JzqjTe12MdHfcuu
+	jvmh4eqmwW9FCDjzokeeaYdvD9BCrAvqdkjs0ADERyWrfR8CoPHWKupe0efFZUh2rfW+uV
+	wcX9Qtc2i+o5SB2ZmW+HRvqD5MqNXSc7XAwbIX2diQQkRdEj4Tk1lXrxk9eAHQ==
 From: Lukasz Majewski <lukma@denx.de>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	davem@davemloft.net,
@@ -64,9 +64,9 @@ Cc: Sascha Hauer <s.hauer@pengutronix.de>,
 	Stefan Wahren <wahrenst@gmx.net>,
 	Simon Horman <horms@kernel.org>,
 	Lukasz Majewski <lukma@denx.de>
-Subject: [net-next v16 09/12] net: mtip: Extend the L2 switch driver for imx287 with bridge operations
-Date: Fri, 25 Jul 2025 00:33:15 +0200
-Message-Id: <20250724223318.3068984-10-lukma@denx.de>
+Subject: [net-next v16 10/12] ARM: mxs_defconfig: Enable CONFIG_NFS_FSCACHE
+Date: Fri, 25 Jul 2025 00:33:16 +0200
+Message-Id: <20250724223318.3068984-11-lukma@denx.de>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250724223318.3068984-1-lukma@denx.de>
 References: <20250724223318.3068984-1-lukma@denx.de>
@@ -79,228 +79,47 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Last-TLS-Session-Version: TLSv1.3
 
-After this change the MTIP L2 switch can be configured as offloading
-device for packet switching when bridge on their interfaces is created.
+It is not possible to enable by user the CONFIG_NETFS_SUPPORT anymore and
+hence it depends on CONFIG_NFS_FSCACHE being enabled.
+
+This patch fixes potential performance regression for NFS on the mxs
+devices.
 
 Signed-off-by: Lukasz Majewski <lukma@denx.de>
+Reviewed-by: Stefan Wahren <wahrenst@gmx.net>
+Suggested-by: Stefan Wahren <wahrenst@gmx.net>
+
 ---
+Changes for v6:
+- New patch
 
-Changes for v13:
-- New patch - created by excluding some code from large (i.e. v12 and
-  earlier) MTIP driver
-
-Changes for v14 - v15:
+Changes for v7 - v16:
 - None
-
-Changes for v16:
-- Enable MTIP ports to support bridge offloading
 ---
- .../net/ethernet/freescale/mtipsw/Makefile    |   2 +-
- .../net/ethernet/freescale/mtipsw/mtipl2sw.c  |   9 +-
- .../net/ethernet/freescale/mtipsw/mtipl2sw.h  |   2 +
- .../ethernet/freescale/mtipsw/mtipl2sw_br.c   | 132 ++++++++++++++++++
- 4 files changed, 143 insertions(+), 2 deletions(-)
- create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw_br.c
+ arch/arm/configs/mxs_defconfig | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/freescale/mtipsw/Makefile b/drivers/net/ethernet/freescale/mtipsw/Makefile
-index a99aaf6ddfb2..81e2b0e03e6c 100644
---- a/drivers/net/ethernet/freescale/mtipsw/Makefile
-+++ b/drivers/net/ethernet/freescale/mtipsw/Makefile
-@@ -1,4 +1,4 @@
- # SPDX-License-Identifier: GPL-2.0
- 
- obj-$(CONFIG_FEC_MTIP_L2SW) += nxp-mtipl2sw.o
--nxp-mtipl2sw-objs := mtipl2sw.o mtipl2sw_mgnt.o
-+nxp-mtipl2sw-objs := mtipl2sw.o mtipl2sw_mgnt.o mtipl2sw_br.o
-diff --git a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
-index 6d2e21ccf404..960857a0bf6f 100644
---- a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
-+++ b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
-@@ -1882,11 +1882,15 @@ static int mtip_sw_probe(struct platform_device *pdev)
- 	if (ret)
- 		return dev_err_probe(&pdev->dev, ret, "Could not alloc IRQ\n");
- 
-+	ret = mtip_register_notifiers(fep);
-+	if (ret)
-+		return ret;
-+
- 	ret = mtip_switch_dma_init(fep);
- 	if (ret) {
- 		dev_err(&pdev->dev, "%s: ethernet switch init fail (%d)!\n",
- 			__func__, ret);
--		return ret;
-+		goto unregister_notifiers;
- 	}
- 
- 	ret = mtip_mii_init(fep, pdev);
-@@ -1917,6 +1921,8 @@ static int mtip_sw_probe(struct platform_device *pdev)
- 			  fep->bd_dma);
- 	fep->rx_bd_base = NULL;
- 	fep->tx_bd_base = NULL;
-+ unregister_notifiers:
-+	mtip_unregister_notifiers(fep);
- 
- 	return ret;
- }
-@@ -1925,6 +1931,7 @@ static void mtip_sw_remove(struct platform_device *pdev)
- {
- 	struct switch_enet_private *fep = platform_get_drvdata(pdev);
- 
-+	mtip_unregister_notifiers(fep);
- 	mtip_ndev_cleanup(fep);
- 
- 	mtip_mii_remove(fep);
-diff --git a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.h b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.h
-index 7e5373823d43..3dae94048917 100644
---- a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.h
-+++ b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.h
-@@ -643,6 +643,8 @@ int mtip_port_learning_config(struct switch_enet_private *fep, int port,
- int mtip_port_blocking_config(struct switch_enet_private *fep, int port,
- 			      bool enable);
- bool mtip_is_switch_netdev_port(const struct net_device *ndev);
-+int mtip_register_notifiers(struct switch_enet_private *fep);
-+void mtip_unregister_notifiers(struct switch_enet_private *fep);
- int mtip_port_enable_config(struct switch_enet_private *fep, int port,
- 			    bool tx_en, bool rx_en);
- void mtip_clear_atable(struct switch_enet_private *fep);
-diff --git a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw_br.c b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw_br.c
-new file mode 100644
-index 000000000000..f961b9cc4e6a
---- /dev/null
-+++ b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw_br.c
-@@ -0,0 +1,132 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ *  L2 switch Controller driver for MTIP block - bridge network interface
-+ *
-+ *  Copyright (C) 2025 DENX Software Engineering GmbH
-+ *  Lukasz Majewski <lukma@denx.de>
-+ */
-+
-+#include <linux/etherdevice.h>
-+#include <linux/netdevice.h>
-+#include <linux/platform_device.h>
-+#include <net/switchdev.h>
-+
-+#include "mtipl2sw.h"
-+
-+static int mtip_ndev_port_link(struct net_device *ndev,
-+			       struct net_device *br_ndev,
-+			       struct netlink_ext_ack *extack)
-+{
-+	struct mtip_ndev_priv *priv = netdev_priv(ndev), *other_priv;
-+	struct switch_enet_private *fep = priv->fep;
-+	struct net_device *other_ndev;
-+	int err;
-+
-+	/* Check if one port of MTIP switch is already bridged */
-+	if (fep->br_members && !fep->br_offload) {
-+		/* Get the second bridge ndev */
-+		other_ndev = fep->ndev[fep->br_members - 1];
-+		other_priv = netdev_priv(other_ndev);
-+		if (other_priv->master_dev != br_ndev) {
-+			NL_SET_ERR_MSG_MOD(extack,
-+					   "L2 offloading only possible for the same bridge!");
-+			return notifier_from_errno(-EOPNOTSUPP);
-+		}
-+
-+		fep->br_offload = 1;
-+		mtip_switch_dis_port_separation(fep);
-+		mtip_clear_atable(fep);
-+	}
-+
-+	if (!priv->master_dev)
-+		priv->master_dev = br_ndev;
-+
-+	fep->br_members |= BIT(priv->portnum - 1);
-+
-+	err = switchdev_bridge_port_offload(ndev, ndev, NULL, NULL, NULL,
-+					    false, extack);
-+	if (err) {
-+		dev_err(&ndev->dev, "can't offload bridge port %s [err: %d]\n",
-+			ndev->name, err);
-+		return err;
-+	}
-+
-+	dev_dbg(&ndev->dev,
-+		"%s: ndev: %s br: %s fep: %p members: 0x%x offload: %d\n",
-+		__func__, ndev->name,  br_ndev->name, fep, fep->br_members,
-+		fep->br_offload);
-+
-+	return NOTIFY_DONE;
-+}
-+
-+static void mtip_netdevice_port_unlink(struct net_device *ndev)
-+{
-+	struct mtip_ndev_priv *priv = netdev_priv(ndev);
-+	struct switch_enet_private *fep = priv->fep;
-+
-+	dev_dbg(&ndev->dev, "%s: ndev: %s members: 0x%x\n", __func__,
-+		ndev->name, fep->br_members);
-+
-+	switchdev_bridge_port_unoffload(ndev, NULL, NULL, NULL);
-+
-+	fep->br_members &= ~BIT(priv->portnum - 1);
-+	priv->master_dev = NULL;
-+
-+	if (fep->br_members && fep->br_offload) {
-+		fep->br_offload = 0;
-+		mtip_switch_en_port_separation(fep);
-+		mtip_clear_atable(fep);
-+	}
-+}
-+
-+/* netdev notifier */
-+static int mtip_netdevice_event(struct notifier_block *unused,
-+				unsigned long event, void *ptr)
-+{
-+	struct net_device *ndev = netdev_notifier_info_to_dev(ptr);
-+	struct netdev_notifier_changeupper_info *info = ptr;
-+	struct netlink_ext_ack *extack;
-+	int ret = NOTIFY_DONE;
-+
-+	if (!mtip_is_switch_netdev_port(ndev))
-+		return NOTIFY_DONE;
-+
-+	extack = netdev_notifier_info_to_extack(&info->info);
-+
-+	switch (event) {
-+	case NETDEV_CHANGEUPPER:
-+		if (!netif_is_bridge_master(info->upper_dev))
-+			break;
-+
-+		if (info->linking)
-+			ret = mtip_ndev_port_link(ndev, info->upper_dev,
-+						  extack);
-+		else
-+			mtip_netdevice_port_unlink(ndev);
-+
-+		break;
-+	default:
-+		return NOTIFY_DONE;
-+	}
-+
-+	return notifier_from_errno(ret);
-+}
-+
-+static struct notifier_block mtip_netdevice_nb __read_mostly = {
-+	.notifier_call = mtip_netdevice_event,
-+};
-+
-+int mtip_register_notifiers(struct switch_enet_private *fep)
-+{
-+	int ret = register_netdevice_notifier(&mtip_netdevice_nb);
-+
-+	if (ret)
-+		dev_err(&fep->pdev->dev, "can't register netdevice notifier\n");
-+
-+	return ret;
-+}
-+
-+void mtip_unregister_notifiers(struct switch_enet_private *fep)
-+{
-+	unregister_netdevice_notifier(&mtip_netdevice_nb);
-+}
+diff --git a/arch/arm/configs/mxs_defconfig b/arch/arm/configs/mxs_defconfig
+index c76d66135abb..22f7639f61fe 100644
+--- a/arch/arm/configs/mxs_defconfig
++++ b/arch/arm/configs/mxs_defconfig
+@@ -138,8 +138,6 @@ CONFIG_PWM_MXS=y
+ CONFIG_NVMEM_MXS_OCOTP=y
+ CONFIG_EXT4_FS=y
+ # CONFIG_DNOTIFY is not set
+-CONFIG_NETFS_SUPPORT=m
+-CONFIG_FSCACHE=y
+ CONFIG_FSCACHE_STATS=y
+ CONFIG_CACHEFILES=m
+ CONFIG_VFAT_FS=y
+@@ -155,6 +153,7 @@ CONFIG_NFS_FS=y
+ CONFIG_NFS_V3_ACL=y
+ CONFIG_NFS_V4=y
+ CONFIG_ROOT_NFS=y
++CONFIG_NFS_FSCACHE=y
+ CONFIG_NLS_CODEPAGE_437=y
+ CONFIG_NLS_CODEPAGE_850=y
+ CONFIG_NLS_ISO8859_1=y
 -- 
 2.39.5
 
