@@ -1,107 +1,114 @@
-Return-Path: <netdev+bounces-209650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66EC6B1023A
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 09:49:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08CEFB10272
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 09:55:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 632D8AC34E9
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 07:48:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50894AA2DAF
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 07:55:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38B72265CBD;
-	Thu, 24 Jul 2025 07:49:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1C4826FA6E;
+	Thu, 24 Jul 2025 07:55:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EUpsX3lg"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="EG1CoS/4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out.smtpout.orange.fr (out-18.smtpout.orange.fr [193.252.22.18])
+	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CDE31C6FF5;
-	Thu, 24 Jul 2025 07:49:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C75BA2459D7;
+	Thu, 24 Jul 2025 07:55:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753343350; cv=none; b=hMS6SmsF7FT2UTAUJz89tdZJmKjcN//LykO2DsvBp+omzye5oVpVufJN6JXNUXv3qwSRuQUzB2Nd7g2ldmfvqgQTdvR4SEMjUXzmMEKrxHJN92gTZL35m11WQ3DoLowC+QfqlA62ILjGDpUMah0dnL5TJsHWw5b/YEv81YXSnYM=
+	t=1753343734; cv=none; b=ZyP6+V2rbxCt/3yjcA26/fk1rAOUcdwN1CCR7a7NO3rI+cbv+ueVdpUlmGy0A1Pz29p0UO36fVBoSmeKSaV9urs1niBCSbjzhFDg/GDuM3TEkTFSj12fmREaZFREbNUJL327YL0gEEgKpBdP8JPc2lflOZQ2VrYUOJ994GGGS90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753343350; c=relaxed/simple;
-	bh=d/8QVK8y6ws/QbHuiFBL8hVTd/dAilTt+zbJtKU4EAs=;
+	s=arc-20240116; t=1753343734; c=relaxed/simple;
+	bh=cDTS6SYvBpPoIL6qy2wUnozxKfGX2b9UFGGUmOYX9E8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EXBe8h5ECnICLEwSB2S5Xt1V6mQDdJz0orhonxx7rN12FYsR+764uguu2gW30gCqsw5eBLwOPAqWck0r7vQo974ENlDM8wjUvUfUAOPU7W9MrlRgJtoaR7yxpEniAi6O6beF4vEKpgsnGlI8zWJ/UJDwOOvQXbMcgeBWBfYITFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EUpsX3lg; arc=none smtp.client-ip=209.85.219.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-e8986a25cbfso441925276.0;
-        Thu, 24 Jul 2025 00:49:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753343347; x=1753948147; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d/8QVK8y6ws/QbHuiFBL8hVTd/dAilTt+zbJtKU4EAs=;
-        b=EUpsX3lgpFwfN+tE2he4V6QBkcK9dNsWjULujyejqFat8p7v6rCg3aLmpbq/bzSeLg
-         nWzNNLdiZor2BVR78EDyrAP+10etS7nhUVAZKjb7U6Xf4+38REcobeK7ZGJP5yT5xDTj
-         CAMS3/DZESFJ7/tmBhg+1CxUt5xsCWSIxbtcrIJHhmNWEc1Fud0NPAwsyjD8AZdiWojP
-         Y2ZLOvb/ILl9TCjR2mwSypkbE7YbsEbisjrQXTXxOwWTcn0CgD3Z+fA5hzDM6QPFzRhm
-         t+v1/z9JBjb+pMU5cdj3blGk5vpK/a0UhXY5rmteVwADjJErSTWWQ4TJhmKScO7cWOn+
-         NtvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753343347; x=1753948147;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=d/8QVK8y6ws/QbHuiFBL8hVTd/dAilTt+zbJtKU4EAs=;
-        b=b+w5LNEfMM4kHcjgswN+hvqTchrRtvUyNuiGYZVh33WDHhSStGjZIrlRSbXo4cl4bo
-         vWLPClqIYbeWcnZ99C1uJkUV/AKimZVmslj8qdfHldtTgne4hTcxMA8TOPYZ9gBqonob
-         xque4KvEBsGUwxfMWzpXNzk2W7+bgFyLeZBxa2EcikpNOMRUn6iZ9y9HrjGlM/4bba+L
-         OFsZD/ho/R+mr2aKJpHP6sXXKydJUaCHKxq/ZE2lXspN0YKM+IS6+WsQK3DXzU2/SHHJ
-         UXnyFT6A69TGc2pIPOFhyHn0iD9rCvoeqQjsa4mYmw5ICNZdjWGIgfncUNL5U+9lJkYg
-         chJw==
-X-Forwarded-Encrypted: i=1; AJvYcCUKrEDrs/caDHuG4fBzvBhFaxko/abigq4AT8KuNlTWmMzTiCfsN/ReF7dMpni52VVR1RZ1TOM21tuqCIyrsw==@vger.kernel.org, AJvYcCVvyCYbrUDdAkTWZp6p5yLTNmT2ub+tteMPYdsGfBsMsWpbM28q5gyo1Y/4zJbwpgU0I46f1/kH@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjgA2+49XLVvYtGc+y7rX0ACBH3txntDyDcs1/Cw1fNzIb5YbX
-	+u0vSNiLXThLvP15p06AnWamj9piwMsCXpKsWuJM2xxlHJITQgZVe0EKrgcDeTPNAE/b0k9BoY5
-	iYpgImJEf5TBK/BS6ZsjlMYai93Jm2ko=
-X-Gm-Gg: ASbGncutJvVvipaEBF1dXJtJxvVTfr9AEGAWoH2G2T7S2XGAQj/AkX9ZDhTZ5WDHoG4
-	RV3DxbmaOMtFRbXy2vx9Wisv18Iz7pG9j8GERREKTSgUo3qnD5uCZT/4QooGRUr/a87umUO67Dv
-	M3CMgXpJXv/bOCt0gZa2OfvDKri1J6AYsl9qJ7/vvNb3nyItVfzG/kPQfEZTYXKek/TJi+8lMGO
-	sceGnar
-X-Google-Smtp-Source: AGHT+IH7A4sB9RjOrAs7qrdWDTw5qFH4C3xm7jLLxKBplQo6vBecYXyV1xeaYMiKq9tnqtcJInBRTdVLgmoBF+xv2UY=
-X-Received: by 2002:a05:6902:18d6:b0:e89:83ee:3bf with SMTP id
- 3f1490d57ef6-e8dc5862cc7mr7840966276.13.1753343347605; Thu, 24 Jul 2025
- 00:49:07 -0700 (PDT)
+	 To:Cc:Content-Type; b=JuV0mvsiDTILBm2A/uUse66llnF2qMPou8impfwvnzsfaCbRY7kQJhSwGOYPtYLyMYJZa/+dOJSBtkOQGe4jZ1nahpeNESwGEJ1eSm3yHW2KNKeGiN4ulnRNaY/wY0EptaEgRqcSKalVpbPYKR2bBhzEGugyOhDjGnIsNWHoBFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=EG1CoS/4; arc=none smtp.client-ip=193.252.22.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from mail-ed1-f49.google.com ([209.85.208.49])
+	by smtp.orange.fr with ESMTPA
+	id eqmPuEdCwpTm4eqmPudItl; Thu, 24 Jul 2025 09:54:17 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1753343657;
+	bh=14MnTsuJbjYYjuvpSxaOGuOPMJUCYT5/HxNBySMFn6s=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To;
+	b=EG1CoS/4cW00UU2VHatFDn+scY1jNyJIfImzfiybNl0SOdfiWPJNp8uBsmJhT+xWA
+	 HMkSOw4FfKc3+HgqVfwB2vX+CPRarbdXwd4SgdROoE2gp9KFDizXNHTaUO1kVt6Cvz
+	 c91boGFK1TT6FRMxgxGRyRKCY/f11yck1+MOt+cGzGtkmgYVsN9voey2lV8g6HGH4p
+	 Q4PiJxaifsL/saOfStBI0PkErUtdPx27+sbGKHbF8b+hdFXWxuMoqm5UBpFt9Esfi7
+	 D7R6R5/9QAw/NRLJL1L0JL+hNgEVc+GgnZ9j28cBoEnkxR/rJBm50F9oopPNOj1NGc
+	 vwwVtDKf+Nu0w==
+X-ME-Helo: mail-ed1-f49.google.com
+X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
+X-ME-Date: Thu, 24 Jul 2025 09:54:17 +0200
+X-ME-IP: 209.85.208.49
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-60c9d8a169bso1249524a12.1;
+        Thu, 24 Jul 2025 00:54:17 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUK9EvTKcyM+i6s8YfbHe6+6fOp4vr26PmkTKEwym3J7tSlv4nBtsH5oLJxUo7cDdfutwBPn6pn@vger.kernel.org, AJvYcCXK65NsBuAaSm9XHZmjn+2A0Kf4LEA6Wykw2namWRKCHS4EA2UNcMnjHipYEf3WNDwaFAyrVlH6XrM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpqhXqrF+4BW4nA33VygUYwfpNILAawrv9xksMd7Y9gJPzqMaj
+	L8Q5cSlkXLfECJeChrmSXvSZyLD4p9EZZft+pZyhgGLEQOkwXF7PQZceeGjMlwb1nJpoTu8PlJn
+	c8bMLPJngWzrJsMJoE7/y0UmLQfl+pqU=
+X-Google-Smtp-Source: AGHT+IEnYtNYk9rHB5umYhZiK5re5ZuGyEu0gh8JHlA3YimeF4fDr+Y1nEvKG5Kr5gjN4v2Px9e8kskJSrWe4wO7Pvw=
+X-Received: by 2002:a17:907:2d0e:b0:af2:aa60:90c with SMTP id
+ a640c23a62f3a-af2f917a878mr594584066b.53.1753343656906; Thu, 24 Jul 2025
+ 00:54:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250724071555.442634-2-moonhee.lee.ca@gmail.com> <b81013d8f7cccb19ab126aebc7bc442c641d0f4a.camel@sipsolutions.net>
-In-Reply-To: <b81013d8f7cccb19ab126aebc7bc442c641d0f4a.camel@sipsolutions.net>
-From: Moon Hee Lee <moonhee.lee.ca@gmail.com>
-Date: Thu, 24 Jul 2025 00:48:56 -0700
-X-Gm-Features: Ac12FXxmJH-eMjOV40LUbD_GpkxkzA2LCDE6kmfZUjiuahwQV2PQa_PqdwVCFZA
-Message-ID: <CAF3JpA5vCOK72Ojy4FTa_MVGz=yYnJ5=vd8x6prMiC7UxBGWuQ@mail.gmail.com>
-Subject: Re: [PATCH wireless-next] wifi: mac80211: fix use-after-free risk in
- sta debugfs removal
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-kernel-mentees@lists.linux.dev, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, 
-	syzbot+d6ccd49ae046542a0641@syzkaller.appspotmail.com, 
-	skhan@linuxfoundation.org, david.hunter.linux@gmail.com
+References: <20250724063651.8-1-extja@kvaser.com> <20250724063651.8-6-extja@kvaser.com>
+ <a88f2cfa-69e1-400e-ad67-01ae83f3f9f6@gmail.com>
+In-Reply-To: <a88f2cfa-69e1-400e-ad67-01ae83f3f9f6@gmail.com>
+From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Date: Thu, 24 Jul 2025 16:54:04 +0900
+X-Gmail-Original-Message-ID: <CAMZ6RqKdTX0++J_TKGkK8=1mLwC3xE3ZZws85tvzv9bmvZRM0w@mail.gmail.com>
+X-Gm-Features: Ac12FXyesHczDBDxjhk8yCZQ22LKEQJyryYbN5LEtfcIsyXouvLlVlz3AX4v46o
+Message-ID: <CAMZ6RqKdTX0++J_TKGkK8=1mLwC3xE3ZZws85tvzv9bmvZRM0w@mail.gmail.com>
+Subject: Re: [PATCH v2 05/10] can: kvaser_pciefd: Store device channel index
+To: Jimmy Assarsson <jimmyassarsson@gmail.com>
+Cc: Jimmy Assarsson <extja@kvaser.com>, linux-can@vger.kernel.org, 
+	Marc Kleine-Budde <mkl@pengutronix.de>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 24, 2025 at 12:18=E2=80=AFAM Johannes Berg
-<johannes@sipsolutions.net> wrote:
-> Maybe so, but it really looks like a bandaid?! Why are we trying to
-> remove it twice in the first place?
+On Thu. 24 Jul. 2025 at 16:09, Jimmy Assarsson <jimmyassarsson@gmail.com> wrote:
+> On 7/24/25 8:36 AM, Jimmy Assarsson wrote:
+> > Store device channel index in netdev.dev_port.
+> >
+> > Fixes: 26ad340e582d ("can: kvaser_pciefd: Add driver for Kvaser PCIEcan devices")
+> > Signed-off-by: Jimmy Assarsson <extja@kvaser.com>
+> > ---
+> > Changes in v2:
+> >    - Add Fixes tag.
+> >
+> >   drivers/net/can/kvaser_pciefd.c | 1 +
+> >   1 file changed, 1 insertion(+)
+> >
+> > diff --git a/drivers/net/can/kvaser_pciefd.c b/drivers/net/can/kvaser_pciefd.c
+> > index 7153b9ea0d3d..8dcb1d1c67e4 100644
+> > --- a/drivers/net/can/kvaser_pciefd.c
+> > +++ b/drivers/net/can/kvaser_pciefd.c
+> > @@ -1028,6 +1028,7 @@ static int kvaser_pciefd_setup_can_ctrls(struct kvaser_pciefd *pcie)
+> >               can->completed_tx_bytes = 0;
+> >               can->bec.txerr = 0;
+> >               can->bec.rxerr = 0;
+> > +             can->can.dev->dev_port = i;
+> >
+> >               init_completion(&can->start_comp);
+> >               init_completion(&can->flush_comp);
+>
+> Would it be better to submit this as a separate patch, or keep it within
+> this patch series?
 
-Thanks, Johannes. I agree this patch is only defensive and does not
-address the root cause.
-
-I am currently tracing the sta_info_destroy flow to determine whether
-this is caused by a duplicate free or an unsynchronized access to
-sta->debugfs_dir. If the race is confirmed, I will follow up with a
-more complete fix that properly handles the lifecycle.
+Even if this is a bug, I see no urgency to it, so I am happy to have
+this goes first to netdev-next and is picked-up by stable later on.
+Doing the opposite would require you to split and seems more
+troublesome.
 
