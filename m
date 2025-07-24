@@ -1,383 +1,247 @@
-Return-Path: <netdev+bounces-209887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F860B11308
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 23:23:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B0F7B11330
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 23:36:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DE4DAE3980
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 21:23:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A36047AAB77
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 21:34:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5AD52EE60D;
-	Thu, 24 Jul 2025 21:23:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44082238C35;
+	Thu, 24 Jul 2025 21:36:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jZ5Qi4LG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uvQG9mmb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF7452ED848
-	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 21:23:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 156AC1F0E29;
+	Thu, 24 Jul 2025 21:36:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753392202; cv=none; b=lHa8TC/Ss5BqYmN1nJwOMpggVpDINMPtdaovB+G36aTdkh9CI9Gm7mXSdRLO6WJi7s0ZS0WxfU+92btkZUX/BhwSzAPdc+WHFfjHwrL6hT/oxCYtOm0t9z43lcfs5x3nIT/IAuCzstKJ6PgchUI4mMn5wDESDAEFFM4sMcCurrA=
+	t=1753392962; cv=none; b=Zv2kGKcAp4wwS7mKr24Bmmyg5/EV5yffyvClNF/6hjXec26G/bZk4Hjqgm7tcu6v/40DCgaqVVUD3mbuRuSL0d5rlrj/GG2cg1IwN901XJRVgsAI3JwWjPQcXRRx3amu7p46g6e1HEuMATWJ4SBK5S+jjvxJAywnrNDwZjkytos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753392202; c=relaxed/simple;
-	bh=AWa3QljlTQI2w6CzFs/GJMnKM1od+dLR+KMOmwq2NRg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WwZRaiMvTy8uHras0H8lP8me77PHAZWAgSEFYPgoLM1PutqU3uRBxVpBuRAObP2oiWKOXZstaFrcdjSgjg78oojE7ITNopj5BwvhQVUkDbyAuKn8fD/DL2gBc0kDA2fArZH+FkT8zTG7XYcFEgIkPaQlBIyn+MAjZcTDyD1p6vU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jZ5Qi4LG; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-237f18108d2so65285ad.0
-        for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 14:23:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753392199; x=1753996999; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TNnTJ5darf1pQDB2vsYeV7FJpreNa9uOT82oPg1Gxp8=;
-        b=jZ5Qi4LG9byWLV2CFlBI6eNDIxXIsnTNhRI/EvwTF56DPpWAT5cLUQooVsFfJG+NjX
-         AU31WoPK2QdXqz/QcjdAU6WFnzSLCs2yzmzxvNEEgu9Ug4MigGnJVpQ/lqPNehQnmQ6a
-         XCvRJ+M33c4fpO9p6CwJ0lLP83gQd26UtGNCBFzSzrT5G2Dkn5iE+5WB8ae/iOjFdSBS
-         jL4aEjekadOsZSumx9HbPlePhuPt9AbAVqZyIbl6RjNZmPgAwyatykA/lRWwyAkAcm/M
-         NvWtElxtpZ2p164pQFy36ym7oj1/yGG0owJRf0v+nml2HAopav+vJjUkNzzGq0iUriLI
-         /BsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753392199; x=1753996999;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TNnTJ5darf1pQDB2vsYeV7FJpreNa9uOT82oPg1Gxp8=;
-        b=X4gPDUSWhdOrYENnLZQZCqR3fxQt30a/5rJT/L+XzbUXfasCh0p61VJKGuJn/S5J8h
-         mfrX5N/cYmqYMj8X55BC/uJqT2JpiTXSyRHTVFfv872IqPq9yQiF+RYDjwB7sQzkI5bM
-         +6oo9KMoDlRQa18laeIb3XJiZLWy1M6qeGY9IB+LlvhISqJUaCQNXdaLm2CuBResUlXn
-         ERx9QUiBEgVsnngwXDgD3ht4ZbrGHIfmz5wkptwU4985g8+J7rzmawX7DhC6yQUjn9OM
-         09K9OJI8nWFlslL1Q2iLaJV7k2fNNPWHuJz/DA+ScmBsnHHejKw7/xyiU3fJpsOiW0+y
-         qCoA==
-X-Forwarded-Encrypted: i=1; AJvYcCUXAZwK+SxGsQ++TQNA9QjN8mmTvlqjWE8PgkIFjuTCMBxLI5VSsJ6W5Tjbs+vmr6OkQbxT1FA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVfhXxzISgg0sAXJz08MxKcP7o9Cgg20um/Ra+E2tFsuAMV/Tj
-	P9r3zj4pWsF/okTZU444vPcrd8uheCu+3rbbqiDM2LPhRqXAmc4wHoUnL6ah/7zLgs+DF+vCd2c
-	IBCj3qcq7NM55SWNf3tbqfmkxsTL3Q6isE58OxWD7
-X-Gm-Gg: ASbGnctDOzcZPtCMs1vU4YLBxj1QLYVzk3TSI5vRZ3iSfFxHKCekyAlhxvAdB74ETcU
-	iEZt/0YFU1+RTHV3XpE2KRPVZIfZWA+BDbTZAr48d3x89PW6kdu1fJQKH+F1h0PTcGwP7PCp7U9
-	7vsOfnNnEMIgxUac7uDKuQQnpODlxt/R3QeD/c4515YJcKUs3b0/Rs5UrEmS3UFh3LojW9a88a+
-	nTpcSTPLeNvMpgQk/ZCpLn69o+7wBcd+FmgG4fLhxTrJuzz
-X-Google-Smtp-Source: AGHT+IHP4CcY56s6tdK30PaY3+VQezaoZk4lvk+rDg73ia56t/qWWvkH19hG/XzNRK1ErwjJSSAFdSL4fYDkuZlCRh0=
-X-Received: by 2002:a17:903:32ce:b0:231:f6bc:5c84 with SMTP id
- d9443c01a7336-23fada5b364mr924205ad.8.1753392198670; Thu, 24 Jul 2025
- 14:23:18 -0700 (PDT)
+	s=arc-20240116; t=1753392962; c=relaxed/simple;
+	bh=VktSpx31T4gvreXXwiCIHMGXxj+dIlDcqOXQZ0Nb58Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=coIuA90YJo8RkD9fL3US992k5hnl0NcZCg3qqbXBAgUBdxZjEc/rZWuF4BI0rzQUzx37Kxh5g23e4Lh1Sz73ZSLB3rj4Hu826m3dUez1O4Z/u1FGyRCBaTYrXHZhuuLr0BoCFQ+NhE3v65KxgLTOCEC3RonEAwlnGxMp/1XKuPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uvQG9mmb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78382C4CEF5;
+	Thu, 24 Jul 2025 21:35:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753392961;
+	bh=VktSpx31T4gvreXXwiCIHMGXxj+dIlDcqOXQZ0Nb58Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uvQG9mmb5SVQIv3JuI8wf8n8pSM2jrkgynaWdk2Awu3haJcvmKJby/Kd7S+vZ84EX
+	 adyzw36maWDQqPaFHuPeHT0+nkIzcT0s3WZj8NTYhYozRphxujua2r7fhZXtpj6sw/
+	 0qiSpDzML0kKWPHphMZZkz1KeUbFheQe72eTsKgzTz86A8dBV2sY/kWPVyQJBoNeYS
+	 fjsdsYdc2ePT2kAtvfcMqL5b+RqQpv0RKXSOeN8XgTxvFYZrgCYTkrv8+85eCOdi8p
+	 Omz/ZmsnFeWz4K06ATI2kS8hyvhdkN636t+7F4rXOiHDG1XFdWrVSLN/v8jBesWrN1
+	 Y/6X171UP2iTg==
+Date: Thu, 24 Jul 2025 22:35:56 +0100
+From: Simon Horman <horms@kernel.org>
+To: Tristram.Ha@microchip.com
+Cc: Woojung.Huh@microchip.com, andrew@lunn.ch, olteanv@gmail.com,
+	kuba@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, maxime.chevallier@bootlin.com,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	marex@denx.de, UNGLinuxDriver@microchip.com,
+	devicetree@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4 4/7] net: dsa: microchip: Use different
+ registers for KSZ8463
+Message-ID: <20250724213556.GG1266901@horms.kernel.org>
+References: <20250719012106.257968-1-Tristram.Ha@microchip.com>
+ <20250719012106.257968-5-Tristram.Ha@microchip.com>
+ <20250720101703.GQ2459@horms.kernel.org>
+ <20250720102224.GR2459@horms.kernel.org>
+ <DM3PR11MB873641FBBF2A79E787F13877EC5FA@DM3PR11MB8736.namprd11.prod.outlook.com>
+ <20250723162158.GJ1036606@horms.kernel.org>
+ <DM3PR11MB87369E36CA76C1BB7C78CEB7EC5EA@DM3PR11MB8736.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250721054903.39833-1-byungchul@sk.com> <CAHS8izM11fxu6jHZw5VJsHXeZ+Tk+6ZBGDk0vHiOoHyXZoOvOg@mail.gmail.com>
- <20250723044610.GA80428@system.software.com>
-In-Reply-To: <20250723044610.GA80428@system.software.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 24 Jul 2025 14:23:05 -0700
-X-Gm-Features: Ac12FXz-gExQLTDVuATyXHwkSGv0B-njaHRD7KrjKadlfvJJk-4Hay1UO-wB7MU
-Message-ID: <CAHS8izMO0LO1uKu0peSAC8Sixes06KLfKJvyQnAOiLfDqZd5+Q@mail.gmail.com>
-Subject: Re: [PATCH] mm, page_pool: introduce a new page type for page pool in
- page type
-To: Byungchul Park <byungchul@sk.com>
-Cc: linux-mm@kvack.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kernel_team@skhynix.com, harry.yoo@oracle.com, ast@kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org, hawk@kernel.org, 
-	john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com, leon@kernel.org, 
-	tariqt@nvidia.com, mbloch@nvidia.com, andrew+netdev@lunn.ch, 
-	edumazet@google.com, pabeni@redhat.com, akpm@linux-foundation.org, 
-	david@redhat.com, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, 
-	vbabka@suse.cz, rppt@kernel.org, surenb@google.com, mhocko@suse.com, 
-	horms@kernel.org, jackmanb@google.com, hannes@cmpxchg.org, ziy@nvidia.com, 
-	ilias.apalodimas@linaro.org, willy@infradead.org, brauner@kernel.org, 
-	kas@kernel.org, yuzhao@google.com, usamaarif642@gmail.com, 
-	baolin.wang@linux.alibaba.com, toke@redhat.com, asml.silence@gmail.com, 
-	bpf@vger.kernel.org, linux-rdma@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM3PR11MB87369E36CA76C1BB7C78CEB7EC5EA@DM3PR11MB8736.namprd11.prod.outlook.com>
 
-On Tue, Jul 22, 2025 at 9:46=E2=80=AFPM Byungchul Park <byungchul@sk.com> w=
-rote:
->
-> On Tue, Jul 22, 2025 at 03:17:15PM -0700, Mina Almasry wrote:
-> > On Sun, Jul 20, 2025 at 10:49=E2=80=AFPM Byungchul Park <byungchul@sk.c=
-om> wrote:
+On Thu, Jul 24, 2025 at 02:28:56AM +0000, Tristram.Ha@microchip.com wrote:
+> > On Wed, Jul 23, 2025 at 02:25:27AM +0000, Tristram.Ha@microchip.com wrote:
+> > > > On Sun, Jul 20, 2025 at 11:17:03AM +0100, Simon Horman wrote:
+> > > > > On Fri, Jul 18, 2025 at 06:21:03PM -0700, Tristram.Ha@microchip.com wrote:
+> > > > > > From: Tristram Ha <tristram.ha@microchip.com>
+> > > > > >
+> > > > > > KSZ8463 does not use same set of registers as KSZ8863 so it is necessary
+> > > > > > to change some registers when using KSZ8463.
+> > > > > >
+> > > > > > Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
+> > > > > > ---
+> > > > > > v3
+> > > > > > - Replace cpu_to_be16() with swab16() to avoid compiler warning
+> > > > >
+> > > > > ...
+> > > > >
+> > > > > > diff --git a/drivers/net/dsa/microchip/ksz_common.c
+> > > > b/drivers/net/dsa/microchip/ksz_common.c
+> > > > >
+> > > > > ...
+> > > > >
+> > > > > > @@ -2980,10 +2981,15 @@ static int ksz_setup(struct dsa_switch *ds)
+> > > > > >     }
+> > > > > >
+> > > > > >     /* set broadcast storm protection 10% rate */
+> > > > > > -   regmap_update_bits(ksz_regmap_16(dev), regs[S_BROADCAST_CTRL],
+> > > > > > -                      BROADCAST_STORM_RATE,
+> > > > > > -                      (BROADCAST_STORM_VALUE *
+> > > > > > -                      BROADCAST_STORM_PROT_RATE) / 100);
+> > > > > > +   storm_mask = BROADCAST_STORM_RATE;
+> > > > > > +   storm_rate = (BROADCAST_STORM_VALUE *
+> > > > BROADCAST_STORM_PROT_RATE) / 100;
+> > > > > > +   if (ksz_is_ksz8463(dev)) {
+> > > > > > +           storm_mask = swab16(storm_mask);
+> > > > > > +           storm_rate = swab16(storm_rate);
+> > > > > > +   }
+> > > > > > +   regmap_update_bits(ksz_regmap_16(dev),
+> > > > > > +                      reg16(dev, regs[S_BROADCAST_CTRL]),
+> > > > > > +                      storm_mask, storm_rate);
+> > > > >
+> > > > > Hi Tristram,
+> > > > >
+> > > > > I am confused by the use of swab16() here.
+> > > > >
+> > > > > Let us say that we are running on a little endian host (likely).
+> > > > > Then the effect of this is to pass big endian values to regmap_update_bits().
+> > > > >
+> > > > > But if we are running on a big endian host, the opposite will be true:
+> > > > > little endian values will be passed to regmap_update_bits().
+> > > > >
+> > > > >
+> > > > > Looking at KSZ_REGMAP_ENTRY() I see:
+> > > > >
+> > > > > #define KSZ_REGMAP_ENTRY(width, swp, regbits, regpad, regalign)         \
+> > > > >         {                                                               \
+> > > > >               ...
+> > > > >                 .reg_format_endian = REGMAP_ENDIAN_BIG,                 \
+> > > > >                 .val_format_endian = REGMAP_ENDIAN_BIG                  \
+> > > > >         }
+> > > >
+> > > > Update; I now see this in another patch of the series:
+> > > >
+> > > > +#define KSZ8463_REGMAP_ENTRY(width, swp, regbits, regpad, regalign)    \
+> > > > +       {                                                               \
+> > > >                 ...
+> > > > +               .reg_format_endian = REGMAP_ENDIAN_BIG,                 \
+> > > > +               .val_format_endian = REGMAP_ENDIAN_LITTLE               \
+> > > > +       }
+> > > >
+> > > > Which I understand to mean that the hardware is expecting little endian
+> > > > values. But still, my concerns raised in my previous email of this
+> > > > thread remain.
+> > > >
+> > > > And I have a question: does this chip use little endian register values
+> > > > whereas other chips used big endian register values?
+> > > >
+> > > > >
+> > > > > Which based on a skimming the regmap code implies to me that
+> > > > > regmap_update_bits() should be passed host byte order values
+> > > > > which regmap will convert to big endian when writing out
+> > > > > these values.
+> > > > >
+> > > > > It is unclear to me why changing the byte order of storm_mask
+> > > > > and storm_rate is needed here. But it does seem clear that
+> > > > > it will lead to inconsistent results on big endian and little
+> > > > > endian hosts.
 > > >
-> > > Hi,
+> > > The broadcast storm value 0x7ff is stored in registers 6 and 7 in KSZ8863
+> > > where register 6 holds the 0x7 part while register 7 holds the 0xff part.
+> > > In KSZ8463 register 6 is defined as 16-bit where the 0x7 part is held in
+> > > lower byte and the 0xff part is held in higher byte.  It is necessary to
+> > > swap the bytes when the value is passed to the 16-bit write function.
+> > 
+> > Perhaps naively, I would have expected
+> > 
+> >         .val_format_endian = REGMAP_ENDIAN_LITTLE
+> > 
+> > to handle writing the 16-bit value 0x7ff such that 0x7 is in
+> > the lower byte, while 0xff is in the upper byte. Is that not the case?
+> > 
+> > If not, do you get the desired result by removing the swab16() calls
+> > and using
+> > 
+> >         .val_format_endian = REGMAP_ENDIAN_BIG
+> > 
+> > But perhaps I misunderstand how .val_format_endian works.
+> > 
 > > >
-> > > I focused on converting the existing APIs accessing ->pp_magic field =
-to
-> > > page type APIs.  However, yes.  Additional works would better be
-> > > considered on top like:
-> > >
-> > >    1. Adjust how to store and retrieve dma index.  Maybe network guys
-> > >       can work better on top.
-> > >
-> > >    2. Move the sanity check for page pool in mm/page_alloc.c to on fr=
-ee.
-> > >
-> > >    Byungchul
-> > >
-> > > ---8<---
-> > > From 7d207a1b3e9f4ff2a72f5b54b09e3ed0c4aaaca3 Mon Sep 17 00:00:00 200=
-1
-> > > From: Byungchul Park <byungchul@sk.com>
-> > > Date: Mon, 21 Jul 2025 14:05:20 +0900
-> > > Subject: [PATCH] mm, page_pool: introduce a new page type for page po=
-ol in page type
-> > >
-> > > ->pp_magic field in struct page is current used to identify if a page
-> > > belongs to a page pool.  However, page type e.i. PGTY_netpp can be us=
-ed
-> > > for that purpose.
-> > >
-> > > Use the page type APIs e.g. PageNetpp(), __SetPageNetpp(), and
-> > > __ClearPageNetpp() instead, and remove the existing APIs accessing
-> > > ->pp_magic e.g. page_pool_page_is_pp(), netmem_or_pp_magic(), and
-> > > netmem_clear_pp_magic() since they are totally replaced.
-> > >
-> > > This work was inspired by the following link by Pavel:
-> > >
-> > > [1] https://lore.kernel.org/all/582f41c0-2742-4400-9c81-0d46bf4e8314@=
-gmail.com/
-> > >
-> > > Suggested-by: Pavel Begunkov <asml.silence@gmail.com>
-> > > Signed-off-by: Byungchul Park <byungchul@sk.com>
-> > > ---
-> > >  .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |  2 +-
-> > >  include/linux/mm.h                            | 28 ++---------------=
---
-> > >  include/linux/page-flags.h                    |  6 ++++
-> > >  include/net/netmem.h                          |  2 +-
-> > >  mm/page_alloc.c                               |  4 +--
-> > >  net/core/netmem_priv.h                        | 16 ++---------
-> > >  net/core/page_pool.c                          | 10 +++++--
-> > >  7 files changed, 24 insertions(+), 44 deletions(-)
-> > >
-> > > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/drive=
-rs/net/ethernet/mellanox/mlx5/core/en/xdp.c
-> > > index 5d51600935a6..def274f5c1ca 100644
-> > > --- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-> > > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-> > > @@ -707,7 +707,7 @@ static void mlx5e_free_xdpsq_desc(struct mlx5e_xd=
-psq *sq,
-> > >                                 xdpi =3D mlx5e_xdpi_fifo_pop(xdpi_fif=
-o);
-> > >                                 page =3D xdpi.page.page;
-> > >
-> > > -                               /* No need to check page_pool_page_is=
-_pp() as we
-> > > +                               /* No need to check PageNetpp() as we
-> > >                                  * know this is a page_pool page.
-> > >                                  */
-> > >                                 page_pool_recycle_direct(pp_page_to_n=
-mdesc(page)->pp,
-> > > diff --git a/include/linux/mm.h b/include/linux/mm.h
-> > > index ae50c1641bed..736061749535 100644
-> > > --- a/include/linux/mm.h
-> > > +++ b/include/linux/mm.h
-> > > @@ -4135,10 +4135,9 @@ int arch_lock_shadow_stack_status(struct task_=
-struct *t, unsigned long status);
-> > >   * DMA mapping IDs for page_pool
-> > >   *
-> > >   * When DMA-mapping a page, page_pool allocates an ID (from an xarra=
-y) and
-> > > - * stashes it in the upper bits of page->pp_magic. We always want to=
- be able to
-> > > - * unambiguously identify page pool pages (using page_pool_page_is_p=
-p()). Non-PP
-> > > - * pages can have arbitrary kernel pointers stored in the same field=
- as pp_magic
-> > > - * (since it overlaps with page->lru.next), so we must ensure that w=
-e cannot
-> > > + * stashes it in the upper bits of page->pp_magic. Non-PP pages can =
-have
-> > > + * arbitrary kernel pointers stored in the same field as pp_magic (s=
-ince
-> > > + * it overlaps with page->lru.next), so we must ensure that we canno=
-t
-> > >   * mistake a valid kernel pointer with any of the values we write in=
-to this
-> > >   * field.
-> > >   *
-> > > @@ -4168,25 +4167,4 @@ int arch_lock_shadow_stack_status(struct task_=
-struct *t, unsigned long status);
-> > >
-> > >  #define PP_DMA_INDEX_MASK GENMASK(PP_DMA_INDEX_BITS + PP_DMA_INDEX_S=
-HIFT - 1, \
-> > >                                   PP_DMA_INDEX_SHIFT)
-> > > -
-> > > -/* Mask used for checking in page_pool_page_is_pp() below. page->pp_=
-magic is
-> > > - * OR'ed with PP_SIGNATURE after the allocation in order to preserve=
- bit 0 for
-> > > - * the head page of compound page and bit 1 for pfmemalloc page, as =
-well as the
-> > > - * bits used for the DMA index. page_is_pfmemalloc() is checked in
-> > > - * __page_pool_put_page() to avoid recycling the pfmemalloc page.
-> > > - */
-> > > -#define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
-> > > -
-> > > -#ifdef CONFIG_PAGE_POOL
-> > > -static inline bool page_pool_page_is_pp(const struct page *page)
-> > > -{
-> > > -       return (page->pp_magic & PP_MAGIC_MASK) =3D=3D PP_SIGNATURE;
-> > > -}
-> > > -#else
-> > > -static inline bool page_pool_page_is_pp(const struct page *page)
-> > > -{
-> > > -       return false;
-> > > -}
-> > > -#endif
-> > > -
-> > >  #endif /* _LINUX_MM_H */
-> > > diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
-> > > index 4fe5ee67535b..906ba7c9e372 100644
-> > > --- a/include/linux/page-flags.h
-> > > +++ b/include/linux/page-flags.h
-> > > @@ -957,6 +957,7 @@ enum pagetype {
-> > >         PGTY_zsmalloc           =3D 0xf6,
-> > >         PGTY_unaccepted         =3D 0xf7,
-> > >         PGTY_large_kmalloc      =3D 0xf8,
-> > > +       PGTY_netpp              =3D 0xf9,
-> > >
-> > >         PGTY_mapcount_underflow =3D 0xff
-> > >  };
-> > > @@ -1101,6 +1102,11 @@ PAGE_TYPE_OPS(Zsmalloc, zsmalloc, zsmalloc)
-> > >  PAGE_TYPE_OPS(Unaccepted, unaccepted, unaccepted)
-> > >  FOLIO_TYPE_OPS(large_kmalloc, large_kmalloc)
-> > >
-> > > +/*
-> > > + * Marks page_pool allocated pages.
-> > > + */
-> > > +PAGE_TYPE_OPS(Netpp, netpp, netpp)
-> > > +
-> > >  /**
-> > >   * PageHuge - Determine if the page belongs to hugetlbfs
-> > >   * @page: The page to test.
-> > > diff --git a/include/net/netmem.h b/include/net/netmem.h
-> > > index f7dacc9e75fd..3667334e16e7 100644
-> > > --- a/include/net/netmem.h
-> > > +++ b/include/net/netmem.h
-> > > @@ -298,7 +298,7 @@ static inline struct net_iov *__netmem_clear_lsb(=
-netmem_ref netmem)
-> > >   */
-> > >  #define pp_page_to_nmdesc(p)                                        =
-   \
-> > >  ({                                                                  =
-   \
-> > > -       DEBUG_NET_WARN_ON_ONCE(!page_pool_page_is_pp(p));            =
-   \
-> > > +       DEBUG_NET_WARN_ON_ONCE(!PageNetpp(p));                       =
-   \
-> > >         __pp_page_to_nmdesc(p);                                      =
-   \
-> > >  })
-> > >
-> > > diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-> > > index 2ef3c07266b3..71c7666e48a9 100644
-> > > --- a/mm/page_alloc.c
-> > > +++ b/mm/page_alloc.c
-> > > @@ -898,7 +898,7 @@ static inline bool page_expected_state(struct pag=
-e *page,
-> > >  #ifdef CONFIG_MEMCG
-> > >                         page->memcg_data |
-> > >  #endif
-> > > -                       page_pool_page_is_pp(page) |
-> > > +                       PageNetpp(page) |
-> > >                         (page->flags & check_flags)))
-> > >                 return false;
-> > >
-> > > @@ -925,7 +925,7 @@ static const char *page_bad_reason(struct page *p=
-age, unsigned long flags)
-> > >         if (unlikely(page->memcg_data))
-> > >                 bad_reason =3D "page still charged to cgroup";
-> > >  #endif
-> > > -       if (unlikely(page_pool_page_is_pp(page)))
-> > > +       if (unlikely(PageNetpp(page)))
-> > >                 bad_reason =3D "page_pool leak";
-> > >         return bad_reason;
-> > >  }
-> > > diff --git a/net/core/netmem_priv.h b/net/core/netmem_priv.h
-> > > index cd95394399b4..39a97703d9ed 100644
-> > > --- a/net/core/netmem_priv.h
-> > > +++ b/net/core/netmem_priv.h
-> > > @@ -8,21 +8,11 @@ static inline unsigned long netmem_get_pp_magic(net=
-mem_ref netmem)
-> > >         return __netmem_clear_lsb(netmem)->pp_magic & ~PP_DMA_INDEX_M=
-ASK;
-> > >  }
-> > >
-> > > -static inline void netmem_or_pp_magic(netmem_ref netmem, unsigned lo=
-ng pp_magic)
-> > > -{
-> > > -       __netmem_clear_lsb(netmem)->pp_magic |=3D pp_magic;
-> > > -}
-> > > -
-> > > -static inline void netmem_clear_pp_magic(netmem_ref netmem)
-> > > -{
-> > > -       WARN_ON_ONCE(__netmem_clear_lsb(netmem)->pp_magic & PP_DMA_IN=
-DEX_MASK);
-> > > -
-> > > -       __netmem_clear_lsb(netmem)->pp_magic =3D 0;
-> > > -}
-> > > -
-> > >  static inline bool netmem_is_pp(netmem_ref netmem)
-> > >  {
-> > > -       return (netmem_get_pp_magic(netmem) & PP_MAGIC_MASK) =3D=3D P=
-P_SIGNATURE;
-> > > +       if (netmem_is_net_iov(netmem))
-> > > +               return true;
-> >
-> > As Pavel alludes, this is dubious, and at least it's difficult to
-> > reason about it.
-> >
-> > There could be net_iovs that are not attached to pp, and should not be
-> > treated as pp memory. These are in the devmem (and future net_iov) tx
-> > paths.
-> >
-> > We need a way to tell if a net_iov is pp or not. A couple of options:
-> >
-> > 1. We could have it such that if net_iov->pp is set, then the
-> > netmem_is_pp =3D=3D true, otherwise false.
-> > 2. We could implement a page-flags equivalent for net_iov.
-> >
-> > Option #1 is simpler and is my preferred. To do that properly, you need=
- to:
-> >
-> > 1. Make sure everywhere net_iovs are allocated that pp=3DNULL in the
-> > non-pp case and pp=3Dnon NULL in the pp case. those callsites are
-> > net_devmem_bind_dmabuf (devmem rx & tx path), io_zcrx_create_area
-> > (io_uring rx path).
-> >
-> > 2. Change netmem_is_pp to check net_iov->pp in the net_iov case.
->
-> Good idea, but I'm not sure if I could work on it without consuming your
-> additional review efforts.  Can anyone add net_iov_is_pp() helper?
->
+> > > All other KSZ switches use 8-bit access with automatic address increase
+> > > so a write to register 0 with value 0x12345678 means 0=0x12, 1=0x34,
+> > > 2=0x56, and 3=0x78.
+> 
+> It is not about big-endian or little-endian.  It is just the presentation
+> of this register is different between KSZ8863 and KSZ8463.  KSZ8863 uses
+> big-endian for register value as the access is 8-bit and the address is
+> automatically increased by 1.  Writing a value 0x03ff to register 6 means
+> 6=0x03 and 7=0xff.  The actual SPI transfer commands are "02 06 03 ff."
+> KSZ8463 uses little-endian for register value as the access is fixed at
+> 8-bit, 16-bit, or 32-bit.  Writing 0x03ff results in the actual SPI
+> transfer commands "80 70 ff 03" where the correct commands are
+> "80 70 03 ff."
 
-Things did indeed get busy for me with work work the past week and I
-still need to look at your merged netmem desc series, but I'm happy to
-review whenever I can.
+The difference between expressing a 16-bit value as "ff 03" and "03 ff"
+sounds a lot like endianness to me.
 
-> Or use the page type, Netpp, as an additional way to identify if it's a
-> pp page for system memory, keeping the current way using ->pp_magic.
-> So the page type, Netpp, is used for system memory, and ->pp_magic is
-> used for net_iov.  The clean up for ->pp_magic can be done if needed.
->
+"ff 03" is the little endian representation of 0x3ff.
+"03 ff" is the big endian representation of 0x3ff.
 
-IMO I would like to avoid deviations like this, especially since
-->pp_magic is in the netmem_desc struct that is now shared between
-page and net_iov. I'd rather both use pp_magic or both not, but that
-may just be me.
+I am very confused as to why you say "KSZ8463 uses little-endian for
+register value". And then go on to say that the correct transfer command is
+"02 06 03 ff", where the value in that command is "03 ff." That looks like
+a big endian value to me.
 
 
---=20
-Thanks,
-Mina
+In my reading of your code, it takes a host byte order value, and swapping
+it's byte order. It is then passing it to an API that expects a host byte
+order value. I think it would be much better to avoid doing that. This is
+my main point.
+
+Let us consider the (likely) case that the host is little endian.  The
+value (and mask) are byte swapped, becoming big endian.  Thisbig endian
+value (and mask) is passed to regmap_update_bits().
+
+Now let us assume that, because REGMAP_ENDIAN_LITTLE is used,
+they then pass through something like cpu_to_le16().
+That's a noop on a little endian system. So the value remains big endian.
+
+Next, let us consider a big endian host.
+The value (and mask) are byte swapped, becoming little endian.
+This little endian value (and mask) is passed to regmap_update_bits().
+
+Then, let us assume that, because REGMAP_ENDIAN_LITTLE is used,
+they then pass through something like cpu_to_le16().
+This is a byte-swap on big endian hosts.
+So the value (and mask) become big endian.
+
+The result turns out to be the same for little endian and big endian hosts,
+which is nice. But now let us assume that instead of passing byte-swapped
+values to APIs that expect host byte order values, we instead pass host
+byte order values and use REGMAP_ENDIAN_BIG.
+
+In this case the host byte order values are passed to regmap_update_bits().
+Then, as per our earlier assumptions, because REGMAP_ENDIAN_BIG is used,
+the value (and mask) pass through cpu_to_be16 or similar. After which they
+are big endian. The same result as above. But without passing byte-swapped
+values to APIs that expect host byte order values.
+
+Is my understanding of the effect of REGMAP_ENDIAN_LITTLE and
+REGMAP_ENDIAN_BIG incorrect? Is some other part of my reasoning faulty?
+
+
+I feel that we are talking past each other.
+Let's try to find a common understanding.
 
