@@ -1,91 +1,135 @@
-Return-Path: <netdev+bounces-209890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCF2EB113DF
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 00:28:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 327BFB113F4
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 00:32:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7FE71629E1
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 22:28:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36BC51CE520F
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 22:33:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABDD523DEB6;
-	Thu, 24 Jul 2025 22:28:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BA6A23C4EA;
+	Thu, 24 Jul 2025 22:32:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k9Y9vu6p"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2NXr7S8R"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B8C23D281
-	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 22:28:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 814A323183B
+	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 22:32:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753396083; cv=none; b=gMTFclWgnwBWiIS2D3SF/xF4EFnhNque0Y6f58vxmTDWQu1tc99C/LoIau2CRG8yqM+bRP9ls2CzX1C6dJiIl5RNY29Rd2byT6QXyH9CaetE/LcPql4e/D0i9pE3R/IcHn4gzObn+JfNbDXSYTiPVLZMM1kE/8VtW/HsiXvXmCA=
+	t=1753396354; cv=none; b=P7DV9TAoTAQkhwSFe60T0aNvLP4INP9AsK/XTzh2kz87aj5jXmIuGYKIomP8vrbWON7kOhqiNzibh/C9A8Iy0J53Teqm2/R4ZLy2lypu25WlnUKI8i7Qj3it9Q69wF2yZI9rEGsnlslFdvMGCF/ukbQsuM6rbT5VmPfFlukXm1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753396083; c=relaxed/simple;
-	bh=63zITmk/1mSkFS40iXszBVOcqkpfa5q1GrAAK6/iNOY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rwf/6p4afnp9yLWyekq9yvxzL/v+pwYmDRfw1BlTqCgXnSXXd9OlXJPAp94svlTJneOS6mypLujz5V470eKpMsxeiXobsbhfMnoCsvFwQIrWpyIkxvsQoZg/uy/jBoukYS14l0BJJ/2FJkPfGtTm9X0unpsx5/s7sSeL2wTga14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k9Y9vu6p; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1683FC4CEF5;
-	Thu, 24 Jul 2025 22:28:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753396083;
-	bh=63zITmk/1mSkFS40iXszBVOcqkpfa5q1GrAAK6/iNOY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=k9Y9vu6puJYKuKxSBos2GWQNZf2QmvkXHEFzsLiB+wACNfh9J5jXumjLKyoGjA26E
-	 yWwiEyl9X9dS6PJ3feeHzan7ha+9xjOpOoAMkGP5iCPj0VYmifZeWhII0wrTmYGsWA
-	 T+oqx5gYzZQQqYFEzvez4U2bQSAdUGLgJQRErfbVItiiIhGk06LYdQTNCAMGEMszou
-	 zemaSpCtXanKECd/JghduC4B+9io80yfM9SrAMEUNCdi3XQo3jvt6E7yB0r7VAQcuA
-	 joTDNwjTQEabbtf++ff+c9KgouBv1ThYgR2sv5aO6HCpxi7F8tdF+7TpTuGP9yISlS
-	 xuUhA8n+Gbv1g==
-Date: Thu, 24 Jul 2025 15:28:02 -0700
-From: Kees Cook <kees@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH 1/6 net-next] net: uapi: Add __kernel_sockaddr_unspec for
- sockaddr of unknown length
-Message-ID: <202507241526.292798770A@keescook>
-References: <20250723230354.work.571-kees@kernel.org>
- <20250723231921.2293685-1-kees@kernel.org>
- <20250724144046.36dd3611@kernel.org>
+	s=arc-20240116; t=1753396354; c=relaxed/simple;
+	bh=qNJea7lpsjCJP/Ap37YwQvHbphKYA19XBsxMlvH+Aq0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=KllnQYOlxNGUEaUBXRgU4SKPviMeNPdfPkbLDemztjlhnQsFlxZkjQFbwcjtZX2z7Yph6MfLOCvpkS7XrnwBxNjC0vNmvSWqXvRJjaAcVn0grakUGFj5y2J4N6476sTwPP4b3lsgnAVgJVJMmWu2OPo7QWpZmS74mOiC1F5Huq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--samitolvanen.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2NXr7S8R; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--samitolvanen.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-31315427249so1365410a91.1
+        for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 15:32:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753396351; x=1754001151; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/DkLxOprfBbIReqRwK5t6BSLgRNtfOK+ocx7xMH4ZB8=;
+        b=2NXr7S8RYOtkuzY0+FQc1u43U/XVbf4FRT/tEGMNTjO3nz4EBYN/YjzNVhbL+9Lvg8
+         6V1CUlqWvOY/gKofYL1FsBfkCjEYx4ZEAZ63d5v43FJL8ZkEtxW+Xigod9sac9e/thxa
+         p6M/u76XY0xXdtXUFVJjHMCpMrqPIDNM+bT569hckrUY4xTTnT9PICemNV9RwvgxShP+
+         /f3ldH1C79awwjbd4y0DSX3piXZE66Hh8ecN6T2l3npk49IL0qSak/bwYu9BtcBxit9V
+         ukIIHYeBrr03MVhwWwGr21KtlOahhq6q+VW5UZ9dikhYw/jx2sTU5zf59KTZ30o3HRvm
+         Q/uw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753396351; x=1754001151;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/DkLxOprfBbIReqRwK5t6BSLgRNtfOK+ocx7xMH4ZB8=;
+        b=xUIsfN1JhvRvwyuZxcfIf8YfGd6OuP5wO0yyRM/qd+4XVwukFznfvrCtwT1oCm4XrC
+         o9wsItsZU3nqj05X9KZH+uAo1mbe8VxpfY8dmsDm2ehGud8vapM4ZLUX7WQlMDWahGOz
+         znv66XS7D3H2DQRf6hGAUN+XdihDNRuVJojSPbPw0gLXcIksk+uTtcl6rs8vYw08aeK2
+         rbvKncKomB0Lcyv8sbhBLwKtnU8idFFkgwM9mnnoEeswRGZjAg4IviMigE0etGxSyHdr
+         PRfCrGvvJkXoMfgq8A/VTxCa4zp5tjGzrRSGKbWZQcIPoGj6Wv/rBXrAUyxRboOj+YlS
+         0/PA==
+X-Forwarded-Encrypted: i=1; AJvYcCVpvJQVLjBL+mOcHpo1HUp1EyD2CrHTAk8e3lATvXHIFDQP1ks4g49qwq2YK4XMjTUKWO50OBE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8Cp0feJzRQjPJg4UumgnDalr8ETeTCBskP4t7dAmZaoUJMUcZ
+	JA1LapjwM8OG6cuakxr8TQmBqBHCvPv52YUZiq9UDgdZ+QRh8lqnhjrldWBsu5tJl258E7UJU/N
+	EpVO2T8cj7SACJwW338yttptdiwWS3Q==
+X-Google-Smtp-Source: AGHT+IF6O7rT5GsXaujxV+fnL7FhV3anbExg+l8E4A3O9jUGKRRbD4C1+rBykCMWxadAw03JwNCLVcFY4EMK3EcKPi4=
+X-Received: from pjbsi15.prod.google.com ([2002:a17:90b:528f:b0:311:4bc2:3093])
+ (user=samitolvanen job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:1d12:b0:2ff:58c7:a71f with SMTP id 98e67ed59e1d1-31e508169f3mr9948065a91.32.1753396350823;
+ Thu, 24 Jul 2025 15:32:30 -0700 (PDT)
+Date: Thu, 24 Jul 2025 22:32:26 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250724144046.36dd3611@kernel.org>
+Mime-Version: 1.0
+X-Developer-Key: i=samitolvanen@google.com; a=openpgp; fpr=35CCFB63B283D6D3AEB783944CB5F6848BBC56EE
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1539; i=samitolvanen@google.com;
+ h=from:subject; bh=qNJea7lpsjCJP/Ap37YwQvHbphKYA19XBsxMlvH+Aq0=;
+ b=owGbwMvMwCUWxa662nLh8irG02pJDBlNWyod3KutuSWsHXTaEs96/ZmfHHzl+1GdFuWbR6oDS
+ wvLPZM6SlkYxLgYZMUUWVq+rt66+7tT6qvPRRIwc1iZQIYwcHEKwERefWNkmLHDra5iz8Opj/kr
+ shXL+FJOmN1vSdvym+HEjQ2szwSS+xkZ9rEpPJgfuXHSGpuKPOlotbzH1o/nhbaf/RR6YO5vBw0 HPgA=
+X-Mailer: git-send-email 2.50.1.470.g6ba607880d-goog
+Message-ID: <20250724223225.1481960-6-samitolvanen@google.com>
+Subject: [PATCH bpf-next 0/4] Use correct destructor kfunc types
+From: Sami Tolvanen <samitolvanen@google.com>
+To: bpf@vger.kernel.org
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Sami Tolvanen <samitolvanen@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jul 24, 2025 at 02:40:46PM -0700, Jakub Kicinski wrote:
-> On Wed, 23 Jul 2025 16:19:08 -0700 Kees Cook wrote:
-> > I added this to UAPI in the hopes that it could also be used for any
-> > future "arbitrarily sized" sockaddr needs. But it may be better to
-> > use a different UAPI with an explicit size member:
-> > 
-> > struct sockaddr_unspec {
-> > 	u16 sa_data_len;
-> > 	u16 sa_family;
-> > 	u8  sa_data[] __counted_by(sa_data_len);
-> > };
-> 
-> Right, not sure how likely we are to add completely new future APIs 
-> that take sockaddr directly. Most new interfaces will be wrapped in
-> Netlink. I may be missing the point but the need to add this struct
-> in uAPI right now is not obvious to me.
+Hi folks,
 
-Yeah, it was pure speculation on my part. I am perfectly happy keeping
-it strictly internal to the kernel, but I thought I'd try to show some
-possibilities.
+While running BPF self-tests with CONFIG_CFI_CLANG (Clang Control
+Flow Integrity) enabled, I ran into a couple of CFI failures
+in bpf_obj_free_fields() caused by type mismatches between
+the btf_dtor_kfunc_t function pointer type and the registered
+destructor functions.
 
+It looks like we can't change the argument type for these
+functions to match btf_dtor_kfunc_t because the verifier doesn't
+like void pointer arguments for functions used in BPF programs,
+so this series fixes the issue by adding stubs with correct types
+to use as destructors for each instance of this I found in the
+kernel tree.
+
+The last patch changes btf_check_dtor_kfuncs() to enforce the
+function type when CFI is enabled, so we don't end up registering
+destructors that panic the kernel. Perhaps this is something we
+could enforce even without CONFIG_CFI_CLANG?
+
+Sami
+
+---
+
+Sami Tolvanen (4):
+  bpf: crypto: Use the correct destructor kfunc type
+  bpf: net_sched: Use the correct destructor kfunc type
+  selftests/bpf: Use the correct destructor kfunc type
+  bpf, btf: Enforce destructor kfunc type with CFI
+
+ kernel/bpf/btf.c                                     | 7 +++++++
+ kernel/bpf/crypto.c                                  | 7 ++++++-
+ net/sched/bpf_qdisc.c                                | 7 ++++++-
+ tools/testing/selftests/bpf/test_kmods/bpf_testmod.c | 7 ++++++-
+ 4 files changed, 25 insertions(+), 3 deletions(-)
+
+
+base-commit: 95993dc3039e29dabb9a50d074145d4cb757b08b
 -- 
-Kees Cook
+2.50.1.470.g6ba607880d-goog
+
 
