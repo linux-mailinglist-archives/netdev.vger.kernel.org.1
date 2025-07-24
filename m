@@ -1,120 +1,232 @@
-Return-Path: <netdev+bounces-209699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 920DCB1071D
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 11:57:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28776B1071F
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 11:58:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5243C4E31D9
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 09:56:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C7754E3EFE
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 09:57:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE05F258CDC;
-	Thu, 24 Jul 2025 09:57:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42EA8257AC7;
+	Thu, 24 Jul 2025 09:58:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yq+0L+l9"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="fIU2qZjg";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="i/U8YpZr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D5E62580E7
-	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 09:57:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74091245032;
+	Thu, 24 Jul 2025 09:57:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753351038; cv=none; b=NmFX7QS2tZZSydqu030mQDXIrvP4S/XANfdHbqqasxUfwBUfgXG3Cl689wc6q2jEKeg3tlsE87HGs+OVsfLawZFN1CPAg6BU4dvcix4xzgsvrg0V+W4JxO+WXs6dPkEFZl191s1y7rntEBsP4Q/7n2KEw2z+dYSl1A1kYUKoaZU=
+	t=1753351081; cv=none; b=ccPjEJldYwywXiZjHTYaI57vKNtl26jJsIoY0VrQBPNvm6O7GpDsekaAalOYF3ayyiKgXXcGI8bc3T4ru2BvVrYGhsW6K8C0FZq4eD974BJAcW3jgKiAZPiz7pG0A46khUWK6gzhiMs+xSCxmrDl8cFf4iaGXXboJo446OqO3G4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753351038; c=relaxed/simple;
-	bh=3QN2SPK+xpAbgocIP4oE8AbjkT4UjG+6575GluaartQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iivv6UJ2UOw+vytL1dLbLLglVCv/BddGpwWmZXEl4OeRvnTW2Geua+rrrKN+5dbeZY1OCExSy1LGrn8rQgKRBuNKg5Dg6rKqzyvpDTU/Lhzp631BF+tFIdXan6YdjgmWdNwX9LPmVPTazLmiLgg3i/jC5urZuicxqfyk9MLZ5Ro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Yq+0L+l9; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1753351036;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3QN2SPK+xpAbgocIP4oE8AbjkT4UjG+6575GluaartQ=;
-	b=Yq+0L+l9jAQB/k+QE4NBNVmFpRV34zGAF2IjOoSmJL4vsqJ8U8KtGxtQjoJaZ8XdVZeaL8
-	59AP6I+rhGX7coO8t1ugw4JZRGNFF4duB0/BUP/kRcCzouwcJH5EozAd4LqxoV0D+755tE
-	JfouTqW2gkr1orkwzJeqJiQPYOujU40=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-543-uo9PCxWeMK2AWoX1L8csOA-1; Thu, 24 Jul 2025 05:57:14 -0400
-X-MC-Unique: uo9PCxWeMK2AWoX1L8csOA-1
-X-Mimecast-MFC-AGG-ID: uo9PCxWeMK2AWoX1L8csOA_1753351033
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-45626532e27so4453835e9.1
-        for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 02:57:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753351033; x=1753955833;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3QN2SPK+xpAbgocIP4oE8AbjkT4UjG+6575GluaartQ=;
-        b=u8nmjFdF8ppeDwnHjGAF41qh+cPOux481R/jJ+MA/HIiB0GrYBhAaZK4teidJOGS6s
-         529cWVEosCYXV0GRW8z/UUO3Pv3m7sBtlCmbK8LFUqpx//Ihr0/LomUmlumeMNAuZp4l
-         t/wU3d2qnrkp74AIj5c5qC7w2XtQys5jKswSKrTRoVvA+ytj0RH01J4RMO1d4Ml7WN0Z
-         Ba6xfHBO42WOfsgO6FhuXFJrwwoWn+c4nHNo9urfWCwGHHcRfgxdrQyoHRzxJLo8mIrk
-         eTZ2GHY02G3e0IAeaK37IWM3W0v6aJcYbhCShe5yDIr8I7GVuPRVp/WkleFIhrR/Nb9D
-         4B5w==
-X-Gm-Message-State: AOJu0YxB6Fh3zNVrzHBcJ1m6CYGRCcct0MvGqPj+FlS2vd5eW5YuH7D9
-	04riye8IuNoH+CDPbovRLSEN1hWfkeuv2B6GWq76rbkixp38NL+01HRM8FEk21JuA9kBay8JEZn
-	o+ITWLoDwev0athae7oYyizuYmHHn68dfrYURXtqT3SxQBXqp4f2gRxVBJw==
-X-Gm-Gg: ASbGncvh1k4cfhiP/JmUhSyRwQPRyPdaOhQehVnT1qllhj9G+gHv2+6yACtl5nYDnOY
-	ezxiA/8M0yetPmJNzBqUwnFCd9Ccb2B/f0dl6dVfcO/vZjce4J6WMVUNQOLG9kt0dxaEqQqOoyA
-	m44iZ8LHC3ssNKUwSN/LAxKRaY1VwHBJGvWzeNMlo/VssVESd0lCHHWCc5I2w1U4C2B2WPK/jb6
-	HSkT7RfmFdJ0vFPO2/7j4mS8AEUOceK4REQWzcIZwhE85aC9xDFLA9S7es/E0dd4ZA3FkL/VnjI
-	v6zk1V6DRKXEsBSwp4pmOz9Emx0DO2xSLNBnqUJkXKXqjqPYp6Fp2LEWCRAWBf0dvbf2Lo09ytQ
-	iMK9VZW4hWig=
-X-Received: by 2002:a05:600c:540c:b0:453:697:6f08 with SMTP id 5b1f17b1804b1-45868d6b4b4mr46224145e9.26.1753351032723;
-        Thu, 24 Jul 2025 02:57:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGBdiBk1y9FYFtZGZos+FZxTmneELrQSJ8S9Hi/6MjtohOABZ0cx37UcBf5gRBbBVayCRRaKw==
-X-Received: by 2002:a05:600c:540c:b0:453:697:6f08 with SMTP id 5b1f17b1804b1-45868d6b4b4mr46223915e9.26.1753351032246;
-        Thu, 24 Jul 2025 02:57:12 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b76fcb9a2asm1677126f8f.63.2025.07.24.02.57.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Jul 2025 02:57:11 -0700 (PDT)
-Message-ID: <045d1ff5-bb20-481d-a067-0a42345ab83d@redhat.com>
-Date: Thu, 24 Jul 2025 11:57:10 +0200
+	s=arc-20240116; t=1753351081; c=relaxed/simple;
+	bh=gs5P+7aHDRhMqsRwZal5MENobFl85Xl8UU3Y/W3qvaY=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=KBYpfAcqbGevkrr2AjhoCWjOcRB8O7IWPzbfDwZfQiYtZ6O3XobPbqIYsSK/xxF6lnGa7fLHnR4qsgLn30Vp2r/79I7yTOV+TZB0e0X8RcoL5aGMoLAe6p1HlCOfjy27D0lvDJYA0daId+eqhJ3A2PW7LFxSNEiEF6M5x7PIuFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=fIU2qZjg; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=i/U8YpZr; arc=none smtp.client-ip=202.12.124.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-07.internal (phl-compute-07.phl.internal [10.202.2.47])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 07D6F7A0125;
+	Thu, 24 Jul 2025 05:57:57 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-07.internal (MEProxy); Thu, 24 Jul 2025 05:57:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
+	 t=1753351076; x=1753437476; bh=Ljyn2ghd83kunm14IdVeScg9Ar47ftsZ
+	2AF4dzGyYQM=; b=fIU2qZjgtKhm6U81KtTKCRs5aXNFqOyybbPleMS+8qlvOnwC
+	3gKUoeXwyswMmOVv4FI42vSVsSC/mql4m8Y9Pmpcd326o/ZVpPMLVPAbeusRX5CH
+	7PzQRYFMNQcU0x6aDiNL9EYmS78sOG1AVPYM0CMRzwkzkZHaLc6slITSQG5x35Ek
+	LgaIAwsF4fnnZRC0qNQeIp//2o9vskIZxOueqQ0AelPDa2O6EFRdq2gqgzq7rivo
+	7ldaTJLC9UVYtwjE0KzHujdUotnRz1dfek9qRvkT8hm3nWCWVBOtppdTE4zSS5q7
+	e7S/pS1r1Dbz0RNp7uTqq5DOHt5seC746D9z3g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1753351076; x=
+	1753437476; bh=Ljyn2ghd83kunm14IdVeScg9Ar47ftsZ2AF4dzGyYQM=; b=i
+	/U8YpZr/BK4GzryVagroIpH+pSH90KjpgGoZ2OmYIt+Z+cy6kwn3AzxKcF1cIyeT
+	djcOzh64VDLsvF+grdI6mJarRgAY0ykvTHPVF/HTeEUDuj1Vem/Dm8NPBlut/YXF
+	w938ellbK3aUEo0DdC6kDIdbRSffNfp70e2nqt2UfFd+UV2/zJEmPhNPdCDUIhIs
+	gDZ3lT+KdwfhUVdl5iPAv+mj7RuJEwT7N1xR+t+DjhdFQ6EedQGJXLbN1I53LlXy
+	MWZ2WUz6izlQp0AidT3p39F+a2CJmkbOaDy2I4VbvS6ENWy4OhZY0omUE3cJJGWD
+	/U6enX96fMoovbbZqNbVA==
+X-ME-Sender: <xms:pAOCaIhZCXbYl9fAijMHXhaAbujHWiHpRDDvrVRBQWfdFhK0yPpEtQ>
+    <xme:pAOCaLdcZOs0SKH1_7HSSskaIJBMFt8vuWs14YVp3qMI6zHGdJRStxCJokU7OJy1p
+    70WpUj69GZOtzin-iU>
+X-ME-Received: <xmr:pAOCaHliJuIUgXkmQH-YU4Xpr6UL2K3W79SK4wXIX-UBnYQxqG4JNQLVcH0AGCH4BMzfPB87>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdektdefhecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefhvfevufgjfhfogggtgfffkfesthhqredtredtjeenucfhrhhomheplfgrhicuggho
+    shgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrdhnvghtqeenucggtffrrghtthgvrh
+    hnpeegfefghffghffhjefgveekhfeukeevffethffgtddutdefffeuheelgeelieeuhfen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjvhesjh
+    hvohhssghurhhghhdrnhgvthdpnhgspghrtghpthhtohepuddvpdhmohguvgepshhmthhp
+    ohhuthdprhgtphhtthhopehrrgiiohhrsegslhgrtghkfigrlhhlrdhorhhgpdhrtghpth
+    htohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehlihhuhhgr
+    nhhgsghinhesghhmrghilhdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhooh
+    hglhgvrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghp
+    thhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehshhhurghhsehkvg
+    hrnhgvlhdrohhrghdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdr
+    tghhpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
+X-ME-Proxy: <xmx:pAOCaAzFTPnrNQTESolq4Zh9NqsqZ9vyVLnYhL75W6SKtx3Cd_KV8w>
+    <xmx:pAOCaKxNNpMmMTdwcYCzgZRazDyQjJWztu15Dj50lPFbhgHQfzZb1Q>
+    <xmx:pAOCaAWlYdNmTasydwPjinhWoNjduqxmJlZl4PurbouInhMz6GZQnQ>
+    <xmx:pAOCaBQNHD-7e9K3WClelUJlHybMTh0zObui7gkOGuV7ZhAi4q3hsA>
+    <xmx:pAOCaO2SuK5-0h1v7SJcHzBrhIcL1c7pRJaqBGsnehkWNX5e7uwTeOkO>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 24 Jul 2025 05:57:55 -0400 (EDT)
+Received: by vermin.localdomain (Postfix, from userid 1000)
+	id D9B8E1C0051; Thu, 24 Jul 2025 02:57:53 -0700 (PDT)
+Received: from vermin (localhost [127.0.0.1])
+	by vermin.localdomain (Postfix) with ESMTP id D7A8D1C004F;
+	Thu, 24 Jul 2025 11:57:53 +0200 (CEST)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Hangbin Liu <liuhangbin@gmail.com>
+cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>,
+    Nikolay Aleksandrov <razor@blackwall.org>,
+    Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+    linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 1/2] bonding: update ntt to true in passive mode
+In-reply-to: <aIC5HrE9js_YtSCB@fedora>
+References: <20250709090344.88242-1-liuhangbin@gmail.com> <20250709090344.88242-2-liuhangbin@gmail.com> <765825.1752639589@famine> <aIC5HrE9js_YtSCB@fedora>
+Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
+   message dated "Wed, 23 Jul 2025 10:27:42 -0000."
+X-Mailer: MH-E 8.6+git; nmh 1.7+dev; Emacs 29.0.50
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] sfc: handle NULL returned by xdp_convert_buff_to_frame()
-To: Chenyuan Yang <chenyuan0y@gmail.com>, ecree.xilinx@gmail.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
- john.fastabend@gmail.com, sdf@fomichev.me, lorenzo@kernel.org
-Cc: netdev@vger.kernel.org, linux-net-drivers@amd.com, bpf@vger.kernel.org,
- zzjas98@gmail.com
-References: <20250723003203.1238480-1-chenyuan0y@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250723003203.1238480-1-chenyuan0y@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 24 Jul 2025 11:57:53 +0200
+Message-ID: <309184.1753351073@vermin>
 
-On 7/23/25 2:32 AM, Chenyuan Yang wrote:
-> The xdp_convert_buff_to_frame() function can return NULL when there is
-> insufficient headroom in the buffer to store the xdp_frame structure
-> or when the driver didn't reserve enough tailroom for skb_shared_info.
+Hangbin Liu <liuhangbin@gmail.com> wrote:
 
-AFAIC the sfc driver reserves both enough headroom and tailroom, but
-this is after ebpf run, which in turn could consume enough headroom to
-cause a failure, so I think this makes sense.
+>On Tue, Jul 15, 2025 at 09:19:49PM -0700, Jay Vosburgh wrote:
+>> 	Presuming that I'm correct that we're not implementing 6.4.1 d),
+>> above, correctly, then I don't think this is a proper fix, as it kind of
+>> band-aids over the problem a bit.
+>>=20
+>> 	Looking at the code, I suspect the problem revolves around the
+>> "lacp_active" check in ad_periodic_machine():
+>>=20
+>> static void ad_periodic_machine(struct port *port, struct bond_params *b=
+ond_params)
+>> {
+>> 	periodic_states_t last_state;
+>>=20
+>> 	/* keep current state machine state to compare later if it was changed =
+*/
+>> 	last_state =3D port->sm_periodic_state;
+>>=20
+>> 	/* check if port was reinitialized */
+>> 	if (((port->sm_vars & AD_PORT_BEGIN) || !(port->sm_vars & AD_PORT_LACP_=
+ENABLED) || !port->is_enabled) ||
+>> 	    (!(port->actor_oper_port_state & LACP_STATE_LACP_ACTIVITY) && !(por=
+t->partner_oper.port_state & LACP_STATE_LACP_ACTIVITY)) ||
+>> 	    !bond_params->lacp_active) {
+>> 		port->sm_periodic_state =3D AD_NO_PERIODIC;
+>> 	}
+>>=20
+>> 	In the above, because all the tests are chained with ||, the
+>> lacp_active test overrides the two correct-looking
+>> LACP_STATE_LACP_ACTIVITY tests.
+>>=20
+>> 	It looks like ad_initialize_port() always sets
+>> LACP_STATE_LACP_ACTIVITY in the port->actor_oper_port_state, and nothing
+>> ever clears it.
+>>=20
+>> 	Thinking out loud, perhaps this could be fixed by
+>>=20
+>> 	a) remove the test of bond_params->lacp_active here, and,
+>>=20
+>> 	b) The lacp_active option setting controls whether LACP_ACTIVITY
+>> is set in port->actor_oper_port_state.
+>>=20
+>> 	Thoughts?
+>
+>Hi Jay,
+>
+>I did some investigation and testing. In addition to your previous change,
+>we also need to initialize the partner's state to 0 in ad_initialize_port_=
+tmpl().
+>Otherwise, the check:
+>```
+>!(port->partner_oper.port_state & LACP_STATE_LACP_ACTIVITY)
+>```
+>in ad_periodic_machine() will fail even when the actor is in passive mode.
 
-@Eduard: could you please have a look?
+	Agreed; the .port_state in the port_params tmpl should just be
+zero; the magic number 1 there now, which is LACP_STATE_LACP_ACTIVITY,
+is just wrong.  For the actor side, the lacp_active option will set it
+appropriately, and the partner's will be updated by any LACPDUs that
+arrive.
 
-Thanks,
+>Also, the line:
+>```
+>port->partner_oper.port_state |=3D LACP_STATE_LACP_ACTIVITY;
+>```
+>in ad_rx_machine() should be removed, since we can't assume the partner is=
+ in
+>active mode. [1]
 
-Paolo
+	Also agreed.
 
+>With these two changes, we can ensure:
+>1. In passive mode, the actor will not send LACPDU before receiving any LA=
+CPDU from the partner.
+>2. Once it receives the partner=E2=80=99s LACPDU, it will start sending pe=
+riodic LACPDUs as expected.
+>
+>Do you agree with making these changes? If so, I can post a patch for your=
+ review.
+
+	Yes, please post a patch.
+
+>[1] IEEE 8021AX-2020, Figure 6-14=E2=80=94LACP Receive state diagram, the =
+AD_RX_EXPIRED
+>statue should be
+>```
+>Partner_Oper_Port_State.Synchronization =3D FALSE;
+>Partner_Oper_Port_State.Short_Timeout =3D TRUE;
+>Actor_Oper_Port_State.Expired =3D TRUE;
+>LACP_currentWhile =3D Short_Timeout_Time;
+>```
+
+	FWIW, I usually reference the older standards 2008 or 2014, as
+the 2020 edition changes a lot of things and bonding isn't necessarily
+conformant to those changes (e.g., many of the state machines are
+different in large or small ways).  Technically, the bonding
+implementation was written to the pre-802.1AX standard when it was still
+part of 802.3 (hence the name 802.3ad), clause 43.
+
+	This particular bit (the EXPIRED state actions) is the same,
+but, for example, the transition test from EXPIRED to DEFAULTED is
+different in the 2014 vs 2020 editions, and we need to be careful not to
+implement the state machines piecemeal from different editions of the
+standard.
+
+	-J
+
+---
+	-Jay Vosburgh, jv@jvosburgh.net
 
