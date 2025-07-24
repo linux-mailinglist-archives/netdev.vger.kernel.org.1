@@ -1,165 +1,257 @@
-Return-Path: <netdev+bounces-209739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 564BCB10AAB
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 14:52:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 769E6B10AB4
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 14:53:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CD04165F8B
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 12:52:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AD593ABD00
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 12:52:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF2D62D46DA;
-	Thu, 24 Jul 2025 12:51:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4112D46DF;
+	Thu, 24 Jul 2025 12:52:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XEFycDLW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XdMFeb2m"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE062E36F2;
-	Thu, 24 Jul 2025 12:51:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E76C2D46D3
+	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 12:52:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753361519; cv=none; b=mS6l6uBLnN9ioVXVUzIm8oN1UNzm5GBzsSYGXnmfHnm4pXQBsjphqbQA61PdrwHJu1U+XYOj7S7yhkUBGe28kljIQVr9a9JiHrVSWojzHEZoc4XYIPsLFoB3ug9LMAYpgSoq91LuZ9KuMrxVBbR9DIc5ulY9N/AcAp3NSiS+wbQ=
+	t=1753361545; cv=none; b=q8Zgr96OnS0qk2b/cb1srr5LPMkCUkkL+7N/AE28fxv4NVnPjrPEC8uo3BSXEIzvR4KbStVWGutB242bS19xBLYiJkVgPk0QodlhTdIrrcbPTXlsennpc9+elp9IjOy2Zi377vQPDZBNe54jTDPJcXc4eVyintiTo128ZgnESrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753361519; c=relaxed/simple;
-	bh=mRrQ1JXUwBfwI4sOg4qT1QEX0Sx1ayhLbfszF804zvg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=smqiXvExZwTXLDKOXM2L+Vw25k+5EwyDQclZe0Htf06iqtqAhG66vXhCMEsvo523/niXOMEJ+pjDWXS2lizwkpL9R4PhiLVlDnxITIlDqmMd9/rQDao32DdUiWi85U7zAYd5VCuhuDwNpKqnAJezbQWgqfH/fhyB/FZAZalZGS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XEFycDLW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FB66C4CEED;
-	Thu, 24 Jul 2025 12:51:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753361519;
-	bh=mRrQ1JXUwBfwI4sOg4qT1QEX0Sx1ayhLbfszF804zvg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=XEFycDLWioiEXuws7smVaej3TtBJKwVXzP85S/Ge7hNSchamdsv+Yr4F0vr6PdJyv
-	 quoj9yNRddq6AZIKxE4EItYvrSZcY3YgBAUQTiBssBSdUAmcdsDzSMy/qJYkFHwboP
-	 xKfuWErySPa3ydVScPtwxd+9TPDi7z6xlzxtpiXgKakyWEvIf2YPPiJ89XtwzUBGu/
-	 1nhAz2UMiQgICEhq7L7IPrwrjl2iE6R7+BFR8/nIX6MX4tqVg//k+2LYXwkEHr864Q
-	 IcrJv21PexyDaikZoN78STwShGA4dwa+gmUENhatAi2VBeyj+P4O4KlPO3R0TLgj0G
-	 55Qb++LnrptkA==
-Message-ID: <e718d0d8-87e7-435f-9174-7b376bf6fa2f@kernel.org>
-Date: Thu, 24 Jul 2025 14:51:54 +0200
+	s=arc-20240116; t=1753361545; c=relaxed/simple;
+	bh=BT20HzWX+V0L1vB//2tVipRHixFnss8XHnnXe1uy9sA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=O7uqkqyVOGjLiII9QiUNCtkH7ANNAyWrsxrI4kips2hSAL9ovkTyEYgL9CiaOag2smEWmFpi/Od/aXGR1ofpyEB2S1n/XybiiaHFuTyKcrCFlVy57Opw7gE2A4aBDVUX4Fd398O/HcIdCVOtL2hOcqohbPgdY/IJOPuc3U1VJtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XdMFeb2m; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753361542;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=M+yXn2Dd03JRNhm/5JyeMXOZKFuYEN81fHuvdMRTIp8=;
+	b=XdMFeb2mGwcipMQfGwdrzGFbHjpUq6XKO0qFx+/NK8gwaxGp5CBCkn9FjXGmmwoMF4fWNs
+	VFa1FZzE80s7Tlb8ret+ADJ2YVZqXsVN5AG7D/zUlBO8k2lB0nEBjCqs/KIP+MqcCYzy8x
+	eIBqWMv3YWeSb2WQc1OH4FJGLuSvSAY=
+Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
+ [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-608-ccOWiT6wOjO-4rMkWcWc7g-1; Thu, 24 Jul 2025 08:52:21 -0400
+X-MC-Unique: ccOWiT6wOjO-4rMkWcWc7g-1
+X-Mimecast-MFC-AGG-ID: ccOWiT6wOjO-4rMkWcWc7g_1753361541
+Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-707cf1b0ecbso15397647b3.2
+        for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 05:52:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753361540; x=1753966340;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=M+yXn2Dd03JRNhm/5JyeMXOZKFuYEN81fHuvdMRTIp8=;
+        b=SQA3W8zV9Z2KVKc/Ol64O+8pLo2mfgUdYGslGPytEPgoM3lrP9jBJO20sgraQropmQ
+         SXD9g/zbe//vMsWsR0+3d7yshzocmjE3y5peDEtt8N2xUF27lKgot9xsvg0OyV7ajFYa
+         pJeHoLHdSuEdAWKBMwn4maD7vrCqmEz9z9A2w+KkHtIsyR2HlnNhZADYMGj4konR0QLb
+         bp3xJztDxCPWmDSagOf4uovfAX4scpO/KXoYtgcINuwP65ZBwJfDkN3YeDqEW29sZKBp
+         djl+u2LK5xK9KFARaqk4Uqcl/SY7kTNCKo3ZoUI6xWpAd8b1LOAoTRrdRhbknKck//Hx
+         Iy2w==
+X-Forwarded-Encrypted: i=1; AJvYcCVnrweqXJXYWaGM9cVMUeMF10zs5hoWAN4RYkFrJ3PkDc1/r53M2/beu9SajE47eo36X2g+MIQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwoIS+QciFoxTS4uqYn6a++/GmTcfub2lZAdYdr3o0TX+rbPpx9
+	lWFUtRnId/oJNN1T6mzrjO+hBzgXk7U0TQsaefnc9jHr1rEnikWZoLwVILbt0fWzxmc3Sbq3Pp9
+	peR3g7Hi7fiuBgvBHoEgZIunJXRjVY9qV1VKUaP82VGWLW3kdLB8ezdHFdy3lqYTY3NqivM9uR6
+	JCJT2MNTrrdbJaW9iJULJKFl/ZfM9LoIOV
+X-Gm-Gg: ASbGncvZu54oCrvUdaBJAG6sO2z+I518iJJk5FmIWh/abXRD5XPmwfHysXyUpxYYFlO
+	TloGBqLEsIkdpKHmXode2H1oQ0VmOVScCil3mklmpWsCwTIXc3tXrHMBbVFn0qtJ+DMDiLyFz25
+	dTo4cJGzWyOecPGBsQ0wOv
+X-Received: by 2002:a05:6902:4a7:b0:e87:9bab:25d with SMTP id 3f1490d57ef6-e8dc5b5c9a3mr6055902276.39.1753361540491;
+        Thu, 24 Jul 2025 05:52:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH+sxi2SF54aHzw0dd7QBG7rNJyq5RlA5zJNp/TA3A+qcVSys8/eRIZSECOlpj/89ZnMMKBfoWNEee5wXBQRqA=
+X-Received: by 2002:a05:6902:4a7:b0:e87:9bab:25d with SMTP id
+ 3f1490d57ef6-e8dc5b5c9a3mr6055873276.39.1753361539934; Thu, 24 Jul 2025
+ 05:52:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/7] arm64: dts: qcom: Rename sa8775p SoC to "lemans"
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
- Wasim Nazir <wasim.nazir@oss.qualcomm.com>
-Cc: Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
- linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kernel@oss.qualcomm.com
-References: <20250722144926.995064-1-wasim.nazir@oss.qualcomm.com>
- <20250722144926.995064-2-wasim.nazir@oss.qualcomm.com>
- <20250723-swinging-chirpy-hornet-eed2f2@kuoka>
- <159eb27b-fca8-4f7e-b604-ba19d6f9ada7@oss.qualcomm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <159eb27b-fca8-4f7e-b604-ba19d6f9ada7@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <vosten2rykookljp6u6qc4hqhsqb6uhdy2iuhpl54plbq2tkr4@kphfpgst3e7c>
+ <20250724034659-mutt-send-email-mst@kernel.org> <CAGxU2F76ueKm3H30vXL+jxMVsiQBuRkDN9NRfVU8VeTXzTVAWg@mail.gmail.com>
+ <20250724042100-mutt-send-email-mst@kernel.org> <aIHydjBEnmkTt-P-@willie-the-truck>
+ <fv6uhq6lcgjwrdp7fcxmokczjmavbc37ikrqz7zpd7puvrbsml@zkt2lidjrqm6>
+In-Reply-To: <fv6uhq6lcgjwrdp7fcxmokczjmavbc37ikrqz7zpd7puvrbsml@zkt2lidjrqm6>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Thu, 24 Jul 2025 14:52:08 +0200
+X-Gm-Features: Ac12FXwbtWtqNIZqXPX4jKNjmg84cpnD3-Y4W9qdqMU4Zw6KtEs0EheiQJT1DQo
+Message-ID: <CAGxU2F5Qy=vMD0z9_HTN2K9wyt+6EH-Yr0N9VqR4OT4O1asqZg@mail.gmail.com>
+Subject: Re: vhost: linux-next: crash at vhost_dev_cleanup()
+To: Breno Leitao <leitao@debian.org>
+Cc: Will Deacon <will@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, jasowang@redhat.com, 
+	eperezma@redhat.com, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 24/07/2025 14:47, Konrad Dybcio wrote:
-> On 7/23/25 10:29 AM, 'Krzysztof Kozlowski' via kernel wrote:
->> On Tue, Jul 22, 2025 at 08:19:20PM +0530, Wasim Nazir wrote:
->>> SA8775P, QCS9100 and QCS9075 are all variants of the same die,
->>> collectively referred to as lemans. Most notably, the last of them
->>> has the SAIL (Safety Island) fused off, but remains identical
->>> otherwise.
->>>
->>> In an effort to streamline the codebase, rename the SoC DTSI, moving
->>> away from less meaningful numerical model identifiers.
->>>
->>> Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
->>> ---
->>>  arch/arm64/boot/dts/qcom/{sa8775p.dtsi => lemans.dtsi} | 0
->>>  arch/arm64/boot/dts/qcom/sa8775p-ride.dtsi             | 2 +-
->>
->> No, stop with this rename.
->>
->> There is no policy of renaming existing files.
-> 
-> There's no policy against renaming existing files either.
+On Thu, 24 Jul 2025 at 14:48, Breno Leitao <leitao@debian.org> wrote:
+>
+> On Thu, Jul 24, 2025 at 09:44:38AM +0100, Will Deacon wrote:
+> > > > On Thu, 24 Jul 2025 at 09:48, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > >
+> > > > > On Wed, Jul 23, 2025 at 08:04:42AM -0700, Breno Leitao wrote:
+> > > > > > Hello,
+> > > > > >
+> > > > > > I've seen a crash in linux-next for a while on my arm64 server, and
+> > > > > > I decided to report.
+> > > > > >
+> > > > > > While running stress-ng on linux-next, I see the crash below.
+> > > > > >
+> > > > > > This is happening in a kernel configure with some debug options (KASAN,
+> > > > > > LOCKDEP and KMEMLEAK).
+> > > > > >
+> > > > > > Basically running stress-ng in a loop would crash the host in 15-20
+> > > > > > minutes:
+> > > > > >       # while (true); do stress-ng -r 10 -t 10; done
+> > > > > >
+> > > > > > >From the early warning "virt_to_phys used for non-linear address",
+> > > >
+> > > > mmm, we recently added nonlinear SKBs support in vhost-vsock [1],
+> > > > @Will can this issue be related?
+> > >
+> > > Good point.
+> > >
+> > > Breno, if bisecting is too much trouble, would you mind testing the commits
+> > > c76f3c4364fe523cd2782269eab92529c86217aa
+> > > and
+> > > c7991b44d7b44f9270dec63acd0b2965d29aab43
+> > > and telling us if this reproduces?
+> >
+> > That's definitely worth doing, but we should be careful not to confuse
+> > the "non-linear address" from the warning (which refers to virtual
+> > addresses that lie outside of the linear mapping of memory, e.g. in the
+> > vmalloc space) and "non-linear SKBs" which refer to SKBs with fragment
+> > pages.
+>
+> I've tested both commits above, and I see the crash on both commits
+> above, thus, the problem reproduces in both cases. The only difference
+> I noted is the fact that I haven't seen the warning before the crash.
+>
+>
+> Log against c76f3c4364fe ("vhost/vsock: Avoid allocating
+> arbitrarily-sized SKBs")
+>
+>          Unable to handle kernel paging request at virtual address 0000001fc0000048
+>          Mem abort info:
+>            ESR = 0x0000000096000005
+>            EC = 0x25: DABT (current EL), IL = 32 bits
+>            SET = 0, FnV = 0
+>            EA = 0, S1PTW = 0
+>            FSC = 0x05: level 1 translation fault
+>          Data abort info:
+>            ISV = 0, ISS = 0x00000005, ISS2 = 0x00000000
+>            CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+>            GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+>          user pgtable: 64k pages, 48-bit VAs, pgdp=0000000cdcf2da00
+>          [0000001fc0000048] pgd=0000000000000000, p4d=0000000000000000, pud=0000000000000000
+>          Internal error: Oops: 0000000096000005 [#1]  SMP
+>          Modules linked in: vfio_iommu_type1 vfio md4 crc32_cryptoapi ghash_generic unix_diag vhost_net tun vhost vhost_iotlb tap mpls_gso mpls_iptunnel mpls_router fou sch_fq ghes_edac tls tcp_diag inet_diag act_gact cls_bpf nvidia_c
+>          CPU: 34 UID: 0 PID: 1727297 Comm: stress-ng-dev Kdump: loaded Not tainted 6.16.0-rc6-upstream-00027-gc76f3c4364fe #19 NONE
+>          pstate: 23401009 (nzCv daif +PAN -UAO +TCO +DIT +SSBS BTYPE=--)
+>          pc : kfree+0x48/0x2a8
+>          lr : vhost_dev_cleanup+0x138/0x2b8 [vhost]
+>          sp : ffff80013a0cfcd0
+>          x29: ffff80013a0cfcd0 x28: ffff0008fd0b6240 x27: 0000000000000000
+>          x26: 0000000000000000 x25: 0000000000000000 x24: 0000000000000000
+>          x23: 00000000040e001f x22: ffffffffffffffff x21: ffff00014f1d4ac0
+>          x20: 0000000000000001 x19: ffff00014f1d0000 x18: 0000000000000000
+>          x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
+>          x14: 000000000000001f x13: 000000000000000f x12: 0000000000000001
+>          x11: 0000000000000000 x10: 0000000000000402 x9 : ffffffdfc0000000
+>          x8 : 0000001fc0000040 x7 : 0000000000000000 x6 : 0000000000000000
+>          x5 : ffff000141931840 x4 : 0000000000000000 x3 : 0000000000000008
+>          x2 : ffffffffffffffff x1 : ffffffffffffffff x0 : 0000000000010000
+>          Call trace:
+>           kfree+0x48/0x2a8 (P)
+>           vhost_dev_cleanup+0x138/0x2b8 [vhost]
+>           vhost_net_release+0xa0/0x1a8 [vhost_net]
 
-There is, because you break all the users. All the distros, bootloaders
-using this DTS, people's scripts.
+But here is the vhost_net, so I'm confused now.
+Do you see the same (vhost_net) also on 9798752 ("Add linux-next
+specific files for 20250721") ?
 
-> 
->> It's ridicilous. Just
->> because you introduced a new naming model for NEW SOC, does not mean you
->> now going to rename all boards which you already upstreamed.
-> 
-> This is a genuine improvement, trying to untangle the mess that you
-> expressed vast discontent about..
-> 
-> There will be new boards based on this family of SoCs submitted either
-> way, so I really think it makes sense to solve it once and for all,
-> instead of bikeshedding over it again and again each time you get a new
-> dt-bindings change in your inbox.
-> 
-> I understand you're unhappy about patch 6, but the others are
-> basically code janitoring.
+The initial report contained only vhost_vsock traces IIUC, so I'm
+suspecting something in the vhost core.
 
-Renaming already accepted DTS is not improvement and not untangling
-anything. These names were discussed (for very long time) and agreed on.
-What is the point of spending DT maintainers time to discuss the sa8775p
-earlier when year later you come and start reversing things (like in
-patch 6).
+Thanks,
+Stefano
 
+>           __fput+0xfc/0x2f0
+>           fput_close_sync+0x38/0xc8
+>           __arm64_sys_close+0xb4/0x108
+>           invoke_syscall+0x4c/0xd0
+>           do_el0_svc+0x80/0xb0
+>           el0_svc+0x3c/0xd0
+>           el0t_64_sync_handler+0x70/0x100
+>           el0t_64_sync+0x170/0x178
+>          Code: 8b080008 f2dffbe9 d350fd08 8b081928 (f9400509)
+>
+> Log against c7991b44d7b4 ("vsock/virtio: Allocate nonlinear SKBs for
+> handling large transmit buffers")
+>
+>         Unable to handle kernel paging request at virtual address 0010502f8f8f4f08
+>         Mem abort info:
+>           ESR = 0x0000000096000004
+>           EC = 0x25: DABT (current EL), IL = 32 bits
+>           SET = 0, FnV = 0
+>           EA = 0, S1PTW = 0
+>           FSC = 0x04: level 0 translation fault
+>         Data abort info:
+>           ISV = 0, ISS = 0x00000004, ISS2 = 0x00000000
+>           CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+>           GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+>         [0010502f8f8f4f08] address between user and kernel address ranges
+>         Internal error: Oops: 0000000096000004 [#1]  SMP
+>         Modules linked in: vhost_vsock vfio_iommu_type1 vfio md4 crc32_cryptoapi ghash_generic vhost_net tun vhost vhost_iotlb tap mpls_gso mpls_iptunnel mpls_router fou sch_fq ghes_edac tls tcp_diag inet_diag act_gact cls_bpf ipmi_s
+>         CPU: 47 UID: 0 PID: 1239699 Comm: stress-ng-dev Kdump: loaded Tainted: G        W           6.16.0-rc6-upstream-00035-gc7991b44d7b4 #18 NONE
+>         Tainted: [W]=WARN
+>         pstate: 23401009 (nzCv daif +PAN -UAO +TCO +DIT +SSBS BTYPE=--)
+>         pc : kfree+0x48/0x2a8
+>         lr : vhost_dev_cleanup+0x138/0x2b8 [vhost]
+>         sp : ffff80016c0cfcd0
+>         x29: ffff80016c0cfcd0 x28: ffff001ad6210d80 x27: 0000000000000000
+>         x26: 0000000000000000 x25: 0000000000000000 x24: 0000000000000000
+>         x23: 00000000040e001f x22: ffffffffffffffff x21: ffff001bb76f00c0
+>         x20: 0000000000000000 x19: ffff001bb76f0000 x18: 0000000000000000
+>         x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
+>         x14: 000000000000001f x13: 000000000000000f x12: 0000000000000001
+>         x11: 0000000000000000 x10: 0000000000000402 x9 : ffffffdfc0000000
+>         x8 : 0010502f8f8f4f00 x7 : 0000000000000000 x6 : 0000000000000000
+>         x5 : ffff00012e7e2128 x4 : 0000000000000000 x3 : 0000000000000008
+>         x2 : ffffffffffffffff x1 : ffffffffffffffff x0 : 41403f3e3d3c3b3a
+>         Call trace:
+>          kfree+0x48/0x2a8 (P)
+>          vhost_dev_cleanup+0x138/0x2b8 [vhost]
+>          vhost_net_release+0xa0/0x1a8 [vhost_net]
+>          __fput+0xfc/0x2f0
+>          fput_close_sync+0x38/0xc8
+>          __arm64_sys_close+0xb4/0x108
+>          invoke_syscall+0x4c/0xd0
+>          do_el0_svc+0x80/0xb0
+>          el0_svc+0x3c/0xd0
+>          el0t_64_sync_handler+0x70/0x100
+>          el0t_64_sync+0x170/0x178
+>         Code: 8b080008 f2dffbe9 d350fd08 8b081928 (f9400509)
+>
+>
+> > Breno -- when you say you've been seeing this "for a while", what's the
+> > earliest kernel you know you saw it on?
+>
+> Looking at my logs, the older kernel that I saw it was net-next from
+> 20250717, which was around the time I decided to test net-next in
+> preparation for 6.17, so, not very helpful. Sorry.
+>
 
-Best regards,
-Krzysztof
 
