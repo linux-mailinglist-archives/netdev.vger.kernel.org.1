@@ -1,233 +1,120 @@
-Return-Path: <netdev+bounces-209698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22071B106DB
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 11:47:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 920DCB1071D
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 11:57:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8665188330A
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 09:44:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5243C4E31D9
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 09:56:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94A7C23F40F;
-	Thu, 24 Jul 2025 09:44:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE05F258CDC;
+	Thu, 24 Jul 2025 09:57:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="WdgOiEgd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yq+0L+l9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9298A23B62B
-	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 09:44:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D5E62580E7
+	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 09:57:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753350246; cv=none; b=tUrd8pY+SI7AyEtsy/EWTnf/W6ymzcj0Lsp4QdD7b4JxTIAf54rAjd6+Q675C9/BMQYGgf1up1ED+kL5kTozLXvKu1vIW8QS6/oNgy4UTt1oR/TikHwCx+lj/83O9LoMtvdG6G0I2sfdfOCp3osMcEsKM5+zL6/a9g4Zw/hqnJM=
+	t=1753351038; cv=none; b=NmFX7QS2tZZSydqu030mQDXIrvP4S/XANfdHbqqasxUfwBUfgXG3Cl689wc6q2jEKeg3tlsE87HGs+OVsfLawZFN1CPAg6BU4dvcix4xzgsvrg0V+W4JxO+WXs6dPkEFZl191s1y7rntEBsP4Q/7n2KEw2z+dYSl1A1kYUKoaZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753350246; c=relaxed/simple;
-	bh=n4kPT2lMhhPzcCkG4U6PjzmcQhrdQnWqLAwRLY5V6Uw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=KCygbDUsM2VIkq2oidnQ6iMm2ic1FD1AJmUA3lzdhdv4QbRu+4zIvkTD0s10B8ffm2bvKQ9PHX8feBII8l1/R0nAk6SgvCKWzM+r+AST700S2awVt8580DgbCngkr+z/oqPMdSK9UI/k7xbOqiIRFaV2mapxYLI0o/nq0aqbGIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=WdgOiEgd; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-60c6fea6742so1708144a12.1
-        for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 02:44:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1753350243; x=1753955043; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=FZSeXQeK+KeRphR5bKM8dbnHyn+N3u8iAzXxo9jDsmY=;
-        b=WdgOiEgd3optoNxYLA4C/aZeIiEJJqzJr5EUJ2mWAE+mzxt2G1DXc4XzJvu46PNklF
-         /1SQbTkCt1EmXATIIXawUKK2OGWzurjfM3pFXHgSl9LGL95xc+txP2qLBKbWb+tjthnl
-         HFB/NkIAOxAv76bg84eL0HZ9J6fp9sQboICnhiK/bxopthUh9R/Rri8vGw8a9AqBzBwB
-         4iEggxEm9AVWC4Td6dpUbL+BRjitgB/GfK3ROdP33tV/u9Pf7NIu7VW6YKF6xkmix6Pm
-         AaNSb78teHAoutSfmPAdpDC22NrEAbxPV6YP3joi5q9Zg7B4FmJ0OUqaeN4WSjLGbMTQ
-         icZA==
+	s=arc-20240116; t=1753351038; c=relaxed/simple;
+	bh=3QN2SPK+xpAbgocIP4oE8AbjkT4UjG+6575GluaartQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iivv6UJ2UOw+vytL1dLbLLglVCv/BddGpwWmZXEl4OeRvnTW2Geua+rrrKN+5dbeZY1OCExSy1LGrn8rQgKRBuNKg5Dg6rKqzyvpDTU/Lhzp631BF+tFIdXan6YdjgmWdNwX9LPmVPTazLmiLgg3i/jC5urZuicxqfyk9MLZ5Ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Yq+0L+l9; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753351036;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3QN2SPK+xpAbgocIP4oE8AbjkT4UjG+6575GluaartQ=;
+	b=Yq+0L+l9jAQB/k+QE4NBNVmFpRV34zGAF2IjOoSmJL4vsqJ8U8KtGxtQjoJaZ8XdVZeaL8
+	59AP6I+rhGX7coO8t1ugw4JZRGNFF4duB0/BUP/kRcCzouwcJH5EozAd4LqxoV0D+755tE
+	JfouTqW2gkr1orkwzJeqJiQPYOujU40=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-543-uo9PCxWeMK2AWoX1L8csOA-1; Thu, 24 Jul 2025 05:57:14 -0400
+X-MC-Unique: uo9PCxWeMK2AWoX1L8csOA-1
+X-Mimecast-MFC-AGG-ID: uo9PCxWeMK2AWoX1L8csOA_1753351033
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-45626532e27so4453835e9.1
+        for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 02:57:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753350243; x=1753955043;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FZSeXQeK+KeRphR5bKM8dbnHyn+N3u8iAzXxo9jDsmY=;
-        b=wyYEM3tw9xCcJ1o47zDZQNq+BgDI2VNCBr7KmIBuy0cpVdrcmwy940dLsNGAXL+JYt
-         N9NUD61AlxrGbCv/sco+AZshIaP1k2JdjAcoxGptZDjM5rBeEgZNjS5S8B0DEr7XOAQy
-         L9DVlNTjumNr8PreRl0z2GPFxKTJ11/d2kgIbsNPSKuMT+gLiXvydQqn23nZ7MlB1tEQ
-         tEIUXeeGwwohldPA1tEXy7TLJB/HpWQH53HJEJm2jk9I+yRYchavC0IRP6Puso2F9wap
-         U+QDMErhnyY5enUArZK9bORarwnIWbbkr38td4hQivnYDbleQ4IpEhfHlS0gcitKl74K
-         JCVw==
-X-Forwarded-Encrypted: i=1; AJvYcCUhtd+mnj0doLJ1xiYxbX5YYRAYpGQoLsf8QxKyYr8+Slg85uCWZXXDJLctJsYrXP8Cr0U6V3s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxW+EPfbZXlUPFzXfU0XIlL6/eDz1riGQeT5fbXAQVZnetim1ry
-	04nEasYvALufgJnh9QydQcPfGWEBm3MLiGLuPGO71ybUCqWMiXS5kkYonX+1Q5Gm6/o=
-X-Gm-Gg: ASbGncuSdWetJjx295oDy1bwgaVzYCjmVpYxrz2DLVfrfl/Rckw9CJLK2ZxTKPZgZ9X
-	6knhN9TQzjBd6zAdlk7FSLnss2kdJCyG7G7Om1Vz4//oijO5DthEXY828dFx7ZM3WsxcZe+VbD0
-	TU7YSEL0LShDEk2HieibA52kalUj33sE/oWc7W9utvQKUo74XWyrzFGCZn45S2a30AOqO/tjp2e
-	4aeVRtxwusz5RqMRKcBaQ9NKlxlyfYk1Dbx92+aeeN2Ke827xHirTkws0y5ufNqQQ1tRWseGNPH
-	l8kO1aA5SJgHReGKeHIuXnJTLsB95GLHWUr7JOLcjFbbyXM542uwXFbvBvW5+hymdkNTG9KHuAK
-	0K3Gm1Rwg7YPL8YbqW7tG+wd5jA==
-X-Google-Smtp-Source: AGHT+IGmnQW87FYmxr9VudKFpz4QPagJwaPdqyp5ax6llJPHOb8xIpSlRALa8/JhQPnvlYD30ucpCg==
-X-Received: by 2002:a05:6402:3591:b0:614:a23b:4959 with SMTP id 4fb4d7f45d1cf-614a23b4e03mr5195438a12.10.1753350242789;
-        Thu, 24 Jul 2025 02:44:02 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:6b])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-614cd0d1babsm642227a12.2.2025.07.24.02.44.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Jul 2025 02:44:02 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Alexei Starovoitov <ast@kernel.org>,  Andrii Nakryiko
- <andrii@kernel.org>,  Arthur Fabre <arthur@arthurfabre.com>,  Daniel
- Borkmann <daniel@iogearbox.net>,  Eduard Zingerman <eddyz87@gmail.com>,
-  Eric Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,
-  Jesper Dangaard Brouer <hawk@kernel.org>,  Jesse Brandeburg
- <jbrandeburg@cloudflare.com>,  Joanne Koong <joannelkoong@gmail.com>,
-  Lorenzo Bianconi <lorenzo@kernel.org>,  Toke =?utf-8?Q?H=C3=B8iland-J?=
- =?utf-8?Q?=C3=B8rgensen?=
- <thoiland@redhat.com>,  Yan Zhai <yan@cloudflare.com>,
-  kernel-team@cloudflare.com,  netdev@vger.kernel.org,
-  bpf@vger.kernel.org,  Stanislav Fomichev <sdf@fomichev.me>
-Subject: Re: [PATCH bpf-next v4 2/8] bpf: Enable read/write access to skb
- metadata through a dynptr
-In-Reply-To: <ae17edd2-22af-4f0f-b130-bf2790bfd774@linux.dev> (Martin KaFai
-	Lau's message of "Wed, 23 Jul 2025 17:02:11 -0700")
-References: <20250723-skb-metadata-thru-dynptr-v4-0-a0fed48bcd37@cloudflare.com>
-	<20250723-skb-metadata-thru-dynptr-v4-2-a0fed48bcd37@cloudflare.com>
-	<ae17edd2-22af-4f0f-b130-bf2790bfd774@linux.dev>
-Date: Thu, 24 Jul 2025 11:44:01 +0200
-Message-ID: <87y0sdx6se.fsf@cloudflare.com>
+        d=1e100.net; s=20230601; t=1753351033; x=1753955833;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3QN2SPK+xpAbgocIP4oE8AbjkT4UjG+6575GluaartQ=;
+        b=u8nmjFdF8ppeDwnHjGAF41qh+cPOux481R/jJ+MA/HIiB0GrYBhAaZK4teidJOGS6s
+         529cWVEosCYXV0GRW8z/UUO3Pv3m7sBtlCmbK8LFUqpx//Ihr0/LomUmlumeMNAuZp4l
+         t/wU3d2qnrkp74AIj5c5qC7w2XtQys5jKswSKrTRoVvA+ytj0RH01J4RMO1d4Ml7WN0Z
+         Ba6xfHBO42WOfsgO6FhuXFJrwwoWn+c4nHNo9urfWCwGHHcRfgxdrQyoHRzxJLo8mIrk
+         eTZ2GHY02G3e0IAeaK37IWM3W0v6aJcYbhCShe5yDIr8I7GVuPRVp/WkleFIhrR/Nb9D
+         4B5w==
+X-Gm-Message-State: AOJu0YxB6Fh3zNVrzHBcJ1m6CYGRCcct0MvGqPj+FlS2vd5eW5YuH7D9
+	04riye8IuNoH+CDPbovRLSEN1hWfkeuv2B6GWq76rbkixp38NL+01HRM8FEk21JuA9kBay8JEZn
+	o+ITWLoDwev0athae7oYyizuYmHHn68dfrYURXtqT3SxQBXqp4f2gRxVBJw==
+X-Gm-Gg: ASbGncvh1k4cfhiP/JmUhSyRwQPRyPdaOhQehVnT1qllhj9G+gHv2+6yACtl5nYDnOY
+	ezxiA/8M0yetPmJNzBqUwnFCd9Ccb2B/f0dl6dVfcO/vZjce4J6WMVUNQOLG9kt0dxaEqQqOoyA
+	m44iZ8LHC3ssNKUwSN/LAxKRaY1VwHBJGvWzeNMlo/VssVESd0lCHHWCc5I2w1U4C2B2WPK/jb6
+	HSkT7RfmFdJ0vFPO2/7j4mS8AEUOceK4REQWzcIZwhE85aC9xDFLA9S7es/E0dd4ZA3FkL/VnjI
+	v6zk1V6DRKXEsBSwp4pmOz9Emx0DO2xSLNBnqUJkXKXqjqPYp6Fp2LEWCRAWBf0dvbf2Lo09ytQ
+	iMK9VZW4hWig=
+X-Received: by 2002:a05:600c:540c:b0:453:697:6f08 with SMTP id 5b1f17b1804b1-45868d6b4b4mr46224145e9.26.1753351032723;
+        Thu, 24 Jul 2025 02:57:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGBdiBk1y9FYFtZGZos+FZxTmneELrQSJ8S9Hi/6MjtohOABZ0cx37UcBf5gRBbBVayCRRaKw==
+X-Received: by 2002:a05:600c:540c:b0:453:697:6f08 with SMTP id 5b1f17b1804b1-45868d6b4b4mr46223915e9.26.1753351032246;
+        Thu, 24 Jul 2025 02:57:12 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b76fcb9a2asm1677126f8f.63.2025.07.24.02.57.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Jul 2025 02:57:11 -0700 (PDT)
+Message-ID: <045d1ff5-bb20-481d-a067-0a42345ab83d@redhat.com>
+Date: Thu, 24 Jul 2025 11:57:10 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] sfc: handle NULL returned by xdp_convert_buff_to_frame()
+To: Chenyuan Yang <chenyuan0y@gmail.com>, ecree.xilinx@gmail.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, sdf@fomichev.me, lorenzo@kernel.org
+Cc: netdev@vger.kernel.org, linux-net-drivers@amd.com, bpf@vger.kernel.org,
+ zzjas98@gmail.com
+References: <20250723003203.1238480-1-chenyuan0y@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250723003203.1238480-1-chenyuan0y@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 23, 2025 at 05:02 PM -07, Martin KaFai Lau wrote:
-> On 7/23/25 10:36 AM, Jakub Sitnicki wrote:
->> diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
->> index 9552b32208c5..237fb5f9d625 100644
->> --- a/kernel/bpf/helpers.c
->> +++ b/kernel/bpf/helpers.c
->> @@ -1781,7 +1781,7 @@ static int __bpf_dynptr_read(void *dst, u32 len, const struct bpf_dynptr_kern *s
->>   	case BPF_DYNPTR_TYPE_XDP:
->>   		return __bpf_xdp_load_bytes(src->data, src->offset + offset, dst, len);
->>   	case BPF_DYNPTR_TYPE_SKB_META:
->> -		return -EOPNOTSUPP; /* not implemented */
->> +		return bpf_skb_meta_load_bytes(src->data, src->offset + offset, dst, len);
->>   	default:
->>   		WARN_ONCE(true, "bpf_dynptr_read: unknown dynptr type %d\n", type);
->>   		return -EFAULT;
->> @@ -1839,7 +1839,7 @@ int __bpf_dynptr_write(const struct bpf_dynptr_kern *dst, u32 offset, void *src,
->>   			return -EINVAL;
->>   		return __bpf_xdp_store_bytes(dst->data, dst->offset + offset, src, len);
->>   	case BPF_DYNPTR_TYPE_SKB_META:
->> -		return -EOPNOTSUPP; /* not implemented */
->
-> It needs to check the flags here such that the flags can be used in the future:
->
-> 		if (flags)
-> 			return -EINVAL;
->
+On 7/23/25 2:32 AM, Chenyuan Yang wrote:
+> The xdp_convert_buff_to_frame() function can return NULL when there is
+> insufficient headroom in the buffer to store the xdp_frame structure
+> or when the driver didn't reserve enough tailroom for skb_shared_info.
 
-Missed that. Thanks.
+AFAIC the sfc driver reserves both enough headroom and tailroom, but
+this is after ebpf run, which in turn could consume enough headroom to
+cause a failure, so I think this makes sense.
 
-> pw-bot: cr
->
->> +		return bpf_skb_meta_store_bytes(dst->data, dst->offset + offset, src, len);
->>   	default:
->>   		WARN_ONCE(true, "bpf_dynptr_write: unknown dynptr type %d\n", type);
->>   		return -EFAULT;
->> @@ -2716,7 +2716,7 @@ __bpf_kfunc void *bpf_dynptr_slice(const struct bpf_dynptr *p, u32 offset,
->>   		return buffer__opt;
->>   	}
->>   	case BPF_DYNPTR_TYPE_SKB_META:
->> -		return NULL; /* not implemented */
->> +		return bpf_skb_meta_pointer(ptr->data, ptr->offset + offset, len);
->>   	default:
->>   		WARN_ONCE(true, "unknown dynptr type %d\n", type);
->>   		return NULL;
->> diff --git a/net/core/filter.c b/net/core/filter.c
->> index 0755dfc0fc2f..cf095897d4c1 100644
->> --- a/net/core/filter.c
->> +++ b/net/core/filter.c
->> @@ -11978,6 +11978,45 @@ bpf_sk_base_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
->>   	return func;
->>   }
->>   +static void *skb_metadata_pointer(const struct sk_buff *skb, u32 off, u32
->> len)
->> +{
->> +	u32 meta_len = skb_metadata_len(skb);
->> +
->> +	if (len > meta_len || off > meta_len - len)
->
-> A nit.
->
-> After reading it again, I think this is a duplicated check. The
-> bpf_dynptr_check_off_len() called in the kfunc should have already checked the
-> same condition.
+@Eduard: could you please have a look?
 
-I took a better-safe-than-sorry approach. Can skb_metadata_len() change
-after the call to bpf_dynptr_from_skb_meta()? Today it can't, but what
-if we let TC BPF resize the metadata area in the future?
+Thanks,
 
-But you're right. It's duplicated code for now and can be dropped.
+Paolo
 
->
->> +		return ERR_PTR(-E2BIG); /* out of bounds */
->> +
->> +	return skb_metadata_end(skb) - meta_len + off;
->> +}
->> +
->> +int bpf_skb_meta_load_bytes(const struct sk_buff *src, u32 off, void *dst, u32 len)
->
-> Since it needs a respin, I have a few nit comments that will be useful for
-> reading filter.c.
->
-> Change the "const struct sk_buff *src" to "const struct sk_buff *skb". It is how
-> other places are naming the arg in filter.c.
-
-No problem. I will unify it with:
-
-int __bpf_skb_load_bytes(const struct sk_buff *skb, u32 offset, void *to, u32 len);
-int __bpf_skb_store_bytes(struct sk_buff *skb, u32 offset, const void *from,
-			  u32 len, u64 flags);
-
->
->> +{
->> +	const void *p = skb_metadata_pointer(src, off, len);
->
-> Not sure if this variable is still needed if skb_metadata_pointer does not
-> return err ptr.
->
-> If it is still needed, use "const void *ptr" instead of "const void *p". The
-> bpf_xdp_pointer and skb_header_pointer callers in filter.c also use that naming.
->
-
-Will do.
-
->> +
->> +	if (IS_ERR(p))
->> +		return PTR_ERR(p);
->> +
->> +	memmove(dst, p, len);
->> +	return 0;
->> +}
->> +
->> +int bpf_skb_meta_store_bytes(struct sk_buff *dst, u32 off, const void *src, u32 len)
->> +{
->> +	void *p = skb_metadata_pointer(dst, off, len);
->
-> Same for the "struct sk_buff *dst" and "void *p" in this function.
->
-
-Will change.
-
->> +
->> +	if (IS_ERR(p))
->> +		return PTR_ERR(p);
->> +
->> +	memmove(p, src, len);
->> +	return 0;
->> +}
-
-Thanks for reviewing.
 
