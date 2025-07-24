@@ -1,110 +1,120 @@
-Return-Path: <netdev+bounces-209652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56D99B102BC
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 10:03:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E227DB102E2
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 10:08:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E33B11CE1A8E
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 08:04:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E48FA3AF971
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 08:07:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51E4C21D5BC;
-	Thu, 24 Jul 2025 08:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GAERuU3D"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA63C272E60;
+	Thu, 24 Jul 2025 08:07:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C21742153F1
-	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 08:03:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 622FE27146E
+	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 08:07:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753344205; cv=none; b=V31T/BC8YsW73Pks1SJviA9M9kjYTXygk7cPGjPmzUMb0lGRTbJvX/uI5A2DutM4uwky5lyWLkkfy2foX1rvrPr7t1Z9ozIG/ACJUa3TQSVqQXIeIDTGeHQPDSZ2GiiuuzTpIo07YvQgx0QCPPIucWJI5sKrAes6yZNr9Ac8cMo=
+	t=1753344467; cv=none; b=Hd/F8xjGRT+af4LBa67BZN9OJ6kPtveMPvgi5OuY0LN77gGCXgmo30WAdMezTu3HyPOM1qBxiIBh4GrFY3Yhq7OdXALzqgH6Q6BRZvs0Tued9TMcH5P+fws8THJ8LvLDtRqJY1c7u12wBZ62tIWxu7EfNoueMCoIb1FB/I1YRuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753344205; c=relaxed/simple;
-	bh=UJieD3EE3q0kc+37pyAjaBrkau4zswjG7oQNF3HamPs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BVK5Q7x5Xk1sn29/n505PrOVNQxxwbbVysY+w+FKtXb49bEWtSVFRnXXzOMqv+9aM9xoSB7UPL8QiVSJxDF0btjNVEH/4sAsaL9oMZNrxTxXPlt9RA5zwLS0esRlJfAQB8BA9hDhPozHjB0FX/8Ck0PR4tGMqX4vqXRPz1fQ+do=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GAERuU3D; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4ab53fce526so10468081cf.2
-        for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 01:03:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753344203; x=1753949003; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UJieD3EE3q0kc+37pyAjaBrkau4zswjG7oQNF3HamPs=;
-        b=GAERuU3DfDLJjC32xjU6lqLAJNgdwMC+cPnpn5o4YDZ9p6GxRzB2YtYEy2yvI/KL6X
-         sE8qCowiJuKsHCF76YDGzdVznj1uA2RLHiVzJ8T54EXiK5xWvoUm+INsuMUzylMj/6e0
-         VwPGgH0Z1Lb6v1Wm9y/E872MJjItDGuvC29fq2Rf2Vd3+uymEofCjRErxytfSQpFFCMP
-         aMHLRl+51M6XVhewC0DFyngqRsWJ9dg7H3SRwVdWR5Jyo0KJx9w9Jic8T9+e/SrWqxRi
-         904RG67IjURmg6b0CWg+LpkFBShFdCJp8j1ZNPA3mo5GWXm3eVBwXEIAW+SDo/+hkoGD
-         1PbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753344203; x=1753949003;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UJieD3EE3q0kc+37pyAjaBrkau4zswjG7oQNF3HamPs=;
-        b=iLEI6/54w6DnfMGhjqWng6dRAAo0FuUOlFfhqYNHOoi34djEh0YB7bdVZ7QDTqEe/8
-         VT5oRVxsUzGYd+Z1uR0zrdge4glu/afFVa2Erl7wWGqQjRpDkIDw9FduiTjCqEIw3y7P
-         SCvbk8kBm2NGMjGVWByxQeHl3vQ/NWK7xQQUZAfpHVqfpJYbxUuB7GSsPY/1p0U8RkEf
-         i2XbE2BzC7S7Dkgnmr+vRW+xHIsTPHztR2+zEqvfWuCa+hIav5TyfcV6cgE93GixaYI1
-         H1YiFCf3/xkOdn2E8BY28RkYnJ8juNyLQI8lHAWH7Mi0EvZIci7+Ok09CKuY6nRcKSlZ
-         taZg==
-X-Forwarded-Encrypted: i=1; AJvYcCXqVPoZOWO+HqjE2e//eB4m39vI7bCLWHeJSkPn+MuO47iuWZFN9Uv7SmTcjZwlJ1mqvj4f4Jg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoH9rKXclZfvt2Mfq3++tPXYocvDFf7TOihnS8OLBg2IMU+Dhy
-	zbCGsZldkb9fuLT8/MUKzfq0Nv9F4dgzw+Qq3y+VMn99fgrShUijtUQS5C3sf12qWYOoZ8OdbEl
-	j4iBuQMZ+pyiQ6G+5kGrQuKl0XxsBrFDEFERbSIX2
-X-Gm-Gg: ASbGnctXjHHIe5bVo1djAdsxxn3BzGT7IQePRsAUS8S8H3LD5OdrAvF7Y5N6MKKNxWq
-	OUIhIvY48Ub6FQHhMPw0QjZroUVZ5OCSvNCc2aPlNVS0ZQIm0F4M+VkoBbg7UQRMwhwnzwh4IJM
-	rIwXxxJFqc5djSFeejmSIGbSzTiLx10mwHUWNjQvzIXroVvhyCRyOQeDtDecfY2/dinGl6r1eH2
-	Jnv8r64gweUHAbPGw==
-X-Google-Smtp-Source: AGHT+IFl+oT1jF7k/9kW1TUUtdhW5Kibpj0coT3C4jfrr8flV4/eU2Q2qfxVAhDslrYzyWWRcnR4dIMOVpUk7b5NvR8=
-X-Received: by 2002:ac8:5f8e:0:b0:4ae:6b72:2ae9 with SMTP id
- d75a77b69052e-4ae6df8a4d9mr81016401cf.43.1753344202234; Thu, 24 Jul 2025
- 01:03:22 -0700 (PDT)
+	s=arc-20240116; t=1753344467; c=relaxed/simple;
+	bh=YYYc9foDjVhRKzIGAxjT5zSiOXGiTC0Cp3AU7QIOjgE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HiyrCzn/0Wy56awhWuR5WXcn2R1dxYbVbUNlNXRlL4WQu+qSprTycOsqMgHy+bNK9O3QBsrGY5d9e5/1+/7DcaC8At4gZfBRWMuZDwSLDDYc4KgJ8CtXkaX5DHSnB22BfoA57A5TPVTUKjUncFSfpdjzjwI4IkFq9a9X7owxxvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.206.34.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: esmtpsz10t1753344380t4a6c2665
+X-QQ-Originating-IP: pvYPyoJbZ8X0ksMCGh9juh9AoS2HU45isUtHAvhQpjA=
+Received: from lap-jiawenwu.trustnetic.com ( [60.186.23.165])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 24 Jul 2025 16:06:18 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 12727271929034278221
+EX-QQ-RecipientCnt: 10
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v3 0/3] net: wangxun: complete ethtool coalesce options
+Date: Thu, 24 Jul 2025 16:05:45 +0800
+Message-Id: <20250724080548.23912-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250723082201.GA14090@hu-sharathv-hyd.qualcomm.com>
- <CANn89iLx29ovUNTp9DjzzeeAOZfKvsokztp_rj6qo1+aSjvrgw@mail.gmail.com> <7ffcb4d4-a5b4-4c87-8c92-ef87269bfd07@quicinc.com>
-In-Reply-To: <7ffcb4d4-a5b4-4c87-8c92-ef87269bfd07@quicinc.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 24 Jul 2025 01:03:11 -0700
-X-Gm-Features: Ac12FXyrVFqHSu-_ClF5-JvN6QWWlq8ElHrMSLpKYWIT9YmGy6cJaULEsLkaWhU
-Message-ID: <CANn89iJwM2-rueNzEdOOUuTF7DV=yT+qAFUJsEDqiMJzdjf=-g@mail.gmail.com>
-Subject: Re: [PATCH] net: Add locking to protect skb->dev access in ip_output
-To: Sharath Chandra Vurukala <quic_sharathv@quicinc.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, quic_kapandey@quicinc.com, 
-	quic_subashab@quicinc.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: M0N6ZCan9mUhYcq9UE4oeuh7KXkhZO0YnEidAtwgMjVOOIEZZ9R/GI/D
+	TPqAYb7ITc0EZS5/f9wfHFPKYLeP5b5O/n+F2s6KTQUx/sDDWsx2cFyo4c3tjUSsAfbZHRB
+	KLNIHEVnv6LlAJ/dNlfWOSLNqvhhxhHhC/VUk2PnPquPYHvhZeN+mdzq3EyW7AfcvDPsa+R
+	DY4MjRBM5c50X25IArea1ySxjI9QR0SujW8//hAIrbK4KYmDArj+8bKqj7sokBH2k3iKy7l
+	kEU/oPVXwnJz6sZm6wIEY7f8jFQf8rrsfS3qxl5qzbk9trwJil66uOS6mLzwabPR3Xl8Q1c
+	n5W7sy+SGC7goip2VJVnhbeFgm8IaQg4jKfzgIF9PFuiuQPrXso9vPQ7t4r0968pB0zVYR7
+	Um9U9n0hNUhp7f46Hz+g76UaS0GPgVeTneFGLoI0syYk1wmCIyoAhwGsvXJvoM9DdoGtogS
+	nhmNpGVC3HBL0wPY6Q4vmZTgZAKaIOEWffHojbzqB7ZLExUJUATVsJzAJXFJPsif6lImSNE
+	LI8wVM+FzdaprcJh/YYYKrgpzsmWQkjXmBVJNWmeeK9kzNFyapIv1SmcJR49MMC5+wwiKIo
+	cVJfhG6/+mLVnttTDT2pCRNDjaEal8NPLGcXO4o5trTkXVdJxmpETsAkIooSQNojGKNvumf
+	OoVMu5wHB+vTyzrldyshlHlcyCBCILJ1vPYI/LpkV5NUZHOiZD1n37Xwck+fm0fAJhrEgQn
+	GupmKZKKLOxxen52+1wAsdahaX+Oo2bjSoC5bgXWxPkEBXRPpTC02qDY+B9HCQLSksmxgFO
+	3OphJNiF9FBZMyhgMSlteR4A/aYIv8qxzR/HKX+LK/Q5HRSDd5SOK6QPTb/v+VXgsfCZNXz
+	NXWfhS0Q2xQMZrXJW+TnNwsgmDxjXUsq4XbLGl5va/8hqh2ZQoFT4MjAk6faAf3EGdaY0lN
+	boDaJU2tMZjM22E0ksc2m6xOSWZZZi8Wj5qxfNQdfyjbR376lj3NvvpJDl6T314bFwoGSZT
+	MRgfvZYQsrnQahPzt+mMdxF6I/0L4CvsTKOrxlIRgFoSeLLOwJi2OJS8jPH1t0tTf9x2xnX
+	w==
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+X-QQ-RECHKSPAM: 0
 
-On Wed, Jul 23, 2025 at 11:16=E2=80=AFPM Sharath Chandra Vurukala
-<quic_sharathv@quicinc.com> wrote:
->
->
-> Thanks Eric for the review, as this work is already underway on your end,=
- I=E2=80=99ll pause and wait for your changes to become available.
+Support to use adaptive RX coalescing. Change the default RX coalesce
+usecs and limit the range of parameters for various types of devices,
+according to their hardware design.
 
-Hi Sharath
+---
+v3:
+- detail the commits messages
+- support DIM algorithm
 
-I think you definitely can send a patch, I was not trying to say you
-could not do it.
+v2: https://lore.kernel.org/all/20250721080103.30964-1-jiawenwu@trustnetic.com/
+- split into 3 patches
+- add missing functions
+- adjust the weird codes and comments
 
-Just pointing out what the plan was :)
+v1: https://lore.kernel.org/all/3D9FB44035A7556E+20250714092811.51244-1-jiawenwu@trustnetic.com/ 
+---
 
-Feel free to use my suggested patch, test it and send a V2
+Jiawen Wu (3):
+  net: wangxun: change the default ITR setting
+  net: wangxun: limit tx_max_coalesced_frames_irq
+  net: wangxun: support to use adaptive RX coalescing
 
-Thanks.
+ drivers/net/ethernet/wangxun/Kconfig          |   1 +
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   |  41 +++----
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   | 100 +++++++++++++++++-
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |   5 +
+ .../net/ethernet/wangxun/libwx/wx_vf_lib.c    |   2 +-
+ .../net/ethernet/wangxun/libwx/wx_vf_lib.h    |   1 +
+ .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  |   3 +-
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |   5 +-
+ .../ethernet/wangxun/txgbe/txgbe_ethtool.c    |   3 +-
+ 9 files changed, 135 insertions(+), 26 deletions(-)
+
+-- 
+2.48.1
+
 
