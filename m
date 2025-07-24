@@ -1,58 +1,49 @@
-Return-Path: <netdev+bounces-209783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81AF0B10C30
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 15:54:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1499FB10C41
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 15:56:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 94A891C83E51
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 13:54:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9465AE53C2
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 13:54:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1EDB2DEA8A;
-	Thu, 24 Jul 2025 13:52:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rLYVxoAG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F028B2E173E;
+	Thu, 24 Jul 2025 13:53:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from eidolon.nox.tf (eidolon.nox.tf [185.142.180.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 874382D94B7;
-	Thu, 24 Jul 2025 13:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A794A2DCF5F
+	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 13:53:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753365149; cv=none; b=FriJ7FBrv+ol7qj/4/eD/TGKSBRZotWJ1UWnltwAwLHPPbbrKCnLvxzZ0jF/6B9QJ2g6kR4gayWSySI49VOFiPipi7+AcUfbflVNFVqfQTs0jK10bdycit5snbYO6KiHbklH356b3/Kz4GOu+WFmIn5/4WYe2tnCgucFPZE/Zmg=
+	t=1753365213; cv=none; b=tsafqQ4HhC3B/8/EYRTqkiz3S86CzWZSvGxBM7ATLi0Ts5qUYk72EzZ/tU0f6Kx1J3axFOsCU6OgEAUukqGhIfeQvig58/oOfAegFK5QyR/Zp5Nl8lfoOCQflzGBR7WvUWjSBOYSMEnwYsm9DBCWQ50M+7xYgW6ayzzKe3m8C10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753365149; c=relaxed/simple;
-	bh=0PBz12B4Woa2oNmckzFPatQZyQ6TcDZHQdFuoa0Q7dE=;
+	s=arc-20240116; t=1753365213; c=relaxed/simple;
+	bh=HZRgSR6Xhs/3eA0j7rai6F/vzfme0n6Sih7d4FuhfTs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HRyRyuaX2YtVxF81gypp1JzKxaaGkXLopX4FI1AKBGPAYLwrHYtmxIjax88N5Mx9Q7sAckRiIJg8Ys6gdcge+sXKGLGaKsa0NoH3Crmn3LbvDoIuYtS8CgLoCMBdtdtvPgSkubGTAGVLuDGtIXjR/sPv51KJ4X4fX3POdRq7LYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rLYVxoAG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E958BC4CEED;
-	Thu, 24 Jul 2025 13:52:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753365148;
-	bh=0PBz12B4Woa2oNmckzFPatQZyQ6TcDZHQdFuoa0Q7dE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rLYVxoAGXA2K2jBJPekNX8COHCIuv6wPKpWqJm6tHJp84rbyAAFaD8Ly8ThF+nMhT
-	 dGckOBr6/NaTT02UJIhrfzr/yFizJXB6ITLOIx0Of9Rlj3StIMgTSs0NOUvonBPOc6
-	 rsC1IknAUGKFKXFeTsmZ3TFBHeW++hHqmwzDZ8mftzrqz/l9867LUghOWpLrjGmH7R
-	 N9GbZws5lcFeOUE3IrlQyHpPRub3cSREofg3gK+KA23ojjhch8+fg1x3gQmTCTVZ1b
-	 wDVkyAsjGHONflPLJ76a+YgNkLjmqk10brnB6iHCuclcmSJTr3ezeSEww+R1eTtmgH
-	 rJBrBSniK8LAQ==
-Date: Thu, 24 Jul 2025 14:52:24 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jimmy Assarsson <extja@kvaser.com>
-Cc: linux-can@vger.kernel.org, Jimmy Assarsson <jimmyassarsson@gmail.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v3 08/10] can: kvaser_pciefd: Expose device firmware
- version via devlink info_get()
-Message-ID: <20250724135224.GA1266901@horms.kernel.org>
-References: <20250724073021.8-1-extja@kvaser.com>
- <20250724073021.8-9-extja@kvaser.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=H0dIZvrgAWtkqQW9tLzFDpCp9GImnVC+3HVSD39sPeBi7FfngrlGhgqRtR3WqQHeU2ZiT6QCkbw/qIjwjrCpQLZ2etWr0xRGf6opoAqWl3mZ9sNb5syrgaGh4CNMdYJL0BaKmUlHifgkB1XIuIFOXGochbHwzxtJ8mtP3fkCQoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=diac24.net; spf=pass smtp.mailfrom=diac24.net; arc=none smtp.client-ip=185.142.180.128
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=diac24.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=diac24.net
+Received: from equinox by eidolon.nox.tf with local (Exim 4.97.1)
+	(envelope-from <equinox@diac24.net>)
+	id 1uewO1-00000002zKC-0RpR;
+	Thu, 24 Jul 2025 15:53:29 +0200
+Date: Thu, 24 Jul 2025 15:53:29 +0200
+From: David Lamparter <equinox@diac24.net>
+To: David Lamparter <equinox@diac24.net>
+Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Lorenzo Colitti <lorenzo@google.com>,
+	Patrick Rohr <prohr@google.com>
+Subject: Re: [PATCH net-next 3/4] net/ipv6: use ipv6_fl_get_saddr in output
+Message-ID: <aII62Z85k7UCX-cY@eidolon.nox.tf>
+References: <20250724131828.32155-1-equinox@diac24.net>
+ <20250724131828.32155-4-equinox@diac24.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,31 +52,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250724073021.8-9-extja@kvaser.com>
+In-Reply-To: <20250724131828.32155-4-equinox@diac24.net>
 
-On Thu, Jul 24, 2025 at 09:30:19AM +0200, Jimmy Assarsson wrote:
+Of course I find a mistake half an hour after sending it out...
 
-...
+On Thu, Jul 24, 2025 at 03:18:24PM +0200, David Lamparter wrote:
+> @@ -1111,31 +1111,44 @@ static int ip6_dst_lookup_tail(struct net *net, const struct sock *sk,
+>  	struct neighbour *n;
+>  	struct rt6_info *rt;
+>  #endif
+> -	int err;
+> +	int err = 0;
+>  	int flags = 0;
+[...]
+>  		struct rt6_info *rt;
+> +		bool same_vrf;
+> +		int err = 0;
 
-> diff --git a/drivers/net/can/kvaser_pciefd/kvaser_pciefd_devlink.c b/drivers/net/can/kvaser_pciefd/kvaser_pciefd_devlink.c
-> index 8145d25943de..4e4550115368 100644
-> --- a/drivers/net/can/kvaser_pciefd/kvaser_pciefd_devlink.c
-> +++ b/drivers/net/can/kvaser_pciefd/kvaser_pciefd_devlink.c
-> @@ -4,7 +4,33 @@
->   * Copyright (C) 2025 KVASER AB, Sweden. All rights reserved.
->   */
->  
-> +#include "kvaser_pciefd.h"
-> +
->  #include <net/devlink.h>
+I accidentally introduced a second, shadow copy of "err"...
 
-Hi Jimmy,
+*sigh* should've built with W=2 so I get -Wshadow
 
-Please consider squashing the two-line change above into
-the previous patch in this series to avoid the following
-transient Sparse warning.
+...fixing and resending.
 
-  .../kvaser_pciefd_devlink.c:9:26: warning: symbol 'kvaser_pciefd_devlink_ops' was not declared. Should it be static?
 
-Thanks!
+-David
 
