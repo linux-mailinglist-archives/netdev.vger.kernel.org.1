@@ -1,146 +1,165 @@
-Return-Path: <netdev+bounces-209738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E84ECB10AA6
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 14:51:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 564BCB10AAB
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 14:52:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9FDB188B2C9
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 12:50:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CD04165F8B
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 12:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F3032D46C4;
-	Thu, 24 Jul 2025 12:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF2D62D46DA;
+	Thu, 24 Jul 2025 12:51:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PWNNmJXb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XEFycDLW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5317B2C3757;
-	Thu, 24 Jul 2025 12:50:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE062E36F2;
+	Thu, 24 Jul 2025 12:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753361428; cv=none; b=JGtFh9wnNTxDgpuZQt2FcCdI71AYPnpysQR/cCZ1pX5SuZT/4Wl/LBAyPDBnAvhiO10FsUZ/iMW4L8Ggv+hK0mtCjdXTSFEDWcfPTWwwzIE8cgWMnvtswbkhNeImsNlgaFy+KVYMzQZ/QfxDrNpiyMcnFnbORt2YkR/wtQKId9I=
+	t=1753361519; cv=none; b=mS6l6uBLnN9ioVXVUzIm8oN1UNzm5GBzsSYGXnmfHnm4pXQBsjphqbQA61PdrwHJu1U+XYOj7S7yhkUBGe28kljIQVr9a9JiHrVSWojzHEZoc4XYIPsLFoB3ug9LMAYpgSoq91LuZ9KuMrxVBbR9DIc5ulY9N/AcAp3NSiS+wbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753361428; c=relaxed/simple;
-	bh=Xq+2aOr76viJriRnJ+pzgbCo0qffhEbG7lm/rdlTwjA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bQNmhBOL47elWEUHzA0sP1RblhQkdPd/qrotLizn4LU76nCRGUwjj7ezXhkxWNgdgfZg22FJl/80A4R7f9lESrahCGhfA59ED+2XXBZer0jBnqgQ3dJxLrI/Kle2WX7bWuirM1SixhQzXJcreRgOOlc9N1XJeGRlLVixhNbEzeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PWNNmJXb; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3a53359dea5so491747f8f.0;
-        Thu, 24 Jul 2025 05:50:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753361425; x=1753966225; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PfVMcAjLS47xQwt22LwNV9vb4H3Sjsc0X/7OduC46U4=;
-        b=PWNNmJXbqrP/uDyeVAAVXhdRXTu5XX5/D48wJml6jD+qli3yWiciW1YT2EMAbf7xWV
-         8AYR/UsKZw8k/XCegv4rHnhQymf+skwK++qELI9C2imH3SoF8B2Qr54FFO/xgBiHTbN8
-         cN4mDSDpXMiLRS47VlsUvJjXtSILfsgSbMXBE8XzrZ7O7+fUB2Ojt/0lh1ZLsz4Y4oQa
-         9YZIMUZKmtiNP3F40Q9k9ERz4762YhYBGy53H7zZzWMcgORsUuUOkZa/2wJkxD/HeynO
-         y3lYW8SLofcZAg2AyA1vE676kxX9R4behXlLbkqteRUT94FXBwwtUP4ACoxzLwthpa39
-         AEiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753361425; x=1753966225;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PfVMcAjLS47xQwt22LwNV9vb4H3Sjsc0X/7OduC46U4=;
-        b=ooZEwbRXuBhS38v9eXs9Bgqh6jO6OGialOB3lsgnzcs/0SkmWjKZG4b2wxeNKoNkk5
-         LZz/4NAfYgY9LcatWiHGU+DKUeyQYx5y9OLecxe1yG4dDDl58qBQjQd6+cH0IGuIp5LF
-         fasFQcMa0pYsM6LF6d6SeGVWUI9+y2jKAz5grFH++IBV561GHJ0/Qa4Z/XQdw6HEc6nz
-         c1RW0bSGdwhwKou9ebIlKU2mLNc7kUEvn9+RGoDVtB3W2xUDk9KctlRuZkdj60VYD0+T
-         4ru6cZCAJ2zuze9Y99AIu8m5Cj8Ek9y8mPRHTWT7Bxf6RT8UTXkMw8RWp92y/aIyz5yv
-         u7pA==
-X-Forwarded-Encrypted: i=1; AJvYcCV96UM3Hjof/wc3GS2wBhmw3VD1hrRaLpLZVbr0puI1hxpzHY2McQRGwLnhAVWTIp61vw2JoyQ5gpNXm7I=@vger.kernel.org, AJvYcCW1wXXGPXw22baQiaRT3W6tUWDmFAlAgiI6dYlSutXG8TUPIKmzg111T7RxOe6cTTMOh0macSj1@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqWG74x20T6Nf+vuE4HbHRQJc7idxCOH7xYecPszGJd4aKPrlg
-	bhkmNdyAckqztwubFb2uyXTkPEhtNCqT0UqKoVRBxfy7B+Mi1/gtJN8gjjf3w50o
-X-Gm-Gg: ASbGnctxmsvJs6v78uFcw89CF65qQic7k+zhvXI8xBL4hwpoQLuGPN7m3i/JwQcUSav
-	hv8eft409i7TGSRKYPyL+qPhqNGerEnih9oEKsaTwkyfEESJqKqqYYFPI8N02O9Lf1N3tlmVkM2
-	+cAcasJelJO7pLnPukrpzcYbHV1IeTQR1Uqp9mCkOau8JrSSpAUr0VCCBgwTz7eA2xT/TXUy/Eu
-	qUKtMDrvGajbP4DLpqzAUv4j3rvXEB2kWScQsk9asbtfwouX6Gi9ISkA3Ue/iJCKtStia+0ydZs
-	TVgTe+mYUOhCQLgmJmdTBJeJnMM+X2xfFXxtL75JX7PFbE7K/5je+9q1CcbddxuF7N6wq4Ue/1C
-	EtzOM/iMAHujHLTyJtdZr+9hsgFm8SEy7C9U=
-X-Google-Smtp-Source: AGHT+IFgSLerD2l5sm9nFan11JNgWqeTR2V8VwvZLnCysxO+YNGEGzgx1M1XpIFFSgYboxFu9aKH0w==
-X-Received: by 2002:a05:6000:22c2:b0:3a4:f35b:d016 with SMTP id ffacd0b85a97d-3b768caa12dmr6105752f8f.11.1753361424142;
-        Thu, 24 Jul 2025 05:50:24 -0700 (PDT)
-Received: from localhost.localdomain ([45.128.133.222])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b76fc6d1b0sm2111089f8f.18.2025.07.24.05.50.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Jul 2025 05:50:23 -0700 (PDT)
-From: Oscar Maes <oscmaes92@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	stable@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Oscar Maes <oscmaes92@gmail.com>
-Subject: [PATCH net-next] net: ipv4: allow directed broadcast routes to use dst hint
-Date: Thu, 24 Jul 2025 14:49:42 +0200
-Message-Id: <20250724124942.6895-1-oscmaes92@gmail.com>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1753361519; c=relaxed/simple;
+	bh=mRrQ1JXUwBfwI4sOg4qT1QEX0Sx1ayhLbfszF804zvg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=smqiXvExZwTXLDKOXM2L+Vw25k+5EwyDQclZe0Htf06iqtqAhG66vXhCMEsvo523/niXOMEJ+pjDWXS2lizwkpL9R4PhiLVlDnxITIlDqmMd9/rQDao32DdUiWi85U7zAYd5VCuhuDwNpKqnAJezbQWgqfH/fhyB/FZAZalZGS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XEFycDLW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FB66C4CEED;
+	Thu, 24 Jul 2025 12:51:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753361519;
+	bh=mRrQ1JXUwBfwI4sOg4qT1QEX0Sx1ayhLbfszF804zvg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=XEFycDLWioiEXuws7smVaej3TtBJKwVXzP85S/Ge7hNSchamdsv+Yr4F0vr6PdJyv
+	 quoj9yNRddq6AZIKxE4EItYvrSZcY3YgBAUQTiBssBSdUAmcdsDzSMy/qJYkFHwboP
+	 xKfuWErySPa3ydVScPtwxd+9TPDi7z6xlzxtpiXgKakyWEvIf2YPPiJ89XtwzUBGu/
+	 1nhAz2UMiQgICEhq7L7IPrwrjl2iE6R7+BFR8/nIX6MX4tqVg//k+2LYXwkEHr864Q
+	 IcrJv21PexyDaikZoN78STwShGA4dwa+gmUENhatAi2VBeyj+P4O4KlPO3R0TLgj0G
+	 55Qb++LnrptkA==
+Message-ID: <e718d0d8-87e7-435f-9174-7b376bf6fa2f@kernel.org>
+Date: Thu, 24 Jul 2025 14:51:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/7] arm64: dts: qcom: Rename sa8775p SoC to "lemans"
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+ Wasim Nazir <wasim.nazir@oss.qualcomm.com>
+Cc: Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
+ linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kernel@oss.qualcomm.com
+References: <20250722144926.995064-1-wasim.nazir@oss.qualcomm.com>
+ <20250722144926.995064-2-wasim.nazir@oss.qualcomm.com>
+ <20250723-swinging-chirpy-hornet-eed2f2@kuoka>
+ <159eb27b-fca8-4f7e-b604-ba19d6f9ada7@oss.qualcomm.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <159eb27b-fca8-4f7e-b604-ba19d6f9ada7@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Currently, ip_extract_route_hint uses RTN_BROADCAST to decide
-whether to use the route dst hint mechanism.
+On 24/07/2025 14:47, Konrad Dybcio wrote:
+> On 7/23/25 10:29 AM, 'Krzysztof Kozlowski' via kernel wrote:
+>> On Tue, Jul 22, 2025 at 08:19:20PM +0530, Wasim Nazir wrote:
+>>> SA8775P, QCS9100 and QCS9075 are all variants of the same die,
+>>> collectively referred to as lemans. Most notably, the last of them
+>>> has the SAIL (Safety Island) fused off, but remains identical
+>>> otherwise.
+>>>
+>>> In an effort to streamline the codebase, rename the SoC DTSI, moving
+>>> away from less meaningful numerical model identifiers.
+>>>
+>>> Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
+>>> ---
+>>>  arch/arm64/boot/dts/qcom/{sa8775p.dtsi => lemans.dtsi} | 0
+>>>  arch/arm64/boot/dts/qcom/sa8775p-ride.dtsi             | 2 +-
+>>
+>> No, stop with this rename.
+>>
+>> There is no policy of renaming existing files.
+> 
+> There's no policy against renaming existing files either.
 
-This check is too strict, as it prevents directed broadcast
-routes from using the hint, resulting in poor performance
-during bursts of directed broadcast traffic.
+There is, because you break all the users. All the distros, bootloaders
+using this DTS, people's scripts.
 
-Fix this in ip_extract_route_hint and modify ip_route_use_hint
-to preserve the intended behaviour.
+> 
+>> It's ridicilous. Just
+>> because you introduced a new naming model for NEW SOC, does not mean you
+>> now going to rename all boards which you already upstreamed.
+> 
+> This is a genuine improvement, trying to untangle the mess that you
+> expressed vast discontent about..
+> 
+> There will be new boards based on this family of SoCs submitted either
+> way, so I really think it makes sense to solve it once and for all,
+> instead of bikeshedding over it again and again each time you get a new
+> dt-bindings change in your inbox.
+> 
+> I understand you're unhappy about patch 6, but the others are
+> basically code janitoring.
 
-Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
----
- net/ipv4/ip_input.c | 6 ++++--
- net/ipv4/route.c    | 2 +-
- 2 files changed, 5 insertions(+), 3 deletions(-)
+Renaming already accepted DTS is not improvement and not untangling
+anything. These names were discussed (for very long time) and agreed on.
+What is the point of spending DT maintainers time to discuss the sa8775p
+earlier when year later you come and start reversing things (like in
+patch 6).
 
-diff --git a/net/ipv4/ip_input.c b/net/ipv4/ip_input.c
-index fc323994b..1581b98bc 100644
---- a/net/ipv4/ip_input.c
-+++ b/net/ipv4/ip_input.c
-@@ -589,8 +589,10 @@ static void ip_sublist_rcv_finish(struct list_head *head)
- static struct sk_buff *ip_extract_route_hint(const struct net *net,
- 					     struct sk_buff *skb, int rt_type)
- {
--	if (fib4_has_custom_rules(net) || rt_type == RTN_BROADCAST ||
--	    IPCB(skb)->flags & IPSKB_MULTIPATH)
-+	const struct iphdr *iph = ip_hdr(skb);
-+
-+	if (fib4_has_custom_rules(net) || ipv4_is_lbcast(iph->daddr) ||
-+	    (iph->daddr == 0 && iph->saddr == 0) || IPCB(skb)->flags & IPSKB_MULTIPATH)
- 		return NULL;
- 
- 	return skb;
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index f639a2ae8..1f212b2ce 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -2210,7 +2210,7 @@ ip_route_use_hint(struct sk_buff *skb, __be32 daddr, __be32 saddr,
- 		goto martian_source;
- 	}
- 
--	if (rt->rt_type != RTN_LOCAL)
-+	if (!(rt->rt_flags & RTCF_LOCAL))
- 		goto skip_validate_source;
- 
- 	reason = fib_validate_source_reason(skb, saddr, daddr, dscp, 0, dev,
--- 
-2.39.5
 
+Best regards,
+Krzysztof
 
