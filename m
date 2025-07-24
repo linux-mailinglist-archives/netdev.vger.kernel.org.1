@@ -1,289 +1,91 @@
-Return-Path: <netdev+bounces-209581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C8D8B0FE7A
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 03:51:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB201B0FE83
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 03:55:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FC73188FE42
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 01:52:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4AC87AA9AA
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 01:53:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D6961A08A4;
-	Thu, 24 Jul 2025 01:51:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E4F2169AE6;
+	Thu, 24 Jul 2025 01:55:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IFrarkhs"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="W0esKhkm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA94E19F424;
-	Thu, 24 Jul 2025 01:51:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D048228399
+	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 01:55:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753321884; cv=none; b=ZYOZ1ayc7NSPGiQWhMwpVwQqeTwPJNuwboizTQbwRRfJgxZMzxkaoln2tbyf4HB4doE6DiSp7ctu6bd7FD4hvzVljVEN5NKuK8V9ZHrKwUUtKME4556tK8eD31co6GU/smBa/lQweXccIC9qiShqfXiQZ3T+uq7nSRzg06DqpG0=
+	t=1753322116; cv=none; b=I1dS7cNVK7Jh6RSXYLjTIBKpooJbQbZZhcveB4UsqIj5PUyyWcP43kS+IONpOEB3ZaB/WzOilIXZdeKo38sSQKiw4MkajqHa6E4neHDVRSEt69pOc932FxHCq0yXd8Ki8C2Oi4Cq3/2CVF266nuck2WKOxOEMN9IpSYVoevNZWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753321884; c=relaxed/simple;
-	bh=8a8yMmgkbck/tnMDbwgodSlBpHVqC3yTvdQ/JzCg0vo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NcKAxe81S9/XARpgM2BgErVIspP2rFKZ6h52cOXBM5m2F3u7PKiZVdmHKzQMGNKpgHrQlHlicEL6+k4EerJvIJHbpjOtgR7IlkYhky63unO6AthclxrHdyv3NJ97Q7egq35VFXgjo+c8cQ6OzsSpH/JU7Gt4ph5FVSSGwjLn4JY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IFrarkhs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 098E6C4CEEF;
-	Thu, 24 Jul 2025 01:51:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753321883;
-	bh=8a8yMmgkbck/tnMDbwgodSlBpHVqC3yTvdQ/JzCg0vo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IFrarkhsUddT+aewN9owLssf/RT+u3woB/AIbCX3Xejnoo72tgwmQthTPabJDDvnl
-	 IaYuoiej/5h7rSWW0MkLtDvxvRhQDKYH1S+KWnE13FoGAgAcKjSkamGVmegqvoIcPG
-	 em+u9LTUOLXt84vldOwpipq6yPWqDvK0mnLmGHxpbf7kic3/Si3C7E+hszjaWco4WE
-	 zKfM2mJ3UONUkb6NcqpB/Et6KY+vmctk/P8Sh3uwnyOtJS72rnGigJ/rM+Hgzer18n
-	 Qe3tACPjajI32kGbOSnBtpdCctusc7k+FEDfvvVZwyhv+eAABIoQtFcxTJHBUtFh+X
-	 cRMyNLzYIYzhA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	donald.hunter@gmail.com,
-	michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com,
-	andrew@lunn.ch,
-	willemdebruijn.kernel@gmail.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	shuah@kernel.org,
-	sdf@fomichev.me,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next v3 4/4] selftests: drv-net: add test for RSS on flow label
-Date: Wed, 23 Jul 2025 18:51:01 -0700
-Message-ID: <20250724015101.186608-5-kuba@kernel.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250724015101.186608-1-kuba@kernel.org>
-References: <20250724015101.186608-1-kuba@kernel.org>
+	s=arc-20240116; t=1753322116; c=relaxed/simple;
+	bh=ERYptIooa6KVqJDSuiuJ1j1cS6DJrh2n44YU1dp15C8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pA3UBcGhN79gI8N9uwH9le1do+WgC2/dYVgN3k0gyei45h0A+bNQDVvvypIIXdZZ4V/LtK5qE0SOYqf21ceK/UOnZzTKG78Vxj9TvuzfkP8J3HQnRODcTudeIiGcF7UdWsItBYj7WOs9FJ0vTROL/BFm+FNv7kgMsdAJo0chFuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=W0esKhkm; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <00a19156-cf90-48ca-be91-6c218b317044@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753322101;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dKuQF9X8Irn5130fOMdphl2+d/j6lxb9FyrQnQYALog=;
+	b=W0esKhkm9fSTfe41Mh1DxLnwU5r7t+z2ExW+zg8kd3+CGZZQPRTQ2O1X9RQqkuHWru6Y/h
+	VryOgi/ZXU1TNbCpX265lteUjWp22o454H5dZs8a4wv7c6ViQaYbKba5qtv03E51FYKtAH
+	Gt6hyjRoj2HhoEVmj14mysWOqUgYPVU=
+Date: Wed, 23 Jul 2025 18:54:53 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next v4 1/8] bpf: Add dynptr type for skb metadata
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Arthur Fabre <arthur@arthurfabre.com>, Daniel Borkmann
+ <daniel@iogearbox.net>, Eduard Zingerman <eddyz87@gmail.com>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Jesse Brandeburg <jbrandeburg@cloudflare.com>,
+ Joanne Koong <joannelkoong@gmail.com>, Lorenzo Bianconi
+ <lorenzo@kernel.org>, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
+ <thoiland@redhat.com>, Yan Zhai <yan@cloudflare.com>,
+ kernel-team@cloudflare.com, netdev@vger.kernel.org,
+ Stanislav Fomichev <sdf@fomichev.me>, bpf@vger.kernel.org
+References: <20250723-skb-metadata-thru-dynptr-v4-0-a0fed48bcd37@cloudflare.com>
+ <20250723-skb-metadata-thru-dynptr-v4-1-a0fed48bcd37@cloudflare.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20250723-skb-metadata-thru-dynptr-v4-1-a0fed48bcd37@cloudflare.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Add a simple test for checking that RSS on flow label works,
-and that its rejected for IPv4 flows.
+On 7/23/25 10:36 AM, Jakub Sitnicki wrote:
+> More importantly, it abstracts away the fact where the storage for the
+> custom metadata lives, which opens up the way to persist the metadata by
+> relocating it as the skb travels through the network stack layers.
+> 
+> A notable difference between the skb and the skb_meta dynptr is that writes
+> to the skb_meta dynptr don't invalidate either skb or skb_meta dynptr
+> slices, since they cannot lead to a skb->head reallocation.
 
- # ./tools/testing/selftests/drivers/net/hw/rss_flow_label.py
- TAP version 13
- 1..2
- ok 1 rss_flow_label.test_rss_flow_label
- ok 2 rss_flow_label.test_rss_flow_label_6only
- # Totals: pass:2 fail:0 xfail:0 xpass:0 skip:0 error:0
+There is not much visibility on how the metadata will be relocated, so trying to 
+think out loud. The "no invalidation after bpf_dynptr_write(&meta_dynptr, ..." 
+behavior will be hard to change in the future. Will this still hold in the 
+future when the metadata can be preserved?
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-v2:
- - check for RPS / RFS
-v1: https://lore.kernel.org/20250722014915.3365370-5-kuba@kernel.org
-
-CC: shuah@kernel.org
-CC: sdf@fomichev.me
-CC: linux-kselftest@vger.kernel.org
----
- .../testing/selftests/drivers/net/hw/Makefile |   1 +
- .../drivers/net/hw/rss_flow_label.py          | 167 ++++++++++++++++++
- 2 files changed, 168 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/hw/rss_flow_label.py
-
-diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-index fdc97355588c..5159fd34cb33 100644
---- a/tools/testing/selftests/drivers/net/hw/Makefile
-+++ b/tools/testing/selftests/drivers/net/hw/Makefile
-@@ -18,6 +18,7 @@ TEST_PROGS = \
- 	pp_alloc_fail.py \
- 	rss_api.py \
- 	rss_ctx.py \
-+	rss_flow_label.py \
- 	rss_input_xfrm.py \
- 	tso.py \
- 	xsk_reconfig.py \
-diff --git a/tools/testing/selftests/drivers/net/hw/rss_flow_label.py b/tools/testing/selftests/drivers/net/hw/rss_flow_label.py
-new file mode 100755
-index 000000000000..6fa95fe27c47
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/rss_flow_label.py
-@@ -0,0 +1,167 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+"""
-+Tests for RSS hashing on IPv6 Flow Label.
-+"""
-+
-+import glob
-+import os
-+import socket
-+from lib.py import CmdExitFailure
-+from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_ge, ksft_in, \
-+    ksft_not_in, ksft_raises, KsftSkipEx
-+from lib.py import bkg, cmd, defer, fd_read_timeout, rand_port
-+from lib.py import NetDrvEpEnv
-+
-+
-+def _check_system(cfg):
-+    if not hasattr(socket, "SO_INCOMING_CPU"):
-+        raise KsftSkipEx("socket.SO_INCOMING_CPU was added in Python 3.11")
-+
-+    qcnt = len(glob.glob(f"/sys/class/net/{cfg.ifname}/queues/rx-*"))
-+    if qcnt < 2:
-+        raise KsftSkipEx(f"Local has only {qcnt} queues")
-+
-+    for f in [f"/sys/class/net/{cfg.ifname}/queues/rx-0/rps_flow_cnt",
-+              f"/sys/class/net/{cfg.ifname}/queues/rx-0/rps_cpus"]:
-+        try:
-+            with open(f, 'r') as fp:
-+                setting = fp.read().strip()
-+                # CPU mask will be zeros and commas
-+                if setting.replace("0", "").replace(",", ""):
-+                    raise KsftSkipEx(f"RPS/RFS is configured: {f}: {setting}")
-+        except FileNotFoundError:
-+            pass
-+
-+    # 1 is the default, if someone changed it we probably shouldn"t mess with it
-+    af = cmd("cat /proc/sys/net/ipv6/auto_flowlabels", host=cfg.remote).stdout
-+    if af.strip() != "1":
-+        raise KsftSkipEx("Remote does not have auto_flowlabels enabled")
-+
-+
-+def _ethtool_get_cfg(cfg, fl_type):
-+    descr = cmd(f"ethtool -n {cfg.ifname} rx-flow-hash {fl_type}").stdout
-+
-+    converter = {
-+        "IP SA": "s",
-+        "IP DA": "d",
-+        "L3 proto": "t",
-+        "L4 bytes 0 & 1 [TCP/UDP src port]": "f",
-+        "L4 bytes 2 & 3 [TCP/UDP dst port]": "n",
-+        "IPv6 Flow Label": "l",
-+    }
-+
-+    ret = ""
-+    for line in descr.split("\n")[1:-2]:
-+        # if this raises we probably need to add more keys to converter above
-+        ret += converter[line]
-+    return ret
-+
-+
-+def _traffic(cfg, one_sock, one_cpu):
-+    local_port  = rand_port(socket.SOCK_DGRAM)
-+    remote_port = rand_port(socket.SOCK_DGRAM)
-+
-+    sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
-+    sock.bind(("", local_port))
-+    sock.connect((cfg.remote_addr_v["6"], 0))
-+    if one_sock:
-+        send = f"exec 5<>/dev/udp/{cfg.addr_v['6']}/{local_port}; " \
-+                "for i in `seq 20`; do echo a >&5; sleep 0.02; done; exec 5>&-"
-+    else:
-+        send = "for i in `seq 20`; do echo a | socat -t0.02 - UDP6:" \
-+              f"[{cfg.addr_v['6']}]:{local_port},sourceport={remote_port}; done"
-+
-+    cpus = set()
-+    with bkg(send, shell=True, host=cfg.remote, exit_wait=True):
-+        for _ in range(20):
-+            fd_read_timeout(sock.fileno(), 1)
-+            cpu = sock.getsockopt(socket.SOL_SOCKET, socket.SO_INCOMING_CPU)
-+            cpus.add(cpu)
-+
-+    if one_cpu:
-+        ksft_eq(len(cpus), 1,
-+                f"{one_sock=} - expected one CPU, got traffic on: {cpus=}")
-+    else:
-+        ksft_ge(len(cpus), 2,
-+                f"{one_sock=} - expected many CPUs, got traffic on: {cpus=}")
-+
-+
-+def test_rss_flow_label(cfg):
-+    """
-+    Test hashing on IPv6 flow label. Send traffic over a single socket
-+    and over multiple sockets. Depend on the remote having auto-label
-+    enabled so that it randomizes the label per socket.
-+    """
-+
-+    cfg.require_ipver("6")
-+    cfg.require_cmd("socat", remote=True)
-+    _check_system(cfg)
-+
-+    # Enable flow label hashing for UDP6
-+    initial = _ethtool_get_cfg(cfg, "udp6")
-+    no_lbl = initial.replace("l", "")
-+    if "l" not in initial:
-+        try:
-+            cmd(f"ethtool -N {cfg.ifname} rx-flow-hash udp6 l{no_lbl}")
-+        except CmdExitFailure as exc:
-+            raise KsftSkipEx("Device doesn't support Flow Label for UDP6") from exc
-+
-+        defer(cmd, f"ethtool -N {cfg.ifname} rx-flow-hash udp6 {initial}")
-+
-+    _traffic(cfg, one_sock=True, one_cpu=True)
-+    _traffic(cfg, one_sock=False, one_cpu=False)
-+
-+    # Disable it, we should see no hashing (reset was already defer()ed)
-+    cmd(f"ethtool -N {cfg.ifname} rx-flow-hash udp6 {no_lbl}")
-+
-+    _traffic(cfg, one_sock=False, one_cpu=True)
-+
-+
-+def _check_v4_flow_types(cfg):
-+    for fl_type in ["tcp4", "udp4", "ah4", "esp4", "sctp4"]:
-+        try:
-+            cur = cmd(f"ethtool -n {cfg.ifname} rx-flow-hash {fl_type}").stdout
-+            ksft_not_in("Flow Label", cur,
-+                        comment=f"{fl_type=} has Flow Label:" + cur)
-+        except CmdExitFailure:
-+            # Probably does not support this flow type
-+            pass
-+
-+
-+def test_rss_flow_label_6only(cfg):
-+    """
-+    Test interactions with IPv4 flow types. It should not be possible to set
-+    IPv6 Flow Label hashing for an IPv4 flow type. The Flow Label should also
-+    not appear in the IPv4 "current config".
-+    """
-+
-+    with ksft_raises(CmdExitFailure) as cm:
-+        cmd(f"ethtool -N {cfg.ifname} rx-flow-hash tcp4 sdfnl")
-+    ksft_in("Invalid argument", cm.exception.cmd.stderr)
-+
-+    _check_v4_flow_types(cfg)
-+
-+    # Try to enable Flow Labels and check again, in case it leaks thru
-+    initial = _ethtool_get_cfg(cfg, "udp6")
-+    changed = initial.replace("l", "") if "l" in initial else initial + "l"
-+
-+    cmd(f"ethtool -N {cfg.ifname} rx-flow-hash udp6 {changed}")
-+    restore = defer(cmd, f"ethtool -N {cfg.ifname} rx-flow-hash udp6 {initial}")
-+
-+    _check_v4_flow_types(cfg)
-+    restore.exec()
-+    _check_v4_flow_types(cfg)
-+
-+
-+def main() -> None:
-+    with NetDrvEpEnv(__file__, nsim_test=False) as cfg:
-+        ksft_run([test_rss_flow_label,
-+                  test_rss_flow_label_6only],
-+                 args=(cfg, ))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
--- 
-2.50.1
-
+Also, following up on Kuba's point about clone skb, what if the bpf prog wants 
+to write metadata to a clone skb in the future by using bpf_dynptr_write?
 
