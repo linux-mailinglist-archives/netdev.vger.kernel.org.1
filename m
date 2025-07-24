@@ -1,166 +1,135 @@
-Return-Path: <netdev+bounces-209742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05A7CB10ADB
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 15:03:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A7B4B10AE5
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 15:05:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27968168184
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 13:03:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C67C51CE0604
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 13:05:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 853EF248864;
-	Thu, 24 Jul 2025 13:03:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F90A2D63E5;
+	Thu, 24 Jul 2025 13:04:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bWV9ECM9"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MX21IWN3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21DEA24113C
-	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 13:03:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 361DF2D5C9E;
+	Thu, 24 Jul 2025 13:04:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753362209; cv=none; b=a0AxS7su4QG922S7sD4AO+W+ZmlkgFiV6Lgx3Fudd5XYwBRF42LfHqOLCjHck/IAzmuUKreJw85FbidUbPhv4i3qDBrDyRRYOdBYmvyoH2hdlFNecXfWlXLWPqH7Sq1dGVZnz04FTKVuY24FxOayCdMoEPXObjJeDVmcntzyZZI=
+	t=1753362276; cv=none; b=GIafN1HEOqBesslExpQK7ttnGWXF6I56xPzQ73CceL6m6sxDdvMpnANASGu39MIH2nbyO4j1viOrIZiblyX1pFSd0esvS9Jadu1aDPren3hqS80rsnQH+Jy+KUuesdirPy5QV74tBO3MXyXWJBuw80toY0jkbc4IahxHI90KyzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753362209; c=relaxed/simple;
-	bh=Z9yx0Znel3PZgr0veP+u6wAz+0Rq+E1+JLEXc+hdjsc=;
+	s=arc-20240116; t=1753362276; c=relaxed/simple;
+	bh=YqndJdzevr/o8/D1lSHMdx6vOXlt/yYGMpa2a9IrOF0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kbNSWQKPdycdQAR8BiDGMEGSdXF66hzHOYL3Fs8sb2apZphTATSqzreZL1/po1bIyabuwsBr+98liYAvEkKpNUq2tP8z/QeL94aIKrSXs+NV1wkJGQmRg75ojM5Dv70AWq35O4V8tjd2ovfDVXPJEk9653vKc8SgsDZF5bTwNLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bWV9ECM9; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753362207; x=1784898207;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Z9yx0Znel3PZgr0veP+u6wAz+0Rq+E1+JLEXc+hdjsc=;
-  b=bWV9ECM9Ur5xB89dQzRFEwJ/PacL+ilxmHNnik/gCgzTeMbZL6WGUeBp
-   q6PFNI5N7bivNBMGPKX7cV0DG7nOIKDAIvbRBpJExTVKlf14Kptye0Qzp
-   2Ee/abuGzFxmEDkd40dLab2zxPbNlASqcpQ9FUoT3pBQuU5i2T88OOpiN
-   Xl4xxJsYmzbaf1VbLhPhZm1S+rzcV1bJEy8AXyLPLgTjvWGQb5at03r3y
-   uZOORBtn3RP3BHjGY6pPCGkhKY00gRWhjWLvHB4gxFdPSQdCzKolawpQh
-   kx+7oKV3+Nakwyx+coaZt9jgCorWufXt5zTm7gADRTXBkGaSdhN3XcMG3
-   Q==;
-X-CSE-ConnectionGUID: FgWUIOz+S1OyoIp3p8/yqw==
-X-CSE-MsgGUID: 5jvRY66CROGHVZurRC5nHg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11501"; a="55524712"
-X-IronPort-AV: E=Sophos;i="6.16,337,1744095600"; 
-   d="scan'208";a="55524712"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2025 06:03:26 -0700
-X-CSE-ConnectionGUID: qpFF78SRRAqtYYzAokPyjA==
-X-CSE-MsgGUID: ARtbnSpRRXOw8IE+ng+FtQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,337,1744095600"; 
-   d="scan'208";a="160515373"
-Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
-  by fmviesa009.fm.intel.com with ESMTP; 24 Jul 2025 06:03:24 -0700
-Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uevbW-000KS7-08;
-	Thu, 24 Jul 2025 13:03:22 +0000
-Date: Thu, 24 Jul 2025 21:02:39 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kees Cook <kees@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, Kees Cook <kees@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH 3/6 net-next] net: Convert proto_ops bind() callbacks to
- use sockaddr_unspec
-Message-ID: <202507242032.e0sbPWI4-lkp@intel.com>
-References: <20250723231921.2293685-3-kees@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nyh6ixSw5iKPKdtVOHcXTpwEq3VygSHaYDcoCgsGbY+lXgKYMyPeC6rVopO81fuHuIWJwQ6mmLTL77OQLK5BjJ9cHq50qRu+ID738IdreCi7YWIDCtdomkyVeYvpePDCDIS/NtfiAfZFzxqywzZ7eLffUvO4UF4uzFgfGeL89Vk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MX21IWN3; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=Pry+UWl4/PhjwuL0w/0sUZRIxTvRnGADRC+HIcDB7CM=; b=MX
+	21IWN3VrE6rdcjbsKU9L27IlOde7srx59LJG4qgzkhuFu0gJuTCUQrYiLRd4oPsQuHLMeL6HXO/Mg
+	wEnM9kP2V5Ui1HWdBowHjNR9SEy9Z3+IVfrmu5hseZc7owCvxt4PXhSNygTJce23VEoa/m6olhQ9e
+	DOT5zrabggA85wk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uevcS-002lGI-P8; Thu, 24 Jul 2025 15:04:20 +0200
+Date: Thu, 24 Jul 2025 15:04:20 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tiezhu Yang <yangtiezhu@loongson.cn>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/2] net: stmmac: Return early if invalid in
+ loongson_dwmac_fix_reset()
+Message-ID: <623de96b-61f8-45af-a3aa-520f61e318a4@lunn.ch>
+References: <20250723100056.6651-1-yangtiezhu@loongson.cn>
+ <20250723100056.6651-2-yangtiezhu@loongson.cn>
+ <f65deb0d-29d1-4820-95e9-f1dd94967957@lunn.ch>
+ <b98a5351-f711-ecb1-75fa-68c69263e950@loongson.cn>
+ <5ef8ae99-256e-8ff7-861f-025e7b7cfb6f@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250723231921.2293685-3-kees@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5ef8ae99-256e-8ff7-861f-025e7b7cfb6f@loongson.cn>
 
-Hi Kees,
+On Thu, Jul 24, 2025 at 05:05:57PM +0800, Tiezhu Yang wrote:
+> On 2025/7/24 上午10:26, Tiezhu Yang wrote:
+> > On 2025/7/23 下午10:53, Andrew Lunn wrote:
+> > > On Wed, Jul 23, 2025 at 06:00:55PM +0800, Tiezhu Yang wrote:
+> > > > If the MAC controller does not connect to any PHY interface, there is a
+> > > > missing clock, then the DMA reset fails.
+> 
+> ...
+> 
+> > > > +    if (value & DMA_BUS_MODE_SFT_RESET)
+> > > > +        return -EINVAL;
+> > > 
+> > > What happens with this return value? Do you get an error message which
+> > > gives a hint the PHY clock is missing? Would a netdev_err() make sense
+> > > here?
+> > 
+> > Yes, I will use dev_err() rather than netdev_err() (because there is no
+> > net_device member here) to do something like this:
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> > b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> > index 6d10077666c7..4a7b2b11ecce 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> > @@ -513,8 +513,11 @@ static int loongson_dwmac_fix_reset(void *priv,
+> > void __iomem *ioaddr)
+> >   {
+> >          u32 value = readl(ioaddr + DMA_BUS_MODE);
+> > 
+> > -       if (value & DMA_BUS_MODE_SFT_RESET)
+> > +       if (value & DMA_BUS_MODE_SFT_RESET) {
+> > +               struct plat_stmmacenet_data *plat = priv;
+> > +               dev_err(&plat->pdev->dev, "the PHY clock is missing\n");
+> >                  return -EINVAL;
+> > +       }
+> > 
+> >          value |= DMA_BUS_MODE_SFT_RESET;
+> >          writel(value, ioaddr + DMA_BUS_MODE);
+> 
+> Oops, the above changes can not work well.
+> 
+> It can not use netdev_err() or dev_err() to print message with device info
+> in loongson_dwmac_fix_reset() directly, this is because the type of "priv"
+> argument is struct plat_stmmacenet_data and the "pdev" member of "priv" is
+> NULL here, it will lead to the fatal error "Unable to handle kernel paging
+> request at virtual address" when printing message.
 
-kernel test robot noticed the following build errors:
+Maybe it would be better to change fix_soc_reset() to have struct
+stmmac_priv * as its first parameter. There are not too many user of
+it, so it is not too big a change.
 
-[auto build test ERROR on next-20250723]
-[also build test ERROR on v6.16-rc7]
-[cannot apply to net-next/main bluetooth-next/master bluetooth/master brauner-vfs/vfs.all mkl-can-next/testing mptcp/export mptcp/export-net trondmy-nfs/linux-next linus/master v6.16-rc7 v6.16-rc6 v6.16-rc5]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+>         ret = stmmac_reset(priv, priv->ioaddr);
+>         if (ret) {
+> +               if (ret == -EINVAL)
+> +                       netdev_err(priv->dev, "the PHY clock is missing\n");
+> +
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kees-Cook/net-uapi-Add-__kernel_sockaddr_unspec-for-sockaddr-of-unknown-length/20250724-072218
-base:   next-20250723
-patch link:    https://lore.kernel.org/r/20250723231921.2293685-3-kees%40kernel.org
-patch subject: [PATCH 3/6 net-next] net: Convert proto_ops bind() callbacks to use sockaddr_unspec
-config: x86_64-buildonly-randconfig-003-20250724 (https://download.01.org/0day-ci/archive/20250724/202507242032.e0sbPWI4-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250724/202507242032.e0sbPWI4-lkp@intel.com/reproduce)
+The problem with this is, you have no idea if EINVAL might of come
+from somewhere else.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507242032.e0sbPWI4-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   net/packet/af_packet.c: In function 'packet_bind_spkt':
->> net/packet/af_packet.c:3340:33: error: 'struct __kernel_sockaddr_unspec' has no member named 'sa_data_min'; did you mean 'sa_data'?
-    3340 |         char name[sizeof(uaddr->sa_data_min) + 1];
-         |                                 ^~~~~~~~~~~
-         |                                 sa_data
-   net/packet/af_packet.c:3351:52: error: 'struct __kernel_sockaddr_unspec' has no member named 'sa_data_min'; did you mean 'sa_data'?
-    3351 |         memcpy(name, uaddr->sa_data, sizeof(uaddr->sa_data_min));
-         |                                                    ^~~~~~~~~~~
-         |                                                    sa_data
-   net/packet/af_packet.c:3352:28: error: 'struct __kernel_sockaddr_unspec' has no member named 'sa_data_min'; did you mean 'sa_data'?
-    3352 |         name[sizeof(uaddr->sa_data_min)] = 0;
-         |                            ^~~~~~~~~~~
-         |                            sa_data
-   net/packet/af_packet.c:3340:14: warning: unused variable 'name' [-Wunused-variable]
-    3340 |         char name[sizeof(uaddr->sa_data_min) + 1];
-         |              ^~~~
-   net/packet/af_packet.c:3355:1: warning: control reaches end of non-void function [-Wreturn-type]
-    3355 | }
-         | ^
-
-
-vim +3340 net/packet/af_packet.c
-
-^1da177e4c3f41 Linus Torvalds      2005-04-16  3331  
-^1da177e4c3f41 Linus Torvalds      2005-04-16  3332  /*
-^1da177e4c3f41 Linus Torvalds      2005-04-16  3333   *	Bind a packet socket to a device
-^1da177e4c3f41 Linus Torvalds      2005-04-16  3334   */
-^1da177e4c3f41 Linus Torvalds      2005-04-16  3335  
-40570133fbb3ba Kees Cook           2025-07-23  3336  static int packet_bind_spkt(struct socket *sock, struct sockaddr_unspec *uaddr,
-40d4e3dfc2f56a Eric Dumazet        2009-07-21  3337  			    int addr_len)
-^1da177e4c3f41 Linus Torvalds      2005-04-16  3338  {
-^1da177e4c3f41 Linus Torvalds      2005-04-16  3339  	struct sock *sk = sock->sk;
-b5f0de6df6dce8 Kees Cook           2022-10-18 @3340  	char name[sizeof(uaddr->sa_data_min) + 1];
-^1da177e4c3f41 Linus Torvalds      2005-04-16  3341  
-^1da177e4c3f41 Linus Torvalds      2005-04-16  3342  	/*
-^1da177e4c3f41 Linus Torvalds      2005-04-16  3343  	 *	Check legality
-^1da177e4c3f41 Linus Torvalds      2005-04-16  3344  	 */
-^1da177e4c3f41 Linus Torvalds      2005-04-16  3345  
-^1da177e4c3f41 Linus Torvalds      2005-04-16  3346  	if (addr_len != sizeof(struct sockaddr))
-^1da177e4c3f41 Linus Torvalds      2005-04-16  3347  		return -EINVAL;
-540e2894f79055 Alexander Potapenko 2017-03-01  3348  	/* uaddr->sa_data comes from the userspace, it's not guaranteed to be
-540e2894f79055 Alexander Potapenko 2017-03-01  3349  	 * zero-terminated.
-540e2894f79055 Alexander Potapenko 2017-03-01  3350  	 */
-b5f0de6df6dce8 Kees Cook           2022-10-18  3351  	memcpy(name, uaddr->sa_data, sizeof(uaddr->sa_data_min));
-b5f0de6df6dce8 Kees Cook           2022-10-18  3352  	name[sizeof(uaddr->sa_data_min)] = 0;
-^1da177e4c3f41 Linus Torvalds      2005-04-16  3353  
-6ffc57ea004234 Eric Dumazet        2023-05-26  3354  	return packet_do_bind(sk, name, 0, 0);
-^1da177e4c3f41 Linus Torvalds      2005-04-16  3355  }
-^1da177e4c3f41 Linus Torvalds      2005-04-16  3356  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+	Andrew
 
