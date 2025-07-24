@@ -1,114 +1,110 @@
-Return-Path: <netdev+bounces-209651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08CEFB10272
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 09:55:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56D99B102BC
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 10:03:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50894AA2DAF
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 07:55:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E33B11CE1A8E
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 08:04:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1C4826FA6E;
-	Thu, 24 Jul 2025 07:55:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51E4C21D5BC;
+	Thu, 24 Jul 2025 08:03:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="EG1CoS/4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GAERuU3D"
 X-Original-To: netdev@vger.kernel.org
-Received: from out.smtpout.orange.fr (out-18.smtpout.orange.fr [193.252.22.18])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C75BA2459D7;
-	Thu, 24 Jul 2025 07:55:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C21742153F1
+	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 08:03:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753343734; cv=none; b=ZyP6+V2rbxCt/3yjcA26/fk1rAOUcdwN1CCR7a7NO3rI+cbv+ueVdpUlmGy0A1Pz29p0UO36fVBoSmeKSaV9urs1niBCSbjzhFDg/GDuM3TEkTFSj12fmREaZFREbNUJL327YL0gEEgKpBdP8JPc2lflOZQ2VrYUOJ994GGGS90=
+	t=1753344205; cv=none; b=V31T/BC8YsW73Pks1SJviA9M9kjYTXygk7cPGjPmzUMb0lGRTbJvX/uI5A2DutM4uwky5lyWLkkfy2foX1rvrPr7t1Z9ozIG/ACJUa3TQSVqQXIeIDTGeHQPDSZ2GiiuuzTpIo07YvQgx0QCPPIucWJI5sKrAes6yZNr9Ac8cMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753343734; c=relaxed/simple;
-	bh=cDTS6SYvBpPoIL6qy2wUnozxKfGX2b9UFGGUmOYX9E8=;
+	s=arc-20240116; t=1753344205; c=relaxed/simple;
+	bh=UJieD3EE3q0kc+37pyAjaBrkau4zswjG7oQNF3HamPs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JuV0mvsiDTILBm2A/uUse66llnF2qMPou8impfwvnzsfaCbRY7kQJhSwGOYPtYLyMYJZa/+dOJSBtkOQGe4jZ1nahpeNESwGEJ1eSm3yHW2KNKeGiN4ulnRNaY/wY0EptaEgRqcSKalVpbPYKR2bBhzEGugyOhDjGnIsNWHoBFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=EG1CoS/4; arc=none smtp.client-ip=193.252.22.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from mail-ed1-f49.google.com ([209.85.208.49])
-	by smtp.orange.fr with ESMTPA
-	id eqmPuEdCwpTm4eqmPudItl; Thu, 24 Jul 2025 09:54:17 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1753343657;
-	bh=14MnTsuJbjYYjuvpSxaOGuOPMJUCYT5/HxNBySMFn6s=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To;
-	b=EG1CoS/4cW00UU2VHatFDn+scY1jNyJIfImzfiybNl0SOdfiWPJNp8uBsmJhT+xWA
-	 HMkSOw4FfKc3+HgqVfwB2vX+CPRarbdXwd4SgdROoE2gp9KFDizXNHTaUO1kVt6Cvz
-	 c91boGFK1TT6FRMxgxGRyRKCY/f11yck1+MOt+cGzGtkmgYVsN9voey2lV8g6HGH4p
-	 Q4PiJxaifsL/saOfStBI0PkErUtdPx27+sbGKHbF8b+hdFXWxuMoqm5UBpFt9Esfi7
-	 D7R6R5/9QAw/NRLJL1L0JL+hNgEVc+GgnZ9j28cBoEnkxR/rJBm50F9oopPNOj1NGc
-	 vwwVtDKf+Nu0w==
-X-ME-Helo: mail-ed1-f49.google.com
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Thu, 24 Jul 2025 09:54:17 +0200
-X-ME-IP: 209.85.208.49
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-60c9d8a169bso1249524a12.1;
-        Thu, 24 Jul 2025 00:54:17 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUK9EvTKcyM+i6s8YfbHe6+6fOp4vr26PmkTKEwym3J7tSlv4nBtsH5oLJxUo7cDdfutwBPn6pn@vger.kernel.org, AJvYcCXK65NsBuAaSm9XHZmjn+2A0Kf4LEA6Wykw2namWRKCHS4EA2UNcMnjHipYEf3WNDwaFAyrVlH6XrM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpqhXqrF+4BW4nA33VygUYwfpNILAawrv9xksMd7Y9gJPzqMaj
-	L8Q5cSlkXLfECJeChrmSXvSZyLD4p9EZZft+pZyhgGLEQOkwXF7PQZceeGjMlwb1nJpoTu8PlJn
-	c8bMLPJngWzrJsMJoE7/y0UmLQfl+pqU=
-X-Google-Smtp-Source: AGHT+IEnYtNYk9rHB5umYhZiK5re5ZuGyEu0gh8JHlA3YimeF4fDr+Y1nEvKG5Kr5gjN4v2Px9e8kskJSrWe4wO7Pvw=
-X-Received: by 2002:a17:907:2d0e:b0:af2:aa60:90c with SMTP id
- a640c23a62f3a-af2f917a878mr594584066b.53.1753343656906; Thu, 24 Jul 2025
- 00:54:16 -0700 (PDT)
+	 To:Cc:Content-Type; b=BVK5Q7x5Xk1sn29/n505PrOVNQxxwbbVysY+w+FKtXb49bEWtSVFRnXXzOMqv+9aM9xoSB7UPL8QiVSJxDF0btjNVEH/4sAsaL9oMZNrxTxXPlt9RA5zwLS0esRlJfAQB8BA9hDhPozHjB0FX/8Ck0PR4tGMqX4vqXRPz1fQ+do=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GAERuU3D; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4ab53fce526so10468081cf.2
+        for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 01:03:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753344203; x=1753949003; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UJieD3EE3q0kc+37pyAjaBrkau4zswjG7oQNF3HamPs=;
+        b=GAERuU3DfDLJjC32xjU6lqLAJNgdwMC+cPnpn5o4YDZ9p6GxRzB2YtYEy2yvI/KL6X
+         sE8qCowiJuKsHCF76YDGzdVznj1uA2RLHiVzJ8T54EXiK5xWvoUm+INsuMUzylMj/6e0
+         VwPGgH0Z1Lb6v1Wm9y/E872MJjItDGuvC29fq2Rf2Vd3+uymEofCjRErxytfSQpFFCMP
+         aMHLRl+51M6XVhewC0DFyngqRsWJ9dg7H3SRwVdWR5Jyo0KJx9w9Jic8T9+e/SrWqxRi
+         904RG67IjURmg6b0CWg+LpkFBShFdCJp8j1ZNPA3mo5GWXm3eVBwXEIAW+SDo/+hkoGD
+         1PbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753344203; x=1753949003;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UJieD3EE3q0kc+37pyAjaBrkau4zswjG7oQNF3HamPs=;
+        b=iLEI6/54w6DnfMGhjqWng6dRAAo0FuUOlFfhqYNHOoi34djEh0YB7bdVZ7QDTqEe/8
+         VT5oRVxsUzGYd+Z1uR0zrdge4glu/afFVa2Erl7wWGqQjRpDkIDw9FduiTjCqEIw3y7P
+         SCvbk8kBm2NGMjGVWByxQeHl3vQ/NWK7xQQUZAfpHVqfpJYbxUuB7GSsPY/1p0U8RkEf
+         i2XbE2BzC7S7Dkgnmr+vRW+xHIsTPHztR2+zEqvfWuCa+hIav5TyfcV6cgE93GixaYI1
+         H1YiFCf3/xkOdn2E8BY28RkYnJ8juNyLQI8lHAWH7Mi0EvZIci7+Ok09CKuY6nRcKSlZ
+         taZg==
+X-Forwarded-Encrypted: i=1; AJvYcCXqVPoZOWO+HqjE2e//eB4m39vI7bCLWHeJSkPn+MuO47iuWZFN9Uv7SmTcjZwlJ1mqvj4f4Jg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzoH9rKXclZfvt2Mfq3++tPXYocvDFf7TOihnS8OLBg2IMU+Dhy
+	zbCGsZldkb9fuLT8/MUKzfq0Nv9F4dgzw+Qq3y+VMn99fgrShUijtUQS5C3sf12qWYOoZ8OdbEl
+	j4iBuQMZ+pyiQ6G+5kGrQuKl0XxsBrFDEFERbSIX2
+X-Gm-Gg: ASbGnctXjHHIe5bVo1djAdsxxn3BzGT7IQePRsAUS8S8H3LD5OdrAvF7Y5N6MKKNxWq
+	OUIhIvY48Ub6FQHhMPw0QjZroUVZ5OCSvNCc2aPlNVS0ZQIm0F4M+VkoBbg7UQRMwhwnzwh4IJM
+	rIwXxxJFqc5djSFeejmSIGbSzTiLx10mwHUWNjQvzIXroVvhyCRyOQeDtDecfY2/dinGl6r1eH2
+	Jnv8r64gweUHAbPGw==
+X-Google-Smtp-Source: AGHT+IFl+oT1jF7k/9kW1TUUtdhW5Kibpj0coT3C4jfrr8flV4/eU2Q2qfxVAhDslrYzyWWRcnR4dIMOVpUk7b5NvR8=
+X-Received: by 2002:ac8:5f8e:0:b0:4ae:6b72:2ae9 with SMTP id
+ d75a77b69052e-4ae6df8a4d9mr81016401cf.43.1753344202234; Thu, 24 Jul 2025
+ 01:03:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250724063651.8-1-extja@kvaser.com> <20250724063651.8-6-extja@kvaser.com>
- <a88f2cfa-69e1-400e-ad67-01ae83f3f9f6@gmail.com>
-In-Reply-To: <a88f2cfa-69e1-400e-ad67-01ae83f3f9f6@gmail.com>
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Date: Thu, 24 Jul 2025 16:54:04 +0900
-X-Gmail-Original-Message-ID: <CAMZ6RqKdTX0++J_TKGkK8=1mLwC3xE3ZZws85tvzv9bmvZRM0w@mail.gmail.com>
-X-Gm-Features: Ac12FXyesHczDBDxjhk8yCZQ22LKEQJyryYbN5LEtfcIsyXouvLlVlz3AX4v46o
-Message-ID: <CAMZ6RqKdTX0++J_TKGkK8=1mLwC3xE3ZZws85tvzv9bmvZRM0w@mail.gmail.com>
-Subject: Re: [PATCH v2 05/10] can: kvaser_pciefd: Store device channel index
-To: Jimmy Assarsson <jimmyassarsson@gmail.com>
-Cc: Jimmy Assarsson <extja@kvaser.com>, linux-can@vger.kernel.org, 
-	Marc Kleine-Budde <mkl@pengutronix.de>, netdev@vger.kernel.org
+References: <20250723082201.GA14090@hu-sharathv-hyd.qualcomm.com>
+ <CANn89iLx29ovUNTp9DjzzeeAOZfKvsokztp_rj6qo1+aSjvrgw@mail.gmail.com> <7ffcb4d4-a5b4-4c87-8c92-ef87269bfd07@quicinc.com>
+In-Reply-To: <7ffcb4d4-a5b4-4c87-8c92-ef87269bfd07@quicinc.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 24 Jul 2025 01:03:11 -0700
+X-Gm-Features: Ac12FXyrVFqHSu-_ClF5-JvN6QWWlq8ElHrMSLpKYWIT9YmGy6cJaULEsLkaWhU
+Message-ID: <CANn89iJwM2-rueNzEdOOUuTF7DV=yT+qAFUJsEDqiMJzdjf=-g@mail.gmail.com>
+Subject: Re: [PATCH] net: Add locking to protect skb->dev access in ip_output
+To: Sharath Chandra Vurukala <quic_sharathv@quicinc.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org, quic_kapandey@quicinc.com, 
+	quic_subashab@quicinc.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu. 24 Jul. 2025 at 16:09, Jimmy Assarsson <jimmyassarsson@gmail.com> wrote:
-> On 7/24/25 8:36 AM, Jimmy Assarsson wrote:
-> > Store device channel index in netdev.dev_port.
-> >
-> > Fixes: 26ad340e582d ("can: kvaser_pciefd: Add driver for Kvaser PCIEcan devices")
-> > Signed-off-by: Jimmy Assarsson <extja@kvaser.com>
-> > ---
-> > Changes in v2:
-> >    - Add Fixes tag.
-> >
-> >   drivers/net/can/kvaser_pciefd.c | 1 +
-> >   1 file changed, 1 insertion(+)
-> >
-> > diff --git a/drivers/net/can/kvaser_pciefd.c b/drivers/net/can/kvaser_pciefd.c
-> > index 7153b9ea0d3d..8dcb1d1c67e4 100644
-> > --- a/drivers/net/can/kvaser_pciefd.c
-> > +++ b/drivers/net/can/kvaser_pciefd.c
-> > @@ -1028,6 +1028,7 @@ static int kvaser_pciefd_setup_can_ctrls(struct kvaser_pciefd *pcie)
-> >               can->completed_tx_bytes = 0;
-> >               can->bec.txerr = 0;
-> >               can->bec.rxerr = 0;
-> > +             can->can.dev->dev_port = i;
-> >
-> >               init_completion(&can->start_comp);
-> >               init_completion(&can->flush_comp);
+On Wed, Jul 23, 2025 at 11:16=E2=80=AFPM Sharath Chandra Vurukala
+<quic_sharathv@quicinc.com> wrote:
 >
-> Would it be better to submit this as a separate patch, or keep it within
-> this patch series?
+>
+> Thanks Eric for the review, as this work is already underway on your end,=
+ I=E2=80=99ll pause and wait for your changes to become available.
 
-Even if this is a bug, I see no urgency to it, so I am happy to have
-this goes first to netdev-next and is picked-up by stable later on.
-Doing the opposite would require you to split and seems more
-troublesome.
+Hi Sharath
+
+I think you definitely can send a patch, I was not trying to say you
+could not do it.
+
+Just pointing out what the plan was :)
+
+Feel free to use my suggested patch, test it and send a V2
+
+Thanks.
 
