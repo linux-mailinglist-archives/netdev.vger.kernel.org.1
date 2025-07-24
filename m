@@ -1,162 +1,124 @@
-Return-Path: <netdev+bounces-209864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93324B11185
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 21:18:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 429C6B111D6
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 21:40:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFCBFAC7A2B
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 19:18:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A799AE76A1
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 19:39:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C40C3255F59;
-	Thu, 24 Jul 2025 19:18:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71C652ED848;
+	Thu, 24 Jul 2025 19:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bMilg8s0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l1N7PnLR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98186223716;
-	Thu, 24 Jul 2025 19:18:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E562EA462
+	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 19:40:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753384710; cv=none; b=JklaO3GC/zVPQ1JZMWRBeuhgLjz2teG3SAXvXqj06036rUvZi9wZDbvw9JWg+b/nWzEMpyza8qsL8OgVaKomE743nzrW1o13Ne25UumDMaZhTLIzAws8VsGOs1dofg9xKk8JMZcdtcSct5IFmxs8kfywGYEukcmuOxQ0J30xhPM=
+	t=1753386005; cv=none; b=J8Sq74OGoLWxfEw+Pt2X/alXrsQ09yrT2bA4Q0tWpU9V1Y7s+rZVON1ANV3GGsYaXREgyqJsoFjLiW4eO/g7ms0GAvrzzWB6hIyY3HEW0v5muYh1aShSuHt95FeScYbS6rjmfjzROfT32Z7blwB+ZvM5yY90o9ydP2tcJ0KkLfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753384710; c=relaxed/simple;
-	bh=96NDcSkGoKkonGb7HasgH/sPNvDPQZGRkcnd/45IH2g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tPL3D4pXvlunsFrYsg1QI9rsDok/nVRO8Xei6rIg3O4B6IxzxLBF73cyPqeJayWuH0R7hteQeSYFVGYsz0ZG4SmNCGE7Va2UmRgEsvPe5X1Ij6v3SaLAGAqzKatQEoWKHBieC+GpJ8m4jTNgWpeP5Hc8L4C8FBLsna5PlDqBKOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bMilg8s0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1030C4CEED;
-	Thu, 24 Jul 2025 19:18:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753384710;
-	bh=96NDcSkGoKkonGb7HasgH/sPNvDPQZGRkcnd/45IH2g=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=bMilg8s05Bs20kgd4SoMISyw4h2FnyksR35JPXU/U2RhKi52jl4IkzNhHJlz9E913
-	 EdyVGCRq1LmxtoyAGUs0r0P0ksv3pEZgE1+zFnMpl/ntdaau2s4l9EcJ+yUyGE2z+t
-	 Q43LNVDwA6jXWy+qAviGFxhrXE7xe0fCr+XA/6RaJwUJiAdne9a1StBTuNUsWDTYJ3
-	 b8rg6PTNy7e3v6Q4lZg9CyoWejfpAeq7xd6Y7vkiiHxn459QNTgTY9BVpgkqvM/iHW
-	 hj9T9jhwgS7DhX2G2jO7pEzAhI7fV92LVb88E73QmBpMO5VimiVOUpuzMWFrcLtFgz
-	 OIqQ4/x2VlDXw==
-Message-ID: <296d6846-6a28-4e53-9e62-3439ac57d9c1@kernel.org>
-Date: Thu, 24 Jul 2025 21:18:24 +0200
+	s=arc-20240116; t=1753386005; c=relaxed/simple;
+	bh=n+VnwJnyhr06eEF9YeKG/lQVmaosrJ28cWF8TH17r7s=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=aJ9xY66s9IkxD2IPPjHlLdITGJd/qd6QJavk10OSdSLE81SiUu2cSHIW2N6EgnLpRFADcBhOyQyPE8H+TAzSVk5Dw8fvSPtwzN/T3i9JYJOa1WZoRz/EH0xMGzQHjAj7jisAug5Y7rX5LmdFn9ZnDuWccc8q+r5c1NpDa0HbRZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l1N7PnLR; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-313fab41f4bso2061501a91.0
+        for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 12:40:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753386003; x=1753990803; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MT3US+bSsiRPpBfgacosyMnvRd6+ev4eL6XBjJ43g54=;
+        b=l1N7PnLRChjEHgaG/5vx1du3E/utMcHFl5RDMws3cYn5t/qqwkMykNvaGRpMpxRZvi
+         /SUDVbKp8Laa7fiQ9JUg1ACGS2aRpWrzOGZCS3FtRdF2l5JSBLd7XG5pnSoDrNkINv60
+         UaiSAw5uLdahVnGZ/UQp2b5kfLhfkoQifSlRja+v3AZSWj8SGBZpJ2/WGIraxSjPFJsD
+         /jbYR7KmKIcWlRImbZpZM3LGJkqNwJA3CcZwqgfJL534sIpSCfLFG6x2OEmFDgK4PQAU
+         oKEcL3JaTN2czxarOwaS4WeClgcvyPxJOdYeuZj3S7JzjQcpD0MVs+C9MYvXwnKacyEC
+         j6HA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753386003; x=1753990803;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MT3US+bSsiRPpBfgacosyMnvRd6+ev4eL6XBjJ43g54=;
+        b=M08VHrcch7w8EDx5BIOHWdni3UySPjnS8QVikcQ4+gPJ/NcaSrS4tuJfNLxo6V4E2Q
+         oezRomG37UfZtdOEwEwVRlXxJKVnISZuu/544fldNOyHWU0pAOFUymAt6u5ubcSPt2xM
+         pWnmHdRWapmWTGlLASLcz6hByd8HYqrd77SJgdhr3/zmttgdPaQvjvk6YRqOUVbQWjAt
+         yVV2T9lPTTOsroduDtHrtyQPfd4+qGivDXA+/XeS9LXrETvDGjjbGet0Ade4uxkviKV6
+         hwMM/gn9Ci5rAn9QLzjxfOWep4hea3YbqY6LndhTAo4GKT47QkDgPPHC3ni2Yc14ASN2
+         b4/A==
+X-Forwarded-Encrypted: i=1; AJvYcCW3VR7C7ooJRK86ljXCbOzfCJJlSq3mHnaV6EZqK5WyeJ8S0DyNteSsjT/8mzCXWRrl+Bgnhds=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzO6/C1dYzjNQmac97W89egv/Dr7B/X9VLzDrF6j3ueaqTOnScl
+	skhh1hzrptxwLzr8rl2e8UrPfKrXZyHGXNSDsZegYUFHaVcSGd/n8qPNiYQCXmgbdvwI/gPwITk
+	s38bwxQ==
+X-Google-Smtp-Source: AGHT+IEt4cWZEBwF3nwLnebBhOCNAoJqHTWbMAwCsGmdP0mt84Z8oNC+l7KSBI1MUHxQBJzvHx0NAjX7rvM=
+X-Received: from pjzz6.prod.google.com ([2002:a17:90b:58e6:b0:313:274d:3007])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:588b:b0:311:fde5:e224
+ with SMTP id 98e67ed59e1d1-31e5078f4ecmr12925337a91.6.1753386003226; Thu, 24
+ Jul 2025 12:40:03 -0700 (PDT)
+Date: Thu, 24 Jul 2025 19:38:58 +0000
+In-Reply-To: <20250724184050.3130-15-ouster@cs.stanford.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/5] net: rpmsg-eth: Add basic rpmsg skeleton
-To: MD Danish Anwar <danishanwar@ti.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Mengyuan Lou
- <mengyuanlou@net-swift.com>, Michael Ellerman <mpe@ellerman.id.au>,
- Madhavan Srinivasan <maddy@linux.ibm.com>, Fan Gong <gongfan1@huawei.com>,
- Lee Trager <lee@trager.us>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Lukas Bulwahn <lukas.bulwahn@redhat.com>,
- Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250723080322.3047826-1-danishanwar@ti.com>
- <20250723080322.3047826-3-danishanwar@ti.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
- cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
- JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
- gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
- J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
- NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
- BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
- vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
- Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
- TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
- S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
- FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJoF1BKBQkWlnSaAAoJEBuTQ307
- QWKbHukP/3t4tRp/bvDnxJfmNdNVn0gv9ep3L39IntPalBFwRKytqeQkzAju0whYWg+R/rwp
- +r2I1Fzwt7+PTjsnMFlh1AZxGDmP5MFkzVsMnfX1lGiXhYSOMP97XL6R1QSXxaWOpGNCDaUl
- ajorB0lJDcC0q3xAdwzRConxYVhlgmTrRiD8oLlSCD5baEAt5Zw17UTNDnDGmZQKR0fqLpWy
- 786Lm5OScb7DjEgcA2PRm17st4UQ1kF0rQHokVaotxRM74PPDB8bCsunlghJl1DRK9s1aSuN
- hL1Pv9VD8b4dFNvCo7b4hfAANPU67W40AaaGZ3UAfmw+1MYyo4QuAZGKzaP2ukbdCD/DYnqi
- tJy88XqWtyb4UQWKNoQqGKzlYXdKsldYqrLHGoMvj1UN9XcRtXHST/IaLn72o7j7/h/Ac5EL
- 8lSUVIG4TYn59NyxxAXa07Wi6zjVL1U11fTnFmE29ALYQEXKBI3KUO1A3p4sQWzU7uRmbuxn
- naUmm8RbpMcOfa9JjlXCLmQ5IP7Rr5tYZUCkZz08LIfF8UMXwH7OOEX87Y++EkAB+pzKZNNd
- hwoXulTAgjSy+OiaLtuCys9VdXLZ3Zy314azaCU3BoWgaMV0eAW/+gprWMXQM1lrlzvwlD/k
- whyy9wGf0AEPpLssLVt9VVxNjo6BIkt6d1pMg6mHsUEVzsFNBFVDXDQBEADNkrQYSREUL4D3
- Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
- MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
- OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
- GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
- 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
- YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
- 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
- BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
- JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
- 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
- YpsFAmgXUF8FCRaWWyoACgkQG5NDfTtBYptO0w//dlXJs5/42hAXKsk+PDg3wyEFb4NpyA1v
- qmx7SfAzk9Hf6lWwU1O6AbqNMbh6PjEwadKUk1m04S7EjdQLsj/MBSgoQtCT3MDmWUUtHZd5
- RYIPnPq3WVB47GtuO6/u375tsxhtf7vt95QSYJwCB+ZUgo4T+FV4hquZ4AsRkbgavtIzQisg
- Dgv76tnEv3YHV8Jn9mi/Bu0FURF+5kpdMfgo1sq6RXNQ//TVf8yFgRtTUdXxW/qHjlYURrm2
- H4kutobVEIxiyu6m05q3e9eZB/TaMMNVORx+1kM3j7f0rwtEYUFzY1ygQfpcMDPl7pRYoJjB
- dSsm0ZuzDaCwaxg2t8hqQJBzJCezTOIkjHUsWAK+tEbU4Z4SnNpCyM3fBqsgYdJxjyC/tWVT
- AQ18NRLtPw7tK1rdcwCl0GFQHwSwk5pDpz1NH40e6lU+NcXSeiqkDDRkHlftKPV/dV+lQXiu
- jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
- zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
- XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20250723080322.3047826-3-danishanwar@ti.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250724184050.3130-15-ouster@cs.stanford.edu>
+X-Mailer: git-send-email 2.50.1.470.g6ba607880d-goog
+Message-ID: <20250724194001.1623075-1-kuniyu@google.com>
+Subject: Re: [PATCH net-next v12 14/15] net: homa: create homa_plumbing.c
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: ouster@cs.stanford.edu
+Cc: edumazet@google.com, horms@kernel.org, kuba@kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 23/07/2025 10:03, MD Danish Anwar wrote:
-> This patch introduces a basic RPMSG Ethernet driver skeleton. It adds
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Thu, 24 Jul 2025 11:40:47 -0700
+> diff --git a/net/homa/homa_plumbing.c b/net/homa/homa_plumbing.c
+> new file mode 100644
+> index 000000000000..694eb18cde00
+> --- /dev/null
+> +++ b/net/homa/homa_plumbing.c
+> @@ -0,0 +1,1115 @@
+> +// SPDX-License-Identifier: BSD-2-Clause
 
-Please do not use "This commit/patch/change", but imperative mood. See
-longer explanation here:
-https://elixir.bootlin.com/linux/v5.17.1/source/Documentation/process/submitting-patches.rst#L95
+IANAL, but I think this file is also licensed under GPL-2.0 from
+the doc below (and as you state by MODULE_LICENSE()), so you
+may want to follow other similar files throughout this series.
 
-> support for creating virtual Ethernet devices over RPMSG channels,
-> allowing user-space programs to send and receive messages using a
-> standard Ethernet protocol. The driver includes message handling,
-> probe, and remove functions, along with necessary data structures.
+  $ grep -rnI SPDX net | grep GPL | grep BSD
+
+
+Documentation/process/license-rules.rst
+---8<---
+The license described in the COPYING file applies to the kernel source
+as a whole, though individual source files can have a different license
+which is required to be compatible with the GPL-2.0::
+
+    GPL-1.0+  :  GNU General Public License v1.0 or later
+    GPL-2.0+  :  GNU General Public License v2.0 or later
+    LGPL-2.0  :  GNU Library General Public License v2 only
+    LGPL-2.0+ :  GNU Library General Public License v2 or later
+    LGPL-2.1  :  GNU Lesser General Public License v2.1 only
+    LGPL-2.1+ :  GNU Lesser General Public License v2.1 or later
+
+Aside from that, individual files can be provided under a dual license,
+e.g. one of the compatible GPL variants and alternatively under a
+permissive license like BSD, MIT etc
+---8<---
+
+
 > 
+> +MODULE_LICENSE("Dual BSD/GPL");
 
-
-...
-
-> +
-> +/**
-> + * rpmsg_eth_get_shm_info - Get shared memory info from device tree
-> + * @common: Pointer to rpmsg_eth_common structure
-> + *
-> + * Return: 0 on success, negative error code on failure
-> + */
-> +static int rpmsg_eth_get_shm_info(struct rpmsg_eth_common *common)
-> +{
-> +	struct device_node *peer;
-> +	const __be32 *reg;
-> +	u64 start_address;
-> +	int prop_size;
-> +	int reg_len;
-> +	u64 size;
-> +
-> +	peer = of_find_node_by_name(NULL, "virtual-eth-shm");
-
-
-This is new ABI and I do not see earlier patch documenting it.
-
-You cannot add undocumented ABI... but even if you documented it, I am
-sorry, but I am pretty sure it is wrong. Why are you choosing random
-nodes just because their name by pure coincidence is "virtual-eth-shm"?
-I cannot name my ethernet like that?
-
-Best regards,
-Krzysztof
 
