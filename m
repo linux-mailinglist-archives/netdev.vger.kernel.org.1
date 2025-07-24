@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-209586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B66D0B0FE99
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 04:01:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2493AB0FE9C
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 04:01:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E713A5881A0
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 02:01:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAE9EAA63E6
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 02:00:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15C901D8DE1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA64E1DE8AD;
 	Thu, 24 Jul 2025 02:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DT8YoktX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oOd1gkEu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16D51D63C6;
-	Thu, 24 Jul 2025 02:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B8A1DE2DC;
+	Thu, 24 Jul 2025 02:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753322427; cv=none; b=hwkPl2LEXJ3IVhKeieNBIufaCKOl4VE6DNsSkjGrKnPTwNibeWFzLxhT5ArgX0NCEBhj/8hmYm50PNJh+YEkI7vkpIyn/LieVtS7RSGee+09nB/ilnQWTQllGm1Ig8xVWM5FqrgZCtUlFOw9M5KYSANwgpBxBigLLCnag/INIxY=
+	t=1753322427; cv=none; b=hU8zEp1SdjJRi4JR1phaPJEXjV0vPoU7hZn8b9XE+Coq4+bWokY581drtLr+/Q73Lw2FDDCYga4dA2QBkVcIpKqHordbApHFT4M7CoN6sIoPRNIWQre379lsoPAP5jahnKlbpGkwMg+GIuPPHgvbYTzDtEb2g2qqUSOhTcGtWt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1753322427; c=relaxed/simple;
-	bh=vW1Y82bQz5Cnb0iD9jSF+gH9byMYZIWwv4s7PFcNCv4=;
+	bh=2ReRg3n4hrA7gWArFH3HjuQScWTdVpvWDBx4Ru+OhBQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cQKlRfIYAmCnkAdR/lYlvzMTt/3pJj1dWa/D6VQoNxnXv/rRTxwy3tbisddjmPkbdLFda59klOuUi1mC1TA1Psli7B5maMfKjNipABX+xVfj7pyxcFYVRsk/aplrb5I1mrBFZdh0vOBPxfxBXyV66WQ3jF9tcGavvsj1M5Cf7g4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DT8YoktX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F455C4CEE7;
-	Thu, 24 Jul 2025 02:00:26 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=dQGds1xtKeP4BXMbfSD1+oh23LQSRtrYexLBnDjX2ZALa7sp3Q+lijFpOIPPmZHgBHvFqGHxThhxh+pZkh2zGbeUOOemyU6dLSuAJQncy6iwvw/xdIz7ziaa5ooASOJQfo8hxIL8/GyDnCZIGz5HSck/xwHg5CHT0WjAkbW04WE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oOd1gkEu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0F03C4CEF4;
+	Thu, 24 Jul 2025 02:00:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753322426;
-	bh=vW1Y82bQz5Cnb0iD9jSF+gH9byMYZIWwv4s7PFcNCv4=;
+	s=k20201202; t=1753322427;
+	bh=2ReRg3n4hrA7gWArFH3HjuQScWTdVpvWDBx4Ru+OhBQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DT8YoktXzkQW9yfEzPUCG0UyswGa5KjG7w2pMnMkA1wacjof4OtSoyYF5Uwa2kUfX
-	 RzCsC0xMl1GAGgCDgGJW9rVY2gfbtBa7hAAu4L3p2f95kpMfU2B54yI7Gbq8UdIxPw
-	 FNOFgEDfhR1AfWKju2ypfeHJJsvmSj2CFuIdbSKAQN0be8i+qE42HdeNqGy43DepXP
-	 0k/0n3jcRAmBQFGv3us2zvxbuRxAmj4HWER+71apunJ41sIAU0IfbvnZJse20Fb307
-	 CsZKEVYpOyiMBWcK6TGBLbygGj8om8mls/HczCYRpmwR7qEbqgn+uzkD9bMunlbFCY
-	 6iOJW2Q6hHfBQ==
+	b=oOd1gkEuDAsKqHRHVFb5Ul2vZ/YXU/iosqu5lAjOh7iT/s/yZCvjYLqL935ILv57f
+	 /W+93hj2f4FobEnnsjbWL0utpGkNrUCBUAXERpd2BvrXcsYEqiQoOKeykrOqR6LX39
+	 2sAPsgI/UdTLrI1F3aV7KNFdaZ8CvVUzHRUFAQl9rGjCfv0C/yD793ABGHlAYc8/Y1
+	 ZtNRY7IS8igg8ssrnxJ6QAtWSSOLSI3yMTJW9gJJwlvhP4QrX6p3BKKJGFL6op/Lpx
+	 RsiL4cmoeIqfj8katFocQK+Mup+lZmvgWploeNc5WMLxnqUe8ufgYm8GcLwghjcqLV
+	 TYlaZBn08V4Ww==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC7F383BF4E;
-	Thu, 24 Jul 2025 02:00:45 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD41383BF4E;
+	Thu, 24 Jul 2025 02:00:46 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,60 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v26 net-next 0/6] DUALPI2 patch
+Subject: Re: [PATCH net-next] vxlan: remove redundant conversion of vni in
+ vxlan_nl2conf
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175332244424.1844642.13296732935919605611.git-patchwork-notify@kernel.org>
-Date: Thu, 24 Jul 2025 02:00:44 +0000
-References: <20250722095915.24485-1-chia-yu.chang@nokia-bell-labs.com>
-In-Reply-To: <20250722095915.24485-1-chia-yu.chang@nokia-bell-labs.com>
-To: Chia-Yu Chang (Nokia) <chia-yu.chang@nokia-bell-labs.com>
-Cc: alok.a.tiwari@oracle.com, pctammela@mojatatu.com, horms@kernel.org,
- donald.hunter@gmail.com, xandfury@gmail.com, netdev@vger.kernel.org,
- dave.taht@gmail.com, pabeni@redhat.com, jhs@mojatatu.com, kuba@kernel.org,
- stephen@networkplumber.org, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- davem@davemloft.net, edumazet@google.com, andrew+netdev@lunn.ch,
- ast@fiberby.net, liuhangbin@gmail.com, shuah@kernel.org,
- linux-kselftest@vger.kernel.org, ij@kernel.org, ncardwell@google.com,
- koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com,
- ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
- cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
- vidhi_goel@apple.com
+ <175332244575.1844642.14095040782507524061.git-patchwork-notify@kernel.org>
+Date: Thu, 24 Jul 2025 02:00:45 +0000
+References: <20250722093049.1527505-1-wangliang74@huawei.com>
+In-Reply-To: <20250722093049.1527505-1-wangliang74@huawei.com>
+To: Wang Liang <wangliang74@huawei.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, razor@blackwall.org, idosch@nvidia.com,
+ petrm@nvidia.com, menglong8.dong@gmail.com, yuehaibing@huawei.com,
+ zhangchangzhong@huawei.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 22 Jul 2025 11:59:09 +0200 you wrote:
-> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+On Tue, 22 Jul 2025 17:30:49 +0800 you wrote:
+> The IFLA_VXLAN_ID data has been converted to local variable vni in
+> vxlan_nl2conf(), there is no need to do it again when set conf->vni.
 > 
-> Hello,
-> 
->   Please find the DualPI2 patch v26.
-> 
->   This patch serise adds DualPI Improved with a Square (DualPI2) with following features:
-> * Supports congestion controls that comply with the Prague requirements in RFC9331 (e.g. TCP-Prague)
-> * Coupled dual-queue that separates the L4S traffic in a low latency queue (L-queue), without harming remaining traffic that is scheduled in classic queue (C-queue) due to congestion-coupling using PI2 as defined in RFC9332
-> * Configurable overload strategies
-> * Use of sojourn time to reliably estimate queue delay
-> * Supports ECN L4S-identifier (IP.ECN==0b*1) to classify traffic into respective queues
-> 
-> [...]
+> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+> ---
+>  drivers/net/vxlan/vxlan_core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [v26,net-next,1/6] sched: Struct definition and parsing of dualpi2 qdisc
-    https://git.kernel.org/netdev/net-next/c/320d031ad6e4
-  - [v26,net-next,2/6] sched: Dump configuration and statistics of dualpi2 qdisc
-    https://git.kernel.org/netdev/net-next/c/d4de8bffbef4
-  - [v26,net-next,3/6] sched: Add enqueue/dequeue of dualpi2 qdisc
-    https://git.kernel.org/netdev/net-next/c/8f9516daedd6
-  - [v26,net-next,4/6] selftests/tc-testing: Fix warning and style check on tdc.sh
-    https://git.kernel.org/netdev/net-next/c/51217c659e74
-  - [v26,net-next,5/6] selftests/tc-testing: Add selftests for qdisc DualPI2
-    https://git.kernel.org/netdev/net-next/c/032f0e9e15a4
-  - [v26,net-next,6/6] Documentation: netlink: specs: tc: Add DualPI2 specification
-    https://git.kernel.org/netdev/net-next/c/68db0ff2f76a
+  - [net-next] vxlan: remove redundant conversion of vni in vxlan_nl2conf
+    https://git.kernel.org/netdev/net-next/c/918c675b208d
 
 You are awesome, thank you!
 -- 
