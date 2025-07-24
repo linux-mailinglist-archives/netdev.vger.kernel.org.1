@@ -1,163 +1,125 @@
-Return-Path: <netdev+bounces-209723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D0DEB10958
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 13:38:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CE12B109A2
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 13:53:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 867647B57C8
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 11:37:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68A33AA7E4E
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 11:53:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2605D283FDD;
-	Thu, 24 Jul 2025 11:38:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF482BE625;
+	Thu, 24 Jul 2025 11:53:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fUeDQzul"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="CRZpcCTm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48738283FDE
-	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 11:38:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A21CC2BD5AE
+	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 11:53:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753357095; cv=none; b=uaSe69R9UOxddy+JhxJAziO2iw9ihzpTaAbIoQ2nRoRwxvLroRuBh0rxjfutId0oP8gWPuK9HfHaJTBJ9PdOV8mhmLrHafQpR6fedIgIzTOrtZnjs0xbtv2VY5A+JG6omNqwtVywsYZlbul8HFT3/gSkXoKe6v193+vid8jixYA=
+	t=1753358025; cv=none; b=JZo9xn4HdSnD+nSKc7HZ44j4OPvAwg/BoNL3S2QwHoAQmtoF1i4M+pEfhTZP5GV9qGvQKS6B9puzmoaTF1kEQgpv5Cx1mxjYtP0bzL/pBGPuGrMPEdth2aBUs4nYN3wIGjaRb/BAWxZNOy3ttfSXh9MesxV1MySRcAG7+kGrQd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753357095; c=relaxed/simple;
-	bh=45FaSWcT2H/J/lWN6laN5MjJAEyxRPSxwgKdw545+gM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VmZwu2PkGnUDoAshX5a9b6j5zcuqOIhN8WhQHJOqW97VZeXctQfergYGGbdtocKfE4rDihaIvIFhl/gQJfQrACn+MyeKapYoFr0j9K1qqTplw7g9Y5GedwhJOYW8ReiOj8MW3WQ+efscoOCEZLap8Gp8yBUaigwBPQGJUyvwexE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=fUeDQzul; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-456053b5b8cso304565e9.3
-        for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 04:38:12 -0700 (PDT)
+	s=arc-20240116; t=1753358025; c=relaxed/simple;
+	bh=aH6Ar9GHWtsswV8u4kFF7shHo7PRvGwiNA17hs0hWKE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=d4URPEait7/GkfeULRUdFRX2s4rY7qk389GvSAihnw0BawAYpKnH0S2UNdhgC8s2FTfnQPxSWJ5UEKtEdVXgKfUG59rt5TsFDSpz8LxHsAs8+2jbkzV/uQBjPXeQM0xw+QvyB8K3K7VSG44NCLDrS8+FvRPDm0L9JaN4JUggkhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=CRZpcCTm; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-60c4f796446so1543763a12.1
+        for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 04:53:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1753357091; x=1753961891; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7SfT/H0IaQgoJ9/m5uHIPysxAkedCZccNPDptMCSI2Y=;
-        b=fUeDQzulOE2OF4JpbpuxPI+M6XTpLzppdkgTLwraVXNH2fsFHY95kZaA9ySWCsa+I7
-         SmBadUQU+AyA5EH/CRMr38oN7HgXJMArRWIlZgBn0u0T+a/J5zC2mSOqm32kMvZmZMoX
-         ZtyIuZcnxpVEWV7K9lH1CYiCvvfk8KE57TVf5um61EhMGYt8snSvh5zrhgpbS2sTdYN0
-         FQ4v1OyadpRUBlMLqK0CfuJZYWJ89mtTTcxc7lfcV/3E0GFDaYIaqmYldLkD1UFRAWi4
-         hB3J9Vt0YnmXEV+wJxY0M5cFu0Jn7Qg8ooYXAOjLhK0nXA+NIz02nvSWF/Vqr8lcQ1+T
-         0eQw==
+        d=cloudflare.com; s=google09082023; t=1753358022; x=1753962822; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aH6Ar9GHWtsswV8u4kFF7shHo7PRvGwiNA17hs0hWKE=;
+        b=CRZpcCTmWp0aHJ4+3sD34EiTBymCffdONG+c53brTzRDwoSHrdS86Fu6Y8Ri+B8CWY
+         dG1h7L+7MM92w+3haILE/JzO9NE+k6UwnZ2Wmynccg23Gk1+xrACwpFccyyZvnAIuXS5
+         Up32Mwb0Q4uWB7i2E/Chpi2f0tbRCsaDwL8R6COfPdZScd7/FpU4pxJn7d6ttqE/uE2b
+         x1pATkZrD2PGDFN0iK07cWhPa4dn2tXuJc62Osxj2LIlCbtyQBP1qBnHOFlIj61619i+
+         X7/SKbhw4hkTCW+tB7id5coBhaD0MCxUL474XP0V++TAuHvTaOUguAVbAtGRzi0Bva42
+         NmkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753357091; x=1753961891;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7SfT/H0IaQgoJ9/m5uHIPysxAkedCZccNPDptMCSI2Y=;
-        b=CpEQetbW16AEmqjlradj+xRvbhl4qkdgblnKypgxrDb3lQ2XPxy3M5gRdRiFFL3OxD
-         503YL08TpAcyMrILJTLXXvEa7xMe5uJm/elvnfY8m0GUttox+Yhme6M3Z5mccanoRuFD
-         MdoKlr2na4e0pIhVbAUHf9g9160bW85e/Xak0BvUJNTS0EZETquZy8zvW1JzfWV8XKa1
-         ZtVanbBKjFDbF/ba2O81ExNwNlKy28yTjSAEgSqN1SvpYCbBWuo1++s1Y55nv64zcz+Y
-         hDvckGjc7w4B0VUZXwnCCOXMdGsUu90MJefksE9wT9u0L49rStcFrW1rS38LRBdzYJ1k
-         2dqA==
-X-Forwarded-Encrypted: i=1; AJvYcCXcgbHBZWBUUe4Ch+ZH04hpY2PFN41xruh1q3wy7EhIaZVkkcYOeQGWWkZdt78fPBZW+aTjmxU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgRkPd8oznmW8iucojBAJdqS1xEKGg/dYnVXHUnXRGKAquKk/F
-	5Ms5Luln2BWy2gsObeGob3odmE+6XMD61etYlWKTmMspS/Iotgu+WfDg2AkAo0+3G78=
-X-Gm-Gg: ASbGncvT5hpyYvyXSEjFr27p8GkARbQoU08UlqIajNGYS+gQ7FYyijLbQLAhbkCpcXH
-	/1HjTMW6LSTqYXD9g6jC29tddf2P+j+OQdBCghtFBj+ae0cRD9ZP1E6YK5Ao2sHxWx+EDJe7tUJ
-	NnpLmWM+vAzn5JkWnw91zbBUu7KBPHy/iEwuLaYSRyaW0Cf11nWp+b0nKUbXOZ3x8gXL3DoEslB
-	bktcMT2Ond41gIJK/te/v22vtxKRmjjCQDuNr+/i3Fe/5+cNmaVC8GDruwA2Yv5Vh9jbcYrPwDN
-	82gFAwGazdRDIG6gtWosFfw7evyVElwTVZq2kv+aAj2GmGVPKOA6rns4Su93BZl+lmrMQJZ59Bi
-	eDJsas+cu0x/Uf+hYzt2JUZw5VYJGSSSlcNeV8KfNl1g=
-X-Google-Smtp-Source: AGHT+IGloTURxwE1dU+QnMLX51vNMCm0IjURW0xHmmC87uccnrc9zCjlEuHTvSB3XoKDYy1Q98b1Vg==
-X-Received: by 2002:a05:600d:11:b0:456:4bb5:c956 with SMTP id 5b1f17b1804b1-45868d6b4ccmr22625275e9.7.1753357091441;
-        Thu, 24 Jul 2025 04:38:11 -0700 (PDT)
-Received: from kuoka.. ([178.197.203.90])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-458704aaf20sm18329565e9.0.2025.07.24.04.38.10
+        d=1e100.net; s=20230601; t=1753358022; x=1753962822;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aH6Ar9GHWtsswV8u4kFF7shHo7PRvGwiNA17hs0hWKE=;
+        b=M0oXBqK/3VbTZHw0qe0jgiF1wXl4W2YMxC6QUYIjz2NrSsklV8Lgp6KHhD6owidFDX
+         FLm0i7kdM7Lh93e1hHOAIuckMQb+VMFa+PTrJ23fthu/v3rFvVrq2PObgojY0KLj5iLu
+         DlO6yZgPLWNNCoU4S4H2CsDC43QfShJRF7yX7SPgiMBVxkUl/YbGjxF5xJtuxVc0AIYp
+         2OK+QPVt7h/WKWUS1CiwzEhVOFpsTIoD99flrGbPcaSENz3auaHY4Ef8Vm8XqI78Nri8
+         o00gPzBY6tTQq068U4C1Cof0NEFRPdjJ7XqVaCMkmVjZ/+gHogOJ9SQILGIh+biO1tLx
+         roJg==
+X-Forwarded-Encrypted: i=1; AJvYcCV/iwlo4xfu9PVZhEvmwPYzsqgCAvrSXyuKJ4qoIxJiM5i74A8vIaQAPEfzL1Li57Zf5bcECow=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUxlW13H7M/8NG+K5a32TDjEblm2cQE2FfBEEAfWrzclJrTLA5
+	D9MAeeOe93i1dZgLPBCimDBAziCTZqGdtr3kj8RvkUWCQohDoVNOvVSAYOEtFFjZaRg=
+X-Gm-Gg: ASbGncv4OospmF5EYGMQ4FKw06kJAEEmsUGY8UXOMT5qzWUOltLVt6oCcIXm5EocQE0
+	2kfyHLZPNGYPSQr4cDWFvnuO9JhEEkp64DOiNV5/lmDUbn+AOLEwy7iZ6wH0M9lxqSpjzVSurOd
+	H6qMYj7w2P3xB3i79srJrjwb5HP854R+iCDRdGwJ5VYHEylXU6pl/dZ8YGdjdT+w6y/tcyZrzd+
+	afbEoWKkgwmrC0oFdDhLfnjTftE8uk4AK2ZnzI/zY8C22RISKod3/lts112nYakZAlgBgA1nLL5
+	uIsxGXIludDG9xO6+cAS/fFruNHmzQGWaxqjSv/mKg9HpfNsBp2sJbUO6Q2/rB0WYbHymvrZPOg
+	inRvaIsWlcIU7qjo=
+X-Google-Smtp-Source: AGHT+IE17Bjl2cnReWZbrPPef0EzIcx/i/mQa82oS5HBV7CB/Znkd6ax1Jo0J7MnGxskvFX2IdGWtA==
+X-Received: by 2002:a05:6402:26c6:b0:60e:b01:74c1 with SMTP id 4fb4d7f45d1cf-6149b5a6b3fmr5364767a12.31.1753358021862;
+        Thu, 24 Jul 2025 04:53:41 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:5f])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-614cd0f64besm764185a12.16.2025.07.24.04.53.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Jul 2025 04:38:10 -0700 (PDT)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To: Michael Hennerich <michael.hennerich@analog.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Marcelo Schmitt <marcelo.schmitt@analog.com>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH net-next] dt-bindings: net: Replace bouncing Alexandru Tachici emails
-Date: Thu, 24 Jul 2025 13:37:59 +0200
-Message-ID: <20250724113758.61874-2-krzysztof.kozlowski@linaro.org>
-X-Mailer: git-send-email 2.48.1
+        Thu, 24 Jul 2025 04:53:41 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: bpf@vger.kernel.org,  Alexei Starovoitov <ast@kernel.org>,  Andrii
+ Nakryiko <andrii@kernel.org>,  Arthur Fabre <arthur@arthurfabre.com>,
+  Daniel Borkmann <daniel@iogearbox.net>,  Eduard Zingerman
+ <eddyz87@gmail.com>,  Eric Dumazet <edumazet@google.com>,  Jesper Dangaard
+ Brouer <hawk@kernel.org>,  Jesse Brandeburg <jbrandeburg@cloudflare.com>,
+  Joanne Koong <joannelkoong@gmail.com>,  Lorenzo Bianconi
+ <lorenzo@kernel.org>,  Martin KaFai Lau <martin.lau@linux.dev>,  Toke
+ =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <thoiland@redhat.com>,  Yan Zhai
+ <yan@cloudflare.com>,
+  kernel-team@cloudflare.com,  netdev@vger.kernel.org,  Stanislav Fomichev
+ <sdf@fomichev.me>
+Subject: Re: [PATCH bpf-next v4 2/8] bpf: Enable read/write access to skb
+ metadata through a dynptr
+In-Reply-To: <20250723173038.45cbaf01@kernel.org> (Jakub Kicinski's message of
+	"Wed, 23 Jul 2025 17:30:38 -0700")
+References: <20250723-skb-metadata-thru-dynptr-v4-0-a0fed48bcd37@cloudflare.com>
+	<20250723-skb-metadata-thru-dynptr-v4-2-a0fed48bcd37@cloudflare.com>
+	<20250723173038.45cbaf01@kernel.org>
+Date: Thu, 24 Jul 2025 13:53:40 +0200
+Message-ID: <87tt31x0sb.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1901; i=krzysztof.kozlowski@linaro.org;
- h=from:subject; bh=45FaSWcT2H/J/lWN6laN5MjJAEyxRPSxwgKdw545+gM=;
- b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBoghsWBEmBafEeHRtRGJFliMCpvIzCTxrEH8ZE6
- 7sbsMzYYZuJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCaIIbFgAKCRDBN2bmhouD
- 116PD/9ml2y2WOFTg7mpMdyOnPb4/iF/0R5DE4b95e7QeX7tBhleeGN/7Cd2ezr1mSTS43lCIv+
- uoY2XPUEyGDufj4rC7NZyFluis69FFz3NYp7WGMNEuweiGeUseSqrWZD4jAd9h/nMkGYLURamG5
- zuw67L+EeUxRxFQz3tBlexhbO9eBF0LrVjZdyrrdkl/bMCCgOohRbIiT0dJJg6Tfnx4T2w11Xep
- U1WYD1CxMfMckGlC6s4V6CSL1gMBvdTxb2VyCgmBd/1xVWKGNcnFrdTyXY87paz54rZ39t+3N+H
- gMHUJ2rvuRYdD7FZVubJ0TkNwBlwexhJKsPLLz+1nHNhIldx5Hxd1T+m2Zc2AdQ2f6rW+IsiA35
- D/sDKShzFWXKn9LIFXYfEW0JgRTHHCkaVHAOqxwrssUWXIVQHQGU2PCLmvMTcI/QTTL2QPLHP2i
- 1xNJ3aWxWwfPjtC79BWjkEh77sqPMs+1CtAv94aDmRzYbXS/YbPUp+VIc56OpMy5TyowVmjjBdG
- Dn64rtb9nwVRaW3Gppou03B7Cybb/rUnZs/S7VdtoSAR0hJu1H3lKJMjQ51C5Fg7wqQuvEuNeR+
- 0TpW3ko9S+d/7U2gUB+xgZtEmZDOieWDC7EP4XY5zy8i2fzwi+FBWnw37V/25aNlcL5o+fma7SY pRkGEm3acQXAdtQ==
-X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp; fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Emails to alexandru.tachici@analog.com bounce permanently:
+On Wed, Jul 23, 2025 at 05:30 PM -07, Jakub Kicinski wrote:
+> On Wed, 23 Jul 2025 19:36:47 +0200 Jakub Sitnicki wrote:
+>> Now that we can create a dynptr to skb metadata, make reads to the metadata
+>> area possible with bpf_dynptr_read() or through a bpf_dynptr_slice(), and
+>> make writes to the metadata area possible with bpf_dynptr_write() or
+>> through a bpf_dynptr_slice_rdwr().
+>
+> What are the expectations around the writes? Presumably we could have
+> two programs writing into the same metadata if the SKB is a clone, no?
 
-  Remote Server returned '550 5.1.10 RESOLVER.ADR.RecipientNotFound; Recipient not found by SMTP address lookup'
+In this series we maintain the status quo. Access metadata dynptr is
+limited to TC BPF hook only, so we provide the same guarntees as the
+existing __sk_buff->data_meta.
 
-so replace him with Marcelo Schmitt from Analog.
+Current situation, as I understand it, is that while packet taps are not
+an issue, you could probably do naughty things with 'tc action mirred'
+and end up with concurrent writes.
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-
----
-
-I don't know who from Analog should maintain these devices, so I chosen
-author from Analog of one of last commits.
-
-Marcelo Schmitt, could you confirm that you are okay (or not) with this?
----
- Documentation/devicetree/bindings/net/adi,adin.yaml     | 2 +-
- Documentation/devicetree/bindings/net/adi,adin1110.yaml | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/Documentation/devicetree/bindings/net/adi,adin.yaml b/Documentation/devicetree/bindings/net/adi,adin.yaml
-index 929cf8c0b0fd..c425a9f1886d 100644
---- a/Documentation/devicetree/bindings/net/adi,adin.yaml
-+++ b/Documentation/devicetree/bindings/net/adi,adin.yaml
-@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
- title: Analog Devices ADIN1200/ADIN1300 PHY
- 
- maintainers:
--  - Alexandru Tachici <alexandru.tachici@analog.com>
-+  - Marcelo Schmitt <marcelo.schmitt@analog.com>
- 
- description: |
-   Bindings for Analog Devices Industrial Ethernet PHYs
-diff --git a/Documentation/devicetree/bindings/net/adi,adin1110.yaml b/Documentation/devicetree/bindings/net/adi,adin1110.yaml
-index 9de865295d7a..0a73e01d7f97 100644
---- a/Documentation/devicetree/bindings/net/adi,adin1110.yaml
-+++ b/Documentation/devicetree/bindings/net/adi,adin1110.yaml
-@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
- title: ADI ADIN1110 MAC-PHY
- 
- maintainers:
--  - Alexandru Tachici <alexandru.tachici@analog.com>
-+  - Marcelo Schmitt <marcelo.schmitt@analog.com>
- 
- description: |
-   The ADIN1110 is a low power single port 10BASE-T1L MAC-
--- 
-2.48.1
-
+Taking about the next step, once skb metadata is preserved past the TC
+hook - here my impression from Netdev was that the least suprising thing
+to do will be to copy-on-clone or copy-on-write (if we can pull it off).
 
