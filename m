@@ -1,127 +1,337 @@
-Return-Path: <netdev+bounces-209772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24BE3B10BAB
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 15:38:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE08DB10BCA
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 15:44:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 016137A3342
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 13:36:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0ECEAE554A
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 13:43:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB1B12D6638;
-	Thu, 24 Jul 2025 13:37:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 447062D641C;
+	Thu, 24 Jul 2025 13:44:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IbXbdoWl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iwH+QRRE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7A0E2741A1
-	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 13:37:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753364274; cv=none; b=KYf0/PnFy0VEvQhkBB7l7h4/Vv1i5Lk+r2dec/HTA/OGVl56YUftc6aZ/CjBYQxz6fKrgZ2a/Wj2SwIB+DRpg1Bz7Id2hYY0U1ImChvyjdKDPkVKzDGcdLf9l5tzOce0E/LJz+dN5reAObrFOCqBfJKjH2cd71q0RjeqOvBW9YI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753364274; c=relaxed/simple;
-	bh=wyW1+aAuMGqDsX9ZH3or0rzHcWvzot1QAO3bxcNViSk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mupVzMwla04MQZ+MgEV1BZUq+upXBVPsDJWP2WBOQwze4KjlyQxB1P4OmasxDqF8XZHvXWz9pY5hYaWRMRnN99uN/Kcz/8h7I2spPriBc6N7TmAIGQ59H+3kWi037eSt1PdHawzWWXexua3bkhcbPqiaNY+7sz48QaSYevIstVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IbXbdoWl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD92FC4CEED;
-	Thu, 24 Jul 2025 13:37:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753364274;
-	bh=wyW1+aAuMGqDsX9ZH3or0rzHcWvzot1QAO3bxcNViSk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IbXbdoWlhdITtoWCWqiI9LATJtzJWoAoQ+2PVuCA/XpRJY3Lyttgim4e1+LVDp2we
-	 nX4SWuuOB20/9vKmkbChexUyY8MtE5K2xUjehAn7LisT4kRhY9yNxskRx22iBH1kve
-	 E48tYob2gX0HfjEARlnNsq28Cx/NPxxcyFObiT4X7kpCXMcwqOU4gbFLQ0UDX+VYeC
-	 TV9Ko8/NW9JFcuLEhsJ+NtaeNVv8TIoyXpUXudYqX9dgcXlsFgNWsixPJWEPVR8Wmw
-	 S5305iyXMU/n+cgwmabP2yXFY2aHOc7Aaxs5tCWn5MOeDNZY3T3rTPHQluG1sLy3PN
-	 igW6Agez9uIDQ==
-Date: Thu, 24 Jul 2025 14:37:47 +0100
-From: Simon Horman <horms@kernel.org>
-To: Daniel Zahka <daniel.zahka@gmail.com>
-Cc: Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
-	Boris Pismenny <borisp@nvidia.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Neal Cardwell <ncardwell@google.com>,
-	Patrisious Haddad <phaddad@nvidia.com>,
-	Raed Salem <raeds@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v5.0 16/19] net/mlx5e: Configure PSP Rx flow
- steering rules
-Message-ID: <20250724133747.GN1150792@horms.kernel.org>
-References: <20250723203454.519540-1-daniel.zahka@gmail.com>
- <20250723203454.519540-37-daniel.zahka@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A111A2D94B2
+	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 13:44:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753364646; cv=fail; b=rP8CqHQRKhsMYNDt244iwCVj9PABdkPYVw3SRi99iIa77rCseL34//boRyeOn0yvOd44Mu1GmMNNeHcWbtFV0VN8Wp0ONEnfkAgbe9VBc0BlX83UnD/G6bG/nH41cXLhZoGGM2ZJHF1Z21xt9sJ3RCZZmhjnSY1kZDCI0IuTBJs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753364646; c=relaxed/simple;
+	bh=BT3VlG8FYImaP8VvMq9/aOK3axUO/ul9WegFe1kchEM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=DqA5mNHs7gb4IUjIARkQDRiABNkrA6ZZ0s5DS+XoQaHZwuEx/6FD7vBVBlOSWbY+VN3X/VN5/DQO7uiI1BfkXVpCyo0oO35EIUBjavvR4yh2186/fFg0zEJ1T3qKE8Gx2XjwRM6HnI3mWqEp0gL/Og3RF4yYFAUqQ1Lz8Yz/K1Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iwH+QRRE; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753364644; x=1784900644;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=BT3VlG8FYImaP8VvMq9/aOK3axUO/ul9WegFe1kchEM=;
+  b=iwH+QRREy6YhcGewFbrJZ5Y2NKJViGzwlsF+oqENG+QLeyg56SNMO9vc
+   e8TCO3pIBvEpd2d/TV66Gh1ykYEu//OJJ2L8dw8hI8NPwsEq/sTulYXAd
+   gK6NFD4cR2DJlt5sew5rNRlTp3z9Kp/DNChdBXEZ/UhN3/XfJHQvOHkyY
+   1Gr6Tq9K9tzsw+MgCvXE7tASzl4ypwCHi0OGOstIO9VXaP30pB86MLrSp
+   +HbtjS/q1LxoBx+6DmqyFQooBCXpSWyRAFvzKwaQ+4JULOVz526EkbvZd
+   /jVv+SSAIa+HEXSVeMB+VUY9xaI1gYEvIU5gBbC56RV9JK0xHGxR9SlzP
+   w==;
+X-CSE-ConnectionGUID: XF8FU4eJT0WKH9iZTOqF0g==
+X-CSE-MsgGUID: GCGVfxygT6OjhxR2dvgGiA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11501"; a="55553065"
+X-IronPort-AV: E=Sophos;i="6.16,337,1744095600"; 
+   d="scan'208";a="55553065"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2025 06:44:04 -0700
+X-CSE-ConnectionGUID: 9BjWyBFpSKGNVCUis3HkpQ==
+X-CSE-MsgGUID: nbDuFLU9T/K94IFOrjw7+g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,337,1744095600"; 
+   d="scan'208";a="159822044"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2025 06:44:02 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Thu, 24 Jul 2025 06:44:02 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26 via Frontend Transport; Thu, 24 Jul 2025 06:44:02 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (40.107.220.68)
+ by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Thu, 24 Jul 2025 06:44:02 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=U3xWfIMmll2bpbzXPZA4+2a0B7alvQAuUpsOHOPoztkuyUpmOlVeWtmoCGNFPNdfX++SvsphPiTV5MNf7AVvPsKmP62kaU3+fR/lKyzNi9c4x0gbJqwDbdAkr/2DMVeCw8gUCQSZOAHk8u+8shAOMSwA4mmOZSt4vuv128P2/a/t2z0xOseSJ6MHcsUG9xm1Vcq+VyqxXOvOS4aCVS0oPQyFfT7xK+PYeJ8XduxXvKksbP3mCMhMsXjKmbIc8dPC9FNKDDUrhv2v6HbUQ6+Oijr0NhNY3OyNWOuJCO22e/B6JuwtI7EHIaTtRf0Ys1BH2Xfe6+jUNyO7h5XBcI58Og==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=liS8byiN4UzSdaGSJ9X8wyQ55Z1RVQlMaHtZkbRCGjM=;
+ b=jVncBVG8XQ/puMXgHZ7m8Y1qE84dIepj0Z9L9WyclP+jRE/F7Ewu6b0MnQ+z+QBdqKlmGcYJ/RiNyfceYmaMx1C2bgGXPH7mfKrr3ZfEuNcsStc4MUApMxfUtrohdfVT8WESvY24tA4x12ktT60dirYb8pJx48+uJD/P2I1Y2pCZy/diaVROJndJ6rHK6zvLLJZuOrIIEOpCpw9/RCWgl9BIts/gNQV2IR9kPOp9Qt3Wyc5qW1Xz0zJz67yQJwIeUOb/azzwTBcYkFmysh01JeOU5qIjt/Xl5UtyVzem4/Mjyg9BaDp72Lqk29RkDqOA5YdudkYoBGSgcsMq3Yyj9A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by SN7PR11MB6875.namprd11.prod.outlook.com (2603:10b6:806:2a6::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.39; Thu, 24 Jul
+ 2025 13:44:00 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408%4]) with mapi id 15.20.8922.037; Thu, 24 Jul 2025
+ 13:44:00 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kubalewski, Arkadiusz"
+	<arkadiusz.kubalewski@intel.com>, "Korba, Przemyslaw"
+	<przemyslaw.korba@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "Olech, Milena" <milena.olech@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH v8 iwl-next] ice: add recovery clock and
+ clock 1588 control for E825c
+Thread-Topic: [Intel-wired-lan] [PATCH v8 iwl-next] ice: add recovery clock
+ and clock 1588 control for E825c
+Thread-Index: AQHb/JaXJJ6a9Z+VzUmZvPalwzcpHLRBSK5g
+Date: Thu, 24 Jul 2025 13:44:00 +0000
+Message-ID: <IA3PR11MB898644529A711CF9228CB65DE55EA@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20250724122736.3398010-1-grzegorz.nitka@intel.com>
+In-Reply-To: <20250724122736.3398010-1-grzegorz.nitka@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|SN7PR11MB6875:EE_
+x-ms-office365-filtering-correlation-id: e96c586e-5571-4610-e698-08ddcab8251a
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7053199007|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?pVpyslCnIgD5gZ7pmoNX8pAAYJ+NI5mEMNHtSDGhHf4cLAKKldYKQxgoxFAY?=
+ =?us-ascii?Q?0kpH5JcpWX+zOf+NkpoDfjmVOYhsTw6Ml9afn2VqGMNvvSf0wgxOuFY4Lvaf?=
+ =?us-ascii?Q?rFS3TYSkxlce3Pj8Ha9f4ez2tC88mg35JKkCMvtSdiHW4z4y9i9g6wGlPf/I?=
+ =?us-ascii?Q?p0VRGJU12NDAyHicX/z2TgcJdXhbW3hYRhFL9FZGbGMjlg7Ph41qvVelvX70?=
+ =?us-ascii?Q?bRxS9m1JU2vnLcD9zYs22TEe3xtohz0TefY072685PIzni8MrmIlMJIa6ksD?=
+ =?us-ascii?Q?Unhs8WwmWIhhAtl67jF6wjnxr/a2sRbWW8+/vF0tZprxP2uIfs2/g7dZkzxZ?=
+ =?us-ascii?Q?1TluLwMoE7la7IQ5f4TMbM1YYAHvwvJ7JweKZPXXYrArBQWVV4QqjVJVdZDJ?=
+ =?us-ascii?Q?uoZf3XMg9MgdRTW8fx1icG6DASrc84ANsXi+rRcvNZwrUAtWut71zZNxC/+t?=
+ =?us-ascii?Q?kCS4zts163TLxIc0icFNhmzdnE8dD7hrPDH2ekZVi9rEOHDqu09wPBjUUEfK?=
+ =?us-ascii?Q?58335B2vQt0ZBt+R2eG1sqS/+l8d1iQyx12G6e21byOizI9OFivio239jmaL?=
+ =?us-ascii?Q?EjLclyps37mLtTjGtxOVo3IhveXOTJyBeSQ7vgYs2GDdr+WNxUrYdCg+ZnDM?=
+ =?us-ascii?Q?zpT4/JJvyUYepNYOZ/5ClK6OndFKuRYt0CS9riRtuUIy9gdErq0L9sxhRBC1?=
+ =?us-ascii?Q?ej4zehq3PV3zQxYqCWtYkg91jXx3/UKBB9XJXAslsEh7/B7keOZlFju3uR7l?=
+ =?us-ascii?Q?PP+gonSSCYmhsfEptClH5F8uhM0ly7H/5rQLIuqbLpjgVvTzJpzCYKe4vERd?=
+ =?us-ascii?Q?ap8jM2sljf+Qdngj8dNtDUTBxRzC6DXZgA8ou/a4LhN10foV4SRaWeyWh8Ct?=
+ =?us-ascii?Q?st1O3KeVSZJG5MYymlNWSnr8JPkFdsy77uIxkv/uXo3A5rcHTkrekGbM54a9?=
+ =?us-ascii?Q?T6ceperslnN1XRN6jmcfeLJPtuO8FyIdGm6gjg+L2qQcHVba0F2VI1V2o8S0?=
+ =?us-ascii?Q?iZsTTr2ZXWuWD7/oZi4hVWs36KVdupc7thlG2HGYDFQjNHZ3aTeIxp7N6LE+?=
+ =?us-ascii?Q?Rl/xcJ2tmd43i2gY0oiD7dYuC7Y/z9mB1eJmqYtE+YIZ2hGoMQeOrOzFNsOx?=
+ =?us-ascii?Q?jtEjCvknaiYt4zZG4RUpEXIIwP1VxA9sB5kIRwd3GXXZa0xVK3JIA6jECh66?=
+ =?us-ascii?Q?WeuI1BIHD5fBNfoXphUG3Jp6hZIwnivUlgyQZSkj45+8HzHcRFBfT7yhDfj5?=
+ =?us-ascii?Q?QDx0m0kE+MsNDxuug8vuoS1Gw2JnqKr3A2s8/kC+zxuQX0TPJYqVgtEv3Xc7?=
+ =?us-ascii?Q?F77gHLZNbvB/XXmmcZq7C5UWWQFnpJm41f+Pia5lui0aE/suDNugs2DczADF?=
+ =?us-ascii?Q?CJxa4WE49QL9Oi1i1XNmXHm/Vp9oMVYw070xaYTpf2NP6Y/NEAevSub4TTV8?=
+ =?us-ascii?Q?nHSQ29xnBb7SR1GrZU3VAh0FapRwaCob4OSA8Agak2KREVrPiiSrfg=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7053199007)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?q04IUs+sKRgzbXOF4tg3leoHHy49KZ+OHDrFkMmnXGpxdUCHGSuHklC/EHMq?=
+ =?us-ascii?Q?mf+0oC181mPsddYmyNdVXPThhirsB5WOJrk7aC0DrZDowmJt1Sb45R4Z5XeM?=
+ =?us-ascii?Q?QMVbNEfv3hGXvdxO2krRG1h1d+gtZwr77it+sApwxW+llg6iVfuTzDINQncu?=
+ =?us-ascii?Q?spije1wmWyl1pc4CYesKUatlvRhZIfOnB2kVZOV3q/WSg9O0eJQ1iDkcUlCm?=
+ =?us-ascii?Q?CsTLSqrdVpouZ0w8lq4pT2xXsRob8xLsGdnRNKM6F97RQpCRW5hETKUV8wEn?=
+ =?us-ascii?Q?IWD5Bci2wjQzAw2pLPshij74zasWLn2jp+Fag1ck5E/xFwt9EFVx7R/6zpvx?=
+ =?us-ascii?Q?fOWihX00gX5Dsw7XmSEIgcWMnR2Wnb68kknKCWp3z9ATY3uP1WUstbeJhmtj?=
+ =?us-ascii?Q?DhkfDLE08qtSwzQ1JkR08XZw8RH35FRfmuNOCP5FTMUSgikmWJ9z+Bg2Lls8?=
+ =?us-ascii?Q?HZZ6Gjnc9MVwTKcT8eMWIn/ThNRtWheuY3m8DG132/mGjL8QBCXew5bylrdi?=
+ =?us-ascii?Q?FnCbhGh8cp9Se2NZnAI/UI2WOe/Me3M1crvBVepuP7gLZP4ox6YYR2hwz4Zl?=
+ =?us-ascii?Q?LIeSI9xf/aeT6tRdgcrBOEKQMe2yJd4uforB9LNlrHu8lNoYzXA03tza1iC0?=
+ =?us-ascii?Q?iQpiugRxoNBz3sVw9ViklQgZeBENwG1VWWD/QvMnbj6EeUD6JUHyO1+b4IKv?=
+ =?us-ascii?Q?Xbirha7Eb78iMavu4DCT1zkHaUHebY7lC64m7OO1dOEwIh4Bh2ImE1eoAVMb?=
+ =?us-ascii?Q?HIbzV1FRF/UIzW5sHvW3zpfjvoHcNrir8XZvQ0SNz2qzQLxMR07UmPVku6J/?=
+ =?us-ascii?Q?DPb2fKWvEnaBkB+DjiZCZi0UZ+5tuJHlcPvrUIs2qggZpU9nIgxRiDomV5nx?=
+ =?us-ascii?Q?nLy/JhVyb8iavxhnP50iID0+Yg/mxWLVMCwg6XTOtrzcpiL1XAJfZ0sQKLVV?=
+ =?us-ascii?Q?p5Y6osrBy520TRggeBChVApudQadmDmwaSpKHbxP5TbYwDeZCwWz40DtJG1c?=
+ =?us-ascii?Q?r/6LnU9bdpqkDEnDJmFLtP9TnWc4brpRVwS0Jbxstmbs2oab9KKL4GZdHT/5?=
+ =?us-ascii?Q?kNHdH27PQcjjyrOwole6s06ODbQaugIoDS6NzpnokBrRkJ6hE54buBJQIXku?=
+ =?us-ascii?Q?jWUk0urmLqUrA4pcywifS/aTQa1rBYwkxzbVSzFlChHwzsFwtaA4gpIXMWCF?=
+ =?us-ascii?Q?je2nzvkxXsJ0uZYa3ptnwdY5b0KqvpqNWDE+beFaYccmc9R7yRk3s+xV/aJP?=
+ =?us-ascii?Q?gTJdcyr9gzZIjIIPmxbVkXowez10wmy7kDDcNX/cUnd5Z+fPx+JiEoOgbfGm?=
+ =?us-ascii?Q?KKl/aFLeJU7Zuc6RW7b/4fOPUOqUBJj+n73cETs9HxRqNkvaY7LWyIlpQ6wc?=
+ =?us-ascii?Q?4BOp/oBlTBMtGKsQvbr3+Va8rHh0PmK3Un1d0sfkocYQ4WdXHiB3kmzbaCq8?=
+ =?us-ascii?Q?wUQSSz4OzKA5Qcd5dxT+U3kl+TQTY4Br7XMqN9vu/jSLOohEkC/dU8rZGz/c?=
+ =?us-ascii?Q?8LOJtW1w5Cs63pMLuaw9AI9AHt/p88xIOwNs/NpDxr8YTiiqcGSybqtFF52R?=
+ =?us-ascii?Q?HXYNn0qaujoOgQRzkkQjOD2kPTJu99n7GLcmcLYKzEwvC0mUOqq3KRXpQW0j?=
+ =?us-ascii?Q?uQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250723203454.519540-37-daniel.zahka@gmail.com>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e96c586e-5571-4610-e698-08ddcab8251a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Jul 2025 13:44:00.1459
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: qYSCOc54GbyndN39DSyKYb0xZInduzpSF+t5PaTOt41Sfw042rAemEWJcpMl3gOSLIJCU9YFP7SkGZ+NtndHXYrCBxB8oIDAkE84s7oKbdE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6875
+X-OriginatorOrg: intel.com
 
-On Wed, Jul 23, 2025 at 01:34:47PM -0700, Daniel Zahka wrote:
 
-...
 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_fs.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_fs.c
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> Of Grzegorz Nitka
+> Sent: Thursday, July 24, 2025 2:28 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Kubalewski, Arkadiusz
+> <arkadiusz.kubalewski@intel.com>; Korba, Przemyslaw
+> <przemyslaw.korba@intel.com>; Nguyen, Anthony L
+> <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; Olech, Milena <milena.olech@intel.com>
+> Subject: [Intel-wired-lan] [PATCH v8 iwl-next] ice: add recovery clock
+> and clock 1588 control for E825c
+>=20
+> From: Przemyslaw Korba <przemyslaw.korba@intel.com>
+>=20
+> Add control for E825 input pins: phy clock recovery and clock 1588.
+> E825 does not provide control over platform level DPLL but it provides
+> control over PHY clock recovery, and PTP/timestamp driven inputs for
+> platform level DPLL.
+>=20
+> Introduce a software controlled layer of abstraction to:
+> - create a DPLL of type EEC for E825c,
+> - create recovered clock pin for each PF, and control them through
+> writing to registers,
+> - create pin to control clock 1588 for PF0, and control it through
+> writing to registers.
+>=20
+> Usage example:
+> - to get EEC PLL info
+> $ ynl --family dpll --dump device-get
+> [{'clock-id': 0,
+>   'id': 6,
+>   'lock-status': 'locked',
+>   'mode': 'manual',
+>   'mode-supported': ['manual'],
+>   'module-name': 'ice',
+>   'type': 'eec'},
+> ...
+>   ]
+>=20
+> - to get 1588 and rclk pins info
+> (note: in the output below, pin id=3D31 is a representor for 1588 input,
+> while pins 32..35 corresponds to PHY clock inputs to SyncE  module) $
+> ynl --family dpll --dump pin-get
+> [{'board-label': 'CLK_IN_0',
+>   'capabilities': set(),
+>   'clock-id': 0,
+>   'id': 27,
+>   'module-name': 'ice',
+>   'parent-device': [{'direction': 'input',
+>                      'parent-id': 6,
+>                      'state': 'connected'}],
+>   'phase-adjust-max': 0,
+>   'phase-adjust-min': 0,
+>   'type': 'mux'},
+>  {'board-label': 'CLK_IN_1',
+>   'capabilities': set(),
+>   'clock-id': 0,
+>   'id': 28,
+>   'module-name': 'ice',
+>   'parent-device': [{'direction': 'input',
+>                      'parent-id': 6,
+>                      'state': 'connected'}],
+>   'phase-adjust-max': 0,
+>   'phase-adjust-min': 0,
+>   'type': 'mux'},
+>  {'board-label': 'pin_1588',
+>   'capabilities': {'state-can-change'},
+>   'clock-id': 0,
+>   'id': 31,
+>   'module-name': 'ice',
+>   'parent-pin': [{'parent-id': 27, 'state': 'disconnected'},
+>                  {'parent-id': 28, 'state': 'disconnected'}],
+>   'phase-adjust-max': 0,
+>   'phase-adjust-min': 0,
+>   'type': 'synce-eth-port'},
+>  {'capabilities': {'state-can-change'},
+>   'clock-id': 0,
+>   'id': 32,
+>   'module-name': 'ice',
+>   'parent-pin': [{'parent-id': 27, 'state': 'disconnected'},
+>                  {'parent-id': 28, 'state': 'disconnected'}],
+>   'phase-adjust-max': 0,
+>   'phase-adjust-min': 0,
+>   'type': 'synce-eth-port'},
+>  {'capabilities': {'state-can-change'},
+>   'clock-id': 0,
+>   'id': 33,
+>   'module-name': 'ice',
+>   'parent-pin': [{'parent-id': 27, 'state': 'disconnected'},
+>                  {'parent-id': 28, 'state': 'disconnected'}],
+>   'phase-adjust-max': 0,
+>   'phase-adjust-min': 0,
+>   'type': 'synce-eth-port'},
+>  {'capabilities': {'state-can-change'},
+>   'clock-id': 0,
+>   'id': 34,
+>   'module-name': 'ice',
+>   'parent-pin': [{'parent-id': 27, 'state': 'disconnected'},
+>                  {'parent-id': 28, 'state': 'disconnected'}],
+>   'phase-adjust-max': 0,
+>   'phase-adjust-min': 0,
+>   'type': 'synce-eth-port'},
+>  {'capabilities': {'state-can-change'},
+>   'clock-id': 0,
+>   'id': 35,
+>   'module-name': 'ice',
+>   'parent-pin': [{'parent-id': 27, 'state': 'disconnected'},
+>                  {'parent-id': 28, 'state': 'disconnected'}],
+>   'phase-adjust-max': 0,
+>   'phase-adjust-min': 0,
+>   'type': 'synce-eth-port'}]
+>=20
+> - to set PHY0 clock as SyncE module input $ ynl --family dpll --do
+> pin-set --json '{"id":32,"parent-pin":\
+>     {"parent-id":27, "state":"connected"}}'
+>=20
+> - to set 1588 Main Timer as source into SyncE module $ ynl --family
+> dpll --do pin-set --json '{"id":31,"parent-pin":\
+>     {"parent-id":27, "state":"connected"}}'
+>=20
+> Reviewed-by: Milena Olech <milena.olech@intel.com>
+> Co-developed-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+> Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
-...
+> ---
+> v7->v8:
+> - rebased
+> - removed unrelated changes
+> - change pin_1588 type to DPLL_PIN_TYPE_EXT
+> - use ICE_SYNCE_CLK_NUM to determine the number of rclk pins
+> ---
+...=20
+> base-commit: c4da238c4a0f62bbaa055f9d85559164df82bd07
+> --
+> 2.39.3
 
-> +int mlx5_accel_psp_fs_init_rx_tables(struct mlx5e_priv *priv)
-> +{
-> +	enum accel_fs_psp_type i;
-> +	struct mlx5e_psp_fs *fs;
-> +	int err;
-> +
-> +	if (!priv->psp)
-> +		return 0;
-> +
-> +	fs = priv->psp->fs;
-> +	for (i = 0; i < ACCEL_FS_PSP_NUM_TYPES; i++) {
-> +		err = accel_psp_fs_rx_ft_get(fs, i);
-> +		if (err)
-> +			goto out_err;
-> +	}
->  
-> -	fs->rx_fs = accel_psp;
->  	return 0;
-> +
-> +out_err:
-> +	i--;
-> +	while (i >= 0) {
-
-In practice i may be unsigned.
-And if so this condition will always be true.
-
-Flagged by Smatch.
-
-> +		accel_psp_fs_rx_ft_put(fs, i);
-> +		--i;
-> +	}
-> +
-> +	return err;
->  }
-
-...
 
