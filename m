@@ -1,140 +1,145 @@
-Return-Path: <netdev+bounces-209679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F14EAB1056D
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 11:14:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36BF3B10593
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 11:18:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 331F51790B3
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 09:14:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9AB41639D7
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 09:18:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43E3727EFFD;
-	Thu, 24 Jul 2025 09:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AE4C24DCEB;
+	Thu, 24 Jul 2025 09:18:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sb/l33ed"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gOBk0hnz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F8A427EC78
-	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 09:14:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E2FE15855E
+	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 09:18:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753348446; cv=none; b=VF0ctgxoVvpzibPdGo7a+e9+O8vahIuvqomaNZ9pOr5i2yF6SPtqTKMzqHgQmQRljPzjpfuhplIjfx5dbq8UfHFAUMUdRwR7kL/ObNklRML/l7A5xVNxTPQNfP5UTDI2NpFk90VYu9VSlcVdMEiLSy1nkA+G+bgBjmQUcGXryZo=
+	t=1753348703; cv=none; b=AnnE7vv28NaOhSzJgFjeALMftFcYjMtQJdhypPeR3sgskgl7/RAd/9Q+Hd79IMH5T36LC0w9spFug1rjh3NNX5mq32HPSP+ZaPkMdhvyDimO0RqZtOQKkuBu6f5/d3iXbpv402FCooV4WOKXsMvYbXjzOnc3tUHo+ehKg/REntI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753348446; c=relaxed/simple;
-	bh=0aWfHkSFO138/lUy44VYtrGkDTHvcLii7yoLMp/1Mpk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XUebhtqqLO/LMYj8LkirYAe3F01jYtRzhyN/TC9niSt/4yG3BSffugVMUpwvY0SYAMRlMyO2sEHDqT+ChZMGWEIECXO5AXmYqEWRvjm9TMnTAhwV9d0/00P3Qxfqb4ZOJd7CtaO/2euHuiUmUoe1CUMQB7mbmA10Yjah29g3n4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sb/l33ed; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D23DCC4CEED;
-	Thu, 24 Jul 2025 09:14:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753348445;
-	bh=0aWfHkSFO138/lUy44VYtrGkDTHvcLii7yoLMp/1Mpk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Sb/l33edbGZHf7SoDHDnCerGz9oL4N0UxC6dV4kIbmXikrYDrXrJoDBDK4gTPcSmu
-	 ypOMKRRn02j5vi3CQU5kUEKiS6209K7sJBxVT/13bQkaq1ykZPdYpkp7RjMlzWYKON
-	 BHkbgU024SbvqE38oDkR07b57hhfUweh+JYXSwCjNMEkapLQfR4FBp2bpGy+5oGNEs
-	 TPjnpDZ+3xytU98hTZGH80TQFJN9cq3UXqvmv+vyDlzz9bNn+bOoLvBi76ECXK0dbN
-	 UCIWYj0ct3J2jdBc0tvZfmj/is8Em+dtmMtLaw1jlytZtd/vw8+EBlr9eZardelr0A
-	 QQAzJc8TvsI3Q==
-Date: Thu, 24 Jul 2025 10:14:02 +0100
-From: Simon Horman <horms@kernel.org>
-To: "Hay, Joshua A" <joshua.a.hay@intel.com>
-Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [Intel-wired-lan] [PATCH net v2 0/6] idpf: replace Tx flow
- scheduling buffer ring with buffer pool
-Message-ID: <20250724091402.GH1150792@horms.kernel.org>
-References: <20250718002150.2724409-1-joshua.a.hay@intel.com>
- <20250723150835.GF1036606@horms.kernel.org>
- <DM4PR11MB6502F4622507B81F56DFFC65D45EA@DM4PR11MB6502.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1753348703; c=relaxed/simple;
+	bh=k4ryQwZrWFdbVrpzPmNt8BN0cErr3tgdmvOIfPNDMj0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p+1BNFPze+1dkVS7YRhPWciymSRv7Tj5ylb0vpFERhYWoXCwYTzXtjFapbalCJcF8kl04V57S7vafUW3tYMl//bp8TtYbym6R0i0ybwNwMFjupTTbaWR993OxYeOS/4+lQmpkeRCc5tijX34arizmqdA5EfzBQP3gZPAdvOPTac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gOBk0hnz; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753348699;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0u8ERjhlWRPtyJChf6ApY+WNDd3j+X08+pYCOJ6kI6s=;
+	b=gOBk0hnzdiXDvGpXuEPxH/13e2i1JjNGVkZBPK9pL1jl73xSxjQzJrengRcq1SgoIRG4U8
+	Tef5KLmNHuuH2M46l+f2mOtrt8l+FYXzsxYvYbCGZCVbKitbDD3jId0zXxlkEj1TQ9M9bx
+	udQCnybDJ8KnxAHLD7zqOTM5cyYCFo4=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-610-drrjsg4ANWKcf-qziuojhw-1; Thu, 24 Jul 2025 05:18:17 -0400
+X-MC-Unique: drrjsg4ANWKcf-qziuojhw-1
+X-Mimecast-MFC-AGG-ID: drrjsg4ANWKcf-qziuojhw_1753348696
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-451d7de4ae3so4597395e9.2
+        for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 02:18:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753348696; x=1753953496;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0u8ERjhlWRPtyJChf6ApY+WNDd3j+X08+pYCOJ6kI6s=;
+        b=r/Ct0GszJ8RELDaZQIKKvq6Qh0C9DYHmhXzMi9snudkHZZI1yEuvB7NqGec06hJ7z9
+         nH/CL71vfHBY/3ef8+DMFSrAhuZiYLyVlk8GYPgMkn5lj+BkxMJn7rQJfjUlJ3cdSrEf
+         VdBJEw2IZsNrMgHPy66LCF73lgLsWD+R35uSY+5uaqcC8HPmE2Ax6msBuiKNG5DWV0NU
+         o8uAS8bUu4Pq6hW3yBP4vl8gPN+2c/0v+qEVkObcXSTpI/qWSjb0Z9FsxORKsji/wnaV
+         edS6Fl2z0Xz4Tp5ZeuHpTk690wqRJE0tYoE/bKjZREuOyhsMHUSAu1IQpm72QJEGdrf4
+         JpnA==
+X-Forwarded-Encrypted: i=1; AJvYcCUZu+a6fiwXpgz0zjDUBCcH0lfCP4vQP1cgjdtjMrcgwjrHl0e3FTxCvDd3njA0ZmyQJTNwAm8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAXCAU5SSPhy68lkrGzHCSnMBxNIPEHGGCMlcMEHoGQYdcGB2H
+	Yy4lYsXqQ+CFXw7kUcgnMWelUEu1eUJrvKqbzBnJipWoUm86ygl0eAnTKAcvImOcosOFf+8JKxD
+	xp5ZzX8gPNBJUKBLaHKxiBNbf9qxca7DhL0ok3VNIslPilicBqCFvxT7Qvg==
+X-Gm-Gg: ASbGncuVYRJ/f79jT6heg8rgrM9LRi/6FYV7xt9DH648C0mln6Quj0Y07i4YW5NMQLD
+	Z0MXvZ5FBNHtmNl0lfMEjC5hEUzC6XTn8yryze8sk+TP9wJ9dmkH2FnkV/YQq0eJqjqjR0OG18u
+	MMqCRlAW7T/9NQD7uOqRTUAZd9jGC07ub6a+9L/w9WtHz8uFdY2w8g/PoJ7f6GRJh0Yvc5mNbcC
+	fPEbYIXXgVvi7Z6Q/1pWpfVRmZIHcZ3Qmm04UhQdruqnmgAQCc53qQQYLSsRMdjPIxBnf9/+cQW
+	UpIs7gLpV8UdqXZp9P9ZAx+poeOzh9wNnKpjf3hGk+ibOHC6ZZ6xO7897yCjpV+d5kuonHPny0Z
+	56cbVuJX7PY4=
+X-Received: by 2002:a05:600c:45c3:b0:43d:b3:fb1 with SMTP id 5b1f17b1804b1-45868d69d8emr54329605e9.27.1753348695925;
+        Thu, 24 Jul 2025 02:18:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGswj6iCsZirmRqy+pX9RHAraGdCm1TZF9NrwvdxJuR2oUFg5RXAFuiCvJUdh5Bl4ruR4N8JA==
+X-Received: by 2002:a05:600c:45c3:b0:43d:b3:fb1 with SMTP id 5b1f17b1804b1-45868d69d8emr54329235e9.27.1753348695478;
+        Thu, 24 Jul 2025 02:18:15 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b76fcad22asm1571531f8f.53.2025.07.24.02.18.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Jul 2025 02:18:15 -0700 (PDT)
+Message-ID: <b772e896-5e73-4904-b6c7-8ed913198b02@redhat.com>
+Date: Thu, 24 Jul 2025 11:18:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM4PR11MB6502F4622507B81F56DFFC65D45EA@DM4PR11MB6502.namprd11.prod.outlook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: virtio_close() stuck on napi_disable_locked()
+To: Zigit Zo <zuozhijie@bytedance.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <c5a93ed1-9abe-4880-a3bb-8d1678018b1d@redhat.com>
+ <20250722145524.7ae61342@kernel.org>
+ <4e3e39ea-b4ae-4785-a8ca-346b66e80a9e@bytedance.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <4e3e39ea-b4ae-4785-a8ca-346b66e80a9e@bytedance.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 24, 2025 at 12:03:33AM +0000, Hay, Joshua A wrote:
-> > On Thu, Jul 17, 2025 at 05:21:44PM -0700, Joshua Hay wrote:
-> > > This series fixes a stability issue in the flow scheduling Tx send/clean
-> > > path that results in a Tx timeout.
-> > >
-> > > The existing guardrails in the Tx path were not sufficient to prevent
-> > > the driver from reusing completion tags that were still in flight (held
-> > > by the HW).  This collision would cause the driver to erroneously clean
-> > > the wrong packet thus leaving the descriptor ring in a bad state.
-> > >
-> > > The main point of this refactor is to replace the flow scheduling buffer
-> > > ring with a large pool/array of buffers.  The completion tag then simply
-> > > is the index into this array.  The driver tracks the free tags and pulls
-> > > the next free one from a refillq.  The cleaning routines simply use the
-> > > completion tag from the completion descriptor to index into the array to
-> > > quickly find the buffers to clean.
-> > >
-> > > All of the code to support the refactor is added first to ensure traffic
-> > > still passes with each patch.  The final patch then removes all of the
-> > > obsolete stashing code.
-> > >
-> > > ---
-> > > v2:
-> > > - Add a new patch "idpf: simplify and fix splitq Tx packet rollback
-> > >   error path" that fixes a bug in the error path. It also sets up
-> > >   changes in patch 4 that are necessary to prevent a crash when a packet
-> > >   rollback occurs using the buffer pool.
-> > >
-> > > v1:
-> > > https://lore.kernel.org/intel-wired-lan/c6444d15-bc20-41a8-9230-
-> > 9bb266cb2ac6@molgen.mpg.de/T/#maf9f464c598951ee860e5dd24ef8a45
-> > 1a488c5a0
-> > >
-> > > Joshua Hay (6):
-> > >   idpf: add support for Tx refillqs in flow scheduling mode
-> > >   idpf: improve when to set RE bit logic
-> > >   idpf: simplify and fix splitq Tx packet rollback error path
-> > >   idpf: replace flow scheduling buffer ring with buffer pool
-> > >   idpf: stop Tx if there are insufficient buffer resources
-> > >   idpf: remove obsolete stashing code
-> > >
-> > >  .../ethernet/intel/idpf/idpf_singleq_txrx.c   |  61 +-
-> > >  drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 723 +++++++-----------
-> > >  drivers/net/ethernet/intel/idpf/idpf_txrx.h   |  87 +--
-> > >  3 files changed, 356 insertions(+), 515 deletions(-)
-> > 
-> > Hi Joshua, all,
-> > 
-> > Perhaps it is not followed much anymore, but at least according to [1]
-> > patches for stable should not be more than 100 lines, with context.
-> > 
-> > This patch-set is an order of magnitude larger.
-> > Can something be done to create a more minimal fix?
-> > 
-> > [1] https://docs.kernel.org/process/stable-kernel-rules.html#stable-kernel-
-> > rules
+On 7/24/25 10:58 AM, Zigit Zo wrote:
+> On 7/23/25 5:55 AM, Jakub Kicinski wrote:
+>> On Tue, 22 Jul 2025 13:00:14 +0200 Paolo Abeni wrote:
+>>> The NIPA CI is reporting some hung-up in the stats.py test caused by the
+>>> virtio_net driver stuck at close time.
+>>>
+>>> A sample splat is available here:
+>>>
+>>> https://netdev-3.bots.linux.dev/vmksft-drv-hw-dbg/results/209441/4-stats-py/stderr
+>>>
+>>> AFAICS the issue happens only on debug builds.
+>>>
+>>> I'm wild guessing to something similar to the the issue addressed by
+>>> commit 4bc12818b363bd30f0f7348dd9ab077290a637ae, possibly for tx_napi,
+>>> but I could not spot anything obvious.
+>>>
+>>> Could you please have a look?
+>>
+>> It only hits in around 1 in 5 runs. Likely some pre-existing race, but
+>> it started popping up for us when be5dcaed694e ("virtio-net: fix
+>> recursived rtnl_lock() during probe()") was merged. It never hit before.
+>> If we can't find a quick fix I think we should revert be5dcaed694e for
+>> now, so that it doesn't end up regressing 6.16 final.
 > 
-> Hi Simon,
-> 
-> It will be quite difficult to make this series smaller without any negative side effects. Here's a summary of why certain patches are necessary or where deferrals are possible (and the side effects):
-> 
-> "idpf: add support for Tx refillqs in flow scheduling mode" is required to keep the Tx path lockless. Otherwise, we would have to use locking in hot path to pass the tags freed in the cleaning thread back to whatever data struct the sending thread pulls the tags from.
-> 
-> Without "idpf: improve when to set RE bit logic", the driver will be much more susceptible to Tx timeouts when sending large packets.
-> 
-> "idpf: simplify and fix splitq Tx packet rollback error path" is a must to setup for the new buffer chaining. The previous implementation rolled back based on ring indexing, which will crash the system if a dma_mapping_error occurs or we run out of tags (more on that below). The buffer tags (indexes) pulled for a packet are not guaranteed to be contiguous, especially as out-of-order completions are processed. 
-> 
-> "idpf: stop Tx if there are insufficient buffer resources" could possibly be deferred, but that makes the rollback change above even more critical as we lose an extra layer of protection from running out of tags. It's also one of the smaller patches and won't make a significant difference in terms of size.
-> 
-> "idpf: remove obsolete stashing code" could also potentially be deferred but is 95% removing obsolete code, which leaves a lot of dead code.
+> Just found that there's a new test script `netpoll_basic.py`. Before 209441,
+> this test did not exist at all, I randomly picked some test results prior to
+> its introduction and did not find any hung logs. Is it relevant?
 
-Thanks Joshua,
+If I read correctly the nipa configuration, it executes the tests in
+sequence. `netpoll_basic.py` runs just before `stats.py`, so it could
+cause failure if it leaves some inconsistent state - but not in a
+deterministic way, as the issue is sporadic.
 
-if there is justification, which is indeed the case,
-then I withdraw my suggestion to create a smaller fix.
+Technically possible, IMHO unlikely. Still it would explain why I can't
+repro the issue here. With unlimited time available could be worthy
+validating if the issue could be reproduced running the 2 tests in sequence.
+
+/P
+
 
