@@ -1,257 +1,288 @@
-Return-Path: <netdev+bounces-209740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 769E6B10AB4
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 14:53:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA1A1B10AC4
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 14:59:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AD593ABD00
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 12:52:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6D215655B3
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 12:59:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4112D46DF;
-	Thu, 24 Jul 2025 12:52:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C19D2D46C4;
+	Thu, 24 Jul 2025 12:59:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XdMFeb2m"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PkW0LwhM"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E76C2D46D3
-	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 12:52:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1FA740856
+	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 12:59:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753361545; cv=none; b=q8Zgr96OnS0qk2b/cb1srr5LPMkCUkkL+7N/AE28fxv4NVnPjrPEC8uo3BSXEIzvR4KbStVWGutB242bS19xBLYiJkVgPk0QodlhTdIrrcbPTXlsennpc9+elp9IjOy2Zi377vQPDZBNe54jTDPJcXc4eVyintiTo128ZgnESrg=
+	t=1753361960; cv=none; b=H/ApvFmpxtwL06xpnPGF6VxY3uXnn5emp4AQmue0MPGYHeLj+9D+EA6OJKlFG+tvC4EOql4so11nSDke2aHzyHl0cFwK8zfCL7UU3O03gpSXQz6AVen6LwFc0mmAhxiG33pcpyaO/ves6WSw3DAPdIl8NTZz3p6r/DtUfMJ7MPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753361545; c=relaxed/simple;
-	bh=BT20HzWX+V0L1vB//2tVipRHixFnss8XHnnXe1uy9sA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O7uqkqyVOGjLiII9QiUNCtkH7ANNAyWrsxrI4kips2hSAL9ovkTyEYgL9CiaOag2smEWmFpi/Od/aXGR1ofpyEB2S1n/XybiiaHFuTyKcrCFlVy57Opw7gE2A4aBDVUX4Fd398O/HcIdCVOtL2hOcqohbPgdY/IJOPuc3U1VJtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XdMFeb2m; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1753361960; c=relaxed/simple;
+	bh=o+/xP/nRACgq6sYyyyENl6/+gxkfYdsCrg7JoE5NC9o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FV1ecjKF5KeTJhdKDyfRtL2jZtFS6RmnR4lGK8ryvigVsLbmeb7t+vaKKt90TBB4iLk9+4JQj2AP9kcKkt5vF6bC2ScZFsT6gUyCA9fYCkMgr/2lBIRNKmMZGraC1UgHwynZ6gAQiXyp6WqxB/++x+uEnt+kaMAqIsWocrsQd34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PkW0LwhM; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1753361542;
+	s=mimecast20190719; t=1753361956;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=M+yXn2Dd03JRNhm/5JyeMXOZKFuYEN81fHuvdMRTIp8=;
-	b=XdMFeb2mGwcipMQfGwdrzGFbHjpUq6XKO0qFx+/NK8gwaxGp5CBCkn9FjXGmmwoMF4fWNs
-	VFa1FZzE80s7Tlb8ret+ADJ2YVZqXsVN5AG7D/zUlBO8k2lB0nEBjCqs/KIP+MqcCYzy8x
-	eIBqWMv3YWeSb2WQc1OH4FJGLuSvSAY=
-Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
- [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-608-ccOWiT6wOjO-4rMkWcWc7g-1; Thu, 24 Jul 2025 08:52:21 -0400
-X-MC-Unique: ccOWiT6wOjO-4rMkWcWc7g-1
-X-Mimecast-MFC-AGG-ID: ccOWiT6wOjO-4rMkWcWc7g_1753361541
-Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-707cf1b0ecbso15397647b3.2
-        for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 05:52:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753361540; x=1753966340;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=M+yXn2Dd03JRNhm/5JyeMXOZKFuYEN81fHuvdMRTIp8=;
-        b=SQA3W8zV9Z2KVKc/Ol64O+8pLo2mfgUdYGslGPytEPgoM3lrP9jBJO20sgraQropmQ
-         SXD9g/zbe//vMsWsR0+3d7yshzocmjE3y5peDEtt8N2xUF27lKgot9xsvg0OyV7ajFYa
-         pJeHoLHdSuEdAWKBMwn4maD7vrCqmEz9z9A2w+KkHtIsyR2HlnNhZADYMGj4konR0QLb
-         bp3xJztDxCPWmDSagOf4uovfAX4scpO/KXoYtgcINuwP65ZBwJfDkN3YeDqEW29sZKBp
-         djl+u2LK5xK9KFARaqk4Uqcl/SY7kTNCKo3ZoUI6xWpAd8b1LOAoTRrdRhbknKck//Hx
-         Iy2w==
-X-Forwarded-Encrypted: i=1; AJvYcCVnrweqXJXYWaGM9cVMUeMF10zs5hoWAN4RYkFrJ3PkDc1/r53M2/beu9SajE47eo36X2g+MIQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwoIS+QciFoxTS4uqYn6a++/GmTcfub2lZAdYdr3o0TX+rbPpx9
-	lWFUtRnId/oJNN1T6mzrjO+hBzgXk7U0TQsaefnc9jHr1rEnikWZoLwVILbt0fWzxmc3Sbq3Pp9
-	peR3g7Hi7fiuBgvBHoEgZIunJXRjVY9qV1VKUaP82VGWLW3kdLB8ezdHFdy3lqYTY3NqivM9uR6
-	JCJT2MNTrrdbJaW9iJULJKFl/ZfM9LoIOV
-X-Gm-Gg: ASbGncvZu54oCrvUdaBJAG6sO2z+I518iJJk5FmIWh/abXRD5XPmwfHysXyUpxYYFlO
-	TloGBqLEsIkdpKHmXode2H1oQ0VmOVScCil3mklmpWsCwTIXc3tXrHMBbVFn0qtJ+DMDiLyFz25
-	dTo4cJGzWyOecPGBsQ0wOv
-X-Received: by 2002:a05:6902:4a7:b0:e87:9bab:25d with SMTP id 3f1490d57ef6-e8dc5b5c9a3mr6055902276.39.1753361540491;
-        Thu, 24 Jul 2025 05:52:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH+sxi2SF54aHzw0dd7QBG7rNJyq5RlA5zJNp/TA3A+qcVSys8/eRIZSECOlpj/89ZnMMKBfoWNEee5wXBQRqA=
-X-Received: by 2002:a05:6902:4a7:b0:e87:9bab:25d with SMTP id
- 3f1490d57ef6-e8dc5b5c9a3mr6055873276.39.1753361539934; Thu, 24 Jul 2025
- 05:52:19 -0700 (PDT)
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=hZiwGdR7LRfu5HGHtwgbMQ2Giw34fi/j2EFOpcB/EYM=;
+	b=PkW0LwhMqlXvJKDNQefH0QDmbZ98uzDpPOt2MDw4fF+BnL+w7zKq1+LJc3lypws7xpV0EP
+	4vPMGqYq1H/V9dlDKNXJv4b0pi49TgPusvfTCo11Tt/GMY8VG/+L2tPENrFNejvE86fZXk
+	EbkwU/eI+Hd0pYfuETFr1FLfmea1AF4=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-133-q7td4VieOdeRbZQwU_ug0A-1; Thu,
+ 24 Jul 2025 08:59:13 -0400
+X-MC-Unique: q7td4VieOdeRbZQwU_ug0A-1
+X-Mimecast-MFC-AGG-ID: q7td4VieOdeRbZQwU_ug0A_1753361952
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9549419560B6;
+	Thu, 24 Jul 2025 12:59:11 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.32.113])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4DCF119560AA;
+	Thu, 24 Jul 2025 12:59:08 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [GIT PULL] Networking for v6.16-rc8
+Date: Thu, 24 Jul 2025 14:58:59 +0200
+Message-ID: <20250724125859.371031-1-pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <vosten2rykookljp6u6qc4hqhsqb6uhdy2iuhpl54plbq2tkr4@kphfpgst3e7c>
- <20250724034659-mutt-send-email-mst@kernel.org> <CAGxU2F76ueKm3H30vXL+jxMVsiQBuRkDN9NRfVU8VeTXzTVAWg@mail.gmail.com>
- <20250724042100-mutt-send-email-mst@kernel.org> <aIHydjBEnmkTt-P-@willie-the-truck>
- <fv6uhq6lcgjwrdp7fcxmokczjmavbc37ikrqz7zpd7puvrbsml@zkt2lidjrqm6>
-In-Reply-To: <fv6uhq6lcgjwrdp7fcxmokczjmavbc37ikrqz7zpd7puvrbsml@zkt2lidjrqm6>
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Thu, 24 Jul 2025 14:52:08 +0200
-X-Gm-Features: Ac12FXwbtWtqNIZqXPX4jKNjmg84cpnD3-Y4W9qdqMU4Zw6KtEs0EheiQJT1DQo
-Message-ID: <CAGxU2F5Qy=vMD0z9_HTN2K9wyt+6EH-Yr0N9VqR4OT4O1asqZg@mail.gmail.com>
-Subject: Re: vhost: linux-next: crash at vhost_dev_cleanup()
-To: Breno Leitao <leitao@debian.org>
-Cc: Will Deacon <will@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, jasowang@redhat.com, 
-	eperezma@redhat.com, linux-arm-kernel@lists.infradead.org, 
-	kvm@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Thu, 24 Jul 2025 at 14:48, Breno Leitao <leitao@debian.org> wrote:
->
-> On Thu, Jul 24, 2025 at 09:44:38AM +0100, Will Deacon wrote:
-> > > > On Thu, 24 Jul 2025 at 09:48, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > >
-> > > > > On Wed, Jul 23, 2025 at 08:04:42AM -0700, Breno Leitao wrote:
-> > > > > > Hello,
-> > > > > >
-> > > > > > I've seen a crash in linux-next for a while on my arm64 server, and
-> > > > > > I decided to report.
-> > > > > >
-> > > > > > While running stress-ng on linux-next, I see the crash below.
-> > > > > >
-> > > > > > This is happening in a kernel configure with some debug options (KASAN,
-> > > > > > LOCKDEP and KMEMLEAK).
-> > > > > >
-> > > > > > Basically running stress-ng in a loop would crash the host in 15-20
-> > > > > > minutes:
-> > > > > >       # while (true); do stress-ng -r 10 -t 10; done
-> > > > > >
-> > > > > > >From the early warning "virt_to_phys used for non-linear address",
-> > > >
-> > > > mmm, we recently added nonlinear SKBs support in vhost-vsock [1],
-> > > > @Will can this issue be related?
-> > >
-> > > Good point.
-> > >
-> > > Breno, if bisecting is too much trouble, would you mind testing the commits
-> > > c76f3c4364fe523cd2782269eab92529c86217aa
-> > > and
-> > > c7991b44d7b44f9270dec63acd0b2965d29aab43
-> > > and telling us if this reproduces?
-> >
-> > That's definitely worth doing, but we should be careful not to confuse
-> > the "non-linear address" from the warning (which refers to virtual
-> > addresses that lie outside of the linear mapping of memory, e.g. in the
-> > vmalloc space) and "non-linear SKBs" which refer to SKBs with fragment
-> > pages.
->
-> I've tested both commits above, and I see the crash on both commits
-> above, thus, the problem reproduces in both cases. The only difference
-> I noted is the fact that I haven't seen the warning before the crash.
->
->
-> Log against c76f3c4364fe ("vhost/vsock: Avoid allocating
-> arbitrarily-sized SKBs")
->
->          Unable to handle kernel paging request at virtual address 0000001fc0000048
->          Mem abort info:
->            ESR = 0x0000000096000005
->            EC = 0x25: DABT (current EL), IL = 32 bits
->            SET = 0, FnV = 0
->            EA = 0, S1PTW = 0
->            FSC = 0x05: level 1 translation fault
->          Data abort info:
->            ISV = 0, ISS = 0x00000005, ISS2 = 0x00000000
->            CM = 0, WnR = 0, TnD = 0, TagAccess = 0
->            GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
->          user pgtable: 64k pages, 48-bit VAs, pgdp=0000000cdcf2da00
->          [0000001fc0000048] pgd=0000000000000000, p4d=0000000000000000, pud=0000000000000000
->          Internal error: Oops: 0000000096000005 [#1]  SMP
->          Modules linked in: vfio_iommu_type1 vfio md4 crc32_cryptoapi ghash_generic unix_diag vhost_net tun vhost vhost_iotlb tap mpls_gso mpls_iptunnel mpls_router fou sch_fq ghes_edac tls tcp_diag inet_diag act_gact cls_bpf nvidia_c
->          CPU: 34 UID: 0 PID: 1727297 Comm: stress-ng-dev Kdump: loaded Not tainted 6.16.0-rc6-upstream-00027-gc76f3c4364fe #19 NONE
->          pstate: 23401009 (nzCv daif +PAN -UAO +TCO +DIT +SSBS BTYPE=--)
->          pc : kfree+0x48/0x2a8
->          lr : vhost_dev_cleanup+0x138/0x2b8 [vhost]
->          sp : ffff80013a0cfcd0
->          x29: ffff80013a0cfcd0 x28: ffff0008fd0b6240 x27: 0000000000000000
->          x26: 0000000000000000 x25: 0000000000000000 x24: 0000000000000000
->          x23: 00000000040e001f x22: ffffffffffffffff x21: ffff00014f1d4ac0
->          x20: 0000000000000001 x19: ffff00014f1d0000 x18: 0000000000000000
->          x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
->          x14: 000000000000001f x13: 000000000000000f x12: 0000000000000001
->          x11: 0000000000000000 x10: 0000000000000402 x9 : ffffffdfc0000000
->          x8 : 0000001fc0000040 x7 : 0000000000000000 x6 : 0000000000000000
->          x5 : ffff000141931840 x4 : 0000000000000000 x3 : 0000000000000008
->          x2 : ffffffffffffffff x1 : ffffffffffffffff x0 : 0000000000010000
->          Call trace:
->           kfree+0x48/0x2a8 (P)
->           vhost_dev_cleanup+0x138/0x2b8 [vhost]
->           vhost_net_release+0xa0/0x1a8 [vhost_net]
+Hi Linus!
 
-But here is the vhost_net, so I'm confused now.
-Do you see the same (vhost_net) also on 9798752 ("Add linux-next
-specific files for 20250721") ?
+The following changes since commit 6832a9317eee280117cd695fa885b2b7a7a38daf:
 
-The initial report contained only vhost_vsock traces IIUC, so I'm
-suspecting something in the vhost core.
+  Merge tag 'net-6.16-rc7' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-07-17 10:04:04 -0700)
 
-Thanks,
-Stefano
+are available in the Git repository at:
 
->           __fput+0xfc/0x2f0
->           fput_close_sync+0x38/0xc8
->           __arm64_sys_close+0xb4/0x108
->           invoke_syscall+0x4c/0xd0
->           do_el0_svc+0x80/0xb0
->           el0_svc+0x3c/0xd0
->           el0t_64_sync_handler+0x70/0x100
->           el0t_64_sync+0x170/0x178
->          Code: 8b080008 f2dffbe9 d350fd08 8b081928 (f9400509)
->
-> Log against c7991b44d7b4 ("vsock/virtio: Allocate nonlinear SKBs for
-> handling large transmit buffers")
->
->         Unable to handle kernel paging request at virtual address 0010502f8f8f4f08
->         Mem abort info:
->           ESR = 0x0000000096000004
->           EC = 0x25: DABT (current EL), IL = 32 bits
->           SET = 0, FnV = 0
->           EA = 0, S1PTW = 0
->           FSC = 0x04: level 0 translation fault
->         Data abort info:
->           ISV = 0, ISS = 0x00000004, ISS2 = 0x00000000
->           CM = 0, WnR = 0, TnD = 0, TagAccess = 0
->           GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
->         [0010502f8f8f4f08] address between user and kernel address ranges
->         Internal error: Oops: 0000000096000004 [#1]  SMP
->         Modules linked in: vhost_vsock vfio_iommu_type1 vfio md4 crc32_cryptoapi ghash_generic vhost_net tun vhost vhost_iotlb tap mpls_gso mpls_iptunnel mpls_router fou sch_fq ghes_edac tls tcp_diag inet_diag act_gact cls_bpf ipmi_s
->         CPU: 47 UID: 0 PID: 1239699 Comm: stress-ng-dev Kdump: loaded Tainted: G        W           6.16.0-rc6-upstream-00035-gc7991b44d7b4 #18 NONE
->         Tainted: [W]=WARN
->         pstate: 23401009 (nzCv daif +PAN -UAO +TCO +DIT +SSBS BTYPE=--)
->         pc : kfree+0x48/0x2a8
->         lr : vhost_dev_cleanup+0x138/0x2b8 [vhost]
->         sp : ffff80016c0cfcd0
->         x29: ffff80016c0cfcd0 x28: ffff001ad6210d80 x27: 0000000000000000
->         x26: 0000000000000000 x25: 0000000000000000 x24: 0000000000000000
->         x23: 00000000040e001f x22: ffffffffffffffff x21: ffff001bb76f00c0
->         x20: 0000000000000000 x19: ffff001bb76f0000 x18: 0000000000000000
->         x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
->         x14: 000000000000001f x13: 000000000000000f x12: 0000000000000001
->         x11: 0000000000000000 x10: 0000000000000402 x9 : ffffffdfc0000000
->         x8 : 0010502f8f8f4f00 x7 : 0000000000000000 x6 : 0000000000000000
->         x5 : ffff00012e7e2128 x4 : 0000000000000000 x3 : 0000000000000008
->         x2 : ffffffffffffffff x1 : ffffffffffffffff x0 : 41403f3e3d3c3b3a
->         Call trace:
->          kfree+0x48/0x2a8 (P)
->          vhost_dev_cleanup+0x138/0x2b8 [vhost]
->          vhost_net_release+0xa0/0x1a8 [vhost_net]
->          __fput+0xfc/0x2f0
->          fput_close_sync+0x38/0xc8
->          __arm64_sys_close+0xb4/0x108
->          invoke_syscall+0x4c/0xd0
->          do_el0_svc+0x80/0xb0
->          el0_svc+0x3c/0xd0
->          el0t_64_sync_handler+0x70/0x100
->          el0t_64_sync+0x170/0x178
->         Code: 8b080008 f2dffbe9 d350fd08 8b081928 (f9400509)
->
->
-> > Breno -- when you say you've been seeing this "for a while", what's the
-> > earliest kernel you know you saw it on?
->
-> Looking at my logs, the older kernel that I saw it was net-next from
-> 20250717, which was around the time I decided to test net-next in
-> preparation for 6.17, so, not very helpful. Sorry.
->
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.16-rc8
+
+for you to fetch changes up to 291d5dc80eca1fc67a0fa4c861d13c101345501a:
+
+  Merge tag 'ipsec-2025-07-23' of git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec (2025-07-24 12:30:40 +0200)
+
+----------------------------------------------------------------
+Including fixes from can and xfrm.
+
+The TI regression notified last week is actually on our net-next tree,
+it does not affect 6.16.
+We are investigating a virtio regression which is quite hard to
+reproduce - currently only our CI sporadically hits it. Hopefully it
+should not be critical, and I'm not sure that an additional week would
+be enough to solve it.
+
+Current release - fix to a fix:
+
+  - sched: sch_qfq: avoid sleeping in atomic context in qfq_delete_class
+
+Previous releases - regressions:
+
+  - xfrm:
+    - set transport header to fix UDP GRO handling
+    - delete x->tunnel as we delete x
+
+  - eth: mlx5: fix memory leak in cmd_exec()
+
+  - eth: i40e: when removing VF MAC filters, avoid losing PF-set MAC
+
+  - eth: gve: fix stuck TX queue for DQ queue format
+
+Previous releases - always broken:
+
+  - can: fix NULL pointer deref of struct can_priv::do_set_mode
+
+  - eth: ice: fix a null pointer dereference in ice_copy_and_init_pkg()
+
+  - eth: ism: fix concurrency management in ism_cmd()
+
+  - eth: dpaa2: fix device reference count leak in MAC endpoint handling
+
+  - eth: icssg-prueth: fix buffer allocation for ICSSG
+
+Misc:
+
+  - selftests: mptcp: increase code coverage
+
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+----------------------------------------------------------------
+Chiara Meiohas (1):
+      net/mlx5: Fix memory leak in cmd_exec()
+
+Dennis Chen (1):
+      i40e: report VF tx_dropped with tx_errors instead of tx_discards
+
+Eyal Birger (1):
+      xfrm: interface: fix use-after-free after changing collect_md xfrm interface
+
+Fernando Fernandez Mancera (1):
+      xfrm: ipcomp: adjust transport header after decompressing
+
+Florian Fainelli (1):
+      net: bcmasp: Restore programming of TX map vector register
+
+Florian Westphal (1):
+      selftests: netfilter: tone-down conntrack clash test
+
+Halil Pasic (1):
+      s390/ism: fix concurrency management in ism_cmd()
+
+Haoxiang Li (1):
+      ice: Fix a null pointer dereference in ice_copy_and_init_pkg()
+
+Himanshu Mittal (1):
+      net: ti: icssg-prueth: Fix buffer allocation for ICSSG
+
+Jacek Kowalski (2):
+      e1000e: disregard NVM checksum on tgp when valid checksum bit is not set
+      e1000e: ignore uninitialized checksum word on tgp
+
+Jakub Kicinski (4):
+      Merge branch 'mlx5-misc-fixes-2025-07-17'
+      Merge branch 'selftests-mptcp-connect-cover-alt-modes'
+      Merge branch '40GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
+      Merge tag 'linux-can-fixes-for-6.16-20250722' of git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can
+
+Jamie Bainbridge (1):
+      i40e: When removing VF MAC filters, only check PF-set MAC
+
+Jian Shen (2):
+      net: hns3: fix concurrent setting vlan filter issue
+      net: hns3: fixed vf get max channels bug
+
+Jijie Shao (1):
+      net: hns3: default enable tx bounce buffer when smmu enabled
+
+Kees Cook (1):
+      MAINTAINERS: Add in6.h to MAINTAINERS
+
+Kito Xu (veritas501) (1):
+      net: appletalk: Fix use-after-free in AARP proxy probe
+
+Leon Romanovsky (1):
+      xfrm: always initialize offload path
+
+Ma Ke (3):
+      bus: fsl-mc: Fix potential double device reference in fsl_mc_get_endpoint()
+      dpaa2-eth: Fix device reference count leak in MAC endpoint handling
+      dpaa2-switch: Fix device reference count leak in MAC endpoint handling
+
+Marc Kleine-Budde (1):
+      can: netlink: can_changelink(): fix NULL pointer deref of struct can_priv::do_set_mode
+
+Matthieu Baerts (NGI0) (2):
+      selftests: mptcp: connect: also cover alt modes
+      selftests: mptcp: connect: also cover checksum
+
+Nimrod Oren (1):
+      selftests: drv-net: wait for iperf client to stop sending
+
+Paolo Abeni (2):
+      Merge branch 'there-are-some-bugfix-for-the-hns3-ethernet-driver'
+      Merge tag 'ipsec-2025-07-23' of git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec
+
+Praveen Kaligineedi (1):
+      gve: Fix stuck TX queue for DQ queue format
+
+Sabrina Dubroca (4):
+      xfrm: state: initialize state_ptrs earlier in xfrm_state_find
+      xfrm: state: use a consistent pcpu_id in xfrm_state_find
+      xfrm: delete x->tunnel as we delete x
+      Revert "xfrm: destroy xfrm_state synchronously on net exit path"
+
+Shahar Shitrit (1):
+      net/mlx5: E-Switch, Fix peer miss rules to use peer eswitch
+
+Steffen Klassert (2):
+      Merge branch 'xfrm: fixes for xfrm_state_find under preemption'
+      Merge branch 'ipsec: fix splat due to ipcomp fallback tunnel'
+
+Tobias Brunner (1):
+      xfrm: Set transport header to fix UDP GRO handling
+
+Xiang Mei (1):
+      net/sched: sch_qfq: Avoid triggering might_sleep in atomic context in qfq_delete_class
+
+Yonglong Liu (1):
+      net: hns3: disable interrupt when ptp init failed
+
+ MAINTAINERS                                        |   1 +
+ drivers/bus/fsl-mc/fsl-mc-bus.c                    |  19 ++-
+ drivers/net/can/dev/dev.c                          |  12 +-
+ drivers/net/can/dev/netlink.c                      |  12 ++
+ drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c   |   3 +
+ drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c   |  15 +-
+ .../net/ethernet/freescale/dpaa2/dpaa2-switch.c    |  15 +-
+ drivers/net/ethernet/google/gve/gve_main.c         |  67 +++++----
+ drivers/net/ethernet/hisilicon/hns3/hns3_enet.c    |  31 ++++
+ drivers/net/ethernet/hisilicon/hns3/hns3_enet.h    |   2 +
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_main.c    |  36 +++--
+ .../net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c |   9 +-
+ .../ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c  |   6 +-
+ drivers/net/ethernet/intel/e1000e/defines.h        |   3 +
+ drivers/net/ethernet/intel/e1000e/ich8lan.c        |   2 +
+ drivers/net/ethernet/intel/e1000e/nvm.c            |   6 +
+ drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c |   6 +-
+ drivers/net/ethernet/intel/ice/ice_ddp.c           |   2 +
+ drivers/net/ethernet/mellanox/mlx5/core/cmd.c      |   4 +-
+ .../ethernet/mellanox/mlx5/core/eswitch_offloads.c | 108 +++++++-------
+ drivers/net/ethernet/ti/icssg/icssg_config.c       | 158 ++++++++++++++-------
+ drivers/net/ethernet/ti/icssg/icssg_config.h       |  80 +++++++++--
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c       |  20 ++-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h       |   2 +
+ drivers/net/ethernet/ti/icssg/icssg_switch_map.h   |   3 +
+ drivers/s390/net/ism_drv.c                         |   3 +
+ include/linux/ism.h                                |   1 +
+ include/net/xfrm.h                                 |  15 +-
+ net/appletalk/aarp.c                               |  24 +++-
+ net/ipv4/ipcomp.c                                  |   2 +
+ net/ipv4/xfrm4_input.c                             |   3 +
+ net/ipv6/ipcomp6.c                                 |   2 +
+ net/ipv6/xfrm6_input.c                             |   3 +
+ net/ipv6/xfrm6_tunnel.c                            |   2 +-
+ net/key/af_key.c                                   |   2 +-
+ net/sched/sch_qfq.c                                |   7 +-
+ net/xfrm/xfrm_device.c                             |   1 -
+ net/xfrm/xfrm_interface_core.c                     |   7 +-
+ net/xfrm/xfrm_ipcomp.c                             |   3 +-
+ net/xfrm/xfrm_state.c                              |  69 ++++-----
+ net/xfrm/xfrm_user.c                               |   3 +-
+ tools/testing/selftests/drivers/net/lib/py/load.py |  23 ++-
+ tools/testing/selftests/net/mptcp/Makefile         |   3 +-
+ .../selftests/net/mptcp/mptcp_connect_checksum.sh  |   5 +
+ .../selftests/net/mptcp/mptcp_connect_mmap.sh      |   5 +
+ .../selftests/net/mptcp/mptcp_connect_sendfile.sh  |   5 +
+ .../selftests/net/netfilter/conntrack_clash.sh     |  45 +++---
+ 47 files changed, 549 insertions(+), 306 deletions(-)
+ create mode 100755 tools/testing/selftests/net/mptcp/mptcp_connect_checksum.sh
+ create mode 100755 tools/testing/selftests/net/mptcp/mptcp_connect_mmap.sh
+ create mode 100755 tools/testing/selftests/net/mptcp/mptcp_connect_sendfile.sh
 
 
