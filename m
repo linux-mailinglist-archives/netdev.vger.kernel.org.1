@@ -1,245 +1,358 @@
-Return-Path: <netdev+bounces-209884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CBC1B112AE
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 22:52:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44875B112E2
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 23:14:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B2141C253F6
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 20:52:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66227562917
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 21:14:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95FAE2EF9A4;
-	Thu, 24 Jul 2025 20:51:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95ACB253F35;
+	Thu, 24 Jul 2025 21:14:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="fH3HSOAI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j3iTBdDG"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2070.outbound.protection.outlook.com [40.107.92.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF8C32EE61D;
-	Thu, 24 Jul 2025 20:51:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753390275; cv=fail; b=CBS+UjVW8EpMjATcBClUKRLPZdcwuxQhccdzX5Ziq0abnPTkAbKdjYIqCXVGrnhOovg7SL7E1BEjTo5fhGvpobyJtqgcgRijTI6PIdb89VhXQQFX+himFgGhpseRj2jFhdBZVPM6XGNZcK9rQsPxEYG2XO0qNEUttC/7q9eVqIc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753390275; c=relaxed/simple;
-	bh=oK9huO71GVBFPTzg+7HUwEJ6PSx/zgEhF42TvI/9wHw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GIG3SYTPpg/0/C8POsm3xE58YzJCl1G/93RqqqkMZg946KOrJV6F40THIci0yy9dcPU/8oHF21qtpfigxyekLs1V7tAJWrwlLi1IjbQrnD9fBI4G2/QEYsG3Zn2rJ0R584aZy5Z78tnNGhnXOKjlGxGWPcGwWXIlOmjrvaG3too=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=fH3HSOAI; arc=fail smtp.client-ip=40.107.92.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Jtjiima+MgEyChngK/1U/ZtJn0OMndzIZWvRbsTwvBGFizPq2FcF+Xb4aOyZh7Dhl0qxXZPN9dr1Hs2eqTo1LVF09V5kd0Ox3dbFTiFTulFEFjnNeFIvVDjo5fZBBwEF/8ztcHmcBKP1x+fD/0qJ1b2mR0Ee4KIt3mVTWQf6emgz6RDi6fmuqP1oLRP9yQZdRSTSgbVLqq6niLLU5nhgzI/wVU1M85MYJSF58q+PfDaGwj3IhYaHRdr7HFRw/SaTDPvyOU6erwZAz54e7i+8G6l3c1hL1t/Zl28C7z8312chPI35QL1iSBPV9UC34M4VSxp79l3TWLRuub7CQCimZw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Xt3kHktPKRSnrcenZBz2XPWcf7NMVPM90QGFthmoE+g=;
- b=omrzr27xRFCBs8q9kIull6JTcNn9HQVfXBf6HMEc/gfYZnWwQYQnI/TvLW/naSQNjAEyULTtagJDk/nP0jO304sDjAMKCq5oLVJ7qTtchssDINtRe/nK3eeeXrI4j536nP5jUyJMMfZkz3+UU+vuUpl4/MixFZvAB5J3XMf+9zO9vzExReY1fGSILq4XtCHepNHS81bQ7cHGmiANzjbAVnaGU6x14Qz9am/WQpPwvf8fEV3lKb5eCUlJhwmRZmzlC0qvikLX7ntwWCMsI0pRCNSKjg+JmH2g11SvIyQbSwe+PfdNCXqAM8oux/KzI7pZfEYvg2qbrG9MbAcROvh/+g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Xt3kHktPKRSnrcenZBz2XPWcf7NMVPM90QGFthmoE+g=;
- b=fH3HSOAIEdT5W7QG6KnwvgsDDAQo5wW5HUp75UJo0CmOuiFE3Jk8X02lpZo2/uiLcdX7FKYa3F9ZMA/vzSu1NCgWvtnJWKs/dXRpgMGsMxH3FsndNyGXkozwwbQoKAVsxlxXeZCZKDjqij/2rjc+31XSvRh/2/9m9M0V4NyuHujrV+ZTxRnqVE71NK+Z/apoBETZefqSORh6YudyIuEdx4EoiBQHvNnXY9MEd+DsjFW+XpbCV+RVJT6X2xvn4fU5fwTn/fzcc97Bu6kw/zQPvjilfpYkDisRr17nXc82DyfFShc7i4//XUI1X9E2HXhOvi18WLD2w9fXYp6vtt82sw==
-Received: from CH0PR13CA0039.namprd13.prod.outlook.com (2603:10b6:610:b2::14)
- by SA5PPF0EB7D076B.namprd12.prod.outlook.com (2603:10b6:80f:fc04::8c5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8943.30; Thu, 24 Jul
- 2025 20:51:11 +0000
-Received: from DS3PEPF0000C37A.namprd04.prod.outlook.com
- (2603:10b6:610:b2:cafe::dc) by CH0PR13CA0039.outlook.office365.com
- (2603:10b6:610:b2::14) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8964.21 via Frontend Transport; Thu,
- 24 Jul 2025 20:51:10 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- DS3PEPF0000C37A.mail.protection.outlook.com (10.167.23.4) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8964.20 via Frontend Transport; Thu, 24 Jul 2025 20:51:10 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Thu, 24 Jul
- 2025 13:51:00 -0700
-Received: from drhqmail201.nvidia.com (10.126.190.180) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Thu, 24 Jul 2025 13:50:59 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
- (10.126.190.180) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
- Transport; Thu, 24 Jul 2025 13:50:52 -0700
-From: Tariq Toukan <tariqt@nvidia.com>
-To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Jiri Pirko <jiri@nvidia.com>, Jiri Pirko
-	<jiri@resnulli.us>
-CC: Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
-	Brett Creeley <brett.creeley@amd.com>, Michael Chan
-	<michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, "Cai
- Huoqing" <cai.huoqing@linux.dev>, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Sunil Goutham
-	<sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>, Geetha sowjanya
-	<gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>, hariprasad
-	<hkelam@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, Saeed Mahameed
-	<saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan
-	<tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Ido Schimmel
-	<idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, Manish Chopra
-	<manishc@marvell.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>, <linux-rdma@vger.kernel.org>, "Shahar
- Shitrit" <shshitrit@nvidia.com>, Gal Pressman <gal@nvidia.com>
-Subject: [PATCH net-next V2 5/5] net/mlx5e: Set default grace period delay for TX and RX reporters
-Date: Thu, 24 Jul 2025 23:48:54 +0300
-Message-ID: <1753390134-345154-6-git-send-email-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.8.0
-In-Reply-To: <1753390134-345154-1-git-send-email-tariqt@nvidia.com>
-References: <1753390134-345154-1-git-send-email-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0D5D1494C3
+	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 21:14:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753391656; cv=none; b=rOmZ7P7xKw0HhqDRwE2otaemwcys5Wi6yA5zpwaWlcakOUQnanWxO1rDidwNxst4Zc6po9rr8K+y6WnNgHlSxISsWJTVi/1aVUYOMilcMLVAY8sWWly4rz8Ns+RRLHhUVaAFUo3FfSZYaF4u1VUhJ3mr+1bBewBj7ODYumTHW38=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753391656; c=relaxed/simple;
+	bh=FoeQUP6R2dV4hT56mf7saYeP0ufIFSHMmIlwGaa8a0o=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=eWsUS3EbUnndi5mKxM6c9QOVhB2vwfAuDULdTIiTfVvjziZl8PkxA3q3n0Ix2b+OrUwPcoRCUOTr/Z6C3SLXqOIHHtmnBv1j870SeKa7jDPjvQW4lvJZFi083tKnEQaw+ruijFeCoCHOvuzi5zAxbAoyohTfR1R1h61SMP0O5Ko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j3iTBdDG; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-748e81d37a7so1056302b3a.1
+        for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 14:14:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753391654; x=1753996454; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=DanjK+ayaBqr/ziqIDwxf4KxKx2IqkL+inWPjL3pAGk=;
+        b=j3iTBdDGLnD0e+6CBUFnq9oJVDXlRn7oFLk8sI5j4HAFlxLxf7fqbsdnX+I0ymf2H3
+         BzvQeZepMjsfBRhHrtY0ItH//IYrmbkom1d1MEs6i58iXaADIiRw+EWw3X3kiq+OplEM
+         rJ5Bo6hej043rszQluewuElSB2TJB7XRwkeeCLHCfIykZZG9jxVWvvp/ryK72PRbpcS3
+         56IKFLLyUJ389sBkzZ+B8xCNsALfOXNTMEnoPeJXWUZ3vaSvuTVOEdC8HpEqV7Gr7G0C
+         5zLlAD83muewOLVbsd3qxdzqGBA4reFPSVpjcFzZetWz9wQnw0cPL8J4UR9w5Z9dUo3o
+         x6ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753391654; x=1753996454;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DanjK+ayaBqr/ziqIDwxf4KxKx2IqkL+inWPjL3pAGk=;
+        b=sl8zV05FfXDTHdlop4S5SNaZXBCiKzI3FbVBVVUbgVp/8bIuq4Yu1PSoIxURblD4mN
+         2MwEK3kviEZvitG0J9HRj1cqiYQf55zO2ISp5UG8ySoQE7n7zjT+nvqYSqfpqYtNra3H
+         GtY2F0nNRsQkQC5tMIQPoBN/wE5zD2icYqjmcgBrz+5Dp51qerc6voGCBsyqVxmwkdRm
+         JuAzDECG5u2mroOcWei7LcFUxWu8UQvQr9ooT13C9Fi9MBz/iKzAOHuB3+rhLrJKjpTf
+         cueR5kq5Ogh38Enstxn24Ca7134dqRK01g7Ud+4Olk5tsEWBAxTHAnFWapiTYFReD1p8
+         HAYg==
+X-Gm-Message-State: AOJu0Yxs8jN5tU94eKU6kzxAWxVyKHepXxtfsOUSlJd5o08FKXbsliOk
+	pBHNYaZ1AnTHZR+ydLC4Qq6QeeH4h/mrbA3N8zK/N3VoMGqsHnRPFNip
+X-Gm-Gg: ASbGncstcShcnjwZEVlUzHFP80xUdc/QogdrFPqb5Klav0fYfGeyi7WiHmCGumIwsLK
+	KXpNstOtnXGJryeYrkSbASlcVqSyrlq1Z7lomFcIGtwffJriGETcOPs4sZj/yXtJabMufIJSNKg
+	7axB10q6Horiypes1VLwEQ61M+AqUrvsEWptaZ7KAT7tROcq9HkHLUG4lWPSjjIrVPwzDvu/MNJ
+	I0MnpkuHtUhwcAe9Bk4orsYyg6vTDFrCDpcs6N9fLzFgj5PuhV3ckWze9ZU/qlPD/V6ccXS34zT
+	4grfZ45aMr8ba+v6SGuy82vJZBFb/pOQ3arURboNmgEzCM+7Oa7pQeEmsZKfqwkPHGHhYw8Wsw5
+	5vnteHjM+GpkhvGJ8KCTIFpUucsiN5zeFgj1w4OUiWUJ37drKSuMAWTPSLsXYtaDpayBo8pOzG5
+	xzhw==
+X-Google-Smtp-Source: AGHT+IGrsFAZrDDdZpr8TpLjR1F6finp5kcpRhIqd1S4HINMtBCCNDixBbsAWAMUYwKcVgWJK+WFwA==
+X-Received: by 2002:a05:6a00:228a:b0:748:323f:ba21 with SMTP id d2e1a72fcca58-76034c00474mr11415875b3a.1.1753391653816;
+        Thu, 24 Jul 2025 14:14:13 -0700 (PDT)
+Received: from ?IPv6:2605:59c8:829:4c00:82ee:73ff:fe41:9a02? ([2605:59c8:829:4c00:82ee:73ff:fe41:9a02])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-7622833c9e2sm1763603b3a.21.2025.07.24.14.14.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Jul 2025 14:14:13 -0700 (PDT)
+Message-ID: <d47b541e48002d8edfc8331183c4617fb3d74f8a.camel@gmail.com>
+Subject: Re: [PATCH net-next 5/9] eth: fbnic: Add XDP pass, drop, abort
+ support
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Mohsin Bashir
+	 <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, alexanderduyck@fb.com, 
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com,  horms@kernel.org, vadim.fedorenko@linux.dev,
+ jdamato@fastly.com, sdf@fomichev.me,  aleksander.lobakin@intel.com,
+ ast@kernel.org, daniel@iogearbox.net,  hawk@kernel.org,
+ john.fastabend@gmail.com
+Date: Thu, 24 Jul 2025 14:14:11 -0700
+In-Reply-To: <aIEdS6fnblUEuYf5@boxer>
+References: <20250723145926.4120434-1-mohsin.bashr@gmail.com>
+	 <20250723145926.4120434-6-mohsin.bashr@gmail.com> <aIEdS6fnblUEuYf5@boxer>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-NV-OnPremToCloud: AnonymousSubmission
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF0000C37A:EE_|SA5PPF0EB7D076B:EE_
-X-MS-Office365-Filtering-Correlation-Id: bd2d78c7-bf00-476e-3a7e-08ddcaf3d226
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?DUa/9RRbvj4Nolugb0FkEI4xI3YAFHaxq1U4f8fTrcx7wqg5EAsJ+K+Vp6HZ?=
- =?us-ascii?Q?KJeN+DmzglNnU+xFv8Q2kHju2F0meS6JDhvCGmn+iOSW9qlm6TuU7AwehkmP?=
- =?us-ascii?Q?u3hY5ioytz4ilQVcx2c1ONHf0k3Xtan16DCafUSO/xWQk+uTt6rWlk2XcmYa?=
- =?us-ascii?Q?dfoXQJf3Wcyzk0i2x8K7RjH0+vCa9S3ah1mBumPErh9QWYk+vd+Mw4dn429d?=
- =?us-ascii?Q?AuJn4TAA2PjELbUdzYKEnSpt6Yss+bOQIcSEQfGfutq0n75QiscAmGjz2+iu?=
- =?us-ascii?Q?45NnlhK+okIVZ2R6PB1M9AImQYwaq8pIdSApjzG4U9SXiKY1FhWSVxgxVcMj?=
- =?us-ascii?Q?DXKhWOGo7icjhis77EQ7RFey37UfAdmm3q2RrJgUfJiDu5qsXRCQ/lUv/b3k?=
- =?us-ascii?Q?r8LszQhtjAlZVHMTNO7yRcJV0NKY2mZkGw4YWVpKRlU5/2QSC52l748T/l/r?=
- =?us-ascii?Q?xmQcn57G/0Ch9M7hdGiIFq7Q4o8ClzmraybzcQ/5yFRNpyY75okvOfibmwZd?=
- =?us-ascii?Q?2Jyi+o2RxLQTfaZuyNaI1TqaipGDaOfRSJhIQjoXxVykNrzT0wPYgUzBSSHH?=
- =?us-ascii?Q?suxh5NckilDngu01s3ik9aFKw8mzlI4X3JTnfgU16vRn0cnX9hatrBUh3Zum?=
- =?us-ascii?Q?VsVxPdB43RaW2KdqbX58d3213juiCp2pGBEeXqX/q+pdYv+HQhPcpbs3QYTo?=
- =?us-ascii?Q?Efqnkrq+xLIpk/gIjkZsyJjyw3UwFWQe7ssrT9an43kUAoMCBofYvaxdY6ib?=
- =?us-ascii?Q?wHfwAs6xjNM6uR/US0VVb3GhVCJSwG6JguYOmZDer43OYBWmoNteVUm25apf?=
- =?us-ascii?Q?cOr7UCliVO6221UB8Jj6/jOiSRjCVFHKEw4jPuWyUM4qb0jgXfJYFEELv+Qb?=
- =?us-ascii?Q?ypO8J5Z9w2n7U2BRv/tcvTatfleMtlc128icK8yBPS5M7/39TuW5QjqSpvw9?=
- =?us-ascii?Q?SBqPlWszIHPsxuaY7ppBfb7ISoubzIxttng53SrbuqZir8SH7713roB6j0cO?=
- =?us-ascii?Q?7o1SC0EUiO/Vp1ac9xZzO7rS0FAIz1a6ScS6nBdPP/FUMJCEgDr3UnAZC+cA?=
- =?us-ascii?Q?4dTez081dtMaWmt6FtZBzmrFYai7u+Zt1bo/G23apRJIjVW/kGdycKPe2Oie?=
- =?us-ascii?Q?7x1+VLkCGvpN7PZyuqoo458NxwTRgtAib1icj3IvfDBXWIA1Zr0jQT68YrHs?=
- =?us-ascii?Q?XZwlAughDCBxK2iVTON8fY6lsWvqsezdlhB9HRnDNMd7d7Phfuk+4E2iJFDw?=
- =?us-ascii?Q?zx+hEqAGi+CaqGALP/PFK09fhqmj1oDnTRfoHkuRNnkNQLST/W5RddXW8SjM?=
- =?us-ascii?Q?ODYlY83jTwK6bQfo57dOXV/asLeJ2vE0CeIOMW8pXw4Qgpl5X8qfDlWUoD/v?=
- =?us-ascii?Q?9vqsUJQ3TTXOD8Al9ud3A0RAQRVK+nrRNr0p0+N620PtaG6h/njPRAQi0TRM?=
- =?us-ascii?Q?ofU9sO8dXTdpPi++1J/XwrSU0jJpTBxdLpmfcbsc9Y8srqGMdEaOoTv7gbNX?=
- =?us-ascii?Q?+z+mhRUxPNfPDUFvpDPUeGxdl8F4WQM5gE7j?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014)(7416014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2025 20:51:10.7477
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bd2d78c7-bf00-476e-3a7e-08ddcaf3d226
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF0000C37A.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA5PPF0EB7D076B
 
-From: Shahar Shitrit <shshitrit@nvidia.com>
+On Wed, 2025-07-23 at 19:35 +0200, Maciej Fijalkowski wrote:
+> On Wed, Jul 23, 2025 at 07:59:22AM -0700, Mohsin Bashir wrote:
+> > Add basic support for attaching an XDP program to the device and suppor=
+t
+> > for PASS/DROP/ABORT actions.
+> > In fbnic, buffers are always mapped as DMA_BIDIRECTIONAL.
+> >=20
+> > Testing:
+> >=20
+> > Hook a simple XDP program that passes all the packets destined for a
+> > specific port
+> >=20
+> > iperf3 -c 192.168.1.10 -P 5 -p 12345
+> > Connecting to host 192.168.1.10, port 12345
+> > [  5] local 192.168.1.9 port 46702 connected to 192.168.1.10 port 12345
+> > [ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+> > - - - - - - - - - - - - - - - - - - - - - - - - -
+> > [SUM]   1.00-2.00   sec  3.86 GBytes  33.2 Gbits/sec    0
+> >=20
+> > XDP_DROP:
+> > Hook an XDP program that drops packets destined for a specific port
+> >=20
+> >  iperf3 -c 192.168.1.10 -P 5 -p 12345
+> > ^C- - - - - - - - - - - - - - - - - - - - - - - - -
+> > [ ID] Interval           Transfer     Bitrate         Retr
+> > [SUM]   0.00-0.00   sec  0.00 Bytes  0.00 bits/sec    0       sender
+> > [SUM]   0.00-0.00   sec  0.00 Bytes  0.00 bits/sec            receiver
+> > iperf3: interrupt - the client has terminated
+> >=20
+> > XDP with HDS:
+> >=20
+> > - Validate XDP attachment failure when HDS is low
+> >    ~] ethtool -G eth0 hds-thresh 512
+> >    ~] sudo ip link set eth0 xdpdrv obj xdp_pass_12345.o sec xdp
+> >    ~] Error: fbnic: MTU too high, or HDS threshold is too low for singl=
+e
+> >       buffer XDP.
+> >=20
+> > - Validate successful XDP attachment when HDS threshold is appropriate
+> >   ~] ethtool -G eth0 hds-thresh 1536
+> >   ~] sudo ip link set eth0 xdpdrv obj xdp_pass_12345.o sec xdp
+> >=20
+> > - Validate when the XDP program is attached, changing HDS thresh to a
+> >   lower value fails
+> >   ~] ethtool -G eth0 hds-thresh 512
+> >   ~] netlink error: fbnic: Use higher HDS threshold or multi-buf capabl=
+e
+> >      program
+> >=20
+> > - Validate HDS thresh does not matter when xdp frags support is
+> >   available
+> >   ~] ethtool -G eth0 hds-thresh 512
+> >   ~] sudo ip link set eth0 xdpdrv obj xdp_pass_mb_12345.o sec xdp.frags
+> >=20
+> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> > Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
+> > ---
+> >  .../net/ethernet/meta/fbnic/fbnic_ethtool.c   | 11 +++
+> >  .../net/ethernet/meta/fbnic/fbnic_netdev.c    | 35 +++++++
+> >  .../net/ethernet/meta/fbnic/fbnic_netdev.h    |  5 +
+> >  drivers/net/ethernet/meta/fbnic/fbnic_txrx.c  | 95 +++++++++++++++++--
+> >  drivers/net/ethernet/meta/fbnic/fbnic_txrx.h  |  1 +
+> >  5 files changed, 140 insertions(+), 7 deletions(-)
+> >=20
+> > diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/=
+net/ethernet/meta/fbnic/fbnic_ethtool.c
+> > index 84a0db9f1be0..d7b9eb267ead 100644
+> > --- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
+> > +++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
+> > @@ -329,6 +329,17 @@ fbnic_set_ringparam(struct net_device *netdev, str=
+uct ethtool_ringparam *ring,
+> >  		return -EINVAL;
+> >  	}
+> > =20
+> > +	/* If an XDP program is attached, we should check for potential frame
+> > +	 * splitting. If the new HDS threshold can cause splitting, we should
+> > +	 * only allow if the attached XDP program can handle frags.
+> > +	 */
+> > +	if (fbnic_check_split_frames(fbn->xdp_prog, netdev->mtu,
+> > +				     kernel_ring->hds_thresh)) {
+> > +		NL_SET_ERR_MSG_MOD(extack,
+> > +				   "Use higher HDS threshold or multi-buf capable program");
+> > +		return -EINVAL;
+> > +	}
+> > +
+> >  	if (!netif_running(netdev)) {
+> >  		fbnic_set_rings(fbn, ring, kernel_ring);
+> >  		return 0;
+> > diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/n=
+et/ethernet/meta/fbnic/fbnic_netdev.c
+> > index d039e1c7a0d5..0621b89cbf3d 100644
+> > --- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+> > +++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+> > @@ -504,6 +504,40 @@ static void fbnic_get_stats64(struct net_device *d=
+ev,
+> >  	}
+> >  }
+> > =20
+> > +bool fbnic_check_split_frames(struct bpf_prog *prog, unsigned int mtu,
+> > +			      u32 hds_thresh)
+> > +{
+> > +	if (!prog)
+> > +		return false;
+> > +
+> > +	if (prog->aux->xdp_has_frags)
+> > +		return false;
+> > +
+> > +	return mtu + ETH_HLEN > hds_thresh;
+> > +}
+> > +
+> > +static int fbnic_bpf(struct net_device *netdev, struct netdev_bpf *bpf=
+)
+> > +{
+> > +	struct bpf_prog *prog =3D bpf->prog, *prev_prog;
+> > +	struct fbnic_net *fbn =3D netdev_priv(netdev);
+> > +
+> > +	if (bpf->command !=3D XDP_SETUP_PROG)
+> > +		return -EINVAL;
+> > +
+> > +	if (fbnic_check_split_frames(prog, netdev->mtu,
+> > +				     fbn->hds_thresh)) {
+> > +		NL_SET_ERR_MSG_MOD(bpf->extack,
+> > +				   "MTU too high, or HDS threshold is too low for single buffer XD=
+P");
+> > +		return -EOPNOTSUPP;
+> > +	}
+> > +
+> > +	prev_prog =3D xchg(&fbn->xdp_prog, prog);
+> > +	if (prev_prog)
+> > +		bpf_prog_put(prev_prog);
+> > +
+> > +	return 0;
+> > +}
+> > +
+> >  static const struct net_device_ops fbnic_netdev_ops =3D {
+> >  	.ndo_open		=3D fbnic_open,
+> >  	.ndo_stop		=3D fbnic_stop,
+> > @@ -513,6 +547,7 @@ static const struct net_device_ops fbnic_netdev_ops=
+ =3D {
+> >  	.ndo_set_mac_address	=3D fbnic_set_mac,
+> >  	.ndo_set_rx_mode	=3D fbnic_set_rx_mode,
+> >  	.ndo_get_stats64	=3D fbnic_get_stats64,
+> > +	.ndo_bpf		=3D fbnic_bpf,
+> >  	.ndo_hwtstamp_get	=3D fbnic_hwtstamp_get,
+> >  	.ndo_hwtstamp_set	=3D fbnic_hwtstamp_set,
+> >  };
+> > diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h b/drivers/n=
+et/ethernet/meta/fbnic/fbnic_netdev.h
+> > index 04c5c7ed6c3a..bfa79ea910d8 100644
+> > --- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+> > +++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+> > @@ -18,6 +18,8 @@
+> >  #define FBNIC_TUN_GSO_FEATURES		NETIF_F_GSO_IPXIP6
+> > =20
+> >  struct fbnic_net {
+> > +	struct bpf_prog *xdp_prog;
+> > +
+> >  	struct fbnic_ring *tx[FBNIC_MAX_TXQS];
+> >  	struct fbnic_ring *rx[FBNIC_MAX_RXQS];
+> > =20
+> > @@ -104,4 +106,7 @@ int fbnic_phylink_ethtool_ksettings_get(struct net_=
+device *netdev,
+> >  int fbnic_phylink_get_fecparam(struct net_device *netdev,
+> >  			       struct ethtool_fecparam *fecparam);
+> >  int fbnic_phylink_init(struct net_device *netdev);
+> > +
+> > +bool fbnic_check_split_frames(struct bpf_prog *prog,
+> > +			      unsigned int mtu, u32 hds_threshold);
+> >  #endif /* _FBNIC_NETDEV_H_ */
+> > diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net=
+/ethernet/meta/fbnic/fbnic_txrx.c
+> > index 71af7b9d5bcd..486c14e83ad5 100644
+> > --- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+> > +++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+> > @@ -2,17 +2,26 @@
+> >  /* Copyright (c) Meta Platforms, Inc. and affiliates. */
+> > =20
+> >  #include <linux/bitfield.h>
+> > +#include <linux/bpf.h>
+> > +#include <linux/bpf_trace.h>
+> >  #include <linux/iopoll.h>
+> >  #include <linux/pci.h>
+> >  #include <net/netdev_queues.h>
+> >  #include <net/page_pool/helpers.h>
+> >  #include <net/tcp.h>
+> > +#include <net/xdp.h>
+> > =20
+> >  #include "fbnic.h"
+> >  #include "fbnic_csr.h"
+> >  #include "fbnic_netdev.h"
+> >  #include "fbnic_txrx.h"
+> > =20
+> > +enum {
+> > +	FBNIC_XDP_PASS =3D 0,
+> > +	FBNIC_XDP_CONSUME,
+> > +	FBNIC_XDP_LEN_ERR,
+> > +};
+> > +
+> >  enum {
+> >  	FBNIC_XMIT_CB_TS	=3D 0x01,
+> >  };
+> > @@ -877,7 +886,7 @@ static void fbnic_pkt_prepare(struct fbnic_napi_vec=
+tor *nv, u64 rcd,
+> > =20
+> >  	headroom =3D hdr_pg_off - hdr_pg_start + FBNIC_RX_PAD;
+> >  	frame_sz =3D hdr_pg_end - hdr_pg_start;
+> > -	xdp_init_buff(&pkt->buff, frame_sz, NULL);
+> > +	xdp_init_buff(&pkt->buff, frame_sz, &qt->xdp_rxq);
+> >  	hdr_pg_start +=3D (FBNIC_RCD_AL_BUFF_FRAG_MASK & rcd) *
+> >  			FBNIC_BD_FRAG_SIZE;
+> > =20
+> > @@ -966,6 +975,38 @@ static struct sk_buff *fbnic_build_skb(struct fbni=
+c_napi_vector *nv,
+> >  	return skb;
+> >  }
+> > =20
+> > +static struct sk_buff *fbnic_run_xdp(struct fbnic_napi_vector *nv,
+> > +				     struct fbnic_pkt_buff *pkt)
+> > +{
+> > +	struct fbnic_net *fbn =3D netdev_priv(nv->napi.dev);
+> > +	struct bpf_prog *xdp_prog;
+> > +	int act;
+> > +
+> > +	xdp_prog =3D READ_ONCE(fbn->xdp_prog);
+> > +	if (!xdp_prog)
+> > +		goto xdp_pass;
+>=20
+> Hi Mohsin,
+>=20
+> I thought we were past the times when we read prog pointer per each
+> processed packet and agreed on reading the pointer once per napi loop?
 
-System errors can sometimes cause multiple errors to be reported
-to the TX reporter at the same time. For instance, lost interrupts
-may cause several SQs to time out simultaneously. When dev_watchdog
-notifies the driver for that, it iterates over all SQs to trigger
-recovery for the timed-out ones, via TX health reporter.
-However, grace period allows only one recovery at a time, so only
-the first SQ recovers while others remain blocked. Since no further
-recoveries are allowed during the grace period, subsequent errors
-cause the reporter to enter an ERROR state, requiring manual
-intervention.
+This is reading the cached pointer from the netdev. Are you saying you
+would rather have this as a stack pointer instead? I don't really see
+the advantage to making this a once per napi poll session versus just
+reading it once per packet.
 
-To address this, set the TX reporter's default grace period
-delay to 0.5 second. This allows the reporter to detect and handle
-all timed-out SQs within this delay window before initiating the
-grace period.
+>=20
+> > +
+> > +	if (xdp_buff_has_frags(&pkt->buff) && !xdp_prog->aux->xdp_has_frags)
+> > +		return ERR_PTR(-FBNIC_XDP_LEN_ERR);
+>=20
+> when can this happen and couldn't you catch this within ndo_bpf? i suppos=
+e
+> it's related to hds setup.
 
-To account for the possibility of a similar issue in the RX reporter,
-its default grace period delay is also configured.
+I was looking over the code and really the MTU is just a suggestion for
+what size packets we can expect to receive. The MTU doesn't guarantee
+the receive size, it is just the maximum transmission unit and
+represents the minimum frame size we should support.
 
-Additionally, while here, align the TX definition prefix with the RX,
-as these are used only in EN driver.
-
-Signed-off-by: Shahar Shitrit <shshitrit@nvidia.com>
-Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c | 3 +++
- drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c | 7 +++++--
- 2 files changed, 8 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
-index e106f0696486..feb3f2bce830 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
-@@ -645,6 +645,7 @@ void mlx5e_reporter_icosq_resume_recovery(struct mlx5e_channel *c)
- }
- 
- #define MLX5E_REPORTER_RX_GRACEFUL_PERIOD 500
-+#define MLX5E_REPORTER_RX_GRACEFUL_PERIOD_DELAY 500
- 
- static const struct devlink_health_reporter_ops mlx5_rx_reporter_ops = {
- 	.name = "rx",
-@@ -652,6 +653,8 @@ static const struct devlink_health_reporter_ops mlx5_rx_reporter_ops = {
- 	.diagnose = mlx5e_rx_reporter_diagnose,
- 	.dump = mlx5e_rx_reporter_dump,
- 	.default_graceful_period = MLX5E_REPORTER_RX_GRACEFUL_PERIOD,
-+	.default_graceful_period_delay =
-+		MLX5E_REPORTER_RX_GRACEFUL_PERIOD_DELAY,
- };
- 
- void mlx5e_reporter_rx_create(struct mlx5e_priv *priv)
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c
-index 6fb0d143ad1b..515b77585926 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c
-@@ -514,14 +514,17 @@ void mlx5e_reporter_tx_ptpsq_unhealthy(struct mlx5e_ptpsq *ptpsq)
- 	mlx5e_health_report(priv, priv->tx_reporter, err_str, &err_ctx);
- }
- 
--#define MLX5_REPORTER_TX_GRACEFUL_PERIOD 500
-+#define MLX5E_REPORTER_TX_GRACEFUL_PERIOD 500
-+#define MLX5E_REPORTER_TX_GRACEFUL_PERIOD_DELAY 500
- 
- static const struct devlink_health_reporter_ops mlx5_tx_reporter_ops = {
- 		.name = "tx",
- 		.recover = mlx5e_tx_reporter_recover,
- 		.diagnose = mlx5e_tx_reporter_diagnose,
- 		.dump = mlx5e_tx_reporter_dump,
--		.default_graceful_period = MLX5_REPORTER_TX_GRACEFUL_PERIOD,
-+		.default_graceful_period = MLX5E_REPORTER_TX_GRACEFUL_PERIOD,
-+		.default_graceful_period_delay =
-+			MLX5E_REPORTER_TX_GRACEFUL_PERIOD_DELAY,
- };
- 
- void mlx5e_reporter_tx_create(struct mlx5e_priv *priv)
--- 
-2.31.1
-
+Much like what I did on the Intel NICs back in the day we can receive
+up to the maximum frame size in almost all cases regardless of MTU
+setting. Otherwise we would have to shut down the NIC and change the
+buffer allocations much like we used to do on the old drivers every
+time you changed the MTU.
 
