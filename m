@@ -1,118 +1,199 @@
-Return-Path: <netdev+bounces-209718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B010B10915
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 13:22:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF6ABB1091E
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 13:25:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91DCC189AF73
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 11:22:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4CCB4E7445
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 11:24:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2D9B26CE38;
-	Thu, 24 Jul 2025 11:22:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EECA270EC5;
+	Thu, 24 Jul 2025 11:25:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Wfh+Z05S"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="UuipYI7w"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4722202C5D;
-	Thu, 24 Jul 2025 11:22:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3EDB270EAA;
+	Thu, 24 Jul 2025 11:24:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753356125; cv=none; b=L6MbyS9+ofF7pgjyyOgS+vWCpf0EMl8DBqkINuAVND75y5dYPDl9PO3Ao4Inp1TSOAemqaJ0G6NtdL8kZa0OxYzE9CD9MfCwNx77OkVmv+u67r/g7imcmcCLO13jpvKZFNr0QADfpo8GMHAGKKFSkFPM94MSJJm0BZv7DZapfds=
+	t=1753356301; cv=none; b=AehgL54hvQbMw/Ev+0tGGgmC2UdAT41NDYzbR62rMt7Hs2eVNrwc1elPdwYiGq+Vviy+fuDgrDMrNT924G7l8y6l4ONeGEasFAiWsoHs7Nas1oPtefFs92kG+Zhwkzu24k2BuK9c1h+D8yZl1Qzzst0ESxqLgZSG5/Jp3owLnd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753356125; c=relaxed/simple;
-	bh=3QoIcUL4Kf7Vw5WmCfJMtddC89Ny21lxl3kdlyVYPi0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dZH2OfFb1MOc1REhUwi0sCvBzgAr4F7q69amLn+HISP8OhPPqRDe7L8rgTelCHP0DkvwhDXkae2AOOTtiDYr9VvsmeEkxMS8dF29/RuD552sWZi0b8Kh0WQkzqWzTc3P7Ikbnq3VlneHJFmGdamjUHwjcgVIbxykjofCfSO9nOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Wfh+Z05S; arc=none smtp.client-ip=202.12.124.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 907057A0120;
-	Thu, 24 Jul 2025 07:22:02 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Thu, 24 Jul 2025 07:22:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1753356122; x=1753442522; bh=zL2seUE5Fc4Dd5Pi/1e7LNXGUzc9Yu49pe0
-	qXMhuH2s=; b=Wfh+Z05SAmNacjQjAeWBtQzLFG/lLni+3DsYwbS38Dm4QbeNjjx
-	PnTNSYQCPhzDLj5afJ1vemJ0UjqxILvVMhV1fj8LmbgvWMubUkdeJOW2aD7SZSE0
-	e26AK6tVwmKspDOoeuvqjDLWwHHqjDbjU6ztb3M+TT5TqmIW0CMLve64eLXkmVfJ
-	5s6OISswPEiwq/T90M30uCrcQxyjXD9lcZT/4yTqiJ4tHRReiF0sF99h7zN8RW4m
-	+AKrE8BqU9lIHkU1BCiJbUHUHcqdr8TGq/82hZ0uWriRF0jRyGeKg/joo81QDx7w
-	2kEbIAmXjl2phQ6a4ZY0jprAEdojuI190uw==
-X-ME-Sender: <xms:WReCaKO7pPO_V6jDcIqxx9ApE4Nd9Ai-WG1usdPbr0b5_CSZn0Ac3Q>
-    <xme:WReCaDmGfJNnMCojJ0hliQfC4urfBQbySpKSbfRtcJRyDnuems2UHK1D0Di351943
-    qAwOdN_VLJUa50>
-X-ME-Received: <xmr:WReCaHQSyuj2v3R4W77MWy3-2SV-oRyI6MVEjr00_Jkhd2E2sxK_u2Qcu-lmM4tG3MJwLS9Q3nuNd83JTuQ8GWHp1b-0iQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdektdehudcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecunecujfgurhepfffhvfevuffkfhggtggujgesthdtredttd
-    dtvdenucfhrhhomhepkfguohcuufgthhhimhhmvghluceoihguohhstghhsehiughoshgt
-    hhdrohhrgheqnecuggftrfgrthhtvghrnhepvddufeevkeehueegfedtvdevfefgudeife
-    duieefgfelkeehgeelgeejjeeggefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghr
-    rghmpehmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrghdpnhgspghrtg
-    hpthhtohepledpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepshgufhesfhhomhhi
-    tghhvghvrdhmvgdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdroh
-    hrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthht
-    ohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskh
-    gvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdp
-    rhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrnh
-    gurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtoheplhhinhhugidqkhgv
-    rhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:WReCaKUPlQ6OD2NUhmdZLi9yidAKHBakaXHE4a2tUpM8FBsGVK3hig>
-    <xmx:WReCaDLObRt8S6Hx0Ca-KTQr1myYWGOCVNTGi1s_UODjiWdz5Iqfqw>
-    <xmx:WReCaC3wvzoK4yUV5B-qlniQZeuVU5pcHv4uEdLWuZd5zo2GtK_XFA>
-    <xmx:WReCaIKychUQXhYKUs1LC5DHiifbsodJRUTsByQJcQ56yTqJqDTpKg>
-    <xmx:WheCaHYnWLEeYbFwrvmb-Gn90riqRwThv3iM13pBAGExBpMNKT4BhnG2>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 24 Jul 2025 07:22:00 -0400 (EDT)
-Date: Thu, 24 Jul 2025 14:21:38 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
-	andrew+netdev@lunn.ch, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] vrf: Drop existing dst reference in
- vrf_ip6_input_dst
-Message-ID: <aIIXQiu5i_ABjqA9@shredder>
-References: <20250723224625.1340224-1-sdf@fomichev.me>
+	s=arc-20240116; t=1753356301; c=relaxed/simple;
+	bh=0qomIO0tpsR6Tvc9gHTcOmpa9P1ET+k5IjBhCYdEKhg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=T7GWEum9Q4A93bnmygJWC+dUADC+tJeW3vtMMe8+BZYjBmI2BJt1Af7+aQFqnlZqLxC9f4+131Vnsnrs+B44B5MrVKsRvYlSISbtS1U/RlSFW6Y+gnoFxI4CdgPknhj0xPQ4oYG646RP/5kOKx5kiSCrQ2iy+bsRv0lSQcr4zrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=UuipYI7w; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id F041710391E80;
+	Thu, 24 Jul 2025 13:24:51 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1753356296; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=qR3ZiIHu9HqpVWUj5J80buPqUyaRwiPieVKbB5bOnt0=;
+	b=UuipYI7wr6Xec4L5rKC1MoLDym1dM9RdnFnVFkGIpZtK0A1eSKsvXQE4Ew4Gc7a5Go5Zsf
+	ag5i4xu5CAvulB97GJGyfF6GSkxgEdK7utdhik3jNlb7EaozAospcIOlxUoLZc3Ew5WfQZ
+	Lu9dKuyoz2/PoC5fnJDYnrpvDW90E5FQ+VxgMioK2F35X2/PBgykSUdwH8+sf2YjJ0j/lM
+	PnxMu3ZOqMHpxpIuaBP1ycO9kCPWDMdXY9EBL+q0PubH8Xz/Gqj+mCUXI7mOujVFsbiX70
+	pzKS7P7fA99YpcBndr+xQ3Kn0JsphGaBXrLkgAdqAj8WVefiFC8bkcrN9OyRxw==
+Date: Thu, 24 Jul 2025 13:24:49 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Xiaoliang Yang <xiaoliang.yang_1@nxp.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "kuba@kernel.org" <kuba@kernel.org>,
+ "n.zhandarovich@fintech.ru" <n.zhandarovich@fintech.ru>,
+ "edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>,
+ "m-karicheri2@ti.com" <m-karicheri2@ti.com>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>
+Subject: Re: [EXT] Re: [RFC PATCH net-next] net: hsr: create an API to get
+ hsr port type
+Message-ID: <20250724132449.38f0e59a@wsk>
+In-Reply-To: <DB9PR04MB92591B3DA0F1CB9CBDE83C24F05EA@DB9PR04MB9259.eurprd04.prod.outlook.com>
+References: <20250723104754.29926-1-xiaoliang.yang_1@nxp.com>
+	<20250723141451.314b9b77@wsk>
+	<DB9PR04MB92591B3DA0F1CB9CBDE83C24F05EA@DB9PR04MB9259.eurprd04.prod.outlook.com>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250723224625.1340224-1-sdf@fomichev.me>
+Content-Type: multipart/signed; boundary="Sig_/.aSIQCRVpkbCdC75m5Hzx4a";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Wed, Jul 23, 2025 at 03:46:25PM -0700, Stanislav Fomichev wrote:
-> Commit 8fba0fc7b3de ("selftests: tc: Add generic erspan_opts matching support
-> for tc-flower") started triggering the following kmemleak warning:
+--Sig_/.aSIQCRVpkbCdC75m5Hzx4a
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Did you mean
+Hi Xiaoliang,
 
-ff3fbcdd4724 ("selftests: tc: Add generic erspan_opts matching support for tc-flower")
+> Hi Lukasz,
+>=20
+> >=20
+> > Hi Xiaoliang,
+> >  =20
+> > > If a switch device has HSR hardware ability and HSR configuration
+> > > offload to hardware. The device driver needs to get the HSR port
+> > > type when joining the port to HSR. Different port types require
+> > > different settings for the hardware, like HSR_PT_SLAVE_A,
+> > > HSR_PT_SLAVE_B, and HSR_PT_INTERLINK. Create the API
+> > > hsr_get_port_type() and export it.=20
+> >=20
+> > Could you describe the use case in more detail - as pointed out by
+> > Vladimir?
+> >=20
+> > In my use case - when I use the KSZ9477 switch I just provide
+> > correct arguments for the iproute2 configuration:
+> >=20
+> > # Configuration - RedBox (EVB-KSZ9477):
+> > if link set lan1 down;ip link set lan2 down ip link add name hsr0
+> > type hsr slave1 lan1 slave2 lan2 supervision 45
+> > 	 version 1
+> > ip link add name hsr1 type hsr slave1 lan4 slave2 lan5 interlink
+> > lan3 supervision 45 version 1
+> > ip link set lan4 up;ip link set lan5 up
+> > ip link set lan3 up
+> > ip addr add 192.168.0.11/24 dev hsr1
+> > ip link set hsr1 up
+> >=20
+> > # Configuration - DAN-H (EVB-KSZ9477):
+> > ip link set lan1 down;ip link set lan2 down ip link add name hsr0
+> > type hsr slave1 lan1 slave2 lan2 supervision 45
+> > 	version 1
+> > ip link add name hsr1 type hsr slave1 lan4 slave2 lan5 supervision
+> > 45 version 1
+> > ip link set lan4 up;ip link set lan5 up
+> > ip addr add 192.168.0.12/24 dev hsr1
+> > ip link set hsr1 up
+> >=20
+> > More info (also regarding HSR testing with QEMU) can be found from:
+> > https://lpc.events/event/18/contributions/1969/attachments/1456/3092/lp=
+c-
+> > 2024-HSR-v1.0-e26d140f6845e94afea.pdf
+> >=20
+> >=20
+> > As fair as I remember - the Node Table can be read from debugfs.
+> >=20
+> > However, such approach has been regarded as obsolete - by the
+> > community.
+> >=20
+> > In the future development plans there was the idea to use netlink
+> > (or iproute separate program) to get the data now available in
+> > debugfs and extend it to also print REDBOX node info (not only
+> > DANH).=20
+> I need to offload the NETIF_F_HW_HSR_TAG_INS and NETIF_F_HW_HSR_TAG_RM
+> to hardware.
 
-?
+I've recently added some "offloading" support for KSZ9477 switch IC.
+You can use it as a reference.
 
-[...]
+> The hardware needs to know which ports are slave ports,
+> which is interlink port.
 
-> vrf_ip6_input_dst unconditionally sets skb dst entry, add a call to
-> skb_dst_drop to drop any existing entry.
-> 
-> Cc: David Ahern <dsahern@kernel.org>
-> Fixes: 9ff74384600a ("net: vrf: Handle ipv6 multicast and link-local addresses")
-> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+This information you provide to the network driver when you call:
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 supervision 45
+version 1
+
+Then the lan1 is configured as slave 1 and lan2 as slave 2
+
+For interlink (RedBOX):
+
+ip link add name hsr1 type hsr slave1 lan4 slave2 lan5 interlink=20
+lan3 supervision 45 version 1
+
+>=20
+> Hardware remove HSR tag on interlink port if it is egress port, keep
+> the HSR tag on HSR slave ports. The frames from ring network are
+> removed HSR tag and forwarded to interlink port in hardware, not
+> received in HSR stack.
+
+Just out of curiosity - which HW IP block has such great capability to
+remove in HW HSR tag from RedBox frames?
+
+>=20
+> Thanks,
+> Xiaoliang
+
+
+
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH, Managing Director: Johanna Denk,
+Tabea Lutz HRB 165235 Munich, Office: Kirchenstr.5, D-82194
+Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/.aSIQCRVpkbCdC75m5Hzx4a
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmiCGAEACgkQAR8vZIA0
+zr2dTQf+Kr+Knz9PyyqN3O6Lmmt/d2AXSZxx7wyvLXmXEHhP/z2sDlCWU/VpQLJC
+HJ1u0/V3x7D65t7SJWrAljxcQ7hncO+j1Dv3ouNTXs7iWZTmDTHVfyDqjEWM9UqR
+lxN90XcEi+LLC7z9Cw/kAIQb0D0obR/A9b8541ySlnQOmibexyH2LCVxbtFMyaES
+hR3oItemNAQaUB1/REVKSd4XUsCo13rnmXdva5+EKEx8i84K8maPo05CdEYcl9E9
+Ss4bjlNegnaa2jwf4OyrV1CU7lLC1LB2pFFcfvZyp+nl7FEwa4c/3kzo5ostDdDb
+ZG9GvIyfIrMXwXXPrNop3+YP8vFyQw==
+=HtnZ
+-----END PGP SIGNATURE-----
+
+--Sig_/.aSIQCRVpkbCdC75m5Hzx4a--
 
