@@ -1,143 +1,194 @@
-Return-Path: <netdev+bounces-209832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A155B110AF
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 20:14:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 241BAB110D4
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 20:26:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CCFE586A3F
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 18:14:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE1C37B4F42
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 18:24:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 789182EB5D4;
-	Thu, 24 Jul 2025 18:14:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B71FD2EBBAC;
+	Thu, 24 Jul 2025 18:26:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.co.jp header.i=@amazon.co.jp header.b="ING8lML4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bMw0bson"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99D791A23BB
-	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 18:14:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8987054723;
+	Thu, 24 Jul 2025 18:26:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753380861; cv=none; b=oHvK+gNczucZ/+BQejS54DxomR8CV7+RSd08XmK+pT/+rxwMOW+NEvOP41+8oKNnjW+TvrJQ8cl7vdlTB+Qgnp4Mc40XNCWb3RWXvNcN9KajpRkdqOqYtoUWWlnSbee3NIAJHHk2JnqjyrJ/F++bbqezdmv3e84o28SnqVUvmmM=
+	t=1753381576; cv=none; b=V6yBWUzHOyWZZHSyrxfk9YqUinjwq44yPGyvn8rjsaGFIBL4DR94fNR4ECiTywHUFs5rPislKPdIzkbGU9vm0y7d8656PvhvzhPNKMiYVfbMAuW8t8k59Gh+86h7DQvP00+vwhTAuMaA8p1qn2430cJtv06WyPjBM3zaVywZx/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753380861; c=relaxed/simple;
-	bh=5jks/iRh0a/1aDKiLgt0AnZmU9i3FXnTkvgaW6JYbWw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qWdx9cPAhCCjElfy9tzD2n8MtwRwvP/Z0GAhyOu5ygdcflqYD3BdYGplGkecjHeGyKh5aM1cfePsqMDQ/969h4PnSRQ5NOdbYU1rMsQ8Ebs9WQnpKVSZ1meNhyeh/OvnltFiEkEDLjvatyClkbNmuAR/UwJMuoJ5Hg2DHa23kq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.jp; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.co.jp header.i=@amazon.co.jp header.b=ING8lML4; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.jp; i=@amazon.co.jp; q=dns/txt;
-  s=amazoncorp2; t=1753380859; x=1784916859;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=JsW0M6F2wkYAEXbg1vCjIJaVdwndN+h+LkOh7xfqoTo=;
-  b=ING8lML4f7FYNnUGo5DrPwNjKTESe2krhQK0qCw0elKFEOINToUaNiT6
-   0Mbts+7WJpBB4llItXf99hyUDfAO9CEiQiC8rYFwn7xAPY1pRzt1smRgH
-   YKr7PjN/t0a3avQoBvvC67h8KiOilFyU7IHBqqu2aSg2mo0L3rGeBJVwy
-   c/P4okOCrmmVRobYjltPIbtydpeq6mOGYozXmcBRN87UVuWsB45r2MKXG
-   /2n0sX1yeAYhVsoh2ewpc8x8gmngk5faq9Lt8n8DpoAOqzfXzbZABflFL
-   wgxPLojYS2twBbcMzHOlzYS+EAsDh9SBhDb+8quJCpph1PKR55B579mSl
-   w==;
-X-IronPort-AV: E=Sophos;i="6.16,337,1744070400"; 
-   d="scan'208";a="217275362"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2025 18:14:18 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:64321]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.22.29:2525] with esmtp (Farcaster)
- id 0cb89c7d-78dc-42d9-bbaa-210dcb81ab33; Thu, 24 Jul 2025 18:14:17 +0000 (UTC)
-X-Farcaster-Flow-ID: 0cb89c7d-78dc-42d9-bbaa-210dcb81ab33
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 24 Jul 2025 18:14:17 +0000
-Received: from 80a9974c3af6.amazon.com (10.37.245.7) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 24 Jul 2025 18:14:15 +0000
-From: Takamitsu Iwai <takamitz@amazon.co.jp>
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>, Jamal Hadi Salim
-	<jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko
-	<jiri@resnulli.us>
-CC: <netdev@vger.kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Vladimir Oltean <olteanv@gmail.com>,
-	<takamitz@amazon.com>, Takamitsu Iwai <takamitz@amazon.co.jp>,
-	<syzbot+398e1ee4ca2cac05fddb@syzkaller.appspotmail.com>
-Subject: [PATCH v1 net] net/sched: taprio: enforce minimum value for picos_per_byte
-Date: Fri, 25 Jul 2025 03:13:45 +0900
-Message-ID: <20250724181345.40961-1-takamitz@amazon.co.jp>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1753381576; c=relaxed/simple;
+	bh=uZxpqiy9RYnUpyxVCBBeUpjPcCp+DX2Powuds3EtP9k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WezJ4bYndCAzwkWKVAg8EfHLAiLpVqCmKPGPn6Bqwrx6qNPc02/g9gjBmGgu99oz//+XFmJ4lE2Wzb5IoMpFrNYtVcwgql0F8QLqMBaI6Gp66IfOld9Bk/T2kMeZP42drAz/jC/5SWyCc+yiGsU+lnUMINWEe6dT0kdne5Zn/EA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bMw0bson; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B37C0C4CEED;
+	Thu, 24 Jul 2025 18:26:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753381575;
+	bh=uZxpqiy9RYnUpyxVCBBeUpjPcCp+DX2Powuds3EtP9k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bMw0bsonIskMUxMWW1Oh4sXlAZ3xVEn9WH9sgAJKe8Jw7WgH51cgTzhCjNHQup6Z6
+	 1UPyUxOcAIu/K7uAcMaZaWPow7h1fSa6oHd3re9j8ID5gtT9XFHKgRoMSZZzSVAZKs
+	 cksw0LNvSmAENglw89ZOjGlpdpGfYjHy6CIWhJGNzvupZWNy20ANKSHgMDONu5KVcz
+	 NmVpTnuWd2aFzIlXusNOyTPmqJxz0vuYzqnpJSlKFsZmiFgJB+wApkITUgsUlWOI1M
+	 sNlxtgL8IDtUpJdYsGLeScvY3uUuNwJxxxKD0vuYKJGO1++PuX/VrJP5dS3tTgygke
+	 7AiU2h3x0s5xw==
+Date: Thu, 24 Jul 2025 19:26:11 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jimmy Assarsson <extja@kvaser.com>
+Cc: linux-can@vger.kernel.org, Jimmy Assarsson <jimmyassarsson@gmail.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2 01/11] can: kvaser_usb: Add support to control CAN
+ LEDs on device
+Message-ID: <20250724182611.GC1266901@horms.kernel.org>
+References: <20250724092505.8-1-extja@kvaser.com>
+ <20250724092505.8-2-extja@kvaser.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWC003.ant.amazon.com (10.13.139.252) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250724092505.8-2-extja@kvaser.com>
 
-Syzbot reported a WARNING in taprio_get_start_time().
+On Thu, Jul 24, 2025 at 11:24:55AM +0200, Jimmy Assarsson wrote:
+> Add support to turn on/off CAN LEDs on device.
+> 
+> Signed-off-by: Jimmy Assarsson <extja@kvaser.com>
 
-When link speed is 470589 or greater, q->picos_per_byte becomes too
-small, causing length_to_duration(q, ETH_ZLEN) to return zero.
+...
 
-This zero value leads to validation failures in fill_sched_entry() and
-parse_taprio_schedule(), allowing arbitrary values to be assigned to
-entry->interval and cycle_time. As a result, sched->cycle can become zero.
+> diff --git a/drivers/net/can/usb/kvaser_usb/kvaser_usb_hydra.c b/drivers/net/can/usb/kvaser_usb/kvaser_usb_hydra.c
 
-Since SPEED_800000 is the largest defined speed in
-include/uapi/linux/ethtool.h, this issue can occur in realistic scenarios.
+...
 
-To ensure length_to_duration() returns a non-zero value for minimum-sized
-Ethernet frames (ETH_ZLEN = 60), picos_per_byte must be at least 17
-(60 * 17 > PSEC_PER_NSEC which is 1000).
+> +static int kvaser_usb_hydra_set_led(struct kvaser_usb_net_priv *priv,
+> +				    enum kvaser_usb_led_state state,
+> +				    u16 duration_ms)
+> +{
+> +	struct kvaser_usb *dev = priv->dev;
+> +	struct kvaser_cmd *cmd;
+> +	int ret;
+> +
+> +	cmd = kzalloc(sizeof(*cmd), GFP_KERNEL);
+> +	if (!cmd)
+> +		return -ENOMEM;
+> +
+> +	cmd->header.cmd_no = CMD_LED_ACTION_REQ;
+> +	kvaser_usb_hydra_set_cmd_dest_he(cmd, dev->card_data.hydra.sysdbg_he);
+> +	kvaser_usb_hydra_set_cmd_transid(cmd, kvaser_usb_hydra_get_next_transid(dev));
+> +
+> +	cmd->led_action_req.duration_ms = cpu_to_le16(duration_ms);
+> +	cmd->led_action_req.action = state |
+> +				     FIELD_PREP(KVASER_USB_HYDRA_LED_IDX_MASK,
+> +						KVASER_USB_HYDRA_LED_YELLOW_CH0_IDX +
+> +						KVASER_USB_HYDRA_LEDS_PER_CHANNEL * priv->channel);
+> +
+> +	ret = kvaser_usb_send_cmd(dev, cmd, kvaser_usb_hydra_cmd_size(cmd));
 
-This patch enforces a minimum value of 17 for picos_per_byte when the
-calculated value would be lower.
+When building this file with GCC 15.1.0 with KCFLAGS=-Warray-bounds
+I see the following:
 
-Fixes: 68ce6688a5ba ("net: sched: taprio: Fix potential integer overflow in taprio_set_picos_per_byte")
-Reported-by: syzbot+398e1ee4ca2cac05fddb@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=398e1ee4ca2cac05fddb
-Signed-off-by: Takamitsu Iwai <takamitz@amazon.co.jp>
----
- net/sched/sch_taprio.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+  In file included from ./include/linux/byteorder/little_endian.h:5,
+                   from ./arch/x86/include/uapi/asm/byteorder.h:5,
+                   from ./include/linux/bitfield.h:12,
+                   from drivers/net/can/usb/kvaser_usb/kvaser_usb_hydra.c:15:
+  In function 'kvaser_usb_hydra_cmd_size',
+      inlined from 'kvaser_usb_hydra_set_led' at drivers/net/can/usb/kvaser_usb/kvaser_usb_hydra.c:1993:38:
+  drivers/net/can/usb/kvaser_usb/kvaser_usb_hydra.c:532:65: warning: array subscript 'struct kvaser_cmd_ext[0]' is partly outside array bounds of 'unsigned char[32]' [-Warray-bounds=]
+    532 |                 ret = le16_to_cpu(((struct kvaser_cmd_ext *)cmd)->len);
+  ./include/uapi/linux/byteorder/little_endian.h:37:51: note: in definition of macro '__le16_to_cpu'
+     37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
+        |                                                   ^
+  drivers/net/can/usb/kvaser_usb/kvaser_usb_hydra.c:532:23: note: in expansion of macro 'le16_to_cpu'
+    532 |                 ret = le16_to_cpu(((struct kvaser_cmd_ext *)cmd)->len);
+        |                       ^~~~~~~~~~~
+  In file included from ./include/linux/fs.h:46,
+                   from ./include/linux/compat.h:17,
+                   from ./arch/x86/include/asm/ia32.h:7,
+                   from ./arch/x86/include/asm/elf.h:10,
+                   from ./include/linux/elf.h:6,
+                   from ./include/linux/module.h:19,
+                   from ./include/linux/device/driver.h:21,
+                   from ./include/linux/device.h:32,
+                   from drivers/net/can/usb/kvaser_usb/kvaser_usb_hydra.c:17:
+  In function 'kmalloc_noprof',
+      inlined from 'kzalloc_noprof' at ./include/linux/slab.h:1039:9,
+      inlined from 'kvaser_usb_hydra_set_led' at drivers/net/can/usb/kvaser_usb/kvaser_usb_hydra.c:1979:8:
+  ./include/linux/slab.h:905:24: note: object of size 32 allocated by '__kmalloc_cache_noprof'
+    905 |                 return __kmalloc_cache_noprof(
+        |                        ^~~~~~~~~~~~~~~~~~~~~~~
+    906 |                                 kmalloc_caches[kmalloc_type(flags, _RET_IP_)][index],
+        |                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    907 |                                 flags, size);
+        |                                 ~~~~~~~~~~~~
 
-diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-index 2b14c81a87e5..bcfdb9446657 100644
---- a/net/sched/sch_taprio.c
-+++ b/net/sched/sch_taprio.c
-@@ -43,6 +43,12 @@ static struct static_key_false taprio_have_working_mqprio;
- #define TAPRIO_SUPPORTED_FLAGS \
- 	(TCA_TAPRIO_ATTR_FLAG_TXTIME_ASSIST | TCA_TAPRIO_ATTR_FLAG_FULL_OFFLOAD)
- #define TAPRIO_FLAGS_INVALID U32_MAX
-+/* Minimum value for picos_per_byte to ensure non-zero duration
-+ * for minimum-sized Ethernet frames (ETH_ZLEN = 60).
-+ * 60 * 17 > PSEC_PER_NSEC (1000)
-+ */
-+#define TAPRIO_PICOS_PER_BYTE_MIN 17
-+
+	if (cmd->header.cmd_no == CMD_EXTENDED)
+		ret = le16_to_cpu(((struct kvaser_cmd_ext *)cmd)->len);
+
+GCC seems to know that:
+* cmd was allocated sizeof(*cmd) = 32 bytes
+* struct kvaser_cmd_ext is larger than this (96 bytes)
+
+And it thinks that cmd->header.cmd_no might be CMD_EXTENDED.
+This is not true, becuae .cmd_no is set to CMD_LED_ACTION_REQ
+earlier in kvaser_usb_hydra_set_led. But still, GCC produces
+a big fat warning.
+
+On the one hand we might say this is a shortcoming in GCC,
+a position I agree with. But on the other hand, we might follow
+the pattern used elsewhere in this file for similar functions,
+which seems to make GCC happy, I guess, and it is strictly a guess,
+because less context is needed for it to analyse things correctly.
+
+That is, do this:
+
+diff --git a/drivers/net/can/usb/kvaser_usb/kvaser_usb_hydra.c b/drivers/net/can/usb/kvaser_usb/kvaser_usb_hydra.c
+index 758fd13f1bf4..a4402b4845c6 100644
+--- a/drivers/net/can/usb/kvaser_usb/kvaser_usb_hydra.c
++++ b/drivers/net/can/usb/kvaser_usb/kvaser_usb_hydra.c
+@@ -1974,6 +1974,7 @@ static int kvaser_usb_hydra_set_led(struct kvaser_usb_net_priv *priv,
+ {
+ 	struct kvaser_usb *dev = priv->dev;
+ 	struct kvaser_cmd *cmd;
++	size_t cmd_len;
+ 	int ret;
  
- struct sched_entry {
- 	/* Durations between this GCL entry and the GCL entry where the
-@@ -1299,7 +1305,7 @@ static void taprio_set_picos_per_byte(struct net_device *dev,
- 		speed = ecmd.base.speed;
+ 	cmd = kzalloc(sizeof(*cmd), GFP_KERNEL);
+@@ -1981,6 +1982,7 @@ static int kvaser_usb_hydra_set_led(struct kvaser_usb_net_priv *priv,
+ 		return -ENOMEM;
  
- skip:
--	picos_per_byte = (USEC_PER_SEC * 8) / speed;
-+	picos_per_byte = max((USEC_PER_SEC * 8) / speed, TAPRIO_PICOS_PER_BYTE_MIN);
+ 	cmd->header.cmd_no = CMD_LED_ACTION_REQ;
++	cmd_len = kvaser_usb_hydra_cmd_size(cmd);
+ 	kvaser_usb_hydra_set_cmd_dest_he(cmd, dev->card_data.hydra.sysdbg_he);
+ 	kvaser_usb_hydra_set_cmd_transid(cmd, kvaser_usb_hydra_get_next_transid(dev));
  
- 	atomic64_set(&q->picos_per_byte, picos_per_byte);
- 	netdev_dbg(dev, "taprio: set %s's picos_per_byte to: %lld, linkspeed: %d\n",
--- 
-2.39.5 (Apple Git-154)
+@@ -1990,7 +1992,7 @@ static int kvaser_usb_hydra_set_led(struct kvaser_usb_net_priv *priv,
+ 						KVASER_USB_HYDRA_LED_YELLOW_CH0_IDX +
+ 						KVASER_USB_HYDRA_LEDS_PER_CHANNEL * priv->channel);
+ 
+-	ret = kvaser_usb_send_cmd(dev, cmd, kvaser_usb_hydra_cmd_size(cmd));
++	ret = kvaser_usb_send_cmd(dev, cmd, cmd_len);
+ 	kfree(cmd);
+ 
+ 	return ret;
 
+> +	kfree(cmd);
+> +
+> +	return ret;
+> +}
+
+...
 
