@@ -1,148 +1,161 @@
-Return-Path: <netdev+bounces-209728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3E0EB109CC
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 14:00:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E5DFB109DB
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 14:02:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 859137A2843
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 11:58:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AE7C3A4787
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 12:02:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B83102BE7A7;
-	Thu, 24 Jul 2025 12:00:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3923D28541C;
+	Thu, 24 Jul 2025 12:02:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RWf7D9Kl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ag76d2cM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2539927F005
-	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 12:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7A0726A1B8;
+	Thu, 24 Jul 2025 12:02:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753358422; cv=none; b=djbwknUrgUz8UHVdAkcfVokl4NSVTadioZmC9cvXJBP84or/bCBAu+8fLaCdZMu+GWPbO6mdApHuQUMV0yo2D+13EKeQKDELpC7TYYnbH2WTAst1iyrLMrAX2spvkIyI+Hd6Ze2SMmBgtwOoOOe/VQMv2rULJn4Ry7EzLY38G7k=
+	t=1753358549; cv=none; b=nSQQzVPns+ROTw+PeOYho2ya/YhD/rHrhDWXVgbE2+Cb+x1h5ENBmGKjiyWyrtOurw1Xixm0NypSaQsISIuTTgURxeWMR5Pjt1HDhCzMPRza5ezNjX0Li5uqJdFHQpuUKWGkEmyiuVin+y63ebXPAY1QuVRpy6nPhrSVk4/F9wI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753358422; c=relaxed/simple;
-	bh=neWN+RsKK5xahj60EuUIzVaJh8Zt6T4jsM98KeOqU5g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f/aEgFiwsuNrCau11JGxFmvaaTqAw58epOhD04AKnLxE0KUogSR0cyI7uge0ktHsAkYD0FHmsaVlzTBX0VjWcyL9+Z8T7udFEkp0uPf0hu4PdcQ0+q0aoAq0bE1p4cvEjvQekuUWuQH1s+4DV3WxDK1Cw65rXbHqBc2C6HBCizE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RWf7D9Kl; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753358421; x=1784894421;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=neWN+RsKK5xahj60EuUIzVaJh8Zt6T4jsM98KeOqU5g=;
-  b=RWf7D9KllCv6d3ZQ4GPAIcx2BIpjcPwReHgSix6/keY39Cw0UbsZf6ec
-   5cryeAz1T5se9d8TSXs9TE7bRz8GA+JputPFyQUOUjNbgiynMFGNub88i
-   dWCf70Y8wx7B1dE5x4FErUR4xe7sMRmYZsIsyozRNo8icxr4p6oyd8Juh
-   x2TJG8A6Jdx7xl57s8YPssBMjM5lTqqvC34PqdWSyfFViOSw93e1IB5gD
-   8M6dEKJ2DpaGOBdJYmLdTuDSEHxEarn5UmQiqtwcoi7NWsTYVWKRsrHgI
-   L7jCLqjRZZecpAVUCOJqOATRZcI86prB/6LNkLdWIpdlv0jALspP1G4Js
-   w==;
-X-CSE-ConnectionGUID: b1Hi9PeqSNW47a0NxADciw==
-X-CSE-MsgGUID: v+3rN+KxSy27kpCmVwojjg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11501"; a="55635937"
-X-IronPort-AV: E=Sophos;i="6.16,337,1744095600"; 
-   d="scan'208";a="55635937"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2025 05:00:21 -0700
-X-CSE-ConnectionGUID: vOmJbI0aThK7xtPKnB5sYw==
-X-CSE-MsgGUID: jDlK+BZLQmiVJlB7l67yww==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,337,1744095600"; 
-   d="scan'208";a="165734121"
-Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
-  by orviesa005.jf.intel.com with ESMTP; 24 Jul 2025 05:00:19 -0700
-Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1ueucR-000KP5-3A;
-	Thu, 24 Jul 2025 12:00:15 +0000
-Date: Thu, 24 Jul 2025 20:00:02 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kees Cook <kees@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Kees Cook <kees@kernel.org>, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH 4/6 net-next] net: Convert proto_ops connect() callbacks
- to use sockaddr_unspec
-Message-ID: <202507241955.kFMs4J5b-lkp@intel.com>
-References: <20250723231921.2293685-4-kees@kernel.org>
+	s=arc-20240116; t=1753358549; c=relaxed/simple;
+	bh=K6wFiF3aPVQCcd7WPZ3i1vEqpPjmDklDm5kgow4PrgM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=EsR0gvUvtRw3uTnj6iQCHkEDwqHiN41zP5YPQd/Wwr0RI70xEBJb951Q1XVBDnENug0Se7SgjHucDxoALtIC0x5QwVnD7xaIPG4VoYgDWhkaApmpdbNMwajFd/IEhCdnXnpMIa0hdrX2Oy5/RKQvS9QTO7NrAIKmUgvfXyzW3Fk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ag76d2cM; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-b26f5f47ba1so824762a12.1;
+        Thu, 24 Jul 2025 05:02:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753358547; x=1753963347; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HMARVpWb7qO6j5xEl6IUDVhdkLX0mNgAEw0wIm4jH8A=;
+        b=Ag76d2cMM3TAX7+XZJRfhrFe5uLXOnpWwyX9gbSE+9YL5BTv9u4xA6MzIUSQTnTaym
+         WIScK6eGta0ACiACiDRIzTrMLWq9wYjq7cJBIhOoJ/+AUr43dWilAQHTQ7XSOzKCkVf8
+         /seTga1w8hEbQG0vkYHb03IeZl8MUepEYaRMVYL3IHNLXtzeCYksDANnU44RxePaF45G
+         bNAN5W6RIIEDdiOLT+I1VPKIWqmnNZxAfkDP9tsqRqKvCxdjrmmzYtmBdBNcROE9T1CR
+         yDesa76AdS+6xnKSb3sEQIUerwypr+dQjfpx75Sqf3guV109+/v7ZM4DWQSbnKmBI90z
+         G6Mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753358547; x=1753963347;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HMARVpWb7qO6j5xEl6IUDVhdkLX0mNgAEw0wIm4jH8A=;
+        b=LdZhth1YnN+FKKeLaP/l9ujmM9AsgmoL3+rVWSLAHTs3j26th7B4xO9WII8+deYRN9
+         +15x5x8RC8X4Xed7H67MeCtjACFeKsOKobR/b+wlOzNplVB2SBmf5lQ812SoD9+0/Xk7
+         FYF/RW71nLBsy2h7oBi0UN3yaWkVQGECbOtAe5UPYtPPm+OiDMBEgp6qHpkBoixKXjWv
+         Yo6DmESfG0Ni+pRl7P9PmuyjytmsE3AOrQjMna90zAP250y/pc1vht6Ps9oYwUoI3LMo
+         zaIFXpc3wHZg+2ziFODaDfF/EPXTDWAi7z3SgwuzRQJvs1kb4bl73Gy7vmvPFGPeM6iY
+         z1Kg==
+X-Forwarded-Encrypted: i=1; AJvYcCU56ueH9cUhq7xQkRLh0J7d2e4fTdAnReOy0m9FHY387Kl1j7fApiMNn9l4b/fCu1xT8d4Fnt0QtBc/pX0=@vger.kernel.org, AJvYcCVPcx/WMi0FHdyqJMpl4x5/TUxbjO04FXd/0rSAnf6uqq7vSYu0x2t0WPb9JxMI4WTvYVVbFqdI@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTXtoOLM6Tw9ex9lmwGVnqme9A6UqrivltWGLt7a+9HA+ZVcnl
+	q4u1WaAlZ25yDW32ciLELN3oWVA/XoCG1cX6zYBTnadCMoKxvOIVvIr5MzjfJA==
+X-Gm-Gg: ASbGncuYvU24MtUSwMOzrAge3bSvDTzMGTdSVZUCsaeAmw5pBrKS8u1x4m0/53qP8mW
+	0KcGaMofEnqx1JBKfUanrlmfNoCXnSmCD7qQYBFjl6Z3+9VXTnVnBh2xyCnatWvFyO3E22HKaSc
+	OlqY0eQkWlYbFH3UtTe+8ySyGW3Cb/64M3p1XQHW4xBb9zYEZWcMSD73OaSL+X8W5Zi4z2/7+h8
+	g6st2HQfZiQjMYUYDBGIDIRSZjp4iip2JdXxiXxol5ae+gwGyDYjkLxIKJa4emlhds266i5T2/a
+	ujImSeKeIQA487pvhMFaGK16JtinaYhaYi5dVlM/vDSXgcs7Yg4+QBGTNxWHHaqPPBq34x7m05l
+	psNa+pOvGHi5G/MoFYiVc+3WwEFDrY74J4/m4YQ==
+X-Google-Smtp-Source: AGHT+IEdl6Fbt8I3BHrC7vXu5S0UB6jJDmdyqjs5D0XQ3FmP16D8pEHXvbvPP7Y+LLvSVyuO+nAoGw==
+X-Received: by 2002:a05:6a20:7491:b0:235:86fd:cc99 with SMTP id adf61e73a8af0-23d490ef288mr11402252637.24.1753358545424;
+        Thu, 24 Jul 2025 05:02:25 -0700 (PDT)
+Received: from C11-068.mioffice.cn ([2408:8607:1b00:c:9e7b:efff:fe4e:6cff])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-761b0649833sm1529502b3a.141.2025.07.24.05.02.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Jul 2025 05:02:24 -0700 (PDT)
+From: Pengtao He <hept.hept.hept@gmail.com>
+To: edumazet@google.com
+Cc: aleksander.lobakin@intel.com,
+	almasrymina@google.com,
+	davem@davemloft.net,
+	ebiggers@google.com,
+	hept.hept.hept@gmail.com,
+	horms@kernel.org,
+	kerneljasonxing@gmail.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	mhal@rbox.co,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	willemb@google.com
+Subject: Re: [PATCH net-next v2] net/core: fix wrong return value in __splice_segment
+Date: Thu, 24 Jul 2025 20:02:11 +0800
+Message-ID: <20250724120211.30050-1-hept.hept.hept@gmail.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <CANn89i+vzHO3yferPBi1kBmVkRAd1mu9gD0S8tUPdVaDXapkVw@mail.gmail.com>
+References: <CANn89i+vzHO3yferPBi1kBmVkRAd1mu9gD0S8tUPdVaDXapkVw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250723231921.2293685-4-kees@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-Hi Kees,
+> >
+> > Return true immediately when the last segment is processed,
+> > avoid to walking once more in the frags loop.
+> >
+> > Signed-off-by: Pengtao He <hept.hept.hept@gmail.com>
+> > ---
+> > v2->v1:
+> > Correct the commit message and target tree.
+> > v1:
+> > https://lore.kernel.org/netdev/20250723063119.24059-1-hept.hept.hept@gmai=
+> l.com/
+> > ---
+> >  net/core/skbuff.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> >
+> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > index ee0274417948..cc3339ab829a 100644
+> > --- a/net/core/skbuff.c
+> > +++ b/net/core/skbuff.c
+> > @@ -3114,6 +3114,9 @@ static bool __splice_segment(struct page *page, uns=
+> igned int poff,
+> >                 *len -=3D flen;
+> >         } while (*len && plen);
+> >
+> > +       if (!*len)
+> > +               return true;
+> > +
+> >         return false;
+> >  }
+> >
+> 
+> Condition is evaluated twice. What about this instead ?
+> 
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index ee0274417948e0eb121792a400a0455884c92e56..23b776cd98796cf8eb4d19868a0=
+> 506423226914d
+> 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -3112,7 +3112,9 @@ static bool __splice_segment(struct page *page,
+> unsigned int poff,
+>                 poff +=3D flen;
+>                 plen -=3D flen;
+>                 *len -=3D flen;
+> -       } while (*len && plen);
+> +               if (!*len)
+> +                       return true;
+> +       } while (plen);
+> 
+>         return false;
+>  }
+> 
+Ok, this is better.
 
-kernel test robot noticed the following build errors:
+Thanks.
 
-[auto build test ERROR on next-20250723]
-[cannot apply to net-next/main bluetooth-next/master bluetooth/master brauner-vfs/vfs.all mkl-can-next/testing mptcp/export mptcp/export-net trondmy-nfs/linux-next linus/master v6.16-rc7 v6.16-rc6 v6.16-rc5 v6.16-rc7]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Kees-Cook/net-uapi-Add-__kernel_sockaddr_unspec-for-sockaddr-of-unknown-length/20250724-072218
-base:   next-20250723
-patch link:    https://lore.kernel.org/r/20250723231921.2293685-4-kees%40kernel.org
-patch subject: [PATCH 4/6 net-next] net: Convert proto_ops connect() callbacks to use sockaddr_unspec
-config: x86_64-buildonly-randconfig-005-20250724 (https://download.01.org/0day-ci/archive/20250724/202507241955.kFMs4J5b-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250724/202507241955.kFMs4J5b-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507241955.kFMs4J5b-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> net/mctp/af_mctp.c:632:13: error: incompatible function pointer types initializing 'int (*)(struct socket *, struct __kernel_sockaddr_unspec *, int, int)' with an expression of type 'int (struct socket *, struct sockaddr *, int, int)' [-Wincompatible-function-pointer-types]
-     632 |         .connect        = mctp_connect,
-         |                           ^~~~~~~~~~~~
-   1 error generated.
-
-
-vim +632 net/mctp/af_mctp.c
-
-63ed1aab3d40aa Matt Johnston 2022-02-09  627  
-8f601a1e4f8c84 Jeremy Kerr   2021-07-29  628  static const struct proto_ops mctp_dgram_ops = {
-8f601a1e4f8c84 Jeremy Kerr   2021-07-29  629  	.family		= PF_MCTP,
-8f601a1e4f8c84 Jeremy Kerr   2021-07-29  630  	.release	= mctp_release,
-8f601a1e4f8c84 Jeremy Kerr   2021-07-29  631  	.bind		= mctp_bind,
-3549eb08e55058 Matt Johnston 2025-07-10 @632  	.connect	= mctp_connect,
-8f601a1e4f8c84 Jeremy Kerr   2021-07-29  633  	.socketpair	= sock_no_socketpair,
-8f601a1e4f8c84 Jeremy Kerr   2021-07-29  634  	.accept		= sock_no_accept,
-8f601a1e4f8c84 Jeremy Kerr   2021-07-29  635  	.getname	= sock_no_getname,
-8f601a1e4f8c84 Jeremy Kerr   2021-07-29  636  	.poll		= datagram_poll,
-63ed1aab3d40aa Matt Johnston 2022-02-09  637  	.ioctl		= mctp_ioctl,
-8f601a1e4f8c84 Jeremy Kerr   2021-07-29  638  	.gettstamp	= sock_gettstamp,
-8f601a1e4f8c84 Jeremy Kerr   2021-07-29  639  	.listen		= sock_no_listen,
-8f601a1e4f8c84 Jeremy Kerr   2021-07-29  640  	.shutdown	= sock_no_shutdown,
-8f601a1e4f8c84 Jeremy Kerr   2021-07-29  641  	.setsockopt	= mctp_setsockopt,
-8f601a1e4f8c84 Jeremy Kerr   2021-07-29  642  	.getsockopt	= mctp_getsockopt,
-8f601a1e4f8c84 Jeremy Kerr   2021-07-29  643  	.sendmsg	= mctp_sendmsg,
-8f601a1e4f8c84 Jeremy Kerr   2021-07-29  644  	.recvmsg	= mctp_recvmsg,
-8f601a1e4f8c84 Jeremy Kerr   2021-07-29  645  	.mmap		= sock_no_mmap,
-63ed1aab3d40aa Matt Johnston 2022-02-09  646  #ifdef CONFIG_COMPAT
-63ed1aab3d40aa Matt Johnston 2022-02-09  647  	.compat_ioctl	= mctp_compat_ioctl,
-63ed1aab3d40aa Matt Johnston 2022-02-09  648  #endif
-8f601a1e4f8c84 Jeremy Kerr   2021-07-29  649  };
-8f601a1e4f8c84 Jeremy Kerr   2021-07-29  650  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
