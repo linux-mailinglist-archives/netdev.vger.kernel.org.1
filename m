@@ -1,58 +1,62 @@
-Return-Path: <netdev+bounces-209576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA926B0FE59
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 03:32:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBA0BB0FE75
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 03:51:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E6743B1A0B
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 01:31:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D432587408
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 01:51:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C08454262;
-	Thu, 24 Jul 2025 01:32:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D94941534EC;
+	Thu, 24 Jul 2025 01:51:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="pZBAooeN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MTQIJC0E"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C0E628E0F;
-	Thu, 24 Jul 2025 01:32:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B39904A28
+	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 01:51:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753320727; cv=none; b=mtIm9HofyFCBXraDfbA3enf8zrEREgM6o++wUGHdeCQ+PdwY1htKvbHuHBvIwp9ap6lca1EhMNnebGCC78BuI9iPhhUYsc9WEVqyjF9Y6oH/ktoEQhReuxgbmDtq4URms4lOmQ3KjdeqNY4owyVuOQHi1mXHjCwbDyj11rSVLMc=
+	t=1753321881; cv=none; b=QuLcdE7L1YSwEKoXupLJ26USAMHzklBHJIn8SroFNOQE4yVvSCx14CeJg0YcBE3S2v0EJsOaIQC07yXZmGWAgTuHYEQMqRvk57/7WCyYzARQv4x92oiVpDcbMtBL14koNy7QtoUdNRnajbAJYIw4IbJdm1onuqI4JJpaJWxEfew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753320727; c=relaxed/simple;
-	bh=eMCaAMgToeHTEFdiJ3MiKleOXM/l+gUrFlLQgweUVOI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rsJummtTuzgNJ4UPNZjYIU4ZvQZjeSe9BlH2siTfPNYP9IdJPf8htdyxxiBPcqLfnEw18tvWWfu419YQepui35eHMZEf4uTq2/Ij7meHxLvhZ3Bx2wAkjQcwAktKzMMkKU9sdB1YRRx95rgTN9/5+bGFYaPiC+bqpS7MUcQ3f3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=pZBAooeN; arc=none smtp.client-ip=117.135.210.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=bI
-	GWBSCbr5xCslura3QUWceaRXrDNmQ1wuyKrSAX7bE=; b=pZBAooeNCloY9lpQsx
-	udlDCzremMw/Nfm/RFmWfuHNXobGme6sSl9UodHhhKtDtqJf0sZ8/VM5Owg16FzU
-	treDMbo8B655K7HX/cQPgNcKPbqS02t2mbJsDRUUhb9bQUL6C8PS0Mdmnw/a6x6Q
-	immJPxJ+eiZFvKpprNqRnAQfc=
-Received: from localhost.localdomain (unknown [])
-	by gzsmtp1 (Coremail) with SMTP id PCgvCgDnL5H3jIFoQZMcAQ--.40865S2;
-	Thu, 24 Jul 2025 09:31:36 +0800 (CST)
-From: yicongsrfy@163.com
-To: kuba@kernel.org,
+	s=arc-20240116; t=1753321881; c=relaxed/simple;
+	bh=A1ANpJUXs8V0+Nvf4lKaDUQ4pugrKdc+C60/pduo/iU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TU1yQIu+vs4R0jxkqe0e6Vu23bDu7Q6Lk92AiKyTrwZlLiHB1UEI6bBIqdPtmuEMYIp/iV/UN7aAsq233NQX5rAvXljyrSiL0pOuMGrVXjgJ/Aov/nezKYMutJrIJm6oBLlxvdUzFXWOpscemtN6IKV3UvclJYYUr0i9U9L1moY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MTQIJC0E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE649C4CEE7;
+	Thu, 24 Jul 2025 01:51:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753321881;
+	bh=A1ANpJUXs8V0+Nvf4lKaDUQ4pugrKdc+C60/pduo/iU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=MTQIJC0EqVjvMigX6X0k628CkCz45g3BBzeKfzo35B+6RFtrNHYt+ROTkQJ/S1BVR
+	 DQQ1tWdAgoXKnlXnpZFQPgz0q7DHqW1kG8L0nLQ8Syq1iur/iAbELcYzYS1SiXWD8S
+	 5WHK2M8XEmoW6a0sVXkwo1JT/ujTfrQnzePeZQOl+AWvqy0oeZrU57Tt7p1vhojvex
+	 thBWLT6D8hlxnuC364rht3V0Hney6T9UiGlDFUYgmIl279tVFSFVy4tZFdBaVm/G+j
+	 U9sUyl8DRH4jDug3kTcsBfY2eTt7QVWP2u8ABFOO5yeg4bFMQke3YgoMqaEdsilo2L
+	 pxBYdpD52KUlw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
 	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	donald.hunter@gmail.com,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
 	andrew@lunn.ch,
-	oneukum@suse.com
-Cc: davem@davemloft.net,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	yicong@kylinos.cn
-Subject: [PATCH v2] usbnet: Set duplex status to unknown in the absence of MII
-Date: Thu, 24 Jul 2025 09:31:33 +0800
-Message-Id: <20250724013133.1645142-1-yicongsrfy@163.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250723152151.70a8034b@kernel.org>
-References: <20250723152151.70a8034b@kernel.org>
+	willemdebruijn.kernel@gmail.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next v3 0/4] net: ethtool: support including Flow Label in the flow hash for RSS
+Date: Wed, 23 Jul 2025 18:50:57 -0700
+Message-ID: <20250724015101.186608-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,50 +64,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PCgvCgDnL5H3jIFoQZMcAQ--.40865S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7tw1xZry8ZrWkuw1rCr1xKrg_yoW8Gr45pF
-	WDAr4kAw1j93y8Zw4xZay09a4Yg3Wvqry7WFy7u398WFZxA3ZIqr18Ka42k34kKrW8GFya
-	vF4qgryav3Z093DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jiZ2fUUUUU=
-X-CM-SenderInfo: p1lf00xjvuw5i6rwjhhfrp/1tbiLByU22iBg-T7UgAAsI
 
-From: Yi Cong <yicong@kylinos.cn>
+Add support for using IPv6 Flow Label in Rx hash computation
+and therefore RSS queue selection.
 
-Currently, USB CDC devices that do not use MDIO to get link status have
-their duplex mode set to half-duplex by default. However, since the CDC
-specification does not define a duplex status, this can be misleading.
+v3:
+ - change the bnxt driver, bits are now exclusive
+ - check for RPS/RFS in the test
+v2:  https://lore.kernel.org/20250722014915.3365370-1-kuba@kernel.org
+RFC: https://lore.kernel.org/20250609173442.1745856-1-kuba@kernel.org
 
-This patch changes the default to DUPLEX_UNKNOWN in the absence of MII,
-which more accurately reflects the state of the link and avoids implying
-an incorrect or error state.
+Jakub Kicinski (4):
+  net: ethtool: support including Flow Label in the flow hash for RSS
+  eth: fbnic: support RSS on IPv6 Flow Label
+  eth: bnxt: support RSS on IPv6 Flow Label
+  selftests: drv-net: add test for RSS on flow label
 
-v2: rewrote commmit messages and code comments
+ Documentation/netlink/specs/ethtool.yaml      |   3 +
+ .../testing/selftests/drivers/net/hw/Makefile |   1 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   1 +
+ include/uapi/linux/ethtool.h                  |   1 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |   2 +
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  20 ++-
+ .../net/ethernet/meta/fbnic/fbnic_ethtool.c   |   2 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_rpc.c   |   2 +
+ net/ethtool/ioctl.c                           |  25 +++
+ net/ethtool/rss.c                             |  27 +--
+ .../drivers/net/hw/rss_flow_label.py          | 167 ++++++++++++++++++
+ 11 files changed, 233 insertions(+), 18 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/hw/rss_flow_label.py
 
-Link: https://lore.kernel.org/all/20250723152151.70a8034b@kernel.org/
-Signed-off-by: Yi Cong <yicong@kylinos.cn>
----
- drivers/net/usb/usbnet.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-index 6a3cca104af9..b870e7c6d6a0 100644
---- a/drivers/net/usb/usbnet.c
-+++ b/drivers/net/usb/usbnet.c
-@@ -1013,6 +1013,13 @@ int usbnet_get_link_ksettings_internal(struct net_device *net,
- 	else
- 		cmd->base.speed = SPEED_UNKNOWN;
- 
-+	/* The standard "Universal Serial Bus Class Definitions
-+	 * for Communications Devices v1.2" does not specify
-+	 * anything about duplex status.
-+	 * So set it DUPLEX_UNKNOWN instead of default DUPLEX_HALF.
-+	 */
-+	cmd->base.duplex = DUPLEX_UNKNOWN;
-+
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(usbnet_get_link_ksettings_internal);
 -- 
-2.25.1
+2.50.1
 
 
