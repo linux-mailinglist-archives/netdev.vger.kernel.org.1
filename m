@@ -1,133 +1,134 @@
-Return-Path: <netdev+bounces-209746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92DA2B10B0D
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 15:11:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A666B10B0A
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 15:11:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 134D17B521A
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 13:09:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD7A91CE234E
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 13:11:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EE642D3721;
-	Thu, 24 Jul 2025 13:11:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7852E2D63E5;
+	Thu, 24 Jul 2025 13:11:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u05XR3it"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BB61TH7B"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AC83169AE6
-	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 13:11:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B01902D5C76
+	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 13:11:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753362662; cv=none; b=dMNLNMfK7Ec2DYE4Hco84LIhao+1oQDWgTlfPeKxsKBjlmIbSp4mEFA0pclNKNOuCrkM9A46F1VW3KEM7H80b0NqB70Y4B10Eh9EJO+XTlGwwVrgaCLifMp8CnqQvhThQgM/8j1dJAfqTh6JUiYnpFtrHI/ESb4zBeP5xbjfN+w=
+	t=1753362667; cv=none; b=GMvqH7WRzFJD5UpkUflcQfFPjAZKQpT4qFBNMPgGgojudzQMKxRj8hHWxx5brblrZTWpgz91QcWMTLGjXGjhrqJGlfCY9TXF1fi7eDFZRIk4e0zZgeRF23AZUqZuuztwcgcXQ6t5OAruI50494+Si8W8KXmZrjLt/vqmJBxrKn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753362662; c=relaxed/simple;
-	bh=w9lGBLME35MXQLK57s/hBzDusXKiX6mMash/a2GgQuY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=bTy+RJiDdWBgMBFxXitXOfVdzFsL1RXR/KBnLIRpv9VMiXEbush+D854zyzJZ9nojDWZ52aiaHVqFyavKmGgT/RZzAju5C9zZf6rCrtPjD7y7V8zd2BSiA8S/AAducVIrTuWURKlKGrJRcKgD4/kY8tqOTQt/3kyvrYYK2zE9v0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u05XR3it; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED464C4CEED;
-	Thu, 24 Jul 2025 13:10:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753362662;
-	bh=w9lGBLME35MXQLK57s/hBzDusXKiX6mMash/a2GgQuY=;
-	h=From:Date:Subject:To:Cc:From;
-	b=u05XR3itAzwVb+ZCCvUILp7y7ehm8KJWQqNtqK/DeZApNP8kr5zY9ajIABFFZ5vG+
-	 OI6iLEf6Ri/UOVAj5SQLiPqLUL14VOZpNfdbhxeAhNqYw6gy1TolnW7HcHit4DAXXU
-	 cG/7JgTn3OyhKgppDMuBBzfnVXpZ4XnwB/Ho7NP8uJKusLpo/g33jcObgFxURjWWbD
-	 9Go+APRgJG37ubHsCGisjuailp5yv/Y6Xuayj+JyCn6qVqePx1O3T+FzihQTG+/se/
-	 LORJNoOOPbH7m2yiTA1G2FrdaIea+rNWn4TXyud+uqkOMoNsaOZtaQXx/b9EEzvzzK
-	 4krMOp4L7QDBQ==
-From: Simon Horman <horms@kernel.org>
-Date: Thu, 24 Jul 2025 14:10:54 +0100
-Subject: [PATCH net-next] octeontx2-af: use unsigned int as iterator for
- unsigned values
+	s=arc-20240116; t=1753362667; c=relaxed/simple;
+	bh=keOlY8IaAAP4UK7nEyK2eSAQe1k4TUyTEO0v5TsdGIg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=uNnfBKpFOY7TRi1N3E8syxoiLkeGd56jeq+nH0rfJZfLQ900Nw6OMh4EJJeTOgrLxTRAIxMaQ7ixtgc5swq7LHpOu0wneWxiVOowr90qMhLkGDVgkn8EAu09kygG6W22jwslv9sbb07Ly0+GxXlANhlSJptaJ/Flr7HKH8oLKwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BB61TH7B; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753362664;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DzMToL0msrSZ/KKMxmuznJBdXGU3S4ZL56R4KdRa7go=;
+	b=BB61TH7BPG1btsSu7D7dR3xBvBvLYcCcE/21W8XHYGHowQsP6fZS76T5cDEfNuIUreic+2
+	L9STSFrUeWtdrvWE7FyEzLvSGZYk1KzXNS2+iidFQXlxxYGILRY5gX2oo480mydDDrv4B3
+	e+fLceLxuc2atV+DaLHPxImnL70AGlQ=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-154-nh2WXxXsNheZtIae9pTtUg-1; Thu, 24 Jul 2025 09:11:03 -0400
+X-MC-Unique: nh2WXxXsNheZtIae9pTtUg-1
+X-Mimecast-MFC-AGG-ID: nh2WXxXsNheZtIae9pTtUg_1753362662
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a4edf5bb4dso669557f8f.0
+        for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 06:11:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753362662; x=1753967462;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DzMToL0msrSZ/KKMxmuznJBdXGU3S4ZL56R4KdRa7go=;
+        b=ZEhhXXjdzdvjQG1JrNzFbmbnvUcqAZyQDCWwcY41yFY+2hoxNwleRHbbpdaXSOk/78
+         omeQQKV6sMf60E4sFebiGbNicm9mjeW22w7X8rLhQiZhO1FMin4CGNboOmbzv6B9wLPe
+         yr/JGi9BYhZO8cJSvT+VyNzTQBrMPtf7cATxQOCvgIBagZSHp+Z1/UEV1P4oVRRHjlvW
+         OZq7AqwF1VzwA3rugPtU3FnI2P58KA2xLF3VaLPp4Syyj5UCKTTBA6V1ychf8mcMWAF2
+         A7VMOCNKPYD+BkP9/GNqSJcC0PIm9QQhFjthxjy2JezJYpt3eF0oV0+s2HCDYnHHgFih
+         Y2Xw==
+X-Forwarded-Encrypted: i=1; AJvYcCVOY+vtTec37rNXDrDvdELnP8ayVs71Qp54LQBx+QROwaYYUdT5cyUA/AAaF+j2FP0Em45CQf4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCDEsoO7DsHnPZP7HYZcrWcHT3pG7OqK8E6EsvrfMXOWjf4uu/
+	/p28l3PsoiC3dNiqHWXhl1RiYNMMGOQwhh84mOt3m/8jgUEoj2D1wY+dJu5wJ3+yeDTcaBl5pdj
+	lxsOLdls+F3c13gIMdIt1SJRGy6/kuw6CQZ67wPok4Q0ibyB4lpQtOm2NoA==
+X-Gm-Gg: ASbGnctelF5QqypzHBjUquKbpqR20CYcGniDLUWtbXne4HzifGoSv7Y80hgDcfA2CdO
+	MTODniX05A8L8sIS51QAEow72CmAxtk28iHi6nIGkfeE8PMgvTknkQi5TlwAtrfdSBk19fIRkkF
+	H20TY9mhKNTWoIYF1MTU0LfubVMgq/Hy2GQmd5zTxZvDs7IRtpM4F9o3ySttIkWSvjNcvV+P5Wp
+	psxNP2TRcEaaIWt7map7QyBi1dois+fPrAZFL1NdUTB1UU6yl5a1ozEediHyz9blOxmSzaRwl/u
+	Fr7zqim+K7SBQO+/21zhtO0RmFuN/vjKG2Jegp0NtrLxiee4ihGdseyRY7ElK+GbFqLhDy1amli
+	uYRvnklRpgls=
+X-Received: by 2002:a05:6000:40db:b0:3a6:d2ae:1503 with SMTP id ffacd0b85a97d-3b768ef6f18mr6952659f8f.34.1753362662149;
+        Thu, 24 Jul 2025 06:11:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF9uXjjqVyQTr1AvkZtxeDHHOZSkmpUhu0Uhy7GWwFd3tbgN6rpLR2iWPHM6a6vJBIw8pnGSQ==
+X-Received: by 2002:a05:6000:40db:b0:3a6:d2ae:1503 with SMTP id ffacd0b85a97d-3b768ef6f18mr6952627f8f.34.1753362661709;
+        Thu, 24 Jul 2025 06:11:01 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b76fcc3ccasm2177679f8f.80.2025.07.24.06.10.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Jul 2025 06:11:01 -0700 (PDT)
+Message-ID: <e79b4382-9421-498d-8b8c-6157ff070a34@redhat.com>
+Date: Thu, 24 Jul 2025 15:10:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v14 net-next 00/14] AccECN protocol patch series
+To: chia-yu.chang@nokia-bell-labs.com, edumazet@google.com,
+ linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
+ dsahern@kernel.org, kuniyu@amazon.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com,
+ kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch,
+ donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
+ ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
+ g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
+ mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
+ Jason_Livingood@comcast.com, vidhi_goel@apple.com
+References: <20250722095931.24510-1-chia-yu.chang@nokia-bell-labs.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250722095931.24510-1-chia-yu.chang@nokia-bell-labs.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250724-octeontx2-af-unsigned-v1-1-c745c106e06f@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAN0wgmgC/x3MQQqDMBBG4avIrDsQE21or1JcBP21s5mUJJWAe
- HeDy2/x3kEZSZDp3R2UsEuWqA39o6P5G3QDy9JM1tjReDtwnAuilmo5rPzXLJti4fAaB9M7793
- TUGt/CavU+/shRWFFLTSd5wVUp5pVcQAAAA==
-To: Sunil Goutham <sgoutham@marvell.com>, 
- Linu Cherian <lcherian@marvell.com>, Geetha sowjanya <gakula@marvell.com>, 
- Jerin Jacob <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>, 
- Subbaraya Sundeep <sbhatta@marvell.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org, Simon Horman <horms@kernel.org>
-X-Mailer: b4 0.14.0
 
-The local variable i is used to iterate over unsigned
-values. The lower bound of the loop is set to 0. While
-the upper bound is cgx->lmac_count, where they lmac_count is
-an u8. So the theoretical upper bound is 255.
+Hi,
 
-As is, GCC can't see this range of values and warns that
-a formatted string, which includes the %d representation of i,
-may overflow the buffer provided.
+On 7/22/25 11:59 AM, chia-yu.chang@nokia-bell-labs.com wrote:
+> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> 
+> Please find the v14 AccECN protocol patch series, which covers the core
+> functionality of Accurate ECN, AccECN negotiation, AccECN TCP options,
+> and AccECN failure handling. The Accurate ECN draft can be found in
+> https://datatracker.ietf.org/doc/html/draft-ietf-tcpm-accurate-ecn-28
+> 
+> This patch series is part of the full AccECN patch series, which is available at
+> https://github.com/L4STeam/linux-net-next/commits/upstream_l4steam/
 
-GCC 15.1.0 says:
+I don't have any additional comments, but let's wait for Eric's review.
 
-  .../cgx.c: In function 'cgx_lmac_init':
-  .../cgx.c:1737:49: warning: '%d' directive writing between 1 and 11 bytes into a region of size between 4 and 6 [-Wformat-overflow=]
-   1737 |                 sprintf(lmac->name, "cgx_fwi_%d_%d", cgx->cgx_id, i);
-        |                                                 ^~
-  .../cgx.c:1737:37: note: directive argument in the range [-2147483641, 254]
-   1737 |                 sprintf(lmac->name, "cgx_fwi_%d_%d", cgx->cgx_id, i);
-        |                                     ^~~~~~~~~~~~~~~
-  .../cgx.c:1737:17: note: 'sprintf' output between 12 and 24 bytes into a destination of size 16
-   1737 |                 sprintf(lmac->name, "cgx_fwi_%d_%d", cgx->cgx_id, i);
-        |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Also we are very far in the development cycle, likely this will have to
+be postponed to the next cycle.
 
-Empirically, changing the type of i from (signed) int to unsigned int
-addresses this problem. I assume by allowing GCC to see the range of
-values described above.
+Thanks,
 
-Also update the format specifiers for the integer values in the string
-in question from %d to %u. This seems appropriate as they are now both
-unsigned.
-
-No functional change intended.
-Compile tested only.
-
-Signed-off-by: Simon Horman <horms@kernel.org>
----
- drivers/net/ethernet/marvell/octeontx2/af/cgx.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-index ab5838865c3f..4ff19a04b23e 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-@@ -1706,9 +1706,9 @@ static int cgx_lmac_init(struct cgx *cgx)
- {
- 	u8 max_dmac_filters;
- 	struct lmac *lmac;
-+	int err, filter;
-+	unsigned int i;
- 	u64 lmac_list;
--	int i, err;
--	int filter;
- 
- 	/* lmac_list specifies which lmacs are enabled
- 	 * when bit n is set to 1, LMAC[n] is enabled
-@@ -1734,7 +1734,7 @@ static int cgx_lmac_init(struct cgx *cgx)
- 			err = -ENOMEM;
- 			goto err_lmac_free;
- 		}
--		sprintf(lmac->name, "cgx_fwi_%d_%d", cgx->cgx_id, i);
-+		sprintf(lmac->name, "cgx_fwi_%u_%u", cgx->cgx_id, i);
- 		if (cgx->mac_ops->non_contiguous_serdes_lane) {
- 			lmac->lmac_id = __ffs64(lmac_list);
- 			lmac_list   &= ~BIT_ULL(lmac->lmac_id);
+Paolo
 
 
