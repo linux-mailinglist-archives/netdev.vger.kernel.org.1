@@ -1,127 +1,111 @@
-Return-Path: <netdev+bounces-209756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F92AB10B47
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 15:21:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA089B10B56
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 15:25:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1925F7AE37A
-	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 13:20:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 062AA583525
+	for <lists+netdev@lfdr.de>; Thu, 24 Jul 2025 13:25:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 097522D63F7;
-	Thu, 24 Jul 2025 13:21:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 516682D781A;
+	Thu, 24 Jul 2025 13:25:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E6fCah3p"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fRwFfiSi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C96F62AF03;
-	Thu, 24 Jul 2025 13:21:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01A02D641C
+	for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 13:25:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753363289; cv=none; b=YY/jjS3izlEMoq/6kPC55DL3LK2BZ8vsgmvC5qTfEaG+Nt/0XB2Z2/qtHFFJprQiNS0DUJZvmBFzuZ6x9cUssVzXKTE31tA9ApCsDxCN8ROuTOnQ/D4DYWBOAmXrjWjURhlag23kAxqN74gyweMday8dXl166dm8rklfYSWYMcY=
+	t=1753363528; cv=none; b=XhZ7yZBfVpzdJsONhH/x7LjrpFjQQHuegs+OAO34TLQ9xT2h192qJK3HcUqPlt1SVsGVZV7JH3EtWvd/RpjeOni4CnDtNpvsyyIcyw3RtFY1at4kCJoFzTkY+hlkV15vaY9AwgLQqoIA1WDgDqC8R5Rm6PRqFs3S1V+qFEp7uFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753363289; c=relaxed/simple;
-	bh=ituzBDn856hlt33VW1UTAz5KYbLL2bWaUwfAHXMovwA=;
+	s=arc-20240116; t=1753363528; c=relaxed/simple;
+	bh=++PbZMPB9w+uxx6N/IcuC9y7r1xlp0Hw0nxM4L8VEsg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cDyHIO7aeS/lJgLepCZZrDKloKXyNBvMYJH9e0b2JRFQsYnHaXx+JBaZWM/bKMAhvV226zmK/Xlt8PeI+8glMxvrcolttJvaurTrN9eMx7zDslqwV0ju+Hu5epo2xEHd1EtZF5K4g3ZWp7B58YsD6DPapz4W50PUy/d5dPKwtmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E6fCah3p; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35E7AC4CEED;
-	Thu, 24 Jul 2025 13:21:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753363289;
-	bh=ituzBDn856hlt33VW1UTAz5KYbLL2bWaUwfAHXMovwA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=E6fCah3pGB/JwG9sSI2wDPfgeHJf0vywQPdPM5CUxh/wPlRzr/3rIMnTj4q7CQYDv
-	 98BWYn/ciNFccPPytHqpOXRFEMOn1MoTOj1XzGCh9k8XRPmP2oqzZMx7bgWuOt7x7J
-	 PuyZf5iVjxE4WVbDA33SPLViMCVbfd/z5u4RPsd+9xTDTmKDvJzkUGujdn6LuSmdo0
-	 15XhXfwcUkUboSoiS87u1pmRfmZIn9eT77ctq+uisfuQdzt+62YQn7vulFYMR09dJi
-	 dJvUxqX1510nrCCGFRyuCB2JaucFPqdWqZeeYGpO/ei+UGuaSibKEta8A1Y+I6Nzad
-	 5WtX3U4Qy/oZQ==
-Message-ID: <68051d34-9fff-4362-a27f-7abf596e662e@kernel.org>
-Date: Thu, 24 Jul 2025 15:21:24 +0200
+	 In-Reply-To:Content-Type; b=cPC2lrETV6T+lcfPp09xnpZZ+TLvcqbJbW/WQXs355w7nCw3LwX+spxNZQEHREqEHXz9SLpvIgtdhFfK1nQ1K6Z91vixYVcBGXOaM0OFFt7a7WmLqgfqzqzM1c0BVIroMcwwectDqWavW09h+mlmgoZLLh1y5p8jaqdf3paqP6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fRwFfiSi; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <5a716f1d-5a37-4634-be93-ba37b3b817c5@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753363523;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qEXQdyoUreQlmJlsZ2BgZUtS3jfDILQNhinD3l474p8=;
+	b=fRwFfiSiAciRirtf3vltzdHFAjFtGJ2m5X0Ei52Y3TTpxY70+RDaQ+EBEoQghrlPwtOFC9
+	2o7Gs44F7uFXst1T1trgXe5au0Y9sb+5hNPRmch9NdjBdv1teOSXwH0c/nErxPgmMoEfjR
+	Vy07839RGq3SSM7onsbrOt8YkCrKU/I=
+Date: Thu, 24 Jul 2025 14:25:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 6/7] dt-bindings: arm: qcom: Refactor QCS9100 and SA8775P
- board names to reflect Lemans variants
-To: Wasim Nazir <wasim.nazir@oss.qualcomm.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Richard Cochran <richardcochran@gmail.com>
-Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kernel@oss.qualcomm.com
-References: <20250722144926.995064-1-wasim.nazir@oss.qualcomm.com>
- <20250722144926.995064-7-wasim.nazir@oss.qualcomm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH net-next] octeontx2-af: use unsigned int as iterator for
+ unsigned values
+To: Simon Horman <horms@kernel.org>, Sunil Goutham <sgoutham@marvell.com>,
+ Linu Cherian <lcherian@marvell.com>, Geetha sowjanya <gakula@marvell.com>,
+ Jerin Jacob <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>,
+ Subbaraya Sundeep <sbhatta@marvell.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org
+References: <20250724-octeontx2-af-unsigned-v1-1-c745c106e06f@kernel.org>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20250722144926.995064-7-wasim.nazir@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250724-octeontx2-af-unsigned-v1-1-c745c106e06f@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On 22/07/2025 16:49, Wasim Nazir wrote:
->          sa8155p
->          sa8540p
-> -        sa8775p
-> +        sa8775p    # lemans
+On 24/07/2025 14:10, Simon Horman wrote:
+> The local variable i is used to iterate over unsigned
+> values. The lower bound of the loop is set to 0. While
+> the upper bound is cgx->lmac_count, where they lmac_count is
+> an u8. So the theoretical upper bound is 255.
+> 
+> As is, GCC can't see this range of values and warns that
+> a formatted string, which includes the %d representation of i,
+> may overflow the buffer provided.
+> 
+> GCC 15.1.0 says:
+> 
+>    .../cgx.c: In function 'cgx_lmac_init':
+>    .../cgx.c:1737:49: warning: '%d' directive writing between 1 and 11 bytes into a region of size between 4 and 6 [-Wformat-overflow=]
+>     1737 |                 sprintf(lmac->name, "cgx_fwi_%d_%d", cgx->cgx_id, i);
+>          |                                                 ^~
+>    .../cgx.c:1737:37: note: directive argument in the range [-2147483641, 254]
+>     1737 |                 sprintf(lmac->name, "cgx_fwi_%d_%d", cgx->cgx_id, i);
+>          |                                     ^~~~~~~~~~~~~~~
+>    .../cgx.c:1737:17: note: 'sprintf' output between 12 and 24 bytes into a destination of size 16
+>     1737 |                 sprintf(lmac->name, "cgx_fwi_%d_%d", cgx->cgx_id, i);
+>          |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> 
+> Empirically, changing the type of i from (signed) int to unsigned int
+> addresses this problem. I assume by allowing GCC to see the range of
+> values described above.
+> 
+> Also update the format specifiers for the integer values in the string
+> in question from %d to %u. This seems appropriate as they are now both
+> unsigned.
+> 
+> No functional change intended.
+> Compile tested only.
+> 
+> Signed-off-by: Simon Horman <horms@kernel.org>
+> ---
+>   drivers/net/ethernet/marvell/octeontx2/af/cgx.c | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
 
-I already commented on other patch on this and I am dissapointed this
-pattern keeps growing.
-
-Linux kernel is not the place to store map of your internal company
-names/codenames and products.
-
-Best regards,
-Krzysztof
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
