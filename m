@@ -1,139 +1,161 @@
-Return-Path: <netdev+bounces-209953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A97CBB11739
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 05:50:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A81FB1173E
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 05:54:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC73C1C288D7
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 03:51:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CAB01C28911
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 03:54:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D880239E7E;
-	Fri, 25 Jul 2025 03:50:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 508F3237704;
+	Fri, 25 Jul 2025 03:53:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SAxUErDJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MnYW7iKB"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B14A230BD2
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 03:50:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9ADA1EDA1A;
+	Fri, 25 Jul 2025 03:53:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753415447; cv=none; b=IQGjSga18D0nmKfigFulzjRr2kkMswBb8mcGCl3ozfucSCNonBBH+HYAfIM3u9/4MJJjkOh7ksaSUT2TUKYIZENii8MqgMnZC7o9bIS2InoKr5YkU+TSrdcMNg4e0YTU6CVRBN9kR8oUp0TzPTvnuXV0H9w6KUGKZknNdE8P1Xs=
+	t=1753415639; cv=none; b=R4grjwx8nqBJepmytyxWH3MvS3QkvQ/LraCxfQrkmr6cP2ADoqiQtCFfmb9tGcEy6TUoRRNQnuFDhpHpPvayHgzoPzD6TpsB9aKqPsTaTfH/p21/iZIut2IkR1HaS+in5eoH9b9buZyJtIs+n0WWp8SKaWgj4YF4/uZcxkqqD6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753415447; c=relaxed/simple;
-	bh=fCJxRZ/FM2eScA1Yqd4ouGWZ0gc+qVaV9V8SgiiE5SY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=agY4EHSB9Lh8awt57czNXhDa+0x0FRpRgpL8AdXOSCiW/bwi+ETmm+l5PvimjyybUjBzSMJrOhmd60ieHHIsnm78KY4VTsKpSHWDYnn/AzQgmz4sCzj+fKsP6vp8a251kiikyCzmtQ0B1UbJK4tGX446RzVtfkjflvDTnt6jArA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SAxUErDJ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1753415444;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=CDqOduZNxWnbZSoqqq7n2RgVln6pLZG+oZF2xiPbDm4=;
-	b=SAxUErDJWyILfCI8nyigBAECRgB/MRhslc3OdC88CsvpiwGoHjsZ30HpTMtS3kvV/LiBYB
-	cS6AS25UaTd9g+By9t9KbdV3Kx1KqM3ODUGr5o82KBBuEh0olCX2RnuIKJcKmW2GOIJGpF
-	8iaNticAa6/TyrUdVTp5fjRwbGWZExA=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-52-44yUy-CnNj-BSbuackteyg-1; Thu,
- 24 Jul 2025 23:50:40 -0400
-X-MC-Unique: 44yUy-CnNj-BSbuackteyg-1
-X-Mimecast-MFC-AGG-ID: 44yUy-CnNj-BSbuackteyg_1753415438
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 637E51956087;
-	Fri, 25 Jul 2025 03:50:38 +0000 (UTC)
-Received: from xmu-thinkpadx1carbon3rd.raycom.csb (unknown [10.72.120.26])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D965D195608D;
-	Fri, 25 Jul 2025 03:50:31 +0000 (UTC)
-From: Xiumei Mu <xmu@redhat.com>
-To: "David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1753415639; c=relaxed/simple;
+	bh=CCnUIhBvuNE3ssmHP0yUwtVB0bHHyEcOhPSZdLQk+O4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FirSZsbSkj5zIOiIys0uDHz1X4oT3pGixqlHrmmdCl4t1lhgqc6WoD321AFCnagq139drPY15bQ4z0PK8yZK6Gd7Q4LNMr4atm4KrMdYj4PapK5/7eSf1Om+x5G8lnNkDtX3c4vzITs6IbBpKa/ezHMoV+oDIU4gL/5cZCdUx3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MnYW7iKB; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-b3aa2a0022cso1982430a12.1;
+        Thu, 24 Jul 2025 20:53:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753415637; x=1754020437; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hW9AXQYKd37BK6sNBYGkdFC2KgxtfKeihilIUBQrgIE=;
+        b=MnYW7iKBOWZSvEmQR+a3gWTtw1N6RbBi+atbq3DcqNGyqsRyJ3E9GnzszX0syCSEvd
+         RIEAwqpK7wgrVDgLkezg0F2wZwtQmAxpPtvYbjcJ9nBGXU1fb8bQvneiJc8LywRiBJGh
+         MQ8zRTNJJ+9p5jfh77iRWE7KUuQTlIzLDVIfOuNLGdbQCDOF55GHBOVJAs6jyiFqSNnp
+         K40GGexVYdErzcN2NuqFhWmmjoyUH6DfiQvMkwmYm9VPzXpQmrnDj0/t/289u+gWABwf
+         N5OKcVbXGY2ygeSTX1WmUEzL8p6eF8vBi+PNOK8ChACItycst2MfSplEjVpLHv0zby50
+         JtqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753415637; x=1754020437;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hW9AXQYKd37BK6sNBYGkdFC2KgxtfKeihilIUBQrgIE=;
+        b=LQNhmbJ/YYrKDwvMUYYAhGJjZ6i5mAblMcdqYzupF+Wr1gVH7rZE9V69GDiSDwTCO6
+         0NZWq4FcC3HHYbb5Z01n4+GfKs39hEZX+8odpc6vvDEZ+r4SkXUAKDrVz5IP6SHBd2Tb
+         6wheQGnne34ELvR+k3Jy287okvBTUH8KpM9IX4O9cFRbJK6LDDcGtAtdlVZCTXIGCbGo
+         M3ESg+ivX8+MttjXUHV0AWLzXnEGDoE5W2ZTz2JCBYoQevd9xVfv6ahrNJoJulF9Af/x
+         Qc/DCKaaxzg7saUj/Ie8zHAWCBQBO9Tg/6i6+Lu1fRp9RcCBgOGDpiiq1It7t1NMkgFj
+         eMbA==
+X-Forwarded-Encrypted: i=1; AJvYcCVwjQGaNJpAsXQGF6+Z8NBODwYfsnYY/Sp8/69YgTKeu+IZjqPBOzCyF+CMPkP31mCxJ1LBJ9hn@vger.kernel.org, AJvYcCWvfcWfHBkAGkDx9Qn0nW/DxwnywGbRGB2+XPkNplPI479ALYriqc+7EywarN/xhDG5pg579cJ210qSrK8fH0vB@vger.kernel.org, AJvYcCXv+e88P7WDGkvfAMnQ6m4zHyoy66C0x5Umj0f7khm95LDylom9hpvMrxgwhRZxu4PTvtlLqfLlI+MXKps=@vger.kernel.org
+X-Gm-Message-State: AOJu0YznLuYhCYnzKzwsJ7fOPoGMgTu+QQqHwmrwyc/HJjYq0WhaoVID
+	6iJu9ZOGWy08hGkmarGdkuApKy7/WxXQAzZoDLDTfs8gDo0nab6BAkvX
+X-Gm-Gg: ASbGncsl3hn4JcWYEWyq+k5JLxZTKX1OcSOjRqx4Hp9JoUNovrWUaWF1/GNSB7aam3F
+	8V3T+o4bsZ819XmEgnYpkoWlVoKVRBVWjnsX6k31ZqvzVWt/EtxBr2eyP4ohzer4OT7vJ2+NfR5
+	2ql3jC6CmOobAbFCFz0F2go2EewFy5WlXyvUP28hw4KTWUXPzDDGZoUtPdsk7fnVP+Baon9fJNj
+	QPbrBPY0qlAf7yqWDVDDyDZ54+580XpPH0u+rderuVcAd2hDIbZIavjNY9L0KwHXZpqv19D9Hb1
+	s8HSs8j3V/fhtQkxMEeyWGq9B/YgosWdI+c3VYDn9Mg4aRgspIHpK4CjBiG8Av8goeMEbkq9GKV
+	mJjqf8PtlcGDhJ2j9Vd1gx9fz3Ag=
+X-Google-Smtp-Source: AGHT+IHvF9CWQBmtPvqxjtafnD0suZKb7Z0tVBD4hH4QI/HjjUoanfXRrgETeCN0uVUFNB6oIekj0Q==
+X-Received: by 2002:a05:6a21:33a2:b0:234:8b24:108d with SMTP id adf61e73a8af0-23d70171b24mr462993637.22.1753415636902;
+        Thu, 24 Jul 2025 20:53:56 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7635561b64csm105688b3a.136.2025.07.24.20.53.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Jul 2025 20:53:56 -0700 (PDT)
+Date: Fri, 25 Jul 2025 03:53:48 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Xiumei Mu <xmu@redhat.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>
-Cc: Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Long Xin <lxin@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Long Xin <lxin@redhat.com>,
 	Sabrina Dubroca <sd@queasysnail.net>,
-	Shannon Nelson <sln@onemain.com>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCH net v2] selftests: rtnetlink.sh: remove esp4_offload after test
-Date: Fri, 25 Jul 2025 11:50:28 +0800
-Message-ID: <6d3a1d777c4de4eb0ca94ced9e77be8d48c5b12f.1753415428.git.xmu@redhat.com>
+	Shannon Nelson <sln@onemain.com>
+Subject: Re: [PATCH net v2] selftests: rtnetlink.sh: remove esp4_offload
+ after test
+Message-ID: <aIL_zAGaP_8HDTS6@fedora>
+References: <6d3a1d777c4de4eb0ca94ced9e77be8d48c5b12f.1753415428.git.xmu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6d3a1d777c4de4eb0ca94ced9e77be8d48c5b12f.1753415428.git.xmu@redhat.com>
 
-The esp4_offload module, loaded during IPsec offload tests, should
-be reset to its default settings after testing.
-Otherwise, leaving it enabled could unintentionally affect subsequence
-test cases by keeping offload active.
+On Fri, Jul 25, 2025 at 11:50:28AM +0800, Xiumei Mu wrote:
+> The esp4_offload module, loaded during IPsec offload tests, should
+> be reset to its default settings after testing.
+> Otherwise, leaving it enabled could unintentionally affect subsequence
+> test cases by keeping offload active.
+> 
+> Without this fix:
+> $ lsmod | grep offload; ./rtnetlink.sh -t kci_test_ipsec_offload ; lsmod | grep offload;
+> PASS: ipsec_offload
+> esp4_offload           12288  0
+> esp4                   32768  1 esp4_offload
+> 
+> With this fix:
+> $ lsmod | grep offload; ./rtnetlink.sh -t kci_test_ipsec_offload ; lsmod | grep offload;
+> PASS: ipsec_offload
+> 
+> Fixes: 2766a11161cc ("selftests: rtnetlink: add ipsec offload API test")
+> Signed-off-by: Xiumei Mu <xmu@redhat.com>
+> Reviewed-by: Shannon Nelson <sln@onemain.com>
+> ---
+> Changes in v2:
+> - add test results in description
+> - Enhanced logic for rmmod esp4_offload
+> - fix shellcheck warning: SC2086 (The quoting issue)
+> ---
 
-Without this fix:
-$ lsmod | grep offload; ./rtnetlink.sh -t kci_test_ipsec_offload ; lsmod | grep offload;
-PASS: ipsec_offload
-esp4_offload           12288  0
-esp4                   32768  1 esp4_offload
+nit: extra ---
 
-With this fix:
-$ lsmod | grep offload; ./rtnetlink.sh -t kci_test_ipsec_offload ; lsmod | grep offload;
-PASS: ipsec_offload
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
 
-Fixes: 2766a11161cc ("selftests: rtnetlink: add ipsec offload API test")
-Signed-off-by: Xiumei Mu <xmu@redhat.com>
-Reviewed-by: Shannon Nelson <sln@onemain.com>
----
-Changes in v2:
-- add test results in description
-- Enhanced logic for rmmod esp4_offload
-- fix shellcheck warning: SC2086 (The quoting issue)
----
----
- tools/testing/selftests/net/rtnetlink.sh | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
-index 2e8243a65b50..d2298da320a6 100755
---- a/tools/testing/selftests/net/rtnetlink.sh
-+++ b/tools/testing/selftests/net/rtnetlink.sh
-@@ -673,6 +673,11 @@ kci_test_ipsec_offload()
- 	sysfsf=$sysfsd/ipsec
- 	sysfsnet=/sys/bus/netdevsim/devices/netdevsim0/net/
- 	probed=false
-+	esp4_offload_probed_default=false
-+
-+	if lsmod | grep -q esp4_offload; then
-+		esp4_offload_probed_default=true
-+	fi
- 
- 	if ! mount | grep -q debugfs; then
- 		mount -t debugfs none /sys/kernel/debug/ &> /dev/null
-@@ -766,6 +771,7 @@ EOF
- 	fi
- 
- 	# clean up any leftovers
-+	! "$esp4_offload_probed_default" && lsmod | grep -q esp4_offload && rmmod esp4_offload
- 	echo 0 > /sys/bus/netdevsim/del_device
- 	$probed && rmmod netdevsim
- 
--- 
-2.50.1
-
+> ---
+>  tools/testing/selftests/net/rtnetlink.sh | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
+> index 2e8243a65b50..d2298da320a6 100755
+> --- a/tools/testing/selftests/net/rtnetlink.sh
+> +++ b/tools/testing/selftests/net/rtnetlink.sh
+> @@ -673,6 +673,11 @@ kci_test_ipsec_offload()
+>  	sysfsf=$sysfsd/ipsec
+>  	sysfsnet=/sys/bus/netdevsim/devices/netdevsim0/net/
+>  	probed=false
+> +	esp4_offload_probed_default=false
+> +
+> +	if lsmod | grep -q esp4_offload; then
+> +		esp4_offload_probed_default=true
+> +	fi
+>  
+>  	if ! mount | grep -q debugfs; then
+>  		mount -t debugfs none /sys/kernel/debug/ &> /dev/null
+> @@ -766,6 +771,7 @@ EOF
+>  	fi
+>  
+>  	# clean up any leftovers
+> +	! "$esp4_offload_probed_default" && lsmod | grep -q esp4_offload && rmmod esp4_offload
+>  	echo 0 > /sys/bus/netdevsim/del_device
+>  	$probed && rmmod netdevsim
+>  
+> -- 
+> 2.50.1
+> 
 
