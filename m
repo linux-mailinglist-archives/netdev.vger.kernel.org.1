@@ -1,129 +1,120 @@
-Return-Path: <netdev+bounces-210082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0F57B1217C
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 18:13:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 916C6B121C2
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 18:18:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2C52AA86A7
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 16:12:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7BE31CE6D95
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 16:16:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 845982EE97B;
-	Fri, 25 Jul 2025 16:13:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="a1GdaUB3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 040162EF66D;
+	Fri, 25 Jul 2025 16:14:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A3132BB17
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 16:13:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E562EE606
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 16:14:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753459994; cv=none; b=NhVr6MhvkFygv9IQbWdH6NPiYzP/BnIJzBHyzr5kOafAxqiN7ZhLC3Rak2L1Z6JHplixTazwdGzZDV3xCewofEj+DYhdpB/NTcoYfu6xQlJekclD0FFOlkjCVpU2DKWGxOS7C1xN4264etWq1OFTdi7qLG9s78mSI2efm5oUjwo=
+	t=1753460074; cv=none; b=WWZF+E6kSwsXxtNj512buhfcM/wdi3lqybgp6PrvvB1fJBF9+3AA/Mx7ZE13oM0c00rctB6wyyIsrg6AcYo/CcejPsmbijWuK5q74WblJhB3zi0C5THsGahrOXgkIMECnX3yZp+AzQBpGcza3q6SBoFviCjfcp+9PR8Geu1BjEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753459994; c=relaxed/simple;
-	bh=vTpbd0BP2L6tPWRLZ509TtVKssBkd0klbMWWaSLeeWA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F+1jnRTxcCBAs/EZvL0W5pogjUGsu9gq34MR1kvscwnM669ru3K1pijaASjoZELxjqVUjLsLGkny/3uJDKW9o5Xj9Pncb3dwhFhFIRuIDTjvIrd4um0mTzd/ZKW6E/ImKUtBlCAYgdyJEGsquaIzhFOtEEy+YuFXJu1rGedVLPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=a1GdaUB3; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <6bab8404-f830-4855-be83-df57705491f9@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753459990;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iRWnqQggMPPeHBerbCQybKqJBdoR2jYJWymSZs5VvRM=;
-	b=a1GdaUB3hA1rLLby3rC4NSVZZevqwc72Qcv6T84csnpMi+/OmKarf0ZjOpJrei2Bg02CHk
-	veA4gw3vtyzIzyRVc3uVLDUz409OlegP60NbfknrwMMgrLkmR0W6oLMlkUfjPI6atdX2Q3
-	jgZa/k6tyiy9OUoeuMOVXYL08kAWPuU=
-Date: Fri, 25 Jul 2025 09:13:00 -0700
+	s=arc-20240116; t=1753460074; c=relaxed/simple;
+	bh=46/Qyf0csSt3L+45rt8fy84xXIfo/4IWt7ugXOkO3wM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tAbPwSyiDPGqLNLYf6bBS5B6n39yHMKkX1TjJVcOgh9rh/+hADmUXd1EzBzyKy2e8/L7WSBbH5uHNUY9zQQ8UqNEadsas38F5RKYRqNpI94KcIRhJbc2zWQ1GwU14In6s2hzBqCj2ByWAnNF0T6DA5Yx59lKa+Ib6WhzNrGXwMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1ufL41-0007ry-H8; Fri, 25 Jul 2025 18:14:29 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1ufL41-00AFgc-0m;
+	Fri, 25 Jul 2025 18:14:29 +0200
+Received: from pengutronix.de (p5b1645f7.dip0.t-ipconnect.de [91.22.69.247])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id DE315449988;
+	Fri, 25 Jul 2025 16:14:28 +0000 (UTC)
+Date: Fri, 25 Jul 2025 18:14:28 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Jimmy Assarsson <extja@kvaser.com>
+Cc: linux-can@vger.kernel.org, Jimmy Assarsson <jimmyassarsson@gmail.com>, 
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 00/11] can: kvaser_usb: Simplify identification of
+ physical CAN interfaces
+Message-ID: <20250725-hungry-slug-of-success-aa3086-mkl@pengutronix.de>
+References: <20250725123452.41-1-extja@kvaser.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next 1/4] bpf: crypto: Use the correct destructor
- kfunc type
-Content-Language: en-GB
-To: Sami Tolvanen <samitolvanen@google.com>, bpf@vger.kernel.org
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250724223225.1481960-6-samitolvanen@google.com>
- <20250724223225.1481960-7-samitolvanen@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <20250724223225.1481960-7-samitolvanen@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="lfncyt5cmnoo6b22"
+Content-Disposition: inline
+In-Reply-To: <20250725123452.41-1-extja@kvaser.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 
+--lfncyt5cmnoo6b22
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v3 00/11] can: kvaser_usb: Simplify identification of
+ physical CAN interfaces
+MIME-Version: 1.0
 
-On 7/24/25 3:32 PM, Sami Tolvanen wrote:
-> With CONFIG_CFI_CLANG enabled, the kernel strictly enforces that
-> indirect function calls use a function pointer type that matches the
-> target function. I ran into the following type mismatch when running
-> BPF self-tests:
->
->    CFI failure at bpf_obj_free_fields+0x190/0x238 (target:
->      bpf_crypto_ctx_release+0x0/0x94; expected type: 0xa488ebfc)
->    Internal error: Oops - CFI: 00000000f2008228 [#1]  SMP
->    ...
->
-> As bpf_crypto_ctx_release() is also used in BPF programs and using
-> a void pointer as the argument would make the verifier unhappy, add
-> a simple stub function with the correct type and register it as the
-> destructor kfunc instead.
->
-> Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
-> ---
->   kernel/bpf/crypto.c | 7 ++++++-
->   1 file changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/kernel/bpf/crypto.c b/kernel/bpf/crypto.c
-> index 94854cd9c4cc..b703b1d1c282 100644
-> --- a/kernel/bpf/crypto.c
-> +++ b/kernel/bpf/crypto.c
-> @@ -261,6 +261,11 @@ __bpf_kfunc void bpf_crypto_ctx_release(struct bpf_crypto_ctx *ctx)
->   		call_rcu(&ctx->rcu, crypto_free_cb);
->   }
->   
-> +__bpf_kfunc void __bpf_crypto_ctx_release(void *ctx)
+On 25.07.2025 14:34:41, Jimmy Assarsson wrote:
+> This patch series simplifies the process of identifying which network
+> interface (can0..canX) corresponds to which physical CAN channel on
+> Kvaser USB based CAN interfaces.
+>=20
+> Note that this patch series is based on [1]
+> "can: kvaser_pciefd: Simplify identification of physical CAN interfaces"
 
-We are not really creating a kfunc here. The function is merely
-to be used for destructor. So you can replace '__bpf_kfunc' with
-'__used __retain'.
+Added to linux-can-next and included the my latest PR.
 
-> +{
-> +	bpf_crypto_ctx_release(ctx);
-> +}
-> +
->   static int bpf_crypto_crypt(const struct bpf_crypto_ctx *ctx,
->   			    const struct bpf_dynptr_kern *src,
->   			    const struct bpf_dynptr_kern *dst,
-> @@ -368,7 +373,7 @@ static const struct btf_kfunc_id_set crypt_kfunc_set = {
->   
->   BTF_ID_LIST(bpf_crypto_dtor_ids)
->   BTF_ID(struct, bpf_crypto_ctx)
-> -BTF_ID(func, bpf_crypto_ctx_release)
-> +BTF_ID(func, __bpf_crypto_ctx_release)
->   
->   static int __init crypto_kfunc_init(void)
->   {
+Have you thought about creating an entry in the MAINTAINERS file?
 
+Thanks,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--lfncyt5cmnoo6b22
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEyBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmiDrWEACgkQDHRl3/mQ
+kZwgiwf44i6mutHLVWWPzPbpL7bmyyeVnoHhd/hrr/1ySag8Y+CrA5cjM5fH+PXy
+M0IJ02uWErJAt+TTKA+MNbphmdp4KACvFgpB7ATEA1yQKRNIJx+G+LeCDtACc4/U
+r5EnHcVP8XI3M9f43ww01g1hQGn0EM53hkSv+ok+TThq7/fNKF4V0cpQN7vh0fJg
+GrZnbxkgtOfDn0xnPzq5X6MK4yyRSnufBCVw5t/fcEnBsHlrfyfJMu8julyRJTb2
+noq+Pj8FBiPdX9uvK/PwXVFObD7iN6i4xoz7kARC8MIbquKz6faxOEF2CdtimOGc
+7pUL6KK4TztSomnDoInPrN0zbL3n
+=KvFV
+-----END PGP SIGNATURE-----
+
+--lfncyt5cmnoo6b22--
 
