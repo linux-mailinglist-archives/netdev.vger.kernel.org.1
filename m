@@ -1,92 +1,106 @@
-Return-Path: <netdev+bounces-209954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A81FB1173E
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 05:54:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6819B1174D
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 06:09:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CAB01C28911
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 03:54:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B93323A5322
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 04:09:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 508F3237704;
-	Fri, 25 Jul 2025 03:53:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F28EA1AC88A;
+	Fri, 25 Jul 2025 04:09:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MnYW7iKB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BI+xFv9w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9ADA1EDA1A;
-	Fri, 25 Jul 2025 03:53:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ABB34685
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 04:09:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753415639; cv=none; b=R4grjwx8nqBJepmytyxWH3MvS3QkvQ/LraCxfQrkmr6cP2ADoqiQtCFfmb9tGcEy6TUoRRNQnuFDhpHpPvayHgzoPzD6TpsB9aKqPsTaTfH/p21/iZIut2IkR1HaS+in5eoH9b9buZyJtIs+n0WWp8SKaWgj4YF4/uZcxkqqD6k=
+	t=1753416570; cv=none; b=EkbecF4rjIbEUCvvhfVggeNXxph5Xpo+NoDJ7aEjGdyaUl2R2ArKtRYVOsqCgZxk6YN2cZxn6sgnjs2PaB/uP4I4vYn6XrSdgCmGuOQtKnONvazHSWT+6dwlcIoqUejeDvjvxnDz1UDnK2hdzGasV0dqgD5TXHkPxiQBgHKGBV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753415639; c=relaxed/simple;
-	bh=CCnUIhBvuNE3ssmHP0yUwtVB0bHHyEcOhPSZdLQk+O4=;
+	s=arc-20240116; t=1753416570; c=relaxed/simple;
+	bh=y9K4kPetCb8hv9kqTGjg01FVaZfY9ZbiqF79cRnqkbs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FirSZsbSkj5zIOiIys0uDHz1X4oT3pGixqlHrmmdCl4t1lhgqc6WoD321AFCnagq139drPY15bQ4z0PK8yZK6Gd7Q4LNMr4atm4KrMdYj4PapK5/7eSf1Om+x5G8lnNkDtX3c4vzITs6IbBpKa/ezHMoV+oDIU4gL/5cZCdUx3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MnYW7iKB; arc=none smtp.client-ip=209.85.215.176
+	 Content-Type:Content-Disposition:In-Reply-To; b=vEQZLRhH47X7wikD3T9JDUQdlTXDJFeXeTEEqt3+TNz44Y4iThwbdpspRtt1Ci0N4ubi0TNAisSx7J89uzq2ETCd8E5Yc9qhcIOuQ9diHtud0PgY+xeaWYISWALOfmtj2x997QQFIMazPAu2sFWoDmTFUWPL8FhZsWJ0z2zYiOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BI+xFv9w; arc=none smtp.client-ip=209.85.128.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-b3aa2a0022cso1982430a12.1;
-        Thu, 24 Jul 2025 20:53:57 -0700 (PDT)
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-70f94fe1e40so30753847b3.1
+        for <netdev@vger.kernel.org>; Thu, 24 Jul 2025 21:09:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753415637; x=1754020437; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1753416568; x=1754021368; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hW9AXQYKd37BK6sNBYGkdFC2KgxtfKeihilIUBQrgIE=;
-        b=MnYW7iKBOWZSvEmQR+a3gWTtw1N6RbBi+atbq3DcqNGyqsRyJ3E9GnzszX0syCSEvd
-         RIEAwqpK7wgrVDgLkezg0F2wZwtQmAxpPtvYbjcJ9nBGXU1fb8bQvneiJc8LywRiBJGh
-         MQ8zRTNJJ+9p5jfh77iRWE7KUuQTlIzLDVIfOuNLGdbQCDOF55GHBOVJAs6jyiFqSNnp
-         K40GGexVYdErzcN2NuqFhWmmjoyUH6DfiQvMkwmYm9VPzXpQmrnDj0/t/289u+gWABwf
-         N5OKcVbXGY2ygeSTX1WmUEzL8p6eF8vBi+PNOK8ChACItycst2MfSplEjVpLHv0zby50
-         JtqA==
+        bh=rF85l8wKTRESci6/gSYswq1QM/FBwarIb0qRFDz1OpY=;
+        b=BI+xFv9wKQyocvaveGhoPzXMyLXdT5sIyGemRGr3cNaTv+xcpmzPzDDwaNBFhdIA/B
+         nVHf9eXAL/4GtvKnCShNQEkM18PKk0mAS9sjlLOHeUHCpNDsDgiDIY6x2Yj+A8QB8gQS
+         Xwv3zgl77eRZLSH6+GGm6Lzw+BYyysH/2wHn/STB2fT5rN8jgZltupNLPMgctFszu41h
+         5sWeLjNs3Km37lZUCRr6q5ho7snolHLu9MEB6yCgm1DqPKqxmkJ8UCKvEmiKgwJZt2v0
+         Xd/b+mZYQ6fupd7lkup69Vwg+cSwJeY7U44TpV5r33xi2VDL8iDGGzTklU08UmO73bQN
+         Hkhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753415637; x=1754020437;
+        d=1e100.net; s=20230601; t=1753416568; x=1754021368;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hW9AXQYKd37BK6sNBYGkdFC2KgxtfKeihilIUBQrgIE=;
-        b=LQNhmbJ/YYrKDwvMUYYAhGJjZ6i5mAblMcdqYzupF+Wr1gVH7rZE9V69GDiSDwTCO6
-         0NZWq4FcC3HHYbb5Z01n4+GfKs39hEZX+8odpc6vvDEZ+r4SkXUAKDrVz5IP6SHBd2Tb
-         6wheQGnne34ELvR+k3Jy287okvBTUH8KpM9IX4O9cFRbJK6LDDcGtAtdlVZCTXIGCbGo
-         M3ESg+ivX8+MttjXUHV0AWLzXnEGDoE5W2ZTz2JCBYoQevd9xVfv6ahrNJoJulF9Af/x
-         Qc/DCKaaxzg7saUj/Ie8zHAWCBQBO9Tg/6i6+Lu1fRp9RcCBgOGDpiiq1It7t1NMkgFj
-         eMbA==
-X-Forwarded-Encrypted: i=1; AJvYcCVwjQGaNJpAsXQGF6+Z8NBODwYfsnYY/Sp8/69YgTKeu+IZjqPBOzCyF+CMPkP31mCxJ1LBJ9hn@vger.kernel.org, AJvYcCWvfcWfHBkAGkDx9Qn0nW/DxwnywGbRGB2+XPkNplPI479ALYriqc+7EywarN/xhDG5pg579cJ210qSrK8fH0vB@vger.kernel.org, AJvYcCXv+e88P7WDGkvfAMnQ6m4zHyoy66C0x5Umj0f7khm95LDylom9hpvMrxgwhRZxu4PTvtlLqfLlI+MXKps=@vger.kernel.org
-X-Gm-Message-State: AOJu0YznLuYhCYnzKzwsJ7fOPoGMgTu+QQqHwmrwyc/HJjYq0WhaoVID
-	6iJu9ZOGWy08hGkmarGdkuApKy7/WxXQAzZoDLDTfs8gDo0nab6BAkvX
-X-Gm-Gg: ASbGncsl3hn4JcWYEWyq+k5JLxZTKX1OcSOjRqx4Hp9JoUNovrWUaWF1/GNSB7aam3F
-	8V3T+o4bsZ819XmEgnYpkoWlVoKVRBVWjnsX6k31ZqvzVWt/EtxBr2eyP4ohzer4OT7vJ2+NfR5
-	2ql3jC6CmOobAbFCFz0F2go2EewFy5WlXyvUP28hw4KTWUXPzDDGZoUtPdsk7fnVP+Baon9fJNj
-	QPbrBPY0qlAf7yqWDVDDyDZ54+580XpPH0u+rderuVcAd2hDIbZIavjNY9L0KwHXZpqv19D9Hb1
-	s8HSs8j3V/fhtQkxMEeyWGq9B/YgosWdI+c3VYDn9Mg4aRgspIHpK4CjBiG8Av8goeMEbkq9GKV
-	mJjqf8PtlcGDhJ2j9Vd1gx9fz3Ag=
-X-Google-Smtp-Source: AGHT+IHvF9CWQBmtPvqxjtafnD0suZKb7Z0tVBD4hH4QI/HjjUoanfXRrgETeCN0uVUFNB6oIekj0Q==
-X-Received: by 2002:a05:6a21:33a2:b0:234:8b24:108d with SMTP id adf61e73a8af0-23d70171b24mr462993637.22.1753415636902;
-        Thu, 24 Jul 2025 20:53:56 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7635561b64csm105688b3a.136.2025.07.24.20.53.51
+        bh=rF85l8wKTRESci6/gSYswq1QM/FBwarIb0qRFDz1OpY=;
+        b=d+5tGuG0gGcyJFgXGQdRVbKvfpoYZke5kkW7zNXY2SdZkd37AAKCv+Cub2OHbK+ZJg
+         52bs6Aw5G5JJmVB7uzZ3ZgPEvX7psjRZUSWcCF+JrdYFLFKE1OFtoHDU9I6NJg4LJkc0
+         /EpfOck+qYSWQbBoKpNqhbQbH91z4omb6TzDqRsD7O+3z6RxWsCtn7Roh+/EqH5ugwH+
+         n1oMl/XMt3hJmuAKFoLp2vSBGVMtenZQpOzswT+lNP64B6LavFvjv3ONIbu2MuQKNUkf
+         5YrgekzqGpdDuNjSbO3v9AF+o4/48iLpFZlnZptdO/J/X3SXN6MJuPexhWZY7dqzvu6a
+         K3cA==
+X-Forwarded-Encrypted: i=1; AJvYcCVk9PWTvi5cdLDlQCVuXug875sT0ybrieaPaizgr7j26LAvONwWf/G7Pabn0PIZ5Wf0r+i7ln8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxv5OW2CaFLsLmkw/cqmZ0uYhNKGPuVyNUY1FKKtLt9qrwanpg1
+	JBkuLWcIR5QGeI+dFJjAKXby1J2cZK3OxNLGWn4vK5VD89UqTzjgp4zy
+X-Gm-Gg: ASbGncuATmLDaqu61BufAUmol0zlFqayTnmkOgDkSPrJg/wdsI17ePIBN+ZWs2Pl4dk
+	34p3nyQ3GpqyIYx0e9BSsPl683MzOQ+4MxDu+lIfn1Uc31v+0tonKuO+/Oxu65HAK/r9YtNtgG2
+	5p7tpWYL/KqG2pQvMq7wU7yQqy5jNlNaZoxWl6NCMgNo/u2V7OMdV5nrUCEvl2OVsZWnWhfak48
+	S4iUf+N+cYj7896Oy5qrSoxPkzJX+OluKDfcaAlDCLtrRYJD71/9qasI6nWuvyoqCCVlPgwoyEd
+	+/10NPSnEx9j7vCiIecbgF+HRQG8Vk4UHv7bJORQJ7BgBMHWqvjhg4F4XUt1wL3Z2llyEeKq7Fz
+	0uAWX5bJDgW2atVlw1ilaSiAUL7QDraFztur29xHbbg==
+X-Google-Smtp-Source: AGHT+IEP3MTZHqUH7L/PpsPgaeaPNYTDUSmqjYkcaH5y0zo292/LM24t1CEXD80F4CWIUJO3ApCGwQ==
+X-Received: by 2002:a05:690c:6ac6:b0:712:c295:d012 with SMTP id 00721157ae682-719e34364f4mr6416927b3.13.1753416568204;
+        Thu, 24 Jul 2025 21:09:28 -0700 (PDT)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-719cb7a76c7sm7016797b3.11.2025.07.24.21.09.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Jul 2025 20:53:56 -0700 (PDT)
-Date: Fri, 25 Jul 2025 03:53:48 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Xiumei Mu <xmu@redhat.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Long Xin <lxin@redhat.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Shannon Nelson <sln@onemain.com>
-Subject: Re: [PATCH net v2] selftests: rtnetlink.sh: remove esp4_offload
- after test
-Message-ID: <aIL_zAGaP_8HDTS6@fedora>
-References: <6d3a1d777c4de4eb0ca94ced9e77be8d48c5b12f.1753415428.git.xmu@redhat.com>
+        Thu, 24 Jul 2025 21:09:27 -0700 (PDT)
+Date: Thu, 24 Jul 2025 21:09:23 -0700
+From: Richard Cochran <richardcochran@gmail.com>
+To: David Arinzon <darinzon@amazon.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	"Woodhouse, David" <dwmw@amazon.com>, Andrew Lunn <andrew@lunn.ch>,
+	Miroslav Lichvar <mlichvar@redhat.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>, netdev@vger.kernel.org,
+	"Machulsky, Zorik" <zorik@amazon.com>,
+	"Matushevsky, Alexander" <matua@amazon.com>,
+	Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>,
+	"Liguori, Anthony" <aliguori@amazon.com>,
+	"Bshara, Nafea" <nafea@amazon.com>,
+	"Schmeilin, Evgeny" <evgenys@amazon.com>,
+	"Belgazal, Netanel" <netanel@amazon.com>,
+	"Saidi, Ali" <alisaidi@amazon.com>,
+	"Herrenschmidt, Benjamin" <benh@amazon.com>,
+	"Kiyanovski, Arthur" <akiyano@amazon.com>,
+	"Dagan, Noam" <ndagan@amazon.com>,
+	"Bernstein, Amit" <amitbern@amazon.com>,
+	"Ostrovsky, Evgeny" <evostrov@amazon.com>,
+	"Tabachnik, Ofir" <ofirt@amazon.com>,
+	Julien Ridoux <ridouxj@amazon.com>,
+	Josh Levinson <joshlev@amazon.com>
+Subject: Re: [RFC PATCH net-next] ptp: Introduce
+ PTP_SYS_OFFSET_EXTENDED_TRUSTED ioctl
+Message-ID: <aIMDc8JC4prOmpLQ@hoboy.vegasvil.org>
+References: <20250724115657.150-1-darinzon@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,67 +109,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6d3a1d777c4de4eb0ca94ced9e77be8d48c5b12f.1753415428.git.xmu@redhat.com>
+In-Reply-To: <20250724115657.150-1-darinzon@amazon.com>
 
-On Fri, Jul 25, 2025 at 11:50:28AM +0800, Xiumei Mu wrote:
-> The esp4_offload module, loaded during IPsec offload tests, should
-> be reset to its default settings after testing.
-> Otherwise, leaving it enabled could unintentionally affect subsequence
-> test cases by keeping offload active.
-> 
-> Without this fix:
-> $ lsmod | grep offload; ./rtnetlink.sh -t kci_test_ipsec_offload ; lsmod | grep offload;
-> PASS: ipsec_offload
-> esp4_offload           12288  0
-> esp4                   32768  1 esp4_offload
-> 
-> With this fix:
-> $ lsmod | grep offload; ./rtnetlink.sh -t kci_test_ipsec_offload ; lsmod | grep offload;
-> PASS: ipsec_offload
-> 
-> Fixes: 2766a11161cc ("selftests: rtnetlink: add ipsec offload API test")
-> Signed-off-by: Xiumei Mu <xmu@redhat.com>
-> Reviewed-by: Shannon Nelson <sln@onemain.com>
-> ---
-> Changes in v2:
-> - add test results in description
-> - Enhanced logic for rmmod esp4_offload
-> - fix shellcheck warning: SC2086 (The quoting issue)
-> ---
+On Thu, Jul 24, 2025 at 02:56:56PM +0300, David Arinzon wrote:
 
-nit: extra ---
+> The first objective focuses on the use case where the PHC device
+> is fully managed. The ENA driver, for example, exposes a PHC
+> device, whose synchronization status and quality is maintained
+> without any user-space application. This new ioctl reports on the
+> clock accuracy and status of the PHC device to user-space
+> applications, where ptp4l and similar are not available.
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+This seems pretty rare.  I can't think of any other hardware that
+makes claims about synchronization quality.
 
-> ---
->  tools/testing/selftests/net/rtnetlink.sh | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
-> index 2e8243a65b50..d2298da320a6 100755
-> --- a/tools/testing/selftests/net/rtnetlink.sh
-> +++ b/tools/testing/selftests/net/rtnetlink.sh
-> @@ -673,6 +673,11 @@ kci_test_ipsec_offload()
->  	sysfsf=$sysfsd/ipsec
->  	sysfsnet=/sys/bus/netdevsim/devices/netdevsim0/net/
->  	probed=false
-> +	esp4_offload_probed_default=false
-> +
-> +	if lsmod | grep -q esp4_offload; then
-> +		esp4_offload_probed_default=true
-> +	fi
->  
->  	if ! mount | grep -q debugfs; then
->  		mount -t debugfs none /sys/kernel/debug/ &> /dev/null
-> @@ -766,6 +771,7 @@ EOF
->  	fi
->  
->  	# clean up any leftovers
-> +	! "$esp4_offload_probed_default" && lsmod | grep -q esp4_offload && rmmod esp4_offload
->  	echo 0 > /sys/bus/netdevsim/del_device
->  	$probed && rmmod netdevsim
->  
-> -- 
-> 2.50.1
-> 
+So this ioctl would be just for one device.
+
+Thanks,
+Richard
 
