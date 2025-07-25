@@ -1,86 +1,89 @@
-Return-Path: <netdev+bounces-210193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 413C9B1250F
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 22:04:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E02EAB12514
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 22:05:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59D7B7A7BCE
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 20:03:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 345FC1CE3DB5
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 20:05:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A017D2528E1;
-	Fri, 25 Jul 2025 20:04:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B282253925;
+	Fri, 25 Jul 2025 20:04:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q6q+i5BC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tc23Ptee"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B7C324DCEA;
-	Fri, 25 Jul 2025 20:04:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCDB72528E1;
+	Fri, 25 Jul 2025 20:04:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753473873; cv=none; b=SYD3bv4aIl4LWHD0KUMo6MKmggABCgVfaAUjkWXjfvCitOL0O8Gpb7BE8wBEa/PB9vzthKoRADtVzLp5RQ+7bsW8kWOTcWvgSqSCvo4qNxemmZU4dxSLBIFYsxF2Dlpjh8DdRZPDsbHew6hCKWdpfE9/S2z1sVc5CjubiDWPSis=
+	t=1753473888; cv=none; b=PZGOT5v5t8rPKTmxU3p8LWFmXETlrRAmyDDNOxj2gx5GHDQjkRF1abXhzTMTEjHGKi7TGABxUtY2CU7Lq2Q0mucIIumYetYaNE8VR98bi9/gP5gUYCPvxaikap45qejKa8BbvAev4DsmsMGdZ+fX4fAb9yhiilbP1ZQRN5tWaNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753473873; c=relaxed/simple;
-	bh=j2xP2YzjEhO/30DThbGEpUholDVj1payjvPb0Iem0lw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=THM8mAhDgVpKyy2OVS8aztkDs/NmJY+W2XIOPn5zrRzk1ZnoDDYX7gKNIbt3PXRaSJdrvZ68/mLAlZYsoJjxi1c221JqCw32kTJlA3pHpqpmIPX7XWA/S/mOAVqhhtyfi8DlCmHzYw1Qt0aCvrgW3dtrLYyja/f7/ffhoHFvRGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q6q+i5BC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE636C4CEE7;
-	Fri, 25 Jul 2025 20:04:32 +0000 (UTC)
+	s=arc-20240116; t=1753473888; c=relaxed/simple;
+	bh=XXKRhRbkPdtCnHz5AqzwvY5fPC+7Cnxs+88nTiPHBpE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uqRK3cK/VNHAvDRcjHk08QvQE8SWFNMpyHGRcJ1ogNzAAsy+OlqOO49OayMlj6NY6f9K3jc6fw6TWK8IEMFUGG7fPhy1lj6X16Xse2dW57vO+HyiNxLKoa0uOuQfPb7m3KwK0YQpdeW8IsZWd54btP6Z8QEL4SSbNIx7kMwRuhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tc23Ptee; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D533C4CEE7;
+	Fri, 25 Jul 2025 20:04:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753473872;
-	bh=j2xP2YzjEhO/30DThbGEpUholDVj1payjvPb0Iem0lw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Q6q+i5BCLBcSN/DYiQwjJAei6Lyf2boWZMGLisUGWhnTSvhjllyce7I9bQP1hszi5
-	 1X7bklybM3GzS9ckn8txmcbWhAlejexAonWa4/7EgzxQn6dTAYmhNXwgS7umhARiWS
-	 pFlj48Du8XGZ1dVczH7C877p+MLFOPjgfaACzIDFELxaXf/+ZFhWjQpw4N9Iz2UR09
-	 5o1082nlM58UCjjElqObxvGtLQ4Wmz/O5BpA+etRU4QQZ/TTtKLH+uxyxuXMEOOTzr
-	 lGRoV9oncbE22SjmSwwDl5iH/Z2iazqq6aOhhx2cUk0xCZ8JdpXu95RDNsh6YlKpm2
-	 lkpKe2UV76yEQ==
-Date: Fri, 25 Jul 2025 15:04:31 -0500
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Kyle Hendry <kylehendrydev@gmail.com>
-Cc: jonas.gorski@gmail.com, netdev@vger.kernel.org,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, noltari@gmail.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Conor Dooley <conor+dt@kernel.org>
-Subject: Re: [PATCH net-next v2 2/7] dt-bindings: net: dsa: b53: Document
- brcm,gpio-ctrl property
-Message-ID: <175347387153.1759527.1350037540423103055.robh@kernel.org>
-References: <20250724035300.20497-1-kylehendrydev@gmail.com>
- <20250724035300.20497-3-kylehendrydev@gmail.com>
+	s=k20201202; t=1753473887;
+	bh=XXKRhRbkPdtCnHz5AqzwvY5fPC+7Cnxs+88nTiPHBpE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Tc23PteexjiHb5GWF3qs9ivHEy+H5q1OPzvdp+dh44jd8vBm5+0bhm0wPPLVviUXE
+	 h0YSPNOB3hyIqIx/PCzzoOv/mR81NhtPsZLpMBvgtvplYOR6JxNRmua2hgOMzNWGIW
+	 HJq5u0pfTtT/aEUinWJeIBcsw3S1rRKrb8sarmtlkB51WR2vJa4YvJmE9JYC/2fld2
+	 +esltBUXb6HBDed/ccndqjCLbsZmRc8tuAC6Mo7tlwtl3UdGQYyAQBXvcJLBrpf2ZD
+	 GH2ibsBbo78pPXzBPImolt7SgxMAUO8LoRnHNrnnVkGvf2ZMP7hpk50IBI7iE5H+WW
+	 tmW2/vlOh+DXA==
+Date: Fri, 25 Jul 2025 13:04:45 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
+ <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, Herve Codina
+ <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Marek
+ =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
+ <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
+ mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
+ devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Romain
+ Gantois <romain.gantois@bootlin.com>, Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject: Re: [PATCH net-next v10 00/15] net: phy: Introduce PHY ports
+ representation
+Message-ID: <20250725130445.32e0307f@kernel.org>
+In-Reply-To: <20250722121623.609732-1-maxime.chevallier@bootlin.com>
+References: <20250722121623.609732-1-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250724035300.20497-3-kylehendrydev@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, 22 Jul 2025 14:16:05 +0200 Maxime Chevallier wrote:
+> Here's V10 of the phy_port series. This version doesn't contain any
+> significant change, it fixes the conflict on the qualcom PHY driver, as
+> well as aggregates the reviews from Rob, K=C3=B6ry and Christophe (thanks
+> again).
 
-On Wed, 23 Jul 2025 20:52:41 -0700, Kyle Hendry wrote:
-> Add description for bcm63xx gpio-ctrl phandle which allows
-> access to registers that control phy functionality.
-> 
-> Signed-off-by: Kyle Hendry <kylehendrydev@gmail.com>
-> ---
->  Documentation/devicetree/bindings/net/dsa/brcm,b53.yaml | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
-
+Looks like we gathered no reviews from PHY maintainers here.
+We'll need to Defer this series to 6.18. Perhaps we should
+have pinged PHY maintainers a bit more for their input, sorry :(
+--=20
+pw-bot: cr
 
