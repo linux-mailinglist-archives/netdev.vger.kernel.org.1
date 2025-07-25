@@ -1,109 +1,135 @@
-Return-Path: <netdev+bounces-210050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A2FEB11F38
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 15:13:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3196BB11F63
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 15:34:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B1371C27148
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 13:14:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E97044E5823
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 13:33:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBFC22ED172;
-	Fri, 25 Jul 2025 13:13:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EA2419D89B;
+	Fri, 25 Jul 2025 13:34:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qgKgR1zh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LCWzyzLY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D3A2ED15C;
-	Fri, 25 Jul 2025 13:13:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D749475;
+	Fri, 25 Jul 2025 13:34:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753449199; cv=none; b=a6+RYVoaYSfmGofN66374dTWCjixosQDz/gL6CqOhmHhwsUsUWkflI+Lk9LfZ09ns1kfk9WPHx+dvMyWSW2i1uASUAkET8QX/r8OZtAafKxX05W94WuxG+ncMgxX2hqE3eYmNbbeSfvnzA4X2zoHTe+HilxT60NMVURKDFgzzHw=
+	t=1753450454; cv=none; b=dC3KyKUAUvS9ZtImudZOX/aaexlIgTO6yEe+ndrCS/kp2fAgYAaQ2tJpkfezSBfNwERcGG/DpX4+gboXyi8RnE8+DqZW/dTTVn0f6QoPv068yAW+4mYc8+5lh+PZ3Eccn065xLfx0GD75UKmjM7RM0up9iNAOF4tOfKon/hHOZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753449199; c=relaxed/simple;
-	bh=K2REaqk436/HBiVa3PYWivahq7G5rrhnQDhvYw7U8sg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jNn2Ni2K13r3AxScoRYdU6Tdo97wpLJVvfnbU3qQ0164K73jnHfl9a9jA7yaG1bUnf9zgKfxDRSjYMZ1zTxv3pUi3U/Gbxpo/ACVbRMcotiMTWc8Fd6DnvssIHyMKwsrOoR0sVe2UFDtMFIFHkdswRcA4P3Grm06RMIIDkVVTXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qgKgR1zh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9EE4C4CEE7;
-	Fri, 25 Jul 2025 13:13:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753449199;
-	bh=K2REaqk436/HBiVa3PYWivahq7G5rrhnQDhvYw7U8sg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qgKgR1zhkQ1q1aTdj5me7BE9A8Ce5cO/+ZJoWHE//JymOms1tpnS+eh+i6IGE7Sx/
-	 E7ipbIjL18u+eVHVKmLtj9nTOesnBRzjCFgXUfOsLFOYII09DiNEQXblle8Dv0t3sP
-	 L7sBeeZgMhBJkpOt1t+YN9O3yaqoAu15BXgSZcypj7nLG4+W86pyrNvnCis5TkWGPE
-	 5Z2FMqFCfzT4zboRsbKeBWWaPQj+fwWpZSqzcE4QtpLTHFDX96GZuQU3VxncbOXmi9
-	 LqNNxCxMqe9mrWarqbrGBTgyYNPz00QO2hgaX9KtTKzJQNHJZIqjLEp7kQRSQSyYbj
-	 YIz5BFnEO6aWA==
-Date: Fri, 25 Jul 2025 14:13:15 +0100
-From: Simon Horman <horms@kernel.org>
-To: Hariprasad Kelam <hkelam@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Sunil Goutham <sgoutham@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
+	s=arc-20240116; t=1753450454; c=relaxed/simple;
+	bh=npbPwPwPnAlRn5kq54i/SmQHlTeHdREVdeflDeKYFu4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rqh+q0pgmrlCfkZ8w0J+Ja9OA4lHauZD9C/1CBlaXY0LqoS6zC/CHd2+IyybK3dCy0pnU0BL2Sxb1m6twDZyExj1vqyn0Owp6EqOrrTTc8OCvslIkUaFQp7Hl/aP0JOCuihTu5yKBmuDoykDq1DVZLuTqQLUMbOsCVUInGWISsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LCWzyzLY; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-45617a1bcdcso1231585e9.1;
+        Fri, 25 Jul 2025 06:34:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753450451; x=1754055251; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=L4fkWohIN9Tymim1ViegWsddn2WdurixVR25PkINhrM=;
+        b=LCWzyzLYYz77m/5KDatuye0+Bd2dVH/aE8sfgkKW/4msMGFVZL4YPvcpoftUmgsS7q
+         xUA0GxJFUn6r0rC97PyVdIyUr4SZVvgfFKxJSMFG5SKxwpHuLRk/34BNqxip5CkfFa17
+         2312HAD48CT3n5uhj2v0aA8LPXkqnvpDQL9ZcKkLywMr5N11W94glJD3lpk/fKL5gAzf
+         +dh0nB39y9AilAF5rCF/336jaHZgGu/o/b0KuNmvd4+Xc6KxPYYYaNTHx+FP2NJLmEU2
+         CDCzY54TO8ucji71OeUO1BC/EP/9r20sQchDJoZRF2qILQvsPNm2gSviHoGezTwwlIHD
+         YEtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753450451; x=1754055251;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=L4fkWohIN9Tymim1ViegWsddn2WdurixVR25PkINhrM=;
+        b=wiE2Yjy/Ev8RavLyhkptp+zkzrDeL+uagLviqreMvDfFufW64UpRAUipRAkDeslWyC
+         Qfs5VbaQmHZR+epT7F0wDo2bgHUtblzvkEvYT9eJijwfrsSJ8M2T5TWTO8zS8ULq1An6
+         7xstSecCwzDmuEkV4kutK/lfD+5sTs4ouhZXv/21QqNXE7bNnPEMGU5sQbqeS7vdWGIs
+         X0VtgXh8gD2a1lbPN2znn3/F+8W3x5dRIqRV6iB/cFfCzt3hKLbOeBet3GrEpqyWwRpe
+         kKXnAoSsiK537VdQFyuTrUCeWepz+16WR74CXdveVTGD7hZONq6aBCrB2ZUAMI9rLjEk
+         uRTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUWavzYtK1xc4za+fEn+O3ox77jTBqqRpD0sna7PE5r2vAWsvU2r2vgF+rgsvK/QRMdJ/TVA+PjHuMrfak=@vger.kernel.org, AJvYcCVb6Nu1Cxf+synBczKldLMtZ0tcF7Lb4Ko9TbDps5MIJco5NhQ4m0DJeMr0bPGyd35aIEhVHkU2@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9troMaihTxRl0g/CN8TA3qaJSEznbnXk19yJIAm/TajREcSeI
+	QDn6MwLPGzVTPiiuhR6nGYQc3lnHmmNsk5FsMohmb5t8dm35zUGX3DaA
+X-Gm-Gg: ASbGncuhaYMnzdy7K7T1CoFZhDCsbOIXkaa9iMLgNigtNZVLzsmHYvjbpSo36FWSDbQ
+	Gu0brng6kQxJDenDRa/ylw/rc/TIKYT57x5hqlZGoS1LYVbTIpfftM91nZc4LVj9AZjtm9lAYu3
+	KUJwa3U4hM2s8nOwJXsNlTpHzugTLGPrUm1JJbJKFWo1AO/cI7/DWDVG5lO0+XQX7VdO9TiCxbB
+	sggMCeiv7R+tcFx7nBAgKclR9vPTyNd1wt97/zKoHa+gxAG0jAgSi67dHxqEIOSW46ZN9Y1oR2F
+	YgQ37b/FV91DGLa2zvSg289L9j3A35ZdzUuX+4oJNOHMGNVSZoAca9Zofcx5Szh6zEtDEWOlVzU
+	bl2/9HXxnfflzxWiZQ0EhHMH/XdJHrM0C15fkWGYLWSjnkQ==
+X-Google-Smtp-Source: AGHT+IGr/2sDO56DQrdwx9I1xVo2cv39WgMClyR+5CETmj47IFNUseUrArHv2aYOr68iQ28812AK6A==
+X-Received: by 2002:a05:600c:5253:b0:456:1823:f10 with SMTP id 5b1f17b1804b1-45876676a3dmr7502385e9.8.1753450450476;
+        Fri, 25 Jul 2025 06:34:10 -0700 (PDT)
+Received: from thomas-precision3591.. ([2a0d:e487:311f:7f4c:22d8:dfe:2923:8b81])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4587054f22esm56287005e9.9.2025.07.25.06.34.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Jul 2025 06:34:10 -0700 (PDT)
+From: Thomas Fourier <fourier.thomas@gmail.com>
+To: 
+Cc: Thomas Fourier <fourier.thomas@gmail.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [net-next PatchV3] Octeontx2-pf: ethtool: Display "Autoneg" and
- "Port" fields
-Message-ID: <20250725131314.GD1367887@horms.kernel.org>
-References: <20250724101057.2419425-1-hkelam@marvell.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+	Moritz Fischer <mdf@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net: ethernet: nixge: Add missing check after DMA map
+Date: Fri, 25 Jul 2025 15:33:04 +0200
+Message-ID: <20250725133311.143814-2-fourier.thomas@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250724101057.2419425-1-hkelam@marvell.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jul 24, 2025 at 03:40:57PM +0530, Hariprasad Kelam wrote:
-> The Octeontx2/CN10k netdev drivers access a shared firmware structure
-> to obtain link configuration details, such as supported and advertised
-> link modes. This patch adds support to display the same.
-> 
-> ethtool eth1
-> Settings for eth1:
->     Supported ports: [ ]
->     Supported link modes:  10000baseCR/Full
-> 	                   10000baseSR/Full
->                            10000baseLR/Full
->     Supported pause frame use: No
->     Supports auto-negotiation: Yes
->     Supported FEC modes: None
->     Advertised link modes: Not reported
->     Advertised pause frame use: No
->     Advertised auto-negotiation: Yes
->     Advertised FEC modes: None
->     Speed: 10000Mb/s
->     Duplex: Full
->     Port: Twisted Pair
->     PHYAD: 0
->     Transceiver: internal
->     Auto-negotiation: on
->     MDI-X: Unknown
->     Current message level: 0x00000000 (0)
->     Link detected: yes
-> 
-> Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
-> ---
-> V3 * Fix port types in firmware 
-> 
-> V2 * Add validation for 'port' parameter
->     include full output of ethtool ethx
+The DMA map functions can fail and should be tested for errors.
 
-Thanks, I believe this addresses Jakub's review of v2.
+Fixes: 492caffa8a1a ("net: ethernet: nixge: Add support for National Instruments XGE netdev")
+Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
+---
+ drivers/net/ethernet/ni/nixge.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+diff --git a/drivers/net/ethernet/ni/nixge.c b/drivers/net/ethernet/ni/nixge.c
+index 230d5ff99dd7..027e53023007 100644
+--- a/drivers/net/ethernet/ni/nixge.c
++++ b/drivers/net/ethernet/ni/nixge.c
+@@ -334,6 +334,10 @@ static int nixge_hw_dma_bd_init(struct net_device *ndev)
+ 		phys = dma_map_single(ndev->dev.parent, skb->data,
+ 				      NIXGE_MAX_JUMBO_FRAME_SIZE,
+ 				      DMA_FROM_DEVICE);
++		if (dma_mapping_error(ndev->dev.parent, phys)) {
++			dev_kfree_skb_any(skb);
++			goto out;
++		}
+ 
+ 		nixge_hw_dma_bd_set_phys(&priv->rx_bd_v[i], phys);
+ 
+@@ -645,8 +649,8 @@ static int nixge_recv(struct net_device *ndev, int budget)
+ 					  NIXGE_MAX_JUMBO_FRAME_SIZE,
+ 					  DMA_FROM_DEVICE);
+ 		if (dma_mapping_error(ndev->dev.parent, cur_phys)) {
+-			/* FIXME: bail out and clean up */
+-			netdev_err(ndev, "Failed to map ...\n");
++			dev_kfree_skb_any(new_skb);
++			return packets;
+ 		}
+ 		nixge_hw_dma_bd_set_phys(cur_p, cur_phys);
+ 		cur_p->cntrl = NIXGE_MAX_JUMBO_FRAME_SIZE;
+-- 
+2.43.0
 
 
