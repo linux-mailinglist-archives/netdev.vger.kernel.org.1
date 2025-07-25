@@ -1,289 +1,359 @@
-Return-Path: <netdev+bounces-210000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEB2EB11CF3
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 12:58:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BBDEB11DAB
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 13:33:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0EC34E6045
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 10:58:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 459C33A63E7
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 11:33:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ED182E5414;
-	Fri, 25 Jul 2025 10:58:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DE1223F413;
+	Fri, 25 Jul 2025 11:33:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GLqtOWt8"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="r1JcpPxA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A3520127B;
-	Fri, 25 Jul 2025 10:58:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753441111; cv=fail; b=QdPQW1wnIdwxt7Rif5di9DUuuZLfyoFUl0ywnXKUVneX/vcjwWuCL9lODOfQrD8xMgQEWqm4g3q4fVkNjajACnAkCGGPeQQNstVMb9YQUvVE/XCkcxf6/z/navGHoHMrD6f1/ggMEwNUZXWIYlHhTqUwNwfJ1SOUMcpIt6dhKlg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753441111; c=relaxed/simple;
-	bh=dqKcCL26BdRKvNiscivCIS0ErgorW3YCNKDiSF2DWs8=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=a7tVKdsNS7eXFeUVvwyo2tSIuErKmhNOyQ3BHoF/G6SXvaSIn1iYZU9qTDXYn3pLoMubpYtQf6S6fQNWM4KBsjKAKXNZIjxyw1KLjHmBNSjFa4cgTJTnjnIyeulpXeQ6hTulQC2TGBPIWTOF/X76vTrBprUKkJ3s2qbzyU7b1fo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GLqtOWt8; arc=fail smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753441109; x=1784977109;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=dqKcCL26BdRKvNiscivCIS0ErgorW3YCNKDiSF2DWs8=;
-  b=GLqtOWt8Kt/q4otjBoOW/7/kOcdbiQ4oMszVjM5BbqoMFgPuXeURAgDU
-   kESjWsDP1wbwhZZKIfZCNDqA14XHobWgggfOjDIYYCodTyoGtaon48fYc
-   PuNNZPdLKtdRdPFLEpaFIawc0QYhWz3MbOKJIKm+JYYvQMkdF2JyqhYZm
-   retmp+pMA8TSCL8N2RceOr+O+WSW8VrH/Aw1Y+3yppITwAWp4pXa26rxE
-   uAXBu9hn2DmX9IcCHMgmZ+jyrXsokoIWjEurDn6SXH5MS3dlMyDpNDdX8
-   BzubZipxeoTbWwc22hhRVWilh9/2/V6+lJ0DBqS7FFidhznLX9yxgfBUM
-   Q==;
-X-CSE-ConnectionGUID: ZZ9XVCrxRhK1TVCid0y0sA==
-X-CSE-MsgGUID: CnBBvx3DTRiVksdPv42Rdw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11501"; a="55738283"
-X-IronPort-AV: E=Sophos;i="6.16,339,1744095600"; 
-   d="scan'208";a="55738283"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2025 03:58:29 -0700
-X-CSE-ConnectionGUID: d67FUey+Sc27ZTNzv75jQw==
-X-CSE-MsgGUID: 5bUh0PUpQmy8JK90LtI2+g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,339,1744095600"; 
-   d="scan'208";a="160456088"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2025 03:58:28 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Fri, 25 Jul 2025 03:58:27 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26 via Frontend Transport; Fri, 25 Jul 2025 03:58:27 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (40.107.92.87) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Fri, 25 Jul 2025 03:58:27 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=f0en505Z/U7Pem5cR6M0Fzq36iS7X6dXQEi9ReMm5L4m96LYcpm2LVyHWKjQ77TlKHRrWeiVk3jYL49HDB2qscwGrH0yC02AD94NFJ1vC6zXg18aAhnOR0Hwlj6d88Ouu2FPCjN+Nuv/ojv4JC4S3DCBydpTiMm0JOCxuagPT+/RjCAQKHdfaKaViAKnLj7Iet/ckkCDftM4QAbT6VHWRJGwY7EgssPleBrcUDn72bFz7vMp4WPGw/+yVTUHClcdpO+Gp/xP9Zmo+htPTiW/Dr6Old41MFzRaxskkdz6VeBJuwxOhGS4mIto/MyzpkXy5XE0I80eN6PenPMfHJeCEw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=H2gLvSNsjDQCQedlFp93o8zJpP/Fk3Ibk754MuMKHj8=;
- b=a4P2kEWmkVlqO22ZwRku+I3wDxUWewJA0cv9aDN96NAT5qZ2IolGAKI6C5heILTYD/Vuh7AF478GcO3DdCHmj/pjnlaOSZa8w7I18vYb0uYZcX7jDO99zW6J/iqu1SLnNBcQ+TPFgFpmPbP/o2fy/bi+Dj7i80QDO69kNFbnkn5sxgRX+XxltXa9eFhvE/dELQcDMyY6krEt4PVV1JPYsnV1oGEYFeCkp6lEriXsKmePToLInIBzHkqme+MB4gAy4vPGF0RJozQZRDwsswl9T6acHP3GLUHvdo10Rr6HjkBcyDgdVFB94Nxej2YXlfj79WFZInTkNq/dH5QM4e3g1w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
- by IA1PR11MB6148.namprd11.prod.outlook.com (2603:10b6:208:3ec::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.22; Fri, 25 Jul
- 2025 10:57:44 +0000
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::399f:ff7c:adb2:8d29]) by SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::399f:ff7c:adb2:8d29%4]) with mapi id 15.20.8964.021; Fri, 25 Jul 2025
- 10:57:44 +0000
-Date: Fri, 25 Jul 2025 12:57:33 +0200
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-CC: Tony Nguyen <anthony.l.nguyen@intel.com>, <przemyslaw.kitszel@intel.com>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <bjorn@kernel.org>,
-	<magnus.karlsson@intel.com>, <maciej.fijalkowski@intel.com>,
-	<jonathan.lemon@gmail.com>, <sdf@fomichev.me>, <ast@kernel.org>,
-	<daniel@iogearbox.net>, <hawk@kernel.org>, <john.fastabend@gmail.com>,
-	<bpf@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
-	<netdev@vger.kernel.org>, Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next 2/5] ixgbe: xsk: resolve the underflow of budget
- in ixgbe_xmit_zc
-Message-ID: <aINjHQU7Uwz_ZThs@soc-5CG4396X81.clients.intel.com>
-References: <20250720091123.474-1-kerneljasonxing@gmail.com>
- <20250720091123.474-3-kerneljasonxing@gmail.com>
- <6ecfc595-04a8-42f4-b86d-fdaec793d4db@intel.com>
- <CAL+tcoBTejWSmv6XTpFqvgy4Qk4c39-OJm8Vqcwraa0cAST=sw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL+tcoBTejWSmv6XTpFqvgy4Qk4c39-OJm8Vqcwraa0cAST=sw@mail.gmail.com>
-X-ClientProxiedBy: WA2P291CA0016.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:1e::12) To SN7PR11MB7540.namprd11.prod.outlook.com
- (2603:10b6:806:340::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90972405F9
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 11:33:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753443213; cv=none; b=fnWbPfJOi85VBCxwt7kG7qB9pVsj8nvmUW0DWmBicybS7KCJZSAPZ57J6uuvInUxvY0BfnFN05KcdbehfUUlIksfGawRc74ULNuT8by7H10LlxkGPBC4SUhH6ThzERTYK/8jiHlA21RKgQeeNavmqHEXL3XUbJ1Gf+oc/OGiSFo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753443213; c=relaxed/simple;
+	bh=FMpT36YouRIX5Po4UqTEsmxy/+1mI31D1PMD9W9aOCU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=G2++R4Gg4zSllaYUsdDfx/yHtYbmVKw86vubG+X+MY/7iZQSDXk8MgL50I1iDEy42tKzIo4hnsaBpmZPZfO32WjK5jbVsn+459I5xelR4I24pPoPnkg/vlFdwtEb0MbhD6NZ4dLJTcBOYo7UGsopK3pFpvYnWcTDLQuJXRpPUsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=r1JcpPxA; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c6f54d34-a22f-4533-a7d7-c991ae08d725@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753443207;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ivya1EzVCbw0o4dYe+knkjWoez4RiejZxGf/to9ndCM=;
+	b=r1JcpPxADtHGVGoReqfDBE5+ELNMpeLSbXkrrGD8Pfrv/pkmjrzm2fDw9LBEFN3+F5myrI
+	MEA4P20otqVnmY5o7bonVpnXcl6Ja/6iazkR5+mKmFzWgapjASMOfCnGPq57Xc+of7P8RR
+	irYArmYtcdceD4dl6Sm0s4asX8OHfsk=
+Date: Fri, 25 Jul 2025 19:32:46 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|IA1PR11MB6148:EE_
-X-MS-Office365-Filtering-Correlation-Id: 196e53d9-5d73-4ebc-df35-08ddcb6a1517
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|10070799003|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?UU55NW1vVWtMOVVRTElaejlSTExoSXMzSFFDWWJUd2UyVXRzVnA0dWFEMlls?=
- =?utf-8?B?L0trRVhxSjBRN0syWFBsdXprU21KWGFLUGlIcENlVkJUMFROZGp2Q29vbFNS?=
- =?utf-8?B?SHdKcjh0VHFZZFk4TVZYMU45bDhicW96MldONmpGcEgwUFlHdEN1dVBWU3JY?=
- =?utf-8?B?N1B4U2FkdUpHaktXYkVxUVV4Z0I1TmRtU0p1VC9uZUlBTTdjK2Fjb2pDclcr?=
- =?utf-8?B?K2g2U1Y0Y0N6ajJLaDkyZjlpZGF3N0JhMGdxMmFlQmhtSElzdjNSdHpwbExn?=
- =?utf-8?B?dE5XVDlwTDZZWUtOMk1kWFl0MFNKcFJXRjYzVzd3cU1VaU5XTG1abGNnQjFC?=
- =?utf-8?B?TGhoT3I5KzZrcFdyQWdXeGNXWFFNVXdlYnpUQlQ1QU9IYUQ5clhzbk9EL1Bo?=
- =?utf-8?B?N3F0OGVIZ1J4VTVIUWd6RHZNaXlVN0h3V3g5bkQ0NzRKbFBTUXA0a0h0bnMv?=
- =?utf-8?B?blNDcVNSOHU4UE55dXBqQm01THV6MDUxTUdqbUlRTzVXWCtEeEFEZ2lVeHVK?=
- =?utf-8?B?UlhubkYyejM1cGxXNmd3Zml0OStyaGZaWUhMMlVRQW5BVVYycS9aS0VNVWtK?=
- =?utf-8?B?OGl1RTZaMkZDWkNBajlpdkV4a2lzbFdXeDJVL3IyU0puRG90alo5QzFGM2VE?=
- =?utf-8?B?VzlZZnFmRnJDK0NFQXpzOFpROXlzdXZQeVNHR2dOampNeDBzdzlRZVZJdlRQ?=
- =?utf-8?B?RVMzcm1CVTdhNFVxck9Pemo4TjNOL0QvRm9KQ3Z3UjVFeXkzS0FmWHRBclpn?=
- =?utf-8?B?dTR4bXdnVy9zMmJ3UWxqeTJ0NnlwdzZESkoyYjlibkxZbUo1enU3ZGpaMHpQ?=
- =?utf-8?B?RlBqVjVNbkM3QnhMbDBiclNUaWplRnpaQjh2NmZMcmpGVUh3d2lrcDdPaFNU?=
- =?utf-8?B?TVFlMkhSZEMxc1p6UWltRDBtTW9HVWtOYVdvSHlJQy9xdWVYTTNlaHJ6ZzdN?=
- =?utf-8?B?OGhnYi9QUVRhdC9vRGtvWnR1VGwyb2ZiZHRRQmRGdFJQYXF4Tkx6dTVaNHRC?=
- =?utf-8?B?YmtXZllFbGhPMkFzRG1XZHFIVkxlaHF0WkxsSlc0YmRoeXRtNzM1cSs3cGdp?=
- =?utf-8?B?ZVV1a0s1cm14cEE3MXorTkNVdHY4RUlhVnQwK3NDTUxmSlEvYzhrR2Z6SEJp?=
- =?utf-8?B?dUl4Z20wbHFhdGJaaTk3c2NFcFh6THBrRVJ0dVkwakxyNWMvWW1nSDBLUCtX?=
- =?utf-8?B?dU4yc3lsblNna2R0WHZURVV0TzNveFIvTE8zeFB2SzIvZksvT2RnTjlGak0z?=
- =?utf-8?B?ekpKNTV2MDhnell4M2hnYmhjb2duaHVxaUpoeWs0VlR4T0lseEdtL3FLQ2Ja?=
- =?utf-8?B?SEM5YVdwVWNHZWJXbkVWTk43RUlaSm1FbG41MTJjY282UG96Y3poWHl2RWpu?=
- =?utf-8?B?cC95ZEU4aUNTaVR0d2pGMy9nT0l3MFduZHpKKzBXT1FaZEpuMHl0WFVnVDVs?=
- =?utf-8?B?NUNIYXpIUzFaYXhGd2RtT1ptaVNqL1YzanRHRERFUURKZUdSc3hQY0MwWDVV?=
- =?utf-8?B?Z3gxZ3JJYXJITi9aSktqc2RYVzlBTk1DdUVOMStjWjhSempnanp6UjNmTXJw?=
- =?utf-8?B?Wis1SmNhZDlWWXJiV0xzL0c4U1Y4UExkSEtwMmNPZUJyNHk2b2pmNFgxVU1V?=
- =?utf-8?B?YVg1Ui9WZkFSME01UnJGSXNhRnFaZXpBMjcvTzVnT2F0dVYxUFI4a3VvSDl2?=
- =?utf-8?B?UFRBKzZ3K1I5WnFhTFM1aStlSGx0K0d3SUVFQU8zclFoWTZ4OThnbk9SeExL?=
- =?utf-8?B?aCtXcEthYXM4c0daZVY2WXl4MnI2clFjd0Rrd1dTU1plV0luajdReEFjL3FE?=
- =?utf-8?B?K2NQbXZJbkcxdzJtdHF6aW9SWlRDYzAwa1l6dUNLa1BEaTkvMWwzR251b1Y5?=
- =?utf-8?B?dG9jaXBISytpeEtSTHlyV3Mxd2JrelhDSTB5ejZ3REJGUisvR08vSkh3dXpC?=
- =?utf-8?Q?RVZ+LKsU0x8=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VGI4UXFoSEpLOGdXTEVNcW53MjFhYUlKTllLaTJ2SDROMDB0Q0NRakYyV0w5?=
- =?utf-8?B?UVBQZFdYTENlN2hmZ0RmWVZxUytoYUJnRzRxY0VDZWVadmNsSWtBSWlEU1FB?=
- =?utf-8?B?eEc5R3VvNzJwTTdqbkNyRUVLOGJYenVvejhJYkRxTFhFazFUM3F3RmtjMFNl?=
- =?utf-8?B?RjhwRU5TRmFIc21TRGRxQWZBcTZDRnJUU0p6cDl4dUxxcmNMbnUxL1Q2MVJ4?=
- =?utf-8?B?WVA5WFI3eHdmRndJMTYydk5VVmd4RXhPUGUxNjdQa0RnN2V0WGRiZWtUcm5B?=
- =?utf-8?B?M0V5SFN5QnF6WUcyaUFVT09JdG0zRVlyZ2lRL3p1WFlldVpndjY2RVJkM3lq?=
- =?utf-8?B?c3ZqL0NhcnlTOFRWUm1xZ0VrUzhhM09jQzVtRDhjZFdPQk94UllOc1lpY1RC?=
- =?utf-8?B?L3dWelFmSlBTUmxraTRGTW52dEU4eklHRU9VM2pvNE8wNUt6YmRjME81eEFk?=
- =?utf-8?B?NDFXMlhCOWtiQ2VMOXluMzlia2Y1Y2I4dFh0L2Jaa2FoQXgxZ3lmRzFNK3pF?=
- =?utf-8?B?WC81NnN0Q1k2bWZweDlSd3JxTnlEcW16UkVYSmczTDFqZ0dsVFVXcWppMTdj?=
- =?utf-8?B?cW82Qy9KVjk2MFZWeHFLOVpzYWs0WG5ob3lxaTJmeEFvN2hKeG56RXAvR2VK?=
- =?utf-8?B?Tm9jdUpKcHVObE54bnBDdzNnbmdUdXdnZllxZ1dSTE1SVCtQZitFQk9RcHl1?=
- =?utf-8?B?ZUkwTFNyVkZFamFpNllOZjZJTWprRHFMODhzeDdTY0kya2xkUTFTOFBsUTdh?=
- =?utf-8?B?WmZqOTJ1NDZFa3V4QW1jcG55SndFeDJRTFJsZ1BlRXV6UkdGVlRKQk5LZ00r?=
- =?utf-8?B?ZUgrY0d2NHF5RnB1clQ1eGMzS1UrVGNuSkQ0WVlYa1A4RzYxVTRKSlhVZ2Z0?=
- =?utf-8?B?ekRrN0ZnY0cwSitUZnluQUE5VTFXRlRpNmYrTGFXQmk2ZW9Eakh6cjl1OW1q?=
- =?utf-8?B?dDJzVkk1SU1iOFYxL1AxUjNSdmFiQllwejRWSFlMVlozRWM2NGtWdTNwQXhE?=
- =?utf-8?B?QW1LK3lQSUh6YjFyMkZWS1BTRHJZZ1pIb3lWcmhza2wwUWtuWmM3eElqcXJk?=
- =?utf-8?B?MDZWVDRSUk44OVBndUx4dmRiWVF2cVpsaDMxNVZubUtLM0xkTWlsT0ZSdTdY?=
- =?utf-8?B?dkc4bG55UU1ZNTRRL0hvSVQ2S2J0TzF2UXRsNmUzaEp6WEFSc3FldUFKOXdF?=
- =?utf-8?B?MVMrOHY0cnB1eFRpUUZpRTBKSTFoYjYxbU5ObWJYN0hTNGRPMTVpWTAxRmtE?=
- =?utf-8?B?ZUoyUVdOblpXblRwYTEwNGZjb2dKZHp0czBNaDJXSzV4SnFwSW9WeU1kaURi?=
- =?utf-8?B?cFBWZ1pUMFg2cVZ6eE0wUW9xTGwrcG1kaDlzSXZsWkJoVEdUN1R3b0hKRmxZ?=
- =?utf-8?B?cVF0OHBUaEd1UjVYN2ZNQVBrS0hmOUYrMisra0xtakw4SXdyUlNUK2lKdGVv?=
- =?utf-8?B?U1l6VDRnMTl0NTFlWDRQRS9QNU5GcHNOVVBJaW5ibE5tMjhOUmFhaTlscmpN?=
- =?utf-8?B?S0JQMGxHQkpUK3k2WHJEcm96bExJd1R3SlJFUEY0dFFzc1Jkd3N0c29oZHdF?=
- =?utf-8?B?R1ZqU3ZyL1JodUx2bzBPc3JpSnE5M3VsaExyTlVEbGNiSlBQbi9hTktPSCt0?=
- =?utf-8?B?RnByQ216dGhUdDd0enV4RjlPQ1pkSnV6eEs2ZmlMemhYYTlrUHNuZkJ0RW55?=
- =?utf-8?B?R0FuMlIrZkFvU2xJZzZzOVlMVzNXazdleUJMTDVzcHBhRmU4RUM3Z3lDdkk1?=
- =?utf-8?B?bUtBYW40N2JPRWYwcUpQbkIwNldDRU0zQ2x5SWdGblYrRjIwdmR1cnZmSEgw?=
- =?utf-8?B?SHh6YUcxNXJUZHhyelVVb2lER3lTYyt3U0FLQzZoUW1HZ05STUEyU01OM2xn?=
- =?utf-8?B?ZTVwMnkzZm9qdk5nL0Q0SDRjaExCNHVmb0hnWm93Nk9GMGs5TGI1WE9oQ2tX?=
- =?utf-8?B?NkZ1NXVSSCt5ZWJZMEphN2RCL0hvYmRNWi9vWmZBUWlXRlR2TGk1NmNGZHQ3?=
- =?utf-8?B?aWpad3pseTlTUUtHdjlNaDUvL1dyczVsbks2Q0FxZWFvWnVQZGFLQnFkTC9D?=
- =?utf-8?B?dzlNV3RWd296d29hNFBiU0Y0Rm5RRTZvTlEwSk5uZGx2QmZ2dSs0cTByRTIr?=
- =?utf-8?B?ZlJobzY5bUNRU2tSOHRqcVdMN3JQY3JPUTZYVitUWlQ3V2UzbUcwMnBwbUJF?=
- =?utf-8?B?UGY3WHorZTZGZlpYMHNVNG9aR2piSjlzUCtubjVETVlPbE1LcU1qNzlhS04y?=
- =?utf-8?B?M2xUcnpHcEtJWWV3TFNab0x6V1pBPT0=?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 196e53d9-5d73-4ebc-df35-08ddcb6a1517
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2025 10:57:43.9579
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tRGCZA7ZE7H8o5iCrhudlf3fKCtAb6m2fPcf6iPV3hc9hOJwTuusejVBK14cArpRRZvplxUMOX5HOsv37+9uESL12yNYoRDaugnGC2uqy6k=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6148
-X-OriginatorOrg: intel.com
+Subject: Re: [PATCH] i40e: remove read access to debugfs files
+To: Jacob Keller <jacob.e.keller@intel.com>,
+ Intel Wired LAN <intel-wired-lan@lists.osuosl.org>, netdev@vger.kernel.org
+Cc: Simon Horman <horms@kernel.org>,
+ Anthony Nguyen <anthony.l.nguyen@intel.com>,
+ Wang Haoran <haoranwangsec@gmail.com>,
+ Amir Mohammad Jahangirzad <a.jahangirzad@gmail.com>
+References: <20250722-jk-drop-debugfs-read-access-v1-1-27f13f08d406@intel.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kunwu Chan <kunwu.chan@linux.dev>
+In-Reply-To: <20250722-jk-drop-debugfs-read-access-v1-1-27f13f08d406@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Jul 25, 2025 at 07:18:11AM +0800, Jason Xing wrote:
-> Hi Tony,
-> 
-> On Fri, Jul 25, 2025 at 4:21 AM Tony Nguyen <anthony.l.nguyen@intel.com> wrote:
-> >
-> >
-> >
-> > On 7/20/2025 2:11 AM, Jason Xing wrote:
-> > > From: Jason Xing <kernelxing@tencent.com>
-> > >
-> > > Resolve the budget underflow which leads to returning true in ixgbe_xmit_zc
-> > > even when the budget of descs are thoroughly consumed.
-> > >
-> > > Before this patch, when the budget is decreased to zero and finishes
-> > > sending the last allowed desc in ixgbe_xmit_zc, it will always turn back
-> > > and enter into the while() statement to see if it should keep processing
-> > > packets, but in the meantime it unexpectedly decreases the value again to
-> > > 'unsigned int (0--)', namely, UINT_MAX. Finally, the ixgbe_xmit_zc returns
-> > > true, showing 'we complete cleaning the budget'. That also means
-> > > 'clean_complete = true' in ixgbe_poll.
-> > >
-> > > The true theory behind this is if that budget number of descs are consumed,
-> > > it implies that we might have more descs to be done. So we should return
-> > > false in ixgbe_xmit_zc to tell napi poll to find another chance to start
-> > > polling to handle the rest of descs. On the contrary, returning true here
-> > > means job done and we know we finish all the possible descs this time and
-> > > we don't intend to start a new napi poll.
-> > >
-> > > It is apparently against our expectations. Please also see how
-> > > ixgbe_clean_tx_irq() handles the problem: it uses do..while() statement
-> > > to make sure the budget can be decreased to zero at most and the underflow
-> > > never happens.
-> > >
-> > > Fixes: 8221c5eba8c1 ("ixgbe: add AF_XDP zero-copy Tx support")
-> >
-> > Hi Jason,
-> >
-> > Seems like this one should be split off and go to iwl-net/net like the
-> > other similar ones [1]? Also, some of the updates made to the other
-> > series apply here as well?
-> 
-> The other three patches are built on top of this one. If without the
-> patch, the whole series will be warned because of build failure. I was
-> thinking we could backport this patch that will be backported to the
-> net branch after the whole series goes into the net-next branch.
-> 
-> Or you expect me to cook four patches without this one first so that
-> you could easily cherry pick this one then without building conflict?
-> 
-> >
-> > Thanks,
-> > Tony
-> >
-> > [1]
-> > https://lore.kernel.org/netdev/20250723142327.85187-1-kerneljasonxing@gmail.com/
-> 
-> Regarding this one, should I send a v4 version with the current patch
-> included? And target [iwl-net/net] explicitly as well?
-> 
-> I'm not sure if I follow you. Could you instruct me on how to proceed
-> next in detail?
+On 2025/7/23 08:14, Jacob Keller wrote:
+> The 'command' and 'netdev_ops' debugfs files are a legacy debugging
+> interface supported by the i40e driver since its early days by commit
+> 02e9c290814c ("i40e: debugfs interface").
 >
+> Both of these debugfs files provide a read handler which is mostly useless,
+> and which is implemented with questionable logic. They both use a static
+> 256 byte buffer which is initialized to the empty string. In the case of
+> the 'command' file this buffer is literally never used and simply wastes
+> space. In the case of the 'netdev_ops' file, the last command written is
+> saved here.
+>
+> On read, the files contents are presented as the name of the device
+> followed by a colon and then the contents of their respective static
+> buffer. For 'command' this will always be "<device>: ". For 'netdev_ops',
+> this will be "<device>: <last command written>". But note the buffer is
+> shared between all devices operated by this module. At best, it is mostly
+> meaningless information, and at worse it could be accessed simultaneously
+> as there doesn't appear to be any locking mechanism.
+>
+> We have also recently received multiple reports for both read functions
+> about their use of snprintf and potential overflow that could result in
+> reading arbitrary kernel memory. For the 'command' file, this is definitely
+> impossible, since the static buffer is always zero and never written to.
+> For the 'netdev_ops' file, it does appear to be possible, if the user
+> carefully crafts the command input, it will be copied into the buffer,
+> which could be large enough to cause snprintf to truncate, which then
+> causes the copy_to_user to read beyond the length of the buffer allocated
+> by kzalloc.
+>
+> A minimal fix would be to replace snprintf() with scnprintf() which would
+> cap the return to the number of bytes written, preventing an overflow. A
+> more involved fix would be to drop the mostly useless static buffers,
+> saving 512 bytes and modifying the read functions to stop needing those as
+> input.
+>
+> Instead, lets just completely drop the read access to these files. These
+> are debug interfaces exposed as part of debugfs, and I don't believe that
+> dropping read access will break any script, as the provided output is
+> pretty useless. You can find the netdev name through other more standard
+> interfaces, and the 'netdev_ops' interface can easily result in garbage if
+> you issue simultaneous writes to multiple devices at once.
+>
+> In order to properly remove the i40e_dbg_netdev_ops_buf, we need to
+> refactor its write function to avoid using the static buffer. Instead, use
+> the same logic as the i40e_dbg_command_write, with an allocated buffer.
+> Update the code to use this instead of the static buffer, and ensure we
+> free the buffer on exit. This fixes simultaneous writes to 'netdev_ops' on
+> multiple devices, and allows us to remove the now unused static buffer
+> along with removing the read access.
+>
+> Reported-by: Kunwu Chan <chentao@kylinos.cn>
+> Closes: https://lore.kernel.org/intel-wired-lan/20231208031950.47410-1-chentao@kylinos.cn/
+> Reported-by: Wang Haoran <haoranwangsec@gmail.com>
+> Closes: https://lore.kernel.org/all/CANZ3JQRRiOdtfQJoP9QM=6LS1Jto8PGBGw6y7-TL=BcnzHQn1Q@mail.gmail.com/
+> Reported-by: Amir Mohammad Jahangirzad <a.jahangirzad@gmail.com>
+> Closes: https://lore.kernel.org/all/20250722115017.206969-1-a.jahangirzad@gmail.com/
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> ---
+> I found several reports of the issues with these read functions going at
+> least as far back  as 2023, with suggestions to remove the read access even
+> back then. None of the fixes got accepted or applied, but neither did Intel
+> follow up with removing the interfaces. Its time to just drop the read
+> access altogether.
 
-What I usually do is send the fix as soon as I have it. While I prepare and test 
-the series, the fix usually manages to get into the tree. Advise you do the 
-same, given you have things to change in v2, but the fix can be resent almost 
-as it is now (just change the tree).
+Reviewed-by: Kunwu Chan <kunwu.chan@linux.dev>
 
-Tony can have a different opinion though.
- 
-> Thanks,
-> Jason
-> 
+> ---
+>   drivers/net/ethernet/intel/i40e/i40e_debugfs.c | 123 ++++---------------------
+>   1 file changed, 19 insertions(+), 104 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
+> index 6cd9da662ae1..a5c794371dfe 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
+> @@ -40,48 +40,6 @@ static struct i40e_vsi *i40e_dbg_find_vsi(struct i40e_pf *pf, int seid)
+>    * setup, adding or removing filters, or other things.  Many of
+>    * these will be useful for some forms of unit testing.
+>    **************************************************************/
+> -static char i40e_dbg_command_buf[256] = "";
+> -
+> -/**
+> - * i40e_dbg_command_read - read for command datum
+> - * @filp: the opened file
+> - * @buffer: where to write the data for the user to read
+> - * @count: the size of the user's buffer
+> - * @ppos: file position offset
+> - **/
+> -static ssize_t i40e_dbg_command_read(struct file *filp, char __user *buffer,
+> -				     size_t count, loff_t *ppos)
+> -{
+> -	struct i40e_pf *pf = filp->private_data;
+> -	struct i40e_vsi *main_vsi;
+> -	int bytes_not_copied;
+> -	int buf_size = 256;
+> -	char *buf;
+> -	int len;
+> -
+> -	/* don't allow partial reads */
+> -	if (*ppos != 0)
+> -		return 0;
+> -	if (count < buf_size)
+> -		return -ENOSPC;
+> -
+> -	buf = kzalloc(buf_size, GFP_KERNEL);
+> -	if (!buf)
+> -		return -ENOSPC;
+> -
+> -	main_vsi = i40e_pf_get_main_vsi(pf);
+> -	len = snprintf(buf, buf_size, "%s: %s\n", main_vsi->netdev->name,
+> -		       i40e_dbg_command_buf);
+> -
+> -	bytes_not_copied = copy_to_user(buffer, buf, len);
+> -	kfree(buf);
+> -
+> -	if (bytes_not_copied)
+> -		return -EFAULT;
+> -
+> -	*ppos = len;
+> -	return len;
+> -}
+>   
+>   static char *i40e_filter_state_string[] = {
+>   	"INVALID",
+> @@ -1621,7 +1579,6 @@ static ssize_t i40e_dbg_command_write(struct file *filp,
+>   static const struct file_operations i40e_dbg_command_fops = {
+>   	.owner = THIS_MODULE,
+>   	.open =  simple_open,
+> -	.read =  i40e_dbg_command_read,
+>   	.write = i40e_dbg_command_write,
+>   };
+>   
+> @@ -1630,48 +1587,6 @@ static const struct file_operations i40e_dbg_command_fops = {
+>    * The netdev_ops entry in debugfs is for giving the driver commands
+>    * to be executed from the netdev operations.
+>    **************************************************************/
+> -static char i40e_dbg_netdev_ops_buf[256] = "";
+> -
+> -/**
+> - * i40e_dbg_netdev_ops_read - read for netdev_ops datum
+> - * @filp: the opened file
+> - * @buffer: where to write the data for the user to read
+> - * @count: the size of the user's buffer
+> - * @ppos: file position offset
+> - **/
+> -static ssize_t i40e_dbg_netdev_ops_read(struct file *filp, char __user *buffer,
+> -					size_t count, loff_t *ppos)
+> -{
+> -	struct i40e_pf *pf = filp->private_data;
+> -	struct i40e_vsi *main_vsi;
+> -	int bytes_not_copied;
+> -	int buf_size = 256;
+> -	char *buf;
+> -	int len;
+> -
+> -	/* don't allow partal reads */
+> -	if (*ppos != 0)
+> -		return 0;
+> -	if (count < buf_size)
+> -		return -ENOSPC;
+> -
+> -	buf = kzalloc(buf_size, GFP_KERNEL);
+> -	if (!buf)
+> -		return -ENOSPC;
+> -
+> -	main_vsi = i40e_pf_get_main_vsi(pf);
+> -	len = snprintf(buf, buf_size, "%s: %s\n", main_vsi->netdev->name,
+> -		       i40e_dbg_netdev_ops_buf);
+> -
+> -	bytes_not_copied = copy_to_user(buffer, buf, len);
+> -	kfree(buf);
+> -
+> -	if (bytes_not_copied)
+> -		return -EFAULT;
+> -
+> -	*ppos = len;
+> -	return len;
+> -}
+>   
+>   /**
+>    * i40e_dbg_netdev_ops_write - write into netdev_ops datum
+> @@ -1685,35 +1600,36 @@ static ssize_t i40e_dbg_netdev_ops_write(struct file *filp,
+>   					 size_t count, loff_t *ppos)
+>   {
+>   	struct i40e_pf *pf = filp->private_data;
+> +	char *cmd_buf, *buf_tmp;
+>   	int bytes_not_copied;
+>   	struct i40e_vsi *vsi;
+> -	char *buf_tmp;
+>   	int vsi_seid;
+>   	int i, cnt;
+>   
+>   	/* don't allow partial writes */
+>   	if (*ppos != 0)
+>   		return 0;
+> -	if (count >= sizeof(i40e_dbg_netdev_ops_buf))
+> -		return -ENOSPC;
+>   
+> -	memset(i40e_dbg_netdev_ops_buf, 0, sizeof(i40e_dbg_netdev_ops_buf));
+> -	bytes_not_copied = copy_from_user(i40e_dbg_netdev_ops_buf,
+> -					  buffer, count);
+> -	if (bytes_not_copied)
+> +	cmd_buf = kzalloc(count + 1, GFP_KERNEL);
+> +	if (!cmd_buf)
+> +		return count;
+> +	bytes_not_copied = copy_from_user(cmd_buf, buffer, count);
+> +	if (bytes_not_copied) {
+> +		kfree(cmd_buf);
+>   		return -EFAULT;
+> -	i40e_dbg_netdev_ops_buf[count] = '\0';
+> +	}
+> +	cmd_buf[count] = '\0';
+>   
+> -	buf_tmp = strchr(i40e_dbg_netdev_ops_buf, '\n');
+> +	buf_tmp = strchr(cmd_buf, '\n');
+>   	if (buf_tmp) {
+>   		*buf_tmp = '\0';
+> -		count = buf_tmp - i40e_dbg_netdev_ops_buf + 1;
+> +		count = buf_tmp - cmd_buf + 1;
+>   	}
+>   
+> -	if (strncmp(i40e_dbg_netdev_ops_buf, "change_mtu", 10) == 0) {
+> +	if (strncmp(cmd_buf, "change_mtu", 10) == 0) {
+>   		int mtu;
+>   
+> -		cnt = sscanf(&i40e_dbg_netdev_ops_buf[11], "%i %i",
+> +		cnt = sscanf(&cmd_buf[11], "%i %i",
+>   			     &vsi_seid, &mtu);
+>   		if (cnt != 2) {
+>   			dev_info(&pf->pdev->dev, "change_mtu <vsi_seid> <mtu>\n");
+> @@ -1735,8 +1651,8 @@ static ssize_t i40e_dbg_netdev_ops_write(struct file *filp,
+>   			dev_info(&pf->pdev->dev, "Could not acquire RTNL - please try again\n");
+>   		}
+>   
+> -	} else if (strncmp(i40e_dbg_netdev_ops_buf, "set_rx_mode", 11) == 0) {
+> -		cnt = sscanf(&i40e_dbg_netdev_ops_buf[11], "%i", &vsi_seid);
+> +	} else if (strncmp(cmd_buf, "set_rx_mode", 11) == 0) {
+> +		cnt = sscanf(&cmd_buf[11], "%i", &vsi_seid);
+>   		if (cnt != 1) {
+>   			dev_info(&pf->pdev->dev, "set_rx_mode <vsi_seid>\n");
+>   			goto netdev_ops_write_done;
+> @@ -1756,8 +1672,8 @@ static ssize_t i40e_dbg_netdev_ops_write(struct file *filp,
+>   			dev_info(&pf->pdev->dev, "Could not acquire RTNL - please try again\n");
+>   		}
+>   
+> -	} else if (strncmp(i40e_dbg_netdev_ops_buf, "napi", 4) == 0) {
+> -		cnt = sscanf(&i40e_dbg_netdev_ops_buf[4], "%i", &vsi_seid);
+> +	} else if (strncmp(cmd_buf, "napi", 4) == 0) {
+> +		cnt = sscanf(&cmd_buf[4], "%i", &vsi_seid);
+>   		if (cnt != 1) {
+>   			dev_info(&pf->pdev->dev, "napi <vsi_seid>\n");
+>   			goto netdev_ops_write_done;
+> @@ -1775,21 +1691,20 @@ static ssize_t i40e_dbg_netdev_ops_write(struct file *filp,
+>   			dev_info(&pf->pdev->dev, "napi called\n");
+>   		}
+>   	} else {
+> -		dev_info(&pf->pdev->dev, "unknown command '%s'\n",
+> -			 i40e_dbg_netdev_ops_buf);
+> +		dev_info(&pf->pdev->dev, "unknown command '%s'\n", cmd_buf);
+>   		dev_info(&pf->pdev->dev, "available commands\n");
+>   		dev_info(&pf->pdev->dev, "  change_mtu <vsi_seid> <mtu>\n");
+>   		dev_info(&pf->pdev->dev, "  set_rx_mode <vsi_seid>\n");
+>   		dev_info(&pf->pdev->dev, "  napi <vsi_seid>\n");
+>   	}
+>   netdev_ops_write_done:
+> +	kfree(cmd_buf);
+>   	return count;
+>   }
+>   
+>   static const struct file_operations i40e_dbg_netdev_ops_fops = {
+>   	.owner = THIS_MODULE,
+>   	.open = simple_open,
+> -	.read = i40e_dbg_netdev_ops_read,
+>   	.write = i40e_dbg_netdev_ops_write,
+>   };
+>   
+>
+> ---
+> base-commit: cf074eca0065bc5142e6004ae236bb35a2687fdf
+> change-id: 20250722-jk-drop-debugfs-read-access-994721875248
+>
+> Best regards,
+> --
+> Jacob Keller <jacob.e.keller@intel.com>
+>
+-- 
+Thanks,
+        TAO.
+---
+“Life finds a way.”
+
 
