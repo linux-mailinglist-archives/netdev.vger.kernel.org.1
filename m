@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-210218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00B3FB126BF
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 00:17:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D381B126C2
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 00:17:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37F95168A16
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 22:17:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93F491787FD
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 22:17:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1EA0230BEE;
-	Fri, 25 Jul 2025 22:17:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 171DE2586CA;
+	Fri, 25 Jul 2025 22:17:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="acSP1X6h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J8EXD8pR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE3919D06B;
-	Fri, 25 Jul 2025 22:17:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6BED25742F
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 22:17:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753481826; cv=none; b=qH9amePsQ1z+xf105JvEfCfmkhNTku47o6WVb4s5PUWwp2k2CmZed/3JNsXCTt0qaYqdMuGEPjQ+sW7aVaz2odEe6SDEYueh+3Z0Kmhp3ZW72aQp4rJjvDku9aYZ72Ort9xHW0UFRBp3bPgSiuBdK9iWqU2ee5fT/K5C5vSZnVw=
+	t=1753481828; cv=none; b=R5nPKQLd8HUztkXc0p0fWG/EKffmR34CfSlZJZVMcqctV5KrXWRg7vCz34XEiSePRZRpwA/79ufKZKwjsoimWsaKPtSXNGIOmQ5q67KM1hFAZIYcaa0jOhJtnfFzFs0l/znqYwdMaWajjdNqq7fFwHHsWTttpLYLYttExhPhVDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753481826; c=relaxed/simple;
-	bh=DBCb4FWtpyFIFm67hpEsdJ6fXyQXhExhN7ermn3t7D0=;
+	s=arc-20240116; t=1753481828; c=relaxed/simple;
+	bh=VXg8+zCO9LTq5Cfa5Xw2AKpxR9HK7gLPGqCNVfuhUng=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MgeH9Bnf8PLJrVDld3AS9zFHYYUS7yh/qvoyo1kKGf5+S4AOslFI5x4AuK7DEm34m5nR0ApJsjKPn1QfZqGwQly7gspeVkisk0e8dxgCk7jxL/rw22YSgltJc1wqa8rUlgk8O0h42AveUpLfvh8gWj3KneZDBSxzV1IhtMGsEds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=acSP1X6h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39985C4CEE7;
-	Fri, 25 Jul 2025 22:17:06 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=pFU+tmcBNAajbuRZlRTQgXI0uiOry6LcES3a3atrflyyZWj89Gm1nxhIiVZCQ+hMiOgyyx/hd7reMHzEvCkp/L3onZX66wmlGeU4j2hcotVOKJBvCaR5cw9Iq0q1w3maAgDB9lML2raiu4A9HTUB0/7VZa4pPA6Dywus72I4ynk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J8EXD8pR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75B87C4CEF9;
+	Fri, 25 Jul 2025 22:17:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753481826;
-	bh=DBCb4FWtpyFIFm67hpEsdJ6fXyQXhExhN7ermn3t7D0=;
+	s=k20201202; t=1753481827;
+	bh=VXg8+zCO9LTq5Cfa5Xw2AKpxR9HK7gLPGqCNVfuhUng=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=acSP1X6h+7EnIL9YFvNNuCfxp2b6l++aBIIOXCev0c7qSBM5+gV9kWO0ixLlChp5k
-	 g/McvzbNPVQwYFCoEL0FVNsV0T1wZFhUCNZq+rWyOBA54J2oXIdmwFyusilKpUhuwn
-	 o44PJsRNEaBQh+g41RCfc20GwB37lAzFFThXPOFSIlmnh6ktaAQSoVaifFFa9zMyf4
-	 UNg2FejKyXeiEoXpBEt6O8n5ytLcEvVDpNk8so36Y/GvRVBJ6kVI3eNP6Mww5f/xEI
-	 J69efI/wFEX7oMZie/jZJ1traJC4MhDDdJs+NlB94EwP2qLaU0gjkgmOfNuNfpRtgn
-	 ddVJiSoK4Z+vw==
+	b=J8EXD8pR8gIQHRG8Oh+Z1QL08qQ/vaxrEbNhZfYdnFk96C/VxC/DXQBNLHfmuY1Xl
+	 IuJBaiF++Ag9aOo0P1Q7sU5TUHdyPbHUOcOgdpTXUuEJnFJW+HSPxttgnoyEHn2vUo
+	 16e350UzP4KYMW2t+JQCgcrin2jNO3J1Mj6RM6NujTVt7s1+fTG1JAc2wddzqNtdQN
+	 Q0wgYV+gE2mTnEI0XmrWLDw08Fal/9qDUdFqMTv2I3BBvpPjVLOV8Qks/LSsf3xCAv
+	 k/DryHo29erQfrZnOzJZLLa3F8zdjBBJUYgn81J/SmnzGTKi9cpyCPdomnCYHyTUdm
+	 TWXoSwkgvLSfw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAFAD383BF5B;
-	Fri, 25 Jul 2025 22:17:24 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CF1383BF5B;
+	Fri, 25 Jul 2025 22:17:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: phy: micrel: fix KSZ8081/KSZ8091 cable test
+Subject: Re: [PATCH v1 net] neighbour: Fix null-ptr-deref in
+ neigh_flush_dev().
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175348184349.3265195.8359629740044567911.git-patchwork-notify@kernel.org>
-Date: Fri, 25 Jul 2025 22:17:23 +0000
-References: <20250723222250.13960-1-fl@n621.de>
-In-Reply-To: <20250723222250.13960-1-fl@n621.de>
-To: Florian Larysch <fl@n621.de>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- Divya.Koppera@microchip.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
+ <175348184500.3265195.14222572943753775652.git-patchwork-notify@kernel.org>
+Date: Fri, 25 Jul 2025 22:17:25 +0000
+References: <20250723195443.448163-1-kuniyu@google.com>
+In-Reply-To: <20250723195443.448163-1-kuniyu@google.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, gnaaman@drivenets.com,
+ kuni1840@gmail.com, netdev@vger.kernel.org, oliver.sang@intel.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 24 Jul 2025 00:20:42 +0200 you wrote:
-> Commit 21b688dabecb ("net: phy: micrel: Cable Diag feature for lan8814
-> phy") introduced cable_test support for the LAN8814 that reuses parts of
-> the KSZ886x logic and introduced the cable_diag_reg and pair_mask
-> parameters to account for differences between those chips.
+On Wed, 23 Jul 2025 19:53:59 +0000 you wrote:
+> kernel test robot reported null-ptr-deref in neigh_flush_dev(). [0]
 > 
-> However, it did not update the ksz8081_type struct, so those members are
-> now 0, causing no pairs to be tested in ksz886x_cable_test_get_status
-> and ksz886x_cable_test_wait_for_completion to poll the wrong register
-> for the affected PHYs (Basic Control/Reset, which is 0 in normal
-> operation) and exit immediately.
+> The cited commit introduced per-netdev neighbour list and converted
+> neigh_flush_dev() to use it instead of the global hash table.
+> 
+> One thing we missed is that neigh_table_clear() calls neigh_ifdown()
+> with NULL dev.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: phy: micrel: fix KSZ8081/KSZ8091 cable test
-    https://git.kernel.org/netdev/net/c/49db61c27c4b
+  - [v1,net] neighbour: Fix null-ptr-deref in neigh_flush_dev().
+    https://git.kernel.org/netdev/net/c/1bbb76a89948
 
 You are awesome, thank you!
 -- 
