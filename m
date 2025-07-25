@@ -1,167 +1,192 @@
-Return-Path: <netdev+bounces-210049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74CE1B11F22
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 15:02:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F0E6B11F07
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 14:54:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E63758658F
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 13:02:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0C9F18941C2
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 12:54:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA320139D0A;
-	Fri, 25 Jul 2025 13:02:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C509C2ECD17;
+	Fri, 25 Jul 2025 12:54:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z8EZ5tKd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aWeHC8nj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 388462405F9;
-	Fri, 25 Jul 2025 13:02:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3FA62405F9
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 12:54:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753448575; cv=none; b=hTpmSxMT18yI4XBFYIxELHmF4OKrRF+wPcFDEE+qXvbheU5izERlSbCT2uMIqMcypSAEBOhfJKDAxlwOTgiiKHvioPj6Mv+PzwdLLQfMYhuhdYmuSM5VX4TCwePr+oHZrb0yxwGvq7oTzOm8VYQCchBP57t+Lwy1nqIr9S/6XlU=
+	t=1753448053; cv=none; b=GYaQ4/xkMoneK1lxMRZLpVvJOGeKcz8n7rjC++hUamfzOrxrtuBjOLCzrHOO0SC08K3fy07ybMwLWX5eiUMQiQ/FAM52Dn6gzvN01iT8T9zPPsdKibUW2Pqyfv7tWTTTx70pu1F4tpFzZE+KFNvzSNWIhy280eHtsGywUSwoLs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753448575; c=relaxed/simple;
-	bh=pnQvmNBIWePPKU4vyT0ztIsbhKrl6w5UhNYkRPp35is=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e/dPT25ugHGTyomKG86+wZ/hhYP4CCNLpH8VC3AKuto6UFYeYRGBpckv0ipEsuJOWfEUiWLX4mN1mvfD9uymI4AJjk9G5sDvnCsk13a2rk6I8Qu1E+r2b4/0J5Fm+FO+2A6wWuCJgAyNDmW26wdGCIID3qirWbTDXAh5CKtJokQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z8EZ5tKd; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-236192f8770so14744005ad.0;
-        Fri, 25 Jul 2025 06:02:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753448573; x=1754053373; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rvnuCWC++P2rSLplAPzOWf1/FSno9Iwm1i2Ll6MyWVQ=;
-        b=Z8EZ5tKd1/UkHx2SzsGlfgZasnGc81ZZxUc/+84O+/AnYcY8kg7P83PeV+LFUf8skg
-         uel7l+5p0AJekgkuks4hXegy4pBluMuw+UTQ1tKstuyuTOMZnX4vII+VX+jwwCEzNI4U
-         Pt5fyvAEP0dRa+E5MFWYm9f/unM/hvlNKxLFQiiD4exoCgwbvirFjYUKUsqJ5D3gY/aW
-         yAvE1wWBU4ZplqDPGa8aXyk+0P37Mdcg22wZIAutPskwB8IcNS08jo6MSq6/JqniKZUw
-         WRrFM+e70ACQ8uIS0SggKkeV9HffCaopYitSqncPMFJVXPfZbQHsxOtGVkkXXkA5oi3s
-         bh2g==
+	s=arc-20240116; t=1753448053; c=relaxed/simple;
+	bh=n6Pv49YI2ixqQxeXeoElRqTOz7LINnIIS8q9IK1ssoM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Vx/sL9/LsnwsG46OTUXmRh46De7rE3PAQPUMQICKVAAH3bys9k8HgVG+MQKM4GjXxlsKprjRBdgjzXUz8/0+1Fg87zkCcWBbWWpcrQ9qcf0dVGHnLaOfj2D/0rftVsGe9U1jySzGEVNCIIYJ1B6e0hCBYIxlV8yDzfN4nx7qqt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aWeHC8nj; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753448050;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gnS/9RA0O+Nr1ONscGv61A0UEDWCGQVb3k03oaKVO74=;
+	b=aWeHC8nj6VZbcK9974JxiBBC6l7VDvQx2FWAWPAs+CpzDnYU3KKO9ZyaunVXkFU9uzaM5K
+	IvXmR2BBqjuBjzeB30kFCpHZeXa+dEaC0dmhUKrSmCuoacomIsORO3s9/k0sVuUFhBpEHA
+	k9A6gg7tN2ZTFzGXmhia2fE1me9g+38=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-88-d3T-znw0Nqu22NcrH7KP0g-1; Fri, 25 Jul 2025 08:54:09 -0400
+X-MC-Unique: d3T-znw0Nqu22NcrH7KP0g-1
+X-Mimecast-MFC-AGG-ID: d3T-znw0Nqu22NcrH7KP0g_1753448048
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a4f6ba526eso1552935f8f.1
+        for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 05:54:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753448573; x=1754053373;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rvnuCWC++P2rSLplAPzOWf1/FSno9Iwm1i2Ll6MyWVQ=;
-        b=wYXJY7PRoGOdHWAbLQ/7WMoHEepHAdPFh5Ew4n0DXeH8A/hrPsyORhBU+IrfM+FW2p
-         X4qb355FbCbQLWvCmFQBRE/iPLExPpwq9xiaRFau/xr9Gi4ATVbaTciEo3d7pduZVwzC
-         5C/7bfTYzFR3Gk3tfs34bVIK0dFO92Z6W74Ap6BO3KwyWIN3SfT7NFGxlcgB+7pXo4JB
-         O7+cSGZZJquic/+dme4TSw13Sg4sY0RqRkBYRgdRJHtBXw8K09FWtS9u30Ju7JmY8wGR
-         9gQilDzbejdDIuZSrnJk9wnxKCmpSMH9Hpcm5DXDN0vzcFqukBjdltXhIzarFjFgQxdy
-         M9bQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVdiJ3a2NzU3h2Y7Mfyeo7zxf5OAHkfIHEiJEAxDS4H4fTBS8PWxqo6bwB6YuwOphK0RX+qR/JwNyU4DBjEwOzm@vger.kernel.org, AJvYcCVzwd4rTPdLUGJonf/oqjW1LmD7TAvGfpaj1iBu6K8C4O8diorquicTvds4blPerE73xHurPZttk+smRjU=@vger.kernel.org, AJvYcCX03X6daJFgs7rWdApAkn2tc+PdCVmAr2/IXvoDEmdzD1mOpU9DyP4rVkmVgsCeQcUQ5K/BFdsL@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwvofykOxzJhBZX0K/llQk58x2sVQSGi6dVw9Xcy3A1N87Xu1W
-	ceGRIBJuOrfqD0+YW3C9xO/z2Of+TfnhIfABzCJDDxH4KWhPKnw0qGNxPviDn17ahZc=
-X-Gm-Gg: ASbGncu7c0oGycCNpP358+NxsLnCjF59T+ftqnk/7nyFaofQLCEL7RNOsGN+4oEsSfh
-	l+AOLymHLhPToCpkt+nGoLgo+OJ8910a8erT6NYYY+XsHd7vHOjdodOAMC6LKNsX4mYkOmwOk5b
-	X6Ytxb0jmA2Y21m+axtvrCtpQWfEyAqPWWWX0hoMYSM2RZm0SMiljSt8+aF4oQseKMpmVzfvQFP
-	0z6IY7bySCTiJoFhjJMslRJjmTESwUysuG2SmhYFRJr68nti4a+KfGESlTZ/iU25OHpUjgKMq+W
-	JJKoDclDRmqu0kkBg6hztuCtIlbQs9abdZhL3E2RcD1Gnvc3zYX2/xXepEUeIAwkP4anQL9x5b3
-	3YuQ36ZPuwwQLjuZ3mSwIMp7EpxA=
-X-Google-Smtp-Source: AGHT+IEwVtEPJ4Wk23wiO0WMIjQ0EiztpjidWUR6uUpP9DUtmExgj76cb72uWpB+tJ+lclx10mlBKg==
-X-Received: by 2002:a17:903:2b0f:b0:235:e94b:62dd with SMTP id d9443c01a7336-23fa5d7420emr90326485ad.12.1753448573239;
-        Fri, 25 Jul 2025 06:02:53 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23fa476ea42sm36966305ad.67.2025.07.25.06.02.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Jul 2025 06:02:52 -0700 (PDT)
-Date: Fri, 25 Jul 2025 12:53:10 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Petr Machata <petrm@nvidia.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-	Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 2/2] selftests: bonding: add test for passive LACP
- mode
-Message-ID: <aIN-Nv_w0N6jdSsD@fedora>
-References: <20250709090344.88242-1-liuhangbin@gmail.com>
- <20250709090344.88242-3-liuhangbin@gmail.com>
- <6d4bbed3-472f-4002-abb9-47edf7743779@redhat.com>
- <aIGxI_ctF5RPEph8@fedora>
- <aIGykkgqktjgLvVI@fedora>
- <87ikjgd5yq.fsf@nvidia.com>
+        d=1e100.net; s=20230601; t=1753448048; x=1754052848;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gnS/9RA0O+Nr1ONscGv61A0UEDWCGQVb3k03oaKVO74=;
+        b=LovDu4s8p7eQ5JmJC10VoYabTKzOMgDANYBgvvKMTfvTCaXFf4PFYI6vtVQwZl2yzS
+         0MkjnqzcQkjKZ1JB+M4rrQPdkdc2IuKhSyALWkkoO4JrJVfK6m99InyPuEXTzTRv5hhj
+         YAbfMowgEs6iayCalS1J16IGg3X3UzW29GPUttCX3bZmUxv2L7pa+1HNGedXcbiPBLn6
+         0vvpMCD1h+0/Wnh32buU1+yxtqEaMzEOcoqrmsANyf4wT6F2Lk2IHMxxXITBo03ZB3sD
+         BFukz8Q1xLMhbnYPih9tMRpwrflNZGxkwGp9tS5nUh6rBVr3B0WcKRGreUvhznODWMF7
+         hTkA==
+X-Gm-Message-State: AOJu0Yx072fkLg5OBg9M02WVwuySImxCxP313UnAjpTMR+XAfU4oOMBU
+	GVEomsWcW/K9WexKb44pwiaoqqq/PKfzp8pNjkbx1s7zz7AIJtc3FPyd82svveRtLfGLXBD61s8
+	g9YjLJOa4HvyBCjAASrsBpQoO5rR2Lx53GNiI/y8fmgXG60hMULukXzfeDA==
+X-Gm-Gg: ASbGncumQEuE9GUMP1WMoDWFotPF6WQKxlC8GIsiF60NIwgwFv9qm1kjBVIHQZEaaZr
+	mJsNEI7xIijdcXewWGWvIBdT5NzcVwolT5AoZXf3PPXSN3CJp9HbttgNXZ+2e2Q3ZEPMmkyK/LG
+	DxKMCVEvL/w/po85qz/lOy2zV48CLA6lkIJ7dPuB/PwZB6d6xwF8xafI4gbsGT1QZrk1+zMrhTN
+	y989kUUMwl908PF+1I5EpMnmvmp41oltxK9+B6N5Wxk4La8r1uom6w8EDNkHfp+CPUyJWTO6MfP
+	D6WXN4zigB0WITpWFvH2OwgFXMPGfIFUu/GpSXloDHSmL9qI+AV1oi26O28fPeWzH2OvHm/9+n4
+	eo9LypPzeDY8=
+X-Received: by 2002:a5d:584a:0:b0:3b6:463:d886 with SMTP id ffacd0b85a97d-3b77673ccd7mr1532680f8f.20.1753448048280;
+        Fri, 25 Jul 2025 05:54:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGnV/rTUIg6XNZcuQXqD7Mby5vL1dPZ+EQSiUq6okt35LgK8UVlU5ZqK2/bmlNQOz46/9c5Tw==
+X-Received: by 2002:a5d:584a:0:b0:3b6:463:d886 with SMTP id ffacd0b85a97d-3b77673ccd7mr1532648f8f.20.1753448047723;
+        Fri, 25 Jul 2025 05:54:07 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-458705377dasm53895725e9.4.2025.07.25.05.54.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Jul 2025 05:54:07 -0700 (PDT)
+Message-ID: <5fce419c-622f-4eda-ab92-86deaf0db5ca@redhat.com>
+Date: Fri, 25 Jul 2025 14:54:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87ikjgd5yq.fsf@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] net: pppoe: implement GRO support
+To: Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Felix Fietkau <nbd@nbd.name>
+Cc: netdev@vger.kernel.org, Michal Ostrowski <mostrows@earthlink.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org
+References: <20250716081441.93088-1-nbd@nbd.name>
+ <5f250beb-6a81-42b2-bf6f-da02c04cbf15@redhat.com>
+ <0861d960-d1e7-4b51-b320-c2e033b49f12@nbd.name>
+ <46fd972c-14d9-4876-8df5-1212f6530971@intel.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <46fd972c-14d9-4876-8df5-1212f6530971@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jul 25, 2025 at 10:27:48AM +0200, Petr Machata wrote:
+On 7/25/25 2:42 PM, Alexander Lobakin wrote:
+> From: Felix Fietkau <nbd@nbd.name> Date: Tue, 22 Jul 2025 10:56:10 +0200
+>> On 22.07.25 10:36, Paolo Abeni wrote:
+>>> On 7/16/25 10:14 AM, Felix Fietkau wrote:
+>>>> +static struct sk_buff *pppoe_gro_receive(struct list_head *head,
+>>>> +                     struct sk_buff *skb)
+>>>> +{
+>>>> +    const struct packet_offload *ptype;
+>>>> +    unsigned int hlen, off_pppoe;
+>>>> +    struct sk_buff *pp = NULL;
+>>>> +    struct pppoe_hdr *phdr;
+>>>> +    struct sk_buff *p;
+>>>> +    __be16 type;
+>>>> +    int flush = 1;
+>>>
+>>> Minor nit: please respect the reverse christmas tree order above
+>>
+>> Will do
+>>
+>>>> +    off_pppoe = skb_gro_offset(skb);
+>>>> +    hlen = off_pppoe + sizeof(*phdr) + 2;
+>>>> +    phdr = skb_gro_header(skb, hlen, off_pppoe);
+>>>> +    if (unlikely(!phdr))
+>>>> +        goto out;
+>>>> +
+>>>> +    /* ignore packets with padding or invalid length */
+>>>> +    if (skb_gro_len(skb) != be16_to_cpu(phdr->length) + hlen - 2)
+>>>> +        goto out;
+>>>> +
+>>>> +    NAPI_GRO_CB(skb)->network_offsets[NAPI_GRO_CB(skb)->encap_mark]
+>>>> = hlen;
+>>>> +
+>>>> +    type = pppoe_hdr_proto(phdr);
+>>>> +    if (!type)
+>>>> +        goto out;
+>>>> +
+>>>> +    ptype = gro_find_receive_by_type(type);
+>>>> +    if (!ptype)
+>>>> +        goto out;
+>>>> +
+>>>> +    flush = 0;
+>>>> +
+>>>> +    list_for_each_entry(p, head, list) {
+>>>> +        struct pppoe_hdr *phdr2;
+>>>> +
+>>>> +        if (!NAPI_GRO_CB(p)->same_flow)
+>>>> +            continue;
+>>>> +
+>>>> +        phdr2 = (struct pppoe_hdr *)(p->data + off_pppoe);
+>>>> +        if (compare_pppoe_header(phdr, phdr2))
+>>>> +            NAPI_GRO_CB(p)->same_flow = 0;
+>>>> +    }
+>>>> +
+>>>> +    skb_gro_pull(skb, sizeof(*phdr) + 2);
+>>>> +    skb_gro_postpull_rcsum(skb, phdr, sizeof(*phdr) + 2);
+>>>> +
+>>>> +    pp = ptype->callbacks.gro_receive(head, skb);
+>>>
+>>> Here you can use INDIRECT_CALL_INET()
+>>
+>> I did that in the initial version, but then I got reports of build
+>> failures with the patch:
+>>
+>> ERROR: modpost: "inet_gro_receive" [drivers/net/ppp/pppoe.ko] undefined!
+>> ERROR: modpost: "inet_gro_complete" [drivers/net/ppp/pppoe.ko] undefined!
+>>
+>> Should I leave it out, or export inet_gro_receive/complete?
 > 
-> Hangbin Liu <liuhangbin@gmail.com> writes:
+> Could be exported I'd say. This would allows more modules to implement
+> GRO support.
+> INDIRECT_CALL() here gives good boosts here, at least I got some after
+> switching VLAN and TEB code several years ago.
 > 
-> > On Thu, Jul 24, 2025 at 04:06:03AM +0000, Hangbin Liu wrote:
-> >> On Tue, Jul 15, 2025 at 11:37:54AM +0200, Paolo Abeni wrote:
-> >> > > diff --git a/tools/testing/selftests/drivers/net/bonding/bond_passive_lacp.sh
-> >> > > b/tools/testing/selftests/drivers/net/bonding/bond_passive_lacp.sh
-> >> > > new file mode 100755
-> >> > > index 000000000000..4cf8a5999aaa
-> >> > > --- /dev/null
-> >> > > +++ b/tools/testing/selftests/drivers/net/bonding/bond_passive_lacp.sh
-> >> > > @@ -0,0 +1,21 @@
-> >> > > +#!/bin/sh
-> >> > > +# SPDX-License-Identifier: GPL-2.0
-> >> > > +#
-> >> > > +# Testing if bond works with lacp_active = off
-> >> > > +
-> >> > > +lib_dir=$(dirname "$0")
-> >> > > +source ${lib_dir}/bond_topo_lacp.sh
-> >> > 
-> >> > shellcheck is not super happy about 'source' usage:
-> >> > 
-> >> > In bond_passive_lacp.sh line 7:
-> >> > source ${lib_dir}/bond_topo_lacp.sh
-> >> > ^-- SC3046 (warning): In POSIX sh, 'source' in place of '.' is undefined.
-> >> > ^-- SC3051 (warning): In POSIX sh, 'source' in place of '.' is undefined.
-> >> > 
-> >> > either switch to '. ' or use bash instead of 'sh'.
-> >> 
-> >> Hi Paolo,
-> >> 
-> >> I updated the case and remove the source file bond_topo_lacp.sh.
-> >> Instead I source the forwarding lib directly like:
-> >> 
-> >> lib_dir=$(dirname "$0")
-> >> source "$lib_dir"/../../../net/forwarding/lib.sh
-> >> 
-> >> But this cause shell check unable to find the lib.sh as $lib_dir is get
-> >> dynamically. This usage is common in selftest. How should we resolves this
-> >> problem?
-> >
-> > OK, I just disabled this warning.
-> >
-> > # shellcheck disable=SC1091
-> 
-> I believe the point was only about using "." instead of "source". The
-> following should have fixed it:
-> 
-> . ${lib_dir}/bond_topo_lacp.sh
-> 
-> ... or just use bash as the interpreter, I suspect lib.sh is not
-> actually POSIX clean.
+> If everyone is fine with exporting, I'd say those need to be exported as
+> GPL-only.
 
-Thanks Petr, I know Paolo means to use "." to fix this. The issue is that
-I changed the script to source forwarding lib. And shell check could only
-analyse static path. Unless use -x to supply the real source path. But I guess
-the CI can't do this. So I disabled the SC1091 checking as a workaround.
+Thanks Olek, I was almost missing this!
 
-Regards
-Hangbin
+I agree with exporting GPL-only the symbols.
+
+Thanks,
+
+Paolo
+
 
