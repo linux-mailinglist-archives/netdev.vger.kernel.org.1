@@ -1,98 +1,105 @@
-Return-Path: <netdev+bounces-210223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DB91B126CD
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 00:18:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4611B126CF
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 00:18:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8ACD23AECFC
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 22:17:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63D70163D80
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 22:18:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AD132609D9;
-	Fri, 25 Jul 2025 22:17:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5DB424C07A;
+	Fri, 25 Jul 2025 22:18:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N0lwcTR+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WOLR8Ymm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D361D2609C5;
-	Fri, 25 Jul 2025 22:17:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F2BEAF9;
+	Fri, 25 Jul 2025 22:18:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753481847; cv=none; b=gB2z9C4c7JYmGeePYKJ6gK2Y/25YQrkKjNsVaay0Fua04KBmHpmDiOoWxP9oMKDsL5xdTGXornPizxbkSjlQnLREnb7iftBr7aXQOuubVU6Ndz42P4MIbWnn00tFONJJA1xltaqN2kS9Ev2Zc1C9dE5eT/YN6Z65tP0n15cU1Z8=
+	t=1753481911; cv=none; b=ABPBgO3W/rUPJ2eGe9KcjSHbMkNlfRrXruI5Gk2pa7i42w6KGO4u7xHQq8hfkVgyPUsW+Jp171ouqpwbe5wYbO/PBIpiEtNDi1bEZ8J8VfBRkZTgWLEF9rMkZTe5+qAfjdiC+nnD+hGGAjlsd8UUrqENjfT+S56uX+xwUynnkTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753481847; c=relaxed/simple;
-	bh=kaC7o/gIzpWspfu84JeA/waO2WFmJ19AtYM2TPHc+W4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JhoC1xEv58pDAOES/a3hvUE/JtHp3Md0I2ZZNZy6L4gTMk6/SdPD0IpZZX9c30cAVIhd+HIvzmxXV0Z1ZBd55OmfisVBICtaPs2ipo9l6ml53ovUbBEYfZQPXjyio2TBfsrRVWayept/qUr8yY36iEVF1o+fXA57QaeuUwt6auc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N0lwcTR+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75E35C4CEF8;
-	Fri, 25 Jul 2025 22:17:27 +0000 (UTC)
+	s=arc-20240116; t=1753481911; c=relaxed/simple;
+	bh=CGiveRG0F4ZRe38E+iuFBLXGZzwDIfze3JyfGxabL28=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CfqLksAOyZ6u+dqzODSq+D5cLvKbYW+UxGJE0SOxu1njOASzEtoky1AaYwwGxoox2AAUfLxaW3PvAov5tQh7yix05ttt5itZy/+T4zPJV+qjGCyewv/nWu9KtFOIcKHIL/1ph7qjmSHY81ipt5EhcNllO20tNXXAakl2mD4sm9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WOLR8Ymm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DE6DC4CEE7;
+	Fri, 25 Jul 2025 22:18:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753481847;
-	bh=kaC7o/gIzpWspfu84JeA/waO2WFmJ19AtYM2TPHc+W4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=N0lwcTR+lh5n+gA3u1ficpm7dB+K6lC265MdUKyGDB53c1EnDAWeS2Vv5EfYoQN4i
-	 ubGPpPBrF6kj6aDF1JO+YeQumlXXvtc2IGY0QVfZsGy/ZJpYpLZ3hywPKol4PrAmRG
-	 6lzdiYnrqNKxwGpI8mN6zruCnvf0kIENqlwhCdWMsuj1jtuJjev0AdnP05KSG/XJyV
-	 2o489JX3VPYNWYLnqET56w1tofM2I+03BK6opTW7WrC8tlhUA2GMavL8G7t3UW4FU2
-	 Zyjfz+4x6TEbmyPJ3hn0/4k56z5qGZz/rtjw2NuN0O23CX3SaAjTqnslbY+Q55llix
-	 9JtJJY68RQo3w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C42383BF5B;
-	Fri, 25 Jul 2025 22:17:46 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1753481911;
+	bh=CGiveRG0F4ZRe38E+iuFBLXGZzwDIfze3JyfGxabL28=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=WOLR8Ymm6P4gOv/050K6B7gAqqQ522Hc4yVFoRh0Txi/+d6pnHEvinr6VyqQaqiEA
+	 bxQnFJuEEnj7oYMsnEMoEErRuOv/lEKf4G8F8o4I8JgGJJe7tQJ7TPu30EPv5TtPmB
+	 TgFF13w2d8O/ZVN2wSV1XMPdxfekwZwndLuw7WOmF8YUgK8WGy8nS8+2MoQ3miW9D5
+	 h/j0GodhjKDmBrmN9c4cHX3EL7TIzRTUnEBkaEgjEbwvM9pyADb2unstM7FKhhIKCt
+	 zPXGo3Ns7XsRtMSkFLuV5KImnLI+gKqqIo0FE0sRPdPOzyoddQDDDdZbcBO92/XWBj
+	 9siEB3HNpDhtw==
+Date: Fri, 25 Jul 2025 15:18:29 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
+ <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, Richard Cochran
+ <richardcochran@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
+ <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>, Andrew Lunn
+ <andrew@lunn.ch>
+Subject: Re: [net-next v16 04/12] net: mtip: The L2 switch driver for imx287
+Message-ID: <20250725151829.40bd5f4e@kernel.org>
+In-Reply-To: <20250724223318.3068984-5-lukma@denx.de>
+References: <20250724223318.3068984-1-lukma@denx.de>
+	<20250724223318.3068984-5-lukma@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v7] ipv6: add `force_forwarding` sysctl to enable
- per-interface forwarding
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175348186474.3265195.6030564834693464068.git-patchwork-notify@kernel.org>
-Date: Fri, 25 Jul 2025 22:17:44 +0000
-References: <20250722081847.132632-1-g.goller@proxmox.com>
-In-Reply-To: <20250722081847.132632-1-g.goller@proxmox.com>
-To: Gabriel Goller <g.goller@proxmox.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, corbet@lwn.net, dsahern@kernel.org,
- shuah@kernel.org, nicolas.dichtel@6wind.com, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Fri, 25 Jul 2025 00:33:10 +0200 Lukasz Majewski wrote:
+> +	for (i = 0; i < SWITCH_EPORT_NUMBER; i++) {
+> +		fep->ndev[i] = alloc_netdev(sizeof(struct mtip_ndev_priv),
+> +					    fep->ndev_name[i], NET_NAME_USER,
+> +					    ether_setup);
+> +		if (!fep->ndev[i]) {
+> +			ret = -ENOMEM;
+> +			break;
+> +		}
+> +
+> +		fep->ndev[i]->ethtool_ops = &mtip_ethtool_ops;
+> +		fep->ndev[i]->netdev_ops = &mtip_netdev_ops;
+> +		SET_NETDEV_DEV(fep->ndev[i], &pdev->dev);
+> +
+> +		priv = netdev_priv(fep->ndev[i]);
+> +		priv->dev = fep->ndev[i];
+> +		priv->fep = fep;
+> +		priv->portnum = i + 1;
+> +		fep->ndev[i]->irq = fep->irq;
+> +
+> +		mtip_setup_mac(fep->ndev[i]);
+> +
+> +		ret = register_netdev(fep->ndev[i]);
+> +		if (ret) {
+> +			dev_err(&fep->ndev[i]->dev,
+> +				"%s: ndev %s register err: %d\n", __func__,
+> +				fep->ndev[i]->name, ret);
+> +			break;
+> +		}
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 22 Jul 2025 10:18:45 +0200 you wrote:
-> It is currently impossible to enable ipv6 forwarding on a per-interface
-> basis like in ipv4. To enable forwarding on an ipv6 interface we need to
-> enable it on all interfaces and disable it on the other interfaces using
-> a netfilter rule. This is especially cumbersome if you have lots of
-> interfaces and only want to enable forwarding on a few. According to the
-> sysctl docs [0] the `net.ipv6.conf.all.forwarding` enables forwarding
-> for all interfaces, while the interface-specific
-> `net.ipv6.conf.<interface>.forwarding` configures the interface
-> Host/Router configuration.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v7] ipv6: add `force_forwarding` sysctl to enable per-interface forwarding
-    https://git.kernel.org/netdev/net-next/c/f24987ef6959
-
-You are awesome, thank you!
+Error handling in case of register_netdev() still buggy, AFAICT.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
