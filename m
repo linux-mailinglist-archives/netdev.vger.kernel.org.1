@@ -1,79 +1,162 @@
-Return-Path: <netdev+bounces-210231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12033B12717
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 01:09:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A4C9B1271E
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 01:11:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A5A8583ED4
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 23:09:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D1B01CC40EB
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 23:12:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5754258CE8;
-	Fri, 25 Jul 2025 23:09:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92E7225A334;
+	Fri, 25 Jul 2025 23:11:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ICJliPK3"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sjh/y5yV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8155422F767
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 23:09:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B102F1D555
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 23:11:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753484972; cv=none; b=Tyyz+xTHn2Lv6jm+nd3iegSkO4SFocaik7zsJmi/pX3woxwkc48SSdmzTM5sAWCydMr1hq1f1AKv0jvhqTjqfKmnwNZMHADqZU3HisiMlsyhfrURWgsN80AlTuV0lrFvTPr2UeLPV0ln4UBUtr4zFUlsge7UFvWWUT28NJbWJ38=
+	t=1753485109; cv=none; b=VFZVq80xhJv2zKXRxWC5rk+vNGtjQM0U5vEf/6PFI7dm5IBDzlaEq/iN7C+CRBHxljZKRZ1N1QC1+YZMMIYubL453FHgbwsWSL902rjmtSENPMJmusEqDP5VTxr5OJTzB+e5DQerEfw5JUw/LVtvB0H0FQWQbXI5wKN06Hb9N4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753484972; c=relaxed/simple;
-	bh=zRJjPHB9H/qhUCzIPa3tiO1M5+D1iRVDeu5PtSf3w28=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IqK052e6hITWQFt82gzESS16iq61EYUPiiCZRHuy6SD8o/e34stfPdPgwTvxNNbNx1s1KpAU0aD3eD5ldyVxUudOxn6aGY5kQHyJEsAdcE2L39wSBs83XVF7AwEefDoUP89YL7IhbKIOM2TCsCjx9+vxRxyzzIGHKTp60jjkhvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ICJliPK3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88CCAC4CEF4;
-	Fri, 25 Jul 2025 23:09:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753484972;
-	bh=zRJjPHB9H/qhUCzIPa3tiO1M5+D1iRVDeu5PtSf3w28=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ICJliPK3TNLCnjo4wDYl7OxheLlm21NHx326L0xIoO7ExxMvvs9c3t4cofqSWU1aa
-	 1TSQRfUVQVAeY522dSG39LzKglCZ5KzMqWkDxDh347TsFy6Ffr6Exyg+0pkATnZe5N
-	 LhaQ6g/FDa+DvgfkhzK02TGMOvCokfAjhX0J3GbiRL+1pPzJ2ANJOC4ypBalmIYE7F
-	 WLpBIgpN0Lu3pt+Q5Qd3cCj8qrDbG/MHM+4s9t1sD7M1Ja0qW/XeGNriy8ZiWur79G
-	 2ehvB1CUIm+TiherKmMGAaxY1xHFaJBZZ+8pg5wx+tbvE/tXY5yASV+imFvVfK2UFS
-	 85uUQfQ+XuCTA==
-Date: Fri, 25 Jul 2025 16:09:30 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- andrew+netdev@lunn.ch, netdev@vger.kernel.org, Michal Swiatkowski
- <michal.swiatkowski@linux.intel.com>, aleksander.lobakin@intel.com,
- przemyslaw.kitszel@intel.com, piotr.kwapulinski@intel.com,
- aleksandr.loktionov@intel.com, jedrzej.jagielski@intel.com,
- larysa.zaremba@intel.com
-Subject: Re: [PATCH net-next 5/8] libie: add adminq helper for converting
- err to str
-Message-ID: <20250725160930.23f9c420@kernel.org>
-In-Reply-To: <20250724182826.3758850-6-anthony.l.nguyen@intel.com>
-References: <20250724182826.3758850-1-anthony.l.nguyen@intel.com>
-	<20250724182826.3758850-6-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1753485109; c=relaxed/simple;
+	bh=IXkJNk6afU6gWW1EIchhvOKGzqQ7V9PRE3PFU/v204c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CMxW0LRhWgmwrdzDiSI+Qhtz9LyssVQ4J5HYzyOSD6ttK2+2t6ZlTz5r6JtDy0bgAc67MWiNeiCBCdaDGD1GiDTb/rl0zjHmBcgFV8Ns4V2GUmELhLcnp/IFwaHloJkn/71L5zpsXoSTSd5arAEDJAbJOpHuw3GHadB7g6YoxSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sjh/y5yV; arc=none smtp.client-ip=91.218.175.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <932a6a4d-d30b-4b85-b6a9-2eabeb5eaf2e@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753485095;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vQRz5jGRtVRmnbmD+RJSpwn39XGxG33xPSgLoIzuVnI=;
+	b=sjh/y5yVn7VP408JwIB0FZXLlq5c6ou7dox1+ek5j3rK3FShuNkMI47wztrk6ZnEverdie
+	t5rBIe6rqMa9KvQ79lknL4SZnpJs9E6TqWEZnGTGpxzbSbGB2wU6JrGN/QZAo+jvpH1rP5
+	4ObXP8+JyuR0rD0KetdiH+JvlLcHAsg=
+Date: Fri, 25 Jul 2025 16:11:27 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH bpf-next v2 1/4] bpf: crypto: Use the correct destructor
+ kfunc type
+Content-Language: en-GB
+To: Sami Tolvanen <samitolvanen@google.com>, bpf@vger.kernel.org
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250725214401.1475224-6-samitolvanen@google.com>
+ <20250725214401.1475224-7-samitolvanen@google.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <20250725214401.1475224-7-samitolvanen@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 24 Jul 2025 11:28:21 -0700 Tony Nguyen wrote:
-> +const char *libie_aq_str(enum libie_aq_err err)
+
+
+On 7/25/25 2:44 PM, Sami Tolvanen wrote:
+> With CONFIG_CFI_CLANG enabled, the kernel strictly enforces that
+> indirect function calls use a function pointer type that matches the
+> target function. I ran into the following type mismatch when running
+> BPF self-tests:
+>
+>    CFI failure at bpf_obj_free_fields+0x190/0x238 (target:
+>      bpf_crypto_ctx_release+0x0/0x94; expected type: 0xa488ebfc)
+>    Internal error: Oops - CFI: 00000000f2008228 [#1]  SMP
+>    ...
+>
+> As bpf_crypto_ctx_release() is also used in BPF programs and using
+> a void pointer as the argument would make the verifier unhappy, add
+> a simple stub function with the correct type and register it as the
+> destructor kfunc instead.
+>
+> Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+> ---
+>   kernel/bpf/crypto.c | 9 ++++++++-
+>   1 file changed, 8 insertions(+), 1 deletion(-)
+>
+> diff --git a/kernel/bpf/crypto.c b/kernel/bpf/crypto.c
+> index 94854cd9c4cc..f44aa454826b 100644
+> --- a/kernel/bpf/crypto.c
+> +++ b/kernel/bpf/crypto.c
+> @@ -261,6 +261,13 @@ __bpf_kfunc void bpf_crypto_ctx_release(struct bpf_crypto_ctx *ctx)
+>   		call_rcu(&ctx->rcu, crypto_free_cb);
+>   }
+>   
+> +__used __retain void __bpf_crypto_ctx_release(void *ctx)
 > +{
-> +	if (err >= ARRAY_SIZE(libie_aq_str_arr) ||
-> +	    !libie_aq_str_arr[err])
-> +		err = __LIBIE_AQ_STR_NUM;
+> +	bpf_crypto_ctx_release(ctx);
+> +}
 > +
-> +	return libie_aq_str_arr[err];
+> +CFI_NOSEAL(__bpf_crypto_ctx_release);
 
-All the LIBIE error values map to the POSIX ones, right? And this is
-mostly used in error messages. So why not use %pe I wonder..
+Okay, looks like Peter has made similar changes before.
+See https://lore.kernel.org/all/20231215092707.799451071@infradead.org/
+
+To be consistent with existing code base, I think the following
+change is better:
+
+diff --git a/kernel/bpf/crypto.c b/kernel/bpf/crypto.c
+index 94854cd9c4cc..a267d9087d40 100644
+--- a/kernel/bpf/crypto.c
++++ b/kernel/bpf/crypto.c
+@@ -261,6 +261,12 @@ __bpf_kfunc void bpf_crypto_ctx_release(struct bpf_crypto_ctx *ctx)
+                 call_rcu(&ctx->rcu, crypto_free_cb);
+  }
+  
++__bpf_kfunc void bpf_crypto_ctx_release_dtor(void *ctx)
++{
++       bpf_crypto_ctx_release(ctx);
++}
++CFI_NOSEAL(bpf_crypto_ctx_release_dtor);
++
+  static int bpf_crypto_crypt(const struct bpf_crypto_ctx *ctx,
+                             const struct bpf_dynptr_kern *src,
+                             const struct bpf_dynptr_kern *dst,
+@@ -368,7 +374,7 @@ static const struct btf_kfunc_id_set crypt_kfunc_set = {
+  
+  BTF_ID_LIST(bpf_crypto_dtor_ids)
+  BTF_ID(struct, bpf_crypto_ctx)
+-BTF_ID(func, bpf_crypto_ctx_release)
++BTF_ID(func, bpf_crypto_ctx_release_dtor)
+  
+  static int __init crypto_kfunc_init(void)
+  {
+
+The same code pattern can be done for patch 2 and patch 3.
+
+> +
+>   static int bpf_crypto_crypt(const struct bpf_crypto_ctx *ctx,
+>   			    const struct bpf_dynptr_kern *src,
+>   			    const struct bpf_dynptr_kern *dst,
+> @@ -368,7 +375,7 @@ static const struct btf_kfunc_id_set crypt_kfunc_set = {
+>   
+>   BTF_ID_LIST(bpf_crypto_dtor_ids)
+>   BTF_ID(struct, bpf_crypto_ctx)
+> -BTF_ID(func, bpf_crypto_ctx_release)
+> +BTF_ID(func, __bpf_crypto_ctx_release)
+>   
+>   static int __init crypto_kfunc_init(void)
+>   {
+
 
