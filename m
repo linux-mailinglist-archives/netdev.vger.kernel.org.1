@@ -1,359 +1,117 @@
-Return-Path: <netdev+bounces-210002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BBDEB11DAB
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 13:33:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA6A1B11DEB
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 13:51:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 459C33A63E7
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 11:33:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EF29561613
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 11:51:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DE1223F413;
-	Fri, 25 Jul 2025 11:33:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 068092DE70C;
+	Fri, 25 Jul 2025 11:51:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="r1JcpPxA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kYxiGPnY"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90972405F9
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 11:33:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5896923F40F
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 11:51:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753443213; cv=none; b=fnWbPfJOi85VBCxwt7kG7qB9pVsj8nvmUW0DWmBicybS7KCJZSAPZ57J6uuvInUxvY0BfnFN05KcdbehfUUlIksfGawRc74ULNuT8by7H10LlxkGPBC4SUhH6ThzERTYK/8jiHlA21RKgQeeNavmqHEXL3XUbJ1Gf+oc/OGiSFo=
+	t=1753444273; cv=none; b=aXjNTVz+YN5Vh/XquJH4zQYWiqTTVUz+2GYL7wVEmqzc7JhE4G1NDerirc/qxgtyPkR6Y2K19WQwnfuUOkk4F7RFc88bNmOIWbaea5Cm3/dQk/4SXMa273akRS8z7uJP37mQQLTG1Q2kSw/uDI2FfqfN9qNbvTbBDOfsIVi2npY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753443213; c=relaxed/simple;
-	bh=FMpT36YouRIX5Po4UqTEsmxy/+1mI31D1PMD9W9aOCU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G2++R4Gg4zSllaYUsdDfx/yHtYbmVKw86vubG+X+MY/7iZQSDXk8MgL50I1iDEy42tKzIo4hnsaBpmZPZfO32WjK5jbVsn+459I5xelR4I24pPoPnkg/vlFdwtEb0MbhD6NZ4dLJTcBOYo7UGsopK3pFpvYnWcTDLQuJXRpPUsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=r1JcpPxA; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <c6f54d34-a22f-4533-a7d7-c991ae08d725@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753443207;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ivya1EzVCbw0o4dYe+knkjWoez4RiejZxGf/to9ndCM=;
-	b=r1JcpPxADtHGVGoReqfDBE5+ELNMpeLSbXkrrGD8Pfrv/pkmjrzm2fDw9LBEFN3+F5myrI
-	MEA4P20otqVnmY5o7bonVpnXcl6Ja/6iazkR5+mKmFzWgapjASMOfCnGPq57Xc+of7P8RR
-	irYArmYtcdceD4dl6Sm0s4asX8OHfsk=
-Date: Fri, 25 Jul 2025 19:32:46 +0800
+	s=arc-20240116; t=1753444273; c=relaxed/simple;
+	bh=eaz/k0XUl9/m37N9jp4+DjxLU/AFRKjbVXkkx0LnzuQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BQnPg+Qo7HC/YO85IGz6xRdHTycXBfVVaj0eXo80OENg7kGt0D+mGEyTbXW5TrkrJO5Rz+r6vWyS1kShvoCnjUvRPq7yMkGyWYu7SWnCZGcCa1BTCDdGsF/IKXZkFsDnIbD8FP0Dpsy7N2G8IQoHo/Jkiba3+p7+rQpanLHm4YI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kYxiGPnY; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-455fdfb5d04so11474315e9.2
+        for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 04:51:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753444271; x=1754049071; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=G39Ht0cASJSf8Vm8tYG6XzeHDMGd5e51f/0AVFb03Ug=;
+        b=kYxiGPnY0g8/NBH63L+t8ruusfWPAe/pxxcy/ilkihw4gUcHhj1ijjFckxvBKjDGHU
+         LZtPGDJ5guJDbvUdDMwv0Ybg1dL1AIUTeLU3F019r5JOxzUs5xZuGtfDEAyot+dbzmBe
+         3ho55sBfA1DsMts0qzRqB6gt16X2cmbBjf4yJdpIHourXWsuCWNose1TBB2uZdD5Ez+F
+         vioKAQUK2BgdvWeTsr1YuorDF0JL/IpY4kRtl3GTPj96gb09KVOqnc0gHy9pfse4ogyr
+         aKeeYUOVJ28YUw94LWzK8pwPIyKbpcKsr36W1Z33ifq9ndtJ2ZlFT6kxOMmuU3hnd3ih
+         5QUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753444271; x=1754049071;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G39Ht0cASJSf8Vm8tYG6XzeHDMGd5e51f/0AVFb03Ug=;
+        b=LqvzbnzL0JxaHtXaZ/AkPRvlmieSKduzLSIC29cnh20PPdczR399bhiwweCBXLkVH+
+         s+QFk43piL8+7UPgmzR3y2bji9tCSI20bn5/EGruHJt48wDEyZN8pA+NYxtmNGSvTOQ7
+         WQR8xF9xstaCH1lK4FG3mH+GEKC+9FtgcO4fQosw2eWp80Yt/OOr/IBjNR/w1noh3r5r
+         w9uhbT8ADj11fTMUWG1Z33ZXZPTI1pHqVa9mQvP6IksLlKTA6knFkhOz2dr5Zrh7K6yn
+         upmg3/xyRtdR8DW8HUxy0Fmgqaj4E9ZNFiRmSBc7cfXtjr39Jlf/HCPd/USW/ppTEJGG
+         bYOg==
+X-Gm-Message-State: AOJu0YwRs37rumClRtjc5NktrCSUVKDYmgzUVqKXe9BTu7Nc+GnGJ9Zr
+	yx4ThnCL+3ZSRxusIMHjW82agonn6nSmgREMj9IMVKE/RHlZNocuhooRfKTGs/s0
+X-Gm-Gg: ASbGnct0sAPwo4ovTBxe4iVtMsnJVbXcDMvRTaufQ/b1JaWuDk78rjLcMO9ylVFVeXY
+	MufZ2nTmRM7kJH1xKWiudqHtha3BzuUIjND3viZzGfpX040vbkNYgZJ3RDU6sSpquVjKbzUYLzR
+	vSSWlVuIL/tJrdBzX6eIVmEfLHCV+b8ZpIkTLCNFhi0u2+Ui1jXSJEH8mjjP6SYqKlqL0fziTyF
+	BQr4kvtDxncHJrvEP9iqcKx0LDcZtFkob22ZJ2Sv/4NPhddCnnEohjMdSebdS3b7XFyfbN4g8G2
+	A/pyAY5GUQlPE1JHGWzSQGLkGgZBcXoLobEBwVWnfDdulN/GNGqRMTk3PaFLqjgxAChChJ4aEnq
+	kw3+gty9A5nv91mEMUUW4E3RbYUh6rvHd9T4GTa8F5SY6zEME3lEu3VE=
+X-Google-Smtp-Source: AGHT+IHGErcDFcSf5LS36mdqBjR7lNYNd3Z002kf8K8T7M2Y8YEGM2XGFdrB9eK8tqHhfmECuLSYig==
+X-Received: by 2002:a05:600c:6291:b0:456:29da:bb25 with SMTP id 5b1f17b1804b1-4587643928amr13827045e9.19.1753444270361;
+        Fri, 25 Jul 2025 04:51:10 -0700 (PDT)
+Received: from gmail.com (deskosmtp.auranext.com. [195.134.167.217])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-458705378f4sm53908375e9.2.2025.07.25.04.51.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Jul 2025 04:51:09 -0700 (PDT)
+Date: Fri, 25 Jul 2025 13:51:07 +0200
+From: Mahe Tardy <mahe.tardy@gmail.com>
+To: Yonghong Song <yhs@meta.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>
+Subject: Re: bpf: LLVM BTF inner map struct type def missing
+Message-ID: <aINvq2iqUJkNBvZT@gmail.com>
+References: <aH_cGvgC20iD8qs9@gmail.com>
+ <PH0PR15MB5639C7853B00C613ACF18A74CA5CA@PH0PR15MB5639.namprd15.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] i40e: remove read access to debugfs files
-To: Jacob Keller <jacob.e.keller@intel.com>,
- Intel Wired LAN <intel-wired-lan@lists.osuosl.org>, netdev@vger.kernel.org
-Cc: Simon Horman <horms@kernel.org>,
- Anthony Nguyen <anthony.l.nguyen@intel.com>,
- Wang Haoran <haoranwangsec@gmail.com>,
- Amir Mohammad Jahangirzad <a.jahangirzad@gmail.com>
-References: <20250722-jk-drop-debugfs-read-access-v1-1-27f13f08d406@intel.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kunwu Chan <kunwu.chan@linux.dev>
-In-Reply-To: <20250722-jk-drop-debugfs-read-access-v1-1-27f13f08d406@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <PH0PR15MB5639C7853B00C613ACF18A74CA5CA@PH0PR15MB5639.namprd15.prod.outlook.com>
 
-On 2025/7/23 08:14, Jacob Keller wrote:
-> The 'command' and 'netdev_ops' debugfs files are a legacy debugging
-> interface supported by the i40e driver since its early days by commit
-> 02e9c290814c ("i40e: debugfs interface").
->
-> Both of these debugfs files provide a read handler which is mostly useless,
-> and which is implemented with questionable logic. They both use a static
-> 256 byte buffer which is initialized to the empty string. In the case of
-> the 'command' file this buffer is literally never used and simply wastes
-> space. In the case of the 'netdev_ops' file, the last command written is
-> saved here.
->
-> On read, the files contents are presented as the name of the device
-> followed by a colon and then the contents of their respective static
-> buffer. For 'command' this will always be "<device>: ". For 'netdev_ops',
-> this will be "<device>: <last command written>". But note the buffer is
-> shared between all devices operated by this module. At best, it is mostly
-> meaningless information, and at worse it could be accessed simultaneously
-> as there doesn't appear to be any locking mechanism.
->
-> We have also recently received multiple reports for both read functions
-> about their use of snprintf and potential overflow that could result in
-> reading arbitrary kernel memory. For the 'command' file, this is definitely
-> impossible, since the static buffer is always zero and never written to.
-> For the 'netdev_ops' file, it does appear to be possible, if the user
-> carefully crafts the command input, it will be copied into the buffer,
-> which could be large enough to cause snprintf to truncate, which then
-> causes the copy_to_user to read beyond the length of the buffer allocated
-> by kzalloc.
->
-> A minimal fix would be to replace snprintf() with scnprintf() which would
-> cap the return to the number of bytes written, preventing an overflow. A
-> more involved fix would be to drop the mostly useless static buffers,
-> saving 512 bytes and modifying the read functions to stop needing those as
-> input.
->
-> Instead, lets just completely drop the read access to these files. These
-> are debug interfaces exposed as part of debugfs, and I don't believe that
-> dropping read access will break any script, as the provided output is
-> pretty useless. You can find the netdev name through other more standard
-> interfaces, and the 'netdev_ops' interface can easily result in garbage if
-> you issue simultaneous writes to multiple devices at once.
->
-> In order to properly remove the i40e_dbg_netdev_ops_buf, we need to
-> refactor its write function to avoid using the static buffer. Instead, use
-> the same logic as the i40e_dbg_command_write, with an allocated buffer.
-> Update the code to use this instead of the static buffer, and ensure we
-> free the buffer on exit. This fixes simultaneous writes to 'netdev_ops' on
-> multiple devices, and allows us to remove the now unused static buffer
-> along with removing the read access.
->
-> Reported-by: Kunwu Chan <chentao@kylinos.cn>
-> Closes: https://lore.kernel.org/intel-wired-lan/20231208031950.47410-1-chentao@kylinos.cn/
-> Reported-by: Wang Haoran <haoranwangsec@gmail.com>
-> Closes: https://lore.kernel.org/all/CANZ3JQRRiOdtfQJoP9QM=6LS1Jto8PGBGw6y7-TL=BcnzHQn1Q@mail.gmail.com/
-> Reported-by: Amir Mohammad Jahangirzad <a.jahangirzad@gmail.com>
-> Closes: https://lore.kernel.org/all/20250722115017.206969-1-a.jahangirzad@gmail.com/
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> ---
-> I found several reports of the issues with these read functions going at
-> least as far back  as 2023, with suggestions to remove the read access even
-> back then. None of the fixes got accepted or applied, but neither did Intel
-> follow up with removing the interfaces. Its time to just drop the read
-> access altogether.
+On Tue, Jul 22, 2025 at 11:02:58PM +0000, Yonghong Song wrote:
+> > If you think it's reasonable to fix, I would be interested looking into
+> > this.
+> 
+> Looks like this may be something we want to fix as people starts or already uses
+> nested maps. So yes, please go ahead to look into this.
 
-Reviewed-by: Kunwu Chan <kunwu.chan@linux.dev>
+Here is my proposal patch https://github.com/llvm/llvm-project/pull/150608.
+The idea is to visit inner maps as we visit the global maps during BTF
+generation. Unfortunately, for that, I had to add a boolean arg to some
+functions, I hope it's okay.
 
-> ---
->   drivers/net/ethernet/intel/i40e/i40e_debugfs.c | 123 ++++---------------------
->   1 file changed, 19 insertions(+), 104 deletions(-)
->
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
-> index 6cd9da662ae1..a5c794371dfe 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
-> @@ -40,48 +40,6 @@ static struct i40e_vsi *i40e_dbg_find_vsi(struct i40e_pf *pf, int seid)
->    * setup, adding or removing filters, or other things.  Many of
->    * these will be useful for some forms of unit testing.
->    **************************************************************/
-> -static char i40e_dbg_command_buf[256] = "";
-> -
-> -/**
-> - * i40e_dbg_command_read - read for command datum
-> - * @filp: the opened file
-> - * @buffer: where to write the data for the user to read
-> - * @count: the size of the user's buffer
-> - * @ppos: file position offset
-> - **/
-> -static ssize_t i40e_dbg_command_read(struct file *filp, char __user *buffer,
-> -				     size_t count, loff_t *ppos)
-> -{
-> -	struct i40e_pf *pf = filp->private_data;
-> -	struct i40e_vsi *main_vsi;
-> -	int bytes_not_copied;
-> -	int buf_size = 256;
-> -	char *buf;
-> -	int len;
-> -
-> -	/* don't allow partial reads */
-> -	if (*ppos != 0)
-> -		return 0;
-> -	if (count < buf_size)
-> -		return -ENOSPC;
-> -
-> -	buf = kzalloc(buf_size, GFP_KERNEL);
-> -	if (!buf)
-> -		return -ENOSPC;
-> -
-> -	main_vsi = i40e_pf_get_main_vsi(pf);
-> -	len = snprintf(buf, buf_size, "%s: %s\n", main_vsi->netdev->name,
-> -		       i40e_dbg_command_buf);
-> -
-> -	bytes_not_copied = copy_to_user(buffer, buf, len);
-> -	kfree(buf);
-> -
-> -	if (bytes_not_copied)
-> -		return -EFAULT;
-> -
-> -	*ppos = len;
-> -	return len;
-> -}
->   
->   static char *i40e_filter_state_string[] = {
->   	"INVALID",
-> @@ -1621,7 +1579,6 @@ static ssize_t i40e_dbg_command_write(struct file *filp,
->   static const struct file_operations i40e_dbg_command_fops = {
->   	.owner = THIS_MODULE,
->   	.open =  simple_open,
-> -	.read =  i40e_dbg_command_read,
->   	.write = i40e_dbg_command_write,
->   };
->   
-> @@ -1630,48 +1587,6 @@ static const struct file_operations i40e_dbg_command_fops = {
->    * The netdev_ops entry in debugfs is for giving the driver commands
->    * to be executed from the netdev operations.
->    **************************************************************/
-> -static char i40e_dbg_netdev_ops_buf[256] = "";
-> -
-> -/**
-> - * i40e_dbg_netdev_ops_read - read for netdev_ops datum
-> - * @filp: the opened file
-> - * @buffer: where to write the data for the user to read
-> - * @count: the size of the user's buffer
-> - * @ppos: file position offset
-> - **/
-> -static ssize_t i40e_dbg_netdev_ops_read(struct file *filp, char __user *buffer,
-> -					size_t count, loff_t *ppos)
-> -{
-> -	struct i40e_pf *pf = filp->private_data;
-> -	struct i40e_vsi *main_vsi;
-> -	int bytes_not_copied;
-> -	int buf_size = 256;
-> -	char *buf;
-> -	int len;
-> -
-> -	/* don't allow partal reads */
-> -	if (*ppos != 0)
-> -		return 0;
-> -	if (count < buf_size)
-> -		return -ENOSPC;
-> -
-> -	buf = kzalloc(buf_size, GFP_KERNEL);
-> -	if (!buf)
-> -		return -ENOSPC;
-> -
-> -	main_vsi = i40e_pf_get_main_vsi(pf);
-> -	len = snprintf(buf, buf_size, "%s: %s\n", main_vsi->netdev->name,
-> -		       i40e_dbg_netdev_ops_buf);
-> -
-> -	bytes_not_copied = copy_to_user(buffer, buf, len);
-> -	kfree(buf);
-> -
-> -	if (bytes_not_copied)
-> -		return -EFAULT;
-> -
-> -	*ppos = len;
-> -	return len;
-> -}
->   
->   /**
->    * i40e_dbg_netdev_ops_write - write into netdev_ops datum
-> @@ -1685,35 +1600,36 @@ static ssize_t i40e_dbg_netdev_ops_write(struct file *filp,
->   					 size_t count, loff_t *ppos)
->   {
->   	struct i40e_pf *pf = filp->private_data;
-> +	char *cmd_buf, *buf_tmp;
->   	int bytes_not_copied;
->   	struct i40e_vsi *vsi;
-> -	char *buf_tmp;
->   	int vsi_seid;
->   	int i, cnt;
->   
->   	/* don't allow partial writes */
->   	if (*ppos != 0)
->   		return 0;
-> -	if (count >= sizeof(i40e_dbg_netdev_ops_buf))
-> -		return -ENOSPC;
->   
-> -	memset(i40e_dbg_netdev_ops_buf, 0, sizeof(i40e_dbg_netdev_ops_buf));
-> -	bytes_not_copied = copy_from_user(i40e_dbg_netdev_ops_buf,
-> -					  buffer, count);
-> -	if (bytes_not_copied)
-> +	cmd_buf = kzalloc(count + 1, GFP_KERNEL);
-> +	if (!cmd_buf)
-> +		return count;
-> +	bytes_not_copied = copy_from_user(cmd_buf, buffer, count);
-> +	if (bytes_not_copied) {
-> +		kfree(cmd_buf);
->   		return -EFAULT;
-> -	i40e_dbg_netdev_ops_buf[count] = '\0';
-> +	}
-> +	cmd_buf[count] = '\0';
->   
-> -	buf_tmp = strchr(i40e_dbg_netdev_ops_buf, '\n');
-> +	buf_tmp = strchr(cmd_buf, '\n');
->   	if (buf_tmp) {
->   		*buf_tmp = '\0';
-> -		count = buf_tmp - i40e_dbg_netdev_ops_buf + 1;
-> +		count = buf_tmp - cmd_buf + 1;
->   	}
->   
-> -	if (strncmp(i40e_dbg_netdev_ops_buf, "change_mtu", 10) == 0) {
-> +	if (strncmp(cmd_buf, "change_mtu", 10) == 0) {
->   		int mtu;
->   
-> -		cnt = sscanf(&i40e_dbg_netdev_ops_buf[11], "%i %i",
-> +		cnt = sscanf(&cmd_buf[11], "%i %i",
->   			     &vsi_seid, &mtu);
->   		if (cnt != 2) {
->   			dev_info(&pf->pdev->dev, "change_mtu <vsi_seid> <mtu>\n");
-> @@ -1735,8 +1651,8 @@ static ssize_t i40e_dbg_netdev_ops_write(struct file *filp,
->   			dev_info(&pf->pdev->dev, "Could not acquire RTNL - please try again\n");
->   		}
->   
-> -	} else if (strncmp(i40e_dbg_netdev_ops_buf, "set_rx_mode", 11) == 0) {
-> -		cnt = sscanf(&i40e_dbg_netdev_ops_buf[11], "%i", &vsi_seid);
-> +	} else if (strncmp(cmd_buf, "set_rx_mode", 11) == 0) {
-> +		cnt = sscanf(&cmd_buf[11], "%i", &vsi_seid);
->   		if (cnt != 1) {
->   			dev_info(&pf->pdev->dev, "set_rx_mode <vsi_seid>\n");
->   			goto netdev_ops_write_done;
-> @@ -1756,8 +1672,8 @@ static ssize_t i40e_dbg_netdev_ops_write(struct file *filp,
->   			dev_info(&pf->pdev->dev, "Could not acquire RTNL - please try again\n");
->   		}
->   
-> -	} else if (strncmp(i40e_dbg_netdev_ops_buf, "napi", 4) == 0) {
-> -		cnt = sscanf(&i40e_dbg_netdev_ops_buf[4], "%i", &vsi_seid);
-> +	} else if (strncmp(cmd_buf, "napi", 4) == 0) {
-> +		cnt = sscanf(&cmd_buf[4], "%i", &vsi_seid);
->   		if (cnt != 1) {
->   			dev_info(&pf->pdev->dev, "napi <vsi_seid>\n");
->   			goto netdev_ops_write_done;
-> @@ -1775,21 +1691,20 @@ static ssize_t i40e_dbg_netdev_ops_write(struct file *filp,
->   			dev_info(&pf->pdev->dev, "napi called\n");
->   		}
->   	} else {
-> -		dev_info(&pf->pdev->dev, "unknown command '%s'\n",
-> -			 i40e_dbg_netdev_ops_buf);
-> +		dev_info(&pf->pdev->dev, "unknown command '%s'\n", cmd_buf);
->   		dev_info(&pf->pdev->dev, "available commands\n");
->   		dev_info(&pf->pdev->dev, "  change_mtu <vsi_seid> <mtu>\n");
->   		dev_info(&pf->pdev->dev, "  set_rx_mode <vsi_seid>\n");
->   		dev_info(&pf->pdev->dev, "  napi <vsi_seid>\n");
->   	}
->   netdev_ops_write_done:
-> +	kfree(cmd_buf);
->   	return count;
->   }
->   
->   static const struct file_operations i40e_dbg_netdev_ops_fops = {
->   	.owner = THIS_MODULE,
->   	.open = simple_open,
-> -	.read = i40e_dbg_netdev_ops_read,
->   	.write = i40e_dbg_netdev_ops_write,
->   };
->   
->
-> ---
-> base-commit: cf074eca0065bc5142e6004ae236bb35a2687fdf
-> change-id: 20250722-jk-drop-debugfs-read-access-994721875248
->
-> Best regards,
-> --
-> Jacob Keller <jacob.e.keller@intel.com>
->
--- 
-Thanks,
-        TAO.
----
-“Life finds a way.”
+> 
+> FYI, the llvm patch https://github.com/llvm/llvm-project/pull/141719/ tried to solve
+> nested struct definition issue (similar to here). In that case, a type_tag is the
+> indicator which allows further type generation. The patch listed llvm source
+> locations you likely need to touch.
 
+Thank you, it was very useful to have this pointer!
+
+> 
+> > 
+> > [^1]: https://github.com/cilium/ebpf/discussions/1658#discussioncomment-12491339
 
