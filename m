@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-210058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB04AB11FCB
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 16:07:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 003A6B11FCA
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 16:07:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B6683B9B0B
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 14:07:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5787C3B8B5C
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 14:07:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 594DA23A9BE;
-	Fri, 25 Jul 2025 14:07:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7527A1F4CBD;
+	Fri, 25 Jul 2025 14:07:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EzID8VZb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xutO+I5y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D02401DED63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D422376FD
 	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 14:07:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753452461; cv=none; b=P743LKO6d6j0juXYLsoXbRl4KkX1tZv4XlzxejkAaGhzF9mX+HDhc6XZLWXFEvDEOFYf81aqV37rSiiTx1R/lCi0JAUZnu4f3lkLh7YCATC8NZCJOviCrnQymWLCoqDzfFrY975c35w/iTyv+UYe9mQO+xMW8bJ5hCFPuVq6xBw=
+	t=1753452460; cv=none; b=NyoQYy3EirbqoPgoA/OLr7Dlpy6u1rY8Q2WK62H6UNXSdIVf2u//tPnfztvrzLinUb1IBqK/skR7z/oWPbQ3PuGirrY7DSGlVfglaRRxAbn/fq+ITLOAzNxtnGwRx1vEQBDYrztxUbTp8PFbrdpT5RJBsXARpjSEBIZUNLF+WCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753452461; c=relaxed/simple;
-	bh=Gb2apZkmGIp8PSuKqTJydnTRQIP64r7iiPQbsHJE7KA=;
+	s=arc-20240116; t=1753452460; c=relaxed/simple;
+	bh=Yp4kNtHrbrb12XfeuM8tyPpYiJ+UaKpGZWffFSKQ/3I=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sQc0KoyH7AkQSDl3H5AbicVP0VPNDySOZHP4wWfoS9lymQGEs0t7CZddxO/7lbgVBXdCNgp0kK0pEsgFO2I2zrIAvNXx5HIl2zon+QzI0vFyTualZgNTRC2ewbo1J5/hP81xxv+RPL/DmQJhtgAvFtiJd8qWWB8ZUipiElxMdY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EzID8VZb; arc=none smtp.client-ip=209.85.160.202
+	 To:Cc:Content-Type; b=ONab8B8eqKqRePi8Y7P0BjgfAJnZ1oU5wG9HlM0B2KMdL9urpdkAz4Alp76hIQbZp0hQjzKc22b51kpWHjvGGo4XFxGXBpOpztizvPikD7xC3RTGFs1b4+//oSmqbWdvD2F8WPAT81GElA8W9zzonKWthqc0EfT5QZlrb0hTIXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xutO+I5y; arc=none smtp.client-ip=209.85.160.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4ab758aaaf3so82461451cf.2
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-4ab87fec9e2so46521431cf.0
         for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 07:07:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753452457; x=1754057257; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1753452458; x=1754057258; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dBtCUcGMczkfi4ipnIj6s20R+9sfuEskgKfPDELyCmI=;
-        b=EzID8VZbrJcCmodCbPWRD2IhaQasXTnvk50QgDsQdfZbai0klLm6Grl/bqEY85uoxL
-         UANpSrdP4d/UQuihsU5aukl5qT8lq8tU5IT5pUGROv4s68q6u8s5vZAHB1eEmWyeceTI
-         tA4dfDKykizUC4vzABARAWe6049Xvn9zZc5KNKhxu6wV/GWAC96eEaAMKGqYBhl0BJBX
-         QfdNujSwBPYjIYXbWxXwSSHJB+bwJkPCHkoc/PsKVlprOy0Oa/nzv21iepbfMgDvmzyD
-         JuXRYxrFqTQCCsX2bxWv4tNzZ+jENW8tfgGGBwEx3tEYaaFvBJamUqO9XQhKvIaRA2DW
-         Q01w==
+        bh=p7ii8ZBSksHUoenWXiIoBguWRbIjsMsuUpBNxSoW5Mk=;
+        b=xutO+I5yGJx2qKzkivkCZ8dW8ePzLxTdz8enCHn+y0LLHAUehAxE8vABZrOWZiJEyr
+         tOz9+gm+rJzABXEi6WWIF4gcPq/rOcM3pyqtBTOafbwiJC7tIqvJhR1VK/XzSTe2tx79
+         fp//YvNTFBqFQ/NRrYiSQl3NRqSrAhRV3Q1Me5pRtXww6hD4e9n2rmWS+A/JRv2lowLR
+         Xf2Qb+6DreaoQ8chMqFRwxOQQtwuDdIU6qLuZvT8qDBwuYHsViEvyLh9gmF4BuUQn/uG
+         45yKvOCtFxhQisNCqnPwSl7grfZ7CRJ7t5ocPviKAyThZSKAeN7sxE6+76hh9cbuFDVZ
+         Metw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753452457; x=1754057257;
+        d=1e100.net; s=20230601; t=1753452458; x=1754057258;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dBtCUcGMczkfi4ipnIj6s20R+9sfuEskgKfPDELyCmI=;
-        b=LJBUfWwAbGVnBnX1Q2Cbqsfl6HOp80RShLDzZMAa/HMfe3jH4xIpQsDsRZhigUXVnd
-         j7qjR2KygbPdd6IdsHt4kGkRqWg+lVqZexZ/m/xhj0OFlypBHZlVZFBTNHsOS5s7+4/b
-         rXF0kXrF4b+S8WkuzSx/zXxJrixtuqa42jW008qi5WiFbHsFLnOPrPVHDEKw9r4InvJO
-         PbceNJStboJDWJp573taepO7v44dB35AQnsDZm9MCqYA+ECFtQnXzc4v70d1y3GAGT7t
-         U0uoR98k4hoTlb4dGIRNDoZm9OhquDMAah7GkXkQUdOK/rZkTxNFbHgB+DFrNcS9tEdE
-         6qIg==
-X-Forwarded-Encrypted: i=1; AJvYcCWNwERkzIxIPBDZ2MBA6M5nOy+VDtbH6wnimrKKyCRiCXKwzo4cyMRpNCaJIq5lyx3O/X+I7cM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAXS5BAZU0T9/F5b6b8q6kG60q6ebnB2g6/vfx0VTxW+VCmbv7
-	kO4kQ3iKhBApiigGCpkhbkgI1OdL36yA8pzD5S/BUsmRd0+5czx1dOaK0i9Q5wrQN2YaIFlbA+t
-	WtFjx4B6wFVrtUg==
-X-Google-Smtp-Source: AGHT+IEwRHn38aTU+ZLathGsQrm4P4BR5+oqH8sCUu3EOiGysBbPZPqPOMYiVGB2FDMrYdsdcmlfdG6zp5P/CA==
-X-Received: from qtbfg9.prod.google.com ([2002:a05:622a:5809:b0:4ab:7d7e:a849])
+        bh=p7ii8ZBSksHUoenWXiIoBguWRbIjsMsuUpBNxSoW5Mk=;
+        b=Es1gKB0EfZ7sqNJaCFg7rvqXD6o7CBHDrVM9RMy0WzPQbqwKOa/XdKKHAHGyqkg5EN
+         FKMfsNS/hPsXA360yE8PkiVeW6nchK6ovaSQ6qD36WlWum9GOLIPNahzcDU1HPD4uBLO
+         QnGdaBekY2TqN9F6vpaAhG2I9e0768ZmM7vFx0J+8D72DQjuJ3LhxjBb16X+AmYGqxAI
+         38kzItiXxt76659nkXRlTaH8SX0ajSlpVrA4R+aTOoOFRGu5M4PmTRb1NF9EFpeyKwfX
+         P+9TDbyl1MeXVgG2Eo6S/kxOIDbhQvhNX92v3SFJBc502UCK5/lFi9CgfJsuqx/gZfeh
+         USKA==
+X-Forwarded-Encrypted: i=1; AJvYcCWyZe/sbkMn5e9uzfpnQKfM6Zu8Atb1hxTNkZcacsOP5lMYF+CVZZvprAmRhu1hp5yjBpx8V40=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyAZ6snSN6NbVvxVZ6h8LNNHFgNa2El6hd62jG65TfYnvl4RbO
+	1sMxl6vK1+LX1yu+LCfniGgAtiuN1kNwoCo4mO5Z5C1UCveRs0WyOuT+2B3wXK182zHWple9Dfw
+	SApOOGWzBI0zs5Q==
+X-Google-Smtp-Source: AGHT+IGdqp4vXoWkwJi6HpLZpU8uBS6W5h/87TAPPr1G9oMfT7ltUPZNNBp1t07MrRezWI52hg0ot+IKjCCQ9w==
+X-Received: from qtav6.prod.google.com ([2002:ac8:5786:0:b0:4ab:83a3:861])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:574b:0:b0:4ab:b187:17ec with SMTP id d75a77b69052e-4ae8ef8c95dmr25235141cf.14.1753452456292;
- Fri, 25 Jul 2025 07:07:36 -0700 (PDT)
-Date: Fri, 25 Jul 2025 14:07:23 +0000
+ 2002:ac8:7f53:0:b0:4ae:5be0:9c46 with SMTP id d75a77b69052e-4ae8f0e01acmr24503711cf.41.1753452457771;
+ Fri, 25 Jul 2025 07:07:37 -0700 (PDT)
+Date: Fri, 25 Jul 2025 14:07:24 +0000
 In-Reply-To: <20250725140725.3626540-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250725140725.3626540-1-edumazet@google.com>
 X-Mailer: git-send-email 2.50.1.470.g6ba607880d-goog
-Message-ID: <20250725140725.3626540-3-edumazet@google.com>
-Subject: [PATCH net 2/4] ipv6: prevent infinite loop in rt6_nlmsg_size()
+Message-ID: <20250725140725.3626540-4-edumazet@google.com>
+Subject: [PATCH net 3/4] ipv6: fix possible infinite loop in fib6_info_uses_dev()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -84,104 +84,51 @@ Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-While testing prior patch, I was able to trigger
-an infinite loop in rt6_nlmsg_size() in the following place:
+fib6_info_uses_dev() seems to rely on RCU without an explicit
+protection.
 
-list_for_each_entry_rcu(sibling, &f6i->fib6_siblings,
-			fib6_siblings) {
-	rt6_nh_nlmsg_size(sibling->fib6_nh, &nexthop_len);
-}
-
-This is because fib6_del_route() and fib6_add_rt2node()
-uses list_del_rcu(), which can confuse rcu readers,
-because they might no longer see the head of the list.
-
-Restart the loop if f6i->fib6_nsiblings is zero.
+Like the prior fix in rt6_nlmsg_size(),
+we need to make sure fib6_del_route() or fib6_add_rt2node()
+have not removed the anchor from the list, or we risk an infinite loop.
 
 Fixes: d9ccb18f83ea ("ipv6: Fix soft lockups in fib6_select_path under high next hop churn")
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/ipv6/ip6_fib.c |  4 ++--
- net/ipv6/route.c   | 34 ++++++++++++++++++----------------
- 2 files changed, 20 insertions(+), 18 deletions(-)
+ net/ipv6/route.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index 93578b2ec35fb55ca1f56c3e558661989568639e..af7db69d9eac97033fde46c5ee57e0cfb53a36db 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -1265,7 +1265,7 @@ static int fib6_add_rt2node(struct fib6_node *fn, struct fib6_info *rt,
- 							 &rt->fib6_siblings,
- 							 fib6_siblings)
- 					sibling->fib6_nsiblings--;
--				rt->fib6_nsiblings = 0;
-+				WRITE_ONCE(rt->fib6_nsiblings, 0);
- 				list_del_rcu(&rt->fib6_siblings);
- 				rcu_read_lock();
- 				rt6_multipath_rebalance(next_sibling);
-@@ -2015,7 +2015,7 @@ static void fib6_del_route(struct fib6_table *table, struct fib6_node *fn,
- 		list_for_each_entry_safe(sibling, next_sibling,
- 					 &rt->fib6_siblings, fib6_siblings)
- 			sibling->fib6_nsiblings--;
--		rt->fib6_nsiblings = 0;
-+		WRITE_ONCE(rt->fib6_nsiblings, 0);
- 		list_del_rcu(&rt->fib6_siblings);
- 		rt6_multipath_rebalance(next_sibling);
- 	}
 diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 9f92129efa05087d435575aa84c81b30430db249..6d4e147ae46bc245ccd195e5fb0e254f34ec65a4 100644
+index 6d4e147ae46bc245ccd195e5fb0e254f34ec65a4..04f2b860ca6156776e0cedd18d96877effd287a4 100644
 --- a/net/ipv6/route.c
 +++ b/net/ipv6/route.c
-@@ -5670,32 +5670,34 @@ static int rt6_nh_nlmsg_size(struct fib6_nh *nh, void *arg)
+@@ -5958,16 +5958,21 @@ static bool fib6_info_uses_dev(const struct fib6_info *f6i,
+ 	if (f6i->fib6_nh->fib_nh_dev == dev)
+ 		return true;
  
- static size_t rt6_nlmsg_size(struct fib6_info *f6i)
- {
-+	struct fib6_info *sibling;
-+	struct fib6_nh *nh;
- 	int nexthop_len;
- 
- 	if (f6i->nh) {
- 		nexthop_len = nla_total_size(4); /* RTA_NH_ID */
- 		nexthop_for_each_fib6_nh(f6i->nh, rt6_nh_nlmsg_size,
- 					 &nexthop_len);
--	} else {
--		struct fib6_nh *nh = f6i->fib6_nh;
--		struct fib6_info *sibling;
--
--		nexthop_len = 0;
--		if (f6i->fib6_nsiblings) {
--			rt6_nh_nlmsg_size(nh, &nexthop_len);
--
--			rcu_read_lock();
-+		goto common;
-+	}
- 
--			list_for_each_entry_rcu(sibling, &f6i->fib6_siblings,
--						fib6_siblings) {
--				rt6_nh_nlmsg_size(sibling->fib6_nh, &nexthop_len);
--			}
-+	rcu_read_lock();
-+retry:
-+	nh = f6i->fib6_nh;
-+	nexthop_len = 0;
+-	if (f6i->fib6_nsiblings) {
+-		struct fib6_info *sibling, *next_sibling;
 +	if (READ_ONCE(f6i->fib6_nsiblings)) {
-+		rt6_nh_nlmsg_size(nh, &nexthop_len);
++		const struct fib6_info *sibling;
  
--			rcu_read_unlock();
+-		list_for_each_entry_safe(sibling, next_sibling,
+-					 &f6i->fib6_siblings, fib6_siblings) {
+-			if (sibling->fib6_nh->fib_nh_dev == dev)
++		rcu_read_lock();
 +		list_for_each_entry_rcu(sibling, &f6i->fib6_siblings,
 +					fib6_siblings) {
-+			rt6_nh_nlmsg_size(sibling->fib6_nh, &nexthop_len);
++			if (sibling->fib6_nh->fib_nh_dev == dev) {
++				rcu_read_unlock();
+ 				return true;
++			}
 +			if (!READ_ONCE(f6i->fib6_nsiblings))
-+				goto retry;
++				break;
  		}
--		nexthop_len += lwtunnel_get_encap_size(nh->fib_nh_lws);
++		rcu_read_unlock();
  	}
 -
-+	rcu_read_unlock();
-+	nexthop_len += lwtunnel_get_encap_size(nh->fib_nh_lws);
-+common:
- 	return NLMSG_ALIGN(sizeof(struct rtmsg))
- 	       + nla_total_size(16) /* RTA_SRC */
- 	       + nla_total_size(16) /* RTA_DST */
+ 	return false;
+ }
+ 
 -- 
 2.50.1.470.g6ba607880d-goog
 
