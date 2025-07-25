@@ -1,229 +1,108 @@
-Return-Path: <netdev+bounces-210054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B558B11FBF
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 16:06:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90639B11FC8
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 16:07:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E936C1CE4B97
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 14:06:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7A3E1634C3
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 14:07:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 432131ADC97;
-	Fri, 25 Jul 2025 14:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 234C31DED63;
+	Fri, 25 Jul 2025 14:07:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="jMvaaTbL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DAcW+Rq4"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A3F310FD
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 14:05:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F0E31DEFE8
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 14:07:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753452358; cv=none; b=p5KdTJisL25XQ6PUTPoFo3B4MEoOL1/5M+crG/c8jVqHbiUOBQrHH5aRXNnajW6oPZVOmZ8qxSlwhO+5+BIYhZCeDTF5wi8b9HC1f3X6Eb/0OMj+75znjcV3sJs75RKwxuATcl38iN+Llvtf9uDnUMwQyWXFET8kKbhpKRUoxVs=
+	t=1753452453; cv=none; b=AQjFFdFNKWceYo52Wp7Y2Ss+uoihpmfprukBk0R7oJ8XLypKv31UwrUS+g2SWXLv3YvAECgIuvplGmzAHYk/3gg7UHNwypD2d28mKQp0/YNvvO8azOBtjB5VMQA0bca+ZEWCO+HIJo7W8MwznJSkXdxcpAg3SXJUuvF3RWgL6JE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753452358; c=relaxed/simple;
-	bh=aujr9dQmvuOFtLExiD0PSAA22/xtHkKRICtDiJBFziY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rLI2fHNY+JuqOdnuGYH9NZ3LtgEZEztQtNx/nwnzhnIuVL2DvzYT8TNK49ctMCgWNp9lRA5/lb+SXx7v+rdJfiCm6lOD28EEZYHMIQlRdlfU7XJ9hUTZ/T4VHaE6+dKrDBaqyaa6jfkSjYVOwDJtE4dtoZJChzMm2AF21xMDAXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=jMvaaTbL; arc=none smtp.client-ip=103.168.172.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 763BE1400548;
-	Fri, 25 Jul 2025 10:05:55 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-03.internal (MEProxy); Fri, 25 Jul 2025 10:05:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1753452355; x=1753538755; bh=N+kHxpipNhjucJJL9Twh493YZMFMau/Si7R
-	ulOH/HL0=; b=jMvaaTbLJMnw3vL6ibfuYQ6IaJJ1wPIoUsokLXahUA8/l7fFdKm
-	3f2X40yrnyeXjfmBmws14bVEXxgydQJt7rM3xzMJpWZDJvYz9F0jNxCfZBfby+V3
-	Toor8BQLVEBpjudYueu6bF90avTJgV6enJbTu4XYA2WcB5+XUFN9UvVPyR+ti5Zg
-	1k4ysobpeLVUTiVBh8bAl/LZf43DxDXZqytpAUoIVVYgUz0RSIQzSrvw19EyP2YM
-	PrbPVb1j5Y7jYykGknBHOh5jIc5dducGQSIzrJ99WaQ3V2Js7Co7G9wR6xcS1cPL
-	6KbHLtm90uMHW5DGjAC/haw2ywzMzW5XWEQ==
-X-ME-Sender: <xms:Q4-DaEaoLKrsnjCV_6L_8XUBw8vhj9WiCvxqgjBSS047jzHLbkBgtQ>
-    <xme:Q4-DaMVHR_y7IjmI5ckOV1NnBB0z3FxfracNluZSC4bIEAb9BHeeX7FrGClrOsd_W
-    h9onUM4kL3rLWI>
-X-ME-Received: <xmr:Q4-DaKmqWekKTiJVZVjEktbmdaIKtnCW1lgSW45Kwv2-iPdEdYmbb51VBfFOf91A_SkvwoAECyKZfdAwCYC370Ac>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdekfeejvdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfutghh
-    ihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtthgvrh
-    hnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeghfen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughosh
-    gthhesihguohhstghhrdhorhhgpdhnsggprhgtphhtthhopeekpdhmohguvgepshhmthhp
-    ohhuthdprhgtphhtthhopegtphgrrghstghhsehophgvnhgrihdrtghomhdprhgtphhtth
-    hopegushgrhhgvrhhnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghvvghmsegu
-    rghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvg
-    drtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
-    phgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhohhrmhhssehkvghrnh
-    gvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhr
-    gh
-X-ME-Proxy: <xmx:Q4-DaHAOjPSdjrLuMtuNVCEAKVUCtf9RJjzFBH5Y4QES3nILq_uigg>
-    <xmx:Q4-DaJjDkkRpuuvk4_n6o0xG1z8ViF7d4vWW9V1mIqcAYDW8p7FYVA>
-    <xmx:Q4-DaEwoG7G4ptjDtVO8dgMOcsl6NbuNubkcH5of-jAM8BOWOwN1BQ>
-    <xmx:Q4-DaK1QiA_abq2F201aUSHl1wO6EoaEIL8h94WXwncJoIvww90myQ>
-    <xmx:Q4-DaOA04CKDgbQeT4lZzJQHY-OcH1-oIdAi7l1-dcV_0Zyhq-cq1K46>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 25 Jul 2025 10:05:54 -0400 (EDT)
-Date: Fri, 25 Jul 2025 17:05:52 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: cpaasch@openai.com
-Cc: David Ahern <dsahern@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: Make nexthop-dumps scale linearly with the
- number of nexthops
-Message-ID: <aIOPQH-S5LAPCb1u@shredder>
-References: <20250724-nexthop_dump-v1-1-6b43fffd5bac@openai.com>
+	s=arc-20240116; t=1753452453; c=relaxed/simple;
+	bh=kxiX32bMjkhwzhDOzkS7wrrhbw7CdmsqvWRgBEIiEqE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=RmtBEXT16AgSDBXmiGt/Ocjkgrp9m5xsZBTpW5G982ZEfZUDGBmSnIIw6UKPAMZDCs4XFZ4h6GjVITdgnuAQuElgrRjldQ+o5KHy8L7UC6p4JnQJoBb6l12Or7bXtDUgUMxx8Sj3EcjmNASNZKpGq4lqG9/Wb1he1tN7ndepPGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DAcW+Rq4; arc=none smtp.client-ip=209.85.160.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4ab99d1a223so44256741cf.1
+        for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 07:07:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753452450; x=1754057250; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=SqjWWtDB5X6C7wX10vcS09OoFSLJknYCbCBnYcDL8BE=;
+        b=DAcW+Rq4uhpd+DXKOnxaZmUl+gFi5FX3daRxXLA0w4xfkMMtAE84GSUHa7jc8dZyb6
+         P6oPDo0+g6vmuHsbBkq8ajMdPFMOgght4ApkOoJxlM6Crbd3ekjh9xUE6O+1m/z2xbZN
+         PFwYn55OEG2i/8bbjLKy+0D//CX8kNqRLaMh4UY9WgdUe+D3BDeOekEzEAOKzskkRrVv
+         r2aR7wwUuYqDba2XnqSXBjt5TEZspSihAP9NGTEjBn5dEnuCg4shqy9qOx9wkalfcGnM
+         I4Ttnumu54yn/9b6b2XAjIjj2PlttAYy9GzUJvqTpeo/l8Jfwkci4psj54EmwjDhXpfb
+         l+4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753452450; x=1754057250;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SqjWWtDB5X6C7wX10vcS09OoFSLJknYCbCBnYcDL8BE=;
+        b=j/7vUWz+yfQlSpxLNMy+P6Y+AvQxKvBL20bNpXwF5uo0w6DogjpkKYUWMKSxjb03EF
+         m24TNhyUdPCP4LLc18CDGGWBS4iJQW8cwQ3if1XIKE0dQGcLL6cU55iu6+a+MXuDthD1
+         aPsm08X8PnCs4jGPbroke49VAUxaElxy34jqF5WPLxaQy1tDietY4ITECjc4G0W3Aswj
+         U2gImB03MbFrOmnDhECQkoJRHBZQn6H9B82emp+5LlCLp2UrZjjOmVvYN1QylMs81v6R
+         GmDkuA8dYmFRDJYSXNb9DR/pFMgO5DkVU4UaC7KuSQJeJxf4TL/toLxqhR4xoPTnAqsf
+         UlxA==
+X-Forwarded-Encrypted: i=1; AJvYcCWp35jqgaS5bk7nxjv6MZVnWARrZT0HK9geohk+4fR28yvICOmr/wYPgToElMKIVVd8gxl4RhU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6W/Ugg2vzspMXMlvIfATi18UOa4Q7oSvyw0PxnpGWvZcRUiV3
+	+25QmfVbV3roHDJpBK/34uds/+dKDlImkyMQICACAk5Cs8C6sPrSS9lYVhb8gJ6Y/2YxJM9vL14
+	SVALsD7NzWg8JXA==
+X-Google-Smtp-Source: AGHT+IERy4I0Bn1d2FJmz5HvtM0XXcKmBrzLTl9r6a9g1hlM+xj3vvvMYHNeMBHfvmzd1/iQKZ8EkJb21qo3xA==
+X-Received: from qtbff23.prod.google.com ([2002:a05:622a:4d97:b0:4ab:3da2:a9b9])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:ac8:7f8f:0:b0:4ab:61fc:ebce with SMTP id d75a77b69052e-4ae8f00cedemr23075111cf.27.1753452449932;
+ Fri, 25 Jul 2025 07:07:29 -0700 (PDT)
+Date: Fri, 25 Jul 2025 14:07:21 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250724-nexthop_dump-v1-1-6b43fffd5bac@openai.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.1.470.g6ba607880d-goog
+Message-ID: <20250725140725.3626540-1-edumazet@google.com>
+Subject: [PATCH net 0/4] ipv6: f6i->fib6_siblings and rt->fib6_nsiblings fixes
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jul 24, 2025 at 05:10:36PM -0700, Christoph Paasch via B4 Relay wrote:
-> From: Christoph Paasch <cpaasch@openai.com>
-> 
-> When we have a (very) large number of nexthops, they do not fit within a
-> single message. rtm_dump_walk_nexthops() thus will be called repeatedly
-> and ctx->idx is used to avoid dumping the same nexthops again.
-> 
-> The approach in which we avoid dumpint the same nexthops is by basically
+Series based on an internal syzbot report with a repro.
 
-s/dumpint/dumping/
+After fixing (in the first patch) the original minor issue,
+I found that syzbot repro was able to trigger a second
+more serious bug in rt6_nlmsg_size().
 
-> walking the entire nexthop rb-tree from the left-most node until we find
-> a node whose id is >= s_idx. That does not scale well.
-> 
-> Instead of this non-efficient  approach, rather go directly through the
-                               ^ double space
-s/non-efficient/inefficient/ ?
+Code review then led to the two final patches.
 
-> tree to the nexthop that should be dumped (the one whose nh_id >=
-> s_idx). This allows us to find the relevant node in O(log(n)).
-> 
-> We have quite a nice improvement with this:
-> 
-> Before:
-> =======
-> 
-> --> ~1M nexthops:
-> $ time ~/libnl/src/nl-nh-list | wc -l
-> 1050624
-> 
-> real	0m21.080s
-> user	0m0.666s
-> sys	0m20.384s
-> 
-> --> ~2M nexthops:
-> $ time ~/libnl/src/nl-nh-list | wc -l
-> 2101248
-> 
-> real	1m51.649s
-> user	0m1.540s
-> sys	1m49.908s
-> 
-> After:
-> ======
-> 
-> --> ~1M nexthops:
-> $ time ~/libnl/src/nl-nh-list | wc -l
-> 1050624
-> 
-> real	0m1.157s
-> user	0m0.926s
-> sys	0m0.259s
-> 
-> --> ~2M nexthops:
-> $ time ~/libnl/src/nl-nh-list | wc -l
-> 2101248
-> 
-> real	0m2.763s
-> user	0m2.042s
-> sys	0m0.776s
+I have not released the syzbot bug, because other issues
+still need investigations.
 
-I was able to reproduce these results.
+Eric Dumazet (4):
+  ipv6: add a retry logic in net6_rt_notify()
+  ipv6: prevent infinite loop in rt6_nlmsg_size()
+  ipv6: fix possible infinite loop in fib6_info_uses_dev()
+  ipv6: annotate data-races around rt->fib6_nsiblings
 
-> 
-> Signed-off-by: Christoph Paasch <cpaasch@openai.com>
-> ---
->  net/ipv4/nexthop.c | 34 +++++++++++++++++++++++++++++++++-
->  1 file changed, 33 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-> index 29118c43ebf5f1e91292fe227d4afde313e564bb..226447b1c17d22eab9121bed88c0c2b9148884ac 100644
-> --- a/net/ipv4/nexthop.c
-> +++ b/net/ipv4/nexthop.c
-> @@ -3511,7 +3511,39 @@ static int rtm_dump_walk_nexthops(struct sk_buff *skb,
->  	int err;
->  
->  	s_idx = ctx->idx;
-> -	for (node = rb_first(root); node; node = rb_next(node)) {
-> +
-> +	/*
-> +	 * If this is not the first invocation, ctx->idx will contain the id of
-> +	 * the last nexthop we processed.  Instead of starting from the very first
-> +	 * element of the red/black tree again and linearly skipping the
-> +	 * (potentially large) set of nodes with an id smaller than s_idx, walk the
-> +	 * tree and find the left-most node whose id is >= s_idx.  This provides an
-> +	 * efficient O(log n) starting point for the dump continuation.
-> +	 */
+ net/ipv6/ip6_fib.c | 24 ++++++++++------
+ net/ipv6/route.c   | 71 +++++++++++++++++++++++++++-------------------
+ 2 files changed, 57 insertions(+), 38 deletions(-)
 
-Please try to keep lines at 80 characters.
+-- 
+2.50.1.470.g6ba607880d-goog
 
-> +	if (s_idx != 0) {
-> +		struct rb_node *tmp = root->rb_node;
-> +
-> +		node = NULL;
-> +		while (tmp) {
-> +			struct nexthop *nh;
-> +
-> +			nh = rb_entry(tmp, struct nexthop, rb_node);
-> +			if (nh->id < s_idx) {
-> +				tmp = tmp->rb_right;
-> +			} else {
-> +				/* Track current candidate and keep looking on
-> +				 * the left side to find the left-most
-> +				 * (smallest id) that is still >= s_idx.
-> +				 */
-
-I'm aware that netdev now accepts both comment styles, but it's a bit
-weird to mix both in the same commit and at the same function.
-
-> +				node = tmp;
-> +				tmp = tmp->rb_left;
-> +			}
-> +		}
-> +	} else {
-> +		node = rb_first(root);
-> +	}
-> +
-> +	for (; node; node = rb_next(node)) {
->  		struct nexthop *nh;
->  
->  		nh = rb_entry(node, struct nexthop, rb_node);
-
-The code below is:
-
-if (nh->id < s_idx)
-	continue;
-
-Can't it be removed given the above code means we start at a nexthop
-whose identifier is at least s_idx ?
 
