@@ -1,78 +1,75 @@
-Return-Path: <netdev+bounces-210141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DACBB122A9
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 19:07:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DDC2B122C6
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 19:14:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B51E5A6B62
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 17:06:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15736AA75AB
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 17:13:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72F8F2F2343;
-	Fri, 25 Jul 2025 17:04:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E9762EF9A7;
+	Fri, 25 Jul 2025 17:14:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="Iz7HYyd5";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="j9Ni0yOj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kJgEUy3I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00982EFD86;
-	Fri, 25 Jul 2025 17:04:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 197162EF2B7;
+	Fri, 25 Jul 2025 17:14:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753463071; cv=none; b=l0pI0wvBce08xlCtcW0SaojIjRJ8UeXbmJr44x1KRDXOtMaHRKIBYXydvFoPkrwShYB3KzU4EIRML3ohVocoYCwCBPb58QRHVGbwHHpZYef7foXPj1X1q6mVnjBKLZX0uMJNJuHL0YdTXUesj7uNeDuTvLQfNCGJncoTTCm9TFg=
+	t=1753463655; cv=none; b=UtBCtfpcSJvWWzkVBQjagvyiUpl0WqyTVGQonHD/fdYvx3K2/UmXLBB+nu9EiKRbIE9UQqVlwCnFgNsFf6amHGlwfxF/7Gc8kDPl3do9g+UFrlyzCvb3P4uAD70a3KLpOfGtt8Dvix3q/1GktmF+KA9bx1vOCTKfELowdh2/MLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753463071; c=relaxed/simple;
-	bh=saTvY1xNV9odBTdpzYotFCX6xkjzZJMxHYHlN0zSC0c=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pcRTzVaojVgC3Ha3+n0jUEx/J+T5P3c7qQLDcXblDMXMZCOJUs+S+PIWwgf69mhQSxJzC7Ay1IathjDw2P7fNwzjSUqy8+F+OGrPPs1qCjZ/33EeQccVzXo71s9XfpuxP/8psm8hgSRWZFBDlikBsXXSYpAisKrJePd/sbIOU14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=Iz7HYyd5; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=j9Ni0yOj; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id AB02A60287; Fri, 25 Jul 2025 19:04:28 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1753463068;
-	bh=2nSk3/XWL9Gu8qwfao7/VodiDG0CLkG0nflCVUDCe8w=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Iz7HYyd5th4k5q8L2d1veF/O1Z+4tsa6+ufkJNsgB98rzATftiavY+0hRkB4zNJKi
-	 tmro32dYiqTJBb3cW8/rEJwLkmJqz0mgjdnCY3zHVyvO+jIVHfNMXE+6S9IU9J0TGk
-	 F7faFeMuG/oBDOR/TnEN9DHWP7PvexhHMhQQBq0qNo1RlOUAe60H4PB7bghg//LX5a
-	 CDA5IPXitviAxKz1huNPMM0BHw1jHvX6aJy3Zjo7ssyjZJ98XBMD5jpXzbQOly2kDN
-	 cmCI8NRktsO/EaJuHPgBQDpcYleeCa6W1sZtDEP98S5GXd00xxwH1A998Pe8uIgii2
-	 Lh//+slZvbs3g==
-X-Spam-Level: 
-Received: from localhost.localdomain (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 2FD5860273;
-	Fri, 25 Jul 2025 19:04:22 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1753463063;
-	bh=2nSk3/XWL9Gu8qwfao7/VodiDG0CLkG0nflCVUDCe8w=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=j9Ni0yOjnVYi2l39HeXaD3KOzAYCR8CLFC5FIxsFUG9yW3uUysMMs4NbrEaGuzedO
-	 kd/8i2/03Jw89/TnaVKUOOINYA4hbWnDh+FGiLKk0OpZIud2mYvRyyiCusTgff/mK2
-	 LoJNkGfSlw7e7D4G6Z2nzEoM2/lncitpASjDM2CXRFu+V0pykS97YefWL0agGP8IG4
-	 EcMYl+kSpf8J6TGyCnoYZqGJa68wgPNOCZMAxE/ZIMfLsXyubdlqv+aHeJqxTayrUK
-	 P/I7PULhyWkQVPm7fAhIKNuukYKg7JD9c393ww9V5fXMECiyvqf8+gLfI92hoivhcT
-	 R3ENoArPavZYg==
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
+	s=arc-20240116; t=1753463655; c=relaxed/simple;
+	bh=re11S+8tEIqumSpDL6H1rj102o30u8YGPUHXIsZC5kQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jZF5D0czoeXLmLRiqSp2f7fISVifdimY6+NdFEgAnfc6cB0CKDJuaGeherUFhOtxHtOWRLbesKqvPllemse5TucPnehfPG150rTqeJxrFN7/RN8vAA/Byy+DDo10jjZx9Xg8NA1lav0Ha/tf728tVVOUHweEmnxGI49SoawqbdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kJgEUy3I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B51FDC4AF09;
+	Fri, 25 Jul 2025 17:14:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753463654;
+	bh=re11S+8tEIqumSpDL6H1rj102o30u8YGPUHXIsZC5kQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=kJgEUy3Imdjsuw91viPX8c8gaBRYRt4bL7YSdv6zJ3WZgdij2GElV+409kOiwRE1W
+	 2eIiuHUAAl+c69S3vgJ48bsijUWVZ1b2Dn7wFXh6Z8fm58GD/zZKP71AxSrAo6LiSy
+	 Sng9eCdlOWbvx9e2Z9jmsFZZ33iMQecx9auRvcfw4l9aR2zwyQDFbOlCLQYioLL9Gx
+	 HaLM520HJvbfp6zoLO0tdbtZbEu/VK81WQ97besWCDJFL5WMMX6/SAjNaHyldtpPVo
+	 KvtqvG1k+zSynY7sZtmupbM5d0uhX9aMHvH5xcgDB0nTbFC+ec02VGRJvfgsq+oCC4
+	 pe28SmQiQ3PuA==
+Received: from johan by xi.lan with local (Exim 4.98.2)
+	(envelope-from <johan@kernel.org>)
+	id 1ufLzm-000000000Gh-34a4;
+	Fri, 25 Jul 2025 19:14:11 +0200
+From: Johan Hovold <johan@kernel.org>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Madalin Bucur <madalin.bucur@nxp.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Wei Fang <wei.fang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Felix Fietkau <nbd@nbd.name>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	MD Danish Anwar <danishanwar@ti.com>,
+	Roger Quadros <rogerq@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
 	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de,
-	horms@kernel.org
-Subject: [PATCH net-next 19/19] selftests: netfilter: ipvs.sh: Explicity disable rp_filter on interface tunl0
-Date: Fri, 25 Jul 2025 19:03:40 +0200
-Message-Id: <20250725170340.21327-20-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20250725170340.21327-1-pablo@netfilter.org>
-References: <20250725170340.21327-1-pablo@netfilter.org>
+	linux-kernel@vger.kernel.org,
+	Johan Hovold <johan@kernel.org>
+Subject: [PATCH 0/5] net: ethernet: fix device leaks
+Date: Fri, 25 Jul 2025 19:12:08 +0200
+Message-ID: <20250725171213.880-1-johan@kernel.org>
+X-Mailer: git-send-email 2.49.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,59 +78,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Yi Chen <yiche@redhat.com>
+This series fixes devices leaks stemming from failure to drop the
+reference taken by of_find_device_by_node().
 
-Although setup_ns() set net.ipv4.conf.default.rp_filter=0,
-loading certain module such as ipip will automatically create a tunl0 interface
-in all netns including new created ones. In the script, this is before than
-default.rp_filter=0 applied, as a result tunl0.rp_filter remains set to 1
-which causes the test report FAIL when ipip module is preloaded.
+Johan
 
-Before fix:
-Testing DR mode...
-Testing NAT mode...
-Testing Tunnel mode...
-ipvs.sh: FAIL
 
-After fix:
-Testing DR mode...
-Testing NAT mode...
-Testing Tunnel mode...
-ipvs.sh: PASS
+Johan Hovold (5):
+  net: dpaa: fix device leak when querying time stamp info
+  net: enetc: fix device and OF node leak at probe
+  net: gianfar: fix device leak when querying time stamp info
+  net: mtk_eth_soc: fix device leak at probe
+  net: ti: icss-iep: fix device and OF node leaks at probe
 
-Fixes: 7c8b89ec506e ("selftests: netfilter: remove rp_filter configuration")
-Signed-off-by: Yi Chen <yiche@redhat.com>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- tools/testing/selftests/net/netfilter/ipvs.sh | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ .../ethernet/freescale/dpaa/dpaa_ethtool.c    |  4 +++-
+ .../net/ethernet/freescale/enetc/enetc_pf.c   | 14 +++++++++--
+ .../net/ethernet/freescale/gianfar_ethtool.c  |  4 +++-
+ drivers/net/ethernet/mediatek/mtk_wed.c       |  1 -
+ drivers/net/ethernet/ti/icssg/icss_iep.c      | 23 +++++++++++++++----
+ 5 files changed, 36 insertions(+), 10 deletions(-)
 
-diff --git a/tools/testing/selftests/net/netfilter/ipvs.sh b/tools/testing/selftests/net/netfilter/ipvs.sh
-index 6af2ea3ad6b8..9c9d5b38ab71 100755
---- a/tools/testing/selftests/net/netfilter/ipvs.sh
-+++ b/tools/testing/selftests/net/netfilter/ipvs.sh
-@@ -151,7 +151,7 @@ test_nat() {
- test_tun() {
- 	ip netns exec "${ns0}" ip route add "${vip_v4}" via "${gip_v4}" dev br0
- 
--	ip netns exec "${ns1}" modprobe -q ipip
-+	modprobe -q ipip
- 	ip netns exec "${ns1}" ip link set tunl0 up
- 	ip netns exec "${ns1}" sysctl -qw net.ipv4.ip_forward=0
- 	ip netns exec "${ns1}" sysctl -qw net.ipv4.conf.all.send_redirects=0
-@@ -160,10 +160,10 @@ test_tun() {
- 	ip netns exec "${ns1}" ipvsadm -a -i -t "${vip_v4}:${port}" -r ${rip_v4}:${port}
- 	ip netns exec "${ns1}" ip addr add ${vip_v4}/32 dev lo:1
- 
--	ip netns exec "${ns2}" modprobe -q ipip
- 	ip netns exec "${ns2}" ip link set tunl0 up
- 	ip netns exec "${ns2}" sysctl -qw net.ipv4.conf.all.arp_ignore=1
- 	ip netns exec "${ns2}" sysctl -qw net.ipv4.conf.all.arp_announce=2
-+	ip netns exec "${ns2}" sysctl -qw net.ipv4.conf.tunl0.rp_filter=0
- 	ip netns exec "${ns2}" ip addr add "${vip_v4}/32" dev lo:1
- 
- 	test_service
 -- 
-2.30.2
+2.49.1
 
 
