@@ -1,250 +1,175 @@
-Return-Path: <netdev+bounces-210172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6548B123A4
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 20:13:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A02D5B123C2
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 20:28:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFC1B547902
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 18:13:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 628533B95CB
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 18:28:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A762EF9DD;
-	Fri, 25 Jul 2025 18:12:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 292642472B5;
+	Fri, 25 Jul 2025 18:28:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 010341A23A4;
-	Fri, 25 Jul 2025 18:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57E7124728F
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 18:28:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753467179; cv=none; b=Y+id3wmjCwDE6ddvJ3Xijb3FY40jT4WnuAshBxUruDputfLQDsma05rnsH9UzMwMRWCMqqNKMCmoqsJ8NmYwqZFweitMEjhDrEKnNgcN7C090Z3ubKMebPI4TN0hmKRLkfjbRLhC7kIesbXvLASopdfuKHXhBPX6xx6X5+0XA3Y=
+	t=1753468117; cv=none; b=PmMPad7SJMq+nq4Rxs+LhC9OUnY2x5mLQyVrgqbNnl/ADOYV+s2MnjFZqvnG87WmnUKtSQg8Ig1gtgyPZ7R/mdwPNSs9lV3avJnFyvPYNgMkPR/lf8PGUv5LJ2aHxj9KEdi0oHV94vNxvR70Jh64it5lWXgL09c+Me6PwXqJwjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753467179; c=relaxed/simple;
-	bh=EpzX4gVltvQWn439XtsEeaalCBacbreSsUzM2HbBzQg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ENWWveneNkri3UDbBjmgWHyDTSEAAivf5w6rNfE494byuTEdOtJuz4OMz36SifT8D8PleH/x/Hs9knl3JDZzYqulGfRpaEOCVlWVZkKQwCxPlYvqzsOr29/MMK61fLxsv4fMKuS3+kWS3ANv3s558KFlRP8NBTh7meIjGFQLFek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4321E176C;
-	Fri, 25 Jul 2025 11:12:49 -0700 (PDT)
-Received: from [10.57.4.83] (unknown [10.57.4.83])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A29DE3F6A8;
-	Fri, 25 Jul 2025 11:12:53 -0700 (PDT)
-Message-ID: <6817efe1-f2c2-4686-bdf1-fca11f066e3a@arm.com>
-Date: Fri, 25 Jul 2025 19:12:50 +0100
+	s=arc-20240116; t=1753468117; c=relaxed/simple;
+	bh=ouzsgk+19QmaRO9pKjJbgZ+UqbuwEfzKidBzOU/dHWo=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=rrPEnK9tTVbPp3tJNyMCMqQG4cHEVF5Nd0DM1e0fRDZMMmLcLqJclHrcrzM1BY/62sAi+6J6M3sRMvpXz3PhNQvr2PUvr/WLTLUKNKNp2wyjWHyL0yZiIEW3caHhyW9uVmn67AjcI3ATn202B6L5NUPOeX0O+5Ks4Z5iLkJaEWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-86d1218df67so263892939f.1
+        for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 11:28:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753468114; x=1754072914;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pipXtIEWEhRvtnHJ7xlpV/XMoRV9BNZ+hdAoR8pES7Y=;
+        b=aLfanIhRs7BDmkMP6K11cbj4e8O9gNs+8SQ+i/BBch1T5qBgBIdrDhxJ0RG9Yb5MsM
+         MwL8i2ZDAbTxIhCUu9qNDMm4t8C7LG0Pir6xcRe1CRBun9qPuzX+RfIwpb4bGbGkSrI2
+         aX1c5AGKZxZfnVhrpMmk4fQj8NJzsWaRXCxTnX6RS90DwTxUSHC5r1BFiFqCepRZY4s7
+         SMiN4yN4C9p630Smt5/yG2xos6hORwOKnuo9joUAH0JJQrdOciMrRN517upfZr9/QFPW
+         P3BtKlFek8f08BqipyWSdJQqaEQii3Yv46BOgwCNepWyE8JtvWCii+qsU2O0rw39YU2S
+         Mn/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUG9vl/DouBRRUcP9z7/jYnaVtCrIG+pycfn0rQQLdkK4BHqB1/2rUKvb4fiTnhgRu9GMWj9Gc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/UjSwRqApepzo3AI1BF09UE/c261uyPTt2EJ+bOpQEf0bc0Ep
+	TbVbnrKkNLtdKkk9I6eUdlpFA/OoeRPCf73sYYNc22Df0DZvyC1RZCHMwniOlV5CEtW4OYFlmpy
+	jy5aAAWsL6KLqMakMeKcCzJqXglctOdqog5j9kaHRTCIUHM8kQAbc6dIUxZc=
+X-Google-Smtp-Source: AGHT+IH0x+8018duqbyYiMeiRij8Fur/WaLqmHTXNy2m65q2EWKw8XSHg002KZNgmzWMNe02inHWp8hIfNTBxg3rmRMJeyJQfyKK
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: BUG: Circular locking dependency on netdev led trigger on NanoPi
- R5S
-To: Diederik de Haas <didi.debian@cknow.org>, Lee Jones <lee@kernel.org>,
- Pavel Machek <pavel@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-leds@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org,
- linux-kernel@vger.kernel.org
-References: <DBLBPIBKFCJV.36AVW8JY88L7H@cknow.org>
-From: Robin Murphy <robin.murphy@arm.com>
-Content-Language: en-GB
-In-Reply-To: <DBLBPIBKFCJV.36AVW8JY88L7H@cknow.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6602:1494:b0:87c:538b:2a3c with SMTP id
+ ca18e2360f4ac-880229b13d5mr427236839f.14.1753468114452; Fri, 25 Jul 2025
+ 11:28:34 -0700 (PDT)
+Date: Fri, 25 Jul 2025 11:28:34 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6883ccd2.a00a0220.2f88df.0056.GAE@google.com>
+Subject: [syzbot] [wireless?] WARNING in ieee80211_ocb_rx_no_sta
+From: syzbot <syzbot+a06b95a67a174af018cf@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 2025-07-25 6:48 pm, Diederik de Haas wrote:
-> Hi,
-> 
-> I have a FriendlyELEC NanoPi R5S (with rk3568 SoC) and in commit
-> 1631cbdb8089 ("arm64: dts: rockchip: Improve LED config for NanoPi R5S")
-> 
-> I tried to improve its LED configuration and that included
-> ``linux,default-trigger = "netdev"``
-> 
-> Problem: sometimes I got a 'hung task' error which resulted in the WAN
-> port not to come up (that's the only one I use) and logging in via
-> serial also didn't work, so pulling the plug was the only remedy.
-> 
-> Robin Murphy quickly identified that it likely had to do with led
-> triggers and removing those netdev triggers made the problem go away[1].
-> To find out what actually caused it, I built a kernel with PROOF_LOCKING
-> and PRINTK_CALLER enabled, which after adding a patch which fixed an
-> OOPS [2], showed the underlaying problem:
+Hello,
 
-For the record, I think the actual deadlock condition Diederik's system 
-hits in practice is a shorter cycle, wherein immediately after acquiring 
-pernet_ops_rwsem, thread #0 then tries to take rtnl_mutex, which forms a 
-straight inversion against thread #2 (which holds rtnl_mutex from 
-devinet_ioctl()).
+syzbot found the following issue on:
 
-Thanks,
-Robin.
+HEAD commit:    89be9a83ccf1 Linux 6.16-rc7
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17798fd4580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9f175a9275d2cdd7
+dashboard link: https://syzkaller.appspot.com/bug?extid=a06b95a67a174af018cf
+compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
->     ======================================================
->     WARNING: possible circular locking dependency detected
->     6.16-rc7+unreleased-arm64-cknow #1 Not tainted
->     ------------------------------------------------------
->     modprobe/936 is trying to acquire lock:
->     ffffc943e0edc3b0 (pernet_ops_rwsem){++++}-{4:4}, at: register_netdevice_notifier+0x38/0x148
-> 
->     but task is already holding lock:
->     ffff0001f2762248 (&led_cdev->trigger_lock){+.+.}-{4:4}, at: led_trigger_register+0x14c/0x1e0
-> 
->     which lock already depends on the new lock.
-> 
-> 
->     the existing dependency chain (in reverse order) is:
-> 
->     -> #3 (&led_cdev->trigger_lock){+.+.}-{4:4}:
->            lock_acquire+0x1cc/0x348
->            down_write+0x40/0xd8
->            led_trigger_set_default+0x5c/0x170
->            led_classdev_register_ext+0x340/0x488
->            __sdhci_add_host+0x190/0x368 [sdhci]
->            dwcmshc_probe+0x2b8/0x6b0 [sdhci_of_dwcmshc]
->            platform_probe+0x70/0xe8
->            really_probe+0xc8/0x3a0
->            __driver_probe_device+0x84/0x160
->            driver_probe_device+0x44/0x128
->            __device_attach_driver+0xc4/0x170
->            bus_for_each_drv+0x90/0xf8
->            __device_attach_async_helper+0xc0/0x120
->            async_run_entry_fn+0x40/0x180
->            process_one_work+0x23c/0x640
->            worker_thread+0x1b4/0x360
->            kthread+0x150/0x250
->            ret_from_fork+0x10/0x20
-> 
->     -> #2 (triggers_list_lock){++++}-{4:4}:
->            lock_acquire+0x1cc/0x348
->            down_write+0x40/0xd8
->            led_trigger_register+0x58/0x1e0
->            phy_led_triggers_register+0xf4/0x258 [libphy]
->            phy_attach_direct+0x328/0x3a8 [libphy]
->            phylink_fwnode_phy_connect+0xb0/0x138 [phylink]
->            __stmmac_open+0xec/0x520 [stmmac]
->            stmmac_open+0x4c/0xe8 [stmmac]
->            __dev_open+0x13c/0x310
->            __dev_change_flags+0x1d4/0x260
->            netif_change_flags+0x2c/0x80
->            dev_change_flags+0x90/0xd0
->            devinet_ioctl+0x55c/0x730
->            inet_ioctl+0x1e4/0x200
->            sock_do_ioctl+0x6c/0x140
->            sock_ioctl+0x328/0x3c0
->            __arm64_sys_ioctl+0xb4/0x118
->            invoke_syscall+0x6c/0x100
->            el0_svc_common.constprop.0+0x48/0xf0
->            do_el0_svc+0x24/0x38
->            el0_svc+0x54/0x1e0
->            el0t_64_sync_handler+0x10c/0x140
->            el0t_64_sync+0x198/0x1a0
-> 
->     -> #1 (rtnl_mutex){+.+.}-{4:4}:
->            lock_acquire+0x1cc/0x348
->            __mutex_lock+0xac/0x590
->            mutex_lock_nested+0x2c/0x40
->            rtnl_lock+0x24/0x38
->            register_netdevice_notifier+0x40/0x148
->            rtnetlink_init+0x40/0x68
->            netlink_proto_init+0x120/0x158
->            do_one_initcall+0x88/0x3b8
->            kernel_init_freeable+0x2d0/0x340
->            kernel_init+0x28/0x160
->            ret_from_fork+0x10/0x20
-> 
->     -> #0 (pernet_ops_rwsem){++++}-{4:4}:
->            check_prev_add+0x114/0xcb8
->            __lock_acquire+0x12e8/0x15f0
->            lock_acquire+0x1cc/0x348
->            down_write+0x40/0xd8
->            register_netdevice_notifier+0x38/0x148
->            netdev_trig_activate+0x18c/0x1e8 [ledtrig_netdev]
->            led_trigger_set+0x1d4/0x328
->            led_trigger_register+0x194/0x1e0
->            netdev_led_trigger_init+0x20/0xff8 [ledtrig_netdev]
->            do_one_initcall+0x88/0x3b8
->            do_init_module+0x5c/0x270
->            load_module+0x1ed8/0x2608
->            init_module_from_file+0x94/0x100
->            idempotent_init_module+0x1e8/0x2f0
->            __arm64_sys_finit_module+0x70/0xe8
->            invoke_syscall+0x6c/0x100
->            el0_svc_common.constprop.0+0x48/0xf0
->            do_el0_svc+0x24/0x38
->            el0_svc+0x54/0x1e0
->            el0t_64_sync_handler+0x10c/0x140
->            el0t_64_sync+0x198/0x1a0
-> 
->     other info that might help us debug this:
-> 
->     Chain exists of:
->       pernet_ops_rwsem --> triggers_list_lock --> &led_cdev->trigger_lock
-> 
->      Possible unsafe locking scenario:
-> 
->            CPU0                    CPU1
->            ----                    ----
->       lock(&led_cdev->trigger_lock);
->                                    lock(triggers_list_lock);
->                                    lock(&led_cdev->trigger_lock);
->       lock(pernet_ops_rwsem);
-> 
->      *** DEADLOCK ***
-> 
->     2 locks held by modprobe/936:
->      #0: ffffc943e0d2baa8 (leds_list_lock){++++}-{4:4}, at: led_trigger_register+0x10c/0x1e0
->      #1: ffff0001f2762248 (&led_cdev->trigger_lock){+.+.}-{4:4}, at: led_trigger_register+0x14c/0x1e0
-> 
->     stack backtrace:
->     CPU: 0 UID: 0 PID: 936 Comm: modprobe Not tainted 6.16-rc7+unreleased-arm64-cknow #1 PREEMPTLAZY  Debian 6.16~rc7-2~exp1
->     Hardware name: FriendlyElec NanoPi R5S (DT)
->     Call trace:
->      show_stack+0x34/0xa0 (C)
->      dump_stack_lvl+0x70/0x98
->      dump_stack+0x18/0x24
->      print_circular_bug+0x230/0x280
->      check_noncircular+0x174/0x188
->      check_prev_add+0x114/0xcb8
->      __lock_acquire+0x12e8/0x15f0
->      lock_acquire+0x1cc/0x348
->      down_write+0x40/0xd8
->      register_netdevice_notifier+0x38/0x148
->      netdev_trig_activate+0x18c/0x1e8 [ledtrig_netdev]
->      led_trigger_set+0x1d4/0x328
->      led_trigger_register+0x194/0x1e0
->      netdev_led_trigger_init+0x20/0xff8 [ledtrig_netdev]
->      do_one_initcall+0x88/0x3b8
->      do_init_module+0x5c/0x270
->      load_module+0x1ed8/0x2608
->      init_module_from_file+0x94/0x100
->      idempotent_init_module+0x1e8/0x2f0
->      __arm64_sys_finit_module+0x70/0xe8
->      invoke_syscall+0x6c/0x100
->      el0_svc_common.constprop.0+0x48/0xf0
->      do_el0_svc+0x24/0x38
->      el0_svc+0x54/0x1e0
->      el0t_64_sync_handler+0x10c/0x140
->      el0t_64_sync+0x198/0x1a0
->     leds-gpio gpio-leds: bus: 'platform': really_probe: bound device to driver leds-gpio
-> 
-> Full serial log can be found at [3] which is quite verbose and the boot
-> took way longer then normal as the following was added to cmdline:
-> ``dyndbg="file dd.c func really_probe +p" maxcpus=1``
-> 
-> Free free to ask for additional info and/or to run tests.
-> 
-> Cheers,
->    Diederik
-> 
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/soc/soc.git/commit/?h=arm/fixes&id=912b1f2a796ec73530a709b11821cb0c249fb23e
-> [2] https://lore.kernel.org/linux-rockchip/f81b88df-9959-4968-a60a-b7efd3d5ea24@arm.com/
-> [3] https://paste.sr.ht/~diederik/142e92bfb29bbb58bca18a74cdffc5e0ba79081c
+Unfortunately, I don't have any reproducer for this issue yet.
 
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/34b3f6e5e365/disk-89be9a83.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/55356b071589/vmlinux-89be9a83.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/5daf2522b291/bzImage-89be9a83.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+a06b95a67a174af018cf@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 9078 at net/mac80211/ocb.c:63 ieee80211_ocb_rx_no_sta+0x583/0x710 net/mac80211/ocb.c:63
+Modules linked in:
+CPU: 0 UID: 0 PID: 9078 Comm: syz.1.959 Not tainted 6.16.0-rc7-syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+RIP: 0010:ieee80211_ocb_rx_no_sta+0x583/0x710 net/mac80211/ocb.c:63
+Code: 48 c7 c2 80 c5 08 8d be 65 03 00 00 48 c7 c7 a0 c4 08 8d c6 05 4b b5 78 05 01 e8 c8 63 7f f6 e9 0b fc ff ff e8 ce 12 a3 f6 90 <0f> 0b 90 e8 25 ac 6d 00 31 ff 89 c3 89 c6 e8 fa 0d a3 f6 85 db 75
+RSP: 0018:ffffc90000007a08 EFLAGS: 00010283
+RAX: 000000000000022a RBX: ffff888056a7cd80 RCX: ffffc90002181000
+RDX: 0000000000040000 RSI: ffffffff8b18d5a2 RDI: 0000000000000005
+RBP: ffff888025e9e40a R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000001 R12: ffff888030e40e40
+R13: 0000000000000001 R14: 0000000000000000 R15: ffff888033a44500
+FS:  00007f8e60a7d6c0(0000) GS:ffff888124720000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000110c3a8d5a CR3: 00000000343fa000 CR4: 00000000003526f0
+Call Trace:
+ <IRQ>
+ ieee80211_accept_frame net/mac80211/rx.c:4445 [inline]
+ ieee80211_prepare_and_rx_handle+0x55a1/0x77a0 net/mac80211/rx.c:4999
+ ieee80211_rx_for_interface+0x10a/0x1f0 net/mac80211/rx.c:5129
+ __ieee80211_rx_handle_packet net/mac80211/rx.c:5285 [inline]
+ ieee80211_rx_list+0x10d7/0x2980 net/mac80211/rx.c:5420
+ ieee80211_rx_napi+0xdc/0x410 net/mac80211/rx.c:5443
+ ieee80211_rx include/net/mac80211.h:5185 [inline]
+ ieee80211_handle_queued_frames+0xd5/0x130 net/mac80211/main.c:441
+ tasklet_action_common+0x281/0x400 kernel/softirq.c:829
+ handle_softirqs+0x219/0x8e0 kernel/softirq.c:579
+ do_softirq kernel/softirq.c:480 [inline]
+ do_softirq+0xb2/0xf0 kernel/softirq.c:467
+ </IRQ>
+ <TASK>
+ __local_bh_enable_ip+0x100/0x120 kernel/softirq.c:407
+ ieee80211_tx_skb_tid+0x176/0x4f0 net/mac80211/tx.c:6131
+ ieee80211_mgmt_tx+0x14d2/0x2310 net/mac80211/offchannel.c:1023
+ rdev_mgmt_tx net/wireless/rdev-ops.h:762 [inline]
+ cfg80211_mlme_mgmt_tx+0x7d5/0x1660 net/wireless/mlme.c:938
+ nl80211_tx_mgmt+0x9f9/0xd60 net/wireless/nl80211.c:12921
+ genl_family_rcv_msg_doit+0x206/0x2f0 net/netlink/genetlink.c:1115
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0x55c/0x800 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x155/0x420 net/netlink/af_netlink.c:2552
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+ netlink_unicast+0x58d/0x850 net/netlink/af_netlink.c:1346
+ netlink_sendmsg+0x8d1/0xdd0 net/netlink/af_netlink.c:1896
+ sock_sendmsg_nosec net/socket.c:712 [inline]
+ __sock_sendmsg net/socket.c:727 [inline]
+ ____sys_sendmsg+0xa95/0xc70 net/socket.c:2566
+ ___sys_sendmsg+0x134/0x1d0 net/socket.c:2620
+ __sys_sendmsg+0x16d/0x220 net/socket.c:2652
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xcd/0x4c0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f8e5fb8e9a9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f8e60a7d038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f8e5fdb5fa0 RCX: 00007f8e5fb8e9a9
+RDX: 0000000000000000 RSI: 0000200000000080 RDI: 0000000000000003
+RBP: 00007f8e5fc10d69 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007f8e5fdb5fa0 R15: 00007ffd54948378
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
