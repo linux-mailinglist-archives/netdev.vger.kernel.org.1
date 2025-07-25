@@ -1,177 +1,207 @@
-Return-Path: <netdev+bounces-210045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D7EFB11F03
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 14:48:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 579D2B11F18
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 14:58:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D8F1189080D
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 12:48:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B0DCA7AA3A6
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 12:57:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A0092628C;
-	Fri, 25 Jul 2025 12:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3548C2ED15E;
+	Fri, 25 Jul 2025 12:58:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nPdO80B9"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B818134BD
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 12:47:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D0F52ED153;
+	Fri, 25 Jul 2025 12:58:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753447676; cv=none; b=hlcAC3jfHfMf3pxgXvQxZLlopMnUQcdL5tETf7alXOVnRipfSzH6zyrDLntW4FNI0Ix6h0E1RxqyCsQby2UNYEtvIO6IdFOB4WU+msGSLV6PH6fz8HGqyL0P4E5LI38LBWkbxzzrrSyKLiKDHLRAQ/ZQdVJ799ew3p1R5YzwXrM=
+	t=1753448326; cv=none; b=NBLN+8j6pkkk9uUUWVbo0BmO926cSfI3iJZ6WESEiIBqo1fuk28typUY92/PRKP1f8/F4o7nwYJ8SYGQaDCZBBs6jgurgBJPN5S3GOxbUD0+OIuA7a8i+8aLNmFWq3PX/k9TiFCEnxpdIxrD6oT26f4jNNCwbm16Y2O7TKxEzCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753447676; c=relaxed/simple;
-	bh=HZtWIFNtCJpMK2qxCgsJ8HLcBMXFIsU6z61saV4vKcA=;
+	s=arc-20240116; t=1753448326; c=relaxed/simple;
+	bh=U+l2daCSxoxZop8pSJd81XPpmelPZZWa2K/uyjIKm9U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MkhSFhygF5zMag7gJHn+Z1yTr3vSHiCW17IDaPiqhREWAT3gIa5ort3sDVmmUqJn3xX6nQTo8bbyLI5NmP+8bGCEDFxWaQASXrxvWaxpTk3bSvsQndRI0a1An2/dw/dboIeamSjsp7mm5J2/wI9EVPUPcsBroEGws/1r+fynqEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1ufHpz-0000aE-CF; Fri, 25 Jul 2025 14:47:47 +0200
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1ufHpy-00ADrz-2y;
-	Fri, 25 Jul 2025 14:47:46 +0200
-Received: from pengutronix.de (p5b1645f7.dip0.t-ipconnect.de [91.22.69.247])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 97D7044960A;
-	Fri, 25 Jul 2025 12:47:46 +0000 (UTC)
-Date: Fri, 25 Jul 2025 14:47:46 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Jimmy Assarsson <extja@kvaser.com>
-Cc: linux-can@vger.kernel.org, Jimmy Assarsson <jimmyassarsson@gmail.com>, 
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH v4 07/10] can: kvaser_pciefd: Add devlink support
-Message-ID: <20250725-ingenious-labradoodle-of-action-d4dfb7-mkl@pengutronix.de>
-References: <20250725123230.8-1-extja@kvaser.com>
- <20250725123230.8-8-extja@kvaser.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=V2O/2Q6uH9eiQ6m5ya1rlbbEwJuw/3JsboN0iOzlyOXfhSPglcWs0Ey0IonKiQt1MbjlufcUs1y7WclNMxP+xcyD7D6k1zBjlzIlLO0lcB3FNCGJG48HjaUE6G06bxDLLH5N0Aka6mkTbAPJjYjT9uWmsv5K4hRCi2OY2UZjknI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nPdO80B9; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-235e1d710d8so27074995ad.1;
+        Fri, 25 Jul 2025 05:58:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753448323; x=1754053123; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IRzi0ZZ7lzn256rqqzO9OVR+xH0dahkcse6WfaiH0cE=;
+        b=nPdO80B9jTFuMzhve0uXt2bdD9x2G6QfzgLV5HZbNUMBz+RMEASlMICFTxwBmTMhQv
+         g4Mdzr23ie3WsyMRI0KrEya6CCKuZojAkK2tMz53N5cjLQSgJd/eYD3iqS+NeHheIJBk
+         JU0za/1HU4EfzIeNyW7tx3AcHibYe4CAm55kQxt6V6P+8aNWPmf4G4rbMeOJpFt35j/y
+         N+naT1lgtzR8RzLGgGDZ2ydTmYhuVbkVkcZJiDAC1U0SaaG0tx3JqieoX2diMRK7TdyB
+         mMc3RhX603aOTr1aRbBcdXjmvnS5E5JoDCCrubmW45Y/nd/oTUotRYUZliHnkkAcfg3M
+         tbAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753448323; x=1754053123;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IRzi0ZZ7lzn256rqqzO9OVR+xH0dahkcse6WfaiH0cE=;
+        b=urY59oqh1UQcqJYrE3ktuvlXb8CwwGyjx8prBcXvZVLIebK5xcl/hI5lxNy9jb0ogJ
+         sJfYCnsVPmGWlu7oRavvbHC4FzXsfBWbzc8Fbn9nbj4+DK0wjy6LtkJuTb/D6+womhMi
+         uYojxSVgf4c8+Z7MfHtRL7yldF/hcGLUctgydleS/7fbAB3jjCFYw/XxVUSYXvv7BvDh
+         SBQaQn5nL7fSWz3IFP1drdClzN0GWqSEBPWWELrQGjuA4v9SyR3RA3eBQCH++Ml7ljrh
+         ROwuCg7eAGL2QPSB/Wfa65YebNiYaCXiq9wf1RtvSpbyu33aWPuRN1646+mvgTkTWMwN
+         dxWg==
+X-Forwarded-Encrypted: i=1; AJvYcCVNTsNCa/I5hd4RBHAoZIfDXwgLHtK8dDMTKJZY9lC2ry9Iuegz9jfobmrAoaVCE5GK31o51KoRdWM=@vger.kernel.org, AJvYcCWCEkjMs+JYZQzNR+//CJT8bBPZ28NqOiaZ28hBAVgFQsO7WAnWZrw8ZGd4pTv5wAW2CDF8gGH9Q10OHmbk@vger.kernel.org, AJvYcCWvYlIV+33YdHkMYM6POZLUmbwl8C5oV4dxPGdTtrv3hDtr4ZQop6Dmu2k5AQ86N8+wr2xmBC7kefZkyVbSyamV@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBohJtLNGygDs0PzKzYRWR4GJX+sGieLN3oX2EuKe+LZw5y2sO
+	vdPxrnrYXlZgpXGV05EJCyE+Mot3ZVKwAs1iH0gXQc+2wzMyLxFIe8A8
+X-Gm-Gg: ASbGncvx+vBvypUhglum1LKI+1gv1wCFU3vyN3+Arm5CULAqplffeECFUkjaVF8IA8p
+	GZxEnAAi5sUVjLApp8CLypQGIELurbe4H3pQSqfkcBwf8Qbfp0Tu27mJ3u3+cjcqfzdDeidbmpS
+	OtppZ1qFJhjijd/txFY+Ve+6h6tcCNMYCGWtfNkhDDeS58xcLpHjTCNra6p1yLp4cfdU8dlIPIu
+	OqMIV5W+44vVHUDaeIz8ERWbdR3dJ4QnQUcVLc32ZvJOWKek+j8BZsAM2sk6w0dYWIiZA4yZqdq
+	b6lzujEDE0xx+4xS3j9jLdissPR9nClrCPubooboc+5cAuBp/8nsd5XUzoQ3hSHnUk05Zg8p0w+
+	fbKYD0UkCpTxTIAbIF1lK22Qcyf8=
+X-Google-Smtp-Source: AGHT+IGAlITfVYzd8DhScqugYjRH2Umn84vSkWnZzDqtOwuyZIYx5kzZZ3ufcrPHnIufB7PqwcJY1w==
+X-Received: by 2002:a17:903:4405:b0:23d:da20:1685 with SMTP id d9443c01a7336-23fb3065804mr32846585ad.4.1753448322695;
+        Fri, 25 Jul 2025 05:58:42 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23fadc8f669sm16852005ad.12.2025.07.25.05.58.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Jul 2025 05:58:42 -0700 (PDT)
+Date: Fri, 25 Jul 2025 12:48:58 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>, Petr Machata <petrm@nvidia.com>,
+	Amit Cohen <amcohen@nvidia.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Alessandro Zanni <alessandro.zanni87@gmail.com>,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/3] bonding: support aggregator selection based
+ on port priority
+Message-ID: <aIN9OtPcnPtkqrks@fedora>
+References: <20250724081632.12921-1-liuhangbin@gmail.com>
+ <20250724081632.12921-3-liuhangbin@gmail.com>
+ <d5b2f8df-8a2e-4319-809a-ec06d8381038@blackwall.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="3mf2wj25wf4cp2ss"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250725123230.8-8-extja@kvaser.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <d5b2f8df-8a2e-4319-809a-ec06d8381038@blackwall.org>
 
+On Fri, Jul 25, 2025 at 12:02:02PM +0300, Nikolay Aleksandrov wrote:
+> > diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
+> > index 4a1b2f01fe37..6f8a406ed34a 100644
+> > --- a/drivers/net/bonding/bond_3ad.c
+> > +++ b/drivers/net/bonding/bond_3ad.c
+> > @@ -747,6 +747,20 @@ static int __agg_active_ports(struct aggregator *agg)
+> >  	return active;
+> >  }
+> >  
+> > +static unsigned int __agg_ports_priority(struct aggregator *agg)
+> 
+> const agg?
+> 
+> > +{
+> > +	struct port *port;
+> > +	unsigned int prio = 0;
+> 
+> reverse xmas tree or alternatively you can save a line below with
+> port = agg->lag_ports above
 
---3mf2wj25wf4cp2ss
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v4 07/10] can: kvaser_pciefd: Add devlink support
-MIME-Version: 1.0
+Thanks, I will fix this.
 
-On 25.07.2025 14:32:27, Jimmy Assarsson wrote:
-> --- a/drivers/net/can/kvaser_pciefd/kvaser_pciefd_core.c
-> +++ b/drivers/net/can/kvaser_pciefd/kvaser_pciefd_core.c
-> @@ -1751,14 +1751,16 @@ static int kvaser_pciefd_probe(struct pci_dev *pd=
-ev,
->  			       const struct pci_device_id *id)
->  {
->  	int ret;
-> +	struct devlink *devlink;
->  	struct device *dev =3D &pdev->dev;
->  	struct kvaser_pciefd *pcie;
->  	const struct kvaser_pciefd_irq_mask *irq_mask;
-> =20
-> -	pcie =3D devm_kzalloc(dev, sizeof(*pcie), GFP_KERNEL);
-> -	if (!pcie)
-> +	devlink =3D devlink_alloc(&kvaser_pciefd_devlink_ops, sizeof(*pcie), de=
-v);
-> +	if (!devlink)
->  		return -ENOMEM;
-> =20
-> +	pcie =3D devlink_priv(devlink);
->  	pci_set_drvdata(pdev, pcie);
->  	pcie->pci =3D pdev;
->  	pcie->driver_data =3D (const struct kvaser_pciefd_driver_data *)id->dri=
-ver_data;
-> @@ -1766,7 +1768,7 @@ static int kvaser_pciefd_probe(struct pci_dev *pdev,
-> =20
->  	ret =3D pci_enable_device(pdev);
->  	if (ret)
-> -		return ret;
-> +		goto err_free_devlink;
-> =20
->  	ret =3D pci_request_regions(pdev, KVASER_PCIEFD_DRV_NAME);
->  	if (ret)
-> @@ -1830,6 +1832,8 @@ static int kvaser_pciefd_probe(struct pci_dev *pdev,
->  	if (ret)
->  		goto err_free_irq;
-> =20
-> +	devlink_register(devlink);
-> +
->  	return 0;
-> =20
->  err_free_irq:
-> @@ -1853,6 +1857,9 @@ static int kvaser_pciefd_probe(struct pci_dev *pdev,
->  err_disable_pci:
->  	pci_disable_device(pdev);
-> =20
-> +err_free_devlink:
-> +	devlink_free(devlink);
-> +
->  	return ret;
->  }
-> =20
-> @@ -1876,6 +1883,8 @@ static void kvaser_pciefd_remove(struct pci_dev *pd=
-ev)
->  	for (i =3D 0; i < pcie->nr_channels; ++i)
->  		free_candev(pcie->can[i]->can.dev);
-> =20
-> +	devlink_unregister(priv_to_devlink(pcie));
-> +	devlink_free(priv_to_devlink(pcie));
->  	pci_iounmap(pdev, pcie->reg_base);
-                          ^^^^
-
-This smells like a use after free. Please call the cleanup function in
-reverse order of allocation functions, i.e. move devlink_free() to the
-end of this function.
-
->  	pci_release_regions(pdev);
->  	pci_disable_device(pdev);
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---3mf2wj25wf4cp2ss
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmiDfO8ACgkQDHRl3/mQ
-kZyY2Qf/d8YL1m9zzf0GR8VhMlgXqQMqKI6bgEetN/STYpbPYISZikAXLKH3PMhl
-+KPg4RXEm83uDB0jMEm9EW+wmKp523GQAI+nbFKxuNeRCX/XkopzSMr89DqltU0o
-vH1wV5ARkJW1DtiB4sAJdUWpPk2ry44gecZmujxs2fRM8yhU1HivumKUDauaMpu5
-jiQhjvjWet4hcKagRVHU4yt58PPXSc/gbkVKjEzFxHReVEO831SDPBvsUMVaOHMQ
-rSj7uv5Z6ZwAGDHhMAEWr5TtdGQLv/6+5ZFIZzd7ZqoCOk3MjLdvwUcbvgAnhZUa
-dv3ihtEUDQbMCqIKpnnrigGWuCx/iw==
-=veG8
------END PGP SIGNATURE-----
-
---3mf2wj25wf4cp2ss--
+Hangbin
+> 
+> > +
+> > +	for (port = agg->lag_ports; port;
+> > +	     port = port->next_port_in_aggregator) {
+> > +		if (port->is_enabled)
+> > +			prio += port->actor_port_priority;
+> > +	}
+> 
+> minor nit: {} are unnecessary
+> 
+> > +
+> > +	return prio;
+> > +}
+> > +
+> >  /**
+> >   * __get_agg_bandwidth - get the total bandwidth of an aggregator
+> >   * @aggregator: the aggregator we're looking at
+> > @@ -1695,6 +1709,9 @@ static struct aggregator *ad_agg_selection_test(struct aggregator *best,
+> >  	 * BOND_AD_COUNT: Select by count of ports.  If count is equal,
+> >  	 *     select by bandwidth.
+> >  	 *
+> > +	 * BOND_AD_PRIO: Select by total priority of ports. If priority
+> > +	 *     is equal, select by count.
+> > +	 *
+> >  	 * BOND_AD_STABLE, BOND_AD_BANDWIDTH: Select by bandwidth.
+> >  	 */
+> >  	if (!best)
+> > @@ -1713,6 +1730,14 @@ static struct aggregator *ad_agg_selection_test(struct aggregator *best,
+> >  		return best;
+> >  
+> >  	switch (__get_agg_selection_mode(curr->lag_ports)) {
+> > +	case BOND_AD_PRIO:
+> > +		if (__agg_ports_priority(curr) > __agg_ports_priority(best))
+> > +			return curr;
+> > +
+> > +		if (__agg_ports_priority(curr) < __agg_ports_priority(best))
+> > +			return best;
+> > +
+> > +		fallthrough;
+> >  	case BOND_AD_COUNT:
+> >  		if (__agg_active_ports(curr) > __agg_active_ports(best))
+> >  			return curr;
+> > @@ -1778,6 +1803,10 @@ static int agg_device_up(const struct aggregator *agg)
+> >   * (slaves), and reselect whenever a link state change takes place or the
+> >   * set of slaves in the bond changes.
+> >   *
+> > + * BOND_AD_PRIO: select the aggregator with highest total priority of ports
+> > + * (slaves), and reselect whenever a link state change takes place or the
+> > + * set of slaves in the bond changes.
+> > + *
+> >   * FIXME: this function MUST be called with the first agg in the bond, or
+> >   * __get_active_agg() won't work correctly. This function should be better
+> >   * called with the bond itself, and retrieve the first agg from it.
+> > diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
+> > index 2b8606b4e4f5..708ca1f18a00 100644
+> > --- a/drivers/net/bonding/bond_options.c
+> > +++ b/drivers/net/bonding/bond_options.c
+> > @@ -163,6 +163,7 @@ static const struct bond_opt_value bond_ad_select_tbl[] = {
+> >  	{ "stable",    BOND_AD_STABLE,    BOND_VALFLAG_DEFAULT},
+> >  	{ "bandwidth", BOND_AD_BANDWIDTH, 0},
+> >  	{ "count",     BOND_AD_COUNT,     0},
+> > +	{ "prio",      BOND_AD_PRIO,      0},
+> >  	{ NULL,        -1,                0},
+> >  };
+> >  
+> > diff --git a/include/net/bond_3ad.h b/include/net/bond_3ad.h
+> > index bf551ca70359..34495df965f0 100644
+> > --- a/include/net/bond_3ad.h
+> > +++ b/include/net/bond_3ad.h
+> > @@ -26,6 +26,7 @@ enum {
+> >  	BOND_AD_STABLE = 0,
+> >  	BOND_AD_BANDWIDTH = 1,
+> >  	BOND_AD_COUNT = 2,
+> > +	BOND_AD_PRIO = 3,
+> >  };
+> >  
+> >  /* rx machine states(43.4.11 in the 802.3ad standard) */
+> 
 
