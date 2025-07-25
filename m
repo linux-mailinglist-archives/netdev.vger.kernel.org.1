@@ -1,150 +1,90 @@
-Return-Path: <netdev+bounces-210242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A59D4B12796
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 01:42:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0955CB1279C
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 01:45:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59A083BC61F
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 23:42:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41DF5176A74
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 23:45:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082A125F7A7;
-	Fri, 25 Jul 2025 23:42:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9173B261591;
+	Fri, 25 Jul 2025 23:45:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="u22ODKMx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tmxiU7LU"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A84CF2522BE;
-	Fri, 25 Jul 2025 23:42:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6855825F994;
+	Fri, 25 Jul 2025 23:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753486965; cv=none; b=j15tTlRSMSSBd7fxKXYkxAtHckyOa7LyBevUB2x+a9USOydT49lkkhBOcJRxkzAa2eDLTYHJxzZtDmBIUkElmMYgSp8Hr/Ivs8cWjSm1IVOCVxvZPmZ/YYl4LutJS6eBzUxjuhQ04I18QtzoB/o3lvG1M4UGKy+z7JieL5MbEIo=
+	t=1753487106; cv=none; b=SDSR5UvTumiDJ4tubuovIxlZR7jgDb4V2N9GkjSU4m56rZyX/0xW1dN5aOJKkSaOrV7/eCLLFg9aS+7j2NSi0Uc/2fprS3nX4yYzKYwGGnCo32pC3aztyI/Byx9FRGEs3bA8OrhKrqplTV4mzSbmSi7fVxdZxk1pKKNrcUyTpzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753486965; c=relaxed/simple;
-	bh=KUe9FcrjMaejAdUmcnM2eRUMGnf9x+1Fz4c6VOO6z2Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C3BrxteQuynZFfbh/IXjogUti+pFR8wrONZNjCKERPuCNZTFfPyrfvdZxU01iVcuxwldXkz//BJFpkz7HgSueGGeKIr59GWUZ3wOpFT1cjIkRqybsDPcCyrnjB2oFTqVpCt5O27JOgy7yO+SNT68U3saE65L4MNjuX1KNnh7N58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=u22ODKMx; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <5d7d1ff3-14cd-4c18-a180-3c99e784bbeb@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753486961;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7mJSyB47Hf1VSmZxpedRPHsm4zGk7oqWFstVKJE02/c=;
-	b=u22ODKMxQaOkLMz1JJUOKh5tZGHKxkO3dqz9oSNy2GKcbFIdhoSPN8k4iJYhoR2RrzwCxp
-	sl+dT7OLEAQS9OVdBuoL298oCdTx/XV5HE7eekIDJFZerzYoIFEMdr/qvd0cY0rFbQu/Rn
-	o7y6VbUKL4RBhfSW7pNEQRIzd9BtFBA=
-Date: Fri, 25 Jul 2025 16:42:29 -0700
+	s=arc-20240116; t=1753487106; c=relaxed/simple;
+	bh=3rdziaczc0a/lJCeDUd7v4a7aJxVb4hsGLAW/6wcH5E=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RFzFF+wrGX7WVitjtI6fHNw4scgUYjnxz8SHFT268Mv1umCV7cRAuvOf6kcIMXpf1Fz4Y3Yl7fPMkB8IHe6ZyCytocVxZe7S5We543GFKVcLz3gxOwHk+BX2dT6gYtcJxzkCpNjje5qRqC4LHzOw7aYcvCilEh6QcgIwZR1XagI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tmxiU7LU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9947DC4CEE7;
+	Fri, 25 Jul 2025 23:45:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753487105;
+	bh=3rdziaczc0a/lJCeDUd7v4a7aJxVb4hsGLAW/6wcH5E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tmxiU7LUQNhMwDiUCxLyfnCgfL8dfSAilwn4J6+pThtI4f9Wrasr7O5nqKgDXVZi4
+	 DdBnz39RFV+HVf1pz9+gF6lhTyEljhuK7agSIATFrOQJbVzJTKzS8XISCYNlZcBapG
+	 gzpAlBNSBZJU2npK2e6gz7+gfoPTc7E3exvYEzp83qPIQlpT40LQ058LvV1+UTkTlB
+	 5jNpKm/bcHxSbU4aWQ63MhDo2bGSbc4vzbv1jInXbm04t0i98SpyHs+yAuNNw5JFl+
+	 T1vXVobyWtqnlRbDAaPe1QRCLRaZGRwKT7zadqP5JKDigYUKURekw0Gjb7EaJxO78b
+	 247t5qoBbpkaQ==
+Date: Fri, 25 Jul 2025 16:45:04 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+ fw@strlen.de, horms@kernel.org
+Subject: Re: [PATCH net-next 13/19] netfilter: nft_set: remove one argument
+ from lookup and update functions
+Message-ID: <20250725164504.2c68da9a@kernel.org>
+In-Reply-To: <20250725163729.268cb252@kernel.org>
+References: <20250725170340.21327-1-pablo@netfilter.org>
+	<20250725170340.21327-14-pablo@netfilter.org>
+	<20250725163729.268cb252@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v2 0/4] Use correct destructor kfunc types
-Content-Language: en-GB
-To: Sami Tolvanen <samitolvanen@google.com>, bpf@vger.kernel.org
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250725214401.1475224-6-samitolvanen@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <20250725214401.1475224-6-samitolvanen@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
+On Fri, 25 Jul 2025 16:37:29 -0700 Jakub Kicinski wrote:
+> On Fri, 25 Jul 2025 19:03:34 +0200 Pablo Neira Ayuso wrote:
+> > diff --git a/net/netfilter/nft_set_pipapo.c b/net/netfilter/nft_set_pipapo.c
+> > index 08fb6720673f..36a4de11995b 100644
+> > --- a/net/netfilter/nft_set_pipapo.c
+> > +++ b/net/netfilter/nft_set_pipapo.c
+> > @@ -407,8 +407,9 @@ int pipapo_refill(unsigned long *map, unsigned int len, unsigned int rules,
+> >   *
+> >   * Return: true on match, false otherwise.
+> >   */
+> > -bool nft_pipapo_lookup(const struct net *net, const struct nft_set *set,
+> > -		       const u32 *key, const struct nft_set_ext **ext)
+> > +const struct nft_set_ext *
+> > +nft_pipapo_lookup(const struct net *net, const struct nft_set *set,
+> > +		  const u32 *key)  
+> 
+> Warning: ../net/netfilter/nft_set_pipapo_avx2.c:1151 Excess function parameter 'ext' description in 'nft_pipapo_avx2_lookup'
+> Warning: ../net/netfilter/nft_set_pipapo.c:412 Excess function parameter 'ext' description in 'nft_pipapo_lookup'
+> 
+> Hopefully this doesn't bubble up to htmldocs.
+> Please follow up with the fix.
 
-
-On 7/25/25 2:44 PM, Sami Tolvanen wrote:
-> Hi folks,
->
-> While running BPF self-tests with CONFIG_CFI_CLANG (Clang Control
-> Flow Integrity) enabled, I ran into a couple of CFI failures
-> in bpf_obj_free_fields() caused by type mismatches between
-> the btf_dtor_kfunc_t function pointer type and the registered
-> destructor functions.
->
-> It looks like we can't change the argument type for these
-> functions to match btf_dtor_kfunc_t because the verifier doesn't
-> like void pointer arguments for functions used in BPF programs,
-> so this series fixes the issue by adding stubs with correct types
-> to use as destructors for each instance of this I found in the
-> kernel tree.
->
-> The last patch changes btf_check_dtor_kfuncs() to enforce the
-> function type when CFI is enabled, so we don't end up registering
-> destructors that panic the kernel. Perhaps this is something we
-> could enforce even without CONFIG_CFI_CLANG?
->
-> Sami
->
-> ---
-> v2:
-> - Annotated the stubs with CFI_NOSEAL to fix issues with IBT
->    sealing on x86.
-> - Changed __bpf_kfunc to explicit __used __retain.
->
-> v1: https://lore.kernel.org/bpf/20250724223225.1481960-6-samitolvanen@google.com/
->
-> ---
-> Sami Tolvanen (4):
->    bpf: crypto: Use the correct destructor kfunc type
->    bpf: net_sched: Use the correct destructor kfunc type
->    selftests/bpf: Use the correct destructor kfunc type
->    bpf, btf: Enforce destructor kfunc type with CFI
->
->   kernel/bpf/btf.c                                     | 7 +++++++
->   kernel/bpf/crypto.c                                  | 9 ++++++++-
->   net/sched/bpf_qdisc.c                                | 9 ++++++++-
->   tools/testing/selftests/bpf/test_kmods/bpf_testmod.c | 9 ++++++++-
->   4 files changed, 31 insertions(+), 3 deletions(-)
->
->
-> base-commit: 95993dc3039e29dabb9a50d074145d4cb757b08b
-
-With this patch set and no CONFIG_CFI_CLANG in .config,
-the bpf selftests work okay. In bpf ci, CONFIG_CFI_CLANG
-is not enabled.
-
-But if enabling CONFIG_CFI_CLANG, this patch set fixed
-./test_progs run issue, but there are some test failures
-like
-
-===
-test_get_linfo:FAIL:check jited_linfo[1]:ffffffffa000d581 - ffffffffa000d558 > 39
-processed 4 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
-#32/186  btf/line_info (No subprog):FAIL
-
-test_get_linfo:FAIL:check jited_linfo[1]:ffffffffa000dee5 - ffffffffa000debc > 39
-processed 4 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
-#32/189  btf/line_info (No subprog. zero tailing line_info:FAIL
-
-...
-
-test_get_linfo:FAIL:check jited_linfo[1]:ffffffffa000e069 - ffffffffa000e040 > 38
-processed 9 insns (limit 1000000) max_states_per_insn 0 total_states 1 peak_states 1 mark_read 0
-#32/202  btf/line_info (dead subprog + dead start w/ move):FAIL
-#32      btf:FAIL
-===
-
-The failure probably not related to this patch, but rather related
-to CONFIG_CFI_CLANG itself. I will debug this separately.
-
+Ah, I take that back, looks like the next two commits fix these.
+Bad squash perhaps..
 
