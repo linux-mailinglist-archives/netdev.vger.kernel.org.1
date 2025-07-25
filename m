@@ -1,153 +1,130 @@
-Return-Path: <netdev+bounces-210076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C02E1B12143
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 17:47:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9C12B1214A
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 17:49:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 351D27A671E
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 15:46:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4430F7A453C
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 15:48:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 956792EAD06;
-	Fri, 25 Jul 2025 15:47:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63E0F2EE604;
+	Fri, 25 Jul 2025 15:49:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F+gsQ7ei"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="p3bhAtN9";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="d8ZFYSFq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0278B2BB17
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 15:47:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0EEF2BB17;
+	Fri, 25 Jul 2025 15:49:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753458470; cv=none; b=MsgiFHJo+GKSsZJzAGhTIGoUFdx24phKDVhQUsDM7h8uRm5s2orfG07bL28uGWfmfIW+GhVt42F3KtgZh/Z/n8In4+P/aCX2IEI2oFvdmIy34O4Kv91ggFdSnUnpb3LXODzOz2OBTsWP+RAiZeQ3iJa2CdE4kV0sOUpXj9fuos0=
+	t=1753458568; cv=none; b=c3+BS2ETnDf5fJjFQ7bzvxnz0ksqIBIACaCyXJsA+Y12SaO3zHoXtMM0Gwlt4KvjUzhEO1xCREVltveqP8WsetAmcUOgsGxeoE0vzj3Th0tw8D17DAvC75Hd7lRduD0N3YaJMgaMTvz63H8Qnac+eYZdK57le7opKs4/C6rEaRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753458470; c=relaxed/simple;
-	bh=t0RQZYqOnC8qwtn6qPNBO3T1TznaSsM5oAbGsa8BZIg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aZvuaICr1+Pj/q9SA9cP9bDEbhZA/SK1Ae002Mzb8XcpobICssq+m6fxJvD6zQ4FJzI+votkuHLEg/X3EEtXrr7jRSwhn3ZHuZ6AZ0g3T1N5r2ot6eJ38XPhre8xRxObrxmJV+Bzc5rH7Z6WAbOtxXZ4yCFD8dCRj1pxm1XDr4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=F+gsQ7ei; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4ab53fce526so29730601cf.2
-        for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 08:47:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753458468; x=1754063268; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R+Gxk8kDLeWhUfZa20iC5ukdIQPazYFON7keNdL4TSs=;
-        b=F+gsQ7eitsoBzB8dI4StcNsOhbf87xfVdFF+7Kn/6SPBQCf+/lwRv0bdm80g3ifDYw
-         yI2Ibhv/rQ+/MQ2ltivclkz8+fi+zi5vv9Onf/zwnXkkwPVuCMnz+CbB/wMF4+1c609f
-         jZnJaTzHFsgrTJGmRBd02KnsvL3ygT+1pW/eN6ZPJ+hN36lQHhRe1tP08duJ97JoaeWs
-         4UeI38G2wkxNxHmueYW0iUVgytsg5/gMpyHxyL4OZxX9VLCpejjCf1kngiBf2E28f03f
-         d6tOkq5iWSSDie/XtYb+SZrEDTrbji9iKqrqECT4XB8+D18oKojghBKldgk9U/cY8S/+
-         YgiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753458468; x=1754063268;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=R+Gxk8kDLeWhUfZa20iC5ukdIQPazYFON7keNdL4TSs=;
-        b=G3rEnNfcqr2vhA9t4U++tOx2xfCR5O8Zw9FQXJxvLi0bpPeQysDAGYZPzzZdCKYdU2
-         9GA9394vwfhRLGk+5MPS+vAFpoWykroPlVcgWx84lk9YzPfWznYVuojwYb34c2A/7HDM
-         tRZWyjC7NW84tllx9ju6dV7o5czspdi5835wkJWhBPKNn+rgxEs2YVoKeldIY1opbKTy
-         e9ynETMtYlIg60yKXy94GvS85B81N1FfSDz2153gteoXJ4QUSsyQ0kaNBkXD4fJ/0s4K
-         xCndaWV9uh8CkSJqE73jaZD8u/tvS9iTZbhzhaEucK88Os+QT3LH5IIirgzTS93izil6
-         TEFw==
-X-Forwarded-Encrypted: i=1; AJvYcCWS0bbqhe/HuzjLs6h3/XCA8N6shSYcpEpPcp6AI3tUr5J9aQrC3iyhVjRIanAth8PR5umoSew=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCOPjZAQi7J3kUXC/MXA17ht3bz3Z9YxrJ15XaIXpiZXyAnNCw
-	A3HPVOa5y0dS0eDop3vhxTHeit/ClknRf8a8wFgXF2BEa0TzLNWsy8SbpmM6eKB0wdQV6ZEdua1
-	8lykgmjHx4KsBWv8idR3ZvyD07kd02ziD+Iw8Lc/7
-X-Gm-Gg: ASbGnctXZcdt0mny+ppsd/TTPLgdh/quRqS7AA5a/yIaoIacDbDHwvlxjJkaMniLxue
-	9hf+IJQV86t5Ti07UnVasbx3m8Qdo2BMnpzUgCITtaYQJXL4l4PqiLOc2XapQCTqGctqkomBEg2
-	Ty8cRHnqIBQ9/BaI+lk8YEbDr6N+lMUMqg4vWPuDX5XzX0EBW6yWdRWu+BMeUDmtlLHB3DjlSp+
-	TNbFTM=
-X-Google-Smtp-Source: AGHT+IEzZaHMReJ5XNFbGAgHeYF3Xnnap7wt6MhmmuxMPMOXDXp7wr/rsmslpn79gUJF3ssMvXLdqQrveoBAxpR2CLs=
-X-Received: by 2002:a05:622a:146:b0:4ab:ac54:e3eb with SMTP id
- d75a77b69052e-4ae8f1c9a85mr24811891cf.54.1753458467542; Fri, 25 Jul 2025
- 08:47:47 -0700 (PDT)
+	s=arc-20240116; t=1753458568; c=relaxed/simple;
+	bh=WIbcDd2hBVWPw5liwDAnKhJorrg6SMWEsW4UWntHIjc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EtH4aP11mKJeUDL5T1fOWzwLWt45dwYfehvvOBNyg9sCZiCvyWJhSfLnMj5PfY4FLWwOia9jckGUyZuzw6FqZ9JONVK5yzIKGGxnN79GQLusbI2YNl8rn8q1sXD4T1KVxk1pPn5UFcVkWSlX647q3ZNinjP1sKdWi/oogQFCoqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=p3bhAtN9; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=d8ZFYSFq; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id B4E0A60264; Fri, 25 Jul 2025 17:49:23 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1753458563;
+	bh=hkOlR1Au5kRDU/srz9QZOpj+qDOVeKRe1xam/M4NP7Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=p3bhAtN9DUX5KKUkRWHkWtPSC27WfJVZ/Oeb1lpTK0mo/qRxU1fBv04Ekd2znf0Ds
+	 b+5QOfJl1Z72CL8j8ZgFtZNcdCD7WbMu5OnlgPeTKSB5uUW3T/5WVbK/O+5GyU/Bg8
+	 LOwRBHGIiV9yMkXB+g9/FUm++xBcCnMyceSsYlxE41MZhRxXM//FVOTmQO5URrfCtF
+	 wetz7PLj8nCPZLuSWzSRTmAy2UlUepmIdl1jJ0ZYiUiFApzunfRb8ZTGnriIbjG8hc
+	 yOwito7Tw/xVJAdKDRKveovUjuoCMKXOcrb0ugRYpvLRYwCaxmaTYhlnK9Nd06roSd
+	 HtUYZ44R+hwuQ==
+X-Spam-Level: 
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id C8936600B5;
+	Fri, 25 Jul 2025 17:49:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1753458561;
+	bh=hkOlR1Au5kRDU/srz9QZOpj+qDOVeKRe1xam/M4NP7Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=d8ZFYSFq7eEgDxamrmyFRPNOZP4BsSxxqck3uaceJW1oA9Apk9Du1uTCjyAL80fNc
+	 jizgkT2UzqkZlz00wcl76MyHbPXPQQN4wfCCx5JeZAI0rq1o2GTIt4EgRr8Sy9idMS
+	 fm/lerRSgVFNy8A0jZwcpgAJOjmmhnoD+PVZyTADfgn8lxAk3GnkeFYKCmilPZjDwp
+	 rqPcNky5PXOkwLa3VPt9FU4POIqBXX0UXlr2cvOp6ZGB88XUHRAGBTxEUBrJqjMv15
+	 2umcShPHdzpqBCJvG7swfUSBPj/jkJR6EK8+xNdTqcGcpMdbws0aOWi5c2RjX6ttsJ
+	 cIrwzuy8uNdeQ==
+Date: Fri, 25 Jul 2025 17:49:17 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: syzbot <syzbot+a225fea35d7baf8dbdc3@syzkaller.appspotmail.com>
+Cc: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com,
+	horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [netfilter?] WARNING in nft_socket_init (2)
+Message-ID: <aIOnfc06qpphQqZs@calendula>
+References: <68837ca6.a00a0220.2f88df.0053.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250725133311.143814-2-fourier.thomas@gmail.com>
- <CANn89iJW+4xLsTGU6LU4Y=amciL5Kni=wS1uTKy-wC8pCwNDGQ@mail.gmail.com> <20250725081045.34ac4130@kernel.org>
-In-Reply-To: <20250725081045.34ac4130@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 25 Jul 2025 08:47:34 -0700
-X-Gm-Features: Ac12FXynX-SjHxFw157YJI9K51vdJtrSbnIWsfJzDnXOtRCfRbQ7IxrMqCpAIvo
-Message-ID: <CANn89iKhVL0uQz9eTi6y3iDtQqRvCVt8T7MndxfMGKf7sPLvhw@mail.gmail.com>
-Subject: Re: [PATCH net] net: ethernet: nixge: Add missing check after DMA map
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Thomas Fourier <fourier.thomas@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@baylibre.com>, 
-	Moritz Fischer <mdf@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/mixed; boundary="kX7Dfd+oWmQp+3k+"
+Content-Disposition: inline
+In-Reply-To: <68837ca6.a00a0220.2f88df.0053.GAE@google.com>
 
-On Fri, Jul 25, 2025 at 8:10=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Fri, 25 Jul 2025 06:53:16 -0700 Eric Dumazet wrote:
-> > Not sure if this driver is actively used...
->
-> Like most of the drivers that are missing dma_mappnig_error() :(
 
-Well, a failure in __netdev_alloc_skb_ip_align() is more probable.
+--kX7Dfd+oWmQp+3k+
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 
-Maybe the following would help (and fix
-ndev->stats.rx_packets/ndev->stats.rx_bytes) as well.
+On Fri, Jul 25, 2025 at 05:46:30AM -0700, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    94619ea2d933 Merge tag 'ipsec-next-2025-07-23' of git://gi..
+> git tree:       net-next
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=14bf10a2580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=ceda48240b85ec34
+> dashboard link: https://syzkaller.appspot.com/bug?extid=a225fea35d7baf8dbdc3
+> compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12bf10a2580000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13d27fd4580000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/afd64d9816ee/disk-94619ea2.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/e1755ce1f83b/vmlinux-94619ea2.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/2061dff2fbf4/bzImage-94619ea2.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+a225fea35d7baf8dbdc3@syzkaller.appspotmail.com
 
-diff --git a/drivers/net/ethernet/ni/nixge.c b/drivers/net/ethernet/ni/nixg=
-e.c
-index 230d5ff99dd7e1e9fabe21a6617d72d663cc1a7c..835463c301e11dca9f824137e75=
-dd0eacf130419
-100644
---- a/drivers/net/ethernet/ni/nixge.c
-+++ b/drivers/net/ethernet/ni/nixge.c
-@@ -606,9 +606,6 @@ static int nixge_recv(struct net_device *ndev, int budg=
-et)
+Attached patch should fix this.
 
-        while ((cur_p->status & XAXIDMA_BD_STS_COMPLETE_MASK &&
-                budget > packets)) {
--               tail_p =3D priv->rx_bd_p + sizeof(*priv->rx_bd_v) *
--                        priv->rx_bd_ci;
--
-                skb =3D (struct sk_buff *)(uintptr_t)
-                        nixge_hw_dma_bd_get_addr(cur_p, sw_id_offset);
+--kX7Dfd+oWmQp+3k+
+Content-Type: text/x-diff; charset=utf-8
+Content-Disposition: attachment; filename="fix.patch"
 
-@@ -639,7 +636,7 @@ static int nixge_recv(struct net_device *ndev, int budg=
-et)
-                new_skb =3D netdev_alloc_skb_ip_align(ndev,
-                                                    NIXGE_MAX_JUMBO_FRAME_S=
-IZE);
-                if (!new_skb)
--                       return packets;
-+                       goto end;
+diff --git a/net/netfilter/nft_socket.c b/net/netfilter/nft_socket.c
+index 35d0409b0095..36affbb697c2 100644
+--- a/net/netfilter/nft_socket.c
++++ b/net/netfilter/nft_socket.c
+@@ -217,7 +217,7 @@ static int nft_socket_init(const struct nft_ctx *ctx,
+ 
+ 		level += err;
+ 		/* Implies a giant cgroup tree */
+-		if (WARN_ON_ONCE(level > 255))
++		if (level > 255)
+ 			return -EOPNOTSUPP;
+ 
+ 		priv->level = level;
 
-                cur_phys =3D dma_map_single(ndev->dev.parent, new_skb->data=
-,
-                                          NIXGE_MAX_JUMBO_FRAME_SIZE,
-@@ -653,11 +650,15 @@ static int nixge_recv(struct net_device *ndev, int bu=
-dget)
-                cur_p->status =3D 0;
-                nixge_hw_dma_bd_set_offset(cur_p, (uintptr_t)new_skb);
-
-+               tail_p =3D priv->rx_bd_p + sizeof(*priv->rx_bd_v) *
-+                        priv->rx_bd_ci;
-+
-                ++priv->rx_bd_ci;
-                priv->rx_bd_ci %=3D RX_BD_NUM;
-                cur_p =3D &priv->rx_bd_v[priv->rx_bd_ci];
-        }
-
-+end:
-        ndev->stats.rx_packets +=3D packets;
-        ndev->stats.rx_bytes +=3D size;
+--kX7Dfd+oWmQp+3k+--
 
