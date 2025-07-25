@@ -1,150 +1,139 @@
-Return-Path: <netdev+bounces-209952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD3A7B11735
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 05:44:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A97CBB11739
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 05:50:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9A24161654
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 03:43:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC73C1C288D7
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 03:51:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 239A823C50A;
-	Fri, 25 Jul 2025 03:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D880239E7E;
+	Fri, 25 Jul 2025 03:50:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="J8RG4pGI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SAxUErDJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BEFC23C4F2
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 03:43:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B14A230BD2
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 03:50:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753414999; cv=none; b=hPVopB9dn0J6iTbhYpHd8BdP5pte91cFv/vOMnZq2uagDJM3O/dv2MJ+c6MUtI7aPICzUUMMFeqR2IgeT9aVe4BxljdFX7bsGHxk7KRbljWQOqFh5oVj0svPFGtXc3nya3oxxPNVU30CfTBFZTGyroqIMZwq4Xv70dnXnFjhxCo=
+	t=1753415447; cv=none; b=IQGjSga18D0nmKfigFulzjRr2kkMswBb8mcGCl3ozfucSCNonBBH+HYAfIM3u9/4MJJjkOh7ksaSUT2TUKYIZENii8MqgMnZC7o9bIS2InoKr5YkU+TSrdcMNg4e0YTU6CVRBN9kR8oUp0TzPTvnuXV0H9w6KUGKZknNdE8P1Xs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753414999; c=relaxed/simple;
-	bh=zstK35mmA9juoQw20Ov3Iw9XX0+6+2G+gDYye4Qp314=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=dqMYIwNZ1SZ62j+ozl/UQavy+dZwYJJkWJB6DDCXhIMnqteDDdhGEPYcs85/QxS1D81oZWFb9Fy/4WpNp01p8x3acnzAZLOV/Oa16fjKO3Qxm44ZdSGPK+vMTvka24XnUtJ6Jk+ze0rxop04rBZHW2tZrB6z2nIQM6ryuomCNv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=J8RG4pGI; arc=none smtp.client-ip=115.124.30.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1753414994; h=Message-ID:Subject:Date:From:To;
-	bh=vinw7/i39C0MpkA7/FoBU8SqU/KCgQ8tkJq9RXxClNI=;
-	b=J8RG4pGIz2q1IIbsm0jT+tXUvdfkulkO1En+nF9WMkAuCsoRN2WqLfmmlolvnVqSbK/7pDe6Uj5LBhOpqFQuZWgmUwhusp7t1FM4bN8FWWOvth0urNeWQckZNvazsf1YkfAmRmwtXW5od17R+t3IAxkLowgAcE5FnAkp8Dc3tdE=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WjvFl1o_1753414993 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 25 Jul 2025 11:43:13 +0800
-Message-ID: <1753414751.8289475-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v1] eea: Add basic driver framework for Alibaba Elastic Ethernet Adaptor
-Date: Fri, 25 Jul 2025 11:39:11 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Wen Gu <guwen@linux.alibaba.com>,
- Philo Lu <lulie@linux.alibaba.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Lukas Bulwahn <lukas.bulwahn@redhat.com>,
- Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Dust Li <dust.li@linux.alibaba.com>
-References: <20250724110645.88734-1-xuanzhuo@linux.alibaba.com>
- <20250724164418.GB1266901@horms.kernel.org>
-In-Reply-To: <20250724164418.GB1266901@horms.kernel.org>
+	s=arc-20240116; t=1753415447; c=relaxed/simple;
+	bh=fCJxRZ/FM2eScA1Yqd4ouGWZ0gc+qVaV9V8SgiiE5SY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=agY4EHSB9Lh8awt57czNXhDa+0x0FRpRgpL8AdXOSCiW/bwi+ETmm+l5PvimjyybUjBzSMJrOhmd60ieHHIsnm78KY4VTsKpSHWDYnn/AzQgmz4sCzj+fKsP6vp8a251kiikyCzmtQ0B1UbJK4tGX446RzVtfkjflvDTnt6jArA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SAxUErDJ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753415444;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=CDqOduZNxWnbZSoqqq7n2RgVln6pLZG+oZF2xiPbDm4=;
+	b=SAxUErDJWyILfCI8nyigBAECRgB/MRhslc3OdC88CsvpiwGoHjsZ30HpTMtS3kvV/LiBYB
+	cS6AS25UaTd9g+By9t9KbdV3Kx1KqM3ODUGr5o82KBBuEh0olCX2RnuIKJcKmW2GOIJGpF
+	8iaNticAa6/TyrUdVTp5fjRwbGWZExA=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-52-44yUy-CnNj-BSbuackteyg-1; Thu,
+ 24 Jul 2025 23:50:40 -0400
+X-MC-Unique: 44yUy-CnNj-BSbuackteyg-1
+X-Mimecast-MFC-AGG-ID: 44yUy-CnNj-BSbuackteyg_1753415438
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 637E51956087;
+	Fri, 25 Jul 2025 03:50:38 +0000 (UTC)
+Received: from xmu-thinkpadx1carbon3rd.raycom.csb (unknown [10.72.120.26])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D965D195608D;
+	Fri, 25 Jul 2025 03:50:31 +0000 (UTC)
+From: Xiumei Mu <xmu@redhat.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>
+Cc: Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Long Xin <lxin@redhat.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Shannon Nelson <sln@onemain.com>,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCH net v2] selftests: rtnetlink.sh: remove esp4_offload after test
+Date: Fri, 25 Jul 2025 11:50:28 +0800
+Message-ID: <6d3a1d777c4de4eb0ca94ced9e77be8d48c5b12f.1753415428.git.xmu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Thu, 24 Jul 2025 17:44:18 +0100, Simon Horman <horms@kernel.org> wrote:
-> On Thu, Jul 24, 2025 at 07:06:45PM +0800, Xuan Zhuo wrote:
-> > Add a driver framework for EEA that will be available in the future.
->
-> This is a 40k LoC patch.
-> It would be nice to add a bit more information about
-> what it includes.
->
-> >
-> > Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-> > Reviewed-by: Philo Lu <lulie@linux.alibaba.com>
-> > Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
->
-> ...
->
-> >  19 files changed, 4067 insertions(+)
->
-> ...
->
-> > diff --git a/drivers/net/ethernet/alibaba/eea/eea_adminq.c b/drivers/net/ethernet/alibaba/eea/eea_adminq.c
->
-> > +int eea_adminq_config_host_info(struct eea_net *enet)
-> > +{
-> > +	struct device *dev = enet->edev->dma_dev;
-> > +	struct eea_aq_host_info_cfg *cfg;
-> > +	struct eea_aq_host_info_rep *rep;
-> > +	int rc = -ENOMEM;
-> > +
-> > +	cfg = kzalloc(sizeof(*cfg), GFP_KERNEL);
-> > +	if (!cfg)
-> > +		return rc;
-> > +
-> > +	rep = kzalloc(sizeof(*rep), GFP_KERNEL);
-> > +	if (!rep)
-> > +		goto free_cfg;
-> > +
-> > +	cfg->os_type = EEA_OS_LINUX;
->
-> The type of the lvalue above is a little endian integer.
-> While the type of the rvalue is a host byte order integer.
-> I would address this as follows:
->
-> 	cfg->os_type = cpu_to_le16(EEA_OS_LINUX);
->
-> Likewise for other members of cfg set in this function,
-> noting that pci_domain is a 32bit entity.
->
-> Flagged by Sparse.
->
-> There are a number of other (minor) problems flagged by Sparse
-> in this patch. Please address them and make sure patches
-> are Sparse-clean.
+The esp4_offload module, loaded during IPsec offload tests, should
+be reset to its default settings after testing.
+Otherwise, leaving it enabled could unintentionally affect subsequence
+test cases by keeping offload active.
 
-I did the check by make C=1, but I found that my sparse is old ^_^.
-I updated the sparse, and cleared all the reports.
+Without this fix:
+$ lsmod | grep offload; ./rtnetlink.sh -t kci_test_ipsec_offload ; lsmod | grep offload;
+PASS: ipsec_offload
+esp4_offload           12288  0
+esp4                   32768  1 esp4_offload
 
-...
+With this fix:
+$ lsmod | grep offload; ./rtnetlink.sh -t kci_test_ipsec_offload ; lsmod | grep offload;
+PASS: ipsec_offload
 
->
-> > diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.c b/drivers/net/ethernet/alibaba/eea/eea_net.c
->
-> ...
->
-> > +void *ering_cq_get_desc(const struct ering *ering)
-> > +{
-> > +	u8 phase;
-> > +	u8 *desc;
-> > +
-> > +	desc = ering->cq.desc + (ering->cq.head << ering->cq.desc_size_shift);
-> > +
-> > +	phase = *(u8 *)(desc + ering->cq.desc_size - 1);
-> > +
-> > +	if ((phase & ERING_DESC_F_CQ_PHASE)  == ering->cq.phase) {
->
-> nit: unnecessary inner-parentheses
+Fixes: 2766a11161cc ("selftests: rtnetlink: add ipsec offload API test")
+Signed-off-by: Xiumei Mu <xmu@redhat.com>
+Reviewed-by: Shannon Nelson <sln@onemain.com>
+---
+Changes in v2:
+- add test results in description
+- Enhanced logic for rmmod esp4_offload
+- fix shellcheck warning: SC2086 (The quoting issue)
+---
+---
+ tools/testing/selftests/net/rtnetlink.sh | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-I think we should keep it.
-
-Thanks.
+diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
+index 2e8243a65b50..d2298da320a6 100755
+--- a/tools/testing/selftests/net/rtnetlink.sh
++++ b/tools/testing/selftests/net/rtnetlink.sh
+@@ -673,6 +673,11 @@ kci_test_ipsec_offload()
+ 	sysfsf=$sysfsd/ipsec
+ 	sysfsnet=/sys/bus/netdevsim/devices/netdevsim0/net/
+ 	probed=false
++	esp4_offload_probed_default=false
++
++	if lsmod | grep -q esp4_offload; then
++		esp4_offload_probed_default=true
++	fi
+ 
+ 	if ! mount | grep -q debugfs; then
+ 		mount -t debugfs none /sys/kernel/debug/ &> /dev/null
+@@ -766,6 +771,7 @@ EOF
+ 	fi
+ 
+ 	# clean up any leftovers
++	! "$esp4_offload_probed_default" && lsmod | grep -q esp4_offload && rmmod esp4_offload
+ 	echo 0 > /sys/bus/netdevsim/del_device
+ 	$probed && rmmod netdevsim
+ 
+-- 
+2.50.1
 
 
