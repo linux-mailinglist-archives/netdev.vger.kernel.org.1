@@ -1,339 +1,118 @@
-Return-Path: <netdev+bounces-209974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18EBAB11A39
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 10:49:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E730B11A42
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 10:52:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43A021668D3
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 08:49:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39BBC3ACCEA
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 08:51:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807772046A9;
-	Fri, 25 Jul 2025 08:49:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="IfN/1RrF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D15C7231C9F;
+	Fri, 25 Jul 2025 08:51:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F2631F03D5
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 08:49:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 352D72046A9
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 08:51:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753433346; cv=none; b=LurojmghE2dMpCqPtqeWJvmsC/SLwNiH+be58bS8+2ZgTUBQ2zmdgUk+HjrMHzaX4TcxrXLlU5uE9nByO4M6Uflz7331RCuPL0OXIZ2qQ54JWZHp8thFuDhNG3CApov418eBWY19Vi6g4TGyBlz1lrTAoufH4LHZoY5MEFiHZiw=
+	t=1753433515; cv=none; b=jNJvp6HuYSNwPZZ2q/pQf+CJfpPpbv/9NMyE4ol17bOTq9XBKx/h0KqXy8AnsjEUdYzLSJRQ47qkHGNjrHsxA+07VHjtJLSmfrizPp2NPcGXGY0BenMU4z3gOIL1qRM+qz5yLBzVlbymF10q2UJV93NIQyrktneV5qT4GXtCOdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753433346; c=relaxed/simple;
-	bh=mLb2N9Sk52gxfDFaR98oVbkimyev4kEyhPLHisBUWOk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hcjg4QbEF3eMfCI489lK1jITDzYOdBKOKrg0FPoXa8ytjv3pfs0NWfYI7GkKPpIeuk8yi69Uuxo5z6/z/NoJmC5yKnnpj0h3UmkrvvPFcfQEZ1mb9Sf1PQA84uEqVGlsz5OsqAosjQaQ3dfmnPocddV0ZQpN2/KARUQoCbDCXdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=IfN/1RrF; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-60c01b983b6so4176448a12.0
-        for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 01:49:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1753433343; x=1754038143; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wbgBxVqvuAaSCTHnKyGAvWS3c7FK3JV6irIi80dt/AA=;
-        b=IfN/1RrFygL+ZxwARMQ11mpRaZn4LauNY1cGiOE5F55rnCEbD3nsumjGn3dWlocqXO
-         9qmco4aZkXo0tcAqEKNc5ClmKQbLBNRMJXNy7MFwB9v1U+84WCz94nGqaln5Rs+OPnEv
-         nMySxJomILi2wJ92QbSwEja4a0LHsT+USdTa9EqGgn0TBxLvS9uRZD4IMVA8dFVnc0Wn
-         y+0Gho9j986qI5NuTNYeIXKihMbLurHQPodqF+fjOy/CcYXjyD46S0DRJJjV9DNpdBIR
-         gxe9lf496P2+ygJi+AOL3yLWyXwIs/DML8DyDXarWhv4NOXvpNPyZNNToTbXI6tfAkDz
-         5G4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753433343; x=1754038143;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wbgBxVqvuAaSCTHnKyGAvWS3c7FK3JV6irIi80dt/AA=;
-        b=Iuw5GdiLKmw4a1mCZTbylGClUrmpAj1/+q+rDq/Vlv7htyPN61QhC07xuc4sEauA41
-         XJSCvTqW2LMe8zAQiPNJNhbiFNHSvt1D1qklCat5ur4dMG1XkzFrEKzbJztFFKaQBNNc
-         dg+YsnprRVaqUzuz+qpqg4CYUk+w7NtlGST4s9H8I8rVMmRpnBbQj/DJxPLJMY6AuGbC
-         HeokiEFFpy0gZMifz1794d1bigtbkLEKocSH5VGb+EsKVJpLejJOQKvEM6dtIBHyZKQJ
-         Gdc0KEoubki1wV7ur2R7xANuF/r0v1nCHftfCpmriN2Zw0oWbOMPORWrtSgFzKXJjzx2
-         7Nsg==
-X-Forwarded-Encrypted: i=1; AJvYcCUleZ1nKKCAanY8OXnyWWiAFyCcAzIjwD8288RjZe9pXEmjqInGgedewj54AkMQJcX6vhV6C9w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOWGLiifQ9N/FgxLqapJKS9fccqPMFr+2mT9DcubTNexW+hwxI
-	HtDrU4NEm518sBBPeI0vPXKh59ciVmMZr01iilJoHE2Nr8uF0eEM0p3wcukf/AAMY5I=
-X-Gm-Gg: ASbGncvizD1KhK51ZrtbAwWm4TsK8XfNdHQxAMnStP5K15YNpyGWygAw8X5Y+TuKXfD
-	tQrJD9VnL6Xgd2XUJw7x2CcEKujfIVQNFfDGOYysLqdv/TebZjrWpjPJdVTpaIPpY0SN1T6lP4Q
-	lwX+ohThDeE094870cFBTwGt+XMqgsRYSFQokJEA9pMFXznPAvvLLDj3DCehDHed/9OMUCRUcnL
-	N/9DrjDY9anwz4WmAeMlMRB9ojiAwTIJ07GEaoVNJuExE5XLb6eRbEXTCP3/XTEz4LHvJOTacuZ
-	jVpGJjwnlOBfAvAXVQ7PPTTAiUzbRvV2EPnwQB9T2Sng9bx+WDOcndJqsmelSN6WfuGprU8csM7
-	zFtHtiIPv7FW8ihY0o+f343p1dnwdq0+K41FI8RABeXysLoGcIoFE1Ipu2MaHFITf
-X-Google-Smtp-Source: AGHT+IGp/h33UX4VuxGPj+pY0fYttSnIKhYoSPyGHW4EMhc9+8Q1n1iPPrKA8O8mMIX/IrOuoIiu3w==
-X-Received: by 2002:a05:6402:50cb:b0:607:2e08:f3e6 with SMTP id 4fb4d7f45d1cf-614f05f6207mr1099160a12.17.1753433342161;
-        Fri, 25 Jul 2025 01:49:02 -0700 (PDT)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-614cd336253sm1883539a12.65.2025.07.25.01.49.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Jul 2025 01:49:01 -0700 (PDT)
-Message-ID: <367f9bbb-537b-4828-b8c8-cfc9d8ca8c2c@blackwall.org>
-Date: Fri, 25 Jul 2025 11:49:00 +0300
+	s=arc-20240116; t=1753433515; c=relaxed/simple;
+	bh=krHuaO35W9bhEGRE8djxxabvNCe4+fTRyBw9hZJ/P3A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ixlt8vz9ysjJZ85l/TPkgC5mo2FSQCH/WPFIMieyLMVahucF3xA7KzZCKOPd7hmXrcYtt5Eaa7egl9Wn7z1HwI4bSqzY/RuRkuXfH3NoEFCNZtSSAk46ykQ0BDEmaD6JyIxEo16zchv+qhq93exHyFA3YIoO5ZLUl7ozWQZV+7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1ufE9d-0003lE-Cr; Fri, 25 Jul 2025 10:51:49 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1ufE9c-00ABrD-37;
+	Fri, 25 Jul 2025 10:51:48 +0200
+Received: from pengutronix.de (p5b1645f7.dip0.t-ipconnect.de [91.22.69.247])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 989144492F3;
+	Fri, 25 Jul 2025 08:51:48 +0000 (UTC)
+Date: Fri, 25 Jul 2025 10:51:47 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Jimmy Assarsson <extja@kvaser.com>
+Cc: linux-can@vger.kernel.org, Jimmy Assarsson <jimmyassarsson@gmail.com>, 
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 00/10] can: kvaser_pciefd: Simplify identification of
+ physical CAN interfaces
+Message-ID: <20250725-furry-precise-jerboa-d9e29d-mkl@pengutronix.de>
+References: <20250724073021.8-1-extja@kvaser.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/2] bonding: send LACPDUs periodically in passive
- mode after receiving partner's LACPDU
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Petr Machata <petrm@nvidia.com>,
- Amit Cohen <amcohen@nvidia.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- Alessandro Zanni <alessandro.zanni87@gmail.com>, linux-doc@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250725062848.18889-1-liuhangbin@gmail.com>
- <20250725062848.18889-2-liuhangbin@gmail.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250725062848.18889-2-liuhangbin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ti3ks7o5nqqj7rie"
+Content-Disposition: inline
+In-Reply-To: <20250724073021.8-1-extja@kvaser.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 7/25/25 09:28, Hangbin Liu wrote:
-> When `lacp_active` is set to `off`, the bond operates in passive mode, meaning
-> it only "speaks when spoken to." However, the current kernel implementation
-> only sends an LACPDU in response when the partner's state changes.
-> 
-> As a result, once LACP negotiation succeeds, the actor stops sending LACPDUs
-> until the partner times out and sends an "expired" LACPDU. This causes
-> continuous LACP state flapping.
-> 
-> According to IEEE 802.1AX-2014, 6.4.13 Periodic Transmission machine. The
-> values of Partner_Oper_Port_State.LACP_Activity and
-> Actor_Oper_Port_State.LACP_Activity determine whether periodic transmissions
-> take place. If either or both parameters are set to Active LACP, then periodic
-> transmissions occur; if both are set to Passive LACP, then periodic
-> transmissions do not occur.
-> 
-> To comply with this, we remove the `!bond->params.lacp_active` check in
-> `ad_periodic_machine()`. Instead, we initialize the actor's port's
-> `LACP_STATE_LACP_ACTIVITY` state based on `lacp_active` setting.
-> 
-> Additionally, we avoid setting the partner's state to
-> `LACP_STATE_LACP_ACTIVITY` in the EXPIRED state, since we should not assume
-> the partner is active by default.
-> 
-> This ensures that in passive mode, the bond starts sending periodic LACPDUs
-> after receiving one from the partner, and avoids flapping due to inactivity.
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
 
-Shouldn't the fixes tag be lacp_active commit id?
-E.g. 3a755cd8b7c6 ("bonding: add new option lacp_active")
+--ti3ks7o5nqqj7rie
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v3 00/10] can: kvaser_pciefd: Simplify identification of
+ physical CAN interfaces
+MIME-Version: 1.0
 
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
->  drivers/net/bonding/bond_3ad.c     | 72 ++++++++++++++++++++++--------
->  drivers/net/bonding/bond_options.c |  1 +
->  include/net/bond_3ad.h             |  1 +
->  3 files changed, 56 insertions(+), 18 deletions(-)
-> 
-> diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
-> index 2fca8e84ab10..aa64b397bb19 100644
-> --- a/drivers/net/bonding/bond_3ad.c
-> +++ b/drivers/net/bonding/bond_3ad.c
-> @@ -95,13 +95,13 @@ static int ad_marker_send(struct port *port, struct bond_marker *marker);
->  static void ad_mux_machine(struct port *port, bool *update_slave_arr);
->  static void ad_rx_machine(struct lacpdu *lacpdu, struct port *port);
->  static void ad_tx_machine(struct port *port);
-> -static void ad_periodic_machine(struct port *port, struct bond_params *bond_params);
-> +static void ad_periodic_machine(struct port *port);
->  static void ad_port_selection_logic(struct port *port, bool *update_slave_arr);
->  static void ad_agg_selection_logic(struct aggregator *aggregator,
->  				   bool *update_slave_arr);
->  static void ad_clear_agg(struct aggregator *aggregator);
->  static void ad_initialize_agg(struct aggregator *aggregator);
-> -static void ad_initialize_port(struct port *port, int lacp_fast);
-> +static void ad_initialize_port(struct port *port, struct bond_params *bond_params);
->  static void ad_enable_collecting(struct port *port);
->  static void ad_disable_distributing(struct port *port,
->  				    bool *update_slave_arr);
-> @@ -1307,10 +1307,16 @@ static void ad_rx_machine(struct lacpdu *lacpdu, struct port *port)
->  			 * case of EXPIRED even if LINK_DOWN didn't arrive for
->  			 * the port.
->  			 */
-> -			port->partner_oper.port_state &= ~LACP_STATE_SYNCHRONIZATION;
->  			port->sm_vars &= ~AD_PORT_MATCHED;
-> +			/* Based on IEEE 8021AX-2014, Figure 6-18 - Receive
-> +			 * machine state diagram, the statue should be
-> +			 * Partner_Oper_Port_State.Synchronization = FALSE;
-> +			 * Partner_Oper_Port_State.LACP_Timeout = Short Timeout;
-> +			 * start current_while_timer(Short Timeout);
-> +			 * Actor_Oper_Port_State.Expired = TRUE;
-> +			 */
-> +			port->partner_oper.port_state &= ~LACP_STATE_SYNCHRONIZATION;
->  			port->partner_oper.port_state |= LACP_STATE_LACP_TIMEOUT;
-> -			port->partner_oper.port_state |= LACP_STATE_LACP_ACTIVITY;
->  			port->sm_rx_timer_counter = __ad_timer_to_ticks(AD_CURRENT_WHILE_TIMER, (u16)(AD_SHORT_TIMEOUT));
->  			port->actor_oper_port_state |= LACP_STATE_EXPIRED;
->  			port->sm_vars |= AD_PORT_CHURNED;
-> @@ -1417,11 +1423,10 @@ static void ad_tx_machine(struct port *port)
->  /**
->   * ad_periodic_machine - handle a port's periodic state machine
->   * @port: the port we're looking at
-> - * @bond_params: bond parameters we will use
->   *
->   * Turn ntt flag on priodically to perform periodic transmission of lacpdu's.
->   */
-> -static void ad_periodic_machine(struct port *port, struct bond_params *bond_params)
-> +static void ad_periodic_machine(struct port *port)
->  {
->  	periodic_states_t last_state;
->  
-> @@ -1430,8 +1435,7 @@ static void ad_periodic_machine(struct port *port, struct bond_params *bond_para
->  
->  	/* check if port was reinitialized */
->  	if (((port->sm_vars & AD_PORT_BEGIN) || !(port->sm_vars & AD_PORT_LACP_ENABLED) || !port->is_enabled) ||
-> -	    (!(port->actor_oper_port_state & LACP_STATE_LACP_ACTIVITY) && !(port->partner_oper.port_state & LACP_STATE_LACP_ACTIVITY)) ||
-> -	    !bond_params->lacp_active) {
-> +	    (!(port->actor_oper_port_state & LACP_STATE_LACP_ACTIVITY) && !(port->partner_oper.port_state & LACP_STATE_LACP_ACTIVITY))) {
->  		port->sm_periodic_state = AD_NO_PERIODIC;
->  	}
->  	/* check if state machine should change state */
-> @@ -1955,16 +1959,16 @@ static void ad_initialize_agg(struct aggregator *aggregator)
->  /**
->   * ad_initialize_port - initialize a given port's parameters
->   * @port: the port we're looking at
-> - * @lacp_fast: boolean. whether fast periodic should be used
-> + * @bond_params: bond parameters we will use
->   */
-> -static void ad_initialize_port(struct port *port, int lacp_fast)
-> +static void ad_initialize_port(struct port *port, struct bond_params *bond_params)
->  {
->  	static const struct port_params tmpl = {
->  		.system_priority = 0xffff,
->  		.key             = 1,
->  		.port_number     = 1,
->  		.port_priority   = 0xff,
-> -		.port_state      = 1,
-> +		.port_state      = 0,
+On 24.07.2025 09:30:11, Jimmy Assarsson wrote:
+> This patch series simplifies the process of identifying which network
+> interface (can0..canX) corresponds to which physical CAN channel on
+> Kvaser PCIe based CAN interfaces.
 
-1 == LACP_STATE_ACTIVITY :)
-Just noting that this lets LACP_STATE_ACTIVITY to be set based on lacp_active.
+Since Linus is traveling during the merge window, the last PR for
+net-next should go out today. If you manage to send the next version of
+the pcie and usb patch series before about 16:00 CEST, I will send it
+out today.
 
->  	};
->  	static const struct lacpdu lacpdu = {
->  		.subtype		= 0x01,
-> @@ -1982,12 +1986,14 @@ static void ad_initialize_port(struct port *port, int lacp_fast)
->  		port->actor_port_priority = 0xff;
->  		port->actor_port_aggregator_identifier = 0;
->  		port->ntt = false;
-> -		port->actor_admin_port_state = LACP_STATE_AGGREGATION |
-> -					       LACP_STATE_LACP_ACTIVITY;
-> -		port->actor_oper_port_state  = LACP_STATE_AGGREGATION |
-> -					       LACP_STATE_LACP_ACTIVITY;
-> +		port->actor_admin_port_state = LACP_STATE_AGGREGATION;
-> +		port->actor_oper_port_state  = LACP_STATE_AGGREGATION;
-> +		if (bond_params->lacp_active) {
-> +			port->actor_admin_port_state |= LACP_STATE_LACP_ACTIVITY;
-> +			port->actor_oper_port_state  |= LACP_STATE_LACP_ACTIVITY;
-> +		}
->  
-> -		if (lacp_fast)
-> +		if (bond_params->lacp_fast)
->  			port->actor_oper_port_state |= LACP_STATE_LACP_TIMEOUT;
->  
->  		memcpy(&port->partner_admin, &tmpl, sizeof(tmpl));
-> @@ -2201,7 +2207,7 @@ void bond_3ad_bind_slave(struct slave *slave)
->  		/* port initialization */
->  		port = &(SLAVE_AD_INFO(slave)->port);
->  
-> -		ad_initialize_port(port, bond->params.lacp_fast);
-> +		ad_initialize_port(port, &bond->params);
->  
->  		port->slave = slave;
->  		port->actor_port_number = SLAVE_AD_INFO(slave)->id;
-> @@ -2513,7 +2519,7 @@ void bond_3ad_state_machine_handler(struct work_struct *work)
->  		}
->  
->  		ad_rx_machine(NULL, port);
-> -		ad_periodic_machine(port, &bond->params);
-> +		ad_periodic_machine(port);
->  		ad_port_selection_logic(port, &update_slave_arr);
->  		ad_mux_machine(port, &update_slave_arr);
->  		ad_tx_machine(port);
-> @@ -2883,6 +2889,36 @@ void bond_3ad_update_lacp_rate(struct bonding *bond)
->  	spin_unlock_bh(&bond->mode_lock);
->  }
->  
-> +/**
-> + * bond_3ad_update_lacp_active - change the lacp active
-> + * @bond: bonding struct
-> + *
-> + * When modify lacp_active parameter via sysfs,
-> + * update actor_oper_port_state of each port.
+regards,
+Marc
 
-It could also be netlink, right? I'd just say something like:
-Update actor_oper_port_state when lacp_active is modified.
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
-> + *
-> + * Hold bond->mode_lock,
-> + * so we can modify port->actor_oper_port_state,
-> + * no matter bond is up or down.
+--ti3ks7o5nqqj7rie
+Content-Type: application/pgp-signature; name="signature.asc"
 
-nit: this last part about bond up/down is unnecessary
+-----BEGIN PGP SIGNATURE-----
 
-> + */
-> +void bond_3ad_update_lacp_active(struct bonding *bond)
-> +{
-> +	struct port *port = NULL;
-> +	struct list_head *iter;
-> +	struct slave *slave;
-> +	int lacp_active;
-> +
-> +	lacp_active = bond->params.lacp_active;
-> +	spin_lock_bh(&bond->mode_lock);
-> +	bond_for_each_slave(bond, slave, iter) {
-> +		port = &(SLAVE_AD_INFO(slave)->port);
-> +		if (lacp_active)
-> +			port->actor_oper_port_state |= LACP_STATE_LACP_ACTIVITY;
-> +		else
-> +			port->actor_oper_port_state &= ~LACP_STATE_LACP_ACTIVITY;
-> +	}
-> +	spin_unlock_bh(&bond->mode_lock);
-> +}
-> +
->  size_t bond_3ad_stats_size(void)
->  {
->  	return nla_total_size_64bit(sizeof(u64)) + /* BOND_3AD_STAT_LACPDU_RX */
-> diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
-> index 1d639a3be6ba..3b6f815c55ff 100644
-> --- a/drivers/net/bonding/bond_options.c
-> +++ b/drivers/net/bonding/bond_options.c
-> @@ -1660,6 +1660,7 @@ static int bond_option_lacp_active_set(struct bonding *bond,
->  	netdev_dbg(bond->dev, "Setting LACP active to %s (%llu)\n",
->  		   newval->string, newval->value);
->  	bond->params.lacp_active = newval->value;
-> +	bond_3ad_update_lacp_active(bond);
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmiDRaAACgkQDHRl3/mQ
+kZzRuQf/d2ldwRhcsFUtm2Q8BeuxR9dxfSPi1TzSMnpALwVrBDCD2VN94Ulja7eI
+tJK9+Qn44oSWBnKf2LM8DDSIZEL69bbZg8tRyw2g/ePpujNn14hU6Tf+P4PC+bqf
+txiwhy1gvQXB5zEUGBSdaLPUS7alFL1n0hnGbQJPCriKxol95nGv2/hxHHwWzm/v
+Ir9V1Mg8FtKYSMGwGAKVdTDu0bBoADQfyPULM/Pe36zy5vK/eW5F0qZWSkT576xX
+0RA57Z2VDXO9EGGt7WwOqpElib71kwCjigLlIicl9m/QqIpU8HvcvJWxbfJoLoWY
+WjP5FgasSGu1QTORTwKWofHVhFdiEg==
+=tNH+
+-----END PGP SIGNATURE-----
 
-To me it looks like this fix needs to be in a separate patch.
-
->  
->  	return 0;
->  }
-> diff --git a/include/net/bond_3ad.h b/include/net/bond_3ad.h
-> index 2053cd8e788a..dba369a2cf27 100644
-> --- a/include/net/bond_3ad.h
-> +++ b/include/net/bond_3ad.h
-> @@ -307,6 +307,7 @@ int bond_3ad_lacpdu_recv(const struct sk_buff *skb, struct bonding *bond,
->  			 struct slave *slave);
->  int bond_3ad_set_carrier(struct bonding *bond);
->  void bond_3ad_update_lacp_rate(struct bonding *bond);
-> +void bond_3ad_update_lacp_active(struct bonding *bond);
->  void bond_3ad_update_ad_actor_settings(struct bonding *bond);
->  int bond_3ad_stats_fill(struct sk_buff *skb, struct bond_3ad_stats *stats);
->  size_t bond_3ad_stats_size(void);
-
+--ti3ks7o5nqqj7rie--
 
