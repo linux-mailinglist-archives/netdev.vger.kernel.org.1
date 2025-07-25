@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-209941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4CA9B11622
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 04:00:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 434ECB11623
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 04:00:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1D59AE0258
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 01:59:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCF6E1CE26B6
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 02:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5788415E90;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6B48202C46;
 	Fri, 25 Jul 2025 02:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p5E2CkcL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TLYhLvz1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31ABA137750
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 02:00:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A8D1157493;
+	Fri, 25 Jul 2025 02:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753408807; cv=none; b=hxFlGujeDSH7rgsuqlFbZeEEtrSRDwkN6EIpSvJvgoarHXUFfV+cuwjTQdj7HEKczJ5KY4q7EK1559pZGSkdTBPr7OQJK7rAwG6/pIEkhKj1UL4HLDG2hAfzrP9w/Z9ErLs7/oDhiFVaiZxnvO5/+1q5AuHQgX62zTlxYoeg8mA=
+	t=1753408807; cv=none; b=HBe5aOuNLv2u7izizVanA869+i9Fs0HpMBPL6BVoIZ9GZB+O6vBWEh5K7Jy8toOYQdKM9MUqYhAJRAyu+067W+QwT1YRxQUmvVdnYPaTMX6Ygis2GSGlMetc7RPWotSyxHtObbXDDTGKG20EIYoLjI32liA/l3bOPu3jm7K/MZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1753408807; c=relaxed/simple;
-	bh=/8tegidxVKeauZ79Xs4FvNbdF+l4pkvk54mdqtIY7Us=;
+	bh=zkocS31WlYFiDnA6xSJ3YUmK9DpQdv9esaDls4Mu1YY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PcV8iFYYiwwX43kedCFexuHc/i1m+njcLs1kXBfs3CdwdV9q08Jx0qt4vAffLuetNnZTl6Sp0v8y/cTE5bnBU+iQJNsLFGyLKBYFM8VClcTKG00m2vvi7ort8V3rWH8ZaMKSs9s1i0+3JfDUC+oaX6UHNI6YinAi8+OTq6a01V4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p5E2CkcL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8021C4CEED;
-	Fri, 25 Jul 2025 02:00:05 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=MwNxmNLuDDl1KTbc9LPg3+DeC2ZgCMXGUinhaBC5YyXGtI5jawnF6ZzZF7N0ypA1Dad+a3RJt0z+rXf5aknAQ+xSyQMHbTL4JV+7Lddp4BOXaY0CJWIidPdxcsDfRIZqqV6sxGsjrq4PMVuU7I2I6si+6GJ0R0wNgXFJp40ev4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TLYhLvz1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1119AC4CEEF;
+	Fri, 25 Jul 2025 02:00:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753408805;
-	bh=/8tegidxVKeauZ79Xs4FvNbdF+l4pkvk54mdqtIY7Us=;
+	s=k20201202; t=1753408807;
+	bh=zkocS31WlYFiDnA6xSJ3YUmK9DpQdv9esaDls4Mu1YY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=p5E2CkcLEXsE0nl9g/iCQO2dLjAVrkZF+fFEyARtIkiGNTn7uCEvsfNmTZXOygFan
-	 Jm0tF1Ht3spPLFI+jB4ytqxH0DiQWYu7mzc5oGmls1t7M2ELundRBzrk8Kzc2k72V+
-	 I0jYmr4HaURu13odxnJZPXGpXQactpdNhgJiTjl/NkUmO94LRn/oe9XXAWDJLFefY9
-	 6y8th9rhLtOW/zfJIo7TX5OfD8pwsCV1MLRj6nspjaaQXAZ3Cz5AsORVScGEDxsvyM
-	 c7Kxtan1yqM0IoEbe0V/x1b8RiCEkI3Xrwt8bke1d0lk4PR2V557DBQtC2qDAqaz+e
-	 aOk0rRTYVQ2ow==
+	b=TLYhLvz1dHo2F48eaMcp4ZBEs4BJ33A0j2rllmR3a0FHLs1EjxAwPqWqCP57LFCHx
+	 sfZ1CYf0Ka0bOEk5oMdgj7gYx8Q1O5PsSNdqJvYpccT05w0L68DRpYPOGlTqLKgPUl
+	 UOmYD7o5lYP44YtYcP/yEFoRs9NGVxUSgV2ahAXHUpyvBNZAYVmavyBbkm/FxUDfwT
+	 s/40TKzrqVKocptbza7z40NxLxLtRXliGOwXCXVKAbLg6AgSwXA4MnRKhFYseIq8Jw
+	 OOQyomsdgmRn1iIfmZMOdHYV5f63KciANcQkHa68+JLrCtUcv3yvXuSLgdsi1EAHaJ
+	 5j94m73vOhIFQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC66383BF4E;
-	Fri, 25 Jul 2025 02:00:24 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAB60383BF4E;
+	Fri, 25 Jul 2025 02:00:25 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v8 0/3] Use enum to represent the NAPI threaded
- state
+Subject: Re: [PATCHv4 net-next 1/1] net/mlx5: Fix build -Wframe-larger-than
+ warnings
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175340882324.2604761.15771679897501425014.git-patchwork-notify@kernel.org>
-Date: Fri, 25 Jul 2025 02:00:23 +0000
-References: <20250723013031.2911384-1-skhawaja@google.com>
-In-Reply-To: <20250723013031.2911384-1-skhawaja@google.com>
-To: Samiullah Khawaja <skhawaja@google.com>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, almasrymina@google.com, willemb@google.com,
- netdev@vger.kernel.org
+ <175340882474.2604761.13345976638958207304.git-patchwork-notify@kernel.org>
+Date: Fri, 25 Jul 2025 02:00:24 +0000
+References: <20250722212023.244296-1-yanjun.zhu@linux.dev>
+In-Reply-To: <20250722212023.244296-1-yanjun.zhu@linux.dev>
+To: Zhu Yanjun <yanjun.zhu@linux.dev>
+Cc: saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, huangjunxian6@hisilicon.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 23 Jul 2025 01:30:28 +0000 you wrote:
-> Instead of using 0/1 to represent the NAPI threaded states use enum
-> (disabled/enabled) to represent the NAPI threaded states.
+On Tue, 22 Jul 2025 14:20:23 -0700 you wrote:
+> When building, the following warnings will appear.
+> "
+> pci_irq.c: In function ‘mlx5_ctrl_irq_request’:
+> pci_irq.c:494:1: warning: the frame size of 1040 bytes is larger than 1024 bytes [-Wframe-larger-than=]
 > 
-> This patch series is a subset of patches from the following patch
-> series:
-> https://lore.kernel.org/all/20250718232052.1266188-1-skhawaja@google.com/
+> pci_irq.c: In function ‘mlx5_irq_request_vector’:
+> pci_irq.c:561:1: warning: the frame size of 1040 bytes is larger than 1024 bytes [-Wframe-larger-than=]
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v8,1/3] net: Create separate gro_flush_normal function
-    https://git.kernel.org/netdev/net-next/c/71c52411c51b
-  - [net-next,v8,2/3] net: Use netif_threaded_enable instead of netif_set_threaded in drivers
-    https://git.kernel.org/netdev/net-next/c/78afdadafe6f
-  - [net-next,v8,3/3] net: define an enum for the napi threaded state
-    https://git.kernel.org/netdev/net-next/c/8e7583a4f65f
+  - [PATCHv4,net-next,1/1] net/mlx5: Fix build -Wframe-larger-than warnings
+    https://git.kernel.org/netdev/net-next/c/433501270549
 
 You are awesome, thank you!
 -- 
