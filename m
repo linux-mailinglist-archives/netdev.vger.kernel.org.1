@@ -1,81 +1,87 @@
-Return-Path: <netdev+bounces-209931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4BD3B11581
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 03:01:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5761B1157E
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 03:01:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A0C61CE4325
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 01:02:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4AF6BAE238C
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 01:01:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 408EA199252;
-	Fri, 25 Jul 2025 01:01:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25CBF13EFE3;
+	Fri, 25 Jul 2025 01:01:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S//hzPtk"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D2CA1373;
-	Fri, 25 Jul 2025 01:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5259FC0A;
+	Fri, 25 Jul 2025 01:01:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753405293; cv=none; b=t89Fx4e44jsKwNDnjvw16UHQBQpQm8XQkOuS/HXjkbzFlXl5fE2bf8038ob84ZUjKE/H7h6F8t0QCoTi+BcrfkPY0eHsB3O3jF7PC/8RBfBAEgHmqWhdXt7bMq1rfv5Dbx1to9Nrv39T4BweIC+y8pwDZJinsAa1KBlnI0qEXDs=
+	t=1753405292; cv=none; b=mpUaS6F+LmqU6lHSVbXbJnXCRSRGwR8Zt/E4sTTwnSiey1pUYdFDXXuHxNQureRq6VvbhEfd75IWxYVy3Z6GkoCrPmp/RXbumhgVZO+wHqFNDdBrVYs5AZVnczFUHb8TxgUPt3k+tbKiRq6qcRMFmWmw1tZ19ixsVxAF/IkYIAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753405293; c=relaxed/simple;
-	bh=S68IOHF/e0NaShcmphW9LK69DgrIZLy9G7r8GH8JSf0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Fvnptmtn7tgzqtP7z/1SqqEsZPDuVOsmpdqUZauhv4m2y21bJTY+BS4IQsVCmuZuAwWPBcR7j1BV2l0GXLGo/MQ7+UYuaKEEzK8THMk45RnlNzFEf9h1vjrFBvH1jF7VGEwJfGs5nVqt2485yK4dEfyJwTBdj6oxhDNEiWbthas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4bp8bc148hzGq30;
-	Fri, 25 Jul 2025 08:57:16 +0800 (CST)
-Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4280B180B6A;
-	Fri, 25 Jul 2025 09:01:27 +0800 (CST)
-Received: from DESKTOP-F6Q6J7K.china.huawei.com (10.174.175.220) by
- kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 25 Jul 2025 09:01:25 +0800
-From: Fan Gong <gongfan1@huawei.com>
-To: <gongfan1@huawei.com>
-CC: <andrew+netdev@lunn.ch>, <christophe.jaillet@wanadoo.fr>,
-	<corbet@lwn.net>, <davem@davemloft.net>, <edumazet@google.com>,
-	<fuguiming@h-partners.com>, <guoxin09@huawei.com>, <gur.stavi@huawei.com>,
-	<helgaas@kernel.org>, <horms@kernel.org>, <jdamato@fastly.com>,
-	<kuba@kernel.org>, <lee@trager.us>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <luosifu@huawei.com>,
-	<meny.yossefi@huawei.com>, <mpe@ellerman.id.au>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <przemyslaw.kitszel@intel.com>,
-	<shenchenyang1@hisilicon.com>, <shijing34@huawei.com>, <sumang@marvell.com>,
-	<vadim.fedorenko@linux.dev>, <wulike1@huawei.com>, <zhoushuai28@huawei.com>,
-	<zhuyikai1@h-partners.com>
-Subject: [PATCH net-next v11 0/8] net: hinic3: Add a driver for Huawei 3rd gen NIC - management interfaces
-Date: Fri, 25 Jul 2025 09:01:18 +0800
-Message-ID: <20250725010119.4976-1-gongfan1@huawei.com>
-X-Mailer: git-send-email 2.21.0.windows.1
-In-Reply-To: <cover.1753240706.git.zhuyikai1@h-partners.com>
-References: <cover.1753240706.git.zhuyikai1@h-partners.com>
+	s=arc-20240116; t=1753405292; c=relaxed/simple;
+	bh=2xm7u3ygcZYBzCZXGoS/pCUYoBjZBFKnG8HwfR0nmZA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MtO3rch5zSk7+104GLb2IAb8QAcdXBQPfH9h21ByzZFzKmOg6uDDArzkF7gr6u2cq+x8IcRlxWvg51ovRVdgznxY0adMjMrphpqDG1EPHnOYH+o2pgS7fOAhBgmK/MeiqxP4Xp6s4kJkJoZ2PJPgSxLVx1zAt/dqts/XD0S2vHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S//hzPtk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E0ECC4CEED;
+	Fri, 25 Jul 2025 01:01:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753405291;
+	bh=2xm7u3ygcZYBzCZXGoS/pCUYoBjZBFKnG8HwfR0nmZA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=S//hzPtkrEJWtjCpMVveiikuo8YGKwG6HXKQsFWNzKhUo1FqN3Qha5XSwann5Qfh0
+	 8qgq16uXtPh7baKfgU3rbq6tF4hAGNaNnQHvApWdE2oqiRU/Rl2yRN7OTZgRC+LXxn
+	 95gkYGtHVCApuf2h0QczyVlYs3RTMESoE1yX5KIsoEK67EeJoHbMmVPZbujbf+67Ma
+	 6pffUAXSOuY4fZWPPtXjlFUUir8R4XmbVwy2pJtTWzTWPWjBRaPHvAY8PNNw9KFuJC
+	 Y7KQ6PuuG/byFbltcIqK/g9BJnpqLoyUYm2flutmNIcZ6+ldBIsg0Y2tKUUqeS9BkW
+	 8WWl+mvi9bumg==
+Date: Thu, 24 Jul 2025 18:01:28 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Jiri Pirko <jiri@nvidia.com>, Jiri Pirko
+ <jiri@resnulli.us>, Donald Hunter <donald.hunter@gmail.com>, Jonathan
+ Corbet <corbet@lwn.net>, Brett Creeley <brett.creeley@amd.com>, Michael
+ Chan <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>,
+ "Cai Huoqing" <cai.huoqing@linux.dev>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Sunil Goutham <sgoutham@marvell.com>, Linu
+ Cherian <lcherian@marvell.com>, Geetha sowjanya <gakula@marvell.com>, Jerin
+ Jacob <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>, Subbaraya
+ Sundeep <sbhatta@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon
+ Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, Ido Schimmel
+ <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, Manish Chopra
+ <manishc@marvell.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+ <intel-wired-lan@lists.osuosl.org>, <linux-rdma@vger.kernel.org>, "Shahar
+ Shitrit" <shshitrit@nvidia.com>, Gal Pressman <gal@nvidia.com>
+Subject: Re: [PATCH net-next V2 0/5] Expose grace period delay for devlink
+ health reporter
+Message-ID: <20250724180128.338977e3@kernel.org>
+In-Reply-To: <1753390134-345154-1-git-send-email-tariqt@nvidia.com>
+References: <1753390134-345154-1-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemf100013.china.huawei.com (7.202.181.12)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> PATCH 02 V10: https://lore.kernel.org/netdev/cover.1753152592.git.zhuyikai1@h-partners.com
-> * Use spin_lock in aeq & ceq events instead of bits ops (Jakub Kicinski)
-> * Modify memory barriers comments to explain more clearly (Jakub Kicinski)
->
-> PATCH 02 V11:
-> * Remove unused cb_state variable (Simon Horman)
+On Thu, 24 Jul 2025 23:48:49 +0300 Tariq Toukan wrote:
+> This series by Shahar implements graceful period delay in devlink health
+> reporter, and use it in mlx5e driver.
 
-Oops. This patch was mistakenly sent and the V10 review comments have not been
-fully revised. We will send a new patch after 24 hours.
+You waited a week to get back to me with the reply to my comments on v1:
+https://lore.kernel.org/all/6892bb46-e2eb-4373-9ac0-6c43eca78b8e@gmail.com/
+and 10h later, before I had a chance to reply - you submit a v2. 
+Not very demure.
 
