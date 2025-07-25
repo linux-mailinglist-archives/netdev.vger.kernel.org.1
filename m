@@ -1,241 +1,273 @@
-Return-Path: <netdev+bounces-210160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 908D7B12332
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 19:48:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 80C6AB12337
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 19:48:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23F17AE13AC
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 17:47:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40810AE32E5
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 17:48:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40CF12EFD98;
-	Fri, 25 Jul 2025 17:47:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E39642EFDB0;
+	Fri, 25 Jul 2025 17:48:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b="YJDE//0i"
+	dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b="rFKl1ERZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7866424291C
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 17:47:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B303F2EFDB9
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 17:48:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753465670; cv=none; b=RADSQ3fOihj39IOI5M5HrB7tDL5AOZt4lrKpPor35jHlBDMrt+jCMuWeoR1jiBo6CqovjCMzDIpZoUw+CMRQvM2tOPg9Ak8mSyqJBvJt9l/uUcSbo1GgEt7zx91lIwULsoOIJhfJKBsE974p+uB36WzBzQKB+RSymUb4QkhN+DE=
+	t=1753465707; cv=none; b=oHRus4dsbJsYzjLPm7Jpjprzn1eikkYNXxWdSgYLZfXLhb2Ijf+NhFxPPjMXW4hMgqh+gCckBO117Hv3+wlLu0+rBPx/UmU6VGKxiCzLahZ0TOfKNLPU2RwwpxD3hxBRyrpxrx4/F33x9AET22VJdim5skpf4vevA/HBpcKwDws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753465670; c=relaxed/simple;
-	bh=9eDIK3jVCFBYpk17cfWHRUnPmLO8AyLiFNJ2QzMQUxM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N38zTqSQd69jxuQT9qXabfPrrpD8DrtUgceiEz7KVX6/hwJCea0+joD1dSbkBAbPVIjGF79i9u+iZGcvq5z5BE5mGZGda0Hkpcd6rNvNj1uDLE6a5OfpGPn7KucCRvV1F1IO/L3F3Hxj47Pj5HAzldZSWEKByShh6SWLIKnwzGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com; spf=pass smtp.mailfrom=openai.com; dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b=YJDE//0i; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openai.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-32cd0dfbdb8so23205721fa.0
-        for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 10:47:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openai.com; s=google; t=1753465667; x=1754070467; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o8igKGnqKWRhclIAZjFMGAieuZQEAwLSx36AxSWzK5I=;
-        b=YJDE//0iVUgoS9TC2yJy8ctxmWeggEC6MjZAuYdbt5MGGHI9lY82BZJsyFFIUNrgd4
-         W/0t46NDB6QrsW1jJDyujPZsEbf8ut7ttP+jWtA72jLWtmCpxk+XVIEscm+ANYPrSvHq
-         UII23stwe2Mbg11ylsKH2ByNYWJUn6KfVLuKU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753465667; x=1754070467;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o8igKGnqKWRhclIAZjFMGAieuZQEAwLSx36AxSWzK5I=;
-        b=N5UY47iZmpLL659RM9BZXeTcvXm4nv1HsU8o679tnpcUJgllnNxoASiNPjdalgg4Dw
-         9vq64mOvEvdcS5WDZSnSWpvqVwiqEpZMCm+I0wvzPb7K0MiTghWrQkkz7ujTF8eObpM3
-         s5jhDSseBuHRrgUy3MyfztF66aZbzm4WXF3P6fZChv3SG3quWAFWKHyujX3Gt11t1W6A
-         wRD1hnZ33Cl397zYJs7SCFYyLyEKcXH0KWfmHLfAh7PuicKghJMFnQnO5lrkBXuiS0ca
-         N8BYZTIbYqE1l+NPny5YBjE2MgDn9OypF9rz8L7diTT1QeAli3A8pf40xaEEF5cFADWo
-         Op4A==
-X-Forwarded-Encrypted: i=1; AJvYcCWjBFq40JFEvAXoFXWjgEUzZzLKB4AOwb7B+O67dh68JWsCx53MaiSIdtQICjHTRPAsG1hHAzQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsofB0BhPXTATzP9xOxqfiCIUza/E1rXRzoMVqy8ipZwtxUvUj
-	sR+VPlq2spJ5Fjxs5mSrIDDCNpbcFwYCI8U1YkBTf6HuBBR+CeoVoiMNMHVzqVx6nmcBclMP9tn
-	zQVjMvDYwNmwAolm8D1uNvtHRLfMxUYZ9YU2h/69kLg==
-X-Gm-Gg: ASbGncuxFCNGtOM8/UFJoRifd847IYPCalqdClzJtdCQ167bpFlAgeXQ10kRIiRO/RH
-	MkvqPCgCOXAsuGx9YE6h8Rm67guob21XsU9YHwD2ItdS6RjLaZ1HXRo+fi3bpXWz8ICmlXir4zd
-	QOZNHcx6J5lIJftymkfS4W9p6NZnDUwJeX1I5Nhp7VbL1QRBEvBPmDOH8CQ2mg1WQmuP/jlfhS5
-	5GkDw==
-X-Google-Smtp-Source: AGHT+IFkfnmzNmODcw4O7GHq9qDajGK55gSY11imeb8rrw6tCnKTZQzJU4QShIdnMeRS5NUn9qCF5ViF1iJkhuno3kI=
-X-Received: by 2002:a05:6512:3da3:b0:553:a60d:6898 with SMTP id
- 2adb3069b0e04-55b5f4aab78mr769594e87.45.1753465666466; Fri, 25 Jul 2025
- 10:47:46 -0700 (PDT)
+	s=arc-20240116; t=1753465707; c=relaxed/simple;
+	bh=Wib0GKw0OPRGeW19Pa0wdX36eYgmdl6sqTMiT/3s8Rg=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:Subject:From:Cc; b=oZJlbW4Dm9nWiewUTSPXn0mQqYBEHkBZMRYEGyfdX5FKfQMvGp//LjIh/NPJgQvtTANMrdm0t64aFvwECPnmDlsCDtv6GatHWYjJ4vG2kO5tNponmuj3cUpCTbuc3Lo7tPim6DyBKx3IbaxGqZdovbvUCnhWqhklk0zlwoG8TjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org; spf=pass smtp.mailfrom=cknow.org; dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b=rFKl1ERZ; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cknow.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250724-nexthop_dump-v1-1-6b43fffd5bac@openai.com> <aIOPQH-S5LAPCb1u@shredder>
-In-Reply-To: <aIOPQH-S5LAPCb1u@shredder>
-From: Christoph Paasch <cpaasch@openai.com>
-Date: Fri, 25 Jul 2025 10:47:35 -0700
-X-Gm-Features: Ac12FXzjzTO4-C8ogjX_JnB8KHGgWNT6UwjDM8_9OPCEHmsQhP-m538QaT5BTBo
-Message-ID: <CADg4-L8qauZSuC4=a-Ut4CSmUeyZNT4sprmSxbwWkQ9q-TrRqA@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: Make nexthop-dumps scale linearly with the
- number of nexthops
-To: Ido Schimmel <idosch@idosch.org>
-Cc: David Ahern <dsahern@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cknow.org; s=key1;
+	t=1753465692;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=HOh2/7q7Oj21JFMLSwgw0cSPTuUuF6M/s5BwAyegtKM=;
+	b=rFKl1ERZJID/6udTNkn7bbOz3jMhx1YRXPhQ/+DM6N71sr9f6tcqGHkfFVOpL3GYSmRuzB
+	+ry464+i2ZYj7cZBFJcKkP9qiulJyKgjFPgAPCdF8BSXSWnREPtQrxfHJSiGV5DK/LSVa7
+	HpDf+A55pqU8Xy/+VH2zSXcrb8y2oxxrt+idzY6TV4GiUt8K6paeDU4a3JUuTk1aOkT3Qf
+	hybpY5DgYju3Ff3+Ak75B6Cq5SkTlRkaHIRA7r6ZG90CbWhYm3X9FDF98krk0Cr4b052Ws
+	U/ZGSslEpF5hgXQ2zgU3iFA8WVGoiGTWzgDeeDe08KTmp3PAhYNWHI3GmBoxzw==
+Content-Type: multipart/signed;
+ boundary=05a4ad5a0d7fd99f8edf9ab4b2d58bf2d6e61cebf8097ca6d088ce78129d;
+ micalg=pgp-sha512; protocol="application/pgp-signature"
+Date: Fri, 25 Jul 2025 19:48:03 +0200
+Message-Id: <DBLBPIBKFCJV.36AVW8JY88L7H@cknow.org>
+To: "Lee Jones" <lee@kernel.org>, "Pavel Machek" <pavel@kernel.org>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>
+Subject: BUG: Circular locking dependency on netdev led trigger on NanoPi
+ R5S
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Diederik de Haas" <didi.debian@cknow.org>
+Cc: "Robin Murphy" <robin.murphy@arm.com>, <linux-leds@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <linux-rockchip@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+ "Diederik de Haas" <didi.debian@cknow.org>
+X-Migadu-Flow: FLOW_OUT
+
+--05a4ad5a0d7fd99f8edf9ab4b2d58bf2d6e61cebf8097ca6d088ce78129d
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
 
-On Fri, Jul 25, 2025 at 7:05=E2=80=AFAM Ido Schimmel <idosch@idosch.org> wr=
-ote:
->
-> On Thu, Jul 24, 2025 at 05:10:36PM -0700, Christoph Paasch via B4 Relay w=
-rote:
-> > From: Christoph Paasch <cpaasch@openai.com>
-> >
-> > When we have a (very) large number of nexthops, they do not fit within =
-a
-> > single message. rtm_dump_walk_nexthops() thus will be called repeatedly
-> > and ctx->idx is used to avoid dumping the same nexthops again.
-> >
-> > The approach in which we avoid dumpint the same nexthops is by basicall=
-y
->
-> s/dumpint/dumping/
->
-> > walking the entire nexthop rb-tree from the left-most node until we fin=
-d
-> > a node whose id is >=3D s_idx. That does not scale well.
-> >
-> > Instead of this non-efficient  approach, rather go directly through the
->                                ^ double space
-> s/non-efficient/inefficient/ ?
->
-> > tree to the nexthop that should be dumped (the one whose nh_id >=3D
-> > s_idx). This allows us to find the relevant node in O(log(n)).
-> >
-> > We have quite a nice improvement with this:
-> >
-> > Before:
-> > =3D=3D=3D=3D=3D=3D=3D
-> >
-> > --> ~1M nexthops:
-> > $ time ~/libnl/src/nl-nh-list | wc -l
-> > 1050624
-> >
-> > real  0m21.080s
-> > user  0m0.666s
-> > sys   0m20.384s
-> >
-> > --> ~2M nexthops:
-> > $ time ~/libnl/src/nl-nh-list | wc -l
-> > 2101248
-> >
-> > real  1m51.649s
-> > user  0m1.540s
-> > sys   1m49.908s
-> >
-> > After:
-> > =3D=3D=3D=3D=3D=3D
-> >
-> > --> ~1M nexthops:
-> > $ time ~/libnl/src/nl-nh-list | wc -l
-> > 1050624
-> >
-> > real  0m1.157s
-> > user  0m0.926s
-> > sys   0m0.259s
-> >
-> > --> ~2M nexthops:
-> > $ time ~/libnl/src/nl-nh-list | wc -l
-> > 2101248
-> >
-> > real  0m2.763s
-> > user  0m2.042s
-> > sys   0m0.776s
->
-> I was able to reproduce these results.
->
-> >
-> > Signed-off-by: Christoph Paasch <cpaasch@openai.com>
-> > ---
-> >  net/ipv4/nexthop.c | 34 +++++++++++++++++++++++++++++++++-
-> >  1 file changed, 33 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-> > index 29118c43ebf5f1e91292fe227d4afde313e564bb..226447b1c17d22eab9121be=
-d88c0c2b9148884ac 100644
-> > --- a/net/ipv4/nexthop.c
-> > +++ b/net/ipv4/nexthop.c
-> > @@ -3511,7 +3511,39 @@ static int rtm_dump_walk_nexthops(struct sk_buff=
- *skb,
-> >       int err;
-> >
-> >       s_idx =3D ctx->idx;
-> > -     for (node =3D rb_first(root); node; node =3D rb_next(node)) {
-> > +
-> > +     /*
-> > +      * If this is not the first invocation, ctx->idx will contain the=
- id of
-> > +      * the last nexthop we processed.  Instead of starting from the v=
-ery first
-> > +      * element of the red/black tree again and linearly skipping the
-> > +      * (potentially large) set of nodes with an id smaller than s_idx=
-, walk the
-> > +      * tree and find the left-most node whose id is >=3D s_idx.  This=
- provides an
-> > +      * efficient O(log n) starting point for the dump continuation.
-> > +      */
->
-> Please try to keep lines at 80 characters.
->
-> > +     if (s_idx !=3D 0) {
-> > +             struct rb_node *tmp =3D root->rb_node;
-> > +
-> > +             node =3D NULL;
-> > +             while (tmp) {
-> > +                     struct nexthop *nh;
-> > +
-> > +                     nh =3D rb_entry(tmp, struct nexthop, rb_node);
-> > +                     if (nh->id < s_idx) {
-> > +                             tmp =3D tmp->rb_right;
-> > +                     } else {
-> > +                             /* Track current candidate and keep looki=
-ng on
-> > +                              * the left side to find the left-most
-> > +                              * (smallest id) that is still >=3D s_idx=
-.
-> > +                              */
->
-> I'm aware that netdev now accepts both comment styles, but it's a bit
-> weird to mix both in the same commit and at the same function.
->
-> > +                             node =3D tmp;
-> > +                             tmp =3D tmp->rb_left;
-> > +                     }
-> > +             }
-> > +     } else {
-> > +             node =3D rb_first(root);
-> > +     }
-> > +
-> > +     for (; node; node =3D rb_next(node)) {
-> >               struct nexthop *nh;
-> >
-> >               nh =3D rb_entry(node, struct nexthop, rb_node);
->
-> The code below is:
->
-> if (nh->id < s_idx)
->         continue;
->
-> Can't it be removed given the above code means we start at a nexthop
-> whose identifier is at least s_idx ?
+Hi,
 
-Yes, we can drop this check.
+I have a FriendlyELEC NanoPi R5S (with rk3568 SoC) and in commit
+1631cbdb8089 ("arm64: dts: rockchip: Improve LED config for NanoPi R5S")
 
-Thanks for all your feedback. Will resubmit when net-next reopens.
+I tried to improve its LED configuration and that included
+``linux,default-trigger =3D "netdev"``
+
+Problem: sometimes I got a 'hung task' error which resulted in the WAN
+port not to come up (that's the only one I use) and logging in via
+serial also didn't work, so pulling the plug was the only remedy.
+
+Robin Murphy quickly identified that it likely had to do with led
+triggers and removing those netdev triggers made the problem go away[1].
+To find out what actually caused it, I built a kernel with PROOF_LOCKING
+and PRINTK_CALLER enabled, which after adding a patch which fixed an
+OOPS [2], showed the underlaying problem:
+
+   =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
+   WARNING: possible circular locking dependency detected
+   6.16-rc7+unreleased-arm64-cknow #1 Not tainted
+   ------------------------------------------------------
+   modprobe/936 is trying to acquire lock:
+   ffffc943e0edc3b0 (pernet_ops_rwsem){++++}-{4:4}, at: register_netdevice_=
+notifier+0x38/0x148
+
+   but task is already holding lock:
+   ffff0001f2762248 (&led_cdev->trigger_lock){+.+.}-{4:4}, at: led_trigger_=
+register+0x14c/0x1e0
+
+   which lock already depends on the new lock.
 
 
-Christoph
+   the existing dependency chain (in reverse order) is:
+
+   -> #3 (&led_cdev->trigger_lock){+.+.}-{4:4}:
+          lock_acquire+0x1cc/0x348
+          down_write+0x40/0xd8
+          led_trigger_set_default+0x5c/0x170
+          led_classdev_register_ext+0x340/0x488
+          __sdhci_add_host+0x190/0x368 [sdhci]
+          dwcmshc_probe+0x2b8/0x6b0 [sdhci_of_dwcmshc]
+          platform_probe+0x70/0xe8
+          really_probe+0xc8/0x3a0
+          __driver_probe_device+0x84/0x160
+          driver_probe_device+0x44/0x128
+          __device_attach_driver+0xc4/0x170
+          bus_for_each_drv+0x90/0xf8
+          __device_attach_async_helper+0xc0/0x120
+          async_run_entry_fn+0x40/0x180
+          process_one_work+0x23c/0x640
+          worker_thread+0x1b4/0x360
+          kthread+0x150/0x250
+          ret_from_fork+0x10/0x20
+
+   -> #2 (triggers_list_lock){++++}-{4:4}:
+          lock_acquire+0x1cc/0x348
+          down_write+0x40/0xd8
+          led_trigger_register+0x58/0x1e0
+          phy_led_triggers_register+0xf4/0x258 [libphy]
+          phy_attach_direct+0x328/0x3a8 [libphy]
+          phylink_fwnode_phy_connect+0xb0/0x138 [phylink]
+          __stmmac_open+0xec/0x520 [stmmac]
+          stmmac_open+0x4c/0xe8 [stmmac]
+          __dev_open+0x13c/0x310
+          __dev_change_flags+0x1d4/0x260
+          netif_change_flags+0x2c/0x80
+          dev_change_flags+0x90/0xd0
+          devinet_ioctl+0x55c/0x730
+          inet_ioctl+0x1e4/0x200
+          sock_do_ioctl+0x6c/0x140
+          sock_ioctl+0x328/0x3c0
+          __arm64_sys_ioctl+0xb4/0x118
+          invoke_syscall+0x6c/0x100
+          el0_svc_common.constprop.0+0x48/0xf0
+          do_el0_svc+0x24/0x38
+          el0_svc+0x54/0x1e0
+          el0t_64_sync_handler+0x10c/0x140
+          el0t_64_sync+0x198/0x1a0
+
+   -> #1 (rtnl_mutex){+.+.}-{4:4}:
+          lock_acquire+0x1cc/0x348
+          __mutex_lock+0xac/0x590
+          mutex_lock_nested+0x2c/0x40
+          rtnl_lock+0x24/0x38
+          register_netdevice_notifier+0x40/0x148
+          rtnetlink_init+0x40/0x68
+          netlink_proto_init+0x120/0x158
+          do_one_initcall+0x88/0x3b8
+          kernel_init_freeable+0x2d0/0x340
+          kernel_init+0x28/0x160
+          ret_from_fork+0x10/0x20
+
+   -> #0 (pernet_ops_rwsem){++++}-{4:4}:
+          check_prev_add+0x114/0xcb8
+          __lock_acquire+0x12e8/0x15f0
+          lock_acquire+0x1cc/0x348
+          down_write+0x40/0xd8
+          register_netdevice_notifier+0x38/0x148
+          netdev_trig_activate+0x18c/0x1e8 [ledtrig_netdev]
+          led_trigger_set+0x1d4/0x328
+          led_trigger_register+0x194/0x1e0
+          netdev_led_trigger_init+0x20/0xff8 [ledtrig_netdev]
+          do_one_initcall+0x88/0x3b8
+          do_init_module+0x5c/0x270
+          load_module+0x1ed8/0x2608
+          init_module_from_file+0x94/0x100
+          idempotent_init_module+0x1e8/0x2f0
+          __arm64_sys_finit_module+0x70/0xe8
+          invoke_syscall+0x6c/0x100
+          el0_svc_common.constprop.0+0x48/0xf0
+          do_el0_svc+0x24/0x38
+          el0_svc+0x54/0x1e0
+          el0t_64_sync_handler+0x10c/0x140
+          el0t_64_sync+0x198/0x1a0
+
+   other info that might help us debug this:
+
+   Chain exists of:
+     pernet_ops_rwsem --> triggers_list_lock --> &led_cdev->trigger_lock
+
+    Possible unsafe locking scenario:
+
+          CPU0                    CPU1
+          ----                    ----
+     lock(&led_cdev->trigger_lock);
+                                  lock(triggers_list_lock);
+                                  lock(&led_cdev->trigger_lock);
+     lock(pernet_ops_rwsem);
+
+    *** DEADLOCK ***
+
+   2 locks held by modprobe/936:
+    #0: ffffc943e0d2baa8 (leds_list_lock){++++}-{4:4}, at: led_trigger_regi=
+ster+0x10c/0x1e0
+    #1: ffff0001f2762248 (&led_cdev->trigger_lock){+.+.}-{4:4}, at: led_tri=
+gger_register+0x14c/0x1e0
+
+   stack backtrace:
+   CPU: 0 UID: 0 PID: 936 Comm: modprobe Not tainted 6.16-rc7+unreleased-ar=
+m64-cknow #1 PREEMPTLAZY  Debian 6.16~rc7-2~exp1
+   Hardware name: FriendlyElec NanoPi R5S (DT)
+   Call trace:
+    show_stack+0x34/0xa0 (C)
+    dump_stack_lvl+0x70/0x98
+    dump_stack+0x18/0x24
+    print_circular_bug+0x230/0x280
+    check_noncircular+0x174/0x188
+    check_prev_add+0x114/0xcb8
+    __lock_acquire+0x12e8/0x15f0
+    lock_acquire+0x1cc/0x348
+    down_write+0x40/0xd8
+    register_netdevice_notifier+0x38/0x148
+    netdev_trig_activate+0x18c/0x1e8 [ledtrig_netdev]
+    led_trigger_set+0x1d4/0x328
+    led_trigger_register+0x194/0x1e0
+    netdev_led_trigger_init+0x20/0xff8 [ledtrig_netdev]
+    do_one_initcall+0x88/0x3b8
+    do_init_module+0x5c/0x270
+    load_module+0x1ed8/0x2608
+    init_module_from_file+0x94/0x100
+    idempotent_init_module+0x1e8/0x2f0
+    __arm64_sys_finit_module+0x70/0xe8
+    invoke_syscall+0x6c/0x100
+    el0_svc_common.constprop.0+0x48/0xf0
+    do_el0_svc+0x24/0x38
+    el0_svc+0x54/0x1e0
+    el0t_64_sync_handler+0x10c/0x140
+    el0t_64_sync+0x198/0x1a0
+   leds-gpio gpio-leds: bus: 'platform': really_probe: bound device to driv=
+er leds-gpio
+
+Full serial log can be found at [3] which is quite verbose and the boot
+took way longer then normal as the following was added to cmdline:
+``dyndbg=3D"file dd.c func really_probe +p" maxcpus=3D1``
+
+Free free to ask for additional info and/or to run tests.
+
+Cheers,
+  Diederik
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/soc/soc.git/commit/?h=
+=3Darm/fixes&id=3D912b1f2a796ec73530a709b11821cb0c249fb23e
+[2] https://lore.kernel.org/linux-rockchip/f81b88df-9959-4968-a60a-b7efd3d5=
+ea24@arm.com/
+[3] https://paste.sr.ht/~diederik/142e92bfb29bbb58bca18a74cdffc5e0ba79081c
+
+--05a4ad5a0d7fd99f8edf9ab4b2d58bf2d6e61cebf8097ca6d088ce78129d
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQT1sUPBYsyGmi4usy/XblvOeH7bbgUCaIPDVQAKCRDXblvOeH7b
+bnPAAQDYRsF+p1M4hDupJfWX0bALrNqxmOkDdi52tQ8G0+kYdQD/UQuyU6+40zJE
+CIAARZKfYH/t7AST8gNNJ+VTr0zm/ww=
+=bygX
+-----END PGP SIGNATURE-----
+
+--05a4ad5a0d7fd99f8edf9ab4b2d58bf2d6e61cebf8097ca6d088ce78129d--
 
