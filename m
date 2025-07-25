@@ -1,111 +1,112 @@
-Return-Path: <netdev+bounces-209996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C51B8B11C08
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 12:16:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA6C8B11C1A
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 12:18:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2B15AC2486
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 10:15:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E25115A5EB8
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 10:18:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E87592E7180;
-	Fri, 25 Jul 2025 10:12:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFAA62E11CA;
+	Fri, 25 Jul 2025 10:16:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED62A2E1723
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 10:12:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B802DCF6E
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 10:16:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753438333; cv=none; b=iuqqtw1ktK9nobUY3Z/83u5QIzyL6DHFJPyIE2S1Uybs2kS2Df8HJsReODO4Yqton+XTJ7ZXSPLoqw0i1cS54KVnml00GiiJ1JXnLabPnWkRjfqLo3+sfGmk+JOS18S8MslfzulvVUY2kFfkZhk8j8O/EEZ1MrBhC8Ewg3302ro=
+	t=1753438586; cv=none; b=j6S3hCBZbgpFDf72xNPOAdg+jfPeE3FBGAmvzF4CMkz/vSNGlBIODmbxeHyW7UYCS7oGvGedEkF8wm6mmhtQCqdgAAzGkh5Q8RfAmt8azoSF5gnHy9VGhEkdFdaxy2wP+hgYWFCjdHNNaGaCmJSSQiwNu4veebGEjt6d2wGjUHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753438333; c=relaxed/simple;
-	bh=kRroiVwN8VC5mjdK3a+UEFHGD7+4HV0iLUxuCRe43nY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZEbhUI2edDp2Ruz52y6yOF3nJqIRBRRPJnvcGKodGXnFuzve0+FB89/usJ0sayNHZFL/VUSrTOtwS1VmhG5Xx6lxm/LGeO66a+6BqwEXubDBHctZNpRYLJaJd3DAK+fN3vSDsrbkERMQFyQO2jAPvxqQAm5ACFDv9VZOzThmaok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=18.132.163.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: zesmtpgz1t1753438310t6f10c101
-X-QQ-Originating-IP: hrXMJrjX1v5SmrXvU/RFaoTkBlV+D++VqopZO1o9Pdc=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 25 Jul 2025 18:11:48 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 17354701733030372774
-Date: Fri, 25 Jul 2025 18:11:47 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Simon Horman <horms@kernel.org>, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, corbet@lwn.net, gur.stavi@huawei.com,
-	maddy@linux.ibm.com, mpe@ellerman.id.au, danishanwar@ti.com,
-	lee@trager.us, gongfan1@huawei.com, lorenzo@kernel.org,
-	geert+renesas@glider.be, Parthiban.Veerasooran@microchip.com,
-	lukas.bulwahn@redhat.com, alexanderduyck@fb.com,
-	richardcochran@gmail.com, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 03/15] net: rnpgbe: Add basic mbx ops support
-Message-ID: <B257A91F74F6FCCD+20250725101147.GA365950@nic-Precision-5820-Tower>
-References: <20250721113238.18615-1-dong100@mucse.com>
- <20250721113238.18615-4-dong100@mucse.com>
- <20250722113542.GG2459@horms.kernel.org>
- <78BE2D403125AFDD+20250723030705.GB169181@nic-Precision-5820-Tower>
- <7d191bc9-98cf-4122-8343-7aa5f741d16c@lunn.ch>
+	s=arc-20240116; t=1753438586; c=relaxed/simple;
+	bh=XfLiIJP+lNbTHHUZoH9kSblj58GrrbRlOO2gsVGCJJk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MGT5L+1UCnDLyEg7hW03m6C1fFRQ5eLdnYXQXmi4EpJJX/8WReWZVWCcxmeaHC0TShctLvQN2SSTXSGQ7oHspdW74kqN1Fvc00gxvJ/kmR9iGAUmiVZvqVuBRVCGYBQTYpcIyQfCjBR3dNcqsRM35dFOXHsGBvi13IIdl8NcnR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1ufFTS-0006NB-FH
+	for netdev@vger.kernel.org; Fri, 25 Jul 2025 12:16:22 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1ufFTS-00ACaA-0s
+	for netdev@vger.kernel.org;
+	Fri, 25 Jul 2025 12:16:22 +0200
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id 0021E4493C2
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 10:16:21 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id DC64F4493B7;
+	Fri, 25 Jul 2025 10:16:20 +0000 (UTC)
+Received: from blackshift.org (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 17066578;
+	Fri, 25 Jul 2025 10:16:19 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net 0/1] pull-request: can 2025-07-25
+Date: Fri, 25 Jul 2025 12:13:48 +0200
+Message-ID: <20250725101619.4095105-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7d191bc9-98cf-4122-8343-7aa5f741d16c@lunn.ch>
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: MyirvGjpKb1jiub4PmCgIWUaNX5sabUujGEqnQGZoo0cUbpcgU+pcYQk
-	tpxNJ4eBKDd9/0C3TJI1Q1JV0GkyRKDHjHSY8mEQ7o9gtp0mmu27KRGgJf0GaDzs1g5CRgA
-	Ggt54pF5KH9GiG6sjok4TKXp2ajhojBH6XscLeu9AnTJH8MjOTmRO0k7xnS9D4EOwNZH7Sr
-	1/mZF4T8YlLDlidukjRUR2Ggb2dQ7s2GFnD/cTW43ncRHlryB7oo/Ss35RnbE4NmKuqRfKl
-	wI0LtP6VNOmnY0qPUjnR4emHgDECd0WuqNxjVq1yB2t/O2nTSxTr/9msGfbfIi5O3ImDO8g
-	hhyiKntHxc6p94xd/goXEO6dRoqpOb5qqo7EEiRdUIigR3ifnTJ/wsvyCYnkrH5eCM+Fucm
-	TclxbYtIouUVXQzyo7ZYIzDqBLdioKzWiEJhzq78gK9eO5UJQDIShR1POXI+dI52gqX99l7
-	1LcNp4gnj7hTRgfccpYhGmuX3Kjsu8W6aqUj5DKdEdpEtpjxrIW/O76Jl/iHT8F/bCuzWnS
-	gp8+nXFCiUfDnFQt1akqTLpCtv5X9KkD+sLeMMAAJCTvq5xeIFoCXo0Au3mDM3bDws4qlxA
-	BULqJF+naB3RdDlNYIr7xD5dg3JwNOCDyZzhBXsksILcHIloc7Do2lk/nsh2FSGr1Y2z9dc
-	78nfRmaB2OYHz5gtlRyvtYeZLjhUqCJvlivgDj3tRTjriUE3uABZToqyeW6BBJPzlThVu8W
-	zOBsSJIAgElYSLfs94RYp34qkQxR33oeNyhI7gMieQ4ViiyrxY9pCHWepJvUc78doyeZ1Ex
-	qwdhQdcbSqYrO6hwJGljuApS6mdYNoXySPS31d7+Hkq/alzUKzami09sXnu477et5zt221Q
-	W3Bkd8Gjef3bmaKmOY7anrrXlnp+teavqpTyo1qO8UXoegxFw0Bv8E2u74E5f2Vd2D2x9Zo
-	M5o8uTZFBmtO6xuXC1G1l3qNK87dLueqK7tCu4K/XsL9QuNeHOc4iXfUx7L4XbhPQ160Eqt
-	Nrcf0U9b5lWuSiNe3iIXgvpbtaoeJ3VYBz4gF4mg==
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-X-QQ-RECHKSPAM: 0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Wed, Jul 23, 2025 at 04:38:00PM +0200, Andrew Lunn wrote:
-> > > Flagged by W=1 builds with Clang 20.1.8, and Smatch.
-> > > 
-> > > > +}
-> > > 
-> > > ...
-> > > 
-> > 
-> > Got it, I will fix this.
-> > Maybe my clang (10.0.0) is too old, I will update it and 
-> > try W=1 again.
-> 
-> 10.0.0 was released 24 Mar 2020. That is a five year old compiler!
-> 
-> Try something a bit more modern.
-> 
-> 	Andrew
-> 
+Hello netdev-team,
 
-Ok, I have update it, and got the warning.
+this is a pull request of 1 patch for net/main.
 
-Thanks for your feedback.
+The patch is by Stephane Grosjean and adds support the recent firmware
+of USB CAN FD interfaces to the peak_usb driver.
+
+regards,
+Marc
+
+---
+
+The following changes since commit c8f13134349b4385ae739f1efe403d5d3949ef92:
+
+  Merge branch 'selftests-drv-net-tso-fix-issues-with-tso-selftest' (2025-07-24 18:55:29 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git tags/linux-can-fixes-for-6.16-20250725
+
+for you to fetch changes up to 788199b73b6efe4ee2ade4d7457b50bb45493488:
+
+  can: peak_usb: fix USB FD devices potential malfunction (2025-07-25 12:09:19 +0200)
+
+----------------------------------------------------------------
+linux-can-fixes-for-6.16-20250725
+
+----------------------------------------------------------------
+Stephane Grosjean (1):
+      can: peak_usb: fix USB FD devices potential malfunction
+
+ drivers/net/can/usb/peak_usb/pcan_usb_fd.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
 
