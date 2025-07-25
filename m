@@ -1,148 +1,150 @@
-Return-Path: <netdev+bounces-210241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7930B12794
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 01:40:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A59D4B12796
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 01:42:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84E161C270EE
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 23:40:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59A083BC61F
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 23:42:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 112BA25FA2C;
-	Fri, 25 Jul 2025 23:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082A125F7A7;
+	Fri, 25 Jul 2025 23:42:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cMH+9VGy"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="u22ODKMx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCCBB258CE8;
-	Fri, 25 Jul 2025 23:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A84CF2522BE;
+	Fri, 25 Jul 2025 23:42:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753486830; cv=none; b=MIuRG+IgCjm9Gc8/+fLcVu6ftX5O8HL63k2PvC+Btw8lXdHf+2WQ8OBCNBEdXkSnBE3sTGax/OaMsjyqsRngVxzhNXfLjoBi2Lna1m4qt6GNnG1vb9FPRNOfaJfTd/j8fIWq678WVK2QeTE8ow0Ft/f1XxgYBa2KCd8/MGUHYUs=
+	t=1753486965; cv=none; b=j15tTlRSMSSBd7fxKXYkxAtHckyOa7LyBevUB2x+a9USOydT49lkkhBOcJRxkzAa2eDLTYHJxzZtDmBIUkElmMYgSp8Hr/Ivs8cWjSm1IVOCVxvZPmZ/YYl4LutJS6eBzUxjuhQ04I18QtzoB/o3lvG1M4UGKy+z7JieL5MbEIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753486830; c=relaxed/simple;
-	bh=ahsqIjIrQpQxjVjA8lLyeN8fLfZuvSJ7ZWoVl3+SKBI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=sWvi563f5U4K0gSbg29Z8AFEwgd/0vTEoaU+ZnOsVO0kyn455GgymyTbiawVO0bP0xz6/L+OaWvRiMefcoUdBogCJ0zqvP5NL7T9CjZ5qOArrCtopXSmlFVGA3XGWjFBizDw+h97vYz9dS2LTB6BXyrKMb9a1JMp4Wy4FOHAEnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cMH+9VGy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FFADC4CEE7;
-	Fri, 25 Jul 2025 23:40:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753486829;
-	bh=ahsqIjIrQpQxjVjA8lLyeN8fLfZuvSJ7ZWoVl3+SKBI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cMH+9VGypLdy9rbCoZw1WTA6ePO/rDZciaDkmKbgYkDjgp1Bj6k8238QWLBqkP86T
-	 9UvnEZrJE/BxCLG8ckB8DqimDXRPXpv62zK8ghOXIatmN1yYe/7+fdmiJjHQ9Mdsss
-	 vlK66D471B6uXs/B4n3j1uQIRkFKDU3Z1vx5FVl+M0nHqPpg3uHEBddzfS138qv+pu
-	 mKYx7gOz7wk15tnRImfE8B8q0iOwphh7vAhLK0BsG+kUrQIDpYQraUHGFJjS5BxNsp
-	 aqYYRMv1JmAB4Hgl2n4N6EBtZqXgXLjaX/k4xjOaM3ql4jNyA0EWJTiQUV0qHEQnsk
-	 UDFgeKd0PVjFg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C45383BF4E;
-	Fri, 25 Jul 2025 23:40:48 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1753486965; c=relaxed/simple;
+	bh=KUe9FcrjMaejAdUmcnM2eRUMGnf9x+1Fz4c6VOO6z2Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C3BrxteQuynZFfbh/IXjogUti+pFR8wrONZNjCKERPuCNZTFfPyrfvdZxU01iVcuxwldXkz//BJFpkz7HgSueGGeKIr59GWUZ3wOpFT1cjIkRqybsDPcCyrnjB2oFTqVpCt5O27JOgy7yO+SNT68U3saE65L4MNjuX1KNnh7N58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=u22ODKMx; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <5d7d1ff3-14cd-4c18-a180-3c99e784bbeb@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753486961;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7mJSyB47Hf1VSmZxpedRPHsm4zGk7oqWFstVKJE02/c=;
+	b=u22ODKMxQaOkLMz1JJUOKh5tZGHKxkO3dqz9oSNy2GKcbFIdhoSPN8k4iJYhoR2RrzwCxp
+	sl+dT7OLEAQS9OVdBuoL298oCdTx/XV5HE7eekIDJFZerzYoIFEMdr/qvd0cY0rFbQu/Rn
+	o7y6VbUKL4RBhfSW7pNEQRIzd9BtFBA=
+Date: Fri, 25 Jul 2025 16:42:29 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 01/27] can: janz-ican3: use sysfs_emit() in
- fwinfo_show()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175348684700.3447101.5219444722918500838.git-patchwork-notify@kernel.org>
-Date: Fri, 25 Jul 2025 23:40:47 +0000
-References: <20250725161327.4165174-2-mkl@pengutronix.de>
-In-Reply-To: <20250725161327.4165174-2-mkl@pengutronix.de>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- linux-can@vger.kernel.org, kernel@pengutronix.de,
- khaledelnaggarlinux@gmail.com
+Subject: Re: [PATCH bpf-next v2 0/4] Use correct destructor kfunc types
+Content-Language: en-GB
+To: Sami Tolvanen <samitolvanen@google.com>, bpf@vger.kernel.org
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250725214401.1475224-6-samitolvanen@google.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <20250725214401.1475224-6-samitolvanen@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello:
 
-This series was applied to netdev/net-next.git (main)
-by Marc Kleine-Budde <mkl@pengutronix.de>:
 
-On Fri, 25 Jul 2025 18:05:11 +0200 you wrote:
-> From: Khaled Elnaggar <khaledelnaggarlinux@gmail.com>
-> 
-> As recommended in Documentation/filesystems/sysfs.rst, show() callbacks
-> should use sysfs_emit() or sysfs_emit_at() to format values returned to
-> userspace. Replace scnprintf() with sysfs_emit() in fwinfo_show().
-> 
-> Signed-off-by: Khaled Elnaggar <khaledelnaggarlinux@gmail.com>
-> Link: https://patch.msgid.link/20250712133609.331904-1-khaledelnaggarlinux@gmail.com
-> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-> 
-> [...]
+On 7/25/25 2:44 PM, Sami Tolvanen wrote:
+> Hi folks,
+>
+> While running BPF self-tests with CONFIG_CFI_CLANG (Clang Control
+> Flow Integrity) enabled, I ran into a couple of CFI failures
+> in bpf_obj_free_fields() caused by type mismatches between
+> the btf_dtor_kfunc_t function pointer type and the registered
+> destructor functions.
+>
+> It looks like we can't change the argument type for these
+> functions to match btf_dtor_kfunc_t because the verifier doesn't
+> like void pointer arguments for functions used in BPF programs,
+> so this series fixes the issue by adding stubs with correct types
+> to use as destructors for each instance of this I found in the
+> kernel tree.
+>
+> The last patch changes btf_check_dtor_kfuncs() to enforce the
+> function type when CFI is enabled, so we don't end up registering
+> destructors that panic the kernel. Perhaps this is something we
+> could enforce even without CONFIG_CFI_CLANG?
+>
+> Sami
+>
+> ---
+> v2:
+> - Annotated the stubs with CFI_NOSEAL to fix issues with IBT
+>    sealing on x86.
+> - Changed __bpf_kfunc to explicit __used __retain.
+>
+> v1: https://lore.kernel.org/bpf/20250724223225.1481960-6-samitolvanen@google.com/
+>
+> ---
+> Sami Tolvanen (4):
+>    bpf: crypto: Use the correct destructor kfunc type
+>    bpf: net_sched: Use the correct destructor kfunc type
+>    selftests/bpf: Use the correct destructor kfunc type
+>    bpf, btf: Enforce destructor kfunc type with CFI
+>
+>   kernel/bpf/btf.c                                     | 7 +++++++
+>   kernel/bpf/crypto.c                                  | 9 ++++++++-
+>   net/sched/bpf_qdisc.c                                | 9 ++++++++-
+>   tools/testing/selftests/bpf/test_kmods/bpf_testmod.c | 9 ++++++++-
+>   4 files changed, 31 insertions(+), 3 deletions(-)
+>
+>
+> base-commit: 95993dc3039e29dabb9a50d074145d4cb757b08b
 
-Here is the summary with links:
-  - [net-next,01/27] can: janz-ican3: use sysfs_emit() in fwinfo_show()
-    https://git.kernel.org/netdev/net-next/c/21e9b7d11218
-  - [net-next,02/27] can: ti_hecc: fix -Woverflow compiler warning
-    https://git.kernel.org/netdev/net-next/c/7cae4d04717b
-  - [net-next,03/27] can: ti_hecc: Kconfig: add COMPILE_TEST
-    https://git.kernel.org/netdev/net-next/c/0e7896b95f2b
-  - [net-next,04/27] can: tscan1: Kconfig: add COMPILE_TEST
-    https://git.kernel.org/netdev/net-next/c/5323af351e75
-  - [net-next,05/27] can: tscan1: CAN_TSCAN1 can depend on PC104
-    https://git.kernel.org/netdev/net-next/c/b7d012e59627
-  - [net-next,06/27] docs: Fix kernel-doc error in CAN driver
-    https://git.kernel.org/netdev/net-next/c/2db7a52ca9ed
-  - [net-next,07/27] can: kvaser_pciefd: Add support to control CAN LEDs on device
-    https://git.kernel.org/netdev/net-next/c/44f0b630f67e
-  - [net-next,08/27] can: kvaser_pciefd: Add support for ethtool set_phys_id()
-    https://git.kernel.org/netdev/net-next/c/e74249a00bf1
-  - [net-next,09/27] can: kvaser_pciefd: Add intermediate variable for device struct in probe()
-    https://git.kernel.org/netdev/net-next/c/69a2cb633c27
-  - [net-next,10/27] can: kvaser_pciefd: Store the different firmware version components in a struct
-    https://git.kernel.org/netdev/net-next/c/5131f18ffa97
-  - [net-next,11/27] can: kvaser_pciefd: Store device channel index
-    https://git.kernel.org/netdev/net-next/c/d54b16b40dda
-  - [net-next,12/27] can: kvaser_pciefd: Split driver into C-file and header-file.
-    https://git.kernel.org/netdev/net-next/c/20bc87ae5149
-  - [net-next,13/27] can: kvaser_pciefd: Add devlink support
-    https://git.kernel.org/netdev/net-next/c/0d1b337b6d6c
-  - [net-next,14/27] can: kvaser_pciefd: Expose device firmware version via devlink info_get()
-    https://git.kernel.org/netdev/net-next/c/3d68ecf4173c
-  - [net-next,15/27] can: kvaser_pciefd: Add devlink port support
-    https://git.kernel.org/netdev/net-next/c/6271c8b82730
-  - [net-next,16/27] Documentation: devlink: add devlink documentation for the kvaser_pciefd driver
-    https://git.kernel.org/netdev/net-next/c/fed552478e6f
-  - [net-next,17/27] can: kvaser_usb: Add support to control CAN LEDs on device
-    https://git.kernel.org/netdev/net-next/c/478248f1bc0c
-  - [net-next,18/27] can: kvaser_usb: Add support for ethtool set_phys_id()
-    https://git.kernel.org/netdev/net-next/c/3d7a3de9eba4
-  - [net-next,19/27] can: kvaser_usb: Assign netdev.dev_port based on device channel index
-    https://git.kernel.org/netdev/net-next/c/c151b06a087a
-  - [net-next,20/27] can: kvaser_usb: Add intermediate variables
-    https://git.kernel.org/netdev/net-next/c/827158a67c86
-  - [net-next,21/27] can: kvaser_usb: Move comment regarding max_tx_urbs
-    https://git.kernel.org/netdev/net-next/c/7506789c5335
-  - [net-next,22/27] can: kvaser_usb: Store the different firmware version components in a struct
-    https://git.kernel.org/netdev/net-next/c/280eba332b36
-  - [net-next,23/27] can: kvaser_usb: Store additional device information
-    https://git.kernel.org/netdev/net-next/c/0020f2ba4099
-  - [net-next,24/27] can: kvaser_usb: Add devlink support
-    https://git.kernel.org/netdev/net-next/c/9505a83fc4e1
-  - [net-next,25/27] can: kvaser_usb: Expose device information via devlink info_get()
-    https://git.kernel.org/netdev/net-next/c/8720aed90c87
-  - [net-next,26/27] can: kvaser_usb: Add devlink port support
-    https://git.kernel.org/netdev/net-next/c/aa6a5c995e16
-  - [net-next,27/27] Documentation: devlink: add devlink documentation for the kvaser_usb driver
-    https://git.kernel.org/netdev/net-next/c/6304c4c8476d
+With this patch set and no CONFIG_CFI_CLANG in .config,
+the bpf selftests work okay. In bpf ci, CONFIG_CFI_CLANG
+is not enabled.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+But if enabling CONFIG_CFI_CLANG, this patch set fixed
+./test_progs run issue, but there are some test failures
+like
 
+===
+test_get_linfo:FAIL:check jited_linfo[1]:ffffffffa000d581 - ffffffffa000d558 > 39
+processed 4 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+#32/186  btf/line_info (No subprog):FAIL
+
+test_get_linfo:FAIL:check jited_linfo[1]:ffffffffa000dee5 - ffffffffa000debc > 39
+processed 4 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+#32/189  btf/line_info (No subprog. zero tailing line_info:FAIL
+
+...
+
+test_get_linfo:FAIL:check jited_linfo[1]:ffffffffa000e069 - ffffffffa000e040 > 38
+processed 9 insns (limit 1000000) max_states_per_insn 0 total_states 1 peak_states 1 mark_read 0
+#32/202  btf/line_info (dead subprog + dead start w/ move):FAIL
+#32      btf:FAIL
+===
+
+The failure probably not related to this patch, but rather related
+to CONFIG_CFI_CLANG itself. I will debug this separately.
 
 
